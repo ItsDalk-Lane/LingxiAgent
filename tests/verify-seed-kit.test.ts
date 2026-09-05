@@ -1,3 +1,4 @@
+import { writeKnowledgeVectorPackageFixture } from "./helpers/knowledge-vector-package-fixture.ts";
 import { generateKeyPairSync, sign as cryptoSign } from "crypto";
 import fs from "fs";
 import os from "os";
@@ -43,6 +44,7 @@ function makeServerTree(root: string, marker = "server") {
   fs.mkdirSync(path.join(outDir, "bundle"), { recursive: true });
   fs.writeFileSync(path.join(outDir, "bundle", "index.js"), `console.log(${JSON.stringify(marker)});\n`);
   fs.writeFileSync(path.join(outDir, "hana-server"), "#!/bin/sh\nexit 0\n", { mode: 0o755 });
+  writeKnowledgeVectorPackageFixture(outDir);
   return outDir;
 }
 
@@ -232,4 +234,27 @@ describe("verify-seed-kit: verifySeedKit (negative cases)", () => {
     expect(result.ok).toBe(false);
     expect(result.errors.some((e) => e.startsWith("manifest missing"))).toBe(true);
   });
+});
+
+it("签名和哈希都正确时，仍独立拒绝缺少目标原生扩展的种子", async () => {
+  const { createRequire } = await import("node:module");
+  const { createHash } = await import("node:crypto");
+  const { extract, packTree } = createRequire(import.meta.url)("../shared/artifact-core/ustar.cjs");
+  const root = makeTempDir("knowledge-seed-missing-native-");
+  const { artifactOutDir, platformArch, identity } = await buildValidKit(root);
+  const manifest = JSON.parse(fs.readFileSync(path.join(artifactOutDir, seedManifestFileName(platformArch)), "utf8"));
+  const archivePath = path.join(artifactOutDir, manifest.artifacts.server[platformArch].path);
+  const extracted = path.join(root, "extracted");
+  await extract(archivePath, extracted);
+  fs.unlinkSync(path.join(extracted, "node_modules/usearch/prebuilds/linux-x64/usearch.node"));
+  await packTree(extracted, archivePath);
+  const bytes = fs.readFileSync(archivePath);
+  tamperManifestField(artifactOutDir, platformArch, identity.privateKey, edited => {
+    edited.artifacts.server[platformArch].sha256 = createHash("sha256").update(bytes).digest("hex");
+    edited.artifacts.server[platformArch].size = bytes.length;
+  });
+  const result = await verifySeedKit({ artifactOutDir, platformArch, keyset: identity.keyset });
+  expect(result.ok).toBe(false);
+  expect(result.errors).toHaveLength(1);
+  expect(result.errors[0]).toMatch(/knowledge native runtime: .*linux-x64\/usearch.node/);
 });

@@ -1,0 +1,354 @@
+{
+  "schemaVersion": 1,
+  "task": "Generate a bilingual, user-facing release digest for LingxiAgent.",
+  "rules": [
+    "Use only facts from releaseNotes and commits.",
+    "Write concise zh and en content for normal users, not raw engineering changelog prose.",
+    "Group related commits into at most 12 items.",
+    "Set noUserFacingChanges=true only when there are no meaningful user-facing changes.",
+    "Every item must cite at least one source from the supplied commits or release notes.",
+    "Do not mention internal CI noise unless it directly affects installation or updates."
+  ],
+  "owner": "ItsDalk-Lane",
+  "repo": "LingxiAgent",
+  "tag": "v0.1.33",
+  "version": "0.1.33",
+  "previousTag": "3eab85891a1747c64064252804f70c0a3773f021",
+  "ref": "61ae60d1",
+  "generatedAt": "2026-09-04T10:36:47.536Z",
+  "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.33",
+  "releaseNotes": "",
+  "commitRange": "3eab85891a1747c64064252804f70c0a3773f021..61ae60d1",
+  "commits": [
+    {
+      "sha": "61ae60d1afe4f878ae638ff4de96d7e4f30bfefe",
+      "shortSha": "61ae60d1afe4",
+      "subject": "fix(ci): wait for desktop debug endpoint within startup deadline",
+      "body": ""
+    },
+    {
+      "sha": "842477183a4a295291d808497a564141642d7d13",
+      "shortSha": "842477183a4a",
+      "subject": "chore(audit): verify Windows desktop test cleanup",
+      "body": ""
+    },
+    {
+      "sha": "93764185d30f75048a5611c7b6854858448bd915",
+      "shortSha": "93764185d30f",
+      "subject": "fix(ci): close packaged desktop process tree before profile cleanup",
+      "body": ""
+    },
+    {
+      "sha": "4d52730ed5f4ec1ee7ac9de535094d4c3c44c684",
+      "shortSha": "4d52730ed5f4",
+      "subject": "chore(audit): verify serialized desktop preparation startup",
+      "body": ""
+    },
+    {
+      "sha": "aba59a5caf355053b91cf757c4088c2d44af2f55",
+      "shortSha": "aba59a5caf35",
+      "subject": "chore(knowledge): record compatible desktop lifecycle fingerprint",
+      "body": ""
+    },
+    {
+      "sha": "4ec98d0e185e3785f18cd40a7274c32ec9bff7e4",
+      "shortSha": "4ec98d0e185e",
+      "subject": "fix(desktop): serialize initial splash preparation navigation",
+      "body": ""
+    },
+    {
+      "sha": "4984e6fdb2cc86787094fd7effac99dace8e28c4",
+      "shortSha": "4984e6fdb2cc",
+      "subject": "chore(audit): verify platform startup and download cleanup fixes",
+      "body": ""
+    },
+    {
+      "sha": "75dd47d126490b85157f336c7969303bcddc3b95",
+      "shortSha": "75dd47d12649",
+      "subject": "fix(packaging): await download file closure before overflow cleanup",
+      "body": ""
+    },
+    {
+      "sha": "9c1373917c66c630b30e24d294e58ff5458df237",
+      "shortSha": "9c1373917c66",
+      "subject": "test(packaging): retain redacted desktop startup failure diagnostics",
+      "body": ""
+    },
+    {
+      "sha": "67c07b90f985db2c9a9709ff663eed0633f70adc",
+      "shortSha": "67c07b90f985",
+      "subject": "fix(ci): configure packaged Linux sandbox before startup verification",
+      "body": ""
+    },
+    {
+      "sha": "e296c0178e098f3d48f8cbeda4bea93c15385097",
+      "shortSha": "e296c0178e09",
+      "subject": "chore(audit): record verified P3 source before platform validation",
+      "body": ""
+    },
+    {
+      "sha": "c860054b9ee7f961abbb0cfebc2bbd9428ab6bd3",
+      "shortSha": "c860054b9ee7",
+      "subject": "refactor(knowledge): complete fast retrieval and Agent research architecture",
+      "body": ""
+    },
+    {
+      "sha": "22b4629252e9f8933f054e12975800fdb4fe3d8b",
+      "shortSha": "22b4629252e9",
+      "subject": "test(knowledge): gate completeness quality and research performance",
+      "body": ""
+    },
+    {
+      "sha": "f4e7a958564e1d40add27aa0ff6740a2e7028d8a",
+      "shortSha": "f4e7a958564e",
+      "subject": "fix(knowledge): await hierarchical fixture shutdown and verify test types",
+      "body": ""
+    },
+    {
+      "sha": "e0966fd3185ffc640b097172f821e01bc1245498",
+      "shortSha": "e0966fd3185f",
+      "subject": "feat(knowledge): retrieve hierarchically across sources sections and spans",
+      "body": ""
+    },
+    {
+      "sha": "50bc1ac013d78b45d040127fb9687de98eb5d30a",
+      "shortSha": "50bc1ac013d7",
+      "subject": "feat(knowledge): add source section and span retrieval grains",
+      "body": ""
+    },
+    {
+      "sha": "350c0588d62a65412f840e46e9bea5cbdce10d85",
+      "shortSha": "350c0588d62a",
+      "subject": "feat(knowledge): prove completeness over canonical coverage units",
+      "body": ""
+    },
+    {
+      "sha": "9f4302363e1daa78ce1130ca33d1e51bea47d847",
+      "shortSha": "9f4302363e1d",
+      "subject": "feat(knowledge): persist exact completeness coverage state",
+      "body": ""
+    },
+    {
+      "sha": "d17811341e0782d0f9190533dde366acb447a482",
+      "shortSha": "d17811341e07",
+      "subject": "feat(knowledge): derive explicit completeness policies from user intent",
+      "body": ""
+    },
+    {
+      "sha": "4fefe66ec3b4f6b23c78a09869a607886585740e",
+      "shortSha": "4fefe66ec3b4",
+      "subject": "chore(audit): verify Knowledge P2 stage",
+      "body": ""
+    },
+    {
+      "sha": "56dc1086aa06d0592c12e8a53eef9b8ea8546812",
+      "shortSha": "56dc1086aa06",
+      "subject": "chore(knowledge): close P2 Research Agent verification",
+      "body": ""
+    },
+    {
+      "sha": "d4292b2d0ba5029e7c4b1d1e2969b031f5c7b903",
+      "shortSha": "d4292b2d0ba5",
+      "subject": "fix(knowledge): preserve source startup and research tool coverage",
+      "body": ""
+    },
+    {
+      "sha": "725cf4a056419d29f86fd7e1dad6a0f78678951d",
+      "shortSha": "725cf4a05641",
+      "subject": "feat(knowledge): show Research Agent progress and verify research quality",
+      "body": ""
+    },
+    {
+      "sha": "06cc6179db6d14e23004dd6f5555728cfd0a3ba9",
+      "shortSha": "06cc6179db6d",
+      "subject": "refactor(knowledge): route detailed answers through Agent research",
+      "body": ""
+    },
+    {
+      "sha": "f4340d986a86f94c55e6b3c5a57cd328d940c02f",
+      "shortSha": "f4340d986a86",
+      "subject": "feat(knowledge): orchestrate bounded multi-round Agent research",
+      "body": ""
+    },
+    {
+      "sha": "faad0da24800bc0d0e606ba5e3ae48f7db313083",
+      "shortSha": "faad0da24800",
+      "subject": "feat(agent): add scope-safe isolated knowledge research surfaces",
+      "body": ""
+    },
+    {
+      "sha": "359aeb77bbe8cbeaddd4499c19f50d9e3412d867",
+      "shortSha": "359aeb77bbe8",
+      "subject": "feat(agent): add evidence-ledger research and delegation tools",
+      "body": ""
+    },
+    {
+      "sha": "4a95317c31484368ffbed948139142b7b106359d",
+      "shortSha": "4a95317c3148",
+      "subject": "feat(knowledge): validate all research evidence against frozen source text",
+      "body": ""
+    },
+    {
+      "sha": "c729f68aecced285138e98377748a3b77a6926e7",
+      "shortSha": "c729f68aecce",
+      "subject": "feat(knowledge): persist bounded research runs and evidence ledgers",
+      "body": ""
+    },
+    {
+      "sha": "c3033b05e09877bf425b3fd0e5ea9cf9b065c8da",
+      "shortSha": "c3033b05e098",
+      "subject": "feat(knowledge): define evidence-ledger research contracts",
+      "body": ""
+    },
+    {
+      "sha": "333c5112a7609306f7c4a9e52a287f8410249de8",
+      "shortSha": "333c5112a760",
+      "subject": "chore(audit): seal verified P1 stage and platform evidence",
+      "body": ""
+    },
+    {
+      "sha": "2387398589ec5494e1adb28b014dc84ebcf15a64",
+      "shortSha": "2387398589ec",
+      "subject": "chore(knowledge): close P1 unified retrieval verification",
+      "body": ""
+    },
+    {
+      "sha": "8295e5ff937cf9d3e49c082231188a01bd56122b",
+      "shortSha": "8295e5ff937c",
+      "subject": "chore(audit): verify P1 dispatch and Windows flush fixes",
+      "body": ""
+    },
+    {
+      "sha": "f86da54313e35a5868c6f045c9495717d61ba1bb",
+      "shortSha": "f86da54313e3",
+      "subject": "fix(knowledge): enforce dispatch intervals and flush ANN on Windows",
+      "body": ""
+    },
+    {
+      "sha": "f0e520552ae597230db7652bea7b9930c6053f7f",
+      "shortSha": "f0e520552ae5",
+      "subject": "docs(audit): verify P1 platform fixes without relaxing gates",
+      "body": ""
+    },
+    {
+      "sha": "c452a705f55286df3cd18373390819cf34d60fc5",
+      "shortSha": "c452a705f552",
+      "subject": "fix(knowledge): repair Windows shutdown and macOS Intel native linkage",
+      "body": ""
+    },
+    {
+      "sha": "c742a4236f8b293bab0aad36a55bfff585f03f5c",
+      "shortSha": "c742a4236f8b",
+      "subject": "docs(audit): verify P1 retrieval source and advance stage seal",
+      "body": ""
+    },
+    {
+      "sha": "9bee41dcfade7baad689d6979bbb3f8ede0b48ee",
+      "shortSha": "9bee41dcfade",
+      "subject": "chore(knowledge): close P1 unified retrieval verification",
+      "body": ""
+    },
+    {
+      "sha": "d32352534251c57735ad7b45a1e5dd5b8564a151",
+      "shortSha": "d32352534251",
+      "subject": "refactor(agent): share compiled scope and search data across knowledge tools",
+      "body": ""
+    },
+    {
+      "sha": "08bfd20d70bd0a040c717585b973a7da6ecde75a",
+      "shortSha": "08bfd20d70bd",
+      "subject": "feat(agent): expose bounded scope-safe knowledge search",
+      "body": ""
+    },
+    {
+      "sha": "4c6189e40ccb303cb98f2bf72a5ee0de5ab901d5",
+      "shortSha": "4c6189e40ccb",
+      "subject": "feat(knowledge): add rebuildable HNSW vector search with portable fallback",
+      "body": ""
+    },
+    {
+      "sha": "c1863fdc21f5d85e6bff48cd4956f76d2240d559",
+      "shortSha": "c1863fdc21f5",
+      "subject": "perf(knowledge): fuse globally and rerank once per model group",
+      "body": ""
+    },
+    {
+      "sha": "42520c06a6cb516e0b3eb297a1e488ab9f1a7b92",
+      "shortSha": "42520c06a6cb",
+      "subject": "perf(knowledge): deduplicate query embeddings across notebooks and requests",
+      "body": ""
+    },
+    {
+      "sha": "dac524c44d4012eaea71acc9f27714d55819d2f0",
+      "shortSha": "dac524c44d40",
+      "subject": "refactor(knowledge): centralize retrieval behind KnowledgeSearchService",
+      "body": ""
+    },
+    {
+      "sha": "d0789cf2b81e70e91037530f443d3f9a7e793bb5",
+      "shortSha": "d0789cf2b81e",
+      "subject": "feat(knowledge): persist query-ready chunk variant metadata",
+      "body": ""
+    },
+    {
+      "sha": "f9928d76a2996a3e31ad8b52a1eb94b6d8f8fea5",
+      "shortSha": "f9928d76a299",
+      "subject": "chore(audit): seal knowledge P0 verification",
+      "body": ""
+    },
+    {
+      "sha": "5c016df183ad207cf1ca33de274abb7a4eb10057",
+      "shortSha": "5c016df183ad",
+      "subject": "chore(knowledge): close P0 fast-path verification",
+      "body": ""
+    },
+    {
+      "sha": "480ef08b8ece625c69a3ba5754bbbee2997fe994",
+      "shortSha": "480ef08b8ece",
+      "subject": "feat(ui): expose local fast retrieval timing and execution path",
+      "body": ""
+    },
+    {
+      "sha": "9f32627de89bbf441c054bc26dbab155bdae946c",
+      "shortSha": "9f32627de89b",
+      "subject": "feat(knowledge): route fast references through the local-only pipeline",
+      "body": ""
+    },
+    {
+      "sha": "416bfb0d425eb6bf40604ac97045d90d255f6ab2",
+      "shortSha": "416bfb0d425e",
+      "subject": "refactor(knowledge): centralize evidence packing around canonical spans",
+      "body": ""
+    },
+    {
+      "sha": "53d02eb500a2c9246909f5f330f36808594c1578",
+      "shortSha": "53d02eb500a2",
+      "subject": "feat(knowledge): extract compact canonical evidence spans for fast answers",
+      "body": ""
+    },
+    {
+      "sha": "5e6871898689357ef716b535e28fcf03b8e6a398",
+      "shortSha": "5e6871898689",
+      "subject": "feat(knowledge): add deadline-bound local FTS fast path",
+      "body": ""
+    },
+    {
+      "sha": "3bfc402c1f216a1209d1576ab3ff10c86c2e9a86",
+      "shortSha": "3bfc402c1f21",
+      "subject": "feat(knowledge): compile frozen search scopes without query-time full scans",
+      "body": ""
+    },
+    {
+      "sha": "0586df726267f9f23f0a0dd7a354518235fea77f",
+      "shortSha": "0586df726267",
+      "subject": "refactor(knowledge): introduce explicit fast and research execution policies",
+      "body": ""
+    },
+    {
+      "sha": "eef41dd6be1035547410d23859ec64490e0adf2b",
+      "shortSha": "eef41dd6be10",
+      "subject": "docs(knowledge): establish P0-P3 refactor baseline",
+      "body": ""
+    }
+  ]
+}

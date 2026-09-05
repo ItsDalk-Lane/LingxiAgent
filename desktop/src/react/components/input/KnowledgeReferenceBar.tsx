@@ -1,13 +1,13 @@
 import { memo, useEffect, useState } from 'react';
 import { useI18n } from '../../hooks/use-i18n';
 import { useStore } from '../../stores';
-import { selectKnowledgeRefsForSession, type KnowledgeReferenceMode } from '../../stores/knowledge-reference-slice';
+import { selectKnowledgeRefsForSession } from '../../stores/knowledge-reference-slice';
 import { listKnowledgeNotebooks, type KnowledgeNotebookDto } from '../knowledge/knowledge-api';
 import styles from './InputArea.module.css';
 
 /**
  * 输入框上方的知识库引用条（类似附件条）：已引用笔记本 chip（× 可移除）
- * + 快速/详细回答模式切换。无引用时整体不渲染。
+ * 引用的资料由当前聊天按需检索和阅读。无引用时整体不渲染。
  *
  * 笔记本名称解析顺序：最新列表 → slice 名称缓存 → 原始 id（脏 id 兜底可见、可移除）。
  */
@@ -17,7 +17,6 @@ export const KnowledgeReferenceBar = memo(function KnowledgeReferenceBar({ sessi
   const { t } = useI18n();
   const refs = useStore(s => selectKnowledgeRefsForSession(s, sessionKey));
   const removeKnowledgeNotebook = useStore(s => s.removeKnowledgeNotebook);
-  const setKnowledgeReferenceMode = useStore(s => s.setKnowledgeReferenceMode);
   const [notebooks, setNotebooks] = useState<KnowledgeNotebookDto[] | null>(null);
 
   const ids = refs?.notebookIds;
@@ -63,20 +62,6 @@ export const KnowledgeReferenceBar = memo(function KnowledgeReferenceBar({ sessi
           </span>
         );
       })}
-      <span className={styles['knowledge-ref-mode']} role="group" aria-label={t('input.knowledgeModeLabel')}>
-        {(['fast', 'detailed'] as KnowledgeReferenceMode[]).map((mode) => (
-          <button
-            key={mode}
-            type="button"
-            className={`${styles['knowledge-ref-mode-btn']}${refs.mode === mode ? ` ${styles.active}` : ''}`}
-            title={t(mode === 'fast' ? 'input.knowledgeModeFastHint' : 'input.knowledgeModeDetailedHint')}
-            aria-pressed={refs.mode === mode}
-            onClick={() => setKnowledgeReferenceMode(sessionKey, mode)}
-          >
-            {t(mode === 'fast' ? 'input.knowledgeModeFast' : 'input.knowledgeModeDetailed')}
-          </button>
-        ))}
-      </span>
     </div>
   );
 });

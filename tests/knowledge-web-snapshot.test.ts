@@ -18,8 +18,8 @@ function htmlResponse(bytes = Buffer.from("<h1>Public</h1>", "utf8")) {
   };
 }
 
-afterEach(() => {
-  for (const manager of managers.splice(0)) manager.close();
+afterEach(async () => {
+  for (const manager of managers.splice(0)) await manager.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -176,7 +176,7 @@ describe("网页与粘贴来源冻结", () => {
       endOffset: 15,
     });
     expect(fetchWebSnapshot).toHaveBeenCalledTimes(1);
-    manager.close();
+    await manager.close();
     managers.splice(managers.indexOf(manager), 1);
 
     const restarted = new KnowledgeManager({ lingxiHome });

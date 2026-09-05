@@ -1,0 +1,25 @@
+{
+  "question": "检查全文，找出所有反例。",
+  "query": "采购",
+  "expectedText": [
+    "提前审批",
+    "事后补办",
+    "月度审批"
+  ],
+  "expectedConflict": true,
+  "expectedUnavailable": 0,
+  "notebooks": [
+    {
+      "key": "selected",
+      "name": "完整性资料",
+      "selected": true,
+      "sources": [
+        {
+          "key": "main",
+          "name": "核查原文",
+          "text": "# 一般规则\n所有采购原则上提前审批。\n\n# 紧急情况\n反例：紧急采购允许事后补办审批。\n\n# 小额情况\n反例：小额采购允许集中月度审批。"
+        }
+      ]
+    }
+  ]
+}

@@ -1753,8 +1753,11 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     const clickedQuotes = clickState.quotedSelections.map(quote => ({ ...quote }));
     // 知识库引用在点击发送时快照（引用持续生效，每条消息显式携带；服务端无状态）
     const clickedKnowledgeRefKey = clickedSessionPath ?? (clickedPendingDraftId ? HOME_DRAFT_KEY : null);
-    const clickedKnowledgeRefs = clickedKnowledgeRefKey
+    const selectedKnowledgeRefs = clickedKnowledgeRefKey
       ? selectKnowledgeRefsForSession(clickState, clickedKnowledgeRefKey)
+      : null;
+    const clickedKnowledgeRefs = selectedKnowledgeRefs
+      ? { ...selectedKnowledgeRefs, mode: 'auto' as const }
       : null;
     const clickedDocContextAttached = docContextAttached;
     const clickedDoc = currentDoc ? { ...currentDoc } : null;

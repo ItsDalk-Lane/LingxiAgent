@@ -38,6 +38,7 @@ function writeFile(root: string, relative: string, content = relative) {
 function createInputs(root: string) {
   const serverDir = path.join(root, "dist-server", "win-x64");
   for (const relative of REQUIRED_STANDALONE_SERVER_FILES) writeFile(serverDir, relative);
+  fs.writeFileSync(path.join(serverDir, "node_modules/usearch/package.json"), JSON.stringify({ version: "2.26.0" }));
   writeFile(serverDir, "package.json", '{"version":"1.2.3"}\n');
   writeFile(serverDir, "lib/runtime.json", "server source must remain unchanged\n");
 

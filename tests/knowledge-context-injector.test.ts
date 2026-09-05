@@ -1,3 +1,4 @@
+import { KNOWLEDGE_EVIDENCE_BUDGET } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -26,9 +27,9 @@ import {
   groupFamiliesById,
   parseQuestionDecomposition,
   type DecomposeModel,
-} from "../lib/knowledge/knowledge-context-injector.ts";
-import { KNOWLEDGE_EVIDENCE_BUDGET, KNOWLEDGE_FUSION_BUDGET } from "../lib/knowledge/knowledge-query-service.ts";
-import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+} from "./fixtures/knowledge-legacy/legacy-knowledge-context-injector.ts";
+import { KNOWLEDGE_FUSION_BUDGET } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
+import { KnowledgeManager } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 import type { RetrieveForNotebooksResult } from "../lib/knowledge/knowledge-query-service.ts";
 import { UNTRUSTED_EXTERNAL_CONTENT_MARKER } from "../lib/security/injection-scan.ts";
 
@@ -41,8 +42,8 @@ function tempHome() {
   return dir;
 }
 
-afterEach(() => {
-  for (const manager of managers.splice(0)) manager.close();
+afterEach(async () => {
+  for (const manager of managers.splice(0)) await manager.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
 

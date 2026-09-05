@@ -143,6 +143,19 @@ describe('知识过程 → 合成工具卡（2026-08-31 四轮）', () => {
     ]);
   });
 
+  it('本地快速路径只有检索卡与回答卡，不产生拆解、滚动阅读或补充检索卡', () => {
+    handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'fast-local', kind: 'search', phase: 'start', detail: 'fast_local' });
+    handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'fast-local', kind: 'search', phase: 'done', detail: 'fast_local', hits: 3, elapsedMs: 28.4 });
+    handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'answer', kind: 'note', phase: 'start', detail: 'answer' });
+    const calls = vi.mocked(streamBufferManager.handle).mock.calls.map(call => call[0]);
+    expect(calls).toEqual([
+      { type: 'tool_start', sessionPath: PATH, id: 'kt-fast-local', name: 'knowledge_local_search' },
+      { type: 'tool_end', sessionPath: PATH, id: 'kt-fast-local', success: true, resultNote: 'chat.knowledgeLocalEvidenceFound' },
+      { type: 'tool_start', sessionPath: PATH, id: 'kt-answer', name: 'knowledge_answer' },
+    ]);
+    handleServerMessage({ type: 'text_delta', sessionPath: PATH, streamId: 'fast-stream', delta: '答' });
+  });
+
   it('滚动阅读：每部分一张卡，第 k 部分开始时收尾第 k-1 张', () => {
     handleServerMessage({ type: 'knowledge_rollup_progress', sessionPath: PATH, current: 1, total: 3 });
     handleServerMessage({ type: 'knowledge_rollup_progress', sessionPath: PATH, current: 2, total: 3 });

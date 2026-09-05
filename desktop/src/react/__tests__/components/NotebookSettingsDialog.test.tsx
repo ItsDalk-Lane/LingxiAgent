@@ -80,7 +80,7 @@ describe('NotebookSettingsDialog', () => {
     cleanup();
   });
 
-  it('模型下拉无全局继承选项；分块尺寸只读展示自动计算值', async () => {
+  it('模型下拉无全局继承选项；分块尺寸可设置并提示当前默认值', async () => {
     render(<NotebookSettingsDialog notebook={notebook} onClose={() => {}} onSaved={() => {}} />);
 
     // 空选项是"未配置"（不再有全局继承文案）
@@ -88,10 +88,13 @@ describe('NotebookSettingsDialog', () => {
     expect((await screen.findAllByRole('option', { name: '未配置' })).length).toBeGreaterThanOrEqual(2);
     expect(screen.queryByRole('option', { name: /继承全局/ })).not.toBeInTheDocument();
 
-    // 分块尺寸只读展示生效值（server 的 chunkTargetCharsEffective）
-    expect(screen.getByText('6553')).toBeInTheDocument();
-    // 不存在分块数字输入框
-    expect(screen.queryByRole('spinbutton', { name: '分块大小（字符）' })).not.toBeInTheDocument();
+    const size = screen.getByRole('spinbutton', { name: '分块大小（字符）' });
+    expect(size).toHaveValue(null);
+    fireEvent.change(size, { target: { value: '800' } });
+    fireEvent.click(screen.getByRole('button', { name: '保存' }));
+    await waitFor(() => expect(knowledgeApi.updateKnowledgeNotebookSettings).toHaveBeenCalledWith(
+      'notebook-a', expect.objectContaining({ chunkTargetChars: 800 }),
+    ));
   });
 
   it('检索数量控件已移除：界面无该行，保存原样回传库内 retrievalTopK', async () => {
@@ -110,6 +113,7 @@ describe('NotebookSettingsDialog', () => {
       {
         embeddingModelRef: null,
         rerankModelRef: null,
+        chunkTargetChars: null,
         retrievalTopK: null,
         vectorRetentionDays: null,
       },

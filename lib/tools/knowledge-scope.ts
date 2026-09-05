@@ -18,7 +18,7 @@ import type { KnowledgeBlock, KnowledgeTurnScope, KnowledgeTurnScopeSource } fro
 /** 工具执行会话的 scope 归属上下文（Pi SDK execute 第 5 参 ctx 的解析结果）。 */
 export interface KnowledgeToolSessionContext {
   sessionPath: string | null;
-  parentSessionPath: string | null;
+  scopeOwnerSessionPath: string | null;
 }
 
 export function knowledgeScopeViolation(message: string): KnowledgeError {
@@ -42,12 +42,15 @@ export function requireKnowledgeSessionContext(
       "this knowledge tool requires a session-bound KnowledgeTurnScope context",
     );
   }
+  if (!sessionContext.scopeOwnerSessionPath) {
+    throw knowledgeScopeViolation("Knowledge scope owner must be resolved from session manifests");
+  }
   return sessionContext.sessionPath;
 }
 
 /**
  * scope 归属校验（服务端复核，不信任模型传入的 scopeId）：
- * 存在、active、属于当前 studio、属于当前会话（或其 subagent 父会话）。
+ * 存在、active、属于当前 studio、属于当前会话或经真实祖先链核验的范围拥有者。
  * 通过返回完整 scope（含冻结源集合）。
  */
 export function resolveKnowledgeTurnScope(input: {
@@ -66,8 +69,7 @@ export function resolveKnowledgeTurnScope(input: {
     throw knowledgeScopeViolation("Knowledge turn scope is closed (superseded by a newer turn)");
   }
   const ownsScope = sameKnowledgeSessionPath(scope.sessionPath, input.sessionContext.sessionPath!)
-    || (input.sessionContext.parentSessionPath != null
-      && sameKnowledgeSessionPath(scope.sessionPath, input.sessionContext.parentSessionPath));
+    || sameKnowledgeSessionPath(scope.sessionPath, input.sessionContext.scopeOwnerSessionPath!);
   if (!ownsScope) {
     throw knowledgeScopeViolation("Knowledge turn scope does not belong to this session");
   }
@@ -112,4 +114,138 @@ export function knowledgeBlockHeadingPath(block: KnowledgeBlock): string[] {
   const raw = (block?.locator as Record<string, unknown> | undefined)?.headingPath;
   if (!Array.isArray(raw)) return [];
   return raw.filter((entry): entry is string => typeof entry === "string" && entry.trim().length > 0);
+}
+
+export interface KnowledgeRawReadRange {
+  blockId: string;
+  startOffset?: number;
+  endOffset?: number;
+}
+
+/** 引用由程序直接绑定冻结原文，模型只需使用返回的链接。 */
+export function createKnowledgeToolCitation(input: {
+  knowledge: KnowledgeManager;
+  studioId: string;
+  scope: KnowledgeTurnScope;
+  sourceId: string;
+  block: KnowledgeBlock;
+  startOffset: number;
+  endOffset: number;
+}) {
+  // 检索过程中可能开始了下一轮；签发前重新查库，不能沿用等待前的 active 状态。
+  const current = input.knowledge.getTurnScope({ scopeId: input.scope.id });
+  if (!current || current.status !== "active" || current.studioId !== input.studioId
+    || !sameKnowledgeSessionPath(current.sessionPath, input.scope.sessionPath)) {
+    throw knowledgeScopeViolation("Knowledge turn scope closed before citation issuance");
+  }
+  const frozen = requireKnowledgeScopeSource(current, input.sourceId);
+  const original = requireKnowledgeScopeSource(input.scope, input.sourceId);
+  if (frozen.parseArtifactId !== input.block.parseArtifactId
+    || frozen.parseArtifactId !== original.parseArtifactId
+    || frozen.contentSnapshotId !== original.contentSnapshotId) {
+    throw knowledgeScopeViolation("Citation block is outside the frozen source");
+  }
+  const citation = input.knowledge.createCitation({ studioId: input.studioId,
+    parseArtifactId: input.block.parseArtifactId, blockId: input.block.id,
+    startOffset: input.startOffset, endOffset: input.endOffset });
+  return {
+    citationId: citation.id,
+    citationMarkdown: `[来源 · 原文](#knowledge-citation-${citation.id})`,
+  };
+}
+
+/** 原文只在 spans 中出现一次；位置以去重后的连续原块范围计数，不包含人工分隔符。 */
+export function readKnowledgeCitationPage(input: {
+  knowledge: KnowledgeManager;
+  studioId: string;
+  scope: KnowledgeTurnScope;
+  sourceId: string;
+  parseArtifactId: string;
+  ranges: KnowledgeRawReadRange[];
+  offset?: number;
+  maxChars?: number;
+  maxBytes?: number;
+  signal?: AbortSignal;
+}) {
+  const frozen = requireKnowledgeScopeSource(input.scope, input.sourceId);
+  if (frozen.parseArtifactId !== input.parseArtifactId) {
+    throw knowledgeScopeViolation("Read positions are outside the frozen source");
+  }
+  const offset = input.offset ?? 0;
+  const maxChars = input.maxChars ?? 6000;
+  if (!Number.isSafeInteger(offset) || offset < 0 || !Number.isSafeInteger(maxChars)
+    || maxChars < 256 || maxChars > 8000) {
+    throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "offset must be non-negative; maxChars must be an integer from 256 to 8000");
+  }
+  input.signal?.throwIfAborted();
+  const blocks = new Map(input.knowledge.store.getArtifactBlocksByIds({
+    studioId: input.studioId, parseArtifactId: input.parseArtifactId,
+    blockIds: input.ranges.map(range => range.blockId),
+  }).map(block => [block.id, block] as const));
+  const ordered = input.ranges.map(range => {
+    const block = blocks.get(range.blockId);
+    const start = range.startOffset ?? 0;
+    const end = range.endOffset ?? block?.text.length ?? 0;
+    if (!block || !Number.isSafeInteger(start) || !Number.isSafeInteger(end)
+      || start < 0 || end < start || end > block.text.length) {
+      throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Read range is outside its frozen raw block");
+    }
+    return { block, start, end };
+  }).sort((left, right) => left.block.ordinal - right.block.ordinal || left.start - right.start);
+  const ranges: typeof ordered = [];
+  for (const range of ordered) {
+    if (range.end === range.start) continue;
+    const previous = ranges.at(-1);
+    if (previous?.block.id === range.block.id && range.start <= previous.end) {
+      previous.end = Math.max(previous.end, range.end);
+    } else ranges.push({ ...range });
+  }
+  const totalChars = ranges.reduce((sum, range) => sum + range.end - range.start, 0);
+  if (offset > totalChars) throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "offset exceeds the selected original text");
+  const spans: Array<{
+    blockId: string; blockOrdinal: number; startOffset: number; endOffset: number;
+    headingPath: string[]; pageNumber: number | null; text: string;
+    citationId: string; citationMarkdown: string;
+  }> = [];
+  let skip = offset;
+  let returnedChars = 0;
+  let remainingBytes = input.maxBytes ?? 24_000;
+  for (const range of ranges) {
+    input.signal?.throwIfAborted();
+    const length = range.end - range.start;
+    if (skip >= length) { skip -= length; continue; }
+    const start = range.start + skip;
+    skip = 0;
+    if (start > 0 && /[\uDC00-\uDFFF]/u.test(range.block.text[start])
+      && /[\uD800-\uDBFF]/u.test(range.block.text[start - 1])) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "offset must not split a Unicode character");
+    }
+    const metadata = { blockId: range.block.id, blockOrdinal: range.block.ordinal,
+      startOffset: start, headingPath: knowledgeBlockHeadingPath(range.block),
+      pageNumber: typeof range.block.locator.pageNumber === "number" ? range.block.locator.pageNumber : null };
+    let low = 0, high = Math.min(range.end - start, maxChars - returnedChars);
+    // 为真实引用编号及链接留空间，保证长原文不会触发外层工具的整段截断。
+    while (low < high) {
+      const count = Math.ceil((low + high) / 2);
+      const bytes = Buffer.byteLength(JSON.stringify({ ...metadata, endOffset: start + count,
+        text: range.block.text.slice(start, start + count) }), "utf8") + 512;
+      if (bytes <= remainingBytes) low = count;
+      else high = count - 1;
+    }
+    let end = start + low;
+    if (end < range.block.text.length && /[\uDC00-\uDFFF]/u.test(range.block.text[end])
+      && /[\uD800-\uDBFF]/u.test(range.block.text[end - 1])) end--;
+    if (end <= start) break;
+    const span = { ...metadata, endOffset: end, text: range.block.text.slice(start, end),
+      ...createKnowledgeToolCitation({ ...input, block: range.block, startOffset: start, endOffset: end }) };
+    spans.push(span);
+    returnedChars += end - start;
+    remainingBytes -= Buffer.byteLength(JSON.stringify(span), "utf8") + 1;
+    if (end < range.end || returnedChars >= maxChars) break;
+  }
+  if (offset < totalChars && returnedChars === 0) {
+    throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "The selected source metadata exceeds this read page budget; read the block directly");
+  }
+  const nextOffset = offset + returnedChars < totalChars ? offset + returnedChars : null;
+  return { spans, offset, returnedChars, totalChars, truncated: nextOffset !== null, nextOffset };
 }

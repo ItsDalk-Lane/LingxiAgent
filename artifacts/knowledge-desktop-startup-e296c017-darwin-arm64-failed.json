@@ -1,0 +1,12 @@
+{
+  "platform": "darwin",
+  "arch": "arm64",
+  "startedAt": "2026-09-04T08:05:19.405Z",
+  "status": "failed",
+  "packaged": true,
+  "rendererReady": false,
+  "serverReady": false,
+  "error": "Packaged desktop startup reported a failed renderer phase",
+  "durationMs": 2907.785125,
+  "finishedAt": "2026-09-04T08:05:22.315Z"
+}

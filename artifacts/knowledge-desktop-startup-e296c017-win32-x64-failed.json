@@ -1,0 +1,12 @@
+{
+  "platform": "win32",
+  "arch": "x64",
+  "startedAt": "2026-09-04T08:09:58.250Z",
+  "status": "failed",
+  "packaged": true,
+  "rendererReady": false,
+  "serverReady": false,
+  "error": "Packaged desktop startup reported a failed renderer phase",
+  "durationMs": 798.2888,
+  "finishedAt": "2026-09-04T08:09:59.051Z"
+}

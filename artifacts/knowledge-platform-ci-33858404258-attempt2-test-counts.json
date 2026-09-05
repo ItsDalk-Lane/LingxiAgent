@@ -1,0 +1,23 @@
+{
+  "runId": 33858404258,
+  "headSha": "842477183a4a295291d808497a564141642d7d13",
+  "runAttempt": 2,
+  "source": "gh run view 33858404258 --attempt 2 --log",
+  "lines": [
+    "build (macos-15-intel, darwin, dmg, x64)\tRun Knowledge platform smoke\t2026-09-04T10:14:09.7989320Z  Test Files  19 passed (19)",
+    "build (macos-15-intel, darwin, dmg, x64)\tRun Knowledge platform smoke\t2026-09-04T10:14:09.8035680Z       Tests  151 passed (151)",
+    "build (macos-15-intel, darwin, dmg, x64)\tRun Knowledge platform smoke\t2026-09-04T10:14:09.8304150Z    Duration  105.73s (transform 12.20s, setup 482ms, import 59.38s, tests 39.03s, environment 4ms)",
+    "quality-gate\tUNKNOWN STEP\t2026-09-04T09:46:39.3519596Z  Test Files  1357 passed | 1 skipped (1358)",
+    "quality-gate\tUNKNOWN STEP\t2026-09-04T09:46:39.3587087Z       Tests  13736 passed | 17 skipped (13753)",
+    "quality-gate\tUNKNOWN STEP\t2026-09-04T09:46:39.3603504Z    Duration  634.18s (transform 45.99s, setup 18.42s, import 636.94s, tests 771.00s, environment 236.25s)",
+    "build (macos-15, darwin, dmg, arm64)\tUNKNOWN STEP\t2026-09-04T09:44:30.0769020Z  Test Files  19 passed (19)",
+    "build (macos-15, darwin, dmg, arm64)\tUNKNOWN STEP\t2026-09-04T09:44:30.0782600Z       Tests  151 passed (151)",
+    "build (macos-15, darwin, dmg, arm64)\tUNKNOWN STEP\t2026-09-04T09:44:30.0785860Z    Duration  45.75s (transform 5.26s, setup 189ms, import 24.19s, tests 19.11s, environment 1ms)",
+    "build (windows-2025, win32, nsis, x64)\tUNKNOWN STEP\t2026-09-04T09:45:21.3447857Z  Test Files  19 passed (19)",
+    "build (windows-2025, win32, nsis, x64)\tUNKNOWN STEP\t2026-09-04T09:45:21.3449076Z       Tests  151 passed (151)",
+    "build (windows-2025, win32, nsis, x64)\tUNKNOWN STEP\t2026-09-04T09:45:21.3452453Z    Duration  83.40s (transform 6.02s, setup 263ms, import 28.49s, tests 51.42s, environment 2ms)",
+    "build (ubuntu-24.04, linux, AppImage, x64)\tUNKNOWN STEP\t2026-09-04T09:44:11.6626855Z  Test Files  19 passed (19)",
+    "build (ubuntu-24.04, linux, AppImage, x64)\tUNKNOWN STEP\t2026-09-04T09:44:11.6627497Z       Tests  151 passed (151)",
+    "build (ubuntu-24.04, linux, AppImage, x64)\tUNKNOWN STEP\t2026-09-04T09:44:11.6628684Z    Duration  43.93s (transform 2.54s, setup 118ms, import 10.80s, tests 31.59s, environment 1ms)"
+  ]
+}

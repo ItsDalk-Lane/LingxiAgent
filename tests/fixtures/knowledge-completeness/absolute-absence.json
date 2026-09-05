@@ -1,0 +1,24 @@
+{
+  "question": "检查全文，术语超导协议是否从未出现？",
+  "query": "超导协议",
+  "expectedText": [
+    "普通配送协议",
+    "人工登记"
+  ],
+  "expectedConflict": false,
+  "expectedUnavailable": 0,
+  "notebooks": [
+    {
+      "key": "selected",
+      "name": "完整性资料",
+      "selected": true,
+      "sources": [
+        {
+          "key": "main",
+          "name": "核查原文",
+          "text": "# 规则\n本册讨论普通配送协议。\n\n# 附录\n仓库采用人工登记。"
+        }
+      ]
+    }
+  ]
+}

@@ -10,6 +10,8 @@ import styles from './KnowledgePage.module.css';
 
 const tr = (key: string, vars?: Record<string, string | number>) => window.t?.(key, vars) ?? key;
 
+const CHUNK_TARGET_CHARS_MIN = 100;
+const CHUNK_TARGET_CHARS_MAX = 100_000;
 const VECTOR_RETENTION_DAYS_MIN = 1;
 const VECTOR_RETENTION_DAYS_MAX = 3650;
 
@@ -87,14 +89,16 @@ export interface NotebookSettingsDialogProps {
 
 /**
  * 笔记本级配置弹窗（v8 语义）：嵌入/重排模型仅在笔记本级配置（无全局继承）；
- * 分块尺寸按嵌入模型上下文 ×80% 自动计算（只读展示生效值，遗留显式值仅作
- * 覆盖）；检索数量支持"无上限（默认）"与"最大召回数"两种模式。
+ * 分块目标按字符设置，保存后后台重建；已有回答的引用保留。
  */
 export function NotebookSettingsDialog({ notebook, onClose, onSaved }: NotebookSettingsDialogProps) {
   const [prefs, setPrefs] = useState<ModelPreferences | null>(null);
   const [prefsFailed, setPrefsFailed] = useState(false);
   const [embeddingValue, setEmbeddingValue] = useState(() => refValue(notebook.config.embeddingModelRef));
   const [rerankValue, setRerankValue] = useState(() => refValue(notebook.config.rerankModelRef));
+  const [chunkTarget, setChunkTarget] = useState(
+    notebook.config.chunkTargetChars == null ? '' : String(notebook.config.chunkTargetChars),
+  );
   // 检索数量（retrievalTopK）控件已移除（2026-08-30）：候选预算链对每层独立封顶
   // （生成 60 / 融合 60 / 证据锚点随注入预算伸缩），该设置 ≥60 后无实际影响，
   // 保留只会误导；保存时原样回传库内现值，存量配置不受影响。
@@ -133,6 +137,10 @@ export function NotebookSettingsDialog({ notebook, onClose, onSaved }: NotebookS
   };
 
   const handleSave = async () => {
+    if (!validateNumber(chunkTarget, CHUNK_TARGET_CHARS_MIN, CHUNK_TARGET_CHARS_MAX)) {
+      setFormError(tr('knowledge.settingsInvalidNumber', { min: CHUNK_TARGET_CHARS_MIN, max: CHUNK_TARGET_CHARS_MAX }));
+      return;
+    }
     if (!retentionKeepForever && !validateNumber(retentionDays, VECTOR_RETENTION_DAYS_MIN, VECTOR_RETENTION_DAYS_MAX)) {
       setFormError(tr('knowledge.settingsInvalidNumber', { min: VECTOR_RETENTION_DAYS_MIN, max: VECTOR_RETENTION_DAYS_MAX }));
       return;
@@ -143,6 +151,7 @@ export function NotebookSettingsDialog({ notebook, onClose, onSaved }: NotebookS
       await updateKnowledgeNotebookSettings(notebook.id, {
         embeddingModelRef: resolveRef(embeddingValue, notebook.config.embeddingModelRef),
         rerankModelRef: resolveRef(rerankValue, notebook.config.rerankModelRef),
+        chunkTargetChars: chunkTarget.trim() === '' ? null : Number(chunkTarget),
         retrievalTopK: notebook.config.retrievalTopK,
         vectorRetentionDays: retentionKeepForever || retentionDays.trim() === '' ? null : Number(retentionDays),
       });
@@ -153,9 +162,6 @@ export function NotebookSettingsDialog({ notebook, onClose, onSaved }: NotebookS
       setSaving(false);
     }
   };
-
-  const effectiveChunkTarget = notebook.chunkTargetCharsEffective
-    ?? (notebook.config.chunkTargetChars != null ? notebook.config.chunkTargetChars : null);
 
   return (
     <ConfirmDialog
@@ -191,9 +197,9 @@ export function NotebookSettingsDialog({ notebook, onClose, onSaved }: NotebookS
         />
         <label className={styles.settingsRow}>
           <span className={styles.settingsLabel}>{tr('knowledge.settingsChunkTargetChars')}</span>
-          <output className={styles.settingsInput} aria-label={tr('knowledge.settingsChunkTargetChars')}>
-            {effectiveChunkTarget ?? tr('knowledge.settingsChunkAutoFallback')}
-          </output>
+          <input className={styles.settingsInput} type="number" min={CHUNK_TARGET_CHARS_MIN} max={CHUNK_TARGET_CHARS_MAX}
+            step={1} value={chunkTarget} onChange={event => setChunkTarget(event.target.value)}
+            placeholder={tr('knowledge.settingsChunkAutoFallback')} aria-label={tr('knowledge.settingsChunkTargetChars')} />
           <span className={styles.settingsHint}>{tr('knowledge.settingsChunkHint')}</span>
         </label>
         <div className={styles.settingsRow}>

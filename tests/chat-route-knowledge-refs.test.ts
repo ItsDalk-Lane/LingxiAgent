@@ -39,6 +39,44 @@ function sentErrors(ws: { send: ReturnType<typeof vi.fn> }) {
     .filter((msg) => msg?.type === "error");
 }
 
+describe("调查过程广播只交付有限宿主元数据", () => {
+  const base = { runId: "research-run", scopeId: "frozen-scope", rounds: 1, maxRounds: 4, searchCalls: 2, readCalls: 3,
+    delegatedAgents: 2, needsTotal: 2, needsSupported: 1, needsPartial: 1, needsConflicted: 0, unresolvedNeedIds: ["need-b"] };
+  const updates = [
+    { type: "knowledge_research_started" }, { type: "knowledge_research_plan_updated" },
+    { type: "knowledge_research_round_started", roundId: "round-a", round: 1 },
+    { type: "knowledge_research_worker_started", taskId: "task-a", label: "核对日期" },
+    { type: "knowledge_research_worker_completed", taskId: "task-a", label: "核对日期", status: "completed" },
+    { type: "knowledge_research_ledger_updated", phase: "reviewing" },
+    { type: "knowledge_research_completed", status: "partial", stopReason: "round_budget_exhausted" },
+  ];
+  it("七类过程正确转发到主会话，附带的推理和工具正文一律不进入广播", () => {
+    const { hub, ws } = setup();
+    const listener = hub.subscribe.mock.calls[0][0];
+    for (const update of updates) listener({ ...base, ...update, rawText: "模型推理", toolOutput: "SELECT正文",
+      needs: [{ claim: "内部需求正文" }], receiptIds: ["内部凭据"] }, "/sessions/test.jsonl");
+    const sent = ws.send.mock.calls.map(call => JSON.parse(call[0] as string)).filter(msg => msg.type.startsWith("knowledge_research_"));
+    expect(sent).toEqual(updates.map(update => ({ ...base, ...update, sessionPath: "/sessions/test.jsonl" })));
+    expect(JSON.stringify(sent)).not.toMatch(/模型推理|SELECT正文|内部需求正文|内部凭据/);
+  });
+  it.each([
+    { type: "knowledge_research_started", runId: "" },
+    { type: "knowledge_research_started", searchCalls: Number.NaN },
+    { type: "knowledge_research_started", needsTotal: -1 },
+    { type: "knowledge_research_started", unresolvedNeedIds: ["invalid id"] },
+    { type: "knowledge_research_round_started", roundId: "round-a", round: 5 },
+    { type: "knowledge_research_worker_started", taskId: "task-a", label: "x".repeat(101) },
+    { type: "knowledge_research_worker_completed", taskId: "task-a", label: "任务", status: "running" },
+    { type: "knowledge_research_ledger_updated", phase: "private_thinking" },
+    { type: "knowledge_research_completed", status: "synthesizing", stopReason: "complete" },
+    { type: "knowledge_research_completed", status: "failed", stopReason: "私有失败正文" },
+  ])("无效过程数据不补零或伪装成成功：%j", update => {
+    const { hub, ws } = setup();
+    hub.subscribe.mock.calls[0][0]({ ...base, ...update }, "/sessions/test.jsonl");
+    expect(ws.send.mock.calls.map(call => JSON.parse(call[0] as string)).filter(msg => msg.type.startsWith("knowledge_research_"))).toEqual([]);
+  });
+});
+
 describe("chat route knowledgeRefs handling", () => {
   it("透传合法 knowledgeRefs 到 hub.send", async () => {
     const { handlers, hub, ws } = setup();
@@ -55,7 +93,7 @@ describe("chat route knowledgeRefs handling", () => {
 
     expect(hub.send).toHaveBeenCalledTimes(1);
     expect(hub.send.mock.calls[0][1]).toEqual(expect.objectContaining({
-      knowledgeRefs: { notebookIds: ["nb-1", "nb-2"], mode: "fast" },
+      knowledgeRefs: { notebookIds: ["nb-1", "nb-2"], mode: "auto" },
     }));
     expect(sentErrors(ws)).toEqual([]);
   });
@@ -185,6 +223,18 @@ describe("chat route knowledgeRefs handling", () => {
       kind: "search",
       phase: "start",
     });
+  });
+
+  it("本地检索证据数和耗时完整广播，缺少耗时不补零", () => {
+    const { hub, ws } = setup();
+    const listener = hub.subscribe.mock.calls[0][0];
+    listener({ type: "knowledge_trace", id: "fast-local", kind: "search", phase: "done",
+      detail: "fast_local", hits: 3, elapsedMs: 28.4 }, "/sessions/test.jsonl");
+    listener({ type: "knowledge_trace", id: "fast-local-failed", phase: "failed", detail: "fast_local" }, "/sessions/test.jsonl");
+    const sent = ws.send.mock.calls.map(call => JSON.parse(call[0] as string));
+    expect(sent).toContainEqual({ type: "knowledge_trace", sessionPath: "/sessions/test.jsonl", id: "fast-local",
+      kind: "search", phase: "done", detail: "fast_local", hits: 3, elapsedMs: 28.4 });
+    expect(sent.find(event => event.id === "fast-local-failed")).not.toHaveProperty("elapsedMs");
   });
 
   it("knowledge_supplement_search 引擎事件广播为同名 WS 消息（查询行 + 轮序）", async () => {

@@ -44,6 +44,12 @@
     "sendFailed": "Send failed"
   },
   "knowledge": {
+    "citationRetry": "Retry",
+    "citationNumber": "Citation {number}. Hover to preview; press Enter to open.",
+    "citationLoading": "Loading source passage…",
+    "citationFailed": "The passage could not be loaded. The source may have been removed or the connection is unavailable.",
+    "citationSource": "Knowledge source",
+    "citationTitle": "Source passage",
     "tab": "Knowledge",
     "title": "Knowledge Library",
     "newNotebook": "New notebook",
@@ -114,7 +120,7 @@
     "settingsRerankHint": "Per-notebook; affects query ranking only, no rebuild",
     "settingsGlobalNotConfigured": "Not configured",
     "settingsChunkTargetChars": "Chunk size (chars)",
-    "settingsChunkHint": "Computed automatically as the embedding model's context window ×80% (1 token = 1 char); switching the embedding model rebuilds chunks",
+    "settingsChunkHint": "Set the target number of characters, preserving sentence, paragraph, and chapter boundaries where possible. Leave empty for 2048 characters. Saving rebuilds chunks in the background and preserves citations in existing answers.",
     "settingsInvalidNumber": "Enter an integer between {min} and {max}",
     "selectSource": "Select a source to view its parsed content",
     "ingestionQueued": "Queued",
@@ -130,7 +136,7 @@
     "readinessProcessing": "{count} ingesting",
     "readinessPendingEmbedding": "{count} pending embedding",
     "readinessFailed": "{count} failed",
-    "settingsChunkAutoFallback": "Auto (~6553)",
+    "settingsChunkAutoFallback": "Default (2048 characters)",
     "settingsVectorRetention": "Vector retention",
     "settingsRetentionKeepForever": "Keep forever (default)",
     "settingsRetentionDaysMode": "Clean up after days",
@@ -390,6 +396,13 @@
     "back": "Back"
   },
   "chat": {
+    "knowledgeResearchInterrupted": "Research was interrupted",
+    "knowledgeResearchStopIncomplete": "Research did not finish its workflow",
+    "knowledgeResearchStopUnavailable": "Required research tools are unavailable",
+    "knowledgeResearchStopNoProgress": "Further research found no new evidence",
+    "knowledgeResearchStopRounds": "Research round limit reached",
+    "knowledgeResearchStopTime": "Research time limit reached",
+    "knowledgeResearchStopTools": "Shared tool call limit reached",
     "find": {
       "locateFailed": "Could not locate that message",
       "placeholder": "Find in conversation"
@@ -464,6 +477,16 @@
     "knowledgeRetrievalSupplementTitle": "Supplemental searches issued by the model during the rolling read",
     "knowledgeTraceResults": "{n} search results",
     "knowledgeTraceFailed": "Search failed",
+    "knowledgeLocalEvidenceFound": "Found {n} evidence spans · {ms}ms",
+    "knowledgeFastSummary": "Fast search · {n} evidence spans · {ms}ms",
+    "knowledgeFastDeadlineExceeded": "Target time exceeded",
+    "knowledgeResearchSummary": "Detailed research · {rounds} rounds · {searches} searches · {reads} reads · {completed}/{total} items complete",
+    "knowledgeResearchPartialSummary": "Detailed research partially complete · {rounds} rounds · {pending} items still unconfirmed",
+    "knowledgeResearchProgress": "{completed}/{total} evidence questions complete",
+    "knowledgeResearchCancelled": "Detailed research cancelled",
+    "knowledgeResearchTruncated": "Some evidence was not included",
+    "knowledgeResearchFailed": "Detailed research failed",
+    "knowledgeResearchReviewCounts": "{conflicts} conflicts · {pending} items unconfirmed",
     "knowledgeMetaModeFast": "Fast mode",
     "knowledgeMetaModeDetailed": "Detailed mode",
     "feedbackUp": "Helpful (saved to experience)",
@@ -603,8 +626,8 @@
     },
     "knowledgeModeFast": "Fast",
     "knowledgeModeDetailed": "Detailed",
-    "knowledgeModeFastHint": "Answer as fast as possible: top high-confidence evidence only, no decomposition or rolling read",
-    "knowledgeModeDetailedHint": "Answer as thoroughly as possible: question decomposition and multi-way recall, with batched reading when evidence overflows"
+    "knowledgeModeFastHint": "Fast local-only search; does not wait for remote embeddings, reranking, or multi-round research.",
+    "knowledgeModeDetailedHint": "Generates a detailed answer after multiple rounds of search, reading, and evidence checks."
   },
   "agentReview": {
     "running": "Reviewing this Session",
@@ -823,6 +846,10 @@
     "active": "Thinking"
   },
   "toolGroup": {
+    "mixedCount": "{tools} tool calls · {steps} research steps",
+    "researchRunning": "{n} research steps in progress",
+    "researchCountWithFail": "{total} research steps ({fail} incomplete)",
+    "researchCount": "{n} research steps",
     "success": "✿ {name} all done, piece of cake ~ · {n} steps",
     "failed": "⚠ Something seems off · {n} steps",
     "countWithFail": "{total} tools ({fail} failed)",
@@ -841,9 +868,10 @@
     }
   },
   "processFold": {
+    "research": "{n} research steps",
     "summary": "✨ {name} worked for a while",
     "tools": "{n} tools",
-    "knowledge": "{n} retrievals",
+    "knowledge": "{n} knowledge summaries",
     "thinking": "{n} thoughts",
     "unsuccessful": "{n} attempts not successful"
   },
@@ -1198,10 +1226,15 @@
       "done": "🧠 Decomposed the question",
       "failed": "🧠 Failed to decompose"
     },
+    "knowledge_local_search": {
+      "running": "Searching the knowledge base locally",
+      "done": "Local search completed",
+      "failed": "Local search failed"
+    },
     "knowledge_search": {
       "running": "🔍 Searching the knowledge base",
       "done": "🔍 Searched the knowledge base",
-      "failed": "🔍 Search failed"
+      "failed": "🔍 Knowledge search failed"
     },
     "knowledge_read_part": {
       "running": "📖 Reading evidence",
@@ -1212,6 +1245,36 @@
       "running": "↻ Model requests more searches",
       "done": "↻ Model requested more searches",
       "failed": "↻ Supplement failed"
+    },
+    "knowledge_research_plan": {
+      "running": "Planning the research",
+      "done": "Research planned",
+      "failed": "Research planning incomplete"
+    },
+    "knowledge_research_round": {
+      "running": "Round {round}/{maxRounds}: searching and reading",
+      "done": "Research round {round}/{maxRounds} ended",
+      "failed": "Research round {round}/{maxRounds} incomplete"
+    },
+    "knowledge_research_worker": {
+      "running": "Dispatched {count} research agents",
+      "done": "{count} research agents finished their tasks",
+      "failed": "{count} research agents did not finish their tasks"
+    },
+    "knowledge_research_progress": {
+      "running": "{completed}/{total} evidence questions complete",
+      "done": "{completed}/{total} evidence questions complete",
+      "failed": "{completed}/{total} evidence questions complete (update incomplete)"
+    },
+    "knowledge_research_review": {
+      "running": "Checking conflicts and gaps",
+      "done": "Conflicts and gaps checked",
+      "failed": "Conflict and gap check incomplete"
+    },
+    "knowledge_research_synthesis": {
+      "running": "Preparing the detailed answer",
+      "done": "Answer evidence prepared",
+      "failed": "Answer evidence preparation incomplete"
     },
     "knowledge_answer": {
       "running": "✻ Composing the answer",

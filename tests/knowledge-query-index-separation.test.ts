@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+import { KnowledgeManager } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 
 /**
  * Phase 2（§十一/§十二/§八十九.4-6）Query/Index 分离契约：
@@ -24,8 +24,8 @@ function tempHome() {
   return dir;
 }
 
-afterEach(() => {
-  for (const manager of managers.splice(0)) manager.close();
+afterEach(async () => {
+  for (const manager of managers.splice(0)) await manager.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -207,6 +207,9 @@ describe("Phase 2 查询/索引分离", () => {
     expect(manager.indexStore.db.prepare(
       "SELECT COUNT(*) AS count FROM chunk_index_variants WHERE parse_artifact_id = ?",
     ).get(artifact.id).count).toBe(0);
+    // 查询已返回仍未入队；下一轮事件循环才执行后台配置解析和持久化。
+    expect(activeIngestionJobs(manager, studioId, notebook.id)).toHaveLength(0);
+    await new Promise<void>(resolve => setImmediate(resolve));
     // 幂等入队：恰一个活跃后台构建 job。
     expect(activeIngestionJobs(manager, studioId, notebook.id)).toHaveLength(1);
 
@@ -217,6 +220,7 @@ describe("Phase 2 查询/索引分离", () => {
       question: "长夜",
     });
     expect(second.degraded.some(entry => entry.reason === "KNOWLEDGE_INDEX_MISSING")).toBe(true);
+    await new Promise<void>(resolve => setImmediate(resolve));
     expect(activeIngestionJobs(manager, studioId, notebook.id)).toHaveLength(1);
     expect(embedCalls.length).toBe(0);
 
@@ -323,8 +327,10 @@ describe("Phase 2 查询/索引分离", () => {
       notebookId: notebook.id,
     });
     expect(recovered.degraded[0].detail).toContain("index reset after corruption");
-    // reset 后变体表清空（缓存级重建），后台构建已入队。
+    // reset 后变体表清空；查询返回后再异步入队，不等待实际构建。
     expect(manager.indexStore.db.prepare("SELECT COUNT(*) AS count FROM chunk_index_variants").get().count).toBe(0);
+    expect(activeIngestionJobs(manager, studioId, notebook.id)).toHaveLength(0);
+    await new Promise<void>(resolve => setImmediate(resolve));
     expect(activeIngestionJobs(manager, studioId, notebook.id)).toHaveLength(1);
 
     // 后台摄入从 Block 事实重建索引，查询恢复。

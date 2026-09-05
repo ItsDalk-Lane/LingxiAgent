@@ -1,0 +1,17 @@
+{
+  "runId": 33858404258,
+  "runAttempt": 1,
+  "headSha": "842477183a4a295291d808497a564141642d7d13",
+  "lines": [
+    "build (macos-15-intel, darwin, dmg, x64)\tBuild macOS (DMG + ZIP)\t2026-09-04T10:05:19.1051510Z     raise DMGError(callback, f\"Unable to detach device cleanly: {output}\")",
+    "build (macos-15-intel, darwin, dmg, x64)\tBuild macOS (DMG + ZIP)\t2026-09-04T10:05:19.1057750Z dmgbuild.core.DMGError: Unable to detach device cleanly: hdiutil: couldn't eject \"disk4\" - Resource busy",
+    "build (macos-15-intel, darwin, dmg, x64)\tBuild macOS (DMG + ZIP)\t2026-09-04T10:05:19.1384940Z     raise DMGError(callback, f\"Unable to detach device cleanly: {output}\")",
+    "build (macos-15-intel, darwin, dmg, x64)\tBuild macOS (DMG + ZIP)\t2026-09-04T10:05:19.1388710Z dmgbuild.core.DMGError: Unable to detach device cleanly: hdiutil: couldn't eject \"disk4\" - Resource busy",
+    "build (macos-15-intel, darwin, dmg, x64)\tBuild macOS (DMG + ZIP)\t2026-09-04T10:05:19.2115600Z     raise DMGError(callback, f\"Unable to detach device cleanly: {output}\")",
+    "build (macos-15-intel, darwin, dmg, x64)\tBuild macOS (DMG + ZIP)\t2026-09-04T10:05:19.2131340Z dmgbuild.core.DMGError: Unable to detach device cleanly: hdiutil: couldn't eject \"disk4\" - Resource busy",
+    "build (macos-15-intel, darwin, dmg, x64)\tBuild macOS (DMG + ZIP)\t2026-09-04T10:05:19.3093860Z     raise DMGError(callback, f\"Unable to detach device cleanly: {output}\")",
+    "build (macos-15-intel, darwin, dmg, x64)\tBuild macOS (DMG + ZIP)\t2026-09-04T10:05:19.3097210Z dmgbuild.core.DMGError: Unable to detach device cleanly: hdiutil: couldn't eject \"disk4\" - Resource busy",
+    "build (macos-15-intel, darwin, dmg, x64)\tBuild macOS (DMG + ZIP)\t2026-09-04T10:05:19.4132810Z ##[error]Process completed with exit code 1.",
+    "build (macos-15-intel, darwin, dmg, x64)\tUpload packaged desktop startup evidence\t2026-09-04T10:05:23.4484120Z ##[error]No files were found with the provided path: artifacts/knowledge-desktop-startup-darwin-x64.json. No artifacts will be uploaded."
+  ]
+}

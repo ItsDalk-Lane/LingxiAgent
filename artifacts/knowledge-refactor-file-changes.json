@@ -1,0 +1,2652 @@
+[
+  {
+    "phase": "P0",
+    "from": "3eab85891a1747c64064252804f70c0a3773f021",
+    "to": "5c016df183ad207cf1ca33de274abb7a4eb10057",
+    "command": "git diff --name-status -M 3eab85891a1747c64064252804f70c0a3773f021 5c016df183ad207cf1ca33de274abb7a4eb10057",
+    "changes": [
+      {
+        "status": "A",
+        "paths": [
+          ".github/workflows/knowledge-performance.yml"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "BLOCKED.md"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "KNOWLEDGE_REFACTOR_BASELINE.md"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "KNOWLEDGE_REFACTOR_PROGRESS.md"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "build/cli-runtime-closure.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "build/persistence-schema-fingerprint.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "core/desktop-session-submit.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "core/engine.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/locales/en.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/locales/ja.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/locales/ko.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/locales/zh-TW.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/locales/zh.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/__tests__/components/KnowledgeReference.test.tsx"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/__tests__/components/KnowledgeRetrievalFold.test.tsx"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/__tests__/components/ToolGroupBlock.test.tsx"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/__tests__/services/ws-knowledge-rollup-progress.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/components/chat/KnowledgeRetrievalFold.tsx"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/components/chat/ToolGroupBlock.tsx"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/components/input/KnowledgeReferenceBar.tsx"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/services/ws-message-handler.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/utils/tool-label.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "export-manifest.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/evidence-packer.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/evidence-span-extractor.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/fast-knowledge-pipeline.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-context-injector.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-index-store.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-manager.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-query-service.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-store.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/scope-snapshot-compiler.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/security/injection-scan.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "scripts/benchmark-knowledge-fast.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "server/routes/chat.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "shared/knowledge-evidence.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "shared/knowledge-execution.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "shared/knowledge-refs.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/chat-route-knowledge-refs.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/desktop-session-submit-knowledge-routing.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/desktop-session-submit.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-evidence-packer.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-evidence-span-extractor.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-execution-policy.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-fast-performance-contract.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-fast-pipeline.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-fast-zero-remote.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-scope-snapshot-compiler.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/tool-label-coverage.test.ts"
+        ]
+      }
+    ]
+  },
+  {
+    "phase": "P1",
+    "from": "5c016df183ad207cf1ca33de274abb7a4eb10057",
+    "to": "2387398589ec5494e1adb28b014dc84ebcf15a64",
+    "command": "git diff --name-status -M 5c016df183ad207cf1ca33de274abb7a4eb10057 2387398589ec5494e1adb28b014dc84ebcf15a64",
+    "changes": [
+      {
+        "status": "M",
+        "paths": [
+          ".github/workflows/build.yml"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          ".github/workflows/knowledge-performance.yml"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          ".sync-audit/build-sync-matrix.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          ".sync-audit/upstream-sync-matrix.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          ".sync-audit/verified-source-sha.txt"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "KNOWLEDGE_REFACTOR_PROGRESS.md"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "PROGRESS.md"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "UPSTREAM_SYNC_AUDIT.md"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "UPSTREAM_SYNC_MATRIX.md"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-fast-benchmark-linux-x64-9bee41dc.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-fast-benchmark-linux-x64-f86da543.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-vector-benchmark-linux-x64-9bee41dc.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-vector-benchmark-linux-x64-f86da543.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-vector-benchmark.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "build/cli-runtime-closure.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "build/persistence-schema-fingerprint.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "build/persistence-store-inventory.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "core/agent.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "core/engine.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/locales/en.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/locales/ja.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/locales/ko.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/locales/zh-TW.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/locales/zh.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/utils/tool-label.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "export-manifest.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/ann-index-store.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/fast-knowledge-pipeline.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/ingestion-service.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-context-injector.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-index-store.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-manager.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-query-service.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/knowledge-search-service.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-store.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/query-embedding-cache.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/retrieval-result-cache.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/scope-snapshot-compiler.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/usearch-vector-backend.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/vector-index-adapter.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/vector-search-backend-factory.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/vector-search-backend.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/tools/knowledge-grep-tool.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/tools/knowledge-outline-tool.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/tools/knowledge-read-tool.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/tools/knowledge-search-tool.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "package-lock.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "package.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "scripts/benchmark-knowledge-vector.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "scripts/build-server-artifact.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "scripts/build-server-deps.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "scripts/build-server-phases.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "scripts/build-server-runtime-assets.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "scripts/build-standalone-server-artifact.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "scripts/compute-cli-closure.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "scripts/export-open-tree.mjs"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "scripts/prepare-usearch-native.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "scripts/smoke-packaged-knowledge.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "scripts/verify-seed-kit.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "scripts/verify-standalone-server-artifact.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "shared/knowledge-refs.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "shared/persistence/store-registry.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "shared/tool-categories.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/build-server-artifact.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/build-server-runtime-assets.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/build-standalone-server-artifact.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/helpers/knowledge-ann-fixture.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/helpers/knowledge-metadata-fixture.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/helpers/knowledge-rerank-fixture.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/helpers/knowledge-search-tool-fixture.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/helpers/knowledge-vector-package-fixture.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-agent-tools.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-ann-crash-recovery.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-ann-index-store.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-ann-rebuild.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-cross-notebook-fusion.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-embedding-provider-gate.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-global-rerank.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-index-metadata-backfill.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-index-metadata-migration.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-index-variants.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-mixed-rerank-groups.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-native-build.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-query-embedding-cache.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-read-tool.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-retrieval-result-cache.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-scope-metadata-query.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-search-model-grouping.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-search-service.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-search-tool-output-budget.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-search-tool-scope.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-search-tool.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-usearch-backend.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-vector-backend-fallback.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-vector-backend-parity.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/smoke-packaged-knowledge.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/tool-label-coverage.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/verify-seed-kit.test.ts"
+        ]
+      }
+    ]
+  },
+  {
+    "phase": "P2",
+    "from": "2387398589ec5494e1adb28b014dc84ebcf15a64",
+    "to": "56dc1086aa06d0592c12e8a53eef9b8ea8546812",
+    "command": "git diff --name-status -M 2387398589ec5494e1adb28b014dc84ebcf15a64 56dc1086aa06d0592c12e8a53eef9b8ea8546812",
+    "changes": [
+      {
+        "status": "M",
+        "paths": [
+          ".sync-audit/build-sync-matrix.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          ".sync-audit/upstream-sync-matrix.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          ".sync-audit/verified-source-sha.txt"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "KNOWLEDGE_REFACTOR_PROGRESS.md"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "PROGRESS.md"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "UPSTREAM_SYNC_AUDIT.md"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "UPSTREAM_SYNC_MATRIX.md"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "build/cli-runtime-closure.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "build/persistence-schema-fingerprint.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "build/persistence-store-inventory.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "core/agent.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "core/desktop-session-submit.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "core/engine.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "core/knowledge-history-compressor.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "core/session-coordinator.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "core/session-manifest/knowledge-ancestry.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "core/session-reminders.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/locales/en.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/locales/ja.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/locales/ko.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/locales/zh-TW.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/locales/zh.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/__tests__/components/KnowledgeRetrievalFold.test.tsx"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/__tests__/components/ToolGroupBlock.test.tsx"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "desktop/src/react/__tests__/services/ws-knowledge-research-progress.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/components/chat/KnowledgeRetrievalFold.tsx"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/components/chat/ToolGroupBlock.tsx"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/hooks/use-stream-buffer.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/services/ws-message-handler.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/src/react/utils/tool-label.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "export-manifest.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/evidence-receipt-service.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-context-injector.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-store.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/legacy/legacy-knowledge-context-injector.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/research/evidence-ledger.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/research/knowledge-research-orchestrator.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/research/research-context-renderer.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/research/research-prompts.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/research/research-round-runner.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/research/research-stop-policy.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/research/research-store.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/research/research-tool-budget.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/types.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/tools/knowledge-delegate-tool.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/tools/knowledge-grep-tool.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/tools/knowledge-outline-tool.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/tools/knowledge-read-tool.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/tools/knowledge-research-finish-tool.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/tools/knowledge-research-update-tool.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/tools/knowledge-scope.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/tools/knowledge-search-tool.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/tools/session-permission-wrapper.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "server/routes/chat.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "shared/knowledge-research.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "shared/persistence/store-registry.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "shared/tool-categories.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/builtin-tool-permission-coverage.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/chat-route-knowledge-refs.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/desktop-session-submit-detailed-research.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/desktop-session-submit-knowledge-routing.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/desktop-session-submit.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-research/conflicting-sources.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-research/counterexample.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-research/cross-source-comparison.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-research/no-result.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-research/scope-escape.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-research/second-round-clue.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-research/timeline.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-store-v17.sql"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/helpers/knowledge-research-agent-fixture.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/helpers/knowledge-research-fixture.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/helpers/knowledge-research-quality-fixture.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/helpers/knowledge-search-tool-fixture.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/historical-knowledge-context-compression.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-agent-tools.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-chunk-profiles.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-context-injector.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-coverage-execution.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-coverage-planner.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-delegate-tool.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-detailed-engine-context.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-detailed-engine-recovery.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-detailed-no-legacy-route.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-evidence-ledger.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-evidence-manifest.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-evidence-quote-validation.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-read-receipts.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-read-tool.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-rerank-fusion.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-agent-tools.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-cancellation.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-context-renderer.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-delegation.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-finish-tool.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-multi-round.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-no-progress.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-orchestrator.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-progress-events.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-quality-fixtures.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-recovery.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-search-telemetry.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-stop-policy.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-store.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-surface.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-tool-budget.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-tool-filter.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-update-tool.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-research-worker-permissions.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-retrieval-golden.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-scope-ancestry.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-search-tool-scope.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-store-v18-migration.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/persistence-schema-tripwire.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/tool-label-coverage.test.ts"
+        ]
+      }
+    ]
+  },
+  {
+    "phase": "P3",
+    "from": "56dc1086aa06d0592c12e8a53eef9b8ea8546812",
+    "to": "61ae60d1afe4f878ae638ff4de96d7e4f30bfefe",
+    "command": "git diff --name-status -M 56dc1086aa06d0592c12e8a53eef9b8ea8546812 61ae60d1afe4f878ae638ff4de96d7e4f30bfefe",
+    "changes": [
+      {
+        "status": "M",
+        "paths": [
+          ".github/workflows/build.yml"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          ".github/workflows/knowledge-performance.yml"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          ".sync-audit/build-sync-matrix.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          ".sync-audit/upstream-sync-matrix.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          ".sync-audit/verified-source-sha.txt"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "BLOCKED.md"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "KNOWLEDGE_REFACTOR_FACTS.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "KNOWLEDGE_REFACTOR_IMPLEMENTATION_REPORT.md"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "KNOWLEDGE_REFACTOR_PERFORMANCE_REPORT.md"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "KNOWLEDGE_REFACTOR_PROGRESS.md"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "KNOWLEDGE_REFACTOR_RELEASE_DIGEST_DRAFT.md"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "KNOWLEDGE_REFACTOR_REMAINING.md"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "KNOWLEDGE_REFACTOR_TEST_REPORT.md"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "PROGRESS.md"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "UPSTREAM_SYNC_AUDIT.md"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "UPSTREAM_SYNC_MATRIX.md"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-desktop-startup-4984e6fd-darwin-arm64-failed.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-desktop-startup-4d52730e-darwin-arm64.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-desktop-startup-4d52730e-darwin-x64.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-desktop-startup-4d52730e-linux-x64.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-desktop-startup-4d52730e-win32-x64.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-desktop-startup-84247718-darwin-x64.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-desktop-startup-darwin-arm64.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-desktop-startup-e296c017-darwin-arm64-failed.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-desktop-startup-e296c017-darwin-x64-failed.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-desktop-startup-e296c017-linux-x64-failed.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-desktop-startup-e296c017-win32-x64-failed.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-fast-benchmark-p306-darwin-arm64.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-final-package-verification.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-final-static-verification.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-platform-ci-33850016811-failed.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-platform-ci-33855890039-failed.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-platform-ci-33858404258-attempt1-environment-failure.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-platform-ci-33858404258-attempt2-failure.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-research-benchmark-p306-darwin-arm64.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-test-inventory-final.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "artifacts/knowledge-vector-benchmark-p306-darwin-arm64.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "build/cli-runtime-closure.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "build/persistence-schema-fingerprint.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "build/persistence-store-inventory.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "core/agent.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "core/engine.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "core/session-coordinator.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "core/session-manifest/knowledge-ancestry.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "core/session-reminders.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "desktop/main.cjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "export-manifest.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/chunker.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/evidence-packer.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/evidence-span-extractor.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/ingestion-service.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-context-injector.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-coverage-planner.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-index-store.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-manager.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-query-service.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-search-service.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/knowledge-store.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/research/completeness-policy.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/research/coverage-shard-planner.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/knowledge/research/knowledge-completeness-executor.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/research/knowledge-research-orchestrator.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/research/research-context-renderer.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/research/research-prompts.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/research/research-round-runner.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/research/research-tool-budget.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/scope-snapshot-compiler.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/knowledge/vector-index-adapter.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/tools/knowledge-completeness-mark-tool.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "lib/tools/knowledge-coverage-read-tool.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/tools/knowledge-read-tool.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/tools/knowledge-research-finish-tool.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "lib/tools/knowledge-search-tool.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "package.json"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "scripts/benchmark-knowledge-fast.mjs"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "scripts/benchmark-knowledge-research.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "scripts/benchmark-knowledge-vector.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "scripts/build-server-runtime-assets.mjs"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "scripts/smoke-packaged-desktop.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "scripts/smoke-packaged-knowledge.mjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "shared/artifact-core/ota-core.cjs"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "shared/knowledge-execution.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "shared/knowledge-refs.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "shared/persistence/store-registry.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "shared/tool-categories.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/artifact-boot-channel-consistency.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/artifact-ota.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/builtin-tool-permission-coverage.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/ci-workflow-guards.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-completeness/absolute-absence.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-completeness/all-counterexamples.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-completeness/all-person-names.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-completeness/chapter-changes.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-completeness/needs-ocr.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-completeness/parse-failed.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-completeness/repeated-fact.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-completeness/within-source-conflict.json"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-index-v3.sql"
+        ]
+      },
+      {
+        "status": "R098",
+        "paths": [
+          "lib/knowledge/knowledge-rollup.ts",
+          "tests/fixtures/knowledge-legacy/knowledge-rollup.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-legacy/legacy-context-renderer.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-legacy/legacy-coverage-planner.ts"
+        ]
+      },
+      {
+        "status": "R098",
+        "paths": [
+          "lib/knowledge/legacy/legacy-knowledge-context-injector.ts",
+          "tests/fixtures/knowledge-legacy/legacy-knowledge-context-injector.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-legacy/legacy-query-service.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/fixtures/knowledge-store-v18.sql"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/helpers/knowledge-completeness-quality-fixture.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/helpers/knowledge-final-synthesis-fixture.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/helpers/knowledge-hierarchical-fixture.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/helpers/knowledge-rerank-fixture.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/helpers/knowledge-research-agent-fixture.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/helpers/knowledge-research-quality-fixture.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-chunk-profiles.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-chunker-strategies.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-chunker-v3.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-completeness-executor.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-completeness-lifecycle.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-completeness-negative-claim.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-completeness-policy.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-completeness-quality.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-completeness-renderer-security.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-completeness-sharding.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-completeness-store.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-completeness-surface.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-completeness-tools.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-completeness-unavailable-source.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-context-injector.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-coverage-execution.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-coverage-planner.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-cross-notebook-fusion.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-detailed-engine-context.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-detailed-no-legacy-route.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-evidence-manifest.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-evidence-span-extractor.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-execution-policy.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-fast-performance-contract.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-fast-zero-remote.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-global-rerank.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-hierarchical-recall-golden.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-hierarchical-search.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-index-metadata-backfill.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-index-metadata-migration.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-index-variants.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-ingestion.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-lifecycle.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-multigrain-migration.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-parent-child-retrieval.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-profile-variants.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-query-config-alignment.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-query-index-separation.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-read-tool.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-rerank-fusion.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-research-search-telemetry.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-research-store.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-research-surface.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-research-tool-budget.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-research-update-tool.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-research-worker-permissions.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-retrieval-golden.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-rollup.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-route.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-search-model-grouping.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-search-service.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-search.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-section-filtered-vector.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-section-index.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-store-v18-migration.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-store-v19-migration.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/knowledge-turn-scope.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-v2-profile-fallback.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-v3-background-reindex.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-v3-mixed-formats.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/knowledge-vector-shutdown.test.ts"
+        ]
+      },
+      {
+        "status": "A",
+        "paths": [
+          "tests/packaged-desktop-cleanup.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/persistence-schema-tripwire.test.ts"
+        ]
+      },
+      {
+        "status": "M",
+        "paths": [
+          "tests/tool-label-coverage.test.ts"
+        ]
+      }
+    ]
+  }
+]

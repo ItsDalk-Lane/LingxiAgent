@@ -1,0 +1,137 @@
+{
+  "sourceSha": "61ae60d1afe4f878ae638ff4de96d7e4f30bfefe",
+  "commands": [
+    {
+      "round": 1,
+      "name": "registry",
+      "command": "node scripts/scan-persistent-stores.mjs",
+      "startedAt": "2026-09-04T10:34:53.416Z",
+      "durationMs": 776.194208,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-source61a-generator-1-registry.log"
+    },
+    {
+      "round": 1,
+      "name": "fingerprint",
+      "command": "node scripts/generate-persistence-schema-fingerprint.mjs",
+      "startedAt": "2026-09-04T10:34:54.194Z",
+      "durationMs": 1494.8964579999997,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-source61a-generator-1-fingerprint.log"
+    },
+    {
+      "round": 1,
+      "name": "fingerprint-check",
+      "command": "node scripts/check-persistence-schema-fingerprint.mjs",
+      "startedAt": "2026-09-04T10:34:55.689Z",
+      "durationMs": 50.292625000000044,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-source61a-generator-1-fingerprint-check.log"
+    },
+    {
+      "round": 1,
+      "name": "closure",
+      "command": "node scripts/compute-cli-closure.mjs",
+      "startedAt": "2026-09-04T10:34:55.739Z",
+      "durationMs": 15973.565250000001,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-source61a-generator-1-closure.log"
+    },
+    {
+      "round": 1,
+      "name": "boundary",
+      "command": "npm run lint:boundary",
+      "startedAt": "2026-09-04T10:35:11.713Z",
+      "durationMs": 793.0332500000004,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-source61a-generator-1-boundary.log"
+    },
+    {
+      "round": 1,
+      "name": "export",
+      "command": "node scripts/export-open-tree.mjs /tmp/lingxi-knowledge-p307-source61a-final-open-1 --force",
+      "startedAt": "2026-09-04T10:35:12.506Z",
+      "durationMs": 259.2951670000002,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-source61a-generator-1-export.log"
+    },
+    {
+      "round": 1,
+      "name": "inventory",
+      "command": "node scripts/test-inventory.mjs",
+      "startedAt": "2026-09-04T10:35:12.766Z",
+      "durationMs": 290.33058399999936,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-source61a-final-inventory-1.json"
+    },
+    {
+      "round": 2,
+      "name": "registry",
+      "command": "node scripts/scan-persistent-stores.mjs",
+      "startedAt": "2026-09-04T10:35:13.103Z",
+      "durationMs": 757.9556250000023,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-source61a-generator-2-registry.log"
+    },
+    {
+      "round": 2,
+      "name": "fingerprint",
+      "command": "node scripts/generate-persistence-schema-fingerprint.mjs",
+      "startedAt": "2026-09-04T10:35:13.861Z",
+      "durationMs": 1454.5227919999998,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-source61a-generator-2-fingerprint.log"
+    },
+    {
+      "round": 2,
+      "name": "fingerprint-check",
+      "command": "node scripts/check-persistence-schema-fingerprint.mjs",
+      "startedAt": "2026-09-04T10:35:15.315Z",
+      "durationMs": 49.90650000000096,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-source61a-generator-2-fingerprint-check.log"
+    },
+    {
+      "round": 2,
+      "name": "closure",
+      "command": "node scripts/compute-cli-closure.mjs",
+      "startedAt": "2026-09-04T10:35:15.366Z",
+      "durationMs": 16072.416208999999,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-source61a-generator-2-closure.log"
+    },
+    {
+      "round": 2,
+      "name": "boundary",
+      "command": "npm run lint:boundary",
+      "startedAt": "2026-09-04T10:35:31.438Z",
+      "durationMs": 786.1437500000029,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-source61a-generator-2-boundary.log"
+    },
+    {
+      "round": 2,
+      "name": "export",
+      "command": "node scripts/export-open-tree.mjs /tmp/lingxi-knowledge-p307-source61a-final-open-2 --force",
+      "startedAt": "2026-09-04T10:35:32.225Z",
+      "durationMs": 258.11895899999945,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-source61a-generator-2-export.log"
+    },
+    {
+      "round": 2,
+      "name": "inventory",
+      "command": "node scripts/test-inventory.mjs",
+      "startedAt": "2026-09-04T10:35:32.483Z",
+      "durationMs": 290.2275410000002,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-source61a-final-inventory-2.json"
+    }
+  ],
+  "completeWorkingDiffUnchanged": true,
+  "initialWorkingDiffEmpty": false,
+  "inventoryCount": 961,
+  "inventorySha256": "43df0f0f503484a22fc2d1e0c532db9d01fe820ea3e8b1ae1839bac40d6a46fd",
+  "exportedFileCount": 885,
+  "allExportedFilesEqual": true
+}

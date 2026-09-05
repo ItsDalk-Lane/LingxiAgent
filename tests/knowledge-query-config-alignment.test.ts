@@ -3,12 +3,12 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+import { KnowledgeManager } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 import { resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
 import {
-  KNOWLEDGE_FUSION_BUDGET,
   KNOWLEDGE_RERANK_MAX_DOCS,
 } from "../lib/knowledge/knowledge-query-service.ts";
+import { KNOWLEDGE_FUSION_BUDGET } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 import type { KnowledgeParseArtifact } from "../lib/knowledge/types.ts";
 
 /**
@@ -26,8 +26,8 @@ function tempHome() {
   return dir;
 }
 
-afterEach(() => {
-  for (const manager of managers.splice(0)) manager.close();
+afterEach(async () => {
+  for (const manager of managers.splice(0)) await manager.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -133,9 +133,10 @@ describe("查询侧分块配置与摄入侧同源", () => {
     const artifact = await ingestSource(manager, studioId, notebook.id);
 
     const chunksAfterIngestion = listNotebookProfileChunks(manager, studioId, notebook.id, artifact);
-    expect(chunksAfterIngestion.length).toBe(6); // 5000：整章一块
+    expect(chunksAfterIngestion.length).toBe(6); // 显式字符配置生效，每章足够容纳于5000字符，独立成片。
     expect(embedCalls.length).toBe(1); // 摄入批量嵌入 6 块
     expect(embedCalls[0].length).toBe(6);
+    expect(chunksAfterIngestion.every(chunk => [...chunk.text].length <= 5000)).toBe(true);
 
     await manager.queryService.retrieveForNotebooks({
       studioId,
@@ -150,8 +151,8 @@ describe("查询侧分块配置与摄入侧同源", () => {
     expect(embedCalls[1].length).toBe(1);
   });
 
-  it("自动分块（null）：查询侧经上下文窗口回调解析出与摄入侧相同的生效值", async () => {
-    // 40960 × 0.8 = 32768 > 7500：整章一块，与显式 5000 同型。
+  it("默认分块（null）：嵌入大窗口不放大片段，查询与摄入保持同一身份", async () => {
+    // 大窗口只影响输入硬上限，片段仍约512tokens。
     const { manager, embedCalls } = createManager(tempHome(), { contextWindow: 40960 });
     const studioId = "studio-a";
     const notebook = manager.createNotebook({ studioId, name: "小说" });
@@ -204,7 +205,8 @@ describe("查询侧分块配置与摄入侧同源", () => {
       expect(result.retrievalModeRequested).toBe("hybrid");
       expect(result.degraded.some(entry => entry.reason === "KNOWLEDGE_VECTOR_NOT_READY")).toBe(true);
     }
-    // 幂等入队：并行两次查询共享同一个活跃后台构建 job（活跃 job 去重）。
+    await new Promise<void>(resolve => setImmediate(resolve));
+    // 查询已返回后异步入队，并行两次查询仍共享恰一个活跃任务。
     expect(manager.store.listIngestionJobs({
       studioId,
       notebookId: notebook.id,

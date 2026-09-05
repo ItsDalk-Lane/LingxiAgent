@@ -1,5 +1,120 @@
 import type { KnowledgeChunkerStrategy, KnowledgeChunkSpanDraft } from "./chunker.ts";
 import type { KnowledgeCoverageMode } from "../../shared/knowledge-refs.ts";
+import type { KnowledgeCompletenessPolicy } from "../../shared/knowledge-execution.ts";
+import type {
+  KnowledgeEvidenceNeed,
+  KnowledgeEvidenceRelation,
+  KnowledgeResearchBudget,
+  KnowledgeResearchRunStatus,
+} from "../../shared/knowledge-research.ts";
+
+/** 研究持久化记录只保存结构化事实与定位，不保存模型的完整提示或思考。 */
+export interface KnowledgeResearchRun {
+  id: string;
+  turnScopeId: string;
+  turnId: string;
+  parentSessionPath: string;
+  question: string;
+  status: KnowledgeResearchRunStatus;
+  completenessPolicy: KnowledgeCompletenessPolicy;
+  budget: KnowledgeResearchBudget;
+  roundsCompleted: number;
+  toolCallsUsed: number;
+  searchCalls: number;
+  readCalls: number;
+  grepCalls: number;
+  delegatedAgents: number;
+  stopReason: string | null;
+  degradedReason: string | null;
+  createdAt: string;
+  updatedAt: string;
+  completedAt: string | null;
+}
+
+export interface KnowledgeEvidenceNeedRecord extends Omit<KnowledgeEvidenceNeed, "evidenceIds" | "counterEvidenceIds"> {
+  runId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type KnowledgeResearchStepStatus = "running" | "completed" | "failed" | "cancelled";
+
+export interface KnowledgeResearchRound {
+  id: string;
+  runId: string;
+  ordinal: number;
+  focus: string[];
+  status: KnowledgeResearchStepStatus;
+  newEvidenceCount: number;
+  startedAt: string;
+  completedAt: string | null;
+  errorCode: string | null;
+}
+
+/** 阅读凭据仅保存实际返回原文的位置和摘要，不复制正文。 */
+export interface KnowledgeResearchReadReceipt {
+  id: string;
+  runId: string;
+  actorSessionId: string | null;
+  sourceId: string;
+  contentSnapshotId: string;
+  parseArtifactId: string;
+  chunkIndexVariantId: string | null;
+  chunkId: string | null;
+  blockId: string;
+  startOffset: number;
+  endOffset: number;
+  canonicalTextSha256: string;
+  channel: "knowledge_read" | "knowledge_grep";
+  createdAt: string;
+  consumedAt: string | null;
+}
+
+export interface KnowledgeEvidenceItem {
+  id: string;
+  runId: string;
+  sourceId: string;
+  contentSnapshotId: string;
+  parseArtifactId: string;
+  chunkIndexVariantId: string | null;
+  chunkId: string | null;
+  blockId: string;
+  startOffset: number;
+  endOffset: number;
+  canonicalText: string;
+  canonicalTextSha256: string;
+  headingPath: string[] | null;
+  pageNumber: number | null;
+  createdAt: string;
+}
+
+export interface KnowledgeNeedEvidence {
+  needId: string;
+  evidenceId: string;
+  relation: KnowledgeEvidenceRelation;
+  rationale: string;
+  /** 固定使用证据的 sourceId，同源不同分块不增加独立来源数。 */
+  sourceIndependenceKey: string;
+  createdAt: string;
+}
+
+export interface KnowledgeResearchAction {
+  id: string;
+  runId: string;
+  roundId: string | null;
+  ordinal: number;
+  actorSessionId: string | null;
+  actorAgentId: string | null;
+  actionType: string;
+  /** 只允许查询、来源过滤、需求编号和工具参数摘要，不含知识正文。 */
+  requestSummary: Record<string, unknown>;
+  /** 只允许命中/凭据编号、计数、状态和错误码。 */
+  responseSummary: Record<string, unknown> | null;
+  status: KnowledgeResearchStepStatus;
+  startedAt: string;
+  completedAt: string | null;
+  errorCode: string | null;
+}
 
 export type KnowledgeSourceType = "file" | "pasted_text" | "web_snapshot";
 

@@ -1,0 +1,706 @@
+{
+  "schemaVersion": 2,
+  "seed": "lingxi-knowledge-fast-v2-real-three-grain-index",
+  "platform": "darwin",
+  "cpu": "Apple M3 Ultra",
+  "memoryBytes": 103079215104,
+  "osRelease": "25.6.0",
+  "arch": "arm64",
+  "node": "v24.16.0",
+  "generatedAt": "2026-09-04T07:46:58.667Z",
+  "coldDefinition": "fresh manager, databases, frozen scope and first query; OS page cache is not flushed",
+  "results": [
+    {
+      "size": 10000,
+      "hot": {
+        "samples": [
+          {
+            "scopeCompileMs": 0.0019170000000485743,
+            "ftsMs": 0.20941700000003038,
+            "spanExtractMs": 1.2012500000000728,
+            "packMs": 0.7956249999997453,
+            "totalMs": 2.21100000000024,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.001291999999921245,
+            "ftsMs": 2.2928750000000946,
+            "spanExtractMs": 1.2525829999999587,
+            "packMs": 0.7718340000001263,
+            "totalMs": 4.322625000000244,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.0015410000000883883,
+            "ftsMs": 1.5991669999998521,
+            "spanExtractMs": 1.1499170000001868,
+            "packMs": 0.73104099999955,
+            "totalMs": 3.4844170000001213,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.0013750000002801244,
+            "ftsMs": 1.4793330000002243,
+            "spanExtractMs": 1.327958999999737,
+            "packMs": 0.9775830000003225,
+            "totalMs": 3.790874999999687,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.0035000000002582965,
+            "ftsMs": 1.8982499999997344,
+            "spanExtractMs": 1.139292000000296,
+            "packMs": 0.7127910000003794,
+            "totalMs": 3.7571250000000873,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.001291999999921245,
+            "ftsMs": 1.697374999999738,
+            "spanExtractMs": 1.2356669999999212,
+            "packMs": 0.7206249999999272,
+            "totalMs": 3.6575419999999212,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.0017499999999017746,
+            "ftsMs": 0.1829170000000886,
+            "spanExtractMs": 1.377875000000131,
+            "packMs": 0.9210830000001806,
+            "totalMs": 2.487999999999829,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.003582999999707681,
+            "ftsMs": 0.25025000000005093,
+            "spanExtractMs": 1.4101670000000013,
+            "packMs": 0.7911670000003141,
+            "totalMs": 2.4586669999998776,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0033750000002328306,
+            "ftsMs": 0.24479199999996126,
+            "spanExtractMs": 1.2469169999999394,
+            "packMs": 0.749416999999994,
+            "totalMs": 2.2504170000001977,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0012910000000374566,
+            "ftsMs": 0.16566700000021228,
+            "spanExtractMs": 1.1166659999998956,
+            "packMs": 0.6745829999999842,
+            "totalMs": 1.9600409999998192,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0018749999999272404,
+            "ftsMs": 0.15308299999969677,
+            "spanExtractMs": 1.124749999999949,
+            "packMs": 0.9386249999997744,
+            "totalMs": 2.2196249999997235,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.007458000000042375,
+            "ftsMs": 0.23720800000000963,
+            "spanExtractMs": 1.596791999999823,
+            "packMs": 0.7207910000001903,
+            "totalMs": 2.564332999999806,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0012499999997999112,
+            "ftsMs": 0.21150000000034197,
+            "spanExtractMs": 1.3980000000001382,
+            "packMs": 0.6825840000001335,
+            "totalMs": 2.2947079999999005,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.000792000000274129,
+            "ftsMs": 0.15475000000014916,
+            "spanExtractMs": 1.2152920000003178,
+            "packMs": 0.6477499999996326,
+            "totalMs": 2.0199589999997443,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0005419999997684499,
+            "ftsMs": 0.157542000000376,
+            "spanExtractMs": 1.1181669999996302,
+            "packMs": 0.6741250000000036,
+            "totalMs": 1.9514169999997648,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0005000000001018634,
+            "ftsMs": 0.1432499999996253,
+            "spanExtractMs": 1.381832999999915,
+            "packMs": 0.8283329999999296,
+            "totalMs": 2.3560829999996713,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.004208000000289758,
+            "ftsMs": 0.20908300000019153,
+            "spanExtractMs": 1.3920829999997295,
+            "packMs": 0.6911669999999503,
+            "totalMs": 2.298207999999704,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0008330000000569271,
+            "ftsMs": 0.15612499999997453,
+            "spanExtractMs": 1.145082999999886,
+            "packMs": 0.6602920000000267,
+            "totalMs": 1.9637499999998909,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0006250000001273293,
+            "ftsMs": 0.15454200000021956,
+            "spanExtractMs": 1.125332999999955,
+            "packMs": 0.6508330000001479,
+            "totalMs": 1.9323750000003201,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0005420000002231973,
+            "ftsMs": 0.1453750000000582,
+            "spanExtractMs": 1.1131249999998545,
+            "packMs": 0.6589579999999842,
+            "totalMs": 1.9189160000000811,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": true
+          }
+        ],
+        "percentiles": {
+          "scopeCompileMs": {
+            "P50": 0.001291999999921245,
+            "P95": 0.004208000000289758,
+            "P99": 0.007458000000042375
+          },
+          "ftsMs": {
+            "P50": 0.20908300000019153,
+            "P95": 1.8982499999997344,
+            "P99": 2.2928750000000946
+          },
+          "spanExtractMs": {
+            "P50": 1.2152920000003178,
+            "P95": 1.4101670000000013,
+            "P99": 1.596791999999823
+          },
+          "packMs": {
+            "P50": 0.7206249999999272,
+            "P95": 0.9386249999997744,
+            "P99": 0.9775830000003225
+          },
+          "totalMs": {
+            "P50": 2.2947079999999005,
+            "P95": 3.790874999999687,
+            "P99": 4.322625000000244
+          }
+        },
+        "remoteModelCalls": 0,
+        "returnedSpans": 8,
+        "usedTokens": 890
+      },
+      "cold": {
+        "samples": [
+          {
+            "scopeCompileMs": 0.43466699999999037,
+            "ftsMs": 2.7362080000002607,
+            "spanExtractMs": 1.149666000000252,
+            "packMs": 0.7002079999997477,
+            "totalMs": 53.740792000000056,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.28829099999984464,
+            "ftsMs": 2.9037920000000668,
+            "spanExtractMs": 1.3187080000002425,
+            "packMs": 0.8170000000000073,
+            "totalMs": 53.25458299999991,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.3195830000004207,
+            "ftsMs": 2.793167000000267,
+            "spanExtractMs": 1.1951250000001892,
+            "packMs": 0.6922079999999369,
+            "totalMs": 52.60087500000009,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.36991600000010294,
+            "ftsMs": 2.7708749999997053,
+            "spanExtractMs": 1.2412920000001577,
+            "packMs": 0.6917499999999563,
+            "totalMs": 53.73441700000012,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.28095799999982773,
+            "ftsMs": 2.8125420000001213,
+            "spanExtractMs": 1.3815410000001975,
+            "packMs": 0.7454999999999927,
+            "totalMs": 52.971750000000156,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 890,
+            "retrievalResultCacheHit": false
+          }
+        ],
+        "percentiles": {
+          "scopeCompileMs": {
+            "P50": 0.3195830000004207,
+            "P95": 0.43466699999999037,
+            "P99": 0.43466699999999037
+          },
+          "ftsMs": {
+            "P50": 2.793167000000267,
+            "P95": 2.9037920000000668,
+            "P99": 2.9037920000000668
+          },
+          "spanExtractMs": {
+            "P50": 1.2412920000001577,
+            "P95": 1.3815410000001975,
+            "P99": 1.3815410000001975
+          },
+          "packMs": {
+            "P50": 0.7002079999997477,
+            "P95": 0.8170000000000073,
+            "P99": 0.8170000000000073
+          },
+          "totalMs": {
+            "P50": 53.25458299999991,
+            "P95": 53.740792000000056,
+            "P99": 53.740792000000056
+          }
+        },
+        "remoteModelCalls": 0,
+        "returnedSpans": 8,
+        "usedTokens": 890
+      }
+    },
+    {
+      "size": 100000,
+      "hot": {
+        "samples": [
+          {
+            "scopeCompileMs": 0.002375000000029104,
+            "ftsMs": 0.28949999999895226,
+            "spanExtractMs": 21.19683399999849,
+            "packMs": 0.9599589999997988,
+            "totalMs": 22.452166000002762,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0020000000004074536,
+            "ftsMs": 21.54279200000019,
+            "spanExtractMs": 20.666416000000027,
+            "packMs": 0.7963749999980791,
+            "totalMs": 43.009500000000116,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.0017090000001189765,
+            "ftsMs": 21.52008299999943,
+            "spanExtractMs": 20.633249999998952,
+            "packMs": 0.7927909999998519,
+            "totalMs": 42.95012499999939,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.0024159999993571546,
+            "ftsMs": 21.847625000002154,
+            "spanExtractMs": 20.820457999998325,
+            "packMs": 0.9151249999995343,
+            "totalMs": 43.588833999998315,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.0022920000010344665,
+            "ftsMs": 21.64641699999993,
+            "spanExtractMs": 21.166416000000027,
+            "packMs": 0.942166000000725,
+            "totalMs": 43.76029099999869,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.0016250000007858034,
+            "ftsMs": 21.617708000001585,
+            "spanExtractMs": 20.586833000001207,
+            "packMs": 0.7550839999967138,
+            "totalMs": 42.963707999999315,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.0011249999988649506,
+            "ftsMs": 0.2541669999991427,
+            "spanExtractMs": 20.548290999999153,
+            "packMs": 0.9497080000001006,
+            "totalMs": 21.75604100000055,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0026249999973515514,
+            "ftsMs": 0.33175000000119326,
+            "spanExtractMs": 21.43054199999824,
+            "packMs": 0.7189580000012938,
+            "totalMs": 22.48595800000112,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0014579999988200143,
+            "ftsMs": 0.24291600000287872,
+            "spanExtractMs": 21.13091600000189,
+            "packMs": 0.9618330000012065,
+            "totalMs": 22.339708999999857,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0021249999990686774,
+            "ftsMs": 0.2957910000004631,
+            "spanExtractMs": 24.136459000001196,
+            "packMs": 0.9160000000010768,
+            "totalMs": 25.35295799999949,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0019170000014128163,
+            "ftsMs": 0.31279199999698903,
+            "spanExtractMs": 21.358791000002384,
+            "packMs": 0.8425830000014685,
+            "totalMs": 22.519000000000233,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0015420000017911661,
+            "ftsMs": 0.263875000000553,
+            "spanExtractMs": 21.092874999998457,
+            "packMs": 0.9241250000013679,
+            "totalMs": 22.285250000000815,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0016249999971478246,
+            "ftsMs": 0.2862910000003467,
+            "spanExtractMs": 20.928875000001426,
+            "packMs": 0.8151249999973516,
+            "totalMs": 22.034874999997555,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0015419999981531873,
+            "ftsMs": 0.25412499999947613,
+            "spanExtractMs": 21.323333000000275,
+            "packMs": 0.8563749999993888,
+            "totalMs": 22.437834000000294,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.001374999999825377,
+            "ftsMs": 0.26708299999882,
+            "spanExtractMs": 21.650041999997484,
+            "packMs": 0.8899170000004233,
+            "totalMs": 22.811792000000423,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0017499999994470272,
+            "ftsMs": 0.3016250000000582,
+            "spanExtractMs": 21.0570000000007,
+            "packMs": 0.7537919999995211,
+            "totalMs": 22.11633299999812,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0012499999975261744,
+            "ftsMs": 0.24037500000122236,
+            "spanExtractMs": 21.018166999998357,
+            "packMs": 0.8246670000007725,
+            "totalMs": 22.086708000002545,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.001374999999825377,
+            "ftsMs": 0.2680419999996957,
+            "spanExtractMs": 20.28141599999799,
+            "packMs": 0.7421249999970314,
+            "totalMs": 21.295375000001513,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.001374999999825377,
+            "ftsMs": 0.23300000000017462,
+            "spanExtractMs": 20.453084000000672,
+            "packMs": 0.959208000000217,
+            "totalMs": 21.64929200000188,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": true
+          },
+          {
+            "scopeCompileMs": 0.0016249999971478246,
+            "ftsMs": 0.28395799999998417,
+            "spanExtractMs": 19.776708000001236,
+            "packMs": 0.7289579999996931,
+            "totalMs": 20.793416000000434,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": true
+          }
+        ],
+        "percentiles": {
+          "scopeCompileMs": {
+            "P50": 0.0016249999971478246,
+            "P95": 0.0024159999993571546,
+            "P99": 0.0026249999973515514
+          },
+          "ftsMs": {
+            "P50": 0.2862910000003467,
+            "P95": 21.64641699999993,
+            "P99": 21.847625000002154
+          },
+          "spanExtractMs": {
+            "P50": 21.018166999998357,
+            "P95": 21.650041999997484,
+            "P99": 24.136459000001196
+          },
+          "packMs": {
+            "P50": 0.8425830000014685,
+            "P95": 0.9599589999997988,
+            "P99": 0.9618330000012065
+          },
+          "totalMs": {
+            "P50": 22.437834000000294,
+            "P95": 43.588833999998315,
+            "P99": 43.76029099999869
+          }
+        },
+        "remoteModelCalls": 0,
+        "returnedSpans": 8,
+        "usedTokens": 892
+      },
+      "cold": {
+        "samples": [
+          {
+            "scopeCompileMs": 0.2947500000009313,
+            "ftsMs": 23.173541000000114,
+            "spanExtractMs": 22.3125,
+            "packMs": 0.9032919999990554,
+            "totalMs": 526.9387920000008,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.44979199999943376,
+            "ftsMs": 22.1127919999999,
+            "spanExtractMs": 20.518958999997267,
+            "packMs": 0.9388330000001588,
+            "totalMs": 521.6046249999999,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.3202500000006694,
+            "ftsMs": 22.617874999999913,
+            "spanExtractMs": 21.197707999999693,
+            "packMs": 0.8242499999978463,
+            "totalMs": 510.0680420000026,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.3152909999989788,
+            "ftsMs": 22.30199999999968,
+            "spanExtractMs": 21.05845799999952,
+            "packMs": 0.8387910000019474,
+            "totalMs": 510.580582999999,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": false
+          },
+          {
+            "scopeCompileMs": 0.38491699999940465,
+            "ftsMs": 22.023000000001048,
+            "spanExtractMs": 20.072374999999738,
+            "packMs": 0.9268750000010186,
+            "totalMs": 502.85070800000176,
+            "remoteModelCalls": 0,
+            "returnedSpans": 8,
+            "usedTokens": 892,
+            "retrievalResultCacheHit": false
+          }
+        ],
+        "percentiles": {
+          "scopeCompileMs": {
+            "P50": 0.3202500000006694,
+            "P95": 0.44979199999943376,
+            "P99": 0.44979199999943376
+          },
+          "ftsMs": {
+            "P50": 22.30199999999968,
+            "P95": 23.173541000000114,
+            "P99": 23.173541000000114
+          },
+          "spanExtractMs": {
+            "P50": 21.05845799999952,
+            "P95": 22.3125,
+            "P99": 22.3125
+          },
+          "packMs": {
+            "P50": 0.9032919999990554,
+            "P95": 0.9388330000001588,
+            "P99": 0.9388330000001588
+          },
+          "totalMs": {
+            "P50": 510.580582999999,
+            "P95": 526.9387920000008,
+            "P99": 526.9387920000008
+          }
+        },
+        "remoteModelCalls": 0,
+        "returnedSpans": 8,
+        "usedTokens": 892
+      }
+    }
+  ]
+}

@@ -1379,6 +1379,7 @@ async function resolvePackagedArtifactBoot() {
   // 激活的 beta 目录当"不在保留集"删掉）。
   const bootChannel = readUpdateChannelPreference();
   _artifactBootChannel = bootChannel;
+  let preparingSplashWindow = null;
   const boot = await artifactBoot.prepareArtifactBoot({
     homeDir: lingxiHome,
     resourcesPath,
@@ -1390,14 +1391,18 @@ async function resolvePackagedArtifactBoot() {
     channel: bootChannel,
     onProgress: () => {
       // 首启解压进度：splash 专属 preparing 模式（固定"正在准备新家"文案，
-      // 关闭轮播，不带版本号——这是新装场景，不是壳更新）。两只箱子
-      //（renderer + server）各自解压时都会触发这个回调，重复加载同一个
-      // URL 是幂等的。解压完成后 server 正常启动、主窗口就绪时 splash
-      // 会照常关闭。splash 走 `_distSplash`，不受 `_distRenderer` 尚未
-      // 就绪影响（这正是它能在解压过程中显示的原因）。
-      if (splashWindow && !splashWindow.isDestroyed()) {
-        loadSplashWindowURL(splashWindow, { query: { mode: "preparing" } });
-      }
+      // 关闭轮播，不带版本号）。两只归档都可能报告进度，同一窗口只切换一次；
+      // 先等初始页面加载完成，避免新导航中断旧导航而产生 ERR_ABORTED。
+      const win = splashWindow;
+      if (!win || win.isDestroyed() || preparingSplashWindow === win) return;
+      preparingSplashWindow = win;
+      const showPreparing = () => {
+        if (splashWindow === win && !win.isDestroyed()) {
+          loadSplashWindowURL(win, { query: { mode: "preparing" } });
+        }
+      };
+      if (win.webContents.isLoadingMainFrame()) win.webContents.once("did-finish-load", showPreparing);
+      else showPreparing();
     },
     log: (msg) => console.log(redactMainLogText(msg)),
   });

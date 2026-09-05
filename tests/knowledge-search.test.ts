@@ -5,9 +5,9 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import {
-  buildKnowledgeChunks,
-  knowledgeBlockFingerprint,
-  resolveKnowledgeChunkerConfig,
+  buildLegacyKnowledgeChunks as buildKnowledgeChunks,
+  legacyKnowledgeBlockFingerprint as knowledgeBlockFingerprint,
+  resolveLegacyKnowledgeChunkerConfig as resolveKnowledgeChunkerConfig,
 } from "../lib/knowledge/chunker.ts";
 import { KnowledgeIndexStore } from "../lib/knowledge/knowledge-index-store.ts";
 import type { KnowledgeBlock } from "../lib/knowledge/types.ts";
@@ -17,6 +17,7 @@ import {
   tokenizeSearchText,
 } from "../lib/search/search-text.ts";
 
+// 这些原始索引夹具与无重叠拼接断言固定验证 v2；v3 的章节、重叠和原文完整性另有专测。
 const tempDirs: string[] = [];
 const stores: KnowledgeIndexStore[] = [];
 

@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { buildSync } from "esbuild";
 
 export const SERVER_RUNTIME_ASSET_FILES = [
   "Lingxi.png",
@@ -174,4 +175,45 @@ function listFilesRecursive(fsImpl, rootDir) {
   }
   visit(rootDir);
   return names;
+}
+
+/** 包内验证直接执行同一份后端源码的构建结果，不借用开发目录依赖。 */
+export function buildKnowledgeVectorRuntime({ rootDir, bundleOutDir }) {
+  buildSync({ stdin: { contents: [
+    'export { createKnowledgeVectorSearchBackend } from "./lib/knowledge/vector-search-backend-factory.ts";',
+    'export { PortableVectorIndexAdapter, knowledgeChunkIndexVariantId } from "./lib/knowledge/vector-index-adapter.ts";',
+    'export { searchVectorBackend } from "./lib/knowledge/vector-search-backend.ts";',
+  ].join("\n"), resolveDir: rootDir, sourcefile: "knowledge-vector-runtime-entry.ts" },
+    bundle: true, platform: "node", format: "esm", target: "node24", packages: "external",
+    outfile: path.join(bundleOutDir, "knowledge-vector.js"), logLevel: "silent" });
+  buildSync({ stdin: { contents: 'export { KnowledgeManager } from "./lib/knowledge/knowledge-manager.ts";',
+    resolveDir: rootDir, sourcefile: "knowledge-query-runtime-entry.ts" },
+    bundle: true, platform: "node", format: "esm", target: "node24", packages: "external",
+    outfile: path.join(bundleOutDir, "knowledge-query.js"), logLevel: "silent" });
+}
+
+export function knowledgeUseArchNativePath(platform, arch) {
+  const target = platform === "darwin" && ["x64", "arm64"].includes(arch) ? "darwin-arm64+x64"
+    : platform === "linux" && ["x64", "arm64"].includes(arch) ? `linux-${arch}`
+    : platform === "win32" && arch === "x64" ? "win32-x64" : null;
+  if (!target) throw new Error(`unsupported knowledge native target: ${platform}-${arch}`);
+  return `node_modules/usearch/prebuilds/${target}/usearch.node`;
+}
+
+export function requiredKnowledgeVectorRuntimeFiles(platform, arch) {
+  return ["bundle/knowledge-vector.js", "bundle/knowledge-query.js", "node_modules/usearch/package.json",
+    "node_modules/usearch/javascript/dist/cjs/package.json", "node_modules/usearch/javascript/dist/cjs/usearch.js",
+    "node_modules/node-gyp-build/index.js", "node_modules/node-gyp-build/node-gyp-build.js",
+    "node_modules/bindings/bindings.js", knowledgeUseArchNativePath(platform, arch)];
+}
+
+export function assertKnowledgeVectorRuntime(serverDir, platform, arch) {
+  for (const relative of requiredKnowledgeVectorRuntimeFiles(platform, arch)) {
+    const file = path.join(serverDir, ...relative.split("/"));
+    if (!fs.existsSync(file) || !fs.statSync(file).isFile() || fs.statSync(file).size === 0) {
+      throw new Error(`packaged knowledge vector runtime missing: ${relative}`);
+    }
+  }
+  const pkg = JSON.parse(fs.readFileSync(path.join(serverDir, "node_modules/usearch/package.json"), "utf8"));
+  if (pkg.version !== "2.26.0") throw new Error("packaged usearch version must be exactly 2.26.0");
 }

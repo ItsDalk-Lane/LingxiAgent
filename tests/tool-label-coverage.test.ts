@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { getKnowledgeResearchToolNames } from '../shared/tool-categories.ts';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -37,9 +38,11 @@ const LABELED_TOOL_NAMES = [
   'web_search', 'web_fetch', 'todo_write', 'automation', 'stage_files', 'file', 'channel',
   'browser', 'computer', 'install_skill', 'notify', 'stop_task', 'update_settings',
   'session_folders', 'subagent', 'subagent_reply', 'subagent_close', 'workflow',
-  'check_pending_tasks', 'loop_control', 'current_status', 'session', 'knowledge_read',
-  'knowledge_think', 'knowledge_search', 'knowledge_read_part', 'knowledge_supplement',
-  'knowledge_answer',
+  'check_pending_tasks', 'loop_control', 'current_status', 'session', 'knowledge_search', 'knowledge_read',
+  'knowledge_think', 'knowledge_read_part', 'knowledge_supplement',
+  'knowledge_answer', 'knowledge_local_search',
+  'knowledge_research_plan', 'knowledge_research_round', 'knowledge_research_worker',
+  'knowledge_research_progress', 'knowledge_research_review', 'knowledge_research_synthesis',
   'knowledge_outline', 'knowledge_grep', 'knowledge_manage',
   'hana_card_guide', 'show_card',
   // Hub 频道
@@ -66,6 +69,11 @@ const ACTION_LABEL_KEYS = ['session_send', 'session_create'];
 const UNLABELED_TOOL_NAMES = new Set([
   'structured_output',              // workflow 内部结构化输出
   'jian_update_status',             // desk 心跳
+  'knowledge_research_update',     // 隔离调查工具由聚合进度卡承接
+  'knowledge_research_finish',
+  'knowledge_delegate',
+  'knowledge_coverage_read',       // 仅完整性隔离工作会话内使用，主会话显示聚合研究进度
+  'knowledge_completeness_mark',
   'patrol_update_log',              // desk 巡检
   'hana',                           // MCP client 自我标识，非 agent 工具
   'stop', 'new', 'reset', 'rc', 'exitrc', 'apply', 'confirm', 'reject', 'compact', 'loop',
@@ -101,7 +109,28 @@ function scanRegisteredToolNames(): Set<string> {
 }
 
 describe('工具行文案对账', () => {
+  it('完整性内部工具的文案登记以实际隔离工具边界为依据', () => {
+    const privateTools = getKnowledgeResearchToolNames('knowledge_completeness_worker');
+    expect(privateTools).toEqual(['knowledge_coverage_read', 'knowledge_completeness_mark']);
+    for (const name of privateTools) {
+      expect(UNLABELED_TOOL_NAMES.has(name)).toBe(true);
+      expect(getKnowledgeResearchToolNames('knowledge_research_root')).not.toContain(name);
+      expect(getKnowledgeResearchToolNames('knowledge_research_worker')).not.toContain(name);
+    }
+  });
   for (const locale of locales) {
+    it(`${locale}.json 本地快速检索提示、结果与时限文案完整`, () => {
+      const data = loadLocale(locale);
+      for (const key of ['knowledgeModeFastHint', 'knowledgeModeDetailedHint']) {
+        expect(data.input[key]).toBeTypeOf('string');
+        expect(data.input[key].trim()).not.toBe('');
+      }
+      for (const key of ['knowledgeLocalEvidenceFound', 'knowledgeFastSummary']) {
+        expect(data.chat[key]).toContain('{n}');
+        expect(data.chat[key]).toContain('{ms}');
+      }
+      expect(data.chat.knowledgeFastDeadlineExceeded.trim()).not.toBe('');
+    });
     it(`${locale}.json 为每个已登记工具提供三相位文案`, () => {
       const tool = loadLocale(locale).tool ?? {};
       const missing: string[] = [];

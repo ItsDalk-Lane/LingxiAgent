@@ -44,6 +44,12 @@
     "sendFailed": "傳送失敗"
   },
   "knowledge": {
+    "citationRetry": "重新載入",
+    "citationNumber": "引用 {number}，懸停查看原文，按 Enter 開啟",
+    "citationLoading": "正在載入原文…",
+    "citationFailed": "暫時無法載入原文，資料可能已移除或連線無法使用。",
+    "citationSource": "知識資料",
+    "citationTitle": "引用原文",
     "tab": "知識",
     "title": "知識庫",
     "newNotebook": "新增筆記本",
@@ -114,7 +120,7 @@
     "settingsRerankHint": "本筆記本專屬；僅影響查詢排序，不觸發重建",
     "settingsGlobalNotConfigured": "未設定",
     "settingsChunkTargetChars": "分塊大小（字元）",
-    "settingsChunkHint": "按嵌入模型上下文視窗 ×80% 自動計算（1 token = 1 字元口徑）；換嵌入模型後自動重建",
+    "settingsChunkHint": "按字元數設定片段目標，優先保留句段和章節邊界。留空使用預設 2048 字元。儲存後於背景重建，保留既有回答的引用。",
     "settingsInvalidNumber": "請輸入 {min}–{max} 之間的整數",
     "selectSource": "選擇一個來源查看解析內容",
     "ingestionQueued": "排隊中",
@@ -130,7 +136,7 @@
     "readinessProcessing": "{count} 攝入中",
     "readinessPendingEmbedding": "{count} 待嵌入",
     "readinessFailed": "{count} 失敗",
-    "settingsChunkAutoFallback": "自動（約 6553）",
+    "settingsChunkAutoFallback": "預設（2048 字元）",
     "settingsVectorRetention": "向量保留策略",
     "settingsRetentionKeepForever": "永久保留（預設）",
     "settingsRetentionDaysMode": "天數後清理",
@@ -390,6 +396,13 @@
     "back": "返回"
   },
   "chat": {
+    "knowledgeResearchInterrupted": "調查已中斷",
+    "knowledgeResearchStopIncomplete": "調查流程未正常結束",
+    "knowledgeResearchStopUnavailable": "調查所需工具無法使用",
+    "knowledgeResearchStopNoProgress": "繼續調查未取得新證據",
+    "knowledgeResearchStopRounds": "已達到調查輪數上限",
+    "knowledgeResearchStopTime": "調查時間已用完",
+    "knowledgeResearchStopTools": "共享工具呼叫次數已用完",
     "find": {
       "locateFailed": "未能定位到該訊息",
       "placeholder": "在會話中查找"
@@ -464,6 +477,16 @@
     "knowledgeRetrievalSupplementTitle": "滾動注入循環中模型自主發起的補充檢索",
     "knowledgeTraceResults": "{n} 個搜尋結果",
     "knowledgeTraceFailed": "檢索失敗",
+    "knowledgeLocalEvidenceFound": "已找到 {n} 條證據 · {ms}ms",
+    "knowledgeFastSummary": "快速檢索 · {n} 條證據 · {ms}ms",
+    "knowledgeFastDeadlineExceeded": "已超出目標時限",
+    "knowledgeResearchSummary": "詳細調查 · {rounds} 輪 · {searches} 次檢索 · {reads} 次閱讀 · {completed}/{total} 項完成",
+    "knowledgeResearchPartialSummary": "詳細調查尚未完全完成 · {rounds} 輪 · 仍有 {pending} 項待確認",
+    "knowledgeResearchProgress": "已完成 {completed}/{total} 個證據問題",
+    "knowledgeResearchCancelled": "詳細調查已取消",
+    "knowledgeResearchTruncated": "部分證據未納入",
+    "knowledgeResearchFailed": "詳細調查失敗",
+    "knowledgeResearchReviewCounts": "{conflicts} 項矛盾 · {pending} 項待確認",
     "knowledgeMetaModeFast": "快速模式",
     "knowledgeMetaModeDetailed": "詳細模式",
     "feedbackUp": "有幫助（記入經驗庫）",
@@ -604,8 +627,8 @@
     },
     "knowledgeModeFast": "快速",
     "knowledgeModeDetailed": "詳細",
-    "knowledgeModeFastHint": "以最快速度回答：只取最相關的高命中證據，不做全量拆解與滾動閱讀",
-    "knowledgeModeDetailedHint": "盡量詳盡：拆解問題、多路召回，證據過多時分批閱讀後綜合回答"
+    "knowledgeModeFastHint": "純本機快速檢索；不等待遠端嵌入、重排或多輪調查。",
+    "knowledgeModeDetailedHint": "進行多輪檢索、閱讀和證據核對後產生詳細回答。"
   },
   "agentReview": {
     "running": "正在審閱目前對話",
@@ -824,6 +847,10 @@
     "active": "思考中"
   },
   "toolGroup": {
+    "mixedCount": "{tools} 次工具呼叫 · {steps} 個調查步驟",
+    "researchRunning": "{n} 個調查步驟進行中",
+    "researchCountWithFail": "{total} 個調查步驟（{fail} 個未完成）",
+    "researchCount": "{n} 個調查步驟",
     "success": "✿ {name} 忙完了，小事一樁～ · {n} 步",
     "failed": "⚠ 好像出了點問題 · {n} 步",
     "countWithFail": "{total} 個工具（{fail} 個失敗）",
@@ -842,9 +869,10 @@
     }
   },
   "processFold": {
+    "research": "{n} 個調查步驟",
     "summary": "✨ {name}忙活了一陣子",
     "tools": "{n} 個工具",
-    "knowledge": "{n} 次檢索",
+    "knowledge": "{n} 份知識資料",
     "thinking": "{n} 次思考",
     "unsuccessful": "{n} 次嘗試未成功"
   },
@@ -1199,10 +1227,15 @@
       "done": "🧠 拆解了問題",
       "failed": "🧠 問題沒拆解出來"
     },
+    "knowledge_local_search": {
+      "running": "正在本機檢索知識庫",
+      "done": "已完成本機檢索",
+      "failed": "本機檢索失敗"
+    },
     "knowledge_search": {
       "running": "🔍 正在檢索知識庫",
       "done": "🔍 檢索了知識庫",
-      "failed": "🔍 檢索失敗"
+      "failed": "🔍 知識庫檢索失敗"
     },
     "knowledge_read_part": {
       "running": "📖 正在閱讀證據",
@@ -1213,6 +1246,36 @@
       "running": "↻ 模型發起補充檢索",
       "done": "↻ 模型發起了補充檢索",
       "failed": "↻ 補充檢索失敗"
+    },
+    "knowledge_research_plan": {
+      "running": "正在規劃調查",
+      "done": "已規劃調查",
+      "failed": "調查規劃未完成"
+    },
+    "knowledge_research_round": {
+      "running": "第 {round}/{maxRounds} 輪：正在檢索和閱讀",
+      "done": "第 {round}/{maxRounds} 輪調查已結束",
+      "failed": "第 {round}/{maxRounds} 輪調查未完成"
+    },
+    "knowledge_research_worker": {
+      "running": "已派出 {count} 個調查 Agent",
+      "done": "{count} 個調查 Agent 已結束任務",
+      "failed": "{count} 個調查 Agent 未完成任務"
+    },
+    "knowledge_research_progress": {
+      "running": "已完成 {completed}/{total} 個證據問題",
+      "done": "已完成 {completed}/{total} 個證據問題",
+      "failed": "已完成 {completed}/{total} 個證據問題（本次更新未完成）"
+    },
+    "knowledge_research_review": {
+      "running": "正在核對矛盾和缺口",
+      "done": "已核對矛盾和缺口",
+      "failed": "矛盾與缺口核對未完成"
+    },
+    "knowledge_research_synthesis": {
+      "running": "正在整理詳細回答",
+      "done": "已整理回答依據",
+      "failed": "回答依據整理未完成"
     },
     "knowledge_answer": {
       "running": "✻ 正在產生回答",

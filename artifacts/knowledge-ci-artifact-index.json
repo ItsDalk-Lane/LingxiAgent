@@ -1,0 +1,178 @@
+{
+  "runId": 33864141539,
+  "headSha": "790b496d88d8af6ad4a621085b93d802cc2553f9",
+  "sourceCommand": "gh api --paginate --slurp repos/ItsDalk-Lane/LingxiAgent/actions/runs/33864141539/artifacts",
+  "digestMeaning": "GitHub artifact archive SHA-256; not individual installer checksums",
+  "artifacts": [
+    {
+      "id": 9934295598,
+      "name": "installer-macos-15-intel-x64",
+      "size_in_bytes": 1112163026,
+      "digest": "sha256:635ab9cd3674dab9a4f9a6c48808a2db82af946fb5303a5e478f6ba5f6e8e40c",
+      "created_at": "2026-09-04T11:13:07Z",
+      "expires_at": "2026-09-07T11:11:51Z",
+      "expired": false,
+      "archive_download_url": "https://api.github.com/repos/ItsDalk-Lane/LingxiAgent/actions/artifacts/9934295598/zip",
+      "workflow_run": {
+        "id": 33864141539,
+        "repository_id": 1323644937,
+        "head_repository_id": 1323644937,
+        "head_branch": "feat/knowledge-retrieval-research-p0-p3",
+        "head_sha": "790b496d88d8af6ad4a621085b93d802cc2553f9"
+      }
+    },
+    {
+      "id": 9934259541,
+      "name": "knowledge-desktop-startup-darwin-x64",
+      "size_in_bytes": 444,
+      "digest": "sha256:99b4e55047470d56c30f784a35da615575ddae598b58e4db3ad6a071c99b9058",
+      "created_at": "2026-09-04T11:11:51Z",
+      "expires_at": "2026-12-03T10:37:56Z",
+      "expired": false,
+      "archive_download_url": "https://api.github.com/repos/ItsDalk-Lane/LingxiAgent/actions/artifacts/9934259541/zip",
+      "workflow_run": {
+        "id": 33864141539,
+        "repository_id": 1323644937,
+        "head_repository_id": 1323644937,
+        "head_branch": "feat/knowledge-retrieval-research-p0-p3",
+        "head_sha": "790b496d88d8af6ad4a621085b93d802cc2553f9"
+      }
+    },
+    {
+      "id": 9934145958,
+      "name": "installer-windows-2025-x64",
+      "size_in_bytes": 908925931,
+      "digest": "sha256:7e3bc83b9d25d54b52d2ec2bcc3d3f0039bb90d094e1a9a14a89fb429a6b813e",
+      "created_at": "2026-09-04T11:07:50Z",
+      "expires_at": "2026-09-07T11:07:19Z",
+      "expired": false,
+      "archive_download_url": "https://api.github.com/repos/ItsDalk-Lane/LingxiAgent/actions/artifacts/9934145958/zip",
+      "workflow_run": {
+        "id": 33864141539,
+        "repository_id": 1323644937,
+        "head_repository_id": 1323644937,
+        "head_branch": "feat/knowledge-retrieval-research-p0-p3",
+        "head_sha": "790b496d88d8af6ad4a621085b93d802cc2553f9"
+      }
+    },
+    {
+      "id": 9934131301,
+      "name": "knowledge-desktop-startup-win32-x64",
+      "size_in_bytes": 426,
+      "digest": "sha256:22e5c9da44344bd5cf4ebb1fd88fc587cf86e4d01b48478d72a7369479bd5e17",
+      "created_at": "2026-09-04T11:07:18Z",
+      "expires_at": "2026-12-03T10:37:56Z",
+      "expired": false,
+      "archive_download_url": "https://api.github.com/repos/ItsDalk-Lane/LingxiAgent/actions/artifacts/9934131301/zip",
+      "workflow_run": {
+        "id": 33864141539,
+        "repository_id": 1323644937,
+        "head_repository_id": 1323644937,
+        "head_branch": "feat/knowledge-retrieval-research-p0-p3",
+        "head_sha": "790b496d88d8af6ad4a621085b93d802cc2553f9"
+      }
+    },
+    {
+      "id": 9933827938,
+      "name": "installer-ubuntu-24.04-x64",
+      "size_in_bytes": 1098074519,
+      "digest": "sha256:40358320fb03c2091f9fb18d705e18fb0339d8730b15b69e89cc261b9edc57a7",
+      "created_at": "2026-09-04T10:56:59Z",
+      "expires_at": "2026-09-07T10:56:25Z",
+      "expired": false,
+      "archive_download_url": "https://api.github.com/repos/ItsDalk-Lane/LingxiAgent/actions/artifacts/9933827938/zip",
+      "workflow_run": {
+        "id": 33864141539,
+        "repository_id": 1323644937,
+        "head_repository_id": 1323644937,
+        "head_branch": "feat/knowledge-retrieval-research-p0-p3",
+        "head_sha": "790b496d88d8af6ad4a621085b93d802cc2553f9"
+      }
+    },
+    {
+      "id": 9933825907,
+      "name": "installer-macos-15-arm64",
+      "size_in_bytes": 1099662432,
+      "digest": "sha256:c882abaed2c5798d68b201347a56373ae08bc358799b2b7d17e135f6309d1d50",
+      "created_at": "2026-09-04T10:56:55Z",
+      "expires_at": "2026-09-07T10:56:25Z",
+      "expired": false,
+      "archive_download_url": "https://api.github.com/repos/ItsDalk-Lane/LingxiAgent/actions/artifacts/9933825907/zip",
+      "workflow_run": {
+        "id": 33864141539,
+        "repository_id": 1323644937,
+        "head_repository_id": 1323644937,
+        "head_branch": "feat/knowledge-retrieval-research-p0-p3",
+        "head_sha": "790b496d88d8af6ad4a621085b93d802cc2553f9"
+      }
+    },
+    {
+      "id": 9933811262,
+      "name": "knowledge-desktop-startup-darwin-arm64",
+      "size_in_bytes": 437,
+      "digest": "sha256:6584bfc6693d74e7854c79941b3079689ce3566527a67e0e1c57ad90ef808270",
+      "created_at": "2026-09-04T10:56:25Z",
+      "expires_at": "2026-12-03T10:37:56Z",
+      "expired": false,
+      "archive_download_url": "https://api.github.com/repos/ItsDalk-Lane/LingxiAgent/actions/artifacts/9933811262/zip",
+      "workflow_run": {
+        "id": 33864141539,
+        "repository_id": 1323644937,
+        "head_repository_id": 1323644937,
+        "head_branch": "feat/knowledge-retrieval-research-p0-p3",
+        "head_sha": "790b496d88d8af6ad4a621085b93d802cc2553f9"
+      }
+    },
+    {
+      "id": 9933811215,
+      "name": "knowledge-desktop-startup-linux-x64",
+      "size_in_bytes": 430,
+      "digest": "sha256:df2377b3287de27ef78486ed5c7a44cff4c42ec70a417ac2fc669ff9ba0269fe",
+      "created_at": "2026-09-04T10:56:25Z",
+      "expires_at": "2026-12-03T10:37:56Z",
+      "expired": false,
+      "archive_download_url": "https://api.github.com/repos/ItsDalk-Lane/LingxiAgent/actions/artifacts/9933811215/zip",
+      "workflow_run": {
+        "id": 33864141539,
+        "repository_id": 1323644937,
+        "head_repository_id": 1323644937,
+        "head_branch": "feat/knowledge-retrieval-research-p0-p3",
+        "head_sha": "790b496d88d8af6ad4a621085b93d802cc2553f9"
+      }
+    },
+    {
+      "id": 9933626152,
+      "name": "knowledge-benchmarks-linux-x64",
+      "size_in_bytes": 9655,
+      "digest": "sha256:8e194b35c6970987cafcca68af375866068cb82ba70fec7dfd6cc55408ebbc9c",
+      "created_at": "2026-09-04T10:50:11Z",
+      "expires_at": "2026-12-03T10:37:56Z",
+      "expired": false,
+      "archive_download_url": "https://api.github.com/repos/ItsDalk-Lane/LingxiAgent/actions/artifacts/9933626152/zip",
+      "workflow_run": {
+        "id": 33864141539,
+        "repository_id": 1323644937,
+        "head_repository_id": 1323644937,
+        "head_branch": "feat/knowledge-retrieval-research-p0-p3",
+        "head_sha": "790b496d88d8af6ad4a621085b93d802cc2553f9"
+      }
+    },
+    {
+      "id": 9933533137,
+      "name": "renderer-box",
+      "size_in_bytes": 77692504,
+      "digest": "sha256:0ecc992250e7235c836b00d81dd4de646eb38939e5c8175b13e41d1f044409df",
+      "created_at": "2026-09-04T10:47:03Z",
+      "expires_at": "2026-09-07T10:46:58Z",
+      "expired": false,
+      "archive_download_url": "https://api.github.com/repos/ItsDalk-Lane/LingxiAgent/actions/artifacts/9933533137/zip",
+      "workflow_run": {
+        "id": 33864141539,
+        "repository_id": 1323644937,
+        "head_repository_id": 1323644937,
+        "head_branch": "feat/knowledge-retrieval-research-p0-p3",
+        "head_sha": "790b496d88d8af6ad4a621085b93d802cc2553f9"
+      }
+    }
+  ]
+}

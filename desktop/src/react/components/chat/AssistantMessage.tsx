@@ -59,6 +59,7 @@ import {
 } from '../automation/schedule-draft';
 import styles from './Chat.module.css';
 import { recordChatPerformance } from '../../utils/chat-performance';
+import { resolveContentSurface } from '../../utils/content-semantics';
 import {
   readLiveAssistantMessage,
   subscribeLiveAssistantMessage,
@@ -255,6 +256,7 @@ export const AssistantMessage = memo(function AssistantMessage({
               isStreaming={isStreaming}
               readOnly={readOnly}
               skillPrompt={skillPrompt}
+              knowledgeResearch={knowledgeRetrieval?.research}
             />
           </ContentBlockErrorBoundary>
         ))}
@@ -313,7 +315,7 @@ class ContentBlockErrorBoundary extends Component<{
 
 // ── ContentBlock 分发 ──
 
-const ContentBlockView = memo(function ContentBlockView({ block, agentName, agentId, yuan: _yuan, sessionPath, messageId, blockIdx, isStreaming, readOnly, skillPrompt }: {
+const ContentBlockView = memo(function ContentBlockView({ block, agentName, agentId, yuan: _yuan, sessionPath, messageId, blockIdx, isStreaming, readOnly, skillPrompt, knowledgeResearch }: {
   block: ContentBlock;
   agentName: string;
   agentId?: string | null;
@@ -324,6 +326,7 @@ const ContentBlockView = memo(function ContentBlockView({ block, agentName, agen
   isStreaming: boolean;
   readOnly: boolean;
   skillPrompt: string | null;
+  knowledgeResearch?: KnowledgeRetrievalStats['research'];
 }) {
   return renderRegisteredContentBlock(block, {
     agentName,
@@ -335,6 +338,7 @@ const ContentBlockView = memo(function ContentBlockView({ block, agentName, agen
     isStreaming,
     readOnly,
     skillPrompt,
+    knowledgeResearch,
   });
 });
 
@@ -1307,10 +1311,11 @@ function MoodRenderer({ block }: BlockRendererProps<'mood'>) {
   return <MoodBlock yuan={block.yuan} text={block.text} />;
 }
 
-function ToolGroupRenderer({ block, agentName, skillPrompt, sessionPath }: BlockRendererProps<'tool_group'>) {
+function ToolGroupRenderer({ block, agentName, skillPrompt, sessionPath, knowledgeResearch }: BlockRendererProps<'tool_group'>) {
   return (
     <ToolGroupBlock
       tools={block.tools}
+      knowledgeResearch={knowledgeResearch}
       collapsed={block.collapsed}
       agentName={agentName}
       skillPrompt={skillPrompt}
@@ -1326,6 +1331,7 @@ function TextRenderer({ block, isStreaming, sessionPath, messageId, blockIdx }: 
       source={block.source}
       active={isStreaming}
       linkContext={{ origin: 'session', sessionPath, messageId, blockIdx }}
+      numberKnowledgeCitations={resolveContentSurface(block) === 'answer'}
     />
   );
 }

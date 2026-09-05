@@ -8,7 +8,7 @@
 import fs from "fs";
 import fsp from "fs/promises";
 import path from "path";
-import { createAgentSession, SessionManager, estimateTokens, refreshSessionModelFromRegistry } from "../lib/pi-sdk/index.ts";
+import { createAgentSession, createExtensionRuntime, SessionManager, estimateTokens, refreshSessionModelFromRegistry, type LoadExtensionsResult } from "../lib/pi-sdk/index.ts";
 import { registerSessionModelCallContext } from "../lib/pi-sdk/model-call-stream-observer.ts";
 import { runWithModelTraceRoot } from "../lib/llm/model-trace-scope.ts";
 import {
@@ -49,7 +49,8 @@ import {
   normalizeSessionPermissionMode,
 } from "./session-permission-mode.ts";
 import { findModel } from "../shared/model-ref.ts";
-import { computeToolSnapshot, DEFAULT_DISABLED_TOOL_NAMES, uniqueToolNames } from "../shared/tool-categories.ts";
+import { computeToolSnapshot, DEFAULT_DISABLED_TOOL_NAMES, getKnowledgeResearchToolNames, isKnowledgeResearchSurface, uniqueToolNames } from "../shared/tool-categories.ts";
+import { KnowledgeError } from "../lib/knowledge/errors.ts";
 import {
   computeReminderLiveToolAvailability,
   computeRuntimeDisabledToolNames,
@@ -86,6 +87,7 @@ import {
   createSessionTurnContextExtension,
   normalizeSessionTurnContext,
 } from "./session-turn-context.ts";
+import { isSessionTurnInputEntry } from "../lib/turn-input-presentation.ts";
 import {
   isOfficialDeepSeekEndpoint,
   modelSupportsDirectAudioInput,
@@ -1054,6 +1056,7 @@ export class SessionCoordinator {
   declare _contextUsageEstimatePersistTimers: Map<string, any>;
   declare _memoryPressure: any;
   declare _headlessOps: Set<string>;
+  declare _researchModelsBySession: Map<string, { id: string; provider: string }>;
   declare _titlesCache: Map<string, any>;
   declare _metaCache: Map<string, any>;
   declare _sessionListProjectionCache: SessionListProjectionCache;
@@ -1104,6 +1107,7 @@ export class SessionCoordinator {
     this._runtimePressureTimers = new Map();
     this._memoryPressure = normalizeMemoryPressureOptions(deps.memoryPressure);
     this._headlessOps = new Set();
+    this._researchModelsBySession = new Map();
     this._titlesCache = new Map(); // sessionDir → { titles, ts }
     this._metaCache = new Map();   // metaPath → { data, ts }
     this._sessionListProjectionCache = deps.sessionListProjectionCache || new SessionListProjectionCache();
@@ -7795,6 +7799,7 @@ export class SessionCoordinator {
     if (!agent) return null;
     const oldPath = path.join(agent.agentDir, "activity", activitySessionFile);
     if (!fs.existsSync(oldPath)) return null;
+    if (isKnowledgeResearchSurface(this._resolveSessionManifestForPath(oldPath)?.kind)) return null;
 
     const newPath = path.join(agent.sessionDir, activitySessionFile);
     try {
@@ -7849,6 +7854,67 @@ export class SessionCoordinator {
    *   onSessionReady (sessionPath => void) 回调，session 创建后、prompt 执行前触发
    */
   async executeIsolated(prompt: any, opts: any = {}) {
+    const researchSurface = isKnowledgeResearchSurface(opts.surface) ? opts.surface : null;
+    let researchContext = null;
+    let researchModelRef: { id: string; provider: string } | null = null;
+    if (opts.surface != null && !researchSurface) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Unknown isolated research surface");
+    }
+    if (researchSurface) {
+      const input = opts.research;
+      const validId = (value) => typeof value === "string" && value.trim() && value.length <= 128;
+      if (!input || !validId(input.runId) || !validId(input.scopeId) || !validId(input.studioId)
+        || opts.persist || opts.resumeSessionPath || opts.model) {
+        throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Research requires a fresh temporary session and its Agent chat model");
+      }
+      for (const key of ["allowedNeedIds", "allowedSourceIds"]) {
+        if (input[key] !== undefined && (!Array.isArray(input[key]) || input[key].some(id => !validId(id)))) {
+          throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Invalid research assignment");
+        }
+      }
+      const completenessWorker = researchSurface === "knowledge_completeness_worker";
+      if ((completenessWorker && (!validId(input.completenessCheckId) || !validId(input.completenessShardId) || !input.completeness))
+        || (!completenessWorker && (input.completenessCheckId !== undefined || input.completenessShardId !== undefined))) {
+        throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Completeness assignment differs from the isolated surface");
+      }
+      const parent = typeof opts.parentSessionPath === "string"
+        ? this._resolveSessionManifestForPath(opts.parentSessionPath) : null;
+      const role = researchSurface === "knowledge_research_root" ? "root" : "worker";
+      const parentResearch = parent?.provenance?.researchContext;
+      if (!parent || parent.lifecycle !== "active" || !parent.ownerAgentId
+        || (opts.parentSessionId && opts.parentSessionId !== parent.sessionId)
+        || (parent.provenance?.studioId && parent.provenance.studioId !== input.studioId)
+        || (role === "root" && (isKnowledgeResearchSurface(parent.kind) || parent.domain === "subagent"
+          || (opts.agentId && opts.agentId !== parent.ownerAgentId)))
+        || (role === "worker" && (parent.kind !== "knowledge_research_root" || parentResearch?.role !== "root"
+          || parentResearch.runId !== input.runId || parentResearch.scopeId !== input.scopeId
+          || parent.provenance?.studioId !== input.studioId || !input.allowedNeedIds?.length))) {
+        throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research parent or assignment is outside the frozen scope");
+      }
+      if ((opts.agentId || parent.ownerAgentId) === parent.ownerAgentId) {
+        // 同一助手的研究沿用父会话实际选中的聊天模型，不能重新读旧默认值。
+        // 隔离研究不在普通会话缓存中，工作会话从宿主保存的父研究模型身份继承。
+        const parentModel = role === "root"
+          ? this._getSessionEntryByPath(parent.currentLocator.path)?.session?.model
+          : this._researchModelsBySession.get(parent.sessionId);
+        if (!parentModel?.id || !parentModel.provider) {
+          throw new KnowledgeError("KNOWLEDGE_MODEL_UNAVAILABLE", "Research parent chat model is unavailable");
+        }
+        researchModelRef = { id: parentModel.id, provider: parentModel.provider };
+      }
+      researchContext = {
+        runId: input.runId, scopeId: input.scopeId, role,
+        ...(input.allowedNeedIds !== undefined ? { allowedNeedIds: [...new Set(input.allowedNeedIds)] } : {}),
+        ...(input.allowedSourceIds !== undefined ? { allowedSourceIds: [...new Set(input.allowedSourceIds)] } : {}),
+        ...(completenessWorker ? { completenessCheckId: input.completenessCheckId, completenessShardId: input.completenessShardId } : {}),
+      };
+      // 研究会话的权限由宿主固定，调用方不能靠隔离执行的通用选项扩展工具或写入范围。
+      opts = { ...opts, agentId: opts.agentId || parent.ownerAgentId, parentSessionId: parent.sessionId,
+        permissionMode: SESSION_PERMISSION_MODES.READ_ONLY, approvalPolicy: "deny_on_prompt", allowHumanApproval: false,
+        subagentContext: true, workspaceFolders: [], authorizedFolders: [], fileReadSessionPaths: [],
+        toolFilter: getKnowledgeResearchToolNames(researchSurface), builtinFilter: [], extraCustomTools: [],
+        permissionContext: { knowledgeResearchSurface: researchSurface }, bridgeContext: null, notificationContext: null };
+    }
     let targetAgent = opts.agentId ? this._d.getAgentById(opts.agentId) : this._d.getAgent();
     if (!targetAgent) throw new Error(t("error.agentNotInitialized", { id: opts.agentId }));
 
@@ -7876,6 +7942,13 @@ export class SessionCoordinator {
     let isolatedIdentityPath = null;
     let isolatedInitializationReady = false;
     let isolatedProviderCacheAffinityKey: string | null = null;
+    let researchRuntime = null, researchUnsub = null, researchRuntimeClosed = false;
+    const closeResearchRuntime = async () => {
+      if (!researchRuntime || researchRuntimeClosed) return;
+      await teardownSessionResources({ session: researchRuntime, unsub: researchUnsub,
+        label: "executeIsolated[research_cleanup]", warn: (msg) => log.warn(msg) });
+      researchRuntimeClosed = true;
+    };
     // resume 复用的持久实例 session：cleanup 各路径（含 early_abort 的无条件 cleanupTempSession）
     // 一律不动，否则被 abort 一次实例文件就蒸发（撞底线#3）。
     let isResumedSession = false;
@@ -7903,29 +7976,39 @@ export class SessionCoordinator {
     };
     const cleanupTempSession = (reason = "isolated_ephemeral_cleanup") => {
       if (isResumedSession) return;
-      if (!tombstoneFreshIsolatedManifest(reason)) return;
+      if (!tombstoneFreshIsolatedManifest(reason)) {
+        if (researchSurface) throw new Error("Research temporary session manifest cleanup failed");
+        return;
+      }
       const sp = tempSessionMgr?.getSessionFile?.();
       if (sp) {
         // 临时 session 文件清理 best-effort：删不掉（如已被删/权限）不应让 isolated 执行失败。
-        try { fs.unlinkSync(sp); } catch {}
+        try { fs.unlinkSync(sp); } catch (error) {
+          if (researchSurface && error.code !== "ENOENT") throw error;
+        }
       }
     };
     const rollbackFreshIsolatedInitialization = () => {
       if (isResumedSession || isolatedInitializationReady) return;
-      if (!tombstoneFreshIsolatedManifest("isolated_initialization_failed")) return;
+      if (!tombstoneFreshIsolatedManifest("isolated_initialization_failed")) {
+        if (researchSurface) throw new Error("Research temporary session manifest cleanup failed");
+        return;
+      }
       for (const candidate of new Set([
         childSessionPath,
         isolatedIdentityPath,
         tempSessionMgr?.getSessionFile?.(),
       ].filter(Boolean))) {
-        try { fs.unlinkSync(candidate); } catch {}
+        try { fs.unlinkSync(candidate); } catch (error) {
+          if (researchSurface && error.code !== "ENOENT") throw error;
+        }
       }
     };
     try {
       const sessionDir = opts.persist || path.join(targetAgent.agentDir, '.ephemeral');
       fs.mkdirSync(sessionDir, { recursive: true });
 
-      const execCwd = opts.cwd || this._d.getHomeCwd(targetAgent.id) || process.cwd();
+      const execCwd = (!researchSurface && opts.cwd) || this._d.getHomeCwd(targetAgent.id) || process.cwd();
       const workspaceSourceSessionPath = typeof opts.parentSessionPath === "string" && opts.parentSessionPath.trim()
         ? opts.parentSessionPath
         : this.currentSessionPath;
@@ -7936,11 +8019,11 @@ export class SessionCoordinator {
         ? opts.authorizedFolders
         : this.getSessionAuthorizedFolders(workspaceSourceSessionPath);
       const execWorkspaceScope = normalizeWorkspaceScope({
-        primaryCwd: execCwd,
+        primaryCwd: researchSurface ? null : execCwd,
         workspaceFolders: inheritedWorkspaceFolders,
       });
       const execFolderScope = normalizeSessionFolderScope({
-        primaryCwd: execCwd,
+        primaryCwd: researchSurface ? null : execCwd,
         workspaceFolders: execWorkspaceScope.workspaceFolders,
         authorizedFolders: inheritedAuthorizedFolders,
       });
@@ -7949,7 +8032,7 @@ export class SessionCoordinator {
         : [];
       const models = this._d.getModels();
       // migration #5 之后 models.chat 必为 {id, provider}；旧裸字符串/缺 provider 对象视为未配置
-      const agentPreferredRef = targetAgent.config?.models?.chat;
+      const agentPreferredRef = researchModelRef ?? targetAgent.config?.models?.chat;
       const preferredRef = opts.model ? null
         : ((typeof agentPreferredRef === "object" && agentPreferredRef?.id && agentPreferredRef?.provider)
             ? agentPreferredRef : null);
@@ -7959,6 +8042,7 @@ export class SessionCoordinator {
           resolvedModel = findModel(models.availableModels, preferredRef.id, preferredRef.provider);
         }
         if (!resolvedModel) {
+          if (researchSurface) throw new KnowledgeError("KNOWLEDGE_MODEL_UNAVAILABLE", "Research Agent chat model is unavailable");
           resolvedModel = models.defaultModel;
         }
         if (!resolvedModel) {
@@ -7998,10 +8082,10 @@ export class SessionCoordinator {
         {
           ownerAgentId: targetAgent.id || null,
           domain: opts.subagentContext ? "subagent" : "activity",
-          kind: opts.subagentContext ? "subagent_child" : "activity",
+          kind: researchSurface || (opts.subagentContext ? "subagent_child" : "activity"),
           lifecycle: "active",
           memoryPolicy: {
-            mode: targetAgent.memoryMasterEnabled !== false ? "enabled" : "disabled",
+            mode: !researchSurface && targetAgent.memoryMasterEnabled !== false ? "enabled" : "disabled",
             inheritedFrom: "isolated_session_create",
           },
           permissionModeSnapshot: {
@@ -8010,12 +8094,13 @@ export class SessionCoordinator {
             capturedAt: new Date().toISOString(),
           },
           workspaceScope: {
-            primaryCwd: execCwd,
+            primaryCwd: execWorkspaceScope.primaryCwd,
             workspaceFolders: execWorkspaceScope.workspaceFolders,
             authorizedFolders: execFolderScope.authorizedFolders,
           },
           provenance: {
-            createdBy: opts.subagentContext ? "subagent" : "activity",
+            createdBy: researchSurface || (opts.subagentContext ? "subagent" : "activity"),
+            ...(researchSurface ? { studioId: opts.research.studioId, researchContext } : {}),
             parentSessionId: typeof opts.parentSessionId === "string" && opts.parentSessionId.trim()
               ? opts.parentSessionId.trim()
               : (typeof opts.parentSessionPath === "string" && opts.parentSessionPath.trim()
@@ -8064,9 +8149,12 @@ export class SessionCoordinator {
       }
       const targetAgentToolsSnapshot = typeof targetAgent.getToolsSnapshot === "function"
         ? targetAgent.getToolsSnapshot({
-          forceMemoryEnabled: targetAgent.memoryMasterEnabled !== false,
+          forceMemoryEnabled: !researchSurface && targetAgent.memoryMasterEnabled !== false,
           model: execModel,
-          ...(typeof targetAgent.experienceEnabled === "boolean"
+          ...(researchSurface ? { surface: researchSurface, forceExperienceEnabled: false,
+            research: { ...opts.research, sessionPath: isolatedSessionRef.sessionPath,
+              actorContext: { ...researchContext, actorSessionId: isolatedSessionRef.sessionId, actorAgentId: targetAgent.id } } } : {}),
+          ...(!researchSurface && typeof targetAgent.experienceEnabled === "boolean"
             ? { forceExperienceEnabled: targetAgent.experienceEnabled === true }
             : {}),
         })
@@ -8080,7 +8168,7 @@ export class SessionCoordinator {
         targetAgentToolsSnapshot,
         {
           agentDir: targetAgent.agentDir,
-          workspace: execCwd,
+          workspace: execWorkspaceScope.primaryCwd,
           workspaceFolders: execWorkspaceScope.workspaceFolders,
           authorizedFolders: execFolderScope.authorizedFolders,
           getAuthorizedFolders: () => execFolderScope.authorizedFolders,
@@ -8147,6 +8235,7 @@ export class SessionCoordinator {
         getSystemPrompt: { value: () => isolatedPrompt },
         getAppendSystemPrompt: {
           value: () => {
+            if (researchSurface) return [];
             const base = resourceLoader.getAppendSystemPrompt?.() || [];
             const workspacePrompt = formatWorkspaceScopePrompt({
               primaryCwd: execWorkspaceScope.primaryCwd,
@@ -8167,7 +8256,14 @@ export class SessionCoordinator {
           },
         },
       };
-      if (targetAgent !== agent) {
+      if (researchSurface) {
+        // 研究只使用固定知识工具，扩展和技能不能在运行时重新塞入文件、网络或记忆工具。
+        // 即使没有扩展也要绑定运行接口；每个会话独立创建，多次读取保留同一个载体。
+        const extensionsResult: LoadExtensionsResult = { extensions: [], errors: [], runtime: createExtensionRuntime() };
+        execResourceLoaderProps.getExtensions = { value: () => extensionsResult };
+        execResourceLoaderProps.getSkills = { value: () => ({ skills: [], diagnostics: [] }) };
+        execResourceLoaderProps.getAgentsFiles = { value: () => ({ agentsFiles: [] }) };
+      } else if (targetAgent !== agent) {
         execResourceLoaderProps.getSkills = { value: () => skills.getSkillsForAgent(targetAgent) };
       }
       const execResourceLoader = Object.create(resourceLoader, execResourceLoaderProps);
@@ -8188,6 +8284,7 @@ export class SessionCoordinator {
         tools: actTools,
         customTools: [...actCustomTools, ...wrappedExtraCustomTools],
       });
+      if (researchSurface) researchRuntime = session;
 
       // Throwaway session: the proportional reserve still applies, but there is
       // no long-lived task to resume, so no mid-run compaction is installed.
@@ -8216,6 +8313,7 @@ export class SessionCoordinator {
           label: "executeIsolated[identity_mismatch]",
           warn: (msg) => log.warn(msg),
         });
+        if (researchSurface) researchRuntimeClosed = true;
         throw Object.assign(
           new Error(
             childSessionPath
@@ -8226,7 +8324,10 @@ export class SessionCoordinator {
         );
       }
       isolatedInitializationReady = true;
-      if (!isResumedSession && childSessionPath && this._isPromotableActivitySession(targetAgent, childSessionPath)) {
+      if (researchSurface) {
+        this._researchModelsBySession.set(isolatedSessionRef.sessionId, { id: execModel.id, provider: execModel.provider });
+      }
+      if (!researchSurface && !isResumedSession && childSessionPath && this._isPromotableActivitySession(targetAgent, childSessionPath)) {
         const promotedSessionPath = path.join(targetAgent.sessionDir, path.basename(childSessionPath));
         const isolatedSkillsResult = targetAgent !== agent && skills?.getSkillsForAgent
           ? freezeSkillsResult(skills.getSkillsForAgent(targetAgent))
@@ -8423,11 +8524,13 @@ export class SessionCoordinator {
           this._d.emitEvent({ ...event, isolated: true }, childSessionPath);
         }
       });
+      if (researchSurface) researchUnsub = unsub;
 
       // isolated 专用 teardown: 临时 session 不在 _sessions Map 中,
       // 但仍需 emit shutdown + dispose 以避免扩展资源泄漏。幂等:
       // AgentSession.dispose() 基于 _unsubscribeAgent 做重复调用保护。
       const teardownIsolatedSession = async (label) => {
+        if (researchSurface) { await closeResearchRuntime(); return; }
         await teardownSessionResources({
           session,
           unsub,
@@ -8497,6 +8600,7 @@ export class SessionCoordinator {
       };
     } catch (err) {
       log.error(`isolated execution failed: ${err.message}`);
+      await closeResearchRuntime();
       if (!isResumedSession && !isolatedInitializationReady) {
         rollbackFreshIsolatedInitialization();
       } else if (!opts.persist && tempSessionMgr) {
@@ -8504,6 +8608,9 @@ export class SessionCoordinator {
       }
       return { sessionPath: null, replyText: "", error: err.message };
     } finally {
+      if (researchSurface && isolatedSessionRef?.sessionId) {
+        this._researchModelsBySession.delete(isolatedSessionRef.sessionId);
+      }
       if (childSessionPath && bm.isRunning(childSessionPath)) {
         try { await bm.closeBrowserForSession(childSessionPath); }
         catch (err) { log.warn(`executeIsolated browser cleanup failed for ${path.basename(childSessionPath)}: ${err.message}`); }

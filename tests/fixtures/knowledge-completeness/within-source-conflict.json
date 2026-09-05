@@ -1,0 +1,24 @@
+{
+  "question": "检查全文，同一来源的预算是否冲突？",
+  "query": "预算",
+  "expectedText": [
+    "一百万元",
+    "二百万元"
+  ],
+  "expectedConflict": true,
+  "expectedUnavailable": 0,
+  "notebooks": [
+    {
+      "key": "selected",
+      "name": "完整性资料",
+      "selected": true,
+      "sources": [
+        {
+          "key": "main",
+          "name": "核查原文",
+          "text": "# 初版\n预算为一百万元。\n\n# 修订\n冲突记录：预算为二百万元。"
+        }
+      ]
+    }
+  ]
+}

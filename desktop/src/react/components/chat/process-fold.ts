@@ -9,9 +9,11 @@ import type { KnowledgeRetrievalStats } from '../../../../../shared/knowledge-re
 import { isToolCallHiddenFromProcessUi } from '../../utils/tool-call-visibility';
 import { recordChatPerformance } from '../../utils/chat-performance';
 import { resolveContentSurface } from '../../utils/content-semantics';
+import { KNOWLEDGE_RESEARCH_TOOL_NAMES } from '../../utils/tool-label';
 
 export interface ProcessFoldStats {
   toolCount: number;
+  researchCount?: number;
   thinkingCount: number;
   unsuccessfulCount: number;
   /** 知识检索步骤（非 ContentBlock，由配对 user 消息注入）：0/1，计入摘要步骤数。 */
@@ -149,6 +151,7 @@ function sourceItem(
 
 function collectStats(refs: ProcessFoldBlockRef[]): ProcessFoldStats {
   let toolCount = 0;
+  let researchCount = 0;
   let thinkingCount = 0;
   let unsuccessfulCount = 0;
 
@@ -159,13 +162,15 @@ function collectStats(refs: ProcessFoldBlockRef[]): ProcessFoldStats {
         continue;
       }
       if (!hasVisibleToolCallsShape(block)) continue;
-      const tools = visibleToolCalls(block);
+      const visible = visibleToolCalls(block);
+      const tools = visible.filter(tool => !KNOWLEDGE_RESEARCH_TOOL_NAMES.has(tool.name));
+      researchCount += visible.length - tools.length;
       toolCount += tools.length;
-      unsuccessfulCount += tools.filter((tool) => tool.done && !tool.success).length;
+      unsuccessfulCount += tools.filter((tool) => tool.status === 'failed' || (!tool.status && tool.done && !tool.success)).length;
     }
   }
 
-  return { toolCount, thinkingCount, unsuccessfulCount, knowledgeCount: 0 };
+  return { toolCount, researchCount, thinkingCount, unsuccessfulCount, knowledgeCount: 0 };
 }
 
 function objectValue(value: unknown): Record<string, unknown> | null {
@@ -266,7 +271,7 @@ function projectedTurnItems(
     const headRetrieval = knowledgeRetrievalByIndex && head
       ? knowledgeRetrievalByIndex.get(head.originalIndex) ?? null
       : null;
-    if (!headRetrieval) return sourceMessages;
+    if (!headRetrieval || (headRetrieval.executionPath === 'conversation' && !headRetrieval.unavailableReason)) return sourceMessages;
     const headProjection = head.entry.data.turnProjection;
     const headStatus = completedStatus(segment.map(({ entry }) => entry));
     const knowledgeFold: ProcessFoldRenderItem = {
@@ -321,7 +326,8 @@ function projectedTurnItems(
     originalIndex: blockRefs[0].originalIndex,
     stats: {
       ...collectStats(blockRefs),
-      knowledgeCount: headKnowledgeRetrieval ? 1 : 0,
+      knowledgeCount: headKnowledgeRetrieval && (headKnowledgeRetrieval.executionPath !== 'conversation'
+        || headKnowledgeRetrieval.unavailableReason) ? 1 : 0,
     },
     status,
     // live：不折叠、不显示 summary；settled：completed 默认折叠。
@@ -401,7 +407,8 @@ function fallbackTranslate(key: string, vars?: Record<string, string | number>):
   const table: Record<string, string> = {
     'processFold.summary': '✨ {name}忙活了一阵子',
     'processFold.tools': '{n} 个工具',
-    'processFold.knowledge': '{n} 次检索',
+    'processFold.knowledge': '{n} 份知识资料',
+    'processFold.research': '{n} 个调查步骤',
     'processFold.thinking': '{n} 次思考',
     'processFold.unsuccessful': '{n} 次尝试未成功',
   };
@@ -418,14 +425,10 @@ export function buildProcessFoldSummary(
   translate: ProcessFoldTranslator = fallbackTranslate,
 ): string {
   const parts = [translate('processFold.summary', { name: agentName })];
-  if (stats.toolCount === 0 && stats.thinkingCount === 0 && stats.knowledgeCount > 0) {
-    // 纯检索轮（无工具/思考）：步骤只有知识检索，用专属计数而非「N 个工具」。
-    parts.push(translate('processFold.knowledge', { n: stats.knowledgeCount }));
-  } else {
-    // 知识检索是轮内的一步（同工具语义）：摘要计数把它并进步数，+1。
-    const stepCount = stats.toolCount + stats.knowledgeCount;
-    if (stepCount > 0) parts.push(translate('processFold.tools', { n: stepCount }));
-  }
+  // 真实调用、调查状态与资料摘要分别计数，不能把状态卡冒充模型调用的工具。
+  if (stats.toolCount > 0) parts.push(translate('processFold.tools', { n: stats.toolCount }));
+  if (stats.researchCount) parts.push(translate('processFold.research', { n: stats.researchCount }));
+  if (stats.knowledgeCount > 0) parts.push(translate('processFold.knowledge', { n: stats.knowledgeCount }));
   if (stats.thinkingCount > 0) parts.push(translate('processFold.thinking', { n: stats.thinkingCount }));
   if (stats.unsuccessfulCount > 0) parts.push(translate('processFold.unsuccessful', { n: stats.unsuccessfulCount }));
   return parts.join(' · ');

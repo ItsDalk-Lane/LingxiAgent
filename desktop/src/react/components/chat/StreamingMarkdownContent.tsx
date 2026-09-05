@@ -16,6 +16,7 @@ interface Props {
   className?: string;
   linkContext?: LinkOpenContext;
   richTextCharLimit?: number;
+  numberKnowledgeCitations?: boolean;
 }
 
 // 阈值取自阶段 1 的 10k/50k/100k 压力档，并允许调用方在测试或产品调优时覆盖。
@@ -33,6 +34,7 @@ export const StreamingMarkdownContent = memo(function StreamingMarkdownContent({
   className,
   linkContext,
   richTextCharLimit = STREAMING_MARKDOWN_RICH_TEXT_CHAR_LIMIT,
+  numberKnowledgeCitations = false,
 }: Props) {
   const shouldAnimateStream = !!source && active;
   const cacheRef = useRef(createIncrementalMarkdownCache());
@@ -54,6 +56,7 @@ export const StreamingMarkdownContent = memo(function StreamingMarkdownContent({
       className={cx(className, shouldAnimateStream && styles.streamMarkdownBlockEnter)}
       linkContext={linkContext}
       enhanceMermaid={!active}
+      numberKnowledgeCitations={numberKnowledgeCitations}
     />
   );
 });

@@ -1,0 +1,7 @@
+{
+  "question": "北港工程的预算金额是多少，资料是否一致？",
+  "notebooks": [{ "key": "selected", "name": "预算资料", "selected": true, "sources": [
+    { "key": "first", "name": "预算登记表", "text": "# 金额登记\n北港工程预算总额为一百二十万元。" },
+    { "key": "second", "name": "项目审批单", "text": "# 审批金额\n北港工程预算总额为一百八十万元。" }
+  ] }]
+}

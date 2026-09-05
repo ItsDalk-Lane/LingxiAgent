@@ -15,20 +15,21 @@ import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { isKnowledgeError } from "../lib/knowledge/errors.ts";
-import { resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
+import { KNOWLEDGE_CHUNK_TARGET_CHARS, resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
 import { knowledgeChunkIndexVariantId } from "../lib/knowledge/knowledge-index-store.ts";
 import { knowledgeVectorIndexVariantId } from "../lib/knowledge/vector-index-adapter.ts";
-import { KnowledgeManager, type KnowledgeManagerOptions } from "../lib/knowledge/knowledge-manager.ts";
+import { KnowledgeManager, type KnowledgeManagerOptions } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 import { KnowledgeStore } from "../lib/knowledge/knowledge-store.ts";
 import {
   buildKnowledgeContextInjection,
   type KnowledgeInjectionEvidence,
-} from "../lib/knowledge/knowledge-context-injector.ts";
+} from "./fixtures/knowledge-legacy/legacy-knowledge-context-injector.ts";
 import type { KnowledgeCoveragePlan } from "../lib/knowledge/knowledge-coverage-planner.ts";
 import type { RetrieveForNotebooksResult } from "../lib/knowledge/knowledge-query-service.ts";
 import type { KnowledgeBlockDraft } from "../lib/knowledge/source-adapters.ts";
 import { LingxiEngine } from "../core/engine.ts";
 import { submitDesktopSessionMessage } from "../core/desktop-session-submit.ts";
+import { SessionManifestStore } from "../core/session-manifest/store.ts";
 
 const tempDirs: string[] = [];
 const managers: KnowledgeManager[] = [];
@@ -41,8 +42,8 @@ function tempHome(prefix: string) {
   return dir;
 }
 
-afterEach(() => {
-  for (const manager of managers.splice(0)) manager.close();
+afterEach(async () => {
+  for (const manager of managers.splice(0)) await manager.close();
   for (const store of stores.splice(0)) store.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
@@ -122,9 +123,8 @@ async function injectWithManager(manager: KnowledgeManager, input: {
 
 function chunkProfileHashOf(manager: KnowledgeManager, studioId: string, artifactId: string) {
   const blocks = manager.store.listArtifactBlocks({ studioId, parseArtifactId: artifactId });
-  // 与生命周期测试同一口径：嵌入上下文未接线时自动分块回退 8192×0.8=6553
-  // （摄入侧与查询侧同源解析，见 resolveEffectiveChunkTargetChars）。
-  return resolveKnowledgeChunkerConfig(blocks, { targetChars: 6553 }).configId;
+  // 摄入与查询共用固定的新默认配置，不随嵌入窗口变化。
+  return resolveKnowledgeChunkerConfig(blocks, { targetChars: KNOWLEDGE_CHUNK_TARGET_CHARS }).configId;
 }
 
 /** engine 门面方法（只依赖 _knowledge/_runtimeContext）：stub this 直接绑定测试。 */
@@ -504,6 +504,13 @@ describe("EvidenceManifest：GC 与 deleteSource 引用保护", () => {
 describe("EvidenceManifest：写入失败不阻断会话提交", () => {
   it("engine 门面抛错 → 提交照常完成并显式 warn；无 scopeId 不调用门面", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const sessionHome = tempHome("lingxi-evidence-submit-");
+    const manifests = new SessionManifestStore({ dbPath: path.join(sessionHome, "manifests.db") });
+    const sessionPaths = ["evman-desk.jsonl", "evman-desk2.jsonl"].map(name => path.join(sessionHome, name));
+    for (const sessionPath of sessionPaths) {
+      fs.writeFileSync(sessionPath, "");
+      manifests.createForPath({ sessionPath, ownerAgentId: "agent", domain: "desktop", kind: "chat" });
+    }
     try {
       const session = {
         subscribe: () => () => {},
@@ -523,18 +530,23 @@ describe("EvidenceManifest：写入失败不阻断会话提交", () => {
         truncated: false,
         usedTokens: 10,
         budgetTokens: 6000,
+        research: { runId: "research-run", status: "completed" as const, completenessPolicy: "best_effort" as const,
+          rounds: 1, toolCalls: 2, delegatedAgents: 0, needsTotal: 1, needsSupported: 1,
+          needsPartial: 0, needsConflicted: 0, unresolvedNeedIds: [], stopReason: "complete" },
       };
       const evidence: KnowledgeInjectionEvidence = { entries: [], searchedVectorVariants: [] };
       const recordManifest = vi.fn(() => {
         throw new Error("KNOWLEDGE_CONFLICT: injected failure");
       });
       const engine = {
+        getSessionIdForPath: vi.fn((sessionPath: string) => manifests.resolveByLocatorPath(sessionPath)?.sessionId ?? null),
+        getSessionManifest: vi.fn((sessionId: string) => manifests.getBySessionId(sessionId)),
         ensureSessionLoaded: vi.fn(async () => session),
         promptSession: vi.fn(async (...args: any[]) => { void args; }),
         emitEvent: vi.fn(),
         setUiContext: vi.fn(),
-        buildKnowledgeContextInjection: vi.fn(async () => ({
-          block: "[KnowledgeContext]\ninjected\n[/KnowledgeContext]",
+        buildConversationKnowledgeContext: vi.fn(async () => ({
+          block: "[KnowledgeResearchContext]\ninjected\n[/KnowledgeResearchContext]",
           stats,
           evidence,
         })),
@@ -542,7 +554,7 @@ describe("EvidenceManifest：写入失败不阻断会话提交", () => {
       };
 
       const result = await submitDesktopSessionMessage(engine, {
-        sessionPath: "/tmp/evman-desk.jsonl",
+        sessionPath: sessionPaths[0],
         text: "苹果什么时候交付",
         displayMessage: { text: "苹果什么时候交付" },
         knowledgeRefs: { notebookIds: ["nb-1"], mode: "detailed" },
@@ -554,7 +566,7 @@ describe("EvidenceManifest：写入失败不阻断会话提交", () => {
       // manifest 持久化被调用过一次（prompt 路径），失败转为显式 warn。
       expect(recordManifest).toHaveBeenCalledTimes(1);
       expect(warn).toHaveBeenCalledWith(
-        expect.stringContaining("knowledge evidence manifest write failed for /tmp/evman-desk.jsonl"),
+        expect.stringContaining(`knowledge evidence manifest write failed for ${sessionPaths[0]}`),
       );
       // 用户消息照常投影（stats 仍在）。
       const userMessage = engine.emitEvent.mock.calls
@@ -567,14 +579,14 @@ describe("EvidenceManifest：写入失败不阻断会话提交", () => {
       const engineNoScope = {
         ...engine,
         recordKnowledgeEvidenceManifest: recordNoScope,
-        buildKnowledgeContextInjection: vi.fn(async () => ({
-          block: "[KnowledgeContext]\ninjected\n[/KnowledgeContext]",
+        buildConversationKnowledgeContext: vi.fn(async () => ({
+          block: "[KnowledgeResearchContext]\ninjected\n[/KnowledgeResearchContext]",
           stats: { ...stats, scopeId: undefined },
           evidence,
         })),
       };
       await submitDesktopSessionMessage(engineNoScope, {
-        sessionPath: "/tmp/evman-desk2.jsonl",
+        sessionPath: sessionPaths[1],
         text: "无 scope 追问",
         displayMessage: { text: "无 scope 追问" },
         knowledgeRefs: { notebookIds: ["nb-1"], mode: "detailed" },
@@ -582,6 +594,7 @@ describe("EvidenceManifest：写入失败不阻断会话提交", () => {
       expect(recordNoScope).not.toHaveBeenCalled();
       expect(warn).not.toHaveBeenCalledWith(expect.stringContaining("evidence manifest"));
     } finally {
+      manifests.close();
       warn.mockRestore();
     }
   });

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createKnowledgeReadTool } from "../lib/tools/knowledge-read-tool.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
@@ -17,14 +17,15 @@ function tempHome() {
   return dir;
 }
 
-afterEach(() => {
-  for (const manager of managers.splice(0)) manager.close();
+afterEach(async () => {
+  vi.restoreAllMocks();
+  for (const manager of managers.splice(0)) await manager.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
 
 /** 主会话身份：scope 绑定该 sessionPath，工具执行上下文与之匹配才允许读取。 */
 const MAIN_SESSION_PATH = "/tmp/lingxi-knowledge-read-test/main-session.jsonl";
-const MAIN_SESSION = { sessionPath: MAIN_SESSION_PATH, parentSessionPath: null };
+const MAIN_SESSION = { sessionPath: MAIN_SESSION_PATH, scopeOwnerSessionPath: MAIN_SESSION_PATH };
 
 /**
  * 按 owning notebook 的 RetrievalProfile 锚定列出索引 chunk（schema v2：
@@ -73,6 +74,8 @@ async function setupReadySource(options: {
     manager.queryService.indexArtifactForIngestion(studioId, artifact.id, {
       targetChars: manager.getNotebookEffectiveChunkTargetChars({ studioId, notebookId: notebook.id }),
     });
+    // 统一目录使用摄入阶段登记的笔记本分块身份，样本也完成同一步。
+    listProfileChunks(manager, studioId, notebook.id, artifact.id);
   }
   return { manager, studioId, notebook, imported, artifact };
 }
@@ -93,7 +96,7 @@ function createScope(
 function makeTool(
   manager: KnowledgeManager,
   studioId: string,
-  sessionContext: { sessionPath: string | null; parentSessionPath: string | null } = MAIN_SESSION,
+  sessionContext: { sessionPath: string | null; scopeOwnerSessionPath: string | null } = MAIN_SESSION,
 ) {
   return createKnowledgeReadTool({
     getKnowledge: () => manager,
@@ -124,9 +127,9 @@ describe("knowledge_read 工具（KnowledgeTurnScope 契约）", () => {
     }));
     expect(payload.mode).toBe("ordinal-range");
     expect(payload.totalChunks).toBe(total);
-    expect(payload.chunks).toHaveLength(1);
-    expect(payload.chunks[0].ordinal).toBe(1);
-    expect(payload.chunks[0].text).toContain("苹果项目");
+    expect(payload.spans.length).toBeGreaterThan(0);
+    expect(payload.requestedRange).toEqual([1, 1]);
+    expect(payload.spans[0].text).toContain("苹果项目");
     // 读取锚定 scope 冻结的 snapshot/artifact 身份（§四十三）。
     expect(payload.scopeId).toBe(scope.id);
     expect(payload.parseArtifactId).toBe(artifact.id);
@@ -137,25 +140,30 @@ describe("knowledge_read 工具（KnowledgeTurnScope 契约）", () => {
       scopeId: scope.id,
       sourceId: imported.source.id,
     }));
-    expect(all.chunks).toHaveLength(total);
-    expect(all.chunks.map(chunk => chunk.ordinal)).toEqual(
-      Array.from({ length: total }, (_, index) => index + 1),
-    );
+    expect(all.spans.length).toBeGreaterThan(0);
+    expect(all.spans.every(span => span.citationMarkdown && span.blockId)).toBe(true);
+    expect(all.totalChunks).toBe(total);
   });
 
   it("按 query 检索该源（返回匹配片与 retrievalMode）", async () => {
     const { manager, studioId, imported, notebook } = await setupReadySource();
     const scope = createScope(manager, studioId, [notebook.id]);
     const tool = makeTool(manager, studioId);
+    const unified = vi.spyOn(manager.searchService, "searchWithEvidence");
+    expect("retrieveForArtifacts" in manager.queryService).toBe(false);
+    const legacy = vi.fn(() => { throw new Error("不得进入已退役查询"); });
+    Object.assign(manager.queryService, { retrieveForArtifacts: legacy });
     const payload = parseResult(await tool.execute("call-1", {
       scopeId: scope.id,
       sourceId: imported.source.id,
       query: "火星 预算",
     }));
+    expect(unified.mock.calls[0][0]).toMatchObject({ sourceIds: [imported.source.id], notebookIds: [notebook.id], limit: 12, channel: "hybrid" });
+    expect(legacy).not.toHaveBeenCalled();
     expect(payload.mode).toBe("search");
     expect(payload.retrievalMode).toBe("fts");
-    expect(payload.matches.length).toBeGreaterThan(0);
-    expect(payload.matches[0].text).toContain("火星");
+    expect(payload.spans.length).toBeGreaterThan(0);
+    expect(payload.spans.map(span => span.text).join("\n")).toContain("火星");
   });
 
   it("越界与超额范围显式报错（带合法 ordinal 范围）", async () => {
@@ -306,7 +314,7 @@ describe("knowledge_read 工具（KnowledgeTurnScope 契约）", () => {
     // 其他会话持有该 scopeId：会话归属不匹配。
     const otherSession = makeTool(manager, studioId, {
       sessionPath: "/tmp/lingxi-knowledge-read-test/other-session.jsonl",
-      parentSessionPath: null,
+      scopeOwnerSessionPath: "/tmp/lingxi-knowledge-read-test/other-session.jsonl",
     });
     const crossSession = await otherSession.execute("call-1", {
       scopeId: scope.id,
@@ -335,7 +343,7 @@ describe("knowledge_read 工具（KnowledgeTurnScope 契约）", () => {
     // 这里以 resolveSessionContext 闭包模拟该解析结果（同 agent.ts 接线契约）。
     const subagent = makeTool(manager, studioId, {
       sessionPath: childSessionPath,
-      parentSessionPath: MAIN_SESSION_PATH,
+      scopeOwnerSessionPath: MAIN_SESSION_PATH,
     });
     const ok = await subagent.execute("call-1", {
       scopeId: scope.id,
@@ -347,7 +355,7 @@ describe("knowledge_read 工具（KnowledgeTurnScope 契约）", () => {
     // 父会话不是 scope 持有会话：拒绝（子会话不得读父 scope 之外的源）。
     const stranger = makeTool(manager, studioId, {
       sessionPath: childSessionPath,
-      parentSessionPath: "/tmp/lingxi-knowledge-read-test/stranger.jsonl",
+      scopeOwnerSessionPath: "/tmp/lingxi-knowledge-read-test/stranger.jsonl",
     });
     const denied = await stranger.execute("call-2", {
       scopeId: scope.id,
@@ -394,8 +402,8 @@ describe("knowledge_read 工具（KnowledgeTurnScope 契约）", () => {
     // 本轮仍读冻结的 V1：身份与内容都是旧版本。
     expect(payload.parseArtifactId).toBe(artifactV1.id);
     expect(payload.contentSnapshotId).toBe(scope.sources[0].contentSnapshotId);
-    expect(payload.chunks.map(chunk => chunk.text).join("\n")).toContain("九月");
-    expect(payload.chunks.map(chunk => chunk.text).join("\n")).not.toContain("十月");
+    expect(payload.spans.map(chunk => chunk.text).join("\n")).toContain("九月");
+    expect(payload.spans.map(chunk => chunk.text).join("\n")).not.toContain("十月");
 
     // 新一轮 scope 才冻结到 V2。
     const scopeNext = createScope(manager, studioId, [notebook.id]);

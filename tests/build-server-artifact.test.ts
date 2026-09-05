@@ -1,3 +1,4 @@
+import { writeKnowledgeVectorPackageFixture } from "./helpers/knowledge-vector-package-fixture.ts";
 import { createHash, generateKeyPairSync } from "crypto";
 import fs from "fs";
 import os from "os";
@@ -52,6 +53,7 @@ function makeServerTree(root: string) {
   fs.mkdirSync(path.join(outDir, "bundle"), { recursive: true });
   fs.writeFileSync(path.join(outDir, "bundle", "index.js"), "console.log('server');\n");
   fs.writeFileSync(path.join(outDir, "hana-server"), "#!/bin/sh\nexit 0\n", { mode: 0o755 });
+  writeKnowledgeVectorPackageFixture(outDir);
   return outDir;
 }
 

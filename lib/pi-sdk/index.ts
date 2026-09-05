@@ -97,7 +97,8 @@ export {
 export { createGrepTool, createFindTool };
 
 // ── 资源加载 ──
-export { DefaultResourceLoader } from "@earendil-works/pi-coding-agent";
+export { DefaultResourceLoader, createExtensionRuntime } from "@earendil-works/pi-coding-agent";
+export type { LoadExtensionsResult } from "@earendil-works/pi-coding-agent";
 
 // ── Utilities ──
 export { formatSkillsForPrompt, getLastAssistantUsage } from "@earendil-works/pi-coding-agent";
