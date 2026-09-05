@@ -632,10 +632,10 @@ export function evaluateMcpToolEligibility(agentConfig, {
     return { eligible: false, reason: "mcp_needs_auth", code: "TARGET_REVOKED", diagnostics };
   }
   if (status === "stopped") {
-    return { eligible: false, reason: "mcp_connector_stopped", code: "TARGET_REVOKED", diagnostics };
+    return { eligible: false, reason: "mcp_connector_stopped", code: "TRANSPORT_FAILURE", diagnostics };
   }
   if (status !== "running" || transportAvailable !== true) {
-    return { eligible: false, reason: "mcp_transport_unavailable", code: "TARGET_REVOKED", diagnostics };
+    return { eligible: false, reason: "mcp_transport_unavailable", code: "TRANSPORT_FAILURE", diagnostics };
   }
   return { eligible: true };
 }
@@ -913,6 +913,7 @@ export class McpManager {
   declare refreshInFlight: any;
   declare _lazyStarts: Map<string, Promise<any>>;
   declare _toolListings: Map<string, number>;
+  declare _toolGenerations: Map<string, number>;
   declare _bus: any;
   declare _busDisposers: any;
   declare _configStore: any;
@@ -1000,6 +1001,8 @@ export class McpManager {
     // connector first and needs to know whether the start already did the
     // listing. Never persisted: it describes this process's own work.
     this._toolListings = new Map();
+    // 工具契约代次只描述“旧会话还能否执行这个目标”，不描述短暂网络健康度。
+    this._toolGenerations = new Map();
   }
 
   /**
@@ -1062,6 +1065,7 @@ export class McpManager {
   }
 
   saveConfig(config) {
+    const previous = this.getConfig();
     const normalized = normalizeMcpConfig(config);
     this._configStore.set(MCP_CONFIG_KEY, {
       enabled: normalized.enabled,
@@ -1073,7 +1077,40 @@ export class McpManager {
       deferThreshold: normalized.deferThreshold,
       connectors: normalized.connectors,
     });
+    this._updateToolGenerationsForConfigChange(previous, normalized);
     return normalized;
+  }
+
+  getConnectorToolGeneration(connectorId) {
+    return this._toolGenerations.get(connectorId) || 0;
+  }
+
+  _advanceConnectorToolGeneration(connectorId) {
+    const next = this.getConnectorToolGeneration(connectorId) + 1;
+    this._toolGenerations.set(connectorId, next);
+    return next;
+  }
+
+  _ensureConnectorToolGeneration(connectorId) {
+    if (this.getConnectorToolGeneration(connectorId) === 0) {
+      this._advanceConnectorToolGeneration(connectorId);
+    }
+    return this.getConnectorToolGeneration(connectorId);
+  }
+
+  _updateToolGenerationsForConfigChange(previous, next) {
+    const previousById = new Map(previous.connectors.map((connector) => [connector.id, connector]));
+    const nextById = new Map(next.connectors.map((connector) => [connector.id, connector]));
+    const connectorIds = new Set([...previousById.keys(), ...nextById.keys()]);
+    for (const connectorId of connectorIds) {
+      const before = previousById.get(connectorId);
+      const after = nextById.get(connectorId);
+      const changed = previous.enabled !== next.enabled
+        || !before
+        || !after
+        || mcpToolContractFingerprint(before) !== mcpToolContractFingerprint(after);
+      if (changed) this._advanceConnectorToolGeneration(connectorId);
+    }
   }
 
   /**
@@ -2005,6 +2042,9 @@ export class McpManager {
     });
     tools.push(this._publishTool(statusDefinition));
     const config = this.getConfig();
+    for (const connector of config.connectors) {
+      this._ensureConnectorToolGeneration(connector.id);
+    }
     // A connector the user switched off leaves the model's world entirely: its
     // tools are not published, and it does not claim a canonical id either.
     // The claim matters as much as the publication — ambiguity is what costs a
@@ -2151,6 +2191,7 @@ export class McpManager {
         capabilityBase,
       });
       const permission = normalizeToolPermissionContract(publishedTool, identity);
+      const lifecycleGeneration = this.getConnectorToolGeneration(connectorId);
       const evaluateEligibility = (agentConfig, options = {}) => this.evaluateToolEligibility(
         connectorId,
         toolName,
@@ -2173,13 +2214,13 @@ export class McpManager {
           capabilityBase: identity.capabilityBase,
           description: publishedTool.description || "",
           paramsSummary: summarizeToolParameters(publishedTool.parameters),
-          lifecycleGeneration: 0,
+          lifecycleGeneration,
           deferrable: configuredTool.deferrable !== false,
           pinned: readMcpToolIdentitySetting(connector.pinnedTools, connectorId, toolName) === true,
           schemaRef: () => publishedTool.parameters,
         },
         evaluateEligibility,
-        getCurrentGeneration: () => 0,
+        getCurrentGeneration: () => this.getConnectorToolGeneration(connectorId),
         isCurrentlyAvailable: async (runtimeContext) => {
           const context = runtimeContext && typeof runtimeContext === "object"
             ? runtimeContext as Record<string, unknown>
@@ -2886,6 +2927,18 @@ function connectorClientFingerprint(connector) {
     authType: connector.authType,
     authorizationToken: connector.authorizationToken,
     oauthAccessToken: connector.oauth?.accessToken || "",
+  });
+}
+
+function mcpToolContractFingerprint(connector) {
+  return JSON.stringify({
+    enabled: isConnectorEnabled(connector),
+    client: connectorClientFingerprint(connector),
+    tools: connector.tools || [],
+    permissionMode: connector.permissionMode || null,
+    toolPermissions: connector.toolPermissions || {},
+    trustReadOnlyHint: connector.trustReadOnlyHint === true,
+    pinnedTools: connector.pinnedTools || {},
   });
 }
 

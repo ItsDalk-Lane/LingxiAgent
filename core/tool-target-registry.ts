@@ -9,7 +9,7 @@ import {
 export interface ToolTargetAvailabilityDecision {
   readonly eligible: boolean;
   readonly reason?: string | null;
-  readonly code?: "TARGET_NOT_VISIBLE" | "TARGET_DISABLED_FOR_AGENT" | "TARGET_REVOKED";
+  readonly code?: "TARGET_NOT_VISIBLE" | "TARGET_DISABLED_FOR_AGENT" | "TARGET_REVOKED" | "TRANSPORT_FAILURE";
 }
 
 export interface RegisteredToolTarget {
