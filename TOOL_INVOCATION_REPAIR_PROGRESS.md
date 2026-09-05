@@ -62,7 +62,7 @@
 | P5-03 | completed | `6a6890fc0d8e67fa3bd71f1815c311d8bd65b3b7` | 旧会话撤销语义 |
 | P6-01 | completed | `0b2049015c136bd9b78df259732addd2446e072f` | plugin-dev 聊天身份 |
 | P6-02 | completed | `6fda792303cf6919acc459cc4bad06aaef4bc702` | LocalDeveloperPrincipal |
-| P7-01 | completed | 待本项提交后回填 | 媒体执行目标解析器 |
+| P7-01 | completed | `2ff451d74157678f733a2eeff111acb715d59ebd` | 媒体执行目标解析器 |
 | P7-02 | pending | — | 媒体入口统一 |
 | P8-01 | pending | — | rerank policy 共享执行器 |
 | P9-01 | pending | — | 统一错误映射 |
@@ -276,8 +276,21 @@
 - 绿灯命令：新增媒体凭证路由 parity 测试；`npm run typecheck`；3 个新增文件定向 ESLint；`git diff --check`。
 - 绿灯原始结果：Vitest exit `0`，`1 passed` file、`5 passed` tests；三段 typecheck exit `0`；定向 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p701-attempt1.log`、`/tmp/lingxi-tool-contract-p701-typecheck-attempt1.log`、`/tmp/lingxi-tool-contract-p701-eslint-attempt1.log`。
-- 提交 SHA：待本项提交后、P7-02 红灯前回填。
+- 提交 SHA：`2ff451d74157678f733a2eeff111acb715d59ebd`
 - 偏差：任务书在 P7-02 后给出阶段提交信息；按用户“每项提交并推送”的要求，本项使用独立且内容对应的提交信息。
+
+### P7-02 替换全部媒体入口
+
+- 状态：`completed`
+- 改动文件：`hub/index.ts`、`core/provider-registry.ts`、`core/media-adapter-registry.ts`、`core/media/universal-media-manager.ts`、`core/media/image-task-runner.ts`、`core/media/submit-image.ts`、`core/speech-recognition-service.ts`、7 个内置媒体适配器、13 个相关媒体测试、`TOOL_INVOCATION_REPAIR_PROGRESS.md`。
+- 红灯命令：`set -o pipefail; npx vitest run tests/media-credential-routing-parity.test.ts tests/fresh-credential-routing.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p702-red.log`
+- 红灯原始结果：exit `1`；`1 failed / 1 passed` files、`3 failed / 10 passed` tests。旧代码缺少 Provider Registry 唯一门面、规范目标适配器上下文以及 image/video/STT/background 四入口接线，符合预期。
+- 中间回归：首次扩大到 12 个媒体文件为 `144 passed / 18 failed`，暴露旧测试夹具缺新 Provider Registry 契约以及 direct adapter 旧兼容路径仍需通过统一解析器；修正后为 `162/162`。继续清除适配器内凭证兜底时，直接适配器测试首次为 `17 passed / 70 failed`；给测试驱动补规范执行目标后为 `87/87`。全媒体扩展首次为 `467 passed / 13 failed`，仅剩两套语音观测夹具缺统一门面；补齐后通过。
+- 绿灯命令：P7 两个指定测试；名称命中 media/image/video/speech/credential 的全部 57 个测试文件；`npm run typecheck`；`npm run lint`；凭证路径静态清单；`git diff --check`。
+- 绿灯原始结果：P7 定向 Vitest exit `0`，`2 passed` files、`15 passed` tests；含 Hub 错误映射的阶段门禁 `3 passed` files、`23 passed` tests；全媒体 Vitest exit `0`，`57 passed` files、`482 passed` tests；三段 typecheck exit `0`；全仓 ESLint exit `0`（`0 errors / 9222 warnings`；固定基线为 `9188 warnings`，本阶段不把警告数写成无增量）；本项文件定向 ESLint exit `0`（`0 errors / 317 warnings`）；静态扫描不再命中 `credential_refresh_failed`，执行入口和适配器只消费规范目标；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p702-targeted-final2.log`、`/tmp/lingxi-tool-contract-p702-stage-final.log`、`/tmp/lingxi-tool-contract-p702-media-all-final.log`、`/tmp/lingxi-tool-contract-p702-typecheck-final3.log`、`/tmp/lingxi-tool-contract-p702-lint-final.log`、`/tmp/lingxi-tool-contract-p702-focused-eslint-final.log`、`/tmp/lingxi-tool-contract-p702-credential-inventory-final.log`。
+- 提交 SHA：`pending (commit 后由下一项进度回填)`
+- 偏差：任务书列出的入口文件之外，执行适配器本身仍有凭证供应商回退；为满足本项“下游不得再次回退”和火山引擎多通道硬验收，最小修改 7 个既有适配器，只移除执行期选路，认证检查控制面保持原行为。`core/media/submit-image.ts` 仅持久化模型显式凭证通道，确保后台重解析不会把上一次 active 结果误当成模型显式绑定；无功能扩张。
 
 ## 错误日志
 
@@ -322,13 +335,16 @@
 | 2026-09-05 16:41 +0800 | P6-01 扩展回归 | 首次扩展门禁 `104 passed / 7 failed`：P5 后开发服务旧测试插件未声明权限，加载阶段已被拒绝 | 1 | 只给测试插件夹具补显式 `readOnly` 契约；生产端缺声明继续拒绝，复跑开发服务测试 `15/15` 通过 |
 | 2026-09-05 16:41 +0800 | P6-01 | 首次 typecheck 报宿主会话目标联合类型没有统一的 `sessionId` 字段 | 1 | 为宿主运行上下文与规范会话目标增加明确类型，不改变来源或回退规则；复跑三段 typecheck exit `0` |
 | 2026-09-05 16:58 +0800 | P6-02 | 首次 typecheck 报 3 个测试边界类型错误：影子选项为 `unknown`、Hono 测试环境变量键未声明、故意构造的远端主体不满足本地主体类型 | 1 | 仅在测试边界显式收窄/转换类型；生产接口继续只接受本地主体，复跑三段 typecheck exit `0` |
+| 2026-09-05 17:15 +0800 | P7-02 扩展回归 | 首次 12 文件媒体回归 `144 passed / 18 failed`：旧夹具缺统一解析门面，直接适配器兼容路径被提前删除 | 1 | 测试夹具补规范门面；保留 direct adapter 兼容入口，但仍经同一个 resolver 且无凭证回退 |
+| 2026-09-05 17:21 +0800 | P7-02 下游收口 | 移除适配器内部凭证回退后，旧直接适配器测试 `17 passed / 70 failed` | 1 | 相关测试上下文补规范媒体执行目标；生产适配器只读取规范目标，不恢复 provider/default 猜测 |
+| 2026-09-05 17:25 +0800 | P7-02 全媒体回归 | 首次全媒体门禁 `467 passed / 13 failed`：两套语音观测夹具未暴露新解析门面 | 1 | 只补测试 Provider Registry 夹具；生产 STT 继续 fail-closed，最终全媒体 `482/482` |
 
 ## 断点续跑自检
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P7-01 已完成红绿验证，等待提交和推送 |
-| 接下来去哪？ | 独立提交并推送 P7-01，回填 SHA 后进入 P7-02 四入口替换 |
+| 现在在哪里？ | P7-02 已完成红绿验证、全媒体回归与静态收口，等待提交和推送 |
+| 接下来去哪？ | 使用任务书指定提交信息提交并推送 P7-02，回填 SHA 后进入 P8-01 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P6-02；P7-01 已建立统一媒体执行目标契约、固定凭证优先级与两个稳定失败码，新增回归 `5/5` |
+| 已做什么？ | 完成并推送 P0-00 至 P7-01；P7-02 已把 image/video/STT/background 接到唯一解析器，下游取消凭证回退，定向 `15/15`、全媒体 `482/482` |

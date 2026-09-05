@@ -277,13 +277,21 @@ export class SpeechRecognitionService {
       throw new Error("speech recognition model is not configured");
     }
 
-    const target = this._providers.resolveMediaModel({
+    const resolvedTarget = this._providers.resolveMediaModel({
       providerId: targetProvider,
       modelId: targetModel,
       capability: CAPABILITY,
     });
-    const adapter = this._registry.getProtocol(target.model.protocolId) || this._registry.get(target.providerId);
-    if (!adapter?.transcribe) throw new Error(`No speech recognition adapter registered for protocol "${target.model.protocolId}"`);
+    const adapter = this._registry.getProtocol(resolvedTarget.model.protocolId) || this._registry.get(resolvedTarget.providerId);
+    if (!adapter?.transcribe) throw new Error(`No speech recognition adapter registered for protocol "${resolvedTarget.model.protocolId}"`);
+    const executionTarget = this._providers.resolveMediaExecutionTarget({
+      modelId: resolvedTarget.model.id,
+      modality: "speech-recognition",
+      runtimeProviderId: resolvedTarget.providerId,
+      credentialLane: resolvedTarget.credentialLane || null,
+      adapterId: adapter.id,
+    });
+    const target = { ...resolvedTarget, executionTarget };
 
     const pending = this._updateTranscription({ sessionId, sessionPath }, fileId, {
       status: "pending",
@@ -354,13 +362,21 @@ export class SpeechRecognitionService {
     if (!file) throw new Error(`session file not found: ${fileId}`);
     if (file.presentation !== "voice-input") return { status: "skipped", reason: "not_voice_input" };
 
-    const target = this._providers.resolveMediaModel({
+    const resolvedTarget = this._providers.resolveMediaModel({
       providerId: config.defaultModel.provider,
       modelId: config.defaultModel.id,
       capability: CAPABILITY,
     });
-    const adapter = this._registry.getProtocol(target.model.protocolId) || this._registry.get(target.providerId);
-    if (!adapter?.transcribe) throw new Error(`No speech recognition adapter registered for protocol "${target.model.protocolId}"`);
+    const adapter = this._registry.getProtocol(resolvedTarget.model.protocolId) || this._registry.get(resolvedTarget.providerId);
+    if (!adapter?.transcribe) throw new Error(`No speech recognition adapter registered for protocol "${resolvedTarget.model.protocolId}"`);
+    const executionTarget = this._providers.resolveMediaExecutionTarget({
+      modelId: resolvedTarget.model.id,
+      modality: "speech-recognition",
+      runtimeProviderId: resolvedTarget.providerId,
+      credentialLane: resolvedTarget.credentialLane || null,
+      adapterId: adapter.id,
+    });
+    const target = { ...resolvedTarget, executionTarget };
 
     const pending = this._updateTranscription({ sessionId, sessionPath }, fileId, {
       status: "pending",
@@ -413,8 +429,7 @@ export class SpeechRecognitionService {
   }
 
   async _resolveCredentialsFresh(target) {
-    const credentialProviderId = target.credentialLane?.providerId || target.providerId;
-    return this._resolveProviderCredentialsFresh(credentialProviderId);
+    return this._resolveProviderCredentialsFresh(target.executionTarget.credentialProviderId);
   }
 
   async _transcribeWithAccounting({
@@ -500,6 +515,7 @@ export class SpeechRecognitionService {
         language,
         fetch: this._fetch,
         modelCall: recorder,
+        mediaExecutionTarget: target.executionTarget,
       }));
       // 语义响应（§四十二）：Observer 只记录结构事实；transcription text 是
       // 模型输出正文——Phase 6 经统一 Redactor 进 payload capture（§一百零一）。

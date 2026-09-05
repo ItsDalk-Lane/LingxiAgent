@@ -101,10 +101,11 @@ function getModelCapabilities(modelId) {
 }
 
 async function resolveVolcengineCredentials(ctx, preferredProviderId = null) {
-  if (preferredProviderId) {
-    const preferred = await ctx.bus.request("provider:credentials", { providerId: preferredProviderId });
-    if (!preferred.error && preferred.apiKey) return preferred;
-  }
+  if (!preferredProviderId) return { error: "CREDENTIAL_PROVIDER_UNRESOLVED" };
+  return ctx.bus.request("provider:credentials", { providerId: preferredProviderId });
+}
+
+async function checkVolcengineCredentials(ctx) {
   const primary = await ctx.bus.request("provider:credentials", { providerId: "volcengine" });
   if (!primary.error && primary.apiKey) return primary;
 
@@ -129,7 +130,7 @@ export const volcengineImageAdapter = {
 
   async checkAuth(ctx) {
     try {
-      const creds = await resolveVolcengineCredentials(ctx);
+      const creds = await checkVolcengineCredentials(ctx);
       if (creds.error || !creds.apiKey) {
         return { ok: false, message: creds.error || t("plugin.imageGen.apiKeyNotConfigured") };
       }
@@ -145,8 +146,10 @@ export const volcengineImageAdapter = {
     const rawModel = params.modelId || params.model || ctx.config?.get?.("defaultImageModel")?.id;
     const modelId = resolveModelId("volcengine", rawModel);
 
-    // 2. Fetch credentials — try volcengine first, fall back to volcengine-coding
-    const creds = await resolveVolcengineCredentials(ctx, params.credentialProviderId || params.providerId);
+    // 2. 只消费规范执行目标确定的凭证供应商，不在适配器内重新选路。
+    const credentialProviderId = params.credentialProviderId
+      ?? ctx.mediaExecutionTarget?.credentialProviderId;
+    const creds = await resolveVolcengineCredentials(ctx, credentialProviderId);
     if (creds.error || !creds.apiKey) {
       throw new Error(t("plugin.imageGen.providerNoApiKey", { providerId: "volcengine" }));
     }

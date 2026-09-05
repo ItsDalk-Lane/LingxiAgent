@@ -116,7 +116,8 @@ export const openaiImageAdapter = {
 
   async submit(params, ctx) {
     // 1. Fetch credentials
-    const providerId = params.credentialProviderId || params.providerId || "openai";
+    const providerId = params.credentialProviderId ?? ctx.mediaExecutionTarget?.credentialProviderId;
+    if (!providerId) throw new Error("CREDENTIAL_PROVIDER_UNRESOLVED");
     const creds = await ctx.bus.request("provider:credentials", { providerId });
     if (creds.error || !creds.apiKey) {
       throw new Error(t("plugin.imageGen.providerNoApiKey", { providerId }));

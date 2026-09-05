@@ -19,7 +19,8 @@ function resolveMiniMaxBaseUrl(baseUrl) {
 }
 
 async function getCredentials(ctx, params: any = {}) {
-  const providerId = params.credentialProviderId || params.providerId || "minimax";
+  const providerId = params.credentialProviderId ?? ctx.mediaExecutionTarget?.credentialProviderId;
+  if (!providerId) throw new Error("CREDENTIAL_PROVIDER_UNRESOLVED");
   const creds = await ctx.bus.request("provider:credentials", { providerId });
   if (creds.error || !creds.apiKey) {
     throw new Error(t("plugin.imageGen.providerNoApiKey", { providerId }));
@@ -59,7 +60,8 @@ export const minimaxImageAdapter = {
 
   async checkAuth(ctx) {
     try {
-      await getCredentials(ctx, { providerId: "minimax" });
+      const creds = await ctx.bus.request("provider:credentials", { providerId: "minimax" });
+      if (creds.error || !creds.apiKey) throw new Error(creds.error || "CREDENTIAL_MISSING");
       return { ok: true };
     } catch (err) {
       return { ok: false, message: err.message || String(err) };

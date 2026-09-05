@@ -34,6 +34,9 @@ import {
 } from "../shared/model-capabilities.ts";
 import { validateProviderRuntime } from "./media-runtime-contract.ts";
 import { capabilityKey, inferMediaProtocolId } from "./media-protocols.ts";
+import {
+  resolveMediaExecutionTarget as resolveCanonicalMediaExecutionTarget,
+} from "./media/media-execution-target-resolver.ts";
 import { ProviderCatalogStore } from "./provider-catalog.ts";
 import {
   LocalProviderPluginStore,
@@ -1327,6 +1330,13 @@ export class ProviderRegistry {
       unavailableReason: "no_credentials",
       lanes,
     };
+  }
+
+  resolveMediaExecutionTarget(input) {
+    return resolveCanonicalMediaExecutionTarget({
+      ...input,
+      providerRegistry: this,
+    });
   }
 
   /**

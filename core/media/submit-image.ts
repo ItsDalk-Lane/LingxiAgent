@@ -58,6 +58,7 @@ export async function submitImageGeneration({ input = {}, ctx, metadata = null, 
     ...(target.protocolId ? { protocolId: target.protocolId } : {}),
     ...(target.credentialLaneId ? { credentialLaneId: target.credentialLaneId } : {}),
     ...(target.credentialProviderId ? { credentialProviderId: target.credentialProviderId } : {}),
+    ...(target.modelCredentialLane ? { modelCredentialLane: target.modelCredentialLane } : {}),
   };
   assertAdapterReferenceImageLimit(adapter, params);
 

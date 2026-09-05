@@ -42,6 +42,7 @@ function makeRoot() {
 function makeCtx(root: string, ledger: any): any {
   return {
     dataDir: root,
+    mediaExecutionTarget: { credentialProviderId: "agnes" },
     bus: { request: vi.fn(async () => ({})) },
     log: { error: vi.fn(), warn: vi.fn() },
     config: { get: vi.fn(() => ({})) },
@@ -61,6 +62,17 @@ function makeSubmitCtx(ctx: any) {
     sessionId: ctx.sessionId,
     sessionPath: ctx.sessionPath,
     generatedDir: path.join(ctx.dataDir, "generated"),
+    mediaExecutionTarget: ctx.mediaExecutionTarget,
+    resolveMediaExecutionTarget: (input: any) => ({
+      modelId: input.modelId,
+      modality: input.modality,
+      runtimeProviderId: input.runtimeProviderId,
+      credentialProviderId: input.runtimeProviderId,
+      credentialLaneId: null,
+      credentialSource: "provider-registry",
+      adapterId: input.adapterId,
+      resolutionReason: "runtime_provider_credentials",
+    }),
   };
 }
 

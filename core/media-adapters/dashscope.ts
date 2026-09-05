@@ -38,12 +38,20 @@ function resolveDashScopeBaseUrl(baseUrl) {
 }
 
 async function getCredentials(ctx, params: any = {}) {
-  const providerId = params.credentialProviderId || params.providerId || "dashscope";
+  const providerId = params.credentialProviderId ?? ctx.mediaExecutionTarget?.credentialProviderId;
+  if (!providerId) throw new Error("CREDENTIAL_PROVIDER_UNRESOLVED");
   const creds = await ctx.bus.request("provider:credentials", { providerId });
   if (creds.error || !creds.apiKey) {
     throw new Error(t("plugin.imageGen.providerNoApiKey", { providerId }));
   }
   return creds;
+}
+
+async function checkCredentials(ctx) {
+  const creds = await ctx.bus.request("provider:credentials", { providerId: "dashscope" });
+  if (creds.error || !creds.apiKey) {
+    throw new Error(t("plugin.imageGen.providerNoApiKey", { providerId: "dashscope" }));
+  }
 }
 
 function collectDashScopeUrls(data) {
@@ -226,7 +234,7 @@ export const dashscopeImageAdapter = {
 
   async checkAuth(ctx) {
     try {
-      await getCredentials(ctx, { providerId: "dashscope" });
+      await checkCredentials(ctx);
       return { ok: true };
     } catch (err) {
       return { ok: false, message: err.message || String(err) };
@@ -313,7 +321,7 @@ export const dashscopeImageAdapter = {
   },
 
   async query(taskId, ctx) {
-    const creds = await getCredentials(ctx, { providerId: "dashscope" });
+    const creds = await getCredentials(ctx, ctx?.task?.params || ctx?.task || {});
     const res = await fetch(`${resolveDashScopeBaseUrl(creds.baseUrl)}/tasks/${encodeURIComponent(taskId)}`, {
       headers: { "Authorization": `Bearer ${creds.apiKey}` },
     });

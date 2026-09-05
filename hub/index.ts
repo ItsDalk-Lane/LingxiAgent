@@ -33,8 +33,29 @@ import { extOfName, inferFileKind } from "../lib/file-metadata.ts";
 import { createModuleLogger } from "../lib/debug-log.ts";
 import { normalizeSessionTurnContext } from "../core/session-turn-context.ts";
 import { findModel } from "../shared/model-ref.ts";
+import { MediaExecutionTargetError } from "../core/media/media-execution-target-resolver.ts";
 
 const log = createModuleLogger("hub");
+
+function mapCredentialRefreshFailure(err) {
+  const reason = typeof err?.code === "string" && /^[A-Z0-9_]+$/.test(err.code)
+    ? err.code
+    : err?.name === "AbortError"
+      ? "ABORTED"
+      : "UNKNOWN";
+  const code = reason === "ABORTED" || reason === "ABORT_ERR" || reason === "ERR_CANCELED"
+    ? "CREDENTIAL_REFRESH_CANCELLED"
+    : reason === "ETIMEDOUT" || reason === "UND_ERR_CONNECT_TIMEOUT"
+      ? "CREDENTIAL_REFRESH_TIMEOUT"
+      : reason === "ECONNRESET" || reason === "ECONNREFUSED" || reason === "ENOTFOUND"
+        ? "CREDENTIAL_REFRESH_TRANSPORT_FAILED"
+        : "CREDENTIAL_REFRESH_FAILED";
+  return {
+    error: code,
+    code,
+    resolutionReason: reason.toLowerCase(),
+  };
+}
 
 function assertRuntimeMediaCapabilityOwner(providerRegistry, providerId, requestContext) {
   const caller = requestContext?.caller;
@@ -777,8 +798,8 @@ export class Hub {
           forceRefresh: !!forceRefresh,
           ...(staleApiKey ? { staleApiKey } : {}),
         });
-      } catch {
-        return { error: "credential_refresh_failed" };
+      } catch (err) {
+        return mapCredentialRefreshFailure(err);
       }
       const creds = {
         apiKey: fresh?.api_key,
@@ -860,6 +881,7 @@ export class Hub {
       model,
       capability = "image_generation",
       credentialLaneId,
+      adapterId,
     }: any = {}) => {
       try {
         await engine.providerRegistry.refreshRuntimeMediaCapabilities?.({
@@ -872,23 +894,44 @@ export class Hub {
           capability,
           credentialLaneId,
         });
-        const status = engine.providerRegistry.getMediaProviderCredentialStatus(resolved.providerId, capability);
-        const lane = resolved.credentialLane || null;
-        const credentialProviderId = lane?.providerId || status.activeProviderId || resolved.providerId;
-        if (!status.hasCredentials && resolved.provider.authType !== "none") {
-          return { error: status.unavailableReason || "no_credentials" };
-        }
+        const executionTarget = engine.providerRegistry.resolveMediaExecutionTarget({
+          modelId: resolved.model.id,
+          modality: capability === "video_generation"
+            ? "video"
+            : capability === "speech_recognition"
+              ? "speech-recognition"
+              : "image",
+          runtimeProviderId: resolved.providerId,
+          credentialLane: resolved.credentialLane || null,
+          adapterId: adapterId || null,
+        });
         return {
           providerId: resolved.providerId,
           modelId: resolved.model.id,
           model: resolved.model,
           protocolId: resolved.model.protocolId,
           capability: resolved.capability,
-          credentialLaneId: lane?.id || status.activeLaneId || null,
-          credentialProviderId,
+          credentialLaneId: executionTarget.credentialLaneId,
+          credentialProviderId: executionTarget.credentialProviderId,
+          modelCredentialLane: resolved.credentialLane
+            ? {
+              id: resolved.credentialLane.id || null,
+              providerId: resolved.credentialLane.providerId || null,
+              authType: resolved.credentialLane.authType || null,
+              credentialSource: resolved.credentialLane.credentialSource || null,
+            }
+            : null,
+          credentialSource: executionTarget.credentialSource,
+          resolutionReason: executionTarget.resolutionReason,
+          executionTarget,
         };
       } catch (err) {
-        return { error: err.message || String(err) };
+        return {
+          error: err.message || String(err),
+          ...(err instanceof MediaExecutionTargetError
+            ? { code: err.code, resolutionReason: err.details?.resolutionReason || null }
+            : {}),
+        };
       }
     }));
 

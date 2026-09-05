@@ -370,6 +370,7 @@ export class UniversalMediaManager {
       store: this._store,
       poller: this._poller,
       generatedDir: this._generatedDir,
+      resolveMediaExecutionTarget: (input) => this._providers.resolveMediaExecutionTarget(input),
     };
   }
 
@@ -609,6 +610,50 @@ export class UniversalMediaManager {
     return this._registry.createSubmitContextForAdapter?.(adapter, baseContext) || baseContext;
   }
 
+  _submitContextForExecutionTarget(executionTarget) {
+    return this._registry.createSubmitContextForExecutionTarget(
+      executionTarget,
+      this._submitContext(),
+    );
+  }
+
+  _resolveMediaExecutionTarget({ resolved, adapter, modality }) {
+    return this._providers.resolveMediaExecutionTarget({
+      modelId: resolved.model.id,
+      modality,
+      runtimeProviderId: resolved.providerId,
+      credentialLane: resolved.credentialLane || null,
+      adapterId: adapter.id,
+    });
+  }
+
+  _legacyVideoTarget(adapter, providerId, modelId = null) {
+    if (!adapter || !providerId) return null;
+    const resolvedModelId = modelId || adapter.defaultModel || adapter.id;
+    const resolved = {
+      providerId,
+      model: { id: resolvedModelId, protocolId: adapter.protocolId || null },
+      credentialLane: null,
+    };
+    const executionTarget = this._resolveMediaExecutionTarget({
+      resolved,
+      adapter,
+      modality: "video",
+    });
+    return {
+      adapter,
+      providerId,
+      modelId: resolvedModelId,
+      model: null,
+      protocolId: adapter.protocolId || null,
+      credentialLaneId: executionTarget.credentialLaneId,
+      credentialProviderId: executionTarget.credentialProviderId,
+      credentialSource: executionTarget.credentialSource,
+      resolutionReason: executionTarget.resolutionReason,
+      executionTarget,
+    };
+  }
+
   _toolContext({ sessionId = null, sessionPath = null, sessionRef = null, bridgeContext = null }: any = {}) {
     return {
       dataDir: this._dataDir,
@@ -830,7 +875,10 @@ export class UniversalMediaManager {
       },
       semanticInputProvenance: createSemanticInputProvenance(videoProvenanceShape, videoProvenanceSections),
     });
-    const observedSubmitCtx = { ...this._submitContextForAdapter(adapter), modelCall: recorder };
+    const observedSubmitCtx = {
+      ...this._submitContextForExecutionTarget(target.executionTarget),
+      modelCall: recorder,
+    };
     // Phase 6 Semantic Request Capture（§九十八）：prompt/reference image 是语义
     // 输入（正文捕获）；duration/resolution/fps 仍不因此变成 semantic prompt
     // section（§九十八的 Phase 5 定义不变）。CLI adapter wire = opaque。
@@ -980,17 +1028,7 @@ export class UniversalMediaManager {
         return this._videoTargetFromMediaRef({ providerId, modelId });
       } catch (err) {
         const legacyAdapter = this._registry.get(providerId);
-        if (legacyAdapter) {
-          return {
-            adapter: legacyAdapter,
-            providerId,
-            modelId,
-            model: null,
-            protocolId: legacyAdapter.protocolId || null,
-            credentialLaneId: null,
-            credentialProviderId: providerId,
-          };
-        }
+        if (legacyAdapter) return this._legacyVideoTarget(legacyAdapter, providerId, modelId);
         throw err;
       }
     }
@@ -1003,17 +1041,7 @@ export class UniversalMediaManager {
         if (target) return target;
       }
       const adapter = this._registry.get(providerId);
-      if (adapter) {
-        return {
-          adapter,
-          providerId,
-          modelId: null,
-          model: null,
-          protocolId: adapter.protocolId || null,
-          credentialLaneId: null,
-          credentialProviderId: providerId,
-        };
-      }
+      if (adapter) return this._legacyVideoTarget(adapter, providerId);
       return null;
     }
 
@@ -1045,16 +1073,7 @@ export class UniversalMediaManager {
     }
 
     const adapter = this._registry.getByType("video").at(-1) || null;
-    if (!adapter) return null;
-    return {
-      adapter,
-      providerId: adapter.id || null,
-      modelId: null,
-      model: null,
-      protocolId: adapter.protocolId || null,
-      credentialLaneId: null,
-      credentialProviderId: adapter.id || null,
-    };
+    return adapter ? this._legacyVideoTarget(adapter, adapter.id) : null;
   }
 
   _videoTargetFromMediaRef(ref, { strict = true }: any = {}) {
@@ -1079,14 +1098,22 @@ export class UniversalMediaManager {
       if (strict) throw new Error(`No video generation adapter registered for protocol "${protocolId}"`);
       return null;
     }
+    const executionTarget = this._resolveMediaExecutionTarget({
+      resolved,
+      adapter,
+      modality: "video",
+    });
     return {
       adapter,
       providerId: resolved.providerId,
       modelId: resolved.model.id,
       model: resolved.model,
       protocolId,
-      credentialLaneId: resolved.credentialLane?.id || null,
-      credentialProviderId: resolved.credentialLane?.providerId || resolved.providerId,
+      credentialLaneId: executionTarget.credentialLaneId,
+      credentialProviderId: executionTarget.credentialProviderId,
+      credentialSource: executionTarget.credentialSource,
+      resolutionReason: executionTarget.resolutionReason,
+      executionTarget,
     };
   }
 
@@ -1099,8 +1126,10 @@ export class UniversalMediaManager {
       modelId: target.modelId,
       protocolId: target.protocolId,
       adapterId: target.adapter?.id || null,
-      credentialLaneId: target.credentialLaneId || null,
-      credentialProviderId: target.credentialProviderId || target.providerId,
+      credentialLaneId: target.credentialLaneId,
+      credentialProviderId: target.credentialProviderId,
+      credentialSource: target.credentialSource,
+      resolutionReason: target.resolutionReason,
     };
   }
 
@@ -1288,13 +1317,20 @@ export class UniversalMediaManager {
     if (!protocolId) throw new Error(`Media model "${providerId}/${modelId}" missing protocolId`);
     const adapter = this._registry.getProtocol?.(protocolId) || this._registry.get?.(resolved.providerId);
     if (!adapter) throw new Error(`No image generation adapter registered for protocol "${protocolId}"`);
+    const executionTarget = this._resolveMediaExecutionTarget({
+      resolved,
+      adapter,
+      modality: "image",
+    });
     return {
       providerId: resolved.providerId,
       modelId: resolved.model.id,
       protocolId,
       adapterId: adapter.id || null,
-      credentialLaneId: resolved.credentialLane?.id || null,
-      credentialProviderId: resolved.credentialLane?.providerId || resolved.providerId,
+      credentialLaneId: executionTarget.credentialLaneId,
+      credentialProviderId: executionTarget.credentialProviderId,
+      credentialSource: executionTarget.credentialSource,
+      resolutionReason: executionTarget.resolutionReason,
     };
   }
 

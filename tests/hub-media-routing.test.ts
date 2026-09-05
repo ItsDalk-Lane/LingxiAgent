@@ -38,6 +38,26 @@ function createEngine(overrides = {}) {
 }
 
 describe("Hub media routing", () => {
+  it("preserves a stable credential refresh failure code and safe reason", async () => {
+    const failure: any = new Error("sensitive provider response");
+    failure.code = "ETIMEDOUT";
+    const engine = createEngine({
+      resolveProviderCredentialsFresh: vi.fn(async () => {
+        throw failure;
+      }),
+    });
+    const hub = new Hub({ engine });
+
+    await expect(hub.eventBus.request("provider:credentials", {
+      providerId: "media-provider",
+      forceRefresh: true,
+    })).resolves.toEqual({
+      error: "CREDENTIAL_REFRESH_TIMEOUT",
+      code: "CREDENTIAL_REFRESH_TIMEOUT",
+      resolutionReason: "etimedout",
+    });
+  });
+
   it("preserves clientMessageId when routing desktop session messages", async () => {
     const engine = createEngine();
     const hub = new Hub({ engine });

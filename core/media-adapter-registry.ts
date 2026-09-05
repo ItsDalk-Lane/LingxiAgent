@@ -83,6 +83,19 @@ export class MediaAdapterRegistry {
     };
   }
 
+  createSubmitContextForExecutionTarget(executionTarget: any, baseContext: any = {}) {
+    const adapterId = typeof executionTarget?.adapterId === "string"
+      ? executionTarget.adapterId.trim()
+      : "";
+    if (!adapterId) throw new Error("media execution target requires adapterId");
+    const adapter = this.get(adapterId);
+    if (!adapter) throw new Error(`media adapter "${adapterId}" is unavailable`);
+    return {
+      ...this.createSubmitContextForAdapter(adapter, baseContext),
+      mediaExecutionTarget: executionTarget,
+    };
+  }
+
   getByType(type: any) {
     const result = [];
     const seen = new Set();

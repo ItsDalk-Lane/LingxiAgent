@@ -55,6 +55,10 @@ function makeCtx(task, adapterOverrides = {}) {
   };
   const registry = {
     get: vi.fn((adapterId) => (adapterId === adapter.id ? adapter : null)),
+    createSubmitContextForExecutionTarget: vi.fn((target, baseContext) => ({
+      ...baseContext,
+      mediaExecutionTarget: target,
+    })),
   };
   const poller = {
     add: vi.fn(),
@@ -64,7 +68,21 @@ function makeCtx(task, adapterOverrides = {}) {
     request: vi.fn(async () => ({})),
   };
   const ctx = {
-    _mediaGen: { registry, store, poller },
+    _mediaGen: {
+      registry,
+      store,
+      poller,
+      resolveMediaExecutionTarget: vi.fn((input) => ({
+        modelId: input.modelId,
+        modality: input.modality,
+        runtimeProviderId: input.runtimeProviderId,
+        credentialProviderId: input.runtimeProviderId,
+        credentialLaneId: null,
+        credentialSource: "provider-registry",
+        adapterId: input.adapterId,
+        resolutionReason: "runtime_provider_credentials",
+      })),
+    },
     dataDir: "/tmp/media-gen",
     bus,
     config: { get: vi.fn() },
@@ -139,14 +157,27 @@ describe("image generation retry", () => {
       retryCount: 2,
     }));
     expect(poller.add).toHaveBeenCalledWith("task-img");
+    expect(ctx._mediaGen.resolveMediaExecutionTarget).toHaveBeenCalledWith(expect.objectContaining({
+      modelId: "fake-model",
+      modality: "image",
+      runtimeProviderId: "fake-provider",
+      adapterId: "fake-provider",
+    }));
 
     await flushBackgroundSubmits();
 
-    expect(adapter.submit).toHaveBeenCalledWith(task.params, expect.objectContaining({
+    expect(adapter.submit).toHaveBeenCalledWith(expect.objectContaining({
+      ...task.params,
+      credentialLaneId: null,
+      credentialProviderId: "fake-provider",
+    }), expect.objectContaining({
       generatedDir: path.join("/tmp/media-gen", "generated"),
       bus,
       log: ctx.log,
       config: ctx.config,
+      mediaExecutionTarget: expect.objectContaining({
+        credentialProviderId: "fake-provider",
+      }),
     }));
     expect(store.update).toHaveBeenCalledWith("task-img", expect.objectContaining({
       submitState: "submitted",
