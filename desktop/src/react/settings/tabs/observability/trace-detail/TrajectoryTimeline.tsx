@@ -58,7 +58,9 @@ function assistantTimingDetail(
   metrics: AssistantMetricDetail | undefined,
 ): Pick<TimelineRecordDetail, 'ttftMs' | 'decodingMs'> {
   const start = metrics?.stepStartTime;
-  const first = metrics?.firstTokenTime;
+  // 响应到达事实（产品口径 2026-09-05）：时间线的请求段/解码段以
+  // 「provider 响应到达」为分界——不虚构首 token。
+  const first = metrics?.responseArrivalTime;
   const completed = metrics?.completedTime;
   if (
     metrics?.timingRecorded !== true

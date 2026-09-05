@@ -792,8 +792,9 @@ function assistantMessageCell(
   cell.assistantMetrics = {
     timingRecorded: linkedCall !== undefined,
     stepStartTime: callStart,
-    // 无首 token 事实——不虚构 TTFT，检查器与时间线如实显示不可用。
-    firstTokenTime: null,
+    // 观测只有「provider 响应到达」事实（可能为响应头，部分协议结构性缺失）
+    // ——无事实 → null，不虚构首 token（产品口径 2026-09-05）。
+    responseArrivalTime: linkedCall !== undefined ? epochMs(linkedCall.firstResponseAt) : null,
     completedTime: callEnd ?? message.timestampMs,
     usageProvided: usage !== undefined,
     outputTokens: usage?.output ?? null,
@@ -899,7 +900,8 @@ function modelCallCell(
     cell.assistantMetrics = {
       timingRecorded: true,
       stepStartTime: start,
-      firstTokenTime: null,
+      // 响应到达事实：无 attempt 时间 → null，不虚构首 token。
+      responseArrivalTime: epochMs(call.firstResponseAt),
       completedTime: end,
       usageProvided: usage !== undefined,
       outputTokens: usage?.output ?? null,

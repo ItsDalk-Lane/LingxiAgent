@@ -291,4 +291,88 @@ describe("studio workspaces route", () => {
       capability: "studio.workspace.remove_local_path",
     });
   });
+
+  it("reuses an existing active mount when a Windows case-variant path points at the same directory", async () => {
+    tmpDir = makeTmpDir();
+    const workspace = path.join(tmpDir, "workspace");
+    const mountRoot = path.join(tmpDir, "client-project");
+    const lingxiHome = path.join(tmpDir, "hana");
+    fs.mkdirSync(workspace, { recursive: true });
+    fs.mkdirSync(mountRoot, { recursive: true });
+    // 存量挂载记录的是大小写变体字符串（rootLocator 不要求该形态在磁盘上真实存在）
+    const storedVariant = mountRoot.toUpperCase();
+    upsertStudioMount(lingxiHome, {
+      mountId: "mount_case",
+      hostStudioId: "studio_1",
+      sourceKind: "storage",
+      provider: "local_fs",
+      rootLocator: { path: storedVariant },
+      label: "Client Project",
+      presentation: "folder",
+      capabilities: ["list", "read", "write"],
+    });
+    const app = await makeApp({
+      lingxiHome,
+      homeCwd: workspace,
+      deskCwd: workspace,
+      getRuntimeContext: () => localRuntime(),
+    });
+
+    const originalPlatform = process.platform;
+    Object.defineProperty(process, "platform", { value: "win32", configurable: true });
+    try {
+      const res = await app.request("/api/studio/workspaces", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: mountRoot }),
+      });
+
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      // 同目录大小写变体不再派生新 mountId，复用既有挂载
+      expect(data.workspace.mountId).toBe("mount_case");
+      expect(data.workspace.nativeRootPath).toBe(storedVariant);
+    } finally {
+      Object.defineProperty(process, "platform", { value: originalPlatform, configurable: true });
+    }
+
+    const registry = JSON.parse(fs.readFileSync(path.join(lingxiHome, "studio-mounts.json"), "utf-8"));
+    expect(registry.mounts.filter((mount) => mount.provider === "local_fs")).toHaveLength(1);
+  });
+
+  it("keeps the exact-path upsert so re-adding the same folder refreshes its label", async () => {
+    tmpDir = makeTmpDir();
+    const workspace = path.join(tmpDir, "workspace");
+    const mountRoot = path.join(tmpDir, "client-project");
+    const lingxiHome = path.join(tmpDir, "hana");
+    fs.mkdirSync(workspace, { recursive: true });
+    fs.mkdirSync(mountRoot, { recursive: true });
+    const app = await makeApp({
+      lingxiHome,
+      homeCwd: workspace,
+      deskCwd: workspace,
+      getRuntimeContext: () => localRuntime(),
+    });
+
+    const first = await app.request("/api/studio/workspaces", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: mountRoot, label: "Old Label" }),
+    });
+    const firstData = await first.json();
+
+    const second = await app.request("/api/studio/workspaces", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: mountRoot, label: "New Label" }),
+    });
+
+    expect(second.status).toBe(200);
+    const secondData = await second.json();
+    expect(secondData.workspace.mountId).toBe(firstData.workspace.mountId);
+    expect(secondData.workspace.label).toBe("New Label");
+
+    const registry = JSON.parse(fs.readFileSync(path.join(lingxiHome, "studio-mounts.json"), "utf-8"));
+    expect(registry.mounts.filter((mount) => mount.provider === "local_fs")).toHaveLength(1);
+  });
 });

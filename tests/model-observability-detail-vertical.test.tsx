@@ -101,19 +101,21 @@ beforeEach(async () => {
     }),
   });
 
-  await callText({
-    api: 'openai-completions',
-    apiKey: 'phase10-local-witness-key',
-    baseUrl: harness.witness.baseUrl,
-    model: { id: 'phase10-detail-model', provider: 'witness-provider' },
-    systemPrompt: 'PHASE10_DETAIL_VERTICAL_SYSTEM',
-    messages: [{ role: 'user', content: USER_INPUT }],
-    usageLedger: ledger,
-    usageContext: {
-      source: { subsystem: 'memory', operation: 'detail_vertical', surface: 'desktop', trigger: 'user' },
-      attribution: { kind: 'agent', agentId: 'agent-detail-vertical' },
-    },
-  } as never);
+  await runWithModelTraceRoot({ origin: 'user_turn' }, async () => {
+    await callText({
+      api: 'openai-completions',
+      apiKey: 'phase10-local-witness-key',
+      baseUrl: harness.witness.baseUrl,
+      model: { id: 'phase10-detail-model', provider: 'witness-provider' },
+      systemPrompt: 'PHASE10_DETAIL_VERTICAL_SYSTEM',
+      messages: [{ role: 'user', content: USER_INPUT }],
+      usageLedger: ledger,
+      usageContext: {
+        source: { subsystem: 'memory', operation: 'detail_vertical', surface: 'desktop', trigger: 'user' },
+        attribution: { kind: 'agent', agentId: 'agent-detail-vertical' },
+      },
+    } as never);
+  });
   await flushAsync();
   harness.flush();
   await flushAsync();
@@ -178,7 +180,7 @@ describe('Model Observatory 详情纵向链', () => {
     expect(requestedPaths.some((value) => /\/api\/model-observability\/payloads\/\d+$/.test(value))).toBe(true);
   });
 
-  it('Trace Explorer 经真实 HTTP list/detail：单次调用 trace 不进列表，详情层渲染调用记录', async () => {
+  it('Trace Explorer 经真实 HTTP list/detail：单次调用的会话轨迹进入列表，详情层渲染调用记录', async () => {
     render(
       <ObservabilityTraceExplorer
         appliedFilter={DEFAULT_OBSERVABILITY_FILTER}
@@ -189,11 +191,12 @@ describe('Model Observatory 详情纵向链', () => {
       />,
     );
 
-    // 轨迹列表默认只保留 ≥2 次调用的 trace（minCallCount=2）：
-    // 本 fixture 只发了一次调用 → 空态（调用台账仍可见该调用）。
+    // 轨迹按会话聚合（产品口径 2026-09-05）后不过滤单次调用（minCallCount=1）：
+    // 本 fixture 只发了一次调用 → 列表仍出现这条会话轨迹。
     await waitFor(() => {
-      expect(document.querySelector('[data-state="no-results"]')).not.toBeNull();
+      expect(document.querySelector('[class*="observability-trace-row"]')).not.toBeNull();
     });
+    expect(document.querySelector('[data-state="no-results"]')).toBeNull();
     expect(requestedPaths).toContain('/api/model-observability/query/traces');
     // 详情层（dsh ui-trajectory 布局）经真实 HTTP 拉取 trace 并渲染记录行。
     await waitFor(() => {

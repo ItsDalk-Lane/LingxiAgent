@@ -12,6 +12,7 @@ import { sessionScopedKey, sessionScopedListIncludes, sessionScopedValue } from 
 import { lingxiFetch, lingxiUrl } from '../hooks/use-hana-fetch';
 import { hydrateInputDrafts } from './input-draft-persistence';
 import { HOME_DRAFT_KEY } from '../../../../shared/input-drafts.ts';
+import { normalizeWorkspacePath } from '../../../../shared/workspace-history.ts';
 import { buildItemsFromHistory } from '../utils/history-builder';
 import { migrateLegacyTodos } from '../utils/todo-compat';
 import { clearChat as clearChatAction } from './agent-actions';
@@ -633,6 +634,11 @@ export async function loadSessions(): Promise<void> {
       // 首次加载：走完整的 switchSession 确保后端同步 + 消息加载
       await switchSession(sessions[0].path);
     }
+    // 列表投影刷新后校验当前会话缓存修订点：缓存 revision 落后（如新建会话首条消息
+    // 尚未被本端 WS 消费）时自动补拉。此前桌面端仅 chat-find-locate / 移动端前台触发
+    // reconcile，发送后的 loadSessions 刷新拿到了新 revision 却没有消费者——
+    // 「列表说磁盘前进了、缓存永远不追」的缺口在此闭合（issue #1610 桌面端补齐）。
+    void reconcileCurrentSessionMessages('sessions_refresh');
   } catch { /* ignore */ }
   useStore.getState().setSessionMetaRecovery(await metaRecoveryPromise);
 }
@@ -1152,7 +1158,10 @@ function stageDetachedSessionForActivation(data: any, ref: Readonly<SessionRef>,
       [targetKey]: [...(state.attachedFiles || [])],
     },
   });
-  useStore.getState().initSession?.(ref.sessionPath, [], false);
+  // 不在此处预种空缓存：种了空 items 会让 switchSession 的 hasData 判据为真而跳过
+  // 历史加载，新会话首屏从此完全依赖 WS 事件——事件被入口闸门丢弃/迟到即整片空白。
+  // 交给 switchSession 的 !hasData 路径走 loadMessages（空历史也会 stamp revision，
+  // 供后续 reconcile 补拉自愈）；WS 先到时 session_user_message 侧自会 initSession。
 }
 
 export async function loadPendingNewSessionPermissionDefault(): Promise<SessionPermissionMode> {
@@ -1191,24 +1200,56 @@ export async function createNewSession(options: CreateNewSessionOptions = {}): P
     typeof s.currentSessionPath === 'string' ? s.currentSessionPath : null,
   );
   const inheritedMountId = requestedFolder ? null : normalizeSessionId(currentProjection?.workspaceMountId);
-  const defaultWorkspaceMountId = inheritedMountId;
-  const defaultWorkspaceLabel = inheritedMountId
-    ? (typeof currentProjection?.workspaceLabel === 'string' ? currentProjection.workspaceLabel : null)
-    : null;
+  // 继承/保留的本地目录统一走 normalizeWorkspacePath（与 applyFolder 落 selectedFolder 的
+  // 规范形态一致）：服务端 cwd 在 Windows 上是反斜杠原生路径，直接落 selectedFolder 会让
+  // 全部按 '/' 取目录名的显示位退化为整条路径。
   const inheritedLocalFolder = !requestedFolder && !inheritedMountId
     && typeof currentProjection?.cwd === 'string' && currentProjection.cwd.trim()
-    ? currentProjection.cwd.trim()
+    ? normalizeWorkspacePath(currentProjection.cwd)
     : null;
+  // 无当前会话时继承「当前显示的工作台」：草稿选择（applyFolder/applyStudioWorkspace 写入的
+  // selectedFolder / selectedWorkspaceMountId）优先，其次 desk 已激活身份（冷启动恢复窗口）；
+  // 两者皆空才落 Primary Agent 工作台（设置页「新建对话默认工作台」语义）。
+  // 不做这一层时，用户切到非默认工作台后点新建聊天，草稿会被拽回 Primary 工作台，
+  // 左栏列表作用域（resolveWorkspaceScope 草稿态读 selected*）跟着换轨成默认工作台的记录。
+  const pendingMountId = !requestedFolder && !inheritedMountId
+    ? normalizeSessionId(s.selectedWorkspaceMountId) : null;
+  const deskMountId = !requestedFolder && !inheritedMountId && !pendingMountId
+    ? normalizeSessionId(s.deskWorkspaceMountId) : null;
+  const keptSelectedFolder = !requestedFolder && !inheritedMountId && !pendingMountId && !deskMountId
+    && typeof s.selectedFolder === 'string' && s.selectedFolder.trim()
+    ? normalizeWorkspacePath(s.selectedFolder)
+    : null;
+  // deskBasePath 只在本地目录工作台下是真实路径；mount 工作台下它是 'studio:*' 键形式，
+  // 不能当文件夹用（mount 情形已由上面的 deskMountId 分支接管）。
+  const keptDeskFolder = !requestedFolder && !inheritedMountId && !pendingMountId && !deskMountId && !keptSelectedFolder
+    && typeof s.deskBasePath === 'string' && s.deskBasePath.trim()
+    ? normalizeWorkspacePath(s.deskBasePath)
+    : null;
+  const defaultWorkspaceMountId = inheritedMountId || pendingMountId || deskMountId;
+  const defaultWorkspaceLabel = inheritedMountId
+    ? (typeof currentProjection?.workspaceLabel === 'string' ? currentProjection.workspaceLabel : null)
+    : (pendingMountId
+      ? (typeof s.selectedWorkspaceLabel === 'string' ? s.selectedWorkspaceLabel : null)
+      : (deskMountId ? (typeof s.deskWorkspaceLabel === 'string' ? s.deskWorkspaceLabel : null) : null));
   const defaultFolder = requestedFolder
     || inheritedLocalFolder
-    || (!currentProjection ? primaryWorkspace || (!primaryAgent ? s.homeFolder : null) : null)
+    || keptSelectedFolder
+    || keptDeskFolder
+    // Primary 兜底只在「无会话且未选中任何工作台（含 mount）」时生效，
+    // 否则 mount 已选中时 selectedFolder 仍会被写成 Primary 路径污染草稿状态。
+    || (!currentProjection && !defaultWorkspaceMountId ? primaryWorkspace || (!primaryAgent ? s.homeFolder : null) : null)
     || null;
   const deskFolder = inheritedMountId && typeof currentProjection?.cwd === 'string'
     ? currentProjection.cwd
     : defaultFolder;
-  const selectedPrimaryAgentId = primaryAgent && primaryAgent.id !== s.currentAgentId
-    ? primaryAgent.id
-    : null;
+  // 规则 B 补全（2026-09-05 用户拍板）：助手身份与工作台一样跟随「当前」，不再重置回
+  // Primary。selectedAgentId=null 即「跟随 currentAgentId」（欢迎页显示与建会话请求体
+  // 同语义，与 handleSelectHistory 的 null 约定一致）；仅在没有当前助手时才显式落
+  // Primary 兜底。
+  const selectedAgentIdForDraft = s.currentAgentId
+    ? null
+    : (primaryAgent ? primaryAgent.id : null);
   const pendingProjectId = typeof options.projectId === 'string' && options.projectId.trim()
     ? options.projectId.trim()
     : null;
@@ -1218,13 +1259,13 @@ export async function createNewSession(options: CreateNewSessionOptions = {}): P
     currentSessionPath: null,
     currentSessionId: null,
     pendingSessionSwitchPath: null,
-    // 全局新建仍回到 Primary Agent；工作台则优先使用显式目录，其次继承当前会话的主工作台，
-    // 只有没有当前会话时才使用 Primary Agent 默认工作台。
+    // 新建聊天跟随当前：助手与工作台都不重置回 Primary；仅无当前助手且未选中任何
+    // 工作台时才落 Primary 兜底（设置页「新建对话默认工作台」语义保留）。
     selectedFolder: defaultFolder,
     selectedWorkspaceMountId: defaultWorkspaceMountId,
     selectedWorkspaceLabel: defaultWorkspaceLabel,
     workspaceFolders: [],
-    selectedAgentId: selectedPrimaryAgentId,
+    selectedAgentId: selectedAgentIdForDraft,
     ...pendingNewSessionIdentityPatch(),
     pendingProjectId,
     pendingNewSessionThinkingLevel: null,
@@ -1374,20 +1415,22 @@ export async function archiveSession(path: string): Promise<void> {
 
     const s = useStore.getState();
     const isCurrent = path === s.currentSessionPath;
+    const inDraft = !s.currentSessionPath;
     clearSessionRuntimeCaches(path);
     if (isCurrent) {
       clearChatAction();
-      useStore.setState({ currentSessionPath: null, currentSessionId: null });
+    }
+
+    // 归档当前会话（或草稿态归档旧会话）→ 回「新建聊天」草稿态：createNewSession
+    // 在置空 current* 前读取被归档会话的工作台归属做继承（规则 B：新建跟随当前），
+    // 其写入的 pendingNewSession 同时挡住下面 loadSessions 的「首次加载」自动选中。
+    // 旧实现是 switchSession(sessions[0])——全局列表第一条不属于当前工作台，会把
+    // 整个桌面拽进别的 工作台（用户复测报告 2026-09-05）。
+    if (isCurrent || inDraft) {
+      await createNewSession();
     }
 
     await loadSessions();
-
-    const updated = useStore.getState();
-    if (updated.sessions.length === 0) {
-      await createNewSession();
-    } else if (!updated.currentSessionPath) {
-      await switchSession(updated.sessions[0].path);
-    }
   } catch (err) {
     console.error('[session] archive failed:', err);
     showSidebarToast(window.t('session.archiveFailed'));
@@ -1410,6 +1453,10 @@ export interface ArchivedSession {
   agentDeleted?: boolean;
   readOnlyReason?: string | null;
   deletedAt?: string | null;
+  /** 工作台归属（归档界面按工作台分组的依据）；老服务端可能不带 */
+  cwd?: string | null;
+  workspaceMountId?: string | null;
+  workspaceLabel?: string | null;
 }
 
 export type RestoreResult =
@@ -1428,7 +1475,11 @@ export async function listArchivedSessions(): Promise<ArchivedSession[]> {
   }
 }
 
-export async function restoreSession(target: string | Pick<ArchivedSession, 'path' | 'sessionId'>): Promise<RestoreResult> {
+export async function restoreSession(
+  target: string | Pick<ArchivedSession, 'path' | 'sessionId'>,
+  opts?: { /** 批量恢复传 false：不跳转会话，仅恢复进列表（单条恢复默认跳转，行为不变） */
+    switchTo?: boolean },
+): Promise<RestoreResult> {
   const sessionPath = typeof target === 'string' ? target : target.path;
   const sessionId = typeof target === 'string' ? null : normalizeSessionId(target.sessionId);
   try {
@@ -1452,7 +1503,7 @@ export async function restoreSession(target: string | Pick<ArchivedSession, 'pat
       restoredSessionId,
       restoredPath,
     );
-    if (restoredSession?.path) {
+    if (opts?.switchTo !== false && restoredSession?.path) {
       await switchSession(restoredSession.path);
     }
     void hydrateInputDrafts();
@@ -1496,6 +1547,91 @@ export async function cleanupArchivedSessions(maxAgeDays: 30 | 90): Promise<{ de
     console.error('[archived] cleanup failed:', err);
     return { deleted: 0 };
   }
+}
+
+// ══════════════════════════════════════════════════════
+// 工作台处置（移除工作台前二选一：归档 / 永久删除）
+// ══════════════════════════════════════════════════════
+
+export interface WorkspaceDisposalResult {
+  ok: boolean;
+  action: 'archive' | 'delete';
+  matched: number;
+  disposed: number;
+  skippedStreaming: number;
+}
+
+export async function disposeWorkspaceSessions(
+  identity: { workspaceMountId?: string | null; cwd?: string | null },
+  action: 'archive' | 'delete',
+): Promise<WorkspaceDisposalResult | null> {
+  try {
+    const res = await lingxiFetch('/api/sessions/workspace-disposal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...(identity.workspaceMountId ? { workspaceMountId: identity.workspaceMountId } : {}),
+        ...(identity.cwd ? { cwd: identity.cwd } : {}),
+        action,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data?.error) {
+      console.error('[workspace-disposal] failed:', data?.error || res.statusText);
+      return null;
+    }
+    await loadSessions();
+    return {
+      ok: true,
+      action,
+      matched: Number(data?.matched ?? 0),
+      disposed: Number(data?.disposed ?? 0),
+      skippedStreaming: Number(data?.skippedStreaming ?? 0),
+    };
+  } catch (err) {
+    console.error('[workspace-disposal] failed:', err);
+    return null;
+  }
+}
+
+/**
+ * 孤儿会话清扫（静默自动归档）：所属工作台已被移除（mount 失效）或磁盘目录
+ * 已被直接删除的会话，启动时归档进归档界面——那里按工作台分组可见、可整组处理。
+ * 用户裁决：不弹任何框。
+ */
+export async function sweepOrphanedWorkspaceSessions(): Promise<number> {
+  try {
+    const res = await lingxiFetch('/api/sessions/sweep-orphaned-workspaces', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data?.error) {
+      console.error('[workspace-sweep] failed:', data?.error || res.statusText);
+      return 0;
+    }
+    const archived = Number(data?.archived ?? 0);
+    if (archived > 0) await loadSessions();
+    return archived;
+  } catch (err) {
+    console.error('[workspace-sweep] failed:', err);
+    return 0;
+  }
+}
+
+/** 重新添加工作台时的恢复提示：该路径名下有多少条已归档记录。 */
+export async function countArchivedSessionsForWorkspace(identity: {
+  workspaceMountId?: string | null;
+  cwd?: string | null;
+}): Promise<number> {
+  const list = await listArchivedSessions();
+  const normalizedCwd = identity.cwd ? identity.cwd.replace(/\/+$/, '') : null;
+  return list.filter((item) => {
+    if (identity.workspaceMountId && item.workspaceMountId === identity.workspaceMountId) return true;
+    if (normalizedCwd && item.cwd && item.cwd.replace(/\/+$/, '') === normalizedCwd) return true;
+    return false;
+  }).length;
 }
 
 // ══════════════════════════════════════════════════════

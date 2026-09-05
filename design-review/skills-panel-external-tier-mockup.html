@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>效果稿 · Skills 界面外部技能（项目级启用 + 助手级启停）</title>
+<style>
+  :root {
+    --bg: #3B4A54; --bg-card: #445560;
+    --accent: #C99AAF; --accent-hover: #D8AFC0; --accent-light: rgba(201, 154, 175, 0.11);
+    --text: #E1EAF0; --text-light: #B7C5CE; --text-muted: #A3B5C0;
+    --border: rgba(170, 121, 141, 0.16);
+    --green: #8CC790; --danger: #C77070;
+    --overlay-light: rgba(255,255,255,0.05); --overlay-medium: rgba(255,255,255,0.08);
+    --fs-micro: 11px; --fs-hint: 12px; --fs-caption: 12.5px; --fs-body: 14px;
+    --radius-sm: 5px; --radius-md: 8px; --radius-lg: 12px;
+    --shadow: rgba(0, 0, 0, 0.36);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: var(--fs-body); padding: 40px 48px 80px;
+  }
+  .page-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .page-sub { color: var(--text-muted); font-size: 13px; margin-bottom: 10px; line-height: 1.7; }
+  .page-sub b { color: var(--text-light); }
+  .tier-strip {
+    display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+    font-size: 12.5px; color: var(--text-light);
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 10px 16px; margin-bottom: 34px; max-width: 1020px;
+  }
+  .tier-strip .n {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; border-radius: 50%; flex: none;
+    background: var(--accent-light); color: var(--accent-hover); font-weight: 700; font-size: 11px;
+  }
+  .tier-strip .arrow { color: var(--text-muted); }
+  .tier-strip .off { color: var(--danger); }
+
+  .section { margin-bottom: 46px; }
+  .section-tag {
+    display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 12px;
+    border-radius: 999px; margin-bottom: 10px; letter-spacing: 0.5px;
+  }
+  .tag-gate { background: rgba(201,154,175,0.16); color: var(--accent-hover); }
+  .tag-panel { background: rgba(140,199,144,0.16); color: var(--green); }
+  .section-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .section-desc { color: var(--text-muted); font-size: 12.5px; margin-bottom: 14px; line-height: 1.7; }
+
+  .callout {
+    display: flex; gap: 10px; align-items: flex-start; margin-top: 12px;
+    font-size: 12.5px; line-height: 1.7; color: var(--text-light);
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 10px 14px; max-width: 1020px;
+  }
+  .callout .ico { flex: none; font-weight: 700; }
+  .callout.info .ico { color: var(--accent-hover); }
+  .callout.good .ico { color: var(--green); }
+  .callout.bad .ico { color: var(--danger); }
+  .callout b { color: var(--text); }
+
+  /* ── 设置页兼容技能抽屉 ── */
+  .settings-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 16px 18px; max-width: 640px;
+  }
+  .settings-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .settings-card .lead { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+  .drawer { border: 1px solid var(--border); border-radius: var(--radius-md); margin-top: 8px; background: rgba(255,255,255,0.02); }
+  .drawer-head {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+    font-size: 12.5px; font-weight: 600; color: var(--text-light);
+  }
+  .drawer-head .path { font-size: 11px; color: var(--text-muted); font-weight: 400; margin-left: auto; }
+
+  /* ── 技能行（仿 SkillRow / skills-list-item） ── */
+  .skill-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 12px; border-top: 1px solid var(--overlay-light);
+  }
+  .skill-row:hover { background: var(--overlay-light); }
+  .skill-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .skill-name { font-size: var(--fs-caption); color: var(--text); display: flex; align-items: center; gap: 6px; }
+  .skill-desc { font-size: 11px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* 来源工具小标签（标题后缀徽标） */
+  .src-badge {
+    display: inline-flex; align-items: center;
+    padding: 0 6px; height: 15px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--overlay-light);
+    color: var(--text-muted); font-size: 10px; font-weight: 600; letter-spacing: 0.2px;
+    white-space: nowrap; flex: none;
+  }
+  .src-badge.claude { color: #E3A96B; border-color: rgba(227,169,107,0.35); }
+  .src-badge.codex { color: #9BB8E3; border-color: rgba(155,184,227,0.35); }
+  .src-badge.openclaw { color: #A8E0B0; border-color: rgba(168,224,176,0.35); }
+
+  /* 仿 hana-toggle 开关 */
+  .toggle {
+    width: 36px; height: 20px; border-radius: 5px; border: none; flex: none;
+    background: var(--overlay-medium); position: relative; cursor: default; padding: 0;
+  }
+  .toggle::after {
+    content: ""; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px;
+    border-radius: 3px; background: #fff; transition: transform 0.2s;
+  }
+  .toggle.on { background: var(--green); }
+  .toggle.on::after { transform: translateX(16px); }
+
+  .dim { opacity: 0.55; }
+  .gate-note { font-size: 10.5px; color: var(--danger); margin-left: 8px; flex: none; }
+  .gate-note.ok { color: var(--green); }
+
+  /* ── Skills 浮动面板 ── */
+  .panel-stage { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+  .skills-panel {
+    width: 460px; background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); box-shadow: 0 18px 50px var(--shadow);
+    overflow: hidden; flex: none;
+  }
+  .panel-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+  }
+  .panel-head h2 { font-size: 15px; font-weight: 700; }
+  .x { color: var(--text-muted); }
+  .panel-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 10px; }
+
+  .agent-tabs { display: flex; gap: 8px; align-items: center; }
+  .agent-tab {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 999px; font-size: 12px;
+    border: 1px solid var(--border); color: var(--text-muted);
+    background: transparent;
+  }
+  .agent-tab.active { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-light); font-weight: 600; }
+  .agent-tab .dot { width: 16px; height: 16px; border-radius: 50%; background: var(--overlay-medium); display: inline-flex; align-items: center; justify-content: center; font-size: 9px; }
+
+  .panel-divider { border-top: 1px dashed var(--border); margin: 2px 0; }
+  .panel-sec-label { font-size: 11px; font-weight: 600; color: var(--text-muted); padding: 0 2px; }
+
+  .side-note { flex: 1; min-width: 300px; max-width: 480px; }
+</style>
+</head>
+<body>
+
+<div class="page-title">效果稿 · Skills 界面的外部 Agent 工具技能</div>
+<div class="page-sub">
+  两级启用模型：<b>① 项目级</b>（设置 → 技能 → 兼容技能，决定这个外部技能是否进入本项目/Skills 界面）→
+  <b>② 助手级</b>（Skills 界面的每个助手页里逐个启停，决定哪个助手真正能用）。
+</div>
+<div class="tier-strip">
+  <span><span class="n">1</span> 设置·兼容技能里启用 = 对整个项目启用（可见性闸门）</span>
+  <span class="arrow">→</span>
+  <span><span class="n">2</span> Skills 界面·助手页里启用 = 该助手可用</span>
+  <span class="arrow">·</span>
+  <span class="off">未在第①步启用的外部技能：Skills 界面完全不出现</span>
+</div>
+
+<!-- ═══ ① 项目级闸门：设置 → 技能 → 兼容技能 ═══ -->
+<div class="section">
+  <span class="section-tag tag-gate">① 设置 · 技能 · 兼容技能（项目级启用）</span>
+  <div class="section-title">每个外部 Agent 分组里的开关 = 对整个项目启用</div>
+  <div class="section-desc">这一步只决定「进入不进入项目」。启用后技能才会出现在 Skills 界面；未启用的不出现。开关不再是「对某个助手启用」。</div>
+  <div class="settings-card">
+    <h3>兼容技能</h3>
+    <div class="lead">自动发现其他 AI 工具安装的技能</div>
+    <div class="drawer">
+      <div class="drawer-head">Claude Code <span class="path">~/.claude/skills</span></div>
+      <div class="skill-row">
+        <div class="skill-info"><span class="skill-name">doc-writer</span><span class="skill-desc">根据代码变更生成英文文档</span></div>
+        <button class="toggle on" aria-label="项目级：已启用"></button>
+      </div>
+      <div class="skill-row">
+        <div class="skill-info"><span class="skill-name">sql-helper</span><span class="skill-desc">编写并校验 SQL 迁移脚本</span></div>
+        <button class="toggle" aria-label="项目级：未启用"></button>
+      </div>
+    </div>
+    <div class="drawer">
+      <div class="drawer-head">Codex <span class="path">~/.codex/skills</span></div>
+      <div class="skill-row">
+        <div class="skill-info"><span class="skill-name">code-review</span><span class="skill-desc">按团队规范做代码评审</span></div>
+        <button class="toggle on" aria-label="项目级：已启用"></button>
+      </div>
+    </div>
+    <div class="drawer">
+      <div class="drawer-head">OpenClaw <span class="path">~/.openclaw/skills</span></div>
+      <div class="skill-row">
+        <div class="skill-info"><span class="skill-name">weather-brief</span><span class="skill-desc">生成每日天气简报</span></div>
+        <button class="toggle" aria-label="项目级：未启用"></button>
+      </div>
+    </div>
+  </div>
+  <div class="callout bad"><span class="ico">✕</span><span><b>sql-helper、weather-brief 未在项目级启用 → Skills 界面完全不显示它们</b>（设置页这里仍可见可开）。</span></div>
+</div>
+
+<!-- ═══ ② Skills 界面 · 全部技能页 ═══ -->
+<div class="section">
+  <span class="section-tag tag-panel">② Skills 界面 ·「全部技能」页</span>
+  <div class="section-title">只显示项目级已启用的外部技能，不分组，标题后带来源工具小标签</div>
+  <div class="section-desc">外部技能与内置技能同样平铺；「全部技能」页为管理视图，只读展示，启停去各助手页做。</div>
+  <div class="panel-stage">
+    <div class="skills-panel">
+      <div class="panel-head"><h2>Skills</h2><span class="x">✕</span></div>
+      <div class="panel-body">
+        <div class="agent-tabs">
+          <span class="agent-tab active"><span class="dot">✦</span>全部技能</span>
+          <span class="agent-tab"><span class="dot">花</span>Hana</span>
+          <span class="agent-tab"><span class="dot">猫</span>Mao</span>
+        </div>
+        <div class="skill-row" style="border-top:none; padding: 2px 2px 0;">
+          <div class="skill-info"><span class="skill-name">reader</span><span class="skill-desc">读取并总结本地文档</span></div>
+        </div>
+        <div class="skill-row" style="padding: 2px 2px 0;">
+          <div class="skill-info"><span class="skill-name">pdf-export</span><span class="skill-desc">把会话导出为 PDF</span></div>
+        </div>
+        <div class="panel-divider"></div>
+        <div class="panel-sec-label">外部 Agent 工具技能</div>
+        <div class="skill-row" style="border-top:none;">
+          <div class="skill-info">
+            <span class="skill-name">code-review <span class="src-badge codex">Codex</span></span>
+            <span class="skill-desc">按团队规范做代码评审</span>
+          </div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-info">
+            <span class="skill-name">doc-writer <span class="src-badge claude">Claude Code</span></span>
+            <span class="skill-desc">根据代码变更生成英文文档</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="side-note">
+      <div class="callout info"><span class="ico">ℹ</span><span>
+        <b>对比现状（我上一轮的实现）：不再按来源工具分组、也不再全量显示。</b><br>
+        · 只列出在①里启用的技能（示例中即 code-review、doc-writer 两个）<br>
+        · 平铺不分组，来源信息压缩成标题后的小标签（Codex / Claude Code）<br>
+        · 此页只读；sql-helper / weather-brief 因①未启用而不出现
+      </span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ③ Skills 界面 · 助手页 ═══ -->
+<div class="section">
+  <span class="section-tag tag-panel">③ Skills 界面 · 助手页（助手级启停）</span>
+  <div class="section-title">项目级启用 ≠ 助手自动可用：每个助手要用自己的开关</div>
+  <div class="section-desc">切到某个助手后，外部技能行出现开关（与内置技能一致）。Hana 开了 code-review、没开 doc-writer；Mao 各自独立。</div>
+  <div class="panel-stage">
+    <div class="skills-panel">
+      <div class="panel-head"><h2>Skills</h2><span class="x">✕</span></div>
+      <div class="panel-body">
+        <div class="agent-tabs">
+          <span class="agent-tab"><span class="dot">✦</span>全部技能</span>
+          <span class="agent-tab active"><span class="dot">花</span>Hana</span>
+          <span class="agent-tab"><span class="dot">猫</span>Mao</span>
+        </div>
+        <div class="skill-row" style="border-top:none; padding: 2px 2px 0;">
+          <div class="skill-info"><span class="skill-name">reader</span><span class="skill-desc">读取并总结本地文档</span></div>
+          <button class="toggle on"></button>
+        </div>
+        <div class="panel-divider"></div>
+        <div class="panel-sec-label">外部 Agent 工具技能</div>
+        <div class="skill-row" style="border-top:none;">
+          <div class="skill-info">
+            <span class="skill-name">code-review <span class="src-badge codex">Codex</span></span>
+            <span class="skill-desc">按团队规范做代码评审</span>
+          </div>
+          <button class="toggle on"></button>
+        </div>
+        <div class="skill-row">
+          <div class="skill-info">
+            <span class="skill-name">doc-writer <span class="src-badge claude">Claude Code</span></span>
+            <span class="skill-desc">根据代码变更生成英文文档</span>
+          </div>
+          <button class="toggle"></button>
+        </div>
+      </div>
+    </div>
+    <div class="side-note">
+      <div class="callout good"><span class="ico">✓</span><span>
+        助手级开关走现有 <b>PATCH /api/agents/:id/skills/:name</b>，行为与内置技能完全一致——项目级启用只是「让这个技能可被助手启用」，不会自动加进任何助手的启用集。
+      </span></div>
+      <div class="callout info" style="margin-top:10px;"><span class="ico">⚙</span><span>
+        <b>实现前提（语义变更）：</b>设置页兼容技能区的开关目前实际写的是「当前查看助手的启用集」。按此稿需要把它改为<b>项目级状态</b>（新增全局存储，如偏好键 enabled_external_skills），助手级启停只保留在 Skills 界面的助手页。
+      </span></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

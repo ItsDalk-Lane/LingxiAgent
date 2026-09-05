@@ -11,6 +11,7 @@ const mockLoadAvatars = vi.fn();
 const mockLoadSessions = vi.fn(async () => {});
 const mockLoadPendingNewSessionPermissionDefault = vi.fn(async () => {});
 const mockSwitchSession = vi.fn(async () => {});
+const mockSweepOrphanedWorkspaceSessions = vi.fn(async () => 0);
 const mockPendingNewSessionIdentityPatch = vi.fn(() => ({
   pendingNewSession: true as const,
   pendingDraftId: 'test-pending-draft-id',
@@ -20,6 +21,7 @@ const mockGetWebSocket = vi.fn<() => WebSocket | null>(() => null);
 const mockSetStatus = vi.fn();
 const mockLoadModels = vi.fn(async () => {});
 const mockInitJian = vi.fn();
+const mockLoadStudioWorkspaces = vi.fn(async () => []);
 const mockActivateWorkspaceDesk = vi.fn(async (root: string | null) => {
   mockState.deskBasePath = root || '';
   mockState.deskCurrentPath = '';
@@ -59,6 +61,7 @@ vi.mock('../stores/session-actions', () => ({
   loadPendingNewSessionPermissionDefault: mockLoadPendingNewSessionPermissionDefault,
   switchSession: mockSwitchSession,
   pendingNewSessionIdentityPatch: mockPendingNewSessionIdentityPatch,
+  sweepOrphanedWorkspaceSessions: mockSweepOrphanedWorkspaceSessions,
 }));
 
 vi.mock('../stores/session-project-actions', () => ({
@@ -78,6 +81,7 @@ vi.mock('../utils/ui-helpers', () => ({
 vi.mock('../stores/desk-actions', () => ({
   initJian: mockInitJian,
   activateWorkspaceDesk: mockActivateWorkspaceDesk,
+  loadStudioWorkspaces: mockLoadStudioWorkspaces,
 }));
 
 vi.mock('../stores/channel-actions', () => ({
@@ -427,6 +431,55 @@ describe('initApp bridge indicator', () => {
     expect(mockState.cwdHistory).toEqual(['/desktop']);
     expect(mockState.workspaceFolders).toEqual([]);
     expect(mockInitJian).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads the studio workspace list during bootstrap so the default-workspace merge key is ready for the first session list', async () => {
+    (globalThis as Record<string, unknown>).window = {
+      addEventListener: vi.fn(),
+      platform: {
+        getServerPort: vi.fn(async () => 62950),
+        getServerToken: vi.fn(async () => 'token'),
+        appReady: vi.fn(),
+        onSettingsChanged: vi.fn(),
+        openSettings: vi.fn(),
+      },
+      dispatchEvent: vi.fn(),
+    };
+    (globalThis as Record<string, unknown>).document = {
+      addEventListener: vi.fn(),
+    };
+    (globalThis as Record<string, unknown>).i18n = {
+      locale: 'zh-CN',
+      defaultName: 'Hanako',
+      load: vi.fn(async () => {}),
+    };
+    (globalThis as Record<string, unknown>).t = vi.fn((key: string) => key);
+
+    mockLingxiFetch
+      .mockResolvedValueOnce(serverIdentityResponse())
+      .mockResolvedValueOnce(jsonResponse({ agentId: 'hana', agent: 'Hanako', user: 'User', avatars: {} }))
+      .mockResolvedValueOnce(jsonResponse({ locale: 'zh-CN' }))
+      .mockResolvedValueOnce(jsonResponse({ agents: [{ id: 'hana', isPrimary: true }] }))
+      .mockResolvedValueOnce(jsonResponse({
+        desk: { home_folder: '/agent-home' },
+        cwd_history: [],
+      }))
+      .mockResolvedValueOnce(jsonResponse({ jobs: [] }))
+      .mockResolvedValueOnce(jsonResponse({
+        telegram: { status: 'disconnected' },
+        feishu: { status: 'disconnected' },
+        qq: { status: 'disconnected' },
+        wechat: { status: 'disconnected' },
+      }));
+
+    const { initApp } = await import('../app-init');
+    await initApp();
+
+    // defaultWorkspaceRootPath（默认工作台双形态合流键）不能依赖 FolderPicker
+    // 挂载时的一次性请求：启动首屏的左栏列表就需要它合并 mount/cwd 两形态会话。
+    expect(mockLoadStudioWorkspaces).toHaveBeenCalled();
+    // 孤儿会话清扫（静默自动归档）跟在工作台列表加载之后
+    expect(mockSweepOrphanedWorkspaceSessions).toHaveBeenCalled();
   });
 
   it('hydrates the persisted permission default before showing the pending new-session draft', async () => {

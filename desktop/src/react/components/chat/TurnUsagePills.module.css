@@ -1,0 +1,136 @@
+/* TurnUsagePills.module.css — 聊天 assistant 轮次「用量/用时」胶囊与明细弹窗。
+   移植自 design-review/harness-usage-pills-reference/TurnUsagePanel.module.css
+   （DeepSeek Harness，MIT）：几何/字号/间距等视觉规格 1:1 保留；颜色/圆角/
+   动效变量换成项目 Chat CSS 体系（--text/--text-muted/--bg/--border/--radius-*）。 */
+
+.root {
+  display: inline-flex;
+  min-width: 0;
+}
+
+/* 相邻两枚胶囊（用量→用时）回扣一部分内边距，读作一簇；hover 背景间仍留 2px。 */
+.root + .root {
+  margin-left: -6px;
+}
+
+/* 胶囊触发钮：28px 命中高度、15px 图形、tertiary → hover secondary。 */
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  height: 28px;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 28px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  line-height: 24px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out);
+}
+
+/* 窄列时标签省略号截断，图形不缩。 */
+.label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trigger svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+
+.trigger:hover,
+.trigger[aria-expanded='true'] {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text);
+}
+
+/* 弹出门面：视口 fixed，left/top 由锚定钳位内联供给（12px 视口边距）。 */
+.panel {
+  position: fixed;
+  z-index: 1100;
+  box-sizing: border-box;
+  /* 宽度随最宽行，带上下限；两个上限都让位于窄视口（12px 边距）。 */
+  width: max-content;
+  min-width: min(300px, calc(100vw - 24px));
+  max-width: min(440px, calc(100vw - 24px));
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--text);
+  cursor: default;
+}
+
+/* 弹窗标题行：节名左、headline 值（总量）右，主权重。 */
+.title {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* 标题下分隔线。 */
+.titleRule {
+  margin-bottom: 10px;
+  border-top: 0.5px solid var(--border);
+}
+
+.titleValue {
+  font-variant-numeric: tabular-nums;
+}
+
+.titleLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.titleValue svg,
+.titleLabel svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: minmax(76px, auto) minmax(0, 1fr);
+  gap: 6px 16px;
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.details dt,
+.details dd {
+  min-width: 0;
+  margin: 0;
+}
+
+.details dd {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.details .route {
+  overflow-wrap: anywhere;
+}
+
+.reasoning {
+  color: var(--text-muted);
+  white-space: nowrap;
+}

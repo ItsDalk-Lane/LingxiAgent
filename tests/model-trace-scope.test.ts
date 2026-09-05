@@ -232,3 +232,56 @@ describe("runWithModelTrace（显式 scope 进入）", () => {
     expect(outer.lastCallId).toBe("mc_c9");
   });
 });
+
+describe("runWithModelTraceRoot 的 reuseTraceId（会话级轨迹复用，2026-09-05 口径）", () => {
+  it("无外层 scope 且给出合法 reuseTraceId → 复用该 traceId，origin/refs 照旧", () => {
+    const scope = runWithModelTraceRoot(
+      { origin: "user_turn", refs: { sessionId: "s1" }, reuseTraceId: "mt_session_root" },
+      () => currentModelTraceScope()!,
+    );
+    expect(scope.traceId).toBe("mt_session_root");
+    expect(scope.origin).toBe("user_turn");
+    expect(scope.refs).toMatchObject({ sessionId: "s1" });
+    // 复用轮是同一轨迹内的新根：lastCallId 不跨轮继承
+    expect(scope.lastCallId).toBeNull();
+    expect(scope.causalParentCallId).toBeNull();
+  });
+
+  it("外层已有 scope 时 reuseTraceId 被忽略（原样继承优先）", () => {
+    const result = runWithNewModelTrace({ origin: "user_turn" }, () => {
+      const outerScope = currentModelTraceScope()!;
+      const inner = runWithModelTraceRoot(
+        { origin: "user_turn", reuseTraceId: "mt_session_root" },
+        () => currentModelTraceScope()!,
+      );
+      return { outerScope, inner };
+    });
+    expect(result.inner).toBe(result.outerScope);
+    expect(result.inner.traceId).not.toBe("mt_session_root");
+  });
+
+  it("reuseTraceId 为空串/空白/缺省 → 照旧铸新根", () => {
+    for (const reuseTraceId of [null, "", "   "] as Array<string | null | undefined>) {
+      const scope = runWithModelTraceRoot({ origin: "user_turn", reuseTraceId }, () =>
+        currentModelTraceScope()!);
+      expect(scope.traceId).toMatch(/^mt_/);
+      expect(scope.traceId).not.toBe("mt_session_root");
+    }
+    const without = runWithModelTraceRoot({ origin: "user_turn" }, () => currentModelTraceScope()!);
+    expect(without.traceId).toMatch(/^mt_/);
+  });
+
+  it("复用轮内后续调用接在本轮根之后（lastCallId 从 null 推进）", () => {
+    const resolved = runWithModelTraceRoot(
+      { origin: "user_turn", reuseTraceId: "mt_session_root" },
+      () => {
+        const first = resolveModelTraceContext();
+        noteAgentStreamCallStarted("mc_turn2_c1");
+        const second = resolveModelTraceContext();
+        return { first, second };
+      },
+    );
+    expect(resolved.first.parentCallId).toBeNull();
+    expect(resolved.second.parentCallId).toBe("mc_turn2_c1");
+  });
+});

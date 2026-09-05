@@ -8,7 +8,6 @@ import { readConfigBoolean } from '../resource-state';
 import { SettingsSection } from '../components/SettingsSection';
 import { SettingsRow } from '../components/SettingsRow';
 import { ExpandableRow } from '../components/ExpandableRow';
-import { ArchivedSessionsModal } from '../../components/ArchivedSessionsModal';
 import styles from '../Settings.module.css';
 
 interface Checkpoint {
@@ -85,7 +84,6 @@ export function SecurityTab() {
 
   const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
   const [loading, setLoading] = useState(false);
-  const [archivedOpen, setArchivedOpen] = useState(false);
   const [proxyDraft, setProxyDraft] = useState<NetworkProxyConfig>(
     () => normalizeNetworkProxyDraft(settingsConfig?.network_proxy),
   );
@@ -270,22 +268,6 @@ export function SecurityTab() {
         )}
       </SettingsSection>
 
-      <SettingsSection title={t('settings.security.archivedChats')}>
-        <SettingsRow
-          label={t('settings.security.archivedChats')}
-          hint={t('settings.security.archivedChatsDesc')}
-          control={
-            <button
-              type="button"
-              className={styles['settings-btn-secondary']}
-              onClick={() => setArchivedOpen(true)}
-            >
-              {t('settings.security.viewArchivedChats')}
-            </button>
-          }
-        />
-      </SettingsSection>
-
       <SettingsSection title={t('settings.security.networkProxy')}>
         <SettingsRow
           label={t('settings.security.networkProxyMode')}
@@ -350,11 +332,6 @@ export function SecurityTab() {
           </button>
         </SettingsSection.Footer>
       </SettingsSection>
-      <ArchivedSessionsModal
-        open={archivedOpen}
-        onClose={() => setArchivedOpen(false)}
-        zIndex={1900}
-      />
     </div>
   );
 }

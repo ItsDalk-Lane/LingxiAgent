@@ -2,6 +2,27 @@
 
 影响正确性、需要待裁决/上游修复的事项。处理方式：记录 → 跳过该子功能 → 继续其他任务。
 
+## 2026-09-05 用量/用时胶囊任务:任务0基线差值(已解释,待补认)
+
+1. **git status 条数对不上(68 实测 vs 任务书 73)**:任务书称开工时 73 条未提交(68 M + 5 ??);2026-09-05 17:42 实测 68 条(63 M + 5 ??)。差值=恰 5 个 M 文件,已定位为提交 **d6fbd0d3(09-05 13:20「归档记录按工作台分组…」)** 吞并了任务书快照之后的 5 个当时未提交文件;5 个 ??(design-review/、WorkspaceSwitcher.test.tsx、WorkspaceSwitcher.tsx、workspace-switch.ts、model-observability-session-trace-reuse.test.ts)原样在列。**处置**:按任务 0「只做不受影响的部分」——数量差异已被提交证据完整解释、非丢改动,以实测 68 条为冻结基线(只多不少)继续全部任务;若领导认定必须以 73 条清单逐项核对,请补发原始 73 条文件清单。
+2. **白名单两文件与「一个字节不许碰」表面冲突(按任务书面语义执行,备案)**:`lib/llm/model-observability-query.ts`、`shared/model-observability-api-contract.ts` 既是基线未提交改动文件、又被白名单明确列为可改且任务 1 点名要求改。执行口径:这两文件只做**纯增量**编辑(保留既有全部未提交改动),其余 66 条基线条目一个字节不碰。
+3. **合约新字段 `inputUncachedTokens` 设为可选(约束迫使,备案待追认)**:现有测试(`ObservabilityTraceForest.test.ts:73`、`TraceConversationModel.test.ts:56` 等)以显式类型注解构造 summary 字面量,必填字段会破坏「现有测试文件一律不改」红线;服务端投影始终产出该键(null=无事实),可选仅放宽消费方。若领导要求必填,需同步豁免上述测试的类型改动。
+4. **并发改动入工作树(非本任务所为,待确认归属)**:2026-09-05 17:42(本任务抓基线同分钟)另有会话/用户修改了 4 个白名单外文件——`ArchivedSessionsModal.tsx/.module.css/其 test`(批量恢复 switchTo 选项)与 `stores/session-actions.ts`。本任务未触碰未回滚;如需还原或纳入本任务基线,请裁决。
+5. **归档后自动跳工作台(用户 2026-09-05 报告 → 同日拍板「把问题一也修复了」→ 已修复)**:根因=`session-actions.ts` archiveSession 归档当前会话后无条件 `switchSession(sessions[0].path)`(08-05 基线 d5275e56 既有);且 `loadSessions` 的「首次加载」兜底(626-635)在 currentSessionPath 为空时同样拉 sessions[0],只删显式跳转不够。**修复**:归档当前会话/草稿态归档旧会话 → 先 `createNewSession()` 回「新建聊天」草稿态(置空前读取被归档会话的工作台归属做继承,规则 B;其 pendingNewSession 挡住 loadSessions 兜底),归档后台会话(当前开着别的会话)维持原行为。锁定旧行为的用例已按新语义改写(用户授权覆盖冻结边界),红→绿证据见 PROGRESS.md 同日条目。
+
+## 2026-09-05 v0.1.33 新建会话工作台语义冲突(用户新指认,2026-09-05 已裁决并实施)
+
+3. **「新建对话默认工作台」有两个互相矛盾的规则声明,实现做的是第三种**(已于 2026-09-05 经用户三轮澄清+拍板解决):
+   - 规则A(设置页文案):`desktop/src/locales/zh.json:2317` homeFolderDesc「新建对话默认使用的工作目录,巡检和定时任务也在这里执行」——承诺新建对话默认用**设置里配置的 Agent 工作台目录**。
+   - 规则B(v0.1.33 功能,ea03c627,含锁定测试):新建聊天**继承当前工作台**(从哪个工作台点就进哪个)。
+   - 实现实际行为(createNewSession,session-actions.ts):继承**当前会话**的工作台;无当前会话时兜底 Primary Agent 工作台(agent-workspace.ts:8-11 effectiveHomeFolder=设置页配置的工作台目录 X)——既不是A也不是B。用户切换工作台目录(applyFolder/applyStudioWorkspace 置 currentSessionPath=null 进草稿,desk-actions.ts:1326-1330/:294-298)后点新建聊天,selectedFolder 被覆写为 X、desk 切到 X,左栏作用域(resolveWorkspaceScope 草稿态取 selectedFolder,session-sections.ts:146-149)跟着变 X 的记录。用户实测三个落点全部吻合:a) 其他工作台下点新建聊天→工作台拽回 X;b) Default 工作台(内置 mount "default",lingxidev 路径,core/mount-aware-file-service.ts:370-384)下切会话/新建聊天→列表显示 X 的记录(Default 自己的记录反而不显示);c) 但在 Default 下不点新建聊天直接发消息→建会话体带 selectedWorkspaceMountId="default"(session-actions.ts buildPendingSessionCreateBody)→记录正确存到 Default 名下——显示作用域与数据归属分家。
+   - **裁决结果(2026-09-05)**:用户确认问题复述无误并指示按规则 B 修复。已实施:createNewSession 继承源重排(无当前会话→草稿选择/desk 身份优先,Primary 仅兜底)+ 去空缓存种子 + loadSessions 后补 reconcile + 5 语言文案对齐;回归测试 5 用例(含旧代码红→新代码绿证据)。详见 PROGRESS.md 2026-09-05 修复轮。
+
+## 2026-09-04 v0.1.33 新建会话空白/串台诊断(本任务待裁决/未排除项)
+
+1. **「对话记录串台成主工作台」store 层未复现,候选=服务端身份/WS 时序(未排除)**:机制b(loadSessions 强切 sessions[0],session-actions.ts:626-635)经静态枚举证明在新建会话流程内不可达(三标志同步交接,详见 PROGRESS.md 任务2清单);ChatArea 视图层无 sessions[0] 兜底(chat/ChatArea.tsx:41)。残留可能:new-detached 建出的会话身份与 switch 回包/WS 广播身份不一致时,入口闸门(ws-message-handler.ts:97-140)丢事件(表现=空白)或重放错会话(表现=串台)——复现需真实服务端/WS 配合,超出本任务「store 层自动化测试」白名单。待裁决:是否安排服务端在场的集成复现。
+2. **一行顺手修复未动手(按任务书界限)**:P0-1(stageDetachedSessionForActivation 去掉空种子)、P1-3(createNewSession 不清 desk 三件套)均为小改动,已写进 PROGRESS.md 修复清单待裁决,不在本任务执行。
+
 ## 2026-08-16 供应商模型统一化 + 联网/结构化输出任务
 
 ### 1. Moonshot native web search wire contract 无可靠证据

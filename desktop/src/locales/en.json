@@ -235,7 +235,8 @@
       "allTab": "All Skills",
       "agentTabs": "View skills by assistant",
       "previousAgent": "Previous assistant",
-      "nextAgent": "Next assistant"
+      "nextAgent": "Next assistant",
+      "externalRemove": "Remove (mark disabled)"
     }
   },
   "sidebar": {
@@ -287,7 +288,8 @@
       "showMore": "Show more",
       "loading": "Loading projects…",
       "empty": "No projects yet"
-    }
+    },
+    "archivedChats": "Archived chats"
   },
   "titlebar": {
     "currentChatTitle": "Current chat title",
@@ -340,6 +342,12 @@
       "restoreConfirm": "Restore this conversation to its original location?",
       "restoreConflict": "Original location is occupied; cannot restore",
       "restoreFailed": "Restore failed",
+      "restoreSelected": "Restore selected ({count})",
+      "restoreSelectedConfirm": "Restore {count} selected archives to the chat list?",
+      "restoreSelectedDone": "Restored {count} archives",
+      "restoreSelectedPartial": "Partially restored: {restored}/{total}",
+      "restoreGroup": "Restore group",
+      "restoreGroupConfirm": "Restore all {count} archives in the \"{name}\" group to the chat list?",
       "deleteForever": "Delete forever",
       "deleteConfirm": "Permanently delete this archive? This cannot be undone.",
       "deleteFailed": "Delete failed",
@@ -348,7 +356,15 @@
       "deleteSelectedConfirm": "Permanently delete {count} selected archives ({size} total)? This cannot be undone.",
       "deleteSelectedDone": "Deleted {count} archives",
       "deleteSelectedPartial": "Partially deleted: {deleted}/{total}",
-      "daysAgo": "Archived {days} days ago"
+      "daysAgo": "Archived {days} days ago",
+      "deleteGroup": "Delete group",
+      "deleteGroupConfirm": "Permanently delete all {count} archived records ({size}) in the \"{name}\" group? This cannot be undone.",
+      "deleteGroupDone": "Permanently deleted {count} archived records",
+      "group": {
+        "ungrouped": "Unassigned",
+        "workspaceRemoved": "Workspace removed",
+        "meta": "{count} chats · {size}"
+      }
     },
     "rcTakingOver": "{platform} active",
     "subagentRunStateUnrecoverable": "Historical sub-session run state is unrecoverable",
@@ -1895,9 +1911,6 @@
       "networkProxyWss": "WSS proxy, optional",
       "networkProxyNoProxy": "Bypass proxy, for example localhost, 127.0.0.1, ::1",
       "networkProxySave": "Save Proxy Settings",
-      "archivedChats": "Archived Conversations",
-      "archivedChatsDesc": "Review archived chats, restore conversations you need again, or permanently delete records you no longer want",
-      "viewArchivedChats": "View Archived Conversations",
       "fileBackup": "File Backup",
       "fileBackupDesc": "Automatically save original file content before AI modifications or deletions",
       "retention": "Retention",
@@ -2376,7 +2389,7 @@
       "automationPermissionMode": "Automation permission mode",
       "automationPermissionModeDesc": "Controls whether background automation Agent runs auto-review tool calls, runs with full access, or stays read-only; failed auto-review blocks the action",
       "homeFolder": "Workspace",
-      "homeFolderDesc": "Default working directory for new chats, patrol and cron tasks",
+      "homeFolderDesc": "New chats follow the workspace you opened; when none is open they default to this directory, and patrol and cron tasks run here",
       "homeFolderPlaceholder": "Not set (choose manually each time)",
       "homeFolderClear": "Clear",
       "homeFolderBrowse": "Browse",
@@ -3550,6 +3563,7 @@
           "outputTokensUnavailable": "Output tokens unavailable",
           "durationTooShort": "Duration too short",
           "started": "Started",
+          "responseArrival": "Response arrival",
           "totalDuration": "Total duration",
           "generation": "Generation",
           "throughput": "Throughput",
@@ -3611,7 +3625,7 @@
             "notRecorded": "Not recorded",
             "stepStartUnavailable": "Step start unavailable",
             "pending": "Pending",
-            "firstTokenUnavailable": "First token unavailable",
+            "responseArrivalUnavailable": "Response arrival unavailable",
             "observability": "Observability timing",
             "observabilityRunning": "Observability timing (running)",
             "session": "Session timestamps"
@@ -3923,7 +3937,8 @@
     "tabs": {
       "label": "Right workspace",
       "sessionFiles": "Conversation Files",
-      "workspace": "Workspace"
+      "workspace": "Workspace",
+      "projectSkills": "Project Skills"
     },
     "sessionFiles": {
       "title": "Conversation Files",
@@ -3966,6 +3981,52 @@
     "expand": "Expand runtime info",
     "collapse": "Collapse runtime info",
     "running": "{n} running"
+  },
+  "gitEnv": {
+    "title": "Environment",
+    "changes": "Changes",
+    "local": "Local",
+    "branch": "Branch",
+    "commitOrPush": "Commit or Push",
+    "notGitRepo": "Not a git repository",
+    "loadFailed": "Load failed, click to retry",
+    "mainWorktree": "Local main worktree",
+    "linkedWorktreeShort": "Branch worktree",
+    "linkedWorktree": "New worktree for branch: {name}",
+    "detachedHead": "Detached HEAD ({name})",
+    "checkedOutElsewhere": "This branch is checked out in another worktree",
+    "noBranches": "No local branches",
+    "switchDone": "Switched to {name}",
+    "switchFailed": "Failed to switch branch",
+    "branchesTitle": "Switch branch",
+    "changesTitle": "Changed files",
+    "noChanges": "No changes",
+    "diffBinary": "Binary file, diff not available",
+    "diffUnavailable": "Unable to read diff",
+    "diffTruncated": "Content too long, truncated",
+    "history": "Commit history",
+    "noCommits": "No commits yet",
+    "copyHash": "Copy commit ID",
+    "copied": "Commit ID copied",
+    "timeJustNow": "just now",
+    "timeMinutesAgo": "{n} min ago",
+    "timeHoursAgo": "{n} hours ago",
+    "timeDaysAgo": "{n} days ago",
+    "commitTitle": "Commit or Push",
+    "commitMessagePlaceholder": "Commit message (leave blank to auto-generate)",
+    "includeUnstaged": "Include unstaged changes",
+    "btnCommit": "Commit",
+    "btnCommitPush": "Commit & Push",
+    "btnPush": "Push",
+    "nothingToCommit": "Nothing to commit",
+    "nothingStaged": "Nothing staged (check \"Include unstaged changes\")",
+    "nothingToPush": "No commits to push",
+    "noRemote": "No remote configured",
+    "aiGenerating": "Generating commit message…",
+    "aiFailed": "Failed to generate commit message",
+    "commitDone": "Committed",
+    "pushDone": "Pushed",
+    "operationFailed": "Operation failed"
   },
   "desk": {
     "title": "Desk",
@@ -4935,5 +4996,15 @@
     "sendFailed": "Delivery failed: {error}",
     "rejectFailed": "Failed to ignore: {error}",
     "messageField": "Message"
+  },
+  "workspace": {
+    "disposal": {
+      "failed": "Failed to handle the records; workspace was not removed",
+      "archivedToast": "Workspace removed; {count} conversations archived"
+    },
+    "sweep": {
+      "archivedToast": "Auto-archived {count} conversations from removed workspaces; see archived chats"
+    },
+    "archivedHint": "This workspace has {count} archived records, restorable from archived chats"
   }
 }

@@ -637,6 +637,10 @@ export class LingxiEngine {
       forkSessionDeferredTasks: (options) => this.forkSessionDeferredTasks(options),
       discardForkedSessionDeferredTasks: (options) => this.discardForkedSessionDeferredTasks(options),
       getSessionIdForPath: (sessionPath) => this.getSessionIdForPath(sessionPath),
+      // 会话级轨迹复用（产品口径 2026-09-05）：观测未安装/未启用时惰性读取为
+      // null，行为与旧版逐轮铸根一致。
+      resolveSessionReusableTraceId: (sessionId) =>
+        this._modelObservability?.findReusableSessionTraceId?.(sessionId) ?? null,
       forkSessionFiles: (options) => this.forkSessionFiles(options),
       discardForkedSessionFiles: (options) => this.discardForkedSessionFiles(options),
       forkSessionVisionNotes: (options) => this.forkSessionVisionNotes(options),
@@ -2099,6 +2103,14 @@ export class LingxiEngine {
   }
   getSessionAuthorizedFolders(p = this.currentSessionPath) {
     return this._sessionCoord.getSessionAuthorizedFolders(p);
+  }
+  // switch 路由经 sessionWorkspaceMountFields(engine, sessionPath) 读它回传会话的
+  // 工作台身份。缺这个委托时（此前的真实状态：仅 coordinator 有方法、engine 未暴露，
+  // 路由 optional-call 静默拿到 undefined）switch 回包永远不带 workspaceMountId/
+  // workspaceLabel，客户端 desk 落成本地目录键，与列表投影里带 mountId 的会话
+  // 严格互斥（session-sections.ts 本地作用域排除 mount 会话）——左栏列表空白。
+  getSessionWorkspaceMount(p = this.currentSessionPath) {
+    return this._sessionCoord.getSessionWorkspaceMount(p);
   }
   getSessionExecutorMetadata(ref) {
     return this._sessionCoord.getSessionExecutorMetadata(ref);

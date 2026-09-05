@@ -27,14 +27,16 @@ import fs from "fs";
 import path from "path";
 import { createRequire } from "module";
 
-export const MODEL_OBSERVABILITY_SCHEMA_VERSION = 4;
+export const MODEL_OBSERVABILITY_SCHEMA_VERSION = 6;
 
 /**
  * read side 支持的 schema 版本闭集（Phase 8 §七）：v1 历史库不迁移也可读
  * （accounting projection 标 unavailable）；v2 起有 model_call_usage；
- * v3 起有运行时显式 usage correlation 事实；v4 增加不含正文的来源名称快照。
+ * v3 起有运行时显式 usage correlation 事实；v4 增加不含正文的来源名称快照；
+ * v5/v6 为同会话轨迹合并的纯数据整合（无 DDL）——v5 只合 user_turn，实测
+ * 桌面 turn 历史上落成 origin=unknown，v6 改按「调用归属会话」全量合并。
  */
-export const MODEL_OBSERVABILITY_SUPPORTED_READ_VERSIONS: readonly number[] = [1, 2, 3, 4];
+export const MODEL_OBSERVABILITY_SUPPORTED_READ_VERSIONS: readonly number[] = [1, 2, 3, 4, 5, 6];
 
 /** store 目录约定（audit Q1 决策）。 */
 export const MODEL_OBSERVABILITY_DIR_NAME = "model-observability";
@@ -339,6 +341,107 @@ export function openModelObservabilityDatabase(
 }
 
 /**
+ * v5 数据整合（产品口径 2026-09-05）：同一会话的多个 user_turn 轨迹合并为
+ * 一条——旧版每个用户 turn 铸一个 traceId，列表里同会话被拆成多行。
+ * 已被 v6 取代（实测桌面 turn 经 pi ingress 落成 origin=unknown，
+ * origin='user_turn' 过滤在真实数据上零命中）；保留为本版本的历史步骤。
+ */
+function mergeSessionTurnTracesV5(db: any): void {
+  mergeSessionTurnTraces(db, /* userTurnOnly */ true);
+}
+
+/**
+ * v6 数据整合（产品口径 2026-09-05，取代 v5 的 user_turn-only 口径）：同一
+ * 会话的多个任务轨迹合并为一条——候选 = origin 非空且其 model_calls 带非空
+ * session_id 的轨迹（origin 为空的 singleton 辅助调用不是对话轨迹，不合并）。
+ *
+ * 规则：轨迹的归属会话 = 其 model_calls 里 session_id 众数（与前端
+ * resolveTraceSessionId 同口径；并列取字典序最小）；按归属会话分组，每组
+ * 保留 first_seen_at 最早（并列取 trace_id 字典序）者为 canonical，其余轨迹
+ * 的全部 model_calls 改指 canonical，重算 canonical 的 call_count/
+ * last_seen_at 后删除已清空的旧行。非会话轨迹（embedding/翻译/记忆等）与
+ * parent_call_id 成对性原样不动。幂等：分组后单轨迹组无操作。
+ */
+function mergeSessionTurnTracesV6(db: any): void {
+  mergeSessionTurnTraces(db, /* userTurnOnly */ false);
+}
+
+function mergeSessionTurnTraces(db: any, userTurnOnly: boolean): void {
+  const originClause = userTurnOnly ? " AND origin = 'user_turn'" : " AND origin IS NOT NULL";
+  const userTurnTraces = db.prepare(
+    `SELECT trace_id, first_seen_at, last_seen_at FROM traces WHERE 1=1${originClause}`,
+  ).all() as Array<{ trace_id: string; first_seen_at: string; last_seen_at: string }>;
+  if (userTurnTraces.length < 2) return;
+  const traceIds = userTurnTraces.map((row) => row.trace_id);
+  const sessionVotes = db.prepare(
+    `SELECT trace_id, session_id, COUNT(*) AS n FROM model_calls
+     WHERE trace_id IN (${traceIds.map(() => "?").join(",")})
+       AND session_id IS NOT NULL AND session_id != ''
+     GROUP BY trace_id, session_id`,
+  ).all(...traceIds) as Array<{ trace_id: string; session_id: string; n: number }>;
+
+  const votesByTrace = new Map<string, Map<string, number>>();
+  for (const vote of sessionVotes) {
+    const tally = votesByTrace.get(vote.trace_id) ?? new Map<string, number>();
+    tally.set(vote.session_id, vote.n);
+    votesByTrace.set(vote.trace_id, tally);
+  }
+  const ownerByTrace = new Map<string, string>();
+  for (const trace of userTurnTraces) {
+    const tally = votesByTrace.get(trace.trace_id);
+    if (!tally || tally.size === 0) continue;
+    let owner: string | null = null;
+    let ownerCount = 0;
+    for (const [sessionId, count] of tally) {
+      if (count > ownerCount || (count === ownerCount && owner !== null && sessionId < owner)) {
+        owner = sessionId;
+        ownerCount = count;
+      }
+    }
+    if (owner !== null) ownerByTrace.set(trace.trace_id, owner);
+  }
+
+  const bySession = new Map<string, Array<{ trace_id: string; first_seen_at: string; last_seen_at: string }>>();
+  for (const trace of userTurnTraces) {
+    const owner = ownerByTrace.get(trace.trace_id);
+    if (!owner) continue;
+    const group = bySession.get(owner) ?? [];
+    group.push(trace);
+    bySession.set(owner, group);
+  }
+
+  const moveCalls = db.prepare(`UPDATE model_calls SET trace_id = @canonical WHERE trace_id = @source`);
+  const recountTrace = db.prepare(
+    `UPDATE traces SET
+       call_count = (SELECT COUNT(*) FROM model_calls WHERE trace_id = @trace_id),
+       last_seen_at = MAX(last_seen_at, @last_seen_at),
+       updated_at = @updated_at
+     WHERE trace_id = @trace_id`,
+  );
+  const deleteEmptyTrace = db.prepare(
+    `DELETE FROM traces WHERE trace_id = @trace_id
+       AND NOT EXISTS (SELECT 1 FROM model_calls WHERE trace_id = @trace_id)`,
+  );
+  const updatedAt = new Date().toISOString();
+  for (const group of bySession.values()) {
+    if (group.length < 2) continue;
+    const sorted = [...group].sort((left, right) =>
+      (left.first_seen_at || "").localeCompare(right.first_seen_at || "")
+        || left.trace_id.localeCompare(right.trace_id));
+    const canonical = sorted[0]!;
+    for (const other of sorted.slice(1)) {
+      moveCalls.run({ canonical: canonical.trace_id, source: other.trace_id });
+      recountTrace.run({
+        trace_id: canonical.trace_id,
+        last_seen_at: other.last_seen_at || "",
+        updated_at: updatedAt,
+      });
+      deleteEmptyTrace.run({ trace_id: other.trace_id });
+    }
+  }
+}
+
+/**
  * 显式 migration（§二十六）：v(n) → v(n+1) 单调推进，全部在一个 transaction 内。
  * v1 是首个版本（0 = 全新库 → 建表）。失败 → SQLite 自动 rollback → 包装为
  * migration_failed（调用方禁用 store）。
@@ -366,6 +469,16 @@ export function migrateModelObservabilitySchema(db: any, currentVersion: number)
           case 3:
             // v3 → v4：新增不含正文的名称快照；既有调用与载荷原样保留。
             db.exec(V4_DDL);
+            break;
+          case 4:
+            // v4 → v5：纯数据整合（无 DDL）——同会话 user_turn 轨迹合并
+            // （user_turn-only 口径，已被 v6 取代，保留为历史步骤）。
+            mergeSessionTurnTracesV5(db);
+            break;
+          case 5:
+            // v5 → v6：纯数据整合（无 DDL）——按「调用归属会话」合并全部
+            // 任务轨迹（含历史上 pi ingress 落成的 origin=unknown）。
+            mergeSessionTurnTracesV6(db);
             break;
           default:
             throw new Error(`no migration step from observability schema ${version}`);

@@ -348,7 +348,6 @@ function mockPermissionDefault(mode = 'ask') {
           deskFiles: mockState.deskFiles,
           deskJianContent: mockState.deskJianContent,
           cwdSkills: [],
-          cwdSkillsOpen: false,
           previewOpen: false,
           openTabs: [],
           activeTabId: null,
@@ -648,7 +647,7 @@ function mockPermissionDefault(mode = 'ask') {
   });
 
   describe('createNewSession cwd draft', () => {
-    it('without a current session, resets the draft to the primary agent and its effective workspace', async () => {
+    it('without a current session, keeps the displayed desk workspace and follows the current agent', async () => {
       (mockState as Record<string, unknown>).agents = [
         {
           id: 'hana',
@@ -666,6 +665,8 @@ function mockPermissionDefault(mode = 'ask') {
         },
       ];
       (mockState as Record<string, unknown>).currentAgentId = 'mio';
+      // desk 正在显示 /workspace/Desktop（用户切换到的工作台）：
+      // 新建聊天必须留在当前显示的工作台，不再拽回 Primary Agent 工作台。
       (mockState as Record<string, unknown>).deskBasePath = '/workspace/Desktop';
       (mockState as Record<string, unknown>).deskCurrentPath = 'old/subdir';
       (mockState as Record<string, unknown>).deskFiles = [{ name: 'stale.md' }];
@@ -675,14 +676,16 @@ function mockPermissionDefault(mode = 'ask') {
 
       await createNewSession();
 
-      expect(mockState.selectedAgentId).toBe('hana');
-      expect(mockState.selectedFolder).toBe('/workspace/Primary');
+      // 规则 B 补全：助手身份跟随当前助手（mio），不再重置回 Primary——
+      // selectedAgentId=null 即「跟随 currentAgentId」（显示与建会话体同语义）。
+      expect(mockState.selectedAgentId).toBeNull();
+      expect(mockState.selectedFolder).toBe('/workspace/Desktop');
       expect(mockState.pendingNewSession).toBe(true);
-      expect(mockState.deskBasePath).toBe('/workspace/Primary');
+      expect(mockState.deskBasePath).toBe('/workspace/Desktop');
       expect(mockState.deskCurrentPath).toBe('');
       expect(mockState.deskFiles).toEqual([]);
       expect(mockState.deskJianContent).toBeNull();
-      expect(mockLoadDeskFiles).toHaveBeenCalledWith('', '/workspace/Primary', null);
+      expect(mockLoadDeskFiles).toHaveBeenCalledWith('', '/workspace/Desktop', null);
     });
 
     it('inherits the active session local workspace but not its extra authorized folders or subdirectory', async () => {
@@ -720,7 +723,7 @@ function mockPermissionDefault(mode = 'ask') {
 
       await createNewSession();
 
-      expect(mockState.selectedAgentId).toBe('hana');
+      expect(mockState.selectedAgentId).toBeNull();
       expect(mockState.selectedFolder).toBe('/workspace/current-session');
       expect(mockState.deskBasePath).toBe('/workspace/current-session');
       expect(mockState.workspaceFolders).toEqual([]);
@@ -982,6 +985,9 @@ function mockPermissionDefault(mode = 'ask') {
         if (url === '/api/sessions/switch') {
           return jsonResponse({ ok: true, sessionId: 'sess_fresh', agentId: 'hana', workspaceFolders: [] });
         }
+        if (String(url).startsWith('/api/sessions/messages')) {
+          return jsonResponse({ messages: [], blocks: [], todos: [], hasMore: false });
+        }
         throw new Error(`unexpected fetch: ${url}`);
       });
 
@@ -1206,7 +1212,7 @@ function mockPermissionDefault(mode = 'ask') {
         ok: true,
         path: '/session/new.jsonl',
         sessionId: 'sess_project',
-        agentId: 'hana',
+        agentId: 'mio',
         cwd: '/workspace/project-hana',
         projectId: 'project-hana',
         workspaceFolders: [],
@@ -1215,6 +1221,8 @@ function mockPermissionDefault(mode = 'ask') {
 
       await expect(ensureSession()).resolves.toMatchObject({ sessionId: 'sess_project' });
 
+      // 规则 B 补全：助手跟随当前（mio），请求体不再显式钉 Primary——服务端对省略
+      // agentId 的 new-detached 回落当前活跃助手（coordinator createSession）。
       expect(mockFetch).toHaveBeenCalledWith(
         '/api/sessions/new-detached',
         expect.objectContaining({
@@ -1224,7 +1232,6 @@ function mockPermissionDefault(mode = 'ask') {
             cwd: '/workspace/project-hana',
             projectId: 'project-hana',
             permissionMode: 'ask',
-            agentId: 'hana',
             currentSessionPath: null,
           }),
         }),
@@ -2423,6 +2430,9 @@ function mockPermissionDefault(mode = 'ask') {
       (mockState.streamingSessions as string[]) = ['/current'];
 
       mockFetch.mockResolvedValueOnce(jsonResponse({ ok: true }));
+      // 归档当前会话后走 createNewSession 草稿态（继承当前工作台，不再拉起
+      // sessions[0]）：其 loadPendingNewSessionPermissionDefault 会发一次请求。
+      mockPermissionDefault();
       mockFetch.mockResolvedValueOnce(jsonResponse([{ path: '/other' }]));
       // loadSessions() 内部紧跟 /api/sessions 并行探测 /api/health（session
       // 元数据待恢复状态）——按调用顺序占掉这个位置的响应队列，空块即可，
@@ -2446,7 +2456,11 @@ function mockPermissionDefault(mode = 'ask') {
       expect((mockState.chatSessions as Record<string, unknown>)['/current']).toBeUndefined();
       expect((mockState.sessionStreams as Record<string, unknown>)['/current']).toBeUndefined();
       expect((mockState.streamingSessions as string[])).toEqual([]);
-      expect(mockState.currentSessionPath).toBe('/other');
+      // 归档当前会话 → 回「新建聊天」草稿态（pendingNewSession=true，工作台继承当前），
+      // 不再 switchSession(sessions[0])——旧行为会把桌面拽到别的 工作台（列表里
+      // 的 '/other' 只是刷新结果，不能成为当前会话）。
+      expect(mockState.currentSessionPath).toBeNull();
+      expect(mockState.pendingNewSession).toBe(true);
     });
   });
 

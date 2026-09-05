@@ -635,7 +635,7 @@ describe('MobileApp', () => {
     expect(screen.getByLabelText('titlebar.currentChatTitle')).toHaveTextContent('sidebar.newChat');
   });
 
-  it('resets mobile global new chat to the primary agent effective default workspace', async () => {
+  it('keeps the currently displayed workspace and current agent for mobile global new chat', async () => {
     fetchMock.mockImplementation((input: RequestInfo | URL, options?: RequestInit) => {
       const url = String(input);
       if (url.includes('/api/web-auth/session')) {
@@ -672,8 +672,11 @@ describe('MobileApp', () => {
     await waitForMobileChatReady();
     fireEvent.click(titlebarNewSessionButton());
 
-    expect(useStore.getState().selectedAgentId).toBe('hana');
-    expect(useStore.getState().selectedFolder).toBe('/home/test/Desktop/OH-WorkSpace');
+    // 规则 B 补全（2026-09-05 用户拍板）：新建聊天的助手身份与工作台一样跟随「当前」——
+    // mobile 引导在 Mio 的工作台上，全局新建后目录保持不变、助手仍是 Mio
+    // （selectedAgentId=null 即「跟随 currentAgentId」，与桌面端同一语义孪生）。
+    expect(useStore.getState().selectedAgentId).toBeNull();
+    expect(useStore.getState().selectedFolder).toBe('/workspace/mio');
   });
 
   it('leaves mobile keyboard viewport handling to the browser', async () => {
@@ -1062,7 +1065,6 @@ function resetStoreForMobileTest(): void {
     deskSelectedPath: '',
     deskJianContent: null,
     cwdSkills: [],
-    cwdSkillsOpen: false,
     jianDrawerOpen: false,
     rightWorkspaceTab: 'workspace',
     jianView: 'desk',

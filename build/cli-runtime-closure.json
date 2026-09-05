@@ -3527,11 +3527,16 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "server/routes/sessions.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/routes/studio-workspaces.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/server-identity.ts (import-statement); lib/resource-io/providers/mount-provider.ts (import-statement); core/mount-aware-file-service.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/server-identity.ts (import-statement); lib/resource-io/providers/mount-provider.ts (import-statement); core/mount-aware-file-service.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "core/temporary-provider-credential-boundary.ts",

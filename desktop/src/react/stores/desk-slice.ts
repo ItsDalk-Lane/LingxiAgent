@@ -31,7 +31,6 @@ export interface WorkspaceDeskState {
   deskJianContent: string | null;
   cwdSkills: CwdSkillInfo[];
   cwdSkillPolicy?: CwdSkillPolicy;
-  cwdSkillsOpen: boolean;
   jianDrawerOpen: boolean;
   rightWorkspaceTab: RightWorkspaceTab;
   jianView: string;
@@ -52,7 +51,6 @@ export interface DeskSlice {
   deskJianContent: string | null;
   cwdSkills: CwdSkillInfo[];
   cwdSkillPolicy: CwdSkillPolicy;
-  cwdSkillsOpen: boolean;
   homeFolder: string | null;
   selectedFolder: string | null;
   selectedWorkspaceMountId: string | null;
@@ -66,12 +64,15 @@ export interface DeskSlice {
    */
   deskWorkspaceNativeRoot: string | null;
   studioWorkspaces: StudioWorkspace[];
+  /**
+   * 默认工作台（mount "default" = 当前 Agent 的工作台目录）的本地根路径。
+   * 左栏作用域用它做双形态合流：历史 cwd 形态会话与 mount 形态会话同属一个工作台。
+   */
+  defaultWorkspaceRootPath: string | null;
   workspaceFolders: string[];
   cwdHistory: string[];
   workspaceDeskStateByRoot: Record<string, WorkspaceDeskState>;
   setCwdSkills: (skills: CwdSkillInfo[]) => void;
-  setCwdSkillsOpen: (open: boolean) => void;
-  toggleCwdSkillsOpen: () => void;
   setDeskFiles: (files: DeskFile[]) => void;
   setDeskBasePath: (path: string) => void;
   setDeskCurrentPath: (path: string) => void;
@@ -108,7 +109,6 @@ export const createDeskSlice = (
     discoverProjectSkills: true,
     discoverCompatibleProjectSkills: false,
   },
-  cwdSkillsOpen: false,
   homeFolder: null,
   selectedFolder: null,
   selectedWorkspaceMountId: null,
@@ -117,12 +117,11 @@ export const createDeskSlice = (
   deskWorkspaceLabel: null,
   deskWorkspaceNativeRoot: null,
   studioWorkspaces: [],
+  defaultWorkspaceRootPath: null,
   workspaceFolders: [],
   cwdHistory: [],
   workspaceDeskStateByRoot: {},
   setCwdSkills: (skills) => set({ cwdSkills: skills }),
-  setCwdSkillsOpen: (open) => set({ cwdSkillsOpen: open }),
-  toggleCwdSkillsOpen: () => set((s) => ({ cwdSkillsOpen: !s.cwdSkillsOpen })),
   setDeskFiles: (files) => set({ deskFiles: files }),
   setDeskBasePath: (path) => set({ deskBasePath: path }),
   setDeskCurrentPath: (path) => set({ deskCurrentPath: path }),

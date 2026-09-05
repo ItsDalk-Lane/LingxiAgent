@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = ce701ee20727e7cdaaf3d6f838ae8ca5727c2b63  (2026-09-05 契约执行路径不变量修复源码候选，含 PR #43 Windows 路径夹具修复)
+VERIFIED_SOURCE_SHA   = 8ade0726a10648a15cf08f22e0cbbeb16ca512b6  (2026-09-06 双线合并树封印：环境信息卡+PR#43 契约路径不变量)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 当前知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -909,6 +909,26 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   exit 0（14 删除 → 14 WARN）。验证：typecheck×3 绿 + 全量 npm test
   12896 通过（含新增 425 降级用例）后推进。
 
+- **2026-09-05 v0.1.33 新建会话/工作台五轮修复**（功能链
+  7d2672d2→332e8960→d0dd2492→01cdd80b/seal 本提交；
+  三提交 23+3+2 文件 / +2489-55，另 01cdd80b 测试语义补钉 1 文件，含 engine.ts
+  持久化指纹 compatible 重钉 sha256:d7239a0f… 不变）：修复轮一（新建会话继承源重排/去空缓存种子/
+  loadSessions reconcile 自愈/五语言文案）、轮二（engine 暴露 getSessionWorkspaceMount，
+  switch 回包补齐挂载身份，治左栏空白三症状）、轮三（默认工作台与 Agent 工作台目录
+  同目录两本账合流）、轮四（默认工作台显示名=配置目录名派生+启动合流键）、轮五
+  （Windows 工作台显示双缺陷：split('/') 取名改 workspaceDisplayName、挂载/历史跨源
+  去重、大小写变体挂载创建复用、继承链归一化）。验证：typecheck×3 绿 + eslint 改动
+  文件 0 error + 定向 29/475/146/27 用例绿 + 全量 npm test 12956 过/2 败（1=推进前
+  seal guard 旧坐标预期红，推进后归零；1=既有 DeskSection Jian drawer 用例，前轮
+  stash 对照证实先在）后推进。环境备注：本轮全量首跑 41 文件级失败均为 workspace 包
+  @lingxi/plugin-* 未构建的解析失败（2026-09-04 npm install 后 dist 缺失），
+  `npm run build:packages` 后归零，非代码回归。
+  二次推进（01cdd80b）：包构建后暴露 mobile 全局新建聊天用例——轮一规则 B 改语义时
+  其桌面孪生已更新、该用例因包未构建从未执行而被漏掉，断言仍锁定旧「重置到 Primary
+  工作台」语义；按同一裁决翻转为「目录保持当前显示工作台，Agent 身份仍重置 Primary」
+  （MobileApp.test.tsx 24/24 绿；DeskSection Jian drawer 隔离 27/27 绿，判负载相关
+  既有 flaky）。UPSTREAM_SYNC_AUDIT/MATRIX 的 SHA 副本随二次推进同步。
+
 - **2026-09-02 安全双件套 + 沙盒拒绝分因文案**（功能树 275d82c7/seal 本提交，
   feat/pending-sep02，628d2f90+275d82c7 两提交 32 files / +1053-58）：
   ①安全双件套——lib/security/injection-scan.ts 固定规则注入扫描（去零宽/HTML
@@ -1033,6 +1053,314 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 重新按 3911 行任务书审计当前状态；本机可闭合项没有发现新缺口。
 - 当前复跑：四平台统一稳定性 85/85、工作流契约 28/28、本机真实服务器归档新装/重启/快照读回，退出码均为 0。
 - 远端不存在 `codex/knowledge-notebook` 分支或该分支工作流运行。Phase 9 四种真实宿主仍为 `NOT_EXECUTED`；需要明确 commit、push 和远程触发授权后才能继续。
+
+## 2026-09-04 v0.1.33 新建会话空白/串台诊断开工回执
+- 目标：store 层坐实「新建会话首屏空白」与「串台成主工作台」两症状机制,给修复清单;不动实现源码。
+- 顺序：任务0基线 → 任务1空白复现 → 任务2串台复现或排除 → 任务3归因+修复清单。
+- 最大风险:串台症状部分依赖 GUI/WS 时序,store 层复现不出——兜底=候选路径清单+排除理由(任务书已许可)。
+- 基线(2026-09-04 本工作树):`npm install` exit 0;`./node_modules/.bin/vitest run desktop/src/react/__tests__/stores/session-actions.test.ts` → 89 passed / 0 failed / 0 skipped / 396ms,与任务书预期一致。
+- 白名单:仅 desktop/src/react/__tests__/stores/ 下新测试文件 + PROGRESS.md + BLOCKED.md;不 commit 不 push。
+
+## 2026-09-04 v0.1.33 新建会话空白/串台诊断开工回执
+- 目标：store 层坐实「新建会话首屏空白」与「串台成主工作台」两症状机制,给修复清单;不动实现源码。
+- 顺序：任务0基线 → 任务1空白复现 → 任务2串台复现或排除 → 任务3归因+修复清单。
+- 最大风险:串台症状部分依赖 GUI/WS 时序,store 层复现不出——兜底=候选路径清单+排除理由(任务书已许可)。
+- 基线(2026-09-04 本工作树):`npm install` exit 0;`./node_modules/.bin/vitest run desktop/src/react/__tests__/stores/session-actions.test.ts` → 89 passed / 0 failed / 0 skipped / 396ms,与任务书预期一致。
+- 白名单:仅 desktop/src/react/__tests__/stores/ 下新测试文件 + PROGRESS.md + BLOCKED.md;不 commit 不 push。
+
+## 2026-09-04 任务1完成:空白机制坐实
+
+- 新文件 `desktop/src/react/__tests__/stores/session-new-session-blank.test.ts`(1 用例,名含 characterization: KNOWN DEFECT)。
+- 复现流程:createNewSession → ensureSession(mock new-detached 与 switch 返回固定会话)→ switchSession 完成,全程不注入 WS 事件。
+- 三事实断言全绿:welcomeVisible===false;currentSessionPath===新会话;/session/new-v033.jsonl 缓存存在且 items===[]。
+- 机制证据:mock 的 /api/sessions/messages 备好了首条消息,但断言其从未被调用——stageDetachedSessionForActivation 先 initSession(path,[],false)(session-actions.ts:1155)种空缓存,switchSession hasData 判据(:864-868)为真跳过 loadMessages,首屏内容从此全靠 WS 事件;WS 事件不达(入口闸门 ws-message-handler.ts:97-140 丢身份不匹配事件/断连)即空白。
+- 反向验证:翻转 welcomeVisible 断言 → 红(`AssertionError: expected false to be true`)→ 还原 → 绿。命令:
+  `./node_modules/.bin/vitest run desktop/src/react/__tests__/stores/session-new-session-blank.test.ts`
+
+## 2026-09-04 任务2完成:串台=机制b拉力坐实+流程内不可达排除清单;文件树半边机制c坐实
+
+- 新文件 `session-new-session-crosstalk.test.ts`(2 用例)与 `desk-new-session-capture.test.ts`(1 用例,真实 store+真实 activateWorkspaceDesk),均名含 characterization: KNOWN DEFECT,各自反向验证红→绿已贴对话。
+- 机制b拉力:无会话态(currentSessionPath=null ∧ pendingNewSession=false ∧ pendingSessionSwitchPath=null)下 loadSessions 把视图强切 sessions[0](主工作台会话)并加载其记录(session-actions.ts:626-635)——测试直造该状态坐实。
+- 「无会话态」全部到达点静态枚举(grep pendingNewSession/currentSessionPath 全部赋值点+逐一核实):
+  1. 冷启动初始形状(session-slice.ts:200-206)——loadSessions 强切即设计内 bootstrap。可达,非新建流程。
+  2. archiveSession 归档当前会话(session-actions.ts:1380 清空)——:1386-1390 立即兜底切 sessions[0],窗口内 WS 触发的强切目标与之一致。可达,设计内。
+  3. QuickChatApp.tsx:125 设 pendingNewSession:false——quick-chat 为独立 HTML 入口(quick-chat-main.tsx/quick-chat.html)=独立渲染进程,store 实例隔离。排除。
+  4. mobile-init.ts——mobile 独立入口。排除。
+  5. desk-actions.ts:295/:1331 设 currentSessionPath:null 但同 patch 带 pendingNewSessionIdentityPatch()(草稿态),受 loadSessions guard 保护。排除。
+  6. 新建会话流程内部:invalidateSessionSwitches(:1175)→大 setState(:1216-1238)之间全同步无 await;switchSession :775 设 pendingSessionSwitchPath 先于首个 await(:793);:871-901 一次性翻三标志;错误路径(:805-811/:987-993)保持草稿态。⇒ 流程内「无会话态」不可达。排除。
+  7. ws-message-handler 从不写三标志(只读+:114-127 locator 修复,写 currentSessionId 需 currentSessionPath===sessionPath)。排除。
+  8. setCurrentSessionPath setter(session-slice.ts:224)主窗口零调用;setCurrentSessionRef(:225)仅 QuickChat。排除。
+  9. app-event-actions 'agent-switched'(:121)为显式切换;loadSessions :591-607 locator 回写要求 currentSessionId 非空+currentSessionPath=null 组合,主窗口流程不出现。排除。
+  10. 视图层无串台路径:grep sessions[0] 仅上述两处 store 站点;ChatArea 在 currentSessionPath=null 时渲染 null(chat/ChatArea.tsx:41)。排除。
+- 结论:对话记录串台的 store 层路径(机制b)在新建会话流程内**不可达**;机制真实存在但仅冷启动/归档两设计内入口触发。「记录串台」生产候选(未排除,store 层外):服务端身份/WS 时序(new-detached 会话身份与 switch 回包不一致→闸门丢事件→空白;或 replay 重放错会话)——需服务端配合复现。
+- 文件树串台=机制c坐实:createNewSession 只清三件套(:1235-1237),deskBasePath/deskWorkspaceMountId/deskTreeFilesByPath 全程不重置(crosstalk 测试);activateWorkspaceDesk 快照-恢复把清了一半的 desk 写回主工作台存档 workspaceDeskStateByRoot[root].deskFiles=[](desk-new-session-capture 测试,desk-actions.ts:394-455)。继承同工作台时旧树显示属功能意图;存档污染(回工作台丢子目录/文件列表)是缺陷。
+
+## 2026-09-05 环境信息卡:运行信息胶囊新增 Git 四行(变更/本地/分支/提交或推送)(实现完成,未提交待 GUI 复测)
+
+- 需求(用户截图+四点裁决):右上角「运行信息」胶囊内新增「环境信息」卡,四行=变更(行级增删合计,点击弹变更文件列表,文件点击看 diff)/本地(就地展开:主工作树 vs 分支工作树)/分支(弹层列全部分支,点击切换)/提交或推送(弹窗:提交·提交并推送·推送,提交信息留空 AI 生成,「包含未暂存的更改」默认勾选+统计,无可推送时推送置灰);明确排除创建 PR;胶囊名不改。
+- 现状基线:仓库此前**零结构化 git 集成**(无 git 库依赖/无 IPC),全部新建;git 经 execFile 数组参数直跑(shell:false 防注入,GIT_TERMINAL_PROMPT=0 防挂起)。
+- 后端:
+  - `server/git/git-command.ts`(新):runGit/tryGit 封装+纯函数解析器(numstat -z/for-each-ref %(HEAD)/worktree porcelain)+collectGitStatus(已暂存+未暂存+未跟踪行计,未跟踪按文件行数对齐 numstat 语义,512KB 截断)/worktreeInfo/checkoutBranch/commitChanges/pushChanges/fileDiff(未跟踪合成 new-file patch)/路径与分支名防穿越防 option 注入校验。
+  - `server/routes/git-environment.ts`(新):/api/git/{status,worktree-info,branches,checkout,file-diff,commit,push,ai-commit-message};dir 准入沿用 desk 惯例(agent 根/isApprovedDeskDir/isApprovedWorkspaceDir/cwd_history,symlink 解析比较);非 git 目录只读端点 200+isRepo:false 降级;ai-commit-message 收集 numstat+截断 diff+未跟踪开头,走 hub `utility:call-text`(auxiliary summarize 槽,复用 usage/trace 记账),45s 超时,输出剥围栏取首行限 100 字。
+  - 注册:`full-root.ts` 挂 /api(与 desk 同层,签名 (engine,hub));`route-security.ts` 显式登记 GET→files.read/POST→files.write(不吃 STUDIO_OWNER 兜底);`server-composition-boundary.test.ts` 金名单补 `"/api" :: createGitEnvironmentRoute`(排序位 createFsRoute 与 createInputDraftsRoute 之间)。
+- 前端:
+  - `utils/git-env-api.ts`(新):8 端点客户端(lingxiFetch,commit 60s/push 150s 超时,操作端点结构化结果不抛错);`utils/unified-diff.ts`(新):patch→行(kind=add/del/ctx/hunk,首个 hunk 前的文件头跳过,hunk 后正文按前缀字面解析)。
+  - `runtime/GitEnvironmentCard.tsx`(新):四行卡(压平皮肤),dir=deskWorkspaceNativeRoot||deskBasePath,非本地目录不渲染,非 git 仓库四行降级禁用,加载失败可点击重试;变更行千分位 +绿/-红;分支弹层(AnchoredPortal)当前分支✓/他树检出禁用/点击即切换;工作台切换自动重载。挂载点 `RuntimeInfoCapsule.tsx` SessionStatusCard 之后。
+  - `runtime/GitChangesModal.tsx`(新):文件行=路径(截断+title)+该文件±统计,点击行内展开行级 diff(懒加载+会话缓存,1500 行截断,二进制/失败诚实提示);`runtime/GitCommitModal.tsx`(新):顶部分支条可下拉切换,提交信息 textarea(留空→AI 生成回填再提交),勾选行含未暂存±统计,三按钮禁用语义=提交(无可提交)/提交并推送(两者皆无)/推送(无可推送);提交并推送=先提交(若可)→刷新→再推送(nothing_to_push 静默跳过)。
+  - 胶囊交互修复:portal 弹层(分支列表)打 `runtime-capsule-anchored` 标记类,胶囊「点外收起」捕获监听放行该标记,否则点分支会先塌容器卸载弹层;模态走 Overlay scope=inline(原位渲染,天然在胶囊 DOM 内不触发收起)。
+  - locales 五语言 gitEnv.* 37 键(zh/zh-TW/en/ja/ko)。
+  - 样式纪律:两个 module.css 首版裸间距/硬编码色违例,重写为 token+局部立法(--git-hover-wash 等收进定义行),扫描器复核我的文件 0 违例。
+- 测试(全部新增或更新,61 例):
+  - `tests/git-command.test.ts`(新,20):解析器纯函数+真实临时仓库(init/commit/worktree add)集成,锁定 status 汇总数字、worktree 主/从判别、未跟踪合成 patch、checkout/commit/push 契约、穿越拒绝。
+  - `tests/git-environment-route.test.ts`(新,11):真实临时仓库+mock engine/hub,status/branches/worktree/checkout/commit/push 端到端,dir 校验(400/403),AI 生成净化(围栏/多行)与无 hub 503、clean tree 400。
+  - `desktop/.../__tests__/utils/unified-diff.test.ts`(新,4);`__tests__/components/GitEnvironmentCard.test.tsx`(新,8)/`GitChangesModal.test.tsx`(新,6)/`GitCommitModal.test.tsx`(新,8);`RuntimeInfoCapsule.test.tsx` 更新(补 GitEnvironmentCard mock+存在性断言)。
+- 验证(2026-09-05):
+  - 定向:git-command 20/20,route 11/11,前端 git 四件 26/26+胶囊 4/4+unified-diff 4/4。
+  - `npm run typecheck` ×3 配置 exit 0(两轮,CSS 立法重写后复跑仍绿);eslint 新文件 0 error(any 告警与既有路由文件同风格)。
+  - 全量 `npx vitest run`:13090 passed / 7 failed / 7 skipped。7 失败逐一 stash 对照+记忆清单核实**全部先在**(上轮遗留):i18n parity zh-TW/ja/ko 缺 skills.panel.externalRemove+rightWorkspace.tabs.projectSkills 2 key(×3)、style-discipline 上轮 CSS(ArchivedSessionsModal/SkillsPanel/TurnUsagePills/RightWorkspacePanel,我的文件 0 违例)、release-preflight 版本号、upstream-sync-matrix VERIFIED_SOURCE_SHA 门(未提交态)、AssistantMessage.interlude 重渲染断言。
+- 待 GUI 复测:①胶囊展开见「环境信息」卡四行与增删/分支/工作树类型;②变更弹窗点文件展开 diff(含未跟踪新文件);③分支弹层切换;④提交弹窗:留空提交走 AI 生成回填、勾选含未暂存、推送置灰语义、提交并推送链;⑤非 git 工作台降级文案。重启 dev server 即可(TS 源直跑,无需重构建)。
+- 复测修两处(GUI 反馈驱动,2026-09-05 深夜):
+  1. **目录准入漏挂载注册表**:切换器注册的工作台目录(如 pending-sep04 工作台)被 /api/git/* 403 拒绝(cherry-studio 碰巧在 cwd_history 才放行)。修复=准入根纳入 studio-mounts.json 的 active local_fs 挂载根(rootLocator.path);回归测试含 disabled 挂载不享受准入反例。live 验证:pending-sep04 工作台 → isRepo:true, feat/pending-sep04, +3,924 -3。
+  2. **AI 提交信息过短(用户裁决改「标题+正文」)**:原提示词限一行≤50 字+净化只取首行。改为 Conventional Commits 提示词(首行 type(scope):≤50 字,空行,「- 」要点≤8 条每条≤30 字),maxTokens 200→500,净化函数改保留多行(剥围栏/前缀、压连续空行、整体限 600 字)。前端 textarea/commit -m 均已支持多行,零改动。路由测试更新为标题+正文断言,12/12 绿。
+  - 另:Default 工作台(~/Desktop/OH-WorkSpace)非 git 仓库显示「非 Git 仓库」属预期(卡片跟随当前会话工作台)。
+- 追加两点(用户第二轮 GUI 反馈,同日):**①卡可折叠**——标题行改按钮+Chevron,四/五行内容包 Collapse(对齐「本次对话」卡),弹层与模态留在 Collapse 外避免卸载;**②提交历史(VS Code 源代码管理图表风格)**——服务端新增 `GET /api/git/log`(git log --date-order NUL 分字段+\x1e 分记录,parseLogRecords 解析 %D 装饰:HEAD->/分支/远端/tag,route-security 登记 files.read);前端 utils/git-graph.ts 纯函数泳道布局(槽池制,x 位置稳定,合并/会合曲线)+ GitHistoryModal(每行=泳道 SVG[竖线/节点/HEAD 红点圆环/合并贝塞尔]+提交信息+refs 徽标[HEAD·分支/远端/tag 三色]+作者·相对时间[五语言]+右端短哈希徽标),卡片加第五行「提交记录」入口。locales 增 history/noCommits/相对时间 7 键×5 语言。测试:parseLogRecords 单测×2、泳道算法×4(线性/合并/复用泳道/空)、/api/git/log 路由(自造提交不依赖用例顺序)、GitHistoryModal 组件×5、卡片折叠+历史入口×2;git 域 8 文件 75/75 绿,typecheck×3 绿,新 CSS 零棘轮违例,eslint 0 error。live 验证:/api/git/log 对本 worktree 返回真实提交(head+remote refs、父子衔接)。
+- 悬浮提示整体换自研(用户第三轮反馈:原生 title 出现无规律、内容不完整):**根因两层**——原生 title 由 OS 渲染不可控;且此前 log 只取 %s 首行,多行正文根本没传。修复:①log 格式加 %B,parseLogRecords 输出 `message` 字段(完整标题+正文,尾换行修剪);②git 域四处组件的原生 title 全部替换为共享 `ui/Tooltip`(函数子元素模式):历史弹窗标题→panel 大面板(多行 pre-wrap,悬停 500ms 必现,显示完整提交信息)、短哈希→完整 40 位哈希、变更弹窗文件名→完整路径、提交弹窗分支名/卡片分支行/主工作树路径→对应全文、分支弹层不可点项→「他树检出」提示(anchor span 包裹,disabled 按钮上 hover 仍生效);移除变更行错误 title(文案已可见)。测试:parseLogRecords 8 字段+message 多行断言、路由 message 断言、Tooltip 悬停用例×2(真实计时器等渲染→假计时器推进 500ms→tooltip 必现,mouseLeave 即隐);git 域 8 文件 77/77 绿,typecheck×3 绿。
+- 哈希点击复制(用户第四轮反馈):历史弹窗短哈希徽标改 button,点击→navigator.clipboard.writeText 完整 40 位哈希+toast「已复制提交 ID」+徽标短暂显示 ✓(1.2s 回落,绿色描边反馈);Tooltip 悬停看全哈希与点击复制并存。locales 增 copyHash/copied ×5。git 域 78/78 绿。
+
+## 2026-09-05 聊天页用量/用时胶囊任务(开工回执+任务0基线)
+
+- 任务:主聊天 assistant 轮次操作行加「用量」「用时」胶囊+明细弹窗,1:1 复刻 `design-review/harness-usage-pills-reference/`(只读),数据=observability 账本按轮真实聚合。让步顺序:数据真实>样式一致>覆盖面>速度。
+- 任务0基线(2026-09-05 实测,feat/pending-sep04,HEAD=d6fbd0d3):
+  - `npm run typecheck` → exit 0 ✓(与任务书一致)
+  - `npx vitest run desktop/src/react/__tests__/chat --exclude '**/dist/**'` → 11 files / 60 tests 全绿 ✓(与任务书一致)
+  - `git status --short` → **68 条(63 M + 5 ??)**,任务书说 73 条(68 M + 5 ??)。差值=5 个 M 文件,已被 13:20 的提交 d6fbd0d3(归档分组)吞并,5 个 ?? 原样在列;任务书快照写于该提交之前。证据与处置见 BLOCKED.md 顶部;以当前实测 68 条为冻结基线(只多不少)。
+- 基线 68 条完整快照（2026-09-05 17:42 `git status --short` 原样固化，替代 /tmp 临时文件；其中 `lib/llm/model-observability-query.ts`、`shared/model-observability-api-contract.ts` 既是基线 M 又在白名单——按任务 1 只做纯增量编辑，其余 66 条一个字节不碰）：
+  <details><summary>63 M + 5 ?? 全清单</summary>
+
+  ```
+  M build/cli-runtime-closure.json
+  M build/persistence-schema-fingerprint.json
+  M core/engine.ts
+  M core/mount-aware-file-service.ts
+  M core/session-coordinator.ts
+  M desktop/src/locales/en.json
+  M desktop/src/locales/ja.json
+  M desktop/src/locales/ko.json
+  M desktop/src/locales/zh-TW.json
+  M desktop/src/locales/zh.json
+  M desktop/src/react/__tests__/components/ChatSidebar.test.tsx
+  M desktop/src/react/__tests__/components/DeskCwdSkills.test.tsx
+  M desktop/src/react/__tests__/components/RightWorkspacePanel.test.tsx
+  M desktop/src/react/__tests__/components/SkillsPanel.test.tsx
+  M desktop/src/react/__tests__/mobile/MobileApp.test.tsx
+  M desktop/src/react/__tests__/settings/observability/ObservabilityTraceForest.test.ts
+  M desktop/src/react/__tests__/settings/observability/TraceConversationModel.test.ts
+  M desktop/src/react/__tests__/settings/observability/TraceDetailOverlayRendering.test.tsx
+  M desktop/src/react/__tests__/stores/desk-actions.test.ts
+  M desktop/src/react/__tests__/stores/desk-new-session-capture.test.ts
+  M desktop/src/react/__tests__/stores/session-actions.test.ts
+  M desktop/src/react/__tests__/stores/session-new-session-blank.test.ts
+  M desktop/src/react/__tests__/stores/session-new-session-crosstalk.test.ts
+  M desktop/src/react/__tests__/stores/session-new-session-workspace.test.ts
+  M desktop/src/react/components/DeskSection.tsx
+  M desktop/src/react/components/SkillsPanel.module.css
+  M desktop/src/react/components/SkillsPanel.tsx
+  M desktop/src/react/components/WelcomeScreen.tsx
+  M desktop/src/react/components/app/ChatSidebar.tsx
+  M desktop/src/react/components/desk/Desk.module.css
+  M desktop/src/react/components/desk/DeskCwdSkills.tsx
+  M desktop/src/react/components/right-workspace/RightWorkspacePanel.module.css
+  M desktop/src/react/components/right-workspace/WorkspaceStableBody.tsx
+  M desktop/src/react/settings/tabs/observability/model-observability-actions.ts
+  M desktop/src/react/settings/tabs/observability/trace-detail/TrajectoryTable.tsx
+  M desktop/src/react/settings/tabs/observability/trace-detail/TrajectoryTimeline.tsx
+  M desktop/src/react/settings/tabs/observability/trace-detail/trace-conversation-model.ts
+  M desktop/src/react/settings/tabs/observability/trace-detail/trajectory-record.ts
+  M desktop/src/react/settings/tabs/skills/SkillRow.tsx
+  M desktop/src/react/stores/desk-actions.ts
+  M desktop/src/react/stores/desk-slice.ts
+  M desktop/src/react/types.ts
+  M lib/llm/model-observability-persistence.ts
+  M lib/llm/model-observability-query-types.ts
+  M lib/llm/model-observability-query.ts
+  M lib/llm/model-observability-schema.ts
+  M lib/llm/model-observability-trace-store.ts
+  M lib/llm/model-trace-scope.ts
+  M lib/resource-io/providers/local-fs-provider.ts
+  M server/index.ts
+  M server/routes/desk.ts
+  M shared/model-observability-api-contract.ts
+  M tests/cors-policy.test.ts
+  M tests/desk-route.test.ts
+  M tests/mobile-workbench-route.test.ts
+  M tests/model-observability-detail-vertical.test.tsx
+  M tests/model-observability-export.test.ts
+  M tests/model-observability-query-truth-integrity.test.ts
+  M tests/model-observability-schema-v2.test.ts
+  M tests/model-observability-settings.test.ts
+  M tests/model-observability-store-schema.test.ts
+  M tests/model-trace-scope.test.ts
+  M tests/mount-aware-file-service.test.ts
+  ?? design-review/
+  ?? desktop/src/react/__tests__/components/WorkspaceSwitcher.test.tsx
+  ?? desktop/src/react/components/right-workspace/WorkspaceSwitcher.tsx
+  ?? desktop/src/react/utils/workspace-switch.ts
+  ?? tests/model-observability-session-trace-reuse.test.ts
+  ```
+  </details>
+- 理解的目标/顺序/最大风险(≤10 行):①任务1 query 层透出 inputUncachedTokens(读 input_uncached_tokens,null 语义同现有字段)+合约类型+query 测试;②任务2 新建胶囊组件+聚合(Σ口径,缓存命中=cacheRead÷(total−output),TPS=Σoutput÷ΣdurationMs,总用时=turnProjection completedAt−startedAt),仅 completed 轮渲染,无数据不渲染,挂 MessageFooterActions,新增 5 组测试;③任务3 反向验证红→绿。最大风险:①参考包样式 1:1 复刻与项目 CSS 体系映射的保真度;②无 usage 数据的判定口径(旧会话必须不渲染);③chat 目录测试跑法含 chat-semantics/chat-performance 邻接套件,新增文件须放 `__tests__/chat/` 新文件不动现有测试。
+
+## 2026-09-05 聊天页用量/用时胶囊任务(任务1+2+3 完成记录,未提交)
+
+- **任务1(透出未缓存输入)**:`shared/model-observability-api-contract.ts` 的 `ModelObservabilityUsageSummary` 增加 `inputUncachedTokens?: number | null`;`lib/llm/model-observability-query.ts` 两处:call 投影 `usageOf` 产出 `inputUncachedTokens: finiteIntegerOrNull(usage.input_uncached_tokens)`(该列本就在 USAGE_INTEGER_FIELDS 腐败检测闭集内,负值整行 corrupt 语义自动覆盖)、Trace 聚合 summary 补 `sumKnown("inputUncachedTokens")`。**合约字段设为可选的原因**:`ObservabilityTraceForest.test.ts`/`TraceConversationModel.test.ts` 等现有测试以显式类型注解构造 `ModelObservabilityCallListItem` 字面量,必填字段会炸冻结测试的 typecheck(现有测试文件不许改);服务端投影始终产出该键,null=无事实语义同其余字段。query 层测试新文件 `__tests__/chat/usage-uncached-input-query.test.ts` 4 用例(透出与总输入分离/NULL→null 不冒充 0/负值 corrupt/无 usage 行 unknown)。
+- **任务2(胶囊+聚合+挂载)**:新文件 `components/chat/turn-usage.ts`(聚合+格式化:Σ 口径、缓存命中 1:1 移植 formatCacheHitPercent 防 99.95→100 失真算法+正边界进位、紧凑 K/M、千分位、整秒时长、TPS;`turnUsageWindow` 资格=AssistantTurnStatus==='completed'+起止时间戳齐备)、`TurnUsagePills.tsx`(双胶囊+portal 弹窗:锚定上方 12px 钳位、Esc/外点关闭、行按数据有无条件渲染、中文文案组件内常量照抄 locale-keys.zh.txt、内联 SVG 图标、TTFT 行不移植)、`TurnUsagePills.module.css`(参考包视觉规格 1:1,颜色/圆角/动效换项目变量 --text/--text-muted/--bg/--border)、`use-turn-usage-stats.ts`(POST /api/model-observability/query/calls,filter=sessionPath+since/until(绑定 started_at,since 含/until 不含),失败静默=null)。挂载:`MessageFooterActions.tsx` 加 `statsNode` 插槽(时间文本之后);`AssistantMessage.tsx` 完成轮才启用 hook。**适配说明**:①输入/输出行在无事实时也隐藏(参考包类型保证非空故无条件渲染;本项目全可空,数据真实>样式一致);②formatCacheHitPercent 加 `cacheRead>=prompt → '100'` 前置钳位(参考包对 read>prompt 会落入防失真分支产出无意义 99.x);③胶囊标签保留 ' tok' 后缀(与参考包 consumed='用量 {total} tok' 一致)。
+- **任务2 验收 5 组**:a 有数据渲染双胶囊(紧凑总量+整秒用时)/b totalTokens 无事实整体 null 且不出现 0(+资格面:streaming/failed/aborted/缺时间戳无胶囊)/c 弹窗行条件渲染(缓存写入>0、缓存命中、其中推理、TTFT 永不、TPS 按有无)/d 聚合求和与命中百分比(含 9990/10000→99.9 不上 100、5.95% 正边界进位 6)/e 三 call 混合 null 求和+模型标签去重保序+TPS 分子分母同源。新测试文件 3 个共 23 用例:query 4+aggregate 11+pills 8。
+- **验证(2026-09-05 18:14 本工作树)**:`npm run typecheck` exit 0(注:此前两轮用管道 tail 取 $? 的写法会吃到 tail 的退出码,本轮起改 `npm run typecheck; echo $?` 直取);`npx vitest run desktop/src/react/__tests__/chat --exclude '**/dist/**'` → 14 files/83 tests 全绿 skip=0(基线 60+新增 23);邻接套件 AssistantMessage 渲染方(AssistantMessageCompletionActions/automation-suggestion/skill-block/media-generation/block-renderers/chat-semantics/process-fold/computer-app-approval/SessionCollabDraftCard/session-file-expired/MobileApp)52+86 用例全绿;eslint 改动文件 0 error(AssistantMessage 2 warning 为 HEAD 既有行号平移,新文件 0 警告)。
+- **任务3 反向验证**:把 aggregate 测试 e 组 `uncachedInputTokens` 断言 200→故意 201 → `Tests 1 failed | 10 passed`(`expected 200 to be 201`)→ 还原 → chat 全套 83/83 绿。
+- **并发改动提示(非本任务所为)**:17:42(本任务抓基线同分钟)另有会话/用户在本工作树改了 4 个白名单外文件:ArchivedSessionsModal.tsx/.module.css/其 test(+批量恢复 switchTo 选项)、stores/session-actions.ts。本任务未触碰、未回滚;基线 68 条完整性经 comm 比对全部原样在列。
+
+- **GUI 复测反馈修复(2026-09-05 19:13,胶囊不显示)**:用户实测看不到胶囊。根因坐实——`AssistantTurnProjection` 类型虽有 startedAt/completedAt,但三个 `projectAssistantTurn` 调用点(流式 `use-stream-buffer.ts:410`、收尾 `:512`、历史 `history-builder.ts:665`)**全都不传**这两个字段,`turnUsageWindow` 在真实应用永远 null,胶囊成死代码;单测 fixture 自带时间戳故未暴露。修复(全白名单内):①`use-stream-buffer.ts` commitLiveRun 收尾时传入 startedAt=本条 assistant 之前最近 user 消息 timestamp、completedAt=收尾时刻 Date.now()(本轮全部模型调用 START 于两者之间,与账本 since 含/until 不含、绑定 started_at 口径对齐);②历史重建路径(history-builder 在 utils/,非白名单不可改)改在消费端兜底——`turn-usage.ts` 新增 `turnUsageWindowFromNeighbors`(上一条 user 时刻~本条 entry 时刻,含状态门槛与越序防护),`AssistantMessage.tsx` 投影窗口缺失时回退;③补 4 用例(回溯跳过 interlude/三种状态门槛/缺时间戳或时序倒挂拒绝/找不到消息)。验证:`npm run typecheck` exit 0;chat+semantics+performance 14 文件 87 用例全绿(83+4);eslint 新增 0 warning(use-stream-buffer 的 turnKeyFrom 1 条为 HEAD 既有)。注:实时占位消息的 timestamp=流开始时刻,不能当轮结束用,故历史/实时两条腿缺一不可。
+- **GUI 复测反馈(2026-09-05,归档后工作台自动切换)——非本任务改动导致,已归因待裁决**:机制在 `session-actions.ts:1429-1431`(archiveSession):归档当前会话清空 currentSessionPath 后,`sessions.length===0` 才建新会话,否则**无条件 `switchSession(updated.sessions[0].path)`**——sessions 是跨工作台全局列表,于是默认工作台归档→跳到全局最新一条(常在别的工作台);别的工作台归档→跳回(常是)默认工作台。该行代码出自 08-05 基线提交 d5275e56,HEAD 原样存在,本任务与 17:42 并发改动均未触碰;近期侧栏归档入口 UX(d6fbd0d3)让它更易触发。且 `tests/session-actions.test.ts:2390/2446` 有用例锁定该行为,修复需改冻结测试+非白名单文件,方向(归档后留空白草稿/按当前工作台过滤候选)待用户裁决后另行开工。
+
+- **GUI 复测反馈(2026-09-05,归档后工作台自动切换)——用户拍板「把问题一也修复了」,已修复**:机制=`session-actions.ts` archiveSession 归档当前会话清空 current* 后无条件 `switchSession(sessions[0].path)`(08-05 基线 d5275e56 既有);且 `loadSessions` 内部「首次加载」兜底(currentSessionPath 空时拉 sessions[0],626-635)会让「只删显式跳转」失效。**修复**(用户授权覆盖冻结边界):归档当前会话或草稿态归档旧会话 → 先 `createNewSession()` 回「新建聊天」草稿态——在置空 current* 前读取被归档会话的工作台归属做继承(规则 B 新建跟随当前),写入的 pendingNewSession 挡住 loadSessions 的 sessions[0] 兜底;归档后台会话(正开着别的会话)行为不变。锁旧行为用例(session-actions.test.ts「归档当前 session」)改写为新语义断言(currentSessionPath=null + pendingNewSession=true + 列表里的 '/other' 不得成为当前会话)。**红→绿**:旧实现+旧 mock 队列 → `AssertionError: expected '/other' to be null`(1 failed | 88);新实现+新队列(补 createNewSession 的 permission 默认值请求 mock)→ 89/89 绿。注意供数陷阱:permission mock 插在 /api/sessions 之前会被旧实现的 loadSessions 当列表消费掉,sessions=[] 恰好走旧「空列表→createNewSession」分支,红证必须用旧队列(已踩坑并记录)。**验证**:`npm run typecheck` exit 0;stores+WelcomeScreen+ChatSidebar+ArchivedSessionsModal+MobileApp+app-init 36 文件 511 用例全绿;eslint 0 error(10 warning 全为该文件基线既有);基线 68 条 git status 原样在列。
+
+- **GUI 复测反馈第二轮(2026-09-05 20:40,「还是看不到胶囊」→ 三重真因全部修复,真机验证通过)**:用户以 `sess_0mtob4efv_a9f834bb2c789bd5afce` 实测仍无胶囊。逐层排查:①账本数据✓(5 调用全 present,session_id/session_path 双写,Σtotal=108,649);②服务层以胶囊精确 filter 探查✓(tsx 直连 sqlite,5 calls 全返回,inputUncachedTokens 在);③真实 UI 悬停后 AX 树无胶囊节点→渲染端问题。**真因三层**:⑴ `desktop/main.cjs loadPageFromDir` 只有设 `VITE_DEV_URL` 才走 vite,`--dev` 实际加载 `desktop/dist-renderer/` 构建产物(时为 16:12 构建,早于全部改动)——5173 上的 vite 无人消费,重启应用无效,**必须 `npm run build:renderer`**;⑵ `chatSessions` 以 sessionScopedKey(sessionId 优先)为键(chat-slice:72),我最初的裸 path 选择器在真实会话(有 sessionId)必查空——历史邻居回退全断,改用 `sessionScopedValue` 作用域查找;⑶ assistant entry timestamp=回复**开始**落盘时刻(实测 19:36:28,轮实际至 19:37:34),历史窗口上界不能用它——改为轮次边界「上一条 user 时刻 ~ 下一轮 user 时刻−1,最后一轮=now」;随之发现展示用时也不能用该边界(会把闲置时间算进「用时」),历史轮 runMs 改由账本事实推导=本轮最后调用 ended_at−startedAt,null 时用时胶囊整体隐藏。实时路径(commitLiveRun 写投影时间戳)不变。**新增 turn-usage-mount.test.tsx 4 用例**(mock lingxiFetch 模块边界,不 mock 被测组件):完成轮投影带时间戳→发查询+渲染双胶囊/生产同款 sessionId 键+locator 邻居回退→查询窗口 since/until 断言/账本空→无胶囊不渲染 0/streaming 轮不发请求;另补邻居窗口边界语义 5 断言(含 fake timers 锁「最后一轮=now」)。**验证**:`npm run typecheck` exit 0;chat+semantics+performance 15 文件 95 用例全绿;eslint 0 error(4 warning 均 HEAD 既有);`npm run build:renderer` 后重启应用,真机(同一会话)AX 树+截图证实「用量 109K tok」「用时 1分27秒」与账本全轮数据吻合,弹窗行(模型/缓存命中/未缓存输入/缓存读取/输出+其中推理)齐全。
+
+- **GUI 复测反馈第三轮(2026-09-05 21:00,用户两点追加)**:①「用时和速度」弹窗补**首 token 用时（TTFT）**行——推翻早前「TTFT 不显示」的猜测性裁决;口径=本轮最早一次 provider 响应到达(first_response_at)−轮开始(用户消息时刻),聚合取 min,事实缺失/时钟倒挂→null 整行不渲染;新增 formatLatencySeconds 移植(<10s 一位小数,≥10s 取整)。②胶囊与时间文本的显隐行为统一——最新消息 persistent 场景下,原先胶囊/时间恒显而复制/截图等按钮悬停才显,视觉不一致;`MessageFooterActions` 给 statsNode 加 `.messageFooterStats` 包装,Chat.module.css 新增 persistent 场景下 time+stats 默认 opacity:0/pointer-events:none、消息组 hover/:focus-within/行 hover 显示,与操作按钮完全同规则。**验证**:`npm run typecheck` exit 0;chat 三套件 15 文件 98 用例全绿(新增 TTFT 推导/TTFT 缺失行隐藏/最后一轮 now 边界 fake-timers/persistent 包装类等断言);eslint 0 error;`npm run build:renderer` 后重启应用,真机 AX+截图证实:用时弹窗出现「首 token 用时（TTFT）1.2秒」(真实账本值),非悬停态消息页脚(含时间/胶囊/按钮)整体隐藏。
+
+## 2026-09-05 修复轮七:新建聊天助手身份跟随当前(规则B补全,用户拍板「B 方向」;接续修复轮与 01cdd80b mobile 补钉线索,非 disposal 工作流)
+
+- 背景:mobile 用例补钉(01cdd80b)后用户追问「助手和工作台不是没有绑定吗,为什么要区分」——确认架构上 agentId 与工作目录本是独立维度,「全局新建重置回 Primary」是历史入口语义,轮一实现规则 B 时只改了工作台维度、助手维度经代码注释有意保留,产生「助手回 Primary + 工作台留当前」的不对称组合。用户裁决 B 方向:**助手身份也跟随当前助手**。
+- 改动(session-actions.ts createNewSession,单点):
+  - `selectedPrimaryAgentId`(无条件钉 Primary)改 `selectedAgentIdForDraft`——有 currentAgentId 时为 **null**(null=「跟随当前」:欢迎页 displayAgent 取 selectedAgentId||currentAgentId,建会话体 buildPendingSessionCreateBody 仅在 selectedAgentId≠currentAgentId 时显式带 agentId,与 handleSelectHistory 的 null 约定一致);仅无当前助手时才显式落 Primary 兜底。
+  - setState 注释同步(「全局新建仍回到 Primary Agent」→「助手与工作台都不重置回 Primary」)。
+  - 服务端语义核实:new-detached 省略 agentId 时 coordinator createSession 回落 `this._d.getAgent()`(当前活跃助手)——省略即跟随当前,桌面主线路径(单助手=current=Primary)本就走 null 形态,本次只是把多助手场景并入同一形态。
+- 测试(4 处翻转,红→绿完整对证):
+  - session-actions.test.ts ×3:两条 `selectedAgentId==='hana'` 断言翻 toBeNull(其一用例名从「resets the agent to primary」改为「follows the current agent」);「carries an explicit project id」用例请求体期望删去 `agentId:'hana'`(wire 形态锁定:省略=跟随当前,响应 echo 同步 'mio')。
+  - MobileApp.test.tsx ×1:01cdd80b 翻过的用例再翻助手半边(toBeNull),用例名改「…and current agent」。
+  - 红:还原实现后 4 failed(3× `expected 'hana' to be null` + 1× 请求体不匹配);恢复后绿。
+- 验证:stores 全目录+mobile+WelcomeScreen+session-sections+app-init **37 文件 510 用例全绿**。
+- **未提交**:工作树同期有并行会话在途改动(disposal 工作流:session-coordinator/sessions 路由/ArchivedSessionsModal/ChatSidebar 等,session-actions.ts 亦被其改过但区域不冲突),本轮改动与之共存待统一提交;用户本轮未下达提交指令。
+
+## 2026-09-05 修复轮五:Windows 初始对话界面工作台显示双缺陷(用户 bug 报告 2026-09-04)
+
+- 报告两症状+一次生机制,定位全部核实后修复(纯显示层+服务端创建护栏,不动工作台切换/文件功能):
+  1. **症状一(指示行/列表显示整条路径)**:WelcomeScreen 三处手写 `split('/').pop()` 取名(指示行 folderName、本次工作台列表项、额外文件夹列表项)对 Windows 反斜杠路径失效。改用 shared/workspace-history.ts 既有 `workspaceDisplayName()`(先归一分隔符再取末段);本次工作台列表项本就经 buildWorkspacePickerItems 归一(红证在指示行与额外文件夹两处),额外文件夹列表(workspaceFolders)是原生路径直渲染,一并治。
+  2. **症状二(同一工作台出现两次)**:下拉两来源(挂载 studioWorkspaces + 历史/主目录 buildWorkspacePickerItems)直接拼接、无跨源去重——同目录既是挂载又在 cwd_history 时渲染两行。FolderHistory 渲染前对历史/主目录条目按 `isSameWorkspacePath()`(反斜杠+Windows 大小写归一)与可见挂载的 nativeRootPath 跨源比对,命中即只留挂载行(带 label 与挂载移除钮)。Agent 主目录条目只与(隐藏的)默认挂载同根,不受影响。远端 principal 拿不到 nativeRootPath 时不比对(无从比对,维持两来源并列)。
+  3. **次生机制(Windows 大小写变体挂载)**:`localFsMountId` 派生不做大小写归一,同目录大小写变体各造一条 active 挂载。server/routes/studio-workspaces.ts createLocalPathWorkspace 创建前按「字符串不同但折叠后同根」(win32 下 resolve+lowercase,POSIX 恒 false)找既有 active local_fs 挂载,命中复用;完全相同字符串仍走 upsert(保留重加改 label 既有语义)。不改 mountId 派生本身——存量挂载的 mountId 被会话 meta 引用,改派生会孤立既有身份。
+  4. **继承链归一**(报告 触发链路①):session-actions.ts createNewSession 的 inheritedLocalFolder/keptSelectedFolder/keptDeskFolder 由 `.trim()` 改 `normalizeWorkspacePath()`,与 applyFolder 落 selectedFolder 的规范形态一致,反斜杠原生 cwd 不再进入前端草稿态。
+- 测试(红→绿:临时还原四处实现改动→5 用例红,恢复→全绿):
+  - WelcomeScreen +3:指示行反斜杠取名 / 挂载-历史跨源去重(红证:两行 nest-drama `expected length 1 but got 2`)/ 额外文件夹反斜杠取名。
+  - session-new-session-workspace +1:继承反斜杠 cwd 落 selectedFolder 前归一(红证:`expected 'C:\Users\...' to be 'C:/Users/...'`)。
+  - studio-workspaces-route +2:win32 桩下大小写变体复用既有挂载(红证:`expected 'local_fs_be8c76a96653d5e1' to be 'mount_case'`,registry 仅 1 条 local_fs)/ 精确重加仍走 upsert 更新 label(锁定护栏不破既有语义)。
+- 验证(2026-09-05 本工作树):定向 3 文件 29 用例绿;桌面 stores+WelcomeScreen+session-sections+app-init 475 用例绿;服务端 tripwire+workspace 相关 6 文件 146 用例绿;http-route-security 27 绿;`npm run typecheck` exit 0;eslint 改动文件 0 error(12 warning 全为既有 no-explicit-any,行号平移)。desktop 全量 `__tests__/`:2461 过/1 败(败者=既有 DeskSection Jian drawer 用例)+31 文件级环境性失败(workspace 包 @lingxi/plugin-protocol 未构建,均前轮 stash 对照证实的先在项),与基线一致零新增。
+- 本轮触碰文件均不在 163 个持久化受护源内;check 脚本对 engine.ts 的未重钉报错为修复轮二遗留状态(tripwire 15/15 仍绿),本轮未新增受护源改动。
+
+## 2026-09-05 修复轮七:归档分组支持折叠(用户反馈:分组下记录要能整组收起)
+
+- ArchivedSessionsModal.tsx:分组头改为可点击折叠/展开——`collapsedGroups: Set<key>` 状态(key=mount:/path:/ungrouped,列表刷新后保留);组头 role=button+aria-expanded+Enter/Space 键盘切换;行内勾选与删除整组按钮 stopPropagation 不误触折叠;折叠时组头(含勾选/删除/徽标/统计)保留、仅收起记录行。CSS:组头手型光标+chevron 箭头 90° 旋转动画(token 风格)。
+- 测试:+2 用例(点击组头整组收起/再展开+aria-expanded 翻转;删除按钮不触发折叠)。红→绿:stash 组件后折叠用例红(`expected null to be truthy`),恢复绿;全套 18/18,邻接套件 461 绿,typecheck 0,eslint 0 error。
+
+## 2026-09-05 修复轮六:移除工作台简化为直接归档(用户裁决撤销二选一)
+
+- 用户追加裁决:移除工作台**不再弹二选一,直接归档**。改动:
+  - `WelcomeScreen.tsx`:删除 WorkspaceDisposalDialog 挂载/处置状态/handler;handleRemoveWorkspace 简化为——0 条直接移除;>0 先静默调 disposeWorkspaceSessions('archive'),成功后 removeStudioWorkspace + 成功 toast(「工作台已移除,N 条对话已归档」),失败则 error toast 且不移除;removingMountRef 防重入。
+  - 删除组件文件 WorkspaceDisposalDialog.tsx/.module.css。
+  - 5 语言清理 workspace.disposal 下无用键(title/count/hint/archive/archiveDesc/delete/deleteDesc/deletedToast),保留 archivedToast/failed;服务端 disposal 路由的 delete 档保留为 API 能力(归档界面的整组永久删除仍走既有 archived/delete 路由,不受影响)。
+  - 测试:WelcomeScreen 二选一用例改写为「直接归档、无对话框」(断言 disposal 立即以 action:archive 调用+DELETE 顺序+无对话框文本);零会话用例改名。旧对话框行为下 disposal 不会先于选择被调用,该断言天然构成回归锁。
+- 验证:WelcomeScreen 17/17;stores+归档界面+app-init+SecurityTab+服务端 disposal/sweep+i18n 共 475 用例绿;typecheck exit 0;eslint 0 error 0 warning;无悬挂引用(WorkspaceDisposalDialog/disposed keys 全仓无残留)。
+
+## 2026-09-05 修复轮五:移除工作台的对话处置 + 归档界面工作台分组 + 入口迁移(用户四点裁决全落地)
+
+- 用户裁决:移除工作台时对话二选一(归档/永久删除),无保留档、无孤儿桶;绕过移除的孤儿(目录被直接删/mount 失效)静默自动归档不弹框;归档界面按工作台分组+已移除徽标+整组删除;入口迁到侧栏功能行垃圾桶按钮,设置安全页旧入口移除;重新添加同路径工作台时提示可恢复的归档数。
+- 服务端(server/routes/sessions.ts):
+  - 抽取 `archiveActiveSessionCore`(单条归档路由的锁内序列,单条路由改走它,32 用例无回归);
+  - 新路由 `POST /api/sessions/workspace-disposal`:{workspaceMountId|cwd, action:archive|delete};身份口径与左栏一致(mount 严格+native 根路径 cwd 双形态);delete=归档后复用永久删除内部序列;流式会话跳过计数返回;
+  - 新路由 `POST /api/sessions/sweep-orphaned-workspaces`:mount 失效或 cwd 目录已从磁盘删除的会话静默自动归档(目录仍在但未引用的不清——换配置目录的残留可经重新打开找回,不算暗数据);
+  - `core/session-coordinator.ts` listArchivedSessions 行投影补 cwd/workspaceMountId/workspaceLabel(从 manifest workspaceScope/meta/列表投影缓存,存量归档可正确分组)。
+- 客户端:
+  - `session-actions.ts`:+disposeWorkspaceSessions/sweepOrphanedWorkspaceSessions/countArchivedSessionsForWorkspace;ArchivedSession 类型补三字段;
+  - `WelcomeScreen.tsx`:移除前双形态计数,0 条直接移除,>0 弹 `WorkspaceDisposalDialog`(新组件+CSS,二选一);处置成功后才 removeStudioWorkspace;handleBrowse 重新添加后查归档数给提示;
+  - `ArchivedSessionsModal.tsx` 重写:按 mount/cwd/未归属三型分组;default 组显示名=配置目录名(与主界面同规则);身份解析不到现存工作台 → 「该工作目录已移除」徽标(无身份组不标);组级勾选+删除整组;组内保持时间排序与单条操作;
+  - `app/ChatSidebar.tsx`:功能行新增垃圾桶按钮(设置按钮旁)打开归档界面;`SecurityTab.tsx` 移除归档区块/挂载/state;`app-init.ts` 工作台列表加载后接清扫(归档了东西发非阻塞 info toast);
+  - 5 语言:删 settings.security.archivedChats* 三键,新增 sidebar.archivedChats、session.archived.group.*/deleteGroup*、workspace.disposal.*、workspace.sweep.archivedToast、workspace.archivedHint。
+- 测试:新 tests/workspace-disposal-route.test.ts 7 用例(身份拒绝/双形态归档/删除/流式跳过/default mount 解析/清扫两态);WelcomeScreen +2(二选一对话框全链路/零会话直接移除);ArchivedSessionsModal +3(分组+徽标+default 显示名/整组删除/组级勾选)+1 条既有用例更新(checkbox 顺序因组级勾选变化);SecurityTab 1 条改为锁定入口移除;app-init 断言清扫调用。
+- 红→绿:stash 全部实现后 13+ 用例红,恢复后 56/56 绿。
+- 验证:服务端+路由+i18n 152 用例绿;客户端相关套件 496 用例绿;typecheck exit 0;eslint 改动文件 0 error(sessions.ts +1 条与既有 6 条同款的防御性空 catch warning)。
+
+## 2026-09-05 修复轮四:默认工作台显示名规则 + 启动合流键可靠性(用户拍板:始终显示配置目录名,未配置才显示 Default)
+
+- 用户复测图证:启动时工作台名=配置目录名但列表缺 Default 期记录;发首条消息后工作台名翻成 "Default"、记录才齐。用户细化规则:**启动与运行期显示名一律=设置里配置的工作台目录名;"Default" 仅在未配置任何目录时显示**。
+- 改动:
+  1. **显示名派生**(desk-actions.ts):新增 `defaultWorkspaceDisplayName()`——取 store.homeFolder(显式配置信号,未配置为 null)的目录名,未配置回落 "Default";**不用服务端解析根路径推导**(未配置时服务端根回落内置目录,目录名非用户所愿)。两个咽喉点覆写:`applyStudioWorkspace`(mountId='default' 时 label 一律派生,selectedWorkspaceLabel/deskWorkspaceLabel 同源)与 `activateWorkspaceDesk`(同规则覆写 options.label——switchSession 恢复 desk、发送后翻转等一切路径经此)。全部显示面(DeskSection 面板标题:164/WorkspaceStableBody:47/SessionStatusCard:62/选择器按钮)读 deskWorkspaceLabel 或 selectedWorkspaceLabel,均被覆盖。WelcomeScreen 两处调用去掉硬编码 'Default'。非 default mount 严格保留调用方标签。
+  2. **启动合流键可靠性**(app-init.ts):引导期(agent config 就绪后)`void loadStudioWorkspaces()`——defaultWorkspaceRootPath 不再依赖 FolderPicker 挂载时的一次性请求,启动首屏左栏即可做 mount≡cwd 双形态合并(修图一「启动列表缺一整本账」)。
+- 效果:启动态名称=配置目录名(本地形态 basename)+列表两本账合并;发送后 desk 翻成 default mount 但显示名仍=配置目录名——**两态名称与列表一致,不再出现「先空白、发一条才齐/名称跳变」**。
+- 测试:desk-actions +4(派生覆盖服务端标签/未配置回落 Default+反斜杠与空白边界/非 default 保留标签/switch 恢复咽喉点);app-init +1(引导期调用 loadStudioWorkspaces)+mock 面补齐。红→绿:stash 实现后 5 红(含轮三的根捕获),恢复全绿。
+- 验证:stores+WelcomeScreen+session-sections+app-init 471 用例全绿;typecheck exit 0;eslint 改动文件 0 error 0 warning。
+
+## 2026-09-05 修复轮三:默认工作台与 Agent 工作台目录「同目录两本账」合流(用户拍板 1+2+3 全做)
+
+- 背景:用户确认 Default 工作台(内置 mount "default")与设置页 Agent 工作台目录是同一目录的两个入口,但对话分裂成两本账——会话身份键有两种形态(mount 形态=经切换器/挂载创建,带 workspaceMountId;cwd 形态=经目录历史/旧版本创建,只带 cwd),左栏作用域对两种形态严格互斥(session-sections.ts 原 :170-175)。
+- 三项改动:
+  1. **入口归一**(WelcomeScreen.tsx):目录历史选 Agent 主目录(handleSelectHistory)与欢迎页 Agent 芯片(AgentChips)两个本地形态入口,统一改走 `applyStudioWorkspace({mountId:'default'})`;AgentChips 保留「解析到同一目录不重载 desk」优化(比较改为按解析后的工作台身份,selectedWorkspaceMountId==='default' 时取 defaultWorkspaceRootPath 对比)。跨 Agent 选择时 desk 的 mount 根在会话落到目标 Agent 前按当前 Agent 解析,属草稿期瞬态,首条消息后随 switch 回包归位(注释已记)。
+  2. **作用域归一**(session-sections.ts):WorkspaceScope 增可选 `defaultRootPath` 合流键;resolveWorkspaceScope 在「desk/pending 落在 default mount」或「本地路径 === 默认根」时携带;sessionBelongsToWorkspaceScope 双向放行——default mount 作用域收 cwd 指向该根的旧形态会话,该根的本地作用域收 mount "default" 会话;其余 mount 保持严格互斥。store 新增 `defaultWorkspaceRootPath`(desk-slice),loadStudioWorkspaces 从 isDefault 条目的 nativeRootPath 捕获(列表本体保留 Default 条目——预览/文件刷新按 mountId 查找依赖它);SessionList 接线传入。
+  3. **切换器隐藏 Default**(WelcomeScreen FolderHistory):渲染过滤 isDefault 条目(仅 UI 层;同一目录经历史/主目录条目进入且已是 mount 形态)。
+- 测试:session-sections +4 用例(双向合流/非 default 仍严格/合流键仅按需附着);desk-actions +1(默认根捕获+列表保留);WelcomeScreen +2(历史选主目录→mount 形态、Default 行隐藏且 store 保留)并更新 2 条锁定旧本地形态的用例(agent 芯片选择→断言 mount 形态);「同目录不重载」用例原样通过。
+- 红→绿:stash 全部实现改动后 8 用例红(4 作用域+1 捕获+2 更新+1 历史入口),恢复后全绿。
+- 验证:stores 426 / session-sections 16 / WelcomeScreen 12 全绿;components 目录 798 过/1 败(先在的 DeskSection Jian drawer 用例,与本改动无关,前轮已 stash 对照证实);typecheck exit 0;eslint 改动文件 0 error(顺手清了 WelcomeScreen 失时效的 any-disable 与 unused import,warning 从 HEAD 3 → 0)。
+- 效果预期:同一目录(=默认工作台=Agent 工作台目录)的 mount 形态与 cwd 形态会话在左栏合并显示;不再产生新的 cwd 形态会话(入口全部走 mount);切换器不再出现与目录历史重复的 Default 行。旧 cwd 会话无需迁移即并入。
+
+## 2026-09-05 修复轮二:左栏列表空白三症状的真根因(engine 未暴露 getSessionWorkspaceMount)
+
+- 用户复测反馈:修复轮一只治好「新建聊天拽回默认目录」,症状1/2/3(新对话后记录区空白、点新建聊天列表才出现、点进记录列表又清空)原样未动。
+- 重新定位(静态链+真服务器探针辅助):
+  - **switch 路由的工作台身份回传只信 `engine.getSessionWorkspaceMount`**(server/routes/sessions.ts:2616 经 sessionWorkspaceMountFields,与 create 路由不同、无 workspaceSelection.mount fallback);
+  - **真实 engine 只暴露了 getSessionWorkspaceFolders/getSessionAuthorizedFolders 两个委托**(core/engine.ts:2117-2122),漏了 getSessionWorkspaceMount——路由 optional-call `engine.getSessionWorkspaceMount?.()` 静默拿到 undefined;
+  - ⇒ **switch 回包永远不带 workspaceMountId/workspaceLabel** ⇒ 客户端 resetDeskForSessionWorkspace(cwd,mountId=null) → desk 落本地目录键;
+  - 而会话列表投影带 mountId(engine 侧直接读 meta,core/session-coordinator.ts:6664-6666;new-detached 落库即写 meta :2661-2663);
+  - 客户端作用域谓词:本地作用域**严格排除**带 mountId 的会话(session-sections.ts:173)→ 活跃会话态左栏必然空白(症状1/3);草稿态取 selected*(mount)→ 列表正常(症状2「点新建聊天才显示」)。三个症状一个根因。
+  - 路由契约本有测试锁(tests/sessions-route.test.ts:127/:169-170,mock 的 engine 带该方法)——证明设计意图就是 engine 暴露它,真实 engine 漏配。
+- 修复:core/engine.ts 补一行委托 `getSessionWorkspaceMount(p){ return this._sessionCoord.getSessionWorkspaceMount(p); }`(紧随两个兄弟委托)。
+- 回归测试:tests/engine-session-workspace-mount.test.ts 2 用例(存在性+委托传参/默认参)。红→绿:`git stash push -- core/engine.ts` 后 2 红(`expected 'undefined' to be 'function'`),恢复后 2 绿。
+- 验证(2026-09-05):tripwire 15/15;路由+引擎+协调器定向 133+47 用例绿;stores 425 绿;typecheck exit 0;eslint engine.ts 0 error 且 warning 数与 HEAD 一致(129 行含汇总)。探针脚本(/tmp,未入库)确认了 409/清单/模型门等服务端行为,静态链闭合后不再依赖。
+- 链条覆盖:coordinator meta 读(既有)→ engine 委托(新测试)→ 路由发射(既有测试)→ 客户端 desk 恢复(desktop stores 测试)。
+
+## 2026-09-05 修复轮:新建会话工作台语义(用户拍板=规则B「跟随当前工作台」,批准动手)
+
+- 用户经三轮描述确认病灶全貌(见 BLOCKED.md 2026-09-05 条目)并批准修复。改动三处+文案:
+  1. **createNewSession 继承源重排**(session-actions.ts:1199-1240):无当前会话时继承「当前显示的工作台」——草稿选择(applyFolder/applyStudioWorkspace 写入的 selectedFolder/selectedWorkspaceMountId)优先,其次 desk 已激活身份(deskWorkspaceMountId/deskBasePath,仅本地目录态取路径);两者皆空才落 Primary Agent 工作台(设置页默认语义保留)。Primary 兜底加「未选 mount」门,防 selectedFolder 被 Primary 路径污染。修:症状4(其他工作台点新建聊天被拽回默认)、Default 下列表显示设置目录记录(显示作用域与数据归属分家)。
+  2. **去掉空缓存种子**(原 :1155):stageDetachedSessionForActivation 不再 initSession(path,[],false),switchSession 走 !hasData→loadMessages 真实拉历史并 stamp revision。修:症状1(新会话消息区空白——不再依赖 WS 事件)。
+  3. **loadSessions 尾部补 reconcile 触发**(:636-641):列表刷新后校验当前会话缓存 revision,落后即补拉——闭合「列表说磁盘前进了、缓存永远不追」的自愈缺口(桌面端此前仅 chat-find-locate/移动端触发)。修:「退出重进才恢复」类残留空白。
+  4. **文案对齐**(5 locales homeFolderDesc,如 zh.json:2317):「新建对话跟随当前打开的工作台;未打开其他工作台时默认使用此目录,巡检和定时任务也在这里执行」。
+- 测试:
+  - 更新锁定旧行为的现有用例 1 条(session-actions.test.ts「without a current session…」:期望从落 Primary 改为保持 desk 显示的目录);为「posts one new-session request」补 messages 端点 mock(断言未动)。
+  - 新增 session-new-session-workspace.test.ts 5 用例:mount 草稿保持/folder 草稿保持/仅 desk 身份保持/Primary 兜底保留/reconcile 自愈链。
+  - session-new-session-blank.test.ts 由 KNOWN DEFECT 表征翻为 regression: FIXED(锁定历史真实加载)。
+- 红绿证据:`git stash push -- session-actions.ts` 后新回归 5 用例中 4 例红(第 5 例 Primary 兜底新旧行为一致故两态皆绿),pop 恢复后全绿。
+- 验证(2026-09-05 本工作树):
+  - `./node_modules/.bin/vitest run desktop/src/react/__tests__/stores/` → **31 文件 / 425 用例全绿**(原 89 基线含于其中)。
+  - `./node_modules/.bin/vitest run desktop/src/react/__tests__/` → **2445 passed / 1 failed**;失败集合与「无我的改动」基线逐文件一致(1 例先在的 DeskSection Jian drawer 用例+31 个文件级环境性失败=workspace 包 @lingxi/plugin-protocol 未构建,均先在,stash 对照证实)。
+  - `npm run typecheck` → exit 0(root/node/test 三段);i18n parity 5 用例绿;eslint 改动文件 0 error(实现文件 warning 数与 HEAD 一致=1)。
+- 未动(维持已诊断待办):机制c desk 存档污染(desk-new-session-capture.test.ts 仍锁定该缺陷,P1-3 清单在案)、机制b 强切无会话态(P2-5 纵深防御,枚举已证不可达)。
+
+## 2026-09-04 任务3完成:归因结论与修复清单(不动手,仅清单)
+
+### 归因(两症状各一句)
+
+1. **空白=架构层为主,ea03c627 是触发器而非根因**:「会话身份(switch 完成)/消息缓存(种子空缓存+hasData 短路)/内容来源(WS 事件流)」三源无事务绑定,首屏正确性隐式依赖 WS 事件全达且不被入口闸门丢弃;ea03c627 让「新建会话」首次稳定走完 stage空缓存→skip历史加载 这条链(:1155→:864-868),WS 一断供即空白。
+2. **串台(文件树/存档)=架构层与表层混合**:会话身份与 desk 缓存两套事实无事务绑定是架构层旧疾;createNewSession 半清空 desk(:1235-1237)再被 activateWorkspaceDesk 快照回写(desk-actions.ts:394-455)是 ea03c627 重写引入的具体缺陷点。**串台(对话记录)=机制b(session-actions.ts:626-635)真实存在但新建流程内不可达**(任务2枚举排除);生产残留候选=服务端身份/WS 时序,未排除(见 BLOCKED.md)。
+
+### 修复清单(保留 ea03c627 继承语义,全部只修时序/边界;优先级从高到低)
+
+| # | 位置 | 改动 | 预期效果 | 回归风险 | 验收测试名(建议) |
+|---|---|---|---|---|---|
+| P0-1 | session-actions.ts:1155 | stageDetachedSessionForActivation 移除 `initSession(ref.sessionPath,[],false)` 预种空缓存,让 switchSession :864-868 走 !hasData→loadMessages 拉历史并 stamp revision | 新会话首屏由历史加载兜底,WS 事件丢/迟不再空白;revision 落 stamp 后自愈链有基点 | 低:空会话多一次 messages 请求;WS 先到时 session_user_message 自会 initSession(ws-message-handler.ts:965-967),缓存含真实内容不受影响 | 「ensureSession 完成后新会话缓存从 /api/sessions/messages 加载而非空种子」(现 session-new-session-blank.test.ts 翻红即修复生效) |
+| P0-2 | session-actions.ts:638(loadSessions 尾部) | loadSessions setState 完成后补 `void reconcileCurrentSessionMessages('sessions_refresh')` | 闭合自愈缺口:InputArea.tsx:836 发送后刷列表、列表投影带 revision(server/routes/sessions.ts:958)而缓存 revision=null 时自动补拉;桌面端当前仅 chat-find-locate/移动端前台触发(ChatMessageSurface.tsx:371/MobileApp.tsx:204) | 中:所有缓存落后会话都会补拉(网络量↑);流式会话已被 reconcile :537 streamingSessions guard 排除 | 「loadSessions 后缓存 revision 落后触发补拉」 |
+| P1-3 | session-actions.ts:1235-1237 | createNewSession 不再清 desk 三件套(deskCurrentPath/deskFiles/deskJianContent),desk 状态整体交 activateWorkspaceDesk 的 capture-restore(同 key=原样继承;异 key=恢复目标存档) | 主工作台存档不再被清空快照污染;新会话草稿期 desk 稳定显示继承工作台(继承语义更完整) | 低:草稿期旧 deskFiles 短暂可见(本就是要显示的工作台);ea03c627 现有锁定测试不涉三件套清空断言 | 「createNewSession 不污染 workspaceDeskStateByRoot」(现 desk-new-session-capture.test.ts 翻红即修复生效)+「继承同工作台 desk 状态原样保留」 |
+| P1-4(备选) | desk-actions.ts:397-399 | 若不动 createNewSession:captureCurrentWorkspaceDeskState 在 store.pendingNewSession===true 时跳过 capture | 同 P1-3 止血 | 中:草稿期用户在 desk 的合法操作不被存档;不如 P1-3 干净 | 同 P1-3 |
+| P2-5 | session-actions.ts:626-635 | 强切 sessions[0] 加一次性 bootstrap 标志(冷启动/归档两设计内入口显式置位),防未来新入口在无会话态被静默拉走 | 纵深防御(当前枚举已排除可达路径,无行为变化) | 低:需同步 archiveSession :1386-1390 兜底与 app-init 冷启动置标志,否则破坏现有行为 | 「冷启动/归档仍落 sessions[0]」「未来无会话态不被 loadSessions 拉走」 |
+
+取舍说明:5 项全部不回退「新建聊天继承当前主工作台」;P1-3 反而让 desk 侧继承语义更完整(原样继承,而非清空)。
 
 ## 2026-09-02 安全双件套开工回执
 - 目标：为外部证据增加机械注入扫描，为 Agent 工具循环增加阶梯式跑飞守卫。

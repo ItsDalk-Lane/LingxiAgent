@@ -18,6 +18,7 @@ function makeCall(callId: string): ModelObservabilityCallListItem {
     callId,
     traceId: 'tr_1',
     parentCallId: null,
+    firstResponseAt: null,
     startedAt: '2026-08-22T08:00:00.000Z',
     endedAt: null,
     durationMs: null,

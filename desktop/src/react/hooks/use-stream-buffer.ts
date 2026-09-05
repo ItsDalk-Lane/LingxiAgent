@@ -507,6 +507,24 @@ class StreamBufferManager {
     const segments = buf.segmentOrder
       .map((segmentId) => buf.segmentsById.get(segmentId))
       .filter((segment): segment is LiveAssistantSegment => !!segment);
+    // 轮次窗口时间戳（用量/用时胶囊的查询窗口）：startedAt=本条 assistant 之前
+    // 最近的 user 消息时刻；completedAt=收尾时刻——本轮全部模型调用都 START 于
+    // 两者之间，与 observability since(含)/until(不含) 绑定 started_at 的口径对齐。
+    let turnStartedAt: number | undefined;
+    if (session) {
+      const assistantIndex = session.items.findIndex((entry) => (
+        entry.type === 'message' && entry.data.id === buf.messageId
+      ));
+      for (let i = assistantIndex - 1; assistantIndex > 0 && i >= 0; i -= 1) {
+        const entry = session.items[i];
+        if (entry.type !== 'message' || entry.data.role !== 'user') continue;
+        if (typeof entry.data.timestamp === 'number' && Number.isFinite(entry.data.timestamp)) {
+          turnStartedAt = entry.data.timestamp;
+        }
+        break;
+      }
+    }
+    const turnCompletedAt = Date.now();
     // block.id 从创建那一刻起永久不变（任务书 §二十一/§二十二）：persisted assistant
     // entry 绑定只增加 sourceEntryId / assistantEntryIds，绝不改写 block.id。
     const legacyBlocks = buf.blocks;
@@ -521,6 +539,8 @@ class StreamBufferManager {
       segments,
       legacyBlocks,
       status: persistedEntries.status || 'completed',
+      ...(turnStartedAt !== undefined ? { startedAt: turnStartedAt } : {}),
+      completedAt: turnCompletedAt,
     });
     for (const diagnostic of projected.diagnostics) {
       console.warn('[stream] unresolved assistant segment finalized with fallback:', diagnostic.segmentId);

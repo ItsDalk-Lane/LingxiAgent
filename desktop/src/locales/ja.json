@@ -235,7 +235,8 @@
       "allTab": "すべてのスキル",
       "agentTabs": "アシスタント別にスキルを表示",
       "previousAgent": "前のアシスタント",
-      "nextAgent": "次のアシスタント"
+      "nextAgent": "次のアシスタント",
+      "externalRemove": "削除（無効に変更）"
     }
   },
   "sidebar": {
@@ -287,7 +288,8 @@
       "showMore": "さらに表示",
       "loading": "プロジェクトを読み込み中…",
       "empty": "プロジェクトはまだありません"
-    }
+    },
+    "archivedChats": "アーカイブ"
   },
   "titlebar": {
     "currentChatTitle": "現在のチャットタイトル",
@@ -340,6 +342,12 @@
       "restoreConfirm": "この会話を元の場所に復元しますか？",
       "restoreConflict": "元の場所が使用中のため、復元できません",
       "restoreFailed": "復元に失敗しました",
+      "restoreSelected": "選択項目を復元（{count}）",
+      "restoreSelectedConfirm": "選択した {count} 件のアーカイブをチャットリストに復元しますか？",
+      "restoreSelectedDone": "{count} 件を復元しました",
+      "restoreSelectedPartial": "一部のみ復元：{restored}/{total}",
+      "restoreGroup": "グループを復元",
+      "restoreGroupConfirm": "「{name}」グループのアーカイブ {count} 件をチャットリストに復元しますか？",
       "deleteForever": "完全に削除",
       "deleteConfirm": "このアーカイブを完全に削除しますか？取り消せません。",
       "deleteFailed": "削除に失敗しました",
@@ -348,7 +356,15 @@
       "deleteSelectedConfirm": "選択した {count} 件のアーカイブ（合計 {size}）を完全に削除します。取り消せません。続けますか？",
       "deleteSelectedDone": "{count} 件を削除しました",
       "deleteSelectedPartial": "一部のみ削除：{deleted}/{total}",
-      "daysAgo": "{days} 日前にアーカイブ"
+      "daysAgo": "{days} 日前にアーカイブ",
+      "deleteGroup": "グループを削除",
+      "deleteGroupConfirm": "「{name}」グループのアーカイブ {count} 件（{size}）を完全に削除しますか？この操作は元に戻せません。",
+      "deleteGroupDone": "アーカイブを {count} 件完全に削除しました",
+      "group": {
+        "ungrouped": "未分類",
+        "workspaceRemoved": "ワークスペースは削除済み",
+        "meta": "{count} 件 · {size}"
+      }
     },
     "rcTakingOver": "{platform} 接続中",
     "subagentRunStateUnrecoverable": "過去のサブセッションの実行状態は復元できません",
@@ -1826,9 +1842,6 @@
       "networkProxyWss": "WSS proxy、省略可",
       "networkProxyNoProxy": "プロキシ除外 例: localhost, 127.0.0.1, ::1",
       "networkProxySave": "プロキシ設定を保存",
-      "archivedChats": "アーカイブ済み会話",
-      "archivedChatsDesc": "アーカイブ済みのチャットを確認し、必要な会話を復元したり、不要な記録を完全に削除したりできます",
-      "viewArchivedChats": "アーカイブ済み会話を表示",
       "fileBackup": "ファイルバックアップ",
       "fileBackupDesc": "AIがファイルを変更・削除する前に元の内容を自動保存します",
       "retention": "保持期間",
@@ -2308,7 +2321,7 @@
       "automationPermissionMode": "自動化の権限モード",
       "automationPermissionModeDesc": "バックグラウンド自動化 Agent Run がツール呼び出しを自動審査するか、完全権限で実行するか、読み取り専用にするかを決めます。自動審査に通らない操作は拒否されます",
       "homeFolder": "ワークスペース",
-      "homeFolderDesc": "新しいチャット、巡回、cron タスクのデフォルト作業ディレクトリ",
+      "homeFolderDesc": "新しいチャットは開いているワークスペースに従います。他に開いていない場合のデフォルト作業ディレクトリであり、巡回と cron タスクもここで実行されます",
       "homeFolderPlaceholder": "未設定（毎回手動で選択）",
       "homeFolderClear": "クリア",
       "homeFolderBrowse": "参照",
@@ -3552,6 +3565,7 @@
           "outputTokensUnavailable": "出力トークン数なし",
           "durationTooShort": "期間が短すぎます",
           "started": "開始",
+          "responseArrival": "応答到達",
           "totalDuration": "合計時間",
           "generation": "生成",
           "throughput": "スループット",
@@ -3613,7 +3627,7 @@
             "notRecorded": "記録なし",
             "stepStartUnavailable": "ステップ開始時刻なし",
             "pending": "保留中",
-            "firstTokenUnavailable": "最初のトークン時刻なし",
+            "responseArrivalUnavailable": "応答到達時刻なし",
             "observability": "観測タイミング",
             "observabilityRunning": "観測タイミング（進行中）",
             "session": "セッション・タイムスタンプ"
@@ -3925,7 +3939,8 @@
     "tabs": {
       "label": "右側ワークスペース",
       "sessionFiles": "会話ファイル",
-      "workspace": "ワークスペース"
+      "workspace": "ワークスペース",
+      "projectSkills": "プロジェクトスキル"
     },
     "sessionFiles": {
       "title": "会話ファイル",
@@ -3968,6 +3983,52 @@
     "expand": "実行情報を開く",
     "collapse": "実行情報を閉じる",
     "running": "{n} 件実行中"
+  },
+  "gitEnv": {
+    "title": "環境情報",
+    "changes": "変更",
+    "local": "ローカル",
+    "branch": "ブランチ",
+    "commitOrPush": "コミットまたはプッシュ",
+    "notGitRepo": "Git リポジトリではありません",
+    "loadFailed": "読み込み失敗、クリックで再試行",
+    "mainWorktree": "ローカルのメイン作業ツリー",
+    "linkedWorktreeShort": "ブランチの作業ツリー",
+    "linkedWorktree": "ブランチ {name} の新しい作業ツリー",
+    "detachedHead": "デタッチ済み HEAD（{name}）",
+    "checkedOutElsewhere": "このブランチは他の作業ツリーでチェックアウトされています",
+    "noBranches": "ローカルブランチはありません",
+    "switchDone": "{name} に切り替えました",
+    "switchFailed": "ブランチ切替に失敗しました",
+    "branchesTitle": "ブランチ切替",
+    "changesTitle": "変更ファイル",
+    "noChanges": "変更なし",
+    "diffBinary": "バイナリファイル、diff は表示できません",
+    "diffUnavailable": "diff を読み込めません",
+    "diffTruncated": "内容が長いため省略表示しています",
+    "history": "コミット履歴",
+    "noCommits": "コミットはありません",
+    "copyHash": "コミット ID をコピー",
+    "copied": "コミット ID をコピーしました",
+    "timeJustNow": "たった今",
+    "timeMinutesAgo": "{n} 分前",
+    "timeHoursAgo": "{n} 時間前",
+    "timeDaysAgo": "{n} 日前",
+    "commitTitle": "コミットまたはプッシュ",
+    "commitMessagePlaceholder": "コミットメッセージ（空欄で自動生成）",
+    "includeUnstaged": "未ステージの変更を含む",
+    "btnCommit": "コミット",
+    "btnCommitPush": "コミットしてプッシュ",
+    "btnPush": "プッシュ",
+    "nothingToCommit": "コミットする変更がありません",
+    "nothingStaged": "ステージ済みの変更がありません（「未ステージの変更を含む」をチェック）",
+    "nothingToPush": "プッシュするコミットがありません",
+    "noRemote": "リモートリポジトリが未設定です",
+    "aiGenerating": "コミットメッセージを生成中…",
+    "aiFailed": "コミットメッセージの生成に失敗しました",
+    "commitDone": "コミットしました",
+    "pushDone": "プッシュしました",
+    "operationFailed": "操作に失敗しました"
   },
   "desk": {
     "title": "デスク",
@@ -4931,5 +4992,15 @@
     "sendFailed": "送信に失敗しました：{error}",
     "rejectFailed": "無視に失敗しました：{error}",
     "messageField": "メッセージ内容"
+  },
+  "workspace": {
+    "disposal": {
+      "failed": "会話の処理に失敗したため、ワークスペースは削除されませんでした",
+      "archivedToast": "ワークスペースを削除しました。{count} 件の会話をアーカイブしました"
+    },
+    "sweep": {
+      "archivedToast": "無効になったワークスペースの会話 {count} 件を自動アーカイブしました。アーカイブで確認できます"
+    },
+    "archivedHint": "このワークスペースには {count} 件のアーカイブがあります。アーカイブから復元できます"
   }
 }

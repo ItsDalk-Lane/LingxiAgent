@@ -103,13 +103,12 @@ describe('SecurityTab Windows sandbox network control', () => {
     expect(loadSettingsConfigMock).not.toHaveBeenCalled();
   });
 
-  it('opens archived conversations from the security tab', async () => {
+  it('no longer renders the archived conversations entry (moved to the sidebar function row)', async () => {
     render(React.createElement(SecurityTab));
 
-    fireEvent.click(screen.getByText('View archived conversations'));
-
-    expect(await screen.findByText('Archived conversations window')).toBeTruthy();
-    expect(screen.getByText('No archived conversations')).toBeTruthy();
+    // 入口迁移（用户裁决）：归档对话从设置→安全移到主界面侧栏功能行的垃圾桶按钮。
+    expect(screen.queryByText('View archived conversations')).toBeNull();
+    expect(screen.queryByText('Archived conversations window')).toBeNull();
   });
 
   it('does not render optimistic sandbox or backup states before settings config is ready', () => {

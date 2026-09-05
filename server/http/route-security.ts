@@ -114,6 +114,10 @@ export function classifyHttpRoute({ method = "GET", path = "" } = {}) {
   }
   if (isDeskFileReadRoute(verb, routePath)) return scoped("files.read");
   if (isDeskFileWriteRoute(verb, routePath)) return scoped("files.write");
+  // 环境信息卡 git 面：读 = files.read；checkout/commit/push 等 = files.write
+  if (isGitEnvironmentRoute(verb, routePath)) {
+    return verb === "GET" ? scoped("files.read") : scoped("files.write");
+  }
   if (routePath === "/api/usage/llm") return verb === "GET" ? STUDIO_OWNER : LOCAL_ONLY;
   // Knowledge 保存长期私有文档与可复现研究状态；所有端点显式保持
   // Studio Owner 边界，不依赖文件末尾的未知 /api 兜底。
@@ -484,6 +488,19 @@ function isDeskFileWriteRoute(verb, routePath) {
     || routePath === "/api/desk/beautify/cover"
     || routePath === "/api/desk/beautify/cover/apply"
     || routePath === "/api/desk/beautify/cover/preset/apply";
+}
+
+function isGitEnvironmentRoute(verb, routePath) {
+  if (verb !== "GET" && verb !== "POST") return false;
+  return routePath === "/api/git/status"
+    || routePath === "/api/git/worktree-info"
+    || routePath === "/api/git/branches"
+    || routePath === "/api/git/log"
+    || routePath === "/api/git/file-diff"
+    || routePath === "/api/git/checkout"
+    || routePath === "/api/git/commit"
+    || routePath === "/api/git/push"
+    || routePath === "/api/git/ai-commit-message";
 }
 
 function isSettingsWriteRoute(verb, routePath) {

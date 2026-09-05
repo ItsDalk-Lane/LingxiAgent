@@ -18,7 +18,7 @@ import { installModelObservabilityPersistence } from "../lib/llm/model-observabi
 import { createModelObservabilityQueryService } from "../lib/llm/model-observability-query.ts";
 import { createModelObservabilityTestHarness } from "../lib/llm/model-observability-testing.ts";
 import { createModelCallRecorder } from "../lib/llm/model-call-recorder.ts";
-import { modelObservabilityDbPath } from "../lib/llm/model-observability-schema.ts";
+import { MODEL_OBSERVABILITY_SCHEMA_VERSION, modelObservabilityDbPath } from "../lib/llm/model-observability-schema.ts";
 import { EMPTY_MODEL_OBSERVABILITY_FILTER } from "../lib/llm/model-observability-query-types.ts";
 import type { ModelCallObserver } from "../lib/llm/model-call-observer.ts";
 
@@ -172,7 +172,7 @@ describe("Model Observability Settings / Control Plane", () => {
       expect(calls.ok === true && calls.value.calls.map((c) => c.callId)).toEqual(["mc_keep"]);
       const health = service.getHealth();
       expect(health.ok === true && health.value.queryStatus).toBe("ready");
-      expect(health.ok === true && health.value.schemaVersion).toBe(4);
+      expect(health.ok === true && health.value.schemaVersion).toBe(MODEL_OBSERVABILITY_SCHEMA_VERSION);
     } finally {
       service.close();
     }

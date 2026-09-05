@@ -1,0 +1,179 @@
+/* GitChangesModal — 变更文件列表弹窗（文件行 + 行内展开 diff）
+   弹窗外壳取值惯例对齐 FileHistoryModal.module.css。 */
+
+.modal {
+  background: color-mix(in srgb, var(--bg, #fcfaf5) 94%, white 6%);
+  color: var(--text, #3b3d3f);
+  border: 1px solid var(--overlay-light, rgba(0, 0, 0, 0.08));
+  border-radius: var(--radius-lg, 12px);
+  width: min(720px, 90vw);
+  height: min(600px, 84vh);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: var(--font-ui, system-ui, -apple-system, "Segoe UI", sans-serif);
+  box-shadow: 0 16px 48px var(--shadow, rgba(0, 0, 0, 0.12));
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-16) var(--space-24) var(--space-8);
+  border-bottom: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: var(--fs-title);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  margin: 0;
+}
+
+.closeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: color-mix(in srgb, var(--bg-card, #fff) 72%, transparent);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  cursor: default;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--text-muted, rgba(0, 0, 0, 0.55));
+  transition: all var(--duration-fast) ease;
+}
+
+.closeBtn:hover {
+  color: var(--text, rgba(0, 0, 0, 0.85));
+  border-color: var(--overlay-light, rgba(0, 0, 0, 0.08));
+  background: var(--bg-card, #fff);
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-8) var(--space-16) var(--space-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.empty {
+  padding: var(--space-24);
+  text-align: center;
+  color: var(--text-muted, rgba(0, 0, 0, 0.55));
+  font-size: var(--fs-caption);
+}
+
+.fileBlock {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.fileRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: var(--space-12);
+  width: 100%;
+  min-height: 32px;
+  padding: var(--space-4) var(--space-8);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-input, 6px);
+  cursor: default;
+  color: var(--text, #3b3d3f);
+  font-family: inherit;
+  font-size: var(--fs-caption);
+  text-align: left;
+  transition: background var(--duration-fast) ease;
+}
+
+.fileRow:hover {
+  background: var(--overlay-light, rgba(0, 0, 0, 0.05));
+}
+
+.fileName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fileStats {
+  display: inline-flex;
+  gap: var(--space-8);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.added {
+  color: var(--green, #7BAE7F);
+}
+
+.deleted {
+  color: var(--danger, #8B3A3A);
+}
+
+/* ── 行内展开 diff ── */
+
+.diffPane {
+  margin: 0 var(--space-8) var(--space-8);
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--radius-card, 8px);
+  background: var(--bg-card, #fff);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 340px;
+}
+
+.diff {
+  margin: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.lineSame,
+.lineAdded,
+.lineRemoved,
+.lineHunk {
+  padding: 0 var(--space-12);
+  white-space: pre;
+}
+
+.lineSame {
+  color: var(--text-muted, rgba(0, 0, 0, 0.6));
+}
+
+.lineAdded {
+  background: color-mix(in srgb, var(--green, #7BAE7F) 14%, transparent);
+  color: var(--text, #3b3d3f);
+}
+
+.lineRemoved {
+  background: color-mix(in srgb, var(--danger, #8B3A3A) 12%, transparent);
+  color: var(--text, #3b3d3f);
+}
+
+.lineHunk {
+  color: var(--accent, rgba(0, 0, 0, 0.45));
+  background: var(--overlay-light, rgba(0, 0, 0, 0.04));
+  font-weight: 600;
+}
+
+.diffNote {
+  padding: var(--space-8) var(--space-12);
+  font-size: var(--fs-hint);
+  color: var(--text-muted, rgba(0, 0, 0, 0.55));
+}

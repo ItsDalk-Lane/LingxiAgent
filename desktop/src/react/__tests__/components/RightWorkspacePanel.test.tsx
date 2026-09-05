@@ -53,6 +53,7 @@ vi.mock('../../components/right-workspace/SessionStatusCard', () => ({
 const tMap: Record<string, string> = {
   'rightWorkspace.tabs.sessionFiles': '对话文件',
   'rightWorkspace.tabs.workspace': '工作台',
+  'rightWorkspace.tabs.projectSkills': '项目技能',
   'rightWorkspace.sessionFiles.empty': '本对话还没有产生或上传文件',
   'rightWorkspace.sessionFiles.title': '对话文件',
   'rightWorkspace.sessionFiles.status.expired': '已过期',
@@ -181,10 +182,23 @@ describe('RightWorkspacePanel', () => {
     expect(tabList.closest('.universal-card')).toBe(container.querySelector('.universal-card'));
     expect(within(tabList).getByRole('tab', { name: '对话文件' })).toBeInTheDocument();
     expect(within(tabList).getByRole('tab', { name: '工作台' })).toHaveAttribute('aria-selected', 'true');
+    expect(within(tabList).getByRole('tab', { name: '项目技能' })).toBeInTheDocument();
     expect(container.querySelector('[data-right-workspace-tab-slider]')).toBeInTheDocument();
     expect((tabList as HTMLElement).style.getPropertyValue('--right-workspace-active-tab-index')).toBe('1');
     expect(screen.getByText('hana-work')).toBeInTheDocument();
     expect(screen.queryByText(/工作台 ·/)).not.toBeInTheDocument();
+  });
+
+  it('embeds project skills as the third tab instead of a floating popover', () => {
+    render(<RightWorkspacePanel />);
+
+    fireEvent.click(screen.getByRole('tab', { name: '项目技能' }));
+
+    const tabList = screen.getByRole('tablist', { name: 'rightWorkspace.tabs.label' });
+    expect((tabList as HTMLElement).style.getPropertyValue('--right-workspace-active-tab-index')).toBe('2');
+    expect(screen.getByRole('tab', { name: '项目技能' })).toHaveAttribute('aria-selected', 'true');
+    // 内嵌面板挂载在 tabpanel 内，不再有独立按钮/悬浮入口
+    expect(document.querySelector('[data-desk-cwd-panel]')).toBeInTheDocument();
   });
 
   it('hides desktop-only open-folder controls in the PWA workspace', () => {

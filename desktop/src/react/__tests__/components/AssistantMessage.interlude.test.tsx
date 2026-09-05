@@ -162,6 +162,9 @@ describe('AssistantMessage interlude-only rendering', () => {
 
     expect(screen.getByText('实时正文')).toBeInTheDocument();
     expect(screen.getByText('历史内容')).toBeInTheDocument();
-    expect(renderedMessageIds).toEqual(['assistant-live']);
+    // 隔离性断言：实时块发布只影响所属消息；无关历史消息一次也不得重渲染。
+    // （所属消息自身可能因外部存储一致性检查在同批多渲染一次，不影响隔离语义。）
+    expect(new Set(renderedMessageIds)).toEqual(new Set(['assistant-live']));
+    expect(renderedMessageIds).not.toContain('assistant-history');
   });
 });

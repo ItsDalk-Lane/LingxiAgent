@@ -176,6 +176,11 @@ export type ModelObservabilityPersistenceHandle = {
     updatedAt?: string;
   }): boolean;
   /**
+   * 会话级轨迹复用查找（产品口径 2026-09-05）：该会话最近一次 user_turn
+   * 轨迹 id；同会话后续 turn 复用同一条轨迹记录。无历史/未启用 → null。
+   */
+  findReusableSessionTraceId(sessionId: string | null | undefined): string | null;
+  /**
    * Phase 8（§十四）：接入 Usage Ledger → llm_usage 事件流。幂等（重复调用
    * 先退订旧 consumer）。包含 bounded ledger best-effort backfill（§十五，
    * 只做一次，meta key 标记）。返回 backfill 报告（disabled 时 null）。
@@ -249,6 +254,7 @@ function createDisabledHandle(
     flushSync() { /* disabled：快路径 no-op */ },
     runMaintenance() { return null; },
     upsertSourceIdentitySnapshot() { return false; },
+    findReusableSessionTraceId() { return null; },
     initializeAccounting() { return null; },
     async close() { /* disabled：无资源 */ },
     uninstall() { /* 无安装 */ },
@@ -463,9 +469,34 @@ export function installModelObservabilityPersistence({
 
   /* ── Handler：只 enqueue（§三十五）────────────────────────────────── */
 
+  /**
+   * 会话级轨迹复用内存索引（产品口径 2026-09-05）：logical_call_start 入队
+   * 时同步记录 sessionId → 最近任务轨迹，使 flush 间隔内的快速追问也能命中
+   * 复用（SQL 路径只看已落库行）。口径与 findReusableSessionTraceId 一致：
+   * 只要有 attribution.sessionId 且 traceOrigin 非空（有任务根；singleton
+   * 辅助调用 traceOrigin 缺省）就计入，不限 user_turn——桌面 turn 历史上
+   * 经 pi ingress 落成 origin=unknown。封顶清空：溢出后由后续事件重建。
+   */
+  const MAX_SESSION_TRACE_INDEX = 512;
+  const sessionTraceIndex = new Map<string, string>();
+
+  function noteSessionTraceIndex(event: ModelCallEvent): void {
+    if (event?.eventType !== "logical_call_start") return;
+    const attribution = (event.attribution ?? {}) as Record<string, unknown>;
+    const details = (event.details ?? {}) as Record<string, unknown>;
+    const sessionId = attribution.sessionId;
+    if (typeof sessionId !== "string" || !sessionId) return;
+    if (typeof details.traceOrigin !== "string" || !details.traceOrigin) return;
+    if (typeof event.traceId !== "string" || !event.traceId) return;
+    if (sessionTraceIndex.size >= MAX_SESSION_TRACE_INDEX) sessionTraceIndex.clear();
+    sessionTraceIndex.delete(sessionId);
+    sessionTraceIndex.set(sessionId, event.traceId);
+  }
+
   function handleTraceEvent(event: ModelCallEvent): void {
     if (closed) return;
     try {
+      noteSessionTraceIndex(event);
       if (traceQueue.length >= normalized.limits.maxQueuedTraceEvents) {
         // Trace metadata 是最高优先级通道（§四十一）：trace 队列自身溢出仍显式计数。
         health.droppedTraceEvents += 1;
@@ -885,6 +916,19 @@ export function installModelObservabilityPersistence({
       }
     },
     initializeAccounting,
+    findReusableSessionTraceId(sessionId) {
+      if (closed) return null;
+      const key = typeof sessionId === "string" ? sessionId.trim() : "";
+      if (!key) return null;
+      // 内存索引优先：覆盖尚未 flush 落库的最近一轮。
+      const inMemory = sessionTraceIndex.get(key);
+      if (inMemory) return inMemory;
+      try {
+        return traceStore.findReusableSessionTraceId(key);
+      } catch {
+        return null;
+      }
+    },
     async close() {
       if (closed) return;
       try {

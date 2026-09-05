@@ -18,6 +18,9 @@ import { InteractiveCard } from './InteractiveCard';
 import { SessionCollabDraftCard } from './SessionCollabDraftCard';
 import { useMessageFooterActions } from './MessageActions';
 import { MessageFooterActions, formatMessageTime } from './MessageFooterActions';
+import { TurnUsagePills } from './TurnUsagePills';
+import { turnUsageWindow, turnUsageWindowFromNeighbors } from './turn-usage';
+import { useTurnUsageStats } from './use-turn-usage-stats';
 import { ChatResourceCard } from './ChatResourceCard';
 import { FileResourceIcon, SkillResourceIcon } from './ChatResourceIcons';
 import {
@@ -28,9 +31,10 @@ import {
 import { FileOutputActions } from './FileOutputActions';
 import { KnowledgeRetrievalFold } from './KnowledgeRetrievalFold';
 const lazyScreenshot = () => import('../../utils/screenshot').then(m => m.takeScreenshot);
-import type { ChatMessage, ContentBlock } from '../../stores/chat-types';
+import type { ChatListItem, ChatMessage, ContentBlock } from '../../stores/chat-types';
 import type { KnowledgeRetrievalStats } from '../../../../../shared/knowledge-refs.ts';
 import { useStore } from '../../stores';
+import { sessionScopedValue } from '../../stores/session-slice';
 import { selectSessionFiles } from '../../stores/selectors/file-refs';
 import { sessionIdForPathFromLocatorState } from '../../stores/session-slice';
 import { lingxiFetch } from '../../hooks/use-hana-fetch';
@@ -208,6 +212,23 @@ export const AssistantMessage = memo(function AssistantMessage({
   const canShowNodeActions = !readOnly && showTurnCompletionTime && !!turnTarget && !isStreaming;
   const shouldPersistCompletionTime = showTurnCompletionTime && isLatestAssistantMessage && !isStreaming;
   const timeText = showTurnCompletionTime && !isStreaming ? formatMessageTime(message.timestamp) : null;
+  // 用量/用时胶囊：仅完成轮（completed_*）+ 轮次窗口齐备才查询渲染；无数据整体不渲染。
+  // 投影自带时间戳（流式收尾写入）优先；历史重建的投影不带时间戳，回退用
+  // 「上一条 user 消息时刻 ~ 本条 entry 时刻」邻居窗口。chatSessions 以
+  // sessionScopedKey（sessionId 优先）为键，读取必须走作用域查找，裸 path 键查不到。
+  const chatItems = useStore(useCallback((state: any) => (
+    sessionScopedValue<{ items?: ChatListItem[] }>(state, state.chatSessions, sessionPath)?.items
+  ), [sessionPath]));
+  const usageWindow = useMemo(() => (
+    turnUsageWindow(message.turnProjection)
+    ?? turnUsageWindowFromNeighbors(chatItems ?? [], message.id)
+  ), [chatItems, message.id, message.turnProjection]);
+  const turnUsageStats = useTurnUsageStats({
+    sessionPath,
+    window: usageWindow,
+    enabled: !!usageWindow && !isStreaming,
+  });
+  const statsNode = turnUsageStats ? <TurnUsagePills stats={turnUsageStats} /> : null;
   const standardMessageActions = useMessageFooterActions({
     messageId: message.id,
     selectionIds: assistantTurnSelectionIds,
@@ -261,11 +282,12 @@ export const AssistantMessage = memo(function AssistantMessage({
           </ContentBlockErrorBoundary>
         ))}
       </div>
-      {!isInterludeOnly && (timeText || footerActions.length > 0 || messageActions.length > 0) && (
+      {!isInterludeOnly && (timeText || !!statsNode || footerActions.length > 0 || messageActions.length > 0) && (
         <MessageFooterActions
           align="left"
           timeText={timeText}
           timePersistent={shouldPersistCompletionTime}
+          statsNode={statsNode}
           leadingActions={footerActions}
           actions={messageActions}
           testId="assistant-completion-actions"

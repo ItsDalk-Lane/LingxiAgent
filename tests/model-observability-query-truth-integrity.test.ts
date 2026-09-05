@@ -63,7 +63,7 @@ describe("Model Observatory Phase 10.1 Query Truth Integrity", () => {
       },
       now: () => options.at ?? BASE,
     });
-    recorder.beginLogicalCall({});
+    recorder.beginLogicalCall({ details: { traceOrigin: "user_turn" } });
     const attemptId = recorder.beginAttempt({});
     if (options.status === "error") {
       recorder.attemptError(new Error("truth-test-error"));

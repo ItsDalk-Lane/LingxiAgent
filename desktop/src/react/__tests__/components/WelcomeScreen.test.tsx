@@ -23,6 +23,8 @@ vi.mock('../../utils/ui-helpers', () => ({
 
 const translations: Record<string, string | string[] | Record<string, { avatar: string }>> = {
   'input.workspace': '工作台：',
+  'workspace.disposal.archivedToast': '工作台已移除，{count} 条对话已归档',
+  'input.selectWorkspace': '选择工作台',
   'input.project': '项目：',
   'input.currentWorkspace': '本次工作台',
   'input.cwdProject': '工作台项目：{name}',
@@ -289,7 +291,10 @@ describe('WelcomeScreen workspace picker', () => {
     fireEvent.click(screen.getByRole('button', { name: /Mio/ }));
 
     expect(useStore.getState().selectedAgentId).toBe('mio');
-    expect(useStore.getState().selectedFolder).toBe('/workspace/Mio');
+    // Agent 主目录 = 默认工作台（mount "default"）的解析根，统一走 mount 形态：
+    // 本地路径形态会让同一目录的会话分裂成 cwd/mount 两本账（左栏不聚合）。
+    expect(useStore.getState().selectedWorkspaceMountId).toBe('default');
+    expect(useStore.getState().selectedFolder).toBeNull();
     expect(useStore.getState().workspaceFolders).toEqual([]);
     expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/models/set', expect.objectContaining({
       method: 'POST',
@@ -328,7 +333,9 @@ describe('WelcomeScreen workspace picker', () => {
     fireEvent.click(screen.getByRole('button', { name: /Mio/ }));
 
     expect(useStore.getState().selectedAgentId).toBe('mio');
-    expect(useStore.getState().selectedFolder).toBe('/home/test/Desktop/OH-WorkSpace');
+    // effectiveHomeFolder 兜底仍决定「要不要切工作台」；进入形态统一为默认工作台 mount。
+    expect(useStore.getState().selectedWorkspaceMountId).toBe('default');
+    expect(useStore.getState().selectedFolder).toBeNull();
   });
 
   it('does not reload the visible workspace when two agents resolve to the same folder', async () => {
@@ -367,5 +374,246 @@ describe('WelcomeScreen workspace picker', () => {
     expect(useStore.getState().selectedAgentId).toBe('mio');
     expect(useStore.getState().selectedFolder).toBe('/home/test/Desktop/OH-WorkSpace');
     expect(activateSpy).not.toHaveBeenCalled();
+  });
+
+  it('routes an agent home folder picked from history through the default workspace mount instead of a local path', async () => {
+    useStore.setState({
+      agents: [
+        {
+          id: 'hana',
+          name: 'Hanako',
+          yuan: 'lingxi',
+          isPrimary: true,
+          homeFolder: '/workspace/Desktop/project-hana',
+          effectiveHomeFolder: '/workspace/Desktop/project-hana',
+        },
+      ],
+      currentAgentId: 'hana',
+      selectedAgentId: null,
+      selectedFolder: null,
+      selectedWorkspaceMountId: null,
+      cwdHistory: ['/workspace/Desktop/project-hana'],
+    } as never);
+    const { WelcomeScreen } = await import('../../components/WelcomeScreen');
+
+    render(<WelcomeScreen />);
+    fireEvent.click(screen.getByRole('button', { name: /选择工作台/ }));
+    fireEvent.click(screen.getByText('project-hana'));
+
+    // 入口归一：Agent 主目录（= 默认工作台解析根）以 mount 形态进入草稿，
+    // 之后创建的会话带 workspaceMountId="default"，与经切换器创建的会话同属一本账。
+    await waitFor(() => {
+      expect(useStore.getState().selectedWorkspaceMountId).toBe('default');
+    });
+    expect(useStore.getState().selectedFolder).toBeNull();
+    expect(useStore.getState().selectedAgentId).toBeNull();
+  });
+
+  it('hides the default workspace row from the picker while keeping it in the store list', async () => {
+    mocks.lingxiFetch.mockImplementation(async (path: string) => {
+      if (path === '/api/studio/workspaces') {
+        return new Response(JSON.stringify({
+          workspaces: [
+            { workspaceId: 'default', mountId: 'default', label: 'Default', isDefault: true, nativeRootPath: '/Users/test/Desktop/Project/lingxidev' },
+            { workspaceId: 'local_fs_b', mountId: 'local_fs_b', label: '工作台B', nativeRootPath: '/Users/test/Desktop/B' },
+          ],
+        }), { status: 200 });
+      }
+      if (path.startsWith('/api/preferences/workspace-ui-state')) {
+        return new Response(JSON.stringify({ state: null }), { status: 200 });
+      }
+      return new Response(JSON.stringify({ ok: true }), { status: 200 });
+    });
+    const { WelcomeScreen } = await import('../../components/WelcomeScreen');
+
+    render(<WelcomeScreen />);
+    await waitFor(() => expect(useStore.getState().studioWorkspaces).toHaveLength(2));
+    fireEvent.click(screen.getByRole('button', { name: /工作台：/ }));
+
+    // UI 不单列 Default（同一目录经历史/主目录条目进入）；store 列表保留该条目
+    expect(screen.queryByText('Default')).toBeNull();
+    expect(screen.getByText('工作台B')).toBeTruthy();
+    expect(useStore.getState().studioWorkspaces.map((workspace) => workspace.mountId))
+      .toEqual(['default', 'local_fs_b']);
+  });
+
+  it('shows the folder basename in the indicator line for a Windows backslash path', async () => {
+    useStore.setState({
+      selectedFolder: 'C:\\Users\\lts_D\\Desktop\\Project\\Lingxi',
+      selectedWorkspaceMountId: null,
+      selectedWorkspaceLabel: null,
+    } as never);
+    const { WelcomeScreen } = await import('../../components/WelcomeScreen');
+
+    render(<WelcomeScreen />);
+
+    expect(screen.getByRole('button', { name: /工作台：Lingxi/ })).toBeTruthy();
+    expect(screen.queryByText(/C:\\Users/)).toBeNull();
+  });
+
+  it('dedupes a cwd-history entry that resolves to a visible mount root instead of rendering it twice', async () => {
+    mocks.lingxiFetch.mockImplementation(async (path: string) => {
+      if (path === '/api/studio/workspaces') {
+        return new Response(JSON.stringify({
+          workspaces: [
+            { workspaceId: 'default', mountId: 'default', label: 'Default', isDefault: true, nativeRootPath: 'C:\\Users\\lts_D\\Desktop\\LingxiHome' },
+            { workspaceId: 'local_fs_nest', mountId: 'local_fs_nest', label: 'nest-drama', nativeRootPath: 'C:\\Users\\lts_D\\Desktop\\Project\\nest-drama' },
+          ],
+        }), { status: 200 });
+      }
+      return new Response(JSON.stringify({ ok: true }), { status: 200 });
+    });
+    useStore.setState({
+      selectedFolder: null,
+      selectedWorkspaceMountId: null,
+      selectedWorkspaceLabel: null,
+      homeFolder: 'C:\\Users\\lts_D\\Desktop\\LingxiHome',
+      cwdHistory: ['C:\\Users\\lts_D\\Desktop\\Project\\nest-drama'],
+    } as never);
+    const { WelcomeScreen } = await import('../../components/WelcomeScreen');
+
+    render(<WelcomeScreen />);
+    await waitFor(() => expect(useStore.getState().studioWorkspaces).toHaveLength(2));
+    fireEvent.click(screen.getByRole('button', { name: /选择工作台/ }));
+
+    // 同目录的挂载行与历史行合并为一条挂载行；Agent 主目录条目只与（隐藏的）默认挂载
+    // 同根，不受跨源去重影响——它是默认工作台的入口。
+    expect(screen.queryAllByText('nest-drama')).toHaveLength(1);
+    expect(screen.getByText('LingxiHome')).toBeTruthy();
+  });
+
+  it('shows folder basenames for Windows backslash paths in the extra folders list', async () => {
+    useStore.setState({ workspaceFolders: ['D:\\Assets\\Reference'] } as never);
+    const { WelcomeScreen } = await import('../../components/WelcomeScreen');
+
+    render(<WelcomeScreen />);
+    fireEvent.click(screen.getByRole('button', { name: /工作台：Desktop/ }));
+
+    expect(screen.getByText('Reference')).toBeTruthy();
+    expect(screen.queryByText('D:\\Assets\\Reference')).toBeNull();
+  });
+});
+
+describe('workspace removal disposal dialog', () => {
+  const B_MOUNT = { mountId: 'local_fs_b', label: '工作台B', nativeRootPath: '/workspace/B' };
+
+  afterEach(() => cleanup());
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    const t = vi.fn((key: string, vars?: Record<string, string | number>) => {
+      const template = translations[key] ?? key;
+      return typeof template === 'string'
+        ? template.replace(/\{(\w+)\}/g, (_match, name) => String(vars?.[name] ?? `{${name}}`))
+        : template;
+    });
+    vi.stubGlobal('t', t);
+    window.t = t as typeof window.t;
+    window.platform = { selectFolder: vi.fn() } as unknown as typeof window.platform;
+    useStore.setState({
+      welcomeVisible: true,
+      agents: [],
+      agentName: 'Hanako',
+      agentAvatarUrl: null,
+      agentYuan: 'lingxi',
+      currentAgentId: 'hana',
+      selectedAgentId: null,
+      memoryEnabled: true,
+      selectedFolder: '/workspace/Desktop',
+      selectedWorkspaceMountId: null,
+      selectedWorkspaceLabel: null,
+      deskWorkspaceMountId: null,
+      deskWorkspaceLabel: null,
+      deskBasePath: '',
+      studioWorkspaces: [],
+      defaultWorkspaceRootPath: null,
+      homeFolder: '/workspace/Desktop/project-hana',
+      cwdHistory: ['/workspace/Desktop/project-hana'],
+      workspaceFolders: ['/workspace/Reference'],
+      serverPort: 62950,
+      serverToken: 'test-token',
+      pendingProjectId: null,
+      sessionProjectCatalog: { folders: [], projects: [] },
+      sessionProjectCatalogLoaded: true,
+      locale: 'zh',
+      sessions: [],
+    } as never);
+  });
+
+  function disposeSetup(sessions: unknown[]) {
+    useStore.setState({
+      studioWorkspaces: [
+        { mountId: 'default', label: 'Default', isDefault: true, nativeRootPath: '/Users/test/Desktop/OH-WorkSpace' },
+        B_MOUNT,
+      ],
+      sessions,
+      selectedFolder: '/workspace/Desktop',
+      selectedWorkspaceMountId: null,
+    } as never);
+  }
+
+  it('archives the workspace sessions directly on removal (no dialog, user ruling)', async () => {
+    disposeSetup([
+      { path: '/s/mount-b.jsonl', sessionId: 's1', workspaceMountId: 'local_fs_b', cwd: '/workspace/B' },
+      { path: '/s/cwd-b.jsonl', sessionId: 's2', workspaceMountId: null, cwd: '/workspace/B' },
+      { path: '/s/other.jsonl', sessionId: 's3', workspaceMountId: 'mount_x', cwd: '/elsewhere' },
+    ]);
+    mocks.lingxiFetch.mockImplementation(async (path: string, opts?: RequestInit) => {
+      if (path === '/api/sessions/workspace-disposal') {
+        return new Response(JSON.stringify({ ok: true, matched: 2, disposed: 2, skippedStreaming: 0 }), { status: 200 });
+      }
+      if (path === '/api/studio/workspaces/local_fs_b' && opts?.method === 'DELETE') {
+        return new Response(JSON.stringify({ ok: true }), { status: 200 });
+      }
+      if (path === '/api/studio/workspaces') {
+        return new Response(JSON.stringify({ workspaces: [{ mountId: 'default', label: 'Default', isDefault: true }] }), { status: 200 });
+      }
+      if (path === '/api/sessions') return new Response(JSON.stringify([]), { status: 200 });
+      if (path === '/api/health') return new Response(JSON.stringify({ ok: true }), { status: 200 });
+      return new Response(JSON.stringify({ ok: true }), { status: 200 });
+    });
+
+    const { WelcomeScreen } = await import('../../components/WelcomeScreen');
+    render(<WelcomeScreen />);
+    fireEvent.click(screen.getByRole('button', { name: /工作台：Desktop/ }));
+    fireEvent.click(screen.getByRole('button', { name: '移除工作台' }));
+
+    // 用户裁决：移除=直接归档,不弹任何对话框
+    await waitFor(() => {
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/sessions/workspace-disposal', expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ workspaceMountId: 'local_fs_b', cwd: '/workspace/B', action: 'archive' }),
+      }));
+    });
+    await waitFor(() => {
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/studio/workspaces/local_fs_b', expect.objectContaining({ method: 'DELETE' }));
+    });
+    expect(screen.queryByText(/条对话记录/)).toBeNull();
+  });
+
+  it('removes directly without archiving when the workspace has no sessions', async () => {
+    disposeSetup([]);
+    let disposalCalled = false;
+    mocks.lingxiFetch.mockImplementation(async (path: string, opts?: RequestInit) => {
+      if (path === '/api/sessions/workspace-disposal') disposalCalled = true;
+      if (path === '/api/studio/workspaces/local_fs_b' && opts?.method === 'DELETE') {
+        return new Response(JSON.stringify({ ok: true }), { status: 200 });
+      }
+      if (path === '/api/studio/workspaces') {
+        return new Response(JSON.stringify({ workspaces: [{ mountId: 'default', label: 'Default', isDefault: true }] }), { status: 200 });
+      }
+      return new Response(JSON.stringify({ ok: true }), { status: 200 });
+    });
+
+    const { WelcomeScreen } = await import('../../components/WelcomeScreen');
+    render(<WelcomeScreen />);
+    fireEvent.click(screen.getByRole('button', { name: /工作台：Desktop/ }));
+    fireEvent.click(screen.getByRole('button', { name: '移除工作台' }));
+
+    await waitFor(() => {
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/studio/workspaces/local_fs_b', expect.objectContaining({ method: 'DELETE' }));
+    });
+    expect(disposalCalled).toBe(false);
+    expect(screen.queryByText(/条对话记录/)).toBeNull();
   });
 });

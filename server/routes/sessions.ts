@@ -61,7 +61,8 @@ import {
 import { SessionManager } from "../../lib/pi-sdk/index.ts";
 import { TODO_STATE_CUSTOM_TYPE } from "../../lib/tools/todo-constants.ts";
 import { LOOP_TURN_MESSAGE_TYPE, LOOP_NOTICE_MESSAGE_TYPE, buildLoopInterludeBlock } from "../../lib/loop/loop-messages.ts";
-import { mergeWorkspaceHistory } from "../../shared/workspace-history.ts";
+import { mergeWorkspaceHistory, normalizeWorkspacePath } from "../../shared/workspace-history.ts";
+import { listStudioMountsForStudio } from "../../core/studio-mounts.ts";
 import { sanitizeBridgeVisibleText } from "../../shared/bridge-visible-text.ts";
 import {
   deleteSessionFileSidecarSync,
@@ -610,6 +611,66 @@ export function createSessionsRoute(engine, hub = null) {
 
   function activePathForArchivedSession(sessionPath) {
     return path.join(path.dirname(path.dirname(sessionPath)), path.basename(sessionPath));
+  }
+
+  /**
+   * 单条「归档 transition」核心序列（锁内）：单条归档路由、工作台批量处置
+   * （workspace-disposal）与孤儿清扫（sweep-orphaned-workspaces）共用。
+   * 返回 { destPath, sessionId }；失败抛 routeError（状态码与原单条路由一致）。
+   */
+  async function archiveActiveSessionCore(engine, sessionPath, sessionId = null) {
+    const destPath = archivedPathForActiveSession(sessionPath);
+    return await withSessionLifecycleLock([sessionPath, destPath], async () => {
+      const archiveDir = path.dirname(destPath);
+      try {
+        await fs.access(sessionPath);
+      } catch {
+        throw routeError(t("error.sessionNotFound"), "session_not_found", 404);
+      }
+      if (await pathExists(destPath)) {
+        throw routeError("Archived path already exists", "archived_path_exists", 409);
+      }
+      if (await pathExists(sessionFileSidecarPath(destPath))) {
+        throw routeError("Stage file sidecar destination already exists", "stage_sidecar_exists", 409);
+      }
+      await cleanupSessionLifecycle([sessionPath, destPath], "parent session archived", { skipMemory: true });
+
+      await engine.setSessionPinned({
+        ...(sessionId ? { sessionId } : {}),
+        sessionPath,
+      }, false);
+      await engine.closeSession(sessionPath);
+
+      await fs.mkdir(archiveDir, { recursive: true });
+      const manifest = await moveSessionLifecycleOrThrow({
+        fromPath: sessionPath,
+        toPath: destPath,
+        lifecycle: "archived",
+        reason: "session_archive",
+      });
+      try {
+        await fs.rename(sessionPath, destPath);
+        moveSessionFileSidecarSync(sessionPath, destPath);
+      } catch (err) {
+        try {
+          await moveSessionLifecycleOrThrow({
+            fromPath: destPath,
+            toPath: sessionPath,
+            lifecycle: "active",
+            reason: "session_archive_rollback",
+          });
+        } catch (rollbackErr) {
+          lifecycleLog.error(`archive manifest rollback failed for ${sessionPath}: ${rollbackErr.message}`);
+        }
+        throw err;
+      }
+
+      // 将 mtime 置为归档瞬间，使 cleanup 按"归档时间"而非"最后活动时间"判断
+      const nowSec = Date.now() / 1000;
+      await fs.utimes(destPath, nowSec, nowSec);
+
+      return { destPath, sessionId: manifest.sessionId || sessionId || null };
+    });
   }
 
   function lifecycleLockKeyForPaths(paths) {
@@ -2799,62 +2860,153 @@ export function createSessionsRoute(engine, hub = null) {
       if (!isActiveDesktopSessionPath(sessionPath, engine.agentsDir)) {
         return c.json({ error: "Invalid session path" }, 403);
       }
+      const archivedPath = await archiveActiveSessionCore(engine, sessionPath, sessionId);
+      return c.json({ ok: true, sessionId: archivedPath.sessionId, archivedPath: archivedPath.destPath });
+    } catch (err) {
+      return c.json(bodyFromRouteError(err), statusFromRouteError(err));
+    }
+  });
 
-      // 从 session 路径推导归档目录（同 agent 的 sessions/archived/）
-      const destPath = archivedPathForActiveSession(sessionPath);
-      return await withSessionLifecycleLock([sessionPath, destPath], async () => {
-        const archiveDir = path.dirname(destPath);
-        // 确认文件存在
-        try {
-          await fs.access(sessionPath);
-        } catch {
-          return c.json({ error: t("error.sessionNotFound") }, 404);
-        }
-        if (await pathExists(destPath)) {
-          return c.json({ error: "Archived path already exists" }, 409);
-        }
-        if (await pathExists(sessionFileSidecarPath(destPath))) {
-          return c.json({ error: "Stage file sidecar destination already exists" }, 409);
-        }
-        await cleanupSessionLifecycle([sessionPath, destPath], "parent session archived", { skipMemory: true });
-
-        // 再从 engine 的 session map 中移除。
-        await engine.setSessionPinned({
-          ...(sessionId ? { sessionId } : {}),
-          sessionPath,
-        }, false);
-        await engine.closeSession(sessionPath);
-
-        await fs.mkdir(archiveDir, { recursive: true });
-        const manifest = await moveSessionLifecycleOrThrow({
-          fromPath: sessionPath,
-          toPath: destPath,
-          lifecycle: "archived",
-          reason: "session_archive",
-        });
-        try {
-          await fs.rename(sessionPath, destPath);
-          moveSessionFileSidecarSync(sessionPath, destPath);
-        } catch (err) {
-          try {
-            await moveSessionLifecycleOrThrow({
-              fromPath: destPath,
-              toPath: sessionPath,
-              lifecycle: "active",
-              reason: "session_archive_rollback",
-            });
-          } catch (rollbackErr) {
-            lifecycleLog.error(`archive manifest rollback failed for ${sessionPath}: ${rollbackErr.message}`);
-          }
-          throw err;
-        }
-
-        // 将 mtime 置为归档瞬间，使 cleanup 按"归档时间"而非"最后活动时间"判断
-        const nowSec = Date.now() / 1000;
-        await fs.utimes(destPath, nowSec, nowSec);
-
-        return c.json({ ok: true, sessionId: manifest.sessionId || sessionId || null, archivedPath: destPath });
+  // 工作台处置：移除工作台前，把它名下的全部会话归档或永久删除。
+  // 身份口径与左栏作用域一致：mount 严格匹配 + 目录路径双形态（经挂载创建的带
+  // workspaceMountId；历史 cwd 形态的老会话按 native 根路径并入），不漏任何一本账。
+  route.post("/sessions/workspace-disposal", async (c) => {
+    try {
+      const requestContext = createRequestContext(c, engine);
+      const auth = authorizeSessionRoute(requestContext, "sessions.write", {
+        kind: "studio",
+        studioId: requestContext.studioId,
       });
+      if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
+
+      const body = await safeJson(c);
+      const action = body?.action === "delete" ? "delete" : "archive";
+      const mountId = typeof body?.workspaceMountId === "string" && body.workspaceMountId.trim()
+        ? body.workspaceMountId.trim()
+        : null;
+      const cwdIdentity = typeof body?.cwd === "string" && body.cwd.trim()
+        ? normalizeWorkspacePath(body.cwd.trim())
+        : null;
+      if (!mountId && !cwdIdentity) {
+        return c.json({ error: "missing workspace identity", code: "missing_workspace_identity" }, 400);
+      }
+      // mount 身份：解析出 native 根路径用于 cwd 双形态匹配（此时工作台尚未移除，可解析）。
+      let mountRootPath = cwdIdentity;
+      if (mountId) {
+        try {
+          const selection = resolveSessionWorkspaceSelection(engine, requestContext, { workspaceMountId: mountId });
+          mountRootPath = normalizeWorkspacePath(selection.cwd) || cwdIdentity;
+        } catch (err) {
+          return c.json(bodyFromRouteError(err), statusFromRouteError(err));
+        }
+      }
+
+      const sessions = Array.isArray(await engine.listSessions()) ? await engine.listSessions() : [];
+      const mountRootNormalized = mountRootPath ? normalizeWorkspacePath(mountRootPath) : null;
+      const targets = sessions.filter((s) => {
+        const sessionMountId = typeof s?.workspaceMountId === "string" ? s.workspaceMountId.trim() : "";
+        if (mountId && sessionMountId) return sessionMountId === mountId;
+        if (mountRootNormalized && typeof s?.cwd === "string" && s.cwd.trim()) {
+          const sessionCwd = normalizeWorkspacePath(s.cwd);
+          return !!sessionCwd && sessionCwd === mountRootNormalized;
+        }
+        return false;
+      });
+
+      let disposed = 0;
+      let skippedStreaming = 0;
+      const errors: Array<{ path: string; message: string }> = [];
+      for (const target of targets) {
+        if (engine.isSessionStreaming?.(target.path)) {
+          skippedStreaming += 1;
+          continue;
+        }
+        try {
+          const { destPath: archivedPath } = await archiveActiveSessionCore(engine, target.path, target.sessionId || null);
+          if (action === "delete") {
+            const activeKey = activePathForArchivedSession(archivedPath);
+            await withSessionLifecycleLock([activeKey, archivedPath], async () => {
+              await cleanupSessionLifecycle([activeKey, archivedPath], "parent session deleted");
+              const draftSessionId = target.sessionId || engine.getSessionIdForPath?.(activeKey) || null;
+              try {
+                await permanentlyDeleteArchivedFile(archivedPath, "archived_session_deleted");
+              } catch (err) {
+                if (err?.code === "ENOENT") throw routeError("session not found", "session_not_found", 404);
+                throw err;
+              }
+              if (draftSessionId) {
+                try { engine.deleteSessionInputDrafts?.(draftSessionId); } catch { /* 草稿清理失败不阻塞删除 */ }
+              }
+              try { await engine.clearSessionTitle(activeKey); } catch {}
+            });
+          }
+          disposed += 1;
+        } catch (err) {
+          errors.push({ path: target.path, message: err?.message || String(err) });
+        }
+      }
+      return c.json({
+        ok: true,
+        action,
+        matched: targets.length,
+        disposed,
+        skippedStreaming,
+        errors,
+      });
+    } catch (err) {
+      return c.json(bodyFromRouteError(err), statusFromRouteError(err));
+    }
+  });
+
+  // 孤儿会话清扫：所属工作台已不存在（mount 被移除 / 磁盘目录被直接删除）的会话
+  // 静默自动归档——不弹框（用户裁决：归档界面按工作台分组后可见、可整组处理）。
+  // 边界：目录仍在磁盘上但未被引用的 cwd 会话不清扫（换配置目录的残留可经重新
+  // 打开该目录找回，不算暗数据）。
+  route.post("/sessions/sweep-orphaned-workspaces", async (c) => {
+    try {
+      const requestContext = createRequestContext(c, engine);
+      const auth = authorizeSessionRoute(requestContext, "sessions.write", {
+        kind: "studio",
+        studioId: requestContext.studioId,
+      });
+      if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
+
+      const studioId = requestContext?.studioId || engine.getRuntimeContext?.()?.studioId || null;
+      const activeMountIds = new Set(["default"]);
+      try {
+        for (const mount of listStudioMountsForStudio(engine.lingxiHome, studioId)) {
+          if (mount.status === "active" && mount.mountId) activeMountIds.add(mount.mountId);
+        }
+      } catch { /* mount 列表读取失败按仅 default 处理，宁可不清扫也不误归档 */ }
+
+      const sessions = Array.isArray(await engine.listSessions()) ? await engine.listSessions() : [];
+      const orphans = [];
+      for (const s of sessions) {
+        const sessionMountId = typeof s?.workspaceMountId === "string" ? s.workspaceMountId.trim() : "";
+        if (sessionMountId) {
+          if (!activeMountIds.has(sessionMountId)) orphans.push(s);
+          continue;
+        }
+        const cwd = typeof s?.cwd === "string" ? s.cwd.trim() : "";
+        if (cwd && !(await pathExists(cwd))) orphans.push(s);
+      }
+
+      let archived = 0;
+      let skippedStreaming = 0;
+      const errors: Array<{ path: string; message: string }> = [];
+      for (const target of orphans) {
+        if (engine.isSessionStreaming?.(target.path)) {
+          skippedStreaming += 1;
+          continue;
+        }
+        try {
+          await archiveActiveSessionCore(engine, target.path, target.sessionId || null);
+          archived += 1;
+        } catch (err) {
+          errors.push({ path: target.path, message: err?.message || String(err) });
+        }
+      }
+      return c.json({ ok: true, scanned: sessions.length, archived, skippedStreaming, errors });
     } catch (err) {
       return c.json(bodyFromRouteError(err), statusFromRouteError(err));
     }

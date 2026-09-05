@@ -63,6 +63,8 @@ const PRE_REFACTOR_MOUNT_CALLS = Object.freeze([
   // 工作区文件历史的查询与还原面（挂载点 open-root，与 resource-io 同域）
   '"/api" :: createFileHistoryRoute',
   '"/api" :: createFsRoute',
+  // Added after the split: 环境信息卡的 git 面（挂载点 full-root，与 desk 同域）。
+  '"/api" :: createGitEnvironmentRoute',
   '"/api" :: createInputDraftsRoute',
   // Added after the split: the Notebook-first Knowledge owner surface.
   '"/api" :: createKnowledgeRoute',

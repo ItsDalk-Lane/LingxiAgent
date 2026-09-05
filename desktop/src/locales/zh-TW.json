@@ -235,7 +235,8 @@
       "allTab": "全部技能",
       "agentTabs": "按助手查看技能",
       "previousAgent": "上一個助手",
-      "nextAgent": "下一個助手"
+      "nextAgent": "下一個助手",
+      "externalRemove": "移除（改為未啟用）"
     }
   },
   "sidebar": {
@@ -287,7 +288,8 @@
       "showMore": "展開顯示",
       "loading": "正在載入項目…",
       "empty": "還沒有項目"
-    }
+    },
+    "archivedChats": "歸檔記錄"
   },
   "titlebar": {
     "currentChatTitle": "目前對話標題",
@@ -340,6 +342,12 @@
       "restoreConfirm": "將此對話還原至原位置？",
       "restoreConflict": "原位置已被佔用，無法還原",
       "restoreFailed": "還原失敗",
+      "restoreSelected": "還原所選（{count}）",
+      "restoreSelectedConfirm": "將選中的 {count} 條封存還原到對話列表？",
+      "restoreSelectedDone": "已還原 {count} 條封存",
+      "restoreSelectedPartial": "部分還原成功：{restored}/{total}",
+      "restoreGroup": "整組還原",
+      "restoreGroupConfirm": "將「{name}」分組的全部 {count} 條封存還原到對話列表？",
       "deleteForever": "永久刪除",
       "deleteConfirm": "永久刪除此封存？此操作無法復原。",
       "deleteFailed": "刪除失敗",
@@ -348,7 +356,15 @@
       "deleteSelectedConfirm": "將永久刪除選中的 {count} 條封存（共 {size}），無法復原。繼續？",
       "deleteSelectedDone": "已刪除 {count} 條封存",
       "deleteSelectedPartial": "部分刪除成功：{deleted}/{total}",
-      "daysAgo": "封存於 {days} 天前"
+      "daysAgo": "封存於 {days} 天前",
+      "deleteGroup": "刪除整組",
+      "deleteGroupConfirm": "確定永久刪除「{name}」分組的全部 {count} 條歸檔記錄（{size}）？此操作不可復原。",
+      "deleteGroupDone": "已永久刪除 {count} 條歸檔記錄",
+      "group": {
+        "ungrouped": "未歸屬",
+        "workspaceRemoved": "該工作目錄已移除",
+        "meta": "{count} 條 · {size}"
+      }
     },
     "rcTakingOver": "{platform} 接管中",
     "subagentRunStateUnrecoverable": "歷史 subagent 執行狀態不可恢復",
@@ -1826,9 +1842,6 @@
       "networkProxyWss": "WSS proxy，可留空",
       "networkProxyNoProxy": "不走代理，例如 localhost, 127.0.0.1, ::1",
       "networkProxySave": "儲存代理設定",
-      "archivedChats": "歸檔對話",
-      "archivedChatsDesc": "查看已歸檔的聊天，還原需要繼續的對話，或永久刪除不再需要的紀錄",
-      "viewArchivedChats": "查看歸檔對話",
       "fileBackup": "檔案備份",
       "fileBackupDesc": "AI 修改或刪除檔案前自動儲存原始內容",
       "retention": "保留時間",
@@ -2308,7 +2321,7 @@
       "automationPermissionMode": "自動化執行權限",
       "automationPermissionModeDesc": "決定背景自動化 Agent Run 是自動審核工具呼叫、完整執行，還是只讀取資訊；自動審核不通過時會拒絕操作",
       "homeFolder": "工作台",
-      "homeFolderDesc": "新建對話預設使用的工作目錄，巡檢和定時任務也在這裡執行",
+      "homeFolderDesc": "新建對話跟隨當前開啟的工作台；未開啟其他工作台時預設使用此目錄，巡檢和定時任務也在這裡執行",
       "homeFolderPlaceholder": "未設定（每次手動選擇）",
       "homeFolderClear": "清除",
       "homeFolderBrowse": "選擇資料夾",
@@ -3552,6 +3565,7 @@
           "outputTokensUnavailable": "輸出 token 數不可用",
           "durationTooShort": "時長過短",
           "started": "開始",
+          "responseArrival": "回應到達",
           "totalDuration": "總時長",
           "generation": "生成",
           "throughput": "吞吐",
@@ -3613,7 +3627,7 @@
             "notRecorded": "未記錄",
             "stepStartUnavailable": "步驟開始時間不可用",
             "pending": "進行中",
-            "firstTokenUnavailable": "首 token 時間不可用",
+            "responseArrivalUnavailable": "回應到達時間不可用",
             "observability": "觀測庫計時",
             "observabilityRunning": "觀測庫計時（進行中）",
             "session": "會話時間戳"
@@ -3925,7 +3939,8 @@
     "tabs": {
       "label": "右側工作台",
       "sessionFiles": "對話檔案",
-      "workspace": "工作台"
+      "workspace": "工作台",
+      "projectSkills": "專案技能"
     },
     "sessionFiles": {
       "title": "對話檔案",
@@ -3968,6 +3983,52 @@
     "expand": "展開執行資訊",
     "collapse": "收起執行資訊",
     "running": "{n} 項進行中"
+  },
+  "gitEnv": {
+    "title": "環境資訊",
+    "changes": "變更",
+    "local": "本地",
+    "branch": "分支",
+    "commitOrPush": "提交或推送",
+    "notGitRepo": "非 Git 儲存庫",
+    "loadFailed": "讀取失敗，點擊重試",
+    "mainWorktree": "本地主工作樹",
+    "linkedWorktreeShort": "分支工作樹",
+    "linkedWorktree": "分支的新工作樹：{name}",
+    "detachedHead": "分離頭指標（{name}）",
+    "checkedOutElsewhere": "此分支已在其他工作樹檢出",
+    "noBranches": "沒有本地分支",
+    "switchDone": "已切換到 {name}",
+    "switchFailed": "切換分支失敗",
+    "branchesTitle": "切換分支",
+    "changesTitle": "變更檔案",
+    "noChanges": "暫無變更",
+    "diffBinary": "二進位檔案，不支援檢視 diff",
+    "diffUnavailable": "無法讀取 diff",
+    "diffTruncated": "內容過長，已截斷顯示",
+    "history": "提交記錄",
+    "noCommits": "暫無提交",
+    "copyHash": "複製提交 ID",
+    "copied": "已複製提交 ID",
+    "timeJustNow": "剛剛",
+    "timeMinutesAgo": "{n} 分鐘前",
+    "timeHoursAgo": "{n} 小時前",
+    "timeDaysAgo": "{n} 天前",
+    "commitTitle": "提交或推送",
+    "commitMessagePlaceholder": "提交訊息（留空將自動生成）",
+    "includeUnstaged": "包含未暫存的變更",
+    "btnCommit": "提交",
+    "btnCommitPush": "提交並推送",
+    "btnPush": "推送",
+    "nothingToCommit": "沒有可提交的變更",
+    "nothingStaged": "沒有已暫存的變更（請勾選「包含未暫存的變更」）",
+    "nothingToPush": "沒有可推送的提交",
+    "noRemote": "未設定遠端儲存庫",
+    "aiGenerating": "正在產生提交訊息…",
+    "aiFailed": "提交訊息產生失敗",
+    "commitDone": "提交完成",
+    "pushDone": "推送完成",
+    "operationFailed": "操作失敗"
   },
   "desk": {
     "title": "書桌",
@@ -4931,5 +4992,15 @@
     "sendFailed": "傳送失敗：{error}",
     "rejectFailed": "忽略失敗：{error}",
     "messageField": "訊息內容"
+  },
+  "workspace": {
+    "disposal": {
+      "failed": "記錄處理失敗，工作台未移除",
+      "archivedToast": "工作台已移除，{count} 條對話已歸檔"
+    },
+    "sweep": {
+      "archivedToast": "已自動歸檔 {count} 條失效工作台的對話記錄，可在歸檔記錄中查看"
+    },
+    "archivedHint": "該工作台有 {count} 條已歸檔記錄，可在左上角歸檔記錄中恢復"
   }
 }

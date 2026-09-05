@@ -1,0 +1,207 @@
+/* GitHistoryModal — 提交历史弹窗（泳道图形 + 提交行 + 哈希徽标）
+   弹窗外壳取值惯例对齐 GitChangesModal.module.css；间距/颜色走 token。 */
+
+.modal {
+    /* 立法：本模块一次性字面量收进定义行（扫描豁免位），使用点一律 var() */
+    --git-lane-line: rgba(90, 118, 139, 0.45);
+    --git-hash-bg: rgba(90, 118, 139, 0.1);
+
+    background: color-mix(in srgb, var(--bg, #fcfaf5) 94%, white 6%);
+    color: var(--text, #3b3d3f);
+    border: 1px solid var(--overlay-light, rgba(0, 0, 0, 0.08));
+    border-radius: var(--radius-lg, 12px);
+    width: min(600px, 92vw);
+    height: min(620px, 86vh);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: var(--font-ui, system-ui, -apple-system, "Segoe UI", sans-serif);
+    box-shadow: 0 16px 48px var(--shadow, rgba(0, 0, 0, 0.12));
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-16) var(--space-24) var(--space-8);
+    border-bottom: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+    flex-shrink: 0;
+}
+
+.title {
+    font-size: var(--fs-title);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    margin: 0;
+}
+
+.closeBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: color-mix(in srgb, var(--bg-card, #fff) 72%, transparent);
+    border: 1px solid transparent;
+    border-radius: 50%;
+    cursor: default;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--text-muted, rgba(0, 0, 0, 0.55));
+    transition: all var(--duration-fast) ease;
+}
+
+.closeBtn:hover {
+    color: var(--text, rgba(0, 0, 0, 0.85));
+    border-color: var(--overlay-light, rgba(0, 0, 0, 0.08));
+    background: var(--bg-card, #fff);
+}
+
+.body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--space-8) var(--space-16) var(--space-16);
+}
+
+.note {
+    padding: var(--space-24);
+    text-align: center;
+    color: var(--text-muted, rgba(0, 0, 0, 0.55));
+    font-size: var(--fs-caption);
+}
+
+.commitRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    padding: var(--space-2) var(--space-8);
+    border-radius: var(--radius-input, 6px);
+    min-height: 46px;
+}
+
+.commitRow:hover {
+    background: var(--overlay-light, rgba(0, 0, 0, 0.05));
+}
+
+.graph {
+    flex-shrink: 0;
+    display: block;
+}
+
+.laneLine {
+    stroke: var(--git-lane-line);
+    stroke-width: 1.5;
+    fill: none;
+}
+
+.node {
+    fill: var(--accent, #4a6b8a);
+}
+
+.nodeHead {
+    fill: var(--danger, #8B3A3A);
+}
+
+.headRing {
+    fill: none;
+    stroke: var(--danger, #8B3A3A);
+    stroke-width: 1.5;
+}
+
+.commitMain {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.subjectLine {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    min-width: 0;
+}
+
+.subject {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--fs-caption);
+    color: var(--text, #3b3d3f);
+}
+
+.chipHead,
+.chipBranch,
+.chipTag,
+.chipRemote {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    height: 16px;
+    padding: 0 var(--space-4);
+    border-radius: 4px;
+    font-size: var(--fs-hint);
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.chipHead {
+    background: color-mix(in srgb, var(--accent, #4a6b8a) 18%, transparent);
+    color: var(--accent, #4a6b8a);
+    font-weight: 600;
+}
+
+.chipBranch {
+    background: color-mix(in srgb, var(--accent, #4a6b8a) 12%, transparent);
+    color: var(--accent, #4a6b8a);
+}
+
+.chipTag {
+    background: color-mix(in srgb, var(--green, #7BAE7F) 16%, transparent);
+    color: var(--green, #7BAE7F);
+}
+
+.chipRemote {
+    background: var(--overlay-light, rgba(0, 0, 0, 0.05));
+    color: var(--text-muted, rgba(0, 0, 0, 0.55));
+}
+
+.meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-size: var(--fs-hint);
+    color: var(--text-muted, rgba(0, 0, 0, 0.55));
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.metaDot {
+    color: var(--text-light, rgba(0, 0, 0, 0.35));
+}
+
+.hashChip {
+    flex-shrink: 0;
+    padding: var(--space-2) var(--space-6);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: var(--git-hash-bg);
+    font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: var(--fs-hint);
+    color: var(--text, #3b3d3f);
+    cursor: default;
+    transition: border-color var(--duration-fast) ease, color var(--duration-fast) ease;
+}
+
+.hashChip:hover {
+    border-color: var(--accent, rgba(0, 0, 0, 0.35));
+}
+
+.hashChipCopied {
+    color: var(--green, #7BAE7F);
+    border-color: color-mix(in srgb, var(--green, #7BAE7F) 45%, transparent);
+}

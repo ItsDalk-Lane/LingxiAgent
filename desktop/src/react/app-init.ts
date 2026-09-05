@@ -10,12 +10,12 @@
 import { useStore } from './stores';
 import { lingxiFetch } from './hooks/use-hana-fetch';
 import { applyAgentIdentity, loadAgents, loadAvatars } from './stores/agent-actions';
-import { loadPendingNewSessionPermissionDefault, loadSessions, pendingNewSessionIdentityPatch, switchSession } from './stores/session-actions';
+import { loadPendingNewSessionPermissionDefault, loadSessions, pendingNewSessionIdentityPatch, sweepOrphanedWorkspaceSessions, switchSession } from './stores/session-actions';
 import { initSessionProjectCatalog } from './stores/session-project-actions';
 import { loadSidebarUiPrefs } from './stores/sidebar-ui-slice';
 import { connectWebSocket, getWebSocket } from './services/websocket';
 import { setStatus, loadModels } from './utils/ui-helpers';
-import { initJian } from './stores/desk-actions';
+import { initJian, loadStudioWorkspaces } from './stores/desk-actions';
 import { initViewerEvents } from './stores/preview-actions';
 import { updateLayout } from './components/SidebarLayout';
 import { initErrorBusBridge } from './errors/error-bus-bridge';
@@ -235,6 +235,15 @@ export async function initApp(): Promise<void> {
       memoryMasterEnabled: readConfigMemoryMasterEnabled(agentConfig),
     });
     useStore.setState({ cwdHistory: readConfigCwdHistory(agentConfig) });
+    // 引导期就拉工作台列表：defaultWorkspaceRootPath（默认工作台双形态合流键）不能再
+    // 依赖 FolderPicker 挂载时的一次性请求——启动首屏的左栏列表就需要它合并
+    // mount 形态与历史 cwd 形态的会话，否则首屏缺一整本账、发出首条消息才补齐。
+    void loadStudioWorkspaces().then(() => sweepOrphanedWorkspaceSessions()).then((archived) => {
+      // 孤儿会话清扫（用户裁决：静默自动归档，不弹框）；归档了东西只做非阻塞提示。
+      if (archived > 0) {
+        useStore.getState().addToast?.(t('workspace.sweep.archivedToast', { count: archived }), 'info', 6000);
+      }
+    }).catch(() => { /* 清扫失败不阻塞启动 */ });
 
     // 6. 加载头像（agent 头像按 bootstrap 给出的 agent 身份请求）
     loadAvatars(healthData.avatars, healthData.agentId);

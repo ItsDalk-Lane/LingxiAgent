@@ -2,7 +2,7 @@
   "desktop/src/react/components/ArchivedSessionsModal.module.css": {
     "bare-spacing": 1,
     "hardcoded-color": 2,
-    "bare-duration": 0
+    "bare-duration": 1
   },
   "desktop/src/react/components/AutoUpdateStatus.module.css": {
     "bare-spacing": 16,
@@ -40,7 +40,7 @@
     "bare-duration": 0
   },
   "desktop/src/react/components/SkillsPanel.module.css": {
-    "bare-spacing": 0,
+    "bare-spacing": 1,
     "hardcoded-color": 3,
     "bare-duration": 0
   },
@@ -84,9 +84,14 @@
     "hardcoded-color": 4,
     "bare-duration": 1
   },
+  "desktop/src/react/components/chat/TurnUsagePills.module.css": {
+    "bare-spacing": 9,
+    "hardcoded-color": 2,
+    "bare-duration": 0
+  },
   "desktop/src/react/components/desk/Desk.module.css": {
-    "bare-spacing": 30,
-    "hardcoded-color": 18,
+    "bare-spacing": 28,
+    "hardcoded-color": 15,
     "bare-duration": 0
   },
   "desktop/src/react/components/floating-input/FloatingInput.module.css": {
@@ -155,8 +160,8 @@
     "bare-duration": 0
   },
   "desktop/src/react/components/right-workspace/RightWorkspacePanel.module.css": {
-    "bare-spacing": 9,
-    "hardcoded-color": 9,
+    "bare-spacing": 18,
+    "hardcoded-color": 10,
     "bare-duration": 6
   },
   "desktop/src/react/components/right-workspace/SessionStatusCard.module.css": {

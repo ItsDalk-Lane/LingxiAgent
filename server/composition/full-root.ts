@@ -20,6 +20,7 @@ import { createCharacterCardsRoute } from "../routes/character-cards.ts";
 import { createCardsRoute } from "../routes/cards.ts";
 import { createDeskRoute } from "../routes/desk.ts";
 import { createDiaryRoute } from "../routes/diary.ts";
+import { createGitEnvironmentRoute } from "../routes/git-environment.ts";
 import { builtinImageGenAdapters } from "../../core/media-adapters/builtin-adapters.ts";
 
 export function registerClosedRoutes(app: Hono, ctx: CompositionContext): void {
@@ -29,6 +30,8 @@ export function registerClosedRoutes(app: Hono, ctx: CompositionContext): void {
   app.route("/api", createCardsRoute(engine));
   app.route("/api", createDeskRoute(engine, hub));
   app.route("/api", createDiaryRoute(engine));
+  // 环境信息卡的 git 面（与 desk 同域：以本地工作台目录为准入单位）
+  app.route("/api", createGitEnvironmentRoute(engine, hub));
 }
 
 export const builtinMediaAdapters = builtinImageGenAdapters;

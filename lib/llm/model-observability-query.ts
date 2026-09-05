@@ -504,8 +504,25 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
     return out;
   }
 
-  function payloadSummaries(db: any, callIds: string[]): Map<string, { count: number; providerRequests: number }> {
-    const out = new Map<string, { count: number; providerRequests: number }>();
+  /** 最早一次 attempt 收到 provider 响应的时刻（响应到达事实；无事实为 null）。 */
+  function attemptFirstResponses(db: any, callIds: string[]): Map<string, string> {
+    const out = new Map<string, string>();
+    if (callIds.length === 0) return out;
+    const rows = db.prepare(
+      `SELECT call_id, MIN(response_received_at) AS first_response_at
+       FROM model_attempts
+       WHERE call_id IN (${callIds.map(() => "?").join(",")})
+         AND response_received_at IS NOT NULL AND response_received_at != ''
+       GROUP BY call_id`,
+    ).all(...callIds);
+    for (const row of rows) {
+      const value = textOrNull(row.first_response_at);
+      if (value) out.set(String(row.call_id), value);
+    }
+    return out;
+  }
+
+  function payloadSummaries(db: any, callIds: string[]): Map<string, { count: number; providerRequests: number }> {    const out = new Map<string, { count: number; providerRequests: number }>();
     if (callIds.length === 0) return out;
     const rows = db.prepare(
       `SELECT call_id, COUNT(*) AS n,
@@ -593,6 +610,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
       status: textOrNull(usage.usage_status),
       summary: {
         inputTokens: finiteIntegerOrNull(usage.input_total_tokens),
+        inputUncachedTokens: finiteIntegerOrNull(usage.input_uncached_tokens),
         outputTokens: finiteIntegerOrNull(usage.output_total_tokens),
         reasoningTokens: finiteIntegerOrNull(usage.reasoning_tokens),
         cacheReadTokens: finiteIntegerOrNull(usage.cache_read_tokens),
@@ -611,6 +629,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
       attemptCount: number;
       providerRequestCount: number;
       usageRow: Record<string, unknown> | undefined;
+      firstResponseAt: string | null;
     },
   ): ModelObservabilityCallListItem {
     const startedAt = textOrNull(row.started_at);
@@ -651,6 +670,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
       },
       callPurpose: textOrNull(row.call_purpose),
       inputShape: textOrNull(row.input_shape),
+      firstResponseAt: extras.firstResponseAt,
       provenancePrecision: textOrNull(row.provenance_precision),
       provenance: {
         sectionCount: finiteIntegerOrNull(row.provenance_section_count),
@@ -687,6 +707,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
       const page = hasMore ? rows.slice(0, query.limit) : rows;
       const callIds = page.map((row) => String(row.call_id));
       const attempts = attemptCounts(reader.db, callIds);
+      const firstResponses = attemptFirstResponses(reader.db, callIds);
       const payloads = payloadSummaries(reader.db, callIds);
       const usage = reader.hasAccounting ? usageRows(reader.db, callIds) : new Map<string, Record<string, unknown>>();
 
@@ -698,6 +719,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
           attemptCount: attempts.get(callId) ?? 0,
           providerRequestCount: payload.providerRequests,
           usageRow: usage.get(callId),
+          firstResponseAt: firstResponses.get(callId) ?? null,
         });
       });
 
@@ -726,12 +748,17 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
         )`,
       ];
       const params = [...filterSql.params];
+      // 产品口径（2026-09-05）：调用轨迹列表面向对话/任务轨迹；origin 为空的
+      // singleton 辅助调用（技能名翻译/知识滚动等）默认不进列表（调用台账仍可见）。
+      if (!query.includeSingleton) {
+        clauses.push("t.origin IS NOT NULL");
+      }
       if (query.origin) {
         clauses.push("t.origin = ?");
         params.push(query.origin);
       }
       if (query.cursor) {
-        const decoded = decodeModelObservabilityTraceCursor(query.cursor, query.filter, query.origin, query.minCallCount);
+        const decoded = decodeModelObservabilityTraceCursor(query.cursor, query.filter, query.origin, query.minCallCount, query.includeSingleton);
         if (decoded.ok === false) throw new CursorError(decoded.error.message);
         const { lastSeenAt, lastTraceId } = decoded.value;
         if (lastSeenAt === null) {
@@ -803,6 +830,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
           query.filter,
           query.origin,
           query.minCallCount,
+          query.includeSingleton,
         );
       }
       return { traces, nextCursor };
@@ -1184,6 +1212,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
         attemptCount: attempts,
         providerRequestCount: payloadMeta.filter((p) => p.kind === "provider_request").length,
         usageRow: usage,
+        firstResponseAt: attemptFirstResponses(reader.db, [callId]).get(callId) ?? null,
       });
 
       const traceRow = call.traceId
@@ -1245,6 +1274,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
       }
       const callIds = callRows.map((row) => String(row.call_id));
       const attempts = attemptCounts(reader.db, callIds);
+      const firstResponses = attemptFirstResponses(reader.db, callIds);
       const payloads = payloadSummaries(reader.db, callIds);
       const usage = reader.hasAccounting ? usageRows(reader.db, callIds) : new Map<string, Record<string, unknown>>();
       const calls = callRows.map((row) => {
@@ -1255,6 +1285,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
           attemptCount: attempts.get(callId) ?? 0,
           providerRequestCount: payload.providerRequests,
           usageRow: usage.get(callId),
+          firstResponseAt: firstResponses.get(callId) ?? null,
         });
       });
 
@@ -1364,6 +1395,7 @@ export function createModelObservabilityQueryService({ lingxiHome }: { lingxiHom
           summary: summaries.length > 0
             ? {
               inputTokens: sumKnown("inputTokens"),
+              inputUncachedTokens: sumKnown("inputUncachedTokens"),
               outputTokens: sumKnown("outputTokens"),
               reasoningTokens: sumKnown("reasoningTokens"),
               cacheReadTokens: sumKnown("cacheReadTokens"),

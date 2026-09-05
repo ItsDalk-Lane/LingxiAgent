@@ -235,7 +235,8 @@
       "allTab": "모든 스킬",
       "agentTabs": "어시스턴트별 스킬 보기",
       "previousAgent": "이전 어시스턴트",
-      "nextAgent": "다음 어시스턴트"
+      "nextAgent": "다음 어시스턴트",
+      "externalRemove": "제거(비활성화로 변경)"
     }
   },
   "sidebar": {
@@ -287,7 +288,8 @@
       "showMore": "더 보기",
       "loading": "프로젝트 불러오는 중…",
       "empty": "아직 프로젝트가 없습니다"
-    }
+    },
+    "archivedChats": "보관 대화"
   },
   "titlebar": {
     "currentChatTitle": "현재 대화 제목",
@@ -340,6 +342,12 @@
       "restoreConfirm": "이 대화를 원래 위치로 복원할까요?",
       "restoreConflict": "원래 위치가 점유되어 복원할 수 없습니다",
       "restoreFailed": "복원 실패",
+      "restoreSelected": "선택 항목 복원({count})",
+      "restoreSelectedConfirm": "선택한 {count}개의 보관 항목을 대화 목록으로 복원할까요?",
+      "restoreSelectedDone": "{count}개를 복원했습니다",
+      "restoreSelectedPartial": "일부만 복원됨: {restored}/{total}",
+      "restoreGroup": "그룹 복원",
+      "restoreGroupConfirm": "\"{name}\" 그룹의 보관 기록 {count}건을 대화 목록으로 복원할까요?",
       "deleteForever": "영구 삭제",
       "deleteConfirm": "이 보관 항목을 영구 삭제할까요? 되돌릴 수 없습니다.",
       "deleteFailed": "삭제 실패",
@@ -348,7 +356,15 @@
       "deleteSelectedConfirm": "선택한 {count}개의 보관 항목({size})을 영구 삭제합니다. 되돌릴 수 없습니다. 계속할까요?",
       "deleteSelectedDone": "{count}개를 삭제했습니다",
       "deleteSelectedPartial": "일부만 삭제됨: {deleted}/{total}",
-      "daysAgo": "{days}일 전 보관됨"
+      "daysAgo": "{days}일 전 보관됨",
+      "deleteGroup": "그룹 삭제",
+      "deleteGroupConfirm": "\"{name}\" 그룹의 보관 기록 {count}건({size})을 영구 삭제할까요? 되돌릴 수 없습니다.",
+      "deleteGroupDone": "보관 기록 {count}건을 영구 삭제했습니다",
+      "group": {
+        "ungrouped": "미분류",
+        "workspaceRemoved": "제거된 작업 공간",
+        "meta": "{count}건 · {size}"
+      }
     },
     "rcTakingOver": "{platform} 연결 중",
     "subagentRunStateUnrecoverable": "과거 하위 세션 실행 상태를 복구할 수 없어요",
@@ -1826,9 +1842,6 @@
       "networkProxyWss": "WSS proxy, 선택 사항",
       "networkProxyNoProxy": "프록시 제외 예: localhost, 127.0.0.1, ::1",
       "networkProxySave": "프록시 설정 저장",
-      "archivedChats": "보관된 대화",
-      "archivedChatsDesc": "보관된 채팅을 확인하고, 이어갈 대화를 복원하거나 더 이상 필요 없는 기록을 영구 삭제해요",
-      "viewArchivedChats": "보관된 대화 보기",
       "fileBackup": "파일 백업",
       "fileBackupDesc": "AI가 파일을 수정하거나 삭제하기 전에 원본 내용을 자동으로 저장합니다",
       "retention": "보존 기간",
@@ -2308,7 +2321,7 @@
       "automationPermissionMode": "자동화 권한 모드",
       "automationPermissionModeDesc": "백그라운드 자동화 Agent Run이 도구 호출을 자동 검토할지, 전체 권한으로 실행할지, 읽기 전용으로 둘지 정합니다. 자동 검토를 통과하지 못한 작업은 거부됩니다",
       "homeFolder": "작업 공간",
-      "homeFolderDesc": "새 대화, 순찰, 예약 작업의 기본 작업 디렉토리",
+      "homeFolderDesc": "새 대화는 열려 있는 작업 공간을 따릅니다. 다른 작업 공간이 없을 때의 기본 작업 디렉토리이며, 순찰과 예약 작업도 여기서 실행됩니다",
       "homeFolderPlaceholder": "미설정 (매번 수동 선택)",
       "homeFolderClear": "지우기",
       "homeFolderBrowse": "찾아보기",
@@ -3552,6 +3565,7 @@
           "outputTokensUnavailable": "출력 토큰 수 없음",
           "durationTooShort": "기간이 너무 짧음",
           "started": "시작",
+          "responseArrival": "응답 도착",
           "totalDuration": "총 소요 시간",
           "generation": "생성",
           "throughput": "처리량",
@@ -3613,7 +3627,7 @@
             "notRecorded": "기록 없음",
             "stepStartUnavailable": "단계 시작 시간 없음",
             "pending": "대기 중",
-            "firstTokenUnavailable": "첫 토큰 시간 없음",
+            "responseArrivalUnavailable": "응답 도착 시간 없음",
             "observability": "관측 타이밍",
             "observabilityRunning": "관측 타이밍(진행 중)",
             "session": "세션 타임스탬프"
@@ -3925,7 +3939,8 @@
     "tabs": {
       "label": "오른쪽 작업공간",
       "sessionFiles": "대화 파일",
-      "workspace": "작업공간"
+      "workspace": "작업공간",
+      "projectSkills": "프로젝트 스킬"
     },
     "sessionFiles": {
       "title": "대화 파일",
@@ -3968,6 +3983,52 @@
     "expand": "실행 정보 펼치기",
     "collapse": "실행 정보 접기",
     "running": "{n}개 진행 중"
+  },
+  "gitEnv": {
+    "title": "환경 정보",
+    "changes": "변경 사항",
+    "local": "로컬",
+    "branch": "브랜치",
+    "commitOrPush": "커밋 또는 푸시",
+    "notGitRepo": "Git 저장소가 아닙니다",
+    "loadFailed": "로드 실패, 클릭하여 재시도",
+    "mainWorktree": "로컬 메인 작업 트리",
+    "linkedWorktreeShort": "브랜치 작업 트리",
+    "linkedWorktree": "브랜치 {name}의 새 작업 트리",
+    "detachedHead": "분리된 HEAD({name})",
+    "checkedOutElsewhere": "이 브랜치는 다른 작업 트리에서 체크아웃되었습니다",
+    "noBranches": "로컬 브랜치가 없습니다",
+    "switchDone": "{name}(으)로 전환했습니다",
+    "switchFailed": "브랜치 전환 실패",
+    "branchesTitle": "브랜치 전환",
+    "changesTitle": "변경된 파일",
+    "noChanges": "변경 사항 없음",
+    "diffBinary": "바이너리 파일, diff를 볼 수 없습니다",
+    "diffUnavailable": "diff를 읽을 수 없습니다",
+    "diffTruncated": "내용이 길어 일부만 표시합니다",
+    "history": "커밋 기록",
+    "noCommits": "커밋 없음",
+    "copyHash": "커밋 ID 복사",
+    "copied": "커밋 ID가 복사되었습니다",
+    "timeJustNow": "방금",
+    "timeMinutesAgo": "{n}분 전",
+    "timeHoursAgo": "{n}시간 전",
+    "timeDaysAgo": "{n}일 전",
+    "commitTitle": "커밋 또는 푸시",
+    "commitMessagePlaceholder": "커밋 메시지(비워 두면 자동 생성)",
+    "includeUnstaged": "스테이지되지 않은 변경 포함",
+    "btnCommit": "커밋",
+    "btnCommitPush": "커밋 후 푸시",
+    "btnPush": "푸시",
+    "nothingToCommit": "커밋할 변경 사항이 없습니다",
+    "nothingStaged": "스테이지된 변경 사항이 없습니다(\"스테이지되지 않은 변경 포함\"을 선택하세요)",
+    "nothingToPush": "푸시할 커밋이 없습니다",
+    "noRemote": "원격 저장소가 구성되지 않았습니다",
+    "aiGenerating": "커밋 메시지 생성 중…",
+    "aiFailed": "커밋 메시지 생성 실패",
+    "commitDone": "커밋 완료",
+    "pushDone": "푸시 완료",
+    "operationFailed": "작업 실패"
   },
   "desk": {
     "title": "책상",
@@ -4931,5 +4992,15 @@
     "sendFailed": "전송 실패: {error}",
     "rejectFailed": "무시 실패: {error}",
     "messageField": "메시지 내용"
+  },
+  "workspace": {
+    "disposal": {
+      "failed": "기록 처리에 실패해 작업 공간을 제거하지 않았습니다",
+      "archivedToast": "작업 공간을 제거했습니다. 대화 {count}건을 보관했습니다"
+    },
+    "sweep": {
+      "archivedToast": "사라진 작업 공간의 대화 {count}건을 자동 보관했습니다. 보관 대화에서 확인하세요"
+    },
+    "archivedHint": "이 작업 공간에는 보관 기록 {count}건이 있으며 보관 대화에서 복원할 수 있습니다"
   }
 }
