@@ -18,7 +18,10 @@
 
 import { Type } from "../lib/pi-sdk/index.ts";
 import { registerToolCapabilityDelegate } from "../lib/permission/tool-invocation-permission.ts";
-import { createFirstPartyToolIdentity } from "../lib/tools/invocation/index.ts";
+import {
+  createFirstPartyToolIdentity,
+  isToolInvocationError,
+} from "../lib/tools/invocation/index.ts";
 import type { ToolCatalog, ToolCatalogEntry } from "./tool-catalog.ts";
 
 export const BRIDGE_TOOL_NAMES = ["mcp_search_tools", "mcp_describe_tool", "mcp_call"] as const;
@@ -64,13 +67,13 @@ function resolveTarget(catalog: ToolCatalog, server: unknown, tool: unknown): To
   const toolName = typeof tool === "string" ? tool.trim() : "";
   if (!serverId || !toolName) return null;
 
-  const byCatalogName = catalog.get(toolName);
-  if (byCatalogName && byCatalogName.serverId === serverId) return byCatalogName;
-
-  for (const entry of catalog.all()) {
-    if (entry.serverId === serverId && entry.toolName === toolName) return entry;
+  try {
+    const targetId = catalog.resolveTarget({ serverId, toolName });
+    return catalog.getByTargetId(targetId);
+  } catch (error) {
+    if (isToolInvocationError(error) && error.code === "TARGET_NOT_FOUND") return null;
+    throw error;
   }
-  return null;
 }
 
 function schemaProperties(schema: unknown): Record<string, any> {
@@ -237,7 +240,7 @@ export function createBridgeTools({
         renderSchema(described.schema),
         "",
         `调用示例（${CALL_TOOL_NAME}）：`,
-        callExample(catalog.get(described.name)!, described.schema),
+        callExample(catalog.getByTargetId(described.targetId)!, described.schema),
       ].join("\n"));
     },
   };
@@ -264,7 +267,7 @@ export function createBridgeTools({
       resolveInvocation: (params: any) => {
         const entry = resolveTarget(catalog, params?.server, params?.tool);
         if (!entry) return null;
-        if (entry.origin === "builtin") {
+        if (entry.origin === "plugin") {
           // A deferred builtin already owns a permission voice; speaking for it
           // means repeating what it says, not restating it in MCP terms.
           return resolveBuiltinInvocation?.(entry.name, params?.arguments ?? {}) ?? null;
@@ -306,7 +309,7 @@ export function createBridgeTools({
       }
       const args = (rawArgs ?? {}) as Record<string, unknown>;
 
-      const described = catalog.describe(entry.name);
+      const described = catalog.describe(entry.publicName, { sourceId: entry.sourceId });
       const problems = described?.schema ? validateArguments(described.schema, args) : [];
       if (problems.length > 0) {
         return text([
@@ -318,7 +321,7 @@ export function createBridgeTools({
       }
 
       try {
-        if (entry.origin === "builtin") {
+        if (entry.origin === "plugin") {
           if (!builtinCall) return text(`${entry.name} 当前不可调用。`);
           return await builtinCall(entry.name, args, {
             toolCallId,

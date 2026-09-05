@@ -53,8 +53,8 @@
 | P2-01 | completed | `28e097137dc4f02da63c9047fd1d6d5b67515d07` | 会话级目标注册表 |
 | P2-02 | completed | `1e71a29a272d2292c003293e123dde681cdb6a52` | PreparedInvocation 与统一网关 |
 | P3-01 | completed | `82292ec6f200e4729245d6bc71589b64ba0a2379` | 插件元数据与 target adapter |
-| P3-02 | completed | 待提交后回填 | Engine 装配顺序 |
-| P4-01 | pending | — | Catalog 目标引用目录 |
+| P3-02 | completed | `ae56984375dbf39ff462f363d9c5512fbc2a32de` | Engine 装配顺序 |
+| P4-01 | completed | 待提交后回填 | Catalog 目标引用目录 |
 | P4-02 | pending | — | Bridge Gateway 适配 |
 | P4-03 | pending | — | MCP eligibility 与执行器 |
 | P5-01 | pending | — | Plugin 工具代次 |
@@ -168,8 +168,20 @@
 - 绿灯命令：11 个相关测试文件（插件加载、SDK、Engine 两套 build、延迟装配、新增 bundled parity、可用性、注册表、网关、权限描述与会话包装）；`npm run typecheck`；新增测试文件定向 ESLint；`git diff --check`。
 - 绿灯原始结果：Vitest exit `0`，`11 passed` files、`267 passed` tests；三段 typecheck exit `0`；新增测试 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p302-stage-final.log`、`/tmp/lingxi-tool-contract-p302-typecheck-final.log`、`/tmp/lingxi-tool-contract-p302-new-eslint-final.log`
-- 提交 SHA：待提交后回填
+- 提交 SHA：`ae56984375dbf39ff462f363d9c5512fbc2a32de`
 - 偏差：none
+
+### P4-01 重构 ToolCatalog 为目标引用目录
+
+- 状态：`completed`
+- 改动文件：`core/tool-catalog.ts`、`core/tool-catalog-bridge.ts`、`core/engine.ts`、`tests/tool-catalog-bridge.test.ts`、`tests/tool-target-registry.test.ts`；并为严格新输入契约同步更新既有 `tests/tool-catalog.test.ts`、`tests/session-reference-block.test.ts` 夹具；`TOOL_INVOCATION_REPAIR_PROGRESS.md`。
+- 红灯命令：`set -o pipefail; npx vitest run tests/tool-catalog-bridge.test.ts tests/tool-target-registry.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p401-red.log`
+- 红灯原始结果：exit `1`；`2 failed` files、`3 failed / 31 passed` tests。旧目录没有 `resolveTarget`，并会接受重复 TargetId，符合预期失败原因。
+- 绿灯命令：目录、桥接、注册表、会话目录变更、Engine 延迟装配与 bundled parity 共 7 文件 Vitest；`npm run typecheck`；新目录模型与定向测试 ESLint；`git diff --check`。
+- 绿灯原始结果：Vitest exit `0`，`7 passed` files、`119 passed` tests；三段 typecheck exit `0`；定向 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p401-stage-final.log`、`/tmp/lingxi-tool-contract-p401-typecheck-final.log`、`/tmp/lingxi-tool-contract-p401-new-eslint-final.log`
+- 提交 SHA：待提交后回填
+- 偏差：任务书将 MCP Manager 的规范目标生产归入 P4-03，本项未提前修改 Manager；由 Engine 在目录装配边界把既有 MCP 目录行转换为规范目标引用。严格输入契约要求同步更新两个既有目录测试夹具，无生产范围扩张。
 
 ## 错误日志
 
@@ -200,13 +212,15 @@
 | 2026-09-05 15:08 +0800 | P3-02 扩展回归 | 既有 Engine 测试夹具未经过 PluginManager，缺少 P1 已要求的规范化身份/权限，4 项 fail-closed | 1 | 仅补齐测试夹具的真实注册期契约；生产端继续拒绝缺失声明，不降级 |
 | 2026-09-05 15:13 +0800 | P3-02 扩展回归 | 两个旧断言仍把普通运行上下文放在 canonical executor 的 signal 参数位 | 1 | 更新断言为第三参数仅透传真实 AbortSignal，运行上下文从第五参数验证；实现未做兼容性猜测 |
 | 2026-09-05 15:13 +0800 | P3-02 | 首次 typecheck 报 4 个类型错误：普通 object 属性读取 3 个、联合类型未收窄 1 个 | 1 | 加入显式记录类型与 `allowed === false` 判别；复跑三段 typecheck exit `0` |
+| 2026-09-05 15:25 +0800 | P4-01 | 首次实现回归剩 `1/71` 失败：测试夹具从通用身份读取了不存在的 MCP 专属字段 | 1 | 改为读取规范身份中的本地名字段；不改生产解析语义，复跑通过 |
+| 2026-09-05 15:26 +0800 | P4-01 | 首次 typecheck 报一个测试对象多余兼容字段，exit `2` | 1 | 删除测试输入中的旧目录字段；严格新输入契约不接受该字段，复跑三段 typecheck exit `0` |
 
 ## 断点续跑自检
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P3-02 已通过本项门禁，等待提交与推送 |
-| 接下来去哪？ | 使用任务书指定提交信息提交并推送 P3-02，然后进入 P4-01 |
+| 现在在哪里？ | P4-01 已通过本项门禁，等待提交与推送 |
+| 接下来去哪？ | 提交并推送 P4-01，然后进入 P4-02 Bridge Gateway 适配 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P3-01；P3-02 完成测试先红、eligible-first 装配、插件目标注册与 direct/deferred 统一执行，相关门禁 `267/267` |
+| 已做什么？ | 完成并推送 P0-00 至 P3-02；P4-01 完成测试先红、目录规范引用、重复登记拒绝与跨来源歧义 fail-closed，相关门禁 `119/119` |

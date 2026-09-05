@@ -7,9 +7,9 @@
  *
  * Two properties are load-bearing:
  *
- * - The catalog never holds a full parameter schema. Entries carry a
- *   `schemaRef` closure, so a 30-tool catalog costs a few hundred bytes of
- *   summary text rather than the schemas it describes.
+ * - The catalog never holds an executor or raw tool object. Entries may carry
+ *   a read-only `schemaRef`, so deferred schemas need not enter the model's
+ *   cacheable prefix.
  * - Scoring never reads the owning server. Provenance decides nothing about
  *   rank, so two equally matching tools from different servers score
  *   identically and no connector can buy attention with its label.
@@ -19,39 +19,54 @@
  */
 
 import { estimateTextTokens } from "../lib/llm/estimate-text-tokens.ts";
+import {
+  ToolInvocationError,
+  type ToolOrigin,
+  type ToolTargetId,
+} from "../lib/tools/invocation/index.ts";
 
-export type ToolCatalogOrigin = "mcp" | "builtin";
+export type ToolCatalogOrigin = ToolOrigin;
 
-export interface ToolCatalogEntryInput {
-  /**
-   * The catalog-wide identity, and the base of the tool's capability string.
-   * For MCP tools this is the same id the direct-load path uses, so a session
-   * grant means the same thing whichever path reached the tool.
-   */
-  name: string;
-  /** The name the owning server knows, used when forwarding a call. */
-  toolName?: string;
-  description?: string;
-  paramsSummary?: string;
+interface ToolCatalogEntryInputBase {
+  targetId: ToolTargetId;
+  origin: ToolCatalogOrigin;
+  sourceId: string;
   serverId: string;
-  serverLabel?: string;
-  deferrable?: boolean;
-  pinned?: boolean;
-  origin?: ToolCatalogOrigin;
-  schemaRef: () => unknown;
+  serverLabel: string;
+  publicName: string;
+  /** The local name known by the owning source. */
+  toolName: string;
+  capabilityBase: string;
+  description: string;
+  paramsSummary: string;
+  lifecycleGeneration: string | number;
+  deferrable: boolean;
+  pinned: boolean;
 }
 
+export type ToolCatalogEntryInput = ToolCatalogEntryInputBase & (
+  | { readonly schema: unknown; readonly schemaRef?: never }
+  | { readonly schema?: never; readonly schemaRef: () => unknown }
+);
+
 export interface ToolCatalogEntry {
-  readonly name: string;
-  readonly toolName: string;
-  readonly description: string;
-  readonly paramsSummary: string;
+  readonly targetId: ToolTargetId;
+  readonly origin: ToolCatalogOrigin;
+  readonly sourceId: string;
   readonly serverId: string;
   readonly serverLabel: string;
+  readonly publicName: string;
+  /** Compatibility display alias. It is never used as execution identity. */
+  readonly name: string;
+  readonly toolName: string;
+  readonly capabilityBase: string;
+  readonly description: string;
+  readonly paramsSummary: string;
+  readonly lifecycleGeneration: string | number;
   readonly deferrable: boolean;
   readonly pinned: boolean;
-  readonly origin: ToolCatalogOrigin;
-  readonly schemaRef: () => unknown;
+  readonly schema?: unknown;
+  readonly schemaRef?: () => unknown;
 }
 
 export interface ToolCatalogHit extends ToolCatalogEntry {
@@ -64,7 +79,12 @@ export interface ToolCatalogManifest {
 }
 
 export interface ToolCatalogDescription {
+  readonly targetId: ToolTargetId;
+  readonly sourceId: string;
+  readonly publicName: string;
   readonly toolName: string;
+  readonly capabilityBase: string;
+  readonly lifecycleGeneration: string | number;
   readonly schema: unknown;
   readonly paramsSummary: string;
   readonly serverId: string;
@@ -72,6 +92,17 @@ export interface ToolCatalogDescription {
   readonly name: string;
   readonly description: string;
   readonly origin: ToolCatalogOrigin;
+}
+
+export interface ToolCatalogTargetReference {
+  readonly sourceId?: string;
+  readonly serverId?: string;
+  readonly toolName: string;
+}
+
+export interface ToolCatalogLookupQualifier {
+  readonly sourceId?: string;
+  readonly serverId?: string;
 }
 
 const BM25_K1 = 1.5;
@@ -137,31 +168,56 @@ function firstSentence(value: string, limit = MANIFEST_DESCRIPTION_CHARS): strin
 }
 
 function normalizeEntry(input: ToolCatalogEntryInput): ToolCatalogEntry {
-  const name = normalizeText(input?.name);
-  if (!name) {
-    throw new TypeError("tool catalog entry requires a non-empty name");
-  }
-  if (typeof input?.schemaRef !== "function") {
-    throw new TypeError(`tool catalog entry ${name} requires a schemaRef function`);
-  }
+  const targetId = normalizeText(input?.targetId) as ToolTargetId;
+  const publicName = normalizeText(input?.publicName);
+  const toolName = normalizeText(input?.toolName);
+  const sourceId = normalizeText(input?.sourceId);
   const serverId = normalizeText(input.serverId);
-  if (!serverId) {
-    throw new TypeError(`tool catalog entry ${name} requires a serverId`);
+  const capabilityBase = normalizeText(input?.capabilityBase);
+  if (!targetId) throw new TypeError("tool catalog entry requires a targetId");
+  if (!publicName) throw new TypeError(`tool catalog entry ${targetId} requires a publicName`);
+  if (!toolName) throw new TypeError(`tool catalog entry ${targetId} requires a toolName`);
+  if (!sourceId) throw new TypeError(`tool catalog entry ${targetId} requires a sourceId`);
+  if (!serverId) throw new TypeError(`tool catalog entry ${targetId} requires a serverId`);
+  if (!capabilityBase) throw new TypeError(`tool catalog entry ${targetId} requires a capabilityBase`);
+  if (!(["first-party", "plugin", "mcp"] as const).includes(input?.origin)) {
+    throw new TypeError(`tool catalog entry ${targetId} requires a valid origin`);
+  }
+  if (typeof input?.deferrable !== "boolean" || typeof input?.pinned !== "boolean") {
+    throw new TypeError(`tool catalog entry ${targetId} requires explicit deferrable and pinned flags`);
+  }
+  if (typeof input?.lifecycleGeneration !== "string" && typeof input?.lifecycleGeneration !== "number") {
+    throw new TypeError(`tool catalog entry ${targetId} requires a lifecycleGeneration`);
+  }
+  if (input.schema === undefined && typeof input.schemaRef !== "function") {
+    throw new TypeError(`tool catalog entry ${targetId} requires schema or schemaRef`);
   }
   return Object.freeze({
-    name,
-    toolName: normalizeText(input.toolName) || name,
-    description: normalizeText(input.description),
-    paramsSummary: normalizeText(input.paramsSummary),
+    targetId,
+    origin: input.origin,
+    sourceId,
     serverId,
     serverLabel: normalizeText(input.serverLabel) || serverId,
-    // Absent means deferrable: only an explicit `false` pins a tool into the
-    // prefix, so a source that forgets the field does not silently opt out.
-    deferrable: input.deferrable !== false,
-    pinned: input.pinned === true,
-    origin: input.origin === "builtin" ? "builtin" : "mcp",
-    schemaRef: input.schemaRef,
+    publicName,
+    name: publicName,
+    toolName,
+    capabilityBase,
+    description: normalizeText(input.description),
+    paramsSummary: normalizeText(input.paramsSummary),
+    lifecycleGeneration: input.lifecycleGeneration,
+    deferrable: input.deferrable,
+    pinned: input.pinned,
+    ...(input.schema !== undefined ? { schema: input.schema } : {}),
+    ...(typeof input.schemaRef === "function" ? { schemaRef: input.schemaRef } : {}),
   });
+}
+
+function catalogError(
+  code: "TARGET_NOT_FOUND" | "TARGET_AMBIGUOUS",
+  message: string,
+  details: Record<string, unknown>,
+): ToolInvocationError {
+  return new ToolInvocationError({ code, message, route: "deferred", details });
 }
 
 interface ScoringDoc {
@@ -172,13 +228,16 @@ interface ScoringDoc {
 
 export class ToolCatalog {
   private readonly _sources = new Map<string, ToolCatalogEntry[]>();
-  private _index: Map<string, ToolCatalogEntry> | null = null;
+  private _index: Map<ToolTargetId, ToolCatalogEntry> | null = null;
   private _docs: ScoringDoc[] | null = null;
 
   registerSource(sourceId: string, entries: readonly ToolCatalogEntryInput[]): void {
     const id = normalizeText(sourceId);
     if (!id) throw new TypeError("tool catalog registerSource requires a sourceId");
     const normalized = (Array.isArray(entries) ? entries : []).map(normalizeEntry);
+    const proposed = new Map(this._sources);
+    proposed.set(id, normalized);
+    this._validateEntries([...proposed.values()].flat());
     this._sources.set(id, normalized);
     this._invalidate();
   }
@@ -204,11 +263,19 @@ export class ToolCatalog {
   }
 
   has(name: string): boolean {
-    return this._entryIndex().has(normalizeText(name));
+    return this._matchingEntries({ toolName: name }).length > 0;
   }
 
-  get(name: string): ToolCatalogEntry | null {
-    return this._entryIndex().get(normalizeText(name)) ?? null;
+  get(name: string, qualifier: ToolCatalogLookupQualifier = {}): ToolCatalogEntry | null {
+    return this._resolveEntry({ ...qualifier, toolName: name }, false);
+  }
+
+  getByTargetId(targetId: ToolTargetId): ToolCatalogEntry | null {
+    return this._entryIndex().get(targetId) ?? null;
+  }
+
+  resolveTarget(reference: ToolCatalogTargetReference): ToolTargetId {
+    return this._resolveEntry(reference, true)!.targetId;
   }
 
   all(): ToolCatalogEntry[] {
@@ -217,7 +284,7 @@ export class ToolCatalog {
 
   /** Tool names currently in the catalog, sorted, for change diffing. */
   names(): string[] {
-    return [...this._entryIndex().keys()].sort((left, right) => left.localeCompare(right));
+    return this.all().map((entry) => entry.publicName).sort((left, right) => left.localeCompare(right));
   }
 
   search(
@@ -284,20 +351,25 @@ export class ToolCatalog {
     return { tier: 2, text: tierTwo };
   }
 
-  describe(name: string): ToolCatalogDescription | null {
-    const entry = this.get(name);
+  describe(name: string, qualifier: ToolCatalogLookupQualifier = {}): ToolCatalogDescription | null {
+    const entry = this.get(name, qualifier);
     if (!entry) return null;
     let schema: unknown = null;
     try {
-      schema = entry.schemaRef() ?? null;
+      schema = entry.schema !== undefined ? entry.schema : entry.schemaRef?.() ?? null;
     } catch {
       // A source whose schema resolution has gone away still deserves a usable
       // row; the caller renders the summary and the model can still call it.
       schema = null;
     }
     return Object.freeze({
+      targetId: entry.targetId,
+      sourceId: entry.sourceId,
+      publicName: entry.publicName,
       name: entry.name,
       toolName: entry.toolName,
+      capabilityBase: entry.capabilityBase,
+      lifecycleGeneration: entry.lifecycleGeneration,
       description: entry.description,
       schema,
       paramsSummary: entry.paramsSummary,
@@ -344,18 +416,74 @@ export class ToolCatalog {
     this._docs = null;
   }
 
-  private _entryIndex(): Map<string, ToolCatalogEntry> {
+  private _entryIndex(): Map<ToolTargetId, ToolCatalogEntry> {
     if (this._index) return this._index;
-    const index = new Map<string, ToolCatalogEntry>();
-    // Sources are merged in registration order; a later source registering an
-    // already-known name loses, so a refresh cannot shadow a live entry.
+    const index = new Map<ToolTargetId, ToolCatalogEntry>();
     for (const entries of this._sources.values()) {
       for (const entry of entries) {
-        if (!index.has(entry.name)) index.set(entry.name, entry);
+        index.set(entry.targetId, entry);
       }
     }
     this._index = index;
     return index;
+  }
+
+  private _matchingEntries(reference: ToolCatalogTargetReference): ToolCatalogEntry[] {
+    const toolName = normalizeText(reference?.toolName);
+    if (!toolName) return [];
+    const sourceId = normalizeText(reference?.sourceId);
+    const serverId = normalizeText(reference?.serverId);
+    return this.all().filter((entry) => (
+      (!sourceId || entry.sourceId === sourceId)
+      && (!serverId || entry.serverId === serverId)
+      && (entry.publicName === toolName || entry.toolName === toolName)
+    ));
+  }
+
+  private _resolveEntry(
+    reference: ToolCatalogTargetReference,
+    failWhenMissing: boolean,
+  ): ToolCatalogEntry | null {
+    const matches = this._matchingEntries(reference);
+    if (matches.length === 1) return matches[0];
+    const details = {
+      sourceId: normalizeText(reference?.sourceId) || null,
+      serverId: normalizeText(reference?.serverId) || null,
+      toolName: normalizeText(reference?.toolName),
+      matches: matches.map((entry) => entry.targetId).sort(),
+    };
+    if (matches.length > 1) {
+      throw catalogError("TARGET_AMBIGUOUS", "Tool catalog reference matches more than one target.", details);
+    }
+    if (failWhenMissing) {
+      throw catalogError("TARGET_NOT_FOUND", "No tool catalog target matches this reference.", details);
+    }
+    return null;
+  }
+
+  private _validateEntries(entries: ToolCatalogEntry[]): void {
+    const targetIds = new Set<ToolTargetId>();
+    const sourceNames = new Map<string, ToolTargetId>();
+    for (const entry of entries) {
+      if (targetIds.has(entry.targetId)) {
+        throw catalogError("TARGET_AMBIGUOUS", "Tool catalog targetId is registered more than once.", {
+          targetId: entry.targetId,
+        });
+      }
+      targetIds.add(entry.targetId);
+      for (const name of new Set([entry.publicName, entry.toolName])) {
+        const key = JSON.stringify([entry.sourceId, name]);
+        const existing = sourceNames.get(key);
+        if (existing && existing !== entry.targetId) {
+          throw catalogError("TARGET_AMBIGUOUS", "Tool catalog source contains a duplicate tool name.", {
+            sourceId: entry.sourceId,
+            toolName: name,
+            targetIds: [existing, entry.targetId].sort(),
+          });
+        }
+        sourceNames.set(key, entry.targetId);
+      }
+    }
   }
 
   private _scoringDocs(): ScoringDoc[] {
