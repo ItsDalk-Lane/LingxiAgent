@@ -264,13 +264,24 @@
 
 ## P9-01 完成统一错误映射
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`c470e9c624f0637c99c0a664a1756a8cf09b3d4c`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `e3fe97120a411d3e8cc055bea5a8e2dd34d4f8ae`；除 `core/engine.ts` 外的生产和测试文件均先核对为原提交父树同哈希，引擎只迁移工具装配区的错误诊断片段。
 - RED：exit `1`；8 failed files，`15 failed / 90 passed` tests；路径/密钥未遮蔽、schema 缺稳定路径、能力两侧事实缺失、目标缺失与拒绝混同、媒体凭证错误混同、网关无安全结构化诊断。
 - 核心 GREEN：exit `0`，8 files / 105 tests；扩展门禁：exit `0`，19 files / 349 tests 全部通过。
 - typecheck exit `0`；定向 ESLint exit `0`，`0 errors / 306 warnings`（存量大文件与测试风格警告）；`git diff --check` exit `0`。
 - 错误边界：目标缺失、不可见、按代理禁用、撤销、能力错配、凭证缺失、刷新传输失败与取消分别保留稳定类型；模型可见消息遮蔽内部路径和密钥片段，诊断日志只携带安全归因字段。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p901-red.log`、`/tmp/lingxi-tool-contract-v0134-p901-gate-attempt1.log`、`/tmp/lingxi-tool-contract-v0134-p901-gate-final.log`、`/tmp/lingxi-tool-contract-v0134-p901-typecheck-attempt1.log`、`/tmp/lingxi-tool-contract-v0134-p901-eslint.log`。
+
+## P9-02 建立 raw execution 边界检查
+
+- 状态：`completed_pending_commit`。
+- 复用来源：原分支提交 `ee3ac90a6777996a6776a0fa73db83736512f313`；扫描器和测试原样迁移，`package.json` 只增加任务书指定脚本，没有覆盖 v0.1.34 其它脚本。
+- RED：exit `1`；1 failed suite，0 tests；旧源码缺少任务书指定的语法树边界扫描器。
+- 独立扫描 exit `0`：扫描 2129 个生产源码文件，0 违规；Vitest exit `0`：1 file / 3 tests，其中合成越界样例验证 5 类规则均能报告。
+- typecheck exit `0`；新增脚本和测试定向 ESLint exit `0`、无输出；`git diff --check` exit `0`。
+- allowlist 只使用精确文件路径；底层 MCP 调用、插件执行器和规范目标执行器均限制在指定来源适配器，Bridge 与 Engine 的退役旁路也由同一扫描器检查。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p902-red.log`、`/tmp/lingxi-tool-contract-v0134-p902-boundary-final.log`、`/tmp/lingxi-tool-contract-v0134-p902-test-final.log`、`/tmp/lingxi-tool-contract-v0134-p902-typecheck-final.log`、`/tmp/lingxi-tool-contract-v0134-p902-eslint-final.log`。
 
 ## 错误记录
 
