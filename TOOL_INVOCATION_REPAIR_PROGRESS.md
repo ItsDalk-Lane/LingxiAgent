@@ -16,8 +16,9 @@
 | P0-02 | `completed` | `d5b70f4765be74ddbdc358c6df04d6572898f342` | 入口清单、18 个重叠路径和 11 个真实冲突已建档 |
 | P1-01 | `completed` | `a61a81aa4808d7d5a70b4e902bba883feeb3fd81` | 原测试先红，再原样迁移规范身份与错误实现，本项门禁全绿 |
 | P1-02 | `completed` | `93a600efd32109a394f8b2024e7bf361948ebd96` | 原测试先红，再原样迁移权限适配，本项门禁全绿 |
-| P1-03 | `completed_pending_commit` | 待提交 | 9 项 schema 回归先红后绿，本项门禁全绿 |
-| P2–P7 | `pending_migration` | — | 优先复用原实现 |
+| P1-03 | `completed` | `3b7e21615c2c338afa85f931476b6f902ebf4741` | 9 项 schema 回归先红后绿，本项门禁全绿 |
+| P2-01 | `completed_pending_commit` | 待提交 | 目标表回归先红后绿，本项门禁全绿 |
+| P2-02–P7 | `pending_migration` | — | 优先复用原实现 |
 | P8 | `pending_v0134_adaptation` | — | 知识正式架构发生变化，需重点适配 |
 | P9–P11 | `pending_migration` | — | 迁移错误、边界、组合测试与文档 |
 | P12 | `pending` | — | 最终验证、构建和封印 |
@@ -80,12 +81,22 @@
 
 ## P1-03 建立完整参数 schema 校验
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`3b7e21615c2c338afa85f931476b6f902ebf4741`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `d2f73f21f48a466b19b2d76a6e37e2154b6093b2`；本项与 v0.1.34 无路径冲突。
 - RED：exit `1`；1 file / 9 tests 全部按预期失败，原因是完整 schema 校验入口尚不存在。
 - GREEN：exit `0`；1 file / 9 tests 全部通过。
 - typecheck exit `0`；本项定向 ESLint exit `0`、无输出；`git diff --check` exit `0`。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p103-red.log`、`/tmp/lingxi-tool-contract-v0134-p103-green.log`、`/tmp/lingxi-tool-contract-v0134-p103-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p103-eslint.log`。
+
+## P2-01 建立会话级目标注册表
+
+- 状态：`completed_pending_commit`。
+- 复用来源：原分支提交 `28e097137dc4f02da63c9047fd1d6d5b67515d07`；本项与 v0.1.34 无路径冲突。
+- RED：exit `1`；测试 suite 因目标注册表模块不存在而失败，0 tests 执行。
+- GREEN：exit `0`；1 file / 6 tests 全部通过。
+- typecheck exit `0`；本项定向 ESLint exit `0`、无输出；`git diff --check` exit `0`。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p201-red.log`、`/tmp/lingxi-tool-contract-v0134-p201-green.log`、`/tmp/lingxi-tool-contract-v0134-p201-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p201-eslint.log`。
 
 ## 错误记录
 
