@@ -19,6 +19,8 @@ export type {
 } from "./errors.ts";
 export { normalizeToolPermissionContract } from "./permission-adapter.ts";
 export type { NormalizedToolPermissionContract } from "./permission-adapter.ts";
+export { createToolSchemaValidator } from "./schema-validator.ts";
+export type { ToolSchemaIssue, ToolSchemaValidator } from "./schema-validator.ts";
 export type {
   ToolInvocationRoute,
   ToolOrigin,
