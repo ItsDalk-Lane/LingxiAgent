@@ -4415,68 +4415,9 @@ export class LingxiEngine {
       (builtinDeferEnabled ? pluginRegistry.listDeferredCandidates() : [])
         .map((target) => target.identity.targetId),
     );
-    const catalogPluginTargetIds = new Set(
-      pluginTargets
-        .filter((target) => target.deferrable)
-        .map((target) => target.identity.targetId),
-    );
-    const resolveBuiltinTarget = (name) => {
-      const entry = catalog.get(name);
-      if (!entry || entry.origin !== "plugin") return null;
-      const target = pluginRegistry.resolveCatalogTarget({
-        serverId: entry.serverId,
-        toolName: entry.toolName,
-      });
-      return catalogPluginTargetIds.has(target.identity.targetId) ? target : null;
-    };
     const bridgeTools = createBridgeTools({
       catalog,
-      mcpCall: (serverId, toolName, args, ctx) => this._mcp.callTool(serverId, toolName, args, ctx),
-      resolveMcpPermission: (serverId, toolName) =>
-        this._mcp?.resolveToolPermissionKind?.(serverId, toolName) ?? "review",
-      // A deferred builtin keeps its own permission voice rather than being
-      // flattened into the MCP policy model.
-      resolveBuiltinInvocation: (name, params) => {
-        const target = resolveBuiltinTarget(name);
-        if (!target) return null;
-        const validatedArguments = target.validator.validate(params, "deferred");
-        const permission = target.permission.resolveInvocation(validatedArguments);
-        return {
-          ...permission,
-          effectiveInvocation: {
-            targetId: target.identity.targetId,
-            toolName: target.identity.publicName,
-            arguments: validatedArguments,
-            generation: target.getCurrentGeneration(),
-          },
-        };
-      },
-      builtinCall: (name, args, invocation) => {
-        const target = resolveBuiltinTarget(name);
-        if (!target) {
-          throw new Error(`Deferred tool ${name} is no longer available`);
-        }
-        const runtimeCtx: Record<string, unknown> = invocation.ctx && typeof invocation.ctx === "object"
-          ? invocation.ctx as Record<string, unknown>
-          : {};
-        const runtimeSessionId = typeof runtimeCtx.sessionId === "string" ? runtimeCtx.sessionId : null;
-        const runtimeSessionPath = typeof runtimeCtx.sessionPath === "string" ? runtimeCtx.sessionPath : null;
-        const runtimeAgentId = typeof runtimeCtx.agentId === "string" ? runtimeCtx.agentId : null;
-        return pluginGateway.invoke({
-          targetId: target.identity.targetId,
-          route: "deferred",
-          arguments: args,
-          sessionId: runtimeSessionId,
-          sessionPath: runtimeSessionPath || getToolSessionPath(runtimeCtx),
-          agentId: runtimeAgentId,
-          lifecycleGeneration: target.getCurrentGeneration(),
-          toolCallId: invocation.toolCallId,
-          signal: invocation.signal,
-          onUpdate: invocation.onUpdate,
-          ctx: runtimeCtx,
-          runtimeContext: runtimeCtx,
-        });
-      },
+      gateway: pluginGateway,
       log: toolAvailabilityLog,
     });
 
@@ -4488,7 +4429,6 @@ export class LingxiEngine {
       bridgeTools,
       deferredToolNames,
       deferredPluginTargetIds,
-      catalogPluginTargetIds,
       pluginRegistry,
       pluginGateway,
     };
@@ -4775,13 +4715,7 @@ export class LingxiEngine {
       // delegation registry on object identity, so the objects that actually
       // reach that layer are the ones that must be registered.
       registerBridgeCapabilityDelegates(wrappedBridgeTools, {
-        catalog: deferPlan.catalog,
-        canDelegateCapability: (capability, action) => {
-          return pluginRegistry.listEligible().some((target) => (
-            deferPlan.catalogPluginTargetIds.has(target.identity.targetId)
-            && capability === `${target.identity.capabilityBase}.${action}`
-          ));
-        },
+        gateway: deferPlan.pluginGateway,
       });
     }
     const pluginDevTools = this._pluginDevService && this._prefs.getPluginDevToolsEnabled?.() === true

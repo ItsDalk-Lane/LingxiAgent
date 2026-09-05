@@ -7,19 +7,30 @@ import {
 } from "../core/tool-catalog-bridge.ts";
 import { resolveToolInvocationPermission } from "../lib/permission/tool-invocation-permission.ts";
 import {
+  createPreparedInvocation,
   createMcpToolIdentity,
+  createToolSchemaValidator,
   ToolInvocationError,
+  type ToolTargetId,
 } from "../lib/tools/invocation/index.ts";
 
 const createIssueSchema = {
   type: "object",
+  additionalProperties: false,
   properties: {
     owner: { type: "string", description: "Repository owner" },
     repo: { type: "string", description: "Repository name" },
     title: { type: "string", description: "Issue title" },
-    labels: { type: "array", description: "Label names" },
+    labels: { type: "array", items: { type: "string" }, description: "Label names" },
     draft: { type: "boolean", description: "Open as draft" },
-    count: { type: "number", description: "How many" },
+    count: { type: "integer", minimum: 1, maximum: 4, description: "How many" },
+    mode: { enum: ["fast", "detailed"] },
+    metadata: {
+      type: "object",
+      additionalProperties: false,
+      required: ["owner"],
+      properties: { owner: { type: "string", minLength: 2 } },
+    },
   },
   required: ["owner", "repo", "title"],
 };
@@ -156,15 +167,223 @@ function makeBridge(overrides: Record<string, any> = {}) {
   const catalog = overrides.catalog ?? seededCatalog();
   const mcpCall = overrides.mcpCall ?? vi.fn(async () => ({ content: [{ type: "text", text: "ok" }] }));
   const resolveMcpPermission = overrides.resolveMcpPermission ?? vi.fn(() => "review");
-  const tools = createBridgeTools({ catalog, mcpCall, resolveMcpPermission, log: { warn() {}, log() {} } });
+  const entryFor = (targetId: ToolTargetId) => {
+    const entry = catalog.getByTargetId(targetId);
+    if (!entry) {
+      throw new ToolInvocationError({
+        code: "TARGET_NOT_FOUND",
+        message: "missing target",
+        route: "deferred",
+        targetId,
+      });
+    }
+    return entry;
+  };
+  const validated = (entry: ReturnType<typeof entryFor>, args: unknown) => {
+    const schema = catalog.describe(entry.publicName, { sourceId: entry.sourceId })?.schema;
+    const identity = createMcpToolIdentity({
+      serverId: entry.serverId,
+      remoteToolName: entry.toolName,
+      publicName: entry.publicName,
+      capabilityBase: entry.capabilityBase,
+    });
+    return createToolSchemaValidator(schema, identity).validate(args, "deferred");
+  };
+  const gateway = {
+    resolvePermission: vi.fn((request: any) => {
+      const entry = entryFor(request.targetId);
+      const args = validated(entry, request.arguments);
+      return createPreparedInvocation({
+        targetId: entry.targetId,
+        arguments: args,
+        route: request.route,
+        sessionId: request.sessionId,
+        sessionPath: request.sessionPath,
+        agentId: request.agentId,
+        lifecycleGeneration: entry.lifecycleGeneration,
+        permission: {
+          action: "invoke",
+          kind: resolveMcpPermission(entry.serverId, entry.toolName) === "read" ? "read" : "review",
+          capability: `${entry.capabilityBase}.invoke`,
+        },
+        toolCallId: request.toolCallId,
+        createdAt: 1,
+      });
+    }),
+    invoke: vi.fn(async (request: any) => {
+      const entry = entryFor(request.targetId);
+      const args = validated(entry, request.arguments);
+      return mcpCall(entry.serverId, entry.toolName, args, request.ctx);
+    }),
+    canDelegateCapability: vi.fn((targetId: ToolTargetId, capability: string, action: string) => {
+      const entry = catalog.getByTargetId(targetId);
+      return !!entry && capability === `${entry.capabilityBase}.${action}`;
+    }),
+  };
+  const tools = createBridgeTools({ catalog, gateway, log: { warn() {}, log() {} } });
   const byName = Object.fromEntries(tools.map((tool: any) => [tool.name, tool]));
-  return { catalog, mcpCall, resolveMcpPermission, tools, byName };
+  return { catalog, gateway, mcpCall, resolveMcpPermission, tools, byName };
+}
+
+function makeGatewayBridge(overrides: Record<string, unknown> = {}) {
+  const catalog = (overrides.catalog as ReturnType<typeof seededCatalog> | undefined) ?? seededCatalog();
+  const gateway = {
+    resolvePermission: vi.fn((request: any) => {
+      const entry = catalog.getByTargetId(request.targetId);
+      if (!entry) {
+        throw new ToolInvocationError({
+          code: "TARGET_NOT_FOUND",
+          message: "missing target",
+          route: "deferred",
+          targetId: request.targetId,
+        });
+      }
+      return createPreparedInvocation({
+        targetId: entry.targetId,
+        arguments: Object.freeze({ ...request.arguments }),
+        route: request.route,
+        sessionId: request.sessionId,
+        sessionPath: request.sessionPath,
+        agentId: request.agentId,
+        lifecycleGeneration: entry.lifecycleGeneration,
+        permission: Object.freeze({
+          action: "invoke",
+          kind: "review",
+          capability: `${entry.capabilityBase}.invoke`,
+        }),
+        toolCallId: request.toolCallId,
+        createdAt: 1,
+      });
+    }),
+    invoke: vi.fn(async () => ({ content: [{ type: "text", text: "ok" }] })),
+    canDelegateCapability: vi.fn((targetId: ToolTargetId, capability: string, action: string) => {
+      const entry = catalog.getByTargetId(targetId);
+      return !!entry && capability === `${entry.capabilityBase}.${action}`;
+    }),
+    ...overrides.gateway as Record<string, unknown> | undefined,
+  };
+  const tools = createBridgeTools({ catalog, gateway, log: { warn() {}, log() {} } } as never);
+  const byName = Object.fromEntries(tools.map((tool: any) => [tool.name, tool]));
+  return { catalog, gateway, tools, byName };
 }
 
 async function run(tool: any, params: unknown) {
   const result = await tool.execute("call-1", params, undefined, undefined, {});
   return result.content.map((block: any) => block.text).join("\n");
 }
+
+describe("P4-02 Gateway 桥接边界", () => {
+  it("目录调用只把规范目标和原始调用句柄交给 Gateway", async () => {
+    const { byName, gateway, catalog } = makeGatewayBridge();
+    const controller = new AbortController();
+    const onUpdate = vi.fn();
+    const ctx = { sessionId: "session-1", sessionPath: "/sessions/one.jsonl", agentId: "agent-1" };
+    const argumentsValue = { owner: "acme", repo: "widgets", title: "Bug" };
+
+    await byName.mcp_call.execute("outer-call", {
+      server: "github",
+      tool: "github_create_issue",
+      arguments: argumentsValue,
+    }, controller.signal, onUpdate, ctx);
+
+    expect(gateway.invoke).toHaveBeenCalledWith({
+      targetId: catalog.resolveTarget({ serverId: "github", toolName: "github_create_issue" }),
+      route: "deferred",
+      arguments: argumentsValue,
+      sessionId: "session-1",
+      sessionPath: "/sessions/one.jsonl",
+      agentId: "agent-1",
+      lifecycleGeneration: 3,
+      toolCallId: "outer-call",
+      signal: controller.signal,
+      onUpdate,
+      ctx,
+      runtimeContext: ctx,
+    });
+  });
+
+  it("权限解析由 Gateway 给出真实 capability 和 effective invocation", () => {
+    const { byName, gateway, catalog } = makeGatewayBridge();
+    const argumentsValue = { owner: "acme", repo: "widgets", title: "Bug" };
+    const descriptor = byName.mcp_call.sessionPermission.resolveInvocation({
+      server: "github",
+      tool: "create_issue",
+      arguments: argumentsValue,
+    });
+    const targetId = catalog.resolveTarget({ serverId: "github", toolName: "create_issue" });
+
+    expect(gateway.resolvePermission).toHaveBeenCalledWith(expect.objectContaining({
+      targetId,
+      route: "deferred",
+      arguments: argumentsValue,
+    }));
+    expect(descriptor).toMatchObject({
+      capability: "github_create_issue.invoke",
+      effectiveInvocation: {
+        targetId,
+        toolName: "github_create_issue",
+        arguments: argumentsValue,
+        generation: 3,
+      },
+    });
+  });
+
+  it("Gateway 类型化错误原样传播，不转换为普通文本成功结果", async () => {
+    const transportFailure = new ToolInvocationError({
+      code: "TRANSPORT_FAILURE",
+      message: "canonical failure",
+      route: "deferred",
+    });
+    const { byName } = makeGatewayBridge({
+      gateway: { invoke: vi.fn(async () => { throw transportFailure; }) },
+    });
+
+    await expect(byName.mcp_call.execute("outer-call", {
+      server: "github",
+      tool: "github_create_issue",
+      arguments: { owner: "a", repo: "b", title: "c" },
+    }, undefined, undefined, {})).rejects.toBe(transportFailure);
+  });
+
+  it("描述支持来源限定，未限定的同名歧义会提示补充 server", async () => {
+    const catalog = createToolCatalog();
+    catalog.registerSource("mcp:alpha", [canonicalCatalogEntry("alpha", "search", "shared")]);
+    catalog.registerSource("mcp:beta", [canonicalCatalogEntry("beta", "search", "shared")]);
+    const { byName } = makeGatewayBridge({ catalog });
+
+    expect(byName.mcp_describe_tool.parameters.properties).toHaveProperty("server");
+    await expect(run(byName.mcp_describe_tool, { name: "shared" })).resolves.toMatch(/server|来源/i);
+    await expect(run(byName.mcp_describe_tool, { name: "shared", server: "beta" })).resolves.toContain("BETA");
+  });
+
+  it("工具说明覆盖 connector 与 bundled plugin，不再宣称目录只有外部工具", () => {
+    const { tools } = makeGatewayBridge();
+    for (const tool of tools) {
+      expect(tool.description.toLowerCase()).toContain("connector");
+      expect(tool.description.toLowerCase()).toContain("plugin");
+    }
+  });
+
+  it("capability 委托只接受 Gateway 从 Registry 核对过的权威能力", () => {
+    const bridge = makeGatewayBridge();
+    registerBridgeCapabilityDelegates(bridge.tools, { gateway: bridge.gateway } as never);
+    const result = resolveToolInvocationPermission(bridge.byName.mcp_call, {
+      server: "github",
+      tool: "github_create_issue",
+      arguments: { owner: "a", repo: "b", title: "c" },
+    });
+
+    expect(result).toMatchObject({
+      ok: true,
+      descriptor: { capability: "github_create_issue.invoke" },
+    });
+    expect(bridge.gateway.canDelegateCapability).toHaveBeenCalledWith(
+      bridge.catalog.resolveTarget({ serverId: "github", toolName: "github_create_issue" }),
+      "github_create_issue.invoke",
+      "invoke",
+    );
+  });
+});
 
 describe("bridge tool shape", () => {
   it("returns exactly the three bridge tools", () => {
@@ -177,9 +396,10 @@ describe("bridge tool shape", () => {
     expect(BRIDGE_TOOL_NAMES).toEqual(["mcp_search_tools", "mcp_describe_tool", "mcp_call"]);
   });
 
-  it("scopes every description to external connector tools", () => {
+  it("说明目录同时覆盖 connector 与 bundled plugin 工具", () => {
     for (const tool of makeBridge().tools) {
-      expect(tool.description.toLowerCase()).toContain("external");
+      expect(tool.description.toLowerCase()).toContain("connector");
+      expect(tool.description.toLowerCase()).toContain("plugin");
     }
   });
 
@@ -258,31 +478,60 @@ describe("mcp_call argument validation", () => {
 
   it("refuses to call remotely when a required argument is missing", async () => {
     const { byName, mcpCall } = makeBridge();
-    const text = await run(byName.mcp_call, {
+    await expect(run(byName.mcp_call, {
       server: "github",
       tool: "github_create_issue",
       arguments: { owner: "acme" },
-    });
-    expect(text).toMatch(/repo/);
-    expect(text).toMatch(/title/);
+    })).rejects.toMatchObject({ code: "ARGUMENT_SCHEMA_INVALID" });
     expect(mcpCall).not.toHaveBeenCalled();
   });
 
   it("refuses to call remotely when an argument has the wrong type", async () => {
     const { byName, mcpCall } = makeBridge();
-    const text = await run(byName.mcp_call, {
+    await expect(run(byName.mcp_call, {
       server: "github",
       tool: "github_create_issue",
       arguments: { owner: "acme", repo: "widgets", title: 42 },
-    });
-    expect(text).toMatch(/title/);
+    })).rejects.toMatchObject({ code: "ARGUMENT_SCHEMA_INVALID" });
     expect(mcpCall).not.toHaveBeenCalled();
   });
 
   it("rejects a non object arguments value", async () => {
     const { byName, mcpCall } = makeBridge();
-    const text = await run(byName.mcp_call, { server: "github", tool: "github_create_issue", arguments: "nope" });
-    expect(text).toMatch(/object|对象/i);
+    await expect(run(byName.mcp_call, {
+      server: "github",
+      tool: "github_create_issue",
+      arguments: "nope",
+    })).rejects.toMatchObject({ code: "ARGUMENTS_NOT_OBJECT" });
+    expect(mcpCall).not.toHaveBeenCalled();
+  });
+
+  it("通过 Gateway 执行嵌套、数组、枚举、额外字段、整数和范围约束", async () => {
+    const { byName, mcpCall } = makeBridge();
+    await expect(run(byName.mcp_call, {
+      server: "github",
+      tool: "github_create_issue",
+      arguments: {
+        owner: "acme",
+        repo: "widgets",
+        title: "Bug",
+        labels: [1],
+        count: 5,
+        mode: "unknown",
+        metadata: { owner: "x", extra: true },
+        extra: true,
+      },
+    })).rejects.toMatchObject({
+      code: "ARGUMENT_SCHEMA_INVALID",
+      details: {
+        issues: expect.arrayContaining([
+          expect.objectContaining({ path: "/labels/0" }),
+          expect.objectContaining({ path: "/count" }),
+          expect.objectContaining({ path: "/mode" }),
+          expect.objectContaining({ path: "/metadata/owner" }),
+        ]),
+      },
+    });
     expect(mcpCall).not.toHaveBeenCalled();
   });
 
@@ -312,8 +561,11 @@ describe("mcp_call argument validation", () => {
 
   it("reports an unknown target without calling out", async () => {
     const { byName, mcpCall } = makeBridge();
-    const text = await run(byName.mcp_call, { server: "github", tool: "nope", arguments: {} });
-    expect(text).toMatch(/not found|未找到|unknown/i);
+    await expect(run(byName.mcp_call, {
+      server: "github",
+      tool: "nope",
+      arguments: {},
+    })).rejects.toMatchObject({ code: "TARGET_NOT_FOUND" });
     expect(mcpCall).not.toHaveBeenCalled();
   });
 
@@ -331,7 +583,7 @@ describe("mcp_call argument validation", () => {
 describe("mcp_call permission unwrapping", () => {
   function registered() {
     const bridge = makeBridge();
-    registerBridgeCapabilityDelegates(bridge.tools, { catalog: bridge.catalog });
+    registerBridgeCapabilityDelegates(bridge.tools, { gateway: bridge.gateway });
     return bridge;
   }
 
@@ -340,7 +592,7 @@ describe("mcp_call permission unwrapping", () => {
     const result = resolveToolInvocationPermission(byName.mcp_call, {
       server: "github",
       tool: "github_create_issue",
-      arguments: {},
+      arguments: { owner: "a", repo: "b", title: "c" },
     });
     expect(result).toMatchObject({
       ok: true,
@@ -352,10 +604,11 @@ describe("mcp_call permission unwrapping", () => {
 
   it("carries the permission kind decided for the real tool", () => {
     const bridge = makeBridge({ resolveMcpPermission: vi.fn(() => "read") });
-    registerBridgeCapabilityDelegates(bridge.tools, { catalog: bridge.catalog });
+    registerBridgeCapabilityDelegates(bridge.tools, { gateway: bridge.gateway });
     expect(resolveToolInvocationPermission(bridge.byName.mcp_call, {
       server: "github",
       tool: "github_create_issue",
+      arguments: { owner: "a", repo: "b", title: "c" },
     })).toMatchObject({ descriptor: { kind: "read" } });
   });
 
@@ -364,6 +617,7 @@ describe("mcp_call permission unwrapping", () => {
     const result = resolveToolInvocationPermission(byName.mcp_call, {
       server: "github",
       tool: "github_create_issue",
+      arguments: { owner: "a", repo: "b", title: "c" },
     });
     expect((result as any).descriptor.capability).not.toBe("mcp_call.invoke");
   });
@@ -375,6 +629,7 @@ describe("mcp_call permission unwrapping", () => {
     const result = resolveToolInvocationPermission(byName.mcp_call, {
       server: "notion",
       tool: "notion_create_page",
+      arguments: { parent_id: "root" },
     });
     expect((result as any).descriptor.capability).toBe("notion_create_page.invoke");
   });
@@ -400,6 +655,7 @@ describe("mcp_call permission unwrapping", () => {
     expect(resolveToolInvocationPermission(byName.mcp_call, {
       server: "github",
       tool: "github_create_issue",
+      arguments: { owner: "a", repo: "b", title: "c" },
     })).toMatchObject({ ok: false, error: { reason: "unknown_capability" } });
   });
 

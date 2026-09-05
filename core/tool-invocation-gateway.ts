@@ -101,6 +101,13 @@ export class ToolInvocationGateway {
     this.now = options.now ?? Date.now;
   }
 
+  /** 宿主桥接器只委托注册表中真实目标明确拥有的能力。 */
+  canDelegateCapability(targetId: ToolTargetId, capability: string, action: string): boolean {
+    const target = this.registry.getByTargetId(targetId);
+    return target?.availability.eligible === true
+      && capability === `${target.identity.capabilityBase}.${action}`;
+  }
+
   resolvePermission(request: ToolInvocationGatewayRequest): PreparedInvocation {
     const target = this.registry.getByTargetId(request.targetId);
     if (!target) {

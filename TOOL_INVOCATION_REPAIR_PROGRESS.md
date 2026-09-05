@@ -54,8 +54,8 @@
 | P2-02 | completed | `1e71a29a272d2292c003293e123dde681cdb6a52` | PreparedInvocation 与统一网关 |
 | P3-01 | completed | `82292ec6f200e4729245d6bc71589b64ba0a2379` | 插件元数据与 target adapter |
 | P3-02 | completed | `ae56984375dbf39ff462f363d9c5512fbc2a32de` | Engine 装配顺序 |
-| P4-01 | completed | 待提交后回填 | Catalog 目标引用目录 |
-| P4-02 | pending | — | Bridge Gateway 适配 |
+| P4-01 | completed | `95e5377c0e693599c12b9fb47df9026e04126c28` | Catalog 目标引用目录 |
+| P4-02 | completed | 待提交后回填 | Bridge Gateway 适配 |
 | P4-03 | pending | — | MCP eligibility 与执行器 |
 | P5-01 | pending | — | Plugin 工具代次 |
 | P5-02 | pending | — | MCP live generation |
@@ -180,8 +180,20 @@
 - 绿灯命令：目录、桥接、注册表、会话目录变更、Engine 延迟装配与 bundled parity 共 7 文件 Vitest；`npm run typecheck`；新目录模型与定向测试 ESLint；`git diff --check`。
 - 绿灯原始结果：Vitest exit `0`，`7 passed` files、`119 passed` tests；三段 typecheck exit `0`；定向 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p401-stage-final.log`、`/tmp/lingxi-tool-contract-p401-typecheck-final.log`、`/tmp/lingxi-tool-contract-p401-new-eslint-final.log`
-- 提交 SHA：待提交后回填
+- 提交 SHA：`95e5377c0e693599c12b9fb47df9026e04126c28`
 - 偏差：任务书将 MCP Manager 的规范目标生产归入 P4-03，本项未提前修改 Manager；由 Engine 在目录装配边界把既有 MCP 目录行转换为规范目标引用。严格输入契约要求同步更新两个既有目录测试夹具，无生产范围扩张。
+
+### P4-02 把 Bridge 改成 Gateway 适配器
+
+- 状态：`completed`
+- 改动文件：`core/tool-catalog-bridge.ts`、`core/tool-invocation-gateway.ts`、`core/engine.ts`、`tests/tool-catalog-bridge.test.ts`、`tests/tool-deferred-builtin-parity.test.ts`、`TOOL_INVOCATION_REPAIR_PROGRESS.md`。
+- 红灯命令：`set -o pipefail; npx vitest run tests/tool-catalog-bridge.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p402-red.log`
+- 红灯原始结果：exit `1`；`1 failed` file、`6 failed / 27 passed` tests。旧桥接不调用 Gateway、自己拼权限、吞掉类型化错误、描述不支持来源消歧且仍声称目录仅含外部工具，符合预期。
+- 绿灯命令：Bridge、bundled deferred parity、Gateway、完整 schema、权限描述和会话包装共 6 文件 Vitest；`npm run typecheck`；新增 Gateway 方法定向 ESLint；`git diff --check`。
+- 绿灯原始结果：Vitest exit `0`，`6 passed` files、`146 passed` tests；三段 typecheck exit `0`；定向 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p402-stage-final.log`、`/tmp/lingxi-tool-contract-p402-typecheck-final.log`、`/tmp/lingxi-tool-contract-p402-new-eslint-final.log`
+- 提交 SHA：待提交后回填
+- 偏差：按编号边界没有提前实现 P4-03 的 MCP target descriptor。额外前置诊断 `tests/engine-tool-defer.test.ts` 为 `17 passed / 1 failed`，失败点是 MCP 目标尚未进入 Registry（日志 `/tmp/lingxi-tool-contract-p402-engine-transition-check.log`）；该失败不是 P4-02 Bridge 单元门禁，提交后会作为 P4-03 旧代码红灯重新验证并修复，未恢复任何 raw 直连。
 
 ## 错误日志
 
@@ -214,13 +226,15 @@
 | 2026-09-05 15:13 +0800 | P3-02 | 首次 typecheck 报 4 个类型错误：普通 object 属性读取 3 个、联合类型未收窄 1 个 | 1 | 加入显式记录类型与 `allowed === false` 判别；复跑三段 typecheck exit `0` |
 | 2026-09-05 15:25 +0800 | P4-01 | 首次实现回归剩 `1/71` 失败：测试夹具从通用身份读取了不存在的 MCP 专属字段 | 1 | 改为读取规范身份中的本地名字段；不改生产解析语义，复跑通过 |
 | 2026-09-05 15:26 +0800 | P4-01 | 首次 typecheck 报一个测试对象多余兼容字段，exit `2` | 1 | 删除测试输入中的旧目录字段；严格新输入契约不接受该字段，复跑三段 typecheck exit `0` |
+| 2026-09-05 15:39 +0800 | P4-02 | 首次扩展 bundled parity 为 `143 passed / 2 failed`：一项旧文案断言仍写“仅外部工具”，同本名能力的全局反查再次产生歧义 | 1 | 更新已改变契约的文案断言；委托校验改为携带已解析 TargetId 到 Gateway 做目标级权威能力复核，不按平面 capability 猜目标 |
+| 2026-09-05 15:42 +0800 | P4-02 | 首次 typecheck 报 Gateway 测试替身没有构造完整 PreparedInvocation，exit `2` | 1 | 测试替身改用生产准备对象构造器，不削弱生产接口；复跑三段 typecheck exit `0` |
 
 ## 断点续跑自检
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P4-01 已通过本项门禁，等待提交与推送 |
-| 接下来去哪？ | 提交并推送 P4-01，然后进入 P4-02 Bridge Gateway 适配 |
+| 现在在哪里？ | P4-02 已通过本项门禁，等待提交与推送 |
+| 接下来去哪？ | 使用任务书指定提交信息提交并推送 P4-02，然后进入 P4-03 MCP 统一 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P3-02；P4-01 完成测试先红、目录规范引用、重复登记拒绝与跨来源歧义 fail-closed，相关门禁 `119/119` |
+| 已做什么？ | 完成并推送 P0-00 至 P4-01；P4-02 完成测试先红、Bridge 只走 Gateway、完整参数校验、类型化错误透传与目标级 capability 委托，相关门禁 `146/146` |
