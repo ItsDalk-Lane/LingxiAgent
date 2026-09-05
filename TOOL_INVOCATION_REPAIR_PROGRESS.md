@@ -68,8 +68,8 @@
 | P9-01 | completed | `e3fe97120a411d3e8cc055bea5a8e2dd34d4f8ae` | 统一错误映射 |
 | P9-02 | completed | `ee3ac90a6777996a6776a0fa73db83736512f313` | raw execution 边界检查 |
 | P10-01 | completed | `5518ed2ee4920b81db6943788dba06b4f0e741d5` | 路径等价变形测试 |
-| P10-02 | completed | pending | 完整配置组合 |
-| P11-01 | pending | — | 架构文档 |
+| P10-02 | completed_with_red_not_reproduced | `f8432e83e40331bca9ccf2e74898b9f7b0fb39b8` | 完整配置组合 |
+| P11-01 | completed | pending | 架构文档 |
 | P11-02 | pending | — | 报告、机器事实、源码候选 |
 | P12-01 | pending | — | 定向契约门禁 |
 | P12-02 | pending | — | 静态与全量测试门禁 |
@@ -351,8 +351,20 @@
 - 绿灯命令：路径变形、Engine defer、bundled/MCP parity、生命周期、Catalog、Registry、嵌套 schema、Gateway、plugin-dev、PluginManager/Runtime、MCP Runtime 共 13 文件 Vitest；`npm run typecheck`；`npm run check:tool-invocation-boundaries`；扩展测试定向 ESLint；`git diff --check`。
 - 绿灯原始结果：Vitest exit `0`，`13 passed` files、`373 passed` tests，覆盖总 defer/builtin defer on/off、候选数 10/11/12、插件新旧权限方言与可见性、pinned/non-deferrable、MCP 连接器和 model/app 可见性、grant 参数变化、审批后禁用/卸载/重载、跨来源同名、嵌套 schema、取消和流式更新；三段 typecheck exit `0`；边界扫描 exit `0`，`2121` 个源码文件 `0` 违规；定向 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p1002-gate.log`、`/tmp/lingxi-tool-contract-p1002-typecheck.log`、`/tmp/lingxi-tool-contract-p1002-boundary.log`、`/tmp/lingxi-tool-contract-p1002-eslint.log`。
-- 提交 SHA：`pending (commit 后由下一项进度回填)`
+- 提交 SHA：`f8432e83e40331bca9ccf2e74898b9f7b0fb39b8`
 - 偏差：用户要求每项新增回归都先在当前旧代码上失败；本项新增配置矩阵首次即绿，严格红灯前置未能复现。按“不得削弱/人为破坏测试、不得扩大架构”约束，保留该事实并只提交测试扩展。
+
+### P11-01 架构文档
+
+- 状态：`completed`
+- 改动文件：`docs/architecture/tool-invocation-path-invariance.md`、`tests/tool-invocation-boundary.test.ts`、`TOOL_INVOCATION_REPAIR_PROGRESS.md`。
+- 红灯命令：`set -o pipefail; npx vitest run tests/tool-invocation-boundary.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p1101-red.log`
+- 红灯原始结果：exit `1`；`1 failed` file、`1 failed / 3 passed` tests；任务书指定架构文档不存在，读取返回 `ENOENT`，符合预期。
+- 绿灯命令：文档与 AST 边界测试；`npm run check:tool-invocation-boundaries`；`npm run typecheck`；文档契约测试定向 ESLint；章节清单检查；`git diff --check`。
+- 绿灯原始结果：Vitest exit `0`，`1 passed` file、`4 passed` tests；边界扫描 exit `0`，`2121` 个源码文件 `0` 违规；三段 typecheck exit `0`；定向 ESLint exit `0`、`0` 问题；九个必备二级章节全部存在；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p1101-gate.log`、`/tmp/lingxi-tool-contract-p1101-boundary.log`、`/tmp/lingxi-tool-contract-p1101-typecheck.log`、`/tmp/lingxi-tool-contract-p1101-eslint.log`。
+- 提交 SHA：`pending (commit 后由下一项进度回填)`
+- 偏差：任务书在 P11-02 后给出阶段提交信息；按用户“每项提交并推送”的要求，本项使用独立且内容对应的提交信息。
 
 ## 错误日志
 
@@ -412,8 +424,8 @@
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P10-02 完整配置组合已验证，首次新增矩阵未复现红灯，等待提交和推送 |
-| 接下来去哪？ | 使用任务书指定提交信息提交并推送 P10-02，回填 SHA 后进入 P11-01 架构文档 |
+| 现在在哪里？ | P11-01 架构文档及自动契约检查已完成，等待提交和推送 |
+| 接下来去哪？ | 提交并推送 P11-01，回填 SHA 后进入 P11-02 报告、机器事实与源码候选 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P10-01；P10-02 已用 13 文件、373 项矩阵覆盖任务书要求的开关、阈值、可见性、授权漂移、生命周期、嵌套 schema、取消与流式组合 |
+| 已做什么？ | 完成并推送 P0-00 至 P10-02；P11-01 已把不变量、身份、时序、统一路径、准备绑定、raw 边界、错误码、接入清单与反模式固化为文档和自动检查 |
