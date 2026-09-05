@@ -50,8 +50,8 @@
 | P1-01 | completed | `6ed37ec467c4a5bdfc567cdcd552cc1dbe04ee6a` | 目标身份、路由和错误类型 |
 | P1-02 | completed | `76afb23903e19df1745bdac1f9146d922edd0027` | 新旧权限方言规范化 |
 | P1-03 | completed | `d2f73f21f48a466b19b2d76a6e37e2154b6093b2` | 完整 schema 校验器 |
-| P2-01 | completed | 待提交后回填 | 会话级目标注册表 |
-| P2-02 | pending | — | PreparedInvocation 与统一网关 |
+| P2-01 | completed | `28e097137dc4f02da63c9047fd1d6d5b67515d07` | 会话级目标注册表 |
+| P2-02 | completed | 待提交后回填 | PreparedInvocation 与统一网关 |
 | P3-01 | pending | — | 插件元数据与 target adapter |
 | P3-02 | pending | — | Engine 装配顺序 |
 | P4-01 | pending | — | Catalog 目标引用目录 |
@@ -130,6 +130,18 @@
 - 绿灯命令：`npx vitest run tests/tool-target-registry.test.ts`、`npm run typecheck`、本项文件定向 ESLint、`git diff --check`。
 - 绿灯原始结果：Vitest exit `0`，`1 passed` file、`6 passed` tests；三段 typecheck exit `0`；定向 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p201-final-tests.log`、`/tmp/lingxi-tool-contract-p201-typecheck-final.log`、`/tmp/lingxi-tool-contract-p201-eslint-final.log`
+- 提交 SHA：`28e097137dc4f02da63c9047fd1d6d5b67515d07`
+- 偏差：none
+
+### P2-02 建立 PreparedInvocation 与统一调用网关
+
+- 状态：`completed`
+- 改动文件：`core/tool-invocation-gateway.ts`、`lib/tools/invocation/prepared-invocation-context.ts`、`lib/tools/invocation/index.ts`、`lib/permission/tool-invocation-permission.ts`、`lib/tools/session-permission-wrapper.ts`、`tests/tool-invocation-gateway.test.ts`、`tests/tool-invocation-permission.test.ts`、`tests/session-permission-wrapper.test.ts`、`TOOL_INVOCATION_REPAIR_PROGRESS.md`。
+- 红灯命令：`set -o pipefail; npx vitest run tests/tool-invocation-gateway.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p202-red.log`；随后对 effective invocation 绑定执行 `set -o pipefail; npx vitest run tests/tool-invocation-permission.test.ts tests/session-permission-wrapper.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p202-effective-red.log`。
+- 红灯原始结果：首次 exit `1`，`1 failed` suite、`0` tests，旧实现缺少统一网关模块；第二次 exit `1`，`2 failed` files、`3 failed / 78 passed` tests，旧权限描述拒绝真实目标字段、包装层未建立准备上下文且未按真实目标触发审批，均符合预期。
+- 绿灯命令：任务书 P2 阶段 4 文件 Vitest；`npm run typecheck`；本项 3 个新增 TypeScript 文件定向 ESLint；`git diff --check`。
+- 绿灯原始结果：阶段 Vitest exit `0`，`4 passed` files、`101 passed` tests；三段 typecheck exit `0`；新增文件定向 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p2-stage-final.log`、`/tmp/lingxi-tool-contract-p202-typecheck-final.log`、`/tmp/lingxi-tool-contract-p202-new-eslint-final.log`
 - 提交 SHA：待提交后回填
 - 偏差：none
 
@@ -153,13 +165,15 @@
 | 2026-09-05 14:25 +0800 | P1-03 探索 | 一条只读 `rg` 命令引号组合错误，zsh 报 `unmatched quote`，exit `1` | 1 | 改用两条简单搜索确认范围，不复用错误命令；无文件修改 |
 | 2026-09-05 14:26 +0800 | P1-03 | 首次实现回归 `7 passed / 1 failed`；单个大样例触发校验库最多 8 条错误的上限，尾部数值路径未进入 issue 列表 | 2 | 保留全部约束维度，将数值样例改成单一整数越界并减少同对象内前置噪声；最终阶段门禁 `202/202` 通过 |
 | 2026-09-05 14:32 +0800 | P2-01 | 首次定向 ESLint 报 `1 warning / 0 errors`：新增文件含未使用的类型导入 | 1 | 删除自身引入的无用导入；复跑 ESLint 为 `0` 问题，测试与 typecheck 仍通过 |
+| 2026-09-05 14:41 +0800 | P2-02 编辑 | 首次多文件补丁因函数签名上下文与实际源码不一致而校验失败，未写入 | 1 | 回读真实签名后拆成小范围定点补丁；未产生文件改动 |
+| 2026-09-05 14:46 +0800 | P2-02 | 首次全改动文件 ESLint 为 `0 errors / 89 warnings`，其中新增测试含 `7` 个显式 `any` 警告 | 1 | 只清理本项新增测试类型；新增文件复跑为 `0` 问题，测试与 typecheck 保持通过 |
 
 ## 断点续跑自检
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P2-01 已通过本项门禁，等待提交与推送 |
-| 接下来去哪？ | 按指定提交信息提交并推送 P2-01，然后进入 P2-02 |
+| 现在在哪里？ | P2-02 已通过阶段门禁，等待提交与推送 |
+| 接下来去哪？ | 按指定提交信息提交并推送 P2-02，然后进入 P3-01 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P1-03；P2-01 完成测试先红、目标注册表与本项门禁 |
+| 已做什么？ | 完成并推送 P0-00 至 P2-01；P2-02 完成两轮测试先红、统一网关实现与 P2 阶段 `101/101` 门禁 |

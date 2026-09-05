@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { createApprovalGateway } from "../lib/approval-gateway.ts";
 import { createAutomationTool } from "../lib/tools/automation-tool.ts";
 import { wrapWithSessionPermission } from "../lib/tools/session-permission-wrapper.ts";
+import { getPreparedInvocation } from "../lib/tools/invocation/index.ts";
 
 const SESSION_PATH = path.resolve("/tmp/session.jsonl");
 const DIRECT_SESSION_PATH = path.resolve("/tmp/direct-session.jsonl");
@@ -404,6 +405,126 @@ describe("session permission wrapper", () => {
     );
     expect(tool.execute).toHaveBeenCalledOnce();
     expect(result.details.executed).toBe(true);
+  });
+
+  it("审批与执行都绑定 effective invocation，并通过宿主上下文传递 prepared 记录", async () => {
+    const execute = vi.fn(async () => ({
+      content: [{ type: "text", text: "executed" }],
+      details: { prepared: getPreparedInvocation() },
+    }));
+    const tool = makeTool("mcp_call", {
+      execute,
+      sessionPermission: {
+        resolveInvocation: () => ({
+          action: "invoke",
+          kind: "review",
+          capability: "mcp_call.invoke",
+          sideEffect: { kind: "external_message", summary: "Post to channel." },
+          effectiveInvocation: {
+            targetId: "tool:mcp:chat:post_message",
+            toolName: "channel",
+            arguments: { action: "post", channelId: "team", message: "hello" },
+            generation: 7,
+          },
+        }),
+      },
+    });
+    const approvalGateway = {
+      review: vi.fn(async () => ({ action: "allow", reviewer: "approval_model", risk: "low" })),
+    };
+    const [wrapped] = wrapWithSessionPermission([tool], {
+      getPermissionMode: () => "auto",
+      getApprovalGateway: () => approvalGateway,
+      invocationRoute: "deferred",
+      agentId: "agent-effective",
+      emitEvent: vi.fn(),
+    });
+
+    const result = await wrapped.execute("call-effective", { server: "chat", tool: "post_message" }, null, null, ctx);
+
+    expect(approvalGateway.review).toHaveBeenCalledWith(
+      expect.objectContaining({
+        toolName: "channel",
+        actionName: "invoke",
+        params: { action: "post", channelId: "team", message: "hello" },
+        target: {
+          type: "tool",
+          id: "tool:mcp:chat:post_message",
+          label: "channel",
+        },
+      }),
+      expect.any(Object),
+    );
+    expect(execute).toHaveBeenCalledOnce();
+    expect(result.details.prepared).toMatchObject({
+      targetId: "tool:mcp:chat:post_message",
+      route: "deferred",
+      arguments: { action: "post", channelId: "team", message: "hello" },
+      sessionPath: SESSION_PATH,
+      agentId: "agent-effective",
+      lifecycleGeneration: 7,
+      toolCallId: "call-effective",
+    });
+  });
+
+  it("普通直接工具未声明 effective invocation 时自动绑定自身身份", async () => {
+    const execute = vi.fn(async () => ({
+      content: [{ type: "text", text: "executed" }],
+      details: { prepared: getPreparedInvocation() },
+    }));
+    const tool = makeTool("channel", {
+      execute,
+      sessionPermission: {
+        resolveInvocation: () => ({
+          action: "read",
+          kind: "read",
+          capability: "channel.read",
+        }),
+      },
+    });
+    const [wrapped] = wrapWithSessionPermission([tool], {
+      getPermissionMode: () => "read_only",
+    });
+
+    const result = await wrapped.execute("call-direct", { action: "read" }, null, null, ctx);
+
+    expect(result.details.prepared).toMatchObject({
+      targetId: "tool:first-party:channel",
+      route: "direct",
+      arguments: { action: "read" },
+      lifecycleGeneration: 0,
+      toolCallId: "call-direct",
+    });
+  });
+
+  it("硬安全检查使用 effective invocation 而不是桥接外壳参数", async () => {
+    const tool = makeTool("mcp_call", {
+      sessionPermission: {
+        resolveInvocation: () => ({
+          action: "stage",
+          kind: "review",
+          capability: "mcp_call.stage",
+          effectiveInvocation: {
+            targetId: "tool:first-party:stage_files",
+            toolName: "stage_files",
+            arguments: { filepaths: ["/outside/report.pdf"] },
+            generation: 1,
+          },
+        }),
+      },
+    });
+    const approvalGateway = { review: vi.fn() };
+    const [wrapped] = wrapWithSessionPermission([tool], {
+      getPermissionMode: () => "auto",
+      getApprovalGateway: () => approvalGateway,
+      permissionBoundary: {},
+    });
+
+    const result = await wrapped.execute("call-boundary", { server: "files", tool: "stage" }, null, null, ctx);
+
+    expect(result.details.errorCode).toBe("ACTION_BLOCKED_BY_WORKSPACE_BOUNDARY");
+    expect(approvalGateway.review).not.toHaveBeenCalled();
+    expect(tool.execute).not.toHaveBeenCalled();
   });
 
   it("uses the tool-owned descriptor to allow concrete read actions", async () => {
