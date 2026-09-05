@@ -166,17 +166,18 @@ export class ToolInvocationGateway {
           { reason: resolvedEffectiveTarget.availability.reason ?? null },
         );
       }
-      const capabilityTarget = this.registry.findByCapability(
-        permission.capability,
-        permission.action,
-      );
-      if (capabilityTarget !== resolvedEffectiveTarget) {
+      const expectedCapability = `${resolvedEffectiveTarget.identity.capabilityBase}.${permission.action}`;
+      if (permission.capability !== expectedCapability) {
         throw gatewayError(
           "CAPABILITY_MISMATCH",
           "Effective invocation capability does not belong to its real target.",
           request,
           resolvedEffectiveTarget,
-          { capability: permission.capability, action: permission.action },
+          {
+            capability: permission.capability,
+            expectedCapability,
+            action: permission.action,
+          },
         );
       }
       if (resolvedEffectiveTarget.getCurrentGeneration() !== effective.generation) {

@@ -19,8 +19,9 @@
 | P1-03 | `completed` | `3b7e21615c2c338afa85f931476b6f902ebf4741` | 9 项 schema 回归先红后绿，本项门禁全绿 |
 | P2-01 | `completed` | `db697f42fd8ab87fcf2172b6539915772ab36bf5` | 目标表回归先红后绿，本项门禁全绿 |
 | P2-02 | `completed` | `079a5b8f05edad579414088ccf8aef24e6258d1b` | 网关与 prepared invocation 回归先红后绿，本项门禁全绿 |
-| P3-01 | `completed_pending_commit` | 待提交 | 插件元数据与可用性回归先红后绿，本项门禁全绿 |
-| P3-02–P7 | `pending_migration` | — | 优先复用原实现 |
+| P3-01 | `completed` | `2a8bb90adaab00a5d26ac476a11feaca1a8f9327` | 插件元数据与可用性回归先红后绿，本项门禁全绿 |
+| P3-02 | `completed_pending_commit` | 待提交 | 引擎装配按 v0.1.34 定点适配，10 项红灯转绿 |
+| P4–P7 | `pending_migration` | — | 优先复用原实现 |
 | P8 | `pending_v0134_adaptation` | — | 知识正式架构发生变化，需重点适配 |
 | P9–P11 | `pending_migration` | — | 迁移错误、边界、组合测试与文档 |
 | P12 | `pending` | — | 最终验证、构建和封印 |
@@ -113,12 +114,23 @@
 
 ## P3-01 统一注册插件目标和可用性
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`2a8bb90adaab00a5d26ac476a11feaca1a8f9327`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `82292ec6f200e4729245d6bc71589b64ba0a2379`；相关测试和实现均先核对为父树同哈希。
 - RED：exit `1`；2 files，`4 failed / 95 passed` tests；插件元数据未保留，可用性决策入口缺失，桥接授权不能落到真实目标。
 - GREEN：exit `0`；4 files / 181 tests 全部通过。
 - typecheck exit `0`；本项定向 ESLint exit `0`，`0 errors / 266 warnings`；`git diff --check` exit `0`。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p301-red.log`、`/tmp/lingxi-tool-contract-v0134-p301-green.log`、`/tmp/lingxi-tool-contract-v0134-p301-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p301-eslint.log`。
+
+## P3-02 先过滤、再注册、再决定延迟
+
+- 状态：`completed_pending_commit`。
+- 复用来源：原分支提交 `ae56984375dbf39ff462f363d9c5512fbc2a32de`；非引擎文件同哈希原样迁移，引擎只在现有工具装配区应用原补丁片段。
+- RED：exit `1`；`2 failed / 1 passed` files，`10 failed / 38 passed` tests；禁用目标仍进入目录、pinned 目标被延迟、路径结果和调用句柄不等价，且审批可被换参复用。
+- GREEN：exit `0`；5 files / 115 tests 全部通过。
+- typecheck exit `0`；本项定向 ESLint exit `0`，`0 errors / 220 warnings`；`git diff --check` exit `0`。
+- v0.1.34 适配证明：`core/engine.ts` 只改工具 import、延迟计划、目标注册、直接/延迟门面和结果返回区，没有覆盖正式知识架构或其它引擎区域。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p302-red.log`、`/tmp/lingxi-tool-contract-v0134-p302-green.log`、`/tmp/lingxi-tool-contract-v0134-p302-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p302-eslint.log`。
 
 ## 错误记录
 

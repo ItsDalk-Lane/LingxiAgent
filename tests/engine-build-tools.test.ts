@@ -4,6 +4,10 @@ import path from "path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { LingxiEngine } from "../core/engine.ts";
 import { SessionExecutionRegistry } from "../lib/session-execution-registry.ts";
+import {
+  createPluginToolIdentity,
+  normalizeToolPermissionContract,
+} from "../lib/tools/invocation/index.ts";
 
 function permissionTool(name, execute = vi.fn(), kind: "read" | "routine" | "review" = "routine") {
   return {
@@ -15,6 +19,28 @@ function permissionTool(name, execute = vi.fn(), kind: "read" | "routine" | "rev
         capability: `${name}.execute`,
       }),
     },
+    execute,
+  };
+}
+
+function pluginPermissionTool(name, execute = vi.fn(), pluginId = "test_plugin") {
+  const identity = createPluginToolIdentity({
+    pluginId,
+    publicName: name,
+    capabilityBase: name.startsWith(`${pluginId}_`) ? name.slice(pluginId.length + 1) : name,
+  });
+  const permission = normalizeToolPermissionContract({
+    name,
+    sessionPermission: { readOnly: true },
+  }, identity);
+  return {
+    name,
+    description: "Plugin test tool",
+    parameters: { type: "object", properties: {} },
+    _pluginId: pluginId,
+    _toolTargetIdentity: identity,
+    _normalizedPermissionContract: permission,
+    sessionPermission: { resolveInvocation: permission.resolveInvocation },
     execute,
   };
 }
@@ -114,7 +140,7 @@ describe("LingxiEngine.buildTools", () => {
     })).toThrow(/duplicate tool name "duplicate" across custom tools and extra custom tools/);
 
     expect(() => makeEngine([
-      { ...permissionTool("duplicate"), _pluginId: "test_plugin" },
+      pluginPermissionTool("duplicate"),
     ]).buildTools(tmpDir, [permissionTool("duplicate")], {
       agentDir,
       workspace: tmpDir,
@@ -506,11 +532,7 @@ describe("LingxiEngine.buildTools", () => {
     };
     engine.getAgent = vi.fn(() => agent);
     engine._pluginManager = {
-      getAllTools: () => [{
-        name: "plugin_tool",
-        _pluginId: "test_plugin",
-        execute,
-      }],
+      getAllTools: () => [pluginPermissionTool("plugin_tool", execute)],
     };
     engine._prefs = { getFileBackup: () => ({ enabled: false }) };
     engine._readPreferences = () => ({ sandbox: true });
@@ -534,9 +556,7 @@ describe("LingxiEngine.buildTools", () => {
     expect(execute).toHaveBeenCalledWith(
       "call-1",
       { ok: true },
-      expect.objectContaining({
-        sessionManager: expect.any(Object),
-      }),
+      undefined,
       undefined,
       expect.objectContaining({
         agentId: "focus",
@@ -577,11 +597,7 @@ describe("LingxiEngine.buildTools", () => {
     };
     engine.getAgent = vi.fn(() => agent);
     engine._pluginManager = {
-      getAllTools: () => [{
-        name: "plugin_tool",
-        _pluginId: "test_plugin",
-        execute,
-      }],
+      getAllTools: () => [pluginPermissionTool("plugin_tool", execute)],
     };
     engine._prefs = { getFileBackup: () => ({ enabled: false }) };
     engine._readPreferences = () => ({ sandbox: true });
@@ -607,7 +623,7 @@ describe("LingxiEngine.buildTools", () => {
     expect(execute).toHaveBeenCalledWith(
       "call-1",
       { ok: true },
-      {},
+      undefined,
       undefined,
       expect.objectContaining({
         sessionId: "sess_bridge_owner",
@@ -695,11 +711,7 @@ describe("LingxiEngine.buildTools", () => {
     ));
     engine._sessionExecutions = new SessionExecutionRegistry();
     engine._pluginManager = {
-      getAllTools: () => [{
-        name: "plugin_tool",
-        _pluginId: "test_plugin",
-        execute,
-      }],
+      getAllTools: () => [pluginPermissionTool("plugin_tool", execute)],
     };
     engine._prefs = { getFileBackup: () => ({ enabled: false }) };
     engine._readPreferences = () => ({ sandbox: true });

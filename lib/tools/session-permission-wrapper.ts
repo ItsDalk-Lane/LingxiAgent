@@ -86,10 +86,14 @@ function snapshotRuntimeAuthority(value: any, field: string) {
 function captureSessionBinding(ctx: any, deps: any = {}) {
   try {
     const sessionManager = ctx?.sessionManager;
+    const hostSessionRef = typeof deps.getSessionRef === "function"
+      ? deps.getSessionRef()
+      : null;
     const explicitLocators = [
       normalizedSessionPath(ctx?.sessionRef?.sessionPath),
       normalizedSessionPath(ctx?.sessionPath),
       normalizedSessionPath(getToolSessionPath(ctx)),
+      normalizedSessionPath(hostSessionRef?.sessionPath),
     ].filter(Boolean);
     const uniqueLocators = new Set(explicitLocators);
     if (uniqueLocators.size > 1) {
@@ -110,6 +114,8 @@ function captureSessionBinding(ctx: any, deps: any = {}) {
     const identityCandidates = [
       nonEmptyText(ctx?.sessionRef?.sessionId),
       nonEmptyText(ctx?.sessionId),
+      nonEmptyText(hostSessionRef?.sessionId),
+      nonEmptyText(deps.getSessionId?.()),
       resolvedSessionId,
     ].filter(Boolean);
     const uniqueSessionIds = new Set(identityCandidates);
@@ -508,8 +514,9 @@ function preparedInvocationForTool({
 }): PreparedInvocation | null {
   if (!invocation || !tool?._toolTargetIdentity?.targetId) return null;
   const effective = invocation.effectiveInvocation;
-  const route = TOOL_INVOCATION_ROUTES.has(deps.invocationRoute)
-    ? deps.invocationRoute as ToolInvocationRoute
+  const requestedRoute = deps.invocationRoute ?? tool._toolInvocationRoute;
+  const route = TOOL_INVOCATION_ROUTES.has(requestedRoute)
+    ? requestedRoute as ToolInvocationRoute
     : "direct";
   const normalizedToolCallId = typeof toolCallId === "string" && toolCallId
     ? toolCallId
