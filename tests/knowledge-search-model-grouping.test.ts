@@ -6,6 +6,7 @@ import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
 import { KnowledgeQueryService } from "../lib/knowledge/knowledge-query-service.ts";
 import { KnowledgeSearchService } from "../lib/knowledge/knowledge-search-service.ts";
 import type { KnowledgeModelRef } from "../lib/knowledge/types.ts";
+import { KNOWLEDGE_RERANK_DISABLED_POLICY } from "../lib/knowledge/rerank-policy.ts";
 
 const homes: string[] = [], managers: KnowledgeManager[] = [];
 const services: KnowledgeSearchService[] = [];
@@ -46,7 +47,8 @@ async function fixture(modelCount = 1) {
   const compiledScope = await manager.compileTurnScope(scope);
   const search = new KnowledgeSearchService({ store: manager.store, indexStore: manager.indexStore, queryService: query }); services.push(search);
   embed.mockClear();
-  return { manager, search, embed, revisions, query, request: { compiledScope, query: "后台", channel: "hybrid" as const, limit: 8, rerank: false } };
+  return { manager, search, embed, revisions, query, request: { compiledScope, query: "后台", channel: "hybrid" as const,
+    limit: 8, rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY } };
 }
 
 describe("搜索按嵌入模型分组", () => {

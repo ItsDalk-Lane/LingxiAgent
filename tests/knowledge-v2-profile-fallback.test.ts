@@ -3,6 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { KNOWLEDGE_RERANK_DISABLED_POLICY } from "../lib/knowledge/rerank-policy.ts";
 import { KnowledgeManager } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 import { buildLegacyKnowledgeChunks, legacyKnowledgeBlockFingerprint, resolveLegacyKnowledgeChunkerConfig,
   KNOWLEDGE_CHUNK_TARGET_CHARS } from "../lib/knowledge/chunker.ts";
@@ -70,7 +71,8 @@ describe("v3 重建期间继续使用真实 v2 索引", () => {
     f.manager.queryService.indexArtifactForIngestion(studioId, one.artifact.id, { targetChars: KNOWLEDGE_CHUNK_TARGET_CHARS });
     f.manager.store.resolveNotebookRetrievalProfile({ studioId, notebookId: f.notebook.id, strategy: one.config.strategy });
     // 同一份已冻结编译结果继续只读它登记的旧变体，不偷偷跳到新索引。
-    const frozen = await f.manager.searchService.search({ compiledScope: first, channel: "fts", rerank: false, query: "交付", limit: 24 });
+    const frozen = await f.manager.searchService.search({ compiledScope: first, channel: "fts",
+      rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY, query: "交付", limit: 24 });
     expect(frozen.hits.every(hit => first.readyChunkVariantIds.includes(hit.chunkIndexVariantId))).toBe(true);
     f.manager.scopeCompiler.invalidateScope(f.scope.id);
     const next = await f.manager.compileTurnScope(f.scope);
@@ -78,7 +80,8 @@ describe("v3 重建期间继续使用真实 v2 索引", () => {
     expect(next.readyChunkVariantIds).toHaveLength(2);
     expect(next.readyChunkVariantIds).toContain(f.sources[1].variant.id);
     expect(next.readyChunkVariantIds).not.toContain(one.variant.id);
-    const search = await f.manager.searchService.search({ compiledScope: next, channel: "fts", rerank: false, query: "交付", limit: 24 });
+    const search = await f.manager.searchService.search({ compiledScope: next, channel: "fts",
+      rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY, query: "交付", limit: 24 });
     expect(new Set(search.hits.map(hit => hit.sourceId))).toEqual(new Set(f.sources.map(source => source.imported.source.id)));
     const packed = await f.manager.runFastKnowledgePipeline({ scope: f.scope, question: "交付" });
     expect(new Set(packed.evidence.entries.map(entry => entry.sourceId))).toEqual(new Set(f.sources.map(source => source.imported.source.id)));

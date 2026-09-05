@@ -4,10 +4,9 @@ import { KnowledgeQueryCache, normalizeKnowledgeQuery } from "./query-embedding-
 export interface RetrievalResultCacheKey {
   scopeSnapshotHash: string;
   normalizedQuery: string;
-  channel: "fts" | "hybrid";
   filters: { notebookIds?: string[]; sourceIds?: string[]; sectionKeys?: string[]; sectionsBySourceId?: Array<[string, string[]]> };
   limit: number;
-  rerank: boolean;
+  policyDigest: string;
   retrievalImplementationVersion: string;
 }
 
@@ -18,10 +17,10 @@ export class RetrievalResultCache<T> {
   getOrCreate(key: RetrievalResultCacheKey, loader: (signal: AbortSignal) => Promise<T>, signal?: AbortSignal) {
     const ordered = (values?: string[]) => values === undefined ? null : [...new Set(values)].sort();
     return this.cache.getOrCreate(JSON.stringify([
-      key.scopeSnapshotHash, normalizeKnowledgeQuery(key.normalizedQuery), key.channel,
+      key.scopeSnapshotHash, normalizeKnowledgeQuery(key.normalizedQuery), key.policyDigest,
       ordered(key.filters.notebookIds), ordered(key.filters.sourceIds), ordered(key.filters.sectionKeys),
       key.filters.sectionsBySourceId?.map(([source, keys]) => [source, ordered(keys)]).sort(([a], [b]) => String(a).localeCompare(String(b))) ?? null,
-      key.limit, key.rerank, key.retrievalImplementationVersion,
+      key.limit, key.retrievalImplementationVersion,
     ]), loader, signal);
   }
 

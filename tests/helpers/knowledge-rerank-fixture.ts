@@ -4,6 +4,7 @@ import path from "node:path";
 import { KnowledgeManager } from "../../lib/knowledge/knowledge-manager.ts";
 import type { KnowledgeManagerOptions } from "../../lib/knowledge/knowledge-manager.ts";
 import type { KnowledgeModelRef } from "../../lib/knowledge/types.ts";
+import { KNOWLEDGE_RERANK_ENABLED_POLICY } from "../../lib/knowledge/rerank-policy.ts";
 
 export async function createRerankFixture(refs: Array<KnowledgeModelRef | null>, rerank: KnowledgeManagerOptions["rerankForModel"], manyChunks = false) {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), "knowledge-global-rerank-"));
@@ -22,7 +23,8 @@ export async function createRerankFixture(refs: Array<KnowledgeModelRef | null>,
     const scope = manager.createTurnScope({ studioId: "rerank", sessionPath: "/tmp/global-rerank.jsonl", notebookIds: notebooks.map(item => item.id) });
     const compiledScope = await manager.compileTurnScope(scope);
     return { manager, notebooks, sourceIds,
-      request: { compiledScope, query: "needle", channel: "hybrid" as const, limit: 60, rerank: true },
+      request: { compiledScope, query: "needle", channel: "hybrid" as const, limit: 60,
+        rerankPolicy: KNOWLEDGE_RERANK_ENABLED_POLICY },
       close: async () => { await manager.close(); fs.rmSync(home, { recursive: true, force: true }); },
     };
   } catch (error) {

@@ -21,6 +21,7 @@ import {
   type KnowledgeEmbeddingResult,
   type KnowledgeReranker,
 } from "./knowledge-query-service.ts";
+import { KNOWLEDGE_RERANK_DISABLED_POLICY } from "./rerank-policy.ts";
 import { createKnowledgeVectorSearchBackend } from "./vector-search-backend-factory.ts";
 import type { KnowledgeVectorSearchBackend } from "./vector-search-backend.ts";
 import { PortableVectorIndexAdapter } from "./vector-index-adapter.ts";
@@ -821,7 +822,11 @@ export class KnowledgeManager {
       ...stages,
       compile: scope => this.compileTurnScope(scope),
       search: async input => {
-        const result = await this.searchService.searchWithEvidence({ ...input, channel: "fts", rerank: false });
+        const result = await this.searchService.searchWithEvidence({
+          ...input,
+          channel: "fts",
+          rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY,
+        });
         const { embeddingGroups, rerankGroups, queryEmbeddingCacheHit, retrievalResultCacheHit } = result.response;
         searchStats = { embeddingGroups, rerankGroups, queryEmbeddingCacheHit, retrievalResultCacheHit };
         return result.evidence.candidates;

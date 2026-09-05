@@ -484,6 +484,8 @@ export class LingxiEngine {
     // 迁移（chunk profile 回填），经 getEmbeddingModelContextWindow 闭包读
     // providerRegistry；晚赋值会在存量库迁移时读到 undefined 直接崩。
     this._models = new ModelManager({ lingxiHome });
+    // v0.1.34 起引擎只提供模型执行能力；快速管线与详细知识工具在各自正式入口
+    // 显式选择完整重排策略，禁止在这里重建已退役的兼容检索分支。
     this._knowledge = new KnowledgeManager({
       lingxiHome: this.lingxiHome,
       rerank: (request) => this._rerankKnowledgeTexts(request),

@@ -240,13 +240,26 @@
 
 ## P7-02 统一全部媒体入口
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`b78bcc7dbb13c88734c129992b306b5c80289c7c`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `7581da5ffaeb47554df2a5ebcfcf91be2b6b9944`；14 个生产文件和 13 个测试文件在本项前均与原提交父节点同哈希，原样迁移。
 - RED：exit `1`；`1 failed / 1 passed` files，`5 failed / 10 passed` tests；四入口未统一、后台未重解、下游仍有凭证回退。
 - GREEN：P7 定向 2 files / 15 tests；含 Hub 3 files / 23 tests；全媒体 57 files / 482 tests，均 exit `0`。
 - typecheck exit `0`；全仓 lint exit `0`，`0 errors / 9228 warnings`；定向 ESLint exit `0`，`0 errors / 317 warnings`；`git diff --check` exit `0`。
 - 静态边界：`credential_refresh_failed` 搜索 exit `1`（0 命中）；入口与适配器清单均指向统一执行目标和其凭证供应商字段。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p702-red.log`、`/tmp/lingxi-tool-contract-v0134-p702-targeted-final.log`、`/tmp/lingxi-tool-contract-v0134-p702-stage-final.log`、`/tmp/lingxi-tool-contract-v0134-p702-media-all-final.log`、`/tmp/lingxi-tool-contract-v0134-p702-typecheck-final.log`、`/tmp/lingxi-tool-contract-v0134-p702-lint-final.log`、`/tmp/lingxi-tool-contract-v0134-p702-focused-eslint-final.log`、`/tmp/lingxi-tool-contract-v0134-p702-credential-refresh-scan.log`、`/tmp/lingxi-tool-contract-v0134-p702-credential-inventory-final.log`。
+
+## P8-01 抽取共享 rerank policy 执行器
+
+- 状态：`completed_pending_commit`。
+- 复用来源：原分支提交 `e74aafee04c539dcc1352887e8763a741fb06ba5`；共享模块与回归测试按原实现迁入，其余连接点按 v0.1.34 正式知识架构逐处适配。
+- RED：exit `1`；1 failed suite，0 tests；旧代码缺少 `lib/knowledge/rerank-policy.ts`。
+- 第一次 GREEN 尝试：1 file，`1 failed / 5 passed` tests；实现已通过，唯一失败是旧测试仍要求已经被 v0.1.34 删除的引擎兼容检索分支。
+- 基线适配：没有恢复生产 legacy 注入器，也没有重建退役的引擎检索分支；正式 fast 管线显式使用禁用策略，详细知识工具显式选择完整策略，引擎只提供模型执行能力。
+- 最终任务书门禁：exit `0`，5 files / 96 tests 全部通过；相关知识回归：exit `0`，12 files / 48 tests 全部通过。
+- typecheck 最终 exit `0`；定向 ESLint exit `0`，`0 errors / 125 warnings`（存量警告）；`git diff --check` exit `0`。
+- 缓存身份使用规范化后的完整策略摘要，覆盖 channel、enabled、margin、deadline 和文档上限；两条重排路径共用同一决策与执行入口。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p801-red.log`、`/tmp/lingxi-tool-contract-v0134-p801-green-attempt1.log`、`/tmp/lingxi-tool-contract-v0134-p801-gate-attempt1.log`、`/tmp/lingxi-tool-contract-v0134-p801-related-attempt1.log`、`/tmp/lingxi-tool-contract-v0134-p801-typecheck-attempt3.log`、`/tmp/lingxi-tool-contract-v0134-p801-eslint-attempt1.log`。
 
 ## 错误记录
 
