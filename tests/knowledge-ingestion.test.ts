@@ -211,7 +211,7 @@ describe("Knowledge 摄入管线", () => {
     const claimed = first.manager.store.claimNextIngestionJob();
     expect(claimed).toMatchObject({ id: job.id, status: "running" });
     untrack(first.manager);
-    first.manager.close();
+    await first.manager.close();
 
     // 重启：启动恢复把 running 残留置回 queued，drain 续跑（相位幂等）到 done。
     const restarted = createManager(home);
@@ -509,7 +509,7 @@ describe("Embedding 批级 checkpoint 恢复（§九十，Phase 3）", () => {
     expect(interrupted.error).toContain("KNOWLEDGE_EMBEDDING_INTERRUPTED");
     expect(vectorCount(first.manager, viv)).toBe(64);
     untrack(first.manager);
-    first.manager.close();
+    await first.manager.close();
 
     // 模拟进程重启：新 manager 打开同一 LINGXI_HOME，断点向量仍在，只补 65–100。
     const restarted = createManager(home);

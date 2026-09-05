@@ -43,7 +43,7 @@ describe("KnowledgeManager 文件导入", () => {
       studioId: "studio-a",
       snapshotId: imported.snapshot.id,
     })).toEqual(bytes);
-    manager.close();
+    await manager.close();
 
     fs.unlinkSync(externalPath);
     const restarted = new KnowledgeManager({ lingxiHome });
@@ -51,7 +51,7 @@ describe("KnowledgeManager 文件导入", () => {
       studioId: "studio-a",
       snapshotId: imported.snapshot.id,
     })).toEqual(bytes);
-    restarted.close();
+    await restarted.close();
   });
 
   it("拒绝相对路径、目录、软链接、LINGXI_HOME 内文件和超限文件", async () => {
@@ -84,6 +84,6 @@ describe("KnowledgeManager 文件导入", () => {
     } catch (error: any) {
       if (error?.code !== "EPERM") throw error;
     }
-    manager.close();
+    await manager.close();
   });
 });

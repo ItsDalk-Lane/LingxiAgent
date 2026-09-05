@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { KNOWLEDGE_RERANK_DEADLINE_MS } from "../lib/knowledge/knowledge-query-service.ts";
 import { createRerankFixture } from "./helpers/knowledge-rerank-fixture.ts";
-const cleanups: Array<() => void> = [];
-afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); for (const close of cleanups.splice(0)) close(); });
+const cleanups: Array<() => Promise<void>> = [];
+afterEach(async () => { vi.useRealTimers(); vi.restoreAllMocks(); for (const close of cleanups.splice(0)) await close(); });
 const ref = { provider: "fixture", id: "rerank" };
 
 describe("全局融合后单次重排", () => {

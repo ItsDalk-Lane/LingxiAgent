@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createRerankFixture } from "./helpers/knowledge-rerank-fixture.ts";
-const cleanups: Array<() => void> = [];
-afterEach(() => { vi.restoreAllMocks(); for (const close of cleanups.splice(0)) close(); });
+const cleanups: Array<() => Promise<void>> = [];
+afterEach(async () => { vi.restoreAllMocks(); for (const close of cleanups.splice(0)) await close(); });
 
 describe("全文检索跨笔记本一次融合", () => {
   it("共享来源不会因多挂几个笔记本重复增加 FTS 分数", async () => {

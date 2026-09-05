@@ -148,7 +148,7 @@ describe("统一证据打包", () => {
       }
       expect(remote).not.toHaveBeenCalled();
     } finally {
-      manager.close();
+      await manager.close();
       fs.rmSync(home, { recursive: true, force: true });
     }
   });

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createRerankFixture } from "./helpers/knowledge-rerank-fixture.ts";
-const cleanups: Array<() => void> = [];
-afterEach(() => { vi.restoreAllMocks(); for (const close of cleanups.splice(0)) close(); });
+const cleanups: Array<() => Promise<void>> = [];
+afterEach(async () => { vi.restoreAllMocks(); for (const close of cleanups.splice(0)) await close(); });
 const a = { provider: "fixture", id: "a" }, b = { provider: "fixture", id: "b" };
 
 describe("多个重排模型按名次合并", () => {

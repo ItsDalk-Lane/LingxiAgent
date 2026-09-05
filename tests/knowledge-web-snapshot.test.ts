@@ -176,7 +176,7 @@ describe("网页与粘贴来源冻结", () => {
       endOffset: 15,
     });
     expect(fetchWebSnapshot).toHaveBeenCalledTimes(1);
-    manager.close();
+    await manager.close();
     managers.splice(managers.indexOf(manager), 1);
 
     const restarted = new KnowledgeManager({ lingxiHome });

@@ -23,9 +23,9 @@ export async function createRerankFixture(refs: Array<KnowledgeModelRef | null>,
     const compiledScope = await manager.compileTurnScope(scope);
     return { manager, notebooks, sourceIds,
       request: { compiledScope, query: "needle", channel: "hybrid" as const, limit: 60, rerank: true },
-      close: () => { manager.close(); fs.rmSync(home, { recursive: true, force: true }); },
+      close: async () => { await manager.close(); fs.rmSync(home, { recursive: true, force: true }); },
     };
   } catch (error) {
-    manager.close(); fs.rmSync(home, { recursive: true, force: true }); throw error;
+    await manager.close(); fs.rmSync(home, { recursive: true, force: true }); throw error;
   }
 }
