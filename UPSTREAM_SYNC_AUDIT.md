@@ -14,7 +14,7 @@
 | U1：上游目标 | `c6d0405294be67cb134c2758f6472748ee73e2be` | openhanako `v0.447.4` |
 | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
 | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
-| VERIFIED_SOURCE_SHA | `e4557393012c2a180fc634fc80740bee847350d9` | 2026-09-05 环境信息卡收口封印；验证明细见 PROGRESS.md 最新条目 |
+| VERIFIED_SOURCE_SHA | `8ade0726a10648a15cf08f22e0cbbeb16ca512b6` | 2026-09-06 双线合并树封印（环境信息卡+PR#43 契约修复）；验证明细见 PROGRESS.md 最新条目 |
 
 ## Audit seal model
 
