@@ -378,6 +378,20 @@
 - 提交 SHA：本项提交本身即 `SOURCE_CANDIDATE_SHA`；真实值由 P12-04 写入审计 allowlist 内的 `PROGRESS.md`，避免提交自引用。
 - 偏差：none
 
+### P12-01 / P12-02 首轮验证与源码候选重建
+
+- 首轮源码候选：`931543baedacca62417ef9d4a517d1b9857c9abd`，因 P12-02 开放边界门禁失败而失效，不得作为最终候选或封印来源。
+- P12-01 原始结果：独立 raw execution 边界扫描 exit `0`，扫描 `2121` 个生产源码文件、`0` 违规；任务书指定矩阵 exit `0`，`25 passed` files、`387 passed` tests、无新增 skip。
+- P12-01 日志：`/tmp/lingxi-tool-contract-p1201-boundary.log`、`/tmp/lingxi-tool-contract-p1201-targeted.log`。
+- P12-02 首轮原始结果：`npm run typecheck` exit `0`；`npm run lint` exit `0`，`0 errors / 9225 warnings`；`npm run lint:boundary` exit `1`，报告 `30` 条不在基线中的开放到封闭依赖，因此在执行全量测试前立即停止并判候选失效。
+- 稳定阻塞码：`OPEN_BOUNDARY_BASELINE_UNREGISTERED`。根因是本任务新增的规范调用、媒体执行目标和知识重排策略模块尚未登记到 `export-manifest.json`，不是 30 条应固化的封闭耦合债务。
+- 当前项红灯：`/tmp/lingxi-tool-contract-p1202-open-boundary.log`，exit `1`；30 条新依赖完整保留在原始日志中。
+- 当前项修复：只把 6 个新增通用运行时模块（含 `lib/tools/invocation/` 精确目录）登记到开放发布清单，并由既有生成器重建 `build/cli-runtime-closure.json`；没有修改业务逻辑，也没有把新依赖写入债务基线。
+- 当前项绿灯：`npm run lint:boundary` exit `0`，仅剩 `1` 条不受本任务影响的既有债务；开放边界和真实闭包回归 exit `0`，`2 passed` files、`39 passed` tests；闭包为 `11002` 文件（`793` source-graph、`11` runtime-asset、`10198` nft-runtime-trace）；`git diff --check` exit `0`。
+- 当前项日志：`/tmp/lingxi-tool-contract-p1202-open-boundary-repair.log`、`/tmp/lingxi-tool-contract-p1202-closure-repair.log`、`/tmp/lingxi-tool-contract-p1202-boundary-repair-tests.log`、`/tmp/lingxi-tool-contract-p1202-open-boundary-repair-final.log`。
+- 下一步：提交并推送本次边界登记，形成新的源码候选；随后从 P12-01 开始完整重跑，首轮已通过的任何 P12 结果均不继承。
+- 偏差：P12-02 门禁按预期阻止未登记的开放模块；依照任务书“候选失败后只修当前项并形成新候选”的规则处理，无跳步、无放宽、无静默记绿。
+
 ## 错误日志
 
 | 时间 | 编号 | 原始错误 | 次数 | 处理 |
@@ -431,13 +445,14 @@
 | 2026-09-05 18:24 +0800 | P10-01 | 首次实现后审批目标仍不等价：direct 缺 TargetId，另两路包含真实 TargetId | 1 | 让审批请求在无业务目标时使用宿主注册身份；没有把身份塞回模型参数或普通上下文 |
 | 2026-09-05 18:26 +0800 | P10-01 扩展回归 | 通用 effective target 绑定覆盖频道、浏览器标签、Agent 的业务目标，`54` 项会话权限测试失败 `3` 项 | 1 | 撤销通用覆盖；审批目标优先保留工具自己的业务目标，只在其缺失时使用注册身份，复跑 `57/57` 通过 |
 | 2026-09-05 18:34 +0800 | P10-02 红灯前置 | 新增配置组合首次运行 exit `0`、`12/12`，未复现新的旧代码失败 | 1 | 不伪造红灯、不削弱断言；以 `completed_with_red_not_reproduced` 原样留痕，完整 13 文件矩阵继续验证为 `373/373` |
+| 2026-09-05 18:51 +0800 | P12-02 开放边界 | `npm run lint:boundary` exit `1`，新增通用模块未进入开放发布清单，产生 `30` 条新边界依赖 | 1 | 判首轮源码候选失效；只登记本任务 6 个运行时模块并重建闭包，不扩充债务基线；边界回归 `39/39`、lint exit `0` |
 
 ## 断点续跑自检
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P11-02 报告和机器事实已完成，工作树待提交为最终源码候选 |
-| 接下来去哪？ | 使用任务书指定提交信息形成并推送源码候选；工作树干净后进入 P12-01，验证期间不修改非审计 allowlist 文件 |
+| 现在在哪里？ | P12-02 首轮边界失败已按当前项完成最小修复，正形成新的源码候选 |
+| 接下来去哪？ | 提交并推送开放清单与生成闭包；工作树干净后从 P12-01 重新执行全部最终门禁 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P11-01；P11-02 已生成修复报告、测试报告、剩余事项和机器事实，并用自动测试锁定必填字段 |
+| 已做什么？ | 完成并推送 P0-00 至 P11-02；首轮 P12 在开放边界门禁处正确失败，已修复清单遗漏且没有掩盖为债务 |
