@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { ToolTargetRegistry } from "../core/tool-target-registry.ts";
+import { createToolCatalog } from "../core/tool-catalog.ts";
 import {
   createMcpToolIdentity,
   createPluginToolIdentity,
@@ -143,5 +144,32 @@ describe("会话级工具目标注册表", () => {
       () => registry.resolveCatalogTarget({ serverId: "missing", toolName: "search" }),
       "TARGET_NOT_FOUND",
     );
+  });
+
+  it("目录只返回 TargetId，再由注册表取得唯一的可执行目标", () => {
+    const registry = new ToolTargetRegistry();
+    const registered = target(mcpIdentity("alpha", "search", "shared_search"));
+    registry.register(registered);
+    const catalog = createToolCatalog();
+    catalog.registerSource("mcp:alpha", [{
+      targetId: registered.identity.targetId,
+      origin: registered.identity.origin,
+      sourceId: registered.identity.sourceId,
+      serverId: "alpha",
+      serverLabel: "Alpha",
+      publicName: registered.identity.publicName,
+      toolName: registered.identity.localName,
+      capabilityBase: registered.identity.capabilityBase,
+      description: registered.description,
+      paramsSummary: "query (string, required)",
+      schemaRef: () => registered.parameters,
+      lifecycleGeneration: registered.getCurrentGeneration(),
+      deferrable: registered.deferrable,
+      pinned: registered.pinned,
+    }]);
+
+    const targetId = catalog.resolveTarget({ serverId: "alpha", toolName: "search" });
+    expect(targetId).toBe(registered.identity.targetId);
+    expect(registry.getByTargetId(targetId)).toBe(registered);
   });
 });

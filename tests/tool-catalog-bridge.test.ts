@@ -6,6 +6,10 @@ import {
   registerBridgeCapabilityDelegates,
 } from "../core/tool-catalog-bridge.ts";
 import { resolveToolInvocationPermission } from "../lib/permission/tool-invocation-permission.ts";
+import {
+  createMcpToolIdentity,
+  ToolInvocationError,
+} from "../lib/tools/invocation/index.ts";
 
 const createIssueSchema = {
   type: "object",
@@ -24,37 +28,129 @@ function seededCatalog() {
   const catalog = createToolCatalog();
   catalog.registerSource("mcp:github", [
     {
-      name: "github_create_issue",
-      toolName: "create_issue",
+      ...canonicalCatalogEntry("github", "create_issue", "github_create_issue"),
       description: "Create a new issue in a repository.",
       paramsSummary: "owner (string, required), repo (string, required), title (string, required)",
-      serverId: "github",
       serverLabel: "GitHub",
       schemaRef: () => createIssueSchema,
     },
     {
-      name: "github_list_issues",
-      toolName: "list_issues",
+      ...canonicalCatalogEntry("github", "list_issues", "github_list_issues"),
       description: "List issues in a repository.",
       paramsSummary: "owner (string, required)",
-      serverId: "github",
       serverLabel: "GitHub",
       schemaRef: () => ({ type: "object", properties: { owner: { type: "string" } }, required: ["owner"] }),
     },
   ]);
   catalog.registerSource("mcp:notion", [
     {
-      name: "notion_create_page",
-      toolName: "create_page",
+      ...canonicalCatalogEntry("notion", "create_page", "notion_create_page"),
       description: "Create a page in a Notion database.",
       paramsSummary: "parent_id (string, required)",
-      serverId: "notion",
       serverLabel: "Notion",
       schemaRef: () => ({ type: "object", properties: { parent_id: { type: "string" } }, required: ["parent_id"] }),
     },
   ]);
   return catalog;
 }
+
+function canonicalCatalogEntry(
+  serverId: string,
+  remoteToolName: string,
+  publicName = remoteToolName,
+) {
+  const identity = createMcpToolIdentity({
+    serverId,
+    remoteToolName,
+    publicName,
+    capabilityBase: `${serverId}_${remoteToolName}`,
+  });
+  return {
+    targetId: identity.targetId,
+    origin: identity.origin,
+    sourceId: identity.sourceId,
+    serverId,
+    serverLabel: serverId.toUpperCase(),
+    publicName,
+    // P4-01 前的 name 仅用于让旧目录接纳测试数据；新目录只以规范字段建模。
+    name: publicName,
+    toolName: remoteToolName,
+    capabilityBase: identity.capabilityBase,
+    description: `${serverId} ${remoteToolName}`,
+    paramsSummary: "query (string, required)",
+    schemaRef: () => ({ type: "object", properties: { query: { type: "string" } } }),
+    lifecycleGeneration: 3,
+    deferrable: true,
+    pinned: false,
+  };
+}
+
+function expectCatalogError(call: () => unknown, code: ToolInvocationError["code"]) {
+  try {
+    call();
+  } catch (error) {
+    expect(error).toBeInstanceOf(ToolInvocationError);
+    expect(error).toMatchObject({ code });
+    return;
+  }
+  throw new Error(`expected ${code}`);
+}
+
+describe("规范目标目录", () => {
+  it("跨来源同名可以登记，未限定来源时拒绝歧义，限定来源后返回 TargetId", () => {
+    const catalog = createToolCatalog();
+    const alpha = canonicalCatalogEntry("alpha", "search", "shared_search");
+    const beta = canonicalCatalogEntry("beta", "search", "shared_search");
+    catalog.registerSource("mcp:alpha", [alpha]);
+    catalog.registerSource("mcp:beta", [beta]);
+
+    expectCatalogError(
+      () => catalog.resolveTarget({ toolName: "shared_search" }),
+      "TARGET_AMBIGUOUS",
+    );
+    expectCatalogError(
+      () => catalog.describe("shared_search"),
+      "TARGET_AMBIGUOUS",
+    );
+    expect(catalog.resolveTarget({ serverId: "alpha", toolName: "search" })).toBe(alpha.targetId);
+    expect(catalog.resolveTarget({ sourceId: "beta", toolName: "shared_search" })).toBe(beta.targetId);
+    expect(catalog.describe("shared_search", { serverId: "beta" })).toMatchObject({
+      targetId: beta.targetId,
+      sourceId: "beta",
+      publicName: "shared_search",
+      toolName: "search",
+      capabilityBase: "beta_search",
+      lifecycleGeneration: 3,
+    });
+  });
+
+  it("登记时立即拒绝重复 TargetId 和同来源同名，不保留执行器或原始工具对象", () => {
+    const duplicateTarget = createToolCatalog();
+    const alpha = canonicalCatalogEntry("alpha", "search", "alpha_search");
+    duplicateTarget.registerSource("mcp:alpha", [alpha]);
+    expectCatalogError(
+      () => duplicateTarget.registerSource("mcp:other", [{ ...alpha, sourceId: "other", serverId: "other" }]),
+      "TARGET_AMBIGUOUS",
+    );
+
+    const duplicateName = createToolCatalog();
+    const first = canonicalCatalogEntry("gamma", "remote_one", "shared");
+    const second = canonicalCatalogEntry("gamma", "remote_two", "shared");
+    expectCatalogError(
+      () => duplicateName.registerSource("mcp:gamma", [first, second]),
+      "TARGET_AMBIGUOUS",
+    );
+
+    const rawExecute = vi.fn();
+    const rawTool = { execute: rawExecute };
+    const isolated = createToolCatalog();
+    const inputWithRawFields = { ...alpha, execute: rawExecute, tool: rawTool };
+    isolated.registerSource("mcp:alpha", [inputWithRawFields]);
+    const stored = isolated.getByTargetId(alpha.targetId);
+    expect(stored).not.toHaveProperty("execute");
+    expect(stored).not.toHaveProperty("tool");
+  });
+});
 
 function makeBridge(overrides: Record<string, any> = {}) {
   const catalog = overrides.catalog ?? seededCatalog();

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { ToolTargetId } from "../lib/tools/invocation/index.ts";
 import { EnvChangeLedger } from "../core/env-change-ledger.ts";
 import {
   applyReminderConsumption,
@@ -72,10 +73,19 @@ describe("catalog change broadcasts", () => {
   function catalogWith(names: string[]) {
     const catalog = createToolCatalog();
     catalog.registerSource("mcp", names.map((name) => ({
-      name,
+      targetId: `tool:mcp:github:${encodeURIComponent(name)}` as ToolTargetId,
+      origin: "mcp" as const,
+      sourceId: "github",
       serverId: "github",
       serverLabel: "GitHub",
+      publicName: name,
+      toolName: name,
+      capabilityBase: name,
       description: "d",
+      paramsSummary: "",
+      lifecycleGeneration: 0,
+      deferrable: true,
+      pinned: false,
       schemaRef: () => ({}),
     })));
     return catalog;

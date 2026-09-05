@@ -154,7 +154,10 @@ import { createBridgeTools, registerBridgeCapabilityDelegates } from "./tool-cat
 import { summarizeToolParameters } from "./mcp/manager.ts";
 import { ToolTargetRegistry } from "./tool-target-registry.ts";
 import { ToolInvocationGateway } from "./tool-invocation-gateway.ts";
-import { createToolSchemaValidator } from "../lib/tools/invocation/index.ts";
+import {
+  createMcpToolIdentity,
+  createToolSchemaValidator,
+} from "../lib/tools/invocation/index.ts";
 
 /** Matches the MCP config default; used when no manager config is available. */
 const DEFAULT_TOOL_DEFER_THRESHOLD = 10;
@@ -3981,13 +3984,17 @@ export class LingxiEngine {
     const builtinEntries = pluginTargets
       .filter((target) => target.deferrable)
       .map((target) => ({
-        name: target.identity.publicName,
+        targetId: target.identity.targetId,
+        origin: target.identity.origin,
+        sourceId: target.identity.sourceId,
+        publicName: target.identity.publicName,
         toolName: target.identity.localName,
+        capabilityBase: target.identity.capabilityBase,
         description: target.description,
         paramsSummary: summarizeToolParameters(target.parameters),
         serverId: target.identity.sourceId,
         serverLabel: target.identity.sourceId,
-        origin: "builtin",
+        lifecycleGeneration: target.getCurrentGeneration(),
         deferrable: target.deferrable,
         pinned: target.pinned,
         schemaRef: () => target.parameters,
@@ -4014,7 +4021,7 @@ export class LingxiEngine {
     );
     const resolveBuiltinTarget = (name) => {
       const entry = catalog.get(name);
-      if (!entry || entry.origin !== "builtin") return null;
+      if (!entry || entry.origin !== "plugin") return null;
       const target = pluginRegistry.resolveCatalogTarget({
         serverId: entry.serverId,
         toolName: entry.toolName,
@@ -4073,7 +4080,7 @@ export class LingxiEngine {
     });
 
     const deferredToolNames = new Set(deferrable.map((entry) => (
-      entry.origin === "builtin" ? entry.name : `mcp_${entry.name}`
+      entry.origin === "plugin" ? entry.publicName : `mcp_${entry.publicName}`
     )));
     return {
       catalog,
@@ -4099,7 +4106,25 @@ export class LingxiEngine {
       (Array.isArray(mcpTools) ? mcpTools : (this._mcp?.getAllTools?.() || []))
         .map((tool) => tool?.name),
     );
-    return entries.filter((entry) => published.has(`mcp_${entry.name}`));
+    return entries
+      .filter((entry) => published.has(`mcp_${entry.name}`))
+      .map((entry) => {
+        const identity = createMcpToolIdentity({
+          serverId: entry.serverId,
+          remoteToolName: entry.toolName,
+          publicName: entry.name,
+          capabilityBase: entry.name,
+        });
+        return {
+          ...entry,
+          targetId: identity.targetId,
+          origin: identity.origin,
+          sourceId: identity.sourceId,
+          publicName: identity.publicName,
+          capabilityBase: identity.capabilityBase,
+          lifecycleGeneration: 0,
+        };
+      });
   }
 
   /**
@@ -4110,7 +4135,7 @@ export class LingxiEngine {
   getLiveToolCatalogNames() {
     if (!this._mcp) return null;
     return this._liveMcpCatalogEntries()
-      .map((entry) => entry.name)
+      .map((entry) => entry.publicName)
       .sort((left, right) => left.localeCompare(right));
   }
 
