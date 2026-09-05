@@ -66,8 +66,8 @@
 | P7-02 | completed | `7581da5ffaeb47554df2a5ebcfcf91be2b6b9944` | 媒体入口统一 |
 | P8-01 | completed | `e74aafee04c539dcc1352887e8763a741fb06ba5` | rerank policy 共享执行器 |
 | P9-01 | completed | `e3fe97120a411d3e8cc055bea5a8e2dd34d4f8ae` | 统一错误映射 |
-| P9-02 | completed | pending | raw execution 边界检查 |
-| P10-01 | pending | — | 路径等价变形测试 |
+| P9-02 | completed | `ee3ac90a6777996a6776a0fa73db83736512f313` | raw execution 边界检查 |
+| P10-01 | completed | pending | 路径等价变形测试 |
 | P10-02 | pending | — | 完整配置组合 |
 | P11-01 | pending | — | 架构文档 |
 | P11-02 | pending | — | 报告、机器事实、源码候选 |
@@ -326,8 +326,21 @@
 - 绿灯命令：`npm run check:tool-invocation-boundaries`；`npx vitest run tests/tool-invocation-boundary.test.ts`；`npm run typecheck`；新增脚本和测试定向 ESLint；`git diff --check`。
 - 绿灯原始结果：独立扫描 exit `0`，扫描 `2121` 个生产源码文件、`0` 违规；Vitest exit `0`，`1 passed` file、`3 passed` tests，其中合成越界样例验证 5 类规则均会报错；三段 typecheck exit `0`；定向 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p902-boundary-final.log`、`/tmp/lingxi-tool-contract-p902-test-final.log`、`/tmp/lingxi-tool-contract-p902-typecheck-final.log`、`/tmp/lingxi-tool-contract-p902-eslint-final.log`。
-- 提交 SHA：`pending (commit 后由下一项进度回填)`
+- 提交 SHA：`ee3ac90a6777996a6776a0fa73db83736512f313`
 - 偏差：none
+
+### P10-01 建立路径等价变形测试
+
+- 状态：`completed`
+- 改动文件：`tests/tool-invocation-path-parity.test.ts`、`lib/tools/session-permission-wrapper.ts`、`core/tool-invocation-gateway.ts`、`TOOL_INVOCATION_REPAIR_PROGRESS.md`。
+- 红灯命令：`set -o pipefail; npx vitest run tests/tool-invocation-path-parity.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p1001-red.log`
+- 红灯原始结果：exit `1`；`1 failed` file、`1 failed` test。只改变 direct/deferred/plugin-dev-chat 路由后，直接入口的宿主文件边界证明被 Gateway 当成模型参数拒绝，延迟入口又没有给真实目标执行同一份规范化，符合预期路径差异。
+- 中间回归：首次修复后矩阵继续以审批目标差异失败：direct 只有显示名，deferred/plugin-dev-chat 带真实 TargetId；一次通用绑定尝试又使既有会话权限测试 `54` 项中 `3` 项失败，因为覆盖了频道、浏览器标签和 Agent 的业务目标。撤销该通用覆盖，改为审批目标优先保留真实工具声明的业务目标、无业务目标时才回落到注册身份，矩阵与既有 `57/57` 回归通过。
+- 绿灯命令：路径变形、Gateway、direct/deferred/plugin-dev-chat、MCP、会话权限、文件交付安全、Catalog 与 Engine 共 11 文件 Vitest；`npm run typecheck`；`npm run check:tool-invocation-boundaries`；3 个改动文件定向 ESLint；`git diff --check`。
+- 绿灯原始结果：Vitest exit `0`，`11 passed` files、`191 passed` tests；新矩阵 `3/3` 覆盖三条模型路由与 LocalDeveloperPrincipal HTTP 路由；三段 typecheck exit `0`；边界扫描 exit `0`，`2121` 个源码文件 `0` 违规；定向 ESLint exit `0`（`0 errors / 71 warnings`，全部来自既有会话包装文件）；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p1001-gate-final.log`、`/tmp/lingxi-tool-contract-p1001-typecheck-final.log`、`/tmp/lingxi-tool-contract-p1001-boundary.log`、`/tmp/lingxi-tool-contract-p1001-eslint.log`。
+- 提交 SHA：`pending (commit 后由下一项进度回填)`
+- 偏差：任务书在 P10-02 后给出阶段提交信息；按用户“每项提交并推送”的要求，本项使用独立且内容对应的提交信息。
 
 ## 错误日志
 
@@ -379,13 +392,15 @@
 | 2026-09-05 17:50 +0800 | P8-01 指定门禁 | 首次指定门禁 `92 passed / 1 failed`：旧快速档测试仍只期望两个策略字段 | 1 | 按“完整 rerankPolicy”契约更新断言为 enabled、margin、deadline、maxDocuments 全字段；生产行为不放宽，最终 `94/94` 通过 |
 | 2026-09-05 18:10 +0800 | P9-01 | 首次 typecheck 报 1 处工具可用性联合类型未收窄，exit `2` | 1 | 改用显式真值判别；只修类型表达，运行逻辑不变，三段 typecheck 复跑 exit `0` |
 | 2026-09-05 18:10 +0800 | P9-01 扩展回归 | `177 passed / 1 failed`：既有 plugin-dev 工具测试仍期待缺失目标在权限阶段返回 `null` | 1 | 更新为断言稳定 `TARGET_NOT_FOUND`；不恢复空值/权限拒绝混同，最终扩展矩阵 `283/283` 通过 |
+| 2026-09-05 18:24 +0800 | P10-01 | 首次实现后审批目标仍不等价：direct 缺 TargetId，另两路包含真实 TargetId | 1 | 让审批请求在无业务目标时使用宿主注册身份；没有把身份塞回模型参数或普通上下文 |
+| 2026-09-05 18:26 +0800 | P10-01 扩展回归 | 通用 effective target 绑定覆盖频道、浏览器标签、Agent 的业务目标，`54` 项会话权限测试失败 `3` 项 | 1 | 撤销通用覆盖；审批目标优先保留工具自己的业务目标，只在其缺失时使用注册身份，复跑 `57/57` 通过 |
 
 ## 断点续跑自检
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P9-02 已完成红绿验证，AST 边界扫描与自动测试门禁均通过，等待提交和推送 |
-| 接下来去哪？ | 使用任务书指定提交信息提交并推送 P9-02，回填 SHA 后进入 P10-01 路径等价变形测试 |
+| 现在在哪里？ | P10-01 已完成红绿验证和扩展回归，等待提交和推送 |
+| 接下来去哪？ | 提交并推送 P10-01，回填 SHA 后进入 P10-02 完整配置组合 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P9-01；P9-02 已建立精确文件白名单的 AST 边界扫描，当前 `2121` 个源码文件 `0` 违规 |
+| 已做什么？ | 完成并推送 P0-00 至 P9-02；P10-01 已证明三条模型入口的审批、参数、句柄、结果、错误与副作用等价，并单列验证本地开发 HTTP 主体 |

@@ -248,18 +248,24 @@ function buildToolApprovalRequest(confirmId: any, toolName: any, params: any) {
   };
 }
 
-function buildToolApprovalGatewayRequest(toolName: any, params: any, sessionPath: any, stableKey: any, ctx: any = null, deps: any = {}, invocation: any = null, legacySessionPermission: any = null) {
-  const target = invocation?.effectiveInvocation
+function buildToolApprovalGatewayRequest(toolName: any, params: any, sessionPath: any, stableKey: any, ctx: any = null, deps: any = {}, invocation: any = null, legacySessionPermission: any = null, toolIdentity: any = null) {
+  const target = invocation?.target
+    ? {
+      type: invocation.target.type,
+      id: invocation.target.id,
+      label: invocation.target.label || invocation.target.id,
+    }
+    : invocation?.effectiveInvocation
     ? {
       type: "tool",
       id: invocation.effectiveInvocation.targetId,
       label: invocation.effectiveInvocation.toolName,
     }
-    : invocation?.target
+    : toolIdentity?.targetId
     ? {
-      type: invocation.target.type,
-      id: invocation.target.id,
-      label: invocation.target.label || invocation.target.id,
+      type: "tool",
+      id: toolIdentity.targetId,
+      label: toolIdentity.publicName || toolName,
     }
     : approvalTargetForTool(toolName, params);
   const sideEffect = approvalSideEffectForTool(params, invocation, legacySessionPermission);
@@ -413,9 +419,12 @@ async function executeWithInvocationRevalidation(
       toolName: tool.name,
     });
   }
+  const effectiveInvocation = expectedInvocation?.effectiveInvocation;
+  const executionToolName = effectiveInvocation?.toolName || tool.name;
+  const executionToolParams = effectiveInvocation?.arguments || executionParams.value;
   const preparedExecution = prepareStageFilesExecutionParams({
-    toolName: tool.name,
-    params: executionParams.value,
+    toolName: executionToolName,
+    params: executionToolParams,
   }, deps.permissionBoundary);
   if (preparedExecution.ok === false) {
     return toolError(preparedExecution.error.reason, {
@@ -428,11 +437,19 @@ async function executeWithInvocationRevalidation(
     });
   }
   const executionArgs = [...args];
-  executionArgs[1] = preparedExecution.params;
+  executionArgs[1] = effectiveInvocation
+    ? { ...executionParams.value, arguments: preparedExecution.params }
+    : preparedExecution.params;
   if (runtimeCtxIndex >= 0) executionArgs[runtimeCtxIndex] = executionCtx;
   const execute = () => tool.execute(...executionArgs);
-  return preparedInvocation
-    ? runWithPreparedInvocation(preparedInvocation, execute)
+  const executionPreparedInvocation = preparedInvocation
+    ? createPreparedInvocation({
+      ...preparedInvocation,
+      arguments: { ...preparedExecution.params },
+    })
+    : null;
+  return executionPreparedInvocation
+    ? runWithPreparedInvocation(executionPreparedInvocation, execute)
     : execute();
 }
 
@@ -560,7 +577,7 @@ async function askForToolApproval(toolName: any, params: any, sessionPath: any, 
   };
 }
 
-async function reviewToolApproval(toolName: any, params: any, sessionPath: any, deps: any, ctx: any = null, sessionBinding: any = null, invocation: any = null, legacySessionPermission: any = null) {
+async function reviewToolApproval(toolName: any, params: any, sessionPath: any, deps: any, ctx: any = null, sessionBinding: any = null, invocation: any = null, legacySessionPermission: any = null, toolIdentity: any = null) {
   const gateway = deps.getApprovalGateway?.() || deps.approvalGateway || null;
   if (!gateway || typeof gateway.review !== "function") {
     return {
@@ -570,7 +587,7 @@ async function reviewToolApproval(toolName: any, params: any, sessionPath: any, 
       reasonCode: "approval_gateway_unavailable",
     };
   }
-  const request = buildToolApprovalGatewayRequest(toolName, params, sessionPath, sessionBinding?.sessionId || sessionPath || "session", ctx, deps, invocation, legacySessionPermission);
+  const request = buildToolApprovalGatewayRequest(toolName, params, sessionPath, sessionBinding?.sessionId || sessionPath || "session", ctx, deps, invocation, legacySessionPermission, toolIdentity);
   const decision = await gateway.review(request, buildApprovalReviewContext({
     source: deps,
     ctx,
@@ -800,7 +817,7 @@ export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
               toolName: effectiveToolName,
             });
           }
-          const review = await reviewToolApproval(effectiveToolName, reviewParams.value, sessionPath, deps, executionCtx, sessionBinding.value, invocation, legacySessionPermission);
+          const review = await reviewToolApproval(effectiveToolName, reviewParams.value, sessionPath, deps, executionCtx, sessionBinding.value, invocation, legacySessionPermission, permissionTool?._toolTargetIdentity);
           if (review.allowed) {
             return executeWithInvocationRevalidation(
               permissionTool,
