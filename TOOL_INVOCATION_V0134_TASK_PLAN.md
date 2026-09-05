@@ -52,7 +52,7 @@ P12-06 的语义顺序迁移、适配和重新验证，最终只推送校正版�
 
 ## 当前状态
 
-`Phase B / P6-02 completed_pending_commit`
+`Phase B / P7-01 completed_pending_commit`
 
 ## 错误记录
 
