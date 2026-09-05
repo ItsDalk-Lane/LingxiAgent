@@ -26,7 +26,20 @@
 - 分支创建前原证据分支无已跟踪或未跟踪改动；规划技能随后创建三个本任务专用未跟踪规划文件并随校正版分支带入。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p000-fetch.log`、`/tmp/lingxi-tool-contract-v0134-p000-npm-ci.log`。
 
-## 待 P0-01 采集
+## P0-01 校正版基线门禁
 
-- typecheck、lint、定向测试、全量测试、服务端构建和补丁空白检查的原始统计。
+| 门禁 | 原始日志 | 原始结果 | 判定 |
+|---|---|---|---|
+| `npm run typecheck` | `/tmp/lingxi-tool-contract-v0134-p001-typecheck.log` | exit `0`；三段 TypeScript 检查完成 | `PASS` |
+| `npm run lint` | `/tmp/lingxi-tool-contract-v0134-p001-lint.log` | exit `0`；`0 errors / 9194 warnings`，其中 `25` 条可自动修复 | `PASS_WITH_WARNINGS` |
+| 11 文件定向 Vitest | `/tmp/lingxi-tool-contract-v0134-p001-targeted.log` | exit `0`；`11 passed` files；`253 passed` tests；无失败、无跳过 | `PASS` |
+| `npm test` | `/tmp/lingxi-tool-contract-v0134-p001-full-test.log` | exit `1`；`1359 passed / 1 failed / 1 skipped` files；`13763 passed / 1 failed / 7 skipped` tests | `FAIL_SEQUENCE_SEAL` |
+| `npm run build:server` | `/tmp/lingxi-tool-contract-v0134-p001-build-server.log` | exit `1`；签名打包前明确拒绝：`LINGXI_SIGN_KEY is not set` | `FAIL_ENVIRONMENT` |
+| 抛弃式密钥诊断构建 | `/tmp/lingxi-tool-contract-v0134-p001-build-server-diagnostic.log` | exit `0`；服务端、渲染器归档和签名清单均生成 | `PASS_DIAGNOSTIC` |
+| `git diff --check` | 无单独日志 | exit `0` | `PASS` |
 
+### 基线失败归因
+
+1. `post-verification-audit-seal` 的唯一失败文件正是 P0-00 新增的五份任务记录；发布提交自身从旧已验证源码到 `60d910b8` 只改六份既有审计 allowlist 文件。未修改或放宽封印测试，留待 P12 重新固定已验证源码坐标。
+2. 原始服务端构建在缺少真实签名密钥时按设计拒绝。随后用仓库自带生成器在 `/tmp/lingxi-tool-contract-v0134-p001-signing` 创建抛弃式密钥与匹配公开 keyset，诊断复跑 exit `0`；临时私钥和 keyset 已逐文件删除，空目录也已移除。
+3. P0-01 只建立迁移前事实，不把上述两项原始失败改写为通过，也不在本项改审计门禁或生产代码。
