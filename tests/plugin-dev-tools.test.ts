@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 import { createPluginDevTools } from "../core/plugin-dev-tools.ts";
 
+const failClosedInvocationDeps = {
+  invocationGateway: {} as never,
+  resolveChatToolTarget: () => null,
+};
+
 describe("createPluginDevTools", () => {
   it("wraps dev lifecycle operations as Agent-callable tools", async () => {
     const service = {
@@ -16,7 +21,10 @@ describe("createPluginDevTools", () => {
       describeSurfaceDebug: vi.fn(),
       runScenario: vi.fn(),
     };
-    const tools = createPluginDevTools({ pluginDevService: service });
+    const tools: any[] = createPluginDevTools({
+      pluginDevService: service,
+      ...failClosedInvocationDeps,
+    }) as any[];
     const install = tools.find((tool) => tool.name === "plugin_dev_install");
 
     expect(tools.map((tool) => tool.name)).toContain("plugin_dev_uninstall");
@@ -41,7 +49,10 @@ describe("createPluginDevTools", () => {
       invokeTool: vi.fn(), getDiagnostics: vi.fn(), listSurfaces: vi.fn(),
       describeSurfaceDebug: vi.fn(), runScenario: vi.fn(),
     };
-    const tools = createPluginDevTools({ pluginDevService: service });
+    const tools: any[] = createPluginDevTools({
+      pluginDevService: service,
+      ...failClosedInvocationDeps,
+    }) as any[];
     const descriptors = Object.fromEntries(tools.map((tool) => [
       tool.name,
       tool.sessionPermission.resolveInvocation(),
@@ -61,14 +72,14 @@ describe("createPluginDevTools", () => {
       "plugin_dev_disable",
       "plugin_dev_reset",
       "plugin_dev_uninstall",
-      "plugin_dev_invoke_tool",
       "plugin_dev_run_scenario",
     ]) {
       expect(descriptors[name], name).toMatchObject({ kind: "review" });
     }
+    expect(descriptors.plugin_dev_invoke_tool).toBeNull();
   });
 
-  it("passes session identity and agent context to dev plugin tool invocations", async () => {
+  it("只向模型暴露开发工具的业务参数", () => {
     const service = {
       installFromSource: vi.fn(),
       reloadPlugin: vi.fn(),
@@ -82,40 +93,18 @@ describe("createPluginDevTools", () => {
       describeSurfaceDebug: vi.fn(),
       runScenario: vi.fn(),
     };
-    const tools = createPluginDevTools({
+    const tools: any[] = createPluginDevTools({
       pluginDevService: service,
       getAgentId: () => "hanako",
-    });
+      ...failClosedInvocationDeps,
+    }) as any[];
     const invoke = tools.find((tool) => tool.name === "plugin_dev_invoke_tool");
 
-    await invoke.execute(
-      "call-1",
-      { pluginId: "demo", toolName: "echo", input: { text: "hi" } },
-      null,
-      null,
-      {
-        sessionId: "sess_dev_tool",
-        sessionRef: {
-          sessionId: "sess_dev_tool",
-          sessionPath: "/tmp/session.jsonl",
-          legacySessionPath: "/tmp/legacy.jsonl",
-        },
-        sessionManager: { getSessionFile: () => "/tmp/ignored.jsonl" },
-      },
-    );
-
-    expect(service.invokeTool).toHaveBeenCalledWith({
-      pluginId: "demo",
-      toolName: "echo",
-      input: { text: "hi" },
-      sessionPath: "/tmp/session.jsonl",
-      sessionId: "sess_dev_tool",
-      sessionRef: {
-        sessionId: "sess_dev_tool",
-        sessionPath: "/tmp/session.jsonl",
-        legacySessionPath: "/tmp/legacy.jsonl",
-      },
-      agentId: "hanako",
-    });
+    expect(Object.keys(invoke.parameters.properties).sort()).toEqual([
+      "arguments",
+      "pluginId",
+      "toolName",
+    ]);
+    expect(service.invokeTool).not.toHaveBeenCalled();
   });
 });

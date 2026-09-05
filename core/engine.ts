@@ -42,7 +42,10 @@ import {
 import { PluginManager } from "./plugin-manager.ts";
 import { EnvChangeLedger } from "./env-change-ledger.ts";
 import { PluginDevService } from "./plugin-dev-service.ts";
-import { createPluginDevTools } from "./plugin-dev-tools.ts";
+import {
+  createPluginDevTools,
+  registerPluginDevCapabilityDelegates,
+} from "./plugin-dev-tools.ts";
 import { DefaultResourceLoader, SessionManager, SettingsManager } from "../lib/pi-sdk/index.ts";
 import { compactSessionWithCachePreservationRecoveringRuntime } from "./session-compactor.ts";
 import { resolveRequestReasoningLevelForContext } from "./request-reasoning-level.ts";
@@ -4773,8 +4776,21 @@ export class LingxiEngine {
       ? createPluginDevTools({
           pluginDevService: this._pluginDevService,
           getAgentId: () => agentId,
+          invocationGateway,
+          resolveChatToolTarget: (pluginId, toolName) => {
+            const target = invocationGateway.resolveTarget({ serverId: pluginId, toolName });
+            const registered = registeredPluginTargets.find(
+              (entry) => entry.target.identity.targetId === target.identity.targetId,
+            );
+            if (registered?.runtimeTool?._pluginSource !== "dev") return null;
+            return this._pluginDevService.isChatToolTargetCurrentlyAvailable(
+              pluginId,
+              target.identity.publicName,
+            ) ? target : null;
+          },
         })
       : [];
+    registerPluginDevCapabilityDelegates(pluginDevTools, { gateway: invocationGateway });
     assertUniqueBuiltToolNames([
       { source: "custom tools", tools: baseCustomTools },
       { source: "extra custom tools", tools: extraCustomTools },

@@ -29,6 +29,7 @@ function writeDevPlugin(root, id, options: any = {}) {
   fs.writeFileSync(path.join(pluginDir, "tools", "echo.js"), `
     export const name = "echo";
     export const description = "Echo input text";
+    export const sessionPermission = { readOnly: true };
     export async function execute(params) {
       return ${JSON.stringify(options.prefix || "Echo")} + " " + params.text;
     }
@@ -118,6 +119,7 @@ describe("PluginDevService", () => {
             this.register(this.ctx.registerTool({
               name: "dynamic",
               description: "Dynamic dev tool",
+              sessionPermission: { readOnly: true },
               execute: async (input, ctx) => (ctx.agentId || "") + ":" + input.text,
             }));
           }
@@ -142,6 +144,7 @@ describe("PluginDevService", () => {
     fs.writeFileSync(path.join(sourcePath, "tools", "echo.js"), `
       export const name = "echo";
       export const description = "Echo session identity";
+      export const sessionPermission = { readOnly: true };
       export async function execute(_params, ctx) {
         return JSON.stringify({
           sessionId: ctx.sessionId,
@@ -196,13 +199,16 @@ describe("PluginDevService", () => {
   it("disables, enables, resets, and uninstalls only the remembered dev slot", async () => {
     const sourcePath = writeDevPlugin(sourceRoot, "dev-life", { prefix: "Life" });
     const install = await service.installFromSource({ sourcePath });
+    expect(service.isChatToolTargetCurrentlyAvailable("dev-life", "dev-life_echo")).toBe(true);
 
     const disabled = await service.disablePlugin("dev-life");
     expect(disabled.plugin).toMatchObject({ id: "dev-life", status: "disabled", source: "dev" });
     expect(pluginManager.getPlugin("dev-life").status).toBe("disabled");
+    expect(service.isChatToolTargetCurrentlyAvailable("dev-life", "dev-life_echo")).toBe(false);
 
     const enabled = await service.enablePlugin("dev-life", { devRunId: install.devRunId });
     expect(enabled.plugin).toMatchObject({ id: "dev-life", status: "loaded", source: "dev" });
+    expect(service.isChatToolTargetCurrentlyAvailable("dev-life", "dev-life_echo")).toBe(true);
 
     const reset = await service.resetPlugin("dev-life", { devRunId: install.devRunId });
     expect(reset.plugin).toMatchObject({ id: "dev-life", status: "loaded", source: "dev" });
@@ -212,6 +218,7 @@ describe("PluginDevService", () => {
     expect(removed).toMatchObject({ ok: true, pluginId: "dev-life" });
     expect(pluginManager.getPlugin("dev-life")).toBeNull();
     expect(service.getDevSlot("dev-life")).toBeNull();
+    expect(service.isChatToolTargetCurrentlyAvailable("dev-life", "dev-life_echo")).toBe(false);
     expect(fs.existsSync(path.join(devPluginsDir, "dev-life"))).toBe(false);
     expect(syncPluginExtensions).toHaveBeenCalledTimes(5);
   });
@@ -483,6 +490,7 @@ describe("PluginDevService", () => {
     fs.writeFileSync(path.join(sourcePath, "tools", "echo.js"), `
       export const name = "echo";
       export const description = "Echo scenario session";
+      export const sessionPermission = { readOnly: true };
       export async function execute(_params, ctx) {
         return ctx.sessionId + ":" + ctx.sessionRef.sessionPath;
       }

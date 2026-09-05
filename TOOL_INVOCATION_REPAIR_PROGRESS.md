@@ -59,8 +59,8 @@
 | P4-03 | completed | `ae40059d531bad737c1427cb232e7e8fcf7d03ba` | MCP eligibility 与执行器 |
 | P5-01 | completed | `30eb7d7c5eeb4f9b8d455961ef8bab7104adccf7` | Plugin 工具代次 |
 | P5-02 | completed | `aede651699e2e6ce6b71bcd73ac62607ec9dd1a4` | MCP live generation |
-| P5-03 | completed | 待本项提交后回填 | 旧会话撤销语义 |
-| P6-01 | pending | — | plugin-dev 聊天身份 |
+| P5-03 | completed | `6a6890fc0d8e67fa3bd71f1815c311d8bd65b3b7` | 旧会话撤销语义 |
+| P6-01 | completed | 待本项提交后回填 | plugin-dev 聊天身份 |
 | P6-02 | pending | — | LocalDeveloperPrincipal |
 | P7-01 | pending | — | 媒体执行目标解析器 |
 | P7-02 | pending | — | 媒体入口统一 |
@@ -240,8 +240,20 @@
 - 绿灯命令：生命周期新测试、plugin Manager/runtime、MCP parity/runtime、注册表、网关、Engine 延迟装配与会话漂移播报共 9 文件 Vitest；`npm run typecheck`；新增测试定向 ESLint；`git diff --check`。
 - 绿灯原始结果：Vitest exit `0`，`9 passed` files、`312 passed` tests；三段 typecheck exit `0`；新增测试 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p503-gate-attempt3.log`、`/tmp/lingxi-tool-contract-p503-typecheck-attempt3.log`、`/tmp/lingxi-tool-contract-p503-new-eslint-attempt3.log`。
-- 提交 SHA：待本项提交后、P6-01 红灯前回填。
+- 提交 SHA：`6a6890fc0d8e67fa3bd71f1815c311d8bd65b3b7`
 - 偏差：none
+
+### P6-01 聊天路径只使用宿主持有身份
+
+- 状态：`completed`
+- 改动文件：`core/plugin-dev-tools.ts`、`core/plugin-dev-service.ts`、`core/engine.ts`、`core/tool-invocation-gateway.ts`、`tests/plugin-dev-tools.test.ts`、`tests/plugin-dev-service.test.ts`、`tests/plugin-dev-invocation-parity.test.ts`、`TOOL_INVOCATION_REPAIR_PROGRESS.md`。
+- 红灯命令：`set -o pipefail; npx vitest run tests/plugin-dev-invocation-parity.test.ts tests/plugin-dev-tools.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p601-red.log`
+- 红灯原始结果：exit `1`；`1 passed / 1 failed` files、`3 passed / 4 failed` tests。旧模型 schema 暴露并接受会话身份覆盖字段，权限固定为粗粒度 review，执行直达开发服务而不经过 Gateway，且缺失真实目标时没有 fail-closed，均符合预期。
+- 绿灯命令：plugin-dev 新旧测试、Engine 装配、Gateway 与会话权限共 6 文件 Vitest；`npm run typecheck`；新增测试文件定向 ESLint；聊天入口 raw 调用扫描；`git diff --check`。
+- 绿灯原始结果：Vitest exit `0`，`6 passed` files、`111 passed` tests；三段 typecheck exit `0`；新增测试 ESLint exit `0`、`0` 问题；聊天入口对 `service.invokeTool` / `executePluginTool` 命中 `0`；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p601-stage-final.log`、`/tmp/lingxi-tool-contract-p601-typecheck-final.log`、`/tmp/lingxi-tool-contract-p601-new-eslint-final.log`、`/tmp/lingxi-tool-contract-p601-chat-boundary-final.log`。
+- 提交 SHA：待本项提交后、P6-02 红灯前回填。
+- 偏差：任务书在 P6-02 后给出阶段提交信息；按用户“每项提交并推送”的要求，本项使用独立且内容对应的提交信息。P5 引入的显式权限契约使开发服务旧夹具无法加载，本项只给测试插件补 `readOnly` 声明，生产端继续 fail-closed。
 
 ## 错误日志
 
@@ -283,13 +295,15 @@
 | 2026-09-05 16:26 +0800 | P5-02 | 首次实现后 MCP parity `187 passed / 2 failed`，direct 准备记录仍使用默认代次；typecheck 同时报 Manager 类声明缺字段 | 1 | 给统一 direct façade 写入装配代次，并补 Manager 代次表声明；网关仍严格拒绝不匹配，不放宽检查 |
 | 2026-09-05 16:33 +0800 | P5-03 | 首次阶段回归 `312/312`，但 typecheck 报合并清单集合元素为 `unknown` | 1 | 把集合声明为字符串集合；不改清单内容或排序逻辑 |
 | 2026-09-05 16:34 +0800 | P5-03 | 类型检查继续发现新增测试的可用性回调和两个构造夹具类型过宽 | 1 | 复用注册表判定类型，并按项目既有测试边界把构造夹具收口为 `never`；生产代码不变 |
+| 2026-09-05 16:41 +0800 | P6-01 扩展回归 | 首次扩展门禁 `104 passed / 7 failed`：P5 后开发服务旧测试插件未声明权限，加载阶段已被拒绝 | 1 | 只给测试插件夹具补显式 `readOnly` 契约；生产端缺声明继续拒绝，复跑开发服务测试 `15/15` 通过 |
+| 2026-09-05 16:41 +0800 | P6-01 | 首次 typecheck 报宿主会话目标联合类型没有统一的 `sessionId` 字段 | 1 | 为宿主运行上下文与规范会话目标增加明确类型，不改变来源或回退规则；复跑三段 typecheck exit `0` |
 
 ## 断点续跑自检
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P5-03 已完成红绿验证与 P5 阶段门禁，等待提交和推送 |
-| 接下来去哪？ | 使用任务书指定提交信息提交并推送 P5-03，回填 SHA 后进入 P6-01 |
+| 现在在哪里？ | P6-01 已完成红绿验证与扩展门禁，等待提交和推送 |
+| 接下来去哪？ | 独立提交并推送 P6-01，回填 SHA 后进入 P6-02 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P5-02；P5-03 完成审批后生命周期撤销、旧对象零执行、快照保留、临时断线精确错误，以及 plugin+MCP 联合漂移清单；相关门禁 `312/312` |
+| 已做什么？ | 完成并推送 P0-00 至 P5-03；P6-01 已移除聊天模型的身份覆盖字段，以真实目标权限决策并经 Gateway 执行，相关门禁 `111/111` |

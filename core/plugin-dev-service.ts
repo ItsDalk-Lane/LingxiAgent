@@ -692,6 +692,13 @@ export class PluginDevService {
     };
   }
 
+  isChatToolTargetCurrentlyAvailable(pluginId, publicName) {
+    const entry = this._pluginManager.getPlugin(pluginId, { source: "dev" });
+    if (!entry || entry.status !== "loaded") return false;
+    const tool = this._pluginManager.getPluginTool(pluginId, publicName, { entry });
+    return !!tool && this._pluginManager.isPluginToolCurrentlyAvailable(pluginId, tool.name);
+  }
+
   listSurfaces(pluginId) {
     const include = (item) => !pluginId || item.pluginId === pluginId;
     return [
