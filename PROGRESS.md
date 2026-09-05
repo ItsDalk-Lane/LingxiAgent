@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 6607e9af03d64186ebce6a1109ccb94936323506  (2026-09-05 Windows 知识回归清理同步封印)
+VERIFIED_SOURCE_SHA   = 0adf3727e065e394b71c75cc8006707f1477ab7e  (2026-09-05 v0.1.34 发布资料最终封印)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 当前知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1127,4 +1127,13 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 首轮 CI `33939166103`：Windows 知识专项 150 PASS / 1 FAIL，失败发生在导入回归清理临时目录，EPERM；原文导入与重启断言此前已执行。原始日志 `/tmp/lingxi-pr41-windows1.log` 保留。
 - 异步关闭契约同步遗漏了部分测试内的显式关闭及重排共享夹具；现均等待真实关闭后再删目录或重开管理器，未增加删除重试、忽略异常或变更断言。静态核对直接创建的管理器仅剩两处刻意检验“关闭发起时立即失效”的调用不就地等待，仍由各自清理钩子等待同一关闭承诺。
 - 相关 11 文件 / 53 项本机通过，测试工程类型检查 exit 0。应用源码与 004cdafd 一致；第二轮 macOS arm64 已通过 4GB 配置的 Typecheck，确认原 2GB 内存阻塞解除。最终 Windows 清理和四平台全量待新运行，不复用旧失败为成功。
+
+
+## 2026-09-05 v0.1.34 发布资料最终封印
+
+- 固定源码：`0adf3727e065e394b71c75cc8006707f1477ab7e`。
+- 功能 PR #41 已合并主分支（b02aaab7）；远程 CI 33939710990 四平台及七项门禁全部 PASS，原始坐标与作业链接见 artifacts/release-v0.1.34/feature-ci-validation.json。
+- 版本 0.1.34 / releaseGeneration 12；上一正式版 0.1.33 / generation 11。摘要通过生成器追加到 v2 历史，双份摘要验证与 release:preflight PASS。
+- 发布资料定向回归 6 文件 / 54 项 PASS；运行时代码保持已通过四平台的功能合并版本。
+- 当前是发布资料封印；正式四平台安装包、签名与上传尚未执行，等待发布分支门禁及标签流水线，不能视为已经发布。
 
