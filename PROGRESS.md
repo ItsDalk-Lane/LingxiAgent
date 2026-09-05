@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = d0dd24922126564164b60cf1d0f835fa7989aee7  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-05 v0.1.33 新建会话/工作台五轮修复)
+VERIFIED_SOURCE_SHA   = 01cdd80b1611ddc1c9f4efcb69bdbc7d0f9d76a3  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-05 v0.1.33 新建会话/工作台五轮修复)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -845,9 +845,10 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   exit 0（14 删除 → 14 WARN）。验证：typecheck×3 绿 + 全量 npm test
   12896 通过（含新增 425 降级用例）后推进。
 
-- **2026-09-05 v0.1.33 新建会话/工作台五轮修复**（功能树 d0dd2492/seal 本提交；
-  三提交 7d2672d2+332e8960+d0dd2492，23+3+2 文件 / +2489-55，含 engine.ts 持久化指纹
-  compatible 重钉 sha256:d7239a0f… 不变）：修复轮一（新建会话继承源重排/去空缓存种子/
+- **2026-09-05 v0.1.33 新建会话/工作台五轮修复**（功能链
+  7d2672d2→332e8960→d0dd2492→01cdd80b/seal 本提交；
+  三提交 23+3+2 文件 / +2489-55，另 01cdd80b 测试语义补钉 1 文件，含 engine.ts
+  持久化指纹 compatible 重钉 sha256:d7239a0f… 不变）：修复轮一（新建会话继承源重排/去空缓存种子/
   loadSessions reconcile 自愈/五语言文案）、轮二（engine 暴露 getSessionWorkspaceMount，
   switch 回包补齐挂载身份，治左栏空白三症状）、轮三（默认工作台与 Agent 工作台目录
   同目录两本账合流）、轮四（默认工作台显示名=配置目录名派生+启动合流键）、轮五
@@ -858,6 +859,11 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   stash 对照证实先在）后推进。环境备注：本轮全量首跑 41 文件级失败均为 workspace 包
   @lingxi/plugin-* 未构建的解析失败（2026-09-04 npm install 后 dist 缺失），
   `npm run build:packages` 后归零，非代码回归。
+  二次推进（01cdd80b）：包构建后暴露 mobile 全局新建聊天用例——轮一规则 B 改语义时
+  其桌面孪生已更新、该用例因包未构建从未执行而被漏掉，断言仍锁定旧「重置到 Primary
+  工作台」语义；按同一裁决翻转为「目录保持当前显示工作台，Agent 身份仍重置 Primary」
+  （MobileApp.test.tsx 24/24 绿；DeskSection Jian drawer 隔离 27/27 绿，判负载相关
+  既有 flaky）。UPSTREAM_SYNC_AUDIT/MATRIX 的 SHA 副本随二次推进同步。
 
 - **2026-09-02 安全双件套 + 沙盒拒绝分因文案**（功能树 275d82c7/seal 本提交，
   feat/pending-sep02，628d2f90+275d82c7 两提交 32 files / +1053-58）：
