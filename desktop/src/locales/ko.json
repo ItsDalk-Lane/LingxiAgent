@@ -235,7 +235,8 @@
       "allTab": "모든 스킬",
       "agentTabs": "어시스턴트별 스킬 보기",
       "previousAgent": "이전 어시스턴트",
-      "nextAgent": "다음 어시스턴트"
+      "nextAgent": "다음 어시스턴트",
+      "externalRemove": "제거(비활성화로 변경)"
     }
   },
   "sidebar": {
@@ -3938,7 +3939,8 @@
     "tabs": {
       "label": "오른쪽 작업공간",
       "sessionFiles": "대화 파일",
-      "workspace": "작업공간"
+      "workspace": "작업공간",
+      "projectSkills": "프로젝트 스킬"
     },
     "sessionFiles": {
       "title": "대화 파일",

@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:0ffafa9a1f3c3a892a59a5db98cb9269f58168bd2f945cc81e234d7e669c387c",
+  "payloadFingerprint": "sha256:60b00ba06ec6dcd37cb3f20be09751125ba881fa73b9d74c15d2d9bf6b95e890",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3292,8 +3292,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "知识库连续查阅、可设置分块及后台停止收尾沿用现有数据表和列；旧分块与向量索引继续可读，新增取消归属筛选仅复用已有取消字段，数据版本保持1。",
-    "payloadFingerprint": "sha256:0ffafa9a1f3c3a892a59a5db98cb9269f58168bd2f945cc81e234d7e669c387c"
+    "compatibilityReason": "合并 feat/pending-sep04（环境信息卡 git 面）入 v0.1.34 主线：git-environment 路由与 session-coordinator 挂载读取为增量兼容变更，无 schema/restore 契约变化",
+    "payloadFingerprint": "sha256:60b00ba06ec6dcd37cb3f20be09751125ba881fa73b9d74c15d2d9bf6b95e890"
   },
   "schemas": [
     {
@@ -3467,7 +3467,7 @@
       "contract": "bounded base64 cover upload temporary-directory lifecycle",
       "kind": "directory-contract",
       "module": "server/routes/desk.ts",
-      "sourceHash": "sha256:49c2fbcc3bd85deeefe7e5e5ba187561e419b8207f5e4b22464cf975e2448a79",
+      "sourceHash": "sha256:a7c7e339079be179fd4c1c806c4a19fc4ab687eeff956f2117ed101fcd2bf9a0",
       "storeId": "desk-cover-upload-staging"
     },
     {
@@ -4185,9 +4185,9 @@
             "type": "table"
           }
         ],
-        "userVersion": 4
+        "userVersion": 6
       },
-      "sourceHash": "sha256:ec7b0dc5ab0c1c27f90df3f33be238fda398196e967e3a35f3269162c3962d2a",
+      "sourceHash": "sha256:e0801ad79309b7abd0f8ccd48a4e7ae5f83d341b3ffba832ab4a80f0f5f9694c",
       "storeId": "model-observability-db"
     },
     {
@@ -4284,7 +4284,7 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:f641d0ccaac284d241c2d999178c1cb78bc2d4f1c0e7dcbb6daeb3983d5f97b6",
+      "sourceHash": "sha256:3d1aa600ffab19a5c950eb0da154035d32a38987af9d10d1348879fd81ce1c5b",
       "storeId": "server-runtime-info"
     },
     {
@@ -4306,7 +4306,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:42daf2488c6ff1f96ac0258fd8940db915ae09020bcac0a319c80c4bb0f83dcc"
+          "sourceHash": "sha256:904d37c656bb48b2a372a3984dfd5fd67c47fd568e0929fe0b8aa4dec8b65781"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",

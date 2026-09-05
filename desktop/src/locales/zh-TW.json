@@ -235,7 +235,8 @@
       "allTab": "全部技能",
       "agentTabs": "按助手查看技能",
       "previousAgent": "上一個助手",
-      "nextAgent": "下一個助手"
+      "nextAgent": "下一個助手",
+      "externalRemove": "移除（改為未啟用）"
     }
   },
   "sidebar": {
@@ -3938,7 +3939,8 @@
     "tabs": {
       "label": "右側工作台",
       "sessionFiles": "對話檔案",
-      "workspace": "工作台"
+      "workspace": "工作台",
+      "projectSkills": "專案技能"
     },
     "sessionFiles": {
       "title": "對話檔案",

@@ -235,7 +235,8 @@
       "allTab": "すべてのスキル",
       "agentTabs": "アシスタント別にスキルを表示",
       "previousAgent": "前のアシスタント",
-      "nextAgent": "次のアシスタント"
+      "nextAgent": "次のアシスタント",
+      "externalRemove": "削除（無効に変更）"
     }
   },
   "sidebar": {
@@ -3938,7 +3939,8 @@
     "tabs": {
       "label": "右側ワークスペース",
       "sessionFiles": "会話ファイル",
-      "workspace": "ワークスペース"
+      "workspace": "ワークスペース",
+      "projectSkills": "プロジェクトスキル"
     },
     "sessionFiles": {
       "title": "会話ファイル",
