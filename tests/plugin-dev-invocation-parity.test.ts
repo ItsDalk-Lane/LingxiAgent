@@ -228,6 +228,47 @@ describe("plugin dev chat 规范调用", () => {
     expect(service.invokeTool).not.toHaveBeenCalled();
   });
 
+  it("直接路径与开发聊天路径使用同一参数和结果语义", async () => {
+    const { gateway, invoke, read } = fixture();
+    const runtimeCtx = {
+      sessionId: "host-session",
+      sessionPath: "/host/session.jsonl",
+      agentId: "host-agent",
+    };
+    const directRequest = {
+      targetId: read.identity.targetId,
+      route: "direct" as const,
+      arguments: { query: "hello" },
+      sessionId: "host-session",
+      sessionPath: "/host/session.jsonl",
+      agentId: "host-agent",
+      lifecycleGeneration: read.lifecycleGeneration,
+      toolCallId: "direct-call",
+      runtimeContext: runtimeCtx,
+      ctx: runtimeCtx,
+    };
+    const directPrepared = gateway.resolvePermission(directRequest);
+    const directResult = await runWithPreparedInvocation(
+      directPrepared,
+      () => gateway.invoke(directRequest),
+    );
+    const chatRequest = {
+      ...directRequest,
+      route: "plugin-dev-chat" as const,
+      toolCallId: "chat-call",
+    };
+    const chatPrepared = gateway.resolvePermission(chatRequest);
+    const chatResult = await runWithPreparedInvocation(chatPrepared, () => invoke.execute(
+      "chat-call",
+      { pluginId: "dev-read", toolName: "lookup", arguments: { query: "hello" } },
+      undefined,
+      undefined,
+      runtimeCtx,
+    ));
+
+    expect(chatResult).toEqual(directResult);
+  });
+
   it("无法解析的、禁用的或非 dev 目标在调用前关闭", () => {
     const { invoke, service } = fixture();
     expect(permissionFor(invoke, "missing", "tool")).toBeNull();

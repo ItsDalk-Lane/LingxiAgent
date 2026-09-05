@@ -40,6 +40,47 @@ export interface ToolInvocationGatewayOptions {
   readonly now?: () => number;
 }
 
+export interface LocalDeveloperPrincipal {
+  readonly kind: "local-developer";
+  readonly principalId: string;
+  readonly ownerPrincipalId: string;
+  readonly connectionKind: "local";
+}
+
+function isLocalDeveloperPrincipal(value: unknown): value is LocalDeveloperPrincipal {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const principal = value as Record<string, unknown>;
+  return principal.kind === "local-developer"
+    && typeof principal.principalId === "string"
+    && principal.principalId.startsWith("local-developer:")
+    && typeof principal.ownerPrincipalId === "string"
+    && principal.ownerPrincipalId.length > 0
+    && principal.connectionKind === "local";
+}
+
+export function createLocalDeveloperPrincipal(ownerPrincipal: unknown): LocalDeveloperPrincipal {
+  if (!ownerPrincipal || typeof ownerPrincipal !== "object" || Array.isArray(ownerPrincipal)) {
+    throw new TypeError("local developer principal requires an authenticated local owner");
+  }
+  const owner = ownerPrincipal as Record<string, unknown>;
+  if (
+    owner.kind !== "local_user"
+    || owner.connectionKind !== "local"
+    || owner.credentialKind !== "loopback_token"
+    || typeof owner.principalId !== "string"
+    || !owner.principalId.trim()
+  ) {
+    throw new TypeError("local developer principal requires an authenticated local owner");
+  }
+  const ownerPrincipalId = owner.principalId.trim();
+  return Object.freeze({
+    kind: "local-developer",
+    principalId: `local-developer:${ownerPrincipalId}`,
+    ownerPrincipalId,
+    connectionKind: "local",
+  });
+}
+
 function gatewayError(
   code: "TARGET_NOT_FOUND" | "TARGET_NOT_VISIBLE" | "TARGET_DISABLED_FOR_AGENT" | "TARGET_REVOKED"
     | "PREPARED_INVOCATION_MISSING" | "PREPARED_INVOCATION_MISMATCH"
@@ -358,25 +399,47 @@ export class ToolInvocationGateway {
 
   async prepareAndInvokeForLocalDeveloper(
     request: ToolInvocationGatewayRequest,
+    principal: LocalDeveloperPrincipal,
   ): Promise<unknown> {
-    const prepared = this.resolvePermission(request);
+    if (request.route !== "plugin-dev-http" || !isLocalDeveloperPrincipal(principal)) {
+      throw gatewayError(
+        "PERMISSION_DENIED",
+        "Local developer invocation requires an authenticated local developer principal.",
+        request,
+      );
+    }
+    const runtimeContext = request.runtimeContext && typeof request.runtimeContext === "object"
+      ? { ...request.runtimeContext, principal }
+      : { principal };
+    const ctx = request.ctx && typeof request.ctx === "object"
+      ? { ...request.ctx, principal }
+      : { principal };
+    const localRequest = {
+      ...request,
+      sessionId: null,
+      sessionPath: null,
+      agentId: null,
+      ctx,
+      runtimeContext,
+    };
+    const prepared = this.resolvePermission(localRequest);
     const target = this.registry.getByTargetId(prepared.targetId);
     if (!target) {
-      throw gatewayError("TARGET_REVOKED", "Prepared tool target is no longer registered.", request);
+      throw gatewayError("TARGET_REVOKED", "Prepared tool target is no longer registered.", localRequest);
     }
     try {
-      await this.authorize(prepared, target, request.runtimeContext);
+      await this.authorize(prepared, target, runtimeContext);
     } catch (cause) {
       if (cause instanceof ToolInvocationError) throw cause;
       throw gatewayError(
         "PERMISSION_DENIED",
         "Local developer invocation was not authorized.",
-        request,
+        localRequest,
         target,
         undefined,
         cause,
       );
     }
-    return runWithPreparedInvocation(prepared, () => this.invoke(request));
+    return runWithPreparedInvocation(prepared, () => this.invoke(localRequest));
   }
 }

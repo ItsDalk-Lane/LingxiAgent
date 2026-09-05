@@ -101,12 +101,103 @@ describe("PluginDevService", () => {
     const invocation = await service.invokeTool({
       pluginId: "dev-echo",
       toolName: "echo",
-      input: { text: "hi" },
-      sessionPath: "/tmp/session.jsonl",
+      arguments: { text: "hi" },
     });
 
     expect(invocation.toolName).toBe("dev-echo_echo");
     expect(invocation.result.content[0].text).toBe("Echo hi");
+  });
+
+  it("routes local developer invocation through the canonical HTTP gateway", async () => {
+    const sourcePath = writeDevPlugin(sourceRoot, "dev-http-route");
+    fs.writeFileSync(path.join(sourcePath, "tools", "echo.js"), `
+      export const name = "echo";
+      export const description = "Echo HTTP invocation facts";
+      export const sessionPermission = { readOnly: true };
+      export const parameters = {
+        type: "object",
+        required: ["text"],
+        additionalProperties: false,
+        properties: { text: { type: "string" } },
+      };
+      export async function execute(params, ctx) {
+        return JSON.stringify({ params, route: ctx.invocationRoute, principal: ctx.principal });
+      }
+    `);
+    await service.installFromSource({ sourcePath });
+
+    const invocation = await service.invokeTool({
+      pluginId: "dev-http-route",
+      toolName: "echo",
+      arguments: { text: "hello" },
+      principal: {
+        kind: "local-developer",
+        principalId: "local-developer:owner-1",
+        ownerPrincipalId: "owner-1",
+        connectionKind: "local",
+      },
+    });
+
+    expect(JSON.parse(invocation.result.content[0].text)).toEqual({
+      params: { text: "hello" },
+      route: "plugin-dev-http",
+      principal: {
+        kind: "local-developer",
+        principalId: "local-developer:owner-1",
+        ownerPrincipalId: "owner-1",
+        connectionKind: "local",
+      },
+    });
+
+    await expect(service.invokeTool({
+      pluginId: "dev-http-route",
+      toolName: "echo",
+      arguments: { text: 42 },
+      principal: {
+        kind: "local-developer",
+        principalId: "local-developer:owner-1",
+        ownerPrincipalId: "owner-1",
+        connectionKind: "local",
+      },
+    })).rejects.toMatchObject({ code: "ARGUMENT_SCHEMA_INVALID" });
+  });
+
+  it("cancels HTTP invocation before the plugin executor and rejects shadowed targets", async () => {
+    const sourcePath = writeDevPlugin(sourceRoot, "dev-http-guard");
+    await service.installFromSource({ sourcePath });
+    const tool = pluginManager.getPluginTool("dev-http-guard", "echo", {
+      entry: pluginManager.getPlugin("dev-http-guard", { source: "dev" }),
+    });
+    const execute = vi.spyOn(tool, "execute");
+    const controller = new AbortController();
+    controller.abort();
+    const principal = {
+      kind: "local-developer",
+      principalId: "local-developer:owner-1",
+      ownerPrincipalId: "owner-1",
+      connectionKind: "local",
+    };
+
+    await expect(service.invokeTool({
+      pluginId: "dev-http-guard",
+      toolName: "echo",
+      arguments: { text: "cancelled" },
+      principal,
+      signal: controller.signal,
+    })).rejects.toMatchObject({ code: "EXECUTION_CANCELLED" });
+    expect(execute).not.toHaveBeenCalled();
+
+    vi.spyOn(pluginManager, "getPluginTool").mockImplementation((pluginId, toolName, options) => (
+      (options as { includeShadowed?: boolean } | undefined)?.includeShadowed === true
+        ? tool
+        : null
+    ));
+    await expect(service.invokeTool({
+      pluginId: "dev-http-guard",
+      toolName: "echo",
+      arguments: { text: "hidden" },
+      principal,
+    })).rejects.toMatchObject({ code: "PLUGIN_DEV_TOOL_NOT_FOUND" });
   });
 
   it("invokes dynamically registered dev tools with the SDK input/context signature", async () => {
@@ -131,15 +222,14 @@ describe("PluginDevService", () => {
     const invocation = await service.invokeTool({
       pluginId: "dev-dynamic",
       toolName: "dynamic",
-      input: { text: "hi" },
-      agentId: "agent-dev",
+      arguments: { text: "hi" },
     });
 
     expect(invocation.toolName).toBe("dev-dynamic_dynamic");
-    expect(invocation.result.content[0].text).toBe("agent-dev:hi");
+    expect(invocation.result.content[0].text).toBe(":hi");
   });
 
-  it("passes sessionId-first identity into dev tool invocations", async () => {
+  it("rejects identity overrides passed directly to the dev service", async () => {
     const sourcePath = writeDevPlugin(sourceRoot, "dev-session-identity");
     fs.writeFileSync(path.join(sourcePath, "tools", "echo.js"), `
       export const name = "echo";
@@ -155,27 +245,17 @@ describe("PluginDevService", () => {
     `);
     await service.installFromSource({ sourcePath });
 
-    const invocation = await service.invokeTool({
+    await expect(service.invokeTool({
       pluginId: "dev-session-identity",
       toolName: "echo",
-      input: {},
-      sessionId: "sess_dev_identity",
+      arguments: {},
       sessionRef: {
         sessionId: "sess_dev_identity",
         sessionPath: "/tmp/session.jsonl",
-        legacySessionPath: "/tmp/legacy.jsonl",
       },
-      sessionPath: "/tmp/ignored.jsonl",
-    });
-
-    expect(JSON.parse(invocation.result.content[0].text)).toEqual({
-      sessionId: "sess_dev_identity",
-      sessionPath: "/tmp/session.jsonl",
-      sessionRef: {
-        sessionId: "sess_dev_identity",
-        sessionPath: "/tmp/session.jsonl",
-        legacySessionPath: "/tmp/legacy.jsonl",
-      },
+    })).rejects.toMatchObject({
+      code: "PLUGIN_DEV_IDENTITY_OVERRIDE_FORBIDDEN",
+      status: 400,
     });
   });
 
@@ -188,7 +268,7 @@ describe("PluginDevService", () => {
     const invocation = await service.invokeTool({
       pluginId: "dev-reload",
       toolName: "echo",
-      input: { text: "now" },
+      arguments: { text: "now" },
     });
 
     expect(reload.plugin.version).toBe("0.2.0");
@@ -362,7 +442,7 @@ describe("PluginDevService", () => {
     const invocation = await eventBus.request("plugin.dev.invokeTool", {
       pluginId: "bus-dev",
       toolName: "echo",
-      input: { text: "ok" },
+      arguments: { text: "ok" },
     });
     const scenarios = await eventBus.request("plugin.dev.getScenarios", { pluginId: "bus-dev" });
     const scenarioRun = await eventBus.request("plugin.dev.runScenario", {
@@ -463,7 +543,7 @@ describe("PluginDevService", () => {
     expect(result.steps).toHaveLength(2);
   });
 
-  it("passes sessionId-first identity from manifest dev scenario tool steps", async () => {
+  it("rejects identity overrides from manifest dev scenario tool steps", async () => {
     const sourcePath = writeDevPlugin(sourceRoot, "scenario-session-dev", {
       manifest: {
         dev: {
@@ -497,12 +577,13 @@ describe("PluginDevService", () => {
     `);
     await service.installFromSource({ sourcePath });
 
-    const result = await service.runScenario({
+    await expect(service.runScenario({
       pluginId: "scenario-session-dev",
       scenarioId: "session-tool",
+    })).rejects.toMatchObject({
+      code: "PLUGIN_DEV_IDENTITY_OVERRIDE_FORBIDDEN",
+      status: 400,
     });
-
-    expect(result.status).toBe("passed");
   });
 
   it("requires explicit approval for destructive dev scenarios", async () => {

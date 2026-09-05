@@ -95,7 +95,12 @@ function expectCode(error: unknown, code: ToolInvocationError["code"]) {
 }
 
 type GatewayRequest = Parameters<ToolInvocationGateway["invoke"]>[0];
-type GatewayResult = { normalized: { prepared: { route: string } } };
+type GatewayResult = {
+  normalized: {
+    prepared: { route: string };
+    ctx: Record<string, unknown>;
+  };
+};
 
 const mismatchMutations: Array<[string, (request: GatewayRequest) => GatewayRequest]> = [
   ["参数替换", (request) => ({ ...request, arguments: { path: "other.md", content: "hello" } })],
@@ -297,12 +302,34 @@ describe("规范化工具调用网关", () => {
   it("本地开发入口自行准备并只调用一次宿主审批", async () => {
     const { gateway, request, authorize, target } = fixture();
     const localRequest = { ...request, route: "plugin-dev-http" as const };
+    const principal = {
+      kind: "local-developer" as const,
+      principalId: "local-developer:owner-1",
+      ownerPrincipalId: "owner-1",
+      connectionKind: "local" as const,
+    };
 
-    const result = await gateway.prepareAndInvokeForLocalDeveloper(localRequest);
+    const result = await gateway.prepareAndInvokeForLocalDeveloper(localRequest, principal);
 
     expect(authorize).toHaveBeenCalledOnce();
     expect(target.executeCanonical).toHaveBeenCalledOnce();
     expect((result as GatewayResult).normalized.prepared.route).toBe("plugin-dev-http");
+    expect((result as GatewayResult).normalized.ctx).toMatchObject({ principal });
+  });
+
+  it("本地开发入口拒绝非本地开发主体", async () => {
+    const { gateway, request, target } = fixture();
+
+    await expect(gateway.prepareAndInvokeForLocalDeveloper(
+      { ...request, route: "plugin-dev-http" },
+      {
+        kind: "local-developer",
+        principalId: "local-developer:remote",
+        ownerPrincipalId: "remote",
+        connectionKind: "custom_remote",
+      } as never,
+    )).rejects.toMatchObject({ code: "PERMISSION_DENIED" });
+    expect(target.executeCanonical).not.toHaveBeenCalled();
   });
 
   it("装配时不可见目标和不合规参数在权限解析前被拒绝", () => {

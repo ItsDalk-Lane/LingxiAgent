@@ -60,8 +60,8 @@
 | P5-01 | completed | `30eb7d7c5eeb4f9b8d455961ef8bab7104adccf7` | Plugin 工具代次 |
 | P5-02 | completed | `aede651699e2e6ce6b71bcd73ac62607ec9dd1a4` | MCP live generation |
 | P5-03 | completed | `6a6890fc0d8e67fa3bd71f1815c311d8bd65b3b7` | 旧会话撤销语义 |
-| P6-01 | completed | 待本项提交后回填 | plugin-dev 聊天身份 |
-| P6-02 | pending | — | LocalDeveloperPrincipal |
+| P6-01 | completed | `0b2049015c136bd9b78df259732addd2446e072f` | plugin-dev 聊天身份 |
+| P6-02 | completed | 待本项提交后回填 | LocalDeveloperPrincipal |
 | P7-01 | pending | — | 媒体执行目标解析器 |
 | P7-02 | pending | — | 媒体入口统一 |
 | P8-01 | pending | — | rerank policy 共享执行器 |
@@ -252,8 +252,20 @@
 - 绿灯命令：plugin-dev 新旧测试、Engine 装配、Gateway 与会话权限共 6 文件 Vitest；`npm run typecheck`；新增测试文件定向 ESLint；聊天入口 raw 调用扫描；`git diff --check`。
 - 绿灯原始结果：Vitest exit `0`，`6 passed` files、`111 passed` tests；三段 typecheck exit `0`；新增测试 ESLint exit `0`、`0` 问题；聊天入口对 `service.invokeTool` / `executePluginTool` 命中 `0`；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p601-stage-final.log`、`/tmp/lingxi-tool-contract-p601-typecheck-final.log`、`/tmp/lingxi-tool-contract-p601-new-eslint-final.log`、`/tmp/lingxi-tool-contract-p601-chat-boundary-final.log`。
-- 提交 SHA：待本项提交后、P6-02 红灯前回填。
+- 提交 SHA：`0b2049015c136bd9b78df259732addd2446e072f`
 - 偏差：任务书在 P6-02 后给出阶段提交信息；按用户“每项提交并推送”的要求，本项使用独立且内容对应的提交信息。P5 引入的显式权限契约使开发服务旧夹具无法加载，本项只给测试插件补 `readOnly` 声明，生产端继续 fail-closed。
+
+### P6-02 本地 HTTP 使用独立 LocalDeveloperPrincipal
+
+- 状态：`completed`
+- 改动文件：`server/routes/plugins.ts`、`core/plugin-dev-service.ts`、`core/tool-invocation-gateway.ts`、`tests/plugin-routes.test.ts`、`tests/plugin-dev-service.test.ts`、`tests/tool-invocation-gateway.test.ts`、`tests/plugin-dev-invocation-parity.test.ts`、`TOOL_INVOCATION_REPAIR_PROGRESS.md`。
+- 红灯命令：`set -o pipefail; npx vitest run tests/tool-invocation-gateway.test.ts tests/plugin-routes.test.ts tests/plugin-dev-service.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p602-red.log`
+- 红灯原始结果：exit `1`；`3 failed` files、`91 passed / 6 failed` tests。旧网关不校验或传递本地开发主体，HTTP 路由接受客户端会话身份且不自行复核本机 owner，开发服务继续使用原始 `input` 并直接执行，没有 HTTP 路由事实，均符合预期。
+- 绿灯命令：plugin-dev 聊天/HTTP、路由安全、Gateway、会话权限、插件管理/运行时和 Engine 装配共 10 文件 Vitest；`npm run typecheck`；新增 parity 与 Gateway 定向 ESLint；生产插件 executor 调用边界扫描；`git diff --check`。
+- 绿灯原始结果：Vitest exit `0`，`10 passed` files、`314 passed` tests；三段 typecheck exit `0`；定向 ESLint exit `0`、`0` 问题；生产 `executePluginTool(` 仅命中开发服务 Gateway source adapter 与 PluginManager 方法定义各 1 处；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p602-gate-final.log`、`/tmp/lingxi-tool-contract-p602-typecheck-final.log`、`/tmp/lingxi-tool-contract-p602-focused-eslint-final.log`、`/tmp/lingxi-tool-contract-p602-plugin-executor-boundary.log`。
+- 提交 SHA：待本项提交后、P7-01 红灯前回填。
+- 偏差：none
 
 ## 错误日志
 
@@ -297,13 +309,14 @@
 | 2026-09-05 16:34 +0800 | P5-03 | 类型检查继续发现新增测试的可用性回调和两个构造夹具类型过宽 | 1 | 复用注册表判定类型，并按项目既有测试边界把构造夹具收口为 `never`；生产代码不变 |
 | 2026-09-05 16:41 +0800 | P6-01 扩展回归 | 首次扩展门禁 `104 passed / 7 failed`：P5 后开发服务旧测试插件未声明权限，加载阶段已被拒绝 | 1 | 只给测试插件夹具补显式 `readOnly` 契约；生产端缺声明继续拒绝，复跑开发服务测试 `15/15` 通过 |
 | 2026-09-05 16:41 +0800 | P6-01 | 首次 typecheck 报宿主会话目标联合类型没有统一的 `sessionId` 字段 | 1 | 为宿主运行上下文与规范会话目标增加明确类型，不改变来源或回退规则；复跑三段 typecheck exit `0` |
+| 2026-09-05 16:58 +0800 | P6-02 | 首次 typecheck 报 3 个测试边界类型错误：影子选项为 `unknown`、Hono 测试环境变量键未声明、故意构造的远端主体不满足本地主体类型 | 1 | 仅在测试边界显式收窄/转换类型；生产接口继续只接受本地主体，复跑三段 typecheck exit `0` |
 
 ## 断点续跑自检
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P6-01 已完成红绿验证与扩展门禁，等待提交和推送 |
-| 接下来去哪？ | 独立提交并推送 P6-01，回填 SHA 后进入 P6-02 |
+| 现在在哪里？ | P6-02 已完成红绿验证与 P6 阶段扩展门禁，等待提交和推送 |
+| 接下来去哪？ | 使用任务书指定提交信息提交并推送 P6-02，回填 SHA 后进入 P7-01 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P5-03；P6-01 已移除聊天模型的身份覆盖字段，以真实目标权限决策并经 Gateway 执行，相关门禁 `111/111` |
+| 已做什么？ | 完成并推送 P0-00 至 P6-01；P6-02 已建立独立本地开发主体、拒绝客户端身份覆盖，并让 HTTP/服务调用经 Gateway 与唯一插件来源适配器执行，相关门禁 `314/314` |

@@ -38,6 +38,7 @@ import {
   PLUGIN_HOST_ROUTE_PLUGIN_IDS,
   isLocalOwnerPrincipal,
 } from "../http/route-security.ts";
+import { createLocalDeveloperPrincipal } from "../../core/tool-invocation-gateway.ts";
 
 const log = createModuleLogger("plugin-install");
 
@@ -927,14 +928,36 @@ export function createPluginsRoute(engine: any) {
     if (errorResponse) return errorResponse;
     const body = await c.req.json().catch(() => ({}));
     try {
+      const authPrincipal = readAuthPrincipal(c);
+      if (!isLocalOwnerPrincipal(authPrincipal)) {
+        throw createPluginRouteError(
+          "Plugin developer tool invocation requires a local owner",
+          403,
+          "PLUGIN_DEV_LOCAL_OWNER_REQUIRED",
+        );
+      }
+      const identityOverrideFields = [
+        "sessionId",
+        "sessionRef",
+        "sessionPath",
+        "legacySessionPath",
+        "agentId",
+        "principal",
+        "toolCallId",
+      ].filter((field) => Object.hasOwn(body, field));
+      if (identityOverrideFields.length > 0) {
+        throw createPluginRouteError(
+          "Plugin developer tool invocation identity is host-owned",
+          400,
+          "PLUGIN_DEV_IDENTITY_OVERRIDE_FORBIDDEN",
+        );
+      }
       return c.json(await service.invokeTool({
         pluginId: c.req.param("id"),
         toolName: c.req.param("toolName"),
-        input: body.input || {},
-        sessionId: body.sessionId,
-        sessionRef: body.sessionRef,
-        sessionPath: body.sessionPath,
-        agentId: body.agentId,
+        arguments: Object.hasOwn(body, "arguments") ? body.arguments : {},
+        principal: createLocalDeveloperPrincipal(authPrincipal),
+        signal: c.req.raw.signal,
       }));
     } catch (err) {
       return pluginDevErrorResponse(c, err);
