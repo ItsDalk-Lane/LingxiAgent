@@ -28,7 +28,7 @@ type ToolCall = {
   sideEffect: unknown;
 };
 
-function createPathParityFixture() {
+function createPathParityFixture({ grants = [] }: { grants?: string[] } = {}) {
   const registry = new ToolTargetRegistry();
   const identity = createFirstPartyToolIdentity({
     publicName: "stage_files",
@@ -59,6 +59,10 @@ function createPathParityFixture() {
   }, identity);
   const validator = createToolSchemaValidator(schema, identity);
   const calls: ToolCall[] = [];
+  let generation = 7;
+  let liveAvailability: { eligible: boolean; code?: "TARGET_DISABLED_FOR_AGENT"; reason?: string } = {
+    eligible: true,
+  };
   const executeCanonical = vi.fn(async (
     toolCallId: string,
     args: Record<string, unknown>,
@@ -66,6 +70,12 @@ function createPathParityFixture() {
     onUpdate: unknown,
     ctx: unknown,
   ) => {
+    if (typeof onUpdate === "function") {
+      await onUpdate({ type: "progress", targetId: identity.targetId });
+    }
+    if ((args.filepaths as unknown[])?.includes("/workspace/cancel.md")) {
+      throw Object.assign(new Error("cancelled"), { name: "AbortError" });
+    }
     const prepared = getPreparedInvocation();
     calls.push({
       route: prepared?.route || "isolated",
@@ -95,8 +105,8 @@ function createPathParityFixture() {
     permission,
     validator,
     availability: { eligible: true },
-    getCurrentGeneration: () => 7,
-    isCurrentlyAvailable: () => ({ eligible: true }),
+    getCurrentGeneration: () => generation,
+    isCurrentlyAvailable: () => liveAvailability,
     executeCanonical,
     normalizeResult: (result) => result,
   });
@@ -116,7 +126,7 @@ function createPathParityFixture() {
     })),
   };
   const checkStagePath = vi.fn((filePath: string) => ({
-    allowed: true,
+    allowed: !filePath.startsWith("/outside/"),
     canonicalPath: filePath === RAW_PATH ? CANONICAL_PATH : filePath,
   }));
   const policySnapshot = Object.freeze({
@@ -203,7 +213,10 @@ function createPathParityFixture() {
       approvalPolicy: policySnapshot.approvalPolicy,
       approvalGateway,
       permissionBoundary: { checkStagePath },
-      permissionContext: policySnapshot,
+      permissionContext: {
+        ...policySnapshot,
+        preAuthorizedInvocationCapabilities: grants,
+      },
       now: () => 100,
     })[0];
   }
@@ -221,6 +234,8 @@ function createPathParityFixture() {
     policySnapshot,
     principal,
     sessionRef,
+    setGeneration(value: number) { generation = value; },
+    setLiveAvailability(value: typeof liveAvailability) { liveAvailability = value; },
     target,
   };
 }
@@ -309,6 +324,7 @@ describe("tool invocation route invariance", () => {
     })));
     expect(fixture.checkStagePath).toHaveBeenCalledTimes(9);
     expect(fixture.describeSideEffect).toHaveBeenCalledTimes(6);
+    expect(onUpdate).toHaveBeenCalledTimes(3);
   });
 
   it("keeps model-route schema failures on the same stable error code", async () => {
@@ -389,6 +405,112 @@ describe("tool invocation route invariance", () => {
       lifecycleGeneration: fixture.target.lifecycleGeneration,
       toolCallId: "call-http-invalid",
     }, principal)).rejects.toMatchObject({ code: "ARGUMENT_SCHEMA_INVALID" });
+    expect(fixture.executeCanonical).toHaveBeenCalledOnce();
+  });
+
+  it.each(MODEL_ROUTES)("keeps %s grants narrow when arguments change", async (route) => {
+    const fixture = createPathParityFixture({ grants: ["stage_files.write"] });
+    const tool = fixture.facade(route);
+    const context = {
+      agentId: fixture.principal.agentId,
+      sessionId: fixture.sessionRef.sessionId,
+      sessionPath: fixture.sessionRef.sessionPath,
+      sessionRef: fixture.sessionRef,
+    };
+
+    await tool.execute(
+      "call-granted-safe",
+      route === "direct"
+        ? { filepaths: [RAW_PATH] }
+        : { arguments: { filepaths: [RAW_PATH] } },
+      undefined,
+      undefined,
+      context,
+    );
+    const blocked = await tool.execute(
+      "call-granted-changed",
+      route === "direct"
+        ? { filepaths: ["/outside/private.md"] }
+        : { arguments: { filepaths: ["/outside/private.md"] } },
+      undefined,
+      undefined,
+      context,
+    );
+
+    expect(fixture.approvalGateway.review).not.toHaveBeenCalled();
+    expect(fixture.executeCanonical).toHaveBeenCalledOnce();
+    expect(blocked).toMatchObject({
+      details: { errorCode: "ACTION_BLOCKED_BY_WORKSPACE_BOUNDARY" },
+    });
+  });
+
+  it.each(MODEL_ROUTES)("revokes %s after approval when availability or generation changes", async (route) => {
+    const availabilityFixture = createPathParityFixture();
+    availabilityFixture.approvalGateway.review.mockImplementationOnce(async () => {
+      availabilityFixture.setLiveAvailability({
+        eligible: false,
+        code: "TARGET_DISABLED_FOR_AGENT",
+        reason: "agent disabled target after approval",
+      });
+      return { action: "allow", reviewer: "path-parity" };
+    });
+    const availabilityTool = availabilityFixture.facade(route);
+    await expect(availabilityTool.execute(
+      "call-disabled-after-approval",
+      modelArguments(route),
+      undefined,
+      undefined,
+      {
+        agentId: availabilityFixture.principal.agentId,
+        sessionId: availabilityFixture.sessionRef.sessionId,
+        sessionPath: availabilityFixture.sessionRef.sessionPath,
+        sessionRef: availabilityFixture.sessionRef,
+      },
+    )).rejects.toMatchObject({ code: "TARGET_DISABLED_FOR_AGENT" });
+    expect(availabilityFixture.executeCanonical).not.toHaveBeenCalled();
+
+    const generationFixture = createPathParityFixture();
+    generationFixture.approvalGateway.review.mockImplementationOnce(async () => {
+      generationFixture.setGeneration(8);
+      return { action: "allow", reviewer: "path-parity" };
+    });
+    const generationTool = generationFixture.facade(route);
+    await expect(generationTool.execute(
+      "call-reloaded-after-approval",
+      modelArguments(route),
+      undefined,
+      undefined,
+      {
+        agentId: generationFixture.principal.agentId,
+        sessionId: generationFixture.sessionRef.sessionId,
+        sessionPath: generationFixture.sessionRef.sessionPath,
+        sessionRef: generationFixture.sessionRef,
+      },
+    )).rejects.toMatchObject({ code: "TARGET_REVOKED" });
+    expect(generationFixture.executeCanonical).not.toHaveBeenCalled();
+  });
+
+  it.each(MODEL_ROUTES)("preserves %s streaming updates and cancellation type", async (route) => {
+    const fixture = createPathParityFixture();
+    const tool = fixture.facade(route);
+    const onUpdate = vi.fn();
+    const params = route === "direct"
+      ? { filepaths: ["/workspace/cancel.md"] }
+      : { arguments: { filepaths: ["/workspace/cancel.md"] } };
+
+    await expect(tool.execute(
+      "call-cancelled",
+      params,
+      new AbortController().signal,
+      onUpdate,
+      {
+        agentId: fixture.principal.agentId,
+        sessionId: fixture.sessionRef.sessionId,
+        sessionPath: fixture.sessionRef.sessionPath,
+        sessionRef: fixture.sessionRef,
+      },
+    )).rejects.toMatchObject({ code: "EXECUTION_CANCELLED" });
+    expect(onUpdate).toHaveBeenCalledOnce();
     expect(fixture.executeCanonical).toHaveBeenCalledOnce();
   });
 });

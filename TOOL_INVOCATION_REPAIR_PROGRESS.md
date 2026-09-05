@@ -286,13 +286,24 @@
 
 ## P10-01 建立路径等价变形测试
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`f0def592e3871567d09a33b597aa70c21c6252b5`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `5518ed2ee4920b81db6943788dba06b4f0e741d5`；两份生产文件在本项前与原提交父树同哈希，回归与实现原样迁移。
 - RED：exit `1`；1 failed / 2 passed tests；只改变 direct、deferred、plugin-dev-chat 路由后，规范参数在权限复核后的绑定语义不一致。
 - GREEN：11 files / 202 tests 全部通过；新矩阵 3/3 覆盖三条模型路线和独立的本地开发者 HTTP 主体。
 - typecheck exit `0`；边界扫描 exit `0`，2129 个生产源码文件 0 违规；定向 ESLint exit `0`，`0 errors / 71 warnings`（既有会话权限包装风格警告）；`git diff --check` exit `0`。
 - 等价边界：权限结论、能力、审批次数、副作用描述、真实参数、摘要、执行次数、结果与来源信息、调用标识、取消/进度信号和错误码均只受语义输入影响，不受调用路线影响。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p1001-red.log`、`/tmp/lingxi-tool-contract-v0134-p1001-test-attempt1.log`、`/tmp/lingxi-tool-contract-v0134-p1001-gate-final.log`、`/tmp/lingxi-tool-contract-v0134-p1001-typecheck-final.log`、`/tmp/lingxi-tool-contract-v0134-p1001-boundary.log`、`/tmp/lingxi-tool-contract-v0134-p1001-eslint.log`。
+
+## P10-02 完整配置组合
+
+- 状态：`completed_with_red_not_reproduced_pending_commit`。
+- 复用来源：原分支提交 `f8432e83e40331bca9ccf2e74898b9f7b0fb39b8`；本项只扩展既有路径等价测试，无生产代码修改。
+- 首次矩阵：exit `0`，1 file / 12 tests 全部通过；新增的授权后参数变化、审批后禁用/代次变化、流式更新和取消组合均已被前序修复覆盖，未能复现新的旧代码失败。
+- 处理：没有人为制造失败、削弱断言或扩大生产架构；按真实状态记录红灯未复现。
+- 完整组合门禁：exit `0`，13 files / 373 tests 全部通过，覆盖总延迟/内置延迟开关、候选数 10/11/12、权限方言、可延迟/固定工具、代理和连接器启停、可见性、授权参数变化、审批后撤销、同名冲突、嵌套 schema、取消和流式更新。
+- typecheck exit `0`；边界扫描 exit `0`，2129 个生产源码文件 0 违规；扩展测试定向 ESLint exit `0`、无输出；`git diff --check` exit `0`。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p1002-first-matrix.log`、`/tmp/lingxi-tool-contract-v0134-p1002-gate.log`、`/tmp/lingxi-tool-contract-v0134-p1002-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p1002-boundary.log`、`/tmp/lingxi-tool-contract-v0134-p1002-eslint.log`。
 
 ## 错误记录
 
