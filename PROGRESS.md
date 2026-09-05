@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = c9353fc6b2e2f6b90ed125fc28cf47ad36e4a7d0  (详细研究会话组装修复；本机全量 13756 PASS / 0 FAIL / 7 既有 SKIP，82.74s；本机未公证目录包通过)
+VERIFIED_SOURCE_SHA   = 004cdafd2a3ff69ca38ea7993e33c4150e75e0a7  (0.1.34 合并前连续查阅及停止收尾验证；本机通过，远程待运行)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 当前知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1105,3 +1105,11 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 兼容指纹 `sha256:01923b378ab07195c438fed0cb0fc356da0c4061c7d2e270a8946c97e4875cc0`；只更新会话协调器源码摘要，无数据格式或迁移变化。运行闭包重生成无差异。
 - 本次独立封印只同步既有六份审计文件，保持原差异白名单与门禁；不合并 main。
 - 封印前矩阵与审计门禁 10/10 通过，exit 0，148ms；独立差异检查通过。封印后的六文件差异由同一独立检查再次确认，日志 `/tmp/lingxi-research-runtime-audit.log`。
+
+## 2026-09-05 0.1.34 合并前独立审计封印
+
+- 固定源码：`004cdafd2a3ff69ca38ea7993e33c4150e75e0a7`；连续查阅、分块、引用与后台停止变更以该树为准，历史研究入口保留专门回归。原任务书后续变更已由用户明确授权，当前授权包括合并 main 及正式发布。
+- 本机全量（暂不含等待源码提交的唯一封印文件）13756 PASS / 0 FAIL / 7 既有 SKIP，195.847s；之后新增连续查阅 3 项、引用悬浮窗 2 项各自通过，含相关旧用例复验共 18 PASS。所有测试由同一源码树提供；运行日志、初轮 157 个失败及修复经过保留，详见 `artifacts/release-v0.1.34/premerge-validation.json` 与 KNOWLEDGE_REFACTOR_PROGRESS.md。
+- 三套类型检查 exit 0；最终测试类型检查 exit 0；全仓 lint exit 0（既有警告未升级为错误）、开放边界 exit 0；存储扫描 66 stores / 779 sites，运行闭包重新生成无漂移，兼容指纹已同步。
+- 客户端五入口、完整服务端、种子验签、macOS arm64 目录包、开放服务端构建及正反启动检查均 exit 0。本机使用一次性产物密钥和 ad-hoc 签名、明确不公证；正式发布依赖远程密钥与四平台构建，不将本机结果冒充正式发行证据。
+- 此提交仅推进审计坐标，保留独立封印。四平台合并门禁和 0.1.34 标签发布尚未执行，后续以 GitHub 实际运行记录为准。

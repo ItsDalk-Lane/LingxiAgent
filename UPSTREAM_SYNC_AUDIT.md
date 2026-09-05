@@ -14,7 +14,7 @@
 | U1：上游目标 | `c6d0405294be67cb134c2758f6472748ee73e2be` | openhanako `v0.447.4` |
 | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
 | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
-| VERIFIED_SOURCE_SHA | `c9353fc6b2e2f6b90ed125fc28cf47ad36e4a7d0` | 详细研究会话组装修复；本机全量 13756 PASS / 0 FAIL / 7 既有 SKIP，82.74s；本机构建、种子验签及未公证目录包通过，未重跑四平台发布验证 |
+| VERIFIED_SOURCE_SHA | `004cdafd2a3ff69ca38ea7993e33c4150e75e0a7` | 0.1.34 合并前连续查阅与停止收尾：本机全量 13756 PASS / 0 FAIL / 7 既有 SKIP，另新增 5 项通过；类型、构建、未公证目录包和开放服务端启动通过，远程发布待执行 |
 
 ## Audit seal model
 
