@@ -17,8 +17,9 @@
 | P1-01 | `completed` | `a61a81aa4808d7d5a70b4e902bba883feeb3fd81` | 原测试先红，再原样迁移规范身份与错误实现，本项门禁全绿 |
 | P1-02 | `completed` | `93a600efd32109a394f8b2024e7bf361948ebd96` | 原测试先红，再原样迁移权限适配，本项门禁全绿 |
 | P1-03 | `completed` | `3b7e21615c2c338afa85f931476b6f902ebf4741` | 9 项 schema 回归先红后绿，本项门禁全绿 |
-| P2-01 | `completed_pending_commit` | 待提交 | 目标表回归先红后绿，本项门禁全绿 |
-| P2-02–P7 | `pending_migration` | — | 优先复用原实现 |
+| P2-01 | `completed` | `db697f42fd8ab87fcf2172b6539915772ab36bf5` | 目标表回归先红后绿，本项门禁全绿 |
+| P2-02 | `completed_pending_commit` | 待提交 | 网关与 prepared invocation 回归先红后绿，本项门禁全绿 |
+| P3–P7 | `pending_migration` | — | 优先复用原实现 |
 | P8 | `pending_v0134_adaptation` | — | 知识正式架构发生变化，需重点适配 |
 | P9–P11 | `pending_migration` | — | 迁移错误、边界、组合测试与文档 |
 | P12 | `pending` | — | 最终验证、构建和封印 |
@@ -91,12 +92,22 @@
 
 ## P2-01 建立会话级目标注册表
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`db697f42fd8ab87fcf2172b6539915772ab36bf5`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `28e097137dc4f02da63c9047fd1d6d5b67515d07`；本项与 v0.1.34 无路径冲突。
 - RED：exit `1`；测试 suite 因目标注册表模块不存在而失败，0 tests 执行。
 - GREEN：exit `0`；1 file / 6 tests 全部通过。
 - typecheck exit `0`；本项定向 ESLint exit `0`、无输出；`git diff --check` exit `0`。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p201-red.log`、`/tmp/lingxi-tool-contract-v0134-p201-green.log`、`/tmp/lingxi-tool-contract-v0134-p201-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p201-eslint.log`。
+
+## P2-02 建立唯一调用网关
+
+- 状态：`completed_pending_commit`。
+- 复用来源：原分支提交 `1e71a29a272d2292c003293e123dde681cdb6a52`；两份既有测试和三份既有实现均先核对为父树同哈希。
+- RED：exit `1`；3 files 全部失败，`4 failed / 78 passed` tests；网关模块缺失，effective invocation、prepared 记录和边界检查目标仍不一致。
+- GREEN：exit `0`；5 files / 197 tests 全部通过。
+- typecheck exit `0`；本项定向 ESLint exit `0`，`0 errors / 82 warnings`；`git diff --check` exit `0`。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p202-red.log`、`/tmp/lingxi-tool-contract-v0134-p202-green.log`、`/tmp/lingxi-tool-contract-v0134-p202-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p202-eslint.log`。
 
 ## 错误记录
 

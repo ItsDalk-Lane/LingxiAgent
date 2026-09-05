@@ -37,6 +37,14 @@ export interface NormalizedToolInvocationDescriptor {
   capability: string;
   target?: ToolInvocationTarget;
   sideEffect?: Record<string, unknown>;
+  effectiveInvocation?: EffectiveToolInvocation;
+}
+
+export interface EffectiveToolInvocation {
+  targetId: string;
+  toolName: string;
+  arguments: Readonly<Record<string, unknown>>;
+  generation: string | number;
 }
 
 export type ToolInvocationPermissionResolution =
@@ -71,6 +79,7 @@ const DESCRIPTOR_FIELDS = new Set([
   "capability",
   "target",
   "sideEffect",
+  "effectiveInvocation",
 ]);
 
 const TARGET_FIELDS = new Set(["type", "id", "label"]);
@@ -102,6 +111,7 @@ const MAX_SIDE_EFFECT_STRING_LENGTH = 8192;
 const MAX_INPUT_DEPTH = 16;
 const MAX_INPUT_ITEMS = 4096;
 const MAX_INPUT_STRING_LENGTH = 2 * 1024 * 1024;
+const EFFECTIVE_TOOL_NAME_RE = /^[A-Za-z0-9_.:/-]+$/;
 
 export type ToolInvocationInputSnapshot =
   | { ok: true; value: any }
@@ -512,6 +522,53 @@ function normalizeTarget(raw: unknown): { ok: true; target: ToolInvocationTarget
   };
 }
 
+function normalizeEffectiveInvocation(
+  raw: unknown,
+): { ok: true; value: EffectiveToolInvocation } | { ok: false; field?: string } {
+  const record = snapshotPlainOwnDataRecord(raw);
+  if (!record.ok || !hasOnlyKnownFields(
+    record.value,
+    new Set(["targetId", "toolName", "arguments", "generation"]),
+  )) {
+    return { ok: false };
+  }
+  const targetId = normalizeStableString(record.value.targetId, 1024);
+  if (!targetId || !targetId.startsWith("tool:")) {
+    return { ok: false, field: "effectiveInvocation.targetId" };
+  }
+  const toolName = normalizeStableString(record.value.toolName, 256);
+  if (!toolName || !EFFECTIVE_TOOL_NAME_RE.test(toolName)) {
+    return { ok: false, field: "effectiveInvocation.toolName" };
+  }
+  const argumentsSnapshot = snapshotToolInvocationInput(record.value.arguments);
+  if (
+    argumentsSnapshot.ok === false
+    || !argumentsSnapshot.value
+    || typeof argumentsSnapshot.value !== "object"
+    || Array.isArray(argumentsSnapshot.value)
+  ) {
+    return { ok: false, field: "effectiveInvocation.arguments" };
+  }
+  const generation = record.value.generation;
+  const normalizedGeneration = typeof generation === "string"
+    ? normalizeStableString(generation, 256)
+    : typeof generation === "number" && Number.isSafeInteger(generation) && generation >= 0
+      ? generation
+      : null;
+  if (normalizedGeneration === null) {
+    return { ok: false, field: "effectiveInvocation.generation" };
+  }
+  return {
+    ok: true,
+    value: Object.freeze({
+      targetId,
+      toolName,
+      arguments: argumentsSnapshot.value as Readonly<Record<string, unknown>>,
+      generation: normalizedGeneration,
+    }),
+  };
+}
+
 function normalizeDescriptor(
   tool: Record<string, unknown>,
   raw: unknown,
@@ -632,6 +689,19 @@ function normalizeDescriptor(
     }
     sideEffect = normalized.value;
   }
+  let effectiveInvocation: EffectiveToolInvocation | undefined;
+  if (descriptorInput.effectiveInvocation !== undefined) {
+    const normalized = normalizeEffectiveInvocation(descriptorInput.effectiveInvocation);
+    if (normalized.ok === false) {
+      return failure({
+        toolName,
+        reason: "invalid_effective_invocation",
+        field: normalized.field,
+        message: "Invocation effective target must contain host-verifiable target, arguments, and generation fields.",
+      });
+    }
+    effectiveInvocation = normalized.value;
+  }
 
   const descriptor: NormalizedToolInvocationDescriptor = {
     action,
@@ -639,6 +709,7 @@ function normalizeDescriptor(
     capability,
     ...(target ? { target } : {}),
     ...(sideEffect ? { sideEffect } : {}),
+    ...(effectiveInvocation ? { effectiveInvocation } : {}),
   };
   return {
     ok: true,

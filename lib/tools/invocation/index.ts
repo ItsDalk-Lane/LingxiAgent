@@ -21,6 +21,16 @@ export { normalizeToolPermissionContract } from "./permission-adapter.ts";
 export type { NormalizedToolPermissionContract } from "./permission-adapter.ts";
 export { createToolSchemaValidator } from "./schema-validator.ts";
 export type { ToolSchemaIssue, ToolSchemaValidator } from "./schema-validator.ts";
+export {
+  createPreparedInvocation,
+  digestToolArguments,
+  getPreparedInvocation,
+  runWithPreparedInvocation,
+} from "./prepared-invocation-context.ts";
+export type {
+  PreparedInvocation,
+  PreparedInvocationInput,
+} from "./prepared-invocation-context.ts";
 export type {
   ToolInvocationRoute,
   ToolOrigin,
