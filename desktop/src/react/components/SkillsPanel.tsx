@@ -4,6 +4,7 @@ import { usePanel } from '../hooks/use-panel';
 import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../utils/agent-display';
 import { SkillBundleTree, type SkillBundleInfo } from '../settings/tabs/skills/SkillBundleTree';
+import { SkillRow } from '../settings/tabs/skills/SkillRow';
 import type { SkillInfo } from '../settings/store';
 import { AgentTabScroller, type AgentTabScrollerItem } from './automation/AgentTabScroller';
 import fp from './FloatingPanels.module.css';
@@ -95,6 +96,16 @@ function UploadIcon() {
   );
 }
 
+/** 外部技能标题后的来源工具徽标（唯一区别于内置技能的视觉）。 */
+function ExternalSourceBadge({ skill }: { skill: SkillInfo }) {
+  const label = skill.externalLabel
+    || (skill.externalPath ? (skill.externalPath.replace(/[\\/]+$/, '').split(/[\\/]/).pop() || '') : '');
+  if (!label) return null;
+  return (
+    <span className={styles.srcBadge} title={skill.externalPath || label}>{label}</span>
+  );
+}
+
 function AllSkillsAvatar() {
   return (
     <span className={styles.allAvatar} aria-hidden="true">
@@ -129,6 +140,8 @@ export function SkillsPanel() {
   const [allViewAgentId, setAllViewAgentId] = useState<string | null>(firstUsableAgentId(agents, currentAgentId));
   const [skillsList, setSkillsList] = useState<SkillInfo[]>([]);
   const [skillBundles, setSkillBundles] = useState<SkillBundleInfo[]>([]);
+  /** 全部技能视图所用助手（= 兼容技能开关写入的助手）的外部技能条目，用作显示门槛。 */
+  const [allViewExternal, setAllViewExternal] = useState<SkillInfo[]>([]);
   const [loadedAgentId, setLoadedAgentId] = useState<string | null>(null);
   const [bundleExpandedByAgent, setBundleExpandedByAgent] = useState<Record<string, Record<string, boolean>>>({});
   const [loading, setLoading] = useState(false);
@@ -138,6 +151,7 @@ export function SkillsPanel() {
   const skillFileInputRef = useRef<HTMLInputElement | null>(null);
   const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const selectedAgentIdRef = useRef<string | null>(null);
+  const allViewGenerationRef = useRef(0);
 
   useEffect(() => {
     if (allViewAgentId || !currentAgentId) return;
@@ -190,6 +204,25 @@ export function SkillsPanel() {
     void loadSkillsForAgent(selectedAgentId);
   }, [loadSkillsForAgent, selectedAgentId, visible]);
 
+  // 外部技能显示门槛：与设置页「兼容技能」同一个启用状态（全部技能视图所用助手）。
+  // 未启用的外部技能不出现在面板；助手视图复用该可见集合，只换各助手自己的启停状态。
+  const loadAllViewExternal = useCallback(async (agentId: string | null) => {
+    if (!agentId) return;
+    const generation = ++allViewGenerationRef.current;
+    try {
+      const data = await readJsonObject(await lingxiFetch(`/api/skills?agentId=${encodeURIComponent(agentId)}&runtime=1`));
+      const error = responseError(data);
+      if (error) throw new Error(error);
+      if (allViewGenerationRef.current !== generation) return;
+      setAllViewExternal(skillListField(data).filter(skill => skill.source === 'external'));
+    } catch { /* 门槛加载失败时维持上次集合 */ }
+  }, []);
+
+  useEffect(() => {
+    if (!visible) return;
+    void loadAllViewExternal(allViewAgentId);
+  }, [allViewAgentId, loadAllViewExternal, visible]);
+
   const agentTabItems = useMemo<AgentTabScrollerItem[]>(() => {
     const allLabel = t('skills.panel.allTab');
     return [
@@ -217,6 +250,14 @@ export function SkillsPanel() {
 
   const visibleSkills = skillsList.filter(skill => !skill.hidden);
   const userSkills = visibleSkills.filter(skill => skill.source !== 'external');
+  // 外部 Agent 工具技能：仅在设置页「兼容技能」里启用过（= 全部技能视图助手已启用）的才显示，
+  // 与内置技能同列表混排、不做分组；助手视图沿用同一可见集合，仅启停状态取当前助手。
+  const externalSkillRows = useMemo(() => {
+    const byName = new Map(skillsList.map(skill => [skill.name, skill]));
+    return allViewExternal
+      .filter(skill => skill.enabled)
+      .map(skill => byName.get(skill.name) ?? skill);
+  }, [allViewExternal, skillsList]);
   const manageableSkills = userSkills.filter(skill => skill.source !== 'workspace' && skill.managedBy !== 'workspace' && skill.managedBy !== 'plugin');
   const canManage = selectedTabId === ALL_SKILLS_TAB;
   const treeSkills = canManage ? manageableSkills : userSkills;
@@ -380,6 +421,12 @@ export function SkillsPanel() {
       }
     }
   }, [addToast, loadSkillsForAgent, selectedAgentId, skillsList, t]);
+
+  // 全部技能页外部技能的「移除」＝改为未启用（与设置页兼容技能关闭同一状态，双向同步），不删除文件
+  const removeExternalSkill = useCallback(async (name: string) => {
+    await toggleSkill(name, false);
+    await loadAllViewExternal(allViewAgentId);
+  }, [allViewAgentId, loadAllViewExternal, toggleSkill]);
 
   const toggleBundle = useCallback(async (bundle: SkillBundleInfo, enable: boolean) => {
     const agentId = selectedAgentId;
@@ -655,30 +702,45 @@ export function SkillsPanel() {
 
             {shouldShowInitialLoading ? (
               <div className={styles.empty}>{t('status.loading')}</div>
-            ) : treeSkills.length === 0 && skillBundles.length === 0 ? (
-              <div className={styles.empty}>{t('settings.skills.noUser')}</div>
             ) : (
-              <SkillBundleTree
-                mode={canManage ? 'manage' : 'agent'}
-                bundles={skillBundles}
-                skills={treeSkills}
-                nameHints={{}}
-                emptyText={t('settings.skills.noUser')}
-                onDeleteSkill={canManage ? deleteSkill : undefined}
-                onCreateBundle={canManage ? createBundle : undefined}
-                onRenameBundle={canManage ? renameBundle : undefined}
-                onExportBundle={canManage ? exportBundle : undefined}
-                onDeleteBundle={canManage ? deleteBundle : undefined}
-                onReorderBundles={canManage ? reorderBundles : undefined}
-                onMoveSkillToBundle={canManage ? moveSkillToBundle : undefined}
-                onRemoveSkillFromBundles={canManage ? removeSkillFromBundles : undefined}
-                onToggleSkill={canManage ? undefined : toggleSkill}
-                onToggleBundle={canManage ? undefined : toggleBundle}
-                highlightedSkillName={highlight.skillName}
-                highlightedBundleId={highlight.bundleId}
-                expandedState={bundleExpandedState}
-                onExpandedStateChange={setSelectedBundleExpandedState}
-              />
+              <>
+                {treeSkills.length === 0 && skillBundles.length === 0 ? (
+                  <div className={styles.empty}>{t('settings.skills.noUser')}</div>
+                ) : (
+                  <SkillBundleTree
+                    mode={canManage ? 'manage' : 'agent'}
+                    bundles={skillBundles}
+                    skills={treeSkills}
+                    nameHints={{}}
+                    emptyText={t('settings.skills.noUser')}
+                    onDeleteSkill={canManage ? deleteSkill : undefined}
+                    onCreateBundle={canManage ? createBundle : undefined}
+                    onRenameBundle={canManage ? renameBundle : undefined}
+                    onExportBundle={canManage ? exportBundle : undefined}
+                    onDeleteBundle={canManage ? deleteBundle : undefined}
+                    onReorderBundles={canManage ? reorderBundles : undefined}
+                    onMoveSkillToBundle={canManage ? moveSkillToBundle : undefined}
+                    onRemoveSkillFromBundles={canManage ? removeSkillFromBundles : undefined}
+                    onToggleSkill={canManage ? undefined : toggleSkill}
+                    onToggleBundle={canManage ? undefined : toggleBundle}
+                    highlightedSkillName={highlight.skillName}
+                    highlightedBundleId={highlight.bundleId}
+                    expandedState={bundleExpandedState}
+                    onExpandedStateChange={setSelectedBundleExpandedState}
+                  />
+                )}
+                {externalSkillRows.map(skill => (
+                  <SkillRow
+                    key={`external:${skill.name}`}
+                    skill={skill}
+                    titleSuffix={<ExternalSourceBadge skill={skill} />}
+                    deletable={canManage}
+                    deleteLabel={canManage ? t('skills.panel.externalRemove') : undefined}
+                    onDelete={canManage ? removeExternalSkill : undefined}
+                    onToggle={canManage ? undefined : toggleSkill}
+                  />
+                ))}
+              </>
             )}
           </div>
         </div>

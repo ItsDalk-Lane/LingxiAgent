@@ -229,7 +229,8 @@
       "allTab": "All Skills",
       "agentTabs": "View skills by assistant",
       "previousAgent": "Previous assistant",
-      "nextAgent": "Next assistant"
+      "nextAgent": "Next assistant",
+      "externalRemove": "Remove (mark disabled)"
     }
   },
   "sidebar": {
@@ -335,6 +336,12 @@
       "restoreConfirm": "Restore this conversation to its original location?",
       "restoreConflict": "Original location is occupied; cannot restore",
       "restoreFailed": "Restore failed",
+      "restoreSelected": "Restore selected ({count})",
+      "restoreSelectedConfirm": "Restore {count} selected archives to the chat list?",
+      "restoreSelectedDone": "Restored {count} archives",
+      "restoreSelectedPartial": "Partially restored: {restored}/{total}",
+      "restoreGroup": "Restore group",
+      "restoreGroupConfirm": "Restore all {count} archives in the \"{name}\" group to the chat list?",
       "deleteForever": "Delete forever",
       "deleteConfirm": "Permanently delete this archive? This cannot be undone.",
       "deleteFailed": "Delete failed",
@@ -3493,6 +3500,7 @@
           "outputTokensUnavailable": "Output tokens unavailable",
           "durationTooShort": "Duration too short",
           "started": "Started",
+          "responseArrival": "Response arrival",
           "totalDuration": "Total duration",
           "generation": "Generation",
           "throughput": "Throughput",
@@ -3554,7 +3562,7 @@
             "notRecorded": "Not recorded",
             "stepStartUnavailable": "Step start unavailable",
             "pending": "Pending",
-            "firstTokenUnavailable": "First token unavailable",
+            "responseArrivalUnavailable": "Response arrival unavailable",
             "observability": "Observability timing",
             "observabilityRunning": "Observability timing (running)",
             "session": "Session timestamps"
@@ -3866,7 +3874,8 @@
     "tabs": {
       "label": "Right workspace",
       "sessionFiles": "Conversation Files",
-      "workspace": "Workspace"
+      "workspace": "Workspace",
+      "projectSkills": "Project Skills"
     },
     "sessionFiles": {
       "title": "Conversation Files",

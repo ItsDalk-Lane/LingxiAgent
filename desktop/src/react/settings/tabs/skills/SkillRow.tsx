@@ -19,8 +19,12 @@ interface SkillRowProps {
   highlighted?: boolean;
   className?: string;
   extraActions?: React.ReactNode;
+  /** 标题后缀（如外部技能的来源工具徽标），渲染在技能名之后。 */
+  titleSuffix?: React.ReactNode;
   /** 传了就渲染 delete 按钮。Section 1 "技能管理" 传；Section 3 "Agent 配置" 不传。 */
   onDelete?: (name: string) => void;
+  /** delete 按钮的 title/aria 文案；缺省用"删除"。外部技能的 ✕ 语义是"改为未启用"，传此参覆盖。 */
+  deleteLabel?: string;
   /** 传了就渲染 toggle 按钮。Section 3 "Agent 配置" 传；Section 1 "技能管理" 不传。 */
   onToggle?: (name: string, enabled: boolean) => void;
   onDragStart?: (event: React.DragEvent<HTMLDivElement>, name: string) => void;
@@ -36,7 +40,9 @@ export function SkillRow({
   highlighted = false,
   className = '',
   extraActions,
+  titleSuffix,
   onDelete,
+  deleteLabel,
   onToggle,
   onDragStart,
   onDragOver,
@@ -67,6 +73,7 @@ export function SkillRow({
         <span className={styles['skills-list-name']}>
           {skill.name}
           {nameHint && <span className={styles['skills-list-name-hint']}>{nameHint}</span>}
+          {titleSuffix}
         </span>
         <span className={styles['skills-list-desc']}>{displayDesc}</span>
       </div>
@@ -76,8 +83,8 @@ export function SkillRow({
           <button
             className={styles['skill-card-delete']}
             type="button"
-            title={t('settings.skills.delete')}
-            aria-label={t('settings.skills.delete')}
+            title={deleteLabel ?? t('settings.skills.delete')}
+            aria-label={deleteLabel ?? t('settings.skills.delete')}
             onClick={(e) => { e.stopPropagation(); onDelete(skill.name); }}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

@@ -377,7 +377,6 @@ function buildWorkspaceDeskState(s: ReturnType<typeof useStore.getState>): Works
     deskSelectedPath: s.deskSelectedPath || '',
     deskJianContent: s.deskJianContent ?? null,
     cwdSkills: [...(s.cwdSkills || [])],
-    cwdSkillsOpen: !!s.cwdSkillsOpen,
     jianDrawerOpen: !!s.jianDrawerOpen,
     rightWorkspaceTab: s.rightWorkspaceTab || 'workspace',
     jianView: s.jianView || 'desk',
@@ -437,7 +436,6 @@ export async function activateWorkspaceDesk(root: string | null | undefined, opt
       deskSelectedPath: '',
       deskJianContent: null,
       cwdSkills: [],
-      cwdSkillsOpen: false,
       jianDrawerOpen: false,
       rightWorkspaceTab: 'workspace',
       jianView: 'desk',
@@ -473,7 +471,6 @@ export async function activateWorkspaceDesk(root: string | null | undefined, opt
     deskSelectedPath: saved?.deskSelectedPath || '',
     deskJianContent: null,
     cwdSkills: saved?.cwdSkills || [],
-    cwdSkillsOpen: saved?.cwdSkillsOpen || false,
     jianDrawerOpen: saved?.jianDrawerOpen ?? false,
     rightWorkspaceTab: saved?.rightWorkspaceTab || 'workspace',
     jianView: saved?.jianView || 'desk',
@@ -580,12 +577,17 @@ export async function loadDeskFiles(subdir?: string, overrideDir?: string | null
     st.setDeskTreeFiles('', data.files || []);
     st.setDeskSelectedPath('');
     if (mountId) {
+      const nextMountId = data.mountId || mountId;
+      // 默认工作台显示名不取服务端回传的 "Default"（服务端对 default mount 的 label
+      // 硬编码），统一按「配置目录名，未配置才 Default」本地派生。
       st.setDeskWorkspaceMount(
-        data.mountId || mountId,
-        data.mount?.label || st.deskWorkspaceLabel || null,
+        nextMountId,
+        nextMountId === 'default'
+          ? defaultWorkspaceDisplayName(st)
+          : (data.mount?.label || st.deskWorkspaceLabel || null),
         normalizeMountNativeRoot(data.mount?.nativeRootPath),
       );
-      st.setDeskBasePath(studioWorkspaceKey(data.mountId || mountId));
+      st.setDeskBasePath(studioWorkspaceKey(nextMountId));
     } else {
       st.setDeskWorkspaceMount(null);
       if (data.basePath) st.setDeskBasePath(data.basePath);
@@ -724,12 +726,16 @@ export async function loadDeskTreeFiles(subdir = '', options: { force?: boolean;
     if (data.error) throw new Error(String(data.error));
     const st = useStore.getState();
     if (mountId) {
+      const nextMountId = data.mountId || mountId;
+      // 同 loadDeskFiles：默认工作台显示名本地派生，不取服务端回传的 "Default"。
       st.setDeskWorkspaceMount(
-        data.mountId || mountId,
-        data.mount?.label || st.deskWorkspaceLabel || null,
+        nextMountId,
+        nextMountId === 'default'
+          ? defaultWorkspaceDisplayName(st)
+          : (data.mount?.label || st.deskWorkspaceLabel || null),
         normalizeMountNativeRoot(data.mount?.nativeRootPath),
       );
-      st.setDeskBasePath(studioWorkspaceKey(data.mountId || mountId));
+      st.setDeskBasePath(studioWorkspaceKey(nextMountId));
     } else {
       st.setDeskWorkspaceMount(null);
       if (data.basePath) st.setDeskBasePath(data.basePath);

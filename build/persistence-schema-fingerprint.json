@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:d7239a0f7b0ca2323bb7b57da212a09e98674ac724f863155dfd96f07900e50c",
+  "payloadFingerprint": "sha256:76aa1c344a34f4f1a9864425cfe3e10efcf3bb6aa4c75b61084247456d6e270a",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3287,8 +3287,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "engine.ts 增加 getSessionWorkspaceMount 纯委托方法(向路由回传会话工作台挂载身份),不改变任何持久化形状;tripwire 解析树摘要不变",
-    "payloadFingerprint": "sha256:d7239a0f7b0ca2323bb7b57da212a09e98674ac724f863155dfd96f07900e50c"
+    "compatibilityReason": "observability schema v5→v6：修正同会话轨迹合并口径（实测桌面 turn 经 pi ingress 落成 origin=unknown，v5 的 user_turn 过滤零命中）——v6 按「调用归属会话」全量合并，仍为纯数据整合、无 DDL、无列变化，SQLite 持久化形状不变",
+    "payloadFingerprint": "sha256:76aa1c344a34f4f1a9864425cfe3e10efcf3bb6aa4c75b61084247456d6e270a"
   },
   "schemas": [
     {
@@ -3462,7 +3462,7 @@
       "contract": "bounded base64 cover upload temporary-directory lifecycle",
       "kind": "directory-contract",
       "module": "server/routes/desk.ts",
-      "sourceHash": "sha256:49c2fbcc3bd85deeefe7e5e5ba187561e419b8207f5e4b22464cf975e2448a79",
+      "sourceHash": "sha256:a7c7e339079be179fd4c1c806c4a19fc4ab687eeff956f2117ed101fcd2bf9a0",
       "storeId": "desk-cover-upload-staging"
     },
     {
@@ -4102,9 +4102,9 @@
             "type": "table"
           }
         ],
-        "userVersion": 4
+        "userVersion": 6
       },
-      "sourceHash": "sha256:ec7b0dc5ab0c1c27f90df3f33be238fda398196e967e3a35f3269162c3962d2a",
+      "sourceHash": "sha256:e0801ad79309b7abd0f8ccd48a4e7ae5f83d341b3ffba832ab4a80f0f5f9694c",
       "storeId": "model-observability-db"
     },
     {
@@ -4201,7 +4201,7 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:f641d0ccaac284d241c2d999178c1cb78bc2d4f1c0e7dcbb6daeb3983d5f97b6",
+      "sourceHash": "sha256:3d1aa600ffab19a5c950eb0da154035d32a38987af9d10d1348879fd81ce1c5b",
       "storeId": "server-runtime-info"
     },
     {
@@ -4223,7 +4223,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:ba0e917497712b45c04c392161595e9a40f152a8dcb2c150113359ed5e8440ac"
+          "sourceHash": "sha256:851d0db04c36b2c89c325fec5c8ab224df149bc92a76e9b07cfbc5d7ecf4a700"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",

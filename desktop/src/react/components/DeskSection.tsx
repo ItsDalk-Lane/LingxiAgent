@@ -17,7 +17,6 @@ import { DeskFilterButton, DeskOpenIconButton, DeskPreviewIconButton, DeskSearch
 import { DeskTree, type InlineCreateKind, type InlineTreeEdit } from './desk/DeskTree';
 import { DeskDropZone } from './desk/DeskDropZone';
 import { DeskEmptyOverlay } from './desk/DeskEmptyOverlay';
-import { DeskCwdSkillsButton, DeskCwdSkillsPanel } from './desk/DeskCwdSkills';
 import s from './desk/Desk.module.css';
 import { workspaceDisplayName } from '../../../../shared/workspace-history.ts';
 
@@ -180,10 +179,8 @@ export function DeskSection({
             <div className={`jian-section-title ${s.sectionTitle}`} title={titlePath}>
               {title}
             </div>
-            <DeskCwdSkillsButton />
           </div>
         )}
-        {showHeader && <DeskCwdSkillsPanel />}
         <DeskSearchBox />
         <div className={s.toolbar}>
           <div className={s.toolbarActions}>

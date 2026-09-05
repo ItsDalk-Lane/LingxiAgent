@@ -229,7 +229,8 @@
       "allTab": "全部技能",
       "agentTabs": "按助手查看技能",
       "previousAgent": "上一个助手",
-      "nextAgent": "下一个助手"
+      "nextAgent": "下一个助手",
+      "externalRemove": "移除（改为未启用）"
     }
   },
   "sidebar": {
@@ -335,6 +336,12 @@
       "restoreConfirm": "将此对话恢复到原位置？",
       "restoreConflict": "原位置已被占用，无法恢复",
       "restoreFailed": "恢复失败",
+      "restoreSelected": "恢复所选（{count}）",
+      "restoreSelectedConfirm": "将选中的 {count} 条归档恢复到会话列表？",
+      "restoreSelectedDone": "已恢复 {count} 条归档",
+      "restoreSelectedPartial": "部分恢复成功：{restored}/{total}",
+      "restoreGroup": "整组恢复",
+      "restoreGroupConfirm": "将「{name}」分组的全部 {count} 条归档恢复到会话列表？",
       "deleteForever": "永久删除",
       "deleteConfirm": "永久删除此归档？此操作无法撤销。",
       "deleteFailed": "删除失败",
@@ -3594,6 +3601,7 @@
           "outputTokensUnavailable": "输出 token 数不可用",
           "durationTooShort": "时长过短",
           "started": "开始",
+          "responseArrival": "响应到达",
           "totalDuration": "总时长",
           "generation": "生成",
           "throughput": "吞吐",
@@ -3655,7 +3663,7 @@
             "notRecorded": "未记录",
             "stepStartUnavailable": "步骤开始时间不可用",
             "pending": "进行中",
-            "firstTokenUnavailable": "首 token 时间不可用",
+            "responseArrivalUnavailable": "响应到达时间不可用",
             "observability": "观测库计时",
             "observabilityRunning": "观测库计时（进行中）",
             "session": "会话时间戳"
@@ -3967,7 +3975,8 @@
     "tabs": {
       "label": "右侧工作台",
       "sessionFiles": "对话文件",
-      "workspace": "工作台"
+      "workspace": "工作台",
+      "projectSkills": "项目技能"
     },
     "sessionFiles": {
       "title": "对话文件",

@@ -72,6 +72,38 @@ describe("MountAwareFileService", () => {
     expect(() => service.resolveDirectory("default", "../outside")).toThrow("invalid_subdir");
   });
 
+  it("lists and descends into dot entries like VS Code while still rejecting traversal", async () => {
+    const { MountAwareFileService } = await import("../core/mount-aware-file-service.ts");
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-mount-file-"));
+    const defaultRoot = path.join(tmpDir, "default");
+    fs.mkdirSync(defaultRoot, { recursive: true });
+    fs.mkdirSync(path.join(defaultRoot, ".cloud"), { recursive: true });
+    fs.writeFileSync(path.join(defaultRoot, ".cloud", "config.json"), "{}", "utf-8");
+    fs.writeFileSync(path.join(defaultRoot, ".env"), "KEY=1", "utf-8");
+
+    const service = new MountAwareFileService({
+      lingxiHome: tmpDir,
+      defaultRoot,
+      studioId: "studio_1",
+    });
+
+    const names = (await service.listFiles("default", "")).files.map((f) => f.name);
+    expect(names).toContain(".cloud");
+    expect(names).toContain(".env");
+
+    // 点开头子目录可正常展开
+    const nested = (await service.listFiles("default", ".cloud")).files.map((f) => f.name);
+    expect(nested).toEqual(["config.json"]);
+
+    // 点开头的普通文件名在写操作中同样合法
+    await expect(service.mkdir("default", "", { name: ".codex" })).resolves.toBeTruthy();
+
+    // 穿越/相对段依旧拒绝
+    expect(() => service.resolveDirectory("default", "..")).toThrow("invalid_subdir");
+    expect(() => service.resolveDirectory("default", ".cloud/..")).toThrow("invalid_subdir");
+    await expect(service.listFiles("default", "../outside")).rejects.toThrow("invalid_subdir");
+  });
+
   it("discloses local_fs native roots only when constructed with discloseNativeRoot", async () => {
     const { upsertStudioMount } = await import("../core/studio-mounts.ts");
     const { MountAwareFileService } = await import("../core/mount-aware-file-service.ts");

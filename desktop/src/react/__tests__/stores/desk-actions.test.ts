@@ -62,7 +62,6 @@ describe('desk-actions workspace roots', () => {
       deskSelectedPath: '',
       deskJianContent: null,
       cwdSkills: [],
-      cwdSkillsOpen: false,
       workspaceDeskStateByRoot: {},
       previewOpen: false,
       previewItems: [],
@@ -188,6 +187,38 @@ describe('desk-actions workspace roots', () => {
     );
     expect(useStore.getState().deskFiles).toEqual([{ name: 'remote.md', isDir: false }]);
     expect(useStore.getState().deskBasePath).toBe('studio:mount_docs');
+  });
+
+  it('derives the default workspace display name instead of trusting the server label', async () => {
+    useStore.setState({
+      deskBasePath: 'studio:default',
+      deskWorkspaceMountId: 'default',
+      // 调用方种子已是派生名；服务端对 default mount 的 label 硬编码 "Default"，
+      // 回包刷新不得把显示名打回 "Default"。
+      deskWorkspaceLabel: 'project-hana',
+      homeFolder: '/Users/test/Desktop/Project/project-hana',
+    } as never);
+    mockLingxiFetch
+      .mockResolvedValueOnce(jsonResponse({
+        mountId: 'default',
+        mount: { label: 'Default' },
+        files: [],
+      }))
+      .mockResolvedValueOnce({ ok: false, status: 404, text: async () => '' } as unknown as Response);
+
+    const { loadDeskFiles, loadDeskTreeFiles } = await import('../../stores/desk-actions');
+    await loadDeskFiles();
+    expect(useStore.getState().deskWorkspaceLabel).toBe('project-hana');
+
+    // 子目录树刷新（loadDeskTreeFiles）同样不得覆盖
+    mockLingxiFetch
+      .mockResolvedValueOnce(jsonResponse({
+        mountId: 'default',
+        mount: { label: 'Default' },
+        files: [{ name: 'a.md', isDir: false }],
+      }));
+    await loadDeskTreeFiles('sub');
+    expect(useStore.getState().deskWorkspaceLabel).toBe('project-hana');
   });
 
   it('does not prune local workspace history when a Studio mount load returns 404', async () => {
@@ -667,7 +698,6 @@ describe('desk-actions workspace roots', () => {
       deskSelectedPath: 'notes/a.md',
       deskJianContent: 'a-note',
       cwdSkills: [{ name: 'skill-a', description: '', source: 'workspace', filePath: '/workspace-a/.agents/skills/a/SKILL.md', baseDir: '/workspace-a/.agents/skills/a' }],
-      cwdSkillsOpen: true,
       jianDrawerOpen: true,
       previewOpen: true,
       openTabs: ['previewItem-a'],
@@ -721,7 +751,6 @@ describe('desk-actions workspace roots', () => {
     expect(useStore.getState().deskExpandedPaths).toEqual(['notes']);
     expect(useStore.getState().deskSelectedPath).toBe('notes/a.md');
     expect(useStore.getState().deskJianContent).toBeNull();
-    expect(useStore.getState().cwdSkillsOpen).toBe(true);
     expect(useStore.getState().jianDrawerOpen).toBe(true);
     expect(useStore.getState().previewOpen).toBe(true);
     expect(useStore.getState().openTabs).toEqual(['previewItem-a']);

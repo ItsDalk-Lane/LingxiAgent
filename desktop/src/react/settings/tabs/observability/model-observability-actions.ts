@@ -225,8 +225,10 @@ export type ObservabilityCallsQuery = {
 };
 
 export type ObservabilityTracesQuery = ObservabilityCallsQuery & {
-  /** 轨迹列表默认只保留 ≥2 次调用的 trace（单次调用 trace 由调用台账覆盖）；传 1 = 不过滤。 */
+  /** 轨迹按会话聚合后单次调用也是一条会话轨迹，默认不过滤；传 2+ 只看多轮对话。 */
   minCallCount?: number | null;
+  /** 是否包含 origin 为空的 singleton 辅助轨迹（技能名翻译等）；默认 false，由服务端默认过滤。 */
+  includeSingleton?: boolean;
 };
 
 export function queryObservabilityCalls(
@@ -243,7 +245,7 @@ export function queryObservabilityTraces(
   return observabilityJson(`${API_BASE}/query/traces`, {
     ...opts,
     method: 'POST',
-    body: { ...query, minCallCount: query.minCallCount ?? 2 },
+    body: { ...query, minCallCount: query.minCallCount ?? 1 },
   });
 }
 

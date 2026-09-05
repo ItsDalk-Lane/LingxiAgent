@@ -80,7 +80,12 @@ describe('ChatSidebarContent', () => {
     const row = document.querySelector('.sidebar-function-row');
     expect(row).toBeInTheDocument();
     const buttons = within(row as HTMLElement).getAllByRole('button');
-    expect(buttons.map(b => b.getAttribute('title'))).toEqual(['社交平台', '助手活动', '任务计划', 'Skills', '设置']);
+    expect(buttons.map(b => b.getAttribute('title'))).toEqual(['社交平台', '助手活动', '任务计划', 'Skills', 'sidebar.archivedChats', '设置']);
+
+    // 归档记录入口用归档箱图标（带盖矩形），不是垃圾桶
+    const archivedButton = within(row as HTMLElement).getByTitle('sidebar.archivedChats');
+    expect(archivedButton.querySelector('svg rect')).toBeInTheDocument();
+    expect(archivedButton.querySelector('svg polyline')).not.toBeInTheDocument();
 
     // Bridge 在线状态点与 Automation 数量角标继续工作
     expect(row!.querySelector('.sidebar-bridge-dot.connected')).toBeInTheDocument();

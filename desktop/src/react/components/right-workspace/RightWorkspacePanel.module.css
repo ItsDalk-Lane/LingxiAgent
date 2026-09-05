@@ -38,18 +38,13 @@
     border-top: 1px solid var(--overlay-light);
 }
 
-/* 右栏 header 右侧为绝对位按钮预留的 7.5rem 在窄侧栏不适用，收回为常规留白 */
-.sidebarSection .workspaceHeader {
-    padding-right: var(--space-16);
-}
-
 .workspaceHeader {
     position: relative;
     flex: 0 0 auto;
     display: flex;
     align-items: center;
     min-height: 40px;
-    padding: 6px calc(var(--space-8) + 7.5rem) 2px var(--space-16);
+    padding: 6px var(--space-16) 2px var(--space-16);
 }
 
 .workspaceTitle {
@@ -65,13 +60,144 @@
     color: var(--accent);
 }
 
+/* 工作台标题下拉切换器：标题即触发钮，菜单锚定 .workspaceHeader（position:relative），
+   悬浮在 tabs/content 之上。 */
+.workspaceSwitcherWrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+}
+
+.workspaceSwitcher {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px 2px 8px;
+    margin-left: -8px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out);
+}
+
+.workspaceSwitcher:hover {
+    background: var(--overlay-subtle);
+}
+
+.workspaceSwitcherChevron {
+    flex: 0 0 auto;
+    color: var(--accent);
+    opacity: 0.6;
+    transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.workspaceSwitcherChevronOpen {
+    transform: rotate(180deg);
+}
+
+.workspaceSwitcherMenu {
+    position: absolute;
+    top: calc(100% - 2px);
+    left: var(--space-16);
+    right: var(--space-16);
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 4px;
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    border: 1px solid var(--overlay-light);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+}
+
+.workspaceSwitcherItem {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    min-height: 27px;
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out);
+}
+
+.workspaceSwitcherItem:hover {
+    background: var(--overlay-subtle);
+}
+
+.workspaceSwitcherItemActive {
+    color: var(--accent);
+}
+
+.workspaceSwitcherItemIcon {
+    flex: 0 0 auto;
+    display: inline-flex;
+    opacity: 0.75;
+}
+
+.workspaceSwitcherItemName {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--fs-hint);
+}
+
+/* 移除钮：主界面同款紧凑小叉，固定在整行最右侧 */
+.workspaceSwitcherRemove {    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font: inherit;
+    font-size: var(--fs-caption);
+    line-height: 1;
+    opacity: 0.55;
+    transition: opacity var(--duration-fast) var(--ease-out),
+                background var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+}
+
+.workspaceSwitcherItem:hover .workspaceSwitcherRemove {
+    opacity: 1;
+}
+
+.workspaceSwitcherRemove:hover {
+    background: var(--overlay-subtle);
+    color: var(--accent);
+}
+
+.workspaceSwitcherDivider {
+    flex: 0 0 auto;
+    height: 1px;
+    margin: 4px 2px;
+    background: var(--overlay-light);
+}
+
 .tabs {
     --right-workspace-active-tab-index: 0;
     --right-workspace-tab-slider-offset: 0px;
     position: relative;
     flex: 0 0 auto;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 2px;
     margin: 0 var(--space-8);
     padding: 2px;
@@ -88,7 +214,7 @@
     bottom: 2px;
     left: 2px;
     z-index: 0;
-    width: calc((100% - 6px) / 2);
+    width: calc((100% - 8px) / 3);
     border-radius: max(2px, calc(var(--radius-sm) - 2px));
     background: var(--tab-slider-bg, var(--bg-card));
     box-shadow: var(--tab-slider-shadow, 0 1px 3px var(--shadow));

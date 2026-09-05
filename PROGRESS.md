@@ -1031,6 +1031,107 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 结论:对话记录串台的 store 层路径(机制b)在新建会话流程内**不可达**;机制真实存在但仅冷启动/归档两设计内入口触发。「记录串台」生产候选(未排除,store 层外):服务端身份/WS 时序(new-detached 会话身份与 switch 回包不一致→闸门丢事件→空白;或 replay 重放错会话)——需服务端配合复现。
 - 文件树串台=机制c坐实:createNewSession 只清三件套(:1235-1237),deskBasePath/deskWorkspaceMountId/deskTreeFilesByPath 全程不重置(crosstalk 测试);activateWorkspaceDesk 快照-恢复把清了一半的 desk 写回主工作台存档 workspaceDeskStateByRoot[root].deskFiles=[](desk-new-session-capture 测试,desk-actions.ts:394-455)。继承同工作台时旧树显示属功能意图;存档污染(回工作台丢子目录/文件列表)是缺陷。
 
+## 2026-09-05 聊天页用量/用时胶囊任务(开工回执+任务0基线)
+
+- 任务:主聊天 assistant 轮次操作行加「用量」「用时」胶囊+明细弹窗,1:1 复刻 `design-review/harness-usage-pills-reference/`(只读),数据=observability 账本按轮真实聚合。让步顺序:数据真实>样式一致>覆盖面>速度。
+- 任务0基线(2026-09-05 实测,feat/pending-sep04,HEAD=d6fbd0d3):
+  - `npm run typecheck` → exit 0 ✓(与任务书一致)
+  - `npx vitest run desktop/src/react/__tests__/chat --exclude '**/dist/**'` → 11 files / 60 tests 全绿 ✓(与任务书一致)
+  - `git status --short` → **68 条(63 M + 5 ??)**,任务书说 73 条(68 M + 5 ??)。差值=5 个 M 文件,已被 13:20 的提交 d6fbd0d3(归档分组)吞并,5 个 ?? 原样在列;任务书快照写于该提交之前。证据与处置见 BLOCKED.md 顶部;以当前实测 68 条为冻结基线(只多不少)。
+- 基线 68 条完整快照（2026-09-05 17:42 `git status --short` 原样固化，替代 /tmp 临时文件；其中 `lib/llm/model-observability-query.ts`、`shared/model-observability-api-contract.ts` 既是基线 M 又在白名单——按任务 1 只做纯增量编辑，其余 66 条一个字节不碰）：
+  <details><summary>63 M + 5 ?? 全清单</summary>
+
+  ```
+  M build/cli-runtime-closure.json
+  M build/persistence-schema-fingerprint.json
+  M core/engine.ts
+  M core/mount-aware-file-service.ts
+  M core/session-coordinator.ts
+  M desktop/src/locales/en.json
+  M desktop/src/locales/ja.json
+  M desktop/src/locales/ko.json
+  M desktop/src/locales/zh-TW.json
+  M desktop/src/locales/zh.json
+  M desktop/src/react/__tests__/components/ChatSidebar.test.tsx
+  M desktop/src/react/__tests__/components/DeskCwdSkills.test.tsx
+  M desktop/src/react/__tests__/components/RightWorkspacePanel.test.tsx
+  M desktop/src/react/__tests__/components/SkillsPanel.test.tsx
+  M desktop/src/react/__tests__/mobile/MobileApp.test.tsx
+  M desktop/src/react/__tests__/settings/observability/ObservabilityTraceForest.test.ts
+  M desktop/src/react/__tests__/settings/observability/TraceConversationModel.test.ts
+  M desktop/src/react/__tests__/settings/observability/TraceDetailOverlayRendering.test.tsx
+  M desktop/src/react/__tests__/stores/desk-actions.test.ts
+  M desktop/src/react/__tests__/stores/desk-new-session-capture.test.ts
+  M desktop/src/react/__tests__/stores/session-actions.test.ts
+  M desktop/src/react/__tests__/stores/session-new-session-blank.test.ts
+  M desktop/src/react/__tests__/stores/session-new-session-crosstalk.test.ts
+  M desktop/src/react/__tests__/stores/session-new-session-workspace.test.ts
+  M desktop/src/react/components/DeskSection.tsx
+  M desktop/src/react/components/SkillsPanel.module.css
+  M desktop/src/react/components/SkillsPanel.tsx
+  M desktop/src/react/components/WelcomeScreen.tsx
+  M desktop/src/react/components/app/ChatSidebar.tsx
+  M desktop/src/react/components/desk/Desk.module.css
+  M desktop/src/react/components/desk/DeskCwdSkills.tsx
+  M desktop/src/react/components/right-workspace/RightWorkspacePanel.module.css
+  M desktop/src/react/components/right-workspace/WorkspaceStableBody.tsx
+  M desktop/src/react/settings/tabs/observability/model-observability-actions.ts
+  M desktop/src/react/settings/tabs/observability/trace-detail/TrajectoryTable.tsx
+  M desktop/src/react/settings/tabs/observability/trace-detail/TrajectoryTimeline.tsx
+  M desktop/src/react/settings/tabs/observability/trace-detail/trace-conversation-model.ts
+  M desktop/src/react/settings/tabs/observability/trace-detail/trajectory-record.ts
+  M desktop/src/react/settings/tabs/skills/SkillRow.tsx
+  M desktop/src/react/stores/desk-actions.ts
+  M desktop/src/react/stores/desk-slice.ts
+  M desktop/src/react/types.ts
+  M lib/llm/model-observability-persistence.ts
+  M lib/llm/model-observability-query-types.ts
+  M lib/llm/model-observability-query.ts
+  M lib/llm/model-observability-schema.ts
+  M lib/llm/model-observability-trace-store.ts
+  M lib/llm/model-trace-scope.ts
+  M lib/resource-io/providers/local-fs-provider.ts
+  M server/index.ts
+  M server/routes/desk.ts
+  M shared/model-observability-api-contract.ts
+  M tests/cors-policy.test.ts
+  M tests/desk-route.test.ts
+  M tests/mobile-workbench-route.test.ts
+  M tests/model-observability-detail-vertical.test.tsx
+  M tests/model-observability-export.test.ts
+  M tests/model-observability-query-truth-integrity.test.ts
+  M tests/model-observability-schema-v2.test.ts
+  M tests/model-observability-settings.test.ts
+  M tests/model-observability-store-schema.test.ts
+  M tests/model-trace-scope.test.ts
+  M tests/mount-aware-file-service.test.ts
+  ?? design-review/
+  ?? desktop/src/react/__tests__/components/WorkspaceSwitcher.test.tsx
+  ?? desktop/src/react/components/right-workspace/WorkspaceSwitcher.tsx
+  ?? desktop/src/react/utils/workspace-switch.ts
+  ?? tests/model-observability-session-trace-reuse.test.ts
+  ```
+  </details>
+- 理解的目标/顺序/最大风险(≤10 行):①任务1 query 层透出 inputUncachedTokens(读 input_uncached_tokens,null 语义同现有字段)+合约类型+query 测试;②任务2 新建胶囊组件+聚合(Σ口径,缓存命中=cacheRead÷(total−output),TPS=Σoutput÷ΣdurationMs,总用时=turnProjection completedAt−startedAt),仅 completed 轮渲染,无数据不渲染,挂 MessageFooterActions,新增 5 组测试;③任务3 反向验证红→绿。最大风险:①参考包样式 1:1 复刻与项目 CSS 体系映射的保真度;②无 usage 数据的判定口径(旧会话必须不渲染);③chat 目录测试跑法含 chat-semantics/chat-performance 邻接套件,新增文件须放 `__tests__/chat/` 新文件不动现有测试。
+
+## 2026-09-05 聊天页用量/用时胶囊任务(任务1+2+3 完成记录,未提交)
+
+- **任务1(透出未缓存输入)**:`shared/model-observability-api-contract.ts` 的 `ModelObservabilityUsageSummary` 增加 `inputUncachedTokens?: number | null`;`lib/llm/model-observability-query.ts` 两处:call 投影 `usageOf` 产出 `inputUncachedTokens: finiteIntegerOrNull(usage.input_uncached_tokens)`(该列本就在 USAGE_INTEGER_FIELDS 腐败检测闭集内,负值整行 corrupt 语义自动覆盖)、Trace 聚合 summary 补 `sumKnown("inputUncachedTokens")`。**合约字段设为可选的原因**:`ObservabilityTraceForest.test.ts`/`TraceConversationModel.test.ts` 等现有测试以显式类型注解构造 `ModelObservabilityCallListItem` 字面量,必填字段会炸冻结测试的 typecheck(现有测试文件不许改);服务端投影始终产出该键,null=无事实语义同其余字段。query 层测试新文件 `__tests__/chat/usage-uncached-input-query.test.ts` 4 用例(透出与总输入分离/NULL→null 不冒充 0/负值 corrupt/无 usage 行 unknown)。
+- **任务2(胶囊+聚合+挂载)**:新文件 `components/chat/turn-usage.ts`(聚合+格式化:Σ 口径、缓存命中 1:1 移植 formatCacheHitPercent 防 99.95→100 失真算法+正边界进位、紧凑 K/M、千分位、整秒时长、TPS;`turnUsageWindow` 资格=AssistantTurnStatus==='completed'+起止时间戳齐备)、`TurnUsagePills.tsx`(双胶囊+portal 弹窗:锚定上方 12px 钳位、Esc/外点关闭、行按数据有无条件渲染、中文文案组件内常量照抄 locale-keys.zh.txt、内联 SVG 图标、TTFT 行不移植)、`TurnUsagePills.module.css`(参考包视觉规格 1:1,颜色/圆角/动效换项目变量 --text/--text-muted/--bg/--border)、`use-turn-usage-stats.ts`(POST /api/model-observability/query/calls,filter=sessionPath+since/until(绑定 started_at,since 含/until 不含),失败静默=null)。挂载:`MessageFooterActions.tsx` 加 `statsNode` 插槽(时间文本之后);`AssistantMessage.tsx` 完成轮才启用 hook。**适配说明**:①输入/输出行在无事实时也隐藏(参考包类型保证非空故无条件渲染;本项目全可空,数据真实>样式一致);②formatCacheHitPercent 加 `cacheRead>=prompt → '100'` 前置钳位(参考包对 read>prompt 会落入防失真分支产出无意义 99.x);③胶囊标签保留 ' tok' 后缀(与参考包 consumed='用量 {total} tok' 一致)。
+- **任务2 验收 5 组**:a 有数据渲染双胶囊(紧凑总量+整秒用时)/b totalTokens 无事实整体 null 且不出现 0(+资格面:streaming/failed/aborted/缺时间戳无胶囊)/c 弹窗行条件渲染(缓存写入>0、缓存命中、其中推理、TTFT 永不、TPS 按有无)/d 聚合求和与命中百分比(含 9990/10000→99.9 不上 100、5.95% 正边界进位 6)/e 三 call 混合 null 求和+模型标签去重保序+TPS 分子分母同源。新测试文件 3 个共 23 用例:query 4+aggregate 11+pills 8。
+- **验证(2026-09-05 18:14 本工作树)**:`npm run typecheck` exit 0(注:此前两轮用管道 tail 取 $? 的写法会吃到 tail 的退出码,本轮起改 `npm run typecheck; echo $?` 直取);`npx vitest run desktop/src/react/__tests__/chat --exclude '**/dist/**'` → 14 files/83 tests 全绿 skip=0(基线 60+新增 23);邻接套件 AssistantMessage 渲染方(AssistantMessageCompletionActions/automation-suggestion/skill-block/media-generation/block-renderers/chat-semantics/process-fold/computer-app-approval/SessionCollabDraftCard/session-file-expired/MobileApp)52+86 用例全绿;eslint 改动文件 0 error(AssistantMessage 2 warning 为 HEAD 既有行号平移,新文件 0 警告)。
+- **任务3 反向验证**:把 aggregate 测试 e 组 `uncachedInputTokens` 断言 200→故意 201 → `Tests 1 failed | 10 passed`(`expected 200 to be 201`)→ 还原 → chat 全套 83/83 绿。
+- **并发改动提示(非本任务所为)**:17:42(本任务抓基线同分钟)另有会话/用户在本工作树改了 4 个白名单外文件:ArchivedSessionsModal.tsx/.module.css/其 test(+批量恢复 switchTo 选项)、stores/session-actions.ts。本任务未触碰、未回滚;基线 68 条完整性经 comm 比对全部原样在列。
+
+- **GUI 复测反馈修复(2026-09-05 19:13,胶囊不显示)**:用户实测看不到胶囊。根因坐实——`AssistantTurnProjection` 类型虽有 startedAt/completedAt,但三个 `projectAssistantTurn` 调用点(流式 `use-stream-buffer.ts:410`、收尾 `:512`、历史 `history-builder.ts:665`)**全都不传**这两个字段,`turnUsageWindow` 在真实应用永远 null,胶囊成死代码;单测 fixture 自带时间戳故未暴露。修复(全白名单内):①`use-stream-buffer.ts` commitLiveRun 收尾时传入 startedAt=本条 assistant 之前最近 user 消息 timestamp、completedAt=收尾时刻 Date.now()(本轮全部模型调用 START 于两者之间,与账本 since 含/until 不含、绑定 started_at 口径对齐);②历史重建路径(history-builder 在 utils/,非白名单不可改)改在消费端兜底——`turn-usage.ts` 新增 `turnUsageWindowFromNeighbors`(上一条 user 时刻~本条 entry 时刻,含状态门槛与越序防护),`AssistantMessage.tsx` 投影窗口缺失时回退;③补 4 用例(回溯跳过 interlude/三种状态门槛/缺时间戳或时序倒挂拒绝/找不到消息)。验证:`npm run typecheck` exit 0;chat+semantics+performance 14 文件 87 用例全绿(83+4);eslint 新增 0 warning(use-stream-buffer 的 turnKeyFrom 1 条为 HEAD 既有)。注:实时占位消息的 timestamp=流开始时刻,不能当轮结束用,故历史/实时两条腿缺一不可。
+- **GUI 复测反馈(2026-09-05,归档后工作台自动切换)——非本任务改动导致,已归因待裁决**:机制在 `session-actions.ts:1429-1431`(archiveSession):归档当前会话清空 currentSessionPath 后,`sessions.length===0` 才建新会话,否则**无条件 `switchSession(updated.sessions[0].path)`**——sessions 是跨工作台全局列表,于是默认工作台归档→跳到全局最新一条(常在别的工作台);别的工作台归档→跳回(常是)默认工作台。该行代码出自 08-05 基线提交 d5275e56,HEAD 原样存在,本任务与 17:42 并发改动均未触碰;近期侧栏归档入口 UX(d6fbd0d3)让它更易触发。且 `tests/session-actions.test.ts:2390/2446` 有用例锁定该行为,修复需改冻结测试+非白名单文件,方向(归档后留空白草稿/按当前工作台过滤候选)待用户裁决后另行开工。
+
+- **GUI 复测反馈(2026-09-05,归档后工作台自动切换)——用户拍板「把问题一也修复了」,已修复**:机制=`session-actions.ts` archiveSession 归档当前会话清空 current* 后无条件 `switchSession(sessions[0].path)`(08-05 基线 d5275e56 既有);且 `loadSessions` 内部「首次加载」兜底(currentSessionPath 空时拉 sessions[0],626-635)会让「只删显式跳转」失效。**修复**(用户授权覆盖冻结边界):归档当前会话或草稿态归档旧会话 → 先 `createNewSession()` 回「新建聊天」草稿态——在置空 current* 前读取被归档会话的工作台归属做继承(规则 B 新建跟随当前),写入的 pendingNewSession 挡住 loadSessions 的 sessions[0] 兜底;归档后台会话(正开着别的会话)行为不变。锁旧行为用例(session-actions.test.ts「归档当前 session」)改写为新语义断言(currentSessionPath=null + pendingNewSession=true + 列表里的 '/other' 不得成为当前会话)。**红→绿**:旧实现+旧 mock 队列 → `AssertionError: expected '/other' to be null`(1 failed | 88);新实现+新队列(补 createNewSession 的 permission 默认值请求 mock)→ 89/89 绿。注意供数陷阱:permission mock 插在 /api/sessions 之前会被旧实现的 loadSessions 当列表消费掉,sessions=[] 恰好走旧「空列表→createNewSession」分支,红证必须用旧队列(已踩坑并记录)。**验证**:`npm run typecheck` exit 0;stores+WelcomeScreen+ChatSidebar+ArchivedSessionsModal+MobileApp+app-init 36 文件 511 用例全绿;eslint 0 error(10 warning 全为该文件基线既有);基线 68 条 git status 原样在列。
+
+- **GUI 复测反馈第二轮(2026-09-05 20:40,「还是看不到胶囊」→ 三重真因全部修复,真机验证通过)**:用户以 `sess_0mtob4efv_a9f834bb2c789bd5afce` 实测仍无胶囊。逐层排查:①账本数据✓(5 调用全 present,session_id/session_path 双写,Σtotal=108,649);②服务层以胶囊精确 filter 探查✓(tsx 直连 sqlite,5 calls 全返回,inputUncachedTokens 在);③真实 UI 悬停后 AX 树无胶囊节点→渲染端问题。**真因三层**:⑴ `desktop/main.cjs loadPageFromDir` 只有设 `VITE_DEV_URL` 才走 vite,`--dev` 实际加载 `desktop/dist-renderer/` 构建产物(时为 16:12 构建,早于全部改动)——5173 上的 vite 无人消费,重启应用无效,**必须 `npm run build:renderer`**;⑵ `chatSessions` 以 sessionScopedKey(sessionId 优先)为键(chat-slice:72),我最初的裸 path 选择器在真实会话(有 sessionId)必查空——历史邻居回退全断,改用 `sessionScopedValue` 作用域查找;⑶ assistant entry timestamp=回复**开始**落盘时刻(实测 19:36:28,轮实际至 19:37:34),历史窗口上界不能用它——改为轮次边界「上一条 user 时刻 ~ 下一轮 user 时刻−1,最后一轮=now」;随之发现展示用时也不能用该边界(会把闲置时间算进「用时」),历史轮 runMs 改由账本事实推导=本轮最后调用 ended_at−startedAt,null 时用时胶囊整体隐藏。实时路径(commitLiveRun 写投影时间戳)不变。**新增 turn-usage-mount.test.tsx 4 用例**(mock lingxiFetch 模块边界,不 mock 被测组件):完成轮投影带时间戳→发查询+渲染双胶囊/生产同款 sessionId 键+locator 邻居回退→查询窗口 since/until 断言/账本空→无胶囊不渲染 0/streaming 轮不发请求;另补邻居窗口边界语义 5 断言(含 fake timers 锁「最后一轮=now」)。**验证**:`npm run typecheck` exit 0;chat+semantics+performance 15 文件 95 用例全绿;eslint 0 error(4 warning 均 HEAD 既有);`npm run build:renderer` 后重启应用,真机(同一会话)AX 树+截图证实「用量 109K tok」「用时 1分27秒」与账本全轮数据吻合,弹窗行(模型/缓存命中/未缓存输入/缓存读取/输出+其中推理)齐全。
+
+- **GUI 复测反馈第三轮(2026-09-05 21:00,用户两点追加)**:①「用时和速度」弹窗补**首 token 用时（TTFT）**行——推翻早前「TTFT 不显示」的猜测性裁决;口径=本轮最早一次 provider 响应到达(first_response_at)−轮开始(用户消息时刻),聚合取 min,事实缺失/时钟倒挂→null 整行不渲染;新增 formatLatencySeconds 移植(<10s 一位小数,≥10s 取整)。②胶囊与时间文本的显隐行为统一——最新消息 persistent 场景下,原先胶囊/时间恒显而复制/截图等按钮悬停才显,视觉不一致;`MessageFooterActions` 给 statsNode 加 `.messageFooterStats` 包装,Chat.module.css 新增 persistent 场景下 time+stats 默认 opacity:0/pointer-events:none、消息组 hover/:focus-within/行 hover 显示,与操作按钮完全同规则。**验证**:`npm run typecheck` exit 0;chat 三套件 15 文件 98 用例全绿(新增 TTFT 推导/TTFT 缺失行隐藏/最后一轮 now 边界 fake-timers/persistent 包装类等断言);eslint 0 error;`npm run build:renderer` 后重启应用,真机 AX+截图证实:用时弹窗出现「首 token 用时（TTFT）1.2秒」(真实账本值),非悬停态消息页脚(含时间/胶囊/按钮)整体隐藏。
+
 ## 2026-09-05 修复轮七:新建聊天助手身份跟随当前(规则B补全,用户拍板「B 方向」;接续修复轮与 01cdd80b mobile 补钉线索,非 disposal 工作流)
 
 - 背景:mobile 用例补钉(01cdd80b)后用户追问「助手和工作台不是没有绑定吗,为什么要区分」——确认架构上 agentId 与工作目录本是独立维度,「全局新建重置回 Primary」是历史入口语义,轮一实现规则 B 时只改了工作台维度、助手维度经代码注释有意保留,产生「助手回 Primary + 工作台留当前」的不对称组合。用户裁决 B 方向:**助手身份也跟随当前助手**。

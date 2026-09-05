@@ -1415,20 +1415,22 @@ export async function archiveSession(path: string): Promise<void> {
 
     const s = useStore.getState();
     const isCurrent = path === s.currentSessionPath;
+    const inDraft = !s.currentSessionPath;
     clearSessionRuntimeCaches(path);
     if (isCurrent) {
       clearChatAction();
-      useStore.setState({ currentSessionPath: null, currentSessionId: null });
+    }
+
+    // 归档当前会话（或草稿态归档旧会话）→ 回「新建聊天」草稿态：createNewSession
+    // 在置空 current* 前读取被归档会话的工作台归属做继承（规则 B：新建跟随当前），
+    // 其写入的 pendingNewSession 同时挡住下面 loadSessions 的「首次加载」自动选中。
+    // 旧实现是 switchSession(sessions[0])——全局列表第一条不属于当前工作台，会把
+    // 整个桌面拽进别的 工作台（用户复测报告 2026-09-05）。
+    if (isCurrent || inDraft) {
+      await createNewSession();
     }
 
     await loadSessions();
-
-    const updated = useStore.getState();
-    if (updated.sessions.length === 0) {
-      await createNewSession();
-    } else if (!updated.currentSessionPath) {
-      await switchSession(updated.sessions[0].path);
-    }
   } catch (err) {
     console.error('[session] archive failed:', err);
     showSidebarToast(window.t('session.archiveFailed'));
@@ -1473,7 +1475,11 @@ export async function listArchivedSessions(): Promise<ArchivedSession[]> {
   }
 }
 
-export async function restoreSession(target: string | Pick<ArchivedSession, 'path' | 'sessionId'>): Promise<RestoreResult> {
+export async function restoreSession(
+  target: string | Pick<ArchivedSession, 'path' | 'sessionId'>,
+  opts?: { /** 批量恢复传 false：不跳转会话，仅恢复进列表（单条恢复默认跳转，行为不变） */
+    switchTo?: boolean },
+): Promise<RestoreResult> {
   const sessionPath = typeof target === 'string' ? target : target.path;
   const sessionId = typeof target === 'string' ? null : normalizeSessionId(target.sessionId);
   try {
@@ -1497,7 +1503,7 @@ export async function restoreSession(target: string | Pick<ArchivedSession, 'pat
       restoredSessionId,
       restoredPath,
     );
-    if (restoredSession?.path) {
+    if (opts?.switchTo !== false && restoredSession?.path) {
       await switchSession(restoredSession.path);
     }
     void hydrateInputDrafts();

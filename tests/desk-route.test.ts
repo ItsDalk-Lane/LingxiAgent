@@ -299,6 +299,42 @@ describe("desk route", () => {
     }
   });
 
+  it("shows and descends into dot entries on the desk route like VS Code", async () => {
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-desk-route-dotfiles-"));
+    try {
+      const cwd = path.join(tempRoot, "workspace");
+      fs.mkdirSync(path.join(cwd, ".cloud"), { recursive: true });
+      fs.writeFileSync(path.join(cwd, ".cloud", "settings.json"), "{}", "utf-8");
+      fs.writeFileSync(path.join(cwd, ".codex"), "codex", "utf-8");
+
+      const engine = {
+        lingxiHome: path.join(tempRoot, "hana-home"),
+        deskCwd: cwd,
+        homeCwd: cwd,
+      };
+
+      const { createDeskRoute } = await import("../server/routes/desk.ts");
+      const app = new Hono();
+      app.route("/api", createDeskRoute(engine, null));
+
+      const root = await app.request("/api/desk/files");
+      expect(root.status).toBe(200);
+      const rootNames = (await root.json()).files.map((f) => f.name);
+      expect(rootNames).toContain(".cloud");
+      expect(rootNames).toContain(".codex");
+
+      const nested = await app.request(`/api/desk/files?subdir=${encodeURIComponent(".cloud")}`);
+      expect(nested.status).toBe(200);
+      expect((await nested.json()).files.map((f) => f.name)).toEqual(["settings.json"]);
+
+      // 穿越依旧拒绝
+      const traversal = await app.request(`/api/desk/files?subdir=${encodeURIComponent("..")}`);
+      expect(await traversal.json()).toHaveProperty("error");
+    } finally {
+      fs.rmSync(tempRoot, { recursive: true, force: true });
+    }
+  });
+
   it("allows a selected agent explicit home folder without switching the engine focus", async () => {
     const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-desk-route-"));
     try {

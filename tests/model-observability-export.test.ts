@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import fs from "fs";
 import os from "os";
 import path from "path";
+import { MODEL_OBSERVABILITY_SCHEMA_VERSION } from "../lib/llm/model-observability-schema.ts";
 import { createModelObservabilityTestHarness } from "../lib/llm/model-observability-testing.ts";
 import { createModelCallRecorder } from "../lib/llm/model-call-recorder.ts";
 import { createModelObservabilityQueryService } from "../lib/llm/model-observability-query.ts";
@@ -151,7 +152,7 @@ describe("Model Observability Export", () => {
       exportSchemaVersion: MODEL_OBSERVABILITY_EXPORT_SCHEMA_VERSION,
       includePayloads: false,
       totalCalls: 2,
-      storageSchemaVersion: 4,
+      storageSchemaVersion: MODEL_OBSERVABILITY_SCHEMA_VERSION,
       backfillSource: "bounded_usage_ledger",
     });
     const bundle1 = JSON.parse(lines[1]);

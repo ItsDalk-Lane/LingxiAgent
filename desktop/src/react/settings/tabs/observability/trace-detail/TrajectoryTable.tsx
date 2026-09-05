@@ -372,25 +372,25 @@ function totalTime(metrics: AssistantMetricDetail): string {
   return formatDurationMs(Math.max(0, metrics.completedTime - metrics.stepStartTime));
 }
 
-function ttft(metrics: AssistantMetricDetail): string {
+function responseArrival(metrics: AssistantMetricDetail): string {
   if (!metrics.timingRecorded) return tr('detail.timing.notRecorded');
   if (metrics.stepStartTime === null) return tr('detail.timing.stepStartUnavailable');
-  if (metrics.firstTokenTime === null) return tr('detail.timing.firstTokenUnavailable');
-  return formatDurationMs(Math.max(0, metrics.firstTokenTime - metrics.stepStartTime));
+  if (metrics.responseArrivalTime === null) return tr('detail.timing.responseArrivalUnavailable');
+  return formatDurationMs(Math.max(0, metrics.responseArrivalTime - metrics.stepStartTime));
 }
 
 function generationTime(metrics: AssistantMetricDetail): string {
-  if (!metrics.timingRecorded || metrics.firstTokenTime === null) return tr('detail.timing.firstTokenUnavailable');
+  if (!metrics.timingRecorded || metrics.responseArrivalTime === null) return tr('detail.timing.responseArrivalUnavailable');
   if (metrics.completedTime === null) return tr('detail.timing.pending');
-  return formatDurationMs(Math.max(0, metrics.completedTime - metrics.firstTokenTime));
+  return formatDurationMs(Math.max(0, metrics.completedTime - metrics.responseArrivalTime));
 }
 
 function throughput(metrics: AssistantMetricDetail): string {
-  if (!metrics.usageProvided) return tr('detail.usageUnavailable');
+  if (metrics.usageProvided === false) return tr('detail.usageUnavailable');
   if (metrics.outputTokens === null) return tr('detail.outputTokensUnavailable');
-  if (!metrics.timingRecorded || metrics.firstTokenTime === null) return tr('detail.timing.firstTokenUnavailable');
+  if (!metrics.timingRecorded || metrics.responseArrivalTime === null) return tr('detail.timing.responseArrivalUnavailable');
   if (metrics.completedTime === null) return tr('detail.timing.pending');
-  const generationSeconds = (metrics.completedTime - metrics.firstTokenTime) / 1_000;
+  const generationSeconds = (metrics.completedTime - metrics.responseArrivalTime) / 1_000;
   if (generationSeconds <= 0) return tr('detail.durationTooShort');
   return `${(metrics.outputTokens / generationSeconds).toFixed(1)} tok/s`;
 }
@@ -400,7 +400,7 @@ function AssistantTimingPanel({ metrics }: { metrics: AssistantMetricDetail }) {
     <dl className={css.overview}>
       <div><dt>{tr('detail.started')}</dt><StartedAtValue timestamp={metrics.stepStartTime} /></div>
       <div><dt>{tr('detail.totalDuration')}</dt><dd>{totalTime(metrics)}</dd></div>
-      <div><dt>TTFT</dt><dd>{ttft(metrics)}</dd></div>
+      <div><dt>{tr('detail.responseArrival')}</dt><dd>{responseArrival(metrics)}</dd></div>
       <div><dt>{tr('detail.generation')}</dt><dd>{generationTime(metrics)}</dd></div>
       <div><dt>{tr('detail.throughput')}</dt><dd>{throughput(metrics)}</dd></div>
     </dl>

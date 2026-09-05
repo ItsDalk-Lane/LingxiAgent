@@ -8,23 +8,21 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from '../stores';
-import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { useI18n } from '../hooks/use-i18n';
-import { loadModels } from '../utils/ui-helpers';
 import {
   addWorkspaceFolder,
-  applyFolder,
   applyStudioWorkspace,
-  createLocalStudioWorkspaceFromFolder,
   loadStudioWorkspaces,
   removeRecentWorkspace,
-  removeStudioWorkspace,
   removeWorkspaceFolder,
 } from '../stores/desk-actions';
 import {
-  countArchivedSessionsForWorkspace,
-  disposeWorkspaceSessions,
-} from '../stores/session-actions';
+  applyWorkspaceHistoryFolder,
+  browseAndApplyLocalWorkspace,
+  collectAgentHomeFolders,
+  refreshModelsAfterAgentModelSwitch,
+  removeStudioWorkspaceWithDisposal,
+} from '../utils/workspace-switch';
 import { openSettingsModal } from '../stores/settings-modal-actions';
 import type { Agent, StudioWorkspace } from '../types';
 import { AgentAvatar, refreshAgentAvatarVersion, resolveAgentDisplayInfo, type AgentDisplayInfo } from '../utils/agent-display';
@@ -228,19 +226,6 @@ function AgentChip({ agent, isSelected, onClick }: {
   );
 }
 
-function refreshModelsAfterAgentModelSwitch(agent: Agent | undefined): void {
-  if (agent?.chatModel?.id && agent.chatModel.provider) {
-    lingxiFetch('/api/models/set', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ modelId: agent.chatModel.id, provider: agent.chatModel.provider }),
-    }).then(() => {
-      loadModels();
-    }).catch(() => {});
-    return;
-  }
-}
-
 // ── Folder Picker ──
 
 function FolderPicker({
@@ -290,22 +275,8 @@ function FolderPicker({
 
   const handleBrowse = useCallback(async () => {
     setShowHistory(false);
-    const folder = await window.platform?.selectFolder?.();
-    if (!folder) return;
-    const workspace = await createLocalStudioWorkspaceFromFolder(folder);
-    if (workspace) {
-      await applyStudioWorkspace(workspace);
-      // 重新添加同路径工作台：提示名下可恢复的归档记录（移除工作台即归档的恢复闭环）。
-      void countArchivedSessionsForWorkspace({
-        workspaceMountId: workspace.mountId,
-        cwd: workspace.nativeRootPath ?? undefined,
-      }).then((count) => {
-        if (count > 0) {
-          useStore.getState().addToast(t('workspace.archivedHint', { count }), 'info', 6000);
-        }
-      });
-    }
-  }, [t]);
+    await browseAndApplyLocalWorkspace();
+  }, []);
 
   const handleAddWorkspaceFolder = useCallback(async () => {
     const folder = await window.platform?.selectFolder?.();
@@ -327,59 +298,14 @@ function FolderPicker({
   }, []);
 
   // ── 移除工作台（用户裁决：名下对话直接归档，不弹二选一）──
-  const removingMountRef = useRef<string | null>(null);
-
   const handleRemoveWorkspace = useCallback((mountId: string) => {
     setShowHistory(false);
-    if (removingMountRef.current === mountId) return;
-    const state = useStore.getState();
-    const workspace = (state.studioWorkspaces || []).find((item) => item.mountId === mountId) || null;
-    const root = workspace?.nativeRootPath || null;
-    // 身份口径与服务端 workspace-disposal 一致：mount 形态 + 同目录的 cwd 形态老会话。
-    const count = (state.sessions || []).filter((session: { workspaceMountId?: string | null; cwd?: string | null }) => (
-      (session.workspaceMountId && session.workspaceMountId === mountId)
-      || (!session.workspaceMountId && !!root && !!session.cwd
-        && isSameWorkspacePath(session.cwd, root))
-    )).length;
-    if (count === 0) {
-      void removeStudioWorkspace(mountId);
-      return;
-    }
-    // 有对话：先静默归档（可在归档记录中按工作台分组找回），成功后才移除工作台。
-    removingMountRef.current = mountId;
-    void (async () => {
-      try {
-        const result = await disposeWorkspaceSessions({ workspaceMountId: mountId, cwd: root ?? undefined }, 'archive');
-        if (!result) {
-          useStore.getState().addToast(t('workspace.disposal.failed'), 'error', 6000);
-          return;
-        }
-        await removeStudioWorkspace(mountId);
-        useStore.getState().addToast(t('workspace.disposal.archivedToast', { count: result.disposed }), 'success', 6000);
-      } finally {
-        removingMountRef.current = null;
-      }
-    })();
-  }, [t]);
+    void removeStudioWorkspaceWithDisposal(mountId);
+  }, []);
 
   const handleSelectHistory = useCallback((folder: string) => {
     setShowHistory(false);
-    const agent = findAgentByHomeFolder(agents, folder);
-    if (agent) {
-      // Agent 主目录 = 默认工作台（mount "default"）的解析根。这里统一走 mount 形态：
-      // 若以本地路径形态进入草稿，之后创建的会话只带 cwd，与经切换器创建的 mount 形态
-      // 会话分裂成两本账（左栏作用域严格分家），同一目录的对话不聚合。
-      // 跨 Agent 选择时 desk 的 mount 根在会话落到目标 Agent 前按当前 Agent 解析，
-      // 属草稿期瞬态；首条消息后随 switch 回包归位。
-      useStore.setState({
-        selectedAgentId: agent.id === currentAgentId ? null : agent.id,
-        workspaceFolders: [],
-      });
-      void applyStudioWorkspace({ mountId: 'default' });
-      refreshModelsAfterAgentModelSwitch(agent);
-      return;
-    }
-    void applyFolder(folder);
+    void applyWorkspaceHistoryFolder(agents, currentAgentId, folder);
   }, [agents, currentAgentId]);
 
   const selectedWorkspace = selectedWorkspaceMountId
@@ -609,21 +535,6 @@ function FolderHistory({ cwdHistory, agentHomeFolders, selectedFolder, selectedW
       </div>
     </div>
   );
-}
-
-function collectAgentHomeFolders(agents: Agent[]): string[] {
-  const folders: string[] = [];
-  for (const agent of agents) {
-    const folder = normalizeWorkspacePath(agent.homeFolder);
-    if (folder && !folders.includes(folder)) folders.push(folder);
-  }
-  return folders;
-}
-
-function findAgentByHomeFolder(agents: Agent[], folder: string): Agent | null {
-  const normalized = normalizeWorkspacePath(folder);
-  if (!normalized) return null;
-  return agents.find(agent => normalizeWorkspacePath(agent.homeFolder) === normalized) || null;
 }
 
 // ── Memory Toggle ──

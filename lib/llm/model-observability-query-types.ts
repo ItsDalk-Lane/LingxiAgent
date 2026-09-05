@@ -394,8 +394,14 @@ export function normalizeModelObservabilityAggregateQuery(input: unknown): Norma
 export type NormalizedModelObservabilityTraceQuery = {
   filter: ModelObservabilityNormalizedFilter;
   origin: string | null;
-  /** 轨迹列表只保留 call 总数 ≥ 该值的 trace（null = 不过滤；单次调用 trace 由调用台账覆盖）。 */
+  /** 轨迹列表只保留 call 总数 ≥ 该值的 trace（null = 不过滤）。 */
   minCallCount: number | null;
+  /**
+   * 是否包含 origin 为空的 singleton 轨迹（无任务根的辅助单次调用，如技能名
+   * 翻译/知识滚动）。默认 false——调用轨迹列表面向对话轨迹，这类调用在调用
+   * 台账仍可见（产品口径 2026-09-05）。
+   */
+  includeSingleton: boolean;
   limit: number;
   cursor: string | null;
 };
@@ -406,7 +412,7 @@ export function normalizeModelObservabilityTraceQuery(input: unknown): Normalize
     return { ok: false, error: { code: "invalid_filter", message: "trace query body must be an object" } };
   }
   const source = input as Record<string, unknown>;
-  const allowed = new Set(["filter", "origin", "minCallCount", "limit", "cursor"]);
+  const allowed = new Set(["filter", "origin", "minCallCount", "includeSingleton", "limit", "cursor"]);
   for (const key of Object.keys(source)) {
     if (!allowed.has(key)) {
       return { ok: false, error: { code: "unknown_field", message: `unknown trace query field "${key}"`, field: key } };
@@ -432,6 +438,14 @@ export function normalizeModelObservabilityTraceQuery(input: unknown): Normalize
     minCallCount = n;
   }
 
+  let includeSingleton = false;
+  if (source.includeSingleton !== undefined && source.includeSingleton !== null) {
+    if (typeof source.includeSingleton !== "boolean") {
+      return { ok: false, error: { code: "invalid_filter", message: "includeSingleton must be a boolean", field: "includeSingleton" } };
+    }
+    includeSingleton = source.includeSingleton;
+  }
+
   let limit = MODEL_OBSERVABILITY_PAGE_DEFAULT_LIMIT;
   if (source.limit !== undefined && source.limit !== null) {
     const n = Number(source.limit);
@@ -448,7 +462,7 @@ export function normalizeModelObservabilityTraceQuery(input: unknown): Normalize
     }
     cursor = source.cursor;
   }
-  return { ok: true, value: { filter: filter.value, origin, minCallCount, limit, cursor } };
+  return { ok: true, value: { filter: filter.value, origin, minCallCount, includeSingleton, limit, cursor } };
 }
 
 /* ── Cursor codec（§二十五/二十六：opaque、bounded、与 filter 绑定）──── */
@@ -570,11 +584,12 @@ export function encodeModelObservabilityTraceCursor(
   filter: ModelObservabilityNormalizedFilter,
   origin: string | null = null,
   minCallCount: number | null = null,
+  includeSingleton: boolean = false,
 ): string {
   const payload = {
     v: CURSOR_VERSION,
     kind: "traces" as const,
-    fp: modelObservabilityQueryFingerprint(filter, "started_at_desc", { origin, minCallCount }),
+    fp: modelObservabilityQueryFingerprint(filter, "started_at_desc", { origin, minCallCount, includeSingleton }),
     s: position.lastSeenAt,
     t: position.lastTraceId,
   };
@@ -586,6 +601,7 @@ export function decodeModelObservabilityTraceCursor(
   filter: ModelObservabilityNormalizedFilter,
   origin: string | null = null,
   minCallCount: number | null = null,
+  includeSingleton: boolean = false,
 ): NormalizedQueryResult<ModelObservabilityTraceKeysetCursor> {
   const invalid = (message: string): NormalizedQueryResult<ModelObservabilityTraceKeysetCursor> => ({
     ok: false,
@@ -609,7 +625,7 @@ export function decodeModelObservabilityTraceCursor(
   if (payload.v !== CURSOR_VERSION || payload.kind !== "traces") {
     return invalid("cursor version/kind mismatch");
   }
-  if (payload.fp !== modelObservabilityQueryFingerprint(filter, "started_at_desc", { origin, minCallCount })) {
+  if (payload.fp !== modelObservabilityQueryFingerprint(filter, "started_at_desc", { origin, minCallCount, includeSingleton })) {
     return invalid("cursor was issued for a different query");
   }
   const lastTraceId = typeof payload.t === "string" && payload.t ? payload.t : "";

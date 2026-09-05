@@ -19,11 +19,12 @@ export type TrajectoryCellKind =
   | 'tool'
   | 'subtool';
 
-/** 推导 assistant TTFT 与解码吞吐所需的记录事实。 */
+/** 推导 assistant 请求计时拆解（响应到达/生成/吞吐）所需的记录事实。 */
 export interface AssistantMetricDetail {
   timingRecorded: boolean;
   stepStartTime: number | null;
-  firstTokenTime: number | null;
+  /** provider 响应到达时刻（epoch ms）；无事实为 null——不虚构。 */
+  responseArrivalTime: number | null;
   completedTime: number | null;
   usageProvided: boolean;
   outputTokens: number | null;

@@ -337,7 +337,6 @@ describe('v0.1.33 新建会话首屏空白（regression: FIXED）', () => {
           deskFiles: mockState.deskFiles,
           deskJianContent: mockState.deskJianContent,
           cwdSkills: [],
-          cwdSkillsOpen: false,
           previewOpen: false,
           openTabs: [],
           activeTabId: null,

@@ -348,7 +348,6 @@ function mockPermissionDefault(mode = 'ask') {
           deskFiles: mockState.deskFiles,
           deskJianContent: mockState.deskJianContent,
           cwdSkills: [],
-          cwdSkillsOpen: false,
           previewOpen: false,
           openTabs: [],
           activeTabId: null,
@@ -2431,6 +2430,9 @@ function mockPermissionDefault(mode = 'ask') {
       (mockState.streamingSessions as string[]) = ['/current'];
 
       mockFetch.mockResolvedValueOnce(jsonResponse({ ok: true }));
+      // 归档当前会话后走 createNewSession 草稿态（继承当前工作台，不再拉起
+      // sessions[0]）：其 loadPendingNewSessionPermissionDefault 会发一次请求。
+      mockPermissionDefault();
       mockFetch.mockResolvedValueOnce(jsonResponse([{ path: '/other' }]));
       // loadSessions() 内部紧跟 /api/sessions 并行探测 /api/health（session
       // 元数据待恢复状态）——按调用顺序占掉这个位置的响应队列，空块即可，
@@ -2454,7 +2456,11 @@ function mockPermissionDefault(mode = 'ask') {
       expect((mockState.chatSessions as Record<string, unknown>)['/current']).toBeUndefined();
       expect((mockState.sessionStreams as Record<string, unknown>)['/current']).toBeUndefined();
       expect((mockState.streamingSessions as string[])).toEqual([]);
-      expect(mockState.currentSessionPath).toBe('/other');
+      // 归档当前会话 → 回「新建聊天」草稿态（pendingNewSession=true，工作台继承当前），
+      // 不再 switchSession(sessions[0])——旧行为会把桌面拽到别的 工作台（列表里
+      // 的 '/other' 只是刷新结果，不能成为当前会话）。
+      expect(mockState.currentSessionPath).toBeNull();
+      expect(mockState.pendingNewSession).toBe(true);
     });
   });
 

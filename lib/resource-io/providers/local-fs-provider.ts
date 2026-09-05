@@ -484,7 +484,7 @@ function searchNames(rootPath: string, query: string, guard: Guard | null, limit
     entries.sort((a, b) => a.name.localeCompare(b.name));
     for (const entry of entries) {
       if (matches.length >= max) break;
-      if (entry.name.startsWith(".")) continue;
+      // 点开头条目（.cloud/.codex 等）照常参与搜索；仍跳过常见依赖/构建目录。
       if (entry.isDirectory() && SEARCH_SKIP_DIRS.has(entry.name)) continue;
       const fullPath = path.join(current, entry.name);
       if (guard) {

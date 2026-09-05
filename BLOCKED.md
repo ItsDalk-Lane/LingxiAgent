@@ -2,6 +2,14 @@
 
 影响正确性、需要待裁决/上游修复的事项。处理方式：记录 → 跳过该子功能 → 继续其他任务。
 
+## 2026-09-05 用量/用时胶囊任务:任务0基线差值(已解释,待补认)
+
+1. **git status 条数对不上(68 实测 vs 任务书 73)**:任务书称开工时 73 条未提交(68 M + 5 ??);2026-09-05 17:42 实测 68 条(63 M + 5 ??)。差值=恰 5 个 M 文件,已定位为提交 **d6fbd0d3(09-05 13:20「归档记录按工作台分组…」)** 吞并了任务书快照之后的 5 个当时未提交文件;5 个 ??(design-review/、WorkspaceSwitcher.test.tsx、WorkspaceSwitcher.tsx、workspace-switch.ts、model-observability-session-trace-reuse.test.ts)原样在列。**处置**:按任务 0「只做不受影响的部分」——数量差异已被提交证据完整解释、非丢改动,以实测 68 条为冻结基线(只多不少)继续全部任务;若领导认定必须以 73 条清单逐项核对,请补发原始 73 条文件清单。
+2. **白名单两文件与「一个字节不许碰」表面冲突(按任务书面语义执行,备案)**:`lib/llm/model-observability-query.ts`、`shared/model-observability-api-contract.ts` 既是基线未提交改动文件、又被白名单明确列为可改且任务 1 点名要求改。执行口径:这两文件只做**纯增量**编辑(保留既有全部未提交改动),其余 66 条基线条目一个字节不碰。
+3. **合约新字段 `inputUncachedTokens` 设为可选(约束迫使,备案待追认)**:现有测试(`ObservabilityTraceForest.test.ts:73`、`TraceConversationModel.test.ts:56` 等)以显式类型注解构造 summary 字面量,必填字段会破坏「现有测试文件一律不改」红线;服务端投影始终产出该键(null=无事实),可选仅放宽消费方。若领导要求必填,需同步豁免上述测试的类型改动。
+4. **并发改动入工作树(非本任务所为,待确认归属)**:2026-09-05 17:42(本任务抓基线同分钟)另有会话/用户修改了 4 个白名单外文件——`ArchivedSessionsModal.tsx/.module.css/其 test`(批量恢复 switchTo 选项)与 `stores/session-actions.ts`。本任务未触碰未回滚;如需还原或纳入本任务基线,请裁决。
+5. **归档后自动跳工作台(用户 2026-09-05 报告 → 同日拍板「把问题一也修复了」→ 已修复)**:根因=`session-actions.ts` archiveSession 归档当前会话后无条件 `switchSession(sessions[0].path)`(08-05 基线 d5275e56 既有);且 `loadSessions` 的「首次加载」兜底(626-635)在 currentSessionPath 为空时同样拉 sessions[0],只删显式跳转不够。**修复**:归档当前会话/草稿态归档旧会话 → 先 `createNewSession()` 回「新建聊天」草稿态(置空前读取被归档会话的工作台归属做继承,规则 B;其 pendingNewSession 挡住 loadSessions 兜底),归档后台会话(当前开着别的会话)维持原行为。锁定旧行为的用例已按新语义改写(用户授权覆盖冻结边界),红→绿证据见 PROGRESS.md 同日条目。
+
 ## 2026-09-05 v0.1.33 新建会话工作台语义冲突(用户新指认,2026-09-05 已裁决并实施)
 
 3. **「新建对话默认工作台」有两个互相矛盾的规则声明,实现做的是第三种**(已于 2026-09-05 经用户三轮澄清+拍板解决):

@@ -191,6 +191,34 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
     await refresh();
   };
 
+  // 批量恢复共用：不跳转会话，只统计恢复/冲突数并提示（单条恢复仍走 handleRestore）
+  const handleRestoreBatch = async (targets: ArchivedSession[], successToast: string, params: Record<string, string | number>) => {
+    let restored = 0;
+    let conflicts = 0;
+    for (const item of targets) {
+      const r = await restoreSession(item, { switchTo: false });
+      if (r.status === 'ok') restored += 1;
+      else if (r.status === 'conflict') conflicts += 1;
+    }
+    if (restored === targets.length) {
+      showSidebarToast(t(successToast, params));
+    } else if (restored > 0) {
+      showSidebarToast(t('session.archived.restoreSelectedPartial', { restored, total: targets.length }));
+    } else if (conflicts > 0) {
+      showSidebarToast(t('session.archived.restoreConflict'));
+    } else {
+      showSidebarToast(t('session.archived.restoreFailed'));
+    }
+    await refresh();
+  };
+
+  const handleRestoreSelected = async () => {
+    const targets = list.filter((x) => selected.has(x.path));
+    if (targets.length === 0) return;
+    if (!window.confirm(t('session.archived.restoreSelectedConfirm', { count: targets.length }))) return;
+    await handleRestoreBatch(targets, 'session.archived.restoreSelectedDone', { count: targets.length });
+  };
+
   // 整组删除：按工作台分组直接永久删除该组全部归档记录
   const handleDeleteGroup = async (group: ArchiveGroup) => {
     const size = group.items.reduce((s, x) => s + x.sizeBytes, 0);
@@ -210,6 +238,12 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
       showSidebarToast(t('session.archived.deleteGroupDone', { count: deleted }));
     }
     await refresh();
+  };
+
+  // 整组恢复：按工作台分组把该组全部归档记录恢复到会话列表
+  const handleRestoreGroup = async (group: ArchiveGroup) => {
+    if (!window.confirm(t('session.archived.restoreGroupConfirm', { name: group.title, count: group.items.length }))) return;
+    await handleRestoreBatch(group.items, 'session.archived.restoreSelectedDone', { count: group.items.length });
   };
 
   const handleCleanup = async (days: 30 | 90) => {
@@ -277,13 +311,22 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
                 />
                 <span>{t('session.archived.selectAll')}</span>
               </label>
-              <button
-                className={styles.deleteSelectedBtn}
-                onClick={handleDeleteSelected}
-                disabled={selected.size === 0}
-              >
-                {t('session.archived.deleteSelected', { count: selected.size })}
-              </button>
+              <div className={styles.batchBtns}>
+                <button
+                  className={styles.restoreSelectedBtn}
+                  onClick={handleRestoreSelected}
+                  disabled={selected.size === 0}
+                >
+                  {t('session.archived.restoreSelected', { count: selected.size })}
+                </button>
+                <button
+                  className={styles.deleteSelectedBtn}
+                  onClick={handleDeleteSelected}
+                  disabled={selected.size === 0}
+                >
+                  {t('session.archived.deleteSelected', { count: selected.size })}
+                </button>
+              </div>
             </div>
             <div className={styles.list}>
               {loading ? (
@@ -342,6 +385,15 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
                         <span className={styles.groupMeta}>
                           {t('session.archived.group.meta', { count: group.items.length, size: formatBytes(groupSize) })}
                         </span>
+                        <button
+                          className={styles.groupRestoreBtn}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            void handleRestoreGroup(group);
+                          }}
+                        >
+                          {t('session.archived.restoreGroup')}
+                        </button>
                         <button
                           className={styles.groupDeleteBtn}
                           onClick={(e) => {

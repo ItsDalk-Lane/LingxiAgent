@@ -152,6 +152,13 @@
   margin: 0;
 }
 
+.batchBtns {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.restoreSelectedBtn,
 .deleteSelectedBtn {
   background: linear-gradient(180deg, color-mix(in srgb, var(--bg-card, #fff) 92%, white 8%), var(--bg-card, #fff));
   border: 1px solid var(--border, rgba(0, 0, 0, 0.15));
@@ -165,11 +172,17 @@
   transition: background var(--duration-fast) ease, border-color var(--duration-fast) ease;
 }
 
+.restoreSelectedBtn {
+  color: var(--accent, #b8860b);
+}
+
+.restoreSelectedBtn:hover:not(:disabled),
 .deleteSelectedBtn:hover:not(:disabled) {
   background: var(--bg-hover, color-mix(in srgb, var(--bg-card, #fff) 92%, transparent));
   border-color: var(--overlay-light, rgba(0, 0, 0, 0.18));
 }
 
+.restoreSelectedBtn:disabled,
 .deleteSelectedBtn:disabled {
   opacity: 0.45;
   cursor: default;
@@ -337,10 +350,10 @@
   color: var(--text-secondary, #888);
 }
 
+.groupRestoreBtn,
 .groupDeleteBtn {
   flex-shrink: 0;
   font-size: var(--text-xs, 11px);
-  color: var(--danger, #d9534f);
   background: none;
   border: 1px solid currentColor;
   border-radius: var(--radius-sm, 4px);
@@ -348,6 +361,15 @@
   cursor: pointer;
 }
 
+.groupRestoreBtn {
+  color: var(--accent, #b8860b);
+}
+
+.groupDeleteBtn {
+  color: var(--danger, #d9534f);
+}
+
+.groupRestoreBtn:hover,
 .groupDeleteBtn:hover {
   opacity: 0.85;
 }

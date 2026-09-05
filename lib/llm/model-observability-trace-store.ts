@@ -465,6 +465,26 @@ export function createModelObservabilityTraceStore({ db, now = () => new Date().
       return db.prepare(`SELECT * FROM traces WHERE trace_id = ?`).get(traceId) ?? null;
     },
 
+    /**
+     * 会话级轨迹复用查找（产品口径 2026-09-05）：该会话最近一次有任务上下文
+     * 的轨迹（origin 非空——user_turn/bridge/slash 等任务根；origin 为空的
+     * singleton 辅助调用不是对话轨迹，不得作为复用目标）。同会话后续 turn
+     * 复用它，调用在原记录上累加。未启用/无历史/查不到 → null（铸新根）。
+     * 实测注记（2026-09-05）：桌面 turn 历史上经 pi ingress 落成 origin=
+     * unknown，因此这里不得按 origin='user_turn' 过滤。
+     */
+    findReusableSessionTraceId(sessionId: string | null | undefined): string | null {
+      if (typeof sessionId !== "string" || !sessionId.trim()) return null;
+      const row = db.prepare(
+        `SELECT c.trace_id AS trace_id
+         FROM model_calls c JOIN traces t ON t.trace_id = c.trace_id
+         WHERE c.session_id = ? AND t.origin IS NOT NULL
+         ORDER BY c.started_at DESC, c.call_id DESC
+         LIMIT 1`,
+      ).get(sessionId.trim()) as { trace_id?: unknown } | undefined;
+      return typeof row?.trace_id === "string" && row.trace_id ? row.trace_id : null;
+    },
+
     getAttempts(callId: string): ModelObservabilityAttemptRow[] {
       return db.prepare(`SELECT * FROM model_attempts WHERE call_id = ? ORDER BY started_at, rowid`).all(callId);
     },

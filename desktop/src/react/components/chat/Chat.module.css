@@ -189,6 +189,34 @@
     white-space: nowrap;
 }
 
+.messageFooterStats {
+    display: inline-flex;
+    min-width: 0;
+}
+
+/* 最新消息的 persistent 场景：时间文本与用量/用时胶囊同操作按钮一致——
+   平时隐藏，悬停/键盘聚焦时显示（用户裁决 2026-09-05）。 */
+.messageFooterActionsTimePersistent .messageFooterTime,
+.messageFooterActionsTimePersistent .messageFooterStats {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-instant);
+}
+
+.messageGroupUser:hover .messageFooterActionsTimePersistent .messageFooterTime,
+.messageGroupAssistant:hover .messageFooterActionsTimePersistent .messageFooterTime,
+.agentOriginCard:hover .messageFooterActionsTimePersistent .messageFooterTime,
+.messageFooterActionsTimePersistent:focus-within .messageFooterTime,
+.messageFooterActionsTimePersistent:hover .messageFooterTime,
+.messageGroupUser:hover .messageFooterActionsTimePersistent .messageFooterStats,
+.messageGroupAssistant:hover .messageFooterActionsTimePersistent .messageFooterStats,
+.agentOriginCard:hover .messageFooterActionsTimePersistent .messageFooterStats,
+.messageFooterActionsTimePersistent:focus-within .messageFooterStats,
+.messageFooterActionsTimePersistent:hover .messageFooterStats {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 .messageFooterBtn {
     display: inline-flex;
     align-items: center;

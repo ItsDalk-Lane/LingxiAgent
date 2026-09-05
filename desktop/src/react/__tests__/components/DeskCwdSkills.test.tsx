@@ -23,7 +23,6 @@ vi.mock('../../utils/platform-runtime', () => ({ isWebRuntime: () => false }));
 describe('DeskCwdSkillsPanel source status', () => {
   beforeEach(() => {
     Object.assign(state, {
-      cwdSkillsOpen: true,
       deskWorkspaceMountId: null,
       cwdSkills: [
         {
@@ -75,5 +74,15 @@ describe('DeskCwdSkillsPanel source status', () => {
     expect(screen.getByText('desk.cwdSkillActive')).toBeTruthy();
     expect(screen.getByText(/desk\.cwdSkillShadowed/).textContent).toContain('Agents');
     expect(screen.getByText('desk.cwdSkillInactive')).toBeTruthy();
+  });
+
+  it('renders inline without an open/closed gate (third tab content)', async () => {
+    state.cwdSkills = [];
+    const { DeskCwdSkillsPanel } = await import('../../components/desk/DeskCwdSkills');
+    const { container } = render(<DeskCwdSkillsPanel />);
+
+    // 挂载即渲染：内嵌面板不再受 cwdSkillsOpen 控制，也没有悬浮 wrap 结点
+    expect(container.querySelector('[data-desk-cwd-panel]')).toBeTruthy();
+    expect(screen.getByText('desk.cwdSkillsEmpty')).toBeTruthy();
   });
 });

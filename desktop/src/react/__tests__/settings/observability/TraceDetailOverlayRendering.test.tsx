@@ -35,6 +35,7 @@ function makeCall(overrides: Partial<ModelObservabilityCallListItem> & { callId:
     source: { subsystem: 'llm', operation: 'chat', surface: 'server', trigger: 'user_turn' },
     attribution: { ...BASE_ATTRIBUTION, ...(attribution ?? {}) },
     callPurpose: null, inputShape: 'messages', provenancePrecision: 'exact',
+    firstResponseAt: null,
     provenance: { sectionCount: 0, opaqueCount: 0, categories: [], categoriesState: 'absent' },
     payloadAvailability: 'not_captured', payloadRecordCount: 0,
     usage: { availability: 'present', status: 'ok', summary: null },

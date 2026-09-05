@@ -514,8 +514,9 @@ function resourceRefForTarget(root, subpath = "") {
 }
 
 function listItemsForWorkbench(items = []) {
+  // 与 VS Code 打开工作目录一致：点开头文件/目录（.cloud/.codex 等）全部显示。
   return (Array.isArray(items) ? items : [])
-    .filter((item) => item && !String(item.name || "").startsWith("."))
+    .filter((item) => item && item.name)
     .map((item) => ({
       name: item.name,
       isDir: Boolean(item.isDirectory),
@@ -530,7 +531,7 @@ function listItemsForWorkbench(items = []) {
 
 function searchMatchesForWorkbench(rootPath, matches = []) {
   return (Array.isArray(matches) ? matches : [])
-    .filter((match) => match && !String(match.name || path.basename(match.filePath || "")).startsWith("."))
+    .filter((match) => match && (match.name || path.basename(match.filePath || "")))
     .map((match) => ({
       name: match.name || path.basename(match.filePath || ""),
       relativePath: match.relativePath || toPortableRelative(rootPath, match.filePath || rootPath),
@@ -637,7 +638,9 @@ function resolveMissingPath(rootReal, target) {
 function normalizeSubdirOrThrow(value) {
   const raw = String(value || "").replace(/^\/+|\/+$/g, "");
   if (!raw) return "";
-  if (raw.includes("\\") || raw.split("/").some((part) => part === ".." || part === "." || part.startsWith("."))) {
+  // 点开头目录（.cloud/.codex/.git 等）与 VS Code 一致照常进入；仅拒绝 "." / ".."
+  // 路径段防穿越（resolveInsideRoot 的 realPath 包含检查是第二道兜底）。
+  if (raw.includes("\\") || raw.split("/").some((part) => part === ".." || part === ".")) {
     throw fileError("invalid_subdir", "invalid_subdir", 400);
   }
   return raw;
@@ -645,7 +648,8 @@ function normalizeSubdirOrThrow(value) {
 
 function normalizePlainNameOrThrow(value) {
   const name = String(value || "").trim();
-  if (!name || name.includes("/") || name.includes("\\") || name === "." || name === ".." || name.startsWith(".")) {
+  // 点开头的文件/目录名（.gitignore、.cloud 等）合法；仍拒绝 "." / ".." 与路径分隔符。
+  if (!name || name.includes("/") || name.includes("\\") || name === "." || name === "..") {
     throw fileError("invalid name", "invalid_name", 400);
   }
   return name;

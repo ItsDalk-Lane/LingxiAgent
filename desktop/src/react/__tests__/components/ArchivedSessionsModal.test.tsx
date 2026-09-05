@@ -194,6 +194,83 @@ describe('ArchivedSessionsModal', () => {
     render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
     await waitFor(() => screen.getByText('Alpha'));
     expect(screen.getByRole('button', { name: /session\.archived\.deleteSelected/ })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /session\.archived\.restoreSelected/ })).toBeDisabled();
+  });
+
+  it('restores checked sessions in batch after confirm without switching sessions', async () => {
+    listMock.mockResolvedValue([
+      {
+        path: '/x/a.jsonl',
+        sessionId: 'sess_archived_a',
+        title: 'Alpha',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 100,
+        agentId: 'a',
+        agentName: 'Hana',
+      },
+      {
+        path: '/x/b.jsonl',
+        sessionId: 'sess_archived_b',
+        title: 'Beta',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 100,
+        agentId: 'a',
+        agentName: 'Hana',
+      },
+    ]);
+    restoreMock.mockResolvedValue({ status: 'ok', restoredPath: '/x/a.jsonl', sessionId: 'sess_archived_a' });
+    window.confirm = vi.fn(() => true);
+    render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
+    await waitFor(() => screen.getByText('Alpha'));
+
+    fireEvent.click(screen.getAllByRole('checkbox')[2]);
+    fireEvent.click(screen.getByRole('button', { name: /session\.archived\.restoreSelected/ }));
+
+    await waitFor(() => expect(restoreMock).toHaveBeenCalledTimes(1));
+    expect(restoreMock).toHaveBeenCalledWith(
+      expect.objectContaining({ path: '/x/a.jsonl' }),
+      { switchTo: false },
+    );
+    await waitFor(() => expect(toastMock).toHaveBeenCalledWith(
+      'session.archived.restoreSelectedDone[{"count":1}]',
+    ));
+  });
+
+  it('shows partial toast when some batch restores conflict', async () => {
+    listMock.mockResolvedValue([
+      {
+        path: '/x/a.jsonl',
+        sessionId: 'sess_archived_a',
+        title: 'Alpha',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 100,
+        agentId: 'a',
+        agentName: 'Hana',
+      },
+      {
+        path: '/x/b.jsonl',
+        sessionId: 'sess_archived_b',
+        title: 'Beta',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 100,
+        agentId: 'a',
+        agentName: 'Hana',
+      },
+    ]);
+    restoreMock
+      .mockResolvedValueOnce({ status: 'ok', restoredPath: '/x/a.jsonl', sessionId: 'sess_archived_a' })
+      .mockResolvedValueOnce({ status: 'conflict' });
+    window.confirm = vi.fn(() => true);
+    render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
+    await waitFor(() => screen.getByText('Alpha'));
+
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    fireEvent.click(screen.getByRole('button', { name: /session\.archived\.restoreSelected/ }));
+
+    await waitFor(() => expect(restoreMock).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(toastMock).toHaveBeenCalledWith(
+      'session.archived.restoreSelectedPartial[{"restored":1,"total":2}]',
+    ));
   });
 
   it('returns null when closed (no render side-effect)', () => {
@@ -419,6 +496,23 @@ describe('ArchivedSessionsModal workspace grouping', () => {
     await waitFor(() => expect(deleteMock).toHaveBeenCalledTimes(1));
     expect(deleteMock).toHaveBeenCalledWith(expect.objectContaining({ path: '/arch/mount-b.jsonl' }));
     expect(toastMock).toHaveBeenCalledWith('session.archived.deleteGroupDone[{"count":1}]');
+  });
+
+  it('restores an entire group through the group-level restore button', async () => {
+    listMock.mockResolvedValue(groupedItems());
+    restoreMock.mockResolvedValue({ status: 'ok', restoredPath: '/arch/mount-b.jsonl', sessionId: 's1' });
+    window.confirm = vi.fn(() => true);
+    render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
+    await waitFor(() => expect(screen.getByText('B-1')).toBeInTheDocument());
+
+    fireEvent.click(screen.getAllByText('session.archived.restoreGroup')[0]);
+
+    await waitFor(() => expect(restoreMock).toHaveBeenCalledTimes(1));
+    expect(restoreMock).toHaveBeenCalledWith(
+      expect.objectContaining({ path: '/arch/mount-b.jsonl' }),
+      { switchTo: false },
+    );
+    expect(toastMock).toHaveBeenCalledWith('session.archived.restoreSelectedDone[{"count":1}]');
   });
 
   it('toggles a whole group via the group checkbox', async () => {

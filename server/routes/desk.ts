@@ -1437,8 +1437,8 @@ export function createDeskRoute(engine, hub) {
     if (!dir) return c.json({ files: [], subdir: "", basePath: null });
     if (c.req.query("dir") && !isApprovedDir(dir, engine, { agentId })) return c.json({ error: t("error.dirNotAllowed") });
     const subdir = c.req.query("subdir") || "";
-    // 安全：禁止路径穿越
-    if (subdir && (subdir.includes("\\") || subdir.includes("..") || subdir.startsWith("."))) {
+    // 安全：禁止路径穿越。点开头子目录（.cloud/.codex 等）与 VS Code 一致照常进入。
+    if (subdir && (subdir.includes("\\") || subdir.includes(".."))) {
       return c.json({ error: "invalid subdir" });
     }
     const target = subdir ? path.join(dir, subdir) : dir;
@@ -1451,7 +1451,7 @@ export function createDeskRoute(engine, hub) {
     }
   });
 
-  /** 搜索工作台文件名（递归，默认跳过隐藏目录和常见依赖/构建目录） */
+  /** 搜索工作台文件名（递归；跳过常见依赖/构建目录，点开头条目照常参与） */
   route.get("/desk/search-files", async (c) => {
     const agentId = c.req.query("agentId") || null;
     const dir = c.req.query("dir") ? decodeURIComponent(c.req.query("dir")) : defaultDeskDir(engine);
@@ -1479,7 +1479,7 @@ export function createDeskRoute(engine, hub) {
     if (!dir) return c.json({ content: null });
     if (c.req.query("dir") && !isApprovedDir(dir, engine, { agentId })) return c.json({ error: t("error.dirNotAllowed") });
     const subdir = c.req.query("subdir") || "";
-    if (subdir && (subdir.includes("\\") || subdir.includes("..") || subdir.startsWith("."))) {
+    if (subdir && (subdir.includes("\\") || subdir.includes(".."))) {
       return c.json({ error: "invalid subdir" });
     }
     const target = subdir ? path.join(dir, subdir) : dir;
@@ -1502,7 +1502,7 @@ export function createDeskRoute(engine, hub) {
     if (body.dir && !isApprovedDir(dir, engine, { agentId })) return c.json({ error: t("error.dirNotAllowed") });
     const { subdir, content } = body;
     const sub = subdir || "";
-    if (sub && (sub.includes("\\") || sub.includes("..") || sub.startsWith("."))) {
+    if (sub && (sub.includes("\\") || sub.includes(".."))) {
       return c.json({ error: "invalid subdir" });
     }
     const target = sub ? path.join(dir, sub) : dir;
@@ -1538,7 +1538,7 @@ export function createDeskRoute(engine, hub) {
     // 解析子目录
     const isValidSubdir = (value) => {
       const subdir = value || "";
-      return !(subdir.includes("\\") || subdir.includes("..") || subdir.startsWith("."));
+      return !(subdir.includes("\\") || subdir.includes(".."));
     };
     const subdirStr = sub || "";
     if (!isValidSubdir(subdirStr)) return c.json({ error: "invalid subdir" });

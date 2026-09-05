@@ -43,6 +43,7 @@ function makeCall(overrides: Partial<ModelObservabilityCallListItem> & { callId:
     source: { subsystem: 'llm', operation: 'chat', surface: 'server', trigger: 'user_turn' },
     callPurpose: null,
     inputShape: 'messages',
+    firstResponseAt: null,
     provenancePrecision: 'exact',
     provenance: { sectionCount: 0, opaqueCount: 0, categories: [], categoriesState: 'absent' },
     payloadAvailability: 'not_captured',
@@ -175,8 +176,8 @@ describe('buildTraceConversationModel — 会话 join', () => {
     expect(messageCell?.output).toBe(40);
     expect(messageCell?.think).toBe(10);
     expect(messageCell?.assistantMetrics?.stepStartTime).toBe(T0);
-    // 无首 token 事实：TTFT 不虚构。
-    expect(messageCell?.assistantMetrics?.firstTokenTime).toBeNull();
+    // 该调用无响应到达事实：不虚构。
+    expect(messageCell?.assistantMetrics?.responseArrivalTime).toBeNull();
     expect(messageCell?.timeSeconds).toBe(2);
   });
 

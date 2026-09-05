@@ -13,6 +13,10 @@
  *   - traceId = 一次具有共同因果根源的完整任务执行；不是 sessionId/conversationId/
  *     taskId/callId，一个 session 可以有很多 trace，一个 trace 可以跨多个 session。
  *   - 绝对禁止 traceId = sessionId。
+ *   - 产品口径（2026-09-05）：user_turn 轨迹以「会话」为粒度复用——同一会话的
+ *     后续 turn 经 reuseTraceId 进入同一 trace，调用在原记录上累加；复用的是
+ *     该会话首次铸出的 mt_ id，traceId 本身仍恒不等于 sessionId（铁律保留）。
+ *     bridge/plugin 等其余 origin 维持任务级铸根。
  *   - parentCallId = 直接造成当前 Model Call 发生的上游 Model Call；不是"最近的"、
  *     不是"同 session 的上一条"、不按时间/数组顺序猜。无事实 → null。
  *
@@ -142,15 +146,38 @@ export function currentModelTraceScope(): ModelTraceScope | null {
 
 /**
  * 顶层任务入口包装（§二十五/§二十六/§五十三）：已有 scope（嵌套业务调用，如
- * chat 工具触发的媒体/子代理）→ 原样继承；没有 → 铸新 trace 根。
+ * chat 工具触发的媒体/子代理）→ 原样继承；没有 → 铸新 trace 根，除非 caller
+ * 显式给出 reuseTraceId（产品口径 2026-09-05：user_turn 以会话为粒度复用同一
+ * trace）——此时以显式 scope 进入：traceId=复用 id，origin/refs 照旧，
+ * lastCallId=null（本轮首个调用成为同轨迹内的新根调用，因果链不跨轮伪造）。
  * 只该出现在真正的任务入口（user turn / inbound message / 独立请求），
  * 不是通用装饰器。
  */
 export function runWithModelTraceRoot<T>(
-  options: { origin?: ModelTraceOrigin; refs?: Record<string, unknown> | null },
+  options: {
+    origin?: ModelTraceOrigin;
+    refs?: Record<string, unknown> | null;
+    /** 复用既有 trace（会话级轨迹）；空/非法时忽略，照旧铸新。 */
+    reuseTraceId?: string | null;
+  },
   fn: () => T,
 ): T {
   if (currentModelTraceScope()) return fn();
+  const reuseTraceId = typeof options.reuseTraceId === "string" && options.reuseTraceId.trim()
+    ? options.reuseTraceId.trim()
+    : null;
+  if (reuseTraceId) {
+    return runWithModelTrace(
+      {
+        traceId: reuseTraceId,
+        origin: options.origin && isModelTraceOrigin(options.origin) ? options.origin : "unknown",
+        causalParentCallId: null,
+        refs: sanitizeTraceRefs(options.refs),
+        lastCallId: null,
+      },
+      fn,
+    );
+  }
   return runWithNewModelTrace(options, fn);
 }
 

@@ -212,6 +212,93 @@ describe('SkillsPanel', () => {
     await waitFor(() => expect(toggled).toBe(true));
   });
 
+  it('mixes compat-enabled external skills inline with badges; remove marks them disabled', async () => {
+    let removed = false;
+    fetchMock.mockImplementation((url: string, opts?: RequestInit) => {
+      if (url.includes('/api/agents/agent-a/skills/code-review')) {
+        expect(opts?.method).toBe('PATCH');
+        expect(JSON.parse(String(opts?.body || '{}'))).toEqual({ enabled: false });
+        removed = true;
+        return Promise.resolve(jsonResponse({ ok: true, enabled: [], changed: ['code-review'] }));
+      }
+      if (url.includes('/api/skills/bundles')) {
+        return Promise.resolve(jsonResponse({ bundles: [] }));
+      }
+      if (url.includes('/api/skills?agentId=agent-a')) {
+        return Promise.resolve(jsonResponse({
+          skills: [
+            { name: 'reader', enabled: true, source: 'user', description: 'Read' },
+            { name: 'code-review', enabled: !removed, source: 'external', description: 'Review with Codex', externalLabel: 'Codex', externalPath: '/home/u/.codex/skills' },
+            { name: 'doc-writer', enabled: false, source: 'external', description: 'Write docs', externalLabel: 'Claude Code', externalPath: '/home/u/.claude/skills' },
+          ],
+        }));
+      }
+      return Promise.resolve(jsonResponse({ skills: [] }));
+    });
+
+    render(<SkillsPanel />);
+    await flushMicrotasks(4);
+
+    // 全部技能视图：仅启用过的外部技能混排显示（doc-writer 未启用 → 不出现），带来源徽标，无分组标题
+    expect(screen.getByText('code-review')).toBeInTheDocument();
+    expect(screen.getByText('Codex')).toBeInTheDocument();
+    expect(screen.queryByText('doc-writer')).toBeNull();
+    expect(screen.queryByText('Claude Code')).toBeNull();
+    expect(screen.queryByText('skills.panel.externalSection')).toBeNull();
+    // 管理视图无启停开关
+    expect(screen.queryByRole('button', { name: '启用 code-review' })).toBeNull();
+
+    // 全部技能页的「移除」✕ = 改为未启用（与设置页兼容技能关闭同一状态），不是删除
+    fireEvent.click(screen.getByRole('button', { name: 'skills.panel.externalRemove' }));
+    await waitFor(() => expect(removed).toBe(true));
+    await waitFor(() => expect(screen.queryByText('code-review')).toBeNull());
+  });
+
+  it('shows gated external skills on agent tabs with per-agent toggles', async () => {
+    let agentBToggled = false;
+    fetchMock.mockImplementation((url: string, opts?: RequestInit) => {
+      if (url.includes('/api/agents/agent-b/skills/code-review')) {
+        expect(opts?.method).toBe('PATCH');
+        expect(JSON.parse(String(opts?.body || '{}'))).toEqual({ enabled: true });
+        agentBToggled = true;
+        return Promise.resolve(jsonResponse({ ok: true, enabled: ['code-review'], changed: ['code-review'] }));
+      }
+      if (url.includes('/api/skills/bundles')) {
+        return Promise.resolve(jsonResponse({ bundles: [] }));
+      }
+      if (url.includes('/api/skills?agentId=agent-a')) {
+        return Promise.resolve(jsonResponse({
+          skills: [
+            { name: 'reader', enabled: true, source: 'user', description: 'Read' },
+            { name: 'code-review', enabled: true, source: 'external', description: 'Review with Codex', externalLabel: 'Codex', externalPath: '/home/u/.codex/skills' },
+          ],
+        }));
+      }
+      if (url.includes('/api/skills?agentId=agent-b')) {
+        return Promise.resolve(jsonResponse({
+          skills: [
+            { name: 'reader', enabled: false, source: 'user', description: 'Read' },
+            { name: 'code-review', enabled: agentBToggled, source: 'external', description: 'Review with Codex', externalLabel: 'Codex', externalPath: '/home/u/.codex/skills' },
+          ],
+        }));
+      }
+      return Promise.resolve(jsonResponse({ skills: [] }));
+    });
+
+    render(<SkillsPanel />);
+    await flushMicrotasks(4);
+
+    // 助手页：门槛内技能保持可见，开关取该助手自己的状态，可从关闭直接打开
+    fireEvent.click(screen.getByRole('tab', { name: 'Mao' }));
+    await screen.findByText('code-review');
+    expect(screen.getByText('Codex')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '启用 code-review' })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: '启用 code-review' }));
+
+    await waitFor(() => expect(agentBToggled).toBe(true));
+  });
+
   it('toggles a skill bundle from an agent tab with the same bundle API as settings', async () => {
     let bundleToggled = false;
     fetchMock.mockImplementation((url: string, opts?: RequestInit) => {

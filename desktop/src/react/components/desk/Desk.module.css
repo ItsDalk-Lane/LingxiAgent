@@ -77,14 +77,6 @@
     position: relative;
 }
 
-.headerCwdBtn {
-    position: absolute;
-    right: var(--space-8);
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1;
-}
-
 /* 打开文件夹按钮 */
 .openBtn {
     display: flex;
@@ -505,71 +497,20 @@
     padding: 6px 8px;
 }
 
-/* 项目技能按钮（卡片式） */
-.cwdBtn {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 10px;
-    background: none;
-    border: 1px solid var(--overlay-light);
-    border-radius: var(--radius-sm);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-    color: var(--text-muted);
-    font-size: var(--fs-hint);
-    font-family: inherit;
-    cursor: default;
-    white-space: nowrap;
-    flex-shrink: 0;
-    transition: color var(--duration-fast), border-color var(--duration-fast), box-shadow var(--duration-fast);
-}
-
-.cwdBtn:hover {
-    color: var(--accent);
-    border-color: var(--accent);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
-}
-
-.cwdBtn.active {
-    color: var(--accent);
-    border-color: var(--accent);
-}
-
-.cwdBtn svg {
-    opacity: 0.6;
-}
-
-.cwdBtn:hover svg,
-.cwdBtn.active svg {
-    opacity: 1;
-}
-
-/* 项目技能面板（悬浮卡片） */
-.cwdPanelWrap {
-    position: relative;
-    z-index: 20;
-    margin: 0 var(--space-8);
-}
-
-.cwdPanel {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
+/* 项目技能面板（「对话文件 / 工作台 / 项目技能」第三个 tab 的内嵌内容） */
+.cwdPanelInline {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
     background: var(--bg-card);
     border: 1px solid var(--overlay-light);
     border-radius: var(--radius-sm);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     padding: 0.5rem 0.75rem 0.6rem;
-    min-height: 260px;
-    max-height: 400px;
-    overflow-y: auto;
-    animation: hana-slide-in-top var(--duration-fast) ease-out;
-    transform-origin: top right;
+    margin: 0 var(--space-8) var(--space-8);
     transition: border-color var(--duration-fast);
 }
 
-.cwdPanel.dragOver {
+.cwdPanelInline.dragOver {
     border-color: var(--accent);
     border-style: dashed;
 }
@@ -627,10 +568,6 @@
     color: var(--text-muted);
     opacity: 0.6;
     white-space: nowrap;
-}
-
-.cwdPanelWrap.closing .cwdPanel {
-    animation: hana-slide-out-top var(--duration-instant) ease-in forwards;
 }
 
 .cwdEmpty {

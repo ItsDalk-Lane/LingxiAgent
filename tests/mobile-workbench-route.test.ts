@@ -63,7 +63,8 @@ describe("mobile workbench route", () => {
     const data = await res.json();
     expect(data).toMatchObject({ rootId: "default", subdir: "" });
     expect(data).not.toHaveProperty("basePath");
-    expect(data.files.map((file) => file.name)).toEqual(["note.md"]);
+    // 点开头文件与 VS Code 一致照常列出；但绝对服务器路径仍不外泄
+    expect(data.files.map((file) => file.name).sort()).toEqual([".secret", "note.md"]);
     expect(JSON.stringify(data)).not.toContain(workspace);
   });
 

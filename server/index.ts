@@ -599,7 +599,9 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       c.header("Access-Control-Allow-Origin", origin);
       c.header("Access-Control-Allow-Credentials", "true");
     }
-    c.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    // PATCH 必须在列：file://（打包/dev 渲染页）发起的跨域写请求会先做 CORS 预检，
+    // 缺 PATCH 时 /api/agents/:id/skills/:name 等单项启停路由全部被浏览器预检拒绝
+    c.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
     c.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     if (c.req.method === "OPTIONS") return c.text("", 204);
 

@@ -350,7 +350,6 @@ describe('v0.1.33 新建会话工作台继承（regression: FIXED）', () => {
           deskTreeFilesByPath: { ...(mockState.deskTreeFilesByPath as Record<string, unknown>) },
           deskJianContent: mockState.deskJianContent,
           cwdSkills: [],
-          cwdSkillsOpen: false,
           previewOpen: false,
           openTabs: [],
           activeTabId: null,

@@ -191,6 +191,11 @@ export type ModelObservabilityUsageAggregateAvailability =
 
 export type ModelObservabilityUsageSummary = {
   inputTokens: number | null;
+  /**
+   * 未缓存输入（库列 input_uncached_tokens）。可选是为兼容既有类型化 fixture
+   * （现有测试文件不可改动）；服务端投影始终产出该键，null = 无事实，语义同其余字段。
+   */
+  inputUncachedTokens?: number | null;
   outputTokens: number | null;
   reasoningTokens: number | null;
   cacheReadTokens: number | null;
@@ -246,6 +251,12 @@ export type ModelObservabilityCallListItem = {
   };
   callPurpose: string | null;
   inputShape: string | null;
+  /**
+   * 该调用最早一次 attempt 收到 provider 响应的时刻（ISO；无事实为 null——
+   * 部分协议的响应钩子结构性不触发，或旧数据无 attempt 时间）。这是
+   * 「provider 响应到达」，不等于首个内容 token。
+   */
+  firstResponseAt: string | null;
   provenancePrecision: string | null;
   provenance: {
     sectionCount: number | null;

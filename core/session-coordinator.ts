@@ -1090,6 +1090,7 @@ export class SessionCoordinator {
    * @param {(cwd: string, context: {agent: object, agentId: string}) => Promise<{workspacePaths?: object[]}|void>} [deps.onBeforeSessionCreate]
    * @param {(sessionPath: string, reason: string) => void|Promise<void>} [deps.onSessionRuntimeDiscarded]
    * @param {(sessionPath: string) => string|null} [deps.getSessionIdForPath]
+   * @param {(sessionId: string|null) => string|null} [deps.resolveSessionReusableTraceId] - 会话级轨迹复用查找（观测不可用时 null）
    * @param {(sessionRef: {sessionId: string, sessionPath?: string}, reason: string) => object} [deps.abortToolExecutionsForSession]
    */
   constructor(deps: any) {
@@ -4971,6 +4972,9 @@ export class SessionCoordinator {
     // （Chat 流式、工具内 Vision/Approval/Media/Subagent、compaction、turn 后
     // 派生 summary/title）共享同一个 traceId；外层已有 trace（嵌套/恢复场景）
     // 则原样继承。
+    // 产品口径（2026-09-05）：轨迹以「会话」为粒度——同一会话后续 turn 复用
+    // 该会话最近一次 user_turn 轨迹，调用次数/成败在原记录上累加；新会话或
+    // 观测不可用时照旧铸新根。
     const spForTrace = this._session?.sessionManager?.getSessionFile?.() || this.currentSessionPath;
     const sessionIdForTrace = this._session?.sessionManager?.getSessionId?.() || null;
     return runWithModelTraceRoot(
@@ -4980,6 +4984,7 @@ export class SessionCoordinator {
           ...(sessionIdForTrace ? { sessionId: sessionIdForTrace } : {}),
           ...(spForTrace ? { sessionPath: spForTrace } : {}),
         },
+        reuseTraceId: this._d.resolveSessionReusableTraceId?.(sessionIdForTrace) ?? null,
       },
       () => this._promptWithinTrace(text, opts),
     );
@@ -5083,6 +5088,26 @@ export class SessionCoordinator {
       entry = this._getSessionEntryByPath(sessionPath);
     }
     if (!entry) throw new Error(t("error.sessionNotInCache", { path: sessionPath }));
+    // Agent Turn = Trace 根（§二十七/§二十八）：桌面提交路径（desktop-session-submit
+    // → engine.promptSession）与 prompt() 同语义——没有这层根时，pi ingress 兜底
+    // 会以 origin=unknown 逐轮铸根（实测 2026-09-05：同会话每轮一条轨迹）。
+    // 产品口径（2026-09-05）：同会话复用最近轨迹；外层已有 scope（slash/bridge）
+    // 则原样继承。
+    const sessionIdForTrace = entry.session?.sessionManager?.getSessionId?.() || null;
+    return runWithModelTraceRoot(
+      {
+        origin: "user_turn",
+        refs: {
+          ...(sessionIdForTrace ? { sessionId: sessionIdForTrace } : {}),
+          ...(sessionPath ? { sessionPath } : {}),
+        },
+        reuseTraceId: this._d.resolveSessionReusableTraceId?.(sessionIdForTrace) ?? null,
+      },
+      () => this._promptSessionWithinTrace(entry, sessionPath, text, opts, submitOptions, turnContext),
+    );
+  }
+
+  async _promptSessionWithinTrace(entry: any, sessionPath: any, text: any, opts: any, submitOptions: any, turnContext: any) {
     if (sessionPath === this.currentSessionPath && this._session !== entry.session) {
       this._session = entry.session;
     }

@@ -20,6 +20,8 @@ interface Props {
   visible?: boolean;
   timePersistent?: boolean;
   testId?: string;
+  /** 紧跟时间文本之后的静态插槽（用量/用时胶囊等），不参与按钮态渲染。 */
+  statsNode?: ReactNode;
 }
 
 export const MessageFooterActions = memo(function MessageFooterActions({
@@ -30,8 +32,9 @@ export const MessageFooterActions = memo(function MessageFooterActions({
   visible = false,
   timePersistent = false,
   testId,
+  statsNode,
 }: Props) {
-  if (!timeText && leadingActions.length === 0 && actions.length === 0) return null;
+  if (!timeText && !statsNode && leadingActions.length === 0 && actions.length === 0) return null;
 
   return (
     <div
@@ -45,6 +48,7 @@ export const MessageFooterActions = memo(function MessageFooterActions({
       data-testid={testId}
     >
       {timeText && <span className={styles.messageFooterTime}>{timeText}</span>}
+      {statsNode && <span className={styles.messageFooterStats}>{statsNode}</span>}
       {leadingActions.map(action => (
         <FooterActionButton key={action.id} action={action} />
       ))}

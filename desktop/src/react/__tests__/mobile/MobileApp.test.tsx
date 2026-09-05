@@ -1065,7 +1065,6 @@ function resetStoreForMobileTest(): void {
     deskSelectedPath: '',
     deskJianContent: null,
     cwdSkills: [],
-    cwdSkillsOpen: false,
     jianDrawerOpen: false,
     rightWorkspaceTab: 'workspace',
     jianView: 'desk',
