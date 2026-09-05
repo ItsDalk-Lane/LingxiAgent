@@ -11,8 +11,59 @@ import { semverGte } from "../lib/plugin-versioning.ts";
 import { detectIncompatiblePluginFormat } from "../lib/plugin-format-guard.ts";
 import { createModuleLogger } from "../lib/debug-log.ts";
 import { getToolSessionPath, normalizeToolRuntimeContext } from "../lib/tools/tool-session.ts";
+import {
+  createPluginToolIdentity,
+  normalizeToolPermissionContract,
+} from "../lib/tools/invocation/index.ts";
 
 const log = createModuleLogger("plugin-manager");
+
+function normalizedPluginToolPermissionFields(pluginId, publicName, sessionPermission) {
+  const prefix = `${pluginId}_`;
+  const capabilityBase = publicName.startsWith(prefix)
+    ? publicName.slice(prefix.length)
+    : publicName;
+  const identity = createPluginToolIdentity({ pluginId, publicName, capabilityBase });
+  const permissionTool = {
+    name: publicName,
+    _pluginId: pluginId,
+    ...(sessionPermission !== undefined ? { sessionPermission } : {}),
+  };
+  const contract = normalizeToolPermissionContract(permissionTool, identity);
+  return {
+    sessionPermission: Object.freeze({ resolveInvocation: contract.resolveInvocation }),
+    _toolTargetIdentity: identity,
+    _normalizedPermissionContract: contract,
+  };
+}
+
+function staticPluginToolMetadata(toolModule) {
+  const schema = toolModule.parameters ?? toolModule.schema ?? {};
+  return {
+    ...(typeof toolModule.label === "string" && toolModule.label.trim()
+      ? { label: toolModule.label }
+      : {}),
+    parameters: schema,
+    ...(toolModule.schema && typeof toolModule.schema === "object"
+      ? { schema: toolModule.schema }
+      : {}),
+    ...(typeof toolModule.deferrable === "boolean"
+      ? { deferrable: toolModule.deferrable }
+      : {}),
+    ...(typeof toolModule.pinned === "boolean"
+      ? { pinned: toolModule.pinned }
+      : {}),
+    ...(typeof toolModule.promptSnippet === "string"
+      ? { promptSnippet: toolModule.promptSnippet }
+      : {}),
+    ...(typeof toolModule.promptGuidelines === "string"
+      ? { promptGuidelines: toolModule.promptGuidelines }
+      : {}),
+    ...(typeof toolModule.isEnabledForAgentConfig === "function"
+      ? { isEnabledForAgentConfig: toolModule.isEnabledForAgentConfig }
+      : {}),
+  };
+}
 
 const KNOWN_CONTRIBUTION_DIRS = [
   "tools", "routes", "skills", "agents", "commands", "providers",
@@ -245,6 +296,7 @@ export class PluginManager {
   declare _skillPaths: any;
   declare _slashRegistry: any;
   declare _tools: any;
+  declare _toolGenerations: Map<string, number>;
   declare _widgets: any;
   declare routeRegistry: any;
   /**
@@ -290,6 +342,7 @@ export class PluginManager {
 
     // Contribution registries
     this._tools = [];
+    this._toolGenerations = new Map();
     this._commands = [];
     this._skillPaths = [];
     this._agentTemplates = [];
@@ -383,9 +436,26 @@ export class PluginManager {
     return !fs.existsSync(entry.pluginDir);
   }
 
+  _advancePluginToolGeneration(pluginId) {
+    const current = this.getPluginToolGeneration(pluginId);
+    const next = current + 1;
+    this._toolGenerations.set(pluginId, next);
+    return next;
+  }
+
+  _attachPluginToolGeneration(pluginId, tool) {
+    Object.defineProperty(tool, "_toolLifecycleGeneration", {
+      enumerable: true,
+      configurable: false,
+      get: () => this.getPluginToolGeneration(pluginId),
+    });
+    return tool;
+  }
+
   _cleanupPluginContributions(entry) {
     const pluginId = entry.id;
     const pluginKey = entry.pluginKey;
+    this._advancePluginToolGeneration(pluginId);
     this._tools = this._tools.filter(t => t._pluginKey !== pluginKey);
     this._commands = this._commands.filter(c => c._pluginKey !== pluginKey);
     this._slashRegistry?.unregisterBySource("plugin", pluginKey);
@@ -612,6 +682,7 @@ export class PluginManager {
   }
 
   async _loadPluginWithBoundary(entry) {
+    this._advancePluginToolGeneration(entry.id);
     const loadToken = Symbol(entry.id);
     entry._loadToken = loadToken;
     entry._loadCancelled = false;
@@ -830,14 +901,12 @@ export class PluginManager {
         const mod = await freshImport(filePath);
         if (!mod.name || !mod.description || typeof mod.execute !== "function") continue;
         const origExecute = mod.execute;
-        this._tools.push({
-          name: `${entry.id}_${mod.name}`,
+        const publicName = `${entry.id}_${mod.name}`;
+        const publishedTool = this._attachPluginToolGeneration(entry.id, {
+          name: publicName,
           description: mod.description,
-          parameters: mod.parameters ?? {},
-          ...(mod.promptSnippet ? { promptSnippet: mod.promptSnippet } : {}),
-          ...(mod.promptGuidelines ? { promptGuidelines: mod.promptGuidelines } : {}),
-          ...(mod.sessionPermission && typeof mod.sessionPermission === "object" ? { sessionPermission: mod.sessionPermission } : {}),
-          ...(typeof mod.isEnabledForAgentConfig === "function" ? { isEnabledForAgentConfig: mod.isEnabledForAgentConfig } : {}),
+          ...staticPluginToolMetadata(mod),
+          ...normalizedPluginToolPermissionFields(entry.id, publicName, mod.sessionPermission),
           execute: async (_toolCallId, params, signalOrRuntimeCtx, _onUpdate, piCtx) => {
             await this.activatePlugin(entry.id, { event: `onToolCall:${mod.name}`, toolName: mod.name }, { pluginKey: entry.pluginKey });
             const { ctx: runtimeCtx, hasExplicitCtx } = normalizeToolRuntimeContext(signalOrRuntimeCtx, piCtx);
@@ -860,6 +929,7 @@ export class PluginManager {
           _pluginKey: entry.pluginKey,
           _pluginSource: entry.source,
         });
+        this._tools.push(publishedTool);
       } catch (err) {
         log.error(`tool "${file}" in "${entry.id}" failed to load: ${err.message}`);
       }
@@ -874,6 +944,7 @@ export class PluginManager {
    * @returns {Function} 清理函数（调用即移除该工具）
    */
   addTool(pluginId, toolDef, options: any = {}) {
+    this._advancePluginToolGeneration(pluginId);
     const source = options.source ? normalizePluginSource(options.source) : null;
     const pluginKey = options.pluginKey || null;
     const invocationStyle = getDynamicToolInvocationStyle(toolDef);
@@ -907,14 +978,35 @@ export class PluginManager {
     if (toolDef.metadata && typeof toolDef.metadata === "object") {
       tool.metadata = { ...toolDef.metadata };
     }
-    if (toolDef.sessionPermission && typeof toolDef.sessionPermission === "object") {
-      tool.sessionPermission = toolDef.sessionPermission;
-    }
+    Object.assign(
+      tool,
+      normalizedPluginToolPermissionFields(pluginId, tool.name, toolDef.sessionPermission),
+    );
+    this._attachPluginToolGeneration(pluginId, tool);
     this._tools.push(tool);
     return () => {
       const idx = this._tools.indexOf(tool);
-      if (idx !== -1) this._tools.splice(idx, 1);
+      if (idx !== -1) {
+        this._tools.splice(idx, 1);
+        this._advancePluginToolGeneration(pluginId);
+      }
     };
+  }
+
+  getPluginToolGeneration(pluginId) {
+    return this._toolGenerations.get(pluginId) || 0;
+  }
+
+  isPluginToolCurrentlyAvailable(pluginId, publicName) {
+    this.reconcileMissingPluginDirectories();
+    const normalizedPluginId = typeof pluginId === "string" ? pluginId.trim() : "";
+    const normalizedPublicName = typeof publicName === "string" ? publicName.trim() : "";
+    if (!normalizedPluginId || !normalizedPublicName) return false;
+    return this._tools.some((tool) => (
+      tool?._pluginId === normalizedPluginId
+      && tool.name === normalizedPublicName
+      && (!tool._pluginKey || this._isPluginKeyRuntimeActive(tool._pluginKey))
+    ));
   }
 
   getPluginTool(pluginId, toolName, options: any = {}) {
@@ -1480,6 +1572,7 @@ export class PluginManager {
         await this.unloadPlugin(entry.id, { pluginKey: entry.pluginKey });
       }
       this._plugins.delete(entry.pluginKey);
+      this._advancePluginToolGeneration(entry.id);
       if (entry.source === "dev" || options.persist === false) {
         // Dev plugin removal is scoped to the dev slot and must not mutate the
         // user's persisted disabled community plugin list.
@@ -1506,6 +1599,7 @@ export class PluginManager {
         await this.unloadPlugin(entry.id, { pluginKey: entry.pluginKey });
       }
       entry.status = "disabled";
+      this._advancePluginToolGeneration(entry.id);
       if (entry.source === "dev" || options.persist === false) {
         // Dev plugin enablement is scoped to the dev slot and must not pollute
         // the user's persisted disabled community plugin list.

@@ -2931,6 +2931,7 @@ describe("MCP management-center seams", () => {
         { id: "live", url: "https://live.example.test", tools: [{ name: "search" }] },
         { id: "off", url: "https://off.example.test", enabled: false, tools: [{ name: "lookup" }] },
       ]);
+      runtime.registerCachedTools();
 
       // Two projections of one config: a tool missing from the direct path but
       // present in the catalog would let the model ask for something that

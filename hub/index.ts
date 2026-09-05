@@ -33,8 +33,29 @@ import { extOfName, inferFileKind } from "../lib/file-metadata.ts";
 import { createModuleLogger } from "../lib/debug-log.ts";
 import { normalizeSessionTurnContext } from "../core/session-turn-context.ts";
 import { findModel } from "../shared/model-ref.ts";
+import { MediaExecutionTargetError } from "../core/media/media-execution-target-resolver.ts";
 
 const log = createModuleLogger("hub");
+
+function mapCredentialRefreshFailure(err) {
+  const reason = typeof err?.code === "string" && /^[A-Z0-9_]+$/.test(err.code)
+    ? err.code
+    : err?.name === "AbortError"
+      ? "ABORTED"
+      : "UNKNOWN";
+  const code = reason === "ABORTED" || reason === "ABORT_ERR" || reason === "ERR_CANCELED"
+    ? "CREDENTIAL_REFRESH_CANCELLED"
+    : reason === "ETIMEDOUT" || reason === "UND_ERR_CONNECT_TIMEOUT"
+      ? "CREDENTIAL_REFRESH_TIMEOUT"
+      : reason === "ECONNRESET" || reason === "ECONNREFUSED" || reason === "ENOTFOUND"
+        ? "CREDENTIAL_REFRESH_TRANSPORT_FAILED"
+        : "CREDENTIAL_REFRESH_FAILED";
+  return {
+    error: code,
+    code,
+    resolutionReason: reason.toLowerCase(),
+  };
+}
 
 function assertRuntimeMediaCapabilityOwner(providerRegistry, providerId, requestContext) {
   const caller = requestContext?.caller;
@@ -769,7 +790,11 @@ export class Hub {
 
     this._sessionHandlerCleanups.push(bus.handle("provider:credentials", async ({ providerId, forceRefresh, staleApiKey }) => {
       if (typeof engine.resolveProviderCredentialsFresh !== "function") {
-        return { error: "fresh_credentials_unavailable" };
+        return {
+          error: "CREDENTIAL_PROVIDER_UNRESOLVED",
+          code: "CREDENTIAL_PROVIDER_UNRESOLVED",
+          resolutionReason: "fresh_resolver_unavailable",
+        };
       }
       let fresh;
       try {
@@ -777,8 +802,8 @@ export class Hub {
           forceRefresh: !!forceRefresh,
           ...(staleApiKey ? { staleApiKey } : {}),
         });
-      } catch {
-        return { error: "credential_refresh_failed" };
+      } catch (err) {
+        return mapCredentialRefreshFailure(err);
       }
       const creds = {
         apiKey: fresh?.api_key,
@@ -786,7 +811,13 @@ export class Hub {
         api: fresh?.api,
         accountId: fresh?.accountId,
       };
-      if (!creds?.apiKey) return { error: "no_credentials" };
+      if (!creds?.apiKey) {
+        return {
+          error: "CREDENTIAL_MISSING",
+          code: "CREDENTIAL_MISSING",
+          resolutionReason: "no_credentials",
+        };
+      }
       return {
         apiKey: creds.apiKey,
         baseUrl: creds.baseUrl,
@@ -860,35 +891,78 @@ export class Hub {
       model,
       capability = "image_generation",
       credentialLaneId,
+      adapterId,
     }: any = {}) => {
       try {
         await engine.providerRegistry.refreshRuntimeMediaCapabilities?.({
           providerId: providerId || provider,
           capability,
         });
-        const resolved = engine.providerRegistry.resolveMediaModel({
+      } catch (err) {
+        return mapCredentialRefreshFailure(err);
+      }
+
+      let resolved;
+      try {
+        resolved = engine.providerRegistry.resolveMediaModel({
           providerId: providerId || provider,
           modelId: modelId || model,
           capability,
           credentialLaneId,
         });
-        const status = engine.providerRegistry.getMediaProviderCredentialStatus(resolved.providerId, capability);
-        const lane = resolved.credentialLane || null;
-        const credentialProviderId = lane?.providerId || status.activeProviderId || resolved.providerId;
-        if (!status.hasCredentials && resolved.provider.authType !== "none") {
-          return { error: status.unavailableReason || "no_credentials" };
-        }
+      } catch {
+        return {
+          error: "TARGET_NOT_FOUND",
+          code: "TARGET_NOT_FOUND",
+          resolutionReason: "media_model_not_found",
+        };
+      }
+
+      try {
+        const executionTarget = engine.providerRegistry.resolveMediaExecutionTarget({
+          modelId: resolved.model.id,
+          modality: capability === "video_generation"
+            ? "video"
+            : capability === "speech_recognition"
+              ? "speech-recognition"
+              : "image",
+          runtimeProviderId: resolved.providerId,
+          credentialLane: resolved.credentialLane || null,
+          adapterId: adapterId || null,
+        });
         return {
           providerId: resolved.providerId,
           modelId: resolved.model.id,
           model: resolved.model,
           protocolId: resolved.model.protocolId,
           capability: resolved.capability,
-          credentialLaneId: lane?.id || status.activeLaneId || null,
-          credentialProviderId,
+          credentialLaneId: executionTarget.credentialLaneId,
+          credentialProviderId: executionTarget.credentialProviderId,
+          modelCredentialLane: resolved.credentialLane
+            ? {
+              id: resolved.credentialLane.id || null,
+              providerId: resolved.credentialLane.providerId || null,
+              authType: resolved.credentialLane.authType || null,
+              credentialSource: resolved.credentialLane.credentialSource || null,
+            }
+            : null,
+          credentialSource: executionTarget.credentialSource,
+          resolutionReason: executionTarget.resolutionReason,
+          executionTarget,
         };
       } catch (err) {
-        return { error: err.message || String(err) };
+        if (!(err instanceof MediaExecutionTargetError)) {
+          return {
+            error: "CREDENTIAL_PROVIDER_UNRESOLVED",
+            code: "CREDENTIAL_PROVIDER_UNRESOLVED",
+            resolutionReason: "media_execution_target_unresolved",
+          };
+        }
+        return {
+          error: err.code,
+          code: err.code,
+          resolutionReason: err.details?.resolutionReason || null,
+        };
       }
     }));
 

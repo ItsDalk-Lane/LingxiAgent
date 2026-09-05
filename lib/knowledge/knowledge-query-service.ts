@@ -23,8 +23,20 @@ import {
 } from "./knowledge-index-store.ts";
 import { KnowledgeStore } from "./knowledge-store.ts";
 import type { KnowledgeBlock, KnowledgeIngestionEmbeddingStats, KnowledgeModelRef } from "./types.ts";
-import { MODEL_OPERATION_RERANK_MAX_DOCS } from "../../shared/model-operations.ts";
 import type { KnowledgeDegradeReason } from "../../shared/knowledge-reason-codes.ts";
+import {
+  executeKnowledgeRerankPolicy,
+  normalizeKnowledgeRerankPolicy,
+  type KnowledgeReranker,
+  type KnowledgeRerankPolicyInput,
+} from "./rerank-policy.ts";
+/** 重排策略常量保留从本模块导出，兼容既有调用方。 */
+export {
+  KNOWLEDGE_RERANK_CLEAR_MARGIN,
+  KNOWLEDGE_RERANK_DEADLINE_MS,
+  KNOWLEDGE_RERANK_MAX_DOCS,
+} from "./rerank-policy.ts";
+export type { KnowledgeReranker } from "./rerank-policy.ts";
 import {
   knowledgeVectorIndexVariantId,
   type VectorIndexAdapter,
@@ -47,14 +59,6 @@ export type KnowledgeEmbedder = (request: {
   texts: string[];
   signal?: AbortSignal;
 }) => Promise<KnowledgeEmbeddingResult | null>;
-
-export type KnowledgeReranker = (request: {
-  runId: string;
-  query: string;
-  documents: string[];
-  topN: number;
-  signal?: AbortSignal;
-}) => Promise<{ results: Array<{ index: number; score: number }> } | null>;
 
 /** retrieveForNotebooks 的候选：检索核心 chunk + 注入块定位头所需的元数据。 */
 export interface NotebookRetrievalChunk extends IndexedKnowledgeChunk {
@@ -121,7 +125,7 @@ export interface RetrieveForNotebooksResult {
    * 见 KNOWLEDGE_RERANK_DEADLINE_MS。
    */
   rerankDegradeReasons?: string[];
-  /** @deprecated 仅用于历史读取，生产写入侧不再生成。 */
+  /** rerank 门控主动跳过留痕；与失败降级原因分开记录。 */
   rerankSkippedReasons?: string[];
   /**
    * 检索分段计时（2026-08-31 观测补齐）：多笔记本为各段跨笔记本最大值
@@ -355,23 +359,6 @@ function buildVariantMetadata(chunks: KnowledgeChunkDraft[], blocks: KnowledgeBl
  * （knowledge-store MAX_RETRIEVAL_TOP_K=1000），防病态全表膨胀。
  */
 export const KNOWLEDGE_UNCAPPED_RETRIEVAL_LIMIT = 1000;
-/**
- * rerank 输入文档数防护：无上限召回后候选可达千级，但 rerank 精度在远小于
- * 100 时已饱和且多数 rerank API 有文档数上限；超出部分保持 RRF 名次不再重排。
- * 与 RerankClient 校验共用 shared/model-operations 的同一上限，杜绝两侧各自常量打架。
- */
-export const KNOWLEDGE_RERANK_MAX_DOCS = MODEL_OPERATION_RERANK_MAX_DOCS;
-
-/**
- * rerank 执行期限（2026-08-30 延迟加固）：单次 rerank 调用超过该时长即放弃，
- * 候选保持 RRF 名次继续检索（与「超出 MAX_DOCS 的尾部保持 RRF 名次」同一降级
- * 语义），rerankDegradeReason 显式留痕。动机：远程 rerank 供应商排队方差大
- * （实测单次 11–56s），无期限时一次知识提问的重排尾巴可达一分钟以上；重排是
- * 精排增强层，不该拖死整条检索。传输类失败（网络/HTTP/供应商 5xx）同路径
- * 降级；KnowledgeError 与用户 abort 仍然上抛（禁静默吞真实错误）。
- */
-export const KNOWLEDGE_RERANK_DEADLINE_MS = 15_000;
-
 /**
  * 查询嵌入执行期限（2026-08-30 延迟加固）：单次查询侧嵌入调用超过该时长即
  * 放弃，候选保持 FTS 名次继续检索并显式留痕（KNOWLEDGE_EMBEDDING_FAILED）。
@@ -655,21 +642,24 @@ export class KnowledgeQueryService {
 
   async rerankCompiledCandidates(input: {
     candidates: IndexedKnowledgeChunk[]; modelRef: KnowledgeModelRef | null; query: string;
-    signal?: AbortSignal; onRemoteCall: () => void;
+    signal?: AbortSignal; onRemoteCall: () => void; rerankPolicy: KnowledgeRerankPolicyInput;
   }) {
-    if (!input.modelRef) return { candidates: input.candidates, rerankMs: 0 };
-    if (!this.deps.rerankForModel) return { candidates: input.candidates, rerankMs: 0,
-      rerankDegradeReason: "configured rerank model is unavailable; kept retrieval ranking" };
     try {
-      return await this.rankCandidates({
-        candidates: input.candidates, question: input.query, signal: input.signal,
-        runId: `knowledge_rerank_${crypto.randomUUID()}`, rerank: true,
-        reranker: async request => {
+      return await executeKnowledgeRerankPolicy({
+        candidates: input.candidates,
+        question: input.query,
+        signal: input.signal,
+        runId: `knowledge_rerank_${crypto.randomUUID()}`,
+        policy: normalizeKnowledgeRerankPolicy(input.rerankPolicy),
+        reranker: input.modelRef && this.deps.rerankForModel ? async request => {
           input.onRemoteCall();
           const result = await this.deps.rerankForModel!({ ...request, modelRef: input.modelRef! });
           if (!result) throw new Error("configured rerank model returned no result");
           return result;
-        },
+        } : null,
+        ...(input.modelRef && !this.deps.rerankForModel
+          ? { rerankerUnavailableReason: "configured rerank model is unavailable" }
+          : {}),
       });
     } catch (error) {
       input.signal?.throwIfAborted();
@@ -1029,8 +1019,10 @@ export class KnowledgeQueryService {
      * 底层 FTS/向量 search 各自夹到 sanity 上限。
      */
     topK?: number | null;
-    /** 是否执行 rerank（默认 true）；false 时跳过即使 reranker 已接线。 */
+    /** 是否执行 rerank（兼容旧查询入口；完整语义由 rerankPolicy 承载）。 */
     rerank?: boolean;
+    /** 本轮完整重排策略；缺省时从 rerank 兼容字段归一化。 */
+    rerankPolicy?: Omit<KnowledgeRerankPolicyInput, "enabled"> & { enabled?: boolean };
     /**
      * 本轮使用的 reranker（按笔记本引用构造的闭包）。undefined = 回落 deps.rerank
      * （全局路径，v8 后恒为不可解析 → null 跳过）；null = 显式不用。
@@ -1063,7 +1055,8 @@ export class KnowledgeQueryService {
      * 候选保持 RRF 名次；未尝试或成功重排时缺省。
      */
     rerankDegradeReason?: string;
-    /** rerank 门控主动跳过留痕（2026-08-31 快速档）：头部清晰时跳过重排。 */
+    /** rerank 门控主动跳过留痕（快速策略）：头部清晰时跳过重排。 */
+    rerankSkippedReason?: string;
     /** 检索分段计时（2026-08-31 观测补齐）；未执行的段不携带。 */
     stageTimings?: KnowledgeRetrievalStageTimings;
   }> {
@@ -1355,7 +1348,7 @@ export class KnowledgeQueryService {
     }
     const ranked = await this.rankCandidates({ ...input, candidates });
     candidates = ranked.candidates;
-    const { rerankMs, rerankDegradeReason } = ranked;
+    const { rerankMs, rerankDegradeReason, rerankSkippedReason } = ranked;
     return {
       candidates,
       retrievalMode: "hybrid",
@@ -1364,6 +1357,7 @@ export class KnowledgeQueryService {
       degraded: allDegraded,
       searchedVectorVariants,
       ...(rerankDegradeReason ? { rerankDegradeReason } : {}),
+      ...(rerankSkippedReason ? { rerankSkippedReason } : {}),
       stageTimings: {
         ftsMs,
         ...(embedMs != null ? { embedMs } : {}),
@@ -1377,103 +1371,20 @@ export class KnowledgeQueryService {
   private async rankCandidates(input: {
     candidates: IndexedKnowledgeChunk[]; question: string; runId: string; signal?: AbortSignal;
     rerank?: boolean; reranker?: KnowledgeReranker | null;
+    rerankPolicy?: Omit<KnowledgeRerankPolicyInput, "enabled"> & { enabled?: boolean };
   }) {
-    let candidates = input.candidates;
-    const { question, runId, signal } = input;
-    // rerank 输入防护：超出 KNOWLEDGE_RERANK_MAX_DOCS 的尾部保持 RRF 名次。
-    const rerankCandidates = candidates.length > KNOWLEDGE_RERANK_MAX_DOCS
-      ? candidates.slice(0, KNOWLEDGE_RERANK_MAX_DOCS)
-      : candidates;
-    const rerankTail = candidates.length > KNOWLEDGE_RERANK_MAX_DOCS
-      ? candidates.slice(KNOWLEDGE_RERANK_MAX_DOCS)
-      : [];
     const reranker = input.reranker !== undefined ? input.reranker : this.deps.rerank;
-    let rerankDegradeReason: string | undefined;
-    const rerankStart = Date.now();
-    if (input.rerank !== false && rerankCandidates.length > 0 && reranker) {
-      let reranked;
-      try {
-        reranked = await this.invokeRerankerWithDeadline({
-          reranker,
-          runId,
-          question,
-          documents: rerankCandidates.map(candidate => candidate.text),
-          signal,
-        });
-      } catch (error) {
-        if (isAbortLike(error)) throw error;
-        if (isKnowledgeError(error)) throw error;
-        // 期限超时/传输类失败：重排是精排增强层，降级保 RRF 名次并显式留痕
-        // （见 KNOWLEDGE_RERANK_DEADLINE_MS docstring），不炸整个检索。
-        const cause = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
-        rerankDegradeReason = `rerank degraded (${cause}); kept RRF ranking`;
-      }
-      if (reranked) {
-        if (
-          !Array.isArray(reranked.results)
-          || reranked.results.length !== rerankCandidates.length
-          || new Set(reranked.results.map(entry => entry.index)).size !== rerankCandidates.length
-          || reranked.results.some(entry => (
-            !Number.isSafeInteger(entry.index)
-            || entry.index < 0
-            || entry.index >= rerankCandidates.length
-            || typeof entry.score !== "number"
-            || !Number.isFinite(entry.score)
-          ))
-        ) {
-          throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Knowledge rerank response is invalid");
-        }
-        candidates = [
-          ...reranked.results.map(entry => ({ ...rerankCandidates[entry.index], score: entry.score })),
-          ...rerankTail,
-        ];
-      }
-    }
-    const rerankMs = Date.now() - rerankStart;
-    return { candidates, rerankDegradeReason, rerankMs };
-  }
-
-  /**
-   * rerank 执行 + 期限竞速（KNOWLEDGE_RERANK_DEADLINE_MS）：超时即 abort 底层
-   * 请求并抛 KnowledgeRerankDeadlineError（调用方降级处理）；外部 signal 的
-   * abort 原样穿透（用户取消语义）。竞速落败方的 rejection 就地吞掉，不允许
-   * 变成 unhandled rejection。
-   */
-  private async invokeRerankerWithDeadline(input: {
-    reranker: KnowledgeReranker;
-    runId: string;
-    question: string;
-    documents: string[];
-    signal?: AbortSignal;
-  }): Promise<{ results: Array<{ index: number; score: number }> } | null> {
-    const deadlineMs = KNOWLEDGE_RERANK_DEADLINE_MS;
-    const controller = new AbortController();
-    const onExternalAbort = () => controller.abort();
-    input.signal?.addEventListener("abort", onExternalAbort, { once: true });
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const deadline = new Promise<never>((_, reject) => {
-      timer = setTimeout(() => {
-        controller.abort();
-        const error = new Error(`rerank deadline exceeded after ${deadlineMs}ms`);
-        error.name = "KnowledgeRerankDeadlineError";
-        reject(error);
-      }, deadlineMs);
-    });
-    const attempt = Promise.resolve().then(() => input.reranker({
+    return executeKnowledgeRerankPolicy({
+      candidates: input.candidates,
+      question: input.question,
       runId: input.runId,
-      query: input.question,
-      documents: input.documents,
-      topN: input.documents.length,
-      signal: controller.signal,
-    }));
-    deadline.catch(() => {});
-    attempt.catch(() => {});
-    try {
-      return await Promise.race([attempt, deadline]);
-    } finally {
-      if (timer !== undefined) clearTimeout(timer);
-      input.signal?.removeEventListener("abort", onExternalAbort);
-    }
+      signal: input.signal,
+      reranker,
+      policy: normalizeKnowledgeRerankPolicy({
+        ...input.rerankPolicy,
+        enabled: input.rerankPolicy?.enabled ?? input.rerank !== false,
+      }),
+    });
   }
 
 }

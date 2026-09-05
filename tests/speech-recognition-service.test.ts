@@ -8,6 +8,16 @@ import { ProviderRegistry } from "../core/provider-registry.ts";
 
 function makeProviderRegistry() {
   return {
+    resolveMediaExecutionTarget: vi.fn((input) => ({
+      modelId: input.modelId,
+      modality: input.modality,
+      runtimeProviderId: input.runtimeProviderId,
+      credentialProviderId: input.runtimeProviderId,
+      credentialLaneId: null,
+      credentialSource: "provider-registry",
+      adapterId: input.adapterId,
+      resolutionReason: "runtime_provider_credentials",
+    })),
     getMediaProviders: vi.fn(() => [
       {
         providerId: "mimo",
@@ -142,6 +152,12 @@ describe("SpeechRecognitionService", () => {
         credentials: expect.objectContaining({ apiKey: "fresh-mimo-key" }),
       }));
       expect(resolveProviderCredentialsFresh).toHaveBeenCalledWith("mimo");
+      expect(providerRegistry.resolveMediaExecutionTarget).toHaveBeenCalledWith(expect.objectContaining({
+        modelId: "mimo-v2.5-asr",
+        modality: "speech-recognition",
+        runtimeProviderId: "mimo",
+        adapterId: "mimo",
+      }));
       expect(providerRegistry.getCredentials).not.toHaveBeenCalled();
       expect(usageLedger.start).toHaveBeenCalledWith(expect.objectContaining({
         model: expect.objectContaining({ provider: "mimo", modelId: "mimo-v2.5-asr" }),

@@ -1,15 +1,28 @@
 import { describe, expect, it } from "vitest";
 import { createToolCatalog } from "../core/tool-catalog.ts";
+import { createMcpToolIdentity } from "../lib/tools/invocation/index.ts";
 
 function entry(overrides: Record<string, unknown> = {}) {
+  const serverId = typeof overrides.serverId === "string" ? overrides.serverId : "github";
+  const publicName = typeof overrides.name === "string" ? overrides.name : "github_create_issue";
+  const toolName = typeof overrides.toolName === "string" ? overrides.toolName : publicName;
+  const capabilityBase = typeof overrides.capabilityBase === "string" ? overrides.capabilityBase : publicName;
+  const identity = createMcpToolIdentity({ serverId, remoteToolName: toolName, publicName, capabilityBase });
   return {
-    name: "github_create_issue",
+    targetId: identity.targetId,
+    origin: identity.origin,
+    sourceId: identity.sourceId,
+    publicName: identity.publicName,
+    name: identity.publicName,
+    toolName: identity.localName,
+    capabilityBase: identity.capabilityBase,
     description: "Create a new issue in a repository with a title and body.",
     paramsSummary: "owner (string, required), repo (string, required), title (string, required)",
     serverId: "github",
     serverLabel: "GitHub",
     deferrable: true,
     pinned: false,
+    lifecycleGeneration: 0,
     schemaRef: () => ({ type: "object", properties: { owner: { type: "string" } }, required: ["owner"] }),
     ...overrides,
   };
@@ -23,10 +36,10 @@ describe("tool catalog entry model", () => {
     expect(catalog.has("github_create_issue")).toBe(true);
   });
 
-  it("normalizes optional entry fields with safe defaults", () => {
+  it("保留完整的规范目标字段", () => {
     const catalog = createToolCatalog();
     catalog.registerSource("mcp:github", [
-      { name: "t_one", description: "d", serverId: "s", serverLabel: "S", schemaRef: () => ({}) },
+      entry({ name: "t_one", description: "d", serverId: "s", serverLabel: "S", paramsSummary: "" }),
     ]);
     const found = catalog.get("t_one");
     expect(found?.deferrable).toBe(true);
@@ -37,7 +50,7 @@ describe("tool catalog entry model", () => {
 
   it("rejects an entry without a usable name", () => {
     const catalog = createToolCatalog();
-    expect(() => catalog.registerSource("mcp:x", [entry({ name: "" })])).toThrow(/name/i);
+    expect(() => catalog.registerSource("mcp:x", [{ ...entry(), publicName: "" }])).toThrow(/publicName/i);
   });
 
   it("replaceSource swaps only that source and leaves others intact", () => {

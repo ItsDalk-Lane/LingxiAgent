@@ -32,12 +32,29 @@ function makePreferences(root, initial: any = null) {
   return new PreferencesManager({ userDir, agentsDir });
 }
 
+function resolveTestMediaExecutionTarget(input) {
+  const explicitProviderId = input.credentialLane?.providerId;
+  return Object.freeze({
+    modelId: input.modelId,
+    modality: input.modality,
+    runtimeProviderId: input.runtimeProviderId,
+    credentialProviderId: explicitProviderId ?? input.runtimeProviderId,
+    credentialLaneId: input.credentialLane?.id || null,
+    credentialSource: "provider-registry",
+    adapterId: input.adapterId || null,
+    resolutionReason: explicitProviderId
+      ? "explicit_credential_lane"
+      : "runtime_provider_credentials",
+  });
+}
+
 function makeManager(root, preferences, extra: any = {}) {
   return new UniversalMediaManager({
     lingxiHome: root,
     preferences,
     sessionFiles: extra.sessionFiles,
     providerRegistry: {
+      resolveMediaExecutionTarget: vi.fn(resolveTestMediaExecutionTarget),
       getMediaProviders: () => [],
       resolveMediaModel: () => {
         throw new Error("not configured");
@@ -259,6 +276,12 @@ describe("UniversalMediaManager plugin image input boundary", () => {
     });
     await flushBackgroundWork();
 
+    expect((manager as any)._providers.resolveMediaExecutionTarget).toHaveBeenCalledWith(expect.objectContaining({
+      modality: "image",
+      runtimeProviderId: "real-image",
+      adapterId: "real-image",
+    }));
+
     expect(submit).toHaveBeenCalledWith(
       expect.objectContaining({
         image: [imageA, imageB],
@@ -451,6 +474,7 @@ describe("UniversalMediaManager adapter registration bus contract", () => {
       lingxiHome: root,
       preferences: makePreferences(root),
       providerRegistry: {
+        resolveMediaExecutionTarget: resolveTestMediaExecutionTarget,
         getMediaProviders: () => [],
         resolveMediaModel: () => {
           throw new Error("not configured");
@@ -480,6 +504,7 @@ describe("UniversalMediaManager adapter registration bus contract", () => {
       lingxiHome: root,
       preferences: makePreferences(root),
       providerRegistry: {
+        resolveMediaExecutionTarget: resolveTestMediaExecutionTarget,
         getMediaProviders: () => [],
         resolveMediaModel: () => {
           throw new Error("not configured");
@@ -518,6 +543,7 @@ describe("UniversalMediaManager adapter registration bus contract", () => {
       lingxiHome: root,
       preferences: makePreferences(root),
       providerRegistry: {
+        resolveMediaExecutionTarget: resolveTestMediaExecutionTarget,
         getMediaProviders: () => [],
         resolveMediaModel: () => {
           throw new Error("not configured");
@@ -583,6 +609,7 @@ describe("UniversalMediaManager adapter registration bus contract", () => {
       lingxiHome: root,
       preferences: makePreferences(root),
       providerRegistry: {
+        resolveMediaExecutionTarget: resolveTestMediaExecutionTarget,
         getMediaProviders: () => [],
         resolveMediaModel: () => {
           throw new Error("not configured");
@@ -760,6 +787,7 @@ describe("UniversalMediaManager response delivery", () => {
     const root = makeRoot();
     roots.push(root);
     const providerRegistry = {
+      resolveMediaExecutionTarget: vi.fn(resolveTestMediaExecutionTarget),
       refreshRuntimeMediaCapabilities: vi.fn(async () => ({})),
       getMediaProviders: () => [],
       resolveMediaModel: vi.fn(() => ({
@@ -796,6 +824,12 @@ describe("UniversalMediaManager response delivery", () => {
       modelId: "agnes-video-v2.0",
       capability: "video_generation",
     });
+    expect(providerRegistry.resolveMediaExecutionTarget).toHaveBeenCalledWith(expect.objectContaining({
+      modelId: "agnes-video-v2.0",
+      modality: "video",
+      runtimeProviderId: "agnes",
+      adapterId: "agnes",
+    }));
     expect(providerRegistry.refreshRuntimeMediaCapabilities).toHaveBeenCalledWith({
       providerId: "agnes",
       capability: "video_generation",
@@ -826,6 +860,7 @@ describe("UniversalMediaManager response delivery", () => {
     const root = makeRoot();
     roots.push(root);
     const providerRegistry = {
+      resolveMediaExecutionTarget: resolveTestMediaExecutionTarget,
       getMediaProviders: () => [],
       resolveMediaModel: vi.fn(() => ({
         providerId: "agnes",
@@ -886,6 +921,7 @@ describe("UniversalMediaManager response delivery", () => {
       },
     };
     const providerRegistry = {
+      resolveMediaExecutionTarget: resolveTestMediaExecutionTarget,
       refreshRuntimeMediaCapabilities: vi.fn(async () => ({})),
       getMediaProviders: () => [{
         providerId: "jimeng-cli",
@@ -947,6 +983,7 @@ describe("UniversalMediaManager response delivery", () => {
     const root = makeRoot();
     roots.push(root);
     const providerRegistry = {
+      resolveMediaExecutionTarget: resolveTestMediaExecutionTarget,
       refreshRuntimeMediaCapabilities: vi.fn(async () => ({
         "jimeng-cli": { status: "error" },
       })),
@@ -999,6 +1036,7 @@ describe("UniversalMediaManager response delivery", () => {
     const root = makeRoot();
     roots.push(root);
     const providerRegistry = {
+      resolveMediaExecutionTarget: resolveTestMediaExecutionTarget,
       getMediaProviders: () => [],
       resolveMediaModel: vi.fn(() => ({
         providerId: "jimeng-cli",
@@ -1086,6 +1124,7 @@ describe("UniversalMediaManager response delivery", () => {
     const root = makeRoot();
     roots.push(root);
     const providerRegistry = {
+      resolveMediaExecutionTarget: resolveTestMediaExecutionTarget,
       getMediaProviders: () => [],
       resolveMediaModel: vi.fn(() => ({
         providerId: "jimeng-cli",

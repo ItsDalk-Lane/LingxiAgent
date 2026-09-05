@@ -18,9 +18,20 @@ import {
 import { buildApprovalReviewContext } from "../permission/approval-review-context.ts";
 import {
   cloneToolInvocationInput,
+  hasToolCapabilityDelegate,
   resolveToolInvocationPermission,
   snapshotToolInvocationInput,
 } from "../permission/tool-invocation-permission.ts";
+import {
+  createPreparedInvocation,
+  createFirstPartyToolIdentity,
+  createPluginToolIdentity,
+  normalizeToolPermissionContract,
+  runWithPreparedInvocation,
+  type PreparedInvocation,
+  type ToolInvocationRoute,
+  type ToolTargetId,
+} from "./invocation/index.ts";
 
 const EXTERNAL_APPROVAL_TARGET_TYPES = new Set([
   "url",
@@ -75,10 +86,14 @@ function snapshotRuntimeAuthority(value: any, field: string) {
 function captureSessionBinding(ctx: any, deps: any = {}) {
   try {
     const sessionManager = ctx?.sessionManager;
+    const hostSessionRef = typeof deps.getSessionRef === "function"
+      ? deps.getSessionRef()
+      : null;
     const explicitLocators = [
       normalizedSessionPath(ctx?.sessionRef?.sessionPath),
       normalizedSessionPath(ctx?.sessionPath),
       normalizedSessionPath(getToolSessionPath(ctx)),
+      normalizedSessionPath(hostSessionRef?.sessionPath),
     ].filter(Boolean);
     const uniqueLocators = new Set(explicitLocators);
     if (uniqueLocators.size > 1) {
@@ -99,6 +114,8 @@ function captureSessionBinding(ctx: any, deps: any = {}) {
     const identityCandidates = [
       nonEmptyText(ctx?.sessionRef?.sessionId),
       nonEmptyText(ctx?.sessionId),
+      nonEmptyText(hostSessionRef?.sessionId),
+      nonEmptyText(deps.getSessionId?.()),
       resolvedSessionId,
     ].filter(Boolean);
     const uniqueSessionIds = new Set(identityCandidates);
@@ -231,12 +248,24 @@ function buildToolApprovalRequest(confirmId: any, toolName: any, params: any) {
   };
 }
 
-function buildToolApprovalGatewayRequest(toolName: any, params: any, sessionPath: any, stableKey: any, ctx: any = null, deps: any = {}, invocation: any = null, legacySessionPermission: any = null) {
+function buildToolApprovalGatewayRequest(toolName: any, params: any, sessionPath: any, stableKey: any, ctx: any = null, deps: any = {}, invocation: any = null, legacySessionPermission: any = null, toolIdentity: any = null) {
   const target = invocation?.target
     ? {
       type: invocation.target.type,
       id: invocation.target.id,
       label: invocation.target.label || invocation.target.id,
+    }
+    : invocation?.effectiveInvocation
+    ? {
+      type: "tool",
+      id: invocation.effectiveInvocation.targetId,
+      label: invocation.effectiveInvocation.toolName,
+    }
+    : toolIdentity?.targetId
+    ? {
+      type: "tool",
+      id: toolIdentity.targetId,
+      label: toolIdentity.publicName || toolName,
     }
     : approvalTargetForTool(toolName, params);
   const sideEffect = approvalSideEffectForTool(params, invocation, legacySessionPermission);
@@ -296,8 +325,15 @@ function permissionContextForTool(tool: any, deps: any = {}, invocation: any = n
   const toolSessionPermission = legacySessionPermission && typeof legacySessionPermission === "object"
     ? legacySessionPermission
     : null;
+  const preAuthorizedRoutineCapabilities = invocation?.kind === "routine"
+    && tool?._normalizedPermissionContract?.legacyRoutineAutoAllow === true
+    ? [...new Set([...(Array.isArray(hostContext.preAuthorizedRoutineCapabilities)
+      ? hostContext.preAuthorizedRoutineCapabilities
+      : []), invocation.capability])]
+    : hostContext.preAuthorizedRoutineCapabilities;
   return {
     ...hostContext,
+    ...(preAuthorizedRoutineCapabilities ? { preAuthorizedRoutineCapabilities } : {}),
     ...(toolSessionPermission ? { toolSessionPermission } : {}),
     ...(tool?._pluginId ? { isPluginTool: true, pluginId: tool._pluginId } : {}),
     ...(invocation ? { toolInvocation: invocation } : {}),
@@ -316,6 +352,7 @@ async function executeWithInvocationRevalidation(
   executionCtx: any,
   runtimeCtxIndex: number,
   legacySessionPermission: any,
+  preparedInvocation: PreparedInvocation | null,
   revalidateAfterWait = true,
 ) {
   if (revalidateAfterWait) {
@@ -382,9 +419,12 @@ async function executeWithInvocationRevalidation(
       toolName: tool.name,
     });
   }
+  const effectiveInvocation = expectedInvocation?.effectiveInvocation;
+  const executionToolName = effectiveInvocation?.toolName || tool.name;
+  const executionToolParams = effectiveInvocation?.arguments || executionParams.value;
   const preparedExecution = prepareStageFilesExecutionParams({
-    toolName: tool.name,
-    params: executionParams.value,
+    toolName: executionToolName,
+    params: executionToolParams,
   }, deps.permissionBoundary);
   if (preparedExecution.ok === false) {
     return toolError(preparedExecution.error.reason, {
@@ -397,9 +437,20 @@ async function executeWithInvocationRevalidation(
     });
   }
   const executionArgs = [...args];
-  executionArgs[1] = preparedExecution.params;
+  executionArgs[1] = effectiveInvocation
+    ? { ...executionParams.value, arguments: preparedExecution.params }
+    : preparedExecution.params;
   if (runtimeCtxIndex >= 0) executionArgs[runtimeCtxIndex] = executionCtx;
-  return tool.execute(...executionArgs);
+  const execute = () => tool.execute(...executionArgs);
+  const executionPreparedInvocation = preparedInvocation
+    ? createPreparedInvocation({
+      ...preparedInvocation,
+      arguments: { ...preparedExecution.params },
+    })
+    : null;
+  return executionPreparedInvocation
+    ? runWithPreparedInvocation(executionPreparedInvocation, execute)
+    : execute();
 }
 
 function summarizeParams(params: any) {
@@ -417,6 +468,90 @@ function toStatus(action: any) {
   if (action === "timeout") return "timeout";
   if (action === "aborted") return "aborted";
   return "rejected";
+}
+
+function toolWithNormalizedPermission(tool: any) {
+  if (hasToolCapabilityDelegate(tool)) return tool;
+  const existing = tool?._normalizedPermissionContract;
+  if (existing?.resolveInvocation) {
+    return {
+      ...tool,
+      sessionPermission: Object.freeze({ resolveInvocation: existing.resolveInvocation }),
+    };
+  }
+  if (!Object.prototype.hasOwnProperty.call(tool || {}, "sessionPermission")) return tool;
+  const name = typeof tool?.name === "string" ? tool.name.trim() : "";
+  if (!name) return tool;
+  try {
+    const pluginId = typeof tool?._pluginId === "string" ? tool._pluginId.trim() : "";
+    const identity = pluginId
+      ? createPluginToolIdentity({
+        pluginId,
+        publicName: name,
+        capabilityBase: name.startsWith(`${pluginId}_`) ? name.slice(pluginId.length + 1) : name,
+      })
+      : createFirstPartyToolIdentity({ publicName: name, capabilityBase: name });
+    const contract = normalizeToolPermissionContract(tool, identity);
+    return {
+      ...tool,
+      sessionPermission: Object.freeze({ resolveInvocation: contract.resolveInvocation }),
+      _toolTargetIdentity: identity,
+      _normalizedPermissionContract: contract,
+    };
+  } catch {
+    // 旧直接路径仍由既有解析器返回原有 fail-closed 错误；插件注册路径不会走到这里。
+    return tool;
+  }
+}
+
+const TOOL_INVOCATION_ROUTES = new Set<ToolInvocationRoute>([
+  "direct",
+  "deferred",
+  "plugin-dev-chat",
+  "plugin-dev-http",
+  "isolated",
+]);
+
+function preparedInvocationForTool({
+  tool,
+  toolCallId,
+  params,
+  invocation,
+  sessionBinding,
+  ctx,
+  deps,
+}: {
+  tool: any;
+  toolCallId: unknown;
+  params: Record<string, unknown>;
+  invocation: any;
+  sessionBinding: any;
+  ctx: any;
+  deps: any;
+}): PreparedInvocation | null {
+  if (!invocation || !tool?._toolTargetIdentity?.targetId) return null;
+  const effective = invocation.effectiveInvocation;
+  const requestedRoute = deps.invocationRoute ?? tool._toolInvocationRoute;
+  const route = TOOL_INVOCATION_ROUTES.has(requestedRoute)
+    ? requestedRoute as ToolInvocationRoute
+    : "direct";
+  const normalizedToolCallId = typeof toolCallId === "string" && toolCallId
+    ? toolCallId
+    : `${tool.name}:${Date.now()}`;
+  return createPreparedInvocation({
+    targetId: (effective?.targetId || tool._toolTargetIdentity.targetId) as ToolTargetId,
+    route,
+    arguments: effective?.arguments || params,
+    sessionId: sessionBinding.sessionId,
+    sessionPath: sessionBinding.sessionPath,
+    agentId: nonEmptyText(deps.agentId) || nonEmptyText(ctx?.agentId),
+    permission: invocation,
+    lifecycleGeneration: effective?.generation
+      ?? tool._toolLifecycleGeneration
+      ?? 0,
+    toolCallId: normalizedToolCallId,
+    createdAt: typeof deps.now === "function" ? deps.now() : Date.now(),
+  });
 }
 
 async function askForToolApproval(toolName: any, params: any, sessionPath: any, deps: any) {
@@ -442,7 +577,7 @@ async function askForToolApproval(toolName: any, params: any, sessionPath: any, 
   };
 }
 
-async function reviewToolApproval(toolName: any, params: any, sessionPath: any, deps: any, ctx: any = null, sessionBinding: any = null, invocation: any = null, legacySessionPermission: any = null) {
+async function reviewToolApproval(toolName: any, params: any, sessionPath: any, deps: any, ctx: any = null, sessionBinding: any = null, invocation: any = null, legacySessionPermission: any = null, toolIdentity: any = null) {
   const gateway = deps.getApprovalGateway?.() || deps.approvalGateway || null;
   if (!gateway || typeof gateway.review !== "function") {
     return {
@@ -452,7 +587,7 @@ async function reviewToolApproval(toolName: any, params: any, sessionPath: any, 
       reasonCode: "approval_gateway_unavailable",
     };
   }
-  const request = buildToolApprovalGatewayRequest(toolName, params, sessionPath, sessionBinding?.sessionId || sessionPath || "session", ctx, deps, invocation, legacySessionPermission);
+  const request = buildToolApprovalGatewayRequest(toolName, params, sessionPath, sessionBinding?.sessionId || sessionPath || "session", ctx, deps, invocation, legacySessionPermission, toolIdentity);
   const decision = await gateway.review(request, buildApprovalReviewContext({
     source: deps,
     ctx,
@@ -516,6 +651,7 @@ export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
   const knowledgeResearchSurface = deps.permissionContext?.knowledgeResearchSurface;
   return tools.map((tool: any) => {
     if (!tool?.execute) return tool;
+    const permissionTool = toolWithNormalizedPermission(tool);
     return {
       ...tool,
       execute: async (...args: any[]) => {
@@ -575,7 +711,7 @@ export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
             ruleIds: rawSafety.ruleIds,
           });
         }
-        const invocationResolution = resolveToolInvocationPermission(tool, params);
+        const invocationResolution = resolveToolInvocationPermission(permissionTool, params);
         if (invocationResolution.ok === false) {
           return toolError(invocationResolution.error.message, {
             errorCode: invocationResolution.error.code,
@@ -591,6 +727,34 @@ export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
         const legacySessionPermission = invocationResolution.source === "legacy"
           ? invocationResolution.sessionPermission
           : null;
+        const effectiveInvocation = invocation?.effectiveInvocation;
+        const effectiveToolName = effectiveInvocation?.toolName || tool.name;
+        const effectiveParams = effectiveInvocation?.arguments || params;
+        if (effectiveInvocation) {
+          const effectiveSafety = evaluateToolSafetyPolicy({
+            toolName: effectiveToolName,
+            params: effectiveParams,
+          }, deps.permissionBoundary);
+          if (effectiveSafety?.action === "block") {
+            return toolError(effectiveSafety.reason, {
+              errorCode: effectiveSafety.code,
+              permissionMode: mode,
+              toolName: effectiveToolName,
+              reviewer: effectiveSafety.reviewer,
+              risk: effectiveSafety.risk,
+              ruleIds: effectiveSafety.ruleIds,
+            });
+          }
+        }
+        const preparedInvocation = preparedInvocationForTool({
+          tool: permissionTool,
+          toolCallId: args[0],
+          params,
+          invocation,
+          sessionBinding: sessionBinding.value,
+          ctx,
+          deps,
+        });
         const approvalPolicy = resolveSessionApprovalPolicy({
           mode,
           approvalPolicy: deps.approvalPolicy,
@@ -598,10 +762,10 @@ export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
         });
         const decision: any = classifySessionPermission({
           mode,
-          toolName: tool.name,
-          params,
+          toolName: effectiveToolName,
+          params: effectiveParams,
           context: permissionContextForTool(
-            tool,
+            permissionTool,
             deps,
             invocation,
             legacySessionPermission,
@@ -609,7 +773,7 @@ export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
         });
         if (decision.action === "allow") {
           return executeWithInvocationRevalidation(
-            tool,
+            permissionTool,
             args,
             params,
             invocation,
@@ -620,6 +784,7 @@ export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
             executionCtx,
             runtimeCtxIndex,
             legacySessionPermission,
+            preparedInvocation,
             false,
           );
         }
@@ -641,10 +806,21 @@ export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
               toolName: tool.name,
             });
           }
-          const review = await reviewToolApproval(tool.name, reviewerParams.value, sessionPath, deps, executionCtx, sessionBinding.value, invocation, legacySessionPermission);
+          const reviewParams = effectiveInvocation
+            ? cloneToolInvocationInput(effectiveParams)
+            : reviewerParams;
+          if (reviewParams.ok === false) {
+            return toolError("Effective tool invocation parameters could not be copied for review.", {
+              errorCode: "TOOL_INVOCATION_INPUT_INVALID",
+              inputReason: reviewParams.reason,
+              permissionMode: mode,
+              toolName: effectiveToolName,
+            });
+          }
+          const review = await reviewToolApproval(effectiveToolName, reviewParams.value, sessionPath, deps, executionCtx, sessionBinding.value, invocation, legacySessionPermission, permissionTool?._toolTargetIdentity);
           if (review.allowed) {
             return executeWithInvocationRevalidation(
-              tool,
+              permissionTool,
               args,
               params,
               invocation,
@@ -655,17 +831,18 @@ export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
               executionCtx,
               runtimeCtxIndex,
               legacySessionPermission,
+              preparedInvocation,
             );
           }
           if (review.status !== "ask_user") {
             return toolError("Tool action was not approved.", {
               errorCode: "TOOL_APPROVAL_DENIED",
-              action: tool.name,
+              action: effectiveToolName,
               confirmed: false,
               confirmation: {
                 kind: "tool_action_approval",
                 status: review.status,
-                toolName: tool.name,
+                toolName: effectiveToolName,
                 reason: review.reason,
                 reasonCode: review.reasonCode,
                 reviewer: review.decision?.reviewer,
@@ -675,7 +852,7 @@ export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
             });
           }
           if (approvalPolicy === SESSION_APPROVAL_POLICIES.DENY_ON_PROMPT) {
-            return toolApprovalUnavailable(tool.name, "needs_user_approval_but_unavailable", review.reason || "human approval unavailable", {
+            return toolApprovalUnavailable(effectiveToolName, "needs_user_approval_but_unavailable", review.reason || "human approval unavailable", {
               reviewStatus: "ask_user",
               reasonCode: review.reasonCode || review.decision?.reasonCode || "approval_reviewer_unavailable",
               reviewer: review.decision?.reviewer,
@@ -686,7 +863,7 @@ export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
         }
 
         if (approvalPolicy === SESSION_APPROVAL_POLICIES.DENY_ON_PROMPT) {
-          return toolApprovalUnavailable(tool.name);
+          return toolApprovalUnavailable(effectiveToolName);
         }
         const approvalParams = cloneToolInvocationInput(params);
         if (approvalParams.ok === false) {
@@ -697,23 +874,34 @@ export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
             toolName: tool.name,
           });
         }
-        const approval = await askForToolApproval(tool.name, approvalParams.value, sessionPath, deps);
+        const effectiveApprovalParams = effectiveInvocation
+          ? cloneToolInvocationInput(effectiveParams)
+          : approvalParams;
+        if (effectiveApprovalParams.ok === false) {
+          return toolError("Effective tool invocation parameters could not be copied for approval.", {
+            errorCode: "TOOL_INVOCATION_INPUT_INVALID",
+            inputReason: effectiveApprovalParams.reason,
+            permissionMode: mode,
+            toolName: effectiveToolName,
+          });
+        }
+        const approval = await askForToolApproval(effectiveToolName, effectiveApprovalParams.value, sessionPath, deps);
         if (!approval.allowed) {
           return toolError("Tool action was not approved.", {
             errorCode: "TOOL_APPROVAL_REJECTED",
-            action: tool.name,
+            action: effectiveToolName,
             confirmed: false,
             confirmation: {
               kind: "tool_action_approval",
               status: approval.status,
               confirmId: approval.confirmId,
-              toolName: tool.name,
+              toolName: effectiveToolName,
               reason: approval.reason,
             },
           });
         }
         return executeWithInvocationRevalidation(
-          tool,
+          permissionTool,
           args,
           params,
           invocation,
@@ -724,6 +912,7 @@ export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
           executionCtx,
           runtimeCtxIndex,
           legacySessionPermission,
+          preparedInvocation,
         );
       },
     };

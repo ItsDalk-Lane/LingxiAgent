@@ -4,7 +4,15 @@ import path from "path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { LingxiEngine } from "../core/engine.ts";
 import { toMcpToolId } from "../core/mcp/manager.ts";
-import { resolveToolInvocationPermission } from "../lib/permission/tool-invocation-permission.ts";
+import {
+  evaluateToolAvailability,
+  filterToolObjectsByAvailability,
+} from "../core/tool-availability.ts";
+import {
+  createMcpToolIdentity,
+  createPluginToolIdentity,
+  normalizeToolPermissionContract,
+} from "../lib/tools/invocation/index.ts";
 
 const BRIDGE_NAMES = ["mcp_search_tools", "mcp_describe_tool", "mcp_call"];
 
@@ -50,11 +58,18 @@ function makeEngine({
     pinnedTools: connector.pinnedTools || {},
   }));
 
+  const mcpCall = vi.fn(async (
+    _connectorId: string,
+    _toolName: string,
+    _args: Record<string, unknown>,
+    _ctx: unknown,
+  ) => ({ content: [{ type: "text", text: "ok" }] }));
   const published = normalized.flatMap((connector) => connector.tools.map((tool: any) => ({
     name: `mcp_${toMcpToolId(connector.id, tool.name)}`,
     description: tool.description,
     parameters: tool.inputSchema,
     _pluginId: "mcp",
+    metadata: { kind: "mcp", connectorId: connector.id, toolName: tool.name },
     sessionPermission: {
       resolveInvocation: () => ({
         action: "invoke",
@@ -62,8 +77,46 @@ function makeEngine({
         capability: `${toMcpToolId(connector.id, tool.name)}.invoke`,
       }),
     },
-    execute: vi.fn(async () => ({ content: [{ type: "text", text: "ok" }] })),
+    execute: vi.fn(async (_id, args, _signal, _onUpdate, ctx) => (
+      mcpCall(connector.id, tool.name, args, ctx)
+    )),
   })));
+  const targetDescriptors = normalized.flatMap((connector) => connector.tools.map((tool: any) => {
+    const publicName = `mcp_${toMcpToolId(connector.id, tool.name)}`;
+    const capabilityBase = toMcpToolId(connector.id, tool.name);
+    const publishedTool = published.find((entry) => entry.name === publicName)!;
+    const identity = createMcpToolIdentity({
+      serverId: connector.id,
+      remoteToolName: tool.name,
+      publicName,
+      capabilityBase,
+    });
+    const permission = normalizeToolPermissionContract(publishedTool, identity);
+    return {
+      publishedTool,
+      identity,
+      permission,
+      catalogMetadata: {
+        targetId: identity.targetId,
+        origin: identity.origin,
+        sourceId: identity.sourceId,
+        serverId: connector.id,
+        serverLabel: connector.name,
+        publicName: capabilityBase,
+        toolName: tool.name,
+        capabilityBase,
+        description: tool.description,
+        paramsSummary: "owner (string, required)",
+        lifecycleGeneration: 0,
+        deferrable: tool.deferrable !== false,
+        pinned: connector.pinnedTools?.[tool.name] === true,
+        schemaRef: () => tool.inputSchema,
+      },
+      evaluateEligibility: () => ({ eligible: true }),
+      getCurrentGeneration: () => 0,
+      isCurrentlyAvailable: () => true,
+    };
+  }));
 
   const engine = Object.create(LingxiEngine.prototype);
   engine.lingxiHome = tmpDir;
@@ -71,6 +124,7 @@ function makeEngine({
   engine._pluginManager = pluginTools.length > 0 ? { getAllTools: () => pluginTools } : null;
   engine._mcp = {
     getAllTools: () => published,
+    getToolTargetDescriptors: () => targetDescriptors,
     getConfig: () => ({ enabled: true, deferEnabled, deferThreshold, connectors: normalized }),
     getCatalogEntries: () => normalized.flatMap((connector) => connector.tools.map((tool: any) => ({
       name: toMcpToolId(connector.id, tool.name),
@@ -84,7 +138,7 @@ function makeEngine({
       schemaRef: () => tool.inputSchema,
     }))),
     resolveToolPermissionKind: () => "review",
-    callTool: vi.fn(async () => ({ content: [{ type: "text", text: "ok" }] })),
+    callTool: mcpCall,
   };
   engine._prefs = {
     getFileBackup: () => ({ enabled: false }),
@@ -205,20 +259,89 @@ describe("engine deferred tool assembly", () => {
   });
 
   it("leaves plugin tools alone while builtin defer is off", () => {
-    const pluginTools = Array.from({ length: 15 }, (_, index) => ({
-      name: `plugin_tool_${index}`,
-      description: "A plugin tool.",
-      _pluginId: "demo",
-      execute: vi.fn(),
-    }));
+    const pluginTools = Array.from({ length: 15 }, (_, index) => {
+      const name = `demo_tool_${index}`;
+      const identity = createPluginToolIdentity({
+        pluginId: "demo",
+        publicName: name,
+        capabilityBase: `tool_${index}`,
+      });
+      const permission = normalizeToolPermissionContract({
+        name,
+        sessionPermission: { readOnly: true },
+      }, identity);
+      return {
+        name,
+        description: "A plugin tool.",
+        parameters: { type: "object", properties: {} },
+        _pluginId: "demo",
+        _toolTargetIdentity: identity,
+        _normalizedPermissionContract: permission,
+        sessionPermission: { resolveInvocation: permission.resolveInvocation },
+        execute: vi.fn(),
+      };
+    });
     const { customTools } = build({
       connectors: [{ id: "github", tools: manyTools(11) }],
       deferThreshold: 10,
       pluginTools,
     });
     const names = customTools.map((tool: any) => tool.name);
-    expect(names).toContain("plugin_tool_0");
-    expect(names).toContain("plugin_tool_14");
+    expect(names).toContain("demo_tool_0");
+    expect(names).toContain("demo_tool_14");
+  });
+});
+
+describe("canonical tool availability decisions", () => {
+  it("returns stable reasons for agent-disabled and non-visible targets", () => {
+    const disabled = { name: "office" };
+    const hiddenPlugin = { name: "demo_read", _pluginId: "demo" };
+
+    expect(evaluateToolAvailability(disabled, {
+      tools: { disabled: ["office"] },
+    })).toEqual({
+      allowed: false,
+      code: "TARGET_DISABLED_FOR_AGENT",
+      reason: 'tool "office" is disabled for the current agent',
+    });
+    expect(evaluateToolAvailability(hiddenPlugin, {}, {}, {
+      includePluginTools: false,
+    })).toEqual({
+      allowed: false,
+      code: "TARGET_NOT_VISIBLE",
+      reason: 'tool "demo_read" is not visible on this surface',
+    });
+  });
+
+  it("uses the same decision for filtering and runtime enablement failures", () => {
+    const warn = vi.fn();
+    const ready = { name: "ready" };
+    const unavailable = {
+      name: "office_read-document",
+      isEnabledForAgentConfig: () => false,
+    };
+    const throwing = {
+      name: "beautify_create-cover",
+      isEnabledForAgentConfig: () => {
+        throw new Error("bad agent config");
+      },
+    };
+    const tools = [ready, unavailable, throwing];
+    const options = { warn };
+
+    expect(evaluateToolAvailability(unavailable, {}, {}, options)).toMatchObject({
+      allowed: false,
+      code: "TARGET_DISABLED_FOR_AGENT",
+    });
+    expect(evaluateToolAvailability(throwing, {}, {}, options)).toEqual({
+      allowed: false,
+      code: "TARGET_DISABLED_FOR_AGENT",
+      reason: 'tool "beautify_create-cover" runtime enablement check failed: bad agent config',
+    });
+    expect(filterToolObjectsByAvailability(tools, {}, {}, options)).toEqual([ready]);
+    expect(warn).toHaveBeenCalledWith(
+      'tool "beautify_create-cover" runtime enablement check failed, disabling for fresh session: bad agent config',
+    );
   });
 });
 

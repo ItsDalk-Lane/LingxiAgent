@@ -1,3 +1,12 @@
+import { registerToolCapabilityDelegate } from "../lib/permission/tool-invocation-permission.ts";
+import {
+  isToolInvocationError,
+  ToolInvocationError,
+  type ToolTargetId,
+} from "../lib/tools/invocation/index.ts";
+import type { ToolInvocationGateway } from "./tool-invocation-gateway.ts";
+import type { RegisteredToolTarget } from "./tool-target-registry.ts";
+
 function toolOk(message, details = {}) {
   return {
     content: [{ type: "text", text: message }],
@@ -34,32 +43,35 @@ function textOrNull(value) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
-function createDevToolError(message, code) {
-  const err = new Error(message) as Error & { code?: string; status?: number };
-  err.code = code;
-  err.status = 400;
-  return err;
-}
+type PluginDevHostRuntimeContext = Record<string, unknown> & {
+  sessionId?: unknown;
+  sessionPath?: unknown;
+  legacySessionPath?: unknown;
+  sessionRef?: Record<string, unknown>;
+  sessionManager?: { getSessionFile?: () => unknown };
+  agentId?: unknown;
+};
 
-function normalizeSessionTarget(params, runtimeCtx) {
-  const hasParamTarget = !!(params?.sessionId || params?.sessionRef || params?.sessionPath);
-  const source = hasParamTarget ? params : runtimeCtx;
+function normalizeHostSessionTarget(runtimeCtx: PluginDevHostRuntimeContext): {
+  sessionId?: string;
+  sessionPath?: string;
+  sessionRef?: {
+    sessionId: string;
+    sessionPath?: string;
+    legacySessionPath?: string;
+  };
+} {
+  const source = runtimeCtx;
   const rawRef = source?.sessionRef && typeof source.sessionRef === "object"
     ? source.sessionRef
     : null;
   const explicitSessionId = textOrNull(source?.sessionId);
   const refSessionId = textOrNull(rawRef?.sessionId);
-  if (explicitSessionId && refSessionId && explicitSessionId !== refSessionId) {
-    throw createDevToolError(
-      "sessionId does not match sessionRef.sessionId",
-      "PLUGIN_DEV_SESSION_ID_MISMATCH",
-    );
-  }
   const sessionId = explicitSessionId || refSessionId;
   const sessionPath = textOrNull(rawRef?.sessionPath)
     || textOrNull(rawRef?.path)
     || textOrNull(source?.sessionPath)
-    || (!hasParamTarget ? textOrNull(runtimeCtx?.sessionManager?.getSessionFile?.()) : null);
+    || textOrNull(runtimeCtx?.sessionManager?.getSessionFile?.());
   const legacySessionPath = textOrNull(rawRef?.legacySessionPath)
     || textOrNull(source?.legacySessionPath);
   if (!sessionId) {
@@ -75,6 +87,135 @@ function normalizeSessionTarget(params, runtimeCtx) {
     ...(sessionPath ? { sessionPath } : {}),
     sessionRef,
   };
+}
+
+function delegatedCapabilityKey(capability: string, action: string): string {
+  return JSON.stringify([capability, action]);
+}
+
+const pluginDevDelegatedTargets = new WeakMap<object, Map<string, Set<ToolTargetId>>>();
+
+function createPluginDevInvokeTool({
+  invocationGateway,
+  resolveChatToolTarget,
+  getAgentId,
+}: {
+  invocationGateway: ToolInvocationGateway;
+  resolveChatToolTarget: (pluginId: string, toolName: string) => RegisteredToolTarget | null;
+  getAgentId?: () => string | null | undefined;
+}) {
+  const delegatedTargets = new Map<string, Set<ToolTargetId>>();
+  const resolveTarget = (params) => {
+    const pluginId = typeof params?.pluginId === "string" ? params.pluginId.trim() : "";
+    const toolName = typeof params?.toolName === "string" ? params.toolName.trim() : "";
+    try {
+      const target = resolveChatToolTarget(pluginId, toolName);
+      if (target) return target;
+    } catch (cause) {
+      if (isToolInvocationError(cause) && cause.code === "TARGET_NOT_FOUND") {
+        throw new ToolInvocationError({
+          code: "TARGET_NOT_FOUND",
+          message: "Development plugin tool target is not registered.",
+          route: "plugin-dev-chat",
+          sourceId: pluginId || null,
+          details: { toolName: toolName || null },
+          cause,
+        });
+      }
+      throw new ToolInvocationError({
+        code: "TARGET_NOT_VISIBLE",
+        message: "Development plugin tool target is not visible on this surface.",
+        route: "plugin-dev-chat",
+        sourceId: pluginId || null,
+        details: { toolName: toolName || null },
+        cause,
+      });
+    }
+    throw new ToolInvocationError({
+      code: "TARGET_NOT_FOUND",
+      message: "Development plugin tool target is not registered.",
+      route: "plugin-dev-chat",
+      sourceId: pluginId || null,
+      details: { toolName: toolName || null },
+    });
+  };
+  const tool = {
+    name: "plugin_dev_invoke_tool",
+    description: "Invoke one currently loaded development plugin tool through the host invocation gateway.",
+    parameters: createSchema({
+      pluginId: { type: "string" },
+      toolName: { type: "string" },
+      arguments: { type: "object", additionalProperties: true },
+    }, ["pluginId", "toolName"]),
+    metadata: { pluginDevTool: true },
+    _toolInvocationRoute: "plugin-dev-chat",
+    sessionPermission: {
+      resolveInvocation: (params) => {
+        const target = resolveTarget(params);
+        const prepared = invocationGateway.resolvePermission({
+          targetId: target.identity.targetId,
+          route: "plugin-dev-chat",
+          arguments: params?.arguments || {},
+          lifecycleGeneration: target.lifecycleGeneration,
+          toolCallId: "plugin_dev_invoke_tool:permission",
+        });
+        const key = delegatedCapabilityKey(prepared.permission.capability, prepared.permission.action);
+        const targetIds = delegatedTargets.get(key) || new Set<ToolTargetId>();
+        targetIds.add(prepared.targetId);
+        delegatedTargets.set(key, targetIds);
+        return {
+          ...prepared.permission,
+          effectiveInvocation: {
+            targetId: prepared.targetId,
+            toolName: target.identity.publicName,
+            arguments: prepared.arguments,
+            generation: prepared.lifecycleGeneration,
+          },
+        };
+      },
+    },
+    execute: async (toolCallId, params, signal, onUpdate, runtimeCtx) => {
+      const target = resolveTarget(params);
+      const hostRuntime = runtimeCtx && typeof runtimeCtx === "object"
+        ? runtimeCtx as PluginDevHostRuntimeContext
+        : {};
+      const sessionTarget = normalizeHostSessionTarget(hostRuntime);
+      const agentId = textOrNull(hostRuntime.agentId) || textOrNull(getAgentId?.());
+      return invocationGateway.invoke({
+        targetId: target.identity.targetId,
+        route: "plugin-dev-chat",
+        arguments: params?.arguments || {},
+        sessionId: sessionTarget.sessionId || null,
+        sessionPath: sessionTarget.sessionPath || null,
+        agentId,
+        lifecycleGeneration: target.lifecycleGeneration,
+        toolCallId,
+        signal,
+        onUpdate,
+        ctx: hostRuntime,
+        runtimeContext: hostRuntime,
+      });
+    },
+  };
+  pluginDevDelegatedTargets.set(tool, delegatedTargets);
+  return tool;
+}
+
+export function registerPluginDevCapabilityDelegates(
+  tools: readonly object[],
+  { gateway }: { gateway: Pick<ToolInvocationGateway, "canDelegateCapability"> },
+) {
+  const invokeTool = tools.find((tool) => (tool as { name?: string }).name === "plugin_dev_invoke_tool");
+  if (!invokeTool) return;
+  const delegatedTargets = pluginDevDelegatedTargets.get(invokeTool);
+  registerToolCapabilityDelegate(invokeTool, (capability, action) => {
+    const targetIds = delegatedTargets?.get(delegatedCapabilityKey(capability, action));
+    if (!targetIds) return false;
+    for (const targetId of targetIds) {
+      if (gateway.canDelegateCapability(targetId, capability, action)) return true;
+    }
+    return false;
+  });
 }
 
 function createSchema(properties, required = []) {
@@ -123,7 +264,17 @@ function createPluginDevTool({
   };
 }
 
-export function createPluginDevTools({ pluginDevService, getAgentId }: { pluginDevService?: any; getAgentId?: any } = {}) {
+export function createPluginDevTools({
+  pluginDevService,
+  getAgentId,
+  invocationGateway,
+  resolveChatToolTarget,
+}: {
+  pluginDevService?: any;
+  getAgentId?: any;
+  invocationGateway?: ToolInvocationGateway;
+  resolveChatToolTarget?: (pluginId: string, toolName: string) => RegisteredToolTarget | null;
+} = {}) {
   if (!pluginDevService) return [];
   return [
     createPluginDevTool({
@@ -213,31 +364,9 @@ export function createPluginDevTools({ pluginDevService, getAgentId }: { pluginD
         devRunId: params.devRunId,
       }),
     }),
-    createPluginDevTool({
-      name: "plugin_dev_invoke_tool",
-      description: "Invoke one loaded development plugin tool with explicit input for smoke testing.",
-      service: pluginDevService,
-      parameters: createSchema({
-        pluginId: { type: "string" },
-        toolName: { type: "string" },
-        input: { type: "object", additionalProperties: true },
-        sessionId: { type: "string" },
-        sessionRef: { type: "object", additionalProperties: true },
-        sessionPath: { type: "string" },
-        agentId: { type: "string" },
-      }, ["pluginId", "toolName"]),
-      permissionAction: "invoke",
-      handler: ({ params, runtimeCtx, service }) => {
-        const sessionTarget = normalizeSessionTarget(params, runtimeCtx);
-        return service.invokeTool({
-          pluginId: params.pluginId,
-          toolName: params.toolName,
-          input: params.input || {},
-          ...sessionTarget,
-          agentId: params.agentId || runtimeCtx?.agentId || getAgentId?.(),
-        });
-      },
-    }),
+    ...(invocationGateway && resolveChatToolTarget
+      ? [createPluginDevInvokeTool({ invocationGateway, resolveChatToolTarget, getAgentId })]
+      : []),
     createPluginDevTool({
       name: "plugin_dev_diagnostics",
       description: "Read development plugin slots, load status, logs, UI surfaces, and scenarios.",

@@ -21,6 +21,13 @@ async function makeBus() {
   return new EventBus();
 }
 
+function writePluginToolFixture(filePath: string, source: string) {
+  const explicitSource = source.includes("sessionPermission")
+    ? source
+    : `${source}\nexport const sessionPermission = { readOnly: true };\n`;
+  fs.writeFileSync(filePath, explicitSource);
+}
+
 describe("scan", () => {
   it("discovers plugin from directory with manifest.json", async () => {
     const dir = path.join(pluginsDir, "my-plugin");
@@ -38,7 +45,7 @@ describe("scan", () => {
   it("infers id from directory name when no manifest", async () => {
     const dir = path.join(pluginsDir, "simple-tool");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "hello.js"),
+    writePluginToolFixture(path.join(dir, "tools", "hello.js"),
       'export const name = "hello";\nexport const description = "test";\nexport const parameters = {};\nexport async function execute() { return "hi"; }\n');
     const pm = new PluginManager({ pluginsDir, dataDir, bus: await makeBus() } as any);
     const plugins = pm.scan();
@@ -50,7 +57,7 @@ describe("scan", () => {
     const dir = path.join(pluginsDir, "multi");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
     fs.mkdirSync(path.join(dir, "skills"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "t.js"), "export const name='t';");
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), "export const name='t';");
     fs.writeFileSync(path.join(dir, "skills", "s.md"), "---\nname: s\n---\n# S");
     const pm = new PluginManager({ pluginsDir, dataDir, bus: await makeBus() } as any);
     const plugins = pm.scan();
@@ -226,7 +233,7 @@ describe("loadAll", () => {
         }
       }
     `);
-    fs.writeFileSync(path.join(dir, "tools", "scope.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "scope.js"), `
       export const name = "scope";
       export const description = "Return scope";
       export const parameters = {};
@@ -274,7 +281,7 @@ describe("loadAll", () => {
   it("prefers explicit runtime sessionPath over focus fallback for plugin tools", async () => {
     const dir = path.join(pluginsDir, "session-path-plugin");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "scope.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "scope.js"), `
       export const name = "scope";
       export const description = "Return session path";
       export const parameters = {};
@@ -302,7 +309,7 @@ describe("loadAll", () => {
   it("uses the Pi SDK fifth argument session ctx for static plugin tools", async () => {
     const dir = path.join(pluginsDir, "pi-context-plugin");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "scope.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "scope.js"), `
       export const name = "scope";
       export const description = "Return session path";
       export const parameters = {};
@@ -352,7 +359,7 @@ describe("loadAll", () => {
     `);
     const good = path.join(pluginsDir, "good-plugin");
     fs.mkdirSync(path.join(good, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(good, "tools", "t.js"), "export const name='t';");
+    writePluginToolFixture(path.join(good, "tools", "t.js"), "export const name='t';");
     const pm = new PluginManager({ pluginsDir, dataDir, bus: await makeBus() } as any);
     pm.scan();
     await pm.loadAll();
@@ -390,7 +397,7 @@ describe("loadAll", () => {
   it("plugin without index.js loads as static (no lifecycle)", async () => {
     const dir = path.join(pluginsDir, "static-only");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "t.js"), "export const name='t';");
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), "export const name='t';");
     const pm = new PluginManager({ pluginsDir, dataDir, bus: await makeBus() } as any);
     pm.scan();
     await pm.loadAll();
@@ -412,7 +419,7 @@ describe("loadAll", () => {
         async onload() { globalThis.__lazyToolActivated = true; }
       }
     `);
-    fs.writeFileSync(path.join(dir, "tools", "run.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "run.js"), `
       export const name = "run";
       export const description = "Run lazy tool";
       export const parameters = {};
@@ -483,7 +490,7 @@ describe("loadAll", () => {
   it("stores ctx on entry after loading", async () => {
     const dir = path.join(pluginsDir, "ctx-test");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "t.js"),
+    writePluginToolFixture(path.join(dir, "tools", "t.js"),
       'export const name = "t";\nexport const description = "test";\nexport const parameters = {};\nexport async function execute() { return "ok"; }\n');
     const pm = new PluginManager({ pluginsDir, dataDir, bus: await makeBus() } as any);
     pm.scan();
@@ -502,7 +509,7 @@ describe("tool loading", () => {
   it("loads tools from tools/ directory with namespace prefix", async () => {
     const dir = path.join(pluginsDir, "search-plugin");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "web-search.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "web-search.js"), `
       export const name = "web-search";
       export const description = "Search the web";
       export const parameters = { type: "object", properties: { query: { type: "string" } } };
@@ -520,7 +527,7 @@ describe("tool loading", () => {
   it("copies static plugin tool runtime availability checks", async () => {
     const dir = path.join(pluginsDir, "gated-plugin");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "paint.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "paint.js"), `
       export const name = "paint";
       export const description = "Paint";
       export const parameters = {};
@@ -538,10 +545,53 @@ describe("tool loading", () => {
     expect(tool.isEnabledForAgentConfig({ tools: { disabled: ["beautify"] } })).toBe(false);
   });
 
+  it("preserves the explicit static tool metadata required by canonical target assembly", async () => {
+    const dir = path.join(pluginsDir, "metadata-plugin");
+    fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
+    writePluginToolFixture(path.join(dir, "tools", "inspect.js"), `
+      export const name = "inspect";
+      export const label = "Inspect safely";
+      export const description = "Inspect a resource";
+      export const parameters = {
+        type: "object",
+        properties: { resourceId: { type: "string" } },
+        required: ["resourceId"],
+      };
+      export const deferrable = false;
+      export const pinned = true;
+      export const sessionPermission = { readOnly: true };
+      export const arbitraryHostField = "must-not-cross-the-adapter";
+      export async function execute() { return "ok"; }
+    `);
+    const pm = new PluginManager({ pluginsDir, dataDir, bus: await makeBus() } as any);
+    pm.scan();
+    await pm.loadAll();
+
+    const tool = pm.getAllTools()[0];
+    expect(tool).toMatchObject({
+      name: "metadata-plugin_inspect",
+      label: "Inspect safely",
+      description: "Inspect a resource",
+      deferrable: false,
+      pinned: true,
+      _pluginId: "metadata-plugin",
+      parameters: {
+        type: "object",
+        required: ["resourceId"],
+      },
+      _toolTargetIdentity: {
+        origin: "plugin",
+        sourceId: "metadata-plugin",
+      },
+    });
+    expect(tool.sessionPermission?.resolveInvocation).toBeTypeOf("function");
+    expect(tool).not.toHaveProperty("arbitraryHostField");
+  });
+
   it("invokes static plugin tools through the unified tool adapter", async () => {
     const dir = path.join(pluginsDir, "static-invoke");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "echo.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "echo.js"), `
       export const name = "echo";
       export const description = "Echo text";
       export const parameters = {};
@@ -563,10 +613,10 @@ describe("tool loading", () => {
     expect(result.content[0].text).toBe("/sessions/static.jsonl:hello");
   });
 
-  it("preserves static plugin tool sessionPermission metadata", async () => {
+  it("normalizes static plugin tool sessionPermission metadata", async () => {
     const dir = path.join(pluginsDir, "static-permission");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "status.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "status.js"), `
       export const name = "status";
       export const description = "Read plugin status";
       export const parameters = {};
@@ -581,13 +631,17 @@ describe("tool loading", () => {
 
     const tool = pm.getPluginTool("static-permission", "status");
 
-    expect(tool.sessionPermission).toEqual({ readOnly: true });
+    expect(tool.sessionPermission.resolveInvocation({})).toEqual({
+      action: "read",
+      kind: "read",
+      capability: "status.read",
+    });
   });
 
   it("finds plugin tools when the action id contains underscores", async () => {
     const dir = path.join(pluginsDir, "underscore-plugin");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "create-note.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "create-note.js"), `
       export const name = "create_note";
       export const description = "Create note";
       export const parameters = {};
@@ -595,7 +649,7 @@ describe("tool loading", () => {
         return input.title;
       }
     `);
-    fs.writeFileSync(path.join(dir, "tools", "archive.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "archive.js"), `
       export const name = "underscore-plugin_archive";
       export const description = "Archive note";
       export const parameters = {};
@@ -626,7 +680,7 @@ describe("tool loading", () => {
     }));
     const dir = path.join(pluginsDir, "file-plugin");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "stage.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "stage.js"), `
       export const name = "stage";
       export const description = "Stage plugin output";
       export const parameters = {};
@@ -673,7 +727,7 @@ describe("tool loading", () => {
     }));
     const dir = path.join(pluginsDir, "stage-file-plugin");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "stage.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "stage.js"), `
       export const name = "stage";
       export const description = "Stage plugin output";
       export const parameters = {};
@@ -733,7 +787,7 @@ describe("tool loading", () => {
       id: "resource-tool-plugin",
       capabilities: ["resource.read"],
     }));
-    fs.writeFileSync(path.join(dir, "tools", "read-resource.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "read-resource.js"), `
       export const name = "read_resource";
       export const description = "Read a resource";
       export const parameters = {};
@@ -787,7 +841,7 @@ describe("tool loading", () => {
     }));
     const dir = path.join(pluginsDir, "stage-id-plugin");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "stage.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "stage.js"), `
       export const name = "stage";
       export const description = "Stage plugin output";
       export const parameters = {};
@@ -839,7 +893,7 @@ describe("tool loading", () => {
   it("skips tool files with invalid exports", async () => {
     const dir = path.join(pluginsDir, "bad-tool");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "bad.js"), "export const x = 1;");
+    writePluginToolFixture(path.join(dir, "tools", "bad.js"), "export const x = 1;");
     const pm = new PluginManager({ pluginsDir, dataDir, bus: await makeBus() } as any);
     pm.scan();
     await pm.loadAll();
@@ -955,7 +1009,7 @@ describe("extensions", () => {
       export default function(pi) { pi.on("tool_call", () => {}); }
     `);
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "t.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), `
       export const name = "t";
       export const description = "test";
       export const parameters = {};
@@ -1170,7 +1224,7 @@ describe("permission enforcement", () => {
     const communityDir = path.join(tmpHome, "community-plugins");
     const dir = path.join(communityDir, "comm-plug");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "t.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), `
       export const name = "t";
       export const description = "test tool";
       export const parameters = {};
@@ -1223,7 +1277,7 @@ describe("permission enforcement", () => {
       trust: "full-access",
     }));
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "t.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), `
       export const name = "t";
       export const description = "test";
       export const parameters = {};
@@ -1287,7 +1341,7 @@ describe("permission enforcement", () => {
     const communityDir = path.join(tmpHome, "community-perm-dis");
     const dir = path.join(communityDir, "disabled-plug");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "t.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), `
       export const name = "t";
       export const description = "test";
       export const parameters = {};
@@ -1315,7 +1369,7 @@ describe("permission enforcement", () => {
   it("builtin plugin ignores disabled list and always loads", async () => {
     const dir = path.join(pluginsDir, "builtin-always");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "t.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), `
       export const name = "t";
       export const description = "test";
       export const parameters = {};
@@ -1343,11 +1397,41 @@ describe("permission enforcement", () => {
 // ── 动态工具注册 ──────────────────────────────────────────────────────────────
 
 describe("addTool (dynamic registration)", () => {
+  it("动态工具注册、重注册和移除都会推进插件工具代次", async () => {
+    const pm = new PluginManager({ pluginsDir, dataDir, bus: await makeBus() } as any);
+
+    expect(pm.getPluginToolGeneration("dynamic-generation")).toBe(0);
+    const removeFirst = pm.addTool("dynamic-generation", {
+      name: "search",
+      description: "Search",
+      sessionPermission: { readOnly: true },
+      execute: async () => "first",
+    });
+    const firstGeneration = pm.getPluginToolGeneration("dynamic-generation");
+    expect(firstGeneration).toBeGreaterThan(0);
+    expect(pm.isPluginToolCurrentlyAvailable("dynamic-generation", "dynamic-generation_search")).toBe(true);
+
+    const removeSecond = pm.addTool("dynamic-generation", {
+      name: "lookup",
+      description: "Lookup",
+      sessionPermission: { readOnly: true },
+      execute: async () => "second",
+    });
+    expect(pm.getPluginToolGeneration("dynamic-generation")).toBeGreaterThan(firstGeneration);
+
+    const beforeRemoval = pm.getPluginToolGeneration("dynamic-generation");
+    removeFirst();
+    expect(pm.getPluginToolGeneration("dynamic-generation")).toBeGreaterThan(beforeRemoval);
+    expect(pm.isPluginToolCurrentlyAvailable("dynamic-generation", "dynamic-generation_search")).toBe(false);
+    removeSecond();
+  });
+
   it("dynamically registered tool appears in getAllTools", async () => {
     const pm = new PluginManager({ pluginsDir, dataDir, bus: await makeBus() } as any);
     const remove = pm.addTool("mcp-bridge", {
       name: "search",
       description: "MCP search tool",
+      sessionPermission: { readOnly: true },
       execute: async () => "result",
     });
     const tools = pm.getAllTools();
@@ -1360,7 +1444,18 @@ describe("addTool (dynamic registration)", () => {
     expect(pm.getAllTools()).toHaveLength(0);
   });
 
-  it("preserves dynamic plugin tool sessionPermission metadata", async () => {
+  it("rejects dynamic plugin tools without an explicit permission contract", async () => {
+    const pm = new PluginManager({ pluginsDir, dataDir, bus: await makeBus() } as any);
+
+    expect(() => pm.addTool("mcp-bridge", {
+      name: "missing-permission",
+      description: "Missing permission",
+      execute: async () => "result",
+    })).toThrow(expect.objectContaining({ code: "PERMISSION_CONTRACT_MISSING" }));
+    expect(pm.getAllTools()).toHaveLength(0);
+  });
+
+  it("normalizes dynamic plugin tool sessionPermission metadata", async () => {
     const pm = new PluginManager({ pluginsDir, dataDir, bus: await makeBus() } as any);
     const sessionPermission = {
       kind: "external_side_effect",
@@ -1379,10 +1474,14 @@ describe("addTool (dynamic registration)", () => {
     });
 
     const [tool] = pm.getAllTools();
-    expect(tool.sessionPermission).toBe(sessionPermission);
-    expect(tool.sessionPermission.describeSideEffect({ query: "hana" })).toMatchObject({
+    expect(tool.sessionPermission.resolveInvocation({ query: "hana" })).toMatchObject({
+      action: "execute",
+      kind: "review",
+      capability: "github_search.execute",
+      sideEffect: {
       kind: "external_api",
       ruleId: "mcp-remote-query",
+      },
     });
 
     remove();
@@ -1404,6 +1503,7 @@ describe("addTool (dynamic registration)", () => {
     const remove = pm.addTool("dyn-invoke", {
       name: "search",
       description: "Dynamic search",
+      sessionPermission: { readOnly: true },
       execute,
     }, { pluginKey: entry.pluginKey, source: entry.source });
 
@@ -1441,6 +1541,7 @@ describe("addTool (dynamic registration)", () => {
       name: "github_search",
       description: "Legacy MCP search",
       invocationStyle: "pi_tool",
+      sessionPermission: { readOnly: true },
       execute,
     }, { pluginKey: entry.pluginKey, source: entry.source });
 
@@ -1479,6 +1580,7 @@ describe("addTool (dynamic registration)", () => {
       name: "session_scope",
       description: "Full Pi signature session scope",
       invocationStyle: "pi_tool",
+      sessionPermission: { readOnly: true },
       execute,
     }, { pluginKey: entry.pluginKey, source: entry.source });
 
@@ -1511,6 +1613,7 @@ describe("addTool (dynamic registration)", () => {
           this.register(this.ctx.registerTool({
             name: "dynamic-tool",
             description: "Registered at runtime",
+            sessionPermission: { readOnly: true },
             execute: async (input) => "dynamic " + input.x,
           }));
         }
@@ -1555,7 +1658,7 @@ function writeToolRoutePlugin(root: any, id: any, { text, sourceName = text }: a
     version: "1.0.0",
     trust: "full-access",
   }));
-  fs.writeFileSync(path.join(dir, "tools", "echo.js"), `
+  writePluginToolFixture(path.join(dir, "tools", "echo.js"), `
     export const name = "echo";
     export const description = "Echo source";
     export const parameters = {};
@@ -1589,7 +1692,7 @@ describe("hot operations", () => {
   it("does not produce model Reminder ledger entries for plugin lifecycle changes", async () => {
     const dir = path.join(pluginsDir, "ledger-lifecycle");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "echo.js"), "export const name = 'echo';");
+    writePluginToolFixture(path.join(dir, "tools", "echo.js"), "export const name = 'echo';");
     const append = vi.fn();
     const pm = new PluginManager({
       pluginsDir,
@@ -1614,7 +1717,7 @@ describe("hot operations", () => {
     // Create new plugin dir after initial load
     const newDir = path.join(pluginsDir, "hot-plug");
     fs.mkdirSync(path.join(newDir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(newDir, "tools", "greet.js"), `
+    writePluginToolFixture(path.join(newDir, "tools", "greet.js"), `
       export const name = "greet";
       export const description = "Greet someone";
       export const parameters = {};
@@ -1780,7 +1883,7 @@ describe("hot operations", () => {
   it("installPlugin upgrades an existing plugin (same dirName)", async () => {
     const dir = path.join(pluginsDir, "upgradeable");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "v1.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "v1.js"), `
       export const name = "v1";
       export const description = "version 1";
       export const parameters = {};
@@ -1793,7 +1896,7 @@ describe("hot operations", () => {
     expect(pm.getAllTools().some(t => t.name === "upgradeable_v1")).toBe(true);
 
     // "Upgrade": overwrite tool file
-    fs.writeFileSync(path.join(dir, "tools", "v2.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "v2.js"), `
       export const name = "v2";
       export const description = "version 2";
       export const parameters = {};
@@ -1811,7 +1914,7 @@ describe("hot operations", () => {
     const communityDir = path.join(tmpHome, "community-remove");
     const dir = path.join(communityDir, "removable");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "t.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), `
       export const name = "t";
       export const description = "test";
       export const parameters = {};
@@ -1894,7 +1997,7 @@ describe("hot operations", () => {
     const communityDir = path.join(tmpHome, "community-missing-disabled");
     const dir = path.join(communityDir, "missing-disabled");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "t.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), `
       export const name = "t";
       export const description = "test";
       export const parameters = {};
@@ -1937,7 +2040,7 @@ describe("hot operations", () => {
     const communityDir = path.join(tmpHome, "community-rm-dis");
     const dir = path.join(communityDir, "rm-disabled");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "t.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), `
       export const name = "t";
       export const description = "test";
       export const parameters = {};
@@ -1968,7 +2071,7 @@ describe("hot operations", () => {
     const communityDir = path.join(tmpHome, "community-disable");
     const dir = path.join(communityDir, "disableable");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "t.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), `
       export const name = "t";
       export const description = "test";
       export const parameters = {};
@@ -1983,17 +2086,59 @@ describe("hot operations", () => {
     pm.scan();
     await pm.loadAll();
     expect(pm.getPlugin("disableable").status).toBe("loaded");
+    const publishedTool = pm.getPluginTool("disableable", "t");
+    const loadedGeneration = pm.getPluginToolGeneration("disableable");
+    expect(loadedGeneration).toBeGreaterThan(0);
+    expect(publishedTool._toolLifecycleGeneration).toBe(loadedGeneration);
+    expect(pm.isPluginToolCurrentlyAvailable("disableable", "disableable_t")).toBe(true);
 
     await pm.disablePlugin("disableable");
     expect(pm.getPlugin("disableable").status).toBe("disabled");
+    expect(pm.getPluginToolGeneration("disableable")).toBeGreaterThan(loadedGeneration);
+    expect(publishedTool._toolLifecycleGeneration).toBe(pm.getPluginToolGeneration("disableable"));
+    expect(pm.isPluginToolCurrentlyAvailable("disableable", "disableable_t")).toBe(false);
     expect(pm.getAllTools().some(t => t._pluginId === "disableable")).toBe(false);
     expect(mockPrefs.getDisabledPlugins()).toContain("disableable");
+  });
+
+  it("热重载和卸载都会撤销旧工具代次", async () => {
+    const builtinDir = path.join(tmpHome, "builtin-generation-reload");
+    fs.mkdirSync(builtinDir, { recursive: true });
+    const communityDir = path.join(tmpHome, "community-generation-reload");
+    const dir = path.join(communityDir, "generation-reload");
+    fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), `
+      export const name = "t";
+      export const description = "test";
+      export const parameters = {};
+      export async function execute() { return "ok"; }
+    `);
+    const pm = new PluginManager({
+      pluginsDirs: [builtinDir, communityDir],
+      dataDir,
+      bus: await makeBus(),
+      preferencesManager: createMockPrefs(),
+    } as any);
+    pm.scan();
+    await pm.loadAll();
+    const oldTool = pm.getPluginTool("generation-reload", "t");
+    const loadedGeneration = pm.getPluginToolGeneration("generation-reload");
+
+    await pm.enablePlugin("generation-reload");
+    const reloadedGeneration = pm.getPluginToolGeneration("generation-reload");
+    expect(reloadedGeneration).toBeGreaterThan(loadedGeneration);
+    expect(oldTool._toolLifecycleGeneration).toBe(reloadedGeneration);
+    expect(pm.isPluginToolCurrentlyAvailable("generation-reload", "generation-reload_t")).toBe(true);
+
+    await pm.removePlugin("generation-reload");
+    expect(pm.getPluginToolGeneration("generation-reload")).toBeGreaterThan(reloadedGeneration);
+    expect(pm.isPluginToolCurrentlyAvailable("generation-reload", "generation-reload_t")).toBe(false);
   });
 
   it("disablePlugin rejects builtin plugins", async () => {
     const dir = path.join(pluginsDir, "builtin-no-disable");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "t.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), `
       export const name = "t";
       export const description = "test";
       export const parameters = {};
@@ -2012,7 +2157,7 @@ describe("hot operations", () => {
     const communityDir = path.join(tmpHome, "community-enable");
     const dir = path.join(communityDir, "enableable");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "t.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), `
       export const name = "t";
       export const description = "test";
       export const parameters = {};
@@ -2044,7 +2189,7 @@ describe("hot operations", () => {
       id: "fa-hot", name: "FA Hot", version: "1.0.0",
       trust: "full-access",
     }));
-    fs.writeFileSync(path.join(dir, "tools", "t.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), `
       export const name = "t";
       export const description = "test";
       export const parameters = {};
@@ -2078,7 +2223,7 @@ describe("hot operations", () => {
       id: "fa-hot-off", name: "FA Hot Off", version: "1.0.0",
       trust: "full-access",
     }));
-    fs.writeFileSync(path.join(dir, "tools", "t.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), `
       export const name = "t";
       export const description = "test";
       export const parameters = {};
@@ -2113,7 +2258,7 @@ describe("hot operations", () => {
       trust: "full-access",
     }));
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "tools", "t.js"), `
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), `
       export const name = "t";
       export const description = "test";
       export const parameters = {};
@@ -2158,7 +2303,7 @@ describe("hot operations", () => {
   it("operations are serialized through the queue", async () => {
     const dir1 = path.join(pluginsDir, "serial-1");
     fs.mkdirSync(path.join(dir1, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir1, "tools", "t.js"), `
+    writePluginToolFixture(path.join(dir1, "tools", "t.js"), `
       export const name = "t";
       export const description = "test";
       export const parameters = {};
@@ -2166,7 +2311,7 @@ describe("hot operations", () => {
     `);
     const dir2 = path.join(pluginsDir, "serial-2");
     fs.mkdirSync(path.join(dir2, "tools"), { recursive: true });
-    fs.writeFileSync(path.join(dir2, "tools", "t.js"), `
+    writePluginToolFixture(path.join(dir2, "tools", "t.js"), `
       export const name = "t";
       export const description = "test";
       export const parameters = {};

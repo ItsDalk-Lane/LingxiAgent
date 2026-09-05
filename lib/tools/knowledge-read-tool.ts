@@ -25,6 +25,7 @@ import { EvidenceReceiptService, type KnowledgeResearchToolContext } from "../kn
 import { ResearchStore } from "../knowledge/research/research-store.ts";
 import type { StoredKnowledgeChunk } from "../knowledge/knowledge-index-store.ts";
 import type { KnowledgeManager } from "../knowledge/knowledge-manager.ts";
+import { KNOWLEDGE_RERANK_ENABLED_POLICY } from "../knowledge/rerank-policy.ts";
 import type { KnowledgeTurnScope } from "../knowledge/types.ts";
 import {
   knowledgeScopeViolation,
@@ -299,7 +300,7 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
           const compiledScope = await knowledge.compileTurnScope(resolved.scope);
           const { response, evidence: result } = await knowledge.searchService.searchWithEvidence({
             compiledScope, query, channel: "hybrid", limit: 12, sourceIds: [sourceId],
-            notebookIds: [resolved.notebookId], rerank: true, signal,
+            notebookIds: [resolved.notebookId], rerankPolicy: KNOWLEDGE_RERANK_ENABLED_POLICY, signal,
           });
           // 降级显式标注（§十二）：向量变体未就绪/索引缺失时结果仍是合法 FTS
           // 答案，但 payload 携带 reason code；同时幂等入队后台补齐（去重由

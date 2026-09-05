@@ -5,6 +5,7 @@ import { vi } from "vitest";
 import { KnowledgeManager } from "../../lib/knowledge/knowledge-manager.ts";
 import { resolveKnowledgeChunkerConfig } from "../../lib/knowledge/chunker.ts";
 import type { KnowledgeIngestionEmbedRequest } from "../../lib/knowledge/ingestion-service.ts";
+import { KNOWLEDGE_RERANK_DISABLED_POLICY } from "../../lib/knowledge/rerank-policy.ts";
 
 export const hierarchicalStudio = "hierarchical-studio";
 export async function createHierarchicalFixture(documents: Array<{ name: string; sections: Array<{ heading: string; text: string }> }>, vectors = false) {
@@ -42,6 +43,7 @@ export async function createHierarchicalFixture(documents: Array<{ name: string;
   const compiledScope = await manager.compileTurnScope(scope);
   embed.mockClear();
   return { manager, notebook, sources, sessionPath, scope, compiledScope, embed,
-    request: { compiledScope, query: "needle", channel: "hybrid" as const, rerank: false, limit: 24 },
+    request: { compiledScope, query: "needle", channel: "hybrid" as const,
+      rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY, limit: 24 },
     async close() { await manager.close(); fs.rmSync(home, { recursive: true, force: true }); } };
 }

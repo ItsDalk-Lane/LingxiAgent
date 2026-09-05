@@ -4,6 +4,11 @@ import { RetrievalResultCache } from "./retrieval-result-cache.ts";
 import { normalizeKnowledgeQuery } from "./query-embedding-cache.ts";
 import type { KnowledgeModelRef } from "./types.ts";
 import { KnowledgeError } from "./errors.ts";
+import {
+  knowledgeRetrievalPolicyDigest,
+  normalizeKnowledgeRerankPolicy,
+  type KnowledgeRerankPolicy,
+} from "./rerank-policy.ts";
 import { resolveReadyKnowledgeQueryVariant, type CompiledKnowledgeScope } from "./scope-snapshot-compiler.ts";
 import type { KnowledgeStore } from "./knowledge-store.ts";
 import type { KnowledgeIndexStore, IndexedKnowledgeChunk, KnowledgeOrdinalRange } from "./knowledge-index-store.ts";
@@ -20,7 +25,7 @@ export interface KnowledgeSearchRequest {
   notebookIds?: string[];
   sourceIds?: string[];
   sectionKeys?: string[];
-  rerank: boolean;
+  rerankPolicy: KnowledgeRerankPolicy;
   signal?: AbortSignal;
 }
 
@@ -112,10 +117,11 @@ export class KnowledgeSearchService {
     const { compiledScope: scope } = request;
     if (typeof request.query !== "string" || !request.query.trim() || request.query.length > 4000
       || !Number.isSafeInteger(request.limit) || request.limit < 1 || request.limit > 1000
-      || !["fts", "hybrid"].includes(request.channel) || typeof request.rerank !== "boolean") {
+      || !["fts", "hybrid"].includes(request.channel) || !request.rerankPolicy) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Knowledge search request is invalid");
     }
-    if (request.channel === "fts" && request.rerank) {
+    const rerankPolicy = normalizeKnowledgeRerankPolicy(request.rerankPolicy);
+    if (request.channel === "fts" && rerankPolicy.enabled) {
       throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Local FTS search cannot call rerank");
     }
     const frozen = this.deps.store.getTurnScope({ scopeId: scope.scopeId });
@@ -185,9 +191,11 @@ export class KnowledgeSearchService {
     }
     const cached = await this.resultCache.getOrCreate({
       scopeSnapshotHash: scope.snapshotHash, normalizedQuery: normalizeKnowledgeQuery(request.query),
-      channel: request.channel, filters: { notebookIds: request.notebookIds, sourceIds: request.sourceIds,
+      filters: { notebookIds: request.notebookIds, sourceIds: request.sourceIds,
         sectionKeys: request.sectionKeys, sectionsBySourceId: sectionsBySourceId ? [...sectionsBySourceId] : undefined },
-      limit: request.limit, rerank: request.rerank, retrievalImplementationVersion: "knowledge-search-v3-hierarchical",
+      limit: request.limit,
+      policyDigest: knowledgeRetrievalPolicyDigest({ channel: request.channel, rerankPolicy }),
+      retrievalImplementationVersion: "knowledge-search-v3-hierarchical",
     }, async signal => {
       request = { ...request, query: normalizeKnowledgeQuery(request.query), signal };
       const ftsStart = performance.now();
@@ -262,6 +270,7 @@ export class KnowledgeSearchService {
       const degraded: RetrieveForNotebooksResult["degraded"] = [];
       const degradedReasons = [...scope.warnings];
       const rerankDegradeReasons: string[] = [];
+      const rerankSkippedReasons: string[] = [];
       // 先保留较宽的候选，再重排并限制交付数量；避免相关原文在重排前就被淘汰。
       const generationLimit = request.channel === "hybrid" ? Math.max(request.limit, Math.min(200, request.limit * 5)) : request.limit;
       let fts = variantIds.length === 0 ? [] : ordinalRanges || requiredSectionIds ? this.deps.indexStore.search({
@@ -314,7 +323,7 @@ export class KnowledgeSearchService {
         candidates = fuseNotebookRankings([candidates, ...outcomes.map(outcome => outcome.candidates)], true)
           .map(entry => entry.chunk).slice(0, generationLimit);
         timings.fuseMs += performance.now() - fuseStart;
-        if (request.rerank && candidates.length > 0) {
+        if (rerankPolicy.enabled && candidates.length > 0) {
           const rerankByRef = new Map<string, { ref: KnowledgeModelRef | null; candidates: IndexedKnowledgeChunk[] }>();
           for (const candidate of candidates) {
             const source = sources.find(source => source.parseArtifactId === candidate.parseArtifactId)!;
@@ -333,10 +342,12 @@ export class KnowledgeSearchService {
           if (rerankGroups > 0) {
             const ranked = await Promise.all(rerankGroupsList.map(group => this.deps.queryService.rerankCompiledCandidates({
               candidates: group.candidates, modelRef: group.ref, query: request.query, signal: request.signal,
+              rerankPolicy: request.rerankPolicy,
               onRemoteCall: () => { remoteModelCalls += 1; },
             })));
             timings.rerankMs = Math.max(...ranked.map(group => group.rerankMs));
             rerankDegradeReasons.push(...ranked.flatMap(group => group.rerankDegradeReason ? [group.rerankDegradeReason] : []));
+            rerankSkippedReasons.push(...ranked.flatMap(group => group.rerankSkippedReason ? [group.rerankSkippedReason] : []));
             // 任一组失败时保留整个融合序列，不能把半份重排结果伪装成全局成功。
             if (rerankDegradeReasons.length === 0) {
               const mergeStart = performance.now();
@@ -428,7 +439,7 @@ export class KnowledgeSearchService {
             }] : [];
           })),
           retrievalMode, retrievalModeRequested: request.channel, degraded,
-          searchedVectorVariants, rerankDegradeReasons, stageTimings: timings,
+          searchedVectorVariants, rerankDegradeReasons, rerankSkippedReasons, stageTimings: timings,
         },
       };
     }, callerSignal);

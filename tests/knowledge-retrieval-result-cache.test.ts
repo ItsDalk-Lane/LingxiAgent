@@ -1,7 +1,22 @@
 import { describe, expect, it, vi } from "vitest";
 import { RetrievalResultCache, type RetrievalResultCacheKey } from "../lib/knowledge/retrieval-result-cache.ts";
+import {
+  KNOWLEDGE_RERANK_DISABLED_POLICY,
+  KNOWLEDGE_RERANK_ENABLED_POLICY,
+  knowledgeRetrievalPolicyDigest,
+} from "../lib/knowledge/rerank-policy.ts";
 
-const key: RetrievalResultCacheKey = { scopeSnapshotHash: "scope-a", normalizedQuery: "查询", channel: "hybrid", filters: {}, limit: 8, rerank: false, retrievalImplementationVersion: "v1" };
+const key: RetrievalResultCacheKey = {
+  scopeSnapshotHash: "scope-a",
+  normalizedQuery: "查询",
+  filters: {},
+  limit: 8,
+  policyDigest: knowledgeRetrievalPolicyDigest({
+    channel: "hybrid",
+    rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY,
+  }),
+  retrievalImplementationVersion: "v1",
+};
 
 describe("检索结果缓存", () => {
   it("256 条 LRU 和两分钟期限，不靠墙钟速度判断", async () => {
@@ -20,7 +35,9 @@ describe("检索结果缓存", () => {
     const cache = new RetrievalResultCache<number>(), load = vi.fn(async () => 1);
     await cache.getOrCreate(key, load);
     const changes: Partial<RetrievalResultCacheKey>[] = [
-      { scopeSnapshotHash: "scope-b" }, { channel: "fts" }, { normalizedQuery: "另一问" }, { limit: 12 }, { rerank: true },
+      { scopeSnapshotHash: "scope-b" }, { normalizedQuery: "另一问" }, { limit: 12 },
+      { policyDigest: knowledgeRetrievalPolicyDigest({ channel: "fts", rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY }) },
+      { policyDigest: knowledgeRetrievalPolicyDigest({ channel: "hybrid", rerankPolicy: KNOWLEDGE_RERANK_ENABLED_POLICY }) },
       { retrievalImplementationVersion: "v2" }, { filters: { notebookIds: ["n"] } }, { filters: { sourceIds: ["s"] } },
       { filters: { sectionKeys: ["h"] } }, { filters: { sourceIds: [] } },
       { filters: { sectionsBySourceId: [["s", ["h"]]] } },

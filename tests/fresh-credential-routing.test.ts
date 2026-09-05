@@ -6,6 +6,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { AuxiliaryModelResolver } from "../core/auxiliary-model-resolver.ts";
+import { resolveMediaExecutionTarget } from "../core/media/media-execution-target-resolver.ts";
 
 function makeResolver(models, freshResolver, options: any = {}) {
   const modelList = Object.values(models) as any[];
@@ -132,5 +133,41 @@ describe("AuxiliaryModelResolver fresh credential routing", () => {
 
     expect(resolved).toBeNull();
     expect(fresh).not.toHaveBeenCalled();
+  });
+});
+
+describe("媒体执行目标新鲜凭证路由", () => {
+  it("runtime provider 无密钥时选择当前 active lane 且结果不携带凭证值", () => {
+    const target = resolveMediaExecutionTarget({
+      modelId: "image-model",
+      modality: "image",
+      runtimeProviderId: "runtime-provider",
+      adapterId: "image-adapter",
+      providerRegistry: {
+        get: (providerId) => ({
+          id: providerId,
+          authType: providerId === "active-provider" ? "api-key" : "optional",
+        }),
+        getAuthType: (providerId) => (
+          providerId === "active-provider" ? "api-key" : "optional"
+        ),
+        getCredentials: (providerId) => (
+          providerId === "active-provider" ? { apiKey: "configured" } : null
+        ),
+        getMediaProviderCredentialStatus: () => ({
+          activeProviderId: "active-provider",
+          activeLaneId: "active-lane",
+          lanes: [{ id: "active-lane", providerId: "active-provider" }],
+          unavailableReason: null,
+        }),
+      },
+    });
+
+    expect(target).toMatchObject({
+      runtimeProviderId: "runtime-provider",
+      credentialProviderId: "active-provider",
+      credentialLaneId: "active-lane",
+    });
+    expect(JSON.stringify(target)).not.toContain("configured");
   });
 });
