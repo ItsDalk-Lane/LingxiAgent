@@ -4464,10 +4464,19 @@ export class LingxiEngine {
    * to ask, which reads as "no basis to claim anything changed".
    */
   getLiveToolCatalogNames() {
-    if (!this._mcp) return null;
-    return this._liveMcpCatalogEntries()
-      .map((entry) => entry.publicName)
-      .sort((left, right) => left.localeCompare(right));
+    const names = new Set<string>();
+    if (this._mcp) {
+      for (const entry of this._liveMcpCatalogEntries()) names.add(entry.publicName);
+    }
+    const pluginCatalogEnabled = this._prefs?.getBuiltinToolDeferEnabled?.() === true;
+    if (pluginCatalogEnabled && this._pluginManager) {
+      // 漂移播报只读当前活跃插件的公开名称；旧会话仍保留自己的 schema/描述快照。
+      for (const tool of this._pluginManager.getAllTools?.() || []) {
+        if (typeof tool?.name === "string" && tool.name) names.add(tool.name);
+      }
+    }
+    if (!this._mcp && !pluginCatalogEnabled) return null;
+    return [...names].sort((left, right) => left.localeCompare(right));
   }
 
   buildTools(cwd, customTools, opts: any = {}) {
