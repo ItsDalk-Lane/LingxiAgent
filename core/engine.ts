@@ -2120,6 +2120,14 @@ export class LingxiEngine {
   getSessionAuthorizedFolders(p = this.currentSessionPath) {
     return this._sessionCoord.getSessionAuthorizedFolders(p);
   }
+  // switch 路由经 sessionWorkspaceMountFields(engine, sessionPath) 读它回传会话的
+  // 工作台身份。缺这个委托时（此前的真实状态：仅 coordinator 有方法、engine 未暴露，
+  // 路由 optional-call 静默拿到 undefined）switch 回包永远不带 workspaceMountId/
+  // workspaceLabel，客户端 desk 落成本地目录键，与列表投影里带 mountId 的会话
+  // 严格互斥（session-sections.ts 本地作用域排除 mount 会话）——左栏列表空白。
+  getSessionWorkspaceMount(p = this.currentSessionPath) {
+    return this._sessionCoord.getSessionWorkspaceMount(p);
+  }
   getSessionExecutorMetadata(ref) {
     return this._sessionCoord.getSessionExecutorMetadata(ref);
   }

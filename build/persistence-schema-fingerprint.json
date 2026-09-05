@@ -3287,7 +3287,7 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "registers a stateless Pi tool loop guard extension; no persisted store schema, data epoch, or restore contract changes",
+    "compatibilityReason": "engine.ts 增加 getSessionWorkspaceMount 纯委托方法(向路由回传会话工作台挂载身份),不改变任何持久化形状;tripwire 解析树摘要不变",
     "payloadFingerprint": "sha256:d7239a0f7b0ca2323bb7b57da212a09e98674ac724f863155dfd96f07900e50c"
   },
   "schemas": [
