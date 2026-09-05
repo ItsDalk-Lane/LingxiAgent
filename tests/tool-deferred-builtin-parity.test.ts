@@ -205,7 +205,7 @@ describe("deferred bundled plugin parity", () => {
       arguments: { value: "blocked" },
     }, sessionPath);
 
-    expect(search.content[0].text).toContain("No matching external tool");
+    expect(search.content[0].text).toContain("No matching connector or plugin tool");
     expect(describe.content[0].text).toContain(`No tool named ${office.name}`);
     expect(call).toMatchObject({
       isError: true,

@@ -2,10 +2,8 @@
  * The three tools a session carries in place of the tool schemas it deferred.
  *
  * Search and describe are pure lookups over the catalog. `mcp_call` is the
- * execution path: it resolves the real target, validates arguments against the
- * target's own schema before anything leaves the process, and forwards through
- * the manager so the existing call path (including multi-round tool results)
- * applies unchanged.
+ * execution path: it resolves the real target and forwards the complete call
+ * envelope to the canonical invocation gateway.
  *
  * Permission is the subtle part. The bridge must not become a way to launder
  * one approval into access to every connector, so `mcp_call` never asks to be
@@ -21,8 +19,10 @@ import { registerToolCapabilityDelegate } from "../lib/permission/tool-invocatio
 import {
   createFirstPartyToolIdentity,
   isToolInvocationError,
+  type ToolTargetId,
 } from "../lib/tools/invocation/index.ts";
 import type { ToolCatalog, ToolCatalogEntry } from "./tool-catalog.ts";
+import type { ToolInvocationGateway } from "./tool-invocation-gateway.ts";
 
 export const BRIDGE_TOOL_NAMES = ["mcp_search_tools", "mcp_describe_tool", "mcp_call"] as const;
 
@@ -32,22 +32,15 @@ const CALL_TOOL_NAME = "mcp_call";
 
 export interface BridgeToolDeps {
   catalog: ToolCatalog;
-  mcpCall: (serverId: string, toolName: string, args: Record<string, unknown>, ctx?: unknown) => Promise<unknown>;
-  resolveMcpPermission: (serverId: string, toolName: string) => string;
-  /** Resolves a deferred builtin tool's own invocation descriptor. */
-  resolveBuiltinInvocation?: (name: string, params: unknown) => unknown;
-  /** Executes a deferred builtin tool in place of the MCP call path. */
-  builtinCall?: (
-    name: string,
-    args: Record<string, unknown>,
-    invocation: {
-      toolCallId: string;
-      signal: AbortSignal | undefined;
-      onUpdate: unknown;
-      ctx: unknown;
-    },
-  ) => Promise<unknown>;
+  gateway: Pick<ToolInvocationGateway, "resolvePermission" | "invoke" | "canDelegateCapability">;
   log?: { warn?: (message: string) => void; log?: (message: string) => void };
+}
+
+const bridgeDelegatedTargets = new WeakMap<object, Map<string, Set<ToolTargetId>>>();
+const bridgeDelegatedTargetsByResolver = new WeakMap<object, Map<string, Set<ToolTargetId>>>();
+
+function delegatedCapabilityKey(capability: string, action: string): string {
+  return JSON.stringify([capability, action]);
 }
 
 function text(value: string) {
@@ -84,37 +77,6 @@ function schemaProperties(schema: unknown): Record<string, any> {
 function requiredNames(schema: unknown): string[] {
   const required = (schema as any)?.required;
   return Array.isArray(required) ? required.filter((name): name is string => typeof name === "string") : [];
-}
-
-function jsonTypeOf(value: unknown): string {
-  if (Array.isArray(value)) return "array";
-  if (value === null) return "null";
-  return typeof value;
-}
-
-/**
- * Structural check against the target's declared schema, run before any remote
- * call. This is a guard against wasted round trips and confusing server-side
- * errors, not a security boundary: the server remains the authority on its own
- * input. Only types the schema actually declares are enforced.
- */
-function validateArguments(schema: unknown, args: Record<string, unknown>): string[] {
-  const problems: string[] = [];
-  const properties = schemaProperties(schema);
-  for (const name of requiredNames(schema)) {
-    if (args[name] === undefined) problems.push(`缺少必填参数 ${name}`);
-  }
-  for (const [name, value] of Object.entries(args)) {
-    if (value === undefined) continue;
-    const declared = properties[name]?.type;
-    if (typeof declared !== "string") continue;
-    const actual = jsonTypeOf(value);
-    const ok = declared === "integer"
-      ? actual === "number" && Number.isInteger(value as number)
-      : actual === declared;
-    if (!ok) problems.push(`参数 ${name} 需要 ${declared}，收到 ${actual}`);
-  }
-  return problems;
 }
 
 function renderHit(entry: ToolCatalogEntry, schemaRequired?: string[]): string {
@@ -170,19 +132,13 @@ function callExample(entry: ToolCatalogEntry, schema: unknown): string {
   return JSON.stringify({ server: entry.serverId, tool: entry.name, arguments: example }, null, 2);
 }
 
-export function createBridgeTools({
-  catalog,
-  mcpCall,
-  resolveMcpPermission,
-  resolveBuiltinInvocation,
-  builtinCall,
-  log,
-}: BridgeToolDeps) {
+export function createBridgeTools({ catalog, gateway }: BridgeToolDeps) {
+  const delegatedTargets = new Map<string, Set<ToolTargetId>>();
   const searchTool = {
     name: SEARCH_TOOL_NAME,
     label: "Search MCP Tools",
     description:
-      "Search the extension tools provided by external MCP connectors. These are optional integrations with outside services, not your built-in abilities. Use it when a request needs an external system and you do not already have a loaded tool for it.",
+      "Search deferred tools supplied by MCP connectors and bundled plugins. Use it when you need a capability that is not already loaded.",
     parameters: Type.Object({
       query: Type.String({ description: "Keywords describing the capability you need." }),
       limit: Type.Optional(Type.Number({ description: "Maximum number of results, default 5." })),
@@ -200,11 +156,11 @@ export function createBridgeTools({
       });
       if (hits.length === 0) {
         return text(
-          `No matching external tool. Try different keywords, or use ${DESCRIBE_TOOL_NAME} if you already know a tool name.`,
+          `No matching connector or plugin tool. Try different keywords, or use ${DESCRIBE_TOOL_NAME} if you already know a tool name.`,
         );
       }
       const body = hits.map((hit) => renderHit(hit)).join("\n\n");
-      return text(`${hits.length} 个匹配的外部工具：\n\n${body}\n\n用 ${DESCRIBE_TOOL_NAME} 查看完整参数，再用 ${CALL_TOOL_NAME} 调用。`);
+      return text(`${hits.length} 个匹配的 connector/plugin 工具：\n\n${body}\n\n用 ${DESCRIBE_TOOL_NAME} 查看完整参数，再用 ${CALL_TOOL_NAME} 调用。`);
     },
   };
 
@@ -212,9 +168,10 @@ export function createBridgeTools({
     name: DESCRIBE_TOOL_NAME,
     label: "Describe MCP Tool",
     description:
-      "Show the full parameter schema and a call example for one tool provided by an external MCP connector. Use it before calling a tool you have not called yet in this conversation.",
+      "Show the full parameter schema for one deferred MCP connector or bundled plugin tool before calling it.",
     parameters: Type.Object({
       name: Type.String({ description: "Exact tool name, as returned by mcp_search_tools." }),
+      server: Type.Optional(Type.String({ description: "Server or source id used to disambiguate a shared name." })),
     }),
     sessionPermission: {
       resolveInvocation: () => ({
@@ -225,7 +182,18 @@ export function createBridgeTools({
     },
     execute: async (_id: string, params: any) => {
       const requested = String(params?.name ?? "");
-      const described = catalog.describe(requested);
+      const serverId = typeof params?.server === "string" && params.server.trim()
+        ? params.server.trim()
+        : "";
+      let described;
+      try {
+        described = catalog.describe(requested, serverId ? { serverId } : {});
+      } catch (error) {
+        if (isToolInvocationError(error) && error.code === "TARGET_AMBIGUOUS") {
+          return text(`Tool name ${requested} matches multiple sources. Provide server to choose one.`);
+        }
+        throw error;
+      }
       if (!described) {
         const suggestions = nearNames(catalog, requested);
         return text(suggestions.length > 0
@@ -249,7 +217,7 @@ export function createBridgeTools({
     name: CALL_TOOL_NAME,
     label: "Call MCP Tool",
     description:
-      "Call one tool provided by an external MCP connector, by server and tool name, with a JSON arguments object. Look the tool up with mcp_search_tools or mcp_describe_tool first so the arguments match its schema.",
+      "Call one deferred MCP connector or bundled plugin tool by server/source and tool name. Look it up first so the arguments match its schema.",
     parameters: Type.Object({
       server: Type.String({ description: "Server id that owns the tool." }),
       tool: Type.String({ description: "Tool name to invoke." }),
@@ -267,19 +235,27 @@ export function createBridgeTools({
       resolveInvocation: (params: any) => {
         const entry = resolveTarget(catalog, params?.server, params?.tool);
         if (!entry) return null;
-        if (entry.origin === "plugin") {
-          // A deferred builtin already owns a permission voice; speaking for it
-          // means repeating what it says, not restating it in MCP terms.
-          return resolveBuiltinInvocation?.(entry.name, params?.arguments ?? {}) ?? null;
-        }
-        const kind = resolveMcpPermission(entry.serverId, entry.toolName);
-        // No `target`: the invocation target vocabulary is a closed set that
-        // does not cover MCP tools, and the capability already names the tool
-        // exactly. The reviewer still sees server and tool in the call params.
+        const prepared = gateway.resolvePermission({
+          targetId: entry.targetId,
+          route: "deferred",
+          arguments: (params?.arguments ?? {}) as Record<string, unknown>,
+          lifecycleGeneration: entry.lifecycleGeneration,
+          toolCallId: `${CALL_TOOL_NAME}:permission`,
+        });
+        const resolvedEntry = catalog.getByTargetId(prepared.targetId);
+        if (!resolvedEntry) return null;
+        const key = delegatedCapabilityKey(prepared.permission.capability, prepared.permission.action);
+        const targetIds = delegatedTargets.get(key) ?? new Set<ToolTargetId>();
+        targetIds.add(prepared.targetId);
+        delegatedTargets.set(key, targetIds);
         return {
-          action: "invoke",
-          kind: kind === "read" ? "read" : "review",
-          capability: `${entry.name}.invoke`,
+          ...prepared.permission,
+          effectiveInvocation: {
+            targetId: prepared.targetId,
+            toolName: resolvedEntry.publicName,
+            arguments: prepared.arguments,
+            generation: prepared.lifecycleGeneration,
+          },
         };
       },
     },
@@ -297,46 +273,38 @@ export function createBridgeTools({
     ) => {
       const entry = resolveTarget(catalog, params?.server, params?.tool);
       if (!entry) {
-        const suggestions = nearNames(catalog, String(params?.tool ?? ""));
-        return text(suggestions.length > 0
-          ? `Tool not found: ${params?.tool} on server ${params?.server}. Closest matches: ${suggestions.join(", ")}.`
-          : `Tool not found: ${params?.tool} on server ${params?.server}. Use ${SEARCH_TOOL_NAME} to find the right name.`);
+        catalog.resolveTarget({
+          serverId: String(params?.server ?? ""),
+          toolName: String(params?.tool ?? ""),
+        });
       }
-
-      const rawArgs = params?.arguments;
-      if (rawArgs !== undefined && (typeof rawArgs !== "object" || rawArgs === null || Array.isArray(rawArgs))) {
-        return text(`arguments 必须是一个 JSON 对象，收到 ${jsonTypeOf(rawArgs)}。`);
-      }
-      const args = (rawArgs ?? {}) as Record<string, unknown>;
-
-      const described = catalog.describe(entry.publicName, { sourceId: entry.sourceId });
-      const problems = described?.schema ? validateArguments(described.schema, args) : [];
-      if (problems.length > 0) {
-        return text([
-          `${entry.name} 的参数不满足它的 schema，未发起调用：`,
-          ...problems.map((problem) => `- ${problem}`),
-          "",
-          `用 ${DESCRIBE_TOOL_NAME}("${entry.name}") 查看完整参数。`,
-        ].join("\n"));
-      }
-
-      try {
-        if (entry.origin === "plugin") {
-          if (!builtinCall) return text(`${entry.name} 当前不可调用。`);
-          return await builtinCall(entry.name, args, {
-            toolCallId,
-            signal,
-            onUpdate,
-            ctx,
-          }) as any;
-        }
-        return await mcpCall(entry.serverId, entry.toolName, args, ctx) as any;
-      } catch (error: any) {
-        log?.warn?.(`mcp_call ${entry.name} failed: ${error?.message || error}`);
-        return text(`调用 ${entry.name} 失败：${error?.message || String(error)}`);
-      }
+      const runtime = ctx && typeof ctx === "object" && !Array.isArray(ctx)
+        ? ctx as Record<string, unknown>
+        : {};
+      const stableRuntimeText = (key: string) => (
+        typeof runtime[key] === "string" && runtime[key].trim()
+          ? runtime[key].trim() as string
+          : null
+      );
+      return gateway.invoke({
+        targetId: entry!.targetId,
+        route: "deferred",
+        arguments: (params?.arguments ?? {}) as Record<string, unknown>,
+        sessionId: stableRuntimeText("sessionId"),
+        sessionPath: stableRuntimeText("sessionPath"),
+        agentId: stableRuntimeText("agentId"),
+        lifecycleGeneration: entry!.lifecycleGeneration,
+        toolCallId,
+        signal,
+        onUpdate,
+        ctx,
+        runtimeContext: ctx,
+      });
     },
   };
+
+  bridgeDelegatedTargets.set(callTool, delegatedTargets);
+  bridgeDelegatedTargetsByResolver.set(callTool.sessionPermission.resolveInvocation, delegatedTargets);
 
   return [searchTool, describeTool, callTool];
 }
@@ -344,30 +312,28 @@ export function createBridgeTools({
 /**
  * Authorize the bridge to speak for the tools it fronts.
  *
- * The predicate is deliberately a live catalog lookup rather than a pattern:
- * the bridge may only claim a capability belonging to a tool that is actually
- * in the catalog right now. A tool that leaves the catalog immediately stops
- * being claimable, and no capability outside the catalog is ever accepted.
+ * The gateway checks the capability against the authoritative target registry;
+ * the catalog's display strings are never treated as proof of ownership.
  *
  * Registration is keyed on the tool object itself, so this must be called with
  * the same objects createBridgeTools returned, before they are wrapped.
  */
 export function registerBridgeCapabilityDelegates(
   tools: readonly any[],
-  {
-    catalog,
-    canDelegateCapability,
-  }: {
-    catalog: ToolCatalog;
-    canDelegateCapability?: (capability: string, action: string) => boolean;
-  },
+  { gateway }: { gateway: Pick<ToolInvocationGateway, "canDelegateCapability"> },
 ): void {
   const callTool = tools.find((tool) => tool?.name === CALL_TOOL_NAME);
   if (!callTool) return;
+  const resolver = callTool?.sessionPermission?.resolveInvocation;
+  const delegatedTargets = bridgeDelegatedTargets.get(callTool)
+    ?? (resolver && typeof resolver === "function"
+      ? bridgeDelegatedTargetsByResolver.get(resolver)
+      : undefined);
   registerToolCapabilityDelegate(callTool, (capability, action) => {
-    if (canDelegateCapability?.(capability, action) === true) return true;
-    const suffix = `.${action}`;
-    if (!capability.endsWith(suffix)) return false;
-    return catalog.has(capability.slice(0, -suffix.length));
+    const targetIds = delegatedTargets?.get(delegatedCapabilityKey(capability, action));
+    if (!targetIds || targetIds.size === 0) return false;
+    return [...targetIds].some((targetId) => (
+      gateway.canDelegateCapability(targetId, capability, action)
+    ));
   });
 }
