@@ -30,8 +30,8 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
 });
 
-afterEach(() => {
-  for (const manager of managers.splice(0)) manager.close();
+afterEach(async () => {
+  for (const manager of managers.splice(0)) await manager.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
   vi.useRealTimers();
 });
@@ -321,7 +321,7 @@ describe("Knowledge 源文件 watch", () => {
     expect(jobs).toHaveLength(2);
     const watchJob = jobs.find((job) => job.id !== importJob.id)!;
     expect(watchJob.status).toBe("queued");
-    expect(watchJob.phase).toBe("parse");
+    expect(watchJob.phase).toBe("chunk");
     // refresh 内 parse 成功，job 绑定新解析产物（与导入时的产物不同）。
     expect(watchJob.artifactId).toBeTruthy();
     expect(watchJob.artifactId).not.toBe(importJob.artifactId);

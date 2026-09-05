@@ -10,7 +10,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+import { KnowledgeManager } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 import { KnowledgeError } from "../lib/knowledge/errors.ts";
 
 const tempDirs: string[] = [];
@@ -22,8 +22,8 @@ function tempHome() {
   return dir;
 }
 
-afterEach(() => {
-  for (const manager of managers.splice(0)) manager.close();
+afterEach(async () => {
+  for (const manager of managers.splice(0)) await manager.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
 

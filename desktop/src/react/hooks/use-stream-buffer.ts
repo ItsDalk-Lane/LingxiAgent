@@ -30,6 +30,7 @@ import {
   normalizeContentBlocks,
 } from '../utils/content-semantics';
 import { projectAssistantTurn } from '../utils/turn-projector';
+import { KNOWLEDGE_RESEARCH_TOOL_NAMES } from '../utils/tool-label';
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- 流式消息 handle(msg) 接收动态 JSON */
 
@@ -644,6 +645,38 @@ class StreamBufferManager {
 
   // ── 公开事件处理器 ──
 
+  isRunActive(sessionPath: string): boolean {
+    return this.lookupBuffer(sessionPath)?.runActive === true;
+  }
+
+  /** 研究卡可以跨过并行旧回答的结束点，始终按原身份更新，不增建消息或普通工具。 */
+  updateKnowledgeResearchToolProgress(sessionPath: string, id: string, args: Record<string, unknown>, resultNote?: string,
+    status?: 'running' | 'succeeded' | 'failed' | 'unknown'): void {
+    const buf = this.lookupBuffer(sessionPath);
+    const matches = (blocks: readonly ContentBlock[]) => blocks.some(block => block.type === 'tool_group'
+      && block.tools.some(tool => tool.id === id && KNOWLEDGE_RESEARCH_TOOL_NAMES.has(tool.name)));
+    const update = (message: ChatMessage): ChatMessage => ({
+      ...message,
+      blocks: (message.blocks || []).map(block => {
+        if (block.type !== 'tool_group' || !block.tools.some(tool => tool.id === id && KNOWLEDGE_RESEARCH_TOOL_NAMES.has(tool.name))) return block;
+        const tools = block.tools.map(tool => tool.id !== id || !KNOWLEDGE_RESEARCH_TOOL_NAMES.has(tool.name) ? tool : {
+          ...tool, args, ...(resultNote !== undefined ? { resultNote } : {}),
+          ...(status ? { status, done: status !== 'running', success: status === 'succeeded' } : {}),
+        });
+        return { ...block, tools, ...(status ? { collapsed: tools.length > 1 && tools.every(tool => tool.done) } : {}) };
+      }),
+    });
+    if (buf?.messageId && matches(buf.blocks)) {
+      this.publishBoundary(buf, update);
+      return;
+    }
+    // 旧主回答已经提交时，原卡在会话消息中；不可对空缓冲发送结束事件。
+    const store = useStore.getState();
+    const session = sessionScopedValue(store, store.chatSessions, sessionPath);
+    const item = session?.items.find(item => item.type === 'message' && item.data.role === 'assistant' && matches(item.data.blocks || []));
+    if (item?.type === 'message' && store.updateMessageById(sessionPath, item.data.id, update)) bumpMessageLiveVersion(sessionPath);
+  }
+
   handle(msg: any): void {
     const sessionPath = msg.sessionPath;
     if (!sessionPath) {
@@ -814,8 +847,12 @@ class StreamBufferManager {
           while (lastTg >= 0 && blocks[lastTg].type !== 'tool_group') lastTg--;
           if (lastTg >= 0 && blocks[lastTg].type === 'tool_group') {
             const tg = blocks[lastTg] as Extract<ContentBlock, { type: 'tool_group' }>;
-            // 如果上一个 group 里还有未完成的工具，追加到同一个 group
-            if (tg.tools.some(t => !t.done)) {
+            const isResearchCard = KNOWLEDGE_RESEARCH_TOOL_NAMES.has(msg.name);
+            // 只合并连续到达的同类在途工具，不能跨过思考段，也不能混入研究状态卡。
+            if (lastTg === blocks.length - 1
+              && tg.processOrder === buf.nextProcessOrder - 1
+              && tg.tools.every(tool => KNOWLEDGE_RESEARCH_TOOL_NAMES.has(tool.name) === isResearchCard)
+              && tg.tools.some(t => !t.done)) {
               blocks[lastTg] = {
                 ...tg,
                 tools: [...tg.tools, toolCallFromStartEvent(msg)],

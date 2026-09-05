@@ -1,170 +1,140 @@
 {
   "schemaVersion": 1,
-  "tag": "v0.1.33",
-  "version": "0.1.33",
-  "previousTag": "v0.1.32",
-  "generatedAt": "2026-09-01T18:14:43.000Z",
+  "tag": "v0.1.34",
+  "version": "0.1.34",
+  "previousTag": "v0.1.33",
+  "generatedAt": "2026-09-05T02:26:52.934Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "模型调用全面统一：每条调用有稳定的业务来源身份，助手消息与调用持久关联，调用详情全屏化且长载荷自动并行展示；观测持久化默认全开，设置页只保留保留天数。聊天支持直接上传视频（魔数/大小/数量校验，按供应商自动适配传输格式）。记忆系统升级：用户原则（tenets）审批沉淀、导航索引注入、事实语义检索与经验反馈。新增观测轨迹详情页与轨迹列表会话过滤；新建聊天继承当前工作台。",
-    "en": "Model calls are now unified: every call carries a stable business source identity, assistant messages are persistently linked to their calls, and the call inspector goes full-screen with automatic parallel plain-text rendering of large payloads. Observability persistence is on by default, and its settings page keeps only the retention window. Chat now accepts direct video uploads (magic-number/size/count validation, transport format adapted per provider). The memory system gains tenets (approved user principles), a navigation index, semantic fact retrieval, and experience feedback. Adds the observability trace detail page with session-level list filtering; new chats inherit the current workspace."
+    "zh": "知识库提问改为当前聊天模型连续查阅，支持多次搜索、阅读和补查；回答使用数字引用并提供原文悬浮预览。章节检索与分块设置更可靠，同时修复研究初始化、模型继承以及后台停止和会话收尾问题。",
+    "en": "Knowledge conversations now use repeated search and reading in the current chat, with numbered citations and hover previews of source text. This release improves chapter retrieval and chunk settings, and fixes research initialization, model inheritance, background shutdown and chat cancellation cleanup."
   },
   "counts": {
-    "feature": 4,
-    "fix": 0,
+    "feature": 2,
+    "fix": 2,
     "improvement": 1,
-    "migration": 1
+    "migration": 0
   },
   "source": {
     "owner": "ItsDalk-Lane",
     "repo": "LingxiAgent",
-    "commitRange": "v0.1.32..HEAD",
-    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.33",
+    "commitRange": "v0.1.33..HEAD",
+    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.34",
     "releaseNotes": ""
   },
   "items": [
     {
-      "id": "feat-model-call-unification",
+      "id": "knowledge-continuous-reading",
       "kind": "feature",
       "importance": "high",
       "title": {
-        "zh": "模型调用统一：来源身份与全屏调用详情",
-        "en": "Unified model calls: source identity and full-screen call inspector"
+        "zh": "知识问答支持连续查阅",
+        "en": "Continuous knowledge conversations"
       },
       "summary": {
-        "zh": "每条模型调用现在有稳定的来源身份，界面按「业务标题 + 类型标签」显示它来自哪次会话提问或后台任务；助手消息与调用的关联持久化并在历史加载时按编号归并，不再依赖进程内存。调用详情改为全屏视图：长载荷自动并行展示为纯文本，技术信息默认收起。",
-        "en": "Every model call now carries a stable source identity, shown as a business title plus a type badge telling which conversation turn or background task it came from; assistant-message links are persisted and merged by call number on history load instead of living only in process memory. The call inspector is now full-screen: large payloads render automatically as parallel plain text and technical details stay collapsed by default."
+        "zh": "当前聊天模型可以围绕问题多次搜索、阅读原文和补查缺口，再组织回答；知识库引用不再要求选择快速或详细模式。",
+        "en": "The current chat model can search, read source text and fill evidence gaps through repeated tool calls before composing its answer. Knowledge references no longer require choosing fast or detailed mode."
       },
-      "details": [
+      "details": [],
+      "sources": [
         {
-          "zh": "观测持久化默认全开，产品偏好不再提供关闭开关；设置页只保留保留天数，旧客户端的关闭值会被拒绝。",
-          "en": "Observability persistence is on by default with no product-facing off switch; the settings page keeps only the retention window, and false values from old clients are rejected."
+          "type": "commit",
+          "ref": "31afdea0",
+          "title": "Improve knowledge retrieval modes and streaming progress"
+        }
+      ]
+    },
+    {
+      "id": "knowledge-citation-preview",
+      "kind": "feature",
+      "importance": "high",
+      "title": {
+        "zh": "数字引用与原文悬浮预览",
+        "en": "Numbered citations with source previews"
+      },
+      "summary": {
+        "zh": "回答中的引用以数字角标展示，将鼠标移到引用上即可查看对应的已保存原文和来源名称；引用读取失败时可重试。",
+        "en": "Answers display numbered citations. Hovering shows the saved source excerpt and filename, with retry support when an excerpt cannot be loaded."
+      },
+      "details": [],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "31afdea0",
+          "title": "Improve knowledge retrieval modes and streaming progress"
+        }
+      ]
+    },
+    {
+      "id": "knowledge-chapter-retrieval",
+      "kind": "improvement",
+      "importance": "high",
+      "title": {
+        "zh": "章节检索和分块设置更可靠",
+        "en": "More reliable chapter retrieval and chunk settings"
+      },
+      "summary": {
+        "zh": "检索结合资料、章节和正文线索并补查遗漏；分块大小设置实际参与切分，保持章节边界及精确引用位置。旧分块和向量索引仍可读取。",
+        "en": "Retrieval combines source, chapter and passage signals with an additional pass for missed passages. Chunk-size settings now affect splitting while preserving chapter boundaries and citation offsets; existing chunk and vector indexes remain readable."
+      },
+      "details": [],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "31afdea0",
+          "title": "Improve knowledge retrieval modes and streaming progress"
+        }
+      ]
+    },
+    {
+      "id": "knowledge-stop-close",
+      "kind": "fix",
+      "importance": "high",
+      "title": {
+        "zh": "修复知识后台停止与会话收尾",
+        "en": "Fix knowledge shutdown and cancellation cleanup"
+      },
+      "summary": {
+        "zh": "删除或停止资料处理后，后台先结束在途任务再释放资源，避免取消任务被重新派发；关闭时立即使查询缓存失效，停止聊天后不再把旧停止状态带到下一次发送。",
+        "en": "Deletion and shutdown wait for active processing to finish before releasing resources and prevent cancelled jobs from being dispatched again. Closing immediately invalidates query caches, and stopping a chat no longer leaves cancellation state on the next submission."
+      },
+      "details": [],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "31afdea0",
+          "title": "Improve knowledge retrieval modes and streaming progress"
         },
         {
-          "zh": "观测数据库升级到 schema v4（增量迁移，旧调用不改写；来源快照不含正文）。",
-          "en": "The observability database upgrades to schema v4 (additive migration; existing calls untouched, source snapshots store no content)."
-        }
-      ],
-      "sources": [
-        {
           "type": "commit",
-          "ref": "ea03c627",
-          "title": "feat(observability): 模型调用统一（来源身份+调用引用+详情全屏+观测全开）+ 视频上传闭环 + 工作台继承"
+          "ref": "004cdafd",
+          "title": "Close cancellation state and align continuous reading contracts"
         }
       ]
     },
     {
-      "id": "feat-chat-video-upload",
-      "kind": "feature",
+      "id": "knowledge-research-runtime",
+      "kind": "fix",
       "importance": "high",
       "title": {
-        "zh": "聊天视频上传",
-        "en": "Video uploads in chat"
+        "zh": "修复研究会话初始化与模型继承",
+        "en": "Fix research session initialization and model inheritance"
       },
       "summary": {
-        "zh": "发送框现在可以直接选择并上传视频文件，与图片、音频一致；上传前做魔数、大小与数量三段式校验，并按当前供应商自动适配传输格式（inline data 与多家 video_url 兼容路径）。",
-        "en": "The composer now accepts video files alongside images and audio; uploads pass magic-number, size, and count validation before leaving the browser, and the transport format is adapted per provider (inline data and several video_url compat paths)."
-      },
-      "details": [
-        {
-          "zh": "消息流内视频以海报缩略图加播放角标展示，点开进入媒体查看器播放；播放失败时给出可重试的错误卡片。",
-          "en": "Videos in the message stream render as a poster thumbnail with a play badge and open in the media viewer; playback failures show a retryable error card."
-        }
-      ],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "ea03c627",
-          "title": "feat(observability): 模型调用统一（来源身份+调用引用+详情全屏+观测全开）+ 视频上传闭环 + 工作台继承"
-        }
-      ]
-    },
-    {
-      "id": "feat-memory-system-upgrade",
-      "kind": "feature",
-      "importance": "high",
-      "title": {
-        "zh": "记忆系统升级：原则层、导航与语义检索",
-        "en": "Memory upgrade: tenets, navigation, and semantic retrieval"
-      },
-      "summary": {
-        "zh": "新增用户原则层（tenets）：助手可在对话中提出原则，经你审批后长期注入新会话；记忆库新增导航索引并在编译时注入上下文，事实检索升级为关键词与语义向量融合召回，检索不到时给出零结果诊断；👍/👎 评分会沉淀为经验反馈供后续参考。",
-        "en": "Adds a tenets layer: the assistant can propose principles mid-conversation which, once you approve them, are injected into new sessions; the memory store gains a navigation index injected at compile time, fact retrieval now fuses keyword and semantic-vector recall, empty results get a diagnosis, and 👍/👎 ratings feed an experience store for future turns."
-      },
-      "details": [
-        {
-          "zh": "tenets 管理入口在设置页，可随时停用或删除；停用后不再注入。",
-          "en": "Tenets are managed in settings and can be deactivated or deleted at any time; deactivated tenets stop being injected."
-        }
-      ],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "20a9e944",
-          "title": "feat(memory): 记忆系统升级（tenets/导航节/语义检索/经验反馈）+ 观测轨迹详情页 + 迁移#54"
-        }
-      ]
-    },
-    {
-      "id": "feat-observability-trace-detail",
-      "kind": "feature",
-      "importance": "medium",
-      "title": {
-        "zh": "观测轨迹详情页",
-        "en": "Observability trace detail page"
-      },
-      "summary": {
-        "zh": "轨迹列表新增按会话聚合的过滤（只看发生过多次调用的会话），并新增轨迹详情页：时间线、调用瀑布与载荷快照一屏可读，宽窄屏均已适配。",
-        "en": "The trace list gains a session-aggregated filter (only sessions with repeated calls), plus a new trace detail page: timeline, call waterfall, and payload snapshots readable in one view, adapted to both wide and narrow layouts."
+        "zh": "修复研究会话尚未开始调用模型就初始化失败的问题，并让同一助手的研究会话使用父聊天实际选择的模型；研究失败保留具体原因，方便排查。",
+        "en": "Fixes research-session initialization failures before the first model call. Research under the same assistant inherits the model actually selected in the parent chat, and failures retain attributable diagnostics."
       },
       "details": [],
       "sources": [
         {
           "type": "commit",
-          "ref": "20a9e944",
-          "title": "feat(memory): 记忆系统升级（tenets/导航节/语义检索/经验反馈）+ 观测轨迹详情页 + 迁移#54"
-        }
-      ]
-    },
-    {
-      "id": "improvement-workspace-inheritance",
-      "kind": "improvement",
-      "importance": "medium",
-      "title": {
-        "zh": "新建聊天继承当前工作台",
-        "en": "New chats inherit the current workspace"
-      },
-      "summary": {
-        "zh": "在某个工作台下新建聊天时，新聊天归属该工作台，不再总是回到默认工作台。",
-        "en": "Creating a chat while inside a workspace now files the new chat under that workspace instead of always falling back to the default one."
-      },
-      "details": [],
-      "sources": [
+          "ref": "c9353fc6",
+          "title": "Fix isolated research extension runtime"
+        },
         {
           "type": "commit",
-          "ref": "ea03c627",
-          "title": "feat(observability): 模型调用统一（来源身份+调用引用+详情全屏+观测全开）+ 视频上传闭环 + 工作台继承"
-        }
-      ]
-    },
-    {
-      "id": "migration-54-utility-dead-keys",
-      "kind": "migration",
-      "importance": "low",
-      "title": {
-        "zh": "清理历史配置死键",
-        "en": "Clean up legacy config dead keys"
-      },
-      "summary": {
-        "zh": "自动清理早期版本残留在本地配置中的 utility_model / utility_large_model 死键，避免「已配置辅助模型」的错觉（该槽位实际读取新键名）。",
-        "en": "Automatically removes the utility_model / utility_large_model dead keys left in local config by early builds, eliminating the illusion of a configured helper model (the slot actually reads its new key names)."
-      },
-      "details": [],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "20a9e944",
-          "title": "feat(memory): 记忆系统升级（tenets/导航节/语义检索/经验反馈）+ 观测轨迹详情页 + 迁移#54"
+          "ref": "31afdea0",
+          "title": "Improve knowledge retrieval modes and streaming progress"
         }
       ]
     }

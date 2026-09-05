@@ -7,7 +7,7 @@ export interface KnowledgeModelRefDto {
 
 /**
  * 笔记本级配置（v8 语义）：模型引用 null = 未配置（检索降级纯全文）；
- * chunkTargetChars null = 自动分块（遗留显式值仍生效）；retrievalTopK
+ * chunkTargetChars null = 使用默认字符目标；显式值控制片段正文大小；retrievalTopK
  * null = 无上限召回。
  */
 export interface KnowledgeNotebookConfigDto {
@@ -36,7 +36,7 @@ export interface KnowledgeNotebookDto {
   updatedAt: string;
   deletedAt: string | null;
   config: KnowledgeNotebookConfigDto;
-  /** 生效分块尺寸（遗留显式列 > 嵌入模型上下文 ×80% 自动值），设置弹窗只读展示。 */
+  /** 当前生效的分块字符目标。 */
   chunkTargetCharsEffective?: number | null;
   sourceCount: number;
   ingestion: KnowledgeNotebookIngestionDto;
@@ -208,6 +208,7 @@ export async function updateKnowledgeNotebookSettings(
   settings: {
     embeddingModelRef?: KnowledgeModelRefDto | null;
     rerankModelRef?: KnowledgeModelRefDto | null;
+    chunkTargetChars?: number | null;
     retrievalTopK?: number | null;
     vectorRetentionDays?: number | null;
   },

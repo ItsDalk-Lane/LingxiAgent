@@ -45,6 +45,7 @@
  * - 签名后立即用"将被打包的 keyset"做一次 verify：构建期就证明这颗 seed
  *   能被最终产物验证通过，密钥/keyset 不匹配在构建机上炸，不留到用户首启。
  */
+import { assertKnowledgeVectorRuntime } from "./build-server-runtime-assets.mjs";
 import { execFileSync } from "child_process";
 import crypto from "crypto";
 import fs from "fs";
@@ -363,6 +364,7 @@ function requireSignKeyPath(env) {
  * @returns {Promise<{archivePath: string, archiveName: string, sha256: string, size: number}>}
  */
 export async function packServerArchive({ outDir, artifactOutDir, version, platform, arch, env = process.env, log = console.log, deps = {} }) {
+  assertKnowledgeVectorRuntime(outDir, platform, arch);
   const {
     signMachOFiles = defaultSignMachOFiles,
     smokeTestNodeStartup = defaultSmokeTestNodeStartup,

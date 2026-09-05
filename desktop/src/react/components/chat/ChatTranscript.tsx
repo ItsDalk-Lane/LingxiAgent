@@ -16,6 +16,7 @@ import type {
   SessionNodeTarget,
 } from '../../stores/message-turn-actions';
 import { recordChatPerformance } from '../../utils/chat-performance';
+import { KnowledgeCitationProvider } from './knowledge-citation-scope';
 
 interface Props {
   items: ChatListItem[];
@@ -105,7 +106,7 @@ export const ChatTranscript = memo(function ChatTranscript({
   );
 
   return (
-    <>
+    <KnowledgeCitationProvider items={items} sessionPath={sessionPath}>
       {renderItems.map((renderItem) => (
         <TranscriptRenderItemView
           key={renderItemKey(renderItem)}
@@ -132,7 +133,7 @@ export const ChatTranscript = memo(function ChatTranscript({
           onForkCreated={onForkCreated}
         />
       ))}
-    </>
+    </KnowledgeCitationProvider>
   );
 });
 

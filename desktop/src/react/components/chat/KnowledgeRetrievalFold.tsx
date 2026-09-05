@@ -11,6 +11,7 @@
  *   行 title 悬浮 `{sourceName} · 块 {chunkOrdinal}`。
  * - 滚动注入（2026-08-31）：rollup 携带分批阅读统计与模型自主补充检索的
  *   查询行（过程留痕，历史可见）；distilled 徽标仅为旧会话存量 stats 渲染。
+ * - 详细调查从持久化统计恢复轮数、检索、阅读和需求完成情况，缺失数字显示未知。
  * 视觉复用 ToolGroupBlock 的工具条 class，不另起卡片形态。
  */
 
@@ -18,6 +19,7 @@ import { memo, useCallback, useState } from 'react';
 import { Collapse } from '@/ui';
 import type { KnowledgeRetrievalStats } from '../../../../../shared/knowledge-refs.ts';
 import styles from './Chat.module.css';
+import { knowledgeResearchStopNote } from '../../utils/knowledge-research-status';
 
 interface Props {
   retrieval: KnowledgeRetrievalStats;
@@ -34,6 +36,11 @@ function isRetrievalResult(value: unknown): value is RetrievalResult {
     && typeof (value as { firstLine?: unknown }).firstLine === 'string';
 }
 
+/** 历史数据缺失时保留未知，不能用零冒充实际调用次数。 */
+function researchCount(value: unknown): number | '?' {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : '?';
+}
+
 export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ retrieval }: Props) {
   const t = window.t ?? ((key: string) => key);
   const [expanded, setExpanded] = useState(false);
@@ -42,6 +49,15 @@ export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ ret
   const showMore = useCallback(() => setShowAll(true), []);
 
   const unavailable = !!retrieval.unavailableReason;
+  const localFast = retrieval.executionPath === 'fast_local';
+  const research = retrieval.research;
+  const researchTotal = researchCount(research?.needsTotal);
+  const pending = Array.isArray(research?.unresolvedNeedIds)
+    && research.unresolvedNeedIds.every(id => typeof id === 'string' && id.length > 0)
+    ? new Set(research.unresolvedNeedIds).size : '?';
+  // 宿主已确认不适用的问题也算完成，不能仅凭有支持证据的数量扣除缺口。
+  const researchCompleted = typeof researchTotal === 'number' && typeof pending === 'number' && pending <= researchTotal
+    ? researchTotal - pending : '?';
   const results = Array.isArray(retrieval.results)
     ? retrieval.results.filter(isRetrievalResult)
     : [];
@@ -50,9 +66,23 @@ export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ ret
   const expandable = !unavailable && (results.length > 0 || supplementalQueries.length > 0);
   const summary = unavailable
     ? t('chat.knowledgeRetrievalUnavailable')
-    : t('chat.knowledgeRetrievalSearched', { n: retrieval.injectedChunks });
+    : localFast
+      ? t('chat.knowledgeFastSummary', { n: retrieval.injectedChunks,
+        ms: typeof retrieval.stageTimings?.totalMs === 'number' && Number.isFinite(retrieval.stageTimings.totalMs)
+          ? Math.round(retrieval.stageTimings.totalMs) : '—' })
+      : research?.status === 'completed'
+        ? t('chat.knowledgeResearchSummary', { rounds: researchCount(research.rounds),
+          searches: researchCount(retrieval.searchCalls), reads: researchCount(retrieval.readCalls),
+          completed: researchCompleted, total: researchTotal })
+        : research?.status === 'partial'
+          ? t('chat.knowledgeResearchPartialSummary', { rounds: researchCount(research.rounds), pending })
+          : t('chat.knowledgeRetrievalSearched', { n: retrieval.injectedChunks });
   const preview = showAll ? results : results.slice(0, KNOWLEDGE_RESULTS_PREVIEW_COUNT);
   const hiddenCount = results.length - preview.length;
+  const stopNote = knowledgeResearchStopNote(research?.stopReason, t);
+
+  // 统一聊天的初始统计只表示资料范围已准备，实际检索由真实工具卡展示。
+  if (retrieval.executionPath === 'conversation' && !unavailable) return null;
 
   return (
     <div className={styles.toolGroup} data-testid="knowledge-retrieval-fold">
@@ -61,7 +91,10 @@ export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ ret
         onClick={expandable ? toggle : undefined}
       >
         <span className={styles.knowledgeRetrievalIcon} aria-hidden="true">📚</span>
-        <span className={styles.toolGroupTitle}>{summary}</span>
+        <span className={styles.toolGroupTitle}>{summary}{stopNote ? ` · ${stopNote}` : ''}</span>
+        {localFast && retrieval.deadlineExceeded && !unavailable && (
+          <span className={styles.knowledgeRetrievalBadge}>{t('chat.knowledgeFastDeadlineExceeded')}</span>
+        )}
         {rollup && !unavailable && (
           <span className={styles.knowledgeRetrievalBadge}>
             {t('chat.knowledgeRetrievalRolled', { parts: rollup.parts, rounds: rollup.rounds })}
@@ -72,9 +105,9 @@ export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ ret
             {t('chat.knowledgeRetrievalDistilled', { n: retrieval.distillBatches ?? 0 })}
           </span>
         )}
-        {retrieval.truncated && !unavailable && (
+        {retrieval.truncated && !localFast && !unavailable && (
           <span className={styles.knowledgeRetrievalBadge}>
-            {t('chat.knowledgeRetrievalTruncated')}
+            {t(research ? 'chat.knowledgeResearchTruncated' : 'chat.knowledgeRetrievalTruncated')}
           </span>
         )}
         {expandable && (

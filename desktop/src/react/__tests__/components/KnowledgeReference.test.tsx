@@ -44,8 +44,8 @@ describe('knowledge reference UI', () => {
         'input.knowledgeModeDetailed': '详细',
         'input.knowledgeModeQa': '问答',
         'input.knowledgeModeAssist': '辅助',
-        'input.knowledgeModeFastHint': '以最快速度回答：只取最相关的高命中证据',
-        'input.knowledgeModeDetailedHint': '尽量详尽：拆解问题、多路召回，分批阅读后综合回答',
+        'input.knowledgeModeFastHint': '纯本地快速检索；不等待远程嵌入、重排或多轮调查。',
+        'input.knowledgeModeDetailedHint': '进行多轮检索、阅读和证据核对后生成详细回答。',
         'input.knowledgeModeQaHint': '严格基于检索内容回答，超出范围会明说',
         'input.knowledgeModeAssistHint': '检索内容作为参考，回答可结合对话与常识',
         'input.knowledgeRemoveNotebook': `移除知识库引用 ${params?.name ?? ''}`,
@@ -128,7 +128,7 @@ describe('knowledge reference UI', () => {
     expect(screen.getByRole('button', { name: '知识库' })).toBeDisabled();
   });
 
-  it('引用条渲染已引用笔记本 chip 与模式切换，× 移除单个引用', async () => {
+  it('引用条渲染已引用笔记本 chip，不显示旧模式切换，× 移除单个引用', async () => {
     useStore.setState({
       knowledgeRefsBySession: {
         [SESSION]: { notebookIds: ['nb-1', 'nb-2'], notebookNames: { 'nb-1': '产品笔记' }, mode: 'fast' },
@@ -140,12 +140,8 @@ describe('knowledge reference UI', () => {
     expect(await screen.findByText('小说资料')).toBeInTheDocument();
     expect(screen.getByText('产品笔记')).toBeInTheDocument();
 
-    const fastBtn = screen.getByRole('button', { name: '快速' });
-    const detailedBtn = screen.getByRole('button', { name: '详细' });
-    expect(fastBtn).toHaveAttribute('aria-pressed', 'true');
-    fireEvent.click(detailedBtn);
-    expect(selectKnowledgeRefsForSession(useStore.getState(), SESSION)?.mode).toBe('detailed');
-    expect(detailedBtn).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.queryByRole('button', { name: '快速' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '详细' })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByLabelText('移除知识库引用 产品笔记'));
     expect(selectKnowledgeRefsForSession(useStore.getState(), SESSION)?.notebookIds).toEqual(['nb-2']);

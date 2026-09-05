@@ -44,6 +44,12 @@
     "sendFailed": "发送失败"
   },
   "knowledge": {
+    "citationRetry": "重新加载",
+    "citationNumber": "引用 {number}，悬停查看原文，按回车打开",
+    "citationLoading": "正在加载原文…",
+    "citationFailed": "原文暂时无法加载，资料可能已移除或连接不可用。",
+    "citationSource": "知识资料",
+    "citationTitle": "引用原文",
     "tab": "知识",
     "title": "知识库",
     "newNotebook": "新建笔记本",
@@ -114,7 +120,7 @@
     "settingsRerankHint": "本笔记本专属；仅影响查询排序，不触发重建",
     "settingsGlobalNotConfigured": "未配置",
     "settingsChunkTargetChars": "分块大小（字符）",
-    "settingsChunkHint": "按嵌入模型上下文窗口 ×80% 自动计算（1 token = 1 字符口径）；换嵌入模型后自动重建",
+    "settingsChunkHint": "按字符数设置片段目标，优先保留句段和章节边界。留空使用默认 2048 字符。保存后后台重建，已有回答的引用保留。",
     "settingsInvalidNumber": "请输入 {min}–{max} 之间的整数",
     "selectSource": "选择一个来源查看解析内容",
     "ingestionQueued": "排队中",
@@ -130,7 +136,7 @@
     "readinessProcessing": "{count} 摄入中",
     "readinessPendingEmbedding": "{count} 待嵌入",
     "readinessFailed": "{count} 失败",
-    "settingsChunkAutoFallback": "自动（约 6553）",
+    "settingsChunkAutoFallback": "默认（2048 字符）",
     "settingsVectorRetention": "向量保留策略",
     "settingsRetentionKeepForever": "永久保留（默认）",
     "settingsRetentionDaysMode": "天数后清理",
@@ -406,6 +412,13 @@
     "back": "返回"
   },
   "chat": {
+    "knowledgeResearchInterrupted": "调查已中断",
+    "knowledgeResearchStopIncomplete": "调查流程未正常收尾",
+    "knowledgeResearchStopUnavailable": "调查所需工具不可用",
+    "knowledgeResearchStopNoProgress": "继续调查未获得新证据",
+    "knowledgeResearchStopRounds": "已达到调查轮数上限",
+    "knowledgeResearchStopTime": "调查时间已用完",
+    "knowledgeResearchStopTools": "共享工具调用次数已用完",
     "find": {
       "locateFailed": "未能定位到该消息",
       "placeholder": "在会话中查找"
@@ -480,6 +493,16 @@
     "knowledgeRetrievalSupplementTitle": "滚动注入循环中模型自主发起的补充检索",
     "knowledgeTraceResults": "{n} 个搜索结果",
     "knowledgeTraceFailed": "检索失败",
+    "knowledgeLocalEvidenceFound": "已找到 {n} 条证据 · {ms}ms",
+    "knowledgeFastSummary": "快速检索 · {n} 条证据 · {ms}ms",
+    "knowledgeFastDeadlineExceeded": "已超出目标时限",
+    "knowledgeResearchSummary": "详细调查 · {rounds} 轮 · {searches} 次检索 · {reads} 次阅读 · {completed}/{total} 项完成",
+    "knowledgeResearchPartialSummary": "详细调查未完全完成 · {rounds} 轮 · 仍有 {pending} 项待确认",
+    "knowledgeResearchProgress": "已完成 {completed}/{total} 个证据问题",
+    "knowledgeResearchCancelled": "详细调查已取消",
+    "knowledgeResearchTruncated": "部分证据未纳入",
+    "knowledgeResearchFailed": "详细调查失败",
+    "knowledgeResearchReviewCounts": "{conflicts} 项矛盾 · {pending} 项待确认",
     "knowledgeMetaModeFast": "快速模式",
     "knowledgeMetaModeDetailed": "详细模式",
     "feedbackUp": "有帮助（记入经验库）",
@@ -620,8 +643,8 @@
     },
     "knowledgeModeFast": "快速",
     "knowledgeModeDetailed": "详细",
-    "knowledgeModeFastHint": "以最快速度回答：只取最相关的高命中证据，不做全量拆解与滚动阅读",
-    "knowledgeModeDetailedHint": "尽量详尽：拆解问题、多路召回，证据过多时分批阅读后综合回答"
+    "knowledgeModeFastHint": "纯本地快速检索；不等待远程嵌入、重排或多轮调查。",
+    "knowledgeModeDetailedHint": "进行多轮检索、阅读和证据核对后生成详细回答。"
   },
   "agentReview": {
     "running": "正在审阅当前对话",
@@ -840,6 +863,10 @@
     "active": "思考中"
   },
   "toolGroup": {
+    "mixedCount": "{tools} 次工具调用 · {steps} 个调查步骤",
+    "researchRunning": "{n} 个调查步骤进行中",
+    "researchCountWithFail": "{total} 个调查步骤（{fail} 个未完成）",
+    "researchCount": "{n} 个调查步骤",
     "success": "✿ {name} 忙完了，小事一桩～ · {n} 步",
     "failed": "⚠ 好像出了点问题 · {n} 步",
     "countWithFail": "{total} 个工具（{fail} 个失败）",
@@ -858,9 +885,10 @@
     }
   },
   "processFold": {
+    "research": "{n} 个调查步骤",
     "summary": "✨ {name}忙活了一阵子",
     "tools": "{n} 个工具",
-    "knowledge": "{n} 次检索",
+    "knowledge": "{n} 份知识资料",
     "thinking": "{n} 次思考",
     "unsuccessful": "{n} 次尝试未成功"
   },
@@ -1215,10 +1243,15 @@
       "done": "🧠 拆解了问题",
       "failed": "🧠 问题没拆解出来"
     },
+    "knowledge_local_search": {
+      "running": "正在本地检索知识库",
+      "done": "已完成本地检索",
+      "failed": "本地检索失败"
+    },
     "knowledge_search": {
       "running": "🔍 正在检索知识库",
       "done": "🔍 检索了知识库",
-      "failed": "🔍 检索失败"
+      "failed": "🔍 知识库检索失败"
     },
     "knowledge_read_part": {
       "running": "📖 正在阅读证据",
@@ -1229,6 +1262,36 @@
       "running": "↻ 模型发起补充检索",
       "done": "↻ 模型发起了补充检索",
       "failed": "↻ 补充检索失败"
+    },
+    "knowledge_research_plan": {
+      "running": "正在规划调查",
+      "done": "已规划调查",
+      "failed": "调查规划未完成"
+    },
+    "knowledge_research_round": {
+      "running": "第 {round}/{maxRounds} 轮：正在检索和阅读",
+      "done": "第 {round}/{maxRounds} 轮调查已结束",
+      "failed": "第 {round}/{maxRounds} 轮调查未完成"
+    },
+    "knowledge_research_worker": {
+      "running": "已派出 {count} 个调查 Agent",
+      "done": "{count} 个调查 Agent 已结束任务",
+      "failed": "{count} 个调查 Agent 未完成任务"
+    },
+    "knowledge_research_progress": {
+      "running": "已完成 {completed}/{total} 个证据问题",
+      "done": "已完成 {completed}/{total} 个证据问题",
+      "failed": "已完成 {completed}/{total} 个证据问题（本次更新未完成）"
+    },
+    "knowledge_research_review": {
+      "running": "正在核对矛盾和缺口",
+      "done": "已核对矛盾和缺口",
+      "failed": "矛盾与缺口核对未完成"
+    },
+    "knowledge_research_synthesis": {
+      "running": "正在整理详细回答",
+      "done": "已整理回答依据",
+      "failed": "回答依据整理未完成"
     },
     "knowledge_answer": {
       "running": "✻ 正在生成回答",

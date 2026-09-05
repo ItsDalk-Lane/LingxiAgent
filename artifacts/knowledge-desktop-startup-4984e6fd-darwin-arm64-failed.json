@@ -1,0 +1,90 @@
+{
+  "platform": "darwin",
+  "arch": "arm64",
+  "startedAt": "2026-09-04T08:40:02.363Z",
+  "status": "failed",
+  "packaged": true,
+  "rendererReady": false,
+  "serverReady": false,
+  "error": "Packaged desktop startup reported a failed renderer phase",
+  "launchEvents": [
+    {
+      "ts": "2026-09-04T08:40:03.745Z",
+      "event": "desktop-launch-start",
+      "startupId": "1788511203745-17116",
+      "appVersion": "0.1.33",
+      "platform": "darwin",
+      "arch": "arm64",
+      "details": {
+        "pid": 17116,
+        "argv": [
+          "~/work/LingxiAgent/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/MacOS/Lingxi",
+          "--remote-debugging-address=127.0.0.1",
+          "--remote-debugging-port=0"
+        ],
+        "packaged": true
+      }
+    },
+    {
+      "ts": "2026-09-04T08:40:04.725Z",
+      "event": "window-created",
+      "startupId": "1788511203745-17116",
+      "appVersion": "0.1.33",
+      "platform": "darwin",
+      "arch": "arm64",
+      "details": {
+        "label": "splash",
+        "id": 1
+      }
+    },
+    {
+      "ts": "2026-09-04T08:40:05.021Z",
+      "event": "did-fail-load",
+      "startupId": "1788511203745-17116",
+      "appVersion": "0.1.33",
+      "platform": "darwin",
+      "arch": "arm64",
+      "details": {
+        "label": "splash",
+        "id": 1,
+        "url": "file://~/work/LingxiAgent/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Resources/app.asar/desktop/dist-splash/splash.html",
+        "visible": false,
+        "errorCode": -3,
+        "errorDescription": "",
+        "validatedURL": "file://~/work/LingxiAgent/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Resources/app.asar/desktop/dist-splash/splash.html",
+        "isMainFrame": true
+      }
+    },
+    {
+      "ts": "2026-09-04T08:40:05.090Z",
+      "event": "dom-ready",
+      "startupId": "1788511203745-17116",
+      "appVersion": "0.1.33",
+      "platform": "darwin",
+      "arch": "arm64",
+      "details": {
+        "label": "splash",
+        "id": 1,
+        "url": "file://~/work/LingxiAgent/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Resources/app.asar/desktop/dist-splash/splash.html?mode=preparing",
+        "visible": false
+      }
+    },
+    {
+      "ts": "2026-09-04T08:40:05.091Z",
+      "event": "did-finish-load",
+      "startupId": "1788511203745-17116",
+      "appVersion": "0.1.33",
+      "platform": "darwin",
+      "arch": "arm64",
+      "details": {
+        "label": "splash",
+        "id": 1,
+        "url": "file://~/work/LingxiAgent/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Resources/app.asar/desktop/dist-splash/splash.html?mode=preparing",
+        "visible": false
+      }
+    }
+  ],
+  "processOutput": "[desktop] network proxy applied (startup): system\n[desktop] 启动 LingxiAgent Server...\n[artifact-boot] activating seed train 0 (0.1.33) from ~/work/LingxiAgent/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Resources/seed/server-0.1.33-darwin-arm64.tar.gz\n\n\nDevTools listening on ws://127.0.0.1:[token]\n2026-09-04 08:40:04.944 Lingxi Helper[17122:79064] XPC error for connection com.apple.backupd.sandbox.xpc: Connection invalid\n2026-09-04 08:40:04.944 Lingxi Helper[17122:79060] XPC error for connection com.apple.backupd.sandbox.xpc: Connection invalid\n2026-09-04 08:40:04.947 Lingxi Helper[17122:79064] XPC error for connection com.apple.backupd.sandbox.xpc: Connection invalid\n[safeReadJSON] [path]/user/preferences.json: ENOENT: no such file or directory, open '[path]/user/preferences.json'\n[safeReadJSON] [path]/user/preferences.json: ENOENT: no such file or directory, open '[path]/user/preferences.json'\n[safeReadJSON] [path]/user/preferences.json: ENOENT: no such file or directory, open '[path]/user/preferences.json'\n",
+  "durationMs": 2757.27025,
+  "finishedAt": "2026-09-04T08:40:05.125Z"
+}

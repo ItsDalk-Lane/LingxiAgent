@@ -59,7 +59,7 @@ describe("Knowledge citation-grade parse", () => {
       endOffset: 7,
     });
     expect(citation.canonicalText).toBe("关键事实");
-    manager.close();
+    await manager.close();
     fs.unlinkSync(inputPath);
 
     const restarted = new KnowledgeManager({ lingxiHome });
@@ -74,7 +74,7 @@ describe("Knowledge citation-grade parse", () => {
       studioId: "studio-a",
       snapshotId: resolved.snapshot.id,
     }).toString("utf-8")).toContain("第二行关键事实");
-    restarted.close();
+    await restarted.close();
   });
 
   it("Markdown 保留标题路径，HTML 保留结构路径", async () => {
@@ -115,7 +115,7 @@ describe("Knowledge citation-grade parse", () => {
     expect(htmlBlocks.map((block) => block.text)).toEqual(["说明", "保存快照\u3002"]);
     expect(htmlBlocks[1].locator).toMatchObject({ structuralPath: "html:nth-of-type(1) > body:nth-of-type(1) > main:nth-of-type(1) > p:nth-of-type(1)" });
     expect(htmlBlocks.some((block) => block.text.includes("bad"))).toBe(false);
-    manager.close();
+    await manager.close();
   });
 
   it("文本层 PDF 产生页码和坐标，扫描 PDF 明确标记需要 OCR", async () => {
@@ -163,7 +163,7 @@ describe("Knowledge citation-grade parse", () => {
       startOffset: 0,
       endOffset: 1,
     })).toThrow(/not ready/i);
-    manager.close();
+    await manager.close();
   });
 
   it("同一内容快照与解析产物身份分离，重复解析不制造内容版本", async () => {
@@ -184,6 +184,6 @@ describe("Knowledge citation-grade parse", () => {
       .toBe(1);
     expect(manager.store.countParseArtifacts({ studioId: "studio-a", sourceId: imported.source.id }))
       .toBe(1);
-    manager.close();
+    await manager.close();
   });
 });

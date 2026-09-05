@@ -1,0 +1,50 @@
+{
+  "sourceSha": "4ec98d0e185e3785f18cd40a7274c32ec9bff7e4",
+  "platform": "darwin",
+  "arch": "arm64",
+  "signing": "local ad-hoc; notarization skipped; ephemeral seed signing key",
+  "commands": [
+    {
+      "command": "npm run typecheck",
+      "startedAt": "2026-09-04T08:44:49.951Z",
+      "finishedAt": "2026-09-04T08:45:16.076Z",
+      "durationMs": 26122.969708999997,
+      "exitCode": 0
+    },
+    {
+      "command": "npm run pack",
+      "startedAt": "2026-09-04T08:45:16.077Z",
+      "finishedAt": "2026-09-04T08:47:50.198Z",
+      "durationMs": 154119.457958,
+      "exitCode": 0
+    },
+    {
+      "command": "node scripts/verify-seed-kit.mjs",
+      "startedAt": "2026-09-04T08:47:50.198Z",
+      "finishedAt": "2026-09-04T08:47:53.945Z",
+      "durationMs": 3746.887166999979,
+      "exitCode": 0
+    },
+    {
+      "command": "node scripts/smoke-packaged-knowledge.mjs",
+      "startedAt": "2026-09-04T08:47:53.946Z",
+      "finishedAt": "2026-09-04T08:48:04.562Z",
+      "durationMs": 10616.664708000026,
+      "exitCode": 0
+    },
+    {
+      "command": "node scripts/smoke-packaged-desktop.mjs",
+      "startedAt": "2026-09-04T08:48:04.563Z",
+      "finishedAt": "2026-09-04T08:48:16.065Z",
+      "durationMs": 11502.435916999995,
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build:server:open",
+      "startedAt": "2026-09-04T08:48:16.066Z",
+      "finishedAt": "2026-09-04T08:48:54.815Z",
+      "durationMs": 38748.423666999995,
+      "exitCode": 0
+    }
+  ]
+}

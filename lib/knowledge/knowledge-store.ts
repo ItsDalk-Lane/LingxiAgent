@@ -11,6 +11,7 @@ import {
   MIN_KNOWLEDGE_CHUNK_TARGET_CHARS,
   computeAutoChunkTargetChars,
   knowledgeChunkerConfigId,
+  legacyKnowledgeChunkerConfigId,
 } from "./chunker.ts";
 import type { KnowledgeChunkerStrategy } from "./chunker.ts";
 import type {
@@ -52,12 +53,21 @@ import {
   type KnowledgeCoveragePlanRecord,
 } from "./knowledge-coverage-planner.ts";
 
-export const KNOWLEDGE_SCHEMA_VERSION = 17;
+export const KNOWLEDGE_SCHEMA_VERSION = 19;
 
 const SOURCE_TYPES = new Set<KnowledgeSourceType>(["file", "pasted_text", "web_snapshot"]);
 const PARSE_STATUSES = new Set<KnowledgeParseStatus>(["parsing", "ready", "needs_ocr", "failed"]);
 const INGESTION_PHASES = new Set<IngestionPhase>(["parse", "chunk", "fts_index", "embed", "done"]);
 const INGESTION_STATUSES = new Set<IngestionJobStatus>(["queued", "running", "pending_embedding", "failed", "done"]);
+/** 任务只能属于仍活跃的笔记本、来源及二者关系；所有恢复和派发入口共用此条件。 */
+const ACTIVE_INGESTION_JOB_IDS_SQL = `
+  SELECT j.id FROM ingestion_jobs j
+  JOIN notebooks n ON n.id = j.notebook_id AND n.deleted_at IS NULL
+  JOIN sources s ON s.id = j.source_id AND s.deleted_at IS NULL AND s.studio_id = n.studio_id
+  JOIN notebook_sources ns ON ns.notebook_id = j.notebook_id AND ns.source_id = j.source_id
+    AND ns.removed_at IS NULL
+  WHERE j.cancelled_at IS NULL
+`;
 const PROCESSING_STATUSES = new Set<KnowledgeProcessingArtifact["status"]>([
   "processing", "ready", "failed",
 ]);
@@ -690,21 +700,12 @@ export function resolveNotebookConfig(config: NotebookConfig): ResolvedNotebookC
   };
 }
 
-/**
- * 生效分块尺寸：显式列 > 嵌入模型上下文 ×80% 自动值（computeAutoChunkTargetChars）。
- * 摄入侧与查询侧懒构建必须经同一函数解析——两侧各自解析曾是查询侧按默认 1200
- * 重建索引、与摄入侧指纹互相打架的根因（configId 进 chunk id，尺寸不同即全量重建+重嵌）。
- */
+/** 显式字符目标参与实际切分；未指定时使用默认大小，模型窗口在嵌入派发前校验。 */
 export function resolveEffectiveChunkTargetChars(
   resolved: Pick<ResolvedNotebookConfig, "chunkTargetChars" | "embeddingModelRef">,
-  getEmbeddingModelContextWindow?: ((modelRef: KnowledgeModelRef) => number | null) | null,
+  _getEmbeddingModelContextWindow?: ((modelRef: KnowledgeModelRef) => number | null) | null,
 ): number {
-  return resolved.chunkTargetChars
-    ?? computeAutoChunkTargetChars(
-      resolved.embeddingModelRef
-        ? getEmbeddingModelContextWindow?.(resolved.embeddingModelRef) ?? null
-        : null,
-    );
+  return resolved.chunkTargetChars ?? KNOWLEDGE_CHUNK_TARGET_CHARS;
 }
 
 export interface KnowledgeStoreOptions {
@@ -789,6 +790,8 @@ export class KnowledgeStore {
         if (version === 14) this.createSchemaV15();
         if (version === 15) this.createSchemaV16();
         if (version === 16) this.createSchemaV17();
+        if (version === 17) this.createSchemaV18();
+        if (version === 18) this.createSchemaV19();
         // main 线（PR #30）曾独立把版本推进到自己的 v9（只加 vector_retention_days，
         // 无 chunk_profiles）：这类库进合并链会跳过 version===8 的 v9 步。v9 体幂等
         // （IF NOT EXISTS + 列存在检查），缺表时补跑一次即可对齐。
@@ -1841,10 +1844,11 @@ export class KnowledgeStore {
     `).all();
     for (const row of notebooks) {
       const resolved = resolveNotebookConfig(toNotebookConfig(row));
-      const targetChars = resolveEffectiveChunkTargetChars(resolved, this.getEmbeddingModelContextWindow);
+      const targetChars = resolved.chunkTargetChars ?? computeAutoChunkTargetChars(resolved.embeddingModelRef
+        ? this.getEmbeddingModelContextWindow?.(resolved.embeddingModelRef) : null);
       const source: KnowledgeChunkTargetCharsSource = resolved.chunkTargetChars != null ? "explicit" : "auto";
       for (const strategy of CHUNK_PROFILE_STRATEGIES) {
-        const hash = knowledgeChunkerConfigId(strategy, targetChars);
+        const hash = legacyKnowledgeChunkerConfigId(strategy, targetChars);
         const existing = candidates.get(hash);
         // 同一指纹被多本笔记本推导出来时，explicit 来源比 auto 更具体，优先保留。
         if (!existing || (existing.source === "auto" && source === "explicit")) {
@@ -1869,7 +1873,7 @@ export class KnowledgeStore {
       if (candidate) {
         insert.run(
           `cp_${hash}`, hash, candidate.strategy, candidate.targetChars, candidate.source,
-          KNOWLEDGE_CHUNKER_VERSION, "standard", now,
+          "2", "standard", now,
         );
       } else {
         insert.run(`cp_${hash}`, hash, null, null, null, null, "legacy", now);
@@ -1888,6 +1892,217 @@ export class KnowledgeStore {
     if (columns.some((col) => col.name === "vector_retention_days")) return;
     this.db.exec(`
       ALTER TABLE notebooks ADD COLUMN vector_retention_days INTEGER;
+    `);
+  }
+
+  /** v18 只新增研究台账；建表和版本号由同一个迁移事务提交，旧资料不改写。 */
+  private createSchemaV18() {
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS knowledge_research_runs (
+        id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0),
+        turn_scope_id TEXT NOT NULL,
+        turn_id TEXT NOT NULL CHECK(length(trim(turn_id)) > 0),
+        parent_session_path TEXT NOT NULL CHECK(length(trim(parent_session_path)) > 0),
+        question TEXT NOT NULL CHECK(length(trim(question)) > 0),
+        status TEXT NOT NULL CHECK(status IN ('planning', 'running', 'synthesizing', 'completed', 'partial', 'failed', 'cancelled')),
+        completeness_policy TEXT NOT NULL CHECK(completeness_policy IN ('best_effort', 'source_diverse', 'relevant_sections_complete', 'scope_complete')),
+        budget_json TEXT NOT NULL CHECK(CASE WHEN json_valid(budget_json) THEN
+          json_type(budget_json) = 'object' AND COALESCE(
+            json_type(budget_json, '$.maxRounds') = 'integer' AND json_extract(budget_json, '$.maxRounds') > 0 AND
+            json_type(budget_json, '$.maxParallelAgents') = 'integer' AND json_extract(budget_json, '$.maxParallelAgents') > 0 AND
+            json_type(budget_json, '$.maxToolCalls') = 'integer' AND json_extract(budget_json, '$.maxToolCalls') > 0 AND
+            json_type(budget_json, '$.maxWallClockMs') = 'integer' AND json_extract(budget_json, '$.maxWallClockMs') > 0 AND
+            json_type(budget_json, '$.maxSearchesPerRound') = 'integer' AND json_extract(budget_json, '$.maxSearchesPerRound') > 0 AND
+            json_type(budget_json, '$.maxReadsPerRound') = 'integer' AND json_extract(budget_json, '$.maxReadsPerRound') > 0 AND
+            json_type(budget_json, '$.maxFinalEvidenceSpans') = 'integer' AND json_extract(budget_json, '$.maxFinalEvidenceSpans') > 0 AND
+            json_type(budget_json, '$.finalEvidenceBudgetTokens') = 'integer' AND json_extract(budget_json, '$.finalEvidenceBudgetTokens') > 0,
+            0
+          ) ELSE 0 END),
+        rounds_completed INTEGER NOT NULL DEFAULT 0 CHECK(typeof(rounds_completed) = 'integer' AND rounds_completed >= 0),
+        tool_calls_used INTEGER NOT NULL DEFAULT 0 CHECK(typeof(tool_calls_used) = 'integer' AND tool_calls_used >= 0),
+        search_calls INTEGER NOT NULL DEFAULT 0 CHECK(typeof(search_calls) = 'integer' AND search_calls >= 0),
+        read_calls INTEGER NOT NULL DEFAULT 0 CHECK(typeof(read_calls) = 'integer' AND read_calls >= 0),
+        grep_calls INTEGER NOT NULL DEFAULT 0 CHECK(typeof(grep_calls) = 'integer' AND grep_calls >= 0),
+        delegated_agents INTEGER NOT NULL DEFAULT 0 CHECK(typeof(delegated_agents) = 'integer' AND delegated_agents >= 0),
+        stop_reason TEXT,
+        degraded_reason TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        completed_at TEXT,
+        FOREIGN KEY(turn_scope_id) REFERENCES knowledge_turn_scopes(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_evidence_needs (
+        id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0),
+        run_id TEXT NOT NULL,
+        ordinal INTEGER NOT NULL CHECK(typeof(ordinal) = 'integer' AND ordinal >= 0),
+        claim TEXT NOT NULL CHECK(length(trim(claim)) > 0),
+        kind TEXT NOT NULL CHECK(kind IN ('fact', 'comparison', 'cause', 'timeline', 'counterexample', 'completeness')),
+        required INTEGER NOT NULL CHECK(required IN (0, 1)),
+        min_independent_sources INTEGER NOT NULL CHECK(typeof(min_independent_sources) = 'integer' AND min_independent_sources > 0),
+        require_counter_evidence INTEGER NOT NULL CHECK(require_counter_evidence IN (0, 1)),
+        require_all_relevant_units INTEGER NOT NULL CHECK(require_all_relevant_units IN (0, 1)),
+        status TEXT NOT NULL CHECK(status IN ('uncovered', 'partial', 'supported', 'conflicted', 'not_applicable')),
+        unresolved_gaps_json TEXT NOT NULL CHECK(CASE WHEN json_valid(unresolved_gaps_json) THEN json_type(unresolved_gaps_json) = 'array' ELSE 0 END),
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        UNIQUE(run_id, ordinal),
+        FOREIGN KEY(run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_research_rounds (
+        id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0),
+        run_id TEXT NOT NULL,
+        ordinal INTEGER NOT NULL CHECK(typeof(ordinal) = 'integer' AND ordinal >= 0),
+        focus_json TEXT NOT NULL CHECK(CASE WHEN json_valid(focus_json) THEN json_type(focus_json) = 'array' ELSE 0 END),
+        status TEXT NOT NULL CHECK(status IN ('running', 'completed', 'failed', 'cancelled')),
+        new_evidence_count INTEGER NOT NULL DEFAULT 0 CHECK(typeof(new_evidence_count) = 'integer' AND new_evidence_count >= 0),
+        started_at TEXT NOT NULL,
+        completed_at TEXT,
+        error_code TEXT,
+        UNIQUE(run_id, ordinal),
+        FOREIGN KEY(run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_research_read_receipts (
+        id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0),
+        run_id TEXT NOT NULL,
+        actor_session_id TEXT,
+        source_id TEXT NOT NULL,
+        content_snapshot_id TEXT NOT NULL,
+        parse_artifact_id TEXT NOT NULL,
+        chunk_index_variant_id TEXT,
+        chunk_id TEXT,
+        block_id TEXT NOT NULL,
+        start_offset INTEGER NOT NULL CHECK(typeof(start_offset) = 'integer' AND start_offset >= 0),
+        end_offset INTEGER NOT NULL CHECK(typeof(end_offset) = 'integer' AND end_offset > start_offset),
+        canonical_text_sha256 TEXT NOT NULL CHECK(length(canonical_text_sha256) = 64 AND length(CAST(canonical_text_sha256 AS BLOB)) = 64 AND canonical_text_sha256 NOT GLOB '*[^0-9a-f]*'),
+        channel TEXT NOT NULL CHECK(channel IN ('knowledge_read', 'knowledge_grep')),
+        created_at TEXT NOT NULL,
+        consumed_at TEXT,
+        FOREIGN KEY(run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT,
+        FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT,
+        FOREIGN KEY(content_snapshot_id) REFERENCES content_snapshots(id) ON DELETE RESTRICT,
+        FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT,
+        FOREIGN KEY(block_id) REFERENCES knowledge_blocks(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_evidence_items (
+        id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0),
+        run_id TEXT NOT NULL,
+        source_id TEXT NOT NULL,
+        content_snapshot_id TEXT NOT NULL,
+        parse_artifact_id TEXT NOT NULL,
+        chunk_index_variant_id TEXT,
+        chunk_id TEXT,
+        block_id TEXT NOT NULL,
+        start_offset INTEGER NOT NULL CHECK(typeof(start_offset) = 'integer' AND start_offset >= 0),
+        end_offset INTEGER NOT NULL CHECK(typeof(end_offset) = 'integer' AND end_offset > start_offset),
+        canonical_text TEXT NOT NULL CHECK(length(canonical_text) > 0),
+        canonical_text_sha256 TEXT NOT NULL CHECK(length(canonical_text_sha256) = 64 AND length(CAST(canonical_text_sha256 AS BLOB)) = 64 AND canonical_text_sha256 NOT GLOB '*[^0-9a-f]*'),
+        heading_path_json TEXT CHECK(heading_path_json IS NULL OR CASE WHEN json_valid(heading_path_json) THEN json_type(heading_path_json) = 'array' ELSE 0 END),
+        page_number INTEGER CHECK(page_number IS NULL OR (typeof(page_number) = 'integer' AND page_number > 0)),
+        created_at TEXT NOT NULL,
+        UNIQUE(run_id, parse_artifact_id, block_id, start_offset, end_offset),
+        FOREIGN KEY(run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT,
+        FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT,
+        FOREIGN KEY(content_snapshot_id) REFERENCES content_snapshots(id) ON DELETE RESTRICT,
+        FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT,
+        FOREIGN KEY(block_id) REFERENCES knowledge_blocks(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_need_evidence (
+        need_id TEXT NOT NULL,
+        evidence_id TEXT NOT NULL,
+        relation TEXT NOT NULL CHECK(relation IN ('supports', 'contradicts', 'context')),
+        rationale TEXT NOT NULL CHECK(length(trim(rationale)) > 0),
+        source_independence_key TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        PRIMARY KEY(need_id, evidence_id, relation),
+        FOREIGN KEY(need_id) REFERENCES knowledge_evidence_needs(id) ON DELETE RESTRICT,
+        FOREIGN KEY(evidence_id) REFERENCES knowledge_evidence_items(id) ON DELETE RESTRICT,
+        FOREIGN KEY(source_independence_key) REFERENCES sources(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_research_actions (
+        id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0),
+        run_id TEXT NOT NULL,
+        round_id TEXT,
+        ordinal INTEGER NOT NULL CHECK(typeof(ordinal) = 'integer' AND ordinal >= 0),
+        actor_session_id TEXT,
+        actor_agent_id TEXT,
+        action_type TEXT NOT NULL CHECK(length(trim(action_type)) > 0),
+        request_summary_json TEXT NOT NULL CHECK(CASE WHEN json_valid(request_summary_json) THEN json_type(request_summary_json) = 'object' ELSE 0 END),
+        response_summary_json TEXT CHECK(response_summary_json IS NULL OR CASE WHEN json_valid(response_summary_json) THEN json_type(response_summary_json) = 'object' ELSE 0 END),
+        status TEXT NOT NULL CHECK(status IN ('running', 'completed', 'failed', 'cancelled')),
+        started_at TEXT NOT NULL,
+        completed_at TEXT,
+        error_code TEXT,
+        UNIQUE(run_id, ordinal),
+        FOREIGN KEY(run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT,
+        FOREIGN KEY(round_id) REFERENCES knowledge_research_rounds(id) ON DELETE RESTRICT
+      );
+    `);
+  }
+
+  /** v19 只新增完整性核查记录；与版本号一起提交，旧资料和研究证据均保持原样。 */
+  private createSchemaV19() {
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS knowledge_completeness_checks (
+        id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0),
+        research_run_id TEXT NOT NULL UNIQUE,
+        policy TEXT NOT NULL CHECK(policy IN ('best_effort', 'source_diverse', 'relevant_sections_complete', 'scope_complete')),
+        status TEXT NOT NULL CHECK(length(trim(status)) > 0),
+        total_units INTEGER NOT NULL DEFAULT 0 CHECK(typeof(total_units) = 'integer' AND total_units >= 0),
+        checked_units INTEGER NOT NULL DEFAULT 0 CHECK(typeof(checked_units) = 'integer' AND checked_units >= 0),
+        relevant_units INTEGER NOT NULL DEFAULT 0 CHECK(typeof(relevant_units) = 'integer' AND relevant_units >= 0),
+        unavailable_units INTEGER NOT NULL DEFAULT 0 CHECK(typeof(unavailable_units) = 'integer' AND unavailable_units >= 0),
+        coverage_ratio REAL NOT NULL DEFAULT 0 CHECK(coverage_ratio >= 0 AND coverage_ratio <= 1),
+        exact INTEGER NOT NULL DEFAULT 0 CHECK(exact IN (0, 1)),
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        completed_at TEXT,
+        CHECK(checked_units + unavailable_units <= total_units),
+        CHECK(relevant_units <= checked_units),
+        CHECK(exact = 0 OR (checked_units = total_units AND unavailable_units = 0 AND coverage_ratio = 1)),
+        FOREIGN KEY(research_run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_completeness_units (
+        check_id TEXT NOT NULL,
+        coverage_unit_id TEXT NOT NULL CHECK(length(trim(coverage_unit_id)) > 0),
+        source_id TEXT NOT NULL,
+        parse_artifact_id TEXT NOT NULL,
+        block_id TEXT NOT NULL,
+        start_offset INTEGER NOT NULL CHECK(typeof(start_offset) = 'integer' AND start_offset >= 0),
+        end_offset INTEGER NOT NULL CHECK(typeof(end_offset) = 'integer' AND end_offset > start_offset),
+        section_key TEXT,
+        status TEXT NOT NULL CHECK(status IN ('pending', 'checked_relevant', 'checked_irrelevant', 'unavailable', 'failed')),
+        worker_session_id TEXT,
+        updated_at TEXT NOT NULL,
+        PRIMARY KEY(check_id, coverage_unit_id),
+        FOREIGN KEY(check_id) REFERENCES knowledge_completeness_checks(id) ON DELETE RESTRICT,
+        FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT,
+        FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT,
+        FOREIGN KEY(block_id) REFERENCES knowledge_blocks(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_completeness_unit_evidence (
+        check_id TEXT NOT NULL,
+        coverage_unit_id TEXT NOT NULL,
+        evidence_id TEXT NOT NULL,
+        PRIMARY KEY(check_id, coverage_unit_id, evidence_id),
+        FOREIGN KEY(check_id, coverage_unit_id) REFERENCES knowledge_completeness_units(check_id, coverage_unit_id) ON DELETE RESTRICT,
+        FOREIGN KEY(evidence_id) REFERENCES knowledge_evidence_items(id) ON DELETE RESTRICT
+      );
+
+      CREATE TABLE IF NOT EXISTS knowledge_completeness_coverage_runs (
+        check_id TEXT NOT NULL,
+        coverage_run_id TEXT NOT NULL,
+        PRIMARY KEY(check_id, coverage_run_id),
+        FOREIGN KEY(check_id) REFERENCES knowledge_completeness_checks(id) ON DELETE RESTRICT,
+        FOREIGN KEY(coverage_run_id) REFERENCES coverage_runs(id) ON DELETE RESTRICT
+      );
     `);
   }
 
@@ -1944,6 +2159,79 @@ export class KnowledgeStore {
     return this.activeNotebook(studioId, notebookId);
   }
 
+  /** 查询只读当前绑定，一次关联读取，不扫描正文或重新计算分块配置。 */
+  getNotebookRetrievalProfileSnapshot(input: {
+    studioId: unknown;
+    notebookId: unknown;
+  }): {
+    notebookId: string;
+    notebookName: string;
+    chunkProfileHash: string | null;
+    embeddingModelRef: KnowledgeModelRef | null;
+    rerankModelRef: KnowledgeModelRef | null;
+  } {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const notebookId = requiredString(input?.notebookId, "notebookId", 128);
+    const row = this.db.prepare(`
+      SELECT n.id, n.name, cp.profile_hash, rp.embedding_model_ref, rp.rerank_model_ref
+      FROM notebooks n
+      LEFT JOIN retrieval_profiles rp ON rp.id = n.retrieval_profile_id
+      LEFT JOIN chunk_profiles cp ON cp.id = rp.chunk_profile_id
+      WHERE n.id = ? AND n.studio_id = ? AND n.deleted_at IS NULL
+    `).get(notebookId, studioId);
+    if (!row) throw new KnowledgeError("KNOWLEDGE_NOT_FOUND", "Notebook not found");
+    return {
+      notebookId: row.id,
+      notebookName: row.name,
+      chunkProfileHash: row.profile_hash ?? null,
+      embeddingModelRef: parseModelRefJson(row.embedding_model_ref, "retrieval profile embedding model ref"),
+      rerankModelRef: parseModelRefJson(row.rerank_model_ref, "retrieval profile rerank model ref"),
+    };
+  }
+
+  /** 当前配置优先；旧版本在按冻结原文后台重建期间仍可查询并明确标注。 */
+  getQueryChunkProfileCandidates(profileHash: string): string[] {
+    const row = this.db.prepare("SELECT * FROM chunk_profiles WHERE profile_hash=?").get(profileHash);
+    if (!row || row.profile_type !== "standard" || !row.strategy || row.target_chars == null) return [profileHash];
+    const target = row.target_chars_source === "auto" ? KNOWLEDGE_CHUNK_TARGET_CHARS : Number(row.target_chars);
+    // 同一笔记本的不同格式由各自解析产物决定策略，不能把最后处理资料的策略套给所有来源。
+    const strategies = [chunkProfileStrategy(row.strategy), ...CHUNK_PROFILE_STRATEGIES];
+    const preferred = [...new Set(strategies)].map(strategy => knowledgeChunkerConfigId(strategy, target));
+    const legacy = this.db.prepare(`SELECT profile_hash FROM chunk_profiles
+      WHERE chunker_version IN ('2', '3') AND profile_type='standard'
+        AND ((?='auto' AND target_chars_source='auto') OR (?<>'auto' AND target_chars=?))
+      ORDER BY CASE WHEN profile_hash=? THEN 0 ELSE 1 END, created_at DESC, profile_hash ASC`)
+      .all(row.target_chars_source, row.target_chars_source, target, profileHash);
+    return [...new Set<string>([...preferred, ...legacy.map((item: { profile_hash: string }) => item.profile_hash), profileHash])];
+  }
+
+  /** 仅查配置版本元数据，用于区分旧索引回退与当前版本。 */
+  isCurrentChunkProfile(profileHash: string): boolean {
+    return this.db.prepare("SELECT chunker_version FROM chunk_profiles WHERE profile_hash=?").get(profileHash)?.chunker_version
+      === KNOWLEDGE_CHUNKER_VERSION;
+  }
+
+  /** 启动后逐页扫描活跃资料身份，不在启动线程读取或重建原文。 */
+  listActiveLatestArtifactsForReindex(input: { afterSourceId?: string; limit?: number } = {}): Array<{
+    studioId: string; sourceId: string; notebookId: string; parseArtifactId: string | null;
+  }> {
+    const limit = input.limit ?? 20;
+    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Reindex page size is invalid");
+    }
+    return this.db.prepare(`SELECT s.studio_id AS studioId,s.id AS sourceId,
+      (SELECT n.id FROM notebook_sources ns JOIN notebooks n ON n.id=ns.notebook_id
+        WHERE ns.source_id=s.id AND ns.removed_at IS NULL AND n.deleted_at IS NULL AND n.studio_id=s.studio_id
+        ORDER BY n.id LIMIT 1) AS notebookId,
+      (SELECT pa.id FROM parse_artifacts pa WHERE pa.content_snapshot_id=(SELECT cs.id FROM content_snapshots cs
+        WHERE cs.source_id=s.id ORDER BY cs.captured_at DESC,cs.id DESC LIMIT 1)
+        ORDER BY pa.created_at DESC,pa.id DESC LIMIT 1) AS parseArtifactId
+      FROM sources s WHERE s.deleted_at IS NULL AND s.id>?
+        AND EXISTS(SELECT 1 FROM notebook_sources ns JOIN notebooks n ON n.id=ns.notebook_id
+          WHERE ns.source_id=s.id AND ns.removed_at IS NULL AND n.deleted_at IS NULL AND n.studio_id=s.studio_id)
+      ORDER BY s.id LIMIT ?`).all(input.afterSourceId ?? "", limit);
+  }
+
   renameNotebook(input: { studioId: unknown; notebookId: unknown; name: unknown }): KnowledgeNotebook {
     const studioId = requiredString(input?.studioId, "studioId", 256);
     const notebookId = requiredString(input?.notebookId, "notebookId", 128);
@@ -1970,6 +2258,8 @@ export class KnowledgeStore {
         UPDATE notebook_sources SET removed_at = ?
         WHERE notebook_id = ? AND removed_at IS NULL
       `).run(deletedAt, notebookId);
+      // 删除与取消同事务提交，运行中的请求不能在二者之间继续推进任务。
+      this.cancelNotebookIngestionJobs({ studioId, notebookId });
     })();
     return { ...notebook, updatedAt: deletedAt, deletedAt };
   }
@@ -2841,12 +3131,48 @@ export class KnowledgeStore {
       if (ids.length === 0) return [];
       const cancel = this.db.prepare(`
         UPDATE ingestion_jobs
-        SET status = 'failed', error = ?, cancelled_at = ?, updated_at = ?
+        SET status = 'failed', error = ?, cancelled_at = ?, retry_after = NULL, updated_at = ?
         WHERE id = ? AND status IN ('queued', 'running', 'pending_embedding')
       `);
       for (const id of ids) cancel.run(reason, now, now, id);
       return ids;
     })();
+  }
+
+  /** 只取消指定笔记本的任务，同一来源在其他笔记本中的任务继续保留。 */
+  cancelNotebookIngestionJobs(input: { studioId: unknown; notebookId: unknown }): string[] {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const notebookId = requiredString(input?.notebookId, "notebookId", 128);
+    const now = this.now();
+    return this.db.transaction(() => {
+      const ids = (this.db.prepare(`
+        SELECT j.id FROM ingestion_jobs j JOIN notebooks n ON n.id = j.notebook_id
+        WHERE j.notebook_id = ? AND n.studio_id = ?
+          AND j.status IN ('queued', 'running', 'pending_embedding')
+        ORDER BY j.created_at, j.id
+      `).all(notebookId, studioId) as any[]).map(row => row.id);
+      const cancel = this.db.prepare(`
+        UPDATE ingestion_jobs SET status = 'failed', cancelled_at = ?, retry_after = NULL,
+          error = 'KNOWLEDGE_NOTEBOOK_DELETED: ingestion cancelled because the notebook was deleted', updated_at = ?
+        WHERE id = ? AND status IN ('queued', 'running', 'pending_embedding')
+      `);
+      for (const id of ids) cancel.run(now, now, id);
+      return ids;
+    })();
+  }
+
+  /** 收拢旧版本遗留的失效任务，防止启动恢复或模型就绪信号把它们重新激活。 */
+  private cancelInactiveIngestionJobs(jobId?: string): void {
+    const now = this.now();
+    this.db.prepare(`
+      UPDATE ingestion_jobs SET status = 'failed', retry_after = NULL,
+        error = CASE WHEN cancelled_at IS NOT NULL AND error IS NOT NULL THEN error
+          ELSE 'KNOWLEDGE_INGESTION_CANCELLED: notebook or source membership is no longer active' END,
+        cancelled_at = COALESCE(cancelled_at, ?), updated_at = ?
+      WHERE status IN ('queued', 'running', 'pending_embedding')
+        AND id NOT IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
+        ${jobId == null ? "" : "AND id = ?"}
+    `).run(now, now, ...(jobId == null ? [] : [jobId]));
   }
 
   /**
@@ -3358,6 +3684,23 @@ export class KnowledgeStore {
     `).get(sourceId, sourceId).count);
   }
 
+  /** 研究原文凭据、证据及完整性分母持续保护来源；检查关联的冻结范围也保留没有原文块的不可用源。 */
+  hasResearchReferencesForSource(input: { sourceId: unknown }): boolean {
+    const sourceId = requiredString(input?.sourceId, "sourceId", 128);
+    return !!this.db.prepare(`
+      SELECT 1 WHERE
+        EXISTS (SELECT 1 FROM knowledge_research_read_receipts WHERE source_id = ?)
+        OR EXISTS (SELECT 1 FROM knowledge_evidence_items WHERE source_id = ?)
+        OR EXISTS (SELECT 1 FROM knowledge_completeness_units WHERE source_id = ?)
+        OR EXISTS (
+          SELECT 1 FROM knowledge_completeness_checks checks
+          JOIN knowledge_research_runs runs ON runs.id = checks.research_run_id
+          JOIN knowledge_turn_scope_sources sources ON sources.scope_id = runs.turn_scope_id
+          WHERE sources.source_id = ?
+        )
+    `).get(sourceId, sourceId, sourceId, sourceId);
+  }
+
   private evidenceManifestById(id: string): KnowledgeEvidenceManifest {
     const row = this.db.prepare(`
       SELECT * FROM evidence_manifests WHERE id = ?
@@ -3760,6 +4103,17 @@ export class KnowledgeStore {
     return artifact;
   }
 
+  /** 目录工具只需数量与定位类型，不读取正文或重建覆盖单元。 */
+  getArtifactBlockMetadata(input: { studioId: unknown; parseArtifactId: unknown }): { blockCount: number; locatorTypes: string[] } {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const parseArtifactId = requiredString(input?.parseArtifactId, "parseArtifactId", 128);
+    this.getParseArtifact({ studioId, parseArtifactId });
+    const rows = this.db.prepare(`SELECT locator_type, COUNT(*) AS count FROM knowledge_blocks
+      WHERE parse_artifact_id = ? GROUP BY locator_type`).all(parseArtifactId);
+    return { blockCount: rows.reduce((sum: number, row: any) => sum + Number(row.count), 0),
+      locatorTypes: rows.map((row: any) => row.locator_type) };
+  }
+
   listArtifactBlocks(input: { studioId: unknown; parseArtifactId: unknown }): KnowledgeBlock[] {
     const studioId = requiredString(input?.studioId, "studioId", 256);
     const parseArtifactId = requiredString(input?.parseArtifactId, "parseArtifactId", 128);
@@ -3769,6 +4123,33 @@ export class KnowledgeStore {
       WHERE parse_artifact_id = ?
       ORDER BY ordinal ASC
     `).all(parseArtifactId).map(toBlock);
+  }
+
+  /** 先按块主键取小范围候选，再核对归属，避免逐条凭据查询扫描整个产物。 */
+  getArtifactBlocksByIds(input: {
+    studioId: unknown;
+    parseArtifactId: unknown;
+    blockIds: unknown[];
+  }): KnowledgeBlock[] {
+    const studioId = requiredString(input?.studioId, "studioId", 256);
+    const parseArtifactId = requiredString(input?.parseArtifactId, "parseArtifactId", 128);
+    if (!Array.isArray(input?.blockIds)) {
+      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "blockIds must be an array");
+    }
+    const blockIds = [...new Set(input.blockIds.map(id => requiredString(id, "blockId", 128)))];
+    if (blockIds.length === 0) return [];
+    return this.db.prepare(`
+      WITH requested_blocks AS MATERIALIZED (
+        SELECT * FROM knowledge_blocks
+        WHERE id IN (SELECT value FROM json_each(?))
+      )
+      SELECT b.* FROM requested_blocks b
+      JOIN parse_artifacts pa ON pa.id = b.parse_artifact_id
+      JOIN content_snapshots cs ON cs.id = pa.content_snapshot_id
+      JOIN sources s ON s.id = cs.source_id
+      WHERE s.studio_id = ? AND b.parse_artifact_id = ?
+      ORDER BY b.ordinal ASC, b.id ASC
+    `).all(JSON.stringify(blockIds), studioId, parseArtifactId).map(toBlock);
   }
 
   createCitation(input: {
@@ -4037,6 +4418,7 @@ export class KnowledgeStore {
       const row = this.db.prepare(`
         SELECT * FROM ingestion_jobs
         WHERE status = 'queued' AND (retry_after IS NULL OR retry_after <= ?)
+          AND id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
         ORDER BY created_at ASC, id ASC
         LIMIT 1
       `).get(now);
@@ -4061,6 +4443,7 @@ export class KnowledgeStore {
       FROM ingestion_jobs j
       JOIN notebooks nb ON nb.id = j.notebook_id
       WHERE j.status = 'queued' AND (j.retry_after IS NULL OR j.retry_after <= ?)
+        AND j.id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
       ORDER BY j.created_at ASC, j.id ASC
       LIMIT ?
     `).all(this.now(), limit).map((row: any) => ({
@@ -4075,26 +4458,35 @@ export class KnowledgeStore {
     const now = this.now();
     return this.db.transaction(() => {
       const row = this.db.prepare(`
-        SELECT * FROM ingestion_jobs WHERE id = ?
+        SELECT * FROM ingestion_jobs WHERE id = ? AND id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
       `).get(jobId);
       if (!row || row.status !== "queued" || (row.retry_after != null && row.retry_after > now)) {
         return null;
       }
       const result = this.db.prepare(`
         UPDATE ingestion_jobs SET status = 'running', updated_at = ?
-        WHERE id = ? AND status = 'queued'
+        WHERE id = ? AND status = 'queued' AND id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
       `).run(now, jobId);
       if (Number(result.changes) !== 1) return null;
       return toIngestionJob(this.db.prepare(`SELECT * FROM ingestion_jobs WHERE id = ?`).get(jobId));
     })();
   }
 
-  private runningIngestionJob(studioId: unknown, jobId: unknown): IngestionJob {
-    const job = this.getIngestionJob({ studioId, jobId });
-    if (job.status !== "running") {
+  /** 派发模型请求和写入进度前共用的运行检查，归属已失效时持久化取消结果。 */
+  getRunningIngestionJob(input: { studioId: unknown; jobId: unknown }): IngestionJob {
+    const job = this.getIngestionJob(input);
+    if (job.status !== "running" || job.cancelledAt != null) {
       throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Ingestion job is not running");
     }
+    if (!this.getIngestionJobOwner({ jobId: job.id })) {
+      this.cancelInactiveIngestionJobs(job.id);
+      throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Ingestion job ownership is no longer active");
+    }
     return job;
+  }
+
+  private runningIngestionJob(studioId: unknown, jobId: unknown): IngestionJob {
+    return this.getRunningIngestionJob({ studioId, jobId });
   }
 
   /** 推进到下一个待执行 phase；parse 完成时顺带绑定产生的 parse artifact。 */
@@ -4208,8 +4600,11 @@ export class KnowledgeStore {
     if (job.cancelledAt != null) {
       throw new KnowledgeError(
         "KNOWLEDGE_CONFLICT",
-        "Cancelled ingestion jobs cannot be retried (source deleted)",
+        "Cancelled ingestion jobs cannot be retried",
       );
+    }
+    if (!this.getIngestionJobOwner({ jobId: job.id })) {
+      throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Ingestion job ownership is no longer active");
     }
     this.db.prepare(`
       UPDATE ingestion_jobs
@@ -4220,11 +4615,38 @@ export class KnowledgeStore {
     return this.getIngestionJob({ studioId, jobId: job.id });
   }
 
+  /** 旧配置的排队任务先补新分块；不碰运行中的任务、旧索引或已付费向量。 */
+  restartIngestionJobForChunking(input: {
+    studioId: unknown; jobId: unknown; artifactId: unknown; chunkerConfigId: unknown;
+  }): IngestionJob {
+    const studioId = requiredString(input.studioId, "studioId", 256);
+    const configId = chunkerConfigId(input.chunkerConfigId);
+    return this.db.transaction(() => {
+      const job = this.getIngestionJob({ studioId, jobId: input.jobId });
+      this.activeSource(studioId, job.sourceId);
+      this.activeNotebook(studioId, job.notebookId);
+      if (!this.getIngestionJobOwner({ jobId: job.id })) {
+        throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Ingestion job ownership is no longer active");
+      }
+      const artifact = this.getParseArtifact({ studioId, parseArtifactId: input.artifactId });
+      const snapshot = this.getContentSnapshot({ studioId, snapshotId: artifact.contentSnapshotId });
+      if (snapshot.sourceId !== job.sourceId || artifact.status !== "ready" || job.cancelledAt != null
+        || !["queued", "pending_embedding"].includes(job.status)) {
+        throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Ingestion job cannot restart chunking");
+      }
+      this.db.prepare(`UPDATE ingestion_jobs SET status='queued',phase='chunk',artifact_id=?,chunker_config_id=?,
+        attempt=0,error=NULL,retry_after=NULL,progress_done=0,progress_total=NULL,updated_at=? WHERE id=?`)
+        .run(artifact.id, configId, this.now(), job.id);
+      return this.getIngestionJob({ studioId, jobId: job.id });
+    })();
+  }
+
   /** 模型就绪信号：全部 pending_embedding 一次性置回 queued 补跑嵌入。返回置回数量。 */
   requeuePendingEmbeddingIngestionJobs(): number {
+    this.cancelInactiveIngestionJobs();
     const result = this.db.prepare(`
       UPDATE ingestion_jobs SET status = 'queued', updated_at = ?
-      WHERE status = 'pending_embedding'
+      WHERE status = 'pending_embedding' AND id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
     `).run(this.now());
     return Number(result.changes);
   }
@@ -4237,9 +4659,11 @@ export class KnowledgeStore {
   requeuePendingEmbeddingIngestionJob(input: { studioId: unknown; jobId: unknown }): boolean {
     const studioId = requiredString(input?.studioId, "studioId", 256);
     const jobId = requiredString(input?.jobId, "jobId", 128);
+    this.cancelInactiveIngestionJobs(jobId);
     const result = this.db.prepare(`
       UPDATE ingestion_jobs SET status = 'queued', updated_at = ?
       WHERE id = ? AND status = 'pending_embedding'
+        AND id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
         AND notebook_id IN (SELECT id FROM notebooks WHERE studio_id = ?)
     `).run(this.now(), jobId, studioId);
     return Number(result.changes) === 1;
@@ -4252,12 +4676,13 @@ export class KnowledgeStore {
    * 已落库的批级 checkpoint 向量保留，续跑只补缺失 chunk，不静默重新消费 API。
    */
   requeueRunningIngestionJobs(): number {
+    this.cancelInactiveIngestionJobs();
     const result = this.db.prepare(`
       UPDATE ingestion_jobs
       SET status = 'queued',
         error = CASE WHEN phase = 'embed' THEN ? ELSE error END,
         updated_at = ?
-      WHERE status = 'running'
+      WHERE status = 'running' AND id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
     `).run(
       `${KNOWLEDGE_EMBEDDING_INTERRUPTED}: embedding interrupted; checkpointed vectors are reused on resume`,
       this.now(),
@@ -4272,12 +4697,13 @@ export class KnowledgeStore {
    */
   requeueRunningIngestionJobById(input: { jobId: unknown }): boolean {
     const jobId = requiredString(input?.jobId, "jobId", 128);
+    this.cancelInactiveIngestionJobs(jobId);
     const result = this.db.prepare(`
       UPDATE ingestion_jobs
       SET status = 'queued',
         error = CASE WHEN phase = 'embed' THEN ? ELSE error END,
         updated_at = ?
-      WHERE id = ? AND status = 'running'
+      WHERE id = ? AND status = 'running' AND id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
     `).run(
       `${KNOWLEDGE_EMBEDDING_INTERRUPTED}: embedding interrupted; checkpointed vectors are reused on resume`,
       this.now(),
@@ -4325,7 +4751,7 @@ export class KnowledgeStore {
       SELECT nb.studio_id AS studio_id, j.notebook_id AS notebook_id, j.source_id AS source_id
       FROM ingestion_jobs j
       JOIN notebooks nb ON nb.id = j.notebook_id
-      WHERE j.id = ?
+      WHERE j.id = ? AND j.id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
     `).get(jobId);
     if (!row) return null;
     return {
@@ -4342,6 +4768,7 @@ export class KnowledgeStore {
       FROM ingestion_jobs j
       JOIN notebooks nb ON nb.id = j.notebook_id
       WHERE j.status = 'pending_embedding'
+        AND j.id IN (${ACTIVE_INGESTION_JOB_IDS_SQL})
       ORDER BY j.created_at ASC, j.id ASC
     `).all().map((row: any) => ({ ...(toIngestionJob(row) as IngestionJob), studioId: row.studio_id }));
   }

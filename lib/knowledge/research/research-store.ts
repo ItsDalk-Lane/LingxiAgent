@@ -1,0 +1,408 @@
+import crypto from "node:crypto";
+import { DEFAULT_KNOWLEDGE_RESEARCH_BUDGET, type KnowledgeResearchBudget } from "../../../shared/knowledge-research.ts";
+import type { KnowledgeCompletenessPolicy } from "../../../shared/knowledge-execution.ts";
+import { KnowledgeError } from "../errors.ts";
+import { hasActiveResearchExecution } from "./research-tool-budget.ts";
+import type { KnowledgeStore } from "../knowledge-store.ts";
+import type {
+  KnowledgeEvidenceItem, KnowledgeEvidenceNeedRecord, KnowledgeNeedEvidence, KnowledgeResearchAction,
+  KnowledgeResearchReadReceipt, KnowledgeResearchRound, KnowledgeResearchRun,
+} from "../types.ts";
+
+type NeedInput = Pick<KnowledgeEvidenceNeedRecord, "claim" | "kind" | "required" | "minIndependentSources"
+  | "requireCounterEvidence" | "requireAllRelevantUnits">;
+const NEED_KEYS = ["claim", "kind", "required", "minIndependentSources", "requireCounterEvidence", "requireAllRelevantUnits"];
+const LOCATION_KEYS = ["sourceId", "contentSnapshotId", "parseArtifactId", "chunkIndexVariantId", "chunkId", "blockId",
+  "startOffset", "endOffset", "canonicalTextSha256"];
+const JSON_FIELDS: Record<string, string> = {
+  budget_json: "budget", unresolved_gaps_json: "unresolvedGaps", focus_json: "focus", heading_path_json: "headingPath",
+  request_summary_json: "requestSummary", response_summary_json: "responseSummary",
+};
+
+function invalid(): never { throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Research metadata is invalid"); }
+function scopeViolation(): never { throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research identity is outside the frozen scope"); }
+function text(value: unknown, max = 128): asserts value is string {
+  if (typeof value !== "string" || !value.trim() || value.length > max) invalid();
+}
+function keys(value: unknown, allowed: string[]): asserts value is Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)
+    || ![Object.prototype, null].includes(Object.getPrototypeOf(value))
+    || Object.keys(value).some(key => !allowed.includes(key))) invalid();
+}
+function strings(value: unknown, maxLength = 128): asserts value is string[] {
+  if (!Array.isArray(value)) invalid();
+  for (const entry of value) text(entry, maxLength);
+}
+function budget(input: unknown): KnowledgeResearchBudget {
+  keys(input, Object.keys(DEFAULT_KNOWLEDGE_RESEARCH_BUDGET));
+  for (const key of Object.keys(DEFAULT_KNOWLEDGE_RESEARCH_BUDGET)) {
+    if (!Number.isSafeInteger(input[key]) || Number(input[key]) <= 0) invalid();
+  }
+  return { ...input } as unknown as KnowledgeResearchBudget;
+}
+function record<T>(row: Record<string, unknown>): T {
+  return Object.fromEntries(Object.entries(row).map(([key, value]) => {
+    if (JSON_FIELDS[key]) return [JSON_FIELDS[key], value === null ? null : JSON.parse(String(value))];
+    return [key.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase()),
+      ["required", "require_counter_evidence", "require_all_relevant_units"].includes(key) ? value === 1 : value];
+  })) as T;
+}
+
+/** 研究持久化只保存冻结身份、证据和有限元数据；模型不能通过额外字段夹带整段提示或工具输出。 */
+export class ResearchStore {
+  readonly knowledgeStore: KnowledgeStore;
+  private readonly options: { now?: () => string; idGenerator?: (prefix: string) => string };
+  constructor(knowledgeStore: KnowledgeStore, options: { now?: () => string; idGenerator?: (prefix: string) => string } = {}) {
+    this.knowledgeStore = knowledgeStore;
+    this.options = options;
+  }
+
+  now(): string { return this.options.now?.() ?? new Date().toISOString(); }
+  newId(prefix: string): string {
+    const id = this.options.idGenerator?.(prefix) ?? `${prefix}_${crypto.randomUUID()}`;
+    text(id); return id;
+  }
+  transaction<T>(fn: () => T): T { return this.knowledgeStore.db.transaction(fn)(); }
+
+  private insert(table: string, values: Record<string, unknown>) {
+    const columns = Object.keys(values);
+    this.knowledgeStore.db.prepare(`INSERT INTO ${table} (${columns.join(",")}) VALUES (${columns.map(() => "?").join(",")})`)
+      .run(...Object.values(values));
+  }
+  private requireActive(runId: string): KnowledgeResearchRun {
+    const run = this.requireRun(runId);
+    if (!["planning", "running", "synthesizing"].includes(run.status)
+      || this.knowledgeStore.getTurnScope({ scopeId: run.turnScopeId })?.status !== "active") scopeViolation();
+    return run;
+  }
+  private location(input: KnowledgeResearchReadReceipt | KnowledgeEvidenceItem) {
+    const run = this.requireActive(input.runId);
+    const scope = this.knowledgeStore.getTurnScope({ scopeId: run.turnScopeId })!;
+    const source = scope.sources.find(source => source.sourceId === input.sourceId);
+    if (!source || source.contentSnapshotId !== input.contentSnapshotId || source.parseArtifactId !== input.parseArtifactId) scopeViolation();
+    const artifact = this.knowledgeStore.getParseArtifact({ studioId: scope.studioId, parseArtifactId: input.parseArtifactId });
+    if (artifact.contentSnapshotId !== input.contentSnapshotId || artifact.status !== "ready") scopeViolation();
+    const block = this.knowledgeStore.getArtifactBlocksByIds({ studioId: scope.studioId,
+      parseArtifactId: input.parseArtifactId, blockIds: [input.blockId] })[0];
+    if (!block || !Number.isSafeInteger(input.startOffset) || !Number.isSafeInteger(input.endOffset)
+      || input.startOffset < 0 || input.endOffset <= input.startOffset || input.endOffset > block.text.length) scopeViolation();
+    const canonical = block.text.slice(input.startOffset, input.endOffset);
+    if (crypto.createHash("sha256").update(canonical).digest("hex") !== input.canonicalTextSha256) invalid();
+    if ("canonicalText" in input && (input.canonicalText !== canonical || canonical.length > 2000)) invalid();
+  }
+
+  createRun(input: { turnScopeId: string; turnId: string; parentSessionPath: string; question: string;
+    budget?: KnowledgeResearchBudget; completenessPolicy?: KnowledgeCompletenessPolicy }): KnowledgeResearchRun {
+    keys(input, ["turnScopeId", "turnId", "parentSessionPath", "question", "budget", "completenessPolicy"]);
+    text(input.question, 10_000);
+    const scope = this.knowledgeStore.getTurnScope({ scopeId: input.turnScopeId });
+    if (!scope || scope.status !== "active" || scope.turnId !== input.turnId || scope.sessionPath !== input.parentSessionPath) scopeViolation();
+    const limits = budget(input.budget ?? DEFAULT_KNOWLEDGE_RESEARCH_BUDGET), id = this.newId("krun"), now = this.now();
+    this.insert("knowledge_research_runs", {
+      id, turn_scope_id: input.turnScopeId, turn_id: input.turnId, parent_session_path: input.parentSessionPath,
+      question: input.question, status: "planning", completeness_policy: input.completenessPolicy ?? "source_diverse",
+      budget_json: JSON.stringify(limits), created_at: now, updated_at: now,
+    });
+    return this.requireRun(id);
+  }
+  getRun(runId: string): KnowledgeResearchRun | null {
+    text(runId);
+    const row = this.knowledgeStore.db.prepare("SELECT * FROM knowledge_research_runs WHERE id = ?").get(runId);
+    if (!row) return null;
+    const run = record<KnowledgeResearchRun>(row);
+    const scope = this.knowledgeStore.getTurnScope({ scopeId: run.turnScopeId });
+    if (!scope || scope.turnId !== run.turnId || scope.sessionPath !== run.parentSessionPath) scopeViolation();
+    run.budget = budget(run.budget);
+    return run;
+  }
+  requireRun(runId: string): KnowledgeResearchRun {
+    const run = this.getRun(runId);
+    if (!run) throw new KnowledgeError("KNOWLEDGE_NOT_FOUND", "Research run was not found");
+    return run;
+  }
+
+  /** 生命周期只由宿主推进，终态不能经普通状态写入重新变成可执行状态。 */
+  setRunState(runId: string, input: { status: KnowledgeResearchRun["status"]; stopReason?: string | null; degradedReason?: string | null }): KnowledgeResearchRun {
+    keys(input, ["status", "stopReason", "degradedReason"]);
+    if (!["planning", "running", "synthesizing", "completed", "partial", "failed", "cancelled"].includes(input.status)) invalid();
+    for (const key of ["stopReason", "degradedReason"] as const) if (input[key] !== undefined && input[key] !== null) text(input[key]);
+    return this.transaction(() => {
+      const run = this.requireRun(runId), terminal = ["completed", "partial", "failed", "cancelled"];
+      const stopReason = input.stopReason === undefined ? run.stopReason : input.stopReason;
+      const degradedReason = input.degradedReason === undefined ? run.degradedReason : input.degradedReason;
+      if (terminal.includes(run.status)) {
+        if (run.status === input.status && run.stopReason === stopReason && run.degradedReason === degradedReason) return run;
+        throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Research terminal state cannot be rewritten");
+      }
+      if (!terminal.includes(input.status)) this.requireActive(runId);
+      const now = this.now();
+      this.knowledgeStore.db.prepare(`UPDATE knowledge_research_runs SET status = ?, stop_reason = ?, degraded_reason = ?,
+        updated_at = ?, completed_at = ? WHERE id = ?`).run(input.status, stopReason, degradedReason,
+        now, terminal.includes(input.status) ? now : null, runId);
+      return this.requireRun(runId);
+    });
+  }
+
+  /** 预算停止后的材料合成必须等临时会话、动作和轮次全部收尾，不能借合成入口重新启动调查。 */
+  beginSynthesis(runId: string): KnowledgeResearchRun {
+    return this.transaction(() => {
+      const run = this.requireRun(runId);
+      if (!["planning", "running", "synthesizing", "partial"].includes(run.status)
+        || hasActiveResearchExecution(this.knowledgeStore, runId)
+        || this.listRounds(runId).some(round => round.status === "running")
+        || this.listActions(runId).some(action => action.status === "running")) {
+        throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Research execution must finish before synthesis");
+      }
+      if (run.status !== "partial") return this.setRunState(runId, { status: "synthesizing" });
+      this.knowledgeStore.db.prepare("UPDATE knowledge_research_runs SET status = 'synthesizing', updated_at = ?, completed_at = NULL WHERE id = ?")
+        .run(this.now(), runId);
+      return this.requireRun(runId);
+    });
+  }
+
+  beginRound(runId: string, input: { focus: string[] }): KnowledgeResearchRound {
+    keys(input, ["focus"]); strings(input.focus);
+    return this.transaction(() => {
+      const run = this.requireActive(runId), rounds = this.listRounds(runId);
+      if (rounds.length >= run.budget.maxRounds || rounds.some(round => round.status === "running")) {
+        throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Research round budget is exhausted or another round is running");
+      }
+      for (const id of input.focus) this.getNeed(runId, id);
+      const id = this.newId("kround"), now = this.now();
+      this.insert("knowledge_research_rounds", { id, run_id: runId, ordinal: Math.max(-1, ...rounds.map(round => round.ordinal)) + 1,
+        focus_json: JSON.stringify(input.focus), status: "running", started_at: now });
+      this.setRunState(runId, { status: "running" });
+      return this.listRounds(runId).find(round => round.id === id)!;
+    });
+  }
+
+  finishRound(runId: string, roundId: string, input: {
+    status: "completed" | "failed" | "cancelled"; newEvidenceCount: number; errorCode: string | null;
+  }): KnowledgeResearchRound {
+    keys(input, ["status", "newEvidenceCount", "errorCode"]);
+    if (!["completed", "failed", "cancelled"].includes(input.status) || !Number.isSafeInteger(input.newEvidenceCount) || input.newEvidenceCount < 0) invalid();
+    if (input.errorCode !== null) text(input.errorCode);
+    return this.transaction(() => {
+      this.requireRun(runId);
+      const round = this.listRounds(runId).find(round => round.id === roundId);
+      if (!round) throw new KnowledgeError("KNOWLEDGE_NOT_FOUND", "Research round was not found in this run");
+      if (round.status !== "running") {
+        if (round.status === input.status && round.newEvidenceCount === input.newEvidenceCount && round.errorCode === input.errorCode) return round;
+        throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Research round already has a different terminal result");
+      }
+      const now = this.now();
+      this.knowledgeStore.db.prepare(`UPDATE knowledge_research_rounds SET status = ?, new_evidence_count = ?, error_code = ?, completed_at = ?
+        WHERE id = ? AND run_id = ?`).run(input.status, input.newEvidenceCount, input.errorCode, now, roundId, runId);
+      this.knowledgeStore.db.prepare("UPDATE knowledge_research_runs SET rounds_completed = rounds_completed + 1, updated_at = ? WHERE id = ?").run(now, runId);
+      return this.listRounds(runId).find(round => round.id === roundId)!;
+    });
+  }
+
+  /** 模型首轮没有建立需求时保留用户完整问题，不能套用模型声明的长度限制截断问题。 */
+  createFallbackNeed(runId: string): KnowledgeEvidenceNeedRecord {
+    return this.transaction(() => {
+      const run = this.requireActive(runId);
+      if (this.listNeeds(runId).length !== 0) throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Research fallback requires an empty ledger");
+      const id = this.newId("kneed"), now = this.now();
+      this.insert("knowledge_evidence_needs", { id, run_id: runId, ordinal: 0, claim: run.question, kind: "fact",
+        required: 1, min_independent_sources: 1, require_counter_evidence: 0, require_all_relevant_units: 0,
+        status: "uncovered", unresolved_gaps_json: "[]", created_at: now, updated_at: now });
+      this.setRunState(runId, { status: run.status, degradedReason: "fallback_need_created" });
+      return this.getNeed(runId, id);
+    });
+  }
+
+  /** 完整性要求只能保持或提高；检查和更新处于同一事务，批量工具可共用外层事务。 */
+  upgradeCompletenessPolicy(runId: string, requested: KnowledgeCompletenessPolicy): KnowledgeResearchRun {
+    const order: KnowledgeCompletenessPolicy[] = ["best_effort", "source_diverse", "relevant_sections_complete", "scope_complete"];
+    if (!order.includes(requested)) invalid();
+    return this.transaction(() => {
+      const run = this.requireActive(runId);
+      if (order.indexOf(requested) < order.indexOf(run.completenessPolicy)) {
+        throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Research completeness policy cannot be downgraded");
+      }
+      this.knowledgeStore.db.prepare("UPDATE knowledge_research_runs SET completeness_policy = ?, updated_at = ? WHERE id = ?")
+        .run(requested, this.now(), runId);
+      return this.requireRun(runId);
+    });
+  }
+
+  createNeed(runId: string, input: NeedInput): KnowledgeEvidenceNeedRecord {
+    keys(input, NEED_KEYS); text(input.claim, 1000);
+    for (const key of ["required", "requireCounterEvidence", "requireAllRelevantUnits"] as const) if (typeof input[key] !== "boolean") invalid();
+    return this.transaction(() => {
+      this.requireActive(runId);
+      const count = this.knowledgeStore.db.prepare("SELECT COUNT(*) AS count FROM knowledge_evidence_needs WHERE run_id = ?").get(runId).count;
+      if (count >= 8) throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Research run allows at most eight evidence needs");
+      const id = this.newId("kneed"), now = this.now();
+      const ordinal = this.knowledgeStore.db.prepare("SELECT COALESCE(MAX(ordinal), -1) + 1 AS ordinal FROM knowledge_evidence_needs WHERE run_id = ?").get(runId).ordinal;
+      this.insert("knowledge_evidence_needs", { id, run_id: runId, ordinal, claim: input.claim, kind: input.kind,
+        required: Number(input.required), min_independent_sources: input.minIndependentSources,
+        require_counter_evidence: Number(input.requireCounterEvidence), require_all_relevant_units: Number(input.requireAllRelevantUnits),
+        status: "uncovered", unresolved_gaps_json: "[]", created_at: now, updated_at: now });
+      return this.getNeed(runId, id);
+    });
+  }
+  getNeed(runId: string, needId: string): KnowledgeEvidenceNeedRecord {
+    this.requireRun(runId); text(needId);
+    const row = this.knowledgeStore.db.prepare("SELECT * FROM knowledge_evidence_needs WHERE run_id = ? AND id = ?").get(runId, needId);
+    if (!row) throw new KnowledgeError("KNOWLEDGE_NOT_FOUND", "Research need was not found in this run");
+    return record(row);
+  }
+  listNeeds(runId: string): KnowledgeEvidenceNeedRecord[] {
+    this.requireRun(runId);
+    return this.knowledgeStore.db.prepare("SELECT * FROM knowledge_evidence_needs WHERE run_id = ? ORDER BY ordinal, id").all(runId).map(record);
+  }
+  /** 只供宿主根据已验证证据重算后落库，不接受模型声明的最终需求状态。 */
+  setNeedState(runId: string, needId: string, state: Pick<KnowledgeEvidenceNeedRecord, "status" | "unresolvedGaps">): KnowledgeEvidenceNeedRecord {
+    this.requireActive(runId); this.getNeed(runId, needId);
+    keys(state, ["status", "unresolvedGaps"]); strings(state.unresolvedGaps, 500);
+    if (state.unresolvedGaps.length > 8) invalid();
+    this.knowledgeStore.db.prepare("UPDATE knowledge_evidence_needs SET status = ?, unresolved_gaps_json = ?, updated_at = ? WHERE run_id = ? AND id = ?")
+      .run(state.status, JSON.stringify(state.unresolvedGaps), this.now(), runId, needId);
+    return this.getNeed(runId, needId);
+  }
+
+  getReceipt(runId: string, receiptId: string): KnowledgeResearchReadReceipt {
+    this.requireRun(runId); text(receiptId);
+    const row = this.knowledgeStore.db.prepare("SELECT * FROM knowledge_research_read_receipts WHERE run_id = ? AND id = ?").get(runId, receiptId);
+    if (!row) throw new KnowledgeError("KNOWLEDGE_NOT_FOUND", "Research receipt was not found in this run");
+    return record(row);
+  }
+  insertReceipt(input: KnowledgeResearchReadReceipt): KnowledgeResearchReadReceipt {
+    keys(input, ["id", "runId", "actorSessionId", ...LOCATION_KEYS, "channel", "createdAt", "consumedAt"]);
+    this.location(input);
+    this.insert("knowledge_research_read_receipts", {
+      id: input.id, run_id: input.runId, actor_session_id: input.actorSessionId, source_id: input.sourceId,
+      content_snapshot_id: input.contentSnapshotId, parse_artifact_id: input.parseArtifactId,
+      chunk_index_variant_id: input.chunkIndexVariantId, chunk_id: input.chunkId, block_id: input.blockId,
+      start_offset: input.startOffset, end_offset: input.endOffset, canonical_text_sha256: input.canonicalTextSha256,
+      channel: input.channel, created_at: input.createdAt, consumed_at: input.consumedAt,
+    });
+    return this.getReceipt(input.runId, input.id);
+  }
+  consumeReceipt(runId: string, receiptId: string): KnowledgeResearchReadReceipt {
+    this.requireActive(runId); this.getReceipt(runId, receiptId);
+    this.knowledgeStore.db.prepare("UPDATE knowledge_research_read_receipts SET consumed_at = COALESCE(consumed_at, ?) WHERE run_id = ? AND id = ?")
+      .run(this.now(), runId, receiptId);
+    return this.getReceipt(runId, receiptId);
+  }
+
+  putEvidence(input: KnowledgeEvidenceItem): KnowledgeEvidenceItem {
+    keys(input, ["id", "runId", ...LOCATION_KEYS, "canonicalText", "headingPath", "pageNumber", "createdAt"]);
+    this.location(input); if (input.headingPath !== null) strings(input.headingPath, 1000);
+    return this.transaction(() => {
+      const existing = this.knowledgeStore.db.prepare(`SELECT * FROM knowledge_evidence_items
+        WHERE run_id = ? AND parse_artifact_id = ? AND block_id = ? AND start_offset = ? AND end_offset = ?`)
+        .get(input.runId, input.parseArtifactId, input.blockId, input.startOffset, input.endOffset);
+      if (existing) {
+        if (existing.canonical_text !== input.canonicalText || existing.canonical_text_sha256 !== input.canonicalTextSha256) {
+          throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Stored research evidence differs from frozen text");
+        }
+        return record(existing);
+      }
+      this.insert("knowledge_evidence_items", { id: input.id, run_id: input.runId, source_id: input.sourceId,
+        content_snapshot_id: input.contentSnapshotId, parse_artifact_id: input.parseArtifactId, chunk_index_variant_id: input.chunkIndexVariantId,
+        chunk_id: input.chunkId, block_id: input.blockId, start_offset: input.startOffset, end_offset: input.endOffset,
+        canonical_text: input.canonicalText, canonical_text_sha256: input.canonicalTextSha256,
+        heading_path_json: input.headingPath === null ? null : JSON.stringify(input.headingPath), page_number: input.pageNumber, created_at: input.createdAt });
+      return record(this.knowledgeStore.db.prepare("SELECT * FROM knowledge_evidence_items WHERE id = ?").get(input.id));
+    });
+  }
+  linkEvidence(input: KnowledgeNeedEvidence): KnowledgeNeedEvidence {
+    keys(input, ["needId", "evidenceId", "relation", "rationale", "sourceIndependenceKey", "createdAt"]); text(input.rationale, 1000);
+    const need = this.knowledgeStore.db.prepare("SELECT run_id FROM knowledge_evidence_needs WHERE id = ?").get(input.needId);
+    const evidence = this.knowledgeStore.db.prepare("SELECT run_id, source_id FROM knowledge_evidence_items WHERE id = ?").get(input.evidenceId);
+    if (!need || !evidence || need.run_id !== evidence.run_id || input.sourceIndependenceKey !== evidence.source_id) scopeViolation();
+    this.requireActive(need.run_id);
+    const existing = this.knowledgeStore.db.prepare("SELECT * FROM knowledge_need_evidence WHERE need_id = ? AND evidence_id = ? AND relation = ?")
+      .get(input.needId, input.evidenceId, input.relation);
+    if (existing) return record(existing);
+    this.insert("knowledge_need_evidence", { need_id: input.needId, evidence_id: input.evidenceId, relation: input.relation,
+      rationale: input.rationale, source_independence_key: evidence.source_id, created_at: input.createdAt });
+    return { ...input };
+  }
+  listEvidence(runId: string): KnowledgeEvidenceItem[] {
+    this.requireRun(runId);
+    return this.knowledgeStore.db.prepare("SELECT * FROM knowledge_evidence_items WHERE run_id = ? ORDER BY created_at, id").all(runId).map(record);
+  }
+  listRelations(runId: string, needId?: string): KnowledgeNeedEvidence[] {
+    this.requireRun(runId); if (needId !== undefined) this.getNeed(runId, needId);
+    return this.knowledgeStore.db.prepare(`SELECT relation.* FROM knowledge_need_evidence relation
+      JOIN knowledge_evidence_needs need ON need.id = relation.need_id WHERE need.run_id = ?
+      ${needId === undefined ? "" : "AND relation.need_id = ?"} ORDER BY need.ordinal, relation.evidence_id, relation.relation`)
+      .all(...(needId === undefined ? [runId] : [runId, needId])).map(record);
+  }
+
+  private actionMetadata(run: KnowledgeResearchRun, input: KnowledgeResearchAction) {
+    keys(input.requestSummary, ["query", "sourceIds", "sectionKeys", "needIds", "purpose"]);
+    const request = input.requestSummary;
+    if (request.query !== undefined) text(request.query, 4000);
+    if (request.sectionKeys !== undefined && (!Array.isArray(request.sectionKeys)
+      || request.sectionKeys.some(value => typeof value !== "string" || !value.trim()))) invalid();
+    if (request.purpose !== undefined && request.purpose !== "counterexample") invalid();
+    if (request.needIds !== undefined) {
+      strings(request.needIds); for (const id of request.needIds) this.getNeed(run.id, id);
+    }
+    if (request.sourceIds !== undefined) {
+      strings(request.sourceIds);
+      const sources = this.knowledgeStore.getTurnScope({ scopeId: run.turnScopeId })!.sources;
+      if (request.sourceIds.some(id => !sources.some(source => source.sourceId === id))) scopeViolation();
+    }
+    if (input.responseSummary !== null) {
+      keys(input.responseSummary, ["hitIds", "receiptIds", "count", "status", "errorCode"]);
+      const response = input.responseSummary;
+      for (const key of ["hitIds", "receiptIds"]) if (response[key] !== undefined) strings(response[key]);
+      if (response.count !== undefined && (!Number.isSafeInteger(response.count) || Number(response.count) < 0)) invalid();
+      for (const key of ["status", "errorCode"]) if (response[key] !== undefined) text(response[key]);
+    }
+  }
+  insertAction(input: KnowledgeResearchAction): KnowledgeResearchAction {
+    keys(input, ["id", "runId", "roundId", "ordinal", "actorSessionId", "actorAgentId", "actionType", "requestSummary",
+      "responseSummary", "status", "startedAt", "completedAt", "errorCode"]);
+    const run = this.requireActive(input.runId); this.actionMetadata(run, input);
+    if (input.roundId !== null && !this.knowledgeStore.db.prepare("SELECT id FROM knowledge_research_rounds WHERE id = ? AND run_id = ?")
+      .get(input.roundId, input.runId)) scopeViolation();
+    this.insert("knowledge_research_actions", { id: input.id, run_id: input.runId, round_id: input.roundId, ordinal: input.ordinal,
+      actor_session_id: input.actorSessionId, actor_agent_id: input.actorAgentId, action_type: input.actionType,
+      request_summary_json: JSON.stringify(input.requestSummary), response_summary_json: input.responseSummary === null ? null : JSON.stringify(input.responseSummary),
+      status: input.status, started_at: input.startedAt, completed_at: input.completedAt, error_code: input.errorCode });
+    return record(this.knowledgeStore.db.prepare("SELECT * FROM knowledge_research_actions WHERE id = ?").get(input.id));
+  }
+
+  /** 已经开始的动作必须能在取消或运行结束后收尾，不能借此新增动作或重写已有终态。 */
+  finishAction(runId: string, actionId: string, input: {
+    status: "completed" | "failed" | "cancelled"; responseSummary: Record<string, unknown> | null; errorCode: string | null;
+  }): KnowledgeResearchAction {
+    keys(input, ["status", "responseSummary", "errorCode"]);
+    if (!["completed", "failed", "cancelled"].includes(input.status)) invalid();
+    if (input.errorCode !== null) text(input.errorCode);
+    return this.transaction(() => {
+      const run = this.requireRun(runId);
+      const row = this.knowledgeStore.db.prepare("SELECT * FROM knowledge_research_actions WHERE run_id = ? AND id = ?").get(runId, actionId);
+      if (!row) throw new KnowledgeError("KNOWLEDGE_NOT_FOUND", "Research action was not found in this run");
+      const action = record<KnowledgeResearchAction>(row);
+      this.actionMetadata(run, { ...action, responseSummary: input.responseSummary });
+      if (action.status !== "running") {
+        const normalized = (value: Record<string, unknown> | null) => JSON.stringify(value === null ? null
+          : Object.fromEntries(Object.entries(value).sort(([left], [right]) => left.localeCompare(right))));
+        if (action.status === input.status && action.errorCode === input.errorCode
+          && normalized(action.responseSummary) === normalized(input.responseSummary)) return action;
+        throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Research action already has a different terminal result");
+      }
+      this.knowledgeStore.db.prepare(`UPDATE knowledge_research_actions
+        SET status = ?, response_summary_json = ?, error_code = ?, completed_at = ? WHERE run_id = ? AND id = ?`)
+        .run(input.status, input.responseSummary === null ? null : JSON.stringify(input.responseSummary), input.errorCode, this.now(), runId, actionId);
+      return record(this.knowledgeStore.db.prepare("SELECT * FROM knowledge_research_actions WHERE id = ?").get(actionId));
+    });
+  }
+  listActions(runId: string): KnowledgeResearchAction[] {
+    const run = this.requireRun(runId);
+    return this.knowledgeStore.db.prepare("SELECT * FROM knowledge_research_actions WHERE run_id = ? ORDER BY ordinal, id").all(runId)
+      .map((row: Record<string, unknown>) => { const action = record<KnowledgeResearchAction>(row); this.actionMetadata(run, action); return action; });
+  }
+  listRounds(runId: string): KnowledgeResearchRound[] {
+    this.requireRun(runId);
+    return this.knowledgeStore.db.prepare("SELECT * FROM knowledge_research_rounds WHERE run_id = ? ORDER BY ordinal, id").all(runId).map(record);
+  }
+}

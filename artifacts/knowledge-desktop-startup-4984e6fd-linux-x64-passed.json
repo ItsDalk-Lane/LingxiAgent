@@ -1,0 +1,17 @@
+{
+  "platform": "linux",
+  "arch": "x64",
+  "startedAt": "2026-09-04T08:42:11.337Z",
+  "status": "passed",
+  "packaged": true,
+  "rendererReady": true,
+  "serverReady": true,
+  "renderer": {
+    "ready": "complete",
+    "textLength": 93,
+    "controls": 7,
+    "entryScreen": "onboarding"
+  },
+  "durationMs": 16228.000689,
+  "finishedAt": "2026-09-04T08:42:27.566Z"
+}

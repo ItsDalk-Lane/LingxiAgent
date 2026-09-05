@@ -1,3 +1,4 @@
+import { KNOWLEDGE_EVIDENCE_BUDGET } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -15,16 +16,15 @@ import {
   parseQueryExpansion,
   type DecomposeModel,
   type QueryExpansionModel,
-} from "../lib/knowledge/knowledge-context-injector.ts";
+} from "./fixtures/knowledge-legacy/legacy-knowledge-context-injector.ts";
 import type { KnowledgeCoveragePlan } from "../lib/knowledge/knowledge-coverage-planner.ts";
 import {
-  KNOWLEDGE_EVIDENCE_BUDGET,
-  KNOWLEDGE_FUSION_BUDGET,
   type NotebookRetrievalChunk,
   type NotebookRetrievalSource,
   type RetrieveForNotebooksResult,
 } from "../lib/knowledge/knowledge-query-service.ts";
-import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+import { KNOWLEDGE_FUSION_BUDGET } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
+import { KnowledgeManager } from "./fixtures/knowledge-legacy/legacy-query-service.ts";
 
 /**
  * Phase 8 执行侧（任务书 §九十四/§九十五）：HIGH_RECALL 增强（受控扩展硬上限、
@@ -41,8 +41,8 @@ function tempHome() {
   return dir;
 }
 
-afterEach(() => {
-  for (const manager of managers.splice(0)) manager.close();
+afterEach(async () => {
+  for (const manager of managers.splice(0)) await manager.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
 

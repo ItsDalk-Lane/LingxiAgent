@@ -283,7 +283,7 @@ export const UserMessage = memo(function UserMessage({
 
 /**
  * 用户消息上方的知识库引用元信息：一行 muted 小字，只显示来源与模式
- * （知识库 · 笔记本 · 快速/详细模式）；整体不可用时追加「知识检索不可用」。
+ * （知识库 · 笔记本）；旧消息保留原模式标签，整体不可用时追加提示。
  * 检索统计（块数/注入数/tokens/超预算分片）不再上屏——面向用户的成败信号
  * 由蒸馏进度胶囊与知识检索折叠卡承载。模式 hint 与拆解降级原因收进
  * title tooltip，不占行宽。
@@ -302,8 +302,7 @@ const UserKnowledgeMeta = memo(function UserKnowledgeMeta({
   // 名称缺失回退 id；CJK 语言用顿号枚举，其余用逗号（保持单行紧凑，不走 ListFormat 的「和」连接）。
   const separator = /^(zh|ja)([-_]|$)/.test(locale || '') ? '、' : ', ';
   const nameList = names.join(separator);
-  // 模式标签/hint 查表（2026-08-31 两档化）：新值 fast/detailed 用新键；存量
-  // qa/assist 保留旧键渲染（旧消息显示不变）。
+  // 统一聊天不显示模式标签；旧消息保留当时的模式。
   const modeLabelKey = knowledgeRefs.mode === 'fast'
     ? 'chat.knowledgeMetaModeFast'
     : knowledgeRefs.mode === 'detailed'
@@ -318,15 +317,12 @@ const UserKnowledgeMeta = memo(function UserKnowledgeMeta({
       : knowledgeRefs.mode === 'qa'
         ? 'input.knowledgeModeQaHint'
         : 'input.knowledgeModeAssistHint';
-  const parts = [
-    t('chat.knowledgeMetaLabel'),
-    nameList,
-    t(modeLabelKey),
-  ];
+  const parts = [t('chat.knowledgeMetaLabel'), nameList];
+  if (knowledgeRefs.mode !== 'auto') parts.push(t(modeLabelKey));
   if (retrieval?.unavailableReason) {
     parts.push(t('chat.knowledgeMetaUnavailable'));
   }
-  const modeHint = t(modeHintKey);
+  const modeHint = knowledgeRefs.mode === 'auto' ? '' : t(modeHintKey);
   const degradeTitle = retrieval?.degraded
     ? t('chat.knowledgeMetaDegradedTitle', { reason: retrieval.degradeReason || '' })
     : '';

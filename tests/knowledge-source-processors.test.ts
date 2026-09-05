@@ -184,7 +184,7 @@ describe("source-processors（§五十八/§五十九 ProcessingArtifact 管线�
     await manager.deleteSource({ studioId: "studio-a", sourceId: imported.source.id });
     const left = manager.store.db.prepare("SELECT COUNT(*) AS n FROM processing_artifacts").get() as { n: number };
     expect(left.n).toBe(0);
-    manager.close();
+    await manager.close();
   });
 
   it("显式不支持的格式（.pptx/.doc/.xls/.epub）导入即拒绝，消息不泄露路径", async () => {
@@ -211,6 +211,6 @@ describe("source-processors（§五十八/§五十九 ProcessingArtifact 管线�
         expect(String((error as Error).message)).not.toContain(outside);
       }
     }
-    manager.close();
+    await manager.close();
   });
 });

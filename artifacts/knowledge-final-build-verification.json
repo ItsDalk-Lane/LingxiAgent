@@ -1,0 +1,45 @@
+{
+  "sourceSha": "c860054b9ee7f961abbb0cfebc2bbd9428ab6bd3",
+  "commands": [
+    {
+      "command": "npm run build:server",
+      "startedAt": "2026-09-04T07:52:08.707Z",
+      "finishedAt": "2026-09-04T07:54:00.449Z",
+      "durationMs": 111739.51333399999,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-final-build-server.log"
+    },
+    {
+      "command": "node scripts/verify-seed-kit.mjs",
+      "startedAt": "2026-09-04T07:54:00.450Z",
+      "finishedAt": "2026-09-04T07:54:04.175Z",
+      "durationMs": 3724.8905000000086,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-final-verify-seed.log"
+    },
+    {
+      "command": "node scripts/smoke-packaged-knowledge.mjs",
+      "startedAt": "2026-09-04T07:54:04.175Z",
+      "finishedAt": "2026-09-04T07:54:15.384Z",
+      "durationMs": 11208.604457999987,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-final-packaged-smoke.log"
+    },
+    {
+      "command": "npm run build:server:open",
+      "startedAt": "2026-09-04T07:54:15.384Z",
+      "finishedAt": "2026-09-04T07:54:54.181Z",
+      "durationMs": 38796.84695900002,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-final-build-open.log"
+    },
+    {
+      "command": "npm run build:client",
+      "startedAt": "2026-09-04T07:54:54.181Z",
+      "finishedAt": "2026-09-04T07:55:04.654Z",
+      "durationMs": 10472.506500000018,
+      "exitCode": 0,
+      "log": "/tmp/lingxi-knowledge-p307-final-build-client.log"
+    }
+  ]
+}

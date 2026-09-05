@@ -1,0 +1,117 @@
+{
+  "baseSha": "3eab85891a1747c64064252804f70c0a3773f021",
+  "finalSourceSha": "61ae60d1afe4f878ae638ff4de96d7e4f30bfefe",
+  "knowledgeSchemaVersion": 19,
+  "knowledgeIndexSchemaVersion": 4,
+  "annSchemaVersion": 1,
+  "fast": {
+    "executionPath": "fast_local",
+    "remoteModelCalls": 0,
+    "deadlineMs": 1200,
+    "maxEvidenceSpans": 8,
+    "renderBudgetTokens": 2400
+  },
+  "detailed": {
+    "executionPath": "detailed_research",
+    "maxRounds": 4,
+    "maxParallelAgents": 4,
+    "maxToolCalls": 32,
+    "maxWallClockMs": 180000
+  },
+  "vector": {
+    "primary": "usearch_hnsw",
+    "fallback": "portable_exact",
+    "usearchVersion": "2.26.0"
+  },
+  "tests": {
+    "typecheck": "passed",
+    "lint": "passed",
+    "boundary": "passed",
+    "vitest": "passed",
+    "buildServer": "passed",
+    "buildServerOpen": "passed",
+    "buildClient": "passed",
+    "package": "passed"
+  },
+  "verification": {
+    "localVitest": {
+      "passed": 13751,
+      "failed": 0,
+      "skipped": 7,
+      "durationSeconds": 78.81
+    },
+    "platformCi": {
+      "runId": 33864141539,
+      "runAttempt": 1,
+      "headSha": "790b496d88d8af6ad4a621085b93d802cc2553f9",
+      "status": "completed",
+      "priorFailedRunIds": [
+        33850016811,
+        33853266640,
+        33855890039,
+        33858404258
+      ],
+      "priorFailedAttempts": [
+        {
+          "runId": 33858404258,
+          "runAttempt": 1,
+          "reason": "Intel DMG temporary disk busy"
+        },
+        {
+          "runId": 33858404258,
+          "runAttempt": 2,
+          "reason": "early debug endpoint probe timeout"
+        }
+      ],
+      "conclusion": "success",
+      "artifactReleaseSmoke": {
+        "filesPassed": 8,
+        "passed": 305,
+        "failed": 0,
+        "skipped": 0,
+        "durationSeconds": 1.63
+      },
+      "qualityGate": {
+        "filesPassed": 1357,
+        "passed": 13741,
+        "failed": 0,
+        "skipped": 17,
+        "durationSeconds": 643.87
+      },
+      "platforms": [
+        {
+          "platform": "darwin",
+          "arch": "arm64",
+          "status": "passed",
+          "knowledgeTests": 151,
+          "desktopStartupPassed": true,
+          "cleanupPassed": true
+        },
+        {
+          "platform": "darwin",
+          "arch": "x64",
+          "status": "passed",
+          "knowledgeTests": 151,
+          "desktopStartupPassed": true,
+          "cleanupPassed": true
+        },
+        {
+          "platform": "win32",
+          "arch": "x64",
+          "status": "passed",
+          "knowledgeTests": 151,
+          "desktopStartupPassed": true,
+          "cleanupPassed": true
+        },
+        {
+          "platform": "linux",
+          "arch": "x64",
+          "status": "passed",
+          "knowledgeTests": 151,
+          "desktopStartupPassed": true,
+          "cleanupPassed": true
+        }
+      ]
+    }
+  }
+}

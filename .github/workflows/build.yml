@@ -66,6 +66,9 @@ jobs:
         run: npm ci
 
       - name: Typecheck
+        # 发布与合并检查使用相同容量，避免测试工程在默认堆上限处中断。
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
         run: npm run typecheck
 
       - name: Lint
@@ -165,6 +168,26 @@ jobs:
 
       - name: Run Knowledge platform smoke
         run: npm run test:knowledge-platform-smoke
+
+      - name: Run Knowledge stable-runner performance gates
+        if: runner.os == 'Linux'
+        env:
+          LINGXI_ENFORCE_KNOWLEDGE_PERF: "1"
+        run: |
+          node scripts/benchmark-knowledge-fast.mjs --output=artifacts/knowledge-fast-benchmark.json
+          node scripts/benchmark-knowledge-vector.mjs --output=artifacts/knowledge-vector-benchmark.json
+          node scripts/benchmark-knowledge-research.mjs --output=artifacts/knowledge-research-benchmark.json
+
+      - name: Upload Knowledge performance evidence
+        if: always() && runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-benchmarks-linux-x64
+          path: |
+            artifacts/knowledge-fast-benchmark.json
+            artifacts/knowledge-vector-benchmark.json
+            artifacts/knowledge-research-benchmark.json
+          if-no-files-found: error
 
       # Windows: 下载官方 MinGit（git + sh-compatible shell + coreutils，非交互运行时），打包进安装包
       - name: Download MinGit
@@ -416,6 +439,30 @@ jobs:
           npx electron-builder --linux AppImage deb --${{ matrix.arch }} --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Smoke packaged desktop startup (macOS and Windows)
+        if: runner.os != 'Linux'
+        run: node scripts/smoke-packaged-desktop.mjs
+
+      # 解包目录尚未经过系统安装器，启动前补齐 Chromium 沙箱辅助程序所需的属主和权限。
+      - name: Prepare Linux packaged desktop sandbox
+        if: runner.os == 'Linux'
+        run: |
+          sudo chown root:root dist/linux-unpacked/chrome-sandbox
+          sudo chmod 4755 dist/linux-unpacked/chrome-sandbox
+          test "$(stat -c '%u:%g:%a' dist/linux-unpacked/chrome-sandbox)" = '0:0:4755'
+
+      - name: Smoke packaged desktop startup (Linux virtual display)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a node scripts/smoke-packaged-desktop.mjs
+
+      - name: Upload packaged desktop startup evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-desktop-startup-${{ matrix.platform }}-${{ matrix.arch }}
+          path: artifacts/knowledge-desktop-startup-${{ matrix.platform }}-${{ matrix.arch }}.json
+          if-no-files-found: error
 
       # dist-server-artifact/*/server-*.tar.gz and dist-renderer-artifact/renderer-*.tar.gz
       # are the hot-update boxes packed by packDualKindSeed (see scripts/build-server-artifact.mjs).

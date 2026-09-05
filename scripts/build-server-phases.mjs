@@ -25,12 +25,15 @@ import ts from "typescript";
 import {
   buildAnydocRuntimeSmokeScript,
   buildBetterSqliteRuntimeSmokeScript,
+  buildUseArchRuntimeSmokeScript,
   buildJiebaRuntimeSmokeScript,
   buildExternalPackage,
   collectBareImportPackageNames,
   collectInstalledOptionalDependencyDirs,
   verifyExternalEntrypoints,
 } from "./build-server-deps.mjs";
+import { buildKnowledgeVectorRuntime, assertKnowledgeVectorRuntime, knowledgeUseArchNativePath } from "./build-server-runtime-assets.mjs";
+import { repairUseArchNative } from "./prepare-usearch-native.mjs";
 import { pruneRuntimeDeadFiles } from "./build-server-prune.mjs";
 
 // ── Node.js runtime ──────────────────────────────────────────────────────
@@ -177,6 +180,7 @@ export function buildViteServerBundle({ rootDir, viteBundleDir, bundleOutDir, en
   });
 
   fs.cpSync(viteBundleDir, bundleOutDir, { recursive: true });
+  buildKnowledgeVectorRuntime({ rootDir, bundleOutDir });
   log("[build-server] Vite bundle copied to bundle/");
 }
 
@@ -376,7 +380,7 @@ export async function resolveAndInstallExternalServerDeps({
   }
 
   const builtinSet = new Set(builtinModules.flatMap((m) => [m, `node:${m}`]));
-  const deps = rootPkg.dependencies || {};
+  const deps = { ...rootPkg.dependencies, ...rootPkg.optionalDependencies };
   const externalDeps = {};
 
   for (const ext of viteExternals) {
@@ -390,14 +394,16 @@ export async function resolveAndInstallExternalServerDeps({
     }
   }
 
-  const undeclaredExtraDeps = extraPackageNames.filter((packageName) => !deps[packageName]);
+  // 后台线程动态加载的扩展不是静态 bundle import；发布包必须安装，源码启动仍允许缺失。
+  const runtimeExtraPackageNames = [...new Set([...extraPackageNames, "usearch"])];
+  const undeclaredExtraDeps = runtimeExtraPackageNames.filter((packageName) => !deps[packageName]);
   if (undeclaredExtraDeps.length > 0) {
     throw new Error(
       "[build-server] required package(s) missing from root dependencies: "
         + undeclaredExtraDeps.join(", "),
     );
   }
-  for (const packageName of extraPackageNames) {
+  for (const packageName of runtimeExtraPackageNames) {
     externalDeps[packageName] = deps[packageName];
   }
 
@@ -419,7 +425,7 @@ export async function resolveAndInstallExternalServerDeps({
   const rootLock = JSON.parse(fs.readFileSync(path.join(rootDir, "package-lock.json"), "utf-8"));
   const externalPkg = buildExternalPackage(rootPkg, externalDeps, {
     rootLock,
-    pinnedTransitiveDeps,
+    pinnedTransitiveDeps: externalDeps.usearch ? [...new Set([...pinnedTransitiveDeps, "node-gyp-build", "bindings"])] : pinnedTransitiveDeps,
   });
   const pinnedDeps = Object.entries(externalPkg.dependencies)
     .map(([name, version]) => `${name}@${version}`)
@@ -433,6 +439,7 @@ export async function resolveAndInstallExternalServerDeps({
 
   log("[build-server] installing external dependencies...");
   runWithTargetNode(`"${cachedNpmCli}" install --omit=dev --no-audit --no-fund --ignore-scripts=false`);
+  repairUseArchNative({ rootDir: outDir, platform, arch, required: true, log });
   ensureNodePtySpawnHelperExecutable({ baseDir: outDir, platform, arch, isWin });
 
   // Verify every string Vite external actually resolved into node_modules.
@@ -605,6 +612,13 @@ export async function pruneServerNodeModulesViaNft({
 
   verifyExternalEntrypoints(outDir, externalPackageNames);
 
+  if (externalPackageNames.includes("usearch")) {
+    const smokeScript = path.join(outDir, ".usearch-smoke.mjs");
+    fs.writeFileSync(smokeScript, buildUseArchRuntimeSmokeScript());
+    try { runWithTargetNode(path.basename(smokeScript)); }
+    finally { fs.rmSync(smokeScript, { force: true }); }
+  }
+
   if (externalPackageNames.includes("better-sqlite3")) {
     const smokeScript = path.join(outDir, ".better-sqlite3-smoke.mjs");
     fs.writeFileSync(smokeScript, buildBetterSqliteRuntimeSmokeScript());
@@ -685,6 +699,17 @@ export function applyPlatformPackageTrim({ outDir, platform, arch, log = (msg) =
     if (nodePtyRemoved > 0) {
       log(`[build-server] node-pty: kept prebuilds/${target}, removed ${nodePtyRemoved} other platform prebuilds`);
     }
+  }
+
+  const usearchRoot = path.join(nmDir, "usearch");
+  if (fs.existsSync(usearchRoot)) {
+    const target = path.basename(path.dirname(knowledgeUseArchNativePath(platform, arch)));
+    const prebuilds = path.join(usearchRoot, "prebuilds");
+    for (const name of fs.readdirSync(prebuilds)) {
+      if (name !== target) fs.rmSync(path.join(prebuilds, name), { recursive: true, force: true });
+    }
+    assertKnowledgeVectorRuntime(outDir, platform, arch);
+    log(`[build-server] usearch: kept prebuilds/${target}`);
   }
 
   const larkTypes = path.join(nmDir, "@larksuiteoapi", "node-sdk", "types");

@@ -4,7 +4,8 @@
  * 启动刚构建的闭集服务器种子两次，证明 Knowledge 在真实包内运行时能够：
  * 1. 从空数据目录建库、创建 Notebook、导入并解析粘贴文本；
  * 2. 进程退出后用同一数据目录重启；
- * 3. 读回同一个来源、冻结快照原文与安全响应头。
+ * 3. 读回同一个来源、冻结快照原文与安全响应头；
+ * 4. 用包内真实管理器对该资料执行快速检索，并在移除原生向量扩展后重做。
  *
  * 崩溃中断后的研究续跑由 test:knowledge-platform-smoke 在同一宿主先行验证；
  * 本脚本专注于不能由源码测试替代的“包内运行时 + 持久化重启”边界。
@@ -14,6 +15,7 @@ import os from "node:os";
 import path from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { assertKnowledgeVectorRuntime } from "./build-server-runtime-assets.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SMOKE_TEXT = "Knowledge packaged runtime smoke text. 跨平台冻结正文。";
@@ -215,6 +217,113 @@ async function startServer(input) {
   }
 }
 
+/** 子进程只导入解包目录内的真实后端和依赖。 */
+export function packagedKnowledgeVectorScript() {
+  return `import assert from "node:assert/strict";
+import path from "node:path";
+import crypto from "node:crypto";
+import { createKnowledgeVectorSearchBackend, PortableVectorIndexAdapter, knowledgeChunkIndexVariantId,
+  searchVectorBackend } from "./bundle/knowledge-vector.js";
+const [home, expected] = process.argv.slice(2);
+const portable = new PortableVectorIndexAdapter({ dbPath: path.join(home, "knowledge-vector.db") });
+const model = { provider: "packaged-smoke", modelId: "fixed", protocol: "openai", dimensions: 3,
+  key: crypto.createHash("sha256").update("packaged-smoke").digest("hex") };
+const input = { parseArtifactId: "packaged-smoke", chunkIndexVariantId: knowledgeChunkIndexVariantId("packaged-smoke", "fixed"),
+  model, chunkFingerprint: "fixed-three-vectors", entries: [[1,0,0],[0,1,0],[0,0,1]].map((vector, ordinal) => ({
+    parseArtifactId: "packaged-smoke", chunkId: "chunk-" + ordinal, ordinal, vector })) };
+const variant = expected === "hnsw" ? portable.buildOrReplaceArtifact(input).vectorIndexVariantId
+  : portable.listReadyVectorVariantIds()[0];
+assert.ok(variant);
+const backend = createKnowledgeVectorSearchBackend({ indexesRoot: home, portable });
+try {
+  if (backend.whenIdle) await backend.whenIdle();
+  const result = await searchVectorBackend(backend, { vectorIndexVariantIds: [variant], model, queryVector: [1,0,0], limit: 1 });
+  assert.equal(result.vectorBackend, expected, JSON.stringify({ vectorBackend: result.vectorBackend, degradedReasons: result.degradedReasons }));
+  assert.equal(result.results[0]?.chunkId, "chunk-0");
+  // 余弦实现存在浮点舍入，单位向量只允许两个机器精度单位的误差。
+  assert.ok(Math.abs(result.results[0]?.score - 1) <= 2 * Number.EPSILON);
+  if (expected === "portable") assert.ok(result.degradedReasons.includes("ANN_NATIVE_UNAVAILABLE:" + variant));
+  assert.deepEqual(portable.readReadyVectorBatch(variant, -1).map(entry => entry.vector), input.entries.map(entry => entry.vector));
+  console.log(JSON.stringify({ vectorBackend: result.vectorBackend, degradedReasons: result.degradedReasons, hits: result.results.length }));
+} finally { await backend.close(); portable.close(); }
+`;
+}
+
+export async function runPackagedKnowledgeVectorSmoke({ serverDir, platform = process.platform, arch = process.arch,
+  onNativeRemoved } = {}) {
+  assertNativeTarget({ platform, arch });
+  assertKnowledgeVectorRuntime(serverDir, platform, arch);
+  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-package-vector-"));
+  const script = path.join(serverDir, ".knowledge-vector-smoke.mjs");
+  const moved = [];
+  const home = path.join(temporary, "indexes");
+  fs.mkdirSync(home);
+  function run(expected) {
+    const result = spawnSync(runtimePath(serverDir, platform), [script, home, expected], {
+      cwd: serverDir, env: buildRuntimeEnvironment(), encoding: "utf8", timeout: 60_000,
+      maxBuffer: 2 * 1024 * 1024,
+    });
+    if (result.error || result.status !== 0) throw new Error(
+      `packaged vector ${expected} smoke failed: ${result.error?.message || result.stderr || result.status}`);
+    return JSON.parse(result.stdout.trim().split("\n").at(-1));
+  }
+  try {
+    fs.writeFileSync(script, packagedKnowledgeVectorScript(), { flag: "wx" });
+    const native = run("hnsw");
+    // 真正移走解包副本中的全部原生扩展，再启动一个全新进程，避免模块缓存掩盖缺包问题。
+    const packageRoot = path.join(serverDir, "node_modules/usearch");
+    for (const relative of fs.readdirSync(packageRoot, { recursive: true })) {
+      if (!relative.endsWith(".node")) continue;
+      const original = path.join(packageRoot, relative), backup = path.join(temporary, `native-${moved.length}`);
+      fs.renameSync(original, backup); moved.push({ original, backup });
+    }
+    if (!moved.length) throw new Error("packaged native-removal smoke removed no extension");
+    const fallback = run("portable");
+    if (onNativeRemoved) await onNativeRemoved();
+    console.log(`packaged knowledge vector smoke: native=${native.vectorBackend}, removed-native=${fallback.vectorBackend}`);
+    return { native, fallback };
+  } finally {
+    for (const { original, backup } of moved) fs.renameSync(backup, original);
+    fs.rmSync(script, { force: true });
+    fs.rmSync(temporary, { recursive: true, force: true });
+  }
+}
+
+/** 使用归档内构建模块与包内运行时，重开真实服务器数据执行检索。 */
+export function runPackagedKnowledgeRetrievalSmoke({ serverDir, platform = process.platform, lingxiHome, studioId, notebookId, sourceId }) {
+  const script = path.join(serverDir, ".knowledge-retrieval-smoke.mjs");
+  try {
+    fs.writeFileSync(script, `import assert from "node:assert/strict";
+import path from "node:path";
+import { KnowledgeManager } from "./bundle/knowledge-query.js";
+const [lingxiHome, studioId, notebookId, sourceId] = process.argv.slice(2);
+const remote = () => { throw new Error("Packaged fast retrieval must never call remote models"); };
+const manager = new KnowledgeManager({ lingxiHome, embedTextsForModel: remote, rerankForModel: remote });
+try {
+  assert.equal(manager.store.db.pragma("user_version", { simple: true }), 19);
+  assert.equal(manager.indexStore.db.pragma("user_version", { simple: true }), 4);
+  const scope = manager.createTurnScope({ studioId, notebookIds: [notebookId], sessionPath: path.join(lingxiHome, "packaged-query.jsonl") });
+  const result = await manager.runFastKnowledgePipeline({ scope, question: "跨平台冻结正文" });
+  assert.equal(result.stats.executionPath, "fast_local");
+  assert.equal(result.stats.remoteModelCalls, 0);
+  assert.equal(result.stats.retrievalMode, "fts");
+  assert.ok(result.stats.injectedChunks > 0 && result.stats.injectedChunks <= 8);
+  assert.ok(result.block.includes("跨平台冻结正文"));
+  assert.ok(result.evidence.entries.length > 0);
+  assert.ok(result.evidence.entries.every(entry => entry.sourceId === sourceId));
+  console.log(JSON.stringify({ executionPath: result.stats.executionPath, remoteModelCalls: result.stats.remoteModelCalls,
+    injectedChunks: result.stats.injectedChunks, knowledgeSchemaVersion: 19, indexSchemaVersion: 4 }));
+} finally { await manager.close(); }
+`, { flag: "wx" });
+    const result = spawnSync(runtimePath(serverDir, platform), [script, lingxiHome, studioId, notebookId, sourceId], {
+      cwd: serverDir, env: buildRuntimeEnvironment(), encoding: "utf8", timeout: 60_000, maxBuffer: 2 * 1024 * 1024,
+    });
+    if (result.error || result.status !== 0) throw new Error(
+      `packaged retrieval smoke failed: ${result.error?.message || result.stderr || result.status}`);
+    return JSON.parse(result.stdout.trim().split("\n").at(-1));
+  } finally { fs.rmSync(script, { force: true }); }
+}
+
 export async function runPackagedKnowledgeSmoke({
   rootDir = ROOT,
   platform = process.platform,
@@ -261,6 +370,16 @@ export async function runPackagedKnowledgeSmoke({
     ) {
       throw new Error("packaged Knowledge source was not stored and parsed as READY");
     }
+    // 等待真实摄入队列完成，不在查询检查中手工建索引。
+    const ingestionDeadline = Date.now() + 30_000;
+    while (true) {
+      const ingestion = await requestJson({ ...auth, pathname: `/api/knowledge/ingestion?sourceId=${encodeURIComponent(sourceId)}` }, 200);
+      if (ingestion.jobs.some(job => job.status === "done" || (job.status === "pending_embedding" && job.phase === "embed"))) break;
+      if (ingestion.jobs.some(job => job.status === "failed") || Date.now() >= ingestionDeadline) {
+        throw new Error("packaged Knowledge ingestion did not finish before restart: " + JSON.stringify(ingestion.counts));
+      }
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
     await stopServer(first.child);
     first = null;
 
@@ -291,7 +410,21 @@ export async function runPackagedKnowledgeSmoke({
     ) {
       throw new Error("frozen Knowledge snapshot is missing required security headers");
     }
-    return { ok: true, platform, arch };
+    await stopServer(second.child); second = null;
+    const retrievalInput = { serverDir, platform, lingxiHome, studioId: created.notebook.studioId, notebookId, sourceId };
+    const retrieval = runPackagedKnowledgeRetrievalSmoke(retrievalInput);
+    let fallbackRetrieval;
+    const vector = await runPackagedKnowledgeVectorSmoke({ serverDir, platform, arch, onNativeRemoved: async () => {
+      second = await startServer({ serverDir, platform, lingxiHome });
+      const fallbackContent = await request({ baseUrl: second.baseUrl, token: second.info.token,
+        pathname: `/api/knowledge/snapshots/${encodeURIComponent(snapshotId)}/content` });
+      if (fallbackContent.status !== 200 || await fallbackContent.text() !== SMOKE_TEXT) {
+        throw new Error("packaged server cannot read Knowledge after native extension removal");
+      }
+      await stopServer(second.child); second = null;
+      fallbackRetrieval = runPackagedKnowledgeRetrievalSmoke(retrievalInput);
+    } });
+    return { ok: true, platform, arch, vector, retrieval, fallbackRetrieval };
   } finally {
     if (first) await stopServer(first.child);
     if (second) await stopServer(second.child);
@@ -303,8 +436,9 @@ async function main() {
   const platform = process.argv[2] || process.platform;
   const arch = process.argv[3] || process.arch;
   console.log(`packaged Knowledge smoke: ${platform}-${arch}`);
-  await runPackagedKnowledgeSmoke({ platform, arch });
-  console.log("packaged Knowledge smoke passed: signed archive extraction, fresh install, source parse, restart, immutable snapshot read");
+  const result = await runPackagedKnowledgeSmoke({ platform, arch });
+  console.log(JSON.stringify(result));
+  console.log("packaged Knowledge smoke passed: signed archive extraction, fresh install, source parse, restart, immutable snapshot read, real fast retrieval and native-removal fallback");
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

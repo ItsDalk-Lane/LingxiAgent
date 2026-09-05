@@ -86,7 +86,7 @@ describe("KnowledgeManager 目录导入（§六十九）", () => {
     // displayOrder 按目录枚举序单调递增且互不重复。
     const orders = result.imported.map(entry => membership(entry.path).displayOrder);
     expect(new Set(orders).size).toBe(orders.length);
-    manager.close();
+    await manager.close();
   });
 
   it("同内容跨 Notebook 去重复用：同一 Source 在不同 Notebook 可有不同目录位置", async () => {
@@ -139,7 +139,7 @@ describe("KnowledgeManager 目录导入（§六十九）", () => {
       "SELECT COUNT(*) AS n FROM content_snapshots WHERE sha256 = ?",
     ).get(crypto.createHash("sha256").update(bytes).digest("hex")) as { n: number };
     expect(snapshots.n).toBe(1);
-    manager.close();
+    await manager.close();
   });
 
   it("拒绝相对路径、文件路径与软链接目录", async () => {
@@ -164,6 +164,6 @@ describe("KnowledgeManager 目录导入（§六十九）", () => {
     } catch (error: any) {
       if (error?.code !== "EPERM") throw error;
     }
-    manager.close();
+    await manager.close();
   });
 });

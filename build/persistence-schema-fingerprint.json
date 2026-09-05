@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:76aa1c344a34f4f1a9864425cfe3e10efcf3bb6aa4c75b61084247456d6e270a",
+  "payloadFingerprint": "sha256:0ffafa9a1f3c3a892a59a5db98cb9269f58168bd2f945cc81e234d7e669c387c",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -1676,7 +1676,7 @@
       "protocolModules": [],
       "restorePolicy": "Restore through KnowledgeManager before queries resume; validate SQLite user_version and referenced managed bytes together.",
       "schemaContract": {
-        "compatibility": "schema v6 adds notebook config columns (embedding_model_ref/rerank_model_ref inherit the global preference when NULL; chunk_target_chars/retrieval_top_k fall back to built-in defaults 1200/12) and the ingestion_jobs queue table, and drops the V3-V5 research tables in the same transaction; research rows were derived artifacts, so the V1-V2 source-of-truth tables migrate untouched. schema v7 adds ingestion_jobs.progress_done (NOT NULL DEFAULT 0) and progress_total (NULL = embed phase not reached) for embedding progress; existing rows backfill 0/NULL and no other persisted shape changes. schema v8 is a pure data migration: retrieval_top_k is reset to NULL for all active notebooks (NULL = uncapped retrieval; the DDL DEFAULT 12 from v6 is a legacy artifact new notebooks no longer receive). schema v9 (P0 index identity) is purely additive: it creates the chunk_profiles and retrieval_profiles identity registries plus the notebooks.retrieval_profile_id binding column, and backfills chunk_profiles from ingestion_jobs.chunker_config_id history (unresolvable hashes become profile_type='legacy' rows with NULL config, never fabricated); no existing column or index/vector data is touched and no re-embedding is triggered. schema v10 adds ingestion_jobs.embedding_stats (JSON, NULL = embed phase never ran); schema v11 adds the KnowledgeTurnScope tables knowledge_turn_scopes and knowledge_turn_scope_sources. schema v12 (lifecycle governance) is additive: sources.orphaned_at marks zero-membership orphans for retention-based GC, ingestion_jobs.cancelled_at marks jobs cancelled by explicit source deletion (the status CHECK cannot gain a 'cancelled' value, so cancellation reuses the failed terminal state plus this explicit column, and requeue rejects cancelled rows), and a partial unique index enforces one active job per (notebook_id, source_id) after collapsing pre-existing duplicate active rows to failed with an explicit error. schema v13 (Phase 7 coverage planner) is purely additive: the knowledge_coverage_plans table persists structured KnowledgeCoveragePlan results only (intent/coverage_mode/requires_completeness/scope_level/sub_queries_json/confidence/matched_rule_ids_json/classifier_used/degrade_reason plus a nullable turn_scope_id reference); no chain-of-thought or raw model output is ever stored, and no existing table or row changes. schema v14 (Phase 9 exhaustive coverage execution) is purely additive: the coverage_runs and coverage_shards tables persist the frozen coverage manifest identity (manifest_hash plus manifest_json with unit texts for resume), deterministic shard rows with attempt counts, and worker ShardResult JSON only (structured findings with provenance; no chain-of-thought); recovery reuses completed shard results and resets running shards to pending, and no existing table or row changes. schema v15 (EvidenceManifest, task spec 67) is purely additive: the evidence_manifests and evidence_manifest_entries tables persist per-answer evidence identity chains only (turn scope/session/turn/coverage mode references plus per-source snapshot/artifact/chunk-profile/chunk-and-vector-variant ids, neighbor ids, block offsets, and citation labels); no chunk text, chain-of-thought, or model output is ever stored, entries are re-verified server-side against the frozen turn-scope source set on insert, and orphan GC plus deleteSource now skip sources referenced by any manifest; no existing table or row changes. schema v16 (Phase 12 ProcessingArtifact pipeline, task spec 58/59/69) is purely additive: the processing_artifacts table persists binary-format conversion generations keyed by the processor identity quadruple (content_snapshot_id, processor_id, processor_version, processor_config_hash) with fidelity, output locator, locatorMap JSON and warnings; parse_artifacts gains fidelity (legacy rows default to 'citation_grade') and processing_artifact_id; notebook_sources gains directory organization path columns (relative_path/folder_node/display_order, NULL = no directory context); no existing table, row, or index/vector data is touched and no re-processing is triggered.",
+        "compatibility": "schema v6 adds notebook config columns (embedding_model_ref/rerank_model_ref inherit the global preference when NULL; chunk_target_chars/retrieval_top_k fall back to built-in defaults 1200/12) and the ingestion_jobs queue table, and drops the V3-V5 research tables in the same transaction; research rows were derived artifacts, so the V1-V2 source-of-truth tables migrate untouched. schema v7 adds ingestion_jobs.progress_done (NOT NULL DEFAULT 0) and progress_total (NULL = embed phase not reached) for embedding progress; existing rows backfill 0/NULL and no other persisted shape changes. schema v8 is a pure data migration: retrieval_top_k is reset to NULL for all active notebooks (NULL = uncapped retrieval; the DDL DEFAULT 12 from v6 is a legacy artifact new notebooks no longer receive). schema v9 (P0 index identity) is purely additive: it creates the chunk_profiles and retrieval_profiles identity registries plus the notebooks.retrieval_profile_id binding column, and backfills chunk_profiles from ingestion_jobs.chunker_config_id history (unresolvable hashes become profile_type='legacy' rows with NULL config, never fabricated); no existing column or index/vector data is touched and no re-embedding is triggered. schema v10 adds ingestion_jobs.embedding_stats (JSON, NULL = embed phase never ran); schema v11 adds the KnowledgeTurnScope tables knowledge_turn_scopes and knowledge_turn_scope_sources. schema v12 (lifecycle governance) is additive: sources.orphaned_at marks zero-membership orphans for retention-based GC, ingestion_jobs.cancelled_at marks jobs cancelled by explicit source deletion (the status CHECK cannot gain a 'cancelled' value, so cancellation reuses the failed terminal state plus this explicit column, and requeue rejects cancelled rows), and a partial unique index enforces one active job per (notebook_id, source_id) after collapsing pre-existing duplicate active rows to failed with an explicit error. schema v13 (Phase 7 coverage planner) is purely additive: the knowledge_coverage_plans table persists structured KnowledgeCoveragePlan results only (intent/coverage_mode/requires_completeness/scope_level/sub_queries_json/confidence/matched_rule_ids_json/classifier_used/degrade_reason plus a nullable turn_scope_id reference); no chain-of-thought or raw model output is ever stored, and no existing table or row changes. schema v14 (Phase 9 exhaustive coverage execution) is purely additive: the coverage_runs and coverage_shards tables persist the frozen coverage manifest identity (manifest_hash plus manifest_json with unit texts for resume), deterministic shard rows with attempt counts, and worker ShardResult JSON only (structured findings with provenance; no chain-of-thought); recovery reuses completed shard results and resets running shards to pending, and no existing table or row changes. schema v15 (EvidenceManifest, task spec 67) is purely additive: the evidence_manifests and evidence_manifest_entries tables persist per-answer evidence identity chains only (turn scope/session/turn/coverage mode references plus per-source snapshot/artifact/chunk-profile/chunk-and-vector-variant ids, neighbor ids, block offsets, and citation labels); no chunk text, chain-of-thought, or model output is ever stored, entries are re-verified server-side against the frozen turn-scope source set on insert, and orphan GC plus deleteSource now skip sources referenced by any manifest; no existing table or row changes. schema v16 (Phase 12 ProcessingArtifact pipeline, task spec 58/59/69) is purely additive: the processing_artifacts table persists binary-format conversion generations keyed by the processor identity quadruple (content_snapshot_id, processor_id, processor_version, processor_config_hash) with fidelity, output locator, locatorMap JSON and warnings; parse_artifacts gains fidelity (legacy rows default to 'citation_grade') and processing_artifact_id; notebook_sources gains directory organization path columns (relative_path/folder_node/display_order, NULL = no directory context); no existing table, row, or index/vector data is touched and no re-processing is triggered. schema v18 新增七张研究台账表：knowledge_research_runs、knowledge_evidence_needs、knowledge_research_rounds、knowledge_research_read_receipts、knowledge_evidence_items、knowledge_need_evidence、knowledge_research_actions；建表与 user_version 同事务提交。保留既有资料和派生索引，新增记录通过外键与原始来源定位关联，约束状态、数量、偏移、摘要格式和 JSON 形状。阅读凭据只存定位与 hash，证据表只保存经宿主核实的短引文，动作只保存结构化请求/结果摘要，不保存完整提示、模型原始回答或隐藏思考。 schema v19 仅新增 knowledge_completeness_checks、knowledge_completeness_units、knowledge_completeness_unit_evidence、knowledge_completeness_coverage_runs 四张完整性记录表；在同一事务中建表和更新版本，已有资料、原文凭据及研究证据逐行保持不变。新表仅保存计数、核查状态和既有资料/证据/覆盖运行的身份关联，约束唯一性、引用、偏移和完整性计数，不复制正文或模型输出。",
         "kind": "runtime-source",
         "source": "lib/knowledge/knowledge-store.ts"
       },
@@ -1689,7 +1689,7 @@
     {
       "affectedByEpochMigration": false,
       "bootstrapSafety": null,
-      "checkpointPolicy": "Excluded; indexes are performance projections and must be completely rebuildable from knowledge.db plus validated parse artifacts.",
+      "checkpointPolicy": "Portable vector BLOBs retain ingestion batch checkpoints and remain the recovery input for ANN; regenerable ANN files are not a checkpoint authority. Epoch checkpoint exclusion for this projection store remains unchanged.",
       "epochPolicy": "regenerable",
       "exemption": null,
       "firstPossibleOpenPhase": "engine_construct",
@@ -1699,12 +1699,14 @@
       "identityContract": "Index generation IDs are disposable projection identities; ChunkIndexVariant (parseArtifactId, chunkProfileHash) and VectorIndexVariant (chunkIndexVariantId, modelKey) are deterministic derived identities, while Notebook, Source, Snapshot, Artifact, Evidence, and Claim facts never originate here.",
       "migrationEntry": [
         "KnowledgeIndexStore runtime DDL",
-        "PortableVectorIndexAdapter runtime DDL"
+        "PortableVectorIndexAdapter runtime DDL",
+        "AnnIndexStore runtime DDL"
       ],
       "openEntry": [
         "new KnowledgeManager",
         "new KnowledgeIndexStore",
-        "new PortableVectorIndexAdapter"
+        "new PortableVectorIndexAdapter",
+        "new AnnIndexStore"
       ],
       "ownerModule": "lib/knowledge/knowledge-index-store.ts",
       "pathExclusions": [],
@@ -1715,16 +1717,19 @@
       ],
       "preCoordinatorReadProjection": null,
       "protocolModules": [
-        "lib/knowledge/vector-index-adapter.ts"
+        "lib/knowledge/vector-index-adapter.ts",
+        "lib/knowledge/ann-index-store.ts",
+        "lib/knowledge/usearch-vector-backend.ts",
+        "lib/knowledge/vector-search-backend-factory.ts"
       ],
-      "restorePolicy": "Delete incompatible or corrupt index generations and rebuild them; never use an index as the source of Knowledge truth.",
+      "restorePolicy": "ANN corruption rebuilds only knowledge-ann.db and knowledge-ann files from retained portable vector BLOBs. Lexical projections rebuild from parse artifacts; never use an ANN file as the sole vector recovery source.",
       "schemaContract": {
-        "compatibility": "knowledge-fts.db schema v2 and knowledge-vector.db schema v2 (P0 index identity) migrate v1 in a single transaction each: chunk identity moves from (parse_artifact_id, ordinal) to ChunkIndexVariant (parse_artifact_id, chunk_profile_hash) + ordinal via chunk_index_variants backfill (artifact_indexes is retired after backfill), and vector identity moves from (parse_artifact_id, model_key) to VectorIndexVariant (chunk_index_variant_id, model_key) via vector_index_variants backfill (vector_artifacts is retired after backfill). Rows whose chunk profile cannot be resolved are filed under the explicit legacy_unknown identity instead of being dropped; migrations only establish identities and remap existing rows, never re-chunk or re-embed.",
+        "compatibility": "P3-04 将 FTS v3 增量升级为 v4：新增来源/章节与对应全文索引、片段追加可空 section_id；旧行、旧 v2 分块配置和向量保留，后台分批建立 v3 512-token 片段，未就绪时继续读旧索引。迁移失败整笔回滚且保留旧库。P1 adds chunk_index_variant_metadata (FTS v3) and a separate ann_variants catalog (ANN v1); portable vector schema stays v3 and retains BLOBs for exact fallback and ANN rebuild. Historical knowledge-fts.db schema v2 and knowledge-vector.db schema v2 (P0 index identity) migrate v1 in a single transaction each: chunk identity moves from (parse_artifact_id, ordinal) to ChunkIndexVariant (parse_artifact_id, chunk_profile_hash) + ordinal via chunk_index_variants backfill (artifact_indexes is retired after backfill), and vector identity moves from (parse_artifact_id, model_key) to VectorIndexVariant (chunk_index_variant_id, model_key) via vector_index_variants backfill (vector_artifacts is retired after backfill). Rows whose chunk profile cannot be resolved are filed under the explicit legacy_unknown identity instead of being dropped; migrations only establish identities and remap existing rows, never re-chunk or re-embed.",
         "kind": "protocol",
         "source": "lib/knowledge/knowledge-index-store.ts"
       },
       "schemaSource": {
-        "contract": "Regenerable lexical SQLite schema together with the vector cache schema in lib/knowledge/vector-index-adapter.ts; both derive only from durable Knowledge facts and artifacts",
+        "contract": "Lexical SQLite schema v3, portable vector SQLite schema v3, and rebuildable ANN catalog schema v1. ANN files derive from retained portable vector BLOBs; ANN failure never deletes those BLOBs",
         "kind": "directory-contract",
         "module": "lib/knowledge/knowledge-index-store.ts"
       }
@@ -3287,8 +3292,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "observability schema v5→v6：修正同会话轨迹合并口径（实测桌面 turn 经 pi ingress 落成 origin=unknown，v5 的 user_turn 过滤零命中）——v6 按「调用归属会话」全量合并，仍为纯数据整合、无 DDL、无列变化，SQLite 持久化形状不变",
-    "payloadFingerprint": "sha256:76aa1c344a34f4f1a9864425cfe3e10efcf3bb6aa4c75b61084247456d6e270a"
+    "compatibilityReason": "知识库连续查阅、可设置分块及后台停止收尾沿用现有数据表和列；旧分块与向量索引继续可读，新增取消归属筛选仅复用已有取消字段，数据版本保持1。",
+    "payloadFingerprint": "sha256:0ffafa9a1f3c3a892a59a5db98cb9269f58168bd2f945cc81e234d7e669c387c"
   },
   "schemas": [
     {
@@ -3462,7 +3467,7 @@
       "contract": "bounded base64 cover upload temporary-directory lifecycle",
       "kind": "directory-contract",
       "module": "server/routes/desk.ts",
-      "sourceHash": "sha256:a7c7e339079be179fd4c1c806c4a19fc4ab687eeff956f2117ed101fcd2bf9a0",
+      "sourceHash": "sha256:49c2fbcc3bd85deeefe7e5e5ba187561e419b8207f5e4b22464cf975e2448a79",
       "storeId": "desk-cover-upload-staging"
     },
     {
@@ -3497,7 +3502,7 @@
       "contract": "desktop window bounds, release announcement bookmark, and update cache version marker readers",
       "kind": "directory-contract",
       "module": "desktop/main.cjs",
-      "sourceHash": "sha256:b9d44f3f2940b563371ab0a7d92edf9b4b9a94fe3abf347019f0826dc0e66fca",
+      "sourceHash": "sha256:0ee2eeca269ef41c4ea85a86e464bb6034320b7399b29143e9f1281f4aeeed90",
       "storeId": "desktop-window-version-state"
     },
     {
@@ -3780,9 +3785,75 @@
             "type": "table"
           },
           {
+            "name": "knowledge_completeness_checks",
+            "sql": "CREATE TABLE knowledge_completeness_checks ( id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0), research_run_id TEXT NOT NULL UNIQUE, policy TEXT NOT NULL CHECK(policy IN ('best_effort', 'source_diverse', 'relevant_sections_complete', 'scope_complete')), status TEXT NOT NULL CHECK(length(trim(status)) > 0), total_units INTEGER NOT NULL DEFAULT 0 CHECK(typeof(total_units) = 'integer' AND total_units >= 0), checked_units INTEGER NOT NULL DEFAULT 0 CHECK(typeof(checked_units) = 'integer' AND checked_units >= 0), relevant_units INTEGER NOT NULL DEFAULT 0 CHECK(typeof(relevant_units) = 'integer' AND relevant_units >= 0), unavailable_units INTEGER NOT NULL DEFAULT 0 CHECK(typeof(unavailable_units) = 'integer' AND unavailable_units >= 0), coverage_ratio REAL NOT NULL DEFAULT 0 CHECK(coverage_ratio >= 0 AND coverage_ratio <= 1), exact INTEGER NOT NULL DEFAULT 0 CHECK(exact IN (0, 1)), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, completed_at TEXT, CHECK(checked_units + unavailable_units <= total_units), CHECK(relevant_units <= checked_units), CHECK(exact = 0 OR (checked_units = total_units AND unavailable_units = 0 AND coverage_ratio = 1)), FOREIGN KEY(research_run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT )",
+            "tableName": "knowledge_completeness_checks",
+            "type": "table"
+          },
+          {
+            "name": "knowledge_completeness_coverage_runs",
+            "sql": "CREATE TABLE knowledge_completeness_coverage_runs ( check_id TEXT NOT NULL, coverage_run_id TEXT NOT NULL, PRIMARY KEY(check_id, coverage_run_id), FOREIGN KEY(check_id) REFERENCES knowledge_completeness_checks(id) ON DELETE RESTRICT, FOREIGN KEY(coverage_run_id) REFERENCES coverage_runs(id) ON DELETE RESTRICT )",
+            "tableName": "knowledge_completeness_coverage_runs",
+            "type": "table"
+          },
+          {
+            "name": "knowledge_completeness_unit_evidence",
+            "sql": "CREATE TABLE knowledge_completeness_unit_evidence ( check_id TEXT NOT NULL, coverage_unit_id TEXT NOT NULL, evidence_id TEXT NOT NULL, PRIMARY KEY(check_id, coverage_unit_id, evidence_id), FOREIGN KEY(check_id, coverage_unit_id) REFERENCES knowledge_completeness_units(check_id, coverage_unit_id) ON DELETE RESTRICT, FOREIGN KEY(evidence_id) REFERENCES knowledge_evidence_items(id) ON DELETE RESTRICT )",
+            "tableName": "knowledge_completeness_unit_evidence",
+            "type": "table"
+          },
+          {
+            "name": "knowledge_completeness_units",
+            "sql": "CREATE TABLE knowledge_completeness_units ( check_id TEXT NOT NULL, coverage_unit_id TEXT NOT NULL CHECK(length(trim(coverage_unit_id)) > 0), source_id TEXT NOT NULL, parse_artifact_id TEXT NOT NULL, block_id TEXT NOT NULL, start_offset INTEGER NOT NULL CHECK(typeof(start_offset) = 'integer' AND start_offset >= 0), end_offset INTEGER NOT NULL CHECK(typeof(end_offset) = 'integer' AND end_offset > start_offset), section_key TEXT, status TEXT NOT NULL CHECK(status IN ('pending', 'checked_relevant', 'checked_irrelevant', 'unavailable', 'failed')), worker_session_id TEXT, updated_at TEXT NOT NULL, PRIMARY KEY(check_id, coverage_unit_id), FOREIGN KEY(check_id) REFERENCES knowledge_completeness_checks(id) ON DELETE RESTRICT, FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT, FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT, FOREIGN KEY(block_id) REFERENCES knowledge_blocks(id) ON DELETE RESTRICT )",
+            "tableName": "knowledge_completeness_units",
+            "type": "table"
+          },
+          {
             "name": "knowledge_coverage_plans",
             "sql": "CREATE TABLE knowledge_coverage_plans ( id TEXT PRIMARY KEY, turn_scope_id TEXT, question TEXT NOT NULL CHECK(length(trim(question)) > 0), intent TEXT NOT NULL CHECK(intent IN ('fact_lookup', 'cross_source_synthesis', 'whole_scope_analysis', 'global_negative', 'open_summary')), coverage_mode TEXT NOT NULL CHECK(coverage_mode IN ('high_recall', 'broad', 'exhaustive')), requires_completeness INTEGER NOT NULL CHECK(requires_completeness IN (0, 1)), scope_level TEXT NOT NULL CHECK(scope_level IN ('local', 'source', 'multi_source', 'notebook', 'multi_notebook', 'whole_scope')), sub_queries_json TEXT NOT NULL, confidence REAL NOT NULL CHECK(confidence >= 0 AND confidence <= 1), matched_rule_ids_json TEXT NOT NULL, classifier_used TEXT NOT NULL CHECK(classifier_used IN ('rules', 'llm', 'rules+llm')), degrade_reason TEXT, created_at TEXT NOT NULL, FOREIGN KEY(turn_scope_id) REFERENCES knowledge_turn_scopes(id) ON DELETE RESTRICT )",
             "tableName": "knowledge_coverage_plans",
+            "type": "table"
+          },
+          {
+            "name": "knowledge_evidence_items",
+            "sql": "CREATE TABLE knowledge_evidence_items ( id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0), run_id TEXT NOT NULL, source_id TEXT NOT NULL, content_snapshot_id TEXT NOT NULL, parse_artifact_id TEXT NOT NULL, chunk_index_variant_id TEXT, chunk_id TEXT, block_id TEXT NOT NULL, start_offset INTEGER NOT NULL CHECK(typeof(start_offset) = 'integer' AND start_offset >= 0), end_offset INTEGER NOT NULL CHECK(typeof(end_offset) = 'integer' AND end_offset > start_offset), canonical_text TEXT NOT NULL CHECK(length(canonical_text) > 0), canonical_text_sha256 TEXT NOT NULL CHECK(length(canonical_text_sha256) = 64 AND length(CAST(canonical_text_sha256 AS BLOB)) = 64 AND canonical_text_sha256 NOT GLOB '*[^0-9a-f]*'), heading_path_json TEXT CHECK(heading_path_json IS NULL OR CASE WHEN json_valid(heading_path_json) THEN json_type(heading_path_json) = 'array' ELSE 0 END), page_number INTEGER CHECK(page_number IS NULL OR (typeof(page_number) = 'integer' AND page_number > 0)), created_at TEXT NOT NULL, UNIQUE(run_id, parse_artifact_id, block_id, start_offset, end_offset), FOREIGN KEY(run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT, FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT, FOREIGN KEY(content_snapshot_id) REFERENCES content_snapshots(id) ON DELETE RESTRICT, FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT, FOREIGN KEY(block_id) REFERENCES knowledge_blocks(id) ON DELETE RESTRICT )",
+            "tableName": "knowledge_evidence_items",
+            "type": "table"
+          },
+          {
+            "name": "knowledge_evidence_needs",
+            "sql": "CREATE TABLE knowledge_evidence_needs ( id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0), run_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(typeof(ordinal) = 'integer' AND ordinal >= 0), claim TEXT NOT NULL CHECK(length(trim(claim)) > 0), kind TEXT NOT NULL CHECK(kind IN ('fact', 'comparison', 'cause', 'timeline', 'counterexample', 'completeness')), required INTEGER NOT NULL CHECK(required IN (0, 1)), min_independent_sources INTEGER NOT NULL CHECK(typeof(min_independent_sources) = 'integer' AND min_independent_sources > 0), require_counter_evidence INTEGER NOT NULL CHECK(require_counter_evidence IN (0, 1)), require_all_relevant_units INTEGER NOT NULL CHECK(require_all_relevant_units IN (0, 1)), status TEXT NOT NULL CHECK(status IN ('uncovered', 'partial', 'supported', 'conflicted', 'not_applicable')), unresolved_gaps_json TEXT NOT NULL CHECK(CASE WHEN json_valid(unresolved_gaps_json) THEN json_type(unresolved_gaps_json) = 'array' ELSE 0 END), created_at TEXT NOT NULL, updated_at TEXT NOT NULL, UNIQUE(run_id, ordinal), FOREIGN KEY(run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT )",
+            "tableName": "knowledge_evidence_needs",
+            "type": "table"
+          },
+          {
+            "name": "knowledge_need_evidence",
+            "sql": "CREATE TABLE knowledge_need_evidence ( need_id TEXT NOT NULL, evidence_id TEXT NOT NULL, relation TEXT NOT NULL CHECK(relation IN ('supports', 'contradicts', 'context')), rationale TEXT NOT NULL CHECK(length(trim(rationale)) > 0), source_independence_key TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY(need_id, evidence_id, relation), FOREIGN KEY(need_id) REFERENCES knowledge_evidence_needs(id) ON DELETE RESTRICT, FOREIGN KEY(evidence_id) REFERENCES knowledge_evidence_items(id) ON DELETE RESTRICT, FOREIGN KEY(source_independence_key) REFERENCES sources(id) ON DELETE RESTRICT )",
+            "tableName": "knowledge_need_evidence",
+            "type": "table"
+          },
+          {
+            "name": "knowledge_research_actions",
+            "sql": "CREATE TABLE knowledge_research_actions ( id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0), run_id TEXT NOT NULL, round_id TEXT, ordinal INTEGER NOT NULL CHECK(typeof(ordinal) = 'integer' AND ordinal >= 0), actor_session_id TEXT, actor_agent_id TEXT, action_type TEXT NOT NULL CHECK(length(trim(action_type)) > 0), request_summary_json TEXT NOT NULL CHECK(CASE WHEN json_valid(request_summary_json) THEN json_type(request_summary_json) = 'object' ELSE 0 END), response_summary_json TEXT CHECK(response_summary_json IS NULL OR CASE WHEN json_valid(response_summary_json) THEN json_type(response_summary_json) = 'object' ELSE 0 END), status TEXT NOT NULL CHECK(status IN ('running', 'completed', 'failed', 'cancelled')), started_at TEXT NOT NULL, completed_at TEXT, error_code TEXT, UNIQUE(run_id, ordinal), FOREIGN KEY(run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT, FOREIGN KEY(round_id) REFERENCES knowledge_research_rounds(id) ON DELETE RESTRICT )",
+            "tableName": "knowledge_research_actions",
+            "type": "table"
+          },
+          {
+            "name": "knowledge_research_read_receipts",
+            "sql": "CREATE TABLE knowledge_research_read_receipts ( id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0), run_id TEXT NOT NULL, actor_session_id TEXT, source_id TEXT NOT NULL, content_snapshot_id TEXT NOT NULL, parse_artifact_id TEXT NOT NULL, chunk_index_variant_id TEXT, chunk_id TEXT, block_id TEXT NOT NULL, start_offset INTEGER NOT NULL CHECK(typeof(start_offset) = 'integer' AND start_offset >= 0), end_offset INTEGER NOT NULL CHECK(typeof(end_offset) = 'integer' AND end_offset > start_offset), canonical_text_sha256 TEXT NOT NULL CHECK(length(canonical_text_sha256) = 64 AND length(CAST(canonical_text_sha256 AS BLOB)) = 64 AND canonical_text_sha256 NOT GLOB '*[^0-9a-f]*'), channel TEXT NOT NULL CHECK(channel IN ('knowledge_read', 'knowledge_grep')), created_at TEXT NOT NULL, consumed_at TEXT, FOREIGN KEY(run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT, FOREIGN KEY(source_id) REFERENCES sources(id) ON DELETE RESTRICT, FOREIGN KEY(content_snapshot_id) REFERENCES content_snapshots(id) ON DELETE RESTRICT, FOREIGN KEY(parse_artifact_id) REFERENCES parse_artifacts(id) ON DELETE RESTRICT, FOREIGN KEY(block_id) REFERENCES knowledge_blocks(id) ON DELETE RESTRICT )",
+            "tableName": "knowledge_research_read_receipts",
+            "type": "table"
+          },
+          {
+            "name": "knowledge_research_rounds",
+            "sql": "CREATE TABLE knowledge_research_rounds ( id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0), run_id TEXT NOT NULL, ordinal INTEGER NOT NULL CHECK(typeof(ordinal) = 'integer' AND ordinal >= 0), focus_json TEXT NOT NULL CHECK(CASE WHEN json_valid(focus_json) THEN json_type(focus_json) = 'array' ELSE 0 END), status TEXT NOT NULL CHECK(status IN ('running', 'completed', 'failed', 'cancelled')), new_evidence_count INTEGER NOT NULL DEFAULT 0 CHECK(typeof(new_evidence_count) = 'integer' AND new_evidence_count >= 0), started_at TEXT NOT NULL, completed_at TEXT, error_code TEXT, UNIQUE(run_id, ordinal), FOREIGN KEY(run_id) REFERENCES knowledge_research_runs(id) ON DELETE RESTRICT )",
+            "tableName": "knowledge_research_rounds",
+            "type": "table"
+          },
+          {
+            "name": "knowledge_research_runs",
+            "sql": "CREATE TABLE knowledge_research_runs ( id TEXT PRIMARY KEY NOT NULL CHECK(length(trim(id)) > 0), turn_scope_id TEXT NOT NULL, turn_id TEXT NOT NULL CHECK(length(trim(turn_id)) > 0), parent_session_path TEXT NOT NULL CHECK(length(trim(parent_session_path)) > 0), question TEXT NOT NULL CHECK(length(trim(question)) > 0), status TEXT NOT NULL CHECK(status IN ('planning', 'running', 'synthesizing', 'completed', 'partial', 'failed', 'cancelled')), completeness_policy TEXT NOT NULL CHECK(completeness_policy IN ('best_effort', 'source_diverse', 'relevant_sections_complete', 'scope_complete')), budget_json TEXT NOT NULL CHECK(CASE WHEN json_valid(budget_json) THEN json_type(budget_json) = 'object' AND COALESCE( json_type(budget_json, '$.maxRounds') = 'integer' AND json_extract(budget_json, '$.maxRounds') > 0 AND json_type(budget_json, '$.maxParallelAgents') = 'integer' AND json_extract(budget_json, '$.maxParallelAgents') > 0 AND json_type(budget_json, '$.maxToolCalls') = 'integer' AND json_extract(budget_json, '$.maxToolCalls') > 0 AND json_type(budget_json, '$.maxWallClockMs') = 'integer' AND json_extract(budget_json, '$.maxWallClockMs') > 0 AND json_type(budget_json, '$.maxSearchesPerRound') = 'integer' AND json_extract(budget_json, '$.maxSearchesPerRound') > 0 AND json_type(budget_json, '$.maxReadsPerRound') = 'integer' AND json_extract(budget_json, '$.maxReadsPerRound') > 0 AND json_type(budget_json, '$.maxFinalEvidenceSpans') = 'integer' AND json_extract(budget_json, '$.maxFinalEvidenceSpans') > 0 AND json_type(budget_json, '$.finalEvidenceBudgetTokens') = 'integer' AND json_extract(budget_json, '$.finalEvidenceBudgetTokens') > 0, 0 ) ELSE 0 END), rounds_completed INTEGER NOT NULL DEFAULT 0 CHECK(typeof(rounds_completed) = 'integer' AND rounds_completed >= 0), tool_calls_used INTEGER NOT NULL DEFAULT 0 CHECK(typeof(tool_calls_used) = 'integer' AND tool_calls_used >= 0), search_calls INTEGER NOT NULL DEFAULT 0 CHECK(typeof(search_calls) = 'integer' AND search_calls >= 0), read_calls INTEGER NOT NULL DEFAULT 0 CHECK(typeof(read_calls) = 'integer' AND read_calls >= 0), grep_calls INTEGER NOT NULL DEFAULT 0 CHECK(typeof(grep_calls) = 'integer' AND grep_calls >= 0), delegated_agents INTEGER NOT NULL DEFAULT 0 CHECK(typeof(delegated_agents) = 'integer' AND delegated_agents >= 0), stop_reason TEXT, degraded_reason TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, completed_at TEXT, FOREIGN KEY(turn_scope_id) REFERENCES knowledge_turn_scopes(id) ON DELETE RESTRICT )",
+            "tableName": "knowledge_research_runs",
             "type": "table"
           },
           {
@@ -3834,43 +3905,55 @@
             "type": "table"
           }
         ],
-        "userVersion": 17
+        "userVersion": 19
       },
-      "sourceHash": "sha256:750e1194eac7e48f2e596d845954d90d8a8cc594a9dc5fd0a82f9d55af2a44e3",
+      "sourceHash": "sha256:f7b42df857acc24a5e9797689c917b127ef75b1fa68a7af8552f9864439a87a2",
       "storeId": "knowledge-database"
     },
     {
-      "contract": "Regenerable lexical SQLite schema together with the vector cache schema in lib/knowledge/vector-index-adapter.ts; both derive only from durable Knowledge facts and artifacts",
+      "contract": "Lexical SQLite schema v3, portable vector SQLite schema v3, and rebuildable ANN catalog schema v1. ANN files derive from retained portable vector BLOBs; ANN failure never deletes those BLOBs",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-index-store.ts",
       "protocolModules": [
         {
+          "module": "lib/knowledge/ann-index-store.ts",
+          "sourceHash": "sha256:8583fbdcbff0ad0a40a578c929d93f2aa3d0f5909f2052a4852c8511862880a9"
+        },
+        {
+          "module": "lib/knowledge/usearch-vector-backend.ts",
+          "sourceHash": "sha256:1ae5a4e32535908f4c3d02fd83b31c16340df7416e9a0f94342996a241f84d63"
+        },
+        {
           "module": "lib/knowledge/vector-index-adapter.ts",
-          "sourceHash": "sha256:485d5e8070cc05b2db6821e02b179b08607c0cf15885c30aa45ea2bcfdaf70a6"
+          "sourceHash": "sha256:7915941d09ec0c6a1a19703b604250efef289830d6dd41b7089a469911132d2f"
+        },
+        {
+          "module": "lib/knowledge/vector-search-backend-factory.ts",
+          "sourceHash": "sha256:977e9e13b68de1d1ac0b734f312387d7235b94496bcb909e0445c24275d0e722"
         }
       ],
-      "sourceHash": "sha256:495b0c5ab2f907ad1d242f8fc23cddf64ab4701b8a7fef94c5c16ee4ec921cff",
+      "sourceHash": "sha256:637e59a13e61b868279de1da5fca7380558dae117f0f004502968a339efc533f",
       "storeId": "knowledge-indexes"
     },
     {
       "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:fec50cc6e4517f4dcc40eea0222d28d73d7bc88a8252c3de1b6d820820461257",
+      "sourceHash": "sha256:df40d70c89c5bd2403b1361ff3a62c81210bdb04a86b1ab7bb76888a8f691af2",
       "storeId": "knowledge-parse-artifacts"
     },
     {
       "contract": "ProcessingArtifact output files (binary office formats converted to structured text) referenced by knowledge.db processing_artifacts rows, with locatorMap held in the database",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:fec50cc6e4517f4dcc40eea0222d28d73d7bc88a8252c3de1b6d820820461257",
+      "sourceHash": "sha256:df40d70c89c5bd2403b1361ff3a62c81210bdb04a86b1ab7bb76888a8f691af2",
       "storeId": "knowledge-processing-artifacts"
     },
     {
       "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:fec50cc6e4517f4dcc40eea0222d28d73d7bc88a8252c3de1b6d820820461257",
+      "sourceHash": "sha256:df40d70c89c5bd2403b1361ff3a62c81210bdb04a86b1ab7bb76888a8f691af2",
       "storeId": "knowledge-source-snapshots"
     },
     {
@@ -4102,9 +4185,9 @@
             "type": "table"
           }
         ],
-        "userVersion": 6
+        "userVersion": 4
       },
-      "sourceHash": "sha256:e0801ad79309b7abd0f8ccd48a4e7ae5f83d341b3ffba832ab4a80f0f5f9694c",
+      "sourceHash": "sha256:ec7b0dc5ab0c1c27f90df3f33be238fda398196e967e3a35f3269162c3962d2a",
       "storeId": "model-observability-db"
     },
     {
@@ -4201,7 +4284,7 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:3d1aa600ffab19a5c950eb0da154035d32a38987af9d10d1348879fd81ce1c5b",
+      "sourceHash": "sha256:f641d0ccaac284d241c2d999178c1cb78bc2d4f1c0e7dcbb6daeb3983d5f97b6",
       "storeId": "server-runtime-info"
     },
     {
@@ -4223,7 +4306,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:851d0db04c36b2c89c325fec5c8ab224df149bc92a76e9b07cfbc5d7ecf4a700"
+          "sourceHash": "sha256:42daf2488c6ff1f96ac0258fd8940db915ae09020bcac0a319c80c4bb0f83dcc"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",
@@ -7405,6 +7488,22 @@
     },
     {
       "exemptionId": null,
+      "kind": "database-open",
+      "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/ann-index-store.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/ann-index-store.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
       "kind": "mkdir",
       "ordinal": 0,
       "reason": "Creates and removes only the regenerable lexical SQLite index files.",
@@ -7751,6 +7850,54 @@
       "exemptionId": null,
       "kind": "mkdir",
       "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/usearch-vector-backend.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/usearch-vector-backend.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/usearch-vector-backend.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/usearch-vector-backend.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/usearch-vector-backend.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/usearch-vector-backend.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
       "reason": "Creates and removes only the regenerable vector SQLite cache files.",
       "sourceFile": "lib/knowledge/vector-index-adapter.ts",
       "storeId": "knowledge-indexes"
@@ -7761,6 +7908,14 @@
       "ordinal": 0,
       "reason": "Creates and removes only the regenerable vector SQLite cache files.",
       "sourceFile": "lib/knowledge/vector-index-adapter.ts",
+      "storeId": "knowledge-indexes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
+      "sourceFile": "lib/knowledge/vector-search-backend-factory.ts",
       "storeId": "knowledge-indexes"
     },
     {

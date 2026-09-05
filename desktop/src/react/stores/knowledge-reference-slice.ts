@@ -29,8 +29,8 @@ export interface KnowledgeReferenceSlice {
   clearKnowledgeReferences: (sessionKey: string) => void;
 }
 
-/** 新引用默认快速档（2026-08-31 两档化）：最快速度 + 高命中头部证据；深读切详细。 */
-const DEFAULT_MODE: KnowledgeReferenceMode = 'fast';
+/** 新引用统一交给当前聊天按问题需要检索和阅读。 */
+const DEFAULT_MODE: KnowledgeReferenceMode = 'auto';
 
 function resolveSessionKey(state: unknown, sessionKey: string): string {
   return sessionScopedKey(state as Parameters<typeof sessionScopedKey>[0], sessionKey) || sessionKey;
@@ -68,7 +68,7 @@ export const createKnowledgeReferenceSlice = (
         const notebookNames = { ...(prev?.notebookNames ?? {}) };
         if (removing) delete notebookNames[notebookId];
         else if (notebookName) notebookNames[notebookId] = notebookName;
-        knowledgeRefsBySession[key] = { notebookIds: nextIds, notebookNames, mode: prev?.mode ?? DEFAULT_MODE };
+        knowledgeRefsBySession[key] = { notebookIds: nextIds, notebookNames, mode: DEFAULT_MODE };
       }
       if (key !== sessionKey) delete knowledgeRefsBySession[sessionKey];
       return { knowledgeRefsBySession };

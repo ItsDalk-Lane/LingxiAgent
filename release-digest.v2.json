@@ -3,6 +3,148 @@
   "entries": [
     {
       "schemaVersion": 1,
+      "tag": "v0.1.34",
+      "version": "0.1.34",
+      "previousTag": "v0.1.33",
+      "generatedAt": "2026-09-05T02:26:52.934Z",
+      "noUserFacingChanges": false,
+      "summary": {
+        "zh": "知识库提问改为当前聊天模型连续查阅，支持多次搜索、阅读和补查；回答使用数字引用并提供原文悬浮预览。章节检索与分块设置更可靠，同时修复研究初始化、模型继承以及后台停止和会话收尾问题。",
+        "en": "Knowledge conversations now use repeated search and reading in the current chat, with numbered citations and hover previews of source text. This release improves chapter retrieval and chunk settings, and fixes research initialization, model inheritance, background shutdown and chat cancellation cleanup."
+      },
+      "counts": {
+        "feature": 2,
+        "fix": 2,
+        "improvement": 1,
+        "migration": 0
+      },
+      "source": {
+        "owner": "ItsDalk-Lane",
+        "repo": "LingxiAgent",
+        "commitRange": "v0.1.33..HEAD",
+        "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.34",
+        "releaseNotes": ""
+      },
+      "items": [
+        {
+          "id": "knowledge-continuous-reading",
+          "kind": "feature",
+          "importance": "high",
+          "title": {
+            "zh": "知识问答支持连续查阅",
+            "en": "Continuous knowledge conversations"
+          },
+          "summary": {
+            "zh": "当前聊天模型可以围绕问题多次搜索、阅读原文和补查缺口，再组织回答；知识库引用不再要求选择快速或详细模式。",
+            "en": "The current chat model can search, read source text and fill evidence gaps through repeated tool calls before composing its answer. Knowledge references no longer require choosing fast or detailed mode."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "31afdea0",
+              "title": "Improve knowledge retrieval modes and streaming progress"
+            }
+          ]
+        },
+        {
+          "id": "knowledge-citation-preview",
+          "kind": "feature",
+          "importance": "high",
+          "title": {
+            "zh": "数字引用与原文悬浮预览",
+            "en": "Numbered citations with source previews"
+          },
+          "summary": {
+            "zh": "回答中的引用以数字角标展示，将鼠标移到引用上即可查看对应的已保存原文和来源名称；引用读取失败时可重试。",
+            "en": "Answers display numbered citations. Hovering shows the saved source excerpt and filename, with retry support when an excerpt cannot be loaded."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "31afdea0",
+              "title": "Improve knowledge retrieval modes and streaming progress"
+            }
+          ]
+        },
+        {
+          "id": "knowledge-chapter-retrieval",
+          "kind": "improvement",
+          "importance": "high",
+          "title": {
+            "zh": "章节检索和分块设置更可靠",
+            "en": "More reliable chapter retrieval and chunk settings"
+          },
+          "summary": {
+            "zh": "检索结合资料、章节和正文线索并补查遗漏；分块大小设置实际参与切分，保持章节边界及精确引用位置。旧分块和向量索引仍可读取。",
+            "en": "Retrieval combines source, chapter and passage signals with an additional pass for missed passages. Chunk-size settings now affect splitting while preserving chapter boundaries and citation offsets; existing chunk and vector indexes remain readable."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "31afdea0",
+              "title": "Improve knowledge retrieval modes and streaming progress"
+            }
+          ]
+        },
+        {
+          "id": "knowledge-stop-close",
+          "kind": "fix",
+          "importance": "high",
+          "title": {
+            "zh": "修复知识后台停止与会话收尾",
+            "en": "Fix knowledge shutdown and cancellation cleanup"
+          },
+          "summary": {
+            "zh": "删除或停止资料处理后，后台先结束在途任务再释放资源，避免取消任务被重新派发；关闭时立即使查询缓存失效，停止聊天后不再把旧停止状态带到下一次发送。",
+            "en": "Deletion and shutdown wait for active processing to finish before releasing resources and prevent cancelled jobs from being dispatched again. Closing immediately invalidates query caches, and stopping a chat no longer leaves cancellation state on the next submission."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "31afdea0",
+              "title": "Improve knowledge retrieval modes and streaming progress"
+            },
+            {
+              "type": "commit",
+              "ref": "004cdafd",
+              "title": "Close cancellation state and align continuous reading contracts"
+            }
+          ]
+        },
+        {
+          "id": "knowledge-research-runtime",
+          "kind": "fix",
+          "importance": "high",
+          "title": {
+            "zh": "修复研究会话初始化与模型继承",
+            "en": "Fix research session initialization and model inheritance"
+          },
+          "summary": {
+            "zh": "修复研究会话尚未开始调用模型就初始化失败的问题，并让同一助手的研究会话使用父聊天实际选择的模型；研究失败保留具体原因，方便排查。",
+            "en": "Fixes research-session initialization failures before the first model call. Research under the same assistant inherits the model actually selected in the parent chat, and failures retain attributable diagnostics."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "c9353fc6",
+              "title": "Fix isolated research extension runtime"
+            },
+            {
+              "type": "commit",
+              "ref": "31afdea0",
+              "title": "Improve knowledge retrieval modes and streaming progress"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
       "tag": "v0.1.33",
       "version": "0.1.33",
       "previousTag": "v0.1.32",

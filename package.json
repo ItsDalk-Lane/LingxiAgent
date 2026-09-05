@@ -1,9 +1,9 @@
 {
   "name": "lingxi",
-  "version": "0.1.33",
+  "version": "0.1.34",
   "lingxi": {
     "upstreamVersion": "0.447.4",
-    "releaseGeneration": 11
+    "releaseGeneration": 12
   },
   "type": "module",
   "description": "Lingxi - a personal AI agent with memory and soul",
@@ -61,7 +61,7 @@
     "release:preflight": "node scripts/release-preflight.mjs",
     "test:artifact-release-smoke": "vitest run tests/release-preflight.test.ts tests/artifact-release-order.test.ts tests/artifact-core-manifest.test.ts tests/artifact-core-activation.test.ts tests/artifact-boot.test.ts tests/artifact-ota.test.ts tests/build-server-artifact.test.ts tests/publish-train.test.ts",
     "test": "vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**'",
-    "test:knowledge-platform-smoke": "vitest run tests/knowledge-store.test.ts tests/knowledge-manager-import.test.ts tests/knowledge-engine-persistence.test.ts tests/knowledge-vector-index.test.ts tests/auxiliary-slot-resolver.test.ts tests/fresh-credential-routing.test.ts tests/oauth-force-refresh.test.ts tests/model-manager-auth-storage.test.ts --maxWorkers=1",
+    "test:knowledge-platform-smoke": "vitest run tests/knowledge-store.test.ts tests/knowledge-manager-import.test.ts tests/knowledge-engine-persistence.test.ts tests/knowledge-vector-index.test.ts tests/auxiliary-slot-resolver.test.ts tests/fresh-credential-routing.test.ts tests/oauth-force-refresh.test.ts tests/model-manager-auth-storage.test.ts tests/knowledge-store-v18-migration.test.ts tests/knowledge-store-v19-migration.test.ts tests/knowledge-index-metadata-migration.test.ts tests/knowledge-multigrain-migration.test.ts tests/knowledge-vector-backend-parity.test.ts tests/knowledge-vector-backend-fallback.test.ts tests/knowledge-vector-shutdown.test.ts tests/knowledge-fast-zero-remote.test.ts tests/knowledge-detailed-engine-context.test.ts tests/knowledge-research-recovery.test.ts tests/knowledge-completeness-quality.test.ts --maxWorkers=1",
     "build:server": "node scripts/build-server.mjs",
     "build:server:open": "node scripts/build-server-open.mjs",
     "smoke:server:open": "node scripts/smoke-open-server.mjs",
@@ -72,7 +72,7 @@
     "lint": "eslint .",
     "lint:boundary": "node scripts/lint-open-boundary.mjs",
     "test:watch": "vitest --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**'",
-    "postinstall": "node scripts/patch-pi-sdk.cjs"
+    "postinstall": "node scripts/patch-pi-sdk.cjs && node scripts/prepare-usearch-native.mjs"
   },
   "dependencies": {
     "@codemirror/lang-markdown": "^6.5.0",
@@ -155,6 +155,7 @@
     "appId": "com.lingxi.app",
     "productName": "Lingxi",
     "asar": true,
+    "asarUnpack": ["**/node_modules/usearch/**/*.node"],
     "npmRebuild": false,
     "afterPack": "./scripts/fix-modules.cjs",
     "extraMetadata": {
@@ -270,5 +271,8 @@
       "icon": "desktop/src/icon.png",
       "artifactName": "${productName}-${version}-Linux-${arch}.${ext}"
     }
+  },
+  "optionalDependencies": {
+    "usearch": "2.26.0"
   }
 }

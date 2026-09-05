@@ -1,19 +1,26 @@
 import crypto from "node:crypto";
 
 import type { KnowledgeBlock } from "./types.ts";
+import { CJK_TOKENS_PER_CHAR, NON_CJK_CHARS_PER_TOKEN, estimateTextTokens } from "../llm/estimate-text-tokens.ts";
 
-export const KNOWLEDGE_CHUNKER_VERSION = "2";
-export const KNOWLEDGE_CHUNK_TARGET_CHARS = 1200;
+export const KNOWLEDGE_CHUNKER_VERSION = "4";
+/** 章节划分未变；切片配置升级不能改变已有章节及原文读取的身份。 */
+const KNOWLEDGE_SECTION_VERSION = "3";
+/** @deprecated 仅描述 v3 历史片段；当前片段按生效字符配置切分。 */
+export const KNOWLEDGE_SPAN_TARGET_TOKENS = 512;
+/** @deprecated 仅描述 v3 历史重叠；当前重叠为目标字符数的八分之一。 */
+export const KNOWLEDGE_SPAN_OVERLAP_TOKENS = 64;
+export const KNOWLEDGE_SECTION_SOFT_MAX_TOKENS = 8192;
+export const KNOWLEDGE_CHUNK_TARGET_CHARS = 2048;
+const LEGACY_CHUNK_TARGET_CHARS = 1200;
 
 export type KnowledgeChunkerStrategy = "fixed" | "markdown" | "text" | "pdf" | "html";
 
 export interface KnowledgeChunkerOptions {
-  /**
-   * 目标 chunk 字符数。摄入侧由 ingestion-service 按笔记本配置（schema v6 列，
-   * 解析链见 knowledge-store.resolveNotebookConfig）传入；无笔记本上下文的
-   * 调用（显式 artifact 直检锚点解析等只读路径）落内置默认值。
-   */
+  /** 正文目标字符数；在目标范围内优先沿句段边界切分，并参与索引变体身份。 */
   targetChars?: number;
+  /** 历史算法测试和明确的旧版重建入口；新生产调用缺省使用当前版本。 */
+  legacyVersion?: "2";
 }
 
 export interface KnowledgeChunkerConfig {
@@ -46,7 +53,32 @@ export interface KnowledgeChunkDraft {
   ordinal: number;
   text: string;
   tokenCount: number;
+  /** 自 v3 起始终写入；旧版草稿和迁移前索引没有章节归属。 */
+  sectionId?: string | null;
   spans: KnowledgeChunkSpanDraft[];
+}
+
+export interface KnowledgeSectionSpanDraft {
+  blockId: string;
+  blockStartOffset: number;
+  blockEndOffset: number;
+  sectionStartOffset: number;
+  sectionEndOffset: number;
+}
+
+export interface KnowledgeSectionDraft {
+  id: string;
+  parseArtifactId: string;
+  sectionOrdinal: number;
+  headingPath: string[];
+  startBlockOrdinal: number;
+  endBlockOrdinal: number;
+  text: string;
+  tokenCount: number;
+  /** 仅构建阶段使用：每个原始块只在首次片段所在节拥有主归属，后续子节只引用其余区间。 */
+  primaryBlockIds?: string[];
+  /** 仅构建阶段使用：跨节切开大块时保持原始偏移，落库仍只写锁定的章节字段。 */
+  blockSpans?: KnowledgeSectionSpanDraft[];
 }
 
 // targetChars sanity 边界：下限保证 0.35/0.6 边界系数有意义，上限防止病态配置撑爆内存。
@@ -54,7 +86,7 @@ export interface KnowledgeChunkDraft {
 export const MIN_KNOWLEDGE_CHUNK_TARGET_CHARS = 100;
 export const MAX_KNOWLEDGE_CHUNK_TARGET_CHARS = 100_000;
 
-/** 自动分块：笔记本嵌入模型上下文窗口的可占用比例。 */
+/** @deprecated 仅旧版显式兼容使用；当前版本不以嵌入窗口改变分块粒度。 */
 export const KNOWLEDGE_CHUNK_CONTEXT_FRACTION = 0.8;
 /** 嵌入模型上下文查不到时的兜底窗口（token 数）。 */
 export const KNOWLEDGE_CHUNK_FALLBACK_CONTEXT_TOKENS = 8192;
@@ -77,8 +109,8 @@ export function computeAutoChunkTargetChars(contextWindowTokens: number | null |
   );
 }
 
-function normalizeTargetChars(targetChars: number | undefined): number {
-  const value = targetChars ?? KNOWLEDGE_CHUNK_TARGET_CHARS;
+function normalizeTargetChars(targetChars: number | undefined, legacy = false): number {
+  const value = targetChars ?? (legacy ? LEGACY_CHUNK_TARGET_CHARS : KNOWLEDGE_CHUNK_TARGET_CHARS);
   if (!Number.isSafeInteger(value) || value < MIN_KNOWLEDGE_CHUNK_TARGET_CHARS || value > MAX_KNOWLEDGE_CHUNK_TARGET_CHARS) {
     throw new Error(`Knowledge chunk targetChars is invalid: ${String(targetChars)}`);
   }
@@ -88,9 +120,10 @@ function normalizeTargetChars(targetChars: number | undefined): number {
 export function knowledgeChunkerConfigId(
   strategy: KnowledgeChunkerStrategy,
   targetChars: number,
+  options?: Pick<KnowledgeChunkerOptions, "legacyVersion">,
 ): string {
   return crypto.createHash("sha256")
-    .update(`${KNOWLEDGE_CHUNKER_VERSION}${strategy}${targetChars}`, "utf8")
+    .update(`${options?.legacyVersion ?? KNOWLEDGE_CHUNKER_VERSION}${strategy}${targetChars}`, "utf8")
     .digest("hex")
     .slice(0, 16);
 }
@@ -128,7 +161,7 @@ export function resolveKnowledgeChunkerConfig(
   blocks: readonly KnowledgeBlock[],
   options?: KnowledgeChunkerOptions,
 ): KnowledgeChunkerConfig {
-  const targetChars = normalizeTargetChars(options?.targetChars);
+  const targetChars = normalizeTargetChars(options?.targetChars, options?.legacyVersion === "2");
   let strategy: KnowledgeChunkerStrategy;
   switch (blocks[0]?.locatorType) {
     case "markdown":
@@ -141,13 +174,13 @@ export function resolveKnowledgeChunkerConfig(
       strategy = "pdf";
       break;
     case "text":
-      strategy = hasTextChapterStructure(blocks) ? "text" : "fixed";
+      strategy = (options?.legacyVersion === "2" ? hasTextChapterStructure(blocks) : blocks.some(block => isTextChapterHeading(block.text))) ? "text" : "fixed";
       break;
     default:
       strategy = "fixed";
       break;
   }
-  return { strategy, targetChars, configId: knowledgeChunkerConfigId(strategy, targetChars) };
+  return { strategy, targetChars, configId: knowledgeChunkerConfigId(strategy, targetChars, options) };
 }
 
 function safeSplitEnd(text: string, start: number, proposedEnd: number, budget: number): number {
@@ -425,12 +458,12 @@ function emitStructuredSections(
  * 结构化策略（markdown/html 标题节、text 章节、pdf 页）按 locator 聚合成节，
  * 节内超长二分；无匹配结构时回退固定大小边界策略。
  */
-export function buildKnowledgeChunks(
+export function buildLegacyKnowledgeChunks(
   parseArtifactId: string,
   blocks: readonly KnowledgeBlock[],
   options?: KnowledgeChunkerOptions,
 ): KnowledgeChunkDraft[] {
-  const config = resolveKnowledgeChunkerConfig(blocks, options);
+  const config = resolveKnowledgeChunkerConfig(blocks, { ...options, legacyVersion: "2" });
   const chunks: KnowledgeChunkDraft[] = [];
   const breadcrumb: ChunkHeaderFor = block => breadcrumbHeader(block, config.targetChars);
   switch (config.strategy) {
@@ -452,9 +485,178 @@ export function buildKnowledgeChunks(
   return chunks;
 }
 
-export function knowledgeBlockFingerprint(blocks: readonly KnowledgeBlock[]): string {
+/** 按共享估算器的字符成本推进，边界始终落在完整UTF-16码点之间。 */
+function tokenBoundary(text: string, start: number, limit: number, backwards = false, floor = 0): number {
+  let cursor = start, cjk = 0, other = 0;
+  while (backwards ? cursor > floor : cursor < text.length) {
+    let next: number;
+    if (backwards) {
+      next = cursor - 1;
+      const low = text.charCodeAt(next), high = text.charCodeAt(next - 1);
+      if (next > floor && low >= 0xdc00 && low <= 0xdfff && high >= 0xd800 && high <= 0xdbff) next -= 1;
+    } else next = cursor + (text.codePointAt(cursor)! > 0xffff ? 2 : 1);
+    const character = backwards ? text.slice(next, cursor) : text.slice(cursor, next);
+    const isCjk = estimateTextTokens(character) > 1;
+    const nextCjk = cjk + Number(isCjk), nextOther = other + Number(!isCjk);
+    if (Math.ceil(nextCjk * CJK_TOKENS_PER_CHAR + nextOther / NON_CJK_CHARS_PER_TOKEN) > limit) break;
+    cjk = nextCjk; other = nextOther; cursor = next;
+  }
+  return cursor;
+}
+
+/** 字符数按完整码点计数，返回值仍为原文的 UTF-16 偏移。 */
+function characterBoundary(text: string, start: number, limit: number, backwards = false, floor = 0): number {
+  let cursor = start;
+  for (let count = 0; count < limit && (backwards ? cursor > floor : cursor < text.length); count += 1) {
+    if (backwards) {
+      cursor -= 1;
+      const low = text.charCodeAt(cursor), high = text.charCodeAt(cursor - 1);
+      if (cursor > floor && low >= 0xdc00 && low <= 0xdfff && high >= 0xd800 && high <= 0xdbff) cursor -= 1;
+    } else cursor += text.codePointAt(cursor)! > 0xffff ? 2 : 1;
+  }
+  return cursor;
+}
+
+/** 在目标片段后四成内依次找段落、换行、句末和词间边界，避免产生过小片段。 */
+function preferredChunkEnd(text: string, start: number, end: number): number {
+  if (end === text.length) return end;
+  const floor = start + Math.floor((end - start) * 0.6);
+  const tail = text.slice(floor, end);
+  const boundaries = [
+    /\n[\t ]*\n/gu,
+    /[\r\n]/gu,
+    /[。！？；][”’"'」』】）》]*|[.!?;][”’"'」』】）》]*(?=\s|$)/gu,
+    /\s+/gu,
+  ];
+  for (const pattern of boundaries) {
+    let lastEnd = 0;
+    for (const match of tail.matchAll(pattern)) lastEnd = match.index! + match[0].length;
+    if (lastEnd > 0) return floor + lastEnd;
+  }
+  return end;
+}
+
+interface PrimarySectionGroup { headingPath: string[]; blocks: KnowledgeBlock[] }
+
+function primarySectionGroups(blocks: readonly KnowledgeBlock[]): PrimarySectionGroup[] {
+  const groups: PrimarySectionGroup[] = [];
+  let previousKey: string | null = null, activeHeading: string[] = [];
+  for (const block of blocks) {
+    let headingPath: string[] = [], key = "plain";
+    if (block.locatorType === "markdown" || block.locatorType === "html") {
+      headingPath = headingPathOf(block); key = JSON.stringify(["heading", headingPath]);
+    } else if (block.locatorType === "text") {
+      const path = headingPathOf(block);
+      // 解析阶段已有的章节定位优先；只有缺少定位时才从正文识别章标题。
+      if (path.length > 0) activeHeading = path;
+      else if (isTextChapterHeading(block.text)) activeHeading = [block.text.trim()];
+      headingPath = activeHeading; key = JSON.stringify(["chapter", headingPath]);
+    } else if (block.locatorType === "pdf") {
+      const path = headingPathOf(block);
+      if (path.length > 0) activeHeading = path;
+      headingPath = activeHeading;
+      const page = block.locator.pageNumber ?? block.locator.page ?? null;
+      key = headingPath.length > 0 ? JSON.stringify(["heading", headingPath]) : JSON.stringify(["page", page]);
+    }
+    if (key !== previousKey || groups.length === 0) groups.push({ headingPath: [...headingPath], blocks: [] });
+    groups[groups.length - 1].blocks.push(block); previousKey = key;
+  }
+  return groups;
+}
+
+/**
+ * 章节是原文的确定性连续分区。大块允许拆成同标题的子节：所有片段不重不漏，
+ * 但原块仅在首个片段所在节拥有一次主归属。重复块序号不表示重复主归属。
+ */
+export function buildKnowledgeSections(parseArtifactId: string, blocks: readonly KnowledgeBlock[]): KnowledgeSectionDraft[] {
+  const ordered = [...blocks].sort((left, right) => left.ordinal - right.ordinal);
+  const ids = new Set<string>(), ordinals = new Set<number>();
+  for (const block of ordered) {
+    if (block.parseArtifactId !== parseArtifactId || ids.has(block.id) || ordinals.has(block.ordinal)) {
+      throw new Error("Knowledge section blocks must have unique identities within the parse artifact");
+    }
+    ids.add(block.id); ordinals.add(block.ordinal);
+  }
+  const sections: KnowledgeSectionDraft[] = [], ownedBlocks = new Set<string>();
+  for (const group of primarySectionGroups(ordered)) {
+    let text = "";
+    const positions = group.blocks.map((block, index) => {
+      if (index > 0) text += "\n\n";
+      const start = text.length;
+      text += block.text;
+      return { block, start, end: text.length };
+    });
+    let start = 0;
+    do {
+      const end = tokenBoundary(text, start, KNOWLEDGE_SECTION_SOFT_MAX_TOKENS);
+      const blockSpans: KnowledgeSectionSpanDraft[] = [], primaryBlockIds: string[] = [], coveredOrdinals: number[] = [];
+      for (const position of positions) {
+        const from = Math.max(start, position.start), to = Math.min(end, position.end);
+        const emptyOwnedHere = position.start === position.end && position.start >= start
+          && (position.start < end || end === text.length);
+        if (to <= from && !emptyOwnedHere) continue;
+        coveredOrdinals.push(position.block.ordinal);
+        if (!ownedBlocks.has(position.block.id)) { primaryBlockIds.push(position.block.id); ownedBlocks.add(position.block.id); }
+        if (to > from) blockSpans.push({ blockId: position.block.id, blockStartOffset: from - position.start,
+          blockEndOffset: to - position.start, sectionStartOffset: from - start, sectionEndOffset: to - start });
+      }
+      const sectionOrdinal = sections.length, sectionText = text.slice(start, end);
+      // 分隔符本身不是原文块；极端空行片只按相邻原块保留位置，不能伪造引用跨度。
+      const fallbackOrdinal = positions.find(position => position.end >= start)?.block.ordinal ?? group.blocks[group.blocks.length - 1].ordinal;
+      const id = "section_" + crypto.createHash("sha256").update(JSON.stringify([KNOWLEDGE_SECTION_VERSION, parseArtifactId, sectionOrdinal])).digest("hex").slice(0, 32);
+      sections.push({ id, parseArtifactId, sectionOrdinal, headingPath: [...group.headingPath],
+        startBlockOrdinal: coveredOrdinals[0] ?? fallbackOrdinal, endBlockOrdinal: coveredOrdinals.at(-1) ?? fallbackOrdinal,
+        text: sectionText, tokenCount: estimateTextTokens(sectionText), primaryBlockIds, blockSpans });
+      start = end;
+    } while (start < text.length);
+  }
+  return sections;
+}
+
+/** 片段只在节内滑动，正文和重叠均随字符配置变化；引用跨度逐层回到原始块。 */
+export function buildKnowledgeChunks(parseArtifactId: string, blocks: readonly KnowledgeBlock[], options?: KnowledgeChunkerOptions): KnowledgeChunkDraft[] {
+  if (options?.legacyVersion === "2") return buildLegacyKnowledgeChunks(parseArtifactId, blocks, options);
+  const config = resolveKnowledgeChunkerConfig(blocks, options), chunks: KnowledgeChunkDraft[] = [];
+  const overlapChars = Math.floor(config.targetChars / 8);
+  for (const section of buildKnowledgeSections(parseArtifactId, blocks)) {
+    let start = 0;
+    while (start < section.text.length) {
+      const end = preferredChunkEnd(section.text, start, characterBoundary(section.text, start, config.targetChars));
+      const spans: KnowledgeChunkSpanDraft[] = [];
+      for (const span of section.blockSpans ?? []) {
+        const from = Math.max(start, span.sectionStartOffset), to = Math.min(end, span.sectionEndOffset);
+        if (to > from) spans.push({ blockId: span.blockId,
+          blockStartOffset: span.blockStartOffset + from - span.sectionStartOffset,
+          blockEndOffset: span.blockStartOffset + to - span.sectionStartOffset,
+          chunkStartOffset: from - start, chunkEndOffset: to - start });
+      }
+      if (spans.length > 0) {
+        const text = section.text.slice(start, end), ordinal = chunks.length;
+        chunks.push({ id: deterministicChunkId(config.configId, parseArtifactId, ordinal), parseArtifactId, ordinal,
+          sectionId: section.id, text, tokenCount: estimateTextTokens(text), spans });
+      }
+      if (end === section.text.length) break;
+      const next = characterBoundary(section.text, end, overlapChars, true, start);
+      start = next > start ? next : end;
+    }
+  }
+  return chunks;
+}
+
+/** 旧测试与显式历史生成使用这些门面，不影响新生产入口的当前默认。 */
+export function resolveLegacyKnowledgeChunkerConfig(blocks: readonly KnowledgeBlock[], options?: KnowledgeChunkerOptions): KnowledgeChunkerConfig {
+  return resolveKnowledgeChunkerConfig(blocks, { ...options, legacyVersion: "2" });
+}
+export function legacyKnowledgeChunkerConfigId(strategy: KnowledgeChunkerStrategy, targetChars: number): string {
+  return knowledgeChunkerConfigId(strategy, targetChars, { legacyVersion: "2" });
+}
+export function legacyKnowledgeBlockFingerprint(blocks: readonly KnowledgeBlock[]): string {
+  return knowledgeBlockFingerprint(blocks, { legacyVersion: "2" });
+}
+
+export function knowledgeBlockFingerprint(blocks: readonly KnowledgeBlock[], options?: Pick<KnowledgeChunkerOptions, "legacyVersion">): string {
   const hash = crypto.createHash("sha256");
-  hash.update(KNOWLEDGE_CHUNKER_VERSION, "utf8");
+  hash.update(options?.legacyVersion ?? KNOWLEDGE_CHUNKER_VERSION, "utf8");
   for (const block of blocks) {
     hash.update("\0", "utf8");
     hash.update(block.id, "utf8");

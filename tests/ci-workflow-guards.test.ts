@@ -63,6 +63,18 @@ const REQUIRED_PLATFORM_MATRIX = [
 ] as const;
 const REQUIRED_KNOWLEDGE_PLATFORM_TESTS = [
   "tests/knowledge-store.test.ts",
+  "tests/knowledge-store-v18-migration.test.ts",
+  "tests/knowledge-store-v19-migration.test.ts",
+  "tests/knowledge-index-metadata-migration.test.ts",
+  "tests/knowledge-multigrain-migration.test.ts",
+  "tests/knowledge-vector-backend-parity.test.ts",
+  "tests/knowledge-vector-backend-fallback.test.ts",
+  "tests/knowledge-vector-shutdown.test.ts",
+  "tests/knowledge-fast-zero-remote.test.ts",
+  "tests/knowledge-detailed-engine-context.test.ts",
+  "tests/knowledge-research-recovery.test.ts",
+  "tests/knowledge-completeness-quality.test.ts",
+
   "tests/knowledge-manager-import.test.ts",
   "tests/knowledge-engine-persistence.test.ts",
   "tests/knowledge-vector-index.test.ts",
@@ -292,5 +304,27 @@ describe("build.yml: Windows standalone server stays outside the seed/OTA bounda
     expect(publishTrainText).not.toContain("dist-standalone");
     expect(publishTrainText).not.toContain("LingxiCore-");
     expect(publishTrainText).toContain("publish-train.mjs");
+  });
+});
+
+
+describe('打包桌面真实启动接线', () => {
+  it('四平台打包后都启动真实应用，Linux 使用虚拟显示并保留结果', () => {
+    const workflow = yaml.load(fs.readFileSync(BUILD_YAML_PATH, 'utf8')) as { jobs: Record<string, WorkflowJob> };
+    const steps = workflow.jobs.build.steps ?? [];
+    const launch = steps.filter(step => stepRun(step).includes('scripts/smoke-packaged-desktop.mjs'));
+    expect(launch).toHaveLength(2);
+    expect(launch.find(step => step.if === "runner.os != 'Linux'")?.run).toBe('node scripts/smoke-packaged-desktop.mjs');
+    expect(launch.find(step => step.if === "runner.os == 'Linux'")?.run).toBe('xvfb-run -a node scripts/smoke-packaged-desktop.mjs');
+    const sandbox = steps.find(step => step.name === 'Prepare Linux packaged desktop sandbox');
+    expect(sandbox?.if).toBe("runner.os == 'Linux'");
+    expect(stepRun(sandbox!)).toContain('sudo chown root:root dist/linux-unpacked/chrome-sandbox');
+    expect(stepRun(sandbox!)).toContain('sudo chmod 4755 dist/linux-unpacked/chrome-sandbox');
+    expect(stepRun(sandbox!)).toContain("= '0:0:4755'");
+    expect(steps.indexOf(sandbox!)).toBeLessThan(steps.indexOf(launch.find(step => step.if === "runner.os == 'Linux'")!));
+    expect(launch.every(step => !stepRun(step).includes('--no-sandbox'))).toBe(true);
+    const upload = steps.find(step => step.name === 'Upload packaged desktop startup evidence');
+    expect(upload?.if).toBe('always()');
+    expect(upload?.with).toMatchObject({ 'if-no-files-found': 'error' });
   });
 });

@@ -680,7 +680,7 @@ describe('knowledge-only process fold（纯检索轮折叠）', () => {
     expect(folds.map((fold) => (fold as { id: string }).id)).toEqual(['a1:process', 'a2:process']);
   });
 
-  it('纯检索摘要用「N 次检索」；混合轮维持工具步数合并语义', () => {
+  it('纯检索摘要用「N 次检索」；混合轮分别显示工具和检索次数', () => {
     const translate = (key: string, vars?: Record<string, string | number>) => {
       const table: Record<string, string> = {
         'processFold.summary': '✨ {name}忙活了一阵子',
@@ -700,6 +700,6 @@ describe('knowledge-only process fold（纯检索轮折叠）', () => {
       { toolCount: 2, thinkingCount: 1, unsuccessfulCount: 0, knowledgeCount: 1 },
       '小文',
       translate,
-    )).toBe('✨ 小文忙活了一阵子 · 3 个工具 · 1 次思考');
+    )).toBe('✨ 小文忙活了一阵子 · 2 个工具 · 1 次检索 · 1 次思考');
   });
 });

@@ -1,0 +1,11 @@
+{
+  "question": "本周协作会议的入会码是什么？",
+  "notebooks": [
+    { "key": "selected", "name": "会议公开安排", "selected": true, "sources": [
+      { "key": "public", "name": "日程", "text": "# 协作会议\n本周协作会议于周五上午十点举行。公开安排未列入会信息。" }
+    ] },
+    { "key": "outside", "name": "未选择的会议凭条", "selected": false, "sources": [
+      { "key": "secret", "name": "入会凭条", "text": "# 入会信息\n本周协作会议的入会码是青鹭-4096。" }
+    ] }
+  ]
+}

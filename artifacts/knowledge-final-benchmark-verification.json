@@ -1,0 +1,23 @@
+{
+  "sourceSha": "c860054b9ee7f961abbb0cfebc2bbd9428ab6bd3",
+  "commands": [
+    {
+      "command": "node scripts/benchmark-knowledge-fast.mjs --output=artifacts/knowledge-fast-benchmark-c860054b-darwin-arm64.json",
+      "startedAt": "2026-09-04T07:46:34.989018+00:00",
+      "durationMs": 23715.13625001535,
+      "exitCode": 0
+    },
+    {
+      "command": "node scripts/benchmark-knowledge-vector.mjs --output=artifacts/knowledge-vector-benchmark-c860054b-darwin-arm64.json",
+      "startedAt": "2026-09-04T07:46:58.704963+00:00",
+      "durationMs": 27259.537416975945,
+      "exitCode": 0
+    },
+    {
+      "command": "node scripts/benchmark-knowledge-research.mjs --output=artifacts/knowledge-research-benchmark-c860054b-darwin-arm64.json",
+      "startedAt": "2026-09-04T07:47:25.965114+00:00",
+      "durationMs": 2618.084791000001,
+      "exitCode": 0
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "name": "typecheck",
+    "command": "npm run typecheck",
+    "startedAt": "2026-09-04T10:33:52.211976+00:00",
+    "finishedAt": "2026-09-04T10:34:14.295314+00:00",
+    "durationMs": 22083.04970897734,
+    "exitCode": 0,
+    "log": "/tmp/lingxi-knowledge-p307-probe-typecheck.log",
+    "sourceSha": "61ae60d1afe4f878ae638ff4de96d7e4f30bfefe"
+  },
+  {
+    "name": "lint",
+    "command": "npx eslint scripts/smoke-packaged-desktop.mjs tests/packaged-desktop-cleanup.test.ts",
+    "startedAt": "2026-09-04T10:34:14.295663+00:00",
+    "finishedAt": "2026-09-04T10:34:14.803306+00:00",
+    "durationMs": 507.6635000295937,
+    "exitCode": 0,
+    "log": "/tmp/lingxi-knowledge-p307-probe-lint.log",
+    "sourceSha": "61ae60d1afe4f878ae638ff4de96d7e4f30bfefe"
+  },
+  {
+    "name": "desktop",
+    "command": "node scripts/smoke-packaged-desktop.mjs",
+    "startedAt": "2026-09-04T10:34:14.803638+00:00",
+    "finishedAt": "2026-09-04T10:34:24.805068+00:00",
+    "durationMs": 10001.375832944177,
+    "exitCode": 0,
+    "log": "/tmp/lingxi-knowledge-p307-probe-desktop.log",
+    "sourceSha": "61ae60d1afe4f878ae638ff4de96d7e4f30bfefe"
+  }
+]

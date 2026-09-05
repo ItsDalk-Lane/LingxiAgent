@@ -1,0 +1,6 @@
+{
+  "question": "采购是否都必须提前审批？",
+  "notebooks": [{ "key": "selected", "name": "采购制度", "selected": true, "sources": [
+    { "key": "rules", "name": "采购规则", "text": "# 通用规则\n所有采购原则上必须提前审批。\n# 紧急例外\n紧急采购可以先行购买，并在两个工作日内补办审批。" }
+  ] }]
+}

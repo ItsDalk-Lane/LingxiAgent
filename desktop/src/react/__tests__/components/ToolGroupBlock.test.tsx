@@ -40,6 +40,33 @@ describe('ToolGroupBlock', () => {
     expect(screen.queryByText('✓')).not.toBeInTheDocument();
   });
 
+  it('本地检索完成后只显示一份证据数量与耗时', () => {
+    render(<ToolGroupBlock collapsed={false} tools={[{ id: 'local', name: 'knowledge_local_search',
+      done: true, success: true, status: 'succeeded', resultNote: '已找到 3 条证据 · 28ms' }]} />);
+    expect(screen.getAllByText('已找到 3 条证据 · 28ms')).toHaveLength(1);
+    expect(screen.queryByText('tool.knowledge_local_search.done')).not.toBeInTheDocument();
+  });
+
+  it('调查聚合卡显示本地化进度和任务短标签，不展示内部参数或隐藏推理', () => {
+    const zh = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'desktop/src/locales/zh.json'), 'utf8'));
+    window.t = ((key: string, vars: Record<string, string> = {}) => {
+      const value = key.split('.').reduce((node, name) => node?.[name], zh);
+      return (typeof value === 'string' ? value : key).replace(/\{(\w+)\}/g, (match, name) => vars[name] ?? match);
+    }) as typeof window.t;
+    const { container } = render(<ToolGroupBlock collapsed={false} tools={[
+      { id: 'progress', name: 'knowledge_research_progress', done: false, success: false,
+        args: { completed: 2, total: 3, hiddenReasoning: '秘密推理正文', runId: 'internal-run' } },
+      { id: 'worker', name: 'knowledge_research_worker', done: false, success: false,
+        args: { count: 1, label: '核对两份预算', rawToolResult: { text: '内部工具正文' } } },
+    ]} />);
+    expect(screen.getByText('已完成 2/3 个证据问题')).toBeInTheDocument();
+    expect(screen.getByText('已派出 1 个调查 Agent')).toBeInTheDocument();
+    expect(screen.getByText('核对两份预算')).toBeInTheDocument();
+    expect(container.textContent).not.toContain('秘密推理正文');
+    expect(container.textContent).not.toContain('内部工具正文');
+    expect(container.textContent).not.toContain('internal-run');
+  });
+
   it('shows the full bash command in the hover title when the visible detail is truncated', () => {
     const command = 'rm -rf /Users/jason/.claude/plugins/marketplaces/temp_*';
 

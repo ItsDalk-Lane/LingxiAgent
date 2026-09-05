@@ -1,5 +1,6 @@
 import { isDeepStrictEqual } from "node:util";
 import path from "node:path";
+import { getKnowledgeResearchToolNames, isKnowledgeResearchSurface } from "../../shared/tool-categories.ts";
 import {
   classifySessionPermission,
   normalizeSessionPermissionMode,
@@ -511,11 +512,20 @@ function toolApprovalUnavailable(toolName: any, status = "needs_user_approval_bu
 }
 
 export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
+  // 研究入口来自装配时的宿主权限，工具参数和运行上下文都不能改成另一种入口。
+  const knowledgeResearchSurface = deps.permissionContext?.knowledgeResearchSurface;
   return tools.map((tool: any) => {
     if (!tool?.execute) return tool;
     return {
       ...tool,
       execute: async (...args: any[]) => {
+        if (knowledgeResearchSurface !== undefined && (!isKnowledgeResearchSurface(knowledgeResearchSurface)
+          || !getKnowledgeResearchToolNames(knowledgeResearchSurface).includes(tool.name))) {
+          return toolError("This tool is not allowed in the host-bound knowledge research surface.", {
+            errorCode: "ACTION_BLOCKED_IN_KNOWLEDGE_RESEARCH",
+            toolName: tool.name,
+          });
+        }
         const inputSnapshot = snapshotToolInvocationInput(args[1] == null ? {} : args[1]);
         if (inputSnapshot.ok === false) {
           return toolError("Tool invocation parameters must be bounded plain JSON data.", {
@@ -539,6 +549,16 @@ export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
         const executionCtx = createBoundRuntimeCtx(ctx, sessionBinding.value);
         const sessionPath = sessionBinding.value.sessionPath;
         const mode = resolveToolPermissionMode(deps, sessionPath);
+        if (isKnowledgeResearchSurface(knowledgeResearchSurface)
+          && (mode !== SESSION_PERMISSION_MODES.READ_ONLY
+            || resolveSessionApprovalPolicy({ mode, approvalPolicy: deps.approvalPolicy,
+              allowHumanApproval: deps.allowHumanApproval }) !== SESSION_APPROVAL_POLICIES.DENY_ON_PROMPT)) {
+          return toolError("Knowledge research requires read-only permissions and denial of approval prompts.", {
+            errorCode: "KNOWLEDGE_RESEARCH_PERMISSION_INVALID",
+            permissionMode: mode,
+            toolName: tool.name,
+          });
+        }
         // Raw hard-safety checks run before any tool-owned resolver. A hostile
         // resolver therefore cannot hide a blocked delivery path.
         const rawSafety = evaluateToolSafetyPolicy({

@@ -44,6 +44,12 @@
     "sendFailed": "送信に失敗しました"
   },
   "knowledge": {
+    "citationRetry": "再読み込み",
+    "citationNumber": "引用 {number}。ホバーで本文を確認、Enter で開きます。",
+    "citationLoading": "本文を読み込み中…",
+    "citationFailed": "本文を読み込めません。資料が削除されたか、接続できない可能性があります。",
+    "citationSource": "知識資料",
+    "citationTitle": "引用元の本文",
     "tab": "ナレッジ",
     "title": "ナレッジライブラリ",
     "newNotebook": "ノートブックを作成",
@@ -114,7 +120,7 @@
     "settingsRerankHint": "このノートブック専用。クエリの並べ替えのみに影響し、再構築は行わない",
     "settingsGlobalNotConfigured": "未設定",
     "settingsChunkTargetChars": "チャンクサイズ（文字）",
-    "settingsChunkHint": "埋め込みモデルのコンテキストウィンドウ ×80% で自動計算（1 token = 1 文字）；埋め込みモデル変更時に自動再構築",
+    "settingsChunkHint": "文字数で目標を設定し、文・段落・章の境界を優先します。空欄の場合は 2048 文字です。保存後にバックグラウンドで再構築し、過去の回答の引用は保持します。",
     "settingsInvalidNumber": "{min}〜{max} の整数を入力してください",
     "selectSource": "ソースを選択して解析内容を表示",
     "ingestionQueued": "待機中",
@@ -130,7 +136,7 @@
     "readinessProcessing": "{count} 件取り込み中",
     "readinessPendingEmbedding": "{count} 件埋め込み待ち",
     "readinessFailed": "{count} 件失敗",
-    "settingsChunkAutoFallback": "自動（約 6553）",
+    "settingsChunkAutoFallback": "既定（2048 文字）",
     "settingsVectorRetention": "ベクトル保持ポリシー",
     "settingsRetentionKeepForever": "永久保持（デフォルト）",
     "settingsRetentionDaysMode": "日数経過後に削除",
@@ -405,6 +411,13 @@
     "back": "戻る"
   },
   "chat": {
+    "knowledgeResearchInterrupted": "調査が中断されました",
+    "knowledgeResearchStopIncomplete": "調査の処理が正常に完了しませんでした",
+    "knowledgeResearchStopUnavailable": "調査に必要なツールを利用できません",
+    "knowledgeResearchStopNoProgress": "追加調査で新しい根拠が見つかりませんでした",
+    "knowledgeResearchStopRounds": "調査回数の上限に達しました",
+    "knowledgeResearchStopTime": "調査の制限時間に達しました",
+    "knowledgeResearchStopTools": "共有のツール呼び出し上限に達しました",
     "find": {
       "locateFailed": "メッセージを特定できませんでした",
       "placeholder": "会話内を検索"
@@ -479,6 +492,16 @@
     "knowledgeRetrievalSupplementTitle": "ローリング読解中にモデルが自主的に発行した補足検索",
     "knowledgeTraceResults": "{n} 件の検索結果",
     "knowledgeTraceFailed": "検索に失敗しました",
+    "knowledgeLocalEvidenceFound": "根拠 {n} 件を取得 · {ms}ms",
+    "knowledgeFastSummary": "高速検索 · 根拠 {n} 件 · {ms}ms",
+    "knowledgeFastDeadlineExceeded": "目標時間を超過",
+    "knowledgeResearchSummary": "詳細調査 · {rounds} ラウンド · 検索 {searches} 回 · 閲読 {reads} 回 · {completed}/{total} 項目完了",
+    "knowledgeResearchPartialSummary": "詳細調査は一部未完了 · {rounds} ラウンド · 未確認 {pending} 項目",
+    "knowledgeResearchProgress": "根拠に関する質問 {completed}/{total} 件が完了",
+    "knowledgeResearchCancelled": "詳細調査をキャンセルしました",
+    "knowledgeResearchTruncated": "一部の根拠は未収録",
+    "knowledgeResearchFailed": "詳細調査に失敗しました",
+    "knowledgeResearchReviewCounts": "矛盾 {conflicts} 件 · 未確認 {pending} 項目",
     "knowledgeMetaModeFast": "高速モード",
     "knowledgeMetaModeDetailed": "詳細モード",
     "feedbackUp": "役に立った（経験に記録）",
@@ -619,8 +642,8 @@
     },
     "knowledgeModeFast": "高速",
     "knowledgeModeDetailed": "詳細",
-    "knowledgeModeFastHint": "最速で回答：関連度の高い証拠のみを使用し、分解や多段階読解は行いません",
-    "knowledgeModeDetailedHint": "できる限り詳細に回答：質問を分解して多方向から取得し、証拠が多い場合は分割して読解します"
+    "knowledgeModeFastHint": "ローカルのみで高速検索します。リモートの埋め込み、再ランキング、複数回の調査は待ちません。",
+    "knowledgeModeDetailedHint": "複数回の検索、読解、根拠の照合を行い、詳しい回答を生成します。"
   },
   "agentReview": {
     "running": "この Session をレビュー中",
@@ -839,6 +862,10 @@
     "active": "思考中"
   },
   "toolGroup": {
+    "mixedCount": "{tools} 回のツール呼び出し · {steps} 件の調査手順",
+    "researchRunning": "{n} 件の調査手順が進行中",
+    "researchCountWithFail": "{total} 件の調査手順（{fail} 件未完了）",
+    "researchCount": "{n} 件の調査手順",
     "success": "✿ {name} 完了です、お茶の子さいさい～ · {n} ステップ",
     "failed": "⚠ 何かおかしいようです · {n} ステップ",
     "countWithFail": "{total} 個のツール（{fail} 個失敗）",
@@ -857,9 +884,10 @@
     }
   },
   "processFold": {
+    "research": "{n} 件の調査手順",
     "summary": "✨ {name} がしばらく動き回りました",
     "tools": "{n} 個のツール",
-    "knowledge": "{n} 回の検索",
+    "knowledge": "{n} 件の知識資料",
     "thinking": "{n} 回の思考",
     "unsuccessful": "{n} 回の試行が未成功"
   },
@@ -1214,10 +1242,15 @@
       "done": "🧠 質問を分解しました",
       "failed": "🧠 分解に失敗"
     },
+    "knowledge_local_search": {
+      "running": "ナレッジベースをローカル検索中",
+      "done": "ローカル検索が完了",
+      "failed": "ローカル検索に失敗"
+    },
     "knowledge_search": {
       "running": "🔍 ナレッジベースを検索中",
       "done": "🔍 ナレッジベースを検索しました",
-      "failed": "🔍 検索に失敗"
+      "failed": "🔍 ナレッジ検索に失敗しました"
     },
     "knowledge_read_part": {
       "running": "📖 エビデンスを読み込み中",
@@ -1228,6 +1261,36 @@
       "running": "↻ モデルが補足検索を要求",
       "done": "↻ モデルが補足検索を要求しました",
       "failed": "↻ 補足検索に失敗"
+    },
+    "knowledge_research_plan": {
+      "running": "調査を計画中",
+      "done": "調査を計画しました",
+      "failed": "調査計画は未完了"
+    },
+    "knowledge_research_round": {
+      "running": "第 {round}/{maxRounds} ラウンド：検索・閲読中",
+      "done": "第 {round}/{maxRounds} ラウンドの調査が終了",
+      "failed": "第 {round}/{maxRounds} ラウンドの調査は未完了"
+    },
+    "knowledge_research_worker": {
+      "running": "調査エージェント {count} 体に依頼しました",
+      "done": "調査エージェント {count} 体のタスクが終了",
+      "failed": "調査エージェント {count} 体のタスクは未完了"
+    },
+    "knowledge_research_progress": {
+      "running": "根拠に関する質問 {completed}/{total} 件が完了",
+      "done": "根拠に関する質問 {completed}/{total} 件が完了",
+      "failed": "根拠に関する質問 {completed}/{total} 件が完了（更新は未完了）"
+    },
+    "knowledge_research_review": {
+      "running": "矛盾と不足を確認中",
+      "done": "矛盾と不足を確認しました",
+      "failed": "矛盾と不足の確認は未完了"
+    },
+    "knowledge_research_synthesis": {
+      "running": "詳細な回答を準備中",
+      "done": "回答の根拠を整理しました",
+      "failed": "回答の根拠の整理は未完了"
     },
     "knowledge_answer": {
       "running": "✻ 回答を生成中",

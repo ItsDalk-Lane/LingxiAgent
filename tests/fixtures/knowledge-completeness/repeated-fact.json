@@ -1,0 +1,23 @@
+{
+  "question": "核对全文各章重复的事实。",
+  "query": "登记",
+  "expectedText": [
+    "赵六"
+  ],
+  "expectedConflict": false,
+  "expectedUnavailable": 0,
+  "notebooks": [
+    {
+      "key": "selected",
+      "name": "完整性资料",
+      "selected": true,
+      "sources": [
+        {
+          "key": "main",
+          "name": "核查原文",
+          "text": "# 第一章\n登记负责人为赵六。\n\n# 第二章\n登记负责人为赵六。"
+        }
+      ]
+    }
+  ]
+}

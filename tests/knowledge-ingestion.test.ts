@@ -5,6 +5,7 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import {
+  KNOWLEDGE_CHUNK_TARGET_CHARS,
   knowledgeBlockFingerprint,
   resolveKnowledgeChunkerConfig,
 } from "../lib/knowledge/chunker.ts";
@@ -26,8 +27,8 @@ function untrack(manager: KnowledgeManager) {
   if (index >= 0) managers.splice(index, 1);
 }
 
-afterEach(() => {
-  for (const manager of managers.splice(0)) manager.close();
+afterEach(async () => {
+  for (const manager of managers.splice(0)) await manager.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -113,10 +114,10 @@ describe("Knowledge 摄入管线", () => {
       notebook.id,
       "苹果项目的交付日期是九月十五日。\n火星项目的预算是八百万元。",
     );
-    expect(job).toMatchObject({ status: "queued", phase: "parse", artifactId: artifact.id });
+    expect(job).toMatchObject({ status: "queued", phase: "chunk", artifactId: artifact.id });
     // 入队即记录触发方笔记本的分块配置指纹（按真实 blocks 计算）。
     const blocks = manager.listArtifactBlocks({ studioId, parseArtifactId: artifact.id });
-    expect(job.chunkerConfigId).toBe(resolveKnowledgeChunkerConfig(blocks, { targetChars: 6553 }).configId);
+    expect(job.chunkerConfigId).toBe(resolveKnowledgeChunkerConfig(blocks, { targetChars: KNOWLEDGE_CHUNK_TARGET_CHARS }).configId);
     // 活跃 job 去重：重复入队返回同一 job。
     expect(manager.enqueueSourceIngestion({
       studioId,
@@ -134,7 +135,7 @@ describe("Knowledge 摄入管线", () => {
     const hits = manager.indexStore.search({
       scopes: [{
         parseArtifactId: artifact.id,
-        chunkProfileHash: resolveKnowledgeChunkerConfig(blocks, { targetChars: 6553 }).configId,
+        chunkProfileHash: resolveKnowledgeChunkerConfig(blocks, { targetChars: KNOWLEDGE_CHUNK_TARGET_CHARS }).configId,
       }],
       query: "交付日期",
       limit: 12,
@@ -167,7 +168,7 @@ describe("Knowledge 摄入管线", () => {
       .digest("hex");
     const chunkProfileHash = resolveKnowledgeChunkerConfig(
       manager.listArtifactBlocks({ studioId, parseArtifactId: artifact.id }),
-      { targetChars: 6553 },
+      { targetChars: KNOWLEDGE_CHUNK_TARGET_CHARS },
     ).configId;
     const vectorHits = manager.vectorIndex.search({
       vectorIndexVariantIds: [
@@ -210,7 +211,7 @@ describe("Knowledge 摄入管线", () => {
     const claimed = first.manager.store.claimNextIngestionJob();
     expect(claimed).toMatchObject({ id: job.id, status: "running" });
     untrack(first.manager);
-    first.manager.close();
+    await first.manager.close();
 
     // 重启：启动恢复把 running 残留置回 queued，drain 续跑（相位幂等）到 done。
     const restarted = createManager(home);
@@ -375,11 +376,11 @@ describe("Knowledge 摄入管线", () => {
 describe("Embedding 批级 checkpoint 恢复（§九十，Phase 3）", () => {
   /**
    * 100 chunk 语料：text 章节策略，100 行 "第N章 …"（每行一章一节一 chunk），
-   * 每行 120 字符 ≤ softCap(targetChars×1.5=150)，合计恰好 100 个 chunk（两批：64 + 36）。
+   * 每行 90 字符 ≤ targetChars=100，合计恰好 100 个 chunk（两批：64 + 36）。
    */
   function hundredChunkText(): string {
     return Array.from({ length: 100 }, (_, index) => (
-      `第${index + 1}章恢复测试语料`.padEnd(120, "填")
+      `第${index + 1}章恢复测试语料`.padEnd(90, "填")
     )).join("\n");
   }
 
@@ -508,7 +509,7 @@ describe("Embedding 批级 checkpoint 恢复（§九十，Phase 3）", () => {
     expect(interrupted.error).toContain("KNOWLEDGE_EMBEDDING_INTERRUPTED");
     expect(vectorCount(first.manager, viv)).toBe(64);
     untrack(first.manager);
-    first.manager.close();
+    await first.manager.close();
 
     // 模拟进程重启：新 manager 打开同一 LINGXI_HOME，断点向量仍在，只补 65–100。
     const restarted = createManager(home);

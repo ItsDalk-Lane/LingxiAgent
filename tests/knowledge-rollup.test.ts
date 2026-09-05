@@ -16,7 +16,7 @@ import {
   stripSupplementalFence,
   type KnowledgeRollupEntry,
   type KnowledgeRollupModel,
-} from "../lib/knowledge/knowledge-rollup.ts";
+} from "./fixtures/knowledge-legacy/knowledge-rollup.ts";
 import type { RetrieveForNotebooksResult } from "../lib/knowledge/knowledge-query-service.ts";
 import { UNTRUSTED_EXTERNAL_CONTENT_MARKER } from "../lib/security/injection-scan.ts";
 

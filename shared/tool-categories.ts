@@ -48,11 +48,39 @@ export const STANDARD_TOOL_NAMES = [
   "hana_card_guide",
   "show_card",
   "loop_control",
+  "knowledge_search",
   "knowledge_read",
   "knowledge_outline",
   "knowledge_grep",
   "knowledge_manage",
+  "knowledge_research_update",
+  "knowledge_research_finish",
+  "knowledge_delegate",
+  "knowledge_coverage_read",
+  "knowledge_completeness_mark",
 ];
+
+export type KnowledgeResearchSurface = "knowledge_research_root" | "knowledge_research_worker" | "knowledge_completeness_worker";
+
+const KNOWLEDGE_RESEARCH_TOOL_NAMES: Record<KnowledgeResearchSurface, readonly string[]> = {
+  knowledge_research_root: Object.freeze([
+    "knowledge_outline", "knowledge_search", "knowledge_read", "knowledge_grep",
+    "knowledge_research_update", "knowledge_research_finish", "knowledge_delegate",
+  ]),
+  knowledge_research_worker: Object.freeze([
+    "knowledge_outline", "knowledge_search", "knowledge_read", "knowledge_grep", "knowledge_research_update",
+  ]),
+  knowledge_completeness_worker: Object.freeze(["knowledge_coverage_read", "knowledge_completeness_mark"]),
+};
+
+export function isKnowledgeResearchSurface(value: unknown): value is KnowledgeResearchSurface {
+  return value === "knowledge_research_root" || value === "knowledge_research_worker" || value === "knowledge_completeness_worker";
+}
+
+/** 研究会话只使用固定清单；只读声明不会让其它工具进入研究范围。 */
+export function getKnowledgeResearchToolNames(surface: KnowledgeResearchSurface): readonly string[] {
+  return KNOWLEDGE_RESEARCH_TOOL_NAMES[surface];
+}
 
 export const GLOBAL_TOOL_NAMES = [
   "computer",

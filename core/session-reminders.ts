@@ -33,12 +33,13 @@ export const REFERENCE_BLOCK_PREFIX = "[hana_reference]";
 export const REFERENCE_BLOCK_END = "[/hana_reference]";
 
 /**
- * 知识库注入块包裹符（lib/knowledge/knowledge-context-injector.ts 的
- * renderKnowledgeContextBlock 产出）。与 reminder/reference 同属模型侧信封：
+ * 知识库证据装填产出的包裹符，也兼容历史消息。与 reminder/reference 同属模型侧信封：
  * 必须读给模型、绝不能进用户可见投影，由下方同一剥离函数移除。
  */
 export const KNOWLEDGE_CONTEXT_BLOCK_PREFIX = "[KnowledgeContext]";
 export const KNOWLEDGE_CONTEXT_BLOCK_END = "[/KnowledgeContext]";
+export const KNOWLEDGE_RESEARCH_CONTEXT_BLOCK_PREFIX = "[KnowledgeResearchContext]";
+export const KNOWLEDGE_RESEARCH_CONTEXT_BLOCK_END = "[/KnowledgeResearchContext]";
 
 const REFERENCE_BUDGET_CONTEXT_FRACTION = 0.05;
 const REFERENCE_BUDGET_MAX_TOKENS = 20000;
@@ -121,7 +122,7 @@ export function stripSessionReminderBlocks(value: unknown): string {
   const visibleLines: string[] = [];
   let insideReminder = false;
   let insideReference = false;
-  let insideKnowledge = false;
+  let knowledgeBlockEnd: string | null = null;
   let dropSeparatorAfterReminder = false;
 
   for (const line of value.split(/\r?\n/)) {
@@ -139,9 +140,9 @@ export function stripSessionReminderBlocks(value: unknown): string {
       }
       continue;
     }
-    if (insideKnowledge) {
-      if (line === KNOWLEDGE_CONTEXT_BLOCK_END) {
-        insideKnowledge = false;
+    if (knowledgeBlockEnd !== null) {
+      if (line === knowledgeBlockEnd) {
+        knowledgeBlockEnd = null;
         dropSeparatorAfterReminder = true;
       }
       continue;
@@ -152,8 +153,8 @@ export function stripSessionReminderBlocks(value: unknown): string {
       insideReference = true;
       continue;
     }
-    if (line === KNOWLEDGE_CONTEXT_BLOCK_PREFIX) {
-      insideKnowledge = true;
+    if (line === KNOWLEDGE_CONTEXT_BLOCK_PREFIX || line === KNOWLEDGE_RESEARCH_CONTEXT_BLOCK_PREFIX) {
+      knowledgeBlockEnd = line === KNOWLEDGE_CONTEXT_BLOCK_PREFIX ? KNOWLEDGE_CONTEXT_BLOCK_END : KNOWLEDGE_RESEARCH_CONTEXT_BLOCK_END;
       continue;
     }
     if (REMINDER_HEADER_LINE_RE.test(line)) {
