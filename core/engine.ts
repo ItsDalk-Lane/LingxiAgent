@@ -152,6 +152,9 @@ import { hashCacheContractValue } from "../lib/llm/cache-prefix-contract.ts";
 import { resolveReferenceBudgetTokens } from "./session-reminders.ts";
 import { createBridgeTools, registerBridgeCapabilityDelegates } from "./tool-catalog-bridge.ts";
 import { summarizeToolParameters } from "./mcp/manager.ts";
+import { ToolTargetRegistry } from "./tool-target-registry.ts";
+import { ToolInvocationGateway } from "./tool-invocation-gateway.ts";
+import { createToolSchemaValidator } from "../lib/tools/invocation/index.ts";
 
 /** Matches the MCP config default; used when no manager config is available. */
 const DEFAULT_TOOL_DEFER_THRESHOLD = 10;
@@ -186,7 +189,10 @@ function buildToolCatalogManifestSnapshot(catalog, modelContextWindowTokens) {
     names,
   };
 }
-import { filterToolObjectsByAvailability } from "./tool-availability.ts";
+import {
+  evaluateToolAvailability,
+  filterToolObjectsByAvailability,
+} from "./tool-availability.ts";
 import { TaskRegistry } from "../lib/task-registry.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
 import { KnowledgeResearchOrchestrator } from "../lib/knowledge/research/knowledge-research-orchestrator.ts";
@@ -4361,7 +4367,7 @@ export class LingxiEngine {
    * larger connectors would make a tool's availability depend on which company
    * shipped it, which is exactly the kind of hidden ranking the catalog avoids.
    */
-  _planDeferredToolAssembly(mcpTools, pluginTools) {
+  _planDeferredToolAssembly(mcpTools, pluginRegistry, pluginGateway) {
     const config = this._mcp?.getConfig?.() || null;
     const deferEnabled = config ? config.deferEnabled !== false : true;
     if (!deferEnabled) return null;
@@ -4372,22 +4378,21 @@ export class LingxiEngine {
     const liveMcpEntries = this._liveMcpCatalogEntries(mcpTools);
 
     const builtinDeferEnabled = this._prefs?.getBuiltinToolDeferEnabled?.() === true;
-    const builtinEntries = builtinDeferEnabled
-      ? (pluginTools || [])
-        .filter((tool) => tool?.name && tool.deferrable !== false)
-        .map((tool) => ({
-          name: tool.name,
-          toolName: tool.name,
-          description: tool.description || "",
-          paramsSummary: summarizeToolParameters(tool.parameters),
-          serverId: tool._pluginId || "plugin",
-          serverLabel: tool._pluginId || "plugin",
-          origin: "builtin",
-          deferrable: true,
-          pinned: false,
-          schemaRef: () => tool.parameters || { type: "object", properties: {} },
-        }))
-      : [];
+    const pluginTargets = builtinDeferEnabled ? pluginRegistry.listEligible() : [];
+    const builtinEntries = pluginTargets
+      .filter((target) => target.deferrable)
+      .map((target) => ({
+        name: target.identity.publicName,
+        toolName: target.identity.localName,
+        description: target.description,
+        paramsSummary: summarizeToolParameters(target.parameters),
+        serverId: target.identity.sourceId,
+        serverLabel: target.identity.sourceId,
+        origin: "builtin",
+        deferrable: target.deferrable,
+        pinned: target.pinned,
+        schemaRef: () => target.parameters,
+      }));
 
     const deferrable = [...liveMcpEntries, ...builtinEntries]
       .filter((entry) => entry.deferrable !== false && entry.pinned !== true);
@@ -4399,9 +4404,24 @@ export class LingxiEngine {
     if (liveMcpEntries.length > 0) catalog.registerSource("mcp", liveMcpEntries);
     if (builtinEntries.length > 0) catalog.registerSource("builtin", builtinEntries);
 
-    const builtinToolsByName = new Map<string, any>(
-      (pluginTools || []).map((tool) => [tool?.name, tool] as [string, any]),
+    const deferredPluginTargetIds = new Set(
+      (builtinDeferEnabled ? pluginRegistry.listDeferredCandidates() : [])
+        .map((target) => target.identity.targetId),
     );
+    const catalogPluginTargetIds = new Set(
+      pluginTargets
+        .filter((target) => target.deferrable)
+        .map((target) => target.identity.targetId),
+    );
+    const resolveBuiltinTarget = (name) => {
+      const entry = catalog.get(name);
+      if (!entry || entry.origin !== "builtin") return null;
+      const target = pluginRegistry.resolveCatalogTarget({
+        serverId: entry.serverId,
+        toolName: entry.toolName,
+      });
+      return catalogPluginTargetIds.has(target.identity.targetId) ? target : null;
+    };
     const bridgeTools = createBridgeTools({
       catalog,
       mcpCall: (serverId, toolName, args, ctx) => this._mcp.callTool(serverId, toolName, args, ctx),
@@ -4410,16 +4430,45 @@ export class LingxiEngine {
       // A deferred builtin keeps its own permission voice rather than being
       // flattened into the MCP policy model.
       resolveBuiltinInvocation: (name, params) => {
-        const target = builtinToolsByName.get(name);
-        const resolver = target?.sessionPermission?.resolveInvocation;
-        return typeof resolver === "function" ? resolver(params) : null;
+        const target = resolveBuiltinTarget(name);
+        if (!target) return null;
+        const validatedArguments = target.validator.validate(params, "deferred");
+        const permission = target.permission.resolveInvocation(validatedArguments);
+        return {
+          ...permission,
+          effectiveInvocation: {
+            targetId: target.identity.targetId,
+            toolName: target.identity.publicName,
+            arguments: validatedArguments,
+            generation: target.getCurrentGeneration(),
+          },
+        };
       },
-      builtinCall: (name, args, ctx) => {
-        const target = builtinToolsByName.get(name);
-        if (typeof target?.execute !== "function") {
+      builtinCall: (name, args, invocation) => {
+        const target = resolveBuiltinTarget(name);
+        if (!target) {
           throw new Error(`Deferred tool ${name} is no longer available`);
         }
-        return target.execute(`bridge_${name}`, args, ctx, undefined, ctx);
+        const runtimeCtx: Record<string, unknown> = invocation.ctx && typeof invocation.ctx === "object"
+          ? invocation.ctx as Record<string, unknown>
+          : {};
+        const runtimeSessionId = typeof runtimeCtx.sessionId === "string" ? runtimeCtx.sessionId : null;
+        const runtimeSessionPath = typeof runtimeCtx.sessionPath === "string" ? runtimeCtx.sessionPath : null;
+        const runtimeAgentId = typeof runtimeCtx.agentId === "string" ? runtimeCtx.agentId : null;
+        return pluginGateway.invoke({
+          targetId: target.identity.targetId,
+          route: "deferred",
+          arguments: args,
+          sessionId: runtimeSessionId,
+          sessionPath: runtimeSessionPath || getToolSessionPath(runtimeCtx),
+          agentId: runtimeAgentId,
+          lifecycleGeneration: target.getCurrentGeneration(),
+          toolCallId: invocation.toolCallId,
+          signal: invocation.signal,
+          onUpdate: invocation.onUpdate,
+          ctx: runtimeCtx,
+          runtimeContext: runtimeCtx,
+        });
       },
       log: toolAvailabilityLog,
     });
@@ -4427,7 +4476,15 @@ export class LingxiEngine {
     const deferredToolNames = new Set(deferrable.map((entry) => (
       entry.origin === "builtin" ? entry.name : `mcp_${entry.name}`
     )));
-    return { catalog, bridgeTools, deferredToolNames };
+    return {
+      catalog,
+      bridgeTools,
+      deferredToolNames,
+      deferredPluginTargetIds,
+      catalogPluginTargetIds,
+      pluginRegistry,
+      pluginGateway,
+    };
   }
 
   /**
@@ -4519,9 +4576,26 @@ export class LingxiEngine {
     const approvalPolicy = opts.approvalPolicy
       || (allowHumanApproval ? SESSION_APPROVAL_POLICIES.INTERACTIVE : SESSION_APPROVAL_POLICIES.DENY_ON_PROMPT);
 
-    // Append plugin tools
-    const pluginTools = this._pluginManager?.getAllTools() || [];
-    const mcpTools = this._mcp?.getAllTools() || [];
+    const rawPluginTools = this._pluginManager?.getAllTools() || [];
+    const rawMcpTools = this._mcp?.getAllTools() || [];
+    const toolAvailabilityContext = {
+      agentId,
+      channelsEnabled: resolveChannelsEnabledForToolAvailability(this),
+    };
+    const toolAvailabilityOptions = { warn: (msg) => toolAvailabilityLog.warn(msg) };
+    // 延迟阈值只能看到当前会话真正有资格使用的目标，不能先把禁用项算进去再过滤。
+    const pluginTools = filterToolObjectsByAvailability(
+      rawPluginTools,
+      toolAgent?.config || {},
+      toolAvailabilityContext,
+      toolAvailabilityOptions,
+    );
+    const mcpTools = filterToolObjectsByAvailability(
+      rawMcpTools,
+      toolAgent?.config || {},
+      toolAvailabilityContext,
+      toolAvailabilityOptions,
+    );
     const executionBoundary = this._runtimeContext
       ? this.createExecutionBoundary({ workbenchRoot: cwd })
       : null;
@@ -4555,32 +4629,135 @@ export class LingxiEngine {
         },
       };
     };
+    const pluginRegistry = new ToolTargetRegistry();
+    const pluginGateway = new ToolInvocationGateway({
+      registry: pluginRegistry,
+      authorize: () => {
+        throw new Error("model-facing plugin calls must be authorized by the session permission wrapper");
+      },
+    });
+    const registeredPluginTargets = pluginTools.map((tool) => {
+      const runtimeTool = withRuntimeContext(tool);
+      const identity = tool._toolTargetIdentity;
+      const permission = tool._normalizedPermissionContract;
+      if (!identity || !permission) {
+        throw new Error(`buildTools: plugin tool "${tool?.name || "unknown"}" lacks canonical identity or permission`);
+      }
+      const validator = createToolSchemaValidator(
+        tool.parameters || { type: "object", properties: {} },
+        identity,
+      );
+      const availability = evaluateToolAvailability(
+        tool,
+        toolAgent?.config || {},
+        toolAvailabilityContext,
+        toolAvailabilityOptions,
+      );
+      const target = pluginRegistry.register({
+        identity,
+        label: tool.label || tool.name,
+        description: tool.description || "",
+        parameters: validator.schema,
+        deferrable: tool.deferrable !== false,
+        pinned: tool.pinned === true,
+        permission,
+        validator,
+        availability: availability.allowed === false
+          ? { eligible: false, reason: availability.reason }
+          : { eligible: true },
+        getCurrentGeneration: () => tool._toolLifecycleGeneration ?? 0,
+        isCurrentlyAvailable: (runtimeContext) => evaluateToolAvailability(
+          tool,
+          toolAgent?.config || {},
+          {
+            ...toolAvailabilityContext,
+            ...(runtimeContext && typeof runtimeContext === "object" ? runtimeContext : {}),
+          },
+          toolAvailabilityOptions,
+        ).allowed,
+        executeCanonical: (toolCallId, args, signal, onUpdate, ctx) => (
+          runtimeTool.execute(toolCallId, args, signal, onUpdate, ctx)
+        ),
+        normalizeResult: (result) => result,
+      });
+      return { target, runtimeTool };
+    });
+
+    const createDirectPluginFacade = ({ target, runtimeTool }) => ({
+      ...runtimeTool,
+      name: target.identity.publicName,
+      label: target.label,
+      description: target.description,
+      parameters: target.parameters,
+      deferrable: target.deferrable,
+      pinned: target.pinned,
+      _toolTargetIdentity: target.identity,
+      _normalizedPermissionContract: target.permission,
+      sessionPermission: Object.freeze({
+        resolveInvocation: target.permission.resolveInvocation,
+      }),
+      execute: (toolCallId, args, signalOrRuntimeCtx, onUpdate, piCtx) => {
+        const { ctx: runtimeCtx } = normalizeToolRuntimeContext(signalOrRuntimeCtx, piCtx);
+        const sessionRef = resolveRuntimeSessionRef(runtimeCtx);
+        const signal = signalOrRuntimeCtx
+          && typeof signalOrRuntimeCtx === "object"
+          && typeof signalOrRuntimeCtx.aborted === "boolean"
+          && typeof signalOrRuntimeCtx.addEventListener === "function"
+          ? signalOrRuntimeCtx
+          : undefined;
+        return pluginGateway.invoke({
+          targetId: target.identity.targetId,
+          route: "direct",
+          arguments: args,
+          sessionId: runtimeCtx.sessionId || sessionRef?.sessionId || null,
+          sessionPath: runtimeCtx.sessionPath || sessionRef?.sessionPath || getSessionPath(),
+          agentId: runtimeCtx.agentId || agentId,
+          lifecycleGeneration: target.getCurrentGeneration(),
+          toolCallId,
+          signal,
+          onUpdate,
+          ctx: runtimeCtx,
+          runtimeContext: runtimeCtx,
+        });
+      },
+    });
+
     // Deferred assembly is decided once, here, and never revisited for the life
     // of this tool set. The session's cacheable prefix is the tool schemas plus
     // the system prompt, and a running session asserts that prefix on every
     // request, so a tool set that changed shape mid-session would break the
     // cache and fail the contract. Everything dynamic goes through the
     // conversation stream instead.
-    const deferPlan = this._planDeferredToolAssembly(mcpTools, pluginTools);
+    const deferPlan = this._planDeferredToolAssembly(mcpTools, pluginRegistry, pluginGateway);
     const directMcpTools = deferPlan
       ? mcpTools.filter((tool) => !deferPlan.deferredToolNames.has(tool?.name))
       : mcpTools;
-    const directPluginTools = deferPlan
-      ? pluginTools.filter((tool) => !deferPlan.deferredToolNames.has(tool?.name))
-      : pluginTools;
+    const directPluginTargets = deferPlan
+      ? registeredPluginTargets.filter(({ target }) => (
+        !deferPlan.deferredPluginTargetIds.has(target.identity.targetId)
+      ))
+      : registeredPluginTargets;
+    const directPluginTools = directPluginTargets.map(createDirectPluginFacade);
     const bridgeTools = deferPlan ? deferPlan.bridgeTools : [];
 
     const runtimeCustomTools = ct.map(withRuntimeContext);
     // Plugin tools and MCP tools both need the same session context injection;
     // withRuntimeContext is that wrapper, so neither gets its own copy of it.
-    const wrappedPluginTools = directPluginTools.map(withRuntimeContext);
     const wrappedMcpTools = directMcpTools.map(withRuntimeContext);
     const wrappedBridgeTools = bridgeTools.map(withRuntimeContext);
     if (deferPlan) {
       // withRuntimeContext returns copies, and the permission layer keys its
       // delegation registry on object identity, so the objects that actually
       // reach that layer are the ones that must be registered.
-      registerBridgeCapabilityDelegates(wrappedBridgeTools, { catalog: deferPlan.catalog });
+      registerBridgeCapabilityDelegates(wrappedBridgeTools, {
+        catalog: deferPlan.catalog,
+        canDelegateCapability: (capability, action) => {
+          return pluginRegistry.listEligible().some((target) => (
+            deferPlan.catalogPluginTargetIds.has(target.identity.targetId)
+            && capability === `${target.identity.capabilityBase}.${action}`
+          ));
+        },
+      });
     }
     const pluginDevTools = this._pluginDevService && this._prefs.getPluginDevToolsEnabled?.() === true
       ? createPluginDevTools({
@@ -4597,13 +4774,10 @@ export class LingxiEngine {
       { source: "plugin development tools", tools: pluginDevTools },
     ]);
     const allTools = filterToolObjectsByAvailability(
-      [...runtimeCustomTools, ...wrappedPluginTools, ...wrappedMcpTools, ...wrappedBridgeTools, ...pluginDevTools],
+      [...runtimeCustomTools, ...directPluginTools, ...wrappedMcpTools, ...wrappedBridgeTools, ...pluginDevTools],
       toolAgent?.config || {},
-      {
-        agentId,
-        channelsEnabled: resolveChannelsEnabledForToolAvailability(this),
-      },
-      { warn: (msg) => toolAvailabilityLog.warn(msg) },
+      toolAvailabilityContext,
+      toolAvailabilityOptions,
     );
 
     const effectiveAgentDir = opts.agentDir || this.agent.agentDir;
@@ -4745,6 +4919,8 @@ export class LingxiEngine {
       ...result,
       tools: wrapWithSessionPermission(result.tools, {
         getSessionPath,
+        getSessionRef,
+        getSessionId,
         getPermissionMode,
         permissionContext,
         agentId,
@@ -4762,6 +4938,8 @@ export class LingxiEngine {
       }),
       customTools: wrapWithSessionPermission(result.customTools, {
         getSessionPath,
+        getSessionRef,
+        getSessionId,
         getPermissionMode,
         permissionContext,
         agentId,
@@ -4821,6 +4999,8 @@ export class LingxiEngine {
     // and the engine has no business keeping a map from sessions to catalogs.
     return {
       ...result,
+      toolTargetRegistry: pluginRegistry,
+      toolInvocationGateway: pluginGateway,
       toolCatalogManifest: deferPlan
         ? buildToolCatalogManifestSnapshot(deferPlan.catalog, opts.modelContextWindowTokens)
         : null,

@@ -8,7 +8,10 @@ import {
   evaluateToolAvailability,
   filterToolObjectsByAvailability,
 } from "../core/tool-availability.ts";
-import { resolveToolInvocationPermission } from "../lib/permission/tool-invocation-permission.ts";
+import {
+  createPluginToolIdentity,
+  normalizeToolPermissionContract,
+} from "../lib/tools/invocation/index.ts";
 
 const BRIDGE_NAMES = ["mcp_search_tools", "mcp_describe_tool", "mcp_call"];
 
@@ -209,20 +212,36 @@ describe("engine deferred tool assembly", () => {
   });
 
   it("leaves plugin tools alone while builtin defer is off", () => {
-    const pluginTools = Array.from({ length: 15 }, (_, index) => ({
-      name: `plugin_tool_${index}`,
-      description: "A plugin tool.",
-      _pluginId: "demo",
-      execute: vi.fn(),
-    }));
+    const pluginTools = Array.from({ length: 15 }, (_, index) => {
+      const name = `demo_tool_${index}`;
+      const identity = createPluginToolIdentity({
+        pluginId: "demo",
+        publicName: name,
+        capabilityBase: `tool_${index}`,
+      });
+      const permission = normalizeToolPermissionContract({
+        name,
+        sessionPermission: { readOnly: true },
+      }, identity);
+      return {
+        name,
+        description: "A plugin tool.",
+        parameters: { type: "object", properties: {} },
+        _pluginId: "demo",
+        _toolTargetIdentity: identity,
+        _normalizedPermissionContract: permission,
+        sessionPermission: { resolveInvocation: permission.resolveInvocation },
+        execute: vi.fn(),
+      };
+    });
     const { customTools } = build({
       connectors: [{ id: "github", tools: manyTools(11) }],
       deferThreshold: 10,
       pluginTools,
     });
     const names = customTools.map((tool: any) => tool.name);
-    expect(names).toContain("plugin_tool_0");
-    expect(names).toContain("plugin_tool_14");
+    expect(names).toContain("demo_tool_0");
+    expect(names).toContain("demo_tool_14");
   });
 });
 

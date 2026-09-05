@@ -18,6 +18,7 @@
 
 import { Type } from "../lib/pi-sdk/index.ts";
 import { registerToolCapabilityDelegate } from "../lib/permission/tool-invocation-permission.ts";
+import { createFirstPartyToolIdentity } from "../lib/tools/invocation/index.ts";
 import type { ToolCatalog, ToolCatalogEntry } from "./tool-catalog.ts";
 
 export const BRIDGE_TOOL_NAMES = ["mcp_search_tools", "mcp_describe_tool", "mcp_call"] as const;
@@ -33,7 +34,16 @@ export interface BridgeToolDeps {
   /** Resolves a deferred builtin tool's own invocation descriptor. */
   resolveBuiltinInvocation?: (name: string, params: unknown) => unknown;
   /** Executes a deferred builtin tool in place of the MCP call path. */
-  builtinCall?: (name: string, args: Record<string, unknown>, ctx: unknown) => Promise<unknown>;
+  builtinCall?: (
+    name: string,
+    args: Record<string, unknown>,
+    invocation: {
+      toolCallId: string;
+      signal: AbortSignal | undefined;
+      onUpdate: unknown;
+      ctx: unknown;
+    },
+  ) => Promise<unknown>;
   log?: { warn?: (message: string) => void; log?: (message: string) => void };
 }
 
@@ -270,7 +280,18 @@ export function createBridgeTools({
         };
       },
     },
-    execute: async (_id: string, params: any, _signal: unknown, _onUpdate: unknown, ctx: unknown) => {
+    _toolTargetIdentity: createFirstPartyToolIdentity({
+      publicName: CALL_TOOL_NAME,
+      capabilityBase: CALL_TOOL_NAME,
+    }),
+    _toolInvocationRoute: "deferred",
+    execute: async (
+      toolCallId: string,
+      params: any,
+      signal: AbortSignal | undefined,
+      onUpdate: unknown,
+      ctx: unknown,
+    ) => {
       const entry = resolveTarget(catalog, params?.server, params?.tool);
       if (!entry) {
         const suggestions = nearNames(catalog, String(params?.tool ?? ""));
@@ -299,7 +320,12 @@ export function createBridgeTools({
       try {
         if (entry.origin === "builtin") {
           if (!builtinCall) return text(`${entry.name} 当前不可调用。`);
-          return await builtinCall(entry.name, args, ctx) as any;
+          return await builtinCall(entry.name, args, {
+            toolCallId,
+            signal,
+            onUpdate,
+            ctx,
+          }) as any;
         }
         return await mcpCall(entry.serverId, entry.toolName, args, ctx) as any;
       } catch (error: any) {
@@ -325,11 +351,18 @@ export function createBridgeTools({
  */
 export function registerBridgeCapabilityDelegates(
   tools: readonly any[],
-  { catalog }: { catalog: ToolCatalog },
+  {
+    catalog,
+    canDelegateCapability,
+  }: {
+    catalog: ToolCatalog;
+    canDelegateCapability?: (capability: string, action: string) => boolean;
+  },
 ): void {
   const callTool = tools.find((tool) => tool?.name === CALL_TOOL_NAME);
   if (!callTool) return;
   registerToolCapabilityDelegate(callTool, (capability, action) => {
+    if (canDelegateCapability?.(capability, action) === true) return true;
     const suffix = `.${action}`;
     if (!capability.endsWith(suffix)) return false;
     return catalog.has(capability.slice(0, -suffix.length));

@@ -52,8 +52,8 @@
 | P1-03 | completed | `d2f73f21f48a466b19b2d76a6e37e2154b6093b2` | 完整 schema 校验器 |
 | P2-01 | completed | `28e097137dc4f02da63c9047fd1d6d5b67515d07` | 会话级目标注册表 |
 | P2-02 | completed | `1e71a29a272d2292c003293e123dde681cdb6a52` | PreparedInvocation 与统一网关 |
-| P3-01 | completed | 待提交后回填 | 插件元数据与 target adapter |
-| P3-02 | pending | — | Engine 装配顺序 |
+| P3-01 | completed | `82292ec6f200e4729245d6bc71589b64ba0a2379` | 插件元数据与 target adapter |
+| P3-02 | completed | 待提交后回填 | Engine 装配顺序 |
 | P4-01 | pending | — | Catalog 目标引用目录 |
 | P4-02 | pending | — | Bridge Gateway 适配 |
 | P4-03 | pending | — | MCP eligibility 与执行器 |
@@ -155,8 +155,21 @@
 - 绿灯命令：上述 3 文件加 `tests/tool-availability.test.ts`、`tests/session-coordinator-tool-snapshot.test.ts`、`tests/tool-invocation-permission.test.ts`、`tests/session-permission-wrapper.test.ts`；`npm run typecheck`；本项改动文件定向 ESLint；`git diff --check`。
 - 绿灯原始结果：Vitest exit `0`，`7 passed` files、`265 passed` tests；三段 typecheck exit `0`；定向 ESLint exit `0`（`0 errors / 266 warnings`，均为存量大文件风格警告）；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p301-affected-final.log`、`/tmp/lingxi-tool-contract-p301-typecheck.log`、`/tmp/lingxi-tool-contract-p301-eslint.log`
-- 提交 SHA：待提交后回填
+- 提交 SHA：`82292ec6f200e4729245d6bc71589b64ba0a2379`
 - 偏差：任务书没有为 P3-01 单列提交信息；按用户“每项提交并推送”的要求使用与本项内容一致的独立提交信息。门禁暴露的宿主对象身份回归属于本项装配适配边界，做最小修复并保留 fail-closed。
+
+### P3-02 重排 Engine 工具装配顺序
+
+- 状态：`completed`
+- 改动文件：`core/engine.ts`、`core/tool-catalog-bridge.ts`、`core/tool-invocation-gateway.ts`、`lib/tools/session-permission-wrapper.ts`、`tests/tool-deferred-builtin-parity.test.ts`、`tests/engine-tool-defer.test.ts`、`tests/engine-build-tools.test.ts`、`TOOL_INVOCATION_REPAIR_PROGRESS.md`。
+- 红灯命令：`set -o pipefail; npx vitest run tests/tool-deferred-builtin-parity.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p302-red.log`
+- 红灯原始结果：exit `1`；`1 failed` file、`6 failed / 6 total` tests。旧装配把禁用插件计入阈值、忽略 `pinned`、延迟路径丢失真实 capability/调用句柄，12 个 bundled 契约无法执行，并保留 `builtinToolsByName` 原始对象执行旁路。
+- 中间回归：首次实现为 `4 passed / 2 failed`，prepared route 仍按 direct 绑定；修正路由后为 `5 passed / 1 failed`，同本名跨插件 capability 解析歧义；改为用 effective TargetId 对权威 capability 做精确复核后新矩阵通过。扩展至既有 Engine 门禁时先发现 4 个旧夹具缺规范化插件身份/权限，补齐夹具后又发现 2 个断言仍期待把普通上下文冒充 signal；按 canonical executor 契约更新为第三参数只接受真实取消信号。
+- 绿灯命令：11 个相关测试文件（插件加载、SDK、Engine 两套 build、延迟装配、新增 bundled parity、可用性、注册表、网关、权限描述与会话包装）；`npm run typecheck`；新增测试文件定向 ESLint；`git diff --check`。
+- 绿灯原始结果：Vitest exit `0`，`11 passed` files、`267 passed` tests；三段 typecheck exit `0`；新增测试 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p302-stage-final.log`、`/tmp/lingxi-tool-contract-p302-typecheck-final.log`、`/tmp/lingxi-tool-contract-p302-new-eslint-final.log`
+- 提交 SHA：待提交后回填
+- 偏差：none
 
 ## 错误日志
 
@@ -182,13 +195,18 @@
 | 2026-09-05 14:46 +0800 | P2-02 | 首次全改动文件 ESLint 为 `0 errors / 89 warnings`，其中新增测试含 `7` 个显式 `any` 警告 | 1 | 只清理本项新增测试类型；新增文件复跑为 `0` 问题，测试与 typecheck 保持通过 |
 | 2026-09-05 14:55 +0800 | P3-01 | 首次实现后仍有 `1/121` 失败：桥接工具的宿主委托资格依赖对象身份，权限包装复制对象后规范化解析器抛错 | 1 | 不放宽 capability；让权限包装识别宿主已登记对象并保留原对象，复跑本项及权限相关回归 `265/265` 通过 |
 | 2026-09-05 14:56 +0800 | P3-01 编辑 | 首次多文件补丁因 import 上下文不匹配而校验失败，未写入 | 1 | 回读真实 import 与测试位置后定点补丁；无残留诊断代码 |
+| 2026-09-05 15:06 +0800 | P3-02 | 首次实现回归 `4 passed / 2 failed`：延迟调用的 prepared route 仍按 direct 生成 | 1 | 由宿主给桥接调用绑定 deferred 路由，参数、目标和调用句柄继续由 prepared 摘要复核 |
+| 2026-09-05 15:07 +0800 | P3-02 | 路由修正后剩 `1/6` 失败：两个插件共享本名时 capability 全局反查歧义 | 1 | effective TargetId 已唯一确定真实目标，改为对该目标的权威 capability 精确比对；未采用平面名称猜测 |
+| 2026-09-05 15:08 +0800 | P3-02 扩展回归 | 既有 Engine 测试夹具未经过 PluginManager，缺少 P1 已要求的规范化身份/权限，4 项 fail-closed | 1 | 仅补齐测试夹具的真实注册期契约；生产端继续拒绝缺失声明，不降级 |
+| 2026-09-05 15:13 +0800 | P3-02 扩展回归 | 两个旧断言仍把普通运行上下文放在 canonical executor 的 signal 参数位 | 1 | 更新断言为第三参数仅透传真实 AbortSignal，运行上下文从第五参数验证；实现未做兼容性猜测 |
+| 2026-09-05 15:13 +0800 | P3-02 | 首次 typecheck 报 4 个类型错误：普通 object 属性读取 3 个、联合类型未收窄 1 个 | 1 | 加入显式记录类型与 `allowed === false` 判别；复跑三段 typecheck exit `0` |
 
 ## 断点续跑自检
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P3-01 已通过本项门禁，等待提交与推送 |
-| 接下来去哪？ | 独立提交并推送 P3-01，然后按任务书进入 P3-02 装配顺序重排 |
+| 现在在哪里？ | P3-02 已通过本项门禁，等待提交与推送 |
+| 接下来去哪？ | 使用任务书指定提交信息提交并推送 P3-02，然后进入 P4-01 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P2-02；P3-01 完成测试先红、静态插件元数据 allowlist、统一可用性判定和对象身份委托修复 |
+| 已做什么？ | 完成并推送 P0-00 至 P3-01；P3-02 完成测试先红、eligible-first 装配、插件目标注册与 direct/deferred 统一执行，相关门禁 `267/267` |
