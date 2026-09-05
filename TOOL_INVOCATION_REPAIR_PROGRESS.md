@@ -13,8 +13,9 @@
 |---|---|---|---|
 | P0-00 | `completed` | `6de275e2cf1e0391a466a9f95f2c499455a07d97` | 已从正式 v0.1.34 创建分支、完成环境准备并推送 |
 | P0-01 | `completed` | `092be566bfd09703bf7d648e25763f17c793e584` | 原始结果已完整保留；封印顺序失败与签名环境失败均已归因 |
-| P0-02 | `completed_pending_commit` | 待提交 | 入口清单、18 个重叠路径和 11 个真实冲突已建档 |
-| P1–P7 | `pending_migration` | — | 优先复用原实现 |
+| P0-02 | `completed` | `d5b70f4765be74ddbdc358c6df04d6572898f342` | 入口清单、18 个重叠路径和 11 个真实冲突已建档 |
+| P1-01 | `completed_pending_commit` | 待提交 | 原测试先红，再原样迁移规范身份与错误实现，本项门禁全绿 |
+| P1-02–P7 | `pending_migration` | — | 优先复用原实现 |
 | P8 | `pending_v0134_adaptation` | — | 知识正式架构发生变化，需重点适配 |
 | P9–P11 | `pending_migration` | — | 迁移错误、边界、组合测试与文档 |
 | P12 | `pending` | — | 最终验证、构建和封印 |
@@ -45,7 +46,8 @@
 
 ## P0-02 建立现状调用矩阵和迁移清单
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`d5b70f4765be74ddbdc358c6df04d6572898f342`，远端分支已核对同 SHA。
 - 任务书六条 `rg` 全部 exit `0`，共记录 388 行现场入口。
 - 12 个 bundled plugin 工具仍为 7 个只读、5 个副作用工具；权限和延迟元数据缺口与原基线一致。
 - PluginManager 生产 raw 执行入口 1 处；MCP 生产底层调用 6 处；四个媒体入口仍有分散的凭证回退链。
@@ -53,6 +55,15 @@
 - 文件层统计：303 个发布差异、106 个原修复差异、18 个重叠路径；现场三方预演为 11 个冲突。
 - 处置：P1–P7、P9–P10 主体复用；引擎连接点、P8 知识链、边界生成物和 P11 事实材料按新基线适配或重建。
 - 本项只改审计和规划文档，无生产代码修改。
+
+## P1-01 建立目标身份、路由和错误类型
+
+- 状态：`completed_pending_commit`。
+- 复用来源：原分支提交 `6ed37ec467c4a5bdfc567cdcd552cc1dbe04ee6a`；只迁移本项两份测试和四份实现，没有带入旧进度文件。
+- RED：先迁入测试后运行，exit `1`；2 个 suite 都因规范入口模块不存在而失败，0 tests 执行，符合旧代码预期。
+- GREEN：`tests/tool-target-identity.test.ts` 与 `tests/tool-invocation-errors.test.ts` exit `0`，2 files / 6 tests 全部通过。
+- typecheck exit `0`；本项文件定向 ESLint exit `0`；`git diff --check` exit `0`。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p101-red.log`、`/tmp/lingxi-tool-contract-v0134-p101-green.log`、`/tmp/lingxi-tool-contract-v0134-p101-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p101-eslint.log`。
 
 ## 错误记录
 
