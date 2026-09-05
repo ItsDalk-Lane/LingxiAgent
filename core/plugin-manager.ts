@@ -11,8 +11,31 @@ import { semverGte } from "../lib/plugin-versioning.ts";
 import { detectIncompatiblePluginFormat } from "../lib/plugin-format-guard.ts";
 import { createModuleLogger } from "../lib/debug-log.ts";
 import { getToolSessionPath, normalizeToolRuntimeContext } from "../lib/tools/tool-session.ts";
+import {
+  createPluginToolIdentity,
+  normalizeToolPermissionContract,
+} from "../lib/tools/invocation/index.ts";
 
 const log = createModuleLogger("plugin-manager");
+
+function normalizedPluginToolPermissionFields(pluginId, publicName, sessionPermission) {
+  const prefix = `${pluginId}_`;
+  const capabilityBase = publicName.startsWith(prefix)
+    ? publicName.slice(prefix.length)
+    : publicName;
+  const identity = createPluginToolIdentity({ pluginId, publicName, capabilityBase });
+  const permissionTool = {
+    name: publicName,
+    _pluginId: pluginId,
+    ...(sessionPermission !== undefined ? { sessionPermission } : {}),
+  };
+  const contract = normalizeToolPermissionContract(permissionTool, identity);
+  return {
+    sessionPermission: Object.freeze({ resolveInvocation: contract.resolveInvocation }),
+    _toolTargetIdentity: identity,
+    _normalizedPermissionContract: contract,
+  };
+}
 
 const KNOWN_CONTRIBUTION_DIRS = [
   "tools", "routes", "skills", "agents", "commands", "providers",
@@ -830,13 +853,14 @@ export class PluginManager {
         const mod = await freshImport(filePath);
         if (!mod.name || !mod.description || typeof mod.execute !== "function") continue;
         const origExecute = mod.execute;
+        const publicName = `${entry.id}_${mod.name}`;
         this._tools.push({
-          name: `${entry.id}_${mod.name}`,
+          name: publicName,
           description: mod.description,
           parameters: mod.parameters ?? {},
           ...(mod.promptSnippet ? { promptSnippet: mod.promptSnippet } : {}),
           ...(mod.promptGuidelines ? { promptGuidelines: mod.promptGuidelines } : {}),
-          ...(mod.sessionPermission && typeof mod.sessionPermission === "object" ? { sessionPermission: mod.sessionPermission } : {}),
+          ...normalizedPluginToolPermissionFields(entry.id, publicName, mod.sessionPermission),
           ...(typeof mod.isEnabledForAgentConfig === "function" ? { isEnabledForAgentConfig: mod.isEnabledForAgentConfig } : {}),
           execute: async (_toolCallId, params, signalOrRuntimeCtx, _onUpdate, piCtx) => {
             await this.activatePlugin(entry.id, { event: `onToolCall:${mod.name}`, toolName: mod.name }, { pluginKey: entry.pluginKey });
@@ -907,9 +931,10 @@ export class PluginManager {
     if (toolDef.metadata && typeof toolDef.metadata === "object") {
       tool.metadata = { ...toolDef.metadata };
     }
-    if (toolDef.sessionPermission && typeof toolDef.sessionPermission === "object") {
-      tool.sessionPermission = toolDef.sessionPermission;
-    }
+    Object.assign(
+      tool,
+      normalizedPluginToolPermissionFields(pluginId, tool.name, toolDef.sessionPermission),
+    );
     this._tools.push(tool);
     return () => {
       const idx = this._tools.indexOf(tool);
