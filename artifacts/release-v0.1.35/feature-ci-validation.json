@@ -1,0 +1,55 @@
+{
+  "conclusion": "success",
+  "headSha": "2c835ac77afb1a73cd83816ad3d613297dc770a8",
+  "jobs": [
+    {
+      "name": "lint-open-boundary",
+      "conclusion": "success",
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33991635196/job/101374797178",
+      "startedAt": "2026-09-05T20:57:59Z",
+      "completedAt": "2026-09-05T20:58:38Z"
+    },
+    {
+      "name": "open-build-smoke",
+      "conclusion": "success",
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33991635196/job/101374797103",
+      "startedAt": "2026-09-05T20:57:59Z",
+      "completedAt": "2026-09-05T21:01:06Z"
+    },
+    {
+      "name": "persistence-schema-guard",
+      "conclusion": "success",
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33991635196/job/101374797030",
+      "startedAt": "2026-09-05T20:58:00Z",
+      "completedAt": "2026-09-05T20:58:12Z"
+    },
+    {
+      "name": "test (macos-15, darwin, arm64, 24.15.0)",
+      "conclusion": "success",
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33991635196/job/101374797207",
+      "startedAt": "2026-09-05T20:58:05Z",
+      "completedAt": "2026-09-05T21:11:22Z"
+    },
+    {
+      "name": "test (macos-15-intel, darwin, x64, 24.15.0)",
+      "conclusion": "success",
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33991635196/job/101374797304",
+      "startedAt": "2026-09-05T20:58:02Z",
+      "completedAt": "2026-09-05T21:28:19Z"
+    },
+    {
+      "name": "test (ubuntu-24.04, linux, x64, 24.15.0)",
+      "conclusion": "success",
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33991635196/job/101374797060",
+      "startedAt": "2026-09-05T20:58:10Z",
+      "completedAt": "2026-09-05T21:12:59Z"
+    },
+    {
+      "name": "test (windows-2025, win32, x64, 24.15.0)",
+      "conclusion": "success",
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33991635196/job/101374797224",
+      "startedAt": "2026-09-05T20:58:01Z",
+      "completedAt": "2026-09-05T21:26:29Z"
+    }
+  ]
+}
