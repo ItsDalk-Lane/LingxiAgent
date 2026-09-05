@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 275d82c7e420c343f0d79243c80c3f43536149f5  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-02 安全双件套+沙盒拒绝分因文案)
+VERIFIED_SOURCE_SHA   = d0dd24922126564164b60cf1d0f835fa7989aee7  (最终验证所针对的 feature commit（其 tree 即被验证源码树）；2026-09-05 v0.1.33 新建会话/工作台五轮修复)
 工作分支              = feature/upstream-sync-0.447.4
 ```
 
@@ -844,6 +844,20 @@ seal 不是一次性终点，而是"当前被验证树"的游标；每次审计�
   删除改经 deleteOldReleaseTolerant，失败 WARN 继续不判红；真实环境端到端
   exit 0（14 删除 → 14 WARN）。验证：typecheck×3 绿 + 全量 npm test
   12896 通过（含新增 425 降级用例）后推进。
+
+- **2026-09-05 v0.1.33 新建会话/工作台五轮修复**（功能树 d0dd2492/seal 本提交；
+  三提交 7d2672d2+332e8960+d0dd2492，23+3+2 文件 / +2489-55，含 engine.ts 持久化指纹
+  compatible 重钉 sha256:d7239a0f… 不变）：修复轮一（新建会话继承源重排/去空缓存种子/
+  loadSessions reconcile 自愈/五语言文案）、轮二（engine 暴露 getSessionWorkspaceMount，
+  switch 回包补齐挂载身份，治左栏空白三症状）、轮三（默认工作台与 Agent 工作台目录
+  同目录两本账合流）、轮四（默认工作台显示名=配置目录名派生+启动合流键）、轮五
+  （Windows 工作台显示双缺陷：split('/') 取名改 workspaceDisplayName、挂载/历史跨源
+  去重、大小写变体挂载创建复用、继承链归一化）。验证：typecheck×3 绿 + eslint 改动
+  文件 0 error + 定向 29/475/146/27 用例绿 + 全量 npm test 12956 过/2 败（1=推进前
+  seal guard 旧坐标预期红，推进后归零；1=既有 DeskSection Jian drawer 用例，前轮
+  stash 对照证实先在）后推进。环境备注：本轮全量首跑 41 文件级失败均为 workspace 包
+  @lingxi/plugin-* 未构建的解析失败（2026-09-04 npm install 后 dist 缺失），
+  `npm run build:packages` 后归零，非代码回归。
 
 - **2026-09-02 安全双件套 + 沙盒拒绝分因文案**（功能树 275d82c7/seal 本提交，
   feat/pending-sep02，628d2f90+275d82c7 两提交 32 files / +1053-58）：
