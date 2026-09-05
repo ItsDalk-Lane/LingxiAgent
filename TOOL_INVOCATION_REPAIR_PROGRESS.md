@@ -67,8 +67,8 @@
 | P8-01 | completed | `e74aafee04c539dcc1352887e8763a741fb06ba5` | rerank policy 共享执行器 |
 | P9-01 | completed | `e3fe97120a411d3e8cc055bea5a8e2dd34d4f8ae` | 统一错误映射 |
 | P9-02 | completed | `ee3ac90a6777996a6776a0fa73db83736512f313` | raw execution 边界检查 |
-| P10-01 | completed | pending | 路径等价变形测试 |
-| P10-02 | pending | — | 完整配置组合 |
+| P10-01 | completed | `5518ed2ee4920b81db6943788dba06b4f0e741d5` | 路径等价变形测试 |
+| P10-02 | completed | pending | 完整配置组合 |
 | P11-01 | pending | — | 架构文档 |
 | P11-02 | pending | — | 报告、机器事实、源码候选 |
 | P12-01 | pending | — | 定向契约门禁 |
@@ -339,8 +339,20 @@
 - 绿灯命令：路径变形、Gateway、direct/deferred/plugin-dev-chat、MCP、会话权限、文件交付安全、Catalog 与 Engine 共 11 文件 Vitest；`npm run typecheck`；`npm run check:tool-invocation-boundaries`；3 个改动文件定向 ESLint；`git diff --check`。
 - 绿灯原始结果：Vitest exit `0`，`11 passed` files、`191 passed` tests；新矩阵 `3/3` 覆盖三条模型路由与 LocalDeveloperPrincipal HTTP 路由；三段 typecheck exit `0`；边界扫描 exit `0`，`2121` 个源码文件 `0` 违规；定向 ESLint exit `0`（`0 errors / 71 warnings`，全部来自既有会话包装文件）；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p1001-gate-final.log`、`/tmp/lingxi-tool-contract-p1001-typecheck-final.log`、`/tmp/lingxi-tool-contract-p1001-boundary.log`、`/tmp/lingxi-tool-contract-p1001-eslint.log`。
-- 提交 SHA：`pending (commit 后由下一项进度回填)`
+- 提交 SHA：`5518ed2ee4920b81db6943788dba06b4f0e741d5`
 - 偏差：任务书在 P10-02 后给出阶段提交信息；按用户“每项提交并推送”的要求，本项使用独立且内容对应的提交信息。
+
+### P10-02 完整配置组合
+
+- 状态：`completed_with_red_not_reproduced`
+- 改动文件：扩展 `tests/tool-invocation-path-parity.test.ts`，更新 `TOOL_INVOCATION_REPAIR_PROGRESS.md`；无生产代码修改。
+- 首次矩阵命令：`set -o pipefail; npx vitest run tests/tool-invocation-path-parity.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p1002-red.log`
+- 首次原始结果：exit `0`；`1 passed` file、`12 passed` tests。新增的 grant 前后参数变化、审批后 Agent 禁用/代次重载、流式 update 与 cancellation 组合均已被前序 P5、P9、P10-01 修复覆盖，因此当前项旧状态未出现可修复红灯；没有人为制造失败或改动生产架构。
+- 绿灯命令：路径变形、Engine defer、bundled/MCP parity、生命周期、Catalog、Registry、嵌套 schema、Gateway、plugin-dev、PluginManager/Runtime、MCP Runtime 共 13 文件 Vitest；`npm run typecheck`；`npm run check:tool-invocation-boundaries`；扩展测试定向 ESLint；`git diff --check`。
+- 绿灯原始结果：Vitest exit `0`，`13 passed` files、`373 passed` tests，覆盖总 defer/builtin defer on/off、候选数 10/11/12、插件新旧权限方言与可见性、pinned/non-deferrable、MCP 连接器和 model/app 可见性、grant 参数变化、审批后禁用/卸载/重载、跨来源同名、嵌套 schema、取消和流式更新；三段 typecheck exit `0`；边界扫描 exit `0`，`2121` 个源码文件 `0` 违规；定向 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p1002-gate.log`、`/tmp/lingxi-tool-contract-p1002-typecheck.log`、`/tmp/lingxi-tool-contract-p1002-boundary.log`、`/tmp/lingxi-tool-contract-p1002-eslint.log`。
+- 提交 SHA：`pending (commit 后由下一项进度回填)`
+- 偏差：用户要求每项新增回归都先在当前旧代码上失败；本项新增配置矩阵首次即绿，严格红灯前置未能复现。按“不得削弱/人为破坏测试、不得扩大架构”约束，保留该事实并只提交测试扩展。
 
 ## 错误日志
 
@@ -394,13 +406,14 @@
 | 2026-09-05 18:10 +0800 | P9-01 扩展回归 | `177 passed / 1 failed`：既有 plugin-dev 工具测试仍期待缺失目标在权限阶段返回 `null` | 1 | 更新为断言稳定 `TARGET_NOT_FOUND`；不恢复空值/权限拒绝混同，最终扩展矩阵 `283/283` 通过 |
 | 2026-09-05 18:24 +0800 | P10-01 | 首次实现后审批目标仍不等价：direct 缺 TargetId，另两路包含真实 TargetId | 1 | 让审批请求在无业务目标时使用宿主注册身份；没有把身份塞回模型参数或普通上下文 |
 | 2026-09-05 18:26 +0800 | P10-01 扩展回归 | 通用 effective target 绑定覆盖频道、浏览器标签、Agent 的业务目标，`54` 项会话权限测试失败 `3` 项 | 1 | 撤销通用覆盖；审批目标优先保留工具自己的业务目标，只在其缺失时使用注册身份，复跑 `57/57` 通过 |
+| 2026-09-05 18:34 +0800 | P10-02 红灯前置 | 新增配置组合首次运行 exit `0`、`12/12`，未复现新的旧代码失败 | 1 | 不伪造红灯、不削弱断言；以 `completed_with_red_not_reproduced` 原样留痕，完整 13 文件矩阵继续验证为 `373/373` |
 
 ## 断点续跑自检
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P10-01 已完成红绿验证和扩展回归，等待提交和推送 |
-| 接下来去哪？ | 提交并推送 P10-01，回填 SHA 后进入 P10-02 完整配置组合 |
+| 现在在哪里？ | P10-02 完整配置组合已验证，首次新增矩阵未复现红灯，等待提交和推送 |
+| 接下来去哪？ | 使用任务书指定提交信息提交并推送 P10-02，回填 SHA 后进入 P11-01 架构文档 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P9-02；P10-01 已证明三条模型入口的审批、参数、句柄、结果、错误与副作用等价，并单列验证本地开发 HTTP 主体 |
+| 已做什么？ | 完成并推送 P0-00 至 P10-01；P10-02 已用 13 文件、373 项矩阵覆盖任务书要求的开关、阈值、可见性、授权漂移、生命周期、嵌套 schema、取消与流式组合 |
