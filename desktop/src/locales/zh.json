@@ -281,7 +281,8 @@
       "showMore": "展开显示",
       "loading": "正在载入项目…",
       "empty": "还没有项目"
-    }
+    },
+    "archivedChats": "归档记录"
   },
   "titlebar": {
     "currentChatTitle": "当前对话标题",
@@ -342,7 +343,15 @@
       "deleteSelectedConfirm": "将永久删除选中的 {count} 条归档（共 {size}），无法撤销。继续？",
       "deleteSelectedDone": "已删除 {count} 条归档",
       "deleteSelectedPartial": "部分删除成功：{deleted}/{total}",
-      "daysAgo": "归档于 {days} 天前"
+      "daysAgo": "归档于 {days} 天前",
+      "deleteGroup": "删除整组",
+      "deleteGroupConfirm": "确定永久删除「{name}」分组的全部 {count} 条归档记录（{size}）？此操作不可恢复。",
+      "deleteGroupDone": "已永久删除 {count} 条归档记录",
+      "group": {
+        "ungrouped": "未归属",
+        "workspaceRemoved": "该工作目录已移除",
+        "meta": "{count} 条 · {size}"
+      }
     },
     "subagentRunStateUnrecoverable": "历史 subagent 运行状态不可恢复",
     "subagentLinkUnrecoverable": "历史 subagent 链接不可恢复",
@@ -1833,9 +1842,6 @@
       "networkProxyWss": "WSS proxy，可留空",
       "networkProxyNoProxy": "不走代理，例如 localhost, 127.0.0.1, ::1",
       "networkProxySave": "保存代理设置",
-      "archivedChats": "归档对话",
-      "archivedChatsDesc": "查看已归档的聊天，恢复需要继续的对话，或永久删除不再需要的记录",
-      "viewArchivedChats": "查看归档对话",
       "fileBackup": "文件备份",
       "fileBackupDesc": "AI 修改或删除文件前自动保存原始内容",
       "retention": "保留时长",
@@ -4973,5 +4979,15 @@
     "sendFailed": "发送失败：{error}",
     "rejectFailed": "忽略失败：{error}",
     "messageField": "消息内容"
+  },
+  "workspace": {
+    "disposal": {
+      "failed": "记录处理失败，工作台未移除",
+      "archivedToast": "工作台已移除，{count} 条对话已归档"
+    },
+    "sweep": {
+      "archivedToast": "已自动归档 {count} 条失效工作台的对话记录，可在归档记录中查看"
+    },
+    "archivedHint": "该工作台有 {count} 条已归档记录，可在左上角归档记录中恢复"
   }
 }

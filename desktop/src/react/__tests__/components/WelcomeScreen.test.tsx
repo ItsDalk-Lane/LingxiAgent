@@ -23,6 +23,7 @@ vi.mock('../../utils/ui-helpers', () => ({
 
 const translations: Record<string, string | string[] | Record<string, { avatar: string }>> = {
   'input.workspace': '工作台：',
+  'workspace.disposal.archivedToast': '工作台已移除，{count} 条对话已归档',
   'input.selectWorkspace': '选择工作台',
   'input.project': '项目：',
   'input.currentWorkspace': '本次工作台',
@@ -490,5 +491,129 @@ describe('WelcomeScreen workspace picker', () => {
 
     expect(screen.getByText('Reference')).toBeTruthy();
     expect(screen.queryByText('D:\\Assets\\Reference')).toBeNull();
+  });
+});
+
+describe('workspace removal disposal dialog', () => {
+  const B_MOUNT = { mountId: 'local_fs_b', label: '工作台B', nativeRootPath: '/workspace/B' };
+
+  afterEach(() => cleanup());
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    const t = vi.fn((key: string, vars?: Record<string, string | number>) => {
+      const template = translations[key] ?? key;
+      return typeof template === 'string'
+        ? template.replace(/\{(\w+)\}/g, (_match, name) => String(vars?.[name] ?? `{${name}}`))
+        : template;
+    });
+    vi.stubGlobal('t', t);
+    window.t = t as typeof window.t;
+    window.platform = { selectFolder: vi.fn() } as unknown as typeof window.platform;
+    useStore.setState({
+      welcomeVisible: true,
+      agents: [],
+      agentName: 'Hanako',
+      agentAvatarUrl: null,
+      agentYuan: 'lingxi',
+      currentAgentId: 'hana',
+      selectedAgentId: null,
+      memoryEnabled: true,
+      selectedFolder: '/workspace/Desktop',
+      selectedWorkspaceMountId: null,
+      selectedWorkspaceLabel: null,
+      deskWorkspaceMountId: null,
+      deskWorkspaceLabel: null,
+      deskBasePath: '',
+      studioWorkspaces: [],
+      defaultWorkspaceRootPath: null,
+      homeFolder: '/workspace/Desktop/project-hana',
+      cwdHistory: ['/workspace/Desktop/project-hana'],
+      workspaceFolders: ['/workspace/Reference'],
+      serverPort: 62950,
+      serverToken: 'test-token',
+      pendingProjectId: null,
+      sessionProjectCatalog: { folders: [], projects: [] },
+      sessionProjectCatalogLoaded: true,
+      locale: 'zh',
+      sessions: [],
+    } as never);
+  });
+
+  function disposeSetup(sessions: unknown[]) {
+    useStore.setState({
+      studioWorkspaces: [
+        { mountId: 'default', label: 'Default', isDefault: true, nativeRootPath: '/Users/test/Desktop/OH-WorkSpace' },
+        B_MOUNT,
+      ],
+      sessions,
+      selectedFolder: '/workspace/Desktop',
+      selectedWorkspaceMountId: null,
+    } as never);
+  }
+
+  it('archives the workspace sessions directly on removal (no dialog, user ruling)', async () => {
+    disposeSetup([
+      { path: '/s/mount-b.jsonl', sessionId: 's1', workspaceMountId: 'local_fs_b', cwd: '/workspace/B' },
+      { path: '/s/cwd-b.jsonl', sessionId: 's2', workspaceMountId: null, cwd: '/workspace/B' },
+      { path: '/s/other.jsonl', sessionId: 's3', workspaceMountId: 'mount_x', cwd: '/elsewhere' },
+    ]);
+    mocks.lingxiFetch.mockImplementation(async (path: string, opts?: RequestInit) => {
+      if (path === '/api/sessions/workspace-disposal') {
+        return new Response(JSON.stringify({ ok: true, matched: 2, disposed: 2, skippedStreaming: 0 }), { status: 200 });
+      }
+      if (path === '/api/studio/workspaces/local_fs_b' && opts?.method === 'DELETE') {
+        return new Response(JSON.stringify({ ok: true }), { status: 200 });
+      }
+      if (path === '/api/studio/workspaces') {
+        return new Response(JSON.stringify({ workspaces: [{ mountId: 'default', label: 'Default', isDefault: true }] }), { status: 200 });
+      }
+      if (path === '/api/sessions') return new Response(JSON.stringify([]), { status: 200 });
+      if (path === '/api/health') return new Response(JSON.stringify({ ok: true }), { status: 200 });
+      return new Response(JSON.stringify({ ok: true }), { status: 200 });
+    });
+
+    const { WelcomeScreen } = await import('../../components/WelcomeScreen');
+    render(<WelcomeScreen />);
+    fireEvent.click(screen.getByRole('button', { name: /工作台：Desktop/ }));
+    fireEvent.click(screen.getByRole('button', { name: '移除工作台' }));
+
+    // 用户裁决：移除=直接归档,不弹任何对话框
+    await waitFor(() => {
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/sessions/workspace-disposal', expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ workspaceMountId: 'local_fs_b', cwd: '/workspace/B', action: 'archive' }),
+      }));
+    });
+    await waitFor(() => {
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/studio/workspaces/local_fs_b', expect.objectContaining({ method: 'DELETE' }));
+    });
+    expect(screen.queryByText(/条对话记录/)).toBeNull();
+  });
+
+  it('removes directly without archiving when the workspace has no sessions', async () => {
+    disposeSetup([]);
+    let disposalCalled = false;
+    mocks.lingxiFetch.mockImplementation(async (path: string, opts?: RequestInit) => {
+      if (path === '/api/sessions/workspace-disposal') disposalCalled = true;
+      if (path === '/api/studio/workspaces/local_fs_b' && opts?.method === 'DELETE') {
+        return new Response(JSON.stringify({ ok: true }), { status: 200 });
+      }
+      if (path === '/api/studio/workspaces') {
+        return new Response(JSON.stringify({ workspaces: [{ mountId: 'default', label: 'Default', isDefault: true }] }), { status: 200 });
+      }
+      return new Response(JSON.stringify({ ok: true }), { status: 200 });
+    });
+
+    const { WelcomeScreen } = await import('../../components/WelcomeScreen');
+    render(<WelcomeScreen />);
+    fireEvent.click(screen.getByRole('button', { name: /工作台：Desktop/ }));
+    fireEvent.click(screen.getByRole('button', { name: '移除工作台' }));
+
+    await waitFor(() => {
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/studio/workspaces/local_fs_b', expect.objectContaining({ method: 'DELETE' }));
+    });
+    expect(disposalCalled).toBe(false);
+    expect(screen.queryByText(/条对话记录/)).toBeNull();
   });
 });

@@ -1031,6 +1031,20 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 结论:对话记录串台的 store 层路径(机制b)在新建会话流程内**不可达**;机制真实存在但仅冷启动/归档两设计内入口触发。「记录串台」生产候选(未排除,store 层外):服务端身份/WS 时序(new-detached 会话身份与 switch 回包不一致→闸门丢事件→空白;或 replay 重放错会话)——需服务端配合复现。
 - 文件树串台=机制c坐实:createNewSession 只清三件套(:1235-1237),deskBasePath/deskWorkspaceMountId/deskTreeFilesByPath 全程不重置(crosstalk 测试);activateWorkspaceDesk 快照-恢复把清了一半的 desk 写回主工作台存档 workspaceDeskStateByRoot[root].deskFiles=[](desk-new-session-capture 测试,desk-actions.ts:394-455)。继承同工作台时旧树显示属功能意图;存档污染(回工作台丢子目录/文件列表)是缺陷。
 
+## 2026-09-05 修复轮七:新建聊天助手身份跟随当前(规则B补全,用户拍板「B 方向」;接续修复轮与 01cdd80b mobile 补钉线索,非 disposal 工作流)
+
+- 背景:mobile 用例补钉(01cdd80b)后用户追问「助手和工作台不是没有绑定吗,为什么要区分」——确认架构上 agentId 与工作目录本是独立维度,「全局新建重置回 Primary」是历史入口语义,轮一实现规则 B 时只改了工作台维度、助手维度经代码注释有意保留,产生「助手回 Primary + 工作台留当前」的不对称组合。用户裁决 B 方向:**助手身份也跟随当前助手**。
+- 改动(session-actions.ts createNewSession,单点):
+  - `selectedPrimaryAgentId`(无条件钉 Primary)改 `selectedAgentIdForDraft`——有 currentAgentId 时为 **null**(null=「跟随当前」:欢迎页 displayAgent 取 selectedAgentId||currentAgentId,建会话体 buildPendingSessionCreateBody 仅在 selectedAgentId≠currentAgentId 时显式带 agentId,与 handleSelectHistory 的 null 约定一致);仅无当前助手时才显式落 Primary 兜底。
+  - setState 注释同步(「全局新建仍回到 Primary Agent」→「助手与工作台都不重置回 Primary」)。
+  - 服务端语义核实:new-detached 省略 agentId 时 coordinator createSession 回落 `this._d.getAgent()`(当前活跃助手)——省略即跟随当前,桌面主线路径(单助手=current=Primary)本就走 null 形态,本次只是把多助手场景并入同一形态。
+- 测试(4 处翻转,红→绿完整对证):
+  - session-actions.test.ts ×3:两条 `selectedAgentId==='hana'` 断言翻 toBeNull(其一用例名从「resets the agent to primary」改为「follows the current agent」);「carries an explicit project id」用例请求体期望删去 `agentId:'hana'`(wire 形态锁定:省略=跟随当前,响应 echo 同步 'mio')。
+  - MobileApp.test.tsx ×1:01cdd80b 翻过的用例再翻助手半边(toBeNull),用例名改「…and current agent」。
+  - 红:还原实现后 4 failed(3× `expected 'hana' to be null` + 1× 请求体不匹配);恢复后绿。
+- 验证:stores 全目录+mobile+WelcomeScreen+session-sections+app-init **37 文件 510 用例全绿**。
+- **未提交**:工作树同期有并行会话在途改动(disposal 工作流:session-coordinator/sessions 路由/ArchivedSessionsModal/ChatSidebar 等,session-actions.ts 亦被其改过但区域不冲突),本轮改动与之共存待统一提交;用户本轮未下达提交指令。
+
 ## 2026-09-05 修复轮五:Windows 初始对话界面工作台显示双缺陷(用户 bug 报告 2026-09-04)
 
 - 报告两症状+一次生机制,定位全部核实后修复(纯显示层+服务端创建护栏,不动工作台切换/文件功能):
@@ -1044,6 +1058,38 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
   - studio-workspaces-route +2:win32 桩下大小写变体复用既有挂载(红证:`expected 'local_fs_be8c76a96653d5e1' to be 'mount_case'`,registry 仅 1 条 local_fs)/ 精确重加仍走 upsert 更新 label(锁定护栏不破既有语义)。
 - 验证(2026-09-05 本工作树):定向 3 文件 29 用例绿;桌面 stores+WelcomeScreen+session-sections+app-init 475 用例绿;服务端 tripwire+workspace 相关 6 文件 146 用例绿;http-route-security 27 绿;`npm run typecheck` exit 0;eslint 改动文件 0 error(12 warning 全为既有 no-explicit-any,行号平移)。desktop 全量 `__tests__/`:2461 过/1 败(败者=既有 DeskSection Jian drawer 用例)+31 文件级环境性失败(workspace 包 @lingxi/plugin-protocol 未构建,均前轮 stash 对照证实的先在项),与基线一致零新增。
 - 本轮触碰文件均不在 163 个持久化受护源内;check 脚本对 engine.ts 的未重钉报错为修复轮二遗留状态(tripwire 15/15 仍绿),本轮未新增受护源改动。
+
+## 2026-09-05 修复轮七:归档分组支持折叠(用户反馈:分组下记录要能整组收起)
+
+- ArchivedSessionsModal.tsx:分组头改为可点击折叠/展开——`collapsedGroups: Set<key>` 状态(key=mount:/path:/ungrouped,列表刷新后保留);组头 role=button+aria-expanded+Enter/Space 键盘切换;行内勾选与删除整组按钮 stopPropagation 不误触折叠;折叠时组头(含勾选/删除/徽标/统计)保留、仅收起记录行。CSS:组头手型光标+chevron 箭头 90° 旋转动画(token 风格)。
+- 测试:+2 用例(点击组头整组收起/再展开+aria-expanded 翻转;删除按钮不触发折叠)。红→绿:stash 组件后折叠用例红(`expected null to be truthy`),恢复绿;全套 18/18,邻接套件 461 绿,typecheck 0,eslint 0 error。
+
+## 2026-09-05 修复轮六:移除工作台简化为直接归档(用户裁决撤销二选一)
+
+- 用户追加裁决:移除工作台**不再弹二选一,直接归档**。改动:
+  - `WelcomeScreen.tsx`:删除 WorkspaceDisposalDialog 挂载/处置状态/handler;handleRemoveWorkspace 简化为——0 条直接移除;>0 先静默调 disposeWorkspaceSessions('archive'),成功后 removeStudioWorkspace + 成功 toast(「工作台已移除,N 条对话已归档」),失败则 error toast 且不移除;removingMountRef 防重入。
+  - 删除组件文件 WorkspaceDisposalDialog.tsx/.module.css。
+  - 5 语言清理 workspace.disposal 下无用键(title/count/hint/archive/archiveDesc/delete/deleteDesc/deletedToast),保留 archivedToast/failed;服务端 disposal 路由的 delete 档保留为 API 能力(归档界面的整组永久删除仍走既有 archived/delete 路由,不受影响)。
+  - 测试:WelcomeScreen 二选一用例改写为「直接归档、无对话框」(断言 disposal 立即以 action:archive 调用+DELETE 顺序+无对话框文本);零会话用例改名。旧对话框行为下 disposal 不会先于选择被调用,该断言天然构成回归锁。
+- 验证:WelcomeScreen 17/17;stores+归档界面+app-init+SecurityTab+服务端 disposal/sweep+i18n 共 475 用例绿;typecheck exit 0;eslint 0 error 0 warning;无悬挂引用(WorkspaceDisposalDialog/disposed keys 全仓无残留)。
+
+## 2026-09-05 修复轮五:移除工作台的对话处置 + 归档界面工作台分组 + 入口迁移(用户四点裁决全落地)
+
+- 用户裁决:移除工作台时对话二选一(归档/永久删除),无保留档、无孤儿桶;绕过移除的孤儿(目录被直接删/mount 失效)静默自动归档不弹框;归档界面按工作台分组+已移除徽标+整组删除;入口迁到侧栏功能行垃圾桶按钮,设置安全页旧入口移除;重新添加同路径工作台时提示可恢复的归档数。
+- 服务端(server/routes/sessions.ts):
+  - 抽取 `archiveActiveSessionCore`(单条归档路由的锁内序列,单条路由改走它,32 用例无回归);
+  - 新路由 `POST /api/sessions/workspace-disposal`:{workspaceMountId|cwd, action:archive|delete};身份口径与左栏一致(mount 严格+native 根路径 cwd 双形态);delete=归档后复用永久删除内部序列;流式会话跳过计数返回;
+  - 新路由 `POST /api/sessions/sweep-orphaned-workspaces`:mount 失效或 cwd 目录已从磁盘删除的会话静默自动归档(目录仍在但未引用的不清——换配置目录的残留可经重新打开找回,不算暗数据);
+  - `core/session-coordinator.ts` listArchivedSessions 行投影补 cwd/workspaceMountId/workspaceLabel(从 manifest workspaceScope/meta/列表投影缓存,存量归档可正确分组)。
+- 客户端:
+  - `session-actions.ts`:+disposeWorkspaceSessions/sweepOrphanedWorkspaceSessions/countArchivedSessionsForWorkspace;ArchivedSession 类型补三字段;
+  - `WelcomeScreen.tsx`:移除前双形态计数,0 条直接移除,>0 弹 `WorkspaceDisposalDialog`(新组件+CSS,二选一);处置成功后才 removeStudioWorkspace;handleBrowse 重新添加后查归档数给提示;
+  - `ArchivedSessionsModal.tsx` 重写:按 mount/cwd/未归属三型分组;default 组显示名=配置目录名(与主界面同规则);身份解析不到现存工作台 → 「该工作目录已移除」徽标(无身份组不标);组级勾选+删除整组;组内保持时间排序与单条操作;
+  - `app/ChatSidebar.tsx`:功能行新增垃圾桶按钮(设置按钮旁)打开归档界面;`SecurityTab.tsx` 移除归档区块/挂载/state;`app-init.ts` 工作台列表加载后接清扫(归档了东西发非阻塞 info toast);
+  - 5 语言:删 settings.security.archivedChats* 三键,新增 sidebar.archivedChats、session.archived.group.*/deleteGroup*、workspace.disposal.*、workspace.sweep.archivedToast、workspace.archivedHint。
+- 测试:新 tests/workspace-disposal-route.test.ts 7 用例(身份拒绝/双形态归档/删除/流式跳过/default mount 解析/清扫两态);WelcomeScreen +2(二选一对话框全链路/零会话直接移除);ArchivedSessionsModal +3(分组+徽标+default 显示名/整组删除/组级勾选)+1 条既有用例更新(checkbox 顺序因组级勾选变化);SecurityTab 1 条改为锁定入口移除;app-init 断言清扫调用。
+- 红→绿:stash 全部实现后 13+ 用例红,恢复后 56/56 绿。
+- 验证:服务端+路由+i18n 152 用例绿;客户端相关套件 496 用例绿;typecheck exit 0;eslint 改动文件 0 error(sessions.ts +1 条与既有 6 条同款的防御性空 catch warning)。
 
 ## 2026-09-05 修复轮四:默认工作台显示名规则 + 启动合流键可靠性(用户拍板:始终显示配置目录名,未配置才显示 Default)
 

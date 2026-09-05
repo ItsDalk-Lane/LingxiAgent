@@ -281,7 +281,8 @@
       "showMore": "展開顯示",
       "loading": "正在載入項目…",
       "empty": "還沒有項目"
-    }
+    },
+    "archivedChats": "歸檔記錄"
   },
   "titlebar": {
     "currentChatTitle": "目前對話標題",
@@ -342,7 +343,15 @@
       "deleteSelectedConfirm": "將永久刪除選中的 {count} 條封存（共 {size}），無法復原。繼續？",
       "deleteSelectedDone": "已刪除 {count} 條封存",
       "deleteSelectedPartial": "部分刪除成功：{deleted}/{total}",
-      "daysAgo": "封存於 {days} 天前"
+      "daysAgo": "封存於 {days} 天前",
+      "deleteGroup": "刪除整組",
+      "deleteGroupConfirm": "確定永久刪除「{name}」分組的全部 {count} 條歸檔記錄（{size}）？此操作不可復原。",
+      "deleteGroupDone": "已永久刪除 {count} 條歸檔記錄",
+      "group": {
+        "ungrouped": "未歸屬",
+        "workspaceRemoved": "該工作目錄已移除",
+        "meta": "{count} 條 · {size}"
+      }
     },
     "rcTakingOver": "{platform} 接管中",
     "subagentRunStateUnrecoverable": "歷史 subagent 執行狀態不可恢復",
@@ -1763,9 +1772,6 @@
       "networkProxyWss": "WSS proxy，可留空",
       "networkProxyNoProxy": "不走代理，例如 localhost, 127.0.0.1, ::1",
       "networkProxySave": "儲存代理設定",
-      "archivedChats": "歸檔對話",
-      "archivedChatsDesc": "查看已歸檔的聊天，還原需要繼續的對話，或永久刪除不再需要的紀錄",
-      "viewArchivedChats": "查看歸檔對話",
       "fileBackup": "檔案備份",
       "fileBackupDesc": "AI 修改或刪除檔案前自動儲存原始內容",
       "retention": "保留時間",
@@ -4868,5 +4874,15 @@
     "sendFailed": "傳送失敗：{error}",
     "rejectFailed": "忽略失敗：{error}",
     "messageField": "訊息內容"
+  },
+  "workspace": {
+    "disposal": {
+      "failed": "記錄處理失敗，工作台未移除",
+      "archivedToast": "工作台已移除，{count} 條對話已歸檔"
+    },
+    "sweep": {
+      "archivedToast": "已自動歸檔 {count} 條失效工作台的對話記錄，可在歸檔記錄中查看"
+    },
+    "archivedHint": "該工作台有 {count} 條已歸檔記錄，可在左上角歸檔記錄中恢復"
   }
 }

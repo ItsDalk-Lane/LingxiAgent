@@ -21,6 +21,10 @@ import {
   removeStudioWorkspace,
   removeWorkspaceFolder,
 } from '../stores/desk-actions';
+import {
+  countArchivedSessionsForWorkspace,
+  disposeWorkspaceSessions,
+} from '../stores/session-actions';
 import { openSettingsModal } from '../stores/settings-modal-actions';
 import type { Agent, StudioWorkspace } from '../types';
 import { AgentAvatar, refreshAgentAvatarVersion, resolveAgentDisplayInfo, type AgentDisplayInfo } from '../utils/agent-display';
@@ -291,8 +295,17 @@ function FolderPicker({
     const workspace = await createLocalStudioWorkspaceFromFolder(folder);
     if (workspace) {
       await applyStudioWorkspace(workspace);
+      // 重新添加同路径工作台：提示名下可恢复的归档记录（移除工作台即归档的恢复闭环）。
+      void countArchivedSessionsForWorkspace({
+        workspaceMountId: workspace.mountId,
+        cwd: workspace.nativeRootPath ?? undefined,
+      }).then((count) => {
+        if (count > 0) {
+          useStore.getState().addToast(t('workspace.archivedHint', { count }), 'info', 6000);
+        }
+      });
     }
-  }, []);
+  }, [t]);
 
   const handleAddWorkspaceFolder = useCallback(async () => {
     const folder = await window.platform?.selectFolder?.();
@@ -313,9 +326,41 @@ function FolderPicker({
     void applyStudioWorkspace(workspace);
   }, []);
 
+  // ── 移除工作台（用户裁决：名下对话直接归档，不弹二选一）──
+  const removingMountRef = useRef<string | null>(null);
+
   const handleRemoveWorkspace = useCallback((mountId: string) => {
-    void removeStudioWorkspace(mountId);
-  }, []);
+    setShowHistory(false);
+    if (removingMountRef.current === mountId) return;
+    const state = useStore.getState();
+    const workspace = (state.studioWorkspaces || []).find((item) => item.mountId === mountId) || null;
+    const root = workspace?.nativeRootPath || null;
+    // 身份口径与服务端 workspace-disposal 一致：mount 形态 + 同目录的 cwd 形态老会话。
+    const count = (state.sessions || []).filter((session: { workspaceMountId?: string | null; cwd?: string | null }) => (
+      (session.workspaceMountId && session.workspaceMountId === mountId)
+      || (!session.workspaceMountId && !!root && !!session.cwd
+        && isSameWorkspacePath(session.cwd, root))
+    )).length;
+    if (count === 0) {
+      void removeStudioWorkspace(mountId);
+      return;
+    }
+    // 有对话：先静默归档（可在归档记录中按工作台分组找回），成功后才移除工作台。
+    removingMountRef.current = mountId;
+    void (async () => {
+      try {
+        const result = await disposeWorkspaceSessions({ workspaceMountId: mountId, cwd: root ?? undefined }, 'archive');
+        if (!result) {
+          useStore.getState().addToast(t('workspace.disposal.failed'), 'error', 6000);
+          return;
+        }
+        await removeStudioWorkspace(mountId);
+        useStore.getState().addToast(t('workspace.disposal.archivedToast', { count: result.disposed }), 'success', 6000);
+      } finally {
+        removingMountRef.current = null;
+      }
+    })();
+  }, [t]);
 
   const handleSelectHistory = useCallback((folder: string) => {
     setShowHistory(false);

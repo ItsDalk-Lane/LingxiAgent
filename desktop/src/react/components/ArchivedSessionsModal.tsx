@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useI18n } from '../hooks/use-i18n';
+import { useStore } from '../stores';
 import { Overlay } from '../ui';
 import {
   listArchivedSessions,
@@ -9,6 +10,7 @@ import {
   showSidebarToast,
   type ArchivedSession,
 } from '../stores/session-actions';
+import { isSameWorkspacePath } from '../utils/agent-workspace';
 import styles from './ArchivedSessionsModal.module.css';
 
 function formatBytes(n: number): string {
@@ -25,6 +27,22 @@ function formatAgo(iso: string, t: (k: string, v?: Record<string, string | numbe
   return t('session.archived.daysAgo', { days });
 }
 
+function pathBasename(p: string): string {
+  const trimmed = p.replace(/[\\/]+$/, '');
+  const idx = Math.max(trimmed.lastIndexOf('/'), trimmed.lastIndexOf('\\'));
+  return trimmed.slice(idx + 1) || trimmed;
+}
+
+interface ArchiveGroup {
+  key: string;
+  mountId: string | null;
+  cwd: string | null;
+  /** 工作台是否仍存在（不存在 → 「该工作目录已移除」徽标） */
+  workspaceExists: boolean;
+  title: string;
+  items: ArchivedSession[];
+}
+
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -36,6 +54,19 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
   const [list, setList] = useState<ArchivedSession[]>([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  // 分组折叠态（key 稳定：mount:/path:/ungrouped），刷新列表后保留
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  const studioWorkspaces = useStore(s => s.studioWorkspaces);
+  const defaultWorkspaceRootPath = useStore(s => s.defaultWorkspaceRootPath);
+
+  const toggleGroupCollapse = useCallback((key: string) => {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }, []);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -51,6 +82,48 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
   const totalSize = list.reduce((s, x) => s + x.sizeBytes, 0);
   const allSelected = list.length > 0 && selected.size === list.length;
 
+  // ── 按工作台分组（用户需求：知道哪些归档属于哪个工作目录）──
+  // mount 形态按 mountId 分组；无 mount 的老会话按 cwd 目录分组；两者皆无 → 未归属。
+  const groups = useMemo<ArchiveGroup[]>(() => {
+    const knownMountRoots = studioWorkspaces
+      .map(workspace => workspace.nativeRootPath || null)
+      .filter((p): p is string => !!p);
+    const mountExists = (mountId: string) => mountId === 'default'
+      || studioWorkspaces.some(workspace => workspace.mountId === mountId);
+    const pathExists = (cwd: string) => (
+      (defaultWorkspaceRootPath && isSameWorkspacePath(cwd, defaultWorkspaceRootPath))
+      || knownMountRoots.some(root => isSameWorkspacePath(cwd, root))
+    );
+
+    const byKey = new Map<string, ArchiveGroup>();
+    for (const item of list) {
+      const mountId = item.workspaceMountId?.trim() || null;
+      const cwd = item.cwd?.trim() || null;
+      const key = mountId ? `mount:${mountId}` : (cwd ? `path:${cwd}` : 'ungrouped');
+      let group = byKey.get(key);
+      if (!group) {
+        const workspaceExists = mountId
+          ? mountExists(mountId)
+          : (cwd ? pathExists(cwd) : false);
+        let title: string;
+        if (mountId === 'default') {
+          // 与主界面同规则：配置目录名，未配置才 Default（cwd 是该 mount 的解析根）。
+          title = (cwd && pathBasename(cwd)) || 'Default';
+        } else if (mountId) {
+          title = item.workspaceLabel?.trim() || mountId;
+        } else if (cwd) {
+          title = pathBasename(cwd);
+        } else {
+          title = t('session.archived.group.ungrouped');
+        }
+        group = { key, mountId, cwd, workspaceExists, title, items: [] };
+        byKey.set(key, group);
+      }
+      group.items.push(item);
+    }
+    return [...byKey.values()];
+  }, [list, studioWorkspaces, defaultWorkspaceRootPath, t]);
+
   const toggleSelected = (item: ArchivedSession) => {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -62,6 +135,18 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
 
   const toggleAll = () => {
     setSelected(allSelected ? new Set() : new Set(list.map((x) => x.path)));
+  };
+
+  const toggleGroup = (group: ArchiveGroup) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      const allIn = group.items.every(item => next.has(item.path));
+      for (const item of group.items) {
+        if (allIn) next.delete(item.path);
+        else next.add(item.path);
+      }
+      return next;
+    });
   };
 
   const handleRestore = async (item: ArchivedSession) => {
@@ -102,6 +187,27 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
       showSidebarToast(t('session.archived.deleteSelectedPartial', { deleted, total: targets.length }));
     } else {
       showSidebarToast(t('session.archived.deleteSelectedDone', { count: deleted }));
+    }
+    await refresh();
+  };
+
+  // 整组删除：按工作台分组直接永久删除该组全部归档记录
+  const handleDeleteGroup = async (group: ArchiveGroup) => {
+    const size = group.items.reduce((s, x) => s + x.sizeBytes, 0);
+    const msg = t('session.archived.deleteGroupConfirm', {
+      name: group.title,
+      count: group.items.length,
+      size: formatBytes(size),
+    });
+    if (!window.confirm(msg)) return;
+    let deleted = 0;
+    for (const item of group.items) {
+      if (await deleteArchivedSession(item)) deleted += 1;
+    }
+    if (deleted < group.items.length) {
+      showSidebarToast(t('session.archived.deleteSelectedPartial', { deleted, total: group.items.length }));
+    } else {
+      showSidebarToast(t('session.archived.deleteGroupDone', { count: deleted }));
     }
     await refresh();
   };
@@ -185,40 +291,104 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
               ) : list.length === 0 ? (
                 <div className={styles.empty}>{t('session.archived.empty')}</div>
               ) : (
-                list.map((item) => (
-                  <div key={item.path} className={styles.row}>
-                    <input
-                      type="checkbox"
-                      className={styles.rowCheck}
-                      checked={selected.has(item.path)}
-                      onChange={() => toggleSelected(item)}
-                      aria-label={item.title || item.firstMessage || t('session.untitled')}
-                    />
-                    <div className={styles.rowMain}>
-                      <div className={styles.rowTitle}>
-                        {item.title || item.firstMessage || t('session.untitled')}
-                      </div>
-                      <div className={styles.rowMeta}>
-                        {item.agentName} · {formatAgo(item.archivedAt, t)} ·{' '}
-                        {formatBytes(item.sizeBytes)}
-                      </div>
-                    </div>
-                    <div className={styles.rowActions}>
-                      <button
-                        title={t('session.archived.restore')}
-                        onClick={() => handleRestore(item)}
+                groups.map((group) => {
+                  const groupSize = group.items.reduce((s, x) => s + x.sizeBytes, 0);
+                  const allInGroup = group.items.length > 0
+                    && group.items.every(item => selected.has(item.path));
+                  const collapsed = collapsedGroups.has(group.key);
+                  return (
+                    <div key={group.key} className={styles.group} data-archive-group={group.key}>
+                      {/* 分组头可折叠整组：点击头部切换，行内勾选/删除按钮各自 stopPropagation */}
+                      <div
+                        className={styles.groupHeader}
+                        data-group-header={group.key}
+                        data-collapsed={collapsed ? 'true' : 'false'}
+                        role="button"
+                        tabIndex={0}
+                        aria-expanded={!collapsed}
+                        onClick={() => toggleGroupCollapse(group.key)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            toggleGroupCollapse(group.key);
+                          }
+                        }}
                       >
-                        {t('session.archived.restore')}
-                      </button>
-                      <button
-                        title={t('session.archived.deleteForever')}
-                        onClick={() => handleDelete(item)}
-                      >
-                        {t('session.archived.deleteForever')}
-                      </button>
+                        <span className={`${styles.chevron}${collapsed ? '' : ` ${styles.chevronOpen}`}`} aria-hidden="true">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                          </svg>
+                        </span>
+                        <input
+                          type="checkbox"
+                          className={styles.groupCheck}
+                          checked={allInGroup}
+                          onChange={() => toggleGroup(group)}
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label={group.title}
+                        />
+                        <span className={styles.groupName} title={group.cwd || group.mountId || undefined}>
+                          {group.title}
+                        </span>
+                        {/* 徽标只给「有工作台身份但已解析不到」的分组；未归属组从未有过工作台，不标 */}
+                        {(group.mountId || group.cwd) && !group.workspaceExists && (
+                          <span className={styles.removedBadge}>
+                            {t('session.archived.group.workspaceRemoved')}
+                          </span>
+                        )}
+                        {group.cwd && (
+                          <span className={styles.groupPath} title={group.cwd}>{group.cwd}</span>
+                        )}
+                        <span className={styles.groupMeta}>
+                          {t('session.archived.group.meta', { count: group.items.length, size: formatBytes(groupSize) })}
+                        </span>
+                        <button
+                          className={styles.groupDeleteBtn}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            void handleDeleteGroup(group);
+                          }}
+                        >
+                          {t('session.archived.deleteGroup')}
+                        </button>
+                      </div>
+                      {!collapsed && group.items.map((item) => (
+                        <div key={item.path} className={styles.row}>
+                          <input
+                            type="checkbox"
+                            className={styles.rowCheck}
+                            checked={selected.has(item.path)}
+                            onChange={() => toggleSelected(item)}
+                            aria-label={item.title || item.firstMessage || t('session.untitled')}
+                          />
+                          <div className={styles.rowMain}>
+                            <div className={styles.rowTitle}>
+                              {item.title || item.firstMessage || t('session.untitled')}
+                            </div>
+                            <div className={styles.rowMeta}>
+                              {item.agentName} · {formatAgo(item.archivedAt, t)} ·{' '}
+                              {formatBytes(item.sizeBytes)}
+                            </div>
+                          </div>
+                          <div className={styles.rowActions}>
+                            <button
+                              title={t('session.archived.restore')}
+                              onClick={() => handleRestore(item)}
+                            >
+                              {t('session.archived.restore')}
+                            </button>
+                            <button
+                              title={t('session.archived.deleteForever')}
+                              onClick={() => handleDelete(item)}
+                            >
+                              {t('session.archived.deleteForever')}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>

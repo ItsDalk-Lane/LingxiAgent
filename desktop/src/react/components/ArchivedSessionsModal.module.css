@@ -280,3 +280,93 @@
     margin-left: 0;
   }
 }
+
+/* ── 工作台分组 ── */
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 4px);
+  margin-bottom: var(--space-3, 12px);
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  padding: var(--space-2, 8px) var(--space-2, 8px);
+  background: var(--bg-surface, rgba(128, 128, 128, 0.08));
+  border-radius: var(--radius-sm, 6px);
+}
+
+.groupCheck {
+  margin: 0;
+}
+
+.groupName {
+  font-size: var(--text-sm, 13px);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 40%;
+}
+
+.groupPath {
+  font-size: var(--text-xs, 11px);
+  color: var(--text-secondary, #888);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.removedBadge {
+  flex-shrink: 0;
+  font-size: var(--text-xs, 11px);
+  color: var(--warning, #c29a3b);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-sm, 4px);
+  padding: 0 var(--space-1, 4px);
+}
+
+.groupMeta {
+  flex-shrink: 0;
+  font-size: var(--text-xs, 11px);
+  color: var(--text-secondary, #888);
+}
+
+.groupDeleteBtn {
+  flex-shrink: 0;
+  font-size: var(--text-xs, 11px);
+  color: var(--danger, #d9534f);
+  background: none;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-sm, 4px);
+  padding: var(--space-1, 4px) var(--space-2, 8px);
+  cursor: pointer;
+}
+
+.groupDeleteBtn:hover {
+  opacity: 0.85;
+}
+
+/* 分组折叠 */
+
+.groupHeader {
+  cursor: pointer;
+  user-select: none;
+}
+
+.chevron {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  color: var(--text-secondary, #888);
+  transition: transform 0.15s ease;
+}
+
+.chevronOpen {
+  transform: rotate(90deg);
+}

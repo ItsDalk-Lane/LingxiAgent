@@ -27,6 +27,7 @@ vi.mock('../../hooks/use-i18n', () => ({
 }));
 
 import { ArchivedSessionsModal } from '../../components/ArchivedSessionsModal';
+import { useStore } from '../../stores';
 
 beforeEach(() => {
   listMock.mockReset();
@@ -132,8 +133,9 @@ describe('ArchivedSessionsModal', () => {
     await waitFor(() => screen.getByText('Alpha'));
 
     const checkboxes = screen.getAllByRole('checkbox');
-    // 第 0 个是「全选」，第 1、2 个是行勾选框
-    fireEvent.click(checkboxes[1]);
+    // 第 0 个是「全选」，第 1 个是未归属分组的组级勾选（两条无身份记录同组），
+    // 第 2、3 个是行勾选框
+    fireEvent.click(checkboxes[2]);
     const deleteSelected = screen.getByRole('button', { name: /session\.archived\.deleteSelected/ });
     fireEvent.click(deleteSelected);
 
@@ -324,5 +326,187 @@ describe('ArchivedSessionsModal', () => {
       path: '/x/a.jsonl',
       sessionId: 'sess_archived_delete',
     })));
+  });
+});
+
+describe('ArchivedSessionsModal workspace grouping', () => {
+  beforeEach(() => {
+    useStore.setState({
+      studioWorkspaces: [
+        { mountId: 'default', label: 'Default', isDefault: true, nativeRootPath: '/Users/test/Desktop/OH-WorkSpace' },
+        { mountId: 'local_fs_b', label: '工作台B', nativeRootPath: '/Users/test/Desktop/B' },
+      ],
+      defaultWorkspaceRootPath: '/Users/test/Desktop/OH-WorkSpace',
+    } as never);
+  });
+
+  function groupedItems() {
+    return [
+      {
+        path: '/arch/mount-b.jsonl',
+        sessionId: 's1',
+        title: 'B-1',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 10,
+        agentId: 'a',
+        agentName: 'Hana',
+        workspaceMountId: 'local_fs_b',
+        workspaceLabel: '工作台B',
+        cwd: '/Users/test/Desktop/B',
+      },
+      {
+        path: '/arch/mount-gone.jsonl',
+        sessionId: 's2',
+        title: 'Gone-1',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 10,
+        agentId: 'a',
+        agentName: 'Hana',
+        workspaceMountId: 'local_fs_gone',
+        workspaceLabel: '旧工作台',
+        cwd: '/Users/test/Desktop/Gone',
+      },
+      {
+        path: '/arch/default.jsonl',
+        sessionId: 's3',
+        title: 'D-1',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 10,
+        agentId: 'a',
+        agentName: 'Hana',
+        workspaceMountId: 'default',
+        workspaceLabel: 'Default',
+        cwd: '/Users/test/Desktop/OH-WorkSpace',
+      },
+      {
+        path: '/arch/noidentity.jsonl',
+        sessionId: 's4',
+        title: 'N-1',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 10,
+        agentId: 'a',
+        agentName: 'Hana',
+        workspaceMountId: null,
+        cwd: null,
+      },
+    ];
+  }
+
+  it('groups by workspace identity, derives the default display name, and marks removed workspaces', async () => {
+    listMock.mockResolvedValue(groupedItems());
+    render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
+
+    await waitFor(() => expect(screen.getByText('B-1')).toBeInTheDocument());
+
+    // mount 分组标题取 label；default 分组显示名=配置目录名（与主界面规则一致）；
+    // 已移除 mount 的分组带「该工作目录已移除」徽标；无身份 → 未归属
+    expect(screen.getByText('工作台B')).toBeInTheDocument();
+    expect(screen.getByText('OH-WorkSpace')).toBeInTheDocument();
+    expect(screen.getByText('旧工作台')).toBeInTheDocument();
+    expect(screen.getAllByText('session.archived.group.workspaceRemoved')).toHaveLength(1);
+    expect(screen.getByText('session.archived.group.ungrouped')).toBeInTheDocument();
+  });
+
+  it('deletes an entire group through the group-level button', async () => {
+    listMock.mockResolvedValue(groupedItems());
+    deleteMock.mockResolvedValue(true);
+    window.confirm = vi.fn(() => true);
+    render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
+    await waitFor(() => expect(screen.getByText('B-1')).toBeInTheDocument());
+
+    fireEvent.click(screen.getAllByText('session.archived.deleteGroup')[0]);
+
+    await waitFor(() => expect(deleteMock).toHaveBeenCalledTimes(1));
+    expect(deleteMock).toHaveBeenCalledWith(expect.objectContaining({ path: '/arch/mount-b.jsonl' }));
+    expect(toastMock).toHaveBeenCalledWith('session.archived.deleteGroupDone[{"count":1}]');
+  });
+
+  it('toggles a whole group via the group checkbox', async () => {
+    listMock.mockResolvedValue(groupedItems());
+    render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
+    await waitFor(() => expect(screen.getByText('B-1')).toBeInTheDocument());
+
+    // 未归属组只有一条（N-1）：组级勾选应选中它
+    const groupBlocks = screen.getAllByRole('checkbox');
+    // [全选, 组:工作台B, 组:旧工作台, 组:OH-WorkSpace, 组:未归属, 行B-1, 行Gone-1, 行D-1, 行N-1]
+    fireEvent.click(groupBlocks[4]);
+    const deleteSelected = screen.getByRole('button', { name: /session\.archived\.deleteSelected/ });
+    expect(deleteSelected.textContent).toContain('1');
+  });
+});
+
+describe('ArchivedSessionsModal group collapse', () => {
+  beforeEach(() => {
+    useStore.setState({
+      studioWorkspaces: [
+        { mountId: 'default', label: 'Default', isDefault: true, nativeRootPath: '/Users/test/Desktop/OH-WorkSpace' },
+        { mountId: 'local_fs_b', label: '工作台B', nativeRootPath: '/Users/test/Desktop/B' },
+      ],
+      defaultWorkspaceRootPath: '/Users/test/Desktop/OH-WorkSpace',
+    } as never);
+  });
+
+  it('collapses and expands a whole group via the group header click', async () => {
+    listMock.mockResolvedValue([
+      {
+        path: '/arch/b1.jsonl',
+        sessionId: 's1',
+        title: 'B-Row',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 10,
+        agentId: 'a',
+        agentName: 'Hana',
+        workspaceMountId: 'local_fs_b',
+        workspaceLabel: '工作台B',
+        cwd: '/Users/test/Desktop/B',
+      },
+    ]);
+    const { ArchivedSessionsModal } = await import('../../components/ArchivedSessionsModal');
+    const { container } = render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
+    await waitFor(() => expect(screen.getByText('B-Row')).toBeInTheDocument());
+
+    const header = container.querySelector('[data-group-header="mount:local_fs_b"]') as HTMLElement;
+    expect(header).toBeTruthy();
+    expect(header.getAttribute('aria-expanded')).toBe('true');
+
+    // 折叠：组内记录整组收起，组头仍在
+    fireEvent.click(header);
+    expect(screen.queryByText('B-Row')).toBeNull();
+    expect(screen.getByText('工作台B')).toBeInTheDocument();
+    expect(header.getAttribute('aria-expanded')).toBe('false');
+
+    // 展开：记录回来
+    fireEvent.click(header);
+    expect(await screen.findByText('B-Row')).toBeInTheDocument();
+    expect(header.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('keeps the group delete button working without toggling collapse', async () => {
+    listMock.mockResolvedValue([
+      {
+        path: '/arch/b1.jsonl',
+        sessionId: 's1',
+        title: 'B-Row',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 10,
+        agentId: 'a',
+        agentName: 'Hana',
+        workspaceMountId: 'local_fs_b',
+        workspaceLabel: '工作台B',
+        cwd: '/Users/test/Desktop/B',
+      },
+    ]);
+    deleteMock.mockResolvedValue(true);
+    window.confirm = vi.fn(() => true);
+    const { ArchivedSessionsModal } = await import('../../components/ArchivedSessionsModal');
+    const { container } = render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
+    await waitFor(() => expect(screen.getByText('B-Row')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('session.archived.deleteGroup'));
+
+    await waitFor(() => expect(deleteMock).toHaveBeenCalledTimes(1));
+    // 删除按钮不触发折叠
+    const header = container.querySelector('[data-group-header="mount:local_fs_b"]') as HTMLElement;
+    expect(header.getAttribute('aria-expanded')).toBe('true');
   });
 });

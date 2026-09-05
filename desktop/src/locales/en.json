@@ -281,7 +281,8 @@
       "showMore": "Show more",
       "loading": "Loading projects…",
       "empty": "No projects yet"
-    }
+    },
+    "archivedChats": "Archived chats"
   },
   "titlebar": {
     "currentChatTitle": "Current chat title",
@@ -342,7 +343,15 @@
       "deleteSelectedConfirm": "Permanently delete {count} selected archives ({size} total)? This cannot be undone.",
       "deleteSelectedDone": "Deleted {count} archives",
       "deleteSelectedPartial": "Partially deleted: {deleted}/{total}",
-      "daysAgo": "Archived {days} days ago"
+      "daysAgo": "Archived {days} days ago",
+      "deleteGroup": "Delete group",
+      "deleteGroupConfirm": "Permanently delete all {count} archived records ({size}) in the \"{name}\" group? This cannot be undone.",
+      "deleteGroupDone": "Permanently deleted {count} archived records",
+      "group": {
+        "ungrouped": "Unassigned",
+        "workspaceRemoved": "Workspace removed",
+        "meta": "{count} chats · {size}"
+      }
     },
     "rcTakingOver": "{platform} active",
     "subagentRunStateUnrecoverable": "Historical sub-session run state is unrecoverable",
@@ -1832,9 +1841,6 @@
       "networkProxyWss": "WSS proxy, optional",
       "networkProxyNoProxy": "Bypass proxy, for example localhost, 127.0.0.1, ::1",
       "networkProxySave": "Save Proxy Settings",
-      "archivedChats": "Archived Conversations",
-      "archivedChatsDesc": "Review archived chats, restore conversations you need again, or permanently delete records you no longer want",
-      "viewArchivedChats": "View Archived Conversations",
       "fileBackup": "File Backup",
       "fileBackupDesc": "Automatically save original file content before AI modifications or deletions",
       "retention": "Retention",
@@ -4872,5 +4878,15 @@
     "sendFailed": "Delivery failed: {error}",
     "rejectFailed": "Failed to ignore: {error}",
     "messageField": "Message"
+  },
+  "workspace": {
+    "disposal": {
+      "failed": "Failed to handle the records; workspace was not removed",
+      "archivedToast": "Workspace removed; {count} conversations archived"
+    },
+    "sweep": {
+      "archivedToast": "Auto-archived {count} conversations from removed workspaces; see archived chats"
+    },
+    "archivedHint": "This workspace has {count} archived records, restorable from archived chats"
   }
 }

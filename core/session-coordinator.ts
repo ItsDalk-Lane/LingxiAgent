@@ -7066,6 +7066,14 @@ export class SessionCoordinator {
               agentDeleted: agent.agentDeleted === true,
               readOnlyReason: agent.agentDeleted === true ? "agent_deleted" : null,
               deletedAt: agent.deletedAt || null,
+              // 工作台归属（归档界面按工作台分组的依据）：mount 身份走既有读取链
+              // （运行时 entry → manifest workspaceScope → session-meta），cwd 走列表
+              // 投影缓存 / manifest primaryCwd。归档是整生命周期搬移，这些信息仍在。
+              cwd: projectionByPath.get(full)?.cwd
+                ?? manifest?.workspaceScope?.primaryCwd
+                ?? null,
+              workspaceMountId: this.getSessionWorkspaceMount(full)?.mountId || null,
+              workspaceLabel: this.getSessionWorkspaceMount(full)?.label || null,
             };
           } catch {
             return null;

@@ -281,7 +281,8 @@
       "showMore": "더 보기",
       "loading": "프로젝트 불러오는 중…",
       "empty": "아직 프로젝트가 없습니다"
-    }
+    },
+    "archivedChats": "보관 대화"
   },
   "titlebar": {
     "currentChatTitle": "현재 대화 제목",
@@ -342,7 +343,15 @@
       "deleteSelectedConfirm": "선택한 {count}개의 보관 항목({size})을 영구 삭제합니다. 되돌릴 수 없습니다. 계속할까요?",
       "deleteSelectedDone": "{count}개를 삭제했습니다",
       "deleteSelectedPartial": "일부만 삭제됨: {deleted}/{total}",
-      "daysAgo": "{days}일 전 보관됨"
+      "daysAgo": "{days}일 전 보관됨",
+      "deleteGroup": "그룹 삭제",
+      "deleteGroupConfirm": "\"{name}\" 그룹의 보관 기록 {count}건({size})을 영구 삭제할까요? 되돌릴 수 없습니다.",
+      "deleteGroupDone": "보관 기록 {count}건을 영구 삭제했습니다",
+      "group": {
+        "ungrouped": "미분류",
+        "workspaceRemoved": "제거된 작업 공간",
+        "meta": "{count}건 · {size}"
+      }
     },
     "rcTakingOver": "{platform} 연결 중",
     "subagentRunStateUnrecoverable": "과거 하위 세션 실행 상태를 복구할 수 없어요",
@@ -1763,9 +1772,6 @@
       "networkProxyWss": "WSS proxy, 선택 사항",
       "networkProxyNoProxy": "프록시 제외 예: localhost, 127.0.0.1, ::1",
       "networkProxySave": "프록시 설정 저장",
-      "archivedChats": "보관된 대화",
-      "archivedChatsDesc": "보관된 채팅을 확인하고, 이어갈 대화를 복원하거나 더 이상 필요 없는 기록을 영구 삭제해요",
-      "viewArchivedChats": "보관된 대화 보기",
       "fileBackup": "파일 백업",
       "fileBackupDesc": "AI가 파일을 수정하거나 삭제하기 전에 원본 내용을 자동으로 저장합니다",
       "retention": "보존 기간",
@@ -4868,5 +4874,15 @@
     "sendFailed": "전송 실패: {error}",
     "rejectFailed": "무시 실패: {error}",
     "messageField": "메시지 내용"
+  },
+  "workspace": {
+    "disposal": {
+      "failed": "기록 처리에 실패해 작업 공간을 제거하지 않았습니다",
+      "archivedToast": "작업 공간을 제거했습니다. 대화 {count}건을 보관했습니다"
+    },
+    "sweep": {
+      "archivedToast": "사라진 작업 공간의 대화 {count}건을 자동 보관했습니다. 보관 대화에서 확인하세요"
+    },
+    "archivedHint": "이 작업 공간에는 보관 기록 {count}건이 있으며 보관 대화에서 복원할 수 있습니다"
   }
 }

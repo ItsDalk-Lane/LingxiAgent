@@ -648,7 +648,7 @@ function mockPermissionDefault(mode = 'ask') {
   });
 
   describe('createNewSession cwd draft', () => {
-    it('without a current session, resets the agent to primary but keeps the displayed desk workspace', async () => {
+    it('without a current session, keeps the displayed desk workspace and follows the current agent', async () => {
       (mockState as Record<string, unknown>).agents = [
         {
           id: 'hana',
@@ -677,7 +677,9 @@ function mockPermissionDefault(mode = 'ask') {
 
       await createNewSession();
 
-      expect(mockState.selectedAgentId).toBe('hana');
+      // 规则 B 补全：助手身份跟随当前助手（mio），不再重置回 Primary——
+      // selectedAgentId=null 即「跟随 currentAgentId」（显示与建会话体同语义）。
+      expect(mockState.selectedAgentId).toBeNull();
       expect(mockState.selectedFolder).toBe('/workspace/Desktop');
       expect(mockState.pendingNewSession).toBe(true);
       expect(mockState.deskBasePath).toBe('/workspace/Desktop');
@@ -722,7 +724,7 @@ function mockPermissionDefault(mode = 'ask') {
 
       await createNewSession();
 
-      expect(mockState.selectedAgentId).toBe('hana');
+      expect(mockState.selectedAgentId).toBeNull();
       expect(mockState.selectedFolder).toBe('/workspace/current-session');
       expect(mockState.deskBasePath).toBe('/workspace/current-session');
       expect(mockState.workspaceFolders).toEqual([]);
@@ -1211,7 +1213,7 @@ function mockPermissionDefault(mode = 'ask') {
         ok: true,
         path: '/session/new.jsonl',
         sessionId: 'sess_project',
-        agentId: 'hana',
+        agentId: 'mio',
         cwd: '/workspace/project-hana',
         projectId: 'project-hana',
         workspaceFolders: [],
@@ -1220,6 +1222,8 @@ function mockPermissionDefault(mode = 'ask') {
 
       await expect(ensureSession()).resolves.toMatchObject({ sessionId: 'sess_project' });
 
+      // 规则 B 补全：助手跟随当前（mio），请求体不再显式钉 Primary——服务端对省略
+      // agentId 的 new-detached 回落当前活跃助手（coordinator createSession）。
       expect(mockFetch).toHaveBeenCalledWith(
         '/api/sessions/new-detached',
         expect.objectContaining({
@@ -1229,7 +1233,6 @@ function mockPermissionDefault(mode = 'ask') {
             cwd: '/workspace/project-hana',
             projectId: 'project-hana',
             permissionMode: 'ask',
-            agentId: 'hana',
             currentSessionPath: null,
           }),
         }),

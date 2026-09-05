@@ -281,7 +281,8 @@
       "showMore": "さらに表示",
       "loading": "プロジェクトを読み込み中…",
       "empty": "プロジェクトはまだありません"
-    }
+    },
+    "archivedChats": "アーカイブ"
   },
   "titlebar": {
     "currentChatTitle": "現在のチャットタイトル",
@@ -342,7 +343,15 @@
       "deleteSelectedConfirm": "選択した {count} 件のアーカイブ（合計 {size}）を完全に削除します。取り消せません。続けますか？",
       "deleteSelectedDone": "{count} 件を削除しました",
       "deleteSelectedPartial": "一部のみ削除：{deleted}/{total}",
-      "daysAgo": "{days} 日前にアーカイブ"
+      "daysAgo": "{days} 日前にアーカイブ",
+      "deleteGroup": "グループを削除",
+      "deleteGroupConfirm": "「{name}」グループのアーカイブ {count} 件（{size}）を完全に削除しますか？この操作は元に戻せません。",
+      "deleteGroupDone": "アーカイブを {count} 件完全に削除しました",
+      "group": {
+        "ungrouped": "未分類",
+        "workspaceRemoved": "ワークスペースは削除済み",
+        "meta": "{count} 件 · {size}"
+      }
     },
     "rcTakingOver": "{platform} 接続中",
     "subagentRunStateUnrecoverable": "過去のサブセッションの実行状態は復元できません",
@@ -1763,9 +1772,6 @@
       "networkProxyWss": "WSS proxy、省略可",
       "networkProxyNoProxy": "プロキシ除外 例: localhost, 127.0.0.1, ::1",
       "networkProxySave": "プロキシ設定を保存",
-      "archivedChats": "アーカイブ済み会話",
-      "archivedChatsDesc": "アーカイブ済みのチャットを確認し、必要な会話を復元したり、不要な記録を完全に削除したりできます",
-      "viewArchivedChats": "アーカイブ済み会話を表示",
       "fileBackup": "ファイルバックアップ",
       "fileBackupDesc": "AIがファイルを変更・削除する前に元の内容を自動保存します",
       "retention": "保持期間",
@@ -4868,5 +4874,15 @@
     "sendFailed": "送信に失敗しました：{error}",
     "rejectFailed": "無視に失敗しました：{error}",
     "messageField": "メッセージ内容"
+  },
+  "workspace": {
+    "disposal": {
+      "failed": "会話の処理に失敗したため、ワークスペースは削除されませんでした",
+      "archivedToast": "ワークスペースを削除しました。{count} 件の会話をアーカイブしました"
+    },
+    "sweep": {
+      "archivedToast": "無効になったワークスペースの会話 {count} 件を自動アーカイブしました。アーカイブで確認できます"
+    },
+    "archivedHint": "このワークスペースには {count} 件のアーカイブがあります。アーカイブから復元できます"
   }
 }

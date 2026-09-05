@@ -11,6 +11,7 @@ const mockLoadAvatars = vi.fn();
 const mockLoadSessions = vi.fn(async () => {});
 const mockLoadPendingNewSessionPermissionDefault = vi.fn(async () => {});
 const mockSwitchSession = vi.fn(async () => {});
+const mockSweepOrphanedWorkspaceSessions = vi.fn(async () => 0);
 const mockPendingNewSessionIdentityPatch = vi.fn(() => ({
   pendingNewSession: true as const,
   pendingDraftId: 'test-pending-draft-id',
@@ -60,6 +61,7 @@ vi.mock('../stores/session-actions', () => ({
   loadPendingNewSessionPermissionDefault: mockLoadPendingNewSessionPermissionDefault,
   switchSession: mockSwitchSession,
   pendingNewSessionIdentityPatch: mockPendingNewSessionIdentityPatch,
+  sweepOrphanedWorkspaceSessions: mockSweepOrphanedWorkspaceSessions,
 }));
 
 vi.mock('../stores/session-project-actions', () => ({
@@ -476,6 +478,8 @@ describe('initApp bridge indicator', () => {
     // defaultWorkspaceRootPath（默认工作台双形态合流键）不能依赖 FolderPicker
     // 挂载时的一次性请求：启动首屏的左栏列表就需要它合并 mount/cwd 两形态会话。
     expect(mockLoadStudioWorkspaces).toHaveBeenCalled();
+    // 孤儿会话清扫（静默自动归档）跟在工作台列表加载之后
+    expect(mockSweepOrphanedWorkspaceSessions).toHaveBeenCalled();
   });
 
   it('hydrates the persisted permission default before showing the pending new-session draft', async () => {
