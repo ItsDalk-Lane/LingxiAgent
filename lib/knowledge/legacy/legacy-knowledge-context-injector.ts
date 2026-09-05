@@ -38,6 +38,8 @@ import type { NotebookRetrievalChunk, NotebookRetrievalSource, RetrieveForNotebo
 import { KNOWLEDGE_CANDIDATE_GENERATION_BUDGET, KNOWLEDGE_EVIDENCE_BUDGET, knowledgeSectionKeyOf } from "../knowledge-query-service.ts";
 import type { QuestionIntent, DecomposeSpecialistKind, DecomposeModel, QuestionComplexity, QuestionExpansion, QueryExpansionModel, QueryExpansionResult, QuestionDecomposition, DecomposeDegradeReason, DecomposeResult, KnowledgeInjectorDeps, KnowledgeEvidenceEntry, KnowledgeCoverageFootprint, BroadProbeOutcome, KnowledgeInjectionEvidence, KnowledgeExecutionStats } from "../knowledge-context-injector.ts";
 import { KNOWLEDGE_INJECTION_FALLBACK_BUDGET_TOKENS, mergeSources, resolveFusionPoolBudget, fuseQueryFamilies, groupFamiliesById, rrfFuseRankings, chunkHeader, quoteText, markScannedEvidence, renderKnowledgeContextBlock } from "../knowledge-context-injector.ts";
+import { KNOWLEDGE_FAST_RERANK_POLICY } from "../rerank-policy.ts";
+export { KNOWLEDGE_FAST_RERANK_DEADLINE_MS } from "../rerank-policy.ts";
 export type { QuestionIntent, DecomposeSpecialistKind, QuestionComplexity, QuestionDecomposition, DecomposeDegradeReason, DecomposeResult, DecomposeModel, QueryExpansionModel, QueryExpansionDegradeReason, QueryExpansionResult, KnowledgeInjectorDeps, KnowledgeEvidenceEntry, KnowledgeEvidenceIdentityEntry, KnowledgeInjectionEvidence, KnowledgeCoverageFootprint, KnowledgeExecutionStats } from "../knowledge-context-injector.ts";
 export { KNOWLEDGE_INJECTION_FALLBACK_BUDGET_TOKENS, KNOWLEDGE_FUSION_POOL_UTILIZATION, KNOWLEDGE_FUSION_POOL_MAX, resolveFusionPoolBudget, resolveKnowledgeInjectionBudgetTokens, fuseSubQueryResults, fuseQueryFamilies, groupFamiliesById, knowledgeModeGuidance, knowledgeRollupGuidance, renderKnowledgeContextBlock, assembleKnowledgeEvidenceManifestEntries, EvidencePacker } from "../knowledge-context-injector.ts";
 
@@ -76,7 +78,6 @@ export const KNOWLEDGE_FAST_RENDER_BUDGET_TOKENS = 8192;
  * 快速档 rerank 期限（默认 15s 的收紧版）：门控放行重排（结果模糊）时也
  * 最多等 5s——超时降级 RRF 名次（既有降级路径），快速档的等待有界。
  */
-export const KNOWLEDGE_FAST_RERANK_DEADLINE_MS = 5000;
 
 /** 伸缩后的证据锚点上限：确定性纯函数（同输入同输出，便于测试与留痕）。 */
 export function resolveEvidenceAnchorBudget(input: {
@@ -1097,7 +1098,7 @@ export async function buildKnowledgeContextInjection(input: {
   // 跳过 coverage planner 启动）；直检独走 + rerank 门控；锚点/渲染预算硬
   // 封顶；证据超封顶走截断留痕（绝不触发滚动消化——那是详细档的路径）。
   const isFast = input.mode === "fast";
-  const fastRerankPolicy = { marginGate: true, deadlineMs: KNOWLEDGE_FAST_RERANK_DEADLINE_MS };
+  const fastRerankPolicy = KNOWLEDGE_FAST_RERANK_POLICY;
   // 直检通道立即启动（async 包裹把 retrieve 的同步抛错也归一为 rejection）。
   const directPromise = (async () => input.deps.retrieve({
     query: questionTrimmed,

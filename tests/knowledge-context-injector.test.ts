@@ -2,12 +2,12 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { KNOWLEDGE_FAST_RERANK_POLICY } from "../lib/knowledge/rerank-policy.ts";
 
 import {
   buildKnowledgeContextInjection,
   KNOWLEDGE_FAST_MAX_EVIDENCE_ENTRIES,
   KNOWLEDGE_FAST_RENDER_BUDGET_TOKENS,
-  KNOWLEDGE_FAST_RERANK_DEADLINE_MS,
   KNOWLEDGE_INJECTION_FALLBACK_BUDGET_TOKENS,
   KNOWLEDGE_EVIDENCE_BUDGET_MAX,
   KNOWLEDGE_FUSION_POOL_MAX,
@@ -1473,10 +1473,7 @@ describe("快速档（fast mode）：零辅助 LLM + 证据封顶 + 禁滚动", 
     expect(decomposeModel).not.toHaveBeenCalled();
     // 直检只跑一次，且带快速档 rerank 策略（门控 + 5s 期限）。
     expect(retrieveCalls).toHaveLength(1);
-    expect(retrieveCalls[0].rerankPolicy).toEqual({
-      marginGate: true,
-      deadlineMs: KNOWLEDGE_FAST_RERANK_DEADLINE_MS,
-    });
+    expect(retrieveCalls[0].rerankPolicy).toEqual(KNOWLEDGE_FAST_RERANK_POLICY);
     // 块内显式声明快速档（禁静默），不再有拆解行。
     expect(block).toContain("[fast mode: direct retrieval of top evidence");
     expect(block).not.toContain("Question decomposition:");

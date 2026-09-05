@@ -4,6 +4,10 @@ import { createKnowledgeSearchTool } from "../lib/tools/knowledge-search-tool.ts
 import { classifySessionPermission } from "../core/session-permission-mode.ts";
 import { STANDARD_TOOL_NAMES } from "../shared/tool-categories.ts";
 import { searchToolFixture } from "./helpers/knowledge-search-tool-fixture.ts";
+import {
+  KNOWLEDGE_RERANK_DISABLED_POLICY,
+  KNOWLEDGE_RERANK_ENABLED_POLICY,
+} from "../lib/knowledge/rerank-policy.ts";
 
 it("默认 hybrid/12，复用统一服务，返回候选且明确禁止直接引用", async () => {
   const f = await searchToolFixture();
@@ -11,7 +15,12 @@ it("默认 hybrid/12，复用统一服务，返回候选且明确禁止直接引
     const search = vi.spyOn(f.manager.searchService, "search"), tool = f.makeTool();
     const result = await tool.execute("search", f.params);
     expect(result.isError).toBeUndefined(); const payload = JSON.parse(result.content[0].text);
-    expect(search.mock.calls[0][0]).toMatchObject({ channel: "hybrid", limit: 12, rerank: true, compiledScope: { studioId: f.studioId } });
+    expect(search.mock.calls[0][0]).toMatchObject({
+      channel: "hybrid",
+      limit: 12,
+      rerankPolicy: KNOWLEDGE_RERANK_ENABLED_POLICY,
+      compiledScope: { studioId: f.studioId },
+    });
     expect(payload).toMatchObject({ scopeId: f.scope.id, query: "needle", mode: "fts", vectorBackend: "none", degradedReasons: [] });
     expect(payload.hits[0]).toMatchObject({ sourceId: f.source.id, notebookIds: [f.notebook.id], channels: ["fts"] });
     expect(payload.hits[0].candidateId).toMatch(/^kc_/); expect(payload.hits[0]).not.toHaveProperty("evidenceId");
@@ -33,7 +42,11 @@ it("fts 明确禁止远程重排并传递取消，不可用环境显式报错", 
   try {
     const search = vi.spyOn(f.manager.searchService, "search"), controller = new AbortController();
     expect((await f.makeTool().execute("search", { ...f.params, channel: "fts" }, controller.signal)).isError).toBeUndefined();
-    expect(search.mock.calls[0][0]).toMatchObject({ channel: "fts", rerank: false, signal: controller.signal });
+    expect(search.mock.calls[0][0]).toMatchObject({
+      channel: "fts",
+      rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY,
+      signal: controller.signal,
+    });
     controller.abort(); await expect(f.makeTool().execute("cancel", f.params, controller.signal)).rejects.toMatchObject({ name: "AbortError" });
     const missing = createKnowledgeSearchTool({ getKnowledge: () => null, getStudioId: () => null });
     expect((await missing.execute("missing", f.params)).details).toMatchObject({ errorCode: "KNOWLEDGE_MODEL_UNAVAILABLE" });

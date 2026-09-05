@@ -10,6 +10,7 @@ import type { NotebookRetrievalChunk, NotebookRetrievalSource, RetrieveForNotebo
 import { KNOWLEDGE_FUSION_BUDGET } from "./knowledge-query-service.ts";
 import type { KnowledgeChunkSpanDraft } from "./chunker.ts";
 import type { KnowledgeEvidenceManifestEntry, KnowledgeTurnScope } from "./types.ts";
+import type { KnowledgeRerankPolicyInput } from "./rerank-policy.ts";
 export { EvidencePacker } from "./evidence-packer.ts";
 
 
@@ -210,7 +211,7 @@ export interface KnowledgeInjectorDeps {
      * rerankSkippedReason）；deadlineMs 收紧重排期限。缺省 = 既有行为（总是
      * 重排 + 默认期限）。
      */
-    rerankPolicy?: { marginGate: boolean; deadlineMs?: number };
+    rerankPolicy?: Omit<KnowledgeRerankPolicyInput, "enabled"> & { enabled?: boolean };
   }) => Promise<RetrieveForNotebooksResult>;
   /**
    * 邻接块读取门面（§三十六，Phase 8）：按锚点 (variant, ordinal ±窗口) 定点

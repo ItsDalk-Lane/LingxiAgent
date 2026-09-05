@@ -6,6 +6,10 @@ import { LingxiEngine } from "../core/engine.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
 import { KnowledgeQueryService } from "../lib/knowledge/knowledge-query-service.ts";
 import { KnowledgeSearchService } from "../lib/knowledge/knowledge-search-service.ts";
+import {
+  KNOWLEDGE_RERANK_DISABLED_POLICY,
+  KNOWLEDGE_RERANK_ENABLED_POLICY,
+} from "../lib/knowledge/rerank-policy.ts";
 import { createMetadataFixture, metadataStudio } from "./helpers/knowledge-metadata-fixture.ts";
 
 const homes: string[] = [];
@@ -19,7 +23,13 @@ async function fixture() {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), "knowledge-search-service-")); homes.push(home);
   const data = await createMetadataFixture(home); managers.push(data.manager);
   const compiledScope = await data.manager.compileTurnScope(data.scope);
-  return { ...data, compiledScope, request: { compiledScope, query: "后台", channel: "fts" as const, rerank: false, limit: 8 } };
+  return { ...data, compiledScope, request: {
+    compiledScope,
+    query: "后台",
+    channel: "fts" as const,
+    rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY,
+    limit: 8,
+  } };
 }
 
 describe("统一知识搜索", () => {
@@ -74,7 +84,8 @@ describe("统一知识搜索", () => {
     const { manager, request } = await fixture();
     const fts = vi.spyOn(manager.indexStore, "searchReadyVariantIds");
     await expect(manager.searchService.search({ ...request, signal: AbortSignal.abort() })).rejects.toMatchObject({ name: "AbortError" });
-    await expect(manager.searchService.search({ ...request, rerank: true })).rejects.toMatchObject({ code: "KNOWLEDGE_INVALID_ARGUMENT" });
+    await expect(manager.searchService.search({ ...request, rerankPolicy: KNOWLEDGE_RERANK_ENABLED_POLICY }))
+      .rejects.toMatchObject({ code: "KNOWLEDGE_INVALID_ARGUMENT" });
     expect(fts).not.toHaveBeenCalled();
   });
 
@@ -91,7 +102,7 @@ describe("统一知识搜索", () => {
     embed.mockClear();
     const search = new KnowledgeSearchService({ store: manager.store, indexStore: manager.indexStore, queryService });
     const result = await search.search({ compiledScope: await manager.compileTurnScope(scope), query: "后台",
-      channel: "hybrid", rerank: false, limit: 8 });
+      channel: "hybrid", rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY, limit: 8 });
     expect(embed).toHaveBeenCalledTimes(1);
     expect(result.remoteModelCalls).toBe(1);
     expect(result.retrievalMode).toBe("hybrid");
@@ -104,7 +115,7 @@ describe("统一知识搜索", () => {
     manager.updateNotebookSettings({ studioId: metadataStudio, notebookId: notebook.id,
       embeddingModelRef: { provider: "missing", id: "embed" }, rerankModelRef: { provider: "missing", id: "rerank" } });
     const result = await manager.searchService.search({ compiledScope: await manager.compileTurnScope(scope), query: "后台",
-      channel: "hybrid", rerank: true, limit: 8 });
+      channel: "hybrid", rerankPolicy: KNOWLEDGE_RERANK_ENABLED_POLICY, limit: 8 });
     expect(result.retrievalMode).toBe("fts");
     expect(result.remoteModelCalls).toBe(0);
     expect(result.degradedReasons.some(reason => reason.includes("KNOWLEDGE_VECTOR_NOT_READY"))).toBe(true);
@@ -115,7 +126,10 @@ describe("统一知识搜索", () => {
     const { manager, scope } = await fixture();
     const search = vi.spyOn(manager.searchService, "searchWithEvidence");
     const output = await manager.runFastKnowledgePipeline({ scope, question: "后台" });
-    expect(search).toHaveBeenCalledWith(expect.objectContaining({ channel: "fts", rerank: false }));
+    expect(search).toHaveBeenCalledWith(expect.objectContaining({
+      channel: "fts",
+      rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY,
+    }));
     expect(output.stats.remoteModelCalls).toBe(0);
     expect(output.stats.injectedChunks).toBeGreaterThan(0);
     const again = await manager.runFastKnowledgePipeline({ scope, question: "后台" });

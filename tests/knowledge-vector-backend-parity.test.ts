@@ -1,5 +1,6 @@
 import { expect, it } from "vitest";
 import { searchVectorBackend } from "../lib/knowledge/vector-search-backend.ts";
+import { KNOWLEDGE_RERANK_DISABLED_POLICY } from "../lib/knowledge/rerank-policy.ts";
 import { annFixture } from "./helpers/knowledge-ann-fixture.ts";
 
 it("确定性向量集 top-k overlap 至少 95%，来源 golden set 全部命中", async () => {
@@ -52,7 +53,13 @@ it("真实知识入口的来源召回全部命中，HNSW 热查询只定点读�
     const compiledScope = await manager.compileTurnScope(scope);
     const fullRead = vi.spyOn(manager.indexStore, "listVariantChunks"); const blobRead = vi.spyOn(manager.vectorIndex, "readReadyVectorBatch");
     for (const [index, topic] of topics.entries()) {
-      const result = await manager.searchService.searchWithEvidence({ compiledScope, query: `${topic} 规定`, channel: "hybrid", limit: 1, rerank: false });
+      const result = await manager.searchService.searchWithEvidence({
+        compiledScope,
+        query: `${topic} 规定`,
+        channel: "hybrid",
+        limit: 1,
+        rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY,
+      });
       expect(result.response.vectorBackend).toBe("hnsw"); expect(result.response.degradedReasons).toEqual([]);
       expect(result.response.hits[0].sourceId).toBe(sourceIds[index]); expect(result.evidence.vectorBackend).toBe("hnsw");
     }

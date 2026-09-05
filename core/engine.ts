@@ -205,6 +205,7 @@ import { ResearchStore } from "../lib/knowledge/research/research-store.ts";
 import type { KnowledgeEvidenceSpan } from "../shared/knowledge-evidence.ts";
 import type { CompiledKnowledgeScope } from "../lib/knowledge/scope-snapshot-compiler.ts";
 import { KNOWLEDGE_CANDIDATE_GENERATION_BUDGET } from "../lib/knowledge/knowledge-query-service.ts";
+import { normalizeKnowledgeRerankPolicy } from "../lib/knowledge/rerank-policy.ts";
 import { KnowledgeError } from "../lib/knowledge/errors.ts";
 import { KnowledgeEmbeddingProviderGate } from "../lib/knowledge/ingestion-service.ts";
 import {
@@ -3290,7 +3291,8 @@ export class LingxiEngine {
               const result = compiledKnowledgeScope
                 ? (await knowledge.searchService.searchWithEvidence({
                   compiledScope: compiledKnowledgeScope, query, channel: "hybrid", limit: topK ?? KNOWLEDGE_CANDIDATE_GENERATION_BUDGET,
-                  rerank: true, signal: input.signal, ...(sourceIds ? { sourceIds } : {}),
+                  rerankPolicy: normalizeKnowledgeRerankPolicy({ enabled: true, ...rerankPolicy }),
+                  signal: input.signal, ...(sourceIds ? { sourceIds } : {}),
                 }, sectionsBySourceId)).evidence
                 : await knowledge.queryService.retrieveForNotebooks({
                 studioId,

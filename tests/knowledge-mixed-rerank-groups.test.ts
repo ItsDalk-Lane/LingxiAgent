@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createRerankFixture } from "./helpers/knowledge-rerank-fixture.ts";
+import { KNOWLEDGE_RERANK_DISABLED_POLICY } from "../lib/knowledge/rerank-policy.ts";
 const cleanups: Array<() => void> = [];
 afterEach(() => { vi.restoreAllMocks(); for (const close of cleanups.splice(0)) close(); });
 const a = { provider: "fixture", id: "a" }, b = { provider: "fixture", id: "b" };
@@ -30,7 +31,7 @@ describe("多个重排模型按名次合并", () => {
       if (input.modelRef.id === "b") throw new Error("unavailable");
       return { results: input.documents.map((_, index) => ({ index, score: 1 })) };
     }); cleanups.push(data.close);
-    const baseline = await data.manager.searchService.search({ ...data.request, rerank: false });
+    const baseline = await data.manager.searchService.search({ ...data.request, rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY });
     const result = await data.manager.searchService.search(data.request);
     expect(result.hits.map(hit => hit.chunkId)).toEqual(baseline.hits.map(hit => hit.chunkId));
     expect(result.degradedReasons.some(reason => reason.includes("unavailable"))).toBe(true);
