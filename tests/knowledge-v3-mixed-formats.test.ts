@@ -3,6 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { KNOWLEDGE_RERANK_DISABLED_POLICY } from "../lib/knowledge/rerank-policy.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
 import { buildLegacyKnowledgeChunks, legacyKnowledgeBlockFingerprint, resolveLegacyKnowledgeChunkerConfig,
   resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
@@ -74,7 +75,8 @@ describe("同一笔记本的混合格式与新旧索引选择", () => {
     expect(compiled.sources.every(source => source.status === "ready")).toBe(true);
     expect(compiled.warnings.filter(warning => warning.includes("previous_chunk_version_rebuild_pending"))).toEqual([]);
     expect(fullRead).not.toHaveBeenCalled();
-    const result = await f.manager.searchService.search({ compiledScope: compiled, query: "交付", channel: "fts", rerank: false, limit: 24 });
+    const result = await f.manager.searchService.search({ compiledScope: compiled, query: "交付", channel: "fts",
+      rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY, limit: 24 });
     expect(new Set(result.hits.map(hit => hit.sourceId))).toEqual(new Set(f.sources.map(source => source.sourceId)));
     expect(result.remoteModelCalls).toBe(0); expect(f.embed).not.toHaveBeenCalled();
     const packed = await f.manager.runFastKnowledgePipeline({ scope: f.scope, question: "交付" });
@@ -89,7 +91,8 @@ describe("同一笔记本的混合格式与新旧索引选择", () => {
   it("混合格式共用一个查询嵌入组，每个向量与引用清单保留该来源的实际profile", async () => {
     const f = await fixture();
     const compiled = await f.manager.compileTurnScope(f.scope);
-    const result = await f.manager.searchService.searchWithEvidence({ compiledScope: compiled, query: "交付", channel: "hybrid", rerank: false, limit: 24 });
+    const result = await f.manager.searchService.searchWithEvidence({ compiledScope: compiled, query: "交付", channel: "hybrid",
+      rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY, limit: 24 });
     expect(new Set(result.response.hits.map(hit => hit.sourceId))).toEqual(new Set(f.sources.map(source => source.sourceId)));
     expect(result.response).toMatchObject({ retrievalMode: "hybrid", embeddingGroups: 1, remoteModelCalls: 1 });
     expect(f.embed).toHaveBeenCalledTimes(1);
@@ -113,7 +116,8 @@ describe("同一笔记本的混合格式与新旧索引选择", () => {
     expect(new Set(before.evidence.entries.map(entry => entry.chunkProfileHash))).toEqual(new Set(f.sources.map(source => source.hash)));
     const current = f.manager.queryService.indexArtifactForIngestion(studioId, f.sources[0].artifactId, { targetChars: 1200 });
     f.manager.store.resolveNotebookRetrievalProfile({ studioId, notebookId: f.notebook.id, strategy: "fixed" });
-    const frozen = await f.manager.searchService.search({ compiledScope: first, query: "交付必须", channel: "fts", rerank: false, limit: 24 });
+    const frozen = await f.manager.searchService.search({ compiledScope: first, query: "交付必须", channel: "fts",
+      rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY, limit: 24 });
     expect(new Set(frozen.hits.map(hit => hit.sourceId))).toEqual(new Set(f.sources.map(source => source.sourceId)));
     expect(frozen.hits.every(hit => first.readyChunkVariantIds.includes(hit.chunkIndexVariantId))).toBe(true);
     expect(frozen.hits.some(hit => hit.chunkIndexVariantId === current.chunkIndexVariantId)).toBe(false);

@@ -37,6 +37,14 @@ export interface NormalizedToolInvocationDescriptor {
   capability: string;
   target?: ToolInvocationTarget;
   sideEffect?: Record<string, unknown>;
+  effectiveInvocation?: EffectiveToolInvocation;
+}
+
+export interface EffectiveToolInvocation {
+  targetId: string;
+  toolName: string;
+  arguments: Readonly<Record<string, unknown>>;
+  generation: string | number;
 }
 
 export type ToolInvocationPermissionResolution =
@@ -62,6 +70,7 @@ export type ToolInvocationPermissionResolution =
       toolName: string;
       message: string;
       field?: string;
+      declaredCapability?: string | null;
     };
   };
 
@@ -71,6 +80,7 @@ const DESCRIPTOR_FIELDS = new Set([
   "capability",
   "target",
   "sideEffect",
+  "effectiveInvocation",
 ]);
 
 const TARGET_FIELDS = new Set(["type", "id", "label"]);
@@ -102,6 +112,7 @@ const MAX_SIDE_EFFECT_STRING_LENGTH = 8192;
 const MAX_INPUT_DEPTH = 16;
 const MAX_INPUT_ITEMS = 4096;
 const MAX_INPUT_STRING_LENGTH = 2 * 1024 * 1024;
+const EFFECTIVE_TOOL_NAME_RE = /^[A-Za-z0-9_.:/-]+$/;
 
 export type ToolInvocationInputSnapshot =
   | { ok: true; value: any }
@@ -420,6 +431,12 @@ export function unregisterToolCapabilityDelegate(tool: object): boolean {
   return capabilityDelegates.delete(tool);
 }
 
+/** 宿主包装层用它避免复制后丢失基于对象身份登记的委托资格。 */
+export function hasToolCapabilityDelegate(tool: object): boolean {
+  if (!tool || (typeof tool !== "object" && typeof tool !== "function")) return false;
+  return capabilityDelegates.has(tool);
+}
+
 /**
  * A delegated capability is accepted only when the host registered this exact
  * object and its predicate returns literally true. A throwing or non-boolean
@@ -463,12 +480,14 @@ function failure({
   reason,
   message,
   field,
+  declaredCapability,
 }: {
   toolName: string;
   code?: "TOOL_INVOCATION_RESOLVER_FAILED" | "TOOL_INVOCATION_DESCRIPTOR_INVALID";
   reason: string;
   message: string;
   field?: string;
+  declaredCapability?: string | null;
 }): ToolInvocationPermissionResolution {
   return {
     ok: false,
@@ -479,6 +498,7 @@ function failure({
       toolName,
       message,
       ...(field ? { field } : {}),
+      ...(declaredCapability !== undefined ? { declaredCapability } : {}),
     },
   };
 }
@@ -509,6 +529,53 @@ function normalizeTarget(raw: unknown): { ok: true; target: ToolInvocationTarget
       id,
       ...(label ? { label } : {}),
     },
+  };
+}
+
+function normalizeEffectiveInvocation(
+  raw: unknown,
+): { ok: true; value: EffectiveToolInvocation } | { ok: false; field?: string } {
+  const record = snapshotPlainOwnDataRecord(raw);
+  if (!record.ok || !hasOnlyKnownFields(
+    record.value,
+    new Set(["targetId", "toolName", "arguments", "generation"]),
+  )) {
+    return { ok: false };
+  }
+  const targetId = normalizeStableString(record.value.targetId, 1024);
+  if (!targetId || !targetId.startsWith("tool:")) {
+    return { ok: false, field: "effectiveInvocation.targetId" };
+  }
+  const toolName = normalizeStableString(record.value.toolName, 256);
+  if (!toolName || !EFFECTIVE_TOOL_NAME_RE.test(toolName)) {
+    return { ok: false, field: "effectiveInvocation.toolName" };
+  }
+  const argumentsSnapshot = snapshotToolInvocationInput(record.value.arguments);
+  if (
+    argumentsSnapshot.ok === false
+    || !argumentsSnapshot.value
+    || typeof argumentsSnapshot.value !== "object"
+    || Array.isArray(argumentsSnapshot.value)
+  ) {
+    return { ok: false, field: "effectiveInvocation.arguments" };
+  }
+  const generation = record.value.generation;
+  const normalizedGeneration = typeof generation === "string"
+    ? normalizeStableString(generation, 256)
+    : typeof generation === "number" && Number.isSafeInteger(generation) && generation >= 0
+      ? generation
+      : null;
+  if (normalizedGeneration === null) {
+    return { ok: false, field: "effectiveInvocation.generation" };
+  }
+  return {
+    ok: true,
+    value: Object.freeze({
+      targetId,
+      toolName,
+      arguments: argumentsSnapshot.value as Readonly<Record<string, unknown>>,
+      generation: normalizedGeneration,
+    }),
   };
 }
 
@@ -582,6 +649,7 @@ function normalizeDescriptor(
       toolName,
       reason: "unknown_capability",
       field: "capability",
+      declaredCapability: capability,
       message: expectedCapability
         ? `Invocation capability must be ${expectedCapability}.`
         : "The executing tool has no stable capability namespace.",
@@ -632,6 +700,19 @@ function normalizeDescriptor(
     }
     sideEffect = normalized.value;
   }
+  let effectiveInvocation: EffectiveToolInvocation | undefined;
+  if (descriptorInput.effectiveInvocation !== undefined) {
+    const normalized = normalizeEffectiveInvocation(descriptorInput.effectiveInvocation);
+    if (normalized.ok === false) {
+      return failure({
+        toolName,
+        reason: "invalid_effective_invocation",
+        field: normalized.field,
+        message: "Invocation effective target must contain host-verifiable target, arguments, and generation fields.",
+      });
+    }
+    effectiveInvocation = normalized.value;
+  }
 
   const descriptor: NormalizedToolInvocationDescriptor = {
     action,
@@ -639,6 +720,7 @@ function normalizeDescriptor(
     capability,
     ...(target ? { target } : {}),
     ...(sideEffect ? { sideEffect } : {}),
+    ...(effectiveInvocation ? { effectiveInvocation } : {}),
   };
   return {
     ok: true,
@@ -653,11 +735,13 @@ export function invocationTargetKey(target: Pick<ToolInvocationTarget, "type" | 
   return JSON.stringify([target.type, target.id]);
 }
 
-type LegacyPermissionNormalization =
+export type LegacyToolPermissionNormalization =
   | { ok: true; value: Record<string, unknown> }
   | { ok: false };
 
-function normalizeLegacyPermission(permission: unknown): LegacyPermissionNormalization {
+export function normalizeLegacyToolPermissionMetadata(
+  permission: unknown,
+): LegacyToolPermissionNormalization {
   const snapshot = snapshotPlainOwnDataRecord(permission);
   if (!snapshot.ok) return { ok: false };
   const raw = snapshot.value;
@@ -762,7 +846,7 @@ export function resolveToolInvocationPermission(
     });
   }
   if (!resolverProperty.present) {
-    const legacyPermission = normalizeLegacyPermission(permission);
+    const legacyPermission = normalizeLegacyToolPermissionMetadata(permission);
     if (!legacyPermission.ok) {
       return failure({
         toolName,

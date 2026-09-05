@@ -69,6 +69,16 @@ async function runImageSubmit(adapterId: string, root: string, extraParams: Reco
     usageLedger: ledger,
     sessionId: "sess-media-e2e",
     sessionPath: "/sessions/media-e2e.jsonl",
+    resolveMediaExecutionTarget: (input: any) => ({
+      modelId: input.modelId,
+      modality: input.modality,
+      runtimeProviderId: input.runtimeProviderId,
+      credentialProviderId: input.runtimeProviderId,
+      credentialLaneId: null,
+      credentialSource: "provider-registry",
+      adapterId: input.adapterId,
+      resolutionReason: "runtime_provider_credentials",
+    }),
   };
   await runSubmitInBackground({
     taskId: `task-e2e-${adapterId}`,
@@ -230,6 +240,16 @@ describe("E2E truth — MC-09 speech（S17）", () => {
       const ledger = harness.createLedger();
       const service = new SpeechRecognitionService({
         providerRegistry: {
+          resolveMediaExecutionTarget: (input: any) => ({
+            modelId: input.modelId,
+            modality: input.modality,
+            runtimeProviderId: input.runtimeProviderId,
+            credentialProviderId: input.runtimeProviderId,
+            credentialLaneId: null,
+            credentialSource: "provider-registry",
+            adapterId: input.adapterId,
+            resolutionReason: "runtime_provider_credentials",
+          }),
           resolveMediaModel: () => ({
             providerId: adapterId,
             provider: { providerId: adapterId },

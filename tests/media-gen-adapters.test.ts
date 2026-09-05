@@ -13,6 +13,9 @@ vi.mock("../core/media/download.ts", () => ({
 
 function makeBusCtx(apiKey, baseUrl, providerId = "volcengine") {
   return {
+    mediaExecutionTarget: {
+      credentialProviderId: providerId,
+    },
     bus: {
       request: vi.fn(async (type, payload) => {
         if (type === "provider:credentials" && payload.providerId === providerId) {

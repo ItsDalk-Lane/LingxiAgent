@@ -15,12 +15,20 @@ const GEMINI_3_SIZES = ["1K", "2K", "4K"];
 const GEMINI_31_FLASH_SIZES = ["512", ...GEMINI_3_SIZES];
 
 async function getCredentials(ctx, params: any = {}) {
-  const providerId = params.credentialProviderId || params.providerId || "gemini";
+  const providerId = params.credentialProviderId ?? ctx.mediaExecutionTarget?.credentialProviderId;
+  if (!providerId) throw new Error("CREDENTIAL_PROVIDER_UNRESOLVED");
   const creds = await ctx.bus.request("provider:credentials", { providerId });
   if (creds.error || !creds.apiKey) {
     throw new Error(t("plugin.imageGen.providerNoApiKey", { providerId }));
   }
   return creds;
+}
+
+async function checkCredentials(ctx) {
+  const creds = await ctx.bus.request("provider:credentials", { providerId: "gemini" });
+  if (creds.error || !creds.apiKey) {
+    throw new Error(t("plugin.imageGen.providerNoApiKey", { providerId: "gemini" }));
+  }
 }
 
 function collectInlineImages(data) {
@@ -198,7 +206,7 @@ export const geminiImageAdapter = {
 
   async checkAuth(ctx) {
     try {
-      await getCredentials(ctx, { providerId: "gemini" });
+      await checkCredentials(ctx);
       return { ok: true };
     } catch (err) {
       return { ok: false, message: err.message || String(err) };

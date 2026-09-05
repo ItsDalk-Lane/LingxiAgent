@@ -3,6 +3,10 @@ import { isKnowledgeError, KnowledgeError } from "../knowledge/errors.ts";
 import type { KnowledgeManager } from "../knowledge/knowledge-manager.ts";
 import type { SearchedVectorVariantIdentity } from "../knowledge/knowledge-query-service.ts";
 import type { KnowledgeSearchRequest } from "../knowledge/knowledge-search-service.ts";
+import {
+  KNOWLEDGE_RERANK_DISABLED_POLICY,
+  KNOWLEDGE_RERANK_ENABLED_POLICY,
+} from "../knowledge/rerank-policy.ts";
 import type { KnowledgeResearchToolContext } from "../knowledge/evidence-receipt-service.ts";
 import { knowledgeScopeViolation, readKnowledgeCitationPage, resolveKnowledgeTurnScope, type KnowledgeToolSessionContext } from "./knowledge-scope.ts";
 import { toolError, toolOk } from "./tool-result.ts";
@@ -78,7 +82,9 @@ export function createKnowledgeSearchTool(deps: KnowledgeSearchToolDeps) {
         });
         const compiledScope = await knowledge.compileTurnScope(scope);
         const request: KnowledgeSearchRequest = { compiledScope, query: params.query, channel, limit,
-          ...filters, rerank: channel === "hybrid", signal };
+          ...filters,
+          rerankPolicy: channel === "hybrid" ? KNOWLEDGE_RERANK_ENABLED_POLICY : KNOWLEDGE_RERANK_DISABLED_POLICY,
+          signal };
         const researchContext = deps.resolveResearchContext?.(ctx) ?? null;
         const searched = await knowledge.searchService.searchWithEvidence(request);
         const result = searched.response;

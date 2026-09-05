@@ -82,6 +82,44 @@ describe("tool invocation permission contract", () => {
     expect(first.targetKey).toBe(invocationTargetKey({ type: "channel", id: "ch_team" }));
   });
 
+  it("规范化 effective invocation 并拒绝伪造或不可复核字段", () => {
+    const makeTool = (effectiveInvocation: unknown) => ({
+      name: "mcp_call",
+      sessionPermission: {
+        resolveInvocation: () => ({
+          action: "invoke",
+          kind: "review",
+          capability: "mcp_call.invoke",
+          effectiveInvocation,
+        }),
+      },
+    });
+    const valid = resolveDescriptor(makeTool({
+      targetId: "tool:mcp:github:create_issue",
+      toolName: "github_create_issue",
+      arguments: { title: "Bug", labels: ["security"] },
+      generation: 4,
+    }), {});
+
+    expect(valid.descriptor.effectiveInvocation).toEqual({
+      targetId: "tool:mcp:github:create_issue",
+      toolName: "github_create_issue",
+      arguments: { title: "Bug", labels: ["security"] },
+      generation: 4,
+    });
+    for (const effectiveInvocation of [
+      { targetId: "github", toolName: "github_create_issue", arguments: {}, generation: 4 },
+      { targetId: "tool:mcp:github:create_issue", toolName: "bad name", arguments: {}, generation: 4 },
+      { targetId: "tool:mcp:github:create_issue", toolName: "github_create_issue", arguments: [], generation: 4 },
+      { targetId: "tool:mcp:github:create_issue", toolName: "github_create_issue", arguments: {}, generation: {} },
+    ]) {
+      expect(resolveToolInvocationPermission(makeTool(effectiveInvocation), {})).toMatchObject({
+        ok: false,
+        error: { reason: "invalid_effective_invocation" },
+      });
+    }
+  });
+
   it("accepts read, routine, and review as the complete action-class vocabulary", () => {
     for (const kind of ["read", "routine", "review"] as const) {
       const descriptor = resolveDescriptor({

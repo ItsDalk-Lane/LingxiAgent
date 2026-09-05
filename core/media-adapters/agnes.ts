@@ -50,12 +50,20 @@ function agnesRootBase(baseUrl) {
 }
 
 async function getCredentials(ctx, params: any = {}) {
-  const providerId = params.credentialProviderId || params.providerId || "agnes";
+  const providerId = params.credentialProviderId ?? ctx.mediaExecutionTarget?.credentialProviderId;
+  if (!providerId) throw new Error("CREDENTIAL_PROVIDER_UNRESOLVED");
   const creds = await ctx.bus.request("provider:credentials", { providerId });
   if (creds.error || !creds.apiKey) {
     throw new Error(t("plugin.imageGen.providerNoApiKey", { providerId }));
   }
   return creds;
+}
+
+async function checkCredentials(ctx) {
+  const creds = await ctx.bus.request("provider:credentials", { providerId: "agnes" });
+  if (creds.error || !creds.apiKey) {
+    throw new Error(t("plugin.imageGen.providerNoApiKey", { providerId: "agnes" }));
+  }
 }
 
 function resolveImageSize(params, providerDefaults: any = {}) {
@@ -227,7 +235,7 @@ export const agnesImageAdapter = {
 
   async checkAuth(ctx) {
     try {
-      await getCredentials(ctx, { providerId: "agnes" });
+      await checkCredentials(ctx);
       return { ok: true };
     } catch (err) {
       return { ok: false, message: err.message || String(err) };
@@ -318,7 +326,7 @@ export const agnesVideoAdapter = {
 
   async checkAuth(ctx) {
     try {
-      await getCredentials(ctx, { providerId: "agnes" });
+      await checkCredentials(ctx);
       return { ok: true };
     } catch (err) {
       return { ok: false, message: err.message || String(err) };
@@ -407,7 +415,7 @@ export const agnesVideoAdapter = {
   },
 
   async query(taskId, ctx) {
-    const creds = await getCredentials(ctx, { providerId: "agnes" });
+    const creds = await getCredentials(ctx, ctx?.task?.params || ctx?.task || {});
     const root = agnesRootBase(creds.baseUrl);
     const task = ctx?.task || {};
     const modelName = task.modelId || task.params?.modelId || task.params?.model || "";

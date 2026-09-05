@@ -38,6 +38,8 @@ import {
   PLUGIN_HOST_ROUTE_PLUGIN_IDS,
   isLocalOwnerPrincipal,
 } from "../http/route-security.ts";
+import { createLocalDeveloperPrincipal } from "../../core/tool-invocation-gateway.ts";
+import { isToolInvocationError } from "../../lib/tools/invocation/index.ts";
 
 const log = createModuleLogger("plugin-install");
 
@@ -708,6 +710,18 @@ function pluginDevServiceOrError(engine: any, c: any) {
 }
 
 function pluginDevErrorResponse(c: any, err: any) {
+  if (isToolInvocationError(err)) {
+    const status = err.code === "TARGET_NOT_FOUND"
+      ? 404
+      : err.code === "PERMISSION_DENIED" || err.code === "TARGET_NOT_VISIBLE" || err.code === "TARGET_DISABLED_FOR_AGENT"
+        ? 403
+        : err.code === "TRANSPORT_FAILURE"
+          ? 502
+          : err.code === "TARGET_REVOKED"
+            ? 409
+            : 400;
+    return c.json(err.toJSON(), status);
+  }
   return c.json({
     error: err?.message || String(err),
     ...(err?.code ? { code: err.code } : {}),
@@ -927,14 +941,36 @@ export function createPluginsRoute(engine: any) {
     if (errorResponse) return errorResponse;
     const body = await c.req.json().catch(() => ({}));
     try {
+      const authPrincipal = readAuthPrincipal(c);
+      if (!isLocalOwnerPrincipal(authPrincipal)) {
+        throw createPluginRouteError(
+          "Plugin developer tool invocation requires a local owner",
+          403,
+          "PLUGIN_DEV_LOCAL_OWNER_REQUIRED",
+        );
+      }
+      const identityOverrideFields = [
+        "sessionId",
+        "sessionRef",
+        "sessionPath",
+        "legacySessionPath",
+        "agentId",
+        "principal",
+        "toolCallId",
+      ].filter((field) => Object.hasOwn(body, field));
+      if (identityOverrideFields.length > 0) {
+        throw createPluginRouteError(
+          "Plugin developer tool invocation identity is host-owned",
+          400,
+          "PLUGIN_DEV_IDENTITY_OVERRIDE_FORBIDDEN",
+        );
+      }
       return c.json(await service.invokeTool({
         pluginId: c.req.param("id"),
         toolName: c.req.param("toolName"),
-        input: body.input || {},
-        sessionId: body.sessionId,
-        sessionRef: body.sessionRef,
-        sessionPath: body.sessionPath,
-        agentId: body.agentId,
+        arguments: Object.hasOwn(body, "arguments") ? body.arguments : {},
+        principal: createLocalDeveloperPrincipal(authPrincipal),
+        signal: c.req.raw.signal,
       }));
     } catch (err) {
       return pluginDevErrorResponse(c, err);

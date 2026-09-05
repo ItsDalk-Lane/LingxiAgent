@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { KNOWLEDGE_RERANK_DEADLINE_MS } from "../lib/knowledge/knowledge-query-service.ts";
 import { createRerankFixture } from "./helpers/knowledge-rerank-fixture.ts";
+import { KNOWLEDGE_RERANK_DISABLED_POLICY } from "../lib/knowledge/rerank-policy.ts";
 const cleanups: Array<() => Promise<void>> = [];
 afterEach(async () => { vi.useRealTimers(); vi.restoreAllMocks(); for (const close of cleanups.splice(0)) await close(); });
 const ref = { provider: "fixture", id: "rerank" };
@@ -23,7 +24,7 @@ describe("全局融合后单次重排", () => {
   it("重排只接收全局前 50 条，尾部十条保留", async () => {
     const rerank = vi.fn(async ({ documents }: { documents: string[] }) => ({ results: documents.map((_, index) => ({ index: documents.length - index - 1, score: index })) }));
     const data = await createRerankFixture([ref], rerank, true); cleanups.push(data.close);
-    const baseline = await data.manager.searchService.search({ ...data.request, rerank: false });
+    const baseline = await data.manager.searchService.search({ ...data.request, rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY });
     expect(baseline.hits).toHaveLength(60);
     const result = await data.manager.searchService.search(data.request);
     expect(rerank.mock.calls[0][0].documents).toHaveLength(50);
@@ -36,7 +37,7 @@ describe("全局融合后单次重排", () => {
       if (kind === "network") throw new Error("network failed");
       return kind === "null" ? null : { results: [{ index: 999, score: 1 }] };
     }); cleanups.push(data.close);
-    const baseline = await data.manager.searchService.search({ ...data.request, rerank: false });
+    const baseline = await data.manager.searchService.search({ ...data.request, rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY });
     const result = await data.manager.searchService.search(data.request);
     expect(result.hits.map(hit => hit.chunkId)).toEqual(baseline.hits.map(hit => hit.chunkId));
     expect(result.degradedReasons.some(reason => reason.includes("rerank"))).toBe(true);
