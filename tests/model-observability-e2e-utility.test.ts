@@ -302,7 +302,12 @@ describe("E2E truth — MC-07 CLI（S15）", () => {
     const root = makeRoot();
     const ledger = createUsageLedger({});
     const POISON_STDOUT = "E2E_CLI_STDOUT_POISON_x9";
-    const resolveMediaExecutionTarget = (input: any) => ({
+    const resolveMediaExecutionTarget = (input: {
+      modelId: string;
+      modality: "image";
+      runtimeProviderId: string;
+      adapterId: string | null;
+    }) => ({
       modelId: input.modelId,
       modality: input.modality,
       runtimeProviderId: input.runtimeProviderId,
