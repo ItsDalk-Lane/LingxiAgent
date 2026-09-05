@@ -46,14 +46,14 @@ P12-06 的语义顺序迁移、适配和重新验证，最终只推送校正版�
 
 ### Phase E：P12 最终验证与封印
 
-- [ ] 定向契约、类型、lint、开放边界和全量测试全绿（除审计封印顺序循环外均绿；P12-02 已阻塞）
+- [ ] 定向契约、类型、lint、开放边界和全量测试全绿（用户已授权封印后完整复跑以解除顺序循环）
 - [ ] 服务端、开放服务端、当前平台客户端与 seed-kit 构建全绿
 - [ ] 固定 source candidate，生成独立 audit seal
 - [ ] 封印后门禁、工作树和远端坐标复核
 
 ## 当前状态
 
-`Phase E / P12-02 blocked by P12_SEQUENCE_SEAL_GATE_CYCLE`
+`Phase E / resumed with authorized build -> seal -> full-test order`
 
 ## 错误记录
 

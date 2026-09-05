@@ -39,8 +39,8 @@
 | P11-01 | `completed` | `29a296611a1da1509671f819cf0032dd72937eb2` | 架构说明及文档门禁完成 |
 | P11-02 | `completed` | `c217a04b3a6f33146cd5483cbaf4aed7715891c3` | 报告与机器事实完成；首个源码候选随后被 P12-02 边界门禁作废 |
 | P12-01 | `completed_on_final_attempted_candidate` | `b72a19b209b2bbcfee8c4b3cf3ca98f50b047948` | 2129 文件边界 0 违规；25 文件 389 测试全绿 |
-| P12-02 | `blocked` | `b72a19b209b2bbcfee8c4b3cf3ca98f50b047948` | 仅旧审计封印 1 项失败；稳定阻塞码 `P12_SEQUENCE_SEAL_GATE_CYCLE` |
-| P12-03–P12-06 | `NOT_EXECUTED_BLOCKED_BY_P12_02` | — | 按任务书失败即停，没有构建、封印或最终推送步骤 |
+| P12-02 | `resumed_with_authorized_seal_order` | 待新候选 | 用户已授权先构建、再封印、封印后完整复跑全量测试 |
+| P12-03–P12-06 | `pending_authorized_sequence` | — | 按用户批准的顺序继续，不放宽封印测试 |
 
 ## P0-00 固定 Git 基线并创建校正版分支
 
@@ -370,6 +370,12 @@
 - 后续状态：依照“门禁失败时只修当前项”停止；P12-03、P12-04、P12-05、P12-06 均为 `NOT_EXECUTED_BLOCKED_BY_P12_02`。没有构建、没有 audit seal、没有合并 main。
 - 解除条件：任务书所有者需明确调整封印顺序，例如允许先完成 P12-03 构建，再在 P12-04 封印，并在封印后把完整全量测试作为最终 P12-02 复核；解除后应以新的源码候选从 P12-01 全部重跑。
 - 原始日志：`/tmp/lingxi-tool-contract-p1201-boundary.log`、`/tmp/lingxi-tool-contract-p1201-targeted.log`、`/tmp/lingxi-tool-contract-p1202-typecheck.log`、`/tmp/lingxi-tool-contract-p1202-lint.log`、`/tmp/lingxi-tool-contract-p1202-open-boundary.log`、`/tmp/lingxi-tool-contract-p1202-full-tests.log`。
+
+## P12 授权恢复
+
+- 2026-09-05：用户明确授权采用建议的调整顺序继续。
+- 调整后的顺序：新候选从 P12-01 重跑；P12-02 先完成静态门禁并保留封印前全量测试原始失败；执行 P12-03 全部构建；P12-04 推进审计坐标并创建独立封印提交；封印后完整重跑 `npm test` 作为 P12-02 最终复核；最后执行 P12-05 和 P12-06。
+- 不变边界：不跳过封印测试、不放宽 allowlist、不把封印前失败写成通过；任一非顺序性门禁失败仍只修当前项并重新形成源码候选。
 
 ## 错误记录
 
