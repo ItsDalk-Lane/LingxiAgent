@@ -197,7 +197,7 @@ describe("PluginDevService", () => {
       toolName: "echo",
       arguments: { text: "hidden" },
       principal,
-    })).rejects.toMatchObject({ code: "PLUGIN_DEV_TOOL_NOT_FOUND" });
+    })).rejects.toMatchObject({ code: "TARGET_NOT_FOUND", route: "plugin-dev-http", sourceId: "dev-http-guard" });
   });
 
   it("invokes dynamically registered dev tools with the SDK input/context signature", async () => {

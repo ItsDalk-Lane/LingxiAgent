@@ -11,6 +11,7 @@ import { ToolTargetRegistry } from "./tool-target-registry.ts";
 import {
   createToolSchemaValidator,
   runWithPreparedInvocation,
+  ToolInvocationError,
 } from "../lib/tools/invocation/index.ts";
 
 const DEFAULT_LOG_LIMIT = 200;
@@ -621,6 +622,7 @@ export class PluginDevService {
       principal = null,
       signal,
     } = payload;
+    const route = principal ? "plugin-dev-http" : "isolated";
     if (!pluginId) throw createDevError("pluginId is required", 400, "PLUGIN_DEV_PLUGIN_ID_REQUIRED");
     if (!toolName) throw createDevError("toolName is required", 400, "PLUGIN_DEV_TOOL_NAME_REQUIRED");
     const identityOverrideFields = [
@@ -639,23 +641,43 @@ export class PluginDevService {
       );
     }
     const entry = this._pluginManager.getPlugin(pluginId, { source: "dev" });
-    if (!entry) throw createDevError(`Plugin "${pluginId}" not found`, 404, "PLUGIN_DEV_PLUGIN_NOT_FOUND");
+    if (!entry) {
+      throw new ToolInvocationError({
+        code: "TARGET_NOT_FOUND",
+        message: "Development plugin target is not registered.",
+        route,
+        sourceId: pluginId,
+      });
+    }
     if (entry.status !== "loaded") {
-      throw createDevError(`Plugin "${pluginId}" is not loaded`, 409, "PLUGIN_DEV_PLUGIN_NOT_LOADED");
+      throw new ToolInvocationError({
+        code: "TARGET_NOT_VISIBLE",
+        message: "Development plugin target is not currently visible.",
+        route,
+        sourceId: pluginId,
+      });
     }
     const tool = this._pluginManager.getPluginTool?.(pluginId, toolName, { entry });
     if (!tool) {
-      throw createDevError(`Tool "${toolName}" not found for plugin "${pluginId}"`, 404, "PLUGIN_DEV_TOOL_NOT_FOUND");
+      throw new ToolInvocationError({
+        code: "TARGET_NOT_FOUND",
+        message: "Development plugin tool target is not registered.",
+        route,
+        sourceId: pluginId,
+        details: { toolName },
+      });
     }
     const startedAt = Date.now();
     const identity = tool._toolTargetIdentity;
     const permission = tool._normalizedPermissionContract;
     if (!identity || !permission) {
-      throw createDevError(
-        `Tool "${toolName}" has no canonical invocation contract`,
-        409,
-        "PLUGIN_DEV_TOOL_CONTRACT_MISSING",
-      );
+      throw new ToolInvocationError({
+        code: "PERMISSION_CONTRACT_MISSING",
+        message: "Development plugin tool has no canonical invocation contract.",
+        route,
+        sourceId: pluginId,
+        details: { toolName },
+      });
     }
     const validator = createToolSchemaValidator(
       tool.parameters || { type: "object", properties: {} },
@@ -691,7 +713,6 @@ export class PluginDevService {
       },
       normalizeResult: (result) => result,
     });
-    const route = principal ? "plugin-dev-http" : "isolated";
     const runtimeCtx = {
       pluginDev: true,
       ...(principal ? { principal } : {}),
@@ -712,6 +733,9 @@ export class PluginDevService {
     const gateway = new ToolInvocationGateway({
       registry,
       authorize: async () => undefined,
+      log: {
+        error: (message) => this.recordLog({ pluginId, level: "error", message }),
+      },
     });
     const result = principal
       ? await gateway.prepareAndInvokeForLocalDeveloper(

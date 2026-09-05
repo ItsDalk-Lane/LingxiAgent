@@ -39,6 +39,7 @@ import {
   isLocalOwnerPrincipal,
 } from "../http/route-security.ts";
 import { createLocalDeveloperPrincipal } from "../../core/tool-invocation-gateway.ts";
+import { isToolInvocationError } from "../../lib/tools/invocation/index.ts";
 
 const log = createModuleLogger("plugin-install");
 
@@ -709,6 +710,18 @@ function pluginDevServiceOrError(engine: any, c: any) {
 }
 
 function pluginDevErrorResponse(c: any, err: any) {
+  if (isToolInvocationError(err)) {
+    const status = err.code === "TARGET_NOT_FOUND"
+      ? 404
+      : err.code === "PERMISSION_DENIED" || err.code === "TARGET_NOT_VISIBLE" || err.code === "TARGET_DISABLED_FOR_AGENT"
+        ? 403
+        : err.code === "TRANSPORT_FAILURE"
+          ? 502
+          : err.code === "TARGET_REVOKED"
+            ? 409
+            : 400;
+    return c.json(err.toJSON(), status);
+  }
   return c.json({
     error: err?.message || String(err),
     ...(err?.code ? { code: err.code } : {}),

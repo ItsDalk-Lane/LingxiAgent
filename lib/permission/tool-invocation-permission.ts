@@ -70,6 +70,7 @@ export type ToolInvocationPermissionResolution =
       toolName: string;
       message: string;
       field?: string;
+      declaredCapability?: string | null;
     };
   };
 
@@ -479,12 +480,14 @@ function failure({
   reason,
   message,
   field,
+  declaredCapability,
 }: {
   toolName: string;
   code?: "TOOL_INVOCATION_RESOLVER_FAILED" | "TOOL_INVOCATION_DESCRIPTOR_INVALID";
   reason: string;
   message: string;
   field?: string;
+  declaredCapability?: string | null;
 }): ToolInvocationPermissionResolution {
   return {
     ok: false,
@@ -495,6 +498,7 @@ function failure({
       toolName,
       message,
       ...(field ? { field } : {}),
+      ...(declaredCapability !== undefined ? { declaredCapability } : {}),
     },
   };
 }
@@ -645,6 +649,7 @@ function normalizeDescriptor(
       toolName,
       reason: "unknown_capability",
       field: "capability",
+      declaredCapability: capability,
       message: expectedCapability
         ? `Invocation capability must be ${expectedCapability}.`
         : "The executing tool has no stable capability namespace.",

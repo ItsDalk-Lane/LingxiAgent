@@ -36,7 +36,7 @@ function expectInvocationError(call: () => unknown, code: ToolInvocationError["c
   } catch (error) {
     expect(error).toBeInstanceOf(ToolInvocationError);
     expect(error).toMatchObject({ code });
-    return;
+    return error as ToolInvocationError;
   }
   throw new Error(`expected ${code}`);
 }
@@ -170,11 +170,15 @@ describe("工具权限方言适配器", () => {
       },
     };
 
-    expectInvocationError(
+    const mismatchError = expectInvocationError(
       () => normalizeToolPermissionContract(mismatched, identity("calendar", mismatched.name))
         .resolveInvocation({}),
       "CAPABILITY_MISMATCH",
     );
+    expect(mismatchError.details).toMatchObject({
+      declaredCapability: "other.create",
+      capabilityBase: "create",
+    });
     expectInvocationError(
       () => normalizeToolPermissionContract(conflicting, identity("calendar", conflicting.name))
         .resolveInvocation({}),
@@ -186,6 +190,24 @@ describe("工具权限方言适配器", () => {
         identity("calendar", "calendar_missing"),
       ),
       "PERMISSION_CONTRACT_MISSING",
+    );
+  });
+
+  it("resolver 缺失与 resolver 主动拒绝使用不同错误码", () => {
+    const missing = { name: "calendar_missing", _pluginId: "calendar" };
+    const rejected = {
+      name: "calendar_rejected",
+      _pluginId: "calendar",
+      sessionPermission: { resolveInvocation: () => null },
+    };
+
+    expectInvocationError(
+      () => normalizeToolPermissionContract(missing, identity("calendar", missing.name)),
+      "PERMISSION_CONTRACT_MISSING",
+    );
+    expectInvocationError(
+      () => normalizeToolPermissionContract(rejected, identity("calendar", rejected.name)).resolveInvocation({}),
+      "PERMISSION_DENIED",
     );
   });
 

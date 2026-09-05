@@ -271,7 +271,9 @@ describe("plugin dev chat 规范调用", () => {
 
   it("无法解析的、禁用的或非 dev 目标在调用前关闭", () => {
     const { invoke, service } = fixture();
-    expect(permissionFor(invoke, "missing", "tool")).toBeNull();
+    expect(() => permissionFor(invoke, "missing", "tool")).toThrowError(
+      expect.objectContaining({ code: "TARGET_NOT_FOUND", route: "plugin-dev-chat", sourceId: "missing" }),
+    );
     expect(() => permissionFor(invoke, "dev-disabled", "lookup")).toThrowError(
       expect.objectContaining({ code: "TARGET_NOT_VISIBLE" }),
     );

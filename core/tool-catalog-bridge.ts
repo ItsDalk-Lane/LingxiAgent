@@ -19,6 +19,7 @@ import { registerToolCapabilityDelegate } from "../lib/permission/tool-invocatio
 import {
   createFirstPartyToolIdentity,
   isToolInvocationError,
+  ToolInvocationError,
   type ToolTargetId,
 } from "../lib/tools/invocation/index.ts";
 import type { ToolCatalog, ToolCatalogEntry } from "./tool-catalog.ts";
@@ -67,6 +68,20 @@ function resolveTarget(catalog: ToolCatalog, server: unknown, tool: unknown): To
     if (isToolInvocationError(error) && error.code === "TARGET_NOT_FOUND") return null;
     throw error;
   }
+}
+
+function missingTargetError(server: unknown, tool: unknown): ToolInvocationError {
+  const sourceId = typeof server === "string" && server.trim() ? server.trim() : null;
+  return new ToolInvocationError({
+    code: "TARGET_NOT_FOUND",
+    message: "Deferred tool target is not registered.",
+    route: "deferred",
+    sourceId,
+    details: {
+      serverId: sourceId,
+      toolName: typeof tool === "string" && tool.trim() ? tool.trim() : null,
+    },
+  });
 }
 
 function schemaProperties(schema: unknown): Record<string, any> {
@@ -234,7 +249,7 @@ export function createBridgeTools({ catalog, gateway }: BridgeToolDeps) {
        */
       resolveInvocation: (params: any) => {
         const entry = resolveTarget(catalog, params?.server, params?.tool);
-        if (!entry) return null;
+        if (!entry) throw missingTargetError(params?.server, params?.tool);
         const prepared = gateway.resolvePermission({
           targetId: entry.targetId,
           route: "deferred",
@@ -272,12 +287,7 @@ export function createBridgeTools({ catalog, gateway }: BridgeToolDeps) {
       ctx: unknown,
     ) => {
       const entry = resolveTarget(catalog, params?.server, params?.tool);
-      if (!entry) {
-        catalog.resolveTarget({
-          serverId: String(params?.server ?? ""),
-          toolName: String(params?.tool ?? ""),
-        });
-      }
+      if (!entry) throw missingTargetError(params?.server, params?.tool);
       const runtime = ctx && typeof ctx === "object" && !Array.isArray(ctx)
         ? ctx as Record<string, unknown>
         : {};

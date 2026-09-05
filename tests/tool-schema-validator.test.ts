@@ -54,15 +54,17 @@ describe("工具参数完整 schema 校验器", () => {
     expect(error.details?.issues).toEqual([
       expect.objectContaining({ path: "/", message: expect.stringContaining("query") }),
     ]);
+    expect(error.details?.issuePaths).toEqual(["/"]);
   });
 
   it.each([null, [], "text", 1, true])("执行前拒绝非普通对象参数：%j", (argumentsValue) => {
     const validator = createToolSchemaValidator({ type: "object" }, identity);
 
-    captureError(
+    const error = captureError(
       () => validator.validate(argumentsValue, "deferred"),
       "ARGUMENTS_NOT_OBJECT",
     );
+    expect(error.details?.issuePaths).toEqual(["/"]);
   });
 
   it("完整执行 required、嵌套对象、数组项、enum、union、额外字段、整数和范围约束", () => {
@@ -97,6 +99,7 @@ describe("工具参数完整 schema 校验器", () => {
       count: 5,
     }), "ARGUMENT_SCHEMA_INVALID");
     const issues = error.details?.issues as Array<{ path: string; message: string }>;
+    expect(error.details?.issuePaths).toEqual([...new Set(issues.map((issue) => issue.path))]);
 
     expect(issues.length).toBeGreaterThanOrEqual(8);
     expect(issues.map((issue) => issue.path)).toEqual(

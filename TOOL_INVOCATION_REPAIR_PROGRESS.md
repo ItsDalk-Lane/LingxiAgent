@@ -64,8 +64,8 @@
 | P6-02 | completed | `6fda792303cf6919acc459cc4bad06aaef4bc702` | LocalDeveloperPrincipal |
 | P7-01 | completed | `2ff451d74157678f733a2eeff111acb715d59ebd` | 媒体执行目标解析器 |
 | P7-02 | completed | `7581da5ffaeb47554df2a5ebcfcf91be2b6b9944` | 媒体入口统一 |
-| P8-01 | completed | pending | rerank policy 共享执行器 |
-| P9-01 | pending | — | 统一错误映射 |
+| P8-01 | completed | `e74aafee04c539dcc1352887e8763a741fb06ba5` | rerank policy 共享执行器 |
+| P9-01 | completed | pending | 统一错误映射 |
 | P9-02 | pending | — | raw execution 边界检查 |
 | P10-01 | pending | — | 路径等价变形测试 |
 | P10-02 | pending | — | 完整配置组合 |
@@ -301,8 +301,21 @@
 - 绿灯命令：任务书指定 5 文件 Vitest；受影响的检索、缓存、全局重排、混合分组、工具与向量路径共 10 文件 Vitest；`npm run typecheck`；新增策略与测试定向 ESLint；全部改动文件 ESLint；`git diff --check`。
 - 绿灯原始结果：指定门禁 exit `0`，`5 passed` files、`94 passed` tests；受影响扩展回归 exit `0`，`10 passed` files、`52 passed` tests；三段 typecheck exit `0`；新增文件定向 ESLint exit `0`、`0` 问题；全部改动文件 ESLint exit `0`（`0 errors / 144 warnings`，其中本项新增的两个文件最终为 `0` 问题）；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p801-gate-final2.log`、`/tmp/lingxi-tool-contract-p801-related-final.log`、`/tmp/lingxi-tool-contract-p801-typecheck-final.log`、`/tmp/lingxi-tool-contract-p801-eslint-final.log`、`/tmp/lingxi-tool-contract-p801-focused-eslint-final.log`。
-- 提交 SHA：`pending (commit 后由下一项进度回填)`
+- 提交 SHA：`e74aafee04c539dcc1352887e8763a741fb06ba5`
 - 偏差：none
+
+### P9-01 完成统一错误映射
+
+- 状态：`completed`
+- 改动文件：`core/tool-invocation-gateway.ts`、`core/tool-catalog-bridge.ts`、`core/plugin-dev-tools.ts`、`core/plugin-dev-service.ts`、`core/engine.ts`、`hub/index.ts`、`server/routes/plugins.ts`、`lib/tools/invocation/errors.ts`、`lib/tools/invocation/schema-validator.ts`、`lib/tools/invocation/permission-adapter.ts`、`lib/permission/tool-invocation-permission.ts`，以及 9 个错误契约相关测试和 `TOOL_INVOCATION_REPAIR_PROGRESS.md`。
+- 红灯命令：`set -o pipefail; npx vitest run tests/tool-invocation-errors.test.ts tests/tool-schema-validator.test.ts tests/tool-permission-adapter.test.ts tests/tool-invocation-gateway.test.ts tests/tool-catalog-bridge.test.ts tests/plugin-dev-invocation-parity.test.ts tests/plugin-dev-service.test.ts tests/hub-media-routing.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p901-red.log`
+- 红灯原始结果：exit `1`；`8 failed` files、`14 failed / 90 passed` tests。失败分别证明旧实现会泄露内部路径/密钥片段、schema 错误无稳定 issue paths、能力不匹配缺少两侧事实、resolver 缺失与主动拒绝混同、Bridge/plugin-dev 缺失目标返回空值或旧普通错误、媒体凭证错误混同、Gateway 无结构化诊断日志，符合预期。
+- 中间门禁：首轮实现后 8 文件定向回归 exit `0`，`8 passed` files、`105 passed` tests；首次 typecheck exit `2`，仅 1 处联合类型未显式收窄；扩展回归首次 `177 passed / 1 failed`，既有 plugin-dev 工具测试仍期待缺失目标返回 `null`。改为断言稳定 `TARGET_NOT_FOUND` 后复跑。
+- 绿灯命令：本项 8 文件与目标身份/注册、生命周期、direct/deferred/MCP、Engine、媒体凭证、插件开发/管理/运行时共 19 文件 Vitest；`npm run typecheck`；全部改动文件 ESLint；`git diff --check`。
+- 绿灯原始结果：Vitest exit `0`，`19 passed` files、`283 passed` tests；三段 typecheck exit `0`；ESLint exit `0`（`0 errors / 313 warnings`，均为既有大文件与既有测试风格警告）；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p901-gate-final.log`、`/tmp/lingxi-tool-contract-p901-typecheck-final.log`、`/tmp/lingxi-tool-contract-p901-eslint.log`。
+- 提交 SHA：`pending (commit 后由下一项进度回填)`
+- 偏差：任务书没有为 P9-01 单列提交信息；按用户“每项提交并推送”的要求使用与本项内容一致的独立提交信息。
 
 ## 错误日志
 
@@ -352,13 +365,15 @@
 | 2026-09-05 17:25 +0800 | P7-02 全媒体回归 | 首次全媒体门禁 `467 passed / 13 failed`：两套语音观测夹具未暴露新解析门面 | 1 | 只补测试 Provider Registry 夹具；生产 STT 继续 fail-closed，最终全媒体 `482/482` |
 | 2026-09-05 17:47 +0800 | P8-01 | 首次 typecheck 报结果缓存键仍残留旧 `channel` 字段，exit `2` | 1 | 缓存身份只保留规范化的完整策略摘要，摘要已包含 channel；移除重复旧字段后重跑通过 |
 | 2026-09-05 17:50 +0800 | P8-01 指定门禁 | 首次指定门禁 `92 passed / 1 failed`：旧快速档测试仍只期望两个策略字段 | 1 | 按“完整 rerankPolicy”契约更新断言为 enabled、margin、deadline、maxDocuments 全字段；生产行为不放宽，最终 `94/94` 通过 |
+| 2026-09-05 18:10 +0800 | P9-01 | 首次 typecheck 报 1 处工具可用性联合类型未收窄，exit `2` | 1 | 改用显式真值判别；只修类型表达，运行逻辑不变，三段 typecheck 复跑 exit `0` |
+| 2026-09-05 18:10 +0800 | P9-01 扩展回归 | `177 passed / 1 failed`：既有 plugin-dev 工具测试仍期待缺失目标在权限阶段返回 `null` | 1 | 更新为断言稳定 `TARGET_NOT_FOUND`；不恢复空值/权限拒绝混同，最终扩展矩阵 `283/283` 通过 |
 
 ## 断点续跑自检
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P8-01 已完成红绿验证、指定门禁与受影响扩展回归，等待提交和推送 |
-| 接下来去哪？ | 使用任务书指定提交信息提交并推送 P8-01，回填 SHA 后进入 P9-01 |
+| 现在在哪里？ | P9-01 已完成红绿验证、错误契约与受影响扩展回归，等待提交和推送 |
+| 接下来去哪？ | 提交并推送 P9-01，回填 SHA 后进入 P9-02 raw execution 边界检查 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P7-02；P8-01 已让两条知识检索路径共用完整重排策略，指定门禁 `94/94`、受影响扩展回归 `52/52` |
+| 已做什么？ | 完成并推送 P0-00 至 P8-01；P9-01 已统一错误因果、稳定 issue paths、安全模型文案与结构化诊断，扩展矩阵 `283/283` |

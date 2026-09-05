@@ -115,6 +115,18 @@ function normalizeIssues(
   ));
 }
 
+function issueDetails(issues: ToolSchemaIssue[]): {
+  issues: ToolSchemaIssue[];
+  issuePaths: string[];
+} {
+  return {
+    issues,
+    issuePaths: [...new Set(issues.map((issue) => issue.path))],
+  };
+}
+
+const ROOT_SCHEMA_ISSUE = issueDetails([{ path: "/", message: "schema validation failed" }]);
+
 function invocationError(
   code: "TOOL_SCHEMA_INVALID" | "ARGUMENTS_NOT_OBJECT" | "ARGUMENT_SCHEMA_INVALID",
   message: string,
@@ -147,6 +159,7 @@ function normalizeSchema(schema: unknown, identity: ToolTargetIdentity): TSchema
       "Tool parameter schema must be a bounded plain JSON object.",
       identity,
       "direct",
+      ROOT_SCHEMA_ISSUE,
     );
   }
   const normalized = snapshot.value as TSchema;
@@ -157,7 +170,7 @@ function normalizeSchema(schema: unknown, identity: ToolTargetIdentity): TSchema
         "Tool parameter schema contains invalid schema fields.",
         identity,
         "direct",
-        { issues: normalizeIssues(Value.Errors(TOOL_SCHEMA_META_SCHEMA, normalized)) },
+        issueDetails(normalizeIssues(Value.Errors(TOOL_SCHEMA_META_SCHEMA, normalized))),
       );
     }
     for (const probe of SCHEMA_CONSUMPTION_PROBES) {
@@ -171,7 +184,7 @@ function normalizeSchema(schema: unknown, identity: ToolTargetIdentity): TSchema
       "Tool parameter schema cannot be consumed by the runtime validator.",
       identity,
       "direct",
-      undefined,
+      ROOT_SCHEMA_ISSUE,
       cause,
     );
   }
@@ -201,6 +214,7 @@ export function createToolSchemaValidator(
           "Tool arguments must be a bounded plain JSON object.",
           identity,
           route,
+          ROOT_SCHEMA_ISSUE,
         );
       }
       try {
@@ -212,7 +226,7 @@ export function createToolSchemaValidator(
           "Tool arguments do not match the registered parameter schema.",
           identity,
           route,
-          { issues: normalizeIssues(Value.Errors(normalizedSchema, argumentsValue)) },
+          issueDetails(normalizeIssues(Value.Errors(normalizedSchema, argumentsValue))),
         );
       } catch (cause) {
         if (cause instanceof ToolInvocationError) throw cause;
@@ -221,7 +235,7 @@ export function createToolSchemaValidator(
           "Tool arguments could not be validated against the registered parameter schema.",
           identity,
           route,
-          undefined,
+          ROOT_SCHEMA_ISSUE,
           cause,
         );
       }

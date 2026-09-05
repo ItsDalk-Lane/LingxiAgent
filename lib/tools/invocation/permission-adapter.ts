@@ -187,6 +187,12 @@ function mapResolutionFailure(
   throw permissionError(code, result.error.message, identity, {
     reason: result.error.reason,
     ...(result.error.field ? { field: result.error.field } : {}),
+    ...(code === "CAPABILITY_MISMATCH"
+      ? {
+        declaredCapability: result.error.declaredCapability ?? null,
+        capabilityBase: identity.capabilityBase,
+      }
+      : {}),
   });
 }
 

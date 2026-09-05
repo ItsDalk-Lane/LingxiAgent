@@ -10,7 +10,7 @@ import {
   ToolInvocationError,
 } from "../lib/tools/invocation/index.ts";
 
-function fixture() {
+function fixture(options: { log?: { error: (message: string) => void } } = {}) {
   const registry = new ToolTargetRegistry();
   const identity = createFirstPartyToolIdentity({
     publicName: "write_note",
@@ -62,7 +62,7 @@ function fixture() {
   };
   registry.register(target);
   const authorize = vi.fn(async () => undefined);
-  const gateway = new ToolInvocationGateway({ registry, authorize });
+  const gateway = new ToolInvocationGateway({ registry, authorize, log: options.log });
   const request = {
     targetId: identity.targetId,
     route: "direct" as const,
@@ -297,6 +297,33 @@ describe("规范化工具调用网关", () => {
     )).rejects.toSatisfy(
       (error: unknown) => (expectCode(error, "EXECUTION_CANCELLED"), true),
     );
+  });
+
+  it("错误日志只记录安全归因字段并包含路径、来源、目标、代次和错误码", async () => {
+    const log = { error: vi.fn() };
+    const data = fixture({ log });
+    data.target.executeCanonical.mockRejectedValueOnce(
+      new Error("failed at /Users/alice/.config/provider.json with sk-live-secret123"),
+    );
+    const prepared = data.gateway.resolvePermission(data.request);
+
+    await expect(runWithPreparedInvocation(
+      prepared,
+      () => data.gateway.invoke(data.request),
+    )).rejects.toMatchObject({ code: "TRANSPORT_FAILURE" });
+
+    expect(log.error).toHaveBeenCalledOnce();
+    const record = JSON.parse(log.error.mock.calls[0][0]);
+    expect(record).toEqual({
+      route: "direct",
+      origin: "first-party",
+      targetId: data.identity.targetId,
+      sourceId: "first-party",
+      generation: 3,
+      code: "TRANSPORT_FAILURE",
+    });
+    expect(log.error.mock.calls[0][0]).not.toContain("/Users/alice");
+    expect(log.error.mock.calls[0][0]).not.toContain("sk-live-secret123");
   });
 
   it("本地开发入口自行准备并只调用一次宿主审批", async () => {
