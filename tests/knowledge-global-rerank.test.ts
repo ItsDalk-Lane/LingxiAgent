@@ -6,13 +6,14 @@ afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); for (const close of 
 const ref = { provider: "fixture", id: "rerank" };
 
 describe("全局融合后单次重排", () => {
-  it("五个笔记本同一引用只调用一次，全局 FTS 也只有一次", async () => {
+  it("五个笔记本同一引用只调用一次，分层检索与补漏各执行一次", async () => {
     const rerank = vi.fn(async ({ documents }: { documents: string[] }) => ({ results: documents.map((_, i) => ({ index: documents.length - i - 1, score: documents.length - i })) }));
     const data = await createRerankFixture(Array(5).fill(ref), rerank); cleanups.push(data.close);
     const localFts = vi.spyOn(data.manager.indexStore, "search");
     const unfilteredFts = vi.spyOn(data.manager.indexStore, "searchReadyVariantIds");
     const result = await data.manager.searchService.search(data.request);
-    expect(localFts).toHaveBeenCalledTimes(1); expect(unfilteredFts).not.toHaveBeenCalled();
+    expect(localFts).toHaveBeenCalledTimes(1); expect(unfilteredFts).toHaveBeenCalledTimes(1);
+    expect(unfilteredFts.mock.calls[0][0].chunkIndexVariantIds).toEqual(expect.arrayContaining([...localFts.mock.calls[0][0].sectionIdsByChunkIndexVariantId!.keys()]));
     expect(localFts.mock.calls[0][0].sectionIdsByChunkIndexVariantId).toBeDefined();
     expect(rerank).toHaveBeenCalledTimes(1);
     expect(rerank.mock.calls[0][0].documents).toHaveLength(5);

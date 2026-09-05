@@ -13,7 +13,8 @@ function fixture() {
     ensureSessionLoaded: vi.fn(async () => session),
     promptSession: vi.fn(async () => {}), steerSession: vi.fn(() => true),
     isSessionStreaming: vi.fn(() => true), emitEvent: vi.fn(),
-    buildFastKnowledgeContext: vi.fn<(...args: any[]) => Promise<{ block: string; stats: typeof stats; evidence: typeof evidence }>>(async () => ({ block: "[KnowledgeContext]\nlocal\n[/KnowledgeContext]", stats, evidence })),
+    buildFastKnowledgeContext: vi.fn(),
+    buildConversationKnowledgeContext: vi.fn<(input: { signal: AbortSignal }) => Promise<{ block: string; stats: typeof stats; evidence: typeof evidence }>>(async () => ({ block: "[KnowledgeContext]\nlocal\n[/KnowledgeContext]", stats, evidence })),
     buildDetailedKnowledgeResearchContext: vi.fn(async () => ({ block: "[KnowledgeResearchContext]\ndetailed\n[/KnowledgeResearchContext]", stats: { ...stats, mode: "detailed", research: { status: "completed" } }, evidence })),
     buildKnowledgeContextInjection: vi.fn(),
     recordKnowledgeEvidenceManifest: vi.fn(),
@@ -23,21 +24,22 @@ function fixture() {
 
 for (const [name, submit] of [["普通发送", submitDesktopSessionMessage], ["追加消息", submitDesktopSessionInterjection]] as const) {
   describe(name, () => {
-    for (const mode of ["fast", "detailed"] as const) {
-      it(`${mode} 使用指定入口并传递取消信号，证据清单只在消息接受后保存`, async () => {
+    for (const mode of ["auto", "fast", "detailed"] as const) {
+      it(`${mode} 统一使用当前聊天入口并传递取消信号，证据清单只在消息接受后保存`, async () => {
         const { engine, session } = fixture();
         // 普通发送需要空闲会话；追加消息必须维持正在生成状态。
         engine.isSessionStreaming.mockReturnValue(name === "追加消息");
         await submit(engine, { sessionPath: `/tmp/route-${name}-${mode}.jsonl`, text: "审批", clientMessageId: "turn",
           knowledgeRefs: { notebookIds: ["notebook"], mode } });
-        const selected = mode === "fast" ? engine.buildFastKnowledgeContext : engine.buildDetailedKnowledgeResearchContext;
-        const unused = mode === "fast" ? engine.buildDetailedKnowledgeResearchContext : engine.buildFastKnowledgeContext;
+        const selected = engine.buildConversationKnowledgeContext;
+        const unused = engine.buildDetailedKnowledgeResearchContext;
         expect(selected).toHaveBeenCalledOnce();
         expect(unused).not.toHaveBeenCalled();
         expect(engine.buildKnowledgeContextInjection).not.toHaveBeenCalled();
-        expect(selected).toHaveBeenCalledWith({ question: "审批", knowledgeRefs: { notebookIds: ["notebook"], mode },
+        expect(engine.buildFastKnowledgeContext).not.toHaveBeenCalled();
+        expect(selected).toHaveBeenCalledWith({ knowledgeRefs: { notebookIds: ["notebook"], mode: "auto" },
           sessionPath: `/tmp/route-${name}-${mode}.jsonl`, turnId: "turn", signal: expect.any(AbortSignal),
-          ...(mode === "detailed" ? { sessionId: "session", agentId: "agent" } : {}),
+          sessionId: "session",
         });
         expect(engine.recordKnowledgeEvidenceManifest).toHaveBeenCalledOnce();
         expect(session.sessionManager.appendCustomEntry.mock.invocationCallOrder[0])
@@ -50,7 +52,7 @@ for (const [name, submit] of [["普通发送", submitDesktopSessionMessage], ["�
       engine.isSessionStreaming.mockReturnValue(name === "追加消息");
       const sessionPath = `/tmp/cancel-${name}.jsonl`;
       let signal: AbortSignal;
-      engine.buildFastKnowledgeContext.mockImplementationOnce((input: any) => new Promise<never>((_resolve, reject) => {
+      engine.buildConversationKnowledgeContext.mockImplementationOnce((input: { signal: AbortSignal }) => new Promise<never>((_resolve, reject) => {
         signal = input.signal;
         signal.addEventListener("abort", () => reject(signal.reason), { once: true });
       }));

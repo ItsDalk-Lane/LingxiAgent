@@ -42,8 +42,8 @@ function tempHome(prefix: string) {
   return dir;
 }
 
-afterEach(() => {
-  for (const manager of managers.splice(0)) manager.close();
+afterEach(async () => {
+  for (const manager of managers.splice(0)) await manager.close();
   for (const store of stores.splice(0)) store.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
@@ -545,7 +545,7 @@ describe("EvidenceManifest：写入失败不阻断会话提交", () => {
         promptSession: vi.fn(async (...args: any[]) => { void args; }),
         emitEvent: vi.fn(),
         setUiContext: vi.fn(),
-        buildDetailedKnowledgeResearchContext: vi.fn(async () => ({
+        buildConversationKnowledgeContext: vi.fn(async () => ({
           block: "[KnowledgeResearchContext]\ninjected\n[/KnowledgeResearchContext]",
           stats,
           evidence,
@@ -579,7 +579,7 @@ describe("EvidenceManifest：写入失败不阻断会话提交", () => {
       const engineNoScope = {
         ...engine,
         recordKnowledgeEvidenceManifest: recordNoScope,
-        buildDetailedKnowledgeResearchContext: vi.fn(async () => ({
+        buildConversationKnowledgeContext: vi.fn(async () => ({
           block: "[KnowledgeResearchContext]\ninjected\n[/KnowledgeResearchContext]",
           stats: { ...stats, scopeId: undefined },
           evidence,

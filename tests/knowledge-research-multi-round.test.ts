@@ -51,13 +51,13 @@ describe("研究按缺口继续", () => {
     expect(f.calls[1].options.research.searchPlan[0].query).toContain("矛盾");
   });
 
-  it("每轮虽有新证据仍不能越过四轮共享上限，来源要求不足保留部分状态", async () => {
+  it("每轮虽有新证据仍不能越过四轮共享上限，反证尚未核查时保留部分状态", async () => {
     let round = 0, needId = "";
     const f = await createResearchAgentFixture(async turn => {
       if (++round === 1) {
         await turn.call("knowledge_outline", { scopeId: turn.scopeId });
         needId = (await turn.call("knowledge_research_update", { runId: turn.runId,
-          createNeeds: [researchNeed("汇总项目依据", { minIndependentSources: 4 })] })).needs[0].id;
+          createNeeds: [researchNeed("汇总项目依据", { minIndependentSources: 3, requireCounterEvidence: true })] })).needs[0].id;
       }
       const index = (round - 1) % 3;
       await recordSourceEvidence(turn, needId, f.sources[index].sourceId, round === 4 ? "苹果项目交付日期" : f.sources[index].text);

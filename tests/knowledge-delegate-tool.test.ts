@@ -48,7 +48,7 @@ describe("knowledge_delegate 有界同步委派", () => {
     const result = parse(await data.tool.execute("delegate", { runId: data.run.id, tasks: [data.task()] }));
     expect(result).toMatchObject({ runId: data.run.id, status: "completed", tasks: [{ agentId: "agent-current", status: "completed", needIds: [data.need.id] }] });
     const [prompt, options] = data.executeIsolated.mock.calls[0];
-    const assignment = JSON.parse(prompt.slice(prompt.indexOf("\n") + 1));
+    const assignment = JSON.parse(prompt.slice(prompt.lastIndexOf("\n") + 1));
     expect(assignment).toMatchObject({ question: data.run.question, scopeId: data.scope.id, runId: data.run.id,
       needIds: [data.need.id], needs: [{ id: data.need.id, claim: data.need.claim, status: "uncovered" }] });
     expect(prompt).toContain("不得修改资料");

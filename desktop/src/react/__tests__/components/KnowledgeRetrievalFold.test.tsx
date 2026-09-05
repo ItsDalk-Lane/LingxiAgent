@@ -30,6 +30,8 @@ function t(key: string, vars?: Record<string, string | number>): string {
     'chat.knowledgeRetrievalShowMore': '显示更多（还有 {n} 条）',
     'processFold.summary': '✨ {name}忙活了一阵子',
     'processFold.tools': '{n} 个工具',
+    'processFold.knowledge': '{n} 次检索',
+    'chat.knowledgeResearchStopRounds': '已达到调查轮数上限',
     'processFold.thinking': '{n} 次思考',
     'processFold.unsuccessful': '{n} 次尝试未成功',
     'thinking.done': '思考完成',
@@ -163,7 +165,7 @@ describe('KnowledgeRetrievalFold（工具条样式检索步骤）', () => {
     render(<KnowledgeRetrievalFold retrieval={makeStats({ research: makeResearch({ status: 'partial',
       needsSupported: 1, needsPartial: 1, needsConflicted: 1,
       unresolvedNeedIds: ['need-partial', 'need-conflict', 'need-partial'], stopReason: 'round_budget_exhausted' }) })} />);
-    expect(screen.getByText('详细调查未完全完成 · 3 轮 · 仍有 2 项待确认')).toBeInTheDocument();
+    expect(screen.getByText('详细调查未完全完成 · 3 轮 · 仍有 2 项待确认 · 已达到调查轮数上限')).toBeInTheDocument();
     expect(screen.queryByText(/4\/4 项完成/)).not.toBeInTheDocument();
   });
 
@@ -304,7 +306,7 @@ describe('KnowledgeRetrievalFold（工具条样式检索步骤）', () => {
 
     // 检索算一步：0 工具 + 1 知识检索 → 「1 个工具」
     const summary = screen.getByRole('button', { name: /小花忙活了一阵子/ });
-    expect(summary).toHaveTextContent('1 个工具');
+    expect(summary).toHaveTextContent('1 次检索');
     expect(screen.queryByTestId('knowledge-retrieval-fold')).not.toBeInTheDocument();
 
     fireEvent.click(summary);

@@ -17,9 +17,9 @@ function tempHome() {
   return dir;
 }
 
-afterEach(() => {
+afterEach(async () => {
   vi.restoreAllMocks();
-  for (const manager of managers.splice(0)) manager.close();
+  for (const manager of managers.splice(0)) await manager.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -127,9 +127,9 @@ describe("knowledge_read 工具（KnowledgeTurnScope 契约）", () => {
     }));
     expect(payload.mode).toBe("ordinal-range");
     expect(payload.totalChunks).toBe(total);
-    expect(payload.chunks).toHaveLength(1);
-    expect(payload.chunks[0].ordinal).toBe(1);
-    expect(payload.chunks[0].text).toContain("苹果项目");
+    expect(payload.spans.length).toBeGreaterThan(0);
+    expect(payload.requestedRange).toEqual([1, 1]);
+    expect(payload.spans[0].text).toContain("苹果项目");
     // 读取锚定 scope 冻结的 snapshot/artifact 身份（§四十三）。
     expect(payload.scopeId).toBe(scope.id);
     expect(payload.parseArtifactId).toBe(artifact.id);
@@ -140,10 +140,9 @@ describe("knowledge_read 工具（KnowledgeTurnScope 契约）", () => {
       scopeId: scope.id,
       sourceId: imported.source.id,
     }));
-    expect(all.chunks).toHaveLength(total);
-    expect(all.chunks.map(chunk => chunk.ordinal)).toEqual(
-      Array.from({ length: total }, (_, index) => index + 1),
-    );
+    expect(all.spans.length).toBeGreaterThan(0);
+    expect(all.spans.every(span => span.citationMarkdown && span.blockId)).toBe(true);
+    expect(all.totalChunks).toBe(total);
   });
 
   it("按 query 检索该源（返回匹配片与 retrievalMode）", async () => {
@@ -163,8 +162,8 @@ describe("knowledge_read 工具（KnowledgeTurnScope 契约）", () => {
     expect(legacy).not.toHaveBeenCalled();
     expect(payload.mode).toBe("search");
     expect(payload.retrievalMode).toBe("fts");
-    expect(payload.matches.length).toBeGreaterThan(0);
-    expect(payload.matches[0].text).toContain("火星");
+    expect(payload.spans.length).toBeGreaterThan(0);
+    expect(payload.spans.map(span => span.text).join("\n")).toContain("火星");
   });
 
   it("越界与超额范围显式报错（带合法 ordinal 范围）", async () => {
@@ -403,8 +402,8 @@ describe("knowledge_read 工具（KnowledgeTurnScope 契约）", () => {
     // 本轮仍读冻结的 V1：身份与内容都是旧版本。
     expect(payload.parseArtifactId).toBe(artifactV1.id);
     expect(payload.contentSnapshotId).toBe(scope.sources[0].contentSnapshotId);
-    expect(payload.chunks.map(chunk => chunk.text).join("\n")).toContain("九月");
-    expect(payload.chunks.map(chunk => chunk.text).join("\n")).not.toContain("十月");
+    expect(payload.spans.map(chunk => chunk.text).join("\n")).toContain("九月");
+    expect(payload.spans.map(chunk => chunk.text).join("\n")).not.toContain("十月");
 
     // 新一轮 scope 才冻结到 V2。
     const scopeNext = createScope(manager, studioId, [notebook.id]);

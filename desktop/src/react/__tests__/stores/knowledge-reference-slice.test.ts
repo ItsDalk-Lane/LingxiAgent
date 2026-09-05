@@ -32,12 +32,12 @@ describe('knowledge-reference-slice', () => {
     expect(selectKnowledgeRefsForSession(slice as never, null)).toBeNull();
   });
 
-  it('toggle 添加引用，默认快速模式，并缓存名称', () => {
+  it('toggle 添加引用，默认连续查阅，并缓存名称', () => {
     slice.toggleKnowledgeNotebook('/session/a', 'nb-1', '笔记本一');
     expect(slice.knowledgeRefsBySession['/session/a']).toEqual({
       notebookIds: ['nb-1'],
       notebookNames: { 'nb-1': '笔记本一' },
-      mode: 'fast',
+      mode: 'auto',
     });
   });
 
@@ -63,7 +63,7 @@ describe('knowledge-reference-slice', () => {
     expect(slice.knowledgeRefsBySession['/session/a']).toEqual({
       notebookIds: ['nb-2'],
       notebookNames: { 'nb-2': '二' },
-      mode: 'fast',
+      mode: 'auto',
     });
     slice.removeKnowledgeNotebook('/session/a', 'nb-2');
     expect(slice.knowledgeRefsBySession['/session/a']).toBeUndefined();
@@ -98,7 +98,7 @@ describe('knowledge-reference-slice', () => {
     expect(selectKnowledgeRefsForSession(slice as never, '/session/a')).toEqual({
       notebookIds: ['nb-1'],
       notebookNames: { 'nb-1': '一' },
-      mode: 'fast',
+      mode: 'auto',
     });
     expect(selectKnowledgeRefsForSession(slice as never, '/session/b')).toEqual({
       notebookIds: ['nb-2'],

@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:01923b378ab07195c438fed0cb0fc356da0c4061c7d2e270a8946c97e4875cc0",
+  "payloadFingerprint": "sha256:0ffafa9a1f3c3a892a59a5db98cb9269f58168bd2f945cc81e234d7e669c387c",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3292,8 +3292,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "研究隔离会话通过公开工厂补齐独立的空扩展运行载体；只改变内存组装，不改变会话文件字段、数据库结构、数据代际或迁移策略。",
-    "payloadFingerprint": "sha256:01923b378ab07195c438fed0cb0fc356da0c4061c7d2e270a8946c97e4875cc0"
+    "compatibilityReason": "知识库连续查阅、可设置分块及后台停止收尾沿用现有数据表和列；旧分块与向量索引继续可读，新增取消归属筛选仅复用已有取消字段，数据版本保持1。",
+    "payloadFingerprint": "sha256:0ffafa9a1f3c3a892a59a5db98cb9269f58168bd2f945cc81e234d7e669c387c"
   },
   "schemas": [
     {
@@ -3907,7 +3907,7 @@
         ],
         "userVersion": 19
       },
-      "sourceHash": "sha256:cdbc32afac4299145dcc7543104257331203f54835ec3a5f8ad3d3ddb8fce074",
+      "sourceHash": "sha256:f7b42df857acc24a5e9797689c917b127ef75b1fa68a7af8552f9864439a87a2",
       "storeId": "knowledge-database"
     },
     {
@@ -3939,21 +3939,21 @@
       "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:0a277c8691a1cf899a3cf4de4e5c8ece615c74bfdc1e4472c772dd8005539142",
+      "sourceHash": "sha256:df40d70c89c5bd2403b1361ff3a62c81210bdb04a86b1ab7bb76888a8f691af2",
       "storeId": "knowledge-parse-artifacts"
     },
     {
       "contract": "ProcessingArtifact output files (binary office formats converted to structured text) referenced by knowledge.db processing_artifacts rows, with locatorMap held in the database",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:0a277c8691a1cf899a3cf4de4e5c8ece615c74bfdc1e4472c772dd8005539142",
+      "sourceHash": "sha256:df40d70c89c5bd2403b1361ff3a62c81210bdb04a86b1ab7bb76888a8f691af2",
       "storeId": "knowledge-processing-artifacts"
     },
     {
       "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:0a277c8691a1cf899a3cf4de4e5c8ece615c74bfdc1e4472c772dd8005539142",
+      "sourceHash": "sha256:df40d70c89c5bd2403b1361ff3a62c81210bdb04a86b1ab7bb76888a8f691af2",
       "storeId": "knowledge-source-snapshots"
     },
     {
@@ -4306,7 +4306,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:55e9a77a3b348c75a637cdec2cf7fb24c057807ac619d326d960ba8f4593d24c"
+          "sourceHash": "sha256:42daf2488c6ff1f96ac0258fd8940db915ae09020bcac0a319c80c4bb0f83dcc"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",

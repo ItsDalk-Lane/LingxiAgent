@@ -134,10 +134,11 @@ describe("Research 冻结原文读取凭据", () => {
 });
 
 describe("Research knowledge_read 和 knowledge_grep 凭据接线", () => {
-  it("普通读取和扫描保持原返回、不写凭据；搜索摘要本身始终没有凭据", async () => {
+  it("普通读取、扫描和搜索提供引用链接，但不写研究凭据", async () => {
     const data = await toolSetup();
     const read = payload(await createKnowledgeReadTool(data.deps).execute("ordinary-read", { scopeId: data.scope.id, sourceId: data.source.id }));
-    expect(read.chunks[0]).not.toHaveProperty("spans");
+    expect(read.spans[0]).not.toHaveProperty("receiptId");
+    expect(read.spans[0].citationMarkdown).toContain("](");
     const grep = payload(await createKnowledgeGrepTool(data.deps).execute("ordinary-grep", { scopeId: data.scope.id, pattern: "needle" }));
     expect(grep.matches[0]).not.toHaveProperty("receiptId");
     const search = payload(await data.makeTool().execute("search", data.params));
@@ -216,8 +217,7 @@ describe("Research knowledge_read 和 knowledge_grep 凭据接线", () => {
     const grep = payload(await createKnowledgeGrepTool(deps).execute("grep-empty", { scopeId: data.scope.id, pattern: "没有这个词" }));
     expect(grep.matches).toEqual([]);
     const aborted = new AbortController(); aborted.abort();
-    const read = await createKnowledgeReadTool(deps).execute("read-cancelled", { scopeId: data.scope.id, sourceId: data.source.id }, aborted.signal);
-    expect(read.isError).toBe(true);
+    await expect(createKnowledgeReadTool(deps).execute("read-cancelled", { scopeId: data.scope.id, sourceId: data.source.id }, aborted.signal)).rejects.toBe(aborted.signal.reason);
     expect(receiptCount(data.manager.store)).toBe(0);
   });
 });

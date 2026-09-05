@@ -39,8 +39,8 @@ async function installLocalVectors(manager: KnowledgeManager, studioId: string, 
   return { embed, vector: vi.spyOn(manager.vectorIndex, "search") };
 }
 
-function expectOnlyPublicSearchFields(payload: Record<string, unknown>) {
-  expect(Object.keys(payload).sort()).toEqual(["scopeId", "query", "mode", "vectorBackend", "citationNotice", "hits", "degradedReasons"].sort());
+function expectOnlyPublicSearchFields(payload: Record<string, unknown>, budget = false) {
+  expect(Object.keys(payload).sort()).toEqual(["scopeId", "query", "mode", "vectorBackend", "citationNotice", "readingNotice", "hits", "degradedReasons", ...(budget ? ["remainingBudget"] : [])].sort());
 }
 
 describe("研究搜索的真实内部检索身份", () => {
@@ -51,7 +51,7 @@ describe("研究搜索的真实内部检索身份", () => {
     const search = vi.spyOn(f.manager.searchService, "search");
     const withEvidence = vi.spyOn(f.manager.searchService, "searchWithEvidence");
     const tool = createKnowledgeSearchTool({ getKnowledge: () => f.manager, getStudioId: () => f.studioId,
-      resolveSessionContext: () => f.session, onSearchCompleted: completed });
+      resolveSessionContext: () => f.session, resolveResearchContext: () => ({ runId: "research", actorSessionId: "root" }), onSearchCompleted: completed });
     const result = await tool.execute("research-search", f.params);
     expect(result.isError).toBeUndefined();
     expect(result.details).toEqual({ scopeId: f.scope.id });
@@ -98,12 +98,14 @@ describe("研究搜索的真实内部检索身份", () => {
     expect(completed).toHaveBeenCalledTimes(2);
   });
 
-  it("普通工具继续调用原搜索门面，不增加任何公开字段", async () => {
+  it("普通工具通过带身份的搜索门面返回可引用原文", async () => {
     const f = await searchToolFixture(); fixtures.push(f);
-    const search = vi.spyOn(f.manager.searchService, "search");
+    const search = vi.spyOn(f.manager.searchService, "searchWithEvidence");
     const result = await f.makeTool().execute("ordinary-search", f.params);
     expect(result.isError).toBeUndefined(); expect(search).toHaveBeenCalledTimes(1);
-    expectOnlyPublicSearchFields(JSON.parse(result.content[0].text));
+    const ordinary = JSON.parse(result.content[0].text);
+    expect(ordinary.hits[0].spans[0].citationMarkdown).toContain("](");
+    expect(ordinary).not.toHaveProperty("searchedVectorVariants");
     expect(result.details).toEqual({ scopeId: f.scope.id });
   });
 
@@ -113,7 +115,7 @@ describe("研究搜索的真实内部检索身份", () => {
       if (turn.role === "worker") {
         const need = f.research.getNeed(turn.runId, turn.options.research.allowedNeedIds[0]);
         const search = await turn.call("knowledge_search", { scopeId: turn.scopeId, query: need.ordinal === 0 ? "日期" : "预算" });
-        expectOnlyPublicSearchFields(search); expect(search.mode).toBe("hybrid");
+        expectOnlyPublicSearchFields(search, true); expect(search.mode).toBe("hybrid");
         await recordSourceEvidence(turn, need.id, f.sources[need.ordinal].sourceId, need.ordinal === 0 ? "九月十五日" : "三十二万元");
         return;
       }
@@ -137,14 +139,15 @@ describe("研究搜索的真实内部检索身份", () => {
     expect(embed).toHaveBeenCalledTimes(2); expect(vector.mock.calls.filter(([input]) => input.chunkIds === undefined)).toHaveLength(2);
     expect(vector.mock.calls.filter(([input]) => input.chunkIds !== undefined)).toHaveLength(2);
     const actualIds = [...new Set(vector.mock.calls.flatMap(([input]) => input.vectorIndexVariantIds as string[]))].sort();
-    // 分层检索只查询各问题实际命中的来源，第三份无关资料不参与向量召回。
-    expect(actualIds).toHaveLength(2);
+    // 正文补漏允许查询冻结范围内其他来源，统计必须覆盖实际访问的全部向量身份。
+    expect(actualIds).toHaveLength(3);
     for (const [summary] of completed.mock.calls.slice(1)) {
       expect(summary.mode).toBe("hybrid"); expect(summary.vectorBackend).toBe("portable");
-      expect(summary.searchedVectorVariants).toHaveLength(1);
-      expect(actualIds).toContain(summary.searchedVectorVariants[0].vectorIndexVariantId);
-      expect(f.request.compiledScope.sources.filter(source => f.sources.slice(0, 2).some(item => item.sourceId === source.sourceId)).map(source => source.parseArtifactId)).toContain(summary.searchedVectorVariants[0].parseArtifactId);
-      expect(summary.searchedVectorVariants[0].parseArtifactId).not.toBe(f.request.compiledScope.sources.find(source => source.sourceId === f.sources[2].sourceId)!.parseArtifactId);
+      expect(summary.searchedVectorVariants.length).toBeGreaterThan(0);
+      for (const identity of summary.searchedVectorVariants) {
+        expect(actualIds).toContain(identity.vectorIndexVariantId);
+        expect(f.request.compiledScope.sources.map(source => source.parseArtifactId)).toContain(identity.parseArtifactId);
+      }
       expect(JSON.stringify(summary)).not.toContain("苹果项目");
     }
     const actions = f.research.listActions(result.run.id).filter(action => action.actionType === "knowledge_search");

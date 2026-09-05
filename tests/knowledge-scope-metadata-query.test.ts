@@ -7,9 +7,9 @@ import { createMetadataFixture } from "./helpers/knowledge-metadata-fixture.ts";
 
 const homes: string[] = [];
 const managers: KnowledgeManager[] = [];
-afterEach(() => {
+afterEach(async () => {
   vi.restoreAllMocks();
-  for (const manager of managers.splice(0)) manager.close();
+  for (const manager of managers.splice(0)) await manager.close();
   for (const home of homes.splice(0)) fs.rmSync(home, { recursive: true, force: true });
 });
 async function fixture() {

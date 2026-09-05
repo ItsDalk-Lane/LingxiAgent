@@ -161,7 +161,7 @@ describe("KnowledgeStore v9：ChunkProfile / RetrievalProfile", () => {
     expect(first.id).toBe(`cp_${knowledgeChunkerConfigId("markdown", 1500)}`);
     expect(first.profileHash).toBe(knowledgeChunkerConfigId("markdown", 1500));
     expect(first.profileType).toBe("standard");
-    expect(first.chunkerVersion).toBe("3");
+    expect(first.chunkerVersion).toBe("4");
     expect(first.targetCharsSource).toBe("explicit");
 
     const again = store.findOrCreateChunkProfile({

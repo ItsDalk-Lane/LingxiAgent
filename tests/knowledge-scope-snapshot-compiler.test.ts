@@ -10,9 +10,9 @@ const homes: string[] = [];
 const studioId = "compiler-studio";
 const sessionPath = "/tmp/compiler-session.jsonl";
 
-afterEach(() => {
+afterEach(async () => {
   vi.restoreAllMocks();
-  for (const manager of managers.splice(0)) manager.close();
+  for (const manager of managers.splice(0)) await manager.close();
   for (const home of homes.splice(0)) fs.rmSync(home, { recursive: true, force: true });
 });
 

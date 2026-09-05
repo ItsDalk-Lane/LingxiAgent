@@ -21,9 +21,9 @@ function tempHome() {
   return dir;
 }
 
-afterEach(() => {
+afterEach(async () => {
   vi.restoreAllMocks();
-  for (const manager of managers.splice(0)) manager.close();
+  for (const manager of managers.splice(0)) await manager.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -43,14 +43,14 @@ const MARKDOWN_TEXT = [
  * 带 heading 结构的 ready 源：markdown 文件导入 + parseSource（blocks 带
  * headingPath），返回 manager/notebook/imported/artifact。
  */
-async function setupMarkdownSource(options: { parse?: boolean } = {}) {
+async function setupMarkdownSource(options: { parse?: boolean; text?: string } = {}) {
   const studioId = "studio-a";
   const manager = new KnowledgeManager({ lingxiHome: tempHome() });
   managers.push(manager);
   const notebook = manager.createNotebook({ studioId, name: "资料" });
   const filesDir = tempHome();
   const filePath = path.join(filesDir, "项目.md");
-  fs.writeFileSync(filePath, MARKDOWN_TEXT, "utf8");
+  fs.writeFileSync(filePath, options.text ?? MARKDOWN_TEXT, "utf8");
   const imported = await manager.importFile({ studioId, notebookId: notebook.id, filePath });
   const artifact = options.parse === false
     ? null
@@ -254,13 +254,13 @@ describe("knowledge_grep 工具（冻结原文确定性扫描）", () => {
     expect(match.parseArtifactId).toBe(artifact!.id);
     expect(typeof match.blockId).toBe("string");
     expect(match.headingPath).toEqual(["交付计划"]);
-    expect(match.match).toBe("预算");
-    expect(match.snippet).toContain("八百万元");
+    expect(match.text).toContain("预算");
+    expect(match.text).toContain("八百万元");
     expect(match.offset).toBeGreaterThanOrEqual(0);
     expect(match.lineNumber).toBeGreaterThanOrEqual(1);
     const blocks = manager.listArtifactBlocks({ studioId, parseArtifactId: artifact!.id });
     const block = blocks.find(item => item.id === match.blockId)!;
-    expect(block.text.slice(match.offset, match.endOffset)).toBe(match.match);
+    expect(block.text.slice(match.offset, match.endOffset)).toBe("预算");
     expect(payload.scannedChars).toBe(blocks.reduce((sum, item) => sum + item.text.length, 0));
     expect(payload.matchedSourceCount).toBe(1);
   });
@@ -277,7 +277,7 @@ describe("knowledge_grep 工具（冻结原文确定性扫描）", () => {
     }));
     expect(regexp.mode).toBe("regexp");
     expect(regexp.totalMatches).toBe(2);
-    expect(regexp.matches.map(match => match.match).sort()).toEqual(["负责人是李雷", "负责人是王芳"]);
+    expect(regexp.matches.map(match => match.text.match(/负责人是(?:王芳|李雷)/u)?.[0]).sort()).toEqual(["负责人是李雷", "负责人是王芳"]);
 
     // headingFilter 前缀匹配：只扫「风险登记」节。
     const filtered = parseResult(await tool.execute("call-2", {
@@ -309,9 +309,16 @@ describe("knowledge_grep 工具（冻结原文确定性扫描）", () => {
       maxResults: 1,
     }));
     expect(capped.matches).toHaveLength(1);
-    expect(capped.totalMatches).toBe(3);
+    expect(capped.totalMatches).toBe(1);
     expect(capped.truncated).toBe(true);
-    expect(capped.notice).toContain("maxResults=1");
+    const pages = [...capped.matches];
+    let next = capped.next;
+    while (next) {
+      const page = parseResult(await tool.execute("next", next));
+      pages.push(...page.matches); next = page.next;
+    }
+    expect(pages).toHaveLength(3);
+    expect(new Set(pages.map(match => `${match.blockId}:${match.offset}`)).size).toBe(3);
 
     // 非法 regexp / maxResults / pattern 超长 / 空 pattern。
     const badRegex = await tool.execute("call-2", { scopeId: scope.id, pattern: "([unclosed", regexp: true });
@@ -386,19 +393,20 @@ it("grep 为宿主提供精确可回读位置；保留空白、长匹配截断�
   const { manager, studioId, notebook, imported, artifact } = await setupMarkdownSource();
   const scope = createScope(manager, studioId, [notebook.id]);
   const result = await makeGrepTool(manager, studioId).execute("receipt-hook", { scopeId: scope.id, pattern: "预算" });
-  const readSpans = (result.details as any).readSpans;
+  const readSpans = parseResult(result).matches.map(match => ({ ...match, startOffset: match.textStartOffset, endOffset: match.textEndOffset, canonicalText: match.text }));
   expect(readSpans).toHaveLength(1);
   const blocks = manager.listArtifactBlocks({ studioId, parseArtifactId: artifact!.id });
   for (const span of readSpans) {
-    expect(span).toMatchObject({ sourceId: imported.source.id, contentSnapshotId: scope.sources[0].contentSnapshotId, parseArtifactId: artifact!.id });
+    expect(span).toMatchObject({ sourceId: imported.source.id, parseArtifactId: artifact!.id });
     expect(blocks.find(block => block.id === span.blockId)!.text.slice(span.startOffset, span.endOffset)).toBe(span.canonicalText);
     expect(result.content[0].text).toContain(span.canonicalText);
   }
-  vi.spyOn(manager, "listArtifactBlocks").mockReturnValue([{ ...blocks[0], text: "前缀  空白\n" + "x".repeat(300) }]);
-  const long = parseResult(await makeGrepTool(manager, studioId).execute("long", { scopeId: scope.id, pattern: "x+", regexp: true }));
+  const longSource = await setupMarkdownSource({ text: "前缀  空白 " + "x".repeat(300) });
+  const longScope = createScope(longSource.manager, studioId, [longSource.notebook.id]);
+  const long = parseResult(await makeGrepTool(longSource.manager, studioId).execute("long", { scopeId: longScope.id, pattern: "x+", regexp: true }));
   expect(long.matches[0].endOffset - long.matches[0].offset).toBe(300);
-  expect(long.matches[0].matchTruncated).toBe(true); expect(long.matches[0].match).toHaveLength(200);
-  expect(long.matches[0].snippet).toContain("前缀  空白\n");
+  expect(long.matches[0].matchTruncated).toBe(true); expect(long.matches[0].text.length).toBeGreaterThanOrEqual(200);
+  expect(long.matches[0].text).toContain("前缀  空白 ");
 });
 
 it("grep 扫描预算只计实际扫描的字符，保留中断来源已有结果及匹配来源数", async () => {
@@ -409,8 +417,9 @@ it("grep 扫描预算只计实际扫描的字符，保留中断来源已有结�
     { ...blocks[0], text: "预算" }, { ...blocks[1], text: "x".repeat(4_000_001) },
   ]);
   const payload = parseResult(await makeGrepTool(manager, studioId).execute("bounded", { scopeId: scope.id, pattern: "预算" }));
-  expect(payload.scanTruncated).toBe(true); expect(payload.scannedChars).toBe(2);
-  expect(payload.scannedSources).toHaveLength(1); expect(payload.scannedSources[0]).toMatchObject({ scannedChars: 2, matchCount: 1 });
+  expect(payload.scanTruncated).toBe(true); expect(payload.scannedChars).toBe(4_000_000);
+  expect(payload.scannedSourceCount).toBe(1);
+  expect(payload.next.scanCursor.offset).toBe(3_999_998);
   expect(payload.totalMatches).toBe(1); expect(payload.matchedSourceCount).toBe(1);
 });
 

@@ -67,6 +67,7 @@ async function setup() {
     buildTools, getHomeCwd: () => directory, getConfig: () => ({}), getPrefs: () => ({ getThinkingLevel: () => "off" }),
     emitEvent: vi.fn(), emitDevLog: vi.fn(), agentIdFromSessionPath: () => owner.id,
     switchAgentOnly: async () => {}, getActivityStore: () => null, sessionManifestStore: manifests });
+  coordinator._sessions.set(main.sessionId, { session: { model: model } });
   // 透传侦测仅保留真实装配结果，不能用替身会话绕过第三方组装。
   const assembled = vi.spyOn(sdk, "createAgentSession");
   function optionsFor(surface: typeof surfaces[number]) {
@@ -77,6 +78,7 @@ async function setup() {
     const parent = manifests.createForPath({ sessionPath: parentPath, ownerAgentId: owner.id, domain: "subagent",
       kind: "knowledge_research_root", lifecycle: "active", provenance: { parentSessionId: main.sessionId,
         studioId: research.studioId, researchContext: { runId: research.runId, scopeId: research.scopeId, role: "root" } } });
+    coordinator._researchModelsBySession.set(parent.sessionId, model);
     return { surface, parentSessionPath: parentPath, parentSessionId: parent.sessionId,
       research: { ...research, allowedNeedIds: ["need-a"], allowedSourceIds: ["source-a"],
         ...(surface === "knowledge_completeness_worker"

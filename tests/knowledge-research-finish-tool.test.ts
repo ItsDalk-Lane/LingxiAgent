@@ -66,8 +66,10 @@ describe("研究结束申请只能由宿主核准", () => {
     const f = setup(); const need = f.need(); f.support(need.id);
     const result = payload(await f.finish());
     expect(result).toEqual({ runId: f.run.id, accepted: true, requestedStopReason: "complete",
-      stopReason: "complete", status: "completed" });
-    expect(f.onFinishAccepted).toHaveBeenCalledExactlyOnceWith(result, f.context);
+      stopReason: "complete", status: "completed", remainingBudget: { shared: true, toolCalls: 31, wallClockMs: expect.any(Number) } });
+    const { remainingBudget, ...decision } = result;
+    expect(remainingBudget).toMatchObject({ shared: true, toolCalls: 31 });
+    expect(f.onFinishAccepted).toHaveBeenCalledExactlyOnceWith(decision, f.context);
     expect(f.research.requireRun(f.run.id).status).not.toBe("completed");
     expect(f.research.requireRun(f.run.id).toolCallsUsed).toBe(1);
   });
@@ -114,7 +116,9 @@ describe("研究结束申请只能由宿主核准", () => {
     const f = setup(); f.need(); f.rounds([1, 1, 1, 1]);
     const result = payload(await f.finish("budget_exhausted"));
     expect(result).toMatchObject({ accepted: true, stopReason: "round_budget_exhausted", status: "partial" });
-    expect(f.onFinishAccepted).toHaveBeenCalledExactlyOnceWith(result, f.context);
+    const { remainingBudget, ...decision } = result;
+    expect(remainingBudget).toMatchObject({ shared: true, toolCalls: 31 });
+    expect(f.onFinishAccepted).toHaveBeenCalledExactlyOnceWith(decision, f.context);
   });
 
   it.each(["complete", "budget_exhausted"])("第32次调用申请 %s 时只能按真实工具预算部分结束", async (reason) => {
@@ -150,7 +154,9 @@ describe("研究结束申请只能由宿主核准", () => {
     const f = setup(); f.need(); f.rounds([1, 0, 0]);
     const result = payload(await f.finish("no_progress"));
     expect(result).toMatchObject({ accepted: true, stopReason: "no_progress", status: "partial" });
-    expect(f.onFinishAccepted).toHaveBeenCalledExactlyOnceWith(result, f.context);
+    const { remainingBudget, ...decision } = result;
+    expect(remainingBudget).toMatchObject({ shared: true, toolCalls: 31 });
+    expect(f.onFinishAccepted).toHaveBeenCalledExactlyOnceWith(decision, f.context);
     expect(f.research.requireRun(f.run.id).status).not.toBe("completed");
   });
 

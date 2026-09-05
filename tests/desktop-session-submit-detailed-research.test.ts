@@ -36,7 +36,7 @@ function fixture(interject: boolean) {
     getSessionManifest: vi.fn((id: string) => manifests.getBySessionId(id)),
     ensureSessionLoaded: vi.fn(async () => session), isSessionStreaming: vi.fn(() => interject),
     promptSession: vi.fn(async () => {}), steerSession: vi.fn(() => true), emitEvent: vi.fn(),
-    buildDetailedKnowledgeResearchContext: vi.fn<(input: { signal: AbortSignal }) => Promise<ReturnType<typeof result>>>(async () => result()),
+    buildConversationKnowledgeContext: vi.fn<(input: { signal: AbortSignal }) => Promise<ReturnType<typeof result>>>(async () => result()),
     buildKnowledgeContextInjection: vi.fn(async () => { throw new Error("详细模式不得进入旧调查路径"); }),
     buildFastKnowledgeContext: vi.fn(async () => { throw new Error("详细模式不得进入快速路径"); }),
     recordKnowledgeEvidenceManifest: vi.fn(),
@@ -46,21 +46,21 @@ function fixture(interject: boolean) {
 }
 
 for (const [name, submit, interject] of [["普通发送", submitDesktopSessionMessage, false], ["追加消息", submitDesktopSessionInterjection, true]] as const) {
-  describe(`${name}的详细调查`, () => {
+  describe(`${name}的连续查阅准备`, () => {
     for (const status of ["completed", "partial"] as const) {
       it(`等待${status}材料再提交，身份来自真实会话登记且不调用旧路径`, async () => {
         const f = fixture(interject);
         let resolve!: (value: ReturnType<typeof result>) => void;
-        f.engine.buildDetailedKnowledgeResearchContext.mockImplementation(() => new Promise(done => { resolve = done; }));
+        f.engine.buildConversationKnowledgeContext.mockImplementation(() => new Promise(done => { resolve = done; }));
         const untrustedExtra = { ...f.opts, agentId: "模型伪造的Agent" };
         const pending = submit(f.engine, untrustedExtra);
         await vi.waitFor(() => expect(resolve).toBeTypeOf("function"));
         expect(f.engine.promptSession).not.toHaveBeenCalled();
         expect(f.engine.steerSession).not.toHaveBeenCalled();
         expect(f.session.sessionManager.appendCustomEntry).not.toHaveBeenCalled();
-        expect(f.engine.buildDetailedKnowledgeResearchContext).toHaveBeenCalledWith({ question: f.opts.text,
-          knowledgeRefs: f.opts.knowledgeRefs, sessionId: f.manifest.sessionId, sessionPath: f.sessionPath,
-          agentId: f.manifest.ownerAgentId, turnId: f.opts.clientMessageId, signal: expect.any(AbortSignal) });
+        expect(f.engine.buildConversationKnowledgeContext).toHaveBeenCalledWith({
+          knowledgeRefs: { ...f.opts.knowledgeRefs, mode: "auto" }, sessionId: f.manifest.sessionId, sessionPath: f.sessionPath,
+          turnId: f.opts.clientMessageId, signal: expect.any(AbortSignal) });
         const material = result(status); resolve(material); await pending;
         expect(interject ? f.engine.steerSession : f.engine.promptSession).toHaveBeenCalledWith(
           f.sessionPath, `${material.block}\n\n${f.opts.text}`, ...(interject ? [] : [undefined]));
@@ -73,7 +73,7 @@ for (const [name, submit, interject] of [["普通发送", submitDesktopSessionMe
     it("保留调查的真实失败，不用空知识继续回答，并释放提交登记", async () => {
       const f = fixture(interject);
       const failure = new KnowledgeError("KNOWLEDGE_MODEL_UNAVAILABLE", "调查模型不可用", { researchStatus: "failed" });
-      f.engine.buildDetailedKnowledgeResearchContext.mockRejectedValueOnce(failure);
+      f.engine.buildConversationKnowledgeContext.mockRejectedValueOnce(failure);
       await expect(submit(f.engine, f.opts)).rejects.toBe(failure);
       expect(f.engine.promptSession).not.toHaveBeenCalled(); expect(f.engine.steerSession).not.toHaveBeenCalled();
       expect(f.engine.recordKnowledgeEvidenceManifest).not.toHaveBeenCalled();
@@ -86,7 +86,7 @@ for (const [name, submit, interject] of [["普通发送", submitDesktopSessionMe
     it("停止后等待研究真实清理，不进入主回答且保留中止结果", async () => {
       const f = fixture(interject);
       let signal!: AbortSignal; let cleanup!: () => void; let settled = false;
-      f.engine.buildDetailedKnowledgeResearchContext.mockImplementationOnce(input => new Promise((_resolve, reject) => {
+      f.engine.buildConversationKnowledgeContext.mockImplementationOnce(input => new Promise((_resolve, reject) => {
         signal = input.signal;
         signal.addEventListener("abort", () => { cleanup = () => reject(signal.reason); }, { once: true });
       }));
@@ -107,7 +107,7 @@ for (const [name, submit, interject] of [["普通发送", submitDesktopSessionMe
       const f = fixture(interject);
       const failure = new Error("临时调查会话清理失败");
       let signal!: AbortSignal;
-      f.engine.buildDetailedKnowledgeResearchContext.mockImplementationOnce(input => new Promise((_resolve, reject) => {
+      f.engine.buildConversationKnowledgeContext.mockImplementationOnce(input => new Promise((_resolve, reject) => {
         signal = input.signal;
         signal.addEventListener("abort", () => reject(failure), { once: true });
       }));
@@ -121,8 +121,8 @@ for (const [name, submit, interject] of [["普通发送", submitDesktopSessionMe
     });
 
     for (const status of ["failed", "cancelled"] as const) {
-      it(`拒绝把${status}状态当成可回答材料`, async () => {
-        const f = fixture(interject); f.engine.buildDetailedKnowledgeResearchContext.mockResolvedValueOnce(result(status));
+      it(`资料准备${status}时显式拒绝`, async () => {
+        const f = fixture(interject); f.engine.buildConversationKnowledgeContext.mockRejectedValueOnce(new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", `准备资料${status}`));
         await expect(submit(f.engine, f.opts)).rejects.toThrow();
         expect(f.engine.promptSession).not.toHaveBeenCalled(); expect(f.engine.steerSession).not.toHaveBeenCalled();
         expect(f.session.sessionManager.appendCustomEntry).not.toHaveBeenCalled();
@@ -133,10 +133,10 @@ for (const [name, submit, interject] of [["普通发送", submitDesktopSessionMe
       const f = fixture(interject);
       f.engine.getSessionIdForPath.mockReturnValueOnce(null);
       await expect(submit(f.engine, f.opts)).rejects.toThrow();
-      expect(f.engine.buildDetailedKnowledgeResearchContext).not.toHaveBeenCalled();
+      expect(f.engine.buildConversationKnowledgeContext).not.toHaveBeenCalled();
       await submit(f.engine, { ...f.opts, clientMessageId: undefined });
-      expect(f.engine.buildDetailedKnowledgeResearchContext).toHaveBeenCalledWith(expect.objectContaining({
-        sessionId: f.manifest.sessionId, agentId: "real-agent", turnId: expect.stringMatching(/^[0-9a-f]{8}-[0-9a-f-]{27}$/),
+      expect(f.engine.buildConversationKnowledgeContext).toHaveBeenCalledWith(expect.objectContaining({
+        sessionId: f.manifest.sessionId, turnId: expect.stringMatching(/^[0-9a-f]{8}-[0-9a-f-]{27}$/),
       }));
     });
 
@@ -149,7 +149,7 @@ for (const [name, submit, interject] of [["普通发送", submitDesktopSessionMe
         expect(abortPendingDesktopSubmission(f.engine, { sessionId: f.manifest.sessionId })).toBe(true);
         loaded();
         expect(await pending).toEqual({ text: null, toolMedia: [] });
-        expect(f.engine.buildDetailedKnowledgeResearchContext).not.toHaveBeenCalled();
+        expect(f.engine.buildConversationKnowledgeContext).not.toHaveBeenCalled();
         expect(f.engine.promptSession).not.toHaveBeenCalled();
       });
     }

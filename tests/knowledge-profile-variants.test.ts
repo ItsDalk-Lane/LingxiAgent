@@ -28,8 +28,8 @@ function tempHome() {
   return dir;
 }
 
-afterEach(() => {
-  for (const manager of managers.splice(0)) manager.close();
+afterEach(async () => {
+  for (const manager of managers.splice(0)) await manager.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -170,10 +170,10 @@ describe("Profile-aware Index（任务书 §八十九 ①②③⑦）", () => {
 
     // 互不覆盖：B 的变体建立后 A 的 chunk 集原样保留。
     const chunksB = manager.indexStore.listVariantChunks(variantB.variant!.id);
-    expect(chunksA).toHaveLength(24);
-    expect(chunksB).toHaveLength(24);
+    expect(chunksA).toHaveLength(6);
+    expect(chunksB.length).toBeGreaterThan(chunksA.length);
     expect(chunksB.map(({ text, sectionId, spans }) => ({ text, sectionId, spans })))
-      .toEqual(chunksA.map(({ text, sectionId, spans }) => ({ text, sectionId, spans })));
+      .not.toEqual(chunksA.map(({ text, sectionId, spans }) => ({ text, sectionId, spans })));
     expect(chunksB.every(chunk => !chunksA.some(original => original.id === chunk.id))).toBe(true);
     const blocks = new Map(manager.store.listArtifactBlocks({ studioId, parseArtifactId: artifactId }).map(block => [block.id, block]));
     for (const chunks of [chunksA, chunksB]) {
@@ -182,13 +182,12 @@ describe("Profile-aware Index（任务书 §八十九 ①②③⑦）", () => {
       expect(sectionIds.every(id => typeof id === "string" && id.length > 0)).toBe(true);
       for (const sectionId of sectionIds) {
         const sectionChunks = chunks.filter(chunk => chunk.sectionId === sectionId);
-        expect(sectionChunks).toHaveLength(4);
-        expect(sectionChunks.slice(0, -1).every(chunk => chunk.tokenCount >= 511)).toBe(true);
+        expect(sectionChunks.length).toBe(chunks === chunksA ? 1 : 7);
       }
       for (const chunk of chunks) {
         expect(chunk.tokenCount).toBe(estimateTextTokens(chunk.text));
         expect(chunk.tokenCount).toBeGreaterThan(0);
-        expect(chunk.tokenCount).toBeLessThanOrEqual(512);
+        expect([...chunk.text].length).toBeLessThanOrEqual(chunks === chunksA ? 5000 : 300);
         expect(chunk.spans.length).toBeGreaterThan(0);
         for (const span of chunk.spans) {
           expect(chunk.text.slice(span.chunkStartOffset, span.chunkEndOffset))
@@ -298,7 +297,7 @@ describe("Profile-aware Index（任务书 §八十九 ①②③⑦）", () => {
     const { chunkProfile } = resolveVariant(manager, studioId, notebook.id, artifactId);
     const civ = knowledgeChunkIndexVariantId(artifactId, chunkProfile.profileHash);
     const chunksBefore = manager.indexStore.listVariantChunks(civ);
-    expect(chunksBefore).toHaveLength(24);
+    expect(chunksBefore).toHaveLength(6);
     const vivEmb1 = knowledgeVectorIndexVariantId(civ, modelKeyOf("fake", "emb-1"));
     expect(manager.vectorIndex.getVariant(vivEmb1)).toMatchObject({
       chunkIndexVariantId: civ,
@@ -326,7 +325,7 @@ describe("Profile-aware Index（任务书 §八十九 ①②③⑦）", () => {
     expect(resolveVariant(manager, studioId, notebook.id, artifactId).variant!.id).toBe(civ);
     const secondModelTexts = embedCalls.filter(call => call.modelId === "emb-2").flatMap(call => call.texts);
     expect(secondModelTexts.length).toBeGreaterThan(0);
-    expect(secondModelTexts.every(text => estimateTextTokens(text) <= 512)).toBe(true);
+    expect(secondModelTexts.every(text => [...text].length <= 2048)).toBe(true);
     expect(secondModelTexts.every(text => chunksBefore.some(chunk => chunk.text === text))).toBe(true);
 
     const vivEmb2 = knowledgeVectorIndexVariantId(civ, modelKeyOf("fake", "emb-2"));

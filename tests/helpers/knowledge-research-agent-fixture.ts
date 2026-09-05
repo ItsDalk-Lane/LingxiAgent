@@ -6,7 +6,7 @@ import { SessionManifestStore } from "../../core/session-manifest/store.ts";
 import { KnowledgeManager } from "../../lib/knowledge/knowledge-manager.ts";
 import { ResearchStore } from "../../lib/knowledge/research/research-store.ts";
 import { resolveKnowledgeChunkerConfig } from "../../lib/knowledge/chunker.ts";
-import { resolveKnowledgeExecutionPolicy } from "../../shared/knowledge-execution.ts";
+import { deriveKnowledgeCompletenessPolicy } from "../../lib/knowledge/research/completeness-policy.ts";
 import type { KnowledgeResearchRequest } from "../../lib/knowledge/research/knowledge-research-orchestrator.ts";
 
 export interface ResearchModelTurn {
@@ -83,7 +83,8 @@ export async function createResearchAgentFixture(driver: (turn: ResearchModelTur
     _cb: { getEngine: () => engine, listActiveAgents: () => [{ id: "agent-a" }, { id: "agent-b" }], executeIsolated },
   });
   const request: KnowledgeResearchRequest = { question, compiledScope,
-    policy: resolveKnowledgeExecutionPolicy({ mode: "detailed", question, selectedNotebookCount: 1, selectedSourceCount: sources.length }),
+    policy: { mode: "detailed", path: "detailed_research", responseDetail: "detailed", retrievalDeadlineMs: null,
+      completenessPolicy: deriveKnowledgeCompletenessPolicy({ mode: "detailed", question, selectedNotebookCount: 1, selectedSourceCount: sources.length }) },
     parentSessionId: main.sessionId, parentSessionPath: mainPath, agentId: "agent-a", turnId: scope.turnId };
   return { manager, research, sources, calls, sessionPaths, manifests, executeIsolated, request,
     async close() { await manager.close(); manifests.close(); fs.rmSync(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); },

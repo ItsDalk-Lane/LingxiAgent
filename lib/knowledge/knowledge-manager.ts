@@ -1872,6 +1872,8 @@ export class KnowledgeManager {
   close(): Promise<void> {
     if (this.closePromise) return this.closePromise;
     this.searchService.close();
+    // 立即拒绝新查询，已有摄入任务仍可在关库前完成收尾。
+    this.scopeCompiler.dispose();
     if (this.metadataBackfill) clearImmediate(this.metadataBackfill);
     this.metadataBackfill = null;
     if (this.backgroundReindexScan) clearImmediate(this.backgroundReindexScan);
@@ -1889,7 +1891,6 @@ export class KnowledgeManager {
     this.closePromise = (async () => {
       // 解析、向量写入和任务状态收尾全部退出后再关库，保留真实的断点结果。
       await stopped;
-      this.scopeCompiler.dispose();
       await this.vectorSearchBackend.close();
       this.vectorIndex.close();
       this.indexStore.close();

@@ -9,10 +9,10 @@ import type { KnowledgeModelRef } from "../lib/knowledge/types.ts";
 
 const homes: string[] = [], managers: KnowledgeManager[] = [];
 const services: KnowledgeSearchService[] = [];
-afterEach(() => {
+afterEach(async () => {
   vi.restoreAllMocks();
   for (const service of services.splice(0)) service.close();
-  for (const manager of managers.splice(0)) manager.close();
+  for (const manager of managers.splice(0)) await manager.close();
   for (const home of homes.splice(0)) fs.rmSync(home, { recursive: true, force: true });
 });
 async function fixture(modelCount = 1) {

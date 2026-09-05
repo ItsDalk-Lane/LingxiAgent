@@ -12,19 +12,19 @@ import { resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
 const managers: KnowledgeManager[] = [];
 const homes: string[] = [];
 const studioId = "span-studio";
-afterEach(() => {
+afterEach(async () => {
   vi.restoreAllMocks();
-  for (const manager of managers.splice(0)) manager.close();
+  for (const manager of managers.splice(0)) await manager.close();
   for (const home of homes.splice(0)) fs.rmSync(home, { recursive: true, force: true });
 });
 
-async function fixture(texts: string[], locator: Record<string, unknown> = {}, locatorType: KnowledgeBlockDraft["locatorType"] = "text") {
+async function fixture(texts: string[], locator: Record<string, unknown> = {}, locatorType: KnowledgeBlockDraft["locatorType"] = "text", targetChars = 100_000) {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-evidence-span-"));
   homes.push(home);
   const manager = new KnowledgeManager({ lingxiHome: home });
   managers.push(manager);
   const notebook = manager.createNotebook({ studioId, name: "原文" });
-  manager.updateNotebookSettings({ studioId, notebookId: notebook.id, chunkTargetChars: 100_000 });
+  manager.updateNotebookSettings({ studioId, notebookId: notebook.id, chunkTargetChars: targetChars });
   const imported = await manager.importPastedText({ studioId, notebookId: notebook.id, text: texts.join("\n"), displayName: "原始资料" });
   const artifact = manager.store.beginParseArtifact({ studioId, contentSnapshotId: imported.snapshot.id,
     parserId: "span-fixture", parserVersion: "1", parserConfigHash: "a".repeat(64) });
@@ -34,16 +34,16 @@ async function fixture(texts: string[], locator: Record<string, unknown> = {}, l
   });
   // 这里检验提取器，保留上面明确给定的解析块；不让文本解析器重新拆段或覆盖页码。
   const blocks = manager.store.listArtifactBlocks({ studioId, parseArtifactId: artifact.id });
-  const config = resolveKnowledgeChunkerConfig(blocks, { targetChars: 100_000 });
+  const config = resolveKnowledgeChunkerConfig(blocks, { targetChars });
   manager.store.resolveNotebookRetrievalProfile({ studioId, notebookId: notebook.id, strategy: config.strategy });
-  manager.queryService.indexArtifactForIngestion(studioId, artifact.id, { targetChars: 100_000 });
+  manager.queryService.indexArtifactForIngestion(studioId, artifact.id, { targetChars });
   const scope = manager.createTurnScope({ studioId, sessionPath: "/tmp/span-session.jsonl", notebookIds: [notebook.id] });
   const compiledScope = await manager.compileTurnScope(scope);
   return { manager, compiledScope, blocks, artifact };
 }
 
-async function extract(texts: string[], query: string, locator: Record<string, unknown> = {}, locatorType: KnowledgeBlockDraft["locatorType"] = "text") {
-  const result = await fixture(texts, locator, locatorType);
+async function extract(texts: string[], query: string, locator: Record<string, unknown> = {}, locatorType: KnowledgeBlockDraft["locatorType"] = "text", targetChars = 100_000) {
+  const result = await fixture(texts, locator, locatorType, targetChars);
   const hits = result.manager.queryService.searchCompiledScopeFts({ compiledScope: result.compiledScope, query, limit: 24 });
   const spans = result.manager.queryService.extractEvidenceSpans({ compiledScope: result.compiledScope, hits, query });
   return { ...result, hits, spans };
@@ -96,9 +96,9 @@ describe("精确证据范围", () => {
     const text = "背景说明内容很多。".repeat(20) + "批准发布需要两位负责人同意。" + "后续归档要求明确。".repeat(20);
     expect(estimateTextTokens(text)).toBeGreaterThan(320);
     expect(estimateTextTokens(text)).toBeLessThanOrEqual(512);
-    const { spans, hits, blocks } = await extract([text], "批准发布 两位负责人");
+    const { spans, hits, blocks } = await extract([text], "批准发布 两位负责人", {}, "text", 2048);
     expect(hits).toHaveLength(1);
-    expect(spans[0].text).toContain("批准发布需要两位负责人同意。");
+    expect(spans[0].text).toContain("批准发布需要两位负责人同意");
     expect(spans[0].text.endsWith("。")).toBe(true);
     expect(spans[0].startOffset === 0 || text[spans[0].startOffset - 1] === "。").toBe(true);
     expect(estimateTextTokens(spans[0].text)).toBeLessThanOrEqual(320);
@@ -106,11 +106,11 @@ describe("精确证据范围", () => {
   });
 
   it("新片段在句中结束时保留精确原文边界，不补标点伪造完整句", async () => {
-    const text = "背景说明内容很多。".repeat(80) + "批准发布需要两位负责人同意。" + "后续归档要求明确。".repeat(80);
-    const { spans, hits, blocks } = await extract([text], "批准发布 两位负责人");
+    const text = "背景说明".repeat(190) + "批准发布需要两位负责人同意" + "后续归档要求明确".repeat(350);
+    const { spans, hits, blocks } = await extract([text], "批准发布 两位负责人", {}, "text", 2048);
     expect(hits.some(hit => hit.spans.some(location => location.blockEndOffset < text.length
       && text[location.blockEndOffset - 1] !== "。"))).toBe(true);
-    expect(spans[0].text).toContain("批准发布需要两位负责人同意。");
+    expect(spans[0].text).toContain("批准发布需要两位负责人同意");
     for (const span of spans) {
       expect(span.text).toBe(blocks[0].text.slice(span.startOffset, span.endOffset));
       expect(span.textSha256).toBe(crypto.createHash("sha256").update(span.text).digest("hex"));

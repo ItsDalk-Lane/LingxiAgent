@@ -39,8 +39,8 @@ const tempDirs: string[] = [];
 const managers: KnowledgeManager[] = [];
 const stores: KnowledgeStore[] = [];
 
-afterEach(() => {
-  for (const manager of managers.splice(0)) manager.close();
+afterEach(async () => {
+  for (const manager of managers.splice(0)) await manager.close();
   for (const store of stores.splice(0)) store.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });

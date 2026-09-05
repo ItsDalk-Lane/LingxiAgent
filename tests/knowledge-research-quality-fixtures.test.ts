@@ -113,6 +113,11 @@ describe("P2 七组真实研究质量资料", () => {
             linkEvidence: [{ needId: need.id, receiptId: read.chunks[0].spans[0].receiptId,
               quote: "松舟完全免费并且无条件退款", relation: "supports", rationale: "试图伪造原句" }] });
           expect(attemptedQuote).toMatchObject({ isError: true, errorCode: "KNOWLEDGE_MODEL_OUTPUT_INVALID" });
+          const corrected = await turn.call("knowledge_research_update", { runId: turn.runId,
+            linkEvidence: [{ needId: need.id, receiptId: read.chunks.flatMap(chunk => chunk.spans).find(span => span.text.includes(quotes[0])).receiptId,
+              quote: quotes[0], relation: "supports", rationale: "用同一凭据纠正伪造引文" }] });
+          expect(corrected.isError).toBeUndefined();
+          return;
         }
         expect((await readQualityQuote(turn, need.id, source.sourceId, quotes[need.ordinal])).isError).toBeUndefined();
         return;

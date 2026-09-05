@@ -43,7 +43,7 @@ function expectChunksExact(blocks: KnowledgeBlock[], sections: KnowledgeSectionD
   for (const [ordinal, chunk] of chunks.entries()) {
     expect(chunk.ordinal).toBe(ordinal);
     expect(chunk.tokenCount).toBe(estimateTextTokens(chunk.text));
-    expect(chunk.tokenCount).toBeLessThanOrEqual(512);
+    expect([...chunk.text].length).toBeLessThanOrEqual(2048);
     const section = sections.find(item => item.id === chunk.sectionId);
     expect(section).toBeDefined(); expect(chunk.spans.length).toBeGreaterThan(0);
     for (const span of chunk.spans) {
@@ -59,16 +59,17 @@ function expectChunksExact(blocks: KnowledgeBlock[], sections: KnowledgeSectionD
   for (const counts of covered.values()) expect([...counts].every(count => count >= 1)).toBe(true);
 }
 
-describe("v3章节和原文片段的固定粒度", () => {
+describe("v4章节边界与可设置的原文片段长度", () => {
   it("锁定版本与预算，固定默认不随历史大模型窗口放大", () => {
     expect([KNOWLEDGE_CHUNKER_VERSION, KNOWLEDGE_CHUNK_TARGET_CHARS, KNOWLEDGE_SPAN_TARGET_TOKENS,
-      KNOWLEDGE_SPAN_OVERLAP_TOKENS, KNOWLEDGE_SECTION_SOFT_MAX_TOKENS]).toEqual(["3", 2048, 512, 64, 8192]);
+      KNOWLEDGE_SPAN_OVERLAP_TOKENS, KNOWLEDGE_SECTION_SOFT_MAX_TOKENS]).toEqual(["4", 2048, 512, 64, 8192]);
     const blocks = [block(0, "大窗口不能扩大原文片段。".repeat(2500))];
     const normal = buildKnowledgeChunks(artifactId, blocks);
     const fromHugeLegacyWindow = buildKnowledgeChunks(artifactId, blocks, { targetChars: computeAutoChunkTargetChars(1_000_000) });
     expect(resolveKnowledgeChunkerConfig(blocks).targetChars).toBe(2048);
-    expect(fromHugeLegacyWindow.map(chunk => chunk.text)).toEqual(normal.map(chunk => chunk.text));
-    expect(fromHugeLegacyWindow.every(chunk => chunk.tokenCount <= 512)).toBe(true);
+    expect(fromHugeLegacyWindow.length).toBeLessThan(normal.length);
+    expect([...new Set(fromHugeLegacyWindow.map(chunk => chunk.sectionId))]).toEqual([...new Set(normal.map(chunk => chunk.sectionId))]);
+    expect(normal.every(chunk => [...chunk.text].length <= 2048)).toBe(true);
     expect(fromHugeLegacyWindow.map(chunk => chunk.id)).not.toEqual(normal.map(chunk => chunk.id));
   });
 
@@ -136,15 +137,14 @@ describe("v3章节和原文片段的固定粒度", () => {
 
   it.each(["abcdefghij".repeat(1000),
     "The service processes each request in order and records the original result without dropping evidence. ".repeat(100),
-    "甲".repeat(3000), "𠮷😀".repeat(1500)])("相邻片段共享约64词元原文，完整片段约512词元且偏移精确", text => {
+    "甲".repeat(3000), "𠮷😀".repeat(1500)])("相邻片段共享256字符，优先语句边界且偏移精确", text => {
     const blocks = [block(0, text)], sections = buildKnowledgeSections(artifactId, blocks), chunks = buildKnowledgeChunks(artifactId, blocks);
     expect(sections).toHaveLength(1); expect(chunks.length).toBeGreaterThan(1);
     for (let index = 0; index < chunks.length - 1; index++) {
-      expect(chunks[index].tokenCount).toBeGreaterThanOrEqual(511);
+      expect([...chunks[index].text].length).toBeGreaterThanOrEqual(Math.floor(2048 * 0.6));
       const previous = chunks[index].spans[0], next = chunks[index + 1].spans[0];
       const overlap = text.slice(next.blockStartOffset, previous.blockEndOffset);
-      expect(estimateTextTokens(overlap)).toBeGreaterThanOrEqual(63);
-      expect(estimateTextTokens(overlap)).toBeLessThanOrEqual(64);
+      expect([...overlap].length).toBe(256);
       expect(next.blockStartOffset).toBeGreaterThan(previous.blockStartOffset);
     }
     expectChunksExact(blocks, sections, chunks);
@@ -157,13 +157,13 @@ describe("v3章节和原文片段的固定粒度", () => {
     expectChunksExact(blocks, sections, chunks); expectSectionsComplete(blocks, sections);
   });
 
-  it("重复生成和排序输入得到相同身份，v3配置与v2身份互不覆盖", () => {
+  it("重复生成和排序输入得到相同身份，v4配置与旧版身份互不覆盖", () => {
     const blocks = [block(0, "第一章"), block(1, "同一资料".repeat(700))];
     const chunks = buildKnowledgeChunks(artifactId, blocks);
     expect(buildKnowledgeSections(artifactId, [...blocks].reverse())).toEqual(buildKnowledgeSections(artifactId, blocks));
     expect(buildKnowledgeChunks(artifactId, structuredClone(blocks))).toEqual(chunks);
     const config = resolveKnowledgeChunkerConfig(blocks);
-    expect(config.configId).toBe(crypto.createHash("sha256").update("3text2048").digest("hex").slice(0, 16));
+    expect(config.configId).toBe(crypto.createHash("sha256").update("4text2048").digest("hex").slice(0, 16));
     expect(config.configId).not.toBe(legacyKnowledgeChunkerConfigId("text", 2048));
     const legacy = buildLegacyKnowledgeChunks(artifactId, blocks, { targetChars: 2048 });
     expect(chunks.every(chunk => !legacy.some(old => old.id === chunk.id))).toBe(true);
@@ -179,7 +179,7 @@ describe("v3章节和原文片段的固定粒度", () => {
     expect(knowledgeChunkerConfigId("fixed", 1200, { legacyVersion: "2" })).toBe(legacyKnowledgeChunkerConfigId("fixed", 1200));
     expect(knowledgeBlockFingerprint(blocks, { legacyVersion: "2" })).toBe(legacyKnowledgeBlockFingerprint(blocks));
     expect(legacy.every(chunk => chunk.sectionId === undefined)).toBe(true);
-    expect(buildKnowledgeChunks(artifactId, blocks).every(chunk => chunk.sectionId && chunk.tokenCount <= 512)).toBe(true);
+    expect(buildKnowledgeChunks(artifactId, blocks).every(chunk => chunk.sectionId && [...chunk.text].length <= 2048)).toBe(true);
   });
 
   it("空内容块仍有唯一章节归属，不伪造非空片段或引用", () => {

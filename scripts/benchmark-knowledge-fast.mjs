@@ -87,14 +87,14 @@ export async function runKnowledgeFastBenchmark({ sizes = [10_000, 100_000], hot
         // 首次调用只预热，不混入热缓存分位数。
         await measure(manager, frozenScope, 1);
         hot = await measure(manager, frozenScope, hotRuns);
-      } finally { manager.close(); }
+      } finally { await manager.close(); }
       for (let index = 0; index < coldRuns; index++) {
         const start = performance.now();
         manager = openManager(home, size);
         try {
           const measured = await measure(manager, turnScope(manager, notebookId), 1);
           coldSamples.push({ ...measured.samples[0], totalMs: performance.now() - start });
-        } finally { manager.close(); }
+        } finally { await manager.close(); }
       }
       const cold = { samples: coldSamples, percentiles: summarize(coldSamples),
         remoteModelCalls: Math.max(...coldSamples.map(x => x.remoteModelCalls)),

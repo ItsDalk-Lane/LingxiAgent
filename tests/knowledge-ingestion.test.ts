@@ -27,8 +27,8 @@ function untrack(manager: KnowledgeManager) {
   if (index >= 0) managers.splice(index, 1);
 }
 
-afterEach(() => {
-  for (const manager of managers.splice(0)) manager.close();
+afterEach(async () => {
+  for (const manager of managers.splice(0)) await manager.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -114,7 +114,7 @@ describe("Knowledge 摄入管线", () => {
       notebook.id,
       "苹果项目的交付日期是九月十五日。\n火星项目的预算是八百万元。",
     );
-    expect(job).toMatchObject({ status: "queued", phase: "parse", artifactId: artifact.id });
+    expect(job).toMatchObject({ status: "queued", phase: "chunk", artifactId: artifact.id });
     // 入队即记录触发方笔记本的分块配置指纹（按真实 blocks 计算）。
     const blocks = manager.listArtifactBlocks({ studioId, parseArtifactId: artifact.id });
     expect(job.chunkerConfigId).toBe(resolveKnowledgeChunkerConfig(blocks, { targetChars: KNOWLEDGE_CHUNK_TARGET_CHARS }).configId);
@@ -376,11 +376,11 @@ describe("Knowledge 摄入管线", () => {
 describe("Embedding 批级 checkpoint 恢复（§九十，Phase 3）", () => {
   /**
    * 100 chunk 语料：text 章节策略，100 行 "第N章 …"（每行一章一节一 chunk），
-   * 每行 120 字符 ≤ softCap(targetChars×1.5=150)，合计恰好 100 个 chunk（两批：64 + 36）。
+   * 每行 90 字符 ≤ targetChars=100，合计恰好 100 个 chunk（两批：64 + 36）。
    */
   function hundredChunkText(): string {
     return Array.from({ length: 100 }, (_, index) => (
-      `第${index + 1}章恢复测试语料`.padEnd(120, "填")
+      `第${index + 1}章恢复测试语料`.padEnd(90, "填")
     )).join("\n");
   }
 

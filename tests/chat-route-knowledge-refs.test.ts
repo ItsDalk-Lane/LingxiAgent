@@ -93,7 +93,7 @@ describe("chat route knowledgeRefs handling", () => {
 
     expect(hub.send).toHaveBeenCalledTimes(1);
     expect(hub.send.mock.calls[0][1]).toEqual(expect.objectContaining({
-      knowledgeRefs: { notebookIds: ["nb-1", "nb-2"], mode: "fast" },
+      knowledgeRefs: { notebookIds: ["nb-1", "nb-2"], mode: "auto" },
     }));
     expect(sentErrors(ws)).toEqual([]);
   });

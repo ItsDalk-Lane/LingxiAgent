@@ -1,4 +1,6 @@
 :global(.md-content) a.badge {
+  --knowledge-citation-accent: #69a9ec;
+  --knowledge-citation-text: #438bd4;
   position: relative;
   top: -0.45em;
   display: inline-flex;
@@ -11,8 +13,8 @@
   margin: 0 0.12em;
   border: 0;
   border-radius: 999px;
-  background: color-mix(in srgb, #69a9ec 22%, var(--bg-card));
-  color: color-mix(in srgb, #438bd4 80%, var(--text));
+  background: color-mix(in srgb, var(--knowledge-citation-accent) 22%, var(--bg-card));
+  color: color-mix(in srgb, var(--knowledge-citation-text) 80%, var(--text));
   font-size: 75%;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
@@ -25,45 +27,53 @@
 
 :global(.md-content) a.badge:hover,
 :global(.md-content) a.badge:focus-visible {
-  background: color-mix(in srgb, #69a9ec 34%, var(--bg-card));
+  background: color-mix(in srgb, var(--knowledge-citation-accent) 34%, var(--bg-card));
   text-decoration: none;
 }
 
 :global(.md-content) a.badge:focus-visible {
-  outline: 2px solid #69a9ec;
+  outline: 2px solid var(--knowledge-citation-accent);
   outline-offset: 2px;
 }
 
 .preview {
+  --knowledge-citation-accent: #69a9ec;
+  --knowledge-citation-preview-gutter: 16px;
+  --knowledge-citation-preview-padding: 12px;
+  --knowledge-citation-preview-radius: 8px;
+  --knowledge-citation-preview-shadow: 0 6px 22px rgba(0, 0, 0, 0.16);
+  --knowledge-citation-preview-gap: 8px;
+  --knowledge-citation-preview-title-gap: 7px;
+  --knowledge-citation-retry-padding: 3px 7px;
   position: fixed;
   z-index: 2147483001;
   box-sizing: border-box;
   width: 20rem;
-  max-width: calc(100vw - 16px);
-  max-height: calc(100vh - 16px);
+  max-width: calc(100vw - var(--knowledge-citation-preview-gutter));
+  max-height: calc(100vh - var(--knowledge-citation-preview-gutter));
   overflow: auto;
-  padding: 12px;
+  padding: var(--knowledge-citation-preview-padding);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--knowledge-citation-preview-radius);
   background: var(--bg-card);
   color: var(--text);
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.16);
+  box-shadow: var(--knowledge-citation-preview-shadow);
   font-family: inherit;
   -webkit-app-region: no-drag;
   user-select: text;
 }
 
 .preview:focus-visible {
-  outline: 2px solid #69a9ec;
+  outline: 2px solid var(--knowledge-citation-accent);
   outline-offset: 2px;
 }
 
 .header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--knowledge-citation-preview-gap);
   min-width: 0;
-  margin-bottom: 7px;
+  margin-bottom: var(--knowledge-citation-preview-title-gap);
 }
 
 .fileIcon {
@@ -102,13 +112,13 @@
 }
 
 .status p {
-  margin: 0 0 8px;
+  margin: 0 0 var(--knowledge-citation-preview-gap);
 }
 
 .retry {
   border: 0;
   border-radius: 4px;
-  padding: 3px 7px;
+  padding: var(--knowledge-citation-retry-padding);
   background: var(--bg);
   color: var(--text);
   font: inherit;

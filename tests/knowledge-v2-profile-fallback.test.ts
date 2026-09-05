@@ -49,7 +49,7 @@ describe("v3 重建期间继续使用真实 v2 索引", () => {
     const fullRead = vi.spyOn(f.manager.store, "listArtifactBlocks");
     const compiled = await f.manager.compileTurnScope(f.scope);
     expect(compiled.readyChunkVariantIds.sort()).toEqual(f.sources.map(source => source.variant.id).sort());
-    expect(compiled.warnings.filter(warning => warning.includes("v2_fallback_rebuild_pending"))).toHaveLength(2);
+    expect(compiled.warnings.filter(warning => warning.includes("previous_chunk_version_rebuild_pending"))).toHaveLength(2);
     expect(writes).not.toHaveBeenCalled(); expect(fullRead).not.toHaveBeenCalled();
     const result = await f.manager.runFastKnowledgePipeline({ scope: f.scope, question: "苹果交付" });
     expect(result.stats.remoteModelCalls).toBe(0);

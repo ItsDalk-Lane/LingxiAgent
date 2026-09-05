@@ -15,7 +15,7 @@ describe("来源、章节、片段分层检索", () => {
     expect(result.remoteModelCalls).toBe(0); for (const spy of spies) expect(spy).not.toHaveBeenCalled();
   });
 
-  it("默认章节FTS上限12，并为标题命中的另一来源保留至少一个章节", async () => {
+  it("章节导航上限12，正文补漏保留其余命中与另一来源标题线索", async () => {
     const f = await fixture([
       { name: "many.txt", sections: Array.from({ length: 16 }, (_, index) => ({ heading: `章节${index}`, text: `needle 事实 ${index}` })) },
       { name: "needle-title.txt", sections: [{ heading: "只有标题命中", text: "正文不含查询词" }] },
@@ -27,9 +27,10 @@ describe("来源、章节、片段分层检索", () => {
     const filters = spanSearch.mock.calls[0][0].sectionIdsByChunkIndexVariantId!;
     expect(filters.get(f.sources[0].variantId)).toHaveLength(12);
     expect(filters.get(f.sources[1].variantId)).toEqual([f.sources[1].sections[0].id]);
-    expect(result.hits.filter(hit => hit.grain === "span")).toHaveLength(12);
+    expect(result.hits.filter(hit => hit.grain === "span")).toHaveLength(16);
     expect(result.hits.filter(hit => hit.grain === "source")).toHaveLength(1);
-    expect(result.hits.every(hit => filters.get(hit.chunkIndexVariantId)?.includes(hit.sectionId!))).toBe(true);
+    expect(result.hits.filter(hit => hit.grain === "span").map(hit => hit.sectionId).sort()).toEqual(f.sources[0].sections.map(section => section.id).sort());
+    expect(result.hits.filter(hit => hit.grain === "source").every(hit => filters.get(hit.chunkIndexVariantId)?.includes(hit.sectionId!))).toBe(true);
   });
 
   it("显式章节过滤在SQL的LIMIT之前执行，其他高频章节不能挤掉目标", async () => {

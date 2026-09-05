@@ -1,0 +1,53 @@
+{
+  "version": "0.1.34",
+  "stage": "feature-premerge",
+  "branch": "feat/knowledge-retrieval-research-p0-p3",
+  "implementationBase": "31afdea04d431fadbc1a43a847dd71f1a07e8a4f",
+  "fullSuite": {
+    "command": "npm test -- --maxWorkers=4 --exclude tests/post-verification-audit-seal.test.ts --reporter=json --outputFile=/tmp/lingxi-release-full2.json",
+    "exitCode": 0,
+    "passed": 13756,
+    "failed": 0,
+    "existingSkipped": 7,
+    "durationSeconds": 195.847,
+    "seal": "checked separately after source commit"
+  },
+  "additionalTests": {
+    "conversationContext": 3,
+    "citationPreview": 2,
+    "failed": 0
+  },
+  "typecheck": {
+    "exitCode": 0,
+    "log": "/tmp/lingxi-typecheck-final.log"
+  },
+  "lint": {
+    "exitCode": 0,
+    "log": "/tmp/lingxi-lint-final.log"
+  },
+  "boundary": {
+    "exitCode": 0,
+    "log": "/tmp/lingxi-boundary.log"
+  },
+  "clientBuild": {
+    "exitCode": 0,
+    "log": "/tmp/lingxi-build-client.log"
+  },
+  "localPack": {
+    "exitCode": 0,
+    "platform": "darwin-arm64",
+    "log": "/tmp/lingxi-release-pack.log",
+    "signing": "ephemeral artifact key and ad-hoc application signing; notarization skipped only for local validation",
+    "electronSource": "installed matching node_modules/electron/dist"
+  },
+  "openServerBuild": {
+    "exitCode": 0,
+    "log": "/tmp/lingxi-open-build.log"
+  },
+  "remoteRelease": "NOT_EXECUTED",
+  "notes": [
+    "Previous failed full run retained at /tmp/lingxi-vitest.json; no failures are represented as passing.",
+    "Final source coordinate and seal checks are recorded in PROGRESS.md.",
+    "Local validation does not replace four-platform release checks."
+  ]
+}

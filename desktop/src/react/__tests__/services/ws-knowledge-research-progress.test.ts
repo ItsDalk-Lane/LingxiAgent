@@ -81,7 +81,7 @@ describe('研究实时进度使用真实聊天缓冲', () => {
       'knowledge_research_worker', 'knowledge_research_worker', 'knowledge_research_progress', 'knowledge_research_review', 'knowledge_research_synthesis']);
     expect(cards().filter(card => !card.done).map(card => card.name)).toEqual(['knowledge_research_synthesis']);
     expect(cards().find(card => card.name === 'knowledge_research_review')?.resultNote).toBe('1 项矛盾 · 1 项待确认');
-    expect(cards().at(-1)?.resultNote).toBe('详细调查未完全完成 · 1 轮 · 仍有 1 项待确认');
+    expect(cards().at(-1)?.resultNote).toBe('详细调查未完全完成 · 1 轮 · 仍有 1 项待确认 · 已达到调查轮数上限');
     expect(JSON.stringify(cards())).not.toContain('隐藏推理');
     expect(JSON.stringify(cards())).not.toContain('原始工具正文');
     expect(getToolLabel('knowledge_research_round', 'running', '灵犀', { round: 1, maxRounds: 4 })).toBe('第 1/4 轮：正在检索和阅读');

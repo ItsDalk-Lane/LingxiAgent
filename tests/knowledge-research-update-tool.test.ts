@@ -96,19 +96,21 @@ describe("研究更新工具", () => {
     expect(JSON.stringify(f.research.listActions(f.run.id))).not.toContain("九月十五日");
   });
 
-  it("批次后一条伪造引用失败时，前面的需求、证据、关联与凭据消费全部回滚", async () => {
+  it("批次部分有效时只接受真实引文，伪造条目返回纠错信息且不入库", async () => {
     const f = setup(); const need = f.research.createNeed(f.run.id, needInput); const receipt = f.receipt();
     const link = { needId: need.id, receiptId: receipt.id, quote: "九月十五日", relation: "supports", rationale: "资料明确说明" };
     const result = await f.call({ createNeeds: [needInput], linkEvidence: [link, { ...link, quote: "不存在的日期" }],
       requestCompletenessPolicy: "scope_complete" });
-    expect(result.details).toMatchObject({ errorCode: "KNOWLEDGE_MODEL_OUTPUT_INVALID" });
-    expect(f.research.listNeeds(f.run.id)).toHaveLength(1);
-    expect(f.research.getNeed(f.run.id, need.id).status).toBe("uncovered");
-    expect(f.research.listEvidence(f.run.id)).toEqual([]);
-    expect(f.research.listRelations(f.run.id)).toEqual([]);
-    expect(f.research.getReceipt(f.run.id, receipt.id).consumedAt).toBeNull();
-    expect(f.research.requireRun(f.run.id).completenessPolicy).toBe("source_diverse");
-    expect(f.research.listActions(f.run.id)[0]).toMatchObject({ status: "failed", errorCode: "KNOWLEDGE_MODEL_OUTPUT_INVALID" });
+    expect(result.isError).toBeUndefined();
+    const update = JSON.parse(result.content[0].text).evidenceUpdate;
+    expect(update).toMatchObject({ status: "partially_accepted", submittedCount: 2, acceptedCount: 1, rejectedCount: 1 });
+    expect(update.rejected[0]).toMatchObject({ submissionIndex: 2, errorCode: "KNOWLEDGE_MODEL_OUTPUT_INVALID" });
+    expect(f.research.listNeeds(f.run.id)).toHaveLength(2);
+    expect(f.research.listEvidence(f.run.id).map(item => item.canonicalText)).toEqual(["九月十五日"]);
+    expect(f.research.listRelations(f.run.id)).toHaveLength(1);
+    expect(f.research.getReceipt(f.run.id, receipt.id).consumedAt).not.toBeNull();
+    expect(f.research.requireRun(f.run.id).completenessPolicy).toBe("scope_complete");
+    expect(f.research.listActions(f.run.id)[0]).toMatchObject({ status: "completed", responseSummary: { status: "partial" } });
   });
 
   it("完整性只能升级，相同策略可重试，降级会回滚同批证据与缺口更新", async () => {

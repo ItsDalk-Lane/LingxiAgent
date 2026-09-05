@@ -53,6 +53,7 @@ function setup() {
     getHomeCwd: () => directory, getConfig: () => ({}), getPrefs: () => ({ getThinkingLevel: () => "medium" }),
     emitEvent: vi.fn(), emitDevLog: vi.fn(), agentIdFromSessionPath: () => owner.id,
     switchAgentOnly: async () => {}, getActivityStore: () => null, sessionManifestStore: manifests });
+  coordinator._sessions.set(main.sessionId, { session: { model: models.availableModels[0] } });
   const lifecycle: Array<{ phase: string; exists: boolean; sessionPath: string }> = [];
   const sessions: any[] = [];
   const behavior: { prompt?: (options: any, session: any) => Promise<void>; shutdown?: () => Promise<void>; failAssembly?: boolean; failBeforeReady?: boolean } = {};
@@ -91,6 +92,7 @@ function setup() {
     const manifest = manifests.createForPath({ sessionPath, ownerAgentId: owner.id, domain: "subagent", kind: "knowledge_research_root",
       lifecycle: "active", provenance: { parentSessionId: main.sessionId, studioId: "studio-a",
         researchContext: { runId: "run-a", scopeId: "scope-a", role: "root" }, ...overrides } });
+    coordinator._researchModelsBySession.set(manifest.sessionId, models.availableModels[0]);
     return { sessionPath, manifest };
   }
   const fixture = { directory, manifests, main, mainPath, owner, other, models, tools, coordinator, buildTools,

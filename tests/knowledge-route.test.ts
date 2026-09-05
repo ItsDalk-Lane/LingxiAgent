@@ -77,8 +77,8 @@ function appHarness(
   return { app, knowledge, importsDir };
 }
 
-afterEach(() => {
-  for (const manager of managers.splice(0)) manager.close();
+afterEach(async () => {
+  for (const manager of managers.splice(0)) await manager.close();
   for (const dir of tempDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -324,16 +324,17 @@ describe("Knowledge route", () => {
     });
     expect(knowledge.listIngestionJobs({ studioId: "studio-a", notebookId: notebook.id })).toHaveLength(0);
 
-    // chunkTargetChars 已随自动分块退役：PUT 显式拒绝（遗留显式列值仍生效但不再接受写入）
+    // 显式分块尺寸可保存，并为已有来源生成重建任务。
     const chunkUpdate = await put({ chunkTargetChars: 800 });
-    expect(chunkUpdate.status).toBe(400);
-    expect(await chunkUpdate.json()).toMatchObject({ error: "KNOWLEDGE_INVALID_ARGUMENT" });
-    expect(knowledge.listIngestionJobs({ studioId: "studio-a", notebookId: notebook.id })).toHaveLength(0);
+    expect(chunkUpdate.status).toBe(200);
+    expect(await chunkUpdate.json()).toMatchObject({ config: { chunkTargetChars: 800 } });
+    expect((await put({ chunkTargetChars: 99 })).status).toBe(400);
+    expect(knowledge.listIngestionJobs({ studioId: "studio-a", notebookId: notebook.id })).toHaveLength(1);
 
     // null 清除回 NULL（未配置/无上限召回）
     const cleared = await put({ retrievalTopK: null });
     expect(await cleared.json()).toMatchObject({
-      config: { chunkTargetChars: null, retrievalTopK: null },
+      config: { chunkTargetChars: 800, retrievalTopK: null },
     });
 
     const missing = await app.request("/api/knowledge/notebooks/nb-missing/settings", {
@@ -389,7 +390,7 @@ describe("Knowledge route", () => {
       notebookId: notebook.id,
       sourceId: imported.source.id,
       status: "queued",
-      phase: "parse",
+      phase: "chunk",
     });
     expect(ingestion.counts).toMatchObject({ queued: 1, running: 0, failed: 0, done: 0 });
 

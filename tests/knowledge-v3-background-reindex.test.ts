@@ -128,7 +128,7 @@ describe("v3 启动后低优先级重建", () => {
     const oldRows = manager.indexStore.listVariantChunks(old.oldVariant.id);
     const drain = manager.ingestion.drainQueue();
     await vi.waitFor(() => expect(blocked).toBe(true));
-    expect(parse.mock.calls.map(([input]) => input.sourceId)).toEqual([foreground.sourceId, old.sourceId]);
+    expect(parse).not.toHaveBeenCalled(); // 已就绪解析产物直接复用，重建只做派生索引。
     const answer = await manager.queryService.retrieveForNotebooks({ studioId, notebookIds: [old.notebookId],
       question: "苹果交付日期", rerank: false });
     expect(answer.candidates.some(chunk => chunk.text.includes("苹果"))).toBe(true);
@@ -140,7 +140,7 @@ describe("v3 启动后低优先级重建", () => {
     const variants = manager.indexStore.listChunkIndexVariantsByArtifact(old.artifactId);
     const current = variants.find(variant => variant.id !== old.oldVariant.id)!;
     expect(current.status).toBe("ready");
-    expect(manager.store.getChunkProfile({ profileHash: current.chunkProfileHash }).chunkerVersion).toBe("3");
+    expect(manager.store.getChunkProfile({ profileHash: current.chunkProfileHash }).chunkerVersion).toBe("4");
     const vector = manager.vectorIndex.listVariantsByChunkIndexVariant(current.id)[0];
     expect(vector.status).toBe("ready"); expect(schedule).toHaveBeenCalledWith(vector.id);
     const ann = new AnnIndexStore({ dbPath: path.join(manager.indexesRoot, "knowledge-ann.db") });

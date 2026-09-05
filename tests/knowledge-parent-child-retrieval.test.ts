@@ -7,7 +7,7 @@ const fixtures: Array<Awaited<ReturnType<typeof createHierarchicalFixture>>> = [
 afterEach(async () => { vi.restoreAllMocks(); for (const f of fixtures.splice(0)) await f.close(); });
 async function fixture(large = false) {
   const f = await createHierarchicalFixture([
-    { name: "parent.txt", sections: [{ heading: "父章节", text: large ? "甲乙丙丁戊己庚辛壬癸😀".repeat(1800) : "needle 发布条款。".repeat(220) }] },
+    { name: "parent.txt", sections: [{ heading: "父章节", text: large ? "甲乙丙丁戊己庚辛壬癸😀".repeat(1800) : "needle 发布条款。".repeat(700) }] },
     { name: "outside.txt", sections: [{ heading: "外部章节", text: "另一个来源" }] },
   ]); fixtures.push(f);
   const research = new ResearchStore(f.manager.store);

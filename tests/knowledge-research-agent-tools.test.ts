@@ -240,16 +240,18 @@ describe("真实 Agent 研究工具快照", () => {
     expect(f.research.listActions(f.run.id)[0].requestSummary).not.toHaveProperty("purpose");
   });
 
-  it("空来源或空章节的零命中不能冒充宿主反证调查", async () => {
+  it("空来源的零命中不能冒充反证；空章节列表表示不额外筛选", async () => {
     const f = await fixture();
     const search = f.snapshot(false, { searchPlan: [{ query: "absent sources", needIds: [f.need.id], purpose: "counterexample" },
       { query: "absent sections", needIds: [f.need.id], purpose: "counterexample" }] }).find(tool => tool.name === "knowledge_search")!;
     for (const params of [{ query: "absent sources", sourceIds: [] }, { query: "absent sections", sectionKeys: [] }]) {
       const result = await search.execute("empty", { scopeId: f.scope.id, channel: "fts", ...params }, undefined, undefined, f.runtime());
       expect(result.isError).toBeFalsy();
-      expect(f.research.listActions(f.run.id).at(-1)?.requestSummary).not.toHaveProperty("purpose");
+      const summary = f.research.listActions(f.run.id).at(-1)?.requestSummary;
+      if ("sourceIds" in params) expect(summary).not.toHaveProperty("purpose");
+      else expect(summary).toMatchObject({ purpose: "counterexample" });
     }
-    expect(new EvidenceLedger(f.research).evaluateNeed(f.run.id, f.need.id).counterEvidenceChecked).toBe(false);
+    expect(new EvidenceLedger(f.research).evaluateNeed(f.run.id, f.need.id).counterEvidenceChecked).toBe(true);
   });
 
   it("规范化等价查询在调用检索服务前拒绝，换快照不能重置成功历史", async () => {

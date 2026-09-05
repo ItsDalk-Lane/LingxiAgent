@@ -648,7 +648,8 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
     }
     throw err;
   } finally {
-    abortedDesktopSessionSubmissions.delete(submissionKey);
+    // 停止同时登记会话编号和路径，结束时一并清除，避免下一次发送继承旧停止状态。
+    for (const key of [sessionId, sessionPath]) abortedDesktopSessionSubmissions.delete(key);
     pendingDesktopSessionSubmissions.delete(submissionKey);
   }
 }

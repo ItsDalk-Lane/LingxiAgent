@@ -72,7 +72,7 @@ describe("同一笔记本的混合格式与新旧索引选择", () => {
     const compiled = await f.manager.compileTurnScope(f.scope);
     expect(compiled.readyChunkVariantIds.sort()).toEqual(f.sources.map(source => source.variant.id).sort());
     expect(compiled.sources.every(source => source.status === "ready")).toBe(true);
-    expect(compiled.warnings.filter(warning => warning.includes("v2_fallback_rebuild_pending"))).toEqual([]);
+    expect(compiled.warnings.filter(warning => warning.includes("previous_chunk_version_rebuild_pending"))).toEqual([]);
     expect(fullRead).not.toHaveBeenCalled();
     const result = await f.manager.searchService.search({ compiledScope: compiled, query: "交付", channel: "fts", rerank: false, limit: 24 });
     expect(new Set(result.hits.map(hit => hit.sourceId))).toEqual(new Set(f.sources.map(source => source.sourceId)));
@@ -107,7 +107,7 @@ describe("同一笔记本的混合格式与新旧索引选择", () => {
     const f = await fixture(true);
     const first = await f.manager.compileTurnScope(f.scope);
     expect(first.readyChunkVariantIds.sort()).toEqual(f.sources.map(source => source.variant.id).sort());
-    expect(first.warnings.filter(warning => warning.includes("v2_fallback_rebuild_pending"))).toHaveLength(1);
+    expect(first.warnings.filter(warning => warning.includes("previous_chunk_version_rebuild_pending"))).toHaveLength(1);
     const oldTextRows = f.manager.indexStore.listVariantChunks(f.sources[0].variant.id);
     const before = await f.manager.runFastKnowledgePipeline({ scope: f.scope, question: "交付" });
     expect(new Set(before.evidence.entries.map(entry => entry.chunkProfileHash))).toEqual(new Set(f.sources.map(source => source.hash)));
@@ -121,7 +121,7 @@ describe("同一笔记本的混合格式与新旧索引选择", () => {
     const next = await f.manager.compileTurnScope(f.scope);
     expect(next.snapshotHash).not.toBe(first.snapshotHash);
     expect(next.readyChunkVariantIds.sort()).toEqual([current.chunkIndexVariantId, f.sources[1].variant.id].sort());
-    expect(next.warnings.filter(warning => warning.includes("v2_fallback_rebuild_pending"))).toEqual([]);
+    expect(next.warnings.filter(warning => warning.includes("previous_chunk_version_rebuild_pending"))).toEqual([]);
     const after = await f.manager.runFastKnowledgePipeline({ scope: f.scope, question: "交付" });
     expect(new Set(after.evidence.entries.map(entry => entry.chunkIndexVariantId))).toEqual(new Set(next.readyChunkVariantIds));
     expect(f.manager.indexStore.listVariantChunks(f.sources[0].variant.id)).toEqual(oldTextRows);
