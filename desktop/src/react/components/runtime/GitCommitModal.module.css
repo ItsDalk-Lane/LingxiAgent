@@ -1,0 +1,254 @@
+/* GitCommitModal — 提交或推送弹窗（分支条 + 勾选 + 提交信息 + 三操作） */
+
+.modal {
+    /* 立法：本模块一次性字面量收进定义行（扫描豁免位），使用点一律 var() */
+    --git-hover-wash: rgba(90, 118, 139, 0.09);
+    --git-shadow-smoke: rgba(0, 0, 0, 0.08);
+    --git-accent-text: #ffffff;
+
+    background: color-mix(in srgb, var(--bg, #fcfaf5) 94%, white 6%);
+    color: var(--text, #3b3d3f);
+    border: 1px solid var(--overlay-light, rgba(0, 0, 0, 0.08));
+    border-radius: var(--radius-lg, 12px);
+    width: min(480px, 90vw);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: var(--font-ui, system-ui, -apple-system, "Segoe UI", sans-serif);
+    box-shadow: 0 16px 48px var(--shadow, rgba(0, 0, 0, 0.12));
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-16) var(--space-24) var(--space-8);
+    border-bottom: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+    flex-shrink: 0;
+}
+
+.title {
+    font-size: var(--fs-title);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    margin: 0;
+}
+
+.closeBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: color-mix(in srgb, var(--bg-card, #fff) 72%, transparent);
+    border: 1px solid transparent;
+    border-radius: 50%;
+    cursor: default;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--text-muted, rgba(0, 0, 0, 0.55));
+    transition: all var(--duration-fast) ease;
+}
+
+.closeBtn:hover {
+    color: var(--text, rgba(0, 0, 0, 0.85));
+    border-color: var(--overlay-light, rgba(0, 0, 0, 0.08));
+    background: var(--bg-card, #fff);
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+    padding: var(--space-16) var(--space-24) var(--space-24);
+}
+
+.branchButton {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+    align-self: flex-start;
+    max-width: 100%;
+    min-height: 30px;
+    padding: var(--space-4) var(--space-12);
+    border: 1px solid var(--border, rgba(0, 0, 0, 0.12));
+    border-radius: 999px;
+    background: var(--bg-card, #fff);
+    color: var(--text, #3b3d3f);
+    font: inherit;
+    font-size: var(--fs-caption);
+    cursor: default;
+    transition: border-color var(--duration-fast) ease;
+}
+
+.branchButton:hover {
+    border-color: var(--accent, rgba(0, 0, 0, 0.35));
+}
+
+.branchName {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.checkRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    font-size: var(--fs-caption);
+    cursor: default;
+}
+
+.checkLabel {
+    flex: 1 1 auto;
+}
+
+.unstagedStats {
+    display: inline-flex;
+    gap: var(--space-8);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.added {
+    color: var(--green, #7BAE7F);
+}
+
+.deleted {
+    color: var(--danger, #8B3A3A);
+}
+
+.messageInput {
+    width: 100%;
+    resize: vertical;
+    min-height: 76px;
+    padding: var(--space-8) var(--space-12);
+    background: var(--bg-card, #fff);
+    border: 1px solid var(--border, rgba(0, 0, 0, 0.12));
+    border-radius: var(--radius-input, 6px);
+    color: var(--text, inherit);
+    font-family: inherit;
+    font-size: var(--fs-caption);
+    line-height: 1.6;
+}
+
+.messageInput:focus {
+    outline: none;
+    border-color: var(--accent, rgba(0, 0, 0, 0.35));
+}
+
+.messageInput::placeholder {
+    color: var(--text-muted, rgba(0, 0, 0, 0.4));
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-12);
+}
+
+.secondaryBtn,
+.primaryBtn {
+    min-height: 32px;
+    padding: 0 var(--space-16);
+    border-radius: var(--radius-input, 6px);
+    font: inherit;
+    font-size: var(--fs-caption);
+    cursor: default;
+    transition: all var(--duration-fast) ease;
+}
+
+.secondaryBtn {
+    border: 1px solid var(--border, rgba(0, 0, 0, 0.14));
+    background: var(--bg-card, #fff);
+    color: var(--text, #3b3d3f);
+}
+
+.secondaryBtn:hover:not(:disabled),
+.primaryBtn:hover:not(:disabled) {
+    border-color: var(--accent, rgba(0, 0, 0, 0.35));
+}
+
+.primaryBtn {
+    border: 1px solid transparent;
+    background: var(--accent, #4a6b8a);
+    color: var(--git-accent-text);
+}
+
+.secondaryBtn:disabled,
+.primaryBtn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* ── 分支下拉 ── */
+.branchMenu {
+    background: var(--bg-card, var(--bg));
+    border: 1px solid var(--overlay-light);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px var(--shadow), 0 2px 8px var(--git-shadow-smoke);
+    padding: var(--space-8);
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.branchMenuTitle {
+    font-size: var(--fs-hint);
+    font-weight: 600;
+    color: var(--text-light);
+    padding: var(--space-2) var(--space-8);
+}
+
+.branchList {
+    display: flex;
+    flex-direction: column;
+    max-height: 240px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.branchItem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    min-height: 28px;
+    padding: var(--space-2) var(--space-8);
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-size: var(--fs-caption);
+    text-align: left;
+    cursor: default;
+}
+
+.branchItem:hover:not(:disabled) {
+    background: var(--git-hover-wash);
+}
+
+.branchItem:disabled {
+    opacity: 0.6;
+}
+
+.branchItemName {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.branchItemCurrent {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.branchCurrentMark {
+    flex-shrink: 0;
+    color: var(--accent);
+}

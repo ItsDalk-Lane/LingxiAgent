@@ -1,0 +1,214 @@
+/* GitEnvironmentCard — 环境信息卡（运行信息胶囊内，皮肤由容器压平） */
+
+.card {
+    /* 立法：本模块一次性字面量收进定义行（扫描豁免位），使用点一律 var() */
+    --git-hover-wash: rgba(90, 118, 139, 0.09);
+    --git-shadow-smoke: rgba(0, 0, 0, 0.08);
+
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-8) var(--space-16);
+    gap: var(--space-4);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    min-height: 24px;
+}
+
+.title {
+    font-family: "Songti SC", "Noto Serif CJK SC", serif;
+    font-size: var(--fs-body);
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.rows {
+    display: flex;
+    flex-direction: column;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-10);
+    min-height: 30px;
+    padding: var(--space-2) var(--space-4);
+    margin: 0 calc(var(--space-4) * -1);
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: default;
+    transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.row:hover:not(:disabled) {
+    background: var(--git-hover-wash);
+}
+
+.row:disabled {
+    opacity: 0.55;
+}
+
+.rowLabel {
+    font-size: var(--fs-hint);
+    color: var(--text-light);
+    white-space: nowrap;
+}
+
+.rowValue {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-6);
+    font-size: var(--fs-caption);
+    color: var(--text);
+    min-width: 0;
+}
+
+.added {
+    color: var(--green, #7BAE7F);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.deleted {
+    color: var(--danger, #8B3A3A);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.branchName {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.chevron {
+    flex-shrink: 0;
+    color: var(--text-light);
+    transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.chevron[data-open="false"] {
+    transform: rotate(-90deg);
+}
+
+/* 提交或推送行的 › 指示（恒收起态箭头） */
+.chevronFlat {
+    flex-shrink: 0;
+    color: var(--text-light);
+    transform: rotate(-90deg);
+}
+
+/* ── 本地行就地展开 ── */
+.localBlock {
+    display: flex;
+    flex-direction: column;
+}
+
+.localDetail {
+    padding: var(--space-6) var(--space-4) var(--space-8);
+    margin: 0 calc(var(--space-4) * -1) var(--space-2);
+    border-top: 1px dashed var(--overlay-light);
+    font-size: var(--fs-hint);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.localPath {
+    color: var(--text-light);
+    word-break: break-all;
+    font-size: var(--fs-hint);
+}
+
+/* ── 分支弹出列表 ── */
+.branchMenu {
+    background: var(--bg-card, var(--bg));
+    border: 1px solid var(--overlay-light);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px var(--shadow), 0 2px 8px var(--git-shadow-smoke);
+    padding: var(--space-8);
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.branchMenuTitle {
+    font-size: var(--fs-hint);
+    font-weight: 600;
+    color: var(--text-light);
+    padding: var(--space-2) var(--space-8);
+}
+
+.branchList {
+    display: flex;
+    flex-direction: column;
+    max-height: 260px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.branchItem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    min-height: 28px;
+    padding: var(--space-2) var(--space-8);
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-size: var(--fs-caption);
+    text-align: left;
+    cursor: default;
+}
+
+.branchItem:hover:not(:disabled) {
+    background: var(--git-hover-wash);
+}
+
+.branchItem:disabled {
+    opacity: 0.6;
+}
+
+.branchItemName {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.branchItemCurrent {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.branchCurrentMark {
+    flex-shrink: 0;
+    color: var(--accent);
+}
+
+.branchBusy {
+    flex-shrink: 0;
+    color: var(--text-light);
+}
+
+.branchEmpty {
+    padding: var(--space-8);
+    font-size: var(--fs-hint);
+    color: var(--text-light);
+}

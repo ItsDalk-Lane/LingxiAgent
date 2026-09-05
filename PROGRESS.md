@@ -1031,6 +1031,31 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 结论:对话记录串台的 store 层路径(机制b)在新建会话流程内**不可达**;机制真实存在但仅冷启动/归档两设计内入口触发。「记录串台」生产候选(未排除,store 层外):服务端身份/WS 时序(new-detached 会话身份与 switch 回包不一致→闸门丢事件→空白;或 replay 重放错会话)——需服务端配合复现。
 - 文件树串台=机制c坐实:createNewSession 只清三件套(:1235-1237),deskBasePath/deskWorkspaceMountId/deskTreeFilesByPath 全程不重置(crosstalk 测试);activateWorkspaceDesk 快照-恢复把清了一半的 desk 写回主工作台存档 workspaceDeskStateByRoot[root].deskFiles=[](desk-new-session-capture 测试,desk-actions.ts:394-455)。继承同工作台时旧树显示属功能意图;存档污染(回工作台丢子目录/文件列表)是缺陷。
 
+## 2026-09-05 环境信息卡:运行信息胶囊新增 Git 四行(变更/本地/分支/提交或推送)(实现完成,未提交待 GUI 复测)
+
+- 需求(用户截图+四点裁决):右上角「运行信息」胶囊内新增「环境信息」卡,四行=变更(行级增删合计,点击弹变更文件列表,文件点击看 diff)/本地(就地展开:主工作树 vs 分支工作树)/分支(弹层列全部分支,点击切换)/提交或推送(弹窗:提交·提交并推送·推送,提交信息留空 AI 生成,「包含未暂存的更改」默认勾选+统计,无可推送时推送置灰);明确排除创建 PR;胶囊名不改。
+- 现状基线:仓库此前**零结构化 git 集成**(无 git 库依赖/无 IPC),全部新建;git 经 execFile 数组参数直跑(shell:false 防注入,GIT_TERMINAL_PROMPT=0 防挂起)。
+- 后端:
+  - `server/git/git-command.ts`(新):runGit/tryGit 封装+纯函数解析器(numstat -z/for-each-ref %(HEAD)/worktree porcelain)+collectGitStatus(已暂存+未暂存+未跟踪行计,未跟踪按文件行数对齐 numstat 语义,512KB 截断)/worktreeInfo/checkoutBranch/commitChanges/pushChanges/fileDiff(未跟踪合成 new-file patch)/路径与分支名防穿越防 option 注入校验。
+  - `server/routes/git-environment.ts`(新):/api/git/{status,worktree-info,branches,checkout,file-diff,commit,push,ai-commit-message};dir 准入沿用 desk 惯例(agent 根/isApprovedDeskDir/isApprovedWorkspaceDir/cwd_history,symlink 解析比较);非 git 目录只读端点 200+isRepo:false 降级;ai-commit-message 收集 numstat+截断 diff+未跟踪开头,走 hub `utility:call-text`(auxiliary summarize 槽,复用 usage/trace 记账),45s 超时,输出剥围栏取首行限 100 字。
+  - 注册:`full-root.ts` 挂 /api(与 desk 同层,签名 (engine,hub));`route-security.ts` 显式登记 GET→files.read/POST→files.write(不吃 STUDIO_OWNER 兜底);`server-composition-boundary.test.ts` 金名单补 `"/api" :: createGitEnvironmentRoute`(排序位 createFsRoute 与 createInputDraftsRoute 之间)。
+- 前端:
+  - `utils/git-env-api.ts`(新):8 端点客户端(lingxiFetch,commit 60s/push 150s 超时,操作端点结构化结果不抛错);`utils/unified-diff.ts`(新):patch→行(kind=add/del/ctx/hunk,首个 hunk 前的文件头跳过,hunk 后正文按前缀字面解析)。
+  - `runtime/GitEnvironmentCard.tsx`(新):四行卡(压平皮肤),dir=deskWorkspaceNativeRoot||deskBasePath,非本地目录不渲染,非 git 仓库四行降级禁用,加载失败可点击重试;变更行千分位 +绿/-红;分支弹层(AnchoredPortal)当前分支✓/他树检出禁用/点击即切换;工作台切换自动重载。挂载点 `RuntimeInfoCapsule.tsx` SessionStatusCard 之后。
+  - `runtime/GitChangesModal.tsx`(新):文件行=路径(截断+title)+该文件±统计,点击行内展开行级 diff(懒加载+会话缓存,1500 行截断,二进制/失败诚实提示);`runtime/GitCommitModal.tsx`(新):顶部分支条可下拉切换,提交信息 textarea(留空→AI 生成回填再提交),勾选行含未暂存±统计,三按钮禁用语义=提交(无可提交)/提交并推送(两者皆无)/推送(无可推送);提交并推送=先提交(若可)→刷新→再推送(nothing_to_push 静默跳过)。
+  - 胶囊交互修复:portal 弹层(分支列表)打 `runtime-capsule-anchored` 标记类,胶囊「点外收起」捕获监听放行该标记,否则点分支会先塌容器卸载弹层;模态走 Overlay scope=inline(原位渲染,天然在胶囊 DOM 内不触发收起)。
+  - locales 五语言 gitEnv.* 37 键(zh/zh-TW/en/ja/ko)。
+  - 样式纪律:两个 module.css 首版裸间距/硬编码色违例,重写为 token+局部立法(--git-hover-wash 等收进定义行),扫描器复核我的文件 0 违例。
+- 测试(全部新增或更新,61 例):
+  - `tests/git-command.test.ts`(新,20):解析器纯函数+真实临时仓库(init/commit/worktree add)集成,锁定 status 汇总数字、worktree 主/从判别、未跟踪合成 patch、checkout/commit/push 契约、穿越拒绝。
+  - `tests/git-environment-route.test.ts`(新,11):真实临时仓库+mock engine/hub,status/branches/worktree/checkout/commit/push 端到端,dir 校验(400/403),AI 生成净化(围栏/多行)与无 hub 503、clean tree 400。
+  - `desktop/.../__tests__/utils/unified-diff.test.ts`(新,4);`__tests__/components/GitEnvironmentCard.test.tsx`(新,8)/`GitChangesModal.test.tsx`(新,6)/`GitCommitModal.test.tsx`(新,8);`RuntimeInfoCapsule.test.tsx` 更新(补 GitEnvironmentCard mock+存在性断言)。
+- 验证(2026-09-05):
+  - 定向:git-command 20/20,route 11/11,前端 git 四件 26/26+胶囊 4/4+unified-diff 4/4。
+  - `npm run typecheck` ×3 配置 exit 0(两轮,CSS 立法重写后复跑仍绿);eslint 新文件 0 error(any 告警与既有路由文件同风格)。
+  - 全量 `npx vitest run`:13090 passed / 7 failed / 7 skipped。7 失败逐一 stash 对照+记忆清单核实**全部先在**(上轮遗留):i18n parity zh-TW/ja/ko 缺 skills.panel.externalRemove+rightWorkspace.tabs.projectSkills 2 key(×3)、style-discipline 上轮 CSS(ArchivedSessionsModal/SkillsPanel/TurnUsagePills/RightWorkspacePanel,我的文件 0 违例)、release-preflight 版本号、upstream-sync-matrix VERIFIED_SOURCE_SHA 门(未提交态)、AssistantMessage.interlude 重渲染断言。
+- 待 GUI 复测:①胶囊展开见「环境信息」卡四行与增删/分支/工作树类型;②变更弹窗点文件展开 diff(含未跟踪新文件);③分支弹层切换;④提交弹窗:留空提交走 AI 生成回填、勾选含未暂存、推送置灰语义、提交并推送链;⑤非 git 工作台降级文案。重启 dev server 即可(TS 源直跑,无需重构建)。
+
 ## 2026-09-05 聊天页用量/用时胶囊任务(开工回执+任务0基线)
 
 - 任务:主聊天 assistant 轮次操作行加「用量」「用时」胶囊+明细弹窗,1:1 复刻 `design-review/harness-usage-pills-reference/`(只读),数据=observability 账本按轮真实聚合。让步顺序:数据真实>样式一致>覆盖面>速度。

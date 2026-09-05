@@ -22,6 +22,7 @@ import { TerminalCard } from '../right-workspace/TerminalCard';
 import { WorkflowCard } from '../right-workspace/WorkflowCard';
 import { AgentActivityCard } from '../right-workspace/AgentActivityCard';
 import { SessionStatusCard } from '../right-workspace/SessionStatusCard';
+import { GitEnvironmentCard } from './GitEnvironmentCard';
 import styles from './RuntimeInfoCapsule.module.css';
 
 export function RuntimeInfoCapsule() {
@@ -38,11 +39,15 @@ export function RuntimeInfoCapsule() {
       (entry.kind === 'workflow' || entry.kind === 'subagent') && entry.status === 'running',
     ).length;
 
-  // 展开时点击胶囊外任意处收起（捕获阶段，兼容面板内 stopPropagation 的控件）
+  // 展开时点击胶囊外任意处收起（捕获阶段，兼容面板内 stopPropagation 的控件）。
+  // 例外：卡片内弹出的锚定浮层（分支列表等）portal 到 body，DOM 在胶囊外但
+  // 交互仍属胶囊，用 .runtime-capsule-anchored 标记类放行，否则点击先塌容器。
   useEffect(() => {
     if (!expanded) return;
     const onDocumentMouseDown = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+      const target = e.target as Element | null;
+      if (rootRef.current && target && !rootRef.current.contains(target)
+        && !target.closest?.('.runtime-capsule-anchored')) {
         setExpanded(false);
       }
     };
@@ -89,6 +94,7 @@ export function RuntimeInfoCapsule() {
           <WorkflowCard />
           <AgentActivityCard />
           <SessionStatusCard />
+          <GitEnvironmentCard />
         </div>
       )}
     </div>

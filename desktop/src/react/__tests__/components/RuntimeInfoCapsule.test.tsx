@@ -23,6 +23,9 @@ vi.mock('../../components/right-workspace/AgentActivityCard', () => ({
 vi.mock('../../components/right-workspace/SessionStatusCard', () => ({
   SessionStatusCard: () => <section data-testid="capsule-status" />,
 }));
+vi.mock('../../components/runtime/GitEnvironmentCard', () => ({
+  GitEnvironmentCard: () => <section data-testid="capsule-git-env" />,
+}));
 vi.mock('../../components/desk/DeskEditor', () => ({
   JianEditor: () => <div data-testid="capsule-jian" data-desk-editor="" />,
 }));
@@ -60,7 +63,7 @@ describe('RuntimeInfoCapsule', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('expands into one unified container holding jian, todo, terminal, workflow, agent and status', () => {
+  it('expands into one unified container holding jian, todo, terminal, workflow, agent, status and git env', () => {
     const { container } = render(<RuntimeInfoCapsule />);
 
     fireEvent.click(screen.getByRole('button', { name: '展开运行信息' }));
@@ -77,6 +80,7 @@ describe('RuntimeInfoCapsule', () => {
     expect(screen.getByTestId('capsule-workflow')).toBeInTheDocument();
     expect(screen.getByTestId('capsule-agent')).toBeInTheDocument();
     expect(screen.getByTestId('capsule-status')).toBeInTheDocument();
+    expect(screen.getByTestId('capsule-git-env')).toBeInTheDocument();
   });
 
   it('collapses again on pill click and on outside mousedown', () => {
