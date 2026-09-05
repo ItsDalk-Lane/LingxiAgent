@@ -12,8 +12,8 @@
 | 项目 | 状态 | 提交 SHA | 说明 |
 |---|---|---|---|
 | P0-00 | `completed` | `6de275e2cf1e0391a466a9f95f2c499455a07d97` | 已从正式 v0.1.34 创建分支、完成环境准备并推送 |
-| P0-01 | `completed_pending_commit` | 待提交 | 原始结果已完整保留；封印顺序失败与签名环境失败均已归因 |
-| P0-02 | `pending` | — | 新旧基线差异与迁移矩阵 |
+| P0-01 | `completed` | `092be566bfd09703bf7d648e25763f17c793e584` | 原始结果已完整保留；封印顺序失败与签名环境失败均已归因 |
+| P0-02 | `completed_pending_commit` | 待提交 | 入口清单、18 个重叠路径和 11 个真实冲突已建档 |
 | P1–P7 | `pending_migration` | — | 优先复用原实现 |
 | P8 | `pending_v0134_adaptation` | — | 知识正式架构发生变化，需重点适配 |
 | P9–P11 | `pending_migration` | — | 迁移错误、边界、组合测试与文档 |
@@ -34,13 +34,25 @@
 
 ## P0-01 运行校正版基线门禁
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`092be566bfd09703bf7d648e25763f17c793e584`，远端分支已核对同 SHA。
 - typecheck exit `0`；lint exit `0`，`0 errors / 9194 warnings`。
 - 指定 11 文件定向测试 exit `0`，`11` 文件、`253` 测试全部通过。
 - 全量测试 exit `1`：`1359 passed / 1 failed / 1 skipped` 文件，`13763 passed / 1 failed / 7 skipped` 测试；唯一失败是 P0 新增记录尚未进入旧封印 allowlist。
 - 原始服务端构建 exit `1`：缺少 `LINGXI_SIGN_KEY`；抛弃式匹配密钥诊断复跑 exit `0`，临时密钥已删除。
 - `git diff --check` exit `0`，工作树在记录结果前干净。
 - 处理边界：没有修改生产代码、封印测试或 allowlist；失败保持原始状态，P12 再推进已验证源码坐标。
+
+## P0-02 建立现状调用矩阵和迁移清单
+
+- 状态：`completed_pending_commit`。
+- 任务书六条 `rg` 全部 exit `0`，共记录 388 行现场入口。
+- 12 个 bundled plugin 工具仍为 7 个只读、5 个副作用工具；权限和延迟元数据缺口与原基线一致。
+- PluginManager 生产 raw 执行入口 1 处；MCP 生产底层调用 6 处；四个媒体入口仍有分散的凭证回退链。
+- v0.1.34 删除生产 legacy 知识入口，P8 改为适配正式 compiled-scope 搜索链和测试夹具，不恢复旧生产结构。
+- 文件层统计：303 个发布差异、106 个原修复差异、18 个重叠路径；现场三方预演为 11 个冲突。
+- 处置：P1–P7、P9–P10 主体复用；引擎连接点、P8 知识链、边界生成物和 P11 事实材料按新基线适配或重建。
+- 本项只改审计和规划文档，无生产代码修改。
 
 ## 错误记录
 
