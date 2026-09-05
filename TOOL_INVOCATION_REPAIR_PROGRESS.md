@@ -297,13 +297,24 @@
 
 ## P10-02 完整配置组合
 
-- 状态：`completed_with_red_not_reproduced_pending_commit`。
+- 状态：`completed_with_red_not_reproduced`。
+- 提交：`a90cdd1f188495b9e68b025936bc2c5ae34abb9c`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `f8432e83e40331bca9ccf2e74898b9f7b0fb39b8`；本项只扩展既有路径等价测试，无生产代码修改。
 - 首次矩阵：exit `0`，1 file / 12 tests 全部通过；新增的授权后参数变化、审批后禁用/代次变化、流式更新和取消组合均已被前序修复覆盖，未能复现新的旧代码失败。
 - 处理：没有人为制造失败、削弱断言或扩大生产架构；按真实状态记录红灯未复现。
 - 完整组合门禁：exit `0`，13 files / 373 tests 全部通过，覆盖总延迟/内置延迟开关、候选数 10/11/12、权限方言、可延迟/固定工具、代理和连接器启停、可见性、授权参数变化、审批后撤销、同名冲突、嵌套 schema、取消和流式更新。
 - typecheck exit `0`；边界扫描 exit `0`，2129 个生产源码文件 0 违规；扩展测试定向 ESLint exit `0`、无输出；`git diff --check` exit `0`。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p1002-first-matrix.log`、`/tmp/lingxi-tool-contract-v0134-p1002-gate.log`、`/tmp/lingxi-tool-contract-v0134-p1002-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p1002-boundary.log`、`/tmp/lingxi-tool-contract-v0134-p1002-eslint.log`。
+
+## P11-01 架构说明
+
+- 状态：`completed_pending_commit`。
+- 复用来源：原分支提交 `a6372e50669151df69683ed257661d2443d7429a`；架构说明和文档契约测试按原实现迁入，事实坐标以 v0.1.34 校正版分支为准。
+- RED：exit `1`；1 file，`1 failed / 3 passed` tests；旧代码缺少任务书指定的架构说明文件，原始错误为 `ENOENT`。
+- GREEN：exit `0`；1 file / 4 tests 全部通过；任务书要求的九个章节标题逐项命中。
+- typecheck exit `0`；边界扫描 exit `0`，2129 个生产源码文件 0 违规；测试定向 ESLint exit `0`、无输出；`git diff --check` exit `0`。
+- 文档明确了业务目标与能力、显示名、目录名的分工，完整执行顺序，四种路线共用同一受控入口，绑定后的调用内容，允许触碰底层执行器的来源边界，稳定错误码、新工具接入清单和禁止做法。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p1101-red.log`、`/tmp/lingxi-tool-contract-v0134-p1101-gate.log`、`/tmp/lingxi-tool-contract-v0134-p1101-boundary.log`、`/tmp/lingxi-tool-contract-v0134-p1101-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p1101-eslint.log`、`/tmp/lingxi-tool-contract-v0134-p1101-sections.log`。
 
 ## 错误记录
 

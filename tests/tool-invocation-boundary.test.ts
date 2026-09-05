@@ -59,4 +59,40 @@ describe("tool invocation static boundaries", () => {
       fs.rmSync(fixtureRoot, { recursive: true, force: true });
     }
   });
+
+  it("keeps the route-invariant architecture contract documented", () => {
+    const documentPath = path.join(
+      repositoryRoot,
+      "docs",
+      "architecture",
+      "tool-invocation-path-invariance.md",
+    );
+    const document = fs.readFileSync(documentPath, "utf8");
+
+    for (const requiredSection of [
+      "## 不变量",
+      "## 身份与名称",
+      "## 生命周期时序",
+      "## 统一调用路径",
+      "## PreparedInvocation 绑定",
+      "## Raw source adapter 边界",
+      "## 错误码",
+      "## 新工具接入清单",
+      "## 禁止重新引入的反模式",
+    ]) {
+      expect(document).toContain(requiredSection);
+    }
+    for (const requiredFact of [
+      "targetId",
+      "capabilityBase",
+      "direct",
+      "deferred",
+      "plugin-dev-chat",
+      "plugin-dev-http",
+      "TARGET_REVOKED",
+      "scripts/check-tool-invocation-boundaries.mjs",
+    ]) {
+      expect(document).toContain(requiredFact);
+    }
+  });
 });

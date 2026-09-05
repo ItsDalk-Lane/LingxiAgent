@@ -41,6 +41,7 @@ P12-06 的语义顺序迁移、适配和重新验证，最终只推送校正版�
 
 - [x] 迁移统一错误映射与静态 raw execution 边界
 - [x] 迁移路径等价组合测试并按新基线校准事实
+- [x] 补齐路径无关架构说明及其文档契约门禁
 - [ ] 重建报告、剩余事项和机器事实
 
 ### Phase E：P12 最终验证与封印
@@ -52,7 +53,7 @@ P12-06 的语义顺序迁移、适配和重新验证，最终只推送校正版�
 
 ## 当前状态
 
-`Phase D / P10-02 completed_with_red_not_reproduced_pending_commit`
+`Phase D / P11-01 completed_pending_commit`
 
 ## 错误记录
 
