@@ -545,6 +545,49 @@ describe("tool loading", () => {
     expect(tool.isEnabledForAgentConfig({ tools: { disabled: ["beautify"] } })).toBe(false);
   });
 
+  it("preserves the explicit static tool metadata required by canonical target assembly", async () => {
+    const dir = path.join(pluginsDir, "metadata-plugin");
+    fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
+    writePluginToolFixture(path.join(dir, "tools", "inspect.js"), `
+      export const name = "inspect";
+      export const label = "Inspect safely";
+      export const description = "Inspect a resource";
+      export const parameters = {
+        type: "object",
+        properties: { resourceId: { type: "string" } },
+        required: ["resourceId"],
+      };
+      export const deferrable = false;
+      export const pinned = true;
+      export const sessionPermission = { readOnly: true };
+      export const arbitraryHostField = "must-not-cross-the-adapter";
+      export async function execute() { return "ok"; }
+    `);
+    const pm = new PluginManager({ pluginsDir, dataDir, bus: await makeBus() } as any);
+    pm.scan();
+    await pm.loadAll();
+
+    const tool = pm.getAllTools()[0];
+    expect(tool).toMatchObject({
+      name: "metadata-plugin_inspect",
+      label: "Inspect safely",
+      description: "Inspect a resource",
+      deferrable: false,
+      pinned: true,
+      _pluginId: "metadata-plugin",
+      parameters: {
+        type: "object",
+        required: ["resourceId"],
+      },
+      _toolTargetIdentity: {
+        origin: "plugin",
+        sourceId: "metadata-plugin",
+      },
+    });
+    expect(tool.sessionPermission?.resolveInvocation).toBeTypeOf("function");
+    expect(tool).not.toHaveProperty("arbitraryHostField");
+  });
+
   it("invokes static plugin tools through the unified tool adapter", async () => {
     const dir = path.join(pluginsDir, "static-invoke");
     fs.mkdirSync(path.join(dir, "tools"), { recursive: true });

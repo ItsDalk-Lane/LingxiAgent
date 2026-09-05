@@ -18,6 +18,7 @@ import {
 import { buildApprovalReviewContext } from "../permission/approval-review-context.ts";
 import {
   cloneToolInvocationInput,
+  hasToolCapabilityDelegate,
   resolveToolInvocationPermission,
   snapshotToolInvocationInput,
 } from "../permission/tool-invocation-permission.ts";
@@ -447,6 +448,7 @@ function toStatus(action: any) {
 }
 
 function toolWithNormalizedPermission(tool: any) {
+  if (hasToolCapabilityDelegate(tool)) return tool;
   const existing = tool?._normalizedPermissionContract;
   if (existing?.resolveInvocation) {
     return {

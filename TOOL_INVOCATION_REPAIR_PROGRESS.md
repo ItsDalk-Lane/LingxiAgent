@@ -18,8 +18,9 @@
 | P1-02 | `completed` | `93a600efd32109a394f8b2024e7bf361948ebd96` | 原测试先红，再原样迁移权限适配，本项门禁全绿 |
 | P1-03 | `completed` | `3b7e21615c2c338afa85f931476b6f902ebf4741` | 9 项 schema 回归先红后绿，本项门禁全绿 |
 | P2-01 | `completed` | `db697f42fd8ab87fcf2172b6539915772ab36bf5` | 目标表回归先红后绿，本项门禁全绿 |
-| P2-02 | `completed_pending_commit` | 待提交 | 网关与 prepared invocation 回归先红后绿，本项门禁全绿 |
-| P3–P7 | `pending_migration` | — | 优先复用原实现 |
+| P2-02 | `completed` | `079a5b8f05edad579414088ccf8aef24e6258d1b` | 网关与 prepared invocation 回归先红后绿，本项门禁全绿 |
+| P3-01 | `completed_pending_commit` | 待提交 | 插件元数据与可用性回归先红后绿，本项门禁全绿 |
+| P3-02–P7 | `pending_migration` | — | 优先复用原实现 |
 | P8 | `pending_v0134_adaptation` | — | 知识正式架构发生变化，需重点适配 |
 | P9–P11 | `pending_migration` | — | 迁移错误、边界、组合测试与文档 |
 | P12 | `pending` | — | 最终验证、构建和封印 |
@@ -102,12 +103,22 @@
 
 ## P2-02 建立唯一调用网关
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`079a5b8f05edad579414088ccf8aef24e6258d1b`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `1e71a29a272d2292c003293e123dde681cdb6a52`；两份既有测试和三份既有实现均先核对为父树同哈希。
 - RED：exit `1`；3 files 全部失败，`4 failed / 78 passed` tests；网关模块缺失，effective invocation、prepared 记录和边界检查目标仍不一致。
 - GREEN：exit `0`；5 files / 197 tests 全部通过。
 - typecheck exit `0`；本项定向 ESLint exit `0`，`0 errors / 82 warnings`；`git diff --check` exit `0`。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p202-red.log`、`/tmp/lingxi-tool-contract-v0134-p202-green.log`、`/tmp/lingxi-tool-contract-v0134-p202-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p202-eslint.log`。
+
+## P3-01 统一注册插件目标和可用性
+
+- 状态：`completed_pending_commit`。
+- 复用来源：原分支提交 `82292ec6f200e4729245d6bc71589b64ba0a2379`；相关测试和实现均先核对为父树同哈希。
+- RED：exit `1`；2 files，`4 failed / 95 passed` tests；插件元数据未保留，可用性决策入口缺失，桥接授权不能落到真实目标。
+- GREEN：exit `0`；4 files / 181 tests 全部通过。
+- typecheck exit `0`；本项定向 ESLint exit `0`，`0 errors / 266 warnings`；`git diff --check` exit `0`。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p301-red.log`、`/tmp/lingxi-tool-contract-v0134-p301-green.log`、`/tmp/lingxi-tool-contract-v0134-p301-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p301-eslint.log`。
 
 ## 错误记录
 

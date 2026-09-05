@@ -430,6 +430,12 @@ export function unregisterToolCapabilityDelegate(tool: object): boolean {
   return capabilityDelegates.delete(tool);
 }
 
+/** 宿主包装层用它避免复制后丢失基于对象身份登记的委托资格。 */
+export function hasToolCapabilityDelegate(tool: object): boolean {
+  if (!tool || (typeof tool !== "object" && typeof tool !== "function")) return false;
+  return capabilityDelegates.has(tool);
+}
+
 /**
  * A delegated capability is accepted only when the host registered this exact
  * object and its predicate returns literally true. A throwing or non-boolean
