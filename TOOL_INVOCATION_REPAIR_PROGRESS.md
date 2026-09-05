@@ -25,8 +25,9 @@
 | P4-02 | `completed` | `48bbb8a3d5473982fe9aa83ccacc80fdb1ac2a0f` | Bridge 只经 Gateway 调用，20 项红灯转绿 |
 | P4-03 | `completed` | `1e21140cf77a36f0dcbe33ca4da6156ec78b269e` | MCP 可用性与执行器统一，12 项红灯转绿 |
 | P5-01 | `completed` | `7817c8d7180725d69273885ab7cdd289b37edf55` | Plugin 工具单调代次，3 项红灯转绿 |
-| P5-02 | `completed_pending_commit` | 待提交 | MCP live generation，1 项红灯转绿 |
-| P5-03–P7 | `pending_migration` | — | 优先复用原实现 |
+| P5-02 | `completed` | `2689fedc4f71be28c3579e90703a8da06268c683` | MCP live generation，1 项红灯转绿 |
+| P5-03 | `completed_pending_commit` | 待提交 | 旧会话撤销与联合漂移清单，1 项红灯转绿 |
+| P6–P7 | `pending_migration` | — | 优先复用原实现 |
 | P8 | `pending_v0134_adaptation` | — | 知识正式架构发生变化，需重点适配 |
 | P9–P11 | `pending_migration` | — | 迁移错误、边界、组合测试与文档 |
 | P12 | `pending` | — | 最终验证、构建和封印 |
@@ -183,13 +184,23 @@
 
 ## P5-02 MCP live generation
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`2689fedc4f71be28c3579e90703a8da06268c683`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `aede651699e2e6ce6b71bcd73ac62607ec9dd1a4`；Manager/Registry/测试同哈希原样迁移，引擎仅适配代次传递片段。
 - RED：exit `1`；1 file，`1 failed / 12 passed` tests；旧 Manager 不存在连接器工具代次接口。
 - GREEN：exit `0`；7 files / 278 tests 全部通过。
 - typecheck exit `0`；新增回归与 Registry 定向 ESLint exit `0`，0 问题；`git diff --check` exit `0`。
 - 语义边界：配置和工具清单变化推进代次；临时断线仍作为传输失败，不冒充永久撤销。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p502-red.log`、`/tmp/lingxi-tool-contract-v0134-p502-gate-final.log`、`/tmp/lingxi-tool-contract-v0134-p502-typecheck-final.log`、`/tmp/lingxi-tool-contract-v0134-p502-eslint-final.log`。
+
+## P5-03 旧会话撤销与漂移播报
+
+- 状态：`completed_pending_commit`。
+- 复用来源：原分支提交 `6a6890fc0d8e67fa3bd71f1815c311d8bd65b3b7`；新回归原样迁移，引擎仅适配实时目录名称合并片段。
+- RED：exit `1`；1 file，`1 failed / 5 passed` tests；生命周期撤销已由前两项生效，唯一缺口是漂移清单漏掉 plugin。
+- GREEN：exit `0`；9 files / 312 tests 全部通过。
+- typecheck exit `0`；新增测试定向 ESLint exit `0`，0 问题；`git diff --check` exit `0`。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p503-red.log`、`/tmp/lingxi-tool-contract-v0134-p503-gate-final.log`、`/tmp/lingxi-tool-contract-v0134-p503-typecheck-final.log`、`/tmp/lingxi-tool-contract-v0134-p503-eslint-final.log`。
 
 ## 错误记录
 
