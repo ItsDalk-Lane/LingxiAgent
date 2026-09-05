@@ -12,7 +12,6 @@ import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { useI18n } from '../hooks/use-i18n';
 import { loadModels } from '../utils/ui-helpers';
 import {
-  activateWorkspaceDesk,
   addWorkspaceFolder,
   applyFolder,
   applyStudioWorkspace,
@@ -27,9 +26,7 @@ import type { Agent, StudioWorkspace } from '../types';
 import { AgentAvatar, refreshAgentAvatarVersion, resolveAgentDisplayInfo, type AgentDisplayInfo } from '../utils/agent-display';
 import { isSameWorkspacePath, resolveAgentWorkspace } from '../utils/agent-workspace';
 import styles from './Welcome.module.css';
-import { buildWorkspacePickerItems, normalizeWorkspacePath } from '../../../../shared/workspace-history.ts';
-
-/* eslint-disable @typescript-eslint/no-explicit-any -- store setState 回调 (s: any) */
+import { buildWorkspacePickerItems, normalizeWorkspacePath, workspaceDisplayName } from '../../../../shared/workspace-history.ts';
 
 export function refreshAvatarTs() { refreshAgentAvatarVersion(); }
 
@@ -166,16 +163,19 @@ function AgentChips({ agents, selectedId }: {
     useStore.setState({ selectedAgentId: agentId });
     const targetWorkspace = resolveAgentWorkspace(agent);
     const state = useStore.getState();
-    const workspaceUnchanged = !state.selectedWorkspaceMountId
-      && isSameWorkspacePath(state.selectedFolder || state.deskBasePath, targetWorkspace);
+    // Agent 主目录 = 默认工作台（mount "default"）的解析根，统一走 mount 形态：
+    // 以本地路径形态建出的会话只带 cwd，与 mount 形态会话分裂成两本账（左栏不聚合）。
+    // 跨 Agent 选择时 desk 的 mount 根在会话落到目标 Agent 前按当前 Agent 解析，
+    // 属草稿期瞬态；首条消息后随 switch 回包归位。
+    const currentWorkspace = state.selectedWorkspaceMountId
+      ? (state.selectedWorkspaceMountId === 'default' ? state.defaultWorkspaceRootPath : null)
+      : (state.selectedFolder || state.deskBasePath);
+    const workspaceUnchanged = !!currentWorkspace
+      && !!targetWorkspace
+      && isSameWorkspacePath(currentWorkspace, targetWorkspace);
     if (targetWorkspace && !workspaceUnchanged) {
-      useStore.setState({
-        selectedFolder: targetWorkspace,
-        selectedWorkspaceMountId: null,
-        selectedWorkspaceLabel: null,
-        workspaceFolders: [],
-      });
-      void activateWorkspaceDesk(targetWorkspace, { mountId: null });
+      useStore.setState({ workspaceFolders: [] });
+      void applyStudioWorkspace({ mountId: 'default' });
     }
     // 切换到该 agent 的 chat model
     refreshModelsAfterAgentModelSwitch(agent);
@@ -321,15 +321,16 @@ function FolderPicker({
     setShowHistory(false);
     const agent = findAgentByHomeFolder(agents, folder);
     if (agent) {
-      const homeFolder = normalizeWorkspacePath(agent.homeFolder) || folder;
+      // Agent 主目录 = 默认工作台（mount "default"）的解析根。这里统一走 mount 形态：
+      // 若以本地路径形态进入草稿，之后创建的会话只带 cwd，与经切换器创建的 mount 形态
+      // 会话分裂成两本账（左栏作用域严格分家），同一目录的对话不聚合。
+      // 跨 Agent 选择时 desk 的 mount 根在会话落到目标 Agent 前按当前 Agent 解析，
+      // 属草稿期瞬态；首条消息后随 switch 回包归位。
       useStore.setState({
         selectedAgentId: agent.id === currentAgentId ? null : agent.id,
-        selectedFolder: homeFolder,
-        selectedWorkspaceMountId: null,
-        selectedWorkspaceLabel: null,
         workspaceFolders: [],
       });
-      void activateWorkspaceDesk(homeFolder, { mountId: null });
+      void applyStudioWorkspace({ mountId: 'default' });
       refreshModelsAfterAgentModelSwitch(agent);
       return;
     }
@@ -341,7 +342,7 @@ function FolderPicker({
     : null;
   const folderName = selectedWorkspaceMountId
     ? (selectedWorkspaceLabel || selectedWorkspace?.label || selectedWorkspaceMountId)
-    : (selectedFolder ? selectedFolder.split('/').pop() || selectedFolder : null);
+    : (selectedFolder ? workspaceDisplayName(selectedFolder) || null : null);
   const label = folderName
     ? `${t('input.workspace')}${folderName}`
     : t('input.selectWorkspace');
@@ -406,12 +407,22 @@ function FolderHistory({ cwdHistory, agentHomeFolders, selectedFolder, selectedW
   onRemoveStudioWorkspace: (mountId: string) => void;
   onRemoveWorkspaceFolder: (folder: string) => void;
 }) {
-  const primaryItems: string[] = buildWorkspacePickerItems({
+  const allPrimaryItems: string[] = buildWorkspacePickerItems({
     selectedFolder,
     homeFolder,
     cwdHistory: [...agentHomeFolders, ...cwdHistory],
   });
-  const primaryItemCount = studioWorkspaces.length + primaryItems.length;
+  // 默认工作台（= Agent 工作台目录）不单列：同一目录经历史/主目录条目进入（走 mount
+  // 形态），单列一条 "Default" 会让同一目录出现两个入口、诱导出两种会话身份。
+  const visibleStudioWorkspaces = studioWorkspaces.filter(workspace => !workspace.isDefault);
+  // 跨源去重：同一目录既是挂载、又以使用历史/主目录条目出现时只保留挂载行（带 label
+  // 与挂载移除钮），否则同一文件夹渲染两行。isSameWorkspacePath 兼容 Windows 反斜杠与
+  // 大小写形态；nativeRootPath 仅本地 owner 可见，远端形态拿不到根路径时不比对。
+  const mountedRoots = visibleStudioWorkspaces
+    .map(workspace => workspace.nativeRootPath)
+    .filter((root): root is string => typeof root === 'string' && !!root);
+  const primaryItems = allPrimaryItems.filter(p => !mountedRoots.some(root => isSameWorkspacePath(root, p)));
+  const primaryItemCount = visibleStudioWorkspaces.length + primaryItems.length;
   const primaryScrollable = primaryItemCount > 5;
   const extraScrollable = workspaceFolders.length > 5;
   const removableHistory = new Set(cwdHistory.map(normalizeWorkspacePath).filter(Boolean));
@@ -426,7 +437,7 @@ function FolderHistory({ cwdHistory, agentHomeFolders, selectedFolder, selectedW
         data-folder-history-list="primary"
         data-scrollable={primaryScrollable ? 'true' : 'false'}
       >
-        {studioWorkspaces.map(workspace => {
+        {visibleStudioWorkspaces.map(workspace => {
           const isActive = workspace.mountId === selectedWorkspaceMountId;
           return (
             <div
@@ -459,7 +470,7 @@ function FolderHistory({ cwdHistory, agentHomeFolders, selectedFolder, selectedW
           );
         })}
         {primaryItems.map(p => {
-          const name = p.split('/').pop() || p;
+          const name = workspaceDisplayName(p) || p;
           const isActive = p === selectedFolder;
           return (
             <div
@@ -513,7 +524,7 @@ function FolderHistory({ cwdHistory, agentHomeFolders, selectedFolder, selectedW
         data-scrollable={extraScrollable ? 'true' : 'false'}
       >
         {workspaceFolders.map(p => {
-          const name = p.split('/').pop() || p;
+          const name = workspaceDisplayName(p) || p;
           return (
             <div
               key={p}

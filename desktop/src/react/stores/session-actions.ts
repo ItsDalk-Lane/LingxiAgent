@@ -12,6 +12,7 @@ import { sessionScopedKey, sessionScopedListIncludes, sessionScopedValue } from 
 import { lingxiFetch, lingxiUrl } from '../hooks/use-hana-fetch';
 import { hydrateInputDrafts } from './input-draft-persistence';
 import { HOME_DRAFT_KEY } from '../../../../shared/input-drafts.ts';
+import { normalizeWorkspacePath } from '../../../../shared/workspace-history.ts';
 import { buildItemsFromHistory } from '../utils/history-builder';
 import { migrateLegacyTodos } from '../utils/todo-compat';
 import { clearChat as clearChatAction } from './agent-actions';
@@ -633,6 +634,11 @@ export async function loadSessions(): Promise<void> {
       // 首次加载：走完整的 switchSession 确保后端同步 + 消息加载
       await switchSession(sessions[0].path);
     }
+    // 列表投影刷新后校验当前会话缓存修订点：缓存 revision 落后（如新建会话首条消息
+    // 尚未被本端 WS 消费）时自动补拉。此前桌面端仅 chat-find-locate / 移动端前台触发
+    // reconcile，发送后的 loadSessions 刷新拿到了新 revision 却没有消费者——
+    // 「列表说磁盘前进了、缓存永远不追」的缺口在此闭合（issue #1610 桌面端补齐）。
+    void reconcileCurrentSessionMessages('sessions_refresh');
   } catch { /* ignore */ }
   useStore.getState().setSessionMetaRecovery(await metaRecoveryPromise);
 }
@@ -1152,7 +1158,10 @@ function stageDetachedSessionForActivation(data: any, ref: Readonly<SessionRef>,
       [targetKey]: [...(state.attachedFiles || [])],
     },
   });
-  useStore.getState().initSession?.(ref.sessionPath, [], false);
+  // 不在此处预种空缓存：种了空 items 会让 switchSession 的 hasData 判据为真而跳过
+  // 历史加载，新会话首屏从此完全依赖 WS 事件——事件被入口闸门丢弃/迟到即整片空白。
+  // 交给 switchSession 的 !hasData 路径走 loadMessages（空历史也会 stamp revision，
+  // 供后续 reconcile 补拉自愈）；WS 先到时 session_user_message 侧自会 initSession。
 }
 
 export async function loadPendingNewSessionPermissionDefault(): Promise<SessionPermissionMode> {
@@ -1191,17 +1200,45 @@ export async function createNewSession(options: CreateNewSessionOptions = {}): P
     typeof s.currentSessionPath === 'string' ? s.currentSessionPath : null,
   );
   const inheritedMountId = requestedFolder ? null : normalizeSessionId(currentProjection?.workspaceMountId);
-  const defaultWorkspaceMountId = inheritedMountId;
-  const defaultWorkspaceLabel = inheritedMountId
-    ? (typeof currentProjection?.workspaceLabel === 'string' ? currentProjection.workspaceLabel : null)
-    : null;
+  // 继承/保留的本地目录统一走 normalizeWorkspacePath（与 applyFolder 落 selectedFolder 的
+  // 规范形态一致）：服务端 cwd 在 Windows 上是反斜杠原生路径，直接落 selectedFolder 会让
+  // 全部按 '/' 取目录名的显示位退化为整条路径。
   const inheritedLocalFolder = !requestedFolder && !inheritedMountId
     && typeof currentProjection?.cwd === 'string' && currentProjection.cwd.trim()
-    ? currentProjection.cwd.trim()
+    ? normalizeWorkspacePath(currentProjection.cwd)
     : null;
+  // 无当前会话时继承「当前显示的工作台」：草稿选择（applyFolder/applyStudioWorkspace 写入的
+  // selectedFolder / selectedWorkspaceMountId）优先，其次 desk 已激活身份（冷启动恢复窗口）；
+  // 两者皆空才落 Primary Agent 工作台（设置页「新建对话默认工作台」语义）。
+  // 不做这一层时，用户切到非默认工作台后点新建聊天，草稿会被拽回 Primary 工作台，
+  // 左栏列表作用域（resolveWorkspaceScope 草稿态读 selected*）跟着换轨成默认工作台的记录。
+  const pendingMountId = !requestedFolder && !inheritedMountId
+    ? normalizeSessionId(s.selectedWorkspaceMountId) : null;
+  const deskMountId = !requestedFolder && !inheritedMountId && !pendingMountId
+    ? normalizeSessionId(s.deskWorkspaceMountId) : null;
+  const keptSelectedFolder = !requestedFolder && !inheritedMountId && !pendingMountId && !deskMountId
+    && typeof s.selectedFolder === 'string' && s.selectedFolder.trim()
+    ? normalizeWorkspacePath(s.selectedFolder)
+    : null;
+  // deskBasePath 只在本地目录工作台下是真实路径；mount 工作台下它是 'studio:*' 键形式，
+  // 不能当文件夹用（mount 情形已由上面的 deskMountId 分支接管）。
+  const keptDeskFolder = !requestedFolder && !inheritedMountId && !pendingMountId && !deskMountId && !keptSelectedFolder
+    && typeof s.deskBasePath === 'string' && s.deskBasePath.trim()
+    ? normalizeWorkspacePath(s.deskBasePath)
+    : null;
+  const defaultWorkspaceMountId = inheritedMountId || pendingMountId || deskMountId;
+  const defaultWorkspaceLabel = inheritedMountId
+    ? (typeof currentProjection?.workspaceLabel === 'string' ? currentProjection.workspaceLabel : null)
+    : (pendingMountId
+      ? (typeof s.selectedWorkspaceLabel === 'string' ? s.selectedWorkspaceLabel : null)
+      : (deskMountId ? (typeof s.deskWorkspaceLabel === 'string' ? s.deskWorkspaceLabel : null) : null));
   const defaultFolder = requestedFolder
     || inheritedLocalFolder
-    || (!currentProjection ? primaryWorkspace || (!primaryAgent ? s.homeFolder : null) : null)
+    || keptSelectedFolder
+    || keptDeskFolder
+    // Primary 兜底只在「无会话且未选中任何工作台（含 mount）」时生效，
+    // 否则 mount 已选中时 selectedFolder 仍会被写成 Primary 路径污染草稿状态。
+    || (!currentProjection && !defaultWorkspaceMountId ? primaryWorkspace || (!primaryAgent ? s.homeFolder : null) : null)
     || null;
   const deskFolder = inheritedMountId && typeof currentProjection?.cwd === 'string'
     ? currentProjection.cwd

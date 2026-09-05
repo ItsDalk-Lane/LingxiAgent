@@ -1400,4 +1400,82 @@ describe('desk-actions workspace roots', () => {
     expect(useStore.getState().deskExpandedPaths).toEqual([]);
     expect(useStore.getState().deskSelectedPath).toBe('');
   });
+
+  it('captures the default workspace native root for dual-form scope unification while keeping the list entry', async () => {
+    mockLingxiFetch.mockImplementation(async (url: string) => {
+      if (url === '/api/studio/workspaces') {
+        return jsonResponse({
+          studioId: 'studio_1',
+          workspaces: [
+            { mountId: 'default', label: 'Default', isDefault: true, nativeRootPath: '/Users/test/Desktop/Project/lingxidev', sourceKind: 'storage', provider: 'local_fs' },
+            { mountId: 'local_fs_b', label: '工作台B', nativeRootPath: '/Users/test/Desktop/B', sourceKind: 'local_fs', provider: 'local_fs' },
+          ],
+        });
+      }
+      return jsonResponse({});
+    });
+
+    const { loadStudioWorkspaces } = await import('../../stores/desk-actions');
+    const workspaces = await loadStudioWorkspaces();
+
+    // 列表本体保留 Default 条目（预览/文件刷新按 mountId 查找依赖它；UI 层负责隐藏）
+    expect(workspaces.map((workspace) => workspace.mountId)).toEqual(['default', 'local_fs_b']);
+    expect(useStore.getState().studioWorkspaces).toHaveLength(2);
+    // 默认工作台本地根路径入 store，供左栏作用域做 mount ≡ 本地路径双形态合流
+    expect(useStore.getState().defaultWorkspaceRootPath).toBe('/Users/test/Desktop/Project/lingxidev');
+  });
+
+  it('derives the default workspace display name from the configured agent home folder, not the server label', async () => {
+    mockLingxiFetch.mockImplementation(async () => jsonResponse({}));
+    useStore.setState({ homeFolder: '/Users/test/Desktop/OH-WorkSpace' } as never);
+
+    const { applyStudioWorkspace } = await import('../../stores/desk-actions');
+    await applyStudioWorkspace({ mountId: 'default', label: 'Default' });
+
+    // 配置了工作台目录 → 显示目录名；服务端/调用方回传的 "Default" 被覆盖
+    expect(useStore.getState().selectedWorkspaceLabel).toBe('OH-WorkSpace');
+    expect(useStore.getState().deskWorkspaceMountId).toBe('default');
+    expect(useStore.getState().deskWorkspaceLabel).toBe('OH-WorkSpace');
+  });
+
+  it('falls back to "Default" only when no workspace directory is configured', async () => {
+    mockLingxiFetch.mockImplementation(async () => jsonResponse({}));
+    useStore.setState({ homeFolder: null } as never);
+
+    const { applyStudioWorkspace, defaultWorkspaceDisplayName } = await import('../../stores/desk-actions');
+    await applyStudioWorkspace({ mountId: 'default' });
+
+    expect(useStore.getState().selectedWorkspaceLabel).toBe('Default');
+    expect(useStore.getState().deskWorkspaceLabel).toBe('Default');
+    // 反斜杠路径取目录名（Windows 形态）
+    expect(defaultWorkspaceDisplayName({ homeFolder: 'C:\\Work\\MyDesk' })).toBe('MyDesk');
+    expect(defaultWorkspaceDisplayName({ homeFolder: '   ' })).toBe('Default');
+    expect(defaultWorkspaceDisplayName({})).toBe('Default');
+  });
+
+  it('keeps the caller-provided label for non-default mounts', async () => {
+    mockLingxiFetch.mockImplementation(async () => jsonResponse({}));
+    useStore.setState({ homeFolder: '/Users/test/Desktop/OH-WorkSpace' } as never);
+
+    const { applyStudioWorkspace } = await import('../../stores/desk-actions');
+    await applyStudioWorkspace({ mountId: 'local_fs_b', label: '工作台B' });
+
+    expect(useStore.getState().selectedWorkspaceLabel).toBe('工作台B');
+    expect(useStore.getState().deskWorkspaceLabel).toBe('工作台B');
+  });
+
+  it('derives the default mount label on the switch-restore path through activateWorkspaceDesk', async () => {
+    mockLingxiFetch.mockImplementation(async (url: string) => {
+      if (url.startsWith('/api/preferences/workspace-ui-state')) return jsonResponse({ state: null });
+      return jsonResponse({});
+    });
+    useStore.setState({ homeFolder: '/Users/test/Desktop/Project/lingxidev' } as never);
+
+    const { activateWorkspaceDesk } = await import('../../stores/desk-actions');
+    // switchSession 恢复 desk 走此路径，options.label 来自会话 meta 里落库的 "Default"
+    await activateWorkspaceDesk(null, { mountId: 'default', label: 'Default', reload: false });
+
+    expect(useStore.getState().deskWorkspaceLabel).toBe('lingxidev');
+    expect(useStore.getState().deskWorkspaceMountId).toBe('default');
+  });
 });

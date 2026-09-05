@@ -2245,7 +2245,7 @@
       "automationPermissionMode": "自動化執行權限",
       "automationPermissionModeDesc": "決定背景自動化 Agent Run 是自動審核工具呼叫、完整執行，還是只讀取資訊；自動審核不通過時會拒絕操作",
       "homeFolder": "工作台",
-      "homeFolderDesc": "新建對話預設使用的工作目錄，巡檢和定時任務也在這裡執行",
+      "homeFolderDesc": "新建對話跟隨當前開啟的工作台；未開啟其他工作台時預設使用此目錄，巡檢和定時任務也在這裡執行",
       "homeFolderPlaceholder": "未設定（每次手動選擇）",
       "homeFolderClear": "清除",
       "homeFolderBrowse": "選擇資料夾",

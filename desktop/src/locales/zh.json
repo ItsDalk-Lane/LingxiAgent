@@ -2314,7 +2314,7 @@
       "automationPermissionMode": "自动化运行权限",
       "automationPermissionModeDesc": "决定后台自动化 Agent Run 是自动审核工具调用、完整执行，还是只读取信息；自动审核不通过时会拒绝操作",
       "homeFolder": "工作台",
-      "homeFolderDesc": "新建对话默认使用的工作目录，巡检和定时任务也在这里执行",
+      "homeFolderDesc": "新建对话跟随当前打开的工作台；未打开其他工作台时默认使用此目录，巡检和定时任务也在这里执行",
       "homeFolderPlaceholder": "未设置（每次手动选择）",
       "homeFolderClear": "清除",
       "homeFolderBrowse": "选择文件夹",

@@ -2313,7 +2313,7 @@
       "automationPermissionMode": "Automation permission mode",
       "automationPermissionModeDesc": "Controls whether background automation Agent runs auto-review tool calls, runs with full access, or stays read-only; failed auto-review blocks the action",
       "homeFolder": "Workspace",
-      "homeFolderDesc": "Default working directory for new chats, patrol and cron tasks",
+      "homeFolderDesc": "New chats follow the workspace you opened; when none is open they default to this directory, and patrol and cron tasks run here",
       "homeFolderPlaceholder": "Not set (choose manually each time)",
       "homeFolderClear": "Clear",
       "homeFolderBrowse": "Browse",

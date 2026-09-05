@@ -102,6 +102,7 @@ function SessionListInner() {
   const deskBasePath = useStore(s => s.deskBasePath);
   const selectedWorkspaceMountId = useStore(s => s.selectedWorkspaceMountId);
   const selectedFolder = useStore(s => s.selectedFolder);
+  const defaultWorkspaceRootPath = useStore(s => s.defaultWorkspaceRootPath);
   const workspaceScope = useMemo(
     () => resolveWorkspaceScope({
       currentSessionPath,
@@ -109,8 +110,9 @@ function SessionListInner() {
       deskBasePath,
       selectedWorkspaceMountId,
       selectedFolder,
+      defaultWorkspaceRootPath,
     }),
-    [currentSessionPath, deskBasePath, deskWorkspaceMountId, selectedFolder, selectedWorkspaceMountId],
+    [currentSessionPath, defaultWorkspaceRootPath, deskBasePath, deskWorkspaceMountId, selectedFolder, selectedWorkspaceMountId],
   );
   const scopedSessions = useMemo(
     () => filterSessionsForWorkspaceScope(sessions, workspaceScope),

@@ -237,6 +237,84 @@ describe('workspace scope', () => {
     expect(sessionBelongsToWorkspaceScope({ cwd: null, workspaceMountId: null }, mountScope)).toBe(false);
   });
 
+  // ── 默认工作台双形态合流（Default = Agent 工作台目录的 mount 视图）──
+
+  it('merges legacy cwd-form sessions into the default mount scope when its local root is known', () => {
+    const scope = { mountId: 'default', basePath: null, defaultRootPath: '/Users/test/Desktop/Project/lingxidev' };
+
+    // mount 形态（新入口）会话照常严格匹配
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/Users/test/Desktop/Project/lingxidev', workspaceMountId: 'default' }, scope)).toBe(true);
+    // 历史 cwd 形态（同一目录的旧会话）合流进同一作用域
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/Users/test/Desktop/Project/lingxidev', workspaceMountId: null }, scope)).toBe(true);
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/Users/test/Desktop/Project/lingxidev/', workspaceMountId: null }, scope)).toBe(true);
+    // 其他目录 / 其他 mount / 无身份不合流
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/Users/test/Desktop/other', workspaceMountId: null }, scope)).toBe(false);
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/Users/test/Desktop/Project/lingxidev', workspaceMountId: 'mount-other' }, scope)).toBe(false);
+    expect(sessionBelongsToWorkspaceScope({ cwd: null, workspaceMountId: null }, scope)).toBe(false);
+  });
+
+  it('merges default-mount sessions into the matching local-directory scope when its local root is known', () => {
+    const scope = { mountId: null, basePath: '/Users/test/Desktop/Project/lingxidev', defaultRootPath: '/Users/test/Desktop/Project/lingxidev' };
+
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/Users/test/Desktop/Project/lingxidev', workspaceMountId: 'default' }, scope)).toBe(true);
+    // 其他 mount 不经由此路径混入本地作用域
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/Users/test/Desktop/Project/lingxidev', workspaceMountId: 'mount-other' }, scope)).toBe(false);
+  });
+
+  it('keeps non-default mounts strictly separated even when the default root is known', () => {
+    const mountScope = { mountId: 'local_fs_probe', basePath: null, defaultRootPath: '/Users/test/Desktop/Project/lingxidev' };
+
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/Users/test/Desktop/Project/lingxidev', workspaceMountId: null }, mountScope)).toBe(false);
+    expect(sessionBelongsToWorkspaceScope({ cwd: '/Users/test/Desktop/Project/lingxidev', workspaceMountId: 'default' }, mountScope)).toBe(false);
+  });
+
+  it('attaches the dual-form key only when the scope resolves to the default workspace', () => {
+    const root = '/Users/test/Desktop/Project/lingxidev';
+    // desk 在 default mount：携带合流键
+    expect(resolveWorkspaceScope({
+      currentSessionPath: '/sessions/live.jsonl',
+      deskWorkspaceMountId: 'default',
+      deskBasePath: 'studio:default',
+      selectedWorkspaceMountId: null,
+      selectedFolder: null,
+      defaultWorkspaceRootPath: root,
+    })).toEqual({ mountId: 'default', basePath: null, defaultRootPath: root });
+    // desk 在默认工作台的本地路径形态：携带合流键
+    expect(resolveWorkspaceScope({
+      currentSessionPath: '/sessions/live.jsonl',
+      deskWorkspaceMountId: null,
+      deskBasePath: root,
+      selectedWorkspaceMountId: null,
+      selectedFolder: null,
+      defaultWorkspaceRootPath: root,
+    })).toEqual({ mountId: null, basePath: root, defaultRootPath: root });
+    // 其他 mount / 其他目录：不带合流键（保持旧形状与严格语义）
+    expect(resolveWorkspaceScope({
+      currentSessionPath: '/sessions/live.jsonl',
+      deskWorkspaceMountId: 'mount-abc',
+      deskBasePath: 'studio:mount-abc',
+      selectedWorkspaceMountId: null,
+      selectedFolder: null,
+      defaultWorkspaceRootPath: root,
+    })).toEqual({ mountId: 'mount-abc', basePath: null });
+    expect(resolveWorkspaceScope({
+      currentSessionPath: '/sessions/live.jsonl',
+      deskWorkspaceMountId: null,
+      deskBasePath: '/Users/test/Desktop/other',
+      selectedWorkspaceMountId: null,
+      selectedFolder: null,
+      defaultWorkspaceRootPath: root,
+    })).toEqual({ mountId: null, basePath: '/Users/test/Desktop/other' });
+    // 未提供默认根路径：不改变既有形状
+    expect(resolveWorkspaceScope({
+      currentSessionPath: null,
+      deskWorkspaceMountId: null,
+      deskBasePath: null,
+      selectedWorkspaceMountId: 'default',
+      selectedFolder: null,
+    })).toEqual({ mountId: 'default', basePath: null });
+  });
+
   it('never shows sessions without a reliable identity in any scope', () => {
     const noIdentity = { cwd: null, workspaceMountId: null };
     expect(sessionBelongsToWorkspaceScope(noIdentity, { mountId: 'mount-abc', basePath: null })).toBe(false);

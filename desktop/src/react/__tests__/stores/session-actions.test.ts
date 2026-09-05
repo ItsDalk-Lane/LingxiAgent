@@ -648,7 +648,7 @@ function mockPermissionDefault(mode = 'ask') {
   });
 
   describe('createNewSession cwd draft', () => {
-    it('without a current session, resets the draft to the primary agent and its effective workspace', async () => {
+    it('without a current session, resets the agent to primary but keeps the displayed desk workspace', async () => {
       (mockState as Record<string, unknown>).agents = [
         {
           id: 'hana',
@@ -666,6 +666,8 @@ function mockPermissionDefault(mode = 'ask') {
         },
       ];
       (mockState as Record<string, unknown>).currentAgentId = 'mio';
+      // desk 正在显示 /workspace/Desktop（用户切换到的工作台）：
+      // 新建聊天必须留在当前显示的工作台，不再拽回 Primary Agent 工作台。
       (mockState as Record<string, unknown>).deskBasePath = '/workspace/Desktop';
       (mockState as Record<string, unknown>).deskCurrentPath = 'old/subdir';
       (mockState as Record<string, unknown>).deskFiles = [{ name: 'stale.md' }];
@@ -676,13 +678,13 @@ function mockPermissionDefault(mode = 'ask') {
       await createNewSession();
 
       expect(mockState.selectedAgentId).toBe('hana');
-      expect(mockState.selectedFolder).toBe('/workspace/Primary');
+      expect(mockState.selectedFolder).toBe('/workspace/Desktop');
       expect(mockState.pendingNewSession).toBe(true);
-      expect(mockState.deskBasePath).toBe('/workspace/Primary');
+      expect(mockState.deskBasePath).toBe('/workspace/Desktop');
       expect(mockState.deskCurrentPath).toBe('');
       expect(mockState.deskFiles).toEqual([]);
       expect(mockState.deskJianContent).toBeNull();
-      expect(mockLoadDeskFiles).toHaveBeenCalledWith('', '/workspace/Primary', null);
+      expect(mockLoadDeskFiles).toHaveBeenCalledWith('', '/workspace/Desktop', null);
     });
 
     it('inherits the active session local workspace but not its extra authorized folders or subdirectory', async () => {
@@ -981,6 +983,9 @@ function mockPermissionDefault(mode = 'ask') {
         }
         if (url === '/api/sessions/switch') {
           return jsonResponse({ ok: true, sessionId: 'sess_fresh', agentId: 'hana', workspaceFolders: [] });
+        }
+        if (String(url).startsWith('/api/sessions/messages')) {
+          return jsonResponse({ messages: [], blocks: [], todos: [], hasMore: false });
         }
         throw new Error(`unexpected fetch: ${url}`);
       });

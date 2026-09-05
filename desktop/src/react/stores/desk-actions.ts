@@ -244,6 +244,15 @@ export async function loadStudioWorkspaces(): Promise<StudioWorkspace[]> {
       .map(normalizeStudioWorkspace)
       .filter((workspace: StudioWorkspace | null): workspace is StudioWorkspace => !!workspace);
     useStore.getState().setStudioWorkspaces(workspaces);
+    // 默认工作台（mount "default" = 当前 Agent 工作台目录）的本地根路径：
+    // 左栏作用域用它做双形态合流（历史 cwd 形态 ≡ mount 形态会话）。
+    // 列表本体保留 Default 条目（预览/文件刷新等按 mountId 查找依赖它），
+    // 仅在 FolderPicker 渲染层隐藏。
+    const defaultWorkspace = workspaces.find((workspace: StudioWorkspace) => workspace.isDefault);
+    const defaultRootPath = defaultWorkspace?.nativeRootPath || null;
+    if ((useStore.getState() as { defaultWorkspaceRootPath?: string | null }).defaultWorkspaceRootPath !== defaultRootPath) {
+      useStore.setState({ defaultWorkspaceRootPath: defaultRootPath });
+    }
     return workspaces;
   } catch (err) {
     console.error('[workspace] load studio workspaces failed:', err);
@@ -278,10 +287,26 @@ export async function createLocalStudioWorkspaceFromFolder(folder: string): Prom
   }
 }
 
-export async function applyStudioWorkspace(workspace: Pick<StudioWorkspace, 'mountId' | 'label'> & Partial<Pick<StudioWorkspace, 'nativeRootPath'>>): Promise<void> {
+/**
+ * 默认工作台（mount "default" = Agent 工作台目录）的显示名：
+ * 配置了工作台目录 → 目录名；未配置 → "Default"。
+ * 取 homeFolder 做显式配置信号（未配置时为 null）——不要用服务端解析根路径推导，
+ * 未配置时服务端根回落到内置目录，其目录名不是用户要的显示名。
+ */
+export function defaultWorkspaceDisplayName(state?: { homeFolder?: string | null }): string {
+  const homeFolder = typeof state?.homeFolder === 'string' ? state.homeFolder.trim() : '';
+  const normalized = homeFolder ? normalizeWorkspacePath(homeFolder) : '';
+  const base = normalized ? (normalized.split('/').pop() || '') : '';
+  return base || 'Default';
+}
+
+export async function applyStudioWorkspace(workspace: { mountId: string | null; label?: string | null; nativeRootPath?: string | null }): Promise<void> {
   const mountId = normalizeMountId(workspace.mountId);
   if (!mountId) return;
-  const label = typeof workspace.label === 'string' && workspace.label.trim() ? workspace.label.trim() : mountId;
+  // 默认工作台显示名不取调用方/服务端的 "Default"，统一按「配置目录名，未配置才 Default」派生。
+  const label = mountId === 'default'
+    ? defaultWorkspaceDisplayName(useStore.getState())
+    : (typeof workspace.label === 'string' && workspace.label.trim() ? workspace.label.trim() : mountId);
   const nativeRootPath = normalizeMountNativeRoot(workspace.nativeRootPath);
   useStore.setState((s: any) => ({
     selectedWorkspaceMountId: mountId,
@@ -432,7 +457,11 @@ export async function activateWorkspaceDesk(root: string | null | undefined, opt
   useStore.setState({
     deskBasePath: normalized || workspaceKey,
     deskWorkspaceMountId: mountId,
-    deskWorkspaceLabel: options.label || null,
+    // 默认工作台显示名统一派生（配置目录名，未配置才 "Default"）——不取服务端/调用方
+    // 回传的 "Default"，否则切会话恢复、发送后翻转等时序下名称会在两套显示间跳动。
+    deskWorkspaceLabel: mountId === 'default'
+      ? defaultWorkspaceDisplayName(latest)
+      : (options.label || null),
     // 种子值来自调用方携带的服务端披露（如 applyStudioWorkspace 的 workspace 对象）；
     // 后续 loadDeskFiles 的 mount 响应是同一来源的权威刷新。
     deskWorkspaceNativeRoot: mountId ? normalizeMountNativeRoot(options.nativeRootPath) : null,

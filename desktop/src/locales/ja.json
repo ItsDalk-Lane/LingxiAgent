@@ -2245,7 +2245,7 @@
       "automationPermissionMode": "自動化の権限モード",
       "automationPermissionModeDesc": "バックグラウンド自動化 Agent Run がツール呼び出しを自動審査するか、完全権限で実行するか、読み取り専用にするかを決めます。自動審査に通らない操作は拒否されます",
       "homeFolder": "ワークスペース",
-      "homeFolderDesc": "新しいチャット、巡回、cron タスクのデフォルト作業ディレクトリ",
+      "homeFolderDesc": "新しいチャットは開いているワークスペースに従います。他に開いていない場合のデフォルト作業ディレクトリであり、巡回と cron タスクもここで実行されます",
       "homeFolderPlaceholder": "未設定（毎回手動で選択）",
       "homeFolderClear": "クリア",
       "homeFolderBrowse": "参照",

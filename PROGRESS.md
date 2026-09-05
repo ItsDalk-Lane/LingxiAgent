@@ -970,6 +970,135 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 当前复跑：四平台统一稳定性 85/85、工作流契约 28/28、本机真实服务器归档新装/重启/快照读回，退出码均为 0。
 - 远端不存在 `codex/knowledge-notebook` 分支或该分支工作流运行。Phase 9 四种真实宿主仍为 `NOT_EXECUTED`；需要明确 commit、push 和远程触发授权后才能继续。
 
+## 2026-09-04 v0.1.33 新建会话空白/串台诊断开工回执
+- 目标：store 层坐实「新建会话首屏空白」与「串台成主工作台」两症状机制,给修复清单;不动实现源码。
+- 顺序：任务0基线 → 任务1空白复现 → 任务2串台复现或排除 → 任务3归因+修复清单。
+- 最大风险:串台症状部分依赖 GUI/WS 时序,store 层复现不出——兜底=候选路径清单+排除理由(任务书已许可)。
+- 基线(2026-09-04 本工作树):`npm install` exit 0;`./node_modules/.bin/vitest run desktop/src/react/__tests__/stores/session-actions.test.ts` → 89 passed / 0 failed / 0 skipped / 396ms,与任务书预期一致。
+- 白名单:仅 desktop/src/react/__tests__/stores/ 下新测试文件 + PROGRESS.md + BLOCKED.md;不 commit 不 push。
+
+## 2026-09-04 v0.1.33 新建会话空白/串台诊断开工回执
+- 目标：store 层坐实「新建会话首屏空白」与「串台成主工作台」两症状机制,给修复清单;不动实现源码。
+- 顺序：任务0基线 → 任务1空白复现 → 任务2串台复现或排除 → 任务3归因+修复清单。
+- 最大风险:串台症状部分依赖 GUI/WS 时序,store 层复现不出——兜底=候选路径清单+排除理由(任务书已许可)。
+- 基线(2026-09-04 本工作树):`npm install` exit 0;`./node_modules/.bin/vitest run desktop/src/react/__tests__/stores/session-actions.test.ts` → 89 passed / 0 failed / 0 skipped / 396ms,与任务书预期一致。
+- 白名单:仅 desktop/src/react/__tests__/stores/ 下新测试文件 + PROGRESS.md + BLOCKED.md;不 commit 不 push。
+
+## 2026-09-04 任务1完成:空白机制坐实
+
+- 新文件 `desktop/src/react/__tests__/stores/session-new-session-blank.test.ts`(1 用例,名含 characterization: KNOWN DEFECT)。
+- 复现流程:createNewSession → ensureSession(mock new-detached 与 switch 返回固定会话)→ switchSession 完成,全程不注入 WS 事件。
+- 三事实断言全绿:welcomeVisible===false;currentSessionPath===新会话;/session/new-v033.jsonl 缓存存在且 items===[]。
+- 机制证据:mock 的 /api/sessions/messages 备好了首条消息,但断言其从未被调用——stageDetachedSessionForActivation 先 initSession(path,[],false)(session-actions.ts:1155)种空缓存,switchSession hasData 判据(:864-868)为真跳过 loadMessages,首屏内容从此全靠 WS 事件;WS 事件不达(入口闸门 ws-message-handler.ts:97-140 丢身份不匹配事件/断连)即空白。
+- 反向验证:翻转 welcomeVisible 断言 → 红(`AssertionError: expected false to be true`)→ 还原 → 绿。命令:
+  `./node_modules/.bin/vitest run desktop/src/react/__tests__/stores/session-new-session-blank.test.ts`
+
+## 2026-09-04 任务2完成:串台=机制b拉力坐实+流程内不可达排除清单;文件树半边机制c坐实
+
+- 新文件 `session-new-session-crosstalk.test.ts`(2 用例)与 `desk-new-session-capture.test.ts`(1 用例,真实 store+真实 activateWorkspaceDesk),均名含 characterization: KNOWN DEFECT,各自反向验证红→绿已贴对话。
+- 机制b拉力:无会话态(currentSessionPath=null ∧ pendingNewSession=false ∧ pendingSessionSwitchPath=null)下 loadSessions 把视图强切 sessions[0](主工作台会话)并加载其记录(session-actions.ts:626-635)——测试直造该状态坐实。
+- 「无会话态」全部到达点静态枚举(grep pendingNewSession/currentSessionPath 全部赋值点+逐一核实):
+  1. 冷启动初始形状(session-slice.ts:200-206)——loadSessions 强切即设计内 bootstrap。可达,非新建流程。
+  2. archiveSession 归档当前会话(session-actions.ts:1380 清空)——:1386-1390 立即兜底切 sessions[0],窗口内 WS 触发的强切目标与之一致。可达,设计内。
+  3. QuickChatApp.tsx:125 设 pendingNewSession:false——quick-chat 为独立 HTML 入口(quick-chat-main.tsx/quick-chat.html)=独立渲染进程,store 实例隔离。排除。
+  4. mobile-init.ts——mobile 独立入口。排除。
+  5. desk-actions.ts:295/:1331 设 currentSessionPath:null 但同 patch 带 pendingNewSessionIdentityPatch()(草稿态),受 loadSessions guard 保护。排除。
+  6. 新建会话流程内部:invalidateSessionSwitches(:1175)→大 setState(:1216-1238)之间全同步无 await;switchSession :775 设 pendingSessionSwitchPath 先于首个 await(:793);:871-901 一次性翻三标志;错误路径(:805-811/:987-993)保持草稿态。⇒ 流程内「无会话态」不可达。排除。
+  7. ws-message-handler 从不写三标志(只读+:114-127 locator 修复,写 currentSessionId 需 currentSessionPath===sessionPath)。排除。
+  8. setCurrentSessionPath setter(session-slice.ts:224)主窗口零调用;setCurrentSessionRef(:225)仅 QuickChat。排除。
+  9. app-event-actions 'agent-switched'(:121)为显式切换;loadSessions :591-607 locator 回写要求 currentSessionId 非空+currentSessionPath=null 组合,主窗口流程不出现。排除。
+  10. 视图层无串台路径:grep sessions[0] 仅上述两处 store 站点;ChatArea 在 currentSessionPath=null 时渲染 null(chat/ChatArea.tsx:41)。排除。
+- 结论:对话记录串台的 store 层路径(机制b)在新建会话流程内**不可达**;机制真实存在但仅冷启动/归档两设计内入口触发。「记录串台」生产候选(未排除,store 层外):服务端身份/WS 时序(new-detached 会话身份与 switch 回包不一致→闸门丢事件→空白;或 replay 重放错会话)——需服务端配合复现。
+- 文件树串台=机制c坐实:createNewSession 只清三件套(:1235-1237),deskBasePath/deskWorkspaceMountId/deskTreeFilesByPath 全程不重置(crosstalk 测试);activateWorkspaceDesk 快照-恢复把清了一半的 desk 写回主工作台存档 workspaceDeskStateByRoot[root].deskFiles=[](desk-new-session-capture 测试,desk-actions.ts:394-455)。继承同工作台时旧树显示属功能意图;存档污染(回工作台丢子目录/文件列表)是缺陷。
+
+## 2026-09-05 修复轮五:Windows 初始对话界面工作台显示双缺陷(用户 bug 报告 2026-09-04)
+
+- 报告两症状+一次生机制,定位全部核实后修复(纯显示层+服务端创建护栏,不动工作台切换/文件功能):
+  1. **症状一(指示行/列表显示整条路径)**:WelcomeScreen 三处手写 `split('/').pop()` 取名(指示行 folderName、本次工作台列表项、额外文件夹列表项)对 Windows 反斜杠路径失效。改用 shared/workspace-history.ts 既有 `workspaceDisplayName()`(先归一分隔符再取末段);本次工作台列表项本就经 buildWorkspacePickerItems 归一(红证在指示行与额外文件夹两处),额外文件夹列表(workspaceFolders)是原生路径直渲染,一并治。
+  2. **症状二(同一工作台出现两次)**:下拉两来源(挂载 studioWorkspaces + 历史/主目录 buildWorkspacePickerItems)直接拼接、无跨源去重——同目录既是挂载又在 cwd_history 时渲染两行。FolderHistory 渲染前对历史/主目录条目按 `isSameWorkspacePath()`(反斜杠+Windows 大小写归一)与可见挂载的 nativeRootPath 跨源比对,命中即只留挂载行(带 label 与挂载移除钮)。Agent 主目录条目只与(隐藏的)默认挂载同根,不受影响。远端 principal 拿不到 nativeRootPath 时不比对(无从比对,维持两来源并列)。
+  3. **次生机制(Windows 大小写变体挂载)**:`localFsMountId` 派生不做大小写归一,同目录大小写变体各造一条 active 挂载。server/routes/studio-workspaces.ts createLocalPathWorkspace 创建前按「字符串不同但折叠后同根」(win32 下 resolve+lowercase,POSIX 恒 false)找既有 active local_fs 挂载,命中复用;完全相同字符串仍走 upsert(保留重加改 label 既有语义)。不改 mountId 派生本身——存量挂载的 mountId 被会话 meta 引用,改派生会孤立既有身份。
+  4. **继承链归一**(报告 触发链路①):session-actions.ts createNewSession 的 inheritedLocalFolder/keptSelectedFolder/keptDeskFolder 由 `.trim()` 改 `normalizeWorkspacePath()`,与 applyFolder 落 selectedFolder 的规范形态一致,反斜杠原生 cwd 不再进入前端草稿态。
+- 测试(红→绿:临时还原四处实现改动→5 用例红,恢复→全绿):
+  - WelcomeScreen +3:指示行反斜杠取名 / 挂载-历史跨源去重(红证:两行 nest-drama `expected length 1 but got 2`)/ 额外文件夹反斜杠取名。
+  - session-new-session-workspace +1:继承反斜杠 cwd 落 selectedFolder 前归一(红证:`expected 'C:\Users\...' to be 'C:/Users/...'`)。
+  - studio-workspaces-route +2:win32 桩下大小写变体复用既有挂载(红证:`expected 'local_fs_be8c76a96653d5e1' to be 'mount_case'`,registry 仅 1 条 local_fs)/ 精确重加仍走 upsert 更新 label(锁定护栏不破既有语义)。
+- 验证(2026-09-05 本工作树):定向 3 文件 29 用例绿;桌面 stores+WelcomeScreen+session-sections+app-init 475 用例绿;服务端 tripwire+workspace 相关 6 文件 146 用例绿;http-route-security 27 绿;`npm run typecheck` exit 0;eslint 改动文件 0 error(12 warning 全为既有 no-explicit-any,行号平移)。desktop 全量 `__tests__/`:2461 过/1 败(败者=既有 DeskSection Jian drawer 用例)+31 文件级环境性失败(workspace 包 @lingxi/plugin-protocol 未构建,均前轮 stash 对照证实的先在项),与基线一致零新增。
+- 本轮触碰文件均不在 163 个持久化受护源内;check 脚本对 engine.ts 的未重钉报错为修复轮二遗留状态(tripwire 15/15 仍绿),本轮未新增受护源改动。
+
+## 2026-09-05 修复轮四:默认工作台显示名规则 + 启动合流键可靠性(用户拍板:始终显示配置目录名,未配置才显示 Default)
+
+- 用户复测图证:启动时工作台名=配置目录名但列表缺 Default 期记录;发首条消息后工作台名翻成 "Default"、记录才齐。用户细化规则:**启动与运行期显示名一律=设置里配置的工作台目录名;"Default" 仅在未配置任何目录时显示**。
+- 改动:
+  1. **显示名派生**(desk-actions.ts):新增 `defaultWorkspaceDisplayName()`——取 store.homeFolder(显式配置信号,未配置为 null)的目录名,未配置回落 "Default";**不用服务端解析根路径推导**(未配置时服务端根回落内置目录,目录名非用户所愿)。两个咽喉点覆写:`applyStudioWorkspace`(mountId='default' 时 label 一律派生,selectedWorkspaceLabel/deskWorkspaceLabel 同源)与 `activateWorkspaceDesk`(同规则覆写 options.label——switchSession 恢复 desk、发送后翻转等一切路径经此)。全部显示面(DeskSection 面板标题:164/WorkspaceStableBody:47/SessionStatusCard:62/选择器按钮)读 deskWorkspaceLabel 或 selectedWorkspaceLabel,均被覆盖。WelcomeScreen 两处调用去掉硬编码 'Default'。非 default mount 严格保留调用方标签。
+  2. **启动合流键可靠性**(app-init.ts):引导期(agent config 就绪后)`void loadStudioWorkspaces()`——defaultWorkspaceRootPath 不再依赖 FolderPicker 挂载时的一次性请求,启动首屏左栏即可做 mount≡cwd 双形态合并(修图一「启动列表缺一整本账」)。
+- 效果:启动态名称=配置目录名(本地形态 basename)+列表两本账合并;发送后 desk 翻成 default mount 但显示名仍=配置目录名——**两态名称与列表一致,不再出现「先空白、发一条才齐/名称跳变」**。
+- 测试:desk-actions +4(派生覆盖服务端标签/未配置回落 Default+反斜杠与空白边界/非 default 保留标签/switch 恢复咽喉点);app-init +1(引导期调用 loadStudioWorkspaces)+mock 面补齐。红→绿:stash 实现后 5 红(含轮三的根捕获),恢复全绿。
+- 验证:stores+WelcomeScreen+session-sections+app-init 471 用例全绿;typecheck exit 0;eslint 改动文件 0 error 0 warning。
+
+## 2026-09-05 修复轮三:默认工作台与 Agent 工作台目录「同目录两本账」合流(用户拍板 1+2+3 全做)
+
+- 背景:用户确认 Default 工作台(内置 mount "default")与设置页 Agent 工作台目录是同一目录的两个入口,但对话分裂成两本账——会话身份键有两种形态(mount 形态=经切换器/挂载创建,带 workspaceMountId;cwd 形态=经目录历史/旧版本创建,只带 cwd),左栏作用域对两种形态严格互斥(session-sections.ts 原 :170-175)。
+- 三项改动:
+  1. **入口归一**(WelcomeScreen.tsx):目录历史选 Agent 主目录(handleSelectHistory)与欢迎页 Agent 芯片(AgentChips)两个本地形态入口,统一改走 `applyStudioWorkspace({mountId:'default'})`;AgentChips 保留「解析到同一目录不重载 desk」优化(比较改为按解析后的工作台身份,selectedWorkspaceMountId==='default' 时取 defaultWorkspaceRootPath 对比)。跨 Agent 选择时 desk 的 mount 根在会话落到目标 Agent 前按当前 Agent 解析,属草稿期瞬态,首条消息后随 switch 回包归位(注释已记)。
+  2. **作用域归一**(session-sections.ts):WorkspaceScope 增可选 `defaultRootPath` 合流键;resolveWorkspaceScope 在「desk/pending 落在 default mount」或「本地路径 === 默认根」时携带;sessionBelongsToWorkspaceScope 双向放行——default mount 作用域收 cwd 指向该根的旧形态会话,该根的本地作用域收 mount "default" 会话;其余 mount 保持严格互斥。store 新增 `defaultWorkspaceRootPath`(desk-slice),loadStudioWorkspaces 从 isDefault 条目的 nativeRootPath 捕获(列表本体保留 Default 条目——预览/文件刷新按 mountId 查找依赖它);SessionList 接线传入。
+  3. **切换器隐藏 Default**(WelcomeScreen FolderHistory):渲染过滤 isDefault 条目(仅 UI 层;同一目录经历史/主目录条目进入且已是 mount 形态)。
+- 测试:session-sections +4 用例(双向合流/非 default 仍严格/合流键仅按需附着);desk-actions +1(默认根捕获+列表保留);WelcomeScreen +2(历史选主目录→mount 形态、Default 行隐藏且 store 保留)并更新 2 条锁定旧本地形态的用例(agent 芯片选择→断言 mount 形态);「同目录不重载」用例原样通过。
+- 红→绿:stash 全部实现改动后 8 用例红(4 作用域+1 捕获+2 更新+1 历史入口),恢复后全绿。
+- 验证:stores 426 / session-sections 16 / WelcomeScreen 12 全绿;components 目录 798 过/1 败(先在的 DeskSection Jian drawer 用例,与本改动无关,前轮已 stash 对照证实);typecheck exit 0;eslint 改动文件 0 error(顺手清了 WelcomeScreen 失时效的 any-disable 与 unused import,warning 从 HEAD 3 → 0)。
+- 效果预期:同一目录(=默认工作台=Agent 工作台目录)的 mount 形态与 cwd 形态会话在左栏合并显示;不再产生新的 cwd 形态会话(入口全部走 mount);切换器不再出现与目录历史重复的 Default 行。旧 cwd 会话无需迁移即并入。
+
+## 2026-09-05 修复轮二:左栏列表空白三症状的真根因(engine 未暴露 getSessionWorkspaceMount)
+
+- 用户复测反馈:修复轮一只治好「新建聊天拽回默认目录」,症状1/2/3(新对话后记录区空白、点新建聊天列表才出现、点进记录列表又清空)原样未动。
+- 重新定位(静态链+真服务器探针辅助):
+  - **switch 路由的工作台身份回传只信 `engine.getSessionWorkspaceMount`**(server/routes/sessions.ts:2616 经 sessionWorkspaceMountFields,与 create 路由不同、无 workspaceSelection.mount fallback);
+  - **真实 engine 只暴露了 getSessionWorkspaceFolders/getSessionAuthorizedFolders 两个委托**(core/engine.ts:2117-2122),漏了 getSessionWorkspaceMount——路由 optional-call `engine.getSessionWorkspaceMount?.()` 静默拿到 undefined;
+  - ⇒ **switch 回包永远不带 workspaceMountId/workspaceLabel** ⇒ 客户端 resetDeskForSessionWorkspace(cwd,mountId=null) → desk 落本地目录键;
+  - 而会话列表投影带 mountId(engine 侧直接读 meta,core/session-coordinator.ts:6664-6666;new-detached 落库即写 meta :2661-2663);
+  - 客户端作用域谓词:本地作用域**严格排除**带 mountId 的会话(session-sections.ts:173)→ 活跃会话态左栏必然空白(症状1/3);草稿态取 selected*(mount)→ 列表正常(症状2「点新建聊天才显示」)。三个症状一个根因。
+  - 路由契约本有测试锁(tests/sessions-route.test.ts:127/:169-170,mock 的 engine 带该方法)——证明设计意图就是 engine 暴露它,真实 engine 漏配。
+- 修复:core/engine.ts 补一行委托 `getSessionWorkspaceMount(p){ return this._sessionCoord.getSessionWorkspaceMount(p); }`(紧随两个兄弟委托)。
+- 回归测试:tests/engine-session-workspace-mount.test.ts 2 用例(存在性+委托传参/默认参)。红→绿:`git stash push -- core/engine.ts` 后 2 红(`expected 'undefined' to be 'function'`),恢复后 2 绿。
+- 验证(2026-09-05):tripwire 15/15;路由+引擎+协调器定向 133+47 用例绿;stores 425 绿;typecheck exit 0;eslint engine.ts 0 error 且 warning 数与 HEAD 一致(129 行含汇总)。探针脚本(/tmp,未入库)确认了 409/清单/模型门等服务端行为,静态链闭合后不再依赖。
+- 链条覆盖:coordinator meta 读(既有)→ engine 委托(新测试)→ 路由发射(既有测试)→ 客户端 desk 恢复(desktop stores 测试)。
+
+## 2026-09-05 修复轮:新建会话工作台语义(用户拍板=规则B「跟随当前工作台」,批准动手)
+
+- 用户经三轮描述确认病灶全貌(见 BLOCKED.md 2026-09-05 条目)并批准修复。改动三处+文案:
+  1. **createNewSession 继承源重排**(session-actions.ts:1199-1240):无当前会话时继承「当前显示的工作台」——草稿选择(applyFolder/applyStudioWorkspace 写入的 selectedFolder/selectedWorkspaceMountId)优先,其次 desk 已激活身份(deskWorkspaceMountId/deskBasePath,仅本地目录态取路径);两者皆空才落 Primary Agent 工作台(设置页默认语义保留)。Primary 兜底加「未选 mount」门,防 selectedFolder 被 Primary 路径污染。修:症状4(其他工作台点新建聊天被拽回默认)、Default 下列表显示设置目录记录(显示作用域与数据归属分家)。
+  2. **去掉空缓存种子**(原 :1155):stageDetachedSessionForActivation 不再 initSession(path,[],false),switchSession 走 !hasData→loadMessages 真实拉历史并 stamp revision。修:症状1(新会话消息区空白——不再依赖 WS 事件)。
+  3. **loadSessions 尾部补 reconcile 触发**(:636-641):列表刷新后校验当前会话缓存 revision,落后即补拉——闭合「列表说磁盘前进了、缓存永远不追」的自愈缺口(桌面端此前仅 chat-find-locate/移动端触发)。修:「退出重进才恢复」类残留空白。
+  4. **文案对齐**(5 locales homeFolderDesc,如 zh.json:2317):「新建对话跟随当前打开的工作台;未打开其他工作台时默认使用此目录,巡检和定时任务也在这里执行」。
+- 测试:
+  - 更新锁定旧行为的现有用例 1 条(session-actions.test.ts「without a current session…」:期望从落 Primary 改为保持 desk 显示的目录);为「posts one new-session request」补 messages 端点 mock(断言未动)。
+  - 新增 session-new-session-workspace.test.ts 5 用例:mount 草稿保持/folder 草稿保持/仅 desk 身份保持/Primary 兜底保留/reconcile 自愈链。
+  - session-new-session-blank.test.ts 由 KNOWN DEFECT 表征翻为 regression: FIXED(锁定历史真实加载)。
+- 红绿证据:`git stash push -- session-actions.ts` 后新回归 5 用例中 4 例红(第 5 例 Primary 兜底新旧行为一致故两态皆绿),pop 恢复后全绿。
+- 验证(2026-09-05 本工作树):
+  - `./node_modules/.bin/vitest run desktop/src/react/__tests__/stores/` → **31 文件 / 425 用例全绿**(原 89 基线含于其中)。
+  - `./node_modules/.bin/vitest run desktop/src/react/__tests__/` → **2445 passed / 1 failed**;失败集合与「无我的改动」基线逐文件一致(1 例先在的 DeskSection Jian drawer 用例+31 个文件级环境性失败=workspace 包 @lingxi/plugin-protocol 未构建,均先在,stash 对照证实)。
+  - `npm run typecheck` → exit 0(root/node/test 三段);i18n parity 5 用例绿;eslint 改动文件 0 error(实现文件 warning 数与 HEAD 一致=1)。
+- 未动(维持已诊断待办):机制c desk 存档污染(desk-new-session-capture.test.ts 仍锁定该缺陷,P1-3 清单在案)、机制b 强切无会话态(P2-5 纵深防御,枚举已证不可达)。
+
+## 2026-09-04 任务3完成:归因结论与修复清单(不动手,仅清单)
+
+### 归因(两症状各一句)
+
+1. **空白=架构层为主,ea03c627 是触发器而非根因**:「会话身份(switch 完成)/消息缓存(种子空缓存+hasData 短路)/内容来源(WS 事件流)」三源无事务绑定,首屏正确性隐式依赖 WS 事件全达且不被入口闸门丢弃;ea03c627 让「新建会话」首次稳定走完 stage空缓存→skip历史加载 这条链(:1155→:864-868),WS 一断供即空白。
+2. **串台(文件树/存档)=架构层与表层混合**:会话身份与 desk 缓存两套事实无事务绑定是架构层旧疾;createNewSession 半清空 desk(:1235-1237)再被 activateWorkspaceDesk 快照回写(desk-actions.ts:394-455)是 ea03c627 重写引入的具体缺陷点。**串台(对话记录)=机制b(session-actions.ts:626-635)真实存在但新建流程内不可达**(任务2枚举排除);生产残留候选=服务端身份/WS 时序,未排除(见 BLOCKED.md)。
+
+### 修复清单(保留 ea03c627 继承语义,全部只修时序/边界;优先级从高到低)
+
+| # | 位置 | 改动 | 预期效果 | 回归风险 | 验收测试名(建议) |
+|---|---|---|---|---|---|
+| P0-1 | session-actions.ts:1155 | stageDetachedSessionForActivation 移除 `initSession(ref.sessionPath,[],false)` 预种空缓存,让 switchSession :864-868 走 !hasData→loadMessages 拉历史并 stamp revision | 新会话首屏由历史加载兜底,WS 事件丢/迟不再空白;revision 落 stamp 后自愈链有基点 | 低:空会话多一次 messages 请求;WS 先到时 session_user_message 自会 initSession(ws-message-handler.ts:965-967),缓存含真实内容不受影响 | 「ensureSession 完成后新会话缓存从 /api/sessions/messages 加载而非空种子」(现 session-new-session-blank.test.ts 翻红即修复生效) |
+| P0-2 | session-actions.ts:638(loadSessions 尾部) | loadSessions setState 完成后补 `void reconcileCurrentSessionMessages('sessions_refresh')` | 闭合自愈缺口:InputArea.tsx:836 发送后刷列表、列表投影带 revision(server/routes/sessions.ts:958)而缓存 revision=null 时自动补拉;桌面端当前仅 chat-find-locate/移动端前台触发(ChatMessageSurface.tsx:371/MobileApp.tsx:204) | 中:所有缓存落后会话都会补拉(网络量↑);流式会话已被 reconcile :537 streamingSessions guard 排除 | 「loadSessions 后缓存 revision 落后触发补拉」 |
+| P1-3 | session-actions.ts:1235-1237 | createNewSession 不再清 desk 三件套(deskCurrentPath/deskFiles/deskJianContent),desk 状态整体交 activateWorkspaceDesk 的 capture-restore(同 key=原样继承;异 key=恢复目标存档) | 主工作台存档不再被清空快照污染;新会话草稿期 desk 稳定显示继承工作台(继承语义更完整) | 低:草稿期旧 deskFiles 短暂可见(本就是要显示的工作台);ea03c627 现有锁定测试不涉三件套清空断言 | 「createNewSession 不污染 workspaceDeskStateByRoot」(现 desk-new-session-capture.test.ts 翻红即修复生效)+「继承同工作台 desk 状态原样保留」 |
+| P1-4(备选) | desk-actions.ts:397-399 | 若不动 createNewSession:captureCurrentWorkspaceDeskState 在 store.pendingNewSession===true 时跳过 capture | 同 P1-3 止血 | 中:草稿期用户在 desk 的合法操作不被存档;不如 P1-3 干净 | 同 P1-3 |
+| P2-5 | session-actions.ts:626-635 | 强切 sessions[0] 加一次性 bootstrap 标志(冷启动/归档两设计内入口显式置位),防未来新入口在无会话态被静默拉走 | 纵深防御(当前枚举已排除可达路径,无行为变化) | 低:需同步 archiveSession :1386-1390 兜底与 app-init 冷启动置标志,否则破坏现有行为 | 「冷启动/归档仍落 sessions[0]」「未来无会话态不被 loadSessions 拉走」 |
+
+取舍说明:5 项全部不回退「新建聊天继承当前主工作台」;P1-3 反而让 desk 侧继承语义更完整(原样继承,而非清空)。
+
 ## 2026-09-02 安全双件套开工回执
 - 目标：为外部证据增加机械注入扫描，为 Agent 工具循环增加阶梯式跑飞守卫。
 - 顺序：共享扫描引擎 → 知识普通/滚动链路 → 工具扩展 → 开放边界 → 全量验收。

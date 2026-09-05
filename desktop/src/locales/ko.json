@@ -2245,7 +2245,7 @@
       "automationPermissionMode": "자동화 권한 모드",
       "automationPermissionModeDesc": "백그라운드 자동화 Agent Run이 도구 호출을 자동 검토할지, 전체 권한으로 실행할지, 읽기 전용으로 둘지 정합니다. 자동 검토를 통과하지 못한 작업은 거부됩니다",
       "homeFolder": "작업 공간",
-      "homeFolderDesc": "새 대화, 순찰, 예약 작업의 기본 작업 디렉토리",
+      "homeFolderDesc": "새 대화는 열려 있는 작업 공간을 따릅니다. 다른 작업 공간이 없을 때의 기본 작업 디렉토리이며, 순찰과 예약 작업도 여기서 실행됩니다",
       "homeFolderPlaceholder": "미설정 (매번 수동 선택)",
       "homeFolderClear": "지우기",
       "homeFolderBrowse": "찾아보기",

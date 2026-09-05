@@ -66,6 +66,11 @@ export interface DeskSlice {
    */
   deskWorkspaceNativeRoot: string | null;
   studioWorkspaces: StudioWorkspace[];
+  /**
+   * 默认工作台（mount "default" = 当前 Agent 的工作台目录）的本地根路径。
+   * 左栏作用域用它做双形态合流：历史 cwd 形态会话与 mount 形态会话同属一个工作台。
+   */
+  defaultWorkspaceRootPath: string | null;
   workspaceFolders: string[];
   cwdHistory: string[];
   workspaceDeskStateByRoot: Record<string, WorkspaceDeskState>;
@@ -117,6 +122,7 @@ export const createDeskSlice = (
   deskWorkspaceLabel: null,
   deskWorkspaceNativeRoot: null,
   studioWorkspaces: [],
+  defaultWorkspaceRootPath: null,
   workspaceFolders: [],
   cwdHistory: [],
   workspaceDeskStateByRoot: {},
