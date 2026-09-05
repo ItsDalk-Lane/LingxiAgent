@@ -57,8 +57,8 @@
 | P4-01 | completed | `95e5377c0e693599c12b9fb47df9026e04126c28` | Catalog 目标引用目录 |
 | P4-02 | completed | `40c4db7a95b5db58f41dead8d4d5ea044f8190d6` | Bridge Gateway 适配 |
 | P4-03 | completed | `ae40059d531bad737c1427cb232e7e8fcf7d03ba` | MCP eligibility 与执行器 |
-| P5-01 | completed | 待本项提交后回填 | Plugin 工具代次 |
-| P5-02 | pending | — | MCP live generation |
+| P5-01 | completed | `30eb7d7c5eeb4f9b8d455961ef8bab7104adccf7` | Plugin 工具代次 |
+| P5-02 | completed | 待本项提交后回填 | MCP live generation |
 | P5-03 | pending | — | 旧会话撤销语义 |
 | P6-01 | pending | — | plugin-dev 聊天身份 |
 | P6-02 | pending | — | LocalDeveloperPrincipal |
@@ -216,8 +216,20 @@
 - 绿灯命令：插件管理、插件运行时、注册表、网关、Engine 延迟装配和 bundled parity 共 6 文件 Vitest；`npm run typecheck`；注册表与网关定向 ESLint；`git diff --check`。
 - 绿灯原始结果：Vitest exit `0`，`6 passed` files、`151 passed` tests；三段 typecheck exit `0`；定向 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p501-gate-final2.log`、`/tmp/lingxi-tool-contract-p501-typecheck-final2.log`、`/tmp/lingxi-tool-contract-p501-new-eslint-final.log`。
-- 提交 SHA：待本项提交后、P5-02 红灯前回填。
+- 提交 SHA：`30eb7d7c5eeb4f9b8d455961ef8bab7104adccf7`
 - 偏差：任务书只在 P5-03 后给出阶段提交信息，但用户明确要求每项提交并推送；本项使用独立、内容对应的提交信息。开发入口的 reset 复用同一 reload/install 流程，因此由同一 unload cleanup 与初次加载代次推进覆盖，不另设旁路。
+
+### P5-02 给 MCP 工具增加 live generation
+
+- 状态：`completed`
+- 改动文件：`core/mcp/manager.ts`、`core/engine.ts`、`core/tool-target-registry.ts`、`tests/tool-deferred-mcp-parity.test.ts`、`TOOL_INVOCATION_REPAIR_PROGRESS.md`。
+- 红灯命令：`set -o pipefail; npx vitest run tests/tool-deferred-mcp-parity.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p502-red.log`
+- 红灯原始结果：exit `1`；`1 failed` file、`12 passed / 1 failed` tests；新增用例因旧 Manager 不存在连接器代次接口而失败，符合预期。
+- 绿灯命令：MCP parity/runtime、Engine 延迟装配、Catalog Bridge、网关、注册表和会话权限共 7 文件 Vitest；`npm run typecheck`；新增回归与注册表定向 ESLint；`git diff --check`。
+- 绿灯原始结果：Vitest exit `0`，`7 passed` files、`278 passed` tests；三段 typecheck exit `0`；定向 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p502-gate-final.log`、`/tmp/lingxi-tool-contract-p502-typecheck-final.log`、`/tmp/lingxi-tool-contract-p502-new-eslint-final.log`。
+- 提交 SHA：待本项提交后、P5-03 红灯前回填。
+- 偏差：任务书只在 P5-03 后给出阶段提交信息，但用户明确要求每项提交并推送；本项使用独立、内容对应的提交信息。测试放在 P4-03 新建的 MCP direct/deferred parity 文件中，未新建额外测试模块。
 
 ## 错误日志
 
@@ -256,13 +268,14 @@
 | 2026-09-05 16:06 +0800 | P4-03 | 首次最终 typecheck 报测试夹具把 `unknown` 赋给具体配置类型，exit `2` | 1 | 只在测试配置存储边界显式收窄类型，生产代码不变；重跑三段 typecheck |
 | 2026-09-05 16:10 +0800 | P4-03 | 执行前 eligibility 错误码接入网关后，网关错误码联合和辅助函数类型过宽，typecheck exit `2` | 1 | 把 `TARGET_DISABLED_FOR_AGENT` 纳入网关稳定码并复用注册表判定类型；不改运行策略 |
 | 2026-09-05 16:11 +0800 | P4-03 | 富结果等价测试 `1/85` 失败，仅差两套临时夹具各自生成的会话来源路径 | 1 | 让 direct/deferred 使用同一会话坐标后继续做完整对象严格相等，不删除 provenance 字段、不放宽断言 |
+| 2026-09-05 16:26 +0800 | P5-02 | 首次实现后 MCP parity `187 passed / 2 failed`，direct 准备记录仍使用默认代次；typecheck 同时报 Manager 类声明缺字段 | 1 | 给统一 direct façade 写入装配代次，并补 Manager 代次表声明；网关仍严格拒绝不匹配，不放宽检查 |
 
 ## 断点续跑自检
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P5-01 已完成红绿验证与门禁，等待提交和推送 |
-| 接下来去哪？ | 独立提交并推送 P5-01，回填 SHA 后进入 P5-02 MCP live generation |
+| 现在在哪里？ | P5-02 已完成红绿验证与门禁，等待提交和推送 |
+| 接下来去哪？ | 独立提交并推送 P5-02，回填 SHA 后进入 P5-03 旧会话撤销与漂移播报 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P4-03；P5-01 完成插件单调代次、宿主只读代次注入、实时可用性接口、注册表装配代次冻结和网关执行前复核，相关门禁 `151/151` |
+| 已做什么？ | 完成并推送 P0-00 至 P5-01；P5-02 完成 MCP 契约代次、配置与工具清单变化推进、描述器实时代次、引擎冻结代次透传，并把暂时停机保持为传输失败；相关门禁 `278/278` |

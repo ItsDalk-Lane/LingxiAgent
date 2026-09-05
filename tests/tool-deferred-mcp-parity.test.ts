@@ -23,6 +23,7 @@ interface TestMcpConfig {
     id: string;
     name: string;
     url: string;
+    enabled?: boolean;
     tools: TestMcpToolConfig[];
   }>;
 }
@@ -236,6 +237,59 @@ describe("MCP target descriptor", () => {
     expect(search.evaluateEligibility(agentConfig(["search"]), { surface: "model" })).toMatchObject({
       eligible: false,
       reason: "mcp_tool_removed",
+    });
+  });
+
+  it("只在契约生命周期变化时推进代次，临时断线保留为传输失败", async () => {
+    const { manager, getConfig, setConfig } = managerWithTools();
+    const descriptor = manager.getToolTargetDescriptors()
+      .find((entry) => entry.catalogMetadata.toolName === "search");
+    expect(descriptor).toBeDefined();
+    const initialGeneration = manager.getConnectorToolGeneration("alpha");
+    expect(initialGeneration).toBeGreaterThan(0);
+    expect(descriptor.catalogMetadata.lifecycleGeneration).toBe(initialGeneration);
+
+    manager.saveConfig(structuredClone(getConfig()));
+    expect(manager.getConnectorToolGeneration("alpha")).toBe(initialGeneration);
+
+    const changedListing = structuredClone(getConfig());
+    changedListing.connectors[0].tools.push({
+      name: "new_tool",
+      description: "New tool",
+      inputSchema: { type: "object", properties: {} },
+    });
+    manager.saveConfig(changedListing);
+    manager.registerCachedTools();
+    const listingGeneration = manager.getConnectorToolGeneration("alpha");
+    expect(listingGeneration).toBeGreaterThan(initialGeneration);
+    expect(descriptor.getCurrentGeneration()).toBe(listingGeneration);
+
+    manager.clients.delete("alpha");
+    await expect(descriptor.isCurrentlyAvailable({
+      agentConfig: agentConfig(["search", "lookup"]),
+    })).resolves.toMatchObject({
+      eligible: false,
+      reason: "mcp_connector_stopped",
+      code: "TRANSPORT_FAILURE",
+    });
+
+    const disabled = structuredClone(getConfig());
+    disabled.connectors[0].enabled = false;
+    manager.saveConfig(disabled);
+    const disabledGeneration = manager.getConnectorToolGeneration("alpha");
+    expect(disabledGeneration).toBeGreaterThan(listingGeneration);
+
+    const removed = structuredClone(getConfig());
+    removed.connectors = [];
+    manager.saveConfig(removed);
+    expect(manager.getConnectorToolGeneration("alpha")).toBeGreaterThan(disabledGeneration);
+    setConfig(removed);
+    await expect(descriptor.isCurrentlyAvailable({
+      agentConfig: agentConfig(["search"]),
+    })).resolves.toMatchObject({
+      eligible: false,
+      reason: "mcp_connector_removed",
+      code: "TARGET_REVOKED",
     });
   });
 });
