@@ -1,3 +1,4 @@
+import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { ToolInvocationGateway } from "../core/tool-invocation-gateway.ts";
 import { ToolTargetRegistry } from "../core/tool-target-registry.ts";
@@ -135,7 +136,7 @@ function createPathParityFixture({ grants = [] }: { grants?: string[] } = {}) {
   });
   const sessionRef = Object.freeze({
     sessionId: "session-path-parity",
-    sessionPath: "/sessions/path-parity.jsonl",
+    sessionPath: path.resolve("/sessions/path-parity.jsonl"),
   });
   const principal = Object.freeze({ agentId: "agent-path-parity", sessionRef });
 
