@@ -75,6 +75,9 @@ jobs:
         run: node scripts/smoke-windows-sandbox-helper.mjs x64
 
       - name: Typecheck
+        # macOS ARM 运行器默认约 2GB 堆不足以检查完整测试工程，显式保留 4GB。
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
         run: npm run typecheck
 
       - name: Lint

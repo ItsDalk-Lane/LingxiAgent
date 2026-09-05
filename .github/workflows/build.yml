@@ -66,6 +66,9 @@ jobs:
         run: npm ci
 
       - name: Typecheck
+        # 发布与合并检查使用相同容量，避免测试工程在默认堆上限处中断。
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
         run: npm run typecheck
 
       - name: Lint
