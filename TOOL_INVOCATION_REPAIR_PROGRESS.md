@@ -30,10 +30,15 @@
 | P6-01 | `completed` | `30f51d558a4271953f3cb890f150d1f4a4ded20d` | plugin-dev 聊天身份与真实权限，6 项红灯转绿 |
 | P6-02 | `completed` | `e367c51f4894da81abdc55c3603c800fe591c6f9` | 本地开发者身份与 Gateway 路由，13 项红灯转绿 |
 | P7-01 | `completed` | `5f62fd5ba9506a99bc559fa13ca3dd60950907c9` | 统一媒体执行目标解析器，缺模块红灯转绿 |
-| P7-02 | `completed_pending_commit` | 待提交 | 四类媒体入口统一，5 项红灯转绿 |
-| P8 | `pending_v0134_adaptation` | — | 知识正式架构发生变化，需重点适配 |
-| P9–P11 | `pending_migration` | — | 迁移错误、边界、组合测试与文档 |
-| P12 | `pending` | — | 最终验证、构建和封印 |
+| P7-02 | `completed` | `b78bcc7dbb13c88734c129992b306b5c80289c7c` | 四类媒体入口统一，5 项红灯转绿 |
+| P8-01 | `completed` | `855ed701f9375f87f95618e9e49e083c74a326a7` | 按 v0.1.34 正式知识架构适配共享重排语义 |
+| P9-01 | `completed` | `c470e9c624f0637c99c0a664a1756a8cf09b3d4c` | 统一错误因果与安全诊断 |
+| P9-02 | `completed` | `c63dcf6011f9240e7f66693074d4292dbb9b8443` | 2129 个生产源码文件的底层执行边界为 0 违规 |
+| P10-01 | `completed` | `f0def592e3871567d09a33b597aa70c21c6252b5` | 路径等价变形测试先红后绿 |
+| P10-02 | `completed_with_red_not_reproduced` | `a90cdd1f188495b9e68b025936bc2c5ae34abb9c` | 新组合首次即绿，如实保留偏差 |
+| P11-01 | `completed` | `29a296611a1da1509671f819cf0032dd72937eb2` | 架构说明及文档门禁完成 |
+| P11-02 | `completed` | `c217a04b3a6f33146cd5483cbaf4aed7715891c3` | 报告与机器事实完成；首个源码候选随后被 P12-02 边界门禁作废 |
+| P12 | `repairing_current_item` | 待新源码候选 | P12-02 发现开放清单漏登记，当前只修该项并准备从 P12-01 重跑 |
 
 ## P0-00 固定 Git 基线并创建校正版分支
 
@@ -319,13 +324,25 @@
 
 ## P11-02 修复报告与机器事实
 
-- 状态：`completed_pending_source_candidate_commit`。
+- 状态：`completed`。
+- 提交：`c217a04b3a6f33146cd5483cbaf4aed7715891c3`，已推送并核对远端一致；该提交曾作为首个源码候选，后被 P12-02 边界门禁作废。
 - 复用来源：原分支提交 `931543baedacca62417ef9d4a517d1b9857c9abd` 只作为结构模板；所有基线、分支、统计、日志和适配结论均按 v0.1.34 校正版现场重建。
 - RED：exit `1`；1 file，`1 failed / 4 passed` tests；四份任务书指定报告尚不存在，原始错误为 `ENOENT`。
 - GREEN：exit `0`；1 file / 5 tests 全部通过；机器事实 JSON 独立解析 exit `0`。
 - typecheck exit `0`；边界扫描 exit `0`，2129 个生产源码文件 0 违规；测试定向 ESLint exit `0`、无输出；`git diff --check` exit `0`。
 - `sourceCandidateSha` 和 `sealSha` 按任务书保持 `null`；真实坐标只写 `PROGRESS.md` 和最终执行报告，避免提交自引用。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p1102-red.log`、`/tmp/lingxi-tool-contract-v0134-p1102-gate.log`、`/tmp/lingxi-tool-contract-v0134-p1102-boundary.log`、`/tmp/lingxi-tool-contract-v0134-p1102-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p1102-eslint.log`。
+
+## P12 首次验证与 P12-02 当前项修复
+
+- 首个源码候选：`c217a04b3a6f33146cd5483cbaf4aed7715891c3`，验证开始前工作树干净且远端一致。
+- P12-01 在该候选上通过：底层执行边界扫描 2129 个生产源码文件、0 违规；指定 25 文件 / 389 测试全部通过。
+- P12-02 已通过部分：typecheck exit `0`；lint exit `0`，`0 errors / 9231 warnings`。
+- P12-02 原始失败：`lint:boundary` exit `1`，发现 26 条本次规范模块尚未登记到开放清单的跨层连接，另有 1 条既有债务；因此没有继续运行本轮全量测试或 P12-03。
+- 当前项修复：只向 `export-manifest.json` 精确加入 6 个本次新增模块，未增加目录级通配豁免；重新生成运行闭包为 11005 文件（源码图 796、运行资源 11、依赖追踪 10198），开放边界仍只有 1 条既有债务。
+- 修复后 `lint:boundary` exit `0`；开放边界与闭包回归 2 files / 39 tests 全部通过；`git diff --check` exit `0`。
+- 处理：首个源码候选已作废；本项提交后形成新源码候选，并严格从 P12-01 重跑全部门禁。
+- 日志：`/tmp/lingxi-tool-contract-p1201-boundary.log`、`/tmp/lingxi-tool-contract-p1201-targeted.log`、`/tmp/lingxi-tool-contract-p1202-typecheck.log`、`/tmp/lingxi-tool-contract-p1202-lint.log`、`/tmp/lingxi-tool-contract-p1202-open-boundary.log`、`/tmp/lingxi-tool-contract-v0134-p1202-closure-regenerate.log`、`/tmp/lingxi-tool-contract-v0134-p1202-open-boundary-fix.log`、`/tmp/lingxi-tool-contract-v0134-p1202-boundary-regression.log`。
 
 ## 错误记录
 
@@ -335,3 +352,4 @@
 | 2026-09-05 | `P12_SEQUENCE_SEAL_GATE_CYCLE` | P0 新增任务记录使全量套件中的旧封印测试失败 | 保留 fail-closed 与原始失败；P12 按任务书固定新源码坐标 |
 | 2026-09-05 | `BUILD_SIGN_KEY_MISSING` | 原始 `build:server` 缺少签名密钥，exit `1` | 抛弃式匹配密钥诊断复跑 exit `0`；临时材料已删除 |
 | 2026-09-05 | P7-02 提交整理 | 首次提交暂存漏含 `core/media-adapters/` 下 7 个本项文件，提交尚未推送 | 推送前回读工作树发现并补入同一提交；未拆项、未丢改动 |
+| 2026-09-05 | `P12_OPEN_BOUNDARY_MANIFEST_DRIFT` | 首个源码候选的开放边界门禁发现 26 条新增连接未登记 | 只补 6 个精确开放模块并重生成闭包；原候选作废，新候选后从 P12-01 重跑 |
