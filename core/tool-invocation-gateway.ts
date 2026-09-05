@@ -9,6 +9,7 @@ import {
   type ToolTargetId,
 } from "../lib/tools/invocation/index.ts";
 import type {
+  CatalogTargetReference,
   RegisteredToolTarget,
   ToolTargetAvailabilityDecision,
   ToolTargetRegistry,
@@ -109,6 +110,10 @@ export class ToolInvocationGateway {
     this.registry = options.registry;
     this.authorize = options.authorize;
     this.now = options.now ?? Date.now;
+  }
+
+  resolveTarget(reference: CatalogTargetReference): RegisteredToolTarget {
+    return this.registry.resolveCatalogTarget(reference);
   }
 
   /** 宿主桥接器只委托注册表中真实目标明确拥有的能力。 */

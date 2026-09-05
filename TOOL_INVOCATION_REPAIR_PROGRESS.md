@@ -26,8 +26,9 @@
 | P4-03 | `completed` | `1e21140cf77a36f0dcbe33ca4da6156ec78b269e` | MCP 可用性与执行器统一，12 项红灯转绿 |
 | P5-01 | `completed` | `7817c8d7180725d69273885ab7cdd289b37edf55` | Plugin 工具单调代次，3 项红灯转绿 |
 | P5-02 | `completed` | `2689fedc4f71be28c3579e90703a8da06268c683` | MCP live generation，1 项红灯转绿 |
-| P5-03 | `completed_pending_commit` | 待提交 | 旧会话撤销与联合漂移清单，1 项红灯转绿 |
-| P6–P7 | `pending_migration` | — | 优先复用原实现 |
+| P5-03 | `completed` | `b8840f18b58d631e8d602d17af66ff5dccff2763` | 旧会话撤销与联合漂移清单，1 项红灯转绿 |
+| P6-01 | `completed_pending_commit` | 待提交 | plugin-dev 聊天身份与真实权限，6 项红灯转绿 |
+| P6-02–P7 | `pending_migration` | — | 优先复用原实现 |
 | P8 | `pending_v0134_adaptation` | — | 知识正式架构发生变化，需重点适配 |
 | P9–P11 | `pending_migration` | — | 迁移错误、边界、组合测试与文档 |
 | P12 | `pending` | — | 最终验证、构建和封印 |
@@ -195,12 +196,23 @@
 
 ## P5-03 旧会话撤销与漂移播报
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`b8840f18b58d631e8d602d17af66ff5dccff2763`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `6a6890fc0d8e67fa3bd71f1815c311d8bd65b3b7`；新回归原样迁移，引擎仅适配实时目录名称合并片段。
 - RED：exit `1`；1 file，`1 failed / 5 passed` tests；生命周期撤销已由前两项生效，唯一缺口是漂移清单漏掉 plugin。
 - GREEN：exit `0`；9 files / 312 tests 全部通过。
 - typecheck exit `0`；新增测试定向 ESLint exit `0`，0 问题；`git diff --check` exit `0`。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p503-red.log`、`/tmp/lingxi-tool-contract-v0134-p503-gate-final.log`、`/tmp/lingxi-tool-contract-v0134-p503-typecheck-final.log`、`/tmp/lingxi-tool-contract-v0134-p503-eslint-final.log`。
+
+## P6-01 plugin-dev 聊天身份
+
+- 状态：`completed_pending_commit`。
+- 复用来源：原分支提交 `0b2049015c136bd9b78df259732addd2446e072f`；非引擎文件同哈希迁移，引擎只适配开发工具装配片段。
+- RED：exit `1`；2 files，`6 failed / 1 passed` tests；模型可覆盖会话身份、权限被压平、执行绕过 Gateway，缺目标未关闭。
+- GREEN：exit `0`；6 files / 107 tests 全部通过。
+- typecheck exit `0`；新增测试定向 ESLint exit `0`，0 问题；`git diff --check` exit `0`。
+- 边界：聊天入口对 `service.invokeTool` 和 `executePluginTool` 搜索 exit `1`（0 命中）。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p601-red.log`、`/tmp/lingxi-tool-contract-v0134-p601-stage-final.log`、`/tmp/lingxi-tool-contract-v0134-p601-typecheck-final.log`、`/tmp/lingxi-tool-contract-v0134-p601-eslint-final.log`、`/tmp/lingxi-tool-contract-v0134-p601-chat-boundary-final.log`。
 
 ## 错误记录
 
