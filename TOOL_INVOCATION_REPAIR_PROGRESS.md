@@ -38,7 +38,7 @@
 - 测试命令：任务书列出的六条 `rg` 搜索；本项是只读审计，不适用旧代码失败回归。
 - 原始结果：六条搜索全部 exit `0`；12 个 bundled plugin 工具为 `7` 个 readOnly、`5` 个副作用；确认 `1` 个生产 PluginManager raw 执行入口、`6` 类生产 MCP `callTool` 位置、旧知识入口无外部生产调用方、四套媒体凭证回退链、Catalog 平面名称与浅层 schema 行为。
 - 日志路径：`/tmp/lingxi-tool-contract-p002-bridge-entrypoints.log`、`/tmp/lingxi-tool-contract-p002-plugin-executors.log`、`/tmp/lingxi-tool-contract-p002-mcp-calltool.log`、`/tmp/lingxi-tool-contract-p002-permission-dialects.log`、`/tmp/lingxi-tool-contract-p002-media-credentials.log`、`/tmp/lingxi-tool-contract-p002-knowledge-rerank.log`，以及基线文件列出的 5 份补充明细日志。
-- 提交 SHA：提交后在下一项进度更新中回填
+- 提交 SHA：`479f17145d5f5ef5d00c2718900eb04b27dba2ce`
 - 偏差：一次读取命令错误假设插件根入口文件存在，已改按真实 manifest/tools 路径读取并记录；无生产代码修改。
 
 ## 后续任务
@@ -46,8 +46,8 @@
 | 编号 | 状态 | 提交 SHA | 备注 |
 | --- | --- | --- | --- |
 | P0-01 | completed_with_baseline_failures | `179819092562f5c1d063baff56ada6486e340c1e` | 基线门禁；3 类真实红灯已归因 |
-| P0-02 | completed | 待回填 | 现状矩阵与入口清单 |
-| P1-01 | pending | — | 目标身份、路由和错误类型 |
+| P0-02 | completed | `479f17145d5f5ef5d00c2718900eb04b27dba2ce` | 现状矩阵与入口清单 |
+| P1-01 | completed | 待回填 | 目标身份、路由和错误类型 |
 | P1-02 | pending | — | 新旧权限方言规范化 |
 | P1-03 | pending | — | 完整 schema 校验器 |
 | P2-01 | pending | — | 会话级目标注册表 |
@@ -78,6 +78,19 @@
 | P12-05 | pending | — | 封印后门禁 |
 | P12-06 | pending | — | 推送与最终报告 |
 
+### P1-01 建立目标身份、路由和错误类型
+
+- 状态：`completed`
+- 改动文件：`lib/tools/invocation/types.ts`、`lib/tools/invocation/identity.ts`、`lib/tools/invocation/errors.ts`、`lib/tools/invocation/index.ts`、`tests/tool-target-identity.test.ts`、`tests/tool-invocation-errors.test.ts`、`TOOL_INVOCATION_REPAIR_PROGRESS.md`
+- 红灯命令：`npx vitest run tests/tool-target-identity.test.ts tests/tool-invocation-errors.test.ts`
+- 红灯原始结果：exit `1`；`2 failed` suites，`0` tests executed；两套测试均因 `lib/tools/invocation/index.ts` 不存在而加载失败，符合旧实现缺少规范化内核的预期原因。
+- 红灯日志：`/tmp/lingxi-tool-contract-p101-red.log`
+- 绿灯命令：同一定向 Vitest、`npm run typecheck`、对本项 6 个 TypeScript 文件执行定向 ESLint、`git diff --check`
+- 绿灯原始结果：定向 `2 passed` files、`6 passed` tests、exit `0`；三段 typecheck exit `0`；定向 ESLint 最终 `0` 问题、exit `0`；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p101-targeted.log`、`/tmp/lingxi-tool-contract-p101-typecheck.log`、`/tmp/lingxi-tool-contract-p101-eslint.log`
+- 提交 SHA：提交后在下一项进度更新中回填
+- 偏差：none
+
 ## 错误日志
 
 | 时间 | 编号 | 原始错误 | 次数 | 处理 |
@@ -89,13 +102,14 @@
 | 2026-09-05 13:41 +0800 | P0-01 | 无 `LINGXI_SIGN_KEY` 导致服务构建 exit `1` | 1 | 用临时抛弃式密钥诊断复跑 exit `0`，随后精确销毁临时签名目录；首次失败仍记为 FAIL_ENVIRONMENT |
 | 2026-09-05 13:46 +0800 | P0-01 推送 | 首次 `git push` 因 GitHub HTTPS 接收超时退出 `128` | 1 | 先回读本地/远端坐标并用 `git ls-remote` 确认网络恢复，再有限重试；第二次推送 exit `0` |
 | 2026-09-05 13:50 +0800 | P0-02 | 假设三个 bundled plugin 存在根 `index.ts`，组合读取命令因文件不存在退出 `1` | 1 | 根据 `find` 结果改读真实 `manifest.json` 与 `tools/*.ts`，不重复错误路径 |
+| 2026-09-05 13:57 +0800 | P1-01 | 首次定向 ESLint 报 `FirstPartyToolIdentityInput` 为空接口，`1 error / 0 warnings`，exit `1` | 1 | 改为等价类型别名；重跑定向测试、ESLint、typecheck、diff check 全部 exit `0` |
 
 ## 断点续跑自检
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P0-02 已完成，等待提交并推送 |
-| 接下来去哪？ | 提交并推送 P0-02 后进入 P1-01，先写身份与错误回归测试并确认旧实现缺失导致失败 |
+| 现在在哪里？ | P1-01 已完成，等待提交并推送 |
+| 接下来去哪？ | 提交并推送 P1-01 后进入 P1-02，先补权限方言规范化回归测试 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
 | 已做什么？ | 完成 P0-00/P0-01 并推送；P0-02 六组搜索和 bundled 工具矩阵已完成 |
