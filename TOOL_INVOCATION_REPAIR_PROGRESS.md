@@ -61,8 +61,8 @@
 | P5-02 | completed | `aede651699e2e6ce6b71bcd73ac62607ec9dd1a4` | MCP live generation |
 | P5-03 | completed | `6a6890fc0d8e67fa3bd71f1815c311d8bd65b3b7` | 旧会话撤销语义 |
 | P6-01 | completed | `0b2049015c136bd9b78df259732addd2446e072f` | plugin-dev 聊天身份 |
-| P6-02 | completed | 待本项提交后回填 | LocalDeveloperPrincipal |
-| P7-01 | pending | — | 媒体执行目标解析器 |
+| P6-02 | completed | `6fda792303cf6919acc459cc4bad06aaef4bc702` | LocalDeveloperPrincipal |
+| P7-01 | completed | 待本项提交后回填 | 媒体执行目标解析器 |
 | P7-02 | pending | — | 媒体入口统一 |
 | P8-01 | pending | — | rerank policy 共享执行器 |
 | P9-01 | pending | — | 统一错误映射 |
@@ -264,8 +264,20 @@
 - 绿灯命令：plugin-dev 聊天/HTTP、路由安全、Gateway、会话权限、插件管理/运行时和 Engine 装配共 10 文件 Vitest；`npm run typecheck`；新增 parity 与 Gateway 定向 ESLint；生产插件 executor 调用边界扫描；`git diff --check`。
 - 绿灯原始结果：Vitest exit `0`，`10 passed` files、`314 passed` tests；三段 typecheck exit `0`；定向 ESLint exit `0`、`0` 问题；生产 `executePluginTool(` 仅命中开发服务 Gateway source adapter 与 PluginManager 方法定义各 1 处；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p602-gate-final.log`、`/tmp/lingxi-tool-contract-p602-typecheck-final.log`、`/tmp/lingxi-tool-contract-p602-focused-eslint-final.log`、`/tmp/lingxi-tool-contract-p602-plugin-executor-boundary.log`。
-- 提交 SHA：待本项提交后、P7-01 红灯前回填。
+- 提交 SHA：`6fda792303cf6919acc459cc4bad06aaef4bc702`
 - 偏差：none
+
+### P7-01 建立唯一媒体执行目标解析器
+
+- 状态：`completed`
+- 改动文件：`core/media/media-execution-target.ts`、`core/media/media-execution-target-resolver.ts`、`tests/media-credential-routing-parity.test.ts`、`TOOL_INVOCATION_REPAIR_PROGRESS.md`。
+- 红灯命令：`set -o pipefail; npx vitest run tests/media-credential-routing-parity.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p701-red.log`
+- 红灯原始结果：exit `1`；`1 failed` suite、`0` tests，旧源码没有任务书要求的统一媒体执行目标解析模块，符合预期。
+- 绿灯命令：新增媒体凭证路由 parity 测试；`npm run typecheck`；3 个新增文件定向 ESLint；`git diff --check`。
+- 绿灯原始结果：Vitest exit `0`，`1 passed` file、`5 passed` tests；三段 typecheck exit `0`；定向 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p701-attempt1.log`、`/tmp/lingxi-tool-contract-p701-typecheck-attempt1.log`、`/tmp/lingxi-tool-contract-p701-eslint-attempt1.log`。
+- 提交 SHA：待本项提交后、P7-02 红灯前回填。
+- 偏差：任务书在 P7-02 后给出阶段提交信息；按用户“每项提交并推送”的要求，本项使用独立且内容对应的提交信息。
 
 ## 错误日志
 
@@ -315,8 +327,8 @@
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P6-02 已完成红绿验证与 P6 阶段扩展门禁，等待提交和推送 |
-| 接下来去哪？ | 使用任务书指定提交信息提交并推送 P6-02，回填 SHA 后进入 P7-01 |
+| 现在在哪里？ | P7-01 已完成红绿验证，等待提交和推送 |
+| 接下来去哪？ | 独立提交并推送 P7-01，回填 SHA 后进入 P7-02 四入口替换 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P6-01；P6-02 已建立独立本地开发主体、拒绝客户端身份覆盖，并让 HTTP/服务调用经 Gateway 与唯一插件来源适配器执行，相关门禁 `314/314` |
+| 已做什么？ | 完成并推送 P0-00 至 P6-02；P7-01 已建立统一媒体执行目标契约、固定凭证优先级与两个稳定失败码，新增回归 `5/5` |
