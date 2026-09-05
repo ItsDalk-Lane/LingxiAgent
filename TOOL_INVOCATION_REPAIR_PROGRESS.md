@@ -65,8 +65,8 @@
 | P7-01 | completed | `2ff451d74157678f733a2eeff111acb715d59ebd` | 媒体执行目标解析器 |
 | P7-02 | completed | `7581da5ffaeb47554df2a5ebcfcf91be2b6b9944` | 媒体入口统一 |
 | P8-01 | completed | `e74aafee04c539dcc1352887e8763a741fb06ba5` | rerank policy 共享执行器 |
-| P9-01 | completed | pending | 统一错误映射 |
-| P9-02 | pending | — | raw execution 边界检查 |
+| P9-01 | completed | `e3fe97120a411d3e8cc055bea5a8e2dd34d4f8ae` | 统一错误映射 |
+| P9-02 | completed | pending | raw execution 边界检查 |
 | P10-01 | pending | — | 路径等价变形测试 |
 | P10-02 | pending | — | 完整配置组合 |
 | P11-01 | pending | — | 架构文档 |
@@ -314,8 +314,20 @@
 - 绿灯命令：本项 8 文件与目标身份/注册、生命周期、direct/deferred/MCP、Engine、媒体凭证、插件开发/管理/运行时共 19 文件 Vitest；`npm run typecheck`；全部改动文件 ESLint；`git diff --check`。
 - 绿灯原始结果：Vitest exit `0`，`19 passed` files、`283 passed` tests；三段 typecheck exit `0`；ESLint exit `0`（`0 errors / 313 warnings`，均为既有大文件与既有测试风格警告）；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p901-gate-final.log`、`/tmp/lingxi-tool-contract-p901-typecheck-final.log`、`/tmp/lingxi-tool-contract-p901-eslint.log`。
-- 提交 SHA：`pending (commit 后由下一项进度回填)`
+- 提交 SHA：`e3fe97120a411d3e8cc055bea5a8e2dd34d4f8ae`
 - 偏差：任务书没有为 P9-01 单列提交信息；按用户“每项提交并推送”的要求使用与本项内容一致的独立提交信息。
+
+### P9-02 建立 raw execution 边界检查
+
+- 状态：`completed`
+- 改动文件：`scripts/check-tool-invocation-boundaries.mjs`、`tests/tool-invocation-boundary.test.ts`、`package.json`、`TOOL_INVOCATION_REPAIR_PROGRESS.md`。
+- 红灯命令：`set -o pipefail; npx vitest run tests/tool-invocation-boundary.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p902-red.log`
+- 红灯原始结果：exit `1`；`1 failed` suite、`0` tests；旧源码缺少任务书指定的 AST 边界扫描器，符合预期。
+- 绿灯命令：`npm run check:tool-invocation-boundaries`；`npx vitest run tests/tool-invocation-boundary.test.ts`；`npm run typecheck`；新增脚本和测试定向 ESLint；`git diff --check`。
+- 绿灯原始结果：独立扫描 exit `0`，扫描 `2121` 个生产源码文件、`0` 违规；Vitest exit `0`，`1 passed` file、`3 passed` tests，其中合成越界样例验证 5 类规则均会报错；三段 typecheck exit `0`；定向 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p902-boundary-final.log`、`/tmp/lingxi-tool-contract-p902-test-final.log`、`/tmp/lingxi-tool-contract-p902-typecheck-final.log`、`/tmp/lingxi-tool-contract-p902-eslint-final.log`。
+- 提交 SHA：`pending (commit 后由下一项进度回填)`
+- 偏差：none
 
 ## 错误日志
 
@@ -372,8 +384,8 @@
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P9-01 已完成红绿验证、错误契约与受影响扩展回归，等待提交和推送 |
-| 接下来去哪？ | 提交并推送 P9-01，回填 SHA 后进入 P9-02 raw execution 边界检查 |
+| 现在在哪里？ | P9-02 已完成红绿验证，AST 边界扫描与自动测试门禁均通过，等待提交和推送 |
+| 接下来去哪？ | 使用任务书指定提交信息提交并推送 P9-02，回填 SHA 后进入 P10-01 路径等价变形测试 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P8-01；P9-01 已统一错误因果、稳定 issue paths、安全模型文案与结构化诊断，扩展矩阵 `283/283` |
+| 已做什么？ | 完成并推送 P0-00 至 P9-01；P9-02 已建立精确文件白名单的 AST 边界扫描，当前 `2121` 个源码文件 `0` 违规 |
