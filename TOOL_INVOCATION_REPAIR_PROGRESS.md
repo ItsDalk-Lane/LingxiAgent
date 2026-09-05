@@ -55,8 +55,8 @@
 | P3-01 | completed | `82292ec6f200e4729245d6bc71589b64ba0a2379` | 插件元数据与 target adapter |
 | P3-02 | completed | `ae56984375dbf39ff462f363d9c5512fbc2a32de` | Engine 装配顺序 |
 | P4-01 | completed | `95e5377c0e693599c12b9fb47df9026e04126c28` | Catalog 目标引用目录 |
-| P4-02 | completed | 待提交后回填 | Bridge Gateway 适配 |
-| P4-03 | pending | — | MCP eligibility 与执行器 |
+| P4-02 | completed | `40c4db7a95b5db58f41dead8d4d5ea044f8190d6` | Bridge Gateway 适配 |
+| P4-03 | completed | 待本项提交后回填 | MCP eligibility 与执行器 |
 | P5-01 | pending | — | Plugin 工具代次 |
 | P5-02 | pending | — | MCP live generation |
 | P5-03 | pending | — | 旧会话撤销语义 |
@@ -192,8 +192,20 @@
 - 绿灯命令：Bridge、bundled deferred parity、Gateway、完整 schema、权限描述和会话包装共 6 文件 Vitest；`npm run typecheck`；新增 Gateway 方法定向 ESLint；`git diff --check`。
 - 绿灯原始结果：Vitest exit `0`，`6 passed` files、`146 passed` tests；三段 typecheck exit `0`；定向 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p402-stage-final.log`、`/tmp/lingxi-tool-contract-p402-typecheck-final.log`、`/tmp/lingxi-tool-contract-p402-new-eslint-final.log`
-- 提交 SHA：待提交后回填
+- 提交 SHA：`40c4db7a95b5db58f41dead8d4d5ea044f8190d6`
 - 偏差：按编号边界没有提前实现 P4-03 的 MCP target descriptor。额外前置诊断 `tests/engine-tool-defer.test.ts` 为 `17 passed / 1 failed`，失败点是 MCP 目标尚未进入 Registry（日志 `/tmp/lingxi-tool-contract-p402-engine-transition-check.log`）；该失败不是 P4-02 Bridge 单元门禁，提交后会作为 P4-03 旧代码红灯重新验证并修复，未恢复任何 raw 直连。
+
+### P4-03 统一 MCP eligibility、执行器与结果语义
+
+- 状态：`completed`
+- 改动文件：`core/mcp/manager.ts`、`core/engine.ts`、`core/tool-target-registry.ts`、`core/tool-invocation-gateway.ts`、`tests/engine-tool-defer.test.ts`、`tests/tool-catalog-bridge.test.ts`、`tests/mcp-runtime.test.ts`、`tests/tool-deferred-mcp-parity.test.ts`、`TOOL_INVOCATION_REPAIR_PROGRESS.md`。
+- 红灯命令：`set -o pipefail; npx vitest run tests/tool-deferred-mcp-parity.test.ts tests/engine-tool-defer.test.ts tests/tool-catalog-bridge.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p403-red.log`
+- 红灯原始结果：exit `1`；`1 passed / 2 failed` files、`51 passed / 10 failed` tests。旧实现缺少唯一 MCP eligibility、Manager target descriptor，MCP 目标没有进入统一 Registry/Gateway，符合预期。
+- 绿灯命令：任务书 P4 阶段 6 文件 Vitest；MCP runtime、注册表、网关和 Engine build 4 文件扩展 Vitest；`npm run typecheck`；新增测试文件定向 ESLint；Engine/Bridge raw MCP 调用边界扫描；`git diff --check`。
+- 绿灯原始结果：P4 阶段 Vitest exit `0`，`6 passed` files、`155 passed` tests；扩展 Vitest exit `0`，`4 passed` files、`180 passed` tests；三段 typecheck exit `0`；新增测试 ESLint exit `0`、`0` 问题；Engine/Bridge raw MCP 调用命中 `0`，底层 `.callTool(` 清单只剩 Manager 适配和协议客户端；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p403-gate-final4.log`、`/tmp/lingxi-tool-contract-p403-affected-final.log`、`/tmp/lingxi-tool-contract-p403-typecheck-final4.log`、`/tmp/lingxi-tool-contract-p403-new-eslint-final2.log`、`/tmp/lingxi-tool-contract-p403-boundary-engine-bridge.log`、`/tmp/lingxi-tool-contract-p403-boundary-calltool-inventory.log`。
+- 提交 SHA：待本项提交后、P5-01 红灯前回填。
+- 偏差：为适配 Manager descriptor，既有 `tests/mcp-runtime.test.ts` 的目录投影测试先建立真实已发布工具，属于测试夹具同步；无生产范围扩张。目录继续保留无 `mcp_` 前缀的兼容名称，执行身份与 TargetId 不变。
 
 ## 错误日志
 
@@ -228,13 +240,17 @@
 | 2026-09-05 15:26 +0800 | P4-01 | 首次 typecheck 报一个测试对象多余兼容字段，exit `2` | 1 | 删除测试输入中的旧目录字段；严格新输入契约不接受该字段，复跑三段 typecheck exit `0` |
 | 2026-09-05 15:39 +0800 | P4-02 | 首次扩展 bundled parity 为 `143 passed / 2 failed`：一项旧文案断言仍写“仅外部工具”，同本名能力的全局反查再次产生歧义 | 1 | 更新已改变契约的文案断言；委托校验改为携带已解析 TargetId 到 Gateway 做目标级权威能力复核，不按平面 capability 猜目标 |
 | 2026-09-05 15:42 +0800 | P4-02 | 首次 typecheck 报 Gateway 测试替身没有构造完整 PreparedInvocation，exit `2` | 1 | 测试替身改用生产准备对象构造器，不削弱生产接口；复跑三段 typecheck exit `0` |
+| 2026-09-05 15:46 +0800 | P4-02 推送 | HTTPS 推送与引用核对均在 30 秒无响应；有界重试 exit `142`，直连 `github.com:443` 5 秒超时 | 2 | 发现用户级 Git 配置会把常见 SSH 地址重写为 HTTPS；改用不命中重写规则的 `ssh://git@github.com/...` 一次性地址后推送与 fetch 均 exit `0`，未修改远端配置 |
+| 2026-09-05 16:06 +0800 | P4-03 | 首次最终 typecheck 报测试夹具把 `unknown` 赋给具体配置类型，exit `2` | 1 | 只在测试配置存储边界显式收窄类型，生产代码不变；重跑三段 typecheck |
+| 2026-09-05 16:10 +0800 | P4-03 | 执行前 eligibility 错误码接入网关后，网关错误码联合和辅助函数类型过宽，typecheck exit `2` | 1 | 把 `TARGET_DISABLED_FOR_AGENT` 纳入网关稳定码并复用注册表判定类型；不改运行策略 |
+| 2026-09-05 16:11 +0800 | P4-03 | 富结果等价测试 `1/85` 失败，仅差两套临时夹具各自生成的会话来源路径 | 1 | 让 direct/deferred 使用同一会话坐标后继续做完整对象严格相等，不删除 provenance 字段、不放宽断言 |
 
 ## 断点续跑自检
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P4-02 已通过本项门禁，等待提交与推送 |
-| 接下来去哪？ | 使用任务书指定提交信息提交并推送 P4-02，然后进入 P4-03 MCP 统一 |
+| 现在在哪里？ | P4-03 已完成红绿验证与 P4 阶段门禁，等待提交和推送 |
+| 接下来去哪？ | 使用任务书指定提交信息提交并推送 P4-03，回填 SHA 后进入 P5-01 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P4-01；P4-02 完成测试先红、Bridge 只走 Gateway、完整参数校验、类型化错误透传与目标级 capability 委托，相关门禁 `146/146` |
+| 已做什么？ | 完成并推送 P0-00 至 P4-02；P4-03 完成唯一 MCP 可用性判定、Manager 权威 descriptor、direct/deferred 共用 Registry/Gateway 与 published adapter，P4 阶段 `155/155`、扩展回归 `180/180` |
