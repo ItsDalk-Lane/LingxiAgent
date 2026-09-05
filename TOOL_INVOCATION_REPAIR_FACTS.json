@@ -1,0 +1,78 @@
+{
+  "baselineSha": "60d910b84572c525a7c9c49216fb9206623bf7a4",
+  "branch": "fix/tool-contract-path-invariance-v0134",
+  "sourceCandidateSha": null,
+  "sealSha": null,
+  "commitCoordinatesRecordedIn": "PROGRESS.md and final execution report",
+  "findings": {
+    "V1": "fixed",
+    "V2": "fixed",
+    "V3": "fixed",
+    "V4a": "fixed",
+    "V4b": "fixed_by_generation_contract",
+    "V5a": "fixed",
+    "V5b": "fixed_with_local_developer_principal",
+    "V6": "fixed",
+    "V7": "fixed",
+    "V8": "fixed",
+    "V9": "fixed",
+    "V10": "fixed",
+    "V11": "fixed",
+    "V12": "fixed"
+  },
+  "rawExecutionBoundaryViolations": 0,
+  "tests": [
+    {
+      "id": "baseline-targeted",
+      "status": "passed",
+      "filesPassed": 11,
+      "testsPassed": 253,
+      "log": "/tmp/lingxi-tool-contract-v0134-p001-targeted.log"
+    },
+    {
+      "id": "baseline-full",
+      "status": "failed_baseline_audit_seal",
+      "filesPassed": 1359,
+      "filesFailed": 1,
+      "filesSkipped": 1,
+      "testsPassed": 13763,
+      "testsFailed": 1,
+      "testsSkipped": 7,
+      "log": "/tmp/lingxi-tool-contract-v0134-p001-full-test.log"
+    },
+    {
+      "id": "p9-error-contract",
+      "status": "passed",
+      "filesPassed": 19,
+      "testsPassed": 349,
+      "log": "/tmp/lingxi-tool-contract-v0134-p901-gate-final.log"
+    },
+    {
+      "id": "p10-configuration-matrix",
+      "status": "passed_with_red_not_reproduced",
+      "filesPassed": 13,
+      "testsPassed": 373,
+      "log": "/tmp/lingxi-tool-contract-v0134-p1002-gate.log"
+    },
+    {
+      "id": "p12-final",
+      "status": "pending_source_candidate_verification"
+    }
+  ],
+  "builds": [
+    {
+      "id": "baseline-server",
+      "status": "failed_environment_missing_sign_key",
+      "log": "/tmp/lingxi-tool-contract-v0134-p001-build-server.log"
+    },
+    {
+      "id": "baseline-server-diagnostic",
+      "status": "passed_with_ephemeral_matching_signing_material",
+      "log": "/tmp/lingxi-tool-contract-v0134-p001-build-server-diagnostic.log"
+    },
+    {
+      "id": "p12-final-builds",
+      "status": "pending_source_candidate_verification"
+    }
+  ]
+}

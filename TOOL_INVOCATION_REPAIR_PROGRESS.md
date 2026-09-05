@@ -308,13 +308,24 @@
 
 ## P11-01 架构说明
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`29a296611a1da1509671f819cf0032dd72937eb2`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `a6372e50669151df69683ed257661d2443d7429a`；架构说明和文档契约测试按原实现迁入，事实坐标以 v0.1.34 校正版分支为准。
 - RED：exit `1`；1 file，`1 failed / 3 passed` tests；旧代码缺少任务书指定的架构说明文件，原始错误为 `ENOENT`。
 - GREEN：exit `0`；1 file / 4 tests 全部通过；任务书要求的九个章节标题逐项命中。
 - typecheck exit `0`；边界扫描 exit `0`，2129 个生产源码文件 0 违规；测试定向 ESLint exit `0`、无输出；`git diff --check` exit `0`。
 - 文档明确了业务目标与能力、显示名、目录名的分工，完整执行顺序，四种路线共用同一受控入口，绑定后的调用内容，允许触碰底层执行器的来源边界，稳定错误码、新工具接入清单和禁止做法。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p1101-red.log`、`/tmp/lingxi-tool-contract-v0134-p1101-gate.log`、`/tmp/lingxi-tool-contract-v0134-p1101-boundary.log`、`/tmp/lingxi-tool-contract-v0134-p1101-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p1101-eslint.log`、`/tmp/lingxi-tool-contract-v0134-p1101-sections.log`。
+
+## P11-02 修复报告与机器事实
+
+- 状态：`completed_pending_source_candidate_commit`。
+- 复用来源：原分支提交 `931543baedacca62417ef9d4a517d1b9857c9abd` 只作为结构模板；所有基线、分支、统计、日志和适配结论均按 v0.1.34 校正版现场重建。
+- RED：exit `1`；1 file，`1 failed / 4 passed` tests；四份任务书指定报告尚不存在，原始错误为 `ENOENT`。
+- GREEN：exit `0`；1 file / 5 tests 全部通过；机器事实 JSON 独立解析 exit `0`。
+- typecheck exit `0`；边界扫描 exit `0`，2129 个生产源码文件 0 违规；测试定向 ESLint exit `0`、无输出；`git diff --check` exit `0`。
+- `sourceCandidateSha` 和 `sealSha` 按任务书保持 `null`；真实坐标只写 `PROGRESS.md` 和最终执行报告，避免提交自引用。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p1102-red.log`、`/tmp/lingxi-tool-contract-v0134-p1102-gate.log`、`/tmp/lingxi-tool-contract-v0134-p1102-boundary.log`、`/tmp/lingxi-tool-contract-v0134-p1102-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p1102-eslint.log`。
 
 ## 错误记录
 

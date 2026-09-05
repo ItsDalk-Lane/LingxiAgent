@@ -95,4 +95,45 @@ describe("tool invocation static boundaries", () => {
       expect(document).toContain(requiredFact);
     }
   });
+
+  it("keeps repair reports and machine facts complete without self-referential SHAs", () => {
+    const read = (filename: string) => fs.readFileSync(path.join(repositoryRoot, filename), "utf8");
+    const report = read("TOOL_INVOCATION_REPAIR_REPORT.md");
+    const testReport = read("TOOL_INVOCATION_REPAIR_TEST_REPORT.md");
+    const remaining = read("TOOL_INVOCATION_REPAIR_REMAINING.md");
+    const facts = JSON.parse(read("TOOL_INVOCATION_REPAIR_FACTS.json"));
+
+    expect(facts).toMatchObject({
+      baselineSha: "60d910b84572c525a7c9c49216fb9206623bf7a4",
+      branch: "fix/tool-contract-path-invariance-v0134",
+      sourceCandidateSha: null,
+      sealSha: null,
+      commitCoordinatesRecordedIn: "PROGRESS.md and final execution report",
+      rawExecutionBoundaryViolations: 0,
+      findings: {
+        V1: "fixed",
+        V2: "fixed",
+        V3: "fixed",
+        V4a: "fixed",
+        V4b: "fixed_by_generation_contract",
+        V5a: "fixed",
+        V5b: "fixed_with_local_developer_principal",
+        V6: "fixed",
+        V7: "fixed",
+        V8: "fixed",
+        V9: "fixed",
+        V10: "fixed",
+        V11: "fixed",
+        V12: "fixed",
+      },
+    });
+    expect(Array.isArray(facts.tests)).toBe(true);
+    expect(Array.isArray(facts.builds)).toBe(true);
+    for (const finding of ["V1", "V2", "V3", "V4a", "V4b", "V5a", "V5b", "V6", "V7", "V8", "V9", "V10", "V11", "V12"]) {
+      expect(report).toContain(`| ${finding} |`);
+    }
+    expect(testReport).toContain("P12 最终验证");
+    expect(testReport).toContain("/tmp/lingxi-tool-contract-");
+    expect(remaining).toContain("源代码剩余事项：`none`");
+  });
 });
