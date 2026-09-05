@@ -53,10 +53,12 @@ describe("createPluginDevTools", () => {
       pluginDevService: service,
       ...failClosedInvocationDeps,
     }) as any[];
-    const descriptors = Object.fromEntries(tools.map((tool) => [
+    const descriptors = Object.fromEntries(tools
+      .filter((tool) => tool.name !== "plugin_dev_invoke_tool")
+      .map((tool) => [
       tool.name,
       tool.sessionPermission.resolveInvocation(),
-    ]));
+      ]));
 
     expect(descriptors.plugin_dev_diagnostics).toMatchObject({
       action: "diagnose",
@@ -76,7 +78,10 @@ describe("createPluginDevTools", () => {
     ]) {
       expect(descriptors[name], name).toMatchObject({ kind: "review" });
     }
-    expect(descriptors.plugin_dev_invoke_tool).toBeNull();
+    const invokeTool = tools.find((tool) => tool.name === "plugin_dev_invoke_tool");
+    expect(() => invokeTool.sessionPermission.resolveInvocation()).toThrowError(
+      expect.objectContaining({ code: "TARGET_NOT_FOUND" }),
+    );
   });
 
   it("只向模型暴露开发工具的业务参数", () => {

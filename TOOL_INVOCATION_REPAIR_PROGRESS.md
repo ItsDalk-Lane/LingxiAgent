@@ -251,7 +251,8 @@
 
 ## P8-01 抽取共享 rerank policy 执行器
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`855ed701f9375f87f95618e9e49e083c74a326a7`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `e74aafee04c539dcc1352887e8763a741fb06ba5`；共享模块与回归测试按原实现迁入，其余连接点按 v0.1.34 正式知识架构逐处适配。
 - RED：exit `1`；1 failed suite，0 tests；旧代码缺少 `lib/knowledge/rerank-policy.ts`。
 - 第一次 GREEN 尝试：1 file，`1 failed / 5 passed` tests；实现已通过，唯一失败是旧测试仍要求已经被 v0.1.34 删除的引擎兼容检索分支。
@@ -260,6 +261,16 @@
 - typecheck 最终 exit `0`；定向 ESLint exit `0`，`0 errors / 125 warnings`（存量警告）；`git diff --check` exit `0`。
 - 缓存身份使用规范化后的完整策略摘要，覆盖 channel、enabled、margin、deadline 和文档上限；两条重排路径共用同一决策与执行入口。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p801-red.log`、`/tmp/lingxi-tool-contract-v0134-p801-green-attempt1.log`、`/tmp/lingxi-tool-contract-v0134-p801-gate-attempt1.log`、`/tmp/lingxi-tool-contract-v0134-p801-related-attempt1.log`、`/tmp/lingxi-tool-contract-v0134-p801-typecheck-attempt3.log`、`/tmp/lingxi-tool-contract-v0134-p801-eslint-attempt1.log`。
+
+## P9-01 完成统一错误映射
+
+- 状态：`completed_pending_commit`。
+- 复用来源：原分支提交 `e3fe97120a411d3e8cc055bea5a8e2dd34d4f8ae`；除 `core/engine.ts` 外的生产和测试文件均先核对为原提交父树同哈希，引擎只迁移工具装配区的错误诊断片段。
+- RED：exit `1`；8 failed files，`15 failed / 90 passed` tests；路径/密钥未遮蔽、schema 缺稳定路径、能力两侧事实缺失、目标缺失与拒绝混同、媒体凭证错误混同、网关无安全结构化诊断。
+- 核心 GREEN：exit `0`，8 files / 105 tests；扩展门禁：exit `0`，19 files / 349 tests 全部通过。
+- typecheck exit `0`；定向 ESLint exit `0`，`0 errors / 306 warnings`（存量大文件与测试风格警告）；`git diff --check` exit `0`。
+- 错误边界：目标缺失、不可见、按代理禁用、撤销、能力错配、凭证缺失、刷新传输失败与取消分别保留稳定类型；模型可见消息遮蔽内部路径和密钥片段，诊断日志只携带安全归因字段。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p901-red.log`、`/tmp/lingxi-tool-contract-v0134-p901-gate-attempt1.log`、`/tmp/lingxi-tool-contract-v0134-p901-gate-final.log`、`/tmp/lingxi-tool-contract-v0134-p901-typecheck-attempt1.log`、`/tmp/lingxi-tool-contract-v0134-p901-eslint.log`。
 
 ## 错误记录
 

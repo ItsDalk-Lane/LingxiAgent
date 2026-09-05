@@ -91,4 +91,17 @@ describe("工具调用稳定错误", () => {
       },
     });
   });
+
+  it("模型可见消息会遮蔽内部路径和常见明文密钥", () => {
+    const error = new ToolInvocationError({
+      code: "TRANSPORT_FAILURE",
+      message: "failed at /Users/alice/.config/provider.json with sk-live-secret123",
+      route: "deferred",
+    });
+
+    expect(error.message).not.toContain("/Users/alice");
+    expect(error.message).not.toContain("sk-live-secret123");
+    expect(error.message).toContain("[REDACTED_PATH]");
+    expect(error.message).toContain("[REDACTED]");
+  });
 });

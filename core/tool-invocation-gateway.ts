@@ -38,7 +38,10 @@ export interface ToolInvocationGatewayOptions {
     runtimeContext: unknown,
   ) => void | Promise<void>;
   readonly now?: () => number;
+  readonly log?: { error?: (message: string) => void };
 }
+
+const gatewayDiagnosticLogs = new WeakMap<object, ToolInvocationGatewayOptions["log"]>();
 
 export interface LocalDeveloperPrincipal {
   readonly kind: "local-developer";
@@ -92,7 +95,7 @@ function gatewayError(
   details?: Record<string, unknown>,
   cause?: unknown,
 ): ToolInvocationError {
-  return new ToolInvocationError({
+  const error = new ToolInvocationError({
     code,
     message,
     route: request.route,
@@ -101,6 +104,20 @@ function gatewayError(
     details,
     cause,
   });
+  const diagnostic = {
+    route: request.route,
+    origin: target?.identity.origin ?? "unknown",
+    targetId: target?.identity.targetId ?? request.targetId ?? null,
+    sourceId: target?.identity.sourceId ?? null,
+    generation: target?.lifecycleGeneration ?? request.lifecycleGeneration ?? null,
+    code,
+  };
+  try {
+    gatewayDiagnosticLogs.get(request)?.error?.(JSON.stringify(diagnostic));
+  } catch {
+    // 诊断输出失败不能改变调用错误本身。
+  }
+  return error;
 }
 
 function normalizeOptionalText(value: unknown): string | null {
@@ -143,6 +160,7 @@ export class ToolInvocationGateway {
   private readonly registry: ToolTargetRegistry;
   private readonly authorize: ToolInvocationGatewayOptions["authorize"];
   private readonly now: () => number;
+  private readonly log: ToolInvocationGatewayOptions["log"];
 
   constructor(options: ToolInvocationGatewayOptions) {
     if (!options?.registry || typeof options.authorize !== "function") {
@@ -151,6 +169,11 @@ export class ToolInvocationGateway {
     this.registry = options.registry;
     this.authorize = options.authorize;
     this.now = options.now ?? Date.now;
+    this.log = options.log;
+  }
+
+  private bindDiagnosticLog(request: ToolInvocationGatewayRequest): void {
+    if (this.log) gatewayDiagnosticLogs.set(request, this.log);
   }
 
   resolveTarget(reference: CatalogTargetReference): RegisteredToolTarget {
@@ -165,6 +188,7 @@ export class ToolInvocationGateway {
   }
 
   resolvePermission(request: ToolInvocationGatewayRequest): PreparedInvocation {
+    this.bindDiagnosticLog(request);
     const target = this.registry.getByTargetId(request.targetId);
     if (!target) {
       throw gatewayError("TARGET_NOT_FOUND", "Tool target is not registered.", request);
@@ -222,7 +246,7 @@ export class ToolInvocationGateway {
       }
       if (!resolvedEffectiveTarget.availability.eligible) {
         throw gatewayError(
-          "TARGET_NOT_VISIBLE",
+          resolvedEffectiveTarget.availability.code ?? "TARGET_NOT_VISIBLE",
           "Effective tool target was not eligible when this session was assembled.",
           request,
           resolvedEffectiveTarget,
@@ -237,7 +261,8 @@ export class ToolInvocationGateway {
           request,
           resolvedEffectiveTarget,
           {
-            capability: permission.capability,
+            declaredCapability: permission.capability,
+            capabilityBase: resolvedEffectiveTarget.identity.capabilityBase,
             expectedCapability,
             action: permission.action,
           },
@@ -274,6 +299,7 @@ export class ToolInvocationGateway {
   }
 
   async invoke(request: ToolInvocationGatewayRequest): Promise<unknown> {
+    this.bindDiagnosticLog(request);
     const prepared = getPreparedInvocation();
     if (!prepared) {
       throw gatewayError(
@@ -401,6 +427,7 @@ export class ToolInvocationGateway {
     request: ToolInvocationGatewayRequest,
     principal: LocalDeveloperPrincipal,
   ): Promise<unknown> {
+    this.bindDiagnosticLog(request);
     if (request.route !== "plugin-dev-http" || !isLocalDeveloperPrincipal(principal)) {
       throw gatewayError(
         "PERMISSION_DENIED",
@@ -422,6 +449,7 @@ export class ToolInvocationGateway {
       ctx,
       runtimeContext,
     };
+    this.bindDiagnosticLog(localRequest);
     const prepared = this.resolvePermission(localRequest);
     const target = this.registry.getByTargetId(prepared.targetId);
     if (!target) {

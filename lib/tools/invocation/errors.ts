@@ -35,9 +35,16 @@ export interface ToolInvocationErrorInput {
 
 const SENSITIVE_KEY = /(?:api[-_]?key|authorization|cookie|credential|password|secret|token)/i;
 const BEARER_VALUE = /\bBearer\s+[^\s,;]+/gi;
+const COMMON_SECRET_VALUE = /\b(?:sk|pk|token|secret|key)-[a-z0-9._-]{6,}\b/gi;
+const UNIX_INTERNAL_PATH = /\/(?:Users|home|root|private|tmp|var|opt)\/[^\s,;]+/g;
+const WINDOWS_INTERNAL_PATH = /\b[a-z]:\\(?:Users|Documents and Settings|ProgramData)\\[^\s,;]+/gi;
 
 function redactText(value: string): string {
-  return value.replace(BEARER_VALUE, "Bearer [REDACTED]");
+  return value
+    .replace(BEARER_VALUE, "Bearer [REDACTED]")
+    .replace(COMMON_SECRET_VALUE, "[REDACTED]")
+    .replace(UNIX_INTERNAL_PATH, "[REDACTED_PATH]")
+    .replace(WINDOWS_INTERNAL_PATH, "[REDACTED_PATH]");
 }
 
 function sanitizeValue(value: unknown, seen: WeakSet<object>): unknown {

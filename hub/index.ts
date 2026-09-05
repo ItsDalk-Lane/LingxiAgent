@@ -790,7 +790,11 @@ export class Hub {
 
     this._sessionHandlerCleanups.push(bus.handle("provider:credentials", async ({ providerId, forceRefresh, staleApiKey }) => {
       if (typeof engine.resolveProviderCredentialsFresh !== "function") {
-        return { error: "fresh_credentials_unavailable" };
+        return {
+          error: "CREDENTIAL_PROVIDER_UNRESOLVED",
+          code: "CREDENTIAL_PROVIDER_UNRESOLVED",
+          resolutionReason: "fresh_resolver_unavailable",
+        };
       }
       let fresh;
       try {
@@ -807,7 +811,13 @@ export class Hub {
         api: fresh?.api,
         accountId: fresh?.accountId,
       };
-      if (!creds?.apiKey) return { error: "no_credentials" };
+      if (!creds?.apiKey) {
+        return {
+          error: "CREDENTIAL_MISSING",
+          code: "CREDENTIAL_MISSING",
+          resolutionReason: "no_credentials",
+        };
+      }
       return {
         apiKey: creds.apiKey,
         baseUrl: creds.baseUrl,
@@ -888,12 +898,27 @@ export class Hub {
           providerId: providerId || provider,
           capability,
         });
-        const resolved = engine.providerRegistry.resolveMediaModel({
+      } catch (err) {
+        return mapCredentialRefreshFailure(err);
+      }
+
+      let resolved;
+      try {
+        resolved = engine.providerRegistry.resolveMediaModel({
           providerId: providerId || provider,
           modelId: modelId || model,
           capability,
           credentialLaneId,
         });
+      } catch {
+        return {
+          error: "TARGET_NOT_FOUND",
+          code: "TARGET_NOT_FOUND",
+          resolutionReason: "media_model_not_found",
+        };
+      }
+
+      try {
         const executionTarget = engine.providerRegistry.resolveMediaExecutionTarget({
           modelId: resolved.model.id,
           modality: capability === "video_generation"
@@ -926,11 +951,17 @@ export class Hub {
           executionTarget,
         };
       } catch (err) {
+        if (!(err instanceof MediaExecutionTargetError)) {
+          return {
+            error: "CREDENTIAL_PROVIDER_UNRESOLVED",
+            code: "CREDENTIAL_PROVIDER_UNRESOLVED",
+            resolutionReason: "media_execution_target_unresolved",
+          };
+        }
         return {
-          error: err.message || String(err),
-          ...(err instanceof MediaExecutionTargetError
-            ? { code: err.code, resolutionReason: err.details?.resolutionReason || null }
-            : {}),
+          error: err.code,
+          code: err.code,
+          resolutionReason: err.details?.resolutionReason || null,
         };
       }
     }));

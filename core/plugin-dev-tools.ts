@@ -1,5 +1,9 @@
 import { registerToolCapabilityDelegate } from "../lib/permission/tool-invocation-permission.ts";
-import type { ToolTargetId } from "../lib/tools/invocation/index.ts";
+import {
+  isToolInvocationError,
+  ToolInvocationError,
+  type ToolTargetId,
+} from "../lib/tools/invocation/index.ts";
 import type { ToolInvocationGateway } from "./tool-invocation-gateway.ts";
 import type { RegisteredToolTarget } from "./tool-target-registry.ts";
 
@@ -102,14 +106,38 @@ function createPluginDevInvokeTool({
 }) {
   const delegatedTargets = new Map<string, Set<ToolTargetId>>();
   const resolveTarget = (params) => {
+    const pluginId = typeof params?.pluginId === "string" ? params.pluginId.trim() : "";
+    const toolName = typeof params?.toolName === "string" ? params.toolName.trim() : "";
     try {
-      return resolveChatToolTarget(
-        typeof params?.pluginId === "string" ? params.pluginId : "",
-        typeof params?.toolName === "string" ? params.toolName : "",
-      );
-    } catch {
-      return null;
+      const target = resolveChatToolTarget(pluginId, toolName);
+      if (target) return target;
+    } catch (cause) {
+      if (isToolInvocationError(cause) && cause.code === "TARGET_NOT_FOUND") {
+        throw new ToolInvocationError({
+          code: "TARGET_NOT_FOUND",
+          message: "Development plugin tool target is not registered.",
+          route: "plugin-dev-chat",
+          sourceId: pluginId || null,
+          details: { toolName: toolName || null },
+          cause,
+        });
+      }
+      throw new ToolInvocationError({
+        code: "TARGET_NOT_VISIBLE",
+        message: "Development plugin tool target is not visible on this surface.",
+        route: "plugin-dev-chat",
+        sourceId: pluginId || null,
+        details: { toolName: toolName || null },
+        cause,
+      });
     }
+    throw new ToolInvocationError({
+      code: "TARGET_NOT_FOUND",
+      message: "Development plugin tool target is not registered.",
+      route: "plugin-dev-chat",
+      sourceId: pluginId || null,
+      details: { toolName: toolName || null },
+    });
   };
   const tool = {
     name: "plugin_dev_invoke_tool",
@@ -124,7 +152,6 @@ function createPluginDevInvokeTool({
     sessionPermission: {
       resolveInvocation: (params) => {
         const target = resolveTarget(params);
-        if (!target) return null;
         const prepared = invocationGateway.resolvePermission({
           targetId: target.identity.targetId,
           route: "plugin-dev-chat",
@@ -149,10 +176,6 @@ function createPluginDevInvokeTool({
     },
     execute: async (toolCallId, params, signal, onUpdate, runtimeCtx) => {
       const target = resolveTarget(params);
-      if (!target) {
-        // 与权限阶段保持相同的 fail-closed 结果，不回落到开发服务原始执行器。
-        throw new Error("Development plugin tool target is unavailable");
-      }
       const hostRuntime = runtimeCtx && typeof runtimeCtx === "object"
         ? runtimeCtx as PluginDevHostRuntimeContext
         : {};

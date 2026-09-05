@@ -58,6 +58,70 @@ describe("Hub media routing", () => {
     });
   });
 
+  it("distinguishes missing credentials from unavailable resolution and refresh transport failure", async () => {
+    const missingHub = new Hub({
+      engine: createEngine({ resolveProviderCredentialsFresh: vi.fn(async () => ({})) }),
+    });
+    await expect(missingHub.eventBus.request("provider:credentials", {
+      providerId: "known-provider",
+    })).resolves.toEqual({
+      error: "CREDENTIAL_MISSING",
+      code: "CREDENTIAL_MISSING",
+      resolutionReason: "no_credentials",
+    });
+
+    const unresolvedHub = new Hub({ engine: createEngine() });
+    await expect(unresolvedHub.eventBus.request("provider:credentials", {
+      providerId: "unknown-provider",
+    })).resolves.toEqual({
+      error: "CREDENTIAL_PROVIDER_UNRESOLVED",
+      code: "CREDENTIAL_PROVIDER_UNRESOLVED",
+      resolutionReason: "fresh_resolver_unavailable",
+    });
+  });
+
+  it("media model resolution returns stable safe errors without provider paths or secrets", async () => {
+    const refreshFailure: any = new Error("failed /Users/alice/provider.json sk-live-secret123");
+    refreshFailure.code = "ECONNRESET";
+    const refreshHub = new Hub({
+      engine: createEngine({
+        providerRegistry: {
+          refreshRuntimeMediaCapabilities: vi.fn(async () => { throw refreshFailure; }),
+        },
+      }),
+    });
+    const refreshResult = await refreshHub.eventBus.request("provider:resolve-media-model", {
+      providerId: "provider-a",
+      modelId: "image-a",
+    });
+    expect(refreshResult).toEqual({
+      error: "CREDENTIAL_REFRESH_TRANSPORT_FAILED",
+      code: "CREDENTIAL_REFRESH_TRANSPORT_FAILED",
+      resolutionReason: "econnreset",
+    });
+    expect(JSON.stringify(refreshResult)).not.toContain("/Users/alice");
+    expect(JSON.stringify(refreshResult)).not.toContain("sk-live-secret123");
+
+    const missingHub = new Hub({
+      engine: createEngine({
+        providerRegistry: {
+          refreshRuntimeMediaCapabilities: vi.fn(async () => undefined),
+          resolveMediaModel: vi.fn(() => {
+            throw new Error("missing /Users/alice/provider.json sk-live-secret123");
+          }),
+        },
+      }),
+    });
+    await expect(missingHub.eventBus.request("provider:resolve-media-model", {
+      providerId: "provider-a",
+      modelId: "missing",
+    })).resolves.toEqual({
+      error: "TARGET_NOT_FOUND",
+      code: "TARGET_NOT_FOUND",
+      resolutionReason: "media_model_not_found",
+    });
+  });
+
   it("preserves clientMessageId when routing desktop session messages", async () => {
     const engine = createEngine();
     const hub = new Hub({ engine });

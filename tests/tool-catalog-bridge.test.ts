@@ -345,6 +345,33 @@ describe("P4-02 Gateway 桥接边界", () => {
     }, undefined, undefined, {})).rejects.toBe(transportFailure);
   });
 
+  it("权限阶段未知目标抛 TARGET_NOT_FOUND，不冒充 resolver 主动拒绝", () => {
+    const { byName } = makeGatewayBridge();
+
+    expect(() => byName.mcp_call.sessionPermission.resolveInvocation({
+      server: "github",
+      tool: "missing_tool",
+      arguments: {},
+    })).toThrowError(expect.objectContaining({
+      code: "TARGET_NOT_FOUND",
+      route: "deferred",
+      sourceId: "github",
+    }));
+  });
+
+  it("Gateway 普通异常也继续以异常传播，不包装成普通成功文本", async () => {
+    const failure = new Error("transport failed");
+    const { byName } = makeGatewayBridge({
+      gateway: { invoke: vi.fn(async () => { throw failure; }) },
+    });
+
+    await expect(byName.mcp_call.execute("outer-call", {
+      server: "github",
+      tool: "github_create_issue",
+      arguments: { owner: "a", repo: "b", title: "c" },
+    }, undefined, undefined, {})).rejects.toBe(failure);
+  });
+
   it("Gateway 的富结果、来源信息和多轮状态不经 Bridge 改写", async () => {
     const richResult = {
       content: [{ type: "text", text: "ok" }],

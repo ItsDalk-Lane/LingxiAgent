@@ -4204,6 +4204,7 @@ export class LingxiEngine {
     const targetRegistry = new ToolTargetRegistry();
     const invocationGateway = new ToolInvocationGateway({
       registry: targetRegistry,
+      log: toolAvailabilityLog,
       authorize: () => {
         throw new Error("model-facing plugin calls must be authorized by the session permission wrapper");
       },
@@ -4235,18 +4236,23 @@ export class LingxiEngine {
         permission,
         validator,
         availability: availability.allowed === false
-          ? { eligible: false, reason: availability.reason }
+          ? { eligible: false, reason: availability.reason, code: availability.code }
           : { eligible: true },
         getCurrentGeneration: () => tool._toolLifecycleGeneration ?? 0,
-        isCurrentlyAvailable: (runtimeContext) => evaluateToolAvailability(
-          tool,
-          toolAgent?.config || {},
-          {
-            ...toolAvailabilityContext,
-            ...(runtimeContext && typeof runtimeContext === "object" ? runtimeContext : {}),
-          },
-          toolAvailabilityOptions,
-        ).allowed,
+        isCurrentlyAvailable: (runtimeContext) => {
+          const decision = evaluateToolAvailability(
+            tool,
+            toolAgent?.config || {},
+            {
+              ...toolAvailabilityContext,
+              ...(runtimeContext && typeof runtimeContext === "object" ? runtimeContext : {}),
+            },
+            toolAvailabilityOptions,
+          );
+          return decision.allowed === true
+            ? { eligible: true }
+            : { eligible: false, reason: decision.reason, code: decision.code };
+        },
         executeCanonical: (toolCallId, args, signal, onUpdate, ctx) => (
           runtimeTool.execute(toolCallId, args, signal, onUpdate, ctx)
         ),
