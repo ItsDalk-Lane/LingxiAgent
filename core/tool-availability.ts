@@ -16,6 +16,82 @@ export function getStableFeatureDisabledToolNames({ channelsEnabled }: { channel
   return disabled;
 }
 
+export type ToolAvailabilityDecision =
+  | { allowed: true }
+  | {
+    allowed: false;
+    code: "TARGET_DISABLED_FOR_AGENT" | "TARGET_NOT_VISIBLE";
+    reason: string;
+  };
+
+export function evaluateToolAvailability(
+  tool,
+  agentConfig,
+  context = {},
+  options: {
+    includeRuntimeEnablement?: any;
+    extraDisabled?: any[];
+    includePluginTools?: any;
+    warn?: any;
+  } = {},
+): ToolAvailabilityDecision {
+  const name = typeof tool?.name === "string" ? tool.name.trim() : "";
+  if (!name) {
+    return {
+      allowed: false,
+      code: "TARGET_NOT_VISIBLE",
+      reason: "tool has no visible name",
+    };
+  }
+  if (options.includePluginTools === false && tool?._pluginId) {
+    return {
+      allowed: false,
+      code: "TARGET_NOT_VISIBLE",
+      reason: `tool "${name}" is not visible on this surface`,
+    };
+  }
+
+  const configuredDisabled = agentConfig?.tools?.disabled ?? DEFAULT_DISABLED_TOOL_NAMES;
+  const disabledByAgent = computeToolSnapshot([name], configuredDisabled).length === 0;
+  const extraDisabled = new Set([
+    ...getStableFeatureDisabledToolNames(context),
+    ...(Array.isArray(options.extraDisabled) ? options.extraDisabled : []),
+  ]);
+  if (disabledByAgent || extraDisabled.has(name)) {
+    return {
+      allowed: false,
+      code: "TARGET_DISABLED_FOR_AGENT",
+      reason: `tool "${name}" is disabled for the current agent`,
+    };
+  }
+
+  if (
+    options.includeRuntimeEnablement !== false
+    && typeof tool?.isEnabledForAgentConfig === "function"
+  ) {
+    try {
+      if (!tool.isEnabledForAgentConfig(agentConfig, context)) {
+        return {
+          allowed: false,
+          code: "TARGET_DISABLED_FOR_AGENT",
+          reason: `tool "${name}" is disabled by its runtime availability policy`,
+        };
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      options.warn?.(
+        `tool "${name}" runtime enablement check failed, disabling for fresh session: ${message}`,
+      );
+      return {
+        allowed: false,
+        code: "TARGET_DISABLED_FOR_AGENT",
+        reason: `tool "${name}" runtime enablement check failed: ${message}`,
+      };
+    }
+  }
+  return { allowed: true };
+}
+
 export function computeRuntimeDisabledToolNames(tools, agentConfig, context = {}, options: { warn?: any } = {}) {
   const disabled = [];
   const warn = typeof options.warn === "function" ? options.warn : null;
@@ -34,25 +110,21 @@ export function computeRuntimeDisabledToolNames(tools, agentConfig, context = {}
 }
 
 export function computeAvailableToolNames(tools, agentConfig, context = {}, options: { includeRuntimeEnablement?: any; extraDisabled?: any[]; includePluginTools?: any; warn?: any } = {}) {
-  const disabled = agentConfig?.tools?.disabled ?? DEFAULT_DISABLED_TOOL_NAMES;
-  const runtimeDisabled = options.includeRuntimeEnablement === false
-    ? []
-    : computeRuntimeDisabledToolNames(tools, agentConfig, context, options);
-  const extraDisabled = [
-    ...getStableFeatureDisabledToolNames(context),
-    ...runtimeDisabled,
-    ...(Array.isArray(options.extraDisabled) ? options.extraDisabled : []),
-  ];
-  return computeToolSnapshot(
-    toolNamesFromObjects(tools, { includePluginTools: options.includePluginTools !== false }),
-    disabled,
-    { extraDisabled },
-  );
+  const names = [];
+  const seen = new Set();
+  for (const tool of tools || []) {
+    const decision = evaluateToolAvailability(tool, agentConfig, context, options);
+    if (!decision.allowed || seen.has(tool.name)) continue;
+    seen.add(tool.name);
+    names.push(tool.name);
+  }
+  return names;
 }
 
 export function filterToolObjectsByAvailability(tools, agentConfig, context = {}, options: { includeRuntimeEnablement?: any; extraDisabled?: any[]; includePluginTools?: any; warn?: any } = {}) {
-  const availableNames = new Set(computeAvailableToolNames(tools, agentConfig, context, options));
-  return (tools || []).filter((tool) => tool?.name && availableNames.has(tool.name));
+  return (tools || []).filter((tool) => (
+    evaluateToolAvailability(tool, agentConfig, context, options).allowed
+  ));
 }
 
 function reminderLiveAvailabilityProbe(tool) {

@@ -37,6 +37,34 @@ function normalizedPluginToolPermissionFields(pluginId, publicName, sessionPermi
   };
 }
 
+function staticPluginToolMetadata(toolModule) {
+  const schema = toolModule.parameters ?? toolModule.schema ?? {};
+  return {
+    ...(typeof toolModule.label === "string" && toolModule.label.trim()
+      ? { label: toolModule.label }
+      : {}),
+    parameters: schema,
+    ...(toolModule.schema && typeof toolModule.schema === "object"
+      ? { schema: toolModule.schema }
+      : {}),
+    ...(typeof toolModule.deferrable === "boolean"
+      ? { deferrable: toolModule.deferrable }
+      : {}),
+    ...(typeof toolModule.pinned === "boolean"
+      ? { pinned: toolModule.pinned }
+      : {}),
+    ...(typeof toolModule.promptSnippet === "string"
+      ? { promptSnippet: toolModule.promptSnippet }
+      : {}),
+    ...(typeof toolModule.promptGuidelines === "string"
+      ? { promptGuidelines: toolModule.promptGuidelines }
+      : {}),
+    ...(typeof toolModule.isEnabledForAgentConfig === "function"
+      ? { isEnabledForAgentConfig: toolModule.isEnabledForAgentConfig }
+      : {}),
+  };
+}
+
 const KNOWN_CONTRIBUTION_DIRS = [
   "tools", "routes", "skills", "agents", "commands", "providers",
 ];
@@ -857,11 +885,8 @@ export class PluginManager {
         this._tools.push({
           name: publicName,
           description: mod.description,
-          parameters: mod.parameters ?? {},
-          ...(mod.promptSnippet ? { promptSnippet: mod.promptSnippet } : {}),
-          ...(mod.promptGuidelines ? { promptGuidelines: mod.promptGuidelines } : {}),
+          ...staticPluginToolMetadata(mod),
           ...normalizedPluginToolPermissionFields(entry.id, publicName, mod.sessionPermission),
-          ...(typeof mod.isEnabledForAgentConfig === "function" ? { isEnabledForAgentConfig: mod.isEnabledForAgentConfig } : {}),
           execute: async (_toolCallId, params, signalOrRuntimeCtx, _onUpdate, piCtx) => {
             await this.activatePlugin(entry.id, { event: `onToolCall:${mod.name}`, toolName: mod.name }, { pluginKey: entry.pluginKey });
             const { ctx: runtimeCtx, hasExplicitCtx } = normalizeToolRuntimeContext(signalOrRuntimeCtx, piCtx);

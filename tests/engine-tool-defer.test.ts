@@ -4,6 +4,10 @@ import path from "path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { LingxiEngine } from "../core/engine.ts";
 import { toMcpToolId } from "../core/mcp/manager.ts";
+import {
+  evaluateToolAvailability,
+  filterToolObjectsByAvailability,
+} from "../core/tool-availability.ts";
 import { resolveToolInvocationPermission } from "../lib/permission/tool-invocation-permission.ts";
 
 const BRIDGE_NAMES = ["mcp_search_tools", "mcp_describe_tool", "mcp_call"];
@@ -219,6 +223,59 @@ describe("engine deferred tool assembly", () => {
     const names = customTools.map((tool: any) => tool.name);
     expect(names).toContain("plugin_tool_0");
     expect(names).toContain("plugin_tool_14");
+  });
+});
+
+describe("canonical tool availability decisions", () => {
+  it("returns stable reasons for agent-disabled and non-visible targets", () => {
+    const disabled = { name: "office" };
+    const hiddenPlugin = { name: "demo_read", _pluginId: "demo" };
+
+    expect(evaluateToolAvailability(disabled, {
+      tools: { disabled: ["office"] },
+    })).toEqual({
+      allowed: false,
+      code: "TARGET_DISABLED_FOR_AGENT",
+      reason: 'tool "office" is disabled for the current agent',
+    });
+    expect(evaluateToolAvailability(hiddenPlugin, {}, {}, {
+      includePluginTools: false,
+    })).toEqual({
+      allowed: false,
+      code: "TARGET_NOT_VISIBLE",
+      reason: 'tool "demo_read" is not visible on this surface',
+    });
+  });
+
+  it("uses the same decision for filtering and runtime enablement failures", () => {
+    const warn = vi.fn();
+    const ready = { name: "ready" };
+    const unavailable = {
+      name: "office_read-document",
+      isEnabledForAgentConfig: () => false,
+    };
+    const throwing = {
+      name: "beautify_create-cover",
+      isEnabledForAgentConfig: () => {
+        throw new Error("bad agent config");
+      },
+    };
+    const tools = [ready, unavailable, throwing];
+    const options = { warn };
+
+    expect(evaluateToolAvailability(unavailable, {}, {}, options)).toMatchObject({
+      allowed: false,
+      code: "TARGET_DISABLED_FOR_AGENT",
+    });
+    expect(evaluateToolAvailability(throwing, {}, {}, options)).toEqual({
+      allowed: false,
+      code: "TARGET_DISABLED_FOR_AGENT",
+      reason: 'tool "beautify_create-cover" runtime enablement check failed: bad agent config',
+    });
+    expect(filterToolObjectsByAvailability(tools, {}, {}, options)).toEqual([ready]);
+    expect(warn).toHaveBeenCalledWith(
+      'tool "beautify_create-cover" runtime enablement check failed, disabling for fresh session: bad agent config',
+    );
   });
 });
 
