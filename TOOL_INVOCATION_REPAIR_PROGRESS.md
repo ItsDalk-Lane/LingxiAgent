@@ -275,13 +275,24 @@
 
 ## P9-02 建立 raw execution 边界检查
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`c63dcf6011f9240e7f66693074d4292dbb9b8443`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `ee3ac90a6777996a6776a0fa73db83736512f313`；扫描器和测试原样迁移，`package.json` 只增加任务书指定脚本，没有覆盖 v0.1.34 其它脚本。
 - RED：exit `1`；1 failed suite，0 tests；旧源码缺少任务书指定的语法树边界扫描器。
 - 独立扫描 exit `0`：扫描 2129 个生产源码文件，0 违规；Vitest exit `0`：1 file / 3 tests，其中合成越界样例验证 5 类规则均能报告。
 - typecheck exit `0`；新增脚本和测试定向 ESLint exit `0`、无输出；`git diff --check` exit `0`。
 - allowlist 只使用精确文件路径；底层 MCP 调用、插件执行器和规范目标执行器均限制在指定来源适配器，Bridge 与 Engine 的退役旁路也由同一扫描器检查。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p902-red.log`、`/tmp/lingxi-tool-contract-v0134-p902-boundary-final.log`、`/tmp/lingxi-tool-contract-v0134-p902-test-final.log`、`/tmp/lingxi-tool-contract-v0134-p902-typecheck-final.log`、`/tmp/lingxi-tool-contract-v0134-p902-eslint-final.log`。
+
+## P10-01 建立路径等价变形测试
+
+- 状态：`completed_pending_commit`。
+- 复用来源：原分支提交 `5518ed2ee4920b81db6943788dba06b4f0e741d5`；两份生产文件在本项前与原提交父树同哈希，回归与实现原样迁移。
+- RED：exit `1`；1 failed / 2 passed tests；只改变 direct、deferred、plugin-dev-chat 路由后，规范参数在权限复核后的绑定语义不一致。
+- GREEN：11 files / 202 tests 全部通过；新矩阵 3/3 覆盖三条模型路线和独立的本地开发者 HTTP 主体。
+- typecheck exit `0`；边界扫描 exit `0`，2129 个生产源码文件 0 违规；定向 ESLint exit `0`，`0 errors / 71 warnings`（既有会话权限包装风格警告）；`git diff --check` exit `0`。
+- 等价边界：权限结论、能力、审批次数、副作用描述、真实参数、摘要、执行次数、结果与来源信息、调用标识、取消/进度信号和错误码均只受语义输入影响，不受调用路线影响。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p1001-red.log`、`/tmp/lingxi-tool-contract-v0134-p1001-test-attempt1.log`、`/tmp/lingxi-tool-contract-v0134-p1001-gate-final.log`、`/tmp/lingxi-tool-contract-v0134-p1001-typecheck-final.log`、`/tmp/lingxi-tool-contract-v0134-p1001-boundary.log`、`/tmp/lingxi-tool-contract-v0134-p1001-eslint.log`。
 
 ## 错误记录
 

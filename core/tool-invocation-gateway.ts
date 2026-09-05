@@ -14,6 +14,7 @@ import type {
   ToolTargetAvailabilityDecision,
   ToolTargetRegistry,
 } from "./tool-target-registry.ts";
+import { STAGE_FILES_EXECUTION_BOUNDARY } from "../lib/tools/output-file-tool.ts";
 
 export interface ToolInvocationGatewayRequest {
   readonly targetId: ToolTargetId;
@@ -154,6 +155,69 @@ function executionContext(ctx: unknown, request: ToolInvocationGatewayRequest): 
     invocationRoute: request.route,
     effectiveTargetId: request.targetId,
   };
+}
+
+function separateHostExecutionProof(argumentsValue: Record<string, unknown>): {
+  validationArguments: Record<string, unknown>;
+  stageFilesProof?: unknown;
+} {
+  let symbols: symbol[];
+  let descriptors: PropertyDescriptorMap;
+  try {
+    symbols = Object.getOwnPropertySymbols(argumentsValue);
+    descriptors = Object.getOwnPropertyDescriptors(argumentsValue);
+  } catch {
+    return { validationArguments: argumentsValue };
+  }
+  if (symbols.length === 0) return { validationArguments: argumentsValue };
+  if (symbols.length !== 1 || symbols[0] !== STAGE_FILES_EXECUTION_BOUNDARY) {
+    return { validationArguments: argumentsValue };
+  }
+  const proofDescriptor = Object.getOwnPropertyDescriptor(
+    argumentsValue,
+    STAGE_FILES_EXECUTION_BOUNDARY,
+  );
+  const proof = proofDescriptor?.value;
+  if (
+    !proofDescriptor
+    || proofDescriptor.enumerable
+    || proofDescriptor.configurable
+    || proofDescriptor.writable
+    || !proof
+    || typeof proof !== "object"
+    || !Object.isFrozen(proof)
+    || !Array.isArray(proof.canonicalPaths)
+    || typeof proof.checkStagePath !== "function"
+  ) {
+    return { validationArguments: argumentsValue };
+  }
+  const validationArguments: Record<string, unknown> = {};
+  for (const [key, descriptor] of Object.entries(descriptors)) {
+    if (!("value" in descriptor) || !descriptor.enumerable) {
+      return { validationArguments: argumentsValue };
+    }
+    Object.defineProperty(validationArguments, key, {
+      value: descriptor.value,
+      enumerable: true,
+      configurable: true,
+      writable: true,
+    });
+  }
+  return { validationArguments, stageFilesProof: proof };
+}
+
+function restoreHostExecutionProof(
+  validatedArguments: Record<string, unknown>,
+  proof: unknown,
+): Record<string, unknown> {
+  if (!proof) return validatedArguments;
+  Object.defineProperty(validatedArguments, STAGE_FILES_EXECUTION_BOUNDARY, {
+    value: proof,
+    enumerable: false,
+    writable: false,
+    configurable: false,
+  });
+  return validatedArguments;
 }
 
 export class ToolInvocationGateway {
@@ -321,8 +385,9 @@ export class ToolInvocationGateway {
         },
       );
     }
+    const hostExecution = separateHostExecutionProof(request.arguments);
     const revalidatedArguments = target
-      ? target.validator.validate(request.arguments, request.route)
+      ? target.validator.validate(hostExecution.validationArguments, request.route)
       : request.arguments;
     let argumentsDigest: string;
     try {
@@ -388,7 +453,7 @@ export class ToolInvocationGateway {
     try {
       rawResult = await target.executeCanonical(
         request.toolCallId,
-        revalidatedArguments,
+        restoreHostExecutionProof(revalidatedArguments, hostExecution.stageFilesProof),
         request.signal,
         request.onUpdate,
         executionContext(request.ctx, request),
