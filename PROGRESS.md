@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 004cdafd2a3ff69ca38ea7993e33c4150e75e0a7  (0.1.34 合并前连续查阅及停止收尾验证；本机通过，远程待运行)
+VERIFIED_SOURCE_SHA   = 3e625e6bc41fd6c7274403380dd24cb3ba352adc  (2026-09-05 四平台类型检查容量修复封印)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 当前知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1113,3 +1113,10 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 三套类型检查 exit 0；最终测试类型检查 exit 0；全仓 lint exit 0（既有警告未升级为错误）、开放边界 exit 0；存储扫描 66 stores / 779 sites，运行闭包重新生成无漂移，兼容指纹已同步。
 - 客户端五入口、完整服务端、种子验签、macOS arm64 目录包、开放服务端构建及正反启动检查均 exit 0。本机使用一次性产物密钥和 ad-hoc 签名、明确不公证；正式发布依赖远程密钥与四平台构建，不将本机结果冒充正式发行证据。
 - 此提交仅推进审计坐标，保留独立封印。四平台合并门禁和 0.1.34 标签发布尚未执行，后续以 GitHub 实际运行记录为准。
+
+## 2026-09-05 四平台类型检查容量修复封印
+
+- 固定源码：`3e625e6bc41fd6c7274403380dd24cb3ba352adc`。
+- PR #41 首轮正确提交的 CI `33939166103` 在 macOS arm64 测试工程类型检查耗尽默认约 2GB 堆，exit 134；原始日志 `/tmp/lingxi-pr41-mac-arm-failure.log` 保留。该平台后续测试未执行，不记通过。开放边界、存储兼容前哨和开放构建/启动已经成功。
+- 只为 CI 与发布流程的 Typecheck 步骤显式配置 4096MB 堆，类型规则、检查目录、测试命令和平台矩阵不变，未更改应用代码。相同容量下三套类型检查 exit 0；两份流程契约 23 PASS，exit 0。完整运行源码与上一封印 004cdafd 一致，沿用该源码已通过的本机全量、构建和打包证据；远程内存修复待新运行确认。
+
