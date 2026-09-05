@@ -22,6 +22,7 @@ export interface RegisteredToolTarget {
   readonly permission: NormalizedToolPermissionContract;
   readonly validator: ToolSchemaValidator;
   readonly availability: ToolTargetAvailabilityDecision;
+  readonly lifecycleGeneration: string | number;
   readonly getCurrentGeneration: () => string | number;
   readonly isCurrentlyAvailable: (
     runtimeContext: unknown,
@@ -35,6 +36,8 @@ export interface RegisteredToolTarget {
   ) => Promise<unknown>;
   readonly normalizeResult: (result: unknown) => unknown;
 }
+
+export type ToolTargetRegistration = Omit<RegisteredToolTarget, "lifecycleGeneration">;
 
 export interface CatalogTargetReference {
   readonly serverId?: string;
@@ -84,7 +87,7 @@ function targetError(
   });
 }
 
-function assertTarget(target: RegisteredToolTarget): void {
+function assertTarget(target: ToolTargetRegistration): void {
   const identity = target?.identity;
   if (!identity?.targetId || !identity.sourceId || !identity.publicName || !identity.localName) {
     throw new TypeError("registered tool target requires a complete identity");
@@ -119,9 +122,16 @@ export class ToolTargetRegistry {
   private readonly targetsByName = new Map<string, Set<RegisteredToolTarget>>();
   private readonly targetsByCapabilityBase = new Map<string, Set<RegisteredToolTarget>>();
 
-  register(target: RegisteredToolTarget): RegisteredToolTarget {
+  register(target: ToolTargetRegistration): RegisteredToolTarget {
     assertTarget(target);
-    const { identity } = target;
+    Object.defineProperty(target, "lifecycleGeneration", {
+      enumerable: true,
+      configurable: false,
+      writable: false,
+      value: target.getCurrentGeneration(),
+    });
+    const registered = target as RegisteredToolTarget;
+    const { identity } = registered;
     if (this.targetsById.has(identity.targetId)) {
       throw targetError(
         "TARGET_AMBIGUOUS",
@@ -130,14 +140,14 @@ export class ToolTargetRegistry {
       );
     }
 
-    this.targetsById.set(identity.targetId, target);
+    this.targetsById.set(identity.targetId, registered);
     // 同一目标的显示名与本名可能相同，集合负责去重；二级索引从不覆盖已有目标。
     for (const name of new Set([identity.publicName, identity.localName])) {
-      addToIndex(this.targetsBySourceAndName, indexKey(identity.sourceId, name), target);
-      addToIndex(this.targetsByName, name, target);
+      addToIndex(this.targetsBySourceAndName, indexKey(identity.sourceId, name), registered);
+      addToIndex(this.targetsByName, name, registered);
     }
-    addToIndex(this.targetsByCapabilityBase, identity.capabilityBase, target);
-    return target;
+    addToIndex(this.targetsByCapabilityBase, identity.capabilityBase, registered);
+    return registered;
   }
 
   getByTargetId(targetId: ToolTargetId | string): RegisteredToolTarget | null {

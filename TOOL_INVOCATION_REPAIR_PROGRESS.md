@@ -56,8 +56,8 @@
 | P3-02 | completed | `ae56984375dbf39ff462f363d9c5512fbc2a32de` | Engine 装配顺序 |
 | P4-01 | completed | `95e5377c0e693599c12b9fb47df9026e04126c28` | Catalog 目标引用目录 |
 | P4-02 | completed | `40c4db7a95b5db58f41dead8d4d5ea044f8190d6` | Bridge Gateway 适配 |
-| P4-03 | completed | 待本项提交后回填 | MCP eligibility 与执行器 |
-| P5-01 | pending | — | Plugin 工具代次 |
+| P4-03 | completed | `ae40059d531bad737c1427cb232e7e8fcf7d03ba` | MCP eligibility 与执行器 |
+| P5-01 | completed | 待本项提交后回填 | Plugin 工具代次 |
 | P5-02 | pending | — | MCP live generation |
 | P5-03 | pending | — | 旧会话撤销语义 |
 | P6-01 | pending | — | plugin-dev 聊天身份 |
@@ -204,8 +204,20 @@
 - 绿灯命令：任务书 P4 阶段 6 文件 Vitest；MCP runtime、注册表、网关和 Engine build 4 文件扩展 Vitest；`npm run typecheck`；新增测试文件定向 ESLint；Engine/Bridge raw MCP 调用边界扫描；`git diff --check`。
 - 绿灯原始结果：P4 阶段 Vitest exit `0`，`6 passed` files、`155 passed` tests；扩展 Vitest exit `0`，`4 passed` files、`180 passed` tests；三段 typecheck exit `0`；新增测试 ESLint exit `0`、`0` 问题；Engine/Bridge raw MCP 调用命中 `0`，底层 `.callTool(` 清单只剩 Manager 适配和协议客户端；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p403-gate-final4.log`、`/tmp/lingxi-tool-contract-p403-affected-final.log`、`/tmp/lingxi-tool-contract-p403-typecheck-final4.log`、`/tmp/lingxi-tool-contract-p403-new-eslint-final2.log`、`/tmp/lingxi-tool-contract-p403-boundary-engine-bridge.log`、`/tmp/lingxi-tool-contract-p403-boundary-calltool-inventory.log`。
-- 提交 SHA：待本项提交后、P5-01 红灯前回填。
+- 提交 SHA：`ae40059d531bad737c1427cb232e7e8fcf7d03ba`
 - 偏差：为适配 Manager descriptor，既有 `tests/mcp-runtime.test.ts` 的目录投影测试先建立真实已发布工具，属于测试夹具同步；无生产范围扩张。目录继续保留无 `mcp_` 前缀的兼容名称，执行身份与 TargetId 不变。
+
+### P5-01 给 PluginManager 增加工具代次
+
+- 状态：`completed`
+- 改动文件：`core/plugin-manager.ts`、`core/tool-target-registry.ts`、`core/tool-invocation-gateway.ts`、`tests/plugin-manager.test.ts`、`tests/plugin-runtime.test.ts`、`TOOL_INVOCATION_REPAIR_PROGRESS.md`。
+- 红灯命令：`set -o pipefail; npx vitest run tests/plugin-manager.test.ts tests/plugin-runtime.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p501-red.log`
+- 红灯原始结果：exit `1`；`1 passed / 1 failed` files、`102 passed / 2 failed` tests；两项均因旧管理层不存在 `getPluginToolGeneration` 而失败，符合预期。
+- 绿灯命令：插件管理、插件运行时、注册表、网关、Engine 延迟装配和 bundled parity 共 6 文件 Vitest；`npm run typecheck`；注册表与网关定向 ESLint；`git diff --check`。
+- 绿灯原始结果：Vitest exit `0`，`6 passed` files、`151 passed` tests；三段 typecheck exit `0`；定向 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p501-gate-final2.log`、`/tmp/lingxi-tool-contract-p501-typecheck-final2.log`、`/tmp/lingxi-tool-contract-p501-new-eslint-final.log`。
+- 提交 SHA：待本项提交后、P5-02 红灯前回填。
+- 偏差：任务书只在 P5-03 后给出阶段提交信息，但用户明确要求每项提交并推送；本项使用独立、内容对应的提交信息。开发入口的 reset 复用同一 reload/install 流程，因此由同一 unload cleanup 与初次加载代次推进覆盖，不另设旁路。
 
 ## 错误日志
 
@@ -249,8 +261,8 @@
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P4-03 已完成红绿验证与 P4 阶段门禁，等待提交和推送 |
-| 接下来去哪？ | 使用任务书指定提交信息提交并推送 P4-03，回填 SHA 后进入 P5-01 |
+| 现在在哪里？ | P5-01 已完成红绿验证与门禁，等待提交和推送 |
+| 接下来去哪？ | 独立提交并推送 P5-01，回填 SHA 后进入 P5-02 MCP live generation |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P4-02；P4-03 完成唯一 MCP 可用性判定、Manager 权威 descriptor、direct/deferred 共用 Registry/Gateway 与 published adapter，P4 阶段 `155/155`、扩展回归 `180/180` |
+| 已做什么？ | 完成并推送 P0-00 至 P4-03；P5-01 完成插件单调代次、宿主只读代次注入、实时可用性接口、注册表装配代次冻结和网关执行前复核，相关门禁 `151/151` |
