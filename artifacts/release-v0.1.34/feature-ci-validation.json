@@ -1,0 +1,59 @@
+{
+  "conclusion": "success",
+  "headSha": "3643be843c027dfeb50eec6b0697a7a988f5efd6",
+  "jobs": [
+    {
+      "name": "lint-open-boundary",
+      "conclusion": "success",
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33939710990/job/101234603343",
+      "startedAt": "2026-09-05T02:39:55Z",
+      "completedAt": "2026-09-05T02:40:35Z"
+    },
+    {
+      "name": "open-build-smoke",
+      "conclusion": "success",
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33939710990/job/101234603400",
+      "startedAt": "2026-09-05T02:39:55Z",
+      "completedAt": "2026-09-05T02:43:07Z"
+    },
+    {
+      "name": "test (ubuntu-24.04, linux, x64, 24.15.0)",
+      "conclusion": "success",
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33939710990/job/101234603408",
+      "startedAt": "2026-09-05T02:39:54Z",
+      "completedAt": "2026-09-05T02:53:27Z"
+    },
+    {
+      "name": "test (macos-15, darwin, arm64, 24.15.0)",
+      "conclusion": "success",
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33939710990/job/101234603413",
+      "startedAt": "2026-09-05T02:40:01Z",
+      "completedAt": "2026-09-05T02:56:41Z"
+    },
+    {
+      "name": "persistence-schema-guard",
+      "conclusion": "success",
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33939710990/job/101234603417",
+      "startedAt": "2026-09-05T02:39:55Z",
+      "completedAt": "2026-09-05T02:40:02Z"
+    },
+    {
+      "name": "test (macos-15-intel, darwin, x64, 24.15.0)",
+      "conclusion": "success",
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33939710990/job/101234603442",
+      "startedAt": "2026-09-05T02:39:56Z",
+      "completedAt": "2026-09-05T03:03:02Z"
+    },
+    {
+      "name": "test (windows-2025, win32, x64, 24.15.0)",
+      "conclusion": "success",
+      "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33939710990/job/101234603454",
+      "startedAt": "2026-09-05T02:39:55Z",
+      "completedAt": "2026-09-05T03:08:32Z"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/33939710990",
+  "scope": "feature-premerge-cross-platform-ci",
+  "releasePackaging": "NOT_EXECUTED"
+}
