@@ -18,6 +18,10 @@ import { createSettingsUpdate } from "../../lib/tools/settings-update-result.ts"
 import { normalizeToolRuntimeContext } from "../../lib/tools/tool-session.ts";
 import { createPluginConfigStore, normalizePluginConfigSchema } from "../plugin-config.ts";
 import { t } from "../../lib/i18n.ts";
+import {
+  createMcpToolIdentity,
+  normalizeToolPermissionContract,
+} from "../../lib/tools/invocation/index.ts";
 
 // A server that keeps asking without ever finishing is a loop, not a
 // conversation. Three rounds is generous for a real form flow.
@@ -560,6 +564,8 @@ interface McpLiveAvailabilityInput {
   status?: string;
   transportAvailable?: boolean;
   error?: string;
+  visibility?: readonly string[];
+  surface?: "model" | "app";
 }
 
 function mcpLiveAvailabilityDiagnostics({ connectorId, toolName, status, error }: McpLiveAvailabilityInput = {}) {
@@ -572,8 +578,8 @@ function mcpLiveAvailabilityDiagnostics({ connectorId, toolName, status, error }
   };
 }
 
-/** Pure classification for the Reminder-only live availability probe. */
-export function probeMcpToolLiveAvailability(agentConfig, {
+/** 唯一的 MCP 可用性判定；装配、目录和执行前复核都走这里。 */
+export function evaluateMcpToolEligibility(agentConfig, {
   globalEnabled,
   connectorId,
   serverId,
@@ -584,6 +590,8 @@ export function probeMcpToolLiveAvailability(agentConfig, {
   status,
   transportAvailable,
   error = "",
+  visibility = DEFAULT_TOOL_VISIBILITY,
+  surface = "model",
 }: McpLiveAvailabilityInput = {}) {
   const id = connectorId || serverId;
   const diagnostics = mcpLiveAvailabilityDiagnostics({
@@ -593,19 +601,22 @@ export function probeMcpToolLiveAvailability(agentConfig, {
     error,
   });
   if (globalEnabled !== true) {
-    return { available: false, reason: "mcp_global_disabled", diagnostics };
+    return { eligible: false, reason: "mcp_global_disabled", code: "TARGET_REVOKED", diagnostics };
   }
   if (connectorPresent !== true) {
-    return { available: false, reason: "mcp_connector_removed", diagnostics };
+    return { eligible: false, reason: "mcp_connector_removed", code: "TARGET_REVOKED", diagnostics };
   }
   if (connectorEnabled === false) {
     // Ahead of the per-agent gate and the transport checks on purpose: a
     // switched-off connector is not going to start, so reporting it as merely
     // stopped would point at a retry that cannot work.
-    return { available: false, reason: "mcp_connector_disabled", diagnostics };
+    return { eligible: false, reason: "mcp_connector_disabled", code: "TARGET_REVOKED", diagnostics };
   }
   if (toolPresent !== true) {
-    return { available: false, reason: "mcp_tool_removed", diagnostics };
+    return { eligible: false, reason: "mcp_tool_removed", code: "TARGET_REVOKED", diagnostics };
+  }
+  if (!toolVisibilityIncludes(visibility, surface)) {
+    return { eligible: false, reason: "mcp_not_visible", code: "TARGET_NOT_VISIBLE", diagnostics };
   }
   if (!isMcpToolEnabledForAgentConfig(agentConfig, {
     globalEnabled: true,
@@ -613,20 +624,28 @@ export function probeMcpToolLiveAvailability(agentConfig, {
     serverId: id,
     toolName,
   })) {
-    return { available: false, reason: "mcp_agent_disabled", diagnostics };
+    return { eligible: false, reason: "mcp_agent_disabled", code: "TARGET_DISABLED_FOR_AGENT", diagnostics };
   }
   if (status === STATUS_NEEDS_AUTH) {
     // A revoked/expired bearer or OAuth credential converges to needs-auth in
     // the runtime. The recorded error is diagnostic only and is never acted on.
-    return { available: false, reason: "mcp_needs_auth", diagnostics };
+    return { eligible: false, reason: "mcp_needs_auth", code: "TARGET_REVOKED", diagnostics };
   }
   if (status === "stopped") {
-    return { available: false, reason: "mcp_connector_stopped", diagnostics };
+    return { eligible: false, reason: "mcp_connector_stopped", code: "TARGET_REVOKED", diagnostics };
   }
   if (status !== "running" || transportAvailable !== true) {
-    return { available: false, reason: "mcp_transport_unavailable", diagnostics };
+    return { eligible: false, reason: "mcp_transport_unavailable", code: "TARGET_REVOKED", diagnostics };
   }
-  return { available: true };
+  return { eligible: true };
+}
+
+/** Reminder 保留原有 available 形状，但复用同一个权威判定。 */
+export function probeMcpToolLiveAvailability(agentConfig, input: McpLiveAvailabilityInput = {}) {
+  const result = evaluateMcpToolEligibility(agentConfig, input);
+  return result.eligible
+    ? { available: true }
+    : { available: false, reason: result.reason, diagnostics: result.diagnostics };
 }
 
 export function mcpToolError(text, details: any = {}) {
@@ -733,6 +752,7 @@ export function createMcpToolDefinition({
   app = null,
   visibility = DEFAULT_TOOL_VISIBILITY,
   probeLiveAvailability = null,
+  evaluateEligibility = null,
   // Both are read at decision time, not at registration time, so a policy
   // change in settings or a fresh tool listing takes effect without
   // re-registering the tool. Absent both, the tool reviews every invocation.
@@ -761,41 +781,61 @@ export function createMcpToolDefinition({
         ? { reminderLiveAvailabilityProbe: probeLiveAvailability }
         : {}),
     },
-    isEnabledForAgentConfig: (agentConfig) => toolVisibilityIncludes(visibility, "model")
-      && isMcpToolEnabledForAgentConfig(agentConfig, {
-        globalEnabled: getGlobalEnabled(),
-        connectorId,
-        serverId: connectorId,
-        toolName,
-      }),
+    isEnabledForAgentConfig: (agentConfig) => (
+      typeof evaluateEligibility === "function"
+        ? evaluateEligibility(agentConfig, { surface: "model" }).eligible === true
+        : toolVisibilityIncludes(visibility, "model")
+          && isMcpToolEnabledForAgentConfig(agentConfig, {
+            globalEnabled: getGlobalEnabled(),
+            connectorId,
+            serverId: connectorId,
+            toolName,
+          })
+    ),
     execute: async (toolCallId, params, runtimeCtx: any = {}) => {
-      if (getGlobalEnabled() !== true) {
-        return mcpToolError("MCP is disabled globally. Enable Connectors in Settings before calling this tool.", {
-          connectorId,
-          serverId: connectorId,
-          toolName,
-        });
-      }
-      if (!toolVisibilityIncludes(visibility, "model")) {
-        return mcpToolError(`MCP connector tool "${connectorId}/${toolName}" is not visible to the model.`, {
-          connectorId,
-          serverId: connectorId,
-          toolName,
-        });
-      }
       const agentConfig = await getAgentConfig(runtimeCtx.agentId);
-      if (!isMcpToolEnabledForAgentConfig(agentConfig, {
-        globalEnabled: true,
-        connectorId,
-        serverId: connectorId,
-        toolName,
-      })) {
-        return mcpToolError(`MCP connector tool "${connectorId}/${toolName}" is not enabled for this agent.`, {
+      if (typeof evaluateEligibility === "function") {
+        const eligibility = evaluateEligibility(agentConfig, { surface: "model" });
+        if (eligibility.eligible !== true) {
+          return mcpToolError(
+            `MCP connector tool "${connectorId}/${toolName}" is unavailable: ${eligibility.reason}.`,
+            {
+              connectorId,
+              serverId: connectorId,
+              toolName,
+              agentId: runtimeCtx.agentId || null,
+              reason: eligibility.reason,
+            },
+          );
+        }
+      } else {
+        if (getGlobalEnabled() !== true) {
+          return mcpToolError("MCP is disabled globally. Enable Connectors in Settings before calling this tool.", {
+            connectorId,
+            serverId: connectorId,
+            toolName,
+          });
+        }
+        if (!toolVisibilityIncludes(visibility, "model")) {
+          return mcpToolError(`MCP connector tool "${connectorId}/${toolName}" is not visible to the model.`, {
+            connectorId,
+            serverId: connectorId,
+            toolName,
+          });
+        }
+        if (!isMcpToolEnabledForAgentConfig(agentConfig, {
+          globalEnabled: true,
           connectorId,
           serverId: connectorId,
           toolName,
-          agentId: runtimeCtx.agentId || null,
-        });
+        })) {
+          return mcpToolError(`MCP connector tool "${connectorId}/${toolName}" is not enabled for this agent.`, {
+            connectorId,
+            serverId: connectorId,
+            toolName,
+            agentId: runtimeCtx.agentId || null,
+          });
+        }
       }
       try {
         const result = normalizeMcpToolResult(await callTool(connectorId, toolName, params || {}, runtimeCtx));
@@ -2032,6 +2072,12 @@ export class McpManager {
             tool.name,
             agentConfig,
           ),
+          evaluateEligibility: (agentConfig, options) => this.evaluateToolEligibility(
+            connector.id,
+            tool.name,
+            agentConfig,
+            options,
+          ),
           // Re-read the connector from config on every decision so a policy
           // edit in settings applies to already-registered tools.
           getPermissionPolicy: () => {
@@ -2055,6 +2101,99 @@ export class McpManager {
     return [...this._tools];
   }
 
+  evaluateToolEligibility(connectorId, toolName, agentConfig, { surface = "model" }: any = {}) {
+    const config = this.getConfig();
+    const connector = config.connectors.find((item) => item.id === connectorId);
+    const tool = connector?.tools?.find((item) => item.name === toolName);
+    const status = connector ? this.connectorStatusFor(connectorId) : "";
+    return evaluateMcpToolEligibility(agentConfig, {
+      globalEnabled: config.enabled,
+      connectorId,
+      toolName,
+      connectorPresent: !!connector,
+      connectorEnabled: isConnectorEnabled(connector),
+      toolPresent: !!tool,
+      visibility: tool ? toolVisibility(tool) : DEFAULT_TOOL_VISIBILITY,
+      surface,
+      status,
+      transportAvailable: this.clients.get(connectorId)?.running === true,
+      error: this.clientErrors.get(connectorId) || "",
+    });
+  }
+
+  /**
+   * Engine 消费的 MCP 目标描述器。执行器始终复用已经发布的工具适配器，
+   * 因而不会绕过富结果、多轮输入和既有结果归一化。
+   */
+  getToolTargetDescriptors() {
+    const descriptors = [];
+    for (const publishedTool of this._tools) {
+      const metadata = publishedTool?.metadata;
+      if (metadata?.kind !== "mcp" || !metadata.connectorId || !metadata.toolName) continue;
+      const connectorId = metadata.connectorId;
+      const toolName = metadata.toolName;
+      const config = this.getConfig();
+      const connector = config.connectors.find((item) => item.id === connectorId);
+      const configuredTool = connector?.tools?.find((item) => item.name === toolName);
+      if (!connector || !configuredTool) continue;
+      const permissionDescriptor = publishedTool.sessionPermission?.resolveInvocation?.({});
+      const action = typeof permissionDescriptor?.action === "string" ? permissionDescriptor.action : "";
+      const capability = typeof permissionDescriptor?.capability === "string" ? permissionDescriptor.capability : "";
+      const suffix = action ? `.${action}` : "";
+      if (!suffix || !capability.endsWith(suffix) || capability.length <= suffix.length) {
+        throw new TypeError(`MCP tool ${connectorId}/${toolName} has no authoritative invocation capability`);
+      }
+      const capabilityBase = capability.slice(0, -suffix.length);
+      const identity = createMcpToolIdentity({
+        serverId: connectorId,
+        remoteToolName: toolName,
+        publicName: publishedTool.name,
+        capabilityBase,
+      });
+      const permission = normalizeToolPermissionContract(publishedTool, identity);
+      const evaluateEligibility = (agentConfig, options = {}) => this.evaluateToolEligibility(
+        connectorId,
+        toolName,
+        agentConfig,
+        options,
+      );
+      descriptors.push({
+        publishedTool,
+        identity,
+        permission,
+        catalogMetadata: {
+          targetId: identity.targetId,
+          origin: identity.origin,
+          sourceId: identity.sourceId,
+          serverId: connectorId,
+          serverLabel: connector.name || connectorId,
+          // 目录沿用既有无 mcp_ 前缀名称；执行主键仍是上面的规范 TargetId。
+          publicName: toMcpToolId(connectorId, toolName),
+          toolName,
+          capabilityBase: identity.capabilityBase,
+          description: publishedTool.description || "",
+          paramsSummary: summarizeToolParameters(publishedTool.parameters),
+          lifecycleGeneration: 0,
+          deferrable: configuredTool.deferrable !== false,
+          pinned: readMcpToolIdentitySetting(connector.pinnedTools, connectorId, toolName) === true,
+          schemaRef: () => publishedTool.parameters,
+        },
+        evaluateEligibility,
+        getCurrentGeneration: () => 0,
+        isCurrentlyAvailable: async (runtimeContext) => {
+          const context = runtimeContext && typeof runtimeContext === "object"
+            ? runtimeContext as Record<string, unknown>
+            : {};
+          const currentAgentConfig = context.agentConfig && typeof context.agentConfig === "object"
+            ? context.agentConfig
+            : await this.getAgentConfig(typeof context.agentId === "string" ? context.agentId : null);
+          return evaluateEligibility(currentAgentConfig, { surface: "model" });
+        },
+      });
+    }
+    return descriptors;
+  }
+
   /**
    * One catalog row per connector tool.
    *
@@ -2067,28 +2206,13 @@ export class McpManager {
    * rather than a connector tool, and it is never deferred.
    */
   getCatalogEntries() {
-    const entries = [];
-    for (const connector of this.getConfig().connectors) {
-      // Same cut as the direct-load path. A tool the model can see in the
-      // catalog but can never load is worse than one it cannot see at all.
-      if (!isConnectorEnabled(connector)) continue;
-      for (const tool of connector.tools || []) {
-        if (!tool?.name) continue;
-        entries.push({
-          name: toMcpToolId(connector.id, tool.name),
-          toolName: tool.name,
-          description: tool.description || `${connector.name}: ${tool.title || tool.name}`,
-          paramsSummary: summarizeToolParameters(tool.inputSchema),
-          serverId: connector.id,
-          serverLabel: connector.name || connector.id,
-          // Only an explicit false opts a tool out of deferral.
-          deferrable: tool.deferrable !== false,
-          pinned: readMcpToolIdentitySetting(connector.pinnedTools, connector.id, tool.name) === true,
-          schemaRef: () => tool.inputSchema || { type: "object", properties: {} },
-        });
-      }
-    }
-    return entries;
+    return this.getToolTargetDescriptors().map(({ catalogMetadata }) => ({
+      ...catalogMetadata,
+      // 旧读取方仍显示没有公共 mcp_ 前缀的目录名。
+      name: catalogMetadata.publicName.startsWith(`${MCP_TOOL_NAMESPACE}_`)
+        ? catalogMetadata.publicName.slice(MCP_TOOL_NAMESPACE.length + 1)
+        : catalogMetadata.publicName,
+    }));
   }
 
   /**

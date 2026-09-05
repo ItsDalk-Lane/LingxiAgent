@@ -9,6 +9,7 @@ import {
   filterToolObjectsByAvailability,
 } from "../core/tool-availability.ts";
 import {
+  createMcpToolIdentity,
   createPluginToolIdentity,
   normalizeToolPermissionContract,
 } from "../lib/tools/invocation/index.ts";
@@ -57,11 +58,18 @@ function makeEngine({
     pinnedTools: connector.pinnedTools || {},
   }));
 
+  const mcpCall = vi.fn(async (
+    _connectorId: string,
+    _toolName: string,
+    _args: Record<string, unknown>,
+    _ctx: unknown,
+  ) => ({ content: [{ type: "text", text: "ok" }] }));
   const published = normalized.flatMap((connector) => connector.tools.map((tool: any) => ({
     name: `mcp_${toMcpToolId(connector.id, tool.name)}`,
     description: tool.description,
     parameters: tool.inputSchema,
     _pluginId: "mcp",
+    metadata: { kind: "mcp", connectorId: connector.id, toolName: tool.name },
     sessionPermission: {
       resolveInvocation: () => ({
         action: "invoke",
@@ -69,8 +77,46 @@ function makeEngine({
         capability: `${toMcpToolId(connector.id, tool.name)}.invoke`,
       }),
     },
-    execute: vi.fn(async () => ({ content: [{ type: "text", text: "ok" }] })),
+    execute: vi.fn(async (_id, args, _signal, _onUpdate, ctx) => (
+      mcpCall(connector.id, tool.name, args, ctx)
+    )),
   })));
+  const targetDescriptors = normalized.flatMap((connector) => connector.tools.map((tool: any) => {
+    const publicName = `mcp_${toMcpToolId(connector.id, tool.name)}`;
+    const capabilityBase = toMcpToolId(connector.id, tool.name);
+    const publishedTool = published.find((entry) => entry.name === publicName)!;
+    const identity = createMcpToolIdentity({
+      serverId: connector.id,
+      remoteToolName: tool.name,
+      publicName,
+      capabilityBase,
+    });
+    const permission = normalizeToolPermissionContract(publishedTool, identity);
+    return {
+      publishedTool,
+      identity,
+      permission,
+      catalogMetadata: {
+        targetId: identity.targetId,
+        origin: identity.origin,
+        sourceId: identity.sourceId,
+        serverId: connector.id,
+        serverLabel: connector.name,
+        publicName: capabilityBase,
+        toolName: tool.name,
+        capabilityBase,
+        description: tool.description,
+        paramsSummary: "owner (string, required)",
+        lifecycleGeneration: 0,
+        deferrable: tool.deferrable !== false,
+        pinned: connector.pinnedTools?.[tool.name] === true,
+        schemaRef: () => tool.inputSchema,
+      },
+      evaluateEligibility: () => ({ eligible: true }),
+      getCurrentGeneration: () => 0,
+      isCurrentlyAvailable: () => true,
+    };
+  }));
 
   const engine = Object.create(LingxiEngine.prototype);
   engine.lingxiHome = tmpDir;
@@ -78,6 +124,7 @@ function makeEngine({
   engine._pluginManager = pluginTools.length > 0 ? { getAllTools: () => pluginTools } : null;
   engine._mcp = {
     getAllTools: () => published,
+    getToolTargetDescriptors: () => targetDescriptors,
     getConfig: () => ({ enabled: true, deferEnabled, deferThreshold, connectors: normalized }),
     getCatalogEntries: () => normalized.flatMap((connector) => connector.tools.map((tool: any) => ({
       name: toMcpToolId(connector.id, tool.name),
@@ -91,7 +138,7 @@ function makeEngine({
       schemaRef: () => tool.inputSchema,
     }))),
     resolveToolPermissionKind: () => "review",
-    callTool: vi.fn(async () => ({ content: [{ type: "text", text: "ok" }] })),
+    callTool: mcpCall,
   };
   engine._prefs = {
     getFileBackup: () => ({ enabled: false }),

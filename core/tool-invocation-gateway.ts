@@ -8,7 +8,11 @@ import {
   type ToolInvocationRoute,
   type ToolTargetId,
 } from "../lib/tools/invocation/index.ts";
-import type { RegisteredToolTarget, ToolTargetRegistry } from "./tool-target-registry.ts";
+import type {
+  RegisteredToolTarget,
+  ToolTargetAvailabilityDecision,
+  ToolTargetRegistry,
+} from "./tool-target-registry.ts";
 
 export interface ToolInvocationGatewayRequest {
   readonly targetId: ToolTargetId;
@@ -36,7 +40,7 @@ export interface ToolInvocationGatewayOptions {
 }
 
 function gatewayError(
-  code: "TARGET_NOT_FOUND" | "TARGET_NOT_VISIBLE" | "TARGET_REVOKED"
+  code: "TARGET_NOT_FOUND" | "TARGET_NOT_VISIBLE" | "TARGET_DISABLED_FOR_AGENT" | "TARGET_REVOKED"
     | "PREPARED_INVOCATION_MISSING" | "PREPARED_INVOCATION_MISMATCH"
     | "PERMISSION_DENIED" | "CAPABILITY_MISMATCH" | "TRANSPORT_FAILURE"
     | "EXECUTION_CANCELLED",
@@ -59,6 +63,12 @@ function gatewayError(
 
 function normalizeOptionalText(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
+function availabilityDecision(
+  value: boolean | ToolTargetAvailabilityDecision,
+): ToolTargetAvailabilityDecision {
+  return typeof value === "boolean" ? { eligible: value } : value;
 }
 
 function abortError(
@@ -115,7 +125,7 @@ export class ToolInvocationGateway {
     }
     if (!target.availability.eligible) {
       throw gatewayError(
-        "TARGET_NOT_VISIBLE",
+        target.availability.code ?? "TARGET_NOT_VISIBLE",
         "Tool target was not eligible when this session was assembled.",
         request,
         target,
@@ -275,12 +285,16 @@ export class ToolInvocationGateway {
         target,
       );
     }
-    if (!await target.isCurrentlyAvailable(request.runtimeContext)) {
+    const currentAvailability = availabilityDecision(
+      await target.isCurrentlyAvailable(request.runtimeContext),
+    );
+    if (!currentAvailability.eligible) {
       throw gatewayError(
-        "TARGET_REVOKED",
+        currentAvailability.code ?? "TARGET_REVOKED",
         "Prepared tool target is no longer available.",
         request,
         target,
+        { reason: currentAvailability.reason ?? null },
       );
     }
     if (request.signal?.aborted) throw abortError(request, target);

@@ -22,8 +22,9 @@
 | P3-01 | `completed` | `2a8bb90adaab00a5d26ac476a11feaca1a8f9327` | 插件元数据与可用性回归先红后绿，本项门禁全绿 |
 | P3-02 | `completed` | `31172fbe223c2dd7d5cda2304062c9df16481876` | 引擎装配按 v0.1.34 定点适配，10 项红灯转绿 |
 | P4-01 | `completed` | `9d6fed808429ce6d73138a905b79f2bfe128e36e` | Catalog 改为目标引用，6 项红灯转绿 |
-| P4-02 | `completed_pending_commit` | 待提交 | Bridge 只经 Gateway 调用，20 项红灯转绿 |
-| P4-03–P7 | `pending_migration` | — | 优先复用原实现 |
+| P4-02 | `completed` | `48bbb8a3d5473982fe9aa83ccacc80fdb1ac2a0f` | Bridge 只经 Gateway 调用，20 项红灯转绿 |
+| P4-03 | `completed_pending_commit` | 待提交 | MCP 可用性与执行器统一，12 项红灯转绿 |
+| P5–P7 | `pending_migration` | — | 优先复用原实现 |
 | P8 | `pending_v0134_adaptation` | — | 知识正式架构发生变化，需重点适配 |
 | P9–P11 | `pending_migration` | — | 迁移错误、边界、组合测试与文档 |
 | P12 | `pending` | — | 最终验证、构建和封印 |
@@ -147,13 +148,25 @@
 
 ## P4-02 Bridge 改为 Gateway 适配器
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`48bbb8a3d5473982fe9aa83ccacc80fdb1ac2a0f`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `40c4db7a95b5db58f41dead8d4d5ea044f8190d6`；Bridge 与 Gateway 同哈希原样迁移，引擎只适配桥接依赖和能力委托片段。
 - RED：exit `1`；1 file，`20 failed / 14 passed` tests；旧路径没有调用 Gateway，自行拼权限、吞掉类型化错误、只做浅层校验且不能处理来源歧义。
 - GREEN：exit `0`；6 files / 146 tests 全部通过。
 - typecheck exit `0`；本项定向 ESLint exit `0`，`0 errors / 140 warnings`；`git diff --check` exit `0`。
 - v0.1.34 适配证明：引擎只删除临时的 raw Bridge 闭包并改接已注册的统一入口，没有覆盖正式知识架构或其它引擎区域。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p402-red.log`、`/tmp/lingxi-tool-contract-v0134-p402-stage-final.log`、`/tmp/lingxi-tool-contract-v0134-p402-typecheck-final.log`、`/tmp/lingxi-tool-contract-v0134-p402-eslint-final.log`。
+
+## P4-03 统一 MCP eligibility、执行器与结果语义
+
+- 状态：`completed_pending_commit`。
+- 复用来源：原分支提交 `ae40059d531bad737c1427cb232e7e8fcf7d03ba`；Manager、Registry、Gateway 同哈希原样迁移，引擎只适配 MCP 目标登记和调用连接点。
+- RED：exit `1`；`2 failed / 1 passed` files，`12 failed / 53 passed` tests；缺少唯一可用性判定、Manager 权威目标描述，直达与延迟结果/错误不等价。
+- P4 阶段 GREEN：exit `0`；6 files / 155 tests 全部通过。
+- 扩展 GREEN：exit `0`；4 files / 180 tests 全部通过。
+- typecheck exit `0`；新增测试定向 ESLint exit `0`，0 问题；`git diff --check` exit `0`。
+- 边界：引擎/Bridge 的 raw MCP 调用搜索 exit `1`（0 命中）；全仓 `.callTool(` 仅剩 Manager source adapter 4 处和协议客户端 1 处。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p403-red.log`、`/tmp/lingxi-tool-contract-v0134-p403-gate-final.log`、`/tmp/lingxi-tool-contract-v0134-p403-affected-final.log`、`/tmp/lingxi-tool-contract-v0134-p403-typecheck-final.log`、`/tmp/lingxi-tool-contract-v0134-p403-new-eslint-final.log`、`/tmp/lingxi-tool-contract-v0134-p403-boundary-engine-bridge.log`、`/tmp/lingxi-tool-contract-v0134-p403-boundary-calltool-inventory.log`。
 
 ## 错误记录
 

@@ -9,6 +9,7 @@ import {
 export interface ToolTargetAvailabilityDecision {
   readonly eligible: boolean;
   readonly reason?: string | null;
+  readonly code?: "TARGET_NOT_VISIBLE" | "TARGET_DISABLED_FOR_AGENT" | "TARGET_REVOKED";
 }
 
 export interface RegisteredToolTarget {
@@ -22,7 +23,9 @@ export interface RegisteredToolTarget {
   readonly validator: ToolSchemaValidator;
   readonly availability: ToolTargetAvailabilityDecision;
   readonly getCurrentGeneration: () => string | number;
-  readonly isCurrentlyAvailable: (runtimeContext: unknown) => boolean | Promise<boolean>;
+  readonly isCurrentlyAvailable: (
+    runtimeContext: unknown,
+  ) => boolean | ToolTargetAvailabilityDecision | Promise<boolean | ToolTargetAvailabilityDecision>;
   readonly executeCanonical: (
     toolCallId: string,
     args: Record<string, unknown>,

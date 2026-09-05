@@ -345,6 +345,29 @@ describe("P4-02 Gateway 桥接边界", () => {
     }, undefined, undefined, {})).rejects.toBe(transportFailure);
   });
 
+  it("Gateway 的富结果、来源信息和多轮状态不经 Bridge 改写", async () => {
+    const richResult = {
+      content: [{ type: "text", text: "ok" }],
+      structuredContent: { rows: [{ id: "one" }] },
+      details: {
+        provenance: { connectorId: "github", resultId: "result-1" },
+        rounds: [{ round: 1, state: "complete" }],
+        mcpAppCard: { type: "mcp_app", resourceUri: "ui://github/issues" },
+      },
+    };
+    const { byName } = makeGatewayBridge({
+      gateway: { invoke: vi.fn(async () => richResult) },
+    });
+
+    const result = await byName.mcp_call.execute("outer-call", {
+      server: "github",
+      tool: "github_create_issue",
+      arguments: { owner: "a", repo: "b", title: "c" },
+    }, undefined, undefined, {});
+
+    expect(result).toBe(richResult);
+  });
+
   it("描述支持来源限定，未限定的同名歧义会提示补充 server", async () => {
     const catalog = createToolCatalog();
     catalog.registerSource("mcp:alpha", [canonicalCatalogEntry("alpha", "search", "shared")]);
