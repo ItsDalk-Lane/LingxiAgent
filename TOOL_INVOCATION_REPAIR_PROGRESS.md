@@ -23,8 +23,9 @@
 | P3-02 | `completed` | `31172fbe223c2dd7d5cda2304062c9df16481876` | 引擎装配按 v0.1.34 定点适配，10 项红灯转绿 |
 | P4-01 | `completed` | `9d6fed808429ce6d73138a905b79f2bfe128e36e` | Catalog 改为目标引用，6 项红灯转绿 |
 | P4-02 | `completed` | `48bbb8a3d5473982fe9aa83ccacc80fdb1ac2a0f` | Bridge 只经 Gateway 调用，20 项红灯转绿 |
-| P4-03 | `completed_pending_commit` | 待提交 | MCP 可用性与执行器统一，12 项红灯转绿 |
-| P5–P7 | `pending_migration` | — | 优先复用原实现 |
+| P4-03 | `completed` | `1e21140cf77a36f0dcbe33ca4da6156ec78b269e` | MCP 可用性与执行器统一，12 项红灯转绿 |
+| P5-01 | `completed_pending_commit` | 待提交 | Plugin 工具单调代次，3 项红灯转绿 |
+| P5-02–P7 | `pending_migration` | — | 优先复用原实现 |
 | P8 | `pending_v0134_adaptation` | — | 知识正式架构发生变化，需重点适配 |
 | P9–P11 | `pending_migration` | — | 迁移错误、边界、组合测试与文档 |
 | P12 | `pending` | — | 最终验证、构建和封印 |
@@ -159,7 +160,8 @@
 
 ## P4-03 统一 MCP eligibility、执行器与结果语义
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`1e21140cf77a36f0dcbe33ca4da6156ec78b269e`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `ae40059d531bad737c1427cb232e7e8fcf7d03ba`；Manager、Registry、Gateway 同哈希原样迁移，引擎只适配 MCP 目标登记和调用连接点。
 - RED：exit `1`；`2 failed / 1 passed` files，`12 failed / 53 passed` tests；缺少唯一可用性判定、Manager 权威目标描述，直达与延迟结果/错误不等价。
 - P4 阶段 GREEN：exit `0`；6 files / 155 tests 全部通过。
@@ -167,6 +169,15 @@
 - typecheck exit `0`；新增测试定向 ESLint exit `0`，0 问题；`git diff --check` exit `0`。
 - 边界：引擎/Bridge 的 raw MCP 调用搜索 exit `1`（0 命中）；全仓 `.callTool(` 仅剩 Manager source adapter 4 处和协议客户端 1 处。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p403-red.log`、`/tmp/lingxi-tool-contract-v0134-p403-gate-final.log`、`/tmp/lingxi-tool-contract-v0134-p403-affected-final.log`、`/tmp/lingxi-tool-contract-v0134-p403-typecheck-final.log`、`/tmp/lingxi-tool-contract-v0134-p403-new-eslint-final.log`、`/tmp/lingxi-tool-contract-v0134-p403-boundary-engine-bridge.log`、`/tmp/lingxi-tool-contract-v0134-p403-boundary-calltool-inventory.log`。
+
+## P5-01 PluginManager 工具代次
+
+- 状态：`completed_pending_commit`。
+- 复用来源：原分支提交 `30eb7d7c5eeb4f9b8d455961ef8bab7104adccf7`；所有生产与测试文件在本项前均与原提交父节点同哈希，原样迁移。
+- RED：exit `1`；`1 failed / 1 passed` files，`3 failed / 102 passed` tests；动态注册、禁用、重载和卸载路径缺少插件工具代次。
+- GREEN：exit `0`；6 files / 151 tests 全部通过。
+- typecheck exit `0`；Registry/Gateway 定向 ESLint exit `0`，0 问题；`git diff --check` exit `0`。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p501-red.log`、`/tmp/lingxi-tool-contract-v0134-p501-gate-final.log`、`/tmp/lingxi-tool-contract-v0134-p501-typecheck-final.log`、`/tmp/lingxi-tool-contract-v0134-p501-eslint-final.log`。
 
 ## 错误记录
 

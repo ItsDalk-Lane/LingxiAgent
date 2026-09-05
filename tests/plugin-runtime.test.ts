@@ -55,6 +55,7 @@ describe('plugin runtime SDK', () => {
       description: 'Search things',
       parameters: { type: 'object', properties: {} },
     });
+    expect(tool).not.toHaveProperty('_toolLifecycleGeneration');
     await expect(tool.execute({ query: 'hana' }, {} as any)).resolves.toBe('search:hana');
   });
 

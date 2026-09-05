@@ -1397,6 +1397,35 @@ describe("permission enforcement", () => {
 // ── 动态工具注册 ──────────────────────────────────────────────────────────────
 
 describe("addTool (dynamic registration)", () => {
+  it("动态工具注册、重注册和移除都会推进插件工具代次", async () => {
+    const pm = new PluginManager({ pluginsDir, dataDir, bus: await makeBus() } as any);
+
+    expect(pm.getPluginToolGeneration("dynamic-generation")).toBe(0);
+    const removeFirst = pm.addTool("dynamic-generation", {
+      name: "search",
+      description: "Search",
+      sessionPermission: { readOnly: true },
+      execute: async () => "first",
+    });
+    const firstGeneration = pm.getPluginToolGeneration("dynamic-generation");
+    expect(firstGeneration).toBeGreaterThan(0);
+    expect(pm.isPluginToolCurrentlyAvailable("dynamic-generation", "dynamic-generation_search")).toBe(true);
+
+    const removeSecond = pm.addTool("dynamic-generation", {
+      name: "lookup",
+      description: "Lookup",
+      sessionPermission: { readOnly: true },
+      execute: async () => "second",
+    });
+    expect(pm.getPluginToolGeneration("dynamic-generation")).toBeGreaterThan(firstGeneration);
+
+    const beforeRemoval = pm.getPluginToolGeneration("dynamic-generation");
+    removeFirst();
+    expect(pm.getPluginToolGeneration("dynamic-generation")).toBeGreaterThan(beforeRemoval);
+    expect(pm.isPluginToolCurrentlyAvailable("dynamic-generation", "dynamic-generation_search")).toBe(false);
+    removeSecond();
+  });
+
   it("dynamically registered tool appears in getAllTools", async () => {
     const pm = new PluginManager({ pluginsDir, dataDir, bus: await makeBus() } as any);
     const remove = pm.addTool("mcp-bridge", {
@@ -2057,11 +2086,53 @@ describe("hot operations", () => {
     pm.scan();
     await pm.loadAll();
     expect(pm.getPlugin("disableable").status).toBe("loaded");
+    const publishedTool = pm.getPluginTool("disableable", "t");
+    const loadedGeneration = pm.getPluginToolGeneration("disableable");
+    expect(loadedGeneration).toBeGreaterThan(0);
+    expect(publishedTool._toolLifecycleGeneration).toBe(loadedGeneration);
+    expect(pm.isPluginToolCurrentlyAvailable("disableable", "disableable_t")).toBe(true);
 
     await pm.disablePlugin("disableable");
     expect(pm.getPlugin("disableable").status).toBe("disabled");
+    expect(pm.getPluginToolGeneration("disableable")).toBeGreaterThan(loadedGeneration);
+    expect(publishedTool._toolLifecycleGeneration).toBe(pm.getPluginToolGeneration("disableable"));
+    expect(pm.isPluginToolCurrentlyAvailable("disableable", "disableable_t")).toBe(false);
     expect(pm.getAllTools().some(t => t._pluginId === "disableable")).toBe(false);
     expect(mockPrefs.getDisabledPlugins()).toContain("disableable");
+  });
+
+  it("热重载和卸载都会撤销旧工具代次", async () => {
+    const builtinDir = path.join(tmpHome, "builtin-generation-reload");
+    fs.mkdirSync(builtinDir, { recursive: true });
+    const communityDir = path.join(tmpHome, "community-generation-reload");
+    const dir = path.join(communityDir, "generation-reload");
+    fs.mkdirSync(path.join(dir, "tools"), { recursive: true });
+    writePluginToolFixture(path.join(dir, "tools", "t.js"), `
+      export const name = "t";
+      export const description = "test";
+      export const parameters = {};
+      export async function execute() { return "ok"; }
+    `);
+    const pm = new PluginManager({
+      pluginsDirs: [builtinDir, communityDir],
+      dataDir,
+      bus: await makeBus(),
+      preferencesManager: createMockPrefs(),
+    } as any);
+    pm.scan();
+    await pm.loadAll();
+    const oldTool = pm.getPluginTool("generation-reload", "t");
+    const loadedGeneration = pm.getPluginToolGeneration("generation-reload");
+
+    await pm.enablePlugin("generation-reload");
+    const reloadedGeneration = pm.getPluginToolGeneration("generation-reload");
+    expect(reloadedGeneration).toBeGreaterThan(loadedGeneration);
+    expect(oldTool._toolLifecycleGeneration).toBe(reloadedGeneration);
+    expect(pm.isPluginToolCurrentlyAvailable("generation-reload", "generation-reload_t")).toBe(true);
+
+    await pm.removePlugin("generation-reload");
+    expect(pm.getPluginToolGeneration("generation-reload")).toBeGreaterThan(reloadedGeneration);
+    expect(pm.isPluginToolCurrentlyAvailable("generation-reload", "generation-reload_t")).toBe(false);
   });
 
   it("disablePlugin rejects builtin plugins", async () => {

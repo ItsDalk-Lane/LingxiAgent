@@ -296,6 +296,7 @@ export class PluginManager {
   declare _skillPaths: any;
   declare _slashRegistry: any;
   declare _tools: any;
+  declare _toolGenerations: Map<string, number>;
   declare _widgets: any;
   declare routeRegistry: any;
   /**
@@ -341,6 +342,7 @@ export class PluginManager {
 
     // Contribution registries
     this._tools = [];
+    this._toolGenerations = new Map();
     this._commands = [];
     this._skillPaths = [];
     this._agentTemplates = [];
@@ -434,9 +436,26 @@ export class PluginManager {
     return !fs.existsSync(entry.pluginDir);
   }
 
+  _advancePluginToolGeneration(pluginId) {
+    const current = this.getPluginToolGeneration(pluginId);
+    const next = current + 1;
+    this._toolGenerations.set(pluginId, next);
+    return next;
+  }
+
+  _attachPluginToolGeneration(pluginId, tool) {
+    Object.defineProperty(tool, "_toolLifecycleGeneration", {
+      enumerable: true,
+      configurable: false,
+      get: () => this.getPluginToolGeneration(pluginId),
+    });
+    return tool;
+  }
+
   _cleanupPluginContributions(entry) {
     const pluginId = entry.id;
     const pluginKey = entry.pluginKey;
+    this._advancePluginToolGeneration(pluginId);
     this._tools = this._tools.filter(t => t._pluginKey !== pluginKey);
     this._commands = this._commands.filter(c => c._pluginKey !== pluginKey);
     this._slashRegistry?.unregisterBySource("plugin", pluginKey);
@@ -663,6 +682,7 @@ export class PluginManager {
   }
 
   async _loadPluginWithBoundary(entry) {
+    this._advancePluginToolGeneration(entry.id);
     const loadToken = Symbol(entry.id);
     entry._loadToken = loadToken;
     entry._loadCancelled = false;
@@ -882,7 +902,7 @@ export class PluginManager {
         if (!mod.name || !mod.description || typeof mod.execute !== "function") continue;
         const origExecute = mod.execute;
         const publicName = `${entry.id}_${mod.name}`;
-        this._tools.push({
+        const publishedTool = this._attachPluginToolGeneration(entry.id, {
           name: publicName,
           description: mod.description,
           ...staticPluginToolMetadata(mod),
@@ -909,6 +929,7 @@ export class PluginManager {
           _pluginKey: entry.pluginKey,
           _pluginSource: entry.source,
         });
+        this._tools.push(publishedTool);
       } catch (err) {
         log.error(`tool "${file}" in "${entry.id}" failed to load: ${err.message}`);
       }
@@ -923,6 +944,7 @@ export class PluginManager {
    * @returns {Function} 清理函数（调用即移除该工具）
    */
   addTool(pluginId, toolDef, options: any = {}) {
+    this._advancePluginToolGeneration(pluginId);
     const source = options.source ? normalizePluginSource(options.source) : null;
     const pluginKey = options.pluginKey || null;
     const invocationStyle = getDynamicToolInvocationStyle(toolDef);
@@ -960,11 +982,31 @@ export class PluginManager {
       tool,
       normalizedPluginToolPermissionFields(pluginId, tool.name, toolDef.sessionPermission),
     );
+    this._attachPluginToolGeneration(pluginId, tool);
     this._tools.push(tool);
     return () => {
       const idx = this._tools.indexOf(tool);
-      if (idx !== -1) this._tools.splice(idx, 1);
+      if (idx !== -1) {
+        this._tools.splice(idx, 1);
+        this._advancePluginToolGeneration(pluginId);
+      }
     };
+  }
+
+  getPluginToolGeneration(pluginId) {
+    return this._toolGenerations.get(pluginId) || 0;
+  }
+
+  isPluginToolCurrentlyAvailable(pluginId, publicName) {
+    this.reconcileMissingPluginDirectories();
+    const normalizedPluginId = typeof pluginId === "string" ? pluginId.trim() : "";
+    const normalizedPublicName = typeof publicName === "string" ? publicName.trim() : "";
+    if (!normalizedPluginId || !normalizedPublicName) return false;
+    return this._tools.some((tool) => (
+      tool?._pluginId === normalizedPluginId
+      && tool.name === normalizedPublicName
+      && (!tool._pluginKey || this._isPluginKeyRuntimeActive(tool._pluginKey))
+    ));
   }
 
   getPluginTool(pluginId, toolName, options: any = {}) {
@@ -1530,6 +1572,7 @@ export class PluginManager {
         await this.unloadPlugin(entry.id, { pluginKey: entry.pluginKey });
       }
       this._plugins.delete(entry.pluginKey);
+      this._advancePluginToolGeneration(entry.id);
       if (entry.source === "dev" || options.persist === false) {
         // Dev plugin removal is scoped to the dev slot and must not mutate the
         // user's persisted disabled community plugin list.
@@ -1556,6 +1599,7 @@ export class PluginManager {
         await this.unloadPlugin(entry.id, { pluginKey: entry.pluginKey });
       }
       entry.status = "disabled";
+      this._advancePluginToolGeneration(entry.id);
       if (entry.source === "dev" || options.persist === false) {
         // Dev plugin enablement is scoped to the dev slot and must not pollute
         // the user's persisted disabled community plugin list.

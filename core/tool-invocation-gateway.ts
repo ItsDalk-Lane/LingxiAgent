@@ -149,7 +149,7 @@ export class ToolInvocationGateway {
     }
     let effectiveTarget = target;
     let effectiveArguments = validatedArguments;
-    let lifecycleGeneration = target.getCurrentGeneration();
+    let lifecycleGeneration = target.lifecycleGeneration;
     if (permission.effectiveInvocation) {
       const effective = permission.effectiveInvocation;
       const resolvedEffectiveTarget = this.registry.getByTargetId(effective.targetId);
@@ -197,7 +197,8 @@ export class ToolInvocationGateway {
           },
         );
       }
-      if (resolvedEffectiveTarget.getCurrentGeneration() !== effective.generation) {
+      if (resolvedEffectiveTarget.lifecycleGeneration !== effective.generation
+        || resolvedEffectiveTarget.getCurrentGeneration() !== effective.generation) {
         throw gatewayError(
           "TARGET_REVOKED",
           "Effective tool target generation is no longer current.",
@@ -236,6 +237,18 @@ export class ToolInvocationGateway {
       );
     }
     const target = this.registry.getByTargetId(request.targetId);
+    if (target && target.getCurrentGeneration() !== target.lifecycleGeneration) {
+      throw gatewayError(
+        "TARGET_REVOKED",
+        "Tool target generation changed after this session was assembled.",
+        request,
+        target,
+        {
+          assembledGeneration: target.lifecycleGeneration,
+          currentGeneration: target.getCurrentGeneration(),
+        },
+      );
+    }
     const revalidatedArguments = target
       ? target.validator.validate(request.arguments, request.route)
       : request.arguments;
@@ -277,7 +290,7 @@ export class ToolInvocationGateway {
     if (!target) {
       throw gatewayError("TARGET_REVOKED", "Prepared tool target is no longer registered.", request);
     }
-    if (target.getCurrentGeneration() !== prepared.lifecycleGeneration) {
+    if (target.lifecycleGeneration !== prepared.lifecycleGeneration) {
       throw gatewayError(
         "TARGET_REVOKED",
         "Prepared tool target generation is no longer current.",
