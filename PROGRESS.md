@@ -10,7 +10,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 32ae7431f856f3ee7605ff2beba1dea336ffec48  (2026-09-05 契约执行路径不变量修复源码候选)
+VERIFIED_SOURCE_SHA   = ce701ee20727e7cdaaf3d6f838ae8ca5727c2b63  (2026-09-05 契约执行路径不变量修复源码候选，含 PR #43 Windows 路径夹具修复)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 当前知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1139,7 +1139,7 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 
 ## 2026-09-05 契约执行路径不变量修复
 
-- 固定源码：`32ae7431f856f3ee7605ff2beba1dea336ffec48`；固定基线为 v0.1.34 发布提交 `60d910b84572c525a7c9c49216fb9206623bf7a4`，执行分支为 `fix/tool-contract-path-invariance-v0134`。
+- 固定源码：`ce701ee20727e7cdaaf3d6f838ae8ca5727c2b63`；固定基线为 v0.1.34 发布提交 `60d910b84572c525a7c9c49216fb9206623bf7a4`，执行分支为 `fix/tool-contract-path-invariance-v0134`。
 - 用户明确授权调整 P12 封印顺序：先完成构建，再推进封印，封印后完整重跑全量测试；没有跳过封印用例、扩大白名单或把封印前失败记为通过。
 - P12-01：底层执行边界扫描 2129 个生产源码文件、0 违规；任务书指定 25 文件 / 389 测试全部通过。
 - P12-02 静态门禁：三段 typecheck exit 0；lint exit 0（0 errors / 9231 warnings）；开放边界 exit 0（仅 1 条既有债务）；`git diff --check` exit 0，验证前工作树干净。
@@ -1150,3 +1150,5 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - P12-05：矩阵校验 133 条通过；post-verification diff 仅含 6 个审计 allowlist 文件；`upstream-sync-matrix` 与 `post-verification-audit-seal` 共 2 文件 / 10 测试全部通过；工作树干净。日志：`/tmp/lingxi-tool-contract-p1205-matrix.log`、`/tmp/lingxi-tool-contract-p1205-post-diff.log`、`/tmp/lingxi-tool-contract-p1205-seal-tests.log`。
 - 原始日志：`/tmp/lingxi-tool-contract-p1201-boundary.log`、`/tmp/lingxi-tool-contract-p1201-targeted.log`、`/tmp/lingxi-tool-contract-p1202-typecheck.log`、`/tmp/lingxi-tool-contract-p1202-lint.log`、`/tmp/lingxi-tool-contract-p1202-open-boundary.log`、`/tmp/lingxi-tool-contract-p1202-full-tests-preseal.log`、`/tmp/lingxi-tool-contract-p1203-build-server.log`、`/tmp/lingxi-tool-contract-p1203-build-server-open.log`、`/tmp/lingxi-tool-contract-p1203-build-client.log`、`/tmp/lingxi-tool-contract-p1203-seed-kit.log`。
 - `TOOL_INVOCATION_REPAIR_FACTS.json` 中 `sourceCandidateSha` 与 `sealSha` 按任务书保持 `null`，避免提交自引用；真实源码候选记录在本节，真实封印提交只在最终执行报告中给出。
+- PR #43 首轮 Windows CI 在 `tests/tool-invocation-path-parity.test.ts` 出现 10 项 `PREPARED_INVOCATION_MISMATCH`：测试夹具固定使用 Unix 会话路径，而 Windows 包装层按平台规范化为绝对路径。生产 fail-closed 正确拒绝不一致事实，没有放宽。
+- 最小修复提交 `ce701ee20727e7cdaaf3d6f838ae8ca5727c2b63` 只把测试会话路径改为当前平台的规范绝对路径。修复后定向测试 1 文件 / 12 测试通过；三段 typecheck exit 0；本地全量测试 1374 文件通过 / 1 跳过、13904 测试通过 / 7 跳过、0 fail。日志：`/tmp/lingxi-pr43-windows-path-fixture-green.log`、`/tmp/lingxi-pr43-windows-path-fixture-typecheck.log`、`/tmp/lingxi-pr43-windows-path-fixture-full-test.log`。
