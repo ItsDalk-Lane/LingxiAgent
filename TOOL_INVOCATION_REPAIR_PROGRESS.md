@@ -38,7 +38,9 @@
 | P10-02 | `completed_with_red_not_reproduced` | `a90cdd1f188495b9e68b025936bc2c5ae34abb9c` | 新组合首次即绿，如实保留偏差 |
 | P11-01 | `completed` | `29a296611a1da1509671f819cf0032dd72937eb2` | 架构说明及文档门禁完成 |
 | P11-02 | `completed` | `c217a04b3a6f33146cd5483cbaf4aed7715891c3` | 报告与机器事实完成；首个源码候选随后被 P12-02 边界门禁作废 |
-| P12 | `repairing_current_item` | 待第三个源码候选 | P12-02 全量测试发现指纹与媒体观测夹具缺口；只修当前项后从 P12-01 重跑 |
+| P12-01 | `completed_on_final_attempted_candidate` | `b72a19b209b2bbcfee8c4b3cf3ca98f50b047948` | 2129 文件边界 0 违规；25 文件 389 测试全绿 |
+| P12-02 | `blocked` | `b72a19b209b2bbcfee8c4b3cf3ca98f50b047948` | 仅旧审计封印 1 项失败；稳定阻塞码 `P12_SEQUENCE_SEAL_GATE_CYCLE` |
+| P12-03–P12-06 | `NOT_EXECUTED_BLOCKED_BY_P12_02` | — | 按任务书失败即停，没有构建、封印或最终推送步骤 |
 
 ## P0-00 固定 Git 基线并创建校正版分支
 
@@ -356,6 +358,19 @@
 - 仍待复核：审计封印测试依赖 P12-04 才允许推进的已验证源码坐标。不会提前改坐标、跳过测试或放宽 allowlist；先形成第三个源码候选并从 P12-01 重跑，确认是否只剩该顺序循环。
 - 日志：`/tmp/lingxi-tool-contract-p1202-full-tests.log`、`/tmp/lingxi-tool-contract-v0134-p1202-persistence-repin.log`、`/tmp/lingxi-tool-contract-v0134-p1202-regression-fix.log`、`/tmp/lingxi-tool-contract-v0134-p1202-repair-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p1202-repair-eslint.log`。
 
+## P12-02 最终复跑阻塞
+
+- 最终尝试的源码候选：`b72a19b209b2bbcfee8c4b3cf3ca98f50b047948`。该坐标已推送且本地/远端一致，但 P12-02 全量测试仍非零，不能升级为“已验证源码候选”，不能进入审计封印。
+- P12-01：底层执行边界扫描 exit `0`，扫描 2129 个生产源码文件、0 违规；指定矩阵 exit `0`，25 passed files / 389 passed tests，无新增 skip。
+- P12-02 静态门禁：typecheck exit `0`；lint exit `0`，`0 errors / 9231 warnings`；开放边界 exit `0`，仅 1 条既有债务；`git diff --check` exit `0`；验证前后工作树干净。
+- P12-02 全量测试：exit `1`；`1373 passed / 1 failed / 1 skipped` files，`13903 passed / 1 failed / 7 skipped` tests。相对固定基线，skip 仍为 7，没有增加；指纹和媒体观测失败均已消失。
+- 稳定阻塞码：`P12_SEQUENCE_SEAL_GATE_CYCLE`。
+- 证据：当前 `.sync-audit/verified-source-sha.txt` 仍为 `0adf3727e065e394b71c75cc8006707f1477ab7e`，封印测试因此正确拒绝其后的本任务非审计文件。任务书 P12-02 明确要求全量测试 0 fail，P12-04 又明确要求到该步骤才把验证结果写入 `PROGRESS.md` 并推进已验证源码坐标。
+- 不能采用的处理：提前执行 P12-04 会跳过 P12-03 构建并把未完整验证的源码封印；跳过封印测试、临时改坐标、扩大 allowlist 或把失败记绿都会违反任务书与 fail-closed。
+- 后续状态：依照“门禁失败时只修当前项”停止；P12-03、P12-04、P12-05、P12-06 均为 `NOT_EXECUTED_BLOCKED_BY_P12_02`。没有构建、没有 audit seal、没有合并 main。
+- 解除条件：任务书所有者需明确调整封印顺序，例如允许先完成 P12-03 构建，再在 P12-04 封印，并在封印后把完整全量测试作为最终 P12-02 复核；解除后应以新的源码候选从 P12-01 全部重跑。
+- 原始日志：`/tmp/lingxi-tool-contract-p1201-boundary.log`、`/tmp/lingxi-tool-contract-p1201-targeted.log`、`/tmp/lingxi-tool-contract-p1202-typecheck.log`、`/tmp/lingxi-tool-contract-p1202-lint.log`、`/tmp/lingxi-tool-contract-p1202-open-boundary.log`、`/tmp/lingxi-tool-contract-p1202-full-tests.log`。
+
 ## 错误记录
 
 | 时间 | 编号 | 原始错误 | 处理 |
@@ -366,3 +381,4 @@
 | 2026-09-05 | P7-02 提交整理 | 首次提交暂存漏含 `core/media-adapters/` 下 7 个本项文件，提交尚未推送 | 推送前回读工作树发现并补入同一提交；未拆项、未丢改动 |
 | 2026-09-05 | `P12_OPEN_BOUNDARY_MANIFEST_DRIFT` | 首个源码候选的开放边界门禁发现 26 条新增连接未登记 | 只补 6 个精确开放模块并重生成闭包；原候选作废，新候选后从 P12-01 重跑 |
 | 2026-09-05 | `P12_FULL_SUITE_CONTRACT_DRIFT` | 第二个候选全量测试有 4 项指纹、2 项媒体夹具和 1 项旧封印失败 | 当前项内修复前 6 项；旧封印顺序循环保持原样，第三候选再全量复核 |
+| 2026-09-05 | `P12_SEQUENCE_SEAL_GATE_CYCLE` | 第三个候选全量测试只剩 1 项旧封印失败，但封印坐标按任务书只能在 P12-04 推进 | 不提前封印、不跳过测试；P12-02 稳定阻塞并停止 P12-03–P12-06 |
