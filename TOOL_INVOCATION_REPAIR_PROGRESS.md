@@ -48,8 +48,8 @@
 | P0-01 | completed_with_baseline_failures | `179819092562f5c1d063baff56ada6486e340c1e` | 基线门禁；3 类真实红灯已归因 |
 | P0-02 | completed | `479f17145d5f5ef5d00c2718900eb04b27dba2ce` | 现状矩阵与入口清单 |
 | P1-01 | completed | `6ed37ec467c4a5bdfc567cdcd552cc1dbe04ee6a` | 目标身份、路由和错误类型 |
-| P1-02 | completed | 待提交后回填 | 新旧权限方言规范化 |
-| P1-03 | pending | — | 完整 schema 校验器 |
+| P1-02 | completed | `76afb23903e19df1745bdac1f9146d922edd0027` | 新旧权限方言规范化 |
+| P1-03 | completed | 待提交后回填 | 完整 schema 校验器 |
 | P2-01 | pending | — | 会话级目标注册表 |
 | P2-02 | pending | — | PreparedInvocation 与统一网关 |
 | P3-01 | pending | — | 插件元数据与 target adapter |
@@ -104,7 +104,20 @@
 - 绿灯命令：上述 5 文件受影响 Vitest；`npm run typecheck`；对本项新增文件执行定向 ESLint；`git diff --check`。
 - 绿灯原始结果：Vitest exit `0`，`5 passed` files、`187 passed` tests；三段 typecheck exit `0`；新增文件 ESLint exit `0`、`0` 问题；全部改动文件 ESLint exit `0`（`0 errors / 229 warnings`，均为既有文件存量风格警告）；`git diff --check` exit `0`。
 - 绿灯日志：`/tmp/lingxi-tool-contract-p102-final-tests.log`、`/tmp/lingxi-tool-contract-p102-typecheck-final.log`、`/tmp/lingxi-tool-contract-p102-eslint-final.log`、`/tmp/lingxi-tool-contract-p102-eslint.log`
-- 提交 SHA：待实现、门禁、提交后回填
+- 提交 SHA：`76afb23903e19df1745bdac1f9146d922edd0027`
+- 偏差：none
+
+### P1-03 建立完整 schema 校验器
+
+- 状态：`completed`
+- 改动文件：`lib/tools/invocation/schema-validator.ts`、`lib/tools/invocation/index.ts`、`tests/tool-schema-validator.test.ts`、`TOOL_INVOCATION_REPAIR_PROGRESS.md`。
+- 红灯命令：`set -o pipefail; npx vitest run tests/tool-schema-validator.test.ts 2>&1 | tee /tmp/lingxi-tool-contract-p103-red.log`
+- 红灯原始结果：exit `1`；`1 failed` file、`8 failed` tests；旧实现不存在 `createToolSchemaValidator`，符合缺少完整参数校验器的预期原因。
+- 红灯日志：`/tmp/lingxi-tool-contract-p103-red.log`
+- 绿灯命令：任务书 P1 阶段 8 文件 Vitest；`npm run typecheck`；P1-03 新增文件定向 ESLint；`git diff --check`。
+- 绿灯原始结果：阶段 Vitest exit `0`，`8 passed` files、`202 passed` tests；三段 typecheck exit `0`；定向 ESLint exit `0`、`0` 问题；`git diff --check` exit `0`。
+- 绿灯日志：`/tmp/lingxi-tool-contract-p1-stage.log`、`/tmp/lingxi-tool-contract-p103-typecheck.log`、`/tmp/lingxi-tool-contract-p103-eslint.log`
+- 提交 SHA：待提交后回填
 - 偏差：none
 
 ## 错误日志
@@ -123,13 +136,16 @@
 | 2026-09-05 14:08 +0800 | P1-02 | 首次受影响回归为 `154 passed / 30 failed`：旧测试插件未声明权限被拒绝；legacy `plugin_output` 被错误送审；审批通过后错误地对原始工具重验 | 1 | 保持生产端缺声明拒绝；测试夹具补显式权限；复用规范化契约表达 legacy 自动放行，并统一对规范化工具重验；复跑 `185/185` 通过 |
 | 2026-09-05 14:14 +0800 | P1-02 | 首次 typecheck 因联合类型未被 `!result.ok` 收窄报 `TS2345`，exit `2` | 1 | 改为 `result.ok === false` 的显式判别，不改变运行逻辑；重跑本项门禁 |
 | 2026-09-05 14:19 +0800 | P1-02 | 改为复用真实分类入口后，`187` 项中 `1` 条字段断言失败：只读工具在 auto 档的决策本来就是 allow | 1 | 将内部字段收窄为仅表达 legacy routine 免审；未改变权限决策，重跑本项门禁 |
+| 2026-09-05 14:24 +0800 | P1-03 红灯记录 | 首次带 `tee` 的命令未开启 `pipefail`，外层退出码为 `0`，但 Vitest 明确报告 `8 failed` | 1 | 在实现前用同一测试加 `set -o pipefail` 重跑，取得真实 exit `1`；后续带 `tee` 的门禁统一开启 `pipefail` |
+| 2026-09-05 14:25 +0800 | P1-03 探索 | 一条只读 `rg` 命令引号组合错误，zsh 报 `unmatched quote`，exit `1` | 1 | 改用两条简单搜索确认范围，不复用错误命令；无文件修改 |
+| 2026-09-05 14:26 +0800 | P1-03 | 首次实现回归 `7 passed / 1 failed`；单个大样例触发校验库最多 8 条错误的上限，尾部数值路径未进入 issue 列表 | 2 | 保留全部约束维度，将数值样例改成单一整数越界并减少同对象内前置噪声；最终阶段门禁 `202/202` 通过 |
 
 ## 断点续跑自检
 
 | 问题 | 答案 |
 | --- | --- |
-| 现在在哪里？ | P1-02 已通过门禁，等待提交与推送 |
-| 接下来去哪？ | 按指定提交信息提交并推送 P1-02，然后进入 P1-03 |
+| 现在在哪里？ | P1-03 已完成 P1 阶段门禁，等待提交与推送 |
+| 接下来去哪？ | 按指定提交信息提交并推送 P1-03，然后进入 P2-01 |
 | 最终目标是什么？ | 证明并修复工具调用语义对执行路径不敏感，完成 P0–P12 全部门禁与审计封印 |
 | 已学到什么？ | 12 个 bundled 工具均为 legacy 权限方言；7 个只读、5 个副作用；当前包装不保留延迟元数据 |
-| 已做什么？ | 完成并推送 P0-00 至 P1-01；P1-02 已完成测试先红、实现和 185 项受影响回归 |
+| 已做什么？ | 完成并推送 P0-00 至 P1-02；P1-03 完成测试先红、完整 schema 校验器与 P1 阶段门禁 |
