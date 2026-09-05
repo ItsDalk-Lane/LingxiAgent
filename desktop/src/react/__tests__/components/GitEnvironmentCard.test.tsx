@@ -14,12 +14,15 @@ const fetchGitBranchesMock = vi.fn<(dir: string, agentId?: string | null) => Pro
 const fetchGitWorktreeInfoMock = vi.fn<(dir: string, agentId?: string | null) => Promise<GitWorktreeInfo>>();
 const gitCheckoutMock = vi.fn();
 
+const fetchGitLogMock = vi.fn();
+
 vi.mock('../../utils/git-env-api', () => ({
   fetchGitStatus: (dir: string, agentId?: string | null) => fetchGitStatusMock(dir, agentId),
   fetchGitBranches: (dir: string, agentId?: string | null) => fetchGitBranchesMock(dir, agentId),
   fetchGitWorktreeInfo: (dir: string, agentId?: string | null) => fetchGitWorktreeInfoMock(dir, agentId),
   gitCheckout: (...args: unknown[]) => gitCheckoutMock(...args),
   fetchGitFileDiff: vi.fn(),
+  fetchGitLog: (...args: unknown[]) => fetchGitLogMock(...args),
   gitCommit: vi.fn(),
   gitPush: vi.fn(),
   generateGitCommitMessage: vi.fn(),
@@ -109,6 +112,16 @@ describe('GitEnvironmentCard', () => {
     fetchGitBranchesMock.mockReset().mockResolvedValue(BRANCHES);
     fetchGitWorktreeInfoMock.mockReset().mockResolvedValue(WORKTREE);
     gitCheckoutMock.mockReset().mockResolvedValue({ httpOk: true, ok: true });
+    fetchGitLogMock.mockReset().mockResolvedValue({
+      isRepo: true,
+      commits: [
+        {
+          hash: 'aaa111'.padEnd(40, '0'), shortHash: 'aaa111', subject: 'feat: 头号提交',
+          authorName: 'lingxi-dev', committedAt: Math.floor(Date.now() / 1000),
+          refs: [{ kind: 'head', name: 'feat/demo' }], parents: [],
+        },
+      ],
+    });
     useStore.setState({
       deskBasePath: '/ws/linked',
       deskWorkspaceNativeRoot: null,
@@ -210,5 +223,29 @@ describe('GitEnvironmentCard', () => {
     fireEvent.click(screen.getByTestId('git-env-changes-row'));
     await waitFor(() => expect(fetchGitStatusMock.mock.calls.length).toBeGreaterThanOrEqual(2));
     await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('+73,390'));
+  });
+
+  it('collapses and expands the rows from the title bar', async () => {
+    render(<GitEnvironmentCard />);
+    await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('+73,390'));
+
+    const toggle = screen.getByRole('button', { name: /环境信息/ });
+    fireEvent.click(toggle);
+    // Collapse 走 motion 退场动画，卸载有延迟
+    await waitFor(() => expect(screen.queryByTestId('git-env-changes-row')).not.toBeInTheDocument());
+    expect(screen.queryByTestId('git-env-history-row')).not.toBeInTheDocument();
+
+    fireEvent.click(toggle);
+    await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toBeInTheDocument());
+    expect(screen.getByTestId('git-env-history-row')).toBeInTheDocument();
+  });
+
+  it('opens the commit history modal from the history row', async () => {
+    render(<GitEnvironmentCard />);
+    await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('+73,390'));
+
+    fireEvent.click(screen.getByTestId('git-env-history-row'));
+    expect(await screen.findByText('feat: 头号提交')).toBeInTheDocument();
+    expect(fetchGitLogMock).toHaveBeenCalledWith('/ws/linked', null, 300);
   });
 });

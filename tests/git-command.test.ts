@@ -19,7 +19,9 @@ import {
   isSafeRelPath,
   isValidBranchName,
   listBranches,
+  listCommits,
   parseForEachBranchRef,
+  parseLogRecords,
   parseNumstatZ,
   parseWorktreePorcelain,
   pushChanges,
@@ -126,6 +128,41 @@ describe("parseWorktreePorcelain", () => {
     expect(entries).toHaveLength(2);
     expect(entries[0]).toMatchObject({ path: "/repo/main", branch: "main", bare: false });
     expect(entries[1]).toMatchObject({ path: "/repo/linked", branch: "wt-branch", detached: true });
+  });
+});
+
+describe("parseLogRecords", () => {
+  it("parses fields, full message, refs decorations and multi-parents (NUL separated, record separator \\x1e)", () => {
+    const record = (hash: string, short: string, subject: string, message: string, refs: string, parents: string) =>
+      `${hash}\u0000${short}\u0000${subject}\u0000${message}\u0000张三\u00001700000000\u0000${refs}\u0000${parents}\x1e`;
+    const out = [
+      record("aaa111", "aaa1", "feat: 头", "feat: 头\n\n- 要点一\n- 要点二\n", "HEAD -> main, origin/main, tag: v1.0", "bbb222 ccc333"),
+      record("bbb222", "bbb2", "chore: 中", "chore: 中", "", "ddd444"),
+      record("ddd444", "ddd4", "init", "init\n", "", ""),
+    ].join("\n");
+    const commits = parseLogRecords(out);
+    expect(commits).toHaveLength(3);
+    expect(commits[0]).toMatchObject({
+      hash: "aaa111", shortHash: "aaa1", subject: "feat: 头",
+      message: "feat: 头\n\n- 要点一\n- 要点二",
+      authorName: "张三", committedAt: 1700000000,
+      parents: ["bbb222", "ccc333"],
+    });
+    expect(commits[0].refs).toEqual([
+      { kind: "head", name: "main" },
+      { kind: "remote", name: "origin/main" },
+      { kind: "tag", name: "v1.0" },
+    ]);
+    expect(commits[1].refs).toEqual([]);
+    expect(commits[1].message).toBe("chore: 中");
+    expect(commits[2].parents).toEqual([]);
+  });
+
+  it("treats bare names as branches and skips malformed records", () => {
+    const out = "aaa\u0000a1\u0000s\u0000s\u0000n\u00001700000001\u0000dev\u0000\u001e\u0000garbage";
+    const commits = parseLogRecords(out);
+    expect(commits).toHaveLength(1);
+    expect(commits[0].refs).toEqual([{ kind: "branch", name: "dev" }]);
   });
 });
 
@@ -270,5 +307,17 @@ describe("checkout / commit / push (real repo)", () => {
 
   it("runGit surfaces stderr in GitError", async () => {
     await expect(runGit(mainDir, ["checkout", "no-such-branch"])).rejects.toThrow(/git checkout failed/);
+  });
+
+  it("lists commits newest-first with HEAD ref, full message and parent linkage", async () => {
+    const commits = await listCommits(mainDir, 50);
+    expect(commits.length).toBeGreaterThanOrEqual(2);
+    const head = commits[0];
+    expect(head.refs.some(r => r.kind === "head")).toBe(true);
+    expect(head.message).toContain(head.subject);
+    // 线性区间父子衔接
+    const second = commits[1];
+    expect(head.parents[0]).toBe(second.hash);
+    expect(head.shortHash).toMatch(/^[0-9a-f]{7,}$/);
   });
 });

@@ -9,7 +9,7 @@
  *   - 提交并推送 = 先提交（若无可提交则跳过）再推送
  */
 import { useEffect, useRef, useState } from 'react';
-import { AnchoredPortal, Overlay } from '../../ui';
+import { AnchoredPortal, Overlay, Tooltip } from '../../ui';
 import { useStore } from '../../stores';
 import {
   generateGitCommitMessage,
@@ -197,7 +197,17 @@ export function GitCommitModal({
             <circle cx="18" cy="8" r="2.6" />
             <path d="M6 8.6v6.8M17 10.5c0 3.4-4.5 3.9-8.6 4.3" />
           </svg>
-          <span className={styles.branchName} title={branchLabel}>{branchLabel}</span>
+          <Tooltip content={branchLabel} placement="top">
+            {({ ref, ...tooltipProps }) => (
+              <span
+                ref={(node) => ref(node)}
+                className={styles.branchName}
+                {...tooltipProps}
+              >
+                {branchLabel}
+              </span>
+            )}
+          </Tooltip>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <polyline points="6 9 12 15 18 9" />
           </svg>

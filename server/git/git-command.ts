@@ -560,6 +560,84 @@ function firstStderrLines(stderr: string, maxLines = 4): string {
   return stderr.split("\n").map(s => s.trim()).filter(Boolean).slice(0, maxLines).join("\n");
 }
 
+// ────────────────────────── 提交历史 ──────────────────────────
+
+export type GitRefKind = "head" | "branch" | "remote" | "tag";
+
+export interface GitCommitRef {
+  kind: GitRefKind;
+  name: string;
+}
+
+export interface GitCommit {
+  hash: string;
+  shortHash: string;
+  subject: string;
+  /** 完整提交信息（标题 + 正文，多行） */
+  message: string;
+  authorName: string;
+  /** 提交时间戳（秒） */
+  committedAt: number;
+  refs: GitCommitRef[];
+  /** 父提交哈希（多父=合并提交），限流截断处为空数组 */
+  parents: string[];
+}
+
+/**
+ * `git log --pretty=format:%H%x00%h%x00%s%x00%B%x00%an%x00%at%x00%D%x00%P%x1e`
+ * 输出解析：记录以 \x1e 分隔、字段以 \x00 分隔。
+ * refs 解析：%D 形如 `HEAD -> main, origin/main, tag: v1.0`，空串=无装饰。
+ */
+export function parseLogRecords(output: string): GitCommit[] {
+  const commits: GitCommit[] = [];
+  for (const record of output.split("\x1e")) {
+    if (!record.trim()) continue;
+    const fields = record.replace(/^\n/, "").split("\x00");
+    if (fields.length < 8) continue;
+    const [hash, shortHash, subject, messageRaw, authorName, committedAtRaw, refsRaw, parentsRaw] = fields;
+    if (!hash || !shortHash) continue;
+    const refs: GitCommitRef[] = [];
+    for (const entry of (refsRaw || "").split(",")) {
+      const name = entry.trim();
+      if (!name) continue;
+      const headMatch = /^HEAD -> (.+)$/.exec(name);
+      if (headMatch) {
+        refs.push({ kind: "head", name: headMatch[1] });
+        continue;
+      }
+      if (name === "HEAD") {
+        refs.push({ kind: "head", name: "HEAD" });
+        continue;
+      }
+      const tagMatch = /^tag: (.+)$/.exec(name);
+      if (tagMatch) {
+        refs.push({ kind: "tag", name: tagMatch[1] });
+        continue;
+      }
+      refs.push({ kind: name.includes("/") ? "remote" : "branch", name });
+    }
+    commits.push({
+      hash,
+      shortHash,
+      subject,
+      message: (messageRaw || "").replace(/\n+$/, "").trim(),
+      authorName,
+      committedAt: Number.parseInt(committedAtRaw, 10) || 0,
+      refs,
+      parents: parentsRaw ? parentsRaw.split(" ").filter(Boolean) : [],
+    });
+  }
+  return commits;
+}
+
+export async function listCommits(dir: string, limit = 300): Promise<GitCommit[]> {
+  const safeLimit = Math.min(Math.max(Math.floor(limit) || 1, 1), 1000);
+  const fmt = "%H%x00%h%x00%s%x00%B%x00%an%x00%at%x00%D%x00%P%x1e";
+  const res = await tryGit(dir, ["log", "--date-order", `--max-count=${safeLimit}`, `--pretty=format:${fmt}`]);
+  if (!res.ok) return [];
+  return parseLogRecords(res.stdout);
+}
+
 // ────────────────────────── 单文件 diff ──────────────────────────
 
 export interface GitFileDiff {

@@ -495,6 +495,7 @@ function isGitEnvironmentRoute(verb, routePath) {
   return routePath === "/api/git/status"
     || routePath === "/api/git/worktree-info"
     || routePath === "/api/git/branches"
+    || routePath === "/api/git/log"
     || routePath === "/api/git/file-diff"
     || routePath === "/api/git/checkout"
     || routePath === "/api/git/commit"

@@ -6,7 +6,7 @@
  * 复用文件历史弹窗的 add/remove/same 色值惯例。
  */
 import { useEffect, useState } from 'react';
-import { Overlay } from '../../ui';
+import { Overlay, Tooltip } from '../../ui';
 import { fetchGitFileDiff, type GitFileChange, type GitFileDiff } from '../../utils/git-env-api';
 import { parseUnifiedPatch } from '../../utils/unified-diff';
 import styles from './GitChangesModal.module.css';
@@ -86,7 +86,17 @@ export function GitChangesModal({ open, onClose, dir, files }: GitChangesModalPr
                   aria-expanded={expanded}
                   onClick={() => void toggleFile(file)}
                 >
-                  <span className={styles.fileName} title={file.path}>{file.path}</span>
+                  <Tooltip content={file.path} variant="panel" placement="top" align="start">
+                    {({ ref, ...tooltipProps }) => (
+                      <span
+                        ref={(node) => ref(node)}
+                        className={styles.fileName}
+                        {...tooltipProps}
+                      >
+                        {file.path}
+                      </span>
+                    )}
+                  </Tooltip>
                   <span className={styles.fileStats}>
                     <span className={styles.added}>+{fmt(file.additions)}</span>
                     <span className={styles.deleted}>-{fmt(file.deletions)}</span>

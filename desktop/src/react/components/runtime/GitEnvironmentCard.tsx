@@ -12,7 +12,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from '../../stores';
-import { AnchoredPortal } from '../../ui';
+import { AnchoredPortal, Collapse, Tooltip } from '../../ui';
 import {
   fetchGitBranches,
   fetchGitStatus,
@@ -24,6 +24,7 @@ import {
 } from '../../utils/git-env-api';
 import { GitChangesModal } from './GitChangesModal';
 import { GitCommitModal } from './GitCommitModal';
+import { GitHistoryModal } from './GitHistoryModal';
 import styles from './GitEnvironmentCard.module.css';
 
 function fmt(n: number): string {
@@ -54,6 +55,8 @@ export function GitEnvironmentCard() {
   const [switchingBranch, setSwitchingBranch] = useState<string | null>(null);
   const [changesOpen, setChangesOpen] = useState(false);
   const [commitOpen, setCommitOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const branchRowRef = useRef<HTMLButtonElement>(null);
 
   const refresh = useCallback(async (): Promise<GitStatus | null> => {
@@ -125,17 +128,23 @@ export function GitEnvironmentCard() {
     : (loadState === 'loading' ? '…' : '—');
 
   return (
-    <section className={`universal-card ${styles.card}`} aria-label={t('gitEnv.title')} data-testid="git-env-card">
-      <div className={styles.header}>
+    <section className={`universal-card ${styles.card}`} aria-label={t('gitEnv.title')} data-testid="git-env-card" data-collapsed={collapsed || undefined}>
+      <button
+        type="button"
+        className={styles.headerToggle}
+        onClick={() => setCollapsed(v => !v)}
+        aria-expanded={!collapsed}
+      >
         <span className={styles.title}>{t('gitEnv.title')}</span>
-      </div>
+        <Chevron open={!collapsed} className={styles.chevron} />
+      </button>
+      <Collapse open={!collapsed}>
       <div className={styles.rows}>
         <button
           type="button"
           className={styles.row}
           data-testid="git-env-changes-row"
           disabled={loadState === 'loading' || (loadState === 'idle' && !isRepo)}
-          title={loadState === 'error' ? t('gitEnv.loadFailed') : undefined}
           onClick={() => (loadState === 'error' ? void refresh() : setChangesOpen(true))}
         >
           <span className={styles.rowLabel}>{t('gitEnv.changes')}</span>
@@ -174,7 +183,17 @@ export function GitEnvironmentCard() {
                       : t('gitEnv.linkedWorktree', { name: worktree.name ?? worktree.branch ?? '' })}
                   </div>
                   {!worktree.isMain && worktree.mainPath && (
-                    <div className={styles.localPath} title={worktree.mainPath}>{worktree.mainPath}</div>
+                    <Tooltip content={worktree.mainPath} variant="panel" placement="bottom" align="start">
+                      {({ ref, ...tooltipProps }) => (
+                        <div
+                          ref={(node) => ref(node)}
+                          className={styles.localPath}
+                          {...tooltipProps}
+                        >
+                          {worktree.mainPath}
+                        </div>
+                      )}
+                    </Tooltip>
                   )}
                 </>
               )}
@@ -188,12 +207,21 @@ export function GitEnvironmentCard() {
           className={styles.row}
           data-testid="git-env-branch-row"
           disabled={!isRepo}
-          title={branchValue === '…' ? undefined : branchValue}
           onClick={() => setBranchMenuOpen(v => !v)}
         >
           <span className={styles.rowLabel}>{t('gitEnv.branch')}</span>
           <span className={styles.rowValue}>
-            <span className={styles.branchName}>{branchValue}</span>
+            <Tooltip content={branchValue} placement="left" disabled={branchValue === '…'}>
+              {({ ref, ...tooltipProps }) => (
+                <span
+                  ref={(node) => ref(node)}
+                  className={styles.branchName}
+                  {...tooltipProps}
+                >
+                  {branchValue}
+                </span>
+              )}
+            </Tooltip>
             <Chevron open={branchMenuOpen} className={styles.chevron} />
           </span>
         </button>
@@ -210,7 +238,21 @@ export function GitEnvironmentCard() {
             <Chevron open={false} className={styles.chevronFlat} />
           </span>
         </button>
+
+        <button
+          type="button"
+          className={styles.row}
+          data-testid="git-env-history-row"
+          disabled={!isRepo}
+          onClick={() => setHistoryOpen(true)}
+        >
+          <span className={styles.rowLabel}>{t('gitEnv.history')}</span>
+          <span className={styles.rowValue}>
+            <Chevron open={false} className={styles.chevronFlat} />
+          </span>
+        </button>
       </div>
+      </Collapse>
 
       <AnchoredPortal
         open={branchMenuOpen && isRepo}
@@ -224,19 +266,24 @@ export function GitEnvironmentCard() {
         <div className={styles.branchMenuTitle}>{t('gitEnv.branchesTitle')}</div>
         <div className={styles.branchList}>
           {(branches?.branches ?? []).map(branch => (
-            <button
+            <Tooltip
               key={branch.name}
-              type="button"
-              className={`${styles.branchItem}${branch.current ? ` ${styles.branchItemCurrent}` : ''}`}
-              data-testid={`git-branch-${branch.name}`}
-              disabled={branch.current || branch.checkedOutElsewhere || switchingBranch != null}
-              title={branch.checkedOutElsewhere ? t('gitEnv.checkedOutElsewhere') : undefined}
-              onClick={() => void handleSwitchBranch(branch.name)}
+              content={branch.checkedOutElsewhere ? t('gitEnv.checkedOutElsewhere') : ''}
+              placement="left"
+              disabled={!branch.checkedOutElsewhere}
             >
-              <span className={styles.branchItemName}>{branch.name}</span>
-              {switchingBranch === branch.name && <span className={styles.branchBusy}>…</span>}
-              {branch.current && <span className={styles.branchCurrentMark}>✓</span>}
-            </button>
+              <button
+                type="button"
+                className={`${styles.branchItem}${branch.current ? ` ${styles.branchItemCurrent}` : ''}`}
+                data-testid={`git-branch-${branch.name}`}
+                disabled={branch.current || branch.checkedOutElsewhere || switchingBranch != null}
+                onClick={() => void handleSwitchBranch(branch.name)}
+              >
+                <span className={styles.branchItemName}>{branch.name}</span>
+                {switchingBranch === branch.name && <span className={styles.branchBusy}>…</span>}
+                {branch.current && <span className={styles.branchCurrentMark}>✓</span>}
+              </button>
+            </Tooltip>
           ))}
           {branches != null && branches.branches.length === 0 && (
             <div className={styles.branchEmpty}>{t('gitEnv.noBranches')}</div>
@@ -259,6 +306,12 @@ export function GitEnvironmentCard() {
         sessionPath={sessionPath}
         agentId={currentAgentId}
         refresh={refresh}
+      />
+      <GitHistoryModal
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        dir={dir}
+        agentId={currentAgentId}
       />
     </section>
   );

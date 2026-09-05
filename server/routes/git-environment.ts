@@ -22,6 +22,7 @@ import {
   commitChanges,
   pushChanges,
   listBranches,
+  listCommits,
   tryGit,
 } from "../git/git-command.ts";
 
@@ -159,18 +160,29 @@ async function collectChangeContext(dir: string, includeUnstaged: boolean): Prom
   return parts.join("\n\n");
 }
 
-/** 净化模型输出：剥代码围栏后取首行，去引号/前缀、限长 */
+/**
+ * 净化模型输出：剥代码围栏、去首行前缀，保留多行结构（Conventional Commits
+ * 标题 + 空行 + 要点正文）。压掉行尾空白与连续空行，整体限长防滥用。
+ */
 function sanitizeCommitMessage(raw: string): string {
-  const withoutFences = raw.replace(/```[a-zA-Z]*\n?/g, "");
-  const firstLine = withoutFences
-    .split("\n")
-    .map(s => s.trim())
-    .filter(Boolean)[0] ?? "";
-  const cleaned = firstLine
-    .replace(/^["'`]|["'`]$/g, "")
-    .replace(/^(commit( message)?|提交信息)\s*[:：]\s*/i, "")
-    .trim();
-  return cleaned.slice(0, 100);
+  const withoutFences = raw
+    .replace(/```[a-zA-Z]*\n?/g, "")
+    .trim()
+    .replace(/^(commit( message)?|提交信息)\s*[:：]\s*/i, "");
+  const cleaned: string[] = [];
+  let pendingBlank = false;
+  for (const line of withoutFences.split("\n")) {
+    if (!line.trim()) {
+      if (cleaned.length > 0) pendingBlank = true;
+      continue;
+    }
+    if (pendingBlank) {
+      cleaned.push("");
+      pendingBlank = false;
+    }
+    cleaned.push(line.trim());
+  }
+  return cleaned.join("\n").slice(0, 600).trim();
 }
 
 export function createGitEnvironmentRoute(engine: any, hub?: any) {
@@ -222,6 +234,19 @@ export function createGitEnvironmentRoute(engine: any, hub?: any) {
       }
       const { branches, detached, current } = await listBranches(resolved.dir);
       return c.json({ isRepo: true, branches, detached, current });
+    } catch (err: any) {
+      return c.json({ error: err instanceof GitError ? err.stderr || err.message : err.message }, 500);
+    }
+  });
+
+  route.get("/git/log", async (c) => {
+    try {
+      const resolved = resolveQueryDir(c);
+      if (resolved instanceof Response) return resolved;
+      if (!(await isRepoDir(resolved.dir))) return c.json({ isRepo: false, commits: [] });
+      const limitRaw = Number.parseInt(c.req.query("limit") ?? "", 10);
+      const commits = await listCommits(resolved.dir, Number.isFinite(limitRaw) ? limitRaw : 300);
+      return c.json({ isRepo: true, commits });
     } catch (err: any) {
       return c.json({ error: err instanceof GitError ? err.stderr || err.message : err.message }, 500);
     }
@@ -302,13 +327,14 @@ export function createGitEnvironmentRoute(engine: any, hub?: any) {
       const answer = await Promise.race([
         hub.eventBus.request("utility:call-text", {
           systemPrompt: [
-            "你是 git 提交信息生成器。根据给定的变更统计与 diff 摘要，输出一条简短的中文提交信息。",
-            "要求：只输出提交信息本身一行文字（不超过 50 个字），概括这次变更做了什么；",
-            "不要解释、不要引号、不要 markdown、不要署名。",
+            "你是 git 提交信息生成器。根据给定的变更统计与 diff 摘要，生成中文提交信息，采用 Conventional Commits 的标题+正文格式：",
+            "1. 第一行标题：type(scope): 一句话概括本次变更（type 用 feat/fix/refactor/docs/chore/test 等，scope 尽量取模块名，标题不超过 50 个字）；",
+            "2. 标题后空一行，正文用「- 」开头的要点逐条列出主要改动（每条不超过 30 个字，最多 8 条，按重要性排序）；",
+            "只输出提交信息本身，不要解释、不要引号、不要 markdown 代码块、不要署名。",
           ].join("\n"),
           messages: [{ role: "user", content: changeContext }],
           temperature: 0.3,
-          maxTokens: 200,
+          maxTokens: 500,
           operation: "git-commit-message",
           sessionPath: typeof body?.sessionPath === "string" ? body.sessionPath : null,
           agentId: resolved.agentId,

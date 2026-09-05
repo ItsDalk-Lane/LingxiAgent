@@ -213,6 +213,22 @@ describe("git-environment route", () => {
     expect(body.patch).toContain("+hello");
   });
 
+  it("serves commit history with refs and parents", async () => {
+    const app = makeApp();
+    // 自造第二个提交，使断言不依赖文件内用例顺序
+    const commit = await post(app, "/api/git/commit", { dir: repoDir, message: "log: 历史探针提交", includeUnstaged: true });
+    expect(commit.status).toBe(200);
+    const res = await get(app, `/api/git/log?dir=${encodeURIComponent(repoDir)}&limit=50`);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.isRepo).toBe(true);
+    expect(body.commits.length).toBeGreaterThanOrEqual(2);
+    expect(body.commits[0].subject).toBe("log: 历史探针提交");
+    expect(body.commits[0].message).toContain("log: 历史探针提交");
+    expect(body.commits[0].refs.some((r: any) => r.kind === "head")).toBe(true);
+    expect(body.commits[0].parents[0]).toBe(body.commits[1].hash);
+  });
+
   it("checks out a branch and reflects it in status", async () => {
     const app = makeApp();
     const res = await post(app, "/api/git/checkout", { dir: repoDir, branch: "feature" });
@@ -225,6 +241,8 @@ describe("git-environment route", () => {
 
   it("commits with includeUnstaged and leaves a clean tree", async () => {
     const app = makeApp();
+    // 自带改动，不依赖其他用例留下的工作树状态
+    fs.writeFileSync(path.join(repoDir, "route-commit.txt"), "x\n");
     const res = await post(app, "/api/git/commit", { dir: repoDir, message: "route: 提交", includeUnstaged: true });
     expect(res.status).toBe(200);
     expect((await res.json()).ok).toBe(true);
@@ -243,19 +261,25 @@ describe("git-environment route", () => {
     expect((await push.json()).code).toBe("no_remote");
   });
 
-  it("generates and sanitizes an AI commit message through the hub", async () => {
+  it("generates and sanitizes an AI commit message (title + body) through the hub", async () => {
     const request = vi.fn(async (_type: string, payload: any) => {
-      // 上下文应包含刚写入的 ai.md 的变更统计
+      // 上下文应包含刚写入的 ai.md 的变更统计；提示词要求 Conventional Commits 标题+正文
       expect(payload.messages[0].content).toContain("ai.md");
       expect(payload.operation).toBe("git-commit-message");
-      return { text: "```\nfeat: 环境信息卡\n\n详细说明第二行\n```" };
+      expect(payload.systemPrompt).toContain("Conventional Commits");
+      return {
+        text: "```\nfeat(server): 环境信息卡 git 面接入\n\n- 新增 /api/git/* 八端点\n- 目录准入纳入工作台挂载注册表\n- AI 提交信息支持标题+正文\n\n\n```",
+      };
     });
     const app = makeApp({ eventBus: { request } });
 
     fs.writeFileSync(path.join(repoDir, "ai.md"), "x\n");
     const res = await post(app, "/api/git/ai-commit-message", { dir: repoDir, includeUnstaged: true });
     expect(res.status).toBe(200);
-    expect((await res.json()).message).toBe("feat: 环境信息卡");
+    // 围栏剥除、前缀剥除、连续空行压缩，标题+空行+要点结构完整保留
+    expect((await res.json()).message).toBe(
+      "feat(server): 环境信息卡 git 面接入\n\n- 新增 /api/git/* 八端点\n- 目录准入纳入工作台挂载注册表\n- AI 提交信息支持标题+正文",
+    );
     expect(request).toHaveBeenCalledTimes(1);
   });
 

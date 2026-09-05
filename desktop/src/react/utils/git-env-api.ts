@@ -68,6 +68,30 @@ export interface GitFileDiff {
   binary: boolean;
 }
 
+export type GitRefKind = 'head' | 'branch' | 'remote' | 'tag';
+
+export interface GitCommitRef {
+  kind: GitRefKind;
+  name: string;
+}
+
+export interface GitCommit {
+  hash: string;
+  shortHash: string;
+  subject: string;
+  /** 完整提交信息（标题 + 正文，多行） */
+  message: string;
+  authorName: string;
+  committedAt: number;
+  refs: GitCommitRef[];
+  parents: string[];
+}
+
+export interface GitLogResponse {
+  isRepo: boolean;
+  commits: GitCommit[];
+}
+
 export interface GitActionResult {
   httpOk: boolean;
   ok?: boolean;
@@ -103,6 +127,11 @@ export async function fetchGitWorktreeInfo(dir: string, agentId?: string | null)
 
 export async function fetchGitFileDiff(dir: string, file: string): Promise<GitFileDiff> {
   const res = await lingxiFetch(`/api/git/file-diff?${dirQuery(dir, { file })}`);
+  return res.json();
+}
+
+export async function fetchGitLog(dir: string, agentId?: string | null, limit = 300): Promise<GitLogResponse> {
+  const res = await lingxiFetch(`/api/git/log?${dirQuery(dir, { ...agentFields(agentId), limit: String(limit) })}`);
   return res.json();
 }
 
