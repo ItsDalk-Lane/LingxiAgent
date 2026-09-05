@@ -2,21 +2,21 @@ import fs from "fs";
 import path from "path";
 import { atomicWriteSync } from "../shared/safe-fs.ts";
 import crypto from "crypto";
+import {
+  ToolInvocationGateway,
+  type LocalDeveloperPrincipal,
+  type ToolInvocationGatewayRequest,
+} from "./tool-invocation-gateway.ts";
+import { ToolTargetRegistry } from "./tool-target-registry.ts";
+import {
+  createToolSchemaValidator,
+  runWithPreparedInvocation,
+} from "../lib/tools/invocation/index.ts";
 
 const DEFAULT_LOG_LIMIT = 200;
 const SAFE_PLUGIN_ID_RE = /^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$/;
 const REDACT_KEY_RE = /api[-_]?key|token|secret|password|authorization|credential/i;
 const OBJECT_SCHEMA = Object.freeze({ type: "object", additionalProperties: true });
-const SESSION_REF_SCHEMA = Object.freeze({
-  type: "object",
-  properties: {
-    sessionId: { type: "string" },
-    sessionPath: { type: "string" },
-    legacySessionPath: { type: "string" },
-  },
-  required: ["sessionId"],
-  additionalProperties: true,
-});
 
 export const PLUGIN_DEV_EVENT_BUS_CAPABILITIES = Object.freeze([
   {
@@ -146,11 +146,7 @@ export const PLUGIN_DEV_EVENT_BUS_CAPABILITIES = Object.freeze([
       properties: {
         pluginId: { type: "string" },
         toolName: { type: "string" },
-        input: { type: "object" },
-        sessionId: { type: "string" },
-        sessionRef: SESSION_REF_SCHEMA,
-        sessionPath: { type: "string" },
-        agentId: { type: "string" },
+        arguments: { type: "object" },
       },
       required: ["pluginId", "toolName"],
       additionalProperties: false,
@@ -335,43 +331,6 @@ function extractToolResultText(invocation) {
   }
   if (typeof result === "string") return result;
   return JSON.stringify(result ?? "");
-}
-
-function textOrNull(value) {
-  return typeof value === "string" && value.trim() ? value.trim() : null;
-}
-
-function normalizeDevSessionTarget(target: Record<string, unknown> = {}) {
-  const rawRef = target?.sessionRef && typeof target.sessionRef === "object"
-    ? target.sessionRef as Record<string, unknown>
-    : null;
-  const sessionId = textOrNull(target?.sessionId) || textOrNull(rawRef?.sessionId);
-  const refSessionId = textOrNull(rawRef?.sessionId);
-  if (sessionId && refSessionId && sessionId !== refSessionId) {
-    throw createDevError(
-      "sessionId does not match sessionRef.sessionId",
-      400,
-      "PLUGIN_DEV_SESSION_ID_MISMATCH",
-    );
-  }
-  const sessionPath = textOrNull(rawRef?.sessionPath)
-    || textOrNull(rawRef?.path)
-    || textOrNull(target?.sessionPath);
-  const legacySessionPath = textOrNull(rawRef?.legacySessionPath)
-    || textOrNull(target?.legacySessionPath);
-  if (!sessionId) {
-    return sessionPath ? { sessionPath } : {};
-  }
-  const sessionRef = {
-    sessionId,
-    ...(sessionPath ? { sessionPath } : {}),
-    ...(legacySessionPath ? { legacySessionPath } : {}),
-  };
-  return {
-    sessionId,
-    ...(sessionPath ? { sessionPath } : {}),
-    sessionRef,
-  };
 }
 
 function assertInsideDir(childPath, parentDir) {
@@ -654,36 +613,115 @@ export class PluginDevService {
     };
   }
 
-  async invokeTool({ pluginId, toolName, input = {}, sessionId, sessionRef, sessionPath, agentId }: any = {}) {
+  async invokeTool(payload: any = {}) {
+    const {
+      pluginId,
+      toolName,
+      arguments: toolArguments = {},
+      principal = null,
+      signal,
+    } = payload;
     if (!pluginId) throw createDevError("pluginId is required", 400, "PLUGIN_DEV_PLUGIN_ID_REQUIRED");
     if (!toolName) throw createDevError("toolName is required", 400, "PLUGIN_DEV_TOOL_NAME_REQUIRED");
+    const identityOverrideFields = [
+      "sessionId",
+      "sessionRef",
+      "sessionPath",
+      "legacySessionPath",
+      "agentId",
+      "toolCallId",
+    ].filter((field) => Object.hasOwn(payload, field));
+    if (identityOverrideFields.length > 0) {
+      throw createDevError(
+        "Plugin developer invocation identity is host-owned",
+        400,
+        "PLUGIN_DEV_IDENTITY_OVERRIDE_FORBIDDEN",
+      );
+    }
     const entry = this._pluginManager.getPlugin(pluginId, { source: "dev" });
     if (!entry) throw createDevError(`Plugin "${pluginId}" not found`, 404, "PLUGIN_DEV_PLUGIN_NOT_FOUND");
     if (entry.status !== "loaded") {
       throw createDevError(`Plugin "${pluginId}" is not loaded`, 409, "PLUGIN_DEV_PLUGIN_NOT_LOADED");
     }
-    const tool = this._pluginManager.getPluginTool?.(pluginId, toolName, {
-      entry,
-      includeShadowed: true,
-    });
+    const tool = this._pluginManager.getPluginTool?.(pluginId, toolName, { entry });
     if (!tool) {
       throw createDevError(`Tool "${toolName}" not found for plugin "${pluginId}"`, 404, "PLUGIN_DEV_TOOL_NOT_FOUND");
     }
     const startedAt = Date.now();
-    const sessionTarget = normalizeDevSessionTarget({ sessionId, sessionRef, sessionPath });
+    const identity = tool._toolTargetIdentity;
+    const permission = tool._normalizedPermissionContract;
+    if (!identity || !permission) {
+      throw createDevError(
+        `Tool "${toolName}" has no canonical invocation contract`,
+        409,
+        "PLUGIN_DEV_TOOL_CONTRACT_MISSING",
+      );
+    }
+    const validator = createToolSchemaValidator(
+      tool.parameters || { type: "object", properties: {} },
+      identity,
+    );
+    const registry = new ToolTargetRegistry();
+    const target = registry.register({
+      identity,
+      label: tool.label || tool.name,
+      description: tool.description || "",
+      parameters: validator.schema,
+      deferrable: tool.deferrable !== false,
+      pinned: tool.pinned === true,
+      permission,
+      validator,
+      availability: { eligible: true },
+      getCurrentGeneration: () => this._pluginManager.getPluginToolGeneration(pluginId),
+      isCurrentlyAvailable: () => this.isChatToolTargetCurrentlyAvailable(pluginId, tool.name),
+      executeCanonical: (toolCallId, args, invocationSignal, onUpdate, ctx) => {
+        // 这是开发服务唯一的插件 source adapter：Gateway 完成目标、参数、权限、
+        // 代次和可用性复核后，才允许管理层触发已发布工具。
+        const adapterTool = {
+          ...tool,
+          execute: (callId, input, runtimeCtx) => (
+            tool.execute(callId, input, invocationSignal, onUpdate, runtimeCtx)
+          ),
+        };
+        return this._pluginManager.executePluginTool(adapterTool, {
+          toolCallId,
+          input: args,
+          runtimeCtx: ctx,
+        });
+      },
+      normalizeResult: (result) => result,
+    });
+    const route = principal ? "plugin-dev-http" : "isolated";
     const runtimeCtx = {
       pluginDev: true,
-      ...(agentId ? { agentId } : {}),
-      ...sessionTarget,
-      ...(sessionTarget.sessionPath ? {
-        sessionManager: { getSessionFile: () => sessionTarget.sessionPath },
-      } : {}),
+      ...(principal ? { principal } : {}),
     };
-    const result = await this._pluginManager.executePluginTool(tool, {
+    const request: ToolInvocationGatewayRequest = {
+      targetId: target.identity.targetId,
+      route,
+      arguments: toolArguments,
+      sessionId: null,
+      sessionPath: null,
+      agentId: null,
+      lifecycleGeneration: target.lifecycleGeneration,
       toolCallId: `plugin-dev-${startedAt}`,
-      input,
-      runtimeCtx,
+      signal,
+      ctx: runtimeCtx,
+      runtimeContext: runtimeCtx,
+    };
+    const gateway = new ToolInvocationGateway({
+      registry,
+      authorize: async () => undefined,
     });
+    const result = principal
+      ? await gateway.prepareAndInvokeForLocalDeveloper(
+        request,
+        principal as LocalDeveloperPrincipal,
+      )
+      : await (() => {
+        const prepared = gateway.resolvePermission(request);
+        return runWithPreparedInvocation(prepared, () => gateway.invoke(request));
+      })();
     return {
       pluginId,
       toolName: tool.name,
@@ -785,14 +823,25 @@ export class PluginDevService {
     for (let index = 0; index < scenario.steps.length; index += 1) {
       const step = scenario.steps[index];
       if (step?.invokeTool) {
+        const identityOverrideFields = [
+          "sessionId",
+          "sessionRef",
+          "sessionPath",
+          "legacySessionPath",
+          "agentId",
+          "toolCallId",
+        ].filter((field) => Object.hasOwn(step.invokeTool, field));
+        if (identityOverrideFields.length > 0) {
+          throw createDevError(
+            "Plugin developer scenario invocation identity is host-owned",
+            400,
+            "PLUGIN_DEV_IDENTITY_OVERRIDE_FORBIDDEN",
+          );
+        }
         const invocation = await this.invokeTool({
           pluginId,
           toolName: step.invokeTool.name,
-          input: step.invokeTool.input || {},
-          sessionId: step.invokeTool.sessionId,
-          sessionRef: step.invokeTool.sessionRef,
-          sessionPath: step.invokeTool.sessionPath,
-          agentId: step.invokeTool.agentId,
+          arguments: step.invokeTool.input || {},
         });
         lastToolInvocation = invocation;
         steps.push({

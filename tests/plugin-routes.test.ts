@@ -108,6 +108,16 @@ function createApp(engine) {
   return app;
 }
 
+function createAppWithPrincipal(engine, principal) {
+  const app = new Hono();
+  app.use("*", async (c, next) => {
+    (c as any).set("authPrincipal", principal);
+    await next();
+  });
+  app.route("/api", createPluginsRoute(engine));
+  return app;
+}
+
 function createAppWithProductionPluginTicketBypass(engine) {
   const app = new Hono();
   app.use("*", async (c, next) => {
@@ -1836,7 +1846,7 @@ describe("plugin management API", () => {
       });
     });
 
-    it("invokes a dev plugin tool through PluginDevService", async () => {
+    it("invokes a dev plugin tool as a local developer principal", async () => {
       const invokeTool = vi.fn(async () => ({
         pluginId: "demo",
         toolName: "demo_echo",
@@ -1845,12 +1855,17 @@ describe("plugin management API", () => {
       const engine = mockEngine({
         pluginDevService: { invokeTool },
       });
-      const app = createApp(engine);
+      const app = createAppWithPrincipal(engine, {
+        kind: "local_user",
+        principalId: "owner-local",
+        connectionKind: "local",
+        credentialKind: "loopback_token",
+      });
 
       const res = await app.request("/api/plugins/dev/demo/tools/echo/invoke", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: { text: "hi" }, sessionPath: "/tmp/s.jsonl" }),
+        body: JSON.stringify({ arguments: { text: "hi" } }),
       });
 
       expect(res.status).toBe(200);
@@ -1858,13 +1873,18 @@ describe("plugin management API", () => {
       expect(invokeTool).toHaveBeenCalledWith({
         pluginId: "demo",
         toolName: "echo",
-        input: { text: "hi" },
-        sessionPath: "/tmp/s.jsonl",
-        agentId: undefined,
+        arguments: { text: "hi" },
+        principal: {
+          kind: "local-developer",
+          principalId: "local-developer:owner-local",
+          ownerPrincipalId: "owner-local",
+          connectionKind: "local",
+        },
+        signal: expect.any(AbortSignal),
       });
     });
 
-    it("passes sessionId-first dev tool invocation bodies through PluginDevService", async () => {
+    it("rejects client attempts to override host invocation identity", async () => {
       const invokeTool = vi.fn(async () => ({
         pluginId: "demo",
         toolName: "demo_echo",
@@ -1873,13 +1893,18 @@ describe("plugin management API", () => {
       const engine = mockEngine({
         pluginDevService: { invokeTool },
       });
-      const app = createApp(engine);
+      const app = createAppWithPrincipal(engine, {
+        kind: "local_user",
+        principalId: "owner-local",
+        connectionKind: "local",
+        credentialKind: "loopback_token",
+      });
 
       const res = await app.request("/api/plugins/dev/demo/tools/echo/invoke", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          input: { text: "hi" },
+          arguments: { text: "hi" },
           sessionId: "sess_http_dev",
           sessionRef: {
             sessionId: "sess_http_dev",
@@ -1891,21 +1916,30 @@ describe("plugin management API", () => {
         }),
       });
 
-      expect(res.status).toBe(200);
-      expect(await res.json()).toMatchObject({ toolName: "demo_echo" });
-      expect(invokeTool).toHaveBeenCalledWith({
-        pluginId: "demo",
-        toolName: "echo",
-        input: { text: "hi" },
-        sessionId: "sess_http_dev",
-        sessionRef: {
-          sessionId: "sess_http_dev",
-          sessionPath: "/tmp/s.jsonl",
-          legacySessionPath: "/tmp/legacy.jsonl",
-        },
-        sessionPath: "/tmp/ignored.jsonl",
-        agentId: "hana",
+      expect(res.status).toBe(400);
+      expect(await res.json()).toMatchObject({ code: "PLUGIN_DEV_IDENTITY_OVERRIDE_FORBIDDEN" });
+      expect(invokeTool).not.toHaveBeenCalled();
+    });
+
+    it("rejects non-local owners before invoking the dev service", async () => {
+      const invokeTool = vi.fn();
+      const engine = mockEngine({ pluginDevService: { invokeTool } });
+      const app = createAppWithPrincipal(engine, {
+        kind: "local_user",
+        principalId: "owner-remote",
+        connectionKind: "custom_remote",
+        credentialKind: "user_session",
       });
+
+      const res = await app.request("/api/plugins/dev/demo/tools/echo/invoke", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ arguments: { text: "hi" } }),
+      });
+
+      expect(res.status).toBe(403);
+      expect(await res.json()).toMatchObject({ code: "PLUGIN_DEV_LOCAL_OWNER_REQUIRED" });
+      expect(invokeTool).not.toHaveBeenCalled();
     });
 
     it("enables and disables a dev plugin through PluginDevService", async () => {

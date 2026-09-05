@@ -27,8 +27,9 @@
 | P5-01 | `completed` | `7817c8d7180725d69273885ab7cdd289b37edf55` | Plugin 工具单调代次，3 项红灯转绿 |
 | P5-02 | `completed` | `2689fedc4f71be28c3579e90703a8da06268c683` | MCP live generation，1 项红灯转绿 |
 | P5-03 | `completed` | `b8840f18b58d631e8d602d17af66ff5dccff2763` | 旧会话撤销与联合漂移清单，1 项红灯转绿 |
-| P6-01 | `completed_pending_commit` | 待提交 | plugin-dev 聊天身份与真实权限，6 项红灯转绿 |
-| P6-02–P7 | `pending_migration` | — | 优先复用原实现 |
+| P6-01 | `completed` | `30f51d558a4271953f3cb890f150d1f4a4ded20d` | plugin-dev 聊天身份与真实权限，6 项红灯转绿 |
+| P6-02 | `completed_pending_commit` | 待提交 | 本地开发者身份与 Gateway 路由，13 项红灯转绿 |
+| P7 | `pending_migration` | — | 优先复用原实现 |
 | P8 | `pending_v0134_adaptation` | — | 知识正式架构发生变化，需重点适配 |
 | P9–P11 | `pending_migration` | — | 迁移错误、边界、组合测试与文档 |
 | P12 | `pending` | — | 最终验证、构建和封印 |
@@ -206,13 +207,24 @@
 
 ## P6-01 plugin-dev 聊天身份
 
-- 状态：`completed_pending_commit`。
+- 状态：`completed`。
+- 提交：`30f51d558a4271953f3cb890f150d1f4a4ded20d`，远端分支已核对同 SHA。
 - 复用来源：原分支提交 `0b2049015c136bd9b78df259732addd2446e072f`；非引擎文件同哈希迁移，引擎只适配开发工具装配片段。
 - RED：exit `1`；2 files，`6 failed / 1 passed` tests；模型可覆盖会话身份、权限被压平、执行绕过 Gateway，缺目标未关闭。
 - GREEN：exit `0`；6 files / 107 tests 全部通过。
 - typecheck exit `0`；新增测试定向 ESLint exit `0`，0 问题；`git diff --check` exit `0`。
 - 边界：聊天入口对 `service.invokeTool` 和 `executePluginTool` 搜索 exit `1`（0 命中）。
 - 日志：`/tmp/lingxi-tool-contract-v0134-p601-red.log`、`/tmp/lingxi-tool-contract-v0134-p601-stage-final.log`、`/tmp/lingxi-tool-contract-v0134-p601-typecheck-final.log`、`/tmp/lingxi-tool-contract-v0134-p601-eslint-final.log`、`/tmp/lingxi-tool-contract-v0134-p601-chat-boundary-final.log`。
+
+## P6-02 本地 HTTP 独立开发者身份
+
+- 状态：`completed_pending_commit`。
+- 复用来源：原分支提交 `6fda792303cf6919acc459cc4bad06aaef4bc702`；生产与测试文件在本项前均与原提交父节点同哈希，原样迁移。
+- RED：exit `1`；3 files，`13 failed / 85 passed` tests；网关未约束本地主体，路由接受身份覆盖，开发服务仍直调且取消语义失真。
+- GREEN：exit `0`；10 files / 289 tests 全部通过。
+- typecheck exit `0`；parity/Gateway 定向 ESLint exit `0`，0 问题；`git diff --check` exit `0`。
+- 边界：生产 `executePluginTool(` 只命中开发服务内的 Gateway source adapter 1 处和 PluginManager 方法定义 1 处。
+- 日志：`/tmp/lingxi-tool-contract-v0134-p602-red.log`、`/tmp/lingxi-tool-contract-v0134-p602-gate-final.log`、`/tmp/lingxi-tool-contract-v0134-p602-typecheck-final.log`、`/tmp/lingxi-tool-contract-v0134-p602-eslint-final.log`、`/tmp/lingxi-tool-contract-v0134-p602-plugin-executor-boundary.log`。
 
 ## 错误记录
 
