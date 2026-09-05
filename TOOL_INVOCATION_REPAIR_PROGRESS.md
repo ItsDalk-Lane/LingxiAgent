@@ -38,7 +38,7 @@
 | P10-02 | `completed_with_red_not_reproduced` | `a90cdd1f188495b9e68b025936bc2c5ae34abb9c` | 新组合首次即绿，如实保留偏差 |
 | P11-01 | `completed` | `29a296611a1da1509671f819cf0032dd72937eb2` | 架构说明及文档门禁完成 |
 | P11-02 | `completed` | `c217a04b3a6f33146cd5483cbaf4aed7715891c3` | 报告与机器事实完成；首个源码候选随后被 P12-02 边界门禁作废 |
-| P12 | `repairing_current_item` | 待新源码候选 | P12-02 发现开放清单漏登记，当前只修该项并准备从 P12-01 重跑 |
+| P12 | `repairing_current_item` | 待第三个源码候选 | P12-02 全量测试发现指纹与媒体观测夹具缺口；只修当前项后从 P12-01 重跑 |
 
 ## P0-00 固定 Git 基线并创建校正版分支
 
@@ -344,6 +344,18 @@
 - 处理：首个源码候选已作废；本项提交后形成新源码候选，并严格从 P12-01 重跑全部门禁。
 - 日志：`/tmp/lingxi-tool-contract-p1201-boundary.log`、`/tmp/lingxi-tool-contract-p1201-targeted.log`、`/tmp/lingxi-tool-contract-p1202-typecheck.log`、`/tmp/lingxi-tool-contract-p1202-lint.log`、`/tmp/lingxi-tool-contract-p1202-open-boundary.log`、`/tmp/lingxi-tool-contract-v0134-p1202-closure-regenerate.log`、`/tmp/lingxi-tool-contract-v0134-p1202-open-boundary-fix.log`、`/tmp/lingxi-tool-contract-v0134-p1202-boundary-regression.log`。
 
+## P12 第二个候选与 P12-02 全量测试修复
+
+- 第二个源码候选：`df8e19b9906654c0de0b2b867ea14363ae4a7843`，已推送并核对远端一致；验证开始前工作树干净。
+- P12-01 复跑：底层执行边界扫描 2129 个生产源码文件、0 违规；指定 25 文件 / 389 测试全部通过。
+- P12-02 静态门禁：typecheck exit `0`；lint exit `0`，`0 errors / 9231 warnings`；开放边界 exit `0`，仅 1 条既有债务；`git diff --check` exit `0`。
+- P12-02 全量原始结果：exit `1`；`1371 passed / 3 failed / 1 skipped` files，`13897 passed / 7 failed / 7 skipped` tests。
+- 失败分解：持久化指纹 4 项；媒体可观测性夹具 2 项；旧审计封印 1 项。skip 仍为 7，没有增加。
+- 当前项已修的 6 项：以 `compatible` 理由重新钉住持久化指纹 `sha256:8154c7ec6b44430a91c9b1fc2d6bb8662d6eee1753ddb9702642d7566163222d`；两套媒体观测夹具补入规范执行目标，不恢复凭证回退。
+- 修复门禁：相关 2 files / 26 tests 全部通过；三段 typecheck exit `0`；定向 ESLint exit `0`，`0 errors / 28 warnings`，均为该旧测试文件既有警告；`git diff --check` exit `0`。
+- 仍待复核：审计封印测试依赖 P12-04 才允许推进的已验证源码坐标。不会提前改坐标、跳过测试或放宽 allowlist；先形成第三个源码候选并从 P12-01 重跑，确认是否只剩该顺序循环。
+- 日志：`/tmp/lingxi-tool-contract-p1202-full-tests.log`、`/tmp/lingxi-tool-contract-v0134-p1202-persistence-repin.log`、`/tmp/lingxi-tool-contract-v0134-p1202-regression-fix.log`、`/tmp/lingxi-tool-contract-v0134-p1202-repair-typecheck.log`、`/tmp/lingxi-tool-contract-v0134-p1202-repair-eslint.log`。
+
 ## 错误记录
 
 | 时间 | 编号 | 原始错误 | 处理 |
@@ -353,3 +365,4 @@
 | 2026-09-05 | `BUILD_SIGN_KEY_MISSING` | 原始 `build:server` 缺少签名密钥，exit `1` | 抛弃式匹配密钥诊断复跑 exit `0`；临时材料已删除 |
 | 2026-09-05 | P7-02 提交整理 | 首次提交暂存漏含 `core/media-adapters/` 下 7 个本项文件，提交尚未推送 | 推送前回读工作树发现并补入同一提交；未拆项、未丢改动 |
 | 2026-09-05 | `P12_OPEN_BOUNDARY_MANIFEST_DRIFT` | 首个源码候选的开放边界门禁发现 26 条新增连接未登记 | 只补 6 个精确开放模块并重生成闭包；原候选作废，新候选后从 P12-01 重跑 |
+| 2026-09-05 | `P12_FULL_SUITE_CONTRACT_DRIFT` | 第二个候选全量测试有 4 项指纹、2 项媒体夹具和 1 项旧封印失败 | 当前项内修复前 6 项；旧封印顺序循环保持原样，第三候选再全量复核 |
