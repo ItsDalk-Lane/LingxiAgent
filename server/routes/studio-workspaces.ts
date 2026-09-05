@@ -139,6 +139,23 @@ async function createLocalPathWorkspace(engine, requestContext, body) {
     throw routeError("path must be an existing directory", "invalid_path", 400);
   }
 
+  // Windows 文件系统大小写不敏感，而 path.resolve 与 mountId 派生都不做大小写归一：
+  // 同一目录的大小写变体会各自哈希出不同 mountId，留下两条同名 active 挂载（下拉重复、
+  // 会话身份分裂）。命中「字符串不同但折叠后同根」的既有挂载时直接复用；完全相同的
+  // 字符串仍走 upsert，保留显式重加更新 label 的既有语义。
+  const equivalentMount = listStudioMountsForStudio(engine.lingxiHome, studioId).find((mount) =>
+    mount.status === "active"
+    && mount.sourceKind === "storage"
+    && mount.provider === "local_fs"
+    && typeof mount.rootLocator?.path === "string"
+    && mount.rootLocator.path !== rootPath
+    && isSameLocalFsRoot(mount.rootLocator.path, rootPath));
+  if (equivalentMount) {
+    return workspaceFromMount(equivalentMount, {
+      discloseNativeRoot: isLocalOwnerPrincipal(requestContext?.authPrincipal),
+    });
+  }
+
   const mount = upsertStudioMount(engine.lingxiHome, {
     mountId: localFsMountId(studioId, rootPath),
     hostStudioId: studioId,
@@ -270,6 +287,11 @@ function localFsMountId(studioId, rootPath) {
     .digest("hex")
     .slice(0, 16);
   return `local_fs_${digest}`;
+}
+
+function isSameLocalFsRoot(left, right) {
+  if (process.platform !== "win32") return false;
+  return path.resolve(left).toLowerCase() === path.resolve(right).toLowerCase();
 }
 
 function routeError(message, code, status) {
