@@ -1,11 +1,10 @@
 // Fast persistence-schema-fingerprint repin guard.
 //
-// The authoritative tripwire is tests/persistence-schema-tripwire.test.ts,
-// which runs the full `assertCommittedPersistenceSchemaFingerprint` (parses
-// 149 guarded sources + introspects SQLite stores) inside `npm test`. That is
-// thorough but heavy, and it fails late — only after typecheck/lint/build and
-// the whole vitest run. This script is a cheap diff-only precheck meant to
-// run BEFORE the test matrix: it does not parse TypeScript or open a database.
+// 权威检查位于 tests/persistence-schema-tripwire.test.ts，在 npm test 中运行
+// 完整的 assertCommittedPersistenceSchemaFingerprint：解析指纹列出的受护源文件，
+// 并检查 SQLite 实际结构；受护文件数量随指纹变化，不在此维护副本。
+// 本脚本只比较 diff，不解析 TypeScript 或打开数据库，可在本地独立运行。
+// CI 将它与测试矩阵并行执行；它不是测试矩阵的前置依赖，也不代替完整检查。
 //
 // It derives the guarded file set straight from the committed fingerprint JSON
 // (siteMappings[].sourceFile + schemas[].module + extensions[].module +

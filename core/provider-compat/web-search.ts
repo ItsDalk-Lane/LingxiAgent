@@ -29,7 +29,7 @@
  *   web_search_call 响应 item 被丢弃，且 store:false 回放要求保留完整 item 列表。
  * - OpenAI Chat Completions：官方 host 不构成任意模型的联网 wire contract 证明，
  *   不按 hostname 猜（任务书 #34）。
- * - Moonshot：仓库内无 adapter/fixture 证据，官方协议未在本次执行中核验 → BLOCKED.md。
+ * - Moonshot：当时缺少 adapter/fixture 与官方协议核验，历史依据见 docs/archives/BLOCKED.md。
  */
 
 import * as zhipuCompat from "./zhipu.ts";

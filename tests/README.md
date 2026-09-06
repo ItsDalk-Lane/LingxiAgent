@@ -38,12 +38,20 @@ For `migration #N` labels, treat the number as a durable data-version contract l
 
 ## Required Validation
 
-Run these before considering a cleanup complete:
+Choose validation according to the affected behavior and the current project rules:
+
+- For documentation-only changes, check facts, links, and diffs. Full code validation is not required solely because the task is a cleanup.
+- For code or test changes, run affected tests first, then the applicable type, lint, build, and platform checks. Preserve the required CI and release gates for the change.
+- Do not rerun completed checks unless new edits, failures, or unresolved questions justify it. Record checks that were not executed or were blocked separately from passes.
+
+For a full local code validation pass, use Node.js `>=24.12.0 <25` and installed dependencies, then run:
 
 ```bash
-npm test
+npm run build:packages
 npm run typecheck
 npm run lint
+npm run build:renderer
+npm test
 ```
 
-For focused cleanup, run the affected test files first, then run the full validation set before commit or handoff.
+Workspace packages publish their entrypoints from `dist/`, so build them after a fresh checkout or package source changes. CI also performs platform-specific helper and packaged-runtime checks; the current matrix and ordering live in [ci.yml](../.github/workflows/ci.yml). A local pass does not prove another platform or a released artifact.

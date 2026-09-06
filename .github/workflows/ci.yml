@@ -132,8 +132,8 @@ jobs:
         run: npm test
 
   # persistence-schema 防呆：当 diff 触及指纹所钉的受护源文件（持久化存储、
-  # site 映射源等共 ~149 个）、而 build/persistence-schema-fingerprint.json
-  # 未在同一次提交里更新时，在这里比 test 矩阵更早地 fail 并提示重钉命令。
+  # site 映射源等，集合由指纹派生）、而 build/persistence-schema-fingerprint.json
+  # 未在同一次 diff 里更新时，快速报错并提示重钉命令。
   # 纯 git diff + JSON 解析，不跑 vitest、不解析 TypeScript、不装 npm 依赖，
   # 因此与 test/lint-open-boundary/open-build-smoke 并行，不阻塞它们的启动。
   # 权威 tripwire 仍是 npm test 里的 tests/persistence-schema-tripwire.test.ts

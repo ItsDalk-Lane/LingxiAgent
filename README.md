@@ -79,20 +79,20 @@ openhanako 提供了扎实的 Agent 运行时基础：完整的 Agent 框架、�
 
 ### 下载安装
 
-**macOS（Apple Silicon / Intel）**：从 Releases 页面下载最新 `.dmg`。
+**macOS（Apple Silicon / Intel）**：从 [Releases 页面](https://github.com/ItsDalk-Lane/LingxiAgent/releases)下载对应版本的 `.dmg`。
 
-当前发布版 macOS 构建为 ad-hoc 签名（CI 尚未配置 Apple Developer 证书），非 Developer ID 签名+公证，首次打开可能被 Gatekeeper 拦截。可右键 → **打开** 放行；待配齐 Apple 凭据后 CI 会自动切换到 Developer ID 签名+公证，届时可直接打开。
+macOS CI 构建支持 Developer ID 签名与公证；未配置相应凭据时，CI 使用 ad-hoc 签名并跳过公证。具体下载版本的签名与公证状态以该版本产物和发布说明为准。ad-hoc 构建首次打开可能被 Gatekeeper 拦截。
 
-**Windows**：从 Releases 页面下载最新 `.exe` 安装包。
+**Windows**：从 [Releases 页面](https://github.com/ItsDalk-Lane/LingxiAgent/releases)下载对应版本的 `.exe` 安装包。
 
-> **Windows SmartScreen 提示：** 安装包暂未经过代码签名，首次运行时 Windows Defender SmartScreen 可能会拦截，点击**更多信息** → **仍要运行**即可，未签名版本的正常现象。
+> **Windows SmartScreen 提示：** 构建流程支持配置 Windows 代码签名证书；未签名或尚未建立信誉的安装包可能触发 SmartScreen 提示。具体签名状态以下载产物为准。
 
-**Linux**：从 Releases 页面下载最新 `.AppImage` 或 `.deb`。
+**Linux**：从 [Releases 页面](https://github.com/ItsDalk-Lane/LingxiAgent/releases)下载对应版本的 `.AppImage` 或 `.deb`。
 
 ### 首次运行
 
-首次启动时，引导向导会带你完成配置：选择语言、输入你的名字、连接模型提供商（API key + base URL），并选择三个模型：**对话模型**（主对话）、**小工具模型**（轻量任务）、**大工具模型**（记忆编译和深度分析）。设置页还可以单独选择**视觉模型**，让文本模型通过 Vision Bridge 处理图片附件。LingxiAgent 支持 OpenAI 兼容、Anthropic 风格、OAuth Provider 和 Ollama 本地模型等多类接入。
-目前也添加了 OpenAI 的 OAuth 登录，鉴于 Anthropic 会有封号风险，所以暂时不提供。
+首次启动时，引导向导会带你选择语言、填写用户和 Agent 名称、连接模型提供商、添加可用模型并选定一个**对话模型**，然后选择工作目录。之后可在设置 → 模型中分别配置标题 / 命名、摘要、记忆、知识分析、视觉、审批和安全审查的辅助模型。启用视觉辅助后，文本模型可通过 Vision Bridge 处理图片附件。LingxiAgent 支持 OpenAI 兼容、Anthropic 风格、OAuth Provider 和 Ollama 本地模型等多类接入。
+可用的 OAuth 登录项以设置页的提供商列表为准。
 
 ## 架构
 
@@ -100,9 +100,11 @@ openhanako 提供了扎实的 Agent 运行时基础：完整的 Agent 框架、�
 core/           引擎编排层 + Manager（含 PluginManager）
 lib/            核心库（记忆、工具、沙盒、Bridge 适配器）
 server/         Hono HTTP + WebSocket 服务（独立 Node.js 进程）
+cli/            连接 Server 的命令行入口
 hub/            调度器、频道路由、事件总线
 desktop/        Electron 应用 + React 前端
 shared/         跨层共享工具（config schema、error bus、模型引用等）
+packages/       npm workspaces（插件协议、SDK、运行时和组件）
 plugins/        内置系统插件（随应用打包）
 skills2set/     内置技能定义
 scripts/        构建工具（server 打包、启动器、签名）
@@ -116,7 +118,7 @@ Session 内的用户可见文件通过 `SessionFile` sidecar 统一登记，桌�
 本机 staged 文件优先由各平台 adapter 直接上传：Telegram / 飞书 / 微信走各自上传接口，QQ 走官方 Bot 分片上传接口，再发送 `msg_type: 7` 富媒体消息。`preferences.bridge.mediaPublicBaseUrl` / `LINGXI_BRIDGE_PUBLIC_BASE_URL` 只用于仍需公网 URL 的平台或远程 fallback；该 URL 作为 `/api/bridge/media/:token` 临时文件路由的 origin，文件本身仍由短期 token、下载次数和本地路径白名单保护。Lingxi 不会自动开启公网 tunnel，公网入口必须由用户显式提供。
 
 Server 以独立 Node.js 进程运行（由 Electron spawn 或独立启动），通过 Vite 打包，@vercel/nft 追踪依赖。与 Electron 渲染进程通过 WebSocket 通信。
-用户数据目录由 `LINGXI_HOME` 决定（生产默认 `~/.lingxi`，开发默认 `~/.lingxi-dev`）。Lingxi 管理的 Pi SDK 运行时资源位于 `${LINGXI_HOME}/runtime/pi-sdk/`；Lingxi 不依赖 Pi 的全局 agent 目录或 `PI_CODING_AGENT_DIR`。
+用户数据目录由 `LINGXI_HOME` 决定，生产默认 `~/.lingxi`。项目的 `npm start`、`npm run start:vite`、`npm run server` 和 `npm run cli` 通过开发启动器运行，会将 `LINGXI_HOME` 设为 `~/.lingxi-dev`，覆盖传入的同名环境变量。Lingxi 管理的 Pi SDK 运行时资源位于 `${LINGXI_HOME}/runtime/pi-sdk/`；Lingxi 不依赖 Pi 的全局 agent 目录或 `PI_CODING_AGENT_DIR`。
 
 ## 技术栈
 
@@ -135,7 +137,7 @@ Server 以独立 Node.js 进程运行（由 Electron spawn 或独立启动），
 
 | 平台 | 状态 |
 |------|------|
-| macOS (Apple Silicon) | 已支持（当前 ad-hoc 签名，待 Developer ID 签名+公证） |
+| macOS (Apple Silicon) | 已支持 |
 | macOS (Intel) | 已支持 |
 | Windows | Beta |
 | Linux | 已支持（AppImage / deb） |
@@ -143,14 +145,21 @@ Server 以独立 Node.js 进程运行（由 Electron spawn 或独立启动），
 
 ## 开发
 
+需要 Node.js `>=24.12.0 <25` 和对应的 npm。原生依赖需要的平台编译工具见[贡献指南](CONTRIBUTING.md)。
+
 ```bash
-# 安装依赖
+# 安装依赖并运行安装后脚本
 npm install
+
+# 构建 workspace 包（新 checkout 或包源码变更后）
+npm run build:packages
 
 # Electron 启动（自动构建 renderer）
 npm start
 
-# Vite HMR 开发（需先运行 npm run dev:renderer）
+# Vite HMR：终端 A
+npm run dev:renderer
+# Vite HMR：终端 B
 npm run start:vite
 
 # 仅启动 server
@@ -168,7 +177,8 @@ npm run typecheck
 
 ### 打包与发布
 
-`npm run pack` / `npm run dist*` 走 electron-builder。`package.json` 里 `build.publish` 已指向发布仓库 [ItsDalk-Lane/LingxiAgent](https://github.com/ItsDalk-Lane/LingxiAgent)，`--publish` 发布与自动更新都走该仓库的 Releases；不带 `--publish` 的本地构建不受影响。
+`npm run pack` 构建本地应用目录；`npm run dist`、`npm run dist:win` 和 `npm run dist:linux` 分别生成对应平台安装包。这些命令会构建并校验签名 seed，需先准备[打包环境](CONTRIBUTING.md#打包环境)。`package.json` 的 `build.publish` 指向发布仓库 [ItsDalk-Lane/LingxiAgent](https://github.com/ItsDalk-Lane/LingxiAgent)，发布与自动更新以该仓库的 Releases 为来源；本地构建不等于已发布。
+
 ## 致谢
 
 - [liliMozi/openhanako](https://github.com/liliMozi/openhanako)：LingxiAgent 的上游项目，本项目基于其开发，致以诚挚感谢。
@@ -180,6 +190,7 @@ npm run typecheck
 
 ## 链接
 
+- [文档索引](docs/README.md)
 - [安全政策](SECURITY.md)
 - [插件开发指南](PLUGINS.md)
 - [贡献指南](CONTRIBUTING.md)

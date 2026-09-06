@@ -74,19 +74,21 @@ Our sincere thanks go to [openhanako](https://github.com/liliMozi/openhanako) an
 
 ### Download
 
-**macOS (Apple Silicon / Intel):** download the latest `.dmg` from the Releases page.
+**macOS (Apple Silicon / Intel):** download the matching `.dmg` from the [Releases page](https://github.com/ItsDalk-Lane/LingxiAgent/releases).
 
-The current release uses ad-hoc signing (CI is not yet configured with an Apple Developer certificate) rather than Developer ID signing + notarization, so Gatekeeper may block the first launch. Right-click → **Open** to allow it. Once Apple credentials are in place, CI will switch to Developer ID signing + notarization and launch directly.
+The macOS CI build supports Developer ID signing and notarization. Without the corresponding credentials, CI uses ad-hoc signing and skips notarization. Check the downloaded artifact and its release notes for that version's signing and notarization status. Gatekeeper may block an ad-hoc build on first launch.
 
-**Windows:** download the latest `.exe` installer from the Releases page.
+**Windows:** download the matching `.exe` installer from the [Releases page](https://github.com/ItsDalk-Lane/LingxiAgent/releases).
 
-> **Windows SmartScreen notice:** The installer is not yet code-signed. Windows Defender SmartScreen may show a warning on first run. Click **More info** → **Run anyway**. This is expected for unsigned builds.
+> **Windows SmartScreen notice:** The build workflow supports a Windows code-signing certificate. Unsigned installers or installers without established reputation may trigger SmartScreen. Check the downloaded artifact for its signing status.
 
-**Linux:** download the latest `.AppImage` or `.deb` from the Releases page.
+**Linux:** download the matching `.AppImage` or `.deb` from the [Releases page](https://github.com/ItsDalk-Lane/LingxiAgent/releases).
 
 ### First Run
 
-On first launch, an onboarding wizard will guide you through setup: choose a language, enter your name, connect a model provider (API key + base URL), and select three models — a **chat model** (main conversation), a **utility model** (lightweight tasks), and a **utility large model** (memory compilation and deep analysis). In settings you can also choose a **vision model** that lets text-only chat models work with image attachments through Vision Bridge. LingxiAgent supports OpenAI-compatible providers, Anthropic-style providers, OAuth providers, and local models via Ollama.
+On first launch, the onboarding wizard guides you through choosing a language, entering user and agent names, connecting a provider, adding available models, selecting one **chat model**, and choosing a workspace. Later, Settings → Models lets you configure auxiliary models for title / naming, summarization, memory, knowledge analysis, vision, approval, and security review. Enabling vision assistance lets text-only chat models work with image attachments through Vision Bridge. LingxiAgent supports OpenAI-compatible providers, Anthropic-style providers, OAuth providers, and local models via Ollama.
+
+Available OAuth sign-in options are listed on the providers settings page.
 
 ## Architecture
 
@@ -94,9 +96,11 @@ On first launch, an onboarding wizard will guide you through setup: choose a lan
 core/           Engine orchestration + Managers (including PluginManager)
 lib/            Core libraries (memory, tools, sandbox, bridge adapters)
 server/         Hono HTTP + WebSocket server (standalone Node.js process)
+cli/            Command-line entrypoint connecting to the server
 hub/            Scheduler, ChannelRouter, EventBus
 desktop/        Electron app + React frontend
 shared/         Cross-layer utilities (config schema, error bus, model refs)
+packages/       npm workspaces (plugin protocol, SDK, runtime, components)
 plugins/        Built-in system plugins (bundled into app)
 skills2set/     Built-in skill definitions
 scripts/        Build tools (server bundler, launcher, signing)
@@ -110,7 +114,7 @@ User-visible files inside a session are registered through `SessionFile` sidecar
 Local staged files are uploaded directly by platform adapters when possible: Telegram / Feishu / WeChat use their native upload flows, and QQ uses the official bot chunked-upload flow before sending `msg_type: 7` rich media. `preferences.bridge.mediaPublicBaseUrl` / `LINGXI_BRIDGE_PUBLIC_BASE_URL` are only for consumers or fallback paths that still require an internet-reachable URL.
 
 The server runs as a standalone Node.js process (spawned by Electron or independently), bundled via Vite with @vercel/nft for dependency tracing. It communicates with the Electron renderer through WebSocket.
-User data is rooted at `LINGXI_HOME` (`~/.lingxi` in production, `~/.lingxi-dev` in development). Lingxi-managed Pi SDK runtime resources live under `${LINGXI_HOME}/runtime/pi-sdk/`; Lingxi does not rely on Pi's global agent directory or `PI_CODING_AGENT_DIR`.
+User data is rooted at `LINGXI_HOME`, defaulting to `~/.lingxi` in production. The project's `npm start`, `npm run start:vite`, `npm run server`, and `npm run cli` commands use the development launcher, which sets `LINGXI_HOME` to `~/.lingxi-dev` and overrides an incoming value. Lingxi-managed Pi SDK runtime resources live under `${LINGXI_HOME}/runtime/pi-sdk/`; Lingxi does not rely on Pi's global agent directory or `PI_CODING_AGENT_DIR`.
 
 ## Tech Stack
 
@@ -129,7 +133,7 @@ User data is rooted at `LINGXI_HOME` (`~/.lingxi` in production, `~/.lingxi-dev`
 
 | Platform | Status |
 |----------|--------|
-| macOS (Apple Silicon) | Supported (currently ad-hoc signed; Developer ID signing + notarization pending) |
+| macOS (Apple Silicon) | Supported |
 | macOS (Intel) | Supported |
 | Windows | Beta |
 | Linux | Supported (AppImage / deb) |
@@ -137,14 +141,21 @@ User data is rooted at `LINGXI_HOME` (`~/.lingxi` in production, `~/.lingxi-dev`
 
 ## Development
 
+Use Node.js `>=24.12.0 <25` and its compatible npm. See [Contributing](CONTRIBUTING.md) for platform build tools required by native dependencies.
+
 ```bash
-# Install dependencies
+# Install dependencies and run postinstall scripts
 npm install
+
+# Build workspace packages (fresh checkout or package source changes)
+npm run build:packages
 
 # Start with Electron (builds renderer first)
 npm start
 
-# Start with Vite HMR (run npm run dev:renderer first)
+# Vite HMR: terminal A
+npm run dev:renderer
+# Vite HMR: terminal B
 npm run start:vite
 
 # Server only
@@ -160,6 +171,10 @@ npm test
 npm run typecheck
 ```
 
+### Packaging and Releases
+
+`npm run pack` builds a local application directory. `npm run dist`, `npm run dist:win`, and `npm run dist:linux` produce installers for their respective platforms. These commands build and verify a signed seed; prepare the [packaging environment](CONTRIBUTING.md#打包环境) first. The `build.publish` setting in `package.json` points to [ItsDalk-Lane/LingxiAgent](https://github.com/ItsDalk-Lane/LingxiAgent), whose Releases are the source for distribution and automatic updates. A local build is not a published release.
+
 ## Acknowledgments
 
 - [liliMozi/openhanako](https://github.com/liliMozi/openhanako): the upstream project of LingxiAgent; this project is built on top of it, and we owe it our sincere gratitude.
@@ -171,6 +186,7 @@ npm run typecheck
 
 ## Links
 
+- [Documentation Index](docs/README.md)
 - [Security Policy](SECURITY.md)
 - [Plugin Development](PLUGINS_EN.md)
 - [Contributing](CONTRIBUTING.md)
