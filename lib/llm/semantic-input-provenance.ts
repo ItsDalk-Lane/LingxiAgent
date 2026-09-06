@@ -424,7 +424,7 @@ function identityOnlySection(
 
 /**
  * MC-01（普通 chat）/ MC-03（native summarizer）在 streamFunction 边界的
- * provenance 构造。规则（SEMANTIC_INPUT_PROVENANCE_AUDIT.md §2/§4）：
+ * provenance 构造。原审计依据见 docs/archives/model-observability/SEMANTIC_INPUT_PROVENANCE_AUDIT.md §2/§4：
  *
  *   systemPrompt:
  *     - native summarization → 单段 structural task_instruction（SDK 模板镜像

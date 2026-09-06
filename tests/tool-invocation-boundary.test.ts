@@ -97,7 +97,9 @@ describe("tool invocation static boundaries", () => {
   });
 
   it("keeps repair reports and machine facts complete without self-referential SHAs", () => {
-    const read = (filename: string) => fs.readFileSync(path.join(repositoryRoot, filename), "utf8");
+    const read = (filename: string) => fs.readFileSync(
+      path.join(repositoryRoot, "docs", "archives", "tool-invocation", filename), "utf8",
+    );
     const report = read("TOOL_INVOCATION_REPAIR_REPORT.md");
     const testReport = read("TOOL_INVOCATION_REPAIR_TEST_REPORT.md");
     const remaining = read("TOOL_INVOCATION_REPAIR_REMAINING.md");

@@ -23,10 +23,13 @@ renderer 与 server 继续独立回退。两侧发布世代不一致时不静默
 
 ## 发布步骤
 
-1. 先确定候选产品版本和新的发布世代。
+以下用于已获授权的发布任务；文档整理或阅读本规范不授予提交、推送、打标签或发布权限。
+
+1. 确定候选产品版本和新的发布世代，同步 `package.json` 的 `version` / `lingxi.releaseGeneration`，以及 `package-lock.json` 的两处根版本。预检会拒绝 package 与 lock 根版本不一致。
 2. 运行 `npm run release:preflight -- --tag vX.Y.Z`。
-3. 生成并提交 `release-digest.v1.json`，再通过仓库生成器写入 `release-digest.v2.json`。
-4. 运行类型检查、代码检查、工作区包构建、全量测试和 Artifact release smoke。
-5. 只有所有前置任务成功，tag 工作流才能创建 Release；Train 只能从已完成的源 Release 发布。
+3. 用 `node scripts/generate-release-digest.mjs --tag vX.Y.Z --ref <候选提交>` 生成 `release-digest.v1.json`，再运行 `node scripts/generate-release-digest.mjs --append-history` 将该摘要写入 `release-digest.v2.json`。`--ref` 固定要总结的源码；`--append-history` 只搬运并校验既有摘要，不调用模型。两份生成摘要一并进入发布资料提交，不手改历史条目。
+4. 分别运行 `node scripts/validate-release-digest.mjs --tag vX.Y.Z --file release-digest.v1.json` 与同命令的 `--file release-digest.v2.json`。tag 工作流会在四平台构建前复核两份已提交摘要。
+5. 完成 `npm run typecheck`、`npm run lint`、`npm run build:packages`、`npm test` 和 `npm run test:artifact-release-smoke`；适用的封印流程见 [PROGRESS.md](PROGRESS.md#seal-工作流合并后现行)。本机验证结果绑定实际源码和平台，不能替代正式签名、四平台安装包与远端作业证据。
+6. 只有所有前置任务成功，tag 工作流才能创建 Release；Train 只能从已完成的源 Release 发布。实际门禁依赖以 [build.yml](.github/workflows/build.yml) 为准。
 
 正式发布前禁止仅修改 tag、文件名或 About 页版本来“修复”版本事故；这些变化不能改变客户端实际启动哪个 Artifact。

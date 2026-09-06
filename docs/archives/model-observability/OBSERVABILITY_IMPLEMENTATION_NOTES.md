@@ -1,8 +1,9 @@
 # Model Call Observer — 实现报告（Phase 1 契约 + Phase 2 文本运行时 + Phase 2.5 安全收口 + Phase 3 全路径 + Phase 3.5 残余闭合 + Phase 4 Trace）
 
+> 归档于 2026-09-06：以下源码路径、命令和状态按原任务的仓库根目录与日期理解；档案目录不是命令运行目录。参见[档案索引](../README.md)。
+
 基线：`feature/model-call-observability`。Pi 三件套 0.84.1。
-本文档以当前最终代码为准；Phase 1/2 = 第一轮，Phase 2.5/3 = 第二轮，
-Phase 3.5 + Phase 4 = 本轮（trace 传播 + MC-10）。
+本文保留各 Phase 当时的实现记录；“本轮”“当前”均按所在阶段理解，不能把早期 schema、默认开关和覆盖数字当作当前合同。2026-09-06 核对的源码入口见[模型观测](../../architecture/model-observatory.md)。Phase 1/2 = 第一轮，Phase 2.5/3 = 第二轮，Phase 3.5 + Phase 4 = trace 传播 + MC-10 阶段。
 
 > 注：文中引用的跨会话断点文档（OBSERVABILITY_{STORAGE,QUERY,UI}_PROGRESS.md，
 > 以及更早删除的五个过程文档与 V1 验收）已于 2026-08-23 文档清场删除，

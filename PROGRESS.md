@@ -1,7 +1,10 @@
 # PROGRESS — Seal 推进台账（前身：openhanako v0.444.1 → v0.447.4 上游同步收口）
 
 上游同步已于 2026-08-20 经 PR #20 合入 main（merge 0f941e5b）并随 v0.1.29 发布；
-本文件自那以后作为 seal 推进台账延续，「Seal 推进记录」一节是现行工作流。
+本文件自那以后作为 seal 推进台账延续；现行操作见[Seal 工作流](#seal-工作流合并后现行)。
+日期条目保留当时的分支、授权、成功、失败与未执行状态，不自动成为当前任务清单。
+当前分支以 Git 为准，后续验证只归属于各条记录明确指定的源码和平台。
+历史条目里的任务文件名是当时路径；保留档案与已删除重复锚点的去向见[档案索引](docs/archives/README.md)。
 
 ## 审计坐标（上游坐标固定，源码验证坐标按阶段推进）
 
@@ -10,13 +13,13 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = efc5fffdc8afa590573c723b34acd9341b5103f7  (2026-09-06 v0.1.35 发布资料最终封印)
+VERIFIED_SOURCE_SHA   = 601e918ddf5aa8ec2be2390528223b08ee515e44  (2026-09-06 文档治理收口封印：根目录历史台账归档至 docs/archives)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
-当前知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
+历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
 
-`VERIFIED_SOURCE_SHA` 是最终 typecheck、lint、tests、build、package 所验证的源码树；
-它不是 commit 内容的一部分，因而不存在 Git 自引用（`SHA = hash(contents)`）。
+`VERIFIED_SOURCE_SHA` 用于记录封印对应的候选源码树；实际执行了哪些 typecheck、lint、tests、build、package 门禁，须查该候选的验证证据，不能仅从指针推导。
+源码提交早于记录它的审计提交，因而不在该源码提交中自引用（`SHA = hash(contents)`）。
 
 ### Post-verification audit seal
 
@@ -26,6 +29,7 @@ generated artifacts 不允许改变。当前 branch HEAD 由 Git ref 自身标�
 `.sync-audit/verify-post-verification-diff.mjs`（`git diff --name-only
 VERIFIED_SOURCE_SHA..HEAD` 仅允许审计 allowlist）与
 `tests/post-verification-audit-seal.test.ts` 机器门禁保证。
+门禁只比较已提交版本，不覆盖未提交或未跟踪文件；通过不能代替工作区验证或发布证据。
 
 ΔU = 18 commits / 133 paths（7850+/738-）；ΔL = 346 paths；overlap = 29 paths。
 原始数据：`.sync-audit/delta-U-final.txt`（重算并与旧 delta-U.txt 逐字节一致）、
@@ -71,7 +75,10 @@ e715b8e4 / 9e2fa339 / 8f249913（dream）→ 27d14477 / ba9cb461（automation）
 fb032eea（markdown URL）→ 63bc92b7（context ring）→ 18727d24（windows seed）→
 abbfb593（派生物）→ 345d6b54（upstreamVersion 0.447.4）。
 
-## 已执行测试（最终源码树，全部指向 VERIFIED_SOURCE_SHA 对应树）
+## 已执行测试（2026-08-20 上游同步最终源码树）
+
+本节保留当轮验证结果，对应原始封印源码
+`d4cf92a838a78845893a7b6733375c0cc7a46834`，不随顶部 `VERIFIED_SOURCE_SHA` 推进而改变。
 
 1. `npm run typecheck` — tsc×3（root + node + test）全绿。
 2. `npm run lint` — **0 errors** / 8118 warnings（main 基线 8037；新增均为既有风格类 warning）。
@@ -135,9 +142,9 @@ abbfb593（派生物）→ 345d6b54（upstreamVersion 0.447.4）。
   archive（--smoke，package smoke）、Verify seed kit (Windows)、Build Windows
   installer（`electron-builder --win nsis --publish never`）。
 - 证据链接：https://github.com/ItsDalk-Lane/LingxiAgent/actions/runs/32329515438
-- CI headSha 3707a450 与 VERIFIED_SOURCE_SHA 之间仅有本文件记录与 VERIFIED_SOURCE_SHA
-  标注（docs-only），代码/测试/构建输入零差异
-  （`git diff 3707a450..VERIFIED_SOURCE_SHA --stat` 可核）。
+- CI headSha 3707a450 与本轮原始封印源码 `d4cf92a838a78845893a7b6733375c0cc7a46834`
+  之间仅有本文件记录变化（docs-only），代码/测试/构建输入零差异
+  （`git diff 3707a450..d4cf92a838a78845893a7b6733375c0cc7a46834 --stat` 可核）。
 
 真实 Windows 安装器执行（在本机运行 NSIS）受宿主平台限制未进行——不伪造"真机通过"。
 
@@ -976,9 +983,16 @@ UPSTREAM_SYNC_MATRIX.md
 
 post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
 `.sync-audit/verify-post-verification-diff.mjs`，两处 allowlist 副本须同步维护）。
-上游同步分支已合并；此后任何非 allowlist 的正常开发提交都会挂该门禁——提交前
-要么推进（复跑全量验证后更新 seal），要么退役（删除 seal 文件与 guard 测试）
-`verified-source-sha.txt`。本文件「Seal 推进记录」即推进范例。
+已验证提交之后出现非 allowlist 的开发提交会使门禁失败；它用于约束验证证据的适用范围。
+
+仅在任务要求封印，或已获授权的提交、发布流程确实需要推进时更新审计坐标。
+先将适用验证绑定到实际候选源码提交，再同步既有坐标来源、生成投影并完整复验；
+纯审计提交后再次核对差异门禁。验证和封印顺序遵循该任务已获授权的流程，
+不得把封印前失败记为通过。历史「Seal 推进记录」仅提供各次执行证据。
+
+普通编辑不以推进封印为前置条件。旧坐标造成的失败须如实记录，继续完成其他可验证工作；
+需要提交才能完成的封印留待相应授权步骤。不得为使检查变绿而虚报坐标、扩大白名单，
+或删除 seal 文件与 guard 测试；退役门禁属于另需明确授权的治理变更。
 
 ### Known limitation（保留）
 
@@ -1080,7 +1094,7 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 ## 2026-09-04 任务2完成:串台=机制b拉力坐实+流程内不可达排除清单;文件树半边机制c坐实
 
 - 新文件 `session-new-session-crosstalk.test.ts`(2 用例)与 `desk-new-session-capture.test.ts`(1 用例,真实 store+真实 activateWorkspaceDesk),均名含 characterization: KNOWN DEFECT,各自反向验证红→绿已贴对话。
-- 机制b拉力:无会话态(currentSessionPath=null ∧ pendingNewSession=false ∧ pendingSessionSwitchPath=null)下 loadSessions 把视图强切 sessions[0](主工作台会话)并加载其记录(session-actions.ts:626-635)——测试直造该状态坐实。
+- 机制b拉力:无会话态(currentSessionPath=null ∧ pendingNewSession=false ∧ pendingSessionSwitchPath=null)下 loadSessions 把视图强切 `sessions[0]`(主工作台会话)并加载其记录(session-actions.ts:626-635)——测试直造该状态坐实。
 - 「无会话态」全部到达点静态枚举(grep pendingNewSession/currentSessionPath 全部赋值点+逐一核实):
   1. 冷启动初始形状(session-slice.ts:200-206)——loadSessions 强切即设计内 bootstrap。可达,非新建流程。
   2. archiveSession 归档当前会话(session-actions.ts:1380 清空)——:1386-1390 立即兜底切 sessions[0],窗口内 WS 触发的强切目标与之一致。可达,设计内。

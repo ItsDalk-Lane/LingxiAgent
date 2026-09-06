@@ -1,6 +1,7 @@
 # Upstream v0.444.1 → v0.447.4 同步审计
 
-> **状态：READY TO MERGE。**
+> **状态：上游同步已于 2026-08-20 经 PR #20 合入 main（merge `0f941e5b`）。**
+> 正文保留该轮同步的实现、测试与限制；这些历史结果不随下方源码验证坐标推进而自动覆盖新版本。
 >
 > 逐路径处置矩阵（机器真相源 + 生成投影）见 UPSTREAM_SYNC_MATRIX.md 与
 > `.sync-audit/upstream-sync-matrix.json`；逐阶段测试记录见 PROGRESS.md；
@@ -14,7 +15,11 @@
 | U1：上游目标 | `c6d0405294be67cb134c2758f6472748ee73e2be` | openhanako `v0.447.4` |
 | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
 | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
-| VERIFIED_SOURCE_SHA | `efc5fffdc8afa590573c723b34acd9341b5103f7` | 2026-09-06 v0.1.35 发布资料最终封印；验证明细见 PROGRESS.md 最新条目 |
+| VERIFIED_SOURCE_SHA | `601e918ddf5aa8ec2be2390528223b08ee515e44` | 2026-09-06 文档治理收口封印（根目录历史台账归档至 docs/archives）；typecheck+全量测试 14091 passed 后绑定，验证明细见 PROGRESS.md 最新条目 |
+
+v0.1.35 仓库内的[功能 CI 记录](artifacts/release-v0.1.35/feature-ci-validation.json)
+对应 `2c835ac77afb1a73cd83816ad3d613297dc770a8`，不单独证明上述发布资料提交重新执行了
+全量验证，也不证明正式安装包已经发布。各阶段证据须按其实际源码坐标和作业核对。
 
 ## Audit seal model
 
@@ -26,6 +31,8 @@ post-verification diff guard（`.sync-audit/verify-post-verification-diff.mjs` +
 `tests/post-verification-audit-seal.test.ts`）保证：`git diff --name-only
 VERIFIED_SOURCE_SHA..HEAD` 仅允许审计文件变化，任何生产代码、测试逻辑、
 runtime generated artifacts 变更都会使 guard 失败（exit 1）。
+该检查只覆盖已提交版本间的差异，不覆盖未提交或未跟踪文件；现行推进范围见
+[PROGRESS.md 的 Seal 工作流](PROGRESS.md#seal-工作流合并后现行)。
 
 ## 上游变更统计（ΔU）
 

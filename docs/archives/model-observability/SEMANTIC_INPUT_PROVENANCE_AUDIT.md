@@ -1,5 +1,7 @@
 # Semantic Input Provenance Audit — Phase 5（第四轮）
 
+> 归档于 2026-09-06：以下源码路径、命令和状态按原任务的仓库根目录与日期理解；档案目录不是命令运行目录。参见[档案索引](../README.md)。
+
 > 分支 `feature/model-call-observability`，基线 HEAD `6b93929e`（2026-08-21）。
 > 本文是 Phase 5 Semantic Input Provenance 的 **Step 1 Prompt Construction Audit**，
 > 覆盖 MC-01～MC-10 全部生产 Model Call 路径的 Semantic Input 构造链。
