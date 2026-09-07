@@ -135,27 +135,6 @@ export async function autoSaveGlobalModels(
   }
 }
 
-let _savePinsTimer: ReturnType<typeof setTimeout> | null = null;
-export function savePins() {
-  if (_savePinsTimer) clearTimeout(_savePinsTimer);
-  _savePinsTimer = setTimeout(async () => {
-    const store = useSettingsStore.getState();
-    try {
-      const agentId = store.getSettingsAgentId();
-      const res = await lingxiFetch(`/api/agents/${agentId}/pinned`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pins: store.currentPins }),
-      });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      store.showToast(t('settings.autoSaved'), 'success');
-    } catch (err: any) {
-      store.showToast(t('settings.saveFailed') + ': ' + err.message, 'error');
-    }
-  }, 300);
-}
-
 export const PROVIDER_PRESETS = API_PROVIDER_PRESETS.map(preset => ({
   ...preset,
   label: getProviderPresetLabel(preset),

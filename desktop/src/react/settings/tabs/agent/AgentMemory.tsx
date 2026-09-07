@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSettingsStore } from '../../store';
-import { t, autoSaveConfig, savePins } from '../../helpers';
+import { t, autoSaveConfig } from '../../helpers';
 import { lingxiFetch } from '../../api';
-import { PinItem } from './AgentPins';
 import { SettingsSection } from '../../components/SettingsSection';
 import { Toggle } from '@/ui';
 import { AgentMemoryDream } from './AgentMemoryDream';
@@ -107,14 +106,12 @@ function MemoryHealthNotice({ health, error }: {
   );
 }
 
-export function MemorySection({ agentId, hasUtilityModel, memoryEnabled, autoDreamEnabled = false, currentPins }: {
+export function MemorySection({ agentId, hasUtilityModel, memoryEnabled, autoDreamEnabled = false }: {
   agentId: string | null;
   hasUtilityModel: boolean | undefined;
   memoryEnabled: boolean | undefined;
   autoDreamEnabled?: boolean;
-  currentPins: string[];
 }) {
-  const [pinInput, setPinInput] = useState('');
   const [health, setHealth] = useState<MemoryHealthPayload | null>(null);
   const [healthError, setHealthError] = useState<string | null>(null);
 
@@ -150,22 +147,6 @@ export function MemorySection({ agentId, hasUtilityModel, memoryEnabled, autoDre
     };
   }, [agentId, hasUtilityModel, memoryEnabled]);
 
-  const addPin = () => {
-    const val = pinInput.trim();
-    if (!val) return;
-    const newPins = [...currentPins, val];
-    useSettingsStore.setState({ currentPins: newPins });
-    setPinInput('');
-    savePins();
-  };
-
-  const deletePin = (index: number) => {
-    const newPins = [...currentPins];
-    newPins.splice(index, 1);
-    useSettingsStore.setState({ currentPins: newPins });
-    savePins();
-  };
-
   /* 记忆开关作为 section title 右侧 context（和 WorkTab 的 AgentSelect 作 context 同构）
    * hasUtilityModel=false 时 toggle 禁用，below 显示提示 */
   const utilityModelReady = hasUtilityModel !== undefined;
@@ -190,33 +171,6 @@ export function MemorySection({ agentId, hasUtilityModel, memoryEnabled, autoDre
 
         <div className={hasUtilityModel !== true || memoryEnabled !== true ? 'settings-disabled' : ''}>
           <MemoryHealthNotice health={health} error={healthError} />
-
-          <div className={styles['settings-subsection']}>
-            <div className={styles['settings-subsection-header']}>
-              <h3 className={styles['settings-subsection-title']}>{t('settings.pins.title')}</h3>
-              <span className={styles['settings-subsection-hint']}>{t('settings.pins.hint')}</span>
-            </div>
-            <div className={styles['pin-list']}>
-              {currentPins.length === 0 ? (
-                <div className={styles['pin-empty']}>{t('settings.pins.empty')}</div>
-              ) : (
-                currentPins.map((pin, i) => (
-                  <PinItem key={pin} text={pin} index={i} onDelete={deletePin} />
-                ))
-              )}
-            </div>
-            <div className={styles['pin-add-row']}>
-              <input
-                className={`${styles['settings-input']} ${styles['pin-add-input']}`}
-                type="text"
-                value={pinInput}
-                onChange={(e) => setPinInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addPin(); } }}
-                placeholder={t('settings.pins.addPlaceholder')}
-              />
-              <button className={styles['pin-add-btn']} onClick={addPin}>+</button>
-            </div>
-          </div>
 
           <div className={styles['settings-subsection']}>
             <div className={styles['settings-subsection-header']}>

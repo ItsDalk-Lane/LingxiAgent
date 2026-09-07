@@ -95,7 +95,6 @@ describe("persistent store registry", () => {
       "character-card-staging",
       "desk-cover-upload-staging",
       "office-render-jobs",
-      "plugin-download-cache",
       "skill-state",
       "usage-ledger",
       "operational-checkpoints",

@@ -286,16 +286,6 @@
       "breakingMigrationRequiresAccessMove": false
     },
     {
-      "id": "installed-plugins",
-      "firstPossibleOpenPhase": "engine_construct",
-      "firstPossibleWritePhase": "runtime_ready",
-      "opensBeforeFutureCoordinator": false,
-      "writesBeforeFutureCoordinator": false,
-      "bootstrapSafety": null,
-      "preCoordinatorReadProjection": null,
-      "breakingMigrationRequiresAccessMove": false
-    },
-    {
       "id": "knowledge-database",
       "firstPossibleOpenPhase": "engine_construct",
       "firstPossibleWritePhase": "runtime_ready",
@@ -428,26 +418,6 @@
     {
       "id": "operational-checkpoints",
       "firstPossibleOpenPhase": "engine_construct",
-      "firstPossibleWritePhase": "runtime_ready",
-      "opensBeforeFutureCoordinator": false,
-      "writesBeforeFutureCoordinator": false,
-      "bootstrapSafety": null,
-      "preCoordinatorReadProjection": null,
-      "breakingMigrationRequiresAccessMove": false
-    },
-    {
-      "id": "plugin-development-state",
-      "firstPossibleOpenPhase": "engine_construct",
-      "firstPossibleWritePhase": "runtime_ready",
-      "opensBeforeFutureCoordinator": false,
-      "writesBeforeFutureCoordinator": false,
-      "bootstrapSafety": null,
-      "preCoordinatorReadProjection": null,
-      "breakingMigrationRequiresAccessMove": false
-    },
-    {
-      "id": "plugin-download-cache",
-      "firstPossibleOpenPhase": "runtime_ready",
       "firstPossibleWritePhase": "runtime_ready",
       "opensBeforeFutureCoordinator": false,
       "writesBeforeFutureCoordinator": false,

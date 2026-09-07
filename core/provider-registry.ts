@@ -1434,6 +1434,7 @@ export class ProviderRegistry {
   }
 
   resolveMediaModel(ref) {
+    const includeCatalog = ref?.includeCatalog === true;
     const providerId = ref?.providerId || ref?.provider;
     const modelId = ref?.modelId || ref?.id || ref?.model;
     const capability = ref?.capability || "image_generation";
@@ -1450,7 +1451,13 @@ export class ProviderRegistry {
       }
     }
     const models = this.getMediaModels(providerId, capability);
-    const model = models.find((item) => item.id === modelId || item.aliases?.includes?.(modelId));
+    let model = models.find((item) => item.id === modelId || item.aliases?.includes?.(modelId));
+    // 语音合成走「零配置可用」语义：内置声明但未添加的候选模型（includeCatalog）
+    // 直接可解析执行，用户不必先去供应商页手动「添加模型」。
+    if (!model && includeCatalog) {
+      model = this.getMediaModelCatalog(providerId, capability)
+        .find((item) => item.id === modelId || item.aliases?.includes?.(modelId));
+    }
     if (!model) throw new Error(`Media model "${providerId}/${modelId}" not found`);
     const key = capabilityKey(capability);
     const mediaCapability = entry.capabilities?.media?.[key] || {};

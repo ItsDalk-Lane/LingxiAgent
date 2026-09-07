@@ -320,6 +320,8 @@ function seedInputState(overrides: Partial<ReturnType<typeof useStore.getState>>
     connected: true,
     pendingNewSession: false,
     streamingSessions: [],
+    turnPendingSessions: [],
+    queuedTurnInputsByPath: {},
     compactingSessions: [],
     inlineErrors: {},
     attachedFiles: [],

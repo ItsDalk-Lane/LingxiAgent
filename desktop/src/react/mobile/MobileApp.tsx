@@ -321,7 +321,6 @@ function MobileDesktopShell({
         showPreviewToggle
         showNewSessionButton
         showChannelTabs={false}
-        showWidgetButtons={false}
         centerTitle={titlebarTitle}
         onNewSession={() => void createNewSession()}
         onToggleSidebar={() => {

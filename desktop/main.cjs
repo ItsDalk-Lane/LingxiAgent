@@ -5582,21 +5582,6 @@ wrapIpcBestEffortHandler("select-skill", async (event) => {
   return result.filePaths[0];
 });
 
-wrapIpcBestEffortHandler("select-plugin", async (event) => {
-  const win = BrowserWindow.fromWebContents(event.sender) || mainWindow;
-  if (!win) return null;
-  const result = await dialog.showOpenDialog(win, {
-    properties: ["openFile", "openDirectory"],
-    title: mt("dialog.selectPlugin", null, "Select Plugin"),
-    filters: [
-      { name: "Plugin", extensions: ["zip"] },
-      { name: "All Files", extensions: ["*"] },
-    ],
-  });
-  if (result.canceled || !result.filePaths.length) return null;
-  return result.filePaths[0];
-});
-
 // ── Model Observatory 导出流式保存（Phase 9 §一百一十五～一百一十八）──
 // 安全模型：路径只来自用户亲手操作的系统保存对话框；renderer 拿到的是
 // 绑定发起 webContents 的不透明 exportId（capability token），没有任何任意
@@ -5772,8 +5757,6 @@ wrapIpcBestEffortHandler("skill-viewer-read-file", (_event, filePath) => {
   }
 });
 
-// close-skill-viewer: overlay 模式下由渲染进程 setState 关闭，保留 handler 避免 preload 报错
-wrapIpcBestEffortHandler("close-skill-viewer", () => {});
 
 // 在系统文件管理器中打开文件夹（限制为目录且为绝对路径）
 wrapIpcBestEffortHandler("open-folder", (_event, folderPath) => {

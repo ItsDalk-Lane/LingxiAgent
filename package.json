@@ -8,9 +8,6 @@
   "type": "module",
   "description": "Lingxi - a personal AI agent with memory and soul",
   "license": "Apache-2.0",
-  "workspaces": [
-    "packages/*"
-  ],
   "author": {
     "name": "Lingxi"
   },
@@ -45,10 +42,10 @@
     "server": "node scripts/launch.js server",
     "build:main": "vite build --config vite.config.main.js",
     "build:computer-use-helper": "node scripts/build-computer-use-helper.mjs",
+    "build:speech-helper": "node scripts/build-speech-helper.mjs",
     "build:windows-sandbox-helper": "node scripts/build-windows-sandbox-helper.mjs",
     "build:client": "npm run build:main && npm run build:preload && npm run build:renderer && npm run build:splash && npm run build:theme",
     "build:shell": "node scripts/build-shell.mjs",
-    "build:packages": "npm run build --workspaces --if-present",
     "generate:windows-icon": "node scripts/generate-windows-icon.cjs",
     "generate:tray-icons": "node scripts/generate-tray-icons.cjs",
     "pack": "npm run build:computer-use-helper && npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --dir",
@@ -156,7 +153,9 @@
     "appId": "com.lingxi.app",
     "productName": "Lingxi",
     "asar": true,
-    "asarUnpack": ["**/node_modules/usearch/**/*.node"],
+    "asarUnpack": [
+      "**/node_modules/usearch/**/*.node"
+    ],
     "npmRebuild": false,
     "afterPack": "./scripts/fix-modules.cjs",
     "extraMetadata": {
@@ -212,8 +211,16 @@
         {
           "from": "dist-computer-use/mac-${arch}/",
           "to": "computer-use/macos/"
+        },
+        {
+          "from": "dist-speech/mac-${arch}/",
+          "to": "speech/macos/"
         }
-      ]
+      ],
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "灵犀需要使用麦克风来录制你的语音输入（语音消息与听写）。语音只在你按下录音时录制。",
+        "NSSpeechRecognitionUsageDescription": "灵犀需要使用 macOS 自带的语音识别，把你的录音在本地转为文字（听写功能）。"
+      }
     },
     "dmg": {
       "title": "Lingxi",

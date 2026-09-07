@@ -12,13 +12,10 @@ import {
 } from "../lib/knowledge/rerank-policy.ts";
 import { createMetadataFixture, metadataStudio } from "./helpers/knowledge-metadata-fixture.ts";
 
-import { createResearchAgentFixture, recordSourceEvidence, researchNeed, requestFinish } from "./helpers/knowledge-research-agent-fixture.ts";
-const researchFixtures: Awaited<ReturnType<typeof createResearchAgentFixture>>[] = [];
 const homes: string[] = [];
 const managers: KnowledgeManager[] = [];
 afterEach(async () => {
   vi.restoreAllMocks();
-  for (const fixture of researchFixtures.splice(0)) await fixture.close();
   for (const manager of managers.splice(0)) await manager.close();
   for (const home of homes.splice(0)) fs.rmSync(home, { recursive: true, force: true });
 });
@@ -120,57 +117,6 @@ describe("统一知识搜索", () => {
     expect(result.remoteModelCalls).toBe(0);
     expect(result.degradedReasons.some(reason => reason.includes("KNOWLEDGE_VECTOR_NOT_READY"))).toBe(true);
     expect(result.degradedReasons.some(reason => reason.includes("rerank model is unavailable"))).toBe(true);
-  });
-
-  it("主模型快速注入实际进入同一个服务", async () => {
-    const { manager, scope } = await fixture();
-    const search = vi.spyOn(manager.searchService, "searchWithEvidence");
-    const output = await manager.runFastKnowledgePipeline({ scope, question: "后台" });
-    expect(search).toHaveBeenCalledWith(expect.objectContaining({
-      channel: "fts",
-      rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY,
-    }));
-    expect(output.stats.remoteModelCalls).toBe(0);
-    expect(output.stats.injectedChunks).toBeGreaterThan(0);
-    const again = await manager.runFastKnowledgePipeline({ scope, question: "后台" });
-    expect(again.stats).toMatchObject({ retrievalResultCacheHit: true, ftsQueries: 0, retrievalMode: "fts", remoteModelCalls: 0 });
-  });
-
-  it("详细会话注入也通过统一服务，保留真实证据身份", async () => {
-    const f = await createResearchAgentFixture(async turn => {
-      await turn.call("knowledge_outline", { scopeId: turn.scopeId });
-      const update = await turn.call("knowledge_research_update", { runId: turn.runId,
-        createNeeds: [researchNeed("确认项目日期")] });
-      const needId = update.needs[0].id;
-      const found = await turn.call("knowledge_search", { scopeId: turn.scopeId, query: "苹果项目" });
-      expect(found.isError).toBeUndefined();
-      await recordSourceEvidence(turn, needId, f.sources[0].sourceId, "九月十五日");
-      expect((await requestFinish(turn)).accepted).toBe(true);
-    }, "请核对项目日期。");
-    researchFixtures.push(f);
-    const { manager } = f;
-    const engine = Object.assign(Object.create(LingxiEngine.prototype) as LingxiEngine, {
-      _knowledge: manager, _runtimeContext: { studioId: f.request.compiledScope.studioId },
-      getSessionIdForPath: (sessionPath: string) => f.manifests.resolveByLocatorPath(sessionPath)?.sessionId ?? null,
-      getSessionManifest: (sessionId: string) => f.manifests.getBySessionId(sessionId),
-      executeIsolated: f.executeIsolated, emitEvent: vi.fn(),
-    });
-    const search = vi.spyOn(manager.searchService, "searchWithEvidence");
-    expect("retrieveForNotebooks" in manager.queryService).toBe(false);
-    const legacy = vi.fn(async () => { throw new Error("禁止旧入口"); });
-    Object.assign(manager.queryService, { retrieveForNotebooks: legacy });
-    const result = await engine.buildDetailedKnowledgeResearchContext({ question: f.request.question,
-      sessionId: f.request.parentSessionId, sessionPath: f.request.parentSessionPath,
-      agentId: f.request.agentId, turnId: f.request.turnId,
-      knowledgeRefs: { notebookIds: f.request.compiledScope.notebookIds, mode: "detailed" } });
-    expect(search).toHaveBeenCalled();
-    expect(search.mock.calls.every(([request]) => request.channel === "hybrid")).toBe(true);
-    expect(legacy).not.toHaveBeenCalled();
-    expect(result.stats.injectedChunks).toBeGreaterThan(0);
-    expect(result.evidence.entries.length).toBeGreaterThan(0);
-    expect(result.stats).toMatchObject({ executionPath: "detailed_research", research: { status: "completed" } });
-    const searches = f.research.listActions(result.stats.research!.runId).filter(action => action.actionType === "knowledge_search");
-    expect(searches.length).toBeGreaterThan(0);
   });
 
 });

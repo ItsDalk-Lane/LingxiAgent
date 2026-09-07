@@ -105,7 +105,6 @@ function isGenerationAnchor(block: ContentBlock): boolean {
     || block.type === 'subagent'
     || block.type === 'workflow'
     || block.type === 'media_generation'
-    || block.type === 'plugin_card'
     || block.type === 'file';
 }
 

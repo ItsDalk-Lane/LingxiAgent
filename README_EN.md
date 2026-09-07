@@ -56,7 +56,7 @@ Our sincere thanks go to [openhanako](https://github.com/liliMozi/openhanako) an
 
 **Sandbox** — Two-layer isolation: application-level PathGuard with four access tiers + OS-level sandboxing (macOS Seatbelt / Linux Bubblewrap / Windows restricted token). Agents can read ordinary system files, while writes and deletes stay limited to the workspace and managed data folders. On Windows, the command sandbox is a write-isolation model: reads use the current user's normal permissions, and network access keeps the current user's network permissions. macOS and Linux continue to use the network behavior provided by their platform sandbox backends. External network access can use system proxy, manual proxy, or direct mode.
 
-**Plugins** — Extensible plugin system with a convention-first architecture. Install community plugins by drag-and-drop. Plugins can contribute tools, skills, commands, agent templates, HTTP routes, Pi SDK extensions, LLM providers, pages, widgets, configuration schemas, and background tasks. Routes have direct access to core services (PluginContext injection) and can interact with agent sessions via the Session Bus; plugin cards flow through the same message-block and history replay pipeline as built-in cards. The two-level permission model (restricted / full-access) keeps advanced surfaces safe: `extensions/`, routes, providers, pages, and lifecycle hooks only load for full-access plugins.
+**Built-in Extensions** — Image / video generation, Office document reading and PDF export, cover beautification, and Jimeng CLI ship with the app and work out of the box (some capabilities must be enabled per agent as optional tools).
 
 **Multi-Platform Bridge** — A single agent can connect to Telegram, Feishu, QQ, and WeChat bots simultaneously. Chat from any platform and remotely operate your computer. Bridge sessions carry platform context, and notifications can be delivered back to the current external platform.
 
@@ -109,7 +109,7 @@ tests/          Vitest test suite
 
 The engine layer coordinates multiple managers (Agent, Session, Model, Preferences, Skill, Channel, BridgeSession, Plugin, etc.) and exposes them through a unified facade. The Hub handles background tasks (heartbeat, automation / cron, channel routing, agent messaging, DM routing) independently of the active chat session.
 
-User-visible files inside a session are registered through `SessionFile` sidecars. Desktop, Bridge, Mobile PWA, and other remote frontends consume the same file identity according to their own capabilities. Each Bridge adapter explicitly declares its supported media kinds, delivery modes, and size limits; plugin file contribution rules live in `PLUGINS.md`.
+User-visible files inside a session are registered through `SessionFile` sidecars. Desktop, Bridge, Mobile PWA, and other remote frontends consume the same file identity according to their own capabilities. Each Bridge adapter explicitly declares its supported media kinds, delivery modes, and size limits.
 
 Local staged files are uploaded directly by platform adapters when possible: Telegram / Feishu / WeChat use their native upload flows, and QQ uses the official bot chunked-upload flow before sending `msg_type: 7` rich media. `preferences.bridge.mediaPublicBaseUrl` / `LINGXI_BRIDGE_PUBLIC_BASE_URL` are only for consumers or fallback paths that still require an internet-reachable URL.
 
@@ -188,5 +188,4 @@ npm run typecheck
 
 - [Documentation Index](docs/README.md)
 - [Security Policy](SECURITY.md)
-- [Plugin Development](PLUGINS_EN.md)
 - [Contributing](CONTRIBUTING.md)

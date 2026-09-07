@@ -41,7 +41,6 @@ type CoverGenerationStatus = {
   executorAgentId?: string | null;
   disabledReason?: string | null;
   message?: string | null;
-  settingsTarget?: string | null;
 };
 
 type CoverStatus = {

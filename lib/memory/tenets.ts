@@ -1,12 +1,14 @@
 /**
- * tenets.js — 用户原则（tenets）存储
+ * tenets.js — 置顶与原则（tenets）存储
  *
- * 「经用户确认的行为原则」层：区别于 facts（世界知识）与 experience（任务方法），
- * 这里存的是注入每个新会话 system prompt 的行为准则（借鉴 nuphus 的 tenets）。
+ * 「钉住的事实 + 经用户确认的行为原则」统一库：区别于 facts（世界知识）与
+ * experience（任务方法），这里存的是注入每个新会话 system prompt 的长期约定
+ * （原置顶记忆 pins 与用户原则 tenets 已合并，以 tenets 为底座；原 pins 数据
+ * 经启动迁移并入，source=user_direct）。
  *
  * 生命周期：模型经 tenet_propose 工具提议（pending）→ 用户在聊天卡或设置页
- * 批准（active）/拒绝（rejected）；用户也可在设置页直接添加（active）。
- * pending 永不超时作废——审批是持久等待，不是 confirm-store 那种限时阻塞。
+ * 批准（active）/拒绝（rejected）；用户/模型也可经 pin_memory 工具或设置页
+ * 直接添加（active，user_direct）。pending 永不超时作废。
  *
  * 存储：agentDir/memory/tenets.json，schemaVersion 1，atomicWrite 落盘。
  */
@@ -36,8 +38,10 @@ export interface Tenet {
   decidedAt?: string | null;
 }
 
-/** active 上限：原则注入每个会话，超量即噪音（对齐 nuphus 的 20 条上限） */
+/** active 上限（model_proposed 提案路径）：原则注入每个会话，超量即噪音 */
 export const MAX_ACTIVE_TENETS = 20;
+/** user_direct（直钉/设置页）不受提案上限约束：迁移与用户操作是显式意图 */
+export const MAX_ACTIVE_USER_TENETS = 200;
 /** pending 上限：提案积压说明没人处理，满则拒绝新提案并提示先清理 */
 export const MAX_PENDING_TENETS = 30;
 /** 单条原则长度上限 */
@@ -73,11 +77,11 @@ export function normalizeTenetPriority(value: unknown): TenetPriority {
 }
 
 function normalizeTenetContent(value: unknown): string {
-  return String(value ?? "").replace(/\s+/g, " ").trim();
+  return String(value ?? "").replace(/\r\n?/g, "\n").trim();
 }
 
-/** 归一化查重口径：去空白差异、小写、去句尾标点 */
-function dedupKey(content: string): string {
+/** 归一化查重口径：去空白差异、小写、去句尾标点（导出供迁移预查重） */
+export function dedupKey(content: string): string {
   return content.toLowerCase().replace(/[。.！!？?；;，,]+$/g, "").trim();
 }
 
@@ -215,10 +219,10 @@ export function addTenetDirect(
   return withFile(filePath, (data) => {
     const dup = findDuplicate(data, content);
     if (dup) return { tenet: dup, duplicate: true };
-    if (data.tenets.filter((t) => t.status === "active").length >= MAX_ACTIVE_TENETS) {
+    if (data.tenets.filter((t) => t.status === "active").length >= MAX_ACTIVE_USER_TENETS) {
       throw tenetError(
         TENET_ERRORS.LIMIT_REACHED,
-        `active tenets are full (${MAX_ACTIVE_TENETS}); remove one before adding another`,
+        `active tenets are full (${MAX_ACTIVE_USER_TENETS}); remove one before adding another`,
       );
     }
     const tenet: Tenet = {
@@ -270,15 +274,19 @@ export function removeTenet(agentDir: string, tenetId: string): boolean {
 }
 
 /**
- * system prompt 注入块（# 用户原则）。只列 active，critical 在前；
+ * system prompt 注入块（# 置顶与原则）。只列 active，critical 在前；
+ * 多行内容按缩进续行渲染（沿用原 pinned.md 的列表续行约定）；
  * 为空返回 null（调用方跳过整段）。
  */
 export function buildTenetsPromptSection(agentDir: string, isZh: boolean): string | null {
   const active = activeTenets(agentDir);
   if (active.length === 0) return null;
-  const lines = active.map((t) => `- [${t.priority}] ${t.content}`);
+  const lines = active.flatMap((t) => {
+    const contentLines = t.content.split("\n");
+    return contentLines.map((line, index) => index === 0 ? `- ${line}` : `  ${line}`);
+  });
   const header = isZh
-    ? "# 用户原则\n以下是经用户确认的行为原则，每次输出前都要遵守："
-    : "# User Principles\nThe following behavioral principles are confirmed by the user and must be followed:";
+    ? "# 置顶与原则\n以下是用户钉住的内容与经用户确认的行为原则，始终遵守："
+    : "# Pinned Items & Principles\nThe following pinned content and user-confirmed behavioral principles always apply:";
   return `${header}\n${lines.join("\n")}`;
 }

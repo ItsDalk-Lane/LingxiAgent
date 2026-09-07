@@ -174,9 +174,7 @@ describe('SettingsContent tab heading', () => {
     await waitFor(() => expect(actionMocks.loadSettingsModels).toHaveBeenCalledTimes(1));
   });
 
-  it('normalizes legacy media and computer tab ids to their replacements', () => {
-    expect(normalizeSettingsTab('media')).toBe('models');
-    expect(normalizeSettingsTab('computer')).toBe('experiments');
+  it('passes tab ids through without aliasing', () => {
     expect(normalizeSettingsTab('providers')).toBe('providers');
     expect(normalizeSettingsTab('models')).toBe('models');
   });

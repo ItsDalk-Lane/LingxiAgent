@@ -300,7 +300,7 @@ export class PluginManager {
   declare _widgets: any;
   declare routeRegistry: any;
   /**
-   * @param {{ pluginsDirs: string[], dataDir: string, bus: object }} opts
+   * @param {{ pluginsDirs: string[], dataDir: string, bus: object, logSink?: Function }} opts
    * pluginsDirs: 多个扫描目录，先内嵌后用户（靠前的优先）
    * 兼容旧签名 { pluginsDir: string } → 自动转为单元素数组
    */
@@ -319,7 +319,7 @@ export class PluginManager {
     slashRegistry,
     loadTimeoutMs,
     lifecycleTimeoutMs,
-    logSink,
+    logSink = null,
     runtimeContext,
   }) {
     this._pluginsDirs = pluginsDirs || (pluginsDir ? [pluginsDir] : []);
@@ -430,12 +430,6 @@ export class PluginManager {
     if (routeRecord?.app) this.routeRegistry.set(pluginId, routeRecord.app);
   }
 
-  _isMissingReconcileablePlugin(entry) {
-    if (!entry?.pluginDir) return false;
-    if (normalizePluginSource(entry.source) !== "community") return false;
-    return !fs.existsSync(entry.pluginDir);
-  }
-
   _advancePluginToolGeneration(pluginId) {
     const current = this.getPluginToolGeneration(pluginId);
     const next = current + 1;
@@ -504,33 +498,7 @@ export class PluginManager {
     this._cleanupPluginContributions(entry);
     this._plugins.delete(pluginKey);
 
-    if (source === "community" && options.removePreferences !== false && this._preferencesManager) {
-      const disabled = this._preferencesManager.getDisabledPlugins();
-      if (Array.isArray(disabled) && disabled.includes(pluginId)) {
-        this._preferencesManager.setDisabledPlugins(disabled.filter(id => id !== pluginId));
-      }
-    }
-
     this._refreshRouteRegistryForId(pluginId);
-  }
-
-  reconcileMissingPluginDirectories(options: any = {}) {
-    const removed = [];
-    for (const entry of [...this._plugins.values()]) {
-      if (!this._isMissingReconcileablePlugin(entry)) continue;
-      log.warn(`community plugin "${entry.id}" directory missing, reconciling stale registry entry: ${entry.pluginDir}`);
-      this._forgetPluginEntry(entry, { removePreferences: true });
-      removed.push({
-        id: entry.id,
-        pluginKey: entry.pluginKey,
-        source: normalizePluginSource(entry.source),
-        pluginDir: entry.pluginDir,
-      });
-    }
-    if (removed.length > 0 && options.emitUiChanged !== false) {
-      this._bus?.emit({ type: "plugin_ui_changed" });
-    }
-    return removed;
   }
 
   _annotateShadowing() {
@@ -563,7 +531,7 @@ export class PluginManager {
     const seen = new Set();
     for (let i = 0; i < this._pluginsDirs.length; i++) {
       const dir = this._pluginsDirs[i];
-      const source = i === 0 ? "builtin" : "community";
+      const source = "builtin";
       if (!fs.existsSync(dir)) continue;
       for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
         if (!entry.isDirectory() || entry.name.startsWith(".")) continue;
@@ -588,7 +556,6 @@ export class PluginManager {
       }
     }
     this._scanned = results;
-    this.reconcileMissingPluginDirectories();
     return results;
   }
 
@@ -626,18 +593,9 @@ export class PluginManager {
   }
 
   async loadAll() {
-    this.reconcileMissingPluginDirectories();
     const descriptors = this._scanned.length > 0 ? this._scanned : this.scan();
-    const disabledList = this._preferencesManager?.getDisabledPlugins() || [];
     for (const desc of descriptors) {
       const entry = this._entryFromDescriptor(desc, { status: "loading", activationState: "inactive", activationReason: null, instance: null, _disposables: [] });
-
-      // builtin 插件不受 disabled 列表和全权开关约束，始终加载
-      if (entry.source === "community" && disabledList.includes(entry.id)) {
-        entry.status = "disabled";
-        this._setPluginEntry(entry);
-        continue;
-      }
 
       if (desc.formatIssue) {
         entry.status = "incompatible";
@@ -645,15 +603,6 @@ export class PluginManager {
         this._setPluginEntry(entry);
         log.warn(`"${desc.id}" skipped: ${entry.error}`);
         continue;
-      }
-
-      if (desc.source === "community" && desc.trust === "full-access") {
-        const allowed = this._preferencesManager?.getAllowFullAccessPlugins() || false;
-        if (!allowed) {
-          entry.status = "restricted";
-          this._setPluginEntry(entry);
-          continue;
-        }
       }
 
       // minAppVersion check
@@ -796,17 +745,10 @@ export class PluginManager {
     // Full-access only: system-level extension points
     if (accessLevel === "full-access") {
       this._assertActiveLoad(entry, loadToken);
-      await this._runLoadStageIf(entry, this._hasContributionDir(entry, "routes"), "routes", () => this._loadRoutes(entry));
-      this._assertActiveLoad(entry, loadToken);
       await this._runLoadStageIf(entry, this._hasContributionDir(entry, "extensions"), "extensions", () => this._loadExtensions(entry));
       this._assertActiveLoad(entry, loadToken);
       await this._runLoadStageIf(entry, this._hasContributionDir(entry, "providers"), "providers", () => this._loadProviders(entry));
       this._assertActiveLoad(entry, loadToken);
-      await this._runLoadStageIf(entry, !!entry.manifest?.contributes?.page, "page", () => this._loadPage(entry));
-      this._assertActiveLoad(entry, loadToken);
-      await this._runLoadStageIf(entry, !!entry.manifest?.contributes?.widget, "widget", () => this._loadWidget(entry));
-      this._assertActiveLoad(entry, loadToken);
-      await this._runLoadStageIf(entry, !!entry.manifest?.contributes?.settingsTab, "settings tab", () => this._loadSettingsTab(entry));
 
       if (activationMatches(entry.activationEvents, { event: "onStartup" })) {
         this._assertActiveLoad(entry, loadToken);
@@ -876,16 +818,6 @@ export class PluginManager {
     if (!entry) throw new Error(`Plugin "${pluginId}" not found`);
     if (!activationMatches(entry.activationEvents, reason)) return entry;
     return this._activatePluginEntry(entry, reason);
-  }
-
-  async activatePluginRoute(pluginId, routePath) {
-    const entry = this._getRuntimeEntryForId(pluginId);
-    if (!entry) return null;
-    const page = this._pages.find((item) => item.pluginKey === entry.pluginKey && item.route === routePath);
-    const widget = this._widgets.find((item) => item.pluginKey === entry.pluginKey && item.route === routePath);
-    if (page) return this.activatePlugin(pluginId, { event: "onPageOpen", route: routePath }, { pluginKey: entry.pluginKey });
-    if (widget) return this.activatePlugin(pluginId, { event: "onWidgetOpen", route: routePath }, { pluginKey: entry.pluginKey });
-    return entry;
   }
 
   // ── Task 5: Tool loader ──────────────────────────────────────────────────
@@ -998,7 +930,6 @@ export class PluginManager {
   }
 
   isPluginToolCurrentlyAvailable(pluginId, publicName) {
-    this.reconcileMissingPluginDirectories();
     const normalizedPluginId = typeof pluginId === "string" ? pluginId.trim() : "";
     const normalizedPublicName = typeof publicName === "string" ? publicName.trim() : "";
     if (!normalizedPluginId || !normalizedPublicName) return false;
@@ -1010,7 +941,6 @@ export class PluginManager {
   }
 
   getPluginTool(pluginId, toolName, options: any = {}) {
-    this.reconcileMissingPluginDirectories();
     const entry = options.entry || this._resolvePluginEntry(pluginId, options);
     if (!entry || !toolName) return null;
     const requestedToolName = String(toolName).trim();
@@ -1032,7 +962,6 @@ export class PluginManager {
   }
 
   getAllTools( options: any = {}) {
-    this.reconcileMissingPluginDirectories();
     const includeShadowed = options.includeShadowed === true;
     return this._tools.filter((tool) => (
       includeShadowed || !tool._pluginKey || this._isPluginKeyRuntimeActive(tool._pluginKey)
@@ -1067,7 +996,6 @@ export class PluginManager {
   }
 
   getSkillPaths( options: any = {}) {
-    this.reconcileMissingPluginDirectories();
     const includeShadowed = options.includeShadowed === true;
     return this._skillPaths.filter((skillPath) => (
       includeShadowed || this._isPluginKeyRuntimeActive(skillPath.pluginKey)
@@ -1139,92 +1067,6 @@ export class PluginManager {
 
   // ── Task 7: Route loader ─────────────────────────────────────────────────
 
-  async _loadRoutes(entry) {
-    const routesDir = path.join(entry.pluginDir, "routes");
-    if (!fs.existsSync(routesDir)) return;
-    const { Hono } = await import("hono");
-    const app = new Hono();
-    const ctx = entry.ctx;
-
-    // Error isolation: Hono's onError is the correct hook for handler throws
-    app.onError((err, c) => {
-      if (isPluginBusCapabilityError(err)) {
-        ctx.log.warn(`route bus capability denied: ${err.message}`);
-        return c.json({
-          error: (err as any).code,
-          detail: err.message,
-          capability: (err as any).capability,
-          permission: (err as any).permission,
-          pluginId: (err as any).pluginId,
-          declared: (err as any).declared,
-          granted: (err as any).granted,
-        }, 403);
-      }
-      ctx.log.error("route error:", err.message);
-      return c.json({ error: "Plugin internal error", plugin: entry.id }, 500);
-    });
-
-    // Middleware: inject ctx + agentId + request-level context.
-    // 代理层通过 Hono env 的 `pluginRouteRequest` 传入本次请求的 principal 与
-    // agentId；这里铸造为请求级变量 `pluginRequestContext`（principal +
-    // manifest/grant 校验的 bus），状态只挂在请求上，不落到 ctx / 全局。
-    const injectRequestContext = (c: any) => {
-      c.set("pluginCtx", ctx);
-      const request = c.env?.pluginRouteRequest || null;
-      const agentId = (typeof request?.agentId === "string" && request.agentId)
-        ? request.agentId
-        : null;
-      c.set("agentId", agentId);
-      c.set("pluginRequestContext", createPluginRouteRequestContext({
-        pluginCtx: ctx,
-        accessLevel: entry.accessLevel,
-        capabilities: entry.capabilities,
-        sensitiveCapabilities: entry.sensitiveCapabilities,
-        principal: request?.principal || null,
-        agentId,
-      }));
-    };
-    app.use("*", async (c, next) => {
-      injectRequestContext(c);
-      await next();
-    });
-
-    const files = fs.readdirSync(routesDir).filter(isPluginSourceFile);
-    for (const file of files) {
-      const filePath = path.join(routesDir, file);
-      try {
-        const mod = await freshImport(filePath);
-        if (typeof mod.default === "function") {
-          const sub = mod.default;
-          if (sub && typeof sub.fetch === "function") {
-            // Static Hono app — inject the same request-context middleware onto sub-app too
-            sub.use("*", async (c, next) => {
-              injectRequestContext(c);
-              await next();
-            });
-            const prefix = "/" + stripPluginSourceExt(file);
-            app.route(prefix, sub);
-          } else if (typeof sub === "function") {
-            // Factory function — pass ctx as second arg
-            sub(app, ctx);
-          }
-        }
-        if (mod.register && typeof mod.register === "function") {
-          mod.register(app, ctx);
-        }
-      } catch (err) {
-        log.error(`route "${file}" in "${entry.id}" failed to load: ${err.message}`);
-      }
-    }
-    this._routeApps.set(entry.pluginKey, {
-      pluginId: entry.id,
-      pluginKey: entry.pluginKey,
-      source: entry.source,
-      app,
-    });
-    this._refreshRouteRegistryForId(entry.id);
-  }
-
   // ── Task 8: Extension loader ─────────────────────────────────────────────
 
   /**
@@ -1260,9 +1102,7 @@ export class PluginManager {
   }
 
   _resolveConfigEntry(pluginId, options: any = {}) {
-    if (options.source || options.pluginKey) return this._resolvePluginEntry(pluginId, options);
-    return this.findPluginEntry({ id: pluginId, source: "community" })
-      || this._resolvePluginEntry(pluginId, options);
+    return this._resolvePluginEntry(pluginId, options);
   }
 
   getConfigSchema(pluginId, options: any = {}) {
@@ -1350,78 +1190,6 @@ export class PluginManager {
 
   // ── Page / Widget loader ──────────────────────────────────────────────────
 
-  _loadPage(entry) {
-    const page = entry.manifest?.contributes?.page;
-    if (!page) return;
-    if (entry.accessLevel !== 'full-access') {
-      entry.ctx?.log?.warn('page contribution requires full-access, skipping');
-      return;
-    }
-    const routesDir = path.join(entry.pluginDir, 'routes');
-    if (!fs.existsSync(routesDir)) {
-      entry.ctx?.log?.warn(`page declares route "${page.route}" but routes/ directory not found`);
-      return;
-    }
-    this._pages.push({
-      pluginId: entry.id,
-      pluginKey: entry.pluginKey,
-      source: entry.source,
-      title: page.title || entry.id,
-      icon: page.icon || null,
-      route: page.route,
-      hostCapabilities: [...(entry.uiHostCapabilities || [])],
-    });
-  }
-
-  _loadWidget(entry) {
-    const widget = entry.manifest?.contributes?.widget;
-    if (!widget) return;
-    if (entry.accessLevel !== 'full-access') {
-      entry.ctx?.log?.warn('widget contribution requires full-access, skipping');
-      return;
-    }
-    const routesDir = path.join(entry.pluginDir, 'routes');
-    if (!fs.existsSync(routesDir)) {
-      entry.ctx?.log?.warn(`widget declares route "${widget.route}" but routes/ directory not found`);
-      return;
-    }
-    this._widgets.push({
-      pluginId: entry.id,
-      pluginKey: entry.pluginKey,
-      source: entry.source,
-      title: widget.title || entry.id,
-      icon: widget.icon || null,
-      route: widget.route,
-      hostCapabilities: [...(entry.uiHostCapabilities || [])],
-    });
-  }
-
-  _loadSettingsTab(entry) {
-    const settingsTab = entry.manifest?.contributes?.settingsTab;
-    if (!settingsTab) return;
-    if (entry.source !== "builtin") {
-      entry.ctx?.log?.warn('settingsTab contribution is only available to bundled built-in plugins, skipping');
-      return;
-    }
-    if (entry.accessLevel !== 'full-access') {
-      entry.ctx?.log?.warn('settingsTab contribution requires full-access, skipping');
-      return;
-    }
-    if (typeof settingsTab.nativeComponent !== "string" || !settingsTab.nativeComponent) {
-      entry.ctx?.log?.warn('settingsTab contribution requires nativeComponent, skipping');
-      return;
-    }
-    this._settingsTabs.push({
-      pluginId: entry.id,
-      pluginKey: entry.pluginKey,
-      source: entry.source,
-      id: settingsTab.id || entry.id,
-      title: settingsTab.title || entry.name || entry.id,
-      icon: settingsTab.icon || null,
-      nativeComponent: settingsTab.nativeComponent,
-    });
-  }
-
   // ── Task 10: Agent templates + Provider loader ───────────────────────────
 
   async _loadAgentTemplates(entry) {
@@ -1443,7 +1211,6 @@ export class PluginManager {
   }
 
   getAgentTemplates( options: any = {}) {
-    this.reconcileMissingPluginDirectories();
     const includeShadowed = options.includeShadowed === true;
     return this._agentTemplates.filter((template) => (
       includeShadowed || this._isPluginKeyRuntimeActive(template._pluginKey)
@@ -1467,7 +1234,6 @@ export class PluginManager {
   }
 
   getProviderPlugins( options: any = {}) {
-    this.reconcileMissingPluginDirectories();
     const includeShadowed = options.includeShadowed === true;
     return this._providerPlugins.filter((provider) => (
       includeShadowed || this._isPluginKeyRuntimeActive(provider._pluginKey)
@@ -1488,206 +1254,7 @@ export class PluginManager {
     return this._readPluginDescriptor(pluginDir, dirName);
   }
 
-  _isFullAccessAllowed(entryOrDesc, options: any = {}) {
-    if (entryOrDesc.source === "builtin") return true;
-    if (entryOrDesc.source === "dev") return options.allowFullAccess === true;
-    return this._preferencesManager?.getAllowFullAccessPlugins() || false;
-  }
-
   // ── Hot operations ───────────────────────────────────────────────────────
-
-  async installPlugin(pluginDir, options: any = {}) {
-    return this._enqueue(async () => {
-      const dirName = path.basename(pluginDir);
-      const source = normalizePluginSource(options.source);
-      const desc = this._readPluginDescriptor(pluginDir, dirName);
-      desc.source = source;
-      desc.pluginKey = createPluginKey(source, desc.id);
-      // Check for existing (upgrade scenario)
-      const existing = this.findPluginEntry({ id: options.pluginId || desc.id, source })
-        || [...this._plugins.values()].find(
-          p => p.source === source && path.basename(p.pluginDir) === dirName
-        );
-      if (existing) {
-        await this.unloadPlugin(existing.id, { pluginKey: existing.pluginKey });
-        this._plugins.delete(existing.pluginKey);
-      }
-
-      const disabledList = source === "dev"
-        ? []
-        : (this._preferencesManager?.getDisabledPlugins() || []);
-
-      const entry = this._entryFromDescriptor(desc, { status: "loading", activationState: "inactive", activationReason: null, instance: null, _disposables: [] });
-      this._setPluginEntry(entry);
-
-      if (disabledList.includes(desc.id)) {
-        entry.status = "disabled";
-        this._refreshRouteRegistryForId(entry.id);
-        return entry;
-      }
-
-      if (desc.formatIssue) {
-        entry.status = "incompatible";
-        entry.error = desc.formatIssue.message;
-        this._bus?.emit({ type: "plugin_ui_changed" });
-        this._refreshRouteRegistryForId(entry.id);
-        return entry;
-      }
-
-      if (desc.trust === "full-access" && !this._isFullAccessAllowed(entry, options)) {
-        entry.status = "restricted";
-        this._refreshRouteRegistryForId(entry.id);
-        return entry;
-      }
-
-      const minVer = desc.manifest?.minAppVersion;
-      if (minVer && !semverGte(this._appVersion, minVer)) {
-        entry.status = "incompatible";
-        entry.error = `requires app v${minVer}+, current v${this._appVersion}`;
-        this._bus?.emit({ type: "plugin_ui_changed" });
-        this._refreshRouteRegistryForId(entry.id);
-        return entry;
-      }
-
-      try {
-        await this._loadPluginWithBoundary(entry);
-        entry.status = "loaded";
-        entry.error = null;
-      } catch (err) {
-        entry.status = "failed";
-        entry.error = err.message;
-      }
-      this._refreshRouteRegistryForId(entry.id);
-      this._bus?.emit({ type: "plugin_ui_changed" });
-      return entry;
-    });
-  }
-
-  async removePlugin(pluginId, options: any = {}) {
-    return this._enqueue(async () => {
-      const entry = this._resolvePluginEntry(pluginId, options);
-      if (!entry) throw new Error(`Plugin "${pluginId}" not found`);
-      if (entry.source === "builtin") throw new Error(`Builtin plugin "${pluginId}" cannot be removed`);
-      if (entry.status === "loaded" || entry.status === "failed") {
-        await this.unloadPlugin(entry.id, { pluginKey: entry.pluginKey });
-      }
-      this._plugins.delete(entry.pluginKey);
-      this._advancePluginToolGeneration(entry.id);
-      if (entry.source === "dev" || options.persist === false) {
-        // Dev plugin removal is scoped to the dev slot and must not mutate the
-        // user's persisted disabled community plugin list.
-      } else if (this._preferencesManager) {
-        const disabled = this._preferencesManager.getDisabledPlugins();
-        this._preferencesManager.setDisabledPlugins(
-          disabled.filter(id => id !== entry.id)
-        );
-      } else {
-        log.warn("removePlugin: preferencesManager unavailable, disabled list not updated");
-      }
-      this._refreshRouteRegistryForId(entry.id);
-      this._bus?.emit({ type: "plugin_ui_changed" });
-      return entry.pluginDir;
-    });
-  }
-
-  async disablePlugin(pluginId, options: any = {}) {
-    return this._enqueue(async () => {
-      const entry = this._resolvePluginEntry(pluginId, options);
-      if (!entry) throw new Error(`Plugin "${pluginId}" not found`);
-      if (entry.source === "builtin") throw new Error(`Builtin plugin "${pluginId}" cannot be disabled`);
-      if (entry.status === "loaded") {
-        await this.unloadPlugin(entry.id, { pluginKey: entry.pluginKey });
-      }
-      entry.status = "disabled";
-      this._advancePluginToolGeneration(entry.id);
-      if (entry.source === "dev" || options.persist === false) {
-        // Dev plugin enablement is scoped to the dev slot and must not pollute
-        // the user's persisted disabled community plugin list.
-      } else if (this._preferencesManager) {
-        const disabled = this._preferencesManager.getDisabledPlugins();
-        if (!disabled.includes(entry.id)) {
-          this._preferencesManager.setDisabledPlugins([...disabled, entry.id]);
-        }
-      } else {
-        log.warn("disablePlugin: preferencesManager unavailable, preference not persisted");
-      }
-      this._refreshRouteRegistryForId(entry.id);
-      this._bus?.emit({ type: "plugin_ui_changed" });
-    });
-  }
-
-  async enablePlugin(pluginId, options: any = {}) {
-    return this._enqueue(async () => {
-      const entry = this._resolvePluginEntry(pluginId, options);
-      if (!entry) throw new Error(`Plugin "${pluginId}" not found`);
-      // builtin 插件始终 loaded，跳过偏好写入
-      if (entry.source === "builtin") return;
-      if (entry.source === "dev" || options.persist === false) {
-        // Dev plugin enablement is scoped to the dev slot and must not pollute
-        // the user's persisted disabled community plugin list.
-      } else if (this._preferencesManager) {
-        const disabled = this._preferencesManager.getDisabledPlugins();
-        this._preferencesManager.setDisabledPlugins(
-          disabled.filter(id => id !== entry.id)
-        );
-      } else {
-        log.warn("enablePlugin: preferencesManager unavailable, preference not persisted");
-      }
-      if (entry.trust === "full-access" && !this._isFullAccessAllowed(entry, options)) {
-        entry.status = "restricted";
-        this._bus?.emit({ type: "plugin_ui_changed" });
-        return entry;
-      }
-      // Guard: unload before re-loading to prevent duplicate tool/command/route registration
-      const wasReload = entry.status === "loaded";
-      if (wasReload) {
-        await this.unloadPlugin(entry.id, { pluginKey: entry.pluginKey });
-      }
-      try {
-        await this._loadPluginWithBoundary(entry);
-        entry.status = "loaded";
-        entry.error = null;
-      } catch (err) {
-        entry.status = "failed";
-        entry.error = err.message;
-      }
-      this._refreshRouteRegistryForId(entry.id);
-      this._bus?.emit({ type: "plugin_ui_changed" });
-      return entry;
-    });
-  }
-
-  async setFullAccess(allow) {
-    return this._enqueue(async () => {
-      if (this._preferencesManager) {
-        this._preferencesManager.setAllowFullAccessPlugins(allow);
-      } else {
-        log.warn("setFullAccess: preferencesManager unavailable, preference not persisted");
-      }
-      for (const entry of this._plugins.values()) {
-        if (entry.source !== "community" || entry.trust !== "full-access") continue;
-        const disabledList = this._preferencesManager?.getDisabledPlugins() || [];
-        if (disabledList.includes(entry.id)) continue;
-
-        if (allow && entry.status === "restricted") {
-          try {
-            await this._loadPluginWithBoundary(entry);
-            entry.status = "loaded";
-            entry.error = null;
-          } catch (err) {
-            entry.status = "failed";
-            entry.error = err.message;
-          }
-          this._refreshRouteRegistryForId(entry.id);
-        } else if (!allow && entry.status === "loaded") {
-          await this.unloadPlugin(entry.id, { pluginKey: entry.pluginKey });
-          entry.status = "restricted";
-          this._refreshRouteRegistryForId(entry.id);
-        }
-      }
-      this._bus?.emit({ type: "plugin_ui_changed" });
-    });
-  }
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
 
@@ -1726,17 +1293,6 @@ export class PluginManager {
   }
 
   // ── Public getters (route 层通过这些方法访问，不穿透私有字段) ──
-
-  /** 用户（社区）插件目录 */
-  getUserPluginsDir() {
-    return this._pluginsDirs[this._pluginsDirs.length - 1] || null;
-  }
-
-  /** 是否允许 full-access 社区插件 */
-  getAllowFullAccess() {
-    return this._preferencesManager?.getAllowFullAccessPlugins() || false;
-  }
-
   /** 检测目录是否为合法插件 */
   isValidPluginDir(dirPath) {
     const validMarkers = [
@@ -1751,36 +1307,30 @@ export class PluginManager {
 
   /** 获取指定插件的路由 app */
   getRouteApp(pluginId) {
-    this.reconcileMissingPluginDirectories();
     this._refreshRouteRegistryForId(pluginId);
     return this.routeRegistry.get(pluginId) || null;
   }
 
   /** 获取所有活跃插件的 extension 工厂函数（供 Engine 注入 Pi SDK） */
   getExtensionFactories() {
-    this.reconcileMissingPluginDirectories();
     return this._extensionFactories
       .filter(e => this._isPluginKeyRuntimeActive(e.pluginKey))
       .map(e => e.factory);
   }
 
   getPages( options: any = {}) {
-    this.reconcileMissingPluginDirectories();
     const includeShadowed = options.includeShadowed === true;
     return this._pages.filter((page) => includeShadowed || this._isPluginKeyRuntimeActive(page.pluginKey));
   }
   getWidgets( options: any = {}) {
-    this.reconcileMissingPluginDirectories();
     const includeShadowed = options.includeShadowed === true;
     return this._widgets.filter((widget) => includeShadowed || this._isPluginKeyRuntimeActive(widget.pluginKey));
   }
   getSettingsTabs( options: any = {}) {
-    this.reconcileMissingPluginDirectories();
     const includeShadowed = options.includeShadowed === true;
     return this._settingsTabs.filter((tab) => includeShadowed || this._isPluginKeyRuntimeActive(tab.pluginKey));
   }
   getDiagnostics() {
-    this.reconcileMissingPluginDirectories();
     this._annotateShadowing();
     return [...this._plugins.values()].map((entry) => {
       const pluginId = entry.id;
@@ -1843,12 +1393,10 @@ export class PluginManager {
   }
 
   getPlugin(id, options: any = {}) {
-    this.reconcileMissingPluginDirectories();
     this._annotateShadowing();
     return this._resolvePluginEntry(id, options) || null;
   }
   listPlugins( options: any = {}) {
-    this.reconcileMissingPluginDirectories();
     this._annotateShadowing();
     let entries = [...this._plugins.values()];
     if (options.source) {

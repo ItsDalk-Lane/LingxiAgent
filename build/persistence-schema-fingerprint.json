@@ -35,17 +35,6 @@
     },
     {
       "expiresOn": "2026-10-31",
-      "id": "conditional-plugin-install-cleanup",
-      "kinds": [
-        "remove-path"
-      ],
-      "linePattern": "cleanupPath",
-      "ownerModule": "server/routes/plugins.ts",
-      "reason": "One bounded cleanup list contains both LINGXI_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
-      "sourceFile": "server/routes/plugins.ts"
-    },
-    {
-      "expiresOn": "2026-10-31",
       "id": "conditional-upload-target",
       "kinds": [
         "mkdir",
@@ -660,7 +649,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:a94e3096d9401b9a7f6bb47b85b368c305b7950608ec0537c5add296151496c9",
+  "payloadFingerprint": "sha256:3c927e7797e03fb96f83186608316ffe31a86417cab5f9321a986cfc89440277",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -774,7 +763,6 @@
         "agents/{agentId}/memory/editable-facts-state.json",
         "agents/{agentId}/memory/today-state.json",
         "agents/{agentId}/memory/daily-state.json",
-        "agents/{agentId}/memory/pinned-memory.json",
         "agents/{agentId}/memory/summaries/{sessionId}.json",
         "agents/{agentId}/memory/daily/{date}.md",
         "agents/{agentId}/memory/dream/state.json",
@@ -792,7 +780,7 @@
         "source": "lib/memory/compiled-memory-state.ts"
       },
       "schemaSource": {
-        "contract": "compiled memory, rolling-summary, pinned-memory, and daily-state runtime readers",
+        "contract": "compiled memory, rolling-summary, tenets, and daily-state runtime readers",
         "kind": "directory-contract",
         "module": "lib/memory/compiled-memory-state.ts"
       }
@@ -864,7 +852,6 @@
         "agents/{agentId}/AGENTS.public.md",
         "agents/{agentId}/appearance-summary.json",
         "agents/{agentId}/avatars/{fileName}",
-        "agents/{agentId}/pinned.md",
         "agents/{agentId}/channels.md",
         "user/avatars/{fileName}"
       ],
@@ -1375,12 +1362,11 @@
       "firstPossibleWritePhase": "runtime_ready",
       "format": "json",
       "id": "desktop-update-channel",
-      "identityContract": "One record per desktop installation data home; the device identifier never leaves the machine and is only ever sent as a hash.",
+      "identityContract": "One record per desktop installation data home; the record only selects which update feed this installation follows.",
       "migrationEntry": [],
       "openEntry": [
         "desktop update feed resolution",
-        "invite channel status",
-        "invite code redemption"
+        "activated channel feed selection"
       ],
       "ownerModule": "desktop/auto-updater.cjs",
       "pathExclusions": [],
@@ -1398,7 +1384,7 @@
         "source": "desktop/auto-updater.cjs"
       },
       "schemaSource": {
-        "contract": "update channel record version, device identifier, activation flag, update feed address, activation time, and held invite codes",
+        "contract": "update channel record version, activation flag, update feed address, and activation time (legacy records may still carry a device identifier and held invite codes, which are ignored)",
         "kind": "runtime-contract",
         "module": "desktop/auto-updater.cjs"
       }
@@ -1602,47 +1588,6 @@
         "contract": "FileHistoryStore runtime DDL and meta.schema_version",
         "kind": "sqlite-runtime",
         "module": "lib/file-history/history-store.ts"
-      }
-    },
-    {
-      "affectedByEpochMigration": true,
-      "bootstrapSafety": null,
-      "checkpointPolicy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
-      "epochPolicy": "epoch-managed",
-      "exemption": null,
-      "firstPossibleOpenPhase": "engine_construct",
-      "firstPossibleWritePhase": "runtime_ready",
-      "format": "mixed-directory",
-      "id": "installed-plugins",
-      "identityContract": "pluginId from manifest is identity; versions and directories are locators/generations.",
-      "migrationEntry": [
-        "plugin installation compatibility checks"
-      ],
-      "openEntry": [
-        "PluginManager.loadPlugins"
-      ],
-      "ownerModule": "core/plugin-manager.ts",
-      "pathExclusions": [],
-      "pathKind": "tree",
-      "pathPattern": "plugins/{pluginId}",
-      "pathPatterns": [
-        "plugins/{pluginId}",
-        "plugin-installs.json",
-        "plugin-backups/{pluginId}",
-        "plugin-marketplace/marketplace.json"
-      ],
-      "preCoordinatorReadProjection": null,
-      "protocolModules": [],
-      "restorePolicy": "Restore only through the owning module after reader compatibility is established.",
-      "schemaContract": {
-        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
-        "kind": "protocol",
-        "source": "core/plugin-manager.ts"
-      },
-      "schemaSource": {
-        "contract": "installed manifest, install receipt, backup, and source-package directory protocols",
-        "kind": "directory-contract",
-        "module": "core/plugin-manager.ts"
       }
     },
     {
@@ -2184,80 +2129,6 @@
     {
       "affectedByEpochMigration": true,
       "bootstrapSafety": null,
-      "checkpointPolicy": "Include user-authored sources; run receipts may be regenerated only when their source still exists.",
-      "epochPolicy": "compatible",
-      "exemption": null,
-      "firstPossibleOpenPhase": "engine_construct",
-      "firstPossibleWritePhase": "runtime_ready",
-      "format": "mixed-directory",
-      "id": "plugin-development-state",
-      "identityContract": "pluginId/sourceId/runId are explicit keys; temporary paths are not identities.",
-      "migrationEntry": [],
-      "openEntry": [
-        "PluginDevService"
-      ],
-      "ownerModule": "core/plugin-dev-service.ts",
-      "pathExclusions": [],
-      "pathKind": "tree",
-      "pathPattern": "plugins-dev/{pluginId}",
-      "pathPatterns": [
-        "plugins-dev/{pluginId}",
-        "plugin-dev-runs/{runId}.json",
-        "plugin-dev-sources/{sourceId}"
-      ],
-      "preCoordinatorReadProjection": null,
-      "protocolModules": [],
-      "restorePolicy": "Restore only through the owning module after reader compatibility is established.",
-      "schemaContract": {
-        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
-        "kind": "protocol",
-        "source": "core/plugin-dev-service.ts"
-      },
-      "schemaSource": {
-        "contract": "dev plugin source promotion and run receipt protocol",
-        "kind": "directory-contract",
-        "module": "core/plugin-dev-service.ts"
-      }
-    },
-    {
-      "affectedByEpochMigration": false,
-      "bootstrapSafety": null,
-      "checkpointPolicy": "Excluded; packages can be downloaded again and must pass sha256 verification.",
-      "epochPolicy": "regenerable",
-      "exemption": null,
-      "firstPossibleOpenPhase": "runtime_ready",
-      "firstPossibleWritePhase": "runtime_ready",
-      "format": "binary-cache",
-      "id": "plugin-download-cache",
-      "identityContract": "pluginId/version identify the source generation; ZIP path is a verified cache locator.",
-      "migrationEntry": [],
-      "openEntry": [
-        "downloadMarketplacePluginRelease"
-      ],
-      "ownerModule": "server/routes/plugins.ts",
-      "pathExclusions": [],
-      "pathKind": "tree",
-      "pathPattern": "plugin-install-sources/{pluginId}/{version}",
-      "pathPatterns": [
-        "plugin-install-sources/{pluginId}/{version}"
-      ],
-      "preCoordinatorReadProjection": null,
-      "protocolModules": [],
-      "restorePolicy": "Re-verify sha256 before reuse, otherwise delete and redownload.",
-      "schemaContract": {
-        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
-        "kind": "protocol",
-        "source": "server/routes/plugins.ts"
-      },
-      "schemaSource": {
-        "contract": "verified plugin release ZIP naming by pluginId/version and expected sha256",
-        "kind": "directory-contract",
-        "module": "server/routes/plugins.ts"
-      }
-    },
-    {
-      "affectedByEpochMigration": true,
-      "bootstrapSafety": null,
       "checkpointPolicy": "Checkpoint by pluginId and declared migrationVersion; never infer one schema for plugin-data/**.",
       "epochPolicy": "epoch-managed",
       "exemption": {
@@ -2518,10 +2389,7 @@
       "pathKind": "file",
       "pathPattern": "security/resource-ticket-key",
       "pathPatterns": [
-        "security/resource-ticket-key",
-        "security/plugin-asset-session-key",
-        "security/plugin-iframe-ticket-key",
-        "security/plugin-surface-session-key"
+        "security/resource-ticket-key"
       ],
       "preCoordinatorReadProjection": null,
       "protocolModules": [],
@@ -2532,7 +2400,7 @@
         "source": "core/resource-ticket-service.ts"
       },
       "schemaSource": {
-        "contract": "independent 0600 random key-file protocols for resource and plugin ticket services",
+        "contract": "independent 0600 random key-file protocol for the resource ticket service",
         "kind": "directory-contract",
         "module": "core/resource-ticket-service.ts"
       }
@@ -3292,8 +3160,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "合并 PR #43（tool-contract 路径不变量）与环境信息卡线：无持久化 schema/restore 契约变化",
-    "payloadFingerprint": "sha256:a94e3096d9401b9a7f6bb47b85b368c305b7950608ec0537c5add296151496c9"
+    "compatibilityReason": "session-coordinator think-strip helper 新增 mm:think 方言正则（MiniMax M3 思考标签清理）；纯文本清理路径，无存储 schema 变化",
+    "payloadFingerprint": "sha256:3c927e7797e03fb96f83186608316ffe31a86417cab5f9321a986cfc89440277"
   },
   "schemas": [
     {
@@ -3370,7 +3238,7 @@
       "storeId": "agent-facts-sqlite"
     },
     {
-      "contract": "compiled memory, rolling-summary, pinned-memory, and daily-state runtime readers",
+      "contract": "compiled memory, rolling-summary, tenets, and daily-state runtime readers",
       "kind": "directory-contract",
       "module": "lib/memory/compiled-memory-state.ts",
       "sourceHash": "sha256:f1084e2ec07a0865194a43888ae5d9a6934ed05e0cd0d6afb86d1b1522a64d69",
@@ -3387,7 +3255,7 @@
       "contract": "agent config and authored Markdown/image profile protocol",
       "kind": "directory-contract",
       "module": "core/agent-manager.ts",
-      "sourceHash": "sha256:38c274221c81654f80b8740886fca8fd8f45a4741c63e852abf404e5a7dfd4be",
+      "sourceHash": "sha256:9a393716a0a062e5b9cfb1e0853b377421d178aebfaa8f566de3ab43168335f8",
       "storeId": "agent-profile"
     },
     {
@@ -3467,7 +3335,7 @@
       "contract": "bounded base64 cover upload temporary-directory lifecycle",
       "kind": "directory-contract",
       "module": "server/routes/desk.ts",
-      "sourceHash": "sha256:a7c7e339079be179fd4c1c806c4a19fc4ab687eeff956f2117ed101fcd2bf9a0",
+      "sourceHash": "sha256:baed23fa61b9e36c5c6894c0d3db8b95ddf706f58d1fbc4d33b5d60008fa1998",
       "storeId": "desk-cover-upload-staging"
     },
     {
@@ -3485,10 +3353,10 @@
       "storeId": "desktop-gpu-startup-state"
     },
     {
-      "contract": "update channel record version, device identifier, activation flag, update feed address, activation time, and held invite codes",
+      "contract": "update channel record version, activation flag, update feed address, and activation time (legacy records may still carry a device identifier and held invite codes, which are ignored)",
       "kind": "runtime-contract",
       "module": "desktop/auto-updater.cjs",
-      "sourceHash": "sha256:9e965966c1f425b294b29def6b1609a00953d873b3ce5018db82605a463be162",
+      "sourceHash": "sha256:3dd07009a5283abf6393855e0abb9563c8d1c34585d96a956298173471da4ac2",
       "storeId": "desktop-update-channel"
     },
     {
@@ -3502,7 +3370,7 @@
       "contract": "desktop window bounds, release announcement bookmark, and update cache version marker readers",
       "kind": "directory-contract",
       "module": "desktop/main.cjs",
-      "sourceHash": "sha256:0ee2eeca269ef41c4ea85a86e464bb6034320b7399b29143e9f1281f4aeeed90",
+      "sourceHash": "sha256:28a051ecc13562c3065b1287b88959736e67c79077288cd7dc7aab023696e049",
       "storeId": "desktop-window-version-state"
     },
     {
@@ -3560,13 +3428,6 @@
       },
       "sourceHash": "sha256:d06b4e7e0f6f4bc7040bad4d517fe77c220a1f680a5f51d42086bae66622683d",
       "storeId": "file-history-sqlite"
-    },
-    {
-      "contract": "installed manifest, install receipt, backup, and source-package directory protocols",
-      "kind": "directory-contract",
-      "module": "core/plugin-manager.ts",
-      "sourceHash": "sha256:54df6ad0719346d8976878e65314d2d4b241f6d1ae4c390f31c6edc1307c65b3",
-      "storeId": "installed-plugins"
     },
     {
       "contract": "KnowledgeStore runtime DDL, transactional migration, and store-local PRAGMA user_version",
@@ -3939,21 +3800,21 @@
       "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:70022f67ff778b6c6a7da2bb6770f8fb41110f36d5ef36f99b6ce1004d7ae767",
+      "sourceHash": "sha256:7c4b9c8a398f95806bfa57c6bfb400e8d4b0fda441a8e3dc24761d122e656ecb",
       "storeId": "knowledge-parse-artifacts"
     },
     {
       "contract": "ProcessingArtifact output files (binary office formats converted to structured text) referenced by knowledge.db processing_artifacts rows, with locatorMap held in the database",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:70022f67ff778b6c6a7da2bb6770f8fb41110f36d5ef36f99b6ce1004d7ae767",
+      "sourceHash": "sha256:7c4b9c8a398f95806bfa57c6bfb400e8d4b0fda441a8e3dc24761d122e656ecb",
       "storeId": "knowledge-processing-artifacts"
     },
     {
       "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
       "kind": "directory-contract",
       "module": "lib/knowledge/knowledge-manager.ts",
-      "sourceHash": "sha256:70022f67ff778b6c6a7da2bb6770f8fb41110f36d5ef36f99b6ce1004d7ae767",
+      "sourceHash": "sha256:7c4b9c8a398f95806bfa57c6bfb400e8d4b0fda441a8e3dc24761d122e656ecb",
       "storeId": "knowledge-source-snapshots"
     },
     {
@@ -4205,20 +4066,6 @@
       "storeId": "operational-checkpoints"
     },
     {
-      "contract": "dev plugin source promotion and run receipt protocol",
-      "kind": "directory-contract",
-      "module": "core/plugin-dev-service.ts",
-      "sourceHash": "sha256:98206d0064a5b5f64183df7b51d739a781baf58868817573a23cdafbdac5335f",
-      "storeId": "plugin-development-state"
-    },
-    {
-      "contract": "verified plugin release ZIP naming by pluginId/version and expected sha256",
-      "kind": "directory-contract",
-      "module": "server/routes/plugins.ts",
-      "sourceHash": "sha256:cb4d2b3b01f3a52ff567a5d7d79c867dbd434a16c59d952cb968642c333fe84f",
-      "storeId": "plugin-download-cache"
-    },
-    {
       "expiresOn": "2026-12-31",
       "kind": "narrow-exemption",
       "reason": "Each plugin owns its manifest-declared data contract; third-party data requires per-plugin migrationVersion registration before epoch migration.",
@@ -4260,7 +4107,7 @@
       "storeId": "security-grants"
     },
     {
-      "contract": "independent 0600 random key-file protocols for resource and plugin ticket services",
+      "contract": "independent 0600 random key-file protocol for the resource ticket service",
       "kind": "directory-contract",
       "module": "core/resource-ticket-service.ts",
       "sourceHash": "sha256:2b95ca4ab9977dd2de1c79ab61de84635ebe8c404a50f7623308e73cd45508ef",
@@ -4284,7 +4131,7 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:3d1aa600ffab19a5c950eb0da154035d32a38987af9d10d1348879fd81ce1c5b",
+      "sourceHash": "sha256:929e4189e0bd82df0f95f262730b9943d2d98e87a45aebecedb8a4edd8487c86",
       "storeId": "server-runtime-info"
     },
     {
@@ -4306,7 +4153,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:904d37c656bb48b2a372a3984dfd5fd67c47fd568e0929fe0b8aa4dec8b65781"
+          "sourceHash": "sha256:1775237db94d35ae6313085a8174a672b43a62c0f1c895b8246df00bd09a45d9"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",
@@ -4460,7 +4307,7 @@
       "contract": "PreferencesManager defaults, coercion, and _dataVersion migration driver",
       "kind": "runtime-contract",
       "module": "core/preferences-manager.ts",
-      "sourceHash": "sha256:39e890768ba7df9fa210a987675ec6d55b072915007e4c9a1043954da4cb4723",
+      "sourceHash": "sha256:ea13b6eb412b10c06506478e2e5c2d414e5f08bca8d26c160fa9ff1e63c29127",
       "storeId": "user-preferences"
     },
     {
@@ -4930,14 +4777,6 @@
       "exemptionId": null,
       "kind": "mkdir",
       "ordinal": 0,
-      "reason": "Creates the plugin development source root.",
-      "sourceFile": "core/engine.ts",
-      "storeId": "plugin-development-state"
-    },
-    {
-      "exemptionId": null,
-      "kind": "mkdir",
-      "ordinal": 0,
       "reason": "Creates the user skill root.",
       "sourceFile": "core/engine.ts",
       "storeId": "skill-state"
@@ -5347,6 +5186,14 @@
       "kind": "mkdir",
       "ordinal": 0,
       "reason": "Writes data within the active pluginId-scoped data directory.",
+      "sourceFile": "core/media-adapters/speech.ts",
+      "storeId": "plugin-runtime-data"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Writes data within the active pluginId-scoped data directory.",
       "sourceFile": "core/media/download.ts",
       "storeId": "plugin-runtime-data"
     },
@@ -5440,19 +5287,11 @@
     },
     {
       "exemptionId": null,
-      "kind": "atomic-write",
+      "kind": "rename",
       "ordinal": 0,
-      "reason": "Creates one service-specific signing key with mode 0600.",
-      "sourceFile": "core/plugin-asset-session-service.ts",
-      "storeId": "security-key-material"
-    },
-    {
-      "exemptionId": null,
-      "kind": "mkdir",
-      "ordinal": 0,
-      "reason": "Creates one service-specific signing key with mode 0600.",
-      "sourceFile": "core/plugin-asset-session-service.ts",
-      "storeId": "security-key-material"
+      "reason": "Merges legacy pinned items into tenets.json and renames the legacy files.",
+      "sourceFile": "core/pinned-tenets-migration.ts",
+      "storeId": "agent-memory"
     },
     {
       "exemptionId": null,
@@ -5469,102 +5308,6 @@
       "reason": "Writes the plugin configuration file for the active pluginId.",
       "sourceFile": "core/plugin-config.ts",
       "storeId": "plugin-runtime-data"
-    },
-    {
-      "exemptionId": null,
-      "kind": "atomic-write",
-      "ordinal": 0,
-      "reason": "Writes plugin development source or run state.",
-      "sourceFile": "core/plugin-dev-service.ts",
-      "storeId": "plugin-development-state"
-    },
-    {
-      "exemptionId": null,
-      "kind": "copy-file",
-      "ordinal": 0,
-      "reason": "Writes plugin development source or run state.",
-      "sourceFile": "core/plugin-dev-service.ts",
-      "storeId": "plugin-development-state"
-    },
-    {
-      "exemptionId": null,
-      "kind": "mkdir",
-      "ordinal": 0,
-      "reason": "Writes plugin development source or run state.",
-      "sourceFile": "core/plugin-dev-service.ts",
-      "storeId": "plugin-development-state"
-    },
-    {
-      "exemptionId": null,
-      "kind": "mkdir",
-      "ordinal": 0,
-      "reason": "Writes plugin development source or run state.",
-      "sourceFile": "core/plugin-dev-service.ts",
-      "storeId": "plugin-development-state"
-    },
-    {
-      "exemptionId": null,
-      "kind": "remove-path",
-      "ordinal": 0,
-      "reason": "Writes plugin development source or run state.",
-      "sourceFile": "core/plugin-dev-service.ts",
-      "storeId": "plugin-development-state"
-    },
-    {
-      "exemptionId": null,
-      "kind": "remove-path",
-      "ordinal": 0,
-      "reason": "Writes plugin development source or run state.",
-      "sourceFile": "core/plugin-dev-service.ts",
-      "storeId": "plugin-development-state"
-    },
-    {
-      "exemptionId": null,
-      "kind": "remove-path",
-      "ordinal": 0,
-      "reason": "Writes plugin development source or run state.",
-      "sourceFile": "core/plugin-dev-service.ts",
-      "storeId": "plugin-development-state"
-    },
-    {
-      "exemptionId": null,
-      "kind": "rename",
-      "ordinal": 0,
-      "reason": "Writes plugin development source or run state.",
-      "sourceFile": "core/plugin-dev-service.ts",
-      "storeId": "plugin-development-state"
-    },
-    {
-      "exemptionId": null,
-      "kind": "atomic-write",
-      "ordinal": 0,
-      "reason": "Creates one service-specific signing key with mode 0600.",
-      "sourceFile": "core/plugin-iframe-ticket-service.ts",
-      "storeId": "security-key-material"
-    },
-    {
-      "exemptionId": null,
-      "kind": "mkdir",
-      "ordinal": 0,
-      "reason": "Creates one service-specific signing key with mode 0600.",
-      "sourceFile": "core/plugin-iframe-ticket-service.ts",
-      "storeId": "security-key-material"
-    },
-    {
-      "exemptionId": null,
-      "kind": "atomic-write",
-      "ordinal": 0,
-      "reason": "Creates one service-specific signing key with mode 0600.",
-      "sourceFile": "core/plugin-surface-session-service.ts",
-      "storeId": "security-key-material"
-    },
-    {
-      "exemptionId": null,
-      "kind": "mkdir",
-      "ordinal": 0,
-      "reason": "Creates one service-specific signing key with mode 0600.",
-      "sourceFile": "core/plugin-surface-session-service.ts",
-      "storeId": "security-key-material"
     },
     {
       "exemptionId": null,
@@ -8467,30 +8210,6 @@
       "kind": "atomic-write",
       "ordinal": 0,
       "reason": "Writes a named per-agent memory or Dream revision protocol file.",
-      "sourceFile": "lib/memory/pinned-memory-store.ts",
-      "storeId": "agent-memory"
-    },
-    {
-      "exemptionId": null,
-      "kind": "atomic-write",
-      "ordinal": 0,
-      "reason": "Writes a named per-agent memory or Dream revision protocol file.",
-      "sourceFile": "lib/memory/pinned-memory-store.ts",
-      "storeId": "agent-memory"
-    },
-    {
-      "exemptionId": null,
-      "kind": "mkdir",
-      "ordinal": 0,
-      "reason": "Writes a named per-agent memory or Dream revision protocol file.",
-      "sourceFile": "lib/memory/pinned-memory-store.ts",
-      "storeId": "agent-memory"
-    },
-    {
-      "exemptionId": null,
-      "kind": "atomic-write",
-      "ordinal": 0,
-      "reason": "Writes a named per-agent memory or Dream revision protocol file.",
       "sourceFile": "lib/memory/session-summary.ts",
       "storeId": "agent-memory"
     },
@@ -8597,102 +8316,6 @@
       "reason": "Populates a Hana-owned regenerable runtime cache.",
       "sourceFile": "lib/pi-sdk/search-tools.ts",
       "storeId": "managed-runtime-caches"
-    },
-    {
-      "exemptionId": null,
-      "kind": "copy-file",
-      "ordinal": 0,
-      "reason": "Backs up or records an installed plugin package.",
-      "sourceFile": "lib/plugin-install-backups.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": null,
-      "kind": "copy-file",
-      "ordinal": 0,
-      "reason": "Backs up or records an installed plugin package.",
-      "sourceFile": "lib/plugin-install-backups.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": null,
-      "kind": "mkdir",
-      "ordinal": 0,
-      "reason": "Backs up or records an installed plugin package.",
-      "sourceFile": "lib/plugin-install-backups.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": null,
-      "kind": "mkdir",
-      "ordinal": 0,
-      "reason": "Backs up or records an installed plugin package.",
-      "sourceFile": "lib/plugin-install-backups.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": null,
-      "kind": "remove-path",
-      "ordinal": 0,
-      "reason": "Backs up or records an installed plugin package.",
-      "sourceFile": "lib/plugin-install-backups.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": null,
-      "kind": "remove-path",
-      "ordinal": 0,
-      "reason": "Backs up or records an installed plugin package.",
-      "sourceFile": "lib/plugin-install-backups.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": null,
-      "kind": "remove-path",
-      "ordinal": 0,
-      "reason": "Backs up or records an installed plugin package.",
-      "sourceFile": "lib/plugin-install-backups.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": null,
-      "kind": "rename",
-      "ordinal": 0,
-      "reason": "Backs up or records an installed plugin package.",
-      "sourceFile": "lib/plugin-install-backups.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": null,
-      "kind": "atomic-write",
-      "ordinal": 0,
-      "reason": "Backs up or records an installed plugin package.",
-      "sourceFile": "lib/plugin-install-records.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": null,
-      "kind": "atomic-write",
-      "ordinal": 0,
-      "reason": "Backs up or records an installed plugin package.",
-      "sourceFile": "lib/plugin-install-records.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": null,
-      "kind": "atomic-write",
-      "ordinal": 1,
-      "reason": "Backs up or records an installed plugin package.",
-      "sourceFile": "lib/plugin-install-records.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": null,
-      "kind": "mkdir",
-      "ordinal": 0,
-      "reason": "Backs up or records an installed plugin package.",
-      "sourceFile": "lib/plugin-install-records.ts",
-      "storeId": "installed-plugins"
     },
     {
       "exemptionId": "external-resource-io",
@@ -9853,86 +9476,6 @@
       "reason": "Writes or removes a bounded temporary cover upload.",
       "sourceFile": "server/routes/desk.ts",
       "storeId": "desk-cover-upload-staging"
-    },
-    {
-      "exemptionId": null,
-      "kind": "copy-file",
-      "ordinal": 0,
-      "reason": "Creates, promotes, rolls back, or removes an installed plugin directory.",
-      "sourceFile": "server/routes/plugins.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": null,
-      "kind": "mkdir",
-      "ordinal": 0,
-      "reason": "Caches a sha256-verified plugin release package.",
-      "sourceFile": "server/routes/plugins.ts",
-      "storeId": "plugin-download-cache"
-    },
-    {
-      "exemptionId": null,
-      "kind": "mkdir",
-      "ordinal": 0,
-      "reason": "Creates, promotes, rolls back, or removes an installed plugin directory.",
-      "sourceFile": "server/routes/plugins.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": "conditional-plugin-install-cleanup",
-      "kind": "remove-path",
-      "ordinal": 0,
-      "reason": "One bounded cleanup list contains both LINGXI_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
-      "sourceFile": "server/routes/plugins.ts",
-      "storeId": null
-    },
-    {
-      "exemptionId": null,
-      "kind": "remove-path",
-      "ordinal": 0,
-      "reason": "Creates, promotes, rolls back, or removes an installed plugin directory.",
-      "sourceFile": "server/routes/plugins.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": null,
-      "kind": "remove-path",
-      "ordinal": 0,
-      "reason": "Creates, promotes, rolls back, or removes an installed plugin directory.",
-      "sourceFile": "server/routes/plugins.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": "conditional-plugin-install-cleanup",
-      "kind": "remove-path",
-      "ordinal": 1,
-      "reason": "One bounded cleanup list contains both LINGXI_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
-      "sourceFile": "server/routes/plugins.ts",
-      "storeId": null
-    },
-    {
-      "exemptionId": null,
-      "kind": "remove-path",
-      "ordinal": 1,
-      "reason": "Creates, promotes, rolls back, or removes an installed plugin directory.",
-      "sourceFile": "server/routes/plugins.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": null,
-      "kind": "rename",
-      "ordinal": 0,
-      "reason": "Creates, promotes, rolls back, or removes an installed plugin directory.",
-      "sourceFile": "server/routes/plugins.ts",
-      "storeId": "installed-plugins"
-    },
-    {
-      "exemptionId": null,
-      "kind": "write-file",
-      "ordinal": 0,
-      "reason": "Caches a sha256-verified plugin release package.",
-      "sourceFile": "server/routes/plugins.ts",
-      "storeId": "plugin-download-cache"
     },
     {
       "exemptionId": null,

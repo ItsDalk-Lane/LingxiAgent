@@ -50,17 +50,8 @@ import { createKnowledgeReadTool } from "../lib/tools/knowledge-read-tool.ts";
 import { createKnowledgeOutlineTool } from "../lib/tools/knowledge-outline-tool.ts";
 import { createKnowledgeGrepTool } from "../lib/tools/knowledge-grep-tool.ts";
 import { createKnowledgeManageTool } from "../lib/tools/knowledge-manage-tool.ts";
-import { createKnowledgeResearchUpdateTool } from "../lib/tools/knowledge-research-update-tool.ts";
-import { createKnowledgeResearchFinishTool } from "../lib/tools/knowledge-research-finish-tool.ts";
-import { createKnowledgeDelegateTool } from "../lib/tools/knowledge-delegate-tool.ts";
-import { createKnowledgeCoverageReadTool } from "../lib/tools/knowledge-coverage-read-tool.ts";
-import { createKnowledgeCompletenessMarkTool } from "../lib/tools/knowledge-completeness-mark-tool.ts";
 import { KnowledgeError, isKnowledgeError, type KnowledgeErrorCode } from "../lib/knowledge/errors.ts";
-import { ResearchStore } from "../lib/knowledge/research/research-store.ts";
-import { EvidenceLedger } from "../lib/knowledge/research/evidence-ledger.ts";
-import { ResearchToolBudget, type KnowledgeResearchActorContext } from "../lib/knowledge/research/research-tool-budget.ts";
 import { resolveKnowledgeScopeSessionContext } from "./session-manifest/knowledge-ancestry.ts";
-import { isKnowledgeResearchSurface, getKnowledgeResearchToolNames } from "../shared/tool-categories.ts";
 import { toolError } from "../lib/tools/tool-result.ts";
 import { getToolSessionPath } from "../lib/tools/tool-session.ts";
 import { createWorkflowTool } from "../lib/tools/workflow-tool.ts";
@@ -1044,7 +1035,6 @@ export class Agent {
     return provider && id ? { provider, id } : null;
   }
   getToolsSnapshot( options: any = {}) {
-    if (isKnowledgeResearchSurface(options.surface)) return this.getResearchToolsSnapshot(options);
     const surface = options.surface === "bridge" ? "bridge" : "desktop";
     const forceMemoryEnabled = Object.prototype.hasOwnProperty.call(options, "forceMemoryEnabled")
       ? options.forceMemoryEnabled
@@ -1107,235 +1097,6 @@ export class Agent {
       this._cardGuideTool,
       this._showCardTool,
     ].filter(Boolean);
-  }
-  /** 研究工具按临时会话独立装配，不能把宿主研究身份放进普通 Agent 的共享工具对象。 */
-  private getResearchToolsSnapshot(options: any) {
-    const engine = this._cb?.getEngine?.();
-    const knowledge = engine?.knowledge;
-    const input = options.research;
-    if (!knowledge || !input?.actorContext || typeof input.sessionPath !== "string"
-      || input.studioId !== engine.runtimeContext?.studioId) {
-      throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research tools require a bound isolated session");
-    }
-    const context: KnowledgeResearchActorContext = Object.freeze({ ...input.actorContext,
-      ...(input.actorContext.allowedNeedIds ? { allowedNeedIds: [...input.actorContext.allowedNeedIds] } : {}),
-      ...(input.actorContext.allowedSourceIds ? { allowedSourceIds: [...input.actorContext.allowedSourceIds] } : {}),
-    });
-    if (context.role !== (options.surface === "knowledge_research_root" ? "root" : "worker")) {
-      throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research tool role differs from its surface");
-    }
-    const completenessWorker = options.surface === "knowledge_completeness_worker";
-    if (completenessWorker !== Boolean(context.completenessCheckId && context.completenessShardId)
-      || (!completenessWorker && (context.completenessCheckId !== undefined || context.completenessShardId !== undefined))
-      || (completenessWorker && !input.completeness)) {
-      throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Completeness tool surface requires its host check and shard");
-    }
-    const research = new ResearchStore(knowledge.store);
-    const ledger = new EvidenceLedger(research, { isCompletenessSatisfied: input.isCompletenessSatisfied });
-    const budget = new ResearchToolBudget(research);
-    // 只转交知识错误契约中的固定码，不能把工具任意字符串或底层消息写进动作记录。
-    const allowedErrorCodes = new Set<KnowledgeErrorCode>([
-      "KNOWLEDGE_INVALID_ARGUMENT", "KNOWLEDGE_NOT_FOUND", "KNOWLEDGE_CONFLICT", "KNOWLEDGE_SCHEMA_NEWER",
-      "KNOWLEDGE_STORAGE_INVALID", "KNOWLEDGE_IMPORT_PATH_INVALID", "KNOWLEDGE_IMPORT_NOT_FOUND", "KNOWLEDGE_IMPORT_SYMLINK",
-      "KNOWLEDGE_IMPORT_FILE_REQUIRED", "KNOWLEDGE_IMPORT_PATH_BLOCKED", "KNOWLEDGE_IMPORT_TOO_LARGE",
-      "KNOWLEDGE_IMPORT_TYPE_UNSUPPORTED", "KNOWLEDGE_IMPORT_PROCESSOR_UNAVAILABLE", "KNOWLEDGE_PARSE_FAILED",
-      "KNOWLEDGE_PARSE_NOT_READY", "KNOWLEDGE_SCOPE_VIOLATION", "KNOWLEDGE_SCOPE_EMPTY", "KNOWLEDGE_SCOPE_NOT_READY",
-      "KNOWLEDGE_INDEX_INVALID", "KNOWLEDGE_RETRIEVAL_EMPTY", "KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "KNOWLEDGE_MODEL_UNAVAILABLE",
-      "KNOWLEDGE_MODEL_OUTPUT_INVALID", "KNOWLEDGE_WEB_URL_BLOCKED", "KNOWLEDGE_WEB_FETCH_FAILED", "KNOWLEDGE_WEB_TOO_LARGE",
-      "KNOWLEDGE_WEB_TYPE_UNSUPPORTED",
-    ]);
-    const normalizeQuery = (query: string) => query.normalize("NFKC").replace(/\s+/gu, " ").trim().toLowerCase();
-    const sourceKey = (sourceIds: string[]) => JSON.stringify([...new Set(sourceIds)].sort());
-    if (!Array.isArray(input.searchPlan ?? [])) {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Invalid host research search plan");
-    }
-    const searchPlan: Array<{ query: string; needIds: string[]; purpose?: "counterexample" }> = (input.searchPlan ?? []).map(entry => {
-      if (!entry || typeof entry.query !== "string" || !entry.query.trim() || entry.query.length > 4000
-        || !Array.isArray(entry.needIds) || entry.needIds.length === 0
-        || (entry.purpose !== undefined && entry.purpose !== "counterexample")) {
-        throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Invalid host research search plan");
-      }
-      for (const needId of entry.needIds) research.getNeed(context.runId, needId);
-      return { query: entry.query, needIds: [...new Set<string>(entry.needIds)]
-        .filter(needId => context.allowedNeedIds === undefined || context.allowedNeedIds.includes(needId)),
-      ...(entry.purpose === "counterexample" ? { purpose: "counterexample" as const } : {}) };
-    }).filter(entry => entry.needIds.length > 0);
-    if (!Array.isArray(input.forbiddenQueries ?? []) || (input.forbiddenQueries ?? []).some(query => typeof query !== "string")) {
-      throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Invalid host research forbidden queries");
-    }
-    const forbiddenQueries = new Set<string>((input.forbiddenQueries ?? []).map(normalizeQuery));
-    const resolveContext = (ctx: unknown): KnowledgeResearchActorContext => {
-      const sessionPath = getToolSessionPath(ctx);
-      const sessionId = sessionPath ? engine.getSessionIdForPath?.(sessionPath) : null;
-      const manifest = sessionId ? engine.getSessionManifest?.(sessionId) : null;
-      const recorded = manifest?.provenance?.researchContext;
-      const sameIds = (left: string[] | undefined, right: string[] | undefined) => JSON.stringify([...(left ?? [])].sort()) === JSON.stringify([...(right ?? [])].sort());
-      if (!sessionPath || path.resolve(sessionPath) !== path.resolve(input.sessionPath)
-        || sessionId !== context.actorSessionId || manifest?.lifecycle !== "active"
-        || manifest.ownerAgentId !== context.actorAgentId
-        || recorded?.runId !== context.runId || recorded?.scopeId !== context.scopeId || recorded?.role !== context.role
-        || recorded.completenessCheckId !== context.completenessCheckId
-        || recorded.completenessShardId !== context.completenessShardId
-        || !sameIds(recorded.allowedNeedIds, context.allowedNeedIds) || !sameIds(recorded.allowedSourceIds, context.allowedSourceIds)) {
-        throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research tool session identity changed");
-      }
-      const owner = resolveKnowledgeScopeSessionContext({ sessionPath, studioId: input.studioId,
-        getSessionIdForPath: currentPath => engine.getSessionIdForPath?.(currentPath) ?? null,
-        getSessionManifest: currentId => engine.getSessionManifest?.(currentId) ?? null,
-      });
-      const run = research.requireRun(context.runId);
-      if (!["planning", "running", "synthesizing"].includes(run.status)
-        || run.turnScopeId !== context.scopeId || !owner.scopeOwnerSessionPath
-        || path.resolve(owner.scopeOwnerSessionPath) !== path.resolve(run.parentSessionPath)) {
-        throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research run does not belong to this session ancestry");
-      }
-      return context;
-    };
-    // 装配阶段就拒绝错误归属，不能等模型已经运行后才在首次工具调用时发现。
-    resolveContext({ sessionManager: { getSessionFile: () => input.sessionPath } });
-    if (completenessWorker) {
-      const deps = { research, ledger, budget, resolveContext, completeness: input.completeness, onProgress: input.onProgress };
-      return [createKnowledgeCoverageReadTool(deps), createKnowledgeCompletenessMarkTool(deps)];
-    }
-    const frozenScope = knowledge.store.getTurnScope({ scopeId: context.scopeId })!;
-    const defaultSourceIds = frozenScope.sources.filter(source => context.allowedSourceIds === undefined
-      || context.allowedSourceIds.includes(source.sourceId)).map(source => source.sourceId);
-    const defaultSourceKey = sourceKey(defaultSourceIds);
-    const resolveSessionContext = (ctx: unknown) => {
-      resolveContext(ctx);
-      return resolveKnowledgeScopeSessionContext({ sessionPath: getToolSessionPath(ctx), studioId: input.studioId,
-        getSessionIdForPath: sessionPath => engine.getSessionIdForPath?.(sessionPath) ?? null,
-        getSessionManifest: sessionId => engine.getSessionManifest?.(sessionId) ?? null,
-      });
-    };
-    const base = { getKnowledge: () => knowledge, getStudioId: () => input.studioId,
-      resolveSessionContext, resolveResearchContext: resolveContext };
-    const actionableErrorCodes = new Set<KnowledgeErrorCode>([
-      "KNOWLEDGE_INVALID_ARGUMENT", "KNOWLEDGE_SCOPE_VIOLATION", "KNOWLEDGE_CONFLICT",
-    ]);
-    const readTools = [createKnowledgeOutlineTool(base), createKnowledgeSearchTool({ ...base,
-      onSearchCompleted: summary => input.onSearchCompleted?.(summary),
-    }),
-      createKnowledgeReadTool(base), createKnowledgeGrepTool(base)].map(tool => ({
-      ...tool,
-      execute: async (id: string, params: Record<string, unknown> = {}, signal?: AbortSignal, onUpdate?: unknown, ctx?: unknown) => {
-        try {
-          const actor = resolveContext(ctx);
-          // 与搜索工具保持同一口径，先归一化再记录动作、判断重复和关联反证。
-          if (tool.name === "knowledge_search" && Array.isArray(params.sectionKeys) && params.sectionKeys.length === 0) {
-            params = { ...params };
-            delete params.sectionKeys;
-          }
-          const requestSummary: Record<string, unknown> = {};
-          if (typeof params.query === "string" && params.query.trim() && params.query.length <= 4000) requestSummary.query = params.query;
-          const query = typeof requestSummary.query === "string" ? normalizeQuery(requestSummary.query) : null;
-          const validStrings = (value: unknown): value is string[] => Array.isArray(value) && value.every(item => typeof item === "string");
-          const sectionKeys = validStrings(params.sectionKeys) && params.sectionKeys.every(key => key.trim())
-            ? [...new Set(params.sectionKeys)].sort() : null;
-          if (tool.name === "knowledge_search" && sectionKeys !== null) requestSummary.sectionKeys = sectionKeys;
-          const selectedSourceIds = tool.name === "knowledge_read" && typeof params.sourceId === "string" ? [params.sourceId]
-            : validStrings(params.sourceIds) ? params.sourceIds : defaultSourceIds;
-          const selectedNotebookIds = validStrings(params.notebookIds) ? params.notebookIds : frozenScope.notebookIds;
-          const sourceIds = frozenScope.sources.filter(source => defaultSourceIds.includes(source.sourceId)
-            && selectedSourceIds.includes(source.sourceId)
-            && source.notebookIds.some(notebookId => selectedNotebookIds.includes(notebookId))).map(source => source.sourceId);
-          requestSummary.sourceIds = sourceIds;
-          if (actor.allowedNeedIds?.length) requestSummary.needIds = [...actor.allowedNeedIds];
-          const planned = tool.name === "knowledge_search" && query !== null
-            ? searchPlan.filter(entry => normalizeQuery(entry.query) === query) : [];
-          if (planned.length > 0) {
-            requestSummary.needIds = [...new Set(planned.flatMap(entry => entry.needIds))];
-            // 只有宿主明确安排的纯反证查询才有反证标记，普通问题不能靠文字或参数自称反证。
-            if (sourceIds.length > 0 && !(Array.isArray(params.sectionKeys) && params.sectionKeys.length === 0)
-              && planned.every(entry => entry.purpose === "counterexample")) requestSummary.purpose = "counterexample";
-          }
-          // 在预算记录本次动作之前保存历史，避免把当前动作自身判成重复。
-          const priorSearches = tool.name === "knowledge_search" ? research.listActions(actor.runId)
-            .filter(action => action.actionType === "knowledge_search" && ["running", "completed"].includes(action.status)
-              && typeof action.requestSummary.query === "string" && normalizeQuery(action.requestSummary.query) === query) : [];
-          return await budget.execute({ context: actor, toolName: tool.name, requestSummary, signal }, async activeSignal => {
-            if (params.scopeId !== actor.scopeId) throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research tool scope differs from its bound scope");
-            const scopedParams = { ...params };
-            if (tool.name === "knowledge_search" && actor.allowedSourceIds !== undefined) {
-              if (params.sourceIds !== undefined && (!Array.isArray(params.sourceIds)
-                || params.sourceIds.some(sourceId => !actor.allowedSourceIds!.includes(sourceId)))) {
-                throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research search exceeds the worker scope");
-              }
-              scopedParams.sourceIds = params.sourceIds ?? [...actor.allowedSourceIds];
-            }
-            if (tool.name === "knowledge_search" && query !== null && (params.sectionKeys === undefined || sectionKeys !== null)) {
-              const currentSourceKey = sourceKey(sourceIds);
-              const currentSectionKey = sectionKeys === null ? null : sourceKey(sectionKeys);
-              const repeated = priorSearches.some(action => sourceKey(validStrings(action.requestSummary.sourceIds)
-                ? action.requestSummary.sourceIds : frozenScope.sources.map(source => source.sourceId)) === currentSourceKey
-                && (validStrings(action.requestSummary.sectionKeys) ? sourceKey(action.requestSummary.sectionKeys) : null) === currentSectionKey);
-              // 同一来源的不同章节可以分别调查；只有整源查询才适用宿主字符串禁表。
-              if (repeated || (params.sectionKeys === undefined && priorSearches.length === 0
-                && currentSourceKey === defaultSourceKey && forbiddenQueries.has(query))) {
-                throw new KnowledgeError("KNOWLEDGE_CONFLICT", "Equivalent research query was already executed for this source set");
-              }
-            }
-            const result = await tool.execute(id, scopedParams, activeSignal, onUpdate, ctx);
-            if (result.isError) {
-              const code = "errorCode" in result.details ? result.details.errorCode : undefined;
-              const errorCode = typeof code === "string" && allowedErrorCodes.has(code as KnowledgeErrorCode)
-                ? code as KnowledgeErrorCode : "KNOWLEDGE_RETRIEVAL_UNAVAILABLE";
-              // 只保留可纠正的安全参数诊断，内部异常和供应商错误仍使用通用提示。
-              const message = actionableErrorCodes.has(errorCode)
-                ? result.content[0]?.text || "Research knowledge tool failed" : "Research knowledge tool failed";
-              throw new KnowledgeError(errorCode, message);
-            }
-            const response = JSON.parse(result.content[0].text);
-            const summary: Record<string, unknown> = { status: "completed" };
-            if (Array.isArray(response.hits)) {
-              summary.hitIds = response.hits.map((hit: { candidateId: string }) => hit.candidateId);
-              summary.count = response.hits.length;
-            } else if (tool.name === "knowledge_read") {
-              const chunks = response.chunks ?? response.matches ?? [];
-              summary.receiptIds = chunks.flatMap((chunk: { spans?: Array<{ receiptId: string }> }) => (chunk.spans ?? []).map(span => span.receiptId));
-              summary.count = chunks.length;
-            } else if (tool.name === "knowledge_grep") {
-              summary.receiptIds = (response.matches ?? []).map((match: { receiptId: string }) => match.receiptId);
-              summary.count = response.matches?.length ?? 0;
-            } else summary.count = response.totalSources ?? 0;
-            const hasReadEvidence = Array.isArray(summary.receiptIds) && summary.receiptIds.length > 0;
-            return { value: { ...result, content: [{ type: "text" as const, text: JSON.stringify({
-              ...response, remainingBudget: budget.remainingBudget(actor.runId),
-              ...(hasReadEvidence ? { nextAction: "先调用 knowledge_research_update 登记本批相关原文，再继续采集。若材料无关，说明真实缺口；没有新增缺口可提交空更新。只使用同一凭据 text 中逐字出现的引文。" } : {}),
-            }) }] }, summary };
-          });
-        } catch (error) {
-          if (signal?.aborted) throw error;
-          return toolError(isKnowledgeError(error) && actionableErrorCodes.has(error.code)
-            ? error.message : "Research knowledge tool was rejected or unavailable", {
-            errorCode: isKnowledgeError(error) ? error.code : "KNOWLEDGE_RETRIEVAL_UNAVAILABLE",
-          });
-        }
-      },
-    }));
-    const deps = { research, ledger, budget, resolveContext, onProgress: input.onProgress };
-    const tools = [...readTools, createKnowledgeResearchUpdateTool(deps),
-      createKnowledgeResearchFinishTool({ ...deps, isCompletenessSatisfied: input.isCompletenessSatisfied,
-        ensureCompleteness: input.ensureCompleteness
-          ? (actor, signal) => input.ensureCompleteness(actor, input.sessionPath, signal) : undefined,
-        onFinishAccepted: input.onFinishAccepted }),
-      createKnowledgeDelegateTool({ ...deps,
-        listAgents: () => this._cb?.listActiveAgents?.() ?? [],
-        executeIsolated: (prompt, workerOptions) => this._cb.executeIsolated(prompt, { ...workerOptions,
-          parentSessionPath: input.sessionPath, parentSessionId: context.actorSessionId,
-          research: { runId: context.runId, scopeId: context.scopeId, studioId: input.studioId,
-            allowedNeedIds: workerOptions.researchContext.allowedNeedIds,
-            allowedSourceIds: workerOptions.researchContext.allowedSourceIds,
-            searchPlan: searchPlan.map(entry => ({ ...entry, needIds: entry.needIds.filter(needId =>
-              workerOptions.researchContext.allowedNeedIds?.includes(needId)) })).filter(entry => entry.needIds.length > 0),
-            forbiddenQueries: sourceKey(workerOptions.researchContext.allowedSourceIds ?? defaultSourceIds) === defaultSourceKey
-              ? [...forbiddenQueries] : [],
-            isCompletenessSatisfied: input.isCompletenessSatisfied, onSearchCompleted: input.onSearchCompleted,
-            onProgress: input.onProgress },
-        }),
-      })];
-    const allowed = new Set(getKnowledgeResearchToolNames(options.surface));
-    return tools.filter(tool => allowed.has(tool.name));
   }
   get tools() {
     return this.getToolsSnapshot();
@@ -1598,14 +1359,14 @@ export class Agent {
     const isZh = String(this.resolveLocale()).startsWith("zh");
     const readFile = (filePath) => safeReadFile(filePath, "");
 
-    const pinnedMd = readFile(path.join(this.agentDir, "pinned.md")).trim();
+    const tenetsSectionForReflection = memoryEnabled
+      ? (buildTenetsPromptSection(this.agentDir, isZh) ?? "")
+      : "";
     const memoryMd = readFile(this.memoryMdPath).trim();
     const hasMemory = memoryMd && memoryMd !== "（暂无记忆）" && memoryMd !== "(No memory yet)";
     const existingMemory = memoryEnabled
       ? [
-        pinnedMd
-          ? (isZh ? `# 置顶记忆\n\n${pinnedMd}` : `# Pinned Memories\n\n${pinnedMd}`)
-          : "",
+        tenetsSectionForReflection,
         hasMemory
           ? (isZh ? `# 长期记忆\n\n${memoryMd}` : `# Long-Term Memory\n\n${memoryMd}`)
           : "",
@@ -1629,7 +1390,7 @@ export class Agent {
    * 组装 system prompt
    * @param {object} [options]
    * @param {boolean} [options.forSubagent] - 为 subagent 构造的轻量 prompt：
-   *   跳过记忆三段（规则 + pinned.md + memory.md）和团队 agent 名单。
+   *   跳过记忆两段（规则 + 置顶与原则/记忆）和团队 agent 名单。
    *   Subagent 是隔离子会话，不注入长期记忆和多 agent 协作上下文。
    * @param {object} [options.targetModel] - 新会话即将使用的模型，用于判断是否能读取头像。
    */
@@ -1669,7 +1430,6 @@ export class Agent {
 
     // 可选文件
     const userMd = readFile(userProfilePath(this.userDir));
-    const pinnedMd = readFile(path.join(this.agentDir, "pinned.md"));
     const memory = readFile(this.memoryMdPath);
 
     // 构建 section 分隔格式的 prompt
@@ -1769,33 +1529,20 @@ export class Agent {
         "- **Memory can be outdated; the current conversation always takes priority.** On conflict, follow the conversation; don't correct " + this.userName + " with old memories.",
       ].join("\n");
 
-      // memoryRule 只注入一次，置顶和记忆 section 只放内容
-      const hasPinned = pinnedMd.trim();
+      // memoryRule 只注入一次，置顶与记忆 section 只放内容
       const trimmedMemory = memory.trim();
       const hasMemory = trimmedMemory && trimmedMemory !== "（暂无记忆）" && trimmedMemory !== "(No memory yet)";
-      // 用户原则（tenets）：经用户确认的行为原则，active 才注入；按会话冻结，
+      // 置顶与原则（tenets）：钉住的内容与经用户确认的原则，active 才注入；
       // 与 memory.md 同语义（新批准的原则对新会话生效）
       const tenetsSection = buildTenetsPromptSection(this.agentDir, isZh);
 
-      if (hasPinned || hasMemory || tenetsSection) {
+      if (hasMemory || tenetsSection) {
         const memChunks: Array<{ parts: string[]; category: string; source: Record<string, unknown> }> = [];
         memChunks.push({
           parts: [memoryRule],
           category: "memory_context",
           source: { type: "runtime", id: "memory.rules" },
         });
-        if (hasPinned) {
-          memChunks.push({
-            parts: section(
-              isZh ? "# 置顶记忆" : "# Pinned Memories",
-              isZh
-                ? "用户主动要求你记住的内容，始终保留。你可以读写这些记忆。\n\n" + pinnedMd
-                : "Content the user explicitly asked you to remember. Always retained. You can read and write these memories.\n\n" + pinnedMd
-            ),
-            category: "memory_context",
-            source: { type: "memory", id: "memory.pinned" },
-          });
-        }
         if (tenetsSection) {
           memChunks.push({
             parts: [tenetsSection],

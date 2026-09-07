@@ -121,10 +121,6 @@ export interface HistoryApiResponse {
     status?: string;
     missingAt?: number | null;
   }>;
-  cards?: Array<{
-    afterIndex: number;
-    card: { type: string; pluginId: string; route: string; title?: string; description?: string };
-  }>;
   todos?: TodoItem[];
   hasMore?: boolean;
 }
@@ -151,9 +147,6 @@ function normalizeBlocks(data: HistoryApiResponse): Array<any> {
   for (const ar of (data.artifacts || [])) {
     const { afterIndex, ...artifact } = ar;
     blocks.push({ type: 'artifact', afterIndex, ...artifact });
-  }
-  for (const cd of (data.cards || [])) {
-    blocks.push({ type: 'plugin_card', afterIndex: cd.afterIndex, card: { ...cd.card, type: cd.card.type || 'iframe' } });
   }
 
   // COMPAT: 从 toolCalls 重建 cron/settings 确认卡片（仅老 session 无 blocks[] 时）
@@ -357,42 +350,6 @@ function normalizeHistoryBlock(raw: unknown): Record<string, any> | null {
     return { ...raw, type, afterIndex, filePath, label, ext };
   }
 
-  if (type === 'plugin_card') {
-    if (!isRecord(raw.card)) return null;
-    const pluginId = nonEmptyString(raw.card.pluginId);
-    if (!pluginId) return null;
-    const cardType = nonEmptyString(raw.card.type) || 'iframe';
-    if (cardType === 'chat.surface') {
-      const rawSessionRef = isRecord(raw.card.sessionRef) ? raw.card.sessionRef : {};
-      const sessionId = nonEmptyString(raw.card.sessionId) || nonEmptyString(rawSessionRef.sessionId);
-      if (!sessionId) return null;
-      const sessionPath = nonEmptyString(raw.card.sessionPath)
-        || nonEmptyString(rawSessionRef.sessionPath)
-        || nonEmptyString(rawSessionRef.path)
-        || null;
-      const sessionRef = {
-        ...rawSessionRef,
-        sessionId,
-        ...(sessionPath ? { sessionPath } : {}),
-      };
-      return {
-        ...raw,
-        type,
-        afterIndex,
-        card: {
-          ...raw.card,
-          pluginId,
-          type: cardType,
-          sessionId,
-          ...(sessionPath ? { sessionPath } : {}),
-          sessionRef,
-        },
-      };
-    }
-    const route = nonEmptyString(raw.card.route);
-    if (!route) return null;
-    return { ...raw, type, afterIndex, card: { ...raw.card, pluginId, type: cardType, route } };
-  }
 
   if (type === 'cron_confirm') {
     if (!isRecord(raw.jobData)) return null;

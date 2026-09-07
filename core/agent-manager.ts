@@ -734,7 +734,6 @@ export class AgentManager {
 
     // 可选文件：确保存在（即使为空），避免运行时 ENOENT
     const touchIfMissing = (p) => { if (!fs.existsSync(p)) fs.writeFileSync(p, '', 'utf-8'); };
-    touchIfMissing(path.join(agentDir, 'pinned.md'));
 
     if (initialMemory?.compiled && hasCompiledMemory(initialMemory.compiled)) {
       try {

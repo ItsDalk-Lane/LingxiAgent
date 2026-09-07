@@ -6,7 +6,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { Hono } from "hono";
 import { createMcpRoute } from "../server/routes/mcp.ts";
-import { createPluginProxyRoute } from "../server/routes/plugins.ts";
 
 function createApp(mcp) {
   const app = new Hono();
@@ -133,21 +132,6 @@ describe("MCP first-class routes", () => {
     expect(res.status).toBe(400);
     expect(await res.json()).toMatchObject({ error: 'MCP connector "ghost" not found' });
     expect(mcp.stopConnector).not.toHaveBeenCalled();
-  });
-
-  it("wins over the generic plugin proxy for the legacy alias path", async () => {
-    // open-root mounts createMcpRoute ahead of the plugin routes. If that order
-    // ever flips, /api/plugins/mcp/* falls through to a plugin lookup that no
-    // longer has an "mcp" entry, and every legacy client 404s.
-    const mcp = fakeMcp();
-    const app = new Hono();
-    app.route("/api", createMcpRoute({ mcp } as any));
-    app.route("/api", createPluginProxyRoute(new Map()));
-
-    const res = await app.request("/api/plugins/mcp/state");
-
-    expect(res.status).toBe(200);
-    expect(mcp.getState).toHaveBeenCalled();
   });
 
   it("serves an app's ui:// resource with the connector's own mime type", async () => {

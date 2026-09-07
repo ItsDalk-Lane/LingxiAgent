@@ -140,7 +140,6 @@
         "agents/{agentId}/memory/editable-facts-state.json",
         "agents/{agentId}/memory/today-state.json",
         "agents/{agentId}/memory/daily-state.json",
-        "agents/{agentId}/memory/pinned-memory.json",
         "agents/{agentId}/memory/summaries/{sessionId}.json",
         "agents/{agentId}/memory/daily/{date}.md",
         "agents/{agentId}/memory/dream/state.json",
@@ -155,7 +154,7 @@
       "schemaSource": {
         "kind": "directory-contract",
         "module": "lib/memory/compiled-memory-state.ts",
-        "contract": "compiled memory, rolling-summary, pinned-memory, and daily-state runtime readers"
+        "contract": "compiled memory, rolling-summary, tenets, and daily-state runtime readers"
       },
       "schemaContract": {
         "kind": "protocol",
@@ -229,7 +228,6 @@
         "agents/{agentId}/AGENTS.public.md",
         "agents/{agentId}/appearance-summary.json",
         "agents/{agentId}/avatars/{fileName}",
-        "agents/{agentId}/pinned.md",
         "agents/{agentId}/channels.md",
         "user/avatars/{fileName}"
       ],
@@ -762,7 +760,7 @@
       "schemaSource": {
         "kind": "runtime-contract",
         "module": "desktop/auto-updater.cjs",
-        "contract": "update channel record version, device identifier, activation flag, update feed address, activation time, and held invite codes"
+        "contract": "update channel record version, activation flag, update feed address, and activation time (legacy records may still carry a device identifier and held invite codes, which are ignored)"
       },
       "schemaContract": {
         "kind": "runtime-source",
@@ -771,8 +769,7 @@
       },
       "openEntry": [
         "desktop update feed resolution",
-        "invite channel status",
-        "invite code redemption"
+        "activated channel feed selection"
       ],
       "migrationEntry": [],
       "protocolModules": [],
@@ -784,7 +781,7 @@
       "affectedByEpochMigration": false,
       "bootstrapSafety": null,
       "preCoordinatorReadProjection": null,
-      "identityContract": "One record per desktop installation data home; the device identifier never leaves the machine and is only ever sent as a hash.",
+      "identityContract": "One record per desktop installation data home; the record only selects which update feed this installation follows.",
       "exemption": null
     },
     {
@@ -986,47 +983,6 @@
       "bootstrapSafety": null,
       "preCoordinatorReadProjection": null,
       "identityContract": "workspaceHash derives from the resolved workspace root path; one database per workspace; rel_path inside is workspace-relative posix.",
-      "exemption": null
-    },
-    {
-      "id": "installed-plugins",
-      "ownerModule": "core/plugin-manager.ts",
-      "pathPattern": "plugins/{pluginId}",
-      "pathPatterns": [
-        "plugins/{pluginId}",
-        "plugin-installs.json",
-        "plugin-backups/{pluginId}",
-        "plugin-marketplace/marketplace.json"
-      ],
-      "pathExclusions": [],
-      "pathKind": "tree",
-      "format": "mixed-directory",
-      "schemaSource": {
-        "kind": "directory-contract",
-        "module": "core/plugin-manager.ts",
-        "contract": "installed manifest, install receipt, backup, and source-package directory protocols"
-      },
-      "schemaContract": {
-        "kind": "protocol",
-        "source": "core/plugin-manager.ts",
-        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
-      },
-      "openEntry": [
-        "PluginManager.loadPlugins"
-      ],
-      "migrationEntry": [
-        "plugin installation compatibility checks"
-      ],
-      "protocolModules": [],
-      "firstPossibleOpenPhase": "engine_construct",
-      "firstPossibleWritePhase": "runtime_ready",
-      "epochPolicy": "epoch-managed",
-      "checkpointPolicy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
-      "restorePolicy": "Restore only through the owning module after reader compatibility is established.",
-      "affectedByEpochMigration": true,
-      "bootstrapSafety": null,
-      "preCoordinatorReadProjection": null,
-      "identityContract": "pluginId from manifest is identity; versions and directories are locators/generations.",
       "exemption": null
     },
     {
@@ -1566,80 +1522,6 @@
       "exemption": null
     },
     {
-      "id": "plugin-development-state",
-      "ownerModule": "core/plugin-dev-service.ts",
-      "pathPattern": "plugins-dev/{pluginId}",
-      "pathPatterns": [
-        "plugins-dev/{pluginId}",
-        "plugin-dev-runs/{runId}.json",
-        "plugin-dev-sources/{sourceId}"
-      ],
-      "pathExclusions": [],
-      "pathKind": "tree",
-      "format": "mixed-directory",
-      "schemaSource": {
-        "kind": "directory-contract",
-        "module": "core/plugin-dev-service.ts",
-        "contract": "dev plugin source promotion and run receipt protocol"
-      },
-      "schemaContract": {
-        "kind": "protocol",
-        "source": "core/plugin-dev-service.ts",
-        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
-      },
-      "openEntry": [
-        "PluginDevService"
-      ],
-      "migrationEntry": [],
-      "protocolModules": [],
-      "firstPossibleOpenPhase": "engine_construct",
-      "firstPossibleWritePhase": "runtime_ready",
-      "epochPolicy": "compatible",
-      "checkpointPolicy": "Include user-authored sources; run receipts may be regenerated only when their source still exists.",
-      "restorePolicy": "Restore only through the owning module after reader compatibility is established.",
-      "affectedByEpochMigration": true,
-      "bootstrapSafety": null,
-      "preCoordinatorReadProjection": null,
-      "identityContract": "pluginId/sourceId/runId are explicit keys; temporary paths are not identities.",
-      "exemption": null
-    },
-    {
-      "id": "plugin-download-cache",
-      "ownerModule": "server/routes/plugins.ts",
-      "pathPattern": "plugin-install-sources/{pluginId}/{version}",
-      "pathPatterns": [
-        "plugin-install-sources/{pluginId}/{version}"
-      ],
-      "pathExclusions": [],
-      "pathKind": "tree",
-      "format": "binary-cache",
-      "schemaSource": {
-        "kind": "directory-contract",
-        "module": "server/routes/plugins.ts",
-        "contract": "verified plugin release ZIP naming by pluginId/version and expected sha256"
-      },
-      "schemaContract": {
-        "kind": "protocol",
-        "source": "server/routes/plugins.ts",
-        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
-      },
-      "openEntry": [
-        "downloadMarketplacePluginRelease"
-      ],
-      "migrationEntry": [],
-      "protocolModules": [],
-      "firstPossibleOpenPhase": "runtime_ready",
-      "firstPossibleWritePhase": "runtime_ready",
-      "epochPolicy": "regenerable",
-      "checkpointPolicy": "Excluded; packages can be downloaded again and must pass sha256 verification.",
-      "restorePolicy": "Re-verify sha256 before reuse, otherwise delete and redownload.",
-      "affectedByEpochMigration": false,
-      "bootstrapSafety": null,
-      "preCoordinatorReadProjection": null,
-      "identityContract": "pluginId/version identify the source generation; ZIP path is a verified cache locator.",
-      "exemption": null
-    },
-    {
       "id": "plugin-runtime-data",
       "ownerModule": "core/plugin-config.ts",
       "pathPattern": "plugin-data/{pluginId}",
@@ -1887,10 +1769,7 @@
       "ownerModule": "core/resource-ticket-service.ts",
       "pathPattern": "security/resource-ticket-key",
       "pathPatterns": [
-        "security/resource-ticket-key",
-        "security/plugin-asset-session-key",
-        "security/plugin-iframe-ticket-key",
-        "security/plugin-surface-session-key"
+        "security/resource-ticket-key"
       ],
       "pathExclusions": [],
       "pathKind": "file",
@@ -1898,7 +1777,7 @@
       "schemaSource": {
         "kind": "directory-contract",
         "module": "core/resource-ticket-service.ts",
-        "contract": "independent 0600 random key-file protocols for resource and plugin ticket services"
+        "contract": "independent 0600 random key-file protocol for the resource ticket service"
       },
       "schemaContract": {
         "kind": "protocol",
@@ -3173,15 +3052,6 @@
     {
       "sourceFile": "core/engine.ts",
       "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(pluginDevSourcesDir, { recursive: true })",
-      "reason": "Creates the plugin development source root.",
-      "storeId": "plugin-development-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/engine.ts",
-      "kind": "mkdir",
       "excerpt": "fs.mkdirSync(skillsDir, { recursive: true })",
       "reason": "Creates the user skill root.",
       "storeId": "skill-state",
@@ -3639,6 +3509,15 @@
       "ordinal": 0
     },
     {
+      "sourceFile": "core/media-adapters/speech.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(generatedDir, { recursive: true })",
+      "reason": "Writes data within the active pluginId-scoped data directory.",
+      "storeId": "plugin-runtime-data",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
       "sourceFile": "core/media/download.ts",
       "kind": "mkdir",
       "excerpt": "fs.mkdirSync(dir, { recursive: true })",
@@ -3747,20 +3626,11 @@
       "ordinal": 0
     },
     {
-      "sourceFile": "core/plugin-asset-session-service.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(filePath, `${key}\\n`, { mode: 0o600 })",
-      "reason": "Creates one service-specific signing key with mode 0600.",
-      "storeId": "security-key-material",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/plugin-asset-session-service.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(path.dirname(filePath), { recursive: true })",
-      "reason": "Creates one service-specific signing key with mode 0600.",
-      "storeId": "security-key-material",
+      "sourceFile": "core/pinned-tenets-migration.ts",
+      "kind": "rename",
+      "excerpt": "fs.renameSync(filePath, `${filePath}.migrated`)",
+      "reason": "Merges legacy pinned items into tenets.json and renames the legacy files.",
+      "storeId": "agent-memory",
       "exemptionId": null,
       "ordinal": 0
     },
@@ -3779,114 +3649,6 @@
       "excerpt": "writeSecretFileSync(configPath, `${JSON.stringify(next, null, 2)}\\n`)",
       "reason": "Writes the plugin configuration file for the active pluginId.",
       "storeId": "plugin-runtime-data",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/plugin-dev-service.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(runPath, JSON.stringify(record, null, 2))",
-      "reason": "Writes plugin development source or run state.",
-      "storeId": "plugin-development-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/plugin-dev-service.ts",
-      "kind": "copy-file",
-      "excerpt": "fs.cpSync(sourcePath, tempDir, { recursive: true, filter: (src) => shouldCopyPath(src, sourcePath), })",
-      "reason": "Writes plugin development source or run state.",
-      "storeId": "plugin-development-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/plugin-dev-service.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(runDir, { recursive: true })",
-      "reason": "Writes plugin development source or run state.",
-      "storeId": "plugin-development-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/plugin-dev-service.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(this._devPluginsDir, { recursive: true })",
-      "reason": "Writes plugin development source or run state.",
-      "storeId": "plugin-development-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/plugin-dev-service.ts",
-      "kind": "remove-path",
-      "excerpt": "fs.rmSync(removeTarget, { recursive: true, force: true })",
-      "reason": "Writes plugin development source or run state.",
-      "storeId": "plugin-development-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/plugin-dev-service.ts",
-      "kind": "remove-path",
-      "excerpt": "fs.rmSync(targetDir, { recursive: true, force: true })",
-      "reason": "Writes plugin development source or run state.",
-      "storeId": "plugin-development-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/plugin-dev-service.ts",
-      "kind": "remove-path",
-      "excerpt": "fs.rmSync(tempDir, { recursive: true, force: true })",
-      "reason": "Writes plugin development source or run state.",
-      "storeId": "plugin-development-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/plugin-dev-service.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(tempDir, targetDir)",
-      "reason": "Writes plugin development source or run state.",
-      "storeId": "plugin-development-state",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/plugin-iframe-ticket-service.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(filePath, `${key}\\n`, { mode: 0o600 })",
-      "reason": "Creates one service-specific signing key with mode 0600.",
-      "storeId": "security-key-material",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/plugin-iframe-ticket-service.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(path.dirname(filePath), { recursive: true })",
-      "reason": "Creates one service-specific signing key with mode 0600.",
-      "storeId": "security-key-material",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/plugin-surface-session-service.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(filePath, `${key}\\n`, { mode: 0o600 })",
-      "reason": "Creates one service-specific signing key with mode 0600.",
-      "storeId": "security-key-material",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/plugin-surface-session-service.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(path.dirname(filePath), { recursive: true })",
-      "reason": "Creates one service-specific signing key with mode 0600.",
-      "storeId": "security-key-material",
       "exemptionId": null,
       "ordinal": 0
     },
@@ -7149,33 +6911,6 @@
       "ordinal": 0
     },
     {
-      "sourceFile": "lib/memory/pinned-memory-store.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(pinnedPath(agentDir), renderPinnedMarkdown(data.items))",
-      "reason": "Writes a named per-agent memory or Dream revision protocol file.",
-      "storeId": "agent-memory",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/memory/pinned-memory-store.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(storePath(agentDir), `${JSON.stringify(data, null, 2)}\\n`)",
-      "reason": "Writes a named per-agent memory or Dream revision protocol file.",
-      "storeId": "agent-memory",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/memory/pinned-memory-store.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(agentDir, { recursive: true })",
-      "reason": "Writes a named per-agent memory or Dream revision protocol file.",
-      "storeId": "agent-memory",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
       "sourceFile": "lib/memory/session-summary.ts",
       "kind": "atomic-write",
       "excerpt": "atomicWriteSync(fp, JSON.stringify(data, null, 2) + \"\\n\")",
@@ -7298,114 +7033,6 @@
       "excerpt": "createWriteStream(dest)",
       "reason": "Populates a Hana-owned regenerable runtime cache.",
       "storeId": "managed-runtime-caches",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/plugin-install-backups.ts",
-      "kind": "copy-file",
-      "excerpt": "fs.cpSync(backup.backupDir, targetDir, { recursive: true })",
-      "reason": "Backs up or records an installed plugin package.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/plugin-install-backups.ts",
-      "kind": "copy-file",
-      "excerpt": "fs.cpSync(pluginDir, tmpDir, { recursive: true })",
-      "reason": "Backs up or records an installed plugin package.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/plugin-install-backups.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(backupRoot, { recursive: true })",
-      "reason": "Backs up or records an installed plugin package.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/plugin-install-backups.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(parent, { recursive: true })",
-      "reason": "Backs up or records an installed plugin package.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/plugin-install-backups.ts",
-      "kind": "remove-path",
-      "excerpt": "fs.rmSync(entry.fullPath, { recursive: true, force: true })",
-      "reason": "Backs up or records an installed plugin package.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/plugin-install-backups.ts",
-      "kind": "remove-path",
-      "excerpt": "fs.rmSync(targetDir, { recursive: true, force: true })",
-      "reason": "Backs up or records an installed plugin package.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/plugin-install-backups.ts",
-      "kind": "remove-path",
-      "excerpt": "fs.rmSync(tmpDir, { recursive: true, force: true })",
-      "reason": "Backs up or records an installed plugin package.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/plugin-install-backups.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(tmpDir, backupDir)",
-      "reason": "Backs up or records an installed plugin package.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/plugin-install-records.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteJson(this._path, records)",
-      "reason": "Backs up or records an installed plugin package.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/plugin-install-records.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteJson(this._path, records)",
-      "reason": "Backs up or records an installed plugin package.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "lib/plugin-install-records.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(filePath, `${JSON.stringify(value, null, 2)}\\n`)",
-      "reason": "Backs up or records an installed plugin package.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "lib/plugin-install-records.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(path.dirname(filePath), { recursive: true })",
-      "reason": "Backs up or records an installed plugin package.",
-      "storeId": "installed-plugins",
       "exemptionId": null,
       "ordinal": 0
     },
@@ -8715,96 +8342,6 @@
       "ordinal": 0
     },
     {
-      "sourceFile": "server/routes/plugins.ts",
-      "kind": "copy-file",
-      "excerpt": "fs.cpSync(pluginSrc, tmpTarget, { recursive: true })",
-      "reason": "Creates, promotes, rolls back, or removes an installed plugin directory.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "server/routes/plugins.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(downloadsDir, { recursive: true })",
-      "reason": "Caches a sha256-verified plugin release package.",
-      "storeId": "plugin-download-cache",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "server/routes/plugins.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(userPluginsDir, { recursive: true })",
-      "reason": "Creates, promotes, rolls back, or removes an installed plugin directory.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "server/routes/plugins.ts",
-      "kind": "remove-path",
-      "excerpt": "fs.rmSync(cleanupPath, { recursive: true, force: true })",
-      "reason": "One bounded cleanup list contains both LINGXI_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
-      "storeId": null,
-      "exemptionId": "conditional-plugin-install-cleanup",
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "server/routes/plugins.ts",
-      "kind": "remove-path",
-      "excerpt": "fs.rmSync(cleanupPath, { recursive: true, force: true })",
-      "reason": "One bounded cleanup list contains both LINGXI_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
-      "storeId": null,
-      "exemptionId": "conditional-plugin-install-cleanup",
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "server/routes/plugins.ts",
-      "kind": "remove-path",
-      "excerpt": "fs.rmSync(pluginDir, { recursive: true, force: true })",
-      "reason": "Creates, promotes, rolls back, or removes an installed plugin directory.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "server/routes/plugins.ts",
-      "kind": "remove-path",
-      "excerpt": "fs.rmSync(targetDir, { recursive: true, force: true })",
-      "reason": "Creates, promotes, rolls back, or removes an installed plugin directory.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "server/routes/plugins.ts",
-      "kind": "remove-path",
-      "excerpt": "fs.rmSync(targetDir, { recursive: true, force: true })",
-      "reason": "Creates, promotes, rolls back, or removes an installed plugin directory.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 1
-    },
-    {
-      "sourceFile": "server/routes/plugins.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(stagedDir, targetDir)",
-      "reason": "Creates, promotes, rolls back, or removes an installed plugin directory.",
-      "storeId": "installed-plugins",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "server/routes/plugins.ts",
-      "kind": "write-file",
-      "excerpt": "fs.writeFileSync(packagePath, body)",
-      "reason": "Caches a sha256-verified plugin release package.",
-      "storeId": "plugin-download-cache",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
       "sourceFile": "server/routes/providers.ts",
       "kind": "rename",
       "excerpt": "fs.renameSync(tmp, target)",
@@ -9719,17 +9256,6 @@
         "secret-write",
         "persistent-store-constructor"
       ]
-    },
-    {
-      "id": "conditional-plugin-install-cleanup",
-      "ownerModule": "server/routes/plugins.ts",
-      "sourceFile": "server/routes/plugins.ts",
-      "reason": "One bounded cleanup list contains both LINGXI_HOME .installing staging and operating-system extraction temp; flow-sensitive attribution must replace this exact conditional site.",
-      "expiresOn": "2026-10-31",
-      "kinds": [
-        "remove-path"
-      ],
-      "linePattern": "cleanupPath"
     },
     {
       "id": "conditional-upload-target",

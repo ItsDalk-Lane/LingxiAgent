@@ -43,10 +43,6 @@ function buildProps(overrides: Partial<React.ComponentProps<typeof ComposerToolb
     models: [],
     sessionModel: undefined,
     isStreaming: false,
-    showAudioInput: false,
-    audioRecordingActive: false,
-    audioRecordingBusy: false,
-    onAudioToggle: vi.fn(),
     ...overrides,
   };
 }
@@ -131,25 +127,4 @@ describe('ComposerToolbar', () => {
     expect(container.querySelector(`.${inputStyles['send-btn']}`)).toBeNull();
   });
 
-  it('hides the audio button when audio input is unsupported', () => {
-    renderBar({ showAudioInput: false });
-
-    expect(screen.queryByLabelText('input.recordAudio')).toBeNull();
-  });
-
-  it('shows the audio button and calls the toggle handler when audio input is supported', () => {
-    const onAudioToggle = vi.fn();
-    renderBar({ showAudioInput: true, onAudioToggle });
-
-    const button = screen.getByLabelText('input.recordAudio');
-    fireEvent.click(button);
-
-    expect(onAudioToggle).toHaveBeenCalledTimes(1);
-  });
-
-  it('switches the audio button label while recording', () => {
-    renderBar({ showAudioInput: true, audioRecordingActive: true });
-
-    expect(screen.getByLabelText('input.stopRecording')).toBeTruthy();
-  });
 });

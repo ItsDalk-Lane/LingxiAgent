@@ -26,7 +26,6 @@ const TAB_ITEMS = [
   { id: 'usage', key: 'settings.tabs.usage', d: '<path d="M3 3v18h18"/><path d="M7 14v4"/><path d="M12 9v9"/><path d="M17 5v13"/>' },
   { id: 'sharing', key: 'settings.tabs.sharing', d: '<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>' },
   { id: 'access', key: 'settings.tabs.access', d: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/><path d="M7 19v2"/><path d="M17 19v2"/>' },
-  { id: 'plugins', key: 'settings.tabs.plugins', d: '<path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/>' },
   { id: 'experiments', key: 'settings.tabs.experiments', d: '<path d="M10 2v6.5L5.5 18a3 3 0 0 0 2.7 4h7.6a3 3 0 0 0 2.7-4L14 8.5V2"/><path d="M8 2h8"/><path d="M7.5 15h9"/>' },
   { id: 'security', key: 'settings.tabs.security', d: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>' },
   { id: 'about', key: 'settings.tabs.about', d: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>' },
@@ -47,7 +46,6 @@ export function SettingsNav({ onTabChange }: SettingsNavProps) {
   const set = useSettingsStore(s => s.set);
   const [query, setQuery] = useState('');
   const navItems = buildNavItems();
-  const activeNavTab = activeTab === 'plugin-marketplace' ? 'plugins' : activeTab;
   const trimmedQuery = query.trim();
   const searchEntries = useMemo(() => buildSettingsSearchEntries(navItems), [navItems]);
   const searchResults = useMemo(
@@ -117,7 +115,7 @@ export function SettingsNav({ onTabChange }: SettingsNavProps) {
       ) : navItems.map(item => (
         <button
           key={item.id}
-          className={`${styles['settings-nav-item']}${activeNavTab === item.id ? ' ' + styles['active'] : ''}`}
+          className={`${styles['settings-nav-item']}${activeTab === item.id ? ' ' + styles['active'] : ''}`}
           data-tab={item.id}
           onClick={() => openTab(item.id)}
         >

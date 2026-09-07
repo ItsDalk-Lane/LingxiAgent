@@ -5,9 +5,8 @@
  * 支持多 session 并发：所有 session 事件平等广播，前端按 sessionPath 路由
  */
 import { Hono } from "hono";
-import { MoodParser, ThinkTagParser, CardParser } from "../../core/events.ts";
-import { dropUninstalledPluginCards, extractBlocks, pluginInstalledPredicate } from "../block-extractors.ts";
-import { normalizePluginChatSurfaceBlocks } from "../plugin-chat-surface.ts";
+import { MoodParser, ThinkTagParser } from "../../core/events.ts";
+import { extractBlocks } from "../block-extractors.ts";
 import { toAppEventWsMessage } from "../app-events.ts";
 import { toResourceEventWsMessage } from "../resource-events-ws.ts";
 import {
@@ -473,13 +472,10 @@ export function createChatRoute(engine: any, hub: any, {
       sessionState.set(key, {
         thinkTagParser: new ThinkTagParser(),
         moodParser: new MoodParser(),
-        cardParser: new CardParser(),
         // raw-source 单次消费不变量（任务书 §一）：按 contentIndex 记录「该 raw assistant
         // text 已经过 ReservedTagPipeline」。一旦置位，这份 raw source 永久失去作为
         // normalizer 正文 fallback 的资格（text_end/content、partial、message 三入口同关）。
         reservedProcessedTextKeys: new Set(),
-        _cardHints: [],
-        _cardEmitted: false,
         isThinking: false,
         hasOutput: false,
         hasToolCall: false,
@@ -730,12 +726,9 @@ export function createChatRoute(engine: any, hub: any, {
   function resetAssistantRunParsers(ss) {
     ss.thinkTagParser.reset();
     ss.moodParser.reset();
-    ss.cardParser.reset();
     ss.assistantEventNormalizer.reset();
     ss.reservedProcessedTextKeys?.clear?.();
     ss.pendingToolContextsByCallId?.clear?.();
-    ss._cardHints = [];
-    ss._cardEmitted = false;
     ss.isThinking = false;
   }
 
@@ -856,8 +849,6 @@ export function createChatRoute(engine: any, hub: any, {
     ss.pendingTurnInputConsumptions = [];
     ss.consumedTurnInputsForCurrentTurn = [];
     ss.pendingToolContextsByCallId?.clear?.();
-    ss._cardHints = [];
-    ss._cardEmitted = false;
     ss.turnActive = false;
     flushPendingDeferredContentEvents(sessionPath, ss);
     deliverOrDeferTurnCompletionNotification(sessionPath, ss, {
@@ -1250,11 +1241,6 @@ export function createChatRoute(engine: any, hub: any, {
       return;
     }
 
-    if (event.type === "plugin_ui_changed") {
-      broadcast({ type: "plugin_ui_changed" });
-      return;
-    }
-
     const compactionMessage = toCompactionLifecycleWsMessage(
       event,
       sessionPath,
@@ -1276,29 +1262,6 @@ export function createChatRoute(engine: any, hub: any, {
     if (ss && event.type !== "session_status") {
       markTurnStreamActivity(sessionPath, ss);
     }
-
-    // Helper: feed CardParser, emit card events or pass text through as text_delta
-    const feedCardPipeline = (text) => {
-      ss.cardParser.feed(text, (cEvt) => {
-        switch (cEvt.type) {
-          case "text":
-            ss.titlePreview += cEvt.data || "";
-            emitStreamEvent(sessionPath, ss, { type: "text_delta", delta: cEvt.data });
-            maybeGenerateFirstTurnTitle(sessionPath, ss);
-            break;
-          case "card_start":
-            ss._cardEmitted = true;
-            emitStreamEvent(sessionPath, ss, { type: "card_start", attrs: cEvt.attrs });
-            break;
-          case "card_text":
-            emitStreamEvent(sessionPath, ss, { type: "card_text", delta: cEvt.data });
-            break;
-          case "card_end":
-            emitStreamEvent(sessionPath, ss, { type: "card_end" });
-            break;
-        }
-      });
-    };
 
     const emitMoodPipelineEvent = (mEvt) => {
       if (mEvt.type === "mood_start") {
@@ -1386,18 +1349,6 @@ export function createChatRoute(engine: any, hub: any, {
         publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishReasoning());
         emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
       }
-      ss.cardParser.flush((cEvt) => {
-        if (cEvt.type === "text") {
-          emitStreamEvent(sessionPath, ss, { type: "text_delta", delta: cEvt.data });
-        } else if (cEvt.type === "card_text") {
-          emitStreamEvent(sessionPath, ss, { type: "card_text", delta: cEvt.data });
-        } else if (cEvt.type === "card_start") {
-          ss._cardEmitted = true;
-          emitStreamEvent(sessionPath, ss, { type: "card_start", attrs: cEvt.attrs });
-        } else if (cEvt.type === "card_end") {
-          emitStreamEvent(sessionPath, ss, { type: "card_end" });
-        }
-      });
     };
 
     // normalizer 在 text_end 且没有流式 delta 时会回退读 message.content 的原始块文本；
@@ -1433,9 +1384,10 @@ export function createChatRoute(engine: any, hub: any, {
         emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
       }
 
-      // mood/think 保留协议已在进入 normalizer 之前剥离（见 feedReservedTagText），
-      // 这里的 final_answer 可见文本只剩 card 协议需要解析。
-      feedCardPipeline(text);
+      // mood/think/card 保留协议已全部退役：final_answer 可见文本原样透传。
+      ss.titlePreview += text;
+      emitStreamEvent(sessionPath, ss, { type: "text_delta", delta: text });
+      maybeGenerateFirstTurnTitle(sessionPath, ss);
     };
 
     const publishNormalizedAssistantBatch = (batch) => {
@@ -1578,16 +1530,10 @@ export function createChatRoute(engine: any, hub: any, {
       });
 
       // Unified content_block emission for all tool results
-      const blocks = normalizePluginChatSurfaceBlocks(
-        dropUninstalledPluginCards(
-          enrichSessionFileBlocks(
-            extractBlocks(event.toolName, event.result?.details, event.result),
-            engine,
-            sessionPath,
-          ),
-          pluginInstalledPredicate(engine),
-        ),
+      const blocks = enrichSessionFileBlocks(
+        extractBlocks(event.toolName, event.result?.details, event.result),
         engine,
+        sessionPath,
       );
       for (const block of blocks) {
         emitStreamEvent(sessionPath, ss, { type: "content_block", block });
@@ -1968,16 +1914,10 @@ export function createChatRoute(engine: any, hub: any, {
         queueConsumedTurnInput(sessionPath, ss, event.message);
       }
       if (event.message?.role === "custom" && event.message.display !== false) {
-        const blocks = normalizePluginChatSurfaceBlocks(
-          dropUninstalledPluginCards(
-            enrichSessionFileBlocks(
-              extractBlocks(event.message.customType, event.message.details, event.message),
-              engine,
-              sessionPath,
-            ),
-            pluginInstalledPredicate(engine),
-          ),
+        const blocks = enrichSessionFileBlocks(
+          extractBlocks(event.message.customType, event.message.details, event.message),
           engine,
+          sessionPath,
         );
         for (const block of blocks) {
           emitStreamEvent(sessionPath, ss, { type: "content_block", block });

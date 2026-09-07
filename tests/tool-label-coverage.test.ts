@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { getKnowledgeResearchToolNames } from '../shared/tool-categories.ts';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -109,15 +108,6 @@ function scanRegisteredToolNames(): Set<string> {
 }
 
 describe('工具行文案对账', () => {
-  it('完整性内部工具的文案登记以实际隔离工具边界为依据', () => {
-    const privateTools = getKnowledgeResearchToolNames('knowledge_completeness_worker');
-    expect(privateTools).toEqual(['knowledge_coverage_read', 'knowledge_completeness_mark']);
-    for (const name of privateTools) {
-      expect(UNLABELED_TOOL_NAMES.has(name)).toBe(true);
-      expect(getKnowledgeResearchToolNames('knowledge_research_root')).not.toContain(name);
-      expect(getKnowledgeResearchToolNames('knowledge_research_worker')).not.toContain(name);
-    }
-  });
   for (const locale of locales) {
     it(`${locale}.json 本地快速检索提示、结果与时限文案完整`, () => {
       const data = loadLocale(locale);

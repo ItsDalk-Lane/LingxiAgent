@@ -20,6 +20,12 @@ export const systemSpeechPlugin = {
       allowListSource: "none",
     },
     media: {
+      speechGeneration: {
+        defaultModelId: "system-speech-tts",
+        models: [
+          { id: "system-speech-tts", displayName: "系统语音合成（本地）", protocolId: "system-speech", inputs: ["text"], outputs: ["audio"] },
+        ],
+      },
       speechRecognition: {
         defaultModelId: "system-speech",
         models: [

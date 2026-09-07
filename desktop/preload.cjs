@@ -41,14 +41,9 @@ contextBridge.exposeInMainWorld("hana", {
   ackAnnouncement: () => ipcRenderer.invoke("ack-announcement"),
   // Auto-update (Windows)
   autoUpdateCheck: () => ipcRenderer.invoke("auto-update-check"),
-  autoUpdateDownload: () => ipcRenderer.invoke("auto-update-download"),
   autoUpdateInstall: () => ipcRenderer.invoke("auto-update-install"),
   autoUpdateState: () => ipcRenderer.invoke("auto-update-state"),
   autoUpdateSetChannel: (ch) => ipcRenderer.invoke("auto-update-set-channel", ch),
-  // 邀请制测试通道：查状态 / 核销一枚邀请码 / 用户确认后写入通道状态。
-  inviteStatus: () => ipcRenderer.invoke("invite:status"),
-  inviteRedeem: (code) => ipcRenderer.invoke("invite:redeem", code),
-  inviteActivate: (payload) => ipcRenderer.invoke("invite:activate", payload),
   // 列车更新（OTA）：暂存状态查询 / 手动检查 / 立即应用（下载+激活+重启，仅由用户点击触发）
   trainUpdateStatus: () => ipcRenderer.invoke("train-update-status"),
   trainUpdateCheck: () => ipcRenderer.invoke("train-update-check"),
@@ -102,7 +97,6 @@ contextBridge.exposeInMainWorld("hana", {
   selectFolder: () => ipcRenderer.invoke("select-folder"),
   selectFiles: (options) => ipcRenderer.invoke("select-files", options),
   selectSkill: () => ipcRenderer.invoke("select-skill"),
-  selectPlugin: () => ipcRenderer.invoke("select-plugin"),
   openFolder: (path) => ipcRenderer.invoke("open-folder", path),
   openFile: (path) => ipcRenderer.invoke("open-file", path),
   openExternal: (url) => ipcRenderer.invoke("open-external", url),
@@ -189,8 +183,6 @@ contextBridge.exposeInMainWorld("hana", {
   openSkillViewer: (data) => ipcRenderer.invoke("open-skill-viewer", data),
   listSkillFiles: (baseDir) => ipcRenderer.invoke("skill-viewer-list-files", baseDir),
   readSkillFile: (filePath) => ipcRenderer.invoke("skill-viewer-read-file", filePath),
-  onSkillViewerLoad: (cb) => ipcRenderer.on("skill-viewer-load", (_, data) => cb(data)),
-  closeSkillViewer: () => ipcRenderer.invoke("close-skill-viewer"),
   // 原生拖拽（书桌文件拖到 Finder / 聊天区）
   startDrag: (filePaths) => ipcRenderer.send("start-drag", filePaths),
   // 系统通知（agentId 标识触发的助手，主进程据此设头像 icon；缺失则无 icon）

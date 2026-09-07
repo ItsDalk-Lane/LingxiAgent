@@ -67,12 +67,6 @@ function resetState() {
     globalModelsConfig: null,
     runtimeModels: [],
     homeFolder: null,
-    currentPins: [],
-    pluginSettingsStatus: 'idle',
-    pluginSettingsError: null,
-    pluginAllowFullAccess: undefined,
-    pluginDevToolsEnabled: undefined,
-    pluginUserDir: '',
     set: vi.fn((patch: Record<string, unknown>) => Object.assign(mockState, patch)),
     getSettingsAgentId: () => mockState.settingsAgentId || mockState.currentAgentId,
     showToast: vi.fn(),
@@ -148,7 +142,6 @@ describe('settings actions', () => {
     expect(mockState.settingsConfigKey).toBe('local:config:agent-b');
     expect(mockState.settingsConfigStatus).toBe('ready');
     expect(mockState.settingsConfig.agent.name).toBe('agent-b-name');
-    expect(mockState.currentPins).toEqual(['agent-b-pin']);
     expect(mockState.homeFolder).toBe('/agent-b/home');
 
     for (const [endpoint, resolve] of deferredA.entries()) {
@@ -157,7 +150,6 @@ describe('settings actions', () => {
     await first;
 
     expect(mockState.settingsConfig.agent.name).toBe('agent-b-name');
-    expect(mockState.currentPins).toEqual(['agent-b-pin']);
     expect(mockState.homeFolder).toBe('/agent-b/home');
   });
 
@@ -194,7 +186,6 @@ describe('settings actions', () => {
     expect(mockState.settingsConfigStatus).toBe('loading');
     expect(mockState.settingsConfig).toBeNull();
     expect(mockState.globalModelsConfig).toBeNull();
-    expect(mockState.currentPins).toEqual([]);
 
     for (const [endpoint, resolve] of deferred.entries()) {
       resolve(jsonResponse(buildPayload('agent-b', endpoint)));
@@ -287,7 +278,6 @@ describe('settings actions', () => {
           publicAgents: 'agent-a-public',
           userProfile: 'user-profile',
           experience: 'agent-a-experience',
-          pinned: { pins: ['agent-a-pin'] },
           globalModels: { models: { memory: { id: 'mem' }, summarize: { id: 'sum' } } },
           preferences: {
             quickChat: { shortcut: 'CommandOrControl+Shift+K', reuseTimeoutMinutes: 12 },
@@ -326,10 +316,6 @@ describe('settings actions', () => {
     });
     expect(mockState.globalModelsConfig.models.memory.id).toBe('mem');
     expect(mockState.homeFolder).toBe('/agent-a/home');
-    expect(mockState.currentPins).toEqual(['agent-a-pin']);
-    expect(mockState.pluginSettingsStatus).toBe('ready');
-    expect(mockState.pluginAllowFullAccess).toBe(true);
-    expect(mockState.pluginDevToolsEnabled).toBe(true);
   });
 
   it('clears same-owner stale snapshot data while a fresh settings snapshot is loading', async () => {
@@ -339,11 +325,6 @@ describe('settings actions', () => {
     mockState.settingsConfig = { agent: { id: 'agent-a', name: 'Stale Agent' }, keep_awake: false };
     mockState.globalModelsConfig = { models: { utility: { id: 'old-u' } } };
     mockState.homeFolder = '/old/home';
-    mockState.currentPins = ['old-pin'];
-    mockState.pluginSettingsStatus = 'ready';
-    mockState.pluginAllowFullAccess = false;
-    mockState.pluginDevToolsEnabled = false;
-    mockState.pluginUserDir = '/old/plugins';
     mockState.settingsSnapshot = {
       key: 'local:snapshot:agent-a',
       status: 'ready',
@@ -355,7 +336,6 @@ describe('settings actions', () => {
         publicAgents: '',
         userProfile: '',
         experience: '',
-        pinned: { pins: ['old-pin'] },
         globalModels: { models: { utility: { id: 'old-u' } } },
         preferences: {
           quickChat: {},
@@ -397,9 +377,6 @@ describe('settings actions', () => {
     });
     expect(mockState.settingsConfig).toBeNull();
     expect(mockState.globalModelsConfig).toBeNull();
-    expect(mockState.currentPins).toEqual([]);
-    expect(mockState.pluginAllowFullAccess).toBeUndefined();
-    expect(mockState.pluginDevToolsEnabled).toBeUndefined();
 
     resolveSnapshot(jsonResponse({
       agentId: 'agent-a',
@@ -409,7 +386,6 @@ describe('settings actions', () => {
       publicAgents: '',
       userProfile: '',
       experience: '',
-      pinned: { pins: ['fresh-pin'] },
       globalModels: { models: { utility: { id: 'new-u' } } },
       preferences: {
         quickChat: {},
@@ -418,12 +394,6 @@ describe('settings actions', () => {
         speechRecognition: { enabled: true },
         experiments: [],
       },
-      plugins: {
-        allowFullAccess: true,
-        devToolsEnabled: true,
-        userDir: '/fresh/plugins',
-        settingsTabs: [],
-      },
       access: { network: { mode: 'lan' } },
       bridgeStatus: { agentId: 'agent-a', telegram: { enabled: true } },
     }));
@@ -431,7 +401,6 @@ describe('settings actions', () => {
 
     expect(mockState.settingsConfig.agent.name).toBe('Fresh Agent');
     expect(mockState.settingsSnapshot.data.access.network.mode).toBe('lan');
-    expect(mockState.pluginAllowFullAccess).toBe(true);
   });
 
   it('setPrimaryAgent updates only primary ownership and keeps the current focus', async () => {

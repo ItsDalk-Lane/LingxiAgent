@@ -41,14 +41,12 @@ describe('settings modal actions', () => {
     });
   });
 
-  it('maps the removed Computer Use tab to experiments when reopening', () => {
+  it('passes an unknown tab through unchanged instead of aliasing it', () => {
     openSettingsModal('computer');
-    closeSettingsModal();
-    openSettingsModal();
 
     expect(useStore.getState().settingsModal).toEqual({
       open: true,
-      activeTab: 'experiments',
+      activeTab: 'computer',
     });
   });
 

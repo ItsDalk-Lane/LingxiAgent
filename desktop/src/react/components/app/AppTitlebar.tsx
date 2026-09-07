@@ -1,5 +1,4 @@
 import { ChannelTabBar } from '../channels/ChannelTabBar';
-import { WidgetButtons } from '../plugin/WidgetButtons';
 import { WindowControls } from '../WindowControls';
 
 interface AppTitlebarProps {
@@ -19,7 +18,6 @@ interface AppTitlebarProps {
   showNewSessionButton?: boolean;
   showPreviewToggle?: boolean;
   showChannelTabs?: boolean;
-  showWidgetButtons?: boolean;
   onLeftMouseEnter?: () => void;
   onRightMouseEnter?: () => void;
   onToggleMouseLeave?: () => void;
@@ -39,7 +37,6 @@ export function AppTitlebar({
   showNewSessionButton = false,
   showPreviewToggle = false,
   showChannelTabs = true,
-  showWidgetButtons = true,
   onLeftMouseEnter,
   onRightMouseEnter,
   onToggleMouseLeave,
@@ -104,7 +101,6 @@ export function AppTitlebar({
       )}
       {showChannelTabs && <ChannelTabBar />}
       <div className="tb-right-group">
-        {showWidgetButtons && <WidgetButtons />}
         {showPreviewToggle && onTogglePreview && (
           <button
             className={`tb-toggle tb-toggle-preview${previewOpen ? ' active' : ''}`}

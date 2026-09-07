@@ -19,7 +19,6 @@ import { initJian, loadStudioWorkspaces } from './stores/desk-actions';
 import { initViewerEvents } from './stores/preview-actions';
 import { updateLayout } from './components/SidebarLayout';
 import { initErrorBusBridge } from './errors/error-bus-bridge';
-import { refreshPluginUI } from './stores/plugin-ui-actions';
 import { openSettingsModal } from './stores/settings-modal-actions';
 import { initQuotedSelectionLifecycle } from './stores/selection-actions';
 import { hydrateInputDrafts, initInputDraftPersistence } from './stores/input-draft-persistence';
@@ -296,9 +295,6 @@ export async function initApp(): Promise<void> {
     const anyConnected = data.telegram?.status === 'connected' || data.feishu?.status === 'connected' || data.qq?.status === 'connected' || data.wechat?.status === 'connected' || data.whatsapp?.status === 'connected';
     useStore.setState({ bridgeDotConnected: anyConnected });
   } catch { /* ignore */ }
-
-  // 16. 加载插件 UI（pages / widgets）
-  refreshPluginUI();
 
   // 18. 设置快捷键
   document.addEventListener('keydown', (e) => {

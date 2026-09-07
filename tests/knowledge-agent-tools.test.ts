@@ -4,7 +4,6 @@ import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
-import * as coverageUnits from "../lib/knowledge/knowledge-coverage-unit.ts";
 import { createKnowledgeOutlineTool } from "../lib/tools/knowledge-outline-tool.ts";
 import { createKnowledgeGrepTool } from "../lib/tools/knowledge-grep-tool.ts";
 import { createKnowledgeManageTool } from "../lib/tools/knowledge-manage-tool.ts";
@@ -132,7 +131,6 @@ describe("knowledge_outline 工具（scope 冻结集合结构枚举）", () => {
       displayName: "C.txt",
     });
     const scope = createScope(manager, studioId, [notebook.id]);
-    const units = vi.spyOn(coverageUnits, "buildCoverageUnits");
     const fullBlocks = vi.spyOn(manager.store, "listArtifactBlocks");
     const fullChunks = vi.spyOn(manager.indexStore, "listVariantChunks");
     const expectedChunkCount = Number(manager.indexStore.db.prepare("SELECT COUNT(*) AS count FROM knowledge_chunks WHERE parse_artifact_id = ?").get(scope.sources[0].parseArtifactId).count);
@@ -155,7 +153,6 @@ describe("knowledge_outline 工具（scope 冻结集合结构枚举）", () => {
     expect(source.chunkCount).toBeGreaterThan(0);
     expect(source.status).toBe("ready");
     expect(source.sectionKeys).toEqual(["交付计划", "风险登记"]);
-    expect(units).not.toHaveBeenCalled();
     expect(fullBlocks).not.toHaveBeenCalled();
     expect(fullChunks).not.toHaveBeenCalled();
     expect(source.blockCount).toBeGreaterThan(0);

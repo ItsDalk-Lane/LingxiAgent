@@ -2,7 +2,7 @@
  * chat-slice.ts — Per-session 消息数据 + 滚动位置
  */
 
-import type { AssistantTurnProjection, ChatListItem, ChatMessage, ContentBlock, SessionMessages, SessionModel, SessionRegistryFile } from './chat-types';
+import type { AssistantTurnProjection, ChatListItem, ChatMessage, ContentBlock, QueuedTurnInput, SessionMessages, SessionModel, SessionRegistryFile } from './chat-types';
 import { invalidateSessionCache } from './selectors/file-refs';
 import { invalidateStreamBuffer, invalidateStreamResumeMeta } from './stream-invalidator';
 import { bumpMessageLiveVersion, clearMessageLiveVersion } from './message-live-version';
@@ -64,6 +64,16 @@ export interface ChatSlice {
   setLoadingMore: (path: string, loading: boolean) => void;
   clearSession: (path: string) => void;
   saveScrollPosition: (path: string, scrollTop: number) => void;
+
+  /**
+   * 流式期间发送的用户输入队列（per-session）。入队后输入区立即清空；
+   * 上一轮回答结束（effectiveStreaming 变 false）后由 InputArea 自动续发。
+   * 纯前端态：不落盘，应用重启即清。
+   */
+  queuedTurnInputsByPath: Record<string, QueuedTurnInput[]>;
+  enqueueQueuedTurnInput: (path: string, item: QueuedTurnInput) => void;
+  updateQueuedTurnInputText: (path: string, id: string, text: string) => void;
+  removeQueuedTurnInput: (path: string, id: string) => void;
 }
 
 const MAX_CACHED_SESSIONS = 8;
@@ -110,6 +120,7 @@ export const createChatSlice = (
   _loadMessagesVersion: {},
   _sessionFilesFlightByPath: {},
   scrollPositions: {},
+  queuedTurnInputsByPath: {},
 
   initSession: (path, items, hasMore, revision = null) => set((s) => {
     const key = keyForSession(s as any, path);
@@ -723,6 +734,43 @@ export const createChatSlice = (
   saveScrollPosition: (path, scrollTop) => set((s) => ({
     scrollPositions: putScopedMapValue(s as any, s.scrollPositions, path, scrollTop),
   })),
+
+  enqueueQueuedTurnInput: (path, item) => set((s) => {
+    const key = keyForSession(s as any, path);
+    const existing = s.queuedTurnInputsByPath[key] || [];
+    return {
+      queuedTurnInputsByPath: {
+        ...s.queuedTurnInputsByPath,
+        [key]: [...existing, item],
+      },
+    };
+  }),
+
+  updateQueuedTurnInputText: (path, id, text) => set((s) => {
+    const key = keyForSession(s as any, path);
+    const existing = s.queuedTurnInputsByPath[key];
+    if (!existing?.some(item => item.id === id)) return {};
+    return {
+      queuedTurnInputsByPath: {
+        ...s.queuedTurnInputsByPath,
+        [key]: existing.map(item => item.id === id
+          ? { ...item, text, bundle: { ...item.bundle, text } }
+          : item),
+      },
+    };
+  }),
+
+  removeQueuedTurnInput: (path, id) => set((s) => {
+    const key = keyForSession(s as any, path);
+    const existing = s.queuedTurnInputsByPath[key];
+    if (!existing?.some(item => item.id === id)) return {};
+    return {
+      queuedTurnInputsByPath: {
+        ...s.queuedTurnInputsByPath,
+        [key]: existing.filter(item => item.id !== id),
+      },
+    };
+  }),
 });
 
 function registryFileKey(file: SessionRegistryFile): string | null {

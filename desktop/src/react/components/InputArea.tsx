@@ -40,7 +40,8 @@ import { SendButton } from './input/SendButton';
 import type { PermissionMode } from './input/PlanModeButton';
 import { SessionConfirmationPrompt } from './input/SessionConfirmationPrompt';
 import { TenetApprovalBanner } from './input/TenetApprovalBanner';
-import { serializeEditor } from '../utils/editor-serializer';
+import { serializeEditor, buildFaithfulPasteContent } from '../utils/editor-serializer';
+import { dispatchComposerSend, type ComposerSendBundle } from './input/composer-send';
 import {
   buildFileMentionItems,
   mergeEditorFileRefs,
@@ -81,7 +82,7 @@ import { searchDeskFiles } from '../stores/desk-actions';
 import { lingxiFetch } from '../hooks/use-hana-fetch';
 import type { DeskSearchResult } from '../types';
 import styles from './input/InputArea.module.css';
-import type { AudioWaveform, ChatListItem, SessionConfirmationBlock, SessionModel } from '../stores/chat-types';
+import type { AudioWaveform, ChatListItem, QueuedTurnInput, SessionConfirmationBlock, SessionModel } from '../stores/chat-types';
 import {
   MAX_CHAT_VIDEO_SOURCE_BYTES,
   isAllowedChatVideoMime,
@@ -90,6 +91,8 @@ import {
 } from '../../../../shared/video-mime.ts';
 
 const EMPTY_FILE_REFS: readonly import('../types/file-ref').FileRef[] = Object.freeze([]);
+
+const EMPTY_QUEUED_TURN_INPUTS: readonly QueuedTurnInput[] = Object.freeze([]);
 
 function modelUnavailableMessageKey(reason: SessionModel['unavailableReason']): string {
   if (reason === 'model_removed') return 'model.unavailableReason.modelRemoved';
@@ -138,12 +141,6 @@ function chatAudioMimeTypeForName(name: string, fallback?: string): string {
     webm: 'audio/webm',
   };
   return mimeMap[ext] || 'audio/wav';
-}
-
-function createClientUserMessageId(): string {
-  const uuid = globalThis.crypto?.randomUUID?.();
-  if (uuid) return `client-user-${uuid}`;
-  return `client-user-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
 export function createStopRequest(input: {
@@ -506,6 +503,8 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   // input 数组缺失视为未知；只有显式 text-only 的模型才在 UI 上标记“辅助视觉”。
   const supportsVision = !Array.isArray(currentModelInfo?.input) || currentModelInfo.input.includes("image");
   const showAudioInput = getModelAudioInputMode(currentModelInfo) === 'native-audio';
+  // 听写走 macOS 系统语音识别，与聊天模型是否支持音频无关
+  const isMacDictateAvailable = typeof navigator !== 'undefined' && /Mac/i.test(navigator.platform || '');
   const showThinkingControl = useMemo(
     () => shouldShowThinkingControl(currentModelInfo, models),
     [currentModelInfo, models],
@@ -557,6 +556,18 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   const [continuingDeletedAgentSession, setContinuingDeletedAgentSession] = useState(false);
   const [deletedAgentContinueError, setDeletedAgentContinueError] = useState<string | null>(null);
   const [audioRecorderOpen, setAudioRecorderOpen] = useState(false);
+  // 听写模式：开启后，停止录音不再发送语音附件，而是用系统语音识别
+  // 把录音转成文字插入输入框（macOS 本地识别，不依赖聊天模型能力）。
+  const [dictateMode, setDictateMode] = useState(() => {
+    try { return localStorage.getItem('hana-dictate-mode') === '1'; } catch { return false; }
+  });
+  const toggleDictateMode = useCallback(() => {
+    setDictateMode(prev => {
+      const next = !prev;
+      try { localStorage.setItem('hana-dictate-mode', next ? '1' : '0'); } catch {}
+      return next;
+    });
+  }, []);
   const [audioRecordingState, setAudioRecordingState] = useState<'idle' | 'starting' | 'recording' | 'stopping'>('idle');
   const [audioRecordingStartedAt, setAudioRecordingStartedAt] = useState<number | null>(null);
   const [audioRecordingElapsed, setAudioRecordingElapsed] = useState(0);
@@ -1241,19 +1252,49 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       if (!upload?.dest) {
         throw new Error(upload?.error || 'audio upload failed');
       }
-      const sent = await sendVoiceAudioAttachment({
-        fileId: upload.fileId,
-        path: upload.dest,
-        name: upload.name || name,
-        mimeType: 'audio/wav',
-        base64Data,
-        waveform: upload.waveform || waveform,
-      });
-      if (!sent) {
-        throw new Error('audio send failed');
+      if (dictateMode) {
+        // 听写：系统语音识别转写 → 文本插入输入框（不发送音频）
+        const asrRes = await lingxiFetch('/api/media/asr/transcribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fileId: upload.fileId,
+            sessionId: sessionRef.sessionId,
+            sessionPath: sessionRef.sessionPath,
+            providerId: 'system-speech',
+            modelId: 'system-speech',
+          }),
+          timeout: 180_000,
+        });
+        const asrData = await asrRes.json().catch(() => null);
+        if (!asrRes.ok || asrData?.error) {
+          throw new Error(asrData?.error || `transcription failed (status ${asrRes.status})`);
+        }
+        const text = String(asrData?.transcription ?? asrData?.text ?? '').trim();
+        if (!text) {
+          throw new Error(t('input.dictateEmpty'));
+        }
+        if (editor && !editor.isDestroyed) {
+          editor.commands.focus('end');
+          editor.commands.insertContent(text);
+        }
+        setAudioRecorderOpen(false);
+        setAudioRecordingError(null);
+      } else {
+        const sent = await sendVoiceAudioAttachment({
+          fileId: upload.fileId,
+          path: upload.dest,
+          name: upload.name || name,
+          mimeType: 'audio/wav',
+          base64Data,
+          waveform: upload.waveform || waveform,
+        });
+        if (!sent) {
+          throw new Error('audio send failed');
+        }
+        setAudioRecorderOpen(false);
+        setAudioRecordingError(null);
       }
-      setAudioRecorderOpen(false);
-      setAudioRecordingError(null);
     } catch (err) {
       const message = t('input.audioRecordingFailed');
       setAudioRecordingError(message);
@@ -1264,10 +1305,10 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       setAudioRecordingElapsed(0);
       restoreEditorFocus();
     }
-  }, [addToast, ensureVoiceSessionRef, restoreEditorFocus, sendVoiceAudioAttachment, t]);
+  }, [addToast, dictateMode, editor, ensureVoiceSessionRef, restoreEditorFocus, sendVoiceAudioAttachment, t]);
 
   const startAudioRecording = useCallback(async () => {
-    if (inputLocked || modelSelectionRequired || !showAudioInput || !connected || isStreaming || sending || modelSwitching || pendingSessionSwitchPath) return;
+    if (inputLocked || modelSelectionRequired || (!showAudioInput && !dictateMode) || !connected || isStreaming || sending || modelSwitching || pendingSessionSwitchPath) return;
     if (audioRecordingState !== 'idle' || audioRecorderRef.current) return;
     const AudioContextCtor = window.AudioContext
       || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
@@ -1607,10 +1648,24 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       }
     }
 
+    // 富 URL 粘贴优先：复制超链接时用户要的是链接本身（text/html 里的 href），
+    // 不是链接文字；该语义先于纯文本保真拦截。
     const plainUrlPaste = extractPlainUrlPaste(e.clipboardData);
     if (plainUrlPaste && editor) {
       e.preventDefault();
       editor.commands.insertContent(plainUrlPaste);
+      return true;
+    }
+
+    // ── 粘贴保真（第一性原理：用户放进去的每一个字符 = 原样保留 = 原样渲染）──
+    // 文本粘贴一律按纯文本原样收进编辑器，绝不走富文本解析。剪贴板里同时带
+    // 「纯文字 + 带排版」两份内容时，富文本解析会选排版形态，被编辑器的窄词表
+    // 拍平（Markdown 代码块围栏丢失 → 之后被渲染端当普通文本二次解释）。按纯
+    // 文本收取后，渲染交给聊天区那套完整渲染器，任何 Markdown 结构都保得住。
+    const plainPasteText = e.clipboardData?.getData('text/plain') ?? '';
+    if (plainPasteText && editor) {
+      e.preventDefault();
+      editor.chain().focus().insertContent(buildFaithfulPasteContent(plainPasteText)).run();
       return true;
     }
     return false;
@@ -1797,7 +1852,61 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       hasDocContext: clickedDocContextAttached,
       hasQuotes: clickedQuotes.length > 0,
     }) || !connected) return;
-    if (type === 'prompt' && effectiveStreaming) return;
+    // 流式进行中的「发送」默认入队：上一轮回答结束后自动续发为独立新回合。
+    // 注入进行中的回合改为显式动作——排队卡片上的「立即插入」按钮（派发为 interject）。
+    if (type === 'prompt' && effectiveStreaming) {
+      if (!clickedSessionRef) {
+        useStore.getState().addToast(t('error.noActiveSession'), 'error', 6000, {
+          dedupeKey: 'send-missing-session',
+        });
+        return;
+      }
+      const queuedPath = clickedSessionRef.sessionPath;
+      useStore.getState().enqueueQueuedTurnInput(queuedPath, {
+        id: `queued-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        sessionPath: queuedPath,
+        text,
+        createdAt: Date.now(),
+        bundle: {
+          type: 'prompt',
+          sessionRef: {
+            sessionId: clickedSessionRef.sessionId,
+            sessionPath: clickedSessionRef.sessionPath,
+            agentId: clickedSessionRef.agentId,
+          },
+          text,
+          skills,
+          fileRefs,
+          sessionRefs,
+          agentMentions,
+          inputFiles: mergeEditorFileRefs(clickedAttachedFiles, fileRefs),
+          knowledgeRefs: clickedKnowledgeRefs
+            ? {
+              notebookIds: [...clickedKnowledgeRefs.notebookIds],
+              notebookNames: { ...clickedKnowledgeRefs.notebookNames },
+              mode: clickedKnowledgeRefs.mode,
+            }
+            : null,
+          docContextAttached: clickedDocContextAttached,
+          doc: clickedDoc ? { ...clickedDoc } : null,
+          quotes: clickedQuotes,
+          uiContext: clickedUiContext,
+        },
+      });
+      // 内容已安全入队：立即清空输入区（草稿/附件/文档/引用随队清空），
+      // 用户可以继续输入下一条排队消息。
+      const afterEnqueue = useStore.getState();
+      const stillOwnsComposerAfterEnqueue = afterEnqueue.currentSessionId === clickedSessionRef.sessionId
+        && afterEnqueue.currentSessionPath === queuedPath;
+      if (stillOwnsComposerAfterEnqueue) {
+        editor.commands.clearContent();
+        clearDraft(queuedPath);
+        clearAttachedFilesForSession(queuedPath);
+        if (clickedDocContextAttached) setDocContextAttached(false);
+        if (clickedQuotes.length > 0) useStore.getState().clearQuotedSelections();
+      }
+      return;
+    }
     if (type === 'interject' && !effectiveStreaming) return;
     if (sending) return;
     if (modelSwitching) return;
@@ -1859,197 +1968,33 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
         return;
       }
 
-      // 分离原生媒体和普通附件；后端决定图片视觉桥、视频/音频原生能力或显式报错。
-      const imageFiles = hasFiles ? inputFiles.filter(f => !f.isDirectory && isImageFile(f.name)) : [];
-      const videoFiles = hasFiles ? inputFiles.filter(f => !f.isDirectory && isVideoFile(f.name)) : [];
-      const audioFiles = hasFiles ? inputFiles.filter(f => !f.isDirectory && isAudioFileName(f.name, f.mimeType)) : [];
-
-      const imagePreflight = await evaluateChatImageSendPreflight({
-        attachments: inputFiles,
-        model: currentModelInfo,
-        loadVisionAuxiliaryConfig,
-      });
-      // #1647：视觉能力不可用不再拦下整条消息。图片始终携带文件身份
-      //（displayMessage.attachments → 服务端登记 SessionFile + 注入路径 marker），
-      // 这里只决定是否附带像素载荷；降级是显式的（toast 告知 + 不读字节）。
-      const imagesAsFileOnly = !imagePreflight.ok;
-      if (imagesAsFileOnly) {
-        notifyTextModelImageFileOnly({
-          t,
-          addToast: useStore.getState().addToast,
-          openSettings: () => openProviderModelSettings(currentModelInfo?.provider),
-        });
-      }
-      const videoPreflight = await evaluateChatVideoSendPreflight({
-        attachments: inputFiles,
-        model: currentModelInfo,
-      });
-      if (videoFiles.length > 3) {
-        useStore.getState().addToast(t('error.maxVideos', { max: 3 }), 'error', 6000);
-        return;
-      }
-      const sendVideosNatively = videoPreflight.ok && videoPreflight.reason === 'native-video';
-      if (!videoPreflight.ok) {
-        // 两种拦截分流：模型无视频能力 vs 格式不在该端点契约交集内，提示语不同。
-        if (videoPreflight.reason === 'video-format-unsupported') {
-          notifyChatVideoFormatUnsupported({
-            t,
-            addToast: useStore.getState().addToast,
-            mimeType: videoPreflight.mimeType,
-          });
-        } else {
-          notifyVideoSendBlockedByModel({
-            t,
-            addToast: useStore.getState().addToast,
-            openSettings: () => openProviderModelSettings(currentModelInfo?.provider),
-          });
-        }
-        return;
-      }
-      const audioPreflight = await evaluateChatAudioSendPreflight({
-        attachments: inputFiles,
-        model: currentModelInfo,
-      });
-      const sendAudiosNatively = audioPreflight.ok && audioPreflight.reason === 'native-audio';
-      const otherFiles = hasFiles ? inputFiles.filter(f =>
-        f.isDirectory || (
-          !isImageFile(f.name)
-          && !(sendVideosNatively && isVideoFile(f.name))
-          && !(sendAudiosNatively && isAudioFileName(f.name, f.mimeType))
-        )
-      ) : [];
-
-      const sessionPathForSend = sessionRef.sessionPath;
-      const sessionFileRefs = otherFiles
-        .filter(f => f.fileId)
-        .map(f => ({
-          fileId: f.fileId,
+      const bundle: ComposerSendBundle = {
+        type,
+        sessionRef: {
           sessionId: sessionRef.sessionId,
-          sessionPath: sessionPathForSend,
-          label: f.name || f.path,
-          kind: f.isDirectory ? 'directory' : 'attachment',
-        }));
-
-      let finalText = text;
-      if (otherFiles.length > 0) {
-        const fileBlock = otherFiles.map(f => {
-          const label = f.fileId ? (f.name || f.path) : f.path;
-          return f.isDirectory
-            ? t('input.attachmentDirectory', { label })
-            : t('input.attachmentFile', { label });
-        }).join('\n');
-        finalText = text ? `${text}\n\n${fileBlock}` : fileBlock;
-      }
-
-      // 图片 / 视频读 base64。统一走 platform 层：Electron 里 platform 代理到 hana，
-      // Web/PWA 里 platform 代理到 HTTP fallback。
-      const platform = window.platform;
-      const images: Array<{ type: 'image'; data: string; mimeType: string }> = [];
-      const videos: Array<{ type: 'video'; data: string; mimeType: string }> = [];
-      const audios: Array<{ type: 'audio'; data: string; mimeType: string }> = [];
-      const imageBase64Map = new Map<string, { base64Data: string; mimeType: string }>();
-      const videoBase64Map = new Map<string, { base64Data: string; mimeType: string }>();
-      const audioBase64Map = new Map<string, { base64Data: string; mimeType: string }>();
-      // 单图读取失败同样不拦整条消息：该图退化为仅文件身份，显式提示（#1647）
-      const imageFileOnlyPaths = new Set<string>();
-      for (const img of imagesAsFileOnly ? [] : imageFiles) {
-        try {
-          if (img.base64Data && img.mimeType) {
-            images.push({ type: 'image', data: img.base64Data, mimeType: img.mimeType });
-          } else {
-            const base64 = await platform?.readFileBase64?.(img.path);
-            if (base64) {
-              const mimeType = chatImageMimeTypeForName(img.name, img.mimeType);
-              imageBase64Map.set(img.path, { base64Data: base64, mimeType });
-              images.push({ type: 'image', data: base64, mimeType });
-            } else {
-              throw new Error(`failed to read image attachment: ${img.path}`);
-            }
+          sessionPath: sessionRef.sessionPath,
+          agentId: sessionRef.agentId,
+        },
+        text,
+        skills,
+        fileRefs,
+        sessionRefs,
+        agentMentions,
+        inputFiles,
+        knowledgeRefs: clickedKnowledgeRefs
+          ? {
+            notebookIds: [...clickedKnowledgeRefs.notebookIds],
+            notebookNames: { ...clickedKnowledgeRefs.notebookNames },
+            mode: clickedKnowledgeRefs.mode,
           }
-        } catch (err) {
-          console.warn('[input] failed to read image attachment', err);
-          imageFileOnlyPaths.add(img.path);
-          useStore.getState().addToast(t('input.imageReadFailedSentAsFile'), 'warning', 6000, {
-            dedupeKey: `image-read-failed:${img.path}`,
-          });
-        }
-      }
-      for (const audio of sendAudiosNatively ? audioFiles : []) {
-        try {
-          if (audio.base64Data) {
-            const mimeType = chatAudioMimeTypeForName(audio.name, audio.mimeType);
-            audios.push({ type: 'audio', data: audio.base64Data, mimeType });
-          } else {
-            const base64 = await platform?.readFileBase64?.(audio.path);
-            if (base64) {
-              const mimeType = chatAudioMimeTypeForName(audio.name, audio.mimeType);
-              audioBase64Map.set(audio.path, { base64Data: base64, mimeType });
-              audios.push({ type: 'audio', data: base64, mimeType });
-            } else {
-              throw new Error(`failed to read audio attachment: ${audio.path}`);
-            }
-          }
-        } catch (err) {
-          console.warn('[input] failed to read audio attachment', err);
-          useStore.getState().addToast(t('input.audioReadFailed'), 'error', 6000, {
-            dedupeKey: `audio-read-failed:${audio.path}`,
-          });
-          return;
-        }
-      }
-      for (const video of sendVideosNatively ? videoFiles : []) {
-        try {
-          if (video.base64Data && video.mimeType) {
-            const mimeType = chatVideoMimeTypeForName(video.name, video.mimeType);
-            if (!isAllowedChatVideoMime(mimeType)
-              || !isChatVideoBase64WithinLimit(video.base64Data)
-              || !isChatVideoBase64ContentCompatible(video.base64Data, mimeType)) {
-              throw new Error(`unsupported or oversized video: ${video.name}`);
-            }
-            videos.push({ type: 'video', data: video.base64Data, mimeType });
-          } else {
-            const base64 = await platform?.readFileBase64?.(video.path);
-            if (base64) {
-              const mimeType = chatVideoMimeTypeForName(video.name, video.mimeType);
-              if (!isAllowedChatVideoMime(mimeType)
-                || !isChatVideoBase64WithinLimit(base64)
-                || !isChatVideoBase64ContentCompatible(base64, mimeType)) {
-                throw new Error(`unsupported or oversized video: ${video.name}`);
-              }
-              videoBase64Map.set(video.path, { base64Data: base64, mimeType });
-              videos.push({ type: 'video', data: base64, mimeType });
-            } else {
-              throw new Error(`failed to read video attachment: ${video.path}`);
-            }
-          }
-        } catch (err) {
-          console.warn('[input] failed to read video attachment', err);
-          useStore.getState().addToast(t('input.videoReadFailed'), 'error', 6000, {
-            dedupeKey: `video-read-failed:${video.path}`,
-          });
-          return;
-        }
-      }
+          : null,
+        docContextAttached: clickedDocContextAttached,
+        doc: clickedDoc ? { ...clickedDoc } : null,
+        quotes: clickedQuotes,
+        uiContext: clickedUiContext,
+      };
 
-      // 文档上下文
-      let docForRender: { path: string; name: string } | null = null;
-      if (clickedDocContextAttached && clickedDoc) {
-        finalText = finalText
-          ? `${finalText}\n\n${t('input.referenceDocument', { path: clickedDoc.path })}`
-          : t('input.referenceDocument', { path: clickedDoc.path });
-        docForRender = clickedDoc;
-      }
-
-      // 引用片段
-      const quotes = clickedQuotes;
-      if (quotes.length > 0) {
-        const quoteStr = quotes.map(formatQuotedSelectionForPrompt).join('\n\n');
-        finalText = finalText ? `${finalText}\n\n${quoteStr}` : quoteStr;
-      }
-
-      const allFiles = [...(hasFiles ? inputFiles : [])];
-      if (docForRender) allFiles.push({ path: docForRender.path, name: docForRender.name });
-
+      // 内容随派发落定：先清输入区（附件/草稿/引用/文档），派发器负责乐观消息与 ws 发送。
       const beforeCleanup = useStore.getState();
       const stillOwnsPendingComposer = !!clickedPendingDraftId
         && beforeCleanup.pendingNewSession === true
@@ -2070,125 +2015,83 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
         if (clickedQuotes.length > 0) useStore.getState().clearQuotedSelections();
       }
 
-      const clientMessageId = createClientUserMessageId();
-      const displayMessage = {
-        text,
-        skills: skills.length > 0 ? skills : undefined,
-        quotedText: quotes.length > 0 ? quotes.map(q => q.text).join('\n\n') : undefined,
-        sessionRefs: sessionRefs.length > 0 ? sessionRefs : undefined,
-        agentMentions: agentMentions.length > 0 ? agentMentions : undefined,
-        // 消息投影用的知识库引用（含名称缓存，仅展示；功能字段走 wsMsg.knowledgeRefs）
-        knowledgeRefs: clickedKnowledgeRefs && clickedKnowledgeRefs.notebookIds.length > 0
-          ? {
-            notebookIds: clickedKnowledgeRefs.notebookIds,
-            mode: clickedKnowledgeRefs.mode,
-            notebooks: clickedKnowledgeRefs.notebookIds.map(id => ({
-              id,
-              name: clickedKnowledgeRefs.notebookNames[id],
-            })),
-          }
-          : undefined,
-        attachments: allFiles.length > 0 ? allFiles.map(f => {
-          const cached = imageBase64Map.get(f.path);
-          const cachedVideo = videoBase64Map.get(f.path);
-          const cachedAudio = audioBase64Map.get(f.path);
-          const imageFile = !f.isDirectory && isImageFile(f.name);
-          return {
-            fileId: f.fileId,
-            path: f.path,
-            name: f.name,
-            isDir: !!f.isDirectory,
-            mimeType: f.mimeType || cached?.mimeType || cachedVideo?.mimeType || cachedAudio?.mimeType || undefined,
-            visionAuxiliary: imageFile && !supportsVision && !imagesAsFileOnly && !imageFileOnlyPaths.has(f.path),
-            ...(f.waveform ? { waveform: f.waveform } : {}),
-          };
-        }) : undefined,
-      };
-
-      useStore.getState().appendOptimisticUserMessage(sessionPathForSend, {
-        id: clientMessageId,
-        role: 'user',
-        text,
-        textHtml: text ? renderMarkdown(text) : undefined,
-        timestamp: Date.now(),
-        attachments: displayMessage.attachments,
-        quotedText: displayMessage.quotedText,
-        skills: displayMessage.skills,
-        knowledgeRefs: displayMessage.knowledgeRefs,
-        sendStatus: 'pending',
-        agentReview: agentMentions.length === 1 ? {
-          status: 'running',
-          reviewerAgentId: agentMentions[0].agentId,
-          reviewerAgentName: agentMentions[0].label,
-        } : undefined,
-      });
-
-      const ws = getWebSocket();
-      const wsMsg: Record<string, unknown> = {
-        type,
-        clientMessageId,
-        text: finalText,
-        sessionId: sessionRef.sessionId,
-        sessionPath: sessionPathForSend,
-        uiContext: clickedUiContext,
-        displayMessage,
-      };
-      if (sessionFileRefs.length > 0) wsMsg.sessionFileRefs = sessionFileRefs;
-      if (images.length > 0) wsMsg.images = images;
-      if (videos.length > 0) wsMsg.videos = videos;
-      if (audios.length > 0) wsMsg.audios = audios;
-      if (skills.length > 0) wsMsg.skills = skills;
-      if (sessionRefs.length > 0) wsMsg.sessionRefs = sessionRefs;
-      if (agentMentions.length > 0) wsMsg.agentReviewRequests = agentMentions;
-      if (clickedKnowledgeRefs && clickedKnowledgeRefs.notebookIds.length > 0) {
-        wsMsg.knowledgeRefs = {
-          notebookIds: clickedKnowledgeRefs.notebookIds,
-          mode: clickedKnowledgeRefs.mode,
-        };
-      }
-      if (!ws) {
-        useStore.getState().markOptimisticUserMessageFailed(
-          sessionPathForSend,
-          clientMessageId,
-          'websocket_unavailable',
-        );
-        return;
-      }
-      try {
-        ws.send(JSON.stringify(wsMsg));
-        // 发送即进入「等待助手」态：服务器在知识检索/排队期间不置 isStreaming，
-        // 本地先亮 typing 指示器，首个该 session 的后续事件（status / 流事件 /
-        // error）到达即清（见 ws-message-handler 顶部保守清除）。仅限 prompt——
-        // interject 发生在流式态中，指示器已由 isStreaming 覆盖。
-        if (type === 'prompt') {
-          useStore.getState().beginTurnPending?.(sessionPathForSend);
-          // 携带知识库引用的提问：发送瞬间本地点亮「知识库检索中」——服务器在
-          // 检索/蒸馏期间不发任何流事件，此前这段时间只剩裸三点指示器（用户
-          // 完全看不到动作）。本地置位与服务器 knowledge_retrieval_started 幂等
-          // 合流，清除沿用顶部保守清除。
-          if (wsMsg.knowledgeRefs) {
-            useStore.getState().beginKnowledgeRetrieval?.(sessionPathForSend);
-          }
-        }
-        upsertOptimisticSessionFirstMessage(sessionPathForSend, text, new Date().toISOString());
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        useStore.getState().markOptimisticUserMessageFailed(sessionPathForSend, clientMessageId, message);
-        throw err;
-      }
+      await dispatchComposerSend(bundle, { loadVisionAuxiliaryConfig, t });
     } finally {
       setSending(false);
     }
-  }, [addToast, editor, inputLocked, attachedFiles, docContextAttached, connected, effectiveStreaming, sending, currentDoc, clearAttachedFiles, clearAttachedFilesForSession, clearDraft, setDocContextAttached, slashCommands, slashSelected, handleSlashSelect, supportsVision, currentModelInfo, loadVisionAuxiliaryConfig, modelSwitching, t]);
+  }, [addToast, editor, inputLocked, attachedFiles, docContextAttached, connected, effectiveStreaming, sending, currentDoc, clearAttachedFiles, clearAttachedFilesForSession, clearDraft, setDocContextAttached, slashCommands, slashSelected, handleSlashSelect, modelSwitching, loadVisionAuxiliaryConfig, t]);
 
   const handleSend = useCallback(async () => {
     await submitEditorMessage('prompt');
   }, [submitEditorMessage]);
 
-  // ── Steer ──
-  const handleSteer = useCallback(async () => {
-    await submitEditorMessage('interject');
-  }, [submitEditorMessage]);
+  // ── 排队消息（流式期间发送的输入）：自动续发 / 立即插入 / 编辑 / 删除 ──
+  const queuedTurnInputs = useStore(s => (s.currentSessionPath
+    ? sessionScopedValue(s, s.queuedTurnInputsByPath, s.currentSessionPath)
+    : undefined)) || EMPTY_QUEUED_TURN_INPUTS;
+  const [editingQueuedId, setEditingQueuedId] = useState<string | null>(null);
+  const [editQueuedText, setEditQueuedText] = useState('');
+  const dispatchFailureToast = useCallback(() => {
+    useStore.getState().addToast(t('input.queuedSendFailed'), 'error', 6000);
+  }, [t]);
+
+  // 自动续发：会话回到空闲（上一轮回答结束）且没有阻塞态时，逐条派发队首消息。
+  const flushingRef = useRef(false);
+  useEffect(() => {
+    if (effectiveStreaming || sending || modelSwitching || !connected) return;
+    if (capabilityRefreshing || compactingStatus) return;
+    if (pendingSessionSwitchPath) return;
+    const first = queuedTurnInputs[0];
+    if (!first || flushingRef.current) return;
+    flushingRef.current = true;
+    const timer = setTimeout(() => {
+      flushingRef.current = false;
+      const store = useStore.getState();
+      const item = (sessionScopedValue(store as any, store.queuedTurnInputsByPath, first.sessionPath) || [])
+        .find(queued => queued.id === first.id);
+      if (!item) return;
+      store.removeQueuedTurnInput(first.sessionPath, first.id);
+      dispatchComposerSend({ ...item.bundle, type: 'prompt' }, { loadVisionAuxiliaryConfig, t })
+        .catch((err) => {
+          console.warn('[queue] flush dispatch failed', err);
+          dispatchFailureToast();
+        });
+    }, 400);
+    return () => {
+      clearTimeout(timer);
+      flushingRef.current = false;
+    };
+  }, [capabilityRefreshing, compactingStatus, connected, dispatchFailureToast, effectiveStreaming, loadVisionAuxiliaryConfig, modelSwitching, pendingSessionSwitchPath, queuedTurnInputs, sending]);
+
+  const handleQueuedInsertNow = useCallback((item: QueuedTurnInput) => {
+    const store = useStore.getState();
+    store.removeQueuedTurnInput(item.sessionPath, item.id);
+    // 仍在流式/等待态才走「插话」注入进行中的回合；否则按普通新消息发送。
+    const stillBusy = sessionScopedListIncludes(store as any, store.streamingSessions, item.sessionPath)
+      || sessionScopedListIncludes(store as any, store.turnPendingSessions, item.sessionPath);
+    dispatchComposerSend({ ...item.bundle, type: stillBusy ? 'interject' : 'prompt' }, { loadVisionAuxiliaryConfig, t })
+      .catch((err) => {
+        console.warn('[queue] insert-now dispatch failed', err);
+        dispatchFailureToast();
+      });
+  }, [dispatchFailureToast, loadVisionAuxiliaryConfig]);
+
+  const handleQueuedDelete = useCallback((item: QueuedTurnInput) => {
+    useStore.getState().removeQueuedTurnInput(item.sessionPath, item.id);
+  }, []);
+
+  const handleQueuedEditStart = useCallback((item: QueuedTurnInput) => {
+    setEditingQueuedId(item.id);
+    setEditQueuedText(item.text);
+  }, []);
+
+  const handleQueuedEditSave = useCallback(() => {
+    if (!editingQueuedId) return;
+    const next = editQueuedText.trim();
+    if (!next) return;
+    useStore.getState().updateQueuedTurnInputText(useStore.getState().currentSessionPath || '', editingQueuedId, next);
+    setEditingQueuedId(null);
+  }, [editQueuedText, editingQueuedId]);
 
   // ── Stop ──
   const handleStop = useCallback(() => {
@@ -2259,7 +2162,8 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     }
     if (e.key === 'Enter' && !e.shiftKey && !isComposing.current && !e.isComposing) {
       e.preventDefault();
-      if (effectiveStreaming && hasContent) handleSteer(); else handleSend();
+      // 流式进行中发送会入队（见 submitEditorMessage 的排队分支），空闲则直接发送。
+      handleSend();
       return true;
     }
     return false;
@@ -2274,10 +2178,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     filteredCommands,
     handleMentionSelect,
     handleSend,
-    handleSteer,
     handleSlashSelect,
-    effectiveStreaming,
-    hasContent,
     inputLocked,
     slashMenuOpen,
     slashSelected,
@@ -2380,6 +2281,95 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
           />
         )}
         <TenetApprovalBanner />
+        {queuedTurnInputs.length > 0 && (
+          <div className={styles['queued-turn-list']} data-testid="queued-turn-list">
+            {queuedTurnInputs.map(item => (
+              <div key={item.id} className={styles['queued-turn-card']}>
+                {editingQueuedId === item.id ? (
+                  <>
+                    <textarea
+                      className={styles['queued-turn-edit']}
+                      value={editQueuedText}
+                      onChange={(e) => setEditQueuedText(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                          e.preventDefault();
+                          handleQueuedEditSave();
+                        }
+                        if (e.key === 'Escape') {
+                          e.preventDefault();
+                          setEditingQueuedId(null);
+                        }
+                      }}
+                      rows={3}
+                      autoFocus
+                    />
+                    <div className={styles['queued-turn-actions']}>
+                      <button
+                        type="button"
+                        className={styles['queued-turn-insert']}
+                        onClick={handleQueuedEditSave}
+                        disabled={!editQueuedText.trim()}
+                      >
+                        {t('common.confirm')}
+                      </button>
+                      <button
+                        type="button"
+                        className={styles['queued-turn-icon-btn']}
+                        onClick={() => setEditingQueuedId(null)}
+                      >
+                        {t('common.cancel')}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className={styles['queued-turn-body']}>
+                      <div className={styles['queued-turn-text']} title={item.text}>{item.text}</div>
+                      <div className={styles['queued-turn-hint']}>{t('input.queuedTurnHint')}</div>
+                    </div>
+                    <div className={styles['queued-turn-actions']}>
+                      <button
+                        type="button"
+                        className={styles['queued-turn-insert']}
+                        onClick={() => handleQueuedInsertNow(item)}
+                        title={t('input.queuedInsertNowTitle')}
+                        data-testid="queued-insert-now"
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                          <line x1="12" y1="19" x2="12" y2="5" /><polyline points="5 12 12 5 19 12" />
+                        </svg>
+                        {t('input.queuedInsertNow')}
+                      </button>
+                      <button
+                        type="button"
+                        className={styles['queued-turn-icon-btn']}
+                        onClick={() => handleQueuedEditStart(item)}
+                        title={t('common.edit')}
+                        aria-label={t('common.edit')}
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                          <path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4Z" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        className={styles['queued-turn-icon-btn']}
+                        onClick={() => handleQueuedDelete(item)}
+                        title={t('input.queuedDelete')}
+                        aria-label={t('input.queuedDelete')}
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                          <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                        </svg>
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
         <div className={styles['input-wrapper']} ref={inputCardRef}>
           <input
             ref={browserFileInputRef}
@@ -2405,7 +2395,8 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
               hasInput={hasContent}
               disabled={effectiveStreaming ? false : !canSend}
               onSend={handleSend}
-              onSteer={handleSteer}
+              onSteer={handleSend}
+              steerLabel={t('input.queuedSend')}
               onStop={handleStop}
             />
           </div>
@@ -2481,10 +2472,6 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
           models={models}
           sessionModel={sessionModel}
           isStreaming={isStreaming}
-          showAudioInput={showAudioInput}
-          audioRecordingActive={audioRecordingState === 'recording'}
-          audioRecordingBusy={audioRecordingState === 'starting' || audioRecordingState === 'stopping'}
-          onAudioToggle={handleAudioRecordToggle}
         />
       </div>
     </div>

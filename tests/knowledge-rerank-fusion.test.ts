@@ -517,19 +517,6 @@ describe("rerank 动态门控与快速档期限", () => {
     return { manager, studioId, nb, rerankCalls };
   }
 
-  it("头部清晰的快速请求仍执行真实本地流程，零重排并保留原文证据", async () => {
-    const { manager, studioId, nb, rerankCalls } = await setupMarginNotebook();
-    const scope = manager.createTurnScope({ studioId, sessionPath: "/tmp/fast-clear.jsonl", notebookIds: [nb.id] });
-    const result = await manager.runFastKnowledgePipeline({ scope, question: Q_CLEAR });
-    expect(rerankCalls).toHaveLength(0);
-    expect(result.stats).toMatchObject({ executionPath: "fast_local", retrievalMode: "fts", remoteModelCalls: 0, rerankCalls: 0 });
-    expect(result.stats.injectedChunks).toBeGreaterThan(0);
-    expect(result.block).toContain("甲一");
-    expect(result.evidence.entries.length).toBeGreaterThan(0);
-    expect(result.stats.rerankSkippedReason).toBeUndefined();
-    expect(result.stats.rerankDegradeReason).toBeUndefined();
-  });
-
   it("详细检索即使头部清晰也照常重排，不再受旧快速门控影响", async () => {
     const { manager, studioId, nb, rerankCalls } = await setupMarginNotebook();
     const result = await manager.queryService.retrieveForNotebooks({

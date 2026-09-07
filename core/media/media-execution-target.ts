@@ -1,4 +1,4 @@
-export type MediaExecutionModality = "image" | "video" | "speech-recognition";
+export type MediaExecutionModality = "image" | "video" | "speech-recognition" | "speech";
 
 export type MediaCredentialSource =
   | "provider-registry"

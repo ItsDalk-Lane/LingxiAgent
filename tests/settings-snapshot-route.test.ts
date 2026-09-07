@@ -121,9 +121,6 @@ async function makeEngine() {
     },
     pluginManager: {
       getAllTools: () => [],
-      getAllowFullAccess: () => false,
-      getUserPluginsDir: () => path.join(userDir, "plugins"),
-      getSettingsTabs: () => [],
     },
     preferences: {
       getExperimentValue: () => undefined,
@@ -180,8 +177,6 @@ describe("settings snapshot route", () => {
       richStreamingEnabled: true,
     });
     expect(body.preferences.speechRecognition.enabled).toBe(false);
-    expect(body.plugins.allowFullAccess).toBe(false);
-    expect(body.plugins.devToolsEnabled).toBe(false);
     expect(body.identity).toBe("identity");
     expect(body.agents).toBe("persona");
     expect(body.publicAgents).toBe("public");

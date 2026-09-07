@@ -118,7 +118,6 @@ describe("auto-updater", () => {
     delete process.env.LINGXI_UPDATE_DIGEST_BASE_URL;
     delete process.env.LINGXI_UPDATE_GITHUB_OWNER;
     delete process.env.LINGXI_UPDATE_GITHUB_REPO;
-    delete process.env.LINGXI_INVITE_API_URL;
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
       ok: false,
       status: 404,
@@ -402,7 +401,7 @@ describe("auto-updater", () => {
     mod.initAutoUpdater(win2);
 
     expect(mockAutoUpdater.on).toHaveBeenCalledTimes(6);
-    expect(ipcMain.handle).toHaveBeenCalledTimes(8);
+    expect(ipcMain.handle).toHaveBeenCalledTimes(4);
 
     if (handlers["update-not-available"]) {
       handlers["update-not-available"]();
@@ -565,9 +564,9 @@ describe("auto-updater", () => {
     }
   });
 
-  // ── 邀请制 alpha 更新通道 ──
+  // ── 已激活通道文件（历史 alpha 通道）──
 
-  it("prefers an activated invite channel over the default feed chain", () => {
+  it("prefers an activated channel file over the default feed chain", () => {
     const home = createTempHome();
     writeChannelFile(home, {
       version: 1,
@@ -575,7 +574,6 @@ describe("auto-updater", () => {
       active: true,
       feedUrl: "https://updates.example.com/alpha",
       activatedAt: "2026-07-31T00:00:00.000Z",
-      inviteCodes: ["CODE-A", "CODE-B"],
     });
     initWithMockWindow({ lingxiHome: home });
 
@@ -585,7 +583,7 @@ describe("auto-updater", () => {
       url: "https://updates.example.com/alpha/",
     });
     expect(config.channel).toBe("alpha");
-    // 邀请通道失败就诚实报错，不悄悄换回正式版货架。
+    // 已激活通道失败就诚实报错，不悄悄换回正式版货架。
     expect(config).not.toHaveProperty("fallbackConfigs");
     expect(mod.buildReleaseDigestUrl("0.440.0", config)).toBe(
       "https://updates.example.com/alpha/release-digest.v1.json",
@@ -593,7 +591,7 @@ describe("auto-updater", () => {
     expect(mod.getState().updateChannel).toBe("alpha");
   });
 
-  it("lets an explicit feed URL env override win over an activated invite channel", () => {
+  it("lets an explicit feed URL env override win over an activated channel file", () => {
     const home = createTempHome();
     writeChannelFile(home, {
       version: 1,
@@ -611,7 +609,7 @@ describe("auto-updater", () => {
     expect(config.channel).toBe("default");
   });
 
-  it("ignores an invite channel record that is not active", () => {
+  it("ignores a channel file record that is not active", () => {
     const home = createTempHome();
     writeChannelFile(home, {
       version: 1,
@@ -646,159 +644,6 @@ describe("auto-updater", () => {
     const config = mod.resolveUpdateFeedConfig({});
     expect(config.channel).toBe("default");
     expect(config.channelError).toMatch(/version/i);
-  });
-
-  it("reports the invite channel as unconfigured when no redemption endpoint is set", async () => {
-    const home = createTempHome();
-    initWithMockWindow({ lingxiHome: home });
-
-    await expect(ipcHandlers["invite:status"]()).resolves.toEqual(expect.objectContaining({
-      configured: false,
-      active: false,
-      inviteCodes: [],
-      channel: "default",
-    }));
-  });
-
-  it("reports the invite channel as configured and active once a channel file is activated", async () => {
-    process.env.LINGXI_INVITE_API_URL = "https://invite.example.com";
-    const home = createTempHome();
-    writeChannelFile(home, {
-      version: 1,
-      deviceId: "device-uuid",
-      active: true,
-      feedUrl: "https://updates.example.com/alpha",
-      inviteCodes: ["CODE-A", "CODE-B"],
-    });
-    initWithMockWindow({ lingxiHome: home });
-
-    await expect(ipcHandlers["invite:status"]()).resolves.toEqual(expect.objectContaining({
-      configured: true,
-      active: true,
-      inviteCodes: ["CODE-A", "CODE-B"],
-      channel: "alpha",
-    }));
-  });
-
-  it("redeems an invite code with a hashed device id and never sends the raw device id", async () => {
-    process.env.LINGXI_INVITE_API_URL = "https://invite.example.com";
-    const home = createTempHome();
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: vi.fn().mockResolvedValue({
-        ok: true,
-        feedUrl: "https://updates.example.com/alpha",
-        childCodes: ["CHILD-1", "CHILD-2"],
-      }),
-    });
-    vi.stubGlobal("fetch", fetchMock);
-    initWithMockWindow({ lingxiHome: home });
-
-    const result = await ipcHandlers["invite:redeem"]({}, "HANA-AAAA-BBBB-CCCC");
-
-    expect(result).toEqual({
-      ok: true,
-      feedUrl: "https://updates.example.com/alpha",
-      childCodes: ["CHILD-1", "CHILD-2"],
-    });
-    const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe("https://invite.example.com/redeem");
-    const body = JSON.parse(init.body);
-    expect(body.code).toBe("HANA-AAAA-BBBB-CCCC");
-    expect(body.deviceIdHash).toMatch(/^[0-9a-f]{64}$/);
-    expect(body.deviceId).toBeUndefined();
-
-    // 原始设备 id 只留在本机通道文件里，上送的必须是它的哈希。
-    const record = readChannelFile(home);
-    expect(typeof record.deviceId).toBe("string");
-    expect(body.deviceIdHash).not.toBe(record.deviceId);
-    // 核销本身绝不落激活态：切通道必须等用户在确认对话框点头。
-    expect(record.active).toBe(false);
-  });
-
-  it("reports an invalid or exhausted invite code separately from a network failure", async () => {
-    process.env.LINGXI_INVITE_API_URL = "https://invite.example.com";
-    const home = createTempHome();
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
-      ok: false,
-      status: 404,
-      json: vi.fn().mockResolvedValue({ ok: false, error: "code not found" }),
-    }));
-    initWithMockWindow({ lingxiHome: home });
-
-    await expect(ipcHandlers["invite:redeem"]({}, "HANA-BAD")).resolves.toEqual({
-      ok: false,
-      reason: "invalid",
-      message: "code not found",
-    });
-  });
-
-  it("reports a redemption transport failure as a network error with the original message", async () => {
-    process.env.LINGXI_INVITE_API_URL = "https://invite.example.com";
-    const home = createTempHome();
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("getaddrinfo ENOTFOUND")));
-    initWithMockWindow({ lingxiHome: home });
-
-    await expect(ipcHandlers["invite:redeem"]({}, "HANA-AAAA")).resolves.toEqual({
-      ok: false,
-      reason: "network",
-      message: "getaddrinfo ENOTFOUND",
-    });
-  });
-
-  it("refuses to redeem when no redemption endpoint is configured", async () => {
-    const home = createTempHome();
-    const fetchMock = vi.fn();
-    vi.stubGlobal("fetch", fetchMock);
-    initWithMockWindow({ lingxiHome: home });
-
-    await expect(ipcHandlers["invite:redeem"]({}, "HANA-AAAA")).resolves.toEqual(expect.objectContaining({
-      ok: false,
-      reason: "not-configured",
-    }));
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
-
-  it("activates the invite channel only when explicitly asked, and switches the live feed", async () => {
-    process.env.LINGXI_INVITE_API_URL = "https://invite.example.com";
-    const home = createTempHome();
-    initWithMockWindow({ lingxiHome: home });
-
-    const status = await ipcHandlers["invite:activate"]({}, {
-      feedUrl: "https://updates.example.com/alpha",
-      inviteCodes: ["CHILD-1", "CHILD-2"],
-    });
-
-    expect(status).toEqual(expect.objectContaining({
-      configured: true,
-      active: true,
-      inviteCodes: ["CHILD-1", "CHILD-2"],
-      channel: "alpha",
-    }));
-    const record = readChannelFile(home);
-    expect(record).toEqual(expect.objectContaining({
-      version: 1,
-      active: true,
-      feedUrl: "https://updates.example.com/alpha",
-      inviteCodes: ["CHILD-1", "CHILD-2"],
-    }));
-    expect(typeof record.activatedAt).toBe("string");
-    expect(mockAutoUpdater.setFeedURL).toHaveBeenLastCalledWith({
-      provider: "generic",
-      url: "https://updates.example.com/alpha/",
-    });
-    expect(mod.getState().updateChannel).toBe("alpha");
-  });
-
-  it("refuses to activate a channel without an https feed address", async () => {
-    process.env.LINGXI_INVITE_API_URL = "https://invite.example.com";
-    const home = createTempHome();
-    initWithMockWindow({ lingxiHome: home });
-
-    await expect(ipcHandlers["invite:activate"]({}, { feedUrl: "http://updates.example.com/alpha" }))
-      .rejects.toThrow(/https/i);
-    await expect(ipcHandlers["invite:activate"]({}, {})).rejects.toThrow(/feed address/i);
   });
 
   it("uses a visible installer window for Windows updates", async () => {

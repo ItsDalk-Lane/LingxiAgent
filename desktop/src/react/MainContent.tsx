@@ -60,7 +60,7 @@ async function installSkillFile(filePath: string, sessionPath?: string | null): 
 
 function blockChatAttachmentDropOutsideChat(): boolean {
   const currentTab = useStore.getState().currentTab;
-  if (currentTab === 'chat' || currentTab.startsWith('plugin:')) return false;
+  if (currentTab === 'chat') return false;
   useStore.getState().addToast(
     currentTab === 'knowledge' ? t('knowledge.useImportButton') : t('channel.filesUnsupported'),
     'error',

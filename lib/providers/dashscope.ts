@@ -127,6 +127,12 @@ export const dashscopePlugin = {
   defaultApi: "openai-completions",
   capabilities: {
     media: {
+      speechGeneration: {
+        defaultModelId: "qwen-tts-latest",
+        models: [
+          { id: "qwen-tts-latest", displayName: "Qwen TTS", protocolId: "dashscope-qwen-tts", inputs: ["text"], outputs: ["audio"] },
+        ],
+      },
       imageGeneration: {
         defaultModelId: "wan2.7-image-pro",
         models: [

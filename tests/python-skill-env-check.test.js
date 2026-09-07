@@ -7,7 +7,6 @@ import { fileURLToPath } from "node:url";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const skillCreatorCheck = path.join(repoRoot, "skills2set", "skill-creator", "scripts", "check_env.mjs");
-const pluginCreatorCheck = path.join(repoRoot, "skills2set", "lingxi-plugin-creator", "scripts", "check_env.mjs");
 
 function isolatedPathEnv(directory) {
   const env = { ...process.env, PATH: directory };
@@ -17,7 +16,6 @@ function isolatedPathEnv(directory) {
     }
   }
   delete env.LINGXI_SKILL_CREATOR_PYTHON;
-  delete env.LINGXI_PLUGIN_CREATOR_PYTHON;
   return env;
 }
 
@@ -128,67 +126,5 @@ describe("skill-creator environment check", () => {
       code: "missing_command",
     });
     expect(result.json.missingCommands).toEqual(["claude"]);
-  });
-});
-
-describe("lingxi-plugin-creator environment check", () => {
-  const roots = [];
-
-  afterEach(() => {
-    for (const root of roots.splice(0)) {
-      fs.rmSync(root, { recursive: true, force: true });
-    }
-  });
-
-  it("reports missing Python before running plugin scaffold scripts", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-creator-env-"));
-    roots.push(root);
-
-    const result = runCheck(pluginCreatorCheck, ["--capability", "scaffold"], isolatedPathEnv(root));
-
-    expect(result.status).toBe(1);
-    expect(result.json).toMatchObject({
-      ok: false,
-      code: "python_not_found",
-    });
-  });
-
-  it("passes plugin scaffold preflight with supported Python and no Python packages", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-creator-env-"));
-    roots.push(root);
-    const fakePython = makeFakePython(root);
-
-    const result = runCheck(pluginCreatorCheck, ["--capability", "scaffold"], {
-      ...isolatedPathEnv(root),
-      LINGXI_PLUGIN_CREATOR_PYTHON: JSON.stringify([process.execPath, fakePython]),
-    });
-
-    expect(result.status).toBe(0);
-    expect(result.json).toMatchObject({
-      ok: true,
-      code: "ok",
-    });
-    expect(result.json.requiredPackages.all).toEqual([]);
-  });
-
-  it("accepts Python 3.9 for plugin scaffold preflight", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-plugin-creator-env-"));
-    roots.push(root);
-    const fakePython = makeFakePython(root);
-
-    const result = runCheck(pluginCreatorCheck, ["--capability", "scaffold"], {
-      ...isolatedPathEnv(root),
-      LINGXI_PLUGIN_CREATOR_PYTHON: JSON.stringify([process.execPath, fakePython]),
-      FAKE_PYTHON_VERSION: "3.9.6",
-    });
-
-    expect(result.status).toBe(0);
-    expect(result.json).toMatchObject({
-      ok: true,
-      code: "ok",
-      python: {
-        minimumVersion: "3.9",
-      },
-    });
   });
 });

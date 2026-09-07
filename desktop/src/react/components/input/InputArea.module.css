@@ -2178,3 +2178,117 @@
     font-size: 0.74rem;
     color: var(--danger);
 }
+
+/* ── 排队消息卡片（流式期间发送的输入，上一轮结束后自动续发）────────── */
+
+.queued-turn-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+.queued-turn-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    padding: var(--space-8) var(--space-12);
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border);
+    border-left-width: 3px;
+    border-left-color: var(--accent);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow);
+}
+
+.queued-turn-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.queued-turn-text {
+    font-size: var(--fs-hint);
+    color: var(--text);
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow-wrap: anywhere;
+}
+
+.queued-turn-hint {
+    font-size: var(--fs-hint);
+    color: var(--text-muted);
+}
+
+.queued-turn-actions {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.queued-turn-insert {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    font-family: inherit;
+    font-size: var(--fs-hint);
+    background: transparent;
+    color: var(--accent);
+    border: var(--border-width) solid var(--accent);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--duration-slow) var(--ease-out);
+}
+
+.queued-turn-insert:hover:not(:disabled) {
+    background: var(--accent);
+    color: var(--bg-card);
+}
+
+.queued-turn-insert:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.queued-turn-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--space-24, 1.5rem);
+    height: var(--space-24, 1.5rem);
+    padding: 0;
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--duration-slow) var(--ease-out);
+}
+
+.queued-turn-icon-btn:hover {
+    color: var(--text);
+    background: var(--overlay-light);
+}
+
+.queued-turn-edit {
+    flex: 1;
+    min-width: 0;
+    font-family: inherit;
+    font-size: var(--fs-hint);
+    color: var(--text);
+    background: var(--overlay-subtle);
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-6) var(--space-8);
+    resize: vertical;
+}
+
+.queued-turn-edit:focus {
+    outline: none;
+    border-color: var(--accent);
+}

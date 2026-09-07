@@ -55,6 +55,7 @@ function text(value: unknown): string | null {
 function capabilityFor(modality: MediaExecutionModality): string {
   if (modality === "video") return "video_generation";
   if (modality === "speech-recognition") return "speech_recognition";
+  if (modality === "speech") return "speech_generation";
   return "image_generation";
 }
 

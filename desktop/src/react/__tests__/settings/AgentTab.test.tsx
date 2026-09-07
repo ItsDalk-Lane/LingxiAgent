@@ -144,7 +144,6 @@ describe('AgentTab settings agent selection', () => {
         agent: { name: 'Hana', yuan: 'lingxi' },
         memory: { enabled: true },
       },
-      currentPins: [],
       globalModelsConfig: {
         models: { memory: { id: 'mem' } },
       },

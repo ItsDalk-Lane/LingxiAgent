@@ -577,99 +577,6 @@ describe('InputArea media send', () => {
     });
   });
 
-  it('sends recorded audio immediately after saving the recording', async () => {
-    const audioMocks = installAudioCaptureMocks();
-    mocks.lingxiFetch.mockImplementation(async (path: string) => {
-      if (path === '/api/upload-blob') {
-        return new Response(JSON.stringify({
-          uploads: [{
-            fileId: 'sf_recording',
-            dest: '/tmp/hana/session-files/recording.wav',
-            name: '录音 1.wav',
-            presentation: 'voice-input',
-            listed: false,
-          }],
-        }), { status: 200 });
-      }
-      throw new Error(`unexpected fetch path ${path}`);
-    });
-    useStore.setState({
-      attachedFiles: [],
-      attachedFilesBySession: { '/session/media.jsonl': [] },
-      models: [{
-        id: 'mimo-v2.5',
-        provider: 'mimo',
-        name: 'MiMo V2.5',
-        api: 'openai-completions',
-        baseUrl: 'https://api.xiaomimimo.com/v1',
-        audio: true,
-        audioTransport: 'mimo-input-audio',
-        audioTransportSupported: true,
-        input: ['text'],
-        isCurrent: true,
-      }],
-    } as never);
-
-    render(React.createElement(InputArea));
-
-    fireEvent.click(screen.getByTestId('record-audio'));
-
-    await waitFor(() => {
-      expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
-      expect(audioMocks.processor).not.toBeNull();
-      expect(screen.getByTestId('record-audio').textContent).toBe('stop');
-    });
-    const activeProcessor = audioMocks.processor!;
-    activeProcessor.onaudioprocess?.({
-      inputBuffer: {
-        getChannelData: () => new Float32Array([0.12, -0.12, 0.08, -0.08]),
-      },
-    });
-
-    fireEvent.click(screen.getByTestId('record-audio'));
-
-    await waitFor(() => {
-      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/upload-blob', expect.objectContaining({
-        method: 'POST',
-        body: expect.stringContaining('"presentation":"voice-input"'),
-      }));
-      expect(mocks.wsSend).toHaveBeenCalledTimes(1);
-    });
-    const uploadBody = JSON.parse(String(mocks.lingxiFetch.mock.calls[0][1]?.body));
-    expect(uploadBody.waveform).toMatchObject({
-      version: 1,
-      durationMs: expect.any(Number),
-      source: 'computed',
-    });
-    expect(uploadBody.waveform.peaks.length).toBeGreaterThan(0);
-    const payload = JSON.parse(String(mocks.wsSend.mock.calls[0][0]));
-    expect(payload.text).toBe('');
-    expect(payload.audios).toEqual([{
-      type: 'audio',
-      data: expect.any(String),
-      mimeType: 'audio/wav',
-    }]);
-    expect(payload.displayMessage).toMatchObject({
-      text: '',
-      attachments: [{
-        fileId: 'sf_recording',
-        path: '/tmp/hana/session-files/recording.wav',
-        name: '录音 1.wav',
-        isDir: false,
-        mimeType: 'audio/wav',
-        presentation: 'voice-input',
-        listed: false,
-        waveform: expect.objectContaining({
-          version: 1,
-          peaks: expect.any(Array),
-          source: 'computed',
-        }),
-      }],
-    });
-    expect(useStore.getState().attachedFiles).toEqual([]);
-    expect(audioMocks.stopTrack).toHaveBeenCalled();
-  });
-
   it('starts recording from the app-local voice shortcut only on the focused chat page', async () => {
     installAudioCaptureMocks();
     vi.spyOn(document, 'hasFocus').mockReturnValue(true);
@@ -909,6 +816,8 @@ describe('InputArea media send', () => {
   });
 
   it('interjects streaming attachment sends with the same message envelope as prompt sends', async () => {
+    // 流式期间发送默认入队（不立即发送）；「立即插入」把排队消息以 interject
+    // 注入进行中的回合，信封与普通 prompt 发送完全一致。
     useStore.setState({
       streamingSessions: ['/session/media.jsonl'],
       attachedFiles: [{
@@ -933,6 +842,14 @@ describe('InputArea media send', () => {
     expect(send.disabled).toBe(false);
     fireEvent.click(send);
 
+    // 入队生效：不立即发送，输入区出现排队卡片
+    await waitFor(() => {
+      expect(screen.getByTestId('queued-turn-list')).toBeTruthy();
+    });
+    expect(mocks.wsSend).not.toHaveBeenCalled();
+
+    // 立即插入：注入进行中的回合
+    fireEvent.click(screen.getByTestId('queued-insert-now'));
     await waitFor(() => {
       expect(mocks.wsSend).toHaveBeenCalledTimes(1);
     });

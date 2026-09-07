@@ -64,6 +64,15 @@ export function inferMediaProtocolId(providerId, capability, modelId, provider: 
     return "";
   }
 
+  if (key === "speechGeneration") {
+    if (providerId === "openai" && (id.startsWith("tts-") || id.startsWith("gpt-4o-mini-tts"))) return "openai-audio-speech";
+    if (providerId === "system-speech") return "system-speech";
+    // 用户自定义 provider：OpenAI 兼容网关的语音合成模型按 OpenAI Speech API
+    // （/audio/speech）执行，与图片/识别模型的推断规则同理。
+    if (provider.sourceKind === "user" && OPENAI_COMPATIBLE_APIS.has(provider.api)) return "openai-audio-speech";
+    return "";
+  }
+
   if (key === "speechRecognition") {
     if (providerId === "openai" && (id.includes("transcribe") || id === "whisper-1")) return "openai-audio-transcriptions";
     if ((providerId === "mimo" || providerId === "mimo-token-plan") && id.includes("asr")) return "mimo-chat-completions-asr";

@@ -31,13 +31,18 @@ export { TOOL_ARG_SUMMARY_KEYS };
 const SESSION_TAIL_READ_THRESHOLD = 256 * 1024;
 const ATTACHED_IMAGE_MARKER_RE = /\[attached_image:\s*[^\]]+\]/g;
 
-/** 从文本中提取并剥离 <think>/<thinking> 标签 */
+/** 从文本中提取并剥离 <think>/<thinking>/<mm:think> 标签（mm:think 为 MiniMax M3 方言） */
 export function stripThinkTags(raw) {
   const thinkParts = [];
-  const text = raw.replace(/<think(?:ing)?>([\s\S]*?)<\/think(?:ing)?>\n*/g, (_, inner) => {
-    thinkParts.push(inner.trim());
-    return "";
-  });
+  const text = raw
+    .replace(/<think(?:ing)?>([\s\S]*?)<\/think(?:ing)?>\n*/g, (_, inner) => {
+      thinkParts.push(inner.trim());
+      return "";
+    })
+    .replace(/<mm:think>([\s\S]*?)<\/mm:think>\n*/g, (_, inner) => {
+      thinkParts.push(inner.trim());
+      return "";
+    });
   return { text, thinkContent: thinkParts.join("\n") };
 }
 
@@ -89,7 +94,8 @@ export function extractTextContent(content, { stripThink = false } = {}) {
 export function contentHasThinkingBlock(content, { stripThink = false } = {}) {
   if (typeof content === "string") {
     if (!stripThink) return false;
-    return /<think(?:ing)?>[\s\S]*?<\/think(?:ing)?>/.test(content);
+    return /<think(?:ing)?>[\s\S]*?<\/think(?:ing)?>/.test(content)
+      || /<mm:think>[\s\S]*?<\/mm:think>/.test(content);
   }
   if (!Array.isArray(content)) return false;
   return content.some(block => block?.type === "thinking");

@@ -20,7 +20,6 @@ const translations: Record<string, string> = {
   'settings.tabs.skills': '技能',
   'settings.tabs.bridge': '桥接',
   'settings.tabs.providers': '模型',
-  'settings.tabs.media': '媒体',
   'settings.tabs.sharing': '分享',
   'settings.tabs.access': '访问',
   'settings.tabs.plugins': '插件',

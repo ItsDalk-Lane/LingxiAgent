@@ -1,8 +1,10 @@
 /**
- * pinned-memory.js — pin_memory / unpin_memory 自定义工具
+ * pinned-memory.ts — pin_memory / unpin_memory 自定义工具
  *
- * 让 agent 通过工具调用来管理置顶记忆，替代之前在 yuan.md 中
- * 指导 agent 手动 read→append→write pinned.md 的方式。
+ * 让 agent 通过工具调用来管理「置顶与原则」库（tenets）。工具名保持不变
+ * （权限名单与历史会话的工具调用记录零成本兼容），写入侧已统一到
+ * tenets 存储：pin = 直接生效的 user_direct 条目（写前 PII 脱敏）；
+ * unpin = 按 id 或关键词模糊删除 active 条目。
  */
 
 import { Type } from "../pi-sdk/index.ts";
@@ -10,10 +12,12 @@ import { t } from "../i18n.ts";
 import { scrubPII } from "../pii-guard.ts";
 import { createModuleLogger } from "../debug-log.ts";
 import {
-  addPinnedMemoryItem,
-  readPinnedMemoryItems,
-  removePinnedMemoryItems,
-} from "../memory/pinned-memory-store.ts";
+  activeTenets,
+  addTenetDirect,
+  removeTenet,
+  TENET_ERRORS,
+  isTenetError,
+} from "../memory/tenets.ts";
 
 const log = createModuleLogger("pin_memory");
 
@@ -23,8 +27,7 @@ function stableMemoryTargetId(value: unknown) {
 
 /**
  * 创建 pin_memory + unpin_memory 工具
- * @param {string} agentDir - agent 数据目录（pinned.md 在这里）
- * @returns {[import('../pi-sdk/index.ts').ToolDefinition, import('../pi-sdk/index.ts').ToolDefinition]}
+ * @param {string} agentDir - agent 数据目录（tenets.json 在 memory/ 下）
  */
 export function createPinnedMemoryTools(agentDir: string) {
   const pinTool = {
@@ -51,26 +54,34 @@ export function createPinnedMemoryTools(agentDir: string) {
         log.warn(`PII detected (${detected.join(", ")}), redacted before storage`);
       }
 
-      const content = cleaned;
-      const result = addPinnedMemoryItem(agentDir, content);
-      if (result.alreadyExists) {
+      try {
+        const result = addTenetDirect(agentDir, { content: cleaned });
+        if (result.duplicate) {
+          return {
+            content: [{ type: "text", text: t("error.pinnedAlreadyExists") }],
+            details: {},
+          };
+        }
         return {
-          content: [{ type: "text", text: t("error.pinnedAlreadyExists") }],
-          details: {},
+          content: [{ type: "text", text: t("error.pinnedAdded", { content: cleaned }) }],
+          details: { item: { id: result.tenet.id, content: result.tenet.content, createdAt: result.tenet.createdAt } },
         };
+      } catch (err) {
+        if (isTenetError(err, TENET_ERRORS.LIMIT_REACHED)) {
+          return {
+            content: [{ type: "text", text: t("error.pinnedAdded", { content: cleaned }) + " (storage full)" }],
+            details: { errorCode: TENET_ERRORS.LIMIT_REACHED },
+          };
+        }
+        throw err;
       }
-
-      return {
-        content: [{ type: "text", text: t("error.pinnedAdded", { content }) }],
-        details: { item: result.item },
-      };
     },
   };
 
   const unpinTool = {
     name: "unpin_memory",
     label: "Unpin Memory",
-    description: "Remove an item from pinned memory. Use when the user says 'forget xxx' or 'delete this memory'. Supports fuzzy matching: any line containing the keyword you provide will be removed.",
+    description: "Remove an item from pinned memory. Use when the user says 'forget xxx' or 'delete this memory'. Supports fuzzy matching: any entry containing the keyword you provide will be removed.",
     sessionPermission: {
       resolveInvocation: (params: any = {}) => {
         const id = typeof params.id === "string" ? params.id.trim() : "";
@@ -101,7 +112,7 @@ export function createPinnedMemoryTools(agentDir: string) {
       keyword: Type.Optional(Type.String({ description: "Keyword of the memory to remove, matched fuzzily" })),
     }),
     execute: async (_toolCallId, params) => {
-      const existing = readPinnedMemoryItems(agentDir);
+      const existing = activeTenets(agentDir);
       if (existing.length === 0) {
         return {
           content: [{ type: "text", text: t("error.pinnedEmpty") }],
@@ -109,8 +120,26 @@ export function createPinnedMemoryTools(agentDir: string) {
         };
       }
 
-      const result = removePinnedMemoryItems(agentDir, params);
-      const removed = result.removed;
+      const normalizedId = typeof params.id === "string" ? params.id.trim() : "";
+      const normalizedKeyword = typeof params.keyword === "string"
+        ? params.keyword.replace(/\r\n?/g, "\n").trim().toLowerCase()
+        : "";
+      if (!normalizedId && !normalizedKeyword) {
+        return {
+          content: [{ type: "text", text: t("error.pinnedNotFound", { keyword: "" }) }],
+          details: {},
+        };
+      }
+
+      const removed: Array<{ id: string; content: string }> = [];
+      for (const tenet of existing) {
+        const matchesId = normalizedId && tenet.id === normalizedId;
+        const matchesKeyword = normalizedKeyword && tenet.content.toLowerCase().includes(normalizedKeyword);
+        if (matchesId || matchesKeyword) {
+          removeTenet(agentDir, tenet.id);
+          removed.push({ id: tenet.id, content: tenet.content });
+        }
+      }
 
       if (removed.length === 0) {
         const keyword = params.keyword || params.id || "";

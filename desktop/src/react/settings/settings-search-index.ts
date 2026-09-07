@@ -193,13 +193,6 @@ const BUILT_IN_SETTINGS_SEARCH_ENTRIES: SettingsSearchEntry[] = [
     aliases: ['access', 'mobile', 'pwa', 'lan', 'remote', 'port', 'qr code', '访问', '手机', '局域网', '远程', '端口', '二维码'],
   },
   {
-    id: 'plugins-management',
-    tabId: 'plugins',
-    titleKey: 'settings.plugins.manageTitle',
-    pathKeys: ['settings.tabs.plugins'],
-    aliases: ['plugin', 'plugins', 'marketplace', 'dev tools', 'full access', '插件', '插件市场', '开发工具', '完全访问'],
-  },
-  {
     id: 'experiments-flags',
     tabId: 'experiments',
     titleKey: 'settings.tabs.experiments',

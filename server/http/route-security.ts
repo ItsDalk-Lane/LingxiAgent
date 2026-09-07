@@ -5,27 +5,6 @@ const LOCAL_ONLY = Object.freeze({ kind: "local_only" });
 const PUBLIC = Object.freeze({ kind: "public" });
 const STUDIO_OWNER = Object.freeze({ kind: "studio_owner" });
 
-/**
- * 宿主自有的 /api/plugins/* 一级命名空间。这些 id 下的子路径属于插件管理 API，
- * 永远不会被代理到插件 route app，也绝不接受 plugin surface 凭证。
- * server/routes/plugins.ts 的 iframe ticket 签发校验与这里共用同一份名单。
- */
-export const PLUGIN_HOST_ROUTE_PLUGIN_IDS = Object.freeze(new Set([
-  "config-schemas",
-  "event-bus",
-  "diagnostics",
-  "dev",
-  "marketplace",
-  "install",
-  "settings",
-  "pages",
-  "widgets",
-  "ui-host-capabilities",
-  "settings-tabs",
-  "iframe-ticket",
-  "theme.css",
-]));
-
 export function authorizeHttpRoute({ method, path, principal }) {
   const policy = classifyHttpRoute({ method, path });
   if (policy.kind === "public") {
@@ -47,18 +26,6 @@ export function authorizeHttpRoute({ method, path, principal }) {
   if (!principal) {
     return denied("forbidden", 403, policy, {
       reason: "missing_principal",
-    });
-  }
-  if (policy.kind === "plugin_route") {
-    if (isPluginSurfacePrincipal(principal) && principal.pluginId === policy.pluginId) {
-      return allowed(policy);
-    }
-    if (isStudioOwnerPrincipal(principal)) {
-      return allowed(policy);
-    }
-    return denied("plugin_route_forbidden", 403, policy, {
-      reason: "plugin_route_requires_owner_or_matching_plugin_surface",
-      pluginId: policy.pluginId,
     });
   }
   const scopes = Array.isArray(principal.scopes) ? principal.scopes : [];
@@ -147,13 +114,8 @@ export function classifyHttpRoute({ method = "GET", path = "" } = {}) {
   if (isImageGenerationReadRoute(verb, routePath)) return scoped("settings.read");
   if (isImageGenerationWriteRoute(verb, routePath)) return scoped("settings.write");
   if (isImageGenerationProviderManagementRoute(verb, routePath)) return scoped("providers.manage");
-  if (isPluginSettingsReadRoute(verb, routePath)) return scoped("settings.read");
-  if (isPluginSettingsWriteRoute(verb, routePath)) return scoped("settings.write");
   if (isProviderManagementRoute(verb, routePath)) return scoped("providers.manage");
   if (isBridgeManagementRoute(verb, routePath)) return scoped("bridge.manage");
-  if (isPluginAssetReadRoute(verb, routePath)) return scoped("chat");
-  if (isPluginUiReadRoute(verb, routePath)) return scoped("chat");
-  if (verb === "POST" && routePath === "/api/plugins/iframe-ticket") return scoped("chat");
   if (verb === "POST" && /^\/api\/resources\/[^/]+\/ticket$/.test(routePath)) {
     return scoped("resources.read");
   }
@@ -201,9 +163,6 @@ export function classifyHttpRoute({ method = "GET", path = "" } = {}) {
     return scoped("chat");
   }
 
-  const pluginRoute = classifyPluginRouteProxyPath(routePath);
-  if (pluginRoute) return pluginRoute;
-
   if (routePath.startsWith("/api/")) return STUDIO_OWNER;
 
   return LOCAL_ONLY;
@@ -214,26 +173,6 @@ export function classifyHttpRoute({ method = "GET", path = "" } = {}) {
  * 必须在所有更具体的 /api/plugins/* 匹配器（settings / mcp /
  * assets / dev / iframe-ticket 等）之后调用，那些路径保持原有 scope 策略。
  */
-function classifyPluginRouteProxyPath(routePath) {
-  const match = /^\/api\/plugins\/([^/]+)\/.+$/.exec(routePath);
-  if (!match) return null;
-  let pluginId;
-  try {
-    pluginId = decodeURIComponent(match[1]);
-  } catch {
-    return null;
-  }
-  if (!pluginId || PLUGIN_HOST_ROUTE_PLUGIN_IDS.has(pluginId)) return null;
-  return Object.freeze({ kind: "plugin_route", pluginId });
-}
-
-export function isPluginSurfacePrincipal(principal) {
-  if (!principal || typeof principal !== "object") return false;
-  return principal.kind === "plugin"
-    && principal.credentialKind === "plugin_surface_session"
-    && typeof principal.pluginId === "string"
-    && principal.pluginId.length > 0;
-}
 
 export function isPublicHttpRoute({ method = "GET", path = "" } = {}) {
   return classifyHttpRoute({ method, path }).kind === "public";
@@ -639,6 +578,8 @@ function isImageGenerationReadRoute(verb, routePath) {
   if (verb !== "GET" && verb !== "HEAD") return false;
   return routePath === "/api/media/providers"
     || routePath === "/api/media/image/providers"
+    || routePath === "/api/media/speech/providers"
+    || routePath === "/api/media/speech/config"
     || routePath === "/api/media/tasks"
     || /^\/api\/media\/generated\/[^/]+$/.test(routePath)
     || /^\/api\/media\/tasks\/batch\/[^/]+$/.test(routePath)
@@ -650,11 +591,12 @@ function isMediaSubmitRoute(verb, routePath) {
   return routePath === "/api/media/generate"
     || routePath === "/api/media/image/generate"
     || routePath === "/api/media/video/generate"
+    || routePath === "/api/media/speech/generate"
     || routePath === "/api/media/asr/transcribe";
 }
 
 function isImageGenerationWriteRoute(verb, routePath) {
-  return verb === "PUT" && routePath === "/api/media/image/config";
+  return verb === "PUT" && (routePath === "/api/media/image/config" || routePath === "/api/media/speech/config");
 }
 
 function isImageGenerationProviderManagementRoute(verb, routePath) {
@@ -663,37 +605,3 @@ function isImageGenerationProviderManagementRoute(verb, routePath) {
     || (verb === "POST" && /^\/api\/media\/tasks\/[^/]+\/retry$/.test(routePath));
 }
 
-function isPluginSettingsReadRoute(verb, routePath) {
-  if (verb !== "GET") return false;
-  return routePath === "/api/plugins"
-    || routePath === "/api/plugins/config-schemas"
-    || routePath === "/api/plugins/event-bus/capabilities"
-    || routePath === "/api/plugins/diagnostics"
-    || routePath === "/api/plugins/marketplace"
-    || /^\/api\/plugins\/marketplace\/[^/]+\/readme$/.test(routePath)
-    || /^\/api\/plugins\/[^/]+\/config-schema$/.test(routePath)
-    || /^\/api\/plugins\/[^/]+\/config$/.test(routePath);
-}
-
-function isPluginSettingsWriteRoute(verb, routePath) {
-  return (verb === "PUT" && (
-    routePath === "/api/plugins/settings"
-    || /^\/api\/plugins\/[^/]+\/config$/.test(routePath)
-    || /^\/api\/plugins\/[^/]+\/enabled$/.test(routePath)
-  ))
-    || (verb === "POST" && /^\/api\/plugins\/marketplace\/[^/]+\/install$/.test(routePath))
-    || (verb === "DELETE" && /^\/api\/plugins\/[^/]+$/.test(routePath));
-}
-
-function isPluginUiReadRoute(verb, routePath) {
-  if (verb !== "GET") return false;
-  return routePath === "/api/plugins/pages"
-    || routePath === "/api/plugins/widgets"
-    || routePath === "/api/plugins/ui-host-capabilities"
-    || routePath === "/api/plugins/theme.css";
-}
-
-function isPluginAssetReadRoute(verb, routePath) {
-  if (verb !== "GET" && verb !== "HEAD") return false;
-  return /^\/api\/plugins\/[^/]+\/assets\/.+$/.test(routePath);
-}

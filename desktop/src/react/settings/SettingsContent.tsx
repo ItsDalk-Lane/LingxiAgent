@@ -27,8 +27,6 @@ import { ProvidersTab } from './tabs/ProvidersTab';
 import { ModelsTab } from './tabs/ModelsTab';
 import { UsageTab } from './tabs/UsageTab';
 import { AboutTab } from './tabs/AboutTab';
-import { PluginsTab } from './tabs/PluginsTab';
-import { PluginMarketplaceTab } from './tabs/PluginMarketplaceTab';
 import { ExperimentsTab } from './tabs/ExperimentsTab';
 import { SecurityTab } from './tabs/SecurityTab';
 import { SharingTab } from './tabs/SharingTab';
@@ -60,9 +58,7 @@ const TAB_COMPONENTS: Record<string, React.ComponentType> = {
   usage: UsageTab,
   sharing: SharingTab,
   access: AccessTab,
-  plugins: PluginsTab,
   experiments: ExperimentsTab,
-  'plugin-marketplace': PluginMarketplaceTab,
   security: SecurityTab,
   about: AboutTab,
 };
@@ -91,7 +87,6 @@ const TAB_TITLE_KEYS: Record<string, string> = {
   general: 'settings.tabs.general',
   browser: 'settings.tabs.browser',
   work: 'settings.tabs.work',
-  workflow: 'Workflow',
   skills: 'settings.tabs.skills',
   mcp: 'settings.tabs.mcp',
   bridge: 'settings.tabs.bridge',
@@ -100,9 +95,7 @@ const TAB_TITLE_KEYS: Record<string, string> = {
   usage: 'settings.tabs.usage',
   sharing: 'settings.tabs.sharing',
   access: 'settings.tabs.access',
-  plugins: 'settings.tabs.plugins',
   experiments: 'settings.tabs.experiments',
-  'plugin-marketplace': 'settings.tabs.pluginMarketplace',
   security: 'settings.tabs.security',
   about: 'settings.tabs.about',
 };
@@ -112,8 +105,6 @@ const TAB_DESCRIPTION_KEYS: Record<string, string> = {
 };
 
 export function normalizeSettingsTab(tab: string): string {
-  if (tab === 'computer') return 'experiments';
-  if (tab === 'media') return 'models';
   return tab;
 }
 

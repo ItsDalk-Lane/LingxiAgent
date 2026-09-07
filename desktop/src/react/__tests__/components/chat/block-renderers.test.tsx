@@ -14,7 +14,6 @@ describe('typed content block renderer registry', () => {
       'interlude',
       'media_generation',
       'mood',
-      'plugin_card',
       'screenshot',
       'session_confirmation',
       'settings_confirm',

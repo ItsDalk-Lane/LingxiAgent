@@ -178,8 +178,9 @@ export class Poller {
         taskId: task.taskId,
         sessionPath: task.sessionPath,
         meta: {
-          type: task.type === "video" ? "video-generation" : "image-generation",
-          mediaKind: task.type === "video" ? "video" : "image",
+          type: task.type === "video" ? "video-generation"
+            : task.type === "speech" ? "speech-generation" : "image-generation",
+          mediaKind: task.type === "video" ? "video" : task.type === "speech" ? "speech" : "image",
           deliveryIntent: "ui_only",
           triggerParentTurn: false,
           ...(task.type === "image" ? { notifyAgentOnFailure: true } : {}),
@@ -193,7 +194,8 @@ export class Poller {
         type: "media-generation",
         parentSessionPath: task.sessionPath,
         meta: {
-          type: task.type === "video" ? "video-generation" : "image-generation",
+          type: task.type === "video" ? "video-generation"
+            : task.type === "speech" ? "speech-generation" : "image-generation",
           ...(task.deliveryTarget ? { deliveryTarget: task.deliveryTarget } : {}),
         },
       }).catch(() => {});
@@ -283,7 +285,7 @@ export class Poller {
       type: "media-gen:task-done",
       taskId: task.taskId,
       batchId: task.batchId || null,
-      kind: task.type === "video" ? "video" : "image",
+      kind: task.type === "video" ? "video" : task.type === "speech" ? "speech" : "image",
       files: Array.isArray(files) ? files : [],
       generatedDir: this._generatedDir,
       sessionFiles: Array.isArray(sessionFiles) ? sessionFiles : [],

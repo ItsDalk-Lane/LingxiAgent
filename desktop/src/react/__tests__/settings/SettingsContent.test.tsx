@@ -182,36 +182,13 @@ describe('SettingsContent title placement', () => {
     expect(onActiveTabChange).not.toHaveBeenCalled();
   });
 
-  it('renders the plugin marketplace as a full settings subpage', async () => {
-    mockState.activeTab = 'plugin-marketplace';
-    const { SettingsContent } = await import('../../settings/SettingsContent');
-    render(<SettingsContent variant="window" />);
-
-    expect(screen.getByRole('heading', { name: 'settings.tabs.pluginMarketplace' })).toBeInTheDocument();
-    expect(screen.queryByText('agent tab')).not.toBeInTheDocument();
-  });
-
-  it('notifies the modal shell when content navigates to a hidden settings subpage after mount', async () => {
-    const onActiveTabChange = vi.fn();
-    const { SettingsContent } = await import('../../settings/SettingsContent');
-    const { rerender } = render(<SettingsContent variant="modal" onClose={() => {}} onActiveTabChange={onActiveTabChange} />);
-
-    onActiveTabChange.mockClear();
-    mockState.activeTab = 'plugin-marketplace';
-    rerender(<SettingsContent variant="modal" onClose={() => {}} onActiveTabChange={onActiveTabChange} />);
-
-    await waitFor(() => {
-      expect(onActiveTabChange).toHaveBeenCalledWith('plugin-marketplace');
-    });
-  });
-
-  it('does not render a Computer Use tab and redirects stale computer tabs to experiments', async () => {
+  it('does not render a Computer Use tab and falls back to the agent tab for stale tab values', async () => {
     mockState.activeTab = 'computer';
     const { SettingsContent } = await import('../../settings/SettingsContent');
     render(<SettingsContent variant="modal" onClose={() => {}} />);
 
     expect(screen.queryByRole('button', { name: 'settings.tabs.computer' })).not.toBeInTheDocument();
-    expect(mockState.set).toHaveBeenCalledWith({ activeTab: 'experiments' });
+    expect(screen.getByTestId('active-tab')).toHaveTextContent('agent tab');
   });
 
   it('keeps activeServerConnection in sync when the settings window hears server restart', async () => {

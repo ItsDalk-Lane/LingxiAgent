@@ -19,6 +19,9 @@ interface Props {
   /** 消息级反馈（赞/踩 → experience 沉淀）。缺省时不渲染反馈按钮。 */
   onFeedback?: (rating: 'up' | 'down') => void;
   feedbackState?: 'up' | 'down' | null;
+  /** 朗读：有正文才显示；点击后把正文合成语音发到会话里播放。 */
+  onSpeak?: () => void;
+  speakState?: 'idle' | 'loading' | null;
 }
 
 export function useMessageFooterActions({
@@ -31,6 +34,8 @@ export function useMessageFooterActions({
   isStreaming,
   onFeedback,
   feedbackState = null,
+  onSpeak,
+  speakState = null,
 }: Props): MessageFooterAction[] {
   const { t } = useI18n();
   const selectedIds = useStore(s => selectSelectedIdsBySession(s, sessionPath));
@@ -102,6 +107,17 @@ export function useMessageFooterActions({
         onClick: () => onScreenshot(),
         disabled: isStreaming,
       },
+      ...(typeof onSpeak === 'function'
+        ? [
+            {
+              id: 'speak',
+              title: t('chat.speak'),
+              icon: speakState === 'loading' ? <SpeakLoadingIcon /> : <SpeakIcon />,
+              onClick: () => onSpeak(),
+              disabled: isStreaming || speakState === 'loading',
+            },
+          ]
+        : []),
       ...feedbackActions,
       {
         id: 'select-all',
@@ -122,7 +138,7 @@ export function useMessageFooterActions({
         pressed: isSelected,
       },
     ];
-  }, [allSelected, copied, feedbackState, handleSelectAll, handleToggle, isSelected, isStreaming, onCopy, onFeedback, onScreenshot, t]);
+  }, [allSelected, copied, feedbackState, handleSelectAll, handleToggle, isSelected, isStreaming, onCopy, onFeedback, onScreenshot, onSpeak, speakState, t]);
 }
 
 export const MessageActions = memo(function MessageActions(props: Props) {
@@ -153,6 +169,26 @@ function ScreenshotIcon() {
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
       <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
       <circle cx="12" cy="13" r="4" />
+    </svg>
+  );
+}
+
+function SpeakIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+      <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+      <path d="M19 5a9 9 0 0 1 0 14" />
+    </svg>
+  );
+}
+
+function SpeakLoadingIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" opacity="0.6">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+      <path d="M15.5 8.5a5 5 0 0 1 0 7" opacity="0.4" />
+      <path d="M19 5a9 9 0 0 1 0 14" opacity="0.4" />
     </svg>
   );
 }

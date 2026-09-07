@@ -142,7 +142,9 @@ function createUserAbortError() {
 function stripTaggedThinking(text) {
   const stripped = text
     .replace(/<think>[\s\S]*?<\/think>\s*/gi, "")
-    .replace(/<thinking>[\s\S]*?<\/thinking>\s*/gi, "");
+    .replace(/<thinking>[\s\S]*?<\/thinking>\s*/gi, "")
+    // MiniMax M3 思考方言
+    .replace(/<mm:think>[\s\S]*?<\/mm:think>\s*/gi, "");
   return {
     text: stripped.trim(),
     removedThinking: stripped !== text,

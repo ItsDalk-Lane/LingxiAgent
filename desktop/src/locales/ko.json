@@ -221,8 +221,7 @@
     "toolReadOnly": "읽기",
     "toolWrite": "쓰기",
     "filesUnsupported": "채널은 현재 텍스트 메시지만 지원해요. 파일은 일반 채팅 첨부에 추가되지 않습니다",
-    "createIntroOptional": "설명",
-    "unpinPluginTab": "「{label}」 고정 해제"
+    "createIntroOptional": "설명"
   },
   "announcement": {
     "title": "업데이트 완료 · v{version}",
@@ -444,7 +443,8 @@
       "generationInProgress": "{kind} 생성 중",
       "retryFailed": "재생성 실패",
       "submitting": "제출 중",
-      "retryLabel": "{kind} 재생성"
+      "retryLabel": "{kind} 재생성",
+      "kindSpeech": "음성"
     },
     "turnStatus": {
       "missingFinalAnswer": "최종 답변이 생성되지 않았습니다",
@@ -510,7 +510,9 @@
     "feedbackRecorded": "경험으로 기록했어요.",
     "feedbackRecordedExperienceOff": "기록했어요. 현재 경험 라이브러리가 꺼져 있어요. 켜면 어시스턴트가 참고할 수 있어요.",
     "feedbackDuplicate": "이 피드백은 이미 기록되었어요.",
-    "feedbackFailed": "피드백을 저장하지 못했어요. 잠시 후 다시 시도해 주세요."
+    "feedbackFailed": "피드백을 저장하지 못했어요. 잠시 후 다시 시도해 주세요.",
+    "speak": "읽어 주기",
+    "speakFailed": "음성 생성 실패"
   },
   "time": {
     "justNow": "방금",
@@ -644,7 +646,16 @@
     "knowledgeModeFast": "빠름",
     "knowledgeModeDetailed": "상세",
     "knowledgeModeFastHint": "로컬에서만 빠르게 검색하며 원격 임베딩, 재정렬 또는 여러 차례 조사를 기다리지 않습니다.",
-    "knowledgeModeDetailedHint": "여러 차례 검색, 읽기 및 근거 확인을 거쳐 상세한 답변을 생성합니다."
+    "knowledgeModeDetailedHint": "여러 차례 검색, 읽기 및 근거 확인을 거쳐 상세한 답변을 생성합니다.",
+    "dictateOn": "받아쓰기 켜짐: 녹음이 입력창에 텍스트로 삽입됩니다(클릭하여 끄기)",
+    "dictateOff": "받아쓰기: 녹음을 입력창 텍스트로 변환(macOS 온디바이스 인식)",
+    "dictateEmpty": "인식된 음성이 없습니다",
+    "queuedSend": "대기",
+    "queuedTurnHint": "대기 중 · 현재 응답이 끝나면 자동 전송됩니다",
+    "queuedInsertNow": "지금 삽입",
+    "queuedInsertNowTitle": "이 메시지를 진행 중인 응답에 즉시 삽입합니다",
+    "queuedSendFailed": "대기 중인 메시지 전송에 실패했습니다",
+    "queuedDelete": "이 대기 메시지 취소"
   },
   "agentReview": {
     "running": "이 Session을 검토하는 중",
@@ -1366,20 +1377,16 @@
       "me": "나",
       "providers": "제공자",
       "usage": "모델 관측",
-      "media": "미디어",
       "models": "모델",
-      "memory": "기억",
       "work": "워크스페이스",
       "skills": "스킬",
       "mcp": "Connectors",
       "bridge": "소셜",
       "sharing": "공유",
       "access": "접근 및 기기",
-      "plugins": "플러그인",
       "about": "소개",
       "security": "보안",
-      "experiments": "실험 기능",
-      "pluginMarketplace": "플러그인 마켓플레이스"
+      "experiments": "실험 기능"
     },
     "browser": {
       "cookiesTitle": "Cookies",
@@ -1717,25 +1724,7 @@
       "launchAtLogin": "로그인 시 자동 실행",
       "keepAwake": "잠금 중에도 계속 실행",
       "betaUpdates": "베타 업데이트 수신",
-      "autoCheckUpdates": "업데이트 자동 확인",
-      "inviteSectionTitle": "테스트 채널",
-      "inviteCodeLabel": "초대 코드",
-      "inviteCodeHint": "초대 코드는 테스트 채널을 여는 용도입니다. 앱 사용 조건이 아닙니다.",
-      "inviteCodePlaceholder": "초대 코드를 붙여넣으세요",
-      "inviteRedeemBtn": "사용하기",
-      "inviteRedeeming": "확인 중…",
-      "inviteErrorInvalid": "이 초대 코드는 유효하지 않거나 이미 모두 사용되었습니다.",
-      "inviteErrorNetwork": "발급 서비스에 연결할 수 없습니다. 연결을 확인한 뒤 다시 시도하세요.",
-      "inviteErrorActivate": "채널 상태를 저장하지 못했습니다.",
-      "inviteConfirmTitle": "테스트 채널로 전환할까요?",
-      "inviteConfirmBody": "전환하면 앱이 테스트 버전으로 업데이트됩니다. 테스트 버전이 데이터 형식을 갱신한 뒤에는 현재 정식 버전으로 되돌릴 수 없습니다. 확인하면 즉시 적용됩니다.",
-      "inviteConfirmOk": "전환",
-      "inviteConfirmCancel": "정식 버전 유지",
-      "inviteChannelActive": "현재 채널: 테스트 채널",
-      "inviteChannelActiveHint": "이제 업데이트는 테스트 채널에서 받습니다.",
-      "inviteCodesLabel": "내 초대 코드",
-      "inviteCodesHint": "각 코드는 한 번, 기기 한 대에서만 사용할 수 있습니다.",
-      "inviteCopy": "복사"
+      "autoCheckUpdates": "업데이트 자동 확인"
     },
     "access": {
       "networkAccess": "LAN 접근",
@@ -1961,7 +1950,8 @@
       "imageDefaultsButton": "이미지 생성 기본값",
       "videoDefaultsButton": "비디오 생성 기본값",
       "speechSynthesisDefaultsButton": "음성 합성 기본값",
-      "runtimeProvider": "런타임 공급자"
+      "runtimeProvider": "런타임 공급자",
+      "defaultSpeechGenModel": "음성 합성 모델(읽어 주기 / 음성 메시지)"
     },
     "models": {
       "auxiliary": "보조 모델",
@@ -2227,8 +2217,8 @@
       "embeddingActiveNote": "의미 검색 사용 중: 기억 검색이 벡터 검색과 키워드 검색을 함께 수행해요.",
       "embeddingOffNote": "의미 검색이 꺼져 있어요: 기억 검색은 태그와 키워드 검색만 사용해요.",
       "embeddingSaved": "기억 임베딩 모델이 저장되었어요",
-      "tenetsTitle": "사용자 원칙",
-      "tenetsHint": "사용자가 확인한 행동 원칙으로, 새 대화마다 주입돼요. 어시스턴트 제안은 승인 후에 효력이 있어요.",
+      "tenetsTitle": "고정 항목과 원칙",
+      "tenetsHint": "고정한 내용과 확인된 행동 원칙은 매 새 대화에 주입됩니다. 어시스턴트 제안은 승인 후 적용됩니다.",
       "tenetsLoading": "사용자 원칙을 불러오는 중…",
       "tenetsEmpty": "아직 사용자 원칙이 없어요. 대화에서 어시스턴트에게 제안하게 하거나 여기서 직접 추가하세요.",
       "tenetsApprove": "승인",
@@ -2281,13 +2271,6 @@
         "stats": "{remembered} / {total}개 기억 유지 중"
       },
       "activeOnly": "이 에이전트를 먼저 활성으로 설정해 주세요"
-    },
-    "pins": {
-      "title": "고정 기억",
-      "hint": "항상 대화에 주입되며 감쇠하지 않아요",
-      "empty": "아직 고정 기억이 없어요",
-      "delete": "삭제",
-      "addPlaceholder": "고정 기억 추가..."
     },
     "experience": {
       "title": "경험",
@@ -2437,67 +2420,6 @@
       "dissolveBundleAriaLabel": "{name} 풀기",
       "removeFromBundleTitle": "Bundle에서 빼내 개별 스킬로 만들기",
       "removeFromBundleAriaLabel": "{name}을(를) Bundle에서 빼내기"
-    },
-    "plugins": {
-      "title": "플러그인",
-      "desc": "커뮤니티 플러그인을 관리합니다.",
-      "empty": "플러그인이 없습니다",
-      "reload": "새로고침",
-      "statusLoaded": "로드됨",
-      "statusFailed": "실패",
-      "statusDisabled": "비활성화",
-      "fullAccessToggle": "전체 권한 플러그인 허용",
-      "fullAccessDesc": "활성화하면 full-access를 선언한 플러그인이 시스템 수준 API(라우트, 훅, Provider 등)를 사용할 수 있어요",
-      "devToolsToggle": "Agent 플러그인 개발 도구 허용",
-      "devToolsDesc": "활성화하면 Agent가 개발 플러그인을 설치, 다시 로드, 활성화, 비활성화, 제거할 수 있어요. 일반 설치 플러그인에는 영향을 주지 않아요.",
-      "dropzone": "플러그인 폴더 또는 .zip을 여기에 끌어다 설치하거나 클릭하여 선택",
-      "statusRestricted": "전체 권한 필요",
-      "deleteConfirm": "플러그인 \"{name}\"을 제거할까요? 플러그인 데이터는 보존됩니다.",
-      "installSuccess": "플러그인 \"{name}\" 설치 완료",
-      "installError": "플러그인 설치 실패",
-      "invalidPlugin": "유효한 플러그인 디렉토리가 아닙니다",
-      "pluginsDir": "플러그인 디렉토리: {path}",
-      "needsFullAccess": "이 플러그인을 사용하려면 「전체 권한 플러그인 허용」을 먼저 활성화하세요",
-      "configure": "{name} 설정",
-      "configTitle": "{name} 설정",
-      "configLoadError": "플러그인 설정을 불러오지 못했습니다",
-      "sensitiveHint": "저장된 값은 숨겨집니다. 새 값을 입력하면 교체됩니다.",
-      "invalidJson": "JSON 형식이 올바르지 않습니다",
-      "showDiagnostics": "플러그인 진단 보기",
-      "diagnosticsTitle": "플러그인 진단",
-      "diagnosticsLoadError": "플러그인 진단을 불러오지 못했습니다",
-      "diagnosticsSummary": "기능 {capabilities}/{total} · 작업 {tasks} · 일정 {schedules}",
-      "noDiagnostics": "진단 데이터가 없습니다",
-      "diagnosticActivation": "활성화: {state}",
-      "diagnosticRoutes": "페이지 {pages} · 위젯 {widgets} · 설정 {settingsTabs}",
-      "diagnosticTools": "도구 {count}",
-      "diagnosticCommands": "명령 {count}",
-      "diagnosticConfig": "설정 {count}",
-      "openMarketplace": "플러그인 마켓 열기",
-      "marketBack": "플러그인 관리로 돌아가기",
-      "marketplaceTitle": "플러그인 마켓",
-      "marketplaceHint": "설치 가능한 플러그인, README, 권한, 기여 유형을 확인합니다.",
-      "marketplaceCount": "플러그인 {count}개",
-      "marketplaceNoSource": "마켓 소스 없음",
-      "marketplaceEmpty": "둘러볼 플러그인이 없습니다",
-      "marketLoading": "플러그인 마켓을 불러오는 중…",
-      "marketLoadError": "플러그인 마켓을 불러오지 못했습니다",
-      "marketReadmeLoadError": "README를 불러오지 못했습니다",
-      "marketInstalled": "설치됨",
-      "marketInstall": "설치",
-      "marketUpdate": "업데이트",
-      "marketReinstall": "다시 설치",
-      "marketDowngrade": "다운그레이드",
-      "marketIncompatible": "호환되지 않음",
-      "marketUpdateAvailable": "업데이트 가능",
-      "marketInstalledVersion": "설치됨 v{version}",
-      "marketUpdateFrom": "v{from}에서 v{to}로 업데이트 가능",
-      "marketDowngradeTo": "호환되는 v{version}만 설치할 수 있습니다",
-      "marketDowngradeConfirm": "현재 버전은 v{from}입니다. v{to}로 다운그레이드할까요?",
-      "marketReadmeLoading": "README를 불러오는 중…",
-      "marketSelectPlugin": "README를 볼 플러그인을 선택하세요",
-      "manageTitle": "플러그인 관리",
-      "permissionTitle": "권한"
     },
     "mcp": {
       "masterTitle": "Master Switch",
@@ -4478,7 +4400,6 @@
     "dialog": {
       "selectFolder": "작업 폴더 선택",
       "selectSkill": "스킬 선택",
-      "selectPlugin": "플러그인 선택",
       "launchFailedTitle": "Lingxi 실행 실패",
       "launchFailedBody": "Lingxi v{version}\n\n{detail}\n\n상세 로그 저장 위치:\n{logPath}\n\n이 스크린샷이나 로그 파일을 개발자에게 보내주세요.",
       "serverRestartFailed": "Lingxi v{version}\n\nServer가 충돌 후 재시작에 실패했어요.\n{error}\n\n앱을 다시 시작해 주세요.",
@@ -4772,6 +4693,19 @@
     "listCapabilities": {
       "description": "Beautify 도구가 현재 지원하는 미학 향상 기능 목록을 반환해요.",
       "text": "Beautify는 현재 두 가지 기능을 제공해요. 1) Markdown 커버 워크플로: 먼저 커버 스타일 가이드를 읽고, 이미지를 준비(Media Generation, 향후 내장 갤러리, 로컬 파일)한 뒤 attachments 폴더에 복사하고 cover frontmatter를 기록해요. 2) 전체 페이지 HTML 미학 가이드: 웹 페이지/조판 페이지/보고서 생성 전 beautify_get-html-style-guide로 Hana 기본 아트 디렉션을 받으세요(인수 없이 호출하면 라우터, 필요 시 섹션별로 가져오기)."
+    },
+    "generateSpeech": {
+      "description": "음성 생성. 텍스트를 음성 오디오로 합성합니다(낭독, 음성 답장). 생성된 오디오는 음성 메시지로 전달됩니다.",
+      "promptDesc": "음성으로 합성할 텍스트",
+      "voiceDesc": "선택적 음색(alloy, nova 등. 시스템 음성은 macOS 음색 이름)",
+      "speedDesc": "선택적 속도 0.25–4, 기본 1",
+      "formatDesc": "선택적 오디오 형식, 기본 mp3",
+      "modelDesc": "선택적 음성 모델(기본값은 설정된 기본 음성 모델)",
+      "providerDesc": "선택적 공급자 ID(openai, system-speech 등)",
+      "notInitialized": "음성 생성 서비스가 초기화되지 않았습니다",
+      "submitFailed": "음성 생성 실패: {error}",
+      "submitFailedUnknown": "음성 생성 제출 실패",
+      "submitted": "음성 생성이 제출되었습니다. 완료되면 음성 메시지로 전달됩니다."
     }
   },
   "fileHistory": {
@@ -4824,22 +4758,6 @@
     }
   },
   "plugin": {
-    "widget": {
-      "loadFailed": "불러오기 실패",
-      "retry": "다시 시도",
-      "hiddenPlugins": "숨긴 플러그인",
-      "show": "표시",
-      "desk": "Desk",
-      "hideTitle": "\"{title}\" 숨기기"
-    },
-    "page": {
-      "notFound": "플러그인을 찾을 수 없어요",
-      "loadFailed": "플러그인 불러오기 실패",
-      "retry": "다시 시도"
-    },
-    "tab": {
-      "pinToBar": "탭 바에 고정"
-    },
     "imageGen": {
       "notInitialized": "이미지 생성 플러그인이 초기화되지 않았어요",
       "noSessionPath": "이미지 생성에는 명시적 세션 컨텍스트가 필요해요. 현재 도구 호출에 sessionPath가 없어요",

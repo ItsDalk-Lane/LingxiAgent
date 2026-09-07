@@ -2,7 +2,6 @@
 import { KnowledgeError } from "./errors.ts";
 import type { KnowledgeChunkSpanDraft } from "./chunker.ts";
 import type { KnowledgeEvidenceManifestEntry, KnowledgeTurnScope } from "./types.ts";
-export { EvidencePacker } from "./evidence-packer.ts";
 
 /** 真实引文在冻结分块中的定位；只承载身份和偏移，不承载正文。 */
 export interface KnowledgeEvidenceIdentityEntry {

@@ -17,7 +17,6 @@ import { useStore } from '../../stores';
 import type { RightWorkspaceTab } from '../../types';
 import { DeskSection } from '../DeskSection';
 import { DeskCwdSkillsPanel } from '../desk/DeskCwdSkills';
-import { PluginWidgetView } from '../plugin/PluginWidgetView';
 import { SessionRegistryFilesPanel } from './SessionRegistryFilesPanel';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 import styles from './RightWorkspacePanel.module.css';
@@ -42,13 +41,7 @@ function TabContent({ activeTab }: { activeTab: RightWorkspaceTab }) {
 export function WorkspaceStableBody() {
   const rightWorkspaceTab = useStore(s => s.rightWorkspaceTab);
   const setRightWorkspaceTab = useStore(s => s.setRightWorkspaceTab);
-  const jianView = useStore(s => s.jianView);
   const t = window.t ?? ((p: string) => p);
-
-  // Plugin Widget 属于工作台稳定主体：widget 视图时整体短路（与 RightWorkspacePanel 行为一致）
-  if (jianView.startsWith('widget:')) {
-    return <PluginWidgetView pluginId={jianView.slice(7)} />;
-  }
 
   const activeTab = BASE_TABS.some(tab => tab.id === rightWorkspaceTab)
     ? rightWorkspaceTab

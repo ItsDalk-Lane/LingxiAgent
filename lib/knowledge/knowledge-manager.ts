@@ -47,8 +47,6 @@ import {
 } from "./source-processors.ts";
 import type { KnowledgeBlockDraft } from "./source-adapters.ts";
 import { ScopeSnapshotCompiler } from "./scope-snapshot-compiler.ts";
-import { FastKnowledgePipeline, type FastKnowledgeEvidenceStages } from "./fast-knowledge-pipeline.ts";
-import { EvidencePacker } from "./evidence-packer.ts";
 import { KnowledgeSearchService } from "./knowledge-search-service.ts";
 import type {
   ContentSnapshot,
@@ -814,33 +812,6 @@ export class KnowledgeManager {
 
   compileTurnScope(scope: Parameters<ScopeSnapshotCompiler["compile"]>[0]) {
     return this.scopeCompiler.compile(scope);
-  }
-
-  createFastKnowledgePipeline(stages: FastKnowledgeEvidenceStages) {
-    let searchStats = { embeddingGroups: 0, rerankGroups: 0, queryEmbeddingCacheHit: false, retrievalResultCacheHit: false };
-    return new FastKnowledgePipeline({
-      ...stages,
-      compile: scope => this.compileTurnScope(scope),
-      search: async input => {
-        const result = await this.searchService.searchWithEvidence({
-          ...input,
-          channel: "fts",
-          rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY,
-        });
-        const { embeddingGroups, rerankGroups, queryEmbeddingCacheHit, retrievalResultCacheHit } = result.response;
-        searchStats = { embeddingGroups, rerankGroups, queryEmbeddingCacheHit, retrievalResultCacheHit };
-        return result.evidence.candidates;
-      },
-      searchStats: () => searchStats,
-    });
-  }
-
-  runFastKnowledgePipeline(input: Parameters<FastKnowledgePipeline["run"]>[0]) {
-    const packer = new EvidencePacker({ store: this.store, indexStore: this.indexStore });
-    return this.createFastKnowledgePipeline({
-      extractSpans: request => this.queryService.extractEvidenceSpans(request),
-      packEvidence: request => packer.pack(request),
-    }).run(input);
   }
 
   getTurnScope(input: Parameters<KnowledgeStore["getTurnScope"]>[0]) {

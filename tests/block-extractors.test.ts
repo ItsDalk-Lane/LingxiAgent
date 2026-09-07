@@ -1,9 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   BLOCK_EXTRACTORS,
-  dropUninstalledPluginCards,
   extractBlocks,
-  pluginInstalledPredicate,
   resolveMediaGenerationBlocks,
 } from '../server/block-extractors.ts';
 
@@ -921,145 +919,8 @@ describe('workflow', () => {
   });
 });
 
-describe('extractBlocks: plugin card extraction', () => {
-  it('details.card with pluginId produces a plugin_card block', () => {
-    const details = { card: { pluginId: 'fm', route: '/k', title: 'Chart' } };
-    const blocks = (extractBlocks as any)('unknown_tool', details);
-    expect(blocks).toHaveLength(1);
-    expect(blocks[0]).toEqual({
-      type: 'plugin_card',
-      card: { pluginId: 'fm', route: '/k', title: 'Chart', type: 'iframe' },
-    });
-  });
-
-  it('preserves existing card type when specified', () => {
-    const details = { card: { pluginId: 'fm', type: 'native', route: '/x' } };
-    const blocks = (extractBlocks as any)('unknown_tool', details);
-    expect(blocks[0].card.type).toBe('native');
-  });
-
-  it('allows declarative chat surface cards without iframe routes', () => {
-    const details = {
-      card: {
-        pluginId: 'tavern',
-        type: 'chat.surface',
-        sessionRef: { sessionId: 'sess_tavern_private' },
-        title: 'Tavern run',
-      },
-    };
-    const blocks = (extractBlocks as any)('unknown_tool', details);
-    expect(blocks[0]).toEqual({
-      type: 'plugin_card',
-      card: {
-        pluginId: 'tavern',
-        type: 'chat.surface',
-        sessionRef: { sessionId: 'sess_tavern_private' },
-        title: 'Tavern run',
-      },
-    });
-  });
-
-  it('strips legacy file payload fields from plugin cards', () => {
-    const details = {
-      card: {
-        pluginId: 'fm',
-        route: '/k',
-        title: 'Chart',
-        file: { filePath: '/tmp/raw.png', bytes: 'raw' },
-        sessionFile: { fileId: 'sf_1' },
-        sourceFile: { filePath: '/tmp/source.csv' },
-        files: [{ filePath: '/tmp/a.png' }],
-      },
-    };
-    const blocks = (extractBlocks as any)('unknown_tool', details);
-
-    expect(blocks[0].card).toEqual({
-      pluginId: 'fm',
-      route: '/k',
-      title: 'Chart',
-      type: 'iframe',
-    });
-  });
-
-  it('unknown tool with no card: returns empty array', () => {
-    const blocks = (extractBlocks as any)('nonexistent_tool', {});
-    expect(blocks).toEqual([]);
-  });
-
-  it('unknown tool with null details: returns empty array', () => {
-    const blocks = (extractBlocks as any)('nonexistent_tool', null);
-    expect(blocks).toEqual([]);
-  });
-});
-
-describe('dropUninstalledPluginCards', () => {
-  it('drops plugin_card blocks whose pluginId the predicate rejects, keeps everything else', () => {
-    const blocks = [
-      { type: 'file', filePath: '/a' },
-      { type: 'plugin_card', card: { pluginId: 'installed-plugin' } },
-      { type: 'plugin_card', card: { pluginId: 'retired-plugin' } },
-    ];
-    const result = dropUninstalledPluginCards(
-      blocks,
-      (pluginId) => pluginId === 'installed-plugin',
-    );
-    expect(result).toEqual([
-      { type: 'file', filePath: '/a' },
-      { type: 'plugin_card', card: { pluginId: 'installed-plugin' } },
-    ]);
-  });
-
-  it('is a no-op (returns blocks unchanged) when no predicate function is supplied', () => {
-    const blocks = [{ type: 'plugin_card', card: { pluginId: 'x' } }];
-    expect(dropUninstalledPluginCards(blocks)).toBe(blocks);
-  });
-});
-
-describe('pluginInstalledPredicate', () => {
-  it('reports installed when pluginManager.getPlugin resolves a truthy entry', () => {
-    const engine = { pluginManager: { getPlugin: (id) => (id === 'media' ? { id: 'media' } : null) } };
-    const predicate = pluginInstalledPredicate(engine);
-    expect(predicate('media')).toBe(true);
-  });
-
-  it('reports not-installed when pluginManager.getPlugin resolves null', () => {
-    const engine = { pluginManager: { getPlugin: () => null } };
-    const predicate = pluginInstalledPredicate(engine);
-    expect(predicate('retired-plugin')).toBe(false);
-  });
-
-  it('fails open (reports installed) when pluginManager is unavailable, so a caller without plugin-manager access never silently hides a real card', () => {
-    const predicate = pluginInstalledPredicate({});
-    expect(predicate('anything')).toBe(true);
-    expect(pluginInstalledPredicate(null)('anything')).toBe(true);
-  });
-});
 
 // ─── coexistence: tool-specific block + plugin card ───────────────────────────
-
-describe('extractBlocks: tool block + plugin card coexistence', () => {
-  it('stage_files details with a card: returns file blocks AND plugin_card', () => {
-    const details = {
-      files: [{ filePath: '/a/doc.pdf', label: 'doc', ext: 'pdf' }],
-      card: { pluginId: 'viewer', route: '/view', type: 'iframe' },
-    };
-    const blocks = (extractBlocks as any)('stage_files', details);
-    expect(blocks).toHaveLength(2);
-    expect(blocks[0].type).toBe('file');
-    expect(blocks[1].type).toBe('plugin_card');
-  });
-
-  it('install_skill details with a card: returns skill block AND plugin_card', () => {
-    const details = {
-      skillName: 'my-skill',
-      card: { pluginId: 'skill-ui', route: '/s' },
-    };
-    const blocks = (extractBlocks as any)('install_skill', details);
-    expect(blocks).toHaveLength(2);
-    expect(blocks[0].type).toBe('skill');
-    expect(blocks[1].type).toBe('plugin_card');
-  });
-});
 
 // ─── show_card ──────────────────────────────────────────────────────────────
 

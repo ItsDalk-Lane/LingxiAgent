@@ -64,22 +64,25 @@ function buildDefaultModelOptions<T extends { id: string; name?: string; adapter
 
 export function MediaGlobalDefaultsSection() {
   const {
-    image, video, speech,
-    allImageModels, allVideoModels, allSpeechModels, speechEnabled,
-    saveImageConfig, saveVideoConfig, saveSpeechConfig,
+    image, video, speech, speechGen,
+    allImageModels, allVideoModels, allSpeechGenModels, allSpeechModels, speechEnabled,
+    saveImageConfig, saveVideoConfig, saveSpeechGenConfig, saveSpeechConfig,
   } = useMediaSettingsData();
 
   const imageConfigReady = !image.loading && image.config !== null;
   const videoConfigReady = !video.loading && video.config !== null;
   const speechConfigReady = !speech.loading && speech.config !== null;
+  const speechGenConfigReady = !speechGen.loading && speechGen.config !== null;
 
   const imageConfig = image.config as MediaConfig | null;
   const videoConfig = video.config as MediaConfig | null;
   const speechConfig = speech.config as SpeechConfig | null;
+  const speechGenConfig = speechGen.config as MediaConfig | null;
 
   const imageDefaultValue = defaultModelValue(imageConfigReady, imageConfig?.defaultImageModel ? { default: imageConfig.defaultImageModel } : null);
   const videoDefaultValue = defaultModelValue(videoConfigReady, videoConfig?.defaultVideoModel ? { default: videoConfig.defaultVideoModel } : null);
   const speechDefaultValue = defaultModelValue(speechConfigReady, speechConfig?.defaultModel ? { default: speechConfig.defaultModel } : null);
+  const speechGenDefaultValue = defaultModelValue(speechGenConfigReady, speechGenConfig?.defaultSpeechModel ? { default: speechGenConfig.defaultSpeechModel } : null);
 
   const speechRecognitionEnabledLabel = textOrFallback('settings.media.speechRecognitionEnabled', '发送语音条时转录');
   const defaultSpeechModelLabel = textOrFallback('settings.media.defaultSpeechModel', '语音条转录模型');
@@ -96,6 +99,13 @@ export function MediaGlobalDefaultsSection() {
     if (!val) { void saveVideoConfig({ defaultVideoModel: undefined }); return; }
     const [provider, ...rest] = val.split('/');
     void saveVideoConfig({ defaultVideoModel: { provider, id: rest.join('/') } });
+  };
+
+  const saveSpeechGenDefault = (val: string) => {
+    if (val === LOADING_SELECT_VALUE) return;
+    if (!val) { void saveSpeechGenConfig({ defaultSpeechModel: undefined }); return; }
+    const [provider, ...rest] = val.split('/');
+    void saveSpeechGenConfig({ defaultSpeechModel: { provider, id: rest.join('/') } });
   };
 
   const saveSpeechDefault = (val: string) => {
@@ -138,6 +148,24 @@ export function MediaGlobalDefaultsSection() {
               models: allVideoModels,
               providers: video.providers as Record<string, MediaProvider>,
               adapterMissingKey: 'settings.media.videoAdapterMissing',
+              credentialMissingKey: 'settings.media.credentialMissing',
+            })}
+          />
+        }
+      />
+      <SettingsRow
+        label={textOrFallback('settings.media.defaultSpeechGenModel', '语音合成模型（朗读/语音消息）')}
+        control={
+          <SelectWidget
+            value={speechGenDefaultValue}
+            onChange={saveSpeechGenDefault}
+            disabled={!speechGenConfigReady}
+            options={buildDefaultModelOptions({
+              ready: speechGenConfigReady,
+              configDefault: speechGenConfig?.defaultSpeechModel,
+              models: allSpeechGenModels,
+              providers: speechGen.providers as Record<string, MediaProvider>,
+              adapterMissingKey: 'settings.media.adapterMissing',
               credentialMissingKey: 'settings.media.credentialMissing',
             })}
           />

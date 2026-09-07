@@ -22,6 +22,14 @@ function media(): UseMediaSettingsDataResult {
       loading: false,
       error: null,
     },
+    speechGen: {
+      providers: {},
+      config: {},
+      loading: false,
+      error: null,
+    },
+    allSpeechGenModels: [],
+    saveSpeechGenConfig: async () => {},
     speech: {
       providers: {
         'volcengine-speech': { providerId: 'volcengine-speech', displayName: '火山引擎语音 (BigASR)', hasCredentials: true, models: [], availableModels: [] },

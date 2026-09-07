@@ -5,10 +5,15 @@
  *   - 保留标签（如 <mood>/<pulse>/<reflect>、<think>/<thinking>）是协议，不是文本。
  *     无论出现在一次生成的什么位置，都必须被结构化，而不是只在开头才被识别。
  *   - 转义：`\<tag>` 与 `\</tag>` 输出字面量（反斜杠被消费，标签按普通文本透传）。
+ *     转义契约只对词表内标签生效。
  *   - 代码保护：行内代码（1~2 个反引号成对）与围栏代码块（>=3 个反引号/波浪线）
  *     内部的标签一律按字面文本处理。
  *   - 跨 delta：半截标签、半截转义、半截代码标记都挂在缓冲里等下一段，绝不误吞。
  *   - 关闭标签必须与打开标签同名；标签内容不透明（内部不再识别代码/转义）。
+ *   - 词表外孤儿闭标签（形状规则，方言无关，仅最终文本边界开启）：模型思考
+ *     方言的收尾标签若不在词表内且没有打开标签（API 剥掉开标签、闭标签漏进
+ *     正文的实测形态），一律按协议残渣吞掉。新模型方言无需先登记词表也不会
+ *     泄漏；解析链中间层必须关闭此规则（见 ReservedTagScannerOptions）。
  *
  * 输出 token 流：
  *   { type: "open", tag }   — 遇到完整、未转义、不在代码内的开标签
@@ -42,16 +47,37 @@ function trailingPrefixLen(buffer: string, target: string): number {
   return 0;
 }
 
+/** 未知名字闭标签的完整形状：`</name>`，name 以字母开头（含 mm:think 这类命名空间方言）。 */
+const CLOSE_TAG_SHAPE = /^<\/([A-Za-z][A-Za-z0-9:_.-]*)>/;
+/** 跨 delta 挂起判定：尾巴是尚未闭合的 `</…` 或 `<…` 标签形状（还没有出现 `>`）。 */
+const PARTIAL_TAG_SHAPE = /^<\/?[A-Za-z][A-Za-z0-9:_.-]*$/;
+
+export interface ReservedTagScannerOptions {
+  /**
+   * 词表外孤儿闭标签形状规则（方言无关兜底）：没有打开标签时遇到的收尾标签，
+   * 若名字不在本扫描器词表内，按模型协议残渣吞掉，绝不透传进正文。词表内的
+   * 孤儿闭标签保持旧的字面透传契约（转义/教学场景依赖）。
+   *
+   * 只在「最终文本边界」开启：解析链的中间层（如 ThinkTagParser 链在
+   * MoodParser 之前）不认识下游的结构标签（`</mood>` 对 think 层就是
+   * 「未知名字的闭标签」），在这里吞掉会破坏下游解析——中间层保持透传，
+   * 词表外孤儿闭标签由链尾（MoodParser）或独立的全文切分兜底。
+   */
+  dropUnknownOrphanClosers?: boolean;
+}
+
 export class ReservedTagScanner {
   private buffer = "";
   private openTag: string | null = null;
   private code: CodeSpan | null = null;
   private readonly literals: readonly string[];
   private readonly openers: ReadonlyMap<string, string>;
+  private readonly dropUnknownOrphanClosers: boolean;
 
-  constructor(tags: readonly string[]) {
+  constructor(tags: readonly string[], options: ReservedTagScannerOptions = {}) {
     this.literals = Object.freeze(tags.flatMap((tag) => [`<${tag}>`, `</${tag}>`]));
     this.openers = new Map(tags.map((tag) => [`<${tag}>`, tag]));
+    this.dropUnknownOrphanClosers = options.dropUnknownOrphanClosers === true;
   }
 
   /** 当前是否有打开的标签（供上层在 flush 时补发结束事件） */
@@ -192,11 +218,22 @@ export class ReservedTagScanner {
             tokens.push({ type: "open", tag: match.tag });
             this.openTag = match.tag;
           } else {
-            // 没有打开标签时的孤立闭标签：按字面文本处理
+            // 词表内的孤儿闭标签：保持旧的字面透传契约（转义/教学场景依赖）；
+            // 残渣兜底交给链尾扫描器的「词表外孤儿闭标签」规则。
             text += match.literal;
           }
           i += match.literal.length;
           continue;
+        }
+        if (this.dropUnknownOrphanClosers && buf.startsWith("</", i)) {
+          const rest = buf.slice(i);
+          const closeMatch = CLOSE_TAG_SHAPE.exec(rest);
+          if (closeMatch) {
+            // 词表外的孤儿闭标签：吞掉，不产生任何 token（方言无关的残渣兜底）。
+            i += closeMatch[0].length;
+            continue;
+          }
+          if (!isFlush && PARTIAL_TAG_SHAPE.test(rest)) break; // 尾巴可能是跨 delta 的收尾标签，挂起
         }
         text += ch;
         i += 1;
@@ -229,12 +266,13 @@ export type ReservedTagSegment = ReservedTagTextSegment | ReservedTagBlockSegmen
 /**
  * 一次性（非流式）把一段完整文本切成 文本/标签块 交替的片段序列。
  * 用于历史消息重渲染等"全文已在手"的场景；转义与代码保护规则与流式扫描一致。
+ * 调用方都是最终文本边界，孤儿闭标签形状规则默认开启。
  */
 export function splitReservedTagSegments(
   content: string,
   tags: readonly string[],
 ): ReservedTagSegment[] {
-  const scanner = new ReservedTagScanner(tags);
+  const scanner = new ReservedTagScanner(tags, { dropUnknownOrphanClosers: true });
   const tokens = [...scanner.feed(content), ...scanner.flush()];
   const segments: ReservedTagSegment[] = [];
   let text = "";

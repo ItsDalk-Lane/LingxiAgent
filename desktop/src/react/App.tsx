@@ -68,7 +68,6 @@ function App() {
   const chatSearchOpen = useStore(s => s.chatSearchOpen);
   const setChatSearchOpen = useStore(s => s.setChatSearchOpen);
   const currentTab = useStore(s => s.currentTab);
-  const isPluginTab = typeof currentTab === 'string' && currentTab.startsWith('plugin:');
   const { side: floatSide, show: showFloat, scheduleHide: scheduleFloatHide, cancelHide: cancelFloatHide, hide: hideFloat } = useFloatSidebar();
 
   useEffect(() => {
@@ -107,7 +106,7 @@ function App() {
         {/* ── App body ── */}
         <div className="app">
           <ChatSidebar
-            open={sidebarOpen && currentTab !== 'knowledge' && !isPluginTab}
+            open={sidebarOpen && currentTab !== 'knowledge'}
             onOpenSettings={() => openSettingsModal()}
             onTogglePanel={togglePanel}
           />

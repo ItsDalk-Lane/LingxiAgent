@@ -133,10 +133,6 @@ describe("first run default workspace", () => {
     // 默认 agent 正常播种，启动不被脏目录阻断
     const cfgPath = path.join(lingxiHome, "agents", "lingxi", "config.yaml");
     expect(fs.existsSync(cfgPath)).toBe(true);
-    // 不往脏目录里喂 pinned.md，避免把垃圾目录越喂越像 agent 目录
-    expect(fs.existsSync(path.join(lingxiHome, "agents", "kon", "pinned.md"))).toBe(false);
-    // 有效 agent 仍然补齐 pinned.md
-    expect(fs.existsSync(path.join(lingxiHome, "agents", "lingxi", "pinned.md"))).toBe(true);
   });
 
   it("keeps startup alive and reports non-default agent directories with unreadable config.yaml", async () => {
@@ -166,7 +162,6 @@ describe("first run default workspace", () => {
 
     expect(report.invalidAgentDirs).toContainEqual({ id: "明", reason: "invalid_id" });
     expect(fs.readFileSync(path.join(legacyDir, "config.yaml"), "utf-8")).toBe(original);
-    expect(fs.existsSync(path.join(legacyDir, "pinned.md"))).toBe(false);
     expect(fs.existsSync(path.join(lingxiHome, "agents", "lingxi", "config.yaml"))).toBe(true);
 
     const { PreferencesManager } = await import("../core/preferences-manager.ts");
@@ -189,7 +184,6 @@ describe("first run default workspace", () => {
     expect(report.invalidAgentDirs).toEqual([]);
     expect(report.repairedDefaultAgent).toBe(false);
     expect(fs.existsSync(path.join(lingxiHome, "agents", "lingxi"))).toBe(false);
-    expect(fs.existsSync(path.join(legacyDir, "pinned.md"))).toBe(true);
   });
 
   it("backs up an unreadable default lingxi config before reseeding", async () => {

@@ -41,7 +41,14 @@ function makeAgent(locale: string) {
     "utf-8",
   );
   fs.writeFileSync(path.join(userDir, "user.md"), "PROFILE-TOP_SECRET 简介𝐀\n", "utf-8");
-  fs.writeFileSync(path.join(agentDir, "pinned.md"), "PINNED-TOP_SECRET 置顶\n", "utf-8");
+  fs.writeFileSync(path.join(agentDir, "memory", "tenets.json"), JSON.stringify({
+    schemaVersion: 1,
+    tenets: [{
+      id: "golden-pinned-1", content: "PINNED-TOP_SECRET 置顶", priority: "high",
+      status: "active", source: "user_direct", sessionId: null,
+      createdAt: "2026-09-06T00:00:00.000Z", decidedAt: "2026-09-06T00:00:00.000Z",
+    }],
+  }, null, 2) + "\n", "utf-8");
   fs.writeFileSync(path.join(agentDir, "memory", "memory.md"), "MEMORY-TOP_SECRET 记忆🇨🇳\n", "utf-8");
 
   fs.writeFileSync(path.join(agentDir, "avatars", "agent.png"), Buffer.from("fake-avatar-bytes"));

@@ -62,11 +62,18 @@ describe("用户原则（tenets）存储", () => {
 
     addTenetDirect(agentDir, { content: "删除文件必须二次确认", priority: "critical" });
     const section = buildTenetsPromptSection(agentDir, true) || "";
-    expect(section).toContain("# 用户原则");
-    expect(section.indexOf("[critical]")).toBeLessThan(section.indexOf("[high]"));
+    expect(section).toContain("# 置顶与原则");
+    // 注入按 priority 升序（critical 在前）；单行条目不再带 [priority] 标签
+    expect(section.indexOf("删除文件必须二次确认")).toBeLessThan(section.indexOf("改文件前先说明影响范围"));
     expect(section).toContain("改文件前先说明影响范围");
     // 英文头
-    expect(buildTenetsPromptSection(agentDir, false)).toContain("# User Principles");
+    expect(buildTenetsPromptSection(agentDir, false)).toContain("# Pinned Items & Principles");
+  });
+
+  it("多行内容保留换行并按缩进续行渲染（原 pins 语义）", () => {
+    addTenetDirect(agentDir, { content: "第一行\n第二行" });
+    const section = buildTenetsPromptSection(agentDir, true) || "";
+    expect(section).toContain("- 第一行\n  第二行");
   });
 
   it("拒绝 → rejected，不注入；重复审批显式报错", () => {
@@ -84,12 +91,12 @@ describe("用户原则（tenets）存储", () => {
     expect(pendingTenets(agentDir)).toHaveLength(1);
   });
 
-  it("active 上限 20：满员后 direct/审批都显式报 TENET_LIMIT_REACHED", () => {
+  it("active 上限：提案审批路径满 20 条报 TENET_LIMIT_REACHED；user_direct 直钉不受此限", () => {
     for (let i = 0; i < MAX_ACTIVE_TENETS; i++) {
       addTenetDirect(agentDir, { content: `原则 ${i}` });
     }
-    expect(() => addTenetDirect(agentDir, { content: "超限原则" }))
-      .toThrowError(expect.objectContaining({ code: TENET_ERRORS.LIMIT_REACHED }));
+    // user_direct（含原 pins 迁移数据）不受 20 条提案上限约束
+    addTenetDirect(agentDir, { content: "直钉条目不受提案上限约束" });
 
     const proposal = addTenetProposal(agentDir, { content: "待审提案" });
     expect(() => decideTenet(agentDir, proposal.tenet.id, true))

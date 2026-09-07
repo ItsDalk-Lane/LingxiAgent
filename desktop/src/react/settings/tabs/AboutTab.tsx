@@ -13,7 +13,7 @@ import { digestLocale, digestText, kindLabel } from '../../components/shared/rel
 import { useAutoUpdateState } from '../../hooks/use-auto-update-state';
 import { useReleaseCheck } from '../../hooks/use-release-check';
 import { ConfirmDialog, Overlay } from '../../ui';
-import type { AutoUpdateState, InviteChannelStatus, UpdateDigestHistoryResult } from '../../types';
+import type { AutoUpdateState, UpdateDigestHistoryResult } from '../../types';
 import appIconUrl from '../../../icon.png';
 import styles from '../Settings.module.css';
 import updateStyles from '../../components/AutoUpdateStatus.module.css';
@@ -321,177 +321,6 @@ function ReleaseUpdateArea({
   return null;
 }
 
-/**
- * 邀请制测试通道。三条纪律：
- *  1. 核销服务没配置（configured=false）就整块不渲染——正式构建在服务上线前
- *     看不到任何入口，而不是给出一个点了会报错的按钮。
- *  2. 核销成功只是拿到一个地址，绝不顺手落盘；写通道状态必须先过确认对话框。
- *  3. 失败文案只分两类：码本身不认（无效/用完）与够不着服务（网络/服务端），
- *     服务端原话原样附在下面，不美化、不重试。
- */
-function InviteChannelSection() {
-  const hana = window.hana;
-  const [status, setStatus] = useState<InviteChannelStatus | null>(null);
-  const [code, setCode] = useState('');
-  const [redeeming, setRedeeming] = useState(false);
-  const [errorKey, setErrorKey] = useState<string | null>(null);
-  const [errorDetail, setErrorDetail] = useState<string | null>(null);
-  const [pending, setPending] = useState<{ feedUrl: string; inviteCodes: string[] } | null>(null);
-  const [activating, setActivating] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      try {
-        const next = await hana?.inviteStatus?.();
-        if (!cancelled && next) setStatus(next);
-      } catch (err) {
-        // 状态问不出来就不提供入口：宁可不露出一个行为不明的按钮，也不猜。
-        console.error('[invite] failed to read the update channel status', err);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [hana]);
-
-  const copyInviteCode = useCallback(async (value: string) => {
-    if (!value) return;
-    await navigator.clipboard?.writeText(value);
-  }, []);
-
-  const handleRedeem = useCallback(async () => {
-    const trimmed = code.trim();
-    if (!trimmed || redeeming) return;
-    setRedeeming(true);
-    setErrorKey(null);
-    setErrorDetail(null);
-    try {
-      const result = await hana?.inviteRedeem?.(trimmed);
-      if (!result) {
-        setErrorKey('settings.about.inviteErrorNetwork');
-        return;
-      }
-      if (result.ok) {
-        setPending({ feedUrl: result.feedUrl, inviteCodes: result.childCodes });
-        return;
-      }
-      // 只有"码本身不认"才归到邀请码文案；够不着服务的一律说是连接问题。
-      setErrorKey(result.reason === 'invalid'
-        ? 'settings.about.inviteErrorInvalid'
-        : 'settings.about.inviteErrorNetwork');
-      setErrorDetail(result.message || null);
-    } catch (err) {
-      setErrorKey('settings.about.inviteErrorNetwork');
-      setErrorDetail(err instanceof Error ? err.message : String(err));
-    } finally {
-      setRedeeming(false);
-    }
-  }, [code, hana, redeeming]);
-
-  const handleConfirmActivate = useCallback(async () => {
-    if (!pending || activating) return;
-    setActivating(true);
-    try {
-      const next = await hana?.inviteActivate?.(pending);
-      if (next) setStatus(next);
-      setPending(null);
-      setCode('');
-      setErrorKey(null);
-      setErrorDetail(null);
-    } catch (err) {
-      setPending(null);
-      setErrorKey('settings.about.inviteErrorActivate');
-      setErrorDetail(err instanceof Error ? err.message : String(err));
-    } finally {
-      setActivating(false);
-    }
-  }, [activating, hana, pending]);
-
-  if (!status?.configured) return null;
-
-  return (
-    <SettingsSection title={t('settings.about.inviteSectionTitle')}>
-      {status.active ? (
-        <>
-          <SettingsRow
-            label={t('settings.about.inviteChannelActive')}
-            hint={t('settings.about.inviteChannelActiveHint')}
-            control={<span />}
-          />
-          {status.inviteCodes.length > 0 && (
-            <SettingsRow
-              label={t('settings.about.inviteCodesLabel')}
-              hint={t('settings.about.inviteCodesHint')}
-              layout="stacked"
-              control={
-                <SettingsStack gap="sm">
-                  {status.inviteCodes.map((inviteCode) => (
-                    <div key={inviteCode} className={styles['access-url-row']}>
-                      <input className={styles['settings-input']} value={inviteCode} readOnly />
-                      <button
-                        type="button"
-                        className={styles['settings-btn-secondary']}
-                        onClick={() => { void copyInviteCode(inviteCode); }}
-                      >
-                        {t('settings.about.inviteCopy')}
-                      </button>
-                    </div>
-                  ))}
-                </SettingsStack>
-              }
-            />
-          )}
-        </>
-      ) : (
-        <SettingsRow
-          label={t('settings.about.inviteCodeLabel')}
-          hint={errorKey ? (
-            <>
-              <span>{t(errorKey)}</span>
-              {errorDetail && <span title={errorDetail}> {errorDetail}</span>}
-            </>
-          ) : t('settings.about.inviteCodeHint')}
-          hintVariant={errorKey ? 'warn' : 'default'}
-          layout="stacked"
-          control={
-            <div className={styles['access-url-row']}>
-              <input
-                className={styles['settings-input']}
-                aria-label={t('settings.about.inviteCodeLabel')}
-                placeholder={t('settings.about.inviteCodePlaceholder')}
-                value={code}
-                disabled={redeeming}
-                onChange={(event) => setCode(event.target.value)}
-              />
-              <button
-                type="button"
-                className={styles['settings-btn-primary']}
-                onClick={() => { void handleRedeem(); }}
-                disabled={redeeming || !code.trim()}
-              >
-                {redeeming ? t('settings.about.inviteRedeeming') : t('settings.about.inviteRedeemBtn')}
-              </button>
-            </div>
-          }
-        />
-      )}
-
-      <ConfirmDialog
-        open={Boolean(pending)}
-        scope="inline"
-        title={t('settings.about.inviteConfirmTitle')}
-        confirmLabel={t('settings.about.inviteConfirmOk')}
-        cancelLabel={t('settings.about.inviteConfirmCancel')}
-        confirmTone="danger"
-        busy={activating}
-        onConfirm={() => { void handleConfirmActivate(); }}
-        onCancel={() => setPending(null)}
-      >
-        {t('settings.about.inviteConfirmBody')}
-      </ConfirmDialog>
-    </SettingsSection>
-  );
-}
-
 export function AboutTab() {
   const hana = window.hana;
   const settingsConfig = useSettingsStore(s => s.settingsConfig);
@@ -646,8 +475,6 @@ export function AboutTab() {
           control={<Toggle on={isBeta} onChange={handleBetaToggle} />}
         />
       </SettingsSection>
-
-      <InviteChannelSection />
 
       {/* License 全文：ExpandableRow 直接作为 tab 末尾元素 */}
       <ExpandableRow label={t('settings.about.licenseToggle')}>

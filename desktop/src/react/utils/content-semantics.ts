@@ -120,10 +120,6 @@ function intrinsicBlockId(block: ContentBlock): string | null {
     case 'interlude': return block.id;
     case 'subagent': return block.taskId;
     case 'workflow': return block.taskId;
-    case 'plugin_card': {
-      const target = block.card.route || block.card.sessionId || block.card.sessionRef?.sessionId || null;
-      return target ? `${block.card.pluginId}:${target}` : block.card.pluginId || null;
-    }
     case 'interactive_card': return block.cardId;
     default: return null;
   }

@@ -88,24 +88,6 @@ describe("plugin commands/ — slash 注册路径（方案 C）", () => {
     expect(pm.getAllCommands().find(c => c.name === "old.legacy")).toBeDefined();
   });
 
-  it("full-access 闸门（#1）：community restricted 插件的 handler 被拒 + warn", async () => {
-    // 社区目录默认 restricted（manifest 不声明 trust=full-access）
-    writePlugin(path.join(communityDir, "untrusted"), "untrusted", {
-      "commands/bad.js":
-        'export const name = "bad";\n' +
-        'export const permission = "anyone";\n' +
-        'export const handler = async () => ({ reply: "x" });\n',
-    });
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const registry = new SlashCommandRegistry();
-    const pm = (makePM as any)(registry);
-    pm.scan();
-    await (pm as any).loadAll();
-    expect(registry.lookup("bad")).toBeNull();
-    expect(warn).toHaveBeenCalledWith(expect.stringMatching(/restricted|full-access/));
-    warn.mockRestore();
-  });
-
   it("permission 缺省默认 owner（#6）", async () => {
     writePlugin(path.join(builtinDir, "defp"), "defp", {
       "commands/x.js":

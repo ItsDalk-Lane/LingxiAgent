@@ -13,7 +13,11 @@ import { INTERNAL_MOOD_TAGS } from '../../../../shared/internal-mood-block.ts';
 import { splitReservedTagSegments } from '../../../../shared/reserved-tag-stream.ts';
 import type { LiveAssistantSegment } from '../stores/live-turn-store';
 
-/** 全部保留协议标签：mood 家族 + think 家族。 */
+/**
+ * 全部保留协议标签：mood 家族 + think 家族。
+ * 注意：mm:think 不进词表——旧落盘残渣（孤儿闭标签）靠 splitReservedTagSegments
+ * 的「词表外孤儿闭标签」形状规则吞掉；成对方言由服务端流式解析结构化。
+ */
 const RESERVED_TAGS: readonly string[] = [...INTERNAL_MOOD_TAGS, 'think', 'thinking'];
 
 /** 剥离 segment 开头的内部协议块；只处理 leading 位置，正文内部的标签按普通文本保留。 */

@@ -1,5 +1,6 @@
 import type { ContentBlock, ToolCall } from '../stores/chat-types';
-import { extractMoodBlocksFromContent, parseCardFromContent } from './message-parser';
+import { extractMoodBlocksFromContent } from './message-parser';
+import { splitReservedTagSegments } from '../../../../shared/reserved-tag-stream.ts';
 import { skillInvocationName } from '../../../../shared/tool-outcome.ts';
 
 interface AssistantBlockInput {
@@ -18,6 +19,30 @@ interface AssistantBlockInput {
     processOrder?: number;
   }> | null;
   extraBlocks?: ContentBlock[] | null;
+}
+
+/** think 家族词表：旧落盘正文的思考残渣清理（成对结构化为思考块；孤儿闭标签由扫描器形状规则吞掉）。 */
+const THINK_FAMILY_TAGS: readonly string[] = ['think', 'thinking', 'mm:think'];
+
+/**
+ * 旧版本落盘的正文可能残留思考方言标签（如 MiniMax 的 </mm:think>）：成对的
+ * 结构化为思考块，孤立的闭标签由 ReservedTagScanner 的形状规则吞掉。新落盘
+ * 内容在服务端流式解析已结构化，这里只是历史渲染的兜底。
+ */
+function splitThinkResidue(text: string): { thinkingParts: string[]; text: string } {
+  if (!text) return { thinkingParts: [], text };
+  const segments = splitReservedTagSegments(text, THINK_FAMILY_TAGS);
+  const thinkingParts: string[] = [];
+  const textParts: string[] = [];
+  for (const segment of segments) {
+    if (segment.type === 'block') {
+      const cleaned = segment.content.trim();
+      if (cleaned) thinkingParts.push(cleaned);
+    } else {
+      textParts.push(segment.text);
+    }
+  }
+  return { thinkingParts, text: textParts.join('').replace(/^[ \t]*\n+/, '') };
 }
 
 export function buildAssistantBlocksFromContent({
@@ -68,18 +93,20 @@ export function buildAssistantBlocksFromContent({
     blocks.push({ type: 'mood', yuan, text: mood });
   }
 
+  // 旧落盘正文的思考方言残渣：成对 → 思考块；孤儿闭标签 → 已被扫描器吞掉
+  const { thinkingParts, text: afterThink } = splitThinkResidue(afterMood);
+  for (const thinkText of thinkingParts) {
+    blocks.push({ type: 'thinking', content: thinkText, sealed: true });
+  }
+
   pushToolGroup(standardToolCalls);
 
-  const { cards, text: mainText } = parseCardFromContent(afterMood);
+  const mainText = afterThink;
   if (mainText) {
     blocks.push({
       type: 'text',
       source: mainText,
     });
-  }
-
-  for (const card of cards) {
-    blocks.push({ type: 'plugin_card', card });
   }
 
   // 模型通过 read 打开 SKILL.md 才算技能调用。历史消息里这类工具调用位于

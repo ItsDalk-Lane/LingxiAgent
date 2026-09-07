@@ -63,9 +63,6 @@ interface Buffer {
   inThinking: boolean;
   hasThinkingBlock: boolean;
   inMood: boolean;
-  inCard: boolean;
-  cardAttrs: { type: string; plugin: string; route: string; title?: string } | null;
-  cardDescAcc: string;
   lastFlushTime: number;
   flushTimer: ReturnType<typeof setTimeout> | null;
   flushFrame: number | null;
@@ -113,9 +110,6 @@ function createBuffer(sessionPath: string): Buffer {
     inThinking: false,
     hasThinkingBlock: false,
     inMood: false,
-    inCard: false,
-    cardAttrs: null,
-    cardDescAcc: '',
     lastFlushTime: 0,
     flushTimer: null,
     flushFrame: null,
@@ -290,10 +284,7 @@ class StreamBufferManager {
       buf.hasThinkingBlock ||
       buf.moodAcc ||
       buf.inThinking ||
-      buf.inMood ||
-      buf.inCard ||
-      buf.cardAttrs ||
-      buf.cardDescAcc
+      buf.inMood
     );
   }
 
@@ -313,9 +304,6 @@ class StreamBufferManager {
     buf.moodPendingSeparator = false;
     buf.inThinking = false;
     buf.inMood = false;
-    buf.inCard = false;
-    buf.cardAttrs = null;
-    buf.cardDescAcc = '';
     buf.messageId = null;
     buf.runEnding = false;
     buf.publishPending = false;
@@ -792,36 +780,7 @@ class StreamBufferManager {
         this.publishBoundary(buf);
         break;
 
-      case 'card_start':
-        this.ensureMessage(buf);
-        buf.inCard = true;
-        buf.cardAttrs = msg.attrs || null;
-        buf.cardDescAcc = '';
-        break;
 
-      case 'card_text':
-        buf.cardDescAcc += msg.delta || '';
-        break;
-
-      case 'card_end': {
-        buf.inCard = false;
-        if (buf.cardAttrs) {
-          const card = {
-            type: buf.cardAttrs.type || 'iframe',
-            pluginId: buf.cardAttrs.plugin || '',
-            route: buf.cardAttrs.route || '',
-            title: buf.cardAttrs.title,
-            description: buf.cardDescAcc,
-          };
-          this.publishBoundary(buf, (m) => ({
-            ...m,
-            blocks: [...(m.blocks || []), { type: 'plugin_card' as const, card }],
-          }));
-        }
-        buf.cardAttrs = null;
-        buf.cardDescAcc = '';
-        break;
-      }
 
       case 'tool_start': {
         // 幂等防御（第一层，按事件 seq）：resume 增量重放会原样重发 tool_start，

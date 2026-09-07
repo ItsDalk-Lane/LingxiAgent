@@ -6,6 +6,8 @@ export interface EditorFileRef {
   name: string;
   isDirectory?: boolean;
   mimeType?: string;
+  /** 附件随附的 base64 内容（音频/视频直传用）；仅内存态，不落盘 */
+  base64Data?: string;
 }
 
 export interface EditorSessionRef {
@@ -182,4 +184,23 @@ export function serializeEditor(json: JSONContent): {
   const text = lines.join('\n').replace(/\n+$/, '').trim();
 
   return { text, skills, fileRefs, sessionRefs, agentMentions };
+}
+
+/**
+ * 粘贴保真：把剪贴板纯文本原样转成编辑器内容。
+ *
+ * 整段粘进一个段落，行与行之间用 hardBreak 分隔；空行即连续两个 hardBreak。
+ * 序列化时 hardBreak 还原为 '\n'，文本逐字符还原（空行/缩进/围栏零丢失），
+ * Markdown 的块结构（代码围栏/标题/列表/分隔线）在「编辑器 → 纯文本」往返中
+ * 不再被富文本解析拍平。CRLF 统一归一为 LF。
+ */
+export function buildFaithfulPasteContent(text: string): JSONContent {
+  const lines = text.replace(/\r\n?/g, '\n').split('\n');
+  const content: JSONContent[] = [];
+  lines.forEach((line, index) => {
+    if (index > 0) content.push({ type: 'hardBreak' });
+    if (line) content.push({ type: 'text', text: line });
+  });
+  if (content.length === 0) return { type: 'paragraph' };
+  return { type: 'paragraph', content };
 }
