@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 601e918ddf5aa8ec2be2390528223b08ee515e44  (2026-09-06 文档治理收口封印：根目录历史台账归档至 docs/archives)
+VERIFIED_SOURCE_SHA   = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202  (2026-09-07 拆除与语音改造+三 bug 修复封印：分支 refactor/dismantle-and-voice-features)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1494,3 +1494,12 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - `TOOL_INVOCATION_REPAIR_FACTS.json` 中 `sourceCandidateSha` 与 `sealSha` 按任务书保持 `null`，避免提交自引用；真实源码候选记录在本节，真实封印提交只在最终执行报告中给出。
 - PR #43 首轮 Windows CI 在 `tests/tool-invocation-path-parity.test.ts` 出现 10 项 `PREPARED_INVOCATION_MISMATCH`：测试夹具固定使用 Unix 会话路径，而 Windows 包装层按平台规范化为绝对路径。生产 fail-closed 正确拒绝不一致事实，没有放宽。
 - 最小修复提交 `ce701ee20727e7cdaaf3d6f838ae8ca5727c2b63` 只把测试会话路径改为当前平台的规范绝对路径。修复后定向测试 1 文件 / 12 测试通过；三段 typecheck exit 0；本地全量测试 1374 文件通过 / 1 跳过、13904 测试通过 / 7 跳过、0 fail。日志：`/tmp/lingxi-pr43-windows-path-fixture-green.log`、`/tmp/lingxi-pr43-windows-path-fixture-typecheck.log`、`/tmp/lingxi-pr43-windows-path-fixture-full-test.log`。
+
+## 2026-09-07 拆除与语音改造+三 bug 修复封印
+
+- 固定源码：`04f90d2b26449d2f3264a5ea2a1a8bd6fb253202`；分支 `refactor/dismantle-and-voice-features`。内容：九件改造七阶段（邀请码移除/死代码清理/插件生态收口/知识库旧两档与研究模式拆除/置顶+信条合并/TTS/系统语音识别）与三 bug 修复（思考标签泄漏/流式发送排队/粘贴保真），明细见该提交信息。`.gitignore` 同步新增 `dist-speech/`（语音助手构建产物，同 `dist-computer-use/` 惯例）。
+- 用户授权：2026-09-06 会话逐项下达九件改造指令并确认执行方式；2026-09-07 会话报告三 bug 并验收修复设计；本次会话用户明确指示「提交所有修改，并推送到远程仓库」。
+- typecheck：tsc×3（root + node + test）exit 0。全量 `npm test`：1311 测试文件 / 13081 用例，13073 passed / 1 failed / 7 既有 skipped，83.26s；唯一失败为 `tests/artifact-core-ustar.test.ts` afterEach 临时目录 `fs.rmSync` ENOTEMPTY（macOS 清理竞态，属 artifact-core 无关模块），单文件重跑 10/10 通过，未计入回归。日志 `/tmp/lingxi-seal-typecheck.log`、`/tmp/lingxi-seal-fulltest.log`。
+- 派生清单（cli-runtime-closure / open-boundary baseline / shell-surface-manifest / persistence 指纹与 inventory / startup receipt）已在受测工作树重生成并随源码提交；staged diff 密钥模式扫描无命中。
+- 本次封印只同步既有六份审计文件（verified-source-sha.txt / build-sync-matrix.mjs / upstream-sync-matrix.json / UPSTREAM_SYNC_AUDIT.md / UPSTREAM_SYNC_MATRIX.md / 本文件坐标行），矩阵重生成 133 paths 硬校验通过（ADOPTED 25 / ADAPTED 100 / REGENERATED 4 / INTENTIONAL_DIVERGENCE 4）；不合并 main。
+- 未执行/受限：全仓 lint 与 build/package 门禁本轮未跑；系统语音识别端到端未实测（开发终端无语音识别 TCC 授权，helper 正确 fail-closed，打包后首次使用需用户授权）；TTS 云端路径需配置 API key 后实测；三 bug 修复的 dev 环境用户验收仍在进行；正式发布与四平台门禁未启动。
