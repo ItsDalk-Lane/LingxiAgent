@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = d711c092527b0ecefd66c3c75a2d4375b5e96576  (2026-09-08 C01–C03+CI+Windows 兼容修复源码候选：分支 refactor/dismantle-and-voice-features)
+VERIFIED_SOURCE_SHA   = 4d10c2b835a9f92b73a9c24e5a39a2b4c59b3744  (2026-09-08 C01–C03+CI+Windows 兼容修复源码候选：分支 refactor/dismantle-and-voice-features)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1023,6 +1023,12 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
 - 固定源码候选：`d711c092527b0ecefd66c3c75a2d4375b5e96576`（a79f4652 + 语音适配器 posix∥win32 双接受盘符绝对路径——上一轮仅转换反斜杠，posix.isAbsolute 对 C:/… 仍拒绝；本地四形态路径验证）。
 - 验证证据（绑定该候选树）：语音 5 文件 42 项 + 闭包/边界 38 项绿；全量 13443 passed / 0 failed（j38）；round2 manifest 刷新（s22 绿门禁）；round3 manifest 85e9473b（j37 补丁重放 VERIFIED）；提交后独立检出 3 文件 28/28 绿。
 - CI 平台抖动台账（非代码问题）：mac-arm64 曾因 vitest worker fork 崩溃 exit 1（13438 全过后单错误）；intel 曾因 knowledge-vector-shutdown 竞态 1 失败——均按既有惯例重跑失败作业。
+
+## 2026-09-08 A12 路径合同断言对齐候选与封印推进（round3 收尾 IV）
+
+- 固定源码候选：`4d10c2b835a9f92b73a9c24e5a39a2b4c59b3744`（d711c092 + A12 打包路径断言对齐 POSIX 斜杠合同；Windows CI 语音套件由 14 失败收敛至 0，唯一残余即该断言）。
+- 验证证据（绑定该候选树）：语音生命周期 13/13；全量 13442 passed / 0 failed + 1 macOS 临时目录清理竞态（ustar afterEach，单跑 10/10 绿）（j40）；round3 manifest 200e6314（j39 补丁重放 VERIFIED，兼作绿色引导门禁）；提交后独立检出 18/18 绿。
+- 平台抖动台账：intel 的 knowledge-vector-shutdown 在两轮 CI 偶发（main 同平台历史失败为 md-decorations 等，同类慢平台抖动家族，按惯例重跑失败作业）。
 
 ### Known limitation（保留）
 

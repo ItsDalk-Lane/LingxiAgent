@@ -40,7 +40,7 @@ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source
 // tree sha，导致 seal guard 在 HEAD 长期红色——Phase 10 F-4 修复）。
 // 该 commit 早于记录它的审计提交落地，无自引用（SHA = hash(contents)）问题。
 // 当前 branch HEAD 可能在其后存在纯审计 seal 提交，HEAD 由 Git ref 自身标识。
-const VERIFIED_SOURCE_SHA = "d711c092527b0ecefd66c3c75a2d4375b5e96576";
+const VERIFIED_SOURCE_SHA = "4d10c2b835a9f92b73a9c24e5a39a2b4c59b3744";
 
 const ALLOWED_DISPOSITIONS = ["ADOPTED", "ADAPTED", "REGENERATED", "INTENTIONAL_DIVERGENCE"];
 
