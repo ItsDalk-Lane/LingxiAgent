@@ -556,7 +556,7 @@
   },
   "currentRound2Final": {
     "conclusion": "R01–R10 本地实现/联合验证关闭；受测源码候选提交后的审计封印状态以根目录 PROGRESS.md 和 Git guard 为准。整体发布验收仍受 notarization 凭证、真机/供应商/跨平台验收阻塞。",
-    "sourceManifestHash": "1f5514ea8ce975cac8b5223fb2e6c6367e25eae4b0276f3296607de285de05ff",
+    "sourceManifestHash": "f0a527e5637c9c3e286ae30106ad6e23beb0e46c8e284a4ec810ca8a756fcac7",
     "entrypoint": "round2/R01_R10_REPAIR_REPORT.md",
     "jointTests": {
       "files": 25,
@@ -586,8 +586,8 @@
     "notarization": "BLOCKED_MISSING_APPLE_CREDENTIALS",
     "realEnvironment": "BLOCKED",
     "patch": "round2/patches/89bc0b64-to-r01-r10-source.patch",
-    "patchBytes": 425087,
-    "patchSha256": "e8c1959aebdd469a1cad2cee02b8eeb9674c659520dc5d796589b3859a803be8",
+    "patchBytes": 425130,
+    "patchSha256": "2adbdefd1f2c91b51527b7095024b3f1cab26fbc4f0d37daeddf2c979f1d8f40",
     "patchReplay": "VERIFIED"
   }
 }

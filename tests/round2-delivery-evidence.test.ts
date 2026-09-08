@@ -68,7 +68,10 @@ function manifestSourceRef(manifest: any): string | null {
 
 function sourceBytes(relative: string, commit: string | null): Buffer {
   if (!commit) return fs.readFileSync(path.join(ROOT, relative));
-  return execFileSync("git", ["show", `${commit}:${relative}`], { cwd: ROOT });
+  return execFileSync("git", ["show", `${commit}:${relative}`], {
+    cwd: ROOT,
+    maxBuffer: 16 * 1024 * 1024,
+  });
 }
 
 describe("R10 round2 交付证据契约", () => {

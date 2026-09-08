@@ -2,7 +2,7 @@
 
 R01–R10 本地实现/联合验证关闭；受测源码候选提交后的审计封印状态以根目录 `PROGRESS.md` 和 Git guard 为准。整体发布验收仍受 notarization 凭证、真机/供应商/跨平台验收阻塞。
 
-最终源码摘要：`1f5514ea8ce975cac8b5223fb2e6c6367e25eae4b0276f3296607de285de05ff`。
+最终源码摘要：`f0a527e5637c9c3e286ae30106ad6e23beb0e46c8e284a4ec810ca8a756fcac7`。
 
 | 验证 | 真实结果 | 日志（round2/logs） |
 |---|---|---|
@@ -21,7 +21,7 @@ R01–R10 本地实现/联合验证关闭；受测源码候选提交后的审计
 
 真实 macOS 权限/转写、真实供应商、Windows/Linux/其他架构均 BLOCKED；本地构建与合成数据不能替代这些验收。聊天工具栏上没有增加语音输入的组件是用户要求的。后端 system-speech 模型解析、上传转写、错误码、原生音频附件、当前快捷键、ASR/TTS/朗读与宿主授权桥保留，旧前端听写不恢复。真实用户恢复仍受 BLOCKED_HOME_OWNERSHIP 及单独数据授权限制。
 
-最终增量补丁为 `patches/89bc0b64-to-r01-r10-source.patch`（相对 round2），大小 `425087` bytes，SHA-256 `e8c1959aebdd469a1cad2cee02b8eeb9674c659520dc5d796589b3859a803be8`；已在干净 `89bc0b64` 工作树执行 `git apply --check` 和实际重放并核对源码摘要。用户已授权把源码候选和审计封印提交、推送到任务书指定分支；未合并 main、发布或迁移真实用户数据。
+最终增量补丁为 `patches/89bc0b64-to-r01-r10-source.patch`（相对 round2），大小 `425130` bytes，SHA-256 `2adbdefd1f2c91b51527b7095024b3f1cab26fbc4f0d37daeddf2c979f1d8f40`；已在干净 `89bc0b64` 工作树执行 `git apply --check` 和实际重放并核对源码摘要。用户已授权把源码候选和审计封印提交、推送到任务书指定分支；未合并 main、发布或迁移真实用户数据。
 
 ---
 

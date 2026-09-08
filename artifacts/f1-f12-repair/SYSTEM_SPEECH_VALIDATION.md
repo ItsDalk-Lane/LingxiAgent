@@ -6,7 +6,7 @@ replacedBy: `round2`
 
 R01–R10 本地实现/联合验证关闭；受测源码候选提交后的审计封印状态以根目录 `PROGRESS.md` 和 Git guard 为准。整体发布验收仍受 notarization 凭证、真机/供应商/跨平台验收阻塞。
 
-最终源码摘要：`1f5514ea8ce975cac8b5223fb2e6c6367e25eae4b0276f3296607de285de05ff`。
+最终源码摘要：`f0a527e5637c9c3e286ae30106ad6e23beb0e46c8e284a4ec810ca8a756fcac7`。
 
 | 验证 | 真实结果 | 日志（round2/logs） |
 |---|---|---|
