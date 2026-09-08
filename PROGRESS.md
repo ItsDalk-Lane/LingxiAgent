@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = a728597eff749d613cbb117cbd12e7f7379fd0ec  (2026-09-08 C01–C03+CI+Windows 兼容修复源码候选：分支 refactor/dismantle-and-voice-features)
+VERIFIED_SOURCE_SHA   = 25a6b78447c64e169f763f63949fa4258fa9542c  (2026-09-08 C01–C03+CI+Windows 兼容修复源码候选：分支 refactor/dismantle-and-voice-features)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1029,6 +1029,11 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
 - 固定源码候选：`a728597eff749d613cbb117cbd12e7f7379fd0ec`（d711c092 + A12 打包路径断言对齐 POSIX 斜杠合同；Windows CI 语音套件由 14 失败收敛至 0，唯一残余即该断言）。
 - 验证证据（绑定该候选树）：语音生命周期 13/13；全量 13442 passed / 0 failed + 1 macOS 临时目录清理竞态（ustar afterEach，单跑 10/10 绿）（j40）；round3 manifest 200e6314（j39 补丁重放 VERIFIED，兼作绿色引导门禁）；提交后独立检出 18/18 绿。
 - 平台抖动台账：intel 的 knowledge-vector-shutdown 在两轮 CI 偶发（main 同平台历史失败为 md-decorations 等，同类慢平台抖动家族，按惯例重跑失败作业）。
+
+## 2026-09-08 路径合同断言全对齐候选与封印推进（round3 收尾 V）
+
+- 固定源码候选：`25a6b78447c64e169f763f63949fa4258fa9542c`（a728597e + dev/override 两处路径断言同型对齐；上一封印曾误指审计提交 4d10c2b8，已由 a7bb3906 修正到 a728597e，本候选为其直接后继）。Windows CI 语音套件唯一残余断言收敛。
+- 验证证据（绑定该候选树）：语音生命周期 13/13；全量 13443 passed / 0 failed（j42）；round3 manifest 8f5cf500（j41 补丁重放 VERIFIED）；提交后独立检出 18/18 绿。
 
 ### Known limitation（保留）
 
