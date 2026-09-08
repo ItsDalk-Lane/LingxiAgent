@@ -3,6 +3,98 @@
   "entries": [
     {
       "schemaVersion": 1,
+      "tag": "v0.1.36",
+      "version": "0.1.36",
+      "previousTag": "v0.1.35",
+      "generatedAt": "2026-09-08T18:08:21.722409Z",
+      "noUserFacingChanges": false,
+      "summary": {
+        "zh": "本版本聚焦发送链路的可靠性：服务器明确拒绝的消息现在会立即显示「未发送」并提供重试与放弃，不再悬挂或卡住会话；同时修复了 Windows 迁移收据的跨平台路径兼容。",
+        "en": "This release focuses on send-path reliability: messages explicitly rejected by the server now immediately show as not sent with retry and discard actions instead of hanging or blocking the session, and Windows migration receipt paths are now cross-platform compatible."
+      },
+      "counts": {
+        "feature": 0,
+        "fix": 2,
+        "improvement": 0,
+        "migration": 0
+      },
+      "source": {
+        "owner": "ItsDalk-Lane",
+        "repo": "LingxiAgent",
+        "commitRange": "v0.1.35..HEAD",
+        "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.36",
+        "releaseNotes": ""
+      },
+      "items": [
+        {
+          "id": "send-rejection-settlement",
+          "kind": "fix",
+          "importance": "high",
+          "title": {
+            "zh": "发送被拒绝时立即反馈，消息可重试或放弃",
+            "en": "Immediate feedback when a message is rejected, with retry or discard"
+          },
+          "summary": {
+            "zh": "此前消息在切换模型、助手正在忙等被服务器明确拒绝的场景下，气泡会长时间停在「发送中」，还会卡住整个会话无法继续发送。现在服务器会明确告知拒绝原因，消息立即标记为「未发送」并保留全部原文与附件，可一键重试或放弃。",
+            "en": "Previously, when the server clearly rejected a message (for example during a model switch or while the assistant was busy), the bubble could stay in a sending state and block the whole session. The server now reports the rejection immediately: the message is marked as not sent with all text and attachments preserved, and can be retried or discarded in one click."
+          },
+          "details": [
+            {
+              "zh": "服务器拒绝回执带稳定原因码：模型切换中、会话忙、媒体超限、引用的知识库无效等，界面据此给出对应提示与是否可重试。",
+              "en": "Rejection receipts carry stable reason codes (model switching, session busy, media limits, invalid knowledge references) so the UI can show the matching message and retry availability."
+            },
+            {
+              "zh": "排队消息保持顺序：被拒的队首消息不会被后面的消息插队，处置（重试或放弃）后才继续。",
+              "en": "Queued messages keep their order: a rejected head-of-queue message is not skipped over; the queue proceeds only after it is retried or discarded."
+            },
+            {
+              "zh": "已经成功接收的消息不会被误判为「未发送」，也不会自动重发；真正断线导致的「结果未知」仍只提示手动核对。",
+              "en": "Messages already accepted by the server are never misreported as unsent or auto-resent; genuine connection-loss \"result unknown\" states still only suggest manual verification."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "94c71d7a",
+              "title": "fix: C01-C03 拒绝结算闭环、收据平台无关路径与交付证据日志"
+            },
+            {
+              "type": "commit",
+              "ref": "a79f4652",
+              "title": "fix: Windows CI 平台兼容（PR #47 四平台首跑暴露）"
+            }
+          ]
+        },
+        {
+          "id": "windows-migration-receipt-paths",
+          "kind": "fix",
+          "importance": "medium",
+          "title": {
+            "zh": "Windows 迁移收据路径兼容",
+            "en": "Windows migration receipt path compatibility"
+          },
+          "summary": {
+            "zh": "修复了 Windows 上写出的置顶记忆迁移收据在其他系统无法识别的问题：收据路径统一使用跨平台格式，旧格式可正常读取续跑，已完成的历史迁移不会被重复执行，用户后来删除的内容也不会被意外恢复。",
+            "en": "Fixes pinned-memory migration receipts written on Windows being unreadable on other systems. Receipt paths now use a cross-platform format, legacy receipts remain readable and resumable, completed migrations are never re-run, and content the user deleted afterwards is never revived."
+          },
+          "details": [
+            {
+              "zh": "收据内的备份目录路径统一为跨平台格式；含路径逃逸、盘符、UNC 等危险内容的收据会被整体拒绝而非猜测解析。",
+              "en": "Backup directory paths inside receipts use one cross-platform format; receipts containing drive letters, UNC paths or traversal segments are rejected outright instead of guessed at."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "94c71d7a",
+              "title": "fix: C01-C03 拒绝结算闭环、收据平台无关路径与交付证据日志"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
       "tag": "v0.1.35",
       "version": "0.1.35",
       "previousTag": "v0.1.34",
