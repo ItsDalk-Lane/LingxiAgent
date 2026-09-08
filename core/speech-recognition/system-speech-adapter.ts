@@ -98,8 +98,15 @@ export function createSystemSpeechUtf8Decoder() {
 
 function normalizedAbsolutePosixPath(value: any): string | null {
   const candidate = typeof value === "string" ? value.trim() : "";
-  if (!candidate || candidate.includes("\0") || !path.posix.isAbsolute(candidate)) return null;
-  return path.posix.normalize(candidate);
+  if (!candidate || candidate.includes("\0")) return null;
+  // Windows 盘符绝对路径（C:\… / D:/…）转 POSIX 斜杠后参与同一套结构校验：
+  // LINGXI_SPEECH_HELPER_EXEC 覆盖在 Windows 上才可用；mac 包内结构检查对
+  // 盘符形态自然不匹配，无需单列分支。
+  const posixCandidate = /^[A-Za-z]:[\\/]/.test(candidate)
+    ? candidate.replace(/\\/g, "/")
+    : candidate;
+  if (!path.posix.isAbsolute(posixCandidate)) return null;
+  return path.posix.normalize(posixCandidate);
 }
 
 function macAppResourcesRoot(value: any): string | null {
@@ -543,10 +550,19 @@ export const systemSpeechRecognitionAdapter = {
       };
 
       try {
-        child = spawn(helper, args, {
-          env,
-          stdio: ["ignore", "pipe", "pipe"],
-        });
+        // 脚本形态的 helper（.js/.cjs/.mjs，如测试注入的假 helper）不能直接
+        // spawn：Windows 无 shebang 执行语义，统一经当前 Node 可执行文件拉起。
+        // 二进制 helper（打包产物）不受影响，仍直接 spawn。
+        const isScriptHelper = /\.(?:js|cjs|mjs)$/.test(helper);
+        child = isScriptHelper
+          ? spawn(process.execPath, [helper, ...args], {
+            env,
+            stdio: ["ignore", "pipe", "pipe"],
+          })
+          : spawn(helper, args, {
+            env,
+            stdio: ["ignore", "pipe", "pipe"],
+          });
       } catch (err: any) {
         finish({
           kind: "error",

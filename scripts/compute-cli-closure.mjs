@@ -305,6 +305,17 @@ export const DYNAMIC_CALL_ALLOWLIST = Object.freeze([
       + "(SIGTERM -> grace -> SIGKILL), abort/timeout semantics (F6).",
   },
   {
+    file: "core/speech-recognition/system-speech-adapter.ts",
+    callee: "spawn",
+    argText: "process.execPath",
+    reason:
+      "same adapter, script-form helper branch: LINGXI_SPEECH_HELPER_EXEC overrides ending "
+      + "in .js/.cjs/.mjs (test-injected fake helpers / dev tooling) are re-executed through "
+      + "the current Node binary because Windows has no shebang exec semantics. The "
+      + "production binary helper keeps the direct-spawn branch above; the override path is "
+      + "existence-validated before spawn and is never an untracked repo module at runtime.",
+  },
+  {
     file: "server/bootstrap.ts",
     callee: "import",
     argText: "pathToFileURL(serverEntry).href",

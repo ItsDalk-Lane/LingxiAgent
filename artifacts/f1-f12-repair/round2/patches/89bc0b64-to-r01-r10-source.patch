@@ -40,7 +40,7 @@ index af3647c779dad1edd9042249023ada0cb0c81372..e742177ba5684eb2fbcf41e0997aa452
  .codex/
  
 diff --git a/.sync-audit/build-sync-matrix.mjs b/.sync-audit/build-sync-matrix.mjs
-index d978251370637d720d11094c068847b151ae235e..188240655c1f60876e2d15137a20aab56b727ce3 100644
+index d978251370637d720d11094c068847b151ae235e..ea8f74dc335e0a178986d858119ffd3c19e689e5 100644
 --- a/.sync-audit/build-sync-matrix.mjs
 +++ b/.sync-audit/build-sync-matrix.mjs
 @@ -40,7 +40,7 @@ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source
@@ -48,12 +48,12 @@ index d978251370637d720d11094c068847b151ae235e..188240655c1f60876e2d15137a20aab5
  // 该 commit 早于记录它的审计提交落地，无自引用（SHA = hash(contents)）问题。
  // 当前 branch HEAD 可能在其后存在纯审计 seal 提交，HEAD 由 Git ref 自身标识。
 -const VERIFIED_SOURCE_SHA = "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202";
-+const VERIFIED_SOURCE_SHA = "f15e8b29de77f7e42b314f15892f40b90b93a668";
++const VERIFIED_SOURCE_SHA = "91ea310013e66cd84e334a4e14603ef33b664cc6";
  
  const ALLOWED_DISPOSITIONS = ["ADOPTED", "ADAPTED", "REGENERATED", "INTENTIONAL_DIVERGENCE"];
  
 diff --git a/.sync-audit/upstream-sync-matrix.json b/.sync-audit/upstream-sync-matrix.json
-index d6f8692829bc71ee97c3253e5482beabfdb51324..d9521b32c6ba90a6b5b3f2bb07a566d2351ce882 100644
+index d6f8692829bc71ee97c3253e5482beabfdb51324..e96d5f1bca6c687daa4406a6ef0a8118b3957f29 100644
 --- a/.sync-audit/upstream-sync-matrix.json
 +++ b/.sync-audit/upstream-sync-matrix.json
 @@ -4,7 +4,7 @@
@@ -61,19 +61,19 @@ index d6f8692829bc71ee97c3253e5482beabfdb51324..d9521b32c6ba90a6b5b3f2bb07a566d2
      "L0": "97595264ead8735a04559507ddaade25db8a4e15",
      "L1": "ca0b417e36a6a1f80947458aaed328a25718e41b",
 -    "VERIFIED_SOURCE_SHA": "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202"
-+    "VERIFIED_SOURCE_SHA": "f15e8b29de77f7e42b314f15892f40b90b93a668"
++    "VERIFIED_SOURCE_SHA": "91ea310013e66cd84e334a4e14603ef33b664cc6"
    },
    "summary": {
      "total": 133,
 diff --git a/.sync-audit/verified-source-sha.txt b/.sync-audit/verified-source-sha.txt
-index 78c76634c4edc5a8962212273a593e3ddf8bd28d..298a9d3f69b2bb7b8de8cbaa39c4f0a4d6c0c760 100644
+index 78c76634c4edc5a8962212273a593e3ddf8bd28d..e9229c6af1ed900679d8588c8d4d0b1a0283e270 100644
 --- a/.sync-audit/verified-source-sha.txt
 +++ b/.sync-audit/verified-source-sha.txt
 @@ -1 +1 @@
 -04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+f15e8b29de77f7e42b314f15892f40b90b93a668
++91ea310013e66cd84e334a4e14603ef33b664cc6
 diff --git a/PROGRESS.md b/PROGRESS.md
-index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..e6761ae8e9c4e21e7fa9cd173557ab081071880d 100644
+index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..26a8557c732e1c26095c4c9883bd3cc8731af1c2 100644
 --- a/PROGRESS.md
 +++ b/PROGRESS.md
 @@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
@@ -81,11 +81,11 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..e6761ae8e9c4e21e7fa9cd173557ab08
  LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
  LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
 -VERIFIED_SOURCE_SHA   = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202  (2026-09-07 拆除与语音改造+三 bug 修复封印：分支 refactor/dismantle-and-voice-features)
-+VERIFIED_SOURCE_SHA   = f15e8b29de77f7e42b314f15892f40b90b93a668  (2026-09-08 C01–C03+CI 修复源码候选：分支 refactor/dismantle-and-voice-features)
++VERIFIED_SOURCE_SHA   = 91ea310013e66cd84e334a4e14603ef33b664cc6  (2026-09-08 C01–C03+CI 修复源码候选：分支 refactor/dismantle-and-voice-features)
  历史上游同步工作分支  = feature/upstream-sync-0.447.4
  历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
  ```
-@@ -994,6 +994,20 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
+@@ -994,6 +994,25 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
  需要提交才能完成的封印留待相应授权步骤。不得为使检查变绿而虚报坐标、扩大白名单，
  或删除 seal 文件与 guard 测试；退役门禁属于另需明确授权的治理变更。
  
@@ -103,10 +103,15 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..e6761ae8e9c4e21e7fa9cd173557ab08
 +- 固定源码候选：`f15e8b29de77f7e42b314f15892f40b90b93a668`（94c71d7a + ci.yml build:packages 步骤移除 + ci-workflow-guards 顺序不变量更新 + 证据重冻结）。PR #47 四平台 CI 首跑暴露 04f90d2b 拆除 packages 工作区后 ci.yml 残留引用；本地按 CI 顺序预演后续步骤全绿。
 +- 验证证据（绑定该候选树）：全量 13443 passed / 0 failed（j30）；round2 manifest 454cfbc3（s15/s17 绿门禁）；round3 manifest ab73708f（j29 补丁重放 VERIFIED）；证据/封印 25/25；提交后独立检出证据家族绿。
 +
++## 2026-09-08 CI 步骤修复候选与封印推进（round3 收尾）
++
++- 固定源码候选：`91ea310013e66cd84e334a4e14603ef33b664cc6`（94c71d7a + ci.yml build:packages 步骤移除 + ci-workflow-guards 顺序不变量更新 + create-round3-patch 自嵌套修复 + 证据重冻结）。PR #47 四平台 CI 首跑暴露 04f90d2b 拆除 packages 工作区后 ci.yml 残留引用；本地按 CI 顺序预演后续步骤（knowledge 烟测/renderer/server:open+smoke）全绿。
++- 验证证据（绑定该候选树）：全量 13441 passed / 0 实质失败（j32，A08 为已知负载抖动、单跑 13/13 绿）；round2 manifest 29ad19e3（s18/s19 绿门禁）；round3 manifest 3ce0c8a4（j31 补丁重放 VERIFIED，19MB 无自嵌套）；提交后独立检出证据 30/30 绿。
++
  ### Known limitation（保留）
  
  Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面环境执行安装/升级
-@@ -1503,3 +1517,13 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
+@@ -1503,3 +1522,13 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
  - 派生清单（cli-runtime-closure / open-boundary baseline / shell-surface-manifest / persistence 指纹与 inventory / startup receipt）已在受测工作树重生成并随源码提交；staged diff 密钥模式扫描无命中。
  - 本次封印只同步既有六份审计文件（verified-source-sha.txt / build-sync-matrix.mjs / upstream-sync-matrix.json / UPSTREAM_SYNC_AUDIT.md / UPSTREAM_SYNC_MATRIX.md / 本文件坐标行），矩阵重生成 133 paths 硬校验通过（ADOPTED 25 / ADAPTED 100 / REGENERATED 4 / INTENTIONAL_DIVERGENCE 4）；不合并 main。
  - 未执行/受限：全仓 lint 与 build/package 门禁本轮未跑；系统语音识别端到端未实测（开发终端无语音识别 TCC 授权，helper 正确 fail-closed，打包后首次使用需用户授权）；TTS 云端路径需配置 API key 后实测；三 bug 修复的 dev 环境用户验收仍在进行；正式发布与四平台门禁未启动。
@@ -121,7 +126,7 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..e6761ae8e9c4e21e7fa9cd173557ab08
 +- 最终源码候选 `7cf986236cb8ac5c2d22cce1e5882554a42cff28`，审计封印提交 `62c73f77`；候选 source manifest SHA-256 `c418b3ef2fc475e40ed779f21b8e087b120834e9b673baf2e67c3758138d30d8`。封印后独立 diff guard 与 133 路径矩阵通过，upstream-sync、seal、round2 delivery 三文件 20/20 通过。
 +- 封印后原样 `npm test` exit 0：1334 文件通过 / 1 既有跳过，13384 测试通过 / 7 既有跳过，0 fail，82.80s；日志 `/tmp/lingxi-r01-r10-final-postseal-full-v2.log`。最终审计记录只改本 allowlist 内的 `PROGRESS.md`，不改变受测源码候选。
 diff --git a/UPSTREAM_SYNC_AUDIT.md b/UPSTREAM_SYNC_AUDIT.md
-index adcfa57d8a9836fe12c378f95f7448688d077896..72534f73524f383a74a087a26cf18d47fe6bc6c5 100644
+index adcfa57d8a9836fe12c378f95f7448688d077896..ebc684fa4aca04e9df1d22a5fe5f674954dcbb42 100644
 --- a/UPSTREAM_SYNC_AUDIT.md
 +++ b/UPSTREAM_SYNC_AUDIT.md
 @@ -15,7 +15,7 @@
@@ -129,12 +134,12 @@ index adcfa57d8a9836fe12c378f95f7448688d077896..72534f73524f383a74a087a26cf18d47
  | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
  | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
 -| VERIFIED_SOURCE_SHA | `04f90d2b26449d2f3264a5ea2a1a8bd6fb253202` | 2026-09-07 拆除与语音改造+三 bug 修复封印（分支 refactor/dismantle-and-voice-features）；typecheck×3 全绿+全量 13081 用例（唯一失败为无关模块 macOS 临时目录清理竞态 flaky、单跑 10/10 通过）后绑定，验证明细见 PROGRESS.md 最新条目 |
-+| VERIFIED_SOURCE_SHA | `f15e8b29de77f7e42b314f15892f40b90b93a668` | 2026-09-08 C01–C03+CI 修复源码候选（分支 refactor/dismantle-and-voice-features）；round2 manifest 454cfbc3 / round3 manifest ab73708f 同树冻结，验证证据见 PROGRESS.md 最新条目 |
++| VERIFIED_SOURCE_SHA | `91ea310013e66cd84e334a4e14603ef33b664cc6` | 2026-09-08 C01–C03+CI 修复源码候选（分支 refactor/dismantle-and-voice-features）；round2 manifest 29ad19e3 / round3 manifest 3ce0c8a4 同树冻结，验证证据见 PROGRESS.md 最新条目 |
  
  v0.1.35 仓库内的[功能 CI 记录](artifacts/release-v0.1.35/feature-ci-validation.json)
  对应 `2c835ac77afb1a73cd83816ad3d613297dc770a8`，不单独证明上述发布资料提交重新执行了
 diff --git a/UPSTREAM_SYNC_MATRIX.md b/UPSTREAM_SYNC_MATRIX.md
-index 2f98daf42096994372f834d639551859919c294e..23ac8969f78d5c3721bd27e6704a7d757cb115b2 100644
+index 2f98daf42096994372f834d639551859919c294e..2941b2f0f41c0ec040eda4b410b2f9d2ea751648 100644
 --- a/UPSTREAM_SYNC_MATRIX.md
 +++ b/UPSTREAM_SYNC_MATRIX.md
 @@ -10,7 +10,7 @@ U0 = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
@@ -142,22 +147,21 @@ index 2f98daf42096994372f834d639551859919c294e..23ac8969f78d5c3721bd27e6704a7d75
  L0 = 97595264ead8735a04559507ddaade25db8a4e15  (Lingxi v0.444.1 同步完成点, PR #2)
  L1 = ca0b417e36a6a1f80947458aaed328a25718e41b  (本轮同步开始时 main)
 -VERIFIED_SOURCE_SHA = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+VERIFIED_SOURCE_SHA = f15e8b29de77f7e42b314f15892f40b90b93a668
++VERIFIED_SOURCE_SHA = 91ea310013e66cd84e334a4e14603ef33b664cc6
  ```
  
  ## 统计（脚本计算，禁止人工填写）
 diff --git a/artifacts/f1-f12-repair/round2/create-delivery-patch.py b/artifacts/f1-f12-repair/round2/create-delivery-patch.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..cef85bf0e34c7200cfb0b97192cf0fa35c3f5020
+index 0000000000000000000000000000000000000000..a085462b644796d27ba7fa688575a213ba0a7971
 --- /dev/null
 +++ b/artifacts/f1-f12-repair/round2/create-delivery-patch.py
-@@ -0,0 +1,128 @@
+@@ -0,0 +1,160 @@
 +#!/usr/bin/env python3
 +import hashlib
 +import json
 +import os
 +import pathlib
-+import shutil
 +import subprocess
 +import tempfile
 +
@@ -171,23 +175,72 @@ index 0000000000000000000000000000000000000000..cef85bf0e34c7200cfb0b97192cf0fa3
 +    return hashlib.sha256(data).hexdigest()
 +
 +
-+def source_manifest(root: pathlib.Path) -> dict:
-+    raw = subprocess.check_output(
-+        ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"], cwd=root
++def keep(relative: str) -> bool:
++    if relative.startswith("artifacts/f1-f12-repair/") and not relative.endswith(".py"):
++        return False
++    return not relative.endswith(".patch")
++
++
++def stage_current(index_name: str) -> None:
++    """BASE + 当前树（artifacts 只保留 *.py）→ 临时 index。补丁与校验共用。"""
++    env = os.environ.copy()
++    env["GIT_INDEX_FILE"] = index_name
++    subprocess.run(["git", "read-tree", BASE], cwd=ROOT, env=env, check=True)
++    subprocess.run(["git", "add", "-A", "--", "."], cwd=ROOT, env=env, check=True)
++    subprocess.run(
++        ["git", "reset", "-q", BASE, "--", "artifacts/f1-f12-repair"],
++        cwd=ROOT, env=env, check=True,
 +    )
++    python_files = sorted(
++        str(path.relative_to(ROOT))
++        for path in (ROOT / "artifacts/f1-f12-repair").rglob("*.py")
++        if path.is_file()
++    )
++    if python_files:
++        subprocess.run(["git", "add", "--", *python_files], cwd=ROOT, env=env, check=True)
++
++
++def manifest_from_index(index_name: str) -> bytes:
++    """从临时 index 的 blob（git 归一化字节）计算源码 manifest。
++
++    不再读工作树字节：Windows autocrlf 会把工作树字节与 blob 字节拆开
++    （CRLF/LF），导致 current 与 replay 天然不一致（R10-09 Windows CI 实测）。
++    两侧统一走 index blob 后，行尾归一化由 git 同一套规则处理。
++    """
++    env = os.environ.copy()
++    env["GIT_INDEX_FILE"] = index_name
++    listing = subprocess.check_output(["git", "ls-files", "-s", "-z"], cwd=ROOT, env=env)
++    entries = []
++    for record in listing.decode().split("\0"):
++        if not record:
++            continue
++        meta, relative = record.split("\t", 1)
++        _mode, blob_sha, _stage = meta.split(" ")
++        if keep(relative):
++            entries.append((relative, blob_sha))
++    entries.sort()
++    batch_input = "\n".join(sha for _rel, sha in entries) + "\n"
++    batch = subprocess.run(
++        ["git", "cat-file", "--batch"], cwd=ROOT, env=env,
++        input=batch_input.encode(), stdout=subprocess.PIPE,
++    )
++    if batch.returncode != 0:
++        raise RuntimeError("cat-file --batch failed while building index manifest")
 +    rows = []
-+    for relative in sorted(set(raw.decode().split("\0"))):
-+        if not relative:
-+            continue
-+        if relative.startswith("artifacts/f1-f12-repair/") and not relative.endswith(".py"):
-+            continue
-+        if relative.endswith(".patch"):
-+            continue
-+        file_path = root / relative
-+        if file_path.is_file():
-+            content = file_path.read_bytes()
-+            rows.append({"path": relative, "bytes": len(content), "sha256": sha256(content)})
-+    return {
++    offset = 0
++    stdout = batch.stdout
++    for relative, blob_sha in entries:
++        header_end = stdout.index(0x0A, offset)
++        header = stdout[offset:header_end].decode()
++        if not header.startswith(f"{blob_sha} blob "):
++            raise RuntimeError(f"cat-file record mismatch for {relative}: {header}")
++        size = int(header.split(" ")[2])
++        start = header_end + 1
++        end = start + size
++        blob = stdout[start:end]
++        rows.append({"path": relative, "bytes": len(blob), "sha256": sha256(blob)})
++        offset = end + 1
++    manifest = {
 +        "sourceIdentity": {"kind": "worktree", "base": BASE},
 +        "exclusions": [
 +            "artifacts/f1-f12-repair/** except *.py (generated evidence, reports, delivery files and synthetic test home)",
@@ -196,33 +249,23 @@ index 0000000000000000000000000000000000000000..cef85bf0e34c7200cfb0b97192cf0fa3
 +        ],
 +        "files": rows,
 +    }
++    return (json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
 +
 +
-+def manifest_bytes(root: pathlib.Path) -> bytes:
-+    return (json.dumps(source_manifest(root), ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
++def temp_index(prefix: str) -> str:
++    fd, name = tempfile.mkstemp(prefix=prefix)
++    os.close(fd)
++    os.unlink(name)
++    return name
 +
 +
 +def build_patch() -> bytes:
 +    PATCH.parent.mkdir(parents=True, exist_ok=True)
-+    index_fd, index_name = tempfile.mkstemp(prefix="lingxi-r01-r10-index-")
-+    os.close(index_fd)
-+    os.unlink(index_name)
-+    env = os.environ.copy()
-+    env["GIT_INDEX_FILE"] = index_name
++    index_name = temp_index("lingxi-r01-r10-index-")
 +    try:
-+        subprocess.run(["git", "read-tree", BASE], cwd=ROOT, env=env, check=True)
-+        subprocess.run(["git", "add", "-A", "--", "."], cwd=ROOT, env=env, check=True)
-+        subprocess.run(
-+            ["git", "reset", "-q", BASE, "--", "artifacts/f1-f12-repair"],
-+            cwd=ROOT, env=env, check=True,
-+        )
-+        python_files = sorted(
-+            str(path.relative_to(ROOT))
-+            for path in (ROOT / "artifacts/f1-f12-repair").rglob("*.py")
-+            if path.is_file()
-+        )
-+        if python_files:
-+            subprocess.run(["git", "add", "--", *python_files], cwd=ROOT, env=env, check=True)
++        stage_current(index_name)
++        env = os.environ.copy()
++        env["GIT_INDEX_FILE"] = index_name
 +        content = subprocess.check_output(
 +            ["git", "diff", "--cached", "--binary", "--full-index", BASE, "--"],
 +            cwd=ROOT, env=env,
@@ -236,25 +279,23 @@ index 0000000000000000000000000000000000000000..cef85bf0e34c7200cfb0b97192cf0fa3
 +
 +
 +def replay_and_verify(patch: bytes) -> dict:
-+    current = manifest_bytes(ROOT)
-+    temp_parent = pathlib.Path(tempfile.mkdtemp(prefix="lingxi-r01-r10-replay-parent-"))
-+    replay = temp_parent / "worktree"
-+    added = False
++    current_index = temp_index("lingxi-r01-r10-current-")
++    replay_index = temp_index("lingxi-r01-r10-replay-")
 +    try:
-+        subprocess.run(
-+            ["git", "worktree", "add", "--detach", str(replay), BASE],
-+            cwd=ROOT, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
++        stage_current(current_index)
++        current = manifest_from_index(current_index)
++
++        replay_env = os.environ.copy()
++        replay_env["GIT_INDEX_FILE"] = replay_index
++        subprocess.run(["git", "read-tree", BASE], cwd=ROOT, env=replay_env, check=True)
++        apply = subprocess.run(
++            ["git", "apply", "--cached", "--binary", "--whitespace=nowarn", "-"],
++            cwd=ROOT, env=replay_env, input=patch,
++            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
 +        )
-+        added = True
-+        subprocess.run(
-+            ["git", "apply", "--check", "--binary", str(PATCH)],
-+            cwd=replay, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-+        )
-+        subprocess.run(
-+            ["git", "apply", "--binary", str(PATCH)],
-+            cwd=replay, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-+        )
-+        replayed = manifest_bytes(replay)
++        if apply.returncode != 0:
++            raise RuntimeError(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
++        replayed = manifest_from_index(replay_index)
 +        if replayed != current:
 +            raise RuntimeError(
 +                f"replayed source manifest mismatch: current={sha256(current)} replay={sha256(replayed)}"
@@ -269,12 +310,8 @@ index 0000000000000000000000000000000000000000..cef85bf0e34c7200cfb0b97192cf0fa3
 +            "result": "VERIFIED",
 +        }
 +    finally:
-+        if added:
-+            subprocess.run(
-+                ["git", "worktree", "remove", "--force", str(replay)],
-+                cwd=ROOT, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-+            )
-+        shutil.rmtree(temp_parent, ignore_errors=True)
++        pathlib.Path(current_index).unlink(missing_ok=True)
++        pathlib.Path(replay_index).unlink(missing_ok=True)
 +
 +
 +if __name__ == "__main__":
@@ -318,15 +355,17 @@ index 0000000000000000000000000000000000000000..4f733b09a73ee30e55811637a9e50674
 +print(log.decode(errors='replace')[-9000:]); print('EVIDENCE',label,'EXIT',p.returncode,'MANIFEST',h); sys.exit(p.returncode)
 diff --git a/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py b/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..3a7bee09d12fb367a0e826aabe7dd1d9113832c1
+index 0000000000000000000000000000000000000000..01c123b52553052ca9f67b72941de9f447d40e64
 --- /dev/null
 +++ b/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py
-@@ -0,0 +1,159 @@
+@@ -0,0 +1,146 @@
 +#!/usr/bin/env python3
-+"""round3（C01-C03）增量补丁生成与重放验证 — 沿用 round2/create-delivery-patch.py 的
-+temp-index 技法：从干净基线 67dee5d2 read-tree，git add -A 捕获全部非忽略变更
-+（源码 + 交付证据），diff 出单一补丁；随后用独立的第二个 temp index 重放补丁，
-+按源码 manifest 的同一排除规则重算摘要，证明重放树与当前树源码逐字节一致。
++"""round3（C01-C03）增量补丁生成与重放验证 — temp-index 技法（同 round2）。
++
++防自我嵌套：补丁输出文件从 staging 摘除（否则每代嵌入上一代，体积递归膨胀，
++曾涨到 116MB 超 GitHub 硬限）。current 与 replay 两侧的源码 manifest 都从
++git index blob（归一化字节）计算：Windows autocrlf 会拆开工作树字节与 blob
++字节（CRLF/LF），读工作树的对比在 Windows 上天然不一致。
 +输出 JSON 摘要（exit 0 = VERIFIED）。
 +"""
 +import hashlib
@@ -359,25 +398,6 @@ index 0000000000000000000000000000000000000000..3a7bee09d12fb367a0e826aabe7dd1d9
 +    return not relative.endswith(".patch")
 +
 +
-+def source_manifest(root: pathlib.Path) -> dict:
-+    raw = subprocess.check_output(
-+        ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"], cwd=root
-+    )
-+    rows = []
-+    for relative in sorted(set(raw.decode().split("\0"))):
-+        if not relative or not keep(relative):
-+            continue
-+        file_path = root / relative
-+        if file_path.is_file():
-+            content = file_path.read_bytes()
-+            rows.append({"path": relative, "bytes": len(content), "sha256": sha256(content)})
-+    return {"sourceIdentity": {"kind": "worktree", "base": BASE}, "exclusions": EXCLUSIONS, "files": rows}
-+
-+
-+def manifest_bytes(root: pathlib.Path) -> bytes:
-+    return (json.dumps(source_manifest(root), ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
-+
-+
 +def temp_index(prefix: str) -> str:
 +    fd, name = tempfile.mkstemp(prefix=prefix)
 +    os.close(fd)
@@ -385,93 +405,97 @@ index 0000000000000000000000000000000000000000..3a7bee09d12fb367a0e826aabe7dd1d9
 +    return name
 +
 +
-+def replay_manifest(patch: bytes) -> bytes:
-+    """BASE + 补丁 → 独立 temp index → 按排除规则重算源码 manifest 字节。"""
-+    index = temp_index("lingxi-round3-replay-")
++def manifest_from_index(index_name: str) -> bytes:
 +    env = os.environ.copy()
-+    env["GIT_INDEX_FILE"] = index
-+    try:
-+        subprocess.run(["git", "read-tree", BASE], cwd=ROOT, env=env, check=True)
-+        apply = subprocess.run(
-+            ["git", "apply", "--cached", "--whitespace=nowarn", "-"],
-+            cwd=ROOT, env=env, input=patch,
-+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-+        )
-+        if apply.returncode != 0:
-+            raise SystemExit(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
-+        listing = subprocess.check_output(["git", "ls-files", "-s", "-z"], cwd=ROOT, env=env)
-+        entries = []
-+        for record in listing.decode().split("\0"):
-+            if not record:
-+                continue
-+            meta, relative = record.split("\t", 1)
-+            _mode, blob_sha, _stage = meta.split(" ")
-+            if keep(relative):
-+                entries.append((relative, blob_sha))
-+        entries.sort()
-+        batch_input = "\n".join(sha for _rel, sha in entries) + "\n"
-+        batch = subprocess.run(
-+            ["git", "cat-file", "--batch"], cwd=ROOT, env=env,
-+            input=batch_input.encode(), stdout=subprocess.PIPE,
-+        )
-+        if batch.returncode != 0:
-+            raise SystemExit("replay cat-file failed")
-+        rows = []
-+        offset = 0
-+        stdout = batch.stdout
-+        for relative, blob_sha in entries:
-+            header_end = stdout.index(0x0A, offset)
-+            header = stdout[offset:header_end].decode()
-+            if not header.startswith(f"{blob_sha} blob "):
-+                raise SystemExit(f"cat-file record mismatch for {relative}: {header}")
-+            size = int(header.split(" ")[2])
-+            start = header_end + 1
-+            end = start + size
-+            blob = stdout[start:end]
-+            rows.append({"path": relative, "bytes": len(blob), "sha256": sha256(blob)})
-+            offset = end + 1
-+        manifest = {"sourceIdentity": {"kind": "worktree", "base": BASE}, "exclusions": EXCLUSIONS, "files": rows}
-+        return (json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
-+    finally:
-+        if os.path.exists(index):
-+            os.unlink(index)
++    env["GIT_INDEX_FILE"] = index_name
++    listing = subprocess.check_output(["git", "ls-files", "-s", "-z"], cwd=ROOT, env=env)
++    entries = []
++    for record in listing.decode().split("\0"):
++        if not record:
++            continue
++        meta, relative = record.split("\t", 1)
++        _mode, blob_sha, _stage = meta.split(" ")
++        if keep(relative):
++            entries.append((relative, blob_sha))
++    entries.sort()
++    batch_input = "\n".join(sha for _rel, sha in entries) + "\n"
++    batch = subprocess.run(
++        ["git", "cat-file", "--batch"], cwd=ROOT, env=env,
++        input=batch_input.encode(), stdout=subprocess.PIPE,
++    )
++    if batch.returncode != 0:
++        raise SystemExit("cat-file --batch failed while building index manifest")
++    rows = []
++    offset = 0
++    stdout = batch.stdout
++    for relative, blob_sha in entries:
++        header_end = stdout.index(0x0A, offset)
++        header = stdout[offset:header_end].decode()
++        if not header.startswith(f"{blob_sha} blob "):
++            raise SystemExit(f"cat-file record mismatch for {relative}: {header}")
++        size = int(header.split(" ")[2])
++        start = header_end + 1
++        end = start + size
++        blob = stdout[start:end]
++        rows.append({"path": relative, "bytes": len(blob), "sha256": sha256(blob)})
++        offset = end + 1
++    manifest = {"sourceIdentity": {"kind": "worktree", "base": BASE}, "exclusions": EXCLUSIONS, "files": rows}
++    return (json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
++
++
++def stage_current(index_name: str) -> None:
++    """BASE + 当前树 → 临时 index；补丁输出自身摘除（防自我嵌套）。"""
++    env = os.environ.copy()
++    env["GIT_INDEX_FILE"] = index_name
++    subprocess.run(["git", "read-tree", BASE], cwd=ROOT, env=env, check=True)
++    subprocess.run(["git", "add", "-A", "--", "."], cwd=ROOT, env=env, check=True)
++    subprocess.run(
++        ["git", "rm", "--cached", "-q", "--ignore-unmatch", "--", str(PATCH.relative_to(ROOT))],
++        cwd=ROOT, env=env, check=True,
++    )
 +
 +
 +def main() -> None:
 +    PATCH.parent.mkdir(parents=True, exist_ok=True)
-+    source_before = manifest_bytes(ROOT)
-+
-+    index = temp_index("lingxi-round3-index-")
-+    env = os.environ.copy()
-+    env["GIT_INDEX_FILE"] = index
++    current_index = temp_index("lingxi-round3-current-")
++    replay_index = temp_index("lingxi-round3-replay-")
 +    try:
-+        subprocess.run(["git", "read-tree", BASE], cwd=ROOT, env=env, check=True)
-+        subprocess.run(["git", "add", "-A", "--", "."], cwd=ROOT, env=env, check=True)
-+        # 防自我嵌套：补丁输出文件不得进入补丁（否则每代嵌入上一代，体积递归膨胀）。
-+        # 用 rm --cached 把它从 temp index 摘掉（reset 会回到 HEAD 版本，仍会嵌入）。
-+        subprocess.run(
-+            ["git", "rm", "--cached", "-q", "--ignore-unmatch", "--", str(PATCH.relative_to(ROOT))],
-+            cwd=ROOT, env=env, check=True,
-+        )
++        stage_current(current_index)
++        current = manifest_from_index(current_index)
++
++        env = os.environ.copy()
++        env["GIT_INDEX_FILE"] = current_index
 +        patch = subprocess.check_output(
 +            ["git", "diff", "--binary", "--cached", BASE], cwd=ROOT, env=env
 +        )
-+    finally:
-+        if os.path.exists(index):
-+            os.unlink(index)
-+    if not patch:
-+        raise SystemExit("round3 patch is empty")
-+    PATCH.write_bytes(patch)
++        if not patch:
++            raise SystemExit("round3 patch is empty")
++        PATCH.write_bytes(patch)
 +
-+    replayed = replay_manifest(patch)
-+    identical = replayed == source_before
++        replay_env = os.environ.copy()
++        replay_env["GIT_INDEX_FILE"] = replay_index
++        subprocess.run(["git", "read-tree", BASE], cwd=ROOT, env=replay_env, check=True)
++        apply = subprocess.run(
++            ["git", "apply", "--cached", "--binary", "--whitespace=nowarn", "-"],
++            cwd=ROOT, env=replay_env, input=patch,
++            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
++        )
++        if apply.returncode != 0:
++            raise SystemExit(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
++        replayed = manifest_from_index(replay_index)
++    finally:
++        for name in (current_index, replay_index):
++            if os.path.exists(name):
++                os.unlink(name)
++
++    identical = replayed == current
 +    result = {
 +        "base": BASE,
 +        "result": "VERIFIED" if identical else "MISMATCH",
 +        "patch": str(PATCH.relative_to(ROOT)),
 +        "patchBytes": len(patch),
 +        "patchSha256": sha256(patch),
-+        "sourceManifestHash": sha256(source_before),
++        "sourceManifestHash": sha256(current),
 +        "replayedSourceManifestHash": sha256(replayed),
 +    }
 +    print(json.dumps(result, ensure_ascii=False, indent=2))
@@ -573,10 +597,23 @@ index 0000000000000000000000000000000000000000..d077349cab441a108a031d3cb58611c4
 +print('EVIDENCE', label, 'EXIT', p.returncode, 'MANIFEST', h)
 +sys.exit(p.returncode)
 diff --git a/build/cli-runtime-closure.json b/build/cli-runtime-closure.json
-index e1f283e59d272771206ba3cd3b831a8fabce91c0..44a33990282d04749428ce59066282a999e8938f 100644
+index e1f283e59d272771206ba3cd3b831a8fabce91c0..42e513ffecc7887d2b42e661ca6db553b7c6ff34 100644
 --- a/build/cli-runtime-closure.json
 +++ b/build/cli-runtime-closure.json
-@@ -762,6 +762,23 @@
+@@ -70,6 +70,12 @@
+       "argText": "helper",
+       "reason": "system-speech ASR adapter spawns the LingxiSpeechHelper binary (SFSpeechRecognizer file transcription) resolved at runtime from packaged Resources/speech/macos/ or dev dist-speech/. The helper is a native Swift artifact built by scripts/build-speech-helper.mjs and shipped via electron-builder extraResources -- it is a packaged binary, not repo source, so it never enters the module closure by design. The call is an async spawn with bounded termination (SIGTERM -> grace -> SIGKILL), abort/timeout semantics (F6)."
+     },
++    {
++      "file": "core/speech-recognition/system-speech-adapter.ts",
++      "callee": "spawn",
++      "argText": "process.execPath",
++      "reason": "same adapter, script-form helper branch: LINGXI_SPEECH_HELPER_EXEC overrides ending in .js/.cjs/.mjs (test-injected fake helpers / dev tooling) are re-executed through the current Node binary because Windows has no shebang exec semantics. The production binary helper keeps the direct-spawn branch above; the override path is existence-validated before spawn and is never an untracked repo module at runtime."
++    },
+     {
+       "file": "server/bootstrap.ts",
+       "callee": "import",
+@@ -762,6 +768,23 @@
        ],
        "reason": "Reached via esbuild source module graph, imported by cli/data.ts (import-statement)."
      },
@@ -600,7 +637,7 @@ index e1f283e59d272771206ba3cd3b831a8fabce91c0..44a33990282d04749428ce59066282a9
      {
        "path": "core/desktop-session-submit.ts",
        "inputType": "source-graph",
-@@ -781,6 +798,11 @@
+@@ -781,6 +804,11 @@
            "from": "core/session-turn-actions.ts",
            "kind": "import-statement"
          },
@@ -612,7 +649,7 @@ index e1f283e59d272771206ba3cd3b831a8fabce91c0..44a33990282d04749428ce59066282a9
          {
            "root": "server-bootstrap",
            "from": "server/routes/chat.ts",
-@@ -791,13 +813,18 @@
+@@ -791,13 +819,18 @@
            "from": "server/routes/sessions.ts",
            "kind": "import-statement"
          },
@@ -632,7 +669,7 @@ index e1f283e59d272771206ba3cd3b831a8fabce91c0..44a33990282d04749428ce59066282a9
      },
      {
        "path": "core/device-registry.ts",
-@@ -1803,6 +1830,18 @@
+@@ -1803,6 +1836,18 @@
        ],
        "reason": "Reached via esbuild source module graph, imported by core/bridge-session-manager.ts (import-statement); core/agent.ts (import-statement); core/agent-manager.ts (import-statement); +5 more importer(s)."
      },
@@ -651,7 +688,7 @@ index e1f283e59d272771206ba3cd3b831a8fabce91c0..44a33990282d04749428ce59066282a9
      {
        "path": "core/pinned-tenets-migration.ts",
        "inputType": "source-graph",
-@@ -8623,6 +8662,23 @@
+@@ -8623,6 +8668,23 @@
        ],
        "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/index.ts (import-statement)."
      },
@@ -675,7 +712,7 @@ index e1f283e59d272771206ba3cd3b831a8fabce91c0..44a33990282d04749428ce59066282a9
      {
        "path": "lib/pi-sdk/index.ts",
        "inputType": "source-graph",
-@@ -128543,9 +128599,9 @@
+@@ -128543,9 +128605,9 @@
      }
    ],
    "stats": {
@@ -2893,7 +2930,7 @@ index c03cd09f3ddd44f666ba12d99d723b478c8da9ca..50bdbf027e26301e67b8043c90200160
          uiContext,
          preservePromptEnvelope: true,
 diff --git a/core/speech-recognition/system-speech-adapter.ts b/core/speech-recognition/system-speech-adapter.ts
-index 1bc382a525ea0f9c70db69616f49e633927af161..35d4354c991be76c903a4f817785c5bcc44bcf8b 100644
+index 1bc382a525ea0f9c70db69616f49e633927af161..e9e615c680fa1d904ebca543a7e13be14d74ef0f 100644
 --- a/core/speech-recognition/system-speech-adapter.ts
 +++ b/core/speech-recognition/system-speech-adapter.ts
 @@ -23,6 +23,7 @@
@@ -2912,7 +2949,7 @@ index 1bc382a525ea0f9c70db69616f49e633927af161..35d4354c991be76c903a4f817785c5bc
  
  const HELPER_ENV_OVERRIDE = "LINGXI_SPEECH_HELPER_EXEC";
  const PROCESS_TIMEOUT_ENV = "LINGXI_SPEECH_PROCESS_TIMEOUT_MS";
-@@ -72,6 +74,26 @@ function positiveIntFromEnv(env: any, name: string, fallback: number): number {
+@@ -72,12 +74,39 @@ function positiveIntFromEnv(env: any, name: string, fallback: number): number {
    return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : fallback;
  }
  
@@ -2939,7 +2976,22 @@ index 1bc382a525ea0f9c70db69616f49e633927af161..35d4354c991be76c903a4f817785c5bc
  // ---------- helper 路径解析（桌面路径合同，参照 macos-cua-provider 的既有形状） ----------
  
  function normalizedAbsolutePosixPath(value: any): string | null {
-@@ -326,21 +348,38 @@ export const systemSpeechRecognitionAdapter = {
+   const candidate = typeof value === "string" ? value.trim() : "";
+-  if (!candidate || candidate.includes("\0") || !path.posix.isAbsolute(candidate)) return null;
+-  return path.posix.normalize(candidate);
++  if (!candidate || candidate.includes("\0")) return null;
++  // Windows 盘符绝对路径（C:\… / D:/…）转 POSIX 斜杠后参与同一套结构校验：
++  // LINGXI_SPEECH_HELPER_EXEC 覆盖在 Windows 上才可用；mac 包内结构检查对
++  // 盘符形态自然不匹配，无需单列分支。
++  const posixCandidate = /^[A-Za-z]:[\\/]/.test(candidate)
++    ? candidate.replace(/\\/g, "/")
++    : candidate;
++  if (!path.posix.isAbsolute(posixCandidate)) return null;
++  return path.posix.normalize(posixCandidate);
+ }
+ 
+ function macAppResourcesRoot(value: any): string | null {
+@@ -326,21 +355,38 @@ export const systemSpeechRecognitionAdapter = {
        let child: ReturnType<typeof spawn> | null = null;
        let childClosed = false;
        let stdoutBytes = 0;
@@ -2986,7 +3038,7 @@ index 1bc382a525ea0f9c70db69616f49e633927af161..35d4354c991be76c903a4f817785c5bc
          };
        };
  
-@@ -403,11 +442,13 @@ export const systemSpeechRecognitionAdapter = {
+@@ -403,11 +449,13 @@ export const systemSpeechRecognitionAdapter = {
          if (childClosed) return;
          childClosed = true;
          if (killTimer) { clearTimeout(killTimer); killTimer = null; }
@@ -3001,7 +3053,7 @@ index 1bc382a525ea0f9c70db69616f49e633927af161..35d4354c991be76c903a4f817785c5bc
            } else if (parsed?.ok === false) {
              settlement = { kind: "error", error: errorFromStructured(parsed) };
            } else if (code === 0) {
-@@ -435,12 +476,38 @@ export const systemSpeechRecognitionAdapter = {
+@@ -435,12 +483,38 @@ export const systemSpeechRecognitionAdapter = {
          const parsed = parseProtocolLine(line);
          if (!parsed) return;
          if (parsed.ok === true) {
@@ -3041,7 +3093,7 @@ index 1bc382a525ea0f9c70db69616f49e633927af161..35d4354c991be76c903a4f817785c5bc
        const onStdout = (chunk: Buffer) => {
          if (settlement) return;
          stdoutBytes += chunk.length;
-@@ -454,23 +521,15 @@ export const systemSpeechRecognitionAdapter = {
+@@ -454,23 +528,15 @@ export const systemSpeechRecognitionAdapter = {
            });
            return;
          }
@@ -3071,7 +3123,31 @@ index 1bc382a525ea0f9c70db69616f49e633927af161..35d4354c991be76c903a4f817785c5bc
        };
  
        const onAbort = () => {
-@@ -514,7 +573,9 @@ export const systemSpeechRecognitionAdapter = {
+@@ -484,10 +550,19 @@ export const systemSpeechRecognitionAdapter = {
+       };
+ 
+       try {
+-        child = spawn(helper, args, {
+-          env,
+-          stdio: ["ignore", "pipe", "pipe"],
+-        });
++        // 脚本形态的 helper（.js/.cjs/.mjs，如测试注入的假 helper）不能直接
++        // spawn：Windows 无 shebang 执行语义，统一经当前 Node 可执行文件拉起。
++        // 二进制 helper（打包产物）不受影响，仍直接 spawn。
++        const isScriptHelper = /\.(?:js|cjs|mjs)$/.test(helper);
++        child = isScriptHelper
++          ? spawn(process.execPath, [helper, ...args], {
++            env,
++            stdio: ["ignore", "pipe", "pipe"],
++          })
++          : spawn(helper, args, {
++            env,
++            stdio: ["ignore", "pipe", "pipe"],
++          });
+       } catch (err: any) {
+         finish({
+           kind: "error",
+@@ -514,7 +589,9 @@ export const systemSpeechRecognitionAdapter = {
        });
        child.on("close", onChildClose);
        child.stdout?.on("data", onStdout);
@@ -6578,8 +6654,30 @@ index 2e6170aef6c43f9cfc5b510866e7e9a0c4c166b5..e24ba59fe560d2dd7db641281b10023f
    return result;
  }
  
+diff --git a/scripts/compute-cli-closure.mjs b/scripts/compute-cli-closure.mjs
+index cfd522cbaae914fedce00cb2313a7323788da71f..4ed1e3dd5c1d39fd1b41e01d637f4e61a1867753 100644
+--- a/scripts/compute-cli-closure.mjs
++++ b/scripts/compute-cli-closure.mjs
+@@ -304,6 +304,17 @@ export const DYNAMIC_CALL_ALLOWLIST = Object.freeze([
+       + "closure by design. The call is an async spawn with bounded termination "
+       + "(SIGTERM -> grace -> SIGKILL), abort/timeout semantics (F6).",
+   },
++  {
++    file: "core/speech-recognition/system-speech-adapter.ts",
++    callee: "spawn",
++    argText: "process.execPath",
++    reason:
++      "same adapter, script-form helper branch: LINGXI_SPEECH_HELPER_EXEC overrides ending "
++      + "in .js/.cjs/.mjs (test-injected fake helpers / dev tooling) are re-executed through "
++      + "the current Node binary because Windows has no shebang exec semantics. The "
++      + "production binary helper keeps the direct-spawn branch above; the override path is "
++      + "existence-validated before spawn and is never an untracked repo module at runtime.",
++  },
+   {
+     file: "server/bootstrap.ts",
+     callee: "import",
 diff --git a/scripts/pinned-tenets-recovery.mjs b/scripts/pinned-tenets-recovery.mjs
-index 666d46aa443d67a0b58b7e509b93f9806352cc46..eac1356e9f2c4ba6ce43e47252a2c32e8c7bd3b7 100644
+index 666d46aa443d67a0b58b7e509b93f9806352cc46..b0cace912e04895ea11559d97867c842f83c6015 100644
 --- a/scripts/pinned-tenets-recovery.mjs
 +++ b/scripts/pinned-tenets-recovery.mjs
 @@ -8,13 +8,9 @@
@@ -6599,16 +6697,21 @@ index 666d46aa443d67a0b58b7e509b93f9806352cc46..eac1356e9f2c4ba6ce43e47252a2c32e
   *
   * 边界：归档源文件永不删除；收据写在 agentDir/memory/ 下；不重置系统权限；
   * 不操作 --home 以外的目录。macOS 授权状态与本工具无关。
-@@ -45,7 +41,7 @@ function parseArgs(argv) {
+@@ -45,8 +41,11 @@ function parseArgs(argv) {
  
  async function main() {
    const args = parseArgs(process.argv.slice(2));
 -  const { scanPinnedTenetsRecovery, applyPinnedTenetsRecovery } = await import(
+-    path.join(__dirname, "..", "core", "pinned-tenets-recovery.ts")
++  // Windows 上动态 import 需要 file:// URL：盘符绝对路径（D:\…）会被默认 ESM
++  // 加载器按协议解析拒绝（R02-14 Windows CI 实测）。
++  const { pathToFileURL } = await import("node:url");
 +  const { scanPinnedTenetsRecovery } = await import(
-     path.join(__dirname, "..", "core", "pinned-tenets-recovery.ts")
++    pathToFileURL(path.join(__dirname, "..", "core", "pinned-tenets-recovery.ts")).href
    );
  
-@@ -54,7 +50,7 @@ async function main() {
+   if (!args.apply) {
+@@ -54,7 +53,7 @@ async function main() {
      console.log(JSON.stringify(report, null, 2));
      if (report.agents.length > 0) {
        console.error(
@@ -6617,7 +6720,7 @@ index 666d46aa443d67a0b58b7e509b93f9806352cc46..eac1356e9f2c4ba6ce43e47252a2c32e
          `and re-run with --apply --approval <file>.`,
        );
      }
-@@ -64,9 +60,7 @@ async function main() {
+@@ -64,9 +63,7 @@ async function main() {
    if (!args.approval) {
      throw new Error("--apply requires --approval <file>; refusing to restore without an explicit approval manifest");
    }
@@ -8196,10 +8299,10 @@ index 0000000000000000000000000000000000000000..9b4be7b3635a4fa5d3ba462e37c672d9
 +});
 diff --git a/tests/round2-pinned-migration-faults.test.ts b/tests/round2-pinned-migration-faults.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..a536088912d8eb098b173df19ba99c226dbc8382
+index 0000000000000000000000000000000000000000..092f89da01466bbd859ede60b676d49bb8b7b5b7
 --- /dev/null
 +++ b/tests/round2-pinned-migration-faults.test.ts
-@@ -0,0 +1,135 @@
+@@ -0,0 +1,156 @@
 +import fs from 'node:fs';
 +import os from 'node:os';
 +import path from 'node:path';
@@ -8239,7 +8342,14 @@ index 0000000000000000000000000000000000000000..a536088912d8eb098b173df19ba99c22
 +      child.once('error', reject);
 +      child.once('close', (code, signal) => resolve({ code, signal }));
 +    });
-+    expect(termination, stderr).toEqual({ code: null, signal: 'SIGKILL' });
++    // Windows 没有 POSIX 信号语义：process.kill(pid, 'SIGKILL') 由 Node 仿真为
++    // 非零退出码（code=1, signal=null）；崩溃注入本身在两端都真实发生。
++    if (process.platform === 'win32') {
++      expect(termination.code, stderr).not.toBe(0);
++      expect(termination.signal).toBeNull();
++    } else {
++      expect(termination, stderr).toEqual({ code: null, signal: 'SIGKILL' });
++    }
 +    const interrupted = readPinnedTenetsMigrationReceipt(dir)!;
 +    expect(interrupted.state).toBe('target_committed');
 +    expect(interrupted.archived[0].state).toBe('planned');
@@ -8297,20 +8407,34 @@ index 0000000000000000000000000000000000000000..a536088912d8eb098b173df19ba99c22
 +    paths.forEach((file, index) => expect(fs.readFileSync(file)).toEqual(before[index]));
 +  });
 +
-+  it('R01-13 收据 EACCES 是读取错误，不能当作不存在启动迁移', () => {
++  it('R01-13 收据读取错误（EACCES/EISDIR）不能当作不存在启动迁移', () => {
 +    const dir = fixture();
 +    const file = receiptPath(dir);
 +    const original = Buffer.from('{"synthetic":"unreadable receipt"}\n');
 +    fs.writeFileSync(file, original);
-+    fs.chmodSync(file, 0o000);
-+    try {
-+      // 明确证明夹具产生了 EACCES，权限模型不支持时让该验收失败而非假通过。
-+      expect(() => fs.readFileSync(file)).toThrow(expect.objectContaining({ code: 'EACCES' }));
-+      expect(() => migrateAgentPinnedTenets(dir, 'test-agent')).toThrow(expect.objectContaining({ code: 'MIGRATION_RECEIPT_UNREADABLE' }));
-+      expect(fs.existsSync(tenetsFilePath(dir))).toBe(false);
-+      expect(fs.existsSync(path.join(dir, 'pinned-memory.json'))).toBe(true);
-+    } finally { fs.chmodSync(file, 0o600); }
-+    expect(fs.readFileSync(file)).toEqual(original);
++    if (process.platform === 'win32') {
++      // Windows 权限模型不产生 POSIX 读限制（chmod 000 不挡读）：用「收据路径
++      // 是目录」制造确定性的非 ENOENT 读取错误（EISDIR），同一不变量——读取
++      // 错误必须按损坏收据显式失败，不得当作不存在启动迁移。
++      fs.rmSync(file);
++      fs.mkdirSync(file);
++      try {
++        expect(() => fs.readFileSync(file)).toThrow(expect.objectContaining({ code: 'EISDIR' }));
++        expect(() => migrateAgentPinnedTenets(dir, 'test-agent')).toThrow(expect.objectContaining({ code: 'MIGRATION_RECEIPT_UNREADABLE' }));
++        expect(fs.existsSync(tenetsFilePath(dir))).toBe(false);
++        expect(fs.existsSync(path.join(dir, 'pinned-memory.json'))).toBe(true);
++      } finally { fs.rmSync(file, { recursive: true }); }
++    } else {
++      fs.chmodSync(file, 0o000);
++      try {
++        // 明确证明夹具产生了 EACCES，权限模型不支持时让该验收失败而非假通过。
++        expect(() => fs.readFileSync(file)).toThrow(expect.objectContaining({ code: 'EACCES' }));
++        expect(() => migrateAgentPinnedTenets(dir, 'test-agent')).toThrow(expect.objectContaining({ code: 'MIGRATION_RECEIPT_UNREADABLE' }));
++        expect(fs.existsSync(tenetsFilePath(dir))).toBe(false);
++        expect(fs.existsSync(path.join(dir, 'pinned-memory.json'))).toBe(true);
++      } finally { fs.chmodSync(file, 0o600); }
++      expect(fs.readFileSync(file)).toEqual(original);
++    }
 +  });
 +
 +  it.each([
@@ -9785,6 +9909,24 @@ index 0000000000000000000000000000000000000000..a903ff8c2c1b101bec9cad3a45b95ba1
 +    expect(sha256(fs.readFileSync(path.join(ROOT, summary.patch)))).toBe(summary.patchSha256);
 +  });
 +});
+diff --git a/tests/speech-helper-build-contract.test.ts b/tests/speech-helper-build-contract.test.ts
+index abbc1e7d162c5a743769729dd4db3e2977ac5927..2b13fc19d159ce0f31d2db07545dbb76acf0f43a 100644
+--- a/tests/speech-helper-build-contract.test.ts
++++ b/tests/speech-helper-build-contract.test.ts
+@@ -74,8 +74,11 @@ describe("speech helper build contract（A13–A14）", () => {
+     expect(result.skipped).toBe(false);
+     const expected = path.join(tmpDir, "dist-speech", "mac-arm64", "lingxi-speech-helper");
+     expect(fs.existsSync(expected)).toBe(true);
+-    // 可执行权限随产物落盘。
+-    expect(fs.statSync(expected).mode & 0o111).not.toBe(0);
++    // 可执行权限随产物落盘。Windows 的 stat 不反映 POSIX 执行位（chmod 0o755
++    // 对普通文件无该语义），执行位断言只在具备该语义的平台执行。
++    if (process.platform !== "win32") {
++      expect(fs.statSync(expected).mode & 0o111).not.toBe(0);
++    }
+     expect(swiftBuildArgs[0]).toContain("--arch");
+   });
+ 
 diff --git a/tests/speech-output-validation.round2.test.ts b/tests/speech-output-validation.round2.test.ts
 new file mode 100644
 index 0000000000000000000000000000000000000000..a41f590db54bf3b754499b35ace5d0211baf5b3c

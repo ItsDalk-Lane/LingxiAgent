@@ -41,8 +41,11 @@ function parseArgs(argv) {
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
+  // Windows 上动态 import 需要 file:// URL：盘符绝对路径（D:\…）会被默认 ESM
+  // 加载器按协议解析拒绝（R02-14 Windows CI 实测）。
+  const { pathToFileURL } = await import("node:url");
   const { scanPinnedTenetsRecovery } = await import(
-    path.join(__dirname, "..", "core", "pinned-tenets-recovery.ts")
+    pathToFileURL(path.join(__dirname, "..", "core", "pinned-tenets-recovery.ts")).href
   );
 
   if (!args.apply) {

@@ -815,5 +815,95 @@
     "log": "logs/j32-final-full.log",
     "logSha256": "ca449c91f95b754cd2e9d13d194b706ab2e1d35f6c48c8e847082e215e5c5092",
     "sourceManifestHash": "3ce0c8a4cf2c01d71204de9149289106ea079bf2f6787aedfdbac544df541065"
+  },
+  {
+    "command": [
+      "python3",
+      "artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T15:02:13.276269+00:00",
+    "end": "2026-09-08T15:02:15.043428+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "0f1e524bffe1fd5a9f69b26a7eccf474b7e8c5b2321452720d594332153dcd14",
+    "log": "logs/j33-winfix-patch.log",
+    "logSha256": "0eebfa019f477379b47e67933517adc80d0b670d3079fe7494c25c7946342593",
+    "sourceManifestHash": "0f1e524bffe1fd5a9f69b26a7eccf474b7e8c5b2321452720d594332153dcd14"
+  },
+  {
+    "command": [
+      "npm",
+      "test"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T15:02:49.530631+00:00",
+    "end": "2026-09-08T15:04:04.396494+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 13439,
+      "failed": 3,
+      "skipped": 7,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "0f1e524bffe1fd5a9f69b26a7eccf474b7e8c5b2321452720d594332153dcd14",
+    "log": "logs/j34-winfix-full.log",
+    "logSha256": "eb9904ecfd65cd9dbfab4d445b3b4df60abb2f0e42d9ae559dcd35e6ed6922ee",
+    "sourceManifestHash": "0f1e524bffe1fd5a9f69b26a7eccf474b7e8c5b2321452720d594332153dcd14"
+  },
+  {
+    "command": [
+      "python3",
+      "artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T15:07:21.713121+00:00",
+    "end": "2026-09-08T15:07:23.678196+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "016f1cb930a8cdc5e2c8d2a79a72b1a79b277d9237132ecb5f2c2fd646b2c460",
+    "log": "logs/j35-winfix-patch.log",
+    "logSha256": "95e773f62a66cbd84a27a4987f27f3dddadae20764ffd252f207fbe36a049505",
+    "sourceManifestHash": "016f1cb930a8cdc5e2c8d2a79a72b1a79b277d9237132ecb5f2c2fd646b2c460"
+  },
+  {
+    "command": [
+      "npm",
+      "test"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T15:07:23.831546+00:00",
+    "end": "2026-09-08T15:08:46.039959+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 13443,
+      "failed": 0,
+      "skipped": 7,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "016f1cb930a8cdc5e2c8d2a79a72b1a79b277d9237132ecb5f2c2fd646b2c460",
+    "log": "logs/j36-winfix-full.log",
+    "logSha256": "745c510885a953ff36a813fd2c67af26542acfdfb9cd340080cc76c5e57a203b",
+    "sourceManifestHash": "016f1cb930a8cdc5e2c8d2a79a72b1a79b277d9237132ecb5f2c2fd646b2c460"
   }
 ]

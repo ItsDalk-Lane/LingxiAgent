@@ -3509,5 +3509,47 @@
     "log": "logs/s19-evidence-gate.log",
     "logSha256": "fd45a8e5dcec7f508671eb7590bc4eeb5206e7a7ea9c6259a7593b73103af2fe",
     "sourceManifestHash": "29ad19e3c3b6a8e96029a7c7fb2b148208c979dad573d92ac36c2220d6852064"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T15:02:26.771534+00:00",
+    "end": "2026-09-08T15:02:49.380110+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "af8090bb6d5ccd450b4b1b44483a2807220056ff9701cfba5f55d33e5edddbcd",
+    "log": "logs/s20-winfix-gate.log",
+    "logSha256": "1a1deb9920b1895e1f8be03b30d52c10389d23dafbae3076b021af27ae99a95a",
+    "sourceManifestHash": "af8090bb6d5ccd450b4b1b44483a2807220056ff9701cfba5f55d33e5edddbcd"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T15:06:58.915103+00:00",
+    "end": "2026-09-08T15:07:21.557207+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "c10ccdfe0f2677d11ce42a45cb830dc69f6b4f1c87b395b257f4a3dd13660493",
+    "log": "logs/s21-winfix-typecheck.log",
+    "logSha256": "1a1deb9920b1895e1f8be03b30d52c10389d23dafbae3076b021af27ae99a95a",
+    "sourceManifestHash": "c10ccdfe0f2677d11ce42a45cb830dc69f6b4f1c87b395b257f4a3dd13660493"
   }
 ]

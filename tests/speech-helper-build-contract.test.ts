@@ -74,8 +74,11 @@ describe("speech helper build contract（A13–A14）", () => {
     expect(result.skipped).toBe(false);
     const expected = path.join(tmpDir, "dist-speech", "mac-arm64", "lingxi-speech-helper");
     expect(fs.existsSync(expected)).toBe(true);
-    // 可执行权限随产物落盘。
-    expect(fs.statSync(expected).mode & 0o111).not.toBe(0);
+    // 可执行权限随产物落盘。Windows 的 stat 不反映 POSIX 执行位（chmod 0o755
+    // 对普通文件无该语义），执行位断言只在具备该语义的平台执行。
+    if (process.platform !== "win32") {
+      expect(fs.statSync(expected).mode & 0o111).not.toBe(0);
+    }
     expect(swiftBuildArgs[0]).toContain("--arch");
   });
 

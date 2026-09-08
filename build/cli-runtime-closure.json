@@ -71,6 +71,12 @@
       "reason": "system-speech ASR adapter spawns the LingxiSpeechHelper binary (SFSpeechRecognizer file transcription) resolved at runtime from packaged Resources/speech/macos/ or dev dist-speech/. The helper is a native Swift artifact built by scripts/build-speech-helper.mjs and shipped via electron-builder extraResources -- it is a packaged binary, not repo source, so it never enters the module closure by design. The call is an async spawn with bounded termination (SIGTERM -> grace -> SIGKILL), abort/timeout semantics (F6)."
     },
     {
+      "file": "core/speech-recognition/system-speech-adapter.ts",
+      "callee": "spawn",
+      "argText": "process.execPath",
+      "reason": "same adapter, script-form helper branch: LINGXI_SPEECH_HELPER_EXEC overrides ending in .js/.cjs/.mjs (test-injected fake helpers / dev tooling) are re-executed through the current Node binary because Windows has no shebang exec semantics. The production binary helper keeps the direct-spawn branch above; the override path is existence-validated before spawn and is never an untracked repo module at runtime."
+    },
+    {
       "file": "server/bootstrap.ts",
       "callee": "import",
       "argText": "pathToFileURL(serverEntry).href",

@@ -78,7 +78,7 @@
     {
       "bytes": 54382,
       "path": ".sync-audit/build-sync-matrix.mjs",
-      "sha256": "98a945738127f5cac272f7aea4864c59070c03d5e109efcaed65a8edcbcba6ae"
+      "sha256": "28295526ea99dd1b50e381978a25ab30aaab56edb0c41266e4df6681327e0aab"
     },
     {
       "bytes": 16534,
@@ -113,12 +113,12 @@
     {
       "bytes": 80341,
       "path": ".sync-audit/upstream-sync-matrix.json",
-      "sha256": "eb78ff29283fa11bfcbffba0a00ad2b9e10a78e6243fb1e93243bd732632911e"
+      "sha256": "3e181c9116ca99f9e59bac045f0d559924e18d1347413fedec4468c54d61dfbf"
     },
     {
       "bytes": 41,
       "path": ".sync-audit/verified-source-sha.txt",
-      "sha256": "5b71d505159eafc40623b1571c0bb4f6fcbe447dc69438716e24e677d7eecc32"
+      "sha256": "bdae8e2ba3d65ccea207790683bb0ecf64f41390e655c7e995450d9c5a9cfea9"
     },
     {
       "bytes": 4111,
@@ -141,9 +141,9 @@
       "sha256": "0e1c839ef037341be3443f1d2baf3112d983dceb0d3183741c1f9218b09d5b07"
     },
     {
-      "bytes": 177358,
+      "bytes": 178142,
       "path": "PROGRESS.md",
-      "sha256": "fb0defef76127cb1d1d87493d8d3a87717b9b648b30ed467200b5ffffad63506"
+      "sha256": "49cb6bc22a30196fd0b0b3f2466e9edfc42788a855f7c90431ebde9906cb0c80"
     },
     {
       "bytes": 12958,
@@ -168,17 +168,17 @@
     {
       "bytes": 10425,
       "path": "UPSTREAM_SYNC_AUDIT.md",
-      "sha256": "67208d2ebf37e3fe0a7f527baec45d0055b17af123319fd2411f4138e5cbc093"
+      "sha256": "2121053885063012e173f8cfe8f970a5f1296645bdc12819d53bbb2dfcbb0ce8"
     },
     {
       "bytes": 34956,
       "path": "UPSTREAM_SYNC_MATRIX.md",
-      "sha256": "17ac58c1d3bbfbd24d06c076e3d7c1e1a413d663e5facb88da73b45aaafdfebd"
+      "sha256": "943dcd9c675de60bfcc19a040bbe8349927b8fb8356e63dcfc8d14908fecc3bf"
     },
     {
-      "bytes": 4701,
+      "bytes": 6053,
       "path": "artifacts/f1-f12-repair/round2/create-delivery-patch.py",
-      "sha256": "eef96e8db4a096d22b2efe23ac315a0515f2b449191a8b0d965c6eba04fdcef8"
+      "sha256": "c6dd023ea9b4d2f0d5e2a25f0e93564763102c254e52e1bf969f24b98103b2d4"
     },
     {
       "bytes": 2984,
@@ -186,9 +186,9 @@
       "sha256": "576ad9902037f3dded9c1291c9b48ad594daa7f0f8d32ef4c70151256de45358"
     },
     {
-      "bytes": 6286,
+      "bytes": 5501,
       "path": "artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py",
-      "sha256": "bc4a97502a522a99360f968674a69854da78707c072cafcfa5a93f91121a30a9"
+      "sha256": "02127bb3a1e83ceb2ddd2baa7d0173f43e8b70ef959e910a696cce0f126bb6f2"
     },
     {
       "bytes": 3806,
@@ -586,9 +586,9 @@
       "sha256": "75bde2f78cdc9da05c158704058070a96e5a7a1193ea44fab2662a288fe6d06e"
     },
     {
-      "bytes": 4260700,
+      "bytes": 4261268,
       "path": "build/cli-runtime-closure.json",
-      "sha256": "52c822748eabc6ebb357b60f6bfbd6fba9cfec540eab0736283665b03e9f4d6e"
+      "sha256": "e68a418d042e1f2637783a014f68a865654edf21a875aed85f4e5218fbef7fe2"
     },
     {
       "bytes": 25173,
@@ -1626,9 +1626,9 @@
       "sha256": "641875c8befcfec010884b3b28145e7535f7d9a2ed2072a5dbc6d4e91c8bc197"
     },
     {
-      "bytes": 23750,
+      "bytes": 24645,
       "path": "core/speech-recognition/system-speech-adapter.ts",
-      "sha256": "e69d2182b22a5c3c60c671612b69a5d1c2da6c385d98b7217b0e4f7a0efb3aa7"
+      "sha256": "e01e6c6c926e64dc30b500e13fcfdbb88db6cee63f40fc1380367c32c100314e"
     },
     {
       "bytes": 11362,
@@ -11036,9 +11036,9 @@
       "sha256": "d59fe3765897d8581e4e92141c62990dbbea806c85cea765a0a1fbb4a754e5b5"
     },
     {
-      "bytes": 62281,
+      "bytes": 62880,
       "path": "scripts/compute-cli-closure.mjs",
-      "sha256": "b83049f840c1e3f6a0c43c84ac29201a413b816baa4996008e7157243b5d9f0a"
+      "sha256": "70b820bd26e31818494d04227777121a2c74dbc553bded19cc86f93e484d07f7"
     },
     {
       "bytes": 349,
@@ -11171,9 +11171,9 @@
       "sha256": "b6ef6df86e568ecc54d02ca36fd2fb1f8f74b370b0564c0efc4d770e7db73f1d"
     },
     {
-      "bytes": 2823,
+      "bytes": 3064,
       "path": "scripts/pinned-tenets-recovery.mjs",
-      "sha256": "9d62bac07d6fa167e9a1ee8c674956098e2e7dd4f06bbadde72b107346757ef2"
+      "sha256": "49f70ea8b572f6ad0203540d0e6c4af162e3164222c2118d0f35268df0ae5c4f"
     },
     {
       "bytes": 4455,
@@ -15811,9 +15811,9 @@
       "sha256": "5535eae6c67d9c27574df370fda151426f0e43762d64f5541272b2f89ee67aa0"
     },
     {
-      "bytes": 7623,
+      "bytes": 8847,
       "path": "tests/round2-pinned-migration-faults.test.ts",
-      "sha256": "25e9cbd2b95b7402f1cd9d57741ea31b75c5120683b440d0da4a85a27772c8aa"
+      "sha256": "5446e25d36033e5d62d3bfd1c2c88b34faf54334150ac189795c24f9e6318a63"
     },
     {
       "bytes": 8447,
@@ -16561,9 +16561,9 @@
       "sha256": "658195fbd48ae6ee904b2e4a70ccc5ec3d823f0a907faf770f1b3ca24f40febf"
     },
     {
-      "bytes": 5817,
+      "bytes": 6016,
       "path": "tests/speech-helper-build-contract.test.ts",
-      "sha256": "6123a6d8f1e7610b4e62d0919423637dfbca0f9210ab967820bf5333ad6468b5"
+      "sha256": "ed7fa89139015117303c2c38fd4f03d048b102fc30d1f16606e2f77db035c638"
     },
     {
       "bytes": 7468,
