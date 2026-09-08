@@ -36,9 +36,9 @@
       "sha256": "ddbdd327bd6a3f632f2f176de03c3440b5d25e07bb0b141bb20c3da020020615"
     },
     {
-      "bytes": 39345,
+      "bytes": 39027,
       "path": ".github/workflows/build.yml",
-      "sha256": "81fd0db7451c39011c2a53a19127c12d0a1e396021efe87d2985eb182c605400"
+      "sha256": "1cbad14d09b49baecc4d33414813c8360c2df3e65dafe849f8c19dfad5c748fa"
     },
     {
       "bytes": 8032,
@@ -51,9 +51,9 @@
       "sha256": "32d20713e4fa4715b08579b0249b594ec9fe9ce9937a30f62fa5f2b530e07058"
     },
     {
-      "bytes": 1211,
+      "bytes": 709,
       "path": ".github/workflows/knowledge-performance.yml",
-      "sha256": "7d7d80aef9d8023227813e5fdd7ee8e20019efebb9e97ac405271edc511782d3"
+      "sha256": "148688413568380d4372c07b625c68d0988265a63d2f007ad00eb331843f2a0b"
     },
     {
       "bytes": 3420,
@@ -78,7 +78,7 @@
     {
       "bytes": 54382,
       "path": ".sync-audit/build-sync-matrix.mjs",
-      "sha256": "d68efdb4173559b4d3f9533efaa6e5ce58467070756e7284b3520a8576527db1"
+      "sha256": "b922f19697a13765f33f798418e823284e176421f4b0819cbaaf53314aca0227"
     },
     {
       "bytes": 16534,
@@ -113,12 +113,12 @@
     {
       "bytes": 80341,
       "path": ".sync-audit/upstream-sync-matrix.json",
-      "sha256": "8500807f286954d025ea15af937cd34153a4021110e38f2654e6bf2e90fa6400"
+      "sha256": "c66f2aaac9423d7e2773d9ce13842fbde351da5b485dac2ef77ebf5151131a79"
     },
     {
       "bytes": 41,
       "path": ".sync-audit/verified-source-sha.txt",
-      "sha256": "76d5df81dec46d5b81d044e8cd8b5d3ec37ea30079c0bcfe202d3f6b222304d9"
+      "sha256": "b839049fc11d6b13dfc7570f326f95cac6d21fbfa9964fe2cd2c63ef82d98843"
     },
     {
       "bytes": 4111,
@@ -141,9 +141,9 @@
       "sha256": "0e1c839ef037341be3443f1d2baf3112d983dceb0d3183741c1f9218b09d5b07"
     },
     {
-      "bytes": 181758,
+      "bytes": 182452,
       "path": "PROGRESS.md",
-      "sha256": "5796d2e30173803350b0cd3700548695fb719eea66fa52e2aa9e50308e10ce76"
+      "sha256": "ed0e66ca101fe4cc1e4339896569d6d2d6e939a020260a2458e48ace118cd6cd"
     },
     {
       "bytes": 12958,
@@ -166,14 +166,14 @@
       "sha256": "ee8ea30bc27b68baabba0f2eb897b7f5b25c5db27a5322e2019059c4f8391f7e"
     },
     {
-      "bytes": 10363,
+      "bytes": 10368,
       "path": "UPSTREAM_SYNC_AUDIT.md",
-      "sha256": "022e15a080b6579678fe24b8c409640d3a1bf3b3569925097c7884550d4b20a7"
+      "sha256": "71c72e063c35615c2256157173ace7563c3d2ffcad5bd292c234fcefcab0512a"
     },
     {
       "bytes": 34956,
       "path": "UPSTREAM_SYNC_MATRIX.md",
-      "sha256": "cb7106583ca154dc39bcfae56669aacc55c01cae073379ff0ddfff5e656e54d8"
+      "sha256": "25cbe8011933bcdda9b3784defc5f20ed2ce1caa7177f020688715b412eecd6d"
     },
     {
       "bytes": 6053,
@@ -10934,16 +10934,6 @@
       "bytes": 1399,
       "path": "scripts/assert-runner-platform.mjs",
       "sha256": "f23987691f9a6f1cd17eacf0989f9615bedc931bcc44b93553781750774a5e26"
-    },
-    {
-      "bytes": 7678,
-      "path": "scripts/benchmark-knowledge-fast.mjs",
-      "sha256": "dec243b7815780af631df7077584d9041b2dcd9e661ca8f2163d1a3d8438e71f"
-    },
-    {
-      "bytes": 2223,
-      "path": "scripts/benchmark-knowledge-research.mjs",
-      "sha256": "2b09f3a69e8aff523d20e14acaecc250c9cbce6d6d9cb381c60e79899cdb7d25"
     },
     {
       "bytes": 7849,
