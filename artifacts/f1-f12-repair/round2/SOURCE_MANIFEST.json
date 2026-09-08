@@ -78,7 +78,7 @@
     {
       "bytes": 54382,
       "path": ".sync-audit/build-sync-matrix.mjs",
-      "sha256": "28295526ea99dd1b50e381978a25ab30aaab56edb0c41266e4df6681327e0aab"
+      "sha256": "9275822935e76a2bdc508ea3e6d04efbb1706250b0f5c702b3bc68d55c5a3190"
     },
     {
       "bytes": 16534,
@@ -113,12 +113,12 @@
     {
       "bytes": 80341,
       "path": ".sync-audit/upstream-sync-matrix.json",
-      "sha256": "3e181c9116ca99f9e59bac045f0d559924e18d1347413fedec4468c54d61dfbf"
+      "sha256": "24f5d06ff2725201e02dfdd7c0bbd2dfca232e053a34246bfc1e81fbf76a738b"
     },
     {
       "bytes": 41,
       "path": ".sync-audit/verified-source-sha.txt",
-      "sha256": "bdae8e2ba3d65ccea207790683bb0ecf64f41390e655c7e995450d9c5a9cfea9"
+      "sha256": "f061521fd7d39c6a608d64b1831d3866060e29035d351fd408c1861fefa4b07e"
     },
     {
       "bytes": 4111,
@@ -141,9 +141,9 @@
       "sha256": "0e1c839ef037341be3443f1d2baf3112d983dceb0d3183741c1f9218b09d5b07"
     },
     {
-      "bytes": 178142,
+      "bytes": 178932,
       "path": "PROGRESS.md",
-      "sha256": "49cb6bc22a30196fd0b0b3f2466e9edfc42788a855f7c90431ebde9906cb0c80"
+      "sha256": "b2bcebb96cc66bef194a7857b1ab0c58f77ca6d3d5c81d53e4ab89ec4b116b6e"
     },
     {
       "bytes": 12958,
@@ -166,14 +166,14 @@
       "sha256": "ee8ea30bc27b68baabba0f2eb897b7f5b25c5db27a5322e2019059c4f8391f7e"
     },
     {
-      "bytes": 10425,
+      "bytes": 10439,
       "path": "UPSTREAM_SYNC_AUDIT.md",
-      "sha256": "2121053885063012e173f8cfe8f970a5f1296645bdc12819d53bbb2dfcbb0ce8"
+      "sha256": "495f92264234736b326a494a661da03aceae88552b22af64a7e05ccab4d30a58"
     },
     {
       "bytes": 34956,
       "path": "UPSTREAM_SYNC_MATRIX.md",
-      "sha256": "943dcd9c675de60bfcc19a040bbe8349927b8fb8356e63dcfc8d14908fecc3bf"
+      "sha256": "93ce3871778d986dc36f3b727c4fd14c496111b25746b209e42a36a7a0c44694"
     },
     {
       "bytes": 6053,
@@ -1626,9 +1626,9 @@
       "sha256": "641875c8befcfec010884b3b28145e7535f7d9a2ed2072a5dbc6d4e91c8bc197"
     },
     {
-      "bytes": 24645,
+      "bytes": 24608,
       "path": "core/speech-recognition/system-speech-adapter.ts",
-      "sha256": "e01e6c6c926e64dc30b500e13fcfdbb88db6cee63f40fc1380367c32c100314e"
+      "sha256": "7b7adc6e609d74fe788e3d99d42480937cc8607c5ed28095b8bdeaf04645c49a"
     },
     {
       "bytes": 11362,

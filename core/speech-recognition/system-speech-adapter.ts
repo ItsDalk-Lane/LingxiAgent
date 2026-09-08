@@ -99,14 +99,11 @@ export function createSystemSpeechUtf8Decoder() {
 function normalizedAbsolutePosixPath(value: any): string | null {
   const candidate = typeof value === "string" ? value.trim() : "";
   if (!candidate || candidate.includes("\0")) return null;
-  // Windows 盘符绝对路径（C:\… / D:/…）转 POSIX 斜杠后参与同一套结构校验：
-  // LINGXI_SPEECH_HELPER_EXEC 覆盖在 Windows 上才可用；mac 包内结构检查对
-  // 盘符形态自然不匹配，无需单列分支。
-  const posixCandidate = /^[A-Za-z]:[\\/]/.test(candidate)
-    ? candidate.replace(/\\/g, "/")
-    : candidate;
-  if (!path.posix.isAbsolute(posixCandidate)) return null;
-  return path.posix.normalize(posixCandidate);
+  // 接受 POSIX 绝对路径与 Windows 绝对路径（盘符或 UNC）：LINGXI_SPEECH_HELPER_EXEC
+  // 覆盖在 Windows 上才可用。统一转 POSIX 斜杠参与后续结构校验；mac 包内结构
+  // 检查对盘符/UNC 形态自然不匹配，无需单列分支。
+  if (!path.posix.isAbsolute(candidate) && !path.win32.isAbsolute(candidate)) return null;
+  return path.posix.normalize(candidate.replace(/\\/g, "/"));
 }
 
 function macAppResourcesRoot(value: any): string | null {

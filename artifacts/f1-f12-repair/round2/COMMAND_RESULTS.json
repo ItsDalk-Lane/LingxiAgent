@@ -3551,5 +3551,26 @@
     "log": "logs/s21-winfix-typecheck.log",
     "logSha256": "1a1deb9920b1895e1f8be03b30d52c10389d23dafbae3076b021af27ae99a95a",
     "sourceManifestHash": "c10ccdfe0f2677d11ce42a45cb830dc69f6b4f1c87b395b257f4a3dd13660493"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T15:45:27.558568+00:00",
+    "end": "2026-09-08T15:45:50.202980+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "dbcdd29ab1aa8deecd781ba57f48760e2aa1492a75c624ff5c6fddfc5d72a365",
+    "log": "logs/s22-final-gate.log",
+    "logSha256": "1a1deb9920b1895e1f8be03b30d52c10389d23dafbae3076b021af27ae99a95a",
+    "sourceManifestHash": "dbcdd29ab1aa8deecd781ba57f48760e2aa1492a75c624ff5c6fddfc5d72a365"
   }
 ]
