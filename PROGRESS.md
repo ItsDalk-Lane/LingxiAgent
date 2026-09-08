@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 25a6b78447c64e169f763f63949fa4258fa9542c  (2026-09-08 C01–C03+CI+Windows 兼容修复源码候选：分支 refactor/dismantle-and-voice-features)
+VERIFIED_SOURCE_SHA   = 9fba14f72f538de4192ea46226c5d6f84c891fb1  (2026-09-08 v0.1.36 发布元数据候选：分支 codex/release-v0.1.36)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1034,6 +1034,11 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
 
 - 固定源码候选：`25a6b78447c64e169f763f63949fa4258fa9542c`（a728597e + dev/override 两处路径断言同型对齐；上一封印曾误指审计提交 4d10c2b8，已由 a7bb3906 修正到 a728597e，本候选为其直接后继）。Windows CI 语音套件唯一残余断言收敛。
 - 验证证据（绑定该候选树）：语音生命周期 13/13；全量 13443 passed / 0 failed（j42）；round3 manifest 8f5cf500（j41 补丁重放 VERIFIED）；提交后独立检出 18/18 绿。
+
+## 2026-09-08 v0.1.36 发布元数据候选与封印（release）
+
+- 固定源码候选：`9fba14f72f538de4192ea46226c5d6f84c891fb1`（分支 codex/release-v0.1.36，基于 PR #47 合并树 af0fe074）：版本 0.1.36 / releaseGeneration 14 双 bump、preflight 锚点、双格式 digest（v1/v2 校验通过）。
+- 验证证据（绑定该候选树）：release-preflight --tag v0.1.36 PASS（0.1.35→0.1.36、gen 13→14 单调）；validate-release-digest v1/v2 PASS；全量 13442 passed / 0 failed（j43，证据绿门禁 j44 引导后全绿）；发布前测试 11 项（preflight+round3 证据）提交后独立检出全绿。
 
 ### Known limitation（保留）
 
