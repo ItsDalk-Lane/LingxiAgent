@@ -1223,5 +1223,51 @@
     "log": "logs/j50-benchfix-full.log",
     "logSha256": "d8b5ebb0e0b25137a4afd1502a280f0ce178910677280b1fb9ae4aa417808c53",
     "sourceManifestHash": "63edd5db9a378a2f9a7e6351b420d622921843035203f824a530ea1b16119e1b"
+  },
+  {
+    "command": [
+      "npm",
+      "test"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T23:19:58.198318+00:00",
+    "end": "2026-09-08T23:21:17.725334+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 13442,
+      "failed": 1,
+      "skipped": 7,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "f58d023bac360a2fb8d1d03161d423d279b529e354363447e9cdc3499be260da",
+    "log": "logs/j51-timeout-full.log",
+    "logSha256": "eac430fb405ae80c7210b3bcf2a2f2751871fbe49b210c7c09c92dc49ddb99e9",
+    "sourceManifestHash": "f58d023bac360a2fb8d1d03161d423d279b529e354363447e9cdc3499be260da"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T23:21:24.975272+00:00",
+    "end": "2026-09-08T23:21:46.087241+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "f58d023bac360a2fb8d1d03161d423d279b529e354363447e9cdc3499be260da",
+    "log": "logs/j52-timeout-bootstrap.log",
+    "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
+    "sourceManifestHash": "f58d023bac360a2fb8d1d03161d423d279b529e354363447e9cdc3499be260da"
   }
 ]

@@ -27,4 +27,7 @@ it("真实原生模块加载/建图期间重复关闭，子进程不崩溃且向
   });
   expect(result, result.output).toMatchObject({ code: 0, signal: null });
   expect(result.output).toContain("30 native shutdowns verified");
-}, 30_000);
+  // 子进程串行执行 30 轮真实 usearch 建图/关闭；intel 慢速运行器在全量套件
+  // 并行满载下曾 5 次超过 30s 预算（纯超时，断言从未失败）。给真实工作
+  // 留足预算，不为压时间削轮数。
+}, 120_000);
