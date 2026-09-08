@@ -1001,6 +1001,8 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
 - 验证证据（绑定该候选树）：定向 59；round2 交付证据 10/10；受影响回归 313；冻结全量 npm test 13442 passed / 7 skipped / 0 实质失败（j25；A08 抖动单跑 13/13 绿）；typecheck ×3、lint 0 errors、build:client、build:server（一次性签名密钥）；提交后独立检出 4 文件 69/69 绿；候选交付重建（独立 clone + 增量补丁 + npm ci）69/69。逐命令日志与摘要：artifacts/f1-f12-repair/round3-c01-c03/。
 - 平台限制：真实 Windows 客户端、真实供应商、x64 打包实测保留 BLOCKED（详见 C01_C02_C03_TEST_MATRIX.json）。
 
+- 提交后验证（封印推进后）：HEAD `e7b0454e` 下 post-verification diff guard OK（仅 6 审计文件）；封印/矩阵/round2/round3 证据 25/25 绿；候选 94c71d7a 独立检出 manifest 复算一致（edb36fef…）、4 文件 69/69 绿、round2 DELIVERY_MANIFEST 217/217。
+
 ### Known limitation（保留）
 
 Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面环境执行安装/升级
