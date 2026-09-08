@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 9fba14f72f538de4192ea46226c5d6f84c891fb1  (2026-09-08 v0.1.36 发布元数据候选：分支 codex/release-v0.1.36)
+VERIFIED_SOURCE_SHA   = 9953308de1d51b56651294973efc2ee6d776208a  (2026-09-08 发布工作流残留引用修复候选：分支 fix/remove-build-packages-workflow-refs)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1039,6 +1039,11 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
 
 - 固定源码候选：`9fba14f72f538de4192ea46226c5d6f84c891fb1`（分支 codex/release-v0.1.36，基于 PR #47 合并树 af0fe074）：版本 0.1.36 / releaseGeneration 14 双 bump、preflight 锚点、双格式 digest（v1/v2 校验通过）。
 - 验证证据（绑定该候选树）：release-preflight --tag v0.1.36 PASS（0.1.35→0.1.36、gen 13→14 单调）；validate-release-digest v1/v2 PASS；全量 13442 passed / 0 failed（j43，证据绿门禁 j44 引导后全绿）；发布前测试 11 项（preflight+round3 证据）提交后独立检出全绿。
+
+## 2026-09-08 发布工作流残留引用修复候选与封印（v0.1.36 重打 tag 前置）
+
+- 固定源码候选：`9953308de1d51b56651294973efc2ee6d776208a`（分支 fix/remove-build-packages-workflow-refs，基于 d5592f07）：build.yml 两处与 knowledge-performance.yml 一处 build:packages 残留移除，ci-workflow-guards/release-workflow-gates 顺序不变量同步，tests/README 指引清理。v0.1.36 原 tag（d5592f07）的 Build 工作流因 quality-gate 引用失败，将删除后按本候选重打。
+- 验证证据（绑定该候选树）：workflow 守卫 20 项绿；全量 13442 passed / 0 failed（j47，证据引导 j48 后 25/25）。
 
 ### Known limitation（保留）
 

@@ -55,7 +55,7 @@ describe("release workflow hard gates", () => {
     const quality = stepText(build.jobs["quality-gate"]);
     expect(quality).toContain("npm run typecheck");
     expect(quality).toContain("npm run lint");
-    expect(quality).toContain("npm run build:packages");
+    // packages/* 工作区已随插件生态拆除移除（04f90d2b），build:packages 门禁同步退场。
     expect(quality).toContain("npm test");
   });
 

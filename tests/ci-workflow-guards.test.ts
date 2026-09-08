@@ -136,13 +136,13 @@ describe("Knowledge 四平台运行与打包烟测已接入正式流水线", () 
 
   it("发布矩阵在构建服务器前跑源级烟测，并在构建后启动包内 Knowledge 两次", () => {
     const steps = build.jobs.build?.steps ?? [];
-    const packageIndex = steps.findIndex(step => stepRun(step).includes("build:packages"));
+    // packages/* 工作区已随插件生态拆除移除（04f90d2b），build:packages 步骤
+    // 同步退场；顺序不变量保留：源级烟测先于服务器构建。
     const sourceSmokeIndex = steps.findIndex(step => stepRun(step).includes("test:knowledge-platform-smoke"));
     const serverIndex = steps.findIndex(step => stepRun(step).includes("scripts/build-server.mjs"));
     const verifyArchiveIndex = steps.findIndex(step => step.name === "Verify seed kit before packaged Knowledge smoke");
     const packagedSmokeIndex = steps.findIndex(step => stepRun(step).includes("scripts/smoke-packaged-knowledge.mjs"));
-    expect(packageIndex).toBeGreaterThanOrEqual(0);
-    expect(sourceSmokeIndex).toBeGreaterThan(packageIndex);
+    expect(sourceSmokeIndex).toBeGreaterThanOrEqual(0);
     expect(serverIndex).toBeGreaterThan(sourceSmokeIndex);
     expect(verifyArchiveIndex).toBeGreaterThan(serverIndex);
     expect(stepRun(steps[verifyArchiveIndex])).toContain("scripts/verify-seed-kit.mjs");

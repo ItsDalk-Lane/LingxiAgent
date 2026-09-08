@@ -74,8 +74,6 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Build packages
-        run: npm run build:packages
 
       - name: Run full test suite
         run: npm test
@@ -163,8 +161,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build packages for Knowledge platform smoke
-        run: npm run build:packages
 
       - name: Run Knowledge platform smoke
         run: npm run test:knowledge-platform-smoke

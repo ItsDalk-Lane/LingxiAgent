@@ -3635,5 +3635,68 @@
     "log": "logs/s25-release-gate.log",
     "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
     "sourceManifestHash": "8c7afff77847744f3873eb582b18b4f6a5138ea1afed3a7bdc1a340a8e13b0f6"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T19:32:39.985945+00:00",
+    "end": "2026-09-08T19:33:02.962742+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "3370cf800563abf5ed742cd85c4100793269b63b9cbb70c82998e46a395d1902",
+    "log": "logs/s26-buildfix-gate.log",
+    "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
+    "sourceManifestHash": "3370cf800563abf5ed742cd85c4100793269b63b9cbb70c82998e46a395d1902"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T19:35:25.722475+00:00",
+    "end": "2026-09-08T19:35:48.379550+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "b399e39080434a5aa46d1711a23cc80b214e5d68a4f78f2cf6552438ad5ae3f0",
+    "log": "logs/s27-buildfix2-gate.log",
+    "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
+    "sourceManifestHash": "b399e39080434a5aa46d1711a23cc80b214e5d68a4f78f2cf6552438ad5ae3f0"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T19:37:23.553605+00:00",
+    "end": "2026-09-08T19:37:46.343164+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "1a7c197f241828d84337d96ff97a5d31797065637d838c73f50c6b8b2dac6559",
+    "log": "logs/s28-final3-gate.log",
+    "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
+    "sourceManifestHash": "1a7c197f241828d84337d96ff97a5d31797065637d838c73f50c6b8b2dac6559"
   }
 ]

@@ -13,7 +13,6 @@ jobs:
           node-version: "24.15.0"
           cache: npm
       - run: npm ci
-      - run: npm run build:packages
       - name: Run stable-runner performance gates
         env:
           LINGXI_ENFORCE_KNOWLEDGE_PERF: "1"

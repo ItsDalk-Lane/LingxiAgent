@@ -47,7 +47,6 @@ Choose validation according to the affected behavior and the current project rul
 For a full local code validation pass, use Node.js `>=24.12.0 <25` and installed dependencies, then run:
 
 ```bash
-npm run build:packages
 npm run typecheck
 npm run lint
 npm run build:renderer
