@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 9953308de1d51b56651294973efc2ee6d776208a  (2026-09-08 发布工作流残留引用修复候选：分支 fix/remove-build-packages-workflow-refs)
+VERIFIED_SOURCE_SHA   = 9d4f41f3042b26e8b3990671ec55380b99c494dc  (2026-09-08 已拆除知识基准退役候选：分支 fix/remove-dead-knowledge-benchmarks)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1044,6 +1044,11 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
 
 - 固定源码候选：`9953308de1d51b56651294973efc2ee6d776208a`（分支 fix/remove-build-packages-workflow-refs，基于 d5592f07）：build.yml 两处与 knowledge-performance.yml 一处 build:packages 残留移除，ci-workflow-guards/release-workflow-gates 顺序不变量同步，tests/README 指引清理。v0.1.36 原 tag（d5592f07）的 Build 工作流因 quality-gate 引用失败，将删除后按本候选重打。
 - 验证证据（绑定该候选树）：workflow 守卫 20 项绿；全量 13442 passed / 0 failed（j47，证据引导 j48 后 25/25）。
+
+## 2026-09-08 已拆除知识基准退役候选与封印（v0.1.36 重打 tag 前置 II）
+
+- 固定源码候选：`9d4f41f3042b26e8b3990671ec55380b99c494dc`（分支 fix/remove-dead-knowledge-benchmarks，基于 82192202）：benchmark-knowledge-fast/-research 两脚本删除（分别依赖 04f90d2b 已拆除的 runFastKnowledgePipeline 与 completeness fixture），build.yml Linux 性能门禁与 knowledge-performance.yml 只保留现役 vector 基准。v0.1.36 第二次 tag（82192202）的 Build 在性能门禁崩溃，将删除后按本候选第三次重打。
+- 验证证据（绑定该候选树）：vector 基准本地跑通（exit 0）；workflow 守卫 20 项绿；全量 13443 passed / 0 failed（j50）；补丁重放 VERIFIED（j49）；证据 25/25。
 
 ### Known limitation（保留）
 
