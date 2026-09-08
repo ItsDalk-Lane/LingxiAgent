@@ -338,11 +338,11 @@ describe("system speech adapter lifecycle（A06–A12）", () => {
 
     // 开发形态：才允许 dist-speech/mac-<arch>。
     const devResolved = resolveSystemSpeechHelperPath({ env: {}, cwd: devLeftoverRoot });
-    expect(devResolved).toBe(devHelper);
+    expect(devResolved).toBe(devHelper.replace(/\\/g, "/"));
 
     // override 仅信任受控环境变量（启动环境注入），存在性校验。
     expect(resolveSystemSpeechHelperPath({
       env: { LINGXI_SPEECH_HELPER_EXEC: fakeHelper },
-    })).toBe(fakeHelper);
+    })).toBe(fakeHelper.replace(/\\/g, "/"));
   });
 });

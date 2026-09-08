@@ -78,7 +78,7 @@
     {
       "bytes": 54382,
       "path": ".sync-audit/build-sync-matrix.mjs",
-      "sha256": "c384ae8765c38e7fee3d231d8118721d748a65514379f9013c71837115b40f9d"
+      "sha256": "2e793fe48a08d6e939acb78980d9b65e3f4cade1643d4b4094da42be36508bae"
     },
     {
       "bytes": 16534,
@@ -113,12 +113,12 @@
     {
       "bytes": 80341,
       "path": ".sync-audit/upstream-sync-matrix.json",
-      "sha256": "2ef8f7e6f66a04fae0e4ddc638612b0efcbb3f61ca9773b11afaf38fd675ae5e"
+      "sha256": "a77ed425b1b18fd0f47ba44565464b2b7b29f6719b58d35914c0484634c9320c"
     },
     {
       "bytes": 41,
       "path": ".sync-audit/verified-source-sha.txt",
-      "sha256": "10cdfc0c5caec165c0d4d7a42f778621e51c34b28cfa50b0a88ce86664649094"
+      "sha256": "4d2f4bb05855357a85ed085bfd961f54123649502eb4e909a1a138617c4d651e"
     },
     {
       "bytes": 4111,
@@ -141,9 +141,9 @@
       "sha256": "0e1c839ef037341be3443f1d2baf3112d983dceb0d3183741c1f9218b09d5b07"
     },
     {
-      "bytes": 179774,
+      "bytes": 180573,
       "path": "PROGRESS.md",
-      "sha256": "36f4278e9966fa93b8299330318c1e191368f151ec898ae47cd8b4c250358a58"
+      "sha256": "235497dfc53e062f1274acce9230675aae2d531701a12a52bc9f872ac9eb6418"
     },
     {
       "bytes": 12958,
@@ -168,12 +168,12 @@
     {
       "bytes": 10412,
       "path": "UPSTREAM_SYNC_AUDIT.md",
-      "sha256": "70f347c77def1b4cca28aec466ec9e4a92aaf8c815b184a7e1b0dcc2eb7faf08"
+      "sha256": "9d4a06c04dad23067d6075b96a8c88264baab77895f1109c9b0f81f3eb95f66c"
     },
     {
       "bytes": 34956,
       "path": "UPSTREAM_SYNC_MATRIX.md",
-      "sha256": "b88fb557feb6ae17e580af70a5ca9ea21306ab2ced3e28bccbe43c8bee3b1081"
+      "sha256": "657a8f7285f18a53537933f6215c1ba5eb7718b89c223d63724ec8abe3d2e3c2"
     },
     {
       "bytes": 6053,
@@ -16671,9 +16671,9 @@
       "sha256": "c133e78339e2823a745b2ca4bc5b167a266c67b6fa5bdfea28ea1a039277f5ee"
     },
     {
-      "bytes": 15518,
+      "bytes": 15558,
       "path": "tests/system-speech-adapter.lifecycle.test.ts",
-      "sha256": "5cfb953baa8147d5f3cc94d015f4e5fcc8e1a28724c183b9c98cda41f587b544"
+      "sha256": "fbe1d263b505da4934f15fe0aa62566e05b1eda09acb03509187e52ef66ebb33"
     },
     {
       "bytes": 2579,
