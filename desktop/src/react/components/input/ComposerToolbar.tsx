@@ -31,7 +31,7 @@ interface Props {
   isStreaming: boolean;
 }
 
-/** 输入卡片下方的 Composer 工具栏：新建聊天 / 附件 / Slash / 权限模式 / Context / Thinking / 模型 / 语音 */
+/** 输入卡片下方的 Composer 工具栏：新建聊天 / 附件 / Slash / 权限模式 / Context / Thinking / 模型 */
 export const ComposerToolbar = memo(function ComposerToolbar(props: Props) {
   const {
     t, onNewSession, onAttach, slashBtnRef, onSlashToggle,

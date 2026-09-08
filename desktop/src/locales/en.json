@@ -654,6 +654,8 @@
     "queuedInsertNow": "Insert now",
     "queuedInsertNowTitle": "Insert this message into the ongoing reply immediately",
     "queuedSendFailed": "Failed to send the queued message",
+    "queuedRetry": "Retry",
+    "queuedInsertWaiting": "Waiting for the current reply to start — try again in a moment",
     "queuedDelete": "Cancel this queued message"
   },
   "agentReview": {

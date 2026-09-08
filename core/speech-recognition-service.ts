@@ -257,6 +257,7 @@ export class SpeechRecognitionService {
       provider,
       modelId,
       model,
+      signal,
     } = payload;
     const sessionTarget = normalizeSessionRef(payload);
     const { sessionId, sessionPath, sessionRef } = sessionTarget;
@@ -277,11 +278,7 @@ export class SpeechRecognitionService {
       throw new Error("speech recognition model is not configured");
     }
 
-    const resolvedTarget = this._providers.resolveMediaModel({
-      providerId: targetProvider,
-      modelId: targetModel,
-      capability: CAPABILITY,
-    });
+    const resolvedTarget = this._resolveTranscriptionTarget(targetProvider, targetModel);
     const adapter = this._registry.getProtocol(resolvedTarget.model.protocolId) || this._registry.get(resolvedTarget.providerId);
     if (!adapter?.transcribe) throw new Error(`No speech recognition adapter registered for protocol "${resolvedTarget.model.protocolId}"`);
     const executionTarget = this._providers.resolveMediaExecutionTarget({
@@ -313,6 +310,7 @@ export class SpeechRecognitionService {
         sessionId,
         sessionPath,
         fileId,
+        signal,
       });
       const ready = this._updateTranscription({ sessionId, sessionPath }, fileId, {
         status: "ready",
@@ -326,13 +324,19 @@ export class SpeechRecognitionService {
       this._emitTranscriptionUpdate({ sessionId, sessionPath, sessionRef }, fileId, ready.transcription);
       return ready.transcription;
     } catch (err) {
+      // F7/P5.3：适配器错误码（如 SYSTEM_SPEECH_*）以 "CODE: message" 前缀沿
+      // transcription.error 透出，前端据此给出区分文案；无码错误保持原文。
+      const rawMessage = err?.message || String(err);
+      const error = typeof err?.code === "string" && err.code
+        ? `${err.code}: ${rawMessage || "transcription failed"}`
+        : rawMessage;
       const failed = this._updateTranscription({ sessionId, sessionPath }, fileId, {
         status: "failed",
         providerId: target.providerId,
         modelId: target.model.id,
         protocolId: target.model.protocolId,
         ...(language ? { language } : {}),
-        error: err?.message || String(err),
+        error,
       });
       this._emitTranscriptionUpdate({ sessionId, sessionPath, sessionRef }, fileId, failed.transcription);
       return failed.transcription;
@@ -411,13 +415,19 @@ export class SpeechRecognitionService {
       this._emitTranscriptionUpdate({ sessionId, sessionPath, sessionRef }, fileId, ready.transcription);
       return ready.transcription;
     } catch (err) {
+      // F7/P5.3：适配器错误码（如 SYSTEM_SPEECH_*）以 "CODE: message" 前缀沿
+      // transcription.error 透出，前端据此给出区分文案；无码错误保持原文。
+      const rawMessage = err?.message || String(err);
+      const error = typeof err?.code === "string" && err.code
+        ? `${err.code}: ${rawMessage || "transcription failed"}`
+        : rawMessage;
       const failed = this._updateTranscription({ sessionId, sessionPath }, fileId, {
         status: "failed",
         providerId: target.providerId,
         modelId: target.model.id,
         protocolId: target.model.protocolId,
         ...(language ? { language } : {}),
-        error: err?.message || String(err),
+        error,
       });
       this._emitTranscriptionUpdate({ sessionId, sessionPath, sessionRef }, fileId, failed.transcription);
       return failed.transcription;
@@ -441,6 +451,7 @@ export class SpeechRecognitionService {
     sessionId,
     sessionPath,
     fileId = null,
+    signal = null,
   }) {
     // MC-09（§三十七/§三十八）：在 file/provider/model/protocol/language/session
     // 都确定之后、真正 Adapter HTTP 请求之前铸 callId。fileId 是业务引用
@@ -516,6 +527,7 @@ export class SpeechRecognitionService {
         fetch: this._fetch,
         modelCall: recorder,
         mediaExecutionTarget: target.executionTarget,
+        ...(signal ? { signal } : {}),
       }));
       // 语义响应（§四十二）：Observer 只记录结构事实；transcription text 是
       // 模型输出正文——Phase 6 经统一 Redactor 进 payload capture（§一百零一）。
@@ -538,6 +550,25 @@ export class SpeechRecognitionService {
     } catch (err) {
       failObservedModelCall(recorder, err, { errorKind: "adapter_error" });
       throw err;
+    }
+  }
+
+  /**
+   * F7/P5.3：转写目标解析。零配置本地听写要求 system-speech/system-speech 在
+   * 用户从未「添加模型」时也能解析到已注册系统适配器，因此对 authType=none
+   * 的系统身份放行内置目录（includeCatalog）；api-key 云端供应商的候选目录
+   * 模型保持「添加后才可执行」，不得因本接线变为自动可执行。
+   */
+  _resolveTranscriptionTarget(providerId, modelId) {
+    const base = { providerId, modelId, capability: CAPABILITY };
+    try {
+      return this._providers.resolveMediaModel(base);
+    } catch (err) {
+      const entry = typeof this._providers.get === "function"
+        ? this._providers.get(providerId)
+        : null;
+      if (entry?.authType !== "none") throw err;
+      return this._providers.resolveMediaModel({ ...base, includeCatalog: true });
     }
   }
 

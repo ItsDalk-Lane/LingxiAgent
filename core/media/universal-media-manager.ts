@@ -22,7 +22,7 @@ import {
   normalizeMediaDelivery,
   retryImageTask,
 } from "./image-task-runner.ts";
-import { resolveMediaParameters } from "./media-parameters.ts";
+import { resolveMediaParameters, resolveSpeechParameters } from "./media-parameters.ts";
 import { withModelRequestAccounting } from "../../lib/llm/model-request-accounting.ts";
 import {
   beginObservedModelCall,
@@ -572,6 +572,13 @@ export class UniversalMediaManager {
     });
     this._registerBusHandlers(bus);
     this._poller.start();
+    // F12/P8.4：旧 pending 语音 response 任务在启动时幂等收尾（文件在→done、
+    // 缺→failed；不重新合成、不通知会话、不产生新模型调用）。图片/视频与
+    // session 投递的 pending 任务不在特例范围内。
+    const recovered = this._store.recoverSynchronousSpeechTasks({ generatedDir: this._generatedDir });
+    if (recovered > 0) {
+      this._log?.info?.(`[media] recovered ${recovered} synchronous speech task(s) after restart`);
+    }
   }
 
   stop({ keepStore = false }: any = {}) {
@@ -842,12 +849,17 @@ export class UniversalMediaManager {
     if (!adapter) throw new Error("no speech generation provider available; configure a TTS model (e.g. openai tts-1) or use the system-speech provider on macOS");
 
     const batchId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    // F11/P8.2：唯一语音参数解析。供应商默认只取 speech 域 providerDefaults，
+    // 按逻辑 provider 身份索引（与设置页保存契约一致，不用 credentialProviderId
+    // 偷换配置归属）；优先级 = 显式输入 > 语音默认 > 协议默认（适配器收口）。
+    const speechProviderDefaults = target?.providerId
+      ? this.getSpeechConfig()?.providerDefaults?.[target.providerId] || {}
+      : {};
+    const effectiveSpeechParams = resolveSpeechParameters({ input, providerDefaults: speechProviderDefaults });
     const params: Record<string, unknown> = {
       type: "speech",
       prompt: input.prompt,
-      ...(input.voice !== undefined ? { voice: input.voice } : {}),
-      ...(input.speed !== undefined ? { speed: input.speed } : {}),
-      ...(input.format !== undefined ? { format: input.format } : {}),
+      ...effectiveSpeechParams,
       ...(target?.providerId ? { providerId: target.providerId } : {}),
       ...(target?.modelId ? { modelId: target.modelId, model: target.modelId } : (input.model ? { model: input.model } : {})),
       ...(target?.protocolId ? { protocolId: target.protocolId } : {}),
@@ -889,6 +901,8 @@ export class UniversalMediaManager {
         prompt: params.prompt,
         ...(target?.modelId ? { model: target.modelId } : {}),
         voice: params.voice,
+        ...(params.speed !== undefined ? { speed: params.speed } : {}),
+        ...(params.format !== undefined ? { format: params.format } : {}),
       },
       provenance: recorder.semanticInputProvenance,
     });
@@ -963,6 +977,19 @@ export class UniversalMediaManager {
     });
     if (result.files?.length) {
       this._store.update(result.taskId, { files: result.files });
+    }
+
+    // F12/P8.3：response 投递的同步产物在返回之前完成终态化——文件必须
+    // 非空且真实存在于 generated 根目录，否则明确失败（不返回 ok=true 配
+    // 一个永久 pending 任务，也不自动重调适配器补文件以免重复计费）。
+    if (responseDelivery) {
+      const completion = this._store.completeSynchronousSpeechTask(result.taskId, {
+        files: result.files || [],
+        generatedDir: this._generatedDir,
+      });
+      if (!completion.ok) {
+        throw new Error(completion.error);
+      }
     }
 
     if (!responseDelivery) {

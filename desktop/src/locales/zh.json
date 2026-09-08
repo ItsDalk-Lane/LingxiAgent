@@ -655,6 +655,8 @@
     "queuedInsertNow": "立即插入",
     "queuedInsertNowTitle": "把这条消息立即插入正在进行的回答中",
     "queuedSendFailed": "排队消息发送失败",
+    "queuedRetry": "重试",
+    "queuedInsertWaiting": "正在等待当前回答开始，请稍候再插入",
     "queuedDelete": "撤销这条排队消息"
   },
   "agentReview": {

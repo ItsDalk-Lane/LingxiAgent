@@ -655,6 +655,8 @@
     "queuedInsertNow": "지금 삽입",
     "queuedInsertNowTitle": "이 메시지를 진행 중인 응답에 즉시 삽입합니다",
     "queuedSendFailed": "대기 중인 메시지 전송에 실패했습니다",
+    "queuedRetry": "다시 시도",
+    "queuedInsertWaiting": "현재 응답이 시작되기를 기다리는 중입니다. 잠시 후 다시 시도해 주세요",
     "queuedDelete": "이 대기 메시지 취소"
   },
   "agentReview": {

@@ -649,7 +649,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:3c927e7797e03fb96f83186608316ffe31a86417cab5f9321a986cfc89440277",
+  "payloadFingerprint": "sha256:782ba6904f2a6ac752e3355198ad05433a803bac17e136b9730ccbfd75bdff10",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -756,6 +756,8 @@
         "agents/{agentId}/memory/memory.md",
         "agents/{agentId}/memory/navigation.md",
         "agents/{agentId}/memory/tenets.json",
+        "agents/{agentId}/memory/pinned-tenets-migration.receipt.json",
+        "agents/{agentId}/memory/pinned-migration-backup/{backupFile}",
         "agents/{agentId}/memory/facts.md",
         "agents/{agentId}/memory/today.md",
         "agents/{agentId}/memory/week.md",
@@ -3160,8 +3162,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "session-coordinator think-strip helper 新增 mm:think 方言正则（MiniMax M3 思考标签清理）；纯文本清理路径，无存储 schema 变化",
-    "payloadFingerprint": "sha256:3c927e7797e03fb96f83186608316ffe31a86417cab5f9321a986cfc89440277"
+    "compatibilityReason": "desktop/main.cjs: speech permission IPC gains hostCanPrompt gate (dev-shell TCC SIGABRT guard, user-reported crash on mic click). IPC surface and all store schemas unchanged.",
+    "payloadFingerprint": "sha256:782ba6904f2a6ac752e3355198ad05433a803bac17e136b9730ccbfd75bdff10"
   },
   "schemas": [
     {
@@ -3370,7 +3372,7 @@
       "contract": "desktop window bounds, release announcement bookmark, and update cache version marker readers",
       "kind": "directory-contract",
       "module": "desktop/main.cjs",
-      "sourceHash": "sha256:28a051ecc13562c3065b1287b88959736e67c79077288cd7dc7aab023696e049",
+      "sourceHash": "sha256:26cf71777e68e664bb61af4b95329c93f056e39acddca37b97d1ad902648f471",
       "storeId": "desktop-window-version-state"
     },
     {
@@ -5287,10 +5289,90 @@
     },
     {
       "exemptionId": null,
+      "kind": "atomic-write",
+      "ordinal": 0,
+      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+      "sourceFile": "core/pinned-tenets-migration.ts",
+      "storeId": "agent-memory"
+    },
+    {
+      "exemptionId": null,
+      "kind": "atomic-write",
+      "ordinal": 0,
+      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+      "sourceFile": "core/pinned-tenets-migration.ts",
+      "storeId": "agent-memory"
+    },
+    {
+      "exemptionId": null,
+      "kind": "atomic-write",
+      "ordinal": 0,
+      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+      "sourceFile": "core/pinned-tenets-migration.ts",
+      "storeId": "agent-memory"
+    },
+    {
+      "exemptionId": null,
+      "kind": "copy-file",
+      "ordinal": 0,
+      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+      "sourceFile": "core/pinned-tenets-migration.ts",
+      "storeId": "agent-memory"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+      "sourceFile": "core/pinned-tenets-migration.ts",
+      "storeId": "agent-memory"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+      "sourceFile": "core/pinned-tenets-migration.ts",
+      "storeId": "agent-memory"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+      "sourceFile": "core/pinned-tenets-migration.ts",
+      "storeId": "agent-memory"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+      "sourceFile": "core/pinned-tenets-migration.ts",
+      "storeId": "agent-memory"
+    },
+    {
+      "exemptionId": null,
       "kind": "rename",
       "ordinal": 0,
-      "reason": "Merges legacy pinned items into tenets.json and renames the legacy files.",
+      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
       "sourceFile": "core/pinned-tenets-migration.ts",
+      "storeId": "agent-memory"
+    },
+    {
+      "exemptionId": null,
+      "kind": "atomic-write",
+      "ordinal": 0,
+      "reason": "Restores approved archived pinned items and writes the recovery receipt.",
+      "sourceFile": "core/pinned-tenets-recovery.ts",
+      "storeId": "agent-memory"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Restores approved archived pinned items and writes the recovery receipt.",
+      "sourceFile": "core/pinned-tenets-recovery.ts",
       "storeId": "agent-memory"
     },
     {

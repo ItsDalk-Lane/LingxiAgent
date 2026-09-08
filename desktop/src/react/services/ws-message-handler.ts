@@ -42,6 +42,7 @@ import { renderMarkdown } from '../utils/markdown';
 import { bumpMessageLiveVersion } from '../stores/message-live-version';
 import { terminalOutputStream } from './terminal-output-stream';
 import { handleBackgroundProcessControlResult } from './background-process-control';
+import { noteComposerServerAck } from './composer-send-coordinator';
 
 declare function t(key: string, vars?: Record<string, string>): any;
 
@@ -610,11 +611,14 @@ export function handleServerMessage(msg: any): void {
   const state = useStore.getState();
 
   // 「知识库检索中」胶囊与「等待助手」pending 都是纯瞬态信号：该 session 的
-  // 任何后续事件（status / session_user_message / 聊天流事件 / error…）到达都
-  // 代表前一阶段已结束，保守清除（各 end 内部对未命中 session 都是零成本
-  // no-op）。knowledge_retrieval_started 自身不清 pending（发送 → 检索是同一段
-  // 等待），也不被自己清除；knowledge_rollup_progress / knowledge_supplement_search
+  // 任何后续事件（status / 聊天流事件 / error…）到达都代表前一阶段已结束，
+  // 保守清除（各 end 内部对未命中 session 都是零成本 no-op）。
+  // knowledge_retrieval_started 自身不清 pending（发送 → 检索是同一段等待），
+  // 也不被自己清除；knowledge_rollup_progress / knowledge_supplement_search
   // 是检索期内的滚动注入分段进度（自身不清检索态），同样排除。
+  // session_user_message 是自己刚发出消息的接收回执，不代表助手开始响应：
+  // 「等待助手」pending 必须保留到真正的助手活动，否则回执 → run_start 的
+  // 空窗会让排队续发抢跑（F2）。回执对知识检索胶囊的清除语义保持不变。
   if (msg?.type !== 'knowledge_retrieval_started'
     && msg?.type !== 'knowledge_trace'
     && msg?.type !== 'knowledge_rollup_progress'
@@ -623,7 +627,9 @@ export function handleServerMessage(msg: any): void {
     // 与 markSessionOutputUnread? 同策略：部分测试 store / 旧 slice 组合缺 action 时不炸。
     if (retrievalDonePath) {
       useStore.getState().endKnowledgeRetrieval?.(retrievalDonePath);
-      useStore.getState().endTurnPending?.(retrievalDonePath);
+      if (msg?.type !== 'session_user_message') {
+        useStore.getState().endTurnPending?.(retrievalDonePath);
+      }
       useStore.getState().endKnowledgeRollup?.(retrievalDonePath);
       useStore.getState().endKnowledgeSupplement?.(retrievalDonePath);
     }
@@ -982,6 +988,9 @@ export function handleServerMessage(msg: any): void {
         : typeof msg.message.clientMessageId === 'string' && msg.message.clientMessageId
           ? msg.message.clientMessageId
           : null;
+      // 发送回执关联（含重连后恢复/历史回放）：coordinator 据此把 awaiting_ack /
+      // delivery_unknown 记录转为 accepted；不是磁盘 fsync 回执，不冒充持久化。
+      noteComposerServerAck(clientMessageId);
       const serverMessageId = typeof msg.message.id === 'string' && msg.message.id
         ? msg.message.id
         : typeof msg.message.sourceEntryId === 'string' && msg.message.sourceEntryId

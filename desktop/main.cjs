@@ -29,6 +29,10 @@ const { createWorkspaceWatchRegistry } = require("./workspace-watch-registry.cjs
 const { readTextFileSnapshot, writeTextFileIfUnchanged } = require("./file-text-io.cjs");
 const chokidar = require("chokidar");
 const { wrapIpcHandler, wrapIpcBestEffortHandler, wrapIpcOn } = require('./ipc-wrapper.cjs');
+const {
+  getSharedSpeechPermissionController,
+  disposeSharedSpeechPermissionController,
+} = require('./speech-permissions.cjs');
 const themeRegistry = require('./src/shared/theme-registry.cjs');
 const {
   completeOnboardingAndOpenMain,
@@ -5264,6 +5268,23 @@ wrapIpcHandler("quick-chat-shortcut-status", () => ({
 }));
 wrapIpcBestEffortHandler("quick-chat-show", () => showQuickChatWindow());
 wrapIpcBestEffortHandler("quick-chat-hide", () => hideQuickChatWindow());
+
+// 系统语音识别授权（宿主 Speech 框架，F4）：
+// - speech-permission-status 只读查询，绝不触发系统弹窗；
+// - speech-permission-request 由渲染层用户手势（按下录音键）发起，才允许弹窗；
+//   已终结状态（authorized/denied/restricted）直接回包，不重复弹窗。
+// - hostCanPrompt：只有打包壳（Info.plist 带 NSSpeechRecognitionUsageDescription）
+//   允许触发真实 TCC 授权请求；开发壳缺该声明，触发即被 macOS TCC SIGABRT 杀进程
+//   （2026-09-08 实测），开发环境请求原样返回 not_determined，前端走设置引导。
+// 两个入口都校验调用方是本壳窗口，拒绝游离 webContents。
+wrapIpcHandler("speech-permission-status", (event) => {
+  if (!BrowserWindow.fromWebContents(event.sender)) throw new Error("unknown sender");
+  return getSharedSpeechPermissionController({ hostCanPrompt: app.isPackaged === true }).getStatus();
+});
+wrapIpcHandler("speech-permission-request", (event) => {
+  if (!BrowserWindow.fromWebContents(event.sender)) throw new Error("unknown sender");
+  return getSharedSpeechPermissionController({ hostCanPrompt: app.isPackaged === true }).requestAuthorization();
+});
 wrapIpcBestEffortHandler("quick-chat-resize", (_event, mode) => applyQuickChatMode(mode));
 wrapIpcBestEffortHandler("quick-chat-open-session", (_event, sessionPath) => {
   if (typeof sessionPath !== "string" || !sessionPath.trim()) return;
@@ -6349,6 +6370,7 @@ app.on("activate", () => {
 // ── 优雅关闭 ──
 app.on("will-quit", () => {
   keepAwakeManager.dispose();
+  disposeSharedSpeechPermissionController();
   globalShortcut.unregisterAll();
   // 销毁托盘图标
   if (tray && !tray.isDestroyed()) {

@@ -37,7 +37,7 @@ import {
 
 export type { ComposerSendBundle };
 
-function createClientUserMessageId(): string {
+export function createClientUserMessageId(): string {
   const uuid = globalThis.crypto?.randomUUID?.();
   if (uuid) return `client-user-${uuid}`;
   return `client-user-${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -93,16 +93,76 @@ export interface ComposerSendOptions {
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
+export function modelUnavailableMessageKey(reason: string | null | undefined): string {
+  if (reason === 'model_removed') return 'model.unavailableReason.modelRemoved';
+  if (reason === 'provider_not_configured') return 'model.unavailableReason.providerNotConfigured';
+  return 'model.unavailableReason.temporarilyUnavailable';
+}
+
 /**
- * 派发一条已准备好的消息：预检 → base64 读取 → finalText 拼装 → 乐观消息 → ws 发送。
- * 抛错时乐观消息已标记失败；排队续发方负责 toast 兜底。
+ * 派发显式结果（F1/P2.2）：不再以 Promise<void> 混淆成功与阻止。
+ * - transport_submitted：仅表示 WebSocket 提交动作成功，不代表服务端已接收/落盘。
+ * - blocked：门禁/预检拦下，没有发送；输入与快照原位保留，可按语义重试。
+ * - failed_before_submit：准备/提交执行失败，乐观消息若已创建则同卡标失败。
+ * - delivery_unknown：提交后断线或回执超时，服务端是否收到不可证；禁止自动重发。
  */
-export async function dispatchComposerSend(
+export type ComposerDispatchResult =
+  | { kind: 'transport_submitted'; clientMessageId: string }
+  | { kind: 'blocked'; code: string; retryable: boolean }
+  | { kind: 'failed_before_submit'; code: string; retryable: boolean }
+  | { kind: 'delivery_unknown'; clientMessageId: string; code: string };
+
+/** prepare 阶段的可能失败：尚未上线路由，只会是 blocked / failed_before_submit。 */
+export type ComposerPreSubmitResult = Extract<ComposerDispatchResult, { kind: 'blocked' | 'failed_before_submit' }>;
+/** commit 的返回：要么提交成功，要么提交前明确失败/被拦；delivery_unknown 只来自提交后的看门狗/断连。 */
+export type ComposerCommitResult = Exclude<ComposerDispatchResult, { kind: 'delivery_unknown' }>;
+
+/** prepare 的产出：commit 所需的全部载荷与上下文（不持有租约语义）。 */
+export interface PreparedComposerSend {
+  bundle: ComposerSendBundle;
+  clientMessageId: string;
+  sessionPathForSend: string;
+  /** 预检所用模型（provider:id）；commit 重新核验模型未变更。 */
+  modelKey: string | null;
+  finalText: string;
+  displayMessage: Record<string, unknown>;
+  wsMsg: Record<string, unknown>;
+  optimisticMessage: Record<string, unknown>;
+}
+
+export type ComposerPrepareOutcome =
+  | { ok: true; prepared: PreparedComposerSend }
+  | { ok: false; result: ComposerPreSubmitResult };
+
+export interface ComposerPrepareOptions extends ComposerSendOptions {
+  /** 复用既有逻辑消息身份（租约/重试）；缺省生成新 clientMessageId。 */
+  clientMessageId?: string;
+}
+
+function webSocketOpenOrMissing(): 'open' | 'unavailable' {
+  const ws = getWebSocket();
+  if (!ws) return 'unavailable';
+  // 测试 mock 可能不带 readyState；真实 WebSocket 必带，非 OPEN 一律拦截。
+  if (typeof ws.readyState === 'number' && ws.readyState !== WebSocket.OPEN) return 'unavailable';
+  return 'open';
+}
+
+/**
+ * 准备阶段：模型快照 → 预检 → base64 读取 → finalText/载荷拼装。
+ * 每个预检分支都返回显式结果；图片「提示后退化为文件引用」策略保留。
+ * 不产生任何副作用式清理，也不创建乐观消息。
+ */
+export async function prepareComposerSend(
   bundle: ComposerSendBundle,
-  options: ComposerSendOptions,
-): Promise<void> {
+  options: ComposerPrepareOptions,
+): Promise<ComposerPrepareOutcome> {
   const { loadVisionAuxiliaryConfig, t } = options;
   const sessionRef = bundle.sessionRef;
+
+  // WebSocket 不存在/非 OPEN：连准备都不必做，明确 blocked（输入保留）。
+  if (webSocketOpenOrMissing() !== 'open') {
+    return { ok: false, result: { kind: 'blocked', code: 'websocket_unavailable', retryable: true } };
+  }
 
   // 派发时刻的模型快照（排队消息按「实际发出时」的模型能力预检，而非入队时刻）。
   const state = useStore.getState();
@@ -117,6 +177,17 @@ export async function dispatchComposerSend(
     return full ? { ...full, ...sessionModel } : sessionModel;
   })();
   const currentModelInfo = sessionModelInfo || globalModelInfo;
+  const modelKey = currentModelInfo ? `${currentModelInfo.provider}:${currentModelInfo.id}` : null;
+  // 模型被显式标记不可用：明确 blocked（与 InputArea 的点击侧守卫同一语义）。
+  if (sessionModelInfo && (sessionModelInfo as { available?: boolean }).available === false) {
+    useStore.getState().addToast(
+      t(modelUnavailableMessageKey((sessionModelInfo as { unavailableReason?: string }).unavailableReason)),
+      'warning',
+      6000,
+      { dedupeKey: 'session-model-unavailable' },
+    );
+    return { ok: false, result: { kind: 'blocked', code: 'model_unavailable', retryable: false } };
+  }
   // input 数组缺失视为未知；只有显式 text-only 的模型才标记“辅助视觉”。
   const supportsVision = !Array.isArray(currentModelInfo?.input) || currentModelInfo.input.includes('image');
 
@@ -154,7 +225,7 @@ export async function dispatchComposerSend(
   });
   if (videoFiles.length > 3) {
     useStore.getState().addToast(t('error.maxVideos', { max: 3 }), 'error', 6000);
-    return;
+    return { ok: false, result: { kind: 'blocked', code: 'video_count_exceeded', retryable: false } };
   }
   const sendVideosNatively = videoPreflight.ok && videoPreflight.reason === 'native-video';
   if (!videoPreflight.ok) {
@@ -165,14 +236,14 @@ export async function dispatchComposerSend(
         addToast: useStore.getState().addToast,
         mimeType: videoPreflight.mimeType,
       });
-    } else {
-      notifyVideoSendBlockedByModel({
-        t,
-        addToast: useStore.getState().addToast,
-        openSettings: () => openProviderModelSettings(currentModelInfo?.provider),
-      });
+      return { ok: false, result: { kind: 'blocked', code: 'video_format_unsupported', retryable: false } };
     }
-    return;
+    notifyVideoSendBlockedByModel({
+      t,
+      addToast: useStore.getState().addToast,
+      openSettings: () => openProviderModelSettings(currentModelInfo?.provider),
+    });
+    return { ok: false, result: { kind: 'blocked', code: 'video_blocked_by_model', retryable: false } };
   }
   const audioPreflight = await evaluateChatAudioSendPreflight({
     attachments: inputFiles,
@@ -262,7 +333,7 @@ export async function dispatchComposerSend(
       useStore.getState().addToast(t('input.audioReadFailed'), 'error', 6000, {
         dedupeKey: `audio-read-failed:${audio.path}`,
       });
-      return;
+      return { ok: false, result: { kind: 'failed_before_submit', code: 'audio_read_failed', retryable: true } };
     }
   }
   for (const video of sendVideosNatively ? videoFiles : []) {
@@ -295,7 +366,7 @@ export async function dispatchComposerSend(
       useStore.getState().addToast(t('input.videoReadFailed'), 'error', 6000, {
         dedupeKey: `video-read-failed:${video.path}`,
       });
-      return;
+      return { ok: false, result: { kind: 'failed_before_submit', code: 'video_read_failed', retryable: true } };
     }
   }
 
@@ -318,7 +389,7 @@ export async function dispatchComposerSend(
   const allFiles = [...inputFiles];
   if (docForRender) allFiles.push({ path: docForRender.path, name: docForRender.name });
 
-  const clientMessageId = createClientUserMessageId();
+  const clientMessageId = options.clientMessageId || createClientUserMessageId();
   const displayMessage = {
     text,
     skills: skills.length > 0 ? skills : undefined,
@@ -353,7 +424,7 @@ export async function dispatchComposerSend(
     }) : undefined,
   };
 
-  useStore.getState().appendOptimisticUserMessage(sessionPathForSend, {
+  const optimisticMessage = {
     id: clientMessageId,
     role: 'user',
     text,
@@ -369,9 +440,8 @@ export async function dispatchComposerSend(
       reviewerAgentId: agentMentions[0].agentId,
       reviewerAgentName: agentMentions[0].label,
     } : undefined,
-  });
+  };
 
-  const ws = getWebSocket();
   const wsMsg: Record<string, unknown> = {
     type: bundle.type,
     clientMessageId,
@@ -394,34 +464,97 @@ export async function dispatchComposerSend(
       mode: bundle.knowledgeRefs.mode,
     };
   }
-  if (!ws) {
-    useStore.getState().markOptimisticUserMessageFailed(
-      sessionPathForSend,
+
+  return {
+    ok: true,
+    prepared: {
+      bundle,
       clientMessageId,
-      'websocket_unavailable',
-    );
-    return;
+      sessionPathForSend,
+      modelKey,
+      finalText,
+      displayMessage,
+      wsMsg,
+      optimisticMessage,
+    },
+  };
+}
+
+export interface ComposerCommitRuntime {
+  t: ComposerSendOptions['t'];
+  /**
+   * 提交前的同步复核（租约/连接代次/会话身份/模型/目标 run）：返回非 null
+   * 即拒绝提交——此时不得清理输入、不得创建乐观消息。由调用方（coordinator
+   * 或薄封装）提供；缺省仅做 ws 可用性检查。
+   */
+  revalidate?: () => ComposerPreSubmitResult | null;
+  /** 复核通过后、乐观消息创建前的同步钩子（InputArea 的输入清理）。 */
+  onCommit?: () => void;
+}
+
+/**
+ * 提交阶段：同步复核 → （可选）输入清理钩子 → 乐观消息 → ws 发送。
+ * 复核与发送在同一个同步窗口内完成，期间没有 await，杜绝「准备完成到实际
+ * 发送之间」的状态漂移。
+ */
+export async function commitPreparedComposerSend(
+  prepared: PreparedComposerSend,
+  runtime: ComposerCommitRuntime,
+): Promise<ComposerCommitResult> {
+  const sessionPathForSend = prepared.sessionPathForSend;
+  const clientMessageId = prepared.clientMessageId;
+
+  const rejection = runtime.revalidate?.() ?? null;
+  if (rejection) return rejection;
+
+  const ws = getWebSocket();
+  if (!ws || (typeof ws.readyState === 'number' && ws.readyState !== WebSocket.OPEN)) {
+    return { kind: 'failed_before_submit', code: 'websocket_unavailable', retryable: true };
   }
+
+  // 复核通过：内容随派发落定，调用方做输入清理（草稿/附件/引用/编辑器）。
+  runtime.onCommit?.();
+
+  useStore.getState().appendOptimisticUserMessage(sessionPathForSend, prepared.optimisticMessage as never);
   try {
-    ws.send(JSON.stringify(wsMsg));
+    ws.send(JSON.stringify(prepared.wsMsg));
     // 发送即进入「等待助手」态：服务器在知识检索/排队期间不置 isStreaming，
     // 本地先亮 typing 指示器，首个该 session 的后续事件（status / 流事件 /
     // error）到达即清（见 ws-message-handler 顶部保守清除）。仅限 prompt——
     // interject 发生在流式态中，指示器已由 isStreaming 覆盖。
-    if (bundle.type === 'prompt') {
+    if (prepared.bundle.type === 'prompt') {
       useStore.getState().beginTurnPending?.(sessionPathForSend);
       // 携带知识库引用的提问：发送瞬间本地点亮「知识库检索中」——服务器在
       // 检索/蒸馏期间不发任何流事件，此前这段时间只剩裸三点指示器（用户
       // 完全看不到动作）。本地置位与服务器 knowledge_retrieval_started 幂等
       // 合流，清除沿用顶部保守清除。
-      if (wsMsg.knowledgeRefs) {
+      if (prepared.wsMsg.knowledgeRefs) {
         useStore.getState().beginKnowledgeRetrieval?.(sessionPathForSend);
       }
     }
-    upsertOptimisticSessionFirstMessage(sessionPathForSend, text, new Date().toISOString());
+    upsertOptimisticSessionFirstMessage(sessionPathForSend, prepared.bundle.text, new Date().toISOString());
+    return { kind: 'transport_submitted', clientMessageId };
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    useStore.getState().markOptimisticUserMessageFailed(sessionPathForSend, clientMessageId, message);
-    throw err;
+    // 提交动作本身失败：乐观消息同卡标失败，记录保留完整快照供显式重试。
+    console.warn('[input] websocket send failed', err);
+    useStore.getState().markOptimisticUserMessageFailed(
+      sessionPathForSend,
+      clientMessageId,
+      err instanceof Error ? err.message : String(err),
+    );
+    return { kind: 'failed_before_submit', code: 'ws_send_threw', retryable: true };
   }
+}
+
+/**
+ * 公开派发入口（判别联合结果）：普通发送/排队续发/立即插入共用
+ * prepare → commit 两段式；coordinator 以租约语义包裹同一对阶段。
+ */
+export async function dispatchComposerSend(
+  bundle: ComposerSendBundle,
+  options: ComposerSendOptions,
+): Promise<ComposerDispatchResult> {
+  const prep = await prepareComposerSend(bundle, options);
+  if (prep.ok === false) return prep.result;
+  return commitPreparedComposerSend(prep.prepared, { t: options.t });
 }

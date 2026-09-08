@@ -107,7 +107,9 @@ export function createMediaRoute(engine) {
   route.post("/media/asr/transcribe", async (c) => {
     try {
       const body = await safeJson(c);
-      const result = await requireMediaManager(engine).transcribeAudio(body);
+      // F6：把已认证请求的生命周期信号透传进转写链——客户端断开时取消在途
+      // 识别（取消/超时绝不记为成功；取消语义由适配器层强制执行）。
+      const result = await requireMediaManager(engine).transcribeAudio({ ...body, signal: c.req.raw.signal });
       return c.json(result);
     } catch (err) {
       return c.json({ error: err.message }, 400);

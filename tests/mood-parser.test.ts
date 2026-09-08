@@ -120,11 +120,11 @@ describe("MoodParser", () => {
     ]);
   });
 
-  it("treats an escaped opener as literal text", () => {
+  it("treats an escaped opener as literal text (F8/P6.3: backslash preserved on-chain)", () => {
     const events = collect(["\\<mood>A</mood>"]);
     expect(events.every((event) => event.type === "text")).toBe(true);
-    // 反斜杠被消费，标签按字面量保留
-    expect(visibleText(events)).toBe("<mood>A</mood>");
+    // 反斜杠随字面量保留到显示层一次性消费
+    expect(visibleText(events)).toBe("\\<mood>A</mood>");
   });
 
   it("treats tag content as opaque: the first matching closer ends the block", () => {
@@ -138,10 +138,10 @@ describe("MoodParser", () => {
     ]);
   });
 
-  it("handles an escape split across chunks", () => {
+  it("handles an escape split across chunks (backslash preserved on-chain)", () => {
     const events = collect(["文字\\", "<mood>A</mood>"]);
     expect(events.every((event) => event.type === "text")).toBe(true);
-    expect(visibleText(events)).toBe("文字<mood>A</mood>");
+    expect(visibleText(events)).toBe("文字\\<mood>A</mood>");
   });
 
   it("re-arms leading mood eligibility on an explicit new assistant segment", () => {

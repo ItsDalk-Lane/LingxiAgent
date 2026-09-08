@@ -1,0 +1,30 @@
+ ❯ desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx (18 tests | 16 failed) 2148ms
+ FAIL  desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx > InputArea system dictation (F7/P5) > D01: text-only model can dictate start→stop→transcribe and is not discarded by the old capability effect
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx:390:28
+ FAIL  desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx > InputArea system dictation (F7/P5) > D02: native-audio model — dictation inserts text while audio mode still sends the native attachment
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx:407:28
+ FAIL  desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx > InputArea system dictation (F7/P5) > D03: toggling dictate then immediately recording uses the new mode (no stale closure)
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx:451:27
+ FAIL  desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx > InputArea system dictation (F7/P5) > D04: switching mode during recording follows the modeAtStart snapshot
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx:471:28
+ FAIL  desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx > InputArea system dictation (F7/P5) > D04b: native-audio recording snapshot survives a mid-recording switch to dictate
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19

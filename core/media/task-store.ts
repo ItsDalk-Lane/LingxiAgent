@@ -340,6 +340,105 @@ export class TaskStore {
   }
 
   /**
+   * F12/P8.3：同步语音产物的收尾原语（仅 response 投递使用）。
+   *
+   * 1. files 必须非空、每个条目位于 generated 根目录内且真实存在（不信任
+   *    任意路径，拒绝 .. 逃逸）；
+   * 2. 验证通过 → status='done'、submitState='completed'、completedAt 定格、
+   *    清除 failReason；调用返回前内存即终态（沿用 debounce 持久化，不谎称
+   *    同步 fsync）；
+   * 3. 幂等：已 done 的任务重复完成不改变完成时间、不新增任务；
+   *    已 cancelled/failed/aborted 的任务不得被无条件改 done；
+   * 4. 验证失败 → 任务标明确失败并返回 { ok:false }，由调用方把错误抛出。
+   */
+  completeSynchronousSpeechTask(taskId, { files = [], generatedDir }: Record<string, any> = {}) {
+    const task = this._tasks.get(taskId);
+    if (!task) {
+      return { ok: false, error: `TaskStore: task not found: ${taskId}` };
+    }
+    if (task.status === "done") {
+      return { ok: true, idempotent: true, task: { ...task } };
+    }
+    if (task.status === "cancelled" || task.status === "failed" || task.status === "aborted") {
+      return { ok: false, error: `TaskStore: cannot complete ${task.status} task ${taskId}` };
+    }
+    const fail = (reason) => {
+      this.update(taskId, { status: "failed", submitState: "failed", failReason: reason });
+      return { ok: false, error: reason };
+    };
+    if (!Array.isArray(files) || files.length === 0) {
+      return fail("speech generation returned no output files");
+    }
+    for (const file of files) {
+      if (typeof file !== "string" || !file.trim()) {
+        return fail("speech generation returned an invalid file entry");
+      }
+      if (!this._isFileInsideGeneratedDir(file, generatedDir)) {
+        return fail(`speech output escapes generated dir: ${file}`);
+      }
+      if (!fs.existsSync(path.resolve(generatedDir, file))) {
+        return fail(`speech output file missing: ${file}`);
+      }
+    }
+    this.update(taskId, {
+      status: "done",
+      submitState: "completed",
+      completedAt: new Date().toISOString(),
+      failReason: null,
+      files: [...files],
+    });
+    return { ok: true, task: { ...this._tasks.get(taskId) } };
+  }
+
+  _isFileInsideGeneratedDir(file, generatedDir) {
+    const root = path.resolve(generatedDir);
+    const abs = path.resolve(root, file);
+    return abs === root || abs.startsWith(root + path.sep);
+  }
+
+  /**
+   * F12/P8.4：旧 pending 记录恢复（幂等收尾）。
+   *
+   * 只处理 type='speech' && delivery.mode='response' && status='pending' 的
+   * 记录：文件全部真实存在 → 标 done；文件缺失 → 标明确失败。不重新合成、
+   * 不向会话通知、不产生新的模型调用/用量。已终态的记录不改写；图片/视频
+   * pending 任务一律不动。
+   */
+  recoverSynchronousSpeechTasks({ generatedDir, now = () => new Date().toISOString() }: Record<string, any> = {}) {
+    if (!generatedDir) return 0;
+    let changed = 0;
+    for (const task of this._tasks.values()) {
+      if (task.type !== "speech") continue;
+      const mode = task.deliveryMode || task.delivery?.mode;
+      if (mode !== "response") continue;
+      if (task.status !== "pending") continue;
+      const files = Array.isArray(task.files) ? task.files : [];
+      const allExist = files.length > 0 && files.every((file) => (
+        typeof file === "string"
+        && file.trim()
+        && this._isFileInsideGeneratedDir(file, generatedDir)
+        && fs.existsSync(path.resolve(generatedDir, file))
+      ));
+      if (allExist) {
+        this.update(task.taskId, {
+          status: "done",
+          submitState: "completed",
+          completedAt: task.completedAt || now(),
+          failReason: null,
+        });
+      } else {
+        this.update(task.taskId, {
+          status: "failed",
+          submitState: "failed",
+          failReason: "speech output file missing after restart",
+        });
+      }
+      changed += 1;
+    }
+    return changed;
+  }
+
+  /**
    * Merge partial fields into an existing task.
    * Returns the updated shallow copy, or null if not found.
    *

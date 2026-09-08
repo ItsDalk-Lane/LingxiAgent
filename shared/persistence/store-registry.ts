@@ -498,6 +498,8 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
       "agents/{agentId}/memory/memory.md",
       "agents/{agentId}/memory/navigation.md",
       "agents/{agentId}/memory/tenets.json",
+      "agents/{agentId}/memory/pinned-tenets-migration.receipt.json",
+      "agents/{agentId}/memory/pinned-migration-backup/{backupFile}",
       "agents/{agentId}/memory/facts.md",
       "agents/{agentId}/memory/today.md",
       "agents/{agentId}/memory/week.md",
@@ -521,9 +523,14 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
     siteRules: [
       ...rules(["core/agent.ts"], "Creates the memory directory and records legacy memories.db import state.", ["write-file", "mkdir"]),
       // Startup one-shot: merges legacy pinned.md / pinned-memory.json items into
-      // tenets.json (through the tenets library) and renames the old files to
-      // *.migrated within the same agent directory.
-      ...rules(["core/pinned-tenets-migration.ts"], "Merges legacy pinned items into tenets.json and renames the legacy files.", ["write-file", "rename", "mkdir"]),
+      // tenets.json (through the tenets library), keeps a content-addressed local
+      // backup, maintains the migration receipt state machine, and renames the old
+      // files to *.migrated within the same agent directory.
+      ...rules(["core/pinned-tenets-migration.ts"], "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.", ["write-file", "rename", "mkdir", "copy-file", "atomic-write"]),
+      // Explicit, approval-gated recovery of archived .migrated pinned sources;
+      // same batch import + receipt mechanism as the startup migration. Never
+      // wired into any startup path.
+      ...rules(["core/pinned-tenets-recovery.ts"], "Restores approved archived pinned items and writes the recovery receipt.", ["write-file", "mkdir", "atomic-write"]),
       ...rules([
         "lib/memory/cache-snapshot-observation.ts",
         "lib/memory/compile.ts",

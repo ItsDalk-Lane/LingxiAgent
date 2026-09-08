@@ -144,6 +144,12 @@ export function parseUserAttachments(content: string): ParsedAttachments {
   content = skillNotes.text;
   const lines = content.split('\n');
   const textLines: string[] = [];
+  // F10/P7.4：协议附加块（[附件]/[引用片段]/SessionFile 等）由发送链以
+  // `\n\n` 追加在用户正文之后。解析摘除协议行时，同步摘除其前面的分隔空行
+  // （系统残渣，不是用户输入）；正文内部的空行不受影响。
+  const dropPendingSeparatorBlanks = () => {
+    while (textLines.length > 0 && textLines[textLines.length - 1] === '') textLines.pop();
+  };
   const files: Array<{ path: string; name: string; isDirectory: boolean }> = [];
   const attachedImages: Array<{ path: string; name: string }> = [];
   const attachedVideos: Array<{ path: string; name: string }> = [];
@@ -182,6 +188,7 @@ export function parseUserAttachments(content: string): ParsedAttachments {
     const sessionFileRef = parseSessionFileMarker(line);
     if (sessionFileRef) {
       pendingQuoteOriginal = false;
+      dropPendingSeparatorBlanks();
       sessionFileRefs.push(sessionFileRef);
       continue;
     }
@@ -190,6 +197,7 @@ export function parseUserAttachments(content: string): ParsedAttachments {
     if (deskMatch) {
       inDeskBlock = true;
       pendingQuoteOriginal = false;
+      dropPendingSeparatorBlanks();
       deskContext = { dir: deskMatch[1].trim(), fileCount: 0 };
       continue;
     }
@@ -207,12 +215,14 @@ export function parseUserAttachments(content: string): ParsedAttachments {
       const titleMatch = raw.match(/^(.+?)（第\d/);
       quotedText = titleMatch ? titleMatch[1].trim() : raw.trim();
       pendingQuoteOriginal = true;
+      dropPendingSeparatorBlanks();
       continue;
     }
 
     const attachedImageMatch = line.match(attachedImageRe);
     if (attachedImageMatch) {
       pendingQuoteOriginal = false;
+      dropPendingSeparatorBlanks();
       const p = attachedImageMatch[1].trim();
       attachedImages.push({ path: p, name: baseName(p) });
       continue;
@@ -221,6 +231,7 @@ export function parseUserAttachments(content: string): ParsedAttachments {
     const attachedVideoMatch = line.match(attachedVideoRe);
     if (attachedVideoMatch) {
       pendingQuoteOriginal = false;
+      dropPendingSeparatorBlanks();
       const p = attachedVideoMatch[1].trim();
       attachedVideos.push({ path: p, name: baseName(p) });
       continue;
@@ -229,6 +240,7 @@ export function parseUserAttachments(content: string): ParsedAttachments {
     const attachedAudioMatch = line.match(attachedAudioRe);
     if (attachedAudioMatch) {
       pendingQuoteOriginal = false;
+      dropPendingSeparatorBlanks();
       const p = attachedAudioMatch[1].trim();
       attachedAudios.push({ path: p, name: baseName(p) });
       continue;
@@ -240,13 +252,16 @@ export function parseUserAttachments(content: string): ParsedAttachments {
       const p = m[2].trim();
       const name = baseName(p);
       pendingQuoteOriginal = false;
+      dropPendingSeparatorBlanks();
       files.push({ path: p, name, isDirectory: isDir });
     } else {
       pendingQuoteOriginal = false;
       textLines.push(line);
     }
   }
-  const text = textLines.join('\n').replace(/\n+$/, '').trim();
+  // F10/P7.4：用户正文不做边界修剪——协议标记行已被摘除，剩余文本逐字符
+  // 保留（首尾空格/换行/空行与落盘一致）；空白判空由展示层谓词负责。
+  const text = textLines.join('\n');
   return { text, skills: skillNotes.skills, files, attachedImages, attachedVideos, attachedAudios, sessionFileRefs, deskContext, quotedText };
 }
 

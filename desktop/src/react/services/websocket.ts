@@ -29,6 +29,10 @@ import {
   requestTerminalSnapshot,
 } from './terminal-client';
 import { configureBackgroundProcessWebSocketGetter } from './background-process-control';
+import {
+  noteComposerConnectionClosed,
+  noteComposerConnectionOpened,
+} from './composer-send-coordinator';
 
 // ── 模块级 WS 实例 ──
 let _ws: WebSocket | null = null;
@@ -127,6 +131,8 @@ async function openConnectionWebSocket(connection: ServerConnection): Promise<vo
   _ws.onopen = () => {
     _wsRetryDelay = 1000;
     _wsRetryCount = 0;
+    // 连接代次递增：旧代次上准备中的发送在提交复核时会被拒绝（F2）。
+    noteComposerConnectionOpened();
     setStatus('status.connected', true);
     useStore.setState({
       wsState: 'connected',
@@ -181,6 +187,9 @@ async function openConnectionWebSocket(connection: ServerConnection): Promise<vo
     // 断连后再不会有后续事件来清「等待助手」pending；streamingSessions 保留
     // （重连 resume 靠它圈目标），pending 必须就地全清，否则挂出永久指示器。
     useStore.getState().clearAllTurnPending?.();
+    // 在途发送的回执随连接消失：标记 delivery_unknown（禁止自动重发），
+    // 连接代次递增使旧代次的准备任务在提交时被拒绝。
+    noteComposerConnectionClosed();
     scheduleReconnect();
   };
 

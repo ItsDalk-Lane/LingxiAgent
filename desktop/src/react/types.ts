@@ -74,6 +74,15 @@ export interface AutoUpdateState {
 
 export type UpdateChannel = 'default' | 'alpha';
 
+/** 宿主 Speech 授权状态（desktop/speech-permissions.cjs 的 SPEECH_PERMISSION_STATES）。 */
+export type SpeechPermissionState =
+  | 'not_determined'
+  | 'authorized'
+  | 'denied'
+  | 'restricted'
+  | 'unsupported'
+  | 'bridge_unavailable';
+
 /** train-update-status 里 `available` 字段的形状：检查阶段发现的、尚未下载的一班车 */
 export interface TrainUpdateAvailable {
   train: number;
@@ -580,6 +589,11 @@ export interface PlatformApi {
 
   // ── App info ──
   getAppVersion?(): Promise<string>;
+  // ── 系统语音识别授权（macOS Speech 框架，F4）──
+  // status 只读查询（不触发系统弹窗）；request 由用户手势（按下录音键）发起。
+  // 状态集合：not_determined/authorized/denied/restricted/unsupported/bridge_unavailable。
+  speechPermissionStatus?(): Promise<SpeechPermissionState>;
+  speechPermissionRequest?(): Promise<SpeechPermissionState>;
   /**
    * 查询 GitHub 最新 release，与当前壳版本比对。About 页"检查更新"主出口：
    * 返回 latest（已是最新）/ available（发现新版本，带 releaseUrl）/ error（网络失败）。

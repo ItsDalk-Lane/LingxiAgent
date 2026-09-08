@@ -22,17 +22,23 @@ const execFileAsync = promisify(execFile);
 /** OpenAI TTS 支持的响应格式（mime → 扩展名走 saveImage 的扩展表） */
 const OPENAI_SPEECH_FORMATS = new Set(["mp3", "opus", "aac", "flac", "wav", "pcm"]);
 
-function resolveSpeechBody(params, providerDefaults) {
+/**
+ * F11/P8.2：请求体解析只认显式/manager 已解析的语音参数（providerDefaults
+ * 已在 UniversalMediaManager 按 speech 域解析并注入 params），不再读取任何
+ * ctx.config。缺失（undefined/null）与非法值语义显式区分：
+ *   - voice/format 缺失 → 协议默认；非法 → 回落协议默认（白名单）；
+ *   - speed 仅接受有限数字（0 是合法显式取值），null/undefined 绝不经过
+ *     Number() 隐式转换（旧实现 Number(null)=0 会吞掉缺失语义）。
+ */
+function resolveSpeechBody(params) {
   const input = typeof params.prompt === "string" ? params.prompt : String(params.prompt ?? "");
-  const model = params.modelId || params.model || providerDefaults?.model || "tts-1";
-  const voice = params.voice || providerDefaults?.voice || "alloy";
-  const format = OPENAI_SPEECH_FORMATS.has(params.format) ? params.format
-    : OPENAI_SPEECH_FORMATS.has(providerDefaults?.format) ? providerDefaults.format : "mp3";
-  const speed = Number.isFinite(Number(params.speed))
-    ? Math.min(4, Math.max(0.25, Number(params.speed)))
-    : (Number.isFinite(Number(providerDefaults?.speed))
-      ? Math.min(4, Math.max(0.25, Number(providerDefaults.speed)))
-      : 1.0);
+  // 模型身份只来自已解析的 execution target；默认参数不得改写模型
+  const model = params.modelId || params.model || "tts-1";
+  const voice = typeof params.voice === "string" && params.voice.trim() ? params.voice : "alloy";
+  const format = OPENAI_SPEECH_FORMATS.has(params.format) ? params.format : "mp3";
+  const speed = typeof params.speed === "number" && Number.isFinite(params.speed)
+    ? Math.min(4, Math.max(0.25, params.speed))
+    : 1.0;
   return { model, voice, format, speed, input };
 }
 
@@ -69,8 +75,7 @@ export const openaiSpeechAdapter = {
     const { apiKey, baseUrl } = creds;
     if (!baseUrl) throw new Error(`provider "${providerId}" has no base url`);
 
-    const providerDefaults = ctx.config?.get?.("providerDefaults")?.[providerId] || {};
-    const { model, voice, format, speed, input } = resolveSpeechBody(params, providerDefaults);
+    const { model, voice, format, speed, input } = resolveSpeechBody(params);
 
     const base = baseUrl.replace(/\/+$/, "");
     const response = await fetch(`${base}/audio/speech`, {
@@ -145,13 +150,12 @@ export const minimaxSpeechAdapter = {
     if (!groupId) {
       throw new Error("MiniMax speech requires a GroupId configured on the model entry (settings > providers > model > GroupId)");
     }
-    const providerDefaults = ctx.config?.get?.("providerDefaults")?.[providerId] || {};
-    const model = params.modelId || params.model || providerDefaults?.model || "speech-02-hd";
-    const voice = params.voice || providerDefaults?.voice || "male-qn-qingse";
-    const format = ["mp3", "wav", "pcm", "flac"].includes(params.format) ? params.format
-      : ["mp3", "wav", "pcm", "flac"].includes(providerDefaults?.format) ? providerDefaults.format : "mp3";
-    const speed = Number.isFinite(Number(params.speed))
-      ? Math.min(2, Math.max(0.5, Number(params.speed)))
+    // F11/P8.2：参数只来自显式/manager 已解析的语音参数，不读取图片 ctx.config
+    const model = params.modelId || params.model || "speech-02-hd";
+    const voice = typeof params.voice === "string" && params.voice.trim() ? params.voice : "male-qn-qingse";
+    const format = ["mp3", "wav", "pcm", "flac"].includes(params.format) ? params.format : "mp3";
+    const speed = typeof params.speed === "number" && Number.isFinite(params.speed)
+      ? Math.min(2, Math.max(0.5, params.speed))
       : 1.0;
 
     let origin: string;
@@ -236,9 +240,9 @@ export const dashscopeSpeechAdapter = {
       throw new Error(`provider "${providerId}" base url is invalid`);
     }
 
-    const providerDefaults = ctx.config?.get?.("providerDefaults")?.[providerId] || {};
-    const model = params.modelId || params.model || providerDefaults?.model || "qwen-tts-latest";
-    const voice = params.voice || providerDefaults?.voice || "Cherry";
+    // F11/P8.2：参数只来自显式/manager 已解析的语音参数，不读取图片 ctx.config
+    const model = params.modelId || params.model || "qwen-tts-latest";
+    const voice = typeof params.voice === "string" && params.voice.trim() ? params.voice : "Cherry";
 
     const generateResponse = await fetch(`${origin}/api/v1/services/aigc/multimodal-generation/generation`, {
       method: "POST",

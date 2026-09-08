@@ -5,6 +5,7 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { InputArea } from '../../components/InputArea';
 import { useStore } from '../../stores';
+import { resetComposerSendCoordinatorForTests } from '../../services/composer-send-coordinator';
 
 const mocks = vi.hoisted(() => ({
   clearContent: vi.fn(),
@@ -284,6 +285,9 @@ describe('InputArea media send', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // 发送租约/回执门禁是模块级状态：用例间必须复位，否则上一条
+    // awaiting_ack 租约会按设计拦截后续发送（F2 串行语义）。
+    resetComposerSendCoordinatorForTests();
     mocks.ensureSession.mockResolvedValue({
       sessionId: 'sess_media',
       sessionPath: '/session/media.jsonl',

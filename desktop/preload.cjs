@@ -35,6 +35,9 @@ contextBridge.exposeInMainWorld("hana", {
   getServerToken: () => ipcRenderer.invoke("get-server-token"),
   runEditCommand: (command) => ipcRenderer.invoke("run-edit-command", command),
   getAppVersion: () => ipcRenderer.invoke("get-app-version"),
+  // 系统语音识别授权（macOS Speech 框架）：status 只读不弹窗；request 由用户手势触发。
+  speechPermissionStatus: () => ipcRenderer.invoke("speech-permission-status"),
+  speechPermissionRequest: () => ipcRenderer.invoke("speech-permission-request"),
   // About 页"检查更新"：查 GitHub 最新 release 是否比当前版本新。
   releaseCheckLatest: () => ipcRenderer.invoke("release-check-latest"),
   getPendingAnnouncement: () => ipcRenderer.invoke("get-pending-announcement"),

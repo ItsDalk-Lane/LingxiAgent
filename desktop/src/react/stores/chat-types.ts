@@ -41,6 +41,21 @@ export interface QueuedTurnInput {
   text: string;
   createdAt: number;
   bundle: ComposerSendBundle;
+  /**
+   * 快照版本：编辑保存递增（F1）。在途准备按版本对账，迟到的旧版本结果
+   * 不得覆盖更新后的队列项。
+   */
+  snapshotVersion?: number;
+  /**
+   * 调度状态：ready = 等待自动/手动派发；blocked / failed = 上次派发被门禁
+   * 拦下或提交前失败，队列项原位保留全部字段，等待用户编辑/删除/显式重试
+   *（自动调度不会在失败项上无限循环，也不跳过队首）。
+   */
+  status?: 'ready' | 'blocked' | 'failed';
+  /** blocked/failed 时的显式错误码（与 ComposerDispatchResult.code 一致）。 */
+  errorCode?: string;
+  /** 上次失败是否允许按原快照显式重试（默认 true；门禁类 blocked 为 false）。 */
+  retryable?: boolean;
 }
 
 /**

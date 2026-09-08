@@ -11,11 +11,11 @@ import { Type } from "../pi-sdk/index.ts";
 import { t } from "../i18n.ts";
 import { scrubPII } from "../pii-guard.ts";
 import { createModuleLogger } from "../debug-log.ts";
+import { toolError } from "./tool-result.ts";
 import {
   activeTenets,
   addTenetDirect,
   removeTenet,
-  TENET_ERRORS,
   isTenetError,
 } from "../memory/tenets.ts";
 
@@ -66,12 +66,11 @@ export function createPinnedMemoryTools(agentDir: string) {
           content: [{ type: "text", text: t("error.pinnedAdded", { content: cleaned }) }],
           details: { item: { id: result.tenet.id, content: result.tenet.content, createdAt: result.tenet.createdAt } },
         };
-      } catch (err) {
-        if (isTenetError(err, TENET_ERRORS.LIMIT_REACHED)) {
-          return {
-            content: [{ type: "text", text: t("error.pinnedAdded", { content: cleaned }) + " (storage full)" }],
-            details: { errorCode: TENET_ERRORS.LIMIT_REACHED },
-          };
+      } catch (err: any) {
+        // 写入失败必须按工具失败契约返回并保留具体错误码；
+        // 不得返回「已添加」式成功文案（旧实现会把 INVALID 错报成容量满的假成功）。
+        if (isTenetError(err)) {
+          return toolError(err?.message || "failed to pin memory", { errorCode: err?.code });
         }
         throw err;
       }

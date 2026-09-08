@@ -117,10 +117,13 @@ export function serializeEditor(json: JSONContent): {
       if (child.type === 'paragraph') {
         const paragraph = serializeParagraph(child);
         if (!markerUsed) {
-          lines.push(`${indent}${marker}${paragraph}`);
+          // hardBreak 续行留在同一列表项内并带 marker 缩进（F10/P7.3）。
+          const [first, ...rest] = paragraph.split('\n');
+          lines.push(`${indent}${marker}${first}`);
           markerUsed = true;
+          for (const line of rest) lines.push(`${markerContinuation}${line}`);
         } else if (paragraph) {
-          lines.push(`${markerContinuation}${paragraph}`);
+          for (const line of paragraph.split('\n')) lines.push(`${markerContinuation}${line}`);
         }
         continue;
       }
@@ -163,8 +166,16 @@ export function serializeEditor(json: JSONContent): {
 
   function serializeBlock(node: JSONContent, indent = ''): string[] {
     if (node.type === 'paragraph') {
+      // F10/P7.3：空 paragraph 是用户可见的空行，参与序列化，不被
+      // `paragraph ? ... : []` 无条件丢弃。徽章独占段例外：胶囊化呈现，
+      // 不产出一个假空行（徽章本身已被提取到独立数组）。
       const paragraph = serializeParagraph(node);
-      return paragraph ? [`${indent}${paragraph}`] : [];
+      const badgeOnly = !paragraph && (node.content || []).some(child => (
+        child.type === 'skillBadge' || child.type === 'fileBadge'
+        || child.type === 'sessionBadge' || child.type === 'agentBadge'
+      ));
+      if (badgeOnly) return [];
+      return [`${indent}${paragraph}`];
     }
     if (node.type === 'bulletList' || node.type === 'orderedList') {
       return serializeList(node, indent);
@@ -181,7 +192,13 @@ export function serializeEditor(json: JSONContent): {
 
   const lines = serializeBlock(json);
 
-  const text = lines.join('\n').replace(/\n+$/, '').trim();
+  // F10/P7.3：非空正文原样保留（首尾空格/换行/空行零丢失）。空白判空是
+  // 调用方的独立谓词（trim 副本），不在这里收口。唯一例外：文档末尾的
+  // 真空段是 TipTap 的 schema 垫尾（列表后必补一个空 paragraph），不是
+  // 用户输入，剥掉；粘贴保真走段内 hardBreak 模型，不受影响。
+  while (lines.length > 1 && lines[lines.length - 1] === '') lines.pop();
+
+  const text = lines.join('\n');
 
   return { text, skills, fileRefs, sessionRefs, agentMentions };
 }
@@ -203,4 +220,27 @@ export function buildFaithfulPasteContent(text: string): JSONContent {
   });
   if (content.length === 0) return { type: 'paragraph' };
   return { type: 'paragraph', content };
+}
+
+/**
+ * F10/P7.3：在当前选区处按纯文本保真插入（粘贴的实际 insert 操作）。
+ *
+ * 插入的是行内节点序列（text + hardBreak），不套整段 paragraph：
+ * - 段落中间粘贴不会因插入完整 paragraph 多出首尾换行；
+ * - 选区替换直接替换选中的字符；
+ * - 空编辑器/列表项内同样落在当前段落，不拆块。
+ * 文本节点逐字符保留（`<tag>`、空格、缩进不进 HTML 解释），CRLF 归一为 LF。
+ */
+export function insertFaithfulPasteAtSelection(
+  editor: { chain: () => { focus: () => { insertContent: (content: JSONContent[]) => { run: () => void } } } },
+  text: string,
+): void {
+  const lines = text.replace(/\r\n?/g, '\n').split('\n');
+  const content: JSONContent[] = [];
+  lines.forEach((line, index) => {
+    if (index > 0) content.push({ type: 'hardBreak' });
+    if (line) content.push({ type: 'text', text: line });
+  });
+  if (content.length === 0) return;
+  editor.chain().focus().insertContent(content).run();
 }

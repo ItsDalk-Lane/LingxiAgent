@@ -229,3 +229,42 @@ export function resolveMediaParameters({
     resolvedParameters,
   };
 }
+
+/**
+ * F11/P8.2：局限于 speech 的参数解析步骤。
+ *
+ * 优先级固定：本次显式输入 > 该语音供应商默认参数（speech 域 providerDefaults，
+ * 按逻辑 provider 身份索引）> 协议默认值（由适配器按各协议边界收口）。
+ * 语义约定：
+ *   - 显式 undefined/null = 本次没有取值 → 用供应商默认（null 绝不能被
+ *     Number(null)=0 之类的隐式转换吞掉）；
+ *   - 显式非法值原样透传给协议层按既有边界处理，不在这里吞掉；
+ *   - 供应商默认只接受类型健全的值（voice/format 必须是非空字符串，
+ *     speed 必须是有限数字），否则视为未配置；
+ *   - 只输出解析到值的字段，未解析到的字段不出现（适配器见 undefined
+ *     才会落到协议默认）。
+ * 模型身份不参与本解析：execution target 已解析的模型不允许被默认参数改写。
+ */
+export function resolveSpeechParameters({
+  input = {},
+  providerDefaults = {},
+}: {
+  input?: Record<string, unknown>;
+  providerDefaults?: Record<string, unknown>;
+} = {}): { voice?: string; speed?: number; format?: string } {
+  const defaults = providerDefaults && typeof providerDefaults === "object" && !Array.isArray(providerDefaults)
+    ? providerDefaults
+    : {};
+  const defaultVoice = typeof defaults.voice === "string" && defaults.voice.trim() ? defaults.voice : undefined;
+  const defaultSpeed = typeof defaults.speed === "number" && Number.isFinite(defaults.speed) ? defaults.speed : undefined;
+  const defaultFormat = typeof defaults.format === "string" && defaults.format.trim() ? defaults.format : undefined;
+
+  const resolved: { voice?: string; speed?: number; format?: string } = {};
+  const voice = input.voice === undefined || input.voice === null ? defaultVoice : input.voice;
+  if (voice !== undefined) resolved.voice = voice as string;
+  const speed = input.speed === undefined || input.speed === null ? defaultSpeed : input.speed;
+  if (speed !== undefined) resolved.speed = speed as number;
+  const format = input.format === undefined || input.format === null ? defaultFormat : input.format;
+  if (format !== undefined) resolved.format = format as string;
+  return resolved;
+}

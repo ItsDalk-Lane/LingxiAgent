@@ -655,6 +655,8 @@
     "queuedInsertNow": "立即插入",
     "queuedInsertNowTitle": "把這條訊息立即插入正在進行的回答中",
     "queuedSendFailed": "排隊訊息發送失敗",
+    "queuedRetry": "重試",
+    "queuedInsertWaiting": "正在等待目前回答開始，請稍候再插入",
     "queuedDelete": "撤銷這條排隊訊息"
   },
   "agentReview": {

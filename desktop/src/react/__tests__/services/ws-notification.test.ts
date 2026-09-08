@@ -16,6 +16,9 @@ vi.mock('../../services/stream-resume', () => ({
   isStreamResumeRebuilding: () => null,
   isStreamScopedMessage: () => false,
   updateSessionStreamMeta: vi.fn(),
+  injectHandlers: vi.fn(),
+  injectWebSocketGetter: vi.fn(),
+  requestStreamResume: vi.fn(),
 }));
 vi.mock('../../services/stream-key-dispatcher', () => ({ dispatchStreamKey: vi.fn() }));
 

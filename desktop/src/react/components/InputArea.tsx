@@ -40,8 +40,22 @@ import { SendButton } from './input/SendButton';
 import type { PermissionMode } from './input/PlanModeButton';
 import { SessionConfirmationPrompt } from './input/SessionConfirmationPrompt';
 import { TenetApprovalBanner } from './input/TenetApprovalBanner';
-import { serializeEditor, buildFaithfulPasteContent } from '../utils/editor-serializer';
-import { dispatchComposerSend, type ComposerSendBundle } from './input/composer-send';
+import { serializeEditor, insertFaithfulPasteAtSelection } from '../utils/editor-serializer';
+import { modelUnavailableMessageKey, type ComposerSendBundle } from './input/composer-send';
+import {
+  cancelQueueItemSend,
+  cancelSendLease,
+  dispatchQueuedItem,
+  hasInFlightSend,
+  requestQueueFlush,
+  resolveQueuedInsertNowAction,
+  sendWithLease,
+  transferLeaseIdentity,
+  tryAcquireSendLease,
+  updateLeaseBundle,
+  type ComposerSessionIdentity,
+} from '../services/composer-send-coordinator';
+import { sessionScopedKey } from '../stores/session-slice';
 import {
   buildFileMentionItems,
   mergeEditorFileRefs,
@@ -93,12 +107,6 @@ import {
 const EMPTY_FILE_REFS: readonly import('../types/file-ref').FileRef[] = Object.freeze([]);
 
 const EMPTY_QUEUED_TURN_INPUTS: readonly QueuedTurnInput[] = Object.freeze([]);
-
-function modelUnavailableMessageKey(reason: SessionModel['unavailableReason']): string {
-  if (reason === 'model_removed') return 'model.unavailableReason.modelRemoved';
-  if (reason === 'provider_not_configured') return 'model.unavailableReason.providerNotConfigured';
-  return 'model.unavailableReason.temporarilyUnavailable';
-}
 
 function chatVideoMimeTypeForName(name: string, fallback?: string): string {
   if (fallback?.startsWith('video/')) return fallback;
@@ -503,8 +511,6 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   // input 数组缺失视为未知；只有显式 text-only 的模型才在 UI 上标记“辅助视觉”。
   const supportsVision = !Array.isArray(currentModelInfo?.input) || currentModelInfo.input.includes("image");
   const showAudioInput = getModelAudioInputMode(currentModelInfo) === 'native-audio';
-  // 听写走 macOS 系统语音识别，与聊天模型是否支持音频无关
-  const isMacDictateAvailable = typeof navigator !== 'undefined' && /Mac/i.test(navigator.platform || '');
   const showThinkingControl = useMemo(
     () => shouldShowThinkingControl(currentModelInfo, models),
     [currentModelInfo, models],
@@ -556,18 +562,6 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   const [continuingDeletedAgentSession, setContinuingDeletedAgentSession] = useState(false);
   const [deletedAgentContinueError, setDeletedAgentContinueError] = useState<string | null>(null);
   const [audioRecorderOpen, setAudioRecorderOpen] = useState(false);
-  // 听写模式：开启后，停止录音不再发送语音附件，而是用系统语音识别
-  // 把录音转成文字插入输入框（macOS 本地识别，不依赖聊天模型能力）。
-  const [dictateMode, setDictateMode] = useState(() => {
-    try { return localStorage.getItem('hana-dictate-mode') === '1'; } catch { return false; }
-  });
-  const toggleDictateMode = useCallback(() => {
-    setDictateMode(prev => {
-      const next = !prev;
-      try { localStorage.setItem('hana-dictate-mode', next ? '1' : '0'); } catch {}
-      return next;
-    });
-  }, []);
   const [audioRecordingState, setAudioRecordingState] = useState<'idle' | 'starting' | 'recording' | 'stopping'>('idle');
   const [audioRecordingStartedAt, setAudioRecordingStartedAt] = useState<number | null>(null);
   const [audioRecordingElapsed, setAudioRecordingElapsed] = useState(0);
@@ -1252,49 +1246,19 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       if (!upload?.dest) {
         throw new Error(upload?.error || 'audio upload failed');
       }
-      if (dictateMode) {
-        // 听写：系统语音识别转写 → 文本插入输入框（不发送音频）
-        const asrRes = await lingxiFetch('/api/media/asr/transcribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            fileId: upload.fileId,
-            sessionId: sessionRef.sessionId,
-            sessionPath: sessionRef.sessionPath,
-            providerId: 'system-speech',
-            modelId: 'system-speech',
-          }),
-          timeout: 180_000,
-        });
-        const asrData = await asrRes.json().catch(() => null);
-        if (!asrRes.ok || asrData?.error) {
-          throw new Error(asrData?.error || `transcription failed (status ${asrRes.status})`);
-        }
-        const text = String(asrData?.transcription ?? asrData?.text ?? '').trim();
-        if (!text) {
-          throw new Error(t('input.dictateEmpty'));
-        }
-        if (editor && !editor.isDestroyed) {
-          editor.commands.focus('end');
-          editor.commands.insertContent(text);
-        }
-        setAudioRecorderOpen(false);
-        setAudioRecordingError(null);
-      } else {
-        const sent = await sendVoiceAudioAttachment({
-          fileId: upload.fileId,
-          path: upload.dest,
-          name: upload.name || name,
-          mimeType: 'audio/wav',
-          base64Data,
-          waveform: upload.waveform || waveform,
-        });
-        if (!sent) {
-          throw new Error('audio send failed');
-        }
-        setAudioRecorderOpen(false);
-        setAudioRecordingError(null);
+      const sent = await sendVoiceAudioAttachment({
+        fileId: upload.fileId,
+        path: upload.dest,
+        name: upload.name || name,
+        mimeType: 'audio/wav',
+        base64Data,
+        waveform: upload.waveform || waveform,
+      });
+      if (!sent) {
+        throw new Error('audio send failed');
       }
+      setAudioRecorderOpen(false);
+      setAudioRecordingError(null);
     } catch (err) {
       const message = t('input.audioRecordingFailed');
       setAudioRecordingError(message);
@@ -1305,11 +1269,12 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       setAudioRecordingElapsed(0);
       restoreEditorFocus();
     }
-  }, [addToast, dictateMode, editor, ensureVoiceSessionRef, restoreEditorFocus, sendVoiceAudioAttachment, t]);
+  }, [addToast, editor, ensureVoiceSessionRef, restoreEditorFocus, sendVoiceAudioAttachment, t]);
 
   const startAudioRecording = useCallback(async () => {
-    if (inputLocked || modelSelectionRequired || (!showAudioInput && !dictateMode) || !connected || isStreaming || sending || modelSwitching || pendingSessionSwitchPath) return;
+    if (inputLocked || modelSelectionRequired || !showAudioInput || !connected || isStreaming || sending || modelSwitching || pendingSessionSwitchPath) return;
     if (audioRecordingState !== 'idle' || audioRecorderRef.current) return;
+
     const AudioContextCtor = window.AudioContext
       || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!navigator.mediaDevices?.getUserMedia || !AudioContextCtor) {
@@ -1430,6 +1395,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     return () => window.clearInterval(timer);
   }, [audioRecordingStartedAt, audioRecordingState]);
 
+  // 录音能力随模型变化：失去原生音频输入能力的模型不再支持录音，自动丢弃在途录音。
   useEffect(() => {
     if (showAudioInput || audioRecordingState === 'idle') return undefined;
     void stopAudioRecording({ discard: true });
@@ -1665,7 +1631,9 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     const plainPasteText = e.clipboardData?.getData('text/plain') ?? '';
     if (plainPasteText && editor) {
       e.preventDefault();
-      editor.chain().focus().insertContent(buildFaithfulPasteContent(plainPasteText)).run();
+      // F10/P7.3：在当前选区处按行内节点（text/hardBreak）保真插入——
+      // 段落中间粘贴与选区替换都不多生段落换行，不套整段 paragraph。
+      insertFaithfulPasteAtSelection(editor, plainPasteText);
       return true;
     }
     return false;
@@ -1792,7 +1760,8 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     if (!editor) return;
     const editorJson = editor.getJSON();
     const { text: rawText, skills, fileRefs, sessionRefs, agentMentions } = serializeEditor(editorJson);
-    const text = rawText.trim();
+    // 快照正文逐字符保留（不 trim）；空白判空用修剪后的副本（F1/P2.3）。
+    const trimmedText = rawText.trim();
     const clickState = useStore.getState();
     const clickedPendingDraftId = clickState.pendingNewSession ? clickState.pendingDraftId : null;
     const clickedSessionPath = clickState.currentSessionPath;
@@ -1817,6 +1786,11 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     const clickedDocContextAttached = docContextAttached;
     const clickedDoc = currentDoc ? { ...currentDoc } : null;
     const clickedUiContext = collectUiContext(clickState);
+    // 清理时机判据：点击时的输入区修订号（每次有效编辑递增，见 input-slice）。
+    const clickedDraftKey = clickedSessionPath ?? (clickedPendingDraftId ? HOME_DRAFT_KEY : null);
+    const clickedComposerRevision = clickedDraftKey
+      ? (clickState.composerRevisionsByKey?.[sessionScopedKey(clickState, clickedDraftKey) || clickedDraftKey] ?? 0)
+      : null;
 
     if (agentMentions.length > 1) {
       addToast(t('input.mention.singleAgent'), 'warning', 5000);
@@ -1829,7 +1803,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
 
     if (type === 'prompt') {
       const slashSelection = resolveSlashSubmitSelection({
-        text,
+        text: trimmedText,
         skills,
         commands: slashCommands,
         selectedIndex: slashSelected,
@@ -1845,13 +1819,64 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     const hasFiles = inputFiles.length > 0;
     // 空输入静默 return 是合理行为（不是错误），不加 toast；与按钮侧 hasContent 共用同一份谓词（#2101）。
     if (composerPayloadIsEmpty({
-      hasText: !!text,
+      hasText: !!trimmedText,
       hasFiles,
       hasSkills: skills.length > 0,
       hasMentions: sessionRefs.length > 0 || agentMentions.length > 0,
       hasDocContext: clickedDocContextAttached,
       hasQuotes: clickedQuotes.length > 0,
     }) || !connected) return;
+
+    const buildBundle = (sessionRef: Readonly<SessionRef> | null, bundleType: 'prompt' | 'interject'): ComposerSendBundle => ({
+      type: bundleType,
+      sessionRef: sessionRef
+        ? { sessionId: sessionRef.sessionId, sessionPath: sessionRef.sessionPath, agentId: sessionRef.agentId }
+        : { sessionId: '', sessionPath: '', agentId: null },
+      text: rawText,
+      skills,
+      fileRefs,
+      sessionRefs,
+      agentMentions,
+      inputFiles,
+      knowledgeRefs: clickedKnowledgeRefs
+        ? {
+          notebookIds: [...clickedKnowledgeRefs.notebookIds],
+          notebookNames: { ...clickedKnowledgeRefs.notebookNames },
+          mode: clickedKnowledgeRefs.mode,
+        }
+        : null,
+      docContextAttached: clickedDocContextAttached,
+      doc: clickedDoc ? { ...clickedDoc } : null,
+      quotes: clickedQuotes,
+      uiContext: clickedUiContext,
+    });
+
+    // 内容入队（快照随队列项持有）后清理输入区：只在身份仍匹配时动编辑器。
+    const enqueueDraft = (sessionRef: Readonly<SessionRef>) => {
+      const queuedPath = sessionRef.sessionPath;
+      useStore.getState().enqueueQueuedTurnInput(queuedPath, {
+        id: `queued-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        sessionPath: queuedPath,
+        text: rawText,
+        createdAt: Date.now(),
+        snapshotVersion: 1,
+        status: 'ready',
+        bundle: buildBundle(sessionRef, 'prompt'),
+      });
+      // 内容已安全入队：立即清空输入区（草稿/附件/文档/引用随队清空），
+      // 用户可以继续输入下一条排队消息。
+      const afterEnqueue = useStore.getState();
+      const stillOwnsComposerAfterEnqueue = afterEnqueue.currentSessionId === sessionRef.sessionId
+        && afterEnqueue.currentSessionPath === queuedPath;
+      if (stillOwnsComposerAfterEnqueue) {
+        editor.commands.clearContent();
+        clearDraft(queuedPath);
+        clearAttachedFilesForSession(queuedPath);
+        if (clickedDocContextAttached) setDocContextAttached(false);
+        if (clickedQuotes.length > 0) useStore.getState().clearQuotedSelections();
+      }
+    };
+
     // 流式进行中的「发送」默认入队：上一轮回答结束后自动续发为独立新回合。
     // 注入进行中的回合改为显式动作——排队卡片上的「立即插入」按钮（派发为 interject）。
     if (type === 'prompt' && effectiveStreaming) {
@@ -1861,54 +1886,19 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
         });
         return;
       }
-      const queuedPath = clickedSessionRef.sessionPath;
-      useStore.getState().enqueueQueuedTurnInput(queuedPath, {
-        id: `queued-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        sessionPath: queuedPath,
-        text,
-        createdAt: Date.now(),
-        bundle: {
-          type: 'prompt',
-          sessionRef: {
-            sessionId: clickedSessionRef.sessionId,
-            sessionPath: clickedSessionRef.sessionPath,
-            agentId: clickedSessionRef.agentId,
-          },
-          text,
-          skills,
-          fileRefs,
-          sessionRefs,
-          agentMentions,
-          inputFiles: mergeEditorFileRefs(clickedAttachedFiles, fileRefs),
-          knowledgeRefs: clickedKnowledgeRefs
-            ? {
-              notebookIds: [...clickedKnowledgeRefs.notebookIds],
-              notebookNames: { ...clickedKnowledgeRefs.notebookNames },
-              mode: clickedKnowledgeRefs.mode,
-            }
-            : null,
-          docContextAttached: clickedDocContextAttached,
-          doc: clickedDoc ? { ...clickedDoc } : null,
-          quotes: clickedQuotes,
-          uiContext: clickedUiContext,
-        },
-      });
-      // 内容已安全入队：立即清空输入区（草稿/附件/文档/引用随队清空），
-      // 用户可以继续输入下一条排队消息。
-      const afterEnqueue = useStore.getState();
-      const stillOwnsComposerAfterEnqueue = afterEnqueue.currentSessionId === clickedSessionRef.sessionId
-        && afterEnqueue.currentSessionPath === queuedPath;
-      if (stillOwnsComposerAfterEnqueue) {
-        editor.commands.clearContent();
-        clearDraft(queuedPath);
-        clearAttachedFilesForSession(queuedPath);
-        if (clickedDocContextAttached) setDocContextAttached(false);
-        if (clickedQuotes.length > 0) useStore.getState().clearQuotedSelections();
-      }
+      enqueueDraft(clickedSessionRef);
       return;
     }
-    if (type === 'interject' && !effectiveStreaming) return;
-    if (sending) return;
+    if (type === 'interject') {
+      if (!effectiveStreaming) return;
+      // 只有活跃 run 可以插入；等待回执/回合启动（无 run）时保留输入并明确等待（P3.4）。
+      if (!isStreaming) {
+        useStore.getState().addToast(t('input.queuedInsertWaiting'), 'info', 4000, {
+          dedupeKey: 'interject-no-active-run',
+        });
+        return;
+      }
+    }
     if (modelSwitching) return;
     if (useStore.getState().pendingSessionSwitchPath) return;
     const guardState = useStore.getState();
@@ -1935,6 +1925,48 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
         || isSessionCompacting(guardState, guardPath)
       )) return;
     }
+
+    const identity: ComposerSessionIdentity = clickedSessionRef
+      ? {
+        kind: 'session',
+        sessionId: clickedSessionRef.sessionId,
+        sessionPath: clickedSessionRef.sessionPath,
+        agentId: clickedSessionRef.agentId,
+      }
+      : { kind: 'pending_draft', draftId: clickedPendingDraftId! };
+
+    // 新的手动普通发送不能越过已有队首；有在途发送或排队项时同样进入队列（P3.2）。
+    if (type === 'prompt' && clickedSessionRef) {
+      const queued = sessionScopedValue(clickState, clickState.queuedTurnInputsByPath, clickedSessionRef.sessionPath) || [];
+      if (queued.length > 0 || hasInFlightSend(identity)) {
+        enqueueDraft(clickedSessionRef);
+        return;
+      }
+    }
+
+    // 在第一个 await 之前同步占用发送租约：leaseId/会话身份/连接代次/快照版本此刻落定。
+    const targetRun = type === 'interject' && clickedSessionRef
+      ? (() => {
+        const key = sessionScopedKey(clickState, clickedSessionRef.sessionPath) || clickedSessionRef.sessionPath;
+        const active = clickState.activeSessionStreams?.[key] ?? clickState.activeSessionStreams?.[clickedSessionRef.sessionPath];
+        return { streamId: active?.streamId ?? null, turnId: active?.turnId ?? null };
+      })()
+      : null;
+    const acquisition = tryAcquireSendLease({
+      identity,
+      bundle: buildBundle(clickedSessionRef, type),
+      queueItemId: null,
+      snapshotVersion: 1,
+      composerRevisionAtClick: clickedComposerRevision,
+      targetRun,
+    });
+    if (!acquisition.ok) {
+      // 传输互斥被占用：普通发送转入队（不越过队首）；插话放弃（按钮态本应拦住）。
+      if (type === 'prompt' && clickedSessionRef) {
+        enqueueDraft(clickedSessionRef);
+      }
+      return;
+    }
     setSending(true);
 
     try {
@@ -1943,11 +1975,19 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
         sessionRef = await ensureSession(clickedPendingDraftId);
         if (!sessionRef) {
           // ensureSession 拿不到会话身份：不能静默吞掉这次发送，否则用户会以为点了没反应（#2101）。
+          cancelSendLease(acquisition.leaseId);
           useStore.getState().addToast(t('error.noActiveSession'), 'error', 6000, {
             dedupeKey: 'send-missing-session',
           });
           return;
         }
+        // pending 草稿租约原子转移到真实会话身份，不出现无锁窗口（P3.2）。
+        transferLeaseIdentity(acquisition.leaseId, {
+          kind: 'session',
+          sessionId: sessionRef.sessionId,
+          sessionPath: sessionRef.sessionPath,
+          agentId: sessionRef.agentId,
+        });
         loadSessions();
         // pending 首页占位落成真实会话：知识库引用从 HOME_DRAFT_KEY 迁移到新会话，
         // 保持「引用持续生效直到手动取消」语义。
@@ -1962,64 +2002,54 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       }
       if (!sessionRef) {
         // 走到这里说明既不是 pending 新会话、也没有已激活会话身份——同样是无法发送，显式报错而非静默 return。
+        cancelSendLease(acquisition.leaseId);
         useStore.getState().addToast(t('error.noActiveSession'), 'error', 6000, {
           dedupeKey: 'send-missing-session',
         });
         return;
       }
 
-      const bundle: ComposerSendBundle = {
-        type,
-        sessionRef: {
-          sessionId: sessionRef.sessionId,
-          sessionPath: sessionRef.sessionPath,
-          agentId: sessionRef.agentId,
-        },
-        text,
-        skills,
-        fileRefs,
-        sessionRefs,
-        agentMentions,
-        inputFiles,
-        knowledgeRefs: clickedKnowledgeRefs
-          ? {
-            notebookIds: [...clickedKnowledgeRefs.notebookIds],
-            notebookNames: { ...clickedKnowledgeRefs.notebookNames },
-            mode: clickedKnowledgeRefs.mode,
+      const finalRef: Readonly<SessionRef> = sessionRef;
+      updateLeaseBundle(acquisition.leaseId, buildBundle(finalRef, type));
+
+      await sendWithLease(acquisition.leaseId, {
+        loadVisionAuxiliaryConfig,
+        t,
+        onCommit: () => {
+          // 准备成功且快照已独立保存后才可以清理输入；清理必须同时匹配
+          // 会话/首页草稿身份与点击时的修订号——准备期间用户继续输入的
+          // 内容（修订号已递增）不得被清除，旧快照也不得回写覆盖新草稿（P2.4）。
+          const state = useStore.getState();
+          const revisionKey = clickedDraftKey
+            ? (sessionScopedKey(state, clickedDraftKey) || clickedDraftKey)
+            : null;
+          const revisionNow = revisionKey ? (state.composerRevisionsByKey?.[revisionKey] ?? 0) : null;
+          const unchanged = clickedComposerRevision !== null && revisionNow === clickedComposerRevision;
+          if (!unchanged) return;
+          const stillOwnsPendingComposer = !!clickedPendingDraftId
+            && state.pendingNewSession === true
+            && state.pendingDraftId === clickedPendingDraftId;
+          const stillOwnsComposer = stillOwnsPendingComposer || (
+            state.currentSessionId === finalRef.sessionId
+            && state.currentSessionPath === finalRef.sessionPath
+          );
+          clearDraft(finalRef.sessionPath);
+          clearAttachedFilesForSession(finalRef.sessionPath);
+          if (clickedPendingDraftId && state.pendingDraftId === clickedPendingDraftId) {
+            clearDraft(HOME_DRAFT_KEY);
           }
-          : null,
-        docContextAttached: clickedDocContextAttached,
-        doc: clickedDoc ? { ...clickedDoc } : null,
-        quotes: clickedQuotes,
-        uiContext: clickedUiContext,
-      };
-
-      // 内容随派发落定：先清输入区（附件/草稿/引用/文档），派发器负责乐观消息与 ws 发送。
-      const beforeCleanup = useStore.getState();
-      const stillOwnsPendingComposer = !!clickedPendingDraftId
-        && beforeCleanup.pendingNewSession === true
-        && beforeCleanup.pendingDraftId === clickedPendingDraftId;
-      const stillOwnsComposer = stillOwnsPendingComposer || (
-        beforeCleanup.currentSessionId === sessionRef.sessionId
-        && beforeCleanup.currentSessionPath === sessionRef.sessionPath
-      );
-      clearDraft(sessionRef.sessionPath);
-      clearAttachedFilesForSession(sessionRef.sessionPath);
-      if (clickedPendingDraftId && beforeCleanup.pendingDraftId === clickedPendingDraftId) {
-        clearDraft(HOME_DRAFT_KEY);
-      }
-      if (stillOwnsComposer) {
-        editor.commands.clearContent();
-        if (stillOwnsPendingComposer) clearAttachedFiles();
-        if (clickedDocContextAttached) setDocContextAttached(false);
-        if (clickedQuotes.length > 0) useStore.getState().clearQuotedSelections();
-      }
-
-      await dispatchComposerSend(bundle, { loadVisionAuxiliaryConfig, t });
+          if (stillOwnsComposer) {
+            editor.commands.clearContent();
+            if (stillOwnsPendingComposer) clearAttachedFiles();
+            if (clickedDocContextAttached) setDocContextAttached(false);
+            if (clickedQuotes.length > 0) useStore.getState().clearQuotedSelections();
+          }
+        },
+      });
     } finally {
       setSending(false);
     }
-  }, [addToast, editor, inputLocked, attachedFiles, docContextAttached, connected, effectiveStreaming, sending, currentDoc, clearAttachedFiles, clearAttachedFilesForSession, clearDraft, setDocContextAttached, slashCommands, slashSelected, handleSlashSelect, modelSwitching, loadVisionAuxiliaryConfig, t]);
+  }, [addToast, editor, inputLocked, attachedFiles, docContextAttached, connected, effectiveStreaming, isStreaming, currentDoc, clearAttachedFiles, clearAttachedFilesForSession, clearDraft, setDocContextAttached, slashCommands, slashSelected, handleSlashSelect, modelSwitching, loadVisionAuxiliaryConfig, t]);
 
   const handleSend = useCallback(async () => {
     await submitEditorMessage('prompt');
@@ -2031,52 +2061,59 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     : undefined)) || EMPTY_QUEUED_TURN_INPUTS;
   const [editingQueuedId, setEditingQueuedId] = useState<string | null>(null);
   const [editQueuedText, setEditQueuedText] = useState('');
-  const dispatchFailureToast = useCallback(() => {
-    useStore.getState().addToast(t('input.queuedSendFailed'), 'error', 6000);
-  }, [t]);
 
-  // 自动续发：会话回到空闲（上一轮回答结束）且没有阻塞态时，逐条派发队首消息。
-  const flushingRef = useRef(false);
+  // 自动续发：会话回到空闲（上一轮回答结束）且没有阻塞态时，组件只发出调度意图。
+  // 互斥、串行与失败原位保留由 composer-send-coordinator 持有——不随组件
+  // 卸载/重挂载丢失，也不再「先移除队首再异步派发」（F2）。
   useEffect(() => {
+    if (!currentSessionPath) return;
     if (effectiveStreaming || sending || modelSwitching || !connected) return;
     if (capabilityRefreshing || compactingStatus) return;
     if (pendingSessionSwitchPath) return;
-    const first = queuedTurnInputs[0];
-    if (!first || flushingRef.current) return;
-    flushingRef.current = true;
-    const timer = setTimeout(() => {
-      flushingRef.current = false;
-      const store = useStore.getState();
-      const item = (sessionScopedValue(store as any, store.queuedTurnInputsByPath, first.sessionPath) || [])
-        .find(queued => queued.id === first.id);
-      if (!item) return;
-      store.removeQueuedTurnInput(first.sessionPath, first.id);
-      dispatchComposerSend({ ...item.bundle, type: 'prompt' }, { loadVisionAuxiliaryConfig, t })
-        .catch((err) => {
-          console.warn('[queue] flush dispatch failed', err);
-          dispatchFailureToast();
-        });
-    }, 400);
-    return () => {
-      clearTimeout(timer);
-      flushingRef.current = false;
-    };
-  }, [capabilityRefreshing, compactingStatus, connected, dispatchFailureToast, effectiveStreaming, loadVisionAuxiliaryConfig, modelSwitching, pendingSessionSwitchPath, queuedTurnInputs, sending]);
+    if (queuedTurnInputs.length === 0) return;
+    requestQueueFlush(currentSessionPath, {
+      loadVisionAuxiliaryConfig,
+      t,
+      shouldSkipItem: (item) => item.id === editingQueuedId,
+    });
+  }, [capabilityRefreshing, compactingStatus, connected, currentSessionPath, editingQueuedId, effectiveStreaming, loadVisionAuxiliaryConfig, modelSwitching, pendingSessionSwitchPath, queuedTurnInputs, sending, t]);
 
   const handleQueuedInsertNow = useCallback((item: QueuedTurnInput) => {
     const store = useStore.getState();
-    store.removeQueuedTurnInput(item.sessionPath, item.id);
-    // 仍在流式/等待态才走「插话」注入进行中的回合；否则按普通新消息发送。
-    const stillBusy = sessionScopedListIncludes(store as any, store.streamingSessions, item.sessionPath)
-      || sessionScopedListIncludes(store as any, store.turnPendingSessions, item.sessionPath);
-    dispatchComposerSend({ ...item.bundle, type: stillBusy ? 'interject' : 'prompt' }, { loadVisionAuxiliaryConfig, t })
-      .catch((err) => {
-        console.warn('[queue] insert-now dispatch failed', err);
-        dispatchFailureToast();
-      });
-  }, [dispatchFailureToast, loadVisionAuxiliaryConfig]);
+    const streaming = sessionScopedListIncludes(store as any, store.streamingSessions, item.sessionPath);
+    const turnPending = sessionScopedListIncludes(store as any, store.turnPendingSessions, item.sessionPath);
+    const action = resolveQueuedInsertNowAction(item, { streaming, turnPending });
+    if (action === 'review_forbidden') {
+      // agent review 请求不能注入进行中的回合：保留既有禁止语义，队列项不丢（P3.4）。
+      store.addToast(t('agentReview.interjectionUnavailable'), 'warning', 5000);
+      return;
+    }
+    if (action === 'wait') {
+      // 只有等待回执/回合启动（无活跃 run）时：保留输入并明确等待，不凭外观猜测。
+      store.addToast(t('input.queuedInsertWaiting'), 'info', 4000, { dedupeKey: 'queued-insert-wait' });
+      return;
+    }
+    const key = sessionScopedKey(store, item.sessionPath) || item.sessionPath;
+    const active = store.activeSessionStreams?.[key] ?? store.activeSessionStreams?.[item.sessionPath];
+    // 队列项在派发成功前保持原位（快照持有者在队）；失败由 coordinator 原位标记。
+    void dispatchQueuedItem(item, {
+      type: action,
+      targetRun: action === 'interject'
+        ? { streamId: active?.streamId ?? null, turnId: active?.turnId ?? null }
+        : null,
+    }, { loadVisionAuxiliaryConfig, t });
+  }, [loadVisionAuxiliaryConfig, t]);
+
+  const handleQueuedRetry = useCallback((item: QueuedTurnInput) => {
+    if (item.retryable === false) return;
+    // 显式重试：同一队列项回到 ready 并按原快照重新调度，不复制新消息（P2.4）。
+    useStore.getState().setQueuedTurnInputStatus(item.sessionPath, item.id, 'ready');
+    requestQueueFlush(item.sessionPath, { loadVisionAuxiliaryConfig, t });
+  }, [loadVisionAuxiliaryConfig, t]);
 
   const handleQueuedDelete = useCallback((item: QueuedTurnInput) => {
+    // 删除正在准备的队列项：取消在途准备并使租约失效，迟到读取结果不发送已删除内容（P3.4）。
+    cancelQueueItemSend(item.id);
     useStore.getState().removeQueuedTurnInput(item.sessionPath, item.id);
   }, []);
 
@@ -2087,9 +2124,11 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
 
   const handleQueuedEditSave = useCallback(() => {
     if (!editingQueuedId) return;
-    const next = editQueuedText.trim();
-    if (!next) return;
-    useStore.getState().updateQueuedTurnInputText(useStore.getState().currentSessionPath || '', editingQueuedId, next);
+    // 编辑保存 = 新快照：取消在途准备（迟到结果不发送旧快照），版本由 store 递增。
+    // 文本逐字符保留；空白判空用修剪后的副本。
+    if (!editQueuedText.trim()) return;
+    cancelQueueItemSend(editingQueuedId);
+    useStore.getState().updateQueuedTurnInputText(useStore.getState().currentSessionPath || '', editingQueuedId, editQueuedText);
     setEditingQueuedId(null);
   }, [editQueuedText, editingQueuedId]);
 
@@ -2326,9 +2365,24 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
                   <>
                     <div className={styles['queued-turn-body']}>
                       <div className={styles['queued-turn-text']} title={item.text}>{item.text}</div>
-                      <div className={styles['queued-turn-hint']}>{t('input.queuedTurnHint')}</div>
+                      <div className={styles['queued-turn-hint']}>
+                        {item.status === 'blocked' || item.status === 'failed'
+                          ? t('input.queuedSendFailed')
+                          : t('input.queuedTurnHint')}
+                      </div>
                     </div>
                     <div className={styles['queued-turn-actions']}>
+                      {(item.status === 'blocked' || item.status === 'failed') && item.retryable !== false && (
+                        <button
+                          type="button"
+                          className={styles['queued-turn-insert']}
+                          onClick={() => handleQueuedRetry(item)}
+                          title={t('input.queuedRetry')}
+                          data-testid="queued-retry"
+                        >
+                          {t('input.queuedRetry')}
+                        </button>
+                      )}
                       <button
                         type="button"
                         className={styles['queued-turn-insert']}

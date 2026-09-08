@@ -74,6 +74,8 @@ export interface ChatSlice {
   enqueueQueuedTurnInput: (path: string, item: QueuedTurnInput) => void;
   updateQueuedTurnInputText: (path: string, id: string, text: string) => void;
   removeQueuedTurnInput: (path: string, id: string) => void;
+  /** 显式标记队列项调度结果（blocked/failed/ready）；错误码与可重试性随状态记录。 */
+  setQueuedTurnInputStatus: (path: string, id: string, status: 'ready' | 'blocked' | 'failed', errorCode?: string, retryable?: boolean) => void;
 }
 
 const MAX_CACHED_SESSIONS = 8;
@@ -222,6 +224,9 @@ export const createChatSlice = (
         ...current.data,
         ...message,
         id: current.data.id,
+        // 回执/恢复回放不得覆盖用户原文：本地乐观文本是用户输入的逐字符快照（F1/F10），
+        // 服务端回声只负责确认与补充元数据；本地文本为空（纯附件等）时才采用服务端文本。
+        text: current.data.text ? current.data.text : message.text,
         sourceEntryId: message.sourceEntryId ?? current.data.sourceEntryId,
       };
       delete nextData.sendStatus;
@@ -753,8 +758,32 @@ export const createChatSlice = (
     return {
       queuedTurnInputsByPath: {
         ...s.queuedTurnInputsByPath,
+        // 编辑保存 = 新快照：版本递增（在途准备的迟到结果按版本丢弃），
+        // 状态回到 ready 等一次新的调度；旧错误码随快照作废。
         [key]: existing.map(item => item.id === id
-          ? { ...item, text, bundle: { ...item.bundle, text } }
+          ? {
+            ...item,
+            text,
+            bundle: { ...item.bundle, text },
+            snapshotVersion: (item.snapshotVersion ?? 1) + 1,
+            status: 'ready' as const,
+            errorCode: undefined,
+            retryable: undefined,
+          }
+          : item),
+      },
+    };
+  }),
+
+  setQueuedTurnInputStatus: (path, id, status, errorCode, retryable) => set((s) => {
+    const key = keyForSession(s as any, path);
+    const existing = s.queuedTurnInputsByPath[key];
+    if (!existing?.some(item => item.id === id)) return {};
+    return {
+      queuedTurnInputsByPath: {
+        ...s.queuedTurnInputsByPath,
+        [key]: existing.map(item => item.id === id
+          ? { ...item, status, errorCode, retryable }
           : item),
       },
     };

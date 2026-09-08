@@ -193,7 +193,8 @@ describe("chat route mood segment lifecycle", () => {
     subscriber?.({ type: "turn_end", message: msg, toolResults: [] }, sessionPath);
 
     const textDeltas = payloads().filter((p) => p.type === "text_delta").map((p) => p.delta);
-    expect(textDeltas.join("")).toBe("写法是 <reflect> 或 `<reflect>` 两种");
+    // F8/P6.3：链上保留转义反斜杠（保护字面量），显示层一次性消费
+    expect(textDeltas.join("")).toBe("写法是 \\<reflect> 或 `<reflect>` 两种");
     expect(payloads().filter((p) => p.type === "mood_start")).toHaveLength(0);
   });
 

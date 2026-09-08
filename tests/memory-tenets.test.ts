@@ -91,7 +91,9 @@ describe("用户原则（tenets）存储", () => {
     expect(pendingTenets(agentDir)).toHaveLength(1);
   });
 
-  it("active 上限：提案审批路径满 20 条报 TENET_LIMIT_REACHED；user_direct 直钉不受此限", () => {
+  it("active 上限按来源分离：user_direct 占满 20 不挡首次提案审批；model_proposed 满 20 才拒批", () => {
+    // 断言变化说明（F9/M15）：旧断言「active 总数满 20 即拒批」验证的是来源混算的
+    // 缺陷行为；现按任务书要求改为「20 条 user_direct 不占 model_proposed 配额」。
     for (let i = 0; i < MAX_ACTIVE_TENETS; i++) {
       addTenetDirect(agentDir, { content: `原则 ${i}` });
     }
@@ -99,8 +101,7 @@ describe("用户原则（tenets）存储", () => {
     addTenetDirect(agentDir, { content: "直钉条目不受提案上限约束" });
 
     const proposal = addTenetProposal(agentDir, { content: "待审提案" });
-    expect(() => decideTenet(agentDir, proposal.tenet.id, true))
-      .toThrowError(expect.objectContaining({ code: TENET_ERRORS.LIMIT_REACHED }));
+    expect(decideTenet(agentDir, proposal.tenet.id, true).status).toBe("active");
   });
 
   it("pending 上限 30：满员后新提案报 TENET_PENDING_FULL", () => {

@@ -66,9 +66,9 @@
   "dynamicCallSites": [
     {
       "file": "core/speech-recognition/system-speech-adapter.ts",
-      "callee": "execFileSync",
+      "callee": "spawn",
       "argText": "helper",
-      "reason": "system-speech ASR adapter spawns the LingxiSpeechHelper binary (SFSpeechRecognizer file transcription) resolved at runtime from packaged Resources/speech/macos/ or dev dist-speech/. The helper is a native Swift artifact built by scripts/build-speech-helper.mjs and shipped via electron-builder extraResources -- it is a packaged binary, not repo source, so it never enters the module closure by design."
+      "reason": "system-speech ASR adapter spawns the LingxiSpeechHelper binary (SFSpeechRecognizer file transcription) resolved at runtime from packaged Resources/speech/macos/ or dev dist-speech/. The helper is a native Swift artifact built by scripts/build-speech-helper.mjs and shipped via electron-builder extraResources -- it is a packaged binary, not repo source, so it never enters the module closure by design. The call is an async spawn with bounded termination (SIGTERM -> grace -> SIGKILL), abort/timeout semantics (F6)."
     },
     {
       "file": "server/bootstrap.ts",
@@ -3741,17 +3741,6 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by lib/tools/update-settings-tool.ts (import-statement)."
-    },
-    {
-      "path": "dist-speech/mac-arm64/lingxi-speech-helper",
-      "inputType": "nft-runtime-trace",
-      "provenance": [
-        {
-          "root": "nft-server-bundle",
-          "kind": "nft-trace"
-        }
-      ],
-      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
     },
     {
       "path": "hub/agent-executor.ts",
@@ -11712,6 +11701,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/tools/pinned-memory.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/tools/session-folders-tool.ts",
           "kind": "import-statement"
         },
@@ -11771,7 +11765,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/browser-tool.ts (import-statement); lib/tools/computer-use-tool.ts (import-statement); lib/tools/session-folders-tool.ts (import-statement); +11 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/browser-tool.ts (import-statement); lib/tools/computer-use-tool.ts (import-statement); lib/tools/pinned-memory.ts (import-statement); +12 more importer(s)."
     },
     {
       "path": "lib/tools/tool-session.ts",
@@ -127764,6 +127758,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "core/pinned-tenets-migration.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/execution-lease-registry.ts",
           "kind": "import-statement"
         },
@@ -127968,7 +127967,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/memory/tenets.ts (import-statement); core/execution-lease-registry.ts (import-statement); core/grant-registry.ts (import-statement); +39 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/memory/tenets.ts (import-statement); core/pinned-tenets-migration.ts (import-statement); core/execution-lease-registry.ts (import-statement); +40 more importer(s)."
     },
     {
       "path": "shared/safe-parse.ts",
@@ -128544,11 +128543,11 @@
     }
   ],
   "stats": {
-    "totalFiles": 10971,
+    "totalFiles": 10970,
     "byInputType": {
       "source-graph": 761,
-      "nft-runtime-trace": 10199,
-      "runtime-asset": 11
+      "runtime-asset": 11,
+      "nft-runtime-trace": 10198
     }
   }
 }

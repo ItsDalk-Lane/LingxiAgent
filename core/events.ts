@@ -6,6 +6,10 @@
  * 一次生成里允许出现多个同族块。需要字面量时由模型用 `\<tag>` 转义或放进
  * 行内代码 / 围栏代码块（扫描器对这两种位置一律按文本透传）。
  *
+ * F8/P6.3：转义反斜杠在解析链上保留（`\<tag>` → 文本 `\<tag>`，任何中间层都
+ * 不得消费——链尾吞孤儿闭标签时受保护字面量必须安全），显示层
+ * （StreamingMarkdownContent → stripTagEscapes）一次性消费。
+ *
  * 两个解析器共享同一个扫描内核（ReservedTagScanner），只是把 token 映射成各自的
  * 事件名：
  *   MoodParser:      mood_start / mood_text / mood_end / text

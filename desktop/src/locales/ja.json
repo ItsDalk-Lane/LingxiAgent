@@ -655,6 +655,8 @@
     "queuedInsertNow": "今すぐ挿入",
     "queuedInsertNowTitle": "このメッセージを進行中の返答にすぐ挿入します",
     "queuedSendFailed": "キュー内のメッセージの送信に失敗しました",
+    "queuedRetry": "再試行",
+    "queuedInsertWaiting": "現在の返答の開始を待っています。しばらくしてからもう一度お試しください",
     "queuedDelete": "このキュー中のメッセージを取り消す"
   },
   "agentReview": {

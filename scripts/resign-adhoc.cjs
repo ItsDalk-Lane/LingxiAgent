@@ -102,6 +102,12 @@ async function resignAdhoc(context) {
     sign(speechHelper);
   }
 
+  // 1c. speech 授权桥（.node，Mach-O bundle，宿主 Speech 授权状态机）
+  const speechPermissionsBridge = path.join(appDir, "Contents", "Resources", "speech", "macos", "lingxi-speech-permissions.node");
+  if (fs.existsSync(speechPermissionsBridge)) {
+    sign(speechPermissionsBridge);
+  }
+
   // 2. Frameworks：.framework(--deep 递归内部 dylib/Helpers) + Helper.app(带 entitlements)
   const frameworksDir = path.join(appDir, "Contents", "Frameworks");
   for (const entry of fs.readdirSync(frameworksDir)) {

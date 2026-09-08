@@ -276,22 +276,22 @@ describe("native media route", () => {
     });
 
     expect(res.status).toBe(200);
+    // F6：路由把已认证请求的生命周期 AbortSignal 透传进转写链（取消由适配器执行）。
     expect(transcribeAudio).toHaveBeenCalledWith({
       sessionPath: "/sessions/a.jsonl",
       fileId: "file_audio",
       language: "zh",
+      signal: expect.any(AbortSignal),
     });
-    expect(await res.json()).toEqual({
-      ok: true,
-      transcription: {
-        status: "ready",
-        text: "hello",
-        received: {
-          sessionPath: "/sessions/a.jsonl",
-          fileId: "file_audio",
-          language: "zh",
-        },
-      },
+    const body = await res.json();
+    expect(body.ok).toBe(true);
+    expect(body.transcription.status).toBe("ready");
+    expect(body.transcription.text).toBe("hello");
+    // 回显的业务字段不受 signal 注入影响。
+    expect(body.transcription.received).toMatchObject({
+      sessionPath: "/sessions/a.jsonl",
+      fileId: "file_audio",
+      language: "zh",
     });
   });
 

@@ -44,7 +44,14 @@ export function sanitizePersistedSegmentSource(
     }
     break;
   }
-  if (!changed) return source;
+  if (!changed) {
+    // F8/P6.3（T16）：没有 leading 块可剥离时，也不能因 return 原 source 抵消
+    // 扫描器已做的孤儿闭标签清理；按切分结果重建（受保护字面量原样保留）。
+    const rebuilt = segments.map((segment) => (
+      segment.type === 'text' ? segment.text : `<${segment.tag}>${segment.content}</${segment.tag}>`
+    )).join('');
+    return rebuilt === source ? source : rebuilt;
+  }
   // 非剥离部分的标签块按原字面量重建，保证正文内部标签一字不动
   const rest = segments.slice(start).map((segment) => (
     segment.type === 'text' ? segment.text : `<${segment.tag}>${segment.content}</${segment.tag}>`

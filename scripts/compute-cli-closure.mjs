@@ -293,7 +293,7 @@ export const NFT_TRACE_ROOTS = CLOSURE_ROOTS.filter((root) => root.inputType ===
 export const DYNAMIC_CALL_ALLOWLIST = Object.freeze([
   {
     file: "core/speech-recognition/system-speech-adapter.ts",
-    callee: "execFileSync",
+    callee: "spawn",
     argText: "helper",
     reason:
       "system-speech ASR adapter spawns the LingxiSpeechHelper binary (SFSpeechRecognizer "
@@ -301,7 +301,8 @@ export const DYNAMIC_CALL_ALLOWLIST = Object.freeze([
       + "dev dist-speech/. The helper is a native Swift artifact built by "
       + "scripts/build-speech-helper.mjs and shipped via electron-builder extraResources "
       + "-- it is a packaged binary, not repo source, so it never enters the module "
-      + "closure by design.",
+      + "closure by design. The call is an async spawn with bounded termination "
+      + "(SIGTERM -> grace -> SIGKILL), abort/timeout semantics (F6).",
   },
   {
     file: "server/bootstrap.ts",

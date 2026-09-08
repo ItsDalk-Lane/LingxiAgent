@@ -4,6 +4,8 @@
  * 与 computer-use helper 同一产物形态：dist-speech/mac-<arch>/lingxi-speech-helper，
  * 经 electron-builder extraResources 进包（Resources/speech/macos/）。
  * 无第三方依赖，`swift build` 离线可编译；非 macOS 跳过。
+ *
+ * run/read/rootDir 可注入：构建合同的自动化测试用替身驱动，不触碰真实 swift。
  */
 
 import { execFileSync } from "node:child_process";
@@ -12,7 +14,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const rootDir = path.resolve(__dirname, "..");
+const moduleRootDir = path.resolve(__dirname, "..");
 
 export function swiftArchForNodeArch(arch = process.arch) {
   if (arch === "arm64") return "arm64";
@@ -20,14 +22,21 @@ export function swiftArchForNodeArch(arch = process.arch) {
   throw new Error(`[speech-helper] unsupported arch: ${arch}`);
 }
 
-function outputDir({ rootDir: root, osName, arch }) {
-  return path.join(root, "dist-speech", `${osName}-${arch}`);
+function defaultRun(cmd, args, { cwd, env }) {
+  execFileSync(cmd, args, { cwd, env, stdio: "inherit" });
+}
+
+function defaultRead(cmd, args, { cwd, env }) {
+  return execFileSync(cmd, args, { cwd, env, encoding: "utf-8" }).trim();
 }
 
 export function buildSpeechHelper({
   platform = process.platform,
   env = process.env,
   arch = env.LINGXI_SPEECH_HELPER_ARCH || process.arch,
+  rootDir = moduleRootDir,
+  run = defaultRun,
+  read = defaultRead,
 } = {}) {
   if (platform !== "darwin") {
     console.log(`[speech-helper] skipped on ${platform}`);
@@ -54,7 +63,7 @@ export function buildSpeechHelper({
     throw new Error(`[speech-helper] build did not produce ${source}`);
   }
 
-  const outDir = outputDir({ rootDir, osName: "mac", arch });
+  const outDir = path.join(rootDir, "dist-speech", `mac-${arch}`);
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.mkdirSync(outDir, { recursive: true });
   const target = path.join(outDir, "lingxi-speech-helper");
@@ -62,14 +71,6 @@ export function buildSpeechHelper({
   fs.chmodSync(target, 0o755);
   console.log(`[speech-helper] copied ${target}`);
   return { skipped: false, target };
-}
-
-function run(cmd, args, { cwd, env }) {
-  execFileSync(cmd, args, { cwd, env, stdio: "inherit" });
-}
-
-function read(cmd, args, { cwd, env }) {
-  return execFileSync(cmd, args, { cwd, env, encoding: "utf-8" }).trim();
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {

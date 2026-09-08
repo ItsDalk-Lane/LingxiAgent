@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ReservedTagScanner, splitReservedTagSegments } from "../shared/reserved-tag-stream.ts";
+import { ReservedTagScanner, splitReservedTagSegments, stripTagEscapes } from "../shared/reserved-tag-stream.ts";
 import { MoodParser, ThinkTagParser } from "../core/events.ts";
 
 /**
@@ -102,7 +102,10 @@ describe("ReservedTagScanner 词表外孤儿闭标签形状规则", () => {
   });
 
   it("转义的字面闭标签（词表内）仍按契约输出字面量", () => {
-    expect(scannerText("\\</think>")).toBe("</think>");
+    // F8/P6.3：转义反斜杠在链上保留（任何层都不得吞掉受保护字面量），
+  // 显示层用 stripTagEscapes 一次性消费 → 用户看到的仍是 </think>。
+  expect(scannerText("\\</think>")).toBe("\\</think>");
+  expect(stripTagEscapes(scannerText("\\</think>"))).toBe("</think>");
   });
 });
 

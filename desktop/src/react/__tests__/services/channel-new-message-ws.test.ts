@@ -51,6 +51,9 @@ vi.mock('../../services/stream-resume', () => ({
   isStreamResumeRebuilding: () => null,
   isStreamScopedMessage: () => false,
   updateSessionStreamMeta: vi.fn(),
+  injectHandlers: vi.fn(),
+  injectWebSocketGetter: vi.fn(),
+  requestStreamResume: vi.fn(),
 }));
 
 import { useStore } from '../../stores';

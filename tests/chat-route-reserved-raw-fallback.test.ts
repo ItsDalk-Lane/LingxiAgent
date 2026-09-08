@@ -311,7 +311,8 @@ describe("chat route reserved raw fallback (text_end 二次回流)", () => {
 
   it("Test 26: 转义 / 行内代码 / 围栏代码中的字面标签仍按正文透传", () => {
     const scenarios = [
-      { name: "escaped", raw: "\\<mood>A</mood>", expected: "<mood>A</mood>" },
+      // F8/P6.3：链上保留反斜杠（显示层消费）；行内代码/围栏本就原样
+      { name: "escaped", raw: "\\<mood>A</mood>", expected: "\\<mood>A</mood>" },
       { name: "inline-code", raw: "`<mood>A</mood>`", expected: "`<mood>A</mood>`" },
       { name: "fenced", raw: "```text\n<mood>A</mood>\n```", expected: "```text\n<mood>A</mood>\n```" },
     ];

@@ -2,6 +2,7 @@ import type { AudioWaveform } from './chat-types';
 import type { JSONContent } from '@tiptap/core';
 import { sessionScopedKey } from './session-slice';
 import { notifyDraftCleared, notifyDraftSet } from './input-draft-sync';
+import { HOME_DRAFT_KEY } from '../../../../shared/input-drafts.ts';
 
 export interface AttachedFile {
   fileId?: string;
@@ -52,6 +53,12 @@ export interface InputSlice {
   drafts: Record<string, string>;
   /** 按 session path 存储的输入框富文本草稿（内存级，关窗口清空） */
   draftDocs: Record<string, JSONContent>;
+  /**
+   * 输入区修订号（按草稿 key）：每次有效编辑（文本变化/附件增删/引用增删/
+   * 文档上下文开关）递增。发送清理只作用于「点击时修订号未变」的原草稿，
+   * 避免准备期间用户继续输入的内容被误清（F1/P2.4）。
+   */
+  composerRevisionsByKey: Record<string, number>;
   /** 草稿持久化 hydrate 完成时间戳（0 = 未 hydrate）；InputArea 恢复 effect 依赖它重跑 */
   draftsHydratedAt: number;
   deskContextAttached: boolean;
@@ -104,6 +111,25 @@ function syncCurrentSessionAttachments(state: InputSlice & { currentSessionPath?
   return patch;
 }
 
+/** 当前输入区的修订号 key：会话草稿（scoped）或首页 pending 草稿。 */
+function currentComposerRevisionKey(
+  state: InputSlice & { currentSessionPath?: string | null; pendingNewSession?: boolean },
+): string | null {
+  const path = typeof state.currentSessionPath === 'string' && state.currentSessionPath
+    ? state.currentSessionPath
+    : null;
+  if (path) return sessionScopedKey(state as any, path) || path;
+  return state.pendingNewSession ? HOME_DRAFT_KEY : null;
+}
+
+function bumpComposerRevision(
+  s: InputSlice & { currentSessionPath?: string | null; pendingNewSession?: boolean },
+  key: string | null,
+): Partial<InputSlice> {
+  if (!key) return {};
+  return { composerRevisionsByKey: { ...s.composerRevisionsByKey, [key]: (s.composerRevisionsByKey[key] ?? 0) + 1 } };
+}
+
 export const createInputSlice = (
   set: (partial: Partial<InputSlice> | ((s: InputSlice) => Partial<InputSlice>)) => void
 ): InputSlice => ({
@@ -111,6 +137,7 @@ export const createInputSlice = (
   attachedFilesBySession: {},
   drafts: {},
   draftDocs: {},
+  composerRevisionsByKey: {},
   draftsHydratedAt: 0,
   deskContextAttached: false,
   docContextAttached: false,
@@ -120,14 +147,23 @@ export const createInputSlice = (
   quotedSelections: [],
   quotedSelection: null,
   addAttachedFile: (file) =>
-    set((s) => syncCurrentSessionAttachments(s as InputSlice & { currentSessionPath?: string | null }, [...s.attachedFiles, file])),
+    set((s) => ({
+      ...syncCurrentSessionAttachments(s as InputSlice & { currentSessionPath?: string | null }, [...s.attachedFiles, file]),
+      ...bumpComposerRevision(s as never, currentComposerRevisionKey(s as never)),
+    })),
   removeAttachedFile: (index) =>
-    set((s) => syncCurrentSessionAttachments(
-      s as InputSlice & { currentSessionPath?: string | null },
-      s.attachedFiles.filter((_, i) => i !== index),
-    )),
+    set((s) => ({
+      ...syncCurrentSessionAttachments(
+        s as InputSlice & { currentSessionPath?: string | null },
+        s.attachedFiles.filter((_, i) => i !== index),
+      ),
+      ...bumpComposerRevision(s as never, currentComposerRevisionKey(s as never)),
+    })),
   setAttachedFiles: (files) =>
-    set((s) => syncCurrentSessionAttachments(s as InputSlice & { currentSessionPath?: string | null }, files)),
+    set((s) => ({
+      ...syncCurrentSessionAttachments(s as InputSlice & { currentSessionPath?: string | null }, files),
+      ...bumpComposerRevision(s as never, currentComposerRevisionKey(s as never)),
+    })),
   clearAttachedFiles: () =>
     set((s) => syncCurrentSessionAttachments(s as InputSlice & { currentSessionPath?: string | null }, [])),
   clearAttachedFilesForSession: (sessionPath) =>
@@ -172,7 +208,8 @@ export const createInputSlice = (
       if (key !== sessionPath) delete drafts[sessionPath];
       if (key !== sessionPath) delete draftDocs[sessionPath];
       notifyDraftSet(key, text, doc ?? null);
-      return { drafts, draftDocs };
+      // 内容确实变化才递增修订号；清空/恢复触发的幂等回写不算编辑。
+      return { drafts, draftDocs, ...bumpComposerRevision(s as never, key) };
     }),
   clearDraft: (sessionPath) =>
     set((s) => {
@@ -189,9 +226,16 @@ export const createInputSlice = (
   setDeskContextAttached: (attached) => set({ deskContextAttached: attached }),
   toggleDeskContext: () =>
     set((s) => ({ deskContextAttached: !s.deskContextAttached })),
-  setDocContextAttached: (attached) => set({ docContextAttached: attached }),
+  setDocContextAttached: (attached) =>
+    set((s) => ({
+      docContextAttached: attached,
+      ...bumpComposerRevision(s as never, currentComposerRevisionKey(s as never)),
+    })),
   toggleDocContext: () =>
-    set((s) => ({ docContextAttached: !s.docContextAttached })),
+    set((s) => ({
+      docContextAttached: !s.docContextAttached,
+      ...bumpComposerRevision(s as never, currentComposerRevisionKey(s as never)),
+    })),
   requestInputFocus: (source = 'gesture') =>
     set((s) => ({ inputFocusTrigger: s.inputFocusTrigger + 1, inputFocusTriggerSource: source })),
   setQuoteCandidate: (sel) => set({ quoteCandidate: sel }),
@@ -199,15 +243,28 @@ export const createInputSlice = (
   addQuotedSelection: (sel) =>
     set((s) => {
       const quotedSelections = [...s.quotedSelections, sel];
-      return { quotedSelections, quotedSelection: quotedSelections[0] ?? null };
+      return {
+        quotedSelections,
+        quotedSelection: quotedSelections[0] ?? null,
+        ...bumpComposerRevision(s as never, currentComposerRevisionKey(s as never)),
+      };
     }),
   removeQuotedSelection: (index) =>
     set((s) => {
       const quotedSelections = s.quotedSelections.filter((_, i) => i !== index);
-      return { quotedSelections, quotedSelection: quotedSelections[0] ?? null };
+      return {
+        quotedSelections,
+        quotedSelection: quotedSelections[0] ?? null,
+        ...bumpComposerRevision(s as never, currentComposerRevisionKey(s as never)),
+      };
     }),
   clearQuotedSelections: () => set({ quotedSelections: [], quotedSelection: null }),
-  setQuotedSelections: (sels) => set({ quotedSelections: sels, quotedSelection: sels[0] ?? null }),
+  setQuotedSelections: (sels) =>
+    set((s) => ({
+      quotedSelections: sels,
+      quotedSelection: sels[0] ?? null,
+      ...bumpComposerRevision(s as never, currentComposerRevisionKey(s as never)),
+    })),
   setQuotedSelection: (sel) => set({ quotedSelections: [sel], quotedSelection: sel }),
   clearQuotedSelection: () => set({ quoteCandidate: null, quotedSelections: [], quotedSelection: null }),
 });
