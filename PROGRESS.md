@@ -1510,3 +1510,6 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - R01–R10 联合冻结 25 文件 / 321 测试通过；typecheck exit 0；lint exit 0（9203 warnings）；客户端、合成签名服务端、speech helper 与 permissions 构建通过。原样全量在封印前为 13383 passed / 1 failed / 7 skipped，唯一失败是旧审计坐标正确拒绝新源码；排除该 seal 的补充全量为 13381 passed / 7 skipped、exit 0。逐命令原始日志和哈希见 `artifacts/f1-f12-repair/round2/`。
 - 用户在完成本地交付后明确授权提交并推送。本次按既有六文件流程推进审计坐标，不扩大 allowlist；封印提交后的独立 guard、矩阵和全量复验结果在后续同节记录。
 - 真实 macOS TCC/转写、真实供应商、Windows/Linux/其他架构及 Apple notarization 仍未执行或受凭证阻塞；本地证据不替代这些验证。聊天工具栏未增加语音输入组件，保留后端 ASR/TTS 与原生音频能力。
+- 提交后首轮全量在 `2c178715` 暴露交付证据仍只核对工作树，13383 passed / 1 failed / 7 skipped；改为在 audit-only seal 存在时读取真实 `VERIFIED_SOURCE_SHA` Git 对象并执行 seal guard。随后逐文件 `git show` 在全量并发下先出现 `ENOBUFS`，再因 3454 次进程启动超过 60 秒；没有提高测试超时，改用一次 `git cat-file --batch`，保留全部逐文件字节数与 SHA-256 断言。上述失败日志为 `/tmp/lingxi-r01-r10-postseal-full.log`、`/tmp/lingxi-r01-r10-final-postseal-full.log`。
+- 最终源码候选 `7cf986236cb8ac5c2d22cce1e5882554a42cff28`，审计封印提交 `62c73f77`；候选 source manifest SHA-256 `c418b3ef2fc475e40ed779f21b8e087b120834e9b673baf2e67c3758138d30d8`。封印后独立 diff guard 与 133 路径矩阵通过，upstream-sync、seal、round2 delivery 三文件 20/20 通过。
+- 封印后原样 `npm test` exit 0：1334 文件通过 / 1 既有跳过，13384 测试通过 / 7 既有跳过，0 fail，82.80s；日志 `/tmp/lingxi-r01-r10-final-postseal-full-v2.log`。最终审计记录只改本 allowlist 内的 `PROGRESS.md`，不改变受测源码候选。
