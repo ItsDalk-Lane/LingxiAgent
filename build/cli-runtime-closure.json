@@ -800,6 +800,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/agent-review/turn-coordinator.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/routes/chat.ts",
           "kind": "import-statement"
         },
@@ -819,7 +824,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); lib/session-collab/delivery.ts (import-statement); core/session-turn-actions.ts (import-statement); +4 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); lib/session-collab/delivery.ts (import-statement); core/session-turn-actions.ts (import-statement); +5 more importer(s)."
     },
     {
       "path": "core/device-registry.ts",
@@ -1824,6 +1829,18 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by core/bridge-session-manager.ts (import-statement); core/agent.ts (import-statement); core/agent-manager.ts (import-statement); +5 more importer(s)."
+    },
+    {
+      "path": "core/pinned-tenets-backup-dir.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/pinned-tenets-migration.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/pinned-tenets-migration.ts (import-statement)."
     },
     {
       "path": "core/pinned-tenets-migration.ts",
@@ -128582,9 +128599,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10972,
+    "totalFiles": 10973,
     "byInputType": {
-      "source-graph": 763,
+      "source-graph": 764,
       "runtime-asset": 11,
       "nft-runtime-trace": 10198
     }

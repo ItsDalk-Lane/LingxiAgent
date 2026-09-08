@@ -31,7 +31,8 @@ export interface ChatSlice {
   appendItem: (path: string, item: ChatListItem) => void;
   appendOptimisticUserMessage: (path: string, message: ChatMessage) => void;
   confirmOptimisticUserMessage: (path: string, clientMessageId: string, message: ChatMessage) => boolean;
-  markOptimisticUserMessageFailed: (path: string, clientMessageId: string, error: string) => boolean;
+  markOptimisticUserMessageFailed: (path: string, clientMessageId: string, error: string, retryable?: boolean) => boolean;
+  removeOptimisticUserMessage: (path: string, clientMessageId: string) => boolean;
   updateLastMessage: (path: string, updater: (msg: ChatMessage) => ChatMessage) => void;
   updateMessageById: (path: string, messageId: string, updater: (msg: ChatMessage) => ChatMessage) => boolean;
   bindPersistedTurnEntries: (path: string, entries: {
@@ -74,6 +75,11 @@ export interface ChatSlice {
   enqueueQueuedTurnInput: (path: string, item: QueuedTurnInput) => void;
   updateQueuedTurnInputText: (path: string, id: string, text: string) => void;
   removeQueuedTurnInput: (path: string, id: string) => void;
+  /**
+   * 拒绝后原位恢复队列项（C01）：transport_submitted 时已出队的项收到服务端
+   * 明确拒绝后，按原位置/原身份恢复为可见失败输入；同 id 已存在时幂等刷新状态。
+   */
+  restoreQueuedTurnInput: (path: string, item: QueuedTurnInput, index?: number | null) => void;
   /** 显式标记队列项调度结果（blocked/failed/ready）；错误码与可重试性随状态记录。 */
   setQueuedTurnInputStatus: (path: string, id: string, status: 'ready' | 'blocked' | 'failed', errorCode?: string, retryable?: boolean) => void;
 }
@@ -241,7 +247,7 @@ export const createChatSlice = (
     return consumed;
   },
 
-  markOptimisticUserMessageFailed: (path, clientMessageId, error) => {
+  markOptimisticUserMessageFailed: (path, clientMessageId, error, retryable) => {
     let consumed = false;
     set((s) => {
       const session = scopedMapValue<SessionMessages>(s as any, s.chatSessions, path);
@@ -261,8 +267,32 @@ export const createChatSlice = (
           ...current.data,
           sendStatus: 'failed',
           sendError: error,
+          ...(retryable !== undefined ? { sendRetryable: retryable } : {}),
         },
       };
+      consumed = true;
+      return {
+        chatSessions: putScopedMapValue(s as any, s.chatSessions, path, { ...session, items }),
+      };
+    });
+    if (consumed) bumpMessageLiveVersion(path);
+    return consumed;
+  },
+
+  /** 明确放弃失败输入（C01）：移除失败消息投影；处置语义由调用方（coordinator）统筹。 */
+  removeOptimisticUserMessage: (path, clientMessageId) => {
+    let consumed = false;
+    set((s) => {
+      const session = scopedMapValue<SessionMessages>(s as any, s.chatSessions, path);
+      if (!session) return {};
+      const targetIdx = session.items.findIndex((item) =>
+        item.type === 'message' &&
+        item.data.role === 'user' &&
+        (item.data.id === clientMessageId || item.data.clientMessageId === clientMessageId),
+      );
+      if (targetIdx < 0) return {};
+      const items = [...session.items];
+      items.splice(targetIdx, 1);
       consumed = true;
       return {
         chatSessions: putScopedMapValue(s as any, s.chatSessions, path, { ...session, items }),
@@ -798,6 +828,30 @@ export const createChatSlice = (
       queuedTurnInputsByPath: {
         ...s.queuedTurnInputsByPath,
         [key]: existing.filter(item => item.id !== id),
+      },
+    };
+  }),
+
+  restoreQueuedTurnInput: (path, item, index) => set((s) => {
+    const key = keyForSession(s as any, path);
+    const existing = s.queuedTurnInputsByPath[key] || [];
+    if (existing.some(candidate => candidate.id === item.id)) {
+      // 幂等：同 id 已在队（重复回执/竞态）只刷新失败状态，不重复插入。
+      return {
+        queuedTurnInputsByPath: {
+          ...s.queuedTurnInputsByPath,
+          [key]: existing.map(candidate => candidate.id === item.id
+            ? { ...candidate, status: item.status, errorCode: item.errorCode, retryable: item.retryable }
+            : candidate),
+        },
+      };
+    }
+    const clamped = Math.max(0, Math.min(index ?? existing.length, existing.length));
+    const next = [...existing.slice(0, clamped), item, ...existing.slice(clamped)];
+    return {
+      queuedTurnInputsByPath: {
+        ...s.queuedTurnInputsByPath,
+        [key]: next,
       },
     };
   }),

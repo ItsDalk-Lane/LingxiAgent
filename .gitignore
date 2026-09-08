@@ -91,6 +91,12 @@ auth.json
 # 日志
 *.log
 logs/
+# F1-F12 修复轮交付证据例外（C03）：round2/round3 审计日志是测试依赖的交付物，
+# 随仓库分发；先重包含目录再重包含文件，其余运行日志继续按上面规则忽略。
+!artifacts/f1-f12-repair/round2/logs/
+!artifacts/f1-f12-repair/round2/logs/**
+!artifacts/f1-f12-repair/round3-c01-c03/logs/
+!artifacts/f1-f12-repair/round3-c01-c03/logs/**
 
 # 系统文件
 .DS_Store
@@ -99,6 +105,9 @@ logs/
 # Codex reviews
 reviews/
 .superpowers/
+
+# 本地工具工作台状态（会话记忆类，不入库也不入证据 manifest）
+.workbuddy/
 
 # Codex environments
 .codex/

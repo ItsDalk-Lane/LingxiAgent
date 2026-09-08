@@ -22,6 +22,7 @@ import { isSessionCompacting } from '../stores/context-slice';
 import type { ComposerSendBundle, QueuedTurnInput } from '../stores/chat-types';
 import {
   commitPreparedComposerSend,
+  createClientAttemptId,
   createClientUserMessageId,
   prepareComposerSend,
   type ComposerDispatchResult,
@@ -43,12 +44,18 @@ export type ComposerSendPhase =
   | 'accepted'
   | 'blocked'
   | 'failed_before_submit'
-  | 'delivery_unknown';
+  | 'delivery_unknown'
+  /** 服务端在接受前明确拒绝（C01）：内容未被持久化，保留快照可显式重试。 */
+  | 'rejected_before_acceptance';
 
 export interface ComposerSendRecord {
   leaseId: string;
   clientMessageId: string;
   queueItemId: string | null;
+  /** 派发时队列项在队列中的位置：transport_submitted 出队后拒绝时按它原位恢复（C01）。 */
+  queueItemIndex: number | null;
+  /** 队列项原 createdAt：恢复时保留原逻辑身份与时间线。 */
+  queueItemCreatedAt: number | null;
   identity: ComposerSessionIdentity;
   /** 取得租约时的连接代次；代次不匹配的准备任务禁止向新连接发送旧载荷。 */
   connectionGeneration: number;
@@ -69,8 +76,12 @@ export interface ComposerSendRecord {
    * 可能尚未回流，revalidate 不得把「投影缺席」误判为会话已删除。
    */
   identityFreshlyCreated?: boolean;
-  acceptance: 'unproven' | 'accepted';
+  acceptance: 'unproven' | 'accepted' | 'rejected';
   runStatus: 'run_unknown' | 'running' | 'terminal' | 'reconciled_idle';
+  /** 最近一次 transport_submitted 的尝试身份；拒绝回执按它关联（C01）。 */
+  activeAttemptId: string | null;
+  /** 已观察过的尝试身份：重复/迟到回执按集合判定，不按时间先后猜归属。 */
+  seenAttemptIds: Set<string>;
   sourceEntryId?: string;
   observedRunId?: string;
   observedRunSeq?: number;
@@ -228,9 +239,11 @@ function settleRecord(
   releaseSendLease(record.leaseId);
 }
 
-function markAwaitingAck(record: ComposerSendRecord): void {
+function markAwaitingAck(record: ComposerSendRecord, attemptId: string): void {
   if (record.phase !== 'preparing') return;
   record.phase = 'awaiting_ack';
+  record.activeAttemptId = attemptId;
+  record.seenAttemptIds.add(attemptId);
   record.ackTimer = setTimeout(() => {
     record.ackTimer = null;
     if (record.phase !== 'awaiting_ack') return;
@@ -267,6 +280,9 @@ export function tryAcquireSendLease(input: AcquireSendLeaseInput): AcquireSendLe
   const leaseId = `composer-lease-${++leaseSeq}`;
   // 同一队列项同版本的重试/类型切换复用身份；编辑改变版本后创建新身份。
   let clientMessageId: string | null = null;
+  // 队列项快照位置：transport_submitted 出队后收到拒绝时，按原位恢复为失败输入。
+  let queueItemIndex: number | null = null;
+  let queueItemCreatedAt: number | null = null;
   if (input.queueItemId) {
     for (const record of recordsByLease.values()) {
       if (record.queueItemId === input.queueItemId && record.snapshotVersion === (input.snapshotVersion ?? 1)
@@ -275,11 +291,21 @@ export function tryAcquireSendLease(input: AcquireSendLeaseInput): AcquireSendLe
         break;
       }
     }
+    if (input.identity.kind === 'session') {
+      const items = sessionScopedValue(useStore.getState(), useStore.getState().queuedTurnInputsByPath, input.identity.sessionPath) || [];
+      const index = items.findIndex(item => item.id === input.queueItemId);
+      if (index >= 0) {
+        queueItemIndex = index;
+        queueItemCreatedAt = items[index].createdAt ?? null;
+      }
+    }
   }
   const record: ComposerSendRecord = {
     leaseId,
     clientMessageId: clientMessageId ?? createClientUserMessageId(),
     queueItemId: input.queueItemId ?? null,
+    queueItemIndex,
+    queueItemCreatedAt,
     identity: input.identity,
     connectionGeneration,
     originConnectionKey: composerOriginConnectionKey(),
@@ -290,6 +316,8 @@ export function tryAcquireSendLease(input: AcquireSendLeaseInput): AcquireSendLe
     phase: 'preparing',
     acceptance: 'unproven',
     runStatus: 'run_unknown',
+    activeAttemptId: null,
+    seenAttemptIds: new Set(),
     code: null,
     retryable: false,
     cancelled: false,
@@ -423,6 +451,161 @@ function isUnresolved(record: ComposerSendRecord): boolean {
   return record.phase === 'awaiting_ack' || record.phase === 'delivery_unknown'
     || record.phase === 'accepted' && !['terminal', 'reconciled_idle'].includes(record.runStatus);
 }
+
+// ── 类型化拒绝结算（C01）──
+
+export interface ComposerInputRejectionEvidence {
+  originConnectionKey: string;
+  sessionId: string;
+  sessionPath: string;
+  clientMessageId: string;
+  snapshotVersion: number;
+  clientAttemptId?: string | null;
+}
+
+export interface ComposerInputRejectionReceipt {
+  code: string;
+  retryable: boolean;
+}
+
+/**
+ * 服务端「接受前拒绝」的统一结算入口（ws-message-handler 调用）：
+ * - 身份五元组（连接/会话/消息/快照/尝试）全匹配才结算；跨服务器、跨会话、
+ *   错误版本、旧尝试的回执一律无效果。
+ * - 已有 canonical 接受证据时不倒退为未接收（冲突回执保留诊断）。
+ * - 幂等：已结算记录不被重复回执改动；迟到的 HTTP 对账也不能覆盖。
+ * - 只释放这一条记录的租约与未决屏障；传输史（已执行 ws.send 的尝试）不改写。
+ */
+export function noteComposerInputRejected(
+  evidence: ComposerInputRejectionEvidence,
+  receipt: ComposerInputRejectionReceipt,
+): boolean {
+  if (!evidence.clientMessageId || !Number.isSafeInteger(evidence.snapshotVersion)) return false;
+  const candidates = [...recordsByLease.values()].filter(record => record.clientMessageId === evidence.clientMessageId
+    && record.originConnectionKey === evidence.originConnectionKey
+    && record.identity.kind === 'session'
+    && record.identity.sessionId === evidence.sessionId
+    && record.identity.sessionPath === evidence.sessionPath
+    && record.snapshotVersion === evidence.snapshotVersion);
+  if (!candidates.length) return false;
+  // canonical 接受证据优先：冲突负回执不倒退，保留诊断。
+  if (candidates.some(record => record.acceptance === 'accepted')) {
+    console.warn('[composer-send] conflicting input_rejected after canonical acceptance; keeping accepted', {
+      clientMessageId: evidence.clientMessageId,
+      attemptId: evidence.clientAttemptId ?? null,
+      code: receipt.code,
+    });
+    return false;
+  }
+  const attemptId = typeof evidence.clientAttemptId === 'string' && evidence.clientAttemptId ? evidence.clientAttemptId : null;
+  // 尝试身份匹配：带 attemptId 的回执只结算对应尝试；旧尝试的迟到回执不碰新尝试。
+  const settleable = candidates.filter(record => record.phase === 'awaiting_ack' || record.phase === 'delivery_unknown');
+  const matched = attemptId
+    ? settleable.filter(record => record.activeAttemptId === attemptId)
+    : settleable;
+  if (!matched.length) return false;
+  const settled: ComposerSendRecord[] = [];
+  for (const record of matched) {
+    if (record.ackTimer) {
+      clearTimeout(record.ackTimer);
+      record.ackTimer = null;
+    }
+    record.phase = 'rejected_before_acceptance';
+    record.acceptance = 'rejected';
+    record.code = receipt.code;
+    record.retryable = receipt.retryable !== false;
+    releaseSendLease(record.leaseId);
+    settled.push(record);
+  }
+  for (const record of settled) {
+    if (record.identity.kind !== 'session') continue;
+    const sessionPath = record.identity.sessionPath;
+    // 现有失败展示：乐观消息标失败（正文/附件/引用/知识范围全部原样保留）。
+    useStore.getState().markOptimisticUserMessageFailed(
+      sessionPath,
+      record.clientMessageId,
+      receipt.code,
+      record.retryable,
+    );
+    // 队列项已在 transport_submitted 时出队：原位恢复为可见、可处置的失败输入，
+    // 保留原逻辑身份与顺序；后续排队项不越过失败项（flush 的队首门禁已保证）。
+    restoreQueueItemAfterRejection(record);
+  }
+  return true;
+}
+
+function restoreQueueItemAfterRejection(record: ComposerSendRecord): void {
+  if (!record.queueItemId || record.identity.kind !== 'session') return;
+  const sessionPath = record.identity.sessionPath;
+  const store = useStore.getState();
+  const items = sessionScopedValue(store as never, store.queuedTurnInputsByPath, sessionPath) || [];
+  if (items.some(item => item.id === record.queueItemId)) return;
+  const restored: QueuedTurnInput = {
+    id: record.queueItemId,
+    sessionPath,
+    text: record.bundle.text,
+    createdAt: record.queueItemCreatedAt ?? Date.now(),
+    bundle: record.bundle,
+    snapshotVersion: record.snapshotVersion,
+    status: 'failed',
+    errorCode: record.code ?? undefined,
+    retryable: record.retryable,
+  };
+  store.restoreQueuedTurnInput(sessionPath, restored, record.queueItemIndex ?? items.length);
+}
+
+/** 显式重试被拒绝的用户消息：同一逻辑身份、新尝试身份（C01）。 */
+export async function retryRejectedUserMessage(
+  sessionPath: string,
+  clientMessageId: string,
+  deps?: ComposerSendFlowDeps,
+): Promise<ComposerDispatchResult | null> {
+  const record = findRejectedRecordByClientMessageId(sessionPath, clientMessageId);
+  if (!record) return null;
+  return retrySendRecord(record.leaseId, deps ?? defaultComposerSendFlowDeps());
+}
+
+/** 明确放弃被拒绝的输入：取消记录、移除失败投影（消息与队列项同源处置）。 */
+export function discardRejectedUserMessage(sessionPath: string, clientMessageId: string): boolean {
+  const record = findRejectedRecordByClientMessageId(sessionPath, clientMessageId);
+  if (!record) return false;
+  record.cancelled = true;
+  const store = useStore.getState();
+  if (record.queueItemId && record.identity.kind === 'session'
+    && record.identity.sessionPath === sessionPath) {
+    cancelQueueItemSend(record.queueItemId, 'send_cancelled');
+    store.removeQueuedTurnInput(sessionPath, record.queueItemId);
+  }
+  store.removeOptimisticUserMessage(sessionPath, clientMessageId);
+  return true;
+}
+
+function findRejectedRecordByClientMessageId(sessionPath: string, clientMessageId: string): ComposerSendRecord | null {
+  for (const record of recordsByLease.values()) {
+    if (record.clientMessageId !== clientMessageId || record.phase !== 'rejected_before_acceptance') continue;
+    if (record.identity.kind !== 'session' || record.identity.sessionPath !== sessionPath) continue;
+    return record;
+  }
+  return null;
+}
+
+/** 消息级重试的默认依赖：视觉辅助配置与 i18n 不依赖 InputArea 闭包。 */
+export function defaultComposerSendFlowDeps(): ComposerSendFlowDeps {
+  return {
+    loadVisionAuxiliaryConfig: async () => {
+      try {
+        const { lingxiFetch } = await import('../hooks/use-hana-fetch');
+        const res = await lingxiFetch('/api/preferences/models');
+        const data = await res.json();
+        return { enabled: data?.models?.vision_enabled === true, model: data?.models?.vision || null };
+      } catch {
+        return { enabled: false, model: null };
+      }
+    },
+    t: (key: string, params?: Record<string, string | number>) =>
+      (window.t ?? ((fallback: string) => fallback))(key, params as Record<string, string> | undefined),
+  };
+}
 function unresolvedForKey(key: string): ComposerSendRecord[] {
   return [...recordsByLease.values()].filter(record => isUnresolved(record)
     && identityKey(record.identity, record.originConnectionKey) === key);
@@ -462,6 +645,8 @@ export function noteComposerRunEvent(message: { type: string; sessionId?: string
   if (message.type === 'assistant_run_end' && unresolvedForKey(key).length) void reconcileComposerSession(message.sessionPath);
 }
 function updateReconciliationDisplay(record: ComposerSendRecord, checking: boolean): void {
+  // 已确定的拒绝结果不被迟到的对账展示覆盖（HTTP 对账晚于类型化负回执到达时）。
+  if (record.phase === 'rejected_before_acceptance') return;
   record.reconciliationStatus = checking ? 'checking' : 'failed';
   if (record.identity.kind === 'session') useStore.getState().markOptimisticUserMessageFailed(
     record.identity.sessionPath, record.clientMessageId, checking ? 'delivery_unknown_checking' : 'delivery_unknown_failed');
@@ -548,14 +733,14 @@ export function reconcileComposerSession(sessionPath: string): Promise<void> {
       if (!oldest || seen.has(oldest)) throw new Error('history_pagination_incomplete');
       seen.add(oldest); before = oldest;
     }
-    for (const record of records) if (record.acceptance !== 'accepted') {
+    for (const record of records) if (record.acceptance !== 'accepted' && record.phase !== 'rejected_before_acceptance') {
       record.code = 'history_incomplete_or_unproven'; updateReconciliationDisplay(record, false);
     }
   }).catch(error => {
     if (!valid() && !controller.signal.aborted) return;
     if (generation !== connectionGeneration || composerOriginConnectionKey() !== scope.originConnectionKey) return;
     for (const record of records) {
-      if (!isUnresolved(record) || (eventRevisions.get(key) ?? 0) !== revision) continue;
+      if (record.phase === 'rejected_before_acceptance' || !isUnresolved(record) || (eventRevisions.get(key) ?? 0) !== revision) continue;
       record.code = controller.signal.aborted ? 'reconciliation_timeout' : String(error?.message || 'reconciliation_failed');
       updateReconciliationDisplay(record, false);
     }
@@ -728,13 +913,15 @@ export async function sendWithLease(
     return prep.result;
   }
 
+  const attemptId = createClientAttemptId();
   const result = await commitPreparedComposerSend(prep.prepared, {
     t: deps.t,
+    attemptId,
     onCommit: () => { record.commitStarted = true; deps.onCommit?.(); },
     revalidate: () => revalidateLeaseCommit(record, prep.prepared),
   });
   if (result.kind === 'transport_submitted') {
-    markAwaitingAck(record);
+    markAwaitingAck(record, attemptId);
   } else {
     record.commitStarted = false;
     settleRecord(record, result.kind === 'blocked' ? 'blocked' : 'failed_before_submit', result.code, result.retryable);
@@ -743,14 +930,15 @@ export async function sendWithLease(
   return result;
 }
 
-/** 显式重试：仅允许「明确未发送」的记录（blocked/failed_before_submit 且可重试）。 */
+/** 显式重试：仅允许「明确未发送/未接受」的记录（blocked / failed_before_submit /
+ *  rejected_before_acceptance 且可重试）。 */
 export async function retrySendRecord(
   leaseId: string,
   deps: ComposerSendFlowDeps,
 ): Promise<ComposerDispatchResult | null> {
   const record = recordsByLease.get(leaseId);
   if (!record) return null;
-  if ((record.phase !== 'failed_before_submit' && record.phase !== 'blocked') || !record.retryable) {
+  if ((record.phase !== 'failed_before_submit' && record.phase !== 'blocked' && record.phase !== 'rejected_before_acceptance') || !record.retryable) {
     return null;
   }
   const key = identityKey(record.identity, record.originConnectionKey);

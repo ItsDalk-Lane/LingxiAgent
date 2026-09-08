@@ -1,0 +1,223 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-01: 旧 F7/D 系列明确 superseded，当前无语音输入组件要求与保留能力写清 28ms
+ ✓ tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-02: COMMAND_RESULTS 的日志与源码 manifest 均存在且 SHA-256 可复算 105ms
+ × tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁 154ms
+   → expected undefined to be truthy
+ ✓ tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示 24ms
+ × tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-05: R01-R09 每项均绑定存在的真实测试文件、runner 标题、日志与源码摘要 5ms
+   → expected 'BLOCKED' to be 'VERIFIED' // Object.is equality
+ × tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-06: 真机权限、真实供应商和其他平台只标 BLOCKED，不伪装成本地通过 0ms
+   → expected '# R01–R10 二轮修复报告（执行中）\n\n适用基线：89bc0b6…' to match /真机[^\n]*BLOCKED|BLOCKED[^\n]*真机/
+ × tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-07/08: 失败与成功记录并存且 exit 未改写，历史缺失日志明确 unavailable 1ms
+   → expected '# R01–R10 执行断点\n\n基线：89bc0b64bf0a9b84…' to match /历史.*日志.*unavailable|unavailable.*历史.…/i
+ ✓ tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-10: 本轮日志不泄漏真实用户路径，旧听写流程只以历史/superseded 身份出现 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁
+AssertionError: expected undefined to be truthy
+
+- Expected:
+true
+
++ Received:
+undefined
+
+ ❯ tests/round2-delivery-evidence.test.ts:85:19
+     83|       && record.sourceChangedDuringCommand === false
+     84|     ));
+     85|     expect(green).toBeTruthy();
+       |                   ^
+     86|   });
+     87|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-05: R01-R09 每项均绑定存在的真实测试文件、runner 标题、日志与源码摘要
+AssertionError: expected 'BLOCKED' to be 'VERIFIED' // Object.is equality
+
+Expected: "VERIFIED"
+Received: "BLOCKED"
+
+ ❯ tests/round2-delivery-evidence.test.ts:102:28
+    100|     expect(cases.length).toBeGreaterThan(0);
+    101|     for (const entry of cases) {
+    102|       expect(entry.status).toBe("VERIFIED");
+       |                            ^
+    103|       expect(entry.tests?.length).toBeGreaterThan(0);
+    104|       for (const test of entry.tests) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-06: 真机权限、真实供应商和其他平台只标 BLOCKED，不伪装成本地通过
+AssertionError: expected '# R01–R10 二轮修复报告（执行中）\n\n适用基线：89bc0b6…' to match /真机[^\n]*BLOCKED|BLOCKED[^\n]*真机/
+
+- Expected:
+/真机[^\n]*BLOCKED|BLOCKED[^\n]*真机/
+
++ Received:
+"# R01–R10 二轮修复报告（执行中）
+
+适用基线：89bc0b64bf0a9b84ef3532efaa66c23213affb70；源码身份为隔离未提交 worktree，逐文件摘要及每次命令见本目录 JSON。该报告持续更新，不是最终交付。
+
+| 问题 | implementation | automatedVerification | realEnvironmentVerification | closure |
+|---|---|---|---|---|
+| R01 | IMPLEMENTED | VERIFIED（合成文件系统） | BLOCKED（home 所有权前提未验证） | BLOCKED |
+| R02 | IMPLEMENTED | VERIFIED（合成文件系统与 CLI 拒绝） | BLOCKED（无可复用排他所有权） | BLOCKED |
+| R03 | IMPLEMENTED（S3 阶段） | VERIFIED（真实模块/组件阶段验证） | OPEN（不以合成验证冒充真实环境） | OPEN（S3/S4 联合待验收） |
+| R04 | IMPLEMENTED（S4 阶段） | VERIFIED（真实模块/组件与 SDK 历史路由） | OPEN（本地受控边界，不代替真实环境） | OPEN（全任务与最终门禁未完成） |
+| R05 | IMPLEMENTED（S5 阶段） | VERIFIED（真实组件 DOM/复制与历史、scanner 回归） | OPEN（不代替真实桌面及跨平台验收） | OPEN（全任务与最终门禁未完成） |
+| R06 | IMPLEMENTED（S6 阶段） | VERIFIED（真实 TipTap、serializer 与发送/历史回归） | OPEN（不代替真实桌面及跨平台验收） | OPEN（全任务与最终门禁未完成） |
+| R07 | IMPLEMENTED（S7 阶段） | VERIFIED（decoder 与真实合成 helper 生命周期/并发） | BLOCKED（原生识别、真实权限及跨平台未验收） | OPEN（全任务与最终门禁未完成） |
+| R08 | IMPLEMENTED（S8 阶段） | VERIFIED（参数解析与 manager/adapter 受控边界） | OPEN（付费供应商、真实 say 与跨平台未验收） | OPEN（全任务与最终门禁未完成） |
+| R09 | IMPLEMENTED（S9 阶段） | VERIFIED（真实 TaskStore 与合成文件系统边界） | OPEN（真实权限、跨平台与供应商未验收） | OPEN（全任务与最终门禁未完成） |
+| R10 | OPEN（S10 active） | OPEN | OPEN | OPEN |
+
+S1/S2 联合阶段出口：s2-exit，10 文件 142 passed / 0 failed / 0 skipped；源码摘要 6f4dbbdc0a6fcbeabd6b52b1bd4a70103e92eb8af8fd169228b1e0c5b59bb7ef。此结果仅证明该时刻源码，后续变更必须重跑受影响检查。
+
+R01：严格 v3 收据（兼容 v2）、全源映射与 active/内容/新增来源/创建时间证明；原始源/目标/旧收据独占备份；归档先规划，COPYFILE_EXCL 后回读再删除原名，支持归档后收据前 SIGKILL 恢复。旧 completed 不重写、不复活。
+
+R02：active 优先去重；批准绑定操作、源摘要与目标快照，逐来源条目映射；独立 recovery operation 收据、同单返回原摘要、完成后不补回删除内容。共享 pins 专用事务执行器。CLI apply 明确 BLOCKED_HOME_OWNERSHIP；合成直接模块测试不代替真实 home 排他证明。
+
+R03（仅 S3 阶段）：队列意图读取最新依赖并按 scope/owner 撤销；开始编辑同步使旧准备租约失效，保存改变正文才增加版本并换逻辑身份，取消保留原失败状态。自动 timer 限当前聊天会话，已取得的 A 租约切页后可完成且不清 B 草稿；立即插入仍受编辑、租约、run 与附件门禁限制。五语种不可编辑提示明确要求先核对发送结果。
+
+阶段验证：`logs/s3-final-delivery.log` 13 文件 120 passed，exit 0；`logs/s3-typecheck-delivery.log` 三段 tsc 通过。受测源码摘要 `e6d582c1d99f9eb8bc67d57ae6f78e83356c96cfdf6c3f56c96735f8492bfe10`。矩阵逐项绑定 R03-01–R03-12 的真实测试标题。S4 正在执行；S3/S4 联合验收及未知投递对账尚不能由这些结果推定通过，R03 closure 保持 OPEN。
+
+无提交、推送、合并、发布、真实用户数据迁移、真实权限或付费调用。未恢复聊天工具栏语音输入，不删除保留后端音频能力。
+
+完整合并或发布验收尚未满足：后续阶段未完成，真实平台及 home 所有权仍有阻塞。最终补丁、重放验证、全量门禁和交付清单尚未生成。
+
+R04（S4 冻结出口）：未知输入保留独立屏障与完整快照；canonical ACK 只证明接收，运行空闲须有权威证据。捕获服务器与会话身份后执行有界分页单飞对账，拒绝陈旧响应及跨分支/版本错误关联；历史和 ACK 合并同一气泡并保留原文附件，失败显示核对诊断且不盲重发。
+
+阶段验证：`logs/s4-exit.log` 7 文件 96 passed / 0 failed / 0 skipped，`logs/s4-exit-typecheck.log` 三段 tsc 通过，均 exit 0；manifest `96f1f8edc3693edafeaddfb31f64aabb8b7555a8827739f5474165af3f7606c4`。R04-01–R04-18 逐项真实标题与限制见矩阵。S5 执行中；R01–R03 上述证据状态保留。该出口不代表全任务闭环、最终重放/全量门禁、真实服务器断网或跨平台验收。
+
+R05（S5 阶段）：StreamingMarkdownContent 直接消费 canonical source，移除 stripTagEscapes，避免显示层再次删除反斜杠；scanner 既有结构化协议与孤儿闭标签边界不改。真实组件覆盖代码、正文、重复渲染、delta 切分、终态和复制，配套历史与 scanner 回归保留。超长文本按 canonical source 转义降级；旧 HTML 缺 source 时不反推或声称恢复既往丢字。
+
+验证：`logs/s5-red.log` 5 failed / 49 passed；`logs/s5-exit-verified.log` 6 文件 105 passed / 0 failed / 0 skipped，exit 0；`logs/s5-typecheck.log` 三段 tsc 通过，exit 0。最终两项 manifest 为 `45132e6c7746daf8d90a7b9b13f4f3140927c35f32460398891ee6116c35bea4`。R05-01–R05-10 的真实标题及 RED/回归区别见矩阵。S6 执行中，真实桌面剪贴板、跨平台及全任务最终门禁不由本地自动验证代替，报告仍非最终完成交付。
+
+R06（S6 阶段）：关闭 StarterKit 默认 trailingNode，删除 serializer 无条件尾空段循环；首中尾空段、hardBreak、tab 和全角空格按用户内容保留，旧无标记草稿 hydration 不猜测删除。R06-05/06 未新增 synthetic 标记或解除机制，因为无来源自动补尾已关闭；真实编辑器覆盖用户创建及编辑尾空段。链接与 badge 身份提取、粘贴、判空、失败重试及 wire/历史边界均回归。
+
+验证：`logs/s6-red.log` 7 failed / 1 passed；`logs/s6-exit.log` 10 文件 77 passed / 0 failed / 0 skipped，exit 0；`logs/s6-typecheck.log` 三段 tsc 通过，exit 0。最终两项 manifest：`1105df54e4123f4bf0131e0e110467a2b214eb2c6eacc6f25ef8e3a793eaec54`。矩阵标明 R06-01–R06-12 的真实标题及条件适用性。S7 执行中，真实桌面剪贴板、跨平台及全任务最终门禁仍未闭环。
+
+R07（S7 阶段）：stdout/stderr 使用各自独立的 StringDecoder，按原始字节计数并在 close 时 flush，避免 UTF-8 跨块破坏中文、emoji 或组合字符。成功输出的 text 必须是字符串，否则明确 INVALID_OUTPUT；合法 U+FFFD 保留。既有输出上限、一次结算、取消/超时及事件循环推进规则保留。
+
+验证：`logs/s7-red.log` 4 failed / 8 passed；`logs/s7-exit.log` 7 文件 39 passed / 0 failed / 0 skipped，exit 0；`logs/s7-typecheck.log` 三段 tsc 通过，exit 0。最终两项 manifest：`2bb59c4adc6950d2e4490b991737e4e3779bf350890555e004c9472052edf7b2`。R07-01–R07-10 绑定 decoder、真实异步合成 helper、既有超时/大输出和 X05 并发测试。S8 执行中，合成 helper 证据不代表原生识别、真实权限、付费调用或跨平台验收；保留后端 ASR/TTS 与原生音频能力，不恢复聊天工具栏语音输入或旧前端听写流程。
+
+R08（S8 阶段）：统一协议参数解析，使实际 wire 参数、TaskStore 和语义观测一致；按协议处理速度限幅、格式缺省及错误类型，DashScope 不记录未发送参数，system say 记录实际整数 WPM 且不伪造默认 voice。保留 speech 域、逻辑 provider 与凭证 lane 的归属及既定模型，不增加供应商请求。
+
+验证：`logs/s8-red.log` 7 failed / 6 passed；`logs/s8-first-green.log` 13/13 为非最终中间证据；`logs/s8-exit.log` 6 文件 73 passed / 0 failed / 0 skipped，exit 0；`logs/s8-typecheck.log` 三段 tsc 通过，exit 0。最终两项 manifest：`e1e345ce172f14510b3537a188e11d230a5fe3c5c4d87bcc72fda3ac343fa05e`。R08-01–R08-10 的对应真实标题见矩阵；S9 执行中，真实付费供应商、系统 say 与跨平台验收不由本地受控边界结果代替，全任务仍未闭环。
+
+R09（S9 阶段 PASS）：新完成与重启恢复复用同一产物校验：realpath 解析 generated 根和目标的符号链接，以 path.relative 校验真实目录包含关系；stat 跟随目标并确认根是目录、产物是普通文件。lstat 只检查链接条目本身，不能代替真实目标和普通文件校验，故不能用于一律拒绝合法根内链接。保留 files[] 文件名合同，多文件全部通过才完成，session 投递与 image/video pending 回归保留。此验证是检查时刻的路径与文件类型判断，不提供打开文件描述符后的身份锁定，不能声称防住检查后并发替换的 TOCTOU；真实权限 EACCES、跨平台及真实供应商验收未由本地合成文件系统结果代替。
+
+S9 RED：`logs/s9-red.log` 为 5 failed / 1 passed；`logs/s9-first-green.log` 为 6/6，通过后另增 generated 根为合法符号链接的子例，不能把首轮绿灯称为最终证据。最终出口 `logs/s9-exit-verified.log` 为 5 文件 / 92 passed；`logs/s9-typecheck-verified.log` 三段 tsc PASS。最终 manifest：`c82aaf2ff0f7cd8a4c87c1c9c2090390a66d61b9939275948f753984f77cb3ca`。保留两次真实类型检查失败：`logs/s9-typecheck.log` 的 TaskStore 联合类型 error 字段收窄错误，以及 `logs/s9-typecheck-final.log` 的测试返回值 error 字段类型错误；均不能改记 PASS。
+
+R09-01–R09-10 的真实标题映射见矩阵，R09-03 包含后来增加的根目录链接子例；R09-11 映射 lifecycle V09 的 session 单次投递，R09-12 映射 V13 的 image/video pending 回归。当前 S10 active，全任务仍未闭环。
+"
+
+ ❯ tests/round2-delivery-evidence.test.ts:116:20
+    114|   it("R10-06: 真机权限、真实供应商和其他平台只标 BLOCKED，不伪装成本地通过", () => {
+    115|     const report = bytes("R01_R10_REPAIR_REPORT.md").toString("utf8");
+    116|     expect(report).toMatch(/真机[^\n]*BLOCKED|BLOCKED[^\n]*真机/);
+       |                    ^
+    117|     expect(report).toMatch(/凭证[^\n]*BLOCKED|BLOCKED[^\n]*凭证/);
+    118|     expect(report).toMatch(/跨平台[^\n]*BLOCKED|BLOCKED[^\n]*跨平台/);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-07/08: 失败与成功记录并存且 exit 未改写，历史缺失日志明确 unavailable
+AssertionError: expected '# R01–R10 执行断点\n\n基线：89bc0b64bf0a9b84…' to match /历史.*日志.*unavailable|unavailable.*历史.…/i
+
+- Expected:
+/历史.*日志.*unavailable|unavailable.*历史.*日志/i
+
++ Received:
+"# R01–R10 执行断点
+
+基线：89bc0b64bf0a9b84ef3532efaa66c23213affb70。原工作区 clean；本轮隔离 detached worktree，无提交。
+任务书已完整阅读（849 行）；按 S0→S11，先真实模块 RED 再实现。
+“聊天工具栏上没有增加语音输入的组件是用户要求的”。保留后端 ASR/TTS、宿主授权桥与原生音频附件。旧前端听写不得恢复。
+
+S0 进行中：Node 24.16.0 / npm 11.13.0。当前 package.json 无 build:packages 脚本，不套用旧记忆中的 monorepo 构建命令。
+旧反例 ZIP 未在 Downloads 找到，MANIFEST 校验 BLOCKED，按任务书反例建立 real-module 测试。
+S1–S11 尚未执行。真实权限、付费调用、其他平台验证无授权/设备，对应项 BLOCKED。
+证据工具 run-evidence.py 从首次测试起保存命令、exit、原始脱敏日志及每次完整源码 manifest；counts 在 runner 结果解析后填写，null 不代表 0。
+
+## S1 当前证据
+
+真实 RED：s1-red，13 failed / 5 passed；补充计划缺项 RED：s1-extra-red，1 failed / 28 passed。
+修改：v3 收据严格读取（v2 completed 不改写）、全部源映射后置条件、严格目标条目读取、目标/源/旧收据原字节备份、planned→COPYFILE_EXCL→校验→unlink→done 可恢复归档、v2 唯一归档证明兼容。
+最新阶段测试 s1-faults：5 文件 90 passed，含真实 SIGKILL、EACCES、备份碰撞与原字节保护。s1-exit 正在执行持久化配套门禁。
+现有 home 所有权不能证明真实 CLI 排他，S1 同源/归档双份恢复仅在合成独占目录验证；真实 home 不操作。S2 仍 OPEN。
+持久化 inventory/fingerprint 根据真实路径和写边界生成，未修改豁免/审计封印。
+早期 s1-regression-2 带不存在 tests/tenets.test.ts，未把它算执行；正确 memory-tenets 与 quota 已分别实跑 27 passed。
+
+## S2 当前证据
+
+s2-red：9 failed/1 passed。s2-green-1：3文件48 passed。s2-old-regression：旧恢复6 passed（断言按新批准合同调整，保留拒绝测试）。s2-faults-red：计划缺项1 failed/6 passed。s2-faults-green：8文件113 passed。s2-exit 正在跑联合持久化门禁。
+新批准 schema 1：operationId、agentId、sources 完整摘要、observedTargetHash/null、source/sourceEntryKey/contentHash/action；默认 skip。源缺失/重复 legacyId 用源摘要+ordinal。v3操作收据单独保存，完成重试返回原 summary，不复活用户删除项；源归档不移动。CLI apply 明确 BLOCKED_HOME_OWNERSHIP，未增加 force。
+迁移与恢复共用 executePinnedTargetTransaction；恢复摘要与逐项批准映射严格相等，恢复目标已提交中断时只补完成，不重新随机导入。
+后续：完成 S2 出口验证后进入 S3。S3–S11 生产尚未修改。
+
+S2出口完成：s2-exit 10文件142 passed。S3由子代理 s0_ui_trace 实施，主代理只读复核并维护证据，避免与其测试同时写源码。
+
+
+## 当前阶段：S3 通过，S4 执行中
+
+前述“尚未执行/正在执行”段落为各次启动与阶段断点记录；当前状态以本节为准，不能从早期描述推导后续阶段已验收。
+S3 真实 RED：s3-red-initial 4 failed/16 passed；s3-red-edit 5 failed/16 passed。
+S3 最终阶段出口：s3-final-delivery，13 文件 120 passed/0 failed/0 skipped，exit 0；s3-typecheck-delivery 三段 tsc exit 0。
+二者受测源码 manifest：`e6d582c1d99f9eb8bc67d57ae6f78e83356c96cfdf6c3f56c96735f8492bfe10`。日志均保留在 logs/，R03-01–R03-12 的实际文件、标题与断言映射已写入矩阵。
+实现含最新意图、scope/owner 撤销、同步编辑取消准备租约、新版本身份、blocked 取消保真、前台 timer 与已取得租约的切页区别；真实组件覆盖编辑保存/取消、StrictMode、A 慢附件时 B 发送与不误清 B。
+S4 当前执行中。R03 只达到本阶段已实现及自动验证，S3/S4 联合验收仍待完成；不能写 R03/R04 整组关闭，也不代表最终全量门禁或真实环境验收完成。
+
+## 当前阶段：S4 通过，S5 执行中
+
+S4 冻结出口：`logs/s4-exit.log`，7 文件 96 passed / 0 failed / 0 skipped；`logs/s4-exit-typecheck.log` 三段 tsc 通过，均 exit 0。受测源码 manifest：`96f1f8edc3693edafeaddfb31f64aabb8b7555a8827739f5474165af3f7606c4`。R04-01–R04-18 已绑定日志中的真实文件和测试标题，包含真实 SDK 提交、持久化关联、历史路由与 renderer 对账集成。
+R04 达到阶段实现与自动验证通过；未决屏障、分页/截止/单飞、身份与陈旧响应、原文附件合并、失败可诊断及受保护快照均有对应证据。S5 执行中，全任务尚未闭环；真实权限、跨平台、真实服务器断网及最终全量门禁不由本地合成证据替代。R01–R03 原阶段记录保留，不追溯改写为最终完成。
+
+## 当前阶段：S5 通过，S6 执行中
+
+S5 真实组件 RED：`logs/s5-red.log`，5 failed / 49 passed。冻结出口 `logs/s5-exit-verified.log`：6 文件 105 passed / 0 failed / 0 skipped，exit 0；`logs/s5-typecheck.log` 三段 tsc 通过，exit 0。两者 manifest：`45132e6c7746daf8d90a7b9b13f4f3140927c35f32460398891ee6116c35bea4`。R05-01–R05-10 已按真实标题绑定；配套回归与后补覆盖不冒称独立 RED。
+StreamingMarkdownContent 直接消费 canonical source，移除 stripTagEscapes；保留 scanner 既有协议。S6 执行中，最终全量门禁与真实桌面/跨平台验收尚未完成；无 source 的旧 HTML 不推测恢复过去丢失字符。
+
+## 当前阶段：S6 通过，S7 执行中
+
+S6 真实 RED：`logs/s6-red.log`，7 failed / 1 passed。冻结出口 `logs/s6-exit.log`：10 文件 77 passed / 0 failed / 0 skipped，exit 0；`logs/s6-typecheck.log` 三段 tsc 通过，exit 0。最终两项 manifest：`1105df54e4123f4bf0131e0e110467a2b214eb2c6eacc6f25ef8e3a793eaec54`。R06-01–R06-12 已绑定真实测试标题和边界。
+关闭 StarterKit 默认 trailingNode，并删除 serializer 无条件尾空段循环；旧无标记草稿保守保留。R06-05/06 未新增 synthetic 机制，因为无来源自动补尾已关闭，用户创建/编辑的空段仍保留。S7 执行中，真实桌面、跨平台及全任务最终门禁尚未完成。
+
+## 当前阶段：S7 通过，S8 执行中
+
+S7 真实异步 helper RED：`logs/s7-red.log`，4 failed / 8 passed。冻结出口 `logs/s7-exit.log`：7 文件 39 passed / 0 failed / 0 skipped，exit 0；`logs/s7-typecheck.log` 三段 tsc 通过，exit 0。最终两项 manifest：`2bb59c4adc6950d2e4490b991737e4e3779bf350890555e004c9472052edf7b2`。R07-01–R07-10 绑定 decoder/lifecycle 真实测试与既有超时、大输出、X05 并发证据。
+stdout/stderr 分别使用独立 StringDecoder，按字节计数，close 时 flush；非字符串成功 text 返回 INVALID_OUTPUT。S8 执行中；合成 helper 不代表原生系统识别、真实权限、付费供应商或跨平台验收。
+
+## 当前阶段：S8 通过，S9 执行中
+
+S8 RED：`logs/s8-red.log`，7 failed / 6 passed；`logs/s8-first-green.log` 13/13 通过，仅为中间结果。最终出口 `logs/s8-exit.log`：6 文件 73 passed / 0 failed / 0 skipped，exit 0；`logs/s8-typecheck.log` 三段 tsc 通过，exit 0。最终两项 manifest：`e1e345ce172f14510b3537a188e11d230a5fe3c5c4d87bcc72fda3ac343fa05e`。R08-01–R08-10 映射 tests/speech-parameters.test.ts 的真实标题，参数解析、wire、任务与观测一致性均有对应证据。S9 执行中，付费供应商、真实 say 与跨平台未由合成证据代替。
+
+## 当前阶段：S9 通过，S10 执行中
+
+S9 RED：`logs/s9-red.log` 为 5 failed / 1 passed；`logs/s9-first-green.log` 为 6/6，通过后另增 generated 根为合法符号链接的子例，不能把首轮绿灯称为最终证据。最终出口 `logs/s9-exit-verified.log` 为 5 文件 / 92 passed；`logs/s9-typecheck-verified.log` 三段 tsc PASS。最终 manifest：`c82aaf2ff0f7cd8a4c87c1c9c2090390a66d61b9939275948f753984f77cb3ca`。保留两次真实类型检查失败：`logs/s9-typecheck.log` 的 TaskStore 联合类型 error 字段收窄错误，以及 `logs/s9-typecheck-final.log` 的测试返回值 error 字段类型错误；均不能改记 PASS。
+
+新完成与重启恢复复用同一产物校验：realpath 解析 generated 根和目标的符号链接，以 path.relative 校验真实目录包含关系；stat 跟随目标并确认根是目录、产物是普通文件。lstat 只检查链接条目本身，不能代替真实目标和普通文件校验，故不能用于一律拒绝合法根内链接。保留 files[] 文件名合同，多文件全部通过才完成，session 投递与 image/video pending 回归保留。此验证是检查时刻的路径与文件类型判断，不提供打开文件描述符后的身份锁定，不能声称防住检查后并发替换的 TOCTOU；真实权限 EACCES、跨平台及真实供应商验收未由本地合成文件系统结果代替。
+
+R09-01–R09-10 映射 `tests/speech-output-validation.round2.test.ts` 的真实标题；R09-11 对应 `tests/speech-response-lifecycle.test.ts` 的 V09，R09-12 对应 V13，精确映射见矩阵。S9 阶段 PASS，S10 active；全任务尚未完成。
+"
+
+ ❯ tests/round2-delivery-evidence.test.ts:127:22
+    125|     const progress = bytes("PROGRESS.md").toString("utf8");
+    126|     expect(progress).toContain("s9-typecheck-final");
+    127|     expect(progress).toMatch(/历史.*日志.*unavailable|unavailable.*历史.*日志/…
+       |                      ^
+    128|   });
+    129|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 4 passed (8)
+   Start at  15:06:30
+   Duration  407ms (transform 23ms, setup 17ms, import 9ms, tests 321ms, environment 0ms)
+

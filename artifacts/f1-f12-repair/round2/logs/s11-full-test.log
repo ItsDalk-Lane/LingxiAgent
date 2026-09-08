@@ -1,0 +1,653 @@
+
+> lingxi@0.1.35 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**'
+
+
+ RUN  v4.1.10 <WORKTREE>
+
+(node:84655) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 message listeners added to [process]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: Window's scrollTo() method
+ ❯ desktop/src/react/__tests__/components/subagent-preview-session-binding.test.tsx (0 test)
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+ ❯ desktop/src/react/__tests__/components/subagent-preview-interaction.test.tsx (0 test)
+(node:89364) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 message listeners added to [process]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ tests/open-boundary-lint.test.ts (16 tests | 2 failed) 2998ms
+     × the committed export-manifest.json + baseline pass cleanly against real source 1530ms
+     × the CLI subprocess exits 0 against the real repo and reports the known-debt count 1266ms
+libc++abi: terminating due to uncaught exception of type Napi::Error
+ ❯ tests/post-verification-audit-seal.test.ts (3 tests | 1 failed) 227ms
+     × changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced) 64ms
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+(node:92152) ExperimentalWarning: SOCKS5 proxy support is experimental and subject to change
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ tests/cli-closure-census.test.ts (22 tests | 2 failed) 78493ms
+     × matches the committed deterministic closure and baseline 21319ms
+     × writeCliRuntimeClosure/writeOpenBoundaryBaseline regenerate the exact committed files in place 16863ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/components/subagent-preview-interaction.test.tsx [ desktop/src/react/__tests__/components/subagent-preview-interaction.test.tsx ]
+Error: [vitest] No "configureBackgroundProcessWebSocketGetter" export is defined on the "../../services/background-process-control" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+
+vi.mock(import("../../services/background-process-control"), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    // your mocked methods
+  }
+})
+
+ ❯ desktop/src/react/services/websocket.ts:57:1
+     55| injectWebSocketGetter(() => _ws);
+     56| configureTerminalClientWebSocketGetter(() => _ws);
+     57| configureBackgroundProcessWebSocketGetter(() => _ws);
+       | ^
+     58|
+     59| export function resolveStreamingSessionResumeTargets(state: {
+ ❯ desktop/src/react/components/input/composer-send.ts:17:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  desktop/src/react/__tests__/components/subagent-preview-session-binding.test.tsx [ desktop/src/react/__tests__/components/subagent-preview-session-binding.test.tsx ]
+Error: [vitest] No "injectHandlers" export is defined on the "../../services/stream-resume" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+
+vi.mock(import("../../services/stream-resume"), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    // your mocked methods
+  }
+})
+
+ ❯ desktop/src/react/services/websocket.ts:54:1
+     52|
+     53| // 注入循环依赖的 handlers
+     54| injectHandlers(handleServerMessage, applyStreamingStatus);
+       | ^
+     55| injectWebSocketGetter(() => _ws);
+     56| configureTerminalClientWebSocketGetter(() => _ws);
+ ❯ desktop/src/react/components/input/composer-send.ts:17:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/cli-closure-census.test.ts > compute-cli-closure: full generation (real esbuild + nft, slow) > matches the committed deterministic closure and baseline
+AssertionError: expected { version: 1, …(5) } to deeply equal { version: 1, …(5) }
+
+- Expected
++ Received
+
+@@ -698,10 +698,27 @@
+        ],
+        "reason": "Reached via esbuild source module graph, imported by cli/data.ts (import-statement).",
+      },
+      {
+        "inputType": "source-graph",
++       "path": "core/desktop-input-correlation.ts",
++       "provenance": [
++         {
++           "from": "core/desktop-session-submit.ts",
++           "kind": "import-statement",
++           "root": "server-bootstrap",
++         },
++         {
++           "from": "core/message-utils.ts",
++           "kind": "import-statement",
++           "root": "server-bootstrap",
++         },
++       ],
++       "reason": "Reached via esbuild source module graph, imported by core/desktop-session-submit.ts (import-statement); core/message-utils.ts (import-statement).",
++     },
++     {
++       "inputType": "source-graph",
+        "path": "core/desktop-session-submit.ts",
+        "provenance": [
+          {
+            "from": "core/message-utils.ts",
+            "kind": "import-statement",
+@@ -717,10 +734,15 @@
+            "kind": "import-statement",
+            "root": "server-bootstrap",
+          },
+          {
+            "from": "server/routes/chat.ts",
++           "kind": "import-statement",
++           "root": "server-bootstrap",
++         },
++         {
++           "from": "server/routes/sessions.ts",
+            "kind": "import-statement",
+            "root": "server-bootstrap",
+          },
+          {
+            "from": "server/routes/sessions.ts",
+@@ -731,11 +753,11 @@
+            "from": "hub/index.ts",
+            "kind": "import-statement",
+            "root": "server-bootstrap",
+          },
+        ],
+-       "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); lib/session-collab/delivery.ts (import-statement); core/session-turn-actions.ts (import-statement); +3 more importer(s).",
++       "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); lib/session-collab/delivery.ts (import-statement); core/session-turn-actions.ts (import-statement); +4 more importer(s).",
+      },
+      {
+        "inputType": "source-graph",
+        "path": "core/device-registry.ts",
+        "provenance": [
+@@ -8559,10 +8581,27 @@
+        ],
+        "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/index.ts (import-statement).",
+      },
+      {
+        "inputType": "source-graph",
++       "path": "lib/pi-sdk/desktop-input-commit.ts",
++       "provenance": [
++         {
++           "from": "lib/pi-sdk/index.ts",
++           "kind": "import-statement",
++           "root": "server-bootstrap",
++         },
++         {
++           "from": "core/desktop-session-submit.ts",
++           "kind": "import-statement",
++           "root": "server-bootstrap",
++         },
++       ],
++       "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/index.ts (import-statement); core/desktop-session-submit.ts (import-statement).",
++     },
++     {
++       "inputType": "source-graph",
+        "path": "lib/pi-sdk/index.ts",
+        "provenance": [
+          {
+            "from": "core/compaction-utils.ts",
+            "kind": "import-statement",
+@@ -30041,43 +30080,13 @@
+            "root": "nft-server-bundle",
+          },
+        ],
+        "reason": "Reached via esbuild source module graph, imported by node_modules/@earendil-works/pi-coding-agent/dist/core/resolve-config-value.js (import-statement).",
+      },
+-     {
+-       "inputType": "nft-runtime-trace",
+-       "path": "node_modules/@earendil-works/pi-coding-agent/dist/utils/sleep.js",
+-       "provenance": [
+-         {
+-           "kind": "nft-trace",
+-           "root": "nft-server-bundle",
+-         },
+-       ],
+-       "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)",
+-     },
+-     {
+-       "inputType": "nft-runtime-trace",
+-       "path": "node_modules/@earendil-works/pi-coding-agent/dist/utils/syntax-highlight.js",
+-       "provenance": [
+-         {
+-           "kind": "nft-trace",
+-           "root": "nft-server-bundle",
+-         },
+-       ],
+-       "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)",
+-     },
+-     {
+-       "inputType": "nft-runtime-trace",
+-       "path": "node_modules/@earendil-works/pi-coding-agent/dist/utils/tool-result-images.js",
+-       "provenance": [
+-         {
+-           "kind": "nft-trace",
+-           "root": "nft-server-bundle",
+-         },
+-       ],
+-       "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)",
+-     },
++     [Object],
++     [Object],
++     [Object],
+      [Object],
+      [Object],
+      [Object],
+      [Object],
+      [Object],
+
+ ❯ tests/cli-closure-census.test.ts:292:30
+    290|     const generatedClosure = await computeCliRuntimeClosure({ rootDir:…
+    291|     const committedClosure = JSON.parse(fs.readFileSync(CLOSURE_PATH, …
+    292|     expect(generatedClosure).toEqual(committedClosure);
+       |                              ^
+    293|     expect(JSON.stringify(generatedClosure)).not.toMatch(/(?:\/Users\/…
+    294|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/cli-closure-census.test.ts > compute-cli-closure: full generation (real esbuild + nft, slow) > writeCliRuntimeClosure/writeOpenBoundaryBaseline regenerate the exact committed files in place
+AssertionError: expected '{\n  "version": 1,\n  "generatedBy": …' to be '{\n  "version": 1,\n  "generatedBy": …' // Object.is equality
+
+- Expected
++ Received
+
+@@ -761,10 +761,27 @@
+          }
+        ],
+        "reason": "Reached via esbuild source module graph, imported by cli/data.ts (import-statement)."
+      },
+      {
++       "path": "core/desktop-input-correlation.ts",
++       "inputType": "source-graph",
++       "provenance": [
++         {
++           "root": "server-bootstrap",
++           "from": "core/desktop-session-submit.ts",
++           "kind": "import-statement"
++         },
++         {
++           "root": "server-bootstrap",
++           "from": "core/message-utils.ts",
++           "kind": "import-statement"
++         }
++       ],
++       "reason": "Reached via esbuild source module graph, imported by core/desktop-session-submit.ts (import-statement); core/message-utils.ts (import-statement)."
++     },
++     {
+        "path": "core/desktop-session-submit.ts",
+        "inputType": "source-graph",
+        "provenance": [
+          {
+            "root": "server-bootstrap",
+@@ -782,10 +799,15 @@
+            "kind": "import-statement"
+          },
+          {
+            "root": "server-bootstrap",
+            "from": "server/routes/chat.ts",
++           "kind": "import-statement"
++         },
++         {
++           "root": "server-bootstrap",
++           "from": "server/routes/sessions.ts",
+            "kind": "import-statement"
+          },
+          {
+            "root": "server-bootstrap",
+            "from": "server/routes/sessions.ts",
+@@ -795,11 +817,11 @@
+            "root": "server-bootstrap",
+            "from": "hub/index.ts",
+            "kind": "import-statement"
+          }
+        ],
+-       "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); lib/session-collab/delivery.ts (import-statement); core/session-turn-actions.ts (import-statement); +3 more importer(s)."
++       "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); lib/session-collab/delivery.ts (import-statement); core/session-turn-actions.ts (import-statement); +4 more importer(s)."
+      },
+      {
+        "path": "core/device-registry.ts",
+        "inputType": "source-graph",
+        "provenance": [
+@@ -8620,10 +8642,27 @@
+            "from": "lib/pi-sdk/index.ts",
+            "kind": "import-statement"
+          }
+        ],
+        "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/index.ts (import-statement)."
++     },
++     {
++       "path": "lib/pi-sdk/desktop-input-commit.ts",
++       "inputType": "source-graph",
++       "provenance": [
++         {
++           "root": "server-bootstrap",
++           "from": "lib/pi-sdk/index.ts",
++           "kind": "import-statement"
++         },
++         {
++           "root": "server-bootstrap",
++           "from": "core/desktop-session-submit.ts",
++           "kind": "import-statement"
++         }
++       ],
++       "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/index.ts (import-statement); core/desktop-session-submit.ts (import-statement)."
+      },
+      {
+        "path": "lib/pi-sdk/index.ts",
+        "inputType": "source-graph",
+        "provenance": [
+@@ -128541,13 +128580,13 @@
+        ],
+        "reason": "Reached via esbuild source module graph, imported by cli/terminal-theme.ts (import-statement)."
+      }
+    ],
+    "stats": {
+-     "totalFiles": 10970,
++     "totalFiles": 10972,
+      "byInputType": {
+-       "source-graph": 761,
++       "source-graph": 763,
+        "runtime-asset": 11,
+        "nft-runtime-trace": 10198
+      }
+    }
+  }
+
+ ❯ tests/cli-closure-census.test.ts:330:19
+    328|     const after = fs.readFileSync(CLOSURE_PATH, "utf-8");
+    329|     const afterBaseline = fs.readFileSync(BASELINE_PATH, "utf-8");
+    330|     expect(after).toBe(before);
+       |                   ^
+    331|     expect(afterBaseline).toBe(beforeBaseline);
+    332|   }, 420_000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/open-boundary-lint.test.ts > lint-open-boundary: real repo state (smoke) > the committed export-manifest.json + baseline pass cleanly against real source
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/open-boundary-lint.test.ts:165:23
+    163|     const baseline = readBaseline({ rootDir: REPOSITORY_ROOT });
+    164|     const result = checkRatchet({ violations, baseline });
+    165|     expect(result.ok).toBe(true);
+       |                       ^
+    166|     expect(result.totalViolations).toBeGreaterThan(0); // known debt i…
+    167|   }, 30_000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/open-boundary-lint.test.ts > lint-open-boundary: real repo state (smoke) > the CLI subprocess exits 0 against the real repo and reports the known-debt count
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/open-boundary-lint.test.ts:171:27
+    169|   it("the CLI subprocess exits 0 against the real repo and reports the…
+    170|     const result = spawnSync(process.execPath, [LINT_SCRIPT], { cwd: R…
+    171|     expect(result.status).toBe(0);
+       |                           ^
+    172|     expect(result.stdout).toMatch(/lint:boundary ok/);
+    173|   }, 30_000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  tests/post-verification-audit-seal.test.ts > post-verification audit seal (diff guard) > changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced)
+AssertionError: VERIFIED_SOURCE_SHA 之后出现了非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+.github/workflows/build.yml
+.gitignore
+artifacts/f1-f12-repair/F1_F12_REPAIR_FACTS.json
+artifacts/f1-f12-repair/F1_F12_REPAIR_REPORT.md
+artifacts/f1-f12-repair/F1_F12_TEST_REPORT.md
+artifacts/f1-f12-repair/PINNED_TENETS_RECOVERY_GUIDE.md
+artifacts/f1-f12-repair/SYSTEM_SPEECH_VALIDATION.md
+artifacts/f1-f12-repair/evidence/p0-baseline.md
+artifacts/f1-f12-repair/evidence/p0-call-graphs.md
+artifacts/f1-f12-repair/evidence/p1-f9-f3.md
+artifacts/f1-f12-repair/evidence/p2-p3-f1-f2.md
+artifacts/f1-f12-repair/evidence/p4-f4-f5-f6.md
+artifacts/f1-f12-repair/evidence/p5-f7.md
+artifacts/f1-f12-repair/evidence/p5-red-frontend.txt
+artifacts/f1-f12-repair/evidence/p6-f8.md
+artifacts/f1-f12-repair/evidence/p7-f10.md
+artifacts/f1-f12-repair/evidence/p8-f11-f12.md
+artifacts/f1-f12-repair/evidence/p9-regression-build.md
+artifacts/f1-f12-repair/patches/f1-f12-new-files.patch
+artifacts/f1-f12-repair/patches/f1-f12-tracked-changes.patch
+build/cli-runtime-closure.json
+build/persistence-schema-fingerprint.json
+build/persistence-store-inventory.json
+core/events.ts
+core/media-adapters/speech.ts
+core/media/media-parameters.ts
+core/media/task-store.ts
+core/media/universal-media-manager.ts
+core/pinned-tenets-migration.ts
+core/pinned-tenets-recovery.ts
+core/speech-recognition-service.ts
+core/speech-recognition/system-speech-adapter.ts
+desktop/main.cjs
+desktop/native/LingxiSpeechHelper/Package.swift
+desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/HelperOutput.swift
+desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/RecognitionCoordinator.swift
+desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/SpeechHelperError.swift
+desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/SpeechTranscriber.swift
+desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechHelper/LingxiSpeechHelperMain.swift
+desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechHelper/main.swift
+desktop/native/LingxiSpeechHelper/Tests/LingxiSpeechCoreRunner/CoordinatorTestRunner.swift
+desktop/native/LingxiSpeechPermissions/binding.gyp
+desktop/native/LingxiSpeechPermissions/speech_permissions.mm
+desktop/preload.cjs
+desktop/speech-permissions.cjs
+desktop/src/locales/en.json
+desktop/src/locales/ja.json
+desktop/src/locales/ko.json
+desktop/src/locales/zh-TW.json
+desktop/src/locales/zh.json
+desktop/src/react/__tests__/components/InputArea.media-send.test.tsx
+desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx
+desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx
+desktop/src/react/__tests__/components/composer-send.transaction.test.ts
+desktop/src/react/__tests__/services/channel-new-message-ws.test.ts
+desktop/src/react/__tests__/services/chat-turn-lifecycle.test.ts
+desktop/src/react/__tests__/services/composer-send-coordinator.test.ts
+desktop/src/react/__tests__/services/ws-knowledge-rollup-progress.test.ts
+desktop/src/react/__tests__/services/ws-message-handler.test.ts
+desktop/src/react/__tests__/services/ws-notification.test.ts
+desktop/src/react/__tests__/services/ws-stream-abort-lifecycle.test.ts
+desktop/src/react/__tests__/utils/paste-fidelity-editor.test.ts
+desktop/src/react/components/InputArea.tsx
+desktop/src/react/components/chat/StreamingMarkdownContent.tsx
+desktop/src/react/components/input/ComposerToolbar.tsx
+desktop/src/react/components/input/composer-send.ts
+desktop/src/react/services/composer-send-coordinator.ts
+desktop/src/react/services/websocket.ts
+desktop/src/react/services/ws-message-handler.ts
+desktop/src/react/stores/chat-slice.ts
+desktop/src/react/stores/chat-types.ts
+desktop/src/react/stores/input-slice.ts
+desktop/src/react/types.ts
+desktop/src/react/utils/editor-serializer.ts
+desktop/src/react/utils/history-segment-sanitizer.ts
+desktop/src/react/utils/message-parser.ts
+lib/memory/tenets.ts
+lib/tools/pinned-memory.ts
+package-lock.json
+package.json
+scripts/build-speech-helper.mjs
+scripts/build-speech-permissions.mjs
+scripts/compute-cli-closure.mjs
+scripts/pinned-tenets-recovery.mjs
+scripts/resign-adhoc.cjs
+server/routes/media.ts
+shared/persistence/store-registry.ts
+shared/reserved-tag-stream.ts
+tests/chat-route-mood-segment.test.ts
+tests/chat-route-reserved-raw-fallback.test.ts
+tests/media-route.test.ts
+tests/memory-tenets.test.ts
+tests/mood-parser.test.ts
+tests/paste-fidelity-serializer.test.ts
+tests/pinned-tenets-migration-recovery.test.ts
+tests/pinned-tenets-migration.test.ts
+tests/reserved-tag-orphan-closer.test.ts
+tests/reserved-tag-text-preservation.test.ts
+tests/speech-helper-build-contract.test.ts
+tests/speech-parameters.test.ts
+tests/speech-recognition-service.test.ts
+tests/speech-response-lifecycle.test.ts
+tests/system-speech-adapter.lifecycle.test.ts
+tests/system-speech-permission-bridge.test.ts
+tests/tenets-source-quota.test.ts
+tests/think-tag-parser.test.ts
+tests/x05-speech-concurrency.test.ts: expected [ …(107) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   ".github/workflows/build.yml",
++   ".gitignore",
++   "artifacts/f1-f12-repair/F1_F12_REPAIR_FACTS.json",
++   "artifacts/f1-f12-repair/F1_F12_REPAIR_REPORT.md",
++   "artifacts/f1-f12-repair/F1_F12_TEST_REPORT.md",
++   "artifacts/f1-f12-repair/PINNED_TENETS_RECOVERY_GUIDE.md",
++   "artifacts/f1-f12-repair/SYSTEM_SPEECH_VALIDATION.md",
++   "artifacts/f1-f12-repair/evidence/p0-baseline.md",
++   "artifacts/f1-f12-repair/evidence/p0-call-graphs.md",
++   "artifacts/f1-f12-repair/evidence/p1-f9-f3.md",
++   "artifacts/f1-f12-repair/evidence/p2-p3-f1-f2.md",
++   "artifacts/f1-f12-repair/evidence/p4-f4-f5-f6.md",
++   "artifacts/f1-f12-repair/evidence/p5-f7.md",
++   "artifacts/f1-f12-repair/evidence/p5-red-frontend.txt",
++   "artifacts/f1-f12-repair/evidence/p6-f8.md",
++   "artifacts/f1-f12-repair/evidence/p7-f10.md",
++   "artifacts/f1-f12-repair/evidence/p8-f11-f12.md",
++   "artifacts/f1-f12-repair/evidence/p9-regression-build.md",
++   "artifacts/f1-f12-repair/patches/f1-f12-new-files.patch",
++   "artifacts/f1-f12-repair/patches/f1-f12-tracked-changes.patch",
++   "build/cli-runtime-closure.json",
++   "build/persistence-schema-fingerprint.json",
++   "build/persistence-store-inventory.json",
++   "core/events.ts",
++   "core/media-adapters/speech.ts",
++   "core/media/media-parameters.ts",
++   "core/media/task-store.ts",
++   "core/media/universal-media-manager.ts",
++   "core/pinned-tenets-migration.ts",
++   "core/pinned-tenets-recovery.ts",
++   "core/speech-recognition-service.ts",
++   "core/speech-recognition/system-speech-adapter.ts",
++   "desktop/main.cjs",
++   "desktop/native/LingxiSpeechHelper/Package.swift",
++   "desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/HelperOutput.swift",
++   "desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/RecognitionCoordinator.swift",
++   "desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/SpeechHelperError.swift",
++   "desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/SpeechTranscriber.swift",
++   "desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechHelper/LingxiSpeechHelperMain.swift",
++   "desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechHelper/main.swift",
++   "desktop/native/LingxiSpeechHelper/Tests/LingxiSpeechCoreRunner/CoordinatorTestRunner.swift",
++   "desktop/native/LingxiSpeechPermissions/binding.gyp",
++   "desktop/native/LingxiSpeechPermissions/speech_permissions.mm",
++   "desktop/preload.cjs",
++   "desktop/speech-permissions.cjs",
++   "desktop/src/locales/en.json",
++   "desktop/src/locales/ja.json",
++   "desktop/src/locales/ko.json",
++   "desktop/src/locales/zh-TW.json",
++   "desktop/src/locales/zh.json",
++   "desktop/src/react/__tests__/components/InputArea.media-send.test.tsx",
++   "desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx",
++   "desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx",
++   "desktop/src/react/__tests__/components/composer-send.transaction.test.ts",
++   "desktop/src/react/__tests__/services/channel-new-message-ws.test.ts",
++   "desktop/src/react/__tests__/services/chat-turn-lifecycle.test.ts",
++   "desktop/src/react/__tests__/services/composer-send-coordinator.test.ts",
++   "desktop/src/react/__tests__/services/ws-knowledge-rollup-progress.test.ts",
++   "desktop/src/react/__tests__/services/ws-message-handler.test.ts",
++   "desktop/src/react/__tests__/services/ws-notification.test.ts",
++   "desktop/src/react/__tests__/services/ws-stream-abort-lifecycle.test.ts",
++   "desktop/src/react/__tests__/utils/paste-fidelity-editor.test.ts",
++   "desktop/src/react/components/InputArea.tsx",
++   "desktop/src/react/components/chat/StreamingMarkdownContent.tsx",
++   "desktop/src/react/components/input/ComposerToolbar.tsx",
++   "desktop/src/react/components/input/composer-send.ts",
++   "desktop/src/react/services/composer-send-coordinator.ts",
++   "desktop/src/react/services/websocket.ts",
++   "desktop/src/react/services/ws-message-handler.ts",
++   "desktop/src/react/stores/chat-slice.ts",
++   "desktop/src/react/stores/chat-types.ts",
++   "desktop/src/react/stores/input-slice.ts",
++   "desktop/src/react/types.ts",
++   "desktop/src/react/utils/editor-serializer.ts",
++   "desktop/src/react/utils/history-segment-sanitizer.ts",
++   "desktop/src/react/utils/message-parser.ts",
++   "lib/memory/tenets.ts",
++   "lib/tools/pinned-memory.ts",
++   "package-lock.json",
++   "package.json",
++   "scripts/build-speech-helper.mjs",
++   "scripts/build-speech-permissions.mjs",
++   "scripts/compute-cli-closure.mjs",
++   "scripts/pinned-tenets-recovery.mjs",
++   "scripts/resign-adhoc.cjs",
++   "server/routes/media.ts",
++   "shared/persistence/store-registry.ts",
++   "shared/reserved-tag-stream.ts",
++   "tests/chat-route-mood-segment.test.ts",
++   "tests/chat-route-reserved-raw-fallback.test.ts",
++   "tests/media-route.test.ts",
++   "tests/memory-tenets.test.ts",
++   "tests/mood-parser.test.ts",
++   "tests/paste-fidelity-serializer.test.ts",
++   "tests/pinned-tenets-migration-recovery.test.ts",
++   "tests/pinned-tenets-migration.test.ts",
++   "tests/reserved-tag-orphan-closer.test.ts",
++   "tests/reserved-tag-text-preservation.test.ts",
++   "tests/speech-helper-build-contract.test.ts",
++   "tests/speech-parameters.test.ts",
++   "tests/speech-recognition-service.test.ts",
++   "tests/speech-response-lifecycle.test.ts",
++   "tests/system-speech-adapter.lifecycle.test.ts",
++   "tests/system-speech-permission-bridge.test.ts",
++   "tests/tenets-source-quota.test.ts",
++   "tests/think-tag-parser.test.ts",
++   "tests/x05-speech-concurrency.test.ts",
++ ]
+
+ ❯ tests/post-verification-audit-seal.test.ts:103:7
+    101|       `VERIFIED_SOURCE_SHA 之后出现了非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifact…
+    102|         violators.join("\n"),
+    103|     ).toEqual([]);
+       |       ^
+    104|   });
+    105|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯⎯⎯ Unhandled Error ⎯⎯⎯⎯⎯⎯⎯
+Error: [vitest-pool]: Worker forks emitted error.
+ ❯ EventEmitter.onTaskError node_modules/vitest/dist/chunks/cli-api.BK8pd4xc.js:3459:21
+ ❯ EventEmitter.emit node:events:509:28
+ ❯ ChildProcess.emitUnexpectedExit node_modules/vitest/dist/chunks/cli-api.BK8pd4xc.js:3025:22
+ ❯ ChildProcess.emit node:events:509:28
+ ❯ Process.ChildProcess._handle.onexit node:internal/child_process:295:12
+
+Caused by: Error: Worker exited unexpectedly
+ ❯ ChildProcess.emitUnexpectedExit node_modules/vitest/dist/chunks/cli-api.BK8pd4xc.js:3023:33
+ ❯ ChildProcess.emit node:events:509:28
+ ❯ Process.ChildProcess._handle.onexit node:internal/child_process:295:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  5 failed | 1328 passed | 1 skipped (1335)
+      Tests  5 failed | 13356 passed | 7 skipped (13368)
+     Errors  1 error
+   Start at  15:25:49
+   Duration  93.96s (transform 76.44s, setup 18.93s, import 754.16s, tests 714.86s, environment 233.53s)
+

@@ -1,0 +1,120 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+stdout | tests/pinned-tenets-migration.test.ts > pinned → tenets 一次性迁移（既有行为保持） > json 优先：pinned-memory.json 条目并入 tenets（active/user_direct），旧文件改名 .migrated
+[pins-migration] [hana] pinned→tenets migration: 2 added, 0 duplicates, 2 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > pinned → tenets 一次性迁移（既有行为保持） > json 缺失时解析 pinned.md（含缩进续行）
+[pins-migration] [hana] pinned→tenets migration: 2 added, 0 duplicates, 2 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M01/M02：旧版合法内容完整接纳（豁免普通新增限制） > M01：301 字符、数千字符、多行旧 pin 全文保留并 active
+[pins-migration] [hana] pinned→tenets migration: 3 added, 0 duplicates, 3 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M01/M02：旧版合法内容完整接纳（豁免普通新增限制） > M02：201 条旧 pin 全部迁移；普通第 202 条新增受新配额限制
+[pins-migration] [hana] pinned→tenets migration: 201 added, 0 duplicates, 201 source items
+
+stdout | tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-06 合法空源完成
+[pins-migration] [test-agent] pinned→tenets migration: 0 added, 0 duplicates, 0 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M03/M04：旧版权威来源规则（mtime）与删除语义 > M03：Markdown mtime 更新时以 Markdown 为准，否则以 JSON 为准
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-14 v2 completed 后删除不复活不改收据
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-01 E02 duplicate-only 目标被清空不得认证完成 43ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 content 不得归档 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 pending 不得归档 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 rejected 不得归档 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 source 不得归档 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 createdAt 不得归档 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-04 同一个目标映射两种哈希拒绝继续 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-05 后续新增不覆盖 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-06 合法空源完成 6ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-07 E03 空计划 prepared 后目标改变不能 every=true 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-09 E04 归档移走后收据未写可恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-11 规划目的地被占用时保留源和目的地 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {bad 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {"version":99,"state":"prepared"} 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {"version":3,"state":"mystery"} 2ms
+stdout | tests/pinned-tenets-migration.test.ts > M03/M04：旧版权威来源规则（mtime）与删除语义 > M04：合法空 items 的 JSON 是权威时保留删除语义；md 更新时采用 md
+[pins-migration] [hana] pinned→tenets migration: 0 added, 0 duplicates, 0 source items
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+ ✓ tests/pinned-tenets-migration.test.ts > pinned → tenets 一次性迁移（既有行为保持） > json 优先：pinned-memory.json 条目并入 tenets（active/user_direct），旧文件改名 .migrated 51ms
+ ✓ tests/pinned-tenets-migration.test.ts > pinned → tenets 一次性迁移（既有行为保持） > json 缺失时解析 pinned.md（含缩进续行） 5ms
+ ✓ tests/pinned-tenets-migration.test.ts > pinned → tenets 一次性迁移（既有行为保持） > 没有旧 pins 文件的 agent 目录完全不动 1ms
+ ✓ tests/pinned-tenets-migration.test.ts > M01/M02：旧版合法内容完整接纳（豁免普通新增限制） > M01：301 字符、数千字符、多行旧 pin 全文保留并 active 5ms
+ ✓ tests/pinned-tenets-migration.test.ts > M01/M02：旧版合法内容完整接纳（豁免普通新增限制） > M02：201 条旧 pin 全部迁移；普通第 202 条新增受新配额限制 11ms
+ ✓ tests/pinned-tenets-migration.test.ts > M03/M04：旧版权威来源规则（mtime）与删除语义 > M03：Markdown mtime 更新时以 Markdown 为准，否则以 JSON 为准 20ms
+stdout | tests/pinned-tenets-migration.test.ts > M05/M06：严格读写边界与权威来源损坏 > M05：目标 tenets 损坏时不覆盖、不归档、明确失败；修复后可重试
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:before:tenets.json 故障保留数据且可恢复
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:after:tenets.json 故障保留数据且可恢复
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M07–M09：迁移去重规则（精确内容比较） > M07：与 active 精确重复（含边界空白/换行归一差异）不新增，映射记录到收据
+[pins-migration] [hana] pinned→tenets migration: 1 added, 1 duplicates, 2 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M07–M09：迁移去重规则（精确内容比较） > M08：只与 pending/rejected 重复时仍迁移为 active/user_direct，历史保留
+[pins-migration] [hana] pinned→tenets migration: 0 added, 0 duplicates, 2 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M07–M09：迁移去重规则（精确内容比较） > M09：仅大小写/句尾标点相似不合并（不同事实各自保留）
+[pins-migration] [hana] pinned→tenets migration: 1 added, 1 duplicates, 2 source items
+
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-14 v2 completed 后删除不复活不改收据 11ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-15 prepared 前目标原字节备份可恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-严格读取不默默过滤损坏条目 2ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-计划映射缺项不能被结果哈希捷径认证 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:before:tenets.json 故障保留数据且可恢复 6ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:after:tenets.json 故障保留数据且可恢复 7ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 receipt:prepared 故障保留数据且可恢复 7ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 commit:before 故障保留数据且可恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 commit:after 故障保留数据且可恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 archive:copied:pinned-memory.json 故障保留数据且可恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 archive:after:pinned-memory.json 故障保留数据且可恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 completed:before 故障保留数据且可恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-12 v2 唯一归档证据转换后恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-12 v2 多个相同归档路径不猜选 4ms
+stdout | tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M12：completed 后用户删除迁移条目，重启不复活
+[pins-migration] [hana] pinned→tenets migration: 2 added, 0 duplicates, 2 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M14a：连续运行两次幂等
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M20：迁移结果对设置页与 system prompt 可见 > 只注入 active；多行完整可见；pending/rejected 不注入
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > 遗留 .migrated 与既有归档共存 > 归档目标已存在时改用带源哈希的后缀，不覆盖既有 .migrated
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+ ✓ tests/pinned-tenets-migration.test.ts > M03/M04：旧版权威来源规则（mtime）与删除语义 > M04：合法空 items 的 JSON 是权威时保留删除语义；md 更新时采用 md 20ms
+ ✓ tests/pinned-tenets-migration.test.ts > M05/M06：严格读写边界与权威来源损坏 > M05：目标 tenets 损坏时不覆盖、不归档、明确失败；修复后可重试 6ms
+ ✓ tests/pinned-tenets-migration.test.ts > M05/M06：严格读写边界与权威来源损坏 > M05b：目标为未来 schema 时不覆盖、明确失败 2ms
+ ✓ tests/pinned-tenets-migration.test.ts > M05/M06：严格读写边界与权威来源损坏 > M05c：目标 EACCES 时明确失败，不归档 2ms
+ ✓ tests/pinned-tenets-migration.test.ts > M05/M06：严格读写边界与权威来源损坏 > M06：权威来源损坏时不静默按空库迁移、不回退另一份、不归档 4ms
+ ✓ tests/pinned-tenets-migration.test.ts > M07–M09：迁移去重规则（精确内容比较） > M07：与 active 精确重复（含边界空白/换行归一差异）不新增，映射记录到收据 6ms
+ ✓ tests/pinned-tenets-migration.test.ts > M07–M09：迁移去重规则（精确内容比较） > M08：只与 pending/rejected 重复时仍迁移为 active/user_direct，历史保留 6ms
+ ✓ tests/pinned-tenets-migration.test.ts > M07–M09：迁移去重规则（精确内容比较） > M09：仅大小写/句尾标点相似不合并（不同事实各自保留） 5ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M10：在 receipt:prepared 注入崩溃后重启可恢复，无丢失无重复 5ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M10：在 commit:before 注入崩溃后重启可恢复，无丢失无重复 5ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M10：在 commit:after 注入崩溃后重启可恢复，无丢失无重复 6ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M10：在 archive:before:pinned-memory.json 注入崩溃后重启可恢复，无丢失无重复 5ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M10：在 completed:before 注入崩溃后重启可恢复，无丢失无重复 6ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M11：目标已提交但归档失败，下次只完成归档，不重写目标、不丢后续数据 5ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M12：completed 后用户删除迁移条目，重启不复活 3ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M14a：连续运行两次幂等 3ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M14b：prepare 后源文件被改动 → conflict，不覆盖、不归档，且不自动重试 3ms
+ ✓ tests/pinned-tenets-migration.test.ts > M20：迁移结果对设置页与 system prompt 可见 > 只注入 active；多行完整可见；pending/rejected 不注入 4ms
+ ✓ tests/pinned-tenets-migration.test.ts > 遗留 .migrated 与既有归档共存 > 归档目标已存在时改用带源哈希的后缀，不覆盖既有 .migrated 4ms
+
+ Test Files  2 passed (2)
+      Tests  54 passed (54)
+   Start at  13:22:34
+   Duration  347ms (transform 143ms, setup 42ms, import 129ms, tests 368ms, environment 0ms)
+

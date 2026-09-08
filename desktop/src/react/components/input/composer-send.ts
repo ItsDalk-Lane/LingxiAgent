@@ -43,6 +43,17 @@ export function createClientUserMessageId(): string {
   return `client-user-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
+/**
+ * 每次提交尝试的唯一身份（C01）：同一逻辑消息（clientMessageId）同版本重试会
+ * 复用消息身份，但每次 ws.send 都是独立尝试。服务端拒绝回执带上的尝试身份，
+ * 让第一次尝试迟到的负回执不会错误结算第二次尝试。
+ */
+export function createClientAttemptId(): string {
+  const uuid = globalThis.crypto?.randomUUID?.();
+  if (uuid) return `client-attempt-${uuid}`;
+  return `client-attempt-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
 export function chatVideoMimeTypeForName(name: string, fallback?: string): string {
   if (fallback?.startsWith('video/')) return fallback;
   const ext = name.toLowerCase().replace(/^.*\./, '');
@@ -492,6 +503,8 @@ export interface ComposerCommitRuntime {
   revalidate?: () => ComposerPreSubmitResult | null;
   /** 复核通过后、乐观消息创建前的同步钩子（InputArea 的输入清理）。 */
   onCommit?: () => void;
+  /** 本次提交尝试的唯一身份：随载荷发给服务端，拒绝回执按它关联（C01）。 */
+  attemptId?: string | null;
 }
 
 /**
@@ -510,12 +523,16 @@ export async function commitPreparedComposerSend(
   if (rejection) return rejection;
 
   const ws = getWebSocket();
-  if (!ws || (typeof ws.readyState === 'number' && ws.readyState !== WebSocket.OPEN)) {
+  if (!ws || (typeof ws.readyState === "number" && ws.readyState !== WebSocket.OPEN)) {
     return { kind: 'failed_before_submit', code: 'websocket_unavailable', retryable: true };
   }
 
   // 复核通过：内容随派发落定，调用方做输入清理（草稿/附件/引用/编辑器）。
   runtime.onCommit?.();
+
+  // 尝试身份在真正发送前落进载荷：一次 commit = 一次尝试 = 一个 attemptId。
+  if (runtime.attemptId) prepared.wsMsg.clientAttemptId = runtime.attemptId;
+  else delete prepared.wsMsg.clientAttemptId;
 
   useStore.getState().appendOptimisticUserMessage(sessionPathForSend, prepared.optimisticMessage as never);
   try {

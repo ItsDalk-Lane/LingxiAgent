@@ -1,0 +1,30 @@
+
+> lingxi@0.1.35 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' --exclude tests/post-verification-audit-seal.test.ts
+
+
+ RUN  v4.1.10 <WORKTREE>
+
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+(node:43270) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 message listeners added to [process]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:43242) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 message listeners added to [process]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:43514) ExperimentalWarning: SOCKS5 proxy support is experimental and subject to change
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1333 passed | 1 skipped (1334)
+      Tests  13381 passed | 7 skipped (13388)
+   Start at  15:37:39
+   Duration  85.22s (transform 58.19s, setup 20.46s, import 779.06s, tests 752.75s, environment 237.31s)
+

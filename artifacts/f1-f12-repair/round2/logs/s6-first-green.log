@@ -1,0 +1,17 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-01：普通文档的两个用户尾空段逐个序列化 27ms
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-02：首中尾空段、tab、全角空格和连续尾空段全部保留 0ms
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-03：尾部 hardBreak 与尾部 paragraph 表达的换行都保留 0ms
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-04：真实 TipTap splitBlock 创建的用户尾空段进入实际 source 31ms
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-05：composer 明确关闭无来源标记的 StarterKit trailingNode 5ms
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-06：列表后由用户创建的空段仍按用户内容保留 4ms
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-07：无 synthetic 标记的旧草稿 hydration 与再次保存不猜删尾行 3ms
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-09：纯空白正文由 trim 副本判空，附件身份仍独立提取 0ms
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  14:31:17
+   Duration  579ms (transform 158ms, setup 21ms, import 188ms, tests 70ms, environment 236ms)
+

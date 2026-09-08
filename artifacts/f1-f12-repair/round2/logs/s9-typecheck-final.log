@@ -1,0 +1,8 @@
+
+> lingxi@0.1.35 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+tests/speech-output-validation.round2.test.ts(66,21): error TS2339: Property 'error' does not exist on type '{ ok: boolean; error: any; } | { ok: boolean; idempotent: boolean; task: any; } | { ok: boolean; task: any; idempotent?: undefined; }'.
+  Property 'error' does not exist on type '{ ok: boolean; idempotent: boolean; task: any; }'.
+tests/speech-output-validation.round2.test.ts(102,21): error TS2339: Property 'error' does not exist on type '{ ok: boolean; error: any; } | { ok: boolean; idempotent: boolean; task: any; } | { ok: boolean; task: any; idempotent?: undefined; }'.
+  Property 'error' does not exist on type '{ ok: boolean; idempotent: boolean; task: any; }'.

@@ -1,0 +1,168 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+stdout | tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-06 合法空源完成
+[pins-migration] [test-agent] pinned→tenets migration: 0 added, 0 duplicates, 0 source items
+
+stdout | tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {bad
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+ × tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-01 E02 duplicate-only 目标被清空不得认证完成 42ms
+   → expected 'completed' to be 'conflict' // Object.is equality
+ × tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 content 不得归档 6ms
+   → expected 'completed' to be 'conflict' // Object.is equality
+ × tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 pending 不得归档 5ms
+   → expected 'completed' to be 'conflict' // Object.is equality
+ × tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 rejected 不得归档 5ms
+   → expected 'completed' to be 'conflict' // Object.is equality
+ × tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 source 不得归档 5ms
+   → expected 'completed' to be 'conflict' // Object.is equality
+ × tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 createdAt 不得归档 5ms
+   → expected 'completed' to be 'conflict' // Object.is equality
+ × tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-04 同一个目标映射两种哈希拒绝继续 5ms
+   → expected [Function] to throw an error
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-05 后续新增不覆盖 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-06 合法空源完成 5ms
+ × tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-07 E03 空计划 prepared 后目标改变不能 every=true 7ms
+   → expected 'completed' to be 'conflict' // Object.is equality
+ × tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-09 E04 归档移走后收据未写可恢复 4ms
+   → migration conflict: source pinned-memory.json disappeared before archiving (agent test-agent)
+ × tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-11 规划目的地被占用时保留源和目的地 4ms
+   → expected false to be true // Object.is equality
+stdout | tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-14 v2 completed 后删除不复活不改收据
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+ × tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {bad 5ms
+   → expected [Function] to throw an error
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {"version":99,"state":"prepared"} 2ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {"version":3,"state":"mystery"} 2ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-14 v2 completed 后删除不复活不改收据 11ms
+ × tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-15 prepared 前目标原字节备份可恢复 11ms
+   → expected false to be true // Object.is equality
+ × tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-严格读取不默默过滤损坏条目 2ms
+   → expected [Function] to throw an error
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-01 E02 duplicate-only 目标被清空不得认证完成
+AssertionError: expected 'completed' to be 'conflict' // Object.is equality
+
+Expected: "conflict"
+Received: "completed"
+
+ ❯ tests/round2-pinned-migration.test.ts:26:56
+     24|     const d = fixture(); addTenetDirect(d, {content:'synthetic item'})…
+     25|     changeTarget(d, t => { t.tenets = []; }); migrateAgentPinnedTenets…
+     26|     expect(readPinnedTenetsMigrationReceipt(d)?.state).toBe('conflict'…
+       |                                                        ^
+     27|   });
+     28|   it.each(['content','pending','rejected','source','createdAt'] as con…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/13]⎯
+
+ FAIL  tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 content 不得归档
+ FAIL  tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 pending 不得归档
+ FAIL  tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 rejected 不得归档
+ FAIL  tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 source 不得归档
+ FAIL  tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 createdAt 不得归档
+AssertionError: expected 'completed' to be 'conflict' // Object.is equality
+
+Expected: "conflict"
+Received: "completed"
+
+ ❯ tests/round2-pinned-migration.test.ts:31:98
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/13]⎯
+
+ FAIL  tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-04 同一个目标映射两种哈希拒绝继续
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ tests/round2-pinned-migration.test.ts:36:60
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/13]⎯
+
+ FAIL  tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-07 E03 空计划 prepared 后目标改变不能 every=true
+AssertionError: expected 'completed' to be 'conflict' // Object.is equality
+
+Expected: "conflict"
+Received: "completed"
+
+ ❯ tests/round2-pinned-migration.test.ts:40:239
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/13]⎯
+
+ FAIL  tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-09 E04 归档移走后收据未写可恢复
+Error: migration conflict: source pinned-memory.json disappeared before archiving (agent test-agent)
+ ❯ migrationError core/pinned-tenets-migration.ts:107:20
+    105|
+    106| function migrationError(code: string, message: string): Error & { code…
+    107|   const err: any = new Error(message);
+       |                    ^
+    108|   err.code = code;
+    109|   return err;
+ ❯ archiveSources core/pinned-tenets-migration.ts:313:13
+ ❯ resumeMigration core/pinned-tenets-migration.ts:452:5
+ ❯ migrateAgentPinnedTenets core/pinned-tenets-migration.ts:347:5
+ ❯ tests/round2-pinned-migration.test.ts:45:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'MIGRATION_CONFLICT' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/13]⎯
+
+ FAIL  tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-11 规划目的地被占用时保留源和目的地
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/round2-pinned-migration.test.ts:47:354
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/13]⎯
+
+ FAIL  tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {bad
+AssertionError: expected [Function] to throw an error
+ ❯ tests/round2-pinned-migration.test.ts:48:259
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/13]⎯
+
+ FAIL  tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-15 prepared 前目标原字节备份可恢复
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/round2-pinned-migration.test.ts:50:440
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/13]⎯
+
+ FAIL  tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-严格读取不默默过滤损坏条目
+AssertionError: expected [Function] to throw an error
+ ❯ tests/round2-pinned-migration.test.ts:51:190
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/13]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  13 failed | 5 passed (18)
+   Start at  13:18:28
+   Duration  280ms (transform 66ms, setup 22ms, import 56ms, tests 130ms, environment 0ms)
+

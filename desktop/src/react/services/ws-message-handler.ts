@@ -42,7 +42,7 @@ import { renderMarkdown } from '../utils/markdown';
 import { bumpMessageLiveVersion } from '../stores/message-live-version';
 import { terminalOutputStream } from './terminal-output-stream';
 import { handleBackgroundProcessControlResult } from './background-process-control';
-import { noteComposerServerAck, noteComposerRunEvent, composerOriginConnectionKey, findSendRecordByClientMessageId } from './composer-send-coordinator';
+import { noteComposerServerAck, noteComposerRunEvent, noteComposerInputRejected, composerOriginConnectionKey, findSendRecordByClientMessageId } from './composer-send-coordinator';
 
 declare function t(key: string, vars?: Record<string, string>): any;
 
@@ -1223,6 +1223,38 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
           (_s, d) => ({ contextTokens: d.tokens, contextWindow: d.window, contextPercent: d.percent }),
         );
       }
+      break;
+    }
+
+    case 'input_rejected': {
+      // 服务端「接受前明确拒绝」的类型化回执（C01）：身份五元组由连接上下文 +
+      // 服务端解析字段组成，coordinator 完成匹配检查、状态转换与 UI 投影更新。
+      // 与 legacy error 独立——这里只结算发送记录，错误展示仍由 error 分支负责。
+      const { sessionId: rejectedSessionId, sessionPath: rejectedSessionPath } = sessionIdentityFromMessage(msg);
+      const clientMessageId = typeof msg.clientMessageId === 'string' && msg.clientMessageId.trim()
+        ? msg.clientMessageId.trim()
+        : null;
+      const snapshotVersion = Number.isSafeInteger(msg.snapshotVersion) ? msg.snapshotVersion : null;
+      if (!rejectedSessionId || !rejectedSessionPath || !clientMessageId || snapshotVersion == null) {
+        console.warn('[ws] input_rejected missing identity fields; ignoring', msg);
+        break;
+      }
+      if (msg.outcome !== 'not_accepted') {
+        console.warn('[ws] input_rejected with unknown outcome; ignoring', { outcome: msg.outcome });
+        break;
+      }
+      const receipt = {
+        code: typeof msg.code === 'string' && msg.code.trim() ? msg.code.trim() : 'rejected_before_acceptance',
+        retryable: msg.retryable === true,
+      };
+      noteComposerInputRejected({
+        originConnectionKey,
+        sessionId: rejectedSessionId,
+        sessionPath: rejectedSessionPath,
+        clientMessageId,
+        snapshotVersion,
+        clientAttemptId: typeof msg.clientAttemptId === 'string' && msg.clientAttemptId.trim() ? msg.clientAttemptId.trim() : null,
+      }, receipt);
       break;
     }
 

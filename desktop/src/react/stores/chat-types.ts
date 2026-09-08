@@ -459,6 +459,8 @@ export interface ChatMessage {
   agentReviewRequest?: AgentReviewRequestContext;
   sendStatus?: 'pending' | 'failed';
   sendError?: string;
+  /** 失败后是否允许按原快照显式重试（服务端拒绝回执携带；C01）。 */
+  sendRetryable?: boolean;
   /** 非用户本人发出的消息来源（如别的 Agent 经跨 session 协作投递）。老数据无此字段，按普通用户消息渲染。 */
   origin?: { kind: 'agent'; agentId: string | null; agentName: string | null };
   // Assistant

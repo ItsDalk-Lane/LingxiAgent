@@ -1,0 +1,8 @@
+
+> lingxi@0.1.35 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+core/media/task-store.ts(435,48): error TS2339: Property 'error' does not exist on type '{ ok: true; files: string[]; } | { ok: false; error: string; }'.
+  Property 'error' does not exist on type '{ ok: true; files: string[]; }'.
+core/media/task-store.ts(474,74): error TS2339: Property 'error' does not exist on type '{ ok: true; files: string[]; } | { ok: false; error: string; }'.
+  Property 'error' does not exist on type '{ ok: true; files: string[]; }'.

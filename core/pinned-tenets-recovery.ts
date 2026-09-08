@@ -12,6 +12,7 @@ import {
   type LegacyPinImportItem,
 } from "../lib/memory/tenets.ts";
 import { atomicWriteSync } from "../shared/safe-fs.ts";
+import { backupDirForReceipt, parseReceiptBackupDir, receiptBackupDirLocalPath } from "./pinned-tenets-backup-dir.ts";
 
 const ARCHIVED_SOURCE_RE = /^(pinned-memory\.json|pinned\.md)\.migrated(?:-[a-zA-Z0-9-]+)?$/;
 const SAFE_ID = /^[a-zA-Z0-9][a-zA-Z0-9_-]*$/;
@@ -173,6 +174,8 @@ export function applyPinnedTenetsRecovery(home: string, input: unknown, hooks?: 
   const approvalDigest = digest(JSON.stringify(approval));
   let receipt = readOperation(dir, approval.operationId);
   if (receipt) {
+    // 旧操作收据的 Windows 反斜杠 backupDir：续写时在内存中转规范形式（C02）。
+    if (receipt.backupDir !== null) receipt.backupDir = parseReceiptBackupDir(receipt.backupDir);
     if (receipt.approvalDigest !== approvalDigest) return fail("approval changed for existing operationId");
     if (receipt.state === 'completed') return receipt.summary;
     if (receipt.state === 'conflict' || receipt.state === 'failed') return fail("recovery operation conflict; new reviewed approval required");
@@ -208,13 +211,14 @@ export function applyPinnedTenetsRecovery(home: string, input: unknown, hooks?: 
       sources:approval.sources.map(s=>({...s,mtimeMs:fs.statSync(path.join(dir,s.file)).mtimeMs})),authority:{file:approval.sources[0].file,reason:'explicit_recovery_approval'},
       target:{existed:targetHash!==null,sha256:targetHash},resultSha256,plan,
       counts:{sourceItems:plan.length,added:plan.filter(p=>p.outcome==='added').length,duplicateActive:plan.filter(p=>p.outcome==='duplicate_active').length,addedOverHistory:plan.filter(p=>p.outcome.startsWith('added_over')).length,duplicateInBatch:plan.filter(p=>p.outcome==='duplicate_in_batch').length},
-      archived:[],archiveStatus:'not_applicable',backupDir:path.join('memory','pinned-migration-backup',approval.operationId),error:null,createdAt:now,updatedAt:now,completedAt:null,
+      archived:[],archiveStatus:'not_applicable',backupDir:backupDirForReceipt(approval.operationId),error:null,createdAt:now,updatedAt:now,completedAt:null,
       approval,approvalDigest,summary:{restored:plan.filter(p=>p.outcome.startsWith('added')).length,entries:plan}};
   }
   const operation=receipt;
   executePinnedTargetTransaction({targetPath,finalBytes,resultSha256,plan:operation.plan,hooks,
     prepare:()=>{
-      const backupDir=path.join(dir,operation.backupDir!);fs.mkdirSync(backupDir,{recursive:true,mode:0o700});
+      // 旧操作收据可能带 Windows 反斜杠 backupDir：本地访问走兼容解析（C02）。
+      const backupDir=receiptBackupDirLocalPath(dir,operation.backupDir);fs.mkdirSync(backupDir,{recursive:true,mode:0o700});
       const files=approval.sources.map(s=>({file:path.join(dir,s.file),name:s.file}));
       if(targetHash!==null)files.push({file:targetPath,name:'tenets.json'});
       for(const name of [path.join('memory',PINNED_TENETS_MIGRATION_RECEIPT),path.join('memory',OPERATIONS,approval.operationId+'.json')]) {

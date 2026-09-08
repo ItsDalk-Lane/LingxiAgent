@@ -1,0 +1,50 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ❯ tests/round2-delivery-evidence.test.ts (10 tests | 2 failed) 1795ms
+     × R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁 157ms
+     × S11-X2: X2-01 至 X2-12 均绑定最终联合回归的真实测试、日志与源码摘要 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁
+AssertionError: expected undefined to be truthy
+
+- Expected:
+true
+
++ Received:
+undefined
+
+ ❯ tests/round2-delivery-evidence.test.ts:85:19
+     83|       && record.sourceChangedDuringCommand === false
+     84|     ));
+     85|     expect(green).toBeTruthy();
+       |                   ^
+     86|   });
+     87|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > S11-X2: X2-01 至 X2-12 均绑定最终联合回归的真实测试、日志与源码摘要
+AssertionError: expected 'NOT_RUN' to be 'VERIFIED' // Object.is equality
+
+Expected: "VERIFIED"
+Received: "NOT_RUN"
+
+ ❯ tests/round2-delivery-evidence.test.ts:120:28
+    118|     expect(cases).toHaveLength(12);
+    119|     for (const entry of cases) {
+    120|       expect(entry.status).toBe("VERIFIED");
+       |                            ^
+    121|       expect(entry.tests?.length).toBeGreaterThan(0);
+    122|       for (const test of entry.tests) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 8 passed (10)
+   Start at  15:20:46
+   Duration  1.89s (transform 24ms, setup 18ms, import 10ms, tests 1.80s, environment 0ms)
+

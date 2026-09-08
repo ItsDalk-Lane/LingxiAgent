@@ -1,0 +1,68 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+stdout | tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-06 合法空源完成
+[pins-migration] [test-agent] pinned→tenets migration: 0 added, 0 duplicates, 0 source items
+
+stdout | tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-14 v2 completed 后删除不复活不改收据
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:before:tenets.json 故障保留数据且可恢复
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:after:tenets.json 故障保留数据且可恢复
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-01 E02 duplicate-only 目标被清空不得认证完成 38ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 content 不得归档 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 pending 不得归档 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 rejected 不得归档 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 source 不得归档 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 createdAt 不得归档 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-04 同一个目标映射两种哈希拒绝继续 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-05 后续新增不覆盖 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-06 合法空源完成 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-07 E03 空计划 prepared 后目标改变不能 every=true 2ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-09 E04 归档移走后收据未写可恢复 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-11 规划目的地被占用时保留源和目的地 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {bad 1ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {"version":99,"state":"prepared"} 1ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {"version":3,"state":"mystery"} 1ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-14 v2 completed 后删除不复活不改收据 7ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-15 prepared 前目标原字节备份可恢复 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-严格读取不默默过滤损坏条目 1ms
+ × tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-计划映射缺项不能被结果哈希捷径认证 6ms
+   → expected [Function] to throw an error
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:before:tenets.json 故障保留数据且可恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:after:tenets.json 故障保留数据且可恢复 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 receipt:prepared 故障保留数据且可恢复 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 commit:before 故障保留数据且可恢复 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 commit:after 故障保留数据且可恢复 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 archive:copied:pinned-memory.json 故障保留数据且可恢复 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 archive:after:pinned-memory.json 故障保留数据且可恢复 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 completed:before 故障保留数据且可恢复 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-12 v2 唯一归档证据转换后恢复 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-12 v2 多个相同归档路径不猜选 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-计划映射缺项不能被结果哈希捷径认证
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ tests/round2-pinned-migration.test.ts:55:267
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 28 passed (29)
+   Start at  13:21:50
+   Duration  283ms (transform 68ms, setup 20ms, import 61ms, tests 137ms, environment 0ms)
+

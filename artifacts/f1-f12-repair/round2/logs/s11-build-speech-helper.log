@@ -1,0 +1,14 @@
+
+> lingxi@0.1.35 build:speech-helper
+> node scripts/build-speech-helper.mjs
+
+[speech-helper] building for arm64
+Building for production...
+[0/5] Write sources
+[2/5] Write swift-version--1AB21518FC5DEDBE.txt
+[4/6] Compiling LingxiSpeechCore HelperOutput.swift
+[5/7] Compiling LingxiSpeechHelper LingxiSpeechHelperMain.swift
+[5/7] Write Objects.LinkFileList
+[6/7] Linking lingxi-speech-helper
+Build of product 'lingxi-speech-helper' complete! (30.48s)
+[speech-helper] copied <WORKTREE>/dist-speech/mac-arm64/lingxi-speech-helper

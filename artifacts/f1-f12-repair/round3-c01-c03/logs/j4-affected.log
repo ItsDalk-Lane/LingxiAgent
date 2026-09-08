@@ -1,0 +1,130 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+stdout | tests/pinned-tenets-migration.test.ts > pinned → tenets 一次性迁移（既有行为保持） > json 优先：pinned-memory.json 条目并入 tenets（active/user_direct），旧文件改名 .migrated
+[pins-migration] [hana] pinned→tenets migration: 2 added, 0 duplicates, 2 source items
+
+stdout | tests/pinned-tenets-migration-recovery.test.ts > M13：旧 .migrated 无收据 → 默认仅 dry-run > completed 仅覆盖本计划：删除的条目不复活，其他归档仍为候选
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > X2-01 pending/active 混合旧库经首次迁移、恢复重试、删除与重启后无重复或复活
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 1 duplicates, 2 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > pinned → tenets 一次性迁移（既有行为保持） > json 缺失时解析 pinned.md（含缩进续行）
+[pins-migration] [hana] pinned→tenets migration: 2 added, 0 duplicates, 2 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M01/M02：旧版合法内容完整接纳（豁免普通新增限制） > M01：301 字符、数千字符、多行旧 pin 全文保留并 active
+[pins-migration] [hana] pinned→tenets migration: 3 added, 0 duplicates, 3 source items
+
+ ✓ tests/desktop-session-submit-browser-revocation.test.ts (5 tests) 117ms
+ ✓ tests/pinned-tenets-migration-recovery.test.ts (6 tests) 194ms
+stdout | tests/pinned-tenets-migration.test.ts > M01/M02：旧版合法内容完整接纳（豁免普通新增限制） > M02：201 条旧 pin 全部迁移；普通第 202 条新增受新配额限制
+[pins-migration] [hana] pinned→tenets migration: 201 added, 0 duplicates, 201 source items
+
+stderr | tests/desktop-session-submit.test.ts > submitDesktopSessionMessage > threads clientMessageId into the session user message event
+[desktop-session-submit] canonical input correlation unavailable
+
+stderr | tests/desktop-session-submit.test.ts > submitDesktopSessionMessage > still submits the message when the origin entry write fails
+[desktop-session-submit] message origin write failed for /tmp/desk.jsonl: disk hiccup
+
+stderr | tests/desktop-session-submit.test.ts > submitDesktopSessionMessage > adds SessionFile references for display-only audio attachments
+[desktop-session-submit] message presentation write failed for /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-display-audio-Z71y9k/main.jsonl: appendCustomEntry unavailable
+
+stdout | tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-06 合法空源完成
+[pins-migration] [test-agent] pinned→tenets migration: 0 added, 0 duplicates, 0 source items
+
+stderr | tests/desktop-session-submit.test.ts > submitDesktopSessionMessage > interjects into a streaming session after registering the same visible attachment envelope
+[desktop-session-submit] message presentation write failed for /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-desktop-interject-vwUwUj/main.jsonl: appendCustomEntry unavailable
+
+stdout | tests/pinned-tenets-migration.test.ts > M03/M04：旧版权威来源规则（mtime）与删除语义 > M03：Markdown mtime 更新时以 Markdown 为准，否则以 JSON 为准
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stderr | tests/desktop-session-submit.test.ts > session reminder block injection > does not consume a rendered receipt when promptSession rejects
+[desktop-session-submit] message presentation write failed for /tmp/desk.jsonl: appendCustomEntry unavailable
+
+stderr | tests/desktop-session-submit.test.ts > session reminder block injection > ignores destructive consume-only reminders while preserving numeric rendered receipts
+[desktop-session-submit] message presentation write failed for /tmp/numeric.jsonl: appendCustomEntry unavailable
+
+stderr | tests/desktop-session-submit.test.ts > session reminder block injection > puts reminder, beforeUser context, attachment marker, and body in stable interjection order
+[desktop-session-submit] message presentation write failed for /tmp/desk.jsonl: appendCustomEntry unavailable
+
+stderr | tests/desktop-session-submit.test.ts > session reminder block injection > closes streaming status but retains the receipt when Pi prompt fails after the hook
+[desktop-session-submit] message presentation write failed for /tmp/desk.jsonl: appendCustomEntry unavailable
+
+ ✓ tests/agent-review-turn-coordinator.test.ts (3 tests) 173ms
+ ✓ tests/round2-pinned-migration-faults.test.ts (9 tests) 258ms
+ ✓ tests/round2-pinned-recovery.test.ts (11 tests) 258ms
+stdout | tests/pinned-tenets-migration.test.ts > M03/M04：旧版权威来源规则（mtime）与删除语义 > M04：合法空 items 的 JSON 是权威时保留删除语义；md 更新时采用 md
+[pins-migration] [hana] pinned→tenets migration: 0 added, 0 duplicates, 0 source items
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-14 v2 completed 后删除不复活不改收据
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M05/M06：严格读写边界与权威来源损坏 > M05：目标 tenets 损坏时不覆盖、不归档、明确失败；修复后可重试
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:before:tenets.json 故障保留数据且可恢复
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M07–M09：迁移去重规则（精确内容比较） > M07：与 active 精确重复（含边界空白/换行归一差异）不新增，映射记录到收据
+[pins-migration] [hana] pinned→tenets migration: 1 added, 1 duplicates, 2 source items
+
+ ✓ tests/desktop-session-submit-knowledge-routing.test.ts (8 tests) 228ms
+stdout | tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:after:tenets.json 故障保留数据且可恢复
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M07–M09：迁移去重规则（精确内容比较） > M08：只与 pending/rejected 重复时仍迁移为 active/user_direct，历史保留
+[pins-migration] [hana] pinned→tenets migration: 0 added, 0 duplicates, 2 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M07–M09：迁移去重规则（精确内容比较） > M09：仅大小写/句尾标点相似不合并（不同事实各自保留）
+[pins-migration] [hana] pinned→tenets migration: 1 added, 1 duplicates, 2 source items
+
+ ✓ tests/round2-pinned-migration.test.ts (29 tests) 367ms
+ ✓ tests/round2-pinned-recovery-faults.test.ts (7 tests) 375ms
+stdout | tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M12：completed 后用户删除迁移条目，重启不复活
+[pins-migration] [hana] pinned→tenets migration: 2 added, 0 duplicates, 2 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M14a：连续运行两次幂等
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M20：迁移结果对设置页与 system prompt 可见 > 只注入 active；多行完整可见；pending/rejected 不注入
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > 遗留 .migrated 与既有归档共存 > 归档目标已存在时改用带源哈希的后缀，不覆盖既有 .migrated
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+ ✓ tests/pinned-tenets-migration.test.ts (25 tests) 397ms
+ ✓ tests/desktop-session-submit.test.ts (59 tests) 380ms
+ ✓ tests/desktop-session-submit-detailed-research.test.ts (17 tests) 615ms
+ ✓ tests/chat-route-skill-message.test.ts (1 test) 48ms
+stderr | tests/chat-route-session-identity.test.ts > slash WS handler agent identity > labels a slash with no identity at all as an internal contract violation
+[chat] ws slash rejected: internal_contract — agent identity unresolved (sessionPath=/sessions/remote.jsonl)
+
+ ✓ tests/chat-route-session-identity.test.ts (5 tests) 52ms
+ ✓ tests/chat-route-mood-segment.test.ts (14 tests) 55ms
+ ✓ tests/chat-route-knowledge-refs.test.ts (20 tests) 59ms
+ ✓ tests/chat-route-reserved-raw-fallback.test.ts (15 tests) 57ms
+stderr | tests/chat-route-switching.test.ts > chat route model switch guard > rejects prompt routing when sessionId and sessionPath disagree (#2078)
+[chat] ws prompt rejected: session_identity_mismatch — sessionId and sessionPath refer to different sessions (sessionId=sess_other, sessionPath=/tmp/path.jsonl)
+
+stderr | tests/chat-route-switching.test.ts > chat route model switch guard > rejects a prompt with no identity before it validates the attachments
+[chat] ws prompt rejected: internal_contract — session identity required (sessionId=none, sessionPath=none)
+
+stderr | tests/chat-route-switching.test.ts > chat route model switch guard > rejects mismatched steer and resume targets before touching runtime state (#2078)
+[chat] ws steer rejected: session_identity_mismatch — sessionId and sessionPath refer to different sessions (sessionId=sess_other, sessionPath=/tmp/path.jsonl)
+
+stderr | tests/chat-route-switching.test.ts > chat route model switch guard > rejects mismatched steer and resume targets before touching runtime state (#2078)
+[chat] ws resume_stream rejected: session_identity_mismatch — sessionId and sessionPath refer to different sessions (sessionId=sess_other, sessionPath=/tmp/path.jsonl)
+
+ ✓ tests/chat-route-switching.test.ts (48 tests) 117ms
+ ✓ tests/round2-composer-reconciliation-route.test.ts (1 test) 959ms
+   ✓ R04-01/02/15：真实SDK提交后丢失ACK，断线恢复经真实history路由合并并续发一次  959ms
+
+ Test Files  18 passed (18)
+      Tests  283 passed (283)
+   Start at  19:09:51
+   Duration  3.08s (transform 5.70s, setup 392ms, import 13.24s, tests 4.71s, environment 328ms)
+

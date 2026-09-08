@@ -1,0 +1,115 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ × tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-01: files=['.'] 与实际子目录都拒绝，不能标 done 34ms
+   → expected true to be false // Object.is equality
+ × tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-02/03: 外链拒绝，指向根内普通文件的链接按既定规则接受 2ms
+   → expected true to be false // Object.is equality
+ ✓ tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-04: 悬空与循环链接明确失败，不抛出未处理文件系统异常 1ms
+ × tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-05: root/root-evil 前缀、../ 与绝对路径都拒绝 1ms
+   → expected true to be false // Object.is equality
+ × tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-06/07/08: 普通文件成功；多文件一个无效则整体失败；终态不倒退 1ms
+   → expected true to be false // Object.is equality
+ × tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-09/10: 重启恢复与新完成共用同一规则，目录和外链失败、普通文件完成 2ms
+   → expected 'done' to be 'failed' // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-01: files=['.'] 与实际子目录都拒绝，不能标 done
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/speech-output-validation.round2.test.ts:46:25
+     44|       addPending(store, taskId);
+     45|       const result = store.completeSynchronousSpeechTask(taskId, { fil…
+     46|       expect(result.ok).toBe(false);
+       |                         ^
+     47|       expect(store.get(taskId)?.status).toBe("failed");
+     48|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-02/03: 外链拒绝，指向根内普通文件的链接按既定规则接受
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/speech-output-validation.round2.test.ts:64:25
+     62|       files: ["outside-link.mp3"], generatedDir,
+     63|     });
+     64|     expect(rejected.ok).toBe(false);
+       |                         ^
+     65|     expect(store.get("outside-link")?.status).toBe("failed");
+     66|     expect(rejected.error).not.toContain(outside);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-05: root/root-evil 前缀、../ 与绝对路径都拒绝
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/speech-output-validation.round2.test.ts:107:25
+    105|       addPending(store, taskId);
+    106|       const result = store.completeSynchronousSpeechTask(taskId, { fil…
+    107|       expect(result.ok).toBe(false);
+       |                         ^
+    108|       expect(store.get(taskId)?.status).toBe("failed");
+    109|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-06/07/08: 普通文件成功；多文件一个无效则整体失败；终态不倒退
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/speech-output-validation.round2.test.ts:132:22
+    130|       files: ["a.mp3", "not-file"], generatedDir,
+    131|     });
+    132|     expect(mixed.ok).toBe(false);
+       |                      ^
+    133|     expect(store.get("mixed")?.status).toBe("failed");
+    134|     expect(store.get("mixed")?.files).toEqual([]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-09/10: 重启恢复与新完成共用同一规则，目录和外链失败、普通文件完成
+AssertionError: expected 'done' to be 'failed' // Object.is equality
+
+Expected: "failed"
+Received: "done"
+
+ ❯ tests/speech-output-validation.round2.test.ts:151:46
+    149|     expect(store.recoverSynchronousSpeechTasks({ generatedDir })).toBe…
+    150|     expect(store.get("recover-ok")?.status).toBe("done");
+    151|     expect(store.get("recover-dir")?.status).toBe("failed");
+       |                                              ^
+    152|     expect(store.get("recover-link")?.status).toBe("failed");
+    153|     store.flushSync();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 1 passed (6)
+   Start at  14:58:13
+   Duration  158ms (transform 44ms, setup 18ms, import 32ms, tests 43ms, environment 0ms)
+

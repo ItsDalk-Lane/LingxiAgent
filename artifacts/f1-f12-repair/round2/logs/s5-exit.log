@@ -1,0 +1,137 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 词表外的孤儿闭标签按残渣吞掉（mm:think 方言，单次喂入） 45ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 连续两个词表外孤儿闭标签全部吞掉（模型连发收尾标签的实测形态） 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 跨 delta 撕裂的词表外闭标签也能识别并吞掉 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 词表内的孤儿闭标签保持字面透传（转义/教学契约，残渣由链尾兜底） 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 链尾 MoodParser 吞掉词表外孤儿闭标签（mm:think 实测泄漏形态） 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 链头 ThinkTagParser 透传下游结构标签（</mood> 不得被误吞） 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 成对的 mm:think 方言标签结构化，内容进 think 通道 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 代码保护区内的闭标签仍按字面保留（教学场景不受影响） 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 普通小于号与数学比较不受影响 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 转义的字面闭标签（词表内）仍按契约输出字面量 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > splitReservedTagSegments 词表外孤儿闭标签清理（历史渲染兜底） > 旧落盘正文里的孤儿闭标签在全文切分时被清掉 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > splitReservedTagSegments 词表外孤儿闭标签清理（历史渲染兜底） > 词表内的成对标签在全文切分时成为结构化块 0ms
+ ✓ desktop/src/react/__tests__/chat-semantics/history-segment-sanitizer.test.ts > history-segment-sanitizer（迁移边界一次性净化） > 结构化 mood 存在时剥离 leading <mood> 标签，正文保留 45ms
+ ✓ desktop/src/react/__tests__/chat-semantics/history-segment-sanitizer.test.ts > history-segment-sanitizer（迁移边界一次性净化） > 没有结构化 mood 时保留原文（避免内容凭空消失） 0ms
+ ✓ desktop/src/react/__tests__/chat-semantics/history-segment-sanitizer.test.ts > history-segment-sanitizer（迁移边界一次性净化） > 结构化 thinking 存在时剥离 leading <think> 块 0ms
+ ✓ desktop/src/react/__tests__/chat-semantics/history-segment-sanitizer.test.ts > history-segment-sanitizer（迁移边界一次性净化） > 正文内部的标签保留（模型在讲解标签时是内容） 0ms
+ ✓ desktop/src/react/__tests__/chat-semantics/history-segment-sanitizer.test.ts > history-segment-sanitizer（迁移边界一次性净化） > 多段 mood 交错时循环剥离，reasoning segment 不动 0ms
+ ✓ desktop/src/react/__tests__/chat-semantics/history-segment-sanitizer.test.ts > history-segment-sanitizer（迁移边界一次性净化） > 净化后为空白的 text segment 被丢弃（不变量 4：没有 visible text 就没有 text segment） 1ms
+ ✓ desktop/src/react/__tests__/chat-semantics/history-segment-sanitizer.test.ts > history-segment-sanitizer（迁移边界一次性净化） > 没有结构化 mood 时全 mood 的 segment 原样保留（内容不得凭空消失） 0ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > renders inline and block KaTeX math 43ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > renders LaTeX parenthesis and bracket math delimiters 1ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > renders invalid KaTeX as inline error markup instead of throwing 1ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > renders Obsidian ==highlight== syntax as mark 1ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > renders whitelisted Obsidian background span as a safe mark 0ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > keeps non-whitelisted span markup escaped 1ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > keeps default markdown rendering from rendering raw HTML 0ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > marks mermaid fenced code blocks as renderable diagram placeholders 0ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > renders markdown footnotes with clickable refs and backrefs 1ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > uses stable but source-scoped footnote ids 1ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > trims CJK punctuation from auto-linkified URLs 5ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > trims invisible suffix characters from auto-linkified URLs 0ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > keeps punctuation inside explicit markdown link destinations 0ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > keeps local file names from becoming auto-linkified domains 14ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > keeps normal fuzzy links and explicit markdown file labels clickable 0ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > renders filtered HTML in markdown preview mode 26ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > adds stable heading ids in markdown preview mode 2ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > wraps markdown tables in a constrained width container 0ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > preserves markdown table containers in preview mode 2ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > removes dangerous HTML from markdown preview output 1ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > resolves standard markdown image paths relative to the previewed markdown file 1ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > resolves markdown image paths from Windows-style previewed markdown paths 1ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > renders Obsidian wikilink image embeds with width and height 1ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > renders Obsidian external image width shorthand without leaking the size into alt text 0ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > filters unsafe markdown preview links while preserving safe links 1ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > filters unsafe preview styles while preserving safe presentation styles 1ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > preserves generated mermaid placeholder classes in markdown preview mode 1ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > preserves safe generated footnote markup in markdown preview mode 2ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > strips unsafe raw footnote ids classes and roles in markdown preview mode 1ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > does not preserve raw non-footnote section tags in markdown preview mode 1ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > preserves generated KaTeX markup in markdown preview mode 3ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > preserves complex generated KaTeX markup in markdown preview mode 5ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > does not trust raw HTML just because it uses KaTeX classes 0ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > preserves task list checkboxes in markdown preview mode 1ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > strips non-checkbox inputs even in task list context 0ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > forces disabled on checkbox inputs and strips unsafe attributes 0ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > does not allow raw SVG outside generated KaTeX markup 0ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > renders Obsidian callouts from blockquote syntax 0ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > normalizes Obsidian callout aliases and supports fold markers 0ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts > renderMarkdown > preserves callout classes in markdown preview mode 0ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-01/09：围栏代码的转义标签在实时、终态和复制中保留原反斜杠 65ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-02：行内代码中的闭标签和反斜杠不被协议解析或显示预处理删除 4ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-03/05：正文转义标签只由 Markdown 消费且同一 source 重渲染稳定 3ms
+ × desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-03：旧直测反例经真实组件按 Markdown 语义显示且普通反斜杠不变 5ms
+   → expected 'C:\path 与 1 < 2\n' to be 'C:\path 与 1 < 2' // Object.is equality
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-06：同一 canonical source 的每个 delta 切分经实时组件后都收敛到同一显示结果 36ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-04：连续1到4个反斜杠按 Markdown 词法处理，不由组件额外删层 1ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-10：超长纯文本降级直接转义 canonical source，旧 html-only 内容不被反推 4ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > treats source as authoritative when a stale legacy html cache is also present 1ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > defers mermaid enhancement until the turn is settled 53ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > defers KaTeX layout until the turn is settled 8ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > uses a configurable plain-text circuit breaker for oversized active source 1ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > renders active prose through markdown html instead of a plain-text fallback 1ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > matches final markdown paragraph structure while prose is streaming 1ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > updates prose immediately through the upstream 30Hz flush instead of local text animation debt 1ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > hard-catches up 80-character prose backlogs without waiting for animation debt 1ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > renders final prose with markdown html when streaming is complete 1ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > does not typewriter complex markdown blocks 3ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > keeps complex markdown mounted while streaming updates arrive 3ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > co-renders code block toolbar without post-render DOM injection 2ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > handles co-rendered code toolbar wrap and copy actions through React events 3ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > does not typewriter backtick-sensitive inline markdown while streaming 1ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > keeps common markdown formatting rendered while streaming 3ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > does not fall back to plain text when rendered html contains formatting 1ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > uses identical markdown html structure while streaming and after completion 2ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > uses identical mermaid html structure while streaming and after completion 2ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > keeps stream motion off React animation frames and limits CSS to opacity or tiny transforms 1ms
+ ✓ tests/live-history-reserved-tag-parity.test.ts > live = history 语义等价（保留协议不泄漏） > 场景一：mood-only → generate-image → mood + final answer，两条路径语义一致 43ms
+ ✓ tests/live-history-reserved-tag-parity.test.ts > live = history 语义等价（保留协议不泄漏） > 场景二：mood-only 无 final answer，两条路径都得到 missing_final_answer 且无假正文段 2ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T01: 正常配对的未知标记全部保留 30ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T02: 属性内带引号的 > 不误截断，配对闭标签保留 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T03: 未知自闭合标记与正常嵌套不产生伪孤儿 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T04: 未知孤儿闭标签在最终原始 assistant 边界清理 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T05: 已知 think/mood/mm:think 成对结构化通道不退化（完整链） 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T06: code fence／inline code 内闭标签字符不变 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T07: 已转义已知／未知闭标签经完整链保留 canonical 字面量 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T08: 每个字符位置二分喂入与一次性喂入语义一致 5ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T09: 固定种子多段分块与一次性喂入等价（事件序列归一） 1ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T10: 半截标记后 flush 按字面定界，不跨 assistant segment 污染 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T11: a<b、比较式、注释、CDATA 保守保留非协议内容 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T12: 错配嵌套与超深/超长输入不崩溃、不成段丢正文 15ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 历史与实时入口（T13–T16） > T13: 同源 raw 实时与历史路径的 answer 文本一致（未知配对保留 + 孤儿清理 + 代码保护） 11ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 历史与实时入口（T13–T16） > T14: 已规范化 canonical 文本再渲染不再次清理字面内容（转义字面量稳定） 1ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 历史与实时入口（T13–T16） > T15: 用户输入含 HTML/XML 不进入 assistant 残渣清理 1ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 历史与实时入口（T13–T16） > T16: 历史仅孤儿残渣、无 leading block 可删时不被 return 原 source 抵消清理 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 splitReservedTagSegments 与显示投影 > 孤儿清理与配对保留在全文切分同时成立 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 splitReservedTagSegments 与显示投影 > canonical source 保留标签转义与普通反斜杠，多次经过 scanner 不漂移 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-03：旧直测反例经真实组件按 Markdown 语义显示且普通反斜杠不变
+AssertionError: expected 'C:\path 与 1 < 2\n' to be 'C:\path 与 1 < 2' // Object.is equality
+
+- Expected
++ Received
+
+  C:\path 与 1 < 2
++
+
+ ❯ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx:87:42
+     85|     const ordinary = 'C:\\path 与 1 \\< 2';
+     86|     const second = render(<StreamingMarkdownContent source={ordinary} …
+     87|     expect(second.container.textContent).toBe('C:\\path 与 1 < 2');
+       |                                          ^
+     88|     second.unmount();
+     89|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  1 failed | 104 passed (105)
+   Start at  14:26:15
+   Duration  1.60s (transform 1.30s, setup 76ms, import 2.96s, tests 538ms, environment 1.25s)
+

@@ -1,0 +1,781 @@
+{
+  "round": "round3-c01-c03",
+  "base": "67dee5d2de9d3b9fc75ec5ef5c555e93c65b3ccd",
+  "finalSourceManifestHash": "e1bfe94a0075775ff1cc69683fff6cdcdd81ccdcda7eb14da65367ba7cd4c3ab",
+  "cases": [
+    {
+      "id": "C01-SRV-01",
+      "area": "server-route",
+      "status": "VERIFIED",
+      "summary": "模型切换拒绝：error + input_rejected（not_accepted / code / retryable / 身份与尝试回显）",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "模型切换拒绝：error + input_rejected（not_accepted / code / retryable / 身份与尝试回显）",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-SRV-02",
+      "area": "server-route",
+      "status": "VERIFIED",
+      "summary": "会话忙拒绝：code=session_busy 且 retryable=true",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "会话忙拒绝：code=session_busy 且 retryable=true",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-SRV-03",
+      "area": "server-route",
+      "status": "VERIFIED",
+      "summary": "无效审阅 Agent（评审者=属主）：code=invalid_review_agent 且 retryable=false",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "无效审阅 Agent（评审者=属主）：code=invalid_review_agent 且 retryable=false",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-SRV-04",
+      "area": "server-route",
+      "status": "VERIFIED",
+      "summary": "已接受后的运行失败（hub.send 抛未标记错误）：不发 input_rejected，只保留普通 error",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "已接受后的运行失败（hub.send 抛未标记错误）：不发 input_rejected，只保留普通 error",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-SRV-05",
+      "area": "server-route",
+      "status": "VERIFIED",
+      "summary": "hub.send 抛出提交层标记的「未接受」错误：发 input_rejected（code=session_busy）",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "hub.send 抛出提交层标记的「未接受」错误：发 input_rejected（code=session_busy）",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-SRV-06",
+      "area": "server-route",
+      "status": "VERIFIED",
+      "summary": "无 clientMessageId 的旧客户端：只收到 legacy error，不投递拒绝回执",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "无 clientMessageId 的旧客户端：只收到 legacy error，不投递拒绝回执",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-SUB-01",
+      "area": "submit-layer",
+      "status": "VERIFIED",
+      "summary": "busy 门禁拒绝被标记为未接受",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "busy 门禁拒绝被标记为未接受",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-SUB-02",
+      "area": "submit-layer",
+      "status": "VERIFIED",
+      "summary": "真实 SDK：canonical append 之后的供应商错误不被标记为未接受",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "真实 SDK：canonical append 之后的供应商错误不被标记为未接受",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-SUB-03",
+      "area": "submit-layer",
+      "status": "VERIFIED",
+      "summary": "真实 SDK：流式中的 busy 拒绝被标记，用户消息未落盘",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "真实 SDK：流式中的 busy 拒绝被标记，用户消息未落盘",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-REV-01",
+      "area": "agent-review",
+      "status": "VERIFIED",
+      "summary": "父会话提交前失败（模型缺失）通知 onRejected，父会话从未收到提交",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "父会话提交前失败（模型缺失）通知 onRejected，父会话从未收到提交",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-REV-02",
+      "area": "agent-review",
+      "status": "VERIFIED",
+      "summary": "评审完成（父会话提交成功）不通知 onRejected",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "评审完成（父会话提交成功）不通知 onRejected",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-REV-03",
+      "area": "agent-review",
+      "status": "VERIFIED",
+      "summary": "用户在父会话提交前停止：通知 onRejected（review_cancelled_before_acceptance）",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "用户在父会话提交前停止：通知 onRejected（review_cancelled_before_acceptance）",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-CLI-01",
+      "area": "client-settlement",
+      "status": "VERIFIED",
+      "summary": "模型切换拒绝：结算为明确失败、释放屏障、保留快照，修正后可显式重试（路由全链路）",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "模型切换拒绝：结算为明确失败、释放屏障、保留快照，修正后可显式重试（路由全链路）",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-CLI-02",
+      "area": "client-settlement",
+      "status": "VERIFIED",
+      "summary": "负回执在看门狗超时之前到达：不触发 delivery_unknown，也不启动对账",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "负回执在看门狗超时之前到达：不触发 delivery_unknown，也不启动对账",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-CLI-03",
+      "area": "client-settlement",
+      "status": "VERIFIED",
+      "summary": "负回执在看门狗超时之后到达：delivery_unknown 被确定拒绝覆盖",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "负回执在看门狗超时之后到达：delivery_unknown 被确定拒绝覆盖",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-CLI-04",
+      "area": "client-settlement",
+      "status": "VERIFIED",
+      "summary": "第一尝试迟到负回执不影响第二尝试；重复回执幂等",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "第一尝试迟到负回执不影响第二尝试；重复回执幂等",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-CLI-05",
+      "area": "client-settlement",
+      "status": "VERIFIED",
+      "summary": "跨会话 / 跨服务器 / 错误版本回执无效果",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "跨会话 / 跨服务器 / 错误版本回执无效果",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-CLI-06",
+      "area": "client-settlement",
+      "status": "VERIFIED",
+      "summary": "已有 canonical 接受证据时，冲突负回执不倒退为未接收",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "已有 canonical 接受证据时，冲突负回执不倒退为未接收",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-CLI-07",
+      "area": "client-settlement",
+      "status": "VERIFIED",
+      "summary": "已接受后的供应商错误（普通 error）：不结算为未接收、不自动重发",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "已接受后的供应商错误（普通 error）：不结算为未接收、不自动重发",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-CLI-08",
+      "area": "client-settlement",
+      "status": "VERIFIED",
+      "summary": "拒绝项的正文/附件/引用/知识范围完整保留在失败投影",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "拒绝项的正文/附件/引用/知识范围完整保留在失败投影",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-CLI-09",
+      "area": "client-settlement",
+      "status": "VERIFIED",
+      "summary": "A 被拒（transport_submitted 后出队）恢复原位失败；不跳过 A 发 B；处置 A 后 B 推进",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "A 被拒（transport_submitted 后出队）恢复原位失败；不跳过 A 发 B；处置 A 后 B 推进",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C01-CLI-10",
+      "area": "client-settlement",
+      "status": "VERIFIED",
+      "summary": "真正的 delivery_unknown 屏障仍有效，且不阻塞其他会话",
+      "tests": [
+        {
+          "file": "tests/round3-c01-input-rejection.test.ts",
+          "title": "真正的 delivery_unknown 屏障仍有效，且不阻塞其他会话",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C02-01",
+      "area": "写侧",
+      "status": "VERIFIED",
+      "summary": "完整迁移写出的收据 backupDir 是 \"/\" 分隔且可原样读回（写→读往返）",
+      "tests": [
+        {
+          "file": "tests/round3-c02-receipt-backup-dir.test.ts",
+          "title": "完整迁移写出的收据 backupDir 是 \"/\" 分隔且可原样读回（写→读往返）",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C02-02",
+      "area": "写侧",
+      "status": "VERIFIED",
+      "summary": "合法续写（Windows 旧收据恢复中断后）持久化为规范路径",
+      "tests": [
+        {
+          "file": "tests/round3-c02-receipt-backup-dir.test.ts",
+          "title": "合法续写（Windows 旧收据恢复中断后）持久化为规范路径",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C02-03",
+      "area": "写侧",
+      "status": "VERIFIED",
+      "summary": "恢复操作（recovery）新收据 backupDir 同样是规范路径",
+      "tests": [
+        {
+          "file": "tests/round3-c02-receipt-backup-dir.test.ts",
+          "title": "恢复操作（recovery）新收据 backupDir 同样是规范路径",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C02-04",
+      "area": "兼容读",
+      "status": "VERIFIED",
+      "summary": "Windows 旧表示的 prepared 收据可读、可续跑至 completed",
+      "tests": [
+        {
+          "file": "tests/round3-c02-receipt-backup-dir.test.ts",
+          "title": "Windows 旧表示的 prepared 收据可读、可续跑至 completed",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C02-05",
+      "area": "兼容读",
+      "status": "VERIFIED",
+      "summary": "Windows 旧表示的 target_committed 收据可读、可续跑至 completed",
+      "tests": [
+        {
+          "file": "tests/round3-c02-receipt-backup-dir.test.ts",
+          "title": "Windows 旧表示的 target_committed 收据可读、可续跑至 completed",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C02-06",
+      "area": "兼容读",
+      "status": "VERIFIED",
+      "summary": "Windows 旧表示的 sources_archived 收据可读、可续跑至 completed",
+      "tests": [
+        {
+          "file": "tests/round3-c02-receipt-backup-dir.test.ts",
+          "title": "Windows 旧表示的 sources_archived 收据可读、可续跑至 completed",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C02-07",
+      "area": "兼容读",
+      "status": "VERIFIED",
+      "summary": "completed 后删除记忆，再读 Windows 旧收据不复活、不重导",
+      "tests": [
+        {
+          "file": "tests/round3-c02-receipt-backup-dir.test.ts",
+          "title": "completed 后删除记忆，再读 Windows 旧收据不复活、不重导",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C02-08",
+      "area": "兼容读",
+      "status": "VERIFIED",
+      "summary": "旧 v2 completed 收据（含 Windows backupDir）读取不抛错且不重导",
+      "tests": [
+        {
+          "file": "tests/round3-c02-receipt-backup-dir.test.ts",
+          "title": "旧 v2 completed 收据（含 Windows backupDir）读取不抛错且不重导",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C02-09",
+      "area": "兼容读",
+      "status": "VERIFIED",
+      "summary": "旧 v2 中间态收据（Windows backupDir）按升级路径继续并落规范路径",
+      "tests": [
+        {
+          "file": "tests/round3-c02-receipt-backup-dir.test.ts",
+          "title": "旧 v2 中间态收据（Windows backupDir）按升级路径继续并落规范路径",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C02-10",
+      "area": "recovery",
+      "status": "VERIFIED",
+      "summary": "target_committed 中断 + Windows 旧表示：续跑完成，批准摘要与 operation 身份不变",
+      "tests": [
+        {
+          "file": "tests/round3-c02-receipt-backup-dir.test.ts",
+          "title": "target_committed 中断 + Windows 旧表示：续跑完成，批准摘要与 operation 身份不变",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C02-11",
+      "area": "recovery",
+      "status": "VERIFIED",
+      "summary": "completed 恢复操作 + Windows 旧表示：幂等返回原 summary，不重导",
+      "tests": [
+        {
+          "file": "tests/round3-c02-receipt-backup-dir.test.ts",
+          "title": "completed 恢复操作 + Windows 旧表示：幂等返回原 summary，不重导",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C02-12",
+      "area": "拒绝路径",
+      "status": "VERIFIED",
+      "summary": "危险路径输入拒绝（盘符/UNC/绝对/逃逸/点段/层级/混合/NUL 等 16 项）",
+      "tests": [
+        {
+          "file": "tests/round3-c02-receipt-backup-dir.test.ts",
+          "title": "危险路径输入拒绝（盘符/UNC/绝对/逃逸/点段/层级/混合/NUL 等 16 项）",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C02-13",
+      "area": "拒绝路径",
+      "status": "VERIFIED",
+      "summary": "receiptBackupDirLocalPath 拒绝非法输入（明确失败，不猜测路径）",
+      "tests": [
+        {
+          "file": "tests/round3-c02-receipt-backup-dir.test.ts",
+          "title": "receiptBackupDirLocalPath 拒绝非法输入（明确失败，不猜测路径）",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C02-LIMIT-01",
+      "area": "platform",
+      "status": "BLOCKED",
+      "summary": "真实 Windows 客户端端到端收据写入/读取实测",
+      "limitation": "无 Windows 运行环境；POSIX 上以数据级重写模拟旧 Windows 表示，表示规则与续跑语义已证明",
+      "tests": []
+    },
+    {
+      "id": "C03-01",
+      "area": "delivery",
+      "status": "VERIFIED",
+      "summary": "round2 交付日志 121/121 存在且 SHA-256 与 COMMAND_RESULTS 一致（R10-02）",
+      "tests": [
+        {
+          "file": "tests/round2-delivery-evidence.test.ts",
+          "title": "round2 交付日志 121/121 存在且 SHA-256 与 COMMAND_RESULTS 一致（R10-02）",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C03-02",
+      "area": "delivery",
+      "status": "VERIFIED",
+      "summary": "R01-R09 矩阵绑定真实测试与日志（R10-05）",
+      "tests": [
+        {
+          "file": "tests/round2-delivery-evidence.test.ts",
+          "title": "R01-R09 矩阵绑定真实测试与日志（R10-05）",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C03-03",
+      "area": "delivery",
+      "status": "VERIFIED",
+      "summary": "X2 联合回归绑定（S11-X2）",
+      "tests": [
+        {
+          "file": "tests/round2-delivery-evidence.test.ts",
+          "title": "X2 联合回归绑定（S11-X2）",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C03-04",
+      "area": "delivery",
+      "status": "VERIFIED",
+      "summary": "日志无真实用户路径（R10-10）",
+      "tests": [
+        {
+          "file": "tests/round2-delivery-evidence.test.ts",
+          "title": "日志无真实用户路径（R10-10）",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C03-05",
+      "area": "delivery",
+      "status": "VERIFIED",
+      "summary": "DELIVERY_MANIFEST 217/217 哈希一致",
+      "tests": [
+        {
+          "file": "tests/round2-delivery-evidence.test.ts",
+          "title": "DELIVERY_MANIFEST 217/217 哈希一致",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C03-06",
+      "area": "delivery",
+      "status": "VERIFIED",
+      "summary": "增量补丁从干净 89bc0b64 重放一致（R10-09，补丁含 round3 源码）",
+      "tests": [
+        {
+          "file": "tests/round2-delivery-evidence.test.ts",
+          "title": "增量补丁从干净 89bc0b64 重放一致（R10-09，补丁含 round3 源码）",
+          "log": "logs/j3-directed.log",
+          "logSha256": "d54b09f6bef5eecb2b08591d381cd86863f52aef8cbea2af49a59c290892e6c8",
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "C03-EVD-01",
+      "area": "round3-evidence",
+      "status": "VERIFIED",
+      "summary": "round3 命令记录/manifest/绿色门禁/补丁重放证据契约（独立重建后 4 文件 69/69 绿）",
+      "tests": [
+        {
+          "file": "tests/round3-delivery-evidence.test.ts",
+          "title": "round3 C01-C03 候选交付证据契约",
+          "log": "logs/j11-npm-test-final.log",
+          "logSha256": null,
+          "sourceManifestHash": "fee9f794b45533104367b51471d30472abd72016f854fa1d805b1a71a37904bb",
+          "result": "PASSED"
+        }
+      ]
+    },
+    {
+      "id": "JNT-01",
+      "area": "joint-regression",
+      "status": "VERIFIED",
+      "summary": "j1 typecheck（tsc ×3）",
+      "tests": []
+    },
+    {
+      "id": "JNT-02",
+      "area": "joint-regression",
+      "status": "VERIFIED",
+      "summary": "j2 lint（0 errors）",
+      "tests": []
+    },
+    {
+      "id": "JNT-03",
+      "area": "joint-regression",
+      "status": "VERIFIED",
+      "summary": "j3 定向：C01×22 + C02×32 + round2 证据×10",
+      "tests": []
+    },
+    {
+      "id": "JNT-04",
+      "area": "joint-regression",
+      "status": "VERIFIED",
+      "summary": "j4 受影响回归（composer/route/submit/pinned 18 文件）",
+      "tests": []
+    },
+    {
+      "id": "JNT-05",
+      "area": "joint-regression",
+      "status": "VERIFIED",
+      "summary": "j5 语音/标签/正文保真回归（12 文件）",
+      "tests": []
+    },
+    {
+      "id": "JNT-06",
+      "area": "joint-regression",
+      "status": "VERIFIED",
+      "summary": "j6b 闭包普查与开放边界（export-manifest 修正后）",
+      "tests": []
+    },
+    {
+      "id": "JNT-07",
+      "area": "joint-regression",
+      "status": "VERIFIED",
+      "summary": "j7 build:client",
+      "tests": []
+    },
+    {
+      "id": "JNT-08",
+      "area": "joint-regression",
+      "status": "VERIFIED",
+      "summary": "j8 build:server（一次性签名密钥）",
+      "tests": []
+    },
+    {
+      "id": "JNT-09",
+      "area": "joint-regression",
+      "status": "VERIFIED",
+      "summary": "j9 全量 npm test（13438 passed / 0 failed / 7 skipped）",
+      "tests": []
+    },
+    {
+      "id": "JNT-10",
+      "area": "joint-regression",
+      "status": "VERIFIED",
+      "summary": "j11/j13/j15 全量 npm test 迭代（最终 j15：13443 passed / 0 failed / 7 skipped，无 unhandled error）",
+      "tests": []
+    },
+    {
+      "id": "LIM-01",
+      "area": "platform",
+      "status": "BLOCKED",
+      "summary": "真实供应商 5xx / 真实付费模型端到端",
+      "limitation": "授权限制：不调用真实付费模型；供应商错误路径以 SDK fixture 合成验证",
+      "tests": []
+    },
+    {
+      "id": "LIM-02",
+      "area": "platform",
+      "status": "BLOCKED",
+      "summary": "Windows / Linux 平台实测与 x64 打包",
+      "limitation": "本环境 darwin-arm64；跨平台构建未执行",
+      "tests": []
+    },
+    {
+      "id": "LIM-03",
+      "area": "governance",
+      "status": "BLOCKED",
+      "summary": "提交/推送/封印推进",
+      "limitation": "未获提交授权；VERIFIED_SOURCE_SHA 未推进（按规则）",
+      "tests": []
+    }
+  ]
+}

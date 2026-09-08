@@ -1,0 +1,22 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V01: 同 provider 的图片默认值与语音默认值不同，TTS 只取语音域 31ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V02: 语音缺省、图片域里有 voice/format 时不回退图片域 2ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V03: 本次显式参数覆盖语音默认，TaskStore.params 与语义观测一致 2ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V03b: null 不被 Number(null) 隐式吞掉——speed null 走默认缺失语义 2ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V04: 多凭证 lane 时配置归属（逻辑 provider）与凭证归属（credentialProviderId）不混淆 2ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V06: 系统 say 路径只用它实际支持的参数，不被云端默认声线污染 2ms
+ ✓ tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-01/02: OpenAI 非法格式回落、有限速度限幅，缺失/null/空串/错误类型不会被 Number 隐式转换 1ms
+ ✓ tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-03/07/08: MiniMax 只取 speech 默认，保留执行目标模型与模型条目的 groupId 0ms
+ ✓ tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-04: DashScope 不把未发送的 speed/format 记成已应用 wire 参数 0ms
+ ✓ tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-05/06: system 默认选择不伪造 voice，显式小数 speed 只记录实际整数 WPM 0ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 云端适配路径不再读取图片 ctx.config（V05） > openai 路径：参数全部来自显式 params，不触 config；模型不被默认参数改写 9ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 云端适配路径不再读取图片 ctx.config（V05） > minimax 路径：不触 config，speed 进入 voice_setting 1ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 云端适配路径不再读取图片 ctx.config（V05） > dashscope 路径：不触 config，voice 显式传入 1ms
+
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+   Start at  14:49:44
+   Duration  338ms (transform 188ms, setup 19ms, import 204ms, tests 56ms, environment 0ms)
+

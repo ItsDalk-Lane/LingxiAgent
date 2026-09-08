@@ -1,0 +1,111 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-01: files=['.'] 与实际子目录都拒绝，不能标 done 37ms
+ ✓ tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-02/03: 外链拒绝，指向根内普通文件的链接按既定规则接受 2ms
+ ✓ tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-03: generated 根本身是合法目录链接时先 canonicalize，再接受根内普通文件 2ms
+ ✓ tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-04: 悬空与循环链接明确失败，不抛出未处理文件系统异常 1ms
+ ✓ tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-05: root/root-evil 前缀、../ 与绝对路径都拒绝 2ms
+ ✓ tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-06/07/08: 普通文件成功；多文件一个无效则整体失败；终态不倒退 2ms
+ ✓ tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-09/10: 重启恢复与新完成共用同一规则，目录和外链失败、普通文件完成 2ms
+ ✓ tests/media-task-store.test.ts > add / get > add returns a task with the expected shape including adapterId 36ms
+ ✓ tests/media-task-store.test.ts > add / get > get returns a shallow copy of the stored task 1ms
+ ✓ tests/media-task-store.test.ts > add / get > get returns null for an unknown taskId 0ms
+ ✓ tests/media-task-store.test.ts > add / get > add throws on duplicate taskId 1ms
+ ✓ tests/media-task-store.test.ts > add / get > returned object from add is a copy; mutations do not affect stored task 0ms
+ ✓ tests/media-task-store.test.ts > add / get > stores sessionPath when provided 0ms
+ ✓ tests/media-task-store.test.ts > add / get > stores sessionId and sessionRef when provided 0ms
+ ✓ tests/media-task-store.test.ts > add / get > defaults sessionPath to null 0ms
+ ✓ tests/media-task-store.test.ts > add / get > defaults imageWidth and imageHeight to null 1ms
+ ✓ tests/media-task-store.test.ts > update > merges patch fields into the task 1ms
+ ✓ tests/media-task-store.test.ts > update > returns null for an unknown taskId 0ms
+ ✓ tests/media-task-store.test.ts > update > returned object from update is a copy; mutations do not affect stored task 0ms
+ ✓ tests/media-task-store.test.ts > getByBatch > returns all tasks for a given batchId 1ms
+ ✓ tests/media-task-store.test.ts > getByBatch > returns empty array when no tasks match batchId 0ms
+ ✓ tests/media-task-store.test.ts > getByAdapter > returns all tasks for a given adapterId 0ms
+ ✓ tests/media-task-store.test.ts > getByAdapter > returns empty array when no tasks match adapterId 0ms
+ ✓ tests/media-task-store.test.ts > getByAdapter > tasks from different adapters are isolated 0ms
+ ✓ tests/media-task-store.test.ts > listAll > returns all tasks 0ms
+ ✓ tests/media-task-store.test.ts > listAll > returns empty array when store is empty 0ms
+ ✓ tests/media-task-store.test.ts > listPending > returns only pending tasks 0ms
+ ✓ tests/media-task-store.test.ts > listPending > returns empty array when no tasks are pending 0ms
+ ✓ tests/media-task-store.test.ts > listFavorited > returns only favorited tasks 0ms
+ ✓ tests/media-task-store.test.ts > listFavorited > returns empty array when nothing is favorited 0ms
+ ✓ tests/media-task-store.test.ts > remove > removes a task and returns true 1ms
+ ✓ tests/media-task-store.test.ts > remove > returns false when taskId does not exist 0ms
+ ✓ tests/media-task-store.test.ts > removeUnfavorited > removes completed non-favorited tasks and returns them 0ms
+ ✓ tests/media-task-store.test.ts > removeUnfavorited > does not remove pending tasks even if not favorited 0ms
+ ✓ tests/media-task-store.test.ts > removeUnfavorited > returns empty array when nothing qualifies for removal 0ms
+ ✓ tests/media-task-store.test.ts > removeUnfavorited > returned removed tasks are copies; they include all task fields 0ms
+ ✓ tests/media-task-store.test.ts > persistence > flushSync writes tasks.json and a new store reads it back 1ms
+ ✓ tests/media-task-store.test.ts > persistence > migrates old plugin-era task rows to provider/model/protocol metadata 1ms
+ ✓ tests/media-task-store.test.ts > persistence > starts with empty store when tasks.json does not exist 0ms
+ ✓ tests/media-task-store.test.ts > persistence > starts with empty store when tasks.json is corrupted JSON 0ms
+ ✓ tests/media-task-store.test.ts > persistence > starts with empty store when tasks.json contains non-array JSON 0ms
+ ✓ tests/media-task-store.test.ts > persistence > destroy cancels pending debounce without writing 0ms
+stdout | tests/speech-response-lifecycle.test.ts > F12/P8.4 持久化与旧 pending 恢复（V12–V13） > V12: 完成任务持久化后重启仍是终态；旧 pending/response 文件在→done、缺→failed；不再请求供应商
+[media] [media] poller recovered 2 pending task(s)
+[media] [media] recovered 2 synchronous speech task(s) after restart
+
+stdout | tests/speech-response-lifecycle.test.ts > F12/P8.4 持久化与旧 pending 恢复（V12–V13） > V13: 原图片/视频 pending 任务不被 speech 恢复特例误改
+[media] [media] poller recovered 3 pending task(s)
+
+ ✓ tests/speech-response-lifecycle.test.ts > F12/P8.3 同步 response 完成（V07–V11） > V07: response 同步文件成功 → 返回前任务 done/completed，有 completedAt 37ms
+ ✓ tests/speech-response-lifecycle.test.ts > F12/P8.3 同步 response 完成（V07–V11） > V08: response 模式无 poller/deferred/task:register/chat 消息副作用 3ms
+ ✓ tests/speech-response-lifecycle.test.ts > F12/P8.3 同步 response 完成（V07–V11） > V09: session 模式保留既有会话投递（deferred/task:register/poller 各一次） 3ms
+ ✓ tests/speech-response-lifecycle.test.ts > F12/P8.3 同步 response 完成（V07–V11） > V10: 文件缺失 → 明确失败，不返回 ok=true 配永久 pending 3ms
+ ✓ tests/speech-response-lifecycle.test.ts > F12/P8.3 同步 response 完成（V07–V11） > V10b: 适配器未返回文件 → 明确失败；无 taskId → 提交失败不建任务 4ms
+ ✓ tests/speech-response-lifecycle.test.ts > F12/P8.3 同步 response 完成（V07–V11） > V11: 重复完成幂等（completedAt 不变）；已取消任务不得被改成 done 3ms
+ ✓ tests/speech-response-lifecycle.test.ts > F12/P8.4 持久化与旧 pending 恢复（V12–V13） > V12: 完成任务持久化后重启仍是终态；旧 pending/response 文件在→done、缺→failed；不再请求供应商 4ms
+ ✓ tests/speech-response-lifecycle.test.ts > F12/P8.4 持久化与旧 pending 恢复（V12–V13） > V13: 原图片/视频 pending 任务不被 speech 恢复特例误改 3ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V01: 同 provider 的图片默认值与语音默认值不同，TTS 只取语音域 46ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V02: 语音缺省、图片域里有 voice/format 时不回退图片域 3ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V03: 本次显式参数覆盖语音默认，TaskStore.params 与语义观测一致 4ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > R08-01/09/10: manager→真实 OpenAI adapter 只解析一次，wire/任务/观测同值且只发一次请求 8ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > R08-03/08: manager→真实 MiniMax adapter 的限幅、格式、groupId 与凭证 lane 同源 4ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > R08-04: manager→真实 DashScope adapter 不把未发送的 speed/format 记录成 wire 参数 3ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V03b: null 不被 Number(null) 隐式吞掉——speed null 走默认缺失语义 3ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V04: 多凭证 lane 时配置归属（逻辑 provider）与凭证归属（credentialProviderId）不混淆 2ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V06: 系统 say 路径只用它实际支持的参数，不被云端默认声线污染 2ms
+ ✓ tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-01/02: OpenAI 非法格式回落、有限速度限幅，缺失/null/空串/错误类型不会被 Number 隐式转换 1ms
+ ✓ tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-03/07/08: MiniMax 只取 speech 默认，保留执行目标模型与模型条目的 groupId 0ms
+ ✓ tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-04: DashScope 不把未发送的 speed/format 记成已应用 wire 参数 0ms
+ ✓ tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-05/06: system 默认选择不伪造 voice，显式小数 speed 只记录实际整数 WPM 0ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 云端适配路径不再读取图片 ctx.config（V05） > openai 路径：参数全部来自显式 params，不触 config；模型不被默认参数改写 1ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 云端适配路径不再读取图片 ctx.config（V05） > minimax 路径：不触 config，speed 进入 voice_setting 1ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 云端适配路径不再读取图片 ctx.config（V05） > dashscope 路径：不触 config，voice 显式传入 1ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager image config migration > merges legacy image-gen config into native preferences before native config shadows it 34ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager image config migration > does not resurrect legacy defaults after migration has been marked 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager plugin image input boundary > resolves plugin referenceImages through session-owned SessionFile records 4ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager plugin image input boundary > rejects plugin referenceImages that are raw strings instead of SessionFile references 4ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager plugin image input boundary > submits resolved SessionFile referenceImages to the adapter on the real image path 9ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager plugin image input boundary > submits image generation with sessionId ownership when no path locator is supplied 3ms
+ ✓ tests/universal-media-manager.test.ts > media parameter input limits > lets explicit image resolution override a provider default size 0ms
+ ✓ tests/universal-media-manager.test.ts > media parameter input limits > drops stale provider image size defaults when the selected mode schema only accepts resolution 0ms
+ ✓ tests/universal-media-manager.test.ts > media parameter input limits > rejects image resolution values outside the selected mode schema instead of falling back 0ms
+ ✓ tests/universal-media-manager.test.ts > media parameter input limits > rejects reference images when the selected model mode is text-only 0ms
+ ✓ tests/universal-media-manager.test.ts > media parameter input limits > rejects too many reference images for the selected model mode 0ms
+stdout | tests/universal-media-manager.test.ts > UniversalMediaManager adapter registration bus contract > passes the registering plugin owner context to adapter submit calls
+[media] adapter registered: dreamina
+
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager adapter registration bus contract > registers an injected built-in adapter list in the native media runtime 50ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager adapter registration bus contract > registers zero built-in adapters when the composition root injects none 1ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager adapter registration bus contract > accepts module loggers that expose log/warn/error but no info method 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager adapter registration bus contract > passes the registering plugin owner context to adapter submit calls 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager adapter registration bus contract > keeps adapter registration independent from logger failures 1ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > submits image generation without a sessionPath when delivery mode is response 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > submits video generation without a sessionPath when delivery mode is response 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > submits video generation with sessionId ownership when no path locator is supplied 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > resolves explicit video provider and model through media capabilities before selecting an adapter 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > uses the default video model config when no video provider is specified 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > preserves provider-contributed video parameter schemas for settings and discovery 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > keeps a runtime CLI provider visible with its discovery error when no models can be read 1ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > merges video model defaults, user defaults, and request options before adapter submit 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > rejects video options outside the selected model mode schema 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > resolves video reference images through session-owned SessionFile records 3ms
+
+ Test Files  5 passed (5)
+      Tests  92 passed (92)
+   Start at  15:00:15
+   Duration  463ms (transform 791ms, setup 92ms, import 838ms, tests 375ms, environment 0ms)
+

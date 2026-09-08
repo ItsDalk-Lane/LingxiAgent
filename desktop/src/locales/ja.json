@@ -662,7 +662,10 @@
     "deliveryChecking": "結果不明、確認中",
     "deliveryUnknown": "結果不明、確認未完了",
     "deliveryRunUnknown": "メッセージ受信済み、実行結果は未確認",
-    "recheckDelivery": "再確認"
+    "recheckDelivery": "再確認",
+    "sendNotAccepted": "未送信：サーバーがこのメッセージを受け付けませんでした",
+    "sendRetry": "再送信",
+    "sendDismiss": "破棄"
   },
   "agentReview": {
     "running": "この Session をレビュー中",

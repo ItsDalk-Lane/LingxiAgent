@@ -1,0 +1,55 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q01：队首附件读取挂起时，后续纯文本项不准备、不先发 31ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q02：A 已发送但回执未到时，传输租约阻止 B 发送 3ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q03：A 回执到但 run 未结束（含 run 进行中），B 均不发 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q04：model_turn_end / tool_end / mood_end 均不释放下一轮 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q05：A 正确 run_end 后，B 只发一次且顺序稳定（经 400ms 调度通道） 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q06：重复 effect / StrictMode 双调用同一调度，不重复提交 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q07：准备 A 时手动发送 C，C 不超越 B 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q08：A1 会话准备挂起，不阻塞空闲的 A2 会话 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q09：准备期间连接代次切换，旧租约不得向新连接发送旧载荷 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q10：旧 run 的迟到终态不结束新 run 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q11：编辑/删除正在准备的队列项，过期快照不得发送 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q12：立即插入与普通续发并发，不双发、不绕过预检 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q13：run 在插话准备期间结束/更换，不得插入错误的 run 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q14：agent review 排队项立即插入保留既有禁止语义，不静默丢失 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q15：abort 后先收到权威终态再续发；迟到媒体结果不重开旧 run 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q16：两个会话各自一次发送，投影与载荷互不混块 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-01/R03-02：旧 timer 到点读取最后一次编辑保护，不延长计时 0ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-07：A timer 未开始切 B，不自动发送 A 0ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-04：保存相同正文不改变版本和 blocked 状态 0ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-04：同 queueItemId 新版本不复用旧逻辑身份 0ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03-03：慢准备期间队列进入编辑，commit 同步拒绝旧快照 0ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts [ desktop/src/react/__tests__/components/composer-send.transaction.test.ts ]
+Error: Transform failed with 1 error:
+<WORKTREE>/desktop/src/react/components/InputArea.tsx:1651:8: ERROR: The symbol "activeServerConnection" has already been declared
+  Plugin: vite:esbuild
+  File: <WORKTREE>/desktop/src/react/components/InputArea.tsx:1651:8
+  
+  The symbol "activeServerConnection" has already been declared
+  1649 |  
+  1650 |    // ── Load thinking level once server port is ready + listen for plan mode sync ──
+  1651 |    const activeServerConnection = useStore(s => s.activeServerConnection);
+       |          ^
+  1652 |    useEffect(() => {
+  1653 |      if (activeServerConnection && surface !== 'mobile') {
+  
+ ❯ failureErrorWithLog node_modules/esbuild/lib/main.js:1748:15
+ ❯ node_modules/esbuild/lib/main.js:1017:50
+ ❯ responseCallbacks.<computed> node_modules/esbuild/lib/main.js:884:9
+ ❯ handleIncomingPacket node_modules/esbuild/lib/main.js:939:12
+ ❯ Socket.readFromStdout node_modules/esbuild/lib/main.js:862:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  21 passed (21)
+   Start at  13:39:47
+   Duration  709ms (transform 306ms, setup 40ms, import 296ms, tests 56ms, environment 538ms)
+

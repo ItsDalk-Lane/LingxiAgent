@@ -16,6 +16,7 @@
     "core/agent.ts",
     "core/agents-md-migration.ts",
     "core/pinned-tenets-migration.ts",
+    "core/pinned-tenets-backup-dir.ts",
     "core/auxiliary-model-resolver.ts",
     "core/auxiliary-slots.ts",
     "core/bridge-session-manager.ts",

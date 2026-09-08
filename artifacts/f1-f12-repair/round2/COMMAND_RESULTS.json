@@ -3316,5 +3316,51 @@
     "log": "logs/s11-sealed-contract-readback-v3.log",
     "logSha256": "698611761717bfcd8727370a28329a65389d4270a0815d94b27d49447897d4b0",
     "sourceManifestHash": "c418b3ef2fc475e40ed779f21b8e087b120834e9b673baf2e67c3758138d30d8"
+  },
+  {
+    "command": [
+      "npm",
+      "test"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T13:41:42.482368+00:00",
+    "end": "2026-09-08T13:43:04.125793+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 13440,
+      "failed": 3,
+      "skipped": 7,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "b4bac4f6502728ea6e42c6b0be8c8cad81fdfab1b891e40fc192f6cd59ab7622",
+    "log": "logs/s12-round3-refresh-gate.log",
+    "logSha256": "9977fe9be0019e67b0ed435c11923483b3756a0b5f8eb256dca69f5e7644a5c6",
+    "sourceManifestHash": "b4bac4f6502728ea6e42c6b0be8c8cad81fdfab1b891e40fc192f6cd59ab7622"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T13:45:26.709291+00:00",
+    "end": "2026-09-08T13:45:49.383493+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "b4bac4f6502728ea6e42c6b0be8c8cad81fdfab1b891e40fc192f6cd59ab7622",
+    "log": "logs/s13-round3-refresh-green.log",
+    "logSha256": "1a1deb9920b1895e1f8be03b30d52c10389d23dafbae3076b021af27ae99a95a",
+    "sourceManifestHash": "b4bac4f6502728ea6e42c6b0be8c8cad81fdfab1b891e40fc192f6cd59ab7622"
   }
 ]

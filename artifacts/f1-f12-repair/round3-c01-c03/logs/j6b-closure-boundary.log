@@ -1,0 +1,16 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/open-boundary-lint.test.ts (16 tests) 1630ms
+     ✓ the committed export-manifest.json + baseline pass cleanly against real source  857ms
+     ✓ the CLI subprocess exits 0 against the real repo and reports the known-debt count  728ms
+ ✓ tests/cli-closure-census.test.ts (22 tests) 64990ms
+     ✓ matches the committed deterministic closure and baseline  16830ms
+     ✓ is idempotent: two independent full runs produce identical output  32103ms
+     ✓ writeCliRuntimeClosure/writeOpenBoundaryBaseline regenerate the exact committed files in place  16013ms
+
+ Test Files  2 passed (2)
+      Tests  38 passed (38)
+   Start at  19:17:35
+   Duration  65.25s (transform 166ms, setup 39ms, import 355ms, tests 66.62s, environment 0ms)
+

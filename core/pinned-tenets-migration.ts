@@ -22,6 +22,7 @@ import path from "path";
 import { createHash, randomUUID } from "node:crypto";
 import { createModuleLogger } from "../lib/debug-log.ts";
 import { atomicWriteSync } from "../shared/safe-fs.ts";
+import { backupDirForReceipt, parseReceiptBackupDir, receiptBackupDirLocalPath } from "./pinned-tenets-backup-dir.ts";
 import {
   planLegacyPinnedImport,
   legacyContentKey,
@@ -141,7 +142,8 @@ export function isMigrationReceipt(value: unknown, agentId: string): value is Mi
     if (expected.has(entry.tenetId) && expected.get(entry.tenetId) !== entry.contentHash) return false;
     expected.set(entry.tenetId, entry.contentHash);
   }
-  if (r.backupDir !== null && (typeof r.backupDir !== "string" || !/^memory\/pinned-migration-backup(?:\/[a-zA-Z0-9-]+)?$/.test(r.backupDir))) return false;
+  // backupDir 存储合同（C02）：规范 POSIX 形式；旧 Windows 反斜杠形式只读兼容。
+  if (r.backupDir !== null && parseReceiptBackupDir(r.backupDir) === null) return false;
   if (new Set(r.archived.map(x => x.from)).size !== r.archived.length) return false;
   return r.archived.every(x => x && r.sources.some(src => src.file === x.from) && sourceName(x.to)
     && x.to.startsWith(x.from + ".migrated")
@@ -345,8 +347,9 @@ export function writePinnedBackup(sourcePath: string, destination: string): void
 }
 
 function writeBackups(agentDir: string, receipt: MigrationReceipt, hooks?: MigrationFaultHooks): string {
-  const relative = path.join("memory", BACKUP_DIR, receipt.operationId!);
-  const directory = path.join(agentDir, relative);
+  // 收据持久化用平台无关表示（C02）：不把本机 path.join 的结果写进收据。
+  const relative = backupDirForReceipt(receipt.operationId!);
+  const directory = receiptBackupDirLocalPath(agentDir, relative);
   fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
   const files = receipt.sources.map(source => ({ source: path.join(agentDir, source.file), name: source.file }));
   if (receipt.target.existed) files.push({ source: tenetsFilePath(agentDir), name: "tenets.json" });
@@ -506,8 +509,9 @@ function upgradeLegacyReceipt(agentDir: string, receipt: MigrationReceipt): bool
   if (items.length !== receipt.plan.length || items.some((item, i) => `sha256:${sha256Text(legacyContentKey(item.content))}` !== receipt.plan[i].contentHash)) return conflict();
   receipt.operationId = randomUUID();
   // 升级前保留旧收据、当前目标和所有来源的原始字节，不追认旧 completed。
-  const relative = path.join("memory", BACKUP_DIR, receipt.operationId);
-  const directory = path.join(agentDir, relative);
+  // 收据持久化用平台无关表示（C02）。
+  const relative = backupDirForReceipt(receipt.operationId);
+  const directory = receiptBackupDirLocalPath(agentDir, relative);
   fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
   for (const [name, file] of [...paths.entries(), ["receipt.json", receiptPath(agentDir)] as const,
     ...(fs.existsSync(tenetsFilePath(agentDir)) ? [["tenets.json", tenetsFilePath(agentDir)] as const] : [])]) {
@@ -590,7 +594,7 @@ function assertReceiptSourcePlan(agentDir: string, receipt: MigrationReceipt): v
   if (!source) throw migrationError("MIGRATION_CONFLICT", "receipt source plan lacks authority");
   const candidates = [path.join(agentDir, source.file),
     ...receipt.archived.filter(item => item.from === source.file).map(item => path.join(agentDir, item.to)),
-    ...(receipt.backupDir ? [path.join(agentDir, receipt.backupDir, `${source.sha256}-${source.file}`)] : [])];
+    ...(receipt.backupDir ? [path.join(receiptBackupDirLocalPath(agentDir, receipt.backupDir), `${source.sha256}-${source.file}`)] : [])];
   const file = candidates.find(candidate => fs.existsSync(candidate) && fs.statSync(candidate).isFile() && sha256File(candidate) === source.sha256);
   if (!file) throw migrationError("MIGRATION_CONFLICT", "receipt source plan cannot be verified");
   // 备份名包含摘要，解析仍沿原源的固定格式，不按备份文件名猜协议。
@@ -608,6 +612,10 @@ function assertReceiptSourcePlan(agentDir: string, receipt: MigrationReceipt): v
 }
 
 function resumeMigration(agentDir: string, receipt: MigrationReceipt, hooks?: MigrationFaultHooks): void {
+  // 旧收据的 Windows 反斜杠 backupDir：读取时兼容校验，这里在内存中转成规范
+  // 形式——合法续写的收据持久化为统一 POSIX 路径，不为了换分隔符重跑迁移、
+  // 也不移动既有备份（本地访问走 receiptBackupDirLocalPath 的兼容解析）。
+  if (receipt.backupDir !== null) receipt.backupDir = parseReceiptBackupDir(receipt.backupDir);
   assertReceiptSourcePlan(agentDir, receipt);
 
 

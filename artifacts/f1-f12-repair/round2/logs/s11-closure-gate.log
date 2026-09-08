@@ -1,0 +1,31 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: fail-closed validation > throws when a declared root does not exist on disk 31ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: fail-closed validation > throws when a declared runtime asset does not exist on disk 0ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: fail-closed validation > does not throw when every declared runtime asset exists 0ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: fail-closed validation > maps source graph paths behind a shared node_modules symlink back into the worktree 2ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: fail-closed validation > keeps nft closure output stable whether a local native binding exists 1ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: fail-closed validation > keeps nft closure output stable across the host's platform-variant native package 0ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: fail-closed validation > does not fold a package that merely looks platform-suffixed but ships real code 0ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: fail-closed validation > flags a non-literal dynamic import() as a hit 3ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: fail-closed validation > flags a non-literal require() as a hit but ignores a .require() method call 1ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: fail-closed validation > flags a non-literal child_process spawn-family call 1ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: fail-closed validation > does not flag literal import()/require()/spawn calls, including JSDoc-only import() type references 2ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: fail-closed validation > scanAndValidateDynamicCallSites throws on a non-literal call with no allowlist entry 1ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: fail-closed validation > scanAndValidateDynamicCallSites succeeds when the call matches an allowlist entry exactly 1ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: fail-closed validation > scanAndValidateDynamicCallSites throws when an allowlist entry matches no real call site (stale entry) 1ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: open/closed classification > classifies confirmed closed-product routes 0ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: open/closed classification > classifies closed-content (built-in plugins/skills) 0ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: open/closed classification > classifies evidence-needed and provisional paths distinctly from closed-product/closed-content 0ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: open/closed classification > treats the resolved theme-registry and suggestion-blocks rulings as redistributable 0ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: open/closed classification > does not classify ordinary open source files 0ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: full generation (real esbuild + nft, slow) > matches the committed deterministic closure and baseline 17408ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: full generation (real esbuild + nft, slow) > is idempotent: two independent full runs produce identical output 34791ms
+ ✓ tests/cli-closure-census.test.ts > compute-cli-closure: full generation (real esbuild + nft, slow) > writeCliRuntimeClosure/writeOpenBoundaryBaseline regenerate the exact committed files in place 16928ms
+
+ Test Files  1 passed (1)
+      Tests  22 passed (22)
+   Start at  15:31:24
+   Duration  69.44s (transform 87ms, setup 19ms, import 182ms, tests 69.17s, environment 0ms)
+

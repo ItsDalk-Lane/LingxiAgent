@@ -661,7 +661,10 @@
     "deliveryChecking": "Result unknown, checking",
     "deliveryUnknown": "Result unknown, verification incomplete",
     "deliveryRunUnknown": "Message received, run result still unknown",
-    "recheckDelivery": "Check again"
+    "recheckDelivery": "Check again",
+    "sendNotAccepted": "Not sent: the server did not accept this message",
+    "sendRetry": "Retry send",
+    "sendDismiss": "Discard"
   },
   "agentReview": {
     "running": "Reviewing this Session",

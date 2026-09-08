@@ -1,0 +1,147 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ desktop/src/react/__tests__/utils/editor-serializer.test.ts > serializeEditor > extracts file badges as file refs without leaking their visual label into prompt text 55ms
+ ✓ desktop/src/react/__tests__/utils/editor-serializer.test.ts > serializeEditor > serializes TipTap ordered and unordered lists as markdown markers 0ms
+ ✓ desktop/src/react/__tests__/utils/editor-serializer.test.ts > serializeEditor > serializes Session and Agent badges as structured references 0ms
+ ✓ tests/paste-fidelity-serializer.test.ts > buildFaithfulPasteContent 粘贴保真 > P01: 围栏代码块 + 空行 + 缩进（首行四个空格开头）逐字符还原 54ms
+ ✓ tests/paste-fidelity-serializer.test.ts > buildFaithfulPasteContent 粘贴保真 > P02: tab 开头、首尾空行、尾部多个空格完整保留 0ms
+ ✓ tests/paste-fidelity-serializer.test.ts > buildFaithfulPasteContent 粘贴保真 > P03: Python／Shell 围栏、多空行、中文、emoji 的 N(text) 往返一致 0ms
+ ✓ tests/paste-fidelity-serializer.test.ts > buildFaithfulPasteContent 粘贴保真 > P04: CRLF 与 CR 输入只做既定 LF 归一，无其他变换 0ms
+ ✓ tests/paste-fidelity-serializer.test.ts > buildFaithfulPasteContent 粘贴保真 > P02b: 全角空格与行内连续空格逐字符保留 0ms
+ ✓ tests/paste-fidelity-serializer.test.ts > buildFaithfulPasteContent 粘贴保真 > P06: 空 paragraph 与连续 hardBreak 序列化为可见空行，不被过滤 0ms
+ ✓ tests/paste-fidelity-serializer.test.ts > buildFaithfulPasteContent 粘贴保真 > 首尾空行不再被发送侧 trim 收口（F10/P7.3 修正旧断言） 0ms
+ ✓ tests/paste-fidelity-serializer.test.ts > buildFaithfulPasteContent 粘贴保真 > 技能徽章序列化不受粘贴保真影响（徽章仍被提取而非当文本） 0ms
+ ✓ tests/paste-fidelity-serializer.test.ts > buildFaithfulPasteContent 粘贴保真 > 多段落文档：段落间换行数与空段一一对应（无 trim 兜底） 0ms
+ ✓ tests/input-drafts.test.ts > input drafts shared normalization > exposes surface whitelist and home key 55ms
+ ✓ tests/input-drafts.test.ts > input drafts shared normalization > normalizes surface and rejects unknown values 0ms
+ ✓ tests/input-drafts.test.ts > input drafts shared normalization > treats empty/blank text as deletion (null entry) 0ms
+ ✓ tests/input-drafts.test.ts > input drafts shared normalization > keeps text, plain-object doc and updatedAt 0ms
+ ✓ tests/input-drafts.test.ts > input drafts shared normalization > drops doc first when entry exceeds size cap, then truncates text 1ms
+ ✓ tests/input-drafts.test.ts > input drafts shared normalization > upserts session drafts with LRU eviction by updatedAt 3ms
+ ✓ tests/input-drafts.test.ts > input drafts shared normalization > deletes entry when upserting null 0ms
+ ✓ tests/input-drafts.test.ts > input drafts shared normalization > normalizes a whole file shape, dropping junk 0ms
+stderr | tests/input-drafts-store.test.ts > InputDraftsStore > quarantines a corrupt file and restarts from empty state
+[input-drafts] input drafts file corrupt, moved aside to input-drafts.v1.json.corrupt-1788849119667: Expected property name or '}' in JSON at position 2 (line 1 column 3)
+
+ ✓ tests/input-drafts-store.test.ts > InputDraftsStore > persists home and session drafts per surface and survives reload 42ms
+ ✓ tests/input-drafts-store.test.ts > InputDraftsStore > clears entries when text is empty 2ms
+ ✓ tests/input-drafts-store.test.ts > InputDraftsStore > deleteSession removes the session draft across all surfaces 2ms
+ ✓ tests/input-drafts-store.test.ts > InputDraftsStore > quarantines a corrupt file and restarts from empty state 2ms
+ ✓ tests/input-drafts-route.test.ts > input drafts route > PUT home scope then GET returns it, isolated per surface 54ms
+ ✓ tests/input-drafts-route.test.ts > input drafts route > PUT with sessionId stores a session draft; empty text deletes it 2ms
+ ✓ tests/input-drafts-route.test.ts > input drafts route > resolves sessionPath to sessionId at the boundary and rejects unresolvable paths 1ms
+ ✓ tests/input-drafts-route.test.ts > input drafts route > rejects unknown surface and missing scope 1ms
+ ✓ desktop/src/react/__tests__/stores/input-draft-persistence.test.ts > input draft persistence > hydrates server drafts into memory without overwriting existing keys 38ms
+ ✓ desktop/src/react/__tests__/stores/input-draft-persistence.test.ts > input draft persistence > debounces pushes and sends home scope / sessionId / sessionPath correctly 3ms
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-01：普通文档的两个用户尾空段逐个序列化 38ms
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-02：首中尾空段、tab、全角空格和连续尾空段全部保留 0ms
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-03：尾部 hardBreak 与尾部 paragraph 表达的换行都保留 0ms
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-04：真实 TipTap splitBlock 创建的用户尾空段进入实际 source 34ms
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-05：composer 明确关闭无来源标记的 StarterKit trailingNode 5ms
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-06：列表后由用户创建的空段仍按用户内容保留 5ms
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-07：无 synthetic 标记的旧草稿 hydration 与再次保存不猜删尾行 3ms
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-09：纯空白正文由 trim 副本判空，附件身份仍独立提取 0ms
+ ✓ desktop/src/react/__tests__/components/input-editor-extensions.test.ts > input editor extensions > does not register TipTap link marks for the chat input 70ms
+ ✓ desktop/src/react/__tests__/components/input-editor-extensions.test.ts > input editor extensions > allows placeholder decorations to read the latest supplied label 5ms
+ ✓ desktop/src/react/__tests__/components/input-editor-extensions.test.ts > input editor extensions > serializes file badges as readable text and attachment references 3ms
+ ✓ desktop/src/react/__tests__/components/input-editor-extensions.test.ts > input editor extensions > registers Session and Agent mention badges as inline atoms 3ms
+ ✓ desktop/src/react/__tests__/components/input-editor-extensions.test.ts > input editor extensions > keeps text after markdown bold outside the bold mark even if stored marks are cleared 6ms
+ ✓ desktop/src/react/__tests__/components/input-editor-extensions.test.ts > input editor extensions > does not carry markdown bold onto the next paragraph 4ms
+ ✓ desktop/src/react/__tests__/components/input-editor-extensions.test.ts > input editor extensions > keeps markdown list input as rich list structure and serializes it as markdown text 8ms
+ ✓ desktop/src/react/__tests__/utils/paste-fidelity-editor.test.ts > F10/P7.3 真实编辑器粘贴插入（P05） > 段落中间粘贴：只插入目标字符，不把当前段落拆成多段 56ms
+ ✓ desktop/src/react/__tests__/utils/paste-fidelity-editor.test.ts > F10/P7.3 真实编辑器粘贴插入（P05） > 选区替换：替换选中的字符，首尾不多生换行 5ms
+ ✓ desktop/src/react/__tests__/utils/paste-fidelity-editor.test.ts > F10/P7.3 真实编辑器粘贴插入（P05） > 空编辑器：粘贴多行内容原样落地（首尾空行保留） 4ms
+ ✓ desktop/src/react/__tests__/utils/paste-fidelity-editor.test.ts > F10/P7.3 真实编辑器粘贴插入（P05） > 列表环境：粘贴进列表项不拆出列表，续行留在同一项 4ms
+ ✓ desktop/src/react/__tests__/utils/paste-fidelity-editor.test.ts > F10/P7.3 真实编辑器粘贴插入（P05） > 多行粘贴含空行：空行是连续 hardBreak，序列化往返零丢失 4ms
+ ✓ desktop/src/react/__tests__/utils/paste-fidelity-editor.test.ts > F10/P7.3 富 URL 分支与纯文本保真分支（P09） > 复制超链接（text/html 带 href）→ 走富 URL 分支取 href 2ms
+ ✓ desktop/src/react/__tests__/utils/paste-fidelity-editor.test.ts > F10/P7.3 富 URL 分支与纯文本保真分支（P09） > 普通多行含 URL 文本（无 text/html）→ 不进富 URL 分支，整段按纯文本保真 3ms
+ ✓ desktop/src/react/__tests__/utils/paste-fidelity-editor.test.ts > F10/P7.3 转写式插入不解释 HTML（P11） > 含 <...> 的文本按纯文本节点插入，不产生对应节点/标记 3ms
+ ✓ desktop/src/react/__tests__/utils/paste-fidelity-editor.test.ts > F10/P7.4 wire → 落盘/历史/复制边界（P12） > 用户正文在历史投影中原样保留，系统追加内容独立成块 5ms
+ ✓ desktop/src/react/__tests__/utils/paste-fidelity-editor.test.ts > F10/P7.4 wire → 落盘/历史/复制边界（P12） > 无系统追加块的纯正文：首尾空格、tab 与空行在历史投影逐字符保留 1ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+[input] failed to read video attachment Error: disk gone
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:433:49)
+    at Object.Mock [as readFileBase64] (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at prepareComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:351:40)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:706:12)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:810:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:439:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+[input] failed to read audio attachment Error: disk gone
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:433:49)
+    at Object.Mock [as readFileBase64] (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at prepareComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:323:40)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:706:12)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:810:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:460:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S01：普通发送视频预检失败，编辑器、草稿、附件与引用全部保留 47ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send 5ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S03：视频数超限与格式错误都是明确 blocked，不冒充成功 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S04：ws 不存在 / CONNECTING / CLOSING / CLOSED，明确结果、不清输入、不发消息 24ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S05：读文件期间会话删除/定位器变化/模型变更，重新验证后旧目标不误发 8ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:609:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:522:8)
+    at Module.sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:731:24)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:610:20
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试
+[input] websocket send failed Error: socket exploded
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:651:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:522:8)
+    at Module.sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:731:24)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:654:20
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:740:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:522:8)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:731:24)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:810:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:743:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:901:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:522:8)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:731:24)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:810:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:904:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S06：准备期间用户继续输入，原快照独立、新草稿不被清除或覆盖 61ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段 2ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S08：图片按既有规则退化为文件引用，提示保留、文件身份不丢 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S10：提交后断线无回执与回执超时，都标 delivery_unknown 且不自动重发 2ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S11：重连后经恢复/历史找到原 clientMessageId，合并不重复追加 2ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致 2ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S13：带首行空格与末尾换行的输入，快照逐字符保留 8ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S14：首页 ensureSession 期间重复点击，只创建/提交一次 8ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S15：入队后改变界面选中的笔记本，已排队消息仍使用入队快照范围 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P07：全空白正文（无其他内容维度）不发，且不做破坏性清空 4ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P08：全空白正文但有附件 → 按已有内容维度发送，wire 保真、附件身份保留 6ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文 2ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03 InputArea 编辑点击接线 > R03-03：点击编辑同步取消慢附件，保存后仅提交新正文 408ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03 InputArea 编辑点击接线 > R03-05：点击取消保留原 blocked 状态与正文 27ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03-09：真实 InputArea StrictMode 卸载撤销 timer，重挂只发一次 18ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03-12：InputArea A 慢附件时切 B 可发送，A 完成不再清 B 编辑器 61ms
+
+ Test Files  10 passed (10)
+      Tests  77 passed (77)
+   Start at  14:31:59
+   Duration  1.62s (transform 1.25s, setup 161ms, import 1.68s, tests 1.30s, environment 1.29s)
+

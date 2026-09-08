@@ -1,0 +1,14 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/post-verification-audit-seal.test.ts (3 tests) 52ms
+ ✓ tests/round3-delivery-evidence.test.ts (5 tests) 235ms
+ ✓ tests/round2-delivery-evidence.test.ts (10 tests) 2724ms
+     ✓ R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁  663ms
+     ✓ R10-09: 增量补丁从干净 89bc0b64 重放后，源码摘要与当前工作树完全一致  1774ms
+
+ Test Files  3 passed (3)
+      Tests  18 passed (18)
+   Start at  19:38:57
+   Duration  2.83s (transform 77ms, setup 59ms, import 41ms, tests 3.01s, environment 0ms)
+

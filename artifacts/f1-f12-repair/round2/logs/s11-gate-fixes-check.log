@@ -1,0 +1,74 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/open-boundary-lint.test.ts > lint-open-boundary: manifest loading > rejects a negation-pattern entry 41ms
+ ✓ tests/open-boundary-lint.test.ts > lint-open-boundary: manifest loading > throws when a manifest file entry does not exist on disk 1ms
+ ✓ tests/open-boundary-lint.test.ts > lint-open-boundary: manifest loading > throws when a manifest directory entry does not exist on disk 1ms
+ ✓ tests/open-boundary-lint.test.ts > lint-open-boundary: import specifier collection > collects literal static and dynamic import/require specifiers with line numbers 4ms
+ ✓ tests/open-boundary-lint.test.ts > lint-open-boundary: import specifier collection > ignores bare specifiers and non-literal dynamic calls (out of this lint's scope) 1ms
+ ✓ tests/open-boundary-lint.test.ts > lint-open-boundary: relative specifier resolution > returns null for a bare (non-relative) specifier 0ms
+ ✓ tests/open-boundary-lint.test.ts > lint-open-boundary: relative specifier resolution > resolves a relative specifier with an explicit extension 0ms
+ ✓ tests/open-boundary-lint.test.ts > lint-open-boundary: relative specifier resolution > throws when a relative specifier cannot be resolved to any file 0ms
+ ✓ tests/open-boundary-lint.test.ts > lint-open-boundary: violation detection > reports an edge when a whitelisted file imports a non-whitelisted repo path 1ms
+ ✓ tests/open-boundary-lint.test.ts > lint-open-boundary: violation detection > reports nothing when every import target is whitelisted 1ms
+ ✓ tests/open-boundary-lint.test.ts > lint-open-boundary: violation detection > does not scan non-JS/TS whitelisted files (e.g. markdown, JSON, HTML) for imports 1ms
+ ✓ tests/open-boundary-lint.test.ts > lint-open-boundary: ratchet check > a violation already present in the baseline is ok (known debt) 0ms
+ ✓ tests/open-boundary-lint.test.ts > lint-open-boundary: ratchet check > a violation NOT in the baseline fails closed and reports the exact from/to edge 0ms
+ ✓ tests/open-boundary-lint.test.ts > lint-open-boundary: ratchet check > readBaseline throws a clear error when the baseline file is missing 1ms
+ ✓ tests/open-boundary-lint.test.ts > lint-open-boundary: real repo state (smoke) > the committed export-manifest.json + baseline pass cleanly against real source 963ms
+ ✓ tests/open-boundary-lint.test.ts > lint-open-boundary: real repo state (smoke) > the CLI subprocess exits 0 against the real repo and reports the known-debt count 742ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/components/subagent-preview-interaction.test.tsx [ desktop/src/react/__tests__/components/subagent-preview-interaction.test.tsx ]
+Error: [vitest] No "configureBackgroundProcessWebSocketGetter" export is defined on the "../../services/background-process-control" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+
+vi.mock(import("../../services/background-process-control"), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    // your mocked methods
+  }
+})
+
+ ❯ desktop/src/react/services/websocket.ts:57:1
+     55| injectWebSocketGetter(() => _ws);
+     56| configureTerminalClientWebSocketGetter(() => _ws);
+     57| configureBackgroundProcessWebSocketGetter(() => _ws);
+       | ^
+     58|
+     59| export function resolveStreamingSessionResumeTargets(state: {
+ ❯ desktop/src/react/components/input/composer-send.ts:17:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  desktop/src/react/__tests__/components/subagent-preview-session-binding.test.tsx [ desktop/src/react/__tests__/components/subagent-preview-session-binding.test.tsx ]
+Error: [vitest] No "injectHandlers" export is defined on the "../../services/stream-resume" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+
+vi.mock(import("../../services/stream-resume"), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    // your mocked methods
+  }
+})
+
+ ❯ desktop/src/react/services/websocket.ts:54:1
+     52|
+     53| // 注入循环依赖的 handlers
+     54| injectHandlers(handleServerMessage, applyStreamingStatus);
+       | ^
+     55| injectWebSocketGetter(() => _ws);
+     56| configureTerminalClientWebSocketGetter(() => _ws);
+ ❯ desktop/src/react/components/input/composer-send.ts:17:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  16 passed (16)
+   Start at  15:30:13
+   Duration  2.03s (transform 1.18s, setup 40ms, import 179ms, tests 1.76s, environment 596ms)
+

@@ -1,0 +1,93 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ × tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-15 相同正文不同 client ID 经真实 append 和历史路由仍分别关联 51ms
+   → expected [ [ undefined, undefined ], …(1) ] to deeply equal [ [ 'input-a', 2 ], [ 'input-b', 3 ] ]
+ × tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-08 分支读取失败保持不完整，不能 fallback 全 JSONL 认证 7ms
+   → expected undefined to match object { complete: false, …(1) }
+ × tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04 缺失权威运行读取能力不能宣称 idle 6ms
+   → expected undefined to match object { Object (complete, runStatus) }
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-15 相同正文不同 client ID 经真实 append 和历史路由仍分别关联
+AssertionError: expected [ [ undefined, undefined ], …(1) ] to deeply equal [ [ 'input-a', 2 ], [ 'input-b', 3 ] ]
+
+- Expected
++ Received
+
+  [
+    [
+-     "input-a",
+-     2,
++     undefined,
++     undefined,
+    ],
+    [
+-     "input-b",
+-     3,
++     undefined,
++     undefined,
+    ],
+  ]
+
+ ❯ tests/round2-desktop-input-history.test.ts:68:93
+     66|     const response = await f.history();
+     67|     const users = response.messages.filter((message: any) => message.r…
+     68|     expect(users.map((message: any) => [message.clientMessageId, messa…
+       |                                                                                             ^
+     69|     const entries = f.manager.getBranch().filter(entry => entry.type =…
+     70|     expect(users.map((message: any) => message.sourceEntryId)).toEqual…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-08 分支读取失败保持不完整，不能 fallback 全 JSONL 认证
+AssertionError: expected undefined to match object { complete: false, …(1) }
+
+- Expected:
+{
+  "complete": false,
+  "runStatus": "unknown",
+}
+
++ Received:
+undefined
+
+ ❯ tests/round2-desktop-input-history.test.ts:82:37
+     80|     const before = fs.readFileSync(f.sessionPath);
+     81|     const response = await f.history();
+     82|     expect(response.reconciliation).toMatchObject({ complete: false, r…
+       |                                     ^
+     83|     expect(response.messages.some((message: any) => message.clientMess…
+     84|     expect(fs.readFileSync(f.sessionPath)).toEqual(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04 缺失权威运行读取能力不能宣称 idle
+AssertionError: expected undefined to match object { Object (complete, runStatus) }
+
+- Expected:
+{
+  "complete": true,
+  "runStatus": "unknown",
+}
+
++ Received:
+undefined
+
+ ❯ tests/round2-desktop-input-history.test.ts:90:37
+     88|     const f = await fixture(); await f.submit('input-a'); delete f.eng…
+     89|     const response = await f.history();
+     90|     expect(response.reconciliation).toMatchObject({ complete: true, ru…
+       |                                     ^
+     91|   });
+     92| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  13:52:03
+   Duration  1.35s (transform 513ms, setup 20ms, import 1.20s, tests 66ms, environment 0ms)
+

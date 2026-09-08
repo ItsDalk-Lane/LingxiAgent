@@ -662,7 +662,10 @@
     "deliveryChecking": "결과 확인 중",
     "deliveryUnknown": "결과 확인 미완료",
     "deliveryRunUnknown": "메시지는 수신되었으나 실행 결과는 확인되지 않음",
-    "recheckDelivery": "다시 확인"
+    "recheckDelivery": "다시 확인",
+    "sendNotAccepted": "전송되지 않음: 서버가 이 메시지를 수락하지 않았습니다",
+    "sendRetry": "다시 보내기",
+    "sendDismiss": "버리기"
   },
   "agentReview": {
     "running": "이 Session을 검토하는 중",

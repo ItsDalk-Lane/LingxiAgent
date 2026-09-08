@@ -1,0 +1,38 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-01: 旧 F7/D 系列明确 superseded，当前无语音输入组件要求与保留能力写清 26ms
+ ✓ tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-02: COMMAND_RESULTS 的日志与源码 manifest 均存在且 SHA-256 可复算 92ms
+ ✓ tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁 148ms
+Preparing worktree (detached HEAD 89bc0b64)
+<WORKTREE>/artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch:5562: new blank line at EOF.
++
+warning: 1 line adds whitespace errors.
+ ✓ tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示 23ms
+ ✓ tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-05: R01-R09 每项均绑定存在的真实测试文件、runner 标题、日志与源码摘要 13ms
+ ✓ tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-06: 真机权限、真实供应商和其他平台只标 BLOCKED，不伪装成本地通过 0ms
+ ✓ tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-07/08: 失败与成功记录并存且 exit 未改写，历史缺失日志明确 unavailable 0ms
+ × tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-09: 增量补丁从干净 89bc0b64 重放后，源码摘要与当前工作树完全一致 2180ms
+   → Unexpected token 'H', "HEAD is no"... is not valid JSON
+ ✓ tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-10: 本轮日志不泄漏真实用户路径，旧听写流程只以历史/superseded 身份出现 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-09: 增量补丁从干净 89bc0b64 重放后，源码摘要与当前工作树完全一致
+SyntaxError: Unexpected token 'H', "HEAD is no"... is not valid JSON
+ ❯ tests/round2-delivery-evidence.test.ts:135:25
+    133|       path.join(OUT, "create-delivery-patch.py"),
+    134|     ], { cwd: ROOT, encoding: "utf8" });
+    135|     const result = JSON.parse(output.trim());
+       |                         ^
+    136|     expect(result).toMatchObject({
+    137|       base: BASE,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 passed (9)
+   Start at  15:11:13
+   Duration  2.57s (transform 23ms, setup 18ms, import 9ms, tests 2.49s, environment 0ms)
+

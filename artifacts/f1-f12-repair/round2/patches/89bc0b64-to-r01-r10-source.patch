@@ -1,5 +1,32 @@
+diff --git a/.gitignore b/.gitignore
+index af3647c779dad1edd9042249023ada0cb0c81372..e742177ba5684eb2fbcf41e0997aa452aec265b1 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -91,6 +91,12 @@ auth.json
+ # 日志
+ *.log
+ logs/
++# F1-F12 修复轮交付证据例外（C03）：round2/round3 审计日志是测试依赖的交付物，
++# 随仓库分发；先重包含目录再重包含文件，其余运行日志继续按上面规则忽略。
++!artifacts/f1-f12-repair/round2/logs/
++!artifacts/f1-f12-repair/round2/logs/**
++!artifacts/f1-f12-repair/round3-c01-c03/logs/
++!artifacts/f1-f12-repair/round3-c01-c03/logs/**
+ 
+ # 系统文件
+ .DS_Store
+@@ -100,6 +106,9 @@ logs/
+ reviews/
+ .superpowers/
+ 
++# 本地工具工作台状态（会话记忆类，不入库也不入证据 manifest）
++.workbuddy/
++
+ # Codex environments
+ .codex/
+ 
 diff --git a/.sync-audit/build-sync-matrix.mjs b/.sync-audit/build-sync-matrix.mjs
-index d978251370637d720d11094c068847b151ae235e..c5bf90db47ea43b479715f0cf2012104dab67ef5 100644
+index d978251370637d720d11094c068847b151ae235e..2d33578f629f5821a3b3d88ec81696288b172fe0 100644
 --- a/.sync-audit/build-sync-matrix.mjs
 +++ b/.sync-audit/build-sync-matrix.mjs
 @@ -40,7 +40,7 @@ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source
@@ -7,12 +34,12 @@ index d978251370637d720d11094c068847b151ae235e..c5bf90db47ea43b479715f0cf2012104
  // 该 commit 早于记录它的审计提交落地，无自引用（SHA = hash(contents)）问题。
  // 当前 branch HEAD 可能在其后存在纯审计 seal 提交，HEAD 由 Git ref 自身标识。
 -const VERIFIED_SOURCE_SHA = "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202";
-+const VERIFIED_SOURCE_SHA = "2173edac94eccbb5f25c2a80515fbd7559d1954b";
++const VERIFIED_SOURCE_SHA = "7cf986236cb8ac5c2d22cce1e5882554a42cff28";
  
  const ALLOWED_DISPOSITIONS = ["ADOPTED", "ADAPTED", "REGENERATED", "INTENTIONAL_DIVERGENCE"];
  
 diff --git a/.sync-audit/upstream-sync-matrix.json b/.sync-audit/upstream-sync-matrix.json
-index d6f8692829bc71ee97c3253e5482beabfdb51324..74f13d123ecf509ba0d70d8420e6c3f773769680 100644
+index d6f8692829bc71ee97c3253e5482beabfdb51324..bb956cc615ed9c2d5e5a5e97ac117d410e6a0aad 100644
 --- a/.sync-audit/upstream-sync-matrix.json
 +++ b/.sync-audit/upstream-sync-matrix.json
 @@ -4,7 +4,7 @@
@@ -20,19 +47,19 @@ index d6f8692829bc71ee97c3253e5482beabfdb51324..74f13d123ecf509ba0d70d8420e6c3f7
      "L0": "97595264ead8735a04559507ddaade25db8a4e15",
      "L1": "ca0b417e36a6a1f80947458aaed328a25718e41b",
 -    "VERIFIED_SOURCE_SHA": "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202"
-+    "VERIFIED_SOURCE_SHA": "2173edac94eccbb5f25c2a80515fbd7559d1954b"
++    "VERIFIED_SOURCE_SHA": "7cf986236cb8ac5c2d22cce1e5882554a42cff28"
    },
    "summary": {
      "total": 133,
 diff --git a/.sync-audit/verified-source-sha.txt b/.sync-audit/verified-source-sha.txt
-index 78c76634c4edc5a8962212273a593e3ddf8bd28d..46bb6d310404f664e437416f1db0f03b663673d7 100644
+index 78c76634c4edc5a8962212273a593e3ddf8bd28d..b4c4d081e85f36f7ec4fd42fd88fa746dcc83679 100644
 --- a/.sync-audit/verified-source-sha.txt
 +++ b/.sync-audit/verified-source-sha.txt
 @@ -1 +1 @@
 -04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+2173edac94eccbb5f25c2a80515fbd7559d1954b
++7cf986236cb8ac5c2d22cce1e5882554a42cff28
 diff --git a/PROGRESS.md b/PROGRESS.md
-index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..3efde61c441148404ab240d645634660dd97e47b 100644
+index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..326686492099f6cbc538884efcb19ae3c1f322a0 100644
 --- a/PROGRESS.md
 +++ b/PROGRESS.md
 @@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
@@ -40,23 +67,26 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..3efde61c441148404ab240d645634660
  LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
  LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
 -VERIFIED_SOURCE_SHA   = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202  (2026-09-07 拆除与语音改造+三 bug 修复封印：分支 refactor/dismantle-and-voice-features)
-+VERIFIED_SOURCE_SHA   = 2173edac94eccbb5f25c2a80515fbd7559d1954b  (2026-09-08 R01–R10 修复源码候选：分支 refactor/dismantle-and-voice-features)
++VERIFIED_SOURCE_SHA   = 7cf986236cb8ac5c2d22cce1e5882554a42cff28  (2026-09-08 R01–R10 修复源码候选：分支 refactor/dismantle-and-voice-features)
  历史上游同步工作分支  = feature/upstream-sync-0.447.4
  历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
  ```
-@@ -1503,3 +1503,10 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
+@@ -1503,3 +1503,13 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
  - 派生清单（cli-runtime-closure / open-boundary baseline / shell-surface-manifest / persistence 指纹与 inventory / startup receipt）已在受测工作树重生成并随源码提交；staged diff 密钥模式扫描无命中。
  - 本次封印只同步既有六份审计文件（verified-source-sha.txt / build-sync-matrix.mjs / upstream-sync-matrix.json / UPSTREAM_SYNC_AUDIT.md / UPSTREAM_SYNC_MATRIX.md / 本文件坐标行），矩阵重生成 133 paths 硬校验通过（ADOPTED 25 / ADAPTED 100 / REGENERATED 4 / INTENTIONAL_DIVERGENCE 4）；不合并 main。
  - 未执行/受限：全仓 lint 与 build/package 门禁本轮未跑；系统语音识别端到端未实测（开发终端无语音识别 TCC 授权，helper 正确 fail-closed，打包后首次使用需用户授权）；TTS 云端路径需配置 API key 后实测；三 bug 修复的 dev 环境用户验收仍在进行；正式发布与四平台门禁未启动。
 +
 +## 2026-09-08 R01–R10 增量修复源码候选与审计封印
 +
-+- 固定源码候选：`2173edac94eccbb5f25c2a80515fbd7559d1954b`；基线 `89bc0b64bf0a9b84ef3532efaa66c23213affb70`；分支 `refactor/dismantle-and-voice-features`。候选源码 manifest SHA-256 为 `f0a527e5637c9c3e286ae30106ad6e23beb0e46c8e284a4ec810ca8a756fcac7`，提交后复算与 S11 受测工作树一致。
++- 固定源码候选：`7cf986236cb8ac5c2d22cce1e5882554a42cff28`；基线 `89bc0b64bf0a9b84ef3532efaa66c23213affb70`；分支 `refactor/dismantle-and-voice-features`。候选源码 manifest SHA-256 为 `c418b3ef2fc475e40ed779f21b8e087b120834e9b673baf2e67c3758138d30d8`，提交后复算与 S11 受测工作树一致。
 +- R01–R10 联合冻结 25 文件 / 321 测试通过；typecheck exit 0；lint exit 0（9203 warnings）；客户端、合成签名服务端、speech helper 与 permissions 构建通过。原样全量在封印前为 13383 passed / 1 failed / 7 skipped，唯一失败是旧审计坐标正确拒绝新源码；排除该 seal 的补充全量为 13381 passed / 7 skipped、exit 0。逐命令原始日志和哈希见 `artifacts/f1-f12-repair/round2/`。
 +- 用户在完成本地交付后明确授权提交并推送。本次按既有六文件流程推进审计坐标，不扩大 allowlist；封印提交后的独立 guard、矩阵和全量复验结果在后续同节记录。
 +- 真实 macOS TCC/转写、真实供应商、Windows/Linux/其他架构及 Apple notarization 仍未执行或受凭证阻塞；本地证据不替代这些验证。聊天工具栏未增加语音输入组件，保留后端 ASR/TTS 与原生音频能力。
++- 提交后首轮全量在 `2c178715` 暴露交付证据仍只核对工作树，13383 passed / 1 failed / 7 skipped；改为在 audit-only seal 存在时读取真实 `VERIFIED_SOURCE_SHA` Git 对象并执行 seal guard。随后逐文件 `git show` 在全量并发下先出现 `ENOBUFS`，再因 3454 次进程启动超过 60 秒；没有提高测试超时，改用一次 `git cat-file --batch`，保留全部逐文件字节数与 SHA-256 断言。上述失败日志为 `/tmp/lingxi-r01-r10-postseal-full.log`、`/tmp/lingxi-r01-r10-final-postseal-full.log`。
++- 最终源码候选 `7cf986236cb8ac5c2d22cce1e5882554a42cff28`，审计封印提交 `62c73f77`；候选 source manifest SHA-256 `c418b3ef2fc475e40ed779f21b8e087b120834e9b673baf2e67c3758138d30d8`。封印后独立 diff guard 与 133 路径矩阵通过，upstream-sync、seal、round2 delivery 三文件 20/20 通过。
++- 封印后原样 `npm test` exit 0：1334 文件通过 / 1 既有跳过，13384 测试通过 / 7 既有跳过，0 fail，82.80s；日志 `/tmp/lingxi-r01-r10-final-postseal-full-v2.log`。最终审计记录只改本 allowlist 内的 `PROGRESS.md`，不改变受测源码候选。
 diff --git a/UPSTREAM_SYNC_AUDIT.md b/UPSTREAM_SYNC_AUDIT.md
-index adcfa57d8a9836fe12c378f95f7448688d077896..cfae9b977f2e8e6f61fba0a9ef7f94f4e7a26fd8 100644
+index adcfa57d8a9836fe12c378f95f7448688d077896..13cee18758b503f843f031a90813616a2d72e613 100644
 --- a/UPSTREAM_SYNC_AUDIT.md
 +++ b/UPSTREAM_SYNC_AUDIT.md
 @@ -15,7 +15,7 @@
@@ -64,12 +94,12 @@ index adcfa57d8a9836fe12c378f95f7448688d077896..cfae9b977f2e8e6f61fba0a9ef7f94f4
  | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
  | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
 -| VERIFIED_SOURCE_SHA | `04f90d2b26449d2f3264a5ea2a1a8bd6fb253202` | 2026-09-07 拆除与语音改造+三 bug 修复封印（分支 refactor/dismantle-and-voice-features）；typecheck×3 全绿+全量 13081 用例（唯一失败为无关模块 macOS 临时目录清理竞态 flaky、单跑 10/10 通过）后绑定，验证明细见 PROGRESS.md 最新条目 |
-+| VERIFIED_SOURCE_SHA | `2173edac94eccbb5f25c2a80515fbd7559d1954b` | 2026-09-08 R01–R10 增量修复源码候选（分支 refactor/dismantle-and-voice-features）；源码 manifest 与 S11 受测树一致，联合冻结、类型、lint、构建与补充全量验证证据见 PROGRESS.md 最新条目 |
++| VERIFIED_SOURCE_SHA | `7cf986236cb8ac5c2d22cce1e5882554a42cff28` | 2026-09-08 R01–R10 增量修复源码候选（分支 refactor/dismantle-and-voice-features）；源码 manifest 与 S11 受测树一致，联合冻结、类型、lint、构建与补充全量验证证据见 PROGRESS.md 最新条目 |
  
  v0.1.35 仓库内的[功能 CI 记录](artifacts/release-v0.1.35/feature-ci-validation.json)
  对应 `2c835ac77afb1a73cd83816ad3d613297dc770a8`，不单独证明上述发布资料提交重新执行了
 diff --git a/UPSTREAM_SYNC_MATRIX.md b/UPSTREAM_SYNC_MATRIX.md
-index 2f98daf42096994372f834d639551859919c294e..32f91a2256683bcc1e96835cc63cdc62412d6085 100644
+index 2f98daf42096994372f834d639551859919c294e..13a3d55a25fe5e8754436ee6b71556240a890431 100644
 --- a/UPSTREAM_SYNC_MATRIX.md
 +++ b/UPSTREAM_SYNC_MATRIX.md
 @@ -10,7 +10,7 @@ U0 = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
@@ -77,7 +107,7 @@ index 2f98daf42096994372f834d639551859919c294e..32f91a2256683bcc1e96835cc63cdc62
  L0 = 97595264ead8735a04559507ddaade25db8a4e15  (Lingxi v0.444.1 同步完成点, PR #2)
  L1 = ca0b417e36a6a1f80947458aaed328a25718e41b  (本轮同步开始时 main)
 -VERIFIED_SOURCE_SHA = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+VERIFIED_SOURCE_SHA = 2173edac94eccbb5f25c2a80515fbd7559d1954b
++VERIFIED_SOURCE_SHA = 7cf986236cb8ac5c2d22cce1e5882554a42cff28
  ```
  
  ## 统计（脚本计算，禁止人工填写）
@@ -251,8 +281,258 @@ index 0000000000000000000000000000000000000000..4f733b09a73ee30e55811637a9e50674
 +record={'command':cmd,'cwd':'<WORKTREE>','platform':platform.system(),'arch':platform.machine(),'node':subprocess.check_output(['node','--version']).decode().strip(),'npm':subprocess.check_output(['npm','--version']).decode().strip(),'start':start,'end':datetime.datetime.now(datetime.timezone.utc).isoformat(),'exitCode':p.returncode,'counts':counts,'sourceChangedDuringCommand':digest(after)!=h,'endSourceManifestHash':digest(after),'log':f'logs/{f.name}','logSha256':digest(log),'sourceManifestHash':h}
 +results=out/'COMMAND_RESULTS.json'; data=json.loads(results.read_text()) if results.exists() else []; data.append(record); results.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
 +print(log.decode(errors='replace')[-9000:]); print('EVIDENCE',label,'EXIT',p.returncode,'MANIFEST',h); sys.exit(p.returncode)
+diff --git a/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py b/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..8373a3adee6e51c950d3979a223c937947a0fed1
+--- /dev/null
++++ b/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py
+@@ -0,0 +1,153 @@
++#!/usr/bin/env python3
++"""round3（C01-C03）增量补丁生成与重放验证 — 沿用 round2/create-delivery-patch.py 的
++temp-index 技法：从干净基线 67dee5d2 read-tree，git add -A 捕获全部非忽略变更
++（源码 + 交付证据），diff 出单一补丁；随后用独立的第二个 temp index 重放补丁，
++按源码 manifest 的同一排除规则重算摘要，证明重放树与当前树源码逐字节一致。
++输出 JSON 摘要（exit 0 = VERIFIED）。
++"""
++import hashlib
++import json
++import os
++import pathlib
++import subprocess
++import tempfile
++
++BASE = "67dee5d2de9d3b9fc75ec5ef5c555e93c65b3ccd"
++ROOT = pathlib.Path(__file__).resolve().parents[3]
++OUT = ROOT / "artifacts/f1-f12-repair/round3-c01-c03"
++PATCH = OUT / "patches/67dee5d2-to-round3-c01-c03.patch"
++
++
++def sha256(data: bytes) -> str:
++    return hashlib.sha256(data).hexdigest()
++
++
++EXCLUSIONS = [
++    "artifacts/f1-f12-repair/** except *.py (generated evidence, reports, delivery files and synthetic test home)",
++    "*.patch (delivery patches)",
++    "git ignored generated files; git ls-files --cached --others --exclude-standard",
++]
++
++
++def keep(relative: str) -> bool:
++    if relative.startswith("artifacts/f1-f12-repair/") and not relative.endswith(".py"):
++        return False
++    return not relative.endswith(".patch")
++
++
++def source_manifest(root: pathlib.Path) -> dict:
++    raw = subprocess.check_output(
++        ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"], cwd=root
++    )
++    rows = []
++    for relative in sorted(set(raw.decode().split("\0"))):
++        if not relative or not keep(relative):
++            continue
++        file_path = root / relative
++        if file_path.is_file():
++            content = file_path.read_bytes()
++            rows.append({"path": relative, "bytes": len(content), "sha256": sha256(content)})
++    return {"sourceIdentity": {"kind": "worktree", "base": BASE}, "exclusions": EXCLUSIONS, "files": rows}
++
++
++def manifest_bytes(root: pathlib.Path) -> bytes:
++    return (json.dumps(source_manifest(root), ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
++
++
++def temp_index(prefix: str) -> str:
++    fd, name = tempfile.mkstemp(prefix=prefix)
++    os.close(fd)
++    os.unlink(name)
++    return name
++
++
++def replay_manifest(patch: bytes) -> bytes:
++    """BASE + 补丁 → 独立 temp index → 按排除规则重算源码 manifest 字节。"""
++    index = temp_index("lingxi-round3-replay-")
++    env = os.environ.copy()
++    env["GIT_INDEX_FILE"] = index
++    try:
++        subprocess.run(["git", "read-tree", BASE], cwd=ROOT, env=env, check=True)
++        apply = subprocess.run(
++            ["git", "apply", "--cached", "--whitespace=nowarn", "-"],
++            cwd=ROOT, env=env, input=patch,
++            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
++        )
++        if apply.returncode != 0:
++            raise SystemExit(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
++        listing = subprocess.check_output(["git", "ls-files", "-s", "-z"], cwd=ROOT, env=env)
++        entries = []
++        for record in listing.decode().split("\0"):
++            if not record:
++                continue
++            meta, relative = record.split("\t", 1)
++            _mode, blob_sha, _stage = meta.split(" ")
++            if keep(relative):
++                entries.append((relative, blob_sha))
++        entries.sort()
++        batch_input = "\n".join(sha for _rel, sha in entries) + "\n"
++        batch = subprocess.run(
++            ["git", "cat-file", "--batch"], cwd=ROOT, env=env,
++            input=batch_input.encode(), stdout=subprocess.PIPE,
++        )
++        if batch.returncode != 0:
++            raise SystemExit("replay cat-file failed")
++        rows = []
++        offset = 0
++        stdout = batch.stdout
++        for relative, blob_sha in entries:
++            header_end = stdout.index(0x0A, offset)
++            header = stdout[offset:header_end].decode()
++            if not header.startswith(f"{blob_sha} blob "):
++                raise SystemExit(f"cat-file record mismatch for {relative}: {header}")
++            size = int(header.split(" ")[2])
++            start = header_end + 1
++            end = start + size
++            blob = stdout[start:end]
++            rows.append({"path": relative, "bytes": len(blob), "sha256": sha256(blob)})
++            offset = end + 1
++        manifest = {"sourceIdentity": {"kind": "worktree", "base": BASE}, "exclusions": EXCLUSIONS, "files": rows}
++        return (json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
++    finally:
++        if os.path.exists(index):
++            os.unlink(index)
++
++
++def main() -> None:
++    PATCH.parent.mkdir(parents=True, exist_ok=True)
++    source_before = manifest_bytes(ROOT)
++
++    index = temp_index("lingxi-round3-index-")
++    env = os.environ.copy()
++    env["GIT_INDEX_FILE"] = index
++    try:
++        subprocess.run(["git", "read-tree", BASE], cwd=ROOT, env=env, check=True)
++        subprocess.run(["git", "add", "-A", "--", "."], cwd=ROOT, env=env, check=True)
++        patch = subprocess.check_output(
++            ["git", "diff", "--binary", "--cached", BASE], cwd=ROOT, env=env
++        )
++    finally:
++        if os.path.exists(index):
++            os.unlink(index)
++    if not patch:
++        raise SystemExit("round3 patch is empty")
++    PATCH.write_bytes(patch)
++
++    replayed = replay_manifest(patch)
++    identical = replayed == source_before
++    result = {
++        "base": BASE,
++        "result": "VERIFIED" if identical else "MISMATCH",
++        "patch": str(PATCH.relative_to(ROOT)),
++        "patchBytes": len(patch),
++        "patchSha256": sha256(patch),
++        "sourceManifestHash": sha256(source_before),
++        "replayedSourceManifestHash": sha256(replayed),
++    }
++    print(json.dumps(result, ensure_ascii=False, indent=2))
++    if not identical:
++        raise SystemExit(1)
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/artifacts/f1-f12-repair/round3-c01-c03/run-evidence.py b/artifacts/f1-f12-repair/round3-c01-c03/run-evidence.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..d077349cab441a108a031d3cb58611c44bc9a446
+--- /dev/null
++++ b/artifacts/f1-f12-repair/round3-c01-c03/run-evidence.py
+@@ -0,0 +1,85 @@
++#!/usr/bin/env python3
++"""round3（C01-C03）验证命令证据 runner — 与 round2/run-evidence.py 同构。
++
++用法：
++  python3 artifacts/f1-f12-repair/round3-c01-c03/run-evidence.py <label> <command...>
++
++行为：快照源码 manifest（排除 artifacts 非 .py 与 *.patch）→ 执行命令 →
++日志脱敏（仓库根 → <WORKTREE>，真实 home → <USER_HOME>）落盘 → 追加
++COMMAND_RESULTS.json（含命令前后 manifest 漂移标记）。
++"""
++import os, sys, json, hashlib, subprocess, platform, datetime, pathlib, re
++
++root = pathlib.Path(__file__).resolve().parents[3]
++out = root / 'artifacts/f1-f12-repair/round3-c01-c03'
++BASE = '67dee5d2de9d3b9fc75ec5ef5c555e93c65b3ccd'
++
++def digest(b): return hashlib.sha256(b).hexdigest()
++
++def manifest():
++    paths = subprocess.check_output(['git', 'ls-files', '-z', '--cached', '--others', '--exclude-standard'], cwd=root).decode().split('\0')
++    rows = []
++    for p in sorted(set(paths)):
++        if not p: continue
++        if p.startswith('artifacts/f1-f12-repair/') and not p.endswith('.py'): continue
++        if p.endswith('.patch'): continue
++        f = root / p
++        if f.is_file():
++            b = f.read_bytes(); rows.append({'path': p, 'bytes': len(b), 'sha256': digest(b)})
++    return {
++        'sourceIdentity': {'kind': 'worktree', 'base': BASE},
++        'exclusions': [
++            'artifacts/f1-f12-repair/** except *.py (generated evidence, reports, delivery files and synthetic test home)',
++            '*.patch (delivery patches)',
++            'git ignored generated files; git ls-files --cached --others --exclude-standard',
++        ],
++        'files': rows,
++    }
++
++m = manifest()
++raw = (json.dumps(m, ensure_ascii=False, sort_keys=True, indent=2) + '\n').encode()
++h = digest(raw)
++(out / 'manifests').mkdir(exist_ok=True)
++(out / 'manifests' / f'{h}.json').write_bytes(raw)
++(out / 'SOURCE_MANIFEST.json').write_bytes(raw)
++
++if len(sys.argv) < 3:
++    print(h); sys.exit(0)
++
++label = sys.argv[1]; cmd = sys.argv[2:]
++start = datetime.datetime.now(datetime.timezone.utc).isoformat()
++env = os.environ.copy()
++env['LINGXI_HOME'] = str(out / 'synthetic-home')
++env['HANA_HOME'] = env['LINGXI_HOME']
++env['NO_COLOR'] = '1'
++p = subprocess.run(cmd, cwd=root, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
++log = p.stdout.replace(str(root).encode(), b'<WORKTREE>').replace(str(pathlib.Path.home()).encode(), b'<USER_HOME>')
++f = out / 'logs' / f'{label}.log'
++f.parent.mkdir(exist_ok=True)
++f.write_bytes(log)
++clean = re.sub(r'\x1b\[[0-9;]*m', '', log.decode(errors='replace'))
++rows = re.findall(r'^\s*Tests\s+(.+)$', clean, re.M)
++counts = None
++if rows:
++    counts = {}
++    for k in ['passed', 'failed', 'skipped', 'todo']:
++        match = re.search(r'(\d+) ' + k, rows[-1])
++        counts[k] = int(match.group(1)) if match else 0
++after = (json.dumps(manifest(), ensure_ascii=False, sort_keys=True, indent=2) + '\n').encode()
++record = {
++    'command': cmd, 'cwd': '<WORKTREE>', 'platform': platform.system(), 'arch': platform.machine(),
++    'node': subprocess.check_output(['node', '--version']).decode().strip(),
++    'npm': subprocess.check_output(['npm', '--version']).decode().strip(),
++    'start': start, 'end': datetime.datetime.now(datetime.timezone.utc).isoformat(),
++    'exitCode': p.returncode, 'counts': counts,
++    'sourceChangedDuringCommand': digest(after) != h,
++    'endSourceManifestHash': digest(after),
++    'log': f'logs/{f.name}', 'logSha256': digest(log), 'sourceManifestHash': h,
++}
++results = out / 'COMMAND_RESULTS.json'
++data = json.loads(results.read_text()) if results.exists() else []
++data.append(record)
++results.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
++print(log.decode(errors='replace')[-6000:])
++print('EVIDENCE', label, 'EXIT', p.returncode, 'MANIFEST', h)
++sys.exit(p.returncode)
 diff --git a/build/cli-runtime-closure.json b/build/cli-runtime-closure.json
-index e1f283e59d272771206ba3cd3b831a8fabce91c0..f4b0aa91f1195b82346f94d340e4dfde156a950e 100644
+index e1f283e59d272771206ba3cd3b831a8fabce91c0..44a33990282d04749428ce59066282a999e8938f 100644
 --- a/build/cli-runtime-closure.json
 +++ b/build/cli-runtime-closure.json
 @@ -762,6 +762,23 @@
@@ -279,7 +559,19 @@ index e1f283e59d272771206ba3cd3b831a8fabce91c0..f4b0aa91f1195b82346f94d340e4dfde
      {
        "path": "core/desktop-session-submit.ts",
        "inputType": "source-graph",
-@@ -791,13 +808,18 @@
+@@ -781,6 +798,11 @@
+           "from": "core/session-turn-actions.ts",
+           "kind": "import-statement"
+         },
++        {
++          "root": "server-bootstrap",
++          "from": "lib/agent-review/turn-coordinator.ts",
++          "kind": "import-statement"
++        },
+         {
+           "root": "server-bootstrap",
+           "from": "server/routes/chat.ts",
+@@ -791,13 +813,18 @@
            "from": "server/routes/sessions.ts",
            "kind": "import-statement"
          },
@@ -295,11 +587,30 @@ index e1f283e59d272771206ba3cd3b831a8fabce91c0..f4b0aa91f1195b82346f94d340e4dfde
          }
        ],
 -      "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); lib/session-collab/delivery.ts (import-statement); core/session-turn-actions.ts (import-statement); +3 more importer(s)."
-+      "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); lib/session-collab/delivery.ts (import-statement); core/session-turn-actions.ts (import-statement); +4 more importer(s)."
++      "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); lib/session-collab/delivery.ts (import-statement); core/session-turn-actions.ts (import-statement); +5 more importer(s)."
      },
      {
        "path": "core/device-registry.ts",
-@@ -8623,6 +8645,23 @@
+@@ -1803,6 +1830,18 @@
+       ],
+       "reason": "Reached via esbuild source module graph, imported by core/bridge-session-manager.ts (import-statement); core/agent.ts (import-statement); core/agent-manager.ts (import-statement); +5 more importer(s)."
+     },
++    {
++      "path": "core/pinned-tenets-backup-dir.ts",
++      "inputType": "source-graph",
++      "provenance": [
++        {
++          "root": "server-bootstrap",
++          "from": "core/pinned-tenets-migration.ts",
++          "kind": "import-statement"
++        }
++      ],
++      "reason": "Reached via esbuild source module graph, imported by core/pinned-tenets-migration.ts (import-statement)."
++    },
+     {
+       "path": "core/pinned-tenets-migration.ts",
+       "inputType": "source-graph",
+@@ -8623,6 +8662,23 @@
        ],
        "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/index.ts (import-statement)."
      },
@@ -323,15 +634,15 @@ index e1f283e59d272771206ba3cd3b831a8fabce91c0..f4b0aa91f1195b82346f94d340e4dfde
      {
        "path": "lib/pi-sdk/index.ts",
        "inputType": "source-graph",
-@@ -128543,9 +128582,9 @@
+@@ -128543,9 +128599,9 @@
      }
    ],
    "stats": {
 -    "totalFiles": 10970,
-+    "totalFiles": 10972,
++    "totalFiles": 10973,
      "byInputType": {
 -      "source-graph": 761,
-+      "source-graph": 763,
++      "source-graph": 764,
        "runtime-asset": 11,
        "nft-runtime-trace": 10198
      }
@@ -678,7 +989,7 @@ index 0000000000000000000000000000000000000000..27c9705abcf7a6cec0ba1c0ae30a4abb
 +  return result;
 +}
 diff --git a/core/desktop-session-submit.ts b/core/desktop-session-submit.ts
-index 032c7a1eca650761703c325f7edaaaf675ca27dc..2451b3745e95d5785c3fed963bac7a2776826a29 100644
+index 032c7a1eca650761703c325f7edaaaf675ca27dc..74f714ff24636cfbf35a0eb9fe5d4b0f1b3eef61 100644
 --- a/core/desktop-session-submit.ts
 +++ b/core/desktop-session-submit.ts
 @@ -30,6 +30,8 @@
@@ -690,11 +1001,29 @@ index 032c7a1eca650761703c325f7edaaaf675ca27dc..2451b3745e95d5785c3fed963bac7a27
  import { extOfName, inferFileKind } from "../lib/file-metadata.ts";
  import { collectMediaItems } from "../lib/tools/media-details.ts";
  import { formatSettingsUpdateText } from "../lib/tools/settings-update-result.ts";
-@@ -60,7 +62,43 @@ export const MESSAGE_ORIGIN_RECORD_TYPE = "hana-message-origin";
+@@ -60,7 +62,62 @@ export const MESSAGE_ORIGIN_RECORD_TYPE = "hana-message-origin";
  export const MESSAGE_PRESENTATION_RECORD_TYPE = "hana-message-presentation";
  export const AGENT_REVIEW_RECORD_TYPE = "hana-agent-review-result";
  
 -const pendingDesktopSessionSubmissions = new Set();
++/**
++ * 「输入未被接受」证据标记（C01）：提交链抛错时，若本次输入的 canonical 关联
++ * 回执（session_user_message 带 sourceEntryId）从未触发，说明没有任何用户输入
++ * 被持久化——提交 Promise 已终结，不会再 append。调用方（chat.ts）据此发送
++ * 类型化拒绝回执；标记只在有实际提交阶段证据时设置，不根据文案猜测。
++ */
++const INPUT_NOT_ACCEPTED = Symbol("lingxiDesktopInputNotAccepted");
++
++export function markDesktopInputRejectedBeforeAcceptance(err: unknown): void {
++  if (err && typeof err === "object") {
++    (err as Record<symbol, unknown>)[INPUT_NOT_ACCEPTED] = true;
++  }
++}
++
++export function isDesktopInputRejectedBeforeAcceptance(err: unknown): boolean {
++  return !!(err && typeof err === "object" && (err as Record<symbol, unknown>)[INPUT_NOT_ACCEPTED] === true);
++}
++
 +const pendingDesktopSessionSubmissions = new class extends Set<string> {
 +  add(key: string) { if (!this.has(key)) noteDesktopInputRuntimeChange(); return super.add(key); }
 +  delete(key: string) { const removed = super.delete(key); if (removed) noteDesktopInputRuntimeChange(); return removed; }
@@ -714,7 +1043,7 @@ index 032c7a1eca650761703c325f7edaaaf675ca27dc..2451b3745e95d5785c3fed963bac7a27
 +  } catch { return { revision, status: 'unknown' }; }
 +}
 +
-+function withInputCorrelation<T>(engine: any, session: any, identity: any, action: () => T): T {
++function withInputCorrelation<T>(engine: any, session: any, identity: any, action: () => T, onCanonicalReceipt?: () => void): T {
 +  if (!identity.clientMessageId || typeof identity.clientMessageId !== 'string') return action();
 +  const snapshotVersion = identity.snapshotVersion === undefined ? 1 : identity.snapshotVersion;
 +  const unavailable = () => {
@@ -728,6 +1057,7 @@ index 032c7a1eca650761703c325f7edaaaf675ca27dc..2451b3745e95d5785c3fed963bac7a27
 +    session.sessionManager.appendCustomEntry(DESKTOP_INPUT_CORRELATION_TYPE, { schemaVersion: 1, sessionId: identity.sessionId, clientMessageId: identity.clientMessageId, snapshotVersion, sourceEntryId });
 +    const correlation = collectDesktopInputCorrelations(session.sessionManager.getBranch(), identity.sessionId).get(sourceEntryId);
 +    if (!correlation?.clientMessageId) { unavailable(); return; }
++    onCanonicalReceipt?.();
 +    engine.emitEvent?.({ type: 'session_user_message', sessionId: identity.sessionId, clientMessageId: identity.clientMessageId, snapshotVersion,
 +      message: { ...(identity.displayMessage || {}), text: identity.displayMessage?.text ?? identity.text ?? '', id: sourceEntryId, sourceEntryId } }, identity.sessionPath);
 +  } }, action);
@@ -735,7 +1065,7 @@ index 032c7a1eca650761703c325f7edaaaf675ca27dc..2451b3745e95d5785c3fed963bac7a27
  
  /**
   * 检索/排队期间被用户 abort 的提交键（sessionId 与 sessionPath 两种形式都记，
-@@ -291,6 +329,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
+@@ -291,6 +348,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
    audioAttachmentPaths?: string[];
    inboundFiles?: Array<{ type: string; filename?: string; mimeType?: string; buffer: any }>;
    clientMessageId?: string;
@@ -743,7 +1073,7 @@ index 032c7a1eca650761703c325f7edaaaf675ca27dc..2451b3745e95d5785c3fed963bac7a27
    onDelta?: (delta: string, accumulated: string) => void;
    displayMessage?: any;
    sessionFileRefs?: Array<{ fileId?: string; sessionId?: string; sessionPath?: string; label?: string; kind?: string }>;
-@@ -314,6 +353,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
+@@ -314,6 +372,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
      audioAttachmentPaths,
      inboundFiles,
      clientMessageId,
@@ -751,7 +1081,48 @@ index 032c7a1eca650761703c325f7edaaaf675ca27dc..2451b3745e95d5785c3fed963bac7a27
      onDelta,
      displayMessage,
      sessionFileRefs,
-@@ -617,14 +657,14 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
+@@ -326,17 +385,35 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
+     onInputAccepted,
+   } = opts;
+ 
++  // canonical 关联回执观察：committed 回调触发 = 用户输入已被 append（接受证据）。
++  // 抛错时据此判定「未接受」——早于回执的一切错误都没有持久化任何用户输入。
++  let canonicalReceiptEmitted = false;
++  const noteCanonicalReceipt = () => { canonicalReceiptEmitted = true; };
++  /** 接受前确定失败：构造即标记的错误（busy 门禁/身份解析/载荷校验），调用方可据此发拒绝回执。 */
++  const notAcceptedError = (message: string): never => {
++    const err = new Error(message);
++    markDesktopInputRejectedBeforeAcceptance(err);
++    throw err;
++  };
+   if (!engine || typeof engine.ensureSessionLoaded !== "function" || typeof engine.promptSession !== "function") {
+-    throw new Error("desktop-session-submit: engine session API unavailable");
++    notAcceptedError("desktop-session-submit: engine session API unavailable");
+   }
+-  const { sessionId, sessionPath } = resolveDesktopSessionTarget(engine, requestedSessionId, requestedSessionPath);
+-  if (!text && !images?.length && !videos?.length && !audios?.length) throw new Error("desktop-session-submit: text, images, videos, or audios required");
++  let resolvedTarget: { sessionId: string | null; sessionPath: string };
++  try {
++    resolvedTarget = resolveDesktopSessionTarget(engine, requestedSessionId, requestedSessionPath);
++  } catch (err) {
++    // 会话身份解析失败：输入未被路由到任何会话，更没有被接受。
++    markDesktopInputRejectedBeforeAcceptance(err);
++    throw err;
++  }
++  const { sessionId, sessionPath } = resolvedTarget;
++  if (!text && !images?.length && !videos?.length && !audios?.length) notAcceptedError("desktop-session-submit: text, images, videos, or audios required");
+   const submissionKey = sessionId || sessionPath;
+   if (pendingDesktopSessionSubmissions.has(submissionKey)) {
+-    throw new Error("session_busy");
++    notAcceptedError("session_busy");
+   }
+   if (typeof engine.isSessionStreaming === "function" && engine.isSessionStreaming(sessionPath)) {
+-    throw new Error("session_busy");
++    notAcceptedError("session_busy");
+   }
+ 
+   liftBrowserAuthorizationRevocation(sessionPath);
+@@ -617,14 +694,14 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
          context,
        });
        if (typeof engine.preflightSessionInput === "function") {
@@ -760,16 +1131,27 @@ index 032c7a1eca650761703c325f7edaaaf675ca27dc..2451b3745e95d5785c3fed963bac7a27
            afterCachePreflight,
            afterInputAccepted: onInputAccepted,
 -        });
-+        }));
++        }), noteCanonicalReceipt);
        } else {
          // Compatibility for older embedders. LingxiEngine always takes the guarded path above.
          afterCachePreflight();
 -        await engine.promptSession(sessionPath, promptText, promptOpts);
-+        await withInputCorrelation(engine, session, { sessionId, sessionPath, clientMessageId, snapshotVersion, text, displayMessage }, () => engine.promptSession(sessionPath, promptText, promptOpts));
++        await withInputCorrelation(engine, session, { sessionId, sessionPath, clientMessageId, snapshotVersion, text, displayMessage }, () => engine.promptSession(sessionPath, promptText, promptOpts), noteCanonicalReceipt);
        }
        consumeRenderedReminderBlock(engine, sessionPath, reminderBlock);
      } finally {
-@@ -710,6 +750,7 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
+@@ -646,6 +723,10 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
+       engine.emitEvent?.({ type: "session_status", isStreaming: false }, sessionPath);
+       earlyBusyEmitted = false;
+     }
++    // canonical 关联回执未触发 = 没有任何用户输入被 append。提交 Promise 已终结，
++    // 不会再持久化——这是「未接受」的实际提交阶段证据（afterCachePreflight 的展示
++    // 副作可能留下孤儿 presentation 条目，消费方按既有孤儿容忍规则跳过）。
++    if (!canonicalReceiptEmitted) markDesktopInputRejectedBeforeAcceptance(err);
+     throw err;
+   } finally {
+     // 停止同时登记会话编号和路径，结束时一并清除，避免下一次发送继承旧停止状态。
+@@ -710,12 +791,26 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
    audioAttachmentPaths?: string[];
    inboundFiles?: Array<{ type: string; filename?: string; mimeType?: string; buffer: any }>;
    clientMessageId?: string;
@@ -777,7 +1159,26 @@ index 032c7a1eca650761703c325f7edaaaf675ca27dc..2451b3745e95d5785c3fed963bac7a27
    displayMessage?: any;
    sessionFileRefs?: Array<{ fileId?: string; sessionId?: string; sessionPath?: string; label?: string; kind?: string }>;
    knowledgeRefs?: KnowledgeRefs;
-@@ -728,6 +769,7 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
+   uiContext?: any;
+   context?: any;
+ } = {}) {
++  // 接受证据载体：canonical 关联回执触发置 true。抛错时未触发 = 输入从未被
++  // append（steer 成功前的一切失败：busy 门禁/检索失败/装载失败），调用方可
++  // 据此发送类型化拒绝回执（C01）。
++  const receipt = { canonical: false };
++  try {
++    return await runDesktopSessionInterjection(engine, opts, receipt);
++  } catch (err) {
++    if (!receipt.canonical) markDesktopInputRejectedBeforeAcceptance(err);
++    throw err;
++  }
++}
++
++async function runDesktopSessionInterjection(engine: any, opts: Parameters<typeof submitDesktopSessionInterjection>[1], receipt: { canonical: boolean }) {
+   const {
+     sessionId: requestedSessionId,
+     sessionPath: requestedSessionPath,
+@@ -728,6 +823,7 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
      audioAttachmentPaths,
      inboundFiles,
      clientMessageId,
@@ -785,12 +1186,12 @@ index 032c7a1eca650761703c325f7edaaaf675ca27dc..2451b3745e95d5785c3fed963bac7a27
      displayMessage,
      sessionFileRefs,
      knowledgeRefs,
-@@ -879,7 +921,7 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
+@@ -879,7 +975,7 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
      promptText = `${reminderBlock.block}\n\n${promptText}`;
    }
  
 -  const steered = engine.steerSession(sessionPath, promptText);
-+  const steered = withInputCorrelation(engine, session, { sessionId, sessionPath, clientMessageId, snapshotVersion, text, displayMessage }, () => engine.steerSession(sessionPath, promptText));
++  const steered = withInputCorrelation(engine, session, { sessionId, sessionPath, clientMessageId, snapshotVersion, text, displayMessage }, () => engine.steerSession(sessionPath, promptText), () => { receipt.canonical = true; });
    if (!steered) throw new Error("session_busy");
    consumeRenderedReminderBlock(engine, sessionPath, reminderBlock);
    engine.emitEvent?.({
@@ -1421,11 +1822,69 @@ index cc63e0d9427728fa76ef2859ed844a98fc9118fa..97e2c83f90c66d4ff9ccbb9244847ea6
  function historyMessageFromEntry(entry) {
    if (entry?.type === "message" && entry.message) {
      const message = entry.message.role === "toolResult"
+diff --git a/core/pinned-tenets-backup-dir.ts b/core/pinned-tenets-backup-dir.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..5f5121bcede09728148334268f2b77f412c1df13
+--- /dev/null
++++ b/core/pinned-tenets-backup-dir.ts
+@@ -0,0 +1,52 @@
++/**
++ * pinned-tenets-backup-dir.ts — 迁移/恢复收据 backupDir 的平台无关存储合同（C02）。
++ *
++ * 存储表示：收据里的 backupDir 永远是 "/" 分隔的规范形式
++ *   memory/pinned-migration-backup
++ *   memory/pinned-migration-backup/<operationId>
++ * 历史 bug：Windows 端用 path.join() 的结果直接持久化，写出
++ * "memory\\pinned-migration-backup\\<uuid>"；而收据校验只认 POSIX 斜杠，POSIX
++ * 端的本地路径解析又把反斜杠当文件名字符——同一份合法收据跨平台不可读。
++ *
++ * 这里集中收据侧的构造、兼容解析与本地路径合成，迁移与恢复共用；实际文件
++ * 访问仍走本机 path 规则。兼容解析先验证原始结构再转规范形式，不先 normalize
++ * 消掉危险路径段：绝对路径、盘符、UNC、NUL、"."/".."、多余层级与混合分隔符
++ * 一律拒绝。
++ */
++import path from "node:path";
++
++export const BACKUP_DIR_STORAGE_PREFIX = "memory/pinned-migration-backup";
++/** 收据校验的权威形状：规范 POSIX 表示，最多一个 operation 段。 */
++const CANONICAL_BACKUP_DIR_RE = /^memory\/pinned-migration-backup(?:\/[a-zA-Z0-9-]+)?$/;
++/** 既有 Windows 写入逻辑产生的反斜杠形式（仅兼容读取，不再写出）。 */
++const LEGACY_WINDOWS_BACKUP_DIR_RE = /^memory\\pinned-migration-backup(?:\\[a-zA-Z0-9-]+)?$/;
++
++/** 收据写入用：构造规范 POSIX 表示。绝不把本机 path.join 的结果直接持久化。 */
++export function backupDirForReceipt(operationId: string | null): string {
++  return operationId ? `${BACKUP_DIR_STORAGE_PREFIX}/${operationId}` : BACKUP_DIR_STORAGE_PREFIX;
++}
++
++/**
++ * 兼容解析：接受规范 POSIX 形式与旧 Windows 反斜杠形式，产出规范形式（仅在
++ * 内存中规范化，只读扫描不回写文件）。非法输入返回 null，由调用方按收据
++ * 损坏处理。混合分隔符（部分斜杠部分反斜杠）视为歧义输入拒绝。
++ */
++export function parseReceiptBackupDir(value: unknown): string | null {
++  if (typeof value !== "string" || value.length === 0 || value.includes("\0")) return null;
++  if (CANONICAL_BACKUP_DIR_RE.test(value)) return value;
++  if (LEGACY_WINDOWS_BACKUP_DIR_RE.test(value)) return value.replace(/\\/g, "/");
++  return null;
++}
++
++/**
++ * 本地文件访问用：把（可能来自旧收据的）backupDir 解析为本机路径。解析失败
++ * 说明收据损坏——按明确失败处理，不猜测路径。
++ */
++export function receiptBackupDirLocalPath(agentDir: string, backupDir: string | null): string {
++  if (backupDir === null) return path.join(agentDir, ...BACKUP_DIR_STORAGE_PREFIX.split("/"));
++  const canonical = parseReceiptBackupDir(backupDir);
++  if (canonical === null) {
++    throw new Error(`invalid receipt backupDir: ${JSON.stringify(backupDir)}`);
++  }
++  return path.join(agentDir, ...canonical.split("/"));
++}
 diff --git a/core/pinned-tenets-migration.ts b/core/pinned-tenets-migration.ts
-index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5b8254ed4 100644
+index 6f800c036c376fb2ff4accda77dfec3df63e20ab..58cb2126c43d6112658377a739c72706ee864a91 100644
 --- a/core/pinned-tenets-migration.ts
 +++ b/core/pinned-tenets-migration.ts
-@@ -19,11 +19,12 @@
+@@ -19,11 +19,13 @@
  
  import fs from "fs";
  import path from "path";
@@ -1433,13 +1892,14 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
 +import { createHash, randomUUID } from "node:crypto";
  import { createModuleLogger } from "../lib/debug-log.ts";
  import { atomicWriteSync } from "../shared/safe-fs.ts";
++import { backupDirForReceipt, parseReceiptBackupDir, receiptBackupDirLocalPath } from "./pinned-tenets-backup-dir.ts";
  import {
    planLegacyPinnedImport,
 +  legacyContentKey,
    readTenetsFileStrict,
    serializeTenetsFile,
    tenetsFilePath,
-@@ -39,11 +40,12 @@ const log = createModuleLogger("pins-migration");
+@@ -39,11 +41,12 @@ const log = createModuleLogger("pins-migration");
  export const PINNED_MD = "pinned.md";
  export const PINNED_JSON = "pinned-memory.json";
  export const PINNED_TENETS_MIGRATION_RECEIPT = "pinned-tenets-migration.receipt.json";
@@ -1453,7 +1913,7 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
    kind: "migration" | "recovery";
    agentId: string;
    state: "prepared" | "target_committed" | "sources_archived" | "completed" | "failed" | "conflict";
-@@ -51,7 +53,7 @@ export interface MigrationReceipt {
+@@ -51,7 +54,7 @@ export interface MigrationReceipt {
    authority: { file: string; reason: string } | null;
    target: { existed: boolean; sha256: string | null };
    resultSha256: string | null;
@@ -1462,7 +1922,7 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
    counts: {
      sourceItems: number;
      added: number;
-@@ -59,7 +61,7 @@ export interface MigrationReceipt {
+@@ -59,7 +62,7 @@ export interface MigrationReceipt {
      addedOverHistory: number;
      duplicateInBatch: number;
    };
@@ -1471,7 +1931,7 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
    backupDir: string | null;
    error: { code: string; message: string } | null;
    createdAt: string;
-@@ -86,14 +88,64 @@ function receiptPath(agentDir: string): string {
+@@ -86,14 +89,65 @@ function receiptPath(agentDir: string): string {
    return path.join(agentDir, "memory", PINNED_TENETS_MIGRATION_RECEIPT);
  }
  
@@ -1534,7 +1994,8 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
 +    if (expected.has(entry.tenetId) && expected.get(entry.tenetId) !== entry.contentHash) return false;
 +    expected.set(entry.tenetId, entry.contentHash);
    }
-+  if (r.backupDir !== null && (typeof r.backupDir !== "string" || !/^memory\/pinned-migration-backup(?:\/[a-zA-Z0-9-]+)?$/.test(r.backupDir))) return false;
++  // backupDir 存储合同（C02）：规范 POSIX 形式；旧 Windows 反斜杠形式只读兼容。
++  if (r.backupDir !== null && parseReceiptBackupDir(r.backupDir) === null) return false;
 +  if (new Set(r.archived.map(x => x.from)).size !== r.archived.length) return false;
 +  return r.archived.every(x => x && r.sources.some(src => src.file === x.from) && sourceName(x.to)
 +    && x.to.startsWith(x.from + ".migrated")
@@ -1542,7 +2003,7 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
  }
  
  function writeReceipt(agentDir: string, receipt: MigrationReceipt): MigrationReceipt {
-@@ -142,6 +194,19 @@ export function readLegacyPinnedSource(filePath: string): LegacyPinImportItem[]
+@@ -142,6 +196,19 @@ export function readLegacyPinnedSource(filePath: string): LegacyPinImportItem[]
    const base = path.basename(filePath);
    const rawText = fs.readFileSync(filePath, "utf-8");
    if (base.startsWith(PINNED_JSON)) {
@@ -1562,7 +2023,7 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
      let raw: any;
      try {
        raw = JSON.parse(rawText);
-@@ -158,15 +223,6 @@ export function readLegacyPinnedSource(filePath: string): LegacyPinImportItem[]
+@@ -158,15 +225,6 @@ export function readLegacyPinnedSource(filePath: string): LegacyPinImportItem[]
          createdAt: typeof item?.createdAt === "string" ? item.createdAt : null,
        }))
        .filter((item: LegacyPinImportItem) => item.content);
@@ -1578,7 +2039,7 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
  }
  
  // ── 权威来源选择（沿用旧版运行时 mtime 规则） ───────────────────────────────
-@@ -211,13 +267,19 @@ function planCounts(entries: readonly LegacyPinImportEntry[]): MigrationReceipt[
+@@ -211,13 +269,19 @@ function planCounts(entries: readonly LegacyPinImportEntry[]): MigrationReceipt[
  function archiveTargetName(agentDir: string, base: string, sourceSha256: string): string {
    const plain = path.join(agentDir, `${base}.migrated`);
    if (!fs.existsSync(plain)) return `${base}.migrated`;
@@ -1600,7 +2061,7 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
    receipt.error = { code, message };
    try {
      writeReceipt(agentDir, receipt);
-@@ -229,6 +291,7 @@ function failWithReceipt(agentDir: string, receipt: MigrationReceipt, code: stri
+@@ -229,6 +293,7 @@ function failWithReceipt(agentDir: string, receipt: MigrationReceipt, code: stri
  function newReceipt(agentId: string): MigrationReceipt {
    return {
      version: MIGRATION_VERSION,
@@ -1608,7 +2069,7 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
      kind: "migration",
      agentId,
      state: "prepared",
-@@ -273,53 +336,110 @@ function readSourcesAndTarget(agentDir: string, authority: AuthorityChoice) {
+@@ -273,53 +338,111 @@ function readSourcesAndTarget(agentDir: string, authority: AuthorityChoice) {
    return { sources, items, targetPath, targetExisted, targetSha256, targetData };
  }
  
@@ -1638,8 +2099,9 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
 -  } catch {
 -    return false;
 +function writeBackups(agentDir: string, receipt: MigrationReceipt, hooks?: MigrationFaultHooks): string {
-+  const relative = path.join("memory", BACKUP_DIR, receipt.operationId!);
-+  const directory = path.join(agentDir, relative);
++  // 收据持久化用平台无关表示（C02）：不把本机 path.join 的结果写进收据。
++  const relative = backupDirForReceipt(receipt.operationId!);
++  const directory = receiptBackupDirLocalPath(agentDir, relative);
 +  fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
 +  const files = receipt.sources.map(source => ({ source: path.join(agentDir, source.file), name: source.file }));
 +  if (receipt.target.existed) files.push({ source: tenetsFilePath(agentDir), name: "tenets.json" });
@@ -1755,7 +2217,7 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
      writeReceipt(agentDir, receipt);
    }
  }
-@@ -343,6 +463,10 @@ function finalizeReceipt(agentDir: string, receipt: MigrationReceipt, hooks?: Mi
+@@ -343,6 +466,10 @@ function finalizeReceipt(agentDir: string, receipt: MigrationReceipt, hooks?: Mi
  export function migrateAgentPinnedTenets(agentDir: string, agentId: string, hooks?: MigrationFaultHooks): void {
    const existing = readPinnedTenetsMigrationReceipt(agentDir);
    if (existing && (existing.state === "completed" || existing.state === "conflict")) return;
@@ -1766,7 +2228,7 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
    if (existing && existing.state !== "failed") {
      resumeMigration(agentDir, existing, hooks);
      return;
-@@ -350,6 +474,50 @@ export function migrateAgentPinnedTenets(agentDir: string, agentId: string, hook
+@@ -350,6 +477,51 @@ export function migrateAgentPinnedTenets(agentDir: string, agentId: string, hook
    runFreshMigration(agentDir, agentId, hooks, existing ?? undefined);
  }
  
@@ -1802,8 +2264,9 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
 +  if (items.length !== receipt.plan.length || items.some((item, i) => `sha256:${sha256Text(legacyContentKey(item.content))}` !== receipt.plan[i].contentHash)) return conflict();
 +  receipt.operationId = randomUUID();
 +  // 升级前保留旧收据、当前目标和所有来源的原始字节，不追认旧 completed。
-+  const relative = path.join("memory", BACKUP_DIR, receipt.operationId);
-+  const directory = path.join(agentDir, relative);
++  // 收据持久化用平台无关表示（C02）。
++  const relative = backupDirForReceipt(receipt.operationId);
++  const directory = receiptBackupDirLocalPath(agentDir, relative);
 +  fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
 +  for (const [name, file] of [...paths.entries(), ["receipt.json", receiptPath(agentDir)] as const,
 +    ...(fs.existsSync(tenetsFilePath(agentDir)) ? [["tenets.json", tenetsFilePath(agentDir)] as const] : [])]) {
@@ -1817,7 +2280,7 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
  function runFreshMigration(agentDir: string, agentId: string, hooks: MigrationFaultHooks | undefined, prior?: MigrationReceipt): void {
    const authority = chooseAuthority(agentDir);
    if (!authority) {
-@@ -378,33 +546,18 @@ function runFreshMigration(agentDir: string, agentId: string, hooks: MigrationFa
+@@ -378,33 +550,18 @@ function runFreshMigration(agentDir: string, agentId: string, hooks: MigrationFa
    receipt.plan = receiptPlanEntries(entries);
    receipt.counts = planCounts(entries);
  
@@ -1863,7 +2326,7 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
  
    archiveSources(agentDir, receipt, hooks);
    finalizeReceipt(agentDir, receipt, hooks);
-@@ -431,17 +584,38 @@ function assertUnchanged(agentDir: string, receipt: MigrationReceipt, targetPath
+@@ -431,17 +588,42 @@ function assertUnchanged(agentDir: string, receipt: MigrationReceipt, targetPath
    }
  }
  
@@ -1873,7 +2336,7 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
 +  if (!source) throw migrationError("MIGRATION_CONFLICT", "receipt source plan lacks authority");
 +  const candidates = [path.join(agentDir, source.file),
 +    ...receipt.archived.filter(item => item.from === source.file).map(item => path.join(agentDir, item.to)),
-+    ...(receipt.backupDir ? [path.join(agentDir, receipt.backupDir, `${source.sha256}-${source.file}`)] : [])];
++    ...(receipt.backupDir ? [path.join(receiptBackupDirLocalPath(agentDir, receipt.backupDir), `${source.sha256}-${source.file}`)] : [])];
 +  const file = candidates.find(candidate => fs.existsSync(candidate) && fs.statSync(candidate).isFile() && sha256File(candidate) === source.sha256);
 +  if (!file) throw migrationError("MIGRATION_CONFLICT", "receipt source plan cannot be verified");
 +  // 备份名包含摘要，解析仍沿原源的固定格式，不按备份文件名猜协议。
@@ -1895,6 +2358,10 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
 -    finalizeReceipt(agentDir, receipt, hooks);
 -    return;
 -  }
++  // 旧收据的 Windows 反斜杠 backupDir：读取时兼容校验，这里在内存中转成规范
++  // 形式——合法续写的收据持久化为统一 POSIX 路径，不为了换分隔符重跑迁移、
++  // 也不移动既有备份（本地访问走 receiptBackupDirLocalPath 的兼容解析）。
++  if (receipt.backupDir !== null) receipt.backupDir = parseReceiptBackupDir(receipt.backupDir);
 +  assertReceiptSourcePlan(agentDir, receipt);
 +
  
@@ -1907,7 +2374,7 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
      // 目标已提交：只校验计划条目仍在（允许后续用户写入），然后只补归档。
      if (!targetExists || !verifyTargetCommitted(targetPath, receipt.resultSha256!, receipt.plan)) {
        receipt.state = "conflict";
-@@ -466,7 +640,7 @@ function resumeMigration(agentDir: string, receipt: MigrationReceipt, hooks?: Mi
+@@ -466,7 +648,7 @@ function resumeMigration(agentDir: string, receipt: MigrationReceipt, hooks?: Mi
      }
    }
  
@@ -1916,7 +2383,7 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
      // 崩溃在 commit 之后、收据更新之前：目标已是计划终态，只补收据与归档。
      receipt.state = "target_committed";
      writeReceipt(agentDir, receipt);
-@@ -512,19 +686,17 @@ function resumeMigration(agentDir: string, receipt: MigrationReceipt, hooks?: Mi
+@@ -512,19 +694,17 @@ function resumeMigration(agentDir: string, receipt: MigrationReceipt, hooks?: Mi
      return;
    }
  
@@ -1948,10 +2415,10 @@ index 6f800c036c376fb2ff4accda77dfec3df63e20ab..ceb7cc8168090b4dad9b2f2bcaf99db5
    archiveSources(agentDir, receipt, hooks);
    finalizeReceipt(agentDir, receipt, hooks);
 diff --git a/core/pinned-tenets-recovery.ts b/core/pinned-tenets-recovery.ts
-index 5d23cfca074a545bfe44e2d59d29c4c6aaf10c0b..ea7d2a386f9aecb479ecd0183311dfd861286b01 100644
+index 5d23cfca074a545bfe44e2d59d29c4c6aaf10c0b..166e901c600512bdebc5c71da1cc75e9b4678b66 100644
 --- a/core/pinned-tenets-recovery.ts
 +++ b/core/pinned-tenets-recovery.ts
-@@ -1,228 +1,231 @@
+@@ -1,228 +1,235 @@
 -/**
 - * pinned-tenets-recovery.ts — 旧迁移遗留 .migrated 数据的仅预览恢复入口。
 - *
@@ -1995,6 +2462,7 @@ index 5d23cfca074a545bfe44e2d59d29c4c6aaf10c0b..ea7d2a386f9aecb479ecd0183311dfd8
    type LegacyPinImportItem,
  } from "../lib/memory/tenets.ts";
  import { atomicWriteSync } from "../shared/safe-fs.ts";
++import { backupDirForReceipt, parseReceiptBackupDir, receiptBackupDirLocalPath } from "./pinned-tenets-backup-dir.ts";
  
 -const ARCHIVED_SOURCE_RE = /^(pinned-memory\.json|pinned\.md)\.migrated(-[0-9a-f]{8})?$/;
 +const ARCHIVED_SOURCE_RE = /^(pinned-memory\.json|pinned\.md)\.migrated(?:-[a-zA-Z0-9-]+)?$/;
@@ -2263,6 +2731,8 @@ index 5d23cfca074a545bfe44e2d59d29c4c6aaf10c0b..ea7d2a386f9aecb479ecd0183311dfd8
 +  const approvalDigest = digest(JSON.stringify(approval));
 +  let receipt = readOperation(dir, approval.operationId);
 +  if (receipt) {
++    // 旧操作收据的 Windows 反斜杠 backupDir：续写时在内存中转规范形式（C02）。
++    if (receipt.backupDir !== null) receipt.backupDir = parseReceiptBackupDir(receipt.backupDir);
 +    if (receipt.approvalDigest !== approvalDigest) return fail("approval changed for existing operationId");
 +    if (receipt.state === 'completed') return receipt.summary;
 +    if (receipt.state === 'conflict' || receipt.state === 'failed') return fail("recovery operation conflict; new reviewed approval required");
@@ -2334,13 +2804,14 @@ index 5d23cfca074a545bfe44e2d59d29c4c6aaf10c0b..ea7d2a386f9aecb479ecd0183311dfd8
 +      sources:approval.sources.map(s=>({...s,mtimeMs:fs.statSync(path.join(dir,s.file)).mtimeMs})),authority:{file:approval.sources[0].file,reason:'explicit_recovery_approval'},
 +      target:{existed:targetHash!==null,sha256:targetHash},resultSha256,plan,
 +      counts:{sourceItems:plan.length,added:plan.filter(p=>p.outcome==='added').length,duplicateActive:plan.filter(p=>p.outcome==='duplicate_active').length,addedOverHistory:plan.filter(p=>p.outcome.startsWith('added_over')).length,duplicateInBatch:plan.filter(p=>p.outcome==='duplicate_in_batch').length},
-+      archived:[],archiveStatus:'not_applicable',backupDir:path.join('memory','pinned-migration-backup',approval.operationId),error:null,createdAt:now,updatedAt:now,completedAt:null,
++      archived:[],archiveStatus:'not_applicable',backupDir:backupDirForReceipt(approval.operationId),error:null,createdAt:now,updatedAt:now,completedAt:null,
 +      approval,approvalDigest,summary:{restored:plan.filter(p=>p.outcome.startsWith('added')).length,entries:plan}};
 +  }
 +  const operation=receipt;
 +  executePinnedTargetTransaction({targetPath,finalBytes,resultSha256,plan:operation.plan,hooks,
 +    prepare:()=>{
-+      const backupDir=path.join(dir,operation.backupDir!);fs.mkdirSync(backupDir,{recursive:true,mode:0o700});
++      // 旧操作收据可能带 Windows 反斜杠 backupDir：本地访问走兼容解析（C02）。
++      const backupDir=receiptBackupDirLocalPath(dir,operation.backupDir);fs.mkdirSync(backupDir,{recursive:true,mode:0o700});
 +      const files=approval.sources.map(s=>({file:path.join(dir,s.file),name:s.file}));
 +      if(targetHash!==null)files.push({file:targetPath,name:'tenets.json'});
 +      for(const name of [path.join('memory',PINNED_TENETS_MIGRATION_RECEIPT),path.join('memory',OPERATIONS,approval.operationId+'.json')]) {
@@ -2570,10 +3041,10 @@ index 1bc382a525ea0f9c70db69616f49e633927af161..35d4354c991be76c903a4f817785c5bc
        if (signal) signal.addEventListener("abort", onAbort, { once: true });
  
 diff --git a/desktop/src/locales/en.json b/desktop/src/locales/en.json
-index c0d4adfa2243288bae94a927832086ca73364e14..72ab56c93a20b31cb2f4264ff7abccb19b228b51 100644
+index c0d4adfa2243288bae94a927832086ca73364e14..69a3ceb5ba639f9a5d25f667ca4e68ba9ad3285e 100644
 --- a/desktop/src/locales/en.json
 +++ b/desktop/src/locales/en.json
-@@ -656,7 +656,12 @@
+@@ -656,7 +656,15 @@
      "queuedSendFailed": "Failed to send the queued message",
      "queuedRetry": "Retry",
      "queuedInsertWaiting": "Waiting for the current reply to start — try again in a moment",
@@ -2583,15 +3054,18 @@ index c0d4adfa2243288bae94a927832086ca73364e14..72ab56c93a20b31cb2f4264ff7abccb1
 +    "deliveryChecking": "Result unknown, checking",
 +    "deliveryUnknown": "Result unknown, verification incomplete",
 +    "deliveryRunUnknown": "Message received, run result still unknown",
-+    "recheckDelivery": "Check again"
++    "recheckDelivery": "Check again",
++    "sendNotAccepted": "Not sent: the server did not accept this message",
++    "sendRetry": "Retry send",
++    "sendDismiss": "Discard"
    },
    "agentReview": {
      "running": "Reviewing this Session",
 diff --git a/desktop/src/locales/ja.json b/desktop/src/locales/ja.json
-index 060f09b53d3a19b0e6a56ad2d68b2e049352448a..99820f4039db676f485ea310e2ae794096053961 100644
+index 060f09b53d3a19b0e6a56ad2d68b2e049352448a..10c617b778c4b0b6188cd188ef4a852a198a2242 100644
 --- a/desktop/src/locales/ja.json
 +++ b/desktop/src/locales/ja.json
-@@ -657,7 +657,12 @@
+@@ -657,7 +657,15 @@
      "queuedSendFailed": "キュー内のメッセージの送信に失敗しました",
      "queuedRetry": "再試行",
      "queuedInsertWaiting": "現在の返答の開始を待っています。しばらくしてからもう一度お試しください",
@@ -2601,15 +3075,18 @@ index 060f09b53d3a19b0e6a56ad2d68b2e049352448a..99820f4039db676f485ea310e2ae7940
 +    "deliveryChecking": "結果不明、確認中",
 +    "deliveryUnknown": "結果不明、確認未完了",
 +    "deliveryRunUnknown": "メッセージ受信済み、実行結果は未確認",
-+    "recheckDelivery": "再確認"
++    "recheckDelivery": "再確認",
++    "sendNotAccepted": "未送信：サーバーがこのメッセージを受け付けませんでした",
++    "sendRetry": "再送信",
++    "sendDismiss": "破棄"
    },
    "agentReview": {
      "running": "この Session をレビュー中",
 diff --git a/desktop/src/locales/ko.json b/desktop/src/locales/ko.json
-index b0c35e29961b9a11997f3f49a5403f426b73e455..f1edc089d442fe3da4ab1f6206191cef63746738 100644
+index b0c35e29961b9a11997f3f49a5403f426b73e455..f09f3bf72ecf589fbf93a041e94fc38024d2890d 100644
 --- a/desktop/src/locales/ko.json
 +++ b/desktop/src/locales/ko.json
-@@ -657,7 +657,12 @@
+@@ -657,7 +657,15 @@
      "queuedSendFailed": "대기 중인 메시지 전송에 실패했습니다",
      "queuedRetry": "다시 시도",
      "queuedInsertWaiting": "현재 응답이 시작되기를 기다리는 중입니다. 잠시 후 다시 시도해 주세요",
@@ -2619,15 +3096,18 @@ index b0c35e29961b9a11997f3f49a5403f426b73e455..f1edc089d442fe3da4ab1f6206191cef
 +    "deliveryChecking": "결과 확인 중",
 +    "deliveryUnknown": "결과 확인 미완료",
 +    "deliveryRunUnknown": "메시지는 수신되었으나 실행 결과는 확인되지 않음",
-+    "recheckDelivery": "다시 확인"
++    "recheckDelivery": "다시 확인",
++    "sendNotAccepted": "전송되지 않음: 서버가 이 메시지를 수락하지 않았습니다",
++    "sendRetry": "다시 보내기",
++    "sendDismiss": "버리기"
    },
    "agentReview": {
      "running": "이 Session을 검토하는 중",
 diff --git a/desktop/src/locales/zh-TW.json b/desktop/src/locales/zh-TW.json
-index 8d3c117f8c7a37b3631fe503cb8665ba3a20ae55..05bbeae89fd2d36d8315b9cc6b9041e325d6bcd8 100644
+index 8d3c117f8c7a37b3631fe503cb8665ba3a20ae55..c514b4165073d74f022a176df855ea51ea97c7c5 100644
 --- a/desktop/src/locales/zh-TW.json
 +++ b/desktop/src/locales/zh-TW.json
-@@ -657,7 +657,12 @@
+@@ -657,7 +657,15 @@
      "queuedSendFailed": "排隊訊息發送失敗",
      "queuedRetry": "重試",
      "queuedInsertWaiting": "正在等待目前回答開始，請稍候再插入",
@@ -2637,15 +3117,18 @@ index 8d3c117f8c7a37b3631fe503cb8665ba3a20ae55..05bbeae89fd2d36d8315b9cc6b9041e3
 +    "deliveryChecking": "結果未知，正在核對",
 +    "deliveryUnknown": "結果未知，核對未完成",
 +    "deliveryRunUnknown": "訊息已接收，執行結果仍未知",
-+    "recheckDelivery": "重新核對"
++    "recheckDelivery": "重新核對",
++    "sendNotAccepted": "未傳送：伺服器未接受這則訊息",
++    "sendRetry": "重試傳送",
++    "sendDismiss": "放棄"
    },
    "agentReview": {
      "running": "正在審閱目前對話",
 diff --git a/desktop/src/locales/zh.json b/desktop/src/locales/zh.json
-index 4f3e2ddc60aefa1e7681d78b5592d41ba8287357..7bf7ae1e65834e636b194ba49e37431312b811d0 100644
+index 4f3e2ddc60aefa1e7681d78b5592d41ba8287357..e85afef0434cc0d828ea25dc364a984c3f707567 100644
 --- a/desktop/src/locales/zh.json
 +++ b/desktop/src/locales/zh.json
-@@ -657,7 +657,12 @@
+@@ -657,7 +657,15 @@
      "queuedSendFailed": "排队消息发送失败",
      "queuedRetry": "重试",
      "queuedInsertWaiting": "正在等待当前回答开始，请稍候再插入",
@@ -2655,7 +3138,10 @@ index 4f3e2ddc60aefa1e7681d78b5592d41ba8287357..7bf7ae1e65834e636b194ba49e374313
 +    "deliveryChecking": "结果未知，正在核对",
 +    "deliveryUnknown": "结果未知，核对未完成",
 +    "deliveryRunUnknown": "消息已接收，运行结果仍未知",
-+    "recheckDelivery": "重新核对"
++    "recheckDelivery": "重新核对",
++    "sendNotAccepted": "未发送：服务器未接受这条消息",
++    "sendRetry": "重试发送",
++    "sendDismiss": "放弃"
    },
    "agentReview": {
      "running": "正在审阅当前对话",
@@ -4291,27 +4777,40 @@ index 572e22223b8365192c802162e02de1e62a75d19d..3bbe40bf2a472c4e84d5898078757f0e
          renderFragment: active ? renderStreamingMarkdown : renderMarkdown,
        })).html
 diff --git a/desktop/src/react/components/chat/UserMessage.tsx b/desktop/src/react/components/chat/UserMessage.tsx
-index 7fb88ea0fa4cad63fd055b98ce699877c531b2ca..c3ca6e70ce2315b0b2c0d06c268da16649b2346f 100644
+index 7fb88ea0fa4cad63fd055b98ce699877c531b2ca..d1a5b98f62906eb5fa96e7ac9380d0b57ee6fc9d 100644
 --- a/desktop/src/react/components/chat/UserMessage.tsx
 +++ b/desktop/src/react/components/chat/UserMessage.tsx
 @@ -13,6 +13,7 @@ import { FolderIcon } from '../shared/FolderIcon';
  import type { ChatMessage, UserAttachment, DeskContext } from '../../stores/chat-types';
  import type { KnowledgeRetrievalStats } from '../../../../../shared/knowledge-refs.ts';
  import { useStore } from '../../stores';
-+import { reconcileComposerSession } from '../../services/composer-send-coordinator';
++import { discardRejectedUserMessage, reconcileComposerSession, retryRejectedUserMessage } from '../../services/composer-send-coordinator';
  import { selectSelectedIdsBySession } from '../../stores/session-selectors';
  import { extractSelectedTexts } from '../../utils/message-text';
  import { openFilePreview } from '../../utils/file-preview';
-@@ -110,6 +111,8 @@ export const UserMessage = memo(function UserMessage({
+@@ -110,6 +111,21 @@ export const UserMessage = memo(function UserMessage({
    }, [message.id, sessionPath]);
  
    const isReviewTurn = !!message.agentReview || !!message.agentReviewRequest;
 +  const unresolvedDelivery = message.sendError?.startsWith('delivery_unknown')
 +    || message.sendError === 'delivery_run_unknown';
++  // 服务端明确拒绝（C01）：与「结果未知」分开——内容未被接受，保留快照供显式
++  // 重试（同逻辑身份、新尝试身份）或放弃。修正类拒绝（媒体超限等）不给重试，
++  // 提示修改内容后重新发送。
++  const rejectedSend = message.sendStatus === 'failed'
++    && !!message.sendError
++    && !message.sendError.startsWith('delivery_unknown')
++    && message.sendError !== 'delivery_run_unknown';
++  const handleRejectedRetry = useCallback(() => {
++    void retryRejectedUserMessage(sessionPath, message.id);
++  }, [message.id, sessionPath]);
++  const handleRejectedDiscard = useCallback(() => {
++    discardRejectedUserMessage(sessionPath, message.id);
++  }, [message.id, sessionPath]);
    const turnTarget = useMemo<SessionNodeTarget | null>(() => (
      message.sourceEntryId
        ? { role: 'user', entryId: message.sourceEntryId }
-@@ -117,7 +120,7 @@ export const UserMessage = memo(function UserMessage({
+@@ -117,7 +133,7 @@ export const UserMessage = memo(function UserMessage({
    ), [message.sourceEntryId]);
    const { actions: nodeActions, busy: nodeActionBusy } = useSessionNodeActions({
      sessionPath,
@@ -4320,7 +4819,7 @@ index 7fb88ea0fa4cad63fd055b98ce699877c531b2ca..c3ca6e70ce2315b0b2c0d06c268da166
      retryMessage: message,
      onForkCreated,
      disabled: isStreaming,
-@@ -155,7 +158,7 @@ export const UserMessage = memo(function UserMessage({
+@@ -155,7 +171,7 @@ export const UserMessage = memo(function UserMessage({
  
    // Retry and fork preserve the recorded review envelope. Inline text editing remains
    // unavailable because changing only its text would no longer match that snapshot.
@@ -4329,7 +4828,7 @@ index 7fb88ea0fa4cad63fd055b98ce699877c531b2ca..c3ca6e70ce2315b0b2c0d06c268da166
    const timeText = formatMessageTime(message.timestamp);
    const editingActions: MessageFooterAction[] = useMemo(() => [
      {
-@@ -209,6 +212,17 @@ export const UserMessage = memo(function UserMessage({
+@@ -209,6 +225,29 @@ export const UserMessage = memo(function UserMessage({
            />
          </div>
        )}
@@ -4344,14 +4843,44 @@ index 7fb88ea0fa4cad63fd055b98ce699877c531b2ca..c3ca6e70ce2315b0b2c0d06c268da166
 +            onClick={() => { void reconcileComposerSession(sessionPath); }}>{t('input.recheckDelivery')}</button>
 +        </div>
 +      )}
++      {rejectedSend && (
++        <div role="alert" data-testid="send-rejected-banner">
++          <span>{t('input.sendNotAccepted')}</span>
++          {message.sendRetryable !== false && (
++            <button type="button" disabled={isStreaming || busy}
++              onClick={handleRejectedRetry}
++              data-testid="send-rejected-retry">{t('input.sendRetry')}</button>
++          )}
++          <button type="button" onClick={handleRejectedDiscard}
++            data-testid="send-rejected-discard">{t('input.sendDismiss')}</button>
++        </div>
++      )}
        {message.quotedText && (
          <div className={styles.userAttachments}>
            <AttachmentChip
 diff --git a/desktop/src/react/components/input/composer-send.ts b/desktop/src/react/components/input/composer-send.ts
-index e14db866c303d8f092922abd78005868885445aa..d2cac19b1880b61ef204ce945bcede6979815d44 100644
+index e14db866c303d8f092922abd78005868885445aa..626de249cd014862bf76028df263948f5680bca4 100644
 --- a/desktop/src/react/components/input/composer-send.ts
 +++ b/desktop/src/react/components/input/composer-send.ts
-@@ -137,6 +137,7 @@ export type ComposerPrepareOutcome =
+@@ -43,6 +43,17 @@ export function createClientUserMessageId(): string {
+   return `client-user-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+ }
+ 
++/**
++ * 每次提交尝试的唯一身份（C01）：同一逻辑消息（clientMessageId）同版本重试会
++ * 复用消息身份，但每次 ws.send 都是独立尝试。服务端拒绝回执带上的尝试身份，
++ * 让第一次尝试迟到的负回执不会错误结算第二次尝试。
++ */
++export function createClientAttemptId(): string {
++  const uuid = globalThis.crypto?.randomUUID?.();
++  if (uuid) return `client-attempt-${uuid}`;
++  return `client-attempt-${Date.now()}-${Math.random().toString(36).slice(2)}`;
++}
++
+ export function chatVideoMimeTypeForName(name: string, fallback?: string): string {
+   if (fallback?.startsWith('video/')) return fallback;
+   const ext = name.toLowerCase().replace(/^.*\./, '');
+@@ -137,6 +148,7 @@ export type ComposerPrepareOutcome =
  export interface ComposerPrepareOptions extends ComposerSendOptions {
    /** 复用既有逻辑消息身份（租约/重试）；缺省生成新 clientMessageId。 */
    clientMessageId?: string;
@@ -4359,7 +4888,7 @@ index e14db866c303d8f092922abd78005868885445aa..d2cac19b1880b61ef204ce945bcede69
  }
  
  function webSocketOpenOrMissing(): 'open' | 'unavailable' {
-@@ -445,6 +446,7 @@ export async function prepareComposerSend(
+@@ -445,6 +457,7 @@ export async function prepareComposerSend(
    const wsMsg: Record<string, unknown> = {
      type: bundle.type,
      clientMessageId,
@@ -4367,6 +4896,34 @@ index e14db866c303d8f092922abd78005868885445aa..d2cac19b1880b61ef204ce945bcede69
      text: finalText,
      sessionId: sessionRef.sessionId,
      sessionPath: sessionPathForSend,
+@@ -490,6 +503,8 @@ export interface ComposerCommitRuntime {
+   revalidate?: () => ComposerPreSubmitResult | null;
+   /** 复核通过后、乐观消息创建前的同步钩子（InputArea 的输入清理）。 */
+   onCommit?: () => void;
++  /** 本次提交尝试的唯一身份：随载荷发给服务端，拒绝回执按它关联（C01）。 */
++  attemptId?: string | null;
+ }
+ 
+ /**
+@@ -508,13 +523,17 @@ export async function commitPreparedComposerSend(
+   if (rejection) return rejection;
+ 
+   const ws = getWebSocket();
+-  if (!ws || (typeof ws.readyState === 'number' && ws.readyState !== WebSocket.OPEN)) {
++  if (!ws || (typeof ws.readyState === "number" && ws.readyState !== WebSocket.OPEN)) {
+     return { kind: 'failed_before_submit', code: 'websocket_unavailable', retryable: true };
+   }
+ 
+   // 复核通过：内容随派发落定，调用方做输入清理（草稿/附件/引用/编辑器）。
+   runtime.onCommit?.();
+ 
++  // 尝试身份在真正发送前落进载荷：一次 commit = 一次尝试 = 一个 attemptId。
++  if (runtime.attemptId) prepared.wsMsg.clientAttemptId = runtime.attemptId;
++  else delete prepared.wsMsg.clientAttemptId;
++
+   useStore.getState().appendOptimisticUserMessage(sessionPathForSend, prepared.optimisticMessage as never);
+   try {
+     ws.send(JSON.stringify(prepared.wsMsg));
 diff --git a/desktop/src/react/components/input/input-editor-extensions.ts b/desktop/src/react/components/input/input-editor-extensions.ts
 index 776848306c41c7e670f6cd08d5b4aac372e5b948..8ed2fcf94e949efe0cfbb26cd1ec4362e8ef4234 100644
 --- a/desktop/src/react/components/input/input-editor-extensions.ts
@@ -4382,7 +4939,7 @@ index 776848306c41c7e670f6cd08d5b4aac372e5b948..8ed2fcf94e949efe0cfbb26cd1ec4362
      ChatInputBold,
      Placeholder.configure({ placeholder }),
 diff --git a/desktop/src/react/services/composer-send-coordinator.ts b/desktop/src/react/services/composer-send-coordinator.ts
-index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a6779ca2a 100644
+index 3a6c1656e20f55c1384d70862c64b8031517ffc6..968a56b4c5c6554ea45e28104953bc374fa662eb 100644
 --- a/desktop/src/react/services/composer-send-coordinator.ts
 +++ b/desktop/src/react/services/composer-send-coordinator.ts
 @@ -6,8 +6,8 @@
@@ -4396,7 +4953,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
   * - 队列项是快照持有者：prepare 前不删除；失败原位标 blocked/failed；
   *   编辑/删除会取消在途准备，迟到的结果不得发送。
   *
-@@ -16,6 +16,7 @@
+@@ -16,11 +16,13 @@
   */
  
  import { useStore } from '../stores';
@@ -4404,7 +4961,29 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
  import { sessionScopedKey, sessionScopedListIncludes, sessionScopedValue } from '../stores/session-slice';
  import { isSessionCompacting } from '../stores/context-slice';
  import type { ComposerSendBundle, QueuedTurnInput } from '../stores/chat-types';
-@@ -51,6 +52,7 @@ export interface ComposerSendRecord {
+ import {
+   commitPreparedComposerSend,
++  createClientAttemptId,
+   createClientUserMessageId,
+   prepareComposerSend,
+   type ComposerDispatchResult,
+@@ -42,15 +44,22 @@ export type ComposerSendPhase =
+   | 'accepted'
+   | 'blocked'
+   | 'failed_before_submit'
+-  | 'delivery_unknown';
++  | 'delivery_unknown'
++  /** 服务端在接受前明确拒绝（C01）：内容未被持久化，保留快照可显式重试。 */
++  | 'rejected_before_acceptance';
+ 
+ export interface ComposerSendRecord {
+   leaseId: string;
+   clientMessageId: string;
+   queueItemId: string | null;
++  /** 派发时队列项在队列中的位置：transport_submitted 出队后拒绝时按它原位恢复（C01）。 */
++  queueItemIndex: number | null;
++  /** 队列项原 createdAt：恢复时保留原逻辑身份与时间线。 */
++  queueItemCreatedAt: number | null;
    identity: ComposerSessionIdentity;
    /** 取得租约时的连接代次；代次不匹配的准备任务禁止向新连接发送旧载荷。 */
    connectionGeneration: number;
@@ -4412,7 +4991,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
    snapshotVersion: number;
    composerRevisionAtClick: number | null;
    bundle: ComposerSendBundle;
-@@ -60,11 +62,19 @@ export interface ComposerSendRecord {
+@@ -60,11 +69,23 @@ export interface ComposerSendRecord {
    code: string | null;
    retryable: boolean;
    cancelled: boolean;
@@ -4423,8 +5002,12 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
     * 可能尚未回流，revalidate 不得把「投影缺席」误判为会话已删除。
     */
    identityFreshlyCreated?: boolean;
-+  acceptance: 'unproven' | 'accepted';
++  acceptance: 'unproven' | 'accepted' | 'rejected';
 +  runStatus: 'run_unknown' | 'running' | 'terminal' | 'reconciled_idle';
++  /** 最近一次 transport_submitted 的尝试身份；拒绝回执按它关联（C01）。 */
++  activeAttemptId: string | null;
++  /** 已观察过的尝试身份：重复/迟到回执按集合判定，不按时间先后猜归属。 */
++  seenAttemptIds: Set<string>;
 +  sourceEntryId?: string;
 +  observedRunId?: string;
 +  observedRunSeq?: number;
@@ -4432,7 +5015,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
    ackTimer: ReturnType<typeof setTimeout> | null;
  }
  
-@@ -79,7 +89,7 @@ export interface AcquireSendLeaseInput {
+@@ -79,7 +100,7 @@ export interface AcquireSendLeaseInput {
  
  export type AcquireSendLeaseResult =
    | { ok: true; leaseId: string }
@@ -4441,7 +5024,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
  
  export interface ComposerSendFlowDeps extends ComposerSendOptions {
    /** 复核通过后、乐观消息创建前的同步钩子（InputArea 的输入清理）。 */
-@@ -100,15 +110,89 @@ const ACK_TIMEOUT_MS = 15_000;
+@@ -100,15 +121,89 @@ const ACK_TIMEOUT_MS = 15_000;
  /** 队列自动续发的视觉缓冲；计时结束后仍重新验证状态并同步取得租约。 */
  const QUEUE_FLUSH_DEBOUNCE_MS = 400;
  const MAX_RETAINED_RECORDS = 200;
@@ -4534,7 +5117,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
  }
  
  function pruneRecords(): void {
-@@ -117,7 +201,7 @@ function pruneRecords(): void {
+@@ -117,7 +212,7 @@ function pruneRecords(): void {
    for (const [leaseId, record] of recordsByLease) {
      if (recordsByLease.size <= MAX_RETAINED_RECORDS) break;
      if (activeLeaseIds.has(leaseId)) continue;
@@ -4543,7 +5126,17 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
      if (record.ackTimer) clearTimeout(record.ackTimer);
      recordsByLease.delete(leaseId);
    }
-@@ -151,6 +235,7 @@ function markAwaitingAck(record: ComposerSendRecord): void {
+@@ -144,13 +239,16 @@ function settleRecord(
+   releaseSendLease(record.leaseId);
+ }
+ 
+-function markAwaitingAck(record: ComposerSendRecord): void {
++function markAwaitingAck(record: ComposerSendRecord, attemptId: string): void {
+   if (record.phase !== 'preparing') return;
+   record.phase = 'awaiting_ack';
++  record.activeAttemptId = attemptId;
++  record.seenAttemptIds.add(attemptId);
+   record.ackTimer = setTimeout(() => {
      record.ackTimer = null;
      if (record.phase !== 'awaiting_ack') return;
      transitionToDeliveryUnknown(record, 'ack_timeout');
@@ -4551,7 +5144,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
    }, ACK_TIMEOUT_MS);
    // DOM 版 setTimeout 返回 number，unref 仅 Node 存在；两端都安全。
    (record.ackTimer as unknown as { unref?: () => void }).unref?.();
-@@ -175,13 +260,17 @@ function transitionToDeliveryUnknown(record: ComposerSendRecord, code: string):
+@@ -175,29 +273,51 @@ function transitionToDeliveryUnknown(record: ComposerSendRecord, code: string):
  
  export function tryAcquireSendLease(input: AcquireSendLeaseInput): AcquireSendLeaseResult {
    const key = identityKey(input.identity);
@@ -4564,6 +5157,9 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
 -  // 同一队列项的重试/类型切换复用原 clientMessageId：一条逻辑消息一个身份。
 +  // 同一队列项同版本的重试/类型切换复用身份；编辑改变版本后创建新身份。
    let clientMessageId: string | null = null;
++  // 队列项快照位置：transport_submitted 出队后收到拒绝时，按原位恢复为失败输入。
++  let queueItemIndex: number | null = null;
++  let queueItemCreatedAt: number | null = null;
    if (input.queueItemId) {
      for (const record of recordsByLease.values()) {
 -      if (record.queueItemId === input.queueItemId) {
@@ -4572,8 +5168,22 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
          clientMessageId = record.clientMessageId;
          break;
        }
-@@ -193,11 +282,14 @@ export function tryAcquireSendLease(input: AcquireSendLeaseInput): AcquireSendLe
+     }
++    if (input.identity.kind === 'session') {
++      const items = sessionScopedValue(useStore.getState(), useStore.getState().queuedTurnInputsByPath, input.identity.sessionPath) || [];
++      const index = items.findIndex(item => item.id === input.queueItemId);
++      if (index >= 0) {
++        queueItemIndex = index;
++        queueItemCreatedAt = items[index].createdAt ?? null;
++      }
++    }
+   }
+   const record: ComposerSendRecord = {
+     leaseId,
+     clientMessageId: clientMessageId ?? createClientUserMessageId(),
      queueItemId: input.queueItemId ?? null,
++    queueItemIndex,
++    queueItemCreatedAt,
      identity: input.identity,
      connectionGeneration,
 +    originConnectionKey: composerOriginConnectionKey(),
@@ -4584,10 +5194,12 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
      phase: 'preparing',
 +    acceptance: 'unproven',
 +    runStatus: 'run_unknown',
++    activeAttemptId: null,
++    seenAttemptIds: new Set(),
      code: null,
      retryable: false,
      cancelled: false,
-@@ -216,7 +308,7 @@ export function transferLeaseIdentity(leaseId: string, next: ComposerSessionIden
+@@ -216,7 +336,7 @@ export function transferLeaseIdentity(leaseId: string, next: ComposerSessionIden
    const nextKey = identityKey(next);
    const occupant = activeLeaseByKey.get(nextKey);
    if (occupant && occupant !== leaseId) return false;
@@ -4596,7 +5208,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
    activeLeaseByKey.set(nextKey, leaseId);
    record.identity = next;
    record.identityFreshlyCreated = true;
-@@ -247,16 +339,18 @@ export function cancelSendLease(leaseId: string, code = 'send_cancelled'): void
+@@ -247,16 +367,18 @@ export function cancelSendLease(leaseId: string, code = 'send_cancelled'): void
    }
  }
  
@@ -4618,7 +5230,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
  }
  
  export function getSendRecord(leaseId: string): ComposerSendRecord | null {
-@@ -264,7 +358,7 @@ export function getSendRecord(leaseId: string): ComposerSendRecord | null {
+@@ -264,7 +386,7 @@ export function getSendRecord(leaseId: string): ComposerSendRecord | null {
  }
  
  export function findSendRecordByClientMessageId(clientMessageId: string): ComposerSendRecord | null {
@@ -4627,7 +5239,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
    // 优先返回仍在等待回执/投递未知的活跃记录，其次才是最新一条历史记录。
    let latest: ComposerSendRecord | null = null;
    for (const record of recordsByLease.values()) {
-@@ -283,10 +377,12 @@ export function getComposerConnectionGeneration(): number {
+@@ -283,10 +405,12 @@ export function getComposerConnectionGeneration(): number {
  
  export function noteComposerConnectionOpened(): void {
    connectionGeneration += 1;
@@ -4640,7 +5252,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
    // 断线后再不会有回执：在途 awaiting_ack 一律转 delivery_unknown，禁止自动重发。
    for (const record of recordsByLease.values()) {
      if (record.phase !== 'awaiting_ack') continue;
-@@ -298,19 +394,179 @@ export function noteComposerConnectionClosed(): void {
+@@ -298,19 +422,336 @@ export function noteComposerConnectionClosed(): void {
    }
  }
  
@@ -4682,6 +5294,161 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
 +  return record.phase === 'awaiting_ack' || record.phase === 'delivery_unknown'
 +    || record.phase === 'accepted' && !['terminal', 'reconciled_idle'].includes(record.runStatus);
 +}
++
++// ── 类型化拒绝结算（C01）──
++
++export interface ComposerInputRejectionEvidence {
++  originConnectionKey: string;
++  sessionId: string;
++  sessionPath: string;
++  clientMessageId: string;
++  snapshotVersion: number;
++  clientAttemptId?: string | null;
++}
++
++export interface ComposerInputRejectionReceipt {
++  code: string;
++  retryable: boolean;
++}
++
++/**
++ * 服务端「接受前拒绝」的统一结算入口（ws-message-handler 调用）：
++ * - 身份五元组（连接/会话/消息/快照/尝试）全匹配才结算；跨服务器、跨会话、
++ *   错误版本、旧尝试的回执一律无效果。
++ * - 已有 canonical 接受证据时不倒退为未接收（冲突回执保留诊断）。
++ * - 幂等：已结算记录不被重复回执改动；迟到的 HTTP 对账也不能覆盖。
++ * - 只释放这一条记录的租约与未决屏障；传输史（已执行 ws.send 的尝试）不改写。
++ */
++export function noteComposerInputRejected(
++  evidence: ComposerInputRejectionEvidence,
++  receipt: ComposerInputRejectionReceipt,
++): boolean {
++  if (!evidence.clientMessageId || !Number.isSafeInteger(evidence.snapshotVersion)) return false;
++  const candidates = [...recordsByLease.values()].filter(record => record.clientMessageId === evidence.clientMessageId
++    && record.originConnectionKey === evidence.originConnectionKey
++    && record.identity.kind === 'session'
++    && record.identity.sessionId === evidence.sessionId
++    && record.identity.sessionPath === evidence.sessionPath
++    && record.snapshotVersion === evidence.snapshotVersion);
++  if (!candidates.length) return false;
++  // canonical 接受证据优先：冲突负回执不倒退，保留诊断。
++  if (candidates.some(record => record.acceptance === 'accepted')) {
++    console.warn('[composer-send] conflicting input_rejected after canonical acceptance; keeping accepted', {
++      clientMessageId: evidence.clientMessageId,
++      attemptId: evidence.clientAttemptId ?? null,
++      code: receipt.code,
++    });
++    return false;
++  }
++  const attemptId = typeof evidence.clientAttemptId === 'string' && evidence.clientAttemptId ? evidence.clientAttemptId : null;
++  // 尝试身份匹配：带 attemptId 的回执只结算对应尝试；旧尝试的迟到回执不碰新尝试。
++  const settleable = candidates.filter(record => record.phase === 'awaiting_ack' || record.phase === 'delivery_unknown');
++  const matched = attemptId
++    ? settleable.filter(record => record.activeAttemptId === attemptId)
++    : settleable;
++  if (!matched.length) return false;
++  const settled: ComposerSendRecord[] = [];
++  for (const record of matched) {
++    if (record.ackTimer) {
++      clearTimeout(record.ackTimer);
++      record.ackTimer = null;
++    }
++    record.phase = 'rejected_before_acceptance';
++    record.acceptance = 'rejected';
++    record.code = receipt.code;
++    record.retryable = receipt.retryable !== false;
++    releaseSendLease(record.leaseId);
++    settled.push(record);
++  }
++  for (const record of settled) {
++    if (record.identity.kind !== 'session') continue;
++    const sessionPath = record.identity.sessionPath;
++    // 现有失败展示：乐观消息标失败（正文/附件/引用/知识范围全部原样保留）。
++    useStore.getState().markOptimisticUserMessageFailed(
++      sessionPath,
++      record.clientMessageId,
++      receipt.code,
++      record.retryable,
++    );
++    // 队列项已在 transport_submitted 时出队：原位恢复为可见、可处置的失败输入，
++    // 保留原逻辑身份与顺序；后续排队项不越过失败项（flush 的队首门禁已保证）。
++    restoreQueueItemAfterRejection(record);
++  }
++  return true;
++}
++
++function restoreQueueItemAfterRejection(record: ComposerSendRecord): void {
++  if (!record.queueItemId || record.identity.kind !== 'session') return;
++  const sessionPath = record.identity.sessionPath;
++  const store = useStore.getState();
++  const items = sessionScopedValue(store as never, store.queuedTurnInputsByPath, sessionPath) || [];
++  if (items.some(item => item.id === record.queueItemId)) return;
++  const restored: QueuedTurnInput = {
++    id: record.queueItemId,
++    sessionPath,
++    text: record.bundle.text,
++    createdAt: record.queueItemCreatedAt ?? Date.now(),
++    bundle: record.bundle,
++    snapshotVersion: record.snapshotVersion,
++    status: 'failed',
++    errorCode: record.code ?? undefined,
++    retryable: record.retryable,
++  };
++  store.restoreQueuedTurnInput(sessionPath, restored, record.queueItemIndex ?? items.length);
++}
++
++/** 显式重试被拒绝的用户消息：同一逻辑身份、新尝试身份（C01）。 */
++export async function retryRejectedUserMessage(
++  sessionPath: string,
++  clientMessageId: string,
++  deps?: ComposerSendFlowDeps,
++): Promise<ComposerDispatchResult | null> {
++  const record = findRejectedRecordByClientMessageId(sessionPath, clientMessageId);
++  if (!record) return null;
++  return retrySendRecord(record.leaseId, deps ?? defaultComposerSendFlowDeps());
++}
++
++/** 明确放弃被拒绝的输入：取消记录、移除失败投影（消息与队列项同源处置）。 */
++export function discardRejectedUserMessage(sessionPath: string, clientMessageId: string): boolean {
++  const record = findRejectedRecordByClientMessageId(sessionPath, clientMessageId);
++  if (!record) return false;
++  record.cancelled = true;
++  const store = useStore.getState();
++  if (record.queueItemId && record.identity.kind === 'session'
++    && record.identity.sessionPath === sessionPath) {
++    cancelQueueItemSend(record.queueItemId, 'send_cancelled');
++    store.removeQueuedTurnInput(sessionPath, record.queueItemId);
++  }
++  store.removeOptimisticUserMessage(sessionPath, clientMessageId);
++  return true;
++}
++
++function findRejectedRecordByClientMessageId(sessionPath: string, clientMessageId: string): ComposerSendRecord | null {
++  for (const record of recordsByLease.values()) {
++    if (record.clientMessageId !== clientMessageId || record.phase !== 'rejected_before_acceptance') continue;
++    if (record.identity.kind !== 'session' || record.identity.sessionPath !== sessionPath) continue;
++    return record;
++  }
++  return null;
++}
++
++/** 消息级重试的默认依赖：视觉辅助配置与 i18n 不依赖 InputArea 闭包。 */
++export function defaultComposerSendFlowDeps(): ComposerSendFlowDeps {
++  return {
++    loadVisionAuxiliaryConfig: async () => {
++      try {
++        const { lingxiFetch } = await import('../hooks/use-hana-fetch');
++        const res = await lingxiFetch('/api/preferences/models');
++        const data = await res.json();
++        return { enabled: data?.models?.vision_enabled === true, model: data?.models?.vision || null };
++      } catch {
++        return { enabled: false, model: null };
++      }
++    },
++    t: (key: string, params?: Record<string, string | number>) =>
++      (window.t ?? ((fallback: string) => fallback))(key, params as Record<string, string> | undefined),
++  };
++}
 +function unresolvedForKey(key: string): ComposerSendRecord[] {
 +  return [...recordsByLease.values()].filter(record => isUnresolved(record)
 +    && identityKey(record.identity, record.originConnectionKey) === key);
@@ -4721,6 +5488,8 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
 +  if (message.type === 'assistant_run_end' && unresolvedForKey(key).length) void reconcileComposerSession(message.sessionPath);
 +}
 +function updateReconciliationDisplay(record: ComposerSendRecord, checking: boolean): void {
++  // 已确定的拒绝结果不被迟到的对账展示覆盖（HTTP 对账晚于类型化负回执到达时）。
++  if (record.phase === 'rejected_before_acceptance') return;
 +  record.reconciliationStatus = checking ? 'checking' : 'failed';
 +  if (record.identity.kind === 'session') useStore.getState().markOptimisticUserMessageFailed(
 +    record.identity.sessionPath, record.clientMessageId, checking ? 'delivery_unknown_checking' : 'delivery_unknown_failed');
@@ -4807,14 +5576,14 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
 +      if (!oldest || seen.has(oldest)) throw new Error('history_pagination_incomplete');
 +      seen.add(oldest); before = oldest;
 +    }
-+    for (const record of records) if (record.acceptance !== 'accepted') {
++    for (const record of records) if (record.acceptance !== 'accepted' && record.phase !== 'rejected_before_acceptance') {
 +      record.code = 'history_incomplete_or_unproven'; updateReconciliationDisplay(record, false);
 +    }
 +  }).catch(error => {
 +    if (!valid() && !controller.signal.aborted) return;
 +    if (generation !== connectionGeneration || composerOriginConnectionKey() !== scope.originConnectionKey) return;
 +    for (const record of records) {
-+      if (!isUnresolved(record) || (eventRevisions.get(key) ?? 0) !== revision) continue;
++      if (record.phase === 'rejected_before_acceptance' || !isUnresolved(record) || (eventRevisions.get(key) ?? 0) !== revision) continue;
 +      record.code = controller.signal.aborted ? 'reconciliation_timeout' : String(error?.message || 'reconciliation_failed');
 +      updateReconciliationDisplay(record, false);
 +    }
@@ -4829,7 +5598,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
  }
  
  // ── 提交复核 ──
-@@ -338,13 +594,16 @@ function revalidateLeaseCommit(
+@@ -338,13 +779,16 @@ function revalidateLeaseCommit(
    if (record.cancelled || record.phase !== 'preparing') {
      return { kind: 'failed_before_submit', code: record.code ?? 'send_cancelled', retryable: true };
    }
@@ -4848,7 +5617,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
    if (record.identity.kind === 'session') {
      const { sessionId, sessionPath } = record.identity;
      const state = useStore.getState();
-@@ -363,6 +622,12 @@ function revalidateLeaseCommit(
+@@ -363,6 +807,12 @@ function revalidateLeaseCommit(
        return { kind: 'blocked', code: 'session_deleted', retryable: false };
      }
    }
@@ -4861,7 +5630,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
    // 模型在准备期间变更：载荷按旧模型预检，拒绝；重试会按新模型重新预检。
    const sessionPath = record.identity.kind === 'session' ? record.identity.sessionPath : prepared.sessionPathForSend;
    if (prepared.modelKey !== currentModelKeyForSession(sessionPath)) {
-@@ -397,7 +662,7 @@ function syncQueueItemAfterSend(record: ComposerSendRecord, result: ComposerDisp
+@@ -397,7 +847,7 @@ function syncQueueItemAfterSend(record: ComposerSendRecord, result: ComposerDisp
    const store = useStore.getState();
    const items = sessionScopedValue(store as never, store.queuedTurnInputsByPath, sessionPath) || [];
    const current = items.find(item => item.id === record.queueItemId);
@@ -4870,7 +5639,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
    // 发送途中被编辑（快照版本递增）：迟到结果不得覆盖新快照的状态。
    if ((current.snapshotVersion ?? 1) !== record.snapshotVersion) return;
    if (result.kind === 'transport_submitted') {
-@@ -438,7 +703,7 @@ export async function sendWithLease(
+@@ -438,7 +888,7 @@ export async function sendWithLease(
  
    let prep: ComposerPrepareOutcome;
    try {
@@ -4879,23 +5648,40 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
    } catch (err) {
      // 程序异常归入明确阶段并保留诊断，不冒充网络错误。
      console.error('[composer-send] prepare threw', err);
-@@ -465,12 +730,13 @@ export async function sendWithLease(
+@@ -463,31 +913,35 @@ export async function sendWithLease(
+     return prep.result;
+   }
  
++  const attemptId = createClientAttemptId();
    const result = await commitPreparedComposerSend(prep.prepared, {
      t: deps.t,
 -    onCommit: deps.onCommit ?? undefined,
++    attemptId,
 +    onCommit: () => { record.commitStarted = true; deps.onCommit?.(); },
      revalidate: () => revalidateLeaseCommit(record, prep.prepared),
    });
    if (result.kind === 'transport_submitted') {
-     markAwaitingAck(record);
+-    markAwaitingAck(record);
++    markAwaitingAck(record, attemptId);
    } else {
 +    record.commitStarted = false;
      settleRecord(record, result.kind === 'blocked' ? 'blocked' : 'failed_before_submit', result.code, result.retryable);
    }
    syncQueueItemAfterSend(record, result);
-@@ -487,7 +753,7 @@ export async function retrySendRecord(
-   if ((record.phase !== 'failed_before_submit' && record.phase !== 'blocked') || !record.retryable) {
+   return result;
+ }
+ 
+-/** 显式重试：仅允许「明确未发送」的记录（blocked/failed_before_submit 且可重试）。 */
++/** 显式重试：仅允许「明确未发送/未接受」的记录（blocked / failed_before_submit /
++ *  rejected_before_acceptance 且可重试）。 */
+ export async function retrySendRecord(
+   leaseId: string,
+   deps: ComposerSendFlowDeps,
+ ): Promise<ComposerDispatchResult | null> {
+   const record = recordsByLease.get(leaseId);
+   if (!record) return null;
+-  if ((record.phase !== 'failed_before_submit' && record.phase !== 'blocked') || !record.retryable) {
++  if ((record.phase !== 'failed_before_submit' && record.phase !== 'blocked' && record.phase !== 'rejected_before_acceptance') || !record.retryable) {
      return null;
    }
 -  const key = identityKey(record.identity);
@@ -4903,7 +5689,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
    if (activeLeaseByKey.has(key)) return null;
    activeLeaseByKey.set(key, leaseId);
    record.phase = 'preparing';
-@@ -505,6 +771,13 @@ export async function dispatchQueuedItem(
+@@ -505,6 +959,13 @@ export async function dispatchQueuedItem(
    deps: QueueFlushDeps,
  ): Promise<ComposerDispatchResult> {
    const ref = item.bundle.sessionRef;
@@ -4917,7 +5703,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
    const acq = tryAcquireSendLease({
      identity: { kind: 'session', sessionId: ref.sessionId, sessionPath: ref.sessionPath, agentId: ref.agentId },
      bundle: { ...item.bundle, type: dispatch.type },
-@@ -512,7 +785,7 @@ export async function dispatchQueuedItem(
+@@ -512,7 +973,7 @@ export async function dispatchQueuedItem(
      snapshotVersion: item.snapshotVersion ?? 1,
      targetRun: dispatch.targetRun ?? null,
    });
@@ -4926,7 +5712,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
    return sendWithLease(acq.leaseId, deps);
  }
  
-@@ -522,6 +795,7 @@ export async function dispatchQueuedItem(
+@@ -522,6 +983,7 @@ export async function dispatchQueuedItem(
  export async function flushQueuedHeadNow(sessionPath: string, deps: QueueFlushDeps): Promise<void> {
    const store = useStore.getState();
    if (!store.connected) return;
@@ -4934,7 +5720,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
    if (store.modelSwitching) return;
    if (store.pendingSessionSwitchPath) return;
    if (sessionScopedListIncludes(store as never, store.streamingSessions, sessionPath)) return;
-@@ -529,7 +803,7 @@ export async function flushQueuedHeadNow(sessionPath: string, deps: QueueFlushDe
+@@ -529,7 +991,7 @@ export async function flushQueuedHeadNow(sessionPath: string, deps: QueueFlushDe
    if (sessionScopedListIncludes(store as never, store.capabilityRefreshingSessions, sessionPath)) return;
    if (isSessionCompacting(store as never, sessionPath)) return;
    const item = (sessionScopedValue(store as never, store.queuedTurnInputsByPath, sessionPath) || [])[0];
@@ -4943,7 +5729,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
    // 失败/阻塞的队首原位保留：不无限循环，也不跳过队首导致后续乱序。
    if ((item.status ?? 'ready') !== 'ready') return;
    if (deps.shouldSkipItem?.(item)) return;
-@@ -540,18 +814,50 @@ export async function flushQueuedHeadNow(sessionPath: string, deps: QueueFlushDe
+@@ -540,18 +1002,50 @@ export async function flushQueuedHeadNow(sessionPath: string, deps: QueueFlushDe
   * 组件只发出调度意图；互斥状态由本模块持有。400ms 仅作视觉缓冲，
   * 计时结束后重新验证状态并同步取得租约（不把时长当正确性条件）。
   */
@@ -5002,7 +5788,7 @@ index 3a6c1656e20f55c1384d70862c64b8031517ffc6..a207342ba6d5da86671a5f5a2d4ef25a
  }
  
  /** 立即插入按钮的行为判定：不凭外观猜测（P3.4）。 */
-@@ -574,12 +880,16 @@ export function resetComposerSendCoordinatorForTests(): void {
+@@ -574,12 +1068,16 @@ export function resetComposerSendCoordinatorForTests(): void {
    for (const record of recordsByLease.values()) {
      if (record.ackTimer) clearTimeout(record.ackTimer);
    }
@@ -5075,7 +5861,7 @@ index 041663ccbbdf6b890951c5a08ff0f9550d5c2376..126bfb5836ea687464bd4d2e10d5fda9
      // 断连后再不会有后续事件来清「等待助手」pending；streamingSessions 保留
      // （重连 resume 靠它圈目标），pending 必须就地全清，否则挂出永久指示器。
 diff --git a/desktop/src/react/services/ws-message-handler.ts b/desktop/src/react/services/ws-message-handler.ts
-index eeea1d43465bfcabbcc5fe752bd0d1872b8fcde0..1f42922f9a36ddb5482118c8a47e0e4275d4111b 100644
+index eeea1d43465bfcabbcc5fe752bd0d1872b8fcde0..c8e7e41b5339ad6f4dff65e865f8194ffd92fb50 100644
 --- a/desktop/src/react/services/ws-message-handler.ts
 +++ b/desktop/src/react/services/ws-message-handler.ts
 @@ -42,7 +42,7 @@ import { renderMarkdown } from '../utils/markdown';
@@ -5083,7 +5869,7 @@ index eeea1d43465bfcabbcc5fe752bd0d1872b8fcde0..1f42922f9a36ddb5482118c8a47e0e42
  import { terminalOutputStream } from './terminal-output-stream';
  import { handleBackgroundProcessControlResult } from './background-process-control';
 -import { noteComposerServerAck } from './composer-send-coordinator';
-+import { noteComposerServerAck, noteComposerRunEvent, composerOriginConnectionKey, findSendRecordByClientMessageId } from './composer-send-coordinator';
++import { noteComposerServerAck, noteComposerRunEvent, noteComposerInputRejected, composerOriginConnectionKey, findSendRecordByClientMessageId } from './composer-send-coordinator';
  
  declare function t(key: string, vars?: Record<string, string>): any;
  
@@ -5123,11 +5909,72 @@ index eeea1d43465bfcabbcc5fe752bd0d1872b8fcde0..1f42922f9a36ddb5482118c8a47e0e42
        const serverMessageId = typeof msg.message.id === 'string' && msg.message.id
          ? msg.message.id
          : typeof msg.message.sourceEntryId === 'string' && msg.message.sourceEntryId
+@@ -1215,6 +1226,38 @@ export function handleServerMessage(msg: any): void {
+       break;
+     }
+ 
++    case 'input_rejected': {
++      // 服务端「接受前明确拒绝」的类型化回执（C01）：身份五元组由连接上下文 +
++      // 服务端解析字段组成，coordinator 完成匹配检查、状态转换与 UI 投影更新。
++      // 与 legacy error 独立——这里只结算发送记录，错误展示仍由 error 分支负责。
++      const { sessionId: rejectedSessionId, sessionPath: rejectedSessionPath } = sessionIdentityFromMessage(msg);
++      const clientMessageId = typeof msg.clientMessageId === 'string' && msg.clientMessageId.trim()
++        ? msg.clientMessageId.trim()
++        : null;
++      const snapshotVersion = Number.isSafeInteger(msg.snapshotVersion) ? msg.snapshotVersion : null;
++      if (!rejectedSessionId || !rejectedSessionPath || !clientMessageId || snapshotVersion == null) {
++        console.warn('[ws] input_rejected missing identity fields; ignoring', msg);
++        break;
++      }
++      if (msg.outcome !== 'not_accepted') {
++        console.warn('[ws] input_rejected with unknown outcome; ignoring', { outcome: msg.outcome });
++        break;
++      }
++      const receipt = {
++        code: typeof msg.code === 'string' && msg.code.trim() ? msg.code.trim() : 'rejected_before_acceptance',
++        retryable: msg.retryable === true,
++      };
++      noteComposerInputRejected({
++        originConnectionKey,
++        sessionId: rejectedSessionId,
++        sessionPath: rejectedSessionPath,
++        clientMessageId,
++        snapshotVersion,
++        clientAttemptId: typeof msg.clientAttemptId === 'string' && msg.clientAttemptId.trim() ? msg.clientAttemptId.trim() : null,
++      }, receipt);
++      break;
++    }
++
+     case 'error': {
+       const { sessionPath: sp } = sessionIdentityFromMessage(msg);
+       const presented = presentError(errorWithCode(
 diff --git a/desktop/src/react/stores/chat-slice.ts b/desktop/src/react/stores/chat-slice.ts
-index 4a3347fae299447fe47b491f016ffaae17ee2658..0c6833054262bbf49315a6686ea85c8ca843a8ae 100644
+index 4a3347fae299447fe47b491f016ffaae17ee2658..09348e028d63197ddcc552cfeb4878a587d67bdd 100644
 --- a/desktop/src/react/stores/chat-slice.ts
 +++ b/desktop/src/react/stores/chat-slice.ts
-@@ -214,7 +214,7 @@ export const createChatSlice = (
+@@ -31,7 +31,8 @@ export interface ChatSlice {
+   appendItem: (path: string, item: ChatListItem) => void;
+   appendOptimisticUserMessage: (path: string, message: ChatMessage) => void;
+   confirmOptimisticUserMessage: (path: string, clientMessageId: string, message: ChatMessage) => boolean;
+-  markOptimisticUserMessageFailed: (path: string, clientMessageId: string, error: string) => boolean;
++  markOptimisticUserMessageFailed: (path: string, clientMessageId: string, error: string, retryable?: boolean) => boolean;
++  removeOptimisticUserMessage: (path: string, clientMessageId: string) => boolean;
+   updateLastMessage: (path: string, updater: (msg: ChatMessage) => ChatMessage) => void;
+   updateMessageById: (path: string, messageId: string, updater: (msg: ChatMessage) => ChatMessage) => boolean;
+   bindPersistedTurnEntries: (path: string, entries: {
+@@ -74,6 +75,11 @@ export interface ChatSlice {
+   enqueueQueuedTurnInput: (path: string, item: QueuedTurnInput) => void;
+   updateQueuedTurnInputText: (path: string, id: string, text: string) => void;
+   removeQueuedTurnInput: (path: string, id: string) => void;
++  /**
++   * 拒绝后原位恢复队列项（C01）：transport_submitted 时已出队的项收到服务端
++   * 明确拒绝后，按原位置/原身份恢复为可见失败输入；同 id 已存在时幂等刷新状态。
++   */
++  restoreQueuedTurnInput: (path: string, item: QueuedTurnInput, index?: number | null) => void;
+   /** 显式标记队列项调度结果（blocked/failed/ready）；错误码与可重试性随状态记录。 */
+   setQueuedTurnInputStatus: (path: string, id: string, status: 'ready' | 'blocked' | 'failed', errorCode?: string, retryable?: boolean) => void;
+ }
+@@ -214,7 +220,7 @@ export const createChatSlice = (
        const targetIdx = session.items.findIndex((item) =>
          item.type === 'message' &&
          item.data.role === 'user' &&
@@ -5136,7 +5983,7 @@ index 4a3347fae299447fe47b491f016ffaae17ee2658..0c6833054262bbf49315a6686ea85c8c
        );
        if (targetIdx < 0) return {};
        const items = [...session.items];
-@@ -222,7 +222,8 @@ export const createChatSlice = (
+@@ -222,7 +228,8 @@ export const createChatSlice = (
        if (current.type !== 'message' || current.data.role !== 'user') return {};
        const nextData: ChatMessage = {
          ...current.data,
@@ -5146,7 +5993,16 @@ index 4a3347fae299447fe47b491f016ffaae17ee2658..0c6833054262bbf49315a6686ea85c8c
          id: current.data.id,
          // 回执/恢复回放不得覆盖用户原文：本地乐观文本是用户输入的逐字符快照（F1/F10），
          // 服务端回声只负责确认与补充元数据；本地文本为空（纯附件等）时才采用服务端文本。
-@@ -248,7 +249,7 @@ export const createChatSlice = (
+@@ -240,7 +247,7 @@ export const createChatSlice = (
+     return consumed;
+   },
+ 
+-  markOptimisticUserMessageFailed: (path, clientMessageId, error) => {
++  markOptimisticUserMessageFailed: (path, clientMessageId, error, retryable) => {
+     let consumed = false;
+     set((s) => {
+       const session = scopedMapValue<SessionMessages>(s as any, s.chatSessions, path);
+@@ -248,7 +255,7 @@ export const createChatSlice = (
        const targetIdx = session.items.findIndex((item) =>
          item.type === 'message' &&
          item.data.role === 'user' &&
@@ -5155,7 +6011,45 @@ index 4a3347fae299447fe47b491f016ffaae17ee2658..0c6833054262bbf49315a6686ea85c8c
        );
        if (targetIdx < 0) return {};
        const items = [...session.items];
-@@ -760,7 +761,7 @@ export const createChatSlice = (
+@@ -260,6 +267,7 @@ export const createChatSlice = (
+           ...current.data,
+           sendStatus: 'failed',
+           sendError: error,
++          ...(retryable !== undefined ? { sendRetryable: retryable } : {}),
+         },
+       };
+       consumed = true;
+@@ -271,6 +279,29 @@ export const createChatSlice = (
+     return consumed;
+   },
+ 
++  /** 明确放弃失败输入（C01）：移除失败消息投影；处置语义由调用方（coordinator）统筹。 */
++  removeOptimisticUserMessage: (path, clientMessageId) => {
++    let consumed = false;
++    set((s) => {
++      const session = scopedMapValue<SessionMessages>(s as any, s.chatSessions, path);
++      if (!session) return {};
++      const targetIdx = session.items.findIndex((item) =>
++        item.type === 'message' &&
++        item.data.role === 'user' &&
++        (item.data.id === clientMessageId || item.data.clientMessageId === clientMessageId),
++      );
++      if (targetIdx < 0) return {};
++      const items = [...session.items];
++      items.splice(targetIdx, 1);
++      consumed = true;
++      return {
++        chatSessions: putScopedMapValue(s as any, s.chatSessions, path, { ...session, items }),
++      };
++    });
++    if (consumed) bumpMessageLiveVersion(path);
++    return consumed;
++  },
++
+   updateLastMessage: (path, updater) => set((s) => {
+     const session = scopedMapValue<SessionMessages>(s as any, s.chatSessions, path);
+     if (!session || session.items.length === 0) return {};
+@@ -760,7 +791,7 @@ export const createChatSlice = (
          ...s.queuedTurnInputsByPath,
          // 编辑保存 = 新快照：版本递增（在途准备的迟到结果按版本丢弃），
          // 状态回到 ready 等一次新的调度；旧错误码随快照作废。
@@ -5164,8 +6058,39 @@ index 4a3347fae299447fe47b491f016ffaae17ee2658..0c6833054262bbf49315a6686ea85c8c
            ? {
              ...item,
              text,
+@@ -800,6 +831,30 @@ export const createChatSlice = (
+       },
+     };
+   }),
++
++  restoreQueuedTurnInput: (path, item, index) => set((s) => {
++    const key = keyForSession(s as any, path);
++    const existing = s.queuedTurnInputsByPath[key] || [];
++    if (existing.some(candidate => candidate.id === item.id)) {
++      // 幂等：同 id 已在队（重复回执/竞态）只刷新失败状态，不重复插入。
++      return {
++        queuedTurnInputsByPath: {
++          ...s.queuedTurnInputsByPath,
++          [key]: existing.map(candidate => candidate.id === item.id
++            ? { ...candidate, status: item.status, errorCode: item.errorCode, retryable: item.retryable }
++            : candidate),
++        },
++      };
++    }
++    const clamped = Math.max(0, Math.min(index ?? existing.length, existing.length));
++    const next = [...existing.slice(0, clamped), item, ...existing.slice(clamped)];
++    return {
++      queuedTurnInputsByPath: {
++        ...s.queuedTurnInputsByPath,
++        [key]: next,
++      },
++    };
++  }),
+ });
+ 
+ function registryFileKey(file: SessionRegistryFile): string | null {
 diff --git a/desktop/src/react/stores/chat-types.ts b/desktop/src/react/stores/chat-types.ts
-index 181f3b8efc24e5f90d188ce292f06f65b43cefc3..1412d11204f2ea7b3d863ca850779a02ba7bed8b 100644
+index 181f3b8efc24e5f90d188ce292f06f65b43cefc3..5856a66bf5edbfb90e2b621e3902559294c70058 100644
 --- a/desktop/src/react/stores/chat-types.ts
 +++ b/desktop/src/react/stores/chat-types.ts
 @@ -46,6 +46,8 @@ export interface QueuedTurnInput {
@@ -5185,6 +6110,15 @@ index 181f3b8efc24e5f90d188ce292f06f65b43cefc3..1412d11204f2ea7b3d863ca850779a02
    sourceEntryId?: string;  // Pi SDK session entry id，用于 branch-aware 的重新生成/编辑
    /** 本次 Agent turn 的真实输入 entry；隐藏后台输入也必须保留，不能猜到最近可见 user。 */
    turnInputEntryId?: string;
+@@ -456,6 +459,8 @@ export interface ChatMessage {
+   agentReviewRequest?: AgentReviewRequestContext;
+   sendStatus?: 'pending' | 'failed';
+   sendError?: string;
++  /** 失败后是否允许按原快照显式重试（服务端拒绝回执携带；C01）。 */
++  sendRetryable?: boolean;
+   /** 非用户本人发出的消息来源（如别的 Agent 经跨 session 协作投递）。老数据无此字段，按普通用户消息渲染。 */
+   origin?: { kind: 'agent'; agentId: string | null; agentName: string | null };
+   // Assistant
 diff --git a/desktop/src/react/stores/session-actions.ts b/desktop/src/react/stores/session-actions.ts
 index dd70127eec6e1e2527b7d3f8abf75ae71026e758..58a26e091049958a59fb667d96036f7079498b81 100644
 --- a/desktop/src/react/stores/session-actions.ts
@@ -5290,10 +6224,18 @@ index c2a12d1f02340dbee0ef5fd42e875f2645b7818d..52333c0b4b7eb275ce648a9be9a65eba
          text: visibleText,
          textHtml: visibleText ? renderMarkdown(visibleText) : undefined,
 diff --git a/export-manifest.json b/export-manifest.json
-index bb8f68cd206bba4a8a9a8034ab513a69c73df952..92879ed9e617d74f8e27b53d6b0e2db0eb79f153 100644
+index bb8f68cd206bba4a8a9a8034ab513a69c73df952..96572657a9b1f363236d43735a3f4f4c3889d1dc 100644
 --- a/export-manifest.json
 +++ b/export-manifest.json
-@@ -43,6 +43,7 @@
+@@ -16,6 +16,7 @@
+     "core/agent.ts",
+     "core/agents-md-migration.ts",
+     "core/pinned-tenets-migration.ts",
++    "core/pinned-tenets-backup-dir.ts",
+     "core/auxiliary-model-resolver.ts",
+     "core/auxiliary-slots.ts",
+     "core/bridge-session-manager.ts",
+@@ -43,6 +44,7 @@
      "core/data-epoch-coordinator.ts",
      "core/data-epoch-migrations.ts",
      "core/data-epoch-restore.ts",
@@ -5301,7 +6243,7 @@ index bb8f68cd206bba4a8a9a8034ab513a69c73df952..92879ed9e617d74f8e27b53d6b0e2db0
      "core/desktop-session-submit.ts",
      "core/device-registry.ts",
      "core/engine.ts",
-@@ -427,6 +428,7 @@
+@@ -427,6 +429,7 @@
      "lib/permission/tool-invocation-permission.ts",
      "lib/pi-sdk/auth-facade.ts",
      "lib/pi-sdk/compaction-request-shape.ts",
@@ -5339,10 +6281,30 @@ index 72b841fb5b0db5c95db4cf0ad227dc54f41adc54..e74f4b51343ecaea699960febc4c3bf5
              uiContext: o.uiContext,
              displayMessage: o.displayMessage,
 diff --git a/lib/agent-review/turn-coordinator.ts b/lib/agent-review/turn-coordinator.ts
-index eea84e46a957075e9c52ccebb3d5280996b1d494..84275fc78702c25b5d9dcc43928663dce19f8f48 100644
+index eea84e46a957075e9c52ccebb3d5280996b1d494..8f51e5bf7235804683a37c427fee9d8d55bc1e9f 100644
 --- a/lib/agent-review/turn-coordinator.ts
 +++ b/lib/agent-review/turn-coordinator.ts
-@@ -25,6 +25,7 @@ interface ReviewTurnInput {
+@@ -1,4 +1,5 @@
+ import crypto from 'crypto';
++import { isDesktopInputRejectedBeforeAcceptance } from '../../core/desktop-session-submit.ts';
+ 
+ /* eslint-disable @typescript-eslint/no-explicit-any -- engine and Pi session boundaries are runtime-injected */
+ 
+@@ -16,6 +17,13 @@ export interface AgentReviewStatus {
+   error?: string | null;
+ }
+ 
++/** 评审输入「未被接受」结算通知（C01）：父会话提交前失败/取消时回调提交客户端。 */
++export interface AgentReviewRejectionInfo {
++  code: string;
++  message: string;
++  retryable: boolean;
++}
++
+ interface ReviewTurnInput {
+   requestId?: string | null;
+   reviewedSessionId: string;
+@@ -25,11 +33,14 @@ interface ReviewTurnInput {
    displayMessage?: Record<string, unknown> | null;
    sessionRefs?: SessionReference[];
    clientMessageId?: string | null;
@@ -5350,7 +6312,69 @@ index eea84e46a957075e9c52ccebb3d5280996b1d494..84275fc78702c25b5d9dcc43928663dc
    images?: any[];
    videos?: any[];
    audios?: any[];
-@@ -265,6 +266,7 @@ export class AgentReviewTurnCoordinator {
+   uiContext?: any;
+   sessionFileRefs?: any[];
++  /** 父会话提交前失败/取消：用户输入从未被接受，通知提交方结算发送记录。 */
++  onRejected?: (info: AgentReviewRejectionInfo) => void;
+ }
+ 
+ interface ReviewTurnRecord {
+@@ -38,6 +49,8 @@ interface ReviewTurnRecord {
+   state: AgentReviewStatus['status'];
+   reviewerSessionId: string | null;
+   reviewerSessionPath: string | null;
++  /** 父会话（被审阅会话）的最终提交已发起：此后用户输入已被接受，失败不再按未接受结算。 */
++  parentSubmitted: boolean;
+ }
+ 
+ interface CoordinatorDeps {
+@@ -50,6 +63,15 @@ function reviewWasCancelled(record: ReviewTurnRecord): boolean {
+   return record.state === 'cancelled';
+ }
+ 
++/** 评审链路已知失败的稳定错误码；未知错误统一 review_failed_before_acceptance。 */
++function rejectionCodeForReviewError(message: string): string {
++  if (message === 'session_busy') return 'session_busy';
++  if (message === 'reviewed_session_model_unavailable') return 'reviewed_session_model_unavailable';
++  if (message === 'reviewer_session_creation_failed') return 'reviewer_session_creation_failed';
++  if (message === 'reviewer_returned_empty_result') return 'reviewer_returned_empty_result';
++  return 'review_failed_before_acceptance';
++}
++
+ function nonEmptyString(value: unknown): string | null {
+   return typeof value === 'string' && value.trim() ? value.trim() : null;
+ }
+@@ -158,6 +180,7 @@ export class AgentReviewTurnCoordinator {
+       state: 'running',
+       reviewerSessionId: null,
+       reviewerSessionPath: null,
++      parentSubmitted: false,
+     };
+     this.records.set(requestId, record);
+     this.requestByParentSession.set(input.reviewedSessionId, requestId);
+@@ -174,6 +197,13 @@ export class AgentReviewTurnCoordinator {
+       this.deps.engine.emitEvent?.({ type: 'session_status', isStreaming: false }, input.reviewedSessionPath);
+       this.requestByParentSession.delete(input.reviewedSessionId);
+       this.records.delete(requestId);
++      // 父会话提交前失败：用户输入（评审请求）从未被接受到任何用户会话——
++      // 通知提交客户端按未接受结算，释放输入屏障（C01）。父会话提交抛错但
++      // 提交层证明「未接受」（busy 门禁等）时同样结算；已接受后的运行失败
++      // 不在这里通知。
++      if (input.onRejected && (!record.parentSubmitted || isDesktopInputRejectedBeforeAcceptance(error))) {
++        input.onRejected({ code: rejectionCodeForReviewError(message), message, retryable: true });
++      }
+     }
+   }
+ 
+@@ -257,6 +287,7 @@ export class AgentReviewTurnCoordinator {
+       reviewText,
+       sessionRefs: input.sessionRefs,
+     });
++    record.parentSubmitted = true;
+     await submitSessionMessage(engine, {
+       sessionId: input.reviewedSessionId,
+       sessionPath: input.reviewedSessionPath,
+@@ -265,6 +296,7 @@ export class AgentReviewTurnCoordinator {
        videos: input.videos,
        audios: input.audios,
        clientMessageId: input.clientMessageId,
@@ -5358,6 +6382,19 @@ index eea84e46a957075e9c52ccebb3d5280996b1d494..84275fc78702c25b5d9dcc43928663dc
        uiContext: input.uiContext,
        sessionFileRefs: input.sessionFileRefs,
        displayMessage: {
+@@ -288,7 +320,11 @@ export class AgentReviewTurnCoordinator {
+     this.emit(record, { error: reason });
+     this.deps.engine.emitEvent?.({ type: 'session_status', isStreaming: false }, record.input.reviewedSessionPath);
+     this.requestByParentSession.delete(sessionId);
+-    this.records.delete(requestId);
++    this.records.delete(record.requestId);
++    // 用户停止发生在父会话提交前：输入确定未被接受，结算发送记录（C01）。
++    if (!record.parentSubmitted && record.input.onRejected) {
++      record.input.onRejected({ code: 'review_cancelled_before_acceptance', message: reason, retryable: true });
++    }
+     return true;
+   }
+ }
 diff --git a/lib/memory/tenets.ts b/lib/memory/tenets.ts
 index 0ff934312031dcc083904b325bfccdd8d5fc895c..d36ebd49fd79e33ca416c2101901de4695b434bb 100644
 --- a/lib/memory/tenets.ts
@@ -5551,10 +6588,66 @@ index 666d46aa443d67a0b58b7e509b93f9806352cc46..eac1356e9f2c4ba6ce43e47252a2c32e
  
  main().catch((err) => {
 diff --git a/server/routes/chat.ts b/server/routes/chat.ts
-index 19e19db2c4135dfe4dddbacf4a153f74d2bc74ff..8801ce369db9e6c34901d953820f880414309e8f 100644
+index 19e19db2c4135dfe4dddbacf4a153f74d2bc74ff..2184cb839607c83d4dbca0b281da837223c23593 100644
 --- a/server/routes/chat.ts
 +++ b/server/routes/chat.ts
-@@ -1715,6 +1715,8 @@ export function createChatRoute(engine: any, hub: any, {
+@@ -30,7 +30,7 @@ import {
+   INSTANT_SIMPLE_COMPACTION_RUNTIME_MODE,
+   normalizeCompactionLifecycleMode,
+ } from "../../shared/compaction-mode.ts";
+-import { abortPendingDesktopSubmission, submitDesktopSessionInterjection, submitDesktopSessionMessage } from "../../core/desktop-session-submit.ts";
++import { abortPendingDesktopSubmission, isDesktopInputRejectedBeforeAcceptance, submitDesktopSessionInterjection, submitDesktopSessionMessage } from "../../core/desktop-session-submit.ts";
+ import { normalizeKnowledgeRefs } from "../../shared/knowledge-refs.ts";
+ import {
+   AgentReviewTurnCoordinator,
+@@ -434,6 +434,46 @@ export function createChatRoute(engine: any, hub: any, {
+     wsSend(ws, { type: "error", message: "agent_deleted", sessionPath });
+   }
+ 
++  /**
++   * 类型化输入拒绝回执（C01）：服务端在「接受前」明确拒绝某次输入时，向提交
++   * 客户端单播 not_accepted 结算证据。与 legacy error 并存——旧客户端继续走
++   * inline error，新客户端据此把发送记录结算为明确失败并按 retryable 提供显式
++   * 重试。身份字段全部来自服务端解析结果（promptTarget），不信任载荷自称；
++   * 没有 clientMessageId 的客户端无法关联，不投递。已接受后的运行失败不走
++   * 这里（保持普通 error，客户端不得推断为未接收）。
++   */
++  function sendInputRejection(ws, target, input, rejection) {
++    const clientMessageId = typeof input?.clientMessageId === "string" && input.clientMessageId.trim()
++      ? input.clientMessageId.trim()
++      : null;
++    if (!clientMessageId) return;
++    const snapshotVersion = Number.isSafeInteger(input?.snapshotVersion) ? input.snapshotVersion : null;
++    const clientAttemptId = typeof input?.clientAttemptId === "string" && input.clientAttemptId.trim()
++      ? input.clientAttemptId.trim()
++      : null;
++    wsSend(ws, {
++      type: "input_rejected",
++      outcome: "not_accepted",
++      ...(target?.sessionId ? { sessionId: target.sessionId } : {}),
++      ...(target?.sessionPath ? { sessionPath: target.sessionPath } : {}),
++      clientMessageId,
++      ...(snapshotVersion != null ? { snapshotVersion } : {}),
++      ...(clientAttemptId ? { clientAttemptId } : {}),
++      code: rejection.code,
++      message: rejection.message,
++      retryable: rejection.retryable === true,
++    });
++  }
++
++  /** 提交层抛出的「未接受」错误 → 稳定错误码（session_busy/KnowledgeError.code/兜底）。 */
++  function inputRejectionInfoForSubmitError(err) {
++    if (typeof err?.code === "string" && err.code.trim()) {
++      return { code: err.code.trim(), retryable: true };
++    }
++    if (err?.message === "session_busy") return { code: "session_busy", retryable: true };
++    return { code: "rejected_before_acceptance", retryable: true };
++  }
++
+   function sessionIdForPath(sessionPath) {
+     if (!sessionPath) return null;
+     try {
+@@ -1715,6 +1755,8 @@ export function createChatRoute(engine: any, hub: any, {
        emitStreamEvent(sessionPath, ss, {
          type: "session_user_message",
          clientMessageId: event.clientMessageId || null,
@@ -5563,7 +6656,129 @@ index 19e19db2c4135dfe4dddbacf4a153f74d2bc74ff..8801ce369db9e6c34901d953820f8804
          message: event.message,
        });
      } else if (event.type === "voice_transcription_update") {
-@@ -2563,6 +2565,7 @@ export function createChatRoute(engine: any, hub: any, {
+@@ -2447,20 +2489,27 @@ export function createChatRoute(engine: any, hub: any, {
+               // 消息不值得先把几 MB base64 量一遍再拒。
+               const promptTarget = requireWsSessionContext(msg, ws); if (!promptTarget) return;
+               const promptSessionPath = promptTarget.sessionPath;
++              // 接受前确定拒绝：legacy error 照发（旧客户端显示不变；code 让前端
++              // 错误展示走稳定文案映射），新客户端额外收到类型化拒绝回执结算发送
++              // 记录（C01）。retryable=false 表示修正内容后才应重试。
++              const rejectPromptInput = (code, message, retryable) => {
++                wsSend(ws, { type: "error", code, message, sessionPath: promptSessionPath });
++                sendInputRejection(ws, promptTarget, msg, { code, message, retryable });
++              };
+               // 图片校验：最多 10 张，单张 ≤ 20MB，仅允许常见图片 MIME
+               if (msg.images?.length) {
+                 const MAX_IMAGES = 10;
+                 if (msg.images.length > MAX_IMAGES) {
+-                  wsSend(ws, { type: "error", message: t("error.maxImages", { max: MAX_IMAGES }), sessionPath: promptSessionPath });
++                  rejectPromptInput("max_images", t("error.maxImages", { max: MAX_IMAGES }), false);
+                   return;
+                 }
+                 for (const img of msg.images) {
+                   if (!img?.mimeType || !isAllowedChatImageMime(img.mimeType)) {
+-                    wsSend(ws, { type: "error", message: t("error.unsupportedImageFormat", { mime: img?.mimeType || "unknown" }), sessionPath: promptSessionPath });
++                    rejectPromptInput("unsupported_image_format", t("error.unsupportedImageFormat", { mime: img?.mimeType || "unknown" }), false);
+                     return;
+                   }
+                   if (img.data && !isChatImageBase64WithinLimit(img.data)) {
+-                    wsSend(ws, { type: "error", message: t("error.imageTooLarge"), sessionPath: promptSessionPath });
++                    rejectPromptInput("image_too_large", t("error.imageTooLarge"), false);
+                     return;
+                   }
+                 }
+@@ -2468,20 +2517,20 @@ export function createChatRoute(engine: any, hub: any, {
+               if (msg.videos?.length) {
+                 const MAX_VIDEOS = 3;
+                 if (msg.videos.length > MAX_VIDEOS) {
+-                  wsSend(ws, { type: "error", message: t("error.maxVideos", { max: MAX_VIDEOS }), sessionPath: promptSessionPath });
++                  rejectPromptInput("max_videos", t("error.maxVideos", { max: MAX_VIDEOS }), false);
+                   return;
+                 }
+                 for (const video of msg.videos) {
+                   if (!video?.mimeType || !isAllowedChatVideoMime(video.mimeType)) {
+-                    wsSend(ws, { type: "error", message: t("error.unsupportedVideoFormat", { mime: video?.mimeType || "unknown" }), sessionPath: promptSessionPath });
++                    rejectPromptInput("unsupported_video_format", t("error.unsupportedVideoFormat", { mime: video?.mimeType || "unknown" }), false);
+                     return;
+                   }
+                   if (video.data && !isChatVideoBase64WithinLimit(video.data)) {
+-                    wsSend(ws, { type: "error", message: t("error.videoTooLarge"), sessionPath: promptSessionPath });
++                    rejectPromptInput("video_too_large", t("error.videoTooLarge"), false);
+                     return;
+                   }
+                   if (!isChatVideoBase64ContentCompatible(video.data, video.mimeType)) {
+-                    wsSend(ws, { type: "error", message: t("error.invalidVideoContent"), sessionPath: promptSessionPath });
++                    rejectPromptInput("invalid_video_content", t("error.invalidVideoContent"), false);
+                     return;
+                   }
+                 }
+@@ -2489,16 +2538,16 @@ export function createChatRoute(engine: any, hub: any, {
+               if (msg.audios?.length) {
+                 const MAX_AUDIOS = 3;
+                 if (msg.audios.length > MAX_AUDIOS) {
+-                  wsSend(ws, { type: "error", message: t("error.maxAudios", { max: MAX_AUDIOS }), sessionPath: promptSessionPath });
++                  rejectPromptInput("max_audios", t("error.maxAudios", { max: MAX_AUDIOS }), false);
+                   return;
+                 }
+                 for (const audio of msg.audios) {
+                   if (!audio?.mimeType || !isAllowedChatAudioMime(audio.mimeType)) {
+-                    wsSend(ws, { type: "error", message: t("error.unsupportedAudioFormat", { mime: audio?.mimeType || "unknown" }), sessionPath: promptSessionPath });
++                    rejectPromptInput("unsupported_audio_format", t("error.unsupportedAudioFormat", { mime: audio?.mimeType || "unknown" }), false);
+                     return;
+                   }
+                   if (audio.data && !isChatAudioBase64WithinLimit(audio.data)) {
+-                    wsSend(ws, { type: "error", message: t("error.audioTooLarge"), sessionPath: promptSessionPath });
++                    rejectPromptInput("audio_too_large", t("error.audioTooLarge"), false);
+                     return;
+                   }
+                 }
+@@ -2515,18 +2564,19 @@ export function createChatRoute(engine: any, hub: any, {
+               // abort、resume_stream、context_usage 是停止和只读，删除态照常放行，与改动前一致。
+               if (promptTarget.agentDeleted) {
+                 rejectDeletedAgentSession(ws, promptSessionPath);
++                sendInputRejection(ws, promptTarget, msg, { code: "agent_deleted", message: "agent_deleted", retryable: false });
+                 return;
+               }
+               if (!interject && (
+                 engine.isSessionStreaming(promptSessionPath)
+                 || agentReviewTurns.hasPendingParent(promptTarget.sessionId)
+               )) {
+-                wsSend(ws, { type: "error", message: t("error.stillStreaming", { name: engine.agentName }), sessionPath: promptSessionPath });
++                rejectPromptInput("session_busy", t("error.stillStreaming", { name: engine.agentName }), true);
+                 return;
+               }
+               // Reject prompt while model switch is in progress
+               if (engine.isSessionSwitching(promptSessionPath)) {
+-                wsSend(ws, { type: "error", message: t("chat.modelSwitching"), sessionPath: promptSessionPath });
++                rejectPromptInput("model_switching", t("chat.modelSwitching"), true);
+                 return;
+               }
+               const reviewRequests = Array.isArray(msg.agentReviewRequests)
+@@ -2539,21 +2589,11 @@ export function createChatRoute(engine: any, hub: any, {
+               try {
+                 knowledgeRefs = normalizeKnowledgeRefs(msg.knowledgeRefs);
+               } catch (err: any) {
+-                wsSend(ws, {
+-                  type: "error",
+-                  code: "invalid_knowledge_refs",
+-                  message: err?.message || "invalid knowledgeRefs",
+-                  sessionPath: promptSessionPath,
+-                });
++                rejectPromptInput("invalid_knowledge_refs", err?.message || "invalid knowledgeRefs", false);
+                 return;
+               }
+               if (interject && reviewRequests.length > 0) {
+-                wsSend(ws, {
+-                  type: "error",
+-                  code: "agent_review_interjection_not_supported",
+-                  message: "@Agent review cannot be sent as an interjection.",
+-                  sessionPath: promptSessionPath,
+-                });
++                rejectPromptInput("agent_review_interjection_not_supported", "@Agent review cannot be sent as an interjection.", false);
+                 return;
+               }
+               if (interject && engine.isSessionStreaming(promptSessionPath)) {
+@@ -2563,6 +2603,7 @@ export function createChatRoute(engine: any, hub: any, {
                      sessionPath: promptSessionPath,
                      text: promptText,
                      clientMessageId: msg.clientMessageId,
@@ -5571,15 +6786,118 @@ index 19e19db2c4135dfe4dddbacf4a153f74d2bc74ff..8801ce369db9e6c34901d953820f8804
                      images: msg.images,
                      videos: msg.videos,
                      audios: msg.audios,
-@@ -2629,6 +2632,7 @@ export function createChatRoute(engine: any, hub: any, {
-                   displayMessage: msg.displayMessage,
-                   sessionRefs,
-                   clientMessageId: msg.clientMessageId,
-+                  snapshotVersion: msg.snapshotVersion,
-                   images: msg.images,
-                   videos: msg.videos,
-                   audios: msg.audios,
-@@ -2644,6 +2648,7 @@ export function createChatRoute(engine: any, hub: any, {
+@@ -2577,27 +2618,23 @@ export function createChatRoute(engine: any, hub: any, {
+                     ? t("error.stillStreaming", { name: engine.agentName })
+                     : err.message;
+                   wsSend(ws, { type: "error", message: errMessage, sessionPath: promptSessionPath });
++                  // 提交层证明「未接受」（canonical 回执未触发）才发拒绝回执；已接受后
++                  // 的运行失败保持普通 error，客户端不得推断为未接收（C01）。
++                  if (isDesktopInputRejectedBeforeAcceptance(err)) {
++                    const info = inputRejectionInfoForSubmitError(err);
++                    sendInputRejection(ws, promptTarget, msg, { ...info, message: errMessage });
++                  }
+                 }
+                 return;
+               }
+               const sessionRefs = normalizeSessionReferences(msg.sessionRefs);
+               if (reviewRequests.length > 1) {
+-                wsSend(ws, {
+-                  type: "error",
+-                  code: "multiple_agent_reviews_not_supported",
+-                  message: "Only one @Agent review is supported per turn.",
+-                  sessionPath: promptSessionPath,
+-                });
++                rejectPromptInput("multiple_agent_reviews_not_supported", "Only one @Agent review is supported per turn.", false);
+                 return;
+               }
+               if (reviewRequests.length === 1) {
+                 if (!promptTarget.sessionId) {
+-                  wsSend(ws, {
+-                    type: "error",
+-                    code: "session_id_required_for_agent_review",
+-                    message: "A stable Session ID is required for @Agent review.",
+-                    sessionPath: promptSessionPath,
+-                  });
++                  rejectPromptInput("session_id_required_for_agent_review", "A stable Session ID is required for @Agent review.", false);
+                   return;
+                 }
+                 const reviewerAgentId = reviewRequests[0].agentId.trim();
+@@ -2607,34 +2644,50 @@ export function createChatRoute(engine: any, hub: any, {
+                 // 所以这一处宁可在属主查不出时放行创建，也不拿宽松来源当权威。
+                 const ownerAgentId = engine.getSessionManifest?.(promptTarget.sessionId)?.ownerAgentId || null;
+                 if (!engine.getAgent?.(reviewerAgentId) || reviewerAgentId === ownerAgentId) {
+-                  wsSend(ws, {
+-                    type: "error",
+-                    code: "invalid_review_agent",
+-                    message: reviewerAgentId === ownerAgentId
++                  rejectPromptInput(
++                    "invalid_review_agent",
++                    reviewerAgentId === ownerAgentId
+                       ? "The reviewing Agent must be different from the current Session Agent."
+                       : `Agent not found: ${reviewerAgentId}`,
+-                    sessionPath: promptSessionPath,
+-                  });
++                    false,
++                  );
+                   return;
+                 }
+-                await agentReviewTurns.start({
+-                  requestId: msg.clientMessageId,
+-                  reviewedSessionId: promptTarget.sessionId,
+-                  reviewedSessionPath: promptSessionPath,
+-                  reviewer: {
+-                    agentId: reviewerAgentId,
+-                    label: typeof reviewRequests[0].label === "string" ? reviewRequests[0].label : reviewerAgentId,
+-                  },
+-                  text: promptText,
+-                  displayMessage: msg.displayMessage,
+-                  sessionRefs,
+-                  clientMessageId: msg.clientMessageId,
+-                  images: msg.images,
+-                  videos: msg.videos,
+-                  audios: msg.audios,
+-                  uiContext: msg.uiContext ?? null,
+-                  sessionFileRefs: msg.sessionFileRefs,
+-                });
++                try {
++                  await agentReviewTurns.start({
++                    requestId: msg.clientMessageId,
++                    reviewedSessionId: promptTarget.sessionId,
++                    reviewedSessionPath: promptSessionPath,
++                    reviewer: {
++                      agentId: reviewerAgentId,
++                      label: typeof reviewRequests[0].label === "string" ? reviewRequests[0].label : reviewerAgentId,
++                    },
++                    text: promptText,
++                    displayMessage: msg.displayMessage,
++                    sessionRefs,
++                    clientMessageId: msg.clientMessageId,
++                    snapshotVersion: msg.snapshotVersion,
++                    images: msg.images,
++                    videos: msg.videos,
++                    audios: msg.audios,
++                    uiContext: msg.uiContext ?? null,
++                    sessionFileRefs: msg.sessionFileRefs,
++                    // 父会话提交前的评审失败（模型缺失/评审员会话建立失败/空结果/用户
++                    // 停止）：用户输入从未被接受，通知提交客户端结算（C01）。
++                    onRejected: (info) => sendInputRejection(ws, promptTarget, msg, info),
++                  });
++                } catch (err) {
++                  // start() 同步抛错只发生在 hasPendingParent（session_busy）：
++                  // 尚未产生任何副作用，属于接受前确定拒绝。
++                  const message = err?.message === "session_busy"
++                    ? t("error.stillStreaming", { name: engine.agentName })
++                    : err?.message || "agent review failed to start";
++                  rejectPromptInput(
++                    err?.message === "session_busy" ? "session_busy" : "review_start_failed",
++                    message,
++                    true,
++                  );
++                }
+                 return;
+               }
+               const sessionRefBlock = buildSessionReferenceBlock(sessionRefs);
+@@ -2644,6 +2697,7 @@ export function createChatRoute(engine: any, hub: any, {
                    sessionId: promptTarget.sessionId,
                    sessionPath: promptSessionPath,
                    clientMessageId: msg.clientMessageId,
@@ -5587,6 +6905,20 @@ index 19e19db2c4135dfe4dddbacf4a153f74d2bc74ff..8801ce369db9e6c34901d953820f8804
                    images: msg.images,
                    videos: msg.videos,
                    audios: msg.audios,
+@@ -2661,6 +2715,13 @@ export function createChatRoute(engine: any, hub: any, {
+                     ? t("error.stillStreaming", { name: engine.agentName })
+                     : err.message;
+                   wsSend(ws, { type: "error", message: errMessage, sessionPath: promptSessionPath });
++                  // 提交层证明「未接受」（canonical 关联回执未触发，busy 门禁/身份
++                  // 解析/知识检索失败等）才发类型化拒绝回执；已接受后的运行错误
++                  //（供应商失败等）保持普通 error——客户端不得推断为未接收（C01）。
++                  if (isDesktopInputRejectedBeforeAcceptance(err)) {
++                    const info = inputRejectionInfoForSubmitError(err);
++                    sendInputRejection(ws, promptTarget, msg, { ...info, message: errMessage });
++                  }
+                 }
+               }
+             }
 diff --git a/server/routes/sessions.ts b/server/routes/sessions.ts
 index aae39ca0eebd0dfed1c510da03310696dba2ccb9..3669e7d35f2b70bab76722c7cf36022031b39fc3 100644
 --- a/server/routes/sessions.ts
@@ -7230,6 +8562,1168 @@ index 0000000000000000000000000000000000000000..9ba086bd26df02281c69168980974624
 + it('R02-08 新批准操作才允许恢复用户删除内容',()=>{const f=setup();applyPinnedTenetsRecovery(f.home,approval(f));fs.writeFileSync(tenetsFilePath(f.dir),JSON.stringify({schemaVersion:1,tenets:[]}));applyPinnedTenetsRecovery(f.home,approval(f));expect(readTenetsFileStrict(tenetsFilePath(f.dir)).tenets).toHaveLength(1);});
 + it.each(['source','target'])('R02-09 批准后 %s 改变拒绝写入',kind=>{const f=setup();const a=approval(f);if(kind==='source')fs.appendFileSync(path.join(f.dir,f.source),' ');else addTenetDirect(f.dir,{content:'later'});const before=fs.existsSync(tenetsFilePath(f.dir))?fs.readFileSync(tenetsFilePath(f.dir)):null;expect(()=>applyPinnedTenetsRecovery(f.home,a)).toThrow(/stale_approval|conflict/i);expect(fs.existsSync(tenetsFilePath(f.dir))?fs.readFileSync(tenetsFilePath(f.dir)):null).toEqual(before);});
 + it('R02-13 收据按 operation 存放，不覆盖首次迁移位置',()=>{const f=setup();const a=approval(f);applyPinnedTenetsRecovery(f.home,a);expect(fs.existsSync(path.join(f.dir,'memory','pinned-recovery-operations',a.operationId+'.json'))).toBe(true);expect(fs.existsSync(path.join(f.dir,'memory','pinned-tenets-migration.receipt.json'))).toBe(false);expect(fs.existsSync(path.join(f.dir,f.source))).toBe(true);});
++});
+diff --git a/tests/round3-c01-input-rejection.test.ts b/tests/round3-c01-input-rejection.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..27f295bf4d43902170b9aa6b1a9d2235c8fe221d
+--- /dev/null
++++ b/tests/round3-c01-input-rejection.test.ts
+@@ -0,0 +1,707 @@
++// @vitest-environment jsdom
++
++/**
++ * C01：服务端「接受前明确拒绝」的类型化结算闭环。
++ *
++ * 三层覆盖：
++ * 1. 服务端路由层——input_rejected 回执形状（模型切换/会话忙/无效审阅 Agent/
++ *    提交层标记错误），以及「已接受后运行失败不发拒绝回执」的反向断言。
++ * 2. 提交层标记——真实 SDK fixture 验证 canonical 接受边界：busy 拒绝被标记，
++ *    append 之后的供应商错误不被标记。
++ * 3. 客户端结算——真实 ws-message-handler → coordinator → store 链路：看门狗
++ *    前后、迟到尝试、幂等、跨会话/服务器/版本隔离、队列恢复顺序、屏障隔离。
++ */
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import type { Mock } from 'vitest';
++
++const previewRefreshMocks = vi.hoisted(() => ({
++  changeOptions: { retryMissing: true, retryUnchanged: true },
++  refreshOpenPreviewDocumentsForResourceChange: vi.fn(async () => undefined),
++  markDeskTreeDirtyForResourceChange: vi.fn(),
++}));
++
++vi.mock('../desktop/src/react/hooks/use-stream-buffer', () => ({
++  streamBufferManager: { handle: vi.fn(), beginRun: vi.fn(), finishRun: vi.fn() },
++}));
++
++vi.mock('../desktop/src/react/stores/session-actions', async (original) => ({
++  ...await original<typeof import('../desktop/src/react/stores/session-actions')>(),
++  loadSessions: vi.fn(), upsertOptimisticSessionFirstMessage: vi.fn(),
++}));
++
++vi.mock('../desktop/src/react/stores/channel-actions', () => ({
++  loadChannels: vi.fn(),
++  openChannel: vi.fn(),
++}));
++
++vi.mock('../desktop/src/react/stores/preview-actions', () => ({
++  handleLegacyArtifactBlock: vi.fn(),
++}));
++
++vi.mock('../desktop/src/react/services/app-event-actions', () => ({
++  handleAppEvent: vi.fn(),
++}));
++
++vi.mock('../desktop/src/react/utils/preview-document-refresh', () => ({
++  PREVIEW_DOCUMENT_CHANGE_REFRESH_OPTIONS: previewRefreshMocks.changeOptions,
++  refreshOpenPreviewDocumentsForResourceChange: previewRefreshMocks.refreshOpenPreviewDocumentsForResourceChange,
++  markDeskTreeDirtyForResourceChange: previewRefreshMocks.markDeskTreeDirtyForResourceChange,
++}));
++
++vi.mock('../desktop/src/react/services/stream-resume', () => ({
++  replayStreamResume: vi.fn(),
++  isStreamResumeRebuilding: () => null,
++  isStreamScopedMessage: () => false,
++  updateSessionStreamMeta: vi.fn(),
++}));
++
++vi.mock('../desktop/src/react/services/stream-key-dispatcher', () => ({
++  dispatchStreamKey: vi.fn(),
++}));
++
++const wsMocks = vi.hoisted(() => ({
++  current: null as { send: Mock; readyState: number } | null,
++}));
++
++vi.mock('../desktop/src/react/services/websocket', () => ({
++  getWebSocket: () => wsMocks.current,
++}));
++
++import { createChatRoute } from '../server/routes/chat.ts';
++import {
++  isDesktopInputRejectedBeforeAcceptance,
++  markDesktopInputRejectedBeforeAcceptance,
++  submitDesktopSessionMessage,
++} from '../core/desktop-session-submit.ts';
++import { AgentReviewTurnCoordinator } from '../lib/agent-review/turn-coordinator.ts';
++import { useStore } from '../desktop/src/react/stores';
++import { sessionScopedValue } from '../desktop/src/react/stores/session-slice';
++import { handleServerMessage } from '../desktop/src/react/services/ws-message-handler';
++import {
++  discardRejectedUserMessage,
++  getSendRecord,
++  hasInFlightSend,
++  noteComposerInputRejected,
++  retryRejectedUserMessage,
++  resetComposerSendCoordinatorForTests,
++  retrySendRecord,
++  sendWithLease,
++  tryAcquireSendLease,
++  type ComposerSessionIdentity,
++} from '../desktop/src/react/services/composer-send-coordinator';
++import type { ChatListItem, ComposerSendBundle, QueuedTurnInput } from '../desktop/src/react/stores/chat-types';
++import { createTestTranslator } from '../desktop/src/react/__tests__/helpers/i18n-test-strings';
++import { createDesktopInputHistoryFixture } from './helpers/desktop-input-history-fixture';
++
++const testT = createTestTranslator();
++const PATH_A = '/session/a.jsonl';
++const PATH_B = '/session/b.jsonl';
++const SESSION_A = 'sess-a';
++
++function makeBundle(sessionPath: string, text: string, overrides: Partial<ComposerSendBundle> = {}): ComposerSendBundle {
++  return {
++    type: 'prompt',
++    sessionRef: { sessionId: SESSION_A, sessionPath, agentId: 'hana' },
++    text,
++    skills: [],
++    fileRefs: [],
++    sessionRefs: [],
++    agentMentions: [],
++    inputFiles: [],
++    knowledgeRefs: null,
++    docContextAttached: false,
++    doc: null,
++    quotes: [],
++    uiContext: null,
++    ...overrides,
++  };
++}
++
++function identityOf(sessionPath: string, sessionId = SESSION_A): ComposerSessionIdentity {
++  return { kind: 'session', sessionId, sessionPath, agentId: 'hana' };
++}
++
++function seedStore(sessionPaths: string[]) {
++  useStore.setState({
++    currentSessionPath: sessionPaths[0] ?? null,
++    currentSessionId: sessionPaths[0] ? SESSION_A : null,
++    currentAgentId: 'hana',
++    currentTab: 'chat',
++    sessions: sessionPaths.map(path => ({ path, sessionId: SESSION_A, agentId: 'hana', agentName: 'Hana' })),
++    sessionLocatorsById: { [SESSION_A]: { path: PATH_A } },
++    connected: true,
++    streamingSessions: [],
++    activeSessionStreams: {},
++    turnPendingSessions: [],
++    knowledgeRetrievingSessions: [],
++    knowledgeRollupBySession: {},
++    knowledgeSupplementBySession: {},
++    queuedTurnInputsByPath: {},
++    capabilityRefreshingSessions: [],
++    compactingSessions: [],
++    compactionModeBySession: {},
++    pendingSessionSwitchPath: null,
++    modelSwitching: false,
++    models: [{ id: 'm-text', provider: 'test', name: 'Text', input: ['text'], isCurrent: true }],
++    sessionModelsByPath: {},
++    toasts: [],
++    inlineErrors: {},
++    chatSessions: {},
++    drafts: {},
++    composerRevisionsByKey: {},
++    attachedFiles: [],
++    pendingNewSession: false,
++    pendingDraftId: null,
++  } as never);
++}
++
++function makeDeps() {
++  return { loadVisionAuxiliaryConfig: vi.fn(async () => ({ enabled: false, model: null })), t: testT };
++}
++
++function messageData(item: ChatListItem | undefined) {
++  if (!item || item.type !== 'message') throw new Error('expected message item');
++  return item.data;
++}
++
++function itemsOf(sessionPath: string) {
++  const state = useStore.getState();
++  return (sessionScopedValue(state as never, state.chatSessions, sessionPath) || { items: [] }).items;
++}
++
++function queueOf(sessionPath: string): QueuedTurnInput[] {
++  const state = useStore.getState();
++  return sessionScopedValue(state as never, state.queuedTurnInputsByPath, sessionPath) || [];
++}
++
++function sentPayloads(): Array<Record<string, any>> {
++  return wsMocks.current!.send.mock.calls.map(call => JSON.parse(String(call[0])));
++}
++
++/** 客户端完整提交一次输入（真实 coordinator → ws.send），返回记录与载荷。 */
++async function submitViaCoordinator(text: string, sessionPath = PATH_A) {
++  const identity = identityOf(sessionPath);
++  const lease = tryAcquireSendLease({ identity, bundle: makeBundle(sessionPath, text) });
++  if (lease.ok === false) {
++    const why: string = lease.reason;
++    throw new Error(`lease not acquired: ${why}`);
++  }
++  const result = await sendWithLease(lease.leaseId, makeDeps());
++  if (result.kind !== 'transport_submitted') throw new Error(`not submitted: ${JSON.stringify(result)}`);
++  const payload = sentPayloads().at(-1)!;
++  const record = getSendRecord(lease.leaseId)!;
++  return { record, payload, leaseId: lease.leaseId };
++}
++
++function dispatchRejection(input: {
++  sessionPath?: string; sessionId?: string; clientMessageId: string; snapshotVersion?: number;
++  clientAttemptId?: string | null; code?: string; retryable?: boolean;
++}) {
++  handleServerMessage({
++    type: 'input_rejected',
++    outcome: 'not_accepted',
++    sessionPath: input.sessionPath ?? PATH_A,
++    sessionId: input.sessionId ?? SESSION_A,
++    clientMessageId: input.clientMessageId,
++    snapshotVersion: input.snapshotVersion ?? 1,
++    ...(input.clientAttemptId !== undefined ? { clientAttemptId: input.clientAttemptId } : {}),
++    code: input.code ?? 'model_switching',
++    message: 'synthetic rejection',
++    retryable: input.retryable ?? true,
++  });
++}
++
++// ── 服务端路由 harness ──
++
++interface RouteHarness {
++  handlers: any;
++  ws: { readyState: number; send: Mock };
++  sent: () => Array<Record<string, any>>;
++  receive: (msg: Record<string, unknown>) => void;
++  engine: Record<string, any>;
++  hub: Record<string, any>;
++}
++
++function buildChatRouteHarness(engineOverrides: Record<string, any> = {}, hubOverrides: Record<string, any> = {}): RouteHarness {
++  let createHandlers: any;
++  const upgradeWebSocket = vi.fn((factory: any) => { createHandlers = factory; return () => new Response(null); });
++  let subscriber: ((event: any, sessionPath: string) => void) | undefined;
++  const hub = {
++    subscribe: vi.fn((fn: any) => { subscriber = fn; }),
++    send: vi.fn(async () => { throw new Error('hub.send not expected'); }),
++    eventBus: { emit: vi.fn() },
++    abort: vi.fn(async () => false),
++    ...hubOverrides,
++  };
++  const engine: Record<string, any> = {
++    agentName: 'Hana',
++    abortAllStreaming: vi.fn(async () => {}),
++    getSessionByPath: vi.fn(() => ({ entries: [], sessionManager: { getBranch: () => [] } })),
++    isSessionStreaming: vi.fn(() => false),
++    isSessionSwitching: vi.fn(() => false),
++    steerSession: vi.fn(() => false),
++    slashDispatcher: null,
++    getSessionIdForPath: vi.fn((p: string) => (p === PATH_A ? SESSION_A : null)),
++    getSessionManifest: vi.fn(() => ({ currentLocator: { path: PATH_A }, ownerAgentId: 'hana' })),
++    resolveSessionOwnership: vi.fn(() => ({ agentId: 'hana', agentDeleted: false })),
++    isDeletedAgent: vi.fn(() => false),
++    terminalSessions: {},
++    getRuntimeContext: vi.fn(() => ({})),
++    getAgent: vi.fn(() => ({ agentName: 'Hana' })),
++    emitEvent: vi.fn(),
++    ...engineOverrides,
++  };
++  createChatRoute(engine as any, hub as any, { upgradeWebSocket });
++  const handlers = createHandlers({});
++  const ws = { readyState: 1, send: vi.fn() };
++  handlers.onOpen({}, ws);
++  return {
++    handlers,
++    ws: ws as any,
++    engine,
++    hub,
++    sent: () => ws.send.mock.calls.map(([raw]: [string]) => JSON.parse(raw)),
++    receive: (msg: Record<string, unknown>) => { handlers.onMessage({ data: JSON.stringify(msg) }, ws); },
++  };
++}
++
++beforeEach(() => {
++  vi.useFakeTimers();
++  wsMocks.current = { send: vi.fn(), readyState: 1 };
++  resetComposerSendCoordinatorForTests();
++  seedStore([PATH_A]);
++  window.platform = { readFileBase64: vi.fn(async () => 'SUJBTkVfQkFTRTY0') } as unknown as typeof window.platform;
++});
++
++afterEach(() => {
++  resetComposerSendCoordinatorForTests();
++  vi.useRealTimers();
++  vi.unstubAllGlobals();
++  delete (window as { platform?: unknown }).platform;
++});
++
++// ── 服务端路由层：input_rejected 回执形状 ──
++
++describe('C01 server route: typed input_rejected receipts', () => {
++  it('模型切换拒绝：error + input_rejected（not_accepted / code / retryable / 身份与尝试回显）', async () => {
++    const h = buildChatRouteHarness({ isSessionSwitching: () => true });
++    h.receive({ type: 'prompt', text: 'hi', sessionId: SESSION_A, sessionPath: PATH_A, clientMessageId: 'client-user-1', snapshotVersion: 2, clientAttemptId: 'client-attempt-1' });
++    await vi.runAllTimersAsync();
++
++    const payloads = h.sent();
++    const legacy = payloads.find(p => p.type === 'error');
++    expect(legacy).toMatchObject({ sessionPath: PATH_A });
++    const rejected = payloads.find(p => p.type === 'input_rejected');
++    expect(rejected).toBeDefined();
++    expect(rejected).toMatchObject({
++      outcome: 'not_accepted',
++      sessionId: SESSION_A,
++      sessionPath: PATH_A,
++      clientMessageId: 'client-user-1',
++      snapshotVersion: 2,
++      clientAttemptId: 'client-attempt-1',
++      code: 'model_switching',
++      retryable: true,
++    });
++    expect(h.hub.send).not.toHaveBeenCalled();
++  });
++
++  it('会话忙拒绝：code=session_busy 且 retryable=true', async () => {
++    const h = buildChatRouteHarness({ isSessionStreaming: () => true });
++    h.receive({ type: 'prompt', text: 'hi', sessionId: SESSION_A, sessionPath: PATH_A, clientMessageId: 'client-user-2', snapshotVersion: 1 });
++    await vi.runAllTimersAsync();
++    expect(h.sent().find(p => p.type === 'input_rejected')).toMatchObject({ code: 'session_busy', retryable: true, clientMessageId: 'client-user-2' });
++  });
++
++  it('无效审阅 Agent（评审者=属主）：code=invalid_review_agent 且 retryable=false', async () => {
++    const h = buildChatRouteHarness({});
++    h.receive({
++      type: 'prompt', text: 'please review', sessionId: SESSION_A, sessionPath: PATH_A,
++      clientMessageId: 'client-user-3', snapshotVersion: 1,
++      agentReviewRequests: [{ agentId: 'hana', label: 'Hana' }],
++    });
++    await vi.runAllTimersAsync();
++    expect(h.sent().find(p => p.type === 'input_rejected')).toMatchObject({
++      code: 'invalid_review_agent',
++      retryable: false,
++      clientMessageId: 'client-user-3',
++    });
++  });
++
++  it('已接受后的运行失败（hub.send 抛未标记错误）：不发 input_rejected，只保留普通 error', async () => {
++    const providerError = new Error('provider 500');
++    const h = buildChatRouteHarness({}, { send: vi.fn(async () => { throw providerError; }) });
++    h.receive({ type: 'prompt', text: 'hi', sessionId: SESSION_A, sessionPath: PATH_A, clientMessageId: 'client-user-4', snapshotVersion: 1 });
++    await vi.runAllTimersAsync();
++    const payloads = h.sent();
++    expect(payloads.some(p => p.type === 'error')).toBe(true);
++    expect(payloads.some(p => p.type === 'input_rejected')).toBe(false);
++  });
++
++  it('hub.send 抛出提交层标记的「未接受」错误：发 input_rejected（code=session_busy）', async () => {
++    const busyError = new Error('session_busy');
++    markDesktopInputRejectedBeforeAcceptance(busyError);
++    const h = buildChatRouteHarness({}, { send: vi.fn(async () => { throw busyError; }) });
++    h.receive({ type: 'prompt', text: 'hi', sessionId: SESSION_A, sessionPath: PATH_A, clientMessageId: 'client-user-5', snapshotVersion: 1, clientAttemptId: 'client-attempt-5' });
++    await vi.runAllTimersAsync();
++    expect(h.sent().find(p => p.type === 'input_rejected')).toMatchObject({
++      code: 'session_busy',
++      retryable: true,
++      clientAttemptId: 'client-attempt-5',
++    });
++  });
++
++  it('无 clientMessageId 的旧客户端：只收到 legacy error，不投递拒绝回执', async () => {
++    const h = buildChatRouteHarness({ isSessionSwitching: () => true });
++    h.receive({ type: 'prompt', text: 'hi', sessionId: SESSION_A, sessionPath: PATH_A });
++    await vi.runAllTimersAsync();
++    const payloads = h.sent();
++    expect(payloads.some(p => p.type === 'error')).toBe(true);
++    expect(payloads.some(p => p.type === 'input_rejected')).toBe(false);
++  });
++});
++
++// ── 提交层标记：canonical 接受边界 ──
++
++describe('C01 submit layer: not-accepted evidence vs canonical acceptance', () => {
++  it('busy 门禁拒绝被标记为未接受', async () => {
++    const engine: any = {
++      ensureSessionLoaded: vi.fn(async () => ({})),
++      promptSession: vi.fn(async () => { throw new Error('should not reach'); }),
++      isSessionStreaming: () => true,
++      getSessionManifest: () => ({ currentLocator: { path: PATH_A } }),
++    };
++    let caught: any;
++    await submitDesktopSessionMessage(engine, { sessionId: SESSION_A, text: 'hi', clientMessageId: 'c1' } as any).catch(err => { caught = err; });
++    expect(caught?.message).toBe('session_busy');
++    expect(isDesktopInputRejectedBeforeAcceptance(caught)).toBe(true);
++  });
++
++  it('真实 SDK：canonical append 之后的供应商错误不被标记为未接受', async () => {
++    vi.useRealTimers();
++    const { createAssistantMessageEventStream } = await import('@earendil-works/pi-ai');
++    const f = await createDesktopInputHistoryFixture();
++    // 第一轮成功提交，确认 canonical 关联链路健康。
++    await f.submit('client-user-seed', 1);
++    const seeded = f.manager.getBranch().filter(entry => entry.type === 'message' && entry.message?.role === 'user');
++    expect(seeded.length).toBeGreaterThanOrEqual(1);
++    // 第二轮：canonical append 之后的提交链故障。真实供应商流错误会被 SDK 化解成
++    // run 级事件（不 reject 提交）；这里让「回合结束的 session_status:false 广播」
++    // 在第二轮抛错——它发生在 promptSession 正常返回之后（canonical 已触发），
++    // 错误会沿提交 Promise 冒出，是「已接受后的运行失败」的确定性注入点。
++    const originalEmit = f.engine.emitEvent;
++    let armPostAcceptanceFailure = false;
++    let canonicalSeenWhenArmed = false;
++    f.engine.emitEvent = vi.fn((event: any, sp: string) => {
++      if (armPostAcceptanceFailure && event?.type === 'session_user_message' && event?.message?.sourceEntryId) {
++        canonicalSeenWhenArmed = true;
++        return undefined;
++      }
++      if (armPostAcceptanceFailure && canonicalSeenWhenArmed && event?.type === 'session_status' && event?.isStreaming === false) {
++        throw new Error('synthetic post-acceptance sink failure');
++      }
++      return originalEmit?.call(null, event, sp);
++    });
++    armPostAcceptanceFailure = true;
++    let caught: any;
++    await f.submit('client-user-boom', 1).catch(err => { caught = err; });
++    expect(caught).toBeTruthy();
++    // 用户消息已经 append（canonical 接受证据存在）→ 错误不得标记为未接受。
++    expect(canonicalSeenWhenArmed).toBe(true);
++    const boomUsers = f.manager.getBranch().filter(entry => entry.type === 'message' && entry.message?.role === 'user');
++    expect(boomUsers.length).toBeGreaterThanOrEqual(2);
++    expect(isDesktopInputRejectedBeforeAcceptance(caught)).toBe(false);
++  });
++
++  it('真实 SDK：流式中的 busy 拒绝被标记，用户消息未落盘', async () => {
++    vi.useRealTimers();
++    const { createAssistantMessageEventStream } = await import('@earendil-works/pi-ai');
++    const f = await createDesktopInputHistoryFixture();
++    // 第一轮挂起（流永不结束）占住 session：isSessionStreaming=true。
++    let held!: ReturnType<typeof createAssistantMessageEventStream>;
++    f.stream.mockImplementationOnce(() => {
++      held = createAssistantMessageEventStream();
++      return held;
++    });
++    const first = f.submit('client-user-hold', 1).catch(() => {});
++    await new Promise(resolve => setTimeout(resolve, 100));
++    let caught: any;
++    await f.submit('client-user-busy', 1).catch(err => { caught = err; });
++    expect(caught?.message).toBe('session_busy');
++    expect(isDesktopInputRejectedBeforeAcceptance(caught)).toBe(true);
++    // busy 输入没有落盘：用户消息仍只有第一轮 hold 的一条。
++    const users = f.manager.getBranch().filter(entry => entry.type === 'message' && entry.message?.role === 'user');
++    expect(users).toHaveLength(1);
++    // 释放挂起的流，让 fixture 清理可以完成。
++    held.push({ type: 'done', reason: 'stop', message: { role: 'assistant', content: [{ type: 'text', text: 'release' }], api: 'openai-completions', provider: 'synthetic-r04', model: 'synthetic-r04-model', usage: { input: 1, output: 1, cacheRead: 0, cacheWrite: 0, totalTokens: 2, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } }, stopReason: 'stop', timestamp: Date.now() } } as any);
++    held.end();
++    await first;
++  });
++});
++
++// ── 评审协调器：onRejected 结算通知 ──
++
++describe('C01 agent review: onRejected notification', () => {
++  beforeEach(() => { vi.useRealTimers(); });
++
++  function buildCoordinator(overrides: Record<string, any> = {}) {
++    const statuses: any[] = [];
++    const engine: any = {
++      emitEvent: vi.fn(),
++      getSessionByPath: () => ({ model: { id: 'm' } }),
++      getSessionManifest: () => ({}),
++      createDetachedSession: vi.fn(async () => ({ sessionId: 'rev-1', sessionPath: '/rev.jsonl' })),
++      abortSession: vi.fn(async () => {}),
++      ...overrides,
++    };
++    const coordinator = new AgentReviewTurnCoordinator({
++      engine,
++      submitSessionMessage: vi.fn(async () => ({ text: 'review text' })),
++      emitStatus: (status) => { statuses.push(status); },
++    });
++    return { coordinator, engine, statuses };
++  }
++
++  const baseInput = {
++    reviewedSessionId: SESSION_A,
++    reviewedSessionPath: PATH_A,
++    reviewer: { agentId: 'reviewer' },
++    text: 'please review',
++    clientMessageId: 'client-user-rev',
++    snapshotVersion: 1,
++  };
++
++  it('父会话提交前失败（模型缺失）通知 onRejected，父会话从未收到提交', async () => {
++    const { coordinator } = buildCoordinator({ getSessionByPath: () => null });
++    const rejections: any[] = [];
++    await coordinator.start({ ...baseInput, onRejected: info => rejections.push(info) });
++    expect(rejections).toHaveLength(1);
++    expect(rejections[0]).toMatchObject({ code: 'reviewed_session_model_unavailable', retryable: true });
++  });
++
++  it('评审完成（父会话提交成功）不通知 onRejected', async () => {
++    const { coordinator } = buildCoordinator();
++    const rejections: any[] = [];
++    await coordinator.start({ ...baseInput, onRejected: info => rejections.push(info) });
++    expect(rejections).toHaveLength(0);
++  });
++
++  it('用户在父会话提交前停止：通知 onRejected（review_cancelled_before_acceptance）', async () => {
++    let releaseReviewer!: () => void;
++    const reviewerGate = new Promise<void>(resolve => { releaseReviewer = resolve; });
++    const { coordinator } = buildCoordinator({
++      createDetachedSession: vi.fn(async () => {
++        await reviewerGate;
++        return { sessionId: 'rev-1', sessionPath: '/rev.jsonl' };
++      }),
++    });
++    const rejections: any[] = [];
++    const start = coordinator.start({ ...baseInput, onRejected: info => rejections.push(info) });
++    await new Promise(resolve => setTimeout(resolve, 20));
++    await coordinator.cancelByParent(SESSION_A, 'user_abort');
++    releaseReviewer();
++    await start;
++    expect(rejections).toHaveLength(1);
++    expect(rejections[0]).toMatchObject({ code: 'review_cancelled_before_acceptance', retryable: true });
++  });
++});
++
++// ── 客户端结算：真实 handler → coordinator → store ──
++
++describe('C01 client settlement via real ws-message-handler', () => {
++  it('模型切换拒绝：结算为明确失败、释放屏障、保留快照，修正后可显式重试（路由全链路）', async () => {
++    const h = buildChatRouteHarness({ isSessionSwitching: () => true });
++    const { record, payload } = await submitViaCoordinator('待发消息');
++    expect(record.phase).toBe('awaiting_ack');
++
++    // 客户端载荷经真实 ws 路由提交到服务端；服务端回包（error + input_rejected）
++    // 再经真实 handler 进入 store/coordinator——完整闭环。
++    h.receive(payload);
++    await vi.advanceTimersByTimeAsync(0);
++    const rejectedFromServer = h.sent().find(p => p.type === 'input_rejected');
++    expect(rejectedFromServer).toMatchObject({ clientMessageId: record.clientMessageId });
++    for (const out of h.sent()) handleServerMessage(out);
++
++    expect(record.phase).toBe('rejected_before_acceptance');
++    expect(record.code).toBe('model_switching');
++    expect(record.retryable).toBe(true);
++    expect(record.bundle.text).toBe('待发消息');
++    // 屏障释放：同会话可再次取得租约（transport_busy 消失）。
++    expect(hasInFlightSend(identityOf(PATH_A))).toBe(false);
++    // 消息投影：明确失败 + 可重试，正文原样保留。
++    const item = itemsOf(PATH_A).find(i => i.type === 'message' && i.data.id === record.clientMessageId);
++    const data = messageData(item);
++    expect(data.sendStatus).toBe('failed');
++    expect(data.sendError).toBe('model_switching');
++    expect(data.sendRetryable).toBe(true);
++    expect(data.text).toBe('待发消息');
++
++    // 修正（切换完成）后显式重试：同一逻辑身份、新尝试身份、不产生重复消息项。
++    h.engine.isSessionSwitching = () => false;
++    h.hub.send = vi.fn(async () => ({}));
++    const retry = await retryRejectedUserMessage(PATH_A, record.clientMessageId, makeDeps());
++    expect(retry?.kind).toBe('transport_submitted');
++    expect(record.phase).toBe('awaiting_ack');
++    const retryPayload = sentPayloads().at(-1)!;
++    expect(retryPayload.clientMessageId).toBe(record.clientMessageId);
++    expect(retryPayload.clientAttemptId).not.toBe(payload.clientAttemptId);
++    const matches = itemsOf(PATH_A).filter(i => i.type === 'message' && i.data.id === record.clientMessageId);
++    expect(matches).toHaveLength(1);
++    // 重试把失败投影重置回「等待回执」的 pending 态。
++    expect(messageData(matches[0]).sendStatus).toBe('pending');
++  });
++
++  it('负回执在看门狗超时之前到达：不触发 delivery_unknown，也不启动对账', async () => {
++    const { record } = await submitViaCoordinator('watchdog before');
++    dispatchRejection({ clientMessageId: record.clientMessageId, clientAttemptId: record.activeAttemptId });
++    expect(record.phase).toBe('rejected_before_acceptance');
++    vi.advanceTimersByTime(20_000);
++    expect(record.phase).toBe('rejected_before_acceptance');
++    expect(messageData(itemsOf(PATH_A).find(i => i.type === 'message' && i.data.id === record.clientMessageId)).sendError)
++      .toBe('model_switching');
++  });
++
++  it('负回执在看门狗超时之后到达：delivery_unknown 被确定拒绝覆盖', async () => {
++    const { record } = await submitViaCoordinator('watchdog after');
++    vi.advanceTimersByTime(16_000);
++    expect(record.phase).toBe('delivery_unknown');
++    dispatchRejection({ clientMessageId: record.clientMessageId, clientAttemptId: record.activeAttemptId });
++    expect(record.phase).toBe('rejected_before_acceptance');
++    expect(hasInFlightSend(identityOf(PATH_A))).toBe(false);
++  });
++
++  it('第一尝试迟到负回执不影响第二尝试；重复回执幂等', async () => {
++    const { record } = await submitViaCoordinator('attempt one');
++    const firstAttemptId = record.activeAttemptId!;
++    dispatchRejection({ clientMessageId: record.clientMessageId, clientAttemptId: firstAttemptId });
++    expect(record.phase).toBe('rejected_before_acceptance');
++    // 显式重试 → 新尝试。
++    const retry = await retrySendRecord(record.leaseId, makeDeps());
++    expect(retry?.kind).toBe('transport_submitted');
++    expect(record.phase).toBe('awaiting_ack');
++    const secondAttemptId = record.activeAttemptId!;
++    expect(secondAttemptId).not.toBe(firstAttemptId);
++    // 第一次尝试的迟到负回执：不结算第二次尝试。
++    dispatchRejection({ clientMessageId: record.clientMessageId, clientAttemptId: firstAttemptId, code: 'session_busy' });
++    expect(record.phase).toBe('awaiting_ack');
++    // 重复的当前尝试回执：幂等，不改变状态。
++    dispatchRejection({ clientMessageId: record.clientMessageId, clientAttemptId: secondAttemptId });
++    expect(record.phase).toBe('rejected_before_acceptance');
++    expect(record.code).toBe('model_switching');
++  });
++
++  it('跨会话 / 跨服务器 / 错误版本回执无效果', async () => {
++    const { record } = await submitViaCoordinator('isolation');
++    // 跨会话。
++    dispatchRejection({ clientMessageId: record.clientMessageId, sessionPath: PATH_B, sessionId: 'sess-b', clientAttemptId: record.activeAttemptId });
++    expect(record.phase).toBe('awaiting_ack');
++    // 跨服务器（不同 originConnectionKey）。
++    const cross = noteComposerInputRejected({
++      originConnectionKey: JSON.stringify(['other-server']),
++      sessionId: SESSION_A, sessionPath: PATH_A,
++      clientMessageId: record.clientMessageId, snapshotVersion: 1,
++      clientAttemptId: record.activeAttemptId,
++    }, { code: 'model_switching', retryable: true });
++    expect(cross).toBe(false);
++    expect(record.phase).toBe('awaiting_ack');
++    // 错误版本。
++    dispatchRejection({ clientMessageId: record.clientMessageId, snapshotVersion: 9, clientAttemptId: record.activeAttemptId });
++    expect(record.phase).toBe('awaiting_ack');
++  });
++
++  it('已有 canonical 接受证据时，冲突负回执不倒退为未接收', async () => {
++    const { record } = await submitViaCoordinator('accepted conflict');
++    handleServerMessage({
++      type: 'session_user_message',
++      sessionPath: PATH_A, sessionId: SESSION_A,
++      clientMessageId: record.clientMessageId, snapshotVersion: 1,
++      message: { id: 'srv-entry-1', text: 'accepted conflict', timestamp: new Date().toISOString() },
++    });
++    expect(record.acceptance).toBe('accepted');
++    dispatchRejection({ clientMessageId: record.clientMessageId, clientAttemptId: record.activeAttemptId });
++    expect(record.acceptance).toBe('accepted');
++    expect(record.phase).toBe('accepted');
++  });
++
++  it('已接受后的供应商错误（普通 error）：不结算为未接收、不自动重发', async () => {
++    const { record } = await submitViaCoordinator('provider error later');
++    handleServerMessage({
++      type: 'session_user_message',
++      sessionPath: PATH_A, sessionId: SESSION_A,
++      clientMessageId: record.clientMessageId, snapshotVersion: 1,
++      message: { id: 'srv-entry-2', text: 'provider error later', timestamp: new Date().toISOString() },
++    });
++    handleServerMessage({ type: 'error', sessionPath: PATH_A, message: 'provider 500' });
++    expect(record.acceptance).toBe('accepted');
++    expect(record.phase).toBe('accepted');
++    const sendsBefore = sentPayloads().length;
++    vi.advanceTimersByTime(30_000);
++    expect(sentPayloads().length).toBe(sendsBefore);
++    const data = messageData(itemsOf(PATH_A).find(i => i.type === 'message' && i.data.id === record.clientMessageId));
++    expect(data.sendStatus).toBeUndefined();
++  });
++
++  it('拒绝项的正文/附件/引用/知识范围完整保留在失败投影', async () => {
++    const bundle = makeBundle(PATH_A, '正文内容', {
++      quotes: [{ text: '被引用的段落', start: 0, end: 8 } as never],
++      knowledgeRefs: { notebookIds: ['nb-1'], mode: 'fast', notebookNames: { 'nb-1': '笔记本' } } as never,
++    });
++    const identity = identityOf(PATH_A);
++    const acquired = tryAcquireSendLease({ identity, bundle });
++    if (!acquired.ok) throw new Error('lease not acquired');
++    const result = await sendWithLease(acquired.leaseId, makeDeps());
++    expect(result.kind).toBe('transport_submitted');
++    const record = getSendRecord(acquired.leaseId)!;
++    dispatchRejection({ clientMessageId: record.clientMessageId, clientAttemptId: record.activeAttemptId });
++    const data = messageData(itemsOf(PATH_A).find(i => i.type === 'message' && i.data.id === record.clientMessageId));
++    expect(data.text).toBe('正文内容');
++    expect(data.quotedText).toContain('被引用的段落');
++    expect(data.knowledgeRefs?.notebookIds).toEqual(['nb-1']);
++  });
++
++  it('A 被拒（transport_submitted 后出队）恢复原位失败；不跳过 A 发 B；处置 A 后 B 推进', async () => {
++    // 队列：A、B。
++    const itemA: QueuedTurnInput = { id: 'qa', sessionPath: PATH_A, createdAt: 1, text: 'A 消息', bundle: makeBundle(PATH_A, 'A 消息'), snapshotVersion: 1 };
++    const itemB: QueuedTurnInput = { id: 'qb', sessionPath: PATH_A, createdAt: 2, text: 'B 消息', bundle: makeBundle(PATH_A, 'B 消息'), snapshotVersion: 1 };
++    useStore.getState().enqueueQueuedTurnInput(PATH_A, itemA);
++    useStore.getState().enqueueQueuedTurnInput(PATH_A, itemB);
++    const { dispatchQueuedItem, flushQueuedHeadNow, findSendRecordByClientMessageId } = await import('../desktop/src/react/services/composer-send-coordinator');
++    const dispatched = await dispatchQueuedItem(itemA, { type: 'prompt' }, makeDeps());
++    expect(dispatched.kind).toBe('transport_submitted');
++    // transport_submitted 已把 A 出队（快照移交乐观消息）。
++    expect(queueOf(PATH_A).map(item => item.id)).toEqual(['qb']);
++    const record = findSendRecordByClientMessageId(String(sentPayloads().at(-1)!.clientMessageId))!;
++    expect(record.queueItemId).toBe('qa');
++
++    dispatchRejection({ clientMessageId: record.clientMessageId, clientAttemptId: record.activeAttemptId });
++
++    // A 原位恢复为失败输入（顺序保持队首），B 不越过 A。
++    const queue = queueOf(PATH_A);
++    expect(queue.map(item => item.id)).toEqual(['qa', 'qb']);
++    expect(queue[0]).toMatchObject({ status: 'failed', errorCode: 'model_switching', retryable: true });
++
++    const sendsBefore = sentPayloads().length;
++    await flushQueuedHeadNow(PATH_A, makeDeps());
++    expect(sentPayloads().length).toBe(sendsBefore); // B 未被发出
++
++    // 处置 A（明确放弃）后 B 正常推进。
++    expect(discardRejectedUserMessage(PATH_A, record.clientMessageId)).toBe(true);
++    expect(queueOf(PATH_A).map(item => item.id)).toEqual(['qb']);
++    useStore.setState({ currentSessionPath: PATH_A, currentSessionId: SESSION_A } as never);
++    await flushQueuedHeadNow(PATH_A, makeDeps());
++    expect(sentPayloads().length).toBe(sendsBefore + 1);
++    expect(sentPayloads().at(-1)!.text).toContain('B 消息');
++  });
++
++  it('真正的 delivery_unknown 屏障仍有效，且不阻塞其他会话', async () => {
++    const { record } = await submitViaCoordinator('unknown barrier');
++    vi.advanceTimersByTime(16_000);
++    expect(record.phase).toBe('delivery_unknown');
++    // 该会话新输入被未决屏障拦下。
++    const blocked = tryAcquireSendLease({ identity: identityOf(PATH_A), bundle: makeBundle(PATH_A, '第二条') });
++    expect(blocked).toMatchObject({ ok: false, reason: 'transport_busy' });
++    // 其他会话不受影响。
++    const other = tryAcquireSendLease({ identity: identityOf(PATH_B, 'sess-b'), bundle: makeBundle(PATH_B, '其他会话') });
++    expect(other.ok).toBe(true);
++  });
++});
+diff --git a/tests/round3-c02-receipt-backup-dir.test.ts b/tests/round3-c02-receipt-backup-dir.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..e928eaa8c4e7e3695c0c9e234d4a91ec52af7cf9
+--- /dev/null
++++ b/tests/round3-c02-receipt-backup-dir.test.ts
+@@ -0,0 +1,264 @@
++/**
++ * C02：迁移/恢复收据 backupDir 的平台无关存储合同。
++ *
++ * 写侧：新产生/合法续写的收据一律 "/" 分隔（backupDirForReceipt），
++ * 不再把本机 path.join 的结果持久化。
++ * 读侧：校验接受规范 POSIX 形式与旧 Windows 写入逻辑产生的反斜杠形式；
++ * 续跑在内存中转规范形式，只读扫描不改写文件；实际文件访问经
++ * receiptBackupDirLocalPath 用本机规则合成路径。
++ *
++ * 平台限制：本文件在 POSIX（macOS）上运行；「Windows 旧表示」通过把真实
++ * 迁移/恢复产出的收据 backupDir 重写为反斜杠形式模拟——缺陷本身是数据格式
++ * 级（写入侧把平台分隔符持久化），表示规则与续跑语义可由此完整证明；真实
++ * Windows 客户端端到端写入留待该平台实测（不在本环境伪造）。
++ */
++import fs from 'node:fs';
++import os from 'node:os';
++import path from 'node:path';
++import { createHash, randomUUID } from 'node:crypto';
++import { afterEach, describe, expect, it } from 'vitest';
++import {
++  migrateAgentPinnedTenets,
++  readPinnedTenetsMigrationReceipt,
++  type MigrationReceipt,
++} from '../core/pinned-tenets-migration.ts';
++import { applyPinnedTenetsRecovery } from '../core/pinned-tenets-recovery.ts';
++import { parseReceiptBackupDir, receiptBackupDirLocalPath, backupDirForReceipt } from '../core/pinned-tenets-backup-dir.ts';
++import { tenetsFilePath, readTenetsFileStrict } from '../lib/memory/tenets.ts';
++
++const homes: string[] = [];
++afterEach(() => { for (const home of homes.splice(0)) fs.rmSync(home, { recursive: true, force: true }); });
++const sha = (s: string | Buffer) => createHash('sha256').update(s).digest('hex');
++const POSIX_BACKUP = /^memory\/pinned-migration-backup(?:\/[a-zA-Z0-9-]+)?$/;
++
++function fixture(content = 'synthetic item') {
++  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'r-c02-')); homes.push(home);
++  const dir = path.join(home, 'agents', 'test-agent'); fs.mkdirSync(path.join(dir, 'memory'), { recursive: true });
++  fs.writeFileSync(path.join(dir, 'pinned-memory.json'), JSON.stringify({ version: 1, items: content ? [{ id: 'old', content }] : [] }));
++  return { home, dir };
++}
++const receiptPath = (d: string) => path.join(d, 'memory', 'pinned-tenets-migration.receipt.json');
++const operationPath = (d: string, id: string) => path.join(d, 'memory', 'pinned-recovery-operations', `${id}.json`);
++
++function readReceiptRaw(dir: string): MigrationReceipt {
++  return JSON.parse(fs.readFileSync(receiptPath(dir), 'utf8')) as MigrationReceipt;
++}
++function writeReceiptRaw(dir: string, receipt: MigrationReceipt) {
++  fs.writeFileSync(receiptPath(dir), JSON.stringify(receipt, null, 2) + '\n');
++}
++/** 模拟旧 Windows 写入逻辑：把收据 backupDir 换成 path.win32 风格反斜杠形式。 */
++function windowsifyBackupDir<T extends { backupDir: string | null }>(receipt: T): T {
++  expect(receipt.backupDir).toMatch(POSIX_BACKUP);
++  receipt.backupDir = receipt.backupDir!.replace(/\//g, '\\');
++  return receipt;
++}
++function crashAt(checkpoint: string) {
++  return { at: (p: string) => { if (p === checkpoint) throw new Error('synthetic crash'); } };
++}
++
++describe('C02 写侧：新收据一律 POSIX 规范路径', () => {
++  it('完整迁移写出的收据 backupDir 是 "/" 分隔且可原样读回（写→读往返）', () => {
++    const { dir } = fixture();
++    migrateAgentPinnedTenets(dir, 'test-agent');
++    const raw = readReceiptRaw(dir);
++    expect(raw.backupDir).toMatch(POSIX_BACKUP);
++    expect(raw.state).toBe('completed');
++    // 备份文件实际落在该规范路径表示的目录下（本机规则合成）。
++    const backupDirPath = receiptBackupDirLocalPath(dir, raw.backupDir);
++    expect(fs.existsSync(backupDirPath)).toBe(true);
++    // 重新读取（严格校验路径）不抛错，且与磁盘内容一致。
++    expect(readPinnedTenetsMigrationReceipt(dir)).toEqual(raw);
++  });
++
++  it('合法续写（Windows 旧收据恢复中断后）持久化为规范路径', () => {
++    const { dir } = fixture();
++    expect(() => migrateAgentPinnedTenets(dir, 'test-agent', crashAt('archive:before:pinned-memory.json'))).toThrow();
++    const receipt = windowsifyBackupDir(readReceiptRaw(dir));
++    writeReceiptRaw(dir, receipt);
++    expect(receipt.backupDir).toContain('\\');
++    migrateAgentPinnedTenets(dir, 'test-agent');
++    const after = readReceiptRaw(dir);
++    expect(after.state).toBe('completed');
++    expect(after.backupDir).toMatch(POSIX_BACKUP);
++    expect(readTenetsFileStrict(tenetsFilePath(dir)).tenets.some(t => t.content === 'synthetic item')).toBe(true);
++  });
++
++  it('恢复操作（recovery）新收据 backupDir 同样是规范路径', () => {
++    const { home, dir } = fixture();
++    fs.renameSync(path.join(dir, 'pinned-memory.json'), path.join(dir, 'pinned-memory.json.migrated'));
++    const source = 'pinned-memory.json.migrated';
++    const approval = {
++      schemaVersion: 1, operationId: randomUUID(), agentId: 'test-agent',
++      sources: [{ file: source, sha256: sha(fs.readFileSync(path.join(dir, source))) }],
++      observedTargetHash: fs.existsSync(tenetsFilePath(dir)) ? sha(fs.readFileSync(tenetsFilePath(dir))) : null,
++      decisions: [{ source, sourceEntryKey: 'old', contentHash: `sha256:${sha('synthetic item')}`, action: 'restore' as const }],
++    };
++    applyPinnedTenetsRecovery(home, approval);
++    const op = JSON.parse(fs.readFileSync(operationPath(dir, approval.operationId), 'utf8'));
++    expect(op.backupDir).toMatch(POSIX_BACKUP);
++    expect(op.backupDir).toBe(backupDirForReceipt(approval.operationId));
++  });
++});
++
++describe('C02 兼容读：v3 迁移收据三个续跑状态 × Windows 旧表示', () => {
++  it.each([
++    ['prepared', 'receipt:prepared'],
++    ['target_committed', 'archive:before:pinned-memory.json'],
++    ['sources_archived', 'completed:before'],
++  ] as const)('Windows 旧表示的 %s 收据可读、可续跑至 completed', (expectedState, checkpoint) => {
++    const { dir } = fixture();
++    expect(() => migrateAgentPinnedTenets(dir, 'test-agent', crashAt(checkpoint))).toThrow();
++    const raw = readReceiptRaw(dir);
++    expect(raw.state).toBe(expectedState);
++    const receipt = windowsifyBackupDir(raw);
++    writeReceiptRaw(dir, receipt);
++    // 严格校验读取接受 Windows 旧表示。
++    expect(readPinnedTenetsMigrationReceipt(dir)?.state).toBe(expectedState);
++    migrateAgentPinnedTenets(dir, 'test-agent');
++    const after = readReceiptRaw(dir);
++    expect(after.state).toBe('completed');
++    expect(after.backupDir).toMatch(POSIX_BACKUP);
++    // 归档与目标内容完整。
++    expect(fs.existsSync(path.join(dir, 'pinned-memory.json'))).toBe(false);
++    expect(fs.existsSync(path.join(dir, 'pinned-memory.json.migrated'))).toBe(true);
++    expect(readTenetsFileStrict(tenetsFilePath(dir)).tenets.some(t => t.content === 'synthetic item')).toBe(true);
++  });
++
++  it('completed 后删除记忆，再读 Windows 旧收据不复活、不重导', () => {
++    const { dir } = fixture();
++    migrateAgentPinnedTenets(dir, 'test-agent');
++    const receipt = windowsifyBackupDir(readReceiptRaw(dir));
++    fs.writeFileSync(tenetsFilePath(dir), JSON.stringify({ schemaVersion: 1, tenets: [] }));
++    writeReceiptRaw(dir, receipt);
++    const before = fs.readFileSync(receiptPath(dir));
++    migrateAgentPinnedTenets(dir, 'test-agent');
++    expect(fs.readFileSync(receiptPath(dir))).toEqual(before);
++    expect(readTenetsFileStrict(tenetsFilePath(dir)).tenets).toHaveLength(0);
++  });
++
++  it('旧 v2 completed 收据（含 Windows backupDir）读取不抛错且不重导', () => {
++    const { dir } = fixture();
++    migrateAgentPinnedTenets(dir, 'test-agent');
++    const raw = readReceiptRaw(dir);
++    raw.version = 2;
++    delete (raw as Partial<MigrationReceipt>).operationId;
++    windowsifyBackupDir(raw);
++    fs.writeFileSync(tenetsFilePath(dir), JSON.stringify({ schemaVersion: 1, tenets: [] }));
++    writeReceiptRaw(dir, raw);
++    migrateAgentPinnedTenets(dir, 'test-agent');
++    expect(readTenetsFileStrict(tenetsFilePath(dir)).tenets).toHaveLength(0);
++  });
++
++  it('旧 v2 中间态收据（Windows backupDir）按升级路径继续并落规范路径', () => {
++    const { dir } = fixture();
++    expect(() => migrateAgentPinnedTenets(dir, 'test-agent', crashAt('receipt:prepared'))).toThrow();
++    const raw = readReceiptRaw(dir);
++    raw.version = 2;
++    delete (raw as Partial<MigrationReceipt>).operationId;
++    windowsifyBackupDir(raw);
++    writeReceiptRaw(dir, raw);
++    migrateAgentPinnedTenets(dir, 'test-agent');
++    const after = readReceiptRaw(dir);
++    expect(after.state).toBe('completed');
++    expect(after.version).toBe(3);
++    expect(after.backupDir).toMatch(POSIX_BACKUP);
++  });
++});
++
++describe('C02 兼容读：v3 恢复操作收据 × Windows 旧表示', () => {
++  function setupRecovery() {
++    const { home, dir } = fixture();
++    fs.renameSync(path.join(dir, 'pinned-memory.json'), path.join(dir, 'pinned-memory.json.migrated'));
++    const source = 'pinned-memory.json.migrated';
++    const approval = {
++      schemaVersion: 1, operationId: randomUUID(), agentId: 'test-agent',
++      sources: [{ file: source, sha256: sha(fs.readFileSync(path.join(dir, source))) }],
++      observedTargetHash: fs.existsSync(tenetsFilePath(dir)) ? sha(fs.readFileSync(tenetsFilePath(dir))) : null,
++      decisions: [{ source, sourceEntryKey: 'old', contentHash: `sha256:${sha('synthetic item')}`, action: 'restore' as const }],
++    };
++    return { home, dir, approval, source };
++  }
++
++  it('target_committed 中断 + Windows 旧表示：续跑完成，批准摘要与 operation 身份不变', () => {
++    const f = setupRecovery();
++    // 第一轮在提交后、收据更新前崩溃（target_committed 或 prepared-with-committed-target）。
++    expect(() => applyPinnedTenetsRecovery(f.home, f.approval, crashAt('completed:before'))).toThrow();
++    const before = JSON.parse(fs.readFileSync(operationPath(f.dir, f.approval.operationId), 'utf8'));
++    const identityBefore = { operationId: before.operationId, approvalDigest: before.approvalDigest, approval: before.approval, plan: before.plan };
++    windowsifyBackupDir(before);
++    fs.writeFileSync(operationPath(f.dir, f.approval.operationId), JSON.stringify(before, null, 2) + '\n');
++    const summary = applyPinnedTenetsRecovery(f.home, f.approval);
++    expect(summary.restored).toBe(1);
++    const after = JSON.parse(fs.readFileSync(operationPath(f.dir, f.approval.operationId), 'utf8'));
++    expect(after.state).toBe('completed');
++    expect(after.operationId).toBe(identityBefore.operationId);
++    expect(after.approvalDigest).toBe(identityBefore.approvalDigest);
++    expect(after.approval).toEqual(identityBefore.approval);
++    expect(after.plan).toEqual(identityBefore.plan);
++    expect(after.backupDir).toMatch(POSIX_BACKUP);
++    expect(readTenetsFileStrict(tenetsFilePath(f.dir)).tenets.some(t => t.content === 'synthetic item')).toBe(true);
++  });
++
++  it('completed 恢复操作 + Windows 旧表示：幂等返回原 summary，不重导', () => {
++    const f = setupRecovery();
++    const first = applyPinnedTenetsRecovery(f.home, f.approval);
++    const raw = JSON.parse(fs.readFileSync(operationPath(f.dir, f.approval.operationId), 'utf8'));
++    windowsifyBackupDir(raw);
++    fs.writeFileSync(operationPath(f.dir, f.approval.operationId), JSON.stringify(raw, null, 2) + '\n');
++    // 用户此后删除了恢复出来的条目：旧收据不得复活。
++    fs.writeFileSync(tenetsFilePath(f.dir), JSON.stringify({ schemaVersion: 1, tenets: [] }));
++    expect(applyPinnedTenetsRecovery(f.home, f.approval)).toEqual(first);
++    expect(readTenetsFileStrict(tenetsFilePath(f.dir)).tenets).toHaveLength(0);
++  });
++});
++
++describe('C02 拒绝路径：结构先行验证，危险输入一律拒绝', () => {
++  it.each([
++    ['盘符', 'C:\\memory\\pinned-migration-backup'],
++    ['UNC', '\\\\server\\share\\pinned-migration-backup'],
++    ['绝对路径', '/memory/pinned-migration-backup'],
++    ['路径逃逸(POSIX)', 'memory/pinned-migration-backup/../escape'],
++    ['路径逃逸(Windows)', 'memory\\pinned-migration-backup\\..\\escape'],
++    ['点段', 'memory/pinned-migration-backup/.'],
++    ['双点段', 'memory/pinned-migration-backup/..'],
++    ['多余层级', 'memory/pinned-migration-backup/a/b'],
++    ['混合分隔符', 'memory/pinned-migration-backup\\abc'],
++    ['混合分隔符2', 'memory\\pinned-migration-backup/abc'],
++    ['NUL', 'memory/pinned-migration-backup/\0abc'],
++    ['前缀伪造', 'memoryx/pinned-migration-backup'],
++    ['尾部空白', 'memory/pinned-migration-backup '],
++    ['空串', ''],
++    ['非字符串', 42],
++  ])('%s 被拒绝', (_name, value) => {
++    expect(parseReceiptBackupDir(value)).toBeNull();
++  });
++
++  it.each([
++    'memory/pinned-migration-backup',
++    'memory/pinned-migration-backup/0e2d1f2a-1111-2222-3333-444455556666',
++    'memory\\pinned-migration-backup',
++    'memory\\pinned-migration-backup\\0e2d1f2a-1111-2222-3333-444455556666',
++  ])('合法表示 %j 被接受并规范化', value => {
++    const canonical = parseReceiptBackupDir(value);
++    expect(canonical).toBe(String(value).replace(/\\/g, '/'));
++  });
++
++  it('危险 backupDir 让收据整体判无效（读取抛错），不落入续跑', () => {
++    const { dir } = fixture();
++    migrateAgentPinnedTenets(dir, 'test-agent');
++    const raw = readReceiptRaw(dir);
++    raw.state = 'target_committed';
++    raw.backupDir = 'memory/pinned-migration-backup/../../escape';
++    writeReceiptRaw(dir, raw);
++    expect(() => readPinnedTenetsMigrationReceipt(dir)).toThrow(/invalid migration receipt/i);
++    // 源文件保持归档态，没有被续跑移动或重导。
++    expect(fs.existsSync(path.join(dir, 'pinned-memory.json'))).toBe(false);
++  });
++
++  it('receiptBackupDirLocalPath 拒绝非法输入（明确失败，不猜测路径）', () => {
++    expect(() => receiptBackupDirLocalPath('/agents/x', 'C:\\evil')).toThrow(/invalid receipt backupDir/i);
++    expect(receiptBackupDirLocalPath('/agents/x', null)).toBe(path.join('/agents/x', 'memory', 'pinned-migration-backup'));
++    expect(receiptBackupDirLocalPath('/agents/x', 'memory\\pinned-migration-backup\\abc'))
++      .toBe(path.join('/agents/x', 'memory', 'pinned-migration-backup', 'abc'));
++  });
++});
+diff --git a/tests/round3-delivery-evidence.test.ts b/tests/round3-delivery-evidence.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..a903ff8c2c1b101bec9cad3a45b95ba1f805a673
+--- /dev/null
++++ b/tests/round3-delivery-evidence.test.ts
+@@ -0,0 +1,173 @@
++import crypto from "node:crypto";
++import fs from "node:fs";
++import path from "node:path";
++import { execFileSync, spawnSync } from "node:child_process";
++import { describe, expect, it } from "vitest";
++
++/**
++ * round3（C01-C03）候选交付证据契约。
++ *
++ * 与 round2-delivery-evidence.test.ts 分层：本文件只约束本轮（基线 67dee5d2）
++ * 的证据——命令记录日志存在且哈希可复算、源码 manifest 覆盖当前树（含本轮
++ * 新增源码/测试）、存在同摘要无漂移的绿色门禁、增量补丁重放验证通过、
++ * round2 日志交付不回退（C03 回归守卫）。不追认历史：round2 的验证事实由其
++ * 自身的证据测试约束。
++ *
++ * manifest 与树的比对沿用 R10-03 的候选回退语义：封印推进提交（仅审计六文件）
++ * 会让当前树偏离冻结 manifest，此时退回 VERIFIED_SOURCE_SHA 指向的候选提交，
++ * 经 post-verification diff guard 验证后按该提交内容比对。
++ */
++const ROOT = path.resolve(import.meta.dirname, "..");
++const OUT = path.join(ROOT, "artifacts", "f1-f12-repair", "round3-c01-c03");
++const ROUND2 = path.join(ROOT, "artifacts", "f1-f12-repair", "round2");
++const BASE = "67dee5d2de9d3b9fc75ec5ef5c555e93c65b3ccd";
++
++function bytes(relative: string, base = OUT): Buffer {
++  return fs.readFileSync(path.join(base, relative));
++}
++
++function sha256(value: Buffer | string): string {
++  return crypto.createHash("sha256").update(value).digest("hex");
++}
++
++function readJson(relative: string, base = OUT): any {
++  return JSON.parse(bytes(relative, base).toString("utf8"));
++}
++
++function currentSourcePaths(): string[] {
++  return execFileSync("git", ["ls-files", "-z", "--cached", "--others", "--exclude-standard"], {
++    cwd: ROOT, encoding: "utf8",
++  }).split("\0").filter(Boolean)
++    .filter(file => !(file.startsWith("artifacts/f1-f12-repair/") && !file.endsWith(".py")))
++    .filter(file => !file.endsWith(".patch"))
++    .filter(file => fs.statSync(path.join(ROOT, file)).isFile())
++    .sort();
++}
++
++function sourcePathsAtCommit(commit: string): string[] {
++  return execFileSync("git", ["ls-tree", "-r", "-z", "--name-only", commit], {
++    cwd: ROOT, encoding: "utf8",
++  }).split("\0").filter(Boolean)
++    .filter(file => !(file.startsWith("artifacts/f1-f12-repair/") && !file.endsWith(".py")))
++    .filter(file => !file.endsWith(".patch"))
++    .sort();
++}
++
++function sourceContentsAtCommit(commit: string, paths: string[]): Map<string, Buffer> {
++  const result = spawnSync("git", ["cat-file", "--batch"], {
++    cwd: ROOT,
++    input: `${paths.map((relative) => `${commit}:${relative}`).join("\n")}\n`,
++    maxBuffer: 512 * 1024 * 1024,
++  });
++  expect(result.error, result.error?.message).toBeUndefined();
++  expect(result.status, result.stderr.toString()).toBe(0);
++  const contents = new Map<string, Buffer>();
++  let offset = 0;
++  for (const relative of paths) {
++    const headerEnd = result.stdout.indexOf(0x0a, offset);
++    expect(headerEnd).toBeGreaterThan(offset);
++    const header = result.stdout.subarray(offset, headerEnd).toString("utf8");
++    const match = header.match(/^[0-9a-f]+ blob (\d+)$/);
++    expect(match, `${relative}: ${header}`).toBeTruthy();
++    const size = Number(match![1]);
++    const start = headerEnd + 1;
++    const end = start + size;
++    expect(result.stdout[end], `${relative}: cat-file record terminator`).toBe(0x0a);
++    contents.set(relative, Buffer.from(result.stdout.subarray(start, end)));
++    offset = end + 1;
++  }
++  expect(offset).toBe(result.stdout.length);
++  return contents;
++}
++
++/** 当前树与冻结 manifest 一致 → null（直接比树）；否则经 seal guard 回退到候选提交。 */
++function manifestSourceRef(manifest: any): string | null {
++  const rows = manifest.files.map((row: any) => row.path);
++  if (JSON.stringify(rows) === JSON.stringify(currentSourcePaths())
++    && manifest.files.every((row: any) => {
++      const content = fs.readFileSync(path.join(ROOT, row.path));
++      return content.byteLength === row.bytes && sha256(content) === row.sha256;
++    })) return null;
++  const verified = fs.readFileSync(path.join(ROOT, ".sync-audit", "verified-source-sha.txt"), "utf8").trim();
++  expect(verified).toMatch(/^[0-9a-f]{40}$/);
++  const guard = execFileSync("node", [path.join(ROOT, ".sync-audit", "verify-post-verification-diff.mjs")], {
++    cwd: ROOT, encoding: "utf8",
++  });
++  expect(guard).toContain("post-verification diff guard OK");
++  return verified;
++}
++
++describe("round3 C01-C03 候选交付证据契约", () => {
++  it("C03-回归守卫: round2 交付日志全部存在且哈希可复算（缺一即失败）", () => {
++    const results = readJson("COMMAND_RESULTS.json", ROUND2);
++    expect(results.length).toBeGreaterThan(0);
++    for (const record of results) {
++      expect(sha256(bytes(record.log, ROUND2))).toBe(record.logSha256);
++    }
++  });
++
++  it("round3: 每条命令记录的日志存在、哈希可复算、manifest 齐备", () => {
++    const results = readJson("COMMAND_RESULTS.json");
++    expect(results.length).toBeGreaterThan(0);
++    for (const record of results) {
++      expect(record).toEqual(expect.objectContaining({
++        cwd: "<WORKTREE>", platform: expect.any(String), arch: expect.any(String),
++        node: expect.stringMatching(/^v24\./), npm: expect.any(String),
++        start: expect.any(String), end: expect.any(String), exitCode: expect.any(Number),
++        log: expect.any(String), logSha256: expect.any(String), sourceManifestHash: expect.any(String),
++      }));
++      expect(sha256(bytes(record.log))).toBe(record.logSha256);
++      expect(fs.existsSync(path.join(OUT, "manifests", `${record.sourceManifestHash}.json`))).toBe(true);
++    }
++  });
++
++  it("round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试", () => {
++    const manifest = readJson("SOURCE_MANIFEST.json");
++    expect(manifest.sourceIdentity).toEqual({ kind: "worktree", base: BASE });
++    const sourceRef = manifestSourceRef(manifest);
++    const rows = manifest.files.map((row: any) => row.path);
++    expect(rows).toEqual(sourceRef ? sourcePathsAtCommit(sourceRef) : currentSourcePaths());
++    const committedContents = sourceRef ? sourceContentsAtCommit(sourceRef, rows) : null;
++    for (const row of manifest.files) {
++      const content = committedContents?.get(row.path) ?? fs.readFileSync(path.join(ROOT, row.path));
++      expect(content.byteLength).toBe(row.bytes);
++      expect(sha256(content)).toBe(row.sha256);
++    }
++    // 本轮新增源码/测试进入 manifest（C03.D）。
++    for (const required of [
++      "core/pinned-tenets-backup-dir.ts",
++      "tests/round3-c01-input-rejection.test.ts",
++      "tests/round3-c02-receipt-backup-dir.test.ts",
++      "tests/round3-delivery-evidence.test.ts",
++      "export-manifest.json",
++    ]) {
++      expect(rows).toContain(required);
++    }
++  });
++
++  it("round3: 存在与最终源码摘要一致、执行期间无漂移的绿色门禁", () => {
++    const manifestHash = sha256(bytes("SOURCE_MANIFEST.json"));
++    const results = readJson("COMMAND_RESULTS.json");
++    const green = results.find((record: any) => (
++      record.exitCode === 0
++      && record.sourceManifestHash === manifestHash
++      && record.endSourceManifestHash === manifestHash
++      && record.sourceChangedDuringCommand === false
++    ));
++    expect(green).toBeTruthy();
++  });
++
++  it("round3: 增量补丁存在且重放验证通过（生成脚本输出 VERIFIED 并入库为记录）", () => {
++    const results = readJson("COMMAND_RESULTS.json");
++    // 多次生成补丁时以最后一条为准（补丁文件随源码冻结重生成，旧记录是历史）。
++    const patchRun = results.filter((record: any) => record.command.join(" ").includes("create-round3-patch.py")).at(-1);
++    expect(patchRun).toBeTruthy();
++    const log = bytes(patchRun.log).toString("utf8");
++    expect(log).toContain('"result": "VERIFIED"');
++    const summary = JSON.parse(log.slice(log.indexOf("{"), log.lastIndexOf("}") + 1));
++    expect(summary.base).toBe(BASE);
++    expect(summary.sourceManifestHash).toBe(summary.replayedSourceManifestHash);
++    expect(fs.existsSync(path.join(ROOT, summary.patch))).toBe(true);
++    expect(sha256(fs.readFileSync(path.join(ROOT, summary.patch)))).toBe(summary.patchSha256);
++  });
 +});
 diff --git a/tests/speech-output-validation.round2.test.ts b/tests/speech-output-validation.round2.test.ts
 new file mode 100644

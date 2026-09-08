@@ -662,7 +662,10 @@
     "deliveryChecking": "結果未知，正在核對",
     "deliveryUnknown": "結果未知，核對未完成",
     "deliveryRunUnknown": "訊息已接收，執行結果仍未知",
-    "recheckDelivery": "重新核對"
+    "recheckDelivery": "重新核對",
+    "sendNotAccepted": "未傳送：伺服器未接受這則訊息",
+    "sendRetry": "重試傳送",
+    "sendDismiss": "放棄"
   },
   "agentReview": {
     "running": "正在審閱目前對話",
