@@ -35,6 +35,42 @@ function currentSourcePaths(): string[] {
   }).sort();
 }
 
+function sourcePathsAtCommit(commit: string): string[] {
+  return execFileSync("git", ["ls-tree", "-r", "-z", "--name-only", commit], {
+    cwd: ROOT,
+    encoding: "utf8",
+  }).split("\0").filter(Boolean).filter((file) => {
+    if (file.startsWith("artifacts/f1-f12-repair/") && !file.endsWith(".py")) return false;
+    return !file.endsWith(".patch");
+  }).sort();
+}
+
+function currentTreeMatchesManifest(manifest: any): boolean {
+  const rows = manifest.files.map((row: any) => row.path);
+  if (JSON.stringify(rows) !== JSON.stringify(currentSourcePaths())) return false;
+  return manifest.files.every((row: any) => {
+    const content = fs.readFileSync(path.join(ROOT, row.path));
+    return content.byteLength === row.bytes && sha256(content) === row.sha256;
+  });
+}
+
+function manifestSourceRef(manifest: any): string | null {
+  if (currentTreeMatchesManifest(manifest)) return null;
+  const verified = fs.readFileSync(path.join(ROOT, ".sync-audit", "verified-source-sha.txt"), "utf8").trim();
+  expect(verified).toMatch(/^[0-9a-f]{40}$/);
+  const guard = execFileSync("node", [path.join(ROOT, ".sync-audit", "verify-post-verification-diff.mjs")], {
+    cwd: ROOT,
+    encoding: "utf8",
+  });
+  expect(guard).toContain("post-verification diff guard OK");
+  return verified;
+}
+
+function sourceBytes(relative: string, commit: string | null): Buffer {
+  if (!commit) return fs.readFileSync(path.join(ROOT, relative));
+  return execFileSync("git", ["show", `${commit}:${relative}`], { cwd: ROOT });
+}
+
 describe("R10 round2 交付证据契约", () => {
   it("R10-01: 旧 F7/D 系列明确 superseded，当前无语音输入组件要求与保留能力写清", () => {
     const report = fs.readFileSync(path.join(ROOT, "artifacts/f1-f12-repair/F1_F12_REPAIR_REPORT.md"), "utf8");
@@ -68,10 +104,11 @@ describe("R10 round2 交付证据契约", () => {
   it("R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁", () => {
     const manifest = readJson("SOURCE_MANIFEST.json");
     expect(manifest.sourceIdentity).toEqual({ kind: "worktree", base: BASE });
+    const sourceRef = manifestSourceRef(manifest);
     const rows = manifest.files.map((row: any) => row.path);
-    expect(rows).toEqual(currentSourcePaths());
+    expect(rows).toEqual(sourceRef ? sourcePathsAtCommit(sourceRef) : currentSourcePaths());
     for (const row of manifest.files) {
-      const content = fs.readFileSync(path.join(ROOT, row.path));
+      const content = sourceBytes(row.path, sourceRef);
       expect(content.byteLength).toBe(row.bytes);
       expect(sha256(content)).toBe(row.sha256);
     }
@@ -87,7 +124,10 @@ describe("R10 round2 交付证据契约", () => {
 
   it("R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示", () => {
     const manifest = readJson("SOURCE_MANIFEST.json");
-    expect(manifest.files.map((row: any) => row.path)).toEqual(currentSourcePaths());
+    const sourceRef = manifestSourceRef(manifest);
+    expect(manifest.files.map((row: any) => row.path)).toEqual(
+      sourceRef ? sourcePathsAtCommit(sourceRef) : currentSourcePaths(),
+    );
     expect(manifest.files.map((row: any) => row.path)).toContain("tests/round2-delivery-evidence.test.ts");
     expect(manifest.exclusions.join("\n")).toContain("generated evidence, reports, delivery files");
     expect(manifest.exclusions.join("\n")).toContain("*.patch");

@@ -1,3 +1,86 @@
+diff --git a/.sync-audit/build-sync-matrix.mjs b/.sync-audit/build-sync-matrix.mjs
+index d978251370637d720d11094c068847b151ae235e..51e01b79c63bf78a0d0018c6500b9c71ec9d7a1c 100644
+--- a/.sync-audit/build-sync-matrix.mjs
++++ b/.sync-audit/build-sync-matrix.mjs
+@@ -40,7 +40,7 @@ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source
+ // tree sha，导致 seal guard 在 HEAD 长期红色——Phase 10 F-4 修复）。
+ // 该 commit 早于记录它的审计提交落地，无自引用（SHA = hash(contents)）问题。
+ // 当前 branch HEAD 可能在其后存在纯审计 seal 提交，HEAD 由 Git ref 自身标识。
+-const VERIFIED_SOURCE_SHA = "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202";
++const VERIFIED_SOURCE_SHA = "272ecc708314d8f968931bb9e639e9ed169308ee";
+ 
+ const ALLOWED_DISPOSITIONS = ["ADOPTED", "ADAPTED", "REGENERATED", "INTENTIONAL_DIVERGENCE"];
+ 
+diff --git a/.sync-audit/upstream-sync-matrix.json b/.sync-audit/upstream-sync-matrix.json
+index d6f8692829bc71ee97c3253e5482beabfdb51324..933a4b45187333fa1d81b2285317e054bbc69fc4 100644
+--- a/.sync-audit/upstream-sync-matrix.json
++++ b/.sync-audit/upstream-sync-matrix.json
+@@ -4,7 +4,7 @@
+     "U1": "c6d0405294be67cb134c2758f6472748ee73e2be",
+     "L0": "97595264ead8735a04559507ddaade25db8a4e15",
+     "L1": "ca0b417e36a6a1f80947458aaed328a25718e41b",
+-    "VERIFIED_SOURCE_SHA": "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202"
++    "VERIFIED_SOURCE_SHA": "272ecc708314d8f968931bb9e639e9ed169308ee"
+   },
+   "summary": {
+     "total": 133,
+diff --git a/.sync-audit/verified-source-sha.txt b/.sync-audit/verified-source-sha.txt
+index 78c76634c4edc5a8962212273a593e3ddf8bd28d..4071f3762edd7f8b3ed9facaabfab8e258981abc 100644
+--- a/.sync-audit/verified-source-sha.txt
++++ b/.sync-audit/verified-source-sha.txt
+@@ -1 +1 @@
+-04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
++272ecc708314d8f968931bb9e639e9ed169308ee
+diff --git a/PROGRESS.md b/PROGRESS.md
+index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..71a06bbb929d18def7471d63decd02ab802c0a61 100644
+--- a/PROGRESS.md
++++ b/PROGRESS.md
+@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
+ UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
+ LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
+ LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
+-VERIFIED_SOURCE_SHA   = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202  (2026-09-07 拆除与语音改造+三 bug 修复封印：分支 refactor/dismantle-and-voice-features)
++VERIFIED_SOURCE_SHA   = 272ecc708314d8f968931bb9e639e9ed169308ee  (2026-09-08 R01–R10 修复源码候选：分支 refactor/dismantle-and-voice-features)
+ 历史上游同步工作分支  = feature/upstream-sync-0.447.4
+ 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
+ ```
+@@ -1503,3 +1503,10 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
+ - 派生清单（cli-runtime-closure / open-boundary baseline / shell-surface-manifest / persistence 指纹与 inventory / startup receipt）已在受测工作树重生成并随源码提交；staged diff 密钥模式扫描无命中。
+ - 本次封印只同步既有六份审计文件（verified-source-sha.txt / build-sync-matrix.mjs / upstream-sync-matrix.json / UPSTREAM_SYNC_AUDIT.md / UPSTREAM_SYNC_MATRIX.md / 本文件坐标行），矩阵重生成 133 paths 硬校验通过（ADOPTED 25 / ADAPTED 100 / REGENERATED 4 / INTENTIONAL_DIVERGENCE 4）；不合并 main。
+ - 未执行/受限：全仓 lint 与 build/package 门禁本轮未跑；系统语音识别端到端未实测（开发终端无语音识别 TCC 授权，helper 正确 fail-closed，打包后首次使用需用户授权）；TTS 云端路径需配置 API key 后实测；三 bug 修复的 dev 环境用户验收仍在进行；正式发布与四平台门禁未启动。
++
++## 2026-09-08 R01–R10 增量修复源码候选与审计封印
++
++- 固定源码候选：`272ecc708314d8f968931bb9e639e9ed169308ee`；基线 `89bc0b64bf0a9b84ef3532efaa66c23213affb70`；分支 `refactor/dismantle-and-voice-features`。候选源码 manifest SHA-256 为 `a342614cece3eba2c27e88561a71653e450114700d87c59e798808b25a8e9bf6`，提交后复算与 S11 受测工作树一致。
++- R01–R10 联合冻结 25 文件 / 321 测试通过；typecheck exit 0；lint exit 0（9203 warnings）；客户端、合成签名服务端、speech helper 与 permissions 构建通过。原样全量在封印前为 13383 passed / 1 failed / 7 skipped，唯一失败是旧审计坐标正确拒绝新源码；排除该 seal 的补充全量为 13381 passed / 7 skipped、exit 0。逐命令原始日志和哈希见 `artifacts/f1-f12-repair/round2/`。
++- 用户在完成本地交付后明确授权提交并推送。本次按既有六文件流程推进审计坐标，不扩大 allowlist；封印提交后的独立 guard、矩阵和全量复验结果在后续同节记录。
++- 真实 macOS TCC/转写、真实供应商、Windows/Linux/其他架构及 Apple notarization 仍未执行或受凭证阻塞；本地证据不替代这些验证。聊天工具栏未增加语音输入组件，保留后端 ASR/TTS 与原生音频能力。
+diff --git a/UPSTREAM_SYNC_AUDIT.md b/UPSTREAM_SYNC_AUDIT.md
+index adcfa57d8a9836fe12c378f95f7448688d077896..8b88bf4014ef994e83e1ef3a6d478a0dff02f60e 100644
+--- a/UPSTREAM_SYNC_AUDIT.md
++++ b/UPSTREAM_SYNC_AUDIT.md
+@@ -15,7 +15,7 @@
+ | U1：上游目标 | `c6d0405294be67cb134c2758f6472748ee73e2be` | openhanako `v0.447.4` |
+ | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
+ | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
+-| VERIFIED_SOURCE_SHA | `04f90d2b26449d2f3264a5ea2a1a8bd6fb253202` | 2026-09-07 拆除与语音改造+三 bug 修复封印（分支 refactor/dismantle-and-voice-features）；typecheck×3 全绿+全量 13081 用例（唯一失败为无关模块 macOS 临时目录清理竞态 flaky、单跑 10/10 通过）后绑定，验证明细见 PROGRESS.md 最新条目 |
++| VERIFIED_SOURCE_SHA | `272ecc708314d8f968931bb9e639e9ed169308ee` | 2026-09-08 R01–R10 增量修复源码候选（分支 refactor/dismantle-and-voice-features）；源码 manifest 与 S11 受测树一致，联合冻结、类型、lint、构建与补充全量验证证据见 PROGRESS.md 最新条目 |
+ 
+ v0.1.35 仓库内的[功能 CI 记录](artifacts/release-v0.1.35/feature-ci-validation.json)
+ 对应 `2c835ac77afb1a73cd83816ad3d613297dc770a8`，不单独证明上述发布资料提交重新执行了
+diff --git a/UPSTREAM_SYNC_MATRIX.md b/UPSTREAM_SYNC_MATRIX.md
+index 2f98daf42096994372f834d639551859919c294e..c18c1d42433d8c0770c0282ac0a08cb619a6ffb8 100644
+--- a/UPSTREAM_SYNC_MATRIX.md
++++ b/UPSTREAM_SYNC_MATRIX.md
+@@ -10,7 +10,7 @@ U0 = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
+ U1 = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
+ L0 = 97595264ead8735a04559507ddaade25db8a4e15  (Lingxi v0.444.1 同步完成点, PR #2)
+ L1 = ca0b417e36a6a1f80947458aaed328a25718e41b  (本轮同步开始时 main)
+-VERIFIED_SOURCE_SHA = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
++VERIFIED_SOURCE_SHA = 272ecc708314d8f968931bb9e639e9ed169308ee
+ ```
+ 
+ ## 统计（脚本计算，禁止人工填写）
 diff --git a/artifacts/f1-f12-repair/round2/create-delivery-patch.py b/artifacts/f1-f12-repair/round2/create-delivery-patch.py
 new file mode 100644
 index 0000000000000000000000000000000000000000..cef85bf0e34c7200cfb0b97192cf0fa35c3f5020
@@ -6315,10 +6398,10 @@ index 0000000000000000000000000000000000000000..c3a12d521b5f2f64021ceb6d86d15981
 +});
 diff --git a/tests/round2-delivery-evidence.test.ts b/tests/round2-delivery-evidence.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..7043c37ac782726b09de6c9070515bcef5c36018
+index 0000000000000000000000000000000000000000..15f6bde98eb6653527fc28775392ce49764ddc2c
 --- /dev/null
 +++ b/tests/round2-delivery-evidence.test.ts
-@@ -0,0 +1,180 @@
+@@ -0,0 +1,220 @@
 +import crypto from "node:crypto";
 +import fs from "node:fs";
 +import path from "node:path";
@@ -6356,6 +6439,42 @@ index 0000000000000000000000000000000000000000..7043c37ac782726b09de6c9070515bce
 +  }).sort();
 +}
 +
++function sourcePathsAtCommit(commit: string): string[] {
++  return execFileSync("git", ["ls-tree", "-r", "-z", "--name-only", commit], {
++    cwd: ROOT,
++    encoding: "utf8",
++  }).split("\0").filter(Boolean).filter((file) => {
++    if (file.startsWith("artifacts/f1-f12-repair/") && !file.endsWith(".py")) return false;
++    return !file.endsWith(".patch");
++  }).sort();
++}
++
++function currentTreeMatchesManifest(manifest: any): boolean {
++  const rows = manifest.files.map((row: any) => row.path);
++  if (JSON.stringify(rows) !== JSON.stringify(currentSourcePaths())) return false;
++  return manifest.files.every((row: any) => {
++    const content = fs.readFileSync(path.join(ROOT, row.path));
++    return content.byteLength === row.bytes && sha256(content) === row.sha256;
++  });
++}
++
++function manifestSourceRef(manifest: any): string | null {
++  if (currentTreeMatchesManifest(manifest)) return null;
++  const verified = fs.readFileSync(path.join(ROOT, ".sync-audit", "verified-source-sha.txt"), "utf8").trim();
++  expect(verified).toMatch(/^[0-9a-f]{40}$/);
++  const guard = execFileSync("node", [path.join(ROOT, ".sync-audit", "verify-post-verification-diff.mjs")], {
++    cwd: ROOT,
++    encoding: "utf8",
++  });
++  expect(guard).toContain("post-verification diff guard OK");
++  return verified;
++}
++
++function sourceBytes(relative: string, commit: string | null): Buffer {
++  if (!commit) return fs.readFileSync(path.join(ROOT, relative));
++  return execFileSync("git", ["show", `${commit}:${relative}`], { cwd: ROOT });
++}
++
 +describe("R10 round2 交付证据契约", () => {
 +  it("R10-01: 旧 F7/D 系列明确 superseded，当前无语音输入组件要求与保留能力写清", () => {
 +    const report = fs.readFileSync(path.join(ROOT, "artifacts/f1-f12-repair/F1_F12_REPAIR_REPORT.md"), "utf8");
@@ -6389,10 +6508,11 @@ index 0000000000000000000000000000000000000000..7043c37ac782726b09de6c9070515bce
 +  it("R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁", () => {
 +    const manifest = readJson("SOURCE_MANIFEST.json");
 +    expect(manifest.sourceIdentity).toEqual({ kind: "worktree", base: BASE });
++    const sourceRef = manifestSourceRef(manifest);
 +    const rows = manifest.files.map((row: any) => row.path);
-+    expect(rows).toEqual(currentSourcePaths());
++    expect(rows).toEqual(sourceRef ? sourcePathsAtCommit(sourceRef) : currentSourcePaths());
 +    for (const row of manifest.files) {
-+      const content = fs.readFileSync(path.join(ROOT, row.path));
++      const content = sourceBytes(row.path, sourceRef);
 +      expect(content.byteLength).toBe(row.bytes);
 +      expect(sha256(content)).toBe(row.sha256);
 +    }
@@ -6408,7 +6528,10 @@ index 0000000000000000000000000000000000000000..7043c37ac782726b09de6c9070515bce
 +
 +  it("R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示", () => {
 +    const manifest = readJson("SOURCE_MANIFEST.json");
-+    expect(manifest.files.map((row: any) => row.path)).toEqual(currentSourcePaths());
++    const sourceRef = manifestSourceRef(manifest);
++    expect(manifest.files.map((row: any) => row.path)).toEqual(
++      sourceRef ? sourcePathsAtCommit(sourceRef) : currentSourcePaths(),
++    );
 +    expect(manifest.files.map((row: any) => row.path)).toContain("tests/round2-delivery-evidence.test.ts");
 +    expect(manifest.exclusions.join("\n")).toContain("generated evidence, reports, delivery files");
 +    expect(manifest.exclusions.join("\n")).toContain("*.patch");

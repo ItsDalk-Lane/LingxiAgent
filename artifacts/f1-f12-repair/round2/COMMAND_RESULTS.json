@@ -3026,5 +3026,121 @@
     "log": "logs/s11-delivery-contract-readback.log",
     "logSha256": "c2957851a1170eec2e997b0575c5dc9c1040e2b3eb01de78df6efe97845fdb2c",
     "sourceManifestHash": "a342614cece3eba2c27e88561a71653e450114700d87c59e798808b25a8e9bf6"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--reporter",
+      "verbose",
+      "tests/round2-delivery-evidence.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T08:38:51.648545+00:00",
+    "end": "2026-09-08T08:38:54.660391+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 9,
+      "failed": 1,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "1f5514ea8ce975cac8b5223fb2e6c6367e25eae4b0276f3296607de285de05ff",
+    "log": "logs/s11-postseal-contract.log",
+    "logSha256": "6ab76cfe4b6f417a44fcda767636beae0cfcf016c87447d0092d314bcc4ee8c4",
+    "sourceManifestHash": "1f5514ea8ce975cac8b5223fb2e6c6367e25eae4b0276f3296607de285de05ff"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--reporter",
+      "verbose",
+      "tests/round2-pinned-recovery.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T08:39:25.536595+00:00",
+    "end": "2026-09-08T08:39:26.366819+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "1f5514ea8ce975cac8b5223fb2e6c6367e25eae4b0276f3296607de285de05ff",
+    "log": "logs/s11-postseal-source-freeze.log",
+    "logSha256": "d242055cdfa94507430be6f4c8321a6407e1694061513eeaf2576efc7ea62a0b",
+    "sourceManifestHash": "1f5514ea8ce975cac8b5223fb2e6c6367e25eae4b0276f3296607de285de05ff"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--reporter",
+      "verbose",
+      "tests/round2-delivery-evidence.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T08:39:26.521223+00:00",
+    "end": "2026-09-08T08:39:29.498117+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "1f5514ea8ce975cac8b5223fb2e6c6367e25eae4b0276f3296607de285de05ff",
+    "log": "logs/s11-postseal-contract-final.log",
+    "logSha256": "922f93caabbda5a842a881beb6a47f2078bdaccef329448fca2c19808d0a77c9",
+    "sourceManifestHash": "1f5514ea8ce975cac8b5223fb2e6c6367e25eae4b0276f3296607de285de05ff"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--reporter",
+      "verbose",
+      "tests/round2-delivery-evidence.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T08:41:47.526774+00:00",
+    "end": "2026-09-08T08:41:50.511396+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "1f5514ea8ce975cac8b5223fb2e6c6367e25eae4b0276f3296607de285de05ff",
+    "log": "logs/s11-postseal-contract-readback.log",
+    "logSha256": "5155c1fbe4a19b4824e0e12ff2d189148807fe01ce23edf0abf34bc98e03fecf",
+    "sourceManifestHash": "1f5514ea8ce975cac8b5223fb2e6c6367e25eae4b0276f3296607de285de05ff"
   }
 ]
