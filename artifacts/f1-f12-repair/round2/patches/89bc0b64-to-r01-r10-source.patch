@@ -1,5 +1,5 @@
 diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
-index 5559153df75f94115a8d82e24f37f8ee84fd94bc..4ee6f51c16b810182c3066fd4373cb3cb5ffd3b9 100644
+index 5559153df75f94115a8d82e24f37f8ee84fd94bc..71bb5e300f85e97b2af95055aa8c24f633f58edb 100644
 --- a/.github/workflows/build.yml
 +++ b/.github/workflows/build.yml
 @@ -74,8 +74,6 @@ jobs:
@@ -20,6 +20,26 @@ index 5559153df75f94115a8d82e24f37f8ee84fd94bc..4ee6f51c16b810182c3066fd4373cb3c
  
        - name: Run Knowledge platform smoke
          run: npm run test:knowledge-platform-smoke
+@@ -174,9 +170,7 @@ jobs:
+         env:
+           LINGXI_ENFORCE_KNOWLEDGE_PERF: "1"
+         run: |
+-          node scripts/benchmark-knowledge-fast.mjs --output=artifacts/knowledge-fast-benchmark.json
+           node scripts/benchmark-knowledge-vector.mjs --output=artifacts/knowledge-vector-benchmark.json
+-          node scripts/benchmark-knowledge-research.mjs --output=artifacts/knowledge-research-benchmark.json
+ 
+       - name: Upload Knowledge performance evidence
+         if: always() && runner.os == 'Linux'
+@@ -184,9 +178,7 @@ jobs:
+         with:
+           name: knowledge-benchmarks-linux-x64
+           path: |
+-            artifacts/knowledge-fast-benchmark.json
+             artifacts/knowledge-vector-benchmark.json
+-            artifacts/knowledge-research-benchmark.json
+           if-no-files-found: error
+ 
+       # Windows: 下载官方 MinGit（git + sh-compatible shell + coreutils，非交互运行时），打包进安装包
 diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
 index 679670f1ab7792548d6c22d72894160ab13c3537..8075d4eaf28bbbb881c36fe3ad47aa14e16c22ef 100644
 --- a/.github/workflows/ci.yml
@@ -35,17 +55,33 @@ index 679670f1ab7792548d6c22d72894160ab13c3537..8075d4eaf28bbbb881c36fe3ad47aa14
          run: npm run test:knowledge-platform-smoke
  
 diff --git a/.github/workflows/knowledge-performance.yml b/.github/workflows/knowledge-performance.yml
-index fb21916befac83cc5ccb35f90a8d92b90f8442cc..b4644942cbb2453c91356e47651c192005afb759 100644
+index fb21916befac83cc5ccb35f90a8d92b90f8442cc..c876102448d2362dea2481a7c3acc1a6e0f6d5bd 100644
 --- a/.github/workflows/knowledge-performance.yml
 +++ b/.github/workflows/knowledge-performance.yml
-@@ -13,7 +13,6 @@ jobs:
+@@ -13,23 +13,14 @@ jobs:
            node-version: "24.15.0"
            cache: npm
        - run: npm ci
 -      - run: npm run build:packages
-       - name: Run stable-runner performance gates
+-      - name: Run stable-runner performance gates
+-        env:
+-          LINGXI_ENFORCE_KNOWLEDGE_PERF: "1"
+-        run: node scripts/benchmark-knowledge-fast.mjs --output=artifacts/knowledge-fast-benchmark.json
+       - name: Run vector performance gates
          env:
            LINGXI_ENFORCE_KNOWLEDGE_PERF: "1"
+         run: node scripts/benchmark-knowledge-vector.mjs --output=artifacts/knowledge-vector-benchmark.json
+-      - name: Run research quality and observable synthesis benchmark
+-        run: node scripts/benchmark-knowledge-research.mjs --output=artifacts/knowledge-research-benchmark.json
+       - uses: actions/upload-artifact@v4
+         if: always()
+         with:
+           name: knowledge-benchmarks-linux-x64
+           path: |
+-            artifacts/knowledge-fast-benchmark.json
+             artifacts/knowledge-vector-benchmark.json
+-            artifacts/knowledge-research-benchmark.json
+           if-no-files-found: error
 diff --git a/.gitignore b/.gitignore
 index af3647c779dad1edd9042249023ada0cb0c81372..e742177ba5684eb2fbcf41e0997aa452aec265b1 100644
 --- a/.gitignore
@@ -74,7 +110,7 @@ index af3647c779dad1edd9042249023ada0cb0c81372..e742177ba5684eb2fbcf41e0997aa452
  .codex/
  
 diff --git a/.sync-audit/build-sync-matrix.mjs b/.sync-audit/build-sync-matrix.mjs
-index d978251370637d720d11094c068847b151ae235e..04689cefd0e0d2b1c687652fb913220e8c132e09 100644
+index d978251370637d720d11094c068847b151ae235e..17669415ac3c58410cc05775dd0c3425fd3bf05c 100644
 --- a/.sync-audit/build-sync-matrix.mjs
 +++ b/.sync-audit/build-sync-matrix.mjs
 @@ -40,7 +40,7 @@ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source
@@ -82,12 +118,12 @@ index d978251370637d720d11094c068847b151ae235e..04689cefd0e0d2b1c687652fb913220e
  // 该 commit 早于记录它的审计提交落地，无自引用（SHA = hash(contents)）问题。
  // 当前 branch HEAD 可能在其后存在纯审计 seal 提交，HEAD 由 Git ref 自身标识。
 -const VERIFIED_SOURCE_SHA = "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202";
-+const VERIFIED_SOURCE_SHA = "9fba14f72f538de4192ea46226c5d6f84c891fb1";
++const VERIFIED_SOURCE_SHA = "9d4f41f3042b26e8b3990671ec55380b99c494dc";
  
  const ALLOWED_DISPOSITIONS = ["ADOPTED", "ADAPTED", "REGENERATED", "INTENTIONAL_DIVERGENCE"];
  
 diff --git a/.sync-audit/upstream-sync-matrix.json b/.sync-audit/upstream-sync-matrix.json
-index d6f8692829bc71ee97c3253e5482beabfdb51324..fc30b23228669a22f257a9f3101953b9ccce2991 100644
+index d6f8692829bc71ee97c3253e5482beabfdb51324..4c7b0fd875d1a11059f4d995bd04b3d760a18564 100644
 --- a/.sync-audit/upstream-sync-matrix.json
 +++ b/.sync-audit/upstream-sync-matrix.json
 @@ -4,7 +4,7 @@
@@ -95,19 +131,19 @@ index d6f8692829bc71ee97c3253e5482beabfdb51324..fc30b23228669a22f257a9f3101953b9
      "L0": "97595264ead8735a04559507ddaade25db8a4e15",
      "L1": "ca0b417e36a6a1f80947458aaed328a25718e41b",
 -    "VERIFIED_SOURCE_SHA": "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202"
-+    "VERIFIED_SOURCE_SHA": "9fba14f72f538de4192ea46226c5d6f84c891fb1"
++    "VERIFIED_SOURCE_SHA": "9d4f41f3042b26e8b3990671ec55380b99c494dc"
    },
    "summary": {
      "total": 133,
 diff --git a/.sync-audit/verified-source-sha.txt b/.sync-audit/verified-source-sha.txt
-index 78c76634c4edc5a8962212273a593e3ddf8bd28d..0872556401f64aa71e7246423ad7936031b38b7b 100644
+index 78c76634c4edc5a8962212273a593e3ddf8bd28d..a26475efafafbdb7dfc9aef928069e64f61505c7 100644
 --- a/.sync-audit/verified-source-sha.txt
 +++ b/.sync-audit/verified-source-sha.txt
 @@ -1 +1 @@
 -04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+9fba14f72f538de4192ea46226c5d6f84c891fb1
++9d4f41f3042b26e8b3990671ec55380b99c494dc
 diff --git a/PROGRESS.md b/PROGRESS.md
-index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..f3215305d0a944fd921735f299a55a3f228ac4b6 100644
+index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..72af7c9848baaf5e1182af839a2d1efa27295952 100644
 --- a/PROGRESS.md
 +++ b/PROGRESS.md
 @@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
@@ -115,11 +151,11 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..f3215305d0a944fd921735f299a55a3f
  LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
  LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
 -VERIFIED_SOURCE_SHA   = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202  (2026-09-07 拆除与语音改造+三 bug 修复封印：分支 refactor/dismantle-and-voice-features)
-+VERIFIED_SOURCE_SHA   = 9fba14f72f538de4192ea46226c5d6f84c891fb1  (2026-09-08 v0.1.36 发布元数据候选：分支 codex/release-v0.1.36)
++VERIFIED_SOURCE_SHA   = 9d4f41f3042b26e8b3990671ec55380b99c494dc  (2026-09-08 已拆除知识基准退役候选：分支 fix/remove-dead-knowledge-benchmarks)
  历史上游同步工作分支  = feature/upstream-sync-0.447.4
  历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
  ```
-@@ -994,6 +994,52 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
+@@ -994,6 +994,62 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
  需要提交才能完成的封印留待相应授权步骤。不得为使检查变绿而虚报坐标、扩大白名单，
  或删除 seal 文件与 guard 测试；退役门禁属于另需明确授权的治理变更。
  
@@ -169,10 +205,20 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..f3215305d0a944fd921735f299a55a3f
 +- 固定源码候选：`9fba14f72f538de4192ea46226c5d6f84c891fb1`（分支 codex/release-v0.1.36，基于 PR #47 合并树 af0fe074）：版本 0.1.36 / releaseGeneration 14 双 bump、preflight 锚点、双格式 digest（v1/v2 校验通过）。
 +- 验证证据（绑定该候选树）：release-preflight --tag v0.1.36 PASS（0.1.35→0.1.36、gen 13→14 单调）；validate-release-digest v1/v2 PASS；全量 13442 passed / 0 failed（j43，证据绿门禁 j44 引导后全绿）；发布前测试 11 项（preflight+round3 证据）提交后独立检出全绿。
 +
++## 2026-09-08 发布工作流残留引用修复候选与封印（v0.1.36 重打 tag 前置）
++
++- 固定源码候选：`9953308de1d51b56651294973efc2ee6d776208a`（分支 fix/remove-build-packages-workflow-refs，基于 d5592f07）：build.yml 两处与 knowledge-performance.yml 一处 build:packages 残留移除，ci-workflow-guards/release-workflow-gates 顺序不变量同步，tests/README 指引清理。v0.1.36 原 tag（d5592f07）的 Build 工作流因 quality-gate 引用失败，将删除后按本候选重打。
++- 验证证据（绑定该候选树）：workflow 守卫 20 项绿；全量 13442 passed / 0 failed（j47，证据引导 j48 后 25/25）。
++
++## 2026-09-08 已拆除知识基准退役候选与封印（v0.1.36 重打 tag 前置 II）
++
++- 固定源码候选：`9d4f41f3042b26e8b3990671ec55380b99c494dc`（分支 fix/remove-dead-knowledge-benchmarks，基于 82192202）：benchmark-knowledge-fast/-research 两脚本删除（分别依赖 04f90d2b 已拆除的 runFastKnowledgePipeline 与 completeness fixture），build.yml Linux 性能门禁与 knowledge-performance.yml 只保留现役 vector 基准。v0.1.36 第二次 tag（82192202）的 Build 在性能门禁崩溃，将删除后按本候选第三次重打。
++- 验证证据（绑定该候选树）：vector 基准本地跑通（exit 0）；workflow 守卫 20 项绿；全量 13443 passed / 0 failed（j50）；补丁重放 VERIFIED（j49）；证据 25/25。
++
  ### Known limitation（保留）
  
  Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面环境执行安装/升级
-@@ -1503,3 +1549,13 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
+@@ -1503,3 +1559,13 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
  - 派生清单（cli-runtime-closure / open-boundary baseline / shell-surface-manifest / persistence 指纹与 inventory / startup receipt）已在受测工作树重生成并随源码提交；staged diff 密钥模式扫描无命中。
  - 本次封印只同步既有六份审计文件（verified-source-sha.txt / build-sync-matrix.mjs / upstream-sync-matrix.json / UPSTREAM_SYNC_AUDIT.md / UPSTREAM_SYNC_MATRIX.md / 本文件坐标行），矩阵重生成 133 paths 硬校验通过（ADOPTED 25 / ADAPTED 100 / REGENERATED 4 / INTENTIONAL_DIVERGENCE 4）；不合并 main。
  - 未执行/受限：全仓 lint 与 build/package 门禁本轮未跑；系统语音识别端到端未实测（开发终端无语音识别 TCC 授权，helper 正确 fail-closed，打包后首次使用需用户授权）；TTS 云端路径需配置 API key 后实测；三 bug 修复的 dev 环境用户验收仍在进行；正式发布与四平台门禁未启动。
@@ -187,7 +233,7 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..f3215305d0a944fd921735f299a55a3f
 +- 最终源码候选 `7cf986236cb8ac5c2d22cce1e5882554a42cff28`，审计封印提交 `62c73f77`；候选 source manifest SHA-256 `c418b3ef2fc475e40ed779f21b8e087b120834e9b673baf2e67c3758138d30d8`。封印后独立 diff guard 与 133 路径矩阵通过，upstream-sync、seal、round2 delivery 三文件 20/20 通过。
 +- 封印后原样 `npm test` exit 0：1334 文件通过 / 1 既有跳过，13384 测试通过 / 7 既有跳过，0 fail，82.80s；日志 `/tmp/lingxi-r01-r10-final-postseal-full-v2.log`。最终审计记录只改本 allowlist 内的 `PROGRESS.md`，不改变受测源码候选。
 diff --git a/UPSTREAM_SYNC_AUDIT.md b/UPSTREAM_SYNC_AUDIT.md
-index adcfa57d8a9836fe12c378f95f7448688d077896..0c73662d2bdc8b1fc4c94937e2803bad243edfac 100644
+index adcfa57d8a9836fe12c378f95f7448688d077896..959ad7a48e13a4fa2381b2ce26da5937745a7c62 100644
 --- a/UPSTREAM_SYNC_AUDIT.md
 +++ b/UPSTREAM_SYNC_AUDIT.md
 @@ -15,7 +15,7 @@
@@ -195,12 +241,12 @@ index adcfa57d8a9836fe12c378f95f7448688d077896..0c73662d2bdc8b1fc4c94937e2803bad
  | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
  | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
 -| VERIFIED_SOURCE_SHA | `04f90d2b26449d2f3264a5ea2a1a8bd6fb253202` | 2026-09-07 拆除与语音改造+三 bug 修复封印（分支 refactor/dismantle-and-voice-features）；typecheck×3 全绿+全量 13081 用例（唯一失败为无关模块 macOS 临时目录清理竞态 flaky、单跑 10/10 通过）后绑定，验证明细见 PROGRESS.md 最新条目 |
-+| VERIFIED_SOURCE_SHA | `9fba14f72f538de4192ea46226c5d6f84c891fb1` | 2026-09-08 v0.1.36 发布元数据候选（分支 codex/release-v0.1.36）；preflight/digest/全量验证证据见 PROGRESS.md 最新条目 |
++| VERIFIED_SOURCE_SHA | `9d4f41f3042b26e8b3990671ec55380b99c494dc` | 2026-09-08 已拆除知识基准退役候选（分支 fix/remove-dead-knowledge-benchmarks）；验证证据见 PROGRESS.md 最新条目 |
  
  v0.1.35 仓库内的[功能 CI 记录](artifacts/release-v0.1.35/feature-ci-validation.json)
  对应 `2c835ac77afb1a73cd83816ad3d613297dc770a8`，不单独证明上述发布资料提交重新执行了
 diff --git a/UPSTREAM_SYNC_MATRIX.md b/UPSTREAM_SYNC_MATRIX.md
-index 2f98daf42096994372f834d639551859919c294e..6ae5c0a2bb7418c3f109afa827032cafcaf26f43 100644
+index 2f98daf42096994372f834d639551859919c294e..745bc88159e69172b1ff3ad0446d28e2edcfd83a 100644
 --- a/UPSTREAM_SYNC_MATRIX.md
 +++ b/UPSTREAM_SYNC_MATRIX.md
 @@ -10,7 +10,7 @@ U0 = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
@@ -208,7 +254,7 @@ index 2f98daf42096994372f834d639551859919c294e..6ae5c0a2bb7418c3f109afa827032caf
  L0 = 97595264ead8735a04559507ddaade25db8a4e15  (Lingxi v0.444.1 同步完成点, PR #2)
  L1 = ca0b417e36a6a1f80947458aaed328a25718e41b  (本轮同步开始时 main)
 -VERIFIED_SOURCE_SHA = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+VERIFIED_SOURCE_SHA = 9fba14f72f538de4192ea46226c5d6f84c891fb1
++VERIFIED_SOURCE_SHA = 9d4f41f3042b26e8b3990671ec55380b99c494dc
  ```
  
  ## 统计（脚本计算，禁止人工填写）
@@ -7036,6 +7082,179 @@ index 9743b792df653fa9ed3f7548a8c5cbf72b2eee2c..ca39f1c30adeba2f5f4cdf3f3af0b44f
      {
        "schemaVersion": 1,
        "tag": "v0.1.35",
+diff --git a/scripts/benchmark-knowledge-fast.mjs b/scripts/benchmark-knowledge-fast.mjs
+deleted file mode 100644
+index 5bf2d346ae7615ae613d4ddd4bbd4f2ff349a35a..0000000000000000000000000000000000000000
+--- a/scripts/benchmark-knowledge-fast.mjs
++++ /dev/null
+@@ -1,130 +0,0 @@
+-import fs from "node:fs";
+-import os from "node:os";
+-import path from "node:path";
+-import { performance } from "node:perf_hooks";
+-import crypto from "node:crypto";
+-import { pathToFileURL } from "node:url";
+-import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
+-import { resolveKnowledgeChunkerConfig } from "../lib/knowledge/chunker.ts";
+-
+-const STUDIO = "benchmark-studio";
+-const QUERIES = ["发布审批", "release.config.json", "20260903", "AuroraQuokka", "Risk Controls", "第七章"];
+-
+-function textAt(index, size) {
+-  const special = index % 997 === 0 ? " 发布审批 release.config.json 20260903 AuroraQuokka Risk Controls 第七章" : "";
+-  return `# 章节 ${index % 97}\n干扰资料 ${index} / ${size}：普通流程、随机编号和文件说明。${special}`;
+-}
+-
+-function openManager(home, size) {
+-  const remote = () => { throw new Error("性能测试禁止远程模型调用"); };
+-  return new KnowledgeManager({ lingxiHome: home, maxImportBytes: size * 1024,
+-    embedTextsForModel: remote, rerankForModel: remote });
+-}
+-
+-async function seed(manager, size) {
+-  const notebook = manager.createNotebook({ studioId: STUDIO, name: "性能资料" });
+-  const texts = Array.from({ length: size }, (_, index) => textAt(index, size));
+-  const imported = await manager.importPastedText({ studioId: STUDIO, notebookId: notebook.id,
+-    displayName: "性能资料.txt", text: texts.join("\n") });
+-  const artifact = manager.store.beginParseArtifact({ studioId: STUDIO, contentSnapshotId: imported.snapshot.id,
+-    parserId: "benchmark-fixed-seed", parserVersion: "1", parserConfigHash: crypto.createHash("sha256").update(String(size)).digest("hex") });
+-  manager.store.completeParseArtifact({ studioId: STUDIO, parseArtifactId: artifact.id, status: "ready", warnings: [],
+-    semanticArtifactPath: `artifacts/${artifact.id}.json`, blocks: texts.map((text, ordinal) => ({ ordinal, text,
+-      locatorType: "text", locator: { headingPath: [`章节 ${ordinal % 97}`] } })) });
+-  // 每段独立章节，真实 v3 分块仍恰好一段一片；同时建立实际来源/章节投影。
+-  const blocks = manager.store.listArtifactBlocks({ studioId: STUDIO, parseArtifactId: artifact.id });
+-  const config = resolveKnowledgeChunkerConfig(blocks);
+-  manager.store.resolveNotebookRetrievalProfile({ studioId: STUDIO, notebookId: notebook.id, strategy: config.strategy });
+-  const indexed = manager.queryService.indexArtifactForIngestion(STUDIO, artifact.id);
+-  if (manager.indexStore.getReadyVariantMetadata({ parseArtifactId: artifact.id, chunkProfileHash: indexed.chunkerConfigId })?.chunkCount !== size) {
+-    throw new Error("基准生产索引片段数量与固定规模不符");
+-  }
+-  return notebook.id;
+-}
+-
+-function turnScope(manager, notebookId) {
+-  return manager.createTurnScope({ studioId: STUDIO, notebookIds: [notebookId], sessionPath: "/benchmark/session.jsonl" });
+-}
+-
+-function percentile(values, p) {
+-  const sorted = [...values].sort((a, b) => a - b);
+-  return sorted[Math.min(sorted.length - 1, Math.ceil(sorted.length * p) - 1)];
+-}
+-
+-function summarize(samples) {
+-  const metric = key => ({ P50: percentile(samples.map(row => row[key]), .5),
+-    P95: percentile(samples.map(row => row[key]), .95), P99: percentile(samples.map(row => row[key]), .99) });
+-  return { scopeCompileMs: metric("scopeCompileMs"), ftsMs: metric("ftsMs"), spanExtractMs: metric("spanExtractMs"),
+-    packMs: metric("packMs"), totalMs: metric("totalMs") };
+-}
+-
+-async function measure(manager, frozenScope, runs) {
+-  const samples = [];
+-  for (let index = 0; index < runs; index++) {
+-    const result = await manager.runFastKnowledgePipeline({ question: QUERIES[index % QUERIES.length], scope: frozenScope });
+-    samples.push({ ...result.timings, remoteModelCalls: result.stats.remoteModelCalls,
+-      returnedSpans: result.stats.injectedChunks, usedTokens: result.stats.usedTokens,
+-      retrievalResultCacheHit: result.stats.retrievalResultCacheHit === true });
+-  }
+-  return { samples, percentiles: summarize(samples), remoteModelCalls: Math.max(...samples.map(x => x.remoteModelCalls)),
+-    returnedSpans: Math.max(...samples.map(x => x.returnedSpans)), usedTokens: Math.max(...samples.map(x => x.usedTokens)) };
+-}
+-
+-export async function runKnowledgeFastBenchmark({ sizes = [10_000, 100_000], hotRuns = 20, coldRuns = 5,
+-  enforce = process.env.LINGXI_ENFORCE_KNOWLEDGE_PERF === "1", outputPath = null } = {}) {
+-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-fast-benchmark-"));
+-  const results = [];
+-  try {
+-    for (const size of sizes) {
+-      const home = path.join(root, String(size));
+-      let manager = openManager(home, size);
+-      let notebookId;
+-      let hot;
+-      const coldSamples = [];
+-      try {
+-        notebookId = await seed(manager, size);
+-        const frozenScope = turnScope(manager, notebookId);
+-        // 首次调用只预热，不混入热缓存分位数。
+-        await measure(manager, frozenScope, 1);
+-        hot = await measure(manager, frozenScope, hotRuns);
+-      } finally { await manager.close(); }
+-      for (let index = 0; index < coldRuns; index++) {
+-        const start = performance.now();
+-        manager = openManager(home, size);
+-        try {
+-          const measured = await measure(manager, turnScope(manager, notebookId), 1);
+-          coldSamples.push({ ...measured.samples[0], totalMs: performance.now() - start });
+-        } finally { await manager.close(); }
+-      }
+-      const cold = { samples: coldSamples, percentiles: summarize(coldSamples),
+-        remoteModelCalls: Math.max(...coldSamples.map(x => x.remoteModelCalls)),
+-        returnedSpans: Math.max(...coldSamples.map(x => x.returnedSpans)), usedTokens: Math.max(...coldSamples.map(x => x.usedTokens)) };
+-      results.push({ size, hot, cold });
+-    }
+-    const report = { schemaVersion: 2, seed: "lingxi-knowledge-fast-v2-real-three-grain-index", platform: process.platform,
+-      cpu: os.cpus()[0]?.model ?? null, memoryBytes: os.totalmem(), osRelease: os.release(),
+-      arch: process.arch, node: process.version, generatedAt: new Date().toISOString(), coldDefinition: "fresh manager, databases, frozen scope and first query; OS page cache is not flushed", results };
+-    // 即使门禁失败也保留原始测量，供远程工作流上传核查。
+-    if (outputPath) { fs.mkdirSync(path.dirname(outputPath), { recursive: true }); fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`); }
+-    if (enforce) {
+-      for (const row of results) {
+-        const hotLimit = row.size <= 10_000 ? 800 : 1_200;
+-        if (row.hot.percentiles.totalMs.P95 > hotLimit) throw new Error(`${row.size} hot P95 ${row.hot.percentiles.totalMs.P95}ms > ${hotLimit}ms`);
+-        if (row.size >= 100_000 && row.cold.percentiles.totalMs.P95 > 1_500) throw new Error(`${row.size} cold P95 ${row.cold.percentiles.totalMs.P95}ms > 1500ms`);
+-        for (const sample of [...row.hot.samples, ...row.cold.samples]) {
+-          if (sample.remoteModelCalls !== 0 || sample.returnedSpans > 8 || sample.usedTokens > 2400) {
+-            throw new Error(`${row.size} result contract violated`);
+-          }
+-        }
+-      }
+-    }
+-    return report;
+-  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+-}
+-
+-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+-  const outputArg = process.argv.find(arg => arg.startsWith("--output="));
+-  const report = await runKnowledgeFastBenchmark({ outputPath: outputArg?.slice("--output=".length) || null,
+-    sizes: process.argv.includes("--million") ? [10_000, 100_000, 1_000_000] : [10_000, 100_000] });
+-  process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+-}
+diff --git a/scripts/benchmark-knowledge-research.mjs b/scripts/benchmark-knowledge-research.mjs
+deleted file mode 100644
+index a18d73d6a3cd30983ad899156f7093aedb65e16f..0000000000000000000000000000000000000000
+--- a/scripts/benchmark-knowledge-research.mjs
++++ /dev/null
+@@ -1,31 +0,0 @@
+-import assert from "node:assert/strict";
+-import fs from "node:fs";
+-import os from "node:os";
+-import path from "node:path";
+-import { pathToFileURL } from "node:url";
+-import { COMPLETENESS_QUALITY_CASES, runCompletenessQualityCase } from "../tests/helpers/knowledge-completeness-quality-fixture.ts";
+-
+-/** 固定模型动作只衡量宿主链路；在线模型耗时、真实用量和最终回答不得用估算伪装。 */
+-export async function runKnowledgeResearchBenchmark({ outputPath = null, cases = COMPLETENESS_QUALITY_CASES } = {}) {
+-  const results = [];
+-  for (const name of cases) {
+-    const result = await runCompletenessQualityCase(name);
+-    results.push({ name, status: result.run.status, metrics: result.metrics, telemetry: result.telemetry,
+-      exact: result.completeness.exact, citationCount: result.citationCount, validCitations: result.validCitations });
+-  }
+-  const report = { schemaVersion: 1, platform: process.platform, arch: process.arch, node: process.version,
+-    cpu: os.cpus()[0]?.model ?? null, memoryBytes: os.totalmem(), osRelease: os.release(), generatedAt: new Date().toISOString(),
+-    boundary: "deterministic model actions; real local research runtime; final synthesis uses real AgentSession/HTTP against a local scripted provider; timing and declared usage do not represent paid provider performance", results };
+-  if (outputPath) { fs.mkdirSync(path.dirname(outputPath), { recursive: true }); fs.writeFileSync(outputPath, JSON.stringify(report, null, 2) + "\n"); }
+-  for (const result of results) {
+-    assert.equal(result.metrics.citationValidityRate, 1);
+-    assert.ok(result.telemetry.timeToFirstResearchAction !== null && result.telemetry.timeToFirstResearchAction <= 500);
+-    assert.ok(result.metrics.researchRounds <= 4 && result.telemetry.toolCalls <= 32);
+-    if (result.metrics.unavailableUnitCount === 0) assert.equal(result.metrics.coverageRatio, 1);
+-  }
+-  return report;
+-}
+-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+-  const outputArg = process.argv.find(arg => arg.startsWith("--output="));
+-  console.log(JSON.stringify(await runKnowledgeResearchBenchmark({ outputPath: outputArg?.slice("--output=".length) || null }), null, 2));
+-}
 diff --git a/scripts/compute-cli-closure.mjs b/scripts/compute-cli-closure.mjs
 index cfd522cbaae914fedce00cb2313a7323788da71f..4ed1e3dd5c1d39fd1b41e01d637f4e61a1867753 100644
 --- a/scripts/compute-cli-closure.mjs
@@ -7712,6 +7931,19 @@ index 0000000000000000000000000000000000000000..1378c84caaa1ecdf766546bd29929a96
 +  };
 +  return { home, manager, session, sessionId, sessionPath, engine, stream, app, submit, history };
 +}
+diff --git a/tests/knowledge-vector-shutdown.test.ts b/tests/knowledge-vector-shutdown.test.ts
+index 2c1aaf486843452de64ce568ffafea97eb329336..b52a9805a66caed1ed3325685f7f02f66841eaa3 100644
+--- a/tests/knowledge-vector-shutdown.test.ts
++++ b/tests/knowledge-vector-shutdown.test.ts
+@@ -27,4 +27,7 @@ it("真实原生模块加载/建图期间重复关闭，子进程不崩溃且向
+   });
+   expect(result, result.output).toMatchObject({ code: 0, signal: null });
+   expect(result.output).toContain("30 native shutdowns verified");
+-}, 30_000);
++  // 子进程串行执行 30 轮真实 usearch 建图/关闭；intel 慢速运行器在全量套件
++  // 并行满载下曾 5 次超过 30s 预算（纯超时，断言从未失败）。给真实工作
++  // 留足预算，不为压时间削轮数。
++}, 120_000);
 diff --git a/tests/pinned-tenets-migration-recovery.test.ts b/tests/pinned-tenets-migration-recovery.test.ts
 index f415f1a7f38a323fc7abefe94900d05a3ae28b0d..6e3bcfff0dcffc5d4906b9be678e4ec3b221762e 100644
 --- a/tests/pinned-tenets-migration-recovery.test.ts

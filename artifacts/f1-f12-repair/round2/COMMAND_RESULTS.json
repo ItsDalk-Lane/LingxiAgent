@@ -3698,5 +3698,47 @@
     "log": "logs/s28-final3-gate.log",
     "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
     "sourceManifestHash": "1a7c197f241828d84337d96ff97a5d31797065637d838c73f50c6b8b2dac6559"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T21:57:24.851205+00:00",
+    "end": "2026-09-08T21:57:47.687740+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "77de93c7cb36944eaabc5f2621a803cbbb152a885ee0c3caf01e27d3708cd946",
+    "log": "logs/s29-benchfix-gate.log",
+    "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
+    "sourceManifestHash": "77de93c7cb36944eaabc5f2621a803cbbb152a885ee0c3caf01e27d3708cd946"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T23:19:36.807788+00:00",
+    "end": "2026-09-08T23:19:58.058519+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "a462b9b4cecaa744808ad15ae6c351fefd37beac8eeecded9ddbc5d1121e1007",
+    "log": "logs/s30-timeout-gate.log",
+    "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
+    "sourceManifestHash": "a462b9b4cecaa744808ad15ae6c351fefd37beac8eeecded9ddbc5d1121e1007"
   }
 ]
