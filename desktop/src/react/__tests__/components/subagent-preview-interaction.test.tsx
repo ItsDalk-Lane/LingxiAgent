@@ -10,6 +10,7 @@ import { createSubagentPreviewSlice, type SubagentPreviewSlice } from '../../sto
 import { dispatchStreamKey } from '../../services/stream-key-dispatcher';
 
 const controlMocks = vi.hoisted(() => ({
+  configureBackgroundProcessWebSocketGetter: vi.fn(),
   stopSubagentProcess: vi.fn(async () => ({ ok: true })),
 }));
 

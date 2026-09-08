@@ -413,6 +413,7 @@ async function retrySessionTurnInternal(engine, opts, deps, compatibility) {
         audios: audios.length ? audios : undefined,
         audioAttachmentPaths: audioAttachmentPaths.length ? audioAttachmentPaths : undefined,
         clientMessageId: clientMessageId || undefined,
+        snapshotVersion: opts.snapshotVersion,
         displayMessage: nextDisplayMessage,
         uiContext,
         preservePromptEnvelope: true,

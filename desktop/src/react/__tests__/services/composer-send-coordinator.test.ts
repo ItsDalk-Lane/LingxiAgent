@@ -6,6 +6,9 @@
  * 覆盖任务书 P3.5 最低测试集：会话级发送租约（preparing/awaiting_ack）、
  * 回执关联、连接代次、队列续发串行、立即插入门禁、编辑/删除取消语义。
  * 全部使用可控 Promise 与 fake timers，不用真实 sleep。
+ * R04 合同迁移理由：ACK 只证明 canonical user 接收，status(false) 不证明回合终结。
+ * 原续发断言全部保留，但须先提供对应 sourceEntryId 和有序 run 起止；
+ * status 夹具仅同步已有流式投影，不能替代 coordinator 的权威终态判断。
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -26,6 +29,8 @@ vi.mock('../../hooks/use-stream-buffer', () => ({
 }));
 
 vi.mock('../../stores/session-actions', () => ({
+  // 未提供权威历史时显式失败，不能用空历史伪造 idle 或漏掉导出。
+  fetchSessionHistoryPage: vi.fn(async () => { throw new Error('test_history_unavailable'); }),
   loadSessions: vi.fn(),
   upsertOptimisticSessionFirstMessage: vi.fn(),
 }));
@@ -73,6 +78,10 @@ import { useStore } from '../../stores';
 import { sessionScopedValue } from '../../stores/session-slice';
 import { handleServerMessage } from '../../services/ws-message-handler';
 import {
+  beginQueuedItemEdit,
+  cancelQueuedItemEdit,
+  saveQueuedItemEdit,
+  cancelQueueFlushIntent,
   cancelQueueItemSend,
   dispatchQueuedItem,
   findSendRecordByClientMessageId,
@@ -125,6 +134,7 @@ function seedStore(sessionPaths: string[]) {
     currentSessionPath: sessionPaths[0] ?? null,
     currentSessionId: sessionPaths[0] ? `sess-${sessionPaths[0]}` : null,
     currentAgentId: 'hana',
+    currentTab: 'chat',
     sessions: sessionPaths.map(path => ({
       path,
       sessionId: `sess-${path}`,
@@ -203,12 +213,32 @@ function dispatchAck(sessionPath: string, clientMessageId: string, text = 'acked
     sessionPath,
     sessionId: `sess-${sessionPath}`,
     clientMessageId,
-    message: { id: `srv-${clientMessageId}`, text, timestamp: new Date().toISOString() },
+    snapshotVersion: findSendRecordByClientMessageId(clientMessageId)?.snapshotVersion ?? 1,
+    message: { id: `srv-${clientMessageId}`, sourceEntryId: `srv-${clientMessageId}`, text, timestamp: new Date().toISOString() },
   });
 }
 
 function dispatchStatus(sessionPath: string, isStreaming: boolean, streamId: string | null) {
   handleServerMessage({ type: 'status', sessionPath, isStreaming, streamId, turnId: null });
+}
+
+// R04：网络边界夹具携带真实发送记录身份，不能把普通 status 冒充 run 终态。
+const runInputEntries = new Map<string, string>();
+function dispatchRunStart(sessionPath: string, runId: string): void {
+  const payload = sentPayloads().filter(item => item.sessionPath === sessionPath).at(-1);
+  const clientId = payload?.clientMessageId ? String(payload.clientMessageId) : null;
+  const sourceEntryId = clientId ? `srv-${clientId}` : `external-input-${runId}`;
+  runInputEntries.set(`${sessionPath}:${runId}`, sourceEntryId);
+  handleServerMessage({ type: 'assistant_run_start', sessionPath, sessionId: `sess-${sessionPath}`,
+    streamId: runId, runId, seq: 10, turnInputEntryId: sourceEntryId });
+  dispatchStatus(sessionPath, true, runId);
+}
+function dispatchRunEnd(sessionPath: string, runId: string): void {
+  const sourceEntryId = runInputEntries.get(`${sessionPath}:${runId}`);
+  if (!sourceEntryId) throw new Error('run must start before its terminal fixture');
+  handleServerMessage({ type: 'assistant_run_end', sessionPath, sessionId: `sess-${sessionPath}`,
+    streamId: runId, runId, seq: 20, turnInputEntryId: sourceEntryId });
+  dispatchStatus(sessionPath, false, runId);
 }
 
 function makeGatedRead() {
@@ -225,6 +255,7 @@ beforeEach(() => {
   vi.useFakeTimers();
   wsMocks.current = { send: vi.fn(), readyState: 1 };
   resetComposerSendCoordinatorForTests();
+  runInputEntries.clear();
   seedStore([PATH_A]);
   window.platform = { readFileBase64: vi.fn(async () => 'SUJBTkVfQkFTRTY0') } as unknown as typeof window.platform;
 });
@@ -274,9 +305,14 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
     await vi.advanceTimersByTimeAsync(1000);
     expect(wsMocks.current!.send).toHaveBeenCalledTimes(1);
 
-    // 回执到达（租约释放）后 B 才可以发。
+    // R04 修正旧合同：canonical ACK 后仍有独立 run barrier，不能立即放行 B。
     const clientMessageId = String(sentPayloads()[0].clientMessageId);
     dispatchAck(PATH_A, clientMessageId);
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+    await flushQueuedHeadNow(PATH_A, makeDeps());
+    expect(wsMocks.current!.send).toHaveBeenCalledTimes(1);
+    dispatchRunStart(PATH_A, 'run-ack');
+    dispatchRunEnd(PATH_A, 'run-ack');
     expect(hasInFlightSend(identityOf(PATH_A))).toBe(false);
     await flushQueuedHeadNow(PATH_A, makeDeps());
     expect(wsMocks.current!.send).toHaveBeenCalledTimes(2);
@@ -300,14 +336,14 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
     expect(wsMocks.current!.send).toHaveBeenCalledTimes(1);
 
     // run 开始：pending 清除、streaming 置位，B 仍然不发。
-    dispatchStatus(PATH_A, true, 'run-1');
+    dispatchRunStart(PATH_A, 'run-1');
     expect(useStore.getState().turnPendingSessions).toEqual([]);
     await flushQueuedHeadNow(PATH_A, makeDeps());
     await vi.advanceTimersByTimeAsync(1000);
     expect(wsMocks.current!.send).toHaveBeenCalledTimes(1);
 
     // run 权威终结后 B 才发出。
-    dispatchStatus(PATH_A, false, 'run-1');
+    dispatchRunEnd(PATH_A, 'run-1');
     await flushQueuedHeadNow(PATH_A, makeDeps());
     expect(wsMocks.current!.send).toHaveBeenCalledTimes(2);
     expect(sentPayloads()[1].text).toBe('B');
@@ -320,7 +356,7 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
     await flushQueuedHeadNow(PATH_A, makeDeps());
     const clientMessageId = String(sentPayloads()[0].clientMessageId);
     dispatchAck(PATH_A, clientMessageId);
-    dispatchStatus(PATH_A, true, 'run-1');
+    dispatchRunStart(PATH_A, 'run-1');
     expect(useStore.getState().streamingSessions.length).toBe(1);
 
     for (const type of ['model_turn_end', 'tool_end', 'mood_end']) {
@@ -335,12 +371,12 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
 
   it('Q05：A 正确 run_end 后，B 只发一次且顺序稳定（经 400ms 调度通道）', async () => {
     // A 正在 run：队列积压 A→B（流式期间发送入队的真实形态）。
-    dispatchStatus(PATH_A, true, 'run-0');
+    dispatchRunStart(PATH_A, 'run-0');
     enqueue(PATH_A, 'q-a', 'A');
     enqueue(PATH_A, 'q-b', 'B');
 
     // run-0 结束 → 组件 effect 发出调度意图（400ms 视觉缓冲后重新验证并取得租约）。
-    dispatchStatus(PATH_A, false, 'run-0');
+    dispatchRunEnd(PATH_A, 'run-0');
     requestQueueFlush(PATH_A, makeDeps());
     requestQueueFlush(PATH_A, makeDeps()); // 重复 effect 触发去重
     await vi.advanceTimersByTimeAsync(400);
@@ -350,8 +386,8 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
 
     const clientMessageId = String(sentPayloads()[0].clientMessageId);
     dispatchAck(PATH_A, clientMessageId);
-    dispatchStatus(PATH_A, true, 'run-1');
-    dispatchStatus(PATH_A, false, 'run-1');
+    dispatchRunStart(PATH_A, 'run-1');
+    dispatchRunEnd(PATH_A, 'run-1');
 
     requestQueueFlush(PATH_A, makeDeps());
     await vi.advanceTimersByTimeAsync(400);
@@ -397,16 +433,16 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
     gated.release('SU1HX0E=');
     await flushA;
     dispatchAck(PATH_A, String(sentPayloads()[0].clientMessageId));
-    dispatchStatus(PATH_A, true, 'run-1');
-    dispatchStatus(PATH_A, false, 'run-1');
+    dispatchRunStart(PATH_A, 'run-1');
+    dispatchRunEnd(PATH_A, 'run-1');
 
     await flushQueuedHeadNow(PATH_A, makeDeps());
     expect(wsMocks.current!.send).toHaveBeenCalledTimes(2);
     expect(sentPayloads()[1].text).toBe('B');
 
     dispatchAck(PATH_A, String(sentPayloads()[1].clientMessageId));
-    dispatchStatus(PATH_A, true, 'run-2');
-    dispatchStatus(PATH_A, false, 'run-2');
+    dispatchRunStart(PATH_A, 'run-2');
+    dispatchRunEnd(PATH_A, 'run-2');
     await flushQueuedHeadNow(PATH_A, makeDeps());
     expect(wsMocks.current!.send).toHaveBeenCalledTimes(3);
     expect(sentPayloads()[2].text).toBe('C');
@@ -422,6 +458,8 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
     await vi.advanceTimersByTimeAsync(0);
     expect(gated.readFileBase64).toHaveBeenCalledTimes(1);
 
+    // R03：自动发送仅当前会话；切 B 不取消已开始准备的 A。
+    useStore.setState({ currentSessionPath: PATH_B, currentSessionId: `sess-${PATH_B}` });
     await flushQueuedHeadNow(PATH_B, makeDeps());
     expect(wsMocks.current!.send).toHaveBeenCalledTimes(1);
     expect(sentPayloads()[0].sessionPath).toBe(PATH_B);
@@ -465,7 +503,7 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
 
     await flushQueuedHeadNow(PATH_A, makeDeps());
     dispatchAck(PATH_A, String(sentPayloads()[0].clientMessageId));
-    dispatchStatus(PATH_A, true, 'run-2');
+    dispatchRunStart(PATH_A, 'run-2');
 
     // 旧 run-1 的迟到 status(false)：身份不匹配，不得结束 run-2。
     dispatchStatus(PATH_A, false, 'run-1');
@@ -475,8 +513,8 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
     expect(wsMocks.current!.send).toHaveBeenCalledTimes(1);
 
     // 匹配的 run-2 终态才释放下一轮；重复的终态事件是 no-op。
-    dispatchStatus(PATH_A, false, 'run-2');
-    dispatchStatus(PATH_A, false, 'run-2');
+    dispatchRunEnd(PATH_A, 'run-2');
+    dispatchRunEnd(PATH_A, 'run-2');
     expect(useStore.getState().streamingSessions).toEqual([]);
     await flushQueuedHeadNow(PATH_A, makeDeps());
     expect(wsMocks.current!.send).toHaveBeenCalledTimes(2);
@@ -513,7 +551,9 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
     expect(sentPayloads()[0].text).toBe('A-edited');
     expect(queueOf(PATH_A)).toEqual([]);
     dispatchAck(PATH_A, String(sentPayloads()[0].clientMessageId));
-    useStore.getState().endTurnPending(PATH_A);
+    // R04：删除子例开始前完成前一提交的真实回合，而非手工清 pending。
+    dispatchRunStart(PATH_A, 'run-edit-complete');
+    dispatchRunEnd(PATH_A, 'run-edit-complete');
     wsMocks.current!.send.mockClear();
 
     // 删除路径：在途准备被取消后，迟到的读取结果同样不得发送。
@@ -533,7 +573,7 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
 
   it('Q12：立即插入与普通续发并发，不双发、不绕过预检', async () => {
     const gated = makeGatedRead();
-    dispatchStatus(PATH_A, true, 'run-1');
+    dispatchRunStart(PATH_A, 'run-1');
     const itemX = enqueue(PATH_A, 'q-x', 'X', { inputFiles: [IMAGE_FILE] });
     enqueue(PATH_A, 'q-b', 'B');
 
@@ -555,14 +595,18 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
     // 插入成功后队列项移除，后续 B 仍按序等待。
     expect(queueOf(PATH_A).map(item => item.id)).toEqual(['q-b']);
 
-    // 回执释放传输租约，下一项才允许进入准备。
+    // R04：先明确接收并结束 X 的回合，另一个已知 run 上再测视频预检。
+    // 不能靠 ACK 越过未知/运行门禁来“测到”视频上限。
     dispatchAck(PATH_A, String(sentPayloads()[0].clientMessageId));
+    dispatchRunStart(PATH_A, 'run-1');
+    dispatchRunEnd(PATH_A, 'run-1');
+    dispatchRunStart(PATH_A, 'run-video');
 
     // 预检不被插入路径绕过：超限视频明确 blocked，原位保留。
     const itemV = enqueue(PATH_A, 'q-v', 'V', {
       inputFiles: [1, 2, 3, 4].map(i => ({ fileId: `sf_v${i}`, path: `/tmp/v${i}.mp4`, name: `v${i}.mp4`, mimeType: 'video/mp4', isDirectory: false })),
     });
-    const blockedResult = await dispatchQueuedItem(itemV, { type: 'interject', targetRun: { streamId: 'run-1', turnId: null } }, makeDeps());
+    const blockedResult = await dispatchQueuedItem(itemV, { type: 'interject', targetRun: { streamId: 'run-video', turnId: null } }, makeDeps());
     expect(blockedResult).toEqual({ kind: 'blocked', code: 'video_count_exceeded', retryable: false });
     expect(wsMocks.current!.send).toHaveBeenCalledTimes(1);
     const kept = queueOf(PATH_A).find(item => item.id === 'q-v');
@@ -573,11 +617,11 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
   it('Q13：run 在插话准备期间结束/更换，不得插入错误的 run', async () => {
     // 场景一：run 更换（run-1 → run-2）。
     let gated = makeGatedRead();
-    dispatchStatus(PATH_A, true, 'run-1');
+    dispatchRunStart(PATH_A, 'run-1');
     const itemX = enqueue(PATH_A, 'q-x', 'X', { inputFiles: [IMAGE_FILE] });
     const insert = dispatchQueuedItem(itemX, { type: 'interject', targetRun: { streamId: 'run-1', turnId: null } }, makeDeps());
     await vi.advanceTimersByTimeAsync(0);
-    dispatchStatus(PATH_A, true, 'run-2');
+    dispatchRunStart(PATH_A, 'run-2');
     gated.release('SU1HX1g=');
     const changed = await insert;
     expect(changed).toEqual({ kind: 'blocked', code: 'run_changed', retryable: false });
@@ -587,11 +631,11 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
     // 场景二：run 直接结束。
     gated = makeGatedRead();
     useStore.setState({ streamingSessions: [], activeSessionStreams: {} } as never);
-    dispatchStatus(PATH_A, true, 'run-3');
+    dispatchRunStart(PATH_A, 'run-3');
     const itemY = enqueue(PATH_A, 'q-y', 'Y', { inputFiles: [IMAGE_FILE] });
     const insert2 = dispatchQueuedItem(itemY, { type: 'interject', targetRun: { streamId: 'run-3', turnId: null } }, makeDeps());
     await vi.advanceTimersByTimeAsync(0);
-    dispatchStatus(PATH_A, false, 'run-3');
+    dispatchRunEnd(PATH_A, 'run-3');
     gated.release('SU1HX1k=');
     const ended = await insert2;
     expect(ended).toEqual({ kind: 'blocked', code: 'run_ended', retryable: false });
@@ -599,7 +643,7 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
   });
 
   it('Q14：agent review 排队项立即插入保留既有禁止语义，不静默丢失', async () => {
-    dispatchStatus(PATH_A, true, 'run-1');
+    dispatchRunStart(PATH_A, 'run-1');
     const item = enqueue(PATH_A, 'q-review', '请审一下', {
       agentMentions: [{ agentId: 'reviewer', label: 'Reviewer' }] as never,
     });
@@ -621,7 +665,7 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
 
     await flushQueuedHeadNow(PATH_A, makeDeps());
     dispatchAck(PATH_A, String(sentPayloads()[0].clientMessageId));
-    dispatchStatus(PATH_A, true, 'run-1');
+    dispatchRunStart(PATH_A, 'run-1');
 
     // 用户点击停止：终态未到达前不得续发（不能点击停止就立刻清 busy）。
     await flushQueuedHeadNow(PATH_A, makeDeps());
@@ -629,7 +673,7 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
     expect(wsMocks.current!.send).toHaveBeenCalledTimes(1);
 
     // 权威终态到达。
-    dispatchStatus(PATH_A, false, 'run-1');
+    dispatchRunEnd(PATH_A, 'run-1');
     expect(useStore.getState().streamingSessions).toEqual([]);
 
     // 迟到的旧 run 媒体/过程事件：不得重开旧 run、不得触发额外发送。
@@ -674,5 +718,168 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
     expect(itemsB).toHaveLength(1);
     expect(messageData(itemsA[0]).text).toBe('给A');
     expect(messageData(itemsB[0]).text).toBe('给B');
+  });
+});
+
+describe('R03 最新意图与前台边界', () => {
+  it('R03-01/R03-02：旧 timer 到点读取最后一次编辑保护，不延长计时', async () => {
+    enqueue(PATH_A, 'r03-a', '旧快照');
+    requestQueueFlush(PATH_A, makeDeps());
+    await vi.advanceTimersByTimeAsync(200);
+    requestQueueFlush(PATH_A, { ...makeDeps(), shouldSkipItem: () => false });
+    requestQueueFlush(PATH_A, { ...makeDeps(), shouldSkipItem: () => true });
+    await vi.advanceTimersByTimeAsync(200);
+    expect(wsMocks.current!.send).not.toHaveBeenCalled();
+    expect(queueOf(PATH_A)).toHaveLength(1);
+  });
+
+  it('R03-07：A timer 未开始切 B，不自动发送 A', async () => {
+    seedStore([PATH_A, PATH_B]);
+    enqueue(PATH_A, 'r03-a', 'A');
+    requestQueueFlush(PATH_A, makeDeps());
+    useStore.setState({ currentSessionPath: PATH_B, currentSessionId: `sess-${PATH_B}` });
+    await vi.advanceTimersByTimeAsync(400);
+    expect(wsMocks.current!.send).not.toHaveBeenCalled();
+    expect(queueOf(PATH_A)).toHaveLength(1);
+  });
+
+  it('R03-04：保存相同正文不改变版本和 blocked 状态', () => {
+    enqueue(PATH_A, 'r03-a', '  原文\n');
+    useStore.getState().setQueuedTurnInputStatus(PATH_A, 'r03-a', 'blocked', 'vision_disabled', false);
+    useStore.getState().updateQueuedTurnInputText(PATH_A, 'r03-a', '  原文\n');
+    expect(queueOf(PATH_A)[0].snapshotVersion ?? 1).toBe(1);
+    expect(queueOf(PATH_A)[0].status).toBe('blocked');
+  });
+
+  it('R03-04：同 queueItemId 新版本不复用旧逻辑身份', () => {
+    const item = enqueue(PATH_A, 'r03-a', '旧文');
+    const old = tryAcquireSendLease({ identity: identityOf(PATH_A), bundle: item.bundle, queueItemId: item.id, snapshotVersion: 1 });
+    if (!old.ok) throw new Error('expected lease');
+    cancelQueueItemSend(item.id);
+    useStore.getState().updateQueuedTurnInputText(PATH_A, item.id, ' 新文\n');
+    const updated = queueOf(PATH_A)[0];
+    const next = tryAcquireSendLease({ identity: identityOf(PATH_A), bundle: updated.bundle, queueItemId: item.id, snapshotVersion: updated.snapshotVersion });
+    if (!next.ok) throw new Error('expected new lease');
+    expect(getSendRecord(next.leaseId)!.clientMessageId).not.toBe(getSendRecord(old.leaseId)!.clientMessageId);
+  });
+});
+
+// 编辑状态由队列权威持有，不等待 React 局部 state 生效。
+it('R03-03：慢准备期间队列进入编辑，commit 同步拒绝旧快照', async () => {
+  const gated = makeGatedRead();
+  const item = enqueue(PATH_A, 'r03-edit', '旧文', { inputFiles: [IMAGE_FILE] });
+  const pending = flushQueuedHeadNow(PATH_A, makeDeps());
+  await vi.advanceTimersByTimeAsync(0);
+  useStore.setState(state => ({ queuedTurnInputsByPath: Object.fromEntries(
+    Object.entries(state.queuedTurnInputsByPath).map(([key, items]) => [key, items.map(row => row.id === item.id ? { ...row, editing: true } : row)]),
+  ) }));
+  gated.release('SU1H');
+  await pending;
+  expect(wsMocks.current!.send).not.toHaveBeenCalled();
+  expect(queueOf(PATH_A)).toHaveLength(1);
+});
+
+describe('R03 编辑与意图生命周期真实入口', () => {
+  it('R03-03/R03-04/X2-03：开始编辑立即取消慢 lease，保存只发新快照一次', async () => {
+    const gate = makeGatedRead();
+    const item = enqueue(PATH_A, 'edit-a', '旧快照', { inputFiles: [IMAGE_FILE] });
+    const pending = flushQueuedHeadNow(PATH_A, makeDeps());
+    await vi.advanceTimersByTimeAsync(0);
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+    expect(beginQueuedItemEdit(PATH_A, item.id)).toBe('ok');
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(false);
+    expect(queueOf(PATH_A)[0].editing).toBe(true);
+    gate.release('SU1H');
+    await pending;
+    expect(wsMocks.current!.send).not.toHaveBeenCalled();
+    expect(saveQueuedItemEdit(PATH_A, item.id, '  新快照\n')).toBe('ok');
+    expect(queueOf(PATH_A)[0].snapshotVersion).toBe(2);
+    expect(queueOf(PATH_A)[0].bundle.inputFiles).toEqual([IMAGE_FILE]);
+    requestQueueFlush(PATH_A, makeDeps());
+    requestQueueFlush(PATH_A, makeDeps());
+    await vi.advanceTimersByTimeAsync(400);
+    expect(sentPayloads()).toHaveLength(1);
+    expect(sentPayloads()[0].text).toBe('  新快照\n');
+  });
+
+  it('R03-05：取消编辑恢复 blocked 原快照且不自动解锁', async () => {
+    const item = enqueue(PATH_A, 'edit-blocked', '  保留正文\n');
+    useStore.getState().setQueuedTurnInputStatus(PATH_A, item.id, 'blocked', 'vision_disabled', false);
+    const original = queueOf(PATH_A)[0];
+    expect(beginQueuedItemEdit(PATH_A, item.id)).toBe('ok');
+    cancelQueuedItemEdit(PATH_A, item.id);
+    expect(queueOf(PATH_A)[0]).toEqual({ ...original, editing: false });
+    requestQueueFlush(PATH_A, makeDeps());
+    await vi.advanceTimersByTimeAsync(400);
+    expect(wsMocks.current!.send).not.toHaveBeenCalled();
+  });
+
+  it('R03-06：同步提交窗口和已提交项返回 too_late', async () => {
+    const item = enqueue(PATH_A, 'edit-late', '已发送');
+    let editResult: string | null = null;
+    wsMocks.current!.send.mockImplementation(() => { editResult = beginQueuedItemEdit(PATH_A, item.id); });
+    await dispatchQueuedItem(item, { type: 'prompt' }, makeDeps());
+    expect(editResult).toBe('too_late');
+    expect(beginQueuedItemEdit(PATH_A, item.id)).toBe('too_late');
+    expect(queueOf(PATH_A)).toHaveLength(0);
+  });
+
+  it('R03-08/R03-12/X2-04：A preparing 后撤销前台意图不取消 lease，B 独立发送且草稿保留', async () => {
+    seedStore([PATH_A, PATH_B]);
+    const gate = makeGatedRead();
+    enqueue(PATH_A, 'slow-a', 'A', { inputFiles: [IMAGE_FILE] });
+    const b = enqueue(PATH_B, 'fast-b', 'B');
+    const owner = {};
+    const scope = requestQueueFlush(PATH_A, makeDeps(), owner)!;
+    await vi.advanceTimersByTimeAsync(400);
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+    useStore.setState({ currentSessionPath: PATH_B, currentSessionId: `sess-${PATH_B}` });
+    useStore.getState().setDraft(PATH_B, 'B 未发草稿');
+    const beforeDrafts = useStore.getState().drafts;
+    cancelQueueFlushIntent(scope, owner);
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+    await dispatchQueuedItem(b, { type: 'prompt' }, makeDeps());
+    expect(sentPayloads()[0].sessionPath).toBe(PATH_B);
+    gate.release('SU1H');
+    await vi.advanceTimersByTimeAsync(0);
+    expect(sentPayloads().map(payload => payload.sessionPath)).toEqual([PATH_B, PATH_A]);
+    expect(useStore.getState().drafts).toEqual(beforeDrafts);
+  });
+
+  it('R03-09：旧 owner cleanup 不取消新挂载意图，同 owner 撤销后重挂仅发一次', async () => {
+    enqueue(PATH_A, 'strict-a', 'A');
+    const first = {}, next = {};
+    const scope = requestQueueFlush(PATH_A, makeDeps(), first)!;
+    cancelQueueFlushIntent(scope, first);
+    requestQueueFlush(PATH_A, makeDeps(), next);
+    cancelQueueFlushIntent(scope, first);
+    await vi.advanceTimersByTimeAsync(400);
+    expect(sentPayloads()).toHaveLength(1);
+  });
+
+  it('R03-10：删除旧慢项后创建新 lease，旧读取不释放新项租约', async () => {
+    const gate = makeGatedRead();
+    const old = enqueue(PATH_A, 'deleted', '旧', { inputFiles: [IMAGE_FILE] });
+    const pending = flushQueuedHeadNow(PATH_A, makeDeps());
+    await vi.advanceTimersByTimeAsync(0);
+    cancelQueueItemSend(old.id, 'send_cancelled', { sessionPath: PATH_A, snapshotVersion: 1 });
+    useStore.getState().removeQueuedTurnInput(PATH_A, old.id);
+    const next = enqueue(PATH_A, 'replacement', '新');
+    const lease = tryAcquireSendLease({ identity: identityOf(PATH_A), bundle: next.bundle, queueItemId: next.id });
+    if (!lease.ok) throw new Error('expected replacement lease');
+    gate.release('SU1H');
+    await pending;
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+    expect(getSendRecord(lease.leaseId)!.phase).toBe('preparing');
+    expect(sentPayloads()).toHaveLength(0);
+  });
+
+  it('R03-11：立即插入也不能越过 editing', async () => {
+    const item = enqueue(PATH_A, 'insert-edit', 'A');
+    dispatchRunStart(PATH_A, 'run-a');
+    expect(beginQueuedItemEdit(PATH_A, item.id)).toBe('ok');
+    const result = await dispatchQueuedItem(item, { type: 'interject', targetRun: { streamId: 'run-a', turnId: null } }, makeDeps());
+    expect(result).toMatchObject({ kind: 'blocked', code: 'queue_snapshot_changed' });
+    expect(sentPayloads()).toHaveLength(0);
   });
 });

@@ -191,13 +191,6 @@ export function serializeEditor(json: JSONContent): {
   }
 
   const lines = serializeBlock(json);
-
-  // F10/P7.3：非空正文原样保留（首尾空格/换行/空行零丢失）。空白判空是
-  // 调用方的独立谓词（trim 副本），不在这里收口。唯一例外：文档末尾的
-  // 真空段是 TipTap 的 schema 垫尾（列表后必补一个空 paragraph），不是
-  // 用户输入，剥掉；粘贴保真走段内 hardBreak 模型，不受影响。
-  while (lines.length > 1 && lines[lines.length - 1] === '') lines.pop();
-
   const text = lines.join('\n');
 
   return { text, skills, fileRefs, sessionRefs, agentMentions };

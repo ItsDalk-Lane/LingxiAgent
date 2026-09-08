@@ -154,7 +154,10 @@ export function readTenetsFileStrict(filePath: string): TenetsFile {
   if (raw === null || typeof raw !== "object" || Array.isArray(raw)) {
     throw tenetError(TENET_ERRORS.STORE_CORRUPTED, "tenets store has an invalid top-level shape");
   }
-  const schemaVersion = Number(raw.schemaVersion) || TENETS_SCHEMA_VERSION;
+  const schemaVersion = raw.schemaVersion;
+  if (typeof schemaVersion !== "number" || !Number.isInteger(schemaVersion) || schemaVersion < 1) {
+    throw tenetError(TENET_ERRORS.STORE_CORRUPTED, "invalid tenets schemaVersion");
+  }
   if (schemaVersion > TENETS_SCHEMA_VERSION) {
     throw tenetError(
       TENET_ERRORS.STORE_UNSUPPORTED_SCHEMA,
@@ -164,8 +167,18 @@ export function readTenetsFileStrict(filePath: string): TenetsFile {
   if (raw.tenets !== undefined && !Array.isArray(raw.tenets)) {
     throw tenetError(TENET_ERRORS.STORE_CORRUPTED, "tenets store field 'tenets' is not an array");
   }
-  const tenets = (raw.tenets ?? []).filter((t: any) => t && typeof t.content === "string" && t.content.trim());
-  return { schemaVersion, tenets: tenets.map(normalizeTenet) };
+  // 写入证明不能过滤损坏项或随机补 ID 后宣布整库合法。
+  if (!Array.isArray(raw.tenets) || raw.tenets.some((t: unknown) => {
+    if (!t || typeof t !== "object") return true;
+    const entry = t as Record<string, unknown>;
+    return typeof entry.id !== "string" || !entry.id || typeof entry.content !== "string" || !entry.content.trim()
+      || (typeof entry.status !== "string" || !["active", "pending", "rejected"].includes(entry.status))
+      || (typeof entry.source !== "string" || !["user_direct", "model_proposed"].includes(entry.source))
+      || typeof entry.createdAt !== "string" || !Number.isFinite(Date.parse(entry.createdAt));
+  })) throw tenetError(TENET_ERRORS.STORE_CORRUPTED, "tenets store contains an invalid entry");
+  const ids = raw.tenets.map((t: { id: string }) => t.id);
+  if (new Set(ids).size !== ids.length) throw tenetError(TENET_ERRORS.STORE_CORRUPTED, "tenets store contains duplicate IDs");
+  return { schemaVersion, tenets: raw.tenets.map(normalizeTenet) };
 }
 
 function normalizeTenet(raw: any): Tenet {
@@ -434,7 +447,8 @@ export function planLegacyPinnedImport(
     const contentHash = legacyImportContentHash(normalizedContent);
     const override = overrides?.[order];
 
-    const existingExact = finalTenets.find((t) => legacyContentKey(t.content) === normalizedContent);
+    const existingExact = data.tenets.find((t) => t.status === "active" && legacyContentKey(t.content) === normalizedContent)
+      ?? data.tenets.find((t) => legacyContentKey(t.content) === normalizedContent);
     if (existingExact && existingExact.status === "active") {
       entries.push({
         order,

@@ -7,9 +7,12 @@
  * delivery_unknown/transport_submitted）、完整快照保留、输入清理时机、
  * 回执关联与断线对账、重试同一逻辑记录。
  * 模块级用例直接驱动 prepare/commit/coordinator；渲染级用例驱动 InputArea。
+ * R04 合同迁移：canonical ACK 必须含版本与真实 entry 身份，接收不等于 run 结束；
+ * S10 的旧“unknown 后再取租约”与新门禁相违，改为拒绝新发送并保留快照，
+ * 另用独立合成会话保留超时断言；S09/S12 的明确未发送重试仍独立验证。
  */
 
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
@@ -128,6 +131,8 @@ vi.mock('../../hooks/use-hana-fetch', () => ({
 }));
 
 vi.mock('../../stores/session-actions', () => ({
+  // 未提供权威历史时显式失败，不能用空历史伪造 idle 或漏掉导出。
+  fetchSessionHistoryPage: vi.fn(async () => { throw new Error('test_history_unavailable'); }),
   ensureSession: mocks.ensureSession,
   loadSessions: vi.fn(),
   upsertOptimisticSessionFirstMessage: mocks.upsertOptimisticSessionFirstMessage,
@@ -219,6 +224,7 @@ import {
   dispatchComposerSend,
 } from '../../components/input/composer-send';
 import {
+  findSendRecordByClientMessageId,
   flushQueuedHeadNow,
   getSendRecord,
   noteComposerConnectionClosed,
@@ -345,8 +351,21 @@ function dispatchAck(clientMessageId: string) {
     sessionPath: PATH,
     sessionId: SESSION_ID,
     clientMessageId,
-    message: { id: `srv-${clientMessageId}`, text: 'acked', timestamp: new Date().toISOString() },
+    snapshotVersion: findSendRecordByClientMessageId(clientMessageId)?.snapshotVersion ?? 1,
+    message: { id: `srv-${clientMessageId}`, sourceEntryId: `srv-${clientMessageId}`, text: 'acked', timestamp: new Date().toISOString() },
   });
+}
+
+// R04：跨子场景续发前必须有同一 canonical 输入的有序权威 run 起止。
+function completeAcknowledgedRun(clientMessageId: string): void {
+  const runId = `run-${clientMessageId}`;
+  const sourceEntryId = `srv-${clientMessageId}`;
+  handleServerMessage({ type: 'assistant_run_start', sessionId: SESSION_ID, sessionPath: PATH,
+    runId, streamId: runId, seq: 1, turnInputEntryId: sourceEntryId });
+  handleServerMessage({ type: 'assistant_run_end', sessionId: SESSION_ID, sessionPath: PATH,
+    runId, streamId: runId, seq: 2, turnInputEntryId: sourceEntryId });
+  // 本文件 mock 了 stream renderer，只同步投影；coordinator 已独立消费权威事件。
+  handleServerMessage({ type: 'status', sessionId: SESSION_ID, sessionPath: PATH, isStreaming: false, streamId: runId });
 }
 
 /** 真实计时器下冲刷宏/微任务：替代 fake-timer 的 advanceTimersByTimeAsync(0)。 */
@@ -667,16 +686,33 @@ describe('composer-send 显式结果与快照（S01–S15）', () => {
     // 未知投递禁止盲目重试。
     expect(await retrySendRecord(acq.leaseId, makeDeps())).toBeNull();
 
-    // 回执超时路径
-    const acq2 = tryAcquireSendLease({ identity: { kind: 'session', sessionId: SESSION_ID, sessionPath: PATH, agentId: 'hana' }, bundle: makeBundle('超时') });
-    if (!acq2.ok) throw new Error('lease2');
+    // R04：unknown 是仍持有的输入，不可通过新 lease/普通消息绕过。
+    const blockedNew = tryAcquireSendLease({ identity: { kind: 'session', sessionId: SESSION_ID, sessionPath: PATH, agentId: 'hana' }, bundle: makeBundle('不能越过未知') });
+    expect(blockedNew.ok).toBe(false);
+    expect(record.bundle.text).toBe('断线');
+    expect(chatItems()).toHaveLength(1);
+    expect(messageData(chatItems()[0]).text).toBe('断线');
+
+    // 保留原 ACK 超时反例，但在独立合成会话验证，不能隐式解锁上一个 unknown。
+    const timeoutPath = '/session/timeout.jsonl';
+    const timeoutSessionId = 'sess_timeout';
+    const timeoutBundle = makeBundle('超时', { sessionRef: { sessionId: timeoutSessionId, sessionPath: timeoutPath, agentId: 'hana' } });
+    useStore.setState(state => ({ sessions: [...state.sessions, { path: timeoutPath, sessionId: timeoutSessionId, agentId: 'hana' } as never],
+      sessionLocatorsById: { ...state.sessionLocatorsById, [timeoutSessionId]: { path: timeoutPath } } }));
+    const acq2 = tryAcquireSendLease({ identity: { kind: 'session', sessionId: timeoutSessionId, sessionPath: timeoutPath, agentId: 'hana' }, bundle: timeoutBundle });
+    if (!acq2.ok) throw new Error('independent timeout session lease');
     const sent2 = await sendWithLease(acq2.leaseId, makeDeps());
     expect(sent2.kind).toBe('transport_submitted');
-    await vi.advanceTimersByTimeAsync(16_000);
+    // 同步观察看门狗边界，后续异步对账诊断不能覆盖本条超时来源断言。
+    vi.advanceTimersByTime(15_000);
     const record2 = getSendRecord(acq2.leaseId)!;
     expect(record2.phase).toBe('delivery_unknown');
     expect(record2.code).toBe('ack_timeout');
+    expect(record2.bundle.text).toBe('超时');
+    expect(await retrySendRecord(acq2.leaseId, makeDeps())).toBeNull();
     expect(wsMocks.current!.send).toHaveBeenCalledTimes(2);
+    expect(record.phase).toBe('delivery_unknown');
+    expect(tryAcquireSendLease({ identity: { kind: 'session', sessionId: timeoutSessionId, sessionPath: timeoutPath, agentId: 'hana' }, bundle: timeoutBundle }).ok).toBe(false);
   });
 
   it('S11：重连后经恢复/历史找到原 clientMessageId，合并不重复追加', async () => {
@@ -702,7 +738,8 @@ describe('composer-send 显式结果与快照（S01–S15）', () => {
   it('S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致', async () => {
     // 队首因 ws.send 抛错失败 → 显式重试（同 queueItemId 复用 clientMessageId）。
     wsMocks.current!.send.mockImplementationOnce(() => { throw new Error('boom'); });
-    enqueue('q-1', '排队内容', { skills: ['skill-x'] });
+    const queuedBody = '\n排队内容  \n';
+    enqueue('q-1', queuedBody, { skills: ['skill-x'] });
     await flushQueuedHeadNow(PATH, makeDeps());
     let items = queueOf();
     expect(items).toHaveLength(1);
@@ -715,14 +752,15 @@ describe('composer-send 显式结果与快照（S01–S15）', () => {
     const payloads = sentPayloads();
     expect(payloads).toHaveLength(2);
     expect(payloads[1].clientMessageId).toBe(firstClientMessageId);
-    expect(payloads[1].text).toBe('排队内容');
+    expect(payloads[1].text).toBe(queuedBody);
     expect(payloads[1].skills).toEqual(['skill-x']);
     // 重试更新同一条乐观消息，不追加第二条用户消息。
     expect(chatItems()).toHaveLength(1);
 
     // 回执释放传输租约、回合门禁清空后，下一项才允许进入准备（F2 串行）。
     dispatchAck(firstClientMessageId);
-    useStore.getState().endTurnPending(PATH);
+    // R04：原视频失败断言保留，先用真正 run 终态结束前一成功重试。
+    completeAcknowledgedRun(firstClientMessageId);
 
     // 不可重试的 blocked 项（视频超限）拒绝重试。
     enqueue('q-2', '四段视频', {
@@ -752,7 +790,8 @@ describe('composer-send 显式结果与快照（S01–S15）', () => {
 
     // 模块级发送仍持有传输租约（awaiting_ack）：回执释放、回合门禁清空后再进渲染级用例。
     dispatchAck(String(sentPayloads()[0].clientMessageId));
-    useStore.getState().endTurnPending(PATH);
+    // R04：渲染级保真子例之前完成前一条真实回合，不能只清 pending。
+    completeAcknowledgedRun(String(sentPayloads()[0].clientMessageId));
 
     // 渲染级：编辑器序列化结果不经过发送链的二次改写，逐字符进入载荷。
     cleanup();
@@ -880,4 +919,76 @@ describe('composer-send 显式结果与快照（S01–S15）', () => {
     expect(lastPayload.text).toBe(edited);
     expect((lastPayload.displayMessage as { text: string }).text).toBe(edited);
   });
+});
+
+describe('R03 InputArea 编辑点击接线', () => {
+  it('R03-03：点击编辑同步取消慢附件，保存后仅提交新正文', async () => {
+    let release!: (value: string) => void;
+    const gate = new Promise<string>(resolve => { release = resolve; });
+    window.platform = { readFileBase64: vi.fn(() => gate) } as unknown as typeof window.platform;
+    seedSession({ models: [{ id: 'vision', provider: 'test', name: 'Vision', input: ['text', 'image'], isCurrent: true }] });
+    enqueue('ui-edit', '旧正文', { inputFiles: [{ fileId: 'img', path: '/tmp/test.png', name: 'test.png', isDirectory: false }] });
+    const view = render(React.createElement(InputArea));
+    const pending = flushQueuedHeadNow(PATH, makeDeps());
+    await waitFor(() => expect(window.platform.readFileBase64).toHaveBeenCalled());
+    fireEvent.click(screen.getByRole('button', { name: /编辑|Edit/i }));
+    expect(queueOf()[0].editing).toBe(true);
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: '  新正文\n' } });
+    await act(async () => { release('SU1H'); await pending; });
+    expect(sentPayloads()).toHaveLength(0);
+    fireEvent.click(screen.getByRole('button', { name: /确认|Confirm/i }));
+    await waitFor(() => expect(sentPayloads()).toHaveLength(1));
+    expect(sentPayloads()[0].text).toBe('  新正文\n');
+    view.unmount();
+  });
+
+  it('R03-05：点击取消保留原 blocked 状态与正文', () => {
+    enqueue('ui-cancel', '原正文');
+    useStore.getState().setQueuedTurnInputStatus(PATH, 'ui-cancel', 'blocked', 'vision_disabled', false);
+    render(React.createElement(InputArea));
+    fireEvent.click(screen.getByRole('button', { name: /编辑|Edit/i }));
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: '未保存修改' } });
+    fireEvent.click(screen.getByRole('button', { name: /取消|Cancel/i }));
+    expect(queueOf()[0]).toMatchObject({ text: '原正文', status: 'blocked', errorCode: 'vision_disabled', retryable: false, editing: false });
+    expect(sentPayloads()).toHaveLength(0);
+  });
+});
+
+it('R03-09：真实 InputArea StrictMode 卸载撤销 timer，重挂只发一次', async () => {
+  vi.useFakeTimers();
+  enqueue('strict-ui', '只发一次');
+  const first = render(React.createElement(React.StrictMode, null, React.createElement(InputArea)));
+  first.unmount();
+  await act(async () => { await vi.advanceTimersByTimeAsync(400); });
+  expect(sentPayloads()).toHaveLength(0);
+  render(React.createElement(React.StrictMode, null, React.createElement(InputArea)));
+  await act(async () => { await vi.advanceTimersByTimeAsync(400); });
+  expect(sentPayloads()).toHaveLength(1);
+});
+
+it('R03-12：InputArea A 慢附件时切 B 可发送，A 完成不再清 B 编辑器', async () => {
+  const otherPath = '/session/b-ui.jsonl';
+  let release!: (value: string) => void;
+  const gate = new Promise<string>(resolve => { release = resolve; });
+  window.platform = { readFileBase64: vi.fn(() => gate) } as unknown as typeof window.platform;
+  seedSession({
+    sessions: [{ path: PATH, sessionId: SESSION_ID, agentId: 'hana' }, { path: otherPath, sessionId: 'b-ui', agentId: 'hana' }],
+    sessionLocatorsById: { [SESSION_ID]: { path: PATH }, 'b-ui': { path: otherPath } },
+    models: [{ id: 'vision', provider: 'test', input: ['text', 'image'], isCurrent: true }],
+    attachedFiles: [{ fileId: 'a-img', path: '/tmp/a.png', name: 'a.png', isDirectory: false }],
+  });
+  mocks.editorDoc = buildFaithfulPasteContent('A 正文');
+  render(React.createElement(InputArea));
+  fireEvent.click(screen.getByTestId('send'));
+  await waitFor(() => expect(window.platform.readFileBase64).toHaveBeenCalled());
+  mocks.editorDoc = buildFaithfulPasteContent('B 正文');
+  act(() => { useStore.setState({ currentSessionPath: otherPath, currentSessionId: 'b-ui', attachedFiles: [] }); });
+  fireEvent.click(screen.getByTestId('send'));
+  await waitFor(() => expect(sentPayloads()).toHaveLength(1));
+  expect(sentPayloads()[0].sessionPath).toBe(otherPath);
+  const clearedByB = mocks.clearContent.mock.calls.length;
+  await act(async () => { release('SU1H'); });
+  await waitFor(() => expect(sentPayloads()).toHaveLength(2));
+  expect(sentPayloads()[1].sessionPath).toBe(PATH);
+  expect(mocks.clearContent).toHaveBeenCalledTimes(clearedByB);
 });

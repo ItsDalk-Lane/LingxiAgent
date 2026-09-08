@@ -214,7 +214,7 @@ export const createChatSlice = (
       const targetIdx = session.items.findIndex((item) =>
         item.type === 'message' &&
         item.data.role === 'user' &&
-        item.data.id === clientMessageId,
+        (item.data.id === clientMessageId || item.data.clientMessageId === clientMessageId),
       );
       if (targetIdx < 0) return {};
       const items = [...session.items];
@@ -222,7 +222,8 @@ export const createChatSlice = (
       if (current.type !== 'message' || current.data.role !== 'user') return {};
       const nextData: ChatMessage = {
         ...current.data,
-        ...message,
+        ...Object.fromEntries(Object.entries(message).filter(([, value]) => value !== undefined)),
+        clientMessageId,
         id: current.data.id,
         // 回执/恢复回放不得覆盖用户原文：本地乐观文本是用户输入的逐字符快照（F1/F10），
         // 服务端回声只负责确认与补充元数据；本地文本为空（纯附件等）时才采用服务端文本。
@@ -248,7 +249,7 @@ export const createChatSlice = (
       const targetIdx = session.items.findIndex((item) =>
         item.type === 'message' &&
         item.data.role === 'user' &&
-        item.data.id === clientMessageId,
+        (item.data.id === clientMessageId || item.data.clientMessageId === clientMessageId),
       );
       if (targetIdx < 0) return {};
       const items = [...session.items];
@@ -760,7 +761,7 @@ export const createChatSlice = (
         ...s.queuedTurnInputsByPath,
         // 编辑保存 = 新快照：版本递增（在途准备的迟到结果按版本丢弃），
         // 状态回到 ready 等一次新的调度；旧错误码随快照作废。
-        [key]: existing.map(item => item.id === id
+        [key]: existing.map(item => item.id === id && item.text !== text
           ? {
             ...item,
             text,

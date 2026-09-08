@@ -8,13 +8,9 @@
  * 真实恢复（必须显式批准；只恢复清单里 action=restore 的条目）：
  *   node scripts/pinned-tenets-recovery.mjs --home <LINGXI_HOME> --apply --approval <approval.json>
  *
- * approval.json 格式：
- *   {
- *     "agentId": "hana",
- *     "source": "pinned-memory.json.migrated",
- *     "decisions": [{ "contentHash": "sha256:<hex>", "action": "restore" | "skip" }]
- *   }
- * contentHash 从 dry-run 报告的 candidates 中复制。
+ * dry-run 的 approvalTemplate 包含 schemaVersion/operationId/agentId、源摘要、
+ * observedTargetHash 和逐源条目决策；默认全 skip，用户审阅后显式选择 restore。
+ * 当前 Node CLI 没有可复用的 home 排他所有权；apply 明确 BLOCKED，不绕过该边界。
  *
  * 边界：归档源文件永不删除；收据写在 agentDir/memory/ 下；不重置系统权限；
  * 不操作 --home 以外的目录。macOS 授权状态与本工具无关。
@@ -45,7 +41,7 @@ function parseArgs(argv) {
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const { scanPinnedTenetsRecovery, applyPinnedTenetsRecovery } = await import(
+  const { scanPinnedTenetsRecovery } = await import(
     path.join(__dirname, "..", "core", "pinned-tenets-recovery.ts")
   );
 
@@ -54,7 +50,7 @@ async function main() {
     console.log(JSON.stringify(report, null, 2));
     if (report.agents.length > 0) {
       console.error(
-        `\ndry-run only. To restore, write an approval JSON (agentId/source/decisions by contentHash) ` +
+        `\ndry-run only. To restore, review approvalTemplate (operationId/source snapshots/entry decisions) ` +
         `and re-run with --apply --approval <file>.`,
       );
     }
@@ -64,9 +60,7 @@ async function main() {
   if (!args.approval) {
     throw new Error("--apply requires --approval <file>; refusing to restore without an explicit approval manifest");
   }
-  const approval = JSON.parse(fs.readFileSync(args.approval, "utf-8"));
-  const result = applyPinnedTenetsRecovery(args.home, approval);
-  console.log(JSON.stringify({ ok: true, restored: result.restored }, null, 2));
+  throw new Error("BLOCKED_HOME_OWNERSHIP: no verified exclusive home ownership primitive is available; apply is disabled. Keep the approved snapshot for retry after ownership support is available.");
 }
 
 main().catch((err) => {

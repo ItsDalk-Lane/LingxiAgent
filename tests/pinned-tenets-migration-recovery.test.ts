@@ -1,9 +1,13 @@
 /**
- * F3 / P1.7 恢复工具测试：旧迁移跑过（.migrated 存在）且没有新版本 completed
- * 收据的目录。默认行为必须是 dry-run；真实恢复必须接收明确批准的源文件与
+ * F3 / P1.7 恢复工具测试：旧迁移归档与逐操作完成范围。
+ * 默认行为必须是 dry-run；真实恢复必须接收明确批准的源文件与
  * 条目决策，并走与迁移相同的批量写入与收据机制。
  *
- * 对应任务书 M13。
+ * 对应任务书 M13；R02/S2 将批准绑定源摘要、目标快照与 operationId。
+ * 本轮调整理由：旧手造 version=1 completed 不是有效收据，改由真实迁移生成；
+ * completed 仅覆盖本计划，不能隐藏其他归档；同 operation 重试返回原摘要。
+ * 拒绝与不默认恢复断言仍保留，只更新为新批准 schema，避免旧参数先失败
+ * 而未实际验证路径、源、内容与决策边界。
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -13,8 +17,8 @@ import {
   scanPinnedTenetsRecovery,
   applyPinnedTenetsRecovery,
 } from "../core/pinned-tenets-recovery.ts";
-import { activeTenets, listTenets, addTenetDirect, addTenetProposal, tenetsFilePath } from "../lib/memory/tenets.ts";
-import { readPinnedTenetsMigrationReceipt } from "../core/pinned-tenets-migration.ts";
+import { activeTenets, listTenets, addTenetDirect, addTenetProposal, tenetsFilePath, removeTenet } from "../lib/memory/tenets.ts";
+import { migrateAgentPinnedTenets, readPinnedTenetsMigrationReceipt } from "../core/pinned-tenets-migration.ts";
 
 const homes: string[] = [];
 
@@ -72,17 +76,33 @@ describe("M13：旧 .migrated 无收据 → 默认仅 dry-run", () => {
     expect(fs.existsSync(tenetsFilePath(agentDir))).toBe(false);
   });
 
-  it("completed 收据的 agent 不是恢复候选（防复活用户主动删除）", () => {
+  it("completed 仅覆盖本计划：删除的条目不复活，其他归档仍为候选", () => {
     const { home, agentDir } = makeAgentHome();
-    fs.writeFileSync(path.join(agentDir, "pinned-memory.json.migrated"), JSON.stringify({
+    fs.writeFileSync(path.join(agentDir, "pinned-memory.json"), JSON.stringify({
       version: 1, items: [{ id: "pin_a", content: "旧条目" }],
     }), "utf-8");
-    fs.writeFileSync(path.join(agentDir, "memory", "pinned-tenets-migration.receipt.json"), JSON.stringify({
-      version: 1, kind: "migration", agentId: "hana", state: "completed",
+    migrateAgentPinnedTenets(agentDir, "hana");
+    const receipt = readPinnedTenetsMigrationReceipt(agentDir)!;
+    expect(receipt.state).toBe("completed");
+    const imported = activeTenets(agentDir).find(item => item.content === "旧条目")!;
+    expect(removeTenet(agentDir, imported.id)).toBe(true);
+    fs.writeFileSync(path.join(agentDir, "pinned-memory.json.migrated-other"), JSON.stringify({
+      version: 1, items: [{ id: "pin_other", content: "另一个尚未恢复的条目" }],
     }), "utf-8");
+    const before = snapshotTree(agentDir);
 
     const report = scanPinnedTenetsRecovery(home);
-    expect(report.agents).toHaveLength(0);
+    expect(report.agents).toHaveLength(1);
+    expect(report.agents[0].candidates.find(item => item.legacyId === "pin_a"))
+      .toMatchObject({ classification: "previously_restored_now_missing", legacyRestored: true });
+    expect(report.agents[0].candidates.find(item => item.legacyId === "pin_other"))
+      .toMatchObject({ classification: "missing" });
+    expect(report.agents[0].recoverableCount).toBe(1);
+    expect(report.agents[0].approvalTemplate.decisions.every(item => item.action === "skip")).toBe(true);
+    migrateAgentPinnedTenets(agentDir, "hana");
+    expect(activeTenets(agentDir)).toHaveLength(0);
+    expect(readPinnedTenetsMigrationReceipt(agentDir)).toEqual(receipt);
+    expect(snapshotTree(agentDir)).toEqual(before);
   });
 
   it("分类：present / inactive / similar / missing", () => {
@@ -126,17 +146,14 @@ describe("恢复 apply：明确批准后走同一批量写入与收据机制", (
     const { home, agentDir } = makeAgentHome();
     setupArchived(agentDir);
     const report = scanPinnedTenetsRecovery(home);
-    const candidates = report.agents[0].candidates;
-    const hashOf = (legacyId: string) => candidates.find((c: any) => c.legacyId === legacyId).contentHash;
-
+    const template = report.agents[0].approvalTemplate;
+    expect(template.decisions.every(decision => decision.action === "skip")).toBe(true);
     const approval = {
-      agentId: "hana",
-      source: "pinned-memory.json.migrated",
-      decisions: [
-        { contentHash: hashOf("pin_a"), action: "restore" as const },
-        { contentHash: hashOf("pin_b"), action: "restore" as const },
-        { contentHash: hashOf("pin_c"), action: "skip" as const },
-      ],
+      ...template,
+      decisions: template.decisions.map(decision => ({
+        ...decision,
+        action: decision.sourceEntryKey === "pin_c" ? "skip" as const : "restore" as const,
+      })),
     };
     const result = applyPinnedTenetsRecovery(home, approval);
 
@@ -149,8 +166,11 @@ describe("恢复 apply：明确批准后走同一批量写入与收据机制", (
     const kept = activeTenets(agentDir).find(t => t.content === "对花生过敏")!;
     expect(kept.createdAt).toBe("2026-08-01T00:00:00.000Z");
     // 收据
-    const receipt = readPinnedTenetsMigrationReceipt(agentDir);
-    expect(receipt).not.toBeNull();
+    const receiptFile = path.join(agentDir, "memory", "pinned-recovery-operations", `${approval.operationId}.json`);
+    const receipt = JSON.parse(fs.readFileSync(receiptFile, "utf-8"));
+    expect(readPinnedTenetsMigrationReceipt(agentDir)).toBeNull();
+    expect(receipt.operationId).toBe(approval.operationId);
+    expect(receipt.version).toBe(3);
     expect(receipt!.kind).toBe("recovery");
     expect(receipt!.state).toBe("completed");
     expect(receipt!.plan).toHaveLength(2);
@@ -158,7 +178,9 @@ describe("恢复 apply：明确批准后走同一批量写入与收据机制", (
     expect(fs.existsSync(path.join(agentDir, "pinned-memory.json.migrated"))).toBe(true);
     // 幂等：同一批准再次 apply 不产生新条目
     const again = applyPinnedTenetsRecovery(home, approval);
-    expect(again.restored).toBe(0);
+    expect(again).toEqual(result);
+    expect(again.restored).toBe(2);
+    expect(JSON.parse(fs.readFileSync(receiptFile, "utf-8"))).toEqual(receipt);
     expect(activeTenets(agentDir)).toHaveLength(2);
   });
 
@@ -166,31 +188,38 @@ describe("恢复 apply：明确批准后走同一批量写入与收据机制", (
     const { home, agentDir } = makeAgentHome();
     setupArchived(agentDir);
     const report = scanPinnedTenetsRecovery(home);
-    const hashOf = (legacyId: string) => report.agents[0].candidates.find((c: any) => c.legacyId === legacyId).contentHash;
+    const template = report.agents[0].approvalTemplate;
+    const decision = { ...template.decisions.find(item => item.sourceEntryKey === "pin_a")!, action: "restore" as const };
+    const approval = { ...template, decisions: [decision] };
+    const source = template.sources[0];
 
     expect(() => applyPinnedTenetsRecovery(home, {
-      agentId: "hana", source: "../pinned-memory.json.migrated",
-      decisions: [{ contentHash: hashOf("pin_a"), action: "restore" as const }],
+      ...approval, sources: [{ ...source, file: "../pinned-memory.json.migrated" }],
+      decisions: [{ ...decision, source: "../pinned-memory.json.migrated" }],
     })).toThrowError(/source/i);
 
     expect(() => applyPinnedTenetsRecovery(home, {
-      agentId: "hana", source: "pinned-memory.json",
-      decisions: [{ contentHash: hashOf("pin_a"), action: "restore" as const }],
+      ...approval, sources: [{ ...source, file: "pinned-memory.json" }],
+      decisions: [{ ...decision, source: "pinned-memory.json" }],
     })).toThrowError(/source/i);
 
     expect(() => applyPinnedTenetsRecovery(home, {
-      agentId: "hana", source: "pinned-memory.json.migrated",
-      decisions: [{ contentHash: "sha256:deadbeef", action: "restore" as const }],
+      ...approval, decisions: [{ ...decision, contentHash: "sha256:deadbeef" }],
     })).toThrowError(/contentHash|decision/i);
+    // 形状合法但内容身份错误也必须拒绝，不能只通过 schema 拒绝伪哈希。
+    expect(() => applyPinnedTenetsRecovery(home, {
+      ...approval, decisions: [{ ...decision, contentHash: `sha256:${"0".repeat(64)}` }],
+    })).toThrowError(/source entry mismatch/i);
 
     expect(() => applyPinnedTenetsRecovery(home, {
-      agentId: "hana", source: "pinned-memory.json.migrated", decisions: [],
-    })).toThrowError(/decision/i);
+      ...approval, decisions: [],
+    })).toThrowError(/invalid approval schema/i);
+    // 模板默认全 skip，不构成恢复批准。
+    expect(() => applyPinnedTenetsRecovery(home, template)).toThrowError(/no restore decisions/i);
 
-    // 未知 agent
+    // 未知 agent 仍拒绝；错误可以来自不存在的 agents/nobody 目录。
     expect(() => applyPinnedTenetsRecovery(home, {
-      agentId: "nobody", source: "pinned-memory.json.migrated",
-      decisions: [{ contentHash: hashOf("pin_a"), action: "restore" as const }],
+      ...approval, agentId: "nobody",
     })).toThrowError(/agent/i);
 
     expect(listTenets(agentDir)).toHaveLength(0);
@@ -210,11 +239,11 @@ describe("恢复 apply：明确批准后走同一批量写入与收据机制", (
     const report = scanPinnedTenetsRecovery(home);
     const candidates = report.agents[0].candidates;
     // 只批准 missing 的；similar 不给决策即不恢复
-    const missing = candidates.find((c: any) => c.legacyId === "pin_missing");
+    const missing = candidates.find(c => c.legacyId === "pin_missing")!;
     applyPinnedTenetsRecovery(home, {
-      agentId: "hana",
-      source: "pinned-memory.json.migrated",
-      decisions: [{ contentHash: missing.contentHash, action: "restore" as const }],
+      ...report.agents[0].approvalTemplate,
+      decisions: [{ source: missing.source, sourceEntryKey: missing.sourceEntryKey,
+        contentHash: missing.contentHash, action: "restore" as const }],
     });
 
     const contents = activeTenets(agentDir).map(t => t.content);

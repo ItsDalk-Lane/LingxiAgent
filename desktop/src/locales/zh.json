@@ -657,7 +657,12 @@
     "queuedSendFailed": "排队消息发送失败",
     "queuedRetry": "重试",
     "queuedInsertWaiting": "正在等待当前回答开始，请稍候再插入",
-    "queuedDelete": "撤销这条排队消息"
+    "queuedEditUnavailable": "这条消息已进入发送流程或已不可编辑，请先核对发送结果。",
+    "queuedDelete": "撤销这条排队消息",
+    "deliveryChecking": "结果未知，正在核对",
+    "deliveryUnknown": "结果未知，核对未完成",
+    "deliveryRunUnknown": "消息已接收，运行结果仍未知",
+    "recheckDelivery": "重新核对"
   },
   "agentReview": {
     "running": "正在审阅当前对话",

@@ -230,41 +230,161 @@ export function resolveMediaParameters({
   };
 }
 
+const OPENAI_SPEECH_FORMATS = new Set(["mp3", "opus", "aac", "flac", "wav", "pcm"]);
+const MINIMAX_SPEECH_FORMATS = new Set(["mp3", "wav", "pcm", "flac"]);
+export const EFFECTIVE_SPEECH_PARAMETERS_VERSION = 1;
+
+export type EffectiveSpeechParameters = Readonly<{
+  effectiveSpeechParametersVersion: 1;
+  protocolId: string;
+  modelId: string;
+  voice?: string;
+  voiceMode?: "explicit" | "configured" | "protocol_default" | "system_default";
+  speed?: number;
+  rateWpm?: number;
+  rateMode?: "explicit" | "configured" | "system_default";
+  format?: string;
+  formatMode?: "explicit" | "configured" | "protocol_default" | "protocol_output_default";
+  groupId?: string;
+}>;
+
+function selectedValue(explicit: Record<string, unknown>, defaults: Record<string, unknown>, key: string) {
+  return explicit[key] === undefined || explicit[key] === null ? defaults[key] : explicit[key];
+}
+
+function selectedMode(explicit: Record<string, unknown>, defaults: Record<string, unknown>, key: string) {
+  if (explicit[key] !== undefined && explicit[key] !== null) return "explicit" as const;
+  if (defaults[key] !== undefined && defaults[key] !== null) return "configured" as const;
+  return null;
+}
+
+function normalizedText(value: unknown, fallback: string): string {
+  return typeof value === "string" && value.trim() ? value.trim() : fallback;
+}
+
+function normalizedSpeed(value: unknown, fallback: number, min: number, max: number): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) return fallback;
+  return Math.min(max, Math.max(min, value));
+}
+
+function targetText(target: Record<string, any>, key: string): string {
+  return typeof target[key] === "string" && target[key].trim() ? target[key].trim() : "";
+}
+
 /**
- * F11/P8.2：局限于 speech 的参数解析步骤。
- *
- * 优先级固定：本次显式输入 > 该语音供应商默认参数（speech 域 providerDefaults，
- * 按逻辑 provider 身份索引）> 协议默认值（由适配器按各协议边界收口）。
- * 语义约定：
- *   - 显式 undefined/null = 本次没有取值 → 用供应商默认（null 绝不能被
- *     Number(null)=0 之类的隐式转换吞掉）；
- *   - 显式非法值原样透传给协议层按既有边界处理，不在这里吞掉；
- *   - 供应商默认只接受类型健全的值（voice/format 必须是非空字符串，
- *     speed 必须是有限数字），否则视为未配置；
- *   - 只输出解析到值的字段，未解析到的字段不出现（适配器见 undefined
- *     才会落到协议默认）。
- * 模型身份不参与本解析：execution target 已解析的模型不允许被默认参数改写。
+ * R08：语音参数的唯一解析入口。这里先选择本次输入或 speech 域默认，再按实际
+ * 协议归一化；返回值已冻结，可直接交给 adapter、TaskStore 和语义观测。
+ * modelId 只读取 executionTarget，绝不读取 providerDefaults.model。
  */
 export function resolveSpeechParameters({
-  input = {},
-  providerDefaults = {},
+  protocolId = "",
+  executionTarget = {},
+  explicitInput,
+  speechProviderDefaults,
+  // 兼容旧调用名；manager 已改用上面的明确字段。
+  input,
+  providerDefaults,
 }: {
+  protocolId?: string;
+  executionTarget?: Record<string, unknown>;
+  explicitInput?: Record<string, unknown>;
+  speechProviderDefaults?: Record<string, unknown>;
   input?: Record<string, unknown>;
   providerDefaults?: Record<string, unknown>;
-} = {}): { voice?: string; speed?: number; format?: string } {
-  const defaults = providerDefaults && typeof providerDefaults === "object" && !Array.isArray(providerDefaults)
-    ? providerDefaults
-    : {};
-  const defaultVoice = typeof defaults.voice === "string" && defaults.voice.trim() ? defaults.voice : undefined;
-  const defaultSpeed = typeof defaults.speed === "number" && Number.isFinite(defaults.speed) ? defaults.speed : undefined;
-  const defaultFormat = typeof defaults.format === "string" && defaults.format.trim() ? defaults.format : undefined;
+} = {}): EffectiveSpeechParameters {
+  const explicit = isObject(explicitInput) ? explicitInput : (isObject(input) ? input : {});
+  const defaults = isObject(speechProviderDefaults)
+    ? speechProviderDefaults
+    : (isObject(providerDefaults) ? providerDefaults : {});
+  const target = isObject(executionTarget) ? executionTarget : {};
+  const protocol = text(protocolId) || targetText(target, "protocolId");
+  const modelId = targetText(target, "modelId");
+  const selectedVoice = selectedValue(explicit, defaults, "voice");
+  const selectedSpeed = selectedValue(explicit, defaults, "speed");
+  const selectedFormat = selectedValue(explicit, defaults, "format");
+  const voiceSource = selectedMode(explicit, defaults, "voice");
+  const speedSource = selectedMode(explicit, defaults, "speed");
+  const formatSource = selectedMode(explicit, defaults, "format");
+  const base = {
+    effectiveSpeechParametersVersion: EFFECTIVE_SPEECH_PARAMETERS_VERSION,
+    protocolId: protocol,
+    modelId,
+  } as const;
 
-  const resolved: { voice?: string; speed?: number; format?: string } = {};
-  const voice = input.voice === undefined || input.voice === null ? defaultVoice : input.voice;
-  if (voice !== undefined) resolved.voice = voice as string;
-  const speed = input.speed === undefined || input.speed === null ? defaultSpeed : input.speed;
-  if (speed !== undefined) resolved.speed = speed as number;
-  const format = input.format === undefined || input.format === null ? defaultFormat : input.format;
-  if (format !== undefined) resolved.format = format as string;
-  return resolved;
+  if (protocol === "system-speech") {
+    const voice = normalizedText(selectedVoice, "");
+    const hasRate = typeof selectedSpeed === "number" && Number.isFinite(selectedSpeed);
+    const speed = hasRate ? normalizedSpeed(selectedSpeed, 1, 0.25, 4) : null;
+    return Object.freeze({
+      ...base,
+      ...(voice ? { voice, voiceMode: voiceSource || "explicit" } : { voiceMode: "system_default" }),
+      ...(speed !== null
+        ? { rateWpm: Math.round(175 * speed), rateMode: speedSource || "explicit" }
+        : { rateMode: "system_default" }),
+      format: "m4a",
+      formatMode: "protocol_output_default",
+    });
+  }
+
+  if (protocol === "dashscope-qwen-tts") {
+    return Object.freeze({
+      ...base,
+      voice: normalizedText(selectedVoice, "Cherry"),
+      voiceMode: normalizedText(selectedVoice, "") ? (voiceSource || "explicit") : "protocol_default",
+      // DashScope 的 format 是下载产物默认，不是请求体字段。
+      format: "wav",
+      formatMode: "protocol_output_default",
+    });
+  }
+
+  if (protocol === "minimax-tts" || protocol === "minimax-t2a-v2") {
+    const format = typeof selectedFormat === "string" && MINIMAX_SPEECH_FORMATS.has(selectedFormat)
+      ? selectedFormat
+      : "mp3";
+    const groupId = targetText(target, "groupId") || targetText((target as any).model || {}, "groupId");
+    return Object.freeze({
+      ...base,
+      voice: normalizedText(selectedVoice, "male-qn-qingse"),
+      voiceMode: normalizedText(selectedVoice, "") ? (voiceSource || "explicit") : "protocol_default",
+      speed: normalizedSpeed(selectedSpeed, 1, 0.5, 2),
+      format,
+      formatMode: format === selectedFormat ? (formatSource || "explicit") : "protocol_default",
+      ...(groupId ? { groupId } : {}),
+    });
+  }
+
+  const format = typeof selectedFormat === "string" && OPENAI_SPEECH_FORMATS.has(selectedFormat)
+    ? selectedFormat
+    : "mp3";
+  return Object.freeze({
+    ...base,
+    voice: normalizedText(selectedVoice, "alloy"),
+    voiceMode: normalizedText(selectedVoice, "") ? (voiceSource || "explicit") : "protocol_default",
+    speed: normalizedSpeed(selectedSpeed, 1, 0.25, 4),
+    format,
+    formatMode: format === selectedFormat ? (formatSource || "explicit") : "protocol_default",
+  });
+}
+
+/** adapter 直调也必须经同一解析器；manager 传入的已解析对象不会再归一化。 */
+export function ensureEffectiveSpeechParameters(
+  params: Record<string, any>,
+  protocolId: string,
+  executionTarget: Record<string, any> = {},
+): EffectiveSpeechParameters & Record<string, any> {
+  if (params?.effectiveSpeechParametersVersion === EFFECTIVE_SPEECH_PARAMETERS_VERSION) {
+    return params as EffectiveSpeechParameters & Record<string, any>;
+  }
+  const effective = resolveSpeechParameters({
+    protocolId,
+    executionTarget: {
+      protocolId,
+      modelId: targetText(executionTarget, "modelId") || text(params?.modelId) || text(params?.model),
+      groupId: targetText(executionTarget, "groupId") || text(params?.groupId),
+      model: executionTarget?.model,
+    },
+    explicitInput: params,
+    speechProviderDefaults: {},
+  });
+  return Object.freeze({ ...params, ...effective });
 }

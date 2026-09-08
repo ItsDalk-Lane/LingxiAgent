@@ -19,11 +19,12 @@
 
 import fs from "fs";
 import path from "path";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { createModuleLogger } from "../lib/debug-log.ts";
 import { atomicWriteSync } from "../shared/safe-fs.ts";
 import {
   planLegacyPinnedImport,
+  legacyContentKey,
   readTenetsFileStrict,
   serializeTenetsFile,
   tenetsFilePath,
@@ -39,11 +40,12 @@ const log = createModuleLogger("pins-migration");
 export const PINNED_MD = "pinned.md";
 export const PINNED_JSON = "pinned-memory.json";
 export const PINNED_TENETS_MIGRATION_RECEIPT = "pinned-tenets-migration.receipt.json";
-const MIGRATION_VERSION = 2;
+const MIGRATION_VERSION = 3;
 const BACKUP_DIR = "pinned-migration-backup";
 
 export interface MigrationReceipt {
   version: number;
+  operationId?: string;
   kind: "migration" | "recovery";
   agentId: string;
   state: "prepared" | "target_committed" | "sources_archived" | "completed" | "failed" | "conflict";
@@ -51,7 +53,7 @@ export interface MigrationReceipt {
   authority: { file: string; reason: string } | null;
   target: { existed: boolean; sha256: string | null };
   resultSha256: string | null;
-  plan: Array<Omit<LegacyPinImportEntry, "normalizedContent"> & { exemption?: string }>;
+  plan: Array<Omit<LegacyPinImportEntry, "normalizedContent"> & { exemption?: string; source?: string; sourceEntryKey?: string }>;
   counts: {
     sourceItems: number;
     added: number;
@@ -59,7 +61,7 @@ export interface MigrationReceipt {
     addedOverHistory: number;
     duplicateInBatch: number;
   };
-  archived: Array<{ from: string; to: string }>;
+  archived: Array<{ from: string; to: string; sourceHash?: string; state?: "planned" | "done" }>;
   backupDir: string | null;
   error: { code: string; message: string } | null;
   createdAt: string;
@@ -86,14 +88,64 @@ function receiptPath(agentDir: string): string {
   return path.join(agentDir, "memory", PINNED_TENETS_MIGRATION_RECEIPT);
 }
 
+const HASH = /^[0-9a-f]{64}$/;
+const safeName = (value: unknown): value is string => typeof value === "string" && !!value
+  && value !== "." && value !== ".." && !/[\\/\0]/.test(value);
+const sourceName = (value: unknown): value is string => safeName(value)
+  && /^(pinned-memory\.json|pinned\.md)(\.migrated(?:-[a-zA-Z0-9-]+)?)?$/.test(value);
+
+/** 缺失返回 null；读取失败和非法收据必须阻止自动写入。 */
 export function readPinnedTenetsMigrationReceipt(agentDir: string): MigrationReceipt | null {
-  try {
-    const raw = JSON.parse(fs.readFileSync(receiptPath(agentDir), "utf-8"));
-    if (!raw || typeof raw !== "object" || typeof raw.state !== "string") return null;
-    return raw as MigrationReceipt;
-  } catch {
-    return null;
+  let text: string;
+  try { text = fs.readFileSync(receiptPath(agentDir), "utf8"); }
+  catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw migrationError("MIGRATION_RECEIPT_UNREADABLE", "cannot read migration receipt");
   }
+  let raw: unknown;
+  try { raw = JSON.parse(text); } catch { throw migrationError("MIGRATION_RECEIPT_INVALID", "invalid migration receipt JSON"); }
+  if (!isMigrationReceipt(raw, path.basename(agentDir))) {
+    throw migrationError("MIGRATION_RECEIPT_INVALID", "invalid migration receipt identity, schema or plan");
+  }
+  return raw;
+}
+
+export function isMigrationReceipt(value: unknown, agentId: string): value is MigrationReceipt {
+  if (!value || typeof value !== "object") return false;
+  const r = value as MigrationReceipt;
+  if (![2, 3].includes(r.version) || r.agentId !== agentId || !["migration", "recovery"].includes(r.kind)
+    || !["prepared", "target_committed", "sources_archived", "completed", "failed", "conflict"].includes(r.state)
+    || !Array.isArray(r.sources) || !Array.isArray(r.plan) || !Array.isArray(r.archived)
+    || !r.target || typeof r.target.existed !== "boolean" || !r.counts
+    || typeof r.createdAt !== "string" || typeof r.updatedAt !== "string") return false;
+  const legacyRecovery = r.version === 2 && r.kind === "recovery";
+  if (r.target.sha256 !== null && !HASH.test(r.target.sha256)) return false;
+  if (r.target.existed && !r.target.sha256 && !legacyRecovery) return false;
+  if (!r.target.existed && r.target.sha256 !== null) return false;
+  if (r.resultSha256 !== null && !HASH.test(r.resultSha256)) return false;
+  if (!["failed", "conflict"].includes(r.state) && !r.resultSha256 && !legacyRecovery) return false;
+  if (r.version === 3 && !safeName(r.operationId)) return false;
+  if (r.sources.some(x => !x || !sourceName(x.file) || !HASH.test(x.sha256) || !Number.isFinite(x.mtimeMs))
+    || new Set(r.sources.map(x => x.file)).size !== r.sources.length) return false;
+  if (r.authority && (!sourceName(r.authority.file) || !r.sources.some(x => x.file === r.authority!.file))) return false;
+  if (!r.authority && !["failed", "conflict"].includes(r.state)) return false;
+  if (r.counts.sourceItems !== r.plan.length || !Object.values(r.counts).every(n => Number.isInteger(n) && n >= 0)) return false;
+  const expected = new Map<string, string>();
+  for (const [i, entry] of r.plan.entries()) {
+    if (!entry || entry.order !== i || typeof entry.tenetId !== "string" || !entry.tenetId
+      || !/^sha256:[0-9a-f]{64}$/.test(entry.contentHash)
+      || !["added", "added_over_pending_history", "added_over_rejected_history", "duplicate_active", "duplicate_in_batch"].includes(entry.outcome)
+      || typeof entry.createdAt !== "string" || !Number.isFinite(Date.parse(entry.createdAt))
+      || typeof entry.decidedAt !== "string" || !Number.isFinite(Date.parse(entry.decidedAt))
+      || !(entry.legacyId === null || typeof entry.legacyId === "string")) return false;
+    if (expected.has(entry.tenetId) && expected.get(entry.tenetId) !== entry.contentHash) return false;
+    expected.set(entry.tenetId, entry.contentHash);
+  }
+  if (r.backupDir !== null && (typeof r.backupDir !== "string" || !/^memory\/pinned-migration-backup(?:\/[a-zA-Z0-9-]+)?$/.test(r.backupDir))) return false;
+  if (new Set(r.archived.map(x => x.from)).size !== r.archived.length) return false;
+  return r.archived.every(x => x && r.sources.some(src => src.file === x.from) && sourceName(x.to)
+    && x.to.startsWith(x.from + ".migrated")
+    && (r.version === 2 || (x.sourceHash === r.sources.find(src => src.file === x.from)?.sha256 && ["planned", "done"].includes(x.state!))));
 }
 
 function writeReceipt(agentDir: string, receipt: MigrationReceipt): MigrationReceipt {
@@ -142,6 +194,19 @@ export function readLegacyPinnedSource(filePath: string): LegacyPinImportItem[] 
   const base = path.basename(filePath);
   const rawText = fs.readFileSync(filePath, "utf-8");
   if (base.startsWith(PINNED_JSON)) {
+    return parsePinnedJsonItems(rawText, base);
+  }
+  if (base.startsWith(PINNED_MD)) {
+    return parsePinnedMarkdownItems(rawText).map((content) => ({
+      legacyId: null,
+      content,
+      createdAt: null,
+    }));
+  }
+  throw migrationError("MIGRATION_SOURCE_UNREADABLE", `${base} is not a recognized pinned source`);
+}
+
+function parsePinnedJsonItems(rawText: string, base: string): LegacyPinImportItem[] {
     let raw: any;
     try {
       raw = JSON.parse(rawText);
@@ -158,15 +223,6 @@ export function readLegacyPinnedSource(filePath: string): LegacyPinImportItem[] 
         createdAt: typeof item?.createdAt === "string" ? item.createdAt : null,
       }))
       .filter((item: LegacyPinImportItem) => item.content);
-  }
-  if (base.startsWith(PINNED_MD)) {
-    return parsePinnedMarkdownItems(rawText).map((content) => ({
-      legacyId: null,
-      content,
-      createdAt: null,
-    }));
-  }
-  throw migrationError("MIGRATION_SOURCE_UNREADABLE", `${base} is not a recognized pinned source`);
 }
 
 // ── 权威来源选择（沿用旧版运行时 mtime 规则） ───────────────────────────────
@@ -211,13 +267,19 @@ function planCounts(entries: readonly LegacyPinImportEntry[]): MigrationReceipt[
 function archiveTargetName(agentDir: string, base: string, sourceSha256: string): string {
   const plain = path.join(agentDir, `${base}.migrated`);
   if (!fs.existsSync(plain)) return `${base}.migrated`;
-  return `${base}.migrated-${sourceSha256.slice(0, 8)}`;
+  return `${base}.migrated-${sourceSha256}`;
 }
 
 // ── 主流程 ──────────────────────────────────────────────────────────────────
 
 function failWithReceipt(agentDir: string, receipt: MigrationReceipt, code: string, message: string): void {
-  receipt.state = "failed";
+  if (fs.existsSync(receiptPath(agentDir))) {
+    const directory = path.join(agentDir, "memory", BACKUP_DIR);
+    fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
+    writePinnedBackup(receiptPath(agentDir), path.join(directory, `${sha256File(receiptPath(agentDir))}-receipt.json`));
+  }
+  receipt.state = code === "MIGRATION_VERIFY_FAILED" ? "conflict" : "failed";
+  if (receipt.sources.length === 0) receipt.authority = null;
   receipt.error = { code, message };
   try {
     writeReceipt(agentDir, receipt);
@@ -229,6 +291,7 @@ function failWithReceipt(agentDir: string, receipt: MigrationReceipt, code: stri
 function newReceipt(agentId: string): MigrationReceipt {
   return {
     version: MIGRATION_VERSION,
+    operationId: randomUUID(),
     kind: "migration",
     agentId,
     state: "prepared",
@@ -273,53 +336,110 @@ function readSourcesAndTarget(agentDir: string, authority: AuthorityChoice) {
   return { sources, items, targetPath, targetExisted, targetSha256, targetData };
 }
 
-function writeBackups(agentDir: string, sources: MigrationReceipt["sources"]): string {
-  const backupDir = path.join(agentDir, "memory", BACKUP_DIR);
-  fs.mkdirSync(backupDir, { recursive: true });
-  for (const source of sources) {
-    const name = `${source.sha256.slice(0, 8)}-${source.file}`;
-    const dest = path.join(backupDir, name);
-    if (!fs.existsSync(dest)) {
-      fs.copyFileSync(path.join(agentDir, source.file), dest);
-    }
+/** 仅 pins 事务使用：独占创建并回读；同名备份必须逐字节摘要相同。 */
+export function writePinnedBackup(sourcePath: string, destination: string): void {
+  const expected = sha256File(sourcePath);
+  try { fs.copyFileSync(sourcePath, destination, fs.constants.COPYFILE_EXCL); }
+  catch (error) { if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error; }
+  if (sha256File(destination) !== expected) throw migrationError("MIGRATION_BACKUP_FAILED", "backup digest mismatch");
+}
+
+function writeBackups(agentDir: string, receipt: MigrationReceipt, hooks?: MigrationFaultHooks): string {
+  const relative = path.join("memory", BACKUP_DIR, receipt.operationId!);
+  const directory = path.join(agentDir, relative);
+  fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
+  const files = receipt.sources.map(source => ({ source: path.join(agentDir, source.file), name: source.file }));
+  if (receipt.target.existed) files.push({ source: tenetsFilePath(agentDir), name: "tenets.json" });
+  if (fs.existsSync(receiptPath(agentDir))) files.push({ source: receiptPath(agentDir), name: "receipt.json" });
+  for (const file of files) {
+    hooks?.at?.(`backup:before:${file.name}`);
+    writePinnedBackup(file.source, path.join(directory, `${sha256File(file.source)}-${file.name}`));
+    hooks?.at?.(`backup:after:${file.name}`);
   }
-  return path.join("memory", BACKUP_DIR);
+  return relative;
+}
+
+/** 所有映射均证明 active、正文摘要、唯一 ID；新增项另证来源和原创建时间。 */
+export function verifyPinnedTarget(targetPath: string, resultSha256: string, plan: MigrationReceipt["plan"]): { ok: boolean; reason: string; mismatches: string[] } {
+  try {
+    const data = readTenetsFileStrict(targetPath);
+    const expected = new Map<string, string>();
+    const mismatches: string[] = [];
+    for (const entry of plan) {
+      if (expected.has(entry.tenetId) && expected.get(entry.tenetId) !== entry.contentHash) mismatches.push(entry.tenetId);
+      expected.set(entry.tenetId, entry.contentHash);
+      const matches = data.tenets.filter(t => t.id === entry.tenetId);
+      const target = matches[0];
+      if (matches.length !== 1 || target.status !== "active"
+        || `sha256:${sha256Text(legacyContentKey(target.content))}` !== entry.contentHash
+        || (entry.outcome.startsWith("added") && (target.source !== "user_direct" || target.createdAt !== entry.createdAt))) mismatches.push(entry.tenetId);
+    }
+    // 空计划的证据只能是经过源计划验证的精确结果字节。
+    if (plan.length === 0 && sha256File(targetPath) !== resultSha256) return { ok: false, reason: "empty_plan_target_changed", mismatches: [] };
+    return { ok: mismatches.length === 0, reason: mismatches.length ? "planned_entries_changed" : "verified", mismatches };
+  } catch { return { ok: false, reason: "invalid_target", mismatches: [] }; }
+}
+
+/** pins 迁移/批准恢复共享的局部写入顺序；不向其他存储推广。 */
+export function executePinnedTargetTransaction(options: {
+  targetPath: string;
+  finalBytes: string;
+  resultSha256: string;
+  plan: MigrationReceipt["plan"];
+  prepare: () => void;
+  recheck: () => void;
+  committed: () => void;
+  hooks?: MigrationFaultHooks;
+}): void {
+  readTenetsFileStrict(options.targetPath);
+  options.prepare();
+  options.hooks?.at?.("receipt:prepared");
+  options.hooks?.at?.("recheck:before");
+  options.recheck();
+  options.hooks?.at?.("commit:before");
+  fs.mkdirSync(path.dirname(options.targetPath), { recursive: true });
+  atomicWriteSync(options.targetPath, options.finalBytes);
+  options.hooks?.at?.("commit:after");
+  if (!verifyPinnedTarget(options.targetPath, options.resultSha256, options.plan).ok) {
+    throw migrationError("MIGRATION_CONFLICT", "target verification failed after commit");
+  }
+  options.committed();
 }
 
 function verifyTargetCommitted(targetPath: string, resultSha256: string, plan: MigrationReceipt["plan"]): boolean {
-  let raw: string;
-  try {
-    raw = fs.readFileSync(targetPath, "utf-8");
-  } catch {
-    return false;
-  }
-  if (sha256Text(raw) === resultSha256) return true;
-  // 目标在提交后又有新写入：计划内条目仍在即视为已提交（绝不重写覆盖新数据）
-  let data: TenetsFile;
-  try {
-    data = readTenetsFileStrict(targetPath);
-  } catch {
-    return false;
-  }
-  const plannedAdds = plan.filter((p) => p.outcome === "added" || p.outcome === "added_over_pending_history" || p.outcome === "added_over_rejected_history");
-  return plannedAdds.every((p) => data.tenets.some((t) => t.id === p.tenetId));
+  return verifyPinnedTarget(targetPath, resultSha256, plan).ok;
 }
 
 function archiveSources(agentDir: string, receipt: MigrationReceipt, hooks?: MigrationFaultHooks): void {
   for (const source of receipt.sources) {
-    if (receipt.archived.some((a) => a.from === source.file)) continue;
-    const filePath = path.join(agentDir, source.file);
-    if (!fs.existsSync(filePath)) {
-      throw migrationError(
-        "MIGRATION_CONFLICT",
-        `migration conflict: source ${source.file} disappeared before archiving (agent ${receipt.agentId})`,
-      );
+    const entry = receipt.archived.find(a => a.from === source.file);
+    if (!entry) throw migrationError("MIGRATION_CONFLICT", "archive destination not planned");
+    const original = path.join(agentDir, source.file);
+    const destination = path.join(agentDir, entry.to);
+    const sourceExists = fs.existsSync(original);
+    const destinationExists = fs.existsSync(destination);
+    if ((sourceExists && sha256File(original) !== source.sha256)
+      || (destinationExists && sha256File(destination) !== source.sha256)
+      || (!sourceExists && !destinationExists)) {
+      receipt.state = "conflict";
+      receipt.error = { code: "MIGRATION_CONFLICT", message: `archive identity conflict: ${source.file}` };
+      writeReceipt(agentDir, receipt);
+      throw migrationError("MIGRATION_CONFLICT", receipt.error.message);
     }
+    if (entry.state === "done" && !sourceExists) continue;
     hooks?.at?.(`archive:before:${source.file}`);
-    const to = archiveTargetName(agentDir, source.file, source.sha256);
-    fs.renameSync(filePath, path.join(agentDir, to));
-    receipt.archived.push({ from: source.file, to });
-    receipt.state = receipt.state === "prepared" ? "target_committed" : receipt.state;
+    if (!destinationExists) {
+      // COPYFILE_EXCL 提供不覆盖保证；中断时源仍保留，重启按摘要恢复。
+      fs.copyFileSync(original, destination, fs.constants.COPYFILE_EXCL);
+      hooks?.at?.(`archive:copied:${source.file}`);
+    }
+    if (sha256File(destination) !== source.sha256) throw migrationError("MIGRATION_CONFLICT", "archive verification failed");
+    if (sourceExists) {
+      if (sha256File(original) !== source.sha256) throw migrationError("MIGRATION_CONFLICT", "archive source changed");
+      fs.unlinkSync(original);
+    }
+    hooks?.at?.(`archive:after:${source.file}`);
+    entry.state = "done";
     writeReceipt(agentDir, receipt);
   }
 }
@@ -343,11 +463,59 @@ function finalizeReceipt(agentDir: string, receipt: MigrationReceipt, hooks?: Mi
 export function migrateAgentPinnedTenets(agentDir: string, agentId: string, hooks?: MigrationFaultHooks): void {
   const existing = readPinnedTenetsMigrationReceipt(agentDir);
   if (existing && (existing.state === "completed" || existing.state === "conflict")) return;
+  if (existing?.kind === "recovery") return; // 旧全局恢复收据不授权启动迁移。
+  if (existing?.version === 2 && existing.state !== "failed") {
+    if (!upgradeLegacyReceipt(agentDir, existing)) return;
+  }
   if (existing && existing.state !== "failed") {
     resumeMigration(agentDir, existing, hooks);
     return;
   }
   runFreshMigration(agentDir, agentId, hooks, existing ?? undefined);
+}
+
+function upgradeLegacyReceipt(agentDir: string, receipt: MigrationReceipt): boolean {
+  const conflict = () => {
+    const directory = path.join(agentDir, "memory", BACKUP_DIR);
+    fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
+    writePinnedBackup(receiptPath(agentDir), path.join(directory, `${sha256File(receiptPath(agentDir))}-receipt.json`));
+    receipt.state = "conflict";
+    receipt.error = { code: "MIGRATION_CONFLICT", message: "legacy receipt lacks unique source/plan evidence" };
+    writeReceipt(agentDir, receipt);
+    return false;
+  };
+  const paths = new Map<string, string>();
+  const archived: MigrationReceipt["archived"] = [];
+  for (const source of receipt.sources) {
+    const original = path.join(agentDir, source.file);
+    if (fs.existsSync(original)) {
+      if (sha256File(original) !== source.sha256) return conflict();
+      paths.set(source.file, original);
+      archived.push({ from: source.file, to: archiveTargetName(agentDir, source.file, source.sha256), sourceHash: source.sha256, state: "planned" });
+    } else {
+      const candidates = fs.readdirSync(agentDir).filter(name => sourceName(name) && name.startsWith(source.file + ".migrated")
+        && fs.statSync(path.join(agentDir, name)).isFile() && sha256File(path.join(agentDir, name)) === source.sha256);
+      if (candidates.length !== 1) return conflict();
+      paths.set(source.file, path.join(agentDir, candidates[0]));
+      archived.push({ from: source.file, to: candidates[0], sourceHash: source.sha256, state: "done" });
+    }
+  }
+  const authorityPath = receipt.authority && paths.get(receipt.authority.file);
+  if (!authorityPath) return conflict();
+  const items = readLegacyPinnedSource(authorityPath);
+  if (items.length !== receipt.plan.length || items.some((item, i) => `sha256:${sha256Text(legacyContentKey(item.content))}` !== receipt.plan[i].contentHash)) return conflict();
+  receipt.operationId = randomUUID();
+  // 升级前保留旧收据、当前目标和所有来源的原始字节，不追认旧 completed。
+  const relative = path.join("memory", BACKUP_DIR, receipt.operationId);
+  const directory = path.join(agentDir, relative);
+  fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
+  for (const [name, file] of [...paths.entries(), ["receipt.json", receiptPath(agentDir)] as const,
+    ...(fs.existsSync(tenetsFilePath(agentDir)) ? [["tenets.json", tenetsFilePath(agentDir)] as const] : [])]) {
+    writePinnedBackup(file, path.join(directory, `${sha256File(file)}-${name}`));
+  }
+  receipt.version = 3; receipt.archived = archived; receipt.backupDir = relative;
+  writeReceipt(agentDir, receipt);
+  return true;
 }
 
 function runFreshMigration(agentDir: string, agentId: string, hooks: MigrationFaultHooks | undefined, prior?: MigrationReceipt): void {
@@ -378,33 +546,18 @@ function runFreshMigration(agentDir: string, agentId: string, hooks: MigrationFa
   receipt.plan = receiptPlanEntries(entries);
   receipt.counts = planCounts(entries);
 
-  try {
-    receipt.backupDir = writeBackups(agentDir, receipt.sources);
-  } catch (err: any) {
-    failWithReceipt(agentDir, receipt, "MIGRATION_BACKUP_FAILED", err?.message || String(err));
-    return;
-  }
-
-  receipt.state = "prepared";
-  writeReceipt(agentDir, receipt);
-  hooks?.at?.("receipt:prepared");
-
-  // 提交前复查：源与目标必须保持 prepare 时的字节
-  hooks?.at?.("recheck:before");
-  assertUnchanged(agentDir, receipt, prepared.targetPath);
-
-  // 原子提交目标
-  hooks?.at?.("commit:before");
-  fs.mkdirSync(path.dirname(prepared.targetPath), { recursive: true });
-  atomicWriteSync(prepared.targetPath, finalBytes);
-  hooks?.at?.("commit:after");
-
-  if (!verifyTargetCommitted(prepared.targetPath, receipt.resultSha256!, receipt.plan)) {
-    failWithReceipt(agentDir, receipt, "MIGRATION_VERIFY_FAILED", "target verification failed after commit");
-    return;
-  }
-  receipt.state = "target_committed";
-  writeReceipt(agentDir, receipt);
+  executePinnedTargetTransaction({
+    targetPath: prepared.targetPath, finalBytes, resultSha256: receipt.resultSha256!, plan: receipt.plan, hooks,
+    prepare: () => {
+      try { receipt.backupDir = writeBackups(agentDir, receipt, hooks); }
+      catch { throw migrationError("MIGRATION_BACKUP_FAILED", "backup failed; original receipt and target preserved"); }
+      receipt.archived = receipt.sources.map(source => ({ from: source.file, to: archiveTargetName(agentDir, source.file, source.sha256), sourceHash: source.sha256, state: "planned" }));
+      receipt.state = "prepared";
+      writeReceipt(agentDir, receipt);
+    },
+    recheck: () => assertUnchanged(agentDir, receipt, prepared.targetPath),
+    committed: () => { receipt.state = "target_committed"; writeReceipt(agentDir, receipt); },
+  });
 
   archiveSources(agentDir, receipt, hooks);
   finalizeReceipt(agentDir, receipt, hooks);
@@ -431,17 +584,38 @@ function assertUnchanged(agentDir: string, receipt: MigrationReceipt, targetPath
   }
 }
 
+/** 收据不能自报计划完整；用完整摘要定位的权威来源证明每一项。 */
+function assertReceiptSourcePlan(agentDir: string, receipt: MigrationReceipt): void {
+  const source = receipt.sources.find(item => item.file === receipt.authority?.file);
+  if (!source) throw migrationError("MIGRATION_CONFLICT", "receipt source plan lacks authority");
+  const candidates = [path.join(agentDir, source.file),
+    ...receipt.archived.filter(item => item.from === source.file).map(item => path.join(agentDir, item.to)),
+    ...(receipt.backupDir ? [path.join(agentDir, receipt.backupDir, `${source.sha256}-${source.file}`)] : [])];
+  const file = candidates.find(candidate => fs.existsSync(candidate) && fs.statSync(candidate).isFile() && sha256File(candidate) === source.sha256);
+  if (!file) throw migrationError("MIGRATION_CONFLICT", "receipt source plan cannot be verified");
+  // 备份名包含摘要，解析仍沿原源的固定格式，不按备份文件名猜协议。
+  const raw = fs.readFileSync(file, "utf8");
+  const items = source.file.startsWith(PINNED_JSON)
+    ? parsePinnedJsonItems(raw, source.file)
+    : parsePinnedMarkdownItems(raw).map(content => ({ content, legacyId: null }));
+  if (items.length !== receipt.plan.length || items.some((item, index) => {
+    const entry = receipt.plan[index];
+    const sourceTime = "createdAt" in item && typeof item.createdAt === "string" && Number.isFinite(Date.parse(item.createdAt))
+      ? new Date(item.createdAt).toISOString() : null;
+    return entry.contentHash !== `sha256:${sha256Text(legacyContentKey(item.content))}` || entry.legacyId !== item.legacyId
+      || (entry.outcome.startsWith("added") && sourceTime !== null && entry.createdAt !== sourceTime);
+  })) throw migrationError("MIGRATION_CONFLICT", "receipt source plan is incomplete or inconsistent");
+}
+
 function resumeMigration(agentDir: string, receipt: MigrationReceipt, hooks?: MigrationFaultHooks): void {
-  if (receipt.state === "sources_archived") {
-    finalizeReceipt(agentDir, receipt, hooks);
-    return;
-  }
+  assertReceiptSourcePlan(agentDir, receipt);
+
 
   const targetPath = tenetsFilePath(agentDir);
   const targetExists = fs.existsSync(targetPath);
   const targetSha256 = targetExists ? sha256File(targetPath) : null;
 
-  if (receipt.state === "target_committed") {
+  if (receipt.state === "target_committed" || receipt.state === "sources_archived") {
     // 目标已提交：只校验计划条目仍在（允许后续用户写入），然后只补归档。
     if (!targetExists || !verifyTargetCommitted(targetPath, receipt.resultSha256!, receipt.plan)) {
       receipt.state = "conflict";
@@ -466,7 +640,7 @@ function resumeMigration(agentDir: string, receipt: MigrationReceipt, hooks?: Mi
     }
   }
 
-  if (targetExists && targetSha256 === receipt.resultSha256) {
+  if (targetExists && targetSha256 === receipt.resultSha256 && verifyTargetCommitted(targetPath, receipt.resultSha256!, receipt.plan)) {
     // 崩溃在 commit 之后、收据更新之前：目标已是计划终态，只补收据与归档。
     receipt.state = "target_committed";
     writeReceipt(agentDir, receipt);
@@ -512,19 +686,17 @@ function resumeMigration(agentDir: string, receipt: MigrationReceipt, hooks?: Mi
     return;
   }
 
-  hooks?.at?.("commit:before");
-  fs.mkdirSync(path.dirname(targetPath), { recursive: true });
-  atomicWriteSync(targetPath, finalBytes);
-  hooks?.at?.("commit:after");
-
-  if (!verifyTargetCommitted(targetPath, receipt.resultSha256!, receipt.plan)) {
-    failWithReceipt(agentDir, receipt, "MIGRATION_VERIFY_FAILED", "target verification failed after commit");
-    return;
-  }
-  receipt.state = "target_committed";
-  receipt.plan = receiptPlanEntries(entries);
-  receipt.counts = planCounts(entries);
-  writeReceipt(agentDir, receipt);
+  executePinnedTargetTransaction({
+    targetPath, finalBytes, resultSha256: receipt.resultSha256!, plan: receipt.plan, hooks,
+    prepare: () => { /* prepared 与备份已在上次调用持久化。 */ },
+    recheck: () => assertUnchanged(agentDir, receipt, targetPath),
+    committed: () => {
+      receipt.state = "target_committed";
+      receipt.plan = receiptPlanEntries(entries);
+      receipt.counts = planCounts(entries);
+      writeReceipt(agentDir, receipt);
+    },
+  });
 
   archiveSources(agentDir, receipt, hooks);
   finalizeReceipt(agentDir, receipt, hooks);

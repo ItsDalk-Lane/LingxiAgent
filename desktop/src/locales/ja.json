@@ -657,7 +657,12 @@
     "queuedSendFailed": "キュー内のメッセージの送信に失敗しました",
     "queuedRetry": "再試行",
     "queuedInsertWaiting": "現在の返答の開始を待っています。しばらくしてからもう一度お試しください",
-    "queuedDelete": "このキュー中のメッセージを取り消す"
+    "queuedEditUnavailable": "このメッセージは送信処理に入ったか、編集できなくなりました。送信状況を確認してください。",
+    "queuedDelete": "このキュー中のメッセージを取り消す",
+    "deliveryChecking": "結果不明、確認中",
+    "deliveryUnknown": "結果不明、確認未完了",
+    "deliveryRunUnknown": "メッセージ受信済み、実行結果は未確認",
+    "recheckDelivery": "再確認"
   },
   "agentReview": {
     "running": "この Session をレビュー中",

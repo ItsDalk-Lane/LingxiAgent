@@ -6,7 +6,6 @@ import {
   updateIncrementalMarkdownCache,
 } from '../../utils/incremental-markdown';
 import { escapeHtml } from '../../utils/format';
-import { stripTagEscapes } from '../../../../../shared/reserved-tag-stream.ts';
 import { MarkdownContent } from './MarkdownContent';
 import styles from './Chat.module.css';
 
@@ -39,15 +38,13 @@ export const StreamingMarkdownContent = memo(function StreamingMarkdownContent({
 }: Props) {
   const shouldAnimateStream = !!source && active;
   const cacheRef = useRef(createIncrementalMarkdownCache());
-  // F8/P6.3：转义反斜杠只在显示层一次性消费（live 与历史同走本组件，等价且幂等）
-  const displaySource = typeof source === 'string' ? stripTagEscapes(source) : source;
-  const usePlainText = typeof displaySource === 'string'
+  const usePlainText = typeof source === 'string'
     && active
-    && displaySource.length > richTextCharLimit;
+    && source.length > richTextCharLimit;
   const renderedHtml = usePlainText
-    ? `<p data-stream-plain-text="true">${escapeHtml(displaySource).replace(/\r?\n/g, '<br>')}</p>`
-    : typeof displaySource === 'string'
-    ? (cacheRef.current = updateIncrementalMarkdownCache(cacheRef.current, displaySource, {
+    ? `<p data-stream-plain-text="true">${escapeHtml(source).replace(/\r?\n/g, '<br>')}</p>`
+    : typeof source === 'string'
+    ? (cacheRef.current = updateIncrementalMarkdownCache(cacheRef.current, source, {
         active,
         renderFragment: active ? renderStreamingMarkdown : renderMarkdown,
       })).html

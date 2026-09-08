@@ -17,9 +17,15 @@ import {
   openaiSpeechAdapter,
   minimaxSpeechAdapter,
   dashscopeSpeechAdapter,
+  buildSystemSpeechSayArgs,
 } from "../core/media-adapters/speech.ts";
+import { resolveSpeechParameters } from "../core/media/media-parameters.ts";
+import { setModelCallObserver } from "../lib/llm/model-call-observer.ts";
+import { setModelCallPayloadSink } from "../lib/llm/model-call-payload-capture.ts";
+import { installTestPayloadSink } from "../lib/llm/model-call-payload-testing.ts";
 
 const roots: string[] = [];
+let payloadSink: ReturnType<typeof installTestPayloadSink>;
 
 function makeRoot() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "hana-speech-params-"));
@@ -106,10 +112,14 @@ function speechProvider(providerId: string, models: any[]) {
 }
 
 beforeEach(() => {
+  payloadSink = installTestPayloadSink();
+  setModelCallObserver({ handleModelCallEvent() {} });
   vi.stubGlobal("fetch", vi.fn(async () => new Response(new ArrayBuffer(8), { status: 200 })));
 });
 
 afterEach(() => {
+  setModelCallObserver(null);
+  setModelCallPayloadSink(null);
   vi.unstubAllGlobals();
   for (const root of roots.splice(0)) {
     fs.rmSync(root, { recursive: true, force: true });
@@ -142,10 +152,11 @@ describe("F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 
 
     expect(submit).toHaveBeenCalledTimes(1);
     const [params] = submit.mock.calls[0] as unknown as [Record<string, any>, unknown];
+    expect(Object.isFrozen(params)).toBe(true);
     // 语音域默认生效；图片域的 voice/format 不得混入
     expect(params.voice).toBe("echo");
     expect(params.speed).toBe(1.5);
-    expect(params.format).toBeUndefined();
+    expect(params.format).toBe("mp3");
     manager.stop();
   });
 
@@ -169,9 +180,9 @@ describe("F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 
     });
 
     const [params] = submit.mock.calls[0] as unknown as [Record<string, any>, unknown];
-    expect(params.voice).toBeUndefined();
-    expect(params.speed).toBeUndefined();
-    expect(params.format).toBeUndefined();
+    expect(params.voice).toBe("alloy");
+    expect(params.speed).toBe(1);
+    expect(params.format).toBe("mp3");
     manager.stop();
   });
 
@@ -198,10 +209,166 @@ describe("F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 
     expect(params.speed).toBe(0.5);
     // TaskStore.params 反映实际使用参数；模型身份不被默认参数改写
     const task = manager.getTask(result.tasks[0].taskId);
+    expect(task.params).toBe(params);
     expect(task.params.voice).toBe("fable");
     expect(task.params.speed).toBe(0.5);
     expect(task.params.modelId).toBe("tts-1");
     expect(task.modelId).toBe("tts-1");
+    const semantic = payloadSink.records.find((record) => record.kind === "semantic_request")!;
+    expect((semantic.payload as any).parameters).toMatchObject({
+      modelId: "tts-1",
+      voice: "fable",
+      speed: 0.5,
+      format: "mp3",
+    });
+    manager.stop();
+  });
+
+  it("R08-01/09/10: manager→真实 OpenAI adapter 只解析一次，wire/任务/观测同值且只发一次请求", async () => {
+    const root = makeRoot();
+    const preferences = makePreferences(root, {
+      speechGeneration: { providerDefaults: { openai: { model: "wrong-model", speed: 1.5 } } },
+    });
+    const manager = makeManager(root, preferences, [speechProvider("openai", [
+      { id: "tts-real", protocolId: "openai-audio-speech" },
+    ])]);
+    const bus = makeBus();
+    manager.start(bus);
+    manager.registerAdapter(openaiSpeechAdapter);
+
+    const result = await manager.submitSpeech({
+      input: {
+        prompt: "一次解析",
+        provider: "openai",
+        model: "tts-real",
+        voice: "echo",
+        speed: 99,
+        format: "bogus",
+        delivery: { mode: "response" },
+      },
+    });
+
+    expect(fetch).toHaveBeenCalledTimes(1);
+    const wire = JSON.parse((fetch as any).mock.calls[0][1].body);
+    expect(wire).toMatchObject({ model: "tts-real", voice: "echo", speed: 4, response_format: "mp3" });
+    const task = manager.getTask(result.tasks[0].taskId);
+    expect(task.params).toMatchObject({ modelId: "tts-real", voice: "echo", speed: 4, format: "mp3" });
+    expect(Object.isFrozen(task.params)).toBe(true);
+    const semantic = payloadSink.records.find((record) => record.kind === "semantic_request")!;
+    expect((semantic.payload as any).parameters).toMatchObject({
+      modelId: "tts-real",
+      voice: "echo",
+      speed: 4,
+      format: "mp3",
+    });
+    manager.stop();
+
+    await openaiSpeechAdapter.submit(
+      { prompt: "一次解析", modelId: "tts-real", voice: "echo", speed: 99, format: "bogus" },
+      {
+        dataDir: makeRoot(),
+        bus,
+        mediaExecutionTarget: {
+          protocolId: "openai-audio-speech",
+          modelId: "tts-real",
+          credentialProviderId: "openai",
+        },
+      },
+    );
+    expect(fetch).toHaveBeenCalledTimes(2);
+    const directWire = JSON.parse((fetch as any).mock.calls[1][1].body);
+    expect(directWire).toEqual(wire);
+  });
+
+  it("R08-03/08: manager→真实 MiniMax adapter 的限幅、格式、groupId 与凭证 lane 同源", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({
+      base_resp: { status_code: 0 },
+      data: { audio: "0011" },
+    }), { status: 200 })));
+    const root = makeRoot();
+    const preferences = makePreferences(root, {
+      speechGeneration: { providerDefaults: { "minimax-token-plan": { model: "wrong", format: "wav" } } },
+    });
+    const manager = makeManager(root, preferences, [speechProvider("minimax-token-plan", [{
+      id: "speech-target",
+      protocolId: "minimax-tts",
+      groupId: "group-target",
+      credentialLaneId: "main",
+    }])]);
+    const bus = makeBus();
+    manager.start(bus);
+    manager.registerAdapter(minimaxSpeechAdapter);
+
+    const result = await manager.submitSpeech({
+      input: {
+        prompt: "限幅",
+        provider: "minimax-token-plan",
+        model: "speech-target",
+        speed: -9,
+        delivery: { mode: "response" },
+      },
+    });
+    expect(fetch).toHaveBeenCalledTimes(1);
+    const wire = JSON.parse((fetch as any).mock.calls[0][1].body);
+    expect(wire).toMatchObject({
+      model: "speech-target",
+      voice_setting: { voice_id: "male-qn-qingse", speed: 0.5 },
+      audio_setting: { format: "wav" },
+    });
+    const task = manager.getTask(result.tasks[0].taskId);
+    expect(task.params).toMatchObject({
+      modelId: "speech-target",
+      groupId: "group-target",
+      credentialProviderId: "minimax",
+      credentialLaneId: "main",
+      speed: 0.5,
+      format: "wav",
+    });
+    const semantic = payloadSink.records.find((record) => record.kind === "semantic_request")!;
+    expect((semantic.payload as any).parameters).toMatchObject({
+      modelId: "speech-target",
+      groupId: "group-target",
+      speed: 0.5,
+      format: "wav",
+    });
+    manager.stop();
+  });
+
+  it("R08-04: manager→真实 DashScope adapter 不把未发送的 speed/format 记录成 wire 参数", async () => {
+    const audioUrl = "https://cdn.example.com/tts.wav";
+    vi.stubGlobal("fetch", vi.fn(async (url: any) => String(url).includes("multimodal-generation")
+      ? new Response(JSON.stringify({ output: { audio: { url: audioUrl } } }), { status: 200 })
+      : new Response(new ArrayBuffer(4), { status: 200 })));
+    const root = makeRoot();
+    const preferences = makePreferences(root);
+    const manager = makeManager(root, preferences, [speechProvider("dashscope", [{
+      id: "qwen-tts-real",
+      protocolId: "dashscope-qwen-tts",
+    }])]);
+    const bus = makeBus();
+    manager.start(bus);
+    manager.registerAdapter(dashscopeSpeechAdapter);
+
+    const result = await manager.submitSpeech({
+      input: {
+        prompt: "协议字段",
+        provider: "dashscope",
+        model: "qwen-tts-real",
+        voice: "Serena",
+        speed: 2,
+        format: "mp3",
+        delivery: { mode: "response" },
+      },
+    });
+    expect(fetch).toHaveBeenCalledTimes(2);
+    const wire = JSON.parse((fetch as any).mock.calls[0][1].body);
+    expect(wire).toEqual({ model: "qwen-tts-real", input: { text: "协议字段", voice: "Serena" } });
+    const task = manager.getTask(result.tasks[0].taskId);
+    expect(task.params).not.toHaveProperty("speed");
+    expect(task.params).toMatchObject({ format: "wav", formatMode: "protocol_output_default" });
+    const semantic = payloadSink.records.find((record) => record.kind === "semantic_request")!;
+    expect((semantic.payload as any).parameters).not.toHaveProperty("speed");
+    expect((semantic.payload as any).parameters).toMatchObject({ format: "wav", formatMode: "protocol_output_default" });
     manager.stop();
   });
 
@@ -280,10 +447,118 @@ describe("F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 
 
     const [params] = submit.mock.calls[0] as unknown as [Record<string, any>, unknown];
     // openai 的云端默认不得渗透到系统协议
+    expect(params.voiceMode).toBe("system_default");
     expect(params.voice).toBeUndefined();
-    expect(params.speed).toBeUndefined();
+    expect(params.rateMode).toBe("system_default");
+    expect(params.rateWpm).toBeUndefined();
+    expect(params.format).toBe("m4a");
     expect(params.modelId).toBe("system-speech-tts");
     manager.stop();
+  });
+});
+
+describe("R08 唯一协议解析器反例", () => {
+  const target = (protocolId: string, modelId: string, extra: Record<string, unknown> = {}) => ({
+    protocolId,
+    modelId,
+    ...extra,
+  });
+
+  it("R08-01/02: OpenAI 非法格式回落、有限速度限幅，缺失/null/空串/错误类型不会被 Number 隐式转换", () => {
+    const fast = resolveSpeechParameters({
+      protocolId: "openai-audio-speech",
+      executionTarget: target("openai-audio-speech", "tts-real"),
+      explicitInput: { voice: "echo", speed: 99, format: "bogus" },
+      speechProviderDefaults: { model: "must-not-win", speed: 1.5 },
+    } as any);
+    expect(fast).toEqual(expect.objectContaining({
+      protocolId: "openai-audio-speech",
+      modelId: "tts-real",
+      voice: "echo",
+      speed: 4,
+      format: "mp3",
+    }));
+    expect(fast).not.toHaveProperty("model", "must-not-win");
+
+    for (const speed of [undefined, null, "", "2", {}, Number.NaN, Number.POSITIVE_INFINITY]) {
+      const resolved = resolveSpeechParameters({
+        protocolId: "openai-audio-speech",
+        executionTarget: target("openai-audio-speech", "tts-real"),
+        explicitInput: { speed },
+        speechProviderDefaults: {},
+      } as any);
+      expect(resolved.speed).toBe(1);
+    }
+    expect(resolveSpeechParameters({
+      protocolId: "openai-audio-speech",
+      executionTarget: target("openai-audio-speech", "tts-real"),
+      explicitInput: { speed: 0 },
+    } as any).speed).toBe(0.25);
+  });
+
+  it("R08-03/07/08: MiniMax 只取 speech 默认，保留执行目标模型与模型条目的 groupId", () => {
+    const resolved = resolveSpeechParameters({
+      protocolId: "minimax-t2a-v2",
+      executionTarget: target("minimax-t2a-v2", "speech-target", { groupId: "group-target" }),
+      explicitInput: { speed: -9 },
+      speechProviderDefaults: { model: "wrong-model", voice: "female-yujie", format: "wav" },
+    } as any);
+    expect(resolved).toEqual(expect.objectContaining({
+      modelId: "speech-target",
+      groupId: "group-target",
+      voice: "female-yujie",
+      speed: 0.5,
+      format: "wav",
+    }));
+  });
+
+  it("R08-04: DashScope 不把未发送的 speed/format 记成已应用 wire 参数", () => {
+    const resolved = resolveSpeechParameters({
+      protocolId: "dashscope-qwen-tts",
+      executionTarget: target("dashscope-qwen-tts", "qwen-tts-real"),
+      explicitInput: { voice: "Serena", speed: 2, format: "mp3" },
+    } as any);
+    expect(resolved).toEqual(expect.objectContaining({
+      modelId: "qwen-tts-real",
+      voice: "Serena",
+      format: "wav",
+      formatMode: "protocol_output_default",
+    }));
+    expect(resolved).not.toHaveProperty("speed");
+  });
+
+  it("R08-05/06: system 默认选择不伪造 voice，显式小数 speed 只记录实际整数 WPM", () => {
+    const defaulted = resolveSpeechParameters({
+      protocolId: "system-speech",
+      executionTarget: target("system-speech", "system-speech-tts"),
+      explicitInput: {},
+    } as any);
+    expect(defaulted).toEqual(expect.objectContaining({
+      voiceMode: "system_default",
+      rateMode: "system_default",
+      format: "m4a",
+    }));
+    expect(defaulted).not.toHaveProperty("voice");
+    expect(defaulted).not.toHaveProperty("rateWpm");
+    expect(defaulted).not.toHaveProperty("speed");
+
+    const explicit = resolveSpeechParameters({
+      protocolId: "system-speech",
+      executionTarget: target("system-speech", "system-speech-tts"),
+      explicitInput: { voice: " Ting-Ting ", speed: 1.234 },
+    } as any);
+    expect(explicit).toEqual(expect.objectContaining({
+      voiceMode: "explicit",
+      voice: "Ting-Ting",
+      rateMode: "explicit",
+      rateWpm: 216,
+      format: "m4a",
+    }));
+    expect(explicit).not.toHaveProperty("speed");
+    expect(buildSystemSpeechSayArgs({ prompt: " 你好 ", ...defaulted }, "/tmp/default.m4a"))
+      .toEqual(["-o", "/tmp/default.m4a", "你好"]);
+    expect(buildSystemSpeechSayArgs({ prompt: " 你好 ", ...explicit }, "/tmp/explicit.m4a"))
+      .toEqual(["-o", "/tmp/explicit.m4a", "-v", "Ting-Ting", "-r", "216", "你好"]);
   });
 });
 

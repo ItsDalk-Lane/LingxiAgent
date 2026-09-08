@@ -46,6 +46,8 @@ export interface QueuedTurnInput {
    * 不得覆盖更新后的队列项。
    */
   snapshotVersion?: number;
+  /** 编辑保护由 coordinator 同步设置，不改变进入编辑前的失败状态。 */
+  editing?: boolean;
   /**
    * 调度状态：ready = 等待自动/手动派发；blocked / failed = 上次派发被门禁
    * 拦下或提交前失败，队列项原位保留全部字段，等待用户编辑/删除/显式重试
@@ -429,6 +431,7 @@ export type ContentBlock = TextDecorator | RichBlock;
 
 export interface ChatMessage {
   id: string;              // UI message id；本地发送的 user message 可先使用 clientMessageId
+  clientMessageId?: string; // 可验证的桌面输入关联；分页ID仍保持历史索引
   sourceEntryId?: string;  // Pi SDK session entry id，用于 branch-aware 的重新生成/编辑
   /** 本次 Agent turn 的真实输入 entry；隐藏后台输入也必须保留，不能猜到最近可见 user。 */
   turnInputEntryId?: string;

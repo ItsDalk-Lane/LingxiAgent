@@ -1,228 +1,231 @@
-/**
- * pinned-tenets-recovery.ts — 旧迁移遗留 .migrated 数据的仅预览恢复入口。
- *
- * 适用条件：agent 目录里存在 pinned.md.migrated* / pinned-memory.json.migrated*
- * 归档文件，且没有 state=completed 的新版迁移收据（completed 说明迁移已收口，
- * 之后缺失的条目视为用户主动删除，本工具不复活）。
- *
- * 默认行为是 dry-run（scanPinnedTenetsRecovery）：列出归档源、当前库里的
- * present/inactive/similar/missing 分类与可恢复数量，不改任何文件。
- * 真实恢复（applyPinnedTenetsRecovery）必须接收明确批准的源文件与逐条决策，
- * 并复用与迁移相同的批量写入（importLegacyPinnedItems）与收据机制。
- * 本模块不挂到任何启动路径；CLI 见 scripts/pinned-tenets-recovery.mjs。
- */
-
-import fs from "fs";
-import path from "path";
-import { createHash } from "node:crypto";
+/** 旧 pins 归档的只读预览及明确批准恢复；不挂启动路径。 */
+import fs from "node:fs";
+import path from "node:path";
+import { createHash, randomUUID } from "node:crypto";
 import {
-  PINNED_MD,
-  PINNED_JSON,
-  PINNED_TENETS_MIGRATION_RECEIPT,
-  readLegacyPinnedSource,
-  readPinnedTenetsMigrationReceipt,
-  sha256File,
-  type MigrationReceipt,
+  PINNED_TENETS_MIGRATION_RECEIPT, readLegacyPinnedSource, readPinnedTenetsMigrationReceipt,
+  sha256File, writePinnedBackup, verifyPinnedTarget, executePinnedTargetTransaction, isMigrationReceipt,
+  type MigrationReceipt, type MigrationFaultHooks,
 } from "./pinned-tenets-migration.ts";
 import {
-  dedupKey,
-  importLegacyPinnedItems,
-  legacyContentKey,
-  listTenets,
-  type LegacyPinImportEntry,
+  dedupKey, legacyContentKey, planLegacyPinnedImport, readTenetsFileStrict, serializeTenetsFile, tenetsFilePath,
   type LegacyPinImportItem,
 } from "../lib/memory/tenets.ts";
 import { atomicWriteSync } from "../shared/safe-fs.ts";
 
-const ARCHIVED_SOURCE_RE = /^(pinned-memory\.json|pinned\.md)\.migrated(-[0-9a-f]{8})?$/;
+const ARCHIVED_SOURCE_RE = /^(pinned-memory\.json|pinned\.md)\.migrated(?:-[a-zA-Z0-9-]+)?$/;
+const SAFE_ID = /^[a-zA-Z0-9][a-zA-Z0-9_-]*$/;
+const HASH = /^[a-f0-9]{64}$/;
+const OPERATIONS = "pinned-recovery-operations";
+const digest = (value: string) => createHash("sha256").update(value).digest("hex");
+const contentHash = (value: string) => `sha256:${digest(legacyContentKey(value))}`;
 
+export interface RecoveryApproval {
+  schemaVersion: number;
+  operationId: string;
+  agentId: string;
+  sources: Array<{ file: string; sha256: string }>;
+  /** null 表示批准时目标不存在；绝不按当前文件偷偷更新批准。 */
+  observedTargetHash: string | null;
+  decisions: Array<{ source: string; sourceEntryKey: string; contentHash: string; action: "restore" | "skip" }>;
+}
 export interface RecoveryCandidate {
   source: string;
+  sourceEntryKey: string;
   legacyId: string | null;
   contentHash: string;
-  /** 供用户本地决策的预览（本工具只在用户本机运行，预览不进入收据/日志） */
+  /** 只供本地预览，不进入日志或收据。 */
   preview: string;
-  classification: "present" | "inactive" | "similar" | "missing";
+  classification: "present" | "inactive" | "similar" | "missing" | "previously_restored_now_missing";
   matchedTenetId?: string | null;
+  legacyRestored?: boolean;
 }
-
 export interface RecoveryAgentReport {
   agentId: string;
   receiptState: string | null;
+  diagnostic?: string;
   archivedSources: Array<{ file: string; sha256: string; itemCount: number }>;
   candidates: RecoveryCandidate[];
   recoverableCount: number;
+  approvalTemplate: RecoveryApproval;
 }
-
-export interface RecoveryReport {
-  home: string;
-  agents: RecoveryAgentReport[];
+export interface RecoveryReport { home: string; agents: RecoveryAgentReport[] }
+export interface RecoverySummary { restored: number; entries: MigrationReceipt["plan"] }
+interface RecoveryOperation extends MigrationReceipt {
+  approvalDigest: string;
+  approval: RecoveryApproval;
+  archiveStatus: "not_applicable";
+  summary: RecoverySummary;
 }
-
-export interface RecoveryApproval {
-  agentId: string;
-  source: string;
-  decisions: Array<{ contentHash: string; action: "restore" | "skip" }>;
+function fail(message: string): never { throw new Error(message); }
+function currentTargetHash(dir: string): string | null {
+  try { return sha256File(tenetsFilePath(dir)); }
+  catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return null; throw error; }
 }
-
-function previewOf(content: string): string {
-  const oneLine = content.replace(/\s+/g, " ").trim();
-  return oneLine.length > 120 ? `${oneLine.slice(0, 120)}…` : oneLine;
+function sourceEntries(dir: string, source: { file: string; sha256: string }) {
+  const items = readLegacyPinnedSource(path.join(dir, source.file));
+  const counts = new Map<string, number>();
+  for (const item of items) if (item.legacyId) counts.set(item.legacyId, (counts.get(item.legacyId) ?? 0) + 1);
+  return items.map((item, ordinal) => ({ item, key: item.legacyId && counts.get(item.legacyId) === 1 ? item.legacyId : `${source.sha256}:${ordinal}` }));
 }
-
-function contentHashOf(content: string): string {
-  // 与迁移计划同一哈希口径（归一化内容的 sha256）
-  return `sha256:${createHash("sha256").update(legacyContentKey(content), "utf-8").digest("hex")}`;
-}
-
-function classify(agentDir: string, source: string, item: LegacyPinImportItem): RecoveryCandidate {
-  const content = legacyContentKey(item.content);
-  const all = listTenets(agentDir);
-  const exact = all.find((t) => legacyContentKey(t.content) === content);
-  let classification: RecoveryCandidate["classification"] = "missing";
-  let matchedTenetId: string | null = null;
-  if (exact) {
-    classification = exact.status === "active" ? "present" : "inactive";
-    matchedTenetId = exact.id;
-  } else if (all.some((t) => dedupKey(t.content) === dedupKey(content))) {
-    classification = "similar";
+function validatedApproval(input: unknown): RecoveryApproval {
+  if (!input || typeof input !== "object") return fail("invalid approval");
+  const a = input as RecoveryApproval;
+  if (a.schemaVersion !== 1 || typeof a.operationId !== "string" || !SAFE_ID.test(a.operationId)
+    || typeof a.agentId !== "string" || !SAFE_ID.test(a.agentId)
+    || !(a.observedTargetHash === null || typeof a.observedTargetHash === "string" && HASH.test(a.observedTargetHash))
+    || !Array.isArray(a.sources) || !a.sources.length || !Array.isArray(a.decisions) || !a.decisions.length) return fail("invalid approval schema/operation/snapshot");
+  const sources = new Set<string>();
+  for (const s of a.sources) {
+    if (!s || typeof s.file !== "string" || !ARCHIVED_SOURCE_RE.test(s.file) || typeof s.sha256 !== "string" || !HASH.test(s.sha256) || sources.has(s.file)) return fail("invalid approval source");
+    sources.add(s.file);
   }
-  return {
-    source,
-    legacyId: item.legacyId ?? null,
-    contentHash: contentHashOf(content),
-    preview: previewOf(content),
-    classification,
-    matchedTenetId,
-  };
+  const decisions = new Set<string>();
+  for (const d of a.decisions) {
+    if (!d || !sources.has(d.source) || typeof d.sourceEntryKey !== "string" || !d.sourceEntryKey
+      || typeof d.contentHash !== "string" || !/^sha256:[a-f0-9]{64}$/.test(d.contentHash) || !["restore", "skip"].includes(d.action)) return fail("invalid approval decision");
+    const key = JSON.stringify([d.source, d.sourceEntryKey]);
+    if (decisions.has(key)) return fail("duplicate or contradictory approval decision");
+    decisions.add(key);
+  }
+  // 固定字段与排序使对象键序无关，决策变化则摘要必变。
+  return { schemaVersion: 1, operationId: a.operationId, agentId: a.agentId, observedTargetHash: a.observedTargetHash,
+    sources: a.sources.map(s => ({ file: s.file, sha256: s.sha256 })).sort((x,y) => x.file.localeCompare(y.file)),
+    decisions: a.decisions.map(d => ({ source: d.source, sourceEntryKey: d.sourceEntryKey, contentHash: d.contentHash, action: d.action }))
+      .sort((x,y) => x.source.localeCompare(y.source) || x.sourceEntryKey.localeCompare(y.sourceEntryKey)) };
+}
+function operationPath(dir: string, operationId: string): string { return path.join(dir, "memory", OPERATIONS, `${operationId}.json`); }
+function readOperation(dir: string, operationId: string): RecoveryOperation | null {
+  let raw: unknown;
+  try { raw = JSON.parse(fs.readFileSync(operationPath(dir, operationId), "utf8")); }
+  catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return null; throw new Error("invalid or unreadable recovery operation receipt", { cause: error }); }
+  if (!isMigrationReceipt(raw, path.basename(dir))) return fail("invalid recovery operation receipt");
+  const r = raw as RecoveryOperation;
+  if (r.version !== 3 || r.kind !== "recovery" || r.operationId !== operationId || r.archiveStatus !== "not_applicable"
+    || r.approvalDigest !== digest(JSON.stringify(validatedApproval(r.approval)))
+    || !r.summary || !Number.isInteger(r.summary.restored) || r.summary.restored < 0 || JSON.stringify(r.summary.entries) !== JSON.stringify(r.plan)) return fail("invalid recovery operation proof");
+  const decisions = r.approval.decisions.filter(d => d.action === "restore");
+  if (decisions.length !== r.plan.length || r.plan.some((entry, index) => {
+    const decision = decisions[index];
+    return entry.source !== decision.source || entry.sourceEntryKey !== decision.sourceEntryKey || entry.contentHash !== decision.contentHash;
+  }) || r.summary.restored !== r.plan.filter(p=>p.outcome.startsWith("added")).length) return fail("recovery receipt plan does not cover approval");
+  return r;
+}
+function writeOperation(dir: string, receipt: RecoveryOperation) {
+  receipt.updatedAt = new Date().toISOString();
+  fs.mkdirSync(path.dirname(operationPath(dir, receipt.operationId!)), { recursive: true });
+  atomicWriteSync(operationPath(dir, receipt.operationId!), JSON.stringify(receipt, null, 2) + "\n");
+}
+function completedOperations(dir: string): RecoveryOperation[] {
+  const directory = path.join(dir, "memory", OPERATIONS);
+  if (!fs.existsSync(directory)) return [];
+  return fs.readdirSync(directory).filter(name => name.endsWith('.json')).map(name => {
+    const id = name.slice(0, -5); if (!SAFE_ID.test(id)) return fail("invalid recovery operation filename");
+    return readOperation(dir, id)!;
+  }).filter(r => r.state === "completed");
 }
 
-/** dry-run：只读扫描，绝不改任何文件。 */
-export function scanPinnedTenetsRecovery(lingxiHome: string): RecoveryReport {
-  const report: RecoveryReport = { home: lingxiHome, agents: [] };
-  const agentsDir = path.join(lingxiHome, "agents");
+/** dry-run 只读；completed 仅关闭其批准范围，不能隐藏整个 agent。 */
+export function scanPinnedTenetsRecovery(home: string): RecoveryReport {
+  const report: RecoveryReport = { home, agents: [] };
+  const agentsDir = path.join(home, "agents");
   if (!fs.existsSync(agentsDir)) return report;
-
   for (const entry of fs.readdirSync(agentsDir, { withFileTypes: true })) {
-    if (!entry.isDirectory() || entry.name.startsWith(".")) continue;
-    const agentDir = path.join(agentsDir, entry.name);
-    const receipt = readPinnedTenetsMigrationReceipt(agentDir);
-    if (receipt?.state === "completed") continue;
-
-    const archived = fs.readdirSync(agentDir)
-      .filter((name) => ARCHIVED_SOURCE_RE.test(name))
-      .sort();
-    if (archived.length === 0) continue;
-
-    const agent: RecoveryAgentReport = {
-      agentId: entry.name,
-      receiptState: receipt?.state ?? null,
-      archivedSources: [],
-      candidates: [],
-      recoverableCount: 0,
-    };
-    for (const name of archived) {
-      const filePath = path.join(agentDir, name);
-      let items: LegacyPinImportItem[] = [];
-      let readable = true;
-      try {
-        items = readLegacyPinnedSource(filePath);
-      } catch {
-        readable = false;
-      }
-      agent.archivedSources.push({
-        file: name,
-        sha256: sha256File(filePath),
-        itemCount: readable ? items.length : -1,
-      });
-      for (const item of items) {
-        agent.candidates.push(classify(agentDir, name, item));
+    if (!entry.isDirectory() || !SAFE_ID.test(entry.name)) continue;
+    const dir = path.join(agentsDir, entry.name);
+    const legacy = readPinnedTenetsMigrationReceipt(dir);
+    const archived = fs.readdirSync(dir).filter(name => ARCHIVED_SOURCE_RE.test(name)).sort();
+    if (!archived.length) continue;
+    const data = readTenetsFileStrict(tenetsFilePath(dir));
+    const operations = completedOperations(dir);
+    const template: RecoveryApproval = { schemaVersion: 1, operationId: randomUUID(), agentId: entry.name, sources: [], observedTargetHash: currentTargetHash(dir), decisions: [] };
+    const agent: RecoveryAgentReport = { agentId: entry.name, receiptState: legacy?.state ?? null, archivedSources: [], candidates: [], recoverableCount: 0, approvalTemplate: template };
+    if (legacy?.version === 2 && legacy.state === "completed") agent.diagnostic = "LEGACY_COMPLETION_UNVERIFIED";
+    for (const file of archived) {
+      const source = { file, sha256: sha256File(path.join(dir,file)) };
+      const items = sourceEntries(dir,source);
+      agent.archivedSources.push({ ...source, itemCount: items.length }); template.sources.push(source);
+      for (const {item,key} of items) {
+        const h = contentHash(item.content);
+        const exact = data.tenets.find(t => t.status === "active" && legacyContentKey(t.content) === legacyContentKey(item.content))
+          ?? data.tenets.find(t => legacyContentKey(t.content) === legacyContentKey(item.content));
+        const wasRestored = operations.some(op => op.approval.sources.some(s=>s.file===file && s.sha256===source.sha256)
+          && op.approval.decisions.some(d=>d.source===file && d.sourceEntryKey===key && d.contentHash===h && d.action==='restore'));
+        const legacyRestored = legacy?.state === "completed" && legacy.sources.some(s=>s.sha256===source.sha256)
+          && legacy.plan.some(p=>p.legacyId===item.legacyId && p.contentHash===h);
+        let classification: RecoveryCandidate["classification"] = exact?.status === "active" ? "present" : exact ? "inactive" : data.tenets.some(t=>dedupKey(t.content)===dedupKey(item.content)) ? "similar" : "missing";
+        if (classification !== "present" && (wasRestored || legacyRestored)) classification = "previously_restored_now_missing";
+        agent.candidates.push({ source:file, sourceEntryKey:key, legacyId:item.legacyId, contentHash:h, preview:item.content.replace(/\s+/g,' ').slice(0,120), classification, matchedTenetId:exact?.id ?? null, legacyRestored:!!legacyRestored });
+        template.decisions.push({source:file,sourceEntryKey:key,contentHash:h,action:"skip"});
       }
     }
-    agent.recoverableCount = agent.candidates.filter(
-      (c) => c.classification === "missing" || c.classification === "inactive",
-    ).length;
+    agent.recoverableCount = agent.candidates.filter(c=>c.classification==='missing'||c.classification==='inactive').length;
     report.agents.push(agent);
   }
   return report;
 }
 
-/**
- * 真实恢复：只恢复批准清单中 action=restore 的条目；不默认全量复活；
- * 归档源文件保留不删。幂等（已 active 的精确重复不会产生新条目）。
- */
-export function applyPinnedTenetsRecovery(
-  lingxiHome: string,
-  approval: RecoveryApproval,
-): { restored: number; entries: LegacyPinImportEntry[] } {
-  if (!approval || typeof approval.agentId !== "string" || !approval.agentId) {
-    throw new Error("approval.agentId is required");
+/** 只供持有 home 写入所有权的内部调用者或合成独占目录测试使用。CLI 尚无可复用所有权，拒绝 apply。 */
+export function applyPinnedTenetsRecovery(home: string, input: unknown, hooks?: MigrationFaultHooks): RecoverySummary {
+  const approval = validatedApproval(input);
+  const dir = path.join(home, "agents", approval.agentId);
+  if (!fs.statSync(dir).isDirectory()) return fail("agent not found");
+  const approvalDigest = digest(JSON.stringify(approval));
+  let receipt = readOperation(dir, approval.operationId);
+  if (receipt) {
+    if (receipt.approvalDigest !== approvalDigest) return fail("approval changed for existing operationId");
+    if (receipt.state === 'completed') return receipt.summary;
+    if (receipt.state === 'conflict' || receipt.state === 'failed') return fail("recovery operation conflict; new reviewed approval required");
   }
-  if (approval.agentId.includes("/") || approval.agentId.includes("\\") || approval.agentId.startsWith(".")) {
-    throw new Error(`invalid agent id: ${approval.agentId}`);
-  }
-  const agentDir = path.join(lingxiHome, "agents", approval.agentId);
-  if (!fs.existsSync(agentDir)) {
-    throw new Error(`agent not found: ${approval.agentId}`);
-  }
-  if (typeof approval.source !== "string" || !ARCHIVED_SOURCE_RE.test(approval.source)) {
-    throw new Error(`invalid recovery source: ${approval.source} (must be an archived pinned source file name)`);
-  }
-  const sourcePath = path.join(agentDir, approval.source);
-  if (!fs.existsSync(sourcePath)) {
-    throw new Error(`recovery source not found: ${approval.source}`);
-  }
-  if (!Array.isArray(approval.decisions) || approval.decisions.length === 0) {
-    throw new Error("approval.decisions must be a non-empty array");
-  }
-
-  const items = readLegacyPinnedSource(sourcePath);
-  const byHash = new Map(items.map((item) => [contentHashOf(legacyContentKey(item.content)), item]));
-  const restore: LegacyPinImportItem[] = [];
-  for (const decision of approval.decisions) {
-    if (!decision || (decision.action !== "restore" && decision.action !== "skip")) {
-      throw new Error(`invalid decision action: ${(decision as any)?.action}`);
+  const restore: LegacyPinImportItem[]=[];
+  for (const source of approval.sources) {
+    if (sha256File(path.join(dir, source.file)) !== source.sha256) return fail("stale_approval: source changed");
+    const items = sourceEntries(dir,source);
+    for (const decision of approval.decisions.filter(d=>d.source===source.file)) {
+      const item = items.find(i=>i.key===decision.sourceEntryKey)?.item;
+      if (!item || contentHash(item.content)!==decision.contentHash) return fail("stale_approval: source entry mismatch");
+      if (decision.action === 'restore') restore.push(item);
     }
-    const item = byHash.get(decision.contentHash);
-    if (!item) {
-      throw new Error(`decision contentHash does not match any item in ${approval.source}: ${decision.contentHash}`);
-    }
-    if (decision.action === "restore") restore.push(item);
   }
-  if (restore.length === 0) {
-    throw new Error("no restore decisions supplied; refusing to apply an empty recovery");
+  if (!restore.length) return fail("no restore decisions supplied");
+  const targetPath = tenetsFilePath(dir);
+  const targetHash = currentTargetHash(dir);
+  if (receipt && targetHash !== approval.observedTargetHash) {
+    if (!verifyPinnedTarget(targetPath,receipt.resultSha256!,receipt.plan).ok) return fail("recovery conflict: committed target changed");
+    receipt.state='completed'; receipt.completedAt=new Date().toISOString(); writeOperation(dir,receipt); return receipt.summary;
   }
-
-  const { entries } = importLegacyPinnedItems(agentDir, restore);
-
-  const receipt: MigrationReceipt = {
-    version: 2,
-    kind: "recovery",
-    agentId: approval.agentId,
-    state: "completed",
-    sources: [{ file: approval.source, sha256: sha256File(sourcePath), mtimeMs: fs.statSync(sourcePath).mtimeMs }],
-    authority: { file: approval.source, reason: "explicit_recovery_approval" },
-    target: { existed: true, sha256: null },
-    resultSha256: null,
-    plan: entries.map(({ normalizedContent: _c, ...entry }) => ({ ...entry, exemption: "legacy_migration" })),
-    counts: {
-      sourceItems: restore.length,
-      added: entries.filter((e) => e.outcome === "added").length,
-      duplicateActive: entries.filter((e) => e.outcome === "duplicate_active").length,
-      addedOverHistory: entries.filter((e) => e.outcome === "added_over_pending_history" || e.outcome === "added_over_rejected_history").length,
-      duplicateInBatch: entries.filter((e) => e.outcome === "duplicate_in_batch").length,
+  if (targetHash !== approval.observedTargetHash) return fail("stale_approval: target changed");
+  const original = readTenetsFileStrict(targetPath);
+  const {entries,finalTenets} = planLegacyPinnedImport(original,restore,receipt?.plan);
+  const finalBytes = serializeTenetsFile({schemaVersion:original.schemaVersion,tenets:finalTenets});
+  const resultSha256 = digest(finalBytes);
+  if (receipt && receipt.resultSha256!==resultSha256) return fail("recovery conflict: prepared plan diverged");
+  if (!receipt) {
+    const approvedEntries = approval.decisions.filter(d=>d.action === "restore");
+    const plan = entries.map(({normalizedContent:_body,...entry}, index)=>({...entry,exemption:'legacy_migration',source:approvedEntries[index].source,sourceEntryKey:approvedEntries[index].sourceEntryKey}));
+    const now=new Date().toISOString();
+    receipt={version:3,kind:'recovery',operationId:approval.operationId,agentId:approval.agentId,state:'prepared',
+      sources:approval.sources.map(s=>({...s,mtimeMs:fs.statSync(path.join(dir,s.file)).mtimeMs})),authority:{file:approval.sources[0].file,reason:'explicit_recovery_approval'},
+      target:{existed:targetHash!==null,sha256:targetHash},resultSha256,plan,
+      counts:{sourceItems:plan.length,added:plan.filter(p=>p.outcome==='added').length,duplicateActive:plan.filter(p=>p.outcome==='duplicate_active').length,addedOverHistory:plan.filter(p=>p.outcome.startsWith('added_over')).length,duplicateInBatch:plan.filter(p=>p.outcome==='duplicate_in_batch').length},
+      archived:[],archiveStatus:'not_applicable',backupDir:path.join('memory','pinned-migration-backup',approval.operationId),error:null,createdAt:now,updatedAt:now,completedAt:null,
+      approval,approvalDigest,summary:{restored:plan.filter(p=>p.outcome.startsWith('added')).length,entries:plan}};
+  }
+  const operation=receipt;
+  executePinnedTargetTransaction({targetPath,finalBytes,resultSha256,plan:operation.plan,hooks,
+    prepare:()=>{
+      const backupDir=path.join(dir,operation.backupDir!);fs.mkdirSync(backupDir,{recursive:true,mode:0o700});
+      const files=approval.sources.map(s=>({file:path.join(dir,s.file),name:s.file}));
+      if(targetHash!==null)files.push({file:targetPath,name:'tenets.json'});
+      for(const name of [path.join('memory',PINNED_TENETS_MIGRATION_RECEIPT),path.join('memory',OPERATIONS,approval.operationId+'.json')]) {
+        const file=path.join(dir,name); if(fs.existsSync(file))files.push({file,name:path.basename(file)});
+      }
+      for(const f of files){hooks?.at?.(`backup:before:${f.name}`);writePinnedBackup(f.file,path.join(backupDir,`${sha256File(f.file)}-${f.name}`));hooks?.at?.(`backup:after:${f.name}`);}
+      writeOperation(dir,operation);
     },
-    archived: [],
-    backupDir: null,
-    error: null,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    completedAt: new Date().toISOString(),
-  };
-  const receiptPath = path.join(agentDir, "memory", PINNED_TENETS_MIGRATION_RECEIPT);
-  fs.mkdirSync(path.dirname(receiptPath), { recursive: true });
-  atomicWriteSync(receiptPath, JSON.stringify(receipt, null, 2) + "\n");
-
-  const restored = entries.filter((e) => e.outcome !== "duplicate_active" && e.outcome !== "duplicate_in_batch").length;
-  return { restored, entries };
+    recheck:()=>{if(currentTargetHash(dir)!==approval.observedTargetHash||approval.sources.some(s=>sha256File(path.join(dir,s.file))!==s.sha256))return fail('stale_approval: preparation snapshot changed');},
+    committed:()=>{operation.state='target_committed';writeOperation(dir,operation);},
+  });
+  hooks?.at?.('completed:before');operation.state='completed';operation.completedAt=new Date().toISOString();writeOperation(dir,operation);
+  return operation.summary;
 }

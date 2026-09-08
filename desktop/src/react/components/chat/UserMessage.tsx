@@ -13,6 +13,7 @@ import { FolderIcon } from '../shared/FolderIcon';
 import type { ChatMessage, UserAttachment, DeskContext } from '../../stores/chat-types';
 import type { KnowledgeRetrievalStats } from '../../../../../shared/knowledge-refs.ts';
 import { useStore } from '../../stores';
+import { reconcileComposerSession } from '../../services/composer-send-coordinator';
 import { selectSelectedIdsBySession } from '../../stores/session-selectors';
 import { extractSelectedTexts } from '../../utils/message-text';
 import { openFilePreview } from '../../utils/file-preview';
@@ -110,6 +111,8 @@ export const UserMessage = memo(function UserMessage({
   }, [message.id, sessionPath]);
 
   const isReviewTurn = !!message.agentReview || !!message.agentReviewRequest;
+  const unresolvedDelivery = message.sendError?.startsWith('delivery_unknown')
+    || message.sendError === 'delivery_run_unknown';
   const turnTarget = useMemo<SessionNodeTarget | null>(() => (
     message.sourceEntryId
       ? { role: 'user', entryId: message.sourceEntryId }
@@ -117,7 +120,7 @@ export const UserMessage = memo(function UserMessage({
   ), [message.sourceEntryId]);
   const { actions: nodeActions, busy: nodeActionBusy } = useSessionNodeActions({
     sessionPath,
-    target: readOnly ? null : turnTarget,
+    target: readOnly || unresolvedDelivery ? null : turnTarget,
     retryMessage: message,
     onForkCreated,
     disabled: isStreaming,
@@ -155,7 +158,7 @@ export const UserMessage = memo(function UserMessage({
 
   // Retry and fork preserve the recorded review envelope. Inline text editing remains
   // unavailable because changing only its text would no longer match that snapshot.
-  const canEdit = !readOnly && !isReviewTurn && isLatestUserMessage && !!turnTarget;
+  const canEdit = !readOnly && !unresolvedDelivery && !isReviewTurn && isLatestUserMessage && !!turnTarget;
   const timeText = formatMessageTime(message.timestamp);
   const editingActions: MessageFooterAction[] = useMemo(() => [
     {
@@ -207,6 +210,17 @@ export const UserMessage = memo(function UserMessage({
             className={`${styles.avatar} ${styles.userAvatar}`}
             alt={userName}
           />
+        </div>
+      )}
+      {(message.sendError?.startsWith('delivery_unknown') || message.sendError === 'delivery_run_unknown') && (
+        <div role="status">
+          <span>{t(message.sendError === 'delivery_unknown_checking'
+            ? 'input.deliveryChecking'
+            : message.sendError === 'delivery_run_unknown'
+              ? 'input.deliveryRunUnknown'
+              : 'input.deliveryUnknown')}</span>
+          <button type="button" disabled={message.sendError === 'delivery_unknown_checking'}
+            onClick={() => { void reconcileComposerSession(sessionPath); }}>{t('input.recheckDelivery')}</button>
         </div>
       )}
       {message.quotedText && (

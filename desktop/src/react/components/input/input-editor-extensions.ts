@@ -25,6 +25,9 @@ export function createInputEditorExtensions(placeholder: InputEditorPlaceholder)
       gapcursor: false,
       link: false,
       bold: false,
+      // StarterKit 3 默认会在列表等块后自动补一个无法标明来源的空 paragraph。
+      // 输入框把空段视为用户正文，因此关闭该插件，避免序列化时猜测删除尾行。
+      trailingNode: false,
     }),
     ChatInputBold,
     Placeholder.configure({ placeholder }),

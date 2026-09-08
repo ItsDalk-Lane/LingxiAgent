@@ -1715,6 +1715,8 @@ export function createChatRoute(engine: any, hub: any, {
       emitStreamEvent(sessionPath, ss, {
         type: "session_user_message",
         clientMessageId: event.clientMessageId || null,
+        snapshotVersion: event.snapshotVersion,
+        sessionId: event.sessionId || null,
         message: event.message,
       });
     } else if (event.type === "voice_transcription_update") {
@@ -2563,6 +2565,7 @@ export function createChatRoute(engine: any, hub: any, {
                     sessionPath: promptSessionPath,
                     text: promptText,
                     clientMessageId: msg.clientMessageId,
+                  snapshotVersion: msg.snapshotVersion,
                     images: msg.images,
                     videos: msg.videos,
                     audios: msg.audios,
@@ -2629,6 +2632,7 @@ export function createChatRoute(engine: any, hub: any, {
                   displayMessage: msg.displayMessage,
                   sessionRefs,
                   clientMessageId: msg.clientMessageId,
+                  snapshotVersion: msg.snapshotVersion,
                   images: msg.images,
                   videos: msg.videos,
                   audios: msg.audios,
@@ -2644,6 +2648,7 @@ export function createChatRoute(engine: any, hub: any, {
                   sessionId: promptTarget.sessionId,
                   sessionPath: promptSessionPath,
                   clientMessageId: msg.clientMessageId,
+                  snapshotVersion: msg.snapshotVersion,
                   images: msg.images,
                   videos: msg.videos,
                   audios: msg.audios,

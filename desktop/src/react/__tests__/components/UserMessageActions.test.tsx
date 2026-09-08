@@ -40,6 +40,9 @@ describe('UserMessage Codex-style actions', () => {
         'common.edit': '编辑',
         'common.cancel': '取消',
         'common.confirm': '确认',
+        'input.deliveryUnknown': '结果未知，核对未完成',
+        'input.deliveryRunUnknown': '消息已接收，运行结果仍未知',
+        'input.recheckDelivery': '重新核对',
       }[key] || key),
     });
     Object.assign(navigator, {
@@ -60,6 +63,37 @@ describe('UserMessage Codex-style actions', () => {
         },
       },
     } as never);
+  });
+
+  it('R04-12：未决投递只提供重新核对，不暴露重发、分支或编辑动作', () => {
+    const message = {
+      id: 'client-pending',
+      sourceEntryId: 'entry-pending',
+      role: 'user' as const,
+      text: '原消息',
+      textHtml: '<p>原消息</p>',
+      sendStatus: 'failed' as const,
+      sendError: 'delivery_run_unknown',
+    };
+
+    render(
+      <UserMessage
+        viewerIdentity={{ name: '小黎', avatarUrl: null }}
+        isStreaming={false}
+        isSelected={false}
+        message={message}
+        showAvatar={false}
+        sessionPath="/session/a.jsonl"
+        isLatestUserMessage
+      />,
+    );
+
+    expect(screen.getByText('消息已接收，运行结果仍未知')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '重新核对' })).toBeInTheDocument();
+    expect(screen.queryByTitle('重新生成')).not.toBeInTheDocument();
+    expect(screen.queryByTitle('分支为新会话')).not.toBeInTheDocument();
+    expect(screen.queryByTitle('编辑')).not.toBeInTheDocument();
+    expect(retryMock).not.toHaveBeenCalled();
   });
 
   it('shows retry and fork for every persisted user message while keeping edit latest-only', () => {

@@ -30,6 +30,8 @@
  */
 import path from "path";
 import { randomUUID } from "node:crypto";
+import { withDesktopInputCommitted, noteDesktopInputRuntimeChange, desktopInputRuntimeRevision, hasDesktopInputCommitObserver } from '../lib/pi-sdk/desktop-input-commit.ts';
+import { DESKTOP_INPUT_CORRELATION_TYPE, collectDesktopInputCorrelations } from './desktop-input-correlation.ts';
 import { extOfName, inferFileKind } from "../lib/file-metadata.ts";
 import { collectMediaItems } from "../lib/tools/media-details.ts";
 import { formatSettingsUpdateText } from "../lib/tools/settings-update-result.ts";
@@ -60,7 +62,43 @@ export const MESSAGE_ORIGIN_RECORD_TYPE = "hana-message-origin";
 export const MESSAGE_PRESENTATION_RECORD_TYPE = "hana-message-presentation";
 export const AGENT_REVIEW_RECORD_TYPE = "hana-agent-review-result";
 
-const pendingDesktopSessionSubmissions = new Set();
+const pendingDesktopSessionSubmissions = new class extends Set<string> {
+  add(key: string) { if (!this.has(key)) noteDesktopInputRuntimeChange(); return super.add(key); }
+  delete(key: string) { const removed = super.delete(key); if (removed) noteDesktopInputRuntimeChange(); return removed; }
+}();
+
+/** 查询不创建/加载会话；缺少运行态能力时不能声称空闲。 */
+export function readDesktopInputRunSnapshot(engine: any, sessionId: string, sessionPath: string) {
+  const revision = desktopInputRuntimeRevision();
+  const pending = pendingDesktopSessionSubmissions.has(sessionId) || pendingDesktopSessionSubmissions.has(sessionPath);
+  try {
+    if (typeof engine.isSessionStreaming !== 'function' || typeof engine.getSessionByPath !== 'function') return { revision, status: pending ? 'running' : 'unknown' };
+    const streaming = engine.isSessionStreaming(sessionPath);
+    const session = engine.getSessionByPath(sessionPath);
+    if (pending || streaming === true) return { revision, status: 'running' };
+    if (streaming !== false || (session && !hasDesktopInputCommitObserver(session))) return { revision, status: 'unknown' };
+    return { revision, status: 'reconciled_idle' };
+  } catch { return { revision, status: 'unknown' }; }
+}
+
+function withInputCorrelation<T>(engine: any, session: any, identity: any, action: () => T): T {
+  if (!identity.clientMessageId || typeof identity.clientMessageId !== 'string') return action();
+  const snapshotVersion = identity.snapshotVersion === undefined ? 1 : identity.snapshotVersion;
+  const unavailable = () => {
+    console.warn('[desktop-session-submit] canonical input correlation unavailable');
+    try { engine.emitEvent?.({ type: 'session_input_correlation_unavailable', sessionId: identity.sessionId, clientMessageId: identity.clientMessageId, snapshotVersion }, identity.sessionPath); }
+    catch { /* 诊断投递失败也不能中断已提交的用户输入。 */ }
+  };
+  if (!Number.isSafeInteger(snapshotVersion) || snapshotVersion < 1 || !identity.sessionId) { unavailable(); return action(); }
+  return withDesktopInputCommitted({ session, unavailable, committed: sourceEntryId => {
+    if (session.sessionManager.getSessionId() !== identity.sessionId) { unavailable(); return; }
+    session.sessionManager.appendCustomEntry(DESKTOP_INPUT_CORRELATION_TYPE, { schemaVersion: 1, sessionId: identity.sessionId, clientMessageId: identity.clientMessageId, snapshotVersion, sourceEntryId });
+    const correlation = collectDesktopInputCorrelations(session.sessionManager.getBranch(), identity.sessionId).get(sourceEntryId);
+    if (!correlation?.clientMessageId) { unavailable(); return; }
+    engine.emitEvent?.({ type: 'session_user_message', sessionId: identity.sessionId, clientMessageId: identity.clientMessageId, snapshotVersion,
+      message: { ...(identity.displayMessage || {}), text: identity.displayMessage?.text ?? identity.text ?? '', id: sourceEntryId, sourceEntryId } }, identity.sessionPath);
+  } }, action);
+}
 
 /**
  * 检索/排队期间被用户 abort 的提交键（sessionId 与 sessionPath 两种形式都记，
@@ -291,6 +329,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
   audioAttachmentPaths?: string[];
   inboundFiles?: Array<{ type: string; filename?: string; mimeType?: string; buffer: any }>;
   clientMessageId?: string;
+  snapshotVersion?: number;
   onDelta?: (delta: string, accumulated: string) => void;
   displayMessage?: any;
   sessionFileRefs?: Array<{ fileId?: string; sessionId?: string; sessionPath?: string; label?: string; kind?: string }>;
@@ -314,6 +353,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
     audioAttachmentPaths,
     inboundFiles,
     clientMessageId,
+    snapshotVersion,
     onDelta,
     displayMessage,
     sessionFileRefs,
@@ -617,14 +657,14 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
         context,
       });
       if (typeof engine.preflightSessionInput === "function") {
-        await engine.promptSession(sessionPath, promptText, promptOpts, {
+        await withInputCorrelation(engine, session, { sessionId, sessionPath, clientMessageId, snapshotVersion, text, displayMessage }, () => engine.promptSession(sessionPath, promptText, promptOpts, {
           afterCachePreflight,
           afterInputAccepted: onInputAccepted,
-        });
+        }));
       } else {
         // Compatibility for older embedders. LingxiEngine always takes the guarded path above.
         afterCachePreflight();
-        await engine.promptSession(sessionPath, promptText, promptOpts);
+        await withInputCorrelation(engine, session, { sessionId, sessionPath, clientMessageId, snapshotVersion, text, displayMessage }, () => engine.promptSession(sessionPath, promptText, promptOpts));
       }
       consumeRenderedReminderBlock(engine, sessionPath, reminderBlock);
     } finally {
@@ -710,6 +750,7 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
   audioAttachmentPaths?: string[];
   inboundFiles?: Array<{ type: string; filename?: string; mimeType?: string; buffer: any }>;
   clientMessageId?: string;
+  snapshotVersion?: number;
   displayMessage?: any;
   sessionFileRefs?: Array<{ fileId?: string; sessionId?: string; sessionPath?: string; label?: string; kind?: string }>;
   knowledgeRefs?: KnowledgeRefs;
@@ -728,6 +769,7 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
     audioAttachmentPaths,
     inboundFiles,
     clientMessageId,
+    snapshotVersion,
     displayMessage,
     sessionFileRefs,
     knowledgeRefs,
@@ -879,7 +921,7 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
     promptText = `${reminderBlock.block}\n\n${promptText}`;
   }
 
-  const steered = engine.steerSession(sessionPath, promptText);
+  const steered = withInputCorrelation(engine, session, { sessionId, sessionPath, clientMessageId, snapshotVersion, text, displayMessage }, () => engine.steerSession(sessionPath, promptText));
   if (!steered) throw new Error("session_busy");
   consumeRenderedReminderBlock(engine, sessionPath, reminderBlock);
   engine.emitEvent?.({

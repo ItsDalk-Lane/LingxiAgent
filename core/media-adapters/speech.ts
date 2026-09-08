@@ -15,32 +15,10 @@ import { promisify } from "node:util";
 import fs from "node:fs";
 import path from "node:path";
 import { saveImage } from "../media/download.ts";
+import { ensureEffectiveSpeechParameters } from "../media/media-parameters.ts";
 import { t } from "../../lib/i18n.ts";
 
 const execFileAsync = promisify(execFile);
-
-/** OpenAI TTS 支持的响应格式（mime → 扩展名走 saveImage 的扩展表） */
-const OPENAI_SPEECH_FORMATS = new Set(["mp3", "opus", "aac", "flac", "wav", "pcm"]);
-
-/**
- * F11/P8.2：请求体解析只认显式/manager 已解析的语音参数（providerDefaults
- * 已在 UniversalMediaManager 按 speech 域解析并注入 params），不再读取任何
- * ctx.config。缺失（undefined/null）与非法值语义显式区分：
- *   - voice/format 缺失 → 协议默认；非法 → 回落协议默认（白名单）；
- *   - speed 仅接受有限数字（0 是合法显式取值），null/undefined 绝不经过
- *     Number() 隐式转换（旧实现 Number(null)=0 会吞掉缺失语义）。
- */
-function resolveSpeechBody(params) {
-  const input = typeof params.prompt === "string" ? params.prompt : String(params.prompt ?? "");
-  // 模型身份只来自已解析的 execution target；默认参数不得改写模型
-  const model = params.modelId || params.model || "tts-1";
-  const voice = typeof params.voice === "string" && params.voice.trim() ? params.voice : "alloy";
-  const format = OPENAI_SPEECH_FORMATS.has(params.format) ? params.format : "mp3";
-  const speed = typeof params.speed === "number" && Number.isFinite(params.speed)
-    ? Math.min(4, Math.max(0.25, params.speed))
-    : 1.0;
-  return { model, voice, format, speed, input };
-}
 
 export const openaiSpeechAdapter = {
   id: "openai-speech",
@@ -66,6 +44,7 @@ export const openaiSpeechAdapter = {
   },
 
   async submit(params, ctx) {
+    params = ensureEffectiveSpeechParameters(params, "openai-audio-speech", ctx.mediaExecutionTarget);
     const providerId = params.credentialProviderId ?? ctx.mediaExecutionTarget?.credentialProviderId;
     if (!providerId) throw new Error("CREDENTIAL_PROVIDER_UNRESOLVED");
     const creds = await ctx.bus.request("provider:credentials", { providerId });
@@ -75,7 +54,8 @@ export const openaiSpeechAdapter = {
     const { apiKey, baseUrl } = creds;
     if (!baseUrl) throw new Error(`provider "${providerId}" has no base url`);
 
-    const { model, voice, format, speed, input } = resolveSpeechBody(params);
+    const { modelId: model, voice, format, speed } = params;
+    const input = typeof params.prompt === "string" ? params.prompt : String(params.prompt ?? "");
 
     const base = baseUrl.replace(/\/+$/, "");
     const response = await fetch(`${base}/audio/speech`, {
@@ -138,6 +118,7 @@ export const minimaxSpeechAdapter = {
   },
 
   async submit(params, ctx) {
+    params = ensureEffectiveSpeechParameters(params, "minimax-tts", ctx.mediaExecutionTarget);
     const providerId = params.credentialProviderId ?? ctx.mediaExecutionTarget?.credentialProviderId;
     if (!providerId) throw new Error("CREDENTIAL_PROVIDER_UNRESOLVED");
     const creds = await ctx.bus.request("provider:credentials", { providerId });
@@ -150,13 +131,7 @@ export const minimaxSpeechAdapter = {
     if (!groupId) {
       throw new Error("MiniMax speech requires a GroupId configured on the model entry (settings > providers > model > GroupId)");
     }
-    // F11/P8.2：参数只来自显式/manager 已解析的语音参数，不读取图片 ctx.config
-    const model = params.modelId || params.model || "speech-02-hd";
-    const voice = typeof params.voice === "string" && params.voice.trim() ? params.voice : "male-qn-qingse";
-    const format = ["mp3", "wav", "pcm", "flac"].includes(params.format) ? params.format : "mp3";
-    const speed = typeof params.speed === "number" && Number.isFinite(params.speed)
-      ? Math.min(2, Math.max(0.5, params.speed))
-      : 1.0;
+    const { modelId: model, voice, format, speed } = params;
 
     let origin: string;
     try {
@@ -225,6 +200,7 @@ export const dashscopeSpeechAdapter = {
   },
 
   async submit(params, ctx) {
+    params = ensureEffectiveSpeechParameters(params, "dashscope-qwen-tts", ctx.mediaExecutionTarget);
     const providerId = params.credentialProviderId ?? ctx.mediaExecutionTarget?.credentialProviderId;
     if (!providerId) throw new Error("CREDENTIAL_PROVIDER_UNRESOLVED");
     const creds = await ctx.bus.request("provider:credentials", { providerId });
@@ -240,9 +216,7 @@ export const dashscopeSpeechAdapter = {
       throw new Error(`provider "${providerId}" base url is invalid`);
     }
 
-    // F11/P8.2：参数只来自显式/manager 已解析的语音参数，不读取图片 ctx.config
-    const model = params.modelId || params.model || "qwen-tts-latest";
-    const voice = typeof params.voice === "string" && params.voice.trim() ? params.voice : "Cherry";
+    const { modelId: model, voice } = params;
 
     const generateResponse = await fetch(`${origin}/api/v1/services/aigc/multimodal-generation/generation`, {
       method: "POST",
@@ -280,6 +254,19 @@ export const dashscopeSpeechAdapter = {
 
 const SUPPORTED_SYSTEM_SPEECH_PLATFORMS = new Set(["darwin"]);
 
+/** `say` 的唯一 argv 映射；只消费解析器给出的实际 voice/rate。 */
+export function buildSystemSpeechSayArgs(params: Record<string, any>, outputPath: string): string[] {
+  const input = typeof params.prompt === "string" ? params.prompt.trim() : "";
+  if (!input) throw new Error("prompt is required");
+  const args = ["-o", outputPath];
+  if (params.voiceMode !== "system_default" && params.voice) args.push("-v", params.voice);
+  if (params.rateMode !== "system_default" && Number.isInteger(params.rateWpm)) {
+    args.push("-r", String(params.rateWpm));
+  }
+  args.push(input);
+  return args;
+}
+
 export const systemSpeechAdapter = {
   id: "system-speech-tts",
   protocolId: "system-speech",
@@ -303,24 +290,16 @@ export const systemSpeechAdapter = {
   },
 
   async submit(params, ctx) {
+    params = ensureEffectiveSpeechParameters(params, "system-speech", ctx.mediaExecutionTarget);
     if (!SUPPORTED_SYSTEM_SPEECH_PLATFORMS.has(process.platform)) {
       throw new Error("system speech is only available on macOS");
     }
-    const input = typeof params.prompt === "string" ? params.prompt.trim() : "";
-    if (!input) throw new Error("prompt is required");
-
     const generatedDir = path.join(ctx.dataDir, "generated");
     fs.mkdirSync(generatedDir, { recursive: true });
     const filename = `${Date.now()}-say-${Math.random().toString(36).slice(2, 8)}.m4a`;
     const outputPath = path.join(generatedDir, filename);
 
-    const args = ["-o", outputPath];
-    if (typeof params.voice === "string" && params.voice.trim()) args.push("-v", params.voice.trim());
-    if (Number.isFinite(Number(params.speed))) {
-      // say 的 rate 词/分钟，默认 ~175；speed 1.0 → 175
-      args.push("-r", String(Math.round(175 * Math.min(4, Math.max(0.25, Number(params.speed))))));
-    }
-    args.push(input);
+    const args = buildSystemSpeechSayArgs(params, outputPath);
 
     try {
       await execFileAsync("/usr/bin/say", args, { timeout: 120_000 });
@@ -336,4 +315,3 @@ export const systemSpeechAdapter = {
     };
   },
 };
-

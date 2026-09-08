@@ -355,11 +355,13 @@ describe("M10/M11/M14：状态机崩溃恢复与幂等", () => {
   for (const point of checkpoints) {
     it(`M10：在 ${point} 注入崩溃后重启可恢复，无丢失无重复`, () => {
       const { agentDir } = makeAgentHome();
+      const jsonTime = new Date("2026-08-02T00:00:00Z");
+      const mdTime = new Date("2026-08-01T00:00:00Z");
       writeJsonPins(agentDir, [
         { id: "pin_a", content: "条目 A" },
         { id: "pin_b", content: "条目 B" },
-      ]);
-      writeMdPins(agentDir, "- md 条目\n");
+      ], jsonTime);
+      writeMdPins(agentDir, "- md 条目\n", mdTime);
 
       expect(() => migrateAgentPinnedTenets(agentDir, "hana", {
         at: (checkpoint) => { if (checkpoint === point) throw new Error(`boom at ${point}`); },
@@ -381,8 +383,8 @@ describe("M10/M11/M14：状态机崩溃恢复与幂等", () => {
 
   it("M11：目标已提交但归档失败，下次只完成归档，不重写目标、不丢后续数据", () => {
     const { agentDir } = makeAgentHome();
-    writeJsonPins(agentDir, [{ id: "pin_a", content: "条目 A" }]);
-    writeMdPins(agentDir, "- md 条目\n");
+    writeJsonPins(agentDir, [{ id: "pin_a", content: "条目 A" }], new Date("2026-08-02T00:00:00Z"));
+    writeMdPins(agentDir, "- md 条目\n", new Date("2026-08-01T00:00:00Z"));
 
     expect(() => migrateAgentPinnedTenets(agentDir, "hana", {
       at: (checkpoint) => { if (checkpoint === "archive:before:pinned.md") throw new Error("archive boom"); },

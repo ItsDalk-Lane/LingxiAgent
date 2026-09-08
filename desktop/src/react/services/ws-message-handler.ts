@@ -42,7 +42,7 @@ import { renderMarkdown } from '../utils/markdown';
 import { bumpMessageLiveVersion } from '../stores/message-live-version';
 import { terminalOutputStream } from './terminal-output-stream';
 import { handleBackgroundProcessControlResult } from './background-process-control';
-import { noteComposerServerAck } from './composer-send-coordinator';
+import { noteComposerServerAck, noteComposerRunEvent, composerOriginConnectionKey, findSendRecordByClientMessageId } from './composer-send-coordinator';
 
 declare function t(key: string, vars?: Record<string, string>): any;
 
@@ -604,7 +604,8 @@ function settleKnowledgeReadCard(sp: string): void {
 
 // ── 消息分发（大 switch） ──
 
-export function handleServerMessage(msg: any): void {
+export function handleServerMessage(msg: any, originConnectionKey = composerOriginConnectionKey()): void {
+  if (originConnectionKey !== composerOriginConnectionKey()) return;
   // 高频 terminal_output 只能做只读身份校验；即使 locator 没变化，也不能调用
   // Zustand setState，否则卡片折叠时仍会让整棵状态树持续更新。
   if (!rememberSessionLocatorFromMessage(msg, { write: msg?.type !== 'terminal_output' })) return;
@@ -680,6 +681,10 @@ export function handleServerMessage(msg: any): void {
       // 无回答卡的会话仍要收尾可能的阅读卡（map 空时为 no-op）。
       settleKnowledgeReadCard(traceDonePath);
     }
+  }
+
+  if (['assistant_run_start', 'assistant_run_end', 'session_user_message', 'status'].includes(msg.type)) {
+    noteComposerRunEvent(msg, originConnectionKey);
   }
 
   // 活跃 block 事件路由：非当前 session 的聊天事件也要写入正常聊天缓存。
@@ -990,7 +995,13 @@ export function handleServerMessage(msg: any): void {
           : null;
       // 发送回执关联（含重连后恢复/历史回放）：coordinator 据此把 awaiting_ack /
       // delivery_unknown 记录转为 accepted；不是磁盘 fsync 回执，不冒充持久化。
-      noteComposerServerAck(clientMessageId);
+      const acknowledged = noteComposerServerAck(clientMessageId, {
+        originConnectionKey, sessionId: msg.sessionId, sessionPath: sp,
+        snapshotVersion: msg.snapshotVersion ?? msg.message.snapshotVersion,
+        sourceEntryId: msg.message.sourceEntryId || msg.message.id,
+      });
+      // 预提交展示事件仍可能早于 canonical user append；它不能清除本地未知状态。
+      if (clientMessageId && findSendRecordByClientMessageId(clientMessageId) && !acknowledged) break;
       const serverMessageId = typeof msg.message.id === 'string' && msg.message.id
         ? msg.message.id
         : typeof msg.message.sourceEntryId === 'string' && msg.message.sourceEntryId

@@ -137,6 +137,7 @@ export type ComposerPrepareOutcome =
 export interface ComposerPrepareOptions extends ComposerSendOptions {
   /** 复用既有逻辑消息身份（租约/重试）；缺省生成新 clientMessageId。 */
   clientMessageId?: string;
+  snapshotVersion?: number;
 }
 
 function webSocketOpenOrMissing(): 'open' | 'unavailable' {
@@ -445,6 +446,7 @@ export async function prepareComposerSend(
   const wsMsg: Record<string, unknown> = {
     type: bundle.type,
     clientMessageId,
+    snapshotVersion: options.snapshotVersion ?? 1,
     text: finalText,
     sessionId: sessionRef.sessionId,
     sessionPath: sessionPathForSend,

@@ -499,7 +499,9 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
       "agents/{agentId}/memory/navigation.md",
       "agents/{agentId}/memory/tenets.json",
       "agents/{agentId}/memory/pinned-tenets-migration.receipt.json",
+      "agents/{agentId}/memory/pinned-recovery-operations/{operationId}.json",
       "agents/{agentId}/memory/pinned-migration-backup/{backupFile}",
+      "agents/{agentId}/memory/pinned-migration-backup/{operationId}/{backupFile}",
       "agents/{agentId}/memory/facts.md",
       "agents/{agentId}/memory/today.md",
       "agents/{agentId}/memory/week.md",
@@ -526,7 +528,7 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
       // tenets.json (through the tenets library), keeps a content-addressed local
       // backup, maintains the migration receipt state machine, and renames the old
       // files to *.migrated within the same agent directory.
-      ...rules(["core/pinned-tenets-migration.ts"], "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.", ["write-file", "rename", "mkdir", "copy-file", "atomic-write"]),
+      ...rules(["core/pinned-tenets-migration.ts"], "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。", ["write-file", "rename", "mkdir", "copy-file", "remove-path", "atomic-write"]),
       // Explicit, approval-gated recovery of archived .migrated pinned sources;
       // same batch import + receipt mechanism as the startup migration. Never
       // wired into any startup path.

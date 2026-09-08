@@ -60,6 +60,9 @@ export interface HistoryApiResponse {
   messages: Array<{
     id?: string;
     entryId?: string;
+    sourceEntryId?: string;
+    clientMessageId?: string;
+    snapshotVersion?: number;
     role: string;
     content: string;
     assistantSegments?: LiveAssistantSegment[];
@@ -543,7 +546,8 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
       const allAtts = [...fileAtts, ...markerImageAtts, ...markerVideoAtts, ...markerAudioAtts, ...imageAtts];
       const msg: ChatMessage = {
         id,
-        sourceEntryId: m.entryId,
+        sourceEntryId: m.sourceEntryId || m.entryId,
+        clientMessageId: m.clientMessageId,
         role: 'user',
         text: visibleText,
         textHtml: visibleText ? renderMarkdown(visibleText) : undefined,

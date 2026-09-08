@@ -13,7 +13,6 @@ import { MoodParser, ThinkTagParser } from "../core/events.ts";
 import {
   ReservedTagScanner,
   splitReservedTagSegments,
-  stripTagEscapes,
 } from "../shared/reserved-tag-stream.ts";
 import { sanitizePersistedSegmentSource } from "../desktop/src/react/utils/history-segment-sanitizer.ts";
 import { createChatRoute } from "../server/routes/chat.ts";
@@ -126,17 +125,14 @@ describe("F8/P6 通用形状规则与正常标记保护（T01–T12：scanner �
     expect(scannerText(source)).toBe(source);
   });
 
-  it("T07: 已转义已知／未知闭标签经完整链保留字面量（链上带 \\，显示层去 \\）", () => {
+  it("T07: 已转义已知／未知闭标签经完整链保留 canonical 字面量", () => {
     const raw = '教学：\\</think> 与 \\</vendor:tail> 两种闭标签';
     const text = chainText(runChain(raw));
     // 链上保护：反斜杠随字面量保留，任何层都不得吞掉标签本身
     expect(text).toBe('教学：\\</think> 与 \\</vendor:tail> 两种闭标签');
-    // 显示层一次性消费反斜杠 → 字面量可见
-    expect(stripTagEscapes(text)).toBe('教学：</think> 与 </vendor:tail> 两种闭标签');
     // 转义开标签同样保护（不会被误结构化为思考块）
     const openEvents = runChain('\\<think>不是思考块');
     expect(chainText(openEvents)).toBe('\\<think>不是思考块');
-    expect(stripTagEscapes(chainText(openEvents))).toBe('<think>不是思考块');
   });
 
   it("T08: 每个字符位置二分喂入与一次性喂入语义一致", () => {
@@ -419,10 +415,12 @@ describe("F8/P6 splitReservedTagSegments 与显示投影", () => {
     ]);
   });
 
-  it("stripTagEscapes 只摘除紧邻完整标签形状的反斜杠，幂等且不动普通反斜杠", () => {
-    expect(stripTagEscapes('\\</think>\\<b>x</b>与\\<custom/>')).toBe('</think><b>x</b>与<custom/>');
-    expect(stripTagEscapes('C:\\path 与 1 \\< 2')).toBe('C:\\path 与 1 \\< 2');
-    const once = stripTagEscapes('\\</vendor:tail>');
-    expect(stripTagEscapes(once)).toBe(once);
+  it("canonical source 保留标签转义与普通反斜杠，多次经过 scanner 不漂移", () => {
+    const tagged = '\\</think>\\<b>x\\</b>与\\<custom/>';
+    expect(scannerText(tagged)).toBe(tagged);
+    const ordinary = 'C:\\path 与 1 \\< 2';
+    expect(scannerText(ordinary)).toBe(ordinary);
+    const once = scannerText('\\</vendor:tail>');
+    expect(scannerText(once)).toBe(once);
   });
 });

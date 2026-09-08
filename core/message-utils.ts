@@ -7,7 +7,8 @@ import fs from "fs/promises";
 import path from "path";
 import { isToolCallBlock, getToolArgs } from "./llm-utils.ts";
 import { SessionManager } from "../lib/pi-sdk/index.ts";
-import { isSessionJsonlFilename } from "../lib/session-jsonl.ts";
+import { isSessionJsonlFilename, projectCurrentSessionBranchEntries } from "../lib/session-jsonl.ts";
+import { collectDesktopInputCorrelations } from './desktop-input-correlation.ts';
 import { DEFERRED_RESULT_RECORD_TYPE } from "../lib/deferred-result-notification.ts";
 import {
   AGENT_REVIEW_RECORD_TYPE,
@@ -114,9 +115,10 @@ export function filterUnreferencedInlineImages(text, images) {
  * engine.messages 可能只是当前上下文窗口，切回页面时会导致旧消息缺失。
  * 读文件失败时再退回内存态，避免历史接口直接空白。
  */
-export async function loadSessionHistoryMessages(engine, explicitPath) {
+export async function loadSessionHistoryMessages(engine, explicitPath, options: { readSideEffects?: boolean; sessionId?: string } = {}) {
   const sessionPath = explicitPath;
   if (!sessionPath) return [];
+  if (options.readSideEffects === false) return (await loadSessionHistoryEvidence(engine, sessionPath, options.sessionId)).messages;
 
   try {
     if (await looksLikePiSessionFile(sessionPath)) {
@@ -125,12 +127,7 @@ export async function loadSessionHistoryMessages(engine, explicitPath) {
         ? engine.openSessionManagerAtCurrentBranch(sessionPath, path.dirname(sessionPath))
         : SessionManager.open(sessionPath, path.dirname(sessionPath));
       const branch = manager.getBranch();
-      const messages = [];
-      for (const entry of branch) {
-        const message = historyMessageFromEntry(entry);
-        if (message) messages.push(message);
-      }
-      return messages.map(projectSessionMessageForDisplay);
+      return projectBranchHistory(branch, manager.getSessionId());
     }
   } catch {
     // 旧文件或损坏文件继续走兼容读取，不让历史页直接空白。
@@ -157,6 +154,35 @@ export async function loadSessionHistoryMessages(engine, explicitPath) {
   }
 
   return [];
+}
+
+function projectBranchHistory(entries: any[], sessionId: string) {
+  const correlations = collectDesktopInputCorrelations(entries, sessionId);
+  return entries.map(historyMessageFromEntry).filter(Boolean).map(message => projectSessionMessageForDisplay({
+    ...message, ...(message.role === 'user' ? correlations.get(message.id) || {} : {}),
+  }));
+}
+
+/** 对账严格读取：不修复文件/manifest，不采用全 JSONL 或旧历史猜测分支。 */
+export async function loadSessionHistoryEvidence(engine: any, sessionPath: string, requestedSessionId?: string) {
+  const unavailable = (diagnostic: string) => ({ messages: [] as any[], complete: false, diagnostic });
+  try {
+    const sessionId = requestedSessionId || engine.getSessionIdForPath?.(sessionPath);
+    if (!sessionId || typeof engine.getSessionBranchHead !== 'function') return unavailable('session_identity_unavailable');
+    const manifest = engine.getSessionManifest?.(sessionId);
+    if (manifest?.currentLocator?.path !== sessionPath) return unavailable('session_identity_mismatch');
+    const branchHead = engine.getSessionBranchHead(sessionId);
+    if (!branchHead) return unavailable('branch_head_unavailable');
+    const raw = await fs.readFile(sessionPath, 'utf8');
+    const entries = raw.split('\n').filter(line => line.trim()).map(line => JSON.parse(line));
+    const headers = entries.filter(entry => entry?.type === 'session');
+    if (headers.length !== 1 || headers[0].id !== sessionId || headers[0].version !== 3) return unavailable('session_schema_or_identity_unverified');
+    const projection = projectCurrentSessionBranchEntries(entries, { branchHead, filePath: sessionPath });
+    if (projection.legacySyntheticIds) return unavailable('legacy_branch_unverified');
+    const byId = new Map(entries.filter(entry => entry?.id).map(entry => [entry.id, entry]));
+    const branch = projection.lineage.map(entry => byId.get(entry.id));
+    return { messages: projectBranchHistory(branch, sessionId), complete: true, diagnostic: null };
+  } catch { return unavailable('branch_read_unverified'); }
 }
 
 function historyMessageFromEntry(entry) {

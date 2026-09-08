@@ -20,6 +20,8 @@ vi.mock('../../stores/session-actions', async () => {
 });
 
 vi.mock('../../services/stream-resume', () => ({
+  injectHandlers: vi.fn(),
+  injectWebSocketGetter: vi.fn(),
   requestStreamResume: vi.fn(),
 }));
 

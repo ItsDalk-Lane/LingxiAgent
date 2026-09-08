@@ -134,7 +134,9 @@
         "agents/{agentId}/memory/navigation.md",
         "agents/{agentId}/memory/tenets.json",
         "agents/{agentId}/memory/pinned-tenets-migration.receipt.json",
+        "agents/{agentId}/memory/pinned-recovery-operations/{operationId}.json",
         "agents/{agentId}/memory/pinned-migration-backup/{backupFile}",
+        "agents/{agentId}/memory/pinned-migration-backup/{operationId}/{backupFile}",
         "agents/{agentId}/memory/facts.md",
         "agents/{agentId}/memory/today.md",
         "agents/{agentId}/memory/week.md",
@@ -3630,8 +3632,8 @@
     {
       "sourceFile": "core/pinned-tenets-migration.ts",
       "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(prepared.targetPath, finalBytes)",
-      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+      "excerpt": "atomicWriteSync(options.targetPath, options.finalBytes)",
+      "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
       "storeId": "agent-memory",
       "exemptionId": null,
       "ordinal": 0
@@ -3640,16 +3642,7 @@
       "sourceFile": "core/pinned-tenets-migration.ts",
       "kind": "atomic-write",
       "excerpt": "atomicWriteSync(receiptPath(agentDir), JSON.stringify(receipt, null, 2) + \"\\n\")",
-      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
-      "storeId": "agent-memory",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/pinned-tenets-migration.ts",
-      "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(targetPath, finalBytes)",
-      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+      "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
       "storeId": "agent-memory",
       "exemptionId": null,
       "ordinal": 0
@@ -3657,8 +3650,17 @@
     {
       "sourceFile": "core/pinned-tenets-migration.ts",
       "kind": "copy-file",
-      "excerpt": "fs.copyFileSync(path.join(agentDir, source.file), dest)",
-      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+      "excerpt": "fs.copyFileSync(original, destination, fs.constants.COPYFILE_EXCL)",
+      "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
+      "storeId": "agent-memory",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "core/pinned-tenets-migration.ts",
+      "kind": "copy-file",
+      "excerpt": "fs.copyFileSync(sourcePath, destination, fs.constants.COPYFILE_EXCL)",
+      "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
       "storeId": "agent-memory",
       "exemptionId": null,
       "ordinal": 0
@@ -3666,8 +3668,8 @@
     {
       "sourceFile": "core/pinned-tenets-migration.ts",
       "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(backupDir, { recursive: true })",
-      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+      "excerpt": "fs.mkdirSync(directory, { recursive: true, mode: 0o700 })",
+      "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
       "storeId": "agent-memory",
       "exemptionId": null,
       "ordinal": 0
@@ -3675,8 +3677,35 @@
     {
       "sourceFile": "core/pinned-tenets-migration.ts",
       "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(path.dirname(prepared.targetPath), { recursive: true })",
-      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+      "excerpt": "fs.mkdirSync(directory, { recursive: true, mode: 0o700 })",
+      "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
+      "storeId": "agent-memory",
+      "exemptionId": null,
+      "ordinal": 1
+    },
+    {
+      "sourceFile": "core/pinned-tenets-migration.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(directory, { recursive: true, mode: 0o700 })",
+      "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
+      "storeId": "agent-memory",
+      "exemptionId": null,
+      "ordinal": 2
+    },
+    {
+      "sourceFile": "core/pinned-tenets-migration.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(directory, { recursive: true, mode: 0o700 })",
+      "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
+      "storeId": "agent-memory",
+      "exemptionId": null,
+      "ordinal": 3
+    },
+    {
+      "sourceFile": "core/pinned-tenets-migration.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(path.dirname(options.targetPath), { recursive: true })",
+      "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
       "storeId": "agent-memory",
       "exemptionId": null,
       "ordinal": 0
@@ -3685,25 +3714,16 @@
       "sourceFile": "core/pinned-tenets-migration.ts",
       "kind": "mkdir",
       "excerpt": "fs.mkdirSync(path.dirname(receiptPath(agentDir)), { recursive: true })",
-      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+      "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
       "storeId": "agent-memory",
       "exemptionId": null,
       "ordinal": 0
     },
     {
       "sourceFile": "core/pinned-tenets-migration.ts",
-      "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(path.dirname(targetPath), { recursive: true })",
-      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
-      "storeId": "agent-memory",
-      "exemptionId": null,
-      "ordinal": 0
-    },
-    {
-      "sourceFile": "core/pinned-tenets-migration.ts",
-      "kind": "rename",
-      "excerpt": "fs.renameSync(filePath, path.join(agentDir, to))",
-      "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+      "kind": "remove-path",
+      "excerpt": "fs.unlinkSync(original)",
+      "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
       "storeId": "agent-memory",
       "exemptionId": null,
       "ordinal": 0
@@ -3711,7 +3731,7 @@
     {
       "sourceFile": "core/pinned-tenets-recovery.ts",
       "kind": "atomic-write",
-      "excerpt": "atomicWriteSync(receiptPath, JSON.stringify(receipt, null, 2) + \"\\n\")",
+      "excerpt": "atomicWriteSync(operationPath(dir, receipt.operationId!), JSON.stringify(receipt, null, 2) + \"\\n\")",
       "reason": "Restores approved archived pinned items and writes the recovery receipt.",
       "storeId": "agent-memory",
       "exemptionId": null,
@@ -3720,7 +3740,16 @@
     {
       "sourceFile": "core/pinned-tenets-recovery.ts",
       "kind": "mkdir",
-      "excerpt": "fs.mkdirSync(path.dirname(receiptPath), { recursive: true })",
+      "excerpt": "fs.mkdirSync(backupDir,{recursive:true,mode:0o700})",
+      "reason": "Restores approved archived pinned items and writes the recovery receipt.",
+      "storeId": "agent-memory",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "core/pinned-tenets-recovery.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(path.dirname(operationPath(dir, receipt.operationId!)), { recursive: true })",
       "reason": "Restores approved archived pinned items and writes the recovery receipt.",
       "storeId": "agent-memory",
       "exemptionId": null,

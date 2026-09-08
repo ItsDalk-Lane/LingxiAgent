@@ -656,7 +656,12 @@
     "queuedSendFailed": "Failed to send the queued message",
     "queuedRetry": "Retry",
     "queuedInsertWaiting": "Waiting for the current reply to start — try again in a moment",
-    "queuedDelete": "Cancel this queued message"
+    "queuedEditUnavailable": "This message has entered sending or is no longer editable. Check its delivery status first.",
+    "queuedDelete": "Cancel this queued message",
+    "deliveryChecking": "Result unknown, checking",
+    "deliveryUnknown": "Result unknown, verification incomplete",
+    "deliveryRunUnknown": "Message received, run result still unknown",
+    "recheckDelivery": "Check again"
   },
   "agentReview": {
     "running": "Reviewing this Session",

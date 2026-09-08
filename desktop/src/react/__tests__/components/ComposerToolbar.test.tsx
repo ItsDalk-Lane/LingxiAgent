@@ -127,4 +127,18 @@ describe('ComposerToolbar', () => {
     expect(container.querySelector(`.${inputStyles['send-btn']}`)).toBeNull();
   });
 
+  it('X2-12：聊天工具栏不渲染语音输入或旧前端听写组件', () => {
+    const { container } = renderBar();
+    const controls = Array.from(container.querySelectorAll('button, [role="button"]'));
+    const labels = controls.map(control => [
+      control.getAttribute('title'),
+      control.getAttribute('aria-label'),
+      control.getAttribute('data-testid'),
+      control.textContent,
+    ].filter(Boolean).join(' ')).join('\n');
+
+    expect(labels).not.toMatch(/voice|dictation|microphone|语音输入|听写/i);
+    expect(container.querySelector('[data-testid*="voice"], [data-testid*="dictation"], [data-testid*="microphone"]')).toBeNull();
+  });
+
 });

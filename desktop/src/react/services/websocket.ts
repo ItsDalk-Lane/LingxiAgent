@@ -30,6 +30,9 @@ import {
 } from './terminal-client';
 import { configureBackgroundProcessWebSocketGetter } from './background-process-control';
 import {
+  composerOriginConnectionKey,
+  reconcilePendingComposerSessions,
+  unresolvedComposerSessionPaths,
   noteComposerConnectionClosed,
   noteComposerConnectionOpened,
 } from './composer-send-coordinator';
@@ -127,8 +130,10 @@ async function openConnectionWebSocket(connection: ServerConnection): Promise<vo
 
   const url = buildConnectionWsUrl(connection, '/ws', { wsTicket });
   _ws = new WebSocket(url);
+  const socket = _ws;
 
   _ws.onopen = () => {
+    if (_ws !== socket) return;
     _wsRetryDelay = 1000;
     _wsRetryCount = 0;
     // 连接代次递增：旧代次上准备中的发送在提交复核时会被拒绝（F2）。
@@ -143,7 +148,8 @@ async function openConnectionWebSocket(connection: ServerConnection): Promise<vo
 
     const s = useStore.getState();
     requestTerminalSnapshotForCurrentSession(s);
-    const streamingPaths = resolveStreamingSessionResumeTargets(s);
+    const streamingPaths = [...new Set([...resolveStreamingSessionResumeTargets(s), ...unresolvedComposerSessionPaths(composerOriginConnectionKey(connection))])];
+    reconcilePendingComposerSessions();
     if (streamingPaths.length > 0) {
       const myVersion = ++_wsResumeVersion;
       Promise.resolve().then(async () => {
@@ -173,16 +179,18 @@ async function openConnectionWebSocket(connection: ServerConnection): Promise<vo
   };
 
   _ws.onmessage = (event: MessageEvent) => {
+    if (_ws !== socket) return;
     try {
       const msg = JSON.parse(event.data);
       recordResourceEventCursor(msg);
-      handleServerMessage(msg);
+      handleServerMessage(msg, composerOriginConnectionKey(connection));
     } catch (err) {
       console.error('[ws] message parse error:', err);
     }
   };
 
   _ws.onclose = () => {
+    if (_ws !== socket) return;
     setStatus('status.disconnected', false);
     // 断连后再不会有后续事件来清「等待助手」pending；streamingSessions 保留
     // （重连 resume 靠它圈目标），pending 必须就地全清，否则挂出永久指示器。

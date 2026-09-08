@@ -763,6 +763,23 @@
       "reason": "Reached via esbuild source module graph, imported by cli/data.ts (import-statement)."
     },
     {
+      "path": "core/desktop-input-correlation.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/desktop-session-submit.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/message-utils.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/desktop-session-submit.ts (import-statement); core/message-utils.ts (import-statement)."
+    },
+    {
       "path": "core/desktop-session-submit.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -793,11 +810,16 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "server/routes/sessions.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "hub/index.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); lib/session-collab/delivery.ts (import-statement); core/session-turn-actions.ts (import-statement); +3 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); lib/session-collab/delivery.ts (import-statement); core/session-turn-actions.ts (import-statement); +4 more importer(s)."
     },
     {
       "path": "core/device-registry.ts",
@@ -8622,6 +8644,23 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/pi-sdk/desktop-input-commit.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/pi-sdk/index.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/desktop-session-submit.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/index.ts (import-statement); core/desktop-session-submit.ts (import-statement)."
     },
     {
       "path": "lib/pi-sdk/index.ts",
@@ -128543,9 +128582,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10970,
+    "totalFiles": 10972,
     "byInputType": {
-      "source-graph": 761,
+      "source-graph": 763,
       "runtime-asset": 11,
       "nft-runtime-trace": 10198
     }

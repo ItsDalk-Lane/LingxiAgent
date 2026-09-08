@@ -23,6 +23,7 @@
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { StringDecoder } from "node:string_decoder";
 import { createModuleLogger } from "../../lib/debug-log.ts";
 
 const log = createModuleLogger("system-speech-asr");
@@ -61,6 +62,7 @@ const RECOGNITION_TIMEOUT_SECONDS = 120;
 const DEFAULT_PROCESS_TIMEOUT_MS = 150_000;
 const DEFAULT_KILL_GRACE_MS = 1_500;
 const MAX_STDOUT_BYTES = 4 * 1024 * 1024;
+const MAX_STDERR_BYTES = 64 * 1024;
 
 const HELPER_ENV_OVERRIDE = "LINGXI_SPEECH_HELPER_EXEC";
 const PROCESS_TIMEOUT_ENV = "LINGXI_SPEECH_PROCESS_TIMEOUT_MS";
@@ -70,6 +72,26 @@ const HELPER_RELATIVE_RESOURCES = ["speech", "macos", "lingxi-speech-helper"];
 function positiveIntFromEnv(env: any, name: string, fallback: number): number {
   const raw = Number(env?.[name]);
   return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : fallback;
+}
+
+/**
+ * 为一条子进程输出流创建独立 UTF-8 解码器。生产适配器与边界测试共用此入口，
+ * 确保多字节字符跨 data chunk 时不会由逐块 Buffer.toString() 产生替换字符。
+ */
+export function createSystemSpeechUtf8Decoder() {
+  const decoder = new StringDecoder("utf8");
+  let ended = false;
+  return {
+    write(chunk: Buffer): string {
+      if (ended) throw new Error("system speech UTF-8 decoder already ended");
+      return decoder.write(chunk);
+    },
+    end(): string {
+      if (ended) return "";
+      ended = true;
+      return decoder.end();
+    },
+  };
 }
 
 // ---------- helper 路径解析（桌面路径合同，参照 macos-cua-provider 的既有形状） ----------
@@ -326,21 +348,38 @@ export const systemSpeechRecognitionAdapter = {
       let child: ReturnType<typeof spawn> | null = null;
       let childClosed = false;
       let stdoutBytes = 0;
+      let stderrBytes = 0;
       let stdoutBuffer = "";
       let stderrBuffer = "";
       let pendingLine = "";
+      const stdoutDecoder = createSystemSpeechUtf8Decoder();
+      const stderrDecoder = createSystemSpeechUtf8Decoder();
+      let stdoutDecoderEnded = false;
+      let stderrDecoderEnded = false;
       let timeoutTimer: NodeJS.Timeout | null = null;
       let killTimer: NodeJS.Timeout | null = null;
 
-      const resultFromPayload = (parsed: any) => {
-        const text = String(parsed?.text ?? "").trim();
+      const resultFromPayload = (parsed: any): Settlement => {
+        if (typeof parsed?.text !== "string") {
+          return {
+            kind: "error",
+            error: speechError(
+              SYSTEM_SPEECH_ERROR_CODES.INVALID_OUTPUT,
+              "helper 成功结果的 text 必须是字符串",
+            ),
+          };
+        }
+        const text = parsed.text.trim();
         return {
-          text,
-          ...(typeof parsed?.resultCode === "string" && parsed.resultCode
-            ? { resultCode: parsed.resultCode }
-            : (text ? {} : { resultCode: "EMPTY_RESULT" })),
-          ...(input.language ? { language: input.language } : {}),
-          ...(parsed?.durationMs ? { durationMs: Number(parsed.durationMs) } : {}),
+          kind: "result",
+          value: {
+            text,
+            ...(typeof parsed?.resultCode === "string" && parsed.resultCode
+              ? { resultCode: parsed.resultCode }
+              : (text ? {} : { resultCode: "EMPTY_RESULT" })),
+            ...(input.language ? { language: input.language } : {}),
+            ...(parsed?.durationMs ? { durationMs: Number(parsed.durationMs) } : {}),
+          },
         };
       };
 
@@ -403,11 +442,13 @@ export const systemSpeechRecognitionAdapter = {
         if (childClosed) return;
         childClosed = true;
         if (killTimer) { clearTimeout(killTimer); killTimer = null; }
+        finalizeStdoutDecoding();
+        finalizeStderrDecoding();
         if (!settlement) {
           const lastLine = lastNonEmptyLine(stdoutBuffer);
           const parsed = parseProtocolLine(lastLine);
           if (parsed?.ok === true) {
-            settlement = { kind: "result", value: resultFromPayload(parsed) };
+            settlement = resultFromPayload(parsed);
           } else if (parsed?.ok === false) {
             settlement = { kind: "error", error: errorFromStructured(parsed) };
           } else if (code === 0) {
@@ -435,10 +476,36 @@ export const systemSpeechRecognitionAdapter = {
         const parsed = parseProtocolLine(line);
         if (!parsed) return;
         if (parsed.ok === true) {
-          finish({ kind: "result", value: resultFromPayload(parsed) });
+          finish(resultFromPayload(parsed));
         } else {
           finish({ kind: "error", error: errorFromStructured(parsed) });
         }
+      };
+
+      const appendStdoutText = (text: string) => {
+        if (!text || settlement) return;
+        stdoutBuffer += text;
+        pendingLine += text;
+        let newlineIndex = pendingLine.indexOf("\n");
+        while (newlineIndex >= 0) {
+          const line = pendingLine.slice(0, newlineIndex);
+          pendingLine = pendingLine.slice(newlineIndex + 1);
+          settleFromStdoutLine(line);
+          if (settlement) return;
+          newlineIndex = pendingLine.indexOf("\n");
+        }
+      };
+
+      const finalizeStdoutDecoding = () => {
+        if (stdoutDecoderEnded) return;
+        stdoutDecoderEnded = true;
+        appendStdoutText(stdoutDecoder.end());
+      };
+
+      const finalizeStderrDecoding = () => {
+        if (stderrDecoderEnded) return;
+        stderrDecoderEnded = true;
+        stderrBuffer += stderrDecoder.end();
       };
 
       const onStdout = (chunk: Buffer) => {
@@ -454,23 +521,15 @@ export const systemSpeechRecognitionAdapter = {
           });
           return;
         }
-        const text = chunk.toString("utf-8");
-        stdoutBuffer += text;
-        pendingLine += text;
-        let newlineIndex = pendingLine.indexOf("\n");
-        while (newlineIndex >= 0) {
-          const line = pendingLine.slice(0, newlineIndex);
-          pendingLine = pendingLine.slice(newlineIndex + 1);
-          settleFromStdoutLine(line);
-          if (settlement) return;
-          newlineIndex = pendingLine.indexOf("\n");
-        }
+        appendStdoutText(stdoutDecoder.write(chunk));
       };
 
       const onStderr = (chunk: Buffer) => {
-        if (stderrBuffer.length < 64 * 1024) {
-          stderrBuffer += chunk.toString("utf-8");
-        }
+        if (stderrDecoderEnded || stderrBytes >= MAX_STDERR_BYTES) return;
+        const remaining = MAX_STDERR_BYTES - stderrBytes;
+        const accepted = chunk.length <= remaining ? chunk : chunk.subarray(0, remaining);
+        stderrBytes += chunk.length;
+        stderrBuffer += stderrDecoder.write(accepted);
       };
 
       const onAbort = () => {
@@ -514,7 +573,9 @@ export const systemSpeechRecognitionAdapter = {
       });
       child.on("close", onChildClose);
       child.stdout?.on("data", onStdout);
+      child.stdout?.once("end", finalizeStdoutDecoding);
       child.stderr?.on("data", onStderr);
+      child.stderr?.once("end", finalizeStderrDecoding);
 
       if (signal) signal.addEventListener("abort", onAbort, { once: true });
 

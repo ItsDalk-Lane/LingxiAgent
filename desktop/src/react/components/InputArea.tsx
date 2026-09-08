@@ -43,10 +43,17 @@ import { TenetApprovalBanner } from './input/TenetApprovalBanner';
 import { serializeEditor, insertFaithfulPasteAtSelection } from '../utils/editor-serializer';
 import { modelUnavailableMessageKey, type ComposerSendBundle } from './input/composer-send';
 import {
+  beginQueuedItemEdit,
+  cancelQueuedItemEdit,
+  saveQueuedItemEdit,
+  cancelQueueFlushIntent,
+  composerOriginConnectionKey,
+  type QueueFlushScope,
   cancelQueueItemSend,
   cancelSendLease,
   dispatchQueuedItem,
   hasInFlightSend,
+  reconcileComposerSession,
   requestQueueFlush,
   resolveQueuedInsertNowAction,
   sendWithLease,
@@ -456,6 +463,10 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   const pendingNewSession = useStore(s => s.pendingNewSession);
   const pendingSessionSwitchPath = useStore(s => s.pendingSessionSwitchPath);
   const currentSessionPath = useStore(s => s.currentSessionPath);
+  useEffect(() => {
+    if (currentSessionPath) void reconcileComposerSession(currentSessionPath);
+  }, [currentSessionPath]);
+  const currentTab = useStore(s => s.currentTab);
   const pendingDraftId = useStore(s => s.pendingDraftId);
   const currentAgentId = useStore(s => s.currentAgentId);
   const agents = useStore(s => s.agents);
@@ -2061,22 +2072,44 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     : undefined)) || EMPTY_QUEUED_TURN_INPUTS;
   const [editingQueuedId, setEditingQueuedId] = useState<string | null>(null);
   const [editQueuedText, setEditQueuedText] = useState('');
+  const editTargetRef = useRef<{ sessionPath: string; id: string } | null>(null);
+  const flushOwner = useRef({});
+  const flushScopeRef = useRef<QueueFlushScope | null>(null);
+  const flushOriginKey = composerOriginConnectionKey();
+  const handleQueuedEditCancel = useCallback(() => {
+    const target = editTargetRef.current;
+    if (target) cancelQueuedItemEdit(target.sessionPath, target.id);
+    editTargetRef.current = null;
+    setEditingQueuedId(null);
+  }, []);
+  // 归属 cleanup 不依赖队列更新，重复 effect 更新最新意图不会重新计时。
+  useEffect(() => {
+    const owner = flushOwner.current;
+    return () => {
+      const scope = flushScopeRef.current;
+      if (scope) cancelQueueFlushIntent(scope, owner);
+      flushScopeRef.current = null;
+      const target = editTargetRef.current;
+      if (target) cancelQueuedItemEdit(target.sessionPath, target.id);
+      editTargetRef.current = null;
+    };
+  }, [currentSessionPath, flushOriginKey, currentTab]);
 
   // 自动续发：会话回到空闲（上一轮回答结束）且没有阻塞态时，组件只发出调度意图。
   // 互斥、串行与失败原位保留由 composer-send-coordinator 持有——不随组件
   // 卸载/重挂载丢失，也不再「先移除队首再异步派发」（F2）。
   useEffect(() => {
-    if (!currentSessionPath) return;
-    if (effectiveStreaming || sending || modelSwitching || !connected) return;
+    if (!currentSessionPath || currentTab !== 'chat') return;
+    if (effectiveStreaming || modelSwitching || !connected) return;
     if (capabilityRefreshing || compactingStatus) return;
     if (pendingSessionSwitchPath) return;
     if (queuedTurnInputs.length === 0) return;
-    requestQueueFlush(currentSessionPath, {
+    flushScopeRef.current = requestQueueFlush(currentSessionPath, {
       loadVisionAuxiliaryConfig,
       t,
-      shouldSkipItem: (item) => item.id === editingQueuedId,
-    });
-  }, [capabilityRefreshing, compactingStatus, connected, currentSessionPath, editingQueuedId, effectiveStreaming, loadVisionAuxiliaryConfig, modelSwitching, pendingSessionSwitchPath, queuedTurnInputs, sending, t]);
+      shouldSkipItem: (item) => item.editing === true,
+    }, flushOwner.current);
+  }, [activeServerConnection, currentTab, capabilityRefreshing, compactingStatus, connected, currentSessionPath, editingQueuedId, effectiveStreaming, loadVisionAuxiliaryConfig, modelSwitching, pendingSessionSwitchPath, queuedTurnInputs, t]);
 
   const handleQueuedInsertNow = useCallback((item: QueuedTurnInput) => {
     const store = useStore.getState();
@@ -2113,24 +2146,30 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
 
   const handleQueuedDelete = useCallback((item: QueuedTurnInput) => {
     // 删除正在准备的队列项：取消在途准备并使租约失效，迟到读取结果不发送已删除内容（P3.4）。
-    cancelQueueItemSend(item.id);
+    cancelQueueItemSend(item.id, 'send_cancelled', { sessionPath: item.sessionPath, snapshotVersion: item.snapshotVersion ?? 1 });
     useStore.getState().removeQueuedTurnInput(item.sessionPath, item.id);
   }, []);
 
   const handleQueuedEditStart = useCallback((item: QueuedTurnInput) => {
+    const result = beginQueuedItemEdit(item.sessionPath, item.id);
+    if (result !== 'ok') {
+      useStore.getState().addToast(t('input.queuedEditUnavailable'), 'info', 4000);
+      return;
+    }
+    const previous = editTargetRef.current;
+    if (previous && previous.id !== item.id) cancelQueuedItemEdit(previous.sessionPath, previous.id);
+    editTargetRef.current = { sessionPath: item.sessionPath, id: item.id };
     setEditingQueuedId(item.id);
     setEditQueuedText(item.text);
-  }, []);
+  }, [t]);
 
   const handleQueuedEditSave = useCallback(() => {
-    if (!editingQueuedId) return;
-    // 编辑保存 = 新快照：取消在途准备（迟到结果不发送旧快照），版本由 store 递增。
-    // 文本逐字符保留；空白判空用修剪后的副本。
-    if (!editQueuedText.trim()) return;
-    cancelQueueItemSend(editingQueuedId);
-    useStore.getState().updateQueuedTurnInputText(useStore.getState().currentSessionPath || '', editingQueuedId, editQueuedText);
+    const target = editTargetRef.current;
+    if (!target) return;
+    if (saveQueuedItemEdit(target.sessionPath, target.id, editQueuedText) !== 'ok') return;
+    editTargetRef.current = null;
     setEditingQueuedId(null);
-  }, [editQueuedText, editingQueuedId]);
+  }, [editQueuedText]);
 
   // ── Stop ──
   const handleStop = useCallback(() => {
@@ -2324,7 +2363,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
           <div className={styles['queued-turn-list']} data-testid="queued-turn-list">
             {queuedTurnInputs.map(item => (
               <div key={item.id} className={styles['queued-turn-card']}>
-                {editingQueuedId === item.id ? (
+                {editingQueuedId === item.id && item.editing ? (
                   <>
                     <textarea
                       className={styles['queued-turn-edit']}
@@ -2337,7 +2376,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
                         }
                         if (e.key === 'Escape') {
                           e.preventDefault();
-                          setEditingQueuedId(null);
+                          handleQueuedEditCancel();
                         }
                       }}
                       rows={3}
@@ -2355,7 +2394,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
                       <button
                         type="button"
                         className={styles['queued-turn-icon-btn']}
-                        onClick={() => setEditingQueuedId(null)}
+                        onClick={handleQueuedEditCancel}
                       >
                         {t('common.cancel')}
                       </button>

@@ -25,6 +25,7 @@ interface ReviewTurnInput {
   displayMessage?: Record<string, unknown> | null;
   sessionRefs?: SessionReference[];
   clientMessageId?: string | null;
+  snapshotVersion?: number;
   images?: any[];
   videos?: any[];
   audios?: any[];
@@ -265,6 +266,7 @@ export class AgentReviewTurnCoordinator {
       videos: input.videos,
       audios: input.audios,
       clientMessageId: input.clientMessageId,
+      snapshotVersion: input.snapshotVersion,
       uiContext: input.uiContext,
       sessionFileRefs: input.sessionFileRefs,
       displayMessage: {

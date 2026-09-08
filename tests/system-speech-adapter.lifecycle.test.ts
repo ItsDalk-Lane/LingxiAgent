@@ -27,6 +27,17 @@ if (process.env.FAKE_HELPER_PID_FILE) {
   fs.writeFileSync(process.env.FAKE_HELPER_PID_FILE, String(process.pid));
 }
 function out(obj) { process.stdout.write(JSON.stringify(obj) + "\n"); }
+function writeBytes(stream, value, done) {
+  const bytes = Buffer.from(value, "utf8");
+  let index = 0;
+  const step = () => {
+    if (index >= bytes.length) { done(); return; }
+    stream.write(bytes.subarray(index, index + 1));
+    index += 1;
+    setTimeout(step, 1);
+  };
+  step();
+}
 switch (mode) {
   case "ok":
     out({ ok: true, protocol: 2, text: "你好世界", durationMs: 12 });
@@ -66,6 +77,19 @@ switch (mode) {
   case "exit-stderr-legacy":
     process.stderr.write("lingxi-speech-helper error: speech recognition permission denied\n");
     process.exit(2);
+    break;
+  case "bytewise-utf8":
+    writeBytes(process.stdout, JSON.stringify({ ok: true, protocol: 2, text: process.env.FAKE_HELPER_TEXT || "你好🙂é中英�" }) + "\n", () => process.exit(0));
+    break;
+  case "bytewise-no-newline":
+    writeBytes(process.stdout, JSON.stringify({ ok: true, protocol: 2, text: "无换行结尾🙂" }), () => process.exit(0));
+    break;
+  case "non-string-text":
+    out({ ok: true, protocol: 2, text: { forged: "success" } });
+    process.exit(0);
+    break;
+  case "bytewise-stderr":
+    writeBytes(process.stderr, "中文错误：识别器不可用", () => process.exit(2));
     break;
   default:
     process.stderr.write("unknown mode " + mode + "\n");
@@ -126,6 +150,53 @@ afterEach(() => {
 });
 
 describe("system speech adapter lifecycle（A06–A12）", () => {
+  it("R07-02/03/06：真实异步 helper 逐字节写 UTF-8，复杂正文无损且只结算一次", async () => {
+    let settleCount = 0;
+    const result = await systemSpeechRecognitionAdapter.transcribe(makeInput(), {
+      platform: "darwin", env: helperEnv("bytewise-utf8"),
+    }).then(value => {
+      settleCount += 1;
+      return value;
+    });
+    expect(result.text).toBe("你好🙂é中英�");
+    expect(settleCount).toBe(1);
+  });
+
+  it("R07-04：真实 helper 的无末尾换行 JSON 在 close 边界完整解码", async () => {
+    const result = await systemSpeechRecognitionAdapter.transcribe(makeInput(), {
+      platform: "darwin", env: helperEnv("bytewise-no-newline"),
+    });
+    expect(result.text).toBe("无换行结尾🙂");
+  });
+
+  it("R07-05：结构化成功中的非字符串 text 明确 INVALID_OUTPUT", async () => {
+    await expect(systemSpeechRecognitionAdapter.transcribe(makeInput(), {
+      platform: "darwin", env: helperEnv("non-string-text"),
+    })).rejects.toMatchObject({ code: SYSTEM_SPEECH_ERROR_CODES.INVALID_OUTPUT });
+  });
+
+  it("R07-08：中文 stderr 跨字节块仍保持可读且按失败结算", async () => {
+    await expect(systemSpeechRecognitionAdapter.transcribe(makeInput(), {
+      platform: "darwin", env: helperEnv("bytewise-stderr"),
+    })).rejects.toMatchObject({
+      code: SYSTEM_SPEECH_ERROR_CODES.PROCESS_FAILED,
+      message: expect.stringContaining("中文错误：识别器不可用"),
+    });
+  });
+
+  it("R07-07：两个真实并发 transcribe 的解码与缓冲互不污染", async () => {
+    const [left, right] = await Promise.all([
+      systemSpeechRecognitionAdapter.transcribe(makeInput(), {
+        platform: "darwin", env: helperEnv("bytewise-utf8", { FAKE_HELPER_TEXT: "左🙂通道" }),
+      }),
+      systemSpeechRecognitionAdapter.transcribe(makeInput(), {
+        platform: "darwin", env: helperEnv("bytewise-utf8", { FAKE_HELPER_TEXT: "右🌸通道" }),
+      }),
+    ]);
+    expect(left.text).toBe("左🙂通道");
+    expect(right.text).toBe("右🌸通道");
+  });
+
   it("A06：helper 正常 final 返回——不等待超时，stdout 可解析", async () => {
     const started = Date.now();
     const result = await systemSpeechRecognitionAdapter.transcribe(makeInput(), {

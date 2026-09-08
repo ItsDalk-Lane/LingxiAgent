@@ -8,8 +8,8 @@
  *      按通用形状规则维护「开启栈」：配对的原样保留；只有真正没有开启记录的
  *      未知闭标签才是协议残渣，仅在最终原始 assistant 文本边界清理。
  *   3. 转义与代码保护：`\<tag>`（任意标签形状）与行内代码/围栏代码块内的
- *      标签一律按字面文本处理，反斜杠随字面量保留到显示层
- *      （stripTagEscapes）一次性消费——任何中间层都不得吞掉受保护字面量。
+ *      标签一律按字面文本处理，反斜杠随 canonical source 原样保留；显示层直接
+ *      交给 Markdown 词法处理，任何中间层都不得额外吞掉受保护字面量。
  *
  * 三个扫描状态分开保存：协议块 openTag、未知标记栈 unknownStack、代码 code。
  *
@@ -154,28 +154,6 @@ function matchGenericTag(buf: string, pos: number): GenericTagMatch | "partial" 
     while (i < rest.length && !isSpace(rest[i]) && rest[i] !== ">") i += 1;
   }
   return { kind: selfClose ? "self-close" : "open", name, length: i };
-}
-
-/** 完整标签字面量（含反斜杠）→ 受保护文本；显示层用 stripTagEscapes 消费反斜杠。 */
-
-/** 显示层一次性消费转义反斜杠：`\` + 完整标记形状 → 标记字面量。与扫描器的
- * 转义判定同源（matchGenericTag），引号属性内的 > 不会被误当边界。幂等。 */
-export function stripTagEscapes(text: string): string {
-  let out = "";
-  let i = 0;
-  while (i < text.length) {
-    if (text[i] === "\\" && text[i + 1] === "<") {
-      const generic = matchGenericTag(text, i + 1);
-      if (generic && generic !== "partial") {
-        out += text.slice(i + 1, i + 1 + generic.length);
-        i += 1 + generic.length;
-        continue;
-      }
-    }
-    out += text[i];
-    i += 1;
-  }
-  return out;
 }
 
 export interface ReservedTagScannerOptions {

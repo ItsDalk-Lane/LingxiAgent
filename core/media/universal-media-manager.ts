@@ -849,24 +849,33 @@ export class UniversalMediaManager {
     if (!adapter) throw new Error("no speech generation provider available; configure a TTS model (e.g. openai tts-1) or use the system-speech provider on macOS");
 
     const batchId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    // F11/P8.2：唯一语音参数解析。供应商默认只取 speech 域 providerDefaults，
-    // 按逻辑 provider 身份索引（与设置页保存契约一致，不用 credentialProviderId
-    // 偷换配置归属）；优先级 = 显式输入 > 语音默认 > 协议默认（适配器收口）。
+    // R08：在观测、任务记录和 adapter 之前得到唯一的协议级最终参数。
+    // 供应商默认只按逻辑 provider 从 speech 域读取；modelId/groupId 只来自
+    // 已解析的 execution target，不能被 providerDefaults 改写。
     const speechProviderDefaults = target?.providerId
       ? this.getSpeechConfig()?.providerDefaults?.[target.providerId] || {}
       : {};
-    const effectiveSpeechParams = resolveSpeechParameters({ input, providerDefaults: speechProviderDefaults });
-    const params: Record<string, unknown> = {
+    const effectiveSpeechParams = resolveSpeechParameters({
+      protocolId: target.protocolId,
+      executionTarget: {
+        ...target.executionTarget,
+        protocolId: target.protocolId,
+        modelId: target.modelId,
+        model: target.model,
+        ...(target?.model?.groupId ? { groupId: target.model.groupId } : {}),
+      },
+      explicitInput: input,
+      speechProviderDefaults,
+    });
+    const params: Record<string, unknown> = Object.freeze({
       type: "speech",
       prompt: input.prompt,
       ...effectiveSpeechParams,
       ...(target?.providerId ? { providerId: target.providerId } : {}),
-      ...(target?.modelId ? { modelId: target.modelId, model: target.modelId } : (input.model ? { model: input.model } : {})),
-      ...(target?.protocolId ? { protocolId: target.protocolId } : {}),
+      ...(target?.modelId ? { model: target.modelId } : {}),
       ...(target?.credentialLaneId ? { credentialLaneId: target.credentialLaneId } : {}),
       ...(target?.credentialProviderId ? { credentialProviderId: target.credentialProviderId } : {}),
-      ...(target?.model?.groupId ? { groupId: target.model.groupId } : {}),
-    };
+    });
     const recorder = beginObservedModelCall({
       model: {
         provider: target.providerId,
@@ -897,13 +906,7 @@ export class UniversalMediaManager {
     };
     recorder.payloadCapture?.captureSemanticRequest({
       inputShape: "media_speech",
-      parameters: {
-        prompt: params.prompt,
-        ...(target?.modelId ? { model: target.modelId } : {}),
-        voice: params.voice,
-        ...(params.speed !== undefined ? { speed: params.speed } : {}),
-        ...(params.format !== undefined ? { format: params.format } : {}),
-      },
+      parameters: params,
       provenance: recorder.semanticInputProvenance,
     });
     let result;

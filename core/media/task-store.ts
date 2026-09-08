@@ -69,6 +69,71 @@ function deepClone(value) {
   return value == null ? value : structuredClone(value);
 }
 
+function fileSystemErrorCode(error: unknown): string {
+  const code = (error as NodeJS.ErrnoException)?.code;
+  return typeof code === "string" && code ? code : "FS_ERROR";
+}
+
+/**
+ * R09：同步 TTS 产物的共同校验原语。
+ *
+ * realpath 解析根目录和链接的真实目标，path.relative 证明目标仍在 canonical
+ * root 内，stat 再确认最终目标是普通文件。lstat 只描述链接本身，不能证明链接
+ * 指向哪里，因此不用于最终接受判断。返回值只带原文件名和错误码，避免泄漏
+ * canonical 绝对路径。
+ */
+export function validateSynchronousSpeechOutputs(
+  files: unknown,
+  generatedDir: unknown,
+): { ok: true; files: string[] } | { ok: false; error: string } {
+  if (typeof generatedDir !== "string" || !generatedDir.trim()) {
+    return { ok: false, error: "speech output generated dir is invalid" };
+  }
+  let realRoot: string;
+  try {
+    realRoot = fs.realpathSync(generatedDir);
+    if (!fs.statSync(realRoot).isDirectory()) {
+      return { ok: false, error: "speech output generated root is not a directory" };
+    }
+  } catch (error) {
+    return { ok: false, error: `speech output generated root is unavailable (${fileSystemErrorCode(error)})` };
+  }
+  if (!Array.isArray(files) || files.length === 0) {
+    return { ok: false, error: "speech generation returned no output files" };
+  }
+
+  const accepted: string[] = [];
+  for (const entry of files) {
+    if (typeof entry !== "string" || !entry.trim() || entry.includes("\0")) {
+      return { ok: false, error: "speech generation returned an invalid file entry" };
+    }
+    const file = entry;
+    // 当前 files[] 合同是 generated 根下的文件名；不借本修复新增子目录合同。
+    if (path.isAbsolute(file) || file === "." || file === ".." || path.basename(file) !== file) {
+      return { ok: false, error: `speech output has an invalid file name: ${file}` };
+    }
+    let realTarget: string;
+    try {
+      realTarget = fs.realpathSync(path.join(realRoot, file));
+    } catch (error) {
+      return { ok: false, error: `speech output file unavailable: ${file} (${fileSystemErrorCode(error)})` };
+    }
+    const relative = path.relative(realRoot, realTarget);
+    if (!relative || relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+      return { ok: false, error: `speech output escapes generated dir: ${file}` };
+    }
+    try {
+      if (!fs.statSync(realTarget).isFile()) {
+        return { ok: false, error: `speech output is not a regular file: ${file}` };
+      }
+    } catch (error) {
+      return { ok: false, error: `speech output file unavailable: ${file} (${fileSystemErrorCode(error)})` };
+    }
+    accepted.push(file);
+  }
+  return { ok: true, files: accepted };
+}
+
 // 这里刻意只做纯字符串归一，不走文件系统归一原语：比较的是 session JSONL 的
 // 定位路径（可能已经不存在，甚至属于另一台机器上的备份），一旦引入 realpath 就
 // 会平白多出磁盘 I/O，还会让 fork 的来源/目标映射依赖当下磁盘状态。
@@ -366,34 +431,16 @@ export class TaskStore {
       this.update(taskId, { status: "failed", submitState: "failed", failReason: reason });
       return { ok: false, error: reason };
     };
-    if (!Array.isArray(files) || files.length === 0) {
-      return fail("speech generation returned no output files");
-    }
-    for (const file of files) {
-      if (typeof file !== "string" || !file.trim()) {
-        return fail("speech generation returned an invalid file entry");
-      }
-      if (!this._isFileInsideGeneratedDir(file, generatedDir)) {
-        return fail(`speech output escapes generated dir: ${file}`);
-      }
-      if (!fs.existsSync(path.resolve(generatedDir, file))) {
-        return fail(`speech output file missing: ${file}`);
-      }
-    }
+    const validation = validateSynchronousSpeechOutputs(files, generatedDir);
+    if (validation.ok === false) return fail(validation.error);
     this.update(taskId, {
       status: "done",
       submitState: "completed",
       completedAt: new Date().toISOString(),
       failReason: null,
-      files: [...files],
+      files: [...validation.files],
     });
     return { ok: true, task: { ...this._tasks.get(taskId) } };
-  }
-
-  _isFileInsideGeneratedDir(file, generatedDir) {
-    const root = path.resolve(generatedDir);
-    const abs = path.resolve(root, file);
-    return abs === root || abs.startsWith(root + path.sep);
   }
 
   /**
@@ -412,14 +459,8 @@ export class TaskStore {
       const mode = task.deliveryMode || task.delivery?.mode;
       if (mode !== "response") continue;
       if (task.status !== "pending") continue;
-      const files = Array.isArray(task.files) ? task.files : [];
-      const allExist = files.length > 0 && files.every((file) => (
-        typeof file === "string"
-        && file.trim()
-        && this._isFileInsideGeneratedDir(file, generatedDir)
-        && fs.existsSync(path.resolve(generatedDir, file))
-      ));
-      if (allExist) {
+      const validation = validateSynchronousSpeechOutputs(task.files, generatedDir);
+      if (validation.ok === true) {
         this.update(task.taskId, {
           status: "done",
           submitState: "completed",
@@ -430,7 +471,7 @@ export class TaskStore {
         this.update(task.taskId, {
           status: "failed",
           submitState: "failed",
-          failReason: "speech output file missing after restart",
+          failReason: `speech output invalid after restart: ${validation.error}`,
         });
       }
       changed += 1;

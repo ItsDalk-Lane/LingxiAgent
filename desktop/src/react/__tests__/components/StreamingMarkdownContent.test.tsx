@@ -6,6 +6,7 @@ import path from 'node:path';
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { StreamingMarkdownContent } from '../../components/chat/StreamingMarkdownContent';
+import { MarkdownContent } from '../../components/chat/MarkdownContent';
 import { injectCopyButtons } from '../../utils/format';
 import { renderMarkdown } from '../../utils/markdown';
 import { renderMermaidDiagrams } from '../../utils/mermaid-renderer';
@@ -35,6 +36,98 @@ describe('StreamingMarkdownContent', () => {
     cleanup();
     vi.useRealTimers();
     vi.restoreAllMocks();
+  });
+
+  it('R05-01/09：围栏代码的转义标签在实时、终态和复制中保留原反斜杠', async () => {
+    const writeText = vi.fn(async () => undefined);
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } });
+    window.t = ((key: string) => key) as typeof window.t;
+    const source = '```text\n\\<tag> 与 \\</think>\n```';
+    const { container, rerender } = render(<StreamingMarkdownContent source={source} active />);
+
+    expect(container.querySelector('code')?.textContent).toBe('\\<tag> 与 \\</think>\n');
+    fireEvent.click(container.querySelectorAll<HTMLButtonElement>('.code-block-toolbar-btn')[1]);
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith('\\<tag> 与 \\</think>\n'));
+
+    rerender(<StreamingMarkdownContent source={source} active={false} />);
+    expect(container.querySelector('code')?.textContent).toBe('\\<tag> 与 \\</think>\n');
+  });
+
+  it('R05-02：行内代码中的闭标签和反斜杠不被协议解析或显示预处理删除', () => {
+    const source = '教学：`\\</think>` 与 `C:\\path\\<tag>`';
+    const { container } = render(<StreamingMarkdownContent source={source} active />);
+    expect(Array.from(container.querySelectorAll('code')).map(node => node.textContent)).toEqual([
+      '\\</think>',
+      'C:\\path\\<tag>',
+    ]);
+  });
+
+  it('R05-03/05：正文转义标签只由 Markdown 消费且同一 source 重渲染稳定', () => {
+    const source = '已知：\\<mood>平静\\</mood>；未知：\\<vendor:tag>内容\\</vendor:tag>';
+    const { container, rerender } = render(<StreamingMarkdownContent source={source} active />);
+    const first = container.querySelector('.md-content')?.innerHTML;
+    expect(container.textContent).toContain('<mood>平静</mood>');
+    expect(container.textContent).toContain('<vendor:tag>内容</vendor:tag>');
+    expect(container.querySelector('mood')).toBeNull();
+    expect(container.querySelector('vendor\\:tag')).toBeNull();
+    rerender(<StreamingMarkdownContent source={source} active={false} />);
+    expect(container.querySelector('.md-content')?.innerHTML).toBe(first);
+    expect(source).toBe('已知：\\<mood>平静\\</mood>；未知：\\<vendor:tag>内容\\</vendor:tag>');
+  });
+
+  it('R05-03：旧直测反例经真实组件按 Markdown 语义显示且普通反斜杠不变', () => {
+    const tagged = '\\</think>\\<b>x</b>与\\<custom/>';
+    const first = render(<StreamingMarkdownContent source={tagged} active={false} />);
+    expect(first.container.textContent?.trimEnd()).toBe('</think><b>x</b>与<custom/>');
+    expect(first.container.querySelector('b')).toBeNull();
+    first.unmount();
+
+    const ordinary = 'C:\\path 与 1 \\< 2';
+    const second = render(<StreamingMarkdownContent source={ordinary} active={false} />);
+    expect(second.container.textContent?.trimEnd()).toBe('C:\\path 与 1 < 2');
+    second.unmount();
+
+    const once = '\\</vendor:tail>';
+    const third = render(<StreamingMarkdownContent source={once} active={false} />);
+    expect(third.container.textContent?.trimEnd()).toBe('</vendor:tail>');
+    third.rerender(<StreamingMarkdownContent source={once} active={false} />);
+    expect(third.container.textContent?.trimEnd()).toBe('</vendor:tail>');
+  });
+
+  it('R05-06：同一 canonical source 的每个 delta 切分经实时组件后都收敛到同一显示结果', () => {
+    const canonical = '前\\<think>字面\\</think>；`\\</tag>`；后';
+    const expected = render(<StreamingMarkdownContent source={canonical} active={false} />);
+    const expectedHtml = expected.container.querySelector('.md-content')?.innerHTML;
+    expected.unmount();
+
+    for (let split = 1; split < canonical.length; split += 1) {
+      const view = render(<StreamingMarkdownContent source={canonical.slice(0, split)} active />);
+      view.rerender(<StreamingMarkdownContent source={canonical} active />);
+      view.rerender(<StreamingMarkdownContent source={canonical} active={false} />);
+      expect(view.container.querySelector('.md-content')?.innerHTML).toBe(expectedHtml);
+      view.unmount();
+    }
+    expect(canonical).toBe('前\\<think>字面\\</think>；`\\</tag>`；后');
+  });
+
+  it('R05-04：连续1到4个反斜杠按 Markdown 词法处理，不由组件额外删层', () => {
+    const source = String.raw`一：\<tag>；二：\\<tag>；三：\\\<tag>；四：\\\\<tag>`;
+    const expected = renderMarkdown(source);
+    const { container } = render(<StreamingMarkdownContent source={source} active={false} />);
+    expect(container.querySelector('.md-content')?.innerHTML).toBe(expected);
+    expect(source).toBe(String.raw`一：\<tag>；二：\\<tag>；三：\\\<tag>；四：\\\\<tag>`);
+  });
+
+  it('R05-10：超长纯文本降级直接转义 canonical source，旧 html-only 内容不被反推', () => {
+    const source = '代码 \\<tag> 和 \\</think>';
+    const active = render(<StreamingMarkdownContent source={source} active richTextCharLimit={1} />);
+    expect(active.container.textContent).toBe(source);
+    active.unmount();
+
+    const legacyHtml = '<p>旧内容 &lt;tag&gt;，来源已缺失</p>';
+    const direct = render(<MarkdownContent html={legacyHtml} />);
+    const legacy = render(<StreamingMarkdownContent html={legacyHtml} active={false} />);
+    expect(legacy.container.innerHTML).toBe(direct.container.innerHTML);
   });
 
   it('treats source as authoritative when a stale legacy html cache is also present', () => {

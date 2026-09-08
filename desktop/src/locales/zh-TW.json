@@ -657,7 +657,12 @@
     "queuedSendFailed": "排隊訊息發送失敗",
     "queuedRetry": "重試",
     "queuedInsertWaiting": "正在等待目前回答開始，請稍候再插入",
-    "queuedDelete": "撤銷這條排隊訊息"
+    "queuedEditUnavailable": "這則訊息已進入傳送流程或已無法編輯，請先核對傳送結果。",
+    "queuedDelete": "撤銷這條排隊訊息",
+    "deliveryChecking": "結果未知，正在核對",
+    "deliveryUnknown": "結果未知，核對未完成",
+    "deliveryRunUnknown": "訊息已接收，執行結果仍未知",
+    "recheckDelivery": "重新核對"
   },
   "agentReview": {
     "running": "正在審閱目前對話",
