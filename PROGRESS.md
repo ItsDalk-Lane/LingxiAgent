@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 272ecc708314d8f968931bb9e639e9ed169308ee  (2026-09-08 R01–R10 修复源码候选：分支 refactor/dismantle-and-voice-features)
+VERIFIED_SOURCE_SHA   = 4924ba5d41ded4fb37e12e3549878575ea685387  (2026-09-08 R01–R10 修复源码候选：分支 refactor/dismantle-and-voice-features)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1506,7 +1506,7 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 
 ## 2026-09-08 R01–R10 增量修复源码候选与审计封印
 
-- 固定源码候选：`272ecc708314d8f968931bb9e639e9ed169308ee`；基线 `89bc0b64bf0a9b84ef3532efaa66c23213affb70`；分支 `refactor/dismantle-and-voice-features`。候选源码 manifest SHA-256 为 `a342614cece3eba2c27e88561a71653e450114700d87c59e798808b25a8e9bf6`，提交后复算与 S11 受测工作树一致。
+- 固定源码候选：`4924ba5d41ded4fb37e12e3549878575ea685387`；基线 `89bc0b64bf0a9b84ef3532efaa66c23213affb70`；分支 `refactor/dismantle-and-voice-features`。候选源码 manifest SHA-256 为 `1f5514ea8ce975cac8b5223fb2e6c6367e25eae4b0276f3296607de285de05ff`，提交后复算与 S11 受测工作树一致。
 - R01–R10 联合冻结 25 文件 / 321 测试通过；typecheck exit 0；lint exit 0（9203 warnings）；客户端、合成签名服务端、speech helper 与 permissions 构建通过。原样全量在封印前为 13383 passed / 1 failed / 7 skipped，唯一失败是旧审计坐标正确拒绝新源码；排除该 seal 的补充全量为 13381 passed / 7 skipped、exit 0。逐命令原始日志和哈希见 `artifacts/f1-f12-repair/round2/`。
 - 用户在完成本地交付后明确授权提交并推送。本次按既有六文件流程推进审计坐标，不扩大 allowlist；封印提交后的独立 guard、矩阵和全量复验结果在后续同节记录。
 - 真实 macOS TCC/转写、真实供应商、Windows/Linux/其他架构及 Apple notarization 仍未执行或受凭证阻塞；本地证据不替代这些验证。聊天工具栏未增加语音输入组件，保留后端 ASR/TTS 与原生音频能力。
