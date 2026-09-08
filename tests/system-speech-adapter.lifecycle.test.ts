@@ -320,7 +320,8 @@ describe("system speech adapter lifecycle（A06–A12）", () => {
       LINGXI_DESKTOP_IS_PACKAGED: "1",
       LINGXI_DESKTOP_RESOURCES_PATH: resources,
     };
-    expect(resolveSystemSpeechHelperPath({ env: packagedEnv })).toBe(helperPath);
+    // 路径合同：解析结果统一 POSIX 斜杠形态（Windows 输入反斜杠也归一）。
+    expect(resolveSystemSpeechHelperPath({ env: packagedEnv })).toBe(helperPath.replace(/\\/g, "/"));
 
     // 打包但 Resources 缺失 helper：明确 HELPER_NOT_FOUND（安装损坏），
     // 且不得回退到 cwd 下偶然残留的 dev helper。
