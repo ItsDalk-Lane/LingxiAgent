@@ -15,7 +15,7 @@
 | U1：上游目标 | `c6d0405294be67cb134c2758f6472748ee73e2be` | openhanako `v0.447.4` |
 | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
 | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
-| VERIFIED_SOURCE_SHA | `7cf986236cb8ac5c2d22cce1e5882554a42cff28` | 2026-09-08 R01–R10 增量修复源码候选（分支 refactor/dismantle-and-voice-features）；源码 manifest 与 S11 受测树一致，联合冻结、类型、lint、构建与补充全量验证证据见 PROGRESS.md 最新条目 |
+| VERIFIED_SOURCE_SHA | `94c71d7afdcad8ef8be0ae930d5fbc3291aac976` | 2026-09-08 C01–C03 修复源码候选（分支 refactor/dismantle-and-voice-features）；源码 manifest edb36fef… 提交后复算一致，round2 交付 manifest 与 DELIVERY_MANIFEST 同树绑定，冻结/类型/lint/全量/构建/提交后/重建验证证据见 PROGRESS.md 最新条目与 artifacts/f1-f12-repair/round3-c01-c03/ |
 
 v0.1.35 仓库内的[功能 CI 记录](artifacts/release-v0.1.35/feature-ci-validation.json)
 对应 `2c835ac77afb1a73cd83816ad3d613297dc770a8`，不单独证明上述发布资料提交重新执行了

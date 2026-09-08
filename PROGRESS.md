@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 7cf986236cb8ac5c2d22cce1e5882554a42cff28  (2026-09-08 R01–R10 修复源码候选：分支 refactor/dismantle-and-voice-features)
+VERIFIED_SOURCE_SHA   = 94c71d7afdcad8ef8be0ae930d5fbc3291aac976  (2026-09-08 C01–C03 修复源码候选：分支 refactor/dismantle-and-voice-features)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -993,6 +993,13 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
 普通编辑不以推进封印为前置条件。旧坐标造成的失败须如实记录，继续完成其他可验证工作；
 需要提交才能完成的封印留待相应授权步骤。不得为使检查变绿而虚报坐标、扩大白名单，
 或删除 seal 文件与 guard 测试；退役门禁属于另需明确授权的治理变更。
+
+## 2026-09-08 C01–C03 修复源码候选与审计封印（round3）
+
+- 固定源码候选：`94c71d7afdcad8ef8be0ae930d5fbc3291aac976`；基线 `67dee5d2de9d3b9fc75ec5ef5c555e93c65b3ccd`；分支 `refactor/dismantle-and-voice-features`。候选源码 manifest SHA-256 为 `edb36fefbd8f59c2d848281ae65148bb37f26197f8207724d40698abd1f75240`，提交后独立检出复算一致；round2 交付 manifest（s12/s13 刷新）与 DELIVERY_MANIFEST（217/217）绑定同一棵树。
+- 修复内容：C01 服务端类型化拒绝回执（input_rejected）+ 客户端 rejected_before_acceptance 结算相位与每次尝试身份；C02 收据 backupDir 平台无关存储合同（core/pinned-tenets-backup-dir.ts）+ 旧 Windows 收据兼容解析；C03 round2 121 份原始审计日志按字节交付 + .gitignore 精确例外 + round3 证据/补丁重放/重建验证（证据测试含候选回退语义）。
+- 验证证据（绑定该候选树）：定向 59；round2 交付证据 10/10；受影响回归 313；冻结全量 npm test 13442 passed / 7 skipped / 0 实质失败（j25；A08 抖动单跑 13/13 绿）；typecheck ×3、lint 0 errors、build:client、build:server（一次性签名密钥）；提交后独立检出 4 文件 69/69 绿；候选交付重建（独立 clone + 增量补丁 + npm ci）69/69。逐命令日志与摘要：artifacts/f1-f12-repair/round3-c01-c03/。
+- 平台限制：真实 Windows 客户端、真实供应商、x64 打包实测保留 BLOCKED（详见 C01_C02_C03_TEST_MATRIX.json）。
 
 ### Known limitation（保留）
 
