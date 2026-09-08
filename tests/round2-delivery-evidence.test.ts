@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
@@ -66,12 +66,31 @@ function manifestSourceRef(manifest: any): string | null {
   return verified;
 }
 
-function sourceBytes(relative: string, commit: string | null): Buffer {
-  if (!commit) return fs.readFileSync(path.join(ROOT, relative));
-  return execFileSync("git", ["show", `${commit}:${relative}`], {
+function sourceContentsAtCommit(commit: string, paths: string[]): Map<string, Buffer> {
+  const result = spawnSync("git", ["cat-file", "--batch"], {
     cwd: ROOT,
-    maxBuffer: 16 * 1024 * 1024,
+    input: `${paths.map((relative) => `${commit}:${relative}`).join("\n")}\n`,
+    maxBuffer: 512 * 1024 * 1024,
   });
+  expect(result.error, result.error?.message).toBeUndefined();
+  expect(result.status, result.stderr.toString()).toBe(0);
+  const contents = new Map<string, Buffer>();
+  let offset = 0;
+  for (const relative of paths) {
+    const headerEnd = result.stdout.indexOf(0x0a, offset);
+    expect(headerEnd).toBeGreaterThan(offset);
+    const header = result.stdout.subarray(offset, headerEnd).toString("utf8");
+    const match = header.match(/^[0-9a-f]+ blob (\d+)$/);
+    expect(match, `${relative}: ${header}`).toBeTruthy();
+    const size = Number(match![1]);
+    const start = headerEnd + 1;
+    const end = start + size;
+    expect(result.stdout[end], `${relative}: cat-file record terminator`).toBe(0x0a);
+    contents.set(relative, Buffer.from(result.stdout.subarray(start, end)));
+    offset = end + 1;
+  }
+  expect(offset).toBe(result.stdout.length);
+  return contents;
 }
 
 describe("R10 round2 交付证据契约", () => {
@@ -110,8 +129,9 @@ describe("R10 round2 交付证据契约", () => {
     const sourceRef = manifestSourceRef(manifest);
     const rows = manifest.files.map((row: any) => row.path);
     expect(rows).toEqual(sourceRef ? sourcePathsAtCommit(sourceRef) : currentSourcePaths());
+    const committedContents = sourceRef ? sourceContentsAtCommit(sourceRef, rows) : null;
     for (const row of manifest.files) {
-      const content = sourceBytes(row.path, sourceRef);
+      const content = committedContents?.get(row.path) ?? fs.readFileSync(path.join(ROOT, row.path));
       expect(content.byteLength).toBe(row.bytes);
       expect(sha256(content)).toBe(row.sha256);
     }
