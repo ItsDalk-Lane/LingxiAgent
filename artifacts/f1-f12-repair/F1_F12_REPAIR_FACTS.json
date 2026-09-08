@@ -1,0 +1,593 @@
+{
+  "applicableSource": "89bc0b64bf0a9b84ef3532efaa66c23213affb70 worktree",
+  "replacedBy": "round2",
+  "status": "SUPERSEDED_HISTORICAL_DELIVERY",
+  "currentEntrypoints": [
+    "round2/R01_R10_REPAIR_REPORT.md",
+    "round2/R01_R10_TEST_MATRIX.json",
+    "round2/COMMAND_RESULTS.json",
+    "round2/PROGRESS.md"
+  ],
+  "productRequirement": "聊天工具栏上没有增加语音输入的组件是用户要求的",
+  "frontendDictation": {
+    "scope": "旧 F7 前端听写 / D01–D12 / X04",
+    "status": "SUPERSEDED_BY_PRODUCT_CHANGE",
+    "note": "不恢复旧前端听写流程，不称当前通过；不适用于保留的后端能力。"
+  },
+  "retainedCapabilities": [
+    "后端 system-speech 模型解析",
+    "上传转写",
+    "错误码",
+    "原生音频附件",
+    "当前快捷键",
+    "TTS/朗读",
+    "宿主授权桥"
+  ],
+  "evidencePolicy": "下方 historicalSnapshot 的旧基线、manifest、数字、PASS、签名或真机声明均仅为旧文档原述，不证明 round2。当前结果逐项读取 round2；最终 S11、补丁身份和源码摘要见 currentRound2Final。",
+  "legacyLogAvailability": [
+    {
+      "path": "logs/electron-node-bridge-load.txt",
+      "status": "UNAVAILABLE"
+    },
+    {
+      "path": "logs/helper-failclosed-smoke.txt",
+      "status": "UNAVAILABLE"
+    },
+    {
+      "path": "logs/swift-core-tests.txt",
+      "status": "UNAVAILABLE"
+    },
+    {
+      "path": "logs/full-vitest-final.txt",
+      "status": "UNAVAILABLE"
+    }
+  ],
+  "realEnvironmentVerification": {
+    "nativePermissionAndRecognition": "BLOCKED_NOT_AUTHORIZED_OR_NOT_VERIFIED",
+    "paidProviders": "BLOCKED_NO_CREDENTIALS",
+    "crossPlatform": "BLOCKED_NO_TARGET_ENVIRONMENT",
+    "realUserMigration": "BLOCKED_HOME_OWNERSHIP_AND_NO_DATA_AUTHORIZATION"
+  },
+  "historicalSnapshot": {
+    "planVersion": "1.0",
+    "repository": "ItsDalk-Lane/LingxiAgent",
+    "baselineHead": "fc4a6df7714a2a26c423be993147e4772b2883ea",
+    "baselineSource": "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202",
+    "executionHead": null,
+    "candidateCommit": null,
+    "worktreeManifestSha256": "b00c612941955a243945218e49d474b2dd4afc7fce37bdf98b7ebb60546571c5",
+    "worktreeFileCount": 104,
+    "userDataTouched": false,
+    "remoteWritesPerformed": false,
+    "generatedAt": "2026-09-07T22:30:00+08:00",
+    "environment": {
+      "platform": "darwin 25.6.0 arm64 (macOS)",
+      "node": "24.16.0",
+      "swiftToolchain": "CLT (no XCTest/swift-testing)",
+      "electron": "42.8.1 (devDependency)",
+      "signing": "throwaway keypair via scripts/artifact-keygen.mjs in /tmp (local validation only)",
+      "note": "真实用户数据/系统权限未触碰；零 commit/push"
+    },
+    "findings": [
+      {
+        "id": "F1",
+        "implementation": "IMPLEMENTED",
+        "automatedVerification": "PASSED",
+        "realEnvironmentVerification": "BLOCKED_NO_REAL_MACHINE_OR_CREDENTIALS",
+        "closure": "IMPLEMENTED",
+        "changedFiles": [
+          "desktop/src/react/components/input/composer-send.ts",
+          "desktop/src/react/services/composer-send-coordinator.ts",
+          "desktop/src/react/components/InputArea.tsx",
+          "desktop/src/react/stores/chat-slice.ts",
+          "desktop/src/react/stores/chat-types.ts",
+          "desktop/src/react/stores/input-slice.ts",
+          "desktop/src/react/services/ws-message-handler.ts"
+        ],
+        "testIds": [
+          "S01",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11"
+        ],
+        "evidence": [
+          "evidence/p2-p3-f1-f2.md"
+        ],
+        "limitations": [],
+        "evidenceScope": "HISTORICAL_ONLY_NOT_ROUND2_VERIFICATION"
+      },
+      {
+        "id": "F2",
+        "implementation": "IMPLEMENTED",
+        "automatedVerification": "PASSED",
+        "realEnvironmentVerification": "NOT_APPLICABLE_SYNTHETIC_WS_ONLY",
+        "closure": "IMPLEMENTED",
+        "changedFiles": [
+          "desktop/src/react/services/composer-send-coordinator.ts",
+          "desktop/src/react/components/InputArea.tsx",
+          "desktop/src/react/services/websocket.ts",
+          "desktop/src/react/services/ws-message-handler.ts",
+          "desktop/src/react/stores/chat-slice.ts"
+        ],
+        "testIds": [
+          "S02",
+          "S03",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "X01",
+          "X02",
+          "X15",
+          "X16"
+        ],
+        "evidence": [
+          "evidence/p2-p3-f1-f2.md",
+          "evidence/p9-regression-build.md"
+        ],
+        "limitations": [],
+        "evidenceScope": "HISTORICAL_ONLY_NOT_ROUND2_VERIFICATION"
+      },
+      {
+        "id": "F3",
+        "implementation": "IMPLEMENTED",
+        "automatedVerification": "PASSED",
+        "realEnvironmentVerification": "BLOCKED_REAL_USER_DATA_MIGRATION_FORBIDDEN",
+        "closure": "IMPLEMENTED",
+        "changedFiles": [
+          "core/pinned-tenets-migration.ts",
+          "core/pinned-tenets-recovery.ts",
+          "scripts/pinned-tenets-recovery.mjs",
+          "lib/memory/tenets.ts",
+          "lib/tools/pinned-memory.ts",
+          "shared/persistence/store-registry.ts"
+        ],
+        "testIds": [
+          "M01",
+          "M02",
+          "M03",
+          "M04",
+          "M05",
+          "M06",
+          "M07",
+          "M08",
+          "M09",
+          "M12",
+          "M13",
+          "M15",
+          "M16",
+          "M17",
+          "M18",
+          "M19",
+          "M20"
+        ],
+        "evidence": [
+          "evidence/p1-f9-f3.md",
+          "PINNED_TENETS_RECOVERY_GUIDE.md"
+        ],
+        "limitations": [],
+        "evidenceScope": "HISTORICAL_ONLY_NOT_ROUND2_VERIFICATION"
+      },
+      {
+        "id": "F4",
+        "implementation": "IMPLEMENTED",
+        "automatedVerification": "PASSED",
+        "realEnvironmentVerification": "BLOCKED_NO_REAL_MACHINE_OR_CREDENTIALS",
+        "closure": "IMPLEMENTED",
+        "changedFiles": [
+          "desktop/speech-permissions.cjs",
+          "desktop/native/LingxiSpeechPermissions/speech_permissions.mm",
+          "desktop/native/LingxiSpeechPermissions/binding.gyp",
+          "scripts/build-speech-permissions.mjs",
+          "desktop/main.cjs",
+          "desktop/preload.cjs",
+          "desktop/src/react/types.ts",
+          "desktop/src/react/components/InputArea.tsx",
+          ".github/workflows/build.yml",
+          "scripts/resign-adhoc.cjs",
+          "package.json"
+        ],
+        "testIds": [
+          "A01",
+          "A02",
+          "A03",
+          "A04",
+          "A05",
+          "A15",
+          "A16"
+        ],
+        "evidence": [
+          "evidence/p4-f4-f5-f6.md",
+          "logs/electron-node-bridge-load.txt",
+          "logs/helper-failclosed-smoke.txt"
+        ],
+        "limitations": [
+          "真实 TCC 弹窗流转 BLOCKED；Electron 加载已补验通过"
+        ],
+        "evidenceScope": "HISTORICAL_ONLY_NOT_ROUND2_VERIFICATION"
+      },
+      {
+        "id": "F5",
+        "implementation": "IMPLEMENTED",
+        "automatedVerification": "PASSED",
+        "realEnvironmentVerification": "BLOCKED_NO_REAL_MACHINE_OR_CREDENTIALS",
+        "closure": "IMPLEMENTED",
+        "changedFiles": [
+          "desktop/native/LingxiSpeechHelper/Package.swift",
+          "desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/",
+          "desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechHelper/LingxiSpeechHelperMain.swift",
+          "desktop/native/LingxiSpeechHelper/Tests/LingxiSpeechCoreRunner/CoordinatorTestRunner.swift"
+        ],
+        "testIds": [
+          "A05",
+          "A06",
+          "A07",
+          "A08",
+          "A09",
+          "A10",
+          "A11",
+          "A12",
+          "A13"
+        ],
+        "evidence": [
+          "evidence/p4-f4-f5-f6.md",
+          "logs/swift-core-tests.txt"
+        ],
+        "limitations": [
+          "swift test 无 XCTest target（CLT 限制），runner 16/16 为准；真机识别 BLOCKED"
+        ],
+        "evidenceScope": "HISTORICAL_ONLY_NOT_ROUND2_VERIFICATION"
+      },
+      {
+        "id": "F6",
+        "implementation": "IMPLEMENTED",
+        "automatedVerification": "PASSED",
+        "realEnvironmentVerification": "BLOCKED_NO_REAL_MACHINE_OR_CREDENTIALS",
+        "closure": "IMPLEMENTED",
+        "changedFiles": [
+          "core/speech-recognition/system-speech-adapter.ts",
+          "server/routes/media.ts",
+          "core/speech-recognition-service.ts",
+          "scripts/compute-cli-closure.mjs",
+          "build/cli-runtime-closure.json"
+        ],
+        "testIds": [
+          "A06",
+          "A07",
+          "A08",
+          "A09",
+          "A10",
+          "A11",
+          "A12",
+          "A14",
+          "X05"
+        ],
+        "evidence": [
+          "evidence/p4-f4-f5-f6.md",
+          "tests/x05-speech-concurrency.test.ts"
+        ],
+        "limitations": [],
+        "evidenceScope": "HISTORICAL_ONLY_NOT_ROUND2_VERIFICATION"
+      },
+      {
+        "id": "F7",
+        "implementation": "SUPERSEDED_BY_PRODUCT_CHANGE",
+        "automatedVerification": "SUPERSEDED_BY_PRODUCT_CHANGE",
+        "realEnvironmentVerification": "BLOCKED_NO_REAL_MACHINE_OR_CREDENTIALS",
+        "closure": "SUPERSEDED_BY_PRODUCT_CHANGE",
+        "changedFiles": [
+          "desktop/src/react/components/InputArea.tsx",
+          "desktop/src/react/components/input/ComposerToolbar.tsx",
+          "desktop/src/react/utils/system-dictation.ts",
+          "desktop/src/locales/*.json",
+          "core/speech-recognition-service.ts",
+          "desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/SpeechTranscriber.swift"
+        ],
+        "testIds": [
+          "D01",
+          "D02",
+          "D03",
+          "D04",
+          "D05",
+          "D06",
+          "D07",
+          "D08",
+          "D09",
+          "D10",
+          "D11",
+          "D12",
+          "X04",
+          "zero-config",
+          "catalog-strict",
+          "error-code"
+        ],
+        "evidence": [
+          "evidence/p5-f7.md"
+        ],
+        "limitations": [
+          "真机全流程 BLOCKED（首次授权→录音→插入→发送）"
+        ],
+        "evidenceScope": "HISTORICAL_ONLY_NOT_ROUND2_VERIFICATION",
+        "historicalOriginalStatus": {
+          "implementation": "IMPLEMENTED",
+          "automatedVerification": "PASSED",
+          "closure": "IMPLEMENTED"
+        },
+        "note": "D01–D12/X04 前端流程已被产品需求取代；zero-config/catalog-strict/error-code 等后端能力保留，当前验收看 round2。"
+      },
+      {
+        "id": "F8",
+        "implementation": "IMPLEMENTED",
+        "automatedVerification": "PASSED",
+        "realEnvironmentVerification": "NOT_APPLICABLE_SYNTHETIC_ONLY",
+        "closure": "IMPLEMENTED",
+        "changedFiles": [
+          "shared/reserved-tag-stream.ts",
+          "core/events.ts",
+          "desktop/src/react/components/chat/StreamingMarkdownContent.tsx",
+          "desktop/src/react/utils/history-segment-sanitizer.ts"
+        ],
+        "testIds": [
+          "T01",
+          "T02",
+          "T03",
+          "T04",
+          "T05",
+          "T06",
+          "T07",
+          "T08",
+          "T09",
+          "T10",
+          "T11",
+          "T12",
+          "T13",
+          "T14",
+          "T15",
+          "T16"
+        ],
+        "evidence": [
+          "evidence/p6-f8.md"
+        ],
+        "limitations": [
+          "形状规则不能可靠识别所有未知成对思考内容（保守保留方向）"
+        ],
+        "evidenceScope": "HISTORICAL_ONLY_NOT_ROUND2_VERIFICATION"
+      },
+      {
+        "id": "F9",
+        "implementation": "IMPLEMENTED",
+        "automatedVerification": "PASSED",
+        "realEnvironmentVerification": "BLOCKED_REAL_USER_DATA",
+        "closure": "IMPLEMENTED",
+        "changedFiles": [
+          "core/pinned-tenets-migration.ts",
+          "lib/memory/tenets.ts",
+          "tests/tenets-source-quota.test.ts"
+        ],
+        "testIds": [
+          "M10",
+          "M11",
+          "M14",
+          "quota-01.."
+        ],
+        "evidence": [
+          "evidence/p1-f9-f3.md"
+        ],
+        "limitations": [],
+        "evidenceScope": "HISTORICAL_ONLY_NOT_ROUND2_VERIFICATION"
+      },
+      {
+        "id": "F10",
+        "implementation": "IMPLEMENTED",
+        "automatedVerification": "PASSED",
+        "realEnvironmentVerification": "NOT_APPLICABLE_SYNTHETIC_ONLY",
+        "closure": "IMPLEMENTED",
+        "changedFiles": [
+          "desktop/src/react/utils/editor-serializer.ts",
+          "desktop/src/react/components/InputArea.tsx",
+          "desktop/src/react/utils/message-parser.ts"
+        ],
+        "testIds": [
+          "P01",
+          "P02",
+          "P03",
+          "P04",
+          "P05",
+          "P06",
+          "P07",
+          "P08",
+          "P09",
+          "P10",
+          "P11",
+          "P12"
+        ],
+        "evidence": [
+          "evidence/p7-f10.md"
+        ],
+        "limitations": [],
+        "evidenceScope": "HISTORICAL_ONLY_NOT_ROUND2_VERIFICATION"
+      },
+      {
+        "id": "F11",
+        "implementation": "IMPLEMENTED",
+        "automatedVerification": "PASSED",
+        "realEnvironmentVerification": "BLOCKED_NO_REAL_MACHINE_OR_CREDENTIALS",
+        "closure": "IMPLEMENTED",
+        "changedFiles": [
+          "core/media/media-parameters.ts",
+          "core/media/universal-media-manager.ts",
+          "core/media-adapters/speech.ts"
+        ],
+        "testIds": [
+          "V01",
+          "V02",
+          "V03",
+          "V03b",
+          "V04",
+          "V05",
+          "V06"
+        ],
+        "evidence": [
+          "evidence/p8-f11-f12.md"
+        ],
+        "limitations": [
+          "真实云端短文本冒烟 BLOCKED（无凭证）"
+        ],
+        "evidenceScope": "HISTORICAL_ONLY_NOT_ROUND2_VERIFICATION"
+      },
+      {
+        "id": "F12",
+        "implementation": "IMPLEMENTED",
+        "automatedVerification": "PASSED",
+        "realEnvironmentVerification": "BLOCKED_NO_REAL_MACHINE_OR_CREDENTIALS",
+        "closure": "IMPLEMENTED",
+        "changedFiles": [
+          "core/media/task-store.ts",
+          "core/media/universal-media-manager.ts"
+        ],
+        "testIds": [
+          "V07",
+          "V08",
+          "V09",
+          "V10",
+          "V10b",
+          "V11",
+          "V12",
+          "V13"
+        ],
+        "evidence": [
+          "evidence/p8-f11-f12.md"
+        ],
+        "limitations": [
+          "真实云端产物可播放性 BLOCKED（无凭证）"
+        ],
+        "evidenceScope": "HISTORICAL_ONLY_NOT_ROUND2_VERIFICATION"
+      }
+    ],
+    "commands": [
+      {
+        "cmd": "npm run typecheck (tsc x3)",
+        "exit": 0,
+        "result": "pass",
+        "when": "2026-09-07 final"
+      },
+      {
+        "cmd": "npm run lint (eslint .)",
+        "exit": 0,
+        "result": "0 errors / 9096 warnings (pre-existing baseline warnings)",
+        "when": "2026-09-07"
+      },
+      {
+        "cmd": "npm test (vitest full)",
+        "exit": 0,
+        "result": "13243 passed / 0 failed / 7 skipped (13250)",
+        "log": "logs/full-vitest-final.txt"
+      },
+      {
+        "cmd": "npm run build:client",
+        "exit": 0,
+        "result": "vite build ok"
+      },
+      {
+        "cmd": "npm run build:server",
+        "exit": 0,
+        "result": "ok with throwaway LINGXI_SIGN_KEY(+KEYSET); seed startup smoke passed",
+        "note": "无官方签名凭证，本地验证密钥"
+      },
+      {
+        "cmd": "npm run build:speech-helper",
+        "exit": 0,
+        "result": "Swift build ok"
+      },
+      {
+        "cmd": "npm run pack (clean dist-speech, throwaway key)",
+        "exit": "见记录",
+        "result": "构建/打包/ad-hoc 重签名通过（speech 资源含 .node 已签名入 app）；Apple 公证步骤 BLOCKED(凭证)",
+        "log": "logs/electron-node-bridge-load.txt 为桥加载；pack 摘要在 evidence/p9"
+      },
+      {
+        "cmd": "swift run --package-path desktop/native/LingxiSpeechHelper lingxi-speech-core-tests",
+        "exit": 0,
+        "result": "16/16 coordinator checks passed",
+        "log": "logs/swift-core-tests.txt"
+      },
+      {
+        "cmd": "swift test --package-path desktop/native/LingxiSpeechHelper",
+        "exit": 1,
+        "result": "no tests found — CLT 无 XCTest，Package 用可执行 runner（如实记录）"
+      },
+      {
+        "cmd": "ELECTRON_RUN_AS_NODE=1 npx electron -e require(.node bridge)",
+        "exit": 0,
+        "result": "exports 可枚举 / rawStatus=0 / dispose ok",
+        "log": "logs/electron-node-bridge-load.txt"
+      },
+      {
+        "cmd": "dist-speech/.../lingxi-speech-helper transcribe (synthetic wav)",
+        "exit": 2,
+        "result": "PERMISSION_REQUIRED fail-closed（预期，无授权）",
+        "log": "logs/helper-failclosed-smoke.txt"
+      },
+      {
+        "cmd": "vitest tests/cli-closure-census / persistence-schema-tripwire / post-verification-audit-seal",
+        "exit": 0,
+        "result": "22+15+3 全绿；VERIFIED_SOURCE_SHA 未推进"
+      }
+    ],
+    "blockers": [
+      "真机 TCC：首次授权/授权后识别/拒绝/恢复全流程（需明确授权验收环境）",
+      "macOS x64 交叉构建与运行（无设备）",
+      "设备内识别断网验收（真机限制）",
+      "真实云端 TTS 一次短文本验证（未提供凭证；未复用他人凭证）",
+      "Windows/Linux 非 macOS 初始化回归（无设备）",
+      "Apple 公证（发布凭证缺失；不影响本地结构验证）",
+      "正式签名/发布流水（无授权，pack 用一次性本地密钥）"
+    ],
+    "outOfScopeObservations": [
+      "pinned-tenets-migration M10 在满载全量跑中偶发单例失败（不同子用例轮换；单跑恒绿；本任务未触碰该模块）——疑似既有 flaky，未据此改写记录",
+      "swift run 在后台任务管道下曾一次挂起；直接运行/文件输出复跑即过（管道交互，非代码缺陷）",
+      "eslint 全仓 9096 warnings 为既有风格基线"
+    ]
+  },
+  "currentRound2Final": {
+    "conclusion": "R01–R10 本地实现/联合验证关闭；受测源码候选提交后的审计封印状态以根目录 PROGRESS.md 和 Git guard 为准。整体发布验收仍受 notarization 凭证、真机/供应商/跨平台验收阻塞。",
+    "sourceManifestHash": "c418b3ef2fc475e40ed779f21b8e087b120834e9b673baf2e67c3758138d30d8",
+    "entrypoint": "round2/R01_R10_REPAIR_REPORT.md",
+    "jointTests": {
+      "files": 25,
+      "passed": 321
+    },
+    "fullTests": {
+      "passed": 13383,
+      "failed": 1,
+      "skipped": 7,
+      "exitCode": 1
+    },
+    "supplementExcludingBaselineSeal": {
+      "passed": 13381,
+      "skipped": 7,
+      "exitCode": 0
+    },
+    "lint": {
+      "exitCode": 0,
+      "warnings": 9203
+    },
+    "baselineSeal": {
+      "status": "PRESEAL_EXPECTED_FAILURE",
+      "cleanBaselinePassed": 2,
+      "cleanBaselineFailed": 1,
+      "committedDifferences": 113
+    },
+    "notarization": "BLOCKED_MISSING_APPLE_CREDENTIALS",
+    "realEnvironment": "BLOCKED",
+    "patch": "round2/patches/89bc0b64-to-r01-r10-source.patch",
+    "patchBytes": 426195,
+    "patchSha256": "459bfbef9e58102ae51be798694802d4b76fcbdf35ea6f1ecd3c53d91696a1a7",
+    "patchReplay": "VERIFIED"
+  }
+}

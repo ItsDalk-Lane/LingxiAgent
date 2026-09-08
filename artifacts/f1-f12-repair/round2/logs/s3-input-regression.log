@@ -1,0 +1,199 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ desktop/src/react/__tests__/components/InputArea.layout.test.ts > InputArea layout > keeps chat, composer, welcome, and bridge widths in their intended lanes 75ms
+ ✓ desktop/src/react/__tests__/components/InputArea.layout.test.ts > InputArea layout > keeps composer horizontal padding symmetric with the left inset 1ms
+ ✓ desktop/src/react/__tests__/components/InputArea.layout.test.ts > InputArea layout > keeps mobile drawers out of the flex layout while they close 0ms
+ ✓ desktop/src/react/__tests__/components/InputArea.layout.test.ts > InputArea layout > keeps the mobile model selector content-sized and aligned with icon buttons 0ms
+ ✓ desktop/src/react/__tests__/components/InputArea.layout.test.ts > InputArea layout > keeps the mention menu as compact as the Skill menu and gives primary names display priority 1ms
+ ✓ desktop/src/react/__tests__/components/InputArea.layout.test.ts > InputArea layout > keeps one transient row free, then pushes chat when the whole input surface reaches another row 0ms
+ ✓ desktop/src/react/__tests__/components/InputArea.layout.test.ts > InputArea layout > uses the measured input bottom inset as the chat panel and footer cut point 0ms
+ ✓ desktop/src/react/__tests__/components/InputArea.layout.test.ts > InputArea layout > floats the scroll-to-bottom FAB above the measured input card instead of a fixed offset (#1297) 0ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q01：队首附件读取挂起时，后续纯文本项不准备、不先发 75ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q02：A 已发送但回执未到时，传输租约阻止 B 发送 3ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q03：A 回执到但 run 未结束（含 run 进行中），B 均不发 3ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q04：model_turn_end / tool_end / mood_end 均不释放下一轮 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q05：A 正确 run_end 后，B 只发一次且顺序稳定（经 400ms 调度通道） 3ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q06：重复 effect / StrictMode 双调用同一调度，不重复提交 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q07：准备 A 时手动发送 C，C 不超越 B 3ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q08：A1 会话准备挂起，不阻塞空闲的 A2 会话 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q09：准备期间连接代次切换，旧租约不得向新连接发送旧载荷 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q10：旧 run 的迟到终态不结束新 run 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q11：编辑/删除正在准备的队列项，过期快照不得发送 3ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q12：立即插入与普通续发并发，不双发、不绕过预检 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q13：run 在插话准备期间结束/更换，不得插入错误的 run 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q14：agent review 排队项立即插入保留既有禁止语义，不静默丢失 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q15：abort 后先收到权威终态再续发；迟到媒体结果不重开旧 run 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q16：两个会话各自一次发送，投影与载荷互不混块 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-01/R03-02：旧 timer 到点读取最后一次编辑保护，不延长计时 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-07：A timer 未开始切 B，不自动发送 A 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-04：保存相同正文不改变版本和 blocked 状态 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-04：同 queueItemId 新版本不复用旧逻辑身份 0ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03-03：慢准备期间队列进入编辑，commit 同步拒绝旧快照 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-03/R03-04/X2-03：开始编辑立即取消慢 lease，保存只发新快照一次 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-05：取消编辑恢复 blocked 原快照且不自动解锁 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-06：同步提交窗口和已提交项返回 too_late 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-08/R03-12/X2-04：A preparing 后撤销前台意图不取消 lease，B 独立发送且草稿保留 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-09：旧 owner cleanup 不取消新挂载意图，同 owner 撤销后重挂仅发一次 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-10：删除旧慢项后创建新 lease，旧读取不释放新项租约 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-11：立即插入也不能越过 editing 1ms
+ ✓ desktop/src/react/__tests__/components/InputArea.composer-layout.test.tsx > InputArea composer layout > keeps only the editor and the send control inside the input card 119ms
+ ✓ desktop/src/react/__tests__/components/InputArea.composer-layout.test.tsx > InputArea composer layout > places the composer toolbar below the card but still inside the input stack/surface 5ms
+ ✓ desktop/src/react/__tests__/components/InputArea.welcome-placeholder.test.tsx > InputArea welcome placeholder > refreshes the welcome tip when locale data becomes ready after the input mounts 117ms
+ ✓ desktop/src/react/__tests__/components/InputArea.welcome-placeholder.test.tsx > InputArea welcome placeholder > uses a fresh random tip each time the welcome screen is re-entered 12ms
+ ✓ desktop/src/react/__tests__/components/InputArea.status-stack.test.tsx > InputArea status stack > places transient notices between context chips and the approval prompt 118ms
+ ✓ desktop/src/react/__tests__/components/InputArea.status-stack.test.tsx > InputArea status stack > shows one fresh-compact status when capability refresh is also compacting 7ms
+ ✓ desktop/src/react/__tests__/components/InputArea.status-stack.test.tsx > InputArea status stack > labels lossy local compaction as instant simple compaction 4ms
+ ✓ desktop/src/react/__tests__/components/InputArea.status-stack.test.tsx > InputArea status stack > opens legacy screenshot notice directories in the system file manager 8ms
+ ✓ desktop/src/react/__tests__/components/InputArea.status-stack.test.tsx > InputArea status stack > reveals the generated screenshot in the system file manager when the notice carries a file path 5ms
+ ✓ desktop/src/react/__tests__/components/InputArea.status-stack.test.tsx > InputArea status stack > does not show the composer context row for todos alone 3ms
+ ✓ desktop/src/react/__tests__/components/InputArea.status-stack.test.tsx > InputArea status stack > covers deleted-agent sessions with a read-only continuation action and progress bar 55ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > keeps desktop editor creation immediate while deferring mobile editor creation until after mount 119ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > consumes a rich URL paste through the TipTap paste hook before the default editor paste runs 7ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > selects the highlighted slash command on Enter without falling through to message send 18ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > replaces only the selected rich-document slash trigger when a skill is clicked 64ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+[input] failed to read video attachment Error: disk gone
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:414:49)
+    at Object.Mock [as readFileBase64] (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at prepareComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:350:40)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:524:12)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:628:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:420:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/InputArea.pending-identity.test.tsx > InputArea pending identity & sendable predicate (#2101) > R1: welcome 态 pendingDraftId 缺失时发送 > shows an explicit error toast instead of a silent no-op 74ms
+ ✓ desktop/src/react/__tests__/components/InputArea.pending-identity.test.tsx > InputArea pending identity & sendable predicate (#2101) > R5: badge-only 消息可发送 > does not fall into the empty-message guard when the composer only holds a skill badge 11ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+[input] failed to read audio attachment Error: disk gone
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:414:49)
+    at Object.Mock [as readFileBase64] (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at prepareComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:322:40)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:524:12)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:628:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:441:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/InputArea.file-mention.test.tsx > InputArea file mention workspace search > searches desk files when @ mention menu opens with a query and shows workspace results 244ms
+ ✓ desktop/src/react/__tests__/components/InputArea.focus-surface.test.tsx > InputArea focus-restore surface gating (#2045 symptom 3) > does not focus the editor on mobile when the trigger source is restore 151ms
+ ✓ desktop/src/react/__tests__/components/InputArea.focus-surface.test.tsx > InputArea focus-restore surface gating (#2045 symptom 3) > focuses the editor on mobile when the trigger source is an explicit gesture 55ms
+ ✓ desktop/src/react/__tests__/components/InputArea.draft-sync.test.tsx > InputArea draft sync > clears the live editor when clearDraft is called externally 70ms
+ ✓ desktop/src/react/__tests__/components/InputArea.draft-sync.test.tsx > InputArea draft sync > enables send after draft restore without requiring another keystroke 7ms
+ ✓ desktop/src/react/__tests__/components/InputArea.draft-sync.test.tsx > InputArea draft sync > keeps history editable but disables sending until an unavailable session model is replaced 6ms
+ ✓ desktop/src/react/__tests__/components/InputArea.draft-sync.test.tsx > InputArea draft sync > does not inject home draft text after pending activation when the session draft is empty 8ms
+ ✓ desktop/src/react/__tests__/components/InputArea.draft-sync.test.tsx > InputArea draft sync > restores a badge-only draft even though its serialized text is empty (#2101) 5ms
+ ✓ desktop/src/react/__tests__/components/InputArea.draft-sync.test.tsx > InputArea draft sync > does not wipe a skill badge already present in the editor when the restore effect re-runs (#2101) 5ms
+stderr | desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > keeps the send alive as file-only when reading image bytes fails (#1647)
+[input] failed to read image attachment Error: failed to read image attachment: /tmp/hana/session-files/pasted.png
+    at prepareComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:305:17)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:524:12)
+    at <WORKTREE>/desktop/src/react/components/InputArea.tsx:2022:7
+    at <WORKTREE>/desktop/src/react/components/InputArea.tsx:2062:5
+
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S01：普通发送视频预检失败，编辑器、草稿、附件与引用全部保留 72ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send 6ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S03：视频数超限与格式错误都是明确 blocked，不冒充成功 1ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > sends pasted image bytes through the platform API when window.hana is unavailable 78ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > keeps an async pending-session submission bound to its original session and leaves the new composer intact (#2078) 10ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > keeps the send alive as file-only when the text model has no auxiliary vision (#1647) 8ms
+ ✓ desktop/src/react/__tests__/components/InputArea.focus-surface.test.tsx > InputArea focus-restore surface gating (#2045 symptom 3) > focuses the editor on desktop (default surface) even when the trigger source is restore 56ms
+ ✓ desktop/src/react/__tests__/components/InputArea.focus-surface.test.tsx > InputArea Stop request contract > sends a session-scoped Stop even when active stream metadata is missing 1ms
+ ✓ desktop/src/react/__tests__/components/InputArea.focus-surface.test.tsx > InputArea Stop request contract > includes a known stream id so the server can reject a delayed Stop safely 0ms
+ ✓ desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx > 输入框无话筒/听写入口（F7 前端入口移除守卫） > 纯文字模型：不渲染话筒按钮、不做后端探测、快捷键不启动录音 113ms
+ ✓ desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx > 输入框无话筒/听写入口（F7 前端入口移除守卫） > 原生音频模型：仍无话筒按钮；快捷键录音只走语音附件发送，残留听写开关也不进转写 22ms
+stderr | desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > rejects spoofed video content before WebSocket send
+[input] failed to read video attachment Error: unsupported or oversized video: clip.mp4
+    at prepareComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:356:19)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:524:12)
+    at <WORKTREE>/desktop/src/react/components/InputArea.tsx:2022:7
+    at <WORKTREE>/desktop/src/react/components/InputArea.tsx:2062:5
+
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > inserts a toolbar-selected skill at the current selection when there is no slash trigger 17ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > saves rich list drafts as markdown text plus the editor document 6ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > uses Shift+Enter inside list items to create the next list item 3ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > leaves Shift+Enter outside lists to the editor default soft break behavior 3ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > handles welcome Enter inside TipTap before the editor inserts a newline 13ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > maps mobile insertParagraph beforeinput to the same send path as Enter 6ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > returns focus to the editor after the desktop file picker resolves 60ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > passes pasted clipboard files with filesystem paths through the drag attachment path 6ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:590:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:520:8)
+    at Module.sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:549:24)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:591:20
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试
+[input] websocket send failed Error: socket exploded
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:632:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:520:8)
+    at Module.sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:549:24)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:635:20
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > keeps the send alive as file-only when reading image bytes fails (#1647) 12ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > uses the chat-scoped auxiliary vision route for mobile image preflight 10ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > sends audio bytes natively for official MiMo audio models 7ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > uses the switched session model audio snapshot when sending recorded audio 6ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > starts recording from the app-local voice shortcut only on the focused chat page 6ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > ignores the app-local voice shortcut while settings is open 3ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > keeps audio attachments on the legacy text path for unsupported models 7ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > rejects video before send when the selected model does not support video 7ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > sends a valid video as an independent native media type for a supported provider 6ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > rejects spoofed video content before WebSocket send 5ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > sends ordinary attachments by fileId instead of using visible path text as the machine contract 7ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > interjects streaming attachment sends with the same message envelope as prompt sends 11ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > does not send while an agent switch session is still pending 4ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > binds Stop to the focused session current stream identity (#2078) 4ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:704:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:520:8)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:549:24)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:628:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:706:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S04：ws 不存在 / CONNECTING / CLOSING / CLOSED，明确结果、不清输入、不发消息 26ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S05：读文件期间会话删除/定位器变化/模型变更，重新验证后旧目标不误发 10ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S06：准备期间用户继续输入，原快照独立、新草稿不被清除或覆盖 61ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段 2ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S08：图片按既有规则退化为文件引用，提示保留、文件身份不丢 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S10：提交后断线无回执与回执超时，都标 delivery_unknown 且不自动重发 5ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S11：重连后经恢复/历史找到原 clientMessageId，合并不重复追加 3ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致 2ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S13：带首行空格与末尾换行的输入，快照逐字符保留 9ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > registers pasted image blob uploads as path-backed attachments without base64Data 8ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > compresses oversized pasted images before upload-blob 8ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > sends chat quoted selection through the existing prompt quote contract 6ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > adds an optimistic user message with a clientMessageId when sending a prompt 6ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > uploads mobile file-picker attachments through browser File API 9ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > compresses oversized mobile browser image files before upload-blob 8ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:862:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:520:8)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:549:24)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:628:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:865:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S14：首页 ensureSession 期间重复点击，只创建/提交一次 9ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S15：入队后改变界面选中的笔记本，已排队消息仍使用入队快照范围 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P07：全空白正文（无其他内容维度）不发，且不做破坏性清空 4ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P08：全空白正文但有附件 → 按已有内容维度发送，wire 保真、附件身份保留 7ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文 2ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03 InputArea 编辑点击接线 > R03-03：点击编辑同步取消慢附件，保存后仅提交新正文 416ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03 InputArea 编辑点击接线 > R03-05：点击取消保留原 blocked 状态与正文 23ms
+
+ Test Files  13 passed (13)
+      Tests  118 passed (118)
+   Start at  13:44:34
+   Duration  1.87s (transform 3.18s, setup 246ms, import 6.53s, tests 2.71s, environment 5.24s)
+

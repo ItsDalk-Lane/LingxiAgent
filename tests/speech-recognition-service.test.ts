@@ -397,4 +397,153 @@ describe("SpeechRecognitionService", () => {
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining("sf_missing"));
   });
+
+  // F7/P5.3：零配置本地听写——system-speech/system-speech 在用户从未「添加模型」
+  // 时也必须能解析到已注册系统适配器并完成转写（authType=none 的目录直通）。
+  it("resolves zero-config system-speech dictation through the real ProviderRegistry", async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-speech-zero-config-"));
+    try {
+      const providerRegistry = new ProviderRegistry(tmpDir);
+      providerRegistry.reload();
+
+      const sessionPath = path.join(tmpDir, "session.jsonl");
+      const voicePath = path.join(tmpDir, "voice.wav");
+      fs.writeFileSync(sessionPath, "{}\n");
+      fs.writeFileSync(voicePath, "RIFF");
+      const sessionFiles = new SessionFileRegistry();
+      const file = sessionFiles.registerFile({
+        sessionPath,
+        filePath: voicePath,
+        label: "voice.wav",
+        origin: "voice_input",
+        storageKind: "managed_cache",
+        presentation: "voice-input",
+        listed: false,
+      });
+      const transcribe = vi.fn(async () => ({ text: "zero-config ok" }));
+      const service = new SpeechRecognitionService({
+        providerRegistry,
+        resolveProviderCredentialsFresh: async () => ({}),
+        preferences: { getSpeechRecognitionConfig: () => ({ enabled: false }) },
+        sessionFiles,
+        emitEvent: vi.fn(),
+      });
+      service.registerAdapter({
+        id: "system-speech",
+        protocolId: "system-speech-recognition",
+        types: ["speechRecognition"],
+        transcribe,
+      });
+
+      const result = await service.transcribeAudio({
+        sessionId: "sess_zero",
+        sessionPath,
+        fileId: file.id,
+        providerId: "system-speech",
+        modelId: "system-speech",
+      });
+
+      expect(result).toMatchObject({
+        status: "ready",
+        text: "zero-config ok",
+        providerId: "system-speech",
+        modelId: "system-speech",
+      });
+      expect(transcribe).toHaveBeenCalledTimes(1);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  // F7/P5.3 反向护栏：目录直通只对 authType=none 的系统身份开放；
+  // api-key 云端供应商的候选目录模型在用户添加之前仍不可执行。
+  it("keeps catalog models of api-key providers non-executable until added", async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-speech-catalog-strict-"));
+    try {
+      const providerRegistry = new ProviderRegistry(tmpDir);
+      providerRegistry.reload();
+      expect(providerRegistry.getMediaModelCatalog("mimo", "speech_recognition").map((m: any) => m.id))
+        .toContain("mimo-v2.5-asr");
+
+      const service = new SpeechRecognitionService({
+        providerRegistry,
+        resolveProviderCredentialsFresh: resolveMimoCredentialsFresh,
+        preferences: { getSpeechRecognitionConfig: () => ({ enabled: false }) },
+        sessionFiles: new SessionFileRegistry(),
+        emitEvent: vi.fn(),
+      });
+      service.registerAdapter({
+        id: "mimo",
+        protocolId: "mimo-chat-completions-asr",
+        types: ["speechRecognition"],
+        transcribe: vi.fn(),
+      });
+
+      await expect(service.transcribeAudio({
+        sessionId: "sess_strict",
+        sessionPath: "/tmp/strict.jsonl",
+        fileId: "sf_any",
+        providerId: "mimo",
+        modelId: "mimo-v2.5-asr",
+      })).rejects.toThrow(/not found/);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  // F7/P5.3：适配器错误码必须沿 service→route→前端 链以可解析形式透出，
+  // 前端才能给出「被拒绝/helper 缺失/超时」的区分文案而不是统一「录音失败」。
+  it("carries adapter error codes through the transcription failure record", async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-speech-error-code-"));
+    try {
+      const sessionPath = path.join(tmpDir, "session.jsonl");
+      const voicePath = path.join(tmpDir, "voice.wav");
+      fs.writeFileSync(sessionPath, "{}\n");
+      fs.writeFileSync(voicePath, "RIFF");
+      const sessionFiles = new SessionFileRegistry();
+      const file = sessionFiles.registerFile({
+        sessionPath,
+        filePath: voicePath,
+        label: "voice.wav",
+        origin: "voice_input",
+        storageKind: "managed_cache",
+        presentation: "voice-input",
+        listed: false,
+      });
+      const service = new SpeechRecognitionService({
+        providerRegistry: makeProviderRegistry(),
+        resolveProviderCredentialsFresh: resolveMimoCredentialsFresh,
+        preferences: {
+          getSpeechRecognitionConfig: () => ({
+            enabled: true,
+            defaultModel: { provider: "mimo", id: "mimo-v2.5-asr" },
+          }),
+        },
+        sessionFiles,
+        emitEvent: vi.fn(),
+      });
+      service.registerAdapter({
+        id: "mimo",
+        protocolId: "mimo-chat-completions-asr",
+        types: ["speechRecognition"],
+        transcribe: vi.fn(async () => {
+          throw Object.assign(new Error("recognition timed out"), {
+            code: "SYSTEM_SPEECH_TIMEOUT",
+          });
+        }),
+      });
+
+      const result = await service.transcribeAudio({
+        sessionId: "sess_code",
+        sessionPath,
+        fileId: file.id,
+      });
+
+      expect(result.status).toBe("failed");
+      expect(result.error).toMatch(/^SYSTEM_SPEECH_TIMEOUT: /);
+      expect(result.error).toContain("recognition timed out");
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
 });

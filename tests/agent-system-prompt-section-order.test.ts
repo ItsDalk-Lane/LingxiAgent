@@ -32,7 +32,14 @@ function makeAgent(locale: string) {
   fs.mkdirSync(userDir, { recursive: true });
   fs.writeFileSync(path.join(productDir, "yuan", "lingxi.md"), "AGENTSMD-TEMPLATE-MARKER", "utf-8");
   fs.writeFileSync(path.join(userDir, "user.md"), "PROFILE-MARKER\n", "utf-8");
-  fs.writeFileSync(path.join(agentDir, "pinned.md"), "PINNED-MARKER\n", "utf-8");
+  fs.writeFileSync(path.join(agentDir, "memory", "tenets.json"), JSON.stringify({
+    schemaVersion: 1,
+    tenets: [{
+      id: "order-pinned-1", content: "PINNED-MARKER", priority: "high",
+      status: "active", source: "user_direct", sessionId: null,
+      createdAt: "2026-09-06T00:00:00.000Z", decidedAt: "2026-09-06T00:00:00.000Z",
+    }],
+  }, null, 2) + "\n", "utf-8");
   fs.writeFileSync(path.join(agentDir, "memory", "memory.md"), "MEMORY-MARKER\n", "utf-8");
 
   fs.writeFileSync(path.join(agentDir, "avatars", "agent.png"), Buffer.from("fake-avatar-bytes"));
@@ -87,7 +94,7 @@ describe("system prompt section order", () => {
       "## 你的样子",
       "## 工具使用纪律",
       "## 记忆使用规则",
-      "# 置顶记忆",
+      "# 置顶与原则",
       "MEMORY-MARKER",
       "Session started at:",
     ]);
@@ -107,7 +114,7 @@ describe("system prompt section order", () => {
       "## Your Appearance",
       "## Tool Usage Discipline",
       "## Memory Rules",
-      "# Pinned Memories",
+      "# Pinned Items & Principles",
       "MEMORY-MARKER",
       "Session started at:",
     ]);

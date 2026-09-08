@@ -12,6 +12,7 @@ import {
 import {
   normalizeImageGenerationConfig,
   normalizeVideoGenerationConfig,
+  normalizeSpeechGenerationConfig,
 } from "../preferences-manager.ts";
 import { TaskStore } from "./task-store.ts";
 import { Poller } from "./poller.ts";
@@ -21,7 +22,7 @@ import {
   normalizeMediaDelivery,
   retryImageTask,
 } from "./image-task-runner.ts";
-import { resolveMediaParameters } from "./media-parameters.ts";
+import { resolveMediaParameters, resolveSpeechParameters } from "./media-parameters.ts";
 import { withModelRequestAccounting } from "../../lib/llm/model-request-accounting.ts";
 import {
   beginObservedModelCall,
@@ -41,6 +42,7 @@ function hasAnyKey(source: Record<string, unknown>, keys: string[]): boolean {
 const log = createModuleLogger("media");
 const IMAGE_CAPABILITY = "image_generation";
 const VIDEO_CAPABILITY = "video_generation";
+const SPEECH_CAPABILITY = "speech_generation";
 
 // Schema id keeps the "image-gen" name for the same reason as this._dataDir
 // above (see the constructor comment): it is the persisted plugin-config
@@ -67,6 +69,23 @@ const VIDEO_GENERATION_CONFIG_SCHEMA = normalizePluginConfigSchema("video-gen", 
     defaultVideoModel: {
       type: "object",
       title: "默认视频模型",
+      properties: {
+        id: { type: "string" },
+        provider: { type: "string" },
+      },
+    },
+    providerDefaults: {
+      type: "object",
+      title: "per-provider 默认参数",
+    },
+  },
+});
+
+const SPEECH_GENERATION_CONFIG_SCHEMA = normalizePluginConfigSchema("speech-gen", {
+  properties: {
+    defaultSpeechModel: {
+      type: "object",
+      title: "默认语音模型",
       properties: {
         id: { type: "string" },
         provider: { type: "string" },
@@ -452,6 +471,38 @@ export class UniversalMediaManager {
     return structuredClone(normalized);
   }
 
+  _createSpeechConfigBridge() {
+    return {
+      get: (key) => {
+        const config = this.getSpeechConfig();
+        if (!key) return structuredClone(config);
+        return config[key];
+      },
+      getAll: () => {
+        return structuredClone(this.getSpeechConfig());
+      },
+      getSchema() {
+        return structuredClone(SPEECH_GENERATION_CONFIG_SCHEMA);
+      },
+    };
+  }
+
+  getSpeechConfig() {
+    return normalizeSpeechGenerationConfig(this._preferences.getSpeechGenerationConfig?.() || {});
+  }
+
+  setSpeechConfig(patch) {
+    const current = this.getSpeechConfig();
+    const next = { ...current };
+    for (const [key, value] of Object.entries(isObject(patch) ? patch : {})) {
+      if (value === undefined) delete next[key];
+      else next[key] = value;
+    }
+    const normalized = normalizeSpeechGenerationConfig(next);
+    this._preferences.setSpeechGenerationConfig?.(normalized);
+    return structuredClone(normalized);
+  }
+
   getVideoConfig() {
     return normalizeVideoGenerationConfig(this._preferences.getVideoGenerationConfig?.() || {});
   }
@@ -521,6 +572,13 @@ export class UniversalMediaManager {
     });
     this._registerBusHandlers(bus);
     this._poller.start();
+    // F12/P8.4：旧 pending 语音 response 任务在启动时幂等收尾（文件在→done、
+    // 缺→failed；不重新合成、不通知会话、不产生新模型调用）。图片/视频与
+    // session 投递的 pending 任务不在特例范围内。
+    const recovered = this._store.recoverSynchronousSpeechTasks({ generatedDir: this._generatedDir });
+    if (recovered > 0) {
+      this._log?.info?.(`[media] recovered ${recovered} synchronous speech task(s) after restart`);
+    }
   }
 
   stop({ keepStore = false }: any = {}) {
@@ -542,6 +600,7 @@ export class UniversalMediaManager {
       bus.handle("media:generate", (payload: any = {}) => this.generateMedia(payload)),
       bus.handle("media:generate-image", (payload: any = {}) => this.generateImageFromBus(payload)),
       bus.handle("media:generate-video", (payload: any = {}) => this.generateVideoFromBus(payload)),
+      bus.handle("media:generate-speech", (payload: any = {}) => this.generateSpeechFromBus(payload)),
       bus.handle("media:transcribe-audio", (payload: any = {}) => this.transcribeAudio(payload)),
       bus.handle("media-gen:register-adapter", (payload: any = {}, requestContext: any = null) => {
         const { adapter } = payload;
@@ -601,6 +660,7 @@ export class UniversalMediaManager {
       generatedDir: this._generatedDir,
       config: this._config,
       videoConfig: this._createVideoConfigBridge(),
+      speechConfig: this._createSpeechConfigBridge(),
       usageLedger: this._getUsageLedger(),
     };
   }
@@ -661,6 +721,7 @@ export class UniversalMediaManager {
       log: this._log,
       config: this._config,
       videoConfig: this._createVideoConfigBridge(),
+      speechConfig: this._createSpeechConfigBridge(),
       sessionId,
       sessionPath,
       sessionRef,
@@ -677,6 +738,9 @@ export class UniversalMediaManager {
     }
     if (kind === "video" || kind === "video_generation" || kind === "videoGeneration") {
       return this.generateVideoFromBus(payload);
+    }
+    if (kind === "speech_generation" || kind === "speechGeneration" || kind === "speech") {
+      return this.generateSpeechFromBus(payload);
     }
     if (kind === "audio" || kind === "speech_recognition" || kind === "transcription" || kind === "asr") {
       return this.transcribeAudio(payload);
@@ -746,6 +810,343 @@ export class UniversalMediaManager {
         deliveryTarget,
       } as any),
     );
+  }
+
+  async generateSpeechFromBus(payload: any = {}) {
+    const sessionTarget = normalizeSessionRefPayload(payload);
+    const { sessionId, sessionPath, sessionRef } = sessionTarget;
+    const inputSource = payload.input && isObject(payload.input)
+      ? { ...payload.input }
+      : payload;
+    const delivery = normalizeMediaDelivery(inputSource);
+    if (!sessionId && !sessionPath && !isResponseDelivery(delivery)) throw new Error("sessionId or sessionPath is required");
+    if (!textOrNull(inputSource.prompt)) throw new Error("prompt is required");
+    return this.submitSpeech({ input: { ...inputSource, delivery }, sessionId, sessionPath, sessionRef });
+  }
+
+  async submitSpeech({ input = {}, sessionId = null, sessionPath = null, sessionRef = null }: any = {}) {
+    if (!this._bus || !this._poller) throw new Error(t("plugin.imageGen.notInitialized"));
+    // 同 submitImage：媒体任务继承调用它的 Chat trace；独立提交铸新根。
+    return runWithModelTraceRoot(
+      { origin: "media", refs: { ...(sessionId ? { sessionId } : {}), ...(sessionPath ? { sessionPath } : {}) } },
+      () => this._submitSpeechWithinTrace(input, sessionId, sessionPath, sessionRef),
+    );
+  }
+
+  async _submitSpeechWithinTrace(input: any = {}, sessionId: any = null, sessionPath: any = null, sessionRef: any = null) {
+    if (!textOrNull(input.prompt)) throw new Error("prompt is required");
+    const delivery = normalizeMediaDelivery(input);
+    const responseDelivery = isResponseDelivery(delivery);
+    if (!sessionId && !sessionPath && !responseDelivery) throw new Error("sessionId or sessionPath is required");
+    const requestedProviderId = textOrNull(input.provider)
+      || textOrNull(this.getSpeechConfig()?.defaultSpeechModel?.provider);
+    await this._providers.refreshRuntimeMediaCapabilities?.({
+      ...(requestedProviderId ? { providerId: requestedProviderId } : {}),
+      capability: SPEECH_CAPABILITY,
+    });
+    const target = this._resolveSpeechTarget(input);
+    const adapter = target?.adapter || null;
+    if (!adapter) throw new Error("no speech generation provider available; configure a TTS model (e.g. openai tts-1) or use the system-speech provider on macOS");
+
+    const batchId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    // R08：在观测、任务记录和 adapter 之前得到唯一的协议级最终参数。
+    // 供应商默认只按逻辑 provider 从 speech 域读取；modelId/groupId 只来自
+    // 已解析的 execution target，不能被 providerDefaults 改写。
+    const speechProviderDefaults = target?.providerId
+      ? this.getSpeechConfig()?.providerDefaults?.[target.providerId] || {}
+      : {};
+    const effectiveSpeechParams = resolveSpeechParameters({
+      protocolId: target.protocolId,
+      executionTarget: {
+        ...target.executionTarget,
+        protocolId: target.protocolId,
+        modelId: target.modelId,
+        model: target.model,
+        ...(target?.model?.groupId ? { groupId: target.model.groupId } : {}),
+      },
+      explicitInput: input,
+      speechProviderDefaults,
+    });
+    const params: Record<string, unknown> = Object.freeze({
+      type: "speech",
+      prompt: input.prompt,
+      ...effectiveSpeechParams,
+      ...(target?.providerId ? { providerId: target.providerId } : {}),
+      ...(target?.modelId ? { model: target.modelId } : {}),
+      ...(target?.credentialLaneId ? { credentialLaneId: target.credentialLaneId } : {}),
+      ...(target?.credentialProviderId ? { credentialProviderId: target.credentialProviderId } : {}),
+    });
+    const recorder = beginObservedModelCall({
+      model: {
+        provider: target.providerId,
+        modelId: target.modelId,
+        api: target.protocolId,
+      },
+      source: { subsystem: "media", operation: "submit", surface: "tool", trigger: "user" },
+      attribution: {
+        kind: "session",
+        ...(sessionId ? { sessionId } : {}),
+        ...(sessionPath ? { sessionPath } : {}),
+      },
+      details: {
+        path: "media_speech_submit",
+        mediaType: "speech",
+      },
+      semanticInputProvenance: createSemanticInputProvenance("media_speech", [
+        ...(typeof params.prompt === "string" && params.prompt.length > 0 ? [provenanceSection(
+          { root: "parameters", path: ["prompt"] },
+          "media_prompt",
+          { role: "input", source: { type: "runtime", id: "media.prompt" } },
+        )] : []),
+      ]),
+    });
+    const observedSubmitCtx = {
+      ...this._submitContextForExecutionTarget(target.executionTarget),
+      modelCall: recorder,
+    };
+    recorder.payloadCapture?.captureSemanticRequest({
+      inputShape: "media_speech",
+      parameters: params,
+      provenance: recorder.semanticInputProvenance,
+    });
+    let result;
+    try {
+      result = await withModelRequestAccounting({
+        usageLedger: this._getUsageLedger(),
+        model: {
+          provider: target.providerId,
+          modelId: target.modelId,
+          api: target.protocolId,
+        },
+        usageContext: {
+          source: { subsystem: "media", operation: "submit", surface: "tool", trigger: "user" },
+          attribution: {
+            kind: "session",
+            ...(sessionId ? { sessionId } : {}),
+            ...(sessionPath ? { sessionPath } : {}),
+          },
+        },
+        metadata: { mediaType: "speech", ...observedModelCallLedgerMetadata(recorder) },
+      }, () => adapter.submit(params, observedSubmitCtx));
+    } catch (err) {
+      failObservedModelCall(recorder, err, { errorKind: "adapter_error" });
+      throw err;
+    }
+    if (!result?.taskId) {
+      const submitUnknown = new Error("speech generation submit failed with no task id");
+      failObservedModelCall(recorder, submitUnknown, { errorKind: "adapter_error" });
+      throw submitUnknown;
+    }
+    recorder.payloadCapture?.captureSemanticResponse({
+      response: {
+        media: {
+          taskId: result.taskId,
+          providerTaskId: typeof result?.providerTaskId === "string" && result.providerTaskId.trim()
+            ? result.providerTaskId
+            : null,
+          deferred: true,
+        },
+        completeness: "complete",
+      },
+    });
+    recorder.semanticResponseCompleted({
+      details: {
+        deferred: true,
+        providerTaskId: typeof result?.providerTaskId === "string" && result.providerTaskId.trim()
+          ? result.providerTaskId
+          : null,
+      },
+    });
+    recorder.endLogicalCall("ok");
+
+    this._store.add({
+      taskId: result.taskId,
+      adapterId: adapter.id,
+      ...(result.providerTaskId || result.adapterTaskId ? { adapterTaskId: result.providerTaskId || result.adapterTaskId } : {}),
+      batchId,
+      type: "speech",
+      prompt: input.prompt,
+      params,
+      sessionId,
+      sessionPath,
+      sessionRef,
+      deliveryMode: delivery.mode,
+      delivery,
+      ...(target?.providerId ? { providerId: target.providerId } : {}),
+      ...(target?.modelId ? { modelId: target.modelId } : {}),
+      ...(target?.protocolId ? { protocolId: target.protocolId } : {}),
+      ...(target?.credentialLaneId ? { credentialLaneId: target.credentialLaneId } : {}),
+      ...(target?.credentialProviderId ? { credentialProviderId: target.credentialProviderId } : {}),
+    });
+    if (result.files?.length) {
+      this._store.update(result.taskId, { files: result.files });
+    }
+
+    // F12/P8.3：response 投递的同步产物在返回之前完成终态化——文件必须
+    // 非空且真实存在于 generated 根目录，否则明确失败（不返回 ok=true 配
+    // 一个永久 pending 任务，也不自动重调适配器补文件以免重复计费）。
+    if (responseDelivery) {
+      const completion = this._store.completeSynchronousSpeechTask(result.taskId, {
+        files: result.files || [],
+        generatedDir: this._generatedDir,
+      });
+      if (!completion.ok) {
+        throw new Error(completion.error);
+      }
+    }
+
+    if (!responseDelivery) {
+      await this._bus.request("deferred:register", {
+        taskId: result.taskId,
+        sessionId,
+        sessionPath,
+        sessionRef,
+        meta: {
+          type: "speech-generation",
+          mediaKind: "speech",
+          deliveryIntent: "ui_only",
+          triggerParentTurn: false,
+          prompt: input.prompt,
+        },
+      }).catch((err) => {
+        this._log.warn(`deferred:register failed for ${result.taskId}:`, err);
+      });
+      await this._bus.request("task:register", {
+        taskId: result.taskId,
+        type: "media-generation",
+        sessionId,
+        sessionRef,
+        parentSessionPath: sessionPath,
+        meta: { type: "speech-generation", prompt: input.prompt },
+      }).catch(() => {});
+    }
+    // 语音合成适配器都是同步返回文件的：response 投递直接把文件带给调用方
+    // （朗读按钮即取即播），不进轮询、不落任何对话消息；session 投递才入轮询
+    // 走 deferred 通知。
+    if (!responseDelivery) {
+      this._poller.add(result.taskId);
+    }
+
+    return {
+      ok: true,
+      kind: "speech",
+      batchId,
+      prompt: input.prompt,
+      delivery,
+      tasks: [{
+        taskId: result.taskId,
+        ...(result.files?.length ? { files: result.files } : {}),
+      }],
+    };
+  }
+
+  _resolveSpeechTarget(input: any = {}) {
+    const providerId = textOrNull(input.provider);
+    const modelId = textOrNull(input.model) || textOrNull(input.modelId);
+
+    if (providerId && modelId) {
+      return this._speechTargetFromMediaRef({ providerId, modelId });
+    }
+
+    if (providerId) {
+      const provider = this._providers.getMediaProviders(SPEECH_CAPABILITY)
+        .find((item) => item.providerId === providerId);
+      for (const model of provider?.models?.length ? provider.models : (provider?.availableModels || [])) {
+        const target = this._speechTargetFromMediaRef({ providerId, modelId: model.id }, { strict: false });
+        if (target) return target;
+      }
+      return null;
+    }
+
+    if (modelId) {
+      const matches = [];
+      for (const provider of this._providers.getMediaProviders(SPEECH_CAPABILITY) || []) {
+        if (provider.models?.some?.((model) => model.id === modelId || model.aliases?.includes?.(modelId))) {
+          matches.push({ providerId: provider.providerId, modelId });
+        }
+      }
+      if (matches.length > 1) throw new Error(`Speech model "${modelId}" is available from multiple providers`);
+      if (matches.length === 1) return this._speechTargetFromMediaRef(matches[0]);
+      throw new Error(`Speech model "${modelId}" not found`);
+    }
+
+    const defaultModel = this.getSpeechConfig()?.defaultSpeechModel;
+    if (defaultModel?.provider && defaultModel.id) {
+      return this._speechTargetFromMediaRef({
+        providerId: defaultModel.provider,
+        modelId: defaultModel.id,
+      });
+    }
+
+    for (const provider of this._providers.getMediaProviders(SPEECH_CAPABILITY) || []) {
+      // 无凭证的供应商（如未配 key 的 openai）跳过，优先挑免凭证/已配置的
+      // （system-speech authType=none 恒可用），否则首个命中会霸占默认解析。
+      const credentialOk = this._providers.getMediaProviderCredentialStatus?.(provider.providerId, SPEECH_CAPABILITY)?.hasCredentials !== false;
+      if (!credentialOk) continue;
+      for (const model of provider.models?.length ? provider.models : (provider.availableModels || [])) {
+        const target = this._speechTargetFromMediaRef({ providerId: provider.providerId, modelId: model.id }, { strict: false });
+        if (target) return target;
+      }
+    }
+    return null;
+  }
+
+  _speechTargetFromMediaRef(ref, { strict = true }: any = {}) {
+    let resolved;
+    try {
+      resolved = this._providers.resolveMediaModel({
+        providerId: ref.providerId,
+        modelId: ref.modelId,
+        capability: SPEECH_CAPABILITY,
+        includeCatalog: true,
+      });
+    } catch (err) {
+      if (strict) throw err;
+      return null;
+    }
+    const protocolId = resolved?.model?.protocolId;
+    if (!protocolId) {
+      if (strict) throw new Error(`Media model "${ref.providerId}/${ref.modelId}" missing protocolId`);
+      return null;
+    }
+    const adapter = this._registry.getProtocol?.(protocolId) || this._registry.get?.(resolved.providerId);
+    if (!adapter) {
+      if (strict) throw new Error(`No speech generation adapter registered for protocol "${protocolId}"`);
+      return null;
+    }
+    const executionTarget = this._resolveMediaExecutionTarget({
+      resolved,
+      adapter,
+      modality: "speech",
+    });
+    return {
+      adapter,
+      providerId: resolved.providerId,
+      modelId: resolved.model.id,
+      model: resolved.model,
+      protocolId,
+      credentialLaneId: executionTarget.credentialLaneId,
+      credentialProviderId: executionTarget.credentialProviderId,
+      credentialSource: executionTarget.credentialSource,
+      resolutionReason: executionTarget.resolutionReason,
+      executionTarget,
+    };
+  }
+
+  resolveSpeechModelRef(ref: any = {}) {
+    const providerId = ref.providerId || ref.provider;
+    const modelId = ref.modelId || ref.id || ref.model;
+    const target = this._speechTargetFromMediaRef({ providerId, modelId });
+    return {
+      providerId: target.providerId,
+      modelId: target.modelId,
+      protocolId: target.protocolId,
+      adapterId: target.adapter?.id || null,
+      credentialLaneId: target.credentialLaneId,
+      credentialProviderId: target.credentialProviderId,
+      credentialSource: target.credentialSource,
+      resolutionReason: target.resolutionReason,
+    };
   }
 
   async generateVideoFromBus(payload: any = {}) {
@@ -1250,6 +1651,62 @@ export class UniversalMediaManager {
   hasAdapterForImageModel(providerId, model) {
     if (!model?.protocolId) return false;
     return Boolean(this._registry.getProtocol?.(model.protocolId) || this._registry.get(providerId));
+  }
+
+  hasAdapterForSpeechModel(providerId, model) {
+    if (!model?.protocolId) return false;
+    return Boolean(this._registry.getProtocol?.(model.protocolId) || this._registry.get(providerId));
+  }
+
+  async listSpeechProviders() {
+    await this._providers.refreshRuntimeMediaCapabilities?.({ capability: SPEECH_CAPABILITY });
+    const providers: any = {};
+    for (const provider of this._providers.getMediaProviders(SPEECH_CAPABILITY) || []) {
+      const credentialStatus = this._providers.getMediaProviderCredentialStatus?.(provider.providerId, SPEECH_CAPABILITY) || {};
+      // 生效模型为空（用户未添加）时回退到内置候选目录：语音合成走「零配置可用」
+      // 语义（system-speech 免凭证即用），候选 + 注册了适配器 = 直接可用。
+      const effectiveSpeechModels = (provider.models || []).length > 0
+        ? provider.models
+        : (provider.availableModels || []);
+      const models = (effectiveSpeechModels)
+        .map((model) => projectMediaProviderModel(
+          model,
+          this.hasAdapterForSpeechModel(provider.providerId, model),
+        ))
+        .filter((model) => {
+          if (model.adapterAvailable) return true;
+          this._log.warn(
+            `[media] settings hide speech model "${provider.providerId}/${model.id}": `
+            + (model.protocolId
+              ? `no adapter registered for protocol "${model.protocolId}"`
+              : "protocol unrecognized (model has no protocolId)"),
+          );
+          return false;
+        });
+      const availableModels = (provider.availableModels || [])
+        .map((model) => projectMediaProviderModel(
+          model,
+          this.hasAdapterForSpeechModel(provider.providerId, model),
+        ))
+        .filter((model) => model.adapterAvailable);
+      if (!models.length && !provider.runtimeCapability && !availableModels.length) continue;
+      providers[provider.providerId] = {
+        ...provider,
+        ...credentialStatus,
+        hasCredentials: credentialStatus.hasCredentials === true,
+        unavailableReason: credentialStatus.unavailableReason || null,
+        unavailableMessage: credentialStatus.unavailableMessage || null,
+        credentialLanes: credentialStatus.lanes,
+        activeCredentialLaneId: credentialStatus.activeLaneId || null,
+        activeCredentialProviderId: credentialStatus.activeProviderId || null,
+        models,
+        availableModels,
+      };
+    }
+    return {
+      providers,
+      config: this.getSpeechConfig(),
+    };
   }
 
   async listVideoProviders() {

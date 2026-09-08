@@ -1,0 +1,134 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ × tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > R07-02/03/06：真实异步 helper 逐字节写 UTF-8，复杂正文无损且只结算一次 1475ms
+   → expected '\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\…' to be '你好🙂é中英\ufffd' // Object.is equality
+ × tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > R07-04：真实 helper 的无末尾换行 JSON 在 close 边界完整解码 1028ms
+   → expected '\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\…' to be '无换行结尾🙂' // Object.is equality
+ × tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > R07-05：结构化成功中的非字符串 text 明确 INVALID_OUTPUT 380ms
+   → promise resolved "{ text: '[object Object]', …(1) }" instead of rejecting
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > R07-08：中文 stderr 跨字节块仍保持可读且按失败结算
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_PROCESS_FAILED] ���������������������������������
+
+ × tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > R07-08：中文 stderr 跨字节块仍保持可读且按失败结算 416ms
+   → expected SystemSpeechError: ����������������������… { code: '…' } to match object { …(2) }
+(1 matching property omitted from actual)
+ ✓ tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A06：helper 正常 final 返回——不等待超时，stdout 可解析 883ms
+ ✓ tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A06b：空文本是明确的 EMPTY_RESULT，不伪造文本 386ms
+ ✓ tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A07：结果后晚到错误/非零退出——只结算一次 675ms
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A08：超时与外部取消都终止子进程且不输出成功
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_TIMEOUT] 系统语音识别超过进程上限 1s
+
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A08：超时与外部取消都终止子进程且不输出成功
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_CANCELLED] 系统语音识别已取消
+
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A09：helper 慢速在途时事件循环不被阻塞（非 execFileSync）
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_CANCELLED] 系统语音识别已取消
+
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A10：子进程无视温和终止时，有界等待后强制结束同一进程
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_CANCELLED] 系统语音识别已取消
+
+ ✓ tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A08：超时与外部取消都终止子进程且不输出成功 1241ms
+ ✓ tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A09：helper 慢速在途时事件循环不被阻塞（非 execFileSync） 61ms
+ ✓ tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A10：子进程无视温和终止时，有界等待后强制结束同一进程 1181ms
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A11：helper 缺失/坏 JSON/超大 stdout/结构化错误/旧式 stderr 各自独立错误码
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_INVALID_OUTPUT] helper 退出码 0 但输出无法解析: not a json line
+
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A11：helper 缺失/坏 JSON/超大 stdout/结构化错误/旧式 stderr 各自独立错误码
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_PROCESS_FAILED] helper stdout 超过 4194304 字节上限
+
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A11：helper 缺失/坏 JSON/超大 stdout/结构化错误/旧式 stderr 各自独立错误码
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_PERMISSION_DENIED] denied by user
+
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A11：helper 缺失/坏 JSON/超大 stdout/结构化错误/旧式 stderr 各自独立错误码
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_PERMISSION_DENIED] lingxi-speech-helper error: speech recognition permission denied
+
+ ✓ tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A11：helper 缺失/坏 JSON/超大 stdout/结构化错误/旧式 stderr 各自独立错误码 479ms
+ ✓ tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A12：打包形态按桌面路径合同解析 Resources，不回退 dev 残留；缺失即安装损坏 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > R07-02/03/06：真实异步 helper 逐字节写 UTF-8，复杂正文无损且只结算一次
+AssertionError: expected '\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\…' to be '你好🙂é中英\ufffd' // Object.is equality
+
+Expected: "你好🙂é中英�"
+Received: "����������e�����������"
+
+ ❯ tests/system-speech-adapter.lifecycle.test.ts:161:25
+    159|       return value;
+    160|     });
+    161|     expect(result.text).toBe("你好🙂é中英�");
+       |                         ^
+    162|     expect(settleCount).toBe(1);
+    163|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > R07-04：真实 helper 的无末尾换行 JSON 在 close 边界完整解码
+AssertionError: expected '\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\…' to be '无换行结尾🙂' // Object.is equality
+
+Expected: "无换行结尾🙂"
+Received: "�������������������"
+
+ ❯ tests/system-speech-adapter.lifecycle.test.ts:169:25
+    167|       platform: "darwin", env: helperEnv("bytewise-no-newline"),
+    168|     });
+    169|     expect(result.text).toBe("无换行结尾🙂");
+       |                         ^
+    170|   });
+    171|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > R07-05：结构化成功中的非字符串 text 明确 INVALID_OUTPUT
+AssertionError: promise resolved "{ text: '[object Object]', …(1) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "language": "zh-CN",
++   "text": "[object Object]",
+  }
+
+ ❯ tests/system-speech-adapter.lifecycle.test.ts:175:7
+    173|     await expect(systemSpeechRecognitionAdapter.transcribe(makeInput()…
+    174|       platform: "darwin", env: helperEnv("non-string-text"),
+    175|     })).rejects.toMatchObject({ code: SYSTEM_SPEECH_ERROR_CODES.INVALI…
+       |       ^
+    176|   });
+    177|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > R07-08：中文 stderr 跨字节块仍保持可读且按失败结算
+AssertionError: expected SystemSpeechError: ����������������������… { code: '…' } to match object { …(2) }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
++ SystemSpeechError {
+    "code": "SYSTEM_SPEECH_PROCESS_FAILED",
+-   "message": StringContaining "中文错误：识别器不可用",
+  }
+
+ ❯ tests/system-speech-adapter.lifecycle.test.ts:181:7
+    179|     await expect(systemSpeechRecognitionAdapter.transcribe(makeInput()…
+    180|       platform: "darwin", env: helperEnv("bytewise-stderr"),
+    181|     })).rejects.toMatchObject({
+       |       ^
+    182|       code: SYSTEM_SPEECH_ERROR_CODES.PROCESS_FAILED,
+    183|       message: expect.stringContaining("中文错误：识别器不可用"),
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 8 passed (12)
+   Start at  14:34:29
+   Duration  8.32s (transform 43ms, setup 17ms, import 31ms, tests 8.21s, environment 0ms)
+

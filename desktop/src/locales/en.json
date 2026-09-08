@@ -172,7 +172,6 @@
     "created": "Channel #{name} created ✿",
     "createFailed": "Create failed",
     "alreadyExists": "Channel already exists",
-    "unpinPluginTab": "Unpin \"{label}\"",
     "deleteChannel": "Delete channel",
     "deleteConfirm": "Delete channel \"{name}\"? Message history cannot be recovered.",
     "deleted": "Channel deleted",
@@ -444,7 +443,8 @@
       "generationInProgress": "{kind} generating",
       "retryFailed": "Regeneration failed",
       "submitting": "Submitting",
-      "retryLabel": "Regenerate {kind}"
+      "retryLabel": "Regenerate {kind}",
+      "kindSpeech": "Speech"
     },
     "turnStatus": {
       "missingFinalAnswer": "No final reply was generated",
@@ -510,7 +510,9 @@
     "feedbackRecorded": "Saved to experience.",
     "feedbackRecordedExperienceOff": "Recorded. The experience library is currently disabled; enable it so the assistant can consult this.",
     "feedbackDuplicate": "This feedback was already recorded.",
-    "feedbackFailed": "Could not save the feedback. Please try again later."
+    "feedbackFailed": "Could not save the feedback. Please try again later.",
+    "speak": "Read aloud",
+    "speakFailed": "Speech generation failed"
   },
   "time": {
     "justNow": "Just now",
@@ -643,7 +645,26 @@
     "knowledgeModeFast": "Fast",
     "knowledgeModeDetailed": "Detailed",
     "knowledgeModeFastHint": "Fast local-only search; does not wait for remote embeddings, reranking, or multi-round research.",
-    "knowledgeModeDetailedHint": "Generates a detailed answer after multiple rounds of search, reading, and evidence checks."
+    "knowledgeModeDetailedHint": "Generates a detailed answer after multiple rounds of search, reading, and evidence checks.",
+    "dictateOn": "Dictation on: recordings are transcribed to text in the composer (click to turn off)",
+    "dictateOff": "Dictate: transcribe recordings to text in the composer (macOS on-device)",
+    "dictateEmpty": "No speech recognized",
+    "queuedSend": "Queue",
+    "queuedTurnHint": "Queued · sends automatically when the current reply finishes",
+    "queuedInsertNow": "Insert now",
+    "queuedInsertNowTitle": "Insert this message into the ongoing reply immediately",
+    "queuedSendFailed": "Failed to send the queued message",
+    "queuedRetry": "Retry",
+    "queuedInsertWaiting": "Waiting for the current reply to start — try again in a moment",
+    "queuedEditUnavailable": "This message has entered sending or is no longer editable. Check its delivery status first.",
+    "queuedDelete": "Cancel this queued message",
+    "deliveryChecking": "Result unknown, checking",
+    "deliveryUnknown": "Result unknown, verification incomplete",
+    "deliveryRunUnknown": "Message received, run result still unknown",
+    "recheckDelivery": "Check again",
+    "sendNotAccepted": "Not sent: the server did not accept this message",
+    "sendRetry": "Retry send",
+    "sendDismiss": "Discard"
   },
   "agentReview": {
     "running": "Reviewing this Session",
@@ -1365,20 +1386,16 @@
       "me": "Me",
       "providers": "Providers",
       "usage": "Model Observatory",
-      "media": "Media",
       "models": "Models",
-      "memory": "Memory",
       "work": "Workspace",
       "skills": "Skills",
       "mcp": "Connectors",
       "bridge": "Social Platforms",
       "sharing": "Sharing",
       "access": "Access & Devices",
-      "plugins": "Plugins",
       "experiments": "Experiments",
       "about": "About",
-      "security": "Security",
-      "pluginMarketplace": "Plugin Marketplace"
+      "security": "Security"
     },
     "browser": {
       "cookiesTitle": "Cookies",
@@ -1786,25 +1803,7 @@
       "launchAtLogin": "Launch at login",
       "keepAwake": "Keep running while locked",
       "betaUpdates": "Receive beta updates",
-      "autoCheckUpdates": "Check for updates automatically",
-      "inviteSectionTitle": "Test channel",
-      "inviteCodeLabel": "Invite code",
-      "inviteCodeHint": "An invite code unlocks the test channel. It does not unlock the app itself.",
-      "inviteCodePlaceholder": "Paste your invite code",
-      "inviteRedeemBtn": "Redeem",
-      "inviteRedeeming": "Redeeming…",
-      "inviteErrorInvalid": "This invite code is not valid, or it has already been used up.",
-      "inviteErrorNetwork": "Could not reach the redemption service. Check your connection and try again.",
-      "inviteErrorActivate": "The channel could not be saved.",
-      "inviteConfirmTitle": "Switch to the test channel?",
-      "inviteConfirmBody": "Once you switch, the app updates to test versions. After a test version upgrades your data, you cannot go back to the current stable version. Confirm to switch.",
-      "inviteConfirmOk": "Switch",
-      "inviteConfirmCancel": "Stay on stable",
-      "inviteChannelActive": "Current channel: test channel",
-      "inviteChannelActiveHint": "Updates now come from the test channel.",
-      "inviteCodesLabel": "Your invite codes",
-      "inviteCodesHint": "Each code works once, for one device.",
-      "inviteCopy": "Copy"
+      "autoCheckUpdates": "Check for updates automatically"
     },
     "access": {
       "networkAccess": "LAN Access",
@@ -2030,7 +2029,8 @@
       "imageDefaultsButton": "Image generation defaults",
       "videoDefaultsButton": "Video generation defaults",
       "speechSynthesisDefaultsButton": "Speech synthesis defaults",
-      "runtimeProvider": "Runtime provider"
+      "runtimeProvider": "Runtime provider",
+      "defaultSpeechGenModel": "Speech synthesis model (read-aloud / voice messages)"
     },
     "models": {
       "auxiliary": "Auxiliary Models",
@@ -2295,8 +2295,8 @@
       "embeddingActiveNote": "Semantic search is on: memory search combines vector retrieval with keyword matching.",
       "embeddingOffNote": "Semantic search is off: memory search uses tags and keyword matching only.",
       "embeddingSaved": "Memory embedding model saved",
-      "tenetsTitle": "User Principles",
-      "tenetsHint": "Behavioral principles you confirmed, injected into every new conversation. Assistant proposals take effect only after your approval.",
+      "tenetsTitle": "Pinned Items & Principles",
+      "tenetsHint": "Pinned content and confirmed behavioral principles, injected into every new conversation. Assistant proposals take effect only after your approval.",
       "tenetsLoading": "Loading user principles…",
       "tenetsEmpty": "No user principles yet. Let the assistant propose some in chat, or add them here directly.",
       "tenetsApprove": "Approve",
@@ -2349,13 +2349,6 @@
         "stats": "{remembered} / {total} memories remembered"
       },
       "activeOnly": "Set this agent as active first"
-    },
-    "pins": {
-      "title": "Pinned Memories",
-      "hint": "Always injected into conversations, never decay",
-      "empty": "No pinned memories yet",
-      "delete": "Delete",
-      "addPlaceholder": "Add a pinned memory..."
     },
     "experience": {
       "title": "Experience",
@@ -2505,67 +2498,6 @@
       "dissolveBundleAriaLabel": "Dissolve {name}",
       "removeFromBundleTitle": "Remove from bundle, make loose skill",
       "removeFromBundleAriaLabel": "Remove {name} from bundle"
-    },
-    "plugins": {
-      "title": "Plugins",
-      "desc": "Manage community plugins.",
-      "empty": "No plugins installed",
-      "reload": "Reload",
-      "statusLoaded": "loaded",
-      "statusFailed": "failed",
-      "statusDisabled": "disabled",
-      "fullAccessToggle": "Allow full-access plugins",
-      "fullAccessDesc": "When enabled, plugins that declare full-access can use system-level APIs (routes, hooks, providers, etc.)",
-      "devToolsToggle": "Allow Agent plugin dev tools",
-      "devToolsDesc": "When enabled, the Agent can install, reload, enable, disable, and uninstall development plugins. This only affects the development plugin directory, not normally installed plugins.",
-      "dropzone": "Drag plugin folder or .zip here to install, or click to select",
-      "statusRestricted": "needs full access",
-      "deleteConfirm": "Remove plugin \"{name}\"? Plugin data will be preserved.",
-      "installSuccess": "Plugin \"{name}\" installed",
-      "installError": "Plugin install failed",
-      "invalidPlugin": "Not a valid plugin directory",
-      "pluginsDir": "Plugin directory: {path}",
-      "needsFullAccess": "Enable \"Allow full-access plugins\" to use this plugin",
-      "configure": "Configure {name}",
-      "configTitle": "{name} settings",
-      "configLoadError": "Plugin settings failed to load",
-      "sensitiveHint": "Stored value is hidden. Enter a new value to replace it.",
-      "invalidJson": "Invalid JSON",
-      "showDiagnostics": "Show plugin diagnostics",
-      "diagnosticsTitle": "Plugin Diagnostics",
-      "diagnosticsLoadError": "Plugin diagnostics failed to load",
-      "diagnosticsSummary": "Capabilities {capabilities}/{total} · Tasks {tasks} · Schedules {schedules}",
-      "noDiagnostics": "No diagnostics yet",
-      "diagnosticActivation": "Activation: {state}",
-      "diagnosticRoutes": "Pages {pages} · Widgets {widgets} · Settings {settingsTabs}",
-      "diagnosticTools": "Tools {count}",
-      "diagnosticCommands": "Commands {count}",
-      "diagnosticConfig": "Config {count}",
-      "openMarketplace": "Open plugin marketplace",
-      "marketBack": "Back to plugin management",
-      "marketplaceTitle": "Plugin Marketplace",
-      "marketplaceHint": "Browse installable plugins, README files, permissions, and contribution types.",
-      "marketplaceCount": "{count} plugins",
-      "marketplaceNoSource": "No marketplace source",
-      "marketplaceEmpty": "No plugins to browse",
-      "marketLoading": "Loading plugin marketplace…",
-      "marketLoadError": "Plugin marketplace failed to load",
-      "marketReadmeLoadError": "README failed to load",
-      "marketInstalled": "Installed",
-      "marketInstall": "Install",
-      "marketUpdate": "Update",
-      "marketReinstall": "Reinstall",
-      "marketDowngrade": "Downgrade",
-      "marketIncompatible": "Incompatible",
-      "marketUpdateAvailable": "Update available",
-      "marketInstalledVersion": "Installed v{version}",
-      "marketUpdateFrom": "Installed v{from}, update to v{to}",
-      "marketDowngradeTo": "Only compatible version v{version} can be installed",
-      "marketDowngradeConfirm": "Installed version is v{from}. Downgrade to v{to}?",
-      "marketReadmeLoading": "Loading README…",
-      "marketSelectPlugin": "Select a plugin to view its README",
-      "manageTitle": "Manage Plugins",
-      "permissionTitle": "Permissions"
     },
     "mcp": {
       "masterTitle": "Master Switch",
@@ -4482,7 +4414,6 @@
     "dialog": {
       "selectFolder": "Select Working Folder",
       "selectSkill": "Select Skill",
-      "selectPlugin": "Select Plugin",
       "launchFailedTitle": "Lingxi Launch Failed",
       "launchFailedBody": "Lingxi v{version}\n\n{detail}\n\nDetailed log saved to:\n{logPath}\n\nPlease send this screenshot or log file to the developer.",
       "serverRestartFailed": "Lingxi v{version}\n\nServer crashed and failed to restart.\n{error}\n\nPlease restart the application.",
@@ -4659,6 +4590,19 @@
     "listCapabilities": {
       "description": "List the aesthetic enhancement capabilities currently supported by the Beautify tool.",
       "text": "Beautify currently offers two capabilities. 1) Markdown cover workflow: read the cover style guide first, prepare an image (from Media Generation, a future built-in gallery, or a local file), then copy it into the attachments folder and write the cover frontmatter. 2) Full-page HTML aesthetic guide: before generating web pages / typeset pages / reports, call beautify_get-html-style-guide for Hana's default art direction (no-arg call returns the router, then fetch sections on demand)."
+    },
+    "generateSpeech": {
+      "description": "Generate speech. Synthesize spoken audio from text (read-aloud, voiceover, voice replies). The generated audio is delivered as a voice message.",
+      "promptDesc": "Text to synthesize into speech",
+      "voiceDesc": "Optional voice (e.g. alloy, nova; macOS voice name for system speech)",
+      "speedDesc": "Optional speed, 0.25–4, default 1",
+      "formatDesc": "Optional audio format, default mp3",
+      "modelDesc": "Optional speech model (defaults to the configured default speech model)",
+      "providerDesc": "Optional provider id (e.g. openai, system-speech)",
+      "notInitialized": "Speech generation service is not initialized",
+      "submitFailed": "Speech generation failed: {error}",
+      "submitFailedUnknown": "Speech generation submit failed",
+      "submitted": "Speech generation submitted; the audio will be delivered as a voice message when ready."
     }
   },
   "cli": {
@@ -4796,22 +4740,6 @@
     }
   },
   "plugin": {
-    "widget": {
-      "loadFailed": "Load failed",
-      "retry": "Retry",
-      "hiddenPlugins": "Hidden plugins",
-      "show": "Show",
-      "desk": "Desk",
-      "hideTitle": "Hide \"{title}\""
-    },
-    "page": {
-      "notFound": "Plugin not found",
-      "loadFailed": "Plugin load failed",
-      "retry": "Retry"
-    },
-    "tab": {
-      "pinToBar": "Pin to tab bar"
-    },
     "imageGen": {
       "notInitialized": "Image generation plugin not initialized",
       "noSessionPath": "Image generation requires an explicit session context; the current tool call is missing sessionPath",

@@ -1,0 +1,92 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/model-call-speech-observer.test.ts > MC-09 speech recognition × ModelCallObserver > coverage: openai transcribe → observer 完整生命周期 + ledger 关联 51ms
+ ✓ tests/model-call-speech-observer.test.ts > MC-09 speech recognition × ModelCallObserver > coverage: mimo transcribe → observer 完整生命周期 + ledger 关联 3ms
+ ✓ tests/model-call-speech-observer.test.ts > MC-09 speech recognition × ModelCallObserver > coverage: dashscope transcribe → observer 完整生命周期 + ledger 关联 2ms
+ ✓ tests/model-call-speech-observer.test.ts > MC-09 speech recognition × ModelCallObserver > coverage: volcengine-speech transcribe → observer 完整生命周期 + ledger 关联 2ms
+ ✓ tests/model-call-speech-observer.test.ts > MC-09 speech recognition × ModelCallObserver > HTTP 500（毒丸 error body）：attempt_error + logical error；业务失败态照常 2ms
+ ✓ tests/model-call-speech-observer.test.ts > MC-09 speech recognition × ModelCallObserver > Volcengine 特别检查：credential 在 JSON body（user.uid）——绝不进事件（§四十一） 2ms
+ ✓ tests/model-call-payload-speech.test.ts > MC-09 speech × payload capture > coverage: openai 四层 capture：audio externalize + language 保留 + credential 替换 + transcription 捕获 53ms
+ ✓ tests/model-call-payload-speech.test.ts > MC-09 speech × payload capture > coverage: mimo 四层 capture：audio externalize + language 保留 + credential 替换 + transcription 捕获 3ms
+ ✓ tests/model-call-payload-speech.test.ts > MC-09 speech × payload capture > coverage: dashscope 四层 capture：audio externalize + language 保留 + credential 替换 + transcription 捕获 2ms
+ ✓ tests/model-call-payload-speech.test.ts > MC-09 speech × payload capture > coverage: volcengine-speech 四层 capture：audio externalize + language 保留 + credential 替换 + transcription 捕获 2ms
+ ✓ tests/model-call-payload-speech.test.ts > MC-09 speech × payload capture > Volcengine 专项硬验收：body.user.uid 由协议规则处理，generic 'uid' 键不受影响（§一百四十九） 2ms
+ ✓ tests/model-call-payload-speech.test.ts > MC-09 speech × payload capture > HTTP 500：error body 安全捕获 2ms
+ ✓ tests/model-call-payload-speech.test.ts > MC-09 speech × payload capture > sink 关闭：speech 路径 0 record 2ms
+stdout | tests/speech-response-lifecycle.test.ts > F12/P8.4 持久化与旧 pending 恢复（V12–V13） > V12: 完成任务持久化后重启仍是终态；旧 pending/response 文件在→done、缺→failed；不再请求供应商
+[media] [media] poller recovered 2 pending task(s)
+[media] [media] recovered 2 synchronous speech task(s) after restart
+
+stdout | tests/speech-response-lifecycle.test.ts > F12/P8.4 持久化与旧 pending 恢复（V12–V13） > V13: 原图片/视频 pending 任务不被 speech 恢复特例误改
+[media] [media] poller recovered 3 pending task(s)
+
+ ✓ tests/speech-response-lifecycle.test.ts > F12/P8.3 同步 response 完成（V07–V11） > V07: response 同步文件成功 → 返回前任务 done/completed，有 completedAt 41ms
+ ✓ tests/speech-response-lifecycle.test.ts > F12/P8.3 同步 response 完成（V07–V11） > V08: response 模式无 poller/deferred/task:register/chat 消息副作用 3ms
+ ✓ tests/speech-response-lifecycle.test.ts > F12/P8.3 同步 response 完成（V07–V11） > V09: session 模式保留既有会话投递（deferred/task:register/poller 各一次） 3ms
+ ✓ tests/speech-response-lifecycle.test.ts > F12/P8.3 同步 response 完成（V07–V11） > V10: 文件缺失 → 明确失败，不返回 ok=true 配永久 pending 3ms
+ ✓ tests/speech-response-lifecycle.test.ts > F12/P8.3 同步 response 完成（V07–V11） > V10b: 适配器未返回文件 → 明确失败；无 taskId → 提交失败不建任务 4ms
+ ✓ tests/speech-response-lifecycle.test.ts > F12/P8.3 同步 response 完成（V07–V11） > V11: 重复完成幂等（completedAt 不变）；已取消任务不得被改成 done 3ms
+ ✓ tests/speech-response-lifecycle.test.ts > F12/P8.4 持久化与旧 pending 恢复（V12–V13） > V12: 完成任务持久化后重启仍是终态；旧 pending/response 文件在→done、缺→failed；不再请求供应商 4ms
+ ✓ tests/speech-response-lifecycle.test.ts > F12/P8.4 持久化与旧 pending 恢复（V12–V13） > V13: 原图片/视频 pending 任务不被 speech 恢复特例误改 3ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V01: 同 provider 的图片默认值与语音默认值不同，TTS 只取语音域 51ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V02: 语音缺省、图片域里有 voice/format 时不回退图片域 4ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V03: 本次显式参数覆盖语音默认，TaskStore.params 与语义观测一致 4ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > R08-01/09/10: manager→真实 OpenAI adapter 只解析一次，wire/任务/观测同值且只发一次请求 8ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > R08-03/08: manager→真实 MiniMax adapter 的限幅、格式、groupId 与凭证 lane 同源 3ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > R08-04: manager→真实 DashScope adapter 不把未发送的 speed/format 记录成 wire 参数 4ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V03b: null 不被 Number(null) 隐式吞掉——speed null 走默认缺失语义 2ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V04: 多凭证 lane 时配置归属（逻辑 provider）与凭证归属（credentialProviderId）不混淆 2ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V06: 系统 say 路径只用它实际支持的参数，不被云端默认声线污染 2ms
+ ✓ tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-01/02: OpenAI 非法格式回落、有限速度限幅，缺失/null/空串/错误类型不会被 Number 隐式转换 1ms
+ ✓ tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-03/07/08: MiniMax 只取 speech 默认，保留执行目标模型与模型条目的 groupId 0ms
+ ✓ tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-04: DashScope 不把未发送的 speed/format 记成已应用 wire 参数 0ms
+ ✓ tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-05/06: system 默认选择不伪造 voice，显式小数 speed 只记录实际整数 WPM 0ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 云端适配路径不再读取图片 ctx.config（V05） > openai 路径：参数全部来自显式 params，不触 config；模型不被默认参数改写 1ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 云端适配路径不再读取图片 ctx.config（V05） > minimax 路径：不触 config，speed 进入 voice_setting 1ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 云端适配路径不再读取图片 ctx.config（V05） > dashscope 路径：不触 config，voice 显式传入 1ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager image config migration > merges legacy image-gen config into native preferences before native config shadows it 38ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager image config migration > does not resurrect legacy defaults after migration has been marked 4ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager plugin image input boundary > resolves plugin referenceImages through session-owned SessionFile records 5ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager plugin image input boundary > rejects plugin referenceImages that are raw strings instead of SessionFile references 4ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager plugin image input boundary > submits resolved SessionFile referenceImages to the adapter on the real image path 10ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager plugin image input boundary > submits image generation with sessionId ownership when no path locator is supplied 3ms
+ ✓ tests/universal-media-manager.test.ts > media parameter input limits > lets explicit image resolution override a provider default size 0ms
+ ✓ tests/universal-media-manager.test.ts > media parameter input limits > drops stale provider image size defaults when the selected mode schema only accepts resolution 0ms
+ ✓ tests/universal-media-manager.test.ts > media parameter input limits > rejects image resolution values outside the selected mode schema instead of falling back 0ms
+ ✓ tests/universal-media-manager.test.ts > media parameter input limits > rejects reference images when the selected model mode is text-only 0ms
+ ✓ tests/universal-media-manager.test.ts > media parameter input limits > rejects too many reference images for the selected model mode 0ms
+stdout | tests/universal-media-manager.test.ts > UniversalMediaManager adapter registration bus contract > passes the registering plugin owner context to adapter submit calls
+[media] adapter registered: dreamina
+
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager adapter registration bus contract > registers an injected built-in adapter list in the native media runtime 52ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager adapter registration bus contract > registers zero built-in adapters when the composition root injects none 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager adapter registration bus contract > accepts module loggers that expose log/warn/error but no info method 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager adapter registration bus contract > passes the registering plugin owner context to adapter submit calls 3ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager adapter registration bus contract > keeps adapter registration independent from logger failures 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > submits image generation without a sessionPath when delivery mode is response 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > submits video generation without a sessionPath when delivery mode is response 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > submits video generation with sessionId ownership when no path locator is supplied 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > resolves explicit video provider and model through media capabilities before selecting an adapter 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > uses the default video model config when no video provider is specified 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > preserves provider-contributed video parameter schemas for settings and discovery 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > keeps a runtime CLI provider visible with its discovery error when no models can be read 1ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > merges video model defaults, user defaults, and request options before adapter submit 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > rejects video options outside the selected model mode schema 2ms
+ ✓ tests/universal-media-manager.test.ts > UniversalMediaManager response delivery > resolves video reference images through session-owned SessionFile records 3ms
+ ✓ tests/media-credential-routing-parity.test.ts > 媒体执行目标凭证解析 > 显式且可用的模型凭证通道优先于注册表 active provider 19ms
+ ✓ tests/media-credential-routing-parity.test.ts > 媒体执行目标凭证解析 > 显式通道不可用时使用注册表 active provider 0ms
+ ✓ tests/media-credential-routing-parity.test.ts > 媒体执行目标凭证解析 > 无显式通道时使用注册表 active provider 0ms
+ ✓ tests/media-credential-routing-parity.test.ts > 媒体执行目标凭证解析 > runtime provider 只有无认证或自身有凭证时才能兜底 0ms
+ ✓ tests/media-credential-routing-parity.test.ts > 媒体执行目标凭证解析 > 已知供应商缺凭证与未知供应商使用不同稳定错误码 0ms
+ ✓ tests/media-credential-routing-parity.test.ts > 媒体执行目标凭证解析 > 供应商注册表暴露唯一媒体执行目标门面 0ms
+ ✓ tests/media-credential-routing-parity.test.ts > 媒体执行目标凭证解析 > 适配器上下文绑定同一个规范媒体执行目标 0ms
+ ✓ tests/media-credential-routing-parity.test.ts > 媒体执行目标凭证解析 > image、video、STT 与后台 image task 都只调用统一解析器 0ms
+ ✓ tests/media-credential-routing-parity.test.ts > 媒体执行目标凭证解析 > 后台图片任务执行前重新解析并只把新目标交给适配器 3ms
+ ✓ tests/media-credential-routing-parity.test.ts > 媒体执行目标凭证解析 > 多通道适配器不会在所选凭证刷新失败后改试其它通道 5ms
+
+ Test Files  6 passed (6)
+      Tests  73 passed (73)
+   Start at  14:55:14
+   Duration  945ms (transform 1.27s, setup 109ms, import 1.93s, tests 457ms, environment 0ms)
+

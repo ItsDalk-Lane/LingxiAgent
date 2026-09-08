@@ -1,0 +1,76 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ × desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-14：断线未知保留独立barrier，A不能越过而B正常发送 37ms
+   → expected false to be true // Object.is equality
+ × desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-13：超过200条历史记录不能淘汰未知快照 2ms
+   → expected undefined to be '原文  \n' // Object.is equality
+ × desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-11：canonical ACK仅确认接收，未证明运行结束仍保留barrier 2ms
+   → expected false to be true // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-14：断线未知保留独立barrier，A不能越过而B正常发送
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts:263:49
+    261|     noteComposerConnectionOpened();
+    262|     expect(record.phase).toBe('delivery_unknown');
+    263|     expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+       |                                                 ^
+    264|     expect(tryAcquireSendLease({identity: identityOf(PATH_A),bundle:ma…
+    265|     expect(tryAcquireSendLease({identity: identityOf(PATH_B),bundle:ma…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-13：超过200条历史记录不能淘汰未知快照
+AssertionError: expected undefined to be '原文  \n' // Object.is equality
+
+- Expected:
+"原文  
+"
+
++ Received:
+undefined
+
+ ❯ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts:275:55
+    273|       if(lease.ok) coordinator.cancelSendLease(lease.leaseId);
+    274|     }
+    275|     expect(getSendRecord(first.leaseId)?.bundle.text).toBe('原文  \n');
+       |                                                       ^
+    276|   });
+    277|   it('R04-11：canonical ACK仅确认接收，未证明运行结束仍保留barrier', async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-11：canonical ACK仅确认接收，未证明运行结束仍保留barrier
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts:281:49
+    279|     dispatchAck(PATH_A, record.clientMessageId);
+    280|     expect(record.phase).toBe('accepted');
+    281|     expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+       |                                                 ^
+    282|   });
+    283| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  13:49:36
+   Duration  687ms (transform 242ms, setup 21ms, import 295ms, tests 42ms, environment 262ms)
+

@@ -1,0 +1,18 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+stdout | tests/pinned-tenets-migration-recovery.test.ts > M13：旧 .migrated 无收据 → 默认仅 dry-run > completed 仅覆盖本计划：删除的条目不复活，其他归档仍为候选
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+ ✓ tests/pinned-tenets-migration-recovery.test.ts > M13：旧 .migrated 无收据 → 默认仅 dry-run > scan 报告可恢复项但不改任何文件、不写收据 31ms
+ ✓ tests/pinned-tenets-migration-recovery.test.ts > M13：旧 .migrated 无收据 → 默认仅 dry-run > completed 仅覆盖本计划：删除的条目不复活，其他归档仍为候选 6ms
+ ✓ tests/pinned-tenets-migration-recovery.test.ts > M13：旧 .migrated 无收据 → 默认仅 dry-run > 分类：present / inactive / similar / missing 2ms
+ ✓ tests/pinned-tenets-migration-recovery.test.ts > 恢复 apply：明确批准后走同一批量写入与收据机制 > 按批准清单恢复选中条目；幂等；收据 kind=recovery 9ms
+ ✓ tests/pinned-tenets-migration-recovery.test.ts > 恢复 apply：明确批准后走同一批量写入与收据机制 > 拒绝：路径穿越、未知源、未知内容哈希、空决策、非 dry-run 默认 2ms
+ ✓ tests/pinned-tenets-migration-recovery.test.ts > 恢复 apply：明确批准后走同一批量写入与收据机制 > 恢复不默认全量复活：只恢复 restore 决策，inactive/similar 需显式选择 3ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  13:32:57
+   Duration  190ms (transform 66ms, setup 17ms, import 60ms, tests 54ms, environment 0ms)
+

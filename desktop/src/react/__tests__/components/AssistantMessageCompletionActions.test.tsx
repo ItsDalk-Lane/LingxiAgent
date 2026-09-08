@@ -131,6 +131,7 @@ describe('AssistantMessage completion actions', () => {
       '分支为新会话',
       '复制文本',
       '截图',
+      'chat.speak',
       '有帮助',
       '没帮助',
       '全选消息',

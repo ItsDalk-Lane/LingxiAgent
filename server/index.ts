@@ -46,14 +46,6 @@ import { authorizeHttpRoute, isPublicHttpRoute } from "./http/route-security.ts"
 setMaxListeners(50);
 
 import { loadLocale } from "../lib/i18n.ts";
-import { verifyPluginIframeTicketForHostRequest } from "./routes/plugins.ts";
-import { PluginIframeTicketError } from "../core/plugin-iframe-ticket-service.ts";
-import { PluginAssetSessionError } from "../core/plugin-asset-session-service.ts";
-import {
-  isMalformedPluginAssetRequest,
-  isPluginAssetRequest,
-  verifyPluginAssetSessionForHostRequest,
-} from "./http/plugin-assets.ts";
 import { resolveHttpRequestPrincipal } from "./http/request-principal.ts";
 import { ensureLocalIdentityRegistries } from "../core/server-identity.ts";
 import { createMobileWorkbenchRoute } from "./routes/mobile-workbench.ts";
@@ -621,38 +613,6 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       return;
     }
 
-    if (isPluginIframeTicketRequest(c, routePath)) {
-      try {
-        verifyPluginIframeTicketForHostRequest(c, engine, { requireTicket: true });
-      } catch (err: any) {
-        if (err instanceof PluginIframeTicketError) {
-          return c.json({ error: (err as any).code, detail: err.message }, (err as any).status);
-        }
-        throw err;
-      }
-      await next();
-      return;
-    }
-
-    if (isMalformedPluginAssetRequest(c.req.url, routePath)) {
-      return c.json({ error: "plugin_asset_not_found" }, 404);
-    }
-
-    if (isPluginAssetSessionRequest(c, routePath)) {
-      try {
-        const session = verifyPluginAssetSessionForHostRequest(c, engine, { requireSession: false });
-        if (session) {
-          await next();
-          return;
-        }
-      } catch (err: any) {
-        if (err instanceof PluginAssetSessionError) {
-          return c.json({ error: (err as any).code, detail: err.message }, (err as any).status);
-        }
-        throw err;
-      }
-    }
-
     if (isPublicHttpRoute({ method: c.req.method, path: routePath })) {
       await next();
       return;
@@ -678,19 +638,6 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     return (method === "GET" || method === "HEAD")
       && /^\/api\/resources\/[^/]+\/content$/.test(routePath)
       && !!c.req.query("ticket");
-  }
-
-  function isPluginIframeTicketRequest(c: any, routePath: any) {
-    const method = c.req.method;
-    return (method === "GET" || method === "HEAD")
-      && /^\/api\/plugins\/[^/]+\/.+$/.test(routePath)
-      && !!c.req.query("pluginIframeTicket");
-  }
-
-  function isPluginAssetSessionRequest(c: any, routePath: any) {
-    const method = c.req.method;
-    return (method === "GET" || method === "HEAD")
-      && isPluginAssetRequest(routePath);
   }
 
   // 全局错误处理

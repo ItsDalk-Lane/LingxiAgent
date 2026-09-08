@@ -1,8 +1,4 @@
 import { authorizeHttpRoute } from "./route-security.ts";
-import {
-  PluginSurfaceSessionError,
-  authenticatePluginSurfaceRequest,
-} from "./plugin-surface-session.ts";
 
 /**
  * HTTP 入口的 principal 解析 + 路由授权。server/index.ts 的全局鉴权中间件与
@@ -11,12 +7,7 @@ import {
  * 顺序：
  * 1. 主鉴权：bearer / query token / web session cookie
  *    （serverAuthService.authenticateRequestDetailed）。
- * 2. plugin surface session 后备：仅当主凭证"缺席"（denied.reason ===
- *    "missing_credential"）时尝试。凭证存在但无效（invalid_credential /
- *    connection_not_allowed / loopback_token_requires_local_transport）必须
- *    按主鉴权的拒绝原因原样返回——无效 bearer 不得被同请求附带的 surface
- *    token 静默掩盖成放行。
- * 3. authorizeHttpRoute 路由级授权。
+ * 2. authorizeHttpRoute 路由级授权。
  *
  * 返回 { ok: true, principal } 或 { ok: false, status, body }；调用方负责把
  * body 序列化为 JSON 响应，并在成功时自行 c.set("authPrincipal", principal)。
@@ -77,22 +68,6 @@ export function resolveHttpRequestPrincipal(c, engine, {
           },
         };
       }
-    }
-  }
-  if (!principal && authResult.denied?.reason === "missing_credential") {
-    // Plugin surface session 后备认证：插件 iframe 页面调用本插件 route 时的
-    // 请求级入口凭证。bearer / web session 优先；只在二者缺席时尝试。
-    try {
-      principal = authenticatePluginSurfaceRequest(c, engine, { connectionKind });
-    } catch (err: any) {
-      if (err instanceof PluginSurfaceSessionError) {
-        return {
-          ok: false as const,
-          status: (err as any).status,
-          body: { error: (err as any).code, detail: err.message },
-        };
-      }
-      throw err;
     }
   }
   if (!principal) {

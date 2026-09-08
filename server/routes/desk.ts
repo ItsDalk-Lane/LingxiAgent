@@ -465,7 +465,6 @@ export function createDeskRoute(engine, hub) {
         status: 404,
         reason: "image-generation-unavailable",
         error: "image generation runtime is unavailable",
-        settingsTarget: "media",
       };
     }
     const defaultModel = imageRuntime.config?.get?.("defaultImageModel");
@@ -475,7 +474,6 @@ export function createDeskRoute(engine, hub) {
         status: 409,
         reason: "default-image-model-missing",
         error: "default image model is not configured",
-        settingsTarget: "media",
       };
     }
 
@@ -488,7 +486,6 @@ export function createDeskRoute(engine, hub) {
         status: 409,
         reason: "default-image-model-invalid",
         error: err?.message || String(err),
-        settingsTarget: "media",
       };
     }
   }
@@ -502,7 +499,6 @@ export function createDeskRoute(engine, hub) {
       executorAgentName: beautifyAgentName(agent, agentId),
       disabledReason: null,
       message: null,
-      settingsTarget: null,
     };
 
     if (!agentId || !agent) {
@@ -518,7 +514,6 @@ export function createDeskRoute(engine, hub) {
         ...base,
         disabledReason: "beautify-plugin-unavailable",
         message: "beautify tool is unavailable",
-        settingsTarget: "plugins",
       };
     }
 
@@ -528,7 +523,6 @@ export function createDeskRoute(engine, hub) {
         available: true,
         disabledReason: "beautify-disabled",
         message: "beautify tool is disabled for this agent",
-        settingsTarget: "agent-tools",
       };
     }
 
@@ -539,7 +533,6 @@ export function createDeskRoute(engine, hub) {
         available: true,
         disabledReason: imageStatus.reason,
         message: imageStatus.error,
-        settingsTarget: imageStatus.settingsTarget,
       };
     }
 
@@ -748,7 +741,6 @@ export function createDeskRoute(engine, hub) {
         error: status.message || "beautify generation is unavailable",
         status: httpStatus,
         reason: status.disabledReason,
-        settingsTarget: status.settingsTarget,
       };
     }
     const agent = engine.getAgent?.(status.executorAgentId);
@@ -852,7 +844,6 @@ export function createDeskRoute(engine, hub) {
       return c.json({
         error: access.error,
         reason: access.reason,
-        settingsTarget: access.settingsTarget,
       }, access.status as any);
     }
     const { agent, agentId } = access;

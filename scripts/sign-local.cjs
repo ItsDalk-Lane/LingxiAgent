@@ -70,6 +70,12 @@ if (fs.existsSync(computerUseHelper)) {
   sign(computerUseHelper);
 }
 
+// 2b. 签 Speech helper
+const speechHelper = path.join(APP, "Contents", "Resources", "speech", "macos", "lingxi-speech-helper");
+if (fs.existsSync(speechHelper)) {
+  sign(speechHelper);
+}
+
 // 3. 签 frameworks + helpers（--deep 处理内部结构）
 const frameworks = path.join(APP, "Contents", "Frameworks");
 for (const entry of fs.readdirSync(frameworks)) {

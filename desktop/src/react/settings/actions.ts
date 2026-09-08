@@ -132,7 +132,6 @@ export async function loadSettingsConfig() {
       settingsConfig: null,
       globalModelsConfig: null,
       homeFolder: null,
-      currentPins: [],
     }),
   });
   if (!agentId || !resourceKey) {
@@ -142,20 +141,18 @@ export async function loadSettingsConfig() {
       settingsConfig: null,
       globalModelsConfig: null,
       homeFolder: null,
-      currentPins: [],
     });
     return;
   }
   try {
     const agentBase = `/api/agents/${agentId}`;
-    const [configRes, identityRes, agentsMdRes, publicAgentsMdRes, userProfileRes, pinnedRes, globalModelsRes] =
+    const [configRes, identityRes, agentsMdRes, publicAgentsMdRes, userProfileRes, globalModelsRes] =
       await Promise.all([
         lingxiFetch(`${agentBase}/config`, { signal: controller.signal }),
         lingxiFetch(`${agentBase}/identity`, { signal: controller.signal }),
         lingxiFetch(`${agentBase}/agents-md`, { signal: controller.signal }),
         lingxiFetch(`${agentBase}/public-agents-md`, { signal: controller.signal }),
         lingxiFetch('/api/user-profile', { signal: controller.signal }),
-        lingxiFetch(`${agentBase}/pinned`, { signal: controller.signal }),
         lingxiFetch('/api/preferences/models', { signal: controller.signal }),
       ]);
 
@@ -169,7 +166,6 @@ export async function loadSettingsConfig() {
     config._publicAgents = publicAgentsMdData.content || '';
     const userProfileData = await userProfileRes.json();
     config._userProfile = userProfileData.content || '';
-    const pinnedData = await pinnedRes.json();
     config._experience = '';
     if (config.experience?.enabled === true) {
       const experienceRes = await lingxiFetch(`${agentBase}/experience`, { signal: controller.signal });
@@ -188,7 +184,6 @@ export async function loadSettingsConfig() {
       settingsConfig: config,
       globalModelsConfig: globalModels,
       homeFolder: config.desk?.home_folder || null,
-      currentPins: pinnedData.pins || [],
     });
   } catch (err) {
     if (isAbortError(err)) return;
@@ -231,12 +226,6 @@ function applySettingsSnapshot(snapshot: SettingsSnapshot, resourceKey: string, 
     settingsConfig: config,
     globalModelsConfig: snapshot.globalModels || {},
     homeFolder: config.desk?.home_folder || null,
-    currentPins: Array.isArray(snapshot.pinned?.pins) ? snapshot.pinned.pins : [],
-    pluginSettingsStatus: 'ready',
-    pluginSettingsError: null,
-    pluginAllowFullAccess: snapshot.plugins?.allowFullAccess === true,
-    pluginDevToolsEnabled: snapshot.plugins?.devToolsEnabled === true,
-    pluginUserDir: snapshot.plugins?.userDir || '',
   });
 }
 
@@ -275,16 +264,10 @@ export async function loadSettingsSnapshot(options: { retainSameKeyData?: boolea
     settingsConfigKey: configKey,
     settingsConfigStatus: 'loading',
     settingsConfigError: null,
-    pluginSettingsStatus: 'loading',
-    pluginSettingsError: null,
     ...(keepSameConfigOwnerData ? {} : {
       settingsConfig: null,
       globalModelsConfig: null,
       homeFolder: null,
-      currentPins: [],
-      pluginAllowFullAccess: undefined,
-      pluginDevToolsEnabled: undefined,
-      pluginUserDir: '',
     }),
   });
 
@@ -297,9 +280,6 @@ export async function loadSettingsSnapshot(options: { retainSameKeyData?: boolea
       settingsConfig: null,
       globalModelsConfig: null,
       homeFolder: null,
-      currentPins: [],
-      pluginSettingsStatus: 'error',
-      pluginSettingsError: 'No settings agent selected',
     });
     return;
   }
@@ -322,42 +302,12 @@ export async function loadSettingsSnapshot(options: { retainSameKeyData?: boolea
         settingsSnapshot: failRemoteLoad(latest.settingsSnapshot, resourceKey, requestId, err),
         settingsConfigStatus: 'error',
         settingsConfigError: err instanceof Error ? err.message : String(err),
-        pluginSettingsStatus: 'error',
-        pluginSettingsError: err instanceof Error ? err.message : String(err),
       });
     }
   } finally {
     if (_settingsSnapshotAbortController === controller) {
       _settingsSnapshotAbortController = null;
     }
-  }
-}
-
-export async function loadPluginSettings() {
-  const store = useSettingsStore.getState();
-  store.set({
-    pluginSettingsStatus: 'loading',
-    pluginSettingsError: null,
-    pluginAllowFullAccess: store.pluginSettingsStatus === 'idle' ? undefined : store.pluginAllowFullAccess,
-    pluginDevToolsEnabled: store.pluginSettingsStatus === 'idle' ? undefined : store.pluginDevToolsEnabled,
-  });
-  try {
-    const settingsRes = await lingxiFetch('/api/plugins/settings');
-    const data = await settingsRes.json();
-    if (data.error) throw new Error(data.error);
-    store.set({
-      pluginSettingsStatus: 'ready',
-      pluginSettingsError: null,
-      pluginAllowFullAccess: data.allow_full_access === true,
-      pluginDevToolsEnabled: data.plugin_dev_tools_enabled === true,
-      pluginUserDir: data.plugins_dir || '',
-    });
-  } catch (err) {
-    console.error('[plugins] load settings failed:', err);
-    store.set({
-      pluginSettingsStatus: 'error',
-      pluginSettingsError: err instanceof Error ? err.message : String(err),
-    });
   }
 }
 

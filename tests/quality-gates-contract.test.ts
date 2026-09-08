@@ -52,12 +52,6 @@ describe("quality gates", () => {
     ]));
   });
 
-  it("package builds use the workspace graph instead of a hard-coded package list", () => {
-    const packageJson = readJson("package.json");
-
-    expect(packageJson.scripts["build:packages"]).toBe("npm run build --workspaces --if-present");
-  });
-
   it("CI runs lint before build and tests can merge to main", () => {
     const ci = readYaml(".github/workflows/ci.yml");
     const runSteps = ci.jobs.test.steps

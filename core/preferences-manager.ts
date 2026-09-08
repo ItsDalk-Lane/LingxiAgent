@@ -710,34 +710,6 @@ export class PreferencesManager {
     this.savePreferences(prefs);
   }
 
-  /** 读取是否允许 full-access 社区插件运行 */
-  getAllowFullAccessPlugins() {
-    return this._cache.allow_full_access_plugins || false;
-  }
-
-  /** 保存是否允许 full-access 社区插件运行 */
-  setAllowFullAccessPlugins(value) {
-    const prefs = this._mutableCopy();
-    prefs.allow_full_access_plugins = !!value;
-    this.savePreferences(prefs);
-  }
-
-  /** 读取 Agent 插件开发工具开关（全局，默认关闭） */
-  getPluginDevToolsEnabled() {
-    return this._cache.plugin_dev_tools?.enabled === true;
-  }
-
-  /** 保存 Agent 插件开发工具开关 */
-  setPluginDevToolsEnabled(value) {
-    const prefs = this._mutableCopy();
-    prefs.plugin_dev_tools = {
-      ...(prefs.plugin_dev_tools || {}),
-      enabled: value === true,
-    };
-    this.savePreferences(prefs);
-    return prefs.plugin_dev_tools.enabled;
-  }
-
   /**
    * 读取内置/插件工具的延迟加载开关（全局，默认关闭）。
    *
@@ -757,41 +729,6 @@ export class PreferencesManager {
     };
     this.savePreferences(prefs);
     return prefs.builtin_tool_defer.enabled;
-  }
-
-  /** 读取用户手动禁用的插件 ID 列表 */
-  getDisabledPlugins() {
-    return this._cache.disabled_plugins || [];
-  }
-
-  /** 保存用户手动禁用的插件 ID 列表 */
-  setDisabledPlugins(list) {
-    const prefs = this._mutableCopy();
-    prefs.disabled_plugins = Array.isArray(list) ? list : [];
-    this.savePreferences(prefs);
-  }
-
-  /** 读取插件 UI 偏好（hiddenWidgets / hiddenTabs / tabOrder） */
-  getPluginUiPrefs() {
-    const raw = this._cache.plugin_ui;
-    return {
-      hiddenWidgets: Array.isArray(raw?.hiddenWidgets) ? raw.hiddenWidgets : [],
-      hiddenTabs: Array.isArray(raw?.hiddenTabs) ? raw.hiddenTabs : [],
-      tabOrder: Array.isArray(raw?.tabOrder) ? raw.tabOrder : [],
-    };
-  }
-
-  /** 合并写入插件 UI 偏好 */
-  setPluginUiPrefs(partial) {
-    const prefs = this._mutableCopy();
-    const current = prefs.plugin_ui || {};
-    const merged = { ...current };
-    if (Array.isArray(partial.hiddenWidgets)) merged.hiddenWidgets = partial.hiddenWidgets;
-    if (Array.isArray(partial.hiddenTabs)) merged.hiddenTabs = partial.hiddenTabs;
-    if (Array.isArray(partial.tabOrder)) merged.tabOrder = partial.tabOrder;
-    prefs.plugin_ui = merged;
-    this.savePreferences(prefs);
-    return this.getPluginUiPrefs();
   }
 
   getImageGenerationConfig() {
@@ -832,6 +769,17 @@ export class PreferencesManager {
     prefs.videoGeneration = normalizeVideoGenerationConfig(config);
     this.savePreferences(prefs);
     return this.getVideoGenerationConfig();
+  }
+
+  getSpeechGenerationConfig() {
+    return normalizeSpeechGenerationConfig(this._cache.speechGeneration);
+  }
+
+  setSpeechGenerationConfig(config) {
+    const prefs = this._mutableCopy();
+    prefs.speechGeneration = normalizeSpeechGenerationConfig(config);
+    this.savePreferences(prefs);
+    return this.getSpeechGenerationConfig();
   }
 
   getSpeechRecognitionConfig() {
@@ -1017,6 +965,23 @@ export function normalizeVideoGenerationConfig(value) {
     : null;
   return {
     ...(defaultModel?.provider && defaultModel.id ? { defaultVideoModel: defaultModel } : {}),
+    ...(providerDefaults ? { providerDefaults } : {}),
+  };
+}
+
+export function normalizeSpeechGenerationConfig(value) {
+  const raw = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  const defaultModel = raw.defaultSpeechModel && typeof raw.defaultSpeechModel === "object" && !Array.isArray(raw.defaultSpeechModel)
+    ? {
+      provider: typeof raw.defaultSpeechModel.provider === "string" ? raw.defaultSpeechModel.provider.trim() : "",
+      id: typeof raw.defaultSpeechModel.id === "string" ? raw.defaultSpeechModel.id.trim() : "",
+    }
+    : null;
+  const providerDefaults = raw.providerDefaults && typeof raw.providerDefaults === "object" && !Array.isArray(raw.providerDefaults)
+    ? structuredClone(raw.providerDefaults)
+    : null;
+  return {
+    ...(defaultModel?.provider && defaultModel.id ? { defaultSpeechModel: defaultModel } : {}),
     ...(providerDefaults ? { providerDefaults } : {}),
   };
 }

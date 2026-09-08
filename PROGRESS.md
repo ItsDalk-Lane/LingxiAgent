@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 601e918ddf5aa8ec2be2390528223b08ee515e44  (2026-09-06 文档治理收口封印：根目录历史台账归档至 docs/archives)
+VERIFIED_SOURCE_SHA   = 25a6b78447c64e169f763f63949fa4258fa9542c  (2026-09-08 C01–C03+CI+Windows 兼容修复源码候选：分支 refactor/dismantle-and-voice-features)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -994,6 +994,47 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
 需要提交才能完成的封印留待相应授权步骤。不得为使检查变绿而虚报坐标、扩大白名单，
 或删除 seal 文件与 guard 测试；退役门禁属于另需明确授权的治理变更。
 
+## 2026-09-08 C01–C03 修复源码候选与审计封印（round3）
+
+- 固定源码候选：`94c71d7afdcad8ef8be0ae930d5fbc3291aac976`；基线 `67dee5d2de9d3b9fc75ec5ef5c555e93c65b3ccd`；分支 `refactor/dismantle-and-voice-features`。候选源码 manifest SHA-256 为 `edb36fefbd8f59c2d848281ae65148bb37f26197f8207724d40698abd1f75240`，提交后独立检出复算一致；round2 交付 manifest（s12/s13 刷新）与 DELIVERY_MANIFEST（217/217）绑定同一棵树。
+- 修复内容：C01 服务端类型化拒绝回执（input_rejected）+ 客户端 rejected_before_acceptance 结算相位与每次尝试身份；C02 收据 backupDir 平台无关存储合同（core/pinned-tenets-backup-dir.ts）+ 旧 Windows 收据兼容解析；C03 round2 121 份原始审计日志按字节交付 + .gitignore 精确例外 + round3 证据/补丁重放/重建验证（证据测试含候选回退语义）。
+- 验证证据（绑定该候选树）：定向 59；round2 交付证据 10/10；受影响回归 313；冻结全量 npm test 13442 passed / 7 skipped / 0 实质失败（j25；A08 抖动单跑 13/13 绿）；typecheck ×3、lint 0 errors、build:client、build:server（一次性签名密钥）；提交后独立检出 4 文件 69/69 绿；候选交付重建（独立 clone + 增量补丁 + npm ci）69/69。逐命令日志与摘要：artifacts/f1-f12-repair/round3-c01-c03/。
+- 平台限制：真实 Windows 客户端、真实供应商、x64 打包实测保留 BLOCKED（详见 C01_C02_C03_TEST_MATRIX.json）。
+
+- 提交后验证（封印推进后）：HEAD `e7b0454e` 下 post-verification diff guard OK（仅 6 审计文件）；封印/矩阵/round2/round3 证据 25/25 绿；候选 94c71d7a 独立检出 manifest 复算一致（edb36fef…）、4 文件 69/69 绿、round2 DELIVERY_MANIFEST 217/217。
+
+## 2026-09-08 CI 步骤修复候选与封印推进（round3 收尾）
+
+- 固定源码候选：`f15e8b29de77f7e42b314f15892f40b90b93a668`（94c71d7a + ci.yml build:packages 步骤移除 + ci-workflow-guards 顺序不变量更新 + 证据重冻结）。PR #47 四平台 CI 首跑暴露 04f90d2b 拆除 packages 工作区后 ci.yml 残留引用；本地按 CI 顺序预演后续步骤全绿。
+- 验证证据（绑定该候选树）：全量 13443 passed / 0 failed（j30）；round2 manifest 454cfbc3（s15/s17 绿门禁）；round3 manifest ab73708f（j29 补丁重放 VERIFIED）；证据/封印 25/25；提交后独立检出证据家族绿。
+
+## 2026-09-08 CI 步骤修复候选与封印推进（round3 收尾）
+
+- 固定源码候选：`91ea310013e66cd84e334a4e14603ef33b664cc6`（94c71d7a + ci.yml build:packages 步骤移除 + ci-workflow-guards 顺序不变量更新 + create-round3-patch 自嵌套修复 + 证据重冻结）。PR #47 四平台 CI 首跑暴露 04f90d2b 拆除 packages 工作区后 ci.yml 残留引用；本地按 CI 顺序预演后续步骤（knowledge 烟测/renderer/server:open+smoke）全绿。
+- 验证证据（绑定该候选树）：全量 13441 passed / 0 实质失败（j32，A08 为已知负载抖动、单跑 13/13 绿）；round2 manifest 29ad19e3（s18/s19 绿门禁）；round3 manifest 3ce0c8a4（j31 补丁重放 VERIFIED，19MB 无自嵌套）；提交后独立检出证据 30/30 绿。
+
+## 2026-09-08 Windows 平台兼容修复候选与封印推进（round3 收尾 II）
+
+- 固定源码候选：`a79f465215dd8eaa56ed54f6ce0d0fafae9c57f0`（f15e8b29 基础上：语音适配器盘符路径/脚本 helper 拉起 + 闭包 allowlist 与基线、恢复 CLI pathToFileURL、迁移故障与构建合同测试的 Windows 语义夹具、交付补丁脚本 index-blob 对称防 CRLF 漂移）。PR #47 Windows 首跑 19 项失败全部定位与修复；其余三平台 CI 已绿。
+- 验证证据（绑定该候选树）：受影响 9 文件 106 项 + 闭包/边界 38 项绿；全量 13443 passed / 0 failed（j36）；round2 manifest af8090bb（s20/s21 绿门禁）；round3 manifest 016f1cb9（j35 补丁重放 VERIFIED）；提交后独立检出 4 文件 50/50 绿。
+
+## 2026-09-08 Windows 盘符路径修复候选与封印推进（round3 收尾 III）
+
+- 固定源码候选：`d711c092527b0ecefd66c3c75a2d4375b5e96576`（a79f4652 + 语音适配器 posix∥win32 双接受盘符绝对路径——上一轮仅转换反斜杠，posix.isAbsolute 对 C:/… 仍拒绝；本地四形态路径验证）。
+- 验证证据（绑定该候选树）：语音 5 文件 42 项 + 闭包/边界 38 项绿；全量 13443 passed / 0 failed（j38）；round2 manifest 刷新（s22 绿门禁）；round3 manifest 85e9473b（j37 补丁重放 VERIFIED）；提交后独立检出 3 文件 28/28 绿。
+- CI 平台抖动台账（非代码问题）：mac-arm64 曾因 vitest worker fork 崩溃 exit 1（13438 全过后单错误）；intel 曾因 knowledge-vector-shutdown 竞态 1 失败——均按既有惯例重跑失败作业。
+
+## 2026-09-08 A12 路径合同断言对齐候选与封印推进（round3 收尾 IV）
+
+- 固定源码候选：`a728597eff749d613cbb117cbd12e7f7379fd0ec`（d711c092 + A12 打包路径断言对齐 POSIX 斜杠合同；Windows CI 语音套件由 14 失败收敛至 0，唯一残余即该断言）。
+- 验证证据（绑定该候选树）：语音生命周期 13/13；全量 13442 passed / 0 failed + 1 macOS 临时目录清理竞态（ustar afterEach，单跑 10/10 绿）（j40）；round3 manifest 200e6314（j39 补丁重放 VERIFIED，兼作绿色引导门禁）；提交后独立检出 18/18 绿。
+- 平台抖动台账：intel 的 knowledge-vector-shutdown 在两轮 CI 偶发（main 同平台历史失败为 md-decorations 等，同类慢平台抖动家族，按惯例重跑失败作业）。
+
+## 2026-09-08 路径合同断言全对齐候选与封印推进（round3 收尾 V）
+
+- 固定源码候选：`25a6b78447c64e169f763f63949fa4258fa9542c`（a728597e + dev/override 两处路径断言同型对齐；上一封印曾误指审计提交 4d10c2b8，已由 a7bb3906 修正到 a728597e，本候选为其直接后继）。Windows CI 语音套件唯一残余断言收敛。
+- 验证证据（绑定该候选树）：语音生命周期 13/13；全量 13443 passed / 0 failed（j42）；round3 manifest 8f5cf500（j41 补丁重放 VERIFIED）；提交后独立检出 18/18 绿。
+
 ### Known limitation（保留）
 
 Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面环境执行安装/升级
@@ -1494,3 +1535,22 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - `TOOL_INVOCATION_REPAIR_FACTS.json` 中 `sourceCandidateSha` 与 `sealSha` 按任务书保持 `null`，避免提交自引用；真实源码候选记录在本节，真实封印提交只在最终执行报告中给出。
 - PR #43 首轮 Windows CI 在 `tests/tool-invocation-path-parity.test.ts` 出现 10 项 `PREPARED_INVOCATION_MISMATCH`：测试夹具固定使用 Unix 会话路径，而 Windows 包装层按平台规范化为绝对路径。生产 fail-closed 正确拒绝不一致事实，没有放宽。
 - 最小修复提交 `ce701ee20727e7cdaaf3d6f838ae8ca5727c2b63` 只把测试会话路径改为当前平台的规范绝对路径。修复后定向测试 1 文件 / 12 测试通过；三段 typecheck exit 0；本地全量测试 1374 文件通过 / 1 跳过、13904 测试通过 / 7 跳过、0 fail。日志：`/tmp/lingxi-pr43-windows-path-fixture-green.log`、`/tmp/lingxi-pr43-windows-path-fixture-typecheck.log`、`/tmp/lingxi-pr43-windows-path-fixture-full-test.log`。
+
+## 2026-09-07 拆除与语音改造+三 bug 修复封印
+
+- 固定源码：`04f90d2b26449d2f3264a5ea2a1a8bd6fb253202`；分支 `refactor/dismantle-and-voice-features`。内容：九件改造七阶段（邀请码移除/死代码清理/插件生态收口/知识库旧两档与研究模式拆除/置顶+信条合并/TTS/系统语音识别）与三 bug 修复（思考标签泄漏/流式发送排队/粘贴保真），明细见该提交信息。`.gitignore` 同步新增 `dist-speech/`（语音助手构建产物，同 `dist-computer-use/` 惯例）。
+- 用户授权：2026-09-06 会话逐项下达九件改造指令并确认执行方式；2026-09-07 会话报告三 bug 并验收修复设计；本次会话用户明确指示「提交所有修改，并推送到远程仓库」。
+- typecheck：tsc×3（root + node + test）exit 0。全量 `npm test`：1311 测试文件 / 13081 用例，13073 passed / 1 failed / 7 既有 skipped，83.26s；唯一失败为 `tests/artifact-core-ustar.test.ts` afterEach 临时目录 `fs.rmSync` ENOTEMPTY（macOS 清理竞态，属 artifact-core 无关模块），单文件重跑 10/10 通过，未计入回归。日志 `/tmp/lingxi-seal-typecheck.log`、`/tmp/lingxi-seal-fulltest.log`。
+- 派生清单（cli-runtime-closure / open-boundary baseline / shell-surface-manifest / persistence 指纹与 inventory / startup receipt）已在受测工作树重生成并随源码提交；staged diff 密钥模式扫描无命中。
+- 本次封印只同步既有六份审计文件（verified-source-sha.txt / build-sync-matrix.mjs / upstream-sync-matrix.json / UPSTREAM_SYNC_AUDIT.md / UPSTREAM_SYNC_MATRIX.md / 本文件坐标行），矩阵重生成 133 paths 硬校验通过（ADOPTED 25 / ADAPTED 100 / REGENERATED 4 / INTENTIONAL_DIVERGENCE 4）；不合并 main。
+- 未执行/受限：全仓 lint 与 build/package 门禁本轮未跑；系统语音识别端到端未实测（开发终端无语音识别 TCC 授权，helper 正确 fail-closed，打包后首次使用需用户授权）；TTS 云端路径需配置 API key 后实测；三 bug 修复的 dev 环境用户验收仍在进行；正式发布与四平台门禁未启动。
+
+## 2026-09-08 R01–R10 增量修复源码候选与审计封印
+
+- 固定源码候选：`7cf986236cb8ac5c2d22cce1e5882554a42cff28`；基线 `89bc0b64bf0a9b84ef3532efaa66c23213affb70`；分支 `refactor/dismantle-and-voice-features`。候选源码 manifest SHA-256 为 `c418b3ef2fc475e40ed779f21b8e087b120834e9b673baf2e67c3758138d30d8`，提交后复算与 S11 受测工作树一致。
+- R01–R10 联合冻结 25 文件 / 321 测试通过；typecheck exit 0；lint exit 0（9203 warnings）；客户端、合成签名服务端、speech helper 与 permissions 构建通过。原样全量在封印前为 13383 passed / 1 failed / 7 skipped，唯一失败是旧审计坐标正确拒绝新源码；排除该 seal 的补充全量为 13381 passed / 7 skipped、exit 0。逐命令原始日志和哈希见 `artifacts/f1-f12-repair/round2/`。
+- 用户在完成本地交付后明确授权提交并推送。本次按既有六文件流程推进审计坐标，不扩大 allowlist；封印提交后的独立 guard、矩阵和全量复验结果在后续同节记录。
+- 真实 macOS TCC/转写、真实供应商、Windows/Linux/其他架构及 Apple notarization 仍未执行或受凭证阻塞；本地证据不替代这些验证。聊天工具栏未增加语音输入组件，保留后端 ASR/TTS 与原生音频能力。
+- 提交后首轮全量在 `2c178715` 暴露交付证据仍只核对工作树，13383 passed / 1 failed / 7 skipped；改为在 audit-only seal 存在时读取真实 `VERIFIED_SOURCE_SHA` Git 对象并执行 seal guard。随后逐文件 `git show` 在全量并发下先出现 `ENOBUFS`，再因 3454 次进程启动超过 60 秒；没有提高测试超时，改用一次 `git cat-file --batch`，保留全部逐文件字节数与 SHA-256 断言。上述失败日志为 `/tmp/lingxi-r01-r10-postseal-full.log`、`/tmp/lingxi-r01-r10-final-postseal-full.log`。
+- 最终源码候选 `7cf986236cb8ac5c2d22cce1e5882554a42cff28`，审计封印提交 `62c73f77`；候选 source manifest SHA-256 `c418b3ef2fc475e40ed779f21b8e087b120834e9b673baf2e67c3758138d30d8`。封印后独立 diff guard 与 133 路径矩阵通过，upstream-sync、seal、round2 delivery 三文件 20/20 通过。
+- 封印后原样 `npm test` exit 0：1334 文件通过 / 1 既有跳过，13384 测试通过 / 7 既有跳过，0 fail，82.80s；日志 `/tmp/lingxi-r01-r10-final-postseal-full-v2.log`。最终审计记录只改本 allowlist 内的 `PROGRESS.md`，不改变受测源码候选。

@@ -1,0 +1,177 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q01：队首附件读取挂起时，后续纯文本项不准备、不先发 31ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q02：A 已发送但回执未到时，传输租约阻止 B 发送 3ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q03：A 回执到但 run 未结束（含 run 进行中），B 均不发 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q04：model_turn_end / tool_end / mood_end 均不释放下一轮 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q05：A 正确 run_end 后，B 只发一次且顺序稳定（经 400ms 调度通道） 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q06：重复 effect / StrictMode 双调用同一调度，不重复提交 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q07：准备 A 时手动发送 C，C 不超越 B 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q08：A1 会话准备挂起，不阻塞空闲的 A2 会话 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q09：准备期间连接代次切换，旧租约不得向新连接发送旧载荷 0ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q10：旧 run 的迟到终态不结束新 run 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q11：编辑/删除正在准备的队列项，过期快照不得发送 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q12：立即插入与普通续发并发，不双发、不绕过预检 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q13：run 在插话准备期间结束/更换，不得插入错误的 run 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q14：agent review 排队项立即插入保留既有禁止语义，不静默丢失 0ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q15：abort 后先收到权威终态再续发；迟到媒体结果不重开旧 run 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q16：两个会话各自一次发送，投影与载荷互不混块 1ms
+ × desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-01/R03-02：旧 timer 到点读取最后一次编辑保护，不延长计时 3ms
+   → expected "vi.fn()" to not be called at all, but actually been called 1 times
+
+Received:
+
+  1st vi.fn() call:
+
+    Array [
+      "{"type":"prompt","clientMessageId":"client-user-3cb4c1ca-d266-440b-af64-d40b4c3b2ff2","text":"旧快照","sessionId":"sess-/session/a.jsonl","sessionPath":"/session/a.jsonl","uiContext":null,"displayMessage":{"text":"旧快照"}}",
+    ]
+
+
+Number of calls: 1
+
+ × desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-07：A timer 未开始切 B，不自动发送 A 1ms
+   → expected "vi.fn()" to not be called at all, but actually been called 1 times
+
+Received:
+
+  1st vi.fn() call:
+
+    Array [
+      "{"type":"prompt","clientMessageId":"client-user-3e247e26-84a9-4956-b9fc-fb6a7d25f8dd","text":"A","sessionId":"sess-/session/a.jsonl","sessionPath":"/session/a.jsonl","uiContext":null,"displayMessage":{"text":"A"}}",
+    ]
+
+
+Number of calls: 1
+
+ × desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-04：保存相同正文不改变版本和 blocked 状态 1ms
+   → expected 2 to be 1 // Object.is equality
+ × desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-04：同 queueItemId 新版本不复用旧逻辑身份 1ms
+   → expected 'client-user-41604fa9-63c7-46fa-98a9-9…' not to be 'client-user-41604fa9-63c7-46fa-98a9-9…' // Object.is equality
+ × desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03-03：慢准备期间队列进入编辑，commit 同步拒绝旧快照 1ms
+   → expected "vi.fn()" to not be called at all, but actually been called 1 times
+
+Received:
+
+  1st vi.fn() call:
+
+    Array [
+      "{"type":"prompt","clientMessageId":"client-user-99f5656b-5468-4137-a3f5-8de7722d0e93","text":"旧文","sessionId":"sess-/session/a.jsonl","sessionPath":"/session/a.jsonl","uiContext":null,"displayMessage":{"text":"旧文","attachments":[{"fileId":"sf_img","path":"/tmp/a.png","name":"a.png","isDir":false,"mimeType":"image/png","visionAuxiliary":false}]},"images":[{"type":"image","data":"SU1H","mimeType":"image/png"}]}",
+    ]
+
+
+Number of calls: 1
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-01/R03-02：旧 timer 到点读取最后一次编辑保护，不延长计时
+AssertionError: expected "vi.fn()" to not be called at all, but actually been called 1 times
+
+Received:
+
+  1st vi.fn() call:
+
+    Array [
+      "{"type":"prompt","clientMessageId":"client-user-3cb4c1ca-d266-440b-af64-d40b4c3b2ff2","text":"旧快照","sessionId":"sess-/session/a.jsonl","sessionPath":"/session/a.jsonl","uiContext":null,"displayMessage":{"text":"旧快照"}}",
+    ]
+
+
+Number of calls: 1
+
+ ❯ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts:688:39
+    686|     requestQueueFlush(PATH_A, { ...makeDeps(), shouldSkipItem: () => t…
+    687|     await vi.advanceTimersByTimeAsync(200);
+    688|     expect(wsMocks.current!.send).not.toHaveBeenCalled();
+       |                                       ^
+    689|     expect(queueOf(PATH_A)).toHaveLength(1);
+    690|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-07：A timer 未开始切 B，不自动发送 A
+AssertionError: expected "vi.fn()" to not be called at all, but actually been called 1 times
+
+Received:
+
+  1st vi.fn() call:
+
+    Array [
+      "{"type":"prompt","clientMessageId":"client-user-3e247e26-84a9-4956-b9fc-fb6a7d25f8dd","text":"A","sessionId":"sess-/session/a.jsonl","sessionPath":"/session/a.jsonl","uiContext":null,"displayMessage":{"text":"A"}}",
+    ]
+
+
+Number of calls: 1
+
+ ❯ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts:698:39
+    696|     useStore.setState({ currentSessionPath: PATH_B, currentSessionId: …
+    697|     await vi.advanceTimersByTimeAsync(400);
+    698|     expect(wsMocks.current!.send).not.toHaveBeenCalled();
+       |                                       ^
+    699|     expect(queueOf(PATH_A)).toHaveLength(1);
+    700|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-04：保存相同正文不改变版本和 blocked 状态
+AssertionError: expected 2 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts:706:53
+    704|     useStore.getState().setQueuedTurnInputStatus(PATH_A, 'r03-a', 'blo…
+    705|     useStore.getState().updateQueuedTurnInputText(PATH_A, 'r03-a', '  …
+    706|     expect(queueOf(PATH_A)[0].snapshotVersion ?? 1).toBe(1);
+       |                                                     ^
+    707|     expect(queueOf(PATH_A)[0].status).toBe('blocked');
+    708|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-04：同 queueItemId 新版本不复用旧逻辑身份
+AssertionError: expected 'client-user-41604fa9-63c7-46fa-98a9-9…' not to be 'client-user-41604fa9-63c7-46fa-98a9-9…' // Object.is equality
+ ❯ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts:719:62
+    717|     const next = tryAcquireSendLease({ identity: identityOf(PATH_A), b…
+    718|     if (!next.ok) throw new Error('expected new lease');
+    719|     expect(getSendRecord(next.leaseId)!.clientMessageId).not.toBe(getS…
+       |                                                              ^
+    720|   });
+    721| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03-03：慢准备期间队列进入编辑，commit 同步拒绝旧快照
+AssertionError: expected "vi.fn()" to not be called at all, but actually been called 1 times
+
+Received:
+
+  1st vi.fn() call:
+
+    Array [
+      "{"type":"prompt","clientMessageId":"client-user-99f5656b-5468-4137-a3f5-8de7722d0e93","text":"旧文","sessionId":"sess-/session/a.jsonl","sessionPath":"/session/a.jsonl","uiContext":null,"displayMessage":{"text":"旧文","attachments":[{"fileId":"sf_img","path":"/tmp/a.png","name":"a.png","isDir":false,"mimeType":"image/png","visionAuxiliary":false}]},"images":[{"type":"image","data":"SU1H","mimeType":"image/png"}]}",
+    ]
+
+
+Number of calls: 1
+
+ ❯ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts:734:37
+    732|   gated.release('SU1H');
+    733|   await pending;
+    734|   expect(wsMocks.current!.send).not.toHaveBeenCalled();
+       |                                     ^
+    735|   expect(queueOf(PATH_A)).toHaveLength(1);
+    736| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 16 passed (21)
+   Start at  13:37:29
+   Duration  654ms (transform 230ms, setup 18ms, import 277ms, tests 60ms, environment 236ms)
+

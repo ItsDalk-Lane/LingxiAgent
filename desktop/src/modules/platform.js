@@ -121,8 +121,6 @@
     openSkillViewer: () => {},
     listSkillFiles: async () => [],
     readSkillFile: async () => null,
-    onSkillViewerLoad: () => {},
-    closeSkillViewer: () => {},
 
     // Onboarding
     onboardingComplete: async () => {},

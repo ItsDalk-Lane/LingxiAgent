@@ -1,0 +1,23 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+stdout | tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > X2-01 pending/active 混合旧库经首次迁移、恢复重试、删除与重启后无重复或复活
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 1 duplicates, 2 source items
+
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > X2-01 pending/active 混合旧库经首次迁移、恢复重试、删除与重启后无重复或复活 49ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-01 E11 pending 在前 active 在后仍复用 active 2ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-02 rejected 历史在前三次批量导入只增加一个 active 2ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-04 只恢复批准部分，其他候选仍显示 3ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-05 同一 operation 返回原 summary 不再写库 4ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-06 同一 operation 改批准决策拒绝 3ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-07 完成后删除再用原单不能复活 3ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-08 新批准操作才允许恢复用户删除内容 5ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-09 批准后 source 改变拒绝写入 1ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-09 批准后 target 改变拒绝写入 2ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-13 收据按 operation 存放，不覆盖首次迁移位置 2ms
+
+ Test Files  1 passed (1)
+      Tests  11 passed (11)
+   Start at  16:49:04
+   Duration  231ms (transform 72ms, setup 20ms, import 65ms, tests 78ms, environment 0ms)
+

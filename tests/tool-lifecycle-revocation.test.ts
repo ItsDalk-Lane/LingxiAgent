@@ -153,15 +153,11 @@ async function pluginFixture(pluginId: string) {
 }
 
 describe("旧插件会话撤销", () => {
-  it.each([
-    ["disable", async (manager: PluginManager, pluginId: string) => manager.disablePlugin(pluginId)],
-    ["uninstall", async (manager: PluginManager, pluginId: string) => manager.removePlugin(pluginId)],
-    ["reload", async (manager: PluginManager, pluginId: string) => manager.enablePlugin(pluginId)],
-  ])("审批后 %s 会以 TARGET_REVOKED 拒绝且不执行旧对象", async (_operation, mutate) => {
-    const pluginId = `lifecycle-${_operation}`;
+  it("审批后卸载插件会以 TARGET_REVOKED 拒绝且不执行旧对象", async () => {
+    const pluginId = "lifecycle-unload";
     const { manager, invocation } = await pluginFixture(pluginId);
 
-    await expect(invokeAfterApproval(invocation, () => mutate(manager, pluginId)))
+    await expect(invokeAfterApproval(invocation, () => manager.unloadPlugin(pluginId)))
       .rejects.toMatchObject({ code: "TARGET_REVOKED" });
     expect(invocation.executeCanonical).not.toHaveBeenCalled();
   });

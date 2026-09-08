@@ -1,0 +1,9 @@
+{
+  "base": "67dee5d2de9d3b9fc75ec5ef5c555e93c65b3ccd",
+  "result": "VERIFIED",
+  "patch": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch",
+  "patchBytes": 82685333,
+  "patchSha256": "cdf42f9854ed7fda736152231437e0e4bdfcd7c38f631b0dc5d78d43e7777761",
+  "sourceManifestHash": "edb36fefbd8f59c2d848281ae65148bb37f26197f8207724d40698abd1f75240",
+  "replayedSourceManifestHash": "edb36fefbd8f59c2d848281ae65148bb37f26197f8207724d40698abd1f75240"
+}

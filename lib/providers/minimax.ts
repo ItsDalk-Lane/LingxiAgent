@@ -62,6 +62,13 @@ export const minimaxPlugin = {
   capabilities: {
     media: {
       imageGeneration: minimaxImageGenerationCapability,
+      speechGeneration: {
+        defaultModelId: "speech-02-hd",
+        models: [
+          { id: "speech-02-hd", displayName: "Speech 02 HD", protocolId: "minimax-tts", inputs: ["text"], outputs: ["audio"] },
+          { id: "speech-02-turbo", displayName: "Speech 02 Turbo", protocolId: "minimax-tts", inputs: ["text"], outputs: ["audio"] },
+        ],
+      },
     },
   },
 };

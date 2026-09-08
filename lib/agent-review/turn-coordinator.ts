@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { isDesktopInputRejectedBeforeAcceptance } from '../../core/desktop-session-submit.ts';
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- engine and Pi session boundaries are runtime-injected */
 
@@ -16,6 +17,13 @@ export interface AgentReviewStatus {
   error?: string | null;
 }
 
+/** 评审输入「未被接受」结算通知（C01）：父会话提交前失败/取消时回调提交客户端。 */
+export interface AgentReviewRejectionInfo {
+  code: string;
+  message: string;
+  retryable: boolean;
+}
+
 interface ReviewTurnInput {
   requestId?: string | null;
   reviewedSessionId: string;
@@ -25,11 +33,14 @@ interface ReviewTurnInput {
   displayMessage?: Record<string, unknown> | null;
   sessionRefs?: SessionReference[];
   clientMessageId?: string | null;
+  snapshotVersion?: number;
   images?: any[];
   videos?: any[];
   audios?: any[];
   uiContext?: any;
   sessionFileRefs?: any[];
+  /** 父会话提交前失败/取消：用户输入从未被接受，通知提交方结算发送记录。 */
+  onRejected?: (info: AgentReviewRejectionInfo) => void;
 }
 
 interface ReviewTurnRecord {
@@ -38,6 +49,8 @@ interface ReviewTurnRecord {
   state: AgentReviewStatus['status'];
   reviewerSessionId: string | null;
   reviewerSessionPath: string | null;
+  /** 父会话（被审阅会话）的最终提交已发起：此后用户输入已被接受，失败不再按未接受结算。 */
+  parentSubmitted: boolean;
 }
 
 interface CoordinatorDeps {
@@ -48,6 +61,15 @@ interface CoordinatorDeps {
 
 function reviewWasCancelled(record: ReviewTurnRecord): boolean {
   return record.state === 'cancelled';
+}
+
+/** 评审链路已知失败的稳定错误码；未知错误统一 review_failed_before_acceptance。 */
+function rejectionCodeForReviewError(message: string): string {
+  if (message === 'session_busy') return 'session_busy';
+  if (message === 'reviewed_session_model_unavailable') return 'reviewed_session_model_unavailable';
+  if (message === 'reviewer_session_creation_failed') return 'reviewer_session_creation_failed';
+  if (message === 'reviewer_returned_empty_result') return 'reviewer_returned_empty_result';
+  return 'review_failed_before_acceptance';
 }
 
 function nonEmptyString(value: unknown): string | null {
@@ -158,6 +180,7 @@ export class AgentReviewTurnCoordinator {
       state: 'running',
       reviewerSessionId: null,
       reviewerSessionPath: null,
+      parentSubmitted: false,
     };
     this.records.set(requestId, record);
     this.requestByParentSession.set(input.reviewedSessionId, requestId);
@@ -174,6 +197,13 @@ export class AgentReviewTurnCoordinator {
       this.deps.engine.emitEvent?.({ type: 'session_status', isStreaming: false }, input.reviewedSessionPath);
       this.requestByParentSession.delete(input.reviewedSessionId);
       this.records.delete(requestId);
+      // 父会话提交前失败：用户输入（评审请求）从未被接受到任何用户会话——
+      // 通知提交客户端按未接受结算，释放输入屏障（C01）。父会话提交抛错但
+      // 提交层证明「未接受」（busy 门禁等）时同样结算；已接受后的运行失败
+      // 不在这里通知。
+      if (input.onRejected && (!record.parentSubmitted || isDesktopInputRejectedBeforeAcceptance(error))) {
+        input.onRejected({ code: rejectionCodeForReviewError(message), message, retryable: true });
+      }
     }
   }
 
@@ -257,6 +287,7 @@ export class AgentReviewTurnCoordinator {
       reviewText,
       sessionRefs: input.sessionRefs,
     });
+    record.parentSubmitted = true;
     await submitSessionMessage(engine, {
       sessionId: input.reviewedSessionId,
       sessionPath: input.reviewedSessionPath,
@@ -265,6 +296,7 @@ export class AgentReviewTurnCoordinator {
       videos: input.videos,
       audios: input.audios,
       clientMessageId: input.clientMessageId,
+      snapshotVersion: input.snapshotVersion,
       uiContext: input.uiContext,
       sessionFileRefs: input.sessionFileRefs,
       displayMessage: {
@@ -288,7 +320,11 @@ export class AgentReviewTurnCoordinator {
     this.emit(record, { error: reason });
     this.deps.engine.emitEvent?.({ type: 'session_status', isStreaming: false }, record.input.reviewedSessionPath);
     this.requestByParentSession.delete(sessionId);
-    this.records.delete(requestId);
+    this.records.delete(record.requestId);
+    // 用户停止发生在父会话提交前：输入确定未被接受，结算发送记录（C01）。
+    if (!record.parentSubmitted && record.input.onRejected) {
+      record.input.onRejected({ code: 'review_cancelled_before_acceptance', message: reason, retryable: true });
+    }
     return true;
   }
 }

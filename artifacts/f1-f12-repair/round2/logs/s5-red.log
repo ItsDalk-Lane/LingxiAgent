@@ -1,0 +1,170 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 词表外的孤儿闭标签按残渣吞掉（mm:think 方言，单次喂入） 32ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 连续两个词表外孤儿闭标签全部吞掉（模型连发收尾标签的实测形态） 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 跨 delta 撕裂的词表外闭标签也能识别并吞掉 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 词表内的孤儿闭标签保持字面透传（转义/教学契约，残渣由链尾兜底） 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 链尾 MoodParser 吞掉词表外孤儿闭标签（mm:think 实测泄漏形态） 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 链头 ThinkTagParser 透传下游结构标签（</mood> 不得被误吞） 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 成对的 mm:think 方言标签结构化，内容进 think 通道 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 代码保护区内的闭标签仍按字面保留（教学场景不受影响） 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 普通小于号与数学比较不受影响 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > ReservedTagScanner 词表外孤儿闭标签形状规则 > 转义的字面闭标签（词表内）仍按契约输出字面量 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > splitReservedTagSegments 词表外孤儿闭标签清理（历史渲染兜底） > 旧落盘正文里的孤儿闭标签在全文切分时被清掉 0ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts > splitReservedTagSegments 词表外孤儿闭标签清理（历史渲染兜底） > 词表内的成对标签在全文切分时成为结构化块 0ms
+ × desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-01/09：围栏代码的转义标签在实时、终态和复制中保留原反斜杠 57ms
+   → expected '<tag> 与 </think>\n' to be '\<tag> 与 \</think>\n' // Object.is equality
+ × desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-02：行内代码中的闭标签和反斜杠不被协议解析或显示预处理删除 5ms
+   → expected [ '</think>', 'C:\path<tag>' ] to deeply equal [ '\</think>', 'C:\path\<tag>' ]
+ × desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-03/05：正文转义标签只由 Markdown 消费且同一 source 重渲染稳定 4ms
+   → expected '已知：<mood>平静</mood>；未知：vendor:tag内容</v…' to contain '<vendor:tag>内容</vendor:tag>'
+ × desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-04：连续1到4个反斜杠按 Markdown 词法处理，不由组件额外删层 3ms
+   → expected '<p>一：&lt;tag&gt;；二：&lt;tag&gt;；三：\&lt…' to be '<p>一：&lt;tag&gt;；二：\&lt;tag&gt;；三：\&l…' // Object.is equality
+ × desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-10：超长纯文本降级直接转义 canonical source，旧 html-only 内容不被反推 2ms
+   → expected '代码 <tag> 和 </think>' to be '代码 \<tag> 和 \</think>' // Object.is equality
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > treats source as authoritative when a stale legacy html cache is also present 2ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > defers mermaid enhancement until the turn is settled 55ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > defers KaTeX layout until the turn is settled 9ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > uses a configurable plain-text circuit breaker for oversized active source 2ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > renders active prose through markdown html instead of a plain-text fallback 2ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > matches final markdown paragraph structure while prose is streaming 1ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > updates prose immediately through the upstream 30Hz flush instead of local text animation debt 1ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > hard-catches up 80-character prose backlogs without waiting for animation debt 1ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > renders final prose with markdown html when streaming is complete 1ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > does not typewriter complex markdown blocks 2ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > keeps complex markdown mounted while streaming updates arrive 3ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > co-renders code block toolbar without post-render DOM injection 2ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > handles co-rendered code toolbar wrap and copy actions through React events 6ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > does not typewriter backtick-sensitive inline markdown while streaming 1ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > keeps common markdown formatting rendered while streaming 3ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > does not fall back to plain text when rendered html contains formatting 1ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > uses identical markdown html structure while streaming and after completion 2ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > uses identical mermaid html structure while streaming and after completion 2ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > keeps stream motion off React animation frames and limits CSS to opacity or tiny transforms 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T01: 正常配对的未知标记全部保留 20ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T02: 属性内带引号的 > 不误截断，配对闭标签保留 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T03: 未知自闭合标记与正常嵌套不产生伪孤儿 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T04: 未知孤儿闭标签在最终原始 assistant 边界清理 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T05: 已知 think/mood/mm:think 成对结构化通道不退化（完整链） 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T06: code fence／inline code 内闭标签字符不变 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T07: 已转义已知／未知闭标签经完整链保留字面量（链上带 \，显示层去 \） 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T08: 每个字符位置二分喂入与一次性喂入语义一致 4ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T09: 固定种子多段分块与一次性喂入等价（事件序列归一） 1ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T10: 半截标记后 flush 按字面定界，不跨 assistant segment 污染 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T11: a<b、比较式、注释、CDATA 保守保留非协议内容 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 通用形状规则与正常标记保护（T01–T12：scanner 与完整链） > T12: 错配嵌套与超深/超长输入不崩溃、不成段丢正文 19ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 历史与实时入口（T13–T16） > T13: 同源 raw 实时与历史路径的 answer 文本一致（未知配对保留 + 孤儿清理 + 代码保护） 10ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 历史与实时入口（T13–T16） > T14: 已规范化 canonical 文本再渲染不再次清理字面内容（转义字面量稳定） 1ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 历史与实时入口（T13–T16） > T15: 用户输入含 HTML/XML 不进入 assistant 残渣清理 1ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 历史与实时入口（T13–T16） > T16: 历史仅孤儿残渣、无 leading block 可删时不被 return 原 source 抵消清理 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 splitReservedTagSegments 与显示投影 > 孤儿清理与配对保留在全文切分同时成立 0ms
+ ✓ tests/reserved-tag-text-preservation.test.ts > F8/P6 splitReservedTagSegments 与显示投影 > stripTagEscapes 只摘除紧邻完整标签形状的反斜杠，幂等且不动普通反斜杠 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-01/09：围栏代码的转义标签在实时、终态和复制中保留原反斜杠
+AssertionError: expected '<tag> 与 </think>\n' to be '\<tag> 与 \</think>\n' // Object.is equality
+
+- Expected
++ Received
+
+- \<tag> 与 \</think>
++ <tag> 与 </think>
+
+
+ ❯ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx:47:58
+     45|     const { container, rerender } = render(<StreamingMarkdownContent s…
+     46|
+     47|     expect(container.querySelector('code')?.textContent).toBe('\\<tag>…
+       |                                                          ^
+     48|     fireEvent.click(container.querySelectorAll<HTMLButtonElement>('.co…
+     49|     await waitFor(() => expect(writeText).toHaveBeenCalledWith('\\<tag…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-02：行内代码中的闭标签和反斜杠不被协议解析或显示预处理删除
+AssertionError: expected [ '</think>', 'C:\path<tag>' ] to deeply equal [ '\</think>', 'C:\path\<tag>' ]
+
+- Expected
++ Received
+
+  [
+-   "\\</think>",
+-   "C:\\path\\<tag>",
++   "</think>",
++   "C:\\path<tag>",
+  ]
+
+ ❯ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx:58:90
+     56|     const source = '教学：`\\</think>` 与 `C:\\path\\<tag>`';
+     57|     const { container } = render(<StreamingMarkdownContent source={sou…
+     58|     expect(Array.from(container.querySelectorAll('code')).map(node => …
+       |                                                                                          ^
+     59|       '\\</think>',
+     60|       'C:\\path\\<tag>',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-03/05：正文转义标签只由 Markdown 消费且同一 source 重渲染稳定
+AssertionError: expected '已知：<mood>平静</mood>；未知：vendor:tag内容</v…' to contain '<vendor:tag>内容</vendor:tag>'
+
+- Expected
++ Received
+
+- <vendor:tag>内容</vendor:tag>
++ 已知：<mood>平静</mood>；未知：vendor:tag内容</vendor:tag>
++
+
+ ❯ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx:69:35
+     67|     const first = container.querySelector('.md-content')?.innerHTML;
+     68|     expect(container.textContent).toContain('<mood>平静</mood>');
+     69|     expect(container.textContent).toContain('<vendor:tag>内容</vendor:ta…
+       |                                   ^
+     70|     expect(container.querySelector('mood')).toBeNull();
+     71|     expect(container.querySelector('vendor\\:tag')).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-04：连续1到4个反斜杠按 Markdown 词法处理，不由组件额外删层
+AssertionError: expected '<p>一：&lt;tag&gt;；二：&lt;tag&gt;；三：\&lt…' to be '<p>一：&lt;tag&gt;；二：\&lt;tag&gt;；三：\&l…' // Object.is equality
+
+- Expected
++ Received
+
+- <p>一：&lt;tag&gt;；二：\&lt;tag&gt;；三：\&lt;tag&gt;；四：\\&lt;tag&gt;</p>
++ <p>一：&lt;tag&gt;；二：&lt;tag&gt;；三：\&lt;tag&gt;；四：\&lt;tag&gt;</p>
+
+
+ ❯ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx:81:63
+     79|     const expected = renderMarkdown(source);
+     80|     const { container } = render(<StreamingMarkdownContent source={sou…
+     81|     expect(container.querySelector('.md-content')?.innerHTML).toBe(exp…
+       |                                                               ^
+     82|     expect(source).toBe(String.raw`一：\<tag>；二：\\<tag>；三：\\\<tag>；四：\\\…
+     83|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx > StreamingMarkdownContent > R05-10：超长纯文本降级直接转义 canonical source，旧 html-only 内容不被反推
+AssertionError: expected '代码 <tag> 和 </think>' to be '代码 \<tag> 和 \</think>' // Object.is equality
+
+Expected: "代码 \<tag> 和 \</think>"
+Received: "代码 <tag> 和 </think>"
+
+ ❯ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx:88:42
+     86|     const source = '代码 \\<tag> 和 \\</think>';
+     87|     const active = render(<StreamingMarkdownContent source={source} ac…
+     88|     expect(active.container.textContent).toBe(source);
+       |                                          ^
+     89|     active.unmount();
+     90|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  5 failed | 49 passed (54)
+   Start at  14:19:17
+   Duration  1.44s (transform 785ms, setup 39ms, import 1.55s, tests 258ms, environment 544ms)
+

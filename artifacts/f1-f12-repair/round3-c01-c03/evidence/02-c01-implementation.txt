@@ -1,0 +1,19 @@
+=== C01 实施记录 2026-09-08T10:56:55Z ===
+新增测试: tests/round3-c01-input-rejection.test.ts — 22 passed
+回归: round2-composer-reconciliation-route + agent-review-turn-coordinator + chat-route-switching + chat-route-knowledge-refs + chat-route-skill-message + chat-route-session-identity + chat-route-mood-segment + chat-route-reserved-raw-fallback + desktop-session-submit×4 = 226 passed
+
+ core/desktop-session-submit.ts                     |  72 +++++++-
+ desktop/src/locales/en.json                        |   5 +-
+ desktop/src/locales/ja.json                        |   5 +-
+ desktop/src/locales/ko.json                        |   5 +-
+ desktop/src/locales/zh-TW.json                     |   5 +-
+ desktop/src/locales/zh.json                        |   5 +-
+ desktop/src/react/components/chat/UserMessage.tsx  |  27 ++-
+ .../src/react/components/input/composer-send.ts    |  19 +-
+ .../react/services/composer-send-coordinator.ts    | 204 ++++++++++++++++++++-
+ desktop/src/react/services/ws-message-handler.ts   |  34 +++-
+ desktop/src/react/stores/chat-slice.ts             |  58 +++++-
+ desktop/src/react/stores/chat-types.ts             |   2 +
+ lib/agent-review/turn-coordinator.ts               |  36 +++-
+ server/routes/chat.ts                              | 180 +++++++++++-------
+ 14 files changed, 567 insertions(+), 90 deletions(-)

@@ -8,7 +8,57 @@
 
 import type { FileVersion } from '../types';
 import type { ThinkingLevel } from './model-slice';
+import type { AttachedFile, QuotedSelection } from './input-slice';
 import type { KnowledgeReferenceMode, KnowledgeRetrievalStats, LegacyKnowledgeReferenceMode } from '../../../../shared/knowledge-refs.ts';
+import type { EditorAgentMention, EditorFileRef, EditorSessionRef } from '../utils/editor-serializer';
+
+/**
+ * 输入框「发送派发」的快照载荷：直发、排队续发、「立即插入」三条路径共用。
+ * text 是用户正文；附件清单/文档引用/引用片段在派发时按快照重新拼接。
+ */
+export interface ComposerSendBundle {
+  type: 'prompt' | 'interject';
+  sessionRef: { sessionId: string; sessionPath: string; agentId: string | null };
+  text: string;
+  skills: string[];
+  fileRefs: EditorFileRef[];
+  sessionRefs: EditorSessionRef[];
+  agentMentions: EditorAgentMention[];
+  /** 附件快照（attachedFiles + 编辑器文件徽章合并结果；含粘贴图片的 base64Data 缓存）。 */
+  inputFiles: AttachedFile[];
+  knowledgeRefs: { notebookIds: string[]; notebookNames: Record<string, string>; mode: KnowledgeReferenceModeDisplay } | null;
+  docContextAttached: boolean;
+  doc: { path: string; name: string } | null;
+  quotes: QuotedSelection[];
+  uiContext: unknown;
+}
+
+/** 流式期间发送的用户输入：入队等待，上一轮回答结束后自动续发。 */
+export interface QueuedTurnInput {
+  id: string;
+  sessionPath: string;
+  /** 卡片展示与再编辑的纯文本（= bundle.text 的镜像）。 */
+  text: string;
+  createdAt: number;
+  bundle: ComposerSendBundle;
+  /**
+   * 快照版本：编辑保存递增（F1）。在途准备按版本对账，迟到的旧版本结果
+   * 不得覆盖更新后的队列项。
+   */
+  snapshotVersion?: number;
+  /** 编辑保护由 coordinator 同步设置，不改变进入编辑前的失败状态。 */
+  editing?: boolean;
+  /**
+   * 调度状态：ready = 等待自动/手动派发；blocked / failed = 上次派发被门禁
+   * 拦下或提交前失败，队列项原位保留全部字段，等待用户编辑/删除/显式重试
+   *（自动调度不会在失败项上无限循环，也不跳过队首）。
+   */
+  status?: 'ready' | 'blocked' | 'failed';
+  /** blocked/failed 时的显式错误码（与 ComposerDispatchResult.code 一致）。 */
+  errorCode?: string;
+  /** 上次失败是否允许按原快照显式重试（默认 true；门禁类 blocked 为 false）。 */
+  retryable?: boolean;
+}
 
 /**
  * 消息投影上的知识引用模式：新值 fast/detailed + 存量 qa/assist（旧消息
@@ -26,7 +76,7 @@ export interface ToolCall {
   success: boolean;
   status?: 'running' | 'succeeded' | 'failed' | 'unknown';
   error?: string;
-  details?: { card?: import('../types').PluginCardDetails; [key: string]: unknown };
+  details?: { [key: string]: unknown };
   /** 完成态行内结果注记（如「50 个结果」）：合成过程卡（knowledge_*）经 tool_end
    * resultNote 透出；真实工具不携带。 */
   resultNote?: string;
@@ -367,7 +417,6 @@ export type RichBlock = ContentBlockSemantics & (
     startedAt?: number | null;
     finishedAt?: number | null;
   }
-  | { type: 'plugin_card'; card: import('../types').PluginCardDetails }
   | { type: 'interactive_card'; cardId: string; title: string; code: string }
   | {
     type: 'turn_status';
@@ -382,6 +431,7 @@ export type ContentBlock = TextDecorator | RichBlock;
 
 export interface ChatMessage {
   id: string;              // UI message id；本地发送的 user message 可先使用 clientMessageId
+  clientMessageId?: string; // 可验证的桌面输入关联；分页ID仍保持历史索引
   sourceEntryId?: string;  // Pi SDK session entry id，用于 branch-aware 的重新生成/编辑
   /** 本次 Agent turn 的真实输入 entry；隐藏后台输入也必须保留，不能猜到最近可见 user。 */
   turnInputEntryId?: string;
@@ -409,6 +459,8 @@ export interface ChatMessage {
   agentReviewRequest?: AgentReviewRequestContext;
   sendStatus?: 'pending' | 'failed';
   sendError?: string;
+  /** 失败后是否允许按原快照显式重试（服务端拒绝回执携带；C01）。 */
+  sendRetryable?: boolean;
   /** 非用户本人发出的消息来源（如别的 Agent 经跨 session 协作投递）。老数据无此字段，按普通用户消息渲染。 */
   origin?: { kind: 'agent'; agentId: string | null; agentName: string | null };
   // Assistant

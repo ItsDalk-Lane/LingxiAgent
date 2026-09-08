@@ -6,6 +6,13 @@ const MIME_TO_EXT = {
   "image/png": "png",
   "image/jpeg": "jpg",
   "image/webp": "webp",
+  // 语音合成产物（openai-audio-speech / system-speech）
+  "audio/mpeg": "mp3",
+  "audio/ogg": "ogg",
+  "audio/aac": "aac",
+  "audio/flac": "flac",
+  "audio/wav": "wav",
+  "audio/mp4": "m4a",
 };
 
 /**
@@ -18,6 +25,7 @@ const MIME_TO_EXT = {
  */
 export async function saveImage(buffer, mimeType, dataDir, customName) {
   const ext = MIME_TO_EXT[mimeType] || "png";
+  // 未知 MIME 仍回落 png（历史行为）；音频适配器只传上表内的 MIME。
   const hash = crypto.createHash("md5").update(buffer).digest("hex").slice(0, 8);
   // sanitize custom name: keep alphanumeric, CJK, hyphens, underscores
   const safeName = customName

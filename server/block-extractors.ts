@@ -69,6 +69,8 @@ export const BLOCK_EXTRACTORS = {
 
   "media_generate-video": (details) => extractMediaGenerationBlocks(details, "video"),
 
+  "media_generate-speech": (details) => extractMediaGenerationBlocks(details, "speech"),
+
   computer: (details) => {
     const confirmation = details.confirmation;
     if (details.action !== "start" || confirmation?.kind !== "computer_app_approval") return null;
@@ -336,6 +338,7 @@ function mediaGenerationReplacementBlocks(block, result) {
 
 function mediaKindFromDeferredType(type) {
   if (type === "video-generation") return "video";
+  if (type === "speech-generation") return "speech";
   if (type === "image-generation") return "image";
   return "image";
 }
@@ -403,21 +406,6 @@ export function resolveMediaGenerationBlocks(blocks, results = new Map(), standa
   return resolved;
 }
 
-function extractPluginCard(details) {
-  if (!details?.card?.pluginId) return null;
-  const c = details.card;
-  const {
-    // COMPAT(v0.127, remove no earlier than v0.133):
-    // 文件归属必须走 SessionFile / details.media，card 只保留展示参数。
-    file: _file,
-    files: _files,
-    sessionFile: _sessionFile,
-    sourceFile: _sourceFile,
-    ...safeCard
-  } = c;
-  return { type: "plugin_card", card: { ...safeCard, type: safeCard.type || "iframe" } };
-}
-
 export function extractBlocks(toolName, details, toolResult) {
   const blocks = [];
   const extractor = BLOCK_EXTRACTORS[toolName];
@@ -425,32 +413,7 @@ export function extractBlocks(toolName, details, toolResult) {
     const result = extractor(details || {}, toolResult);
     if (result) blocks.push(...result);
   }
-  const card = extractPluginCard(details);
-  if (card) blocks.push(card);
   return blocks;
 }
 
-/**
- * Drops plugin_card blocks whose owning plugin is not currently installed
- * (e.g. a historical session recorded by a since-retired plugin, or a
- * plugin the user has since uninstalled). Applied at the consuming side
- * (routes), which has access to pluginManager -- this module stays a pure
- * toolResult -> blocks transform with no plugin-manager dependency of its
- * own. `isPluginInstalled` is expected to fail open (see
- * pluginInstalledPredicate below) so a caller without plugin-manager access
- * never silently hides a real card.
- */
-export function dropUninstalledPluginCards(blocks, isPluginInstalled?: ((pluginId: any) => boolean) | null) {
-  if (typeof isPluginInstalled !== "function") return blocks;
-  return blocks.filter((b) => b?.type !== "plugin_card" || isPluginInstalled(b.card?.pluginId));
-}
 
-/**
- * Builds the `isPluginInstalled` predicate for dropUninstalledPluginCards
- * from an engine reference. Fails open (reports "installed") when
- * pluginManager itself is unavailable, so a degraded/mocked engine never
- * causes a real card to be silently dropped.
- */
-export function pluginInstalledPredicate(engine) {
-  return (pluginId) => !engine?.pluginManager || Boolean(engine.pluginManager.getPlugin?.(pluginId));
-}

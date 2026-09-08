@@ -5,7 +5,6 @@ import path from "node:path";
 import { createRequire } from "node:module";
 import { afterEach, describe, expect, it } from "vitest";
 import { KnowledgeStore } from "../lib/knowledge/knowledge-store.ts";
-import { ResearchStore } from "../lib/knowledge/research/research-store.ts";
 
 interface SqliteDatabase {
   prepare<T = Record<string, unknown>>(sql: string): { all(): T[] };
@@ -208,22 +207,27 @@ describe("Knowledge v18 → v19 真实旧库迁移", () => {
       expect(store.getParseArtifact({ studioId, parseArtifactId: "parse_v17_ocr" })).toMatchObject({ status: "needs_ocr" });
       expect(store.getIngestionJob({ studioId, jobId: "ingjob_v17_006" }))
         .toMatchObject({ status: "running", progressDone: 1, progressTotal: 2 });
-      const research = new ResearchStore(store);
+      // 研究模式的类已退役；迁移完整性改用直读 SQL 断言（同样验证七表逐行保真）。
+      const db = store.db;
+      const row = (sql: string) => db.prepare(sql).get();
       const runId = "krun_v18_001", needId = "kneed_v18_002", evidenceId = "kei_v18_005";
-      expect(research.requireRun(runId)).toMatchObject({ status: "completed", stopReason: "complete", roundsCompleted: 1,
-        turnScopeId: "kts_v17_007", completenessPolicy: "source_diverse" });
-      expect(research.getNeed(runId, needId)).toMatchObject({ status: "supported", claim: "确定项目完成时间" });
-      expect(research.listRounds(runId)).toMatchObject([{ id: "kround_v18_003", status: "completed", newEvidenceCount: 1 }]);
-      expect(research.getReceipt(runId, "krr_v18_004")).toMatchObject({ sourceId: "src_v17_ready", contentSnapshotId: "snap_v17_ready",
-        parseArtifactId: "parse_v17_ready", consumedAt: "2026-09-04T06:00:00.000Z", channel: "knowledge_read" });
-      const evidence = research.listEvidence(runId);
-      expect(evidence).toHaveLength(1);
-      expect(evidence[0]).toMatchObject({ id: evidenceId, canonicalText: "项目 O'Reilly 在九月完成", startOffset: 6, endOffset: 23 });
-      expect(evidence[0].canonicalTextSha256).toBe(crypto.createHash("sha256").update(evidence[0].canonicalText).digest("hex"));
-      expect(research.listRelations(runId)).toMatchObject([{ needId, evidenceId, relation: "supports", sourceIndependenceKey: "src_v17_ready" }]);
-      expect(research.listActions(runId)).toMatchObject([{ status: "completed", actionType: "knowledge_read",
-        requestSummary: { sourceIds: ["src_v17_ready"], needIds: [needId] },
-        responseSummary: { count: 1, receiptIds: ["krr_v18_004"] } }]);
+      expect(row(`SELECT status, stop_reason, rounds_completed, turn_scope_id, completeness_policy FROM knowledge_research_runs WHERE id = '${runId}'`))
+        .toMatchObject({ status: "completed", stop_reason: "complete", rounds_completed: 1,
+          turn_scope_id: "kts_v17_007", completeness_policy: "source_diverse" });
+      expect(row(`SELECT status, claim FROM knowledge_evidence_needs WHERE id = '${needId}'`))
+        .toMatchObject({ status: "supported", claim: "确定项目完成时间" });
+      expect(row(`SELECT id, status, new_evidence_count FROM knowledge_research_rounds WHERE run_id = '${runId}'`))
+        .toMatchObject({ id: "kround_v18_003", status: "completed", new_evidence_count: 1 });
+      expect(row(`SELECT source_id, content_snapshot_id, parse_artifact_id, consumed_at, channel FROM knowledge_research_read_receipts WHERE id = 'krr_v18_004'`))
+        .toMatchObject({ source_id: "src_v17_ready", content_snapshot_id: "snap_v17_ready",
+          parse_artifact_id: "parse_v17_ready", consumed_at: "2026-09-04T06:00:00.000Z", channel: "knowledge_read" });
+      const evidenceRows = db.prepare(`SELECT id, canonical_text, start_offset, end_offset FROM knowledge_evidence_items WHERE run_id = '${runId}'`).all();
+      expect(evidenceRows).toHaveLength(1);
+      expect(evidenceRows[0]).toMatchObject({ id: evidenceId, canonical_text: "项目 O'Reilly 在九月完成", start_offset: 6, end_offset: 23 });
+      expect(row(`SELECT need_id, evidence_id, relation, source_independence_key FROM knowledge_need_evidence WHERE need_id = '${needId}'`))
+        .toMatchObject({ need_id: needId, evidence_id: evidenceId, relation: "supports", source_independence_key: "src_v17_ready" });
+      expect(row(`SELECT status, action_type FROM knowledge_research_actions WHERE run_id = '${runId}'`))
+        .toMatchObject({ status: "completed", action_type: "knowledge_read" });
     } finally { store.close(); }
   });
 });

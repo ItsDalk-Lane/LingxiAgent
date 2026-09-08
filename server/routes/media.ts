@@ -13,6 +13,14 @@ const MIME = {
   webp: "image/webp",
   mp4: "video/mp4",
   mov: "video/quicktime",
+  // 语音合成产物
+  mp3: "audio/mpeg",
+  ogg: "audio/ogg",
+  oga: "audio/ogg",
+  aac: "audio/aac",
+  flac: "audio/flac",
+  wav: "audio/wav",
+  m4a: "audio/mp4",
 };
 
 export function createMediaRoute(engine) {
@@ -48,10 +56,60 @@ export function createMediaRoute(engine) {
     }
   });
 
+  route.post("/media/speech/generate", async (c) => {
+    try {
+      const body = await safeJson(c);
+      const result = await requireMediaManager(engine).generateSpeechFromBus(body);
+      return c.json(result);
+    } catch (err) {
+      return c.json({ error: err.message }, 400);
+    }
+  });
+
+  route.get("/media/speech/providers", async (c) => {
+    try {
+      return c.json(await requireMediaManager(engine).listSpeechProviders());
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
+  route.put("/media/speech/config", async (c) => {
+    try {
+      const denied = denyWithoutScope(c, "settings.write");
+      if (denied) return denied;
+      const body = await safeJson(c);
+      const values = decodeConfigValues(body?.values && typeof body.values === "object" && !Array.isArray(body.values)
+        ? body.values
+        : body);
+      const config = requireMediaManager(engine).setSpeechConfig(values);
+      recordSecurityAuditEvent(c, engine, {
+        action: "settings.speechGeneration.update",
+        target: "speechGeneration",
+        metadata: {
+          hasDefaultSpeechModel: Boolean(config.defaultSpeechModel),
+        },
+      });
+      return c.json({ ok: true, config, values: config });
+    } catch (err) {
+      return c.json({ error: err.message }, 400);
+    }
+  });
+
+  route.get("/media/speech/config", async (c) => {
+    try {
+      return c.json({ config: requireMediaManager(engine).getSpeechConfig() });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
   route.post("/media/asr/transcribe", async (c) => {
     try {
       const body = await safeJson(c);
-      const result = await requireMediaManager(engine).transcribeAudio(body);
+      // F6：把已认证请求的生命周期信号透传进转写链——客户端断开时取消在途
+      // 识别（取消/超时绝不记为成功；取消语义由适配器层强制执行）。
+      const result = await requireMediaManager(engine).transcribeAudio({ ...body, signal: c.req.raw.signal });
       return c.json(result);
     } catch (err) {
       return c.json({ error: err.message }, 400);
@@ -66,6 +124,9 @@ export function createMediaRoute(engine) {
       }
       if (capability === "video_generation" || capability === "video" || capability === "videoGeneration") {
         return c.json(await requireMediaManager(engine).listVideoProviders());
+      }
+      if (capability === "speech_generation" || capability === "speechGeneration") {
+        return c.json(await requireMediaManager(engine).listSpeechProviders());
       }
       return c.json(await requireMediaManager(engine).listImageProviders());
     } catch (err) {

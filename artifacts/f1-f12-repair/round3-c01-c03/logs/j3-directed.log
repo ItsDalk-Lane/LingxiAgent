@@ -1,0 +1,33 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+stdout | tests/round3-c02-receipt-backup-dir.test.ts > C02 写侧：新收据一律 POSIX 规范路径 > 完整迁移写出的收据 backupDir 是 "/" 分隔且可原样读回（写→读往返）
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/round3-c02-receipt-backup-dir.test.ts > C02 兼容读：v3 迁移收据三个续跑状态 × Windows 旧表示 > completed 后删除记忆，再读 Windows 旧收据不复活、不重导
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/round3-c02-receipt-backup-dir.test.ts > C02 兼容读：v3 迁移收据三个续跑状态 × Windows 旧表示 > 旧 v2 completed 收据（含 Windows backupDir）读取不抛错且不重导
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/round3-c02-receipt-backup-dir.test.ts > C02 拒绝路径：结构先行验证，危险输入一律拒绝 > 危险 backupDir 让收据整体判无效（读取抛错），不落入续跑
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+ ✓ tests/round3-c02-receipt-backup-dir.test.ts (32 tests) 79ms
+stderr | tests/round3-c01-input-rejection.test.ts > C01 client settlement via real ws-message-handler > 已有 canonical 接受证据时，冲突负回执不倒退为未接收
+[composer-send] conflicting input_rejected after canonical acceptance; keeping accepted {
+  clientMessageId: 'client-user-78d415bd-1732-4ba5-8c22-34c20c2854ac',
+  attemptId: 'client-attempt-a0194f50-3c41-4978-a344-f243efc0be12',
+  code: 'model_switching'
+}
+
+ ✓ tests/round3-c01-input-rejection.test.ts (22 tests) 208ms
+ ✓ tests/round2-delivery-evidence.test.ts (10 tests) 2701ms
+     ✓ R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁  709ms
+     ✓ R10-09: 增量补丁从干净 89bc0b64 重放后，源码摘要与当前工作树完全一致  1683ms
+
+ Test Files  3 passed (3)
+      Tests  64 passed (64)
+   Start at  19:09:42
+   Duration  2.81s (transform 968ms, setup 50ms, import 1.67s, tests 2.99s, environment 299ms)
+

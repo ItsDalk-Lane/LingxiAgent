@@ -4,7 +4,6 @@ import YAML from "js-yaml";
 import { Hono } from "hono";
 import { injectGlobalFields } from "../../shared/config-scope.ts";
 import { computeSettingsAvailableToolNames } from "../../shared/tool-categories.ts";
-import { readPinnedMemoryItems } from "../../lib/memory/pinned-memory-store.ts";
 import { listExperienceDocuments } from "../../lib/tools/experience.ts";
 import { createAccessSummary, getLanAddresses } from "./access.ts";
 import { buildBridgeStatus } from "./bridge.ts";
@@ -53,10 +52,6 @@ async function readTextFile(filePath: string) {
     if (err?.code === "ENOENT") return "";
     throw err;
   }
-}
-
-function readPinned(agentBaseDir: string) {
-  return readPinnedMemoryItems(agentBaseDir).map(item => item.content);
 }
 
 function isExperienceEnabled(engine: any, id: string, config: Record<string, any>) {
@@ -157,22 +152,6 @@ function resolveSnapshotAgentId(engine: any, rawAgentId: string | undefined) {
   return id;
 }
 
-function buildPluginSettings(engine: any, canSeeLocalPaths: boolean) {
-  const pm = engine.pluginManager;
-  return {
-    allowFullAccess: pm?.getAllowFullAccess?.() || false,
-    devToolsEnabled: engine.getPluginDevToolsEnabled?.() || false,
-    userDir: canSeeLocalPaths ? (pm?.getUserPluginsDir?.() || "") : "",
-    settingsTabs: pm?.getSettingsTabs?.().map((tab: any) => ({
-      pluginId: tab.pluginId,
-      id: tab.id,
-      title: tab.title,
-      icon: tab.icon,
-      nativeComponent: tab.nativeComponent,
-    })) || [],
-  };
-}
-
 function buildBridgePreferences(engine: any) {
   const permissionMode = engine.getBridgePermissionMode?.()
     || normalizeBridgePermissionMode({ readOnly: engine.getBridgeReadOnly?.() });
@@ -235,7 +214,6 @@ export function createSettingsSnapshotRoute(engine: any, options: Record<string,
         publicAgents,
         userProfile: await readUserProfile(engine.userDir),
         experience: readExperience(engine, agentId, config),
-        pinned: { pins: readPinned(baseDir) },
         globalModels: buildGlobalModels(engine),
         preferences: {
           quickChat: engine.getQuickChatPreferences?.() || normalizeQuickChatPreferences({}),
@@ -253,7 +231,6 @@ export function createSettingsSnapshotRoute(engine: any, options: Record<string,
         bridgeStatus: snapshotAgent
           ? buildBridgeStatus(engine, resolveBridgeManager(options.bridgeManagerRef), snapshotAgent)
           : null,
-        plugins: buildPluginSettings(engine, canSeeLocalPaths),
       });
     } catch (err: any) {
       return c.json({ error: err.message }, 500);

@@ -70,7 +70,8 @@ describe('Model Observatory wire contract closed sets (Phase 9)', () => {
     expect([...SEMANTIC_INPUT_ROLES]).toHaveLength(7);
     expect([...SEMANTIC_SOURCE_TYPES]).toHaveLength(9);
     expect([...SEMANTIC_INPUT_ROOTS]).toEqual(['systemPrompt', 'messages', 'tools', 'input', 'parameters']);
-    expect([...SEMANTIC_INPUT_SHAPES]).toHaveLength(9);
+    expect([...SEMANTIC_INPUT_SHAPES]).toHaveLength(10);
+    expect(SEMANTIC_INPUT_SHAPES).toContain('media_speech');
   });
 
   it('locks pagination / group-by limits', () => {

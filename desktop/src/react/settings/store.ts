@@ -93,7 +93,6 @@ export interface SettingsSnapshot {
   publicAgents: string;
   userProfile: string;
   experience: string;
-  pinned: { pins: string[] };
   globalModels: Record<string, any>;
   preferences: {
     quickChat: Record<string, any>;
@@ -116,11 +115,6 @@ export interface SettingsSnapshot {
   };
   access?: Record<string, any> | null;
   bridgeStatus?: Record<string, any> | null;
-  plugins: {
-    allowFullAccess: boolean;
-    devToolsEnabled: boolean;
-    userDir: string;
-  };
 }
 
 export interface SettingsState {
@@ -158,7 +152,6 @@ export interface SettingsState {
   ready: boolean;
 
   // pins
-  currentPins: string[];
 
   // providers (unified)
   providersSummary: Record<string, ProviderSummary>;
@@ -166,12 +159,6 @@ export interface SettingsState {
   /** 各供应商配置面板的当前草稿凭证；「读取模型」在凭证尚未保存时用它直连远端目录 */
   providerCredentialDrafts: Record<string, ProviderCredentialDraft>;
 
-  // plugins
-  pluginSettingsStatus: RemoteResourceStatus;
-  pluginSettingsError: string | null;
-  pluginAllowFullAccess: boolean | undefined;
-  pluginDevToolsEnabled: boolean | undefined;
-  pluginUserDir: string;
 
   // toast
   toastMessage: string;
@@ -225,19 +212,12 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
   ready: false,
 
   // pins
-  currentPins: [],
 
   // providers (unified)
   providersSummary: {},
   selectedProviderId: null,
   providerCredentialDrafts: {},
 
-  // plugins
-  pluginSettingsStatus: 'idle',
-  pluginSettingsError: null,
-  pluginAllowFullAccess: undefined,
-  pluginDevToolsEnabled: undefined,
-  pluginUserDir: '',
 
   // toast
   toastMessage: '',

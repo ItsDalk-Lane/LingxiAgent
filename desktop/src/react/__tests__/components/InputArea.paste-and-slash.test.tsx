@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { InputArea } from '../../components/InputArea';
 import type { SlashItem } from '../../components/input/slash-commands';
 import { useStore } from '../../stores';
+import { resetComposerSendCoordinatorForTests } from '../../services/composer-send-coordinator';
 
 const mocks = vi.hoisted(() => ({
   editorOptions: undefined as undefined | Record<string, unknown>,
@@ -320,6 +321,8 @@ function seedInputState(overrides: Partial<ReturnType<typeof useStore.getState>>
     connected: true,
     pendingNewSession: false,
     streamingSessions: [],
+    turnPendingSessions: [],
+    queuedTurnInputsByPath: {},
     compactingSessions: [],
     inlineErrors: {},
     attachedFiles: [],
@@ -398,6 +401,8 @@ describe('InputArea paste and slash menu behavior', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // 模块级发送租约（F2 串行）跨用例复位，避免上一条 awaiting_ack 拦截后续发送。
+    resetComposerSendCoordinatorForTests();
     mocks.editorOptions = undefined;
     mocks.editorText = '';
     mocks.editorJson = undefined;

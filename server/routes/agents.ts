@@ -17,8 +17,8 @@
  * PUT    /api/agents/:id/agents-md — 写入 AGENTS.md（用户显式定制才落盘）
  * GET/PUT /api/agents/:id/public-agents-md — 读写 AGENTS.public.md
  *   （/ishiki 与 /public-ishiki 是改名前的旧段，过渡期保留为同一 handler 的别名）
- * GET    /api/agents/:id/pinned   — 读取 pinned.md
- * PUT    /api/agents/:id/pinned   — 写入 pinned.md
+ * GET    /api/agents/:id/pinned   — 读取「置顶与原则」active 内容（兼容 shim，底层 tenets.json）
+ * PUT    /api/agents/:id/pinned   — 全量替换 active 内容（保留仍在列表中的 model_proposed 条目）
  * GET    /api/agents/:id/experience — 读取经验（合并）
  * PUT    /api/agents/:id/experience — 写入经验（拆分）
  * POST   /api/agents/:id/experience/feedback — 消息级用户反馈沉淀（赞/踩，不受 experience.enabled 门控）
@@ -39,10 +39,6 @@ import {
   syncExperienceCategories,
   recordEntry,
 } from "../../lib/tools/experience.ts";
-import {
-  readPinnedMemoryItems,
-  replacePinnedMemoryItems,
-} from "../../lib/memory/pinned-memory-store.ts";
 import {
   listTenets,
   addTenetDirect,
@@ -916,7 +912,7 @@ export function createAgentsRoute(engine) {
   route.put("/agents/:id/public-ishiki", writePublicAgentsMd);
 
   // ════════════════════════════
-  //  Pinned（pinned.md）
+  //  Pinned（兼容 shim：底层 tenets.json，只读写 active 内容）
   // ════════════════════════════
 
   route.get("/agents/:id/pinned", async (c) => {
@@ -925,7 +921,9 @@ export function createAgentsRoute(engine) {
       return c.json({ error: "agent not found" }, 404);
     }
     try {
-      const pins = readPinnedMemoryItems(agentDir(engine, id)).map(item => item.content);
+      const pins = listTenets(tenetsDirOf(id))
+        .filter(t => t.status === "active")
+        .map(t => t.content);
       return c.json({ pins });
     } catch (err) {
       return c.json({ error: err.message }, 500);
@@ -943,7 +941,23 @@ export function createAgentsRoute(engine) {
       if (!Array.isArray(pins)) {
         return c.json({ error: "pins must be an array" }, 400);
       }
-      replacePinnedMemoryItems(agentDir(engine, id), pins.filter(p => typeof p === "string"));
+      const contents = pins.filter(p => typeof p === "string" && p.trim());
+      const dir = tenetsDirOf(id);
+      const wanted = new Set(contents.map(p => p.replace(/\s+/g, " ").trim().toLowerCase()));
+      // 删除不在新列表里的 active 条目（含 model_proposed——用户在 UI 里删掉即删除）
+      for (const tenet of listTenets(dir)) {
+        if (tenet.status !== "active") continue;
+        if (!wanted.has(tenet.content.replace(/\s+/g, " ").trim().toLowerCase())) {
+          removeTenet(dir, tenet.id);
+        }
+      }
+      // 新增列表里有而库里没有的条目（user_direct，立即生效）
+      const existingKeys = new Set(listTenets(dir).map(t => t.content.replace(/\s+/g, " ").trim().toLowerCase()));
+      for (const content of contents) {
+        if (!existingKeys.has(content.replace(/\s+/g, " ").trim().toLowerCase())) {
+          addTenetDirect(dir, { content });
+        }
+      }
       await engine.updateConfig({}, { agentId: id });
       emitAppEvent(engine, "agent-updated", { agentId: id });
       return c.json({ ok: true });

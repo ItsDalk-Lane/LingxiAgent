@@ -19,17 +19,3 @@ export interface KnowledgeExecutionPolicy {
 }
 
 /** 普通知识问答统一在当前聊天查阅；不再用问题关键词强制整库扫描或独立调查。 */
-export function resolveKnowledgeExecutionPolicy(input: {
-  mode: KnowledgeReferenceMode;
-  question: string;
-  selectedNotebookCount: number;
-  selectedSourceCount: number;
-}): KnowledgeExecutionPolicy {
-  return {
-    mode: "auto",
-    path: "conversation",
-    completenessPolicy: "best_effort",
-    responseDetail: input.mode === "detailed" ? "detailed" : "normal",
-    retrievalDeadlineMs: null,
-  };
-}

@@ -22,7 +22,7 @@ import {
 
 export function AgentTab() {
   const {
-    agents, currentAgentId, settingsAgentId, settingsConfig, currentPins,
+    agents, currentAgentId, settingsAgentId, settingsConfig,
     globalModelsConfig, availableModels,
   } = useSettingsStore(
     useShallow(s => ({
@@ -30,7 +30,6 @@ export function AgentTab() {
       currentAgentId: s.currentAgentId,
       settingsAgentId: s.settingsAgentId,
       settingsConfig: s.settingsConfig,
-      currentPins: s.currentPins,
       globalModelsConfig: s.globalModelsConfig,
       availableModels: s.runtimeModels,
     }))
@@ -330,7 +329,6 @@ export function AgentTab() {
             {t('settings.save')}
           </button>
         </div>
-        {/* 图片模型选择器暂时隐藏，后续重新设计 */}
       </SettingsSection>
 
       {/* 关于 Ta 的内容保持原样，外层归入标准 Section。 */}
@@ -392,7 +390,6 @@ export function AgentTab() {
         hasUtilityModel={hasMemoryModel}
         memoryEnabled={memoryEnabled}
         autoDreamEnabled={autoDreamEnabled === true}
-        currentPins={currentPins}
       />
 
       {/* 经验 */}

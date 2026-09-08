@@ -8,7 +8,6 @@ import type { KnowledgeCoveragePlan } from "../../../lib/knowledge/knowledge-cov
 import type { KnowledgeRollupEntry, KnowledgeRollupModel } from "./knowledge-rollup.ts";
 import type { NotebookRetrievalChunk, NotebookRetrievalSource, RetrieveForNotebooksResult } from "../../../lib/knowledge/knowledge-query-service.ts";
 import { KNOWLEDGE_FUSION_BUDGET } from "./legacy-query-service.ts";
-export { EvidencePacker } from "../../../lib/knowledge/evidence-packer.ts";
 
 
 const injectionScanLog = createModuleLogger("knowledge-injection-scan");

@@ -113,11 +113,10 @@ export function ensureFirstRun(lingxiHome, productDir): FirstRunReport {
   }
 
   // 4. 确保可选文件存在（老用户升级 + 新 agent 都覆盖）。
-  // 只补有效 agent 目录：往无效目录里写 pinned.md 会把垃圾目录越喂越像 agent 目录。
+  // 只补有效 agent 目录：往无效目录里写档案文件会把垃圾目录越喂越像 agent 目录。
   const touchIfMissing = (p) => { if (!fs.existsSync(p)) fs.writeFileSync(p, '', 'utf-8'); };
   touchIfMissing(path.join(lingxiHome, 'user', USER_PROFILE_FILENAME));
   for (const agentId of validAgentIds) {
-    touchIfMissing(path.join(agentsDir, agentId, 'pinned.md'));
   }
 
   // 5. 确保 user/preferences.json 存在

@@ -46,9 +46,9 @@ describe("ThinkTagParser", () => {
     ]);
   });
 
-  it("treats an escaped think tag as literal text", () => {
+  it("treats an escaped think tag as literal text (F8/P6.3: backslash preserved on-chain, display strips once)", () => {
     expect(collect("正文里提到 \\<think> 标签")).toEqual([
-      { type: "text", data: "正文里提到 <think> 标签" },
+      { type: "text", data: "正文里提到 \\<think> 标签" },
     ]);
   });
 

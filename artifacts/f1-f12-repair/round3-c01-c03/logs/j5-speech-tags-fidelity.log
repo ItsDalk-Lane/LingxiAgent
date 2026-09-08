@@ -1,0 +1,62 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/paste-fidelity-serializer.test.ts (9 tests) 63ms
+ ✓ tests/reserved-tag-orphan-closer.test.ts (12 tests) 52ms
+ ✓ tests/speech-output-validation.round2.test.ts (7 tests) 64ms
+ ✓ tests/speech-recognition-route.test.ts (2 tests) 66ms
+ ✓ tests/speech-recognition-adapters.test.ts (5 tests) 58ms
+ ✓ tests/session-file-registry.test.ts (27 tests) 134ms
+ ✓ tests/speech-parameters.test.ts (16 tests) 88ms
+ ✓ tests/bridge-strip-internal-tags.test.ts (82 tests) 38ms
+ ✓ tests/speech-recognition-service.test.ts (9 tests) 53ms
+ ✓ tests/live-history-reserved-tag-parity.test.ts (2 tests) 50ms
+ ✓ tests/reserved-tag-text-preservation.test.ts (18 tests) 72ms
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > R07-05：结构化成功中的非字符串 text 明确 INVALID_OUTPUT
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_INVALID_OUTPUT] helper 成功结果的 text 必须是字符串
+
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > R07-08：中文 stderr 跨字节块仍保持可读且按失败结算
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_PROCESS_FAILED] 中文错误：识别器不可用
+
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A08：超时与外部取消都终止子进程且不输出成功
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_TIMEOUT] 系统语音识别超过进程上限 1s
+
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A08：超时与外部取消都终止子进程且不输出成功
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_CANCELLED] 系统语音识别已取消
+
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A09：helper 慢速在途时事件循环不被阻塞（非 execFileSync）
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_CANCELLED] 系统语音识别已取消
+
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A10：子进程无视温和终止时，有界等待后强制结束同一进程
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_CANCELLED] 系统语音识别已取消
+
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A11：helper 缺失/坏 JSON/超大 stdout/结构化错误/旧式 stderr 各自独立错误码
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_INVALID_OUTPUT] helper 退出码 0 但输出无法解析: not a json line
+
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A11：helper 缺失/坏 JSON/超大 stdout/结构化错误/旧式 stderr 各自独立错误码
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_PROCESS_FAILED] helper stdout 超过 4194304 字节上限
+
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A11：helper 缺失/坏 JSON/超大 stdout/结构化错误/旧式 stderr 各自独立错误码
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_PERMISSION_DENIED] denied by user
+
+stderr | tests/system-speech-adapter.lifecycle.test.ts > system speech adapter lifecycle（A06–A12） > A11：helper 缺失/坏 JSON/超大 stdout/结构化错误/旧式 stderr 各自独立错误码
+[system-speech-asr] transcribe failed: [SYSTEM_SPEECH_PERMISSION_DENIED] lingxi-speech-helper error: speech recognition permission denied
+
+ ✓ tests/system-speech-adapter.lifecycle.test.ts (13 tests) 9608ms
+     ✓ R07-02/03/06：真实异步 helper 逐字节写 UTF-8，复杂正文无损且只结算一次  3434ms
+     ✓ R07-04：真实 helper 的无末尾换行 JSON 在 close 边界完整解码  1020ms
+     ✓ R07-05：结构化成功中的非字符串 text 明确 INVALID_OUTPUT  394ms
+     ✓ R07-08：中文 stderr 跨字节块仍保持可读且按失败结算  395ms
+     ✓ R07-07：两个真实并发 transcribe 的解码与缓冲互不污染  444ms
+     ✓ A06：helper 正常 final 返回——不等待超时，stdout 可解析  375ms
+     ✓ A06b：空文本是明确的 EMPTY_RESULT，不伪造文本  356ms
+     ✓ A07：结果后晚到错误/非零退出——只结算一次  703ms
+     ✓ A08：超时与外部取消都终止子进程且不输出成功  1241ms
+     ✓ A10：子进程无视温和终止时，有界等待后强制结束同一进程  724ms
+     ✓ A11：helper 缺失/坏 JSON/超大 stdout/结构化错误/旧式 stderr 各自独立错误码  455ms
+
+ Test Files  12 passed (12)
+      Tests  202 passed (202)
+   Start at  19:09:59
+   Duration  9.87s (transform 3.26s, setup 247ms, import 5.96s, tests 10.35s, environment 665ms)
+

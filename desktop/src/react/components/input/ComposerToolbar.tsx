@@ -29,13 +29,9 @@ interface Props {
   models: Model[];
   sessionModel?: SessionModel;
   isStreaming: boolean;
-  showAudioInput: boolean;
-  audioRecordingActive: boolean;
-  audioRecordingBusy: boolean;
-  onAudioToggle: () => void;
 }
 
-/** 输入卡片下方的 Composer 工具栏：新建聊天 / 附件 / Slash / 权限模式 / Context / Thinking / 模型 / 语音 */
+/** 输入卡片下方的 Composer 工具栏：新建聊天 / 附件 / Slash / 权限模式 / Context / Thinking / 模型 */
 export const ComposerToolbar = memo(function ComposerToolbar(props: Props) {
   const {
     t, onNewSession, onAttach, slashBtnRef, onSlashToggle,
@@ -43,7 +39,6 @@ export const ComposerToolbar = memo(function ComposerToolbar(props: Props) {
     permissionMode, onPermissionModeChange, planModeLocked,
     showThinking, thinkingLevel, onThinkingChange, availableThinkingLevels,
     models, sessionModel, isStreaming,
-    showAudioInput, audioRecordingActive, audioRecordingBusy, onAudioToggle,
   } = props;
 
   return (
@@ -91,29 +86,6 @@ export const ComposerToolbar = memo(function ComposerToolbar(props: Props) {
           </div>
         ) : (
           <ModelSelector models={models} sessionModel={sessionModel} isStreaming={isStreaming} />
-        )}
-        {showAudioInput && (
-          <button
-            type="button"
-            className={`${styles['audio-record-btn']}${audioRecordingActive ? ` ${styles['is-recording']}` : ''}`}
-            title={t(audioRecordingActive ? 'input.stopRecording' : 'input.recordAudio')}
-            aria-label={t(audioRecordingActive ? 'input.stopRecording' : 'input.recordAudio')}
-            aria-pressed={audioRecordingActive}
-            disabled={audioRecordingBusy}
-            onClick={onAudioToggle}
-          >
-            {audioRecordingActive ? (
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <rect x="7" y="7" width="10" height="10" rx="2" />
-              </svg>
-            ) : (
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z" />
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                <path d="M12 19v3" />
-              </svg>
-            )}
-          </button>
         )}
       </div>
     </div>

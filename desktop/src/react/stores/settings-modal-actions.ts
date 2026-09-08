@@ -3,8 +3,7 @@ import { useStore } from './index';
 const DEFAULT_SETTINGS_TAB = 'agent';
 
 function normalizeSettingsTab(tab?: string | null): string {
-  if (!tab) return DEFAULT_SETTINGS_TAB;
-  return tab === 'computer' ? 'experiments' : tab;
+  return tab || DEFAULT_SETTINGS_TAB;
 }
 
 export function openSettingsModal(tab?: string): void {

@@ -1,0 +1,6 @@
+=== C03 实施记录 2026-09-08T11:08:16Z ===
+定位: tests/round2-delivery-evidence.test.ts 依赖 artifacts/f1-f12-repair/round2/logs/ 下 121 个日志（COMMAND_RESULTS 121 + 矩阵 10 refs），但 .gitignore 的 'logs/' 与 '*.log' 规则使它们从未入库 → 干净检出 4 个测试失败（R10-02/05/S11-X2/R10-10）
+取证: 原始日志完好保存于 LingxiAgent-r01-r10 工作树副本，121/121 SHA-256 与 COMMAND_RESULTS.logSha256 一致（真实历史，非重造）；全部日志不含真实用户路径（R10-10 泄漏断言通过）
+修复: (1) 复制 121 个原始日志入主树 round2/logs/; (2) .gitignore 增加精确例外 !artifacts/f1-f12-repair/round2/logs/ 与 /**（其余日志仍忽略）; (3) R10-09 契约本身按当前树重生成增量补丁（现含 round3 源码，满足'新增源码与测试进入补丁'），DELIVERY_MANIFEST.sha256 同步补丁新摘要 459bfbef→a946a461 并记录来源关系
+验证: tests/round2-delivery-evidence.test.ts 10/10 passed; DELIVERY_MANIFEST 217/217 哈希一致
+未提交: 全部交付物处于工作区（无 commit 授权）

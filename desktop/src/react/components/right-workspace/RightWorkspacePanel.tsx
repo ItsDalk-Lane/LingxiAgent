@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { useStore } from '../../stores';
 import { JianEditor } from '../desk/DeskEditor';
-import { PluginWidgetView } from '../plugin/PluginWidgetView';
 import { WorkspaceStableBody } from './WorkspaceStableBody';
 import { SessionTodoCard } from './SessionTodoCard';
 import { TerminalCard } from './TerminalCard';
@@ -56,16 +55,7 @@ function JianFloatingToggle() {
 }
 
 export function RightWorkspacePanel({ compact = false }: { compact?: boolean }) {
-  const jianView = useStore(s => s.jianView);
   const jianDrawerOpen = useStore(s => s.jianDrawerOpen);
-
-  if (jianView.startsWith('widget:')) {
-    return (
-      <div className={styles.shell}>
-        <PluginWidgetView pluginId={jianView.slice(7)} />
-      </div>
-    );
-  }
 
   return (
     <div className={styles.shell}>

@@ -3,7 +3,6 @@ import type { ContentBlock } from '../../stores/chat-types';
 import type { LinkOpenContext } from '../../utils/link-open';
 import { buildAssistantBlocksFromContent } from '../../utils/assistant-block-builder';
 import { MoodBlock } from './MoodBlock';
-import { PluginCardBlock } from './PluginCardBlock';
 import { StreamingMarkdownContent } from './StreamingMarkdownContent';
 
 export const AssistantContentPreview = memo(function AssistantContentPreview({
@@ -51,9 +50,6 @@ function AssistantPreviewBlock({
         linkContext={linkContext}
       />
     );
-  }
-  if (block.type === 'plugin_card') {
-    return <PluginCardBlock card={block.card} />;
   }
   return null;
 }

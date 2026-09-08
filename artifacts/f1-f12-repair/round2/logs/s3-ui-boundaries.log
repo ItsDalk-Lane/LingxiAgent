@@ -1,0 +1,89 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+[input] failed to read video attachment Error: disk gone
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:414:49)
+    at Object.Mock [as readFileBase64] (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at prepareComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:350:40)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:524:12)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:628:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:420:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+[input] failed to read audio attachment Error: disk gone
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:414:49)
+    at Object.Mock [as readFileBase64] (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at prepareComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:322:40)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:524:12)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:628:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:441:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S01：普通发送视频预检失败，编辑器、草稿、附件与引用全部保留 50ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send 5ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S03：视频数超限与格式错误都是明确 blocked，不冒充成功 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S04：ws 不存在 / CONNECTING / CLOSING / CLOSED，明确结果、不清输入、不发消息 24ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S05：读文件期间会话删除/定位器变化/模型变更，重新验证后旧目标不误发 8ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:590:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:520:8)
+    at Module.sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:549:24)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:591:20
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试
+[input] websocket send failed Error: socket exploded
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:632:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:520:8)
+    at Module.sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:549:24)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:635:20
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:704:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:520:8)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:549:24)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:628:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:706:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:862:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:520:8)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:549:24)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:628:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:865:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S06：准备期间用户继续输入，原快照独立、新草稿不被清除或覆盖 62ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段 2ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S08：图片按既有规则退化为文件引用，提示保留、文件身份不丢 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S10：提交后断线无回执与回执超时，都标 delivery_unknown 且不自动重发 4ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S11：重连后经恢复/历史找到原 clientMessageId，合并不重复追加 2ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致 2ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S13：带首行空格与末尾换行的输入，快照逐字符保留 7ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S14：首页 ensureSession 期间重复点击，只创建/提交一次 8ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S15：入队后改变界面选中的笔记本，已排队消息仍使用入队快照范围 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P07：全空白正文（无其他内容维度）不发，且不做破坏性清空 4ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P08：全空白正文但有附件 → 按已有内容维度发送，wire 保真、附件身份保留 7ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文 2ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03 InputArea 编辑点击接线 > R03-03：点击编辑同步取消慢附件，保存后仅提交新正文 418ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03 InputArea 编辑点击接线 > R03-05：点击取消保留原 blocked 状态与正文 23ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03-09：真实 InputArea StrictMode 卸载撤销 timer，重挂只发一次 19ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03-12：InputArea A 慢附件时切 B 可发送，A 完成不再清 B 编辑器 62ms
+
+ Test Files  1 passed (1)
+      Tests  22 passed (22)
+   Start at  13:45:24
+   Duration  1.55s (transform 371ms, setup 18ms, import 524ms, tests 713ms, environment 233ms)
+

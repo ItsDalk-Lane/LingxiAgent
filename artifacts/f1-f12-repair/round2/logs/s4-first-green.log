@@ -1,0 +1,27 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-14：断线未知保留独立barrier，A不能越过而B正常发送 36ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-13：超过200条历史记录不能淘汰未知快照 2ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-11：canonical ACK仅确认接收，未证明运行结束仍保留barrier 2ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-02：精确历史命中和权威idle解除barrier，保留原文附件且不追加气泡 2ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-03：命中但run running不释放下一条 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-04：沿before查第二页，第一页未命中不判拒收 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-05：20页上限仍未命中保留unknown和完整快照 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-06：同正文其他client或快照版本不提供接收证据 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-12：读取403保留barrier与诊断 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-12：读取404保留barrier与诊断 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-12：读取network保留barrier与诊断 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-09：切服务器同路径不查询旧记录，也拒绝旧服务器ACK 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-10：HTTP挂起收到新run_start，迟到idle不能清新busy 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-17：同session单飞，完成不自动轮询；断代迟到响应丢弃 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04 ACK缺canonical身份或不同session/version不结算 1ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-15 相同正文不同 client ID 经真实 append 和历史路由仍分别关联 46ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-08 分支读取失败保持不完整，不能 fallback 全 JSONL 认证 8ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04 缺失权威运行读取能力不能宣称 idle 5ms
+
+ Test Files  2 passed (2)
+      Tests  18 passed (18)
+   Start at  13:56:40
+   Duration  1.17s (transform 681ms, setup 28ms, import 1.35s, tests 112ms, environment 263ms)
+

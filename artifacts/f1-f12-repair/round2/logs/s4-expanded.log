@@ -1,0 +1,682 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q01：队首附件读取挂起时，后续纯文本项不准备、不先发 60ms
+ × desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q02：A 已发送但回执未到时，传输租约阻止 B 发送 6ms
+   → expected true to be false // Object.is equality
+ × desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q03：A 回执到但 run 未结束（含 run 进行中），B 均不发 2ms
+   → expected 'awaiting_ack' to be 'accepted' // Object.is equality
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q04：model_turn_end / tool_end / mood_end 均不释放下一轮 2ms
+ × desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q05：A 正确 run_end 后，B 只发一次且顺序稳定（经 400ms 调度通道） 3ms
+   → expected "vi.fn()" to be called 2 times, but got 1 times
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q06：重复 effect / StrictMode 双调用同一调度，不重复提交 1ms
+ × desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q07：准备 A 时手动发送 C，C 不超越 B 2ms
+   → expected "vi.fn()" to be called 2 times, but got 1 times
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q08：A1 会话准备挂起，不阻塞空闲的 A2 会话 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q09：准备期间连接代次切换，旧租约不得向新连接发送旧载荷 1ms
+ × desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q10：旧 run 的迟到终态不结束新 run 2ms
+   → expected "vi.fn()" to be called 2 times, but got 1 times
+ × desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q11：编辑/删除正在准备的队列项，过期快照不得发送 3ms
+   → expected "vi.fn()" to be called 1 times, but got 0 times
+ × desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q12：立即插入与普通续发并发，不双发、不绕过预检 3ms
+   → expected { kind: 'blocked', …(2) } to deeply equal { kind: 'blocked', …(2) }
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q13：run 在插话准备期间结束/更换，不得插入错误的 run 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q14：agent review 排队项立即插入保留既有禁止语义，不静默丢失 1ms
+ × desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q15：abort 后先收到权威终态再续发；迟到媒体结果不重开旧 run 2ms
+   → expected "vi.fn()" to be called 2 times, but got 1 times
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q16：两个会话各自一次发送，投影与载荷互不混块 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-01/R03-02：旧 timer 到点读取最后一次编辑保护，不延长计时 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-07：A timer 未开始切 B，不自动发送 A 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-04：保存相同正文不改变版本和 blocked 状态 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-04：同 queueItemId 新版本不复用旧逻辑身份 0ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03-03：慢准备期间队列进入编辑，commit 同步拒绝旧快照 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-03/R03-04/X2-03：开始编辑立即取消慢 lease，保存只发新快照一次 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-05：取消编辑恢复 blocked 原快照且不自动解锁 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-06：同步提交窗口和已提交项返回 too_late 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-08/R03-12/X2-04：A preparing 后撤销前台意图不取消 lease，B 独立发送且草稿保留 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-09：旧 owner cleanup 不取消新挂载意图，同 owner 撤销后重挂仅发一次 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-10：删除旧慢项后创建新 lease，旧读取不释放新项租约 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-11：立即插入也不能越过 editing 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-14：断线未知保留独立barrier，A不能越过而B正常发送 59ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-13：超过200条历史记录不能淘汰未知快照 3ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-11：canonical ACK仅确认接收，未证明运行结束仍保留barrier 3ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-02：精确历史命中和权威idle解除barrier，保留原文附件且不追加气泡 2ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-03：命中但run running不释放下一条 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-04：沿before查第二页，第一页未命中不判拒收 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-05：20页上限仍未命中保留unknown和完整快照 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-06：同正文其他client或快照版本不提供接收证据 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-12：读取403保留barrier与诊断 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-12：读取404保留barrier与诊断 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-12：读取network保留barrier与诊断 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-09：切服务器同路径不查询旧记录，也拒绝旧服务器ACK 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-10：HTTP挂起收到新run_start，迟到idle不能清新busy 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-17：同session单飞，完成不自动轮询；断代迟到响应丢弃 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04 ACK缺canonical身份或不同session/version不结算 1ms
+ × desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-05：读取边界忽略abort仍在10秒截止释放单飞并显示失败 4ms
+   → expected false to be true // Object.is equality
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-18：未知普通输入阻挡立即插入，不能绕过barrier 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-02：慢HTTP完成时前台timer已耗尽，idle后仍只续发一次 2ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-11：真实history-builder水合后canonical ACK合并同一气泡 35ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-11：ACK未携带字段不擦除已有附件技能和引用 1ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+[input] failed to read video attachment Error: disk gone
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:414:49)
+    at Object.Mock [as readFileBase64] (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at prepareComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:351:40)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:678:12)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:782:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:420:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+[input] failed to read audio attachment Error: disk gone
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:414:49)
+    at Object.Mock [as readFileBase64] (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at prepareComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:323:40)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:678:12)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:782:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:441:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S01：普通发送视频预检失败，编辑器、草稿、附件与引用全部保留 51ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send 6ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S03：视频数超限与格式错误都是明确 blocked，不冒充成功 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S04：ws 不存在 / CONNECTING / CLOSING / CLOSED，明确结果、不清输入、不发消息 25ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S05：读文件期间会话删除/定位器变化/模型变更，重新验证后旧目标不误发 10ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:590:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:522:8)
+    at Module.sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:703:24)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:591:20
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试
+[input] websocket send failed Error: socket exploded
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:632:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:522:8)
+    at Module.sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:703:24)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:635:20
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:704:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:522:8)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:703:24)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:782:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:706:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-11 相同关联重复幂等，client ID 指向另一个版本的 entry 时明确 ambiguous
+[desktop-session-submit] canonical input correlation unavailable
+
+stderr | tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-16 关联存储失败且诊断广播也失败，真实 user 和运行继续且只提交一次
+[desktop-session-submit] canonical input correlation unavailable
+
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-15 相同正文不同 client ID 经真实 append 和历史路由仍分别关联 50ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-08 分支读取失败保持不完整，不能 fallback 全 JSONL 认证 9ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04 缺失权威运行读取能力不能宣称 idle 7ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-07 孤立关联不能认证一个不存在的 user entry 6ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-08 当前分支不含原 user 或关联时不泄漏废弃分支证据 6ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-08 fork 新 session 身份不能消费旧 session client ID 8ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-11 相同关联重复幂等，client ID 指向另一个版本的 entry 时明确 ambiguous 7ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-16 关联存储失败且诊断广播也失败，真实 user 和运行继续且只提交一次 5ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-10 读取过程中完整运行一次，前后均idle也因revision变化保持unknown 5ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-03 历史关联已经落盘但供应商流仍在等待，确认接收不能宣称idle 5ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-08 duplicate-id 不能通过修复/宽松读取认证，文件字节保持不变 7ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-08 old-schema 不能通过修复/宽松读取认证，文件字节保持不变 6ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-08 invalid-json 不能通过修复/宽松读取认证，文件字节保持不变 5ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S06：准备期间用户继续输入，原快照独立、新草稿不被清除或覆盖 62ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段 3ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S08：图片按既有规则退化为文件引用，提示保留、文件身份不丢 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试 1ms
+ × desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S10：提交后断线无回执与回执超时，都标 delivery_unknown 且不自动重发 5ms
+   → lease2
+ × desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S11：重连后经恢复/历史找到原 clientMessageId，合并不重复追加 4ms
+   → expected 'delivery_unknown' to be 'accepted' // Object.is equality
+ × desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致 2ms
+   → expected undefined to be 'blocked' // Object.is equality
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:862:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:522:8)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:703:24)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:782:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:865:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ × desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S13：带首行空格与末尾换行的输入，快照逐字符保留 1017ms
+   → expected "vi.fn()" to be called 1 times, but got 0 times
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_input-surface_1fbae2"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_slash-menu-anchor_1fbae2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_slash-menu-anchor_1fbae2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_input-stack_1fbae2"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_queued-turn-list_1fbae2"[39m
+            [33mdata-testid[39m=[32m"queued-turn-list"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_queued-turn-card_1fbae2"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_queued-turn-body_1fbae2"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_queued-turn-text_1fbae2"[39m
+                  [33mtitle[39m=[32m"  保留我  "[39m
+                [36m>[39m
+                  [0m  保留我  [0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_queued-turn-hint_1fbae2"[39m
+                [36m>[39m
+                  [0minput.queuedTurnHint[0m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_queued-turn-actions_1fbae2"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"_queued-turn-insert_1fbae2"[39m
+                  [33mdata-testid[39m=[32m"queued-insert-now"[39m
+                  [33mtitle[39m=[32m"input.queuedInsertNowTitle"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33maria-hidden[39m=[32m"true"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mheight[39m=[32m"12"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"2.2"[39m
+                    [33mviewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"12"[39m
+                  [36m>[39m
+                    [36m<line[39m
+                      [33mx1[39m=[32m"12"[39m
+                      [33mx2[39m=[32m"12"[39m
+                      [33my1[39m=[32m"19"[39m
+                      [33my2[39m=[32m"5"[39m
+                    [36m/>[39m
+                    [36m<polyline[39m
+                      [33mpoints[39m=[32m"5 12 12 5 19 12"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                  [0minput.queuedInsertNow[0m
+                [36m</button>[39m
+                [36m<button[39m
+                  [33maria-label[39m=[32m"common.edit"[39m
+                  [33mclass[39m=[32m"_queued-turn-icon-btn_1fbae2"[39m
+                  [33mtitle[39m=[32m"common.edit"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33maria-hidden[39m=[32m"true"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mheight[39m=[32m"13"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"1.8"[39m
+                    [33mviewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"13"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M12 20h9"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4Z"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+                [36m<button[39m
+                  [33maria-label[39m=[32m"input.queuedDelete"[39m
+                  [33mclass[39m=[32m"_queued-turn-icon-btn_1fbae2"[39m
+                  [33mtitle[39m=[32m"input.queuedDelete"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33maria-hidden[39m=[32m"true"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mheight[39m=[32m"13"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"1.8"[39m
+                    [33mviewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"13"[39m
+                  [36m>[39m
+                    [36m<polyline[39m
+                      [33mpoints[39m=[32m"3 6 5 6 21 6"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_input-wrapper_1fbae2"[39m
+          [36m>[39m
+            [36m<input[39m
+              [33maccept[39m=[32m"image/png,image/jpeg,image/gif,image/webp,audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/ogg,audio/flac,audio/webm,video/mp4,video/quicktime,video/webm"[39m
+              [33mclass[39m=[32m"_browser-file-input_1fbae2"[39m
+              [33mmultiple[39m=[32m""[39m
+              [33mtype[39m=[32m"file"[39m
+            [36m/>[39m
+            [36m<div>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"editor"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_input-card-footer_1fbae2"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mdata-testid[39m=[32m"send"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msend[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S14：首页 ensureSession 期间重复点击，只创建/提交一次 16ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S15：入队后改变界面选中的笔记本，已排队消息仍使用入队快照范围 2ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P07：全空白正文（无其他内容维度）不发，且不做破坏性清空 7ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P08：全空白正文但有附件 → 按已有内容维度发送，wire 保真、附件身份保留 8ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文 2ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03 InputArea 编辑点击接线 > R03-03：点击编辑同步取消慢附件，保存后仅提交新正文 413ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03 InputArea 编辑点击接线 > R03-05：点击取消保留原 blocked 状态与正文 33ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03-09：真实 InputArea StrictMode 卸载撤销 timer，重挂只发一次 24ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03-12：InputArea A 慢附件时切 B 可发送，A 完成不再清 B 编辑器 64ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S10：提交后断线无回执与回执超时，都标 delivery_unknown 且不自动重发
+Error: lease2
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:672:25
+    670|     // 回执超时路径
+    671|     const acq2 = tryAcquireSendLease({ identity: { kind: 'session', se…
+    672|     if (!acq2.ok) throw new Error('lease2');
+       |                         ^
+    673|     const sent2 = await sendWithLease(acq2.leaseId, makeDeps());
+    674|     expect(sent2.kind).toBe('transport_submitted');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/13]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S11：重连后经恢复/历史找到原 clientMessageId，合并不重复追加
+AssertionError: expected 'delivery_unknown' to be 'accepted' // Object.is equality
+
+Expected: "accepted"
+Received: "delivery_unknown"
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:694:47
+    692|     noteComposerConnectionOpened();
+    693|     dispatchAck(clientMessageId);
+    694|     expect(getSendRecord(acq.leaseId)?.phase).toBe('accepted');
+       |                                               ^
+    695|     const items = chatItems();
+    696|     expect(items).toHaveLength(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/13]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致
+AssertionError: expected undefined to be 'blocked' // Object.is equality
+
+- Expected:
+"blocked"
+
++ Received:
+undefined
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:735:29
+    733|     await flushQueuedHeadNow(PATH, makeDeps());
+    734|     items = queueOf();
+    735|     expect(items[0].status).toBe('blocked');
+       |                             ^
+    736|     expect(items[0].retryable).toBe(false);
+    737|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/13]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S13：带首行空格与末尾换行的输入，快照逐字符保留
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_input-surface_1fbae2"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_slash-menu-anchor_1fbae2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_slash-menu-anchor_1fbae2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_input-stack_1fbae2"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_queued-turn-list_1fbae2"[39m
+            [33mdata-testid[39m=[32m"queued-turn-list"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_queued-turn-card_1fbae2"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_queued-turn-body_1fbae2"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_queued-turn-text_1fbae2"[39m
+                  [33mtitle[39m=[32m"  保留我  "[39m
+                [36m>[39m
+                  [0m  保留我  [0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_queued-turn-hint_1fbae2"[39m
+                [36m>[39m
+                  [0minput.queuedTurnHint[0m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_queued-turn-actions_1fbae2"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"_queued-turn-insert_1fbae2"[39m
+                  [33mdata-testid[39m=[32m"queued-insert-now"[39m
+                  [33mtitle[39m=[32m"input.queuedInsertNowTitle"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33maria-hidden[39m=[32m"true"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mheight[39m=[32m"12"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"2.2"[39m
+                    [33mviewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"12"[39m
+                  [36m>[39m
+                    [36m<line[39m
+                      [33mx1[39m=[32m"12"[39m
+                      [33mx2[39m=[32m"12"[39m
+                      [33my1[39m=[32m"19"[39m
+                      [33my2[39m=[32m"5"[39m
+                    [36m/>[39m
+                    [36m<polyline[39m
+                      [33mpoints[39m=[32m"5 12 12 5 19 12"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                  [0minput.queuedInsertNow[0m
+                [36m</button>[39m
+                [36m<button[39m
+                  [33maria-label[39m=[32m"common.edit"[39m
+                  [33mclass[39m=[32m"_queued-turn-icon-btn_1fbae2"[39m
+                  [33mtitle[39m=[32m"common.edit"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33maria-hidden[39m=[32m"true"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mheight[39m=[32m"13"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"1.8"[39m
+                    [33mviewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"13"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M12 20h9"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4Z"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+                [36m<button[39m
+                  [33maria-label[39m=[32m"input.queuedDelete"[39m
+                  [33mclass[39m=[32m"_queued-turn-icon-btn_1fbae2"[39m
+                  [33mtitle[39m=[32m"input.queuedDelete"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33maria-hidden[39m=[32m"true"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mheight[39m=[32m"13"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"1.8"[39m
+                    [33mviewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"13"[39m
+                  [36m>[39m
+                    [36m<polyline[39m
+                      [33mpoints[39m=[32m"3 6 5 6 21 6"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_input-wrapper_1fbae2"[39m
+          [36m>[39m
+            [36m<input[39m
+              [33maccept[39m=[32m"image/png,image/jpeg,image/gif,image/webp,audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/ogg,audio/flac,audio/webm,video/mp4,video/quicktime,video/webm"[39m
+              [33mclass[39m=[32m"_browser-file-input_1fbae2"[39m
+              [33mmultiple[39m=[32m""[39m
+              [33mtype[39m=[32m"file"[39m
+            [36m/>[39m
+            [36m<div>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"editor"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_input-card-footer_1fbae2"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mdata-testid[39m=[32m"send"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msend[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:768:37
+    766|     fireEvent.click(screen.getByTestId('send'));
+    767|     await waitFor(() => {
+    768|       expect(wsMocks.current!.send).toHaveBeenCalledTimes(1);
+       |                                     ^
+    769|     });
+    770|     const raw = serializeEditor(mocks.editorDoc as never).text;
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/13]⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-05：读取边界忽略abort仍在10秒截止释放单飞并显示失败
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts:364:21
+    362|     let settled=false;void coordinator.reconcileComposerSession(PATH_A…
+    363|     await vi.advanceTimersByTimeAsync(10001);
+    364|     expect(settled).toBe(true);expect(record.reconciliationStatus).toB…
+       |                     ^
+    365|     historyMocks.fetch.mockResolvedValue(page(record));await coordinat…
+    366|     expect(record.acceptance).toBe('accepted');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/13]⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q02：A 已发送但回执未到时，传输租约阻止 B 发送
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts:285:49
+    283|     const clientMessageId = String(sentPayloads()[0].clientMessageId);
+    284|     dispatchAck(PATH_A, clientMessageId);
+    285|     expect(hasInFlightSend(identityOf(PATH_A))).toBe(false);
+       |                                                 ^
+    286|     await flushQueuedHeadNow(PATH_A, makeDeps());
+    287|     expect(wsMocks.current!.send).toHaveBeenCalledTimes(2);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/13]⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q03：A 回执到但 run 未结束（含 run 进行中），B 均不发
+AssertionError: expected 'awaiting_ack' to be 'accepted' // Object.is equality
+
+Expected: "accepted"
+Received: "awaiting_ack"
+
+ ❯ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts:300:69
+    298|     // 回执到达：租约释放，但「等待助手」pending 不得被回执清除（否则此处 B 会抢跑）。
+    299|     dispatchAck(PATH_A, clientMessageId);
+    300|     expect(findSendRecordByClientMessageId(clientMessageId)?.phase).to…
+       |                                                                     ^
+    301|     expect(useStore.getState().turnPendingSessions.length).toBeGreater…
+    302|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/13]⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q05：A 正确 run_end 后，B 只发一次且顺序稳定（经 400ms 调度通道）
+AssertionError: expected "vi.fn()" to be called 2 times, but got 1 times
+ ❯ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts:364:35
+    362|     await vi.advanceTimersByTimeAsync(400);
+    363|     await vi.advanceTimersByTimeAsync(0);
+    364|     expect(wsMocks.current!.send).toHaveBeenCalledTimes(2);
+       |                                   ^
+    365|     expect(sentPayloads()[1].text).toBe('B');
+    366|     expect(queueOf(PATH_A)).toEqual([]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/13]⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q07：准备 A 时手动发送 C，C 不超越 B
+AssertionError: expected "vi.fn()" to be called 2 times, but got 1 times
+ ❯ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts:409:35
+    407|
+    408|     await flushQueuedHeadNow(PATH_A, makeDeps());
+    409|     expect(wsMocks.current!.send).toHaveBeenCalledTimes(2);
+       |                                   ^
+    410|     expect(sentPayloads()[1].text).toBe('B');
+    411|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/13]⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q10：旧 run 的迟到终态不结束新 run
+AssertionError: expected "vi.fn()" to be called 2 times, but got 1 times
+ ❯ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts:489:35
+    487|     expect(useStore.getState().streamingSessions).toEqual([]);
+    488|     await flushQueuedHeadNow(PATH_A, makeDeps());
+    489|     expect(wsMocks.current!.send).toHaveBeenCalledTimes(2);
+       |                                   ^
+    490|     expect(sentPayloads()[1].text).toBe('B');
+    491|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/13]⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q11：编辑/删除正在准备的队列项，过期快照不得发送
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+ ❯ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts:531:35
+    529|     const flushB = flushQueuedHeadNow(PATH_A, makeDeps());
+    530|     await vi.advanceTimersByTimeAsync(0);
+    531|     expect(gated2.readFileBase64).toHaveBeenCalledTimes(1);
+       |                                   ^
+    532|     cancelQueueItemSend(itemB.id);
+    533|     useStore.getState().removeQueuedTurnInput(PATH_A, itemB.id);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/13]⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q12：立即插入与普通续发并发，不双发、不绕过预检
+AssertionError: expected { kind: 'blocked', …(2) } to deeply equal { kind: 'blocked', …(2) }
+
+- Expected
++ Received
+
+  {
+-   "code": "video_count_exceeded",
++   "code": "transport_busy",
+    "kind": "blocked",
+-   "retryable": false,
++   "retryable": true,
+  }
+
+ ❯ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts:573:27
+    571|     });
+    572|     const blockedResult = await dispatchQueuedItem(itemV, { type: 'int…
+    573|     expect(blockedResult).toEqual({ kind: 'blocked', code: 'video_coun…
+       |                           ^
+    574|     expect(wsMocks.current!.send).toHaveBeenCalledTimes(1);
+    575|     const kept = queueOf(PATH_A).find(item => item.id === 'q-v');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/13]⎯
+
+ FAIL  desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q15：abort 后先收到权威终态再续发；迟到媒体结果不重开旧 run
+AssertionError: expected "vi.fn()" to be called 2 times, but got 1 times
+ ❯ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts:649:35
+    647|
+    648|     await flushQueuedHeadNow(PATH_A, makeDeps());
+    649|     expect(wsMocks.current!.send).toHaveBeenCalledTimes(2);
+       |                                   ^
+    650|     expect(sentPayloads()[1].text).toBe('B');
+    651|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/13]⎯
+
+
+ Test Files  3 failed | 1 passed (4)
+      Tests  13 failed | 70 passed (83)
+   Start at  14:01:26
+   Duration  2.88s (transform 1.54s, setup 53ms, import 2.93s, tests 2.11s, environment 1.05s)
+

@@ -66,7 +66,7 @@ export interface AutoUpdateState {
     repo?: string;
     feedUrl?: string;
   } | null;
-  /** 当前生效的更新通道：默认公开货架，或经邀请码开通的测试通道。 */
+  /** 当前生效的更新通道：默认公开货架，或历史 alpha 通道文件激活的测试通道。 */
   updateChannel?: UpdateChannel;
   /** 通道状态文件损坏时的原因；有值代表更新走的是默认通道且用户该被告知。 */
   updateChannelError?: string | null;
@@ -74,19 +74,14 @@ export interface AutoUpdateState {
 
 export type UpdateChannel = 'default' | 'alpha';
 
-export interface InviteChannelStatus {
-  /** 核销服务是否已配置。false 时设置页不渲染任何邀请入口。 */
-  configured: boolean;
-  active: boolean;
-  inviteCodes: string[];
-  channel: UpdateChannel;
-  /** 通道状态文件读取失败的原因，正常为 null。 */
-  error?: string | null;
-}
-
-export type InviteRedeemResult =
-  | { ok: true; feedUrl: string; childCodes: string[] }
-  | { ok: false; reason: 'not-configured' | 'network' | 'invalid' | 'server' | 'storage'; message: string };
+/** 宿主 Speech 授权状态（desktop/speech-permissions.cjs 的 SPEECH_PERMISSION_STATES）。 */
+export type SpeechPermissionState =
+  | 'not_determined'
+  | 'authorized'
+  | 'denied'
+  | 'restricted'
+  | 'unsupported'
+  | 'bridge_unavailable';
 
 /** train-update-status 里 `available` 字段的形状：检查阶段发现的、尚未下载的一班车 */
 export interface TrainUpdateAvailable {
@@ -436,8 +431,8 @@ export interface TodoItem {
 
 // ── 浮动面板类型 ──
 export type ActivePanel = 'activity' | 'automation' | 'bridge' | 'skills' | null;
-export type TabType = 'chat' | 'knowledge' | 'channels' | `plugin:${string}`;
-export type RightWorkspaceTab = 'session-files' | 'workspace' | 'project-skills' | `plugin-widget:${string}`;
+export type TabType = 'chat' | 'knowledge' | 'channels';
+export type RightWorkspaceTab = 'session-files' | 'workspace' | 'project-skills';
 
 export interface FileVersion {
   mtimeMs: number;
@@ -467,53 +462,6 @@ export interface RemoteWorkbenchContentRef {
 }
 
 export type RemoteContentRef = RemoteWorkbenchContentRef;
-
-// ── Plugin Card Protocol ──
-
-export interface PluginCardSessionRef {
-  sessionId?: string | null;
-  sessionPath?: string | null;
-  legacySessionPath?: string | null;
-  path?: string | null;
-}
-
-export interface PluginCardDetails {
-  type: string;         // "iframe" | "webview" | "chat.surface" | future types
-  pluginId: string;
-  route?: string;
-  title?: string;
-  description: string;  // IM fallback / degradation text
-  aspectRatio?: string;
-  sessionId?: string | null;
-  sessionRef?: PluginCardSessionRef | null;
-  sessionPath?: string | null;
-  mode?: 'transcript' | 'full' | string;
-  composer?: boolean;
-  unavailableReason?: string;
-}
-
-// ── 插件 UI 信息 ──
-
-export interface PluginPageInfo {
-  pluginId: string;
-  title: string | Record<string, string>;
-  icon: string | null;
-  routeUrl: string;
-  hostCapabilities: string[];
-}
-
-export interface PluginWidgetInfo {
-  pluginId: string;
-  title: string | Record<string, string>;
-  icon: string | null;
-  routeUrl: string;
-  hostCapabilities: string[];
-}
-
-export interface PluginUiHostCapabilityGrant {
-  pluginId: string;
-  hostCapabilities: string[];
-}
 
 export interface BrowserViewerTab {
   tabId: string;
@@ -554,7 +502,6 @@ export interface PlatformApi {
   selectFolder(): Promise<string | null>;
   selectFiles(options?: { multiple?: boolean }): Promise<string[]>;
   selectSkill(): Promise<string | null>;
-  selectPlugin?(): Promise<string | null>;
   readFile(path: string): Promise<string | null>;
   writeFile(filePath: string, content: string): Promise<boolean>;
   writeFileBinary?(filePath: string, base64Data: string): Promise<boolean>;
@@ -642,6 +589,11 @@ export interface PlatformApi {
 
   // ── App info ──
   getAppVersion?(): Promise<string>;
+  // ── 系统语音识别授权（macOS Speech 框架，F4）──
+  // status 只读查询（不触发系统弹窗）；request 由用户手势（按下录音键）发起。
+  // 状态集合：not_determined/authorized/denied/restricted/unsupported/bridge_unavailable。
+  speechPermissionStatus?(): Promise<SpeechPermissionState>;
+  speechPermissionRequest?(): Promise<SpeechPermissionState>;
   /**
    * 查询 GitHub 最新 release，与当前壳版本比对。About 页"检查更新"主出口：
    * 返回 latest（已是最新）/ available（发现新版本，带 releaseUrl）/ error（网络失败）。
@@ -653,18 +605,10 @@ export interface PlatformApi {
 
   // ── Auto-update (Windows) ──
   autoUpdateCheck?(): Promise<string | null>;
-  autoUpdateDownload?(): Promise<boolean>;
   autoUpdateInstall?(): Promise<boolean>;
   autoUpdateState?(): Promise<AutoUpdateState>;
   autoUpdateSetChannel?(channel: 'stable' | 'beta'): Promise<void>;
   onAutoUpdateState?(callback: (state: AutoUpdateState) => void): (() => void) | void;
-  // ── 邀请制测试通道 ──
-  /** 当前通道状态；configured 为 false 时设置页不渲染邀请入口。 */
-  inviteStatus?(): Promise<InviteChannelStatus>;
-  /** 向核销服务兑换一枚邀请码。成功只返回结果，不改变本机任何状态。 */
-  inviteRedeem?(code: string): Promise<InviteRedeemResult>;
-  /** 用户在确认对话框点头之后才调用：写入通道状态并切换生效的更新地址。 */
-  inviteActivate?(payload: { feedUrl: string; inviteCodes: string[] }): Promise<InviteChannelStatus>;
   // ── 列车更新（OTA） ──
   trainUpdateStatus?(): Promise<TrainUpdateStatus>;
   trainUpdateCheck?(): Promise<{ outcome: string; train?: number; version?: string; minShellBlocked?: boolean; error?: string }>;

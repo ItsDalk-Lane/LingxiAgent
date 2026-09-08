@@ -56,10 +56,6 @@ vi.mock('../../settings/helpers', () => ({
       'settings.memory.health.lastError': `最近错误：${params?.time}`,
       'settings.memory.health.errorMessage': `错误：${params?.message}`,
       'settings.memory.health.steps.deepMemory': '深层记忆',
-      'settings.pins.title': '置顶记忆',
-      'settings.pins.hint': '优先保留',
-      'settings.pins.empty': '没有置顶记忆',
-      'settings.pins.addPlaceholder': '添加置顶记忆',
       'settings.memory.compiled': '当下记忆',
       'settings.memory.compiledHint': '助手记住的重要内容',
       'settings.memory.compiledView': '查看当下记忆',
@@ -108,7 +104,7 @@ describe('Agent memory settings health notice', () => {
         agentId="hana"
         hasUtilityModel
         memoryEnabled
-        currentPins={[]}
+       
       />,
     );
 
@@ -132,7 +128,7 @@ describe('Agent memory settings health notice', () => {
         hasUtilityModel
         memoryEnabled
         autoDreamEnabled={false}
-        currentPins={[]}
+       
       />,
     );
 
@@ -164,7 +160,7 @@ describe('Agent memory settings health notice', () => {
       code: 'dream_memory_busy',
     });
     const { MemorySection } = await import('../../settings/tabs/agent/AgentMemory');
-    render(<MemorySection agentId="hana" hasUtilityModel memoryEnabled currentPins={[]} />);
+    render(<MemorySection agentId="hana" hasUtilityModel memoryEnabled />);
 
     fireEvent.click(await screen.findByRole('button', { name: '整理当下记忆' }));
 
@@ -175,7 +171,7 @@ describe('Agent memory settings health notice', () => {
   it('uses an action-specific localized fallback for an uncoded English failure', async () => {
     dreamRunError = new Error('settings lingxiFetch: server connection not ready');
     const { MemorySection } = await import('../../settings/tabs/agent/AgentMemory');
-    render(<MemorySection agentId="hana" hasUtilityModel memoryEnabled currentPins={[]} />);
+    render(<MemorySection agentId="hana" hasUtilityModel memoryEnabled />);
 
     fireEvent.click(await screen.findByRole('button', { name: '整理当下记忆' }));
 
@@ -196,7 +192,7 @@ describe('Agent memory settings health notice', () => {
       },
     };
     const { MemorySection } = await import('../../settings/tabs/agent/AgentMemory');
-    render(<MemorySection agentId="hana" hasUtilityModel memoryEnabled currentPins={[]} />);
+    render(<MemorySection agentId="hana" hasUtilityModel memoryEnabled />);
 
     expect(await screen.findByText('Dream 整理失败，原记忆没有改动')).toBeInTheDocument();
     expect(screen.queryByText('Dream verification failed: unsupportedClaims=1')).not.toBeInTheDocument();

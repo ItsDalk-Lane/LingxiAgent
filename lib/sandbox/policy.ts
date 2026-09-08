@@ -46,7 +46,9 @@ export const READ_WRITE_AGENT_DIRS = [
 export const READ_ONLY_AGENT_DIRS = [];
 
 /** agentDir 下可读写的文件 */
-export const READ_WRITE_AGENT_FILES = ["pinned.md", "channels.md"];
+// pinned.md 已退役（置顶并入 tenets.json，经工具/API 管理，不再允许直接写文件）；
+// channels.md 仍由 agent 直接编辑。
+export const READ_WRITE_AGENT_FILES = ["channels.md"];
 
 /** lingxiHome 根级别可读写的目录 */
 export const READ_WRITE_HOME_DIRS = ["channels", "logs", "uploads", ".ephemeral"];

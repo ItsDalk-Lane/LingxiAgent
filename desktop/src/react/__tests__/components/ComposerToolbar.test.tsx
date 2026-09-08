@@ -43,10 +43,6 @@ function buildProps(overrides: Partial<React.ComponentProps<typeof ComposerToolb
     models: [],
     sessionModel: undefined,
     isStreaming: false,
-    showAudioInput: false,
-    audioRecordingActive: false,
-    audioRecordingBusy: false,
-    onAudioToggle: vi.fn(),
     ...overrides,
   };
 }
@@ -131,25 +127,18 @@ describe('ComposerToolbar', () => {
     expect(container.querySelector(`.${inputStyles['send-btn']}`)).toBeNull();
   });
 
-  it('hides the audio button when audio input is unsupported', () => {
-    renderBar({ showAudioInput: false });
+  it('X2-12：聊天工具栏不渲染语音输入或旧前端听写组件', () => {
+    const { container } = renderBar();
+    const controls = Array.from(container.querySelectorAll('button, [role="button"]'));
+    const labels = controls.map(control => [
+      control.getAttribute('title'),
+      control.getAttribute('aria-label'),
+      control.getAttribute('data-testid'),
+      control.textContent,
+    ].filter(Boolean).join(' ')).join('\n');
 
-    expect(screen.queryByLabelText('input.recordAudio')).toBeNull();
+    expect(labels).not.toMatch(/voice|dictation|microphone|语音输入|听写/i);
+    expect(container.querySelector('[data-testid*="voice"], [data-testid*="dictation"], [data-testid*="microphone"]')).toBeNull();
   });
 
-  it('shows the audio button and calls the toggle handler when audio input is supported', () => {
-    const onAudioToggle = vi.fn();
-    renderBar({ showAudioInput: true, onAudioToggle });
-
-    const button = screen.getByLabelText('input.recordAudio');
-    fireEvent.click(button);
-
-    expect(onAudioToggle).toHaveBeenCalledTimes(1);
-  });
-
-  it('switches the audio button label while recording', () => {
-    renderBar({ showAudioInput: true, audioRecordingActive: true });
-
-    expect(screen.getByLabelText('input.stopRecording')).toBeTruthy();
-  });
 });

@@ -5,9 +5,8 @@
  * 支持多 session 并发：所有 session 事件平等广播，前端按 sessionPath 路由
  */
 import { Hono } from "hono";
-import { MoodParser, ThinkTagParser, CardParser } from "../../core/events.ts";
-import { dropUninstalledPluginCards, extractBlocks, pluginInstalledPredicate } from "../block-extractors.ts";
-import { normalizePluginChatSurfaceBlocks } from "../plugin-chat-surface.ts";
+import { MoodParser, ThinkTagParser } from "../../core/events.ts";
+import { extractBlocks } from "../block-extractors.ts";
 import { toAppEventWsMessage } from "../app-events.ts";
 import { toResourceEventWsMessage } from "../resource-events-ws.ts";
 import {
@@ -31,7 +30,7 @@ import {
   INSTANT_SIMPLE_COMPACTION_RUNTIME_MODE,
   normalizeCompactionLifecycleMode,
 } from "../../shared/compaction-mode.ts";
-import { abortPendingDesktopSubmission, submitDesktopSessionInterjection, submitDesktopSessionMessage } from "../../core/desktop-session-submit.ts";
+import { abortPendingDesktopSubmission, isDesktopInputRejectedBeforeAcceptance, submitDesktopSessionInterjection, submitDesktopSessionMessage } from "../../core/desktop-session-submit.ts";
 import { normalizeKnowledgeRefs } from "../../shared/knowledge-refs.ts";
 import {
   AgentReviewTurnCoordinator,
@@ -435,6 +434,46 @@ export function createChatRoute(engine: any, hub: any, {
     wsSend(ws, { type: "error", message: "agent_deleted", sessionPath });
   }
 
+  /**
+   * 类型化输入拒绝回执（C01）：服务端在「接受前」明确拒绝某次输入时，向提交
+   * 客户端单播 not_accepted 结算证据。与 legacy error 并存——旧客户端继续走
+   * inline error，新客户端据此把发送记录结算为明确失败并按 retryable 提供显式
+   * 重试。身份字段全部来自服务端解析结果（promptTarget），不信任载荷自称；
+   * 没有 clientMessageId 的客户端无法关联，不投递。已接受后的运行失败不走
+   * 这里（保持普通 error，客户端不得推断为未接收）。
+   */
+  function sendInputRejection(ws, target, input, rejection) {
+    const clientMessageId = typeof input?.clientMessageId === "string" && input.clientMessageId.trim()
+      ? input.clientMessageId.trim()
+      : null;
+    if (!clientMessageId) return;
+    const snapshotVersion = Number.isSafeInteger(input?.snapshotVersion) ? input.snapshotVersion : null;
+    const clientAttemptId = typeof input?.clientAttemptId === "string" && input.clientAttemptId.trim()
+      ? input.clientAttemptId.trim()
+      : null;
+    wsSend(ws, {
+      type: "input_rejected",
+      outcome: "not_accepted",
+      ...(target?.sessionId ? { sessionId: target.sessionId } : {}),
+      ...(target?.sessionPath ? { sessionPath: target.sessionPath } : {}),
+      clientMessageId,
+      ...(snapshotVersion != null ? { snapshotVersion } : {}),
+      ...(clientAttemptId ? { clientAttemptId } : {}),
+      code: rejection.code,
+      message: rejection.message,
+      retryable: rejection.retryable === true,
+    });
+  }
+
+  /** 提交层抛出的「未接受」错误 → 稳定错误码（session_busy/KnowledgeError.code/兜底）。 */
+  function inputRejectionInfoForSubmitError(err) {
+    if (typeof err?.code === "string" && err.code.trim()) {
+      return { code: err.code.trim(), retryable: true };
+    }
+    if (err?.message === "session_busy") return { code: "session_busy", retryable: true };
+    return { code: "rejected_before_acceptance", retryable: true };
+  }
+
   function sessionIdForPath(sessionPath) {
     if (!sessionPath) return null;
     try {
@@ -473,13 +512,10 @@ export function createChatRoute(engine: any, hub: any, {
       sessionState.set(key, {
         thinkTagParser: new ThinkTagParser(),
         moodParser: new MoodParser(),
-        cardParser: new CardParser(),
         // raw-source 单次消费不变量（任务书 §一）：按 contentIndex 记录「该 raw assistant
         // text 已经过 ReservedTagPipeline」。一旦置位，这份 raw source 永久失去作为
         // normalizer 正文 fallback 的资格（text_end/content、partial、message 三入口同关）。
         reservedProcessedTextKeys: new Set(),
-        _cardHints: [],
-        _cardEmitted: false,
         isThinking: false,
         hasOutput: false,
         hasToolCall: false,
@@ -730,12 +766,9 @@ export function createChatRoute(engine: any, hub: any, {
   function resetAssistantRunParsers(ss) {
     ss.thinkTagParser.reset();
     ss.moodParser.reset();
-    ss.cardParser.reset();
     ss.assistantEventNormalizer.reset();
     ss.reservedProcessedTextKeys?.clear?.();
     ss.pendingToolContextsByCallId?.clear?.();
-    ss._cardHints = [];
-    ss._cardEmitted = false;
     ss.isThinking = false;
   }
 
@@ -856,8 +889,6 @@ export function createChatRoute(engine: any, hub: any, {
     ss.pendingTurnInputConsumptions = [];
     ss.consumedTurnInputsForCurrentTurn = [];
     ss.pendingToolContextsByCallId?.clear?.();
-    ss._cardHints = [];
-    ss._cardEmitted = false;
     ss.turnActive = false;
     flushPendingDeferredContentEvents(sessionPath, ss);
     deliverOrDeferTurnCompletionNotification(sessionPath, ss, {
@@ -1250,11 +1281,6 @@ export function createChatRoute(engine: any, hub: any, {
       return;
     }
 
-    if (event.type === "plugin_ui_changed") {
-      broadcast({ type: "plugin_ui_changed" });
-      return;
-    }
-
     const compactionMessage = toCompactionLifecycleWsMessage(
       event,
       sessionPath,
@@ -1276,29 +1302,6 @@ export function createChatRoute(engine: any, hub: any, {
     if (ss && event.type !== "session_status") {
       markTurnStreamActivity(sessionPath, ss);
     }
-
-    // Helper: feed CardParser, emit card events or pass text through as text_delta
-    const feedCardPipeline = (text) => {
-      ss.cardParser.feed(text, (cEvt) => {
-        switch (cEvt.type) {
-          case "text":
-            ss.titlePreview += cEvt.data || "";
-            emitStreamEvent(sessionPath, ss, { type: "text_delta", delta: cEvt.data });
-            maybeGenerateFirstTurnTitle(sessionPath, ss);
-            break;
-          case "card_start":
-            ss._cardEmitted = true;
-            emitStreamEvent(sessionPath, ss, { type: "card_start", attrs: cEvt.attrs });
-            break;
-          case "card_text":
-            emitStreamEvent(sessionPath, ss, { type: "card_text", delta: cEvt.data });
-            break;
-          case "card_end":
-            emitStreamEvent(sessionPath, ss, { type: "card_end" });
-            break;
-        }
-      });
-    };
 
     const emitMoodPipelineEvent = (mEvt) => {
       if (mEvt.type === "mood_start") {
@@ -1386,18 +1389,6 @@ export function createChatRoute(engine: any, hub: any, {
         publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishReasoning());
         emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
       }
-      ss.cardParser.flush((cEvt) => {
-        if (cEvt.type === "text") {
-          emitStreamEvent(sessionPath, ss, { type: "text_delta", delta: cEvt.data });
-        } else if (cEvt.type === "card_text") {
-          emitStreamEvent(sessionPath, ss, { type: "card_text", delta: cEvt.data });
-        } else if (cEvt.type === "card_start") {
-          ss._cardEmitted = true;
-          emitStreamEvent(sessionPath, ss, { type: "card_start", attrs: cEvt.attrs });
-        } else if (cEvt.type === "card_end") {
-          emitStreamEvent(sessionPath, ss, { type: "card_end" });
-        }
-      });
     };
 
     // normalizer 在 text_end 且没有流式 delta 时会回退读 message.content 的原始块文本；
@@ -1433,9 +1424,10 @@ export function createChatRoute(engine: any, hub: any, {
         emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
       }
 
-      // mood/think 保留协议已在进入 normalizer 之前剥离（见 feedReservedTagText），
-      // 这里的 final_answer 可见文本只剩 card 协议需要解析。
-      feedCardPipeline(text);
+      // mood/think/card 保留协议已全部退役：final_answer 可见文本原样透传。
+      ss.titlePreview += text;
+      emitStreamEvent(sessionPath, ss, { type: "text_delta", delta: text });
+      maybeGenerateFirstTurnTitle(sessionPath, ss);
     };
 
     const publishNormalizedAssistantBatch = (batch) => {
@@ -1578,16 +1570,10 @@ export function createChatRoute(engine: any, hub: any, {
       });
 
       // Unified content_block emission for all tool results
-      const blocks = normalizePluginChatSurfaceBlocks(
-        dropUninstalledPluginCards(
-          enrichSessionFileBlocks(
-            extractBlocks(event.toolName, event.result?.details, event.result),
-            engine,
-            sessionPath,
-          ),
-          pluginInstalledPredicate(engine),
-        ),
+      const blocks = enrichSessionFileBlocks(
+        extractBlocks(event.toolName, event.result?.details, event.result),
         engine,
+        sessionPath,
       );
       for (const block of blocks) {
         emitStreamEvent(sessionPath, ss, { type: "content_block", block });
@@ -1769,6 +1755,8 @@ export function createChatRoute(engine: any, hub: any, {
       emitStreamEvent(sessionPath, ss, {
         type: "session_user_message",
         clientMessageId: event.clientMessageId || null,
+        snapshotVersion: event.snapshotVersion,
+        sessionId: event.sessionId || null,
         message: event.message,
       });
     } else if (event.type === "voice_transcription_update") {
@@ -1968,16 +1956,10 @@ export function createChatRoute(engine: any, hub: any, {
         queueConsumedTurnInput(sessionPath, ss, event.message);
       }
       if (event.message?.role === "custom" && event.message.display !== false) {
-        const blocks = normalizePluginChatSurfaceBlocks(
-          dropUninstalledPluginCards(
-            enrichSessionFileBlocks(
-              extractBlocks(event.message.customType, event.message.details, event.message),
-              engine,
-              sessionPath,
-            ),
-            pluginInstalledPredicate(engine),
-          ),
+        const blocks = enrichSessionFileBlocks(
+          extractBlocks(event.message.customType, event.message.details, event.message),
           engine,
+          sessionPath,
         );
         for (const block of blocks) {
           emitStreamEvent(sessionPath, ss, { type: "content_block", block });
@@ -2507,20 +2489,27 @@ export function createChatRoute(engine: any, hub: any, {
               // 消息不值得先把几 MB base64 量一遍再拒。
               const promptTarget = requireWsSessionContext(msg, ws); if (!promptTarget) return;
               const promptSessionPath = promptTarget.sessionPath;
+              // 接受前确定拒绝：legacy error 照发（旧客户端显示不变；code 让前端
+              // 错误展示走稳定文案映射），新客户端额外收到类型化拒绝回执结算发送
+              // 记录（C01）。retryable=false 表示修正内容后才应重试。
+              const rejectPromptInput = (code, message, retryable) => {
+                wsSend(ws, { type: "error", code, message, sessionPath: promptSessionPath });
+                sendInputRejection(ws, promptTarget, msg, { code, message, retryable });
+              };
               // 图片校验：最多 10 张，单张 ≤ 20MB，仅允许常见图片 MIME
               if (msg.images?.length) {
                 const MAX_IMAGES = 10;
                 if (msg.images.length > MAX_IMAGES) {
-                  wsSend(ws, { type: "error", message: t("error.maxImages", { max: MAX_IMAGES }), sessionPath: promptSessionPath });
+                  rejectPromptInput("max_images", t("error.maxImages", { max: MAX_IMAGES }), false);
                   return;
                 }
                 for (const img of msg.images) {
                   if (!img?.mimeType || !isAllowedChatImageMime(img.mimeType)) {
-                    wsSend(ws, { type: "error", message: t("error.unsupportedImageFormat", { mime: img?.mimeType || "unknown" }), sessionPath: promptSessionPath });
+                    rejectPromptInput("unsupported_image_format", t("error.unsupportedImageFormat", { mime: img?.mimeType || "unknown" }), false);
                     return;
                   }
                   if (img.data && !isChatImageBase64WithinLimit(img.data)) {
-                    wsSend(ws, { type: "error", message: t("error.imageTooLarge"), sessionPath: promptSessionPath });
+                    rejectPromptInput("image_too_large", t("error.imageTooLarge"), false);
                     return;
                   }
                 }
@@ -2528,20 +2517,20 @@ export function createChatRoute(engine: any, hub: any, {
               if (msg.videos?.length) {
                 const MAX_VIDEOS = 3;
                 if (msg.videos.length > MAX_VIDEOS) {
-                  wsSend(ws, { type: "error", message: t("error.maxVideos", { max: MAX_VIDEOS }), sessionPath: promptSessionPath });
+                  rejectPromptInput("max_videos", t("error.maxVideos", { max: MAX_VIDEOS }), false);
                   return;
                 }
                 for (const video of msg.videos) {
                   if (!video?.mimeType || !isAllowedChatVideoMime(video.mimeType)) {
-                    wsSend(ws, { type: "error", message: t("error.unsupportedVideoFormat", { mime: video?.mimeType || "unknown" }), sessionPath: promptSessionPath });
+                    rejectPromptInput("unsupported_video_format", t("error.unsupportedVideoFormat", { mime: video?.mimeType || "unknown" }), false);
                     return;
                   }
                   if (video.data && !isChatVideoBase64WithinLimit(video.data)) {
-                    wsSend(ws, { type: "error", message: t("error.videoTooLarge"), sessionPath: promptSessionPath });
+                    rejectPromptInput("video_too_large", t("error.videoTooLarge"), false);
                     return;
                   }
                   if (!isChatVideoBase64ContentCompatible(video.data, video.mimeType)) {
-                    wsSend(ws, { type: "error", message: t("error.invalidVideoContent"), sessionPath: promptSessionPath });
+                    rejectPromptInput("invalid_video_content", t("error.invalidVideoContent"), false);
                     return;
                   }
                 }
@@ -2549,16 +2538,16 @@ export function createChatRoute(engine: any, hub: any, {
               if (msg.audios?.length) {
                 const MAX_AUDIOS = 3;
                 if (msg.audios.length > MAX_AUDIOS) {
-                  wsSend(ws, { type: "error", message: t("error.maxAudios", { max: MAX_AUDIOS }), sessionPath: promptSessionPath });
+                  rejectPromptInput("max_audios", t("error.maxAudios", { max: MAX_AUDIOS }), false);
                   return;
                 }
                 for (const audio of msg.audios) {
                   if (!audio?.mimeType || !isAllowedChatAudioMime(audio.mimeType)) {
-                    wsSend(ws, { type: "error", message: t("error.unsupportedAudioFormat", { mime: audio?.mimeType || "unknown" }), sessionPath: promptSessionPath });
+                    rejectPromptInput("unsupported_audio_format", t("error.unsupportedAudioFormat", { mime: audio?.mimeType || "unknown" }), false);
                     return;
                   }
                   if (audio.data && !isChatAudioBase64WithinLimit(audio.data)) {
-                    wsSend(ws, { type: "error", message: t("error.audioTooLarge"), sessionPath: promptSessionPath });
+                    rejectPromptInput("audio_too_large", t("error.audioTooLarge"), false);
                     return;
                   }
                 }
@@ -2575,18 +2564,19 @@ export function createChatRoute(engine: any, hub: any, {
               // abort、resume_stream、context_usage 是停止和只读，删除态照常放行，与改动前一致。
               if (promptTarget.agentDeleted) {
                 rejectDeletedAgentSession(ws, promptSessionPath);
+                sendInputRejection(ws, promptTarget, msg, { code: "agent_deleted", message: "agent_deleted", retryable: false });
                 return;
               }
               if (!interject && (
                 engine.isSessionStreaming(promptSessionPath)
                 || agentReviewTurns.hasPendingParent(promptTarget.sessionId)
               )) {
-                wsSend(ws, { type: "error", message: t("error.stillStreaming", { name: engine.agentName }), sessionPath: promptSessionPath });
+                rejectPromptInput("session_busy", t("error.stillStreaming", { name: engine.agentName }), true);
                 return;
               }
               // Reject prompt while model switch is in progress
               if (engine.isSessionSwitching(promptSessionPath)) {
-                wsSend(ws, { type: "error", message: t("chat.modelSwitching"), sessionPath: promptSessionPath });
+                rejectPromptInput("model_switching", t("chat.modelSwitching"), true);
                 return;
               }
               const reviewRequests = Array.isArray(msg.agentReviewRequests)
@@ -2599,21 +2589,11 @@ export function createChatRoute(engine: any, hub: any, {
               try {
                 knowledgeRefs = normalizeKnowledgeRefs(msg.knowledgeRefs);
               } catch (err: any) {
-                wsSend(ws, {
-                  type: "error",
-                  code: "invalid_knowledge_refs",
-                  message: err?.message || "invalid knowledgeRefs",
-                  sessionPath: promptSessionPath,
-                });
+                rejectPromptInput("invalid_knowledge_refs", err?.message || "invalid knowledgeRefs", false);
                 return;
               }
               if (interject && reviewRequests.length > 0) {
-                wsSend(ws, {
-                  type: "error",
-                  code: "agent_review_interjection_not_supported",
-                  message: "@Agent review cannot be sent as an interjection.",
-                  sessionPath: promptSessionPath,
-                });
+                rejectPromptInput("agent_review_interjection_not_supported", "@Agent review cannot be sent as an interjection.", false);
                 return;
               }
               if (interject && engine.isSessionStreaming(promptSessionPath)) {
@@ -2623,6 +2603,7 @@ export function createChatRoute(engine: any, hub: any, {
                     sessionPath: promptSessionPath,
                     text: promptText,
                     clientMessageId: msg.clientMessageId,
+                  snapshotVersion: msg.snapshotVersion,
                     images: msg.images,
                     videos: msg.videos,
                     audios: msg.audios,
@@ -2637,27 +2618,23 @@ export function createChatRoute(engine: any, hub: any, {
                     ? t("error.stillStreaming", { name: engine.agentName })
                     : err.message;
                   wsSend(ws, { type: "error", message: errMessage, sessionPath: promptSessionPath });
+                  // 提交层证明「未接受」（canonical 回执未触发）才发拒绝回执；已接受后
+                  // 的运行失败保持普通 error，客户端不得推断为未接收（C01）。
+                  if (isDesktopInputRejectedBeforeAcceptance(err)) {
+                    const info = inputRejectionInfoForSubmitError(err);
+                    sendInputRejection(ws, promptTarget, msg, { ...info, message: errMessage });
+                  }
                 }
                 return;
               }
               const sessionRefs = normalizeSessionReferences(msg.sessionRefs);
               if (reviewRequests.length > 1) {
-                wsSend(ws, {
-                  type: "error",
-                  code: "multiple_agent_reviews_not_supported",
-                  message: "Only one @Agent review is supported per turn.",
-                  sessionPath: promptSessionPath,
-                });
+                rejectPromptInput("multiple_agent_reviews_not_supported", "Only one @Agent review is supported per turn.", false);
                 return;
               }
               if (reviewRequests.length === 1) {
                 if (!promptTarget.sessionId) {
-                  wsSend(ws, {
-                    type: "error",
-                    code: "session_id_required_for_agent_review",
-                    message: "A stable Session ID is required for @Agent review.",
-                    sessionPath: promptSessionPath,
-                  });
+                  rejectPromptInput("session_id_required_for_agent_review", "A stable Session ID is required for @Agent review.", false);
                   return;
                 }
                 const reviewerAgentId = reviewRequests[0].agentId.trim();
@@ -2667,34 +2644,50 @@ export function createChatRoute(engine: any, hub: any, {
                 // 所以这一处宁可在属主查不出时放行创建，也不拿宽松来源当权威。
                 const ownerAgentId = engine.getSessionManifest?.(promptTarget.sessionId)?.ownerAgentId || null;
                 if (!engine.getAgent?.(reviewerAgentId) || reviewerAgentId === ownerAgentId) {
-                  wsSend(ws, {
-                    type: "error",
-                    code: "invalid_review_agent",
-                    message: reviewerAgentId === ownerAgentId
+                  rejectPromptInput(
+                    "invalid_review_agent",
+                    reviewerAgentId === ownerAgentId
                       ? "The reviewing Agent must be different from the current Session Agent."
                       : `Agent not found: ${reviewerAgentId}`,
-                    sessionPath: promptSessionPath,
-                  });
+                    false,
+                  );
                   return;
                 }
-                await agentReviewTurns.start({
-                  requestId: msg.clientMessageId,
-                  reviewedSessionId: promptTarget.sessionId,
-                  reviewedSessionPath: promptSessionPath,
-                  reviewer: {
-                    agentId: reviewerAgentId,
-                    label: typeof reviewRequests[0].label === "string" ? reviewRequests[0].label : reviewerAgentId,
-                  },
-                  text: promptText,
-                  displayMessage: msg.displayMessage,
-                  sessionRefs,
-                  clientMessageId: msg.clientMessageId,
-                  images: msg.images,
-                  videos: msg.videos,
-                  audios: msg.audios,
-                  uiContext: msg.uiContext ?? null,
-                  sessionFileRefs: msg.sessionFileRefs,
-                });
+                try {
+                  await agentReviewTurns.start({
+                    requestId: msg.clientMessageId,
+                    reviewedSessionId: promptTarget.sessionId,
+                    reviewedSessionPath: promptSessionPath,
+                    reviewer: {
+                      agentId: reviewerAgentId,
+                      label: typeof reviewRequests[0].label === "string" ? reviewRequests[0].label : reviewerAgentId,
+                    },
+                    text: promptText,
+                    displayMessage: msg.displayMessage,
+                    sessionRefs,
+                    clientMessageId: msg.clientMessageId,
+                    snapshotVersion: msg.snapshotVersion,
+                    images: msg.images,
+                    videos: msg.videos,
+                    audios: msg.audios,
+                    uiContext: msg.uiContext ?? null,
+                    sessionFileRefs: msg.sessionFileRefs,
+                    // 父会话提交前的评审失败（模型缺失/评审员会话建立失败/空结果/用户
+                    // 停止）：用户输入从未被接受，通知提交客户端结算（C01）。
+                    onRejected: (info) => sendInputRejection(ws, promptTarget, msg, info),
+                  });
+                } catch (err) {
+                  // start() 同步抛错只发生在 hasPendingParent（session_busy）：
+                  // 尚未产生任何副作用，属于接受前确定拒绝。
+                  const message = err?.message === "session_busy"
+                    ? t("error.stillStreaming", { name: engine.agentName })
+                    : err?.message || "agent review failed to start";
+                  rejectPromptInput(
+                    err?.message === "session_busy" ? "session_busy" : "review_start_failed",
+                    message,
+                    true,
+                  );
+                }
                 return;
               }
               const sessionRefBlock = buildSessionReferenceBlock(sessionRefs);
@@ -2704,6 +2697,7 @@ export function createChatRoute(engine: any, hub: any, {
                   sessionId: promptTarget.sessionId,
                   sessionPath: promptSessionPath,
                   clientMessageId: msg.clientMessageId,
+                  snapshotVersion: msg.snapshotVersion,
                   images: msg.images,
                   videos: msg.videos,
                   audios: msg.audios,
@@ -2721,6 +2715,13 @@ export function createChatRoute(engine: any, hub: any, {
                     ? t("error.stillStreaming", { name: engine.agentName })
                     : err.message;
                   wsSend(ws, { type: "error", message: errMessage, sessionPath: promptSessionPath });
+                  // 提交层证明「未接受」（canonical 关联回执未触发，busy 门禁/身份
+                  // 解析/知识检索失败等）才发类型化拒绝回执；已接受后的运行错误
+                  //（供应商失败等）保持普通 error——客户端不得推断为未接收（C01）。
+                  if (isDesktopInputRejectedBeforeAcceptance(err)) {
+                    const info = inputRejectionInfoForSubmitError(err);
+                    sendInputRejection(ws, promptTarget, msg, { ...info, message: errMessage });
+                  }
                 }
               }
             }

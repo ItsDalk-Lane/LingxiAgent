@@ -1,0 +1,15 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-01: files=['.'] 与实际子目录都拒绝，不能标 done 28ms
+ ✓ tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-02/03: 外链拒绝，指向根内普通文件的链接按既定规则接受 2ms
+ ✓ tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-04: 悬空与循环链接明确失败，不抛出未处理文件系统异常 1ms
+ ✓ tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-05: root/root-evil 前缀、../ 与绝对路径都拒绝 1ms
+ ✓ tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-06/07/08: 普通文件成功；多文件一个无效则整体失败；终态不倒退 1ms
+ ✓ tests/speech-output-validation.round2.test.ts > R09 同步语音产物真实文件边界 > R09-09/10: 重启恢复与新完成共用同一规则，目录和外链失败、普通文件完成 2ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  14:59:29
+   Duration  146ms (transform 44ms, setup 19ms, import 32ms, tests 36ms, environment 0ms)
+

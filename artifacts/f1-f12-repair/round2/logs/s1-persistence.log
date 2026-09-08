@@ -1,0 +1,180 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > owns every production persistence site exactly once 874ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > keeps required store contracts explicit and session identity path-independent 4ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > declares provider plugin paths the local plugin store actually writes 0ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > rejects duplicate IDs, overlapping paths, and Windows-only case collisions 1ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > allows only strict child carve-outs fully taken over by one tree descriptor 12ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > rejects expired and dangling exemptions 729ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > fails closed when a declared production root is missing 2ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > detects multiline, imported-alias, destructured-alias, stream, destructive, truncate, and SQLite writes 3ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > scans desktop host and CLI source while explicitly excluding generated, test, renderer, dist, and native products 5ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > rejects epoch-managed pre-coordinator access without a named additive read projection 0ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > requires exact registered paths before bootstrap state may prove an unstamped home is new 0ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > anchors sites by ordinal so the receipt survives line shifts 1425ms
+ × tests/persistence-store-registry.test.ts > persistent store registry > generates deterministic, repository-relative receipts that match the committed inventory 1471ms
+   → expected { version: 3, …(6) } to deeply equal { version: 3, …(6) }
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > still reports a genuinely new write site after the ordinal change 704ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/persistence-store-registry.test.ts > persistent store registry > generates deterministic, repository-relative receipts that match the committed inventory
+AssertionError: expected { version: 3, …(6) } to deeply equal { version: 3, …(6) }
+
+- Expected
++ Received
+
+@@ -1074,110 +1074,83 @@
+      {
+        "excerpt": "atomicWriteSync(prepared.targetPath, finalBytes)",
+        "exemptionId": null,
+        "kind": "atomic-write",
+        "ordinal": 0,
+-       "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
++       "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+        "sourceFile": "core/pinned-tenets-migration.ts",
+        "storeId": "agent-memory",
+      },
+      {
+        "excerpt": "atomicWriteSync(receiptPath(agentDir), JSON.stringify(receipt, null, 2) + \"\\n\")",
+        "exemptionId": null,
+        "kind": "atomic-write",
+        "ordinal": 0,
+-       "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
++       "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+        "sourceFile": "core/pinned-tenets-migration.ts",
+        "storeId": "agent-memory",
+      },
+      {
+        "excerpt": "atomicWriteSync(targetPath, finalBytes)",
+        "exemptionId": null,
+        "kind": "atomic-write",
+-       "ordinal": 0,
+-       "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
+-       "sourceFile": "core/pinned-tenets-migration.ts",
+-       "storeId": "agent-memory",
+-     },
+-     {
+-       "excerpt": "fs.copyFileSync(original, destination, fs.constants.COPYFILE_EXCL)",
+-       "exemptionId": null,
+-       "kind": "copy-file",
+        "ordinal": 0,
+-       "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
++       "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+        "sourceFile": "core/pinned-tenets-migration.ts",
+        "storeId": "agent-memory",
+      },
+      {
+-       "excerpt": "fs.copyFileSync(sourcePath, destination, fs.constants.COPYFILE_EXCL)",
++       "excerpt": "fs.copyFileSync(path.join(agentDir, source.file), dest)",
+        "exemptionId": null,
+        "kind": "copy-file",
+        "ordinal": 0,
+-       "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
++       "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+        "sourceFile": "core/pinned-tenets-migration.ts",
+        "storeId": "agent-memory",
+      },
+      {
+-       "excerpt": "fs.mkdirSync(directory, { recursive: true, mode: 0o700 })",
++       "excerpt": "fs.mkdirSync(backupDir, { recursive: true })",
+        "exemptionId": null,
+        "kind": "mkdir",
+        "ordinal": 0,
+-       "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
+-       "sourceFile": "core/pinned-tenets-migration.ts",
+-       "storeId": "agent-memory",
+-     },
+-     {
+-       "excerpt": "fs.mkdirSync(directory, { recursive: true, mode: 0o700 })",
+-       "exemptionId": null,
+-       "kind": "mkdir",
+-       "ordinal": 1,
+-       "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
+-       "sourceFile": "core/pinned-tenets-migration.ts",
+-       "storeId": "agent-memory",
+-     },
+-     {
+-       "excerpt": "fs.mkdirSync(directory, { recursive: true, mode: 0o700 })",
+-       "exemptionId": null,
+-       "kind": "mkdir",
+-       "ordinal": 2,
+-       "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
++       "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+        "sourceFile": "core/pinned-tenets-migration.ts",
+        "storeId": "agent-memory",
+      },
+      {
+        "excerpt": "fs.mkdirSync(path.dirname(prepared.targetPath), { recursive: true })",
+        "exemptionId": null,
+        "kind": "mkdir",
+        "ordinal": 0,
+-       "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
++       "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+        "sourceFile": "core/pinned-tenets-migration.ts",
+        "storeId": "agent-memory",
+      },
+      {
+        "excerpt": "fs.mkdirSync(path.dirname(receiptPath(agentDir)), { recursive: true })",
+        "exemptionId": null,
+        "kind": "mkdir",
+        "ordinal": 0,
+-       "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
++       "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+        "sourceFile": "core/pinned-tenets-migration.ts",
+        "storeId": "agent-memory",
+      },
+      {
+        "excerpt": "fs.mkdirSync(path.dirname(targetPath), { recursive: true })",
+        "exemptionId": null,
+        "kind": "mkdir",
+        "ordinal": 0,
+-       "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
++       "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+        "sourceFile": "core/pinned-tenets-migration.ts",
+        "storeId": "agent-memory",
+      },
+      {
+-       "excerpt": "fs.unlinkSync(original)",
++       "excerpt": "fs.renameSync(filePath, path.join(agentDir, to))",
+        "exemptionId": null,
+-       "kind": "remove-path",
++       "kind": "rename",
+        "ordinal": 0,
+-       "reason": "将旧 pins 合并到 tenets，写 v3 收据与原字节备份；独占复制并校验归档后移除原名。",
++       "reason": "Merges legacy pinned items into tenets.json, writes the migration receipt/backup, and renames the legacy files.",
+        "sourceFile": "core/pinned-tenets-migration.ts",
+        "storeId": "agent-memory",
+      },
+      {
+        "excerpt": "atomicWriteSync(receiptPath, JSON.stringify(receipt, null, 2) + \"\\n\")",
+@@ -7538,11 +7511,10 @@
+          "agents/{agentId}/memory/memory.md",
+          "agents/{agentId}/memory/navigation.md",
+          "agents/{agentId}/memory/tenets.json",
+          "agents/{agentId}/memory/pinned-tenets-migration.receipt.json",
+          "agents/{agentId}/memory/pinned-migration-backup/{backupFile}",
+-         "agents/{agentId}/memory/pinned-migration-backup/{operationId}/{backupFile}",
+          "agents/{agentId}/memory/facts.md",
+          "agents/{agentId}/memory/today.md",
+          "agents/{agentId}/memory/week.md",
+          "agents/{agentId}/memory/longterm.md",
+          "agents/{agentId}/memory/editable-facts-state.json",
+
+ ❯ tests/persistence-store-registry.test.ts:363:23
+    361|
+    362|     const committed = JSON.parse(fs.readFileSync(INVENTORY_PATH, "utf-…
+    363|     expect(committed).toEqual(first.inventory);
+       |                       ^
+    364|     expect(committed.sourceRoots).toEqual(expect.arrayContaining(["des…
+    365|     expect(committed.sourceExclusions).toEqual(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 13 passed (14)
+   Start at  13:23:47
+   Duration  5.55s (transform 133ms, setup 21ms, import 232ms, tests 5.23s, environment 0ms)
+

@@ -55,12 +55,6 @@ describe("lint-open-boundary: manifest loading", () => {
     expect(() => expandManifestPaths({ rootDir: root, manifest })).toThrow(/directory entry does not exist/);
   });
 
-  it("expands a real git-tracked directory to its tracked files only (excludes gitignored generated output)", () => {
-    const manifest = { version: 1, paths: ["packages/plugin-protocol/"] };
-    const files = expandManifestPaths({ rootDir: REPOSITORY_ROOT, manifest });
-    expect(files.has("packages/plugin-protocol/package.json")).toBe(true);
-    expect([...files].some((f) => f.startsWith("packages/plugin-protocol/dist/"))).toBe(false);
-  });
 });
 
 describe("lint-open-boundary: import specifier collection", () => {

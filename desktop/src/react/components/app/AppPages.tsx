@@ -5,7 +5,6 @@ import { AutomationPanel } from '../AutomationPanel';
 import { BridgePanel } from '../BridgePanel';
 import { SkillsPanel } from '../SkillsPanel';
 import { PreviewPanel } from '../PreviewPanel';
-import { PluginPageView } from '../plugin/PluginPageView';
 import { ChannelMessages, ChannelMembers, ChannelInput, ChannelReadonly, ChannelAgentActivityPanel, ChannelAgentSettingsPanel, ChannelExportPanel } from '../ChannelsPanel';
 import { ChannelHeader } from '../channels/ChannelHeader';
 import { MainContent } from '../../MainContent';
@@ -119,17 +118,8 @@ function ChannelPage() {
   );
 }
 
-function PluginPage({ pluginId }: { pluginId: string }) {
-  return (
-    <div className="plugin-page-shell">
-      <PluginPageView pluginId={pluginId} />
-    </div>
-  );
-}
-
 export function AppPages() {
   const currentTab = useStore(s => s.currentTab);
-  const isPluginTab = typeof currentTab === 'string' && currentTab.startsWith('plugin:');
 
   return (
     <>
@@ -137,7 +127,6 @@ export function AppPages() {
         {currentTab === 'chat' && <ChatPage />}
         {currentTab === 'knowledge' && <KnowledgePage />}
         {currentTab === 'channels' && <ChannelPage />}
-        {isPluginTab && <PluginPage pluginId={currentTab.slice(7)} />}
         <ActivityPanel />
         <AutomationPanel />
         <SkillsPanel />

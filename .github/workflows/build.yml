@@ -346,6 +346,15 @@ jobs:
         run: |
           LINGXI_COMPUTER_USE_HELPER_ARCH=${{ matrix.arch }} node scripts/build-computer-use-helper.mjs ${{ matrix.arch }}
 
+      # 系统听写链路（F4-F6）：Swift 识别 helper + 宿主授权 .node 桥，产物同落
+      # dist-speech/mac-<arch>/，经 build.mac.extraResources 进 Resources/speech/macos/。
+      - name: Build speech helper and permissions bridge
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          LINGXI_SPEECH_HELPER_ARCH=${{ matrix.arch }} node scripts/build-speech-helper.mjs
+          LINGXI_SPEECH_HELPER_ARCH=${{ matrix.arch }} node scripts/build-speech-permissions.mjs
+
       - name: Build Windows sandbox helper
         if: runner.os == 'Windows'
         shell: pwsh

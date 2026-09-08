@@ -23,6 +23,8 @@ export interface UiSlice {
   activePanel: ActivePanel;
   rightWorkspaceTab: RightWorkspaceTab;
   jianDrawerOpen: boolean;
+  /** 当前“笺/工作台”视图内容：'desk'（书桌）等；widget:/plugin: 前缀已随插件生态退役 */
+  jianView: string;
   locale: string;
   /** Skill 预览 overlay 数据（null = 关闭） */
   skillViewerData: { name: string; baseDir: string; filePath?: string; installed?: boolean } | null;
@@ -46,6 +48,7 @@ export interface UiSlice {
   setActivePanel: (panel: ActivePanel) => void;
   setRightWorkspaceTab: (tab: RightWorkspaceTab) => void;
   setJianDrawerOpen: (open: boolean) => void;
+  setJianView: (view: string) => void;
   setChannelCreateOverlayVisible: (visible: boolean) => void;
   setChatSearchOpen: (open: boolean) => void;
   setMediaViewer: (state: MediaViewerState | null) => void;
@@ -69,6 +72,7 @@ export const createUiSlice = (
   activePanel: null,
   rightWorkspaceTab: 'workspace',
   jianDrawerOpen: false,
+  jianView: 'desk',
   // Keep locale empty until i18n.load() finishes so the first successful
   // locale sync always triggers a rerender, even for the default zh locale.
   locale: '',
@@ -88,6 +92,7 @@ export const createUiSlice = (
   setActivePanel: (panel) => set({ activePanel: panel }),
   setRightWorkspaceTab: (tab) => set({ rightWorkspaceTab: tab }),
   setJianDrawerOpen: (open) => set({ jianDrawerOpen: open }),
+  setJianView: (view) => set({ jianView: view }),
   setChannelCreateOverlayVisible: (visible) => set({ channelCreateOverlayVisible: visible }),
   setChatSearchOpen: (open) => set({ chatSearchOpen: open }),
   setMediaViewer: (state) => set({ mediaViewer: state }),

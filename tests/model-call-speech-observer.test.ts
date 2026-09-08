@@ -102,7 +102,9 @@ describe("MC-09 speech recognition × ModelCallObserver", () => {
     for (const root of roots.splice(0)) fs.rmSync(root, { recursive: true, force: true });
   });
 
-  for (const adapter of builtinSpeechRecognitionAdapters) {
+  // system-speech：外部进程 wire 不透明，observer 生命周期仍走 transcribe 包装，
+  // 但 HTTP 捕获矩阵不适用（同 model-call-payload-speech 的排除理由）。
+  for (const adapter of builtinSpeechRecognitionAdapters.filter(a => a.id !== "system-speech")) {
     it(`coverage: ${adapter.id} transcribe → observer 完整生命周期 + ledger 关联`, async () => {
       const file = makeVoiceFile();
       const ledger = createUsageLedger({});

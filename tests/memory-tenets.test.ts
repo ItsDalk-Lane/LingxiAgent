@@ -62,11 +62,18 @@ describe("用户原则（tenets）存储", () => {
 
     addTenetDirect(agentDir, { content: "删除文件必须二次确认", priority: "critical" });
     const section = buildTenetsPromptSection(agentDir, true) || "";
-    expect(section).toContain("# 用户原则");
-    expect(section.indexOf("[critical]")).toBeLessThan(section.indexOf("[high]"));
+    expect(section).toContain("# 置顶与原则");
+    // 注入按 priority 升序（critical 在前）；单行条目不再带 [priority] 标签
+    expect(section.indexOf("删除文件必须二次确认")).toBeLessThan(section.indexOf("改文件前先说明影响范围"));
     expect(section).toContain("改文件前先说明影响范围");
     // 英文头
-    expect(buildTenetsPromptSection(agentDir, false)).toContain("# User Principles");
+    expect(buildTenetsPromptSection(agentDir, false)).toContain("# Pinned Items & Principles");
+  });
+
+  it("多行内容保留换行并按缩进续行渲染（原 pins 语义）", () => {
+    addTenetDirect(agentDir, { content: "第一行\n第二行" });
+    const section = buildTenetsPromptSection(agentDir, true) || "";
+    expect(section).toContain("- 第一行\n  第二行");
   });
 
   it("拒绝 → rejected，不注入；重复审批显式报错", () => {
@@ -84,16 +91,17 @@ describe("用户原则（tenets）存储", () => {
     expect(pendingTenets(agentDir)).toHaveLength(1);
   });
 
-  it("active 上限 20：满员后 direct/审批都显式报 TENET_LIMIT_REACHED", () => {
+  it("active 上限按来源分离：user_direct 占满 20 不挡首次提案审批；model_proposed 满 20 才拒批", () => {
+    // 断言变化说明（F9/M15）：旧断言「active 总数满 20 即拒批」验证的是来源混算的
+    // 缺陷行为；现按任务书要求改为「20 条 user_direct 不占 model_proposed 配额」。
     for (let i = 0; i < MAX_ACTIVE_TENETS; i++) {
       addTenetDirect(agentDir, { content: `原则 ${i}` });
     }
-    expect(() => addTenetDirect(agentDir, { content: "超限原则" }))
-      .toThrowError(expect.objectContaining({ code: TENET_ERRORS.LIMIT_REACHED }));
+    // user_direct（含原 pins 迁移数据）不受 20 条提案上限约束
+    addTenetDirect(agentDir, { content: "直钉条目不受提案上限约束" });
 
     const proposal = addTenetProposal(agentDir, { content: "待审提案" });
-    expect(() => decideTenet(agentDir, proposal.tenet.id, true))
-      .toThrowError(expect.objectContaining({ code: TENET_ERRORS.LIMIT_REACHED }));
+    expect(decideTenet(agentDir, proposal.tenet.id, true).status).toBe("active");
   });
 
   it("pending 上限 30：满员后新提案报 TENET_PENDING_FULL", () => {

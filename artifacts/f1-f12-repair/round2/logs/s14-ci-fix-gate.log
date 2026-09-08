@@ -1,0 +1,43 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/post-verification-audit-seal.test.ts (3 tests) 62ms
+ ❯ tests/round2-delivery-evidence.test.ts (10 tests | 1 failed) 3028ms
+     ✓ R10-01: 旧 F7/D 系列明确 superseded，当前无语音输入组件要求与保留能力写清 39ms
+     ✓ R10-02: COMMAND_RESULTS 的日志与源码 manifest 均存在且 SHA-256 可复算 172ms
+     × R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁 294ms
+     ✓ R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示 150ms
+     ✓ R10-05: R01-R09 每项均绑定存在的真实测试文件、runner 标题、日志与源码摘要 14ms
+     ✓ S11-X2: X2-01 至 X2-12 均绑定最终联合回归的真实测试、日志与源码摘要 3ms
+     ✓ R10-06: 真机权限、真实供应商和其他平台只标 BLOCKED，不伪装成本地通过 0ms
+     ✓ R10-07/08: 失败与成功记录并存且 exit 未改写，历史缺失日志明确 unavailable 1ms
+     ✓ R10-09: 增量补丁从干净 89bc0b64 重放后，源码摘要与当前工作树完全一致  2345ms
+     ✓ R10-10: 本轮日志不泄漏真实用户路径，旧听写流程只以历史/superseded 身份出现 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁
+AssertionError: expected undefined to be truthy
+
+- Expected:
+true
+
++ Received:
+undefined
+
+ ❯ tests/round2-delivery-evidence.test.ts:145:19
+    143|       && record.sourceChangedDuringCommand === false
+    144|     ));
+    145|     expect(green).toBeTruthy();
+       |                   ^
+    146|   });
+    147|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 12 passed (13)
+   Start at  22:07:26
+   Duration  3.13s (transform 50ms, setup 38ms, import 23ms, tests 3.09s, environment 0ms)
+

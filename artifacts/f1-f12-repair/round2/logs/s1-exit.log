@@ -1,0 +1,206 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+stdout | tests/pinned-tenets-migration.test.ts > pinned → tenets 一次性迁移（既有行为保持） > json 优先：pinned-memory.json 条目并入 tenets（active/user_direct），旧文件改名 .migrated
+[pins-migration] [hana] pinned→tenets migration: 2 added, 0 duplicates, 2 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > pinned → tenets 一次性迁移（既有行为保持） > json 缺失时解析 pinned.md（含缩进续行）
+[pins-migration] [hana] pinned→tenets migration: 2 added, 0 duplicates, 2 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M01/M02：旧版合法内容完整接纳（豁免普通新增限制） > M01：301 字符、数千字符、多行旧 pin 全文保留并 active
+[pins-migration] [hana] pinned→tenets migration: 3 added, 0 duplicates, 3 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M01/M02：旧版合法内容完整接纳（豁免普通新增限制） > M02：201 条旧 pin 全部迁移；普通第 202 条新增受新配额限制
+[pins-migration] [hana] pinned→tenets migration: 201 added, 0 duplicates, 201 source items
+
+stdout | tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-06 合法空源完成
+[pins-migration] [test-agent] pinned→tenets migration: 0 added, 0 duplicates, 0 source items
+
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-01 E02 duplicate-only 目标被清空不得认证完成 57ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 content 不得归档 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 pending 不得归档 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 rejected 不得归档 6ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 source 不得归档 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 createdAt 不得归档 6ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-04 同一个目标映射两种哈希拒绝继续 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-05 后续新增不覆盖 7ms
+stdout | tests/pinned-tenets-migration.test.ts > M03/M04：旧版权威来源规则（mtime）与删除语义 > M03：Markdown mtime 更新时以 Markdown 为准，否则以 JSON 为准
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+ ✓ tests/pinned-tenets-migration.test.ts > pinned → tenets 一次性迁移（既有行为保持） > json 优先：pinned-memory.json 条目并入 tenets（active/user_direct），旧文件改名 .migrated 65ms
+ ✓ tests/pinned-tenets-migration.test.ts > pinned → tenets 一次性迁移（既有行为保持） > json 缺失时解析 pinned.md（含缩进续行） 6ms
+ ✓ tests/pinned-tenets-migration.test.ts > pinned → tenets 一次性迁移（既有行为保持） > 没有旧 pins 文件的 agent 目录完全不动 1ms
+ ✓ tests/pinned-tenets-migration.test.ts > M01/M02：旧版合法内容完整接纳（豁免普通新增限制） > M01：301 字符、数千字符、多行旧 pin 全文保留并 active 7ms
+ ✓ tests/pinned-tenets-migration.test.ts > M01/M02：旧版合法内容完整接纳（豁免普通新增限制） > M02：201 条旧 pin 全部迁移；普通第 202 条新增受新配额限制 12ms
+stdout | tests/pinned-tenets-migration.test.ts > M03/M04：旧版权威来源规则（mtime）与删除语义 > M04：合法空 items 的 JSON 是权威时保留删除语义；md 更新时采用 md
+[pins-migration] [hana] pinned→tenets migration: 0 added, 0 duplicates, 0 source items
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-14 v2 completed 后删除不复活不改收据
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M05/M06：严格读写边界与权威来源损坏 > M05：目标 tenets 损坏时不覆盖、不归档、明确失败；修复后可重试
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:before:tenets.json 故障保留数据且可恢复
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M07–M09：迁移去重规则（精确内容比较） > M07：与 active 精确重复（含边界空白/换行归一差异）不新增，映射记录到收据
+[pins-migration] [hana] pinned→tenets migration: 1 added, 1 duplicates, 2 source items
+
+stdout | tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:after:tenets.json 故障保留数据且可恢复
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01-08 SIGKILL 在归档删除源后、收据写入前发生，重启仅补记完成 128ms
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01-16 完整摘要命名的已有备份内容不符，拒绝复用且不覆盖 4ms
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01-15 旧收据备份失败，不覆盖收据、目标或来源原字节 11ms
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01-13 收据 EACCES 是读取错误，不能当作不存在启动迁移 3ms
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01 严格读取拒绝非法 schema string，不归一化后覆盖既有目标 5ms
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01 严格读取拒绝非法 schema negative，不归一化后覆盖既有目标 4ms
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01 严格读取拒绝非法 schema array，不归一化后覆盖既有目标 4ms
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01 严格读取拒绝非法 status array，不归一化后覆盖既有目标 4ms
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01 严格读取拒绝非法 source array，不归一化后覆盖既有目标 4ms
+stdout | tests/pinned-tenets-migration.test.ts > M07–M09：迁移去重规则（精确内容比较） > M08：只与 pending/rejected 重复时仍迁移为 active/user_direct，历史保留
+[pins-migration] [hana] pinned→tenets migration: 0 added, 0 duplicates, 2 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M07–M09：迁移去重规则（精确内容比较） > M09：仅大小写/句尾标点相似不合并（不同事实各自保留）
+[pins-migration] [hana] pinned→tenets migration: 1 added, 1 duplicates, 2 source items
+
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-06 合法空源完成 8ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-07 E03 空计划 prepared 后目标改变不能 every=true 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-09 E04 归档移走后收据未写可恢复 6ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-11 规划目的地被占用时保留源和目的地 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {bad 2ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {"version":99,"state":"prepared"} 2ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {"version":3,"state":"mystery"} 2ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-14 v2 completed 后删除不复活不改收据 10ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-15 prepared 前目标原字节备份可恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-严格读取不默默过滤损坏条目 2ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-计划映射缺项不能被结果哈希捷径认证 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:before:tenets.json 故障保留数据且可恢复 9ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:after:tenets.json 故障保留数据且可恢复 11ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 receipt:prepared 故障保留数据且可恢复 7ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 commit:before 故障保留数据且可恢复 6ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 commit:after 故障保留数据且可恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 archive:copied:pinned-memory.json 故障保留数据且可恢复 7ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 archive:after:pinned-memory.json 故障保留数据且可恢复 6ms
+ ✓ tests/pinned-tenets-migration.test.ts > M03/M04：旧版权威来源规则（mtime）与删除语义 > M03：Markdown mtime 更新时以 Markdown 为准，否则以 JSON 为准 22ms
+ ✓ tests/pinned-tenets-migration.test.ts > M03/M04：旧版权威来源规则（mtime）与删除语义 > M04：合法空 items 的 JSON 是权威时保留删除语义；md 更新时采用 md 19ms
+ ✓ tests/pinned-tenets-migration.test.ts > M05/M06：严格读写边界与权威来源损坏 > M05：目标 tenets 损坏时不覆盖、不归档、明确失败；修复后可重试 8ms
+ ✓ tests/pinned-tenets-migration.test.ts > M05/M06：严格读写边界与权威来源损坏 > M05b：目标为未来 schema 时不覆盖、明确失败 3ms
+ ✓ tests/pinned-tenets-migration.test.ts > M05/M06：严格读写边界与权威来源损坏 > M05c：目标 EACCES 时明确失败，不归档 3ms
+ ✓ tests/pinned-tenets-migration.test.ts > M05/M06：严格读写边界与权威来源损坏 > M06：权威来源损坏时不静默按空库迁移、不回退另一份、不归档 5ms
+ ✓ tests/pinned-tenets-migration.test.ts > M07–M09：迁移去重规则（精确内容比较） > M07：与 active 精确重复（含边界空白/换行归一差异）不新增，映射记录到收据 9ms
+ ✓ tests/pinned-tenets-migration.test.ts > M07–M09：迁移去重规则（精确内容比较） > M08：只与 pending/rejected 重复时仍迁移为 active/user_direct，历史保留 8ms
+ ✓ tests/pinned-tenets-migration.test.ts > M07–M09：迁移去重规则（精确内容比较） > M09：仅大小写/句尾标点相似不合并（不同事实各自保留） 7ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M10：在 receipt:prepared 注入崩溃后重启可恢复，无丢失无重复 6ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M10：在 commit:before 注入崩溃后重启可恢复，无丢失无重复 7ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M10：在 commit:after 注入崩溃后重启可恢复，无丢失无重复 8ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M10：在 archive:before:pinned-memory.json 注入崩溃后重启可恢复，无丢失无重复 7ms
+stdout | tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > uses real SQLite stores and matches the deterministic committed fingerprint
+[fact-store] schema migrated: v0 → v3
+
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 completed:before 故障保留数据且可恢复 6ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-12 v2 唯一归档证据转换后恢复 7ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-12 v2 多个相同归档路径不猜选 5ms
+stdout | tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M12：completed 后用户删除迁移条目，重启不复活
+[pins-migration] [hana] pinned→tenets migration: 2 added, 0 duplicates, 2 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M14a：连续运行两次幂等
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > M20：迁移结果对设置页与 system prompt 可见 > 只注入 active；多行完整可见；pending/rejected 不注入
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/pinned-tenets-migration.test.ts > 遗留 .migrated 与既有归档共存 > 归档目标已存在时改用带源哈希的后缀，不覆盖既有 .migrated
+[pins-migration] [hana] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M10：在 completed:before 注入崩溃后重启可恢复，无丢失无重复 8ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M11：目标已提交但归档失败，下次只完成归档，不重写目标、不丢后续数据 8ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M12：completed 后用户删除迁移条目，重启不复活 5ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M14a：连续运行两次幂等 4ms
+ ✓ tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M14b：prepare 后源文件被改动 → conflict，不覆盖、不归档，且不自动重试 3ms
+ ✓ tests/pinned-tenets-migration.test.ts > M20：迁移结果对设置页与 system prompt 可见 > 只注入 active；多行完整可见；pending/rejected 不注入 4ms
+ ✓ tests/pinned-tenets-migration.test.ts > 遗留 .migrated 与既有归档共存 > 归档目标已存在时改用带源哈希的后缀，不覆盖既有 .migrated 5ms
+stdout | tests/memory-tenets.test.ts > 用户原则（tenets）存储 > 提案 → pending；批准 → active；注入块只含 active 且 critical 在前
+[memory-tenets] tenet 5bdd04e5-e46a-413b-ad7e-36dfe4a42463 → active
+
+stdout | tests/tenets-source-quota.test.ts > M15/M16：两来源配额互不占用 > M15：已有 20 条 active/user_direct 时，首个 model_proposed 审批成功
+[memory-tenets] tenet 32632c8f-190b-4759-9278-5e2d752f5344 → active
+
+stdout | tests/memory-tenets.test.ts > 用户原则（tenets）存储 > 拒绝 → rejected，不注入；重复审批显式报错
+[memory-tenets] tenet 3931fc65-f470-41f4-9dae-adb15c50dd2d → rejected
+
+stdout | tests/tenets-source-quota.test.ts > M17：各自配额到顶时明确拒绝，不影响另一来源 > 第 201 条 user_direct 新增被拒；model_proposed 审批不受影响
+[memory-tenets] tenet 1064d987-b2bc-4fc7-a820-f0f64a5c66a1 → active
+
+stdout | tests/memory-tenets.test.ts > 用户原则（tenets）存储 > active 上限按来源分离：user_direct 占满 20 不挡首次提案审批；model_proposed 满 20 才拒批
+[memory-tenets] tenet 742e01c1-e456-41d6-b94e-c6d943820352 → active
+
+stdout | tests/tenets-source-quota.test.ts > 直钉遇 pending/rejected 同内容：必须产生 active 结果且保留历史 > 与 rejected 重复：新增 active/user_direct，rejected 事实不篡改
+[memory-tenets] tenet be8194b1-c89a-41d0-96bf-f6c783e34ad8 → rejected
+
+ ✓ tests/tenets-source-quota.test.ts > countActiveTenetsBySource > 只统计 active，按来源分列；pending/rejected 不计入 27ms
+ ✓ tests/tenets-source-quota.test.ts > M15/M16：两来源配额互不占用 > M15：已有 20 条 active/user_direct 时，首个 model_proposed 审批成功 5ms
+ ✓ tests/tenets-source-quota.test.ts > M15/M16：两来源配额互不占用 > M16：已有 20 条 active/model_proposed 时，user_direct 直钉仍成功 2ms
+ ✓ tests/tenets-source-quota.test.ts > M17：各自配额到顶时明确拒绝，不影响另一来源 > 第 21 条 model_proposed 审批被拒；user_direct 直钉不受影响 2ms
+ ✓ tests/tenets-source-quota.test.ts > M17：各自配额到顶时明确拒绝，不影响另一来源 > 第 201 条 user_direct 新增被拒；model_proposed 审批不受影响 3ms
+ ✓ tests/tenets-source-quota.test.ts > M17：各自配额到顶时明确拒绝，不影响另一来源 > 历史超量条目保留不删；只阻止该来源继续新增 2ms
+ ✓ tests/tenets-source-quota.test.ts > M18：pending/rejected 不占 active 配额；pending 上限独立 > 大量 pending/rejected 不影响两个 active 配额 2ms
+ ✓ tests/tenets-source-quota.test.ts > 直钉遇 pending/rejected 同内容：必须产生 active 结果且保留历史 > 与 pending 重复：新增 active/user_direct，pending 历史不动 2ms
+ ✓ tests/tenets-source-quota.test.ts > 直钉遇 pending/rejected 同内容：必须产生 active 结果且保留历史 > 与 rejected 重复：新增 active/user_direct，rejected 事实不篡改 2ms
+ ✓ tests/tenets-source-quota.test.ts > 直钉遇 pending/rejected 同内容：必须产生 active 结果且保留历史 > 与 active 重复：仍按既有语义返回 duplicate，不新增 1ms
+ ✓ tests/tenets-source-quota.test.ts > M19：isTenetError 指定码精确匹配；pin_memory 不假报成功 > 传 code 时只精确匹配该码；不传才表示任意 TenetError 1ms
+ ✓ tests/tenets-source-quota.test.ts > M19：isTenetError 指定码精确匹配；pin_memory 不假报成功 > pin_memory 内容非法（INVALID）时返回失败结果并保留错误码，不冒充「已添加」 1ms
+ ✓ tests/tenets-source-quota.test.ts > M19：isTenetError 指定码精确匹配；pin_memory 不假报成功 > pin_memory 配额满（LIMIT_REACHED）时返回失败结果并保留错误码 2ms
+ ✓ tests/tenets-source-quota.test.ts > M19：isTenetError 指定码精确匹配；pin_memory 不假报成功 > pin_memory 正常路径不受影响 1ms
+ ✓ tests/memory-tenets.test.ts > 用户原则（tenets）存储 > 提案 → pending；批准 → active；注入块只含 active 且 critical 在前 32ms
+ ✓ tests/memory-tenets.test.ts > 用户原则（tenets）存储 > 多行内容保留换行并按缩进续行渲染（原 pins 语义） 1ms
+ ✓ tests/memory-tenets.test.ts > 用户原则（tenets）存储 > 拒绝 → rejected，不注入；重复审批显式报错 2ms
+ ✓ tests/memory-tenets.test.ts > 用户原则（tenets）存储 > 归一化查重：空白/大小写/句尾标点差异视为同一条 2ms
+ ✓ tests/memory-tenets.test.ts > 用户原则（tenets）存储 > active 上限按来源分离：user_direct 占满 20 不挡首次提案审批；model_proposed 满 20 才拒批 8ms
+ ✓ tests/memory-tenets.test.ts > 用户原则（tenets）存储 > pending 上限 30：满员后新提案报 TENET_PENDING_FULL 10ms
+ ✓ tests/memory-tenets.test.ts > 用户原则（tenets）存储 > 内容校验：空/超长报 TENET_INVALID 0ms
+ ✓ tests/memory-tenets.test.ts > 用户原则（tenets）存储 > 删除与不存在 id 的报错 1ms
+ ✓ tests/memory-tenets.test.ts > 用户原则（tenets）存储 > 文件损坏/缺失时读侧降级为空列表 1ms
+ ✓ tests/memory-tenets.test.ts > tenet_propose 工具 > 正常提案：写入 pending、回调触发、details 带 tenetId 2ms
+ ✓ tests/memory-tenets.test.ts > tenet_propose 工具 > 重复提案幂等返回 duplicate，不触发回调 2ms
+ ✓ tests/memory-tenets.test.ts > tenet_propose 工具 > isEnabled=false 返回暂停提示且不写库 1ms
+ ✓ tests/memory-tenets.test.ts > tenet_propose 工具 > 超长/空内容在工具层拦截 1ms
+ ✓ tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > uses real SQLite stores and matches the deterministic committed fingerprint 1086ms
+ ✓ tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > fails with both review paths when a runtime contract source drifts 47ms
+ ✓ tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > ignores comment-only drift in the sources it hashes 65ms
+ ✓ tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > ignores JSDoc drift, including the file headers this guard once taxed 46ms
+ ✓ tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > catches a statement-boundary rewrite that keeps the flat token stream intact 24ms
+ ✓ tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > keeps string and template literal content inside the hash 24ms
+ ✓ tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > records the digest method and the compiler in the payload it pins 14ms
+ ✓ tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > names the toolchain change instead of a bare mismatch when digest provenance differs 21ms
+ ✓ tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > holds digest invariants that no toolchain upgrade may break silently 1ms
+ ✓ tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > pins parse-behavior snapshots so toolchain drift is separable from module drift 1ms
+ ✓ tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > rejects a repinned payload until the committed review pins that exact payload 36ms
+ ✓ tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > treats a runtime DATA_EPOCH change as payload drift that needs a new review 27ms
+ ✓ tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > requires an epoch-changing write to carry the exact breaking transition review 47ms
+ ✓ tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > keeps the unregistered-write mutation as the first tripwire 3ms
+ ✓ tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > requires a complete breaking declaration and binds it to the landed DATA_EPOCH 28ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > owns every production persistence site exactly once 973ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > keeps required store contracts explicit and session identity path-independent 4ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > declares provider plugin paths the local plugin store actually writes 0ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > rejects duplicate IDs, overlapping paths, and Windows-only case collisions 1ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > allows only strict child carve-outs fully taken over by one tree descriptor 13ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > rejects expired and dangling exemptions 784ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > fails closed when a declared production root is missing 3ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > detects multiline, imported-alias, destructured-alias, stream, destructive, truncate, and SQLite writes 3ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > scans desktop host and CLI source while explicitly excluding generated, test, renderer, dist, and native products 5ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > rejects epoch-managed pre-coordinator access without a named additive read projection 0ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > requires exact registered paths before bootstrap state may prove an unstamped home is new 0ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > generates deterministic, repository-relative receipts that match the committed inventory 1503ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > anchors sites by ordinal so the receipt survives line shifts 1489ms
+ ✓ tests/persistence-store-registry.test.ts > persistent store registry > still reports a genuinely new write site after the ordinal change 746ms
+
+ Test Files  7 passed (7)
+      Tests  119 passed (119)
+   Start at  13:25:57
+   Duration  5.89s (transform 981ms, setup 117ms, import 2.74s, tests 7.74s, environment 0ms)
+

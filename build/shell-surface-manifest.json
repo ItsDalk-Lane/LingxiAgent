@@ -163,6 +163,15 @@
       "sourcePaths": ["scripts/build-computer-use-helper.mjs"]
     },
     {
+      "builderEntry": "dist-speech/mac-${arch}/ -> speech/macos/",
+      "platform": "mac",
+      "kind": "buildOutput",
+      "producedBy": "build:speech-helper",
+      "buildScript": "scripts/build-speech-helper.mjs",
+      "note": "Swift build, mac-only (buildSpeechHelper() skips on non-darwin). macOS SFSpeechRecognizer file-transcription helper for the system-speech ASR provider.",
+      "sourcePaths": ["scripts/build-speech-helper.mjs"]
+    },
+    {
       "builderEntry": "vendor/mingit -> git",
       "platform": "win",
       "kind": "vendoredBinary",

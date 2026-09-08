@@ -1,0 +1,13 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/upstream-sync-matrix.test.ts (7 tests) 45ms
+ ✓ tests/post-verification-audit-seal.test.ts (3 tests) 51ms
+ ✓ tests/round2-delivery-evidence.test.ts (10 tests) 2555ms
+     ✓ R10-09: 增量补丁从干净 89bc0b64 重放后，源码摘要与当前工作树完全一致  1933ms
+
+ Test Files  3 passed (3)
+      Tests  20 passed (20)
+   Start at  22:08:10
+   Duration  2.66s (transform 80ms, setup 59ms, import 43ms, tests 2.65s, environment 0ms)
+

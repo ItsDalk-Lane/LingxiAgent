@@ -1,0 +1,39 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/round2-pinned-recovery-faults.test.ts > R02 恢复事务、兼容与 CLI 边界 > R02-03 两归档源同内容只建一个 active，保留每个批准源条目映射 40ms
+ ✓ tests/round2-pinned-recovery-faults.test.ts > R02 恢复事务、兼容与 CLI 边界 > R02-10 commit:after 崩溃后按同批准重试，ID 和目标字节稳定 4ms
+ ✓ tests/round2-pinned-recovery-faults.test.ts > R02 恢复事务、兼容与 CLI 边界 > R02-11 目标备份权限错误保持来源和目标原字节，无假 completed 4ms
+ ✓ tests/round2-pinned-recovery-faults.test.ts > R02 恢复事务、兼容与 CLI 边界 > R02-12 v2 全局 recovery completed 仅标对应条目，其他候选可见且启动不重导 7ms
+ ✓ tests/round2-pinned-recovery-faults.test.ts > R02 恢复事务、兼容与 CLI 边界 > R02-14 CLI apply 没有已验证 home 所有权时拒绝，dry-run 只读 138ms
+ ✓ tests/round2-pinned-recovery-faults.test.ts > R02 恢复事务、兼容与 CLI 边界 > R02-16 提交后出现后续用户新增，同批准重试保留新增而不整体恢复旧备份 5ms
+ × tests/round2-pinned-recovery-faults.test.ts > R02 恢复事务、兼容与 CLI 边界 > R02 收据计划缺项不能缩小原批准范围后虚假 completed 5ms
+   → expected [Function] to throw an error
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round2-pinned-recovery-faults.test.ts > R02 恢复事务、兼容与 CLI 边界 > R02 收据计划缺项不能缩小原批准范围后虚假 completed
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ tests/round2-pinned-recovery-faults.test.ts:147:56
+    145|     fs.writeFileSync(tenetsFilePath(f.dir), JSON.stringify(target));
+    146|     const before = fs.readFileSync(tenetsFilePath(f.dir));
+    147|     expect(() => applyPinnedTenetsRecovery(f.home, a)).toThrow(/receip…
+       |                                                        ^
+    148|     expect(fs.readFileSync(tenetsFilePath(f.dir))).toEqual(before);
+    149|     expect(JSON.parse(fs.readFileSync(file, 'utf8')).state).not.toBe('…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  13:33:32
+   Duration  345ms (transform 68ms, setup 20ms, import 59ms, tests 205ms, environment 0ms)
+

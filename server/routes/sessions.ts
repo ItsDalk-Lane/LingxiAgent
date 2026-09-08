@@ -4,12 +4,13 @@
 import { appendFileSync } from "fs";
 import fs from "fs/promises";
 import path from "path";
+import { randomUUID } from 'node:crypto';
+import { readDesktopInputRunSnapshot } from '../../core/desktop-session-submit.ts';
 import { Hono } from "hono";
 import { safeJson } from "../hono-helpers.ts";
 import { bodyFromRouteError, routeError, statusFromRouteError } from "./route-errors.ts";
 import { t } from "../../lib/i18n.ts";
-import { dropUninstalledPluginCards, extractBlocks, pluginInstalledPredicate, resolveMediaGenerationBlocks } from "../block-extractors.ts";
-import { normalizePluginChatSurfaceBlocks } from "../plugin-chat-surface.ts";
+import { extractBlocks, resolveMediaGenerationBlocks } from "../block-extractors.ts";
 import { buildDeferredResultInterludeBlock, resolveDeferredReceiverName } from "../deferred-result-interlude.ts";
 import { BrowserManager } from "../../lib/browser/browser-manager.ts";
 import { isSessionJsonlFilename, sessionIdFromFilename } from "../../lib/session-jsonl.ts";
@@ -38,6 +39,7 @@ import {
   contentHasThinkingBlock,
   filterUnreferencedInlineImages,
   loadSessionHistoryMessages,
+  loadSessionHistoryEvidence,
   collectModelCallReferencesBySourceIndex,
   loadLatestAssistantSummaryFromSessionFile,
   isValidSessionPath,
@@ -1481,11 +1483,15 @@ export function createSessionsRoute(engine, hub = null) {
       });
       if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
       const resolvedSessionPath = queryPath || engine.currentSessionPath || null;
+      const reconciling = c.req.query('reconciliation') === '1';
+      const reconciliationSessionId = querySessionId || engine.getSessionIdForPath?.(resolvedSessionPath) || null;
+      const beforeRun = reconciling ? readDesktopInputRunSnapshot(engine, reconciliationSessionId, resolvedSessionPath) : null;
       // 修订点必须在读取内容之前取：读取期间若有新写入，revision 只会偏旧
       // （前端下次触发时多补拉一次，方向安全），不会偏新（把没读到的写入
       // 标成「已同步」会让 /rc 消息永久漏掉，issue #1610 的反方向竞态）。
       const revision = await readSessionFileRevision(resolvedSessionPath);
-      const sourceMessages = await loadSessionHistoryMessages(engine, resolvedSessionPath);
+      const evidence = reconciling ? await loadSessionHistoryEvidence(engine, resolvedSessionPath, reconciliationSessionId) : null;
+      const sourceMessages = evidence ? evidence.messages : await loadSessionHistoryMessages(engine, resolvedSessionPath);
       // annotateOriginMessages 会把 origin custom 条目从数组里摘掉、把 origin/displayText
       // 并进其后第一条 user 消息。下面的主展示循环大量以 sourceIndex 回查
       // sourceMessages[sourceIndex]（nextImmediateDisplayableAssistantIndex、
@@ -1772,6 +1778,8 @@ export function createSessionsRoute(engine, hub = null) {
               ...(m.id ? { entryId: m.id } : {}),
               role: "user",
               content,
+              ...(m.clientMessageId ? { clientMessageId: m.clientMessageId, sourceEntryId: m.sourceEntryId, snapshotVersion: m.snapshotVersion } : {}),
+              ...(m.acceptanceDiagnostic ? { acceptanceDiagnostic: m.acceptanceDiagnostic } : {}),
               images: visibleImages.length ? visibleImages : undefined,
               ...(m.timestamp ? { timestamp: m.timestamp } : {}),
               ...(originInfo?.origin ? { origin: originInfo.origin } : {}),
@@ -1966,16 +1974,10 @@ export function createSessionsRoute(engine, hub = null) {
           recordDeferredInterlude(parsed, null);
         }
       }
-      const resolvedBlocks = normalizePluginChatSurfaceBlocks(
-        dropUninstalledPluginCards(
-          resolveMediaGenerationBlocks(
-            blocks,
-            mediaGenerationResults,
-            standaloneMediaGenerationResults,
-          ),
-          pluginInstalledPredicate(engine),
-        ),
-        engine,
+      const resolvedBlocks = resolveMediaGenerationBlocks(
+        blocks,
+        mediaGenerationResults,
+        standaloneMediaGenerationResults,
       );
 
       // 重映射 afterIndex 到切片内偏移，过滤超出范围的
@@ -2100,11 +2102,20 @@ export function createSessionsRoute(engine, hub = null) {
       // 重启后右侧 workflow 卡复原：ActivityHub 已从持久化背书回灌该会话的 workflow 活动，
       // 这里在「首屏载入」（非翻页）时重发一遍，让前端 agent-activity slice 重新填充。
       // 翻页（beforeId != null）不重发，避免重复广播。WS 是全局广播、前端按 sessionPath 入库。
-      if (beforeId == null && resolvedSessionPath) {
+      if (!reconciling && beforeId == null && resolvedSessionPath) {
         engine.activityHub?.rebroadcastSession?.(resolvedSessionPath);
       }
 
-      return c.json({ messages, blocks: slicedBlocks, todos, hasMore, sessionFiles, revision });
+      const afterRun = reconciling ? readDesktopInputRunSnapshot(engine, reconciliationSessionId, resolvedSessionPath) : null;
+      const reconciliation = reconciling ? {
+        sessionId: reconciliationSessionId, sessionPath: resolvedSessionPath, snapshotId: randomUUID(),
+        runRevision: afterRun!.revision, complete: evidence!.complete,
+        runStatus: !evidence!.complete || beforeRun!.revision !== afterRun!.revision ? 'unknown'
+          : beforeRun!.status === 'running' || afterRun!.status === 'running' ? 'running'
+            : beforeRun!.status === 'reconciled_idle' && afterRun!.status === 'reconciled_idle' ? 'reconciled_idle' : 'unknown',
+        ...(evidence!.diagnostic ? { diagnostic: evidence!.diagnostic } : {}),
+      } : undefined;
+      return c.json({ messages, blocks: slicedBlocks, todos, hasMore, sessionFiles, revision, ...(reconciliation ? { reconciliation } : {}) });
     } catch (err) {
       return c.json({ error: err.message }, 500);
     }
@@ -2141,6 +2152,7 @@ export function createSessionsRoute(engine, hub = null) {
         sessionPath,
         sourceEntryId: body.sourceEntryId || null,
         clientMessageId: body.clientMessageId || null,
+        snapshotVersion: body.snapshotVersion,
         replacementText: typeof body.text === "string" ? body.text : undefined,
         displayMessage: body.displayMessage || null,
         uiContext: body.uiContext ?? null,
@@ -2183,6 +2195,7 @@ export function createSessionsRoute(engine, hub = null) {
         sessionPath,
         target: body?.target,
         clientMessageId: body?.clientMessageId || null,
+        snapshotVersion: body?.snapshotVersion,
         replacementText: typeof body?.text === "string" ? body.text : undefined,
         displayMessage: body?.displayMessage || null,
         uiContext: body?.uiContext ?? null,

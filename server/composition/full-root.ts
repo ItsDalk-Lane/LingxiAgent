@@ -21,7 +21,7 @@ import { createCardsRoute } from "../routes/cards.ts";
 import { createDeskRoute } from "../routes/desk.ts";
 import { createDiaryRoute } from "../routes/diary.ts";
 import { createGitEnvironmentRoute } from "../routes/git-environment.ts";
-import { builtinImageGenAdapters } from "../../core/media-adapters/builtin-adapters.ts";
+import { builtinImageGenAdapters, builtinSpeechGenAdapters } from "../../core/media-adapters/builtin-adapters.ts";
 
 export function registerClosedRoutes(app: Hono, ctx: CompositionContext): void {
   const { engine, hub } = ctx;
@@ -34,4 +34,7 @@ export function registerClosedRoutes(app: Hono, ctx: CompositionContext): void {
   app.route("/api", createGitEnvironmentRoute(engine, hub));
 }
 
-export const builtinMediaAdapters = builtinImageGenAdapters;
+export const builtinMediaAdapters = Object.freeze([
+  ...builtinImageGenAdapters,
+  ...builtinSpeechGenAdapters,
+]);

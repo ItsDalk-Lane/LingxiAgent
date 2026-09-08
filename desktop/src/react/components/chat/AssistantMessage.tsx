@@ -2,13 +2,12 @@
  * AssistantMessage — 助手消息，遍历 ContentBlock 按类型渲染
  */
 
-import { Component, memo, useCallback, useEffect, useMemo, useState, useSyncExternalStore, type ErrorInfo, type ReactNode } from 'react';
+import { Component, memo, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ErrorInfo, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { StreamingMarkdownContent } from './StreamingMarkdownContent';
 import { MoodBlock } from './MoodBlock';
 import { ThinkingBlock } from './ThinkingBlock';
 import { ToolGroupBlock } from './ToolGroupBlock';
-import { PluginCardBlock } from './PluginCardBlock';
 import { SubagentCard } from './SubagentCard';
 import { WorkflowInlineCard } from './WorkflowInlineCard';
 import { InterludeBlock } from './InterludeBlock';
@@ -202,6 +201,48 @@ export const AssistantMessage = memo(function AssistantMessage({
     });
   }, [addToast, agentId, blocks, feedbackState, sessionPath, t]);
 
+  // ── 朗读（TTS）── 有正文才出现；response 投递直取音频文件即点即播，
+  // 不往对话里插任何语音消息。
+  const speakableText = useMemo(() => {
+    const textBlocks = blocks.filter(
+      (b): b is ContentBlock & { type: 'text' } => b.type === 'text'
+    );
+    return extractTextBlockPlainText(textBlocks).trim();
+  }, [blocks]);
+  const [speakState, setSpeakState] = useState<'idle' | 'loading'>('idle');
+  const speakAudioRef = useRef<HTMLAudioElement | null>(null);
+  const handleSpeak = useCallback(() => {
+    if (!speakableText || speakState === 'loading') return;
+    setSpeakState('loading');
+    lingxiFetch('/api/media/speech/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: speakableText.slice(0, 4000),
+        sessionPath,
+        delivery: { mode: 'response' },
+      }),
+      timeout: 120_000,
+    })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`status ${res.status}`);
+        const data = await res.json().catch(() => null);
+        const filename = data?.tasks?.[0]?.files?.[0];
+        if (!filename) throw new Error('no audio file in response');
+        // 先停掉上一次的朗读，再直接播放（file 名来自受控 generated 目录，
+        // 路径只取 basename 由服务端校验）。
+        speakAudioRef.current?.pause();
+        const audio = new Audio(`/api/media/generated/${encodeURIComponent(filename)}`);
+        speakAudioRef.current = audio;
+        audio.play().catch(() => addToast(t('chat.speakFailed'), 'error'));
+        setSpeakState('idle');
+      })
+      .catch(() => {
+        setSpeakState('idle');
+        addToast(t('chat.speakFailed'), 'error');
+      });
+  }, [addToast, sessionPath, speakState, speakableText, t]);
+
   const { actions: nodeActions, busy: nodeActionBusy } = useSessionNodeActions({
     sessionPath,
     target: readOnly || !showTurnCompletionTime ? null : turnTarget,
@@ -239,6 +280,8 @@ export const AssistantMessage = memo(function AssistantMessage({
     isStreaming: isStreaming || nodeActionBusy,
     onFeedback: handleFeedback,
     feedbackState,
+    onSpeak: speakableText ? handleSpeak : undefined,
+    speakState,
   });
   const messageActions = readOnly || !showTurnCompletionTime || isStreaming ? [] : standardMessageActions;
   const footerActions = canShowNodeActions ? nodeActions : [];
@@ -384,7 +427,8 @@ const MediaGenerationBlock = memo(function MediaGenerationBlock({ block, session
   const t = window.t ?? ((k: string) => k);
   const viewBlock = localBlock?.taskId === block.taskId ? { ...block, ...localBlock } : block;
   const failed = viewBlock.status === 'failed' || viewBlock.status === 'aborted';
-  const kindLabel = viewBlock.kind === 'video' ? t('chat.media.kindVideo') : t('chat.media.kindImage');
+  const kindLabel = viewBlock.kind === 'video' ? t('chat.media.kindVideo')
+    : viewBlock.kind === 'speech' ? t('chat.media.kindSpeech') : t('chat.media.kindImage');
   const canRetry = failed && viewBlock.kind !== 'video' && !readOnly && typeof viewBlock.taskId === 'string';
   const titleText = failed
     ? t('chat.media.generationFailed').replace('{kind}', kindLabel)
@@ -758,6 +802,20 @@ function useSessionFileDownloadUrl({
   }, [ctx, ext, fileId, filePath, kind, label]));
 }
 
+// 语音产物卡（助手主动发的语音消息）：文件名来自受控 generated 目录，
+// 播放走服务端受控端点（file:// 会被渲染层安全策略拦掉，实测无声）。
+const AudioOutputCard = memo(function AudioOutputCard({ filePath, label }: { filePath?: string; label?: string }) {
+  const basename = filePath?.replace(/^.*[\\/]/, '') || '';
+  const url = basename ? `/api/media/generated/${encodeURIComponent(basename)}` : null;
+  if (!url) return null;
+  return (
+    <div className={styles.audioOutputCard} data-testid="audio-output-card">
+      <audio controls preload="metadata" src={url} className={styles.audioOutputElement} />
+      {label && <span className={styles.audioOutputLabel}>{label}</span>}
+    </div>
+  );
+});
+
 const FileBlock = memo(function FileBlock({ block, sessionPath, messageId, blockIdx }: {
   block: any;
   sessionPath: string;
@@ -772,6 +830,9 @@ const FileBlock = memo(function FileBlock({ block, sessionPath, messageId, block
   }
   if (kind === 'video') {
     return <VideoOutputCard fileId={block.fileId} filePath={block.filePath} label={block.label} ext={block.ext} status={block.status} ctx={ctx} />;
+  }
+  if (kind === 'audio' || block.kind === 'audio') {
+    return <AudioOutputCard filePath={block.filePath} label={block.label} />;
   }
   return <FileOutputCard fileId={block.fileId} filePath={block.filePath} label={block.label} ext={block.ext} status={block.status} ctx={ctx} />;
 });
@@ -830,12 +891,6 @@ const LegacyArtifactBlock = memo(function LegacyArtifactBlock({ block, sessionPa
       {expired && <span className={styles.legacyArtifactExpiredBadge}>{window.t('chat.fileExpired')}</span>}
     </div>
   );
-});
-
-// plugin_card block
-
-const PluginCardWrapper = memo(function PluginCardWrapper({ block, agentId }: { block: any; agentId?: string | null }) {
-  return <PluginCardBlock card={block.card} agentId={agentId} />;
 });
 
 // screenshot block
@@ -1411,10 +1466,6 @@ function WorkflowRenderer({ block }: BlockRendererProps<'workflow'>) {
   return <WorkflowInlineCard block={block} />;
 }
 
-function PluginCardRenderer({ block, agentId }: BlockRendererProps<'plugin_card'>) {
-  return <PluginCardWrapper block={block} agentId={agentId} />;
-}
-
 function InteractiveCardRenderer({ block }: BlockRendererProps<'interactive_card'>) {
   return <InteractiveCard block={block} />;
 }
@@ -1447,7 +1498,6 @@ registerBlockRenderers({
   interlude: InterludeRenderer,
   subagent: SubagentRenderer,
   workflow: WorkflowRenderer,
-  plugin_card: PluginCardRenderer,
   interactive_card: InteractiveCardRenderer,
   turn_status: TurnStatusRenderer,
 });

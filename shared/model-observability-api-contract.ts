@@ -727,6 +727,7 @@ export const SEMANTIC_INPUT_SHAPES = [
   "pi_direct_summary", // generateSummary 参数
   "media_image",
   "media_video",
+  "media_speech",
   "external_cli_media",
   "speech_transcribe",
   "provider_probe",

@@ -1,0 +1,157 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ × tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-01 E11 pending 在前 active 在后仍复用 active 36ms
+   → expected '543ec659-fc0d-4ae6-8db9-46a6cf42ad57' to be 'a5f9ad61-958e-46d4-bdda-c020d088f097' // Object.is equality
+ × tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-02 rejected 历史在前三次批量导入只增加一个 active 4ms
+   → expected [ { …(8) }, { …(8) }, { …(8) } ] to have a length of 1 but got 3
+ × tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-04 只恢复批准部分，其他候选仍显示 3ms
+   → expected undefined to be 'missing' // Object.is equality
+ × tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-05 同一 operation 返回原 summary 不再写库 3ms
+   → expected { restored: +0, entries: [ { …(8) } ] } to deeply equal { restored: 1, entries: [ { …(9) } ] }
+ × tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-06 同一 operation 改批准决策拒绝 3ms
+   → expected [Function] to throw an error
+ × tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-07 完成后删除再用原单不能复活 2ms
+   → expected [ { …(8) } ] to have a length of +0 but got 1
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-08 新批准操作才允许恢复用户删除内容 2ms
+ × tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-09 批准后 source 改变拒绝写入 2ms
+   → expected [Function] to throw an error
+ × tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-09 批准后 target 改变拒绝写入 2ms
+   → expected [Function] to throw an error
+ × tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-13 收据按 operation 存放，不覆盖首次迁移位置 2ms
+   → expected false to be true // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-01 E11 pending 在前 active 在后仍复用 active
+AssertionError: expected '543ec659-fc0d-4ae6-8db9-46a6cf42ad57' to be 'a5f9ad61-958e-46d4-bdda-c020d088f097' // Object.is equality
+
+Expected: "a5f9ad61-958e-46d4-bdda-c020d088f097"
+Received: "543ec659-fc0d-4ae6-8db9-46a6cf42ad57"
+
+ ❯ tests/round2-pinned-recovery.test.ts:14:349
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-02 rejected 历史在前三次批量导入只增加一个 active
+AssertionError: expected [ { …(8) }, { …(8) }, { …(8) } ] to have a length of 1 but got 3
+
+- Expected
++ Received
+
+- 1
++ 3
+
+ ❯ tests/round2-pinned-recovery.test.ts:15:405
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-04 只恢复批准部分，其他候选仍显示
+AssertionError: expected undefined to be 'missing' // Object.is equality
+
+- Expected:
+"missing"
+
++ Received:
+undefined
+
+ ❯ tests/round2-pinned-recovery.test.ts:16:222
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-05 同一 operation 返回原 summary 不再写库
+AssertionError: expected { restored: +0, entries: [ { …(8) } ] } to deeply equal { restored: 1, entries: [ { …(9) } ] }
+
+- Expected
++ Received
+
+@@ -2,15 +2,14 @@
+    "entries": [
+      {
+        "contentHash": "sha256:a7937b64b8caa58f03721bb6bacf5c78cb235febe0e70b1b84cd99541461a08e",
+        "createdAt": "2026-09-08T05:27:13.718Z",
+        "decidedAt": "2026-09-08T05:27:13.718Z",
+-       "historyTenetId": null,
+        "legacyId": "a",
+        "normalizedContent": "first",
+        "order": 0,
+-       "outcome": "added",
++       "outcome": "duplicate_active",
+        "tenetId": "0ee90e1f-c9d5-4680-9229-aafb60af49e1",
+      },
+    ],
+-   "restored": 1,
++   "restored": 0,
+  }
+
+ ❯ tests/round2-pinned-recovery.test.ts:17:229
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-06 同一 operation 改批准决策拒绝
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ tests/round2-pinned-recovery.test.ts:18:314
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-07 完成后删除再用原单不能复活
+AssertionError: expected [ { …(8) } ] to have a length of +0 but got 1
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/round2-pinned-recovery.test.ts:19:284
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-09 批准后 source 改变拒绝写入
+ FAIL  tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-09 批准后 target 改变拒绝写入
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ tests/round2-pinned-recovery.test.ts:21:352
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+ FAIL  tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-13 收据按 operation 存放，不覆盖首次迁移位置
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/round2-pinned-recovery.test.ts:22:218
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  9 failed | 1 passed (10)
+   Start at  13:27:13
+   Duration  212ms (transform 67ms, setup 19ms, import 61ms, tests 59ms, environment 0ms)
+

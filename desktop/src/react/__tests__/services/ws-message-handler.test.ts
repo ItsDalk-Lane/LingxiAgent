@@ -42,6 +42,9 @@ vi.mock('../../services/stream-resume', () => ({
   isStreamResumeRebuilding: () => null,
   isStreamScopedMessage: () => false,
   updateSessionStreamMeta: vi.fn(),
+  injectHandlers: vi.fn(),
+  injectWebSocketGetter: vi.fn(),
+  requestStreamResume: vi.fn(),
 }));
 
 vi.mock('../../services/stream-key-dispatcher', () => ({
@@ -331,7 +334,9 @@ describe('ws-message-handler session-scoped desktop events', () => {
       id: 'client-user-1',
       sourceEntryId: 'entry-u1',
       role: 'user',
-      text: 'confirmed text',
+      // F1 输入所有权：回执合并不覆盖本地逐字符快照（服务端持久化的本就是
+      // 同一份 wire text，出现分歧时以用户原文为准）；其余元数据照常合并。
+      text: 'pending text',
       timestamp: Date.parse('2026-06-12T10:00:00.000Z'),
     });
     expect(first.data.sendStatus).toBeUndefined();

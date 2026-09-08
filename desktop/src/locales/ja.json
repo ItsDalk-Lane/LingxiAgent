@@ -221,8 +221,7 @@
     "toolReadOnly": "読取",
     "toolWrite": "書込",
     "filesUnsupported": "チャンネルは現在テキストのみ対応しています。ファイルはチャット添付に追加されません",
-    "createIntroOptional": "説明",
-    "unpinPluginTab": "「{label}」の固定を解除"
+    "createIntroOptional": "説明"
   },
   "announcement": {
     "title": "アップデート完了 · v{version}",
@@ -444,7 +443,8 @@
       "generationInProgress": "{kind}を生成中",
       "retryFailed": "再生成に失敗しました",
       "submitting": "送信中",
-      "retryLabel": "{kind}を再生成"
+      "retryLabel": "{kind}を再生成",
+      "kindSpeech": "音声"
     },
     "turnStatus": {
       "missingFinalAnswer": "最終回答は生成されませんでした",
@@ -510,7 +510,9 @@
     "feedbackRecorded": "経験として記録しました。",
     "feedbackRecordedExperienceOff": "記録しました。現在経験ライブラリは無効のため、有効にするとアシスタントが参照できます。",
     "feedbackDuplicate": "このフィードバックはすでに記録済みです。",
-    "feedbackFailed": "フィードバックを保存できませんでした。後でもう一度お試しください。"
+    "feedbackFailed": "フィードバックを保存できませんでした。後でもう一度お試しください。",
+    "speak": "読み上げ",
+    "speakFailed": "音声生成に失敗しました"
   },
   "time": {
     "justNow": "たった今",
@@ -644,7 +646,26 @@
     "knowledgeModeFast": "高速",
     "knowledgeModeDetailed": "詳細",
     "knowledgeModeFastHint": "ローカルのみで高速検索します。リモートの埋め込み、再ランキング、複数回の調査は待ちません。",
-    "knowledgeModeDetailedHint": "複数回の検索、読解、根拠の照合を行い、詳しい回答を生成します。"
+    "knowledgeModeDetailedHint": "複数回の検索、読解、根拠の照合を行い、詳しい回答を生成します。",
+    "dictateOn": "音声入力オン：録音はテキストとして入力欄に挿入されます（クリックでオフ）",
+    "dictateOff": "音声入力：録音をテキストとして入力欄へ（macOS オンデバイス認識）",
+    "dictateEmpty": "音声が認識されませんでした",
+    "queuedSend": "キュー",
+    "queuedTurnHint": "キュー中 · 現在の返答の後に自動送信されます",
+    "queuedInsertNow": "今すぐ挿入",
+    "queuedInsertNowTitle": "このメッセージを進行中の返答にすぐ挿入します",
+    "queuedSendFailed": "キュー内のメッセージの送信に失敗しました",
+    "queuedRetry": "再試行",
+    "queuedInsertWaiting": "現在の返答の開始を待っています。しばらくしてからもう一度お試しください",
+    "queuedEditUnavailable": "このメッセージは送信処理に入ったか、編集できなくなりました。送信状況を確認してください。",
+    "queuedDelete": "このキュー中のメッセージを取り消す",
+    "deliveryChecking": "結果不明、確認中",
+    "deliveryUnknown": "結果不明、確認未完了",
+    "deliveryRunUnknown": "メッセージ受信済み、実行結果は未確認",
+    "recheckDelivery": "再確認",
+    "sendNotAccepted": "未送信：サーバーがこのメッセージを受け付けませんでした",
+    "sendRetry": "再送信",
+    "sendDismiss": "破棄"
   },
   "agentReview": {
     "running": "この Session をレビュー中",
@@ -1366,20 +1387,16 @@
       "me": "自分",
       "providers": "プロバイダー",
       "usage": "モデル観測",
-      "media": "メディア",
       "models": "モデル",
-      "memory": "記憶",
       "work": "ワークスペース",
       "skills": "スキル",
       "mcp": "Connectors",
       "bridge": "ソーシャル",
       "sharing": "共有",
       "access": "アクセスとデバイス",
-      "plugins": "プラグイン",
       "about": "概要",
       "security": "セキュリティ",
-      "experiments": "実験機能",
-      "pluginMarketplace": "プラグインマーケット"
+      "experiments": "実験機能"
     },
     "browser": {
       "cookiesTitle": "Cookies",
@@ -1717,25 +1734,7 @@
       "launchAtLogin": "ログイン時に起動",
       "keepAwake": "ロック中も実行を継続",
       "betaUpdates": "ベータ版アップデートを受け取る",
-      "autoCheckUpdates": "アップデートを自動で確認",
-      "inviteSectionTitle": "テストチャンネル",
-      "inviteCodeLabel": "招待コード",
-      "inviteCodeHint": "招待コードはテストチャンネルを開くためのものです。アプリの利用条件ではありません。",
-      "inviteCodePlaceholder": "招待コードを貼り付け",
-      "inviteRedeemBtn": "引き換える",
-      "inviteRedeeming": "引き換え中…",
-      "inviteErrorInvalid": "この招待コードは無効か、すでに使い切られています。",
-      "inviteErrorNetwork": "引き換えサービスに接続できません。通信環境を確認してもう一度お試しください。",
-      "inviteErrorActivate": "チャンネルの状態を保存できませんでした。",
-      "inviteConfirmTitle": "テストチャンネルに切り替えますか？",
-      "inviteConfirmBody": "切り替えると、アプリはテスト版に更新されます。テスト版がデータ形式を更新したあとは、現在の正式版には戻れません。確認すると即座に反映されます。",
-      "inviteConfirmOk": "切り替える",
-      "inviteConfirmCancel": "正式版のままにする",
-      "inviteChannelActive": "現在のチャンネル：テストチャンネル",
-      "inviteChannelActiveHint": "更新はテストチャンネルから届きます。",
-      "inviteCodesLabel": "あなたの招待コード",
-      "inviteCodesHint": "各コードは1回だけ、1台の端末で使えます。",
-      "inviteCopy": "コピー"
+      "autoCheckUpdates": "アップデートを自動で確認"
     },
     "access": {
       "networkAccess": "LAN アクセス",
@@ -1961,7 +1960,8 @@
       "imageDefaultsButton": "画像生成のデフォルト",
       "videoDefaultsButton": "動画生成のデフォルト",
       "speechSynthesisDefaultsButton": "音声合成のデフォルト",
-      "runtimeProvider": "ランタイムプロバイダー"
+      "runtimeProvider": "ランタイムプロバイダー",
+      "defaultSpeechGenModel": "音声合成モデル（読み上げ / ボイスメッセージ）"
     },
     "models": {
       "auxiliary": "補助モデル",
@@ -2227,8 +2227,8 @@
       "embeddingActiveNote": "意味検索が有効：記憶検索はベクトル検索とキーワード検索を併用します。",
       "embeddingOffNote": "意味検索が無効：記憶検索はタグとキーワード検索のみを使用します。",
       "embeddingSaved": "記憶用埋め込みモデルを保存しました",
-      "tenetsTitle": "ユーザー原則",
-      "tenetsHint": "あなたが確認した行動原則で、新しい会話ごとに注入されます。アシスタントの提案は承認後に有効になります。",
+      "tenetsTitle": "ピン留めと原則",
+      "tenetsHint": "ピン留めした内容と確認済みの行動原則は、毎回の新しい会話に注入されます。アシスタントの提案は承認後に有効になります。",
       "tenetsLoading": "ユーザー原則を読み込み中…",
       "tenetsEmpty": "まだユーザー原則がありません。会話でアシスタントに提案させるか、ここで直接追加してください。",
       "tenetsApprove": "承認",
@@ -2281,13 +2281,6 @@
         "stats": "{remembered} / {total} 件の記憶を保持中"
       },
       "activeOnly": "このエージェントをアクティブに設定してください"
-    },
-    "pins": {
-      "title": "固定された記憶",
-      "hint": "常に会話に挿入され、減衰しません",
-      "empty": "固定された記憶はまだありません",
-      "delete": "削除",
-      "addPlaceholder": "固定する記憶を追加..."
     },
     "experience": {
       "title": "経験",
@@ -2437,67 +2430,6 @@
       "dissolveBundleAriaLabel": "{name} を解体",
       "removeFromBundleTitle": "Bundle から外して単体スキルにする",
       "removeFromBundleAriaLabel": "{name} を Bundle から外す"
-    },
-    "plugins": {
-      "title": "プラグイン",
-      "desc": "コミュニティプラグインを管理します。",
-      "empty": "プラグインはありません",
-      "reload": "再読み込み",
-      "statusLoaded": "読み込み済み",
-      "statusFailed": "失敗",
-      "statusDisabled": "無効",
-      "fullAccessToggle": "フルアクセスプラグインを許可",
-      "fullAccessDesc": "有効にすると、full-access を宣言したプラグインがシステムレベルの API（ルート、フック、Provider 等）を使用できます",
-      "devToolsToggle": "Agent のプラグイン開発ツールを許可",
-      "devToolsDesc": "有効にすると、Agent は開発用プラグインのインストール、再読み込み、有効化、無効化、削除を実行できます。通常インストールされたプラグインには影響しません。",
-      "dropzone": "プラグインフォルダまたは .zip をここにドラッグしてインストール、またはクリックして選択",
-      "statusRestricted": "フルアクセスが必要",
-      "deleteConfirm": "プラグイン「{name}」を削除しますか？プラグインのデータは保持されます。",
-      "installSuccess": "プラグイン「{name}」をインストールしました",
-      "installError": "プラグインのインストールに失敗しました",
-      "invalidPlugin": "有効なプラグインディレクトリではありません",
-      "pluginsDir": "プラグインディレクトリ：{path}",
-      "needsFullAccess": "このプラグインを使用するには「フルアクセスプラグインを許可」を有効にしてください",
-      "configure": "{name} を設定",
-      "configTitle": "{name} 設定",
-      "configLoadError": "プラグイン設定の読み込みに失敗しました",
-      "sensitiveHint": "保存済みの値は非表示です。新しい値を入力すると置き換えます。",
-      "invalidJson": "JSON 形式が正しくありません",
-      "showDiagnostics": "プラグイン診断を表示",
-      "diagnosticsTitle": "プラグイン診断",
-      "diagnosticsLoadError": "プラグイン診断の読み込みに失敗しました",
-      "diagnosticsSummary": "機能 {capabilities}/{total} · タスク {tasks} · スケジュール {schedules}",
-      "noDiagnostics": "診断データはまだありません",
-      "diagnosticActivation": "起動：{state}",
-      "diagnosticRoutes": "ページ {pages} · ウィジェット {widgets} · 設定 {settingsTabs}",
-      "diagnosticTools": "ツール {count}",
-      "diagnosticCommands": "コマンド {count}",
-      "diagnosticConfig": "設定 {count}",
-      "openMarketplace": "プラグインマーケットを開く",
-      "marketBack": "プラグイン管理に戻る",
-      "marketplaceTitle": "プラグインマーケット",
-      "marketplaceHint": "インストール可能なプラグイン、README、権限、貢献タイプを確認できます。",
-      "marketplaceCount": "{count} 件のプラグイン",
-      "marketplaceNoSource": "マーケットソース未設定",
-      "marketplaceEmpty": "閲覧できるプラグインはありません",
-      "marketLoading": "プラグインマーケットを読み込み中…",
-      "marketLoadError": "プラグインマーケットの読み込みに失敗しました",
-      "marketReadmeLoadError": "README の読み込みに失敗しました",
-      "marketInstalled": "インストール済み",
-      "marketInstall": "インストール",
-      "marketUpdate": "更新",
-      "marketReinstall": "再インストール",
-      "marketDowngrade": "ダウングレード",
-      "marketIncompatible": "非互換",
-      "marketUpdateAvailable": "更新あり",
-      "marketInstalledVersion": "インストール済み v{version}",
-      "marketUpdateFrom": "v{from} から v{to} に更新できます",
-      "marketDowngradeTo": "互換性のある v{version} のみインストールできます",
-      "marketDowngradeConfirm": "現在のバージョンは v{from} です。v{to} にダウングレードしますか？",
-      "marketReadmeLoading": "README を読み込み中…",
-      "marketSelectPlugin": "プラグインを選択して README を表示",
-      "manageTitle": "プラグイン管理",
-      "permissionTitle": "権限"
     },
     "mcp": {
       "masterTitle": "Master Switch",
@@ -4478,7 +4410,6 @@
     "dialog": {
       "selectFolder": "作業フォルダを選択",
       "selectSkill": "スキルを選択",
-      "selectPlugin": "プラグインを選択",
       "launchFailedTitle": "Lingxi の起動に失敗しました",
       "launchFailedBody": "Lingxi v{version}\n\n{detail}\n\n詳細ログの保存先：\n{logPath}\n\nこのスクリーンショットまたはログファイルを開発者にお送りください。",
       "serverRestartFailed": "Lingxi v{version}\n\nServer がクラッシュし、再起動に失敗しました。\n{error}\n\nアプリケーションを再起動してください。",
@@ -4772,6 +4703,19 @@
     "listCapabilities": {
       "description": "Beautify ツールが現在サポートしている美学強化機能を一覧表示します。",
       "text": "Beautify は現在 2 つの機能を提供しています。1) Markdown カバーワークフロー: まずカバースタイルガイドを読み、画像を準備（Media Generation、将来の組み込みギャラリー、またはローカルファイルから）、attachments フォルダーにコピーし、カバー frontmatter を書き込みます。2) フルページ HTML 美学ガイド: Web ページ/組版ページ/レポートを生成する前に beautify_get-html-style-guide を呼び出し、Hana のデフォルトアートディレクションを取得（引数なしでルーターを返し、必要に応じてセクションを取得）。"
+    },
+    "generateSpeech": {
+      "description": "音声生成。テキストから音声を合成します（読み上げ、ボイス返信）。生成された音声はボイスメッセージとして送信されます。",
+      "promptDesc": "音声化するテキスト",
+      "voiceDesc": "任意のボイス（alloy、nova など。システム音声は macOS のボイス名）",
+      "speedDesc": "任意の速度 0.25〜4、既定 1",
+      "formatDesc": "任意の音声フォーマット、既定 mp3",
+      "modelDesc": "任意の音声モデル（既定は設定のデフォルト音声モデル）",
+      "providerDesc": "任意のプロバイダー ID（openai、system-speech など）",
+      "notInitialized": "音声生成サービスが初期化されていません",
+      "submitFailed": "音声生成に失敗しました：{error}",
+      "submitFailedUnknown": "音声生成の送信に失敗しました",
+      "submitted": "音声生成を送信しました。完了後にボイスメッセージとして届きます。"
     }
   },
   "fileHistory": {
@@ -4824,22 +4768,6 @@
     }
   },
   "plugin": {
-    "widget": {
-      "loadFailed": "読み込みに失敗しました",
-      "retry": "再試行",
-      "hiddenPlugins": "非表示のプラグイン",
-      "show": "表示",
-      "desk": "デスク",
-      "hideTitle": "「{title}」を非表示"
-    },
-    "page": {
-      "notFound": "プラグインが見つかりません",
-      "loadFailed": "プラグインの読み込みに失敗しました",
-      "retry": "再試行"
-    },
-    "tab": {
-      "pinToBar": "タブバーに固定"
-    },
     "imageGen": {
       "notInitialized": "画像生成プラグインが初期化されていません",
       "noSessionPath": "画像生成には明示的なセッションコンテキストが必要です。現在のツール呼び出しに sessionPath がありません",

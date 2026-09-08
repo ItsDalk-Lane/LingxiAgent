@@ -30,6 +30,8 @@
  */
 import path from "path";
 import { randomUUID } from "node:crypto";
+import { withDesktopInputCommitted, noteDesktopInputRuntimeChange, desktopInputRuntimeRevision, hasDesktopInputCommitObserver } from '../lib/pi-sdk/desktop-input-commit.ts';
+import { DESKTOP_INPUT_CORRELATION_TYPE, collectDesktopInputCorrelations } from './desktop-input-correlation.ts';
 import { extOfName, inferFileKind } from "../lib/file-metadata.ts";
 import { collectMediaItems } from "../lib/tools/media-details.ts";
 import { formatSettingsUpdateText } from "../lib/tools/settings-update-result.ts";
@@ -60,7 +62,62 @@ export const MESSAGE_ORIGIN_RECORD_TYPE = "hana-message-origin";
 export const MESSAGE_PRESENTATION_RECORD_TYPE = "hana-message-presentation";
 export const AGENT_REVIEW_RECORD_TYPE = "hana-agent-review-result";
 
-const pendingDesktopSessionSubmissions = new Set();
+/**
+ * 「输入未被接受」证据标记（C01）：提交链抛错时，若本次输入的 canonical 关联
+ * 回执（session_user_message 带 sourceEntryId）从未触发，说明没有任何用户输入
+ * 被持久化——提交 Promise 已终结，不会再 append。调用方（chat.ts）据此发送
+ * 类型化拒绝回执；标记只在有实际提交阶段证据时设置，不根据文案猜测。
+ */
+const INPUT_NOT_ACCEPTED = Symbol("lingxiDesktopInputNotAccepted");
+
+export function markDesktopInputRejectedBeforeAcceptance(err: unknown): void {
+  if (err && typeof err === "object") {
+    (err as Record<symbol, unknown>)[INPUT_NOT_ACCEPTED] = true;
+  }
+}
+
+export function isDesktopInputRejectedBeforeAcceptance(err: unknown): boolean {
+  return !!(err && typeof err === "object" && (err as Record<symbol, unknown>)[INPUT_NOT_ACCEPTED] === true);
+}
+
+const pendingDesktopSessionSubmissions = new class extends Set<string> {
+  add(key: string) { if (!this.has(key)) noteDesktopInputRuntimeChange(); return super.add(key); }
+  delete(key: string) { const removed = super.delete(key); if (removed) noteDesktopInputRuntimeChange(); return removed; }
+}();
+
+/** 查询不创建/加载会话；缺少运行态能力时不能声称空闲。 */
+export function readDesktopInputRunSnapshot(engine: any, sessionId: string, sessionPath: string) {
+  const revision = desktopInputRuntimeRevision();
+  const pending = pendingDesktopSessionSubmissions.has(sessionId) || pendingDesktopSessionSubmissions.has(sessionPath);
+  try {
+    if (typeof engine.isSessionStreaming !== 'function' || typeof engine.getSessionByPath !== 'function') return { revision, status: pending ? 'running' : 'unknown' };
+    const streaming = engine.isSessionStreaming(sessionPath);
+    const session = engine.getSessionByPath(sessionPath);
+    if (pending || streaming === true) return { revision, status: 'running' };
+    if (streaming !== false || (session && !hasDesktopInputCommitObserver(session))) return { revision, status: 'unknown' };
+    return { revision, status: 'reconciled_idle' };
+  } catch { return { revision, status: 'unknown' }; }
+}
+
+function withInputCorrelation<T>(engine: any, session: any, identity: any, action: () => T, onCanonicalReceipt?: () => void): T {
+  if (!identity.clientMessageId || typeof identity.clientMessageId !== 'string') return action();
+  const snapshotVersion = identity.snapshotVersion === undefined ? 1 : identity.snapshotVersion;
+  const unavailable = () => {
+    console.warn('[desktop-session-submit] canonical input correlation unavailable');
+    try { engine.emitEvent?.({ type: 'session_input_correlation_unavailable', sessionId: identity.sessionId, clientMessageId: identity.clientMessageId, snapshotVersion }, identity.sessionPath); }
+    catch { /* 诊断投递失败也不能中断已提交的用户输入。 */ }
+  };
+  if (!Number.isSafeInteger(snapshotVersion) || snapshotVersion < 1 || !identity.sessionId) { unavailable(); return action(); }
+  return withDesktopInputCommitted({ session, unavailable, committed: sourceEntryId => {
+    if (session.sessionManager.getSessionId() !== identity.sessionId) { unavailable(); return; }
+    session.sessionManager.appendCustomEntry(DESKTOP_INPUT_CORRELATION_TYPE, { schemaVersion: 1, sessionId: identity.sessionId, clientMessageId: identity.clientMessageId, snapshotVersion, sourceEntryId });
+    const correlation = collectDesktopInputCorrelations(session.sessionManager.getBranch(), identity.sessionId).get(sourceEntryId);
+    if (!correlation?.clientMessageId) { unavailable(); return; }
+    onCanonicalReceipt?.();
+    engine.emitEvent?.({ type: 'session_user_message', sessionId: identity.sessionId, clientMessageId: identity.clientMessageId, snapshotVersion,
+      message: { ...(identity.displayMessage || {}), text: identity.displayMessage?.text ?? identity.text ?? '', id: sourceEntryId, sourceEntryId } }, identity.sessionPath);
+  } }, action);
+}
 
 /**
  * 检索/排队期间被用户 abort 的提交键（sessionId 与 sessionPath 两种形式都记，
@@ -291,6 +348,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
   audioAttachmentPaths?: string[];
   inboundFiles?: Array<{ type: string; filename?: string; mimeType?: string; buffer: any }>;
   clientMessageId?: string;
+  snapshotVersion?: number;
   onDelta?: (delta: string, accumulated: string) => void;
   displayMessage?: any;
   sessionFileRefs?: Array<{ fileId?: string; sessionId?: string; sessionPath?: string; label?: string; kind?: string }>;
@@ -314,6 +372,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
     audioAttachmentPaths,
     inboundFiles,
     clientMessageId,
+    snapshotVersion,
     onDelta,
     displayMessage,
     sessionFileRefs,
@@ -326,17 +385,35 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
     onInputAccepted,
   } = opts;
 
+  // canonical 关联回执观察：committed 回调触发 = 用户输入已被 append（接受证据）。
+  // 抛错时据此判定「未接受」——早于回执的一切错误都没有持久化任何用户输入。
+  let canonicalReceiptEmitted = false;
+  const noteCanonicalReceipt = () => { canonicalReceiptEmitted = true; };
+  /** 接受前确定失败：构造即标记的错误（busy 门禁/身份解析/载荷校验），调用方可据此发拒绝回执。 */
+  const notAcceptedError = (message: string): never => {
+    const err = new Error(message);
+    markDesktopInputRejectedBeforeAcceptance(err);
+    throw err;
+  };
   if (!engine || typeof engine.ensureSessionLoaded !== "function" || typeof engine.promptSession !== "function") {
-    throw new Error("desktop-session-submit: engine session API unavailable");
+    notAcceptedError("desktop-session-submit: engine session API unavailable");
   }
-  const { sessionId, sessionPath } = resolveDesktopSessionTarget(engine, requestedSessionId, requestedSessionPath);
-  if (!text && !images?.length && !videos?.length && !audios?.length) throw new Error("desktop-session-submit: text, images, videos, or audios required");
+  let resolvedTarget: { sessionId: string | null; sessionPath: string };
+  try {
+    resolvedTarget = resolveDesktopSessionTarget(engine, requestedSessionId, requestedSessionPath);
+  } catch (err) {
+    // 会话身份解析失败：输入未被路由到任何会话，更没有被接受。
+    markDesktopInputRejectedBeforeAcceptance(err);
+    throw err;
+  }
+  const { sessionId, sessionPath } = resolvedTarget;
+  if (!text && !images?.length && !videos?.length && !audios?.length) notAcceptedError("desktop-session-submit: text, images, videos, or audios required");
   const submissionKey = sessionId || sessionPath;
   if (pendingDesktopSessionSubmissions.has(submissionKey)) {
-    throw new Error("session_busy");
+    notAcceptedError("session_busy");
   }
   if (typeof engine.isSessionStreaming === "function" && engine.isSessionStreaming(sessionPath)) {
-    throw new Error("session_busy");
+    notAcceptedError("session_busy");
   }
 
   liftBrowserAuthorizationRevocation(sessionPath);
@@ -617,14 +694,14 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
         context,
       });
       if (typeof engine.preflightSessionInput === "function") {
-        await engine.promptSession(sessionPath, promptText, promptOpts, {
+        await withInputCorrelation(engine, session, { sessionId, sessionPath, clientMessageId, snapshotVersion, text, displayMessage }, () => engine.promptSession(sessionPath, promptText, promptOpts, {
           afterCachePreflight,
           afterInputAccepted: onInputAccepted,
-        });
+        }), noteCanonicalReceipt);
       } else {
         // Compatibility for older embedders. LingxiEngine always takes the guarded path above.
         afterCachePreflight();
-        await engine.promptSession(sessionPath, promptText, promptOpts);
+        await withInputCorrelation(engine, session, { sessionId, sessionPath, clientMessageId, snapshotVersion, text, displayMessage }, () => engine.promptSession(sessionPath, promptText, promptOpts), noteCanonicalReceipt);
       }
       consumeRenderedReminderBlock(engine, sessionPath, reminderBlock);
     } finally {
@@ -646,6 +723,10 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
       engine.emitEvent?.({ type: "session_status", isStreaming: false }, sessionPath);
       earlyBusyEmitted = false;
     }
+    // canonical 关联回执未触发 = 没有任何用户输入被 append。提交 Promise 已终结，
+    // 不会再持久化——这是「未接受」的实际提交阶段证据（afterCachePreflight 的展示
+    // 副作可能留下孤儿 presentation 条目，消费方按既有孤儿容忍规则跳过）。
+    if (!canonicalReceiptEmitted) markDesktopInputRejectedBeforeAcceptance(err);
     throw err;
   } finally {
     // 停止同时登记会话编号和路径，结束时一并清除，避免下一次发送继承旧停止状态。
@@ -710,12 +791,26 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
   audioAttachmentPaths?: string[];
   inboundFiles?: Array<{ type: string; filename?: string; mimeType?: string; buffer: any }>;
   clientMessageId?: string;
+  snapshotVersion?: number;
   displayMessage?: any;
   sessionFileRefs?: Array<{ fileId?: string; sessionId?: string; sessionPath?: string; label?: string; kind?: string }>;
   knowledgeRefs?: KnowledgeRefs;
   uiContext?: any;
   context?: any;
 } = {}) {
+  // 接受证据载体：canonical 关联回执触发置 true。抛错时未触发 = 输入从未被
+  // append（steer 成功前的一切失败：busy 门禁/检索失败/装载失败），调用方可
+  // 据此发送类型化拒绝回执（C01）。
+  const receipt = { canonical: false };
+  try {
+    return await runDesktopSessionInterjection(engine, opts, receipt);
+  } catch (err) {
+    if (!receipt.canonical) markDesktopInputRejectedBeforeAcceptance(err);
+    throw err;
+  }
+}
+
+async function runDesktopSessionInterjection(engine: any, opts: Parameters<typeof submitDesktopSessionInterjection>[1], receipt: { canonical: boolean }) {
   const {
     sessionId: requestedSessionId,
     sessionPath: requestedSessionPath,
@@ -728,6 +823,7 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
     audioAttachmentPaths,
     inboundFiles,
     clientMessageId,
+    snapshotVersion,
     displayMessage,
     sessionFileRefs,
     knowledgeRefs,
@@ -879,7 +975,7 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
     promptText = `${reminderBlock.block}\n\n${promptText}`;
   }
 
-  const steered = engine.steerSession(sessionPath, promptText);
+  const steered = withInputCorrelation(engine, session, { sessionId, sessionPath, clientMessageId, snapshotVersion, text, displayMessage }, () => engine.steerSession(sessionPath, promptText), () => { receipt.canonical = true; });
   if (!steered) throw new Error("session_busy");
   consumeRenderedReminderBlock(engine, sessionPath, reminderBlock);
   engine.emitEvent?.({

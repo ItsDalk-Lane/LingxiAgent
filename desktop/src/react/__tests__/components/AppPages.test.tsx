@@ -13,11 +13,7 @@ vi.mock('../../MainContent', () => ({
   ),
 }));
 
-vi.mock('../../components/plugin/PluginPageView', () => ({
-  PluginPageView: ({ pluginId }: { pluginId: string }) => (
-    <section data-testid="plugin-page">{pluginId}</section>
-  ),
-}));
+;
 
 vi.mock('../../components/knowledge/KnowledgePage', () => ({
   KnowledgePage: () => <section data-testid="knowledge-page" />,
@@ -91,16 +87,6 @@ describe('AppPages page ownership', () => {
     expect(screen.getByTestId('chat-area')).toBeInTheDocument();
     expect(document.querySelector('#previewPanel')).toBeInTheDocument();
     // 旧固定右工作区 Rail 已从桌面端移除，不再占位渲染
-    expect(document.querySelector('#jianSidebar')).not.toBeInTheDocument();
-  });
-
-  it('renders plugin pages without carrying the file preview', () => {
-    useStore.setState({ currentTab: 'plugin:hanako-hyperframes' } as never);
-
-    render(<AppPages />);
-
-    expect(screen.getByTestId('plugin-page')).toHaveTextContent('hanako-hyperframes');
-    expect(document.querySelector('#previewPanel')).not.toBeInTheDocument();
     expect(document.querySelector('#jianSidebar')).not.toBeInTheDocument();
   });
 

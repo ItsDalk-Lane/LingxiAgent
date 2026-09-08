@@ -2,7 +2,7 @@
  * chat-slice.ts — Per-session 消息数据 + 滚动位置
  */
 
-import type { AssistantTurnProjection, ChatListItem, ChatMessage, ContentBlock, SessionMessages, SessionModel, SessionRegistryFile } from './chat-types';
+import type { AssistantTurnProjection, ChatListItem, ChatMessage, ContentBlock, QueuedTurnInput, SessionMessages, SessionModel, SessionRegistryFile } from './chat-types';
 import { invalidateSessionCache } from './selectors/file-refs';
 import { invalidateStreamBuffer, invalidateStreamResumeMeta } from './stream-invalidator';
 import { bumpMessageLiveVersion, clearMessageLiveVersion } from './message-live-version';
@@ -31,7 +31,8 @@ export interface ChatSlice {
   appendItem: (path: string, item: ChatListItem) => void;
   appendOptimisticUserMessage: (path: string, message: ChatMessage) => void;
   confirmOptimisticUserMessage: (path: string, clientMessageId: string, message: ChatMessage) => boolean;
-  markOptimisticUserMessageFailed: (path: string, clientMessageId: string, error: string) => boolean;
+  markOptimisticUserMessageFailed: (path: string, clientMessageId: string, error: string, retryable?: boolean) => boolean;
+  removeOptimisticUserMessage: (path: string, clientMessageId: string) => boolean;
   updateLastMessage: (path: string, updater: (msg: ChatMessage) => ChatMessage) => void;
   updateMessageById: (path: string, messageId: string, updater: (msg: ChatMessage) => ChatMessage) => boolean;
   bindPersistedTurnEntries: (path: string, entries: {
@@ -64,6 +65,23 @@ export interface ChatSlice {
   setLoadingMore: (path: string, loading: boolean) => void;
   clearSession: (path: string) => void;
   saveScrollPosition: (path: string, scrollTop: number) => void;
+
+  /**
+   * 流式期间发送的用户输入队列（per-session）。入队后输入区立即清空；
+   * 上一轮回答结束（effectiveStreaming 变 false）后由 InputArea 自动续发。
+   * 纯前端态：不落盘，应用重启即清。
+   */
+  queuedTurnInputsByPath: Record<string, QueuedTurnInput[]>;
+  enqueueQueuedTurnInput: (path: string, item: QueuedTurnInput) => void;
+  updateQueuedTurnInputText: (path: string, id: string, text: string) => void;
+  removeQueuedTurnInput: (path: string, id: string) => void;
+  /**
+   * 拒绝后原位恢复队列项（C01）：transport_submitted 时已出队的项收到服务端
+   * 明确拒绝后，按原位置/原身份恢复为可见失败输入；同 id 已存在时幂等刷新状态。
+   */
+  restoreQueuedTurnInput: (path: string, item: QueuedTurnInput, index?: number | null) => void;
+  /** 显式标记队列项调度结果（blocked/failed/ready）；错误码与可重试性随状态记录。 */
+  setQueuedTurnInputStatus: (path: string, id: string, status: 'ready' | 'blocked' | 'failed', errorCode?: string, retryable?: boolean) => void;
 }
 
 const MAX_CACHED_SESSIONS = 8;
@@ -110,6 +128,7 @@ export const createChatSlice = (
   _loadMessagesVersion: {},
   _sessionFilesFlightByPath: {},
   scrollPositions: {},
+  queuedTurnInputsByPath: {},
 
   initSession: (path, items, hasMore, revision = null) => set((s) => {
     const key = keyForSession(s as any, path);
@@ -201,7 +220,7 @@ export const createChatSlice = (
       const targetIdx = session.items.findIndex((item) =>
         item.type === 'message' &&
         item.data.role === 'user' &&
-        item.data.id === clientMessageId,
+        (item.data.id === clientMessageId || item.data.clientMessageId === clientMessageId),
       );
       if (targetIdx < 0) return {};
       const items = [...session.items];
@@ -209,8 +228,12 @@ export const createChatSlice = (
       if (current.type !== 'message' || current.data.role !== 'user') return {};
       const nextData: ChatMessage = {
         ...current.data,
-        ...message,
+        ...Object.fromEntries(Object.entries(message).filter(([, value]) => value !== undefined)),
+        clientMessageId,
         id: current.data.id,
+        // 回执/恢复回放不得覆盖用户原文：本地乐观文本是用户输入的逐字符快照（F1/F10），
+        // 服务端回声只负责确认与补充元数据；本地文本为空（纯附件等）时才采用服务端文本。
+        text: current.data.text ? current.data.text : message.text,
         sourceEntryId: message.sourceEntryId ?? current.data.sourceEntryId,
       };
       delete nextData.sendStatus;
@@ -224,7 +247,7 @@ export const createChatSlice = (
     return consumed;
   },
 
-  markOptimisticUserMessageFailed: (path, clientMessageId, error) => {
+  markOptimisticUserMessageFailed: (path, clientMessageId, error, retryable) => {
     let consumed = false;
     set((s) => {
       const session = scopedMapValue<SessionMessages>(s as any, s.chatSessions, path);
@@ -232,7 +255,7 @@ export const createChatSlice = (
       const targetIdx = session.items.findIndex((item) =>
         item.type === 'message' &&
         item.data.role === 'user' &&
-        item.data.id === clientMessageId,
+        (item.data.id === clientMessageId || item.data.clientMessageId === clientMessageId),
       );
       if (targetIdx < 0) return {};
       const items = [...session.items];
@@ -244,8 +267,32 @@ export const createChatSlice = (
           ...current.data,
           sendStatus: 'failed',
           sendError: error,
+          ...(retryable !== undefined ? { sendRetryable: retryable } : {}),
         },
       };
+      consumed = true;
+      return {
+        chatSessions: putScopedMapValue(s as any, s.chatSessions, path, { ...session, items }),
+      };
+    });
+    if (consumed) bumpMessageLiveVersion(path);
+    return consumed;
+  },
+
+  /** 明确放弃失败输入（C01）：移除失败消息投影；处置语义由调用方（coordinator）统筹。 */
+  removeOptimisticUserMessage: (path, clientMessageId) => {
+    let consumed = false;
+    set((s) => {
+      const session = scopedMapValue<SessionMessages>(s as any, s.chatSessions, path);
+      if (!session) return {};
+      const targetIdx = session.items.findIndex((item) =>
+        item.type === 'message' &&
+        item.data.role === 'user' &&
+        (item.data.id === clientMessageId || item.data.clientMessageId === clientMessageId),
+      );
+      if (targetIdx < 0) return {};
+      const items = [...session.items];
+      items.splice(targetIdx, 1);
       consumed = true;
       return {
         chatSessions: putScopedMapValue(s as any, s.chatSessions, path, { ...session, items }),
@@ -723,6 +770,91 @@ export const createChatSlice = (
   saveScrollPosition: (path, scrollTop) => set((s) => ({
     scrollPositions: putScopedMapValue(s as any, s.scrollPositions, path, scrollTop),
   })),
+
+  enqueueQueuedTurnInput: (path, item) => set((s) => {
+    const key = keyForSession(s as any, path);
+    const existing = s.queuedTurnInputsByPath[key] || [];
+    return {
+      queuedTurnInputsByPath: {
+        ...s.queuedTurnInputsByPath,
+        [key]: [...existing, item],
+      },
+    };
+  }),
+
+  updateQueuedTurnInputText: (path, id, text) => set((s) => {
+    const key = keyForSession(s as any, path);
+    const existing = s.queuedTurnInputsByPath[key];
+    if (!existing?.some(item => item.id === id)) return {};
+    return {
+      queuedTurnInputsByPath: {
+        ...s.queuedTurnInputsByPath,
+        // 编辑保存 = 新快照：版本递增（在途准备的迟到结果按版本丢弃），
+        // 状态回到 ready 等一次新的调度；旧错误码随快照作废。
+        [key]: existing.map(item => item.id === id && item.text !== text
+          ? {
+            ...item,
+            text,
+            bundle: { ...item.bundle, text },
+            snapshotVersion: (item.snapshotVersion ?? 1) + 1,
+            status: 'ready' as const,
+            errorCode: undefined,
+            retryable: undefined,
+          }
+          : item),
+      },
+    };
+  }),
+
+  setQueuedTurnInputStatus: (path, id, status, errorCode, retryable) => set((s) => {
+    const key = keyForSession(s as any, path);
+    const existing = s.queuedTurnInputsByPath[key];
+    if (!existing?.some(item => item.id === id)) return {};
+    return {
+      queuedTurnInputsByPath: {
+        ...s.queuedTurnInputsByPath,
+        [key]: existing.map(item => item.id === id
+          ? { ...item, status, errorCode, retryable }
+          : item),
+      },
+    };
+  }),
+
+  removeQueuedTurnInput: (path, id) => set((s) => {
+    const key = keyForSession(s as any, path);
+    const existing = s.queuedTurnInputsByPath[key];
+    if (!existing?.some(item => item.id === id)) return {};
+    return {
+      queuedTurnInputsByPath: {
+        ...s.queuedTurnInputsByPath,
+        [key]: existing.filter(item => item.id !== id),
+      },
+    };
+  }),
+
+  restoreQueuedTurnInput: (path, item, index) => set((s) => {
+    const key = keyForSession(s as any, path);
+    const existing = s.queuedTurnInputsByPath[key] || [];
+    if (existing.some(candidate => candidate.id === item.id)) {
+      // 幂等：同 id 已在队（重复回执/竞态）只刷新失败状态，不重复插入。
+      return {
+        queuedTurnInputsByPath: {
+          ...s.queuedTurnInputsByPath,
+          [key]: existing.map(candidate => candidate.id === item.id
+            ? { ...candidate, status: item.status, errorCode: item.errorCode, retryable: item.retryable }
+            : candidate),
+        },
+      };
+    }
+    const clamped = Math.max(0, Math.min(index ?? existing.length, existing.length));
+    const next = [...existing.slice(0, clamped), item, ...existing.slice(clamped)];
+    return {
+      queuedTurnInputsByPath: {
+        ...s.queuedTurnInputsByPath,
+        [key]: next,
+      },
+    };
+  }),
 });
 
 function registryFileKey(file: SessionRegistryFile): string | null {

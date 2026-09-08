@@ -1,0 +1,299 @@
+
+> lingxi@0.1.35 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**'
+
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ❯ tests/post-verification-audit-seal.test.ts (3 tests | 1 failed) 179ms
+     × changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced) 27ms
+ ❯ tests/pinned-tenets-migration.test.ts (25 tests | 3 failed) 1133ms
+     × M10：在 receipt:prepared 注入崩溃后重启可恢复，无丢失无重复 75ms
+     × M10：在 commit:before 注入崩溃后重启可恢复，无丢失无重复 69ms
+     × M10：在 archive:before:pinned-memory.json 注入崩溃后重启可恢复，无丢失无重复 74ms
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+(node:15402) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 message listeners added to [process]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:15820) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 message listeners added to [process]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16030) ExperimentalWarning: SOCKS5 proxy support is experimental and subject to change
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M10：在 receipt:prepared 注入崩溃后重启可恢复，无丢失无重复
+ FAIL  tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M10：在 commit:before 注入崩溃后重启可恢复，无丢失无重复
+ FAIL  tests/pinned-tenets-migration.test.ts > M10/M11/M14：状态机崩溃恢复与幂等 > M10：在 archive:before:pinned-memory.json 注入崩溃后重启可恢复，无丢失无重复
+AssertionError: expected [ 'md 条目' ] to deeply equal [ '条目 A', '条目 B' ]
+
+- Expected
++ Received
+
+  [
+-   "条目 A",
+-   "条目 B",
++   "md 条目",
+  ]
+
+ ❯ tests/pinned-tenets-migration.test.ts:372:24
+    370|
+    371|       const contents = activeTenets(agentDir).map(t => t.content).sort…
+    372|       expect(contents).toEqual(["条目 A", "条目 B"]);
+       |                        ^
+    373|       expect(receiptOf(agentDir).state).toBe("completed");
+    374|       expect(fs.existsSync(path.join(agentDir, "pinned-memory.json")))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/post-verification-audit-seal.test.ts > post-verification audit seal (diff guard) > changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced)
+AssertionError: VERIFIED_SOURCE_SHA 之后出现了非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+.github/workflows/build.yml
+.gitignore
+artifacts/f1-f12-repair/F1_F12_REPAIR_FACTS.json
+artifacts/f1-f12-repair/F1_F12_REPAIR_REPORT.md
+artifacts/f1-f12-repair/F1_F12_TEST_REPORT.md
+artifacts/f1-f12-repair/PINNED_TENETS_RECOVERY_GUIDE.md
+artifacts/f1-f12-repair/SYSTEM_SPEECH_VALIDATION.md
+artifacts/f1-f12-repair/evidence/p0-baseline.md
+artifacts/f1-f12-repair/evidence/p0-call-graphs.md
+artifacts/f1-f12-repair/evidence/p1-f9-f3.md
+artifacts/f1-f12-repair/evidence/p2-p3-f1-f2.md
+artifacts/f1-f12-repair/evidence/p4-f4-f5-f6.md
+artifacts/f1-f12-repair/evidence/p5-f7.md
+artifacts/f1-f12-repair/evidence/p5-red-frontend.txt
+artifacts/f1-f12-repair/evidence/p6-f8.md
+artifacts/f1-f12-repair/evidence/p7-f10.md
+artifacts/f1-f12-repair/evidence/p8-f11-f12.md
+artifacts/f1-f12-repair/evidence/p9-regression-build.md
+artifacts/f1-f12-repair/patches/f1-f12-new-files.patch
+artifacts/f1-f12-repair/patches/f1-f12-tracked-changes.patch
+build/cli-runtime-closure.json
+build/persistence-schema-fingerprint.json
+build/persistence-store-inventory.json
+core/events.ts
+core/media-adapters/speech.ts
+core/media/media-parameters.ts
+core/media/task-store.ts
+core/media/universal-media-manager.ts
+core/pinned-tenets-migration.ts
+core/pinned-tenets-recovery.ts
+core/speech-recognition-service.ts
+core/speech-recognition/system-speech-adapter.ts
+desktop/main.cjs
+desktop/native/LingxiSpeechHelper/Package.swift
+desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/HelperOutput.swift
+desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/RecognitionCoordinator.swift
+desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/SpeechHelperError.swift
+desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/SpeechTranscriber.swift
+desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechHelper/LingxiSpeechHelperMain.swift
+desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechHelper/main.swift
+desktop/native/LingxiSpeechHelper/Tests/LingxiSpeechCoreRunner/CoordinatorTestRunner.swift
+desktop/native/LingxiSpeechPermissions/binding.gyp
+desktop/native/LingxiSpeechPermissions/speech_permissions.mm
+desktop/preload.cjs
+desktop/speech-permissions.cjs
+desktop/src/locales/en.json
+desktop/src/locales/ja.json
+desktop/src/locales/ko.json
+desktop/src/locales/zh-TW.json
+desktop/src/locales/zh.json
+desktop/src/react/__tests__/components/InputArea.media-send.test.tsx
+desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx
+desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx
+desktop/src/react/__tests__/components/composer-send.transaction.test.ts
+desktop/src/react/__tests__/services/channel-new-message-ws.test.ts
+desktop/src/react/__tests__/services/chat-turn-lifecycle.test.ts
+desktop/src/react/__tests__/services/composer-send-coordinator.test.ts
+desktop/src/react/__tests__/services/ws-knowledge-rollup-progress.test.ts
+desktop/src/react/__tests__/services/ws-message-handler.test.ts
+desktop/src/react/__tests__/services/ws-notification.test.ts
+desktop/src/react/__tests__/services/ws-stream-abort-lifecycle.test.ts
+desktop/src/react/__tests__/utils/paste-fidelity-editor.test.ts
+desktop/src/react/components/InputArea.tsx
+desktop/src/react/components/chat/StreamingMarkdownContent.tsx
+desktop/src/react/components/input/ComposerToolbar.tsx
+desktop/src/react/components/input/composer-send.ts
+desktop/src/react/services/composer-send-coordinator.ts
+desktop/src/react/services/websocket.ts
+desktop/src/react/services/ws-message-handler.ts
+desktop/src/react/stores/chat-slice.ts
+desktop/src/react/stores/chat-types.ts
+desktop/src/react/stores/input-slice.ts
+desktop/src/react/types.ts
+desktop/src/react/utils/editor-serializer.ts
+desktop/src/react/utils/history-segment-sanitizer.ts
+desktop/src/react/utils/message-parser.ts
+lib/memory/tenets.ts
+lib/tools/pinned-memory.ts
+package-lock.json
+package.json
+scripts/build-speech-helper.mjs
+scripts/build-speech-permissions.mjs
+scripts/compute-cli-closure.mjs
+scripts/pinned-tenets-recovery.mjs
+scripts/resign-adhoc.cjs
+server/routes/media.ts
+shared/persistence/store-registry.ts
+shared/reserved-tag-stream.ts
+tests/chat-route-mood-segment.test.ts
+tests/chat-route-reserved-raw-fallback.test.ts
+tests/media-route.test.ts
+tests/memory-tenets.test.ts
+tests/mood-parser.test.ts
+tests/paste-fidelity-serializer.test.ts
+tests/pinned-tenets-migration-recovery.test.ts
+tests/pinned-tenets-migration.test.ts
+tests/reserved-tag-orphan-closer.test.ts
+tests/reserved-tag-text-preservation.test.ts
+tests/speech-helper-build-contract.test.ts
+tests/speech-parameters.test.ts
+tests/speech-recognition-service.test.ts
+tests/speech-response-lifecycle.test.ts
+tests/system-speech-adapter.lifecycle.test.ts
+tests/system-speech-permission-bridge.test.ts
+tests/tenets-source-quota.test.ts
+tests/think-tag-parser.test.ts
+tests/x05-speech-concurrency.test.ts: expected [ …(107) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   ".github/workflows/build.yml",
++   ".gitignore",
++   "artifacts/f1-f12-repair/F1_F12_REPAIR_FACTS.json",
++   "artifacts/f1-f12-repair/F1_F12_REPAIR_REPORT.md",
++   "artifacts/f1-f12-repair/F1_F12_TEST_REPORT.md",
++   "artifacts/f1-f12-repair/PINNED_TENETS_RECOVERY_GUIDE.md",
++   "artifacts/f1-f12-repair/SYSTEM_SPEECH_VALIDATION.md",
++   "artifacts/f1-f12-repair/evidence/p0-baseline.md",
++   "artifacts/f1-f12-repair/evidence/p0-call-graphs.md",
++   "artifacts/f1-f12-repair/evidence/p1-f9-f3.md",
++   "artifacts/f1-f12-repair/evidence/p2-p3-f1-f2.md",
++   "artifacts/f1-f12-repair/evidence/p4-f4-f5-f6.md",
++   "artifacts/f1-f12-repair/evidence/p5-f7.md",
++   "artifacts/f1-f12-repair/evidence/p5-red-frontend.txt",
++   "artifacts/f1-f12-repair/evidence/p6-f8.md",
++   "artifacts/f1-f12-repair/evidence/p7-f10.md",
++   "artifacts/f1-f12-repair/evidence/p8-f11-f12.md",
++   "artifacts/f1-f12-repair/evidence/p9-regression-build.md",
++   "artifacts/f1-f12-repair/patches/f1-f12-new-files.patch",
++   "artifacts/f1-f12-repair/patches/f1-f12-tracked-changes.patch",
++   "build/cli-runtime-closure.json",
++   "build/persistence-schema-fingerprint.json",
++   "build/persistence-store-inventory.json",
++   "core/events.ts",
++   "core/media-adapters/speech.ts",
++   "core/media/media-parameters.ts",
++   "core/media/task-store.ts",
++   "core/media/universal-media-manager.ts",
++   "core/pinned-tenets-migration.ts",
++   "core/pinned-tenets-recovery.ts",
++   "core/speech-recognition-service.ts",
++   "core/speech-recognition/system-speech-adapter.ts",
++   "desktop/main.cjs",
++   "desktop/native/LingxiSpeechHelper/Package.swift",
++   "desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/HelperOutput.swift",
++   "desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/RecognitionCoordinator.swift",
++   "desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/SpeechHelperError.swift",
++   "desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechCore/SpeechTranscriber.swift",
++   "desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechHelper/LingxiSpeechHelperMain.swift",
++   "desktop/native/LingxiSpeechHelper/Sources/LingxiSpeechHelper/main.swift",
++   "desktop/native/LingxiSpeechHelper/Tests/LingxiSpeechCoreRunner/CoordinatorTestRunner.swift",
++   "desktop/native/LingxiSpeechPermissions/binding.gyp",
++   "desktop/native/LingxiSpeechPermissions/speech_permissions.mm",
++   "desktop/preload.cjs",
++   "desktop/speech-permissions.cjs",
++   "desktop/src/locales/en.json",
++   "desktop/src/locales/ja.json",
++   "desktop/src/locales/ko.json",
++   "desktop/src/locales/zh-TW.json",
++   "desktop/src/locales/zh.json",
++   "desktop/src/react/__tests__/components/InputArea.media-send.test.tsx",
++   "desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx",
++   "desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx",
++   "desktop/src/react/__tests__/components/composer-send.transaction.test.ts",
++   "desktop/src/react/__tests__/services/channel-new-message-ws.test.ts",
++   "desktop/src/react/__tests__/services/chat-turn-lifecycle.test.ts",
++   "desktop/src/react/__tests__/services/composer-send-coordinator.test.ts",
++   "desktop/src/react/__tests__/services/ws-knowledge-rollup-progress.test.ts",
++   "desktop/src/react/__tests__/services/ws-message-handler.test.ts",
++   "desktop/src/react/__tests__/services/ws-notification.test.ts",
++   "desktop/src/react/__tests__/services/ws-stream-abort-lifecycle.test.ts",
++   "desktop/src/react/__tests__/utils/paste-fidelity-editor.test.ts",
++   "desktop/src/react/components/InputArea.tsx",
++   "desktop/src/react/components/chat/StreamingMarkdownContent.tsx",
++   "desktop/src/react/components/input/ComposerToolbar.tsx",
++   "desktop/src/react/components/input/composer-send.ts",
++   "desktop/src/react/services/composer-send-coordinator.ts",
++   "desktop/src/react/services/websocket.ts",
++   "desktop/src/react/services/ws-message-handler.ts",
++   "desktop/src/react/stores/chat-slice.ts",
++   "desktop/src/react/stores/chat-types.ts",
++   "desktop/src/react/stores/input-slice.ts",
++   "desktop/src/react/types.ts",
++   "desktop/src/react/utils/editor-serializer.ts",
++   "desktop/src/react/utils/history-segment-sanitizer.ts",
++   "desktop/src/react/utils/message-parser.ts",
++   "lib/memory/tenets.ts",
++   "lib/tools/pinned-memory.ts",
++   "package-lock.json",
++   "package.json",
++   "scripts/build-speech-helper.mjs",
++   "scripts/build-speech-permissions.mjs",
++   "scripts/compute-cli-closure.mjs",
++   "scripts/pinned-tenets-recovery.mjs",
++   "scripts/resign-adhoc.cjs",
++   "server/routes/media.ts",
++   "shared/persistence/store-registry.ts",
++   "shared/reserved-tag-stream.ts",
++   "tests/chat-route-mood-segment.test.ts",
++   "tests/chat-route-reserved-raw-fallback.test.ts",
++   "tests/media-route.test.ts",
++   "tests/memory-tenets.test.ts",
++   "tests/mood-parser.test.ts",
++   "tests/paste-fidelity-serializer.test.ts",
++   "tests/pinned-tenets-migration-recovery.test.ts",
++   "tests/pinned-tenets-migration.test.ts",
++   "tests/reserved-tag-orphan-closer.test.ts",
++   "tests/reserved-tag-text-preservation.test.ts",
++   "tests/speech-helper-build-contract.test.ts",
++   "tests/speech-parameters.test.ts",
++   "tests/speech-recognition-service.test.ts",
++   "tests/speech-response-lifecycle.test.ts",
++   "tests/system-speech-adapter.lifecycle.test.ts",
++   "tests/system-speech-permission-bridge.test.ts",
++   "tests/tenets-source-quota.test.ts",
++   "tests/think-tag-parser.test.ts",
++   "tests/x05-speech-concurrency.test.ts",
++ ]
+
+ ❯ tests/post-verification-audit-seal.test.ts:103:7
+    101|       `VERIFIED_SOURCE_SHA 之后出现了非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifact…
+    102|         violators.join("\n"),
+    103|     ).toEqual([]);
+       |       ^
+    104|   });
+    105|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+
+ Test Files  2 failed | 1332 passed | 1 skipped (1335)
+      Tests  4 failed | 13380 passed | 7 skipped (13391)
+   Start at  15:33:23
+   Duration  81.06s (transform 58.44s, setup 19.93s, import 765.55s, tests 745.17s, environment 239.02s)
+

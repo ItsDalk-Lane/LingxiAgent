@@ -1,17 +1,20 @@
 import { useI18n } from '../../hooks/use-i18n';
 import styles from './InputArea.module.css';
 
-export function SendButton({ isStreaming, hasInput, disabled, onSend, onSteer, onStop }: {
+export function SendButton({ isStreaming, hasInput, disabled, onSend, onSteer, onStop, steerLabel }: {
   isStreaming: boolean;
   hasInput: boolean;
   disabled: boolean;
   onSend: () => void;
+  /** 流式且有输入时的动作：主聊天面=入队排队，快速聊天面=插话。 */
   onSteer: () => void;
   onStop: () => void;
+  /** 可选：覆盖流式有输入态的按钮文案（主聊天面显示「排队」）。 */
+  steerLabel?: string;
 }) {
   const { t } = useI18n();
 
-  // 三态：发送 / 插话 / 停止
+  // 三态：发送 / 排队（或插话）/ 停止
   const mode = isStreaming ? (hasInput ? 'steer' : 'stop') : 'send';
 
   return (
@@ -33,7 +36,7 @@ export function SendButton({ isStreaming, hasInput, disabled, onSend, onSteer, o
           <svg className={styles['send-enter-icon']} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6" />
           </svg>
-          <span>{t('chat.steer')}</span>
+          <span>{steerLabel ?? t('chat.steer')}</span>
         </span>
       )}
       {mode === 'stop' && (

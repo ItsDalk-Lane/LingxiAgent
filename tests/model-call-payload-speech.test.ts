@@ -102,7 +102,9 @@ describe("MC-09 speech × payload capture", () => {
     for (const root of roots.splice(0)) fs.rmSync(root, { recursive: true, force: true });
   });
 
-  for (const adapter of builtinSpeechRecognitionAdapters) {
+  // system-speech 是本地外部进程（Swift helper），provider wire 不透明、无 HTTP
+  // 凭证/响应可捕获 —— 与 jimeng-cli external_cli_media 同类，不进本 HTTP 捕获矩阵。
+  for (const adapter of builtinSpeechRecognitionAdapters.filter(a => a.id !== "system-speech")) {
     it(`coverage: ${adapter.id} 四层 capture：audio externalize + language 保留 + credential 替换 + transcription 捕获`, async () => {
       const file = makeVoiceFile();
       const ledger = createUsageLedger({});

@@ -16,14 +16,8 @@
  *   不回落到旧的全 studio 扫描行为。
  */
 import { Type } from "../pi-sdk/index.ts";
-import { KNOWLEDGE_SECTION_SOFT_MAX_TOKENS } from "../knowledge/chunker.ts";
-import { estimateTextTokens } from "../llm/estimate-text-tokens.ts";
-import { materializeKnowledgeSection } from "../knowledge/evidence-span-extractor.ts";
 import { resolveReadyKnowledgeQueryVariant } from "../knowledge/scope-snapshot-compiler.ts";
 import { isKnowledgeError, KnowledgeError } from "../knowledge/errors.ts";
-import { EvidenceReceiptService, type KnowledgeResearchToolContext } from "../knowledge/evidence-receipt-service.ts";
-import { ResearchStore } from "../knowledge/research/research-store.ts";
-import type { StoredKnowledgeChunk } from "../knowledge/knowledge-index-store.ts";
 import type { KnowledgeManager } from "../knowledge/knowledge-manager.ts";
 import { KNOWLEDGE_RERANK_ENABLED_POLICY } from "../knowledge/rerank-policy.ts";
 import type { KnowledgeTurnScope } from "../knowledge/types.ts";
@@ -53,8 +47,6 @@ export interface KnowledgeReadToolDeps {
    * （显式 KNOWLEDGE_MODEL_UNAVAILABLE，不静默放行）。
    */
   resolveSessionContext?: (ctx: unknown) => KnowledgeToolSessionContext;
-  /** 可选研究上下文由宿主提供；普通工具调用不创建研究凭据。 */
-  resolveResearchContext?: (ctx: unknown) => KnowledgeResearchToolContext | null;
 }
 
 function requireNonEmptyString(value: unknown, label: string): string {
@@ -203,21 +195,6 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
           scopeOwnerSessionPath: null,
         };
         const resolved = resolveScopedArtifact(knowledge, studioId, scopeId, sourceId, notebookId, sessionContext);
-        const researchContext = deps.resolveResearchContext?.(ctx) ?? null;
-        const research = researchContext ? new ResearchStore(knowledge.store) : null;
-        if (research && researchContext) {
-          const run = research.requireRun(researchContext.runId);
-          if (run.turnScopeId !== scopeId || !["planning", "running", "synthesizing"].includes(run.status)
-            || (researchContext.allowedSourceIds !== undefined
-              && (!Array.isArray(researchContext.allowedSourceIds)
-                || researchContext.allowedSourceIds.some(id => !resolved.scope.sources.some(source => source.sourceId === id))
-                || !researchContext.allowedSourceIds.includes(sourceId)))) {
-            throw knowledgeScopeViolation("Knowledge read is outside the research scope");
-          }
-        }
-        if (research && (blockId || params.offset !== undefined || params.maxChars !== undefined)) {
-          throw new KnowledgeError("KNOWLEDGE_INVALID_ARGUMENT", "Direct block reads and paging are available in ordinary conversations; research reads retain their receipt contract");
-        }
         const ordinaryPage = (
           ranges: Parameters<typeof readKnowledgeCitationPage>[0]["ranges"],
           selector: Record<string, unknown>,
@@ -238,63 +215,7 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
           }), { sourceId, mode });
         };
         if (blockId) return ordinaryPage([{ blockId }], { blockId }, "raw-block");
-        const prepareChunks = (selected: StoredKnowledgeChunk[]) => {
-          if (!research || !researchContext) return selected.map(chunk => ({ ordinal: chunk.ordinal + 1, text: chunk.text }));
-          const receipts = new EvidenceReceiptService(research);
-          return research.transaction(() => {
-            signal?.throwIfAborted();
-            const blocks = new Map(knowledge.store.getArtifactBlocksByIds({
-              studioId, parseArtifactId: resolved.artifactId,
-              blockIds: selected.flatMap(chunk => chunk.spans.map(span => span.blockId)),
-            }).map(block => [block.id, block] as const));
-            const issued = new Map<string, {
-              receiptId: string; blockId: string; startOffset: number; endOffset: number;
-              text: string; completeParagraph: boolean;
-            }>();
-            // 只补当前已选原文块，额外正文共用既有单节预算，不能把多片命中扩大成整本书。
-            let extraTokensRemaining = KNOWLEDGE_SECTION_SOFT_MAX_TOKENS;
-            return selected.map(chunk => {
-              signal?.throwIfAborted();
-              if (chunk.parseArtifactId !== resolved.artifactId || chunk.spans.length === 0) {
-                throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Research read requires frozen raw block positions");
-              }
-              const spans = chunk.spans.map(span => {
-                signal?.throwIfAborted();
-                const block = blocks.get(span.blockId);
-                if (!block || !Number.isSafeInteger(span.blockStartOffset) || !Number.isSafeInteger(span.blockEndOffset)
-                  || span.blockStartOffset < 0 || span.blockEndOffset <= span.blockStartOffset
-                  || span.blockEndOffset > block.text.length) {
-                  throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Research read span is outside the frozen block");
-                }
-                const originalText = block.text.slice(span.blockStartOffset, span.blockEndOffset);
-                const extraTokens = Math.max(0, estimateTextTokens(block.text) - estimateTextTokens(originalText));
-                // 引文上限内的段落完整交付；超长段落保留请求范围，不能无界扩大上下文。
-                const completeParagraph = block.text.length <= 2000 && extraTokens <= extraTokensRemaining;
-                const startOffset = completeParagraph ? 0 : span.blockStartOffset;
-                const endOffset = completeParagraph ? block.text.length : span.blockEndOffset;
-                if (completeParagraph) extraTokensRemaining -= extraTokens;
-                const chunkId = completeParagraph ? null : chunk.id;
-                const key = JSON.stringify([chunk.chunkIndexVariantId, chunkId, block.id, startOffset, endOffset]);
-                const existing = issued.get(key);
-                if (existing) return existing;
-                // 完整段落凭据不冒充仅覆盖小片段的凭据，后续仍会重新核对原文及摘要。
-                const { receipt, text } = receipts.issueWithText({
-                  ...researchContext, sourceId, contentSnapshotId: resolved.contentSnapshotId,
-                  parseArtifactId: resolved.artifactId, chunkIndexVariantId: chunk.chunkIndexVariantId, chunkId,
-                  blockId: block.id, startOffset, endOffset, channel: "knowledge_read",
-                });
-                const value = { receiptId: receipt.id, blockId: receipt.blockId, startOffset: receipt.startOffset,
-                  endOffset: receipt.endOffset, text,
-                  completeParagraph: startOffset === 0 && endOffset === block.text.length };
-                issued.set(key, value);
-                return value;
-              });
-              return { ordinal: chunk.ordinal + 1, chunkId: chunk.id, sectionId: chunk.sectionId ?? null,
-                text: spans.map(span => span.text).join("\n"), spans,
-                citationNotice: "引用逐字取自同一条 spans 凭据的 text。completeParagraph=false 表示该段尚未完整读入，可用 sectionId 继续读章；不要自行补齐省略的文字。" };
-            });
-          });
-        };
+;
 
         if (query) {
           const compiledScope = await knowledge.compileTurnScope(resolved.scope);
@@ -313,32 +234,11 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
               artifactId: resolved.artifactId,
             });
           }
-          if (research) signal?.throwIfAborted();
-          if (!research) {
-            return ordinaryPage(result.candidates.flatMap(chunk => chunk.spans.map(span => ({
-              blockId: span.blockId, startOffset: span.blockStartOffset, endOffset: span.blockEndOffset,
-            }))), { query }, "search", { retrievalMode: result.retrievalMode,
-              vectorBackend: response.vectorBackend, degradedReasons: response.degradedReasons,
-              readingNotice: "本次是命中的多个原文范围，可能不连续；需要完整上下文可按 blockId 或章节继续读。" });
-          }
-          const chunks = prepareChunks(result.candidates);
-          return toolOk(JSON.stringify({
-            source: resolved.sourceName,
-            sourceId,
-            notebookId: resolved.notebookId,
-            scopeId,
-            parseArtifactId: resolved.artifactId,
-            contentSnapshotId: resolved.contentSnapshotId,
-            mode: "search",
-            retrievalMode: result.retrievalMode,
-            vectorBackend: response.vectorBackend,
-            degradedReasons: response.degradedReasons,
-            retrievalModeRequested: result.retrievalModeRequested,
-            ...(result.degraded.length > 0
-              ? { degraded: result.degraded.map(({ reason, detail }) => ({ reason, ...(detail ? { detail } : {}) })) }
-              : {}),
-            matches: chunks,
-          }, null, 2), { sourceId, mode: "search" });
+          return ordinaryPage(result.candidates.flatMap(chunk => chunk.spans.map(span => ({
+            blockId: span.blockId, startOffset: span.blockStartOffset, endOffset: span.blockEndOffset,
+          }))), { query }, "search", { retrievalMode: result.retrievalMode,
+            vectorBackend: response.vectorBackend, degradedReasons: response.degradedReasons,
+            readingNotice: "本次是命中的多个原文范围，可能不连续；需要完整上下文可按 blockId 或章节继续读。" });
         }
 
         const compiledScope = await knowledge.compileTurnScope(resolved.scope);
@@ -363,50 +263,30 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
         if (aroundChunkId && (!around || around.parseArtifactId !== resolved.artifactId || around.chunkIndexVariantId !== variant.id)) {
           throw knowledgeScopeViolation("Neighbor hit is outside the frozen source and index variant");
         }
-        // 小片段负责定位，默认研究阅读恢复到父章节；显式相邻窗口仍保留精读语义。
+        // 小片段负责定位，默认恢复到父章节阅读；显式相邻窗口保留精读语义。
         const readingSectionId = sectionId ?? (params.neighborWindow === undefined ? around?.sectionId : null);
         if (readingSectionId) {
           const stored = knowledge.indexStore.getSection({ parseArtifactId: resolved.artifactId, sectionId: readingSectionId });
           if (!stored || !knowledge.indexStore.listSectionChunkIds({ chunkIndexVariantId: variant.id, sectionIds: [readingSectionId] }).length) {
             throw knowledgeScopeViolation("Section is outside the frozen source and index variant");
           }
-          if (!research) {
-            // 章节的片段位置已经落库；只合并本节原块范围，不重读和重建整本资料。
-            const chunkIds = knowledge.indexStore.listSectionChunkIds({ chunkIndexVariantId: variant.id,
-              sectionIds: [readingSectionId] });
-            const locations = chunkIds.map(id => knowledge.indexStore.getChunkLocation(id));
-            if (locations.some(location => !location || location.parseArtifactId !== resolved.artifactId
-              || location.chunkIndexVariantId !== variant.id || location.sectionId !== readingSectionId)) {
-              throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Section chunk positions are inconsistent");
-            }
-            const selected = knowledge.indexStore.readVariantChunks(variant.id, locations.map(location => location!.ordinal));
-            if (selected.length !== chunkIds.length) {
-              throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Section raw positions are incomplete");
-            }
-            return ordinaryPage(selected.flatMap(chunk => chunk.spans.map(span => ({ blockId: span.blockId,
-              startOffset: span.blockStartOffset, endOffset: span.blockEndOffset }))),
-            { sectionId: readingSectionId }, "section", { sectionId: readingSectionId,
-              parentSectionHeading: stored.headingPath,
-              readingNotice: "按原文顺序阅读本节。长章可能分成多个同标题子节；next 用于继续当前节，不能把当前节当作整本资料。" });
+          // 章节的片段位置已经落库；只合并本节原块范围，不重读和重建整本资料。
+          const chunkIds = knowledge.indexStore.listSectionChunkIds({ chunkIndexVariantId: variant.id,
+            sectionIds: [readingSectionId] });
+          const locations = chunkIds.map(id => knowledge.indexStore.getChunkLocation(id));
+          if (locations.some(location => !location || location.parseArtifactId !== resolved.artifactId
+            || location.chunkIndexVariantId !== variant.id || location.sectionId !== readingSectionId)) {
+            throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Section chunk positions are inconsistent");
           }
-          const materialized = materializeKnowledgeSection({ parseArtifactId: resolved.artifactId, section: stored,
-            blocks: knowledge.listArtifactBlocks({ studioId, parseArtifactId: resolved.artifactId }) });
-          signal?.throwIfAborted();
-          const receipts = research ? new EvidenceReceiptService(research) : null;
-          const issue = () => materialized.spans.map(span => {
-            signal?.throwIfAborted();
-            if (!research || !researchContext) return span;
-            const { receipt, text } = receipts!.issueWithText({ ...researchContext, sourceId, contentSnapshotId: resolved.contentSnapshotId,
-              parseArtifactId: resolved.artifactId, chunkIndexVariantId: variant.id, blockId: span.blockId,
-              startOffset: span.startOffset, endOffset: span.endOffset, channel: "knowledge_read" });
-            return { ...span, text, receiptId: receipt.id };
-          });
-          const spans = research ? research.transaction(issue) : issue();
-          return toolOk(JSON.stringify({ source: resolved.sourceName, sourceId, notebookId: resolved.notebookId, scopeId,
-            parseArtifactId: resolved.artifactId, contentSnapshotId: resolved.contentSnapshotId, mode: "section", sectionId: readingSectionId,
-            ...(around ? { aroundChunkId, readingNotice: "已从命中片段展开读取父章节。长章可能分为同标题的多个子节，本次只覆盖返回的这一节。" } : {}),
-            citationNotice: "章节正文用于理解上下文；每条引用仍须逐字取自同一条 spans 凭据，跨原始段落时分成多条登记。",
-            parentSectionHeading: materialized.headingPath, chunks: [{ sectionId: readingSectionId, text: materialized.text, spans }] }), { sourceId, mode: "section" });
+          const selected = knowledge.indexStore.readVariantChunks(variant.id, locations.map(location => location!.ordinal));
+          if (selected.length !== chunkIds.length) {
+            throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Section raw positions are incomplete");
+          }
+          return ordinaryPage(selected.flatMap(chunk => chunk.spans.map(span => ({ blockId: span.blockId,
+            startOffset: span.blockStartOffset, endOffset: span.blockEndOffset }))),
+          { sectionId: readingSectionId }, "section", { sectionId: readingSectionId,
+            parentSectionHeading: stored.headingPath,
+            readingNotice: "按原文顺序阅读本节。长章可能分成多个同标题子节；next 用于继续当前节，不能把当前节当作整本资料。" });
         }
         const total = variant.chunkCount;
         if (total === 0) {
@@ -432,30 +312,13 @@ export function createKnowledgeReadTool(deps: KnowledgeReadToolDeps) {
         }
         const selected = knowledge.indexStore.readVariantChunks(variant.id,
           Array.from({ length: Math.min(toExclusive, total) - from }, (_, index) => from + index));
-        if (research) signal?.throwIfAborted();
-        if (!research) {
-          const end = Math.min(toExclusive, total);
-          return ordinaryPage(selected.flatMap(chunk => chunk.spans.map(span => ({ blockId: span.blockId,
-            startOffset: span.blockStartOffset, endOffset: span.blockEndOffset }))),
-          { fromOrdinal: from + 1, toOrdinal: end }, around ? "around-chunk" : "ordinal-range",
-          { requestedRange: [from + 1, end], totalChunks: total },
-          end < total ? { scopeId, sourceId, notebookId: resolved.notebookId, fromOrdinal: end + 1,
-            toOrdinal: Math.min(total, end + end - from), maxChars: params.maxChars ?? 6000 } : null);
-        }
-        const chunks = prepareChunks(selected);
-        return toolOk(JSON.stringify({
-          source: resolved.sourceName,
-          sourceId,
-          notebookId: resolved.notebookId,
-          scopeId,
-          parseArtifactId: resolved.artifactId,
-          contentSnapshotId: resolved.contentSnapshotId,
-          mode: around ? "around-chunk" : "ordinal-range",
-          ...(around ? { aroundChunkId, neighborWindow } : {}),
-          requestedRange: [from + 1, Math.min(toExclusive, total)],
-          totalChunks: total,
-          chunks,
-        }, null, 2), { sourceId, mode: around ? "around-chunk" : "ordinal-range" });
+        const end = Math.min(toExclusive, total);
+        return ordinaryPage(selected.flatMap(chunk => chunk.spans.map(span => ({ blockId: span.blockId,
+          startOffset: span.blockStartOffset, endOffset: span.blockEndOffset }))),
+        { fromOrdinal: from + 1, toOrdinal: end }, around ? "around-chunk" : "ordinal-range",
+        { requestedRange: [from + 1, end], totalChunks: total },
+        end < total ? { scopeId, sourceId, notebookId: resolved.notebookId, fromOrdinal: end + 1,
+          toOrdinal: Math.min(total, end + end - from), maxChars: params.maxChars ?? 6000 } : null);
       } catch (error) {
         if (signal?.aborted) throw error;
         if (isKnowledgeError(error)) {

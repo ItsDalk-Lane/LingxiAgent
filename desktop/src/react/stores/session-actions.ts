@@ -8,6 +8,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- store partial patch + API 响应 JSON */
 
 import { useStore } from './index';
+import { appendConnectionAuth, buildConnectionUrl, type ServerConnection } from '../services/server-connection';
 import { sessionScopedKey, sessionScopedListIncludes, sessionScopedValue } from './session-slice';
 import { lingxiFetch, lingxiUrl } from '../hooks/use-hana-fetch';
 import { hydrateInputDrafts } from './input-draft-persistence';
@@ -137,6 +138,49 @@ function currentSessionIdentityPatch(state: Record<string, any>, path: string | 
       },
     } : {}),
   };
+}
+
+export interface SessionHistoryEvidencePage {
+  messages: Array<{id: string; role: string; clientMessageId?: string; sourceEntryId?: string; snapshotVersion?: number}>;
+  hasMore: boolean;
+  oldestId?: string;
+  reconciliation?: {sessionId: string; sessionPath: string; complete: boolean; snapshotId: string;
+    runRevision: number; runStatus: 'running' | 'reconciled_idle' | 'unknown'};
+}
+/** 只读对账：认证/URL取自捕获连接，不水合编辑器、文件列表或当前会话。 */
+export async function fetchSessionHistoryPage(
+  connection: ServerConnection,
+  sessionRef: {sessionId: string; sessionPath: string},
+  options: {before?: string; signal: AbortSignal},
+): Promise<SessionHistoryEvidencePage> {
+  const params = new URLSearchParams({sessionId:sessionRef.sessionId,path:sessionRef.sessionPath,reconciliation:'1'});
+  if (options.before) params.set('before', options.before);
+  const response = await fetch(buildConnectionUrl(connection, `/api/sessions/messages?${params}`), {
+    headers:appendConnectionAuth(connection),signal:options.signal,
+  });
+  if (!response.ok) throw new Error(`history_http_${response.status}`);
+  const maxBytes = 2 * 1024 * 1024;
+  if (Number(response.headers.get('content-length')) > maxBytes) throw new Error('history_response_too_large');
+  const reader = response.body?.getReader();
+  let text = '';
+  if (reader) {
+    const decoder = new TextDecoder(); let bytes = 0;
+    try {
+      while (true) {
+        const chunk = await reader.read(); if (chunk.done) break;
+        bytes += chunk.value.byteLength;
+        if (bytes > maxBytes) throw new Error('history_response_too_large');
+        text += decoder.decode(chunk.value, {stream:true});
+      }
+      text += decoder.decode();
+    } finally { await reader.cancel(); reader.releaseLock(); }
+  } else {
+    text = await response.text();
+    if (new TextEncoder().encode(text).byteLength > maxBytes) throw new Error('history_response_too_large');
+  }
+  const page = JSON.parse(text);
+  if (!Array.isArray(page.messages) || typeof page.hasMore !== 'boolean') throw new Error('history_response_invalid');
+  return page;
 }
 
 function sessionMessagesUrl(path: string, extra: Record<string, string> = {}): string {

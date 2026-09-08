@@ -13,7 +13,11 @@ import { INTERNAL_MOOD_TAGS } from '../../../../shared/internal-mood-block.ts';
 import { splitReservedTagSegments } from '../../../../shared/reserved-tag-stream.ts';
 import type { LiveAssistantSegment } from '../stores/live-turn-store';
 
-/** 全部保留协议标签：mood 家族 + think 家族。 */
+/**
+ * 全部保留协议标签：mood 家族 + think 家族。
+ * 注意：mm:think 不进词表——旧落盘残渣（孤儿闭标签）靠 splitReservedTagSegments
+ * 的「词表外孤儿闭标签」形状规则吞掉；成对方言由服务端流式解析结构化。
+ */
 const RESERVED_TAGS: readonly string[] = [...INTERNAL_MOOD_TAGS, 'think', 'thinking'];
 
 /** 剥离 segment 开头的内部协议块；只处理 leading 位置，正文内部的标签按普通文本保留。 */
@@ -40,7 +44,14 @@ export function sanitizePersistedSegmentSource(
     }
     break;
   }
-  if (!changed) return source;
+  if (!changed) {
+    // F8/P6.3（T16）：没有 leading 块可剥离时，也不能因 return 原 source 抵消
+    // 扫描器已做的孤儿闭标签清理；按切分结果重建（受保护字面量原样保留）。
+    const rebuilt = segments.map((segment) => (
+      segment.type === 'text' ? segment.text : `<${segment.tag}>${segment.content}</${segment.tag}>`
+    )).join('');
+    return rebuilt === source ? source : rebuilt;
+  }
   // 非剥离部分的标签块按原字面量重建，保证正文内部标签一字不动
   const rest = segments.slice(start).map((segment) => (
     segment.type === 'text' ? segment.text : `<${segment.tag}>${segment.content}</${segment.tag}>`

@@ -1,0 +1,12 @@
+
+> lingxi@0.1.35 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+desktop/src/react/__tests__/components/composer-send.transaction.test.ts(700,23): error TS2345: Argument of type '(state: StoreState) => { sessions: (Session | { path: string; sessionId: string; agentId: string; })[]; sessionLocatorsById: { sess_timeout: { path: string; }; }; }' is not assignable to parameter of type 'StoreState | Partial<StoreState> | ((state: StoreState) => StoreState | Partial<StoreState>)'.
+  Type '(state: StoreState) => { sessions: (Session | { path: string; sessionId: string; agentId: string; })[]; sessionLocatorsById: { sess_timeout: { path: string; }; }; }' is not assignable to type '(state: StoreState) => StoreState | Partial<StoreState>'.
+    Type '{ sessions: (Session | { path: string; sessionId: string; agentId: string; })[]; sessionLocatorsById: { sess_timeout: { path: string; }; }; }' is not assignable to type 'StoreState | Partial<StoreState>'.
+      Type '{ sessions: (Session | { path: string; sessionId: string; agentId: string; })[]; sessionLocatorsById: { sess_timeout: { path: string; }; }; }' is not assignable to type 'Partial<StoreState>'.
+        Types of property 'sessions' are incompatible.
+          Type '(Session | { path: string; sessionId: string; agentId: string; })[]' is not assignable to type 'Session[]'.
+            Type 'Session | { path: string; sessionId: string; agentId: string; }' is not assignable to type 'Session'.
+              Type '{ path: string; sessionId: string; agentId: string; }' is missing the following properties from type 'Session': title, firstMessage, modified, messageCount, and 2 more.

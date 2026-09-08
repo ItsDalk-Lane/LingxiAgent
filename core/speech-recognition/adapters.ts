@@ -217,8 +217,11 @@ export const volcengineSpeechRecognitionAdapter = {
   },
 };
 
+import { systemSpeechRecognitionAdapter } from "./system-speech-adapter.ts";
+
 export const builtinSpeechRecognitionAdapters = [
   openaiSpeechRecognitionAdapter,
+  systemSpeechRecognitionAdapter,
   mimoSpeechRecognitionAdapter,
   dashscopeSpeechRecognitionAdapter,
   volcengineSpeechRecognitionAdapter,

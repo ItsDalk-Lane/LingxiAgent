@@ -1,0 +1,4 @@
+=== C02 实施记录 2026-09-08T11:01:19Z ===
+新增: core/pinned-tenets-backup-dir.ts（集中规范化）; 测试 tests/round3-c02-receipt-backup-dir.test.ts — 32 passed
+修改: pinned-tenets-migration.ts(校验/写侧×2/续跑规范化/消费点), pinned-tenets-recovery.ts(写侧/续跑规范化/本地路径)
+平台限制: POSIX 运行环境，Windows 旧表示经收据数据重写模拟；真实 Windows 客户端端到端未测

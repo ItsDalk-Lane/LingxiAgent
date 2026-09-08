@@ -221,8 +221,7 @@
     "noModelsAvailable": "没有可用模型",
     "toolReadOnly": "只读",
     "toolWrite": "写入",
-    "filesUnsupported": "频道暂只支持文本消息，文件不会加入普通聊天附件",
-    "unpinPluginTab": "取消固定「{label}」"
+    "filesUnsupported": "频道暂只支持文本消息，文件不会加入普通聊天附件"
   },
   "announcement": {
     "title": "更新完成 · v{version}",
@@ -444,7 +443,8 @@
       "generationInProgress": "{kind}生成中",
       "retryFailed": "重新生成失败",
       "submitting": "提交中",
-      "retryLabel": "重新生成{kind}"
+      "retryLabel": "重新生成{kind}",
+      "kindSpeech": "语音"
     },
     "turnStatus": {
       "missingFinalAnswer": "未生成最终回复",
@@ -510,7 +510,9 @@
     "feedbackRecorded": "已记入经验库。",
     "feedbackRecordedExperienceOff": "已记录。当前未开启经验库，开启后助手可查阅。",
     "feedbackDuplicate": "这条反馈之前已记录过。",
-    "feedbackFailed": "反馈未能保存，请稍后重试。"
+    "feedbackFailed": "反馈未能保存，请稍后重试。",
+    "speak": "朗读",
+    "speakFailed": "语音生成失败"
   },
   "time": {
     "justNow": "刚刚",
@@ -644,7 +646,26 @@
     "knowledgeModeFast": "快速",
     "knowledgeModeDetailed": "详细",
     "knowledgeModeFastHint": "纯本地快速检索；不等待远程嵌入、重排或多轮调查。",
-    "knowledgeModeDetailedHint": "进行多轮检索、阅读和证据核对后生成详细回答。"
+    "knowledgeModeDetailedHint": "进行多轮检索、阅读和证据核对后生成详细回答。",
+    "dictateOn": "听写已开启：录音后将转为文字插入输入框（点击关闭）",
+    "dictateOff": "听写：录音转文字插入输入框（macOS 本地识别）",
+    "dictateEmpty": "没有识别到语音内容",
+    "queuedSend": "排队",
+    "queuedTurnHint": "已排队 · 上一轮回答结束后自动发送",
+    "queuedInsertNow": "立即插入",
+    "queuedInsertNowTitle": "把这条消息立即插入正在进行的回答中",
+    "queuedSendFailed": "排队消息发送失败",
+    "queuedRetry": "重试",
+    "queuedInsertWaiting": "正在等待当前回答开始，请稍候再插入",
+    "queuedEditUnavailable": "这条消息已进入发送流程或已不可编辑，请先核对发送结果。",
+    "queuedDelete": "撤销这条排队消息",
+    "deliveryChecking": "结果未知，正在核对",
+    "deliveryUnknown": "结果未知，核对未完成",
+    "deliveryRunUnknown": "消息已接收，运行结果仍未知",
+    "recheckDelivery": "重新核对",
+    "sendNotAccepted": "未发送：服务器未接受这条消息",
+    "sendRetry": "重试发送",
+    "sendDismiss": "放弃"
   },
   "agentReview": {
     "running": "正在审阅当前对话",
@@ -1366,20 +1387,16 @@
       "me": "我",
       "providers": "供应商",
       "usage": "模型观测",
-      "media": "多媒体",
       "models": "模型",
-      "memory": "记忆",
       "work": "工作台",
       "skills": "技能",
       "mcp": "连接器",
       "bridge": "社交平台",
       "sharing": "分享",
       "access": "访问与设备",
-      "plugins": "插件",
       "experiments": "实验",
       "about": "关于",
-      "security": "安全",
-      "pluginMarketplace": "插件市场"
+      "security": "安全"
     },
     "browser": {
       "cookiesTitle": "Cookies",
@@ -1787,25 +1804,7 @@
       "launchAtLogin": "开机自启",
       "keepAwake": "锁屏时保持运行",
       "betaUpdates": "接收测试版更新",
-      "autoCheckUpdates": "自动检查更新",
-      "inviteSectionTitle": "测试通道",
-      "inviteCodeLabel": "邀请码",
-      "inviteCodeHint": "邀请码只用来打开测试通道，不是使用本应用的门槛。",
-      "inviteCodePlaceholder": "粘贴你的邀请码",
-      "inviteRedeemBtn": "兑换",
-      "inviteRedeeming": "兑换中…",
-      "inviteErrorInvalid": "这枚邀请码无效，或者已经用完了。",
-      "inviteErrorNetwork": "连不上兑换服务，检查网络后再试一次。",
-      "inviteErrorActivate": "通道状态没能保存下来。",
-      "inviteConfirmTitle": "切换到测试通道？",
-      "inviteConfirmBody": "切换之后，应用会更新到测试版本。测试版升级过数据格式之后，就回不到当前的正式版了。确认后立即生效。",
-      "inviteConfirmOk": "切换",
-      "inviteConfirmCancel": "留在正式版",
-      "inviteChannelActive": "当前通道：测试通道",
-      "inviteChannelActiveHint": "更新现在来自测试通道。",
-      "inviteCodesLabel": "你的邀请码",
-      "inviteCodesHint": "每枚只能用一次，绑定第一台兑换的设备。",
-      "inviteCopy": "复制"
+      "autoCheckUpdates": "自动检查更新"
     },
     "access": {
       "networkAccess": "局域网访问",
@@ -2031,7 +2030,8 @@
       "imageDefaultsButton": "图片生成默认参数",
       "videoDefaultsButton": "视频生成默认参数",
       "speechSynthesisDefaultsButton": "语音合成默认参数",
-      "runtimeProvider": "运行时供应商"
+      "runtimeProvider": "运行时供应商",
+      "defaultSpeechGenModel": "语音合成模型（朗读/语音消息）"
     },
     "models": {
       "auxiliary": "辅助模型",
@@ -2296,8 +2296,8 @@
       "embeddingActiveNote": "语义检索已启用：记忆搜索会同时进行向量检索与关键词检索。",
       "embeddingOffNote": "语义检索未启用：记忆搜索仅使用标签与关键词检索。",
       "embeddingSaved": "记忆嵌入模型已保存",
-      "tenetsTitle": "用户原则",
-      "tenetsHint": "经你确认的行为原则，会注入每个新对话。助手提案需你批准才生效。",
+      "tenetsTitle": "置顶与原则",
+      "tenetsHint": "钉住的内容与经你确认的行为原则，会注入每个新对话。助手提案需你批准才生效。",
       "tenetsLoading": "正在加载用户原则…",
       "tenetsEmpty": "还没有用户原则。可以让助手在对话中提议，或在这里直接添加。",
       "tenetsApprove": "批准",
@@ -2350,13 +2350,6 @@
         "stats": "记住 {remembered} 条 / 共 {total} 条记忆"
       },
       "activeOnly": "请先将此助手设为主助手"
-    },
-    "pins": {
-      "title": "置顶记忆",
-      "hint": "你主动告诉助手一定要记住的东西，也可以手动编辑与添加",
-      "empty": "还没有置顶记忆",
-      "delete": "删除",
-      "addPlaceholder": "添加一条置顶记忆..."
     },
     "experience": {
       "title": "经验",
@@ -2506,67 +2499,6 @@
       "toggleDisable": "关闭 Skill",
       "toggleEnableNamed": "启用 {name}",
       "toggleDisableNamed": "关闭 {name}"
-    },
-    "plugins": {
-      "title": "插件",
-      "desc": "管理社区插件。",
-      "empty": "暂无插件",
-      "reload": "刷新",
-      "statusLoaded": "已加载",
-      "statusFailed": "加载失败",
-      "statusDisabled": "已禁用",
-      "fullAccessToggle": "允许全权插件",
-      "fullAccessDesc": "开启后，声明 full-access 的插件将获得完整系统权限（路由、钩子、Provider 等）",
-      "devToolsToggle": "允许 Agent 插件开发工具",
-      "devToolsDesc": "开启后，Agent 可以安装、重载、启停和卸载开发态插件。只作用于开发插件目录，不影响正式安装的插件。",
-      "dropzone": "拖入插件文件夹或 .zip 安装，或点击选择",
-      "statusRestricted": "需要全权许可",
-      "deleteConfirm": "移除插件「{name}」？插件数据将保留。",
-      "installSuccess": "插件「{name}」已安装",
-      "installError": "插件安装失败",
-      "invalidPlugin": "不是有效的插件目录",
-      "pluginsDir": "插件目录：{path}",
-      "needsFullAccess": "请先开启「允许全权插件」",
-      "configure": "配置「{name}」",
-      "configTitle": "「{name}」设置",
-      "configLoadError": "插件设置加载失败",
-      "sensitiveHint": "已保存的值会被隐藏。输入新值即可替换。",
-      "invalidJson": "JSON 格式不正确",
-      "showDiagnostics": "查看插件诊断",
-      "diagnosticsTitle": "插件诊断",
-      "diagnosticsLoadError": "插件诊断加载失败",
-      "diagnosticsSummary": "能力 {capabilities}/{total} · 任务 {tasks} · 计划 {schedules}",
-      "noDiagnostics": "暂无诊断数据",
-      "diagnosticActivation": "激活：{state}",
-      "diagnosticRoutes": "页面 {pages} · 组件 {widgets} · 设置页 {settingsTabs}",
-      "diagnosticTools": "工具 {count}",
-      "diagnosticCommands": "命令 {count}",
-      "diagnosticConfig": "配置项 {count}",
-      "openMarketplace": "打开插件市场",
-      "marketBack": "返回插件管理",
-      "marketplaceTitle": "插件市场",
-      "marketplaceHint": "浏览可安装插件，查看 README、权限和贡献类型。",
-      "marketplaceCount": "{count} 个插件",
-      "marketplaceNoSource": "未配置市场源",
-      "marketplaceEmpty": "暂无可浏览插件",
-      "marketLoading": "正在读取插件市场…",
-      "marketLoadError": "插件市场加载失败",
-      "marketReadmeLoadError": "README 加载失败",
-      "marketInstalled": "已安装",
-      "marketInstall": "安装",
-      "marketUpdate": "更新",
-      "marketReinstall": "重新安装",
-      "marketDowngrade": "降级",
-      "marketIncompatible": "不兼容",
-      "marketUpdateAvailable": "可更新",
-      "marketInstalledVersion": "已安装 v{version}",
-      "marketUpdateFrom": "已安装 v{from}，可更新到 v{to}",
-      "marketDowngradeTo": "当前只能安装兼容版本 v{version}",
-      "marketDowngradeConfirm": "当前版本是 v{from}，将降级到 v{to}。继续吗？",
-      "marketReadmeLoading": "正在读取 README…",
-      "marketSelectPlugin": "选择一个插件查看 README",
-      "manageTitle": "管理插件",
-      "permissionTitle": "权限"
     },
     "mcp": {
       "masterTitle": "总开关",
@@ -4578,7 +4510,6 @@
     "dialog": {
       "selectFolder": "选择工作文件夹",
       "selectSkill": "选择技能",
-      "selectPlugin": "选择插件",
       "launchFailedTitle": "灵犀 启动失败",
       "launchFailedBody": "灵犀 v{version}\n\n{detail}\n\n详细日志已保存到：\n{logPath}\n\n请将此截图或日志文件发送给开发者。",
       "serverRestartFailed": "灵犀 v{version}\n\nServer 崩溃后重启失败。\n{error}\n\n请重新启动应用。",
@@ -4774,22 +4705,6 @@
     }
   },
   "plugin": {
-    "widget": {
-      "loadFailed": "加载失败",
-      "retry": "重试",
-      "hiddenPlugins": "已隐藏的插件",
-      "show": "显示",
-      "desk": "工作台",
-      "hideTitle": "隐藏「{title}」"
-    },
-    "page": {
-      "notFound": "插件未找到",
-      "loadFailed": "插件加载失败",
-      "retry": "重试"
-    },
-    "tab": {
-      "pinToBar": "固定到标签栏"
-    },
     "imageGen": {
       "notInitialized": "图片生成插件未初始化",
       "noSessionPath": "图片生成需要明确的会话归属，当前工具调用缺少 sessionPath",
@@ -5075,6 +4990,19 @@
     "todoWrite": {
       "summaryEmpty": "已清空待办",
       "summaryStats": "{total} 项待办：{completed} 已完成，{in_progress} 进行中，{pending} 待处理"
+    },
+    "generateSpeech": {
+      "description": "生成语音。把一段文字合成为语音音频（朗读、配音、语音回复）。生成的是音频文件，作为语音消息发出。",
+      "promptDesc": "要合成为语音的文字",
+      "voiceDesc": "可选音色（如 alloy、nova；系统语音用 macOS 音色名）",
+      "speedDesc": "可选语速，0.25–4，默认 1",
+      "formatDesc": "可选音频格式，默认 mp3",
+      "modelDesc": "可选语音模型（默认用设置里的默认语音模型）",
+      "providerDesc": "可选供应商标识（如 openai、system-speech）",
+      "notInitialized": "语音生成服务未初始化",
+      "submitFailed": "语音生成失败：{error}",
+      "submitFailedUnknown": "语音生成提交失败",
+      "submitted": "语音生成已提交，完成后作为语音消息发出。"
     }
   },
   "link": {

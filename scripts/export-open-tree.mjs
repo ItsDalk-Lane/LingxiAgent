@@ -80,7 +80,7 @@ export const DEFAULT_EXPORT_DIR_NAME = "dist-open-export";
 export const EXPORT_SKELETON = [
   {
     path: "tsconfig.json",
-    reason: "packages/plugin-protocol and plugin-sdk (whitelisted) carry tsconfig.json files that `extends \"../../tsconfig.json\"`; vite's esbuild transform resolves that chain while bundling their sources, so the root compiler config (pure build settings, no business logic) must exist in the export tree.",
+    reason: "vite's esbuild transform resolves the tsconfig chain (root tsconfig extends tsconfig.base.json) while transpiling sources, so the root compiler config (pure build settings, no business logic) must exist in the export tree.",
   },
   {
     path: "tsconfig.base.json",

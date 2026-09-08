@@ -82,6 +82,32 @@ export const openaiPlugin = {
           },
         ],
       },
+      speechGeneration: {
+        defaultModelId: "gpt-4o-mini-tts",
+        models: [
+          {
+            id: "gpt-4o-mini-tts",
+            displayName: "GPT-4o Mini TTS",
+            protocolId: "openai-audio-speech",
+            inputs: ["text"],
+            outputs: ["audio"],
+          },
+          {
+            id: "tts-1",
+            displayName: "TTS-1",
+            protocolId: "openai-audio-speech",
+            inputs: ["text"],
+            outputs: ["audio"],
+          },
+          {
+            id: "tts-1-hd",
+            displayName: "TTS-1 HD",
+            protocolId: "openai-audio-speech",
+            inputs: ["text"],
+            outputs: ["audio"],
+          },
+        ],
+      },
       speechRecognition: {
         defaultModelId: "gpt-4o-mini-transcribe",
         models: [

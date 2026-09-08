@@ -1,0 +1,186 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ × tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V01: 同 provider 的图片默认值与语音默认值不同，TTS 只取语音域 33ms
+   → expected undefined to be 'mp3' // Object.is equality
+ × tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V02: 语音缺省、图片域里有 voice/format 时不回退图片域 3ms
+   → expected undefined to be 'alloy' // Object.is equality
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V03: 本次显式参数覆盖语音默认，TaskStore.params 与语义观测一致 2ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V03b: null 不被 Number(null) 隐式吞掉——speed null 走默认缺失语义 2ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V04: 多凭证 lane 时配置归属（逻辑 provider）与凭证归属（credentialProviderId）不混淆 2ms
+ × tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V06: 系统 say 路径只用它实际支持的参数，不被云端默认声线污染 2ms
+   → expected undefined to be 'system_default' // Object.is equality
+ × tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-01/02: OpenAI 非法格式回落、有限速度限幅，缺失/null/空串/错误类型不会被 Number 隐式转换 2ms
+   → expected {} to deeply equal ObjectContaining{…}
+ × tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-03/07/08: MiniMax 只取 speech 默认，保留执行目标模型与模型条目的 groupId 0ms
+   → expected {} to deeply equal ObjectContaining{…}
+ × tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-04: DashScope 不把未发送的 speed/format 记成已应用 wire 参数 0ms
+   → expected {} to deeply equal ObjectContaining{…}
+ × tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-05/06: system 默认选择不伪造 voice，显式小数 speed 只记录实际整数 WPM 0ms
+   → expected {} to deeply equal ObjectContaining{…}
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 云端适配路径不再读取图片 ctx.config（V05） > openai 路径：参数全部来自显式 params，不触 config；模型不被默认参数改写 9ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 云端适配路径不再读取图片 ctx.config（V05） > minimax 路径：不触 config，speed 进入 voice_setting 1ms
+ ✓ tests/speech-parameters.test.ts > F11/P8.2 云端适配路径不再读取图片 ctx.config（V05） > dashscope 路径：不触 config，voice 显式传入 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V01: 同 provider 的图片默认值与语音默认值不同，TTS 只取语音域
+AssertionError: expected undefined to be 'mp3' // Object.is equality
+
+- Expected:
+"mp3"
+
++ Received:
+undefined
+
+ ❯ tests/speech-parameters.test.ts:149:27
+    147|     expect(params.voice).toBe("echo");
+    148|     expect(params.speed).toBe(1.5);
+    149|     expect(params.format).toBe("mp3");
+       |                           ^
+    150|     manager.stop();
+    151|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V02: 语音缺省、图片域里有 voice/format 时不回退图片域
+AssertionError: expected undefined to be 'alloy' // Object.is equality
+
+- Expected:
+"alloy"
+
++ Received:
+undefined
+
+ ❯ tests/speech-parameters.test.ts:173:26
+    171|
+    172|     const [params] = submit.mock.calls[0] as unknown as [Record<string…
+    173|     expect(params.voice).toBe("alloy");
+       |                          ^
+    174|     expect(params.speed).toBe(1);
+    175|     expect(params.format).toBe("mp3");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/speech-parameters.test.ts > F11/P8.2 manager 级语音参数解析（speech 域、逻辑 provider 索引） > V06: 系统 say 路径只用它实际支持的参数，不被云端默认声线污染
+AssertionError: expected undefined to be 'system_default' // Object.is equality
+
+- Expected:
+"system_default"
+
++ Received:
+undefined
+
+ ❯ tests/speech-parameters.test.ts:284:30
+    282|     const [params] = submit.mock.calls[0] as unknown as [Record<string…
+    283|     // openai 的云端默认不得渗透到系统协议
+    284|     expect(params.voiceMode).toBe("system_default");
+       |                              ^
+    285|     expect(params.voice).toBeUndefined();
+    286|     expect(params.rateMode).toBe("system_default");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-01/02: OpenAI 非法格式回落、有限速度限幅，缺失/null/空串/错误类型不会被 Number 隐式转换
+AssertionError: expected {} to deeply equal ObjectContaining{…}
+
+- Expected
++ Received
+
+- ObjectContaining {
+-   "format": "mp3",
+-   "modelId": "tts-real",
+-   "protocolId": "openai-audio-speech",
+-   "speed": 4,
+-   "voice": "echo",
+- }
++ {}
+
+ ❯ tests/speech-parameters.test.ts:308:18
+    306|       speechProviderDefaults: { model: "must-not-win", speed: 1.5 },
+    307|     } as any);
+    308|     expect(fast).toEqual(expect.objectContaining({
+       |                  ^
+    309|       protocolId: "openai-audio-speech",
+    310|       modelId: "tts-real",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-03/07/08: MiniMax 只取 speech 默认，保留执行目标模型与模型条目的 groupId
+AssertionError: expected {} to deeply equal ObjectContaining{…}
+
+- Expected
++ Received
+
+- ObjectContaining {
+-   "format": "wav",
+-   "groupId": "group-target",
+-   "modelId": "speech-target",
+-   "speed": 0.5,
+-   "voice": "female-yujie",
+- }
++ {}
+
+ ❯ tests/speech-parameters.test.ts:340:22
+    338|       speechProviderDefaults: { model: "wrong-model", voice: "female-y…
+    339|     } as any);
+    340|     expect(resolved).toEqual(expect.objectContaining({
+       |                      ^
+    341|       modelId: "speech-target",
+    342|       groupId: "group-target",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-04: DashScope 不把未发送的 speed/format 记成已应用 wire 参数
+AssertionError: expected {} to deeply equal ObjectContaining{…}
+
+- Expected
++ Received
+
+- ObjectContaining {
+-   "format": "wav",
+-   "formatMode": "protocol_output_default",
+-   "modelId": "qwen-tts-real",
+-   "voice": "Serena",
+- }
++ {}
+
+ ❯ tests/speech-parameters.test.ts:355:22
+    353|       explicitInput: { voice: "Serena", speed: 2, format: "mp3" },
+    354|     } as any);
+    355|     expect(resolved).toEqual(expect.objectContaining({
+       |                      ^
+    356|       modelId: "qwen-tts-real",
+    357|       voice: "Serena",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  tests/speech-parameters.test.ts > R08 唯一协议解析器反例 > R08-05/06: system 默认选择不伪造 voice，显式小数 speed 只记录实际整数 WPM
+AssertionError: expected {} to deeply equal ObjectContaining{…}
+
+- Expected
++ Received
+
+- ObjectContaining {
+-   "format": "m4a",
+-   "rateMode": "system_default",
+-   "voiceMode": "system_default",
+- }
++ {}
+
+ ❯ tests/speech-parameters.test.ts:370:23
+    368|       explicitInput: {},
+    369|     } as any);
+    370|     expect(defaulted).toEqual(expect.objectContaining({
+       |                       ^
+    371|       voiceMode: "system_default",
+    372|       rateMode: "system_default",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed | 6 passed (13)
+   Start at  14:46:09
+   Duration  351ms (transform 193ms, setup 18ms, import 209ms, tests 59ms, environment 0ms)
+

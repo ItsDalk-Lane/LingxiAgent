@@ -1,0 +1,166 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ × desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-01：普通文档的两个用户尾空段逐个序列化 28ms
+   → expected 'hello' to be 'hello\n\n' // Object.is equality
+ × desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-02：首中尾空段、tab、全角空格和连续尾空段全部保留 0ms
+   → expected '\n\t中　间\n\n尾　' to be '\n\t中　间\n\n尾　\n\n' // Object.is equality
+ × desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-03：尾部 hardBreak 与尾部 paragraph 表达的换行都保留 0ms
+   → expected 'hello\n' to be 'hello\n\n' // Object.is equality
+ × desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-04：真实 TipTap splitBlock 创建的用户尾空段进入实际 source 29ms
+   → expected 'hello' to be 'hello\n' // Object.is equality
+ × desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-05：composer 明确关闭无来源标记的 StarterKit trailingNode 4ms
+   → expected true to be false // Object.is equality
+ × desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-06：列表后由用户创建的空段仍按用户内容保留 2ms
+   → expected '- 项目' to be '- 项目\n' // Object.is equality
+ × desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-07：无 synthetic 标记的旧草稿 hydration 与再次保存不猜删尾行 1ms
+   → expected '旧草稿' to be '旧草稿\n' // Object.is equality
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-09：纯空白正文由 trim 副本判空，附件身份仍独立提取 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-01：普通文档的两个用户尾空段逐个序列化
+AssertionError: expected 'hello' to be 'hello\n\n' // Object.is equality
+
+- Expected
++ Received
+
+  hello
+-
+-
+
+ ❯ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts:25:25
+     23|       ],
+     24|     });
+     25|     expect(result.text).toBe('hello\n\n');
+       |                         ^
+     26|   });
+     27|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-02：首中尾空段、tab、全角空格和连续尾空段全部保留
+AssertionError: expected '\n\t中　间\n\n尾　' to be '\n\t中　间\n\n尾　\n\n' // Object.is equality
+
+- Expected
++ Received
+
+
+  	中　间
+
+  尾　
+-
+-
+
+ ❯ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts:40:25
+     38|       ],
+     39|     });
+     40|     expect(result.text).toBe('\n\t中　间\n\n尾　\n\n');
+       |                         ^
+     41|   });
+     42|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-03：尾部 hardBreak 与尾部 paragraph 表达的换行都保留
+AssertionError: expected 'hello\n' to be 'hello\n\n' // Object.is equality
+
+- Expected
++ Received
+
+  hello
+
+-
+
+ ❯ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts:54:25
+     52|       ],
+     53|     });
+     54|     expect(result.text).toBe('hello\n\n');
+       |                         ^
+     55|   });
+     56|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-04：真实 TipTap splitBlock 创建的用户尾空段进入实际 source
+AssertionError: expected 'hello' to be 'hello\n' // Object.is equality
+
+- Expected
++ Received
+
+  hello
+-
+
+ ❯ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts:63:52
+     61|     expect(editor.getJSON().content).toHaveLength(2);
+     62|     expect(editor.getJSON().content?.[1]).toMatchObject({ type: 'parag…
+     63|     expect(serializeEditor(editor.getJSON()).text).toBe('hello\n');
+       |                                                    ^
+     64|     editor.destroy();
+     65|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-05：composer 明确关闭无来源标记的 StarterKit trailingNode
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts:69:101
+     67|   it('R06-05：composer 明确关闭无来源标记的 StarterKit trailingNode', () => {
+     68|     const editor = makeEditor('<ul><li><p>项目</p></li></ul>');
+     69|     expect(editor.extensionManager.extensions.some(extension => extens…
+       |                                                                                                     ^
+     70|     expect(editor.getJSON().content?.map(node => node.type)).toEqual([…
+     71|     editor.destroy();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-06：列表后由用户创建的空段仍按用户内容保留
+AssertionError: expected '- 项目' to be '- 项目\n' // Object.is equality
+
+- Expected
++ Received
+
+  - 项目
+-
+
+ ❯ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts:88:52
+     86|       ],
+     87|     });
+     88|     expect(serializeEditor(editor.getJSON()).text).toBe('- 项目\n');
+       |                                                    ^
+     89|     editor.commands.focus('end');
+     90|     editor.commands.insertContent('用户续写');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts > R06 末尾空段内容所有权 > R06-07：无 synthetic 标记的旧草稿 hydration 与再次保存不猜删尾行
+AssertionError: expected '旧草稿' to be '旧草稿\n' // Object.is equality
+
+- Expected
++ Received
+
+  旧草稿
+-
+
+ ❯ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts:105:44
+    103|     const editor = makeEditor(oldDraft);
+    104|     const hydrated = editor.getJSON();
+    105|     expect(serializeEditor(hydrated).text).toBe('旧草稿\n');
+       |                                            ^
+    106|     editor.commands.setContent(hydrated);
+    107|     expect(serializeEditor(editor.getJSON()).text).toBe('旧草稿\n');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed | 1 passed (8)
+   Start at  14:30:51
+   Duration  598ms (transform 160ms, setup 19ms, import 201ms, tests 67ms, environment 242ms)
+

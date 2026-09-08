@@ -3,7 +3,6 @@ import crypto from "node:crypto";
 import { QueryEmbeddingCache, normalizeKnowledgeQuery } from "./query-embedding-cache.ts";
 import { resolveReadyKnowledgeQueryVariant, type CompiledKnowledgeScope, type CompiledKnowledgeNotebook } from "./scope-snapshot-compiler.ts";
 import { estimateTextTokens } from "../llm/estimate-text-tokens.ts";
-import { EvidenceSpanExtractor } from "./evidence-span-extractor.ts";
 
 import {
   buildKnowledgeChunks,
@@ -666,10 +665,6 @@ export class KnowledgeQueryService {
       return { candidates: input.candidates, rerankMs: 0,
         rerankDegradeReason: `rerank failed: ${error instanceof Error ? error.message : String(error)}; kept RRF ranking` };
     }
-  }
-
-  extractEvidenceSpans(input: Parameters<EvidenceSpanExtractor["extract"]>[0]) {
-    return new EvidenceSpanExtractor(this.deps.store).extract(input);
   }
 
   /**

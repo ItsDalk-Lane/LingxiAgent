@@ -1,0 +1,69 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+stdout | tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-06 合法空源完成
+[pins-migration] [test-agent] pinned→tenets migration: 0 added, 0 duplicates, 0 source items
+
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-01 E11 pending 在前 active 在后仍复用 active 42ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-02 rejected 历史在前三次批量导入只增加一个 active 3ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-04 只恢复批准部分，其他候选仍显示 6ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-05 同一 operation 返回原 summary 不再写库 5ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-06 同一 operation 改批准决策拒绝 10ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-07 完成后删除再用原单不能复活 5ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-08 新批准操作才允许恢复用户删除内容 7ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-09 批准后 source 改变拒绝写入 2ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-09 批准后 target 改变拒绝写入 3ms
+ ✓ tests/round2-pinned-recovery.test.ts > R02 批准快照、范围与幂等 > R02-13 收据按 operation 存放，不覆盖首次迁移位置 5ms
+stdout | tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-14 v2 completed 后删除不复活不改收据
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-01 E02 duplicate-only 目标被清空不得认证完成 45ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 content 不得归档 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 pending 不得归档 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 rejected 不得归档 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 source 不得归档 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-02/R01-03 保留 ID 但改变 createdAt 不得归档 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-04 同一个目标映射两种哈希拒绝继续 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-05 后续新增不覆盖 6ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-06 合法空源完成 6ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-07 E03 空计划 prepared 后目标改变不能 every=true 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-09 E04 归档移走后收据未写可恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-11 规划目的地被占用时保留源和目的地 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {bad 1ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {"version":99,"state":"prepared"} 1ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-13 非法收据不当 absent {"version":3,"state":"mystery"} 1ms
+stdout | tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:before:tenets.json 故障保留数据且可恢复
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+stdout | tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:after:tenets.json 故障保留数据且可恢复
+[pins-migration] [test-agent] pinned→tenets migration: 1 added, 0 duplicates, 1 source items
+
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01-08 SIGKILL 在归档删除源后、收据写入前发生，重启仅补记完成 107ms
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01-16 完整摘要命名的已有备份内容不符，拒绝复用且不覆盖 3ms
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01-15 旧收据备份失败，不覆盖收据、目标或来源原字节 8ms
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01-13 收据 EACCES 是读取错误，不能当作不存在启动迁移 2ms
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01 严格读取拒绝非法 schema string，不归一化后覆盖既有目标 3ms
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01 严格读取拒绝非法 schema negative，不归一化后覆盖既有目标 3ms
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01 严格读取拒绝非法 schema array，不归一化后覆盖既有目标 2ms
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01 严格读取拒绝非法 status array，不归一化后覆盖既有目标 3ms
+ ✓ tests/round2-pinned-migration-faults.test.ts > R01 合成文件系统故障与真实硬终止 > R01 严格读取拒绝非法 source array，不归一化后覆盖既有目标 2ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-14 v2 completed 后删除不复活不改收据 6ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-15 prepared 前目标原字节备份可恢复 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 真实迁移后置条件与归档恢复 > R01-严格读取不默默过滤损坏条目 1ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-计划映射缺项不能被结果哈希捷径认证 3ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:before:tenets.json 故障保留数据且可恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 backup:after:tenets.json 故障保留数据且可恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 receipt:prepared 故障保留数据且可恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 commit:before 故障保留数据且可恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 commit:after 故障保留数据且可恢复 5ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 archive:copied:pinned-memory.json 故障保留数据且可恢复 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 archive:after:pinned-memory.json 故障保留数据且可恢复 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-08 写边界 completed:before 故障保留数据且可恢复 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-12 v2 唯一归档证据转换后恢复 4ms
+ ✓ tests/round2-pinned-migration.test.ts > R01 补充计划和故障窗口 > R01-12 v2 多个相同归档路径不猜选 3ms
+
+ Test Files  3 passed (3)
+      Tests  48 passed (48)
+   Start at  13:30:24
+   Duration  311ms (transform 211ms, setup 60ms, import 195ms, tests 376ms, environment 0ms)
+

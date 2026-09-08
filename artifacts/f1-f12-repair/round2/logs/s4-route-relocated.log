@@ -1,0 +1,10 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/round2-composer-reconciliation-route.test.ts > R04-01/02/15：真实SDK提交后丢失ACK，断线恢复经真实history路由合并并续发一次 973ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  14:11:42
+   Duration  2.80s (transform 792ms, setup 20ms, import 1.46s, tests 974ms, environment 273ms)
+

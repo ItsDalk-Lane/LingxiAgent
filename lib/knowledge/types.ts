@@ -1,12 +1,61 @@
 import type { KnowledgeChunkerStrategy, KnowledgeChunkSpanDraft } from "./chunker.ts";
 import type { KnowledgeCoverageMode } from "../../shared/knowledge-refs.ts";
 import type { KnowledgeCompletenessPolicy } from "../../shared/knowledge-execution.ts";
-import type {
-  KnowledgeEvidenceNeed,
-  KnowledgeEvidenceRelation,
-  KnowledgeResearchBudget,
-  KnowledgeResearchRunStatus,
-} from "../../shared/knowledge-research.ts";
+
+export type KnowledgeResearchRunStatus =
+  | "planning"
+  | "running"
+  | "synthesizing"
+  | "completed"
+  | "partial"
+  | "failed"
+  | "cancelled";
+
+export type KnowledgeEvidenceNeedKind =
+  | "fact"
+  | "comparison"
+  | "cause"
+  | "timeline"
+  | "counterexample"
+  | "completeness";
+
+export type KnowledgeEvidenceNeedStatus =
+  | "uncovered"
+  | "partial"
+  | "supported"
+  | "conflicted"
+  | "not_applicable";
+
+export type KnowledgeEvidenceRelation =
+  | "supports"
+  | "contradicts"
+  | "context";
+
+export interface KnowledgeEvidenceNeed {
+  id: string;
+  ordinal: number;
+  claim: string;
+  kind: KnowledgeEvidenceNeedKind;
+  required: boolean;
+  minIndependentSources: number;
+  requireCounterEvidence: boolean;
+  requireAllRelevantUnits: boolean;
+  status: KnowledgeEvidenceNeedStatus;
+  evidenceIds: string[];
+  counterEvidenceIds: string[];
+  unresolvedGaps: string[];
+}
+
+export interface KnowledgeResearchBudget {
+  maxRounds: number;
+  maxParallelAgents: number;
+  maxToolCalls: number;
+  maxWallClockMs: number;
+  maxSearchesPerRound: number;
+  maxReadsPerRound: number;
+  maxFinalEvidenceSpans: number;
+  finalEvidenceBudgetTokens: number;
+}
 
 /** 研究持久化记录只保存结构化事实与定位，不保存模型的完整提示或思考。 */
 export interface KnowledgeResearchRun {

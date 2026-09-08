@@ -69,6 +69,71 @@ function deepClone(value) {
   return value == null ? value : structuredClone(value);
 }
 
+function fileSystemErrorCode(error: unknown): string {
+  const code = (error as NodeJS.ErrnoException)?.code;
+  return typeof code === "string" && code ? code : "FS_ERROR";
+}
+
+/**
+ * R09：同步 TTS 产物的共同校验原语。
+ *
+ * realpath 解析根目录和链接的真实目标，path.relative 证明目标仍在 canonical
+ * root 内，stat 再确认最终目标是普通文件。lstat 只描述链接本身，不能证明链接
+ * 指向哪里，因此不用于最终接受判断。返回值只带原文件名和错误码，避免泄漏
+ * canonical 绝对路径。
+ */
+export function validateSynchronousSpeechOutputs(
+  files: unknown,
+  generatedDir: unknown,
+): { ok: true; files: string[] } | { ok: false; error: string } {
+  if (typeof generatedDir !== "string" || !generatedDir.trim()) {
+    return { ok: false, error: "speech output generated dir is invalid" };
+  }
+  let realRoot: string;
+  try {
+    realRoot = fs.realpathSync(generatedDir);
+    if (!fs.statSync(realRoot).isDirectory()) {
+      return { ok: false, error: "speech output generated root is not a directory" };
+    }
+  } catch (error) {
+    return { ok: false, error: `speech output generated root is unavailable (${fileSystemErrorCode(error)})` };
+  }
+  if (!Array.isArray(files) || files.length === 0) {
+    return { ok: false, error: "speech generation returned no output files" };
+  }
+
+  const accepted: string[] = [];
+  for (const entry of files) {
+    if (typeof entry !== "string" || !entry.trim() || entry.includes("\0")) {
+      return { ok: false, error: "speech generation returned an invalid file entry" };
+    }
+    const file = entry;
+    // 当前 files[] 合同是 generated 根下的文件名；不借本修复新增子目录合同。
+    if (path.isAbsolute(file) || file === "." || file === ".." || path.basename(file) !== file) {
+      return { ok: false, error: `speech output has an invalid file name: ${file}` };
+    }
+    let realTarget: string;
+    try {
+      realTarget = fs.realpathSync(path.join(realRoot, file));
+    } catch (error) {
+      return { ok: false, error: `speech output file unavailable: ${file} (${fileSystemErrorCode(error)})` };
+    }
+    const relative = path.relative(realRoot, realTarget);
+    if (!relative || relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+      return { ok: false, error: `speech output escapes generated dir: ${file}` };
+    }
+    try {
+      if (!fs.statSync(realTarget).isFile()) {
+        return { ok: false, error: `speech output is not a regular file: ${file}` };
+      }
+    } catch (error) {
+      return { ok: false, error: `speech output file unavailable: ${file} (${fileSystemErrorCode(error)})` };
+    }
+    accepted.push(file);
+  }
+  return { ok: true, files: accepted };
+}
+
 // 这里刻意只做纯字符串归一，不走文件系统归一原语：比较的是 session JSONL 的
 // 定位路径（可能已经不存在，甚至属于另一台机器上的备份），一旦引入 realpath 就
 // 会平白多出磁盘 I/O，还会让 fork 的来源/目标映射依赖当下磁盘状态。
@@ -337,6 +402,81 @@ export class TaskStore {
     this._tasks.set(taskId, task);
     this._scheduleSave();
     return { ...task };
+  }
+
+  /**
+   * F12/P8.3：同步语音产物的收尾原语（仅 response 投递使用）。
+   *
+   * 1. files 必须非空、每个条目位于 generated 根目录内且真实存在（不信任
+   *    任意路径，拒绝 .. 逃逸）；
+   * 2. 验证通过 → status='done'、submitState='completed'、completedAt 定格、
+   *    清除 failReason；调用返回前内存即终态（沿用 debounce 持久化，不谎称
+   *    同步 fsync）；
+   * 3. 幂等：已 done 的任务重复完成不改变完成时间、不新增任务；
+   *    已 cancelled/failed/aborted 的任务不得被无条件改 done；
+   * 4. 验证失败 → 任务标明确失败并返回 { ok:false }，由调用方把错误抛出。
+   */
+  completeSynchronousSpeechTask(taskId, { files = [], generatedDir }: Record<string, any> = {}) {
+    const task = this._tasks.get(taskId);
+    if (!task) {
+      return { ok: false, error: `TaskStore: task not found: ${taskId}` };
+    }
+    if (task.status === "done") {
+      return { ok: true, idempotent: true, task: { ...task } };
+    }
+    if (task.status === "cancelled" || task.status === "failed" || task.status === "aborted") {
+      return { ok: false, error: `TaskStore: cannot complete ${task.status} task ${taskId}` };
+    }
+    const fail = (reason) => {
+      this.update(taskId, { status: "failed", submitState: "failed", failReason: reason });
+      return { ok: false, error: reason };
+    };
+    const validation = validateSynchronousSpeechOutputs(files, generatedDir);
+    if (validation.ok === false) return fail(validation.error);
+    this.update(taskId, {
+      status: "done",
+      submitState: "completed",
+      completedAt: new Date().toISOString(),
+      failReason: null,
+      files: [...validation.files],
+    });
+    return { ok: true, task: { ...this._tasks.get(taskId) } };
+  }
+
+  /**
+   * F12/P8.4：旧 pending 记录恢复（幂等收尾）。
+   *
+   * 只处理 type='speech' && delivery.mode='response' && status='pending' 的
+   * 记录：文件全部真实存在 → 标 done；文件缺失 → 标明确失败。不重新合成、
+   * 不向会话通知、不产生新的模型调用/用量。已终态的记录不改写；图片/视频
+   * pending 任务一律不动。
+   */
+  recoverSynchronousSpeechTasks({ generatedDir, now = () => new Date().toISOString() }: Record<string, any> = {}) {
+    if (!generatedDir) return 0;
+    let changed = 0;
+    for (const task of this._tasks.values()) {
+      if (task.type !== "speech") continue;
+      const mode = task.deliveryMode || task.delivery?.mode;
+      if (mode !== "response") continue;
+      if (task.status !== "pending") continue;
+      const validation = validateSynchronousSpeechOutputs(task.files, generatedDir);
+      if (validation.ok === true) {
+        this.update(task.taskId, {
+          status: "done",
+          submitState: "completed",
+          completedAt: task.completedAt || now(),
+          failReason: null,
+        });
+      } else {
+        this.update(task.taskId, {
+          status: "failed",
+          submitState: "failed",
+          failReason: `speech output invalid after restart: ${validation.error}`,
+        });
+      }
+      changed += 1;
+    }
+    return changed;
   }
 
   /**

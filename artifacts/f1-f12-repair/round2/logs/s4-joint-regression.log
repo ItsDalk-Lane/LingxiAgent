@@ -1,0 +1,166 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-14：断线未知保留独立barrier，A不能越过而B正常发送 64ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-13：超过200条历史记录不能淘汰未知快照 3ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-11：canonical ACK仅确认接收，未证明运行结束仍保留barrier 2ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-02：精确历史命中和权威idle解除barrier，保留原文附件且不追加气泡 2ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-03：命中但run running不释放下一条 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-04：沿before查第二页，第一页未命中不判拒收 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-05：20页上限仍未命中保留unknown和完整快照 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-06：同正文其他client或快照版本不提供接收证据 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-12：读取403保留barrier与诊断 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-12：读取404保留barrier与诊断 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-12：读取network保留barrier与诊断 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-09：切服务器同路径不查询旧记录，也拒绝旧服务器ACK 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-10：HTTP挂起收到新run_start，迟到idle不能清新busy 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-17：同session单飞，完成不自动轮询；断代迟到响应丢弃 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04 ACK缺canonical身份或不同session/version不结算 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-05：读取边界忽略abort仍在10秒截止释放单飞并显示失败 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-18：未知普通输入阻挡立即插入，不能绕过barrier 1ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-02：慢HTTP完成时前台timer已耗尽，idle后仍只续发一次 2ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-11：真实history-builder水合后canonical ACK合并同一气泡 6ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts > R04 未决输入与捕获连接对账 > R04-11：ACK未携带字段不擦除已有附件技能和引用 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q01：队首附件读取挂起时，后续纯文本项不准备、不先发 65ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q02：A 已发送但回执未到时，传输租约阻止 B 发送 5ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q03：A 回执到但 run 未结束（含 run 进行中），B 均不发 3ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q04：model_turn_end / tool_end / mood_end 均不释放下一轮 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q05：A 正确 run_end 后，B 只发一次且顺序稳定（经 400ms 调度通道） 4ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q06：重复 effect / StrictMode 双调用同一调度，不重复提交 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q07：准备 A 时手动发送 C，C 不超越 B 3ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q08：A1 会话准备挂起，不阻塞空闲的 A2 会话 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q09：准备期间连接代次切换，旧租约不得向新连接发送旧载荷 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q10：旧 run 的迟到终态不结束新 run 3ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q11：编辑/删除正在准备的队列项，过期快照不得发送 4ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q12：立即插入与普通续发并发，不双发、不绕过预检 3ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q13：run 在插话准备期间结束/更换，不得插入错误的 run 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q14：agent review 排队项立即插入保留既有禁止语义，不静默丢失 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q15：abort 后先收到权威终态再续发；迟到媒体结果不重开旧 run 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > composer-send-coordinator（Q01–Q16） > Q16：两个会话各自一次发送，投影与载荷互不混块 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-01/R03-02：旧 timer 到点读取最后一次编辑保护，不延长计时 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-07：A timer 未开始切 B，不自动发送 A 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-04：保存相同正文不改变版本和 blocked 状态 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 最新意图与前台边界 > R03-04：同 queueItemId 新版本不复用旧逻辑身份 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03-03：慢准备期间队列进入编辑，commit 同步拒绝旧快照 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-03/R03-04/X2-03：开始编辑立即取消慢 lease，保存只发新快照一次 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-05：取消编辑恢复 blocked 原快照且不自动解锁 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-06：同步提交窗口和已提交项返回 too_late 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-08/R03-12/X2-04：A preparing 后撤销前台意图不取消 lease，B 独立发送且草稿保留 2ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-09：旧 owner cleanup 不取消新挂载意图，同 owner 撤销后重挂仅发一次 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-10：删除旧慢项后创建新 lease，旧读取不释放新项租约 1ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts > R03 编辑与意图生命周期真实入口 > R03-11：立即插入也不能越过 editing 1ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+[input] failed to read video attachment Error: disk gone
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:433:49)
+    at Object.Mock [as readFileBase64] (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at prepareComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:351:40)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:706:12)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:810:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:439:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+[input] failed to read audio attachment Error: disk gone
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:433:49)
+    at Object.Mock [as readFileBase64] (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at prepareComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:323:40)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:706:12)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:810:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:460:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S01：普通发送视频预检失败，编辑器、草稿、附件与引用全部保留 59ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send 6ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S03：视频数超限与格式错误都是明确 blocked，不冒充成功 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S04：ws 不存在 / CONNECTING / CLOSING / CLOSED，明确结果、不清输入、不发消息 25ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:609:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:522:8)
+    at Module.sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:731:24)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:610:20
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试
+[input] websocket send failed Error: socket exploded
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:651:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:522:8)
+    at Module.sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:731:24)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:654:20
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:740:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:522:8)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:731:24)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:810:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:742:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S05：读文件期间会话删除/定位器变化/模型变更，重新验证后旧目标不误发 10ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S06：准备期间用户继续输入，原快照独立、新草稿不被清除或覆盖 62ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段 2ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S08：图片按既有规则退化为文件引用，提示保留、文件身份不丢 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S10：提交后断线无回执与回执超时，都标 delivery_unknown 且不自动重发 3ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S11：重连后经恢复/历史找到原 clientMessageId，合并不重复追加 3ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致 3ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S13：带首行空格与末尾换行的输入，快照逐字符保留 9ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S14：首页 ensureSession 期间重复点击，只创建/提交一次 9ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S15：入队后改变界面选中的笔记本，已排队消息仍使用入队快照范围 1ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P07：全空白正文（无其他内容维度）不发，且不做破坏性清空 5ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (<WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:900:64)
+    at Object.Mock (file://<WORKTREE>/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (<WORKTREE>/desktop/src/react/components/input/composer-send.ts:522:8)
+    at sendWithLease (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:731:24)
+    at Module.flushQueuedHeadNow (<WORKTREE>/desktop/src/react/services/composer-send-coordinator.ts:810:3)
+    at <WORKTREE>/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:903:5
+    at file://<WORKTREE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/UserMessageActions.test.tsx > UserMessage Codex-style actions > R04-12：未决投递只提供重新核对，不暴露重发、分支或编辑动作 117ms
+ ✓ desktop/src/react/__tests__/components/UserMessageActions.test.tsx > UserMessage Codex-style actions > shows retry and fork for every persisted user message while keeping edit latest-only 5ms
+ ✓ desktop/src/react/__tests__/components/UserMessageActions.test.tsx > UserMessage Codex-style actions > orders the user footer as time, latest actions, copy, screenshot, select all, checkbox 4ms
+ ✓ desktop/src/react/__tests__/components/UserMessageActions.test.tsx > UserMessage Codex-style actions > renders the message selection action in the user footer and toggles selection 7ms
+ ✓ desktop/src/react/__tests__/components/UserMessageActions.test.tsx > UserMessage Codex-style actions > keeps retry and fork available for older user messages without edit 3ms
+ ✓ desktop/src/react/__tests__/components/UserMessageActions.test.tsx > UserMessage Codex-style actions > keeps retry and fork available for review user nodes without exposing text edit 8ms
+ ✓ desktop/src/react/__tests__/components/UserMessageActions.test.tsx > UserMessage Codex-style actions > forks a user node, activates the child, then retries the copied user turn there 5ms
+ ✓ desktop/src/react/__tests__/components/UserMessageActions.test.tsx > UserMessage Codex-style actions > uses the main-session activator when the transcript does not provide a surface override 6ms
+ ✓ desktop/src/react/__tests__/components/UserMessageActions.test.tsx > UserMessage Codex-style actions > submits inline edits through the latest-turn replay action 10ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P08：全空白正文但有附件 → 按已有内容维度发送，wire 保真、附件身份保留 9ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文 2ms
+stderr | tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-11 相同关联重复幂等，client ID 指向另一个版本的 entry 时明确 ambiguous
+[desktop-session-submit] canonical input correlation unavailable
+
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-15 相同正文不同 client ID 经真实 append 和历史路由仍分别关联 57ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-08 分支读取失败保持不完整，不能 fallback 全 JSONL 认证 9ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04 缺失权威运行读取能力不能宣称 idle 7ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-07 孤立关联不能认证一个不存在的 user entry 7ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-08 当前分支不含原 user 或关联时不泄漏废弃分支证据 7ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-08 fork 新 session 身份不能消费旧 session client ID 6ms
+stderr | tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-16 关联存储失败且诊断广播也失败，真实 user 和运行继续且只提交一次
+[desktop-session-submit] canonical input correlation unavailable
+
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-11 相同关联重复幂等，client ID 指向另一个版本的 entry 时明确 ambiguous 9ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-16 关联存储失败且诊断广播也失败，真实 user 和运行继续且只提交一次 9ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-10 读取过程中完整运行一次，前后均idle也因revision变化保持unknown 6ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-03 历史关联已经落盘但供应商流仍在等待，确认接收不能宣称idle 6ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-08 duplicate-id 不能通过修复/宽松读取认证，文件字节保持不变 7ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-08 old-schema 不能通过修复/宽松读取认证，文件字节保持不变 7ms
+ ✓ tests/round2-desktop-input-history.test.ts > R04 真实 SDK 桌面提交到历史关联 > R04-08 invalid-json 不能通过修复/宽松读取认证，文件字节保持不变 7ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03 InputArea 编辑点击接线 > R03-03：点击编辑同步取消慢附件，保存后仅提交新正文 409ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03 InputArea 编辑点击接线 > R03-05：点击取消保留原 blocked 状态与正文 24ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03-09：真实 InputArea StrictMode 卸载撤销 timer，重挂只发一次 21ms
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03-12：InputArea A 慢附件时切 B 可发送，A 完成不再清 B 编辑器 64ms
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation-route.round2.test.ts > R04-01/02/15：真实SDK提交后丢失ACK，断线恢复经真实history路由合并并续发一次 961ms
+
+ Test Files  6 passed (6)
+      Tests  93 passed (93)
+   Start at  14:10:04
+   Duration  3.03s (transform 3.16s, setup 64ms, import 5.68s, tests 2.21s, environment 1.77s)
+

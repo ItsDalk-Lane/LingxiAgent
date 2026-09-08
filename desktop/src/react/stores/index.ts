@@ -21,7 +21,6 @@ import { createActivitySlice, type ActivitySlice } from './activity-slice';
 import { createAgentActivitySlice, type AgentActivitySlice } from './agent-activity-slice';
 import { createTerminalSlice, type TerminalSlice } from './terminal-slice';
 import { createBridgeSlice, type BridgeSlice } from './bridge-slice';
-import { createPluginUiSlice, type PluginUiSlice } from './plugin-ui-slice';
 import { createSelectionSlice, type SelectionSlice } from './selection-slice';
 import { createSubagentPreviewSlice, type SubagentPreviewSlice } from './subagent-preview-slice';
 import { createComputerOverlaySlice, type ComputerOverlaySlice } from './computer-overlay-slice';
@@ -53,7 +52,6 @@ export type StoreState = ConnectionSlice &
   AgentActivitySlice &
   TerminalSlice &
   BridgeSlice &
-  PluginUiSlice &
   SelectionSlice &
   SubagentPreviewSlice &
   ComputerOverlaySlice &
@@ -84,7 +82,6 @@ export const useStore = create<StoreState>()((set, _get, _api) => ({
   ...createAgentActivitySlice(set),
   ...createTerminalSlice(set),
   ...createBridgeSlice(set),
-  ...createPluginUiSlice(set),
   ...createSelectionSlice(set),
   ...createSubagentPreviewSlice(set),
   ...createComputerOverlaySlice(set),
@@ -124,7 +121,6 @@ export type {
   AgentActivitySlice,
   TerminalSlice,
   BridgeSlice,
-  PluginUiSlice,
   SelectionSlice,
   SubagentPreviewSlice,
   ComputerOverlaySlice,

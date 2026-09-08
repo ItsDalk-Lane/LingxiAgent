@@ -12,4 +12,20 @@ export const siliconflowPlugin = {
   authType: "api-key",
   defaultBaseUrl: "https://api.siliconflow.cn/v1",
   defaultApi: "openai-completions",
+  capabilities: {
+    media: {
+      speechGeneration: {
+        defaultModelId: "FunAudioLLM/CosyVoice2-0.5B",
+        models: [
+          {
+            id: "FunAudioLLM/CosyVoice2-0.5B",
+            displayName: "CosyVoice2 0.5B",
+            protocolId: "openai-audio-speech",
+            inputs: ["text"],
+            outputs: ["audio"],
+          },
+        ],
+      },
+    },
+  },
 };

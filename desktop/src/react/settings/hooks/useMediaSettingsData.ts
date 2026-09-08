@@ -44,6 +44,8 @@ export interface MediaProvider {
 export interface MediaConfig {
   defaultImageModel?: { id: string; provider: string };
   defaultVideoModel?: { id: string; provider: string };
+  /** 语音合成默认模型（/api/media/speech/config；defaultSpeechModel） */
+  defaultSpeechModel?: { id: string; provider: string };
   providerDefaults?: Record<string, any>;
 }
 
@@ -157,9 +159,12 @@ export interface UseMediaSettingsDataResult {
   image: ResourceState<MediaProvider, MediaConfig>;
   video: ResourceState<MediaProvider, MediaConfig>;
   speech: ResourceState<SpeechProvider, SpeechConfig>;
+  /** 语音合成（TTS）资源：/api/media/speech/*，与识别(speech)无关 */
+  speechGen: ResourceState<MediaProvider, MediaConfig>;
 
   allImageModels: Array<MediaModel & { provider: string }>;
   allVideoModels: Array<MediaModel & { provider: string }>;
+  allSpeechGenModels: Array<MediaModel & { provider: string }>;
   allSpeechModels: Array<{ id: string; name: string; provider: string }>;
   speechEnabled: boolean;
 
@@ -170,6 +175,7 @@ export interface UseMediaSettingsDataResult {
 
   saveImageConfig: (updates: MediaConfigUpdater) => Promise<void>;
   saveVideoConfig: (updates: MediaConfigUpdater) => Promise<void>;
+  saveSpeechGenConfig: (updates: MediaConfigUpdater) => Promise<void>;
   saveSpeechConfig: (updates: SpeechConfigUpdater) => Promise<void>;
 }
 
@@ -177,6 +183,9 @@ const EMPTY_IMAGE: ResourceState<MediaProvider, MediaConfig> = {
   providers: {}, config: null, loading: true, error: null,
 };
 const EMPTY_VIDEO: ResourceState<MediaProvider, MediaConfig> = {
+  providers: {}, config: null, loading: true, error: null,
+};
+const EMPTY_SPEECH_GEN: ResourceState<MediaProvider, MediaConfig> = {
   providers: {}, config: null, loading: true, error: null,
 };
 const EMPTY_SPEECH: ResourceState<SpeechProvider, SpeechConfig> = {
@@ -189,6 +198,7 @@ export function useMediaSettingsData(): UseMediaSettingsDataResult {
 
   const [image, setImage] = useState<ResourceState<MediaProvider, MediaConfig>>(EMPTY_IMAGE);
   const [video, setVideo] = useState<ResourceState<MediaProvider, MediaConfig>>(EMPTY_VIDEO);
+  const [speechGen, setSpeechGen] = useState<ResourceState<MediaProvider, MediaConfig>>(EMPTY_SPEECH_GEN);
   const [speech, setSpeech] = useState<ResourceState<SpeechProvider, SpeechConfig>>(() => ({
     providers: {},
     config: snapshotSpeechConfig ? mergeSpeechConfig({ enabled: false }, snapshotSpeechConfig) : null,
@@ -199,10 +209,12 @@ export function useMediaSettingsData(): UseMediaSettingsDataResult {
   // 权威最新快照 refs：save 基于最新本地快照，而不是旧 React closure。
   const imageConfigRef = useRef<MediaConfig>({});
   const videoConfigRef = useRef<MediaConfig>({});
+  const speechGenConfigRef = useRef<MediaConfig>({});
   const speechConfigRef = useRef<SpeechConfig>({ enabled: false });
   // 每个资源独立的 mutation queue，序列化写入。
   const imageWriteQueueRef = useRef<Promise<unknown>>(Promise.resolve());
   const videoWriteQueueRef = useRef<Promise<unknown>>(Promise.resolve());
+  const speechGenWriteQueueRef = useRef<Promise<unknown>>(Promise.resolve());
   const speechWriteQueueRef = useRef<Promise<unknown>>(Promise.resolve());
 
   useEffect(() => {
@@ -221,6 +233,11 @@ export function useMediaSettingsData(): UseMediaSettingsDataResult {
   const applyVideoConfig = useCallback((next: MediaConfig) => {
     videoConfigRef.current = next;
     setVideo(prev => ({ ...prev, config: next }));
+  }, []);
+
+  const applySpeechGenConfig = useCallback((next: MediaConfig) => {
+    speechGenConfigRef.current = next;
+    setSpeechGen(prev => ({ ...prev, config: next }));
   }, []);
 
   const applySpeechConfig = useCallback((next: SpeechConfig) => {
@@ -269,6 +286,24 @@ export function useMediaSettingsData(): UseMediaSettingsDataResult {
     }
   }, []);
 
+  const loadSpeechGenResource = useCallback(async () => {
+    setSpeechGen(prev => ({ ...prev, loading: prev.config === null && prev.error === null }));
+    try {
+      const res = await lingxiFetch('/api/media/speech/providers');
+      const data = await res.json();
+      const nextProviders = data.providers || {};
+      const nextConfig = data.config || {};
+      speechGenConfigRef.current = nextConfig;
+      setSpeechGen({ providers: nextProviders, config: nextConfig, loading: false, error: null });
+    } catch (err: any) {
+      setSpeechGen(prev => ({
+        ...prev,
+        loading: false,
+        error: err?.message || String(err),
+      }));
+    }
+  }, []);
+
   const loadSpeechResource = useCallback(async () => {
     setSpeech(prev => ({ ...prev, loading: prev.config === null && prev.error === null }));
     try {
@@ -290,21 +325,22 @@ export function useMediaSettingsData(): UseMediaSettingsDataResult {
 
   // 首次挂载：image/video/speech 并发加载，各自独立失败。
   useEffect(() => {
-    void Promise.allSettled([loadImageResource(), loadVideoResource(), loadSpeechResource()]);
+    void Promise.allSettled([loadImageResource(), loadVideoResource(), loadSpeechResource(), loadSpeechGenResource()]);
     const refreshRuntimeMediaProviders = () => {
       void loadImageResource();
       void loadVideoResource();
+      void loadSpeechGenResource();
     };
     window.addEventListener('focus', refreshRuntimeMediaProviders);
     return () => window.removeEventListener('focus', refreshRuntimeMediaProviders);
-  }, [loadImageResource, loadVideoResource, loadSpeechResource]);
+  }, [loadImageResource, loadVideoResource, loadSpeechResource, loadSpeechGenResource]);
 
   const refreshImage = useCallback(() => loadImageResource(), [loadImageResource]);
   const refreshVideo = useCallback(() => loadVideoResource(), [loadVideoResource]);
   const refreshSpeech = useCallback(() => loadSpeechResource(), [loadSpeechResource]);
   const refreshAll = useCallback(async () => {
-    await Promise.allSettled([loadImageResource(), loadVideoResource(), loadSpeechResource()]);
-  }, [loadImageResource, loadVideoResource, loadSpeechResource]);
+    await Promise.allSettled([loadImageResource(), loadVideoResource(), loadSpeechResource(), loadSpeechGenResource()]);
+  }, [loadImageResource, loadVideoResource, loadSpeechResource, loadSpeechGenResource]);
 
   const saveImageConfig = useCallback((updates: MediaConfigUpdater): Promise<void> => {
     const write = async () => {
@@ -348,6 +384,27 @@ export function useMediaSettingsData(): UseMediaSettingsDataResult {
     return queued;
   }, [applyVideoConfig, showToast]);
 
+  const saveSpeechGenConfig = useCallback((updates: MediaConfigUpdater): Promise<void> => {
+    const write = async () => {
+      const patch = resolveMediaConfigUpdater(updates, speechGenConfigRef.current);
+      try {
+        const res = await lingxiFetch('/api/media/speech/config', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ values: encodeConfigPatch(patch) }),
+        });
+        const data = await res.json().catch(() => null);
+        applySpeechGenConfig(data?.values ? data.values : applyConfigPatch(speechGenConfigRef.current, patch));
+        showToast(t('settings.saved'), 'success');
+      } catch (err: any) {
+        showToast(err?.message || 'Save failed', 'error');
+      }
+    };
+    const queued = speechGenWriteQueueRef.current.then(write, write);
+    speechGenWriteQueueRef.current = queued;
+    return queued;
+  }, [applySpeechGenConfig, showToast]);
+
   const saveSpeechConfig = useCallback((updates: SpeechConfigUpdater): Promise<void> => {
     const write = async () => {
       const patch = resolveMediaConfigUpdater(updates, speechConfigRef.current);
@@ -381,6 +438,9 @@ export function useMediaSettingsData(): UseMediaSettingsDataResult {
   const allVideoModels = Object.keys(video.providers).flatMap(pid =>
     (video.providers[pid].models || []).map(m => ({ ...m, provider: pid })),
   );
+  const allSpeechGenModels = Object.keys(speechGen.providers).flatMap(pid =>
+    (speechGen.providers[pid].models || []).map(m => ({ ...m, provider: pid })),
+  );
   const allSpeechModels = Object.keys(speech.providers).flatMap(pid =>
     getRunnableSpeechModels(speech.providers[pid]).map(m => ({ ...m, provider: pid })),
   );
@@ -390,8 +450,10 @@ export function useMediaSettingsData(): UseMediaSettingsDataResult {
     image,
     video,
     speech,
+    speechGen,
     allImageModels,
     allVideoModels,
+    allSpeechGenModels,
     allSpeechModels,
     speechEnabled,
     refreshImage,
@@ -400,6 +462,7 @@ export function useMediaSettingsData(): UseMediaSettingsDataResult {
     refreshAll,
     saveImageConfig,
     saveVideoConfig,
+    saveSpeechGenConfig,
     saveSpeechConfig,
   };
 }

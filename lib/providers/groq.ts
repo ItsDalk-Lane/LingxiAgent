@@ -12,4 +12,20 @@ export const groqPlugin = {
   authType: "api-key",
   defaultBaseUrl: "https://api.groq.com/openai/v1",
   defaultApi: "openai-completions",
+  capabilities: {
+    media: {
+      speechGeneration: {
+        defaultModelId: "playai-tts",
+        models: [
+          {
+            id: "playai-tts",
+            displayName: "PlayAI TTS",
+            protocolId: "openai-audio-speech",
+            inputs: ["text"],
+            outputs: ["audio"],
+          },
+        ],
+      },
+    },
+  },
 };

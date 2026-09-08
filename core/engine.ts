@@ -18,6 +18,7 @@ import os from "os";
 import path from "path";
 import { runMigrations } from "./migrations.ts";
 import { buildFailedPersonaRenameIndex, migrateAgentPersonaFileNames } from "./agents-md-migration.ts";
+import { migratePinnedMemoryToTenets } from "./pinned-tenets-migration.ts";
 import { healCredentialFileModes } from "./credential-file-healer.ts";
 import { PLUGIN_DATA_DIRNAME } from "./plugin-config.ts";
 import { pruneStaleCredentialBackups } from "./credential-backup-retention.ts";
@@ -41,11 +42,6 @@ import {
 } from "../shared/hana-runtime-paths.ts";
 import { PluginManager } from "./plugin-manager.ts";
 import { EnvChangeLedger } from "./env-change-ledger.ts";
-import { PluginDevService } from "./plugin-dev-service.ts";
-import {
-  createPluginDevTools,
-  registerPluginDevCapabilityDelegates,
-} from "./plugin-dev-tools.ts";
 import { DefaultResourceLoader, SessionManager, SettingsManager } from "../lib/pi-sdk/index.ts";
 import { compactSessionWithCachePreservationRecoveringRuntime } from "./session-compactor.ts";
 import { resolveRequestReasoningLevelForContext } from "./request-reasoning-level.ts";
@@ -200,9 +196,6 @@ import {
 } from "./tool-availability.ts";
 import { TaskRegistry } from "../lib/task-registry.ts";
 import { KnowledgeManager } from "../lib/knowledge/knowledge-manager.ts";
-import { KnowledgeResearchOrchestrator } from "../lib/knowledge/research/knowledge-research-orchestrator.ts";
-import { ResearchStore } from "../lib/knowledge/research/research-store.ts";
-import type { KnowledgeEvidenceSpan } from "../shared/knowledge-evidence.ts";
 import { resolveReadyKnowledgeQueryVariant, type CompiledKnowledgeScope } from "../lib/knowledge/scope-snapshot-compiler.ts";
 import { KnowledgeError } from "../lib/knowledge/errors.ts";
 import { KnowledgeEmbeddingProviderGate } from "../lib/knowledge/ingestion-service.ts";
@@ -211,7 +204,6 @@ import {
   serializeVector,
 } from "../lib/memory/fact-embeddings.ts";
 import type { KnowledgeRetrievalStats } from "../shared/knowledge-refs.ts";
-import { deriveKnowledgeCompletenessPolicy } from "../lib/knowledge/research/completeness-policy.ts";
 import {
   assembleKnowledgeEvidenceManifestEntries,
   type KnowledgeInjectionEvidence,
@@ -222,7 +214,6 @@ import {
   SessionExecutionRegistry,
   wrapWithSessionExecutionCancellation,
 } from "../lib/session-execution-registry.ts";
-import { PluginInstallRecords } from "../lib/plugin-install-records.ts";
 import { ComputerHost } from "./computer-use/computer-host.ts";
 import { ComputerProviderRegistry } from "./computer-use/provider-registry.ts";
 import { createMockComputerProvider } from "./computer-use/providers/mock-provider.ts";
@@ -345,9 +336,6 @@ export class LingxiEngine {
   declare _models: any;
   declare _notifications: any;
   declare _outboundProxyRuntime: any;
-  declare _pluginDevEventBusCleanup: any;
-  declare _pluginDevService: any;
-  declare _pluginInstallRecords: any;
   declare _pluginManager: any;
   declare _prefs: any;
   declare _resourceAccess: any;
@@ -460,7 +448,6 @@ export class LingxiEngine {
     });
     this._modelObservabilityQuery = null;
     this._currentTurnNativeMedia = createCurrentTurnNativeMediaStore();
-    this._pluginInstallRecords = new PluginInstallRecords({ lingxiHome });
     this._automationSuggestionStore = new AutomationSuggestionStore();
     this._sessionCollabDraftStore = new SessionCollabDraftStore();
     // §四十二/§四十三/§四十四 Approval gateway uses the semantic "approval" slot.
@@ -852,8 +839,6 @@ export class LingxiEngine {
 
     // ── Plugin Manager ──
     this._pluginManager = null;  // initialized async in initPlugins()
-    this._pluginDevService = null;
-    this._pluginDevEventBusCleanup = null;
 
     // Pi SDK resources（init 时填充）
     this._resourceLoader = null;
@@ -2763,190 +2748,6 @@ export class LingxiEngine {
     }, evidence: { entries: [], searchedVectorVariants: [] } };
   }
 
-  /** 冻结本轮资料范围后，只走本机检索与原文证据加工。 */
-  async buildFastKnowledgeContext(input: {
-    question: string;
-    knowledgeRefs: { notebookIds: string[]; mode: "fast" };
-    sessionPath: string;
-    turnId?: string | null;
-    signal?: AbortSignal;
-  }): Promise<{ block: string; stats: KnowledgeRetrievalStats; evidence: KnowledgeInjectionEvidence }> {
-    input.signal?.throwIfAborted();
-    const knowledge = this._knowledge;
-    const studioId = this._runtimeContext?.studioId;
-    if (!knowledge || !studioId) {
-      throw new Error("Knowledge is not accessible in this runtime");
-    }
-    const scope = knowledge.createTurnScope({
-      studioId,
-      sessionPath: input.sessionPath,
-      turnId: input.turnId ?? null,
-      notebookIds: input.knowledgeRefs.notebookIds,
-    });
-    const { block, stats, evidence } = await knowledge.runFastKnowledgePipeline({
-      question: input.question, scope, signal: input.signal,
-    });
-    return { block, stats, evidence };
-  }
-
-  /** 详细提问先在只读隔离会话中调查，只有完整或部分完成的已验证证据才交给主会话。 */
-  async buildDetailedKnowledgeResearchContext(input: {
-    question: string;
-    knowledgeRefs: { notebookIds: string[]; mode: "detailed" };
-    sessionId: string;
-    sessionPath: string;
-    agentId: string;
-    turnId: string;
-    signal?: AbortSignal;
-  }): Promise<{ block: string; stats: KnowledgeRetrievalStats; evidence: KnowledgeInjectionEvidence }> {
-    input.signal?.throwIfAborted();
-    const started = performance.now(), knowledge = this._knowledge, studioId = this._runtimeContext?.studioId;
-    const manifest = this.getSessionManifest(input.sessionId);
-    if (!knowledge || !studioId || input.knowledgeRefs.mode !== "detailed" || !input.turnId?.trim()
-      || this.getSessionIdForPath(input.sessionPath) !== input.sessionId || manifest?.lifecycle !== "active"
-      || manifest.ownerAgentId !== input.agentId || path.resolve(manifest.currentLocator.path) !== path.resolve(input.sessionPath)) {
-      throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Detailed research requires the active parent session and its Agent");
-    }
-    const previousScope = knowledge.store.db.prepare(`SELECT id FROM knowledge_turn_scopes
-      WHERE studio_id = ? AND session_path = ? AND turn_id = ? ORDER BY created_at DESC, id LIMIT 1`)
-      .get(studioId, input.sessionPath, input.turnId) as { id: string } | undefined;
-    const frozen = previousScope ? knowledge.getTurnScope({ scopeId: previousScope.id }) : null;
-    const notebookKey = (ids: string[]) => JSON.stringify([...new Set(ids)].sort());
-    if (frozen && (frozen.status !== "active" || notebookKey(frozen.notebookIds) !== notebookKey(input.knowledgeRefs.notebookIds))) {
-      throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "A repeated turn cannot replace its frozen research scope");
-    }
-    const scope = frozen ?? knowledge.createTurnScope({ studioId, sessionPath: input.sessionPath, turnId: input.turnId,
-      notebookIds: input.knowledgeRefs.notebookIds });
-    const compiledScope = await knowledge.compileTurnScope(scope);
-    const previousRun = knowledge.store.db.prepare("SELECT question FROM knowledge_research_runs WHERE turn_scope_id = ? LIMIT 1")
-      .get(scope.id) as { question: string } | undefined;
-    if (previousRun && previousRun.question !== input.question) {
-      throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "A repeated research turn cannot replace its question");
-    }
-    const scopeCompileMs = performance.now() - started;
-    const research = new ResearchStore(knowledge.store);
-    const modes = new Set<"fts" | "hybrid">(), backends = new Set<"hnsw" | "portable" | "none">();
-    const searchedVectorVariants = new Map<string, KnowledgeInjectionEvidence["searchedVectorVariants"][number]>();
-    let observedSearches = 0;
-    const result = await new KnowledgeResearchOrchestrator({ research,
-      executeIsolated: (prompt, options) => this.executeIsolated(prompt, options),
-      onProgress: event => this.emitEvent(event, input.sessionPath),
-      onSearchCompleted: summary => {
-        observedSearches++; modes.add(summary.mode); backends.add(summary.vectorBackend);
-        for (const variant of summary.searchedVectorVariants) searchedVectorVariants.set(variant.vectorIndexVariantId, variant);
-      },
-    }).run({ question: input.question, compiledScope,
-      policy: { mode: "detailed", path: "detailed_research", responseDetail: "detailed", retrievalDeadlineMs: null,
-        completenessPolicy: deriveKnowledgeCompletenessPolicy({ mode: "detailed", question: input.question,
-          selectedNotebookCount: scope.notebookIds.length, selectedSourceCount: scope.sources.length }) },
-      parentSessionId: input.sessionId, parentSessionPath: input.sessionPath, agentId: input.agentId,
-      turnId: input.turnId, signal: input.signal,
-    });
-    input.signal?.throwIfAborted();
-    if (result.run.status === "cancelled") throw new DOMException("Knowledge research was cancelled", "AbortError");
-    if (result.run.status !== "completed" && result.run.status !== "partial") {
-      if (research.listRounds(result.run.id).at(-1)?.errorCode === "KNOWLEDGE_MODEL_UNAVAILABLE") {
-        throw new KnowledgeError("KNOWLEDGE_MODEL_UNAVAILABLE", "模型当前不可用或连接失败，详细调查无法继续。请检查所选模型的配置和网络连接。", {
-          runId: result.run.id, status: result.run.status, stopReason: result.run.stopReason,
-        });
-      }
-      throw new KnowledgeError("KNOWLEDGE_RETRIEVAL_UNAVAILABLE", "Detailed research could not produce an answer context", {
-        runId: result.run.id, status: result.run.status, stopReason: result.run.stopReason,
-      });
-    }
-    const assembleStarted = performance.now();
-    const evidence = this.buildResearchInjectionEvidence(compiledScope, result.packet.canonicalEvidenceSpans);
-    evidence.searchedVectorVariants = [...searchedVectorVariants.values()];
-    const actions = research.listActions(result.run.id), searches = actions.filter(action => action.actionType === "knowledge_search");
-    const missingHistoricalMode = searches.filter(action => action.status === "completed" && action.errorCode === null).length > observedSearches;
-    const needs = result.packet.needs, run = result.run;
-    const unresolved = needs.filter(need => !["supported", "not_applicable"].includes(need.status));
-    const reasons = [...compiledScope.warnings, ...(run.degradedReason ? [run.degradedReason] : []),
-      ...(run.status === "partial" ? [run.stopReason ?? "partial"] : []),
-      ...(result.packet.truncated ? ["research_evidence_packet_truncated"] : []),
-      // 恢复只合成而没有本次检索记录时，不从模型配置猜历史实际检索方式。
-      ...(missingHistoricalMode ? ["recovered_retrieval_mode_unavailable"] : [])];
-    const stats: KnowledgeRetrievalStats = {
-      mode: "detailed", executionPath: "detailed_research", scopeId: scope.id,
-      retrievalMode: missingHistoricalMode ? "none" : modes.has("hybrid") ? "hybrid" : modes.has("fts") ? "fts" : "none",
-      vectorBackend: missingHistoricalMode ? "none" : backends.has("hnsw") ? "hnsw" : backends.has("portable") ? "portable" : "none",
-      searchCalls: run.searchCalls, readCalls: run.readCalls, grepCalls: run.grepCalls,
-      subQueries: searches.map(action => String(action.requestSummary.query ?? "")),
-      subQueryHits: searches.map(action => Number(action.responseSummary?.count ?? 0)),
-      fusedChunks: new Set(searches.flatMap(action => Array.isArray(action.responseSummary?.hitIds) ? action.responseSummary.hitIds : [])).size,
-      injectedChunks: result.packet.canonicalEvidenceSpans.length,
-      degraded: reasons.length > 0, ...(reasons.length ? { degradeReason: [...new Set(reasons)].join("; ") } : {}),
-      truncated: result.packet.truncated, usedTokens: result.usedTokens, budgetTokens: run.budget.finalEvidenceBudgetTokens,
-      deadlineMs: run.budget.maxWallClockMs, deadlineExceeded: run.stopReason === "wall_clock_exhausted", scopeCompileMs,
-      research: { runId: run.id, status: run.status, completenessPolicy: run.completenessPolicy,
-        rounds: run.roundsCompleted, toolCalls: run.toolCallsUsed, delegatedAgents: run.delegatedAgents,
-        needsTotal: needs.length, needsSupported: needs.filter(need => need.status === "supported").length,
-        needsPartial: needs.filter(need => need.status === "partial").length,
-        needsConflicted: needs.filter(need => need.status === "conflicted").length,
-        unresolvedNeedIds: unresolved.map(need => need.id), stopReason: run.stopReason ?? "partial" },
-      results: result.packet.canonicalEvidenceSpans.map((span, index) => ({ ordinal: index + 1, sourceName: span.sourceName,
-        chunkOrdinal: (evidence.entries.find(entry => entry.citationLabels.includes(`K${index + 1}`))?.ordinal ?? 0) + 1,
-        firstLine: span.text.split("\n")[0].slice(0, 240) })),
-      stageTimings: { assembleMs: performance.now() - assembleStarted, totalMs: performance.now() - started },
-    };
-    return { block: result.block, stats, evidence };
-  }
-
-  /** 扫描凭据可能没有分块编号，只允许映射到冻结解析产物中真实存在且完整覆盖引文的分块。 */
-  private buildResearchInjectionEvidence(scope: CompiledKnowledgeScope, spans: KnowledgeEvidenceSpan[]): KnowledgeInjectionEvidence {
-    const index = this._knowledge.indexStore;
-    const cached = new Map<string, ReturnType<typeof index.listVariantChunks>>();
-    const entries = new Map<string, KnowledgeInjectionEvidence["entries"][number]>();
-    for (const [ordinal, span] of spans.entries()) {
-      const source = scope.sources.find(source => source.sourceId === span.sourceId
-        && source.contentSnapshotId === span.contentSnapshotId && source.parseArtifactId === span.parseArtifactId);
-      if (!source || span.endOffset - span.startOffset !== span.text.length
-        || createHash("sha256").update(span.text).digest("hex") !== span.textSha256) {
-        throw new KnowledgeError("KNOWLEDGE_SCOPE_VIOLATION", "Research evidence differs from its frozen source");
-      }
-      let mapped = false;
-      for (const notebook of scope.notebooks.filter(notebook => source.notebookIds.includes(notebook.notebookId) && notebook.chunkProfileHash)) {
-        const variant = resolveReadyKnowledgeQueryVariant({ store: this._knowledge.store, indexStore: index,
-          parseArtifactId: span.parseArtifactId, chunkProfileHash: notebook.chunkProfileHash!, readyChunkVariantIds: scope.readyChunkVariantIds });
-        if (!variant || !scope.readyChunkVariantIds.includes(variant.id)
-          || (span.chunkIndexVariantId && span.chunkIndexVariantId !== variant.id)) continue;
-        let chunks = cached.get(variant.id);
-        if (!chunks) { chunks = index.listVariantChunks(variant.id); cached.set(variant.id, chunks); }
-        const matches = chunks.flatMap(chunk => chunk.spans.filter(location => location.blockId === span.blockId
-          && location.blockStartOffset < span.endOffset && location.blockEndOffset > span.startOffset).map(location => {
-          const start = Math.max(span.startOffset, location.blockStartOffset), end = Math.min(span.endOffset, location.blockEndOffset);
-          return { chunk, start, end, location: { blockId: span.blockId, blockStartOffset: start, blockEndOffset: end,
-            chunkStartOffset: location.chunkStartOffset + start - location.blockStartOffset,
-            chunkEndOffset: location.chunkStartOffset + end - location.blockStartOffset } };
-        })).sort((a, b) => a.start - b.start || a.end - b.end || a.chunk.ordinal - b.chunk.ordinal);
-        let covered = span.startOffset;
-        for (const match of matches) {
-          if (match.start > covered) break;
-          if (match.chunk.text.slice(match.location.chunkStartOffset, match.location.chunkEndOffset)
-            !== span.text.slice(match.start - span.startOffset, match.end - span.startOffset)) {
-            throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Research quote mapping differs from canonical text");
-          }
-          covered = Math.max(covered, match.end);
-        }
-        if (covered < span.endOffset) continue;
-        for (const match of matches) {
-          let entry = entries.get(match.chunk.id);
-          if (!entry) {
-            entry = { chunkId: match.chunk.id, ordinal: match.chunk.ordinal, sourceId: span.sourceId,
-              parseArtifactId: span.parseArtifactId, chunkIndexVariantId: variant.id, chunkProfileHash: variant.chunkProfileHash,
-              notebookId: notebook.notebookId, contextOnly: false, citationLabels: [], blockSpans: [] };
-            entries.set(match.chunk.id, entry);
-          }
-          const label = `K${ordinal + 1}`;
-          if (!entry.citationLabels.includes(label)) entry.citationLabels.push(label);
-          if (!entry.blockSpans.some(existing => JSON.stringify(existing) === JSON.stringify(match.location))) entry.blockSpans.push(match.location);
-        }
-        mapped = true; break;
-      }
-      if (!mapped) throw new KnowledgeError("KNOWLEDGE_INDEX_INVALID", "Validated research evidence has no complete frozen index mapping");
-    }
-    return { entries: [...entries.values()], searchedVectorVariants: [] };
-  }
 
   /**
    * EvidenceManifest 持久化门面（任务书 §六十七，schema v15）：desktop-session-submit
@@ -3153,13 +2954,6 @@ export class LingxiEngine {
   }
   getSidebarUiPrefs() { return this._prefs.getSidebarUiPrefs(); }
   setSidebarUiPrefs(partial) { return this._prefs.setSidebarUiPrefs(partial); }
-  getPluginUiPrefs() { return this._prefs.getPluginUiPrefs(); }
-  setPluginUiPrefs(partial) { return this._prefs.setPluginUiPrefs(partial); }
-  getPluginDevToolsEnabled() { return this._prefs.getPluginDevToolsEnabled(); }
-  setPluginDevToolsEnabled(value) { return this._prefs.setPluginDevToolsEnabled(value); }
-  getPluginInstallRecord(pluginId) { return this._pluginInstallRecords.get(pluginId); }
-  recordPluginInstall(record) { return this._pluginInstallRecords.recordInstall(record); }
-  removePluginInstallRecord(pluginId) { return this._pluginInstallRecords.remove(pluginId); }
   getTimezone() { return this._prefs.getTimezone(); }
   setTimezone(tz) { this._prefs.setTimezone(tz); }
   getUpdateChannel() { return this._prefs.getUpdateChannel(); }
@@ -3519,6 +3313,13 @@ export class LingxiEngine {
       }
     }, log);
 
+    // 0g. 置顶记忆并入「置顶与原则」库（tenets）。同样必须在 agent 初始化之前
+    // 跑完：之后 pinned.md 不再是读取源，注入只认 tenets.json。每次启动都跑：
+    // 迁移幂等（已改名 .migrated 的目录直接跳过）。
+    runBestEffortStartupMigrationStep("pinned-tenets-merge", () => {
+      migratePinnedMemoryToTenets(this.lingxiHome);
+    }, log);
+
     this._runtimeContext = createServerRuntimeContext({
       lingxiHome: this.lingxiHome,
       appVersion: this.appVersion,
@@ -3745,7 +3546,7 @@ export class LingxiEngine {
     // 10. 文件历史：按各 agent 的工作区根目录建立/同步快照 watcher
     this.refreshFileHistoryWorkspaces();
 
-    // 11. 知识摄入管线（替代 Phase 1 删除的 resumeResearchRuns 点位）：启动恢复
+    // 11. 知识摄入管线：启动恢复
     // running 残留、接管 queued 存量；模型已于步骤 4 就绪，立即补跑待嵌入 job。
     // 模型/provider/嵌入偏好的运行期变更经 onProviderChanged / setSharedModels
     // 两个收敛点通知（见各自注释）。同点位启动 file 源 watcher：扫描全部活跃
@@ -3801,9 +3602,7 @@ export class LingxiEngine {
           }
         }
       }
-      this._pluginDevEventBusCleanup?.();
-      this._pluginDevEventBusCleanup = null;
-      this._media?.dispose?.();
+        this._media?.dispose?.();
       await this._mcp?.dispose?.();
       this._skills?.unwatch();
       this._deferredResultCoordinator?.dispose?.();
@@ -3854,12 +3653,22 @@ export class LingxiEngine {
     this._media?.start?.(bus);
     await this._mcp?.start?.(bus);
     const builtinPluginsDir = path.join(this.productDir, "..", "plugins");
-    const userPluginsDir = path.join(this.lingxiHome, "plugins");
-    const devPluginsDir = path.join(this.lingxiHome, "plugins-dev");
-    const pluginDevRunsDir = path.join(this.lingxiHome, "plugin-dev-runs");
-    const pluginDevSourcesDir = path.join(this.lingxiHome, "plugin-dev-sources");
     const pluginDataDir = path.join(this.lingxiHome, PLUGIN_DATA_DIRNAME);
-    fs.mkdirSync(pluginDevSourcesDir, { recursive: true });
+
+    // 第三方插件生态已退役：数据目录里的旧用户插件不再加载。只记录告知日志，
+    // 不删除用户数据——目录内容的处置权留给用户。
+    const legacyUserPluginsDir = path.join(this.lingxiHome, "plugins");
+    try {
+      if (fs.existsSync(legacyUserPluginsDir)) {
+        const legacy = fs.readdirSync(legacyUserPluginsDir, { withFileTypes: true })
+          .filter((e) => e.isDirectory() && !e.name.startsWith("."));
+        if (legacy.length > 0) {
+          moduleLog.warn(`[plugins] ${legacy.length} legacy user plugin(s) under ${legacyUserPluginsDir} are no longer loaded (third-party plugin ecosystem retired): ${legacy.map((e) => e.name).join(", ")}`);
+        }
+      }
+    } catch {
+      // 探测失败不影响启动。
+    }
 
     // Read app version for plugin compatibility check
     let appVersion = "0.0.0";
@@ -3872,7 +3681,7 @@ export class LingxiEngine {
     this.appVersion = appVersion;
 
     this._pluginManager = new PluginManager({
-      pluginsDirs: [builtinPluginsDir, userPluginsDir],
+      pluginsDirs: [builtinPluginsDir],
       pluginsDir: undefined,
       dataDir: pluginDataDir,
       bus,
@@ -3889,24 +3698,8 @@ export class LingxiEngine {
       slashRegistry: this._slashSystem?.registry ?? null,
       loadTimeoutMs: undefined,
       lifecycleTimeoutMs: undefined,
-      logSink: (entry) => this._pluginDevService?.recordLog(entry),
       runtimeContext: this.getRuntimeContext(),
     });
-    const allowedPluginDevSourceRoots = [
-      pluginDevSourcesDir,
-      this.homeCwd,
-      process.cwd(),
-      path.resolve(this.productDir, ".."),
-    ].filter((dir) => typeof dir === "string" && dir.trim());
-    this._pluginDevService = new PluginDevService({
-      pluginManager: this._pluginManager,
-      devPluginsDir,
-      runDataDir: pluginDevRunsDir,
-      allowedSourceRoots: allowedPluginDevSourceRoots,
-      syncPluginExtensions: () => this.syncPluginExtensions(),
-    });
-    this._pluginDevEventBusCleanup?.();
-    this._pluginDevEventBusCleanup = this._pluginDevService.registerEventBusHandlers(bus);
     this._pluginManager.scan();
     await this._pluginManager.loadAll();
 
@@ -3961,7 +3754,6 @@ export class LingxiEngine {
   }
 
   get pluginManager() { return this._pluginManager; }
-  get pluginDevService() { return this._pluginDevService; }
 
   /** 插件热操作后调用，同步 extension factories 到 ResourceLoader */
   async syncPluginExtensions() {
@@ -4391,32 +4183,12 @@ export class LingxiEngine {
         gateway: deferPlan.invocationGateway,
       });
     }
-    const pluginDevTools = this._pluginDevService && this._prefs.getPluginDevToolsEnabled?.() === true
-      ? createPluginDevTools({
-          pluginDevService: this._pluginDevService,
-          getAgentId: () => agentId,
-          invocationGateway,
-          resolveChatToolTarget: (pluginId, toolName) => {
-            const target = invocationGateway.resolveTarget({ serverId: pluginId, toolName });
-            const registered = registeredPluginTargets.find(
-              (entry) => entry.target.identity.targetId === target.identity.targetId,
-            );
-            if (registered?.runtimeTool?._pluginSource !== "dev") return null;
-            return this._pluginDevService.isChatToolTargetCurrentlyAvailable(
-              pluginId,
-              target.identity.publicName,
-            ) ? target : null;
-          },
-        })
-      : [];
-    registerPluginDevCapabilityDelegates(pluginDevTools, { gateway: invocationGateway });
     assertUniqueBuiltToolNames([
       { source: "custom tools", tools: baseCustomTools },
       { source: "extra custom tools", tools: extraCustomTools },
       { source: "plugin tools", tools: directPluginTools },
       { source: "mcp tools", tools: [...directMcpTools, ...mcpHostTools] },
       { source: "mcp bridge tools", tools: bridgeTools },
-      { source: "plugin development tools", tools: pluginDevTools },
     ]);
     const allTools = filterToolObjectsByAvailability(
       [
@@ -4425,7 +4197,6 @@ export class LingxiEngine {
         ...directMcpTools,
         ...wrappedMcpHostTools,
         ...wrappedBridgeTools,
-        ...pluginDevTools,
       ],
       toolAgent?.config || {},
       toolAvailabilityContext,
