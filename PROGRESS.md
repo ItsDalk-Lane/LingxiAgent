@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 91ea310013e66cd84e334a4e14603ef33b664cc6  (2026-09-08 C01–C03+CI 修复源码候选：分支 refactor/dismantle-and-voice-features)
+VERIFIED_SOURCE_SHA   = a79f465215dd8eaa56ed54f6ce0d0fafae9c57f0  (2026-09-08 C01–C03+CI+Windows 兼容修复源码候选：分支 refactor/dismantle-and-voice-features)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1012,6 +1012,11 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
 
 - 固定源码候选：`91ea310013e66cd84e334a4e14603ef33b664cc6`（94c71d7a + ci.yml build:packages 步骤移除 + ci-workflow-guards 顺序不变量更新 + create-round3-patch 自嵌套修复 + 证据重冻结）。PR #47 四平台 CI 首跑暴露 04f90d2b 拆除 packages 工作区后 ci.yml 残留引用；本地按 CI 顺序预演后续步骤（knowledge 烟测/renderer/server:open+smoke）全绿。
 - 验证证据（绑定该候选树）：全量 13441 passed / 0 实质失败（j32，A08 为已知负载抖动、单跑 13/13 绿）；round2 manifest 29ad19e3（s18/s19 绿门禁）；round3 manifest 3ce0c8a4（j31 补丁重放 VERIFIED，19MB 无自嵌套）；提交后独立检出证据 30/30 绿。
+
+## 2026-09-08 Windows 平台兼容修复候选与封印推进（round3 收尾 II）
+
+- 固定源码候选：`a79f465215dd8eaa56ed54f6ce0d0fafae9c57f0`（f15e8b29 基础上：语音适配器盘符路径/脚本 helper 拉起 + 闭包 allowlist 与基线、恢复 CLI pathToFileURL、迁移故障与构建合同测试的 Windows 语义夹具、交付补丁脚本 index-blob 对称防 CRLF 漂移）。PR #47 Windows 首跑 19 项失败全部定位与修复；其余三平台 CI 已绿。
+- 验证证据（绑定该候选树）：受影响 9 文件 106 项 + 闭包/边界 38 项绿；全量 13443 passed / 0 failed（j36）；round2 manifest af8090bb（s20/s21 绿门禁）；round3 manifest 016f1cb9（j35 补丁重放 VERIFIED）；提交后独立检出 4 文件 50/50 绿。
 
 ### Known limitation（保留）
 
