@@ -123,6 +123,12 @@ def main() -> None:
     try:
         subprocess.run(["git", "read-tree", BASE], cwd=ROOT, env=env, check=True)
         subprocess.run(["git", "add", "-A", "--", "."], cwd=ROOT, env=env, check=True)
+        # 防自我嵌套：补丁输出文件不得进入补丁（否则每代嵌入上一代，体积递归膨胀）。
+        # 用 rm --cached 把它从 temp index 摘掉（reset 会回到 HEAD 版本，仍会嵌入）。
+        subprocess.run(
+            ["git", "rm", "--cached", "-q", "--ignore-unmatch", "--", str(PATCH.relative_to(ROOT))],
+            cwd=ROOT, env=env, check=True,
+        )
         patch = subprocess.check_output(
             ["git", "diff", "--binary", "--cached", BASE], cwd=ROOT, env=env
         )

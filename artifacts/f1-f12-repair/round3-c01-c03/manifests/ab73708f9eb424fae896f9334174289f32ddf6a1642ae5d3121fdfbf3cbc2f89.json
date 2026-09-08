@@ -78,7 +78,7 @@
     {
       "bytes": 54382,
       "path": ".sync-audit/build-sync-matrix.mjs",
-      "sha256": "98a945738127f5cac272f7aea4864c59070c03d5e109efcaed65a8edcbcba6ae"
+      "sha256": "f918467c243b309ce40561713733834a453c04e2a969ff8627573e596e0fc2e8"
     },
     {
       "bytes": 16534,
@@ -113,12 +113,12 @@
     {
       "bytes": 80341,
       "path": ".sync-audit/upstream-sync-matrix.json",
-      "sha256": "eb78ff29283fa11bfcbffba0a00ad2b9e10a78e6243fb1e93243bd732632911e"
+      "sha256": "80db401e5960ee2c4ba62f75957ec1a864ebf512c8f9e3aca76e5fcb5f6041aa"
     },
     {
       "bytes": 41,
       "path": ".sync-audit/verified-source-sha.txt",
-      "sha256": "5b71d505159eafc40623b1571c0bb4f6fcbe447dc69438716e24e677d7eecc32"
+      "sha256": "2cd1f0ca557d04b0e293319f195cb518e41f4f77e761de545d8ba3a17bcd900d"
     },
     {
       "bytes": 4111,
@@ -141,9 +141,9 @@
       "sha256": "0e1c839ef037341be3443f1d2baf3112d983dceb0d3183741c1f9218b09d5b07"
     },
     {
-      "bytes": 177358,
+      "bytes": 176710,
       "path": "PROGRESS.md",
-      "sha256": "fb0defef76127cb1d1d87493d8d3a87717b9b648b30ed467200b5ffffad63506"
+      "sha256": "c54078dae19308859202d7cfa75e6f29b1afbc9af201d97935ed2e420acc5ab6"
     },
     {
       "bytes": 12958,
@@ -166,14 +166,14 @@
       "sha256": "ee8ea30bc27b68baabba0f2eb897b7f5b25c5db27a5322e2019059c4f8391f7e"
     },
     {
-      "bytes": 10425,
+      "bytes": 10559,
       "path": "UPSTREAM_SYNC_AUDIT.md",
-      "sha256": "67208d2ebf37e3fe0a7f527baec45d0055b17af123319fd2411f4138e5cbc093"
+      "sha256": "e2ffad04ac813e324a6044617ee89fa2ee60286fb3bb597515b51952dc707b4d"
     },
     {
       "bytes": 34956,
       "path": "UPSTREAM_SYNC_MATRIX.md",
-      "sha256": "17ac58c1d3bbfbd24d06c076e3d7c1e1a413d663e5facb88da73b45aaafdfebd"
+      "sha256": "ab95d4668c41f996469f74c4fc97e82dfe00f3fcbf11eca4f31ee9d6f52cdaf1"
     },
     {
       "bytes": 4701,
@@ -186,9 +186,9 @@
       "sha256": "576ad9902037f3dded9c1291c9b48ad594daa7f0f8d32ef4c70151256de45358"
     },
     {
-      "bytes": 6286,
+      "bytes": 5881,
       "path": "artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py",
-      "sha256": "bc4a97502a522a99360f968674a69854da78707c072cafcfa5a93f91121a30a9"
+      "sha256": "54deefb64c8a492fa862ecac301fb9f0b76ba453526a06f2328e81fb842a6eba"
     },
     {
       "bytes": 3806,

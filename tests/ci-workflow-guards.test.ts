@@ -116,11 +116,11 @@ describe("Knowledge 四平台运行与打包烟测已接入正式流水线", () 
 
   it("普通 CI 在全量测试前运行 Knowledge 新建、重启和崩溃恢复烟测", () => {
     const steps = ci.jobs.test?.steps ?? [];
-    const packageIndex = steps.findIndex(step => stepRun(step).includes("build:packages"));
+    // packages/* 工作区已随插件生态拆除移除（04f90d2b），build:packages 步骤同步
+    // 退场；此处的顺序不变量保留：烟测必须先于全量测试。
     const smokeIndex = steps.findIndex(step => stepRun(step).includes("test:knowledge-platform-smoke"));
     const fullIndex = steps.findIndex(step => stepRun(step).includes("npm test"));
-    expect(packageIndex).toBeGreaterThanOrEqual(0);
-    expect(smokeIndex).toBeGreaterThan(packageIndex);
+    expect(smokeIndex).toBeGreaterThanOrEqual(0);
     expect(fullIndex).toBeGreaterThan(smokeIndex);
   });
 

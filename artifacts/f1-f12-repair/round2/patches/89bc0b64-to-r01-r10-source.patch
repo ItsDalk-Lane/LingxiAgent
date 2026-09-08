@@ -1,3 +1,17 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 679670f1ab7792548d6c22d72894160ab13c3537..8075d4eaf28bbbb881c36fe3ad47aa14e16c22ef 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -83,9 +83,6 @@ jobs:
+       - name: Lint
+         run: npm run lint
+ 
+-      - name: Build packages
+-        run: npm run build:packages
+-
+       - name: Run Knowledge platform smoke
+         run: npm run test:knowledge-platform-smoke
+ 
 diff --git a/.gitignore b/.gitignore
 index af3647c779dad1edd9042249023ada0cb0c81372..e742177ba5684eb2fbcf41e0997aa452aec265b1 100644
 --- a/.gitignore
@@ -26,7 +40,7 @@ index af3647c779dad1edd9042249023ada0cb0c81372..e742177ba5684eb2fbcf41e0997aa452
  .codex/
  
 diff --git a/.sync-audit/build-sync-matrix.mjs b/.sync-audit/build-sync-matrix.mjs
-index d978251370637d720d11094c068847b151ae235e..2d33578f629f5821a3b3d88ec81696288b172fe0 100644
+index d978251370637d720d11094c068847b151ae235e..188240655c1f60876e2d15137a20aab56b727ce3 100644
 --- a/.sync-audit/build-sync-matrix.mjs
 +++ b/.sync-audit/build-sync-matrix.mjs
 @@ -40,7 +40,7 @@ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source
@@ -34,12 +48,12 @@ index d978251370637d720d11094c068847b151ae235e..2d33578f629f5821a3b3d88ec8169628
  // 该 commit 早于记录它的审计提交落地，无自引用（SHA = hash(contents)）问题。
  // 当前 branch HEAD 可能在其后存在纯审计 seal 提交，HEAD 由 Git ref 自身标识。
 -const VERIFIED_SOURCE_SHA = "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202";
-+const VERIFIED_SOURCE_SHA = "7cf986236cb8ac5c2d22cce1e5882554a42cff28";
++const VERIFIED_SOURCE_SHA = "f15e8b29de77f7e42b314f15892f40b90b93a668";
  
  const ALLOWED_DISPOSITIONS = ["ADOPTED", "ADAPTED", "REGENERATED", "INTENTIONAL_DIVERGENCE"];
  
 diff --git a/.sync-audit/upstream-sync-matrix.json b/.sync-audit/upstream-sync-matrix.json
-index d6f8692829bc71ee97c3253e5482beabfdb51324..bb956cc615ed9c2d5e5a5e97ac117d410e6a0aad 100644
+index d6f8692829bc71ee97c3253e5482beabfdb51324..d9521b32c6ba90a6b5b3f2bb07a566d2351ce882 100644
 --- a/.sync-audit/upstream-sync-matrix.json
 +++ b/.sync-audit/upstream-sync-matrix.json
 @@ -4,7 +4,7 @@
@@ -47,19 +61,19 @@ index d6f8692829bc71ee97c3253e5482beabfdb51324..bb956cc615ed9c2d5e5a5e97ac117d41
      "L0": "97595264ead8735a04559507ddaade25db8a4e15",
      "L1": "ca0b417e36a6a1f80947458aaed328a25718e41b",
 -    "VERIFIED_SOURCE_SHA": "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202"
-+    "VERIFIED_SOURCE_SHA": "7cf986236cb8ac5c2d22cce1e5882554a42cff28"
++    "VERIFIED_SOURCE_SHA": "f15e8b29de77f7e42b314f15892f40b90b93a668"
    },
    "summary": {
      "total": 133,
 diff --git a/.sync-audit/verified-source-sha.txt b/.sync-audit/verified-source-sha.txt
-index 78c76634c4edc5a8962212273a593e3ddf8bd28d..b4c4d081e85f36f7ec4fd42fd88fa746dcc83679 100644
+index 78c76634c4edc5a8962212273a593e3ddf8bd28d..298a9d3f69b2bb7b8de8cbaa39c4f0a4d6c0c760 100644
 --- a/.sync-audit/verified-source-sha.txt
 +++ b/.sync-audit/verified-source-sha.txt
 @@ -1 +1 @@
 -04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+7cf986236cb8ac5c2d22cce1e5882554a42cff28
++f15e8b29de77f7e42b314f15892f40b90b93a668
 diff --git a/PROGRESS.md b/PROGRESS.md
-index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..326686492099f6cbc538884efcb19ae3c1f322a0 100644
+index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..e6761ae8e9c4e21e7fa9cd173557ab081071880d 100644
 --- a/PROGRESS.md
 +++ b/PROGRESS.md
 @@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
@@ -67,11 +81,32 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..326686492099f6cbc538884efcb19ae3
  LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
  LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
 -VERIFIED_SOURCE_SHA   = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202  (2026-09-07 拆除与语音改造+三 bug 修复封印：分支 refactor/dismantle-and-voice-features)
-+VERIFIED_SOURCE_SHA   = 7cf986236cb8ac5c2d22cce1e5882554a42cff28  (2026-09-08 R01–R10 修复源码候选：分支 refactor/dismantle-and-voice-features)
++VERIFIED_SOURCE_SHA   = f15e8b29de77f7e42b314f15892f40b90b93a668  (2026-09-08 C01–C03+CI 修复源码候选：分支 refactor/dismantle-and-voice-features)
  历史上游同步工作分支  = feature/upstream-sync-0.447.4
  历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
  ```
-@@ -1503,3 +1503,13 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
+@@ -994,6 +994,20 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
+ 需要提交才能完成的封印留待相应授权步骤。不得为使检查变绿而虚报坐标、扩大白名单，
+ 或删除 seal 文件与 guard 测试；退役门禁属于另需明确授权的治理变更。
+ 
++## 2026-09-08 C01–C03 修复源码候选与审计封印（round3）
++
++- 固定源码候选：`94c71d7afdcad8ef8be0ae930d5fbc3291aac976`；基线 `67dee5d2de9d3b9fc75ec5ef5c555e93c65b3ccd`；分支 `refactor/dismantle-and-voice-features`。候选源码 manifest SHA-256 为 `edb36fefbd8f59c2d848281ae65148bb37f26197f8207724d40698abd1f75240`，提交后独立检出复算一致；round2 交付 manifest（s12/s13 刷新）与 DELIVERY_MANIFEST（217/217）绑定同一棵树。
++- 修复内容：C01 服务端类型化拒绝回执（input_rejected）+ 客户端 rejected_before_acceptance 结算相位与每次尝试身份；C02 收据 backupDir 平台无关存储合同（core/pinned-tenets-backup-dir.ts）+ 旧 Windows 收据兼容解析；C03 round2 121 份原始审计日志按字节交付 + .gitignore 精确例外 + round3 证据/补丁重放/重建验证（证据测试含候选回退语义）。
++- 验证证据（绑定该候选树）：定向 59；round2 交付证据 10/10；受影响回归 313；冻结全量 npm test 13442 passed / 7 skipped / 0 实质失败（j25；A08 抖动单跑 13/13 绿）；typecheck ×3、lint 0 errors、build:client、build:server（一次性签名密钥）；提交后独立检出 4 文件 69/69 绿；候选交付重建（独立 clone + 增量补丁 + npm ci）69/69。逐命令日志与摘要：artifacts/f1-f12-repair/round3-c01-c03/。
++- 平台限制：真实 Windows 客户端、真实供应商、x64 打包实测保留 BLOCKED（详见 C01_C02_C03_TEST_MATRIX.json）。
++
++- 提交后验证（封印推进后）：HEAD `e7b0454e` 下 post-verification diff guard OK（仅 6 审计文件）；封印/矩阵/round2/round3 证据 25/25 绿；候选 94c71d7a 独立检出 manifest 复算一致（edb36fef…）、4 文件 69/69 绿、round2 DELIVERY_MANIFEST 217/217。
++
++## 2026-09-08 CI 步骤修复候选与封印推进（round3 收尾）
++
++- 固定源码候选：`f15e8b29de77f7e42b314f15892f40b90b93a668`（94c71d7a + ci.yml build:packages 步骤移除 + ci-workflow-guards 顺序不变量更新 + 证据重冻结）。PR #47 四平台 CI 首跑暴露 04f90d2b 拆除 packages 工作区后 ci.yml 残留引用；本地按 CI 顺序预演后续步骤全绿。
++- 验证证据（绑定该候选树）：全量 13443 passed / 0 failed（j30）；round2 manifest 454cfbc3（s15/s17 绿门禁）；round3 manifest ab73708f（j29 补丁重放 VERIFIED）；证据/封印 25/25；提交后独立检出证据家族绿。
++
+ ### Known limitation（保留）
+ 
+ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面环境执行安装/升级
+@@ -1503,3 +1517,13 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
  - 派生清单（cli-runtime-closure / open-boundary baseline / shell-surface-manifest / persistence 指纹与 inventory / startup receipt）已在受测工作树重生成并随源码提交；staged diff 密钥模式扫描无命中。
  - 本次封印只同步既有六份审计文件（verified-source-sha.txt / build-sync-matrix.mjs / upstream-sync-matrix.json / UPSTREAM_SYNC_AUDIT.md / UPSTREAM_SYNC_MATRIX.md / 本文件坐标行），矩阵重生成 133 paths 硬校验通过（ADOPTED 25 / ADAPTED 100 / REGENERATED 4 / INTENTIONAL_DIVERGENCE 4）；不合并 main。
  - 未执行/受限：全仓 lint 与 build/package 门禁本轮未跑；系统语音识别端到端未实测（开发终端无语音识别 TCC 授权，helper 正确 fail-closed，打包后首次使用需用户授权）；TTS 云端路径需配置 API key 后实测；三 bug 修复的 dev 环境用户验收仍在进行；正式发布与四平台门禁未启动。
@@ -86,7 +121,7 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..326686492099f6cbc538884efcb19ae3
 +- 最终源码候选 `7cf986236cb8ac5c2d22cce1e5882554a42cff28`，审计封印提交 `62c73f77`；候选 source manifest SHA-256 `c418b3ef2fc475e40ed779f21b8e087b120834e9b673baf2e67c3758138d30d8`。封印后独立 diff guard 与 133 路径矩阵通过，upstream-sync、seal、round2 delivery 三文件 20/20 通过。
 +- 封印后原样 `npm test` exit 0：1334 文件通过 / 1 既有跳过，13384 测试通过 / 7 既有跳过，0 fail，82.80s；日志 `/tmp/lingxi-r01-r10-final-postseal-full-v2.log`。最终审计记录只改本 allowlist 内的 `PROGRESS.md`，不改变受测源码候选。
 diff --git a/UPSTREAM_SYNC_AUDIT.md b/UPSTREAM_SYNC_AUDIT.md
-index adcfa57d8a9836fe12c378f95f7448688d077896..13cee18758b503f843f031a90813616a2d72e613 100644
+index adcfa57d8a9836fe12c378f95f7448688d077896..72534f73524f383a74a087a26cf18d47fe6bc6c5 100644
 --- a/UPSTREAM_SYNC_AUDIT.md
 +++ b/UPSTREAM_SYNC_AUDIT.md
 @@ -15,7 +15,7 @@
@@ -94,12 +129,12 @@ index adcfa57d8a9836fe12c378f95f7448688d077896..13cee18758b503f843f031a90813616a
  | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
  | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
 -| VERIFIED_SOURCE_SHA | `04f90d2b26449d2f3264a5ea2a1a8bd6fb253202` | 2026-09-07 拆除与语音改造+三 bug 修复封印（分支 refactor/dismantle-and-voice-features）；typecheck×3 全绿+全量 13081 用例（唯一失败为无关模块 macOS 临时目录清理竞态 flaky、单跑 10/10 通过）后绑定，验证明细见 PROGRESS.md 最新条目 |
-+| VERIFIED_SOURCE_SHA | `7cf986236cb8ac5c2d22cce1e5882554a42cff28` | 2026-09-08 R01–R10 增量修复源码候选（分支 refactor/dismantle-and-voice-features）；源码 manifest 与 S11 受测树一致，联合冻结、类型、lint、构建与补充全量验证证据见 PROGRESS.md 最新条目 |
++| VERIFIED_SOURCE_SHA | `f15e8b29de77f7e42b314f15892f40b90b93a668` | 2026-09-08 C01–C03+CI 修复源码候选（分支 refactor/dismantle-and-voice-features）；round2 manifest 454cfbc3 / round3 manifest ab73708f 同树冻结，验证证据见 PROGRESS.md 最新条目 |
  
  v0.1.35 仓库内的[功能 CI 记录](artifacts/release-v0.1.35/feature-ci-validation.json)
  对应 `2c835ac77afb1a73cd83816ad3d613297dc770a8`，不单独证明上述发布资料提交重新执行了
 diff --git a/UPSTREAM_SYNC_MATRIX.md b/UPSTREAM_SYNC_MATRIX.md
-index 2f98daf42096994372f834d639551859919c294e..13a3d55a25fe5e8754436ee6b71556240a890431 100644
+index 2f98daf42096994372f834d639551859919c294e..23ac8969f78d5c3721bd27e6704a7d757cb115b2 100644
 --- a/UPSTREAM_SYNC_MATRIX.md
 +++ b/UPSTREAM_SYNC_MATRIX.md
 @@ -10,7 +10,7 @@ U0 = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
@@ -107,7 +142,7 @@ index 2f98daf42096994372f834d639551859919c294e..13a3d55a25fe5e8754436ee6b7155624
  L0 = 97595264ead8735a04559507ddaade25db8a4e15  (Lingxi v0.444.1 同步完成点, PR #2)
  L1 = ca0b417e36a6a1f80947458aaed328a25718e41b  (本轮同步开始时 main)
 -VERIFIED_SOURCE_SHA = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+VERIFIED_SOURCE_SHA = 7cf986236cb8ac5c2d22cce1e5882554a42cff28
++VERIFIED_SOURCE_SHA = f15e8b29de77f7e42b314f15892f40b90b93a668
  ```
  
  ## 统计（脚本计算，禁止人工填写）
@@ -283,10 +318,10 @@ index 0000000000000000000000000000000000000000..4f733b09a73ee30e55811637a9e50674
 +print(log.decode(errors='replace')[-9000:]); print('EVIDENCE',label,'EXIT',p.returncode,'MANIFEST',h); sys.exit(p.returncode)
 diff --git a/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py b/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..8373a3adee6e51c950d3979a223c937947a0fed1
+index 0000000000000000000000000000000000000000..3a7bee09d12fb367a0e826aabe7dd1d9113832c1
 --- /dev/null
 +++ b/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py
-@@ -0,0 +1,153 @@
+@@ -0,0 +1,159 @@
 +#!/usr/bin/env python3
 +"""round3（C01-C03）增量补丁生成与重放验证 — 沿用 round2/create-delivery-patch.py 的
 +temp-index 技法：从干净基线 67dee5d2 read-tree，git add -A 捕获全部非忽略变更
@@ -412,6 +447,12 @@ index 0000000000000000000000000000000000000000..8373a3adee6e51c950d3979a223c9379
 +    try:
 +        subprocess.run(["git", "read-tree", BASE], cwd=ROOT, env=env, check=True)
 +        subprocess.run(["git", "add", "-A", "--", "."], cwd=ROOT, env=env, check=True)
++        # 防自我嵌套：补丁输出文件不得进入补丁（否则每代嵌入上一代，体积递归膨胀）。
++        # 用 rm --cached 把它从 temp index 摘掉（reset 会回到 HEAD 版本，仍会嵌入）。
++        subprocess.run(
++            ["git", "rm", "--cached", "-q", "--ignore-unmatch", "--", str(PATCH.relative_to(ROOT))],
++            cwd=ROOT, env=env, check=True,
++        )
 +        patch = subprocess.check_output(
 +            ["git", "diff", "--binary", "--cached", BASE], cwd=ROOT, env=env
 +        )
@@ -7072,6 +7113,25 @@ index c73c4a02b229740e663b880ad84377db3bfead3d..6b64adb1492eb95049cff6190a79e5a2
  export interface ReservedTagScannerOptions {
    /**
     * 词表外孤儿闭标签形状规则（方言无关兜底）：没有开启记录（协议栈与未知
+diff --git a/tests/ci-workflow-guards.test.ts b/tests/ci-workflow-guards.test.ts
+index 0f46c5dffd86e0cebd2f28f8c0960213135ff92a..d6e34d8101c1cba480e0600d8829a073f1a1dda8 100644
+--- a/tests/ci-workflow-guards.test.ts
++++ b/tests/ci-workflow-guards.test.ts
+@@ -116,11 +116,11 @@ describe("Knowledge 四平台运行与打包烟测已接入正式流水线", ()
+ 
+   it("普通 CI 在全量测试前运行 Knowledge 新建、重启和崩溃恢复烟测", () => {
+     const steps = ci.jobs.test?.steps ?? [];
+-    const packageIndex = steps.findIndex(step => stepRun(step).includes("build:packages"));
++    // packages/* 工作区已随插件生态拆除移除（04f90d2b），build:packages 步骤同步
++    // 退场；此处的顺序不变量保留：烟测必须先于全量测试。
+     const smokeIndex = steps.findIndex(step => stepRun(step).includes("test:knowledge-platform-smoke"));
+     const fullIndex = steps.findIndex(step => stepRun(step).includes("npm test"));
+-    expect(packageIndex).toBeGreaterThanOrEqual(0);
+-    expect(smokeIndex).toBeGreaterThan(packageIndex);
++    expect(smokeIndex).toBeGreaterThanOrEqual(0);
+     expect(fullIndex).toBeGreaterThan(smokeIndex);
+   });
+ 
 diff --git a/tests/helpers/desktop-input-history-fixture.ts b/tests/helpers/desktop-input-history-fixture.ts
 new file mode 100644
 index 0000000000000000000000000000000000000000..1378c84caaa1ecdf766546bd29929a96a013476d

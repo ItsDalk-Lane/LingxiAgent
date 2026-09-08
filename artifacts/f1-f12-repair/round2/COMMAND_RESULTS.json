@@ -3362,5 +3362,152 @@
     "log": "logs/s13-round3-refresh-green.log",
     "logSha256": "1a1deb9920b1895e1f8be03b30d52c10389d23dafbae3076b021af27ae99a95a",
     "sourceManifestHash": "b4bac4f6502728ea6e42c6b0be8c8cad81fdfab1b891e40fc192f6cd59ab7622"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/round2-delivery-evidence.test.ts",
+      "tests/post-verification-audit-seal.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T14:07:26.533567+00:00",
+    "end": "2026-09-08T14:07:30.290317+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 12,
+      "failed": 1,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "2cbc85a0785482086662d83d05eff7075fc198700a5a47e70a0d9194afa56ba2",
+    "log": "logs/s14-ci-fix-gate.log",
+    "logSha256": "4cca15f848628e3356c04f92cea8534b4c90226a68b3d3cbc48976b9ea1b8f57",
+    "sourceManifestHash": "2cbc85a0785482086662d83d05eff7075fc198700a5a47e70a0d9194afa56ba2"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T14:07:46.412567+00:00",
+    "end": "2026-09-08T14:08:09.721263+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "2cbc85a0785482086662d83d05eff7075fc198700a5a47e70a0d9194afa56ba2",
+    "log": "logs/s15-typecheck-gate.log",
+    "logSha256": "1a1deb9920b1895e1f8be03b30d52c10389d23dafbae3076b021af27ae99a95a",
+    "sourceManifestHash": "2cbc85a0785482086662d83d05eff7075fc198700a5a47e70a0d9194afa56ba2"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/round2-delivery-evidence.test.ts",
+      "tests/post-verification-audit-seal.test.ts",
+      "tests/upstream-sync-matrix.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T14:08:09.871290+00:00",
+    "end": "2026-09-08T14:08:13.087909+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "2cbc85a0785482086662d83d05eff7075fc198700a5a47e70a0d9194afa56ba2",
+    "log": "logs/s16-evidence-gate.log",
+    "logSha256": "6bc28083d8b90815f5af40c1f605da5b981e5616d0714cd6ad7638b745fab991",
+    "sourceManifestHash": "2cbc85a0785482086662d83d05eff7075fc198700a5a47e70a0d9194afa56ba2"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T14:10:18.049876+00:00",
+    "end": "2026-09-08T14:10:40.688591+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "454cfbc37ae619f1d075eed4bdd3459bc41f84fefdb1bd78fcf1ceba800a837d",
+    "log": "logs/s17-typecheck-gate.log",
+    "logSha256": "1a1deb9920b1895e1f8be03b30d52c10389d23dafbae3076b021af27ae99a95a",
+    "sourceManifestHash": "454cfbc37ae619f1d075eed4bdd3459bc41f84fefdb1bd78fcf1ceba800a837d"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T14:16:48.668298+00:00",
+    "end": "2026-09-08T14:17:11.333415+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "29ad19e3c3b6a8e96029a7c7fb2b148208c979dad573d92ac36c2220d6852064",
+    "log": "logs/s18-typecheck-gate.log",
+    "logSha256": "1a1deb9920b1895e1f8be03b30d52c10389d23dafbae3076b021af27ae99a95a",
+    "sourceManifestHash": "29ad19e3c3b6a8e96029a7c7fb2b148208c979dad573d92ac36c2220d6852064"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/round2-delivery-evidence.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-08T14:17:11.483732+00:00",
+    "end": "2026-09-08T14:17:14.615085+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "29ad19e3c3b6a8e96029a7c7fb2b148208c979dad573d92ac36c2220d6852064",
+    "log": "logs/s19-evidence-gate.log",
+    "logSha256": "fd45a8e5dcec7f508671eb7590bc4eeb5206e7a7ea9c6259a7593b73103af2fe",
+    "sourceManifestHash": "29ad19e3c3b6a8e96029a7c7fb2b148208c979dad573d92ac36c2220d6852064"
   }
 ]

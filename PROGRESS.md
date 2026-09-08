@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 94c71d7afdcad8ef8be0ae930d5fbc3291aac976  (2026-09-08 C01–C03 修复源码候选：分支 refactor/dismantle-and-voice-features)
+VERIFIED_SOURCE_SHA   = f15e8b29de77f7e42b314f15892f40b90b93a668  (2026-09-08 C01–C03+CI 修复源码候选：分支 refactor/dismantle-and-voice-features)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1002,6 +1002,11 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
 - 平台限制：真实 Windows 客户端、真实供应商、x64 打包实测保留 BLOCKED（详见 C01_C02_C03_TEST_MATRIX.json）。
 
 - 提交后验证（封印推进后）：HEAD `e7b0454e` 下 post-verification diff guard OK（仅 6 审计文件）；封印/矩阵/round2/round3 证据 25/25 绿；候选 94c71d7a 独立检出 manifest 复算一致（edb36fef…）、4 文件 69/69 绿、round2 DELIVERY_MANIFEST 217/217。
+
+## 2026-09-08 CI 步骤修复候选与封印推进（round3 收尾）
+
+- 固定源码候选：`f15e8b29de77f7e42b314f15892f40b90b93a668`（94c71d7a + ci.yml build:packages 步骤移除 + ci-workflow-guards 顺序不变量更新 + 证据重冻结）。PR #47 四平台 CI 首跑暴露 04f90d2b 拆除 packages 工作区后 ci.yml 残留引用；本地按 CI 顺序预演后续步骤全绿。
+- 验证证据（绑定该候选树）：全量 13443 passed / 0 failed（j30）；round2 manifest 454cfbc3（s15/s17 绿门禁）；round3 manifest ab73708f（j29 补丁重放 VERIFIED）；证据/封印 25/25；提交后独立检出证据家族绿。
 
 ### Known limitation（保留）
 
