@@ -65,11 +65,11 @@ describe("release preflight", () => {
   });
 
   it("passes against all fetched tags that belong to the current product", () => {
-    expect(runReleasePreflight({ candidateTag: "v0.1.36" })).toMatchObject({
-      candidateVersion: "0.1.36",
-      historicalMaximumVersion: "0.1.35",
-      historicalMaximumGeneration: 13,
-      candidateGeneration: 14,
+    expect(runReleasePreflight({ candidateTag: "v0.1.37" })).toMatchObject({
+      candidateVersion: "0.1.37",
+      historicalMaximumVersion: "0.1.36",
+      historicalMaximumGeneration: 14,
+      candidateGeneration: 15,
     });
   });
 });
