@@ -3782,5 +3782,26 @@
     "log": "logs/s32-adaptive-gate.log",
     "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
     "sourceManifestHash": "02e803c709714d0b34111e5b6335bc37f3292fb170145534f1b16721a0b72ab4"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-09T03:12:14.540117+00:00",
+    "end": "2026-09-09T03:12:37.865557+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "c0a832fe8afd2b6209b607a89f5f3054f00f138d71712f878a7789ebfca59c37",
+    "log": "logs/s33-budget-gate.log",
+    "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
+    "sourceManifestHash": "c0a832fe8afd2b6209b607a89f5f3054f00f138d71712f878a7789ebfca59c37"
   }
 ]

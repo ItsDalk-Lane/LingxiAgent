@@ -1361,5 +1361,51 @@
     "log": "logs/j56-adaptive-bootstrap.log",
     "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
     "sourceManifestHash": "ae3a16406bb1cdfc091df4a935557a9fe1d0927fb7bd1d6851d83f82085f802c"
+  },
+  {
+    "command": [
+      "npm",
+      "test"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-09T03:12:38.018745+00:00",
+    "end": "2026-09-09T03:14:00.594551+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 13442,
+      "failed": 1,
+      "skipped": 7,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "160fa63e947d1410cd5c646f9a3c604e76bef583b82c415f88269f2dffe3a56b",
+    "log": "logs/j57-budget-full.log",
+    "logSha256": "319806f8fd3bbe08283f0f3136cccbf652a807fae63e40b73b0d32bf6619159a",
+    "sourceManifestHash": "160fa63e947d1410cd5c646f9a3c604e76bef583b82c415f88269f2dffe3a56b"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-09T03:14:17.782734+00:00",
+    "end": "2026-09-09T03:14:40.843593+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "160fa63e947d1410cd5c646f9a3c604e76bef583b82c415f88269f2dffe3a56b",
+    "log": "logs/j58-budget-bootstrap.log",
+    "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
+    "sourceManifestHash": "160fa63e947d1410cd5c646f9a3c604e76bef583b82c415f88269f2dffe3a56b"
   }
 ]
