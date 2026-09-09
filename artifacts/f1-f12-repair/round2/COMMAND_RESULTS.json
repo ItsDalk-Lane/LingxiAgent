@@ -3761,5 +3761,26 @@
     "log": "logs/s31-smokefix-gate.log",
     "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
     "sourceManifestHash": "843c3f662c4e1cfd35126cbcd695dc2cbee7d08846dbd958df7dda310e23958e"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-09T01:02:11.817019+00:00",
+    "end": "2026-09-09T01:02:32.916918+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "02e803c709714d0b34111e5b6335bc37f3292fb170145534f1b16721a0b72ab4",
+    "log": "logs/s32-adaptive-gate.log",
+    "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
+    "sourceManifestHash": "02e803c709714d0b34111e5b6335bc37f3292fb170145534f1b16721a0b72ab4"
   }
 ]
