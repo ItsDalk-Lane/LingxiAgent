@@ -1,90 +1,205 @@
 {
   "schemaVersion": 1,
-  "tag": "v0.1.36",
-  "version": "0.1.36",
-  "previousTag": "v0.1.35",
-  "generatedAt": "2026-09-08T18:08:21.722409Z",
+  "tag": "v0.1.37",
+  "version": "0.1.37",
+  "previousTag": "v0.1.36",
+  "generatedAt": "2026-09-09T13:04:48.377Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "本版本聚焦发送链路的可靠性：服务器明确拒绝的消息现在会立即显示「未发送」并提供重试与放弃，不再悬挂或卡住会话；同时修复了 Windows 迁移收据的跨平台路径兼容。",
-    "en": "This release focuses on send-path reliability: messages explicitly rejected by the server now immediately show as not sent with retry and discard actions instead of hanging or blocking the session, and Windows migration receipt paths are now cross-platform compatible."
+    "zh": "这个版本让外部工具连接更省心：MCP 连接器可以自选连接时机与空闲自动断开，临时掉线不再被误判为故障；聊天里同一张图不再重复显示、视频可以直接播放；排队消息的发送结果更可信；知识引用角标与设置页交互也做了打磨。",
+    "en": "This release makes external tool connections easier: MCP connectors now offer connection lifecycle choices with automatic idle disconnect, and a temporary drop is no longer mistaken for a failure; the same image no longer appears twice in chat and videos play inline; queued message delivery is more trustworthy; knowledge citation badges and settings interactions got a round of polish."
   },
   "counts": {
-    "feature": 0,
-    "fix": 2,
-    "improvement": 0,
+    "feature": 2,
+    "fix": 3,
+    "improvement": 2,
     "migration": 0
   },
   "source": {
     "owner": "ItsDalk-Lane",
     "repo": "LingxiAgent",
-    "commitRange": "v0.1.35..HEAD",
-    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.36",
+    "commitRange": "v0.1.36..c9494ae9b6ec3806898562863d7f25c311d388ab",
+    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.37",
     "releaseNotes": ""
   },
   "items": [
     {
-      "id": "send-rejection-settlement",
-      "kind": "fix",
+      "id": "mcp-connector-lifecycle",
+      "kind": "feature",
       "importance": "high",
       "title": {
-        "zh": "发送被拒绝时立即反馈，消息可重试或放弃",
-        "en": "Immediate feedback when a message is rejected, with retry or discard"
+        "zh": "MCP 连接器可按时启停：四种连接方式与空闲自动断开",
+        "en": "MCP connectors get connection lifecycle choices with automatic idle disconnect"
       },
       "summary": {
-        "zh": "此前消息在切换模型、助手正在忙等被服务器明确拒绝的场景下，气泡会长时间停在「发送中」，还会卡住整个会话无法继续发送。现在服务器会明确告知拒绝原因，消息立即标记为「未发送」并保留全部原文与附件，可一键重试或放弃。",
-        "en": "Previously, when the server clearly rejected a message (for example during a model switch or while the assistant was busy), the bubble could stay in a sending state and block the whole session. The server now reports the rejection immediately: the message is marked as not sent with all text and attachments preserved, and can be retried or discarded in one click."
+        "zh": "每个连接器现在可以分别选择「何时连接」（启动就连，或首次使用才连）和「如何保持」（一直保持，或空闲一段时间后自动断开、下次使用再连）。连接器列表会如实显示「空闲待机」这种有意休息的状态，不再让人误以为出了故障。",
+        "en": "Each connector can now choose when to connect (at launch, or on first use) and how to hold the connection (keep it, or park it after an idle period and start again on the next use). The connector list shows the intentional \"idle\" resting state instead of making it look like a failure."
       },
       "details": [
         {
-          "zh": "服务器拒绝回执带稳定原因码：模型切换中、会话忙、媒体超限、引用的知识库无效等，界面据此给出对应提示与是否可重试。",
-          "en": "Rejection receipts carry stable reason codes (model switching, session busy, media limits, invalid knowledge references) so the UI can show the matching message and retry availability."
+          "zh": "四种组合：保活（启动即连、一直保持）、懒保活（首次使用才连、之后保持）、急着连（启动即连、空闲即断）、懒连接（首次使用才连、空闲即断）。",
+          "en": "Four combinations: keep-alive (connect at launch, hold), lazy keep-alive (connect on first use, then hold), eager (connect at launch, park when idle), and lazy (connect on demand, park when idle)."
         },
         {
-          "zh": "排队消息保持顺序：被拒的队首消息不会被后面的消息插队，处置（重试或放弃）后才继续。",
-          "en": "Queued messages keep their order: a rejected head-of-queue message is not skipped over; the queue proceeds only after it is retried or discarded."
+          "zh": "空闲断开时长可自定义；正在处理中的调用不会被误断，下一次使用会自动重新连接。",
+          "en": "The idle timeout is configurable; a call in flight is never interrupted, and the next use reconnects automatically."
         },
         {
-          "zh": "已经成功接收的消息不会被误判为「未发送」，也不会自动重发；真正断线导致的「结果未知」仍只提示手动核对。",
-          "en": "Messages already accepted by the server are never misreported as unsent or auto-resent; genuine connection-loss \"result unknown\" states still only suggest manual verification."
+          "zh": "设置页新增连接生命周期与空闲断开配置，助手自查连接状态的说明同步更新。",
+          "en": "The settings page gains lifecycle and idle-timeout fields, and the assistant-facing status tool now explains that idle is a designed resting state."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "94c71d7a",
-          "title": "fix: C01-C03 拒绝结算闭环、收据平台无关路径与交付证据日志"
-        },
-        {
-          "type": "commit",
-          "ref": "a79f4652",
-          "title": "fix: Windows CI 平台兼容（PR #47 四平台首跑暴露）"
+          "ref": "c9494ae9",
+          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
         }
       ]
     },
     {
-      "id": "windows-migration-receipt-paths",
+      "id": "mcp-transient-drop-availability",
       "kind": "fix",
-      "importance": "medium",
+      "importance": "high",
       "title": {
-        "zh": "Windows 迁移收据路径兼容",
-        "en": "Windows migration receipt path compatibility"
+        "zh": "连接临时掉线不再被当成「已撤销」，工具保持可用",
+        "en": "A dropped connection is no longer treated as revoked; tools stay callable"
       },
       "summary": {
-        "zh": "修复了 Windows 上写出的置顶记忆迁移收据在其他系统无法识别的问题：收据路径统一使用跨平台格式，旧格式可正常读取续跑，已完成的历史迁移不会被重复执行，用户后来删除的内容也不会被意外恢复。",
-        "en": "Fixes pinned-memory migration receipts written on Windows being unreadable on other systems. Receipt paths now use a cross-platform format, legacy receipts remain readable and resumable, completed migrations are never re-run, and content the user deleted afterwards is never revived."
+        "zh": "连接意外断开（而不是你主动停用）时，相关工具不再被误判为永久失效：下一次调用会自动把连接拉起来，进行中的旧会话也不会收到错误的「工具已撤销」结论。只有你亲手停用连接器，工具才真正下线。",
+        "en": "When a connection drops unexpectedly (rather than being switched off by you), its tools are no longer misclassified as permanently unavailable: the next call brings the connector back automatically, and older sessions no longer get a false \"tool revoked\" verdict. Only a deliberate stop by you takes tools offline."
       },
       "details": [
         {
-          "zh": "收据内的备份目录路径统一为跨平台格式；含路径逃逸、盘符、UNC 等危险内容的收据会被整体拒绝而非猜测解析。",
-          "en": "Backup directory paths inside receipts use one cross-platform format; receipts containing drive letters, UNC paths or traversal segments are rejected outright instead of guessed at."
+          "zh": "通过统一桥接调用的外部工具与直连工具行为一致：结果里包含的图片、视频生成任务会照常显示占位与完成卡片。",
+          "en": "External tools called through the unified bridge now behave like direct ones: image and video generation tasks in their results show the same placeholder and completion cards."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "94c71d7a",
-          "title": "fix: C01-C03 拒绝结算闭环、收据平台无关路径与交付证据日志"
+          "ref": "c9494ae9",
+          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
+        }
+      ]
+    },
+    {
+      "id": "media-dedupe-multi-image",
+      "kind": "fix",
+      "importance": "high",
+      "title": {
+        "zh": "同一张图片不再显示两份，多图任务逐张保留",
+        "en": "The same image no longer appears twice; multi-image tasks keep every picture"
+      },
+      "summary": {
+        "zh": "助手生成图片后，「自动贴出的结果」和「手动点开的展示」是同一张图时只保留一处，不再出现两张重复图片；一个任务产出多张图时逐张显示。完成通知迟到或重放也不会追加重复文件，重新进入会话看到的与当时一致。",
+        "en": "After the assistant generates an image, the automatically delivered result and a manually opened presentation of the same file collapse into one card instead of duplicating; a task producing several images keeps them all. Late or replayed completion notices no longer append duplicate files, and revisiting the session shows exactly what was there."
+      },
+      "details": [
+        {
+          "zh": "是否重复按文件身份与内容版本判断：同一文件被明确更新过（内容变化）仍会作为新版本显示。",
+          "en": "Duplication is judged by file identity and content version: the same file explicitly updated with new content still shows as a new version."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "c9494ae9",
+          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
+        }
+      ]
+    },
+    {
+      "id": "inline-video-controlled-preview",
+      "kind": "feature",
+      "importance": "medium",
+      "title": {
+        "zh": "视频直接在聊天里播放，媒体预览更稳",
+        "en": "Videos play inline in chat; media previews are more robust"
+      },
+      "summary": {
+        "zh": "聊天里的视频卡片自带播放控件，可以直接播放和拖动进度，点击不会另开窗口。图片和视频的预览与下载优先走受控的内部地址，旧地址失效后拿到新地址能自动恢复显示，减少「有文件名却看不到内容」的情况。",
+        "en": "Video cards in chat now carry player controls for direct playback and seeking, and clicking no longer opens a separate window. Image and video previews and downloads prefer controlled internal URLs, so a failed old URL recovers automatically once the new one arrives instead of showing a name with no content."
+      },
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "c9494ae9",
+          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
+        }
+      ],
+      "details": []
+    },
+    {
+      "id": "queued-send-settlement",
+      "kind": "fix",
+      "importance": "high",
+      "title": {
+        "zh": "排队消息的发送结果更可信，不被迟到的旧回执打断",
+        "en": "Queued messages settle on trustworthy evidence, immune to stale receipts"
+      },
+      "summary": {
+        "zh": "上一条消息的送达状态还没核实前，「立即插入」会明确提示暂缓，而不是制造顺序混乱；服务器迟到的旧结束回执不会错误地结束你刚发起的新回合，也不会触发重复发送。现在「送达回执 + 回合结束」两份证据齐全才继续队列，先后顺序不影响结论。",
+        "en": "While the previous message's delivery is still unverified, \"insert now\" explains why it waits instead of shuffling order; a stale, late run-end receipt from the server can no longer close a newer run you just started or trigger a duplicate send. The queue now proceeds only with both the delivery receipt and the run end in hand, regardless of arrival order."
+      },
+      "details": [
+        {
+          "zh": "多个回合身份对不上时，只按权威历史记录核实，不靠猜测续发。",
+          "en": "Conflicting run identities are resolved only against the authoritative history, never by guesswork."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "c9494ae9",
+          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
+        }
+      ]
+    },
+    {
+      "id": "knowledge-citation-inline",
+      "kind": "improvement",
+      "importance": "medium",
+      "title": {
+        "zh": "知识引用角标更干净",
+        "en": "Cleaner knowledge citation badges"
+      },
+      "summary": {
+        "zh": "引用角标改为小巧的上标数字，不再带底色胶囊；模型偶尔在角标外多写的括号或字段名包装会自动清理。只清理显示效果，你收到的原文与引用链接都保持原样。给模型的引用格式要求也同步收紧。",
+        "en": "Citation badges are now small superscript numbers without a pill background, and stray brackets or field-name wrappers around them are cleaned up on display only — the original text and links you receive stay untouched. The citation format instructions to the model were tightened as well."
+      },
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "c9494ae9",
+          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
+        }
+      ],
+      "details": []
+    },
+    {
+      "id": "settings-interaction-polish",
+      "kind": "improvement",
+      "importance": "medium",
+      "title": {
+        "zh": "设置页手感修复：弹层、提示与按钮状态",
+        "en": "Settings polish: popups, toasts, and busy states"
+      },
+      "summary": {
+        "zh": "按 Esc 只关闭当前打开的菜单或编辑面板并把焦点还给触发按钮，不再顺手关掉更大一层的窗口；右上角提示改为带图标的卡片，停留更久、错误更醒目；「刷新」「验证」「拉取模型」等按钮在处理中会显示进行中状态并防止重复点击。",
+        "en": "Escape now closes only the currently open menu or editor and returns focus to its trigger instead of dismissing a whole level above; toasts became icon cards that stay longer and mark errors clearly; refresh/verify/fetch buttons show a busy state and cannot be double-fired while working."
+      },
+      "details": [
+        {
+          "zh": "电脑控制状态刷新会明确报告成功或失败；辅助模型连通性测试在切换模型或离开页面时会作废旧结果并中止旧请求。",
+          "en": "Computer-use status refresh reports success or failure explicitly; auxiliary model connectivity tests discard stale results and abort in-flight requests when the model changes or the page closes."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "c9494ae9",
+          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
         }
       ]
     }
