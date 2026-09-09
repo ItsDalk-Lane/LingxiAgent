@@ -1088,6 +1088,7 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 未执行/受限：正式签名、四平台安装包、公证与远端发布证据由 tag 工作流执行（本条目记为待流水线验证，不以本地结果代替）；本地未执行 npm run pack；Windows NSIS 真机安装交互仍未实测（沿用既有 Known limitation）。
 - tag 运行补记（两次失败均非产品回归，实锤后加固冒烟脚本并推进坐标至 `acde46f1`）：运行 34355526584 Windows 打包桌面冒烟顶满 90s 就绪期限（慢跑者：同作业打包知识冒烟 87s vs 健康范围 60–71s；服务端停在导入入口；同作业同包知识冒烟通过）；重打 tag 后运行 34358209757 桌面 69.4s 全就绪（onboarding 正常），败于收尾 rmSync EPERM（taskkill 后句柄异步释放，原 10×100ms 重试不足）。冒烟脚本自 v0.1.36 通过后未改动，两处均属既有脆弱点。加固：就绪期限 90s→150s（真故障仍判败）；清理重试 40×500ms，清理失败不推翻就绪判定但 cleanupPassed/cleanupError 如实入库。该提交仅动 scripts/smoke-packaged-desktop.mjs（不在测试范围，无生产代码差异）；eslint 改动文件绿，node --check 绿；typecheck/全量测试沿用 ef7656c5 证据。
 - tag 第三轮补记（坐标推进至 `696016b7`）：运行 34360980484 四平台腿全绿（Windows 冒烟加固生效），但 artifact-release-smoke 岗哨拦截——tests/release-preflight.test.ts 末条断言硬编码「当前产品 tag」，ef7656c5 升版时漏随版本推进（该断言历来随 release metadata 提交更新）；本地冒烟当时在升版前跑过未复跑，属验证顺序失误。修复后升版状态下本机 test:artifact-release-smoke 305/305 复跑全绿。教训：升版本后必须复跑 artifact-release-smoke（其中含读取当前包版本的实时预检用例）。
+- 发布结果（2026-09-09）：运行 34364163117 全绿（四平台构建 + artifact-release-smoke + release + publish-train）。v0.1.37 正式发布（Latest，非草稿非预发布，18 产物），train-stable-16 与 train-beta-19 双列车同步发布；mirror-atomgit 失败为 AtomGit 镜像长期故障既有状态（best-effort，不阻塞发布）。验证证据以该运行远端作业为准；本提交为纯审计收口。
 
 ## 2026-09-09 CI 流水线与分支保护简化候选与封印
 
