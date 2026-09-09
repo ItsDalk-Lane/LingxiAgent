@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 311c3fa8f9b05ea996d51ca77a16c9b87b8c4c44  (2026-09-09 打包知识冒烟断言修复候选：分支 fix/packaged-smoke-candidates)
+VERIFIED_SOURCE_SHA   = 5fbd96e0a287e5b88fa9ce6ba32b0fe6a332f40e  (2026-09-09 CI 流水线与分支保护简化候选：直提 main)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1079,6 +1079,11 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
 
 Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面环境执行安装/升级
 交互 smoke（宿主平台 macOS 无法运行 NSIS 安装包）。不伪造真机安装通过。
+
+## 2026-09-09 CI 流水线与分支保护简化候选与封印
+
+- 固定源码候选：`5fbd96e0a287e5b88fa9ce6ba32b0fe6a332f40e`（直提 main，基于 6f5abd6d）：CI 收敛为 PR 单触发（合并进 main 后不再重复跑全量）；lint-open-boundary 独立岗哨与发布矩阵源级知识烟测退场（npm test/CI 矩阵单点覆盖，守卫契约测试已随新形状更新并钉住防回流）；发布链 quality-gate 二次考试与 release job 重复 digest 校验退场；知识库发布期性能门保留。GitHub 分支保护必过检查收敛为 macos-15 arm64 + windows-2025 x64 两腿，解除 strict（必须最新）、enforce_admins、会话清零与强制 PR 流程（已在 GitHub 侧生效，允许直推 main 热修）。
+- 验证证据（绑定该候选树）：typecheck×3 绿 + eslint 0 error；全量 13443 passed / 0 failed（round2 s35-ci-simplify-full-v3，round3 j62-ci-simplify-full 同树；s35 首跑与 v2 的失败分别为自举时序与 ustar 临时目录清理竞态，已按实录记录在 COMMAND_RESULTS）；round2/round3 交付清单与再生补丁同步。
 
 ## 2026-08-25 Notebook-first Knowledge 目标
 
