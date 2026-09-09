@@ -55,6 +55,26 @@ function jsonResponse(body: unknown) {
 }
 
 describe('ComputerUseSection', () => {
+  it.each([true, false])('reports a manual refresh result even when status is unchanged (success=%s)', async (success) => {
+    lingxiFetchMock.mockResolvedValueOnce(jsonResponse({ settings: { enabled: false } }));
+    render(<ComputerUseSection />);
+    await waitFor(() => expect((screen.getByText('settings.computerUse.refresh') as HTMLButtonElement).disabled).toBe(false));
+    expect(useSettingsStore.getState().toastVisible).toBe(false);
+    let resolve!: (value: Response) => void;
+    let reject!: (error: Error) => void;
+    lingxiFetchMock.mockReturnValueOnce(new Promise<Response>((done, fail) => { resolve = done; reject = fail; }));
+    const button = screen.getByText('settings.computerUse.refresh');
+    fireEvent.click(button);
+    expect(button.getAttribute('aria-busy')).toBe('true');
+    expect((button as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(button);
+    expect(lingxiFetchMock).toHaveBeenCalledTimes(2);
+    if (success) resolve(jsonResponse({ settings: { enabled: false } }));
+    else reject(new Error('offline'));
+    await waitFor(() => expect(useSettingsStore.getState().toastType).toBe(success ? 'success' : 'error'));
+    expect(useSettingsStore.getState().toastMessage).toContain(success ? 'settings.computerUse.refreshed' : 'settings.computerUse.refreshFailed');
+    expect((button as HTMLButtonElement).disabled).toBe(false);
+  });
   it('hydrates the enabled switch from the unified settings snapshot before refresh completes', async () => {
     let resolveLoad: (response: Response) => void = () => {};
     lingxiFetchMock.mockImplementation(() => new Promise<Response>((resolve) => {

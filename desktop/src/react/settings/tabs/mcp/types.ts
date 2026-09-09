@@ -6,7 +6,16 @@ export type McpConnectorStatus =
   | 'connecting'
   | 'reconnecting'
   | 'failed'
-  | 'needs-auth';
+  | 'needs-auth'
+  /** Parked on purpose by the idle timeout; the next call starts it again. */
+  | 'idle';
+
+/**
+ * Per-connector connection lifecycle. Two axes: when the connector first
+ * connects (load vs first use) and whether an idle connection is parked
+ * (disconnected on purpose, started again on demand) or held.
+ */
+export type McpLifecycle = 'eager' | 'lazy' | 'keep-alive' | 'lazy-keep-alive';
 
 /** Per-connector policy. `review-all` reviews every invocation; `allowlist` honours per-tool grants. */
 export type McpPermissionMode = 'review-all' | 'allowlist';
@@ -79,6 +88,10 @@ export interface McpConnector {
   /** The single persisted switch. Absent means enabled; only false switches it off. */
   enabled?: boolean;
   status: McpConnectorStatus;
+  /** Connection lifecycle; absent reads as keep-alive (connect at load, never park). */
+  lifecycle?: McpLifecycle;
+  /** Idle-park delay override in minutes; null/absent follows the lifecycle default. */
+  idleTimeoutMinutes?: number | null;
   /** Last failure reported by the runtime. Empty when the connector is healthy. */
   error?: string;
   /** Tools dropped for an ambiguous model-facing id. Empty when nothing clashes. */
@@ -129,6 +142,9 @@ export interface McpConnectorInput {
   headers?: Record<string, string>;
   registryUrl?: string;
   timeout?: number;
+  lifecycle?: McpLifecycle;
+  /** Idle-park delay in minutes; null resets to the lifecycle default. */
+  idleTimeoutMinutes?: number | null;
   enabled?: boolean;
   authType?: McpAuthType;
   authorizationToken?: string;

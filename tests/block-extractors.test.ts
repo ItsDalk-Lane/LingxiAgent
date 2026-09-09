@@ -236,6 +236,16 @@ describe('media generation blocks', () => {
     expect(blocks).toEqual([]);
   });
 
+  it('桥接调用保留媒体任务占位，普通 MCP 结果不产生媒体卡', () => {
+    const details = { mediaGeneration: {
+      kind: 'image', tasks: [{ taskId: 'bridge-image' }],
+    } };
+    expect(extractBlocks('mcp_call', details, {})).toEqual(
+      extractBlocks('media_generate-image', details, {}),
+    );
+    expect(extractBlocks('mcp_call', { files: [] }, {})).toEqual([]);
+  });
+
   it('replaces historical pending media_generation blocks with completed session file blocks', () => {
     const blocks = [{
       type: 'media_generation',

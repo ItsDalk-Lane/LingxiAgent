@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { InputArea } from '../../components/InputArea';
 import { useStore } from '../../stores';
 import { resetComposerSendCoordinatorForTests } from '../../services/composer-send-coordinator';
+import * as composerCoordinator from '../../services/composer-send-coordinator';
 
 const mocks = vi.hoisted(() => ({
   clearContent: vi.fn(),
@@ -875,6 +876,29 @@ describe('InputArea media send', () => {
         name: 'note.txt',
       }],
     });
+  });
+
+  it('立即插入被未核实投递阻止时提示原因并保留队列', async () => {
+    useStore.setState({ streamingSessions: ['/session/media.jsonl'] } as never);
+    render(React.createElement(InputArea));
+    fireEvent.click(screen.getByTestId('send'));
+    await waitFor(() => expect(screen.getByTestId('queued-turn-list')).toBeTruthy());
+    const dispatch = vi.spyOn(composerCoordinator, 'dispatchQueuedItem').mockResolvedValueOnce({
+      kind: 'blocked', code: 'transport_busy', retryable: true,
+    });
+    const toast = vi.spyOn(useStore.getState(), 'addToast');
+    try {
+      fireEvent.click(screen.getByTestId('queued-insert-now'));
+      await waitFor(() => expect(toast).toHaveBeenCalledWith(
+        'input.queuedDeliveryUnverified', 'warning', 6000,
+        { dedupeKey: 'queued-insert-unverified' },
+      ));
+      expect(screen.getByTestId('queued-turn-list')).toBeTruthy();
+      expect(mocks.wsSend).not.toHaveBeenCalled();
+    } finally {
+      dispatch.mockRestore();
+      toast.mockRestore();
+    }
   });
 
   it('does not send while an agent switch session is still pending', async () => {

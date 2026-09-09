@@ -71,6 +71,9 @@ export const BLOCK_EXTRACTORS = {
 
   "media_generate-speech": (details) => extractMediaGenerationBlocks(details, "speech"),
 
+  // 延迟桥接保留了原工具的结构化结果，任务占位也必须与直接调用保持一致。
+  mcp_call: (details) => extractMediaGenerationBlocks(details, null),
+
   computer: (details) => {
     const confirmation = details.confirmation;
     if (details.action !== "start" || confirmation?.kind !== "computer_app_approval") return null;
@@ -415,5 +418,4 @@ export function extractBlocks(toolName, details, toolResult) {
   }
   return blocks;
 }
-
 

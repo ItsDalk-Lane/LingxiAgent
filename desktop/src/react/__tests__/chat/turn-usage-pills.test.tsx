@@ -155,6 +155,34 @@ describe('用时弹窗（验收 c 补充：TTFT 永不显示，TPS 按有无渲�
 });
 
 describe('页脚胶囊与时间的行为统一（平时隐藏，悬停显示）', () => {
+  it('保留时间与操作顺序，将胶囊置于末尾独立伸展的区域', () => {
+    const { container } = render(<MessageFooterActions
+      timeText="19:36"
+      leadingActions={[{ id: 'lead', title: '前置操作', icon: '前置', onClick: () => {} }]}
+      actions={[{ id: 'copy', title: '复制', icon: '复制', onClick: () => {} }]}
+      statsNode={<TurnUsagePills stats={statsFixture()} />}
+    />);
+    const row = container.querySelector('[data-message-actions]')!;
+    expect(row.className).toContain('messageFooterActionsWithStats');
+    expect(Array.from(row.children).map(child => child.tagName)).toEqual(['SPAN', 'BUTTON', 'BUTTON', 'SPAN']);
+    expect(row.children[0]).toHaveTextContent('19:36');
+    expect(row.children[1]).toHaveAttribute('title', '前置操作');
+    expect(row.children[2]).toHaveAttribute('title', '复制');
+    expect(row.lastElementChild?.className).toContain('messageFooterStats');
+    expect(row.lastElementChild).toContainElement(screen.getByTestId('turn-usage-pill'));
+  });
+
+  it('无胶囊时保留原对齐方式，只有胶囊时仍可渲染', () => {
+    const { container, rerender } = render(<MessageFooterActions timeText="19:36" actions={[]} align="left" />);
+    const row = container.querySelector('[data-message-actions]')!;
+    expect(row.className).toContain('messageFooterActionsLeft');
+    expect(row.className).not.toContain('messageFooterActionsWithStats');
+    rerender(<MessageFooterActions actions={[]} statsNode={<TurnUsagePills stats={statsFixture()} />} />);
+    expect(row.className).toContain('messageFooterActionsWithStats');
+    expect(row.children).toHaveLength(1);
+    expect(screen.getByTestId('turn-time-pill')).toBeInTheDocument();
+  });
+
   it('timePersistent 场景下 statsNode/time 获得隐藏包装类，随按钮一同被 CSS 隐藏', () => {
     const { container } = render(
       <MessageFooterActions

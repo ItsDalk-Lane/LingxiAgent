@@ -240,7 +240,7 @@ describe("MCP target descriptor", () => {
     });
   });
 
-  it("只在契约生命周期变化时推进代次，临时断线保留为传输失败", async () => {
+  it("只在契约生命周期变化时推进代次；临时断线按需可重启，用户停机才是传输失败", async () => {
     const { manager, getConfig, setConfig } = managerWithTools();
     const descriptor = manager.getToolTargetDescriptors()
       .find((entry) => entry.catalogMetadata.toolName === "search");
@@ -265,6 +265,16 @@ describe("MCP target descriptor", () => {
     expect(descriptor.getCurrentGeneration()).toBe(listingGeneration);
 
     manager.clients.delete("alpha");
+    // Under the connector lifecycle model, dropping the client without a user
+    // stop is a designed resting state: the executor restarts the connector on
+    // the arriving call, so the target stays eligible (dormant, not dead).
+    await expect(descriptor.isCurrentlyAvailable({
+      agentConfig: agentConfig(["search", "lookup"]),
+    })).resolves.toMatchObject({ eligible: true });
+
+    // With the user's stop recorded, the target is genuinely down and the
+    // failure must still classify as a transport failure, not a revocation.
+    manager.desiredStates.set("alpha", "stopped");
     await expect(descriptor.isCurrentlyAvailable({
       agentConfig: agentConfig(["search", "lookup"]),
     })).resolves.toMatchObject({
@@ -272,6 +282,7 @@ describe("MCP target descriptor", () => {
       reason: "mcp_connector_stopped",
       code: "TRANSPORT_FAILURE",
     });
+    manager.desiredStates.delete("alpha");
 
     const disabled = structuredClone(getConfig());
     disabled.connectors[0].enabled = false;
@@ -312,6 +323,31 @@ describe("MCP direct/deferred 路径等价", () => {
     );
     return { result, controller, onUpdate };
   }
+
+  it.each([false, true])("SDK 上下文不携带 agentId 时仍使用当前会话身份（延迟=%s）", async (deferred) => {
+    const fixture = buildEngineWithManager(deferred);
+    dirs.push(fixture.tmpDir);
+    const tool = fixture.result.customTools.find((item: ExecutableTestTool) => (
+      item.name === (deferred ? "mcp_call" : "mcp_alpha_search")
+    ));
+    const params = deferred
+      ? { server: "alpha", tool: "search", arguments: { query: "same" } }
+      : { query: "same" };
+    const result = await tool.execute("sdk-call", params, new AbortController().signal, undefined, {
+      sessionId: "session-1", sessionPath: fixture.sessionPath,
+    });
+    expect(result.isError).not.toBe(true);
+    expect(fixture.callTool).toHaveBeenCalledWith("search", { query: "same" }, undefined);
+    // 补齐身份后仍读取最新权限，不能沿用装配时的许可。
+    fixture.setAgentTools([]);
+    fixture.callTool.mockClear();
+    await expect(tool.execute("sdk-disabled", params, new AbortController().signal, undefined, {
+      sessionId: "session-1", sessionPath: fixture.sessionPath,
+    })).rejects.toMatchObject({
+      code: "TARGET_DISABLED_FOR_AGENT", details: { reason: "mcp_agent_disabled" },
+    });
+    expect(fixture.callTool).not.toHaveBeenCalled();
+  });
 
   it("直接与延迟调用复用同一发布适配器并保留结构化结果", async () => {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-mcp-path-parity-"));

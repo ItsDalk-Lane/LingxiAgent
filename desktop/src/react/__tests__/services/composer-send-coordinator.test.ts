@@ -75,6 +75,7 @@ vi.mock('../../services/websocket', () => ({
 }));
 
 import { useStore } from '../../stores';
+import { createLocalServerConnection } from '../../services/server-connection';
 import { sessionScopedValue } from '../../stores/session-slice';
 import { handleServerMessage } from '../../services/ws-message-handler';
 import {
@@ -92,6 +93,7 @@ import {
   noteComposerConnectionClosed,
   noteComposerConnectionOpened,
   requestQueueFlush,
+  reconcileComposerSession,
   resetComposerSendCoordinatorForTests,
   resolveQueuedInsertNowAction,
   sendWithLease,
@@ -143,6 +145,7 @@ function seedStore(sessionPaths: string[]) {
     })),
     sessionLocatorsById: Object.fromEntries(sessionPaths.map(path => [`sess-${path}`, { path }])),
     connected: true,
+    activeServerConnection: null,
     streamingSessions: [],
     activeSessionStreams: {},
     turnPendingSessions: [],
@@ -722,6 +725,74 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
 });
 
 describe('R03 最新意图与前台边界', () => {
+  it('迟到回执不能用旧回合终态结算随后启动的新回合', async () => {
+    const first = tryAcquireSendLease({ identity: identityOf(PATH_A), bundle: makeBundle(PATH_A, '第一条') });
+    if (!first.ok) throw new Error('expected lease');
+    await sendWithLease(first.leaseId, makeDeps());
+    dispatchRunStart(PATH_A, 'old-run');
+    enqueue(PATH_A, 'new-run-next', '继续等待');
+    requestQueueFlush(PATH_A, makeDeps());
+    dispatchRunEnd(PATH_A, 'old-run');
+    await vi.advanceTimersByTimeAsync(400);
+    dispatchRunStart(PATH_A, 'new-run');
+    dispatchAck(PATH_A, getSendRecord(first.leaseId)!.clientMessageId);
+    expect(getSendRecord(first.leaseId)!.runStatus).toBe('running');
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+    // 即使旧结束通知重放，也不得用它结算新回合。
+    dispatchRunEnd(PATH_A, 'old-run');
+    await vi.advanceTimersByTimeAsync(400);
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+    expect(sentPayloads()).toHaveLength(1);
+  });
+
+  it.each(['输入身份不符', '回合身份不符', '事件顺序无效'])('迟到回执不会采信%s的结束事件', async mismatch => {
+    const first = tryAcquireSendLease({ identity: identityOf(PATH_A), bundle: makeBundle(PATH_A, '第一条') });
+    if (!first.ok) throw new Error('expected lease');
+    await sendWithLease(first.leaseId, makeDeps());
+    dispatchRunStart(PATH_A, 'guarded-run');
+    enqueue(PATH_A, 'guarded-next', '保留队列');
+    requestQueueFlush(PATH_A, makeDeps());
+    const clientId = getSendRecord(first.leaseId)!.clientMessageId;
+    handleServerMessage({ type: 'assistant_run_end', sessionPath: PATH_A, sessionId: `sess-${PATH_A}`,
+      streamId: 'guarded-run', runId: mismatch === '回合身份不符' ? 'other-run' : 'guarded-run',
+      seq: mismatch === '事件顺序无效' ? 9 : 20,
+      turnInputEntryId: mismatch === '输入身份不符' ? 'other-input' : `srv-${clientId}` });
+    dispatchStatus(PATH_A, false, 'guarded-run');
+    await vi.advanceTimersByTimeAsync(400);
+    dispatchAck(PATH_A, clientId);
+    await vi.advanceTimersByTimeAsync(400);
+    expect(sentPayloads()).toHaveLength(1);
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+    expect(queueOf(PATH_A)).toHaveLength(1);
+  });
+
+  it('回合结束先于输入回执：证据齐全后自动续发一次，不需额外界面变化', async () => {
+    useStore.setState({ activeServerConnection: createLocalServerConnection({ serverPort: 18799, serverToken: 'synthetic' }) });
+    const first = tryAcquireSendLease({ identity: identityOf(PATH_A), bundle: makeBundle(PATH_A, '第一条') });
+    if (!first.ok) throw new Error('expected lease');
+    await sendWithLease(first.leaseId, makeDeps());
+    dispatchRunStart(PATH_A, 'late-ack-run');
+    enqueue(PATH_A, 'late-ack-next', '排队的下一条');
+    requestQueueFlush(PATH_A, makeDeps());
+    dispatchRunEnd(PATH_A, 'late-ack-run');
+    await vi.advanceTimersByTimeAsync(400);
+    expect(sentPayloads()).toHaveLength(1);
+    expect(queueOf(PATH_A)[0].status ?? 'ready').toBe('ready');
+    await reconcileComposerSession(PATH_A);
+    expect(getSendRecord(first.leaseId)!.reconciliationStatus).toBe('failed');
+    dispatchAck(PATH_A, getSendRecord(first.leaseId)!.clientMessageId);
+    await vi.advanceTimersByTimeAsync(400);
+    expect(getSendRecord(first.leaseId)!.reconciliationStatus).toBeUndefined();
+    const firstMessage = sessionScopedValue(useStore.getState(), useStore.getState().chatSessions, PATH_A)?.items
+      .find(item => item.type === 'message' && item.data.clientMessageId === getSendRecord(first.leaseId)!.clientMessageId);
+    expect(firstMessage?.type === 'message' && firstMessage.data.sendError).toBeFalsy();
+    expect(sentPayloads().map(payload => payload.text)).toEqual(['第一条', '排队的下一条']);
+    dispatchAck(PATH_A, getSendRecord(first.leaseId)!.clientMessageId);
+    dispatchRunEnd(PATH_A, 'late-ack-run');
+    await vi.advanceTimersByTimeAsync(400);
+    expect(sentPayloads()).toHaveLength(2);
+  });
+
   it('R03-01/R03-02：旧 timer 到点读取最后一次编辑保护，不延长计时', async () => {
     enqueue(PATH_A, 'r03-a', '旧快照');
     requestQueueFlush(PATH_A, makeDeps());

@@ -104,6 +104,43 @@ function chatSummary(overrides: Record<string, any> = {}): any {
 }
 
 describe('ProviderModelList (chat)', () => {
+  it.each(['trigger', 'search'])('Escape closes only the model menu with focus on %s', (focus) => {
+    const outerEscape = vi.fn();
+    document.addEventListener('keydown', outerEscape);
+    try {
+      render(<ProviderModelList providerId="kimi-coding" summary={chatSummary()} media={makeMedia()} onRefresh={vi.fn()} />);
+      const trigger = screen.getByRole('button', { name: 'settings.api.addModel' });
+      fireEvent.click(trigger);
+      const searchInput = screen.getByPlaceholderText('settings.api.searchModel');
+      const target = focus === 'trigger' ? trigger : searchInput;
+      target.focus();
+      fireEvent.keyDown(target, { key: 'Escape' });
+      expect(screen.queryByPlaceholderText('settings.api.searchModel')).not.toBeInTheDocument();
+      expect(outerEscape).not.toHaveBeenCalled();
+      expect(trigger).toHaveFocus();
+    } finally {
+      document.removeEventListener('keydown', outerEscape);
+    }
+  });
+  it.each(['success', 'failure', 'rejection'])('shows pending feedback and prevents duplicate reads until %s', async (result) => {
+    let complete!: (value: Response) => void;
+    let reject!: (error: Error) => void;
+    mocks.lingxiFetch.mockImplementation((url: string) => url === '/api/providers/fetch-models'
+      ? new Promise<Response>((resolve, rejectPromise) => { complete = resolve; reject = rejectPromise; })
+      : Promise.resolve(jsonResponse({ models: [] })));
+    render(<ProviderModelList providerId="kimi-coding" summary={chatSummary()} media={makeMedia()} onRefresh={vi.fn()} />);
+    const button = screen.getByRole('button', { name: 'settings.providers.fetchModels' });
+    fireEvent.click(button);
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    fireEvent.click(button);
+    expect(mocks.lingxiFetch.mock.calls.filter(([url]) => url === '/api/providers/fetch-models')).toHaveLength(1);
+    if (result === 'rejection') reject(new Error('offline'));
+    else complete(jsonResponse(result === 'success' ? { models: [{ id: 'test-model' }] } : { error: 'unavailable' }));
+    await waitFor(() => expect(button).toBeEnabled());
+    expect(button).not.toHaveAttribute('aria-busy', 'true');
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.lingxiFetch.mockResolvedValue(jsonResponse({ models: [{ id: 'kimi-for-coding' }] }));

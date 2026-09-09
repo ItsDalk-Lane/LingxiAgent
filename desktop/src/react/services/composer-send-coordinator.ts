@@ -85,6 +85,10 @@ export interface ComposerSendRecord {
   sourceEntryId?: string;
   observedRunId?: string;
   observedRunSeq?: number;
+  /** 终态可能先于输入回执到达；保留已匹配 run 的证据，待落盘输入身份核对。 */
+  terminalInputEntryId?: string;
+  /** 多个 run 的身份发生冲突时，只能通过权威历史确认空闲。 */
+  observedRunConflict?: boolean;
   reconciliationStatus?: 'checking' | 'failed';
   ackTimer: ReturnType<typeof setTimeout> | null;
 }
@@ -444,7 +448,18 @@ export function noteComposerServerAck(clientMessageId: string | null | undefined
   record.sourceEntryId = evidence.sourceEntryId;
   record.code = null;
   releaseSendLease(record.leaseId);
+  settleObservedTerminal(record);
   return true;
+}
+
+/** 接收与完成是两份独立证据，抵达顺序不影响结算，也不能只凭其中一份续发。 */
+function settleObservedTerminal(record: ComposerSendRecord): void {
+  if (record.acceptance !== 'accepted' || !record.sourceEntryId
+    || record.observedRunConflict || record.terminalInputEntryId !== record.sourceEntryId) return;
+  record.runStatus = 'terminal';
+  record.reconciliationStatus = undefined;
+  clearReconciliationDisplay(record);
+  if (record.identity.kind === 'session') resumeForegroundQueue(record.identity.sessionPath);
 }
 
 function isUnresolved(record: ComposerSendRecord): boolean {
@@ -629,17 +644,21 @@ export function noteComposerRunEvent(message: { type: string; sessionId?: string
   const runId = message.runId || message.streamId || message.turnId;
   for (const record of unresolvedForKey(key)) {
     if (message.type === 'assistant_run_start' && runId) {
+      // 新启动使旧终态失效；不同 run 的冲突不能被迟到的旧结束通知解除。
+      record.terminalInputEntryId = undefined;
       // 不接受第二个不同run覆盖未终结身份；随后以有界历史查询核实。
       if (!record.observedRunId || record.observedRunId === runId) {
         record.observedRunId = runId; record.observedRunSeq = message.seq;
+      } else {
+        record.observedRunConflict = true;
       }
       record.runStatus = 'running';
       if (record.acceptance === 'accepted') clearReconciliationDisplay(record);
     } else if (message.type === 'assistant_run_end' && runId && record.observedRunId === runId
-      && record.sourceEntryId && message.turnInputEntryId === record.sourceEntryId
+      && message.turnInputEntryId
       && Number.isSafeInteger(message.seq) && Number.isSafeInteger(record.observedRunSeq) && message.seq! > record.observedRunSeq!) {
-      record.runStatus = 'terminal';
-      resumeForegroundQueue(message.sessionPath);
+      record.terminalInputEntryId = message.turnInputEntryId;
+      settleObservedTerminal(record);
     }
   }
   if (message.type === 'assistant_run_end' && unresolvedForKey(key).length) void reconcileComposerSession(message.sessionPath);

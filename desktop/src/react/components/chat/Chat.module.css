@@ -192,6 +192,16 @@
 .messageFooterStats {
     display: inline-flex;
     min-width: 0;
+    margin-inline-start: auto;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+/* 胶囊与左侧操作分开，在当前消息宽度内靠右；窄窗口允许换行。 */
+.messageFooterActionsWithStats {
+    align-self: stretch;
+    flex-wrap: wrap;
 }
 
 /* 最新消息的 persistent 场景：时间文本与用量/用时胶囊同操作按钮一致——

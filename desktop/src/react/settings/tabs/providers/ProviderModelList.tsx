@@ -330,6 +330,7 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
   };
 
   const [fetchHint, setFetchHint] = useState<{ msg: string; ok: boolean } | null>(null);
+  const [fetchingModels, setFetchingModels] = useState(false);
   const fetchHintTimer = useRef<ReturnType<typeof setTimeout>>(null);
 
   const showFetchHint = (msg: string, ok: boolean) => {
@@ -338,8 +339,9 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
     fetchHintTimer.current = setTimeout(() => setFetchHint(null), 2500);
   };
 
-  const fetchModels = async (btn: HTMLButtonElement | null) => {
-    if (btn) btn.classList.add(styles['spinning']);
+  const fetchModels = async () => {
+    if (fetchingModels) return;
+    setFetchingModels(true);
     try {
       // 优先用面板里的草稿凭证：key 可能刚输入还没保存（onBlur 保存与点击有竞态），
       // 脱敏占位由服务端回落到已保存明文。
@@ -374,7 +376,7 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
     } catch {
       showFetchHint(t('settings.providers.fetchFailed'), false);
     } finally {
-      if (btn) btn.classList.remove(styles['spinning']);
+      setFetchingModels(false);
     }
   };
 
@@ -653,9 +655,11 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
           </svg>
         </button>
         <button
-          className={styles['pv-fetch-btn-inline']}
+          className={`${styles['pv-fetch-btn-inline']}${fetchingModels ? ' ' + styles['spinning'] : ''}`}
           title={t('settings.providers.fetchModels')}
-          onClick={(e) => fetchModels(e.currentTarget)}
+          disabled={fetchingModels}
+          aria-busy={fetchingModels || undefined}
+          onClick={fetchModels}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" />
@@ -694,7 +698,6 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
             ref={panelRef}
             style={panelStyle}
             data-provider-model-dropdown="true"
-            onKeyDown={(e) => { if (e.key === 'Escape') closeDropdown(); }}
           >
             <input
               className={styles['pv-model-dropdown-search']}

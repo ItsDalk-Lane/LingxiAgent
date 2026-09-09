@@ -68,6 +68,14 @@ export function SelectWidget({
   const [openDirection, setOpenDirection] = useState<'up' | 'down'>('down');
 
   const close = useCallback(() => setOpen(false), []);
+  const closeOnEscape = useCallback((event: KeyboardEvent | React.KeyboardEvent) => {
+    if (event.key !== 'Escape' || event.defaultPrevented) return;
+    // 菜单自身先消费 Escape，避免先注册的外层编辑面板监听抢先关闭。
+    event.preventDefault();
+    event.stopPropagation();
+    close();
+    triggerRef.current?.focus();
+  }, [close]);
 
   useEffect(() => {
     if (!open || !triggerRef.current) return;
@@ -93,6 +101,12 @@ export function SelectWidget({
       zIndex: 9999,
     });
   }, [open, align, offset, popupMinWidth, placement]);
+
+  useEffect(() => {
+    if (!open) return;
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
+  }, [open, closeOnEscape]);
 
   useEffect(() => {
     if (!open) return;
@@ -192,6 +206,7 @@ export function SelectWidget({
         type="button"
         className={[!triggerBare && styles.trigger, triggerClassName].filter(Boolean).join(' ')}
         ref={triggerRef}
+        onKeyDown={open ? closeOnEscape : undefined}
         onClick={() => {
           if (disabled) return;
           if (!open && onAttemptOpen && !onAttemptOpen()) return;
@@ -218,6 +233,7 @@ export function SelectWidget({
         <div
           className={[styles.popup, density === 'comfortable' && styles.comfortable, popupClassName].filter(Boolean).join(' ')}
           ref={panelRef}
+          onKeyDown={closeOnEscape}
           style={panelStyle}
           data-select-widget-popup
           data-direction={openDirection}

@@ -54,6 +54,28 @@ export function useAnchoredDropdown({
 
   useEffect(() => {
     if (!open) return;
+    const handler = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return;
+      // 在焦点仍停留于触发按钮时，也只关闭当前菜单。
+      event.preventDefault();
+      event.stopPropagation();
+      onClose();
+      triggerRef.current?.focus();
+    };
+    const trigger = triggerRef.current;
+    const panel = panelRef.current;
+    trigger?.addEventListener('keydown', handler);
+    panel?.addEventListener('keydown', handler);
+    document.addEventListener('keydown', handler);
+    return () => {
+      trigger?.removeEventListener('keydown', handler);
+      panel?.removeEventListener('keydown', handler);
+      document.removeEventListener('keydown', handler);
+    };
+  }, [onClose, open, panelRef, triggerRef]);
+
+  useEffect(() => {
+    if (!open) return;
     const handler = (e: MouseEvent) => {
       const target = e.target as Node;
       if (triggerRef.current?.contains(target)) return;

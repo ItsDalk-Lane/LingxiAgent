@@ -185,6 +185,29 @@ export const MarkdownContent = memo(function MarkdownContent({
       anchor.classList.add(citationStyles.badge);
       anchor.dataset.knowledgeCitationId = id;
       anchor.textContent = String(number);
+      // 仅移除单独包住真实引用的括号或误输出的字段标签；不清洗原始消息和代码。
+      const before = anchor.previousSibling;
+      const after = anchor.nextSibling;
+      if (before?.nodeType === 3 && after?.nodeType === 3) {
+        const pairs: Record<string, string> = { '(': ')', '（': '）', '[': ']', '【': '】' };
+        while (true) {
+          const beforeText = before.textContent || '';
+          const afterText = after.textContent || '';
+          const fieldOpening = /<citationMarkdown>\s*$/i.exec(beforeText);
+          const fieldClosing = /^\s*<\/citationMarkdown>/i.exec(afterText);
+          const opening = /([（(\[【])\s*$/.exec(beforeText);
+          const closing = /^\s*([）)\]】])/.exec(afterText);
+          if (fieldOpening && fieldClosing) {
+            before.textContent = beforeText.slice(0, fieldOpening.index);
+            after.textContent = afterText.slice(fieldClosing[0].length);
+          } else if (opening && closing && pairs[opening[1]] === closing[1]) {
+            before.textContent = beforeText.slice(0, opening.index);
+            after.textContent = afterText.slice(closing[0].length);
+          } else {
+            break;
+          }
+        }
+      }
       anchor.setAttribute('role', 'button');
       anchor.setAttribute('tabindex', '0');
       anchor.setAttribute('aria-label', t('knowledge.citationNumber', { number }));

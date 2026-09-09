@@ -53,6 +53,21 @@ const DEFAULT_CONFIG = {
 
 const TRANSPORTS = new Set(["stdio", "remote", "streamable-http", "sse"]);
 const AUTH_TYPES = new Set(["none", "bearer", "oauth"]);
+
+// Per-connector connection lifecycle, modelled on the four pi-mcp-adapter
+// modes. Two axes decide the behaviour: when the connector first connects
+// (at load vs on the first call that needs it) and whether an idle connection
+// is parked — disconnected on purpose, to be started again by the next call —
+// or held for as long as the process lives.
+const LIFECYCLES = new Set(["eager", "lazy", "keep-alive", "lazy-keep-alive"]);
+// "keep-alive" is also what every config written before this field existed
+// already behaved as (connect at load, never park), so it is the read-time
+// default and no migration is needed.
+const DEFAULT_LIFECYCLE = "keep-alive";
+// Park delay for the modes that idle out. "lazy" defaults to ten minutes;
+// "eager" defaults to never — its point is to be up, not to cycle.
+const DEFAULT_LAZY_IDLE_TIMEOUT_MINUTES = 10;
+
 const MASKED_SECRET = "********";
 
 // Auto-reconnect backoff, modelled on the MCP SDK's reconnection options:
@@ -76,6 +91,9 @@ const OAUTH_REFRESH_LEEWAY_MS = 60_000;
 const STATUS_CONNECTING = "connecting";
 const STATUS_RECONNECTING = "reconnecting";
 const STATUS_NEEDS_AUTH = "needs-auth";
+// Parked on purpose: an idle-park lifecycle disconnected the client, the
+// start intent stays "running", and the next tool call starts it again.
+const STATUS_IDLE = "idle";
 
 // A tool with no declared visibility is offered to both the model and to app
 // surfaces; an explicit `_meta.ui.visibility` array narrows that.
@@ -302,6 +320,40 @@ function normalizeDeferThreshold(value) {
     : DEFAULT_DEFER_THRESHOLD;
 }
 
+function normalizeLifecycle(value) {
+  return LIFECYCLES.has(value) ? value : DEFAULT_LIFECYCLE;
+}
+
+// Persisted minutes for the idle park. null means "follow the mode default";
+// anything that is not a non-negative safe integer lands there, because a
+// garbage value must not quietly become an aggressive 0-minute park.
+function normalizeIdleTimeoutMinutes(value) {
+  if (value === "" || value == null || value === false) return null;
+  const numeric = Number(value);
+  return Number.isSafeInteger(numeric) && numeric >= 0 ? numeric : null;
+}
+
+// Only "lazy" and "eager" ever park an idle connection; the keep-alive modes
+// hold theirs unconditionally — that is their entire point.
+function idleParkApplies(connector) {
+  return connector?.lifecycle === "lazy" || connector?.lifecycle === "eager";
+}
+
+// Effective park delay in milliseconds; 0 means never park. An unset override
+// follows the mode default (lazy: 10 minutes, eager: never).
+function connectorIdleParkTimeoutMs(connector) {
+  if (!connector || !idleParkApplies(connector)) return 0;
+  const minutes = normalizeIdleTimeoutMinutes(connector.idleTimeoutMinutes);
+  const resolved = minutes ?? (connector.lifecycle === "lazy" ? DEFAULT_LAZY_IDLE_TIMEOUT_MINUTES : 0);
+  return resolved * 60_000;
+}
+
+// "eager" and "keep-alive" connect when the runtime loads; the lazy modes wait
+// for the first call that needs them.
+function startsOnLoad(connector) {
+  return connector?.lifecycle === "eager" || connector?.lifecycle === "keep-alive";
+}
+
 function normalizeConnector(connector, fallbackId = "") {
   if (!connector || typeof connector !== "object") return null;
   const id = sanitizeId(connector.id || fallbackId);
@@ -364,6 +416,12 @@ function normalizeConnector(connector, fallbackId = "") {
     // users get keepalive without a migration script. Only an explicit `false`
     // opts out of automatic reconnection.
     autoReconnect: connector.autoReconnect !== false,
+    // Connection lifecycle: when the connector first connects and whether an
+    // idle connection gets parked. Unset follows "keep-alive", which is what
+    // every connector written before the field existed already did.
+    lifecycle: normalizeLifecycle(connector.lifecycle),
+    // Idle-park delay override in minutes; null follows the mode default.
+    idleTimeoutMinutes: normalizeIdleTimeoutMinutes(connector.idleTimeoutMinutes),
     // Read-time compatibility: connectors saved before the permission policy
     // model existed carry none of these three fields. They default to the
     // pre-existing behaviour (every invocation reviewed), so no write-time
@@ -566,6 +624,11 @@ interface McpLiveAvailabilityInput {
   error?: string;
   visibility?: readonly string[];
   surface?: "model" | "app";
+  // True when a connector that is not running would be started by the call
+  // itself (lazy lifecycle, idle-parked, or dropped with intent still
+  // "running"). Only the caller that can actually see the intent map can
+  // answer this, which is why it is an input and not derived here.
+  startableOnDemand?: boolean;
 }
 
 function mcpLiveAvailabilityDiagnostics({ connectorId, toolName, status, error }: McpLiveAvailabilityInput = {}) {
@@ -592,6 +655,7 @@ export function evaluateMcpToolEligibility(agentConfig, {
   error = "",
   visibility = DEFAULT_TOOL_VISIBILITY,
   surface = "model",
+  startableOnDemand = false,
 }: McpLiveAvailabilityInput = {}) {
   const id = connectorId || serverId;
   const diagnostics = mcpLiveAvailabilityDiagnostics({
@@ -631,7 +695,22 @@ export function evaluateMcpToolEligibility(agentConfig, {
     // the runtime. The recorded error is diagnostic only and is never acted on.
     return { eligible: false, reason: "mcp_needs_auth", code: "TARGET_REVOKED", diagnostics };
   }
+  if (status === STATUS_IDLE) {
+    // Parked by the idle-park lifecycle with intent still "running": a designed
+    // resting state, not an outage. The invocation path starts the connector
+    // for the call that needs it, exactly like a first use does.
+    if (startableOnDemand !== true) {
+      return { eligible: false, reason: "mcp_connector_stopped", code: "TRANSPORT_FAILURE", diagnostics };
+    }
+    return { eligible: true };
+  }
   if (status === "stopped") {
+    if (startableOnDemand === true) {
+      // Not running because it was never started this process (lazy lifecycle)
+      // or was parked after idle, with no user stop in between: the executor
+      // brings it up on demand, so the tool is as callable as a running one.
+      return { eligible: true };
+    }
     return { eligible: false, reason: "mcp_connector_stopped", code: "TRANSPORT_FAILURE", diagnostics };
   }
   if (status !== "running" || transportAvailable !== true) {
@@ -672,9 +751,11 @@ export function normalizeMcpToolResult(value) {
 export const MCP_CONNECTORS_STATUS_TOOL_NAME = "connectors_status";
 
 const MCP_CONNECTORS_STATUS_DESCRIPTION =
-  "Report the live status of every configured MCP connector (running/stopped, last error, "
+  "Report the live status of every configured MCP connector (running/idle/stopped, last error, "
   + "auth state, and cached tool count). Use this to self-diagnose whether an MCP tool failure "
-  + "is a connector problem (stopped/error/auth) versus an upstream API error. Read-only; takes no input.";
+  + "is a connector problem (stopped/error/auth) versus an upstream API error. 'idle' is not a "
+  + "failure: the connector parks itself between uses and starts again on the next call. "
+  + "Read-only; takes no input.";
 
 // Project the redacted getState() view down to the fields an agent needs for
 // self-diagnosis. getState() is the single source of truth; this never reads
@@ -684,6 +765,10 @@ function statusConnectorView(connector) {
     id: connector.id,
     name: connector.name,
     transport: connector.transport,
+    // Connection lifecycle (eager/lazy/keep-alive/lazy-keep-alive): tells the
+    // agent whether "not running right now" is the designed resting state of
+    // this connector or something worth reporting as a problem.
+    lifecycle: connector.lifecycle,
     // Switched off is not the same fact as not running, and the agent acts on
     // the difference: one is fixed by starting the connector, the other only
     // by the user turning it back on.
@@ -914,6 +999,9 @@ export class McpManager {
   declare _lazyStarts: Map<string, Promise<any>>;
   declare _toolListings: Map<string, number>;
   declare _toolGenerations: Map<string, number>;
+  declare _idleTimers: Map<string, any>;
+  declare _lastActivityAt: Map<string, number>;
+  declare _inFlightCalls: Map<string, number>;
   declare _bus: any;
   declare _busDisposers: any;
   declare _configStore: any;
@@ -1003,6 +1091,12 @@ export class McpManager {
     this._toolListings = new Map();
     // 工具契约代次只描述“旧会话还能否执行这个目标”，不描述短暂网络健康度。
     this._toolGenerations = new Map();
+    // Idle-park bookkeeping, all runtime-only: pending park timers, the last
+    // time each connector saw activity, and how many calls are in flight. The
+    // in-flight count is what keeps a park from firing under a live call.
+    this._idleTimers = new Map();
+    this._lastActivityAt = new Map();
+    this._inFlightCalls = new Map();
   }
 
   /**
@@ -1023,7 +1117,10 @@ export class McpManager {
     this.registerCachedTools();
     const config = this.getConfig();
     if (config.enabled) {
-      for (const connector of config.connectors.filter(isConnectorEnabled)) {
+      // Only the startup lifecycles connect here. The lazy modes are designed
+      // to stay down until the first call needs them; dialling them at load
+      // would defeat the setting.
+      for (const connector of config.connectors.filter((item) => isConnectorEnabled(item) && startsOnLoad(item))) {
         this.startConnector(connector.id, { retryInitialFailure: true }).catch((err) => {
           this.log.warn(`auto-start failed for ${connector.id}: ${err.message}`);
         });
@@ -1058,6 +1155,10 @@ export class McpManager {
     this.refreshInFlight.clear();
     this._lazyStarts.clear();
     this._toolListings.clear();
+    for (const timer of this._idleTimers.values()) clearTimeout(timer);
+    this._idleTimers.clear();
+    this._lastActivityAt.clear();
+    this._inFlightCalls.clear();
   }
 
   getConfig() {
@@ -1158,12 +1259,44 @@ export class McpManager {
   }
 
   // Single status derivation: a transient runtime override (connecting/
-  // reconnecting/needs-auth) wins; otherwise read liveness off the
+  // reconnecting/needs-auth/idle) wins; otherwise read liveness off the
   // owning client. Never sourced from anywhere else.
   connectorStatusFor(id) {
     const override = this.connectorStatus.get(id);
     if (override) return override;
-    return this.clients.get(id)?.running ? "running" : "stopped";
+    if (this.clients.get(id)?.running) return "running";
+    // No live client: a lazy-lifecycle connector that has not been started
+    // this process, with intent still "running", is dormant by design — which
+    // reads very differently from stopped (one comes back on the next call,
+    // the other needs the user).
+    if (this._isDormant(id)) return STATUS_IDLE;
+    return "stopped";
+  }
+
+  // Dormant = switched on at every gate, wanted running, and designed to be
+  // started on demand. Only the lazy lifecycle modes rest here without an
+  // explicit override; a connector parked by the idle timer carries the
+  // STATUS_IDLE override regardless of its lifecycle.
+  _isDormant(id) {
+    if (this.desiredStates.get(id) === "stopped") return false;
+    const config = this.getConfig();
+    if (!config.enabled) return false;
+    const connector = config.connectors.find((s) => s.id === id);
+    return !!connector && isConnectorEnabled(connector) && !startsOnLoad(connector);
+  }
+
+  // A connector that is not running is startable on demand when the user has
+  // not switched it off (desiredStates !== "stopped") and every gate is on:
+  // the executor brings it up for the arriving call. Unlike _isDormant this
+  // is not lifecycle-specific — a startup-mode connector dropped with
+  // autoReconnect off is also fair game for a one-shot on-demand start, which
+  // is what callTool has always done for callers that bypass the gateway.
+  _isStartableOnDemand(id) {
+    if (this.desiredStates.get(id) === "stopped") return false;
+    const config = this.getConfig();
+    if (!config.enabled) return false;
+    const connector = config.connectors.find((s) => s.id === id);
+    return !!connector && isConnectorEnabled(connector);
   }
 
   /**
@@ -1186,6 +1319,7 @@ export class McpManager {
       status,
       transportAvailable: this.clients.get(connectorId)?.running === true,
       error: this.clientErrors.get(connectorId) || "",
+      startableOnDemand: this._isStartableOnDemand(connectorId),
     });
   }
 
@@ -1324,6 +1458,9 @@ export class McpManager {
     // forever against the user's stated intent.
     const connector = config.connectors.find((item) => item.id === id);
     if (!isConnectorEnabled(connector)) return;
+    // The same lifecycle gate load() applies: a lazy connector is added
+    // dormant and comes up on its first use, not because it was just saved.
+    if (!startsOnLoad(connector)) return;
     try {
       await this.startConnector(id);
     } catch {
@@ -1354,9 +1491,15 @@ export class McpManager {
       assertConnectorIdIsDistinct(config.connectors, next.id, { excludeId: existing.id });
     }
     const changedClient = connectorClientFingerprint(next) !== connectorClientFingerprint(existing);
+    // Lifecycle fields are runtime knobs, not client construction inputs, so
+    // changing them must not tear the connection down (changedClient) — it
+    // reconciles the timers and start intent instead.
+    const changedLifecycle = next.lifecycle !== existing.lifecycle
+      || next.idleTimeoutMinutes !== existing.idleTimeoutMinutes;
     config.connectors[index] = next;
     const saved = this.saveConfig(config);
     if (changedClient) await this.stopConnector(id);
+    if (changedLifecycle) this._applyLifecycleChange(id, next);
     this.clientErrors.delete(id);
     this.registerCachedTools();
     return saved.connectors[index];
@@ -1373,6 +1516,8 @@ export class McpManager {
     // with it either way, so nothing is left keyed to an id that no longer names
     // anything.
     this._toolListings.delete(id);
+    this._lastActivityAt.delete(id);
+    this._inFlightCalls.delete(id);
     const config = this.getConfig();
     config.connectors = config.connectors.filter((s) => s.id !== id);
     const saved = this.saveConfig(config);
@@ -1407,6 +1552,8 @@ export class McpManager {
     const existing = this.clients.get(id);
     if (existing?.running) {
       this.connectorStatus.delete(id);
+      this._resetIdleClock(id);
+      this._armIdleParkTimer(id);
       return connector;
     }
 
@@ -1419,6 +1566,8 @@ export class McpManager {
       await client.start();
       await this.refreshTools(id);
       this.connectorStatus.delete(id);
+      this._resetIdleClock(id);
+      this._armIdleParkTimer(id);
       return this.getConfig().connectors.find((s) => s.id === id);
     } catch (err) {
       this.clients.delete(id);
@@ -1483,6 +1632,7 @@ export class McpManager {
     // resurrect a connector the user just asked to stop.
     this.desiredStates.set(id, "stopped");
     this._cancelReconnect(id);
+    this._clearIdleParkTimer(id);
     this.connectorStatus.delete(id);
     const client = this.clients.get(id);
     if (!client) return;
@@ -1633,6 +1783,8 @@ export class McpManager {
       this.clientErrors.delete(id);
       this.connectorStatus.delete(id);
       this.reconnectState.delete(id);
+      this._resetIdleClock(id);
+      this._armIdleParkTimer(id);
     } catch (err) {
       this.clients.delete(id);
       await client.stop().catch(() => {});
@@ -1663,6 +1815,126 @@ export class McpManager {
     const state = this.reconnectState.get(id);
     if (state?.timer) clearTimeout(state.timer);
     this.reconnectState.delete(id);
+  }
+
+  // ── Idle park ─────────────────────────────────────────────────────────────
+  // The lazy lifecycle modes disconnect a connection that has gone idle
+  // instead of holding it forever. Parking is deliberate, which is why it
+  // shares nothing with the reconnect path: intent stays "running", the close
+  // is expected, the status becomes idle (not stopped), and the next call
+  // starts the connector again.
+
+  _clearIdleParkTimer(id) {
+    const timer = this._idleTimers.get(id);
+    if (timer) clearTimeout(timer);
+    this._idleTimers.delete(id);
+  }
+
+  // A fresh connection starts its idle clock from zero: a connector the user
+  // just started (or that just came back) must not be parked on the strength
+  // of idleness recorded before it came up.
+  _resetIdleClock(id) {
+    this._lastActivityAt.set(id, Date.now());
+  }
+
+  // (Re-)arm the park timer from current state. A no-op unless the connector
+  // is running under an idle-park lifecycle with a positive delay and nothing
+  // is in flight.
+  _armIdleParkTimer(id) {
+    this._clearIdleParkTimer(id);
+    const connector = this.getConfig().connectors.find((s) => s.id === id);
+    const delayMs = connectorIdleParkTimeoutMs(connector);
+    if (delayMs <= 0) return;
+    if (!this.clients.get(id)?.running) return;
+    if ((this._inFlightCalls.get(id) || 0) > 0) return;
+    const timer = setTimeout(() => {
+      this._onIdleParkTimer(id);
+    }, delayMs);
+    // A pending park must not keep the process alive, same as reconnect.
+    timer.unref?.();
+    this._idleTimers.set(id, timer);
+  }
+
+  _onIdleParkTimer(id) {
+    this._idleTimers.delete(id);
+    if (!this.clients.get(id)?.running) return;
+    // A call landed between arming and firing: not idle, go around again.
+    if ((this._inFlightCalls.get(id) || 0) > 0) {
+      this._armIdleParkTimer(id);
+      return;
+    }
+    const connector = this.getConfig().connectors.find((s) => s.id === id);
+    const delayMs = connectorIdleParkTimeoutMs(connector);
+    if (delayMs <= 0 || !connector || !isConnectorEnabled(connector) || !this.getConfig().enabled) return;
+    // Re-check the elapsed time at fire time: the last activity may be more
+    // recent than this timer (a shorter re-arm replaced a longer one, or the
+    // clock moved). Firing early would park a connector that was just used.
+    if (Date.now() - (this._lastActivityAt.get(id) || 0) < delayMs) {
+      this._armIdleParkTimer(id);
+      return;
+    }
+    this._parkConnectorForIdle(id).catch((err) => {
+      this.log.warn?.(`mcp idle park crashed for ${id}: ${err?.message || err}`);
+    });
+  }
+
+  // Tear the client down for being idle. Deliberately not stopConnector: the
+  // user has not changed their mind, so desiredStates stays "running" and an
+  // expected close never reaches the reconnect decision.
+  async _parkConnectorForIdle(id) {
+    this._clearIdleParkTimer(id);
+    const client = this.clients.get(id);
+    if (!client) return;
+    this.clients.delete(id);
+    this.clientErrors.delete(id);
+    this.toolListFreshness.delete(id);
+    this._toolListings.delete(id);
+    this.connectorStatus.set(id, STATUS_IDLE);
+    this.log.info?.(`mcp connector ${id} parked after going idle`);
+    await client.stop().catch(() => {});
+  }
+
+  _markConnectorBusy(id) {
+    this._inFlightCalls.set(id, (this._inFlightCalls.get(id) || 0) + 1);
+    this._resetIdleClock(id);
+    this._clearIdleParkTimer(id);
+  }
+
+  _markConnectorIdle(id) {
+    this._inFlightCalls.set(id, Math.max(0, (this._inFlightCalls.get(id) || 0) - 1));
+    this._resetIdleClock(id);
+    this._armIdleParkTimer(id);
+  }
+
+  // Reconcile runtime state after a lifecycle edit: drop a park timer the new
+  // settings no longer allow, re-arm one they now do, and bring a connector up
+  // when its lifecycle now says "connect at load" while MCP is live.
+  _applyLifecycleChange(id, connector) {
+    if (connectorIdleParkTimeoutMs(connector) <= 0) {
+      this._clearIdleParkTimer(id);
+      // The override would now describe a park the settings no longer allow.
+      if (this.connectorStatus.get(id) === STATUS_IDLE) this.connectorStatus.delete(id);
+      // needs-auth is skipped on purpose: starting cannot succeed without
+      // re-auth, and the attempt would only overwrite the state telling the
+      // user that.
+      if (
+        startsOnLoad(connector)
+        && !this.clients.get(id)?.running
+        && this.getConfig().enabled
+        && isConnectorEnabled(connector)
+        && this.connectorStatus.get(id) !== STATUS_NEEDS_AUTH
+      ) {
+        this.startConnector(id).catch(() => {
+          // startConnector already recorded the message in clientErrors, which
+          // getState() surfaces as connector.error.
+        });
+      }
+      return;
+    }
+    if (this.clients.get(id)?.running) {
+      this._resetIdleClock(id);
+      this._armIdleParkTimer(id);
+    }
   }
 
   async refreshTools(id) {
@@ -1810,7 +2082,12 @@ export class McpManager {
     if (typeof client.readResource !== "function") {
       throw new Error(`MCP connector "${connectorId}" does not support resources/read`);
     }
-    return client.readResource(resourceUri);
+    this._markConnectorBusy(connectorId);
+    try {
+      return await client.readResource(resourceUri);
+    } finally {
+      this._markConnectorIdle(connectorId);
+    }
   }
 
   async callAppTool(connectorId, toolName, args) {
@@ -1831,7 +2108,12 @@ export class McpManager {
       client = this.clients.get(connectorId);
       if (!client?.running) throw new Error(`MCP connector "${connectorId}" is not running`);
     }
-    return client.callTool(toolName, args || {});
+    this._markConnectorBusy(connectorId);
+    try {
+      return await client.callTool(toolName, args || {});
+    } finally {
+      this._markConnectorIdle(connectorId);
+    }
   }
 
   async callTool(connectorId, toolName, args, runtimeCtx: any = {}) {
@@ -1853,13 +2135,20 @@ export class McpManager {
       client = this.clients.get(connectorId);
       if (!client?.running) throw new Error(`MCP connector "${connectorId}" is not running`);
     }
-    return this._callToolThroughInputRounds(client, {
-      connectorId,
-      connectorName: connector?.name || connectorId,
-      toolName,
-      args,
-      runtimeCtx,
-    });
+    // Busy counting spans the whole multi-round call: an idle park must never
+    // fire while a tool call (or its input rounds) is still being served.
+    this._markConnectorBusy(connectorId);
+    try {
+      return await this._callToolThroughInputRounds(client, {
+        connectorId,
+        connectorName: connector?.name || connectorId,
+        toolName,
+        args,
+        runtimeCtx,
+      });
+    } finally {
+      this._markConnectorIdle(connectorId);
+    }
   }
 
   /**
@@ -2158,6 +2447,7 @@ export class McpManager {
       status,
       transportAvailable: this.clients.get(connectorId)?.running === true,
       error: this.clientErrors.get(connectorId) || "",
+      startableOnDemand: this._isStartableOnDemand(connectorId),
     });
   }
 

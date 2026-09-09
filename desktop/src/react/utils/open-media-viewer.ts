@@ -6,6 +6,7 @@ import { isMediaKind, buildFileRefId } from './file-kind';
 interface OpenInput {
   filePath: string;
   fileId?: string;
+  resource?: FileRef['resource'];
   label: string;
   ext: string;
   kind: FileKind;
@@ -59,6 +60,7 @@ export function openMediaViewerFromContext(input: OpenInput): void {
       name: input.label,
       path: input.filePath,
       fileId: input.fileId,
+      resource: input.resource,
       ext: input.ext,
       sessionMessageId: input.messageId,
     };
@@ -66,7 +68,13 @@ export function openMediaViewerFromContext(input: OpenInput): void {
     return;
   }
 
-  state.setMediaViewer({ files, currentId: startRef.id, origin });
+  state.setMediaViewer({
+    files: input.resource && !startRef.resource
+      ? files.map(file => file === startRef ? { ...file, resource: input.resource } : file)
+      : files,
+    currentId: startRef.id,
+    origin,
+  });
 }
 
 // fork 出来的 session 里，历史消息的 marker 还写着父 session 的文件 id 和路径，

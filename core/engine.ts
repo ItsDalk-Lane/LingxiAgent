@@ -2723,7 +2723,7 @@ export class LingxiEngine {
       "这里只提供可查阅范围，还没有进行搜索；不要把尚未检索理解为没有证据。",
       "先使用 knowledge_search 查询相关材料；需要了解资料结构时才调用 knowledge_outline，不必每次先列目录。",
       "问题有多个方面时自行梳理所需材料，不预设子问题数量。首次结果不足时换用人物名、事件、关键词或具体阶段继续搜索。",
-      "搜索返回的 citations/spans 原文可以直接作为依据，使用工具提供的完整 citationMarkdown 链接，无需重新抄写原文申请登记。保留链接目标，不自行编写引用编号或只写来源文字；界面会自动显示数字引用角标。",
+      "搜索返回的 citations/spans 原文可以直接作为依据，使用工具提供的完整 citationMarkdown 链接，无需重新抄写原文申请登记。citationMarkdown 是工具结果的字段名：只把该字段的完整 Markdown 链接值直接放在结论后，不输出字段名，不包裹 XML/HTML 标签或额外括号。保留链接目标，不自行编写引用编号或只写来源文字；界面会自动显示数字引用角标。",
       "标题、摘要和目录只作线索。需要上下文时，用 knowledge_read 读取命中所在章节或相邻原文；按返回的继续位置阅读后续内容。",
       "需要精确词句时使用 knowledge_grep。不得重复相同查询或已经读过的范围；空结果时改写查询，失败时依据具体原因调整。",
       "遇到新线索就继续查阅，直到能够回答用户实际问题；无需另开研究会话，不要为普通知识问答委派多名调查者。",
@@ -4142,7 +4142,8 @@ export class LingxiEngine {
           signal,
           onUpdate,
           ctx: runtimeCtx,
-          runtimeContext: runtimeCtx,
+          // 执行前复核与调用凭据使用同一助手身份，不能等到实际执行时才补齐。
+          runtimeContext: { ...runtimeCtx, agentId: runtimeCtx.agentId || agentId },
         });
       },
     });

@@ -431,7 +431,7 @@ describe('chat-slice', () => {
       expect(slice.chatSessions['/a']?.items).toHaveLength(3);
     });
 
-    it('重复收到同一个 taskId 的完成块时视为已消费，不追加重复文件', () => {
+    it('重复收到同一任务的同一文件时视为已消费，不追加重复文件', () => {
       slice.initSession('/a', [{
         type: 'message',
         data: {
@@ -451,9 +451,9 @@ describe('chat-slice', () => {
       expect(slice.resolveBlockByTaskId('/a', 'task-img', {
         type: 'file',
         replacesTaskId: 'task-img',
-        fileId: 'sf_img_2',
-        filePath: '/tmp/generated-2.png',
-        label: 'generated-2.png',
+        fileId: 'sf_img',
+        filePath: '/tmp/generated.png',
+        label: 'generated.png',
         ext: 'png',
       })).toBe(true);
 
@@ -467,6 +467,23 @@ describe('chat-slice', () => {
           filePath: '/tmp/generated.png',
         }),
       ]);
+    });
+
+    it('同一任务返回多张图片时逐张保留，完成通知重放不重复', () => {
+      const first = {
+        type: 'file' as const, replacesTaskId: 'multi-image', fileId: 'image-1',
+        filePath: '/tmp/1.png', label: '1.png', ext: 'png',
+      };
+      const second = { ...first, fileId: 'image-2', filePath: '/tmp/2.png', label: '2.png' };
+      slice.initSession('/a', [{ type: 'message', data: {
+        id: 'a1', role: 'assistant', blocks: [first],
+      } }], false);
+      expect(slice.resolveBlockByTaskId('/a', 'multi-image', second)).toBe(true);
+      expect(slice.resolveBlockByTaskId('/a', 'multi-image', second)).toBe(true);
+      const message = slice.chatSessions['/a']?.items[0];
+      if (message?.type !== 'message') throw new Error('expected message');
+      expect(message.data.blocks?.filter(block => block.type === 'file').map(block => block.fileId))
+        .toEqual(['image-1', 'image-2']);
     });
 
     it('允许重试后的完成块替换失败的媒体生成块', () => {

@@ -8,6 +8,7 @@ import { createAssistantMessageEventStream } from '@earendil-works/pi-ai';
 import { createAgentSession } from '../../lib/pi-sdk/index.ts';
 import { submitDesktopSessionMessage } from '../../core/desktop-session-submit.ts';
 import { createSessionsRoute } from '../../server/routes/sessions.ts';
+import { generateSessionId } from '../../core/session-manifest/id.ts';
 
 const cleanup: Array<() => void | Promise<void>> = [];
 afterEach(async () => { for (const fn of cleanup.splice(0).reverse()) await fn(); vi.restoreAllMocks(); });
@@ -35,7 +36,8 @@ export async function createDesktopInputHistoryFixture() {
   const { session } = await createAgentSession({ cwd: home, model, modelRuntime: runtime, resourceLoader: loader, sessionManager: manager, settingsManager: SettingsManager.inMemory({ compaction: { enabled: false }, retry: { enabled: false } }), noTools: 'all' });
   cleanup.push(() => session.dispose());
   const sessionPath = manager.getSessionFile()!;
-  const sessionId = manager.getSessionId();
+  // 生产环境的业务身份由 manifest 生成，与 SDK 文件头 UUID 独立。
+  const sessionId = generateSessionId();
   const engine: any = {
     agentsDir: path.join(home, 'agents'), currentSessionPath: sessionPath,
     ensureSessionLoaded: async () => session,

@@ -108,8 +108,23 @@ function withInputCorrelation<T>(engine: any, session: any, identity: any, actio
     catch { /* 诊断投递失败也不能中断已提交的用户输入。 */ }
   };
   if (!Number.isSafeInteger(snapshotVersion) || snapshotVersion < 1 || !identity.sessionId) { unavailable(); return action(); }
+  const manager = session?.sessionManager;
+  let sdkSessionId: unknown;
+  try { sdkSessionId = manager?.getSessionId?.(); } catch { unavailable(); return action(); }
+  // 业务会话 ID 与 SDK 文件头 UUID 独立；通过当前 manifest、文件和运行实例关联。
+  const identityStillBound = () => {
+    try {
+      return typeof sdkSessionId === 'string' && !!sdkSessionId
+        && session.sessionManager === manager && manager.getSessionId() === sdkSessionId
+        && manager.getSessionFile?.() === identity.sessionPath
+        && engine.getSessionByPath?.(identity.sessionPath) === session
+        && engine.getSessionIdForPath?.(identity.sessionPath) === identity.sessionId
+        && engine.getSessionManifest?.(identity.sessionId)?.currentLocator?.path === identity.sessionPath;
+    } catch { return false; }
+  };
+  if (!identityStillBound()) { unavailable(); return action(); }
   return withDesktopInputCommitted({ session, unavailable, committed: sourceEntryId => {
-    if (session.sessionManager.getSessionId() !== identity.sessionId) { unavailable(); return; }
+    if (!identityStillBound()) { unavailable(); return; }
     session.sessionManager.appendCustomEntry(DESKTOP_INPUT_CORRELATION_TYPE, { schemaVersion: 1, sessionId: identity.sessionId, clientMessageId: identity.clientMessageId, snapshotVersion, sourceEntryId });
     const correlation = collectDesktopInputCorrelations(session.sessionManager.getBranch(), identity.sessionId).get(sourceEntryId);
     if (!correlation?.clientMessageId) { unavailable(); return; }

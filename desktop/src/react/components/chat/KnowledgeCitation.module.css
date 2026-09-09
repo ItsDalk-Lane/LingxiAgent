@@ -3,17 +3,13 @@
   --knowledge-citation-text: #438bd4;
   position: relative;
   top: -0.45em;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: inline;
   box-sizing: border-box;
-  min-width: 1.55em;
-  height: 1.55em;
-  padding: 0 0.25em;
+  padding: 0;
   margin: 0 0.12em;
   border: 0;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--knowledge-citation-accent) 22%, var(--bg-card));
+  border-radius: 0;
+  background: transparent;
   color: color-mix(in srgb, var(--knowledge-citation-text) 80%, var(--text));
   font-size: 75%;
   font-weight: 500;
@@ -27,8 +23,8 @@
 
 :global(.md-content) a.badge:hover,
 :global(.md-content) a.badge:focus-visible {
-  background: color-mix(in srgb, var(--knowledge-citation-accent) 34%, var(--bg-card));
-  text-decoration: none;
+  background: transparent;
+  text-decoration: underline;
 }
 
 :global(.md-content) a.badge:focus-visible {

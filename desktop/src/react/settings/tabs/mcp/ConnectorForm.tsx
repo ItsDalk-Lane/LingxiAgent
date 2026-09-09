@@ -3,7 +3,7 @@ import { t } from '../../helpers';
 import styles from '../../Settings.module.css';
 import { ConfirmDialog, SelectWidget } from '@/ui';
 import { parseKeyValueLines, remoteUrlError, serializeKeyValueLines } from './mcp-config';
-import type { McpAuthType, McpConnector, McpConnectorInput, McpTransport } from './types';
+import type { McpAuthType, McpConnector, McpConnectorInput, McpLifecycle, McpTransport } from './types';
 
 type FormMode = 'local' | 'remote';
 
@@ -40,11 +40,25 @@ const INITIAL_FORM = {
   headers: '',
   registryUrl: '',
   timeout: '',
+  lifecycle: 'keep-alive' as McpLifecycle,
+  idleTimeoutMinutes: '',
   authType: 'none' as McpAuthType,
   authorizationToken: '',
   oauthClientId: '',
   oauthClientSecret: '',
 };
+
+const LIFECYCLE_OPTIONS: ReadonlyArray<{ value: McpLifecycle; labelKey: string; hintKey: string }> = [
+  { value: 'keep-alive', labelKey: 'settings.mcp.lifecycleKeepAlive', hintKey: 'settings.mcp.lifecycleHintKeepAlive' },
+  { value: 'lazy-keep-alive', labelKey: 'settings.mcp.lifecycleLazyKeepAlive', hintKey: 'settings.mcp.lifecycleHintLazyKeepAlive' },
+  { value: 'eager', labelKey: 'settings.mcp.lifecycleEager', hintKey: 'settings.mcp.lifecycleHintEager' },
+  { value: 'lazy', labelKey: 'settings.mcp.lifecycleLazy', hintKey: 'settings.mcp.lifecycleHintLazy' },
+];
+
+/** Only these lifecycles park an idle connection, so only they take a timeout. */
+function lifecycleTakesIdleTimeout(lifecycle: McpLifecycle): boolean {
+  return lifecycle === 'lazy' || lifecycle === 'eager';
+}
 
 const fieldHalfClass = `${styles['settings-form-field']} ${styles['settings-form-field-half']}`;
 const fieldFullClass = styles['settings-form-field'];
@@ -114,10 +128,19 @@ export function ConnectorForm({
       }
     };
     const timeout = Number(form.timeout);
+    const idleRaw = form.idleTimeoutMinutes.trim();
+    const idleNumber = Number(idleRaw);
     const common = {
       name: form.name,
       description: form.description,
       timeout: Number.isFinite(timeout) && timeout > 0 ? timeout : undefined,
+      lifecycle: form.lifecycle,
+      // Empty resets to the lifecycle default; a plain 0 is a real value
+      // (never park) and must survive, so the field is only collapsed to null
+      // when it was left blank.
+      idleTimeoutMinutes: idleRaw === ''
+        ? null
+        : (Number.isFinite(idleNumber) && idleNumber >= 0 ? Math.floor(idleNumber) : null),
     };
     const input: McpConnectorInput = form.mode === 'local'
       ? {
@@ -343,6 +366,34 @@ export function ConnectorForm({
         />
       </div>
 
+      <div className={styles['settings-form-grid']}>
+        <div className={fieldHalfClass}>
+          <label className={styles['settings-form-label']}>{t('settings.mcp.lifecycle')}</label>
+          <SelectWidget
+            value={form.lifecycle}
+            onChange={(v) => setForm({ ...form, lifecycle: v as McpLifecycle })}
+            options={LIFECYCLE_OPTIONS.map(({ value, labelKey }) => ({ value, label: t(labelKey) }))}
+          />
+          <span className={styles['settings-form-hint']}>
+            {t(LIFECYCLE_OPTIONS.find((option) => option.value === form.lifecycle)?.hintKey || 'settings.mcp.lifecycleHintKeepAlive')}
+          </span>
+        </div>
+        {lifecycleTakesIdleTimeout(form.lifecycle) && (
+          <div className={fieldHalfClass}>
+            <label className={styles['settings-form-label']}>{t('settings.mcp.idleTimeout')}</label>
+            <input
+              className={styles['settings-input']}
+              type="number"
+              min={0}
+              value={form.idleTimeoutMinutes}
+              onChange={(e) => setForm({ ...form, idleTimeoutMinutes: e.target.value })}
+              placeholder={form.lifecycle === 'lazy' ? '10' : '0'}
+            />
+            <span className={styles['settings-form-hint']}>{t('settings.mcp.idleTimeoutHint')}</span>
+          </div>
+        )}
+      </div>
+
       {error && <p className={styles['settings-muted-note']}>{error}</p>}
 
       <div className={styles['pv-add-form-actions']}>
@@ -404,6 +455,11 @@ function formFromConnector(connector: McpConnector): typeof INITIAL_FORM {
     headers: serializeKeyValueLines(connector.headers),
     registryUrl: connector.registryUrl || '',
     timeout: connector.timeout ? String(connector.timeout) : '',
+    lifecycle: connector.lifecycle || 'keep-alive',
+    idleTimeoutMinutes:
+      connector.idleTimeoutMinutes === null || connector.idleTimeoutMinutes === undefined
+        ? ''
+        : String(connector.idleTimeoutMinutes),
     authType: connector.authType || 'none',
     authorizationToken: connector.authorizationToken || '',
     oauthClientId: connector.oauthClientId || '',

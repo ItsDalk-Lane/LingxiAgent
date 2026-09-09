@@ -28,6 +28,27 @@ describe('ModelWidget', () => {
     vi.clearAllMocks();
   });
 
+  it('closes the model menu on Escape from the custom input without submitting or closing its parent', () => {
+    const onSelect = vi.fn();
+    const outerEscape = vi.fn();
+    document.addEventListener('keydown', outerEscape);
+    try {
+      render(<ModelWidget value={null} onSelect={onSelect} />);
+      const trigger = screen.getByRole('button', { name: /selectModel/ });
+      fireEvent.click(trigger);
+      const input = screen.getByPlaceholderText('settings.api.customInput');
+      fireEvent.change(input, { target: { value: 'provider/model' } });
+      input.focus();
+      fireEvent.keyDown(input, { key: 'Escape' });
+      expect(screen.queryByRole('listbox')).toBeNull();
+      expect(document.activeElement).toBe(trigger);
+      expect(onSelect).not.toHaveBeenCalled();
+      expect(outerEscape).not.toHaveBeenCalled();
+    } finally {
+      document.removeEventListener('keydown', outerEscape);
+    }
+  });
+
   it('shows the provider icon in the closed selected trigger', () => {
     render(
       <ModelWidget

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSettingsStore } from '../../store';
 import { lingxiFetch } from '../../api';
 import {
@@ -18,6 +18,8 @@ type ModelRef = { id: string; provider: string };
 
 function ToolModelTestBtn({ modelRef }: { modelRef: unknown }) {
   const [status, setStatus] = useState<'idle' | 'testing' | 'ok' | 'fail'>('idle');
+  const requestRef = useRef<AbortController | null>(null);
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const ref = typeof modelRef === 'object' && modelRef !== null
     ? {
@@ -27,27 +29,54 @@ function ToolModelTestBtn({ modelRef }: { modelRef: unknown }) {
     : { id: String(modelRef || ''), provider: '' };
   const hasRef = !!ref.id;
 
+  useEffect(() => {
+    setStatus('idle');
+    return () => {
+      // 换模型或离开页面时，旧请求和旧提示计时器不能影响新的模型。
+      requestRef.current?.abort();
+      requestRef.current = null;
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = null;
+    };
+  }, [ref.id, ref.provider]);
+
   const test = async () => {
-    if (!hasRef) return;
+    if (!hasRef || requestRef.current) return;
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    resetTimerRef.current = null;
+    const controller = new AbortController();
+    requestRef.current = controller;
     setStatus('testing');
     try {
       const res = await lingxiFetch('/api/models/health', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ modelId: ref.id, provider: ref.provider }),
+        signal: controller.signal,
       });
       const data = await res.json();
-      setStatus(data.ok ? 'ok' : 'fail');
+      if (controller.signal.aborted) return;
+      setStatus(res.ok && data.ok ? 'ok' : 'fail');
     } catch {
+      if (controller.signal.aborted) return;
       setStatus('fail');
     }
-    setTimeout(() => setStatus('idle'), 3000);
+    requestRef.current = null;
+    resetTimerRef.current = setTimeout(() => {
+      setStatus('idle');
+      resetTimerRef.current = null;
+    }, 3000);
   };
 
   if (!hasRef) return null;
 
+  const label = t(status === 'testing' ? 'settings.search.verifying'
+    : status === 'ok' ? 'settings.providers.verifySuccess'
+      : status === 'fail' ? 'settings.providers.verifyFailed'
+        : 'settings.providers.verifyConnection');
+
   return (
-    <button className={`${styles['pv-tool-test-btn']} ${styles[status] || ''}`} onClick={test} disabled={status === 'testing'}>
+    <button type="button" className={`${styles['pv-tool-test-btn']} ${styles[status] || ''}`} onClick={test} disabled={status === 'testing'} aria-busy={status === 'testing'} aria-label={label} title={label}>
       {status === 'testing' ? (
         <svg className={styles['spinning']} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" />

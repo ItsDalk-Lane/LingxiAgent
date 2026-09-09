@@ -25,6 +25,13 @@ describe('AssistantMessage media generation placeholder', () => {
       startDrag: vi.fn(),
     };
     useStore.setState({
+      serverPort: 3210,
+      serverToken: null,
+      serverConnections: {},
+      activeServerConnectionId: null,
+      activeServerConnection: null,
+      chatSessions: {},
+      sessionRegistryFilesByPath: {},
       agents: [],
       agentName: 'Hanako',
       agentYuan: 'lingxi',
@@ -36,6 +43,8 @@ describe('AssistantMessage media generation placeholder', () => {
 
   afterEach(() => {
     cleanup();
+    delete (window as any).platform;
+    useStore.setState({ serverPort: null, serverToken: null, serverConnections: {}, activeServerConnectionId: null, activeServerConnection: null, chatSessions: {}, sessionRegistryFilesByPath: {} } as never);
     vi.restoreAllMocks();
   });
 
@@ -161,6 +170,60 @@ describe('AssistantMessage media generation placeholder', () => {
 
     fireEvent.dragStart(card);
     expect(startDrag).toHaveBeenCalledWith('/tmp/generated/agnes.mp4');
+  });
+
+  function mediaMessage(ext: 'png' | 'mp4', resourceId?: string) {
+    return <AssistantMessage
+      agentDisplay={{ id: 'hana', displayName: 'Hana', avatarUrl: null, fallbackAvatar: null, yuan: 'hana', isUser: false }}
+      isStreaming={false}
+      isSelected={false}
+      showAvatar={false}
+      sessionPath="/sessions/main.jsonl"
+      message={{
+        id: 'a-media', role: 'assistant', blocks: [{
+          type: 'file', fileId: 'sf_generated', filePath: `/tmp/generated/output.${ext}`,
+          label: `output.${ext}`, ext,
+          ...(resourceId ? { resource: {
+            schemaVersion: 1 as const, resourceId, studioId: 'studio_local',
+            name: `output.${ext}`, type: 'file', source: 'session_file',
+            lifecycle: { status: 'available', missingAt: null },
+            storage: { provider: 'session_file' },
+            links: { self: `/api/resources/${resourceId}`, content: `/api/resources/${resourceId}/content` },
+          } } : {}),
+        }],
+      }}
+    />;
+  }
+
+  it.each(['png', 'mp4'] as const)('尚未进入文件登记的 %s 使用块内受控地址直接预览', (ext) => {
+    const { container } = render(mediaMessage(ext, 'res_generated'));
+    const media = container.querySelector(ext === 'png' ? 'img' : 'video');
+    expect(media).toHaveAttribute('src', 'http://127.0.0.1:3210/api/resources/res_generated/content');
+  });
+
+  it.each(['png', 'mp4'] as const)('%s 旧地址失败后新资源地址到达能恢复预览', (ext) => {
+    const { container, rerender } = render(mediaMessage(ext));
+    const selector = ext === 'png' ? 'img' : 'video';
+    fireEvent.error(container.querySelector(selector)!);
+    expect(container.querySelector(selector)).toBeNull();
+    rerender(mediaMessage(ext, 'res_ready'));
+    expect(container.querySelector(selector)).toHaveAttribute('src', 'http://127.0.0.1:3210/api/resources/res_ready/content');
+  });
+
+  it('视频在聊天内提供播放器控件，点击视频不会另开查看器', () => {
+    const { container } = render(mediaMessage('mp4', 'res_generated'));
+    const video = container.querySelector('video')!;
+    expect(video).toHaveAttribute('controls');
+    expect(video.muted).toBe(false);
+    fireEvent.click(video);
+    expect(useStore.getState().mediaViewer).toBeNull();
+  });
+
+  it('图片仍可点击放大查看', async () => {
+    const { container } = render(mediaMessage('png', 'res_generated'));
+    fireEvent.click(container.querySelector('img')!);
+    await waitFor(() => expect(useStore.getState().mediaViewer?.currentId).toContain('/tmp/generated/output.png'));
+    expect(useStore.getState().mediaViewer?.files[0].resource?.links.content).toBe('/api/resources/res_generated/content');
   });
 
   it('isolates a malformed rich block without hiding sibling message blocks', () => {

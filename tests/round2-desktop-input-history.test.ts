@@ -5,6 +5,44 @@ import { DESKTOP_INPUT_CORRELATION_TYPE } from '../core/desktop-input-correlatio
 import { createDesktopInputHistoryFixture as fixture } from './helpers/desktop-input-history-fixture.ts';
 
 describe('R04 真实 SDK 桌面提交到历史关联', () => {
+  it('业务 ID 与 SDK UUID 独立，普通历史及未载入运行实例的严格历史仍保留关联', async () => {
+    const f = await fixture(); await f.submit('separate-identities');
+    expect(f.sessionId).not.toBe(f.manager.getSessionId());
+    const normal = await (await f.app.request(`/api/sessions/messages?sessionId=${f.sessionId}`)).json() as any;
+    expect(normal.messages.some((message: any) => message.clientMessageId === 'separate-identities')).toBe(true);
+    f.engine.getSessionByPath = () => null;
+    const response = await f.history();
+    expect(response.reconciliation).toMatchObject({ complete: true, runStatus: 'reconciled_idle' });
+    expect(response.messages.some((message: any) => message.clientMessageId === 'separate-identities')).toBe(true);
+  });
+
+  it.each(['reverse', 'runtime', 'branch', 'header'])('拒绝不一致的%s身份绑定', async (kind) => {
+    const f = await fixture(); await f.submit('bound-input');
+    if (kind === 'reverse') f.engine.getSessionIdForPath = () => 'another-business-id';
+    if (kind === 'runtime') vi.spyOn(f.manager, 'getSessionFile').mockReturnValue('/other-session.jsonl');
+    if (kind === 'branch') f.engine.getSessionBranchHead = () => ({ sessionId: 'another-business-id', leafId: f.manager.getLeafId() });
+    if (kind === 'header') {
+      const lines = fs.readFileSync(f.sessionPath, 'utf8').trim().split('\n');
+      lines[0] = JSON.stringify({ ...JSON.parse(lines[0]), id: 'another-sdk-id' });
+      fs.writeFileSync(f.sessionPath, lines.join('\n') + '\n');
+    }
+    const response = await f.history();
+    expect(response.reconciliation.complete).toBe(false);
+    expect(response.messages.some((message: any) => message.clientMessageId)).toBe(false);
+  });
+
+  it.each(['reverse', 'runtime'])('提交期间%s身份绑定失效时不签发接受回执', async (kind) => {
+    const f = await fixture();
+    const originalPrompt = f.engine.promptSession;
+    f.engine.promptSession = async (...args: any[]) => {
+      if (kind === 'reverse') f.engine.getSessionIdForPath = () => 'another-business-id';
+      else vi.spyOn(f.manager, 'getSessionFile').mockReturnValue('/other-session.jsonl');
+      return originalPrompt(...args);
+    };
+    await f.submit('changed-binding');
+    expect(f.engine.emitEvent.mock.calls.some(([event]: any[]) => event.type === 'session_user_message' && event.message.sourceEntryId)).toBe(false);
+    expect(f.manager.getBranch().some(entry => entry.type === 'custom' && entry.customType === DESKTOP_INPUT_CORRELATION_TYPE)).toBe(false);
+  });
   it('R04-15 相同正文不同 client ID 经真实 append 和历史路由仍分别关联', async () => {
     const f = await fixture(); await f.submit('input-a', 2); await f.submit('input-b', 3);
     const bytes = fs.readFileSync(f.sessionPath);
@@ -60,6 +98,7 @@ describe('R04 真实 SDK 桌面提交到历史关联', () => {
     const forkPath = path.join(path.dirname(f.sessionPath), 'fork-session-identity.jsonl');
     fs.writeFileSync(forkPath, entries.map(entry => JSON.stringify(entry)).join('\n') + '\n');
     f.engine.getSessionManifest = (id: string) => id === forkId ? { sessionId: forkId, currentLocator: { path: forkPath } } : null;
+    f.engine.getSessionIdForPath = (locator: string) => locator === forkPath ? forkId : null;
     f.engine.getSessionBranchHead = () => ({ sessionId: forkId, leafId: entries.at(-1).id, observedTailLeafId: entries.at(-1).id });
     const response = await f.app.request(`/api/sessions/messages?sessionId=${forkId}&reconciliation=1`);
     expect(response.status).toBe(200);

@@ -232,20 +232,19 @@ describe("旧 MCP 会话撤销", () => {
     expect(invocation.executeCanonical).not.toHaveBeenCalled();
   });
 
-  it("临时断线保持 TRANSPORT_FAILURE，不推进代次也不执行旧对象", async () => {
+  it("临时断线按需可重启：不推进代次、不算撤销，也不执行旧客户端对象", async () => {
     const { manager, invocation, callTool } = mcpFixture();
     const generation = invocation.target.lifecycleGeneration;
 
+    // 生命周期模型下，掉线而用户未停机是设计的休眠态：可用性按需放行，
+    // 执行器为这次调用重启连接器；它既不是撤销也不是永久故障。
     await expect(invokeAfterApproval(invocation, () => {
       manager.clients.delete("alpha");
-    })).rejects.toMatchObject({
-      code: "TRANSPORT_FAILURE",
-      details: { reason: "mcp_connector_stopped" },
-    });
+    })).resolves.toBeDefined();
 
     expect(invocation.target.getCurrentGeneration()).toBe(generation);
     expect(callTool).not.toHaveBeenCalled();
-    expect(invocation.executeCanonical).not.toHaveBeenCalled();
+    expect(invocation.executeCanonical).toHaveBeenCalledTimes(1);
   });
 });
 

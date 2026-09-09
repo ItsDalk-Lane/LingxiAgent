@@ -883,7 +883,12 @@ class StreamBufferManager {
         }
 
         const taskId = replacementTaskId(block);
-        if (taskId) {
+        const belongsToBufferedRun = taskId && buf.blocks.some(existing => (
+          (existing.type === 'media_generation' && existing.taskId === taskId)
+          || (existing.type === 'file' && existing.replacesTaskId === taskId)
+        ));
+        // 当前回合以流式缓存为准；重载会话后存储中可能也有旧快照，不能只改快照。
+        if (taskId && !belongsToBufferedRun) {
           if (this.hasRunState(buf)) this.flush(buf);
           const consumed = useStore.getState().resolveBlockByTaskId(buf.sessionPath, taskId, block);
           if (consumed) {

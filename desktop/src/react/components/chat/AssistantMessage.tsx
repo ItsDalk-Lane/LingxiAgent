@@ -502,24 +502,36 @@ interface FileBlockCtx {
   blockIdx: number;
 }
 
-const ImageOutputCard = memo(function ImageOutputCard({ fileId, filePath, label, ext, status, ctx }: { fileId?: string; filePath: string; label: string; ext: string; status?: string; ctx: FileBlockCtx }) {
-  const [failed, setFailed] = useState(false);
+interface FileOutputProps {
+  fileId?: string;
+  filePath: string;
+  label: string;
+  ext: string;
+  status?: string;
+  resource?: FileRef['resource'];
+  ctx: FileBlockCtx;
+}
+
+const ImageOutputCard = memo(function ImageOutputCard({ fileId, filePath, label, ext, status, resource, ctx }: FileOutputProps) {
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const displayName = label || filePath.split('/').pop() || filePath;
   const imageSrc = useStore(useCallback((state) => {
     const files = selectSessionFiles(state, ctx.sessionPath);
     const ref = files.find(file => (fileId && file.fileId === fileId) || file.path === filePath)
-      ?? buildFallbackSessionFileRef({ fileId, filePath, label: displayName, ext, kind: ext.toLowerCase() === 'svg' ? 'svg' : 'image', ctx });
+      ?? buildFallbackSessionFileRef({ fileId, filePath, label: displayName, ext, resource, kind: ext.toLowerCase() === 'svg' ? 'svg' : 'image', ctx });
     try {
-      return resolveFileRefUrl(ref, {
+      return resolveFileRefUrl(ref.resource || !resource ? ref : { ...ref, resource }, {
         connection: resolveServerConnection(state),
         platform: window.platform,
+        preferLocalFile: false,
       }).url;
     } catch {
       return '';
     }
-  }, [ctx, displayName, ext, fileId, filePath]));
+  }, [ctx, displayName, ext, fileId, filePath, resource]));
   const downloadUrl = useSessionFileDownloadUrl({
     fileId,
+    resource,
     filePath,
     label: displayName,
     ext,
@@ -544,8 +556,8 @@ const ImageOutputCard = memo(function ImageOutputCard({ fileId, filePath, label,
     }
   }, [fileId, filePath, displayName]);
 
-  if (status === 'expired') return <FileOutputCard filePath={filePath} label={label} ext={ext} status={status} ctx={ctx} />;
-  if (failed) return <FileOutputCard filePath={filePath} label={label} ext={ext} status={status} ctx={ctx} />;
+  if (status === 'expired') return <FileOutputCard fileId={fileId} resource={resource} filePath={filePath} label={label} ext={ext} status={status} ctx={ctx} />;
+  if (failedSrc === imageSrc) return <FileOutputCard fileId={fileId} resource={resource} filePath={filePath} label={label} ext={ext} status={status} ctx={ctx} />;
 
   return (
     <div
@@ -557,6 +569,7 @@ const ImageOutputCard = memo(function ImageOutputCard({ fileId, filePath, label,
         sessionPath: ctx.sessionPath,
         messageId: ctx.messageId,
         fileId,
+        resource,
         blockIdx: ctx.blockIdx,
       })}
       style={{ cursor: 'default' }}
@@ -578,31 +591,33 @@ const ImageOutputCard = memo(function ImageOutputCard({ fileId, filePath, label,
         src={imageSrc}
         alt={displayName}
         className={styles.imageOutputPreview}
-        onError={() => setFailed(true)}
+        onError={() => setFailedSrc(imageSrc)}
         draggable={false}
       />
     </div>
   );
 });
 
-const VideoOutputCard = memo(function VideoOutputCard({ fileId, filePath, label, ext, status, ctx }: { fileId?: string; filePath: string; label: string; ext: string; status?: string; ctx: FileBlockCtx }) {
-  const [failed, setFailed] = useState(false);
+const VideoOutputCard = memo(function VideoOutputCard({ fileId, filePath, label, ext, status, resource, ctx }: FileOutputProps) {
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const displayName = label || filePath.split('/').pop() || filePath;
   const videoSrc = useStore(useCallback((state) => {
     const files = selectSessionFiles(state, ctx.sessionPath);
     const ref = files.find(file => (fileId && file.fileId === fileId) || file.path === filePath)
-      ?? buildFallbackSessionFileRef({ fileId, filePath, label: displayName, ext, kind: 'video', ctx });
+      ?? buildFallbackSessionFileRef({ fileId, filePath, label: displayName, ext, resource, kind: 'video', ctx });
     try {
-      return resolveFileRefUrl(ref, {
+      return resolveFileRefUrl(ref.resource || !resource ? ref : { ...ref, resource }, {
         connection: resolveServerConnection(state),
         platform: window.platform,
+        preferLocalFile: false,
       }).url;
     } catch {
       return '';
     }
-  }, [ctx, displayName, ext, fileId, filePath]));
+  }, [ctx, displayName, ext, fileId, filePath, resource]));
   const downloadUrl = useSessionFileDownloadUrl({
     fileId,
+    resource,
     filePath,
     label: displayName,
     ext,
@@ -627,8 +642,8 @@ const VideoOutputCard = memo(function VideoOutputCard({ fileId, filePath, label,
     }
   }, [fileId, filePath, displayName]);
 
-  if (status === 'expired') return <FileOutputCard filePath={filePath} label={label} ext={ext} status={status} ctx={ctx} />;
-  if (failed) return <FileOutputCard filePath={filePath} label={label} ext={ext} status={status} ctx={ctx} />;
+  if (status === 'expired') return <FileOutputCard fileId={fileId} resource={resource} filePath={filePath} label={label} ext={ext} status={status} ctx={ctx} />;
+  if (failedSrc === videoSrc) return <FileOutputCard fileId={fileId} resource={resource} filePath={filePath} label={label} ext={ext} status={status} ctx={ctx} />;
 
   return (
     <div
@@ -641,6 +656,7 @@ const VideoOutputCard = memo(function VideoOutputCard({ fileId, filePath, label,
         sessionPath: ctx.sessionPath,
         messageId: ctx.messageId,
         fileId,
+        resource,
         blockIdx: ctx.blockIdx,
       })}
       style={{ cursor: 'default' }}
@@ -663,16 +679,12 @@ const VideoOutputCard = memo(function VideoOutputCard({ fileId, filePath, label,
         src={videoSrc}
         className={styles.videoOutputPreview}
         preload="metadata"
-        muted
+        controls
         playsInline
-        onError={() => setFailed(true)}
+        onClick={(event) => event.stopPropagation()}
+        onError={() => setFailedSrc(videoSrc)}
         draggable={false}
       />
-      <span className={styles.videoOutputPlayBadge} aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M8 5v14l11-7z" />
-        </svg>
-      </span>
     </div>
   );
 });
@@ -689,6 +701,7 @@ function DownloadGlyph() {
 
 function buildFallbackSessionFileRef({
   fileId,
+  resource,
   filePath,
   label,
   ext,
@@ -696,6 +709,7 @@ function buildFallbackSessionFileRef({
   ctx,
 }: {
   fileId?: string;
+  resource?: FileRef['resource'];
   filePath: string;
   label: string;
   ext: string;
@@ -711,6 +725,7 @@ function buildFallbackSessionFileRef({
       path: filePath,
     }),
     fileId,
+    resource,
     kind,
     source: 'session-block-file',
     name: label,
@@ -721,12 +736,13 @@ function buildFallbackSessionFileRef({
   };
 }
 
-const FileOutputCard = memo(function FileOutputCard({ fileId, filePath, label, ext, status, ctx }: { fileId?: string; filePath: string; label: string; ext: string; status?: string; ctx: FileBlockCtx }) {
+const FileOutputCard = memo(function FileOutputCard({ fileId, filePath, label, ext, status, resource, ctx }: FileOutputProps) {
   const expired = status === 'expired';
   const expiredLabel = window.t('chat.fileExpired');
   const displayName = label || filePath.split('/').pop() || filePath;
   const downloadUrl = useSessionFileDownloadUrl({
     fileId,
+    resource,
     filePath,
     label: displayName,
     ext,
@@ -740,6 +756,7 @@ const FileOutputCard = memo(function FileOutputCard({ fileId, filePath, label, e
       sessionPath: ctx.sessionPath,
       messageId: ctx.messageId,
       fileId,
+      resource,
       blockIdx: ctx.blockIdx,
     });
   };
@@ -770,6 +787,7 @@ const FileOutputCard = memo(function FileOutputCard({ fileId, filePath, label, e
 
 function useSessionFileDownloadUrl({
   fileId,
+  resource,
   filePath,
   label,
   ext,
@@ -777,6 +795,7 @@ function useSessionFileDownloadUrl({
   ctx,
 }: {
   fileId?: string;
+  resource?: FileRef['resource'];
   filePath: string;
   label: string;
   ext: string;
@@ -786,10 +805,10 @@ function useSessionFileDownloadUrl({
   return useStore(useCallback((state) => {
     const files = selectSessionFiles(state, ctx.sessionPath);
     const ref = files.find(file => (fileId && file.fileId === fileId) || file.path === filePath)
-      ?? buildFallbackSessionFileRef({ fileId, filePath, label, ext, kind, ctx });
+      ?? buildFallbackSessionFileRef({ fileId, filePath, label, ext, kind, resource, ctx });
     if (ref.status === 'expired') return null;
     try {
-      const resolved = resolveFileRefUrl(ref, {
+      const resolved = resolveFileRefUrl(ref.resource || !resource ? ref : { ...ref, resource }, {
         connection: resolveServerConnection(state),
         platform: typeof window !== 'undefined' ? window.platform : null,
         preferLocalFile: false,
@@ -799,7 +818,7 @@ function useSessionFileDownloadUrl({
     } catch {
       return null;
     }
-  }, [ctx, ext, fileId, filePath, kind, label]));
+  }, [ctx, ext, fileId, filePath, kind, label, resource]));
 }
 
 // 语音产物卡（助手主动发的语音消息）：文件名来自受控 generated 目录，
@@ -826,15 +845,15 @@ const FileBlock = memo(function FileBlock({ block, sessionPath, messageId, block
   // 扩展名识别统一走中心表（inferKindByExt via isImageOrSvgExt）
   const kind = inferKindByExt(block.ext);
   if (isImageOrSvgExt(block.ext)) {
-    return <ImageOutputCard fileId={block.fileId} filePath={block.filePath} label={block.label} ext={block.ext} status={block.status} ctx={ctx} />;
+    return <ImageOutputCard fileId={block.fileId} resource={block.resource} filePath={block.filePath} label={block.label} ext={block.ext} status={block.status} ctx={ctx} />;
   }
   if (kind === 'video') {
-    return <VideoOutputCard fileId={block.fileId} filePath={block.filePath} label={block.label} ext={block.ext} status={block.status} ctx={ctx} />;
+    return <VideoOutputCard fileId={block.fileId} resource={block.resource} filePath={block.filePath} label={block.label} ext={block.ext} status={block.status} ctx={ctx} />;
   }
   if (kind === 'audio' || block.kind === 'audio') {
     return <AudioOutputCard filePath={block.filePath} label={block.label} />;
   }
-  return <FileOutputCard fileId={block.fileId} filePath={block.filePath} label={block.label} ext={block.ext} status={block.status} ctx={ctx} />;
+  return <FileOutputCard fileId={block.fileId} resource={block.resource} filePath={block.filePath} label={block.label} ext={block.ext} status={block.status} ctx={ctx} />;
 });
 
 // COMPAT(create_artifact, remove no earlier than v0.133):

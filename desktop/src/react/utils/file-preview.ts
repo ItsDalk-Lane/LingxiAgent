@@ -5,6 +5,7 @@
  */
 
 import type { PreviewItem } from '../types';
+import type { FileRef } from '../types/file-ref';
 import { openPreview } from '../stores/preview-actions';
 import { inferKindByExt, isMediaKind } from './file-kind';
 import { openMediaViewerFromContext } from './open-media-viewer';
@@ -59,6 +60,7 @@ export async function openFilePreview(
     sessionPath?: string;
     messageId?: string;
     fileId?: string;
+    resource?: FileRef['resource'];
     blockIdx?: number;
     sourceRootPath?: string;
   },
@@ -99,6 +101,7 @@ export async function openFilePreview(
         sessionPath: context?.sessionPath,
         messageId: context?.messageId,
         fileId: context?.fileId,
+        resource: context?.resource,
         blockIdx: context?.blockIdx,
       });
       return;

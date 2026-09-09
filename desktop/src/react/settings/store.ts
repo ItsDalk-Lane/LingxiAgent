@@ -237,7 +237,7 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
     set({ toastMessage: message, toastType: type, toastVisible: true });
     _toastTimer = setTimeout(() => {
       set({ toastVisible: false });
-    }, 1500);
+    }, type === 'error' ? 6000 : 3000);
   },
 
   navigateSettings: (location) => {

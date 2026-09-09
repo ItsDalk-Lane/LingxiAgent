@@ -8,7 +8,7 @@ import { invalidateStreamBuffer, invalidateStreamResumeMeta } from './stream-inv
 import { bumpMessageLiveVersion, clearMessageLiveVersion } from './message-live-version';
 import { sessionScopedKey, sessionScopedValue } from './session-slice';
 import { recordChatPerformance } from '../utils/chat-performance';
-import { normalizeContentBlocks } from '../utils/content-semantics';
+import { isSameFilePresentation, normalizeContentBlocks } from '../utils/content-semantics';
 import { resolveAssistantTurnOutcome } from '../utils/turn-outcome';
 
 export interface ChatSlice {
@@ -534,7 +534,11 @@ export const createChatSlice = (
         if (blockIdx < 0) continue;
 
         consumed = true;
-        if (isResolvedFileTaskBlock(blocks[blockIdx], taskId)) {
+        if (blocks.some(block => block.type === 'file' && block.replacesTaskId === taskId
+          && resolution.type === 'file' && isSameFilePresentation(block, resolution))) {
+          return {};
+        }
+        if (isResolvedFileTaskBlock(blocks[blockIdx], taskId) && resolution.type !== 'file') {
           return {};
         }
 
@@ -544,7 +548,14 @@ export const createChatSlice = (
           turnLifecycle: 'sealed',
         })[0];
         let nextBlocks = [...blocks];
-        nextBlocks[blockIdx] = normalizedResolution;
+        if (isResolvedFileTaskBlock(blocks[blockIdx], taskId)) {
+          // 一个生成任务可以产出多个文件；只有同一个文件的重放才是重复。
+          nextBlocks.splice(blockIdx + 1, 0, normalizedResolution);
+        } else {
+          nextBlocks[blockIdx] = normalizedResolution;
+        }
+        // 迟到完成也走同轮合并，避免占位旁已有的手动展示变成第二张图片。
+        nextBlocks = normalizeContentBlocks(nextBlocks, { idPrefix, turnLifecycle: 'sealed' });
         if (normalizedResolution.surfaceRole === 'result') {
           nextBlocks = nextBlocks.filter((block) => !(
             block.type === 'turn_status' && block.status === 'missing_final_answer'

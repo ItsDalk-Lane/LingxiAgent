@@ -3,17 +3,22 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { loadMediaSource } from '../../../../components/shared/MediaViewer/media-source';
+import { useStore } from '../../../../stores';
 import type { FileRef } from '../../../../types/file-ref';
 
 describe('loadMediaSource', () => {
   beforeEach(() => {
+    useStore.setState({ serverPort: 3210, serverToken: null, serverConnections: {}, activeServerConnectionId: null, activeServerConnection: null } as never);
     (window as any).platform = {
       // 保留 mock，回归测试中如果谁还在走 readFileBase64 会被 expect().not.toHaveBeenCalled() 捕获
       readFileBase64: vi.fn(async (p: string) => `BASE64_OF_${p}`),
       getFileUrl: vi.fn((p: string) => `file:///MOCK${p}`),
     };
   });
-  afterEach(() => { delete (window as any).platform; });
+  afterEach(() => {
+    delete (window as any).platform;
+    useStore.setState({ serverPort: null, serverToken: null, serverConnections: {}, activeServerConnectionId: null, activeServerConnection: null } as never);
+  });
 
   it('image: source=desk 走 getFileUrl（不再整文件 base64）', async () => {
     const ref: FileRef = { id: '1', kind: 'image', source: 'desk', name: 'a.png', path: '/a.png', ext: 'png', version: { mtimeMs: 11, size: 22 } };
@@ -60,6 +65,17 @@ describe('loadMediaSource', () => {
     expect((window as any).platform.getFileUrl).toHaveBeenCalledWith('/a.mp4');
     expect(src.url).toBe('file:///MOCK/a.mp4');
     expect((window as any).platform.readFileBase64).not.toHaveBeenCalled();
+  });
+
+  it.each(['image', 'video'] as const)('%s 放大查看优先使用受控资源地址', async (kind) => {
+    const ref: FileRef = {
+      id: 'generated', kind, source: 'session-block-file', name: 'generated', path: '/tmp/generated',
+      resource: { resourceId: 'res_generated', studioId: 'studio_local', links: {
+        self: '/api/resources/res_generated', content: '/api/resources/res_generated/content',
+      } },
+    };
+    expect((await loadMediaSource(ref)).url).toBe('http://127.0.0.1:3210/api/resources/res_generated/content');
+    expect((window as any).platform.getFileUrl).not.toHaveBeenCalled();
   });
 
   it('platform 缺失 → 抛错', async () => {

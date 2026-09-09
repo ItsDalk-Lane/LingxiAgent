@@ -830,6 +830,44 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
     });
   });
 
+  it.each(['streaming', 'ended', 'rehydrated'])('手动展示后自动图片只展示一次，重开历史一致（%s）', (state) => {
+    const ended = state === 'ended';
+    const file = { type: 'file' as const, fileId: 'same-image', filePath: '/tmp/image.png', label: '图片', ext: 'png' };
+    streamBufferManager.handle({ type: 'content_block', sessionPath: PATH, block: {
+      type: 'media_generation', taskId: 'image-task', kind: 'image', status: 'pending',
+    } });
+    streamBufferManager.handle({ type: 'content_block', sessionPath: PATH, block: file });
+    if (state === 'rehydrated') {
+      const snapshot = snapshotStreamBuffer(PATH)!;
+      useStore.getState().initSession(PATH, [userItem('u1', 'hi'), { type: 'message', data: {
+        id: snapshot.messageId!, role: 'assistant', blocks: snapshot.blocks,
+      } }], false);
+    }
+    if (ended) streamBufferManager.handle({ type: 'assistant_run_end', sessionPath: PATH });
+    const completed = { ...file, replacesTaskId: 'image-task' };
+    streamBufferManager.handle({ type: 'content_block', sessionPath: PATH, block: completed });
+    streamBufferManager.handle({ type: 'content_block', sessionPath: PATH, block: completed });
+    if (!ended) {
+      streamBufferManager.handle({ type: 'text_delta', sessionPath: PATH, delta: '图片已经完成。' });
+      streamBufferManager.handle({ type: 'assistant_run_end', sessionPath: PATH });
+    }
+    expect(getAssistantMessage()?.blocks?.some(block => block.type === 'media_generation')).toBe(false);
+    const liveFiles = getAssistantMessage()?.blocks?.filter(block => block.type === 'file');
+    expect(liveFiles).toHaveLength(1);
+    const history = buildItemsFromHistory({
+      messages: [
+        { id: 'a1', role: 'assistant', content: '', assistantSegments: [], turnInputEntryId: 'input-1' },
+        { id: 'a2', role: 'assistant', content: '', assistantSegments: [], turnInputEntryId: 'input-1' },
+        { id: 'u2', role: 'user', content: '再给我看看' },
+        { id: 'a3', role: 'assistant', content: '', assistantSegments: [], turnInputEntryId: 'input-2' },
+      ],
+      blocks: [{ ...completed, afterIndex: 0 }, { ...file, afterIndex: 1 }, { ...file, afterIndex: 3 }],
+    });
+    const historyFiles = history.flatMap(item => item.type === 'message' && item.data.role === 'assistant'
+      ? (item.data.blocks || []).filter(block => block.type === 'file') : []);
+    expect(historyFiles.map(block => block.fileId)).toEqual(['same-image', 'same-image']);
+  });
+
   it('deferred 文件结果按 taskId 原地替换 media_generation 占位块', () => {
     streamBufferManager.handle({
       type: 'content_block',

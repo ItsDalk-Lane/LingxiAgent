@@ -157,6 +157,8 @@ export function ModelWidget({
               onChange={(e) => setCustomInput(e.target.value)}
               onClick={(e) => e.stopPropagation()}
               onKeyDown={(e) => {
+                // Escape 交给菜单统一关闭并恢复焦点，不在输入框中吞掉。
+                if (e.key === 'Escape') return;
                 if (e.key === 'Enter') handleCustomSubmit();
                 e.stopPropagation();
               }}

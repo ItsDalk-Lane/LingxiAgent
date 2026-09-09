@@ -32,6 +32,7 @@ export function SearchApiKeyConfig() {
   const savedLegacySearchKey = globalModelsConfig?.search?.api_key || '';
   const [searchApiKeys, setSearchApiKeys] = useState<Record<string, string>>({});
   const [searchKeyEdited, setSearchKeyEdited] = useState<Record<string, boolean>>({});
+  const [verifyingProviders, setVerifyingProviders] = useState<Record<string, boolean>>({});
 
   // 从后端同步已保存的 key
   useEffect(() => {
@@ -52,9 +53,11 @@ export function SearchApiKeyConfig() {
   const explicitSearchApiProvider = searchProviderNeedsApiKey(searchProvider) ? searchProvider : '';
 
   const verifySearch = async (provider: string) => {
+    if (verifyingProviders[provider]) return;
     const apiKey = (searchApiKeys[provider] || '').trim();
     if (!provider) { showToast(t('settings.search.noProvider'), 'error'); return; }
     if (searchProviderNeedsApiKey(provider) && !apiKey) { showToast(t('settings.search.noKey'), 'error'); return; }
+    setVerifyingProviders(prev => ({ ...prev, [provider]: true }));
     try {
       const res = await lingxiFetch('/api/search/verify', {
         method: 'POST',
@@ -72,6 +75,8 @@ export function SearchApiKeyConfig() {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(t('settings.saveFailed') + ': ' + msg, 'error');
+    } finally {
+      setVerifyingProviders(prev => ({ ...prev, [provider]: false }));
     }
   };
 
@@ -89,8 +94,13 @@ export function SearchApiKeyConfig() {
           onChange={(v) => updateSearchApiKey(provider, v)}
           placeholder={t('settings.api.apiKeyPlaceholder')}
         />
-        <button className={styles['search-verify-btn']} onClick={() => verifySearch(provider)}>
-          {t('settings.search.verify')}
+        <button
+          className={styles['search-verify-btn']}
+          disabled={verifyingProviders[provider] === true}
+          aria-busy={verifyingProviders[provider] || undefined}
+          onClick={() => verifySearch(provider)}
+        >
+          {t(verifyingProviders[provider] ? 'settings.search.verifying' : 'settings.search.verify')}
         </button>
       </div>
     </div>

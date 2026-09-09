@@ -3909,30 +3909,48 @@
 /* Toast */
 .settings-toast {
     position: fixed;
-    bottom: 0;
-    right: 0;
-    padding: 0.35rem 0.75rem;
-    border-radius: 0;
+    bottom: var(--space-24);
+    right: var(--space-24);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-8);
+    max-width: min(440px, calc(100% - var(--space-24) * 2));
+    box-sizing: border-box;
+    padding: var(--space-12) var(--space-16);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background: var(--bg-card);
+    box-shadow: 0 4px 16px var(--shadow);
+    color: var(--text);
     font-family: inherit;
-    font-size: var(--fs-hint);
+    font-size: var(--fs-ui);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.4s ease-out;
+    transition: opacity var(--duration-fast) var(--ease-out);
     z-index: 90;
 }
 
 .settings-toast.show {
     opacity: 1;
-    pointer-events: auto;
 }
 
-.settings-toast.success {
-    background: none;
-    color: var(--text-muted);
+.settings-toast-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.settings-toast.success .settings-toast-icon {
+    color: var(--accent);
 }
 
 .settings-toast.error {
-    background: none;
+    border-color: var(--coral);
+}
+
+.settings-toast.error .settings-toast-icon {
     color: var(--coral);
 }
 
@@ -5512,6 +5530,8 @@ a.about-link:hover {
 }
 
 .pv-fetch-btn-inline:hover { color: var(--accent); border-color: var(--accent); }
+.pv-fetch-btn-inline:disabled { opacity: 0.5; cursor: not-allowed; }
+.pv-fetch-btn-inline.spinning svg { animation: hana-spin 0.8s linear infinite; }
 
 .pv-fetch-hint {
     font-size: var(--fs-hint);
@@ -5548,7 +5568,16 @@ a.about-link:hover {
 .pv-tool-test-btn:hover { color: var(--accent); border-color: var(--accent); }
 .pv-tool-test-btn.ok { color: #3a7d44; border-color: #3a7d44; }
 .pv-tool-test-btn.fail { color: #b44040; border-color: #b44040; }
-.pv-tool-test-btn.testing { color: var(--text-secondary); pointer-events: none; }
+.pv-tool-test-btn.testing { color: var(--text-secondary); cursor: wait; }
+.pv-tool-test-btn .spinning { animation: hana-spin calc(var(--duration-instant) * 8) linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+    .pv-tool-test-btn .spinning { animation: none; }
+    .pv-tool-test-btn.testing {
+        background: var(--bg-hover);
+        border-color: var(--accent);
+    }
+}
 
 /* ── 配置模型子标签页：上下行布局（左标题+提示，右模型选择菜单） ── */
 

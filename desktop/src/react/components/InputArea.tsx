@@ -2134,7 +2134,13 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       targetRun: action === 'interject'
         ? { streamId: active?.streamId ?? null, turnId: active?.turnId ?? null }
         : null,
-    }, { loadVisionAuxiliaryConfig, t });
+    }, { loadVisionAuxiliaryConfig, t }).then(result => {
+      if (result.kind === 'blocked' && (result.code === 'transport_busy' || result.code === 'unresolved_limit')) {
+        useStore.getState().addToast(t('input.queuedDeliveryUnverified'), 'warning', 6000, {
+          dedupeKey: 'queued-insert-unverified',
+        });
+      }
+    });
   }, [loadVisionAuxiliaryConfig, t]);
 
   const handleQueuedRetry = useCallback((item: QueuedTurnInput) => {

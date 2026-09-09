@@ -8,6 +8,54 @@ import {
 } from '../../utils/content-semantics';
 
 describe('content semantics', () => {
+  const image: Extract<ContentBlock, { type: 'file' }> = {
+    type: 'file', fileId: 'image-1', filePath: '/tmp/image.png', label: '图片', ext: 'png',
+  };
+
+  it.each([true, false])('自动交付与手动展示同一图片只保留一个展示位置（自动先到=%s）', (automaticFirst) => {
+    const automatic = { ...image, replacesTaskId: 'task-1' };
+    const incoming = automaticFirst ? [automatic, image] : [image, automatic];
+    const blocks = normalizeContentBlocks(incoming, { idPrefix: 'run-1', turnLifecycle: 'sealed' });
+    expect(blocks).toHaveLength(1);
+    expect(blocks[0]).toMatchObject({ fileId: 'image-1', replacesTaskId: 'task-1' });
+    expect(normalizeContentBlocks([...blocks, automatic], {
+      idPrefix: 'run-1', turnLifecycle: 'sealed',
+    })).toEqual(blocks);
+  });
+
+  it('合并不改变已展示块的身份与位置，也不丢失同任务的其他图片', () => {
+    const blocks = normalizeContentBlocks([
+      { ...image, id: 'visible-image', processOrder: 2 },
+      { type: 'text', source: '说明', id: 'explanation', processOrder: 3 },
+      { ...image, replacesTaskId: 'task-1', id: 'late-image', processOrder: 4 },
+      { ...image, fileId: 'image-2', replacesTaskId: 'task-1' },
+    ], { idPrefix: 'run-1', turnLifecycle: 'sealed' });
+    expect(blocks.map(block => block.type)).toEqual(['file', 'text', 'file']);
+    expect(blocks[0]).toMatchObject({ id: 'visible-image', processOrder: 2, replacesTaskId: 'task-1' });
+    expect(blocks[2]).toMatchObject({ fileId: 'image-2' });
+  });
+
+  it('纯手动重复展示、不同文件身份及不同轮次的引用不合并', () => {
+    const options = { idPrefix: 'run-1', turnLifecycle: 'sealed' as const };
+    expect(normalizeContentBlocks([image, image], options)).toHaveLength(2);
+    expect(normalizeContentBlocks([
+      image, { ...image, fileId: 'other-image', replacesTaskId: 'task-1' },
+    ], options)).toHaveLength(2);
+    expect(normalizeContentBlocks([{ ...image, replacesTaskId: 'task-1' }], options)).toHaveLength(1);
+    expect(normalizeContentBlocks([image], { ...options, idPrefix: 'run-2' })).toHaveLength(1);
+  });
+
+  it('同一文件的明确不同版本和不同生成任务保持独立', () => {
+    const options = { idPrefix: 'run-1', turnLifecycle: 'sealed' as const };
+    expect(normalizeContentBlocks([
+      { ...image, replacesTaskId: 'task-1', version: { mtimeMs: 1, size: 10, sha256: 'old' } },
+      { ...image, version: { mtimeMs: 2, size: 12, sha256: 'new' } },
+    ], options)).toHaveLength(2);
+    expect(normalizeContentBlocks([
+      { ...image, replacesTaskId: 'task-1' }, { ...image, replacesTaskId: 'task-2' },
+    ], options)).toHaveLength(2);
+  });
+
   it('只按显式阶段区分长过程旁白和短最终答复', () => {
     const commentary: ContentBlock = {
       type: 'text',

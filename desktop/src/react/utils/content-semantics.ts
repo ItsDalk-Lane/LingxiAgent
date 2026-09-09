@@ -137,14 +137,74 @@ function blockId(
     : `${idPrefix}:${block.type}:${ordinal}`;
 }
 
-/** 为实时和历史新内容补齐统一语义；旧字段原样保留。 */
+type FileBlock = Extract<ContentBlock, { type: 'file' }>;
+
+function filePresentationKey(block: FileBlock): string | null {
+  if (block.fileId) return `file:${block.fileId}`;
+  if (block.resource?.resourceId) return `resource:${block.resource.resourceId}`;
+  return block.filePath ? `path:${block.filePath}` : null;
+}
+
+export function isSameFilePresentation(left: FileBlock, right: FileBlock): boolean {
+  const key = filePresentationKey(left);
+  if (!key || key !== filePresentationKey(right)) return false;
+  // 文件身份相同但已明确变更内容时，不能把新版展示当成重复通知。
+  if (left.version?.sha256 && right.version?.sha256) {
+    return left.version.sha256 === right.version.sha256;
+  }
+  const leftSize = left.version?.size ?? left.size;
+  const rightSize = right.version?.size ?? right.size;
+  const leftTime = left.version?.mtimeMs ?? left.mtimeMs;
+  const rightTime = right.version?.mtimeMs ?? right.mtimeMs;
+  return !(leftSize != null && rightSize != null && leftSize !== rightSize)
+    && !(leftTime != null && rightTime != null && leftTime !== rightTime);
+}
+
+/**
+ * 输入限于同一助手回合。自动媒体交付与手动展示是同一文件的两份呈现证据，
+ * 合并时保留首次展示的位置和身份；普通文件的重复交付不受影响。
+ */
+function coalesceMediaFilePresentations(blocks: readonly ContentBlock[]): ContentBlock[] {
+  const automatic = new Map<string, FileBlock[] | null>();
+  for (const block of blocks) {
+    if (block.type !== 'file' || !block.replacesTaskId) continue;
+    const key = filePresentationKey(block);
+    if (!key) continue;
+    const previous = automatic.get(key);
+    // 多个独立任务指向同一文件时，不猜测它们是否应合并。
+    if (previous === null || (previous && previous[0].replacesTaskId !== block.replacesTaskId)) {
+      automatic.set(key, null);
+    } else if (!previous) {
+      automatic.set(key, [block]);
+    } else if (!previous.some(file => isSameFilePresentation(file, block))) {
+      previous.push(block);
+    }
+  }
+  const presented = new Set<FileBlock>();
+  return blocks.flatMap<ContentBlock>((block) => {
+    if (block.type !== 'file') return [block];
+    const key = filePresentationKey(block);
+    const completion = key ? automatic.get(key)?.find(file => isSameFilePresentation(file, block)) : null;
+    if (!key || !completion) return [block];
+    if (presented.has(completion)) return [];
+    presented.add(completion);
+    return [{
+      ...block,
+      ...completion,
+      ...(block.id ? { id: block.id } : {}),
+      ...(block.processOrder !== undefined ? { processOrder: block.processOrder } : {}),
+    }];
+  });
+}
+
+/** 为实时和历史的单个助手回合补齐统一语义。 */
 export function normalizeContentBlocks(
   blocks: readonly ContentBlock[],
   options: NormalizeContentBlocksOptions,
 ): ContentBlock[] {
   const ordinals = new Map<ContentBlock['type'], number>();
   const defaultTextPhase = options.defaultTextPhase || 'final_answer';
-  return blocks.map((block) => {
+  return coalesceMediaFilePresentations(blocks).map((block) => {
     const ordinal = ordinals.get(block.type) || 0;
     ordinals.set(block.type, ordinal + 1);
     const semanticPhase = resolveContentSemanticPhase(block, defaultTextPhase);
@@ -157,4 +217,3 @@ export function normalizeContentBlocks(
     } as ContentBlock;
   });
 }
-

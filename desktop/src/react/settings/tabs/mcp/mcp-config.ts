@@ -88,6 +88,12 @@ function connectorFromJsonServer(id: string, raw: McpJsonServer): McpConnectorIn
     ...(stringRecord(raw.headers) ? { headers: stringRecord(raw.headers) } : {}),
     ...(stringValue(raw.registryUrl) ? { registryUrl: stringValue(raw.registryUrl) } : {}),
     ...(positiveNumber(raw.timeout) ? { timeout: positiveNumber(raw.timeout) } : {}),
+    // Connection lifecycle fields (pi-mcp-adapter-style configs carry them).
+    // Unknown values are dropped here and re-defaulted server-side.
+    ...(lifecycleValue(raw.lifecycle) ? { lifecycle: lifecycleValue(raw.lifecycle)! } : {}),
+    ...(nonNegativeInt(raw.idleTimeoutMinutes) !== null
+      ? { idleTimeoutMinutes: nonNegativeInt(raw.idleTimeoutMinutes)! }
+      : {}),
     // An imported server is on unless it says otherwise. The older isActive /
     // autoStart flags are not carried over: they described a start preference
     // nothing ever wrote, so importing them would switch off servers the file's
@@ -132,6 +138,19 @@ function stringRecord(value: unknown): Record<string, string> | undefined {
 function positiveNumber(value: unknown): number {
   const numeric = typeof value === 'string' ? Number(value) : value;
   return typeof numeric === 'number' && Number.isFinite(numeric) && numeric > 0 ? numeric : 0;
+}
+
+const LIFECYCLE_VALUES = new Set(['eager', 'lazy', 'keep-alive', 'lazy-keep-alive']);
+
+function lifecycleValue(value: unknown): McpConnectorInput['lifecycle'] | null {
+  return typeof value === 'string' && LIFECYCLE_VALUES.has(value)
+    ? value as McpConnectorInput['lifecycle']
+    : null;
+}
+
+function nonNegativeInt(value: unknown): number | null {
+  const numeric = typeof value === 'string' && value.trim() !== '' ? Number(value) : value;
+  return typeof numeric === 'number' && Number.isSafeInteger(numeric) && numeric >= 0 ? numeric : null;
 }
 
 function unquoteValue(value: string): string {

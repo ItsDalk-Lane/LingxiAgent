@@ -4,9 +4,10 @@
 
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { useSettingsStore } from '../../../store';
+import { lingxiFetch } from '../../../api';
 
 const mocks = vi.hoisted(() => ({
   autoSaveGlobalModels: vi.fn(),
@@ -48,6 +49,8 @@ import { AuxiliaryModelsSection } from '../AuxiliaryModelsSection';
 describe('AuxiliaryModelsSection', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(lingxiFetch).mockReset();
+    vi.useFakeTimers();
     useSettingsStore.setState({
       globalModelsConfig: {
         models: {
@@ -82,6 +85,61 @@ describe('AuxiliaryModelsSection', () => {
 
   afterEach(() => {
     cleanup();
+    vi.clearAllTimers();
+    vi.useRealTimers();
+  });
+
+  it('shows a named busy state until the model test succeeds, then restores the action', async () => {
+    let finish!: (response: Response) => void;
+    vi.mocked(lingxiFetch).mockReturnValueOnce(new Promise(resolve => { finish = resolve; }));
+    render(<AuxiliaryModelsSection providers={{}} />);
+    fireEvent.click(screen.getByRole('button', { name: 'settings.providers.verifyConnection' }));
+
+    const button = screen.getByRole('button', { name: 'settings.search.verifying' });
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    expect(button).toHaveAttribute('title', 'settings.search.verifying');
+    expect(button.querySelector('svg')?.getAttribute('class')).toContain('spinning');
+
+    await act(async () => finish(new Response(JSON.stringify({ ok: true }))));
+    expect(screen.getByRole('button', { name: 'settings.providers.verifySuccess' })).not.toBeDisabled();
+    expect(button).toHaveAttribute('aria-busy', 'false');
+    act(() => vi.advanceTimersByTime(3000));
+    expect(screen.getByRole('button', { name: 'settings.providers.verifyConnection' })).toBe(button);
+  });
+
+  it.each(['failed-result', 'request-error'] as const)('shows a readable failure for %s', async (failure) => {
+    if (failure === 'request-error') vi.mocked(lingxiFetch).mockRejectedValueOnce(new Error('offline'));
+    else vi.mocked(lingxiFetch).mockResolvedValueOnce(new Response(JSON.stringify({ ok: false })));
+    render(<AuxiliaryModelsSection providers={{}} />);
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'settings.providers.verifyConnection' })));
+    expect(screen.getByRole('button', { name: 'settings.providers.verifyFailed' })).toHaveAttribute('aria-busy', 'false');
+  });
+
+  it('ignores the previous model result after a model change and aborts requests on unmount', async () => {
+    let finishOld!: (response: Response) => void;
+    let finishNew!: (response: Response) => void;
+    vi.mocked(lingxiFetch)
+      .mockReturnValueOnce(new Promise(resolve => { finishOld = resolve; }))
+      .mockReturnValueOnce(new Promise(resolve => { finishNew = resolve; }));
+    const { unmount } = render(<AuxiliaryModelsSection providers={{}} />);
+    fireEvent.click(screen.getByRole('button', { name: 'settings.providers.verifyConnection' }));
+    const oldSignal = vi.mocked(lingxiFetch).mock.calls[0][1]?.signal;
+    act(() => {
+      const config = useSettingsStore.getState().globalModelsConfig!;
+      useSettingsStore.setState({ globalModelsConfig: {
+        ...config, models: { ...config.models, vision: { id: 'new-model', provider: 'openai' } },
+      } });
+    });
+    expect(oldSignal?.aborted).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'settings.providers.verifyConnection' }));
+    await act(async () => finishOld(new Response(JSON.stringify({ ok: true }))));
+    expect(screen.getByRole('button', { name: 'settings.search.verifying' })).toBeDisabled();
+    const newSignal = vi.mocked(lingxiFetch).mock.calls[1][1]?.signal;
+    unmount();
+    expect(newSignal?.aborted).toBe(true);
+    await act(async () => finishNew(new Response(JSON.stringify({ ok: true }))));
+    expect(vi.getTimerCount()).toBe(0);
   });
 
   it('renders the auxiliary vision toggle above the vision model picker and saves it as a global model preference', () => {

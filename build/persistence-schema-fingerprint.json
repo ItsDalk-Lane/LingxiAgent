@@ -649,7 +649,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:9a912db86279f1ba76057bd4375361445a51b20340914826e11f5b172dd44421",
+  "payloadFingerprint": "sha256:92a83e282cd0ba0fbb03f79be3de552e2d95f176cf187dc61d362e4d15c22a00",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -1955,7 +1955,8 @@
       "migrationEntry": [
         "normalizeMcpConfig read-time normalization (servers→connectors alias)",
         "normalizeMcpConfig read-time permission policy defaults (permissionMode/toolPermissions/trustReadOnlyHint)",
-        "normalizeMcpConfig read-time deferred-loading defaults (deferEnabled true, deferThreshold 10)"
+        "normalizeMcpConfig read-time deferred-loading defaults (deferEnabled true, deferThreshold 10)",
+        "normalizeMcpConfig read-time connection lifecycle defaults (lifecycle keep-alive, idleTimeoutMinutes null → mode default)"
       ],
       "openEntry": [
         "Engine constructor via McpManager"
@@ -1976,7 +1977,7 @@
         "source": "core/mcp/manager.ts"
       },
       "schemaSource": {
-        "contract": "normalizeMcpConfig read-time normalization (servers/connectors alias, auth and OAuth field defaults, per-connector permission policy defaults, deferred-loading defaults)",
+        "contract": "normalizeMcpConfig read-time normalization (servers/connectors alias, auth and OAuth field defaults, per-connector permission policy defaults, deferred-loading defaults, connection lifecycle defaults)",
         "kind": "runtime-contract",
         "module": "core/mcp/manager.ts"
       }
@@ -3164,8 +3165,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "R01/R02 keep tenets schema 1 and completed v2 receipts read-only; v3 adds per-operation recovery receipts, explicit approval snapshots and raw backups. New recovery writes do not overwrite migration receipts. CLI apply remains blocked without verified home ownership.",
-    "payloadFingerprint": "sha256:9a912db86279f1ba76057bd4375361445a51b20340914826e11f5b172dd44421"
+    "compatibilityReason": "MCP connector lifecycle feature: normalizeMcpConfig now persists two new optional per-connector fields (lifecycle, idleTimeoutMinutes). Read-time defaults (lifecycle keep-alive, idleTimeoutMinutes null) reproduce the pre-feature behaviour for every existing config, so old shapes read identically and no migration is needed — a compatible addition, not a breaking change.",
+    "payloadFingerprint": "sha256:92a83e282cd0ba0fbb03f79be3de552e2d95f176cf187dc61d362e4d15c22a00"
   },
   "schemas": [
     {
@@ -3850,10 +3851,10 @@
       "storeId": "managed-runtime-caches"
     },
     {
-      "contract": "normalizeMcpConfig read-time normalization (servers/connectors alias, auth and OAuth field defaults, per-connector permission policy defaults, deferred-loading defaults)",
+      "contract": "normalizeMcpConfig read-time normalization (servers/connectors alias, auth and OAuth field defaults, per-connector permission policy defaults, deferred-loading defaults, connection lifecycle defaults)",
       "kind": "runtime-contract",
       "module": "core/mcp/manager.ts",
-      "sourceHash": "sha256:0d36be8d8d547af33706b8f2024b81c396782abc500df88f8977e390cd8d51bf",
+      "sourceHash": "sha256:35f0f658b7d7e11ddc24f483be71d8f99523c614dcda2b66e669d0b0ebc3e907",
       "storeId": "mcp-config"
     },
     {

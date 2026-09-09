@@ -231,6 +231,8 @@ function statusLabel(connector: McpConnector): string {
   switch (connector.status) {
     case 'running':
       return t('settings.mcp.statusRunning');
+    case 'idle':
+      return t('settings.mcp.statusIdle');
     case 'connecting':
       return t('settings.mcp.statusConnecting');
     case 'reconnecting':
@@ -246,9 +248,10 @@ function statusLabel(connector: McpConnector): string {
 }
 
 // Start is offered whenever the connector is not already live or actively
-// trying to connect — including failed/needs-auth, so the user can retry.
+// trying to connect — including failed/needs-auth, so the user can retry, and
+// idle, so a parked connector can be brought up without waiting for a call.
 function canStart(status: McpConnector['status']): boolean {
-  return status === 'stopped' || status === 'failed' || status === 'needs-auth';
+  return status === 'stopped' || status === 'idle' || status === 'failed' || status === 'needs-auth';
 }
 
 // Stop is offered whenever there is something to tear down: a live session, an

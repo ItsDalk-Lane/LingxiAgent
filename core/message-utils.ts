@@ -127,7 +127,9 @@ export async function loadSessionHistoryMessages(engine, explicitPath, options: 
         ? engine.openSessionManagerAtCurrentBranch(sessionPath, path.dirname(sessionPath))
         : SessionManager.open(sessionPath, path.dirname(sessionPath));
       const branch = manager.getBranch();
-      return projectBranchHistory(branch, manager.getSessionId());
+      const sessionId = engine.getSessionIdForPath?.(sessionPath);
+      const manifest = sessionId ? engine.getSessionManifest?.(sessionId) : null;
+      return projectBranchHistory(branch, manifest?.currentLocator?.path === sessionPath ? sessionId : '');
     }
   } catch {
     // 旧文件或损坏文件继续走兼容读取，不让历史页直接空白。
@@ -170,13 +172,26 @@ export async function loadSessionHistoryEvidence(engine: any, sessionPath: strin
     const sessionId = requestedSessionId || engine.getSessionIdForPath?.(sessionPath);
     if (!sessionId || typeof engine.getSessionBranchHead !== 'function') return unavailable('session_identity_unavailable');
     const manifest = engine.getSessionManifest?.(sessionId);
-    if (manifest?.currentLocator?.path !== sessionPath) return unavailable('session_identity_mismatch');
+    if (manifest?.sessionId !== sessionId || manifest?.currentLocator?.path !== sessionPath
+      || engine.getSessionIdForPath?.(sessionPath) !== sessionId) return unavailable('session_identity_mismatch');
     const branchHead = engine.getSessionBranchHead(sessionId);
     if (!branchHead) return unavailable('branch_head_unavailable');
+    if (branchHead.sessionId !== sessionId) return unavailable('branch_identity_mismatch');
     const raw = await fs.readFile(sessionPath, 'utf8');
     const entries = raw.split('\n').filter(line => line.trim()).map(line => JSON.parse(line));
     const headers = entries.filter(entry => entry?.type === 'session');
-    if (headers.length !== 1 || headers[0].id !== sessionId || headers[0].version !== 3) return unavailable('session_schema_or_identity_unverified');
+    // 文件归属由业务 manifest 和当前分支绑定；文件头是另一套 SDK UUID。
+    if (headers.length !== 1 || typeof headers[0].id !== 'string' || !headers[0].id.trim()
+      || headers[0].version !== 3) return unavailable('session_schema_or_identity_unverified');
+    const runtimeManager = engine.getSessionByPath?.(sessionPath)?.sessionManager;
+    if (runtimeManager && (runtimeManager.getSessionFile?.() !== sessionPath
+      || runtimeManager.getSessionId?.() !== headers[0].id)) return unavailable('runtime_identity_mismatch');
+    // 读取期间 locator 被移动或重新绑定时，不给旧文件签发完整证据。
+    if (engine.getSessionManifest?.(sessionId)?.currentLocator?.path !== sessionPath
+      || engine.getSessionIdForPath?.(sessionPath) !== sessionId) return unavailable('session_identity_mismatch');
+    const latestHead = engine.getSessionBranchHead(sessionId);
+    if (!latestHead || latestHead.sessionId !== sessionId || latestHead.leafId !== branchHead.leafId
+      || latestHead.observedTailLeafId !== branchHead.observedTailLeafId) return unavailable('branch_head_changed');
     const projection = projectCurrentSessionBranchEntries(entries, { branchHead, filePath: sessionPath });
     if (projection.legacySyntheticIds) return unavailable('legacy_branch_unverified');
     const byId = new Map(entries.filter(entry => entry?.id).map(entry => [entry.id, entry]));

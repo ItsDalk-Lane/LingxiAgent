@@ -130,6 +130,18 @@ export function ModelEditPanel({
   onRefresh?: () => Promise<void>;
 }) {
   const showToast = useSettingsStore(s => s.showToast);
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return;
+      // 保留设置窗口，让 Escape 先退出模型编辑。
+      event.preventDefault();
+      event.stopPropagation();
+      onClose();
+      anchorEl?.focus();
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [anchorEl, onClose]);
   const isChat = kind === 'chat';
   const knownMeta: Record<string, any> = isChat ? ((lookupModelMeta(modelId, providerId) as Record<string, any>) || {}) : {};
   const userMeta: Record<string, unknown> = modelMeta || {};

@@ -53,6 +53,25 @@ function renderPanel(props: Record<string, any>) {
 }
 
 describe('ModelEditPanel (chat)', () => {
+  it.each(['anchor', 'input'])('Escape closes only the editor with focus on %s', (focus) => {
+    const onClose = vi.fn();
+    const outerEscape = vi.fn();
+    const anchor = document.createElement('button');
+    document.body.appendChild(anchor);
+    window.addEventListener('keydown', outerEscape);
+    try {
+      renderPanel({ onClose, anchorEl: anchor });
+      const target = focus === 'anchor' ? anchor : screen.getByPlaceholderText('model-x');
+      target.focus();
+      fireEvent.keyDown(target, { key: 'Escape' });
+      expect(onClose).toHaveBeenCalledTimes(1);
+      expect(outerEscape).not.toHaveBeenCalled();
+      expect(anchor).toHaveFocus();
+    } finally {
+      window.removeEventListener('keydown', outerEscape);
+      anchor.remove();
+    }
+  });
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.lookupModelMeta.mockReturnValue(null);

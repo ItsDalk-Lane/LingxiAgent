@@ -31,6 +31,13 @@ export function AnchoredPortal({
   role,
 }: AnchoredPortalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const closeOnEscape = useCallback((event: KeyboardEvent | React.KeyboardEvent) => {
+    if (event.key !== 'Escape' || event.defaultPrevented || !onClose) return;
+    event.preventDefault();
+    event.stopPropagation();
+    onClose();
+    anchorRef.current?.focus();
+  }, [anchorRef, onClose]);
   const [style, setStyle] = useState<React.CSSProperties>({
     position: 'fixed',
     left: 0,
@@ -94,21 +101,22 @@ export function AnchoredPortal({
       if (panelRef.current?.contains(target)) return;
       onClose();
     };
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
+    // 触发按钮可能仍有焦点，先于外层菜单的冒泡处理消费 Escape。
+    const anchor = anchorRef.current;
+    anchor?.addEventListener('keydown', closeOnEscape);
     document.addEventListener('mousedown', handlePointerDown);
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', closeOnEscape);
     return () => {
+      anchor?.removeEventListener('keydown', closeOnEscape);
       document.removeEventListener('mousedown', handlePointerDown);
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', closeOnEscape);
     };
-  }, [anchorRef, onClose, open]);
+  }, [anchorRef, closeOnEscape, onClose, open]);
 
   if (!open) return null;
 
   return createPortal(
-    <div ref={panelRef} className={className} style={style} role={role}>
+    <div ref={panelRef} className={className} style={style} role={role} onKeyDown={closeOnEscape}>
       {children}
     </div>,
     document.body,

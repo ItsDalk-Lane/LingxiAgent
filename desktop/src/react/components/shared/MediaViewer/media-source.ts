@@ -12,8 +12,8 @@ export interface MediaSource {
  * FileRef → 可供 <img> / <video> 直接消费的 URL。
  *
  * 设计原则：
- *   - 本地桌面连接优先走 platform.getFileUrl（preload 层统一编码 + UNC / Windows 盘符兜底）。
- *   - 远程连接优先走 Resource content URL，避免把 server 本机路径暴露给 client。
+ *   - 优先使用受控资源地址，本地服务器也可能搭配不能读取 file:// 的网页界面。
+ *   - 无资源地址的本地文件沿用 platform.getFileUrl，远程文件不得用客户端路径代替。
  *   - 只有无 path 且无 resource content link 的 inline 数据才走 data URL。
  */
 export async function loadMediaSource(ref: FileRef): Promise<MediaSource> {
@@ -25,6 +25,8 @@ export async function loadMediaSource(ref: FileRef): Promise<MediaSource> {
   }
 
   const connection = resolveServerConnection(useStore.getState());
-  const source = resolveFileRefUrl(ref, { connection, platform });
+  const source = resolveFileRefUrl(ref, {
+    connection, platform, preferLocalFile: !ref.resource?.links.content,
+  });
   return { url: source.url };
 }

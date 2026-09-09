@@ -358,6 +358,11 @@ describe("MCP runtime policy", () => {
       mcp: { connectors: { github: { enabled: true, tools: { search: true } } } },
     };
 
+    // Under the connector lifecycle model, "no client" without a user stop
+    // means dormant and startable on demand (see mcp-lifecycle.test.ts), so
+    // this probe shape pins the user-stopped case: the connector reads
+    // stopped only while the user's own decision holds it down.
+    runtime.desiredStates.set("github", "stopped");
     expect(probe(enabledAgent)).toMatchObject({
       available: false,
       reason: "mcp_connector_stopped",

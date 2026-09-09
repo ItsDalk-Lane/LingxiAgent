@@ -70,21 +70,26 @@ export function ComputerUseSection() {
   const [requesting, setRequesting] = useState(false);
   const showToast = useSettingsStore((state) => state.showToast);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (notify = false) => {
     setLoading(true);
     try {
       const res = await lingxiFetch('/api/preferences/computer-use');
       const body = await res.json();
       setData(body);
       rememberComputerUseSnapshot(body);
+      if (notify) showToast(t('settings.computerUse.refreshed'), 'success');
     } catch (err) {
       console.warn('[computer-use] load status failed:', err);
       const latestSnapshot = useSettingsStore.getState().settingsSnapshot?.data?.preferences?.computerUse as ComputerUseStatusResponse | undefined;
       setData(latestSnapshot || null);
+      if (notify) {
+        const message = err instanceof Error ? err.message : String(err);
+        showToast(`${t('settings.computerUse.refreshFailed')}: ${message}`, 'error');
+      }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showToast]);
 
   useEffect(() => {
     if (!snapshotComputerUse) return;
@@ -165,11 +170,12 @@ export function ComputerUseSection() {
   const refreshButton = (
     <button
       className={styles['settings-save-btn-sm']}
-      onClick={load}
+      onClick={() => load(true)}
       disabled={loading}
+      aria-busy={loading || undefined}
       style={{ minWidth: 72 }}
     >
-      {t('settings.computerUse.refresh')}
+      {t(loading ? 'common.loading' : 'settings.computerUse.refresh')}
     </button>
   );
 
