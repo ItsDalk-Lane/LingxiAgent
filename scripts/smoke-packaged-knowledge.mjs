@@ -309,8 +309,8 @@ try {
   });
   assert.equal(response.retrievalMode, "fts");
   assert.ok(response.hits.length > 0, "packaged fts retrieval must return hits");
-  assert.ok(evidence.entries.length > 0);
-  assert.ok(evidence.entries.every(entry => entry.sourceId === sourceId));
+  assert.ok(evidence.candidates.length > 0);
+  assert.ok(evidence.candidates.every(entry => entry.sourceId === sourceId));
   console.log(JSON.stringify({ retrievalMode: response.retrievalMode, hits: response.hits.length,
     knowledgeSchemaVersion: 19, indexSchemaVersion: 4 }));
 } finally { await manager.close(); }
