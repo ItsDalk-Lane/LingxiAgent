@@ -186,7 +186,7 @@ export function buildKnowledgeVectorRuntime({ rootDir, bundleOutDir }) {
   ].join("\n"), resolveDir: rootDir, sourcefile: "knowledge-vector-runtime-entry.ts" },
     bundle: true, platform: "node", format: "esm", target: "node24", packages: "external",
     outfile: path.join(bundleOutDir, "knowledge-vector.js"), logLevel: "silent" });
-  buildSync({ stdin: { contents: 'export { KnowledgeManager } from "./lib/knowledge/knowledge-manager.ts";',
+  buildSync({ stdin: { contents: 'export { KnowledgeManager } from "./lib/knowledge/knowledge-manager.ts";\nexport { KNOWLEDGE_RERANK_DISABLED_POLICY } from "./lib/knowledge/rerank-policy.ts";',
     resolveDir: rootDir, sourcefile: "knowledge-query-runtime-entry.ts" },
     bundle: true, platform: "node", format: "esm", target: "node24", packages: "external",
     outfile: path.join(bundleOutDir, "knowledge-query.js"), logLevel: "silent" });

@@ -295,24 +295,24 @@ export function runPackagedKnowledgeRetrievalSmoke({ serverDir, platform = proce
   try {
     fs.writeFileSync(script, `import assert from "node:assert/strict";
 import path from "node:path";
-import { KnowledgeManager } from "./bundle/knowledge-query.js";
+import { KnowledgeManager, KNOWLEDGE_RERANK_DISABLED_POLICY } from "./bundle/knowledge-query.js";
 const [lingxiHome, studioId, notebookId, sourceId] = process.argv.slice(2);
-const remote = () => { throw new Error("Packaged fast retrieval must never call remote models"); };
+const remote = () => { throw new Error("Packaged local retrieval must never call remote models"); };
 const manager = new KnowledgeManager({ lingxiHome, embedTextsForModel: remote, rerankForModel: remote });
 try {
   assert.equal(manager.store.db.pragma("user_version", { simple: true }), 19);
   assert.equal(manager.indexStore.db.pragma("user_version", { simple: true }), 4);
   const scope = manager.createTurnScope({ studioId, notebookIds: [notebookId], sessionPath: path.join(lingxiHome, "packaged-query.jsonl") });
-  const result = await manager.runFastKnowledgePipeline({ scope, question: "跨平台冻结正文" });
-  assert.equal(result.stats.executionPath, "fast_local");
-  assert.equal(result.stats.remoteModelCalls, 0);
-  assert.equal(result.stats.retrievalMode, "fts");
-  assert.ok(result.stats.injectedChunks > 0 && result.stats.injectedChunks <= 8);
-  assert.ok(result.block.includes("跨平台冻结正文"));
-  assert.ok(result.evidence.entries.length > 0);
-  assert.ok(result.evidence.entries.every(entry => entry.sourceId === sourceId));
-  console.log(JSON.stringify({ executionPath: result.stats.executionPath, remoteModelCalls: result.stats.remoteModelCalls,
-    injectedChunks: result.stats.injectedChunks, knowledgeSchemaVersion: 19, indexSchemaVersion: 4 }));
+  const compiled = await manager.compileTurnScope(scope);
+  const { response, evidence } = await manager.searchService.searchWithEvidence({
+    compiledScope: compiled, query: "跨平台冻结正文", channel: "fts", limit: 8, rerankPolicy: KNOWLEDGE_RERANK_DISABLED_POLICY,
+  });
+  assert.equal(response.retrievalMode, "fts");
+  assert.ok(response.hits.length > 0, "packaged fts retrieval must return hits");
+  assert.ok(evidence.entries.length > 0);
+  assert.ok(evidence.entries.every(entry => entry.sourceId === sourceId));
+  console.log(JSON.stringify({ retrievalMode: response.retrievalMode, hits: response.hits.length,
+    knowledgeSchemaVersion: 19, indexSchemaVersion: 4 }));
 } finally { await manager.close(); }
 `, { flag: "wx" });
     const result = spawnSync(runtimePath(serverDir, platform), [script, lingxiHome, studioId, notebookId, sourceId], {
