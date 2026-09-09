@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = ef7656c5e7ea2ecc8a9936bc117f13cfb47068ef  (2026-09-09 v0.1.37 发布候选：MCP 生命周期等七主题 + 发布元数据，直提 main)
+VERIFIED_SOURCE_SHA   = acde46f1e022de0e40bd13a3ec5b21308d84d48ee  (2026-09-09 v0.1.37 发布候选：MCP 生命周期等七主题 + 发布元数据 + 冒烟加固，直提 main)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1086,6 +1086,7 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 发布元数据提交：`ef7656c5e7ea2ecc8a9936bc117f13cfb47068ef`（= 当前 VERIFIED_SOURCE_SHA）：version 0.1.37 / releaseGeneration 15，release-digest v1 手写 7 项并 append 进 v2（18 条，头 0.1.37），release:preflight PASS（历史最大 0.1.36/14）。该提交相对源码候选仅叠加版本与 digest 元数据，无生产代码差异。
 - 验证证据（typecheck/lint 绑定 ef7656c5 最终树；全量测试绑定补齐 revocation 后同一内容树）：typecheck×3 绿；eslint 0 error（9273 warnings 既有存量）；全量 13530 passed / 0 failed / 7 skipped（1343 文件，~81s）；test:artifact-release-smoke 305/305；release-preflight 6/6（含对所有历史 tag 的版本严格性检查）。
 - 未执行/受限：正式签名、四平台安装包、公证与远端发布证据由 tag 工作流执行（本条目记为待流水线验证，不以本地结果代替）；本地未执行 npm run pack；Windows NSIS 真机安装交互仍未实测（沿用既有 Known limitation）。
+- tag 运行补记（两次失败均非产品回归，实锤后加固冒烟脚本并推进坐标至 `acde46f1`）：运行 34355526584 Windows 打包桌面冒烟顶满 90s 就绪期限（慢跑者：同作业打包知识冒烟 87s vs 健康范围 60–71s；服务端停在导入入口；同作业同包知识冒烟通过）；重打 tag 后运行 34358209757 桌面 69.4s 全就绪（onboarding 正常），败于收尾 rmSync EPERM（taskkill 后句柄异步释放，原 10×100ms 重试不足）。冒烟脚本自 v0.1.36 通过后未改动，两处均属既有脆弱点。加固：就绪期限 90s→150s（真故障仍判败）；清理重试 40×500ms，清理失败不推翻就绪判定但 cleanupPassed/cleanupError 如实入库。该提交仅动 scripts/smoke-packaged-desktop.mjs（不在测试范围，无生产代码差异）；eslint 改动文件绿，node --check 绿；typecheck/全量测试沿用 ef7656c5 证据。
 
 ## 2026-09-09 CI 流水线与分支保护简化候选与封印
 
