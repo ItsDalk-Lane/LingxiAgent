@@ -134,16 +134,16 @@ describe("Knowledge 四平台运行与打包烟测已接入正式流水线", () 
     expect(command).toContain("--maxWorkers=1");
   });
 
-  it("发布矩阵在构建服务器前跑源级烟测，并在构建后启动包内 Knowledge 两次", () => {
+  it("发布矩阵不重复 CI 的源级烟测，仍对真实构建产物做包内 Knowledge 启动", () => {
     const steps = build.jobs.build?.steps ?? [];
-    // packages/* 工作区已随插件生态拆除移除（04f90d2b），build:packages 步骤
-    // 同步退场；顺序不变量保留：源级烟测先于服务器构建。
+    // 源级烟测单点由 PR 的 CI 矩阵负责（去重）；发布矩阵只对真实打包产物
+    // 做包内验证，顺序不变量保留：服务器构建 → seed 复核 → 包内烟测。
     const sourceSmokeIndex = steps.findIndex(step => stepRun(step).includes("test:knowledge-platform-smoke"));
+    expect(sourceSmokeIndex).toBe(-1);
     const serverIndex = steps.findIndex(step => stepRun(step).includes("scripts/build-server.mjs"));
     const verifyArchiveIndex = steps.findIndex(step => step.name === "Verify seed kit before packaged Knowledge smoke");
     const packagedSmokeIndex = steps.findIndex(step => stepRun(step).includes("scripts/smoke-packaged-knowledge.mjs"));
-    expect(sourceSmokeIndex).toBeGreaterThanOrEqual(0);
-    expect(serverIndex).toBeGreaterThan(sourceSmokeIndex);
+    expect(serverIndex).toBeGreaterThanOrEqual(0);
     expect(verifyArchiveIndex).toBeGreaterThan(serverIndex);
     expect(stepRun(steps[verifyArchiveIndex])).toContain("scripts/verify-seed-kit.mjs");
     expect(packagedSmokeIndex).toBeGreaterThan(verifyArchiveIndex);
@@ -167,11 +167,10 @@ describe("ci.yml: open composition build+smoke guard is wired", () => {
     expect(steps.some((s) => stepRun(s).includes("smoke:server:open"))).toBe(true);
   });
 
-  it("defines a lint-open-boundary job that runs the boundary lint script", () => {
-    const job = doc.jobs["lint-open-boundary"];
-    expect(job).toBeDefined();
-    const steps = job?.steps ?? [];
-    expect(steps.some((s) => stepRun(s).includes("scripts/lint-open-boundary.mjs"))).toBe(true);
+  it("does not define a separate lint-open-boundary job (npm test covers the same script)", () => {
+    // 独立边界 lint job 属重复检查：tests/open-boundary-lint.test.ts 在
+    // test 矩阵内 spawn 同一脚本。这里钉住"不回流"，防止精简被无声撤销。
+    expect(doc.jobs["lint-open-boundary"]).toBeUndefined();
   });
 });
 

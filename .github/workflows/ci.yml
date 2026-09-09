@@ -1,8 +1,10 @@
 name: CI
 
+# CI 是 PR 合并前的唯一全量质检点（main 分支保护只要求 macos-15 arm64 与
+# windows-2025 x64 两腿必须绿）。不在 push: main 上重复触发——同一提交在
+# PR 里已经跑过一遍，合并后再跑属于纯重复消耗；直推 main 的热修由下一个
+# PR 的全量测试兜底。
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
 
@@ -35,8 +37,7 @@ jobs:
         with:
           # 全量测试里的 release-preflight 回归用例依赖真实历史 tags
           # （collectProductReleases 用 git tag --list 枚举本地产品 tag），
-          # 浅克隆会把它藏成空集导致断言失败。与 build.yml 的 quality-gate
-          # 保持一致，拉完整历史 + 全部 tags。
+          # 浅克隆会把它藏成空集导致断言失败。拉完整历史 + 全部 tags。
           fetch-depth: 0
 
       - name: Setup Node.js ${{ matrix.node-version }}
@@ -132,7 +133,7 @@ jobs:
   # site 映射源等，集合由指纹派生）、而 build/persistence-schema-fingerprint.json
   # 未在同一次 diff 里更新时，快速报错并提示重钉命令。
   # 纯 git diff + JSON 解析，不跑 vitest、不解析 TypeScript、不装 npm 依赖，
-  # 因此与 test/lint-open-boundary/open-build-smoke 并行，不阻塞它们的启动。
+  # 因此与 test/open-build-smoke 并行，不阻塞它们的启动。
   # 权威 tripwire 仍是 npm test 里的 tests/persistence-schema-tripwire.test.ts
   # （它跑完整的 assertCommittedPersistenceSchemaFingerprint），这里是它的快前哨。
   persistence-schema-guard:
@@ -149,26 +150,9 @@ jobs:
           GITHUB_BASE_REF: ${{ github.base_ref }}
         run: node scripts/check-persistence-schema-fingerprint.mjs
 
-  # 独立于上面 test 矩阵：只跑边界 lint 脚本本身，给"开/闭边界回归"一个比
-  # 全量矩阵（typecheck/lint/build/test 跑完才轮到 npm test 里的边界用例）
-  # 更快的失败信号。npm test 仍会通过 tests/open-boundary-lint.test.ts 的
-  # 冒烟用例 spawn 同一个脚本验证退出码/输出，这里不是重复覆盖，是提前示警。
-  lint-open-boundary:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24.15.0"
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint open/closed import boundary
-        run: node scripts/lint-open-boundary.mjs
+  # 开/闭边界回归不再单设 job：npm test 里的 tests/open-boundary-lint.test.ts
+  # 会 spawn 同一个 scripts/lint-open-boundary.mjs，在四个平台的 test 矩阵内
+  # 照常覆盖，独立 job 属重复检查，已随流水线简化退场。
 
   # 证明"开源 composition 构建"这条独立产物链没有烧掉：构建 + spawn 冒烟。
   # 与 build.yml 的安装包矩阵无关——那条链打的是闭集产品安装包，从不触碰

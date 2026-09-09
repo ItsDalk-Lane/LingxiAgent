@@ -3824,5 +3824,100 @@
     "log": "logs/s34-candidates-gate.log",
     "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
     "sourceManifestHash": "b03cf2ad880ee7b45b794628bc769cfa3f907d14c8ecd563ec216ca894af1df2"
+  },
+  {
+    "command": [
+      "npm",
+      "test"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-09T06:36:52.933699+00:00",
+    "end": "2026-09-09T06:38:15.772933+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 13442,
+      "failed": 1,
+      "skipped": 7,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "009f752308afba141a9a6cbe6ee89d6613d383cee8d6816404aa98e9e13192b8",
+    "log": "logs/s35-ci-simplify-full.log",
+    "logSha256": "f9d3318ea5d8f75b5a6aebdfcb8b03951f5ca7fc716af7c92f04e8d02c6915d0",
+    "sourceManifestHash": "009f752308afba141a9a6cbe6ee89d6613d383cee8d6816404aa98e9e13192b8"
+  },
+  {
+    "command": [
+      "python3",
+      "artifacts/f1-f12-repair/round2/create-delivery-patch.py"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-09T06:39:31.989669+00:00",
+    "end": "2026-09-09T06:39:34.479623+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "009f752308afba141a9a6cbe6ee89d6613d383cee8d6816404aa98e9e13192b8",
+    "log": "logs/s35-patch-bootstrap.log",
+    "logSha256": "10b6bd692701a029d683610028fe719be854d10e5cdff3f7ccbecf5d86742c0b",
+    "sourceManifestHash": "009f752308afba141a9a6cbe6ee89d6613d383cee8d6816404aa98e9e13192b8"
+  },
+  {
+    "command": [
+      "npm",
+      "test"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-09T06:39:39.361686+00:00",
+    "end": "2026-09-09T06:41:01.923776+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 13442,
+      "failed": 1,
+      "skipped": 7,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "009f752308afba141a9a6cbe6ee89d6613d383cee8d6816404aa98e9e13192b8",
+    "log": "logs/s35-ci-simplify-full-v2.log",
+    "logSha256": "07f7374bce3550c5dd74969cc14d34a6aeefe8d53cae022bd7a938f31de76af6",
+    "sourceManifestHash": "009f752308afba141a9a6cbe6ee89d6613d383cee8d6816404aa98e9e13192b8"
+  },
+  {
+    "command": [
+      "npm",
+      "test"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-09T06:41:27.864917+00:00",
+    "end": "2026-09-09T06:42:48.894289+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 13443,
+      "failed": 0,
+      "skipped": 7,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "009f752308afba141a9a6cbe6ee89d6613d383cee8d6816404aa98e9e13192b8",
+    "log": "logs/s35-ci-simplify-full-v3.log",
+    "logSha256": "5720f6c5fe768294e40f1fc0148b1abd9f85b1043f1799bef168f983928f0334",
+    "sourceManifestHash": "009f752308afba141a9a6cbe6ee89d6613d383cee8d6816404aa98e9e13192b8"
   }
 ]

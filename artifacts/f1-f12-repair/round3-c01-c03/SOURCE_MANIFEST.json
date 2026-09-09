@@ -36,14 +36,14 @@
       "sha256": "ddbdd327bd6a3f632f2f176de03c3440b5d25e07bb0b141bb20c3da020020615"
     },
     {
-      "bytes": 39027,
+      "bytes": 38565,
       "path": ".github/workflows/build.yml",
-      "sha256": "1cbad14d09b49baecc4d33414813c8360c2df3e65dafe849f8c19dfad5c748fa"
+      "sha256": "56c128b467e453bb2e4b4b2e280f2b62f94392cb0f71a4acef76f9725c4abe3e"
     },
     {
-      "bytes": 8032,
+      "bytes": 7738,
       "path": ".github/workflows/ci.yml",
-      "sha256": "9f78f7634d7e521ea1b5a4340147b42371eebba075d10f0acbd97a654d558e19"
+      "sha256": "edef3be26ab75553d9c42a7d57aaa8b34ab6d1a268b70518807ef335db38a24e"
     },
     {
       "bytes": 1089,
@@ -78,7 +78,7 @@
     {
       "bytes": 54382,
       "path": ".sync-audit/build-sync-matrix.mjs",
-      "sha256": "722c38b5a3c54a2341c149679bf11fe5b2a4914ffdd980b373649c8921d8463a"
+      "sha256": "97bb74de0bc611c6647d1ab9c0fc0b690ceb7eb462e439e4cae4b502840eb30a"
     },
     {
       "bytes": 16534,
@@ -113,12 +113,12 @@
     {
       "bytes": 80341,
       "path": ".sync-audit/upstream-sync-matrix.json",
-      "sha256": "379490780d108e14167880dfc5db842a8dd40295104690ebb79d870589e4a9fd"
+      "sha256": "f7268997d8b1c3c32a21f25f70896fa6fa032a134076d76d18f098e14abca941"
     },
     {
       "bytes": 41,
       "path": ".sync-audit/verified-source-sha.txt",
-      "sha256": "48eb452c49ad927f98336530bfbf41d8aae47ed438d6e75e1704d097cbc781ca"
+      "sha256": "25b39f710a5e3adc6a9bc007dfc7c906582328b4f86f09a111d80dea8472b0e3"
     },
     {
       "bytes": 4111,
@@ -141,9 +141,9 @@
       "sha256": "0e1c839ef037341be3443f1d2baf3112d983dceb0d3183741c1f9218b09d5b07"
     },
     {
-      "bytes": 185202,
+      "bytes": 185735,
       "path": "PROGRESS.md",
-      "sha256": "83bfaf0709693e5b0d7ef97c7558efce8a22e65525c7b3243d89d73a214424ff"
+      "sha256": "3b61d83423c31f2806dae4c4f6559cc4c4a2f481f8a5620ec55a1cd3b93109f0"
     },
     {
       "bytes": 12958,
@@ -166,14 +166,14 @@
       "sha256": "ee8ea30bc27b68baabba0f2eb897b7f5b25c5db27a5322e2019059c4f8391f7e"
     },
     {
-      "bytes": 10358,
+      "bytes": 10355,
       "path": "UPSTREAM_SYNC_AUDIT.md",
-      "sha256": "3d36a2c12940bdd85712876c2bc97484b5b43b2155f9c072a9fe630ce8378545"
+      "sha256": "f679abee62e4ad121804365da7cd9c5c48a5dab1bee1602b3d1dce0e0bc6d7c8"
     },
     {
       "bytes": 34956,
       "path": "UPSTREAM_SYNC_MATRIX.md",
-      "sha256": "b1a7882ca143fb5a88ba96b96a2f8f54c30285e8493354b537f3e8c6e2d44eac"
+      "sha256": "87a19880055d434295cb0a90164a0e74dcfb593c1ec71254a25b520925607b75"
     },
     {
       "bytes": 6053,
@@ -13086,9 +13086,9 @@
       "sha256": "9dbd07f160215811849d13a08662db6a183e2898474bddc211022f9d0502d7b1"
     },
     {
-      "bytes": 17362,
+      "bytes": 17408,
       "path": "tests/ci-workflow-guards.test.ts",
-      "sha256": "7ee010f6225e039df1c4995bf29b17131410e3685f923d4dc4eac3b6cf66feab"
+      "sha256": "6b6701a1b018ff0bec0db6cea369c49d7f168edb602a16b220e4997147768ff1"
     },
     {
       "bytes": 2552,
@@ -15636,9 +15636,9 @@
       "sha256": "51c63464a1ef8cf1c618d0e60c23bd5b2c130d642183a58966434e8bd359c508"
     },
     {
-      "bytes": 4000,
+      "bytes": 3851,
       "path": "tests/release-workflow-gates.test.ts",
-      "sha256": "73c11d2c9b3f5ece95bbd27d3175a7d2307e98bf607967035adde1b41e7351b9"
+      "sha256": "08607d6159c865f3435fd34000136b1167cb89c82ae0cf76d82d669947e12105"
     },
     {
       "bytes": 6786,

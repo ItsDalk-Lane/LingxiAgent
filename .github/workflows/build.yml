@@ -47,36 +47,9 @@ jobs:
             --tag "${{ github.ref_name }}" \
             --file release-digest.v2.json
 
-  quality-gate:
-    needs: release-preflight
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          # 全量测试包含真实历史标签预检，浅克隆会把历史最高版本藏掉。
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24.15.0"
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Typecheck
-        # 发布与合并检查使用相同容量，避免测试工程在默认堆上限处中断。
-        env:
-          NODE_OPTIONS: --max-old-space-size=4096
-        run: npm run typecheck
-
-      - name: Lint
-        run: npm run lint
-
-
-      - name: Run full test suite
-        run: npm test
+  # quality-gate（发布时重跑 typecheck/lint/全量测试）已随流水线简化退场：
+  # 同一提交的完整质检由 PR 的 CI 矩阵单点负责，发布链不再二次考试。
+  # 发布边界自身的回归（artifact bootstrap / 历史升级 / 打包冒烟）仍保留。
 
   # renderer 归档（renderer-<version>.tar.gz）是纯 web 静态资源，构建结果平台
   # 无关。这里单点构建一次，四个平台的 build job 下载同一份字节复用——避免
@@ -162,9 +135,11 @@ jobs:
         run: npm ci
 
 
-      - name: Run Knowledge platform smoke
-        run: npm run test:knowledge-platform-smoke
-
+      # 源级 Knowledge 烟测（test:knowledge-platform-smoke）不在发布矩阵重复：
+      # PR 的 CI 矩阵已对同一提交跑过（tests/ci-workflow-guards.test.ts 只钉
+      # CI 侧接线）。这里保留的仅是 CI 没有的发布期性能证据：stable-runner
+      # 上的向量检索性能门 + 证据归档（与手动 Knowledge performance 工作流
+      # 同一脚本，非重复检查）。
       - name: Run Knowledge stable-runner performance gates
         if: runner.os == 'Linux'
         env:
@@ -498,7 +473,7 @@ jobs:
           if-no-files-found: error
 
   artifact-release-smoke:
-    needs: [build, quality-gate]
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -569,13 +544,6 @@ jobs:
       - name: Generate merged latest-mac.yml
         run: |
           node scripts/merge-latest-mac-yml.cjs artifacts latest-mac.yml
-
-      # 更新摘要必须在本地 tag 前生成并提交。CI 只校验，不调用 LLM。
-      - name: Validate committed release digest
-        run: |
-          node scripts/validate-release-digest.mjs \
-            --tag "${{ github.ref_name }}" \
-            --file release-digest.v1.json
 
       # 单点上传所有 release assets（dmg/zip/exe/AppImage/deb/yml），blockmap 不上传
       - name: Upload release assets

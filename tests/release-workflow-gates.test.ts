@@ -45,18 +45,14 @@ describe("release workflow hard gates", () => {
     expect(preflight).toContain("release-digest.v2.json");
   });
 
-  it("makes release depend on full quality plus Artifact bootstrap and historical-upgrade smoke", () => {
-    expect(build.jobs["quality-gate"].needs).toBe("release-preflight");
-    expect(build.jobs["quality-gate"].steps?.[0]?.with?.["fetch-depth"]).toBe(0);
-    expect(build.jobs["artifact-release-smoke"].needs).toEqual(["build", "quality-gate"]);
+  it("keeps the release chain single-gated: no release-time re-run of the full quality suite", () => {
+    // 完整质检（typecheck/lint/npm test）单点由 PR 的 CI 矩阵负责；发布链
+    // 不再二次考试（quality-gate 已退场，钉住防回流）。发布边界的专属回归
+    // （artifact bootstrap / 历史升级冒烟）仍保留在 packaging 之后。
+    expect(build.jobs["quality-gate"]).toBeUndefined();
+    expect(build.jobs["artifact-release-smoke"].needs).toEqual(["build"]);
     expect(stepText(build.jobs["artifact-release-smoke"])).toContain("test:artifact-release-smoke");
     expect(build.jobs.release.needs).toBe("artifact-release-smoke");
-
-    const quality = stepText(build.jobs["quality-gate"]);
-    expect(quality).toContain("npm run typecheck");
-    expect(quality).toContain("npm run lint");
-    // packages/* 工作区已随插件生态拆除移除（04f90d2b），build:packages 门禁同步退场。
-    expect(quality).toContain("npm test");
   });
 
   it("classifies prereleases with SemVer instead of publishing every tag as Latest", () => {
