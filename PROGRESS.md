@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 5fbd96e0a287e5b88fa9ce6ba32b0fe6a332f40e  (2026-09-09 CI 流水线与分支保护简化候选：直提 main)
+VERIFIED_SOURCE_SHA   = ef7656c5e7ea2ecc8a9936bc117f13cfb47068ef  (2026-09-09 v0.1.37 发布候选：MCP 生命周期等七主题 + 发布元数据，直提 main)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1079,6 +1079,13 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
 
 Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面环境执行安装/升级
 交互 smoke（宿主平台 macOS 无法运行 NSIS 安装包）。不伪造真机安装通过。
+
+## 2026-09-09 v0.1.37 发布候选与审计封印
+
+- 固定源码候选：`c9494ae9b6ec3806898562863d7f25c311d388ab`（直提 main，基于 c1a79061）：MCP 连接器四档生命周期（保活/懒保活/急着连/懒连接）+ 空闲停泊（新运行态 idle、按需重启、忙碌计数防误停、eligibility startableOnDemand）；桥接 mcp_call 保留媒体任务占位；媒体展示去重（同一文件自动交付与手动展示合一、多图逐张保留）与聊天内受控预览（视频内联控件）；排队回执终态+接收双证据结算与未核实阻塞提示；桌面输入历史业务身份与 SDK UUID 独立多重校验；知识引用角标内联化与展示层括号/字段名清洗、citationMarkdown 提示收紧；设置页 Escape 层级/Toast 卡片化/四处忙碌态防重入；持久化指纹按 compatible repin。测试契约同步：tool-lifecycle-revocation 原锁「临时断线保持 TRANSPORT_FAILURE」旧语义，按新模型补齐为「按需可重启、不算撤销、代次不推进」，与 parity/runtime 两处一致（本轮唯一非候选自带改动）。
+- 发布元数据提交：`ef7656c5e7ea2ecc8a9936bc117f13cfb47068ef`（= 当前 VERIFIED_SOURCE_SHA）：version 0.1.37 / releaseGeneration 15，release-digest v1 手写 7 项并 append 进 v2（18 条，头 0.1.37），release:preflight PASS（历史最大 0.1.36/14）。该提交相对源码候选仅叠加版本与 digest 元数据，无生产代码差异。
+- 验证证据（typecheck/lint 绑定 ef7656c5 最终树；全量测试绑定补齐 revocation 后同一内容树）：typecheck×3 绿；eslint 0 error（9273 warnings 既有存量）；全量 13530 passed / 0 failed / 7 skipped（1343 文件，~81s）；test:artifact-release-smoke 305/305；release-preflight 6/6（含对所有历史 tag 的版本严格性检查）。
+- 未执行/受限：正式签名、四平台安装包、公证与远端发布证据由 tag 工作流执行（本条目记为待流水线验证，不以本地结果代替）；本地未执行 npm run pack；Windows NSIS 真机安装交互仍未实测（沿用既有 Known limitation）。
 
 ## 2026-09-09 CI 流水线与分支保护简化候选与封印
 
