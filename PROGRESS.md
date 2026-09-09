@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 5eba271dd19dc056b6e9259cd1ba560671cce887  (2026-09-08 发布流水线收口候选：分支 fix/remove-dead-knowledge-benchmarks)
+VERIFIED_SOURCE_SHA   = 6f08572182259651f1c511829fc866ee65c7cb40  (2026-09-09 发布流水线收口 III 候选：分支 fix/remove-dead-knowledge-benchmarks)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1054,6 +1054,21 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
 
 - 固定源码候选：`5eba271dd19dc056b6e9259cd1ba560671cce887`（基准退役候选基础上：knowledge-vector-shutdown 测试预算 30s→120s——intel 满载下今日 5 次纯超时、断言从未失败，真实工作给真实预算）。
 - 验证证据（绑定该候选树）：向量关闭本地 623ms 绿；全量 13442 passed / 0 failed（j51，引导 j52 后证据 25/25）。
+
+## 2026-09-09 打包知识冒烟修复候选与封印（v0.1.36 重打 tag 前置 IV）
+
+- 固定源码候选：`c1d2724069a437f03acf331d9066da5fba1f5424`（基准收口候选基础上：smoke-packaged-knowledge 归档检索冒烟改用现行 compileTurnScope + searchWithEvidence(fts, 禁重排) API；bundle 入口补导出 KNOWLEDGE_RERANK_DISABLED_POLICY）。v0.1.36 第三次 tag（3028ee39）的 Build 在包内 Knowledge 启动烟测崩溃。
+- 验证证据（绑定该候选树）：smoke 测试 4 项绿；全量 13442 passed / 0 failed（j53，引导 j54 后证据 25/25）。
+
+## 2026-09-09 发布流水线收口 II 候选与封印
+
+- 固定源码候选：`a5d53265f659866014bef0188bde8fc97f161030`（冒烟修复候选基础上：knowledge-vector-shutdown 子进程内 45s 墙钟自限、最多 30 轮最少 8 轮——intel 运行器劣化轮次下 120s 外层预算仍会吃满，轮数是压力强度不是契约）。
+- 验证证据（绑定该候选树）：本地 30 轮 517ms 绿；全量 13442 passed / 0 failed（j55，引导 j56 后证据 25/25）。
+
+## 2026-09-09 发布流水线收口 III 候选与封印
+
+- 固定源码候选：`6f08572182259651f1c511829fc866ee65c7cb40`（收口 II 基础上：knowledge-vector-shutdown 外层预算 120s→300s，只补劣化运行器的环境开销余量；子进程 45s 自限与断言语义不变）。
+- 验证证据（绑定该候选树）：本地 30 轮 517ms 绿；全量 13442 passed / 0 failed（j57，引导 j58 后证据 25/25）。
 
 ### Known limitation（保留）
 

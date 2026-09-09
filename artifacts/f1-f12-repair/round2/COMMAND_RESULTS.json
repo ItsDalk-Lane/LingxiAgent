@@ -3740,5 +3740,68 @@
     "log": "logs/s30-timeout-gate.log",
     "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
     "sourceManifestHash": "a462b9b4cecaa744808ad15ae6c351fefd37beac8eeecded9ddbc5d1121e1007"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-09T00:08:55.659302+00:00",
+    "end": "2026-09-09T00:09:16.845130+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "843c3f662c4e1cfd35126cbcd695dc2cbee7d08846dbd958df7dda310e23958e",
+    "log": "logs/s31-smokefix-gate.log",
+    "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
+    "sourceManifestHash": "843c3f662c4e1cfd35126cbcd695dc2cbee7d08846dbd958df7dda310e23958e"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-09T01:02:11.817019+00:00",
+    "end": "2026-09-09T01:02:32.916918+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "02e803c709714d0b34111e5b6335bc37f3292fb170145534f1b16721a0b72ab4",
+    "log": "logs/s32-adaptive-gate.log",
+    "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
+    "sourceManifestHash": "02e803c709714d0b34111e5b6335bc37f3292fb170145534f1b16721a0b72ab4"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-09T03:12:14.540117+00:00",
+    "end": "2026-09-09T03:12:37.865557+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "c0a832fe8afd2b6209b607a89f5f3054f00f138d71712f878a7789ebfca59c37",
+    "log": "logs/s33-budget-gate.log",
+    "logSha256": "8b9bfaf4dbe13fec4bdfd47c86541eb0984358efc2f832430c1e35420a661a8b",
+    "sourceManifestHash": "c0a832fe8afd2b6209b607a89f5f3054f00f138d71712f878a7789ebfca59c37"
   }
 ]

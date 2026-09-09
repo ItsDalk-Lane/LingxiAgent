@@ -78,7 +78,7 @@
     {
       "bytes": 54382,
       "path": ".sync-audit/build-sync-matrix.mjs",
-      "sha256": "656faa17ebc4476fd0f2ef37df3b4cc1ef0fd250759fce3b8acb0f24802de70e"
+      "sha256": "cee9287a2620ca77b39045dfae046e6d178eecd2cbec5714077407eb57b00bad"
     },
     {
       "bytes": 16534,
@@ -113,12 +113,12 @@
     {
       "bytes": 80341,
       "path": ".sync-audit/upstream-sync-matrix.json",
-      "sha256": "548639ba10813a9dba982fd6b4c492679b4186c06842af67c2e0b6610bbee532"
+      "sha256": "3e53be0e75aaf4f511f958524be5b259be40d9b91f4f1c63bccb0019c94c8584"
     },
     {
       "bytes": 41,
       "path": ".sync-audit/verified-source-sha.txt",
-      "sha256": "923ef6963e7f252cf32391d61fe652c19238ba5497a6e8b187d31861b906accb"
+      "sha256": "24374f7d3ee1dcaeb059dc73b9b98770ebfc21d1d018f3425572e34f15ddc650"
     },
     {
       "bytes": 4111,
@@ -141,9 +141,9 @@
       "sha256": "0e1c839ef037341be3443f1d2baf3112d983dceb0d3183741c1f9218b09d5b07"
     },
     {
-      "bytes": 184768,
+      "bytes": 184281,
       "path": "PROGRESS.md",
-      "sha256": "fcd5bd9f0bc23ca9a4170df6ba9172ea4b7f26194c8452cfe32b31bf111a603d"
+      "sha256": "e8d7ced0bcb46fbb336a1a6456e3aa57577c2c4af9855046debb15d16ced4f72"
     },
     {
       "bytes": 12958,
@@ -166,14 +166,14 @@
       "sha256": "ee8ea30bc27b68baabba0f2eb897b7f5b25c5db27a5322e2019059c4f8391f7e"
     },
     {
-      "bytes": 10357,
+      "bytes": 10356,
       "path": "UPSTREAM_SYNC_AUDIT.md",
-      "sha256": "42d40a1dcaad77e37e496365a667c35e5daa5f5303a75dbf9511f125ff2fcc97"
+      "sha256": "84065d6dbb038ba26baa589dbe65463e805ae948df49431e40c6df0307924703"
     },
     {
       "bytes": 34956,
       "path": "UPSTREAM_SYNC_MATRIX.md",
-      "sha256": "d435f78b345ff917f166aa647e6cb2b8f11f9be2516387077b8a6af7e7e67e44"
+      "sha256": "5142ec224adf110a15cedc5d1dda43ea7a2ce7390c9272000b205be1b71d6c2a"
     },
     {
       "bytes": 6053,
@@ -14416,9 +14416,9 @@
       "sha256": "2a2eb8c5d97cfd0318d36de52f25660f8a2f9191d9327cad97ff210a15567b23"
     },
     {
-      "bytes": 2372,
+      "bytes": 2324,
       "path": "tests/knowledge-vector-shutdown.test.ts",
-      "sha256": "448e73711927c1a138387680e28019d7e6c0be4b1f4f70929a130981ffe0f801"
+      "sha256": "76b04126fdbf8ea3d1922d0b5adcc0e613f02cb7a3e4570cd0b9c8d6db209cdb"
     },
     {
       "bytes": 25648,
