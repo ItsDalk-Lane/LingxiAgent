@@ -27,16 +27,19 @@ import fs from "fs";
 import path from "path";
 import { createRequire } from "module";
 
-export const MODEL_OBSERVABILITY_SCHEMA_VERSION = 6;
+export const MODEL_OBSERVABILITY_SCHEMA_VERSION = 7;
 
 /**
  * read side 支持的 schema 版本闭集（Phase 8 §七）：v1 历史库不迁移也可读
  * （accounting projection 标 unavailable）；v2 起有 model_call_usage；
  * v3 起有运行时显式 usage correlation 事实；v4 增加不含正文的来源名称快照；
  * v5/v6 为同会话轨迹合并的纯数据整合（无 DDL）——v5 只合 user_turn，实测
- * 桌面 turn 历史上落成 origin=unknown，v6 改按「调用归属会话」全量合并。
+ * 桌面 turn 历史上落成 origin=unknown，v6 改按「调用归属会话」全量合并；
+ * v7 重跑同一幂等合并——df2d91a8（2026-09-05）的实时复用查找错把 SDK
+ * 文件头 UUID 当会话身份（写入侧始终是 manifest 业务会话 ID），v6 迁移
+ * 之后产生的同会话拆分轨迹需要在升级时再次收拢（2026-09-10 修复）。
  */
-export const MODEL_OBSERVABILITY_SUPPORTED_READ_VERSIONS: readonly number[] = [1, 2, 3, 4, 5, 6];
+export const MODEL_OBSERVABILITY_SUPPORTED_READ_VERSIONS: readonly number[] = [1, 2, 3, 4, 5, 6, 7];
 
 /** store 目录约定（audit Q1 决策）。 */
 export const MODEL_OBSERVABILITY_DIR_NAME = "model-observability";
@@ -361,8 +364,24 @@ function mergeSessionTurnTracesV5(db: any): void {
  * 的全部 model_calls 改指 canonical，重算 canonical 的 call_count/
  * last_seen_at 后删除已清空的旧行。非会话轨迹（embedding/翻译/记忆等）与
  * parent_call_id 成对性原样不动。幂等：分组后单轨迹组无操作。
+ *
+ * 安全边界（2026-09-10 复核）：session_id 方言只有 manifest 业务 ID 一种会
+ * 形成规模（SDK UUID 只可能经无注册归属的 unknown fallback 零星混入；两种
+ * 方言取值空间不相交，精确匹配分组绝不跨方言合并，宁可不合也不错并）。
+ * attempts/payload_records/model_call_usage 均以 call_id 关联，迁移只改
+ * model_calls.trace_id 与 traces 行，调用/载荷/用量事实零丢失。
  */
 function mergeSessionTurnTracesV6(db: any): void {
+  mergeSessionTurnTraces(db, /* userTurnOnly */ false);
+}
+
+/**
+ * v7 数据整合（2026-09-10）：v6 迁移是一次性的，而实时复用查找自 df2d91a8
+ * 起错用 SDK 文件头 UUID（写入侧是 manifest 业务会话 ID），导致 v6 之后每个
+ * 新用户轮次仍在铸新轨迹。v6→v7 重跑同一个幂等合并，把这段期间拆开的
+ * 同会话轨迹重新收拢；已正确的数据（单轨迹组）无操作。
+ */
+function mergeSessionTurnTracesV7(db: any): void {
   mergeSessionTurnTraces(db, /* userTurnOnly */ false);
 }
 
@@ -479,6 +498,12 @@ export function migrateModelObservabilitySchema(db: any, currentVersion: number)
             // v5 → v6：纯数据整合（无 DDL）——按「调用归属会话」合并全部
             // 任务轨迹（含历史上 pi ingress 落成的 origin=unknown）。
             mergeSessionTurnTracesV6(db);
+            break;
+          case 6:
+            // v6 → v7：纯数据整合（无 DDL）——重跑同一幂等会话合并，收拢
+            // v6 迁移之后因实时复用查找身份错位（SDK UUID vs 业务会话 ID）
+            // 而继续产生的同会话拆分轨迹。
+            mergeSessionTurnTracesV7(db);
             break;
           default:
             throw new Error(`no migration step from observability schema ${version}`);

@@ -379,6 +379,23 @@ function clearSessionRuntimeCaches(path: string): void {
 // 消息加载（从 app-messages-shim 迁移）
 // ══════════════════════════════════════════════════════
 
+/**
+ * 从历史响应推导下一页游标（F1：分页边界只认服务端原始页面范围）。
+ * - 新服务端：nextBefore（string=继续翻页；null=没有更早记录）；
+ * - 旧服务端：回退用响应首条原始记录的 id（= 本页最早 display 序号），
+ *   绝不用归并后的显示项 id（那是组内最后一条记录的序号，会让每页只推进 1 条）；
+ * - undefined = 无法推导（无字段且无记录），调用方保持既有游标。
+ */
+function historyNextCursor(data: {
+  nextBefore?: string | null;
+  messages?: Array<{ id?: string } | undefined> | null;
+}): string | null | undefined {
+  if (typeof data.nextBefore === 'string') return data.nextBefore;
+  if (data.nextBefore === null) return null;
+  const firstId = Array.isArray(data.messages) ? data.messages[0]?.id : undefined;
+  return typeof firstId === 'string' ? firstId : undefined;
+}
+
 export async function loadMessages(forPath?: string): Promise<void> {
   const targetPath = forPath || useStore.getState().currentSessionPath;
   if (!targetPath) return;
@@ -442,23 +459,31 @@ export async function loadMessages(forPath?: string): Promise<void> {
     // per-session todos（防御性兼容层：即使后端漏转或缓存残留，这里兜底再转一次）
     const rawTodos = data.todos || [];
     const migratedTodos = migrateLegacyTodos({ todos: rawTodos });
-    const items = buildItemsFromHistory(data);
+    // In-flight guard：流仍活跃时，磁盘上的最新 Run 必然不完整（jsonl 按模型轮落盘，
+    // Run 未 settle），其历史投影不得携带终态（T06）；下方快照合并的 inflight 项
+    // 才是该 Run 的实时代表。快照必须在投影前取，保证两者看到同一事实基线。
+    const streamSnapshot = snapshotStreamBuffer(targetPath);
+    const items = buildItemsFromHistory(data, { openTailRun: !!streamSnapshot?.hasContent });
     // 修订点 stamp：记录本次快照对应的磁盘修订点，后续 reconcile 与列表投影对比。
     const revision = typeof data.revision === 'string' ? data.revision : null;
     useStore.getState().setSessionTodosForPath(targetPath, migratedTodos);
-    if (items.length > 0) {
-      useStore.getState().initSession(targetPath, items, data.hasMore ?? false, revision);
-      if (targetPath === useStore.getState().currentSessionPath) {
-        useStore.setState({ welcomeVisible: false });
-      }
-    } else {
-      useStore.getState().initSession(targetPath, [], false, revision);
+    // hasMore 永远以服务端为准：items 为空（本页全被前端过滤的隐藏消息）不等于
+    // 没有更早历史，静默截断会让旧消息永久不可达（T11b）。
+    useStore.getState().initSession(
+      targetPath,
+      items,
+      data.hasMore ?? false,
+      revision,
+      historyNextCursor(data),
+    );
+    if (items.length > 0 && targetPath === useStore.getState().currentSessionPath) {
+      useStore.setState({ welcomeVisible: false });
     }
     // In-flight guard: jsonl 仅在 turn_end 落盘。若 session 在 stream 进行中
     // 被 reload（switchSession 冷启动 / stream-resume truncated），合并 buffer
     // 当前快照作为末尾 assistant，避免 UI 上"正在写的消息消失"。
     // 同步执行，不 await，保证中途不会有 text_delta 事件插入。
-    const snapshot = snapshotStreamBuffer(targetPath);
+    const snapshot = streamSnapshot;
     if (snapshot?.hasContent) {
       useStore.getState().appendItem(targetPath, {
         type: 'message',
@@ -531,18 +556,27 @@ export async function loadMoreMessages(forPath?: string): Promise<void> {
 
   useStore.getState().setLoadingMore(targetPath, true);
   try {
-    const before = session.oldestId ?? '';
+    // 游标（F1）：优先服务端 nextBefore；旧服务端回退 oldestId（hydrate 时已按
+    // 原始首条记录 id 写入）。两者都是原始 display 序号，不是归并显示项身份。
+    const before = session.nextBefore ?? session.oldestId ?? '';
     const res = await lingxiFetch(sessionMessagesUrl(targetPath, { before }));
     const data = await res.json();
     if (Array.isArray(data.sessionFiles)) {
       useStore.getState().setSessionRegistryFiles(targetPath, data.sessionFiles);
     }
     const items = buildItemsFromHistory(data);
-    if (items.length > 0) {
-      useStore.getState().prependItems(targetPath, items, data.hasMore ?? false);
-    } else {
-      useStore.getState().setLoadingMore(targetPath, false);
+    const cursor = historyNextCursor(data);
+    let hasMore = data.hasMore ?? false;
+    if (hasMore && typeof cursor !== 'string') {
+      // 服务端声称还有更早记录却给不出可推进的游标（旧服务端空页/协议异常）：
+      // 不能静默截断，也不能原地死循环——显式记录诊断并终止翻页，等待下次
+      // 全量 hydrate 修正。
+      console.error('[loadMoreMessages] 分页游标缺失，终止翻页等待重新 hydrate:', targetPath, before);
+      hasMore = false;
     }
+    // 空页（全部被前端过滤 / 边界页）也要推进分页进度与 hasMore（T11b），
+    // prependItems 负责幂等合并与游标落盘。
+    useStore.getState().prependItems(targetPath, items, hasMore, cursor);
   } catch (err) {
     console.error('[loadMoreMessages] error:', err);
     useStore.getState().setLoadingMore(targetPath, false);

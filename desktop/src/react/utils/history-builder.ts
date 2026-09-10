@@ -8,6 +8,8 @@ import type {
   ChatMessage,
   ChatListItem,
   ContentBlock,
+  HistoryRunFacts,
+  HistoryRunRecordFact,
   SessionRegistryFile,
   UserAttachment,
 } from '../stores/chat-types';
@@ -84,6 +86,9 @@ export interface HistoryApiResponse {
     sourceIndex?: number;
     turnInputEntryId?: string;
     turnInputVisible?: boolean;
+    /** Run 边界（display 序号）：该记录所属 Run 的首/尾 displayable 记录序号。 */
+    turnStartIndex?: number;
+    turnEndIndex?: number;
     agentReview?: import('../stores/chat-types').AgentReviewContext;
     agentReviewRequest?: import('../stores/chat-types').AgentReviewRequestContext;
     sessionRefs?: Array<{ sessionId: string; label: string }>;
@@ -126,6 +131,8 @@ export interface HistoryApiResponse {
   }>;
   todos?: TodoItem[];
   hasMore?: boolean;
+  /** 服务端下发的下一页游标（display 序号字符串；null=没有更早记录）。 */
+  nextBefore?: string | null;
 }
 
 // ── 兼容层 ──
@@ -473,7 +480,152 @@ function sourceOrderedItems(
     .map((entry) => entry.item);
 }
 
-export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] {
+// ── Run 投影（页内归并与跨页缝合共用核心）──
+
+/** 计算单条记录在 Run 内的到达序偏移：与工具块按真实时间线交错的坐标系。 */
+function runRecordStrideOffset(offset: number): number {
+  return offset * HISTORY_MESSAGE_ORDER_STRIDE;
+}
+
+/**
+ * 把一个 Run 的原始记录事实投影为 ChatMessage。
+ * 页内归并（buildItemsFromHistory）与跨页缝合（prependItems 后重投影）共用，
+ * 保证「任意切页恢复 ≡ 全量恢复」：同 idPrefix、同 stride 坐标系、同裁决入口。
+ *
+ * - 终态（turnStatus）取组内最后一条记录：中间尝试失败后恢复成功的 Run 不被放大为失败；
+ * - runTerminal=false（Run 尾部不在本组，或该 Run 仍在流式进行）时绝不派生任何
+ *   Run 终态块/结局——「未生成最终回复」只能来自 Run 尾部的权威裁决。
+ */
+function projectHistoryRunRecords(
+  records: HistoryRunRecordFact[],
+  meta: {
+    turnInputEntryId?: string;
+    turnInputVisible?: boolean;
+    firstRecordTimestamp?: number;
+  },
+  runTerminal: boolean,
+): ChatMessage & { blocks: ContentBlock[] } {
+  const finalRecord = records[records.length - 1];
+  const finalId = finalRecord.displayId;
+  const idPrefix = finalRecord.entryId || finalId;
+
+  const legacyBlocks: ContentBlock[] = [];
+  for (let offset = 0; offset < records.length; offset += 1) {
+    const record = records[offset];
+    legacyBlocks.push(...buildAssistantBlocksFromContent({
+      content: record.content,
+      thinking: record.thinking ?? null,
+      toolCalls: (record.toolCalls ?? null) as never,
+      extraBlocks: (record.inlineBlocks ?? null) as never,
+    }).map((block) => (
+      block.processOrder !== undefined
+        ? { ...block, processOrder: block.processOrder + runRecordStrideOffset(offset) }
+        : block
+    )));
+  }
+
+  // 兼容分叉：整组没有任何持久化语义分段的旧数据（老服务端/纯工具记录）保持
+  // 旧投影路径——数组位置即展示顺序（技能卡跟在正文后等），不进四区投影、
+  // 不派生 Run 终态。带 segments 的组（现行服务端对一切有文字/思考内容的
+  // 记录都会下发）走统一裁决路径。
+  const hasSemanticSegments = records.some((record) => (record.segments || []).length > 0);
+  if (!hasSemanticSegments) {
+    const blocks = normalizeContentBlocks(legacyBlocks, {
+      idPrefix,
+      turnLifecycle: 'sealed',
+    });
+    return {
+      id: finalId,
+      sourceEntryId: finalRecord.entryId,
+      role: 'assistant',
+      blocks,
+      ...(meta.turnInputEntryId ? { turnInputEntryId: meta.turnInputEntryId } : {}),
+      ...(typeof meta.turnInputVisible === 'boolean' ? { turnInputVisible: meta.turnInputVisible } : {}),
+      ...(meta.firstRecordTimestamp !== undefined ? { timestamp: meta.firstRecordTimestamp } : {}),
+    };
+  }
+
+  const segments = records.flatMap((record, offset) => (
+    (record.segments || []).map((segment) => (
+      segment.processOrder !== undefined
+        ? { ...segment, processOrder: segment.processOrder + runRecordStrideOffset(offset) }
+        : segment
+    ))
+  ));
+  const projectionResult = projectAssistantTurn({
+    idPrefix,
+    inputMessageId: meta.turnInputEntryId || null,
+    assistantMessageIds: records.map((record) => record.entryId || record.displayId),
+    // 迁移边界一次性净化：旧落盘 segments 可能残留 leading 内部标签，
+    // 与结构化 mood/thinking block 双重表示时剥离（任务书 §23）。
+    segments: sanitizePersistedSegments(segments as never, {
+      hasStructuredMood: legacyBlocks.some((block) => block.type === 'mood'),
+      hasStructuredThinking: legacyBlocks.some((block) => block.type === 'thinking'),
+    }),
+    legacyBlocks,
+    status: finalRecord.turnStatus === 'failed'
+      ? 'failed'
+      : finalRecord.turnStatus === 'aborted'
+        ? 'aborted'
+        : 'completed',
+    runTerminal,
+  });
+
+  const msg: ChatMessage & { blocks: ContentBlock[] } = {
+    id: finalId,
+    sourceEntryId: finalRecord.entryId,
+    role: 'assistant',
+    blocks: projectionResult.blocks,
+    turnProjection: projectionResult.projection,
+    ...(meta.turnInputEntryId ? { turnInputEntryId: meta.turnInputEntryId } : {}),
+    ...(typeof meta.turnInputVisible === 'boolean' ? { turnInputVisible: meta.turnInputVisible } : {}),
+    ...(meta.firstRecordTimestamp !== undefined ? { timestamp: meta.firstRecordTimestamp } : {}),
+  };
+  return msg;
+}
+
+/** Run 缝合用：跨页重投影已合并的 facts（头部到达后由调用方决定是否丢弃 facts）。 */
+export function projectHistoryRunFromFacts(facts: HistoryRunFacts): ChatMessage {
+  const records = [...facts.records].sort((a, b) => Number(a.displayId) - Number(b.displayId));
+  const ownsRunTail = records.length > 0
+    && Number(records[records.length - 1].displayId) === facts.turnEndIndex;
+  return projectHistoryRunRecords(records, {
+    turnInputEntryId: facts.turnInputEntryId,
+    turnInputVisible: facts.turnInputVisible,
+    firstRecordTimestamp: facts.firstRecordTimestamp,
+  }, ownsRunTail);
+}
+
+function historyRunBounds(message: HistoryApiResponse['messages'][number]): { turnStartIndex: number; turnEndIndex: number } | null {
+  if (!Number.isInteger(message.turnStartIndex) || !Number.isInteger(message.turnEndIndex)) return null;
+  return { turnStartIndex: message.turnStartIndex as number, turnEndIndex: message.turnEndIndex as number };
+}
+
+function sameHistoryRun(
+  next: HistoryApiResponse['messages'][number],
+  current: HistoryApiResponse['messages'][number],
+): boolean {
+  const nextBounds = historyRunBounds(next);
+  const currentBounds = historyRunBounds(current);
+  if (nextBounds && currentBounds) {
+    return nextBounds.turnStartIndex === currentBounds.turnStartIndex
+      && nextBounds.turnEndIndex === currentBounds.turnEndIndex;
+  }
+  // 兼容旧服务端（无 Run 边界）：沿用 turnInputEntryId 相等 + 双方带 segments 的旧规则。
+  return !!(next.assistantSegments && next.turnInputEntryId
+    && current.assistantSegments && next.turnInputEntryId === current.turnInputEntryId);
+}
+
+export interface BuildItemsFromHistoryOptions {
+  /**
+   * 当前会话仍有活跃流（本端 stream buffer 有内容）时为 true：最新 Run 在磁盘上的
+   * 记录必然不完整，其页内投影不得携带终态（T06：运行中冷加载不误终结）。
+   * Run 真正结束后由实时收口（commitLiveRun）按权威状态落定。
+   */
+  openTailRun?: boolean;
+}
+
+export function buildItemsFromHistory(data: HistoryApiResponse, options: BuildItemsFromHistoryOptions = {}): ChatListItem[] {
   recordChatPerformance('history_projection', { itemCount: data.messages.length });
   const items: ChatListItem[] = [];
   const sessionFileLookup = buildSessionFileLookup(data.sessionFiles);
@@ -483,6 +635,15 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
   const blockMap: Record<number, Array<any>> = {};
   for (const b of allBlocks) {
     (blockMap[b.afterIndex] ??= []).push(b);
+  }
+
+  // 页内最新的 assistant 记录 id（display 序号）：openTailRun 只作用于包含它的组。
+  let newestAssistantId: string | null = null;
+  for (let i = data.messages.length - 1; i >= 0; i -= 1) {
+    if (data.messages[i].role === 'assistant') {
+      newestAssistantId = data.messages[i].id || null;
+      break;
+    }
   }
 
   for (let i = 0; i < data.messages.length; i++) {
@@ -569,29 +730,39 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
       items.push({ type: 'message', data: msg });
     } else if (m.role === 'assistant') {
       let groupEnd = i;
-      if (m.assistantSegments && m.turnInputEntryId) {
-        while (
-          groupEnd + 1 < data.messages.length
-          && data.messages[groupEnd + 1].role === 'assistant'
-          && data.messages[groupEnd + 1].assistantSegments
-          && data.messages[groupEnd + 1].turnInputEntryId === m.turnInputEntryId
-        ) {
-          groupEnd += 1;
-        }
+      while (
+        groupEnd + 1 < data.messages.length
+        && data.messages[groupEnd + 1].role === 'assistant'
+        && sameHistoryRun(data.messages[groupEnd + 1], m)
+      ) {
+        groupEnd += 1;
       }
       const groupMessages = data.messages.slice(i, groupEnd + 1);
-      const finalMessage = groupMessages[groupMessages.length - 1];
-      const finalIndex = groupEnd;
-      const finalId = finalMessage.id || `hist-${finalIndex}`;
-      const idPrefix = finalMessage.entryId || finalId;
+      const runBounds = historyRunBounds(m);
+      const firstRecordIndex = Number(m.id);
+      const lastRecordIndex = Number(groupMessages[groupMessages.length - 1].id);
+      // Run 头部是否已在本组内（未被分页截断）；无边界元数据时保守视为完整。
+      const coversRunHead = runBounds === null
+        || (!Number.isInteger(firstRecordIndex) || firstRecordIndex <= runBounds.turnStartIndex);
+      // Run 尾部是否在本组内：尾部持有整轮结局的裁决权。无元数据时保守视为持有
+      // （兼容旧服务端的既有行为；新服务端下被截断的头部片段 runTerminal=false）。
+      let ownsRunTail = true;
+      if (runBounds !== null && Number.isInteger(lastRecordIndex)) {
+        ownsRunTail = lastRecordIndex >= runBounds.turnEndIndex;
+      }
+      // 活跃流的最新 Run：磁盘记录不完整，不派生终态（T06）。
+      // 「最新组」以组末条记录判定（runTerminal 由尾部持有）。
+      const openTailRun = !!options.openTailRun
+        && ownsRunTail
+        && newestAssistantId != null
+        && newestAssistantId === groupMessages[groupMessages.length - 1].id;
       const beforeInterludes: Array<Record<string, any>> = [];
       const afterInterludes: Array<Record<string, any>> = [];
-      const legacyBlocks: ContentBlock[] = [];
+      const records: HistoryRunRecordFact[] = [];
 
       for (let offset = 0; offset < groupMessages.length; offset += 1) {
-        const messageIndex = i + offset;
         const assistantMessage = groupMessages[offset];
-        const messageBlocks = blockMap[messageIndex] || [];
+        const messageBlocks = blockMap[i + offset] || [];
         const inlineBlocks = messageBlocks.filter((block) => !isInterludeHistoryBlock(block));
         const interludeBlocks = messageBlocks.filter(isInterludeHistoryBlock);
         beforeInterludes.push(...interludeBlocks.filter((block) => (
@@ -600,53 +771,42 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
         afterInterludes.push(...interludeBlocks.filter((block) => (
           !shouldPlaceInterludeBeforeMessage(block, inlineBlocks)
         )));
-        // 服务器下发的 processOrder 是"消息内 content 数组索引"；同一会话轮次跨多条
-        // assistant 消息聚合时，按消息序加偏移，得到全 Turn 单调的全局序号。
-        const orderOffset = offset * HISTORY_MESSAGE_ORDER_STRIDE;
-        legacyBlocks.push(...buildAssistantBlocksFromContent({
+        records.push({
+          displayId: assistantMessage.id || `hist-${i + offset}`,
+          ...(assistantMessage.entryId ? { entryId: assistantMessage.entryId } : {}),
           content: assistantMessage.content,
-          thinking: assistantMessage.thinking,
-          toolCalls: assistantMessage.toolCalls,
-          extraBlocks: inlineBlocks,
-        }).map((block) => (
-          block.processOrder !== undefined
-            ? { ...block, processOrder: block.processOrder + orderOffset }
-            : block
-        )));
+          thinking: assistantMessage.thinking ?? null,
+          toolCalls: (assistantMessage.toolCalls ?? null) as HistoryRunRecordFact['toolCalls'],
+          segments: (assistantMessage.assistantSegments || []) as HistoryRunRecordFact['segments'],
+          ...(assistantMessage.turnStatus && assistantMessage.turnStatus !== 'completed'
+            ? { turnStatus: assistantMessage.turnStatus }
+            : {}),
+          inlineBlocks,
+        });
       }
 
-      const segments = groupMessages.flatMap((message, offset) => (
-        (message.assistantSegments || []).map((segment) => (
-          segment.processOrder !== undefined
-            ? { ...segment, processOrder: segment.processOrder + offset * HISTORY_MESSAGE_ORDER_STRIDE }
-            : segment
-        ))
-      ));
-      const projectionResult = m.assistantSegments
-        ? projectAssistantTurn({
-            idPrefix,
-            inputMessageId: m.turnInputEntryId || null,
-            assistantMessageIds: groupMessages.map((message, offset) => (
-              message.entryId || message.id || `hist-${i + offset}`
-            )),
-            // 迁移边界一次性净化：旧落盘 segments 可能残留 leading 内部标签，
-            // 与结构化 mood/thinking block 双重表示时剥离（任务书 §23）。
-            segments: sanitizePersistedSegments(segments, {
-              hasStructuredMood: legacyBlocks.some((block) => block.type === 'mood'),
-              hasStructuredThinking: legacyBlocks.some((block) => block.type === 'thinking'),
-            }),
-            legacyBlocks,
-            status: groupMessages.some((message) => message.turnStatus === 'failed')
-              ? 'failed'
-              : groupMessages.some((message) => message.turnStatus === 'aborted')
-                ? 'aborted'
-                : 'completed',
-          })
-        : null;
-      const blocks = projectionResult?.blocks || normalizeContentBlocks(legacyBlocks, {
-        idPrefix,
-        turnLifecycle: 'sealed',
-      });
+      const projectionMeta = {
+        turnInputEntryId: m.turnInputEntryId,
+        turnInputVisible: m.turnInputVisible,
+        firstRecordTimestamp: timestamp,
+      };
+      const runTerminal = ownsRunTail && !openTailRun;
+      const msg = projectHistoryRunRecords(records, projectionMeta, runTerminal);
+      const blocks = msg.blocks;
+
+      // Run 被分页截断（头部未加载，或防御性场景尾部缺失）时携带缝合事实；
+      // 更早页片段到达后由 chat-slice 按 runKey 缝合并重投影，头部加载完成后丢弃。
+      if (runBounds !== null && (!coversRunHead || !ownsRunTail)) {
+        msg.runFacts = {
+          runKey: `${runBounds.turnStartIndex}:${runBounds.turnEndIndex}`,
+          turnStartIndex: runBounds.turnStartIndex,
+          turnEndIndex: runBounds.turnEndIndex,
+          ...(m.turnInputEntryId ? { turnInputEntryId: m.turnInputEntryId } : {}),
+          ...(typeof m.turnInputVisible === 'boolean' ? { turnInputVisible: m.turnInputVisible } : {}),
+          ...(timestamp !== undefined ? { firstRecordTimestamp: timestamp } : {}),
+          records,
+        };
+      }
 
       for (let j = 0; j < beforeInterludes.length; j += 1) {
         const data = interludeContentBlock(beforeInterludes[j], `interlude:${i}:before:${j}`);
@@ -657,16 +817,6 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] 
         });
       }
 
-      const msg: ChatMessage = {
-        id: finalId,
-        sourceEntryId: finalMessage.entryId,
-        role: 'assistant',
-        blocks,
-        ...(projectionResult ? { turnProjection: projectionResult.projection } : {}),
-        ...(m.turnInputEntryId ? { turnInputEntryId: m.turnInputEntryId } : {}),
-        ...(typeof m.turnInputVisible === 'boolean' ? { turnInputVisible: m.turnInputVisible } : {}),
-      };
-      if (timestamp !== undefined) msg.timestamp = timestamp;
       if (blocks.length > 0) {
         items.push({ type: 'message', data: msg });
       }

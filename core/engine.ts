@@ -625,7 +625,8 @@ export class LingxiEngine {
       discardForkedSessionDeferredTasks: (options) => this.discardForkedSessionDeferredTasks(options),
       getSessionIdForPath: (sessionPath) => this.getSessionIdForPath(sessionPath),
       // 会话级轨迹复用（产品口径 2026-09-05）：观测未安装/未启用时惰性读取为
-      // null，行为与旧版逐轮铸根一致。
+      // null，行为与旧版逐轮铸根一致。入参是 manifest 业务会话 ID（与 SDK
+      // 文件头 UUID 独立）；SessionCoordinator 负责按该方言传入。
       resolveSessionReusableTraceId: (sessionId) =>
         this._modelObservability?.findReusableSessionTraceId?.(sessionId) ?? null,
       forkSessionFiles: (options) => this.forkSessionFiles(options),

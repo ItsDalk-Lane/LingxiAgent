@@ -235,7 +235,7 @@ index af3647c779dad1edd9042249023ada0cb0c81372..e742177ba5684eb2fbcf41e0997aa452
  .codex/
  
 diff --git a/.sync-audit/build-sync-matrix.mjs b/.sync-audit/build-sync-matrix.mjs
-index d978251370637d720d11094c068847b151ae235e..3c552ead2aa9a7344ed6fa04fb39a76d28d782cf 100644
+index d978251370637d720d11094c068847b151ae235e..6f173d2e6c200e9dad4ef77c7dfdd08a801f07e9 100644
 --- a/.sync-audit/build-sync-matrix.mjs
 +++ b/.sync-audit/build-sync-matrix.mjs
 @@ -40,7 +40,7 @@ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source
@@ -243,12 +243,12 @@ index d978251370637d720d11094c068847b151ae235e..3c552ead2aa9a7344ed6fa04fb39a76d
  // 该 commit 早于记录它的审计提交落地，无自引用（SHA = hash(contents)）问题。
  // 当前 branch HEAD 可能在其后存在纯审计 seal 提交，HEAD 由 Git ref 自身标识。
 -const VERIFIED_SOURCE_SHA = "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202";
-+const VERIFIED_SOURCE_SHA = "5fbd96e0a287e5b88fa9ce6ba32b0fe6a332f40e";
++const VERIFIED_SOURCE_SHA = "696016b7d609b8967db095fa88912119e89b7215";
  
  const ALLOWED_DISPOSITIONS = ["ADOPTED", "ADAPTED", "REGENERATED", "INTENTIONAL_DIVERGENCE"];
  
 diff --git a/.sync-audit/upstream-sync-matrix.json b/.sync-audit/upstream-sync-matrix.json
-index d6f8692829bc71ee97c3253e5482beabfdb51324..00384a23d9aae4cc11dc40a92079e7d71c1cf431 100644
+index d6f8692829bc71ee97c3253e5482beabfdb51324..7ee6a679887bf775ef5e94421ff200971e2bc241 100644
 --- a/.sync-audit/upstream-sync-matrix.json
 +++ b/.sync-audit/upstream-sync-matrix.json
 @@ -4,7 +4,7 @@
@@ -256,19 +256,19 @@ index d6f8692829bc71ee97c3253e5482beabfdb51324..00384a23d9aae4cc11dc40a92079e7d7
      "L0": "97595264ead8735a04559507ddaade25db8a4e15",
      "L1": "ca0b417e36a6a1f80947458aaed328a25718e41b",
 -    "VERIFIED_SOURCE_SHA": "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202"
-+    "VERIFIED_SOURCE_SHA": "5fbd96e0a287e5b88fa9ce6ba32b0fe6a332f40e"
++    "VERIFIED_SOURCE_SHA": "696016b7d609b8967db095fa88912119e89b7215"
    },
    "summary": {
      "total": 133,
 diff --git a/.sync-audit/verified-source-sha.txt b/.sync-audit/verified-source-sha.txt
-index 78c76634c4edc5a8962212273a593e3ddf8bd28d..e05d6b7f6c7b40917afda6c95ef81b9edd37597b 100644
+index 78c76634c4edc5a8962212273a593e3ddf8bd28d..44e85d27558b3db12fcd5408a396ea485e735ab4 100644
 --- a/.sync-audit/verified-source-sha.txt
 +++ b/.sync-audit/verified-source-sha.txt
 @@ -1 +1 @@
 -04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+5fbd96e0a287e5b88fa9ce6ba32b0fe6a332f40e
++696016b7d609b8967db095fa88912119e89b7215
 diff --git a/PROGRESS.md b/PROGRESS.md
-index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..3ce95fa7c47ee5006dfc2b2949df6b22300791cc 100644
+index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..03ed58f4125bfb9991c6f4d2f8c234dcb7db2288 100644
 --- a/PROGRESS.md
 +++ b/PROGRESS.md
 @@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
@@ -276,11 +276,11 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..3ce95fa7c47ee5006dfc2b2949df6b22
  LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
  LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
 -VERIFIED_SOURCE_SHA   = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202  (2026-09-07 拆除与语音改造+三 bug 修复封印：分支 refactor/dismantle-and-voice-features)
-+VERIFIED_SOURCE_SHA   = 5fbd96e0a287e5b88fa9ce6ba32b0fe6a332f40e  (2026-09-09 CI 流水线与分支保护简化候选：直提 main)
++VERIFIED_SOURCE_SHA   = 696016b7d609b8967db095fa88912119e89b7215  (2026-09-09 v0.1.37 发布候选：MCP 生命周期等七主题 + 发布元数据 + 两轮 CI 拦截修复，直提 main)
  历史上游同步工作分支  = feature/upstream-sync-0.447.4
  历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
  ```
-@@ -994,11 +994,97 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
+@@ -994,11 +994,107 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
  需要提交才能完成的封印留待相应授权步骤。不得为使检查变绿而虚报坐标、扩大白名单，
  或删除 seal 文件与 guard 测试；退役门禁属于另需明确授权的治理变更。
  
@@ -370,6 +370,16 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..3ce95fa7c47ee5006dfc2b2949df6b22
  Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面环境执行安装/升级
  交互 smoke（宿主平台 macOS 无法运行 NSIS 安装包）。不伪造真机安装通过。
  
++## 2026-09-09 v0.1.37 发布候选与审计封印
++
++- 固定源码候选：`c9494ae9b6ec3806898562863d7f25c311d388ab`（直提 main，基于 c1a79061）：MCP 连接器四档生命周期（保活/懒保活/急着连/懒连接）+ 空闲停泊（新运行态 idle、按需重启、忙碌计数防误停、eligibility startableOnDemand）；桥接 mcp_call 保留媒体任务占位；媒体展示去重（同一文件自动交付与手动展示合一、多图逐张保留）与聊天内受控预览（视频内联控件）；排队回执终态+接收双证据结算与未核实阻塞提示；桌面输入历史业务身份与 SDK UUID 独立多重校验；知识引用角标内联化与展示层括号/字段名清洗、citationMarkdown 提示收紧；设置页 Escape 层级/Toast 卡片化/四处忙碌态防重入；持久化指纹按 compatible repin。测试契约同步：tool-lifecycle-revocation 原锁「临时断线保持 TRANSPORT_FAILURE」旧语义，按新模型补齐为「按需可重启、不算撤销、代次不推进」，与 parity/runtime 两处一致（本轮唯一非候选自带改动）。
++- 发布元数据提交：`ef7656c5e7ea2ecc8a9936bc117f13cfb47068ef`（= 当前 VERIFIED_SOURCE_SHA）：version 0.1.37 / releaseGeneration 15，release-digest v1 手写 7 项并 append 进 v2（18 条，头 0.1.37），release:preflight PASS（历史最大 0.1.36/14）。该提交相对源码候选仅叠加版本与 digest 元数据，无生产代码差异。
++- 验证证据（typecheck/lint 绑定 ef7656c5 最终树；全量测试绑定补齐 revocation 后同一内容树）：typecheck×3 绿；eslint 0 error（9273 warnings 既有存量）；全量 13530 passed / 0 failed / 7 skipped（1343 文件，~81s）；test:artifact-release-smoke 305/305；release-preflight 6/6（含对所有历史 tag 的版本严格性检查）。
++- 未执行/受限：正式签名、四平台安装包、公证与远端发布证据由 tag 工作流执行（本条目记为待流水线验证，不以本地结果代替）；本地未执行 npm run pack；Windows NSIS 真机安装交互仍未实测（沿用既有 Known limitation）。
++- tag 运行补记（两次失败均非产品回归，实锤后加固冒烟脚本并推进坐标至 `acde46f1`）：运行 34355526584 Windows 打包桌面冒烟顶满 90s 就绪期限（慢跑者：同作业打包知识冒烟 87s vs 健康范围 60–71s；服务端停在导入入口；同作业同包知识冒烟通过）；重打 tag 后运行 34358209757 桌面 69.4s 全就绪（onboarding 正常），败于收尾 rmSync EPERM（taskkill 后句柄异步释放，原 10×100ms 重试不足）。冒烟脚本自 v0.1.36 通过后未改动，两处均属既有脆弱点。加固：就绪期限 90s→150s（真故障仍判败）；清理重试 40×500ms，清理失败不推翻就绪判定但 cleanupPassed/cleanupError 如实入库。该提交仅动 scripts/smoke-packaged-desktop.mjs（不在测试范围，无生产代码差异）；eslint 改动文件绿，node --check 绿；typecheck/全量测试沿用 ef7656c5 证据。
++- tag 第三轮补记（坐标推进至 `696016b7`）：运行 34360980484 四平台腿全绿（Windows 冒烟加固生效），但 artifact-release-smoke 岗哨拦截——tests/release-preflight.test.ts 末条断言硬编码「当前产品 tag」，ef7656c5 升版时漏随版本推进（该断言历来随 release metadata 提交更新）；本地冒烟当时在升版前跑过未复跑，属验证顺序失误。修复后升版状态下本机 test:artifact-release-smoke 305/305 复跑全绿。教训：升版本后必须复跑 artifact-release-smoke（其中含读取当前包版本的实时预检用例）。
++- 发布结果（2026-09-09）：运行 34364163117 全绿（四平台构建 + artifact-release-smoke + release + publish-train）。v0.1.37 正式发布（Latest，非草稿非预发布，18 产物），train-stable-16 与 train-beta-19 双列车同步发布；mirror-atomgit 失败为 AtomGit 镜像长期故障既有状态（best-effort，不阻塞发布）。验证证据以该运行远端作业为准；本提交为纯审计收口。
++
 +## 2026-09-09 CI 流水线与分支保护简化候选与封印
 +
 +- 固定源码候选：`5fbd96e0a287e5b88fa9ce6ba32b0fe6a332f40e`（直提 main，基于 6f5abd6d）：CI 收敛为 PR 单触发（合并进 main 后不再重复跑全量）；lint-open-boundary 独立岗哨与发布矩阵源级知识烟测退场（npm test/CI 矩阵单点覆盖，守卫契约测试已随新形状更新并钉住防回流）；发布链 quality-gate 二次考试与 release job 重复 digest 校验退场；知识库发布期性能门保留。GitHub 分支保护必过检查收敛为 macos-15 arm64 + windows-2025 x64 两腿，解除 strict（必须最新）、enforce_admins、会话清零与强制 PR 流程（已在 GitHub 侧生效，允许直推 main 热修）。
@@ -378,7 +388,7 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..3ce95fa7c47ee5006dfc2b2949df6b22
  ## 2026-08-25 Notebook-first Knowledge 目标
  
  ### 当前阶段：本机闭环完成，外部证据待执行
-@@ -1503,3 +1589,13 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
+@@ -1503,3 +1599,13 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
  - 派生清单（cli-runtime-closure / open-boundary baseline / shell-surface-manifest / persistence 指纹与 inventory / startup receipt）已在受测工作树重生成并随源码提交；staged diff 密钥模式扫描无命中。
  - 本次封印只同步既有六份审计文件（verified-source-sha.txt / build-sync-matrix.mjs / upstream-sync-matrix.json / UPSTREAM_SYNC_AUDIT.md / UPSTREAM_SYNC_MATRIX.md / 本文件坐标行），矩阵重生成 133 paths 硬校验通过（ADOPTED 25 / ADAPTED 100 / REGENERATED 4 / INTENTIONAL_DIVERGENCE 4）；不合并 main。
  - 未执行/受限：全仓 lint 与 build/package 门禁本轮未跑；系统语音识别端到端未实测（开发终端无语音识别 TCC 授权，helper 正确 fail-closed，打包后首次使用需用户授权）；TTS 云端路径需配置 API key 后实测；三 bug 修复的 dev 环境用户验收仍在进行；正式发布与四平台门禁未启动。
@@ -393,7 +403,7 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..3ce95fa7c47ee5006dfc2b2949df6b22
 +- 最终源码候选 `7cf986236cb8ac5c2d22cce1e5882554a42cff28`，审计封印提交 `62c73f77`；候选 source manifest SHA-256 `c418b3ef2fc475e40ed779f21b8e087b120834e9b673baf2e67c3758138d30d8`。封印后独立 diff guard 与 133 路径矩阵通过，upstream-sync、seal、round2 delivery 三文件 20/20 通过。
 +- 封印后原样 `npm test` exit 0：1334 文件通过 / 1 既有跳过，13384 测试通过 / 7 既有跳过，0 fail，82.80s；日志 `/tmp/lingxi-r01-r10-final-postseal-full-v2.log`。最终审计记录只改本 allowlist 内的 `PROGRESS.md`，不改变受测源码候选。
 diff --git a/UPSTREAM_SYNC_AUDIT.md b/UPSTREAM_SYNC_AUDIT.md
-index adcfa57d8a9836fe12c378f95f7448688d077896..0a1068c7fc652722635bc2469ad121affbf22697 100644
+index adcfa57d8a9836fe12c378f95f7448688d077896..d4bd44f572b9f34c2832611ca9024ade6eb25c7e 100644
 --- a/UPSTREAM_SYNC_AUDIT.md
 +++ b/UPSTREAM_SYNC_AUDIT.md
 @@ -15,7 +15,7 @@
@@ -401,12 +411,12 @@ index adcfa57d8a9836fe12c378f95f7448688d077896..0a1068c7fc652722635bc2469ad121af
  | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
  | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
 -| VERIFIED_SOURCE_SHA | `04f90d2b26449d2f3264a5ea2a1a8bd6fb253202` | 2026-09-07 拆除与语音改造+三 bug 修复封印（分支 refactor/dismantle-and-voice-features）；typecheck×3 全绿+全量 13081 用例（唯一失败为无关模块 macOS 临时目录清理竞态 flaky、单跑 10/10 通过）后绑定，验证明细见 PROGRESS.md 最新条目 |
-+| VERIFIED_SOURCE_SHA | `5fbd96e0a287e5b88fa9ce6ba32b0fe6a332f40e` | 2026-09-09 CI 流水线与分支保护简化候选（直提 main）；验证证据见 PROGRESS.md 最新条目 |
++| VERIFIED_SOURCE_SHA | `696016b7d609b8967db095fa88912119e89b7215` | 2026-09-09 CI 流水线与分支保护简化候选（直提 main）；验证证据见 PROGRESS.md 最新条目 |
  
  v0.1.35 仓库内的[功能 CI 记录](artifacts/release-v0.1.35/feature-ci-validation.json)
  对应 `2c835ac77afb1a73cd83816ad3d613297dc770a8`，不单独证明上述发布资料提交重新执行了
 diff --git a/UPSTREAM_SYNC_MATRIX.md b/UPSTREAM_SYNC_MATRIX.md
-index 2f98daf42096994372f834d639551859919c294e..d112e6dcd4d7484758e7dd7c5a2708500181e683 100644
+index 2f98daf42096994372f834d639551859919c294e..8a68181a7d04e7da8d99c9816461679830eacdb6 100644
 --- a/UPSTREAM_SYNC_MATRIX.md
 +++ b/UPSTREAM_SYNC_MATRIX.md
 @@ -10,7 +10,7 @@ U0 = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
@@ -414,7 +424,7 @@ index 2f98daf42096994372f834d639551859919c294e..d112e6dcd4d7484758e7dd7c5a270850
  L0 = 97595264ead8735a04559507ddaade25db8a4e15  (Lingxi v0.444.1 同步完成点, PR #2)
  L1 = ca0b417e36a6a1f80947458aaed328a25718e41b  (本轮同步开始时 main)
 -VERIFIED_SOURCE_SHA = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+VERIFIED_SOURCE_SHA = 5fbd96e0a287e5b88fa9ce6ba32b0fe6a332f40e
++VERIFIED_SOURCE_SHA = 696016b7d609b8967db095fa88912119e89b7215
  ```
  
  ## 统计（脚本计算，禁止人工填写）
@@ -863,6 +873,9 @@ index 0000000000000000000000000000000000000000..d077349cab441a108a031d3cb58611c4
 +print(log.decode(errors='replace')[-6000:])
 +print('EVIDENCE', label, 'EXIT', p.returncode, 'MANIFEST', h)
 +sys.exit(p.returncode)
+diff --git a/artifacts/history-pagination-run-continuity/evidence/fix-verification.json b/artifacts/history-pagination-run-continuity/evidence/fix-verification.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
 diff --git a/build/cli-runtime-closure.json b/build/cli-runtime-closure.json
 index e1f283e59d272771206ba3cd3b831a8fabce91c0..42e513ffecc7887d2b42e661ca6db553b7c6ff34 100644
 --- a/build/cli-runtime-closure.json
@@ -992,7 +1005,7 @@ index e1f283e59d272771206ba3cd3b831a8fabce91c0..42e513ffecc7887d2b42e661ca6db553
        "nft-runtime-trace": 10198
      }
 diff --git a/build/persistence-schema-fingerprint.json b/build/persistence-schema-fingerprint.json
-index ed2984c4adb27400676013bc77713d3b7e2e5229..7a4e77f16d765ce7ce47789f631c7aa37d8a076f 100644
+index ed2984c4adb27400676013bc77713d3b7e2e5229..fa8dbb8a5410d5db2335c30576a007f252eb756f 100644
 --- a/build/persistence-schema-fingerprint.json
 +++ b/build/persistence-schema-fingerprint.json
 @@ -649,7 +649,7 @@
@@ -1000,7 +1013,7 @@ index ed2984c4adb27400676013bc77713d3b7e2e5229..7a4e77f16d765ce7ce47789f631c7aa3
      "version": 3
    },
 -  "payloadFingerprint": "sha256:782ba6904f2a6ac752e3355198ad05433a803bac17e136b9730ccbfd75bdff10",
-+  "payloadFingerprint": "sha256:92a83e282cd0ba0fbb03f79be3de552e2d95f176cf187dc61d362e4d15c22a00",
++  "payloadFingerprint": "sha256:549c80c87f803e33f1bdaeac9165f36e18dda5035ac2069ab289335f51a3844b",
    "registry": [
      {
        "affectedByEpochMigration": true,
@@ -1039,8 +1052,8 @@ index ed2984c4adb27400676013bc77713d3b7e2e5229..7a4e77f16d765ce7ce47789f631c7aa3
      "classification": "compatible",
 -    "compatibilityReason": "desktop/main.cjs: speech permission IPC gains hostCanPrompt gate (dev-shell TCC SIGABRT guard, user-reported crash on mic click). IPC surface and all store schemas unchanged.",
 -    "payloadFingerprint": "sha256:782ba6904f2a6ac752e3355198ad05433a803bac17e136b9730ccbfd75bdff10"
-+    "compatibilityReason": "MCP connector lifecycle feature: normalizeMcpConfig now persists two new optional per-connector fields (lifecycle, idleTimeoutMinutes). Read-time defaults (lifecycle keep-alive, idleTimeoutMinutes null) reproduce the pre-feature behaviour for every existing config, so old shapes read identically and no migration is needed — a compatible addition, not a breaking change.",
-+    "payloadFingerprint": "sha256:92a83e282cd0ba0fbb03f79be3de552e2d95f176cf187dc61d362e4d15c22a00"
++    "compatibilityReason": "session-coordinator model-trace reuse lookup now resolves the business session id (runtime lookup only, no persisted shape change); model-observability schema v6->v7 is a data-only idempotent trace merge with no DDL, same compatible class as the earlier v5/v6 data migrations",
++    "payloadFingerprint": "sha256:549c80c87f803e33f1bdaeac9165f36e18dda5035ac2069ab289335f51a3844b"
    },
    "schemas": [
      {
@@ -1057,6 +1070,27 @@ index ed2984c4adb27400676013bc77713d3b7e2e5229..7a4e77f16d765ce7ce47789f631c7aa3
        "storeId": "mcp-config"
      },
      {
+@@ -4048,9 +4051,9 @@
+             "type": "table"
+           }
+         ],
+-        "userVersion": 6
++        "userVersion": 7
+       },
+-      "sourceHash": "sha256:e0801ad79309b7abd0f8ccd48a4e7ae5f83d341b3ffba832ab4a80f0f5f9694c",
++      "sourceHash": "sha256:c43a6b1de8dc56dfcfc8862eb295b6f3f721429a4cb3bf445e91bc80efae9c74",
+       "storeId": "model-observability-db"
+     },
+     {
+@@ -4155,7 +4158,7 @@
+         {
+           "contract": "core/session-coordinator.ts Hana metadata extensions",
+           "module": "core/session-coordinator.ts",
+-          "sourceHash": "sha256:1775237db94d35ae6313085a8174a672b43a62c0f1c895b8246df00bd09a45d9"
++          "sourceHash": "sha256:91f4454981f847a1337f0a0c53ab4592a77c6526d572a51bbf6fe53da3e05800"
+         },
+         {
+           "contract": "core/session-jsonl-file.ts repair contract",
 @@ -5291,7 +5294,7 @@
        "exemptionId": null,
        "kind": "atomic-write",
@@ -1607,10 +1641,20 @@ index 032c7a1eca650761703c325f7edaaaf675ca27dc..baf4097d729da2d465c7f8ffe3f859e7
    consumeRenderedReminderBlock(engine, sessionPath, reminderBlock);
    engine.emitEvent?.({
 diff --git a/core/engine.ts b/core/engine.ts
-index 4bb25d468affebc67d586732be350db412552ff4..c00cf3c7602d4fc26034f7a1572627de049e71aa 100644
+index 4bb25d468affebc67d586732be350db412552ff4..339a9798f80d5e6a8211ac02fa294c116e6cd686 100644
 --- a/core/engine.ts
 +++ b/core/engine.ts
-@@ -2723,7 +2723,7 @@ export class LingxiEngine {
+@@ -625,7 +625,8 @@ export class LingxiEngine {
+       discardForkedSessionDeferredTasks: (options) => this.discardForkedSessionDeferredTasks(options),
+       getSessionIdForPath: (sessionPath) => this.getSessionIdForPath(sessionPath),
+       // 会话级轨迹复用（产品口径 2026-09-05）：观测未安装/未启用时惰性读取为
+-      // null，行为与旧版逐轮铸根一致。
++      // null，行为与旧版逐轮铸根一致。入参是 manifest 业务会话 ID（与 SDK
++      // 文件头 UUID 独立）；SessionCoordinator 负责按该方言传入。
+       resolveSessionReusableTraceId: (sessionId) =>
+         this._modelObservability?.findReusableSessionTraceId?.(sessionId) ?? null,
+       forkSessionFiles: (options) => this.forkSessionFiles(options),
+@@ -2723,7 +2724,7 @@ export class LingxiEngine {
        "这里只提供可查阅范围，还没有进行搜索；不要把尚未检索理解为没有证据。",
        "先使用 knowledge_search 查询相关材料；需要了解资料结构时才调用 knowledge_outline，不必每次先列目录。",
        "问题有多个方面时自行梳理所需材料，不预设子问题数量。首次结果不足时换用人物名、事件、关键词或具体阶段继续搜索。",
@@ -1619,7 +1663,7 @@ index 4bb25d468affebc67d586732be350db412552ff4..c00cf3c7602d4fc26034f7a1572627de
        "标题、摘要和目录只作线索。需要上下文时，用 knowledge_read 读取命中所在章节或相邻原文；按返回的继续位置阅读后续内容。",
        "需要精确词句时使用 knowledge_grep。不得重复相同查询或已经读过的范围；空结果时改写查询，失败时依据具体原因调整。",
        "遇到新线索就继续查阅，直到能够回答用户实际问题；无需另开研究会话，不要为普通知识问答委派多名调查者。",
-@@ -4142,7 +4142,8 @@ export class LingxiEngine {
+@@ -4142,7 +4143,8 @@ export class LingxiEngine {
            signal,
            onUpdate,
            ctx: runtimeCtx,
@@ -3808,6 +3852,85 @@ index 5d23cfca074a545bfe44e2d59d29c4c6aaf10c0b..166e901c600512bdebc5c71da1cc75e9
 +  hooks?.at?.('completed:before');operation.state='completed';operation.completedAt=new Date().toISOString();writeOperation(dir,operation);
 +  return operation.summary;
  }
+diff --git a/core/session-coordinator.ts b/core/session-coordinator.ts
+index fb8c97fda2d936341ef8910e88786925090480fd..0a29a7ded79a0f27fd480891874cc0141fcc0523 100644
+--- a/core/session-coordinator.ts
++++ b/core/session-coordinator.ts
+@@ -1094,7 +1094,7 @@ export class SessionCoordinator {
+    * @param {(cwd: string, context: {agent: object, agentId: string}) => Promise<{workspacePaths?: object[]}|void>} [deps.onBeforeSessionCreate]
+    * @param {(sessionPath: string, reason: string) => void|Promise<void>} [deps.onSessionRuntimeDiscarded]
+    * @param {(sessionPath: string) => string|null} [deps.getSessionIdForPath]
+-   * @param {(sessionId: string|null) => string|null} [deps.resolveSessionReusableTraceId] - 会话级轨迹复用查找（观测不可用时 null）
++   * @param {(sessionId: string|null) => string|null} [deps.resolveSessionReusableTraceId] - 会话级轨迹复用查找（入参为 manifest 业务会话 ID，非 SDK 文件头 UUID；观测不可用时 null）
+    * @param {(sessionRef: {sessionId: string, sessionPath?: string}, reason: string) => object} [deps.abortToolExecutionsForSession]
+    */
+   constructor(deps: any) {
+@@ -4971,6 +4971,24 @@ export class SessionCoordinator {
+     return allowedModel;
+   }
+ 
++  /**
++   * 模型观测的 canonical 会话身份 = Lingxi 业务会话 ID（session manifest）。
++   *
++   * 业务会话 ID 与 Pi SDK 会话文件头 UUID（sessionManager.getSessionId()）是
++   * 两套独立身份（c9494ae9 加固后显式分离），前者才是观测链路的会话语义：
++   * attribution.sessionId → model_calls.session_id、复用内存索引、SQL 复用
++   * 查找、历史合并、Trace Detail 会话重建全部按业务 ID 落库与读取。复用查找
++   * 若错用 SDK UUID 会结构性零命中（同会话每轮铸新根，2026-09-10 回归根因）。
++   *
++   * 解析顺序：运行态 entry（createSession 时已绑定 manifest）→ manifest
++   * locator 查询；均无 → null（调用方退化为逐轮铸根旧行为，不伪造身份）。
++   */
++  _observabilitySessionIdForTrace(sessionPath: any) {
++    const entry = sessionPath ? this._getSessionEntryByPath(sessionPath) : null;
++    if (typeof entry?.sessionId === "string" && entry.sessionId) return entry.sessionId;
++    return this._sessionIdForPath(sessionPath);
++  }
++
+   async prompt(text: any, opts: any) {
+     // Agent Turn = Trace 根（§二十七/§二十八）：整个用户 turn 的全部模型调用
+     // （Chat 流式、工具内 Vision/Approval/Media/Subagent、compaction、turn 后
+@@ -4978,14 +4996,17 @@ export class SessionCoordinator {
+     // 则原样继承。
+     // 产品口径（2026-09-05）：轨迹以「会话」为粒度——同一会话后续 turn 复用
+     // 该会话最近一次 user_turn 轨迹，调用次数/成败在原记录上累加；新会话或
+-    // 观测不可用时照旧铸新根。
++    // 观测不可用时照旧铸新根。会话身份必须是业务会话 ID（见
++    // _observabilitySessionIdForTrace），SDK 文件头 UUID 只作诊断 ref。
+     const spForTrace = this._session?.sessionManager?.getSessionFile?.() || this.currentSessionPath;
+-    const sessionIdForTrace = this._session?.sessionManager?.getSessionId?.() || null;
++    const sdkSessionId = this._session?.sessionManager?.getSessionId?.() || null;
++    const sessionIdForTrace = this._observabilitySessionIdForTrace(spForTrace);
+     return runWithModelTraceRoot(
+       {
+         origin: "user_turn",
+         refs: {
+           ...(sessionIdForTrace ? { sessionId: sessionIdForTrace } : {}),
++          ...(sdkSessionId && sdkSessionId !== sessionIdForTrace ? { sdkSessionId } : {}),
+           ...(spForTrace ? { sessionPath: spForTrace } : {}),
+         },
+         reuseTraceId: this._d.resolveSessionReusableTraceId?.(sessionIdForTrace) ?? null,
+@@ -5096,13 +5117,18 @@ export class SessionCoordinator {
+     // → engine.promptSession）与 prompt() 同语义——没有这层根时，pi ingress 兜底
+     // 会以 origin=unknown 逐轮铸根（实测 2026-09-05：同会话每轮一条轨迹）。
+     // 产品口径（2026-09-05）：同会话复用最近轨迹；外层已有 scope（slash/bridge）
+-    // 则原样继承。
+-    const sessionIdForTrace = entry.session?.sessionManager?.getSessionId?.() || null;
++    // 则原样继承。会话身份必须是业务会话 ID（见
++    // _observabilitySessionIdForTrace），SDK 文件头 UUID 只作诊断 ref。
++    const sdkSessionIdForTrace = entry.session?.sessionManager?.getSessionId?.() || null;
++    const sessionIdForTrace = this._observabilitySessionIdForTrace(sessionPath);
+     return runWithModelTraceRoot(
+       {
+         origin: "user_turn",
+         refs: {
+           ...(sessionIdForTrace ? { sessionId: sessionIdForTrace } : {}),
++          ...(sdkSessionIdForTrace && sdkSessionIdForTrace !== sessionIdForTrace
++            ? { sdkSessionId: sdkSessionIdForTrace }
++            : {}),
+           ...(sessionPath ? { sessionPath } : {}),
+         },
+         reuseTraceId: this._d.resolveSessionReusableTraceId?.(sessionIdForTrace) ?? null,
 diff --git a/core/session-turn-actions.ts b/core/session-turn-actions.ts
 index c03cd09f3ddd44f666ba12d99d723b478c8da9ca..50bdbf027e26301e67b8043c90200160afe925b0 100644
 --- a/core/session-turn-actions.ts
@@ -4364,6 +4487,156 @@ index 0086bdd47fdaf3ec84eca72835d3b27fc3b121f6..a4abf133b32959372434803a4207f6c4
    it('只按显式阶段区分长过程旁白和短最终答复', () => {
      const commentary: ContentBlock = {
        type: 'text',
+diff --git a/desktop/src/react/__tests__/chat-semantics/turn-outcome-unification.test.ts b/desktop/src/react/__tests__/chat-semantics/turn-outcome-unification.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..c670886edaa4e7237f648a9f7f486b2c36ed9775
+--- /dev/null
++++ b/desktop/src/react/__tests__/chat-semantics/turn-outcome-unification.test.ts
+@@ -0,0 +1,144 @@
++import { describe, expect, it } from 'vitest';
++import type { ContentBlock } from '../../stores/chat-types';
++import { projectAssistantTurn } from '../../utils/turn-projector';
++import { resolveAssistantTurnOutcome } from '../../utils/turn-outcome';
++import type { LiveAssistantSegment } from '../../stores/live-turn-store';
++
++function segment(
++  id: string,
++  semanticPhase: LiveAssistantSegment['semanticPhase'],
++  source: string,
++  kind: LiveAssistantSegment['kind'] = 'text',
++): LiveAssistantSegment {
++  return { id, kind, semanticPhase, source, lifecycle: 'sealed' };
++}
++
++/**
++ * F3：结局裁决必须只有一个入口。
++ * projectAssistantTurn 与 resolveAssistantTurnOutcome 对同一事实集合必须给出
++ * 一致的结局判定——投影器不得再用 answerBlocks.length/resultBlocks.length/
++ * controlBlocks.length 的局部判空自行猜测整轮结局。
++ */
++describe('turn projector × outcome resolver 唯一裁决', () => {
++  const project = (segments: LiveAssistantSegment[], legacyBlocks: ContentBlock[], status: 'completed' | 'failed' | 'aborted' | 'streaming' = 'completed') =>
++    projectAssistantTurn({
++      idPrefix: 'entry-a1',
++      inputMessageId: 'entry-u1',
++      assistantMessageIds: ['entry-a1'],
++      segments,
++      legacyBlocks,
++      status,
++    });
++
++  it('空白答案块不得冒充答案：两套规则必须同判 completed_without_user_output', () => {
++    const segments = [segment('s1', 'final_answer', '   \n\t  ')];
++    const projected = project(segments, []);
++
++    const resolverOutcome = resolveAssistantTurnOutcome({
++      blocks: projected.blocks.filter((block) => block.type !== 'turn_status'),
++      status: 'completed',
++    });
++    // 权威裁决：空白最终答案 = 没有用户可见输出。
++    expect(resolverOutcome.outcome).toBe('completed_without_user_output');
++    expect(resolverOutcome.missingFinalAnswerReason).toBe('empty_final_answer');
++
++    // 投影器必须消费同一裁决：生成带原因的 turn_status 块并记录 outcome，
++    // 而不是因为「存在答案块」就豁免告警。
++    const statusBlocks = projected.blocks.filter((block) => block.type === 'turn_status');
++    expect(statusBlocks.length).toBe(1);
++    expect(statusBlocks[0]).toMatchObject({ status: 'missing_final_answer' });
++    expect(projected.projection.outcome).toBe('completed_without_user_output');
++    expect(projected.projection.missingFinalAnswerReason).toBe('empty_final_answer');
++  });
++
++  it('pending 控制卡是待处理输出：投影器不得因「存在控制块」豁免，也不得误报无输出', () => {
++    // 场景 A：pending 确认卡（待用户处理）→ completed_with_control，不产生无回复告警。
++    const pendingControl: ContentBlock[] = [
++      {
++        id: 'confirm-1',
++        type: 'session_confirmation',
++        confirmId: 'confirm-1',
++        kind: 'approval',
++        surface: 'message',
++        status: 'pending',
++      } as ContentBlock,
++    ];
++    const withPending = project([segment('s1', 'reasoning', '思考', 'reasoning')], pendingControl);
++    const resolverOutcome = resolveAssistantTurnOutcome({
++      blocks: withPending.blocks.filter((block) => block.type !== 'turn_status'),
++      status: 'completed',
++    });
++    expect(resolverOutcome.outcome).toBe('completed_with_control');
++    expect(withPending.blocks.filter((block) => block.type === 'turn_status')).toEqual([]);
++    expect(withPending.projection.outcome).toBe('completed_with_control');
++
++    // 场景 B：已确认（非 pending）控制卡且无答案无结果 → completed_with_result，
++    // 同样不产生无回复告警（用户可见交付已存在）。
++    const resolvedControl: ContentBlock[] = [
++      {
++        id: 'confirm-2',
++        type: 'session_confirmation',
++        confirmId: 'confirm-2',
++        kind: 'approval',
++        surface: 'message',
++        status: 'confirmed',
++      } as ContentBlock,
++    ];
++    const withResolved = project([segment('s1', 'reasoning', '思考', 'reasoning')], resolvedControl);
++    expect(
++      withResolved.blocks.filter((block) => block.type === 'turn_status' && block.status === 'missing_final_answer'),
++    ).toEqual([]);
++    expect(withResolved.projection.outcome).toBe('completed_with_result');
++  });
++
++  it('只有过程块 → 两者同判 completed_without_user_output（only_process_blocks）', () => {
++    const segments = [segment('s1', 'reasoning', '长思考', 'reasoning')];
++    const toolBlocks: ContentBlock[] = [
++      {
++        id: 'tools-1',
++        type: 'tool_group',
++        tools: [{ id: 'call-1', name: 'read', done: true, success: true }],
++        collapsed: false,
++      },
++    ];
++    const projected = project(segments, toolBlocks);
++    const outcome = resolveAssistantTurnOutcome({
++      blocks: projected.blocks.filter((block) => block.type !== 'turn_status'),
++      status: 'completed',
++    });
++    expect(outcome.outcome).toBe('completed_without_user_output');
++    expect(outcome.missingFinalAnswerReason).toBe('only_process_blocks');
++    expect(projected.projection.outcome).toBe('completed_without_user_output');
++    expect(projected.projection.missingFinalAnswerReason).toBe('only_process_blocks');
++  });
++
++  it('派生 turn_status 不得作为「已有结果」的证据参与裁决', () => {
++    // 历史遗留：blocks 里可能已含旧投影产生的 turn_status。resolver 必须过滤它，
++    // 投影器重新裁决时也不得把它算作 result。
++    const stale: ContentBlock[] = [
++      {
++        id: 'stale-status',
++        type: 'turn_status',
++        status: 'missing_final_answer',
++      } as unknown as ContentBlock,
++    ];
++    const outcome = resolveAssistantTurnOutcome({ blocks: stale, status: 'completed' });
++    expect(outcome.outcome).toBe('completed_without_user_output');
++
++    const projected = project([], stale);
++    const statusBlocks = projected.blocks.filter((block) => block.type === 'turn_status');
++    // 旧状态块被过滤后重新裁决 → 仍然无输出，但同一 Run 只保留一个状态块（稳定 id）。
++    expect(statusBlocks.length).toBe(1);
++    expect(statusBlocks[0].id).toBe('entry-a1:missing-final-answer');
++  });
++
++  it('失败/中止终态：投影器保持显式状态块，outcome 同步', () => {
++    const failed = project([segment('s1', 'final_answer', '部分正文')], [], 'failed');
++    expect(failed.blocks.some((block) => block.type === 'turn_status' && (block as any).status === 'failed')).toBe(true);
++    expect(failed.projection.outcome).toBe('failed');
++
++    const aborted = project([segment('s1', 'final_answer', '部分正文')], [], 'aborted');
++    expect(aborted.blocks.some((block) => block.type === 'turn_status' && (block as any).status === 'aborted')).toBe(true);
++    expect(aborted.projection.outcome).toBe('aborted');
++  });
++});
 diff --git a/desktop/src/react/__tests__/chat/turn-usage-pills.test.tsx b/desktop/src/react/__tests__/chat/turn-usage-pills.test.tsx
 index 8232900431e6ad57f812b2b17cb4e26a25083145..02bd0432d65947a5369e8cae72ef30f001add8af 100644
 --- a/desktop/src/react/__tests__/chat/turn-usage-pills.test.tsx
@@ -6454,6 +6727,19 @@ index 0000000000000000000000000000000000000000..c1235c78bcd7bb014a776044984f81a1
 +    expect(result.fileRefs).toEqual([{ path: '/synthetic/a.txt', name: 'a.txt', isDirectory: false }]);
 +  });
 +});
+diff --git a/desktop/src/react/__tests__/utils/history-builder.test.ts b/desktop/src/react/__tests__/utils/history-builder.test.ts
+index f37b97bba416247b8d9c2e127e761684c856ea86..d04cc93a4dea1b0095ccaf25c625ee4d403c6026 100644
+--- a/desktop/src/react/__tests__/utils/history-builder.test.ts
++++ b/desktop/src/react/__tests__/utils/history-builder.test.ts
+@@ -125,6 +125,8 @@ describe('buildItemsFromHistory user image restoration', () => {
+       resultBlockIds: [],
+       controlBlockIds: [],
+       status: 'completed',
++      // 结局唯一裁决（F3）：投影携带权威 outcome，渲染层不再自行猜测。
++      outcome: 'completed_with_answer',
+     });
+     const textBlocks = first.data.blocks?.filter((block) => block.type === 'text') || [];
+     expect(textBlocks.map((block) => block.source)).toEqual(['内部检查', '最终答复']);
 diff --git a/desktop/src/react/components/InputArea.tsx b/desktop/src/react/components/InputArea.tsx
 index f443dd2f3db4b6a06040e38d4c77786439eb0dc8..5f0f0bc508809576336846fc67e4f05505d870d6 100644
 --- a/desktop/src/react/components/InputArea.tsx
@@ -9207,19 +9493,28 @@ index 974ac08f74a277f2f905df7276398b24090837d1..e71749d30486a8a33395802f26950e1f
                  e.stopPropagation();
                }}
 diff --git a/desktop/src/react/stores/chat-slice.ts b/desktop/src/react/stores/chat-slice.ts
-index 4a3347fae299447fe47b491f016ffaae17ee2658..304a71bac159b800e96794e4949643162aa4c5f4 100644
+index 4a3347fae299447fe47b491f016ffaae17ee2658..d234a75381d656bf336973cd617e65a64ceb37d2 100644
 --- a/desktop/src/react/stores/chat-slice.ts
 +++ b/desktop/src/react/stores/chat-slice.ts
-@@ -8,7 +8,7 @@ import { invalidateStreamBuffer, invalidateStreamResumeMeta } from './stream-inv
+@@ -8,8 +8,9 @@ import { invalidateStreamBuffer, invalidateStreamResumeMeta } from './stream-inv
  import { bumpMessageLiveVersion, clearMessageLiveVersion } from './message-live-version';
  import { sessionScopedKey, sessionScopedValue } from './session-slice';
  import { recordChatPerformance } from '../utils/chat-performance';
 -import { normalizeContentBlocks } from '../utils/content-semantics';
 +import { isSameFilePresentation, normalizeContentBlocks } from '../utils/content-semantics';
  import { resolveAssistantTurnOutcome } from '../utils/turn-outcome';
++import { mergePrependedHistoryItems } from '../utils/history-run-merge';
  
  export interface ChatSlice {
-@@ -31,7 +31,8 @@ export interface ChatSlice {
+   chatSessions: Record<string, SessionMessages>;
+@@ -26,12 +27,13 @@ export interface ChatSlice {
+   _loadMessagesVersion: Record<string, number>;
+   scrollPositions: Record<string, number>;
+ 
+-  initSession: (path: string, items: ChatListItem[], hasMore: boolean, revision?: string | null) => void;
+-  prependItems: (path: string, items: ChatListItem[], hasMore: boolean) => void;
++  initSession: (path: string, items: ChatListItem[], hasMore: boolean, revision?: string | null, nextBefore?: string | null) => void;
++  prependItems: (path: string, items: ChatListItem[], hasMore: boolean, nextBefore?: string | null) => void;
    appendItem: (path: string, item: ChatListItem) => void;
    appendOptimisticUserMessage: (path: string, message: ChatMessage) => void;
    confirmOptimisticUserMessage: (path: string, clientMessageId: string, message: ChatMessage) => boolean;
@@ -9229,7 +9524,7 @@ index 4a3347fae299447fe47b491f016ffaae17ee2658..304a71bac159b800e96794e494964316
    updateLastMessage: (path: string, updater: (msg: ChatMessage) => ChatMessage) => void;
    updateMessageById: (path: string, messageId: string, updater: (msg: ChatMessage) => ChatMessage) => boolean;
    bindPersistedTurnEntries: (path: string, entries: {
-@@ -74,6 +75,11 @@ export interface ChatSlice {
+@@ -74,6 +76,11 @@ export interface ChatSlice {
    enqueueQueuedTurnInput: (path: string, item: QueuedTurnInput) => void;
    updateQueuedTurnInputText: (path: string, id: string, text: string) => void;
    removeQueuedTurnInput: (path: string, id: string) => void;
@@ -9241,7 +9536,55 @@ index 4a3347fae299447fe47b491f016ffaae17ee2658..304a71bac159b800e96794e494964316
    /** 显式标记队列项调度结果（blocked/failed/ready）；错误码与可重试性随状态记录。 */
    setQueuedTurnInputStatus: (path: string, id: string, status: 'ready' | 'blocked' | 'failed', errorCode?: string, retryable?: boolean) => void;
  }
-@@ -214,7 +220,7 @@ export const createChatSlice = (
+@@ -124,7 +131,7 @@ export const createChatSlice = (
+   scrollPositions: {},
+   queuedTurnInputsByPath: {},
+ 
+-  initSession: (path, items, hasMore, revision = null) => set((s) => {
++  initSession: (path, items, hasMore, revision = null, nextBefore) => set((s) => {
+     const key = keyForSession(s as any, path);
+     const sessions = { ...s.chatSessions };
+     const registryFiles = { ...s.sessionRegistryFilesByPath };
+@@ -133,7 +140,10 @@ export const createChatSlice = (
+       items,
+       hasMore,
+       loadingMore: false,
+-      oldestId: firstMessageId(items),
++      // 游标语义（F1）：nextBefore 由调用方从服务端响应（或原始首条记录 id）传入；
++      // oldestId 仅作旧消费者兼容的显示项身份，不再承担分页边界。
++      oldestId: nextBefore ?? firstMessageId(items),
++      ...(nextBefore !== undefined ? { nextBefore } : {}),
+       revision,
+     };
+     if (key !== path) delete sessions[path];
+@@ -155,17 +165,23 @@ export const createChatSlice = (
+     return { chatSessions: sessions, sessionRegistryFilesByPath: registryFiles, scrollPositions };
+   }),
+ 
+-  prependItems: (path, items, hasMore) => set((s) => {
++  prependItems: (path, items, hasMore, nextBefore) => set((s) => {
+     const session = scopedMapValue<SessionMessages>(s as any, s.chatSessions, path);
+     if (!session) return {};
+-    const merged = [...items, ...session.items];
++    // 补页合并（F1/F2）：同 Run 片段缝合 + 重复事实幂等，绝不裸拼接；
++    // 缝合会重投影受影响 Run，未受影响的项保持对象引用不变（React 增量渲染）。
++    const { items: merged, stitchedRunKeys } = mergePrependedHistoryItems(session.items, items);
++    if (stitchedRunKeys.length > 0) {
++      recordChatPerformance('history_run_stitch', { sessionPath: path, itemCount: stitchedRunKeys.length });
++    }
+     return {
+       chatSessions: putScopedMapValue(s as any, s.chatSessions, path, {
+           ...session,
+           items: merged,
+           hasMore,
+           loadingMore: false,
+-          oldestId: firstMessageId(items) || session.oldestId,
++          oldestId: nextBefore ?? firstMessageId(items) ?? session.oldestId,
++          ...(nextBefore !== undefined ? { nextBefore } : {}),
+         }),
+     };
+   }),
+@@ -214,7 +230,7 @@ export const createChatSlice = (
        const targetIdx = session.items.findIndex((item) =>
          item.type === 'message' &&
          item.data.role === 'user' &&
@@ -9250,7 +9593,7 @@ index 4a3347fae299447fe47b491f016ffaae17ee2658..304a71bac159b800e96794e494964316
        );
        if (targetIdx < 0) return {};
        const items = [...session.items];
-@@ -222,7 +228,8 @@ export const createChatSlice = (
+@@ -222,7 +238,8 @@ export const createChatSlice = (
        if (current.type !== 'message' || current.data.role !== 'user') return {};
        const nextData: ChatMessage = {
          ...current.data,
@@ -9260,7 +9603,7 @@ index 4a3347fae299447fe47b491f016ffaae17ee2658..304a71bac159b800e96794e494964316
          id: current.data.id,
          // 回执/恢复回放不得覆盖用户原文：本地乐观文本是用户输入的逐字符快照（F1/F10），
          // 服务端回声只负责确认与补充元数据；本地文本为空（纯附件等）时才采用服务端文本。
-@@ -240,7 +247,7 @@ export const createChatSlice = (
+@@ -240,7 +257,7 @@ export const createChatSlice = (
      return consumed;
    },
  
@@ -9269,7 +9612,7 @@ index 4a3347fae299447fe47b491f016ffaae17ee2658..304a71bac159b800e96794e494964316
      let consumed = false;
      set((s) => {
        const session = scopedMapValue<SessionMessages>(s as any, s.chatSessions, path);
-@@ -248,7 +255,7 @@ export const createChatSlice = (
+@@ -248,7 +265,7 @@ export const createChatSlice = (
        const targetIdx = session.items.findIndex((item) =>
          item.type === 'message' &&
          item.data.role === 'user' &&
@@ -9278,7 +9621,7 @@ index 4a3347fae299447fe47b491f016ffaae17ee2658..304a71bac159b800e96794e494964316
        );
        if (targetIdx < 0) return {};
        const items = [...session.items];
-@@ -260,6 +267,7 @@ export const createChatSlice = (
+@@ -260,6 +277,7 @@ export const createChatSlice = (
            ...current.data,
            sendStatus: 'failed',
            sendError: error,
@@ -9286,7 +9629,7 @@ index 4a3347fae299447fe47b491f016ffaae17ee2658..304a71bac159b800e96794e494964316
          },
        };
        consumed = true;
-@@ -271,6 +279,29 @@ export const createChatSlice = (
+@@ -271,6 +289,29 @@ export const createChatSlice = (
      return consumed;
    },
  
@@ -9316,7 +9659,7 @@ index 4a3347fae299447fe47b491f016ffaae17ee2658..304a71bac159b800e96794e494964316
    updateLastMessage: (path, updater) => set((s) => {
      const session = scopedMapValue<SessionMessages>(s as any, s.chatSessions, path);
      if (!session || session.items.length === 0) return {};
-@@ -503,7 +534,11 @@ export const createChatSlice = (
+@@ -503,7 +544,11 @@ export const createChatSlice = (
          if (blockIdx < 0) continue;
  
          consumed = true;
@@ -9329,7 +9672,7 @@ index 4a3347fae299447fe47b491f016ffaae17ee2658..304a71bac159b800e96794e494964316
            return {};
          }
  
-@@ -513,7 +548,14 @@ export const createChatSlice = (
+@@ -513,7 +558,14 @@ export const createChatSlice = (
            turnLifecycle: 'sealed',
          })[0];
          let nextBlocks = [...blocks];
@@ -9345,7 +9688,7 @@ index 4a3347fae299447fe47b491f016ffaae17ee2658..304a71bac159b800e96794e494964316
          if (normalizedResolution.surfaceRole === 'result') {
            nextBlocks = nextBlocks.filter((block) => !(
              block.type === 'turn_status' && block.status === 'missing_final_answer'
-@@ -760,7 +802,7 @@ export const createChatSlice = (
+@@ -760,7 +812,7 @@ export const createChatSlice = (
          ...s.queuedTurnInputsByPath,
          // 编辑保存 = 新快照：版本递增（在途准备的迟到结果按版本丢弃），
          // 状态回到 ready 等一次新的调度；旧错误码随快照作废。
@@ -9354,7 +9697,7 @@ index 4a3347fae299447fe47b491f016ffaae17ee2658..304a71bac159b800e96794e494964316
            ? {
              ...item,
              text,
-@@ -800,6 +842,30 @@ export const createChatSlice = (
+@@ -800,6 +852,30 @@ export const createChatSlice = (
        },
      };
    }),
@@ -9386,7 +9729,7 @@ index 4a3347fae299447fe47b491f016ffaae17ee2658..304a71bac159b800e96794e494964316
  
  function registryFileKey(file: SessionRegistryFile): string | null {
 diff --git a/desktop/src/react/stores/chat-types.ts b/desktop/src/react/stores/chat-types.ts
-index 181f3b8efc24e5f90d188ce292f06f65b43cefc3..5856a66bf5edbfb90e2b621e3902559294c70058 100644
+index 181f3b8efc24e5f90d188ce292f06f65b43cefc3..ae4181b651b96d5b8891ffc7ce86c8899e7b17ac 100644
 --- a/desktop/src/react/stores/chat-types.ts
 +++ b/desktop/src/react/stores/chat-types.ts
 @@ -46,6 +46,8 @@ export interface QueuedTurnInput {
@@ -9398,15 +9741,54 @@ index 181f3b8efc24e5f90d188ce292f06f65b43cefc3..5856a66bf5edbfb90e2b621e39025592
    /**
     * 调度状态：ready = 等待自动/手动派发；blocked / failed = 上次派发被门禁
     * 拦下或提交前失败，队列项原位保留全部字段，等待用户编辑/删除/显式重试
-@@ -429,6 +431,7 @@ export type ContentBlock = TextDecorator | RichBlock;
+@@ -427,8 +429,46 @@ export type ContentBlock = TextDecorator | RichBlock;
  
+ // ── 消息 ──
+ 
++// ── 历史分页 Run 缝合事实 ──
++// 分页按原始记录切页，一个 Run 可能跨多页。被截断的 Run 项携带这些原始事实，
++// 更早页片段到达时与既有项缝合并重新投影；Run 头部记录加载完成后即丢弃（内存有界）。
++
++/** Run 缝合所需的单条原始助手记录事实（display id = 服务端 display 序号）。 */
++export interface HistoryRunRecordFact {
++  displayId: string;
++  entryId?: string;
++  content: string;
++  thinking?: string | null;
++  toolCalls?: Array<Record<string, unknown>> | null;
++  /** 该记录的持久化语义分段（原始形态，未加组内偏移）。 */
++  segments: Array<{
++    id: string;
++    kind: 'text' | 'reasoning';
++    semanticPhase: 'reasoning' | 'commentary' | 'final_answer';
++    source: string;
++    lifecycle: 'sealed';
++    deferred?: DeferredHistoryContent;
++    processOrder?: number;
++  }>;
++  turnStatus?: 'failed' | 'aborted';
++  /** 该记录锚定的页级 blocks（已在页构建时解析为记录归属，不含 interlude）。 */
++  inlineBlocks: Array<Record<string, unknown>>;
++}
++
++/** 同一 Run 的跨页缝合事实。records 按旧→新追加；runKey 即 Run 身份键。 */
++export interface HistoryRunFacts {
++  runKey: string;
++  turnStartIndex: number;
++  turnEndIndex: number;
++  turnInputEntryId?: string;
++  turnInputVisible?: boolean;
++  firstRecordTimestamp?: number;
++  records: HistoryRunRecordFact[];
++}
++
  export interface ChatMessage {
    id: string;              // UI message id；本地发送的 user message 可先使用 clientMessageId
 +  clientMessageId?: string; // 可验证的桌面输入关联；分页ID仍保持历史索引
    sourceEntryId?: string;  // Pi SDK session entry id，用于 branch-aware 的重新生成/编辑
    /** 本次 Agent turn 的真实输入 entry；隐藏后台输入也必须保留，不能猜到最近可见 user。 */
    turnInputEntryId?: string;
-@@ -456,6 +459,8 @@ export interface ChatMessage {
+@@ -456,11 +496,15 @@ export interface ChatMessage {
    agentReviewRequest?: AgentReviewRequestContext;
    sendStatus?: 'pending' | 'failed';
    sendError?: string;
@@ -9415,8 +9797,28 @@ index 181f3b8efc24e5f90d188ce292f06f65b43cefc3..5856a66bf5edbfb90e2b621e39025592
    /** 非用户本人发出的消息来源（如别的 Agent 经跨 session 协作投递）。老数据无此字段，按普通用户消息渲染。 */
    origin?: { kind: 'agent'; agentId: string | null; agentName: string | null };
    // Assistant
+   blocks?: ContentBlock[];
+   turnProjection?: AssistantTurnProjection;
++  /** 跨页 Run 缝合事实：仅当该 Run 被分页截断（头部记录未加载）时携带。 */
++  runFacts?: HistoryRunFacts;
+   // 通用
+   timestamp?: number;
+ }
+@@ -508,6 +552,12 @@ export interface SessionMessages {
+   hasMore: boolean;
+   loadingMore: boolean;
+   oldestId?: string;
++  /**
++   * 服务端下发的下一页游标（display 序号字符串；null=没有更早记录）。
++   * 分页边界由服务端原始页面范围决定；oldestId 是显示项身份，禁止再当游标用（F1）。
++   * 兼容旧服务端（无 nextBefore）时由原始首条记录 id 回退推导。
++   */
++  nextBefore?: string | null;
+   /**
+    * hydrate 时服务端返回的磁盘修订点（stat 签名）。
+    * null = 未知（如 WS 端为新会话 initSession 的空状态，或服务端 stat 失败）。
 diff --git a/desktop/src/react/stores/session-actions.ts b/desktop/src/react/stores/session-actions.ts
-index dd70127eec6e1e2527b7d3f8abf75ae71026e758..58a26e091049958a59fb667d96036f7079498b81 100644
+index dd70127eec6e1e2527b7d3f8abf75ae71026e758..f25f5a8d1cd7f18ba1a44ebbe305d341af0b8030 100644
 --- a/desktop/src/react/stores/session-actions.ts
 +++ b/desktop/src/react/stores/session-actions.ts
 @@ -8,6 +8,7 @@
@@ -9477,6 +9879,104 @@ index dd70127eec6e1e2527b7d3f8abf75ae71026e758..58a26e091049958a59fb667d96036f70
  function sessionMessagesUrl(path: string, extra: Record<string, string> = {}): string {
    const state = useStore.getState() as Record<string, any>;
    const params = new URLSearchParams();
+@@ -335,6 +379,23 @@ function clearSessionRuntimeCaches(path: string): void {
+ // 消息加载（从 app-messages-shim 迁移）
+ // ══════════════════════════════════════════════════════
+ 
++/**
++ * 从历史响应推导下一页游标（F1：分页边界只认服务端原始页面范围）。
++ * - 新服务端：nextBefore（string=继续翻页；null=没有更早记录）；
++ * - 旧服务端：回退用响应首条原始记录的 id（= 本页最早 display 序号），
++ *   绝不用归并后的显示项 id（那是组内最后一条记录的序号，会让每页只推进 1 条）；
++ * - undefined = 无法推导（无字段且无记录），调用方保持既有游标。
++ */
++function historyNextCursor(data: {
++  nextBefore?: string | null;
++  messages?: Array<{ id?: string } | undefined> | null;
++}): string | null | undefined {
++  if (typeof data.nextBefore === 'string') return data.nextBefore;
++  if (data.nextBefore === null) return null;
++  const firstId = Array.isArray(data.messages) ? data.messages[0]?.id : undefined;
++  return typeof firstId === 'string' ? firstId : undefined;
++}
++
+ export async function loadMessages(forPath?: string): Promise<void> {
+   const targetPath = forPath || useStore.getState().currentSessionPath;
+   if (!targetPath) return;
+@@ -398,23 +459,31 @@ export async function loadMessages(forPath?: string): Promise<void> {
+     // per-session todos（防御性兼容层：即使后端漏转或缓存残留，这里兜底再转一次）
+     const rawTodos = data.todos || [];
+     const migratedTodos = migrateLegacyTodos({ todos: rawTodos });
+-    const items = buildItemsFromHistory(data);
++    // In-flight guard：流仍活跃时，磁盘上的最新 Run 必然不完整（jsonl 按模型轮落盘，
++    // Run 未 settle），其历史投影不得携带终态（T06）；下方快照合并的 inflight 项
++    // 才是该 Run 的实时代表。快照必须在投影前取，保证两者看到同一事实基线。
++    const streamSnapshot = snapshotStreamBuffer(targetPath);
++    const items = buildItemsFromHistory(data, { openTailRun: !!streamSnapshot?.hasContent });
+     // 修订点 stamp：记录本次快照对应的磁盘修订点，后续 reconcile 与列表投影对比。
+     const revision = typeof data.revision === 'string' ? data.revision : null;
+     useStore.getState().setSessionTodosForPath(targetPath, migratedTodos);
+-    if (items.length > 0) {
+-      useStore.getState().initSession(targetPath, items, data.hasMore ?? false, revision);
+-      if (targetPath === useStore.getState().currentSessionPath) {
+-        useStore.setState({ welcomeVisible: false });
+-      }
+-    } else {
+-      useStore.getState().initSession(targetPath, [], false, revision);
++    // hasMore 永远以服务端为准：items 为空（本页全被前端过滤的隐藏消息）不等于
++    // 没有更早历史，静默截断会让旧消息永久不可达（T11b）。
++    useStore.getState().initSession(
++      targetPath,
++      items,
++      data.hasMore ?? false,
++      revision,
++      historyNextCursor(data),
++    );
++    if (items.length > 0 && targetPath === useStore.getState().currentSessionPath) {
++      useStore.setState({ welcomeVisible: false });
+     }
+     // In-flight guard: jsonl 仅在 turn_end 落盘。若 session 在 stream 进行中
+     // 被 reload（switchSession 冷启动 / stream-resume truncated），合并 buffer
+     // 当前快照作为末尾 assistant，避免 UI 上"正在写的消息消失"。
+     // 同步执行，不 await，保证中途不会有 text_delta 事件插入。
+-    const snapshot = snapshotStreamBuffer(targetPath);
++    const snapshot = streamSnapshot;
+     if (snapshot?.hasContent) {
+       useStore.getState().appendItem(targetPath, {
+         type: 'message',
+@@ -487,18 +556,27 @@ export async function loadMoreMessages(forPath?: string): Promise<void> {
+ 
+   useStore.getState().setLoadingMore(targetPath, true);
+   try {
+-    const before = session.oldestId ?? '';
++    // 游标（F1）：优先服务端 nextBefore；旧服务端回退 oldestId（hydrate 时已按
++    // 原始首条记录 id 写入）。两者都是原始 display 序号，不是归并显示项身份。
++    const before = session.nextBefore ?? session.oldestId ?? '';
+     const res = await lingxiFetch(sessionMessagesUrl(targetPath, { before }));
+     const data = await res.json();
+     if (Array.isArray(data.sessionFiles)) {
+       useStore.getState().setSessionRegistryFiles(targetPath, data.sessionFiles);
+     }
+     const items = buildItemsFromHistory(data);
+-    if (items.length > 0) {
+-      useStore.getState().prependItems(targetPath, items, data.hasMore ?? false);
+-    } else {
+-      useStore.getState().setLoadingMore(targetPath, false);
++    const cursor = historyNextCursor(data);
++    let hasMore = data.hasMore ?? false;
++    if (hasMore && typeof cursor !== 'string') {
++      // 服务端声称还有更早记录却给不出可推进的游标（旧服务端空页/协议异常）：
++      // 不能静默截断，也不能原地死循环——显式记录诊断并终止翻页，等待下次
++      // 全量 hydrate 修正。
++      console.error('[loadMoreMessages] 分页游标缺失，终止翻页等待重新 hydrate:', targetPath, before);
++      hasMore = false;
+     }
++    // 空页（全部被前端过滤 / 边界页）也要推进分页进度与 hasMore（T11b），
++    // prependItems 负责幂等合并与游标落盘。
++    useStore.getState().prependItems(targetPath, items, hasMore, cursor);
+   } catch (err) {
+     console.error('[loadMoreMessages] error:', err);
+     useStore.getState().setLoadingMore(targetPath, false);
 diff --git a/desktop/src/react/ui/AnchoredPortal.tsx b/desktop/src/react/ui/AnchoredPortal.tsx
 index 65b0b00ef57140ec31ee6e05e52b2aa0a5e66701..79fa801ce6ce133a35c340b694bc0e41a19757a2 100644
 --- a/desktop/src/react/ui/AnchoredPortal.tsx
@@ -9573,6 +10073,20 @@ index 57e52483136262bf0436977a9d7aa9957221c042..58d8a14e2b91bb9353ac768747b66883
            style={panelStyle}
            data-select-widget-popup
            data-direction={openDirection}
+diff --git a/desktop/src/react/utils/chat-performance.ts b/desktop/src/react/utils/chat-performance.ts
+index bcfd0b84e41f91e33d3c1031a8752319aedee53b..a81a1d28bf235f7d707bd54077bf9a4471298778 100644
+--- a/desktop/src/react/utils/chat-performance.ts
++++ b/desktop/src/react/utils/chat-performance.ts
+@@ -7,7 +7,8 @@ export type ChatPerformanceEventName =
+   | 'transcript_projection'
+   | 'turn_state_projection'
+   | 'assistant_message_render'
+-  | 'history_projection';
++  | 'history_projection'
++  | 'history_run_stitch';
+ 
+ export interface ChatPerformanceEvent {
+   name: ChatPerformanceEventName;
 diff --git a/desktop/src/react/utils/content-semantics.ts b/desktop/src/react/utils/content-semantics.ts
 index 6e914e6ee37f44198b8a541861c310c96c48542d..3efc16b17d4dc8f252b44b9c40af0913032631bb 100644
 --- a/desktop/src/react/utils/content-semantics.ts
@@ -9706,10 +10220,19 @@ index 2cf486c004be5c4faa176f4f03dd2f1a34952576..c9d43a8a33d44c67b5153b83062f1109
        });
        return;
 diff --git a/desktop/src/react/utils/history-builder.ts b/desktop/src/react/utils/history-builder.ts
-index c2a12d1f02340dbee0ef5fd42e875f2645b7818d..52333c0b4b7eb275ce648a9be9a65eba91b96853 100644
+index c2a12d1f02340dbee0ef5fd42e875f2645b7818d..34e80d5d19dfef23d6814bf21a2445896e036176 100644
 --- a/desktop/src/react/utils/history-builder.ts
 +++ b/desktop/src/react/utils/history-builder.ts
-@@ -60,6 +60,9 @@ export interface HistoryApiResponse {
+@@ -8,6 +8,8 @@ import type {
+   ChatMessage,
+   ChatListItem,
+   ContentBlock,
++  HistoryRunFacts,
++  HistoryRunRecordFact,
+   SessionRegistryFile,
+   UserAttachment,
+ } from '../stores/chat-types';
+@@ -60,6 +62,9 @@ export interface HistoryApiResponse {
    messages: Array<{
      id?: string;
      entryId?: string;
@@ -9719,7 +10242,196 @@ index c2a12d1f02340dbee0ef5fd42e875f2645b7818d..52333c0b4b7eb275ce648a9be9a65eba
      role: string;
      content: string;
      assistantSegments?: LiveAssistantSegment[];
-@@ -543,7 +546,8 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[]
+@@ -81,6 +86,9 @@ export interface HistoryApiResponse {
+     sourceIndex?: number;
+     turnInputEntryId?: string;
+     turnInputVisible?: boolean;
++    /** Run 边界（display 序号）：该记录所属 Run 的首/尾 displayable 记录序号。 */
++    turnStartIndex?: number;
++    turnEndIndex?: number;
+     agentReview?: import('../stores/chat-types').AgentReviewContext;
+     agentReviewRequest?: import('../stores/chat-types').AgentReviewRequestContext;
+     sessionRefs?: Array<{ sessionId: string; label: string }>;
+@@ -123,6 +131,8 @@ export interface HistoryApiResponse {
+   }>;
+   todos?: TodoItem[];
+   hasMore?: boolean;
++  /** 服务端下发的下一页游标（display 序号字符串；null=没有更早记录）。 */
++  nextBefore?: string | null;
+ }
+ 
+ // ── 兼容层 ──
+@@ -470,7 +480,152 @@ function sourceOrderedItems(
+     .map((entry) => entry.item);
+ }
+ 
+-export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[] {
++// ── Run 投影（页内归并与跨页缝合共用核心）──
++
++/** 计算单条记录在 Run 内的到达序偏移：与工具块按真实时间线交错的坐标系。 */
++function runRecordStrideOffset(offset: number): number {
++  return offset * HISTORY_MESSAGE_ORDER_STRIDE;
++}
++
++/**
++ * 把一个 Run 的原始记录事实投影为 ChatMessage。
++ * 页内归并（buildItemsFromHistory）与跨页缝合（prependItems 后重投影）共用，
++ * 保证「任意切页恢复 ≡ 全量恢复」：同 idPrefix、同 stride 坐标系、同裁决入口。
++ *
++ * - 终态（turnStatus）取组内最后一条记录：中间尝试失败后恢复成功的 Run 不被放大为失败；
++ * - runTerminal=false（Run 尾部不在本组，或该 Run 仍在流式进行）时绝不派生任何
++ *   Run 终态块/结局——「未生成最终回复」只能来自 Run 尾部的权威裁决。
++ */
++function projectHistoryRunRecords(
++  records: HistoryRunRecordFact[],
++  meta: {
++    turnInputEntryId?: string;
++    turnInputVisible?: boolean;
++    firstRecordTimestamp?: number;
++  },
++  runTerminal: boolean,
++): ChatMessage & { blocks: ContentBlock[] } {
++  const finalRecord = records[records.length - 1];
++  const finalId = finalRecord.displayId;
++  const idPrefix = finalRecord.entryId || finalId;
++
++  const legacyBlocks: ContentBlock[] = [];
++  for (let offset = 0; offset < records.length; offset += 1) {
++    const record = records[offset];
++    legacyBlocks.push(...buildAssistantBlocksFromContent({
++      content: record.content,
++      thinking: record.thinking ?? null,
++      toolCalls: (record.toolCalls ?? null) as never,
++      extraBlocks: (record.inlineBlocks ?? null) as never,
++    }).map((block) => (
++      block.processOrder !== undefined
++        ? { ...block, processOrder: block.processOrder + runRecordStrideOffset(offset) }
++        : block
++    )));
++  }
++
++  // 兼容分叉：整组没有任何持久化语义分段的旧数据（老服务端/纯工具记录）保持
++  // 旧投影路径——数组位置即展示顺序（技能卡跟在正文后等），不进四区投影、
++  // 不派生 Run 终态。带 segments 的组（现行服务端对一切有文字/思考内容的
++  // 记录都会下发）走统一裁决路径。
++  const hasSemanticSegments = records.some((record) => (record.segments || []).length > 0);
++  if (!hasSemanticSegments) {
++    const blocks = normalizeContentBlocks(legacyBlocks, {
++      idPrefix,
++      turnLifecycle: 'sealed',
++    });
++    return {
++      id: finalId,
++      sourceEntryId: finalRecord.entryId,
++      role: 'assistant',
++      blocks,
++      ...(meta.turnInputEntryId ? { turnInputEntryId: meta.turnInputEntryId } : {}),
++      ...(typeof meta.turnInputVisible === 'boolean' ? { turnInputVisible: meta.turnInputVisible } : {}),
++      ...(meta.firstRecordTimestamp !== undefined ? { timestamp: meta.firstRecordTimestamp } : {}),
++    };
++  }
++
++  const segments = records.flatMap((record, offset) => (
++    (record.segments || []).map((segment) => (
++      segment.processOrder !== undefined
++        ? { ...segment, processOrder: segment.processOrder + runRecordStrideOffset(offset) }
++        : segment
++    ))
++  ));
++  const projectionResult = projectAssistantTurn({
++    idPrefix,
++    inputMessageId: meta.turnInputEntryId || null,
++    assistantMessageIds: records.map((record) => record.entryId || record.displayId),
++    // 迁移边界一次性净化：旧落盘 segments 可能残留 leading 内部标签，
++    // 与结构化 mood/thinking block 双重表示时剥离（任务书 §23）。
++    segments: sanitizePersistedSegments(segments as never, {
++      hasStructuredMood: legacyBlocks.some((block) => block.type === 'mood'),
++      hasStructuredThinking: legacyBlocks.some((block) => block.type === 'thinking'),
++    }),
++    legacyBlocks,
++    status: finalRecord.turnStatus === 'failed'
++      ? 'failed'
++      : finalRecord.turnStatus === 'aborted'
++        ? 'aborted'
++        : 'completed',
++    runTerminal,
++  });
++
++  const msg: ChatMessage & { blocks: ContentBlock[] } = {
++    id: finalId,
++    sourceEntryId: finalRecord.entryId,
++    role: 'assistant',
++    blocks: projectionResult.blocks,
++    turnProjection: projectionResult.projection,
++    ...(meta.turnInputEntryId ? { turnInputEntryId: meta.turnInputEntryId } : {}),
++    ...(typeof meta.turnInputVisible === 'boolean' ? { turnInputVisible: meta.turnInputVisible } : {}),
++    ...(meta.firstRecordTimestamp !== undefined ? { timestamp: meta.firstRecordTimestamp } : {}),
++  };
++  return msg;
++}
++
++/** Run 缝合用：跨页重投影已合并的 facts（头部到达后由调用方决定是否丢弃 facts）。 */
++export function projectHistoryRunFromFacts(facts: HistoryRunFacts): ChatMessage {
++  const records = [...facts.records].sort((a, b) => Number(a.displayId) - Number(b.displayId));
++  const ownsRunTail = records.length > 0
++    && Number(records[records.length - 1].displayId) === facts.turnEndIndex;
++  return projectHistoryRunRecords(records, {
++    turnInputEntryId: facts.turnInputEntryId,
++    turnInputVisible: facts.turnInputVisible,
++    firstRecordTimestamp: facts.firstRecordTimestamp,
++  }, ownsRunTail);
++}
++
++function historyRunBounds(message: HistoryApiResponse['messages'][number]): { turnStartIndex: number; turnEndIndex: number } | null {
++  if (!Number.isInteger(message.turnStartIndex) || !Number.isInteger(message.turnEndIndex)) return null;
++  return { turnStartIndex: message.turnStartIndex as number, turnEndIndex: message.turnEndIndex as number };
++}
++
++function sameHistoryRun(
++  next: HistoryApiResponse['messages'][number],
++  current: HistoryApiResponse['messages'][number],
++): boolean {
++  const nextBounds = historyRunBounds(next);
++  const currentBounds = historyRunBounds(current);
++  if (nextBounds && currentBounds) {
++    return nextBounds.turnStartIndex === currentBounds.turnStartIndex
++      && nextBounds.turnEndIndex === currentBounds.turnEndIndex;
++  }
++  // 兼容旧服务端（无 Run 边界）：沿用 turnInputEntryId 相等 + 双方带 segments 的旧规则。
++  return !!(next.assistantSegments && next.turnInputEntryId
++    && current.assistantSegments && next.turnInputEntryId === current.turnInputEntryId);
++}
++
++export interface BuildItemsFromHistoryOptions {
++  /**
++   * 当前会话仍有活跃流（本端 stream buffer 有内容）时为 true：最新 Run 在磁盘上的
++   * 记录必然不完整，其页内投影不得携带终态（T06：运行中冷加载不误终结）。
++   * Run 真正结束后由实时收口（commitLiveRun）按权威状态落定。
++   */
++  openTailRun?: boolean;
++}
++
++export function buildItemsFromHistory(data: HistoryApiResponse, options: BuildItemsFromHistoryOptions = {}): ChatListItem[] {
+   recordChatPerformance('history_projection', { itemCount: data.messages.length });
+   const items: ChatListItem[] = [];
+   const sessionFileLookup = buildSessionFileLookup(data.sessionFiles);
+@@ -482,6 +637,15 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[]
+     (blockMap[b.afterIndex] ??= []).push(b);
+   }
+ 
++  // 页内最新的 assistant 记录 id（display 序号）：openTailRun 只作用于包含它的组。
++  let newestAssistantId: string | null = null;
++  for (let i = data.messages.length - 1; i >= 0; i -= 1) {
++    if (data.messages[i].role === 'assistant') {
++      newestAssistantId = data.messages[i].id || null;
++      break;
++    }
++  }
++
+   for (let i = 0; i < data.messages.length; i++) {
+     const m = data.messages[i];
+     const id = m.id || `hist-${i}`;
+@@ -543,7 +707,8 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[]
        const allAtts = [...fileAtts, ...markerImageAtts, ...markerVideoAtts, ...markerAudioAtts, ...imageAtts];
        const msg: ChatMessage = {
          id,
@@ -9729,6 +10441,309 @@ index c2a12d1f02340dbee0ef5fd42e875f2645b7818d..52333c0b4b7eb275ce648a9be9a65eba
          role: 'user',
          text: visibleText,
          textHtml: visibleText ? renderMarkdown(visibleText) : undefined,
+@@ -565,29 +730,39 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[]
+       items.push({ type: 'message', data: msg });
+     } else if (m.role === 'assistant') {
+       let groupEnd = i;
+-      if (m.assistantSegments && m.turnInputEntryId) {
+-        while (
+-          groupEnd + 1 < data.messages.length
+-          && data.messages[groupEnd + 1].role === 'assistant'
+-          && data.messages[groupEnd + 1].assistantSegments
+-          && data.messages[groupEnd + 1].turnInputEntryId === m.turnInputEntryId
+-        ) {
+-          groupEnd += 1;
+-        }
++      while (
++        groupEnd + 1 < data.messages.length
++        && data.messages[groupEnd + 1].role === 'assistant'
++        && sameHistoryRun(data.messages[groupEnd + 1], m)
++      ) {
++        groupEnd += 1;
+       }
+       const groupMessages = data.messages.slice(i, groupEnd + 1);
+-      const finalMessage = groupMessages[groupMessages.length - 1];
+-      const finalIndex = groupEnd;
+-      const finalId = finalMessage.id || `hist-${finalIndex}`;
+-      const idPrefix = finalMessage.entryId || finalId;
++      const runBounds = historyRunBounds(m);
++      const firstRecordIndex = Number(m.id);
++      const lastRecordIndex = Number(groupMessages[groupMessages.length - 1].id);
++      // Run 头部是否已在本组内（未被分页截断）；无边界元数据时保守视为完整。
++      const coversRunHead = runBounds === null
++        || (!Number.isInteger(firstRecordIndex) || firstRecordIndex <= runBounds.turnStartIndex);
++      // Run 尾部是否在本组内：尾部持有整轮结局的裁决权。无元数据时保守视为持有
++      // （兼容旧服务端的既有行为；新服务端下被截断的头部片段 runTerminal=false）。
++      let ownsRunTail = true;
++      if (runBounds !== null && Number.isInteger(lastRecordIndex)) {
++        ownsRunTail = lastRecordIndex >= runBounds.turnEndIndex;
++      }
++      // 活跃流的最新 Run：磁盘记录不完整，不派生终态（T06）。
++      // 「最新组」以组末条记录判定（runTerminal 由尾部持有）。
++      const openTailRun = !!options.openTailRun
++        && ownsRunTail
++        && newestAssistantId != null
++        && newestAssistantId === groupMessages[groupMessages.length - 1].id;
+       const beforeInterludes: Array<Record<string, any>> = [];
+       const afterInterludes: Array<Record<string, any>> = [];
+-      const legacyBlocks: ContentBlock[] = [];
++      const records: HistoryRunRecordFact[] = [];
+ 
+       for (let offset = 0; offset < groupMessages.length; offset += 1) {
+-        const messageIndex = i + offset;
+         const assistantMessage = groupMessages[offset];
+-        const messageBlocks = blockMap[messageIndex] || [];
++        const messageBlocks = blockMap[i + offset] || [];
+         const inlineBlocks = messageBlocks.filter((block) => !isInterludeHistoryBlock(block));
+         const interludeBlocks = messageBlocks.filter(isInterludeHistoryBlock);
+         beforeInterludes.push(...interludeBlocks.filter((block) => (
+@@ -596,53 +771,42 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[]
+         afterInterludes.push(...interludeBlocks.filter((block) => (
+           !shouldPlaceInterludeBeforeMessage(block, inlineBlocks)
+         )));
+-        // 服务器下发的 processOrder 是"消息内 content 数组索引"；同一会话轮次跨多条
+-        // assistant 消息聚合时，按消息序加偏移，得到全 Turn 单调的全局序号。
+-        const orderOffset = offset * HISTORY_MESSAGE_ORDER_STRIDE;
+-        legacyBlocks.push(...buildAssistantBlocksFromContent({
++        records.push({
++          displayId: assistantMessage.id || `hist-${i + offset}`,
++          ...(assistantMessage.entryId ? { entryId: assistantMessage.entryId } : {}),
+           content: assistantMessage.content,
+-          thinking: assistantMessage.thinking,
+-          toolCalls: assistantMessage.toolCalls,
+-          extraBlocks: inlineBlocks,
+-        }).map((block) => (
+-          block.processOrder !== undefined
+-            ? { ...block, processOrder: block.processOrder + orderOffset }
+-            : block
+-        )));
++          thinking: assistantMessage.thinking ?? null,
++          toolCalls: (assistantMessage.toolCalls ?? null) as HistoryRunRecordFact['toolCalls'],
++          segments: (assistantMessage.assistantSegments || []) as HistoryRunRecordFact['segments'],
++          ...(assistantMessage.turnStatus && assistantMessage.turnStatus !== 'completed'
++            ? { turnStatus: assistantMessage.turnStatus }
++            : {}),
++          inlineBlocks,
++        });
+       }
+ 
+-      const segments = groupMessages.flatMap((message, offset) => (
+-        (message.assistantSegments || []).map((segment) => (
+-          segment.processOrder !== undefined
+-            ? { ...segment, processOrder: segment.processOrder + offset * HISTORY_MESSAGE_ORDER_STRIDE }
+-            : segment
+-        ))
+-      ));
+-      const projectionResult = m.assistantSegments
+-        ? projectAssistantTurn({
+-            idPrefix,
+-            inputMessageId: m.turnInputEntryId || null,
+-            assistantMessageIds: groupMessages.map((message, offset) => (
+-              message.entryId || message.id || `hist-${i + offset}`
+-            )),
+-            // 迁移边界一次性净化：旧落盘 segments 可能残留 leading 内部标签，
+-            // 与结构化 mood/thinking block 双重表示时剥离（任务书 §23）。
+-            segments: sanitizePersistedSegments(segments, {
+-              hasStructuredMood: legacyBlocks.some((block) => block.type === 'mood'),
+-              hasStructuredThinking: legacyBlocks.some((block) => block.type === 'thinking'),
+-            }),
+-            legacyBlocks,
+-            status: groupMessages.some((message) => message.turnStatus === 'failed')
+-              ? 'failed'
+-              : groupMessages.some((message) => message.turnStatus === 'aborted')
+-                ? 'aborted'
+-                : 'completed',
+-          })
+-        : null;
+-      const blocks = projectionResult?.blocks || normalizeContentBlocks(legacyBlocks, {
+-        idPrefix,
+-        turnLifecycle: 'sealed',
+-      });
++      const projectionMeta = {
++        turnInputEntryId: m.turnInputEntryId,
++        turnInputVisible: m.turnInputVisible,
++        firstRecordTimestamp: timestamp,
++      };
++      const runTerminal = ownsRunTail && !openTailRun;
++      const msg = projectHistoryRunRecords(records, projectionMeta, runTerminal);
++      const blocks = msg.blocks;
++
++      // Run 被分页截断（头部未加载，或防御性场景尾部缺失）时携带缝合事实；
++      // 更早页片段到达后由 chat-slice 按 runKey 缝合并重投影，头部加载完成后丢弃。
++      if (runBounds !== null && (!coversRunHead || !ownsRunTail)) {
++        msg.runFacts = {
++          runKey: `${runBounds.turnStartIndex}:${runBounds.turnEndIndex}`,
++          turnStartIndex: runBounds.turnStartIndex,
++          turnEndIndex: runBounds.turnEndIndex,
++          ...(m.turnInputEntryId ? { turnInputEntryId: m.turnInputEntryId } : {}),
++          ...(typeof m.turnInputVisible === 'boolean' ? { turnInputVisible: m.turnInputVisible } : {}),
++          ...(timestamp !== undefined ? { firstRecordTimestamp: timestamp } : {}),
++          records,
++        };
++      }
+ 
+       for (let j = 0; j < beforeInterludes.length; j += 1) {
+         const data = interludeContentBlock(beforeInterludes[j], `interlude:${i}:before:${j}`);
+@@ -653,16 +817,6 @@ export function buildItemsFromHistory(data: HistoryApiResponse): ChatListItem[]
+         });
+       }
+ 
+-      const msg: ChatMessage = {
+-        id: finalId,
+-        sourceEntryId: finalMessage.entryId,
+-        role: 'assistant',
+-        blocks,
+-        ...(projectionResult ? { turnProjection: projectionResult.projection } : {}),
+-        ...(m.turnInputEntryId ? { turnInputEntryId: m.turnInputEntryId } : {}),
+-        ...(typeof m.turnInputVisible === 'boolean' ? { turnInputVisible: m.turnInputVisible } : {}),
+-      };
+-      if (timestamp !== undefined) msg.timestamp = timestamp;
+       if (blocks.length > 0) {
+         items.push({ type: 'message', data: msg });
+       }
+diff --git a/desktop/src/react/utils/history-run-merge.ts b/desktop/src/react/utils/history-run-merge.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..218e74a99cf1470cf5f7673e35d082e13358938b
+--- /dev/null
++++ b/desktop/src/react/utils/history-run-merge.ts
+@@ -0,0 +1,137 @@
++/**
++ * history-run-merge.ts — 分页补页与既有会话内容的幂等合并（F1/F2 修复链）
++ *
++ * 职责：
++ *  - 同 Run 的更早页片段（runKey 相同）缝进既有 Run 项并重投影：一个逻辑 Run
++ *    始终一个显示项、一个终态，显示项 id 保持 Run 尾部记录 id（React key 稳定）；
++ *  - 同一事实重复到达幂等：按原始记录 displayId / 显示项 id 去重，不增加消息、
++ *    工具或告警数量；新版本按身份受控更新（历史记录不可变，同 id 即同事实）；
++ *  - 不同 Run、不同会话、interlude 不混入：缝合仅认 runKey + 显示 id 边界。
++ *
++ * 坐标纪律：runKey/displayId 是服务端 display 序号坐标系（原始记录身份），
++ * 与 UI 显示项 id、React key、分页边界各自独立，绝不复用（不变量四）。
++ */
++
++import type { ChatListItem, ChatMessage, HistoryRunFacts, HistoryRunRecordFact } from '../stores/chat-types';
++import { projectHistoryRunFromFacts } from '../utils/history-builder';
++
++function itemIdentity(item: ChatListItem): string | null {
++  if (item.type === 'message') return item.data.id;
++  return item.id;
++}
++
++function isAssistantMessageItem(item: ChatListItem): boolean {
++  return item.type === 'message' && item.data.role === 'assistant';
++}
++
++function mergeRunFacts(
++  existing: HistoryRunFacts,
++  fragment: HistoryRunFacts,
++): HistoryRunFacts {
++  const byDisplayId = new Map<string, HistoryRunRecordFact>();
++  for (const record of existing.records) byDisplayId.set(record.displayId, record);
++  for (const record of fragment.records) {
++    // 同 displayId 重复到达：保留首见（历史记录不可变）；不同 runKey 的记录
++    // 不会到这里（调用方已按 runKey 过滤）。
++    if (!byDisplayId.has(record.displayId)) byDisplayId.set(record.displayId, record);
++  }
++  const records = [...byDisplayId.values()].sort((a, b) => Number(a.displayId) - Number(b.displayId));
++  // 组内首条记录变了 → Run 级元数据（输入绑定/时间戳）跟随新的头部记录，
++  // 与全量恢复（all=1）时的取值一致。
++  return {
++    ...existing,
++    ...(fragment.turnInputEntryId !== undefined ? { turnInputEntryId: fragment.turnInputEntryId } : {}),
++    ...(fragment.turnInputVisible !== undefined ? { turnInputVisible: fragment.turnInputVisible } : {}),
++    ...(fragment.firstRecordTimestamp !== undefined ? { firstRecordTimestamp: fragment.firstRecordTimestamp } : {}),
++    records,
++  };
++}
++
++export interface MergePrependedItemsResult {
++  items: ChatListItem[];
++  /** 是否发生了 Run 片段缝合（诊断/性能记录用）。 */
++  stitchedRunKeys: string[];
++}
++
++/**
++ * 把一页更早的历史项合并进既有会话项列表。
++ *
++ * 前提：incoming 整体早于 existing（分页只向更早方向推进）。
++ * 处理顺序：先按显示身份去重 incoming，再识别 incoming 末尾的 Run 片段与
++ * existing 首个同 runKey 的 Run 项缝合重投影。
++ */
++export function mergePrependedHistoryItems(
++  existing: ChatListItem[],
++  incoming: ChatListItem[],
++): MergePrependedItemsResult {
++  const stitchedRunKeys: string[] = [];
++  if (incoming.length === 0) return { items: existing, stitchedRunKeys };
++  if (existing.length === 0) return { items: incoming, stitchedRunKeys };
++
++  // 1) 识别缝合对：incoming 中最后一个带 runFacts 的助手片段 ↔ existing 中
++  //    第一个同 runKey 的助手项（existing 的该项同样以 runFacts 标注可缝）。
++  let fragmentIdx = -1;
++  for (let i = incoming.length - 1; i >= 0; i -= 1) {
++    if (isAssistantMessageItem(incoming[i]) && (incoming[i] as { data: ChatMessage }).data.runFacts) {
++      fragmentIdx = i;
++      break;
++    }
++  }
++  const fragment = fragmentIdx >= 0
++    ? (incoming[fragmentIdx] as { type: 'message'; data: ChatMessage }).data
++    : null;
++  const fragmentFacts = fragment?.runFacts ?? null;
++
++  let stitchTargetIdx = -1;
++  if (fragmentFacts) {
++    for (let i = 0; i < existing.length; i += 1) {
++      if (!isAssistantMessageItem(existing[i])) continue;
++      const targetFacts = (existing[i] as { data: ChatMessage }).data.runFacts;
++      if (targetFacts && targetFacts.runKey === fragmentFacts.runKey) {
++        stitchTargetIdx = i;
++        break;
++      }
++    }
++  }
++
++  // 2) incoming 去重：同显示身份已存在于 existing（或本页缝合对内部）的项丢弃。
++  const existingIds = new Set<string>();
++  for (const item of existing) {
++    const id = itemIdentity(item);
++    if (id != null) existingIds.add(id);
++  }
++  const keptIncoming: ChatListItem[] = [];
++  const seenIncomingIds = new Set<string>();
++  for (let i = 0; i < incoming.length; i += 1) {
++    if (fragmentIdx >= 0 && i === fragmentIdx) continue; // 缝合对单独处理
++    const id = itemIdentity(incoming[i]);
++    if (id != null) {
++      if (existingIds.has(id) || seenIncomingIds.has(id)) continue;
++      seenIncomingIds.add(id);
++    }
++    keptIncoming.push(incoming[i]);
++  }
++
++  if (stitchTargetIdx < 0 || !fragment || !fragmentFacts) {
++    return { items: [...keptIncoming, ...existing], stitchedRunKeys };
++  }
++
++  // 3) 缝合：合并 facts（原始记录并集）→ 重投影 → 替换既有项内容（位置与 id 不变）。
++  const targetItem = existing[stitchTargetIdx];
++  if (targetItem.type !== 'message') {
++    return { items: [...keptIncoming, ...existing], stitchedRunKeys };
++  }
++  const targetFacts = targetItem.data.runFacts!;
++  const mergedFacts = mergeRunFacts(targetFacts, fragmentFacts);
++  const mergedMessage = projectHistoryRunFromFacts(mergedFacts);
++  // Run 头部已加载（最小 displayId == turnStartIndex）→ 不再携带缝合事实（内存有界）。
++  const minDisplayId = mergedFacts.records.length
++    ? Number(mergedFacts.records[0].displayId)
++    : Number.NaN;
++  const runComplete = minDisplayId === mergedFacts.turnStartIndex;
++  if (!runComplete) mergedMessage.runFacts = mergedFacts;
++  const nextExisting = [...existing];
++  nextExisting[stitchTargetIdx] = { type: 'message', data: mergedMessage };
++  stitchedRunKeys.push(mergedFacts.runKey);
++  return { items: [...keptIncoming, ...nextExisting], stitchedRunKeys };
++}
 diff --git a/desktop/src/react/utils/open-media-viewer.ts b/desktop/src/react/utils/open-media-viewer.ts
 index 0ae53756438ace19a163550159fc8f1f770159d2..611b94608df570829a2e94806973066f8842e4f0 100644
 --- a/desktop/src/react/utils/open-media-viewer.ts
@@ -9764,6 +10779,109 @@ index 0ae53756438ace19a163550159fc8f1f770159d2..611b94608df570829a2e94806973066f
  }
  
  // fork 出来的 session 里，历史消息的 marker 还写着父 session 的文件 id 和路径，
+diff --git a/desktop/src/react/utils/turn-projector.ts b/desktop/src/react/utils/turn-projector.ts
+index b73bab34a9b7f49b02669dd2457f1d06257fffd1..bb25f6e768d1313b50abd5340540af93416822a3 100644
+--- a/desktop/src/react/utils/turn-projector.ts
++++ b/desktop/src/react/utils/turn-projector.ts
+@@ -6,6 +6,7 @@ import type {
+ } from '../stores/chat-types';
+ import type { LiveAssistantSegment } from '../stores/live-turn-store';
+ import { normalizeContentBlocks } from './content-semantics';
++import { resolveAssistantTurnOutcome } from './turn-outcome';
+ 
+ export interface TurnProjectionDiagnostic {
+   code: 'unresolved_phase_fallback';
+@@ -20,6 +21,12 @@ export interface ProjectAssistantTurnInput {
+   segments: readonly LiveAssistantSegment[];
+   legacyBlocks: readonly ContentBlock[];
+   status: AssistantTurnStatus;
++  /**
++   * 输入是否覆盖 Run 的权威尾部（默认 true）。false = Run 仍在进行、或本组只是
++   * Run 的被分页截断的更早片段：此时不得派生任何整轮终态块/结局——结局裁决
++   * 只属于 Run 尾部（F2/T06）。实时路径不传该字段，行为不变。
++   */
++  runTerminal?: boolean;
+   startedAt?: number;
+   completedAt?: number;
+ }
+@@ -145,7 +152,7 @@ function demotePreAnchorNarration(blocks: ContentBlock[]): ContentBlock[] {
+ 
+ function turnStatusBlock(
+   input: ProjectAssistantTurnInput,
+-  hasToolCalls: boolean,
++  outcome: ReturnType<typeof resolveAssistantTurnOutcome> | null,
+ ): Extract<ContentBlock, { type: 'turn_status' }> | null {
+   if (input.status === 'streaming') return null;
+   if (input.status === 'failed') {
+@@ -166,12 +173,13 @@ function turnStatusBlock(
+       lifecycle: 'sealed',
+     };
+   }
+-  // 任务书 §三十四：turnStatusBlock 只在 Assistant Run 真正 terminal（sealed）时被投影，
+-  // 此时 agent 循环已停，带工具但没有最终答复同样算 completed_without_user_output，
+-  // 不再豁免（旧逻辑把「有工具调用」当成「循环还会继续」是 Model Turn 层级才成立的假设）。
+-  void hasToolCalls;
++  // 任务书 §三十四 / 结局唯一裁决（F3）：completed 分支的「未生成最终回复」只能来自
++  // resolveAssistantTurnOutcome 的 completed_without_user_output 判定，投影器不再用
++  // 答案/结果/控制区的局部判空自行猜测（存在答案块 ≠ 非空答案；存在控制块 ≠ 待处理输出）。
++  // 状态块 id 由 Run 键派生：同一 Run 无论投影重算多少次都得到同一个 id，保证每 Run 至多一个。
++  // runTerminal=false 时 outcome 为 null：Run 尾部不在本输入内，不派生任何终态。
++  if (outcome === null || outcome.outcome !== 'completed_without_user_output') return null;
+   return {
+-    // id 由 Run 键派生：同一 Run 无论投影重算多少次都得到同一个 id，保证每 Run 至多一个
+     id: `${input.idPrefix}:missing-final-answer`,
+     type: 'turn_status',
+     status: 'missing_final_answer',
+@@ -188,7 +196,10 @@ export function projectAssistantTurn(input: ProjectAssistantTurnInput): ProjectA
+   const hasSemanticReasoning = input.segments.some((segment) => segment.kind === 'reasoning');
+   const legacyBlocks = normalizeContentBlocks(
+     input.legacyBlocks.filter((block) => !(
+-      (hasSemanticText && block.type === 'text')
++      // 派生 turn_status 永远不是原始事实：输入里残留的旧投影状态块在此剔除、
++      // 由本次投影按权威裁决重新生成（同 Run 稳定 id），不得作为结果存在性证据。
++      block.type === 'turn_status'
++      || (hasSemanticText && block.type === 'text')
+       || (hasSemanticReasoning && block.type === 'thinking')
+     )),
+     {
+@@ -213,15 +224,20 @@ export function projectAssistantTurn(input: ProjectAssistantTurnInput): ProjectA
+   const resultBlocks = allBlocks.filter((block) => block.surfaceRole === 'result');
+   const controlBlocks = allBlocks.filter((block) => block.surfaceRole === 'control');
+ 
++  // 结局唯一裁决（F3）：分区完成后交 resolveAssistantTurnOutcome 统一判定，
++  // 投影器与渲染层消费同一结果，不再各自按数组判空猜测整轮结局。
+   // provisional 是"还没判明身份"的临时文字，不算答案：终结态下它已被回退成
+-  // final_answer，这里的判空条件不会因为 provisional 而误免 missing_final_answer。
+-  const hasToolCalls = allBlocks.some((block) => (
+-    block.type === 'tool_group' && Array.isArray(block.tools) && block.tools.length > 0
+-  ));
+-  if (answerBlocks.length === 0 && resultBlocks.length === 0 && controlBlocks.length === 0) {
+-    const statusBlock = turnStatusBlock(input, hasToolCalls);
+-    if (statusBlock) resultBlocks.push(statusBlock);
+-  }
++  // final_answer，裁决不会因为 provisional 而误免 missing_final_answer。
++  // runTerminal=false（Run 尾部不在本输入内）时不裁决：未知 ≠ 没有输出。
++  const runTerminal = input.runTerminal !== false;
++  const outcome = runTerminal
++    ? resolveAssistantTurnOutcome({
++        blocks: [...processBlocks, ...provisionalBlocks, ...answerBlocks, ...resultBlocks, ...controlBlocks],
++        status: input.status,
++      })
++    : null;
++  const statusBlock = turnStatusBlock(input, outcome);
++  if (statusBlock) resultBlocks.push(statusBlock);
+ 
+   const blocks = [...processBlocks, ...provisionalBlocks, ...answerBlocks, ...resultBlocks, ...controlBlocks]
+     // processOrder 只是投影排序的内部依据：交错完成后顺序已物化为数组位置，
+@@ -242,6 +258,8 @@ export function projectAssistantTurn(input: ProjectAssistantTurnInput): ProjectA
+     resultBlockIds: resultBlocks.map((block) => block.id!),
+     controlBlockIds: controlBlocks.map((block) => block.id!),
+     status: input.status,
++    ...(outcome ? { outcome: outcome.outcome } : {}),
++    ...(outcome?.missingFinalAnswerReason ? { missingFinalAnswerReason: outcome.missingFinalAnswerReason } : {}),
+     ...(input.startedAt !== undefined ? { startedAt: input.startedAt } : {}),
+     ...(input.completedAt !== undefined ? { completedAt: input.completedAt } : {}),
+   };
 diff --git a/export-manifest.json b/export-manifest.json
 index bb8f68cd206bba4a8a9a8034ab513a69c73df952..96572657a9b1f363236d43735a3f4f4c3889d1dc 100644
 --- a/export-manifest.json
@@ -9936,6 +11054,90 @@ index eea84e46a957075e9c52ccebb3d5280996b1d494..8f51e5bf7235804683a37c427fee9d8d
      return true;
    }
  }
+diff --git a/lib/llm/model-observability-persistence.ts b/lib/llm/model-observability-persistence.ts
+index 255531f52156ae4ea24805d9da8d133118512e5c..24a37b0542374ac6ddf04810e8a08503bc406fad 100644
+--- a/lib/llm/model-observability-persistence.ts
++++ b/lib/llm/model-observability-persistence.ts
+@@ -178,6 +178,11 @@ export type ModelObservabilityPersistenceHandle = {
+   /**
+    * 会话级轨迹复用查找（产品口径 2026-09-05）：该会话最近一次 user_turn
+    * 轨迹 id；同会话后续 turn 复用同一条轨迹记录。无历史/未启用 → null。
++   *
++   * 入参是会话归属方言（attribution.sessionId → model_calls.session_id，
++   * 桌面主会话 = manifest 业务会话 ID sess_...）。调用方不得传入 Pi SDK
++   * 会话文件头 UUID——两套身份独立（2026-09-10 回归根因），传错方言
++   * 会结构性零命中、同会话每轮铸新根。
+    */
+   findReusableSessionTraceId(sessionId: string | null | undefined): string | null;
+   /**
+diff --git a/lib/llm/model-observability-schema.ts b/lib/llm/model-observability-schema.ts
+index bdc25bc66af5e5471f25ea9b1679e959489fa965..c2c193bbce0a98515ddcfcf46753eb0cb2d8f1d3 100644
+--- a/lib/llm/model-observability-schema.ts
++++ b/lib/llm/model-observability-schema.ts
+@@ -27,16 +27,19 @@ import fs from "fs";
+ import path from "path";
+ import { createRequire } from "module";
+ 
+-export const MODEL_OBSERVABILITY_SCHEMA_VERSION = 6;
++export const MODEL_OBSERVABILITY_SCHEMA_VERSION = 7;
+ 
+ /**
+  * read side 支持的 schema 版本闭集（Phase 8 §七）：v1 历史库不迁移也可读
+  * （accounting projection 标 unavailable）；v2 起有 model_call_usage；
+  * v3 起有运行时显式 usage correlation 事实；v4 增加不含正文的来源名称快照；
+  * v5/v6 为同会话轨迹合并的纯数据整合（无 DDL）——v5 只合 user_turn，实测
+- * 桌面 turn 历史上落成 origin=unknown，v6 改按「调用归属会话」全量合并。
++ * 桌面 turn 历史上落成 origin=unknown，v6 改按「调用归属会话」全量合并；
++ * v7 重跑同一幂等合并——df2d91a8（2026-09-05）的实时复用查找错把 SDK
++ * 文件头 UUID 当会话身份（写入侧始终是 manifest 业务会话 ID），v6 迁移
++ * 之后产生的同会话拆分轨迹需要在升级时再次收拢（2026-09-10 修复）。
+  */
+-export const MODEL_OBSERVABILITY_SUPPORTED_READ_VERSIONS: readonly number[] = [1, 2, 3, 4, 5, 6];
++export const MODEL_OBSERVABILITY_SUPPORTED_READ_VERSIONS: readonly number[] = [1, 2, 3, 4, 5, 6, 7];
+ 
+ /** store 目录约定（audit Q1 决策）。 */
+ export const MODEL_OBSERVABILITY_DIR_NAME = "model-observability";
+@@ -361,11 +364,27 @@ function mergeSessionTurnTracesV5(db: any): void {
+  * 的全部 model_calls 改指 canonical，重算 canonical 的 call_count/
+  * last_seen_at 后删除已清空的旧行。非会话轨迹（embedding/翻译/记忆等）与
+  * parent_call_id 成对性原样不动。幂等：分组后单轨迹组无操作。
++ *
++ * 安全边界（2026-09-10 复核）：session_id 方言只有 manifest 业务 ID 一种会
++ * 形成规模（SDK UUID 只可能经无注册归属的 unknown fallback 零星混入；两种
++ * 方言取值空间不相交，精确匹配分组绝不跨方言合并，宁可不合也不错并）。
++ * attempts/payload_records/model_call_usage 均以 call_id 关联，迁移只改
++ * model_calls.trace_id 与 traces 行，调用/载荷/用量事实零丢失。
+  */
+ function mergeSessionTurnTracesV6(db: any): void {
+   mergeSessionTurnTraces(db, /* userTurnOnly */ false);
+ }
+ 
++/**
++ * v7 数据整合（2026-09-10）：v6 迁移是一次性的，而实时复用查找自 df2d91a8
++ * 起错用 SDK 文件头 UUID（写入侧是 manifest 业务会话 ID），导致 v6 之后每个
++ * 新用户轮次仍在铸新轨迹。v6→v7 重跑同一个幂等合并，把这段期间拆开的
++ * 同会话轨迹重新收拢；已正确的数据（单轨迹组）无操作。
++ */
++function mergeSessionTurnTracesV7(db: any): void {
++  mergeSessionTurnTraces(db, /* userTurnOnly */ false);
++}
++
+ function mergeSessionTurnTraces(db: any, userTurnOnly: boolean): void {
+   const originClause = userTurnOnly ? " AND origin = 'user_turn'" : " AND origin IS NOT NULL";
+   const userTurnTraces = db.prepare(
+@@ -480,6 +499,12 @@ export function migrateModelObservabilitySchema(db: any, currentVersion: number)
+             // 任务轨迹（含历史上 pi ingress 落成的 origin=unknown）。
+             mergeSessionTurnTracesV6(db);
+             break;
++          case 6:
++            // v6 → v7：纯数据整合（无 DDL）——重跑同一幂等会话合并，收拢
++            // v6 迁移之后因实时复用查找身份错位（SDK UUID vs 业务会话 ID）
++            // 而继续产生的同会话拆分轨迹。
++            mergeSessionTurnTracesV7(db);
++            break;
+           default:
+             throw new Error(`no migration step from observability schema ${version}`);
+         }
 diff --git a/lib/memory/tenets.ts b/lib/memory/tenets.ts
 index 0ff934312031dcc083904b325bfccdd8d5fc895c..d36ebd49fd79e33ca416c2101901de4695b434bb 100644
 --- a/lib/memory/tenets.ts
@@ -10118,68 +11320,68 @@ index f810ae5a083402412102326b4a18e34157ddbc05..5dd93934851bd6c5dff26139da0a3aec
              hits, totalHits: result.hits.length, truncated: hits.length < result.hits.length,
              ...(hits.length < result.hits.length ? { notice: "本页受消息体积限制；可缩小来源或章节、改写查询继续检索。" } : {}),
 diff --git a/package-lock.json b/package-lock.json
-index 8a3dfedb012cf1673813324365e07734d24e6fc8..455a2998c1af893766857a71610351b043662f7c 100644
+index 8a3dfedb012cf1673813324365e07734d24e6fc8..7de71b7957bd07dfeb242b6aa197899712093ec9 100644
 --- a/package-lock.json
 +++ b/package-lock.json
 @@ -1,12 +1,12 @@
  {
    "name": "lingxi",
 -  "version": "0.1.35",
-+  "version": "0.1.36",
++  "version": "0.1.37",
    "lockfileVersion": 3,
    "requires": true,
    "packages": {
      "": {
        "name": "lingxi",
 -      "version": "0.1.35",
-+      "version": "0.1.36",
++      "version": "0.1.37",
        "hasInstallScript": true,
        "license": "Apache-2.0",
        "dependencies": {
 diff --git a/package.json b/package.json
-index c207c9bf46eb3ce00d9a745e12cd3aeaec401a6a..c9901e5bceb11bc96d3d2086a4f9054f94e420cb 100644
+index c207c9bf46eb3ce00d9a745e12cd3aeaec401a6a..84116b1cffed3a537b7f8d1fa1bd3b4342aed208 100644
 --- a/package.json
 +++ b/package.json
 @@ -1,9 +1,9 @@
  {
    "name": "lingxi",
 -  "version": "0.1.35",
-+  "version": "0.1.36",
++  "version": "0.1.37",
    "lingxi": {
      "upstreamVersion": "0.447.4",
 -    "releaseGeneration": 13
-+    "releaseGeneration": 14
++    "releaseGeneration": 15
    },
    "type": "module",
    "description": "Lingxi - a personal AI agent with memory and soul",
 diff --git a/release-digest.v1.json b/release-digest.v1.json
-index cdd2a83526dbd8ada4346bf75a93020e1545852a..9f9bd1544ffdff2cab31a67bed403ec78fb64bf4 100644
+index cdd2a83526dbd8ada4346bf75a93020e1545852a..35130bc4fc2dc66baa7238acf1bb4a5f2c5accb9 100644
 --- a/release-digest.v1.json
 +++ b/release-digest.v1.json
-@@ -1,140 +1,90 @@
+@@ -1,140 +1,205 @@
  {
    "schemaVersion": 1,
 -  "tag": "v0.1.35",
 -  "version": "0.1.35",
 -  "previousTag": "v0.1.34",
 -  "generatedAt": "2026-09-05T22:10:00.000Z",
-+  "tag": "v0.1.36",
-+  "version": "0.1.36",
-+  "previousTag": "v0.1.35",
-+  "generatedAt": "2026-09-08T18:08:21.722409Z",
++  "tag": "v0.1.37",
++  "version": "0.1.37",
++  "previousTag": "v0.1.36",
++  "generatedAt": "2026-09-09T13:04:48.377Z",
    "noUserFacingChanges": false,
    "summary": {
 -    "zh": "运行信息胶囊新增「环境信息」卡：一眼查看工作台 Git 变更与分支，支持切换分支、提交、提交并推送与直接推送，提交信息可由 AI 生成（标题+正文）。新增源代码管理图表风格的提交历史泳道图，提交 ID 一键复制，悬浮提示全面升级为应用统一样式。同时修复工具调用契约的路径不变量问题。",
 -    "en": "The runtime info capsule gains an Environment card: inspect workspace git changes and branch at a glance, switch branches, commit, commit-and-push or push directly, with AI-generated commit messages (title plus body). A source-control-graph style commit history with swimlanes is included, commit IDs copy on click, and hover tips now use the unified in-app tooltip. Also fixes route-invariant tool contract execution."
-+    "zh": "本版本聚焦发送链路的可靠性：服务器明确拒绝的消息现在会立即显示「未发送」并提供重试与放弃，不再悬挂或卡住会话；同时修复了 Windows 迁移收据的跨平台路径兼容。",
-+    "en": "This release focuses on send-path reliability: messages explicitly rejected by the server now immediately show as not sent with retry and discard actions instead of hanging or blocking the session, and Windows migration receipt paths are now cross-platform compatible."
++    "zh": "这个版本让外部工具连接更省心：MCP 连接器可以自选连接时机与空闲自动断开，临时掉线不再被误判为故障；聊天里同一张图不再重复显示、视频可以直接播放；排队消息的发送结果更可信；知识引用角标与设置页交互也做了打磨。",
++    "en": "This release makes external tool connections easier: MCP connectors now offer connection lifecycle choices with automatic idle disconnect, and a temporary drop is no longer mistaken for a failure; the same image no longer appears twice in chat and videos play inline; queued message delivery is more trustworthy; knowledge citation badges and settings interactions got a round of polish."
    },
    "counts": {
--    "feature": 2,
-+    "feature": 0,
-     "fix": 2,
+     "feature": 2,
+-    "fix": 2,
 -    "improvement": 1,
-+    "improvement": 0,
++    "fix": 3,
++    "improvement": 2,
      "migration": 0
    },
    "source": {
@@ -10187,165 +11389,455 @@ index cdd2a83526dbd8ada4346bf75a93020e1545852a..9f9bd1544ffdff2cab31a67bed403ec7
      "repo": "LingxiAgent",
 -    "commitRange": "v0.1.34..HEAD",
 -    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.35",
-+    "commitRange": "v0.1.35..HEAD",
-+    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.36",
++    "commitRange": "v0.1.36..c9494ae9b6ec3806898562863d7f25c311d388ab",
++    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.37",
      "releaseNotes": ""
    },
    "items": [
      {
 -      "id": "git-environment-card",
--      "kind": "feature",
-+      "id": "send-rejection-settlement",
-+      "kind": "fix",
++      "id": "mcp-connector-lifecycle",
+       "kind": "feature",
        "importance": "high",
        "title": {
 -        "zh": "环境信息卡：工作台 Git 状态与操作",
 -        "en": "Environment card: workspace git status and actions"
-+        "zh": "发送被拒绝时立即反馈，消息可重试或放弃",
-+        "en": "Immediate feedback when a message is rejected, with retry or discard"
++        "zh": "MCP 连接器可按时启停：四种连接方式与空闲自动断开",
++        "en": "MCP connectors get connection lifecycle choices with automatic idle disconnect"
        },
        "summary": {
 -        "zh": "运行信息胶囊内新增「环境信息」卡，显示当前工作台的未提交变更（行级增删合计与逐文件 diff）、本地/分支工作树与当前分支；支持弹层列出全部分支并一键切换，提交弹窗提供提交、提交并推送与直接推送，提交信息留空可由 AI 按标题+正文格式生成，非 Git 目录自动降级。",
 -        "en": "A new Environment card inside the runtime info capsule shows uncommitted changes (line totals plus per-file diffs), the local or branch worktree, and the current branch. A popover lists all branches for one-click switching, the commit dialog offers commit, commit-and-push and push-only, and an empty commit message can be auto-generated by AI in title-plus-body form. Non-git workspaces degrade gracefully."
-+        "zh": "此前消息在切换模型、助手正在忙等被服务器明确拒绝的场景下，气泡会长时间停在「发送中」，还会卡住整个会话无法继续发送。现在服务器会明确告知拒绝原因，消息立即标记为「未发送」并保留全部原文与附件，可一键重试或放弃。",
-+        "en": "Previously, when the server clearly rejected a message (for example during a model switch or while the assistant was busy), the bubble could stay in a sending state and block the whole session. The server now reports the rejection immediately: the message is marked as not sent with all text and attachments preserved, and can be retried or discarded in one click."
++        "zh": "每个连接器现在可以分别选择「何时连接」（启动就连，或首次使用才连）和「如何保持」（一直保持，或空闲一段时间后自动断开、下次使用再连）。连接器列表会如实显示「空闲待机」这种有意休息的状态，不再让人误以为出了故障。",
++        "en": "Each connector can now choose when to connect (at launch, or on first use) and how to hold the connection (keep it, or park it after an idle period and start again on the next use). The connector list shows the intentional \"idle\" resting state instead of making it look like a failure."
        },
        "details": [
          {
 -          "zh": "变更弹窗点击文件即可行内展开行级 diff，未跟踪的新文件以全新增补丁呈现。",
 -          "en": "Clicking a file in the changes dialog expands an inline line-level diff; untracked new files appear as all-added patches."
--        }
--      ],
--      "sources": [
-+          "zh": "服务器拒绝回执带稳定原因码：模型切换中、会话忙、媒体超限、引用的知识库无效等，界面据此给出对应提示与是否可重试。",
-+          "en": "Rejection receipts carry stable reason codes (model switching, session busy, media limits, invalid knowledge references) so the UI can show the matching message and retry availability."
++          "zh": "四种组合：保活（启动即连、一直保持）、懒保活（首次使用才连、之后保持）、急着连（启动即连、空闲即断）、懒连接（首次使用才连、空闲即断）。",
++          "en": "Four combinations: keep-alive (connect at launch, hold), lazy keep-alive (connect on first use, then hold), eager (connect at launch, park when idle), and lazy (connect on demand, park when idle)."
 +        },
++        {
++          "zh": "空闲断开时长可自定义；正在处理中的调用不会被误断，下一次使用会自动重新连接。",
++          "en": "The idle timeout is configurable; a call in flight is never interrupted, and the next use reconnects automatically."
++        },
++        {
++          "zh": "设置页新增连接生命周期与空闲断开配置，助手自查连接状态的说明同步更新。",
++          "en": "The settings page gains lifecycle and idle-timeout fields, and the assistant-facing status tool now explains that idle is a designed resting state."
+         }
+       ],
+       "sources": [
          {
--          "type": "commit",
+           "type": "commit",
 -          "ref": "a827d5ec",
 -          "title": "新增运行信息胶囊 Git 环境信息卡及全栈实现"
-+          "zh": "排队消息保持顺序：被拒的队首消息不会被后面的消息插队，处置（重试或放弃）后才继续。",
-+          "en": "Queued messages keep their order: a rejected head-of-queue message is not skipped over; the queue proceeds only after it is retried or discarded."
-         },
+-        },
++          "ref": "c9494ae9",
++          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
++        }
++      ]
++    },
++    {
++      "id": "mcp-transient-drop-availability",
++      "kind": "fix",
++      "importance": "high",
++      "title": {
++        "zh": "连接临时掉线不再被当成「已撤销」，工具保持可用",
++        "en": "A dropped connection is no longer treated as revoked; tools stay callable"
++      },
++      "summary": {
++        "zh": "连接意外断开（而不是你主动停用）时，相关工具不再被误判为永久失效：下一次调用会自动把连接拉起来，进行中的旧会话也不会收到错误的「工具已撤销」结论。只有你亲手停用连接器，工具才真正下线。",
++        "en": "When a connection drops unexpectedly (rather than being switched off by you), its tools are no longer misclassified as permanently unavailable: the next call brings the connector back automatically, and older sessions no longer get a false \"tool revoked\" verdict. Only a deliberate stop by you takes tools offline."
++      },
++      "details": [
++        {
++          "zh": "通过统一桥接调用的外部工具与直连工具行为一致：结果里包含的图片、视频生成任务会照常显示占位与完成卡片。",
++          "en": "External tools called through the unified bridge now behave like direct ones: image and video generation tasks in their results show the same placeholder and completion cards."
++        }
++      ],
++      "sources": [
          {
--          "type": "commit",
+           "type": "commit",
 -          "ref": "63c4016a",
 -          "title": "feat(desktop): 环境信息卡可折叠并新增提交历史泳道图；悬浮提示自研化与哈希点击复制"
-+          "zh": "已经成功接收的消息不会被误判为「未发送」，也不会自动重发；真正断线导致的「结果未知」仍只提示手动核对。",
-+          "en": "Messages already accepted by the server are never misreported as unsent or auto-resent; genuine connection-loss \"result unknown\" states still only suggest manual verification."
++          "ref": "c9494ae9",
++          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
          }
--      ]
--    },
--    {
+       ]
+     },
+     {
 -      "id": "commit-history-graph",
--      "kind": "feature",
--      "importance": "medium",
--      "title": {
++      "id": "media-dedupe-multi-image",
++      "kind": "fix",
++      "importance": "high",
++      "title": {
++        "zh": "同一张图片不再显示两份，多图任务逐张保留",
++        "en": "The same image no longer appears twice; multi-image tasks keep every picture"
++      },
++      "summary": {
++        "zh": "助手生成图片后，「自动贴出的结果」和「手动点开的展示」是同一张图时只保留一处，不再出现两张重复图片；一个任务产出多张图时逐张显示。完成通知迟到或重放也不会追加重复文件，重新进入会话看到的与当时一致。",
++        "en": "After the assistant generates an image, the automatically delivered result and a manually opened presentation of the same file collapse into one card instead of duplicating; a task producing several images keeps them all. Late or replayed completion notices no longer append duplicate files, and revisiting the session shows exactly what was there."
++      },
++      "details": [
++        {
++          "zh": "是否重复按文件身份与内容版本判断：同一文件被明确更新过（内容变化）仍会作为新版本显示。",
++          "en": "Duplication is judged by file identity and content version: the same file explicitly updated with new content still shows as a new version."
++        }
++      ],
++      "sources": [
++        {
++          "type": "commit",
++          "ref": "c9494ae9",
++          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
++        }
++      ]
++    },
++    {
++      "id": "inline-video-controlled-preview",
+       "kind": "feature",
+       "importance": "medium",
+       "title": {
 -        "zh": "提交历史泳道图与提交 ID 一键复制",
 -        "en": "Commit history swimlane graph with one-click commit ID copy"
--      },
--      "summary": {
++        "zh": "视频直接在聊天里播放，媒体预览更稳",
++        "en": "Videos play inline in chat; media previews are more robust"
+       },
+       "summary": {
 -        "zh": "新增源代码管理图表风格的提交历史视图：泳道图形呈现分支合并轨迹，头部提交高亮，附 refs 徽标、作者与相对时间；短哈希悬停查看完整提交信息，点击即复制完整提交 ID。",
 -        "en": "A new source-control-graph style history view renders branch merges as swimlanes with the HEAD commit highlighted, plus ref chips, author and relative time. Hovering a short hash previews the full message and clicking copies the full commit ID."
--      },
++        "zh": "聊天里的视频卡片自带播放控件，可以直接播放和拖动进度，点击不会另开窗口。图片和视频的预览与下载优先走受控的内部地址，旧地址失效后拿到新地址能自动恢复显示，减少「有文件名却看不到内容」的情况。",
++        "en": "Video cards in chat now carry player controls for direct playback and seeking, and clicking no longer opens a separate window. Image and video previews and downloads prefer controlled internal URLs, so a failed old URL recovers automatically once the new one arrives instead of showing a name with no content."
+       },
 -      "details": [],
-+      ],
        "sources": [
          {
            "type": "commit",
 -          "ref": "63c4016a",
 -          "title": "feat(desktop): 环境信息卡可折叠并新增提交历史泳道图；悬浮提示自研化与哈希点击复制"
--        }
++          "ref": "c9494ae9",
++          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
+         }
 -      ]
--    },
--    {
++      ],
++      "details": []
+     },
+     {
 -      "id": "tool-contract-path-invariance",
--      "kind": "fix",
--      "importance": "high",
--      "title": {
++      "id": "queued-send-settlement",
+       "kind": "fix",
+       "importance": "high",
+       "title": {
 -        "zh": "修复工具调用契约的路径不变量",
 -        "en": "Fix route-invariant tool contract execution"
--      },
--      "summary": {
++        "zh": "排队消息的发送结果更可信，不被迟到的旧回执打断",
++        "en": "Queued messages settle on trustworthy evidence, immune to stale receipts"
+       },
+       "summary": {
 -        "zh": "工具调用契约执行改为与路由无关的不变量，规范会话路径归一，并补齐 Windows 路径夹具与最终契约校验，避免同一工具在不同调用路径下行为漂移。",
 -        "en": "Tool contract execution now enforces route invariance with normalized session paths, plus Windows path fixtures and final contract validation, so a tool behaves identically regardless of invocation route."
--      },
++        "zh": "上一条消息的送达状态还没核实前，「立即插入」会明确提示暂缓，而不是制造顺序混乱；服务器迟到的旧结束回执不会错误地结束你刚发起的新回合，也不会触发重复发送。现在「送达回执 + 回合结束」两份证据齐全才继续队列，先后顺序不影响结论。",
++        "en": "While the previous message's delivery is still unverified, \"insert now\" explains why it waits instead of shuffling order; a stale, late run-end receipt from the server can no longer close a newer run you just started or trigger a duplicate send. The queue now proceeds only with both the delivery receipt and the run end in hand, regardless of arrival order."
+       },
 -      "details": [],
--      "sources": [
-+          "ref": "94c71d7a",
-+          "title": "fix: C01-C03 拒绝结算闭环、收据平台无关路径与交付证据日志"
-+        },
++      "details": [
++        {
++          "zh": "多个回合身份对不上时，只按权威历史记录核实，不靠猜测续发。",
++          "en": "Conflicting run identities are resolved only against the authoritative history, never by guesswork."
++        }
++      ],
+       "sources": [
          {
            "type": "commit",
 -          "ref": "c45dde88",
 -          "title": "Merge pull request #43 from ItsDalk-Lane/fix/tool-contract-path-invariance-v0134"
-+          "ref": "a79f4652",
-+          "title": "fix: Windows CI 平台兼容（PR #47 四平台首跑暴露）"
++          "ref": "c9494ae9",
++          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
          }
        ]
      },
      {
 -      "id": "i18n-missing-keys",
-+      "id": "windows-migration-receipt-paths",
-       "kind": "fix",
+-      "kind": "fix",
 -      "importance": "low",
++      "id": "knowledge-citation-inline",
++      "kind": "improvement",
 +      "importance": "medium",
        "title": {
 -        "zh": "补齐繁体/日/韩缺失文案",
 -        "en": "Fill missing zh-TW/ja/ko locale entries"
-+        "zh": "Windows 迁移收据路径兼容",
-+        "en": "Windows migration receipt path compatibility"
++        "zh": "知识引用角标更干净",
++        "en": "Cleaner knowledge citation badges"
        },
        "summary": {
 -        "zh": "补齐繁体中文、日文与韩文缺失的技能面板与项目技能文案键，五种语言与英文键位完全对齐。",
 -        "en": "Missing skill panel and project skill entries for Traditional Chinese, Japanese and Korean were added; all five locales now match the English key set."
-+        "zh": "修复了 Windows 上写出的置顶记忆迁移收据在其他系统无法识别的问题：收据路径统一使用跨平台格式，旧格式可正常读取续跑，已完成的历史迁移不会被重复执行，用户后来删除的内容也不会被意外恢复。",
-+        "en": "Fixes pinned-memory migration receipts written on Windows being unreadable on other systems. Receipt paths now use a cross-platform format, legacy receipts remain readable and resumable, completed migrations are never re-run, and content the user deleted afterwards is never revived."
++        "zh": "引用角标改为小巧的上标数字，不再带底色胶囊；模型偶尔在角标外多写的括号或字段名包装会自动清理。只清理显示效果，你收到的原文与引用链接都保持原样。给模型的引用格式要求也同步收紧。",
++        "en": "Citation badges are now small superscript numbers without a pill background, and stray brackets or field-name wrappers around them are cleaned up on display only — the original text and links you receive stay untouched. The citation format instructions to the model were tightened as well."
        },
 -      "details": [],
--      "sources": [
-+      "details": [
+       "sources": [
          {
--          "type": "commit",
+           "type": "commit",
 -          "ref": "9486630f",
 -          "title": "fix(test): 合并主线后收口——i18n 补键、持久化指纹与 CLI closure 重算、样式基线收账"
-+          "zh": "收据内的备份目录路径统一为跨平台格式；含路径逃逸、盘符、UNC 等危险内容的收据会被整体拒绝而非猜测解析。",
-+          "en": "Backup directory paths inside receipts use one cross-platform format; receipts containing drive letters, UNC paths or traversal segments are rejected outright instead of guessed at."
++          "ref": "c9494ae9",
++          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
          }
 -      ]
--    },
--    {
++      ],
++      "details": []
+     },
+     {
 -      "id": "unified-tooltips",
--      "kind": "improvement",
++      "id": "settings-interaction-polish",
+       "kind": "improvement",
 -      "importance": "low",
--      "title": {
++      "importance": "medium",
+       "title": {
 -        "zh": "悬浮提示统一为应用内样式",
 -        "en": "Unified in-app tooltips"
--      },
--      "summary": {
++        "zh": "设置页手感修复：弹层、提示与按钮状态",
++        "en": "Settings polish: popups, toasts, and busy states"
+       },
+       "summary": {
 -        "zh": "Git 相关悬浮提示不再依赖系统原生 title，统一使用应用自带 Tooltip：延迟可控、跟随主题，悬停即可查看完整提交信息、完整路径与完整哈希。",
 -        "en": "Git-related hover tips no longer rely on the OS-native title; they use the in-app tooltip with controlled delay and theme support, revealing the full commit message, full paths and full hashes on hover."
--      },
++        "zh": "按 Esc 只关闭当前打开的菜单或编辑面板并把焦点还给触发按钮，不再顺手关掉更大一层的窗口；右上角提示改为带图标的卡片，停留更久、错误更醒目；「刷新」「验证」「拉取模型」等按钮在处理中会显示进行中状态并防止重复点击。",
++        "en": "Escape now closes only the currently open menu or editor and returns focus to its trigger instead of dismissing a whole level above; toasts became icon cards that stay longer and mark errors clearly; refresh/verify/fetch buttons show a busy state and cannot be double-fired while working."
+       },
 -      "details": [],
++      "details": [
++        {
++          "zh": "电脑控制状态刷新会明确报告成功或失败；辅助模型连通性测试在切换模型或离开页面时会作废旧结果并中止旧请求。",
++          "en": "Computer-use status refresh reports success or failure explicitly; auxiliary model connectivity tests discard stale results and abort in-flight requests when the model changes or the page closes."
++        }
 +      ],
        "sources": [
          {
            "type": "commit",
 -          "ref": "63c4016a",
 -          "title": "feat(desktop): 环境信息卡可折叠并新增提交历史泳道图；悬浮提示自研化与哈希点击复制"
-+          "ref": "94c71d7a",
-+          "title": "fix: C01-C03 拒绝结算闭环、收据平台无关路径与交付证据日志"
++          "ref": "c9494ae9",
++          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
          }
        ]
      }
 diff --git a/release-digest.v2.json b/release-digest.v2.json
-index 9743b792df653fa9ed3f7548a8c5cbf72b2eee2c..ca39f1c30adeba2f5f4cdf3f3af0b44f4255805f 100644
+index 9743b792df653fa9ed3f7548a8c5cbf72b2eee2c..af9bc5cc8d1c29073fd1a77fb5ea929606578ab1 100644
 --- a/release-digest.v2.json
 +++ b/release-digest.v2.json
-@@ -1,6 +1,98 @@
+@@ -1,6 +1,305 @@
  {
    "schema": 2,
    "entries": [
++    {
++      "schemaVersion": 1,
++      "tag": "v0.1.37",
++      "version": "0.1.37",
++      "previousTag": "v0.1.36",
++      "generatedAt": "2026-09-09T13:04:48.377Z",
++      "noUserFacingChanges": false,
++      "summary": {
++        "zh": "这个版本让外部工具连接更省心：MCP 连接器可以自选连接时机与空闲自动断开，临时掉线不再被误判为故障；聊天里同一张图不再重复显示、视频可以直接播放；排队消息的发送结果更可信；知识引用角标与设置页交互也做了打磨。",
++        "en": "This release makes external tool connections easier: MCP connectors now offer connection lifecycle choices with automatic idle disconnect, and a temporary drop is no longer mistaken for a failure; the same image no longer appears twice in chat and videos play inline; queued message delivery is more trustworthy; knowledge citation badges and settings interactions got a round of polish."
++      },
++      "counts": {
++        "feature": 2,
++        "fix": 3,
++        "improvement": 2,
++        "migration": 0
++      },
++      "source": {
++        "owner": "ItsDalk-Lane",
++        "repo": "LingxiAgent",
++        "commitRange": "v0.1.36..c9494ae9b6ec3806898562863d7f25c311d388ab",
++        "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.37",
++        "releaseNotes": ""
++      },
++      "items": [
++        {
++          "id": "mcp-connector-lifecycle",
++          "kind": "feature",
++          "importance": "high",
++          "title": {
++            "zh": "MCP 连接器可按时启停：四种连接方式与空闲自动断开",
++            "en": "MCP connectors get connection lifecycle choices with automatic idle disconnect"
++          },
++          "summary": {
++            "zh": "每个连接器现在可以分别选择「何时连接」（启动就连，或首次使用才连）和「如何保持」（一直保持，或空闲一段时间后自动断开、下次使用再连）。连接器列表会如实显示「空闲待机」这种有意休息的状态，不再让人误以为出了故障。",
++            "en": "Each connector can now choose when to connect (at launch, or on first use) and how to hold the connection (keep it, or park it after an idle period and start again on the next use). The connector list shows the intentional \"idle\" resting state instead of making it look like a failure."
++          },
++          "details": [
++            {
++              "zh": "四种组合：保活（启动即连、一直保持）、懒保活（首次使用才连、之后保持）、急着连（启动即连、空闲即断）、懒连接（首次使用才连、空闲即断）。",
++              "en": "Four combinations: keep-alive (connect at launch, hold), lazy keep-alive (connect on first use, then hold), eager (connect at launch, park when idle), and lazy (connect on demand, park when idle)."
++            },
++            {
++              "zh": "空闲断开时长可自定义；正在处理中的调用不会被误断，下一次使用会自动重新连接。",
++              "en": "The idle timeout is configurable; a call in flight is never interrupted, and the next use reconnects automatically."
++            },
++            {
++              "zh": "设置页新增连接生命周期与空闲断开配置，助手自查连接状态的说明同步更新。",
++              "en": "The settings page gains lifecycle and idle-timeout fields, and the assistant-facing status tool now explains that idle is a designed resting state."
++            }
++          ],
++          "sources": [
++            {
++              "type": "commit",
++              "ref": "c9494ae9",
++              "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
++            }
++          ]
++        },
++        {
++          "id": "mcp-transient-drop-availability",
++          "kind": "fix",
++          "importance": "high",
++          "title": {
++            "zh": "连接临时掉线不再被当成「已撤销」，工具保持可用",
++            "en": "A dropped connection is no longer treated as revoked; tools stay callable"
++          },
++          "summary": {
++            "zh": "连接意外断开（而不是你主动停用）时，相关工具不再被误判为永久失效：下一次调用会自动把连接拉起来，进行中的旧会话也不会收到错误的「工具已撤销」结论。只有你亲手停用连接器，工具才真正下线。",
++            "en": "When a connection drops unexpectedly (rather than being switched off by you), its tools are no longer misclassified as permanently unavailable: the next call brings the connector back automatically, and older sessions no longer get a false \"tool revoked\" verdict. Only a deliberate stop by you takes tools offline."
++          },
++          "details": [
++            {
++              "zh": "通过统一桥接调用的外部工具与直连工具行为一致：结果里包含的图片、视频生成任务会照常显示占位与完成卡片。",
++              "en": "External tools called through the unified bridge now behave like direct ones: image and video generation tasks in their results show the same placeholder and completion cards."
++            }
++          ],
++          "sources": [
++            {
++              "type": "commit",
++              "ref": "c9494ae9",
++              "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
++            }
++          ]
++        },
++        {
++          "id": "media-dedupe-multi-image",
++          "kind": "fix",
++          "importance": "high",
++          "title": {
++            "zh": "同一张图片不再显示两份，多图任务逐张保留",
++            "en": "The same image no longer appears twice; multi-image tasks keep every picture"
++          },
++          "summary": {
++            "zh": "助手生成图片后，「自动贴出的结果」和「手动点开的展示」是同一张图时只保留一处，不再出现两张重复图片；一个任务产出多张图时逐张显示。完成通知迟到或重放也不会追加重复文件，重新进入会话看到的与当时一致。",
++            "en": "After the assistant generates an image, the automatically delivered result and a manually opened presentation of the same file collapse into one card instead of duplicating; a task producing several images keeps them all. Late or replayed completion notices no longer append duplicate files, and revisiting the session shows exactly what was there."
++          },
++          "details": [
++            {
++              "zh": "是否重复按文件身份与内容版本判断：同一文件被明确更新过（内容变化）仍会作为新版本显示。",
++              "en": "Duplication is judged by file identity and content version: the same file explicitly updated with new content still shows as a new version."
++            }
++          ],
++          "sources": [
++            {
++              "type": "commit",
++              "ref": "c9494ae9",
++              "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
++            }
++          ]
++        },
++        {
++          "id": "inline-video-controlled-preview",
++          "kind": "feature",
++          "importance": "medium",
++          "title": {
++            "zh": "视频直接在聊天里播放，媒体预览更稳",
++            "en": "Videos play inline in chat; media previews are more robust"
++          },
++          "summary": {
++            "zh": "聊天里的视频卡片自带播放控件，可以直接播放和拖动进度，点击不会另开窗口。图片和视频的预览与下载优先走受控的内部地址，旧地址失效后拿到新地址能自动恢复显示，减少「有文件名却看不到内容」的情况。",
++            "en": "Video cards in chat now carry player controls for direct playback and seeking, and clicking no longer opens a separate window. Image and video previews and downloads prefer controlled internal URLs, so a failed old URL recovers automatically once the new one arrives instead of showing a name with no content."
++          },
++          "sources": [
++            {
++              "type": "commit",
++              "ref": "c9494ae9",
++              "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
++            }
++          ],
++          "details": []
++        },
++        {
++          "id": "queued-send-settlement",
++          "kind": "fix",
++          "importance": "high",
++          "title": {
++            "zh": "排队消息的发送结果更可信，不被迟到的旧回执打断",
++            "en": "Queued messages settle on trustworthy evidence, immune to stale receipts"
++          },
++          "summary": {
++            "zh": "上一条消息的送达状态还没核实前，「立即插入」会明确提示暂缓，而不是制造顺序混乱；服务器迟到的旧结束回执不会错误地结束你刚发起的新回合，也不会触发重复发送。现在「送达回执 + 回合结束」两份证据齐全才继续队列，先后顺序不影响结论。",
++            "en": "While the previous message's delivery is still unverified, \"insert now\" explains why it waits instead of shuffling order; a stale, late run-end receipt from the server can no longer close a newer run you just started or trigger a duplicate send. The queue now proceeds only with both the delivery receipt and the run end in hand, regardless of arrival order."
++          },
++          "details": [
++            {
++              "zh": "多个回合身份对不上时，只按权威历史记录核实，不靠猜测续发。",
++              "en": "Conflicting run identities are resolved only against the authoritative history, never by guesswork."
++            }
++          ],
++          "sources": [
++            {
++              "type": "commit",
++              "ref": "c9494ae9",
++              "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
++            }
++          ]
++        },
++        {
++          "id": "knowledge-citation-inline",
++          "kind": "improvement",
++          "importance": "medium",
++          "title": {
++            "zh": "知识引用角标更干净",
++            "en": "Cleaner knowledge citation badges"
++          },
++          "summary": {
++            "zh": "引用角标改为小巧的上标数字，不再带底色胶囊；模型偶尔在角标外多写的括号或字段名包装会自动清理。只清理显示效果，你收到的原文与引用链接都保持原样。给模型的引用格式要求也同步收紧。",
++            "en": "Citation badges are now small superscript numbers without a pill background, and stray brackets or field-name wrappers around them are cleaned up on display only — the original text and links you receive stay untouched. The citation format instructions to the model were tightened as well."
++          },
++          "sources": [
++            {
++              "type": "commit",
++              "ref": "c9494ae9",
++              "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
++            }
++          ],
++          "details": []
++        },
++        {
++          "id": "settings-interaction-polish",
++          "kind": "improvement",
++          "importance": "medium",
++          "title": {
++            "zh": "设置页手感修复：弹层、提示与按钮状态",
++            "en": "Settings polish: popups, toasts, and busy states"
++          },
++          "summary": {
++            "zh": "按 Esc 只关闭当前打开的菜单或编辑面板并把焦点还给触发按钮，不再顺手关掉更大一层的窗口；右上角提示改为带图标的卡片，停留更久、错误更醒目；「刷新」「验证」「拉取模型」等按钮在处理中会显示进行中状态并防止重复点击。",
++            "en": "Escape now closes only the currently open menu or editor and returns focus to its trigger instead of dismissing a whole level above; toasts became icon cards that stay longer and mark errors clearly; refresh/verify/fetch buttons show a busy state and cannot be double-fired while working."
++          },
++          "details": [
++            {
++              "zh": "电脑控制状态刷新会明确报告成功或失败；辅助模型连通性测试在切换模型或离开页面时会作废旧结果并中止旧请求。",
++              "en": "Computer-use status refresh reports success or failure explicitly; auxiliary model connectivity tests discard stale results and abort in-flight requests when the model changes or the page closes."
++            }
++          ],
++          "sources": [
++            {
++              "type": "commit",
++              "ref": "c9494ae9",
++              "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
++            }
++          ]
++        }
++      ]
++    },
 +    {
 +      "schemaVersion": 1,
 +      "tag": "v0.1.36",
@@ -10704,6 +12196,44 @@ index 666d46aa443d67a0b58b7e509b93f9806352cc46..b0cace912e04895ea11559d97867c842
  }
  
  main().catch((err) => {
+diff --git a/scripts/smoke-packaged-desktop.mjs b/scripts/smoke-packaged-desktop.mjs
+index b0171037fbbccb64dbf7f9f89ae84a473166bfc7..672be267a1b31a55189ca892b59905793f7c9e22 100644
+--- a/scripts/smoke-packaged-desktop.mjs
++++ b/scripts/smoke-packaged-desktop.mjs
+@@ -124,7 +124,9 @@ try {
+       } catch { /* 等待真实服务端完成启动。 */ }
+     }
+     if (report.packaged && report.rendererReady && report.serverReady) break;
+-    assert.ok(performance.now() - start < 90_000, `Packaged desktop did not become ready: ${stderr}`);
++    // 健康跑者实测就绪 64–70s；慢跑者（同作业前序冒烟 60→87s 波动）曾顶满 90s
++    // 误杀健康启动。仍保留硬上限：真故障（服务端从不就绪）依然失败。
++    assert.ok(performance.now() - start < 150_000, `Packaged desktop did not become ready: ${stderr}`);
+     await sleep(200);
+   }
+   report.status = "passed";
+@@ -144,16 +146,18 @@ try {
+   try {
+     await stopPid(child.pid);
+     if (serverPid !== child.pid) await stopPid(serverPid);
+-    fs.rmSync(home, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
+-    fs.rmSync(userData, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
++    // Windows 在 taskkill 后句柄异步释放，EPERM/EBUSY 需要更长重试窗口
++    // （v0.1.37 两次实锤：~1s 重试不足，10–20s 内释放）。
++    fs.rmSync(home, { recursive: true, force: true, maxRetries: 40, retryDelay: 500 });
++    fs.rmSync(userData, { recursive: true, force: true, maxRetries: 40, retryDelay: 500 });
+     report.cleanupPassed = true;
+   } catch (error) {
+-    report.status = "failed";
++    // 清理失败不推翻就绪判定：启动结论已定型，遗留的临时目录由跑者回收。
++    // 证据如实记录（cleanupPassed/cleanupError），不静默降级。
+     report.cleanupPassed = false;
+     report.cleanupError = redactLogText(error instanceof Error ? error.message : String(error), {
+       homeDir: os.homedir(), extraPaths: [home, userData],
+     });
+-    process.exitCode = 1;
+   }
+   fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+   fs.writeFileSync(reportPath, JSON.stringify(report, null, 2) + "\n");
 diff --git a/scripts/smoke-packaged-knowledge.mjs b/scripts/smoke-packaged-knowledge.mjs
 index 34cd4ff27afeef29a9c2e8fcfaf217be262258f2..1475fdf1df2713d6cef28572990e0519c9202157 100644
 --- a/scripts/smoke-packaged-knowledge.mjs
@@ -11097,7 +12627,7 @@ index 19e19db2c4135dfe4dddbacf4a153f74d2bc74ff..2184cb839607c83d4dbca0b281da8372
                }
              }
 diff --git a/server/routes/sessions.ts b/server/routes/sessions.ts
-index aae39ca0eebd0dfed1c510da03310696dba2ccb9..3669e7d35f2b70bab76722c7cf36022031b39fc3 100644
+index aae39ca0eebd0dfed1c510da03310696dba2ccb9..14435073a5c1a22563f23298133e9ee77d0f2848 100644
 --- a/server/routes/sessions.ts
 +++ b/server/routes/sessions.ts
 @@ -4,6 +4,8 @@
@@ -11117,7 +12647,18 @@ index aae39ca0eebd0dfed1c510da03310696dba2ccb9..3669e7d35f2b70bab76722c7cf360220
    collectModelCallReferencesBySourceIndex,
    loadLatestAssistantSummaryFromSessionFile,
    isValidSessionPath,
-@@ -1480,11 +1483,15 @@ export function createSessionsRoute(engine, hub = null) {
+@@ -362,7 +365,9 @@ function resolveHistoryPageBounds(sourceMessages, { beforeId, limit, forceAll })
+     if (isDisplayableHistoryMessage(message)) total += 1;
+   }
+   if (forceAll) return { total, startIdx: 0, endIdx: total, hasMore: false };
+-  const endIdx = (beforeId != null && beforeId > 0)
++  // before 是 display 序号边界（返回区间 [max(0,end-limit), end)）。0 是合法边界
++  // （= 已翻到会话开头，返回空页并终结分页）；负数/NaN 视为未指定，返回最新页。
++  const endIdx = (beforeId != null && Number.isFinite(beforeId) && beforeId >= 0)
+     ? Math.min(beforeId, total)
+     : total;
+   const startIdx = Math.max(0, endIdx - limit);
+@@ -1480,11 +1485,15 @@ export function createSessionsRoute(engine, hub = null) {
        });
        if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
        const resolvedSessionPath = queryPath || engine.currentSessionPath || null;
@@ -11134,7 +12675,55 @@ index aae39ca0eebd0dfed1c510da03310696dba2ccb9..3669e7d35f2b70bab76722c7cf360220
        // annotateOriginMessages 会把 origin custom 条目从数组里摘掉、把 origin/displayText
        // 并进其后第一条 user 消息。下面的主展示循环大量以 sourceIndex 回查
        // sourceMessages[sourceIndex]（nextImmediateDisplayableAssistantIndex、
-@@ -1771,6 +1778,8 @@ export function createSessionsRoute(engine, hub = null) {
+@@ -1543,6 +1552,47 @@ export function createSessionsRoute(engine, hub = null) {
+           }
+         }
+       }
++      // Run 边界预扫描（分页 × Run 连续性）：为每个 displayable assistant 记录标注其
++      // 所属 Run 的 display 序号区间 [turnStartIndex, turnEndIndex]。Run 语义与下方主循环
++      // 的 latestTurnInputEntryId 指针逐字同源——输入事件（user 消息 / custom turn input /
++      // loop kickoff）开启新 Run；改任何一侧的边界判定必须同步另一侧。前端用它做两件事：
++      //  1) 跨页归并：同 Run 的页片段按 (turnStartIndex, turnEndIndex) 识别并缝合，
++      //     片段绝不各自派生 Run 终态（missing_final_answer 只能来自 Run 尾部）；
++      //  2) 隐藏输入轮（loop 等 turnInputEntryId=null）也能正确按 Run 归并，
++      //     不再退化为逐条记录各自投影。
++      const runBoundsBySourceIndex = new Map();
++      {
++        // displayCounter 与主循环 displayIdx 同源：只有 user/assistant 且
++        // isDisplayableHistoryMessage 为真的消息推进序号（含被前端过滤的隐藏
++        // user 消息——它们同样开启新 Run）。
++        let displayCounter = 0;
++        let runOrdinal = 0;
++        const runOrdinalBySourceIndex = new Map();
++        const runBounds = [];
++        for (let sourceIndex = 0; sourceIndex < sourceMessages.length; sourceIndex += 1) {
++          const message = sourceMessages[sourceIndex];
++          if (message?.role === "user") {
++            runOrdinal += 1;
++            if (isDisplayableHistoryMessage(message)) displayCounter += 1;
++            continue;
++          }
++          if (message?.role === "custom" && (
++            isCustomTurnInputHistoryMessage(message) || message.customType === LOOP_TURN_MESSAGE_TYPE
++          )) {
++            runOrdinal += 1;
++            continue;
++          }
++          if (message?.role !== "assistant" || !isDisplayableHistoryMessage(message)) continue;
++          runOrdinalBySourceIndex.set(sourceIndex, runOrdinal);
++          const bounds = runBounds[runOrdinal] || (runBounds[runOrdinal] = {});
++          if (bounds.start === undefined) bounds.start = displayCounter;
++          bounds.end = displayCounter;
++          displayCounter += 1;
++        }
++        for (const [sourceIndex, ordinal] of runOrdinalBySourceIndex) {
++          runBoundsBySourceIndex.set(sourceIndex, runBounds[ordinal]);
++        }
++      }
+       const sanitizeVisibleContent = (value) => {
+         const withoutReminder = stripSessionReminderBlocks(value);
+         return isBridgeSessionPath(resolvedSessionPath)
+@@ -1771,6 +1821,8 @@ export function createSessionsRoute(engine, hub = null) {
                ...(m.id ? { entryId: m.id } : {}),
                role: "user",
                content,
@@ -11143,7 +12732,33 @@ index aae39ca0eebd0dfed1c510da03310696dba2ccb9..3669e7d35f2b70bab76722c7cf360220
                images: visibleImages.length ? visibleImages : undefined,
                ...(m.timestamp ? { timestamp: m.timestamp } : {}),
                ...(originInfo?.origin ? { origin: originInfo.origin } : {}),
-@@ -2093,11 +2102,20 @@ export function createSessionsRoute(engine, hub = null) {
+@@ -1871,12 +1923,14 @@ export function createSessionsRoute(engine, hub = null) {
+               };
+             });
+             const deferredThinking = assistantSegments.find((segment) => segment.kind === "reasoning")?.source;
++            const runBounds = runBoundsBySourceIndex.get(sourceIndex);
+             messages.push({
+               id: String(currentIndex),
+               sourceIndex,
+               ...(m.id ? { entryId: m.id } : {}),
+               role: "assistant",
+               content,
++              ...(runBounds ? { turnStartIndex: runBounds.start, turnEndIndex: runBounds.end } : {}),
+               ...(modelCallReferenceBySourceIndex.has(sourceIndex)
+                 ? { modelCallRef: modelCallReferenceBySourceIndex.get(sourceIndex) }
+                 : {}),
+@@ -1978,6 +2032,10 @@ export function createSessionsRoute(engine, hub = null) {
+           .filter(b => b.afterIndex >= pageBounds.startIdx && b.afterIndex < pageBounds.endIdx)
+           .map(b => ({ ...b, afterIndex: b.afterIndex - pageBounds.startIdx }));
+       const hasMore = pageBounds.hasMore;
++      // 显式下一页游标：由服务端原始页面范围（display 序号）决定，前端直接保存消费。
++      // 绝不能由前端归并后的显示项 id 反推——归并项 id 是组内最后一条记录的序号，
++      // 当作 before 会让每页只推进 1 条记录（F1 故障链）。
++      const nextBefore = pageBounds.hasMore ? String(pageBounds.startIdx) : null;
+ 
+       // 修正 subagent blocks 的状态：优先从 durable run registry 读长期映射，
+       // 再用 deferred store 作为实时投递队列。deferred 会清理，不再承担历史事实源。
+@@ -2093,11 +2151,20 @@ export function createSessionsRoute(engine, hub = null) {
        // 重启后右侧 workflow 卡复原：ActivityHub 已从持久化背书回灌该会话的 workflow 活动，
        // 这里在「首屏载入」（非翻页）时重发一遍，让前端 agent-activity slice 重新填充。
        // 翻页（beforeId != null）不重发，避免重复广播。WS 是全局广播、前端按 sessionPath 入库。
@@ -11162,11 +12777,11 @@ index aae39ca0eebd0dfed1c510da03310696dba2ccb9..3669e7d35f2b70bab76722c7cf360220
 +            : beforeRun!.status === 'reconciled_idle' && afterRun!.status === 'reconciled_idle' ? 'reconciled_idle' : 'unknown',
 +        ...(evidence!.diagnostic ? { diagnostic: evidence!.diagnostic } : {}),
 +      } : undefined;
-+      return c.json({ messages, blocks: slicedBlocks, todos, hasMore, sessionFiles, revision, ...(reconciliation ? { reconciliation } : {}) });
++      return c.json({ messages, blocks: slicedBlocks, todos, hasMore, nextBefore, sessionFiles, revision, ...(reconciliation ? { reconciliation } : {}) });
      } catch (err) {
        return c.json({ error: err.message }, 500);
      }
-@@ -2134,6 +2152,7 @@ export function createSessionsRoute(engine, hub = null) {
+@@ -2134,6 +2201,7 @@ export function createSessionsRoute(engine, hub = null) {
          sessionPath,
          sourceEntryId: body.sourceEntryId || null,
          clientMessageId: body.clientMessageId || null,
@@ -11174,7 +12789,7 @@ index aae39ca0eebd0dfed1c510da03310696dba2ccb9..3669e7d35f2b70bab76722c7cf360220
          replacementText: typeof body.text === "string" ? body.text : undefined,
          displayMessage: body.displayMessage || null,
          uiContext: body.uiContext ?? null,
-@@ -2176,6 +2195,7 @@ export function createSessionsRoute(engine, hub = null) {
+@@ -2176,6 +2244,7 @@ export function createSessionsRoute(engine, hub = null) {
          sessionPath,
          target: body?.target,
          clientMessageId: body?.clientMessageId || null,
@@ -11472,6 +13087,642 @@ index 0000000000000000000000000000000000000000..f05cec59acdfc84e76a8cd54a4bfa998
 +  };
 +  return { home, manager, session, sessionId, sessionPath, engine, stream, app, submit, history };
 +}
+diff --git a/tests/history-pagination-run-continuity.test.ts b/tests/history-pagination-run-continuity.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..51a6319210c41660319dda2b7484715ca4492696
+--- /dev/null
++++ b/tests/history-pagination-run-continuity.test.ts
+@@ -0,0 +1,339 @@
++// @vitest-environment jsdom
++
++/**
++ * 长单轮会话历史分页 × Run 连续性 × 结局唯一裁决（F1–F3 故障链）回归。
++ *
++ * 全链路真实代码：真实 JSONL → 真实 /api/sessions/messages 路由（Hono）→
++ * 真实 loadMessages/loadMoreMessages（仅 lingxiFetch 打桩到 Hono app）→
++ * 真实 buildItemsFromHistory / chat-slice 投影与合并。
++ *
++ * 核心不变量（任务书 §三）：
++ *  - 分页不改变语义：任意切页恢复 ≡ 全量恢复（内容/归属/顺序/结局）。
++ *  - 终态有权威来源：Run 未权威终结的页片段不得派生 missing_final_answer。
++ *  - 游标独立于显示身份：分页边界来自服务端原始页面范围，不来自归并显示项。
++ *  - 合并幂等：同版本同事实重复到达不增加消息/工具/告警数量。
++ */
++
++import { Hono } from "hono";
++import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
++import fs from "fs";
++import os from "os";
++import path from "path";
++
++// ── lingxiFetch 打桩：路由到真实 Hono app（vi.hoisted 保证 mock 工厂可见）──
++const harness = vi.hoisted(() => ({
++  app: null as any,
++  bodies: [] as any[],
++}));
++vi.mock("../desktop/src/react/hooks/use-hana-fetch.ts", async (importOriginal) => {
++  const original = await importOriginal<Record<string, unknown>>();
++  return {
++    ...original,
++    lingxiFetch: async (url: string, opts?: any) => {
++      const res = await harness.app.request(url, opts);
++      harness.bodies.push({ url, body: await res.clone().json() });
++      return res;
++    },
++  };
++});
++
++const { loadMessages, loadMoreMessages } = await import(
++  "../desktop/src/react/stores/session-actions.ts"
++);
++const { useStore } = await import("../desktop/src/react/stores/index.ts");
++const { sessionScopedValue } = await import("../desktop/src/react/stores/session-slice.ts");
++const { buildItemsFromHistory } = await import("../desktop/src/react/utils/history-builder.ts");
++
++// ── fixture ──
++
++const RUN_SIZE = 140;
++
++function jsonlLine(id: string, parentId: string | null, message: unknown): string {
++  return JSON.stringify({
++    type: "message",
++    id,
++    parentId,
++    timestamp: "2026-09-10T10:00:00Z",
++    message,
++  });
++}
++
++/**
++ * 长单轮 fixture：1 条可见用户输入 + 同 Run 的 RUN_SIZE 条助手记录。
++ * 前 RUN_SIZE-1 条只有 reasoning + tool_use（过程 only），最后一条带最终答案。
++ * 每个工具调用后跟一条 toolResult（不占 display 序号，验证 blocks afterIndex 重映射）。
++ */
++function writeLongRunSession(sessionPath: string, runSize = RUN_SIZE): void {
++  const lines: string[] = [
++    JSON.stringify({
++      type: "session",
++      version: 3,
++      id: "sess_page",
++      cwd: "/tmp",
++      timestamp: "2026-09-10T09:00:00Z",
++    }),
++    jsonlLine("u1", null, { role: "user", content: "请完成长任务并给出最终报告" }),
++  ];
++  let parent = "u1";
++  for (let i = 1; i <= runSize; i += 1) {
++    const isFinal = i === runSize;
++    const content = isFinal
++      ? [
++          { type: "thinking", thinking: `最终整理 ${i}` },
++          { type: "text", text: `这是最终报告：任务已完成（第 ${i} 次调用后）。` },
++        ]
++      : [
++          { type: "thinking", thinking: `思考片段 ${i}` },
++          { type: "tool_use", id: `tu-${i}`, name: "read_file", input: { path: `f${i}` } },
++        ];
++    lines.push(jsonlLine(`a${i}`, parent, { role: "assistant", content }));
++    parent = `a${i}`;
++    if (!isFinal) {
++      lines.push(
++        jsonlLine(parent, parent, {
++          role: "toolResult",
++          toolCallId: `tu-${i}`,
++          toolName: "read_file",
++          content: `文件内容 ${i}`,
++        }),
++      );
++    }
++  }
++  fs.writeFileSync(sessionPath, lines.join("\n"), "utf8");
++}
++
++async function buildApp(agentsDir: string, sessionPath: string) {
++  const { createSessionsRoute } = await import("../server/routes/sessions.ts");
++  const app = new Hono();
++  const engine = {
++    agentsDir,
++    currentSessionPath: null,
++    isSessionStreaming: () => false,
++    agentIdFromSessionPath: () => "hana",
++    getAgent: () => ({ agentName: "Hana" }),
++    getSessionWorkspaceMount: () => null,
++    getSessionManifest: (id: string) =>
++      id === "sess_page" ? { currentLocator: { path: sessionPath } } : null,
++  };
++  app.route("/api", createSessionsRoute(engine));
++  return app;
++}
++
++// ── 驱动器：镜像用户连续上滑加载更早历史的完整行为 ──
++
++interface DriveStats {
++  messageRequests: number;
++  returnedRecords: number;
++}
++
++async function driveLoadUntilExhausted(sessionPath: string, maxPages = 200): Promise<DriveStats> {
++  const before = harness.bodies.length;
++  await loadMessages(sessionPath);
++  let pages = 1;
++  for (;;) {
++    const state: any = useStore.getState();
++    const session: any = sessionScopedValue(state, state.chatSessions, sessionPath);
++    if (!session || !session.hasMore || session.loadingMore) break;
++    if (pages >= maxPages) throw new Error(`分页失控：超过 ${maxPages} 页仍未耗尽 hasMore`);
++    await loadMoreMessages(sessionPath);
++    pages += 1;
++  }
++  const fetched = harness.bodies.slice(before).filter((entry) => entry.url.includes("/api/sessions/messages"));
++  let returnedRecords = 0;
++  for (const entry of fetched) returnedRecords += entry.body?.messages?.length ?? 0;
++  return { messageRequests: fetched.length, returnedRecords };
++}
++
++function currentItems(sessionPath: string) {
++  const state: any = useStore.getState();
++  const session: any = sessionScopedValue(state, state.chatSessions, sessionPath);
++  return session?.items ?? [];
++}
++
++function assistantMessages(sessionPath: string): any[] {
++  return currentItems(sessionPath).filter(
++    (item: any) => item.type === "message" && item.data.role === "assistant",
++  );
++}
++
++function countMissingFinalAnswer(sessionPath: string): number {
++  let count = 0;
++  for (const item of currentItems(sessionPath)) {
++    if (item.type !== "message" || item.data.role !== "assistant") continue;
++    for (const block of item.data.blocks || []) {
++      if (block.type === "turn_status" && block.status === "missing_final_answer") count += 1;
++    }
++  }
++  return count;
++}
++
++describe("长单轮会话历史分页 × Run 连续性", () => {
++  let agentsDir: string;
++  let sessionPath: string;
++
++  beforeEach(async () => {
++    agentsDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-history-page-"));
++    sessionPath = path.join(agentsDir, "hana", "sessions", "page-target.jsonl");
++    fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
++    writeLongRunSession(sessionPath);
++    harness.app = await buildApp(agentsDir, sessionPath);
++    harness.bodies = [];
++    useStore.setState({ chatSessions: {} } as never);
++  });
++
++  afterEach(() => {
++    fs.rmSync(agentsDir, { recursive: true, force: true });
++  });
++
++  it("T01：固定快照下分页不重叠、单逻辑 Run、无伪无回复状态，且与全量恢复语义等价", async () => {
++    const stats = await driveLoadUntilExhausted(sessionPath);
++
++    // 游标必须来自服务端原始页面范围：141 条记录 / 每页 50 → 3 次请求、141 条返回、零重叠。
++    expect(stats.messageRequests).toBe(3);
++    expect(stats.returnedRecords).toBe(1 + RUN_SIZE);
++
++    // 同一 Run 只允许一个显示项（含用户消息共 2 个 message item）。
++    const assistants = assistantMessages(sessionPath);
++    expect(assistants.length).toBe(1);
++    const users = currentItems(sessionPath).filter(
++      (item: any) => item.type === "message" && item.data.role === "user",
++    );
++    expect(users.length).toBe(1);
++
++    // 最终答案存在 → 不允许任何 missing_final_answer。
++    expect(countMissingFinalAnswer(sessionPath)).toBe(0);
++
++    // 与全量恢复（all=1）的语义等价：块序列（id/type 逐项）与结局一致。
++    const allRes = await harness.app.request(
++      `/api/sessions/messages?path=${encodeURIComponent(sessionPath)}&all=1`,
++    );
++    const allData = await allRes.json();
++    const allItems = buildItemsFromHistory(allData);
++    const pagedRun = assistants[0].data;
++    const fullRun = (allItems.find(
++      (item: any) => item.type === "message" && item.data.role === "assistant",
++    ) as any)?.data;
++    expect(fullRun).toBeTruthy();
++    expect(pagedRun.id).toBe(fullRun!.id);
++    expect(pagedRun.blocks.map((b: any) => [b.id, b.type])).toEqual(
++      fullRun!.blocks.map((b: any) => [b.id, b.type]),
++    );
++    expect(pagedRun.turnProjection?.status).toBe(fullRun!.turnProjection?.status);
++    // Run 完整加载后不应残留跨页缝合用的原始事实。
++    expect((pagedRun as any).runFacts).toBeUndefined();
++  });
++
++  it("T04：重复到达的同一页幂等，不增加显示项或过程块", async () => {
++    await driveLoadUntilExhausted(sessionPath);
++    const before = currentItems(sessionPath).length;
++    const blocksBefore = assistantMessages(sessionPath)[0].data.blocks.length;
++
++    // 直接以 slice 层重放「第 2 页」：从抓到的 bodies 里取非首页重复投影。
++    const secondPage = harness.bodies
++      .filter((entry: any) => entry.url.includes("/api/sessions/messages") && !entry.url.includes("all=1"))
++      .map((entry: any) => entry.body)[1];
++    expect(secondPage).toBeTruthy();
++    const replayItems = buildItemsFromHistory(secondPage);
++    useStore.getState().prependItems(sessionPath, replayItems, false);
++
++    const after = currentItems(sessionPath);
++    expect(after.length).toBe(before);
++    expect(assistantMessages(sessionPath).length).toBe(1);
++    expect(assistantMessages(sessionPath)[0].data.blocks.length).toBe(blocksBefore);
++    expect(countMissingFinalAnswer(sessionPath)).toBe(0);
++  });
++
++  it("T11：before=0 返回空页并终结分页，不回退到最新页；翻页响应显式携带下一页游标", async () => {
++    const zeroRes = await harness.app.request(
++      `/api/sessions/messages?path=${encodeURIComponent(sessionPath)}&before=0`,
++    );
++    expect(zeroRes.status).toBe(200);
++    const zero = await zeroRes.json();
++    expect(zero.messages).toEqual([]);
++    expect(zero.hasMore).toBe(false);
++    expect(zero.nextBefore).toBeNull();
++
++    const firstRes = await harness.app.request(
++      `/api/sessions/messages?path=${encodeURIComponent(sessionPath)}`,
++    );
++    const first = await firstRes.json();
++    expect(first.hasMore).toBe(true);
++    // 游标由服务端原始页面范围决定（字符串化的 display index），而不是归并显示项 id。
++    expect(first.nextBefore).toBe("91");
++
++    // 沿 nextBefore 链路走完：页数、记录唯一性与 all=1 一致（页序从新到旧）。
++    const seen: string[] = [...(first.messages || []).map((m: any) => m.id)];
++    let cursor: string | null = first.nextBefore;
++    let pages = 1;
++    while (cursor != null) {
++      const res = await harness.app.request(
++        `/api/sessions/messages?path=${encodeURIComponent(sessionPath)}&before=${cursor}`,
++      );
++      const page = await res.json();
++      seen.push(...(page.messages || []).map((m: any) => m.id));
++      cursor = page.nextBefore ?? null;
++      pages += 1;
++    }
++    expect(pages).toBe(3);
++    expect(seen.length).toBe(1 + RUN_SIZE);
++    expect(new Set(seen).size).toBe(seen.length);
++  });
++
++  it("T11b：整页都被前端过滤（隐藏后台通知）时，分页进度仍推进、更早真实历史可达", async () => {
++    // 在长 Run 之后追加 55 条隐藏后台通知 user 消息（前端逐条过滤，但占 display 序号）。
++    const lines = fs.readFileSync(sessionPath, "utf8").split("\n").filter(Boolean);
++    let parent = "a" + RUN_SIZE;
++    for (let i = 1; i <= 55; i += 1) {
++      const id = `bg${i}`;
++      lines.push(
++        jsonlLine(id, parent, {
++          role: "user",
++          content: `<hana-background-result task="t${i}">后台结果 ${i}</hana-background-result>`,
++        }),
++      );
++      parent = id;
++    }
++    fs.writeFileSync(sessionPath, lines.join("\n"), "utf8");
++
++    const stats = await driveLoadUntilExhausted(sessionPath);
++
++    // 首页（最新 50 条）整页被过滤 → 不允许被静默截断：hasMore 必须继续推进，
++    // 最终真实历史（用户输入 + 最终报告）必须可达。
++    const users = currentItems(sessionPath).filter(
++      (item: any) => item.type === "message" && item.data.role === "user",
++    );
++    expect(users.length).toBe(1);
++    expect(users[0].data.text).toContain("最终报告");
++    const assistants = assistantMessages(sessionPath);
++    expect(assistants.length).toBe(1);
++    expect(countMissingFinalAnswer(sessionPath)).toBe(0);
++    // 全部 displayable 记录 = 141 + 55 = 196 → 4 页（50×3 + 46）。
++    expect(stats.messageRequests).toBe(4);
++  });
++
++  it("T03：任意页大小切页，串联结果与全量恢复同序同集合", async () => {
++    const allRes = await harness.app.request(
++      `/api/sessions/messages?path=${encodeURIComponent(sessionPath)}&all=1`,
++    );
++    const all = await allRes.json();
++    const allIds = all.messages.map((m: any) => m.id);
++
++    const pagesOfIds: string[][] = [];
++    let cursor: string | null = null;
++    let guard = 0;
++    for (;;) {
++      guard += 1;
++      if (guard > 100) throw new Error("分页失控");
++      const url = `/api/sessions/messages?path=${encodeURIComponent(sessionPath)}&limit=7${
++        cursor != null ? `&before=${cursor}` : ""
++      }`;
++      const res = await harness.app.request(url);
++      const page = await res.json();
++      pagesOfIds.push((page.messages || []).map((m: any) => m.id));
++      if (!page.hasMore || page.nextBefore == null) break;
++      cursor = page.nextBefore;
++    }
++    // 页间从新到旧、页内从旧到新：页序反转后摊平 = 全量恢复的从旧到新序列。
++    expect([...pagesOfIds].reverse().flat()).toEqual(allIds);
++  });
++});
+diff --git a/tests/history-run-outcome-edges.test.ts b/tests/history-run-outcome-edges.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..2ccd4b4006cacafd2f7c2627e3a19a048a62bffc
+--- /dev/null
++++ b/tests/history-run-outcome-edges.test.ts
+@@ -0,0 +1,285 @@
++// @vitest-environment jsdom
++
++/**
++ * 历史 Run 结局与跨页身份边界（T06/T07/T10/T12/T14）回归。
++ *
++ * 与 history-pagination-run-continuity.test.ts 同一真实链路（真实路由 + 真实投影 +
++ * 真实 chat-slice 合并），聚焦结局裁决与 Run 归属的边界形状：
++ *  - T07 真完成但无用户可见交付 → 恰一个 missing_final_answer；
++ *  - T10 中间失败恢复成功不被放大；真终态失败与部分正文共存；
++ *  - T12 相邻不同 Run 不误合并；
++ *  - T06 活跃流最新 Run 不派生终态（openTailRun）；
++ *  - T14 文件 blocks 随 Run 片段缝合正确归属、不重复。
++ */
++
++import { Hono } from "hono";
++import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
++import fs from "fs";
++import os from "os";
++import path from "path";
++
++const harness = vi.hoisted(() => ({ app: null as any }));
++vi.mock("../desktop/src/react/hooks/use-hana-fetch.ts", async (importOriginal) => {
++  const original = await importOriginal<Record<string, unknown>>();
++  return {
++    ...original,
++    lingxiFetch: async (url: string, opts?: any) => harness.app.request(url, opts),
++  };
++});
++
++const { useStore } = await import("../desktop/src/react/stores/index.ts");
++const { sessionScopedValue } = await import("../desktop/src/react/stores/session-slice.ts");
++const { buildItemsFromHistory } = await import("../desktop/src/react/utils/history-builder.ts");
++
++interface FixtureEntry {
++  role: string;
++  content?: unknown;
++  stopReason?: string;
++  toolCallId?: string;
++  toolName?: string;
++  details?: Record<string, unknown>;
++}
++
++function writeSession(sessionPath: string, entries: FixtureEntry[]): void {
++  const lines: string[] = [
++    JSON.stringify({
++      type: "session",
++      version: 3,
++      id: "sess_edges",
++      cwd: "/tmp",
++      timestamp: "2026-09-10T09:00:00Z",
++    }),
++  ];
++  let parent: string | null = null;
++  let n = 0;
++  for (const entry of entries) {
++    n += 1;
++    const id = `e${n}`;
++    const message: Record<string, unknown> = { role: entry.role };
++    if (entry.content !== undefined) message.content = entry.content;
++    if (entry.stopReason !== undefined) message.stopReason = entry.stopReason;
++    if (entry.toolCallId !== undefined) message.toolCallId = entry.toolCallId;
++    if (entry.toolName !== undefined) message.toolName = entry.toolName;
++    if (entry.details !== undefined) message.details = entry.details;
++    lines.push(
++      JSON.stringify({
++        type: "message",
++        id,
++        parentId: parent,
++        timestamp: "2026-09-10T10:00:00Z",
++        message,
++      }),
++    );
++    parent = id;
++  }
++  fs.writeFileSync(sessionPath, lines.join("\n"), "utf8");
++}
++
++const THINK = (i: number) => [{ type: "thinking", thinking: `思考 ${i}` }];
++const TOOL = (i: number, name = "probe_tool") => [
++  { type: "thinking", thinking: `思考 ${i}` },
++  { type: "tool_use", id: `tu-${i}`, name, input: {} },
++];
++const TEXT = (text: string, phase: "commentary" | "final_answer" = "final_answer") => [
++  { type: "text", text, ...(phase === "commentary" ? { textSignature: '{"phase":"commentary"}' } : {}) },
++];
++
++async function fetchAllJsonl(sessionPath: string) {
++  const res = await harness.app.request(
++    `/api/sessions/messages?path=${encodeURIComponent(sessionPath)}&all=1`,
++  );
++  expect(res.status).toBe(200);
++  return res.json();
++}
++
++function project(data: any, options?: { openTailRun?: boolean }) {
++  return buildItemsFromHistory(data, options);
++}
++
++function assistantItems(items: any[]) {
++  return items.filter((item) => item.type === "message" && item.data.role === "assistant");
++}
++
++function turnStatusBlocks(message: any) {
++  return (message.data.blocks || []).filter((block: any) => block.type === "turn_status");
++}
++
++describe("历史 Run 结局与跨页身份边界", () => {
++  let agentsDir: string;
++  let sessionPath: string;
++
++  beforeEach(async () => {
++    agentsDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-history-edges-"));
++    sessionPath = path.join(agentsDir, "hana", "sessions", "edges.jsonl");
++    fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
++    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
++    const app = new Hono();
++    app.route(
++      "/api",
++      createSessionsRoute({
++        agentsDir,
++        currentSessionPath: null,
++        isSessionStreaming: () => false,
++        agentIdFromSessionPath: () => "hana",
++        getAgent: () => ({ agentName: "Hana" }),
++        getSessionWorkspaceMount: () => null,
++        getSessionManifest: (id: string) =>
++          id === "sess_edges" ? { currentLocator: { path: sessionPath } } : null,
++      }),
++    );
++    harness.app = app;
++    useStore.setState({ chatSessions: {} } as never);
++  });
++
++  afterEach(() => {
++    fs.rmSync(agentsDir, { recursive: true, force: true });
++  });
++
++  it("T07：真完成但只有过程（思考+工具）→ 恰一个 missing_final_answer，不因有工具豁免", async () => {
++    writeSession(sessionPath, [
++      { role: "user", content: "执行任务" },
++      { role: "assistant", content: THINK(1) },
++      { role: "toolResult", toolCallId: "tu-1", toolName: "probe_tool", details: { ok: true } },
++      { role: "assistant", content: THINK(2) },
++    ]);
++    const items = project(await fetchAllJsonl(sessionPath));
++    const assistants = assistantItems(items);
++    expect(assistants.length).toBe(1);
++    const status = turnStatusBlocks(assistants[0]);
++    expect(status.length).toBe(1);
++    expect(status[0]).toMatchObject({ status: "missing_final_answer" });
++    expect(assistants[0].data.turnProjection.outcome).toBe("completed_without_user_output");
++    expect(assistants[0].data.turnProjection.missingFinalAnswerReason).toBe("only_process_blocks");
++  });
++
++  it("T10a：中间失败后恢复成功 → 整轮完成，不被中间错误放大为失败", async () => {
++    writeSession(sessionPath, [
++      { role: "user", content: "长任务" },
++      { role: "assistant", content: TOOL(1) },
++      { role: "assistant", content: TEXT("第一次尝试失败", "commentary"), stopReason: "error" },
++      { role: "assistant", content: TOOL(2) },
++      { role: "assistant", content: TEXT("最终成功结论") },
++    ]);
++    const items = project(await fetchAllJsonl(sessionPath));
++    const assistants = assistantItems(items);
++    expect(assistants.length).toBe(1);
++    expect(turnStatusBlocks(assistants[0])).toEqual([]);
++    expect(assistants[0].data.turnProjection.outcome).toBe("completed_with_answer");
++  });
++
++  it("T10b：最终失败带部分正文 → failed 终态与部分正文共存", async () => {
++    writeSession(sessionPath, [
++      { role: "user", content: "长任务" },
++      { role: "assistant", content: TOOL(1) },
++      { role: "assistant", content: TEXT("部分结论，但中断了"), stopReason: "error" },
++    ]);
++    const items = project(await fetchAllJsonl(sessionPath));
++    const assistants = assistantItems(items);
++    expect(assistants.length).toBe(1);
++    const status = turnStatusBlocks(assistants[0]);
++    expect(status.length).toBe(1);
++    expect(status[0]).toMatchObject({ status: "failed" });
++    expect(assistants[0].data.turnProjection.outcome).toBe("failed");
++    // 部分正文仍在答案区可见，不被终态块吞掉。
++    const answer = (assistants[0].data.blocks || []).filter(
++      (b: any) => b.type === "text" && b.surfaceRole === "answer",
++    );
++    expect(answer.length).toBe(1);
++    expect(answer[0].source).toContain("部分结论");
++  });
++
++  it("T12：相邻不同 Run（两次用户输入）不误合并，各自持有自己的结局", async () => {
++    writeSession(sessionPath, [
++      { role: "user", content: "第一问" },
++      { role: "assistant", content: THINK(1) }, // run A：过程 only → 一个无回复提示
++      { role: "user", content: "第二问" },
++      { role: "assistant", content: TEXT("第二问的回答") }, // run B：有答案
++    ]);
++    const items = project(await fetchAllJsonl(sessionPath));
++    const assistants = assistantItems(items);
++    expect(assistants.length).toBe(2);
++    expect(turnStatusBlocks(assistants[0]).map((b: any) => b.status)).toEqual(["missing_final_answer"]);
++    expect(turnStatusBlocks(assistants[1])).toEqual([]);
++    expect(assistants[1].data.turnProjection.outcome).toBe("completed_with_answer");
++  });
++
++  it("T06：流仍活跃时（openTailRun）最新 Run 组不派生终态；流结束后同一事实恢复终态", async () => {
++    writeSession(sessionPath, [
++      { role: "user", content: "正在跑的长任务" },
++      { role: "assistant", content: THINK(1) },
++      { role: "assistant", content: THINK(2) },
++    ]);
++    const data = await fetchAllJsonl(sessionPath);
++    const open = assistantItems(project(data, { openTailRun: true }));
++    expect(open.length).toBe(1);
++    expect(turnStatusBlocks(open[0])).toEqual([]);
++    expect(open[0].data.turnProjection.outcome).toBeUndefined();
++
++    const settled = assistantItems(project(data));
++    expect(turnStatusBlocks(settled[0]).map((b: any) => b.status)).toEqual(["missing_final_answer"]);
++  });
++
++  it("T14：文件 blocks 随 Run 片段缝合归属正确、跨页不重复", async () => {
++    // 一个 Run：[思考+工具+stage_files 文件产出, ...(若干记录)..., 最终答案]，
++    // 限页 4 强制跨页；文件块锚定第 2 条助手记录。
++    const entries: FixtureEntry[] = [{ role: "user", content: "生成文件并总结" }];
++    for (let i = 1; i <= 6; i += 1) {
++      if (i === 2) {
++        entries.push({
++          role: "assistant",
++          content: [
++            { type: "thinking", thinking: "准备产出文件" },
++            { type: "tool_use", id: "tu-2", name: "stage_files", input: {} },
++          ],
++        });
++        entries.push({
++          role: "toolResult",
++          toolCallId: "tu-2",
++          toolName: "stage_files",
++          details: { files: [{ filePath: "/tmp/report.md", label: "report.md", ext: "md" }] },
++        });
++      } else if (i === 6) {
++        entries.push({ role: "assistant", content: TEXT("总结：文件已生成。") });
++      } else {
++        entries.push({ role: "assistant", content: THINK(i) });
++      }
++    }
++    writeSession(sessionPath, entries);
++
++    // 手动镜像 loadMessages/loadMoreMessages 的分页驱动（limit=4 强制切页）。
++    const fetchPage = async (before?: string) => {
++      const q = new URLSearchParams({ path: sessionPath, limit: "4" });
++      if (before) q.set("before", before);
++      const res = await harness.app.request(`/api/sessions/messages?${q}`);
++      expect(res.status).toBe(200);
++      return res.json();
++    };
++    const first = await fetchPage();
++    useStore.getState().initSession(sessionPath, buildItemsFromHistory(first), first.hasMore ?? false, null, first.nextBefore ?? undefined);
++    let guard = 0;
++    for (;;) {
++      guard += 1;
++      if (guard > 20) throw new Error("分页失控");
++      const state: any = useStore.getState();
++      const session: any = sessionScopedValue(state, state.chatSessions, sessionPath);
++      if (!session?.hasMore) break;
++      const page = await fetchPage(session.nextBefore ?? session.oldestId ?? undefined);
++      useStore.getState().prependItems(sessionPath, buildItemsFromHistory(page), page.hasMore ?? false, page.nextBefore ?? undefined);
++    }
++
++    const state: any = useStore.getState();
++    const session: any = sessionScopedValue(state, state.chatSessions, sessionPath);
++    const assistants = assistantItems(session.items);
++    expect(assistants.length).toBe(1);
++    const fileBlocks = (assistants[0].data.blocks || []).filter((b: any) => b.type === "file");
++    expect(fileBlocks.length).toBe(1);
++    expect(fileBlocks[0].filePath).toBe("/tmp/report.md");
++
++    // 与全量恢复逐块等价。
++    const full = assistantItems(project(await fetchAllJsonl(sessionPath)));
++    expect(full.length).toBe(1);
++    expect(assistants[0].data.blocks.map((b: any) => [b.id, b.type])).toEqual(
++      full[0].data.blocks.map((b: any) => [b.id, b.type]),
++    );
++  });
++});
 diff --git a/tests/knowledge-vector-shutdown.test.ts b/tests/knowledge-vector-shutdown.test.ts
 index 2c1aaf486843452de64ce568ffafea97eb329336..4e80e5d98756b69bfedc03bb5c4e58ec8a7fc4d8 100644
 --- a/tests/knowledge-vector-shutdown.test.ts
@@ -11889,6 +14140,653 @@ index 8eeb539ef52a9b5bfe1ce22b5a223363e5ca0d34..997a587e211cf14d456cd78d7adbf5b3
      expect(probe(enabledAgent)).toMatchObject({
        available: false,
        reason: "mcp_connector_stopped",
+diff --git a/tests/model-observability-schema-v2.test.ts b/tests/model-observability-schema-v2.test.ts
+index cb359d66cc872ba23130c45da03bcf6fa4ec1ec8..102accc37e1396fe1cdd8aad8b0780ab37662b55 100644
+--- a/tests/model-observability-schema-v2.test.ts
++++ b/tests/model-observability-schema-v2.test.ts
+@@ -69,8 +69,8 @@ describe("Model Observability Schema 版本迁移", () => {
+   it("fresh v5：usage projection、explicit correlation 与来源快照表存在", () => {
+     const db = openModelObservabilityDatabase(modelObservabilityDbPath(home));
+     try {
+-      expect(readModelObservabilitySchemaVersion(db)).toBe(6);
+-      expect(MODEL_OBSERVABILITY_SCHEMA_VERSION).toBe(6);
++      expect(readModelObservabilitySchemaVersion(db)).toBe(7);
++      expect(MODEL_OBSERVABILITY_SCHEMA_VERSION).toBe(7);
+       const table = db.prepare(
+         `SELECT 1 FROM sqlite_master WHERE type='table' AND name='model_call_usage'`,
+       ).get();
+@@ -116,7 +116,7 @@ describe("Model Observability Schema 版本迁移", () => {
+     // ③ write 侧打开 → 同一个 migration transaction 推进到 v4。
+     const db = openModelObservabilityDatabase(modelObservabilityDbPath(home));
+     try {
+-      expect(readModelObservabilitySchemaVersion(db)).toBe(6);
++      expect(readModelObservabilitySchemaVersion(db)).toBe(7);
+       const trace = db.prepare(`SELECT * FROM traces WHERE trace_id = 'mt_v1'`).get();
+       expect(trace).toMatchObject({ trace_id: "mt_v1", origin: "user_turn" });
+       const call = db.prepare(`SELECT * FROM model_calls WHERE call_id = 'mc_v1'`).get();
+@@ -185,7 +185,7 @@ describe("Model Observability Schema 版本迁移", () => {
+ 
+     const migrated = openModelObservabilityDatabase(modelObservabilityDbPath(home));
+     try {
+-      expect(readModelObservabilitySchemaVersion(migrated)).toBe(6);
++      expect(readModelObservabilitySchemaVersion(migrated)).toBe(7);
+       expect(migrated.prepare(`SELECT * FROM model_calls WHERE call_id = 'mc_v2_preserved'`).get())
+         .toMatchObject({ call_id: "mc_v2_preserved", usage_correlation_state: null });
+       expect(migrated.prepare(`SELECT total_tokens FROM model_call_usage WHERE model_call_id = 'mc_v2_preserved'`).get())
+@@ -229,20 +229,20 @@ describe("Model Observability Schema 版本迁移", () => {
+ 
+     // 失败没有留下脏状态；后续用真实 adapter 可正常完成迁移。
+     const recovered = openModelObservabilityDatabase(modelObservabilityDbPath(home));
+-    expect(readModelObservabilitySchemaVersion(recovered)).toBe(6);
++    expect(readModelObservabilitySchemaVersion(recovered)).toBe(7);
+     recovered.close();
+     expect(fs.existsSync(modelObservabilityDbPath(home))).toBe(true);
+   });
+ 
+-  it("unknown higher schema（v7）：write 打开抛 schema_newer，read 侧 unavailable", () => {
++  it("unknown higher schema（v8）：write 打开抛 schema_newer，read 侧 unavailable", () => {
+     const db = openModelObservabilityDatabase(modelObservabilityDbPath(home));
+-    db.pragma("user_version = 7");
++    db.pragma("user_version = 8");
+     db.close();
+     expect(() => openModelObservabilityDatabase(modelObservabilityDbPath(home)))
+       .toThrowError(ModelObservabilitySchemaError);
+     const readOnly = openModelObservabilityReadDatabase(modelObservabilityDbPath(home));
+     expect(readOnly.status).toBe("schema_newer");
+-    expect(readOnly.schemaVersion).toBe(7);
++    expect(readOnly.schemaVersion).toBe(8);
+     expect(readOnly.db).toBeNull();
+   });
+ 
+diff --git a/tests/model-observability-session-trace-identity.test.ts b/tests/model-observability-session-trace-identity.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..f9bbfc5c2c2f9fb0b750f623bf7523dccc32ed76
+--- /dev/null
++++ b/tests/model-observability-session-trace-identity.test.ts
+@@ -0,0 +1,438 @@
++/**
++ * 会话级轨迹复用的「双身份」生产接线回归（2026-09-10）。
++ *
++ * 背景：Lingxi 业务会话 ID（session manifest，`sess_...`）与 Pi SDK 会话文件头
++ * UUID（uuidv7，`SessionManager.getSessionId()`）是两套独立身份（c9494ae9 加固）。
++ * 2026-09-05 的会话级轨迹复用（df2d91a8）把复用查找键错接到 SDK UUID 上，而
++ * attribution/内存索引/SQL 全部按业务会话 ID 写入——真实桌面上两个值从不相等，
++ * 复用查找结构性零命中，同一桌面会话每轮重新铸根。旧的复用测试用同一个字符串
++ * 同时扮演两种身份，制造了假阳性。
++ *
++ * 本文件用真实生产组合锁死不变量：
++ *
++ *   desktop prompt → SessionCoordinator（真实）→ session manifest（真实业务 ID）
++ *   → installModelCallStreamObserver（真实接点）→ persistence（真实安装）
++ *   → query service（真实读取）
++ *
++ * 只 mock pi-sdk 包入口（createAgentSession/SessionManager），fake session 的
++ * SDK UUID 与 manifest 业务 ID 故意不同。
++ */
++import fs from "fs";
++import os from "os";
++import path from "path";
++import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
++import { createAssistantMessageEventStream } from "@earendil-works/pi-ai";
++
++const {
++  createAgentSessionMock,
++  sessionManagerCreateMock,
++  sessionManagerOpenMock,
++} = vi.hoisted(() => ({
++  createAgentSessionMock: vi.fn(),
++  sessionManagerCreateMock: vi.fn(),
++  sessionManagerOpenMock: vi.fn(),
++}));
++
++vi.mock("../lib/pi-sdk/index.js", () => ({
++  createAgentSession: createAgentSessionMock,
++  createExtensionRuntime: vi.fn(),
++  SessionManager: {
++    create: sessionManagerCreateMock,
++    open: sessionManagerOpenMock,
++    list: vi.fn(async () => []),
++  },
++  SettingsManager: { inMemory: vi.fn(() => ({})) },
++  estimateTokens: vi.fn(() => 0),
++  emitSessionShutdown: vi.fn(async () => false),
++  refreshSessionModelFromRegistry: vi.fn((session: any, model: any) => {
++    session.model = model;
++    return true;
++  }),
++  resizeModelImageInput: vi.fn(async (image: unknown) => image),
++  formatModelImageDimensionNote: vi.fn(() => undefined),
++}));
++
++vi.mock("../lib/debug-log.js", () => ({
++  createModuleLogger: () => ({
++    log: vi.fn(),
++    warn: vi.fn(),
++    error: vi.fn(),
++  }),
++}));
++
++import { SessionCoordinator } from "../core/session-coordinator.ts";
++import { SessionManifestStore } from "../core/session-manifest/store.ts";
++import {
++  installModelCallStreamObserver,
++  installModelCallTraceIngress,
++} from "../lib/pi-sdk/model-call-stream-observer.ts";
++import { createModelObservabilityTestHarness } from "../lib/llm/model-observability-testing.ts";
++import {
++  installModelObservabilityPersistence,
++  type ModelObservabilityPersistenceHandle,
++} from "../lib/llm/model-observability-persistence.ts";
++import { createModelObservabilityQueryService } from "../lib/llm/model-observability-query.ts";
++import { normalizeModelObservabilityTraceQuery } from "../lib/llm/model-observability-query-types.ts";
++
++const MODEL = { id: "test-model", provider: "test", name: "Test Model" };
++
++/** uuidv7 形态的 SDK 文件头身份——与 sess_ 业务身份绝不相同。 */
++const SDK_UUID_FOCUS = "0192b7c4-3f2a-7e1d-9c4b-2a8f6d5e4c3b";
++const SDK_UUID_RESTORED = "0192b7c4-ffff-7e1d-9c4b-2a8f6d5e4c3b";
++
++function assistantStream(fail = false) {
++  const stream = createAssistantMessageEventStream();
++  queueMicrotask(() => {
++    const message = {
++      role: "assistant",
++      content: [{ type: "text", text: "ok" }],
++      api: "openai-completions",
++      provider: "test",
++      model: "test-model",
++      usage: { input: 10, output: 5, cacheRead: 0, cacheWrite: 0, totalTokens: 15 },
++      stopReason: fail ? "error" : "stop",
++      errorMessage: fail ? "provider exploded" : undefined,
++      timestamp: Date.now(),
++    };
++    if (fail) stream.push({ type: "error", reason: "error", error: message } as any);
++    else stream.push({ type: "done", reason: "stop", message } as any);
++    stream.end();
++  });
++  return stream;
++}
++
++/** fake SDK SessionManager：SDK 文件头 UUID 与业务会话 ID 故意分离。 */
++function fakeSdkSessionManager({ sessionPath, sdkSessionId, cwd }: {
++  sessionPath: string;
++  sdkSessionId: string;
++  cwd: string;
++}) {
++  return {
++    getSessionFile: () => sessionPath,
++    getSessionId: () => sdkSessionId,
++    getCwd: () => cwd,
++    getEntries: () => [],
++    getBranch: () => [],
++    getLeafId: () => null,
++    getEntry: () => null,
++    resetLeaf: vi.fn(),
++    branch: vi.fn(),
++    fileEntries: [],
++    buildSessionContext: () => ({ model: null }),
++    // 测试钩子：置 true 时下一轮 provider 流以 error 终态返回。
++    __failNext: false,
++  };
++}
++
++/**
++ * fake AgentSession：prompt() 内部经真实 installModelCallStreamObserver 包装的
++ * streamFunction 走一轮模型调用——与生产 lib/pi-sdk/index.ts createAgentSession
++ * 安装的接点完全一致（observer + trace ingress 都是真实模块）。
++ */
++function buildFakeAgentSession({ manager, model }: { manager: any; model: any }) {
++  const session: any = {
++    sessionManager: manager,
++    model,
++    isStreaming: false,
++    isCompacting: false,
++    subscribe: vi.fn(() => vi.fn()),
++    setActiveToolsByName: vi.fn(),
++    agent: {
++      // 测试可按 manager.__failNext = true 让下一轮 provider 失败。
++      streamFunction: async () => {
++        const fail = manager.__failNext === true;
++        manager.__failNext = false;
++        return assistantStream(fail);
++      },
++      state: { tools: [] },
++    },
++  };
++  session.prompt = async function prompt() {
++    const stream = await session.agent.streamFunction(
++      session.model,
++      { systemPrompt: "BASE", messages: [] },
++      {},
++    );
++    await stream.result();
++  };
++  installModelCallStreamObserver(session);
++  installModelCallTraceIngress(session);
++  return session;
++}
++
++/** 等 observer 的 result().then 终态观察与队列入队跑完。 */
++async function settleObserver() {
++  await new Promise((resolve) => setImmediate(resolve));
++  await new Promise((resolve) => setImmediate(resolve));
++  await new Promise((resolve) => setImmediate(resolve));
++}
++
++describe("模型观测会话轨迹：业务会话 ID ≠ SDK UUID 的真实生产接线", () => {
++  let tempDir: string;
++  let agentsDir: string;
++  let sessionDir: string;
++  let lingxiHome: string;
++  let store: SessionManifestStore | null;
++  let harness: ReturnType<typeof createModelObservabilityTestHarness>;
++  let currentHandle: ModelObservabilityPersistenceHandle;
++  let service: ReturnType<typeof createModelObservabilityQueryService>;
++  let reuseLookupKeys: Array<string | null>;
++  let manifestIdCounter: number;
++  let sdkFileCounter: number;
++
++  const agent = {
++    id: "hana",
++    agentName: "Hana",
++    name: "Hana",
++    get agentDir() { return path.join(agentsDir, "hana"); },
++    get sessionDir() { return sessionDir; },
++    memoryMasterEnabled: true,
++    sessionMemoryEnabled: true,
++    config: {},
++    tools: [],
++    buildSystemPrompt: vi.fn(() => "system"),
++  };
++
++  function buildCoordinator() {
++    return new SessionCoordinator({
++      agentsDir,
++      getAgent: () => agent,
++      getActiveAgentId: () => "hana",
++      getModels: () => ({
++        currentModel: MODEL,
++        availableModels: [MODEL],
++        authStorage: {},
++        modelRegistry: {},
++        resolveThinkingLevel: (level: unknown) => level || "medium",
++      }),
++      getResourceLoader: () => ({
++        getSystemPrompt: () => "BASE",
++        getAppendSystemPrompt: () => [],
++        getExtensions: () => ({ extensions: [], errors: [] }),
++        getSkills: () => ({ skills: [], diagnostics: [] }),
++        getAgentsFiles: () => ({ agentsFiles: [] }),
++      }),
++      getSkills: () => null,
++      buildTools: () => ({ tools: [], customTools: [] }),
++      emitEvent: vi.fn(),
++      emitDevLog: vi.fn(),
++      getHomeCwd: () => tempDir,
++      agentIdFromSessionPath: () => "hana",
++      switchAgentOnly: async () => {},
++      getConfig: () => ({}),
++      getPrefs: () => ({
++        getThinkingLevel: () => "medium",
++        getChannelsEnabled: () => true,
++      }),
++      getAgents: () => new Map(),
++      getActivityStore: () => null,
++      getAgentById: () => agent,
++      listAgents: () => [agent],
++      sessionManifestStore: store,
++      // 与 core/engine.ts 生产 wiring 一致的复用查找委托。
++      resolveSessionReusableTraceId: (sessionId: string | null) => {
++        reuseLookupKeys.push(sessionId);
++        return currentHandle.findReusableSessionTraceId(sessionId);
++      },
++    });
++  }
++
++  function queryTraces() {
++    const normalized = normalizeModelObservabilityTraceQuery({ filter: {}, minCallCount: 1 });
++    if (normalized.ok !== true) throw new Error(`normalize failed: ${JSON.stringify(normalized)}`);
++    const page = service.queryTraces(normalized.value);
++    if (page.ok !== true) throw new Error(`queryTraces failed: ${JSON.stringify(page)}`);
++    return page.value;
++  }
++
++  function businessSessionIdOf(coordinator: any, sessionPath: string) {
++    return coordinator._getSessionEntryByPath(sessionPath)?.sessionId || null;
++  }
++
++  beforeEach(() => {
++    vi.clearAllMocks();
++    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-obs-trace-identity-"));
++    agentsDir = path.join(tempDir, "agents");
++    sessionDir = path.join(agentsDir, "hana", "sessions");
++    fs.mkdirSync(sessionDir, { recursive: true });
++    lingxiHome = path.join(tempDir, "lingxi-home");
++    fs.mkdirSync(lingxiHome, { recursive: true });
++    manifestIdCounter = 0;
++    sdkFileCounter = 0;
++    reuseLookupKeys = [];
++    store = new SessionManifestStore({
++      dbPath: path.join(tempDir, "session-manifest.db"),
++      idGenerator: () => `sess_business_${String(++manifestIdCounter).padStart(4, "0")}`,
++    });
++    harness = createModelObservabilityTestHarness({ lingxiHome });
++    currentHandle = harness.handle;
++    service = createModelObservabilityQueryService({ lingxiHome });
++
++    sessionManagerCreateMock.mockImplementation((cwd: string, dir: string) => {
++      sdkFileCounter += 1;
++      return fakeSdkSessionManager({
++        sessionPath: path.join(dir, `2026-09-10T10-00-0${sdkFileCounter}_sdk-file.jsonl`),
++        sdkSessionId: SDK_UUID_FOCUS,
++        cwd: cwd || tempDir,
++      });
++    });
++    createAgentSessionMock.mockImplementation(async (opts: any) => ({
++      session: buildFakeAgentSession({ manager: opts.sessionManager, model: opts.model || MODEL }),
++    }));
++  });
++
++  afterEach(async () => {
++    service?.close?.();
++    await harness.close();
++    harness.cleanup();
++    try { store?.close(); } catch { /* best-effort */ }
++    fs.rmSync(tempDir, { recursive: true, force: true });
++  });
++
++  it("T1/T2/T3：同一桌面会话连续三轮 prompt（未等 flush）→ 一个轨迹、三个根调用", async () => {
++    const coordinator = buildCoordinator();
++    const created = await coordinator.createSession(null, tempDir, true);
++    const sessionPath = created.session.sessionManager.getSessionFile();
++    const businessSessionId = businessSessionIdOf(coordinator, sessionPath);
++    expect(businessSessionId).toBe("sess_business_0001");
++    // 双身份事实前提：SDK 文件头身份与业务会话身份必须不同。
++    expect(created.session.sessionManager.getSessionId()).toBe(SDK_UUID_FOCUS);
++    expect(created.session.sessionManager.getSessionId()).not.toBe(businessSessionId);
++
++    // 三轮紧跟，全程不做 durable flush——热路径复用必须走内存索引。
++    await coordinator.prompt("第一轮", undefined);
++    await settleObserver();
++    await coordinator.prompt("第二轮", undefined);
++    await settleObserver();
++    await coordinator.prompt("第三轮", undefined);
++    await settleObserver();
++    harness.flush();
++
++    // 复用查找必须按业务会话 ID 发起（且每轮都查过）。
++    expect(reuseLookupKeys).toHaveLength(3);
++    for (const key of reuseLookupKeys) expect(key).toBe(businessSessionId);
++
++    const page = queryTraces();
++    expect(page.traces).toHaveLength(1);
++    const trace = page.traces[0]!;
++    expect(trace.origin).toBe("user_turn");
++    expect(trace.callCount).toBe(3);
++    expect(trace.terminalOk).toBe(3);
++
++    // 三轮各自是独立根调用（不跨轮伪造 parentCallId），归属同一业务会话；
++    // Trace Detail 一次返回三轮调用（T12 数据层契约）。
++    const detail = service.queryTraceDetail(trace.traceId);
++    if (detail.ok !== true) throw new Error(`queryTraceDetail failed: ${JSON.stringify(detail)}`);
++    expect(detail.value.calls).toHaveLength(3);
++    for (const call of detail.value.calls) {
++      expect(call.parentCallId).toBeNull();
++      expect(call.attribution?.sessionId).toBe(businessSessionId);
++    }
++  });
++
++  it("T5：运行时重建（restore）后 SDK 身份变化，同一业务会话仍复用原轨迹", async () => {
++    const coordinator = buildCoordinator();
++    const created = await coordinator.createSession(null, tempDir, true);
++    const sessionPath = created.session.sessionManager.getSessionFile();
++    const businessSessionId = businessSessionIdOf(coordinator, sessionPath);
++
++    await coordinator.prompt("第一轮", undefined);
++    await settleObserver();
++    harness.flush();
++
++    // ── 模拟应用重启：观测 handle 重开（内存索引清空）+ manifest store 重开
++    // （同一 dbPath）+ 新 coordinator；恢复出的 SDK 会话身份故意换一个 UUID。 ──
++    await harness.handle.close();
++    const reopenedHandle = installModelObservabilityPersistence({
++      lingxiHome,
++      policy: { enabled: true, persistPayloads: true, persistBlobs: true },
++    });
++    currentHandle = reopenedHandle;
++    try { store?.close(); } catch { /* best-effort */ }
++    store = new SessionManifestStore({
++      dbPath: path.join(tempDir, "session-manifest.db"),
++      idGenerator: () => `sess_business_${String(++manifestIdCounter).padStart(4, "0")}`,
++    });
++    sessionManagerOpenMock.mockImplementation((p: string) => fakeSdkSessionManager({
++      sessionPath: p,
++      sdkSessionId: SDK_UUID_RESTORED,
++      cwd: tempDir,
++    }));
++    const restarted = buildCoordinator();
++    await restarted.ensureSessionLoaded(sessionPath);
++    const restoredEntry = restarted._getSessionEntryByPath(sessionPath);
++    expect(restoredEntry?.sessionId).toBe(businessSessionId);
++    expect(restoredEntry?.session?.sessionManager?.getSessionId()).toBe(SDK_UUID_RESTORED);
++
++    await restarted.promptSession(sessionPath, "重启后的第二轮", undefined);
++    await settleObserver();
++    reopenedHandle.flushSync();
++
++    const page = queryTraces();
++    expect(page.traces).toHaveLength(1);
++    expect(page.traces[0]).toMatchObject({ origin: "user_turn", callCount: 2, terminalOk: 2 });
++    await reopenedHandle.close();
++  });
++
++  it("T9：失败轮次计入同一轨迹 terminalError，后续轮继续复用", async () => {
++    const coordinator = buildCoordinator();
++    const created = await coordinator.createSession(null, tempDir, true);
++    const sessionPath = created.session.sessionManager.getSessionFile();
++    const businessSessionId = businessSessionIdOf(coordinator, sessionPath);
++
++    await coordinator.prompt("第一轮", undefined);
++    await settleObserver();
++    // 第二轮 provider 失败。
++    (created.session.sessionManager as any).__failNext = true;
++    await coordinator.prompt("第二轮", undefined);
++    await settleObserver();
++    await coordinator.prompt("第三轮", undefined);
++    await settleObserver();
++    harness.flush();
++
++    const page = queryTraces();
++    expect(page.traces).toHaveLength(1);
++    expect(page.traces[0]).toMatchObject({
++      origin: "user_turn",
++      callCount: 3,
++      terminalOk: 2,
++      terminalError: 1,
++    });
++    // 失败轮之后复用查找仍命中同一轨迹（以业务会话 ID）。
++    expect(currentHandle.findReusableSessionTraceId(businessSessionId)).toBe(page.traces[0]!.traceId);
++  });
++
++  it("T4/T6：不同业务会话即使 SDK 身份相同也绝不共享轨迹", async () => {
++    const coordinator = buildCoordinator();
++    const first = await coordinator.createSession(null, tempDir, true);
++    const firstPath = first.session.sessionManager.getSessionFile();
++    const firstBusinessId = businessSessionIdOf(coordinator, firstPath);
++
++    // 第二个业务会话：SDK 侧复用同一 UUID（runtime 对象碰巧复用的极端情形），
++    // 业务 manifest 身份必须仍然区分两条轨迹。
++    await coordinator.prompt("会话 A 第一轮", undefined);
++    await settleObserver();
++
++    const second = await coordinator.createSession(null, tempDir, true);
++    const secondPath = second.session.sessionManager.getSessionFile();
++    const secondBusinessId = businessSessionIdOf(coordinator, secondPath);
++    expect(secondBusinessId).not.toBe(firstBusinessId);
++    expect(second.session.sessionManager.getSessionId()).toBe(SDK_UUID_FOCUS);
++
++    await coordinator.prompt("会话 B 第一轮", undefined);
++    await settleObserver();
++    harness.flush();
++
++    const page = queryTraces();
++    expect(page.traces).toHaveLength(2);
++    const byTraceId = new Map(page.traces.map((trace) => [trace.traceId, trace]));
++    expect(byTraceId.size).toBe(2);
++    const detailCalls = [...byTraceId.keys()].flatMap((traceId) => {
++      const detail = service.queryTraceDetail(traceId);
++      if (detail.ok !== true) throw new Error("queryTraceDetail failed");
++      return detail.value.calls;
++    });
++    const sessionIds = new Set(detailCalls.map((call) => call.attribution?.sessionId));
++    expect(sessionIds).toEqual(new Set([firstBusinessId, secondBusinessId]));
++  });
++});
+diff --git a/tests/model-observability-store-schema.test.ts b/tests/model-observability-store-schema.test.ts
+index 5de5f805d0a066c852b2a595f5bc4d84632304ce..3c6201083523a5f9d39c59d44c0ade6716ff1068 100644
+--- a/tests/model-observability-store-schema.test.ts
++++ b/tests/model-observability-store-schema.test.ts
+@@ -71,7 +71,7 @@ describe("Model Observability Store Schema", () => {
+     const db = openModelObservabilityDatabase(modelObservabilityDbPath(home));
+     try {
+       expect(readModelObservabilitySchemaVersion(db)).toBe(MODEL_OBSERVABILITY_SCHEMA_VERSION);
+-      expect(MODEL_OBSERVABILITY_SCHEMA_VERSION).toBe(6);
++      expect(MODEL_OBSERVABILITY_SCHEMA_VERSION).toBe(7);
+       expect(db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='source_identity_snapshots'`).get()).toBeTruthy();
+       const callColumns = db.prepare(`PRAGMA table_info(model_calls)`).all()
+         .map((row: any) => row.name);
+@@ -112,7 +112,7 @@ describe("Model Observability Store Schema", () => {
+ 
+   it("未知高版本数据库：schema_newer，文件保留不重建（§二十七）", () => {
+     const db = openModelObservabilityDatabase(modelObservabilityDbPath(home));
+-    db.pragma("user_version = 7");
++    db.pragma("user_version = 8");
+     db.close();
+     const dbPath = modelObservabilityDbPath(home);
+     const sizeBefore = fs.statSync(dbPath).size;
+@@ -162,8 +162,8 @@ describe("Model Observability Store Schema", () => {
+     expect(fs.existsSync(path.join(home, "model-observability"))).toBe(false);
+   });
+ 
+-  it("v4→v6 迁移：同会话轨迹合并为一行、非会话轨迹不动、幂等", () => {
+-    // 造一个 v4 旧库：表结构与 v6 相同（v5/v6 纯数据整合无 DDL），只降 user_version。
++  it("v4→v7 迁移：同会话轨迹合并为一行、非会话轨迹不动、幂等", () => {
++    // 造一个 v4 旧库：表结构与 v6/v7 相同（v5/v6/v7 纯数据整合无 DDL），只降 user_version。
+     const seed = openModelObservabilityDatabase(modelObservabilityDbPath(home));
+     seed.pragma("user_version = 4");
+     const insertTrace = seed.prepare(
+@@ -194,7 +194,7 @@ describe("Model Observability Store Schema", () => {
+ 
+     const migrated = openModelObservabilityDatabase(modelObservabilityDbPath(home));
+     try {
+-      expect(readModelObservabilitySchemaVersion(migrated)).toBe(6);
++      expect(readModelObservabilitySchemaVersion(migrated)).toBe(7);
+       const traces = migrated.prepare(`SELECT * FROM traces ORDER BY trace_id`).all();
+       expect(traces.map((row: any) => row.trace_id)).toEqual(["mt_a", "mt_aux", "mt_bg", "mt_c"]);
+       const merged = traces.find((row: any) => row.trace_id === "mt_a");
+@@ -217,7 +217,7 @@ describe("Model Observability Store Schema", () => {
+     // 幂等：再次打开数据不变。
+     const again = openModelObservabilityDatabase(modelObservabilityDbPath(home));
+     try {
+-      expect(readModelObservabilitySchemaVersion(again)).toBe(6);
++      expect(readModelObservabilitySchemaVersion(again)).toBe(7);
+       expect(again.prepare(`SELECT COUNT(*) AS n FROM traces`).get()).toEqual({ n: 4 });
+       expect(again.prepare(`SELECT COUNT(*) AS n FROM model_calls WHERE trace_id = 'mt_a'`).get())
+         .toEqual({ n: 3 });
+@@ -226,6 +226,93 @@ describe("Model Observability Store Schema", () => {
+     }
+   });
+ 
++  it("v6→v7 修复迁移：v6 之后因复用身份错位继续拆分的同会话轨迹重新收拢（不丢 attempts/payload/usage，幂等）", () => {
++    // 构造「已是 v6」的库：v6 历史合并早已跑完，但 2026-09-05～09-10 期间实时
++    // 复用查找错用 SDK 文件头 UUID（写入侧是 manifest 业务会话 ID），同一业务
++    // 会话 sess_biz_x 的三轮各自铸根；另一个业务会话 sess_biz_y 与 singleton
++    // 辅助轨迹不得被波及。
++    const seed = openModelObservabilityDatabase(modelObservabilityDbPath(home));
++    seed.pragma("user_version = 6");
++    const insertTrace = seed.prepare(
++      `INSERT INTO traces (trace_id, origin, first_seen_at, last_seen_at, call_count, created_at, updated_at)
++       VALUES (?, ?, ?, ?, ?, '2026-09-06T00:00:00Z', '2026-09-06T00:00:00Z')`,
++    );
++    const insertCall = seed.prepare(
++      `INSERT INTO model_calls (call_id, trace_id, session_id, started_at, ended_at, terminal_status)
++       VALUES (?, ?, ?, ?, ?, ?)`,
++    );
++    const insertAttempt = seed.prepare(
++      `INSERT INTO model_attempts (attempt_id, call_id, started_at) VALUES (?, ?, ?)`,
++    );
++    const insertPayload = seed.prepare(
++      `INSERT INTO payload_records (call_id, kind, captured_at, visibility, fidelity, sanitization_status, redacted, truncated, degraded)
++       VALUES (?, 'semantic_request', ?, 'full', 'exact', 'clean', 0, 0, 0)`,
++    );
++    const insertUsage = seed.prepare(
++      `INSERT INTO model_call_usage (model_call_id, usage_status, total_tokens, created_at, updated_at)
++       VALUES (?, 'ok', ?, '2026-09-06T00:00:00Z', '2026-09-06T00:00:00Z')`,
++    );
++    insertTrace.run("mt_r1", "user_turn", "2026-09-06T10:00:00Z", "2026-09-06T10:01:00Z", 1);
++    insertTrace.run("mt_r2", "user_turn", "2026-09-07T10:00:00Z", "2026-09-07T10:01:00Z", 1);
++    insertTrace.run("mt_r3", "user_turn", "2026-09-08T10:00:00Z", "2026-09-08T10:01:00Z", 1);
++    insertTrace.run("mt_other", "user_turn", "2026-09-08T11:00:00Z", "2026-09-08T11:01:00Z", 1);
++    insertTrace.run("mt_singleton", null, "2026-09-08T12:00:00Z", "2026-09-08T12:01:00Z", 1);
++    insertCall.run("mc_r1", "mt_r1", "sess_biz_x", "2026-09-06T10:00:00Z", "2026-09-06T10:01:00Z", "ok");
++    insertCall.run("mc_r2", "mt_r2", "sess_biz_x", "2026-09-07T10:00:00Z", "2026-09-07T10:01:00Z", "error");
++    insertCall.run("mc_r3", "mt_r3", "sess_biz_x", "2026-09-08T10:00:00Z", "2026-09-08T10:01:00Z", "ok");
++    insertCall.run("mc_other", "mt_other", "sess_biz_y", "2026-09-08T11:00:00Z", "2026-09-08T11:01:00Z", "ok");
++    insertCall.run("mc_singleton", "mt_singleton", "sess_biz_x", "2026-09-08T12:00:00Z", "2026-09-08T12:01:00Z", "ok");
++    insertAttempt.run("ma_r1", "mc_r1", "2026-09-06T10:00:00Z");
++    insertAttempt.run("ma_r2", "mc_r2", "2026-09-07T10:00:00Z");
++    insertPayload.run("mc_r1", "2026-09-06T10:00:01Z");
++    insertPayload.run("mc_r3", "2026-09-08T10:00:01Z");
++    insertUsage.run("mc_r1", 11);
++    insertUsage.run("mc_r2", 22);
++    insertUsage.run("mc_r3", 33);
++    seed.close();
++
++    const repaired = openModelObservabilityDatabase(modelObservabilityDbPath(home));
++    try {
++      expect(readModelObservabilitySchemaVersion(repaired)).toBe(7);
++      const traces = repaired.prepare(`SELECT * FROM traces ORDER BY trace_id`).all();
++      // 同会话三轮收拢到最早的 canonical 轨迹；其他会话与 singleton 原样保留。
++      expect(traces.map((row: any) => row.trace_id)).toEqual(["mt_other", "mt_r1", "mt_singleton"]);
++      expect(traces.find((row: any) => row.trace_id === "mt_r1")).toMatchObject({
++        origin: "user_turn",
++        call_count: 3,
++        first_seen_at: "2026-09-06T10:00:00Z",
++        last_seen_at: "2026-09-08T10:01:00Z",
++      });
++      expect(repaired.prepare(
++        `SELECT call_id, trace_id FROM model_calls ORDER BY call_id`,
++      ).all()).toEqual([
++        { call_id: "mc_other", trace_id: "mt_other" },
++        { call_id: "mc_r1", trace_id: "mt_r1" },
++        { call_id: "mc_r2", trace_id: "mt_r1" },
++        { call_id: "mc_r3", trace_id: "mt_r1" },
++        { call_id: "mc_singleton", trace_id: "mt_singleton" },
++      ]);
++      // 事实零丢失：attempts / payload / usage 关联不随 trace_id 改指而消失。
++      expect(repaired.prepare(`SELECT COUNT(*) AS n FROM model_attempts`).get()).toEqual({ n: 2 });
++      expect(repaired.prepare(`SELECT COUNT(*) AS n FROM payload_records`).get()).toEqual({ n: 2 });
++      expect(repaired.prepare(
++        `SELECT SUM(total_tokens) AS total FROM model_call_usage`,
++      ).get()).toEqual({ total: 66 });
++    } finally {
++      repaired.close();
++    }
++
++    // 幂等：修复后再次打开不再改变任何数据。
++    const again = openModelObservabilityDatabase(modelObservabilityDbPath(home));
++    try {
++      expect(again.prepare(`SELECT COUNT(*) AS n FROM traces`).get()).toEqual({ n: 3 });
++      expect(again.prepare(`SELECT call_count FROM traces WHERE trace_id = 'mt_r1'`).get())
++        .toEqual({ call_count: 3 });
++    } finally {
++      again.close();
++    }
++  });
++
+   it("persistBlobs 不得脱离 persistPayloads（§八十三）", () => {
+     const handle = installModelObservabilityPersistence({
+       lingxiHome: home,
 diff --git a/tests/pinned-tenets-migration-recovery.test.ts b/tests/pinned-tenets-migration-recovery.test.ts
 index f415f1a7f38a323fc7abefe94900d05a3ae28b0d..6e3bcfff0dcffc5d4906b9be678e4ec3b221762e 100644
 --- a/tests/pinned-tenets-migration-recovery.test.ts
@@ -12109,7 +15007,7 @@ index 233f76e98a17abd3fb3265c1a2227b19408491c4..dfdb9b30b3784fd02473bb9534046255
      expect(() => migrateAgentPinnedTenets(agentDir, "hana", {
        at: (checkpoint) => { if (checkpoint === "archive:before:pinned.md") throw new Error("archive boom"); },
 diff --git a/tests/release-preflight.test.ts b/tests/release-preflight.test.ts
-index 2a2e9f2a53f48348d1dda35122421e1df46004ad..8e6e030aa1a7f3be36912998afb5b7e10d118a98 100644
+index 2a2e9f2a53f48348d1dda35122421e1df46004ad..976b5b79de925cdbc27455968bc1c2db52bbe356 100644
 --- a/tests/release-preflight.test.ts
 +++ b/tests/release-preflight.test.ts
 @@ -65,11 +65,11 @@ describe("release preflight", () => {
@@ -12121,11 +15019,11 @@ index 2a2e9f2a53f48348d1dda35122421e1df46004ad..8e6e030aa1a7f3be36912998afb5b7e1
 -      historicalMaximumVersion: "0.1.34",
 -      historicalMaximumGeneration: 12,
 -      candidateGeneration: 13,
-+    expect(runReleasePreflight({ candidateTag: "v0.1.36" })).toMatchObject({
-+      candidateVersion: "0.1.36",
-+      historicalMaximumVersion: "0.1.35",
-+      historicalMaximumGeneration: 13,
-+      candidateGeneration: 14,
++    expect(runReleasePreflight({ candidateTag: "v0.1.37" })).toMatchObject({
++      candidateVersion: "0.1.37",
++      historicalMaximumVersion: "0.1.36",
++      historicalMaximumGeneration: 14,
++      candidateGeneration: 15,
      });
    });
  });
@@ -14586,6 +17484,46 @@ index 0000000000000000000000000000000000000000..a903ff8c2c1b101bec9cad3a45b95ba1
 +    expect(sha256(fs.readFileSync(path.join(ROOT, summary.patch)))).toBe(summary.patchSha256);
 +  });
 +});
+diff --git a/tests/sessions-route.test.ts b/tests/sessions-route.test.ts
+index 1c6c88edb4d51ae427f1faa9f8fe0fe6b5f20345..4f9a37a0091b8084861fc28da3a40c9c1d04385c 100644
+--- a/tests/sessions-route.test.ts
++++ b/tests/sessions-route.test.ts
+@@ -2904,6 +2904,8 @@ describe("sessions route", () => {
+         sourceIndex: 1,
+         role: "assistant",
+         content: "hi back",
++        turnStartIndex: 1,
++        turnEndIndex: 1,
+         assistantSegments: [{
+           id: "assistant:1:text:default",
+           kind: "text",
+@@ -3091,6 +3093,8 @@ describe("sessions route", () => {
+       sourceIndex: 0,
+       role: "assistant",
+       content: "",
++      turnStartIndex: 0,
++      turnEndIndex: 0,
+       assistantSegments: [{
+         id: "assistant:1:reasoning:default",
+         kind: "reasoning",
+@@ -3141,6 +3145,8 @@ describe("sessions route", () => {
+       sourceIndex: 0,
+       role: "assistant",
+       content: "",
++      turnStartIndex: 0,
++      turnEndIndex: 0,
+       assistantSegments: [{
+         id: "assistant:1:text:0",
+         kind: "text",
+@@ -3227,6 +3233,8 @@ describe("sessions route", () => {
+       entryId: `entry-assistant-${turnStatus}`,
+       role: "assistant",
+       content: "",
++      turnStartIndex: 0,
++      turnEndIndex: 0,
+       assistantSegments: [],
+       turnStatus,
+     }]);
 diff --git a/tests/speech-helper-build-contract.test.ts b/tests/speech-helper-build-contract.test.ts
 index abbc1e7d162c5a743769729dd4db3e2977ac5927..2b13fc19d159ce0f31d2db07545dbb76acf0f43a 100644
 --- a/tests/speech-helper-build-contract.test.ts

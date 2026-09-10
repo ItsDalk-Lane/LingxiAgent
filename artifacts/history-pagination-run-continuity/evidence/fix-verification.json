@@ -1,0 +1,38 @@
+{
+  "fixture": "1 条可见用户输入 + 同 Run N 条助手记录（前 N-1 条 reasoning+tool_use，末条最终答案；每个工具调用带 toolResult），每页 50，驱动真实 /api/sessions/messages 路由 + 真实 buildItemsFromHistory 投影链",
+  "environment": "macOS darwin 25.6.0 arm64, Node v24.16.0, vitest, HEAD e0afc0dc + 本任务工作区改动",
+  "before": {
+    "rule": "旧游标规则：归并后第一条显示消息的 id（= 组内最后一条记录 display 序号）当作 before",
+    "runSize_140": {
+      "pages": 92,
+      "returnedRecords": 4600,
+      "uniqueRecords": 141,
+      "overlapFactor": "每页 50 条只推进 1 条，49 条重复（32.7 倍读取放大）",
+      "elapsedMs": 237966
+    },
+    "pageLevelFalseMissingFinalAnswer": "每页 1 个跨页片段各自派生 missing_final_answer（阶段 A 实测：92 项 / 91 个伪无回复，与任务书模拟表一致）"
+  },
+  "after": {
+    "rule": "服务端 nextBefore 游标 + Run 边界元数据 + 同 Run 片段缝合 + 结局唯一裁决",
+    "runSize_140": {
+      "pages": 3,
+      "returnedRecords": 141,
+      "uniqueRecords": 141,
+      "elapsedMs": 7075
+    },
+    "runSize_1000_T18": {
+      "pages": 21,
+      "returnedRecords": 1001,
+      "uniqueRecords": 1001,
+      "hitPageCap": false,
+      "elapsedMs": 52992,
+      "note": "无重叠、无失控；耗时主要来自每页全文件解析（既有服务端读取模型，非本次回归）"
+    },
+    "storeLevel": "真实 loadMessages/loadMoreMessages + chat-slice 缝合链：1 个逻辑 Run、0 个伪无回复状态、与 all=1 全量恢复逐块等价（tests/history-pagination-run-continuity.test.ts T01）"
+  },
+  "speedup": {
+    "pages_140": "92 → 3（-96.7%）",
+    "records_140": "4600 → 141（-96.9%）",
+    "elapsed_140": "237966ms → 7075ms（-97.0%）"
+  }
+}

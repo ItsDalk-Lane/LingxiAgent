@@ -649,7 +649,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:92a83e282cd0ba0fbb03f79be3de552e2d95f176cf187dc61d362e4d15c22a00",
+  "payloadFingerprint": "sha256:549c80c87f803e33f1bdaeac9165f36e18dda5035ac2069ab289335f51a3844b",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3165,8 +3165,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "MCP connector lifecycle feature: normalizeMcpConfig now persists two new optional per-connector fields (lifecycle, idleTimeoutMinutes). Read-time defaults (lifecycle keep-alive, idleTimeoutMinutes null) reproduce the pre-feature behaviour for every existing config, so old shapes read identically and no migration is needed — a compatible addition, not a breaking change.",
-    "payloadFingerprint": "sha256:92a83e282cd0ba0fbb03f79be3de552e2d95f176cf187dc61d362e4d15c22a00"
+    "compatibilityReason": "session-coordinator model-trace reuse lookup now resolves the business session id (runtime lookup only, no persisted shape change); model-observability schema v6->v7 is a data-only idempotent trace merge with no DDL, same compatible class as the earlier v5/v6 data migrations",
+    "payloadFingerprint": "sha256:549c80c87f803e33f1bdaeac9165f36e18dda5035ac2069ab289335f51a3844b"
   },
   "schemas": [
     {
@@ -4051,9 +4051,9 @@
             "type": "table"
           }
         ],
-        "userVersion": 6
+        "userVersion": 7
       },
-      "sourceHash": "sha256:e0801ad79309b7abd0f8ccd48a4e7ae5f83d341b3ffba832ab4a80f0f5f9694c",
+      "sourceHash": "sha256:c43a6b1de8dc56dfcfc8862eb295b6f3f721429a4cb3bf445e91bc80efae9c74",
       "storeId": "model-observability-db"
     },
     {
@@ -4158,7 +4158,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:1775237db94d35ae6313085a8174a672b43a62c0f1c895b8246df00bd09a45d9"
+          "sourceHash": "sha256:91f4454981f847a1337f0a0c53ab4592a77c6526d572a51bbf6fe53da3e05800"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",

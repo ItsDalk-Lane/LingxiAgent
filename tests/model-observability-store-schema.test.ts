@@ -71,7 +71,7 @@ describe("Model Observability Store Schema", () => {
     const db = openModelObservabilityDatabase(modelObservabilityDbPath(home));
     try {
       expect(readModelObservabilitySchemaVersion(db)).toBe(MODEL_OBSERVABILITY_SCHEMA_VERSION);
-      expect(MODEL_OBSERVABILITY_SCHEMA_VERSION).toBe(6);
+      expect(MODEL_OBSERVABILITY_SCHEMA_VERSION).toBe(7);
       expect(db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='source_identity_snapshots'`).get()).toBeTruthy();
       const callColumns = db.prepare(`PRAGMA table_info(model_calls)`).all()
         .map((row: any) => row.name);
@@ -112,7 +112,7 @@ describe("Model Observability Store Schema", () => {
 
   it("未知高版本数据库：schema_newer，文件保留不重建（§二十七）", () => {
     const db = openModelObservabilityDatabase(modelObservabilityDbPath(home));
-    db.pragma("user_version = 7");
+    db.pragma("user_version = 8");
     db.close();
     const dbPath = modelObservabilityDbPath(home);
     const sizeBefore = fs.statSync(dbPath).size;
@@ -162,8 +162,8 @@ describe("Model Observability Store Schema", () => {
     expect(fs.existsSync(path.join(home, "model-observability"))).toBe(false);
   });
 
-  it("v4→v6 迁移：同会话轨迹合并为一行、非会话轨迹不动、幂等", () => {
-    // 造一个 v4 旧库：表结构与 v6 相同（v5/v6 纯数据整合无 DDL），只降 user_version。
+  it("v4→v7 迁移：同会话轨迹合并为一行、非会话轨迹不动、幂等", () => {
+    // 造一个 v4 旧库：表结构与 v6/v7 相同（v5/v6/v7 纯数据整合无 DDL），只降 user_version。
     const seed = openModelObservabilityDatabase(modelObservabilityDbPath(home));
     seed.pragma("user_version = 4");
     const insertTrace = seed.prepare(
@@ -194,7 +194,7 @@ describe("Model Observability Store Schema", () => {
 
     const migrated = openModelObservabilityDatabase(modelObservabilityDbPath(home));
     try {
-      expect(readModelObservabilitySchemaVersion(migrated)).toBe(6);
+      expect(readModelObservabilitySchemaVersion(migrated)).toBe(7);
       const traces = migrated.prepare(`SELECT * FROM traces ORDER BY trace_id`).all();
       expect(traces.map((row: any) => row.trace_id)).toEqual(["mt_a", "mt_aux", "mt_bg", "mt_c"]);
       const merged = traces.find((row: any) => row.trace_id === "mt_a");
@@ -217,10 +217,97 @@ describe("Model Observability Store Schema", () => {
     // 幂等：再次打开数据不变。
     const again = openModelObservabilityDatabase(modelObservabilityDbPath(home));
     try {
-      expect(readModelObservabilitySchemaVersion(again)).toBe(6);
+      expect(readModelObservabilitySchemaVersion(again)).toBe(7);
       expect(again.prepare(`SELECT COUNT(*) AS n FROM traces`).get()).toEqual({ n: 4 });
       expect(again.prepare(`SELECT COUNT(*) AS n FROM model_calls WHERE trace_id = 'mt_a'`).get())
         .toEqual({ n: 3 });
+    } finally {
+      again.close();
+    }
+  });
+
+  it("v6→v7 修复迁移：v6 之后因复用身份错位继续拆分的同会话轨迹重新收拢（不丢 attempts/payload/usage，幂等）", () => {
+    // 构造「已是 v6」的库：v6 历史合并早已跑完，但 2026-09-05～09-10 期间实时
+    // 复用查找错用 SDK 文件头 UUID（写入侧是 manifest 业务会话 ID），同一业务
+    // 会话 sess_biz_x 的三轮各自铸根；另一个业务会话 sess_biz_y 与 singleton
+    // 辅助轨迹不得被波及。
+    const seed = openModelObservabilityDatabase(modelObservabilityDbPath(home));
+    seed.pragma("user_version = 6");
+    const insertTrace = seed.prepare(
+      `INSERT INTO traces (trace_id, origin, first_seen_at, last_seen_at, call_count, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, '2026-09-06T00:00:00Z', '2026-09-06T00:00:00Z')`,
+    );
+    const insertCall = seed.prepare(
+      `INSERT INTO model_calls (call_id, trace_id, session_id, started_at, ended_at, terminal_status)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    );
+    const insertAttempt = seed.prepare(
+      `INSERT INTO model_attempts (attempt_id, call_id, started_at) VALUES (?, ?, ?)`,
+    );
+    const insertPayload = seed.prepare(
+      `INSERT INTO payload_records (call_id, kind, captured_at, visibility, fidelity, sanitization_status, redacted, truncated, degraded)
+       VALUES (?, 'semantic_request', ?, 'full', 'exact', 'clean', 0, 0, 0)`,
+    );
+    const insertUsage = seed.prepare(
+      `INSERT INTO model_call_usage (model_call_id, usage_status, total_tokens, created_at, updated_at)
+       VALUES (?, 'ok', ?, '2026-09-06T00:00:00Z', '2026-09-06T00:00:00Z')`,
+    );
+    insertTrace.run("mt_r1", "user_turn", "2026-09-06T10:00:00Z", "2026-09-06T10:01:00Z", 1);
+    insertTrace.run("mt_r2", "user_turn", "2026-09-07T10:00:00Z", "2026-09-07T10:01:00Z", 1);
+    insertTrace.run("mt_r3", "user_turn", "2026-09-08T10:00:00Z", "2026-09-08T10:01:00Z", 1);
+    insertTrace.run("mt_other", "user_turn", "2026-09-08T11:00:00Z", "2026-09-08T11:01:00Z", 1);
+    insertTrace.run("mt_singleton", null, "2026-09-08T12:00:00Z", "2026-09-08T12:01:00Z", 1);
+    insertCall.run("mc_r1", "mt_r1", "sess_biz_x", "2026-09-06T10:00:00Z", "2026-09-06T10:01:00Z", "ok");
+    insertCall.run("mc_r2", "mt_r2", "sess_biz_x", "2026-09-07T10:00:00Z", "2026-09-07T10:01:00Z", "error");
+    insertCall.run("mc_r3", "mt_r3", "sess_biz_x", "2026-09-08T10:00:00Z", "2026-09-08T10:01:00Z", "ok");
+    insertCall.run("mc_other", "mt_other", "sess_biz_y", "2026-09-08T11:00:00Z", "2026-09-08T11:01:00Z", "ok");
+    insertCall.run("mc_singleton", "mt_singleton", "sess_biz_x", "2026-09-08T12:00:00Z", "2026-09-08T12:01:00Z", "ok");
+    insertAttempt.run("ma_r1", "mc_r1", "2026-09-06T10:00:00Z");
+    insertAttempt.run("ma_r2", "mc_r2", "2026-09-07T10:00:00Z");
+    insertPayload.run("mc_r1", "2026-09-06T10:00:01Z");
+    insertPayload.run("mc_r3", "2026-09-08T10:00:01Z");
+    insertUsage.run("mc_r1", 11);
+    insertUsage.run("mc_r2", 22);
+    insertUsage.run("mc_r3", 33);
+    seed.close();
+
+    const repaired = openModelObservabilityDatabase(modelObservabilityDbPath(home));
+    try {
+      expect(readModelObservabilitySchemaVersion(repaired)).toBe(7);
+      const traces = repaired.prepare(`SELECT * FROM traces ORDER BY trace_id`).all();
+      // 同会话三轮收拢到最早的 canonical 轨迹；其他会话与 singleton 原样保留。
+      expect(traces.map((row: any) => row.trace_id)).toEqual(["mt_other", "mt_r1", "mt_singleton"]);
+      expect(traces.find((row: any) => row.trace_id === "mt_r1")).toMatchObject({
+        origin: "user_turn",
+        call_count: 3,
+        first_seen_at: "2026-09-06T10:00:00Z",
+        last_seen_at: "2026-09-08T10:01:00Z",
+      });
+      expect(repaired.prepare(
+        `SELECT call_id, trace_id FROM model_calls ORDER BY call_id`,
+      ).all()).toEqual([
+        { call_id: "mc_other", trace_id: "mt_other" },
+        { call_id: "mc_r1", trace_id: "mt_r1" },
+        { call_id: "mc_r2", trace_id: "mt_r1" },
+        { call_id: "mc_r3", trace_id: "mt_r1" },
+        { call_id: "mc_singleton", trace_id: "mt_singleton" },
+      ]);
+      // 事实零丢失：attempts / payload / usage 关联不随 trace_id 改指而消失。
+      expect(repaired.prepare(`SELECT COUNT(*) AS n FROM model_attempts`).get()).toEqual({ n: 2 });
+      expect(repaired.prepare(`SELECT COUNT(*) AS n FROM payload_records`).get()).toEqual({ n: 2 });
+      expect(repaired.prepare(
+        `SELECT SUM(total_tokens) AS total FROM model_call_usage`,
+      ).get()).toEqual({ total: 66 });
+    } finally {
+      repaired.close();
+    }
+
+    // 幂等：修复后再次打开不再改变任何数据。
+    const again = openModelObservabilityDatabase(modelObservabilityDbPath(home));
+    try {
+      expect(again.prepare(`SELECT COUNT(*) AS n FROM traces`).get()).toEqual({ n: 3 });
+      expect(again.prepare(`SELECT call_count FROM traces WHERE trace_id = 'mt_r1'`).get())
+        .toEqual({ call_count: 3 });
     } finally {
       again.close();
     }

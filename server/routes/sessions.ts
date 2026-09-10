@@ -365,7 +365,9 @@ function resolveHistoryPageBounds(sourceMessages, { beforeId, limit, forceAll })
     if (isDisplayableHistoryMessage(message)) total += 1;
   }
   if (forceAll) return { total, startIdx: 0, endIdx: total, hasMore: false };
-  const endIdx = (beforeId != null && beforeId > 0)
+  // before 是 display 序号边界（返回区间 [max(0,end-limit), end)）。0 是合法边界
+  // （= 已翻到会话开头，返回空页并终结分页）；负数/NaN 视为未指定，返回最新页。
+  const endIdx = (beforeId != null && Number.isFinite(beforeId) && beforeId >= 0)
     ? Math.min(beforeId, total)
     : total;
   const startIdx = Math.max(0, endIdx - limit);
@@ -1550,6 +1552,47 @@ export function createSessionsRoute(engine, hub = null) {
           }
         }
       }
+      // Run 边界预扫描（分页 × Run 连续性）：为每个 displayable assistant 记录标注其
+      // 所属 Run 的 display 序号区间 [turnStartIndex, turnEndIndex]。Run 语义与下方主循环
+      // 的 latestTurnInputEntryId 指针逐字同源——输入事件（user 消息 / custom turn input /
+      // loop kickoff）开启新 Run；改任何一侧的边界判定必须同步另一侧。前端用它做两件事：
+      //  1) 跨页归并：同 Run 的页片段按 (turnStartIndex, turnEndIndex) 识别并缝合，
+      //     片段绝不各自派生 Run 终态（missing_final_answer 只能来自 Run 尾部）；
+      //  2) 隐藏输入轮（loop 等 turnInputEntryId=null）也能正确按 Run 归并，
+      //     不再退化为逐条记录各自投影。
+      const runBoundsBySourceIndex = new Map();
+      {
+        // displayCounter 与主循环 displayIdx 同源：只有 user/assistant 且
+        // isDisplayableHistoryMessage 为真的消息推进序号（含被前端过滤的隐藏
+        // user 消息——它们同样开启新 Run）。
+        let displayCounter = 0;
+        let runOrdinal = 0;
+        const runOrdinalBySourceIndex = new Map();
+        const runBounds = [];
+        for (let sourceIndex = 0; sourceIndex < sourceMessages.length; sourceIndex += 1) {
+          const message = sourceMessages[sourceIndex];
+          if (message?.role === "user") {
+            runOrdinal += 1;
+            if (isDisplayableHistoryMessage(message)) displayCounter += 1;
+            continue;
+          }
+          if (message?.role === "custom" && (
+            isCustomTurnInputHistoryMessage(message) || message.customType === LOOP_TURN_MESSAGE_TYPE
+          )) {
+            runOrdinal += 1;
+            continue;
+          }
+          if (message?.role !== "assistant" || !isDisplayableHistoryMessage(message)) continue;
+          runOrdinalBySourceIndex.set(sourceIndex, runOrdinal);
+          const bounds = runBounds[runOrdinal] || (runBounds[runOrdinal] = {});
+          if (bounds.start === undefined) bounds.start = displayCounter;
+          bounds.end = displayCounter;
+          displayCounter += 1;
+        }
+        for (const [sourceIndex, ordinal] of runOrdinalBySourceIndex) {
+          runBoundsBySourceIndex.set(sourceIndex, runBounds[ordinal]);
+        }
+      }
       const sanitizeVisibleContent = (value) => {
         const withoutReminder = stripSessionReminderBlocks(value);
         return isBridgeSessionPath(resolvedSessionPath)
@@ -1880,12 +1923,14 @@ export function createSessionsRoute(engine, hub = null) {
               };
             });
             const deferredThinking = assistantSegments.find((segment) => segment.kind === "reasoning")?.source;
+            const runBounds = runBoundsBySourceIndex.get(sourceIndex);
             messages.push({
               id: String(currentIndex),
               sourceIndex,
               ...(m.id ? { entryId: m.id } : {}),
               role: "assistant",
               content,
+              ...(runBounds ? { turnStartIndex: runBounds.start, turnEndIndex: runBounds.end } : {}),
               ...(modelCallReferenceBySourceIndex.has(sourceIndex)
                 ? { modelCallRef: modelCallReferenceBySourceIndex.get(sourceIndex) }
                 : {}),
@@ -1987,6 +2032,10 @@ export function createSessionsRoute(engine, hub = null) {
           .filter(b => b.afterIndex >= pageBounds.startIdx && b.afterIndex < pageBounds.endIdx)
           .map(b => ({ ...b, afterIndex: b.afterIndex - pageBounds.startIdx }));
       const hasMore = pageBounds.hasMore;
+      // 显式下一页游标：由服务端原始页面范围（display 序号）决定，前端直接保存消费。
+      // 绝不能由前端归并后的显示项 id 反推——归并项 id 是组内最后一条记录的序号，
+      // 当作 before 会让每页只推进 1 条记录（F1 故障链）。
+      const nextBefore = pageBounds.hasMore ? String(pageBounds.startIdx) : null;
 
       // 修正 subagent blocks 的状态：优先从 durable run registry 读长期映射，
       // 再用 deferred store 作为实时投递队列。deferred 会清理，不再承担历史事实源。
@@ -2115,7 +2164,7 @@ export function createSessionsRoute(engine, hub = null) {
             : beforeRun!.status === 'reconciled_idle' && afterRun!.status === 'reconciled_idle' ? 'reconciled_idle' : 'unknown',
         ...(evidence!.diagnostic ? { diagnostic: evidence!.diagnostic } : {}),
       } : undefined;
-      return c.json({ messages, blocks: slicedBlocks, todos, hasMore, sessionFiles, revision, ...(reconciliation ? { reconciliation } : {}) });
+      return c.json({ messages, blocks: slicedBlocks, todos, hasMore, nextBefore, sessionFiles, revision, ...(reconciliation ? { reconciliation } : {}) });
     } catch (err) {
       return c.json({ error: err.message }, 500);
     }

@@ -2904,6 +2904,8 @@ describe("sessions route", () => {
         sourceIndex: 1,
         role: "assistant",
         content: "hi back",
+        turnStartIndex: 1,
+        turnEndIndex: 1,
         assistantSegments: [{
           id: "assistant:1:text:default",
           kind: "text",
@@ -3091,6 +3093,8 @@ describe("sessions route", () => {
       sourceIndex: 0,
       role: "assistant",
       content: "",
+      turnStartIndex: 0,
+      turnEndIndex: 0,
       assistantSegments: [{
         id: "assistant:1:reasoning:default",
         kind: "reasoning",
@@ -3141,6 +3145,8 @@ describe("sessions route", () => {
       sourceIndex: 0,
       role: "assistant",
       content: "",
+      turnStartIndex: 0,
+      turnEndIndex: 0,
       assistantSegments: [{
         id: "assistant:1:text:0",
         kind: "text",
@@ -3227,6 +3233,8 @@ describe("sessions route", () => {
       entryId: `entry-assistant-${turnStatus}`,
       role: "assistant",
       content: "",
+      turnStartIndex: 0,
+      turnEndIndex: 0,
       assistantSegments: [],
       turnStatus,
     }]);
