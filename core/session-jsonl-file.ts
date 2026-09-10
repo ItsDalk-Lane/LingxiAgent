@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { isSessionJsonlFilename } from "../lib/session-jsonl.ts";
 import { stripAllInlineMediaForHistory } from "./message-sanitizer.ts";
+import { noteSessionFileMutation } from "./session-file-mutation-epoch.ts";
 
 export const DEFAULT_SESSION_JSONL_MAX_LINE_BYTES = 1024 * 1024;
 const DEFAULT_SESSION_JSONL_MAX_STRING_CHARS = 8192;
@@ -295,6 +296,8 @@ export function repairOversizedSessionEntriesInFile(sessionPath, opts: { maxLine
  * @param {Array} entries
  */
 export function writeSessionEntriesFile(sessionPath, entries) {
+  // C02：整文件重写，旧前缀字节可变——写前递增变更世代（写失败也不回退）。
+  noteSessionFileMutation(sessionPath, "rewrite");
   fs.writeFileSync(sessionPath, serializeSessionEntries(entries));
 }
 
@@ -318,6 +321,10 @@ export function flushSessionManagerSnapshot(sessionManager, {
   const entries = Array.isArray(sessionManager.fileEntries) ? sessionManager.fileEntries : null;
   if (!entries?.length) return false;
   if (preAssistantOnly && hasAssistantEntry(entries)) return false;
+  // C02：_rewriteFile 为 truncate+重写，旧前缀字节可变——写前递增变更世代。
+  if (typeof sessionManager.sessionFile === "string" && sessionManager.sessionFile) {
+    noteSessionFileMutation(sessionManager.sessionFile, "rewrite");
+  }
   sessionManager._rewriteFile();
   if ("flushed" in sessionManager) sessionManager.flushed = true;
   return true;

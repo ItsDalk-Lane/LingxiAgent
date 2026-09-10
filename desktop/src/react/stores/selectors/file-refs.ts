@@ -88,6 +88,11 @@ const EMPTY_CHAT_ITEMS: readonly ChatListItem[] = Object.freeze([]);
  * 不传 sessionPath 时清空整张 Map（用于登出 / 切换 workspace）。
  */
 export function invalidateSessionCache(sessionPath?: string): void {
+  // E03.4：动态导入（打破 index→chat-slice→file-refs→client 的静态循环）；
+  // 失效为 fire-and-forget，不阻塞缓存清理本身。
+  void import('../history-protocol-client')
+    .then((m) => m.noteHistoryValidationInvalidated(sessionPath))
+    .catch(() => {});
   if (sessionPath == null) {
     cachedSession.clear();
     return;

@@ -1,0 +1,48 @@
+{
+  "generatedAt": "2026-09-11",
+  "phase": "F04",
+  "commands": [
+    {
+      "cmd": "npx vitest run <定向全套：协议+概览+兼容+history-read 十文件+P08 语义+session-actions store>",
+      "exit": 0,
+      "passed": 406,
+      "failed": 0
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "note": "三配置串联（base/node/test）"
+    },
+    {
+      "cmd": "node scripts/check-persistence-schema-fingerprint.mjs",
+      "exit": 0,
+      "note": "E 阶段 4 受护源再 pin 后 OK"
+    },
+    {
+      "cmd": "node scripts/generate-persistence-schema-fingerprint.mjs --classification compatible --compatibility-reason '…E 协议阶段…'",
+      "exit": 0,
+      "note": "F04-c repin"
+    },
+    {
+      "cmd": "npx vitest run tests/persistence-schema-tripwire.test.ts",
+      "exit": 0,
+      "passed": 15,
+      "failed": 0
+    },
+    {
+      "cmd": "npx vitest run（全量，当前工作区）",
+      "exit": 1,
+      "passed": 13735,
+      "failed": 7,
+      "skipped": 7,
+      "note": "7 失败=全部原有（与 D02 基线签名一致），任务引入 0"
+    }
+  ],
+  "fullSuite": {
+    "log": "/tmp/f04-full3.log",
+    "passed": 13735,
+    "failed": 7,
+    "skipped": 7,
+    "failuresIdenticalToDCheckpoint": true
+  }
+}

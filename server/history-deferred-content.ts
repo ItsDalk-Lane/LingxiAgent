@@ -77,15 +77,15 @@ export function shouldDeferHistoryContent(value: unknown): value is string {
   return typeof value === 'string' && value.length > HISTORY_INLINE_CONTENT_LIMIT;
 }
 
-export function createHistoryDeferredContent(
-  sourceMessages: unknown[],
+export function createHistoryDeferredContentFor(
+  record: unknown,
   sourceIndex: number,
   kind: HistoryDeferredContentKind,
   ordinal: number,
   content: string,
   { preview = true }: { preview?: boolean } = {},
 ): HistoryDeferredContentDescriptor {
-  const message = recordOf(sourceMessages[sourceIndex]);
+  const message = recordOf(record);
   const entryId = typeof message?.id === 'string' && message.id.trim() ? message.id.trim() : null;
   return {
     id: encodeLocator({
@@ -100,6 +100,22 @@ export function createHistoryDeferredContent(
     ...(preview ? { preview: content.slice(0, HISTORY_CONTENT_PREVIEW_LIMIT) } : {}),
     available: true,
   };
+}
+
+/**
+ * 既有入口（route / projector 调用面不变）：取出单条记录后委托 For 版本。
+ * B05 定点读取只持有一条记录时直接使用 createHistoryDeferredContentFor，
+ * locator 编码（version/sourceIndex/entryId/kind/ordinal）与这里完全一致。
+ */
+export function createHistoryDeferredContent(
+  sourceMessages: unknown[],
+  sourceIndex: number,
+  kind: HistoryDeferredContentKind,
+  ordinal: number,
+  content: string,
+  opts: { preview?: boolean } = {},
+): HistoryDeferredContentDescriptor {
+  return createHistoryDeferredContentFor(sourceMessages[sourceIndex], sourceIndex, kind, ordinal, content, opts);
 }
 
 export function resolveHistoryDeferredContent(sourceMessages: unknown[], id: string): {

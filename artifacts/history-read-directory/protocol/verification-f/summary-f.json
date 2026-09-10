@@ -1,0 +1,738 @@
+{
+  "task": "D07 真实传输协议基线（不实现 E 功能；仅记录现状）",
+  "phase": "F",
+  "generatedAt": "2026-09-10T16:59:46.023Z",
+  "gitHead": "1d42b7405c76292f617291e3a01cd2f3ef5efd04",
+  "gitBranch": "fix/pending-sep10",
+  "seed": 20260910,
+  "cli": "--phase F --sizes 1000,10000 --seed 20260910 --page-sizes 50,100,150,200 --rtt-ms 0,50,150 --bandwidth-mbps 10,50 --output artifacts/history-read-directory/protocol/verification-f",
+  "failures": [],
+  "experiments": {
+    "n1000-K50": {
+      "firstScreenClientMs": {
+        "p50": 52.951333,
+        "p95": 160.598083,
+        "max": 160.598083,
+        "samples": 7
+      },
+      "hotPageClientMs": {
+        "p50": 59.579292,
+        "p95": 162.225125,
+        "max": 164.679375,
+        "samples": 140
+      },
+      "walkJsonParseMsP50": 0.436041,
+      "peakSinglePageMemoryDelta": {
+        "heapDeltaMax": 0,
+        "externalDeltaMax": 0,
+        "arrayBuffersDeltaMax": 0,
+        "abMax": null
+      },
+      "avgBodyKiBPerPage": 28.1,
+      "byCombo": {
+        "loopback": {
+          "firstScreenWallMs": 23.7,
+          "walkRequests": 21,
+          "walkWallMs": 30,
+          "walkTotalKiB": 601
+        },
+        "rtt0-bw10": {
+          "firstScreenWallMs": 4.1,
+          "walkRequests": 21,
+          "walkWallMs": 78,
+          "walkTotalKiB": 601
+        },
+        "rtt0-bw50": {
+          "firstScreenWallMs": 3.7,
+          "walkRequests": 21,
+          "walkWallMs": 75,
+          "walkTotalKiB": 601
+        },
+        "rtt50-bw10": {
+          "firstScreenWallMs": 53,
+          "walkRequests": 21,
+          "walkWallMs": 1290,
+          "walkTotalKiB": 601
+        },
+        "rtt50-bw50": {
+          "firstScreenWallMs": 60.1,
+          "walkRequests": 21,
+          "walkWallMs": 1285,
+          "walkTotalKiB": 601
+        },
+        "rtt150-bw10": {
+          "firstScreenWallMs": 161.2,
+          "walkRequests": 21,
+          "walkWallMs": 3397,
+          "walkTotalKiB": 601
+        },
+        "rtt150-bw50": {
+          "firstScreenWallMs": 160,
+          "walkRequests": 21,
+          "walkWallMs": 3381,
+          "walkTotalKiB": 601
+        }
+      }
+    },
+    "n1000-K100": {
+      "firstScreenClientMs": {
+        "p50": 53.169167,
+        "p95": 169.361958,
+        "max": 169.361958,
+        "samples": 7
+      },
+      "hotPageClientMs": {
+        "p50": 61.253541,
+        "p95": 164.024042,
+        "max": 165.885584,
+        "samples": 70
+      },
+      "walkJsonParseMsP50": 0.938208,
+      "peakSinglePageMemoryDelta": {
+        "heapDeltaMax": 0,
+        "externalDeltaMax": 0,
+        "arrayBuffersDeltaMax": 0,
+        "abMax": null
+      },
+      "avgBodyKiBPerPage": 53.5,
+      "byCombo": {
+        "loopback": {
+          "firstScreenWallMs": 18.1,
+          "walkRequests": 11,
+          "walkWallMs": 23,
+          "walkTotalKiB": 594
+        },
+        "rtt0-bw10": {
+          "firstScreenWallMs": 2.9,
+          "walkRequests": 11,
+          "walkWallMs": 45,
+          "walkTotalKiB": 594
+        },
+        "rtt0-bw50": {
+          "firstScreenWallMs": 4.3,
+          "walkRequests": 11,
+          "walkWallMs": 42,
+          "walkTotalKiB": 594
+        },
+        "rtt50-bw10": {
+          "firstScreenWallMs": 53.3,
+          "walkRequests": 11,
+          "walkWallMs": 688,
+          "walkTotalKiB": 594
+        },
+        "rtt50-bw50": {
+          "firstScreenWallMs": 63,
+          "walkRequests": 11,
+          "walkWallMs": 699,
+          "walkTotalKiB": 594
+        },
+        "rtt150-bw10": {
+          "firstScreenWallMs": 170.3,
+          "walkRequests": 11,
+          "walkWallMs": 1795,
+          "walkTotalKiB": 594
+        },
+        "rtt150-bw50": {
+          "firstScreenWallMs": 163.3,
+          "walkRequests": 11,
+          "walkWallMs": 1801,
+          "walkTotalKiB": 594
+        }
+      }
+    },
+    "n1000-K150": {
+      "firstScreenClientMs": {
+        "p50": 66.915458,
+        "p95": 184.373167,
+        "max": 184.373167,
+        "samples": 7
+      },
+      "hotPageClientMs": {
+        "p50": 64.640333,
+        "p95": 185.784958,
+        "max": 190.78725,
+        "samples": 42
+      },
+      "walkJsonParseMsP50": 1.33425,
+      "peakSinglePageMemoryDelta": {
+        "heapDeltaMax": 0,
+        "externalDeltaMax": 0,
+        "arrayBuffersDeltaMax": 0,
+        "abMax": null
+      },
+      "avgBodyKiBPerPage": 84,
+      "byCombo": {
+        "loopback": {
+          "firstScreenWallMs": 17.8,
+          "walkRequests": 7,
+          "walkWallMs": 14,
+          "walkTotalKiB": 592
+        },
+        "rtt0-bw10": {
+          "firstScreenWallMs": 25.7,
+          "walkRequests": 7,
+          "walkWallMs": 170,
+          "walkTotalKiB": 592
+        },
+        "rtt0-bw50": {
+          "firstScreenWallMs": 15.5,
+          "walkRequests": 7,
+          "walkWallMs": 91,
+          "walkTotalKiB": 592
+        },
+        "rtt50-bw10": {
+          "firstScreenWallMs": 82.1,
+          "walkRequests": 7,
+          "walkWallMs": 587,
+          "walkTotalKiB": 592
+        },
+        "rtt50-bw50": {
+          "firstScreenWallMs": 68.4,
+          "walkRequests": 7,
+          "walkWallMs": 484,
+          "walkTotalKiB": 592
+        },
+        "rtt150-bw10": {
+          "firstScreenWallMs": 186.1,
+          "walkRequests": 7,
+          "walkWallMs": 1287,
+          "walkTotalKiB": 592
+        },
+        "rtt150-bw50": {
+          "firstScreenWallMs": 168.8,
+          "walkRequests": 7,
+          "walkWallMs": 1197,
+          "walkTotalKiB": 592
+        }
+      }
+    },
+    "n1000-K200": {
+      "firstScreenClientMs": {
+        "p50": 73.799833,
+        "p95": 210.515417,
+        "max": 210.515417,
+        "samples": 7
+      },
+      "hotPageClientMs": {
+        "p50": 73.858625,
+        "p95": 212.346,
+        "max": 216.063917,
+        "samples": 35
+      },
+      "walkJsonParseMsP50": 1.678584,
+      "peakSinglePageMemoryDelta": {
+        "heapDeltaMax": 0,
+        "externalDeltaMax": 0,
+        "arrayBuffersDeltaMax": 0,
+        "abMax": null
+      },
+      "avgBodyKiBPerPage": 97.9,
+      "byCombo": {
+        "loopback": {
+          "firstScreenWallMs": 15.4,
+          "walkRequests": 6,
+          "walkWallMs": 15,
+          "walkTotalKiB": 591
+        },
+        "rtt0-bw10": {
+          "firstScreenWallMs": 50.7,
+          "walkRequests": 6,
+          "walkWallMs": 288,
+          "walkTotalKiB": 591
+        },
+        "rtt0-bw50": {
+          "firstScreenWallMs": 28.1,
+          "walkRequests": 6,
+          "walkWallMs": 91,
+          "walkTotalKiB": 591
+        },
+        "rtt50-bw10": {
+          "firstScreenWallMs": 107,
+          "walkRequests": 6,
+          "walkWallMs": 617,
+          "walkTotalKiB": 591
+        },
+        "rtt50-bw50": {
+          "firstScreenWallMs": 75.7,
+          "walkRequests": 6,
+          "walkWallMs": 443,
+          "walkTotalKiB": 591
+        },
+        "rtt150-bw10": {
+          "firstScreenWallMs": 212.4,
+          "walkRequests": 6,
+          "walkWallMs": 1229,
+          "walkTotalKiB": 591
+        },
+        "rtt150-bw50": {
+          "firstScreenWallMs": 180.1,
+          "walkRequests": 6,
+          "walkWallMs": 1048,
+          "walkTotalKiB": 591
+        }
+      }
+    },
+    "n10000-K50": {
+      "firstScreenClientMs": {
+        "p50": 60.919875,
+        "p95": 159.096833,
+        "max": 159.096833,
+        "samples": 7
+      },
+      "hotPageClientMs": {
+        "p50": 58.772667,
+        "p95": 161.163458,
+        "max": 170.261417,
+        "samples": 1400
+      },
+      "walkJsonParseMsP50": 0.494791,
+      "peakSinglePageMemoryDelta": {
+        "heapDeltaMax": 0,
+        "externalDeltaMax": 0,
+        "arrayBuffersDeltaMax": 0,
+        "abMax": null
+      },
+      "avgBodyKiBPerPage": 29.8,
+      "byCombo": {
+        "loopback": {
+          "firstScreenWallMs": 86.7,
+          "walkRequests": 201,
+          "walkWallMs": 188,
+          "walkTotalKiB": 6095
+        },
+        "rtt0-bw10": {
+          "firstScreenWallMs": 3.6,
+          "walkRequests": 201,
+          "walkWallMs": 1115,
+          "walkTotalKiB": 6095
+        },
+        "rtt0-bw50": {
+          "firstScreenWallMs": 7.4,
+          "walkRequests": 201,
+          "walkWallMs": 1604,
+          "walkTotalKiB": 6095
+        },
+        "rtt50-bw10": {
+          "firstScreenWallMs": 61.4,
+          "walkRequests": 201,
+          "walkWallMs": 12051,
+          "walkTotalKiB": 6095
+        },
+        "rtt50-bw50": {
+          "firstScreenWallMs": 60,
+          "walkRequests": 201,
+          "walkWallMs": 12106,
+          "walkTotalKiB": 6095
+        },
+        "rtt150-bw10": {
+          "firstScreenWallMs": 159.7,
+          "walkRequests": 201,
+          "walkWallMs": 32278,
+          "walkTotalKiB": 6095
+        },
+        "rtt150-bw50": {
+          "firstScreenWallMs": 159.6,
+          "walkRequests": 201,
+          "walkWallMs": 32258,
+          "walkTotalKiB": 6095
+        }
+      }
+    },
+    "n10000-K100": {
+      "firstScreenClientMs": {
+        "p50": 62.69475,
+        "p95": 161.072,
+        "max": 161.072,
+        "samples": 7
+      },
+      "hotPageClientMs": {
+        "p50": 60.726459,
+        "p95": 163.125375,
+        "max": 171.54975,
+        "samples": 700
+      },
+      "walkJsonParseMsP50": 0.80825,
+      "peakSinglePageMemoryDelta": {
+        "heapDeltaMax": 0,
+        "externalDeltaMax": 0,
+        "arrayBuffersDeltaMax": 0,
+        "abMax": null
+      },
+      "avgBodyKiBPerPage": 59.1,
+      "byCombo": {
+        "loopback": {
+          "firstScreenWallMs": 98,
+          "walkRequests": 101,
+          "walkWallMs": 141,
+          "walkTotalKiB": 6025
+        },
+        "rtt0-bw10": {
+          "firstScreenWallMs": 3.9,
+          "walkRequests": 101,
+          "walkWallMs": 488,
+          "walkTotalKiB": 6025
+        },
+        "rtt0-bw50": {
+          "firstScreenWallMs": 8.6,
+          "walkRequests": 101,
+          "walkWallMs": 851,
+          "walkTotalKiB": 6025
+        },
+        "rtt50-bw10": {
+          "firstScreenWallMs": 59.7,
+          "walkRequests": 101,
+          "walkWallMs": 6317,
+          "walkTotalKiB": 6025
+        },
+        "rtt50-bw50": {
+          "firstScreenWallMs": 63.7,
+          "walkRequests": 101,
+          "walkWallMs": 6323,
+          "walkTotalKiB": 6025
+        },
+        "rtt150-bw10": {
+          "firstScreenWallMs": 162.1,
+          "walkRequests": 101,
+          "walkWallMs": 16472,
+          "walkTotalKiB": 6025
+        },
+        "rtt150-bw50": {
+          "firstScreenWallMs": 162.1,
+          "walkRequests": 101,
+          "walkWallMs": 16476,
+          "walkTotalKiB": 6025
+        }
+      }
+    },
+    "n10000-K150": {
+      "firstScreenClientMs": {
+        "p50": 82.132208,
+        "p95": 185.408208,
+        "max": 185.408208,
+        "samples": 7
+      },
+      "hotPageClientMs": {
+        "p50": 69.359792,
+        "p95": 187.028083,
+        "max": 194.111,
+        "samples": 462
+      },
+      "walkJsonParseMsP50": 1.287708,
+      "peakSinglePageMemoryDelta": {
+        "heapDeltaMax": 0,
+        "externalDeltaMax": 0,
+        "arrayBuffersDeltaMax": 0,
+        "abMax": null
+      },
+      "avgBodyKiBPerPage": 89,
+      "byCombo": {
+        "loopback": {
+          "firstScreenWallMs": 97,
+          "walkRequests": 67,
+          "walkWallMs": 127,
+          "walkTotalKiB": 6001
+        },
+        "rtt0-bw10": {
+          "firstScreenWallMs": 26.2,
+          "walkRequests": 67,
+          "walkWallMs": 2387,
+          "walkTotalKiB": 6001
+        },
+        "rtt0-bw50": {
+          "firstScreenWallMs": 18,
+          "walkRequests": 67,
+          "walkWallMs": 1100,
+          "walkTotalKiB": 6001
+        },
+        "rtt50-bw10": {
+          "firstScreenWallMs": 83.6,
+          "walkRequests": 67,
+          "walkWallMs": 5873,
+          "walkTotalKiB": 6001
+        },
+        "rtt50-bw50": {
+          "firstScreenWallMs": 70.3,
+          "walkRequests": 67,
+          "walkWallMs": 4744,
+          "walkTotalKiB": 6001
+        },
+        "rtt150-bw10": {
+          "firstScreenWallMs": 186.9,
+          "walkRequests": 67,
+          "walkWallMs": 12583,
+          "walkTotalKiB": 6001
+        },
+        "rtt150-bw50": {
+          "firstScreenWallMs": 171.1,
+          "walkRequests": 67,
+          "walkWallMs": 11482,
+          "walkTotalKiB": 6001
+        }
+      }
+    },
+    "n10000-K200": {
+      "firstScreenClientMs": {
+        "p50": 82.635541,
+        "p95": 212.703,
+        "max": 212.703,
+        "samples": 7
+      },
+      "hotPageClientMs": {
+        "p50": 75.414375,
+        "p95": 213.376125,
+        "max": 221.945584,
+        "samples": 350
+      },
+      "walkJsonParseMsP50": 1.764458,
+      "peakSinglePageMemoryDelta": {
+        "heapDeltaMax": 0,
+        "externalDeltaMax": 0,
+        "arrayBuffersDeltaMax": 0,
+        "abMax": null
+      },
+      "avgBodyKiBPerPage": 116.9,
+      "byCombo": {
+        "loopback": {
+          "firstScreenWallMs": 82.9,
+          "walkRequests": 51,
+          "walkWallMs": 114,
+          "walkTotalKiB": 5990
+        },
+        "rtt0-bw10": {
+          "firstScreenWallMs": 51,
+          "walkRequests": 51,
+          "walkWallMs": 3076,
+          "walkTotalKiB": 5990
+        },
+        "rtt0-bw50": {
+          "firstScreenWallMs": 25.9,
+          "walkRequests": 51,
+          "walkWallMs": 1077,
+          "walkTotalKiB": 5990
+        },
+        "rtt50-bw10": {
+          "firstScreenWallMs": 108,
+          "walkRequests": 51,
+          "walkWallMs": 5710,
+          "walkTotalKiB": 5990
+        },
+        "rtt50-bw50": {
+          "firstScreenWallMs": 69.1,
+          "walkRequests": 51,
+          "walkWallMs": 3865,
+          "walkTotalKiB": 5990
+        },
+        "rtt150-bw10": {
+          "firstScreenWallMs": 214.7,
+          "walkRequests": 51,
+          "walkWallMs": 10890,
+          "walkTotalKiB": 5990
+        },
+        "rtt150-bw50": {
+          "firstScreenWallMs": 177.4,
+          "walkRequests": 51,
+          "walkWallMs": 9092,
+          "walkTotalKiB": 5990
+        }
+      }
+    }
+  },
+  "etagVariesByLimit": {
+    "1000": true,
+    "10000": true
+  },
+  "stress": {
+    "K50": {
+      "big-tool-result": {
+        "status": 200,
+        "coldDisplay": 31,
+        "coldHasMore": false,
+        "hotDisplay": 31,
+        "hotHasMore": false
+      },
+      "multi-block": {
+        "status": 200,
+        "coldDisplay": 41,
+        "coldHasMore": false,
+        "hotDisplay": 41,
+        "hotHasMore": false
+      },
+      "multi-run": {
+        "status": 200,
+        "coldDisplay": 50,
+        "coldHasMore": true,
+        "hotDisplay": 50,
+        "hotHasMore": true
+      },
+      "superlong-run": {
+        "status": 200,
+        "coldDisplay": 50,
+        "coldHasMore": true,
+        "hotDisplay": 50,
+        "hotHasMore": true
+      },
+      "hidden-page": {
+        "status": 200,
+        "coldDisplay": 1,
+        "coldHasMore": false,
+        "hotDisplay": 1,
+        "hotHasMore": false
+      },
+      "non-local-dependency": {
+        "status": 200,
+        "coldDisplay": 50,
+        "coldHasMore": true,
+        "hotDisplay": 50,
+        "hotHasMore": true
+      }
+    },
+    "K100": {
+      "big-tool-result": {
+        "status": 200,
+        "coldDisplay": 31,
+        "coldHasMore": false,
+        "hotDisplay": 31,
+        "hotHasMore": false
+      },
+      "multi-block": {
+        "status": 200,
+        "coldDisplay": 41,
+        "coldHasMore": false,
+        "hotDisplay": 41,
+        "hotHasMore": false
+      },
+      "multi-run": {
+        "status": 200,
+        "coldDisplay": 80,
+        "coldHasMore": false,
+        "hotDisplay": 80,
+        "hotHasMore": false
+      },
+      "superlong-run": {
+        "status": 200,
+        "coldDisplay": 100,
+        "coldHasMore": true,
+        "hotDisplay": 100,
+        "hotHasMore": true
+      },
+      "hidden-page": {
+        "status": 200,
+        "coldDisplay": 1,
+        "coldHasMore": false,
+        "hotDisplay": 1,
+        "hotHasMore": false
+      },
+      "non-local-dependency": {
+        "status": 200,
+        "coldDisplay": 81,
+        "coldHasMore": false,
+        "hotDisplay": 81,
+        "hotHasMore": false
+      }
+    },
+    "K150": {
+      "big-tool-result": {
+        "status": 200,
+        "coldDisplay": 31,
+        "coldHasMore": false,
+        "hotDisplay": 31,
+        "hotHasMore": false
+      },
+      "multi-block": {
+        "status": 200,
+        "coldDisplay": 41,
+        "coldHasMore": false,
+        "hotDisplay": 41,
+        "hotHasMore": false
+      },
+      "multi-run": {
+        "status": 200,
+        "coldDisplay": 80,
+        "coldHasMore": false,
+        "hotDisplay": 80,
+        "hotHasMore": false
+      },
+      "superlong-run": {
+        "status": 200,
+        "coldDisplay": 150,
+        "coldHasMore": true,
+        "hotDisplay": 150,
+        "hotHasMore": true
+      },
+      "hidden-page": {
+        "status": 200,
+        "coldDisplay": 1,
+        "coldHasMore": false,
+        "hotDisplay": 1,
+        "hotHasMore": false
+      },
+      "non-local-dependency": {
+        "status": 200,
+        "coldDisplay": 81,
+        "coldHasMore": false,
+        "hotDisplay": 81,
+        "hotHasMore": false
+      }
+    },
+    "K200": {
+      "big-tool-result": {
+        "status": 200,
+        "coldDisplay": 31,
+        "coldHasMore": false,
+        "hotDisplay": 31,
+        "hotHasMore": false
+      },
+      "multi-block": {
+        "status": 200,
+        "coldDisplay": 41,
+        "coldHasMore": false,
+        "hotDisplay": 41,
+        "hotHasMore": false
+      },
+      "multi-run": {
+        "status": 200,
+        "coldDisplay": 80,
+        "coldHasMore": false,
+        "hotDisplay": 80,
+        "hotHasMore": false
+      },
+      "superlong-run": {
+        "status": 200,
+        "coldDisplay": 200,
+        "coldHasMore": true,
+        "hotDisplay": 200,
+        "hotHasMore": true
+      },
+      "hidden-page": {
+        "status": 200,
+        "coldDisplay": 1,
+        "coldHasMore": false,
+        "hotDisplay": 1,
+        "hotHasMore": false
+      },
+      "non-local-dependency": {
+        "status": 200,
+        "coldDisplay": 81,
+        "coldHasMore": false,
+        "hotDisplay": 81,
+        "hotHasMore": false
+      }
+    }
+  },
+  "decisive304": {
+    "n1000": {
+      "validations": 20,
+      "all304": true,
+      "bodyBytesTotal": 0,
+      "clientJsonDecodeAttempts": 0,
+      "rebuilds": 0
+    },
+    "n10000": {
+      "validations": 20,
+      "all304": true,
+      "bodyBytesTotal": 0,
+      "clientJsonDecodeAttempts": 0,
+      "rebuilds": 0
+    }
+  }
+}

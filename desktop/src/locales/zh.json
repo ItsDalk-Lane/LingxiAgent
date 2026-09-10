@@ -411,6 +411,17 @@
     "back": "返回"
   },
   "chat": {
+        "historyOverview": {
+          "records": "原始历史记录",
+          "runs": "逻辑轮次",
+          "tasks": "关联任务",
+          "taskSubagent": "子代理",
+          "taskWorkflow": "工作流",
+          "taskMedia": "媒体生成",
+          "taskOther": "其他",
+          "unknown": "统计暂不可用",
+          "detail": "子代理 {subagent} · 工作流 {workflow} · 媒体 {media} · 其他 {other}"
+        },
     "knowledgeResearchInterrupted": "调查已中断",
     "knowledgeResearchStopIncomplete": "调查流程未正常收尾",
     "knowledgeResearchStopUnavailable": "调查所需工具不可用",

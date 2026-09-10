@@ -1,0 +1,122 @@
+{
+  "generatedAt": "2026-09-11",
+  "stage": "F",
+  "statusVocabulary": ["已修复并验证", "已实现但指定环境未验证", "待验证或受阻", "经证据否定"],
+  "scopeNote": "最终矩阵：P01—P12（性能）+ X01—X20（对抗）+ Y01—Y24（协议/客户端/端到端）共 56 项，覆盖 A—F 全链路。P/X 在 D 阶段验证、F 阶段复测保持（verification-f/summary-f.json 与 D02 基线同阈通过）；Y 在 E/F 阶段验证，与 protocol/compatibility-matrix.json 同源。",
+  "evidenceRoot": "artifacts/history-read-directory/",
+  "main": {
+    "P01": {
+      "status": "已修复并验证",
+      "scenario": "1k/10k 稳定热页",
+      "evidence": "verification/summary-d.json：热页 p50 1k=1.0ms / 10k=0.7ms，fullFileReadCalls=0、fullHistoryProjectionCount=0、fallback=0、jsonlParseCount=103（两规模同值，O(K)）；§7.1 硬断言与 §7.2 阈值 4/4 PASS；F 复测 verification-f/summary-f.json 热 0.61ms 两规模同值"
+    },
+    "P02": {
+      "status": "已修复并验证",
+      "scenario": "1k/10k 完整翻页",
+      "evidence": "verification/summary-d.json walks：1k 21 页 / 10k 201 页，overlap=0、missing=0；全翻比 228.20 ≤ 487.17（≤15 阈值）；F 复测全翻 33.3/224.5ms，overlap=0/missing=0"
+    },
+    "P03": {
+      "status": "已修复并验证",
+      "scenario": "冷首页",
+      "evidence": "phase D 冷构建 1k 11.2ms（≤36.58）/ 10k 93.2ms（≤123.84）；冷构建单次扫描（cold jsonlParse=2101/20101，PROGRESS B08：无 repair+SDK 双读）；B 冷页优化已在案（初测 141.5ms 未达标→优化后 73ms 达标，本轮 93.2ms 属运行方差，仍在阈值内）；F 复测冷 10.60/78.94ms"
+    },
+    "P04": {
+      "status": "已修复并验证",
+      "scenario": "翻页中正常追加",
+      "evidence": "tests/history-read-directory-incremental.test.ts P04 两用例：重读旧页===当前完整投影窗口（JSON 全等）、新页可见、旧坐标稳定；C03 off-by-one 回归（无尾换行尾续追加）同文件"
+    },
+    "P05": {
+      "status": "已修复并验证",
+      "scenario": "分支重置",
+      "evidence": "服务端：branch_view_stale→rebuildBranchView 单元+路由级用例（semantics/incremental 测试）；单次响应分支一致由严格层保证。前端跨请求旧页清空已在 E/F 落地（history-protocol-client stale/superseded 隔离 + desktop/__tests__/history-f03-barrier.test.ts），Y05/Y07 举证"
+    },
+    "P06": {
+      "status": "已修复并验证",
+      "scenario": "stat=null",
+      "evidence": "tests/history-read-directory-incremental.test.ts「stat 失败（文件缺失）→ revision_unknown：不用缓存不写缓存（I08）」"
+    },
+    "P07": {
+      "status": "已修复并验证",
+      "scenario": "半行追加",
+      "evidence": "scanner 测试（pendingTailOffset 不 parse、续读补齐）；incremental 续读起点 pendingTail→lastUndelimitedRow→indexedThrough 用例；补齐后准确出现一次由 lastUndelimitedRow 重读核对（id/字节长度）保证"
+    },
+    "P08": {
+      "status": "已修复并验证",
+      "scenario": "前置语义集",
+      "evidence": "D01 Stage3：history-pagination-run-continuity + history-run-outcome-edges + sessions-route + session-find-route + desktop turn-outcome-unification 共 135 测试 exit 0"
+    },
+    "P09": {
+      "status": "已修复并验证",
+      "scenario": "内存与释放",
+      "evidence": "tests/history-read-directory-memory.test.ts（目录无正文驻留/Buffer、估算<原始文件字节、released() 清空）；cache 测试 8 槽/64MiB 预算/淘汰释放；已知边界：retired 旧版本靠 LIMIT=2/invalidate 释放、cache.release() 无调用方（有界，计入驻留，B04 既有行为，PROGRESS C 完成日志在案）；客户端有界性 Y23（32 条/256KiB/epoch 释放）"
+    },
+    "P10": {
+      "status": "已修复并验证",
+      "scenario": "交错会话",
+      "evidence": "tests/history-read-directory-cache.test.ts：8 槽 LRU、跨会话键隔离（runtime/studio/sessionId/normalizedPath 进 key）；fixture-audit 双身份（SDK UUID vs 业务 sess_）T01"
+    },
+    "P11": {
+      "status": "已修复并验证",
+      "scenario": "索引故障/I/O 故障",
+      "evidence": "X05 增量途中读取失败→legacy 全量不混页；short_read/directory_invalid 分类测试（build/incremental/route-fallback）；目录损坏可重建（原文件完好时严格层重建）"
+    },
+    "P12": {
+      "status": "已修复并验证",
+      "scenario": "可信增量",
+      "evidence": "phase-c/summary-c.json：1k/10k 四批次全增量命中（8/8，失败 0），parsedRecords 两规模一致（101/99/150/51）；真实生产追加=fs append+生产等价分支同步+真实路由读取；开放 Run 离散度 1.43×/1.37×（≤8×）"
+    }
+  },
+  "adversarial": {
+    "X01": { "status": "已修复并验证", "evidence": "incremental（duplicate/dangling/cycle→directory_invalid）+ build 严格层同名拒绝码逐字一致" },
+    "X02": { "status": "已修复并验证", "evidence": "incremental「同长度重写（mtime 变）→ untrusted_mutation → 全量重建」" },
+    "X03": { "status": "已修复并验证", "evidence": "incremental「重写后变大（epoch 已通知）→ 不判追加，全量重建」" },
+    "X04": { "status": "已修复并验证", "evidence": "incremental「同路径替换（ino 变）→ file_identity_changed → 全量重建」" },
+    "X05": { "status": "已修复并验证", "evidence": "incremental X05（增量途中 readFile 注入失败→legacy 全量等价输出）+ route-fallback 套件" },
+    "X06": { "status": "已修复并验证", "evidence": "tests/history-read-directory-scanner.test.ts（有/无尾换行、CRLF、中文/emoji、UTF-8 跨块、半字符补齐）" },
+    "X07": { "status": "已修复并验证", "evidence": "scanner/window-reader 短读补读用例（shortReadEvents 计数、提前 EOF 不读空白缓冲）" },
+    "X08": { "status": "已修复并验证", "evidence": "semantics 测试（branch head 缺失 vs 显式 leafId=null 各循原语义）" },
+    "X09": { "status": "已修复并验证", "evidence": "incremental head 规则用例（append_recovery/observedTail 变/弃支续追不污染）+ phase D many-discarded 场景（600 物理条目 300 弃支，热页 O(窗口)）" },
+    "X10": { "status": "已修复并验证", "evidence": "incremental X10：旧 toolCall 结果远窗口追加后旧页结局刷新" },
+    "X11": { "status": "已修复并验证", "evidence": "build/semantics 测试（consumption/presentation/interlude 去重次序）+ incremental consumption overlay 用例" },
+    "X12": { "status": "已修复并验证", "evidence": "build/semantics 测试（collab 决策、input correlation 歧义）+ incremental correlation ambiguous 更新" },
+    "X13": { "status": "已修复并验证", "evidence": "incremental X13：合法快照前移/坏快照跳过保持；extractLatestTodoSnapshot 规则测试" },
+    "X14": { "status": "已修复并验证", "evidence": "semantics/build 外部状态（deferred/subagent/文件状态）改变→重读页面得当前状态；JSONL 不变前提由 probe 分类测试保证（文件未变→目录命中+外部状态物化）" },
+    "X15": { "status": "已修复并验证", "evidence": "cache 测试：同 key 并发冷请求共享同一 lease（single-flight）、失败重试可恢复（failBuild 可重入）" },
+    "X16": { "status": "已修复并验证", "evidence": "cache 测试：invalidate/begin 推进 generation，旧构建晚完成被拒且立即 released()" },
+    "X17": { "status": "已修复并验证", "evidence": "cache 测试：读时淘汰、dispose、构建失败释放许可与 FD；retired 有界（LIMIT=2）；已知 cache.release() 未接线边界在案" },
+    "X18": { "status": "已修复并验证", "evidence": "tests/history-read-cache-auth.test.ts：热缓存后拒绝授权、跨 sessionId/path/studio/runtime 不泄露" },
+    "X19": { "status": "已修复并验证", "evidence": "cache-auth/build/deferred 用例：各类重内容凭证展开、缓存开/关、追加后 sourceIndex/entryId 语义保持" },
+    "X20": { "status": "已修复并验证", "evidence": "tests/history-read-shared-functions.test.ts + tests/session-find-route.test.ts：普通/all/reconciliation/find 共用函数回归；严格 complete/runRevision 不被目录绕过" }
+  },
+  "protocol": {
+    "Y01": { "status": "已修复并验证", "evidence": "四组合全部通过（protocol/compatibility-matrix.json fourCombos）；能力缺失回退路径=旧+新/新+旧 用例。环境依赖：旧服务端侧需 A01 clone（/tmp/lingxi-baseline-1d42b740）在位，runner 模板 tracked（tests/compat-old-server-runner.template.mjs）幂等写入；clone 缺席时该侧套件 skip 并 console 明示「指定环境未验证」（不静默 skip）。F-e 夹具污染修复后复验 4/4+4/4 真实通过（2026-09-11，exit 0）" },
+    "Y02": { "status": "已修复并验证", "evidence": "tests/history-protocol-conditional.test.ts 首次 200/同标签 304/oracle 逐字节、无正文无 Content-Length" },
+    "Y03": { "status": "已修复并验证", "evidence": "conditional『页参数不同』『跨页游标失配』『非法语法』用例；缺头=无条件 200" },
+    "Y04": { "status": "已修复并验证", "evidence": "conditional『文件不变但外部状态变化（deferred 媒体任务）→ 200』+ E04 overview-client『外部状态改变不误 304』" },
+    "Y05": { "status": "已修复并验证", "evidence": "已有用户分支操作（setBranchHead）→ branch_view_stale/rewind 用例（overview-route + run-continuity）使请求/receipt 失效；无通知外部分支修改边界另列（E04.3 信任边界），不表述为全局保证" },
+    "Y06": { "status": "已修复并验证", "evidence": "conditional『stat 失败不签发/路径拒绝 403 不泄露标签』；鉴权先于条件求值（路由顺序）；有权限主体各自生成标签（标签含主体/作用域身份）" },
+    "Y07": { "status": "已修复并验证", "evidence": "history-protocol-client freshStateGuards：chatSessions 缺失→superseded（不清空、不伪造）；同目标至多一次无条件补取（304 stale 用例）" },
+    "Y08": { "status": "已修复并验证", "evidence": "session-actions.test 竞态护栏（stale 丢弃/live version 早退）+ client todos 失配→stale 补取用例" },
+    "Y09": { "status": "已修复并验证", "evidence": "client『新页首次加载无条件』用例 + T11b 隐藏整页推进（run-continuity）+ E06 hidden-page 场景" },
+    "Y10": { "status": "已修复并验证", "evidence": "conditional『304 保留全部已加载状态』（items/nextBefore/Run 状态不变）+ client-state-machine S3" },
+    "Y11": { "status": "已修复并验证", "evidence": "conditional『all/reconciliation 不进条件快路径』+ session-find-route（共用页边界）+ shared-functions 回归" },
+    "Y12": { "status": "已修复并验证", "evidence": "route-fallback rebroadcast 恰一次用例；broadcast 先于条件求值（不因 304 取消/重复）" },
+    "Y13": { "status": "已修复并验证", "evidence": "smoke：200/304/概览 Cache-Control private, no-store（真实响应头）；无 SW/磁盘缓存新增" },
+    "Y14": { "status": "已实现但指定环境未验证", "evidence": "smoke 覆盖 CORS/预检/Expose 头（Node loopback 层）；真实浏览器跨源行为留待指定环境（browser-smoke-report.md 如实标注）" },
+    "Y15": { "status": "已修复并验证", "evidence": "E07 故障场景：缺头/头部剥离（无 etag 200 与 304 缺 etag 补取）/未知版本/400 标 epoch/网络错误回退不标" },
+    "Y16": { "status": "已修复并验证", "evidence": "overview-route 手写 oracle（counts/三桶合计/去重/零与未知区分）" },
+    "Y17": { "status": "已修复并验证", "evidence": "overview-route 热路径硬断言（0 文件读/0 JSONL 解析/不 hydrate）+ cache single-flight 用例；超预算→directory_unavailable（映射测试）" },
+    "Y18": { "status": "已修复并验证", "evidence": "overview-route 追加跨桶/rewind 用例 + E06 压力场景（multi-run/hidden-page/discarded）" },
+    "Y19": { "status": "已修复并验证", "evidence": "overview-client：HTML 错误页/慢响应不阻塞/401 不吞/stale 丢弃用例" },
+    "Y20": { "status": "已修复并验证", "evidence": "E06 experiments：四候选语义通过（walk 页数断言/顺序由 nextBefore 保证/≤200 上限测试），原始数据 summary-e.json" },
+    "Y21": { "status": "已修复并验证", "evidence": "client K 协商用例：混合 limit 仅依 nextBefore（before=服务端游标）、无重叠无缺页由服务端窗口语义保证" },
+    "Y22": { "status": "已修复并验证", "evidence": "client 非法 77/超限 400→保守省略；冲突→保守 50+诊断；旧请求默认不变（compat 新+旧用例）" },
+    "Y23": { "status": "已修复并验证", "evidence": "client epoch 隔离/重启失配/32 条上限/256KiB 预算/in-flight 合并释放用例" },
+    "Y24": { "status": "已修复并验证", "evidence": "D 复测（verification/summary-d.json，固定 50 下 B/C 收益保持）；304=conditional 测试；概览=overview-route；调页=page-size-decision.md 分别举证" }
+  },
+  "resolvedDeferrals": {
+    "D07": "协议基线已在 E 阶段单独执行（protocol/baseline-d/），原 D 阶段暂缓项已闭合"
+  },
+  "counts": { "已修复并验证": 55, "已实现但指定环境未验证": 1, "待验证或受阻": 0, "经证据否定": 0, "total": 56 },
+  "countsNote": "P01—P12 + X01—X20 共 32 项全部已修复并验证；Y01—Y24 共 24 项，23 项已修复并验证、Y14（真实浏览器跨源 CORS）已实现但指定环境未验证（Node loopback 真实链路已验，browser-smoke-report.md 标注）。无待验证或受阻项，无经证据否定项。"
+}

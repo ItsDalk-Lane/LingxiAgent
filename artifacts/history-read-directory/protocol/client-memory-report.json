@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-11",
+  "phase": "F06",
+  "purpose": "E03/E05 客户端 receipt（校验记录）预算实测：每会话 ≤32 条、全局元数据 ≤256KiB、超限淘汰记录不淘汰消息",
+  "implementation": "desktop/src/react/stores/history-protocol-client.ts（records Map + recordsBySession LRU + evictForBudget）",
+  "constants": {
+    "maxRecordsPerSession": 32,
+    "metadataBudgetBytes": 262144,
+    "note": "超限淘汰最旧记录（不淘汰消息）；记录只存 requestKey/etag/connectionEpoch/appliedLiveVersion/appliedTodosVersion/原始记录边界覆盖/能力与推荐值，无正文复制"
+  },
+  "measured": {
+    "test": "desktop/src/react/__tests__/history-f03-barrier.test.ts『校验记录 ≤32 条/会话、元数据 ≤256KiB』",
+    "result": "40 条保存请求 → records=32（LRU 淘汰 8 条最旧）、metadataBytes ≤ 256KiB、chat 会话 items 不受影响（消息未淘汰）",
+    "exitCode": 0
+  },
+  "coexistence": {
+    "withServerDirectoryBudget": "F03 资源用例与服务端 16MiB 单目录/64MiB 驻留/8 槽独立并存；两套预算互不挤占（测试：history-f03-barrier + history-read-directory-cache/memory）",
+    "evictedSessionNoClosureRetention": "invalidateSessionCache（selectors/file-refs.ts，经动态导入通知）+ 会话淘汰路径断言记录不可达（F03『注入会话淘汰』用例）"
+  },
+  "noRawPageCache": {
+    "asserted": "客户端不新增 raw-page/serialized-response 缓存；记录字段清单审查（history-protocol-client.ts HistoryValidationRecord：requestKey/etag/epoch/appliedLiveVersion/appliedTodosVersion/coverage{firstRecordId,lastRecordId,recordCount,hasMore,nextBefore,revision}/protocolVersion/recommendedLimit/savedAt）",
+    "evidence": "desktop/src/react/__tests__/history-protocol-client.test.ts + history-f03-barrier.test.ts"
+  }
+}

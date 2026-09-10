@@ -2667,3 +2667,16 @@
 .chatFindBarHost {
     position: relative;
 }
+
+/* E05 概览徽标：加载更早历史提示区内的轻量统计（不新增顶级入口） */
+.historyOverviewBadge {
+  display: inline-block;
+  margin: 0 auto;
+  padding: var(--space-2) var(--space-12);
+  border-radius: 999px;
+  font-size: var(--font-size-xs, 11px);
+  opacity: 0.55;
+  color: var(--hana-text-secondary, inherit);
+  user-select: none;
+  white-space: nowrap;
+}

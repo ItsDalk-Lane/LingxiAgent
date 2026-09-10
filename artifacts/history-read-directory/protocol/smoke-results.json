@@ -1,0 +1,200 @@
+{
+  "generatedAt": "2026-09-10T15:41:39.658Z",
+  "environment": "Node HTTP loopback（真实 Hono 路由）；真实浏览器/Electron 环境未验证，留待 F 阶段指定环境",
+  "pass": true,
+  "failures": 0,
+  "results": [
+    {
+      "size": 1000,
+      "name": "messages 200",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 1000,
+      "name": "协议头 Lingxi-History-Protocol: 1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 1000,
+      "name": "推荐页大小声明 = 100",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 1000,
+      "name": "Cache-Control: private, no-store",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 1000,
+      "name": "ETag 为 hrp1 弱标签",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 1000,
+      "name": "CORS Allow-Origin 回显",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 1000,
+      "name": "Expose-Headers 含 ETag/协议头/页大小",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 1000,
+      "name": "条件命中 304",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 1000,
+      "name": "304 无正文",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 1000,
+      "name": "304 无 Content-Length",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 1000,
+      "name": "304 ETag/私有策略在",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 1000,
+      "name": "概览 200 available",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 1000,
+      "name": "概览 recommendedLimit 与消息头同源 (=100)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 1000,
+      "name": "概览 Cache-Control 私有",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 1000,
+      "name": "预检 Allow-Headers 含 If-None-Match",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 1000,
+      "name": "Allow-Credentials=true 且来源为白名单回显（非通配）",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 10000,
+      "name": "messages 200",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 10000,
+      "name": "协议头 Lingxi-History-Protocol: 1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 10000,
+      "name": "推荐页大小声明 = 100",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 10000,
+      "name": "Cache-Control: private, no-store",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 10000,
+      "name": "ETag 为 hrp1 弱标签",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 10000,
+      "name": "CORS Allow-Origin 回显",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 10000,
+      "name": "Expose-Headers 含 ETag/协议头/页大小",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 10000,
+      "name": "条件命中 304",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 10000,
+      "name": "304 无正文",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 10000,
+      "name": "304 无 Content-Length",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 10000,
+      "name": "304 ETag/私有策略在",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 10000,
+      "name": "概览 200 available",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 10000,
+      "name": "概览 recommendedLimit 与消息头同源 (=100)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 10000,
+      "name": "概览 Cache-Control 私有",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 10000,
+      "name": "预检 Allow-Headers 含 If-None-Match",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "size": 10000,
+      "name": "Allow-Credentials=true 且来源为白名单回显（非通配）",
+      "pass": true,
+      "detail": ""
+    }
+  ]
+}

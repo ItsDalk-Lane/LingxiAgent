@@ -11,6 +11,13 @@ import { useStore } from './index';
 import { appendConnectionAuth, buildConnectionUrl, type ServerConnection } from '../services/server-connection';
 import { sessionScopedKey, sessionScopedListIncludes, sessionScopedValue } from './session-slice';
 import { lingxiFetch, lingxiUrl } from '../hooks/use-hana-fetch';
+import {
+  conditionalMessagesFetch,
+  hasMessagesValidationRecord,
+  headerGet as responseHeaderGet,
+  negotiatedHistoryPageLimit,
+  saveHistoryValidationRecord,
+} from './history-protocol-client';
 import { hydrateInputDrafts } from './input-draft-persistence';
 import { HOME_DRAFT_KEY } from '../../../../shared/input-drafts.ts';
 import { normalizeWorkspacePath } from '../../../../shared/workspace-history.ts';
@@ -396,9 +403,13 @@ function historyNextCursor(data: {
   return typeof firstId === 'string' ? firstId : undefined;
 }
 
-export async function loadMessages(forPath?: string): Promise<void> {
+export async function loadMessages(
+  forPath?: string,
+  opts?: { preloaded?: { data: any; etag: string | null; protocolHeader: string | null } },
+): Promise<void> {
   const targetPath = forPath || useStore.getState().currentSessionPath;
   if (!targetPath) return;
+  console.error('[lm-entry] targetPath=', targetPath.slice(-24), 'preloaded=', !!opts?.preloaded);
   const messageLiveVersionBefore = readMessageLiveVersion(targetPath);
   // 捕获 hydrate 前的 live 版本：若 fetch 期间有 tool_end 更新 todos，
   // 后面就跳过 hydrate 写入，避免旧快照覆盖刚收到的实时状态。
@@ -407,13 +418,43 @@ export async function loadMessages(forPath?: string): Promise<void> {
   // messages 维度的竞态护栏：rapid switch 或并发 load 时，只有最新一次调用
   // 的响应允许 apply initSession，stale 响应直接丢弃。
   const myVersion = useStore.getState().bumpLoadMessagesVersion(targetPath);
+  // E06.3：协商页大小（能力未知 → null = 省略 limit，服务端默认 50）
+  const negotiatedLimit = negotiatedHistoryPageLimit(targetPath);
   // SessionFile flight 记录（issue #2188）：hydrate 期间到达的 upsert / branch
   // reset 会被下面的 HTTP 快照整表覆盖。开一条 flight 记录桥接两者，hydrate
   // 通过后按 flight 结果决定是丢弃快照还是应用快照 + 重放 flight 期间的 upsert。
   useStore.getState().beginSessionFilesFlight(targetPath, myVersion);
   try {
-    const res = await lingxiFetch(sessionMessagesUrl(targetPath));
-    const data = await res.json();
+    // E03 条件校验：仅当存在「已应用且未失效」的同页校验记录时发 If-None-Match
+    //（记录不存在/预检失败 → 无条件请求，与原行为一致）。304 → 保留全部已加载
+    // 状态，不解析 JSON、不 initSession、不推动游标。
+    let data: any = opts?.preloaded?.data ?? null;
+    let responseEtag: string | null = opts?.preloaded?.etag ?? null;
+    let protocolHeader: string | null = opts?.preloaded?.protocolHeader ?? null;
+    if (data == null) {
+      const conditional = await conditionalMessagesFetch(targetPath, {
+        sessionPath: targetPath,
+        url: sessionMessagesUrl(targetPath),
+        sessionId: sessionIdForPathFromState(useStore.getState() as Record<string, any>, targetPath),
+        limit: 50,
+        requestVersion: myVersion,
+        appliedLiveVersion: messageLiveVersionBefore,
+      });
+      if (conditional.kind === 'not-modified') {
+        // E03.3：304 全有效 → 只更新校验结果与结束状态；保留 messages/blocks/
+        // todos/sessionFiles/hasMore/nextBefore/Run 状态与已加载更早页。
+        useStore.getState().consumeSessionFilesFlight(targetPath, myVersion);
+        return;
+      }
+      if (conditional.kind === 'superseded') {
+        // 更新的 load 在途/目标已切换：丢弃本次（不向新目标补发旧请求）
+        useStore.getState().consumeSessionFilesFlight(targetPath, myVersion);
+        return;
+      }
+      data = await conditional.response.json();
+      responseEtag = conditional.etag;
+      protocolHeader = responseHeaderGet(conditional.response, 'lingxi-history-protocol');
+    }
     const latestVersion =
       sessionScopedValue(useStore.getState() as Record<string, any>, useStore.getState()._loadMessagesVersion, targetPath) ?? 0;
     if (latestVersion !== myVersion) {
@@ -490,6 +531,20 @@ export async function loadMessages(forPath?: string): Promise<void> {
         data: buildInflightAssistantMessage(snapshot),
       });
     }
+    console.error('[lm-dbg] before save, etag=', responseEtag, 'proto=', protocolHeader);
+    // E03.2：initSession/todos/files 全部应用成功后原子保存校验记录
+    //（etag/协议能力头缺失 → 不保存；覆盖证明=原始记录边界 id + 游标 + revision）。
+    saveHistoryValidationRecord(targetPath, {
+      sessionPath: targetPath,
+      url: sessionMessagesUrl(targetPath, negotiatedLimit != null ? { limit: String(negotiatedLimit) } : {}),
+      sessionId: sessionIdForPathFromState(useStore.getState() as Record<string, any>, targetPath),
+      limit: negotiatedLimit ?? 50,
+      appliedLiveVersion: messageLiveVersionBefore,
+      etag: responseEtag,
+      protocolHeader,
+      data,
+      todosVersion: todosLiveVersionBefore,
+    });
   } catch (err) {
     console.error('[loadMessages] error:', err);
     // fetch 失败也要清理本次 flight 记录，避免残留记录被后续 load 误判 version 冲突
@@ -559,7 +614,8 @@ export async function loadMoreMessages(forPath?: string): Promise<void> {
     // 游标（F1）：优先服务端 nextBefore；旧服务端回退 oldestId（hydrate 时已按
     // 原始首条记录 id 写入）。两者都是原始 display 序号，不是归并显示项身份。
     const before = session.nextBefore ?? session.oldestId ?? '';
-    const res = await lingxiFetch(sessionMessagesUrl(targetPath, { before }));
+    const moreLimit = negotiatedHistoryPageLimit(targetPath);
+    const res = await lingxiFetch(sessionMessagesUrl(targetPath, { before, ...(moreLimit != null ? { limit: String(moreLimit) } : {}) }));
     const data = await res.json();
     if (Array.isArray(data.sessionFiles)) {
       useStore.getState().setSessionRegistryFiles(targetPath, data.sessionFiles);
@@ -592,6 +648,40 @@ export async function loadMoreMessages(forPath?: string): Promise<void> {
 const _revisionReconcileInFlight = new Map<string, Promise<void>>();
 
 /**
+ * E03.4：同 revision 既有触发点上的条件重校验（不新增轮询/预取；调用方即
+ * reconcileCurrentSessionMessages 的既有触发链：返回会话/刷新/重连/移动端前台）。
+ * 304 → 状态保留；200 → 交给 loadMessages 既有完整归并链（preloaded，单次传输）。
+ */
+async function revalidateCurrentSessionConditional(
+  path: string,
+  reason: string,
+  listRevision: string,
+): Promise<void> {
+  try {
+    const outcome = await conditionalMessagesFetch(path, {
+      sessionPath: path,
+      url: sessionMessagesUrl(path),
+      sessionId: sessionIdForPathFromState(useStore.getState() as Record<string, any>, path),
+      limit: 50,
+      requestVersion: useStore.getState()._loadMessagesVersion?.[path] ?? 0,
+      appliedLiveVersion: readMessageLiveVersion(path),
+    });
+    if (outcome.kind !== 'ok') return; // 304：状态保留；superseded：已有更新流程在途
+    const data = await outcome.response.json();
+    if (!Array.isArray(data?.messages)) return; // 非 JSON/异常响应：按现有错误流程静默降级
+    await loadMessages(path, {
+      preloaded: {
+        data,
+        etag: outcome.etag,
+        protocolHeader: outcome.response.headers.get('lingxi-history-protocol'),
+      },
+    });
+  } catch (err) {
+    console.warn(`[session] conditional revalidate failed (${reason}):`, err);
+  }
+}
+
+/**
  * 校验「当前打开会话」的缓存内容是否落后于磁盘真相，落后则补拉。
  *
  * 修订点对比：chatSessions[path].revision（hydrate 时 stamp 的 stat 签名）
@@ -619,7 +709,16 @@ export function reconcileCurrentSessionMessages(reason = 'unknown'): Promise<voi
   const projection = s.sessions.find((session) => session.path === target);
   const listRevision = typeof projection?.revision === 'string' ? projection.revision : null;
   if (!listRevision) return undefined;
-  if ((cached.revision ?? null) === listRevision) return undefined;
+  if ((cached.revision ?? null) === listRevision) {
+    // E03.4：既有真实触发点（返回会话/刷新/重连后拿到新鲜列表）上的条件校验。
+    // revision 相同 ≠ 外部状态相同（todos/files/表示变化不反映在文件 stat 上）：
+    // 一次条件请求；304 → 状态保留（不触发完整 hydrate）；200 → 表示已变，
+    // 交给既有 loadMessages 完整归并链（单次传递，不再补发第二个请求）。
+    if (hasMessagesValidationRecord(target, sessionIdForPathFromState(useStore.getState() as Record<string, any>, target), 50)) {
+      void revalidateCurrentSessionConditional(target, reason, listRevision);
+    }
+    return undefined;
+  }
 
   const existing = _revisionReconcileInFlight.get(target);
   if (existing) return existing;

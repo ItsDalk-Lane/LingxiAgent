@@ -44,7 +44,11 @@ vi.mock("../lib/browser/browser-manager.js", () => ({
   },
 }));
 
-vi.mock("../core/message-utils.js", () => ({
+vi.mock("../core/message-utils.js", async (importOriginal) => ({
+  // B06 起 history-read 目录路径（directory/project-page/index）也消费本模块的纯函数
+  // （projectBranchHistory/historyMessageFromEntry 等），以真实实现为底、仅覆盖本文件
+  // 关注的入口；各测试内的 vi.mocked(...) 覆盖保持原语义。
+  ...(await importOriginal()),
   extractTextContent: vi.fn(() => ({ text: "", images: [], thinking: "", toolUses: [] })),
   contentHasThinkingBlock: vi.fn(() => false),
   filterUnreferencedInlineImages: vi.fn((_text, images) => images || []),

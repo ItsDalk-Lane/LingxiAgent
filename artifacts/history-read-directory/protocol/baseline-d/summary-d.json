@@ -1,0 +1,481 @@
+{
+  "task": "D07 真实传输协议基线（不实现 E 功能；仅记录现状）",
+  "phase": "D",
+  "generatedAt": "2026-09-10T12:52:27.886Z",
+  "gitHead": "1d42b7405c76292f617291e3a01cd2f3ef5efd04",
+  "gitBranch": "fix/pending-sep10",
+  "seed": 20260910,
+  "cli": "--phase D --sizes 1000,10000 --seed 20260910 --page-sizes 50 --rtt-ms 0,50,150 --bandwidth-mbps 10,50 --output artifacts/history-read-directory/protocol/baseline-d",
+  "measurementScope": [
+    "三口径分列：honoSpanMs=服务端 app.fetch span（与 D01 同仪表）；HTTP loopback=127.0.0.1 直连（cell rtt=null/bw=null）；受控链路=本地 TCP 代理整形。均为本机确定性条件，不代表公网质量（无丢包/抖动/拥塞）。",
+    "rtt-ms=总附加往返延迟：每请求新建连接（Connection: close），请求方向首字节延迟 rtt/2 + 响应方向首字节延迟 rtt/2，合计每请求一次附加往返；TCP 握手在本机 loopback 不注入。",
+    "bandwidth-mbps=每方向独立 token bucket（桶容量 64KiB、连续补充、仅整形成功后的数据字节）；可测范围 rtt 0–150ms、带宽 10–50Mbps。",
+    "客户端成本：读取+JSON 解码+initSession 状态应用骨架为 Node 可复现部分；buildItemsFromHistory 完整链与 React 提交/渲染为桌面渲染链不可复现（uiApplyMs/renderMs=null，逐请求 gaps 字段注明）。",
+    "RTT/服务端/客户端为不同测量域；residual 不自动归因网络主导。"
+  ],
+  "failures": [],
+  "cells": [
+    {
+      "size": 1000,
+      "pageSize": 50,
+      "rttMs": null,
+      "bandwidthMbps": null,
+      "shaped": false,
+      "behaviors": {
+        "first-screen": {
+          "requests": 1,
+          "wallMs": 25.375792,
+          "bodyBytes": 30299,
+          "totalBytes": 30698
+        },
+        "revalidation": {
+          "requests": 1,
+          "wallMs": 2.796667,
+          "bodyBytes": 30299,
+          "totalBytes": 30698
+        },
+        "walk-forward": {
+          "requests": 21,
+          "wallMs": 31.308291,
+          "totalBytes": 612202,
+          "endNextBefore": null
+        },
+        "overview-tasks": {
+          "supported": false,
+          "requests": 0,
+          "note": "当前协议无总量/任务分布端点；现状达成同一用户目标只能整会话翻页探底（请求数≈walk-forward.requests）或不可得；本基线不虚构强制全翻，亦未实现任何 E 概览功能"
+        }
+      },
+      "wallMs": 59.496709
+    },
+    {
+      "size": 1000,
+      "pageSize": 50,
+      "rttMs": 0,
+      "bandwidthMbps": 10,
+      "shaped": true,
+      "behaviors": {
+        "first-screen": {
+          "requests": 1,
+          "wallMs": 4.700791,
+          "bodyBytes": 30299,
+          "totalBytes": 30698
+        },
+        "revalidation": {
+          "requests": 1,
+          "wallMs": 4.629333,
+          "bodyBytes": 30299,
+          "totalBytes": 30698
+        },
+        "walk-forward": {
+          "requests": 21,
+          "wallMs": 88.645958,
+          "totalBytes": 612202,
+          "endNextBefore": null
+        },
+        "overview-tasks": {
+          "supported": false,
+          "requests": 0,
+          "note": "当前协议无总量/任务分布端点；现状达成同一用户目标只能整会话翻页探底（请求数≈walk-forward.requests）或不可得；本基线不虚构强制全翻，亦未实现任何 E 概览功能"
+        }
+      },
+      "wallMs": 97.988458
+    },
+    {
+      "size": 1000,
+      "pageSize": 50,
+      "rttMs": 0,
+      "bandwidthMbps": 50,
+      "shaped": true,
+      "behaviors": {
+        "first-screen": {
+          "requests": 1,
+          "wallMs": 4.148625,
+          "bodyBytes": 30299,
+          "totalBytes": 30698
+        },
+        "revalidation": {
+          "requests": 1,
+          "wallMs": 4.098583,
+          "bodyBytes": 30299,
+          "totalBytes": 30698
+        },
+        "walk-forward": {
+          "requests": 21,
+          "wallMs": 80.395709,
+          "totalBytes": 612202,
+          "endNextBefore": null
+        },
+        "overview-tasks": {
+          "supported": false,
+          "requests": 0,
+          "note": "当前协议无总量/任务分布端点；现状达成同一用户目标只能整会话翻页探底（请求数≈walk-forward.requests）或不可得；本基线不虚构强制全翻，亦未实现任何 E 概览功能"
+        }
+      },
+      "wallMs": 88.659833
+    },
+    {
+      "size": 1000,
+      "pageSize": 50,
+      "rttMs": 50,
+      "bandwidthMbps": 10,
+      "shaped": true,
+      "behaviors": {
+        "first-screen": {
+          "requests": 1,
+          "wallMs": 55.311209,
+          "bodyBytes": 30299,
+          "totalBytes": 30698
+        },
+        "revalidation": {
+          "requests": 1,
+          "wallMs": 57.376833,
+          "bodyBytes": 30299,
+          "totalBytes": 30698
+        },
+        "walk-forward": {
+          "requests": 21,
+          "wallMs": 1236.690584,
+          "totalBytes": 612202,
+          "endNextBefore": null
+        },
+        "overview-tasks": {
+          "supported": false,
+          "requests": 0,
+          "note": "当前协议无总量/任务分布端点；现状达成同一用户目标只能整会话翻页探底（请求数≈walk-forward.requests）或不可得；本基线不虚构强制全翻，亦未实现任何 E 概览功能"
+        }
+      },
+      "wallMs": 1349.408709
+    },
+    {
+      "size": 1000,
+      "pageSize": 50,
+      "rttMs": 50,
+      "bandwidthMbps": 50,
+      "shaped": true,
+      "behaviors": {
+        "first-screen": {
+          "requests": 1,
+          "wallMs": 57.470041,
+          "bodyBytes": 30299,
+          "totalBytes": 30698
+        },
+        "revalidation": {
+          "requests": 1,
+          "wallMs": 58.951708,
+          "bodyBytes": 30299,
+          "totalBytes": 30698
+        },
+        "walk-forward": {
+          "requests": 21,
+          "wallMs": 1226.30075,
+          "totalBytes": 612202,
+          "endNextBefore": null
+        },
+        "overview-tasks": {
+          "supported": false,
+          "requests": 0,
+          "note": "当前协议无总量/任务分布端点；现状达成同一用户目标只能整会话翻页探底（请求数≈walk-forward.requests）或不可得；本基线不虚构强制全翻，亦未实现任何 E 概览功能"
+        }
+      },
+      "wallMs": 1342.77275
+    },
+    {
+      "size": 1000,
+      "pageSize": 50,
+      "rttMs": 150,
+      "bandwidthMbps": 10,
+      "shaped": true,
+      "behaviors": {
+        "first-screen": {
+          "requests": 1,
+          "wallMs": 158.937917,
+          "bodyBytes": 30299,
+          "totalBytes": 30698
+        },
+        "revalidation": {
+          "requests": 1,
+          "wallMs": 159.3465,
+          "bodyBytes": 30299,
+          "totalBytes": 30698
+        },
+        "walk-forward": {
+          "requests": 21,
+          "wallMs": 3328.157625,
+          "totalBytes": 612202,
+          "endNextBefore": null
+        },
+        "overview-tasks": {
+          "supported": false,
+          "requests": 0,
+          "note": "当前协议无总量/任务分布端点；现状达成同一用户目标只能整会话翻页探底（请求数≈walk-forward.requests）或不可得；本基线不虚构强制全翻，亦未实现任何 E 概览功能"
+        }
+      },
+      "wallMs": 3646.482
+    },
+    {
+      "size": 1000,
+      "pageSize": 50,
+      "rttMs": 150,
+      "bandwidthMbps": 50,
+      "shaped": true,
+      "behaviors": {
+        "first-screen": {
+          "requests": 1,
+          "wallMs": 155.91175,
+          "bodyBytes": 30299,
+          "totalBytes": 30698
+        },
+        "revalidation": {
+          "requests": 1,
+          "wallMs": 165.666333,
+          "bodyBytes": 30299,
+          "totalBytes": 30698
+        },
+        "walk-forward": {
+          "requests": 21,
+          "wallMs": 3334.187041,
+          "totalBytes": 612202,
+          "endNextBefore": null
+        },
+        "overview-tasks": {
+          "supported": false,
+          "requests": 0,
+          "note": "当前协议无总量/任务分布端点；现状达成同一用户目标只能整会话翻页探底（请求数≈walk-forward.requests）或不可得；本基线不虚构强制全翻，亦未实现任何 E 概览功能"
+        }
+      },
+      "wallMs": 3655.771584
+    },
+    {
+      "size": 10000,
+      "pageSize": 50,
+      "rttMs": null,
+      "bandwidthMbps": null,
+      "shaped": false,
+      "behaviors": {
+        "first-screen": {
+          "requests": 1,
+          "wallMs": 122.085333,
+          "bodyBytes": 30753,
+          "totalBytes": 31153
+        },
+        "revalidation": {
+          "requests": 1,
+          "wallMs": 1.435584,
+          "bodyBytes": 30753,
+          "totalBytes": 31153
+        },
+        "walk-forward": {
+          "requests": 201,
+          "wallMs": 210.779167,
+          "totalBytes": 6206193,
+          "endNextBefore": null
+        },
+        "overview-tasks": {
+          "supported": false,
+          "requests": 0,
+          "note": "当前协议无总量/任务分布端点；现状达成同一用户目标只能整会话翻页探底（请求数≈walk-forward.requests）或不可得；本基线不虚构强制全翻，亦未实现任何 E 概览功能"
+        }
+      },
+      "wallMs": 334.302209
+    },
+    {
+      "size": 10000,
+      "pageSize": 50,
+      "rttMs": 0,
+      "bandwidthMbps": 10,
+      "shaped": true,
+      "behaviors": {
+        "first-screen": {
+          "requests": 1,
+          "wallMs": 3.556959,
+          "bodyBytes": 30753,
+          "totalBytes": 31153
+        },
+        "revalidation": {
+          "requests": 1,
+          "wallMs": 3.770209,
+          "bodyBytes": 30753,
+          "totalBytes": 31153
+        },
+        "walk-forward": {
+          "requests": 201,
+          "wallMs": 934.704875,
+          "totalBytes": 6206193,
+          "endNextBefore": null
+        },
+        "overview-tasks": {
+          "supported": false,
+          "requests": 0,
+          "note": "当前协议无总量/任务分布端点；现状达成同一用户目标只能整会话翻页探底（请求数≈walk-forward.requests）或不可得；本基线不虚构强制全翻，亦未实现任何 E 概览功能"
+        }
+      },
+      "wallMs": 942.036917
+    },
+    {
+      "size": 10000,
+      "pageSize": 50,
+      "rttMs": 0,
+      "bandwidthMbps": 50,
+      "shaped": true,
+      "behaviors": {
+        "first-screen": {
+          "requests": 1,
+          "wallMs": 6.087542,
+          "bodyBytes": 30753,
+          "totalBytes": 31153
+        },
+        "revalidation": {
+          "requests": 1,
+          "wallMs": 5.912,
+          "bodyBytes": 30753,
+          "totalBytes": 31153
+        },
+        "walk-forward": {
+          "requests": 201,
+          "wallMs": 1161.031166,
+          "totalBytes": 6206193,
+          "endNextBefore": null
+        },
+        "overview-tasks": {
+          "supported": false,
+          "requests": 0,
+          "note": "当前协议无总量/任务分布端点；现状达成同一用户目标只能整会话翻页探底（请求数≈walk-forward.requests）或不可得；本基线不虚构强制全翻，亦未实现任何 E 概览功能"
+        }
+      },
+      "wallMs": 1173.043459
+    },
+    {
+      "size": 10000,
+      "pageSize": 50,
+      "rttMs": 50,
+      "bandwidthMbps": 10,
+      "shaped": true,
+      "behaviors": {
+        "first-screen": {
+          "requests": 1,
+          "wallMs": 57.561583,
+          "bodyBytes": 30753,
+          "totalBytes": 31153
+        },
+        "revalidation": {
+          "requests": 1,
+          "wallMs": 56.510792,
+          "bodyBytes": 30753,
+          "totalBytes": 31153
+        },
+        "walk-forward": {
+          "requests": 201,
+          "wallMs": 11644.192042,
+          "totalBytes": 6206193,
+          "endNextBefore": null
+        },
+        "overview-tasks": {
+          "supported": false,
+          "requests": 0,
+          "note": "当前协议无总量/任务分布端点；现状达成同一用户目标只能整会话翻页探底（请求数≈walk-forward.requests）或不可得；本基线不虚构强制全翻，亦未实现任何 E 概览功能"
+        }
+      },
+      "wallMs": 11758.273666
+    },
+    {
+      "size": 10000,
+      "pageSize": 50,
+      "rttMs": 50,
+      "bandwidthMbps": 50,
+      "shaped": true,
+      "behaviors": {
+        "first-screen": {
+          "requests": 1,
+          "wallMs": 60.105458,
+          "bodyBytes": 30753,
+          "totalBytes": 31153
+        },
+        "revalidation": {
+          "requests": 1,
+          "wallMs": 58.614459,
+          "bodyBytes": 30753,
+          "totalBytes": 31153
+        },
+        "walk-forward": {
+          "requests": 201,
+          "wallMs": 11595.843042,
+          "totalBytes": 6206193,
+          "endNextBefore": null
+        },
+        "overview-tasks": {
+          "supported": false,
+          "requests": 0,
+          "note": "当前协议无总量/任务分布端点；现状达成同一用户目标只能整会话翻页探底（请求数≈walk-forward.requests）或不可得；本基线不虚构强制全翻，亦未实现任何 E 概览功能"
+        }
+      },
+      "wallMs": 11714.571541
+    },
+    {
+      "size": 10000,
+      "pageSize": 50,
+      "rttMs": 150,
+      "bandwidthMbps": 10,
+      "shaped": true,
+      "behaviors": {
+        "first-screen": {
+          "requests": 1,
+          "wallMs": 158.678542,
+          "bodyBytes": 30753,
+          "totalBytes": 31153
+        },
+        "revalidation": {
+          "requests": 1,
+          "wallMs": 155.983208,
+          "bodyBytes": 30753,
+          "totalBytes": 31153
+        },
+        "walk-forward": {
+          "requests": 201,
+          "wallMs": 31737.970542,
+          "totalBytes": 6206193,
+          "endNextBefore": null
+        },
+        "overview-tasks": {
+          "supported": false,
+          "requests": 0,
+          "note": "当前协议无总量/任务分布端点；现状达成同一用户目标只能整会话翻页探底（请求数≈walk-forward.requests）或不可得；本基线不虚构强制全翻，亦未实现任何 E 概览功能"
+        }
+      },
+      "wallMs": 32052.63975
+    },
+    {
+      "size": 10000,
+      "pageSize": 50,
+      "rttMs": 150,
+      "bandwidthMbps": 50,
+      "shaped": true,
+      "behaviors": {
+        "first-screen": {
+          "requests": 1,
+          "wallMs": 158.932958,
+          "bodyBytes": 30753,
+          "totalBytes": 31153
+        },
+        "revalidation": {
+          "requests": 1,
+          "wallMs": 157.79825,
+          "bodyBytes": 30753,
+          "totalBytes": 31153
+        },
+        "walk-forward": {
+          "requests": 201,
+          "wallMs": 31670.072084,
+          "totalBytes": 6206193,
+          "endNextBefore": null
+        },
+        "overview-tasks": {
+          "supported": false,
+          "requests": 0,
+          "note": "当前协议无总量/任务分布端点；现状达成同一用户目标只能整会话翻页探底（请求数≈walk-forward.requests）或不可得；本基线不虚构强制全翻，亦未实现任何 E 概览功能"
+        }
+      },
+      "wallMs": 31986.811541
+    }
+  ]
+}

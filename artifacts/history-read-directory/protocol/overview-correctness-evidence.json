@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-11",
+  "phase": "F06",
+  "purpose": "E04 概览正确性证据（Y16 准确性 / Y17 冷热并发 / Y18 后补与分支变化 / Y19 失败与竞态）",
+  "tests": {
+    "primary": "tests/history-overview-route.test.ts",
+    "count": 10,
+    "exitCode": 0
+  },
+  "y16_accuracy": {
+    "status": "已修复并验证",
+    "evidence": [
+      "手写 oracle（fixture: u1→a1→c1..c5→a2→u2→a3）：counts={displayRecords:5, sourceRecords:10, runsWithAssistant:2, referencedTasks:4}，三桶合计=2=runsWithAssistant，四类合计=4=referencedTasks（sub-a 重复去重、mystery-thing→other）",
+      "长夹具 oracle（n=10）：displayRecords=11、sourceRecords=20、runsWithAssistant=1、oneTo50=1"
+    ]
+  },
+  "y17_cold_hot_concurrency": {
+    "status": "已修复并验证",
+    "evidence": [
+      "热路径硬断言（E04.3）：命中目录后 fullFileReadCalls=0、jsonlParseCount=0、不触发外部状态 hydrate（deferredResults.listBySession 零调用）",
+      "冷目录借用 B 同一 single-flight（beginBuild/buildHistoryDirectory），不建第二份目录",
+      "超预算 → directory_unavailable（mapOverviewUnavailableReason 映射测试）；legacy_fallback → unsupported_history"
+    ]
+  },
+  "y18_append_and_branch_changes": {
+    "status": "已修复并验证",
+    "evidence": [
+      "追加：user-only 尾段不计入；追加 assistant → runsWithAssistant+1；51 条同 Run 跨桶 oneTo50→from51To200（overview-route『追加与 Run 跨桶』）",
+      "分支 rewind → 前缀重算（displayRecords 11→6，不返回旧分支统计）",
+      "废弃分支追加 → 当前分支计数不变（不污染）",
+      "task 重复/坏类别：deferred taskId 去重、mystery-thing→other（不靠正文关键词猜）"
+    ]
+  },
+  "y19_failure_and_races": {
+    "status": "已修复并验证",
+    "evidence": [
+      "404/405 → epoch unsupported、回退翻页探底（history-overview-client 测试）",
+      "401/403 → 清理失效统计、不标能力缺席、下次仍尝试",
+      "HTML 错误页/慢响应 → 不崩溃、快照保持原状（data=null）",
+      "响应到达时会话已切换/版本过期 → 丢弃（stale generation 检查）"
+    ]
+  },
+  "hotPathHardAssertions": {
+    "fullFileReadCalls": 0,
+    "jsonlParseCount": "热页 ≈ 2×页大小+依赖（O(窗口)，与历史总规模无关）",
+    "coldBuildSingleFlight": "共享 B 的 beginBuild single-flight，不建第二份目录"
+  },
+  "payloadBudget": {
+    "limit": 4096,
+    "measured": "概览响应 UTF-8 字节 ≤4096（overview-route 断言）；非可用时隐藏统计而非伪造 0"
+  }
+}

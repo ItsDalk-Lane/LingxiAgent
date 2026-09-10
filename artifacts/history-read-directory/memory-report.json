@@ -1,0 +1,28 @@
+{
+  "generatedAt": "2026-09-11",
+  "budget": {
+    "maxSessions": 8,
+    "maxResidentIndexBytes": "64MiB",
+    "maxSingleDirectoryBytes": "16MiB",
+    "clientReceipt": {
+      "maxRecordsPerSession": 32,
+      "maxMetadataBytes": 262144
+    }
+  },
+  "measured": {
+    "directoryResident_1k": "≈1.6MiB",
+    "directoryResident_10k": "14.31MiB（准入线 16MiB 内，余量 1.69MiB）",
+    "eviction": "8 槽 LRU + 64MiB 驻留预算 + retired LIMIT=2；淘汰后 released() 清空（memory 测试断言）",
+    "noContentResidency": "可达对象图无正文/无 Buffer/无源消息数组（payload 标记探针，memory 测试）",
+    "clientReceipt": "≤32 条/会话、元数据 ≤256KiB；超限淘汰记录不淘汰消息（f03-barrier『校验记录 ≤32 条』用例）"
+  },
+  "knownBoundaries": [
+    "retired 旧版本靠 LIMIT=2/invalidate 释放；cache.release()（在途归还）全仓无调用方——追加中会话瞬时驻留最高 3×目录估算（有界、计入 residentBytes），B04 既有行为",
+    "服务器重启换盐 → 旧标签失配 → 正常 200 回退（不要求跨重启命中）"
+  ],
+  "tests": [
+    "tests/history-read-directory-memory.test.ts",
+    "tests/history-read-directory-cache.test.ts",
+    "desktop/src/react/__tests__/history-f03-barrier.test.ts"
+  ]
+}

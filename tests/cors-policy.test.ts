@@ -8,7 +8,7 @@ describe("CORS policy", () => {
     // file://（打包/dev 渲染页）与 loopback web 前端发 PATCH 前必过 CORS 预检；
     // 方法列表漏 PATCH 会让 /api/agents/:id/skills/:name 等单项启停路由整体失效
     const source = fs.readFileSync(
-      path.join(__dirname, "../server/index.ts"),
+      path.join(__dirname, "../server/http/cors-policy.ts"),
       "utf-8",
     );
     const match = source.match(/"Access-Control-Allow-Methods",\s*"([^"]+)"/);

@@ -12,6 +12,7 @@ import {
   readSessionEntriesFile,
   writeSessionEntriesFile,
 } from "./session-jsonl-file.ts";
+import { noteSessionFileMutation } from "./session-file-mutation-epoch.ts";
 
 function emptyResult() {
   return { stripped: 0, strippedImages: 0, strippedVideos: 0, strippedAudios: 0 };
@@ -39,6 +40,10 @@ function pruneSessionManagerEntries(sessionManager) {
   }
 
   if (changed && typeof sessionManager?._rewriteFile === "function") {
+    // C02：就地改写条目 + 整文件重写，旧前缀字节可变——写前递增变更世代。
+    if (typeof sessionManager?.sessionFile === "string" && sessionManager.sessionFile) {
+      noteSessionFileMutation(sessionManager.sessionFile, "rewrite");
+    }
     sessionManager._rewriteFile();
   }
 

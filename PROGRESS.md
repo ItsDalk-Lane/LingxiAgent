@@ -1609,3 +1609,18 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 提交后首轮全量在 `2c178715` 暴露交付证据仍只核对工作树，13383 passed / 1 failed / 7 skipped；改为在 audit-only seal 存在时读取真实 `VERIFIED_SOURCE_SHA` Git 对象并执行 seal guard。随后逐文件 `git show` 在全量并发下先出现 `ENOBUFS`，再因 3454 次进程启动超过 60 秒；没有提高测试超时，改用一次 `git cat-file --batch`，保留全部逐文件字节数与 SHA-256 断言。上述失败日志为 `/tmp/lingxi-r01-r10-postseal-full.log`、`/tmp/lingxi-r01-r10-final-postseal-full.log`。
 - 最终源码候选 `7cf986236cb8ac5c2d22cce1e5882554a42cff28`，审计封印提交 `62c73f77`；候选 source manifest SHA-256 `c418b3ef2fc475e40ed779f21b8e087b120834e9b673baf2e67c3758138d30d8`。封印后独立 diff guard 与 133 路径矩阵通过，upstream-sync、seal、round2 delivery 三文件 20/20 通过。
 - 封印后原样 `npm test` exit 0：1334 文件通过 / 1 既有跳过，13384 测试通过 / 7 既有跳过，0 fail，82.80s；日志 `/tmp/lingxi-r01-r10-final-postseal-full-v2.log`。最终审计记录只改本 allowlist 内的 `PROGRESS.md`，不改变受测源码候选。
+
+## 2026-09-11 历史读取目录化+条件协议任务（A—F）完成
+
+- 分支 `fix/pending-sep10`（HEAD `1d42b740`）；任务改动为该提交之上的未提交工作区增量，按任务约束未提交/未推送/未发布。基线快照=APFS clone `/tmp/lingxi-baseline-1d42b740`（纯净 HEAD）。
+- 交付物：`artifacts/history-read-directory/`（TASKBOOK、acceptance-report.md、acceptance-matrix.json、verification{,-f}、protocol/、patches/ 三补丁、checksums.sha256 最后生成）。
+- 结果：P/X/Y 56 项=55 已修复并验证 + 1 已实现但指定环境未验证（Y14 真实浏览器跨源 CORS）+ 0 受阻 + 0 经证据否定。A/D/F（固定 50）：热页 10k 75.53→0.67→0.61ms、全翻 10k 15341.3→254.7→226.1ms、热页 fullFileReadCalls 2→0→0；决定性 304 两规模 20/20（bodyBytes=0、rebuilds=0）；概览替代逐页探底 201 请求/6095KiB→1 请求/≤4KiB；最终推荐 limit=100（省略 limit 旧请求仍 50、最大 200）。新旧四组合（旧/新服务端×旧/新客户端）全部通过。
+- 验证：定向 406/406 exit 0；typecheck exit 0；tripwire 15/15、持久化指纹 guard 0（compatible repin，无 DATA_EPOCH 变更）；全量 13735 passed / 7 failed（exit 1），失败签名与 A01 基线 7 项逐条一致，任务引入失败 0。
+- 三补丁（a-to-d 47 文件 / d-to-final 38 文件 / task-only 74 文件）`git apply --check` 全过，应用于 A01 副本后树级 diff 与工作区均为 0 差异（两路验证）；task-only 文件集与 git status 任务清单逐项一致，排除他人既有差异。
+- 未验证/受限：Windows/Linux/macOS x64 平台、打包与发布门禁、真实浏览器跨源 CORS（Node loopback 真实 HTTP 层已验）；详见 acceptance-report.md §八与 remaining-risks.md。
+
+### 2026-09-11 F-e 补记（历史读取任务）
+
+- A01 快照 clone `/tmp/lingxi-baseline-1d42b740` 曾被补丁验证误污染（任务内容被写入、runner 丢失）；已按 initial-status.txt（A01=porcelain=0）恢复纯净：HEAD `1d42b740`、工作区 0 差异。
+- compat 旧服务端 runner 自包含化：模板 tracked 于 `tests/compat-old-server-runner.template.mjs`，两个兼容测试 beforeAll 幂等写入 clone；clone 缺席时套件 skip 并 console 明示「四组合中旧服务端侧指定环境未验证」。
+- 复验：compat 4/4 + 4/4（exit 0）、定向 410/410、typecheck exit 0、全量 13735 passed / 7 failed（签名=A01 基线，任务引入 0）；d-to-final（40 文件）/task-only（76 文件）补丁重生成并通过 apply 验证与树级 0 差异复验。事件与防护详见 `artifacts/history-read-directory/{PROGRESS.md, remaining-risks.md}`。

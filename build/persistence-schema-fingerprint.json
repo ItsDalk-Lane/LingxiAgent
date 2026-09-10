@@ -649,7 +649,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:549c80c87f803e33f1bdaeac9165f36e18dda5035ac2069ab289335f51a3844b",
+  "payloadFingerprint": "sha256:188b55309c66624503664256eb5b135be2c887afcd40138e0a9f29aed821ba39",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3165,8 +3165,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "session-coordinator model-trace reuse lookup now resolves the business session id (runtime lookup only, no persisted shape change); model-observability schema v6->v7 is a data-only idempotent trace merge with no DDL, same compatible class as the earlier v5/v6 data migrations",
-    "payloadFingerprint": "sha256:549c80c87f803e33f1bdaeac9165f36e18dda5035ac2069ab289335f51a3844b"
+    "compatibilityReason": "E 协议阶段新增客户端渐进能力与条件请求接入，全部为可选附加路径，持久化数据结构与字段保持兼容：desktop/src/react/stores/history-protocol-client.ts（新增客户端校验记录/页大小协商，纯内存 Map，不写任何 store）、desktop/src/react/stores/history-overview-client.ts（概览非阻塞客户端，只读 GET）、server/http/cors-policy.ts（抽共享 CORS 头契约函数 applyCorsResponseHeaders，允许列表增补 If-None-Match、Expose-Headers 暴露协议头，来源白名单语义不变）、server/index.ts（CORS 中间件改调共享函数，删除内联重复）、server/routes/sessions.ts（成功返回边界新增可选条件 GET 与概览路由，失败/旧客户端回退原完整路径）、desktop/src/react/stores/selectors/file-refs.ts（invalidateSessionCache 增加校验记录失效通知，原 FileRef 缓存语义不变）。无 DATA_EPOCH 变更、无 schema 迁移、无字段增删。",
+    "payloadFingerprint": "sha256:188b55309c66624503664256eb5b135be2c887afcd40138e0a9f29aed821ba39"
   },
   "schemas": [
     {
@@ -4136,7 +4136,7 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:929e4189e0bd82df0f95f262730b9943d2d98e87a45aebecedb8a4edd8487c86",
+      "sourceHash": "sha256:c5878f3c7e8e63db612f04b9286ba87cbf2116fe8207fb92f5397477ea4c0718",
       "storeId": "server-runtime-info"
     },
     {
@@ -4150,7 +4150,7 @@
       "contract": "SessionFile payload naming, v1 sidecar, ownership, and 72-hour cold-session cleanup protocol",
       "kind": "directory-contract",
       "module": "lib/session-files/session-file-registry.ts",
-      "sourceHash": "sha256:4b3e42a5c8173c79c766ea82f7e283541cef190e804ed0cd99cc01c0d63e5617",
+      "sourceHash": "sha256:6525a4c94100e669f087ec4ce02c1a4be25fa9971d46622c8f7babf2f0f3170a",
       "storeId": "session-files"
     },
     {
@@ -4163,7 +4163,7 @@
         {
           "contract": "core/session-jsonl-file.ts repair contract",
           "module": "core/session-jsonl-file.ts",
-          "sourceHash": "sha256:6a311935b1a95c7b6af0c3f2980869de4923fdb9b307cecb8475e400b389af12"
+          "sourceHash": "sha256:7c09e741858e73ceef9be030a282b5a53373bb1ee705e519d4f4e41281a0decf"
         }
       ],
       "kind": "external-versioned",
