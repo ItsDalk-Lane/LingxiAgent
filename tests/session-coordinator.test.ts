@@ -1337,7 +1337,7 @@ describe("SessionCoordinator", () => {
     expect(result.messages[0].content[0].text).toContain("image_overview");
   });
 
-  it("passes desktop steer text to the SDK without adding an internal prefix", () => {
+  it("passes desktop steer text to the SDK without adding an internal prefix", async () => {
     const sessionPath = path.join(tempDir, "steer.jsonl");
     const session = {
       isStreaming: true,
@@ -1376,7 +1376,7 @@ describe("SessionCoordinator", () => {
     coordinator._sessions.set(sessionPath, entry);
     coordinator._renewCachePrefixContract(sessionPath, entry, "test_setup");
 
-    expect(coordinator.steerSession(sessionPath, "先别展开，直接给结论")).toBe(true);
+    await expect(coordinator.steerSession(sessionPath, "先别展开，直接给结论")).resolves.toBe(true);
     expect(session.steer).toHaveBeenCalledWith("先别展开，直接给结论");
   });
 
@@ -1434,7 +1434,7 @@ describe("SessionCoordinator", () => {
     expect(entry.cachePrefixContract).toBeTruthy();
     expect(entry.cachePrefixContractRenewReason).toBe("late_init");
 
-    expect(() => coordinator.steer("interrupt")).not.toThrow();
+    await expect(coordinator.steer("interrupt")).resolves.toBe(true);
     expect(session.steer).toHaveBeenCalledWith("interrupt");
   });
 
@@ -3241,7 +3241,7 @@ describe("SessionCoordinator", () => {
     session.isStreaming = true;
     session.steer.mockClear();
     session.agent.state.systemPrompt = "MUTATED BEFORE STEER";
-    expect(() => coordinator.steerSession(sessionFile, "steered")).not.toThrow();
+    await expect(coordinator.steerSession(sessionFile, "steered")).resolves.toBe(true);
     expect(session.steer).toHaveBeenCalledTimes(1);
     expect(violations()).toHaveLength(2);
     expect(violations()[1].action).toBe("renewed");

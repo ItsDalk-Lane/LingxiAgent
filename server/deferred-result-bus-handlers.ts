@@ -40,27 +40,64 @@ function isDeferredTargetError(target): target is { ok: false; error: string } {
 }
 
 export function registerDeferredResultBusHandlers(eventBus, deferredResultStore) {
-  eventBus.handle("deferred:register", ({ taskId, meta, ...payload }) => {
+  const durableResult = (durable, result: any = { ok: true }) => {
+    if (!durable) return result;
+    return deferredResultStore.flushSync() === true
+      ? { ...result, durable: true }
+      : { ok: false, durable: false, error: "deferred result persistence failed" };
+  };
+  const checkAttempt = (taskId, expectedAttempt, terminalStatus) => {
+    const task = deferredResultStore.query(taskId);
+    if (!task) return { ok: false, error: "deferred task not registered" };
+    if (expectedAttempt !== undefined && (task.meta?.mediaAttempt ?? 1) !== expectedAttempt) {
+      return { ok: false, error: "stale media attempt" };
+    }
+    if (task.status !== "pending" && task.status !== terminalStatus) return { ok: false, error: "deferred terminal outcome conflicts with media result" };
+    return null;
+  };
+  eventBus.handle("deferred:register", ({ taskId, meta, durable = false, ...payload }) => {
     const target = requireDeferredTarget(payload);
     if (isDeferredTargetError(target)) return target;
     const resolved = target as ReturnType<typeof sessionRefPayload>;
+    const existing = deferredResultStore.query(taskId);
+    if (durable && meta?.mediaAttempt !== undefined && existing && (existing.meta?.mediaAttempt ?? 1) > meta.mediaAttempt) {
+      return { ok: false, error: "stale media attempt" };
+    }
     deferredResultStore.defer(taskId, resolved, meta);
-    return { ok: true, ...(resolved.sessionId ? { sessionId: resolved.sessionId, sessionRef: resolved.sessionRef } : {}), sessionPath: resolved.sessionPath };
+    return durableResult(durable, { ok: true, ...(resolved.sessionId ? { sessionId: resolved.sessionId, sessionRef: resolved.sessionRef } : {}), sessionPath: resolved.sessionPath });
   });
-  eventBus.handle("deferred:retry", ({ taskId, meta, ...payload }) => {
+  eventBus.handle("deferred:retry", ({ taskId, meta, durable = false, ...payload }) => {
     const target = requireDeferredTarget(payload);
     if (isDeferredTargetError(target)) return target;
     const resolved = target as ReturnType<typeof sessionRefPayload>;
+    const existing = deferredResultStore.query(taskId);
+    if (durable && meta?.mediaAttempt !== undefined && existing) {
+      const previousAttempt = existing.meta?.mediaAttempt ?? 1;
+      if (previousAttempt > meta.mediaAttempt) return { ok: false, error: "stale media attempt" };
+      if (previousAttempt === meta.mediaAttempt) {
+        return existing.status === "pending"
+          ? durableResult(durable)
+          : { ok: false, error: "media attempt is already settled" };
+      }
+    }
     deferredResultStore.retry(taskId, resolved, meta);
-    return { ok: true, ...(resolved.sessionId ? { sessionId: resolved.sessionId, sessionRef: resolved.sessionRef } : {}), sessionPath: resolved.sessionPath };
+    return durableResult(durable, { ok: true, ...(resolved.sessionId ? { sessionId: resolved.sessionId, sessionRef: resolved.sessionRef } : {}), sessionPath: resolved.sessionPath });
   });
-  eventBus.handle("deferred:resolve", ({ taskId, result, files, sessionFiles }) => {
+  eventBus.handle("deferred:resolve", ({ taskId, result, files, sessionFiles, durable = false, expectedAttempt }) => {
+    if (expectedAttempt !== undefined) {
+      const denied = checkAttempt(taskId, expectedAttempt, "resolved");
+      if (denied) return denied;
+    }
     deferredResultStore.resolve(taskId, normalizeDeferredResolveResult({ result, files, sessionFiles }));
-    return { ok: true };
+    return durableResult(durable);
   });
-  eventBus.handle("deferred:fail", ({ taskId, reason, error }) => {
+  eventBus.handle("deferred:fail", ({ taskId, reason, error, durable = false, expectedAttempt }) => {
+    if (expectedAttempt !== undefined) {
+      const denied = checkAttempt(taskId, expectedAttempt, "failed");
+      if (denied) return denied;
+    }
     deferredResultStore.fail(taskId, reason ?? error?.message ?? String(error));
-    return { ok: true };
+    return durableResult(durable);
   });
   eventBus.handle("deferred:query", ({ taskId }) => {
     return deferredResultStore.query(taskId);
@@ -70,8 +107,12 @@ export function registerDeferredResultBusHandlers(eventBus, deferredResultStore)
     if (isDeferredTargetError(target)) return [];
     return deferredResultStore.listPending(target as ReturnType<typeof sessionRefPayload>);
   });
-  eventBus.handle("deferred:abort", ({ taskId, reason }) => {
+  eventBus.handle("deferred:abort", ({ taskId, reason, durable = false, expectedAttempt }) => {
+    if (expectedAttempt !== undefined) {
+      const denied = checkAttempt(taskId, expectedAttempt, "aborted");
+      if (denied) return denied;
+    }
     deferredResultStore.abort(taskId, reason);
-    return { ok: true };
+    return durableResult(durable);
   });
 }

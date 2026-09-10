@@ -2039,8 +2039,7 @@ describe("knowledge context injection (Phase 8)", () => {
     expect(abortPendingDesktopSubmission(engine, { sessionPath: "/tmp/desk.jsonl" })).toBe(true);
 
     resolveInjection({ block: INJECTION_BLOCK, stats: RETRIEVAL_STATS });
-    const result = await submitted;
-    expect(result).toEqual({ text: null, toolMedia: [] });
+    await expect(submitted).rejects.toMatchObject({ name: 'AbortError', code: 'input_cancelled_before_acceptance' });
     expect(engine.promptSession).not.toHaveBeenCalled();
     expect(appendCustomEntry).not.toHaveBeenCalled();
     const types = engine.emitEvent.mock.calls.map(([event]) => event.type);
@@ -2084,8 +2083,7 @@ describe("knowledge context injection (Phase 8)", () => {
 
     // 注入链随后以取消收场（此处模拟 engine 内部对 signal 的响应后返回）。
     rejectInjection(capturedSignal!.reason);
-    const result = await submitted;
-    expect(result).toEqual({ text: null, toolMedia: [] });
+    await expect(submitted).rejects.toMatchObject({ name: 'AbortError', code: 'input_cancelled_before_acceptance' });
     expect(engine.promptSession).not.toHaveBeenCalled();
     // controller 注册表已清理：同 session 再提交拿到的是新的未中止 signal。
     (engine as any).buildConversationKnowledgeContext = vi.fn(async () => ({ block: null, stats: RETRIEVAL_STATS }));

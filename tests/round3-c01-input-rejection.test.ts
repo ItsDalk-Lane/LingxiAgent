@@ -69,6 +69,7 @@ vi.mock('../desktop/src/react/services/websocket', () => ({
 
 import { createChatRoute } from '../server/routes/chat.ts';
 import {
+  abortPendingDesktopSubmission,
   isDesktopInputRejectedBeforeAcceptance,
   markDesktopInputRejectedBeforeAcceptance,
   submitDesktopSessionMessage,
@@ -349,6 +350,40 @@ describe('C01 server route: typed input_rejected receipts', () => {
       retryable: true,
       clientAttemptId: 'client-attempt-5',
     });
+  });
+
+  it('已证实接受前取消：发送拒绝回执并恢复客户端输入，不额外显示普通错误', async () => {
+    const { record, payload } = await submitViaCoordinator('取消后原文仍可处置');
+    const loaded = Promise.withResolvers<object>();
+    const promptSession = vi.fn();
+    const h = buildChatRouteHarness({ ensureSessionLoaded: () => loaded.promise, promptSession }, {
+      send: vi.fn((text, opts) => submitDesktopSessionMessage(h.engine, { ...opts, text })),
+    });
+    h.receive(payload);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(abortPendingDesktopSubmission(h.engine, { sessionId: SESSION_A, sessionPath: PATH_A })).toBe(true);
+    loaded.resolve({});
+    await vi.advanceTimersByTimeAsync(0);
+    const rejection = h.sent().find(event => event.type === 'input_rejected');
+    expect(rejection).toMatchObject({ outcome: 'not_accepted', code: 'input_cancelled_before_acceptance', retryable: true });
+    expect(h.sent().some(event => event.type === 'error')).toBe(false);
+    handleServerMessage(rejection);
+    expect(record.phase).toBe('rejected_before_acceptance');
+    expect(record.bundle.text).toBe('取消后原文仍可处置');
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(false);
+    expect(promptSession).not.toHaveBeenCalled();
+  });
+
+  it('旧 steer 路由等待异步结果，false 才回退到普通发送', async () => {
+    const enqueue = Promise.withResolvers<boolean>();
+    const h = buildChatRouteHarness({ steerSession: () => enqueue.promise }, { send: vi.fn(async () => {}) });
+    h.receive({ type: 'steer', text: 'hi', sessionId: SESSION_A, sessionPath: PATH_A });
+    await vi.advanceTimersByTimeAsync(0);
+    expect(h.sent().some(event => event.type === 'steered')).toBe(false);
+    expect(h.hub.send).not.toHaveBeenCalled();
+    enqueue.resolve(false);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(h.hub.send).toHaveBeenCalledOnce();
   });
 
   it('无 clientMessageId 的旧客户端：只收到 legacy error，不投递拒绝回执', async () => {

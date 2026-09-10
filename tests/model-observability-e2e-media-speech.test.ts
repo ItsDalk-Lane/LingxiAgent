@@ -85,7 +85,9 @@ async function runImageSubmit(adapterId: string, root: string, extraParams: Reco
     adapter,
     params: { prompt: POISON_PROMPT, providerId: adapter.id, ...extraParams },
     submitCtx: { ...shared, generatedDir: path.join(root, "generated") },
-    store: { get: vi.fn(() => ({})), update: vi.fn() },
+    // 替身 store 必须满足在途尝试契约：pending 且 attempt 合法，
+    // 否则 runner 按「旧尝试不得写入新状态」规则提前退出。
+    store: { get: vi.fn(() => ({ status: "pending", attempt: 1 })), update: vi.fn() },
     poller: { checkNow: vi.fn() },
     ctx: shared,
   } as any);

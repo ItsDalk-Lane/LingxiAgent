@@ -416,29 +416,34 @@ describe("persistence", () => {
     expect(store.listAll()).toEqual([]);
   });
 
-  it("starts with empty store when tasks.json is corrupted JSON", () => {
+  it("refuses to start when tasks.json is corrupted JSON", () => {
     const dir = makeTmpDir();
-    fs.writeFileSync(path.join(dir, "tasks.json"), "{{ not valid json }}");
-    const store = new TaskStore(dir);
-    expect(store.listAll()).toEqual([]);
+    const filePath = path.join(dir, "tasks.json");
+    fs.writeFileSync(filePath, "{{ not valid json }}");
+    expect(() => new TaskStore(dir)).toThrow();
+    // 损坏原件必须保留，不能被空库覆盖
+    expect(fs.readFileSync(filePath, "utf8")).toBe("{{ not valid json }}");
   });
 
-  it("starts with empty store when tasks.json contains non-array JSON", () => {
+  it("refuses to start when tasks.json contains non-array JSON", () => {
     const dir = makeTmpDir();
-    fs.writeFileSync(path.join(dir, "tasks.json"), JSON.stringify({ taskId: "t1" }));
-    const store = new TaskStore(dir);
-    expect(store.listAll()).toEqual([]);
+    const filePath = path.join(dir, "tasks.json");
+    fs.writeFileSync(filePath, JSON.stringify({ taskId: "t1" }));
+    expect(() => new TaskStore(dir)).toThrow(/must be an array/);
+    expect(fs.readFileSync(filePath, "utf8")).toBe(JSON.stringify({ taskId: "t1" }));
   });
 
-  it("destroy cancels pending debounce without writing", () => {
+  it("destroy flushes pending debounce before returning", () => {
     const dir = makeTmpDir();
     const store = new TaskStore(dir);
     store.add(makeTask());
     // _scheduleSave is called inside add; destroy before it fires
     store.destroy();
 
+    // 正常关闭必须保存最新状态，不能取消待保存工作后直接退出
     const filePath = path.join(dir, "tasks.json");
-    // File should NOT be written yet (no flushSync, no debounce fired)
-    expect(fs.existsSync(filePath)).toBe(false);
+    expect(fs.existsSync(filePath)).toBe(true);
+    const persisted = JSON.parse(fs.readFileSync(filePath, "utf8"));
+    expect(persisted.map((row) => row.taskId)).toEqual([makeTask().taskId]);
   });
 });

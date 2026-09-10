@@ -28,6 +28,17 @@ final class MockRecognitionTask: RecognitionTaskCancelling {
     }
 }
 
+// 明确等待 continuation 已挂接，不能以调度让步猜测另一个任务已经就绪。
+actor ContinuationReady {
+    private var ready = false
+    private var waiter: CheckedContinuation<Void, Never>?
+    func signal() { ready = true; waiter?.resume(); waiter = nil }
+    func wait() async {
+        if ready { return }
+        await withCheckedContinuation { waiter = $0 }
+    }
+}
+
 @main
 struct CoordinatorTestRunner {
     // 串行执行的测试计数器：全部测试在 main 里顺序 await，无并发访问；
@@ -53,10 +64,11 @@ struct CoordinatorTestRunner {
     }
 
     static func attachContinuation(
-        to coordinator: RecognitionCoordinator
+        to coordinator: RecognitionCoordinator, ready: ContinuationReady? = nil
     ) async throws -> String {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
             coordinator.attachContinuation(continuation)
+            if let ready { Task { await ready.signal() } }
         }
     }
 
@@ -67,6 +79,8 @@ struct CoordinatorTestRunner {
         await testCancelIsIdempotent()
         await testLateResultAfterTimeoutIsDropped()
         await testTaskAttachedAfterTerminalIsCancelledImmediately()
+        await testTerminalBeforeContinuation(cancelled: true)
+        await testTerminalBeforeContinuation(cancelled: false)
 
         print("—")
         let (failedChecks, totalChecks) = counterLock.withLock { (failures, total) }
@@ -79,8 +93,9 @@ struct CoordinatorTestRunner {
 
     static func testFinalResultSettlesWithText() async {
         let coordinator = RecognitionCoordinator()
-        async let outcome = attachContinuation(to: coordinator)
-        await Task.yield()
+        let ready = ContinuationReady()
+        async let outcome = attachContinuation(to: coordinator, ready: ready)
+        await ready.wait()
         coordinator.handleRecognitionEvent(resultText: "你好", isFinal: true, error: nil)
         do {
             let text = try await outcome
@@ -94,8 +109,9 @@ struct CoordinatorTestRunner {
 
     static func testFirstTerminalWins() async {
         let coordinator = RecognitionCoordinator()
-        async let outcome = attachContinuation(to: coordinator)
-        await Task.yield()
+        let ready = ContinuationReady()
+        async let outcome = attachContinuation(to: coordinator, ready: ready)
+        await ready.wait()
         coordinator.handleRecognitionEvent(resultText: "先到结果", isFinal: true, error: nil)
         // 晚到错误/超时/取消：全部必须被丢弃（二次 resume 会触发运行时陷阱）。
         coordinator.handleRecognitionEvent(resultText: nil, isFinal: false,
@@ -114,8 +130,9 @@ struct CoordinatorTestRunner {
     static func testTimeoutCancelsTaskAndSettlesTimedOut() async {
         let coordinator = RecognitionCoordinator()
         let mock = MockRecognitionTask()
-        async let outcome = attachContinuation(to: coordinator)
-        await Task.yield()
+        let ready = ContinuationReady()
+        async let outcome = attachContinuation(to: coordinator, ready: ready)
+        await ready.wait()
         coordinator.attachTask(mock)
         coordinator.timeout()
         do {
@@ -131,8 +148,9 @@ struct CoordinatorTestRunner {
     static func testCancelIsIdempotent() async {
         let coordinator = RecognitionCoordinator()
         let mock = MockRecognitionTask()
-        async let outcome = attachContinuation(to: coordinator)
-        await Task.yield()
+        let ready = ContinuationReady()
+        async let outcome = attachContinuation(to: coordinator, ready: ready)
+        await ready.wait()
         coordinator.attachTask(mock)
         coordinator.cancel()
         coordinator.cancel()
@@ -150,8 +168,9 @@ struct CoordinatorTestRunner {
     static func testLateResultAfterTimeoutIsDropped() async {
         let coordinator = RecognitionCoordinator()
         let mock = MockRecognitionTask()
-        async let outcome = attachContinuation(to: coordinator)
-        await Task.yield()
+        let ready = ContinuationReady()
+        async let outcome = attachContinuation(to: coordinator, ready: ready)
+        await ready.wait()
         coordinator.attachTask(mock)
         coordinator.timeout()
         coordinator.handleRecognitionEvent(resultText: "晚到结果", isFinal: true, error: nil)
@@ -167,8 +186,9 @@ struct CoordinatorTestRunner {
 
     static func testTaskAttachedAfterTerminalIsCancelledImmediately() async {
         let coordinator = RecognitionCoordinator()
-        async let outcome = attachContinuation(to: coordinator)
-        await Task.yield()
+        let ready = ContinuationReady()
+        async let outcome = attachContinuation(to: coordinator, ready: ready)
+        await ready.wait()
         coordinator.timeout()
         let mock = MockRecognitionTask()
         coordinator.attachTask(mock)
@@ -180,4 +200,22 @@ struct CoordinatorTestRunner {
             expectEqual(error as? SpeechHelperError, .timedOut, "race: error code")
         }
     }
+    static func testTerminalBeforeContinuation(cancelled: Bool) async {
+        let coordinator = RecognitionCoordinator()
+        if cancelled { coordinator.cancel() } else { coordinator.timeout() }
+        // 后续终态请求和晚到任务均不能改写最先确定的结果。
+        coordinator.cancel()
+        coordinator.timeout()
+        let mock = MockRecognitionTask()
+        coordinator.attachTask(mock)
+        do {
+            _ = try await attachContinuation(to: coordinator)
+            check(false, "pre-attach: must not produce success")
+        } catch {
+            expectEqual(error as? SpeechHelperError, cancelled ? .cancelled : .timedOut, "pre-attach: exact terminal result")
+        }
+        expectEqual(mock.cancels, 1, "pre-attach: late task cancelled once")
+        expectEqual(coordinator.currentPhase, cancelled ? .cancelled : .timedOut, "pre-attach: terminal phase preserved")
+    }
+
 }

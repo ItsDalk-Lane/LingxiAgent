@@ -105,6 +105,15 @@ export class DeferredResultStore {
     this._flushToDisk();
   }
 
+  /** 媒体交接需要明确的落盘回执，不能把延迟保存当成已经保存。 */
+  flushSync() {
+    if (this._saveTimer) {
+      clearTimeout(this._saveTimer);
+      this._saveTimer = null;
+    }
+    return this._flushToDisk();
+  }
+
   // ── 核心操作 ──
 
   defer(taskId, sessionPath, meta: any = {}) {
@@ -514,14 +523,19 @@ export class DeferredResultStore {
 
   _flushToDisk() {
     this._saveTimer = null;
-    if (!this._dirty) return;
-    this._dirty = false;
+    if (!this._persistPath || !this._dirty) return true;
     try {
       const obj: any = {};
       for (const [k, v] of this._tasks) obj[k] = v;
       fs.mkdirSync(path.dirname(this._persistPath), { recursive: true });
       atomicWriteSync(this._persistPath, JSON.stringify(obj, null, 2) + "\n");
-    } catch { /* best effort */ }
+      this._dirty = false;
+      return true;
+    } catch {
+      // 保留脏标记，明确失败的持久交接可原样重试，不必再次生成媒体。
+      this._dirty = true;
+      return false;
+    }
   }
 
   _load() {

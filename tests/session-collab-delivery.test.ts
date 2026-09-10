@@ -7,10 +7,15 @@ vi.mock("../core/desktop-session-submit.ts", async (importOriginal) => {
     submitDesktopSessionInterjection: vi.fn(),
   };
 });
-import { submitDesktopSessionMessageWithReceipt, submitDesktopSessionInterjection } from "../core/desktop-session-submit.ts";
+import { markDesktopInputRejectedBeforeAcceptance, submitDesktopSessionMessageWithReceipt, submitDesktopSessionInterjection } from "../core/desktop-session-submit.ts";
 import { deliverAgentMessage, AGENT_MESSAGE_SOURCE } from "../lib/session-collab/delivery.ts";
 
 const FROM = { agentId: "hana", agentName: "Hana" };
+function rejectedBusy() {
+  const error = new Error("session_busy");
+  markDesktopInputRejectedBeforeAcceptance(error);
+  return error;
+}
 function makeEngine(streaming = false) {
   return {
     getSessionManifest: vi.fn().mockReturnValue({ currentLocator: { path: "/tmp/dst.jsonl" }, ownerAgentId: "kimi" }),
@@ -59,8 +64,8 @@ describe("deliverAgentMessage", () => {
 
   it("空闲但 submit 立刻 reject session_busy → 兜底走 interjection 一次，最终 resolve accepted", async () => {
     vi.mocked(submitDesktopSessionMessageWithReceipt).mockReturnValueOnce({
-      accepted: Promise.reject(new Error("session_busy")),
-      completion: Promise.reject(new Error("session_busy")),
+      accepted: Promise.reject(rejectedBusy()),
+      completion: Promise.reject(rejectedBusy()),
     } as any);
     const result = await deliverAgentMessage(makeEngine(false), { targetSessionId: "sid-1", message: "正文3", from: FROM });
     expect(submitDesktopSessionMessageWithReceipt).toHaveBeenCalledTimes(1);
@@ -72,7 +77,7 @@ describe("deliverAgentMessage", () => {
 
   it("空闲但 submit 同步 throw session_busy → 同样兜底走 interjection 一次", async () => {
     vi.mocked(submitDesktopSessionMessageWithReceipt).mockImplementationOnce(() => {
-      throw new Error("session_busy");
+      throw rejectedBusy();
     });
     const result = await deliverAgentMessage(makeEngine(false), { targetSessionId: "sid-1", message: "正文3b", from: FROM });
     expect(submitDesktopSessionMessageWithReceipt).toHaveBeenCalledTimes(1);
@@ -92,10 +97,10 @@ describe("deliverAgentMessage", () => {
 
   it("submit 与 interjection 都 reject session_busy → 整体 reject session_busy", async () => {
     vi.mocked(submitDesktopSessionMessageWithReceipt).mockReturnValueOnce({
-      accepted: Promise.reject(new Error("session_busy")),
-      completion: Promise.reject(new Error("session_busy")),
+      accepted: Promise.reject(rejectedBusy()),
+      completion: Promise.reject(rejectedBusy()),
     } as any);
-    vi.mocked(submitDesktopSessionInterjection).mockRejectedValueOnce(new Error("session_busy"));
+    vi.mocked(submitDesktopSessionInterjection).mockRejectedValueOnce(rejectedBusy());
     await expect(
       deliverAgentMessage(makeEngine(false), { targetSessionId: "sid-1", message: "正文5", from: FROM }),
     ).rejects.toThrow("session_busy");

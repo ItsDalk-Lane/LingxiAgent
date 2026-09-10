@@ -3158,6 +3158,11 @@ function patchSessionFileLifecycleBlocks(blocks, engine, sessionPath) {
     }
     if (!file) continue;
     const patch = sessionFileLifecycleFields(file, engine);
+    // 历史块记录展示时的内容证据；目录只更新当前位置与可用性，不能用
+    // 今天的版本改写过去，也不能给缺少版本的旧记录伪造版本。
+    delete patch.version;
+    delete patch.size;
+    delete patch.mtimeMs;
     Object.assign(block, patch);
     if (block.type === "skill" && block.installedFile) {
       block.installedFile = { ...block.installedFile, ...patch };
@@ -3176,7 +3181,7 @@ function listSessionRegistryFiles(engine, sessionPath, activeReferences = []) {
 }
 
 function isMediaGenerationDeferredResult(result) {
-  return result?.type === "image-generation" || result?.type === "video-generation";
+  return result?.type === "image-generation" || result?.type === "video-generation" || result?.type === "speech-generation";
 }
 
 function parseHistoryDeferredResult(message) {

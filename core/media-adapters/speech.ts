@@ -10,15 +10,12 @@
  * 文件直接随 submit 返回时，poller 按 fake-async 语义立即判完成。
  */
 
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
+import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { saveImage } from "../media/download.ts";
 import { ensureEffectiveSpeechParameters } from "../media/media-parameters.ts";
 import { t } from "../../lib/i18n.ts";
-
-const execFileAsync = promisify(execFile);
 
 export const openaiSpeechAdapter = {
   id: "openai-speech",
@@ -44,6 +41,8 @@ export const openaiSpeechAdapter = {
   },
 
   async submit(params, ctx) {
+    const signal = ctx.signal ?? params.signal;
+    signal?.throwIfAborted();
     params = ensureEffectiveSpeechParameters(params, "openai-audio-speech", ctx.mediaExecutionTarget);
     const providerId = params.credentialProviderId ?? ctx.mediaExecutionTarget?.credentialProviderId;
     if (!providerId) throw new Error("CREDENTIAL_PROVIDER_UNRESOLVED");
@@ -65,13 +64,14 @@ export const openaiSpeechAdapter = {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({ model, input, voice, response_format: format, speed }),
-      signal: params.signal,
+      signal,
     });
     if (!response.ok) {
       const detail = await response.text().catch(() => "");
       throw new Error(`speech generation failed: status ${response.status}${detail ? ` — ${detail.slice(0, 300)}` : ""}`);
     }
     const buffer = Buffer.from(await response.arrayBuffer());
+    signal?.throwIfAborted();
     const mimeType = format === "mp3" ? "audio/mpeg"
       : format === "opus" ? "audio/ogg"
       : format === "aac" ? "audio/aac"
@@ -118,6 +118,8 @@ export const minimaxSpeechAdapter = {
   },
 
   async submit(params, ctx) {
+    const signal = ctx.signal ?? params.signal;
+    signal?.throwIfAborted();
     params = ensureEffectiveSpeechParameters(params, "minimax-tts", ctx.mediaExecutionTarget);
     const providerId = params.credentialProviderId ?? ctx.mediaExecutionTarget?.credentialProviderId;
     if (!providerId) throw new Error("CREDENTIAL_PROVIDER_UNRESOLVED");
@@ -149,7 +151,7 @@ export const minimaxSpeechAdapter = {
         voice_setting: { voice_id: voice, speed },
         audio_setting: { format },
       }),
-      signal: params.signal,
+      signal,
     });
     const body = await response.json().catch(() => null);
     const statusCode = body?.base_resp?.status_code;
@@ -161,11 +163,14 @@ export const minimaxSpeechAdapter = {
       throw new Error("MiniMax speech returned no audio data");
     }
     const buffer = Buffer.from(hex, "hex");
-    const mimeType = format === "wav" ? "audio/wav" : format === "flac" ? "audio/flac" : "audio/mpeg";
+    signal?.throwIfAborted();
+    const mimeType = format === "wav" ? "audio/wav" : format === "flac" ? "audio/flac"
+      : format === "pcm" ? "application/octet-stream" : "audio/mpeg";
     const customName = typeof params.suggestedFilename === "string" && params.suggestedFilename.trim()
       ? params.suggestedFilename.trim()
       : null;
-    const { filename } = await saveImage(buffer, mimeType, ctx.dataDir, customName);
+    const { filename } = await saveImage(buffer, mimeType, ctx.dataDir, customName,
+      format === "pcm" ? { extension: "pcm" } : {});
     return {
       taskId: `speech-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
       files: [filename],
@@ -200,6 +205,8 @@ export const dashscopeSpeechAdapter = {
   },
 
   async submit(params, ctx) {
+    const signal = ctx.signal ?? params.signal;
+    signal?.throwIfAborted();
     params = ensureEffectiveSpeechParameters(params, "dashscope-qwen-tts", ctx.mediaExecutionTarget);
     const providerId = params.credentialProviderId ?? ctx.mediaExecutionTarget?.credentialProviderId;
     if (!providerId) throw new Error("CREDENTIAL_PROVIDER_UNRESOLVED");
@@ -225,7 +232,7 @@ export const dashscopeSpeechAdapter = {
         model,
         input: { text: String(params.prompt ?? ""), voice },
       }),
-      signal: params.signal,
+      signal,
     });
     const body = await generateResponse.json().catch(() => null);
     if (!generateResponse.ok) {
@@ -235,11 +242,12 @@ export const dashscopeSpeechAdapter = {
     if (typeof audioUrl !== "string" || !audioUrl) {
       throw new Error("DashScope speech returned no audio url");
     }
-    const audioResponse = await fetch(audioUrl, { signal: params.signal });
+    const audioResponse = await fetch(audioUrl, { signal });
     if (!audioResponse.ok) {
       throw new Error(`DashScope speech audio download failed: status ${audioResponse.status}`);
     }
     const buffer = Buffer.from(await audioResponse.arrayBuffer());
+    signal?.throwIfAborted();
     const mimeType = audioResponse.headers.get("content-type")?.split(";")[0] || "audio/wav";
     const customName = typeof params.suggestedFilename === "string" && params.suggestedFilename.trim()
       ? params.suggestedFilename.trim()
@@ -253,6 +261,62 @@ export const dashscopeSpeechAdapter = {
 };
 
 const SUPPORTED_SYSTEM_SPEECH_PLATFORMS = new Set(["darwin"]);
+
+/** 取消后等待进程关闭；不响应 SIGTERM 时升级 SIGKILL，并给回收保留有限时间。 */
+export async function runSystemSpeechProcess(command: string, args: string[], {
+  signal,
+  timeoutMs = 120_000,
+  killGraceMs = 1_500,
+}: { signal?: AbortSignal; timeoutMs?: number; killGraceMs?: number } = {}): Promise<void> {
+  signal?.throwIfAborted();
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, { stdio: ["ignore", "ignore", "pipe"] });
+    let terminalError: Error | null = null;
+    let settled = false;
+    let stderr = "";
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    let killTimer: ReturnType<typeof setTimeout> | undefined;
+    let cleanupTimer: ReturnType<typeof setTimeout> | undefined;
+    const finish = (error?: Error | null) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      clearTimeout(killTimer);
+      clearTimeout(cleanupTimer);
+      signal?.removeEventListener("abort", onAbort);
+      if (error) reject(error); else resolve();
+    };
+    const terminate = (error: Error) => {
+      if (terminalError || settled) return;
+      terminalError = error;
+      child.kill("SIGTERM");
+      killTimer = setTimeout(() => {
+        if (settled) return;
+        child.kill("SIGKILL");
+        cleanupTimer = setTimeout(() => {
+          // 保留首个失败原因，同时明确说明未能确认进程回收。
+          finish(Object.assign(error, { cleanupError: "SYSTEM_SPEECH_PROCESS_CLEANUP_TIMEOUT" }));
+        }, killGraceMs);
+      }, killGraceMs);
+    };
+    const onAbort = () => terminate(signal?.reason instanceof Error
+      ? signal.reason : new DOMException("Speech generation aborted", "AbortError"));
+    child.stderr.on("data", (chunk) => {
+      if (stderr.length < 65_536) stderr += String(chunk).slice(0, 65_536 - stderr.length);
+    });
+    child.on("error", (error) => { terminalError ??= error; });
+    child.once("close", (code, childSignal) => {
+      finish(terminalError || (code === 0 ? null : new Error(
+        `system speech process exited ${code ?? childSignal}${stderr ? `: ${stderr.trim()}` : ""}`,
+      )));
+    });
+    timeout = setTimeout(() => terminate(Object.assign(new Error("system speech timed out"), {
+      code: "SYSTEM_SPEECH_TIMEOUT",
+    })), timeoutMs);
+    signal?.addEventListener("abort", onAbort, { once: true });
+    if (signal?.aborted) onAbort();
+  });
+}
 
 /** `say` 的唯一 argv 映射；只消费解析器给出的实际 voice/rate。 */
 export function buildSystemSpeechSayArgs(params: Record<string, any>, outputPath: string): string[] {
@@ -290,6 +354,8 @@ export const systemSpeechAdapter = {
   },
 
   async submit(params, ctx) {
+    const signal = ctx.signal ?? params.signal;
+    signal?.throwIfAborted();
     params = ensureEffectiveSpeechParameters(params, "system-speech", ctx.mediaExecutionTarget);
     if (!SUPPORTED_SYSTEM_SPEECH_PLATFORMS.has(process.platform)) {
       throw new Error("system speech is only available on macOS");
@@ -301,11 +367,7 @@ export const systemSpeechAdapter = {
 
     const args = buildSystemSpeechSayArgs(params, outputPath);
 
-    try {
-      await execFileAsync("/usr/bin/say", args, { timeout: 120_000 });
-    } catch (err) {
-      throw new Error(`system speech failed: ${err?.message || err}`);
-    }
+    await runSystemSpeechProcess("/usr/bin/say", args, { signal });
     if (!fs.existsSync(outputPath)) {
       throw new Error("system speech produced no output");
     }

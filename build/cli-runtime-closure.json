@@ -1458,11 +1458,21 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "core/media/image-task-runner.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/media/poller.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/media/universal-media-manager.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/media/universal-media-manager.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/media/image-task-runner.ts (import-statement); core/media/poller.ts (import-statement); core/media/universal-media-manager.ts (import-statement)."
     },
     {
       "path": "core/media/universal-media-manager.ts",
@@ -125992,6 +126002,23 @@
       "reason": "Reached via esbuild source module graph, imported by server/routes/chat.ts (import-statement)."
     },
     {
+      "path": "server/session-file-block.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "server/block-extractors.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/chat.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by server/block-extractors.ts (import-statement); server/routes/chat.ts (import-statement)."
+    },
+    {
       "path": "server/session-stream-store.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -128605,9 +128632,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10973,
+    "totalFiles": 10974,
     "byInputType": {
-      "source-graph": 764,
+      "source-graph": 765,
       "runtime-asset": 11,
       "nft-runtime-trace": 10198
     }

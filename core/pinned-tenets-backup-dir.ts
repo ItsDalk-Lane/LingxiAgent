@@ -17,12 +17,15 @@ import path from "node:path";
 
 export const BACKUP_DIR_STORAGE_PREFIX = "memory/pinned-migration-backup";
 /** 收据校验的权威形状：规范 POSIX 表示，最多一个 operation 段。 */
-const CANONICAL_BACKUP_DIR_RE = /^memory\/pinned-migration-backup(?:\/[a-zA-Z0-9-]+)?$/;
+const CANONICAL_BACKUP_DIR_RE = /^memory\/pinned-migration-backup(?:\/[a-zA-Z0-9_-]+)?$/;
 /** 既有 Windows 写入逻辑产生的反斜杠形式（仅兼容读取，不再写出）。 */
-const LEGACY_WINDOWS_BACKUP_DIR_RE = /^memory\\pinned-migration-backup(?:\\[a-zA-Z0-9-]+)?$/;
+const LEGACY_WINDOWS_BACKUP_DIR_RE = /^memory\\pinned-migration-backup(?:\\[a-zA-Z0-9_-]+)?$/;
 
 /** 收据写入用：构造规范 POSIX 表示。绝不把本机 path.join 的结果直接持久化。 */
 export function backupDirForReceipt(operationId: string | null): string {
+  if (operationId !== null && !/^[a-zA-Z0-9_-]+$/.test(operationId)) {
+    throw new Error("invalid receipt operationId");
+  }
   return operationId ? `${BACKUP_DIR_STORAGE_PREFIX}/${operationId}` : BACKUP_DIR_STORAGE_PREFIX;
 }
 

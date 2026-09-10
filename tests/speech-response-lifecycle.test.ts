@@ -246,14 +246,25 @@ describe("F12/P8.3 同步 response 完成（V07–V11）", () => {
     const after = manager.getTask("t-v11");
     expect(after.completedAt).toBe(first.completedAt);
 
-    // 已取消任务不能被无条件改 done
-    (manager as any)._store.update("t-v11", { status: "cancelled", submitState: "cancelled" });
-    const cancelled = (manager as any)._store.completeSynchronousSpeechTask("t-v11", {
+    // 已取消任务不能被无条件改 done（终态只结算一次：pending 任务取消后，
+    // 迟到的完成不得覆盖取消；done→cancelled 的反向改写同样被 update 拒绝，
+    // 因此用一条真实取消的 pending 任务架设场景）
+    (manager as any)._store.add({
+      taskId: "t-v11-cancelled",
+      adapterId: "openai",
+      batchId: "batch-v11-cancelled",
+      type: "speech",
+      prompt: "读一下",
+      params: {},
+    });
+    (manager as any)._store.update("t-v11-cancelled", { status: "cancelled", submitState: "cancelled" });
+    const cancelled = (manager as any)._store.completeSynchronousSpeechTask("t-v11-cancelled", {
       files: [file],
       generatedDir: (manager as any)._generatedDir,
     });
     expect(cancelled.ok).toBe(false);
-    expect(manager.getTask("t-v11").status).toBe("cancelled");
+    expect(manager.getTask("t-v11-cancelled").status).toBe("cancelled");
+    expect(manager.getTask("t-v11").status).toBe("done");
     manager.stop();
   });
 });

@@ -649,7 +649,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:92a83e282cd0ba0fbb03f79be3de552e2d95f176cf187dc61d362e4d15c22a00",
+  "payloadFingerprint": "sha256:7cfeb40f08fb88a857b7cca867733ac21a42248f763e6c71a215651e19c4eb65",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3165,8 +3165,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "MCP connector lifecycle feature: normalizeMcpConfig now persists two new optional per-connector fields (lifecycle, idleTimeoutMinutes). Read-time defaults (lifecycle keep-alive, idleTimeoutMinutes null) reproduce the pre-feature behaviour for every existing config, so old shapes read identically and no migration is needed — a compatible addition, not a breaking change.",
-    "payloadFingerprint": "sha256:92a83e282cd0ba0fbb03f79be3de552e2d95f176cf187dc61d362e4d15c22a00"
+    "compatibilityReason": "架构契约补强：媒体任务记录新增 attempt/deliveryState 可选字段（旧记录按 attempt=1 与既有 deliveryMode 兼容读取），置顶记忆收据新增 v4 阶段（继续读取 v2/v3），会话/语音/连接流程仅行为加固，无持久结构破坏",
+    "payloadFingerprint": "sha256:7cfeb40f08fb88a857b7cca867733ac21a42248f763e6c71a215651e19c4eb65"
   },
   "schemas": [
     {
@@ -3326,7 +3326,7 @@
       "contract": "DeferredResultStore normalization, seven-day cleanup, and atomic serializer",
       "kind": "runtime-contract",
       "module": "lib/deferred-result-store.ts",
-      "sourceHash": "sha256:43930be66cf5571a03128df9769c3ddbf01146ad8adc31bd4ae646b54b8520cc",
+      "sourceHash": "sha256:9c5d506f5d3c93e45de97263427a0604f897308b7a103edcc584030751b7d09b",
       "storeId": "deferred-result-state"
     },
     {
@@ -3854,7 +3854,7 @@
       "contract": "normalizeMcpConfig read-time normalization (servers/connectors alias, auth and OAuth field defaults, per-connector permission policy defaults, deferred-loading defaults, connection lifecycle defaults)",
       "kind": "runtime-contract",
       "module": "core/mcp/manager.ts",
-      "sourceHash": "sha256:35f0f658b7d7e11ddc24f483be71d8f99523c614dcda2b66e669d0b0ebc3e907",
+      "sourceHash": "sha256:0403ae1978c2dcf46def66a263ea29923962d15e125a2874d76ffe3713a5bdcf",
       "storeId": "mcp-config"
     },
     {
@@ -4158,7 +4158,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:1775237db94d35ae6313085a8174a672b43a62c0f1c895b8246df00bd09a45d9"
+          "sourceHash": "sha256:7a83eaf2d1ede2ab2d304df21a9878e23b875f394445d99f6b8d7c9051fb1d35"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",
