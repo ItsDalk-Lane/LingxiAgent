@@ -125166,12 +125166,12 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "server/routes/chat.ts",
+          "from": "server/history-deferred-content.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
-          "from": "server/history-deferred-content.ts",
+          "from": "server/routes/chat.ts",
           "kind": "import-statement"
         },
         {
@@ -125185,7 +125185,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by server/routes/chat.ts (import-statement); server/history-deferred-content.ts (import-statement); server/history-read/project-page.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by server/history-deferred-content.ts (import-statement); server/routes/chat.ts (import-statement); server/history-read/project-page.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "server/bootstrap.ts",
@@ -125263,6 +125263,11 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "server/routes/chat.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/history-read/project-page.ts",
           "kind": "import-statement"
         },
@@ -125272,7 +125277,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by server/history-read/project-page.ts (import-statement); server/routes/sessions.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by server/routes/chat.ts (import-statement); server/history-read/project-page.ts (import-statement); server/routes/sessions.ts (import-statement)."
     },
     {
       "path": "server/history-read/cache.ts",
@@ -128912,12 +128917,12 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "server/assistant-event-normalizer.ts",
+          "from": "shared/assistant-semantic-segments.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
-          "from": "shared/assistant-semantic-segments.ts",
+          "from": "server/assistant-event-normalizer.ts",
           "kind": "import-statement"
         },
         {
@@ -128926,7 +128931,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); server/assistant-event-normalizer.ts (import-statement); shared/assistant-semantic-segments.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); shared/assistant-semantic-segments.ts (import-statement); server/assistant-event-normalizer.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "shared/tool-arg-summary.ts",
@@ -129008,12 +129013,12 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "server/routes/chat.ts",
+          "from": "server/history-deferred-content.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
-          "from": "server/history-deferred-content.ts",
+          "from": "server/routes/chat.ts",
           "kind": "import-statement"
         },
         {
@@ -129022,7 +129027,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/tool-outcome-adapter.ts (import-statement); core/message-utils.ts (import-statement); server/routes/chat.ts (import-statement); +2 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/tool-outcome-adapter.ts (import-statement); core/message-utils.ts (import-statement); server/history-deferred-content.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "shared/tool-presentation.ts",
@@ -129040,12 +129045,12 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "server/routes/chat.ts",
+          "from": "server/history-deferred-content.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
-          "from": "server/history-deferred-content.ts",
+          "from": "server/routes/chat.ts",
           "kind": "import-statement"
         },
         {
@@ -129054,7 +129059,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by shared/tool-outcome.ts (import-statement); shared/tool-arg-summary.ts (import-statement); server/routes/chat.ts (import-statement); +2 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by shared/tool-outcome.ts (import-statement); shared/tool-arg-summary.ts (import-statement); server/history-deferred-content.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "shared/video-mime.ts",

@@ -27,6 +27,11 @@ export interface ToolSearchPresentation {
   matchCount?: number;
   fileCount?: number;
   truncated?: boolean;
+  /**
+   * 首包省掉 `files` 时给出的可加载引用：展开详情后按保存记录恢复**原来的结构化
+   * files**（路径 / 行号 / context 标志），不再从展示文本反推。
+   */
+  searchDeferred?: ToolPresentationDeferred;
 }
 
 export interface ToolFileChangePresentation {
@@ -126,12 +131,23 @@ export function safeToolInput(
   return { input: JSON.stringify({ truncated: true, preview }, null, 2), inputTruncated: true };
 }
 
-export function toolResultText(result: { content?: unknown } | null | undefined): string | null {
-  if (!Array.isArray(result?.content)) return null;
-  const text = result.content.flatMap((block: unknown) => {
+/**
+ * 结果里的文本块，保持块边界。
+ *
+ * 块边界是安全投影的最小单位：拼接成一段字符串后再判断"整段是不是 JSON"会把
+ * 多块结果里的结构化块降级成普通文本，从而绕过字段遮盖。任何需要遮盖的调用点
+ * 都应先拿到块数组，逐块投影后再拼展示文本。
+ */
+export function toolResultTextBlocks(result: { content?: unknown } | null | undefined): string[] {
+  if (!Array.isArray(result?.content)) return [];
+  return result.content.flatMap((block: unknown) => {
     const item = recordOf(block);
     return item?.type === 'text' && typeof item.text === 'string' ? [item.text] : [];
   });
+}
+
+export function toolResultText(result: { content?: unknown } | null | undefined): string | null {
+  const text = toolResultTextBlocks(result);
   return text.length ? text.join('\n') : null;
 }
 
@@ -164,6 +180,29 @@ export function toolPatchStats(patch: string): { added: number; removed: number 
     if (oldRemaining < 0 || newRemaining < 0) return undefined;
   }
   return hunks && !oldRemaining && !newRemaining ? { added, removed } : undefined;
+}
+
+/** 保持正文真实的文件工具：整段拼接后按字段遮盖会破坏代码与改动正文。 */
+const RAW_OUTPUT_TOOL_NAMES = new Set(['read', 'edit', 'write', 'grep', 'find', 'ls', 'exec_command', 'write_stdin', 'bash']);
+
+/**
+ * 通用工具的展示正文：逐块独立做安全投影，再拼成展示文本。
+ *
+ * 结构化判定必须落在**单个块**上。旧实现把同一结果的多个 text 块先拼成一段再
+ * 判断整体是否为合法 JSON，于是 `{"accessToken":"…"}` 只要后面再跟一句普通说明，
+ * 整段就不再是合法 JSON，遮盖被整体跳过，凭证原样进入工具详情。块边界同时是
+ * 遮盖的最小单位：块内是 JSON 就按字段遮盖，块内是普通文本就原样保留。
+ */
+export function projectSafeOutputText(textBlocks: readonly string[]): string | null {
+  if (!textBlocks.length) return null;
+  const projected = textBlocks.map((block) => {
+    try {
+      return JSON.stringify(safeToolArguments(JSON.parse(block)), null, 2);
+    } catch {
+      return block;
+    }
+  });
+  return projected.join('\n') || null;
 }
 
 function integer(value: unknown, minimum = 0): number | undefined {
@@ -278,11 +317,9 @@ export function projectToolPresentationDetails(
   if (typeof toolName !== 'string' || !toolName || isSyntheticToolPresentation(toolName)) return undefined;
   const raw = recordOf(result.details);
   const input = safeToolInput(toolName, context.args, maxLength);
-  let text = toolResultText(result);
-  // 通用 JSON 返回按字段遮盖；文件工具正文保持真实，避免破坏代码与改动。
-  if (text && !['read', 'edit', 'write', 'grep', 'find', 'ls', 'exec_command', 'write_stdin', 'bash'].includes(toolName)) {
-    try { text = JSON.stringify(safeToolArguments(JSON.parse(text)), null, 2); } catch { /* 普通文本保留原样。 */ }
-  }
+  const textBlocks = toolResultTextBlocks(result);
+  // 文件工具正文保持真实，避免破坏代码与改动；通用工具逐块遮盖敏感字段。
+  const text = RAW_OUTPUT_TOOL_NAMES.has(toolName) ? toolResultText(result) : projectSafeOutputText(textBlocks);
   const details: ToolPresentationDetails = {
     ...input,
     ...(text !== null ? { output: text.slice(0, maxLength), ...(text.length > maxLength ? { outputTruncated: true } : {}) } : {}),

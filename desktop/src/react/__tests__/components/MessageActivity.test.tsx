@@ -13,6 +13,32 @@ import { useStore } from '../../stores';
 import { clearDeferredHistoryContentCacheForTests } from '../../hooks/use-deferred-history-content';
 import { openInternalLink } from '../../utils/link-open';
 const activityCss = readFileSync(path.join(process.cwd(), 'desktop/src/react/components/chat/MessageActivity.module.css'), 'utf8');
+
+/** 取 `.selector` 规则体，兼容 `.a, .b { … }` 这种共享声明块。 */
+function rulesFor(selector: string): string[] {
+  const bodies: string[] = [];
+  const withoutComments = activityCss.replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const match of withoutComments.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    const selectors = match[1].split(',').map(part => part.trim());
+    if (selectors.includes(selector)) bodies.push(match[2]);
+  }
+  return bodies;
+}
+function ruleFor(selector: string): string {
+  return rulesFor(selector).join('\n');
+}
+/** 某选择器子树里能直接解析到的自定义属性名（声明在自身或其祖先规则上）。 */
+function declaredTokens(selector: string): Set<string> {
+  const names = new Set<string>();
+  for (const body of rulesFor(selector)) {
+    for (const match of body.matchAll(/(--[\w-]+)\s*:/g)) names.add(match[1]);
+  }
+  return names;
+}
+/** 规则体里所有不带 fallback 的 `var(--x)` 引用。 */
+function bareVarReferences(body: string): string[] {
+  return [...body.matchAll(/var\(\s*(--[\w-]+)\s*\)/g)].map(match => match[1]);
+}
 vi.mock('../../utils/link-open', async importOriginal => ({ ...await importOriginal<typeof import('../../utils/link-open')>(), openInternalLink: vi.fn() }));
 
 const tool = (name: string, details: ToolCall['details'] = {}, args: ToolCall['args'] = {}): ToolCall => ({
@@ -202,18 +228,93 @@ describe('统一消息行与工具详情', () => {
     openTool();
     fireEvent.click(screen.getByRole('button', { name: 'messageActivity.view' }));
     const dialog = screen.getByRole('dialog');
-    // 局部 token（--ma-pad-x / --ma-dialog-pad）定义在 .activity 上，portal 后不再继承；
-    // 弹窗自身的盒模型声明必须带 var() 回退字面量，否则 padding 整条失效（渲染成 0）。
-    const dialogRule = /\.dialog \{([^}]*)\}/.exec(activityCss)?.[1] ?? '';
+    // 弹窗的盒模型声明必须带 var() 回退字面量，否则 portal 后 padding 整条失效（渲染成 0）。
+    const dialogRule = ruleFor('.dialog');
     expect(dialogRule).toMatch(/padding:\s*var\(--ma-dialog-pad,\s*[^)]+\)/);
     expect(dialogRule).not.toMatch(/padding:\s*var\(--ma-dialog-pad\)\s*;/);
     expect(dialogRule).toMatch(/box-shadow:\s*var\(--shadow-2xl,\s*[^)]+\)/);
     // 关闭按钮与弹窗头部落在 .activity 之外，样式同样不能依赖局部作用域的 class。
-    const headerRule = /\.header \{([^}]*)\}/.exec(activityCss)?.[1] ?? '';
+    const headerRule = ruleFor('.header');
     expect(headerRule).toMatch(/padding:\s*var\(--space-8\)\s+var\(--ma-pad-x,\s*[^)]+\)/);
     expect(document.body.contains(dialog)).toBe(true);
     // .activity 不在弹窗祖先链上：内边距只能来自弹窗自身带回退的声明。
     expect(dialog.closest('[class*="activity"]')).toBeNull();
+  });
+
+  it('diff 与语法高亮 token 在 .panel 和 Portal .dialog 两棵子树里都能解析', () => {
+    // 这两处是 MessageActivity 样式的作用域根：.panel 是行内详情，.dialog 是
+    // portal 到窗口 overlay root 的弹窗。任何一处缺声明，那边的 .added/.removed
+    // 与语法高亮就会拿到空值，color-mix() 整条声明失效（不是没颜色，是声明没了）。
+    const tokens = declaredTokens('.panel');
+    expect(tokens.size).toBeGreaterThan(0);
+    for (const token of ['--ma-diff-added', '--ma-diff-removed', '--ma-syntax-keyword', '--ma-syntax-string', '--ma-syntax-number', '--ma-syntax-type']) {
+      expect(tokens, `${token} 没在 .panel 作用域根上声明`).toContain(token);
+    }
+    const dialogTokens = declaredTokens('.dialog');
+    for (const token of tokens) {
+      expect(dialogTokens, `${token} 只声明在 .panel 上，portal 弹窗里解析不到`).toContain(token);
+    }
+    // 两处声明的是同一组 token，不是各写各的一份。
+    expect([...dialogTokens].sort()).toEqual([...tokens].sort());
+    // 行内 diff 与弹窗 full diff 用的是同一条规则。
+    expect(ruleFor('.added')).toMatch(/var\(--ma-diff-added\)/);
+    expect(ruleFor('.removed')).toMatch(/var\(--ma-diff-removed\)/);
+    // 反向：不能再有"只从 .activity 继承"的 token 引用（.activity 已不再是 token 根）。
+    const activityTokens = declaredTokens('.activity');
+    for (const body of rulesFor('.added').concat(rulesFor('.removed'), rulesFor('.lines'))) {
+      for (const name of bareVarReferences(body)) {
+        expect(activityTokens.has(name), `${name} 只能从 .activity 继承，弹窗里会失效`).toBe(false);
+      }
+    }
+  });
+
+  it('展开 diff 的行内与弹窗两处 added/removed 语义一致，且变量在实际 DOM 上取得到值', () => {
+    const patch = '@@ -1,1 +1,2 @@\n context\n-removed line\n+added line\n';
+    renderTool(tool('edit', { output: 'done', fileChange: { path: 'a.ts', patch, beforeAvailable: true, added: 1, removed: 1 } }));
+    openTool();
+    const inlineAdded = document.querySelector('[class*="added"]');
+    const inlineRemoved = document.querySelector('[class*="removed"]');
+    expect(inlineAdded, '行内没有渲染 added 行').toBeTruthy();
+    expect(inlineRemoved, '行内没有渲染 removed 行').toBeTruthy();
+
+    // jsdom 不会加载 CSS Module，也不会沿祖先链继承自定义属性；要拿到真实的
+    // computed style，就把样式表里**实际生效的那条** token 声明块注入 DOM。
+    // 这样断言的是"声明块本身能让变量在元素上解析出值"，而不是只比对字符串。
+    const tokenBlock = rulesFor('.dialog').find(body => body.includes('--ma-diff-added'));
+    expect(tokenBlock, '.dialog 的 token 声明块不存在').toBeTruthy();
+    const probe = document.createElement('style');
+    probe.textContent = `.ma-token-probe { ${tokenBlock} }`;
+    document.head.appendChild(probe);
+    const resolveTokens = (element: Element) => {
+      element.classList.add('ma-token-probe');
+      const style = getComputedStyle(element);
+      const resolved = {
+        added: style.getPropertyValue('--ma-diff-added').trim(),
+        removed: style.getPropertyValue('--ma-diff-removed').trim(),
+      };
+      element.classList.remove('ma-token-probe');
+      return resolved;
+    };
+    // 行内 diff 与弹窗 full diff 用同一条声明块，取到同一组值。
+    expect(resolveTokens(inlineAdded!)).toEqual({ added: '#16bc4b', removed: '#ff393f' });
+    expect(resolveTokens(inlineRemoved!)).toEqual({ added: '#16bc4b', removed: '#ff393f' });
+
+    // 弹窗：portal 到 body，.activity 不在祖先链上
+    fireEvent.click(screen.getByRole('button', { name: 'messageActivity.view' }));
+    const dialog = screen.getByRole('dialog');
+    expect(dialog.closest('[class*="activity"]')).toBeNull();
+    const dialogAdded = [...dialog.querySelectorAll('[class*="added"]')];
+    const dialogRemoved = [...dialog.querySelectorAll('[class*="removed"]')];
+    expect(dialogAdded.length, '弹窗里没有渲染 added 行').toBeGreaterThan(0);
+    expect(dialogRemoved.length, '弹窗里没有渲染 removed 行').toBeGreaterThan(0);
+    // 弹窗自己的声明块必须带这两个 token —— 它不继承 .activity，只靠这一条。
+    const dialogTokens = declaredTokens('.dialog');
+    expect(dialogTokens).toContain('--ma-diff-added');
+    expect(dialogTokens).toContain('--ma-diff-removed');
+    // 语法高亮 token 同步覆盖，避免只修 diff 两个变量。
+    for (const token of ['--ma-syntax-keyword', '--ma-syntax-string', '--ma-syntax-number', '--ma-syntax-type']) {
+      expect(dialogTokens).toContain(token);
+    }
   });
 
   it('工具行按家族给图标，未匹配的家族才落通用网格', () => {

@@ -905,3 +905,134 @@ describe('ToolGroupBlock', () => {
     expect(labelSpan('read').textContent).not.toBe('读取');
   });
 });
+
+describe('搜索结构化事实与延迟引用的展示语义', () => {
+  beforeEach(() => {
+    useRealLocale();
+    useStore.setState({ serverPort: '30141', terminalsBySession: {} } as never);
+  });
+  afterEach(() => { cleanup(); vi.restoreAllMocks(); });
+
+  const structuredFiles = [
+    { path: 'src/a.ts', matches: [
+      { line: 6, text: 'Error at other.ts:123: boom', context: true },
+      { line: 7, text: 'target' },
+    ] },
+  ];
+  const ambiguousOutput = [
+    'src/a.ts-6- Error at other.ts:123: boom',
+    'src/a.ts:7: target',
+  ].join('\n');
+
+  function grepTool(details: Record<string, unknown>) {
+    return {
+      id: 'grep-1', name: 'grep', args: { pattern: 'target' }, done: true, success: true, status: 'succeeded' as const,
+      details,
+    };
+  }
+  /**
+   * grep 详情：文件标题渲染在 h4 里，行号与正文渲染在 `.line` 行里。
+   * `.lines` 容器也会被 [class*=] 命中，所以按 class 词边界排除它。
+   */
+  const searchPaths = () => [...document.querySelectorAll('h4')].map(node => node.textContent ?? '');
+  const searchLines = () => [...document.querySelectorAll('[class*="line"]')]
+    .filter(node => !/\bline/.test(node.className))
+    .map(node => node.textContent ?? '');
+
+  it('首包省略 files 时用搜索结构引用恢复，不从正文重猜路径与行号', async () => {
+    // 输出与搜索结构是两条引用、两次请求；同一个 Response 对象的 body 只能读一次，
+    // 所以必须按 URL 分别构造（共享响应体会让第二条请求读空、显示加载失败）。
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input: RequestInfo | URL) => {
+      const isSearch = String(input).includes('search-ref-1');
+      return new Response(JSON.stringify(isSearch
+        ? { id: 'search-ref-1', kind: 'tool_search',
+          content: JSON.stringify({ kind: 'grep', basePath: '/root', files: structuredFiles, matchCount: 1, fileCount: 1 }) }
+        : { id: 'out-ref-1', kind: 'tool_output', content: ambiguousOutput }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } });
+    });
+
+    render(
+      <ToolGroupBlock
+        collapsed={false}
+        sessionPath="/session/search.jsonl"
+        tools={[grepTool({
+          output: 'preview',
+          outputDeferred: { id: 'out-ref-1', kind: 'tool_output', size: 20_000, available: true },
+          search: { kind: 'grep', basePath: '/root', matchCount: 1, fileCount: 1,
+            searchDeferred: { id: 'search-ref-1', kind: 'tool_search', size: 200, available: true } },
+        })]}
+      />,
+    );
+
+    fireEvent.click(screen.getAllByRole('button')[0]);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    await waitFor(() => expect(searchPaths()).toContain('src/a.ts'));
+    // 恢复的是结构化真相：src/a.ts + line 6 context + line 7 match。
+    expect(searchPaths()).not.toContain('src/a.ts-6- Error at other.ts');
+    const lines = searchLines();
+    expect(lines).toContain('6: Error at other.ts:123: boom');
+    expect(lines).toContain('7: target');
+  });
+
+  it('真正没有结构化 metadata 的旧记录才走文本解析兜底', async () => {
+    render(
+      <ToolGroupBlock
+        collapsed={false}
+        sessionPath="/session/legacy.jsonl"
+        tools={[grepTool({ output: ambiguousOutput, search: { kind: 'grep', fileCount: 1, matchCount: 1 } })]}
+      />,
+    );
+    fireEvent.click(screen.getAllByRole('button')[0]);
+    // legacy 路径的能力边界：文本歧义无法消除，这里明确记录当前行为——
+    // 上下文行被读成 `src/a.ts-6- Error at other.ts` / 第 123 行。
+    await waitFor(() => expect(searchPaths().length).toBeGreaterThan(0));
+    // legacy 只能还原"看起来像"的东西：命中行是对的，上下文行被读成另一个文件
+    // （`src/a.ts-6- Error at other.ts` / 第 123 行 / boom）。
+    expect(searchPaths()).toContain('src/a.ts');
+    expect(searchPaths()).toContain('src/a.ts-6- Error at other.ts');
+    expect(document.body.textContent).toContain('123: boom');
+    // 这就是结构化记录必须走引用的原因：结构化路径两条都落回同一个文件。
+  });
+
+  it('延迟加载失败时显示失败，不用截断预览冒充完整正文', async () => {
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('offline'));
+    render(
+      <ToolGroupBlock
+        collapsed={false}
+        sessionPath="/session/fail.jsonl"
+        tools={[grepTool({
+          output: 'preview',
+          outputDeferred: { id: 'out-ref-fail', kind: 'tool_output', size: 20_000, available: true },
+          search: { kind: 'grep', fileCount: 1, matchCount: 1,
+            searchDeferred: { id: 'search-ref-fail', kind: 'tool_search', size: 200, available: true } },
+        })]}
+      />,
+    );
+    fireEvent.click(screen.getAllByRole('button')[0]);
+    await waitFor(() => expect(screen.getByText(/加载失败/)).toBeInTheDocument());
+  });
+
+  it('历史兼容工具 present_files 显示专属短标签而不是泛化的“工具”', () => {
+    render(
+      <ToolGroupBlock
+        collapsed={false}
+        tools={[{ id: 'pf', name: 'present_files', args: { path: 'legacy.txt' }, done: true, success: true, status: 'succeeded' }]}
+      />,
+    );
+    expect(labelSpan('present_files').textContent).toBe('交付');
+    expect(labelSpan('present_files').textContent).not.toBe('工具');
+  });
+
+  it('office 工具按运行时长名命中专属短标签', () => {
+    render(
+      <ToolGroupBlock
+        collapsed={false}
+        tools={[{
+          id: 'o1', name: 'office_html-to-pdf', args: { path: 'a.html' },
+          done: true, success: true, status: 'succeeded' as const,
+        }]}
+      />,
+    );
+    expect(labelSpan('office_html-to-pdf').textContent).toBe('转 PDF');
+  });
+});

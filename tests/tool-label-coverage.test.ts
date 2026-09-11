@@ -6,6 +6,7 @@ import {
   SESSION_ACTION_LABEL_KEYS, activityLabel,
   isExternalTool, phaseForStatus, sessionToolTargetName, sessionToolTargetPath,
 } from '../desktop/src/react/utils/tool-label';
+import { isToolCallHiddenFromProcessUi } from '../desktop/src/react/utils/tool-call-visibility';
 
 /**
  * 工具行文案对账。
@@ -29,8 +30,13 @@ const TOOL_LABEL_ALIASES: Record<string, string> = {
   write_stdin: 'terminal',
 };
 
-/** 需要文案的工具名（含插件工具的 `<pluginId>_<tool>` 全名）。 */
-const LABELED_TOOL_NAMES = [
+/**
+ * 需要文案的工具名（含插件工具的 `<pluginId>_<tool>` 全名）。
+ *
+ * 这张表**不再**是"工具全集"的真相源，重建自独立来源（见 toolNameCensus），
+ * 只用于历史兼容工具与老 `tool.*` 整句文案的核对。
+ */
+const LIVE_TOOL_FIXTURE_NAMES = [
   // Pi SDK 沙盒工具
   'read', 'write', 'edit', 'grep', 'find', 'ls', 'bash', 'terminal', 'materialize',
   // Agent 自带
@@ -47,22 +53,27 @@ const LABELED_TOOL_NAMES = [
   'hana_card_guide', 'show_card',
   // Hub 频道
   'channel_read_context', 'channel_reply', 'channel_pass',
-  // 内置插件（PluginManager 注册时统一加 `<pluginId>_` 前缀）
-  'media_generate-image', 'media_generate-video', 'media_describe-options', 'media_get-guide',
-  'beautify_create-cover', 'beautify_apply-cover-candidate', 'beautify_get-cover-style-guide',
-  'beautify_get-html-style-guide', 'beautify_list-capabilities',
-  'office_read-document', 'office_html-to-pdf', 'office_list-capabilities',
-  // 已下线但历史 JSONL 里仍有调用记录，回看旧会话时要能正常渲染
-  'create_artifact', 'dm', 'present_files',
 ];
+
+/**
+ * 已下线、只可能出现在历史 JSONL 里的工具。
+ *
+ * 独立于渲染侧登记表：这些名字由 test 显式列出（而不是从 ACTIVITY_LABEL_KEYS
+ * 派生），所以"回看旧会话时漏配短标签"能变成红灯。
+ * 三个名字都对应真实历史记录形态（present_files 见 server/block-extractors.ts
+ * 的 COMPAT 注释）。
+ */
+const LEGACY_HISTORICAL_TOOL_NAMES = new Set(['create_artifact', 'dm', 'present_files']);
 
 /**
  * 工具行主标签短文案覆盖的工具名。
  *
  * 取运行时的 ACTIVITY_LABEL_KEYS（登记表）加别名键：别名工具（exec_command /
  * write_stdin）在表里指向 terminal，本身不需要独立文案键，但必须有短标签可渲染。
- * 由登记表派生而不是再抄一份清单——抄一份就会出现"新工具只补了渲染侧、忘了对账"
- * 的缝隙。
+ *
+ * 这一组刻意由登记表派生——它守的是"登记表里的每一项在五语言里都真的存在"。
+ * "工具全集有没有漏项"是另一件事，由 toolNameCensus() 从独立真相源回答；
+ * 两者合起来才是双向对账，只留派生那一半就是自证。
  */
 const ACTIVITY_LABEL_TOOL_NAMES = [
   ...new Set([
@@ -88,7 +99,7 @@ const ACTIVITY_LABEL_EXEMPT_TOOL_NAMES = new Set(['todo_write']);
  * `present_files` 不在 lib/tools 注册表里，历史上也没有配过三相位文案；按拍板
  * 旧 `tool.*` 文案原样保留、不新增、不接回，所以这里显式豁免而不是补文案。
  */
-const LEGACY_TOOL_NAMES = new Set(['present_files']);
+const LEGACY_TOOL_NAMES = LEGACY_HISTORICAL_TOOL_NAMES;
 
 /**
  * 文案键但不是工具名：同一个工具按 action 分出来的档位。
@@ -147,6 +158,59 @@ function scanRegisteredToolNames(): Set<string> {
   return found;
 }
 
+/** Pi SDK 固定工具（`lib/pi-sdk/index.ts` 转出的 create*Tool 工厂）。 */
+const PI_SDK_FIXED_TOOL_NAMES = ['read', 'write', 'edit', 'ls', 'bash'];
+
+/**
+ * 内置插件工具全集：**独立真相源**，从 `plugins/<id>/manifest.json` 的 id 与
+ * `plugins/<id>/tools/*.ts` 导出的工具名算出运行时名 `<id>_<name>`
+ * （命名规则见 core/plugin-manager.ts `_loadTools` 的 `${entry.id}_${mod.name}`），
+ * 不读渲染侧的 BUNDLED_PLUGIN_TOOL_NAMES。
+ *
+ * `jimeng-cli` 这类没有 `tools/` 目录的插件是 provider 而不是工具插件，自然不产出名字。
+ */
+function scanBundledPluginToolNames(): { names: Set<string>; plugins: Map<string, string[]> } {
+  const names = new Set<string>();
+  const plugins = new Map<string, string[]>();
+  const root = path.join(process.cwd(), 'plugins');
+  for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const manifestPath = path.join(root, entry.name, 'manifest.json');
+    const toolsDir = path.join(root, entry.name, 'tools');
+    if (!fs.existsSync(manifestPath) || !fs.existsSync(toolsDir)) continue;
+    const pluginId = JSON.parse(fs.readFileSync(manifestPath, 'utf8')).id;
+    expect(pluginId, `${entry.name}/manifest.json 的 id 决定运行时前缀`).toBeTypeOf('string');
+    const toolNames: string[] = [];
+    for (const file of fs.readdirSync(toolsDir).filter((f) => f.endsWith('.ts'))) {
+      const text = fs.readFileSync(path.join(toolsDir, file), 'utf8');
+      // 只认真正会被 _loadTools 发布的模块：必须同时导出 name / description / execute。
+      if (!/export\s+(?:async\s+)?function\s+execute\b/.test(text) || !/export\s+const\s+description\b/.test(text)) continue;
+      const exported = /export\s+const\s+name\s*=\s*"([^"]+)"/.exec(text);
+      if (!exported) continue;
+      const runtimeName = `${pluginId}_${exported[1]}`;
+      toolNames.push(runtimeName);
+      names.add(runtimeName);
+    }
+    plugins.set(pluginId, toolNames.sort());
+  }
+  return { names, plugins };
+}
+
+/**
+ * 真实工具全集：由独立来源构造，**不含** ACTIVITY_LABEL_KEYS / BUILTIN_TOOL_NAMES
+ * 派生出的任何集合。历史兼容工具单独标注，因为它们不在当前注册面里。
+ *
+ * 返回的是"会出现在会话时间线里的工具名"，对账据此判断每个名字要么有短标签、
+ * 要么显式豁免（豁免名单见 UNLABELED_TOOL_NAMES / ACTIVITY_LABEL_EXEMPT_TOOL_NAMES）。
+ */
+function toolNameCensus() {
+  const registered = scanRegisteredToolNames();
+  const bundled = scanBundledPluginToolNames();
+  const runtime = new Set<string>([...registered, ...bundled.names, ...PI_SDK_FIXED_TOOL_NAMES]);
+  const declaredOnly = LIVE_TOOL_FIXTURE_NAMES.filter((name) => !runtime.has(name));
+  return { runtime, registered, bundled, declaredOnly };
+}
+
 describe('工具行文案对账', () => {
   for (const locale of locales) {
     it(`${locale}.json 本地快速检索提示、结果与时限文案完整`, () => {
@@ -164,7 +228,7 @@ describe('工具行文案对账', () => {
     it(`${locale}.json 为每个已登记工具提供三相位文案`, () => {
       const tool = loadLocale(locale).tool ?? {};
       const missing: string[] = [];
-      for (const name of [...LABELED_TOOL_NAMES, ...ACTION_LABEL_KEYS]) {
+      for (const name of [...LIVE_TOOL_FIXTURE_NAMES, ...LEGACY_HISTORICAL_TOOL_NAMES, ...ACTION_LABEL_KEYS]) {
         if (LEGACY_TOOL_NAMES.has(name)) continue;
         const key = TOOL_LABEL_ALIASES[name] ?? name;
         for (const phase of phases) {
@@ -201,7 +265,11 @@ describe('工具行文案对账', () => {
   it('语言包里没有对不上任何工具的孤儿文案', () => {
     const tool = loadLocale('zh').tool ?? {};
     const known = new Set([
-      ...LABELED_TOOL_NAMES.map((n) => TOOL_LABEL_ALIASES[n] ?? n),
+      ...LIVE_TOOL_FIXTURE_NAMES.map((n) => TOOL_LABEL_ALIASES[n] ?? n),
+      // 内置插件工具（含 media_generate-speech 这类只在 plugins/ 源码里定义的工具）
+      // 与历史兼容工具都有自己的 tool.* 整句文案，不能因为静态扫描抓不到就被判成孤儿。
+      ...[...BUNDLED_PLUGIN_TOOL_NAMES].map((n) => TOOL_LABEL_ALIASES[n] ?? n),
+      ...[...BUILTIN_TOOL_NAMES].map((n) => TOOL_LABEL_ALIASES[n] ?? n),
       ...ACTION_LABEL_KEYS,
       '_fallback',
       '_plugin',
@@ -214,7 +282,7 @@ describe('工具行文案对账', () => {
 
   it('源码里的工具要么已登记文案，要么显式豁免', () => {
     const registered = scanRegisteredToolNames();
-    const labeled = new Set([...LABELED_TOOL_NAMES, ...Object.keys(TOOL_LABEL_ALIASES)]);
+    const labeled = new Set([...LIVE_TOOL_FIXTURE_NAMES, ...LEGACY_HISTORICAL_TOOL_NAMES, ...Object.keys(TOOL_LABEL_ALIASES)]);
     const unregistered = [...registered]
       .filter((name) => !labeled.has(name) && !UNLABELED_TOOL_NAMES.has(name))
       .sort();
@@ -228,11 +296,99 @@ describe('工具行文案对账', () => {
     // 内置插件（media / beautify / office）是随 Lingxi 分发的，运行时工具名带
     // pluginId 前缀，所以它们是内置工具而不是第三方插件。
     const expected = new Set([
-      ...LABELED_TOOL_NAMES.filter((n) => !BUNDLED_PLUGIN_TOOL_NAMES.has(n)),
+      ...LIVE_TOOL_FIXTURE_NAMES.filter((n) => !BUNDLED_PLUGIN_TOOL_NAMES.has(n)),
+      ...LEGACY_HISTORICAL_TOOL_NAMES,
       ...BUNDLED_PLUGIN_TOOL_NAMES,
       ...Object.keys(RUNTIME_ALIASES),
     ]);
     expect([...BUILTIN_TOOL_NAMES].sort()).toEqual([...expected].sort());
+  });
+
+  describe('双向 census（期望集合来自独立真相源，不用被测登记表派生）', () => {
+    const census = toolNameCensus();
+
+    it('内置插件工具全集由 plugins/*/manifest.json + tools/*.ts 独立算出，并全部在内置名单里', () => {
+      // 这条独立于渲染侧名单：新加一个 plugins/<id>/tools/<tool>.ts 而忘了登记内置插件，
+      // 这里就红。office_html_to-pdf 这类"名字写错了"的漏配由下一条守。
+      expect(census.bundled.plugins.get('office')).toEqual([
+        'office_html-to-pdf', 'office_list-capabilities', 'office_read-document',
+      ]);
+      const pluginTools = [...census.bundled.names].sort();
+      expect(pluginTools.length, 'plugins/ 下应能扫出内置插件工具').toBeGreaterThan(0);
+      const notBuiltin = pluginTools.filter((name) => !BUNDLED_PLUGIN_TOOL_NAMES.has(name));
+      expect(notBuiltin, '这些内置插件工具没进 BUNDLED_PLUGIN_TOOL_NAMES，会被误判成第三方插件').toEqual([]);
+      // 反向：内置名单里的插件工具必须真的存在于 plugins/ 源码里（防名单过期）
+      const ghost = [...BUNDLED_PLUGIN_TOOL_NAMES].filter((name) => !census.bundled.names.has(name) && !census.runtime.has(name));
+      expect(ghost, '内置插件名单里有 plugins/ 源码里找不到的工具名').toEqual([]);
+    });
+
+    it('真实工具全集 → 可见性 → 需要短标签的工具，全部命中 ACTIVITY_LABEL_KEYS', () => {
+      const needsLabel = [...census.runtime]
+        // 可见性判断复用渲染侧唯一入口：卡片承载 / 子代理 / stage_files 这些
+        // 根本不进进程区的工具，不该被要求配一个永远用不上的短标签。
+        .filter((name) => !isToolCallHiddenFromProcessUi({ name, args: {} }))
+        .filter((name) => !UNLABELED_TOOL_NAMES.has(name))
+        .filter((name) => !ACTIVITY_LABEL_EXEMPT_TOOL_NAMES.has(name))
+        .sort();
+      const missing = needsLabel.filter((name) => {
+        const key = RUNTIME_ALIASES[name] ?? name;
+        return !ACTIVITY_LABEL_KEYS[key];
+      });
+      expect(
+        missing,
+        '这些真实工具会渲染成工具行却查不到专属短标签，只会显示通用词；请登记 ACTIVITY_LABEL_KEYS',
+      ).toEqual([]);
+    });
+
+    it('历史兼容工具即使已下线，仍要有短标签或明确豁免', () => {
+      // present_files 会进 ToolGroupBlock（不在 tool-call-visibility 的隐藏名单里），
+      // 旧会话回放时必须显示专属短标签而不是泛化的"工具"。
+      const missing = [...LEGACY_HISTORICAL_TOOL_NAMES].filter((name) => {
+        const key = RUNTIME_ALIASES[name] ?? name;
+        return !ACTIVITY_LABEL_KEYS[key] && !ACTIVITY_LABEL_EXEMPT_TOOL_NAMES.has(name);
+      });
+      expect(missing, '历史兼容工具缺短标签，旧会话回放会退化成通用词').toEqual([]);
+      expect(ACTIVITY_LABEL_KEYS.present_files, 'present_files 需要专属短标签键').toBe('present_files');
+    });
+
+    it('ACTIVITY_LABEL_KEYS 里不是家族键的项目必须能映射到真实工具 / 别名 / 历史兼容工具 / 明确豁免', () => {
+      // 反向 census：登记表里的每一项都必须落进渲染侧真正认得的工具全集
+      // （BUILTIN_TOOL_NAMES 由上面几条与本 census 双向核对过），否则就是死键。
+      // 典型死键是拼错的工具名：office_html_to-pdf 永远匹配不到 office_html-to-pdf。
+      const known = new Set<string>([
+        ...BUILTIN_TOOL_NAMES,
+        ...Object.keys(RUNTIME_ALIASES),
+        ...ACTION_LABEL_KEYS,
+        ...UNLABELED_TOOL_NAMES,
+      ]);
+      const orphans = Object.keys(ACTIVITY_LABEL_KEYS)
+        .filter((name) => !name.startsWith('_'))
+        .filter((name) => !known.has(name))
+        .sort();
+      expect(
+        orphans,
+        '这些短标签键映射不到任何真实工具、别名、历史兼容工具或豁免项，是拼错或过期的死键',
+      ).toEqual([]);
+    });
+
+    it('插件工具的运行时长名写错一位就会被抓出来（office_html_to-pdf 型死键）', () => {
+      // 直接对账"运行时名 → 短标签键"，而不是相信登记表自己。
+      for (const name of census.bundled.names) {
+        expect(ACTIVITY_LABEL_KEYS[name], `${name} 没有专属短标签键（运行时名拼错会落通用兜底）`).toBeDefined();
+      }
+      // 如果哪天有人把连字符写成下划线，上面的断言会红；这里把反例固定下来。
+      expect(ACTIVITY_LABEL_KEYS['office_html_to-pdf']).toBeUndefined();
+      expect(ACTIVITY_LABEL_KEYS['office_html-to-pdf']).toBe('office_html-to-pdf');
+    });
+
+    it('office 工具按运行时命名规则命中专属短标签，不再落通用兜底', () => {
+      // 运行时名来自 plugins/office/tools/*.ts（连字符保留），不是 registry 里的下划线写法。
+      const officeTools = census.bundled.plugins.get('office') ?? [];
+      expect(officeTools).toContain('office_html-to-pdf');
+      for (const name of officeTools) {
+        expect(ACTIVITY_LABEL_KEYS[name], `${name} 缺短标签键`).toBe(name);
+      }
+    });
   });
 
   it('内置工具走通用兜底，第三方插件与 MCP 工具走插件兜底', () => {

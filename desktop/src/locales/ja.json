@@ -1220,6 +1220,11 @@
       "done": "🎬 {name} は動画を仕上げた",
       "failed": "🎬 動画はできあがらなかった"
     },
+    "media_generate-speech": {
+      "running": "🎙️ {name} は音声を作成中",
+      "done": "🎙️ {name} は音声を仕上げた",
+      "failed": "🎙️ 音声はできあがらなかった"
+    },
     "media_describe-options": {
       "running": "🎨 画像の選択肢を確認中",
       "done": "🎨 画像の選択肢が分かった",
@@ -5119,6 +5124,7 @@
       "dm": "ダイレクトメッセージ",
       "media_generate-image": "画像生成",
       "media_generate-video": "動画生成",
+      "media_generate-speech": "音声生成",
       "media_describe-options": "オプション説明",
       "media_get-guide": "メディアガイド",
       "beautify_create-cover": "カバー作成",

@@ -156,15 +156,18 @@ function ToolActivityDetails({ tool, skillName, skillPrompt, sessionPath, termin
   const patchDeferred = load(change.patchDeferred);
   const contentDeferred = load(change.contentDeferred);
   const skillDeferred = load(invocation.deferred);
+  // 首包为体积省掉的搜索结构：展开时按保存记录原样取回，不从 output 文本重猜。
+  const searchDeferred = load(search.searchDeferred);
   const inputLoad = useDeferredHistoryContent(sessionPath, inputDeferred, !research && !!sessionPath);
   const outputLoad = useDeferredHistoryContent(sessionPath, outputDeferred, !research && !!sessionPath);
   const patchLoad = useDeferredHistoryContent(sessionPath, patchDeferred, !research && !!sessionPath);
   const contentLoad = useDeferredHistoryContent(sessionPath, contentDeferred, !research && !!sessionPath);
   const skillLoad = useDeferredHistoryContent(sessionPath, skillDeferred, !!skillName && !!sessionPath);
-  const loads = [inputLoad, outputLoad, patchLoad, contentLoad, skillLoad];
+  const searchLoad = useDeferredHistoryContent(sessionPath, searchDeferred, !research && !!sessionPath);
+  const loads = [inputLoad, outputLoad, patchLoad, contentLoad, skillLoad, searchLoad];
   const loading = loads.some(item => item.loading);
   const loadError = loads.some(item => item.error);
-  const missingSession = !sessionPath && [inputDeferred, outputDeferred, patchDeferred, contentDeferred, skillDeferred].some(Boolean);
+  const missingSession = !sessionPath && [inputDeferred, outputDeferred, patchDeferred, contentDeferred, skillDeferred, searchDeferred].some(Boolean);
   const input = inputLoad.data?.content ?? string(details.input);
   const output = outputLoad.data?.content ?? string(details.output);
   let fullInputCommand = '';
@@ -188,8 +191,25 @@ function ToolActivityDetails({ tool, skillName, skillPrompt, sessionPath, termin
   const truncated = Boolean(details.inputTruncated || details.outputTruncated || read.truncated || search.truncated || change.truncated || invocation.truncated);
   const available = !loading && !loadError && !missingSession;
   const copy = research ? tool.resultNote || '' : skillName ? skillContent : terminal ? terminalContent.content || output : patch || content || output;
-  const loadedSearch = !Array.isArray(search.files) && ['grep', 'find', 'ls'].includes(string(search.kind)) && output ? parseToolSearchOutput(search.kind as 'grep' | 'find' | 'ls', output) : null;
-  const files = Array.isArray(search.files) ? search.files.map(record) : (loadedSearch?.files || []).map(record);
+  const searchKind = string(search.kind);
+  // 结构化记录优先：首包省略 files 时先用可加载引用取回原结构；只有真正没有结构化
+  // 记录的旧历史才允许退回文本解析（legacy fallback），且不能覆盖已恢复的结构。
+  const restoredSearch = (() => {
+    if (!searchLoad.data?.content) return null;
+    try {
+      const parsed = JSON.parse(searchLoad.data.content);
+      return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? record(parsed) : null;
+    } catch {
+      return null;
+    }
+  })();
+  const loadedSearch = !Array.isArray(search.files) && !restoredSearch && ['grep', 'find', 'ls'].includes(searchKind) && output
+    ? parseToolSearchOutput(searchKind as 'grep' | 'find' | 'ls', output)
+    : null;
+  // path / line / context / matchCount / fileCount 都取自保存记录；文本解析只出 files。
+  const searchFacts = (restoredSearch ?? loadedSearch) as Record<string, unknown> | null;
+  const structuredFiles = [restoredSearch?.files, loadedSearch?.files].find(Array.isArray);
+  const files: Array<Record<string, unknown>> = (Array.isArray(search.files) ? search.files : structuredFiles ?? []).map(record);
   const changeVisible = Object.keys(change).length > 0 && status !== 'failed';
   const counts = typeof change.added === 'number' && typeof change.removed === 'number' ? { added: change.added, removed: change.removed } : !change.truncated && (!patchDeferred || patchLoad.data) && patch ? toolPatchStats(patch) || null : null;
   const empty = status === 'running' ? t('pending') : t('unavailable');
@@ -204,7 +224,7 @@ function ToolActivityDetails({ tool, skillName, skillPrompt, sessionPath, termin
           : skillName ? <><h4 className={styles.section}>{window.t?.('toolGroup.skill.paramsLabel')}</h4><pre className={styles.pre}>{skillPrompt?.trim() || window.t?.('toolGroup.skill.promptUnavailable')}</pre><pre className={styles.pre}>{skillContent ? `<skill_content name="${skillName}">\n${skillContent}\n</skill_content>` : empty}</pre></>
           : isTerminal ? <><pre className={styles.pre}>$ {fullInputCommand || string(record(details.execCommand).renderedCommand) || commandOf(tool)}</pre><div className={styles.notice}>{t(status === 'stale' ? 'unknown' : status)}</div>{terminal && terminalContent.truncated && <div className={styles.notice}>{t('terminalRetained')}</div>}<div className={styles.terminal}>{terminal ? <TerminalPreview terminal={terminal} onContentChange={setTerminalContent} /> : <pre className={styles.pre}>{output || tool.error || empty}</pre>}</div></>
           : Object.keys(read).length > 0 ? <>{readOutput ? <ActivityLines content={readOutput} startLine={Number(read.startLine) || 1} language={string(read.language) || path.split('.').pop()} /> : <div className={styles.notice}>{read.displayedLines === 0 && status === 'succeeded' ? t('emptyFile') : empty}</div>}{readNotice && <div className={styles.notice}>{readNotice}</div>}</>
-          : Object.keys(search).length > 0 ? <><div className={styles.notice}>{t('searchCount', { matches: typeof search.matchCount === 'number' ? search.matchCount : '—', files: typeof search.fileCount === 'number' ? search.fileCount : files.length })}</div>{files.length ? <SearchActivity kind={string(search.kind)} basePath={string(search.basePath) || undefined} files={files.map(file => ({ path: string(file.path), matches: (Array.isArray(file.matches) ? file.matches.map(record) : []).map(match => ({ ...(typeof match.line === 'number' ? { line: match.line } : {}), text: string(match.text), context: match.context === true })) }))} /> : output ? <ActivityLines content={output} /> : <div className={styles.notice}>{empty}</div>}</>
+          : Object.keys(search).length > 0 ? <><div className={styles.notice}>{t('searchCount', { matches: typeof search.matchCount === 'number' ? search.matchCount : typeof searchFacts?.matchCount === 'number' ? searchFacts.matchCount : '—', files: typeof search.fileCount === 'number' ? search.fileCount : typeof searchFacts?.fileCount === 'number' ? searchFacts.fileCount : files.length })}</div>{files.length ? <SearchActivity kind={searchKind} basePath={string(search.basePath) || undefined} files={files.map(file => ({ path: string(file.path), matches: (Array.isArray(file.matches) ? file.matches.map(record) : []).map(match => ({ ...(typeof match.line === 'number' ? { line: match.line } : {}), text: string(match.text), context: match.context === true })) }))} /> : output ? <ActivityLines content={output} /> : <div className={styles.notice}>{empty}</div>}</>
           : changeVisible ? <><div className={styles.notice}>{t(status === 'running' ? 'proposed' : status === 'succeeded' ? 'applied' : 'unknown')}</div>{change.beforeAvailable === false && <div className={styles.notice}>{t('beforeUnavailable')}</div>}{['before_content_unavailable', 'before_permission_denied', 'before_content_too_large', 'before_content_not_text', 'patch_too_large', 'diff_too_large', 'diff_timeout', 'diff_unavailable'].includes(string(change.reason)) && <div className={styles.notice}>{t(`reasons.${string(change.reason)}`)}</div>}{patch && <ActivityLines content={patch} diff />}{counts && <div className={styles.notice}>+{counts.added} −{counts.removed} · {t('fileCount', { n: 1 })}</div>}{hasContent && <><h4 className={styles.section}>{t(status === 'running' ? 'proposedContent' : status === 'succeeded' ? 'writtenContent' : 'recordedContent')}</h4>{content ? <ActivityLines content={content} language={path.split('.').pop()} /> : <div className={styles.notice}>{t('emptyFile')}</div>}</>}{!patch && !hasContent && <div className={styles.notice}>{empty}</div>}</>
           : <><h4 className={styles.section}>{t('input')}</h4><ActivityLines content={input || t('unavailable')} /><h4 className={styles.section}>{t('output')}</h4><ActivityLines content={output || tool.error || empty} /></>}
         {tool.error && <div className={styles.failed}>{tool.error}</div>}

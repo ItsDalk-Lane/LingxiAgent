@@ -1,13 +1,9 @@
-/* MessageActivity — 字面量统一收进 .activity 定义行（样式立法：定义行是唯一合法归宿） */
+/* MessageActivity — 字面量统一收进 token 定义行（样式立法：定义行是唯一合法归宿）。
+   这些 token 有两棵子树根：行内详情的 .panel，以及 Portal 到窗口 overlay root 的
+   .dialog。弹窗内容不在 .activity 的 DOM 子树里，局部 token 继承不过去，所以两处
+   各自声明同一组值——只把 padding/box-shadow 打成 fallback 是逐属性打补丁，
+   每加一个 token 都会再漏一次。 */
 .activity {
-  --ma-pad-x: 14px;
-  --ma-dialog-pad: 18px;
-  --ma-diff-added: #16bc4b;
-  --ma-diff-removed: #ff393f;
-  --ma-syntax-keyword: #bd4ec2;
-  --ma-syntax-string: #559541;
-  --ma-syntax-number: #b97c33;
-  --ma-syntax-type: #448ad0;
   width: 100%; min-width: 0; margin: 0; padding: var(--space-8) 0; color: color-mix(in srgb, var(--tool-text, #61666b) 55%, var(--text-muted, #81858c));
 }
 .row { display: flex; align-items: center; gap: var(--space-8); min-width: 0; min-height: 24px; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-size: 13px; line-height: 24px; text-align: left; cursor: pointer; }
@@ -21,6 +17,20 @@
 .failed .label { color: inherit; }
 .failed { color: var(--danger, #e5484d); }
 .status { font-size: 11px; flex: 0 0 auto; }
+/* MessageActivity design tokens — 行内详情与 Portal 弹窗共享同一组值。
+   .panel 是行内详情的子树根，.dialog 是弹窗的子树根（Overlay scope="window"
+   portal 到 window overlay root，已经不在 .activity 子树内）。两处都声明，
+   弹窗就不必依赖"从 .activity 继承过来的"变量。 */
+.panel, .dialog {
+  --ma-pad-x: 14px;
+  --ma-dialog-pad: 18px;
+  --ma-diff-added: #16bc4b;
+  --ma-diff-removed: #ff393f;
+  --ma-syntax-keyword: #bd4ec2;
+  --ma-syntax-string: #559541;
+  --ma-syntax-number: #b97c33;
+  --ma-syntax-type: #448ad0;
+}
 .panel { margin-top: var(--space-4); background: color-mix(in srgb, var(--text-muted) 6%, transparent); border-radius: 12px; min-width: 0; overflow: hidden; font-size: 12px; line-height: 22px; color: var(--text); }
 .header { display: flex; align-items: center; gap: var(--space-12); padding: var(--space-8) var(--ma-pad-x, 14px); color: var(--text-muted); font-size: 12px; min-width: 0; }
 .title { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -42,8 +52,9 @@
 .terminal { max-height: 224px; overflow: auto; }
 .terminal :global([data-testid^="terminal-preview-"]) { height: auto; max-height: 224px; border: 0; border-radius: 0; margin: 0; background: none; overflow: auto; }
 .terminal :global([role="log"]) { font-size: 11px; line-height: 22px; }
-/* 查看弹窗 portal 到 body，已不在 .activity 子树内：局部 token 取不到，
-   所有值必须自带回退字面量，否则 padding 会整条声明失效。 */
+/* 查看弹窗 portal 到窗口 overlay root，不在 .activity 子树内：设计 token 由
+   `.panel, .dialog` 那条规则一起声明，所以弹窗里的 .added/.removed 与语法高亮
+   拿到的是和行内完全相同的值。 */
 .dialog { width: min(860px, 90vw); max-height: 85vh; overflow: auto; padding: var(--ma-dialog-pad, 18px); border-radius: 12px; background: var(--bg, #fff); color: var(--text); box-shadow: var(--shadow-2xl, 0 8px 32px rgba(0, 0, 0, 0.18)); }
 :global(body.paper-texture) .dialog { background-image: url(../../assets/textures/rice-paper.png); background-repeat: repeat; background-size: 160px; background-attachment: fixed; background-blend-mode: var(--paper-texture-card-blend-mode); }
 .dialog .pre { max-height: 50vh; }

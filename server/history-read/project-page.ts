@@ -422,10 +422,21 @@ export function projectHistoryPage(input: PageProjectorInput): ProjectedPage {
               const deferred = createHistoryDeferredContentFor(rawResult, outcomeSourceIndex, "tool_output", 0, details.output);
               details.output = deferred.preview || "";
               details.outputDeferred = deferred;
-              // 搜索正文可由延迟输出恢复；不把同一大段内容在 files 中再传一次。
-              if (details.search) {
-                const { files: _files, ...summary } = details.search;
-                details.search = summary;
+              // 搜索结构（path / line / context / matchCount / fileCount）是本次执行已有的
+              // 事实，首包只为体积省掉 files；省掉的是体积，不是真相，所以另给一条可加载
+              // 引用，展开时按原结构取回，而不是让前端从 output 文本里重新猜路径和行号。
+              if (details.search && Array.isArray(details.search.files) && details.search.files.length) {
+                const searchDeferred = createHistoryDeferredContentFor(
+                  rawResult,
+                  outcomeSourceIndex,
+                  "tool_search",
+                  0,
+                  JSON.stringify(details.search),
+                  // 结构预览会把刚刚省下的体积原样塞回首包；统计仍由 matchCount /
+                  // fileCount 字段承担，引用只负责按需取回完整结构。
+                  { preview: false },
+                );
+                details.search = { ...details.search, files: undefined, searchDeferred };
               }
             }
             const rawResultContent = soleRawToolResultText(rawResult);

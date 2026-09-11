@@ -1220,6 +1220,11 @@
       "done": "🎬 {name}이(가) 영상을 완성했어요",
       "failed": "🎬 영상이 나오지 않았어요"
     },
+    "media_generate-speech": {
+      "running": "🎙️ {name}이(가) 음성을 만드는 중",
+      "done": "🎙️ {name}이(가) 음성을 완성했어요",
+      "failed": "🎙️ 음성이 나오지 않았어요"
+    },
     "media_describe-options": {
       "running": "🎨 이미지 옵션을 보는 중",
       "done": "🎨 이미지 옵션을 다 봤어요",
@@ -5119,6 +5124,7 @@
       "dm": "다이렉트 메시지",
       "media_generate-image": "이미지 생성",
       "media_generate-video": "영상 생성",
+      "media_generate-speech": "음성 생성",
       "media_describe-options": "옵션 설명",
       "media_get-guide": "미디어 가이드",
       "beautify_create-cover": "커버 만들기",

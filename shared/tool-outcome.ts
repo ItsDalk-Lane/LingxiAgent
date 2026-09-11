@@ -1,24 +1,48 @@
-import { projectToolPresentationDetails, toolResultText, type ToolPresentationDetails } from './tool-presentation.ts';
+import {
+  projectToolPresentationDetails,
+  toolResultText,
+  type ToolPresentationDetails,
+  type ToolSearchPresentation,
+} from './tool-presentation.ts';
 
 export type ToolOutcomeStatus = "succeeded" | "failed" | "unknown";
+
+export type ToolOutcomeDetails = ToolPresentationDetails & {
+  execCommand?: Record<string, unknown>;
+  skillInvocation?: {
+    content: string;
+    truncated?: boolean;
+    deferred?: unknown;
+  };
+};
 
 export type ToolOutcome = {
   status: ToolOutcomeStatus;
   success: boolean;
   error?: string;
-  details?: ToolPresentationDetails & {
-    execCommand?: Record<string, unknown>;
-    skillInvocation?: {
-      content: string;
-      truncated?: boolean;
-      deferred?: unknown;
-    };
-  };
+  details?: ToolOutcomeDetails;
 };
 
 export type ToolInvocationContext = {
   toolName?: unknown;
   args?: unknown;
+};
+
+/**
+ * 实时大结果/大改动的可加载引用工厂。
+ *
+ * 投影本身不制造引用：只有调用方确实能给出一个"以后再按保存记录解析"的坐标时才传。
+ * 传了才在截断时挂上 deferred，实时与历史因此表达同一套完整性语义。
+ */
+export type ToolResultDeferral = {
+  /**
+   * 收到投影后的详情，返回要挂上去的可加载引用。
+   * 只回引用、不回正文：正文留在保存记录里按需解析，首包/WS 体积因此有界。
+   */
+  create: (details: ToolOutcomeDetails) => {
+    outputDeferred?: ToolPresentationDetails['outputDeferred'];
+    searchDeferred?: ToolSearchPresentation['searchDeferred'];
+  } | undefined;
 };
 
 type ToolResultLike = {
@@ -123,6 +147,7 @@ function projectedSkillDetails(
 function projectedDetails(
   result: ToolResultLike,
   context: ToolInvocationContext | undefined,
+  deferral?: ToolResultDeferral,
 ): ToolOutcome['details'] | undefined {
   const generic = projectToolPresentationDetails(result, context);
   const exec = projectedExecDetails(result);
@@ -133,6 +158,13 @@ function projectedDetails(
   if (exec?.execCommand?.tty === true) {
     delete details.output;
     delete details.outputTruncated;
+  }
+  // 实时截断必须同时给出可加载引用，否则"实时看预览、重开历史看全文"就是两套
+  // 完整性规则。引用只登记坐标，正文留在保存记录里按需解析。
+  if (deferral && details.outputTruncated === true) {
+    const deferred = deferral.create(details);
+    if (deferred?.outputDeferred) details.outputDeferred = deferred.outputDeferred;
+    if (deferred?.searchDeferred && details.search) details.search = { ...details.search, searchDeferred: deferred.searchDeferred };
   }
   return details;
 }
@@ -169,8 +201,9 @@ export function isKnownLegacyLingxiToolFailure(result: ToolResultLike): boolean 
 export function projectLiveToolResultOutcome(
   result: ToolResultLike,
   context?: ToolInvocationContext,
+  deferral?: ToolResultDeferral,
 ): ToolOutcome {
-  const details = projectedDetails(result, context);
+  const details = projectedDetails(result, context, deferral);
   if (result?.isError !== true) {
     return { status: "succeeded", success: true, ...(details ? { details } : {}) };
   }

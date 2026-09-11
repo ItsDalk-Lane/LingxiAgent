@@ -53,7 +53,8 @@ function labelKeyFor(name: string, args?: Record<string, unknown>): string {
  * 直接露出裸英文工具名。
  */
 export const BUNDLED_PLUGIN_TOOL_NAMES: ReadonlySet<string> = new Set([
-  'media_generate-image', 'media_generate-video', 'media_describe-options', 'media_get-guide',
+  'media_generate-image', 'media_generate-video', 'media_generate-speech',
+  'media_describe-options', 'media_get-guide',
   'beautify_create-cover', 'beautify_apply-cover-candidate', 'beautify_get-cover-style-guide',
   'beautify_get-html-style-guide', 'beautify_list-capabilities',
   'office_read-document', 'office_html-to-pdf', 'office_list-capabilities',
@@ -128,15 +129,18 @@ export const ACTIVITY_LABEL_KEYS: Readonly<Record<string, string>> = {
   check_pending_tasks: 'check_pending_tasks', loop_control: 'loop_control', current_status: 'current_status',
   subagent_reply: 'subagent_reply', subagent_close: 'subagent_close',
   // 卡片承载（不进进程区，仍要登记文案；键形如 <pluginId>_<tool>）
-  'create_artifact': 'create_artifact', 'dm': 'dm',
+  'create_artifact': 'create_artifact', 'dm': 'dm', 'present_files': 'present_files',
   'media_generate-image': 'media_generate-image', 'media_generate-video': 'media_generate-video',
+  'media_generate-speech': 'media_generate-speech',
   'media_describe-options': 'media_describe-options', 'media_get-guide': 'media_get-guide',
   'beautify_create-cover': 'beautify_create-cover',
   'beautify_apply-cover-candidate': 'beautify_apply-cover-candidate',
   'beautify_get-cover-style-guide': 'beautify_get-cover-style-guide',
   'beautify_get-html-style-guide': 'beautify_get-html-style-guide',
   'beautify_list-capabilities': 'beautify_list-capabilities',
-  'office_read-document': 'office_read-document', 'office_html_to-pdf': 'office_html-to-pdf',
+  // 运行时工具名带连字符（plugins/office/tools/html-to-pdf.ts → office_html-to-pdf）；
+  // 写成下划线就匹配不到调用，只能落通用兜底。
+  'office_read-document': 'office_read-document', 'office_html-to-pdf': 'office_html-to-pdf',
   'office_list-capabilities': 'office_list-capabilities',
   // 家族词：查不到短标签时按工具是不是一方工具分档
   _tool: 'tool',

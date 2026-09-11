@@ -1249,6 +1249,9 @@ export function createSessionsRoute(engine, hub = null) {
       const resolved = resolveHistoryDeferredContent(
         sourceMessages,
         c.req.param("contentId"),
+        // 实时大结果引用只登记「哪个会话、哪次调用」；这里把已经过路径校验和
+        // read 授权的那条会话路径传下去，引用写的是别的会话就解析不出内容。
+        resolvedSessionPath,
       );
       return resolved
         ? c.json(resolved)

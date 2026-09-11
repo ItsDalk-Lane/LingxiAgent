@@ -1219,6 +1219,11 @@
       "done": "🎬 {name} finished the video",
       "failed": "🎬 The video didn't come out"
     },
+    "media_generate-speech": {
+      "running": "🎙️ {name} is recording the voice",
+      "done": "🎙️ {name} finished the audio",
+      "failed": "🎙️ The audio didn't come out"
+    },
     "media_describe-options": {
       "running": "🎨 Checking the image options",
       "done": "🎨 Got the image options",
@@ -5123,6 +5128,7 @@
       "dm": "Direct message",
       "media_generate-image": "Generate image",
       "media_generate-video": "Generate video",
+      "media_generate-speech": "Generate speech",
       "media_describe-options": "Describe options",
       "media_get-guide": "Media guide",
       "beautify_create-cover": "Create cover",

@@ -10,6 +10,77 @@ import {
 } from '../shared/tool-presentation.ts';
 import { collectToolOutcomesByCallId } from '../shared/tool-outcome.ts';
 
+const GENERIC_CONTEXT = { toolName: 'mcp_lookup', args: {} };
+
+/** 通用工具结果的展示文本（走逐块安全投影那条链）。 */
+function genericOutput(content: unknown[], context: Record<string, unknown> = GENERIC_CONTEXT): string {
+  const details = projectToolPresentationDetails({ content } as never, context as never);
+  return details?.output ?? '';
+}
+const text = (value: string) => ({ type: 'text', text: value });
+
+describe('A. 敏感字段遮盖矩阵（块边界不能被绕过）', () => {
+  it('单个 JSON 块遮盖敏感字段', () => {
+    expect(genericOutput([text('{"token":"AUDIT_FAKE_TOKEN"}')]))
+      .toBe('{\n  "token": "********"\n}');
+  });
+
+  it('JSON 块后面跟普通说明：token 仍遮盖，说明仍保留', () => {
+    const output = genericOutput([text('{"token":"AUDIT_FAKE_TOKEN"}'), text('Operation completed')]);
+    expect(output).toContain('"token": "********"');
+    expect(output).not.toContain('AUDIT_FAKE_TOKEN');
+    // 普通说明不能被当成"疑似 secret"删掉，也不能把整块结果标记成不可展示。
+    expect(output).toContain('Operation completed');
+  });
+
+  it('两个各自合法的 JSON 块分别遮盖', () => {
+    const output = genericOutput([text('{"token":"AUDIT_FAKE_TOKEN"}'), text('{"apiKey":"AUDIT_FAKE_KEY"}')]);
+    expect(output).not.toContain('AUDIT_FAKE_TOKEN');
+    expect(output).not.toContain('AUDIT_FAKE_KEY');
+    expect(output).toContain('"token": "********"');
+    expect(output).toContain('"apiKey": "********"');
+  });
+
+  it('text / image / text 混排：图片二进制不进文本详情，两侧内容各自处理', () => {
+    const output = genericOutput([
+      text('{"accessToken":"AUDIT_FAKE_TOKEN"}'),
+      { type: 'image', data: 'AUDIT_FAKE_BINARY' },
+      text('tail text'),
+    ]);
+    expect(output).not.toContain('AUDIT_FAKE_BINARY');
+    expect(output).not.toContain('AUDIT_FAKE_TOKEN');
+    expect(output).toContain('"accessToken": "********"');
+    expect(output).toContain('tail text');
+  });
+
+  it('嵌套凭证按字段身份遮盖，不碰同层的普通字段', () => {
+    const output = genericOutput([text(JSON.stringify({
+      headers: { Authorization: 'AUDIT_FAKE_AUTH', Accept: 'text/plain' },
+      cookie: 'AUDIT_FAKE_COOKIE',
+    }))]);
+    for (const secret of ['AUDIT_FAKE_AUTH', 'AUDIT_FAKE_COOKIE']) expect(output).not.toContain(secret);
+    expect(output).toContain('"Authorization": "********"');
+    expect(output).toContain('"Accept": "text/plain"');
+  });
+
+  it('设置类 key/value 结构：值被遮盖，键名保留', () => {
+    const output = genericOutput([text(JSON.stringify({ key: 'providers.demo.api_key', value: 'AUDIT_FAKE_KEY' }))]);
+    expect(output).not.toContain('AUDIT_FAKE_KEY');
+    expect(output).toContain('providers.demo.api_key');
+    expect(output).toContain('"value": "********"');
+  });
+
+  it('普通代码正文不被遮盖破坏，文件工具正文保持原样', () => {
+    const code = '{"code":"const accessToken = readToken();"}';
+    expect(genericOutput([text(code)])).toContain('const accessToken = readToken();');
+    // read / write / edit 等文件工具正文必须逐字保留（否则写出的代码会被改坏）。
+    const patch = '@@ -1 +1 @@\n-const token = 1;\n+const token = 2;';
+    expect(projectToolPresentationDetails({
+      content: [text(patch)], details: { fileChange: { path: 'a.ts', patch, beforeAvailable: true } },
+    } as never, { toolName: 'edit', args: { path: 'a.ts' } } as never)?.output).toBe(patch);
+  });
+});
+
 describe('工具详情展示投影', () => {
   it('按字段遮盖凭证和设置值，保留正文中的真实代码', () => {
     const content = 'const token = "file content";';
@@ -167,5 +238,53 @@ describe('工具详情展示投影', () => {
     } }, { toolName: 'edit', args: { path: 'a.ts' } }, 40)!;
     expect(details.fileChange).toMatchObject({ added: 3, removed: 2, truncated: true });
     expect(details.fileChange?.patch?.length).toBe(40);
+  });
+});
+
+describe('B. 旧搜索文本解析（legacy fallback）的能力边界', () => {
+  it('上下文行里出现 other.ts:123: 时无法还原真实归属——所以新记录不许走这条路', () => {
+    // 这是 legacy parser 的**已知边界**，不是待修的 bug：文本格式本身有歧义。
+    // 真实语义是 src/a.ts 第 6 行上下文 + 第 7 行命中，纯文本无法区分。
+    const parsed = parseToolSearchOutput('grep', [
+      'src/a.ts-6- Error at other.ts:123: boom',
+      'src/a.ts:7: target',
+    ].join('\n'));
+    expect(parsed.files).toEqual([
+      { path: 'src/a.ts-6- Error at other.ts', matches: [{ line: 123, text: 'boom' }] },
+      { path: 'src/a.ts', matches: [{ line: 7, text: 'target' }] },
+    ]);
+    expect(parsed.fileCount).toBe(2);
+  });
+
+  it('Windows 路径的盘符冒号不会被当成行号分隔符', () => {
+    expect(parseToolSearchOutput('grep', 'C:\\work\\a.ts:12: first')).toMatchObject({
+      files: [{ path: 'C:\\work\\a.ts', matches: [{ line: 12, text: 'first' }] }],
+    });
+    expect(parseToolSearchOutput('grep', 'C:\\work\\a.ts-13- context').files).toEqual([
+      { path: 'C:\\work\\a.ts', matches: [{ line: 13, text: 'context', context: true }] },
+    ]);
+  });
+
+  it('正文里多个 `:数字:` 只按第一个分隔符切分，尾部文本保持完整', () => {
+    const parsed = parseToolSearchOutput('grep', [
+      'logs/app.log:42: 2024-01-01T00:00:00Z GET https://example.com:8443/x',
+      'src/b.ts:8: throw new Error("bad at line 17:2")',
+    ].join('\n'));
+    expect(parsed.files[0]).toEqual({
+      path: 'logs/app.log',
+      matches: [{ line: 42, text: '2024-01-01T00:00:00Z GET https://example.com:8443/x' }],
+    });
+    expect(parsed.files[1]).toEqual({
+      path: 'src/b.ts',
+      matches: [{ line: 8, text: 'throw new Error("bad at line 17:2")' }],
+    });
+  });
+
+  it('结构化 files 缺失时兜底解析，但 matchCount 只统计非上下文行', () => {
+    const parsed = parseToolSearchOutput('grep', [
+      'a.ts:1: hit', 'a.ts-2- ctx', 'a.ts-3- ctx', 'b.ts:9: hit',
+      '[100 matches limit reached. Use limit=200 for more]',
+    ].join('\n'));
+    expect(parsed).toMatchObject({ matchCount: 2, fileCount: 2, truncated: true });
   });
 });

@@ -1220,6 +1220,11 @@
       "done": "🎬 {name} 把视频做好了",
       "failed": "🎬 视频没做成"
     },
+    "media_generate-speech": {
+      "running": "🎙️ {name} 正在配音",
+      "done": "🎙️ {name} 把音配好了",
+      "failed": "🎙️ 音没配成"
+    },
     "media_describe-options": {
       "running": "🎨 正在看出图有哪些选项",
       "done": "🎨 出图的选项看完了",
@@ -5224,6 +5229,7 @@
       "dm": "私信",
       "media_generate-image": "生图",
       "media_generate-video": "生视频",
+      "media_generate-speech": "配音",
       "media_describe-options": "写提示词",
       "media_get-guide": "看生图指南",
       "beautify_create-cover": "做封面",

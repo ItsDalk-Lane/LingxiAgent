@@ -72,7 +72,8 @@ import {
 import { isAllowedChatAudioMime, isChatAudioBase64WithinLimit } from "../../shared/audio-mime.ts";
 import { summarizeToolArgs } from "../../shared/tool-arg-summary.ts";
 import { projectToolStartDetails, safeToolArguments } from "../../shared/tool-presentation.ts";
-import { projectLiveToolResultOutcome } from "../../shared/tool-outcome.ts";
+import { projectLiveToolResultOutcome, type ToolResultDeferral } from "../../shared/tool-outcome.ts";
+import { createLiveToolContentDescriptor } from "../history-deferred-content.ts";
 import { AssistantEventNormalizer } from "../assistant-event-normalizer.ts";
 import fs from "fs";
 import path from "path";
@@ -1610,10 +1611,26 @@ export function createChatRoute(engine: any, hub: any, {
         ? ss.pendingToolContextsByCallId?.get?.(event.toolCallId)
         : null;
       if (event.toolCallId) ss.pendingToolContextsByCallId?.delete?.(event.toolCallId);
+      // 实时截断同样给出可加载引用：引用只记「本会话 + 本次调用」，正文由历史
+      // 读取按保存记录现场投影，用户不必重开会话才能拿到完整已记录内容。
+      const liveDeferral: ToolResultDeferral = {
+        create: (details) => {
+          if (!event.toolCallId) return undefined;
+          const outputDeferred = createLiveToolContentDescriptor(sessionPath, event.toolCallId, "tool_output", details.output?.length ?? 0);
+          if (!outputDeferred) return undefined;
+          // 搜索的结构化 files 与正文同源同寿命：首包省掉 files 只是省体积，
+          // 结构本身要能按同一条引用取回，不能等重开历史再从文本重猜。
+          const search = details.search;
+          const searchDeferred = search && Array.isArray(search.files) && search.files.length
+            ? createLiveToolContentDescriptor(sessionPath, event.toolCallId, "tool_search", JSON.stringify(search).length)
+            : null;
+          return { outputDeferred, ...(searchDeferred ? { searchDeferred } : {}) };
+        },
+      };
       const outcome = projectLiveToolResultOutcome({
         ...event.result,
         isError: event.isError === true || event.result?.isError === true,
-      }, toolContext || { toolName: event.toolName || "" });
+      }, toolContext || { toolName: event.toolName || "" }, liveDeferral);
       emitStreamEvent(sessionPath, ss, {
         type: "tool_end",
         id: event.toolCallId || undefined,
