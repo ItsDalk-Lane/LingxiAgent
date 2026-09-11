@@ -12,6 +12,27 @@ import { isSameFilePresentation, normalizeContentBlocks } from '../utils/content
 import { resolveAssistantTurnOutcome } from '../utils/turn-outcome';
 import { mergePrependedHistoryItems } from '../utils/history-run-merge';
 
+/** 「回退时撤销文件改动」逐文件结果（服务端 WorkspaceRollbackFileResult 的前端形状）。 */
+export interface FileRollbackFileReport {
+  path: string;
+  change: string;
+  action: string;
+  source: string;
+  ok: boolean;
+  reason?: string;
+}
+
+/** 「回退时撤销文件改动」整轮报告（HTTP 响应 + ws session_branch_reset 同源）。 */
+export interface FileRollbackReport {
+  ok: boolean;
+  reason: string | null;
+  degraded: boolean;
+  commit: string | null;
+  turnInputEntryId: string | null;
+  files: FileRollbackFileReport[];
+  failures: FileRollbackFileReport[];
+}
+
 export interface ChatSlice {
   chatSessions: Record<string, SessionMessages>;
   sessionRegistryFilesByPath: Record<string, SessionRegistryFile[]>;
@@ -26,6 +47,11 @@ export interface ChatSlice {
    */
   _loadMessagesVersion: Record<string, number>;
   scrollPositions: Record<string, number>;
+
+  /** 「回退时撤销文件改动」最近一次报告（按会话作用域键）。 */
+  fileRollbackReportsByPath: Record<string, FileRollbackReport>;
+  setFileRollbackReport: (path: string, report: FileRollbackReport) => void;
+  clearFileRollbackReport: (path: string) => void;
 
   initSession: (path: string, items: ChatListItem[], hasMore: boolean, revision?: string | null, nextBefore?: string | null) => void;
   prependItems: (path: string, items: ChatListItem[], hasMore: boolean, nextBefore?: string | null) => void;
@@ -129,6 +155,7 @@ export const createChatSlice = (
   _loadMessagesVersion: {},
   _sessionFilesFlightByPath: {},
   scrollPositions: {},
+  fileRollbackReportsByPath: {},
   queuedTurnInputsByPath: {},
 
   initSession: (path, items, hasMore, revision = null, nextBefore) => set((s) => {
@@ -876,6 +903,14 @@ export const createChatSlice = (
       },
     };
   }),
+
+  setFileRollbackReport: (path, report) => set((s) => ({
+    fileRollbackReportsByPath: putScopedMapValue(s as any, s.fileRollbackReportsByPath, path, report),
+  })),
+
+  clearFileRollbackReport: (path) => set((s) => ({
+    fileRollbackReportsByPath: deleteScopedMapValue(s as any, s.fileRollbackReportsByPath, path),
+  })),
 });
 
 function registryFileKey(file: SessionRegistryFile): string | null {

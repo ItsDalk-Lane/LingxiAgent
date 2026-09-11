@@ -79,4 +79,13 @@ describe('ResourceIO watch architecture', () => {
     expect(aliasBridge).not.toContain('.watchFile(');
     expect(aliasBridge).not.toContain('.watchWorkspace(');
   });
+
+  it('mounts the workspace file change bridge in the desktop app shell', () => {
+    // 桌面端工作台文件树的实时刷新依赖 WorkspaceFileChangeBridge 的 ResourceIO
+    // 订阅；它此前只在移动端 WorkspaceCompanionRail 挂载，桌面端无订阅时
+    // 文件树只能在切换工作台时刷新。防止回归。
+    const appShell = fs.readFileSync(path.join(ROOT, 'desktop/src/react/App.tsx'), 'utf-8');
+    expect(appShell).toContain("from './components/app/WorkspaceFileChangeBridge'");
+    expect(appShell).toContain('<WorkspaceFileChangeBridge />');
+  });
 });

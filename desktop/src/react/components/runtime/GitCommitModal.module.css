@@ -1,9 +1,7 @@
-/* GitCommitModal — 提交或推送弹窗（分支条 + 勾选 + 提交信息 + 三操作） */
+/* GitCommitModal — 提交或推送弹窗（分支条 + 勾选 + 提交信息 + 四操作） */
 
 .modal {
     /* 立法：本模块一次性字面量收进定义行（扫描豁免位），使用点一律 var() */
-    --git-hover-wash: rgba(90, 118, 139, 0.09);
-    --git-shadow-smoke: rgba(0, 0, 0, 0.08);
     --git-accent-text: #ffffff;
 
     background: color-mix(in srgb, var(--bg, #fcfaf5) 94%, white 6%);
@@ -120,14 +118,57 @@
     color: var(--danger, #8B3A3A);
 }
 
-.messageInput {
-    width: 100%;
-    resize: vertical;
-    min-height: 76px;
-    padding: var(--space-8) var(--space-12);
+.messageBox {
+    display: flex;
+    flex-direction: column;
     background: var(--bg-card, #fff);
     border: 1px solid var(--border, rgba(0, 0, 0, 0.12));
     border-radius: var(--radius-input, 6px);
+    overflow: hidden;
+}
+
+.messageBox:focus-within {
+    border-color: var(--accent, rgba(0, 0, 0, 0.35));
+}
+
+/* 提交信息框右上角的工具位：显式让模型生成信息，只回填、不提交 */
+.messageTools {
+    display: flex;
+    justify-content: flex-end;
+    padding: var(--space-4) var(--space-6) 0;
+}
+
+.generateBtn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    padding: 0 var(--space-8);
+    border: 1px solid var(--border, rgba(0, 0, 0, 0.12));
+    border-radius: 999px;
+    background: var(--bg-card, #fff);
+    color: var(--text-light);
+    font: inherit;
+    font-size: var(--fs-hint);
+    cursor: default;
+    transition: border-color var(--duration-fast) ease, color var(--duration-fast) ease;
+}
+
+.generateBtn:hover:not(:disabled) {
+    border-color: var(--accent, rgba(0, 0, 0, 0.35));
+    color: var(--accent);
+}
+
+.generateBtn:disabled {
+    opacity: 0.5;
+}
+
+.messageInput {
+    width: 100%;
+    resize: none;
+    min-height: 76px;
+    padding: var(--space-6) var(--space-12) var(--space-8);
+    background: transparent;
+    border: none;
     color: var(--text, inherit);
     font-family: inherit;
     font-size: var(--fs-caption);
@@ -136,7 +177,6 @@
 
 .messageInput:focus {
     outline: none;
-    border-color: var(--accent, rgba(0, 0, 0, 0.35));
 }
 
 .messageInput::placeholder {
@@ -183,72 +223,5 @@
     cursor: default;
 }
 
-/* ── 分支下拉 ── */
-.branchMenu {
-    background: var(--bg-card, var(--bg));
-    border: 1px solid var(--overlay-light);
-    border-radius: var(--radius-lg);
-    box-shadow: 0 8px 32px var(--shadow), 0 2px 8px var(--git-shadow-smoke);
-    padding: var(--space-8);
-    max-width: 300px;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-}
-
-.branchMenuTitle {
-    font-size: var(--fs-hint);
-    font-weight: 600;
-    color: var(--text-light);
-    padding: var(--space-2) var(--space-8);
-}
-
-.branchList {
-    display: flex;
-    flex-direction: column;
-    max-height: 240px;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-}
-
-.branchItem {
-    display: flex;
-    align-items: center;
-    gap: var(--space-8);
-    min-height: 28px;
-    padding: var(--space-2) var(--space-8);
-    border: none;
-    border-radius: 5px;
-    background: transparent;
-    color: var(--text);
-    font: inherit;
-    font-size: var(--fs-caption);
-    text-align: left;
-    cursor: default;
-}
-
-.branchItem:hover:not(:disabled) {
-    background: var(--git-hover-wash);
-}
-
-.branchItem:disabled {
-    opacity: 0.6;
-}
-
-.branchItemName {
-    flex: 1 1 auto;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.branchItemCurrent {
-    color: var(--accent);
-    font-weight: 600;
-}
-
-.branchCurrentMark {
-    flex-shrink: 0;
-    color: var(--accent);
-}
+/* ── 分支下拉 ──
+   浮层本体与分支项都在 GitBranchList.module.css（与环境信息卡共用） */

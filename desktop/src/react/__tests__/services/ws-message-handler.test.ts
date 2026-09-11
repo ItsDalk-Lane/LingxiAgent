@@ -534,6 +534,42 @@ describe('ws-message-handler session-scoped desktop events', () => {
     ]);
   });
 
+  it('session_branch_reset 携带 fileRollbackReport 时写入会话作用域报告，无报告则不写', () => {
+    useStore.getState().appendItem('/session/a.jsonl', {
+      type: 'message',
+      data: { id: 'u1', role: 'user', text: 'old' },
+    });
+    const report = {
+      ok: true,
+      reason: null,
+      degraded: false,
+      commit: 'commit-1',
+      turnInputEntryId: 'entry-u1',
+      files: [{ path: 'a.txt', change: 'modified', action: 'restored', source: 'snapshot', ok: true }],
+      failures: [],
+    };
+
+    handleServerMessage({
+      type: 'session_branch_reset',
+      sessionPath: '/session/a.jsonl',
+      messageId: 'u1',
+      todos: [],
+      fileRollbackReport: report,
+    } as never);
+
+    expect(useStore.getState().fileRollbackReportsByPath['/session/a.jsonl']).toEqual(report);
+
+    useStore.getState().clearFileRollbackReport('/session/a.jsonl');
+    handleServerMessage({
+      type: 'session_branch_reset',
+      sessionPath: '/session/a.jsonl',
+      messageId: 'u1',
+      todos: [],
+    });
+
+    expect(useStore.getState().fileRollbackReportsByPath['/session/a.jsonl']).toBeUndefined();
+  });
+
   it('session_branch_reset 带 sessionFiles 时，通过 applyBranchResetSessionFiles 整表替换 registry（#2188）', () => {
     useStore.getState().appendItem('/session/a.jsonl', {
       type: 'message',

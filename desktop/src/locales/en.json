@@ -26,7 +26,8 @@
     }
   },
   "selection": {
-    "quoteToChat": "Quote to chat"
+    "quoteToChat": "Quote to chat",
+    "openInSideChat": "Chat in side panel"
   },
   "mermaid": {
     "viewSource": "View source",
@@ -411,17 +412,37 @@
     "back": "Back"
   },
   "chat": {
-        "historyOverview": {
-          "records": "Raw history records",
-          "runs": "Logic turns",
-          "tasks": "Related tasks",
-          "taskSubagent": "Subagents",
-          "taskWorkflow": "Workflows",
-          "taskMedia": "Media generation",
-          "taskOther": "Other",
-          "unknown": "Stats unavailable",
-          "detail": "Subagents {subagent} · Workflows {workflow} · Media {media} · Other {other}"
-        },
+    "fileRollback": {
+      "menuTitle": "Regenerate",
+      "conversationOnly": "Conversation only",
+      "withFiles": "Conversation + file changes",
+      "withFilesCount": "Conversation + file changes ({count} files)",
+      "withFilesDegraded": "Conversation + file changes (snapshot failed, using backups)",
+      "disabledOff": "Enable “Undo file changes on rollback” in Settings → Interface first",
+      "disabledNoCheckpoint": "No file checkpoint for this turn",
+      "disabledUnavailable": "Workspace checkpoint unavailable",
+      "confirmTitle": "Roll back conversation and file changes",
+      "confirmBody": "The workspace will be restored to its state before this turn. These {count} files will be overwritten:",
+      "confirmWarning": "Every change since that turn started — including edits you made by hand — will be overwritten.",
+      "confirmAction": "Roll back",
+      "reportTitle": "File rollback report",
+      "reportAllOk": "{count} files restored",
+      "reportPartial": "{failed} files failed, {count} succeeded",
+      "reportDegraded": "No usable snapshot for this turn; files were reconstructed from pre-change backups",
+      "reportSourceBackup": "Source: pre-change backup",
+      "dismiss": "Dismiss"
+    },
+    "historyOverview": {
+      "records": "Raw history records",
+      "runs": "Logic turns",
+      "tasks": "Related tasks",
+      "taskSubagent": "Subagents",
+      "taskWorkflow": "Workflows",
+      "taskMedia": "Media generation",
+      "taskOther": "Other",
+      "unknown": "Stats unavailable",
+      "detail": "Subagents {subagent} · Workflows {workflow} · Media {media} · Other {other}"
+    },
     "knowledgeResearchInterrupted": "Research was interrupted",
     "knowledgeResearchStopIncomplete": "Research did not finish its workflow",
     "knowledgeResearchStopUnavailable": "Required research tools are unavailable",
@@ -490,6 +511,19 @@
     "knowledgeMetaUnavailable": "knowledge retrieval unavailable",
     "knowledgeMetaDegradedTitle": "Retrieval degraded: {reason}",
     "knowledgeRetrieving": "Searching knowledge base",
+    "running": {
+      "working": "\"{name}\" is working",
+      "thinking": "Thinking",
+      "writing": "Writing the reply",
+      "reading": "Reading files",
+      "searching": "Searching",
+      "editing": "Editing files",
+      "command": "Running a command",
+      "web": "Reading the web",
+      "memory": "Searching memory",
+      "knowledge": "Searching the knowledge base",
+      "tool": "Running tool {name}"
+    },
     "knowledgeRetrievalSearched": "Searched {n} results",
     "knowledgeRetrievalShowMore": "Show more ({n} more)",
     "knowledgeRetrievalTruncated": "over-budget shards",
@@ -1554,6 +1588,8 @@
       "sidebar": "Sidebar",
       "sessionListSingleLine": "Single-line session list",
       "sessionListSingleLineHint": "When enabled, each session uses one row. Hovering reveals the right-side actions while the title shortens with an ellipsis.",
+      "rollbackFileChanges": "Undo file changes on rollback",
+      "rollbackFileChangesHint": "When enabled, regenerating or resending an edited message offers “Roll back conversation + file changes”, restoring workspace files to how they were before that turn. Off by default.",
       "shortcuts": "Shortcuts",
       "voiceRecordingShortcut": "Voice recording/send",
       "voiceRecordingShortcutHint": "When the main chat page is focused, press once to start recording, then press again to finish and send."
@@ -3866,8 +3902,7 @@
       "title": "Activity"
     },
     "todo": {
-      "title": "Progress",
-      "waitForOutput": "Wait for output to finish"
+      "title": "Progress"
     },
     "subagent": {
       "title": "Sub-agents",
@@ -3956,9 +3991,18 @@
     "noBranches": "No local branches",
     "switchDone": "Switched to {name}",
     "switchFailed": "Failed to switch branch",
+    "newBranch": "New branch…",
+    "newBranchPlaceholder": "New branch name",
+    "createBranch": "Create & switch",
+    "createBranchDone": "Created and switched to {name}",
+    "createBranchFailed": "Failed to create branch",
+    "branchExists": "Branch already exists",
+    "invalidBranchName": "Invalid branch name",
+    "branchMissing": "Base branch not found",
     "branchesTitle": "Switch branch",
     "changesTitle": "Changed files",
     "noChanges": "No changes",
+    "noChangesWithStash": "No uncommitted changes in the working tree. {n} stash(es) are still saved — use \"Take back all\" to restore them.",
     "diffBinary": "Binary file, diff not available",
     "diffUnavailable": "Unable to read diff",
     "diffTruncated": "Content too long, truncated",
@@ -3982,9 +4026,59 @@
     "noRemote": "No remote configured",
     "aiGenerating": "Generating commit message…",
     "aiFailed": "Failed to generate commit message",
+    "genMessage": "AI generate",
+    "genMessageHint": "Let the model draft a commit message from the current changes (fills the box only, never commits)",
+    "aiGeneratingShort": "Generating…",
     "commitDone": "Committed",
     "pushDone": "Pushed",
-    "operationFailed": "Operation failed"
+    "nothingToStash": "Nothing to stash",
+    "stashOne": "Stash",
+    "unstashOne": "Take back",
+    "discardOne": "Discard",
+    "stashAll": "Stash all",
+    "unstashAll": "Take back all",
+    "discardAll": "Discard all",
+    "stashCount": "{n} stash(es)",
+    "stashFileDone": "Stashed {name}",
+    "stashFileFailed": "Failed to stash",
+    "stashAllLabel": "Stash all changes",
+    "stashAllDone": "Stashed all changes",
+    "unstashFileDone": "Took {name} back out of the stash",
+    "unstashFileFailed": "Failed to take back",
+    "unstashAllDone": "Took back the newest stash",
+    "unstashNoStash": "No stash entries",
+    "unstashNotInStash": "This file is not in any stash",
+    "unstashPathDirty": "This file has uncommitted changes; taking it back would overwrite them — discard or commit first",
+    "unstashConflict": "Conflicts while taking back; the stash entry was kept — resolve them and retry",
+    "discardOneHint": "Discard this file's uncommitted changes and restore it from HEAD (cannot be undone)",
+    "discardUntrackedHint": "Untracked new files are never discarded here, to avoid deleting them by accident",
+    "discardFileDone": "Discarded changes in {name}",
+    "discardAllDone": "Discarded all tracked changes",
+    "discardFailed": "Failed to discard",
+    "discardNothing": "Nothing to discard",
+    "discardConfirmTitle": "Discard changes",
+    "discardConfirmOk": "Discard",
+    "discardConfirmAll": "All uncommitted changes to tracked files (including staged ones) will be lost. This cannot be undone. Untracked new files are left alone.",
+    "discardConfirmFiles": "Uncommitted changes to these {count} files (including staged ones) will be lost. This cannot be undone:\n{list}",
+    "operationFailed": "Operation failed",
+    "worktreeRow": "New worktree",
+    "worktreeTitle": "Start a new session in a worktree",
+    "worktreeDesc": "Creates an isolated worktree under the project's parent directory ({root}) with a new branch wt/<name>, then opens a new session inside it. Your current checkout is untouched.",
+    "worktreeDescNoRoot": "Creates an isolated worktree under the project's parent directory with a new branch wt/<name>, then opens a new session inside it. Your current checkout is untouched.",
+    "worktreeNameLabel": "worktree name",
+    "worktreeNamePlaceholder": "e.g. fix-login-race",
+    "invalidWorktreeName": "Use letters, digits and . _ - only, starting with a letter or digit",
+    "worktreeBaseLabel": "Base branch",
+    "worktreeBaseHead": "Current HEAD",
+    "worktreeCreate": "Create & start session",
+    "worktreeCreating": "Creating…",
+    "worktreeDone": "New session opened in {name}",
+    "worktreeFailed": "Failed to create worktree",
+    "worktreeOpenFailed": "Worktree created, but registering it as a workspace failed, so no session was opened",
+    "worktreeDirExists": "That directory already exists — pick another name",
+    "worktreeBranchExists": "The matching wt/ branch already exists — pick another name",
+    "worktreeMainTag": "main",
+    "worktreeCurrentTag": "current"
   },
   "desk": {
     "title": "Desk",
@@ -4008,6 +4102,12 @@
     "emptyHint": "The desk is the assistant's patrol workspace and the default directory for every chat.\nSet a folder in settings.",
     "goToSettings": "Go to Settings",
     "fileLabel": "file",
+    "mentionToChat": {
+      "title": "Add to chat",
+      "label": "Add “{name}” to chat",
+      "file": "File",
+      "folder": "Folder"
+    },
     "openWithDefault": "Open with default app",
     "refresh": "Refresh",
     "newMarkdownFileName": "Untitled.md",
@@ -5021,8 +5121,12 @@
     "fileCount": "{n} file(s)",
     "copyRetained": "Copy retained output",
     "terminalRetained": "Only recent terminal output is retained; copying matches this preview."
-  }
-,
+  },
+  "duration": {
+    "seconds": "{seconds}s",
+    "minutes": "{minutes}m {seconds}s",
+    "hours": "{hours}h {minutes}m {seconds}s"
+  },
   "todoPanel": {
     "title": "Tasks",
     "expand": "Expand task list",
@@ -5038,12 +5142,16 @@
     "moreInProgress": "{n} more in progress",
     "stopped": "This turn stopped; tasks remain unfinished",
     "updateFailed": "Todo update failed; kept the last valid list",
-    "confirmComplete": "Confirm remaining tasks completed",
-    "cancelRemaining": "Cancel remaining tasks",
-    "cancelNote": "Only changes this plan; terminal processes, workflows and other background tasks keep running",
     "dismiss": "Dismiss",
-    "waitForOutput": "Wait for output to finish",
     "blockedReason": "Blocked: {reason}",
     "cancelledLabel": "Cancelled"
+  },
+  "sideChat": {
+    "title": "Side chat",
+    "close": "Close side chat",
+    "creating": "Creating side session…",
+    "createFailed": "Failed to create side session",
+    "retry": "Retry",
+    "empty": "Side session ready — ask away"
   }
 }

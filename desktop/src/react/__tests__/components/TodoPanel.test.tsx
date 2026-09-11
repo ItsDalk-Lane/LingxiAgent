@@ -11,8 +11,8 @@
  * - A06 本轮停止后进行中图标不再表现为执行中，并提示真实含义
  * - A08 全部完成 → 收尾摘要 + 收纳操作
  * - A10 部分完成+取消 → 分别统计
- * - A11 确认完成 / 取消剩余调用服务端动作
- * - A12 输出期间完成/取消操作禁用
+ * - A11 不提供手动完成/取消入口（完成状态由模型确定），无对应说明文案
+ * - A12 输出期间进行中图标旋转；用户停止后切回静止并提示
  * - A13 更新失败提示，保留原清单
  */
 import '@testing-library/jest-dom/vitest';
@@ -21,11 +21,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useStore } from '../../stores';
 import { TodoPanel } from '../../components/chat/TodoPanel';
-import {
-  cancelSessionTodos,
-  completeSessionTodos,
-  dismissSessionTodoPanel,
-} from '../../stores/session-actions';
+import { dismissSessionTodoPanel } from '../../stores/session-actions';
 
 vi.mock('../../stores/session-actions', () => ({
   completeSessionTodos: vi.fn(async () => true),
@@ -47,11 +43,7 @@ const I18N: Record<string, string> = {
   'todoPanel.moreInProgress': '另有 {n} 项进行中',
   'todoPanel.stopped': '本轮已停止，仍有未完成任务',
   'todoPanel.updateFailed': '清单更新失败，已保留上一份清单',
-  'todoPanel.confirmComplete': '确认剩余任务已完成',
-  'todoPanel.cancelRemaining': '取消剩余任务',
-  'todoPanel.cancelNote': '只改变这份计划，不会终止后台任务',
   'todoPanel.dismiss': '收纳',
-  'todoPanel.waitForOutput': '输出完成后再操作',
   'todoPanel.blockedReason': '受阻：{reason}',
   'todoPanel.cancelledLabel': '已取消',
 };
@@ -152,8 +144,8 @@ describe('TodoPanel', () => {
     render(<TodoPanel />);
     expect(screen.getByRole('button', { name: /^任务 ·/ })).toHaveTextContent('1 受阻');
     expect(screen.getByText('受阻：缺少凭据')).toBeInTheDocument();
-    // 仍有收尾操作（受阻不算完成）
-    expect(screen.getByRole('button', { name: '确认剩余任务已完成' })).toBeInTheDocument();
+    // 受阻不算完成：不显示"全部完成"，且不提供手动收尾按钮（完成状态由模型确定）
+    expect(screen.queryByText('全部完成')).not.toBeInTheDocument();
   });
 
   it('A06: 非流式且有未完成项时提示本轮已停止，不显示自动打勾', () => {
@@ -195,24 +187,33 @@ describe('TodoPanel', () => {
     expect(screen.getByText('已取消')).toBeInTheDocument();
   });
 
-  it('A11: 确认完成与取消剩余调用对应服务端动作', async () => {
+  it('A11: 面板不提供手动完成/取消入口（完成状态由模型确定），也不显示对应说明文案', () => {
     seed({ todos: ACTIVE_TODOS, version: 'tv1', finished: false, allCompleted: false, dismissed: false, updateFailed: false }, { expanded: true });
     render(<TodoPanel />);
-    fireEvent.click(screen.getByRole('button', { name: '确认剩余任务已完成' }));
-    expect(completeSessionTodos).toHaveBeenCalledWith(SESSION);
-    // 等 acting 状态复位再点下一个操作
-    await vi.waitFor(() => expect(screen.getByRole('button', { name: '取消剩余任务' })).toBeEnabled());
-    fireEvent.click(screen.getByRole('button', { name: '取消剩余任务' }));
-    expect(cancelSessionTodos).toHaveBeenCalledWith(SESSION);
-    expect(screen.getByText('只改变这份计划，不会终止后台任务')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '确认剩余任务已完成' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '取消剩余任务' })).not.toBeInTheDocument();
+    expect(screen.queryByText('只改变这份计划，不会终止后台任务')).not.toBeInTheDocument();
+    // 唯一的收尾操作是收纳已结束摘要，未结束时不出现
+    expect(screen.queryByRole('button', { name: '收纳' })).not.toBeInTheDocument();
   });
 
-  it('A12: 输出期间完成/取消操作禁用，收起仍可用', () => {
+  it('A12: 输出期间进行中图标带旋转类；用户停止后切回静止类', () => {
     seed({ todos: ACTIVE_TODOS, version: 'tv1', finished: false, allCompleted: false, dismissed: false, updateFailed: false }, { expanded: true, streaming: true });
-    render(<TodoPanel />);
-    expect(screen.getByRole('button', { name: '确认剩余任务已完成' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: '取消剩余任务' })).toBeDisabled();
-    // 收起仍可用
+    const { rerender } = render(<TodoPanel />);
+    const iconOf = () => document.querySelector('[data-status="in_progress"] svg');
+    expect(iconOf()?.getAttribute('class')).toMatch(/activeIcon/);
+    expect(iconOf()?.getAttribute('class')).not.toMatch(/stoppedIcon/);
+
+    // 用户手动停止本轮：streaming 标记消失 → 静止图标 + 停止提示
+    seed({ todos: ACTIVE_TODOS, version: 'tv1', finished: false, allCompleted: false, dismissed: false, updateFailed: false }, { expanded: true, streaming: false });
+    rerender(<TodoPanel />);
+    expect(iconOf()?.getAttribute('class')).toMatch(/stoppedIcon/);
+    expect(iconOf()?.getAttribute('class')).not.toMatch(/activeIcon/);
+    expect(screen.getByText('本轮已停止，仍有未完成任务')).toBeInTheDocument();
+
+    // 输出期间收起仍可用
+    seed({ todos: ACTIVE_TODOS, version: 'tv1', finished: false, allCompleted: false, dismissed: false, updateFailed: false }, { expanded: true, streaming: true });
+    rerender(<TodoPanel />);
     fireEvent.click(screen.getByRole('button', { name: /^任务 ·/ }));
     expect(useStore.getState().todoPanelExpandedBySession[SESSION]).toBe(false);
   });

@@ -5,10 +5,14 @@ import os from "os";
 import path from "path";
 import { upsertStudioMount } from "../core/studio-mounts.ts";
 import { normalizeWorkspacePath } from "../shared/workspace-history.ts";
+import { WorkspaceSnapshotService } from "../core/workspace-snapshots.ts";
 
-const { replayLatestUserTurnMock, retrySessionTurnMock } = vi.hoisted(() => ({
+const { replayLatestUserTurnMock, retrySessionTurnMock, resolveSessionNodeTargetMock } = vi.hoisted(() => ({
   replayLatestUserTurnMock: vi.fn(async () => ({ text: null, toolMedia: [] })),
   retrySessionTurnMock: vi.fn(async () => ({ text: null, toolMedia: [] })),
+  resolveSessionNodeTargetMock: vi.fn((_branch: any, target: any) => ({
+    turnInputEntry: { id: target?.turnInputEntryId || target?.entryId || null },
+  })),
 }));
 
 const browserManagerMock = {
@@ -71,6 +75,7 @@ vi.mock("../core/message-utils.js", async (importOriginal) => ({
 vi.mock("../core/session-turn-actions.js", () => ({
   replayLatestUserTurn: replayLatestUserTurnMock,
   retrySessionTurn: retrySessionTurnMock,
+  resolveSessionNodeTarget: resolveSessionNodeTargetMock,
 }));
 
 describe("sessions route", () => {
@@ -746,6 +751,62 @@ describe("sessions route", () => {
       authorizedFolders: [authorizedFolder],
       sandboxFolders: [cwd, authorizedFolder],
     });
+  });
+
+  it("reads and writes the per-session memory switch for any existing session", async () => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const app = new Hono();
+    const sessionPath = path.join(tmpDir, "agents", "hana", "sessions", "side.jsonl");
+    fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
+    fs.writeFileSync(sessionPath, "{}\n");
+    const engine = {
+      agentsDir: path.join(tmpDir, "agents"),
+      agentIdFromSessionPath: vi.fn(() => "hana"),
+      isAgentDeleted: vi.fn(() => false),
+      currentSessionPath: null,
+      getSessionMemoryEnabled: vi.fn(() => true),
+      setSessionMemoryEnabled: vi.fn(async (_path: string, enabled: boolean) => ({ ok: true, memoryEnabled: enabled })),
+    };
+
+    app.route("/api", createSessionsRoute(engine));
+
+    const read = await app.request(`/api/sessions/memory?path=${encodeURIComponent(sessionPath)}`);
+    expect(read.status).toBe(200);
+    expect(await read.json()).toMatchObject({ ok: true, sessionPath, memoryEnabled: true });
+
+    const write = await app.request("/api/sessions/memory", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: sessionPath, memoryEnabled: false }),
+    });
+    expect(write.status).toBe(200);
+    expect(engine.setSessionMemoryEnabled).toHaveBeenCalledWith(sessionPath, false);
+    expect(await write.json()).toMatchObject({ ok: true, sessionPath, memoryEnabled: false });
+  });
+
+  it("rejects a session memory write without an explicit boolean", async () => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const app = new Hono();
+    const sessionPath = path.join(tmpDir, "agents", "hana", "sessions", "side.jsonl");
+    fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
+    fs.writeFileSync(sessionPath, "{}\n");
+    const engine = {
+      agentsDir: path.join(tmpDir, "agents"),
+      agentIdFromSessionPath: vi.fn(() => "hana"),
+      isAgentDeleted: vi.fn(() => false),
+      getSessionMemoryEnabled: vi.fn(() => true),
+      setSessionMemoryEnabled: vi.fn(async () => ({ ok: true, memoryEnabled: true })),
+    };
+
+    app.route("/api", createSessionsRoute(engine));
+
+    const res = await app.request("/api/sessions/memory", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: sessionPath }),
+    });
+    expect(res.status).toBe(400);
+    expect(engine.setSessionMemoryEnabled).not.toHaveBeenCalled();
   });
 
   it("assigns a new session to the requested project before broadcasting it", async () => {
@@ -1538,6 +1599,199 @@ describe("sessions route", () => {
     expect(res.status).toBe(409);
     await expect(res.json()).resolves.toMatchObject({ code: "session_locator_mismatch" });
     expect(retrySessionTurnMock).not.toHaveBeenCalled();
+  });
+
+  describe("file rollback（回退时撤销文件改动）", () => {
+    function rollbackEngine(overrides: any = {}) {
+      const sessionPath = path.join(tmpDir, "agents", "hana", "sessions", "rollback.jsonl");
+      fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
+      fs.writeFileSync(sessionPath, "x\n");
+      const engine = {
+        agentsDir: path.join(tmpDir, "agents"),
+        getSessionManifest: vi.fn(() => ({
+          sessionId: "sess_rollback",
+          lifecycle: "active",
+          currentLocator: { path: sessionPath },
+        })),
+        isSessionStreaming: vi.fn(() => false),
+        preferences: { getRollbackFileChanges: () => false },
+        ...overrides,
+      };
+      return { engine, sessionPath };
+    }
+
+    function retryPayload(sessionPath: string, extra: Record<string, unknown> = {}) {
+      return {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: "sess_rollback",
+          sessionPath,
+          target: { role: "user", entryId: "entry-u1" },
+          ...extra,
+        }),
+      };
+    }
+
+    it("开关关闭时 fileRollback=workspace 显式 403，不静默降级", async () => {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const app = new Hono();
+      const { engine, sessionPath } = rollbackEngine();
+      app.route("/api", createSessionsRoute(engine));
+
+      const res = await app.request("/api/sessions/turns/retry", retryPayload(sessionPath, { fileRollback: "workspace" }));
+
+      expect(res.status).toBe(403);
+      await expect(res.json()).resolves.toMatchObject({ code: "file_rollback_disabled" });
+      expect(retrySessionTurnMock).not.toHaveBeenCalled();
+    });
+
+    it("默认 fileRollback=none 与现状一致：不透传该字段", async () => {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const app = new Hono();
+      const { engine, sessionPath } = rollbackEngine({
+        preferences: { getRollbackFileChanges: () => true },
+      });
+      app.route("/api", createSessionsRoute(engine));
+
+      const res = await app.request("/api/sessions/turns/retry", retryPayload(sessionPath));
+
+      expect(res.status).toBe(200);
+      expect(retrySessionTurnMock).toHaveBeenCalledWith(engine, expect.not.objectContaining({ fileRollback: expect.anything() }));
+    });
+
+    it("开关开启时 fileRollback=workspace 透传，逐文件报告随响应返回", async () => {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const app = new Hono();
+      const { engine, sessionPath } = rollbackEngine({
+        preferences: { getRollbackFileChanges: () => true },
+      });
+      const report = {
+        ok: false,
+        reason: "partial_failure",
+        degraded: false,
+        commit: "abc123",
+        turnInputEntryId: "entry-u1",
+        files: [
+          { path: "a.txt", change: "modified", action: "restored", source: "snapshot", ok: true },
+          { path: "b.txt", change: "added", action: "failed", source: "snapshot", ok: false, reason: "permission denied" },
+        ],
+        failures: [{ path: "b.txt", change: "added", action: "failed", source: "snapshot", ok: false, reason: "permission denied" }],
+      };
+      retrySessionTurnMock.mockResolvedValueOnce({ text: null, toolMedia: [], fileRollbackReport: report } as any);
+      app.route("/api", createSessionsRoute(engine));
+
+      const res = await app.request("/api/sessions/turns/retry", retryPayload(sessionPath, { fileRollback: "workspace" }));
+
+      expect(res.status).toBe(200);
+      expect(retrySessionTurnMock).toHaveBeenCalledWith(engine, expect.objectContaining({
+        sessionId: "sess_rollback",
+        sessionPath,
+        fileRollback: "workspace",
+      }));
+      const body = await res.json();
+      expect(body.fileRollbackReport).toEqual(report);
+    });
+
+    it("非法 fileRollback 值显式 400", async () => {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const app = new Hono();
+      const { engine, sessionPath } = rollbackEngine({ preferences: { getRollbackFileChanges: () => true } });
+      app.route("/api", createSessionsRoute(engine));
+
+      const res = await app.request("/api/sessions/turns/retry", retryPayload(sessionPath, { fileRollback: "everything" }));
+
+      expect(res.status).toBe(400);
+      await expect(res.json()).resolves.toMatchObject({ code: "invalid_file_rollback" });
+      expect(retrySessionTurnMock).not.toHaveBeenCalled();
+    });
+
+    it("GET/PUT 开关：默认关闭，写入后读回落盘值", async () => {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const app = new Hono();
+      let enabled = false;
+      const engine = {
+        agentsDir: path.join(tmpDir, "agents"),
+        preferences: {
+          getRollbackFileChanges: () => enabled,
+          setRollbackFileChanges: (next: boolean) => { enabled = next; return enabled; },
+        },
+      };
+      app.route("/api", createSessionsRoute(engine));
+
+      const readInitial = await app.request("/api/sessions/workspace-rollback");
+      expect(readInitial.status).toBe(200);
+      await expect(readInitial.json()).resolves.toEqual({ enabled: false });
+
+      const write = await app.request("/api/sessions/workspace-rollback", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: true }),
+      });
+      expect(write.status).toBe(200);
+      await expect(write.json()).resolves.toEqual({ ok: true, enabled: true });
+
+      const badBody = await app.request("/api/sessions/workspace-rollback", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: "yes" }),
+      });
+      expect(badBody.status).toBe(400);
+    });
+
+    it("关闭时预览显式不可用（置灰原因），不做会话加载", async () => {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const app = new Hono();
+      const ensureSessionLoaded = vi.fn();
+      const { engine, sessionPath } = rollbackEngine({ ensureSessionLoaded });
+      app.route("/api", createSessionsRoute(engine));
+
+      const res = await app.request("/api/sessions/turns/rollback-preview", retryPayload(sessionPath));
+
+      expect(res.status).toBe(200);
+      await expect(res.json()).resolves.toMatchObject({
+        enabled: false,
+        available: false,
+        reason: "file_rollback_disabled",
+        fileCount: 0,
+      });
+      expect(ensureSessionLoaded).not.toHaveBeenCalled();
+    });
+
+    it("开启且有检查点时预览给出影响文件数", async () => {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const app = new Hono();
+      const { engine, sessionPath } = rollbackEngine({
+        preferences: { getRollbackFileChanges: () => true },
+      });
+      const lingxiHome = path.join(tmpDir, "lingxi");
+      const workspace = path.join(tmpDir, "workspace");
+      fs.mkdirSync(workspace, { recursive: true });
+      fs.writeFileSync(path.join(workspace, "preview.txt"), "v1\n");
+      const service = new WorkspaceSnapshotService({ lingxiHome });
+      await service.captureTurn({ sessionPath, workspaceRoot: workspace, turnInputEntryId: "entry-u1" });
+      fs.writeFileSync(path.join(workspace, "preview.txt"), "v2\n");
+      fs.writeFileSync(path.join(workspace, "added.txt"), "new\n");
+
+      Object.assign(engine, {
+        lingxiHome,
+        ensureSessionLoaded: vi.fn(async () => ({ sessionManager: { getBranch: () => [] } })),
+        resolveSessionOwnership: vi.fn(() => ({ agentId: "hana" })),
+        getHomeCwd: vi.fn(() => workspace),
+      });
+      app.route("/api", createSessionsRoute(engine));
+
+      const res = await app.request("/api/sessions/turns/rollback-preview", retryPayload(sessionPath));
+
+      expect(res.status).toBe(200);
+      await expect(res.json()).resolves.toMatchObject({
+        enabled: true,
+        available: true,
+        degraded: false,
+        turnInputEntryId: "entry-u1",
+        fileCount: 2,
+      });
+    });
   });
 
   it("forks an arbitrary node into a new session and announces the child", async () => {

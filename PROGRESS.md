@@ -1656,3 +1656,167 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - A01 快照 clone `/tmp/lingxi-baseline-1d42b740` 曾被补丁验证误污染（任务内容被写入、runner 丢失）；已按 initial-status.txt（A01=porcelain=0）恢复纯净：HEAD `1d42b740`、工作区 0 差异。
 - compat 旧服务端 runner 自包含化：模板 tracked 于 `tests/compat-old-server-runner.template.mjs`，两个兼容测试 beforeAll 幂等写入 clone；clone 缺席时套件 skip 并 console 明示「四组合中旧服务端侧指定环境未验证」。
 - 复验：compat 4/4 + 4/4（exit 0）、定向 410/410、typecheck exit 0、全量 13735 passed / 7 failed（签名=A01 基线，任务引入 0）；d-to-final（40 文件）/task-only（76 文件）补丁重生成并通过 apply 验证与树级 0 差异复验。事件与防护详见 `artifacts/history-read-directory/{PROGRESS.md, remaining-risks.md}`。
+
+## 2026-09-11 回退时撤销文件改动（fileRollback）任务
+
+### 任务 0 基线（实测，非任务书转述）
+- 分支 `feat/tool-activity-presentation`，HEAD `0a098595bc9ef30b9d7d8aabce2a184e43d9abe0`；工作区含他人 103 项在途改动（70 ` M` + 1 `M ` + 5 `MM` + 27 `??`），`git status --short` 按字节排序 SHA-256 `68947a3ccce001c3209dcba1302c6b84f0ee2da028f77faac4f5b6de0ad8641b`；完整清单见本节末 details。
+- `npm test`：**14050 passed / 12 failed / 7 skipped**（1389 文件：5 failed | 1383 passed | 1 skipped），exit 1；日志 `/tmp/baseline-npm-test.log`。
+- 12 红：`model-observability-e2e-chat`「E2E truth — MC-01 真实 Pi chat」（S1+S2，2 项）；`open-boundary-lint`「real repo state (smoke)」（2 项）；`persistence-schema-tripwire`（4 项）；`persistence-startup-receipt`（1 项）；`persistence-store-registry`（3 项）。
+- `npm run typecheck`：exit 0（tsc ×3），日志 `/tmp/baseline-typecheck.log`。
+- **与任务 0 转述不符**：任务书称 14047/11/7，红集合为 tripwire(4)/store-registry(3)/open-boundary(2)/startup-receipt(1)/model-slice.test.ts(文件级)。实测 `model-slice` 已不在红集合，新增 `model-observability-e2e-chat` 2 项，总红 12 而非 11。按规矩已置顶 `BLOCKED.md`；本任务改动与这些文件无交集，继续做不受影响部分。
+
+### 开工回执（≤10 行）
+1. 任务 0 已核对：`npm run typecheck` 0 错；`npm test` 12 红，全部为预存失败。
+2. 红集合与任务书不符，已记 `BLOCKED.md` 置顶；不阻塞本任务，继续。
+3. 只改白名单：`core/`（session-turn-actions / session-coordinator / preferences-manager / 新快照模块）、`server/routes/sessions.ts`、`server/git/`、`lib/checkpoint-store.ts`、`lib/checkpoint-wrapper.ts`、`desktop/src/react/components/chat/`、`stores/message-turn-actions.ts`、`stores/chat-slice.ts`、`services/ws-message-handler.ts`、`desktop/src/react/settings/`、`types.ts`、`locales/` 五 json、相关测试。
+4. 在途 103 项他人改动一行不动；不 commit、不 push、不动 `.sync-audit`、不推进审计封印。
+5. 顺序：任务 1 影子快照核心（独立可测）→ 任务 2 开关+API → 任务 3 UI → 任务 4 收尾。
+6. 每条验收贴实际命令输出；skip/todo、放宽断言、mock 被测对象、删测试、改基线一律算失败。
+7. 每完成一项立刻更新本文件。
+
+<details><summary>任务 0 `git status --short` 基线（103 行，后续收尾按此核对）</summary>
+
+```
+ M README.md
+ M README_EN.md
+ M artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch
+ M build/cli-runtime-closure.json
+ M core/session-coordinator.ts
+ M desktop/src/animations.css
+MM desktop/src/locales/en.json
+MM desktop/src/locales/ja.json
+MM desktop/src/locales/ko.json
+MM desktop/src/locales/zh-TW.json
+MM desktop/src/locales/zh.json
+ M desktop/src/react/App.tsx
+ M desktop/src/react/MainContent.tsx
+ M desktop/src/react/__tests__/architecture/no-ui-native-watch-production.test.ts
+ M desktop/src/react/__tests__/components/DeskSection.test.tsx
+ M desktop/src/react/__tests__/components/GitChangesModal.test.tsx
+ M desktop/src/react/__tests__/components/GitCommitModal.test.tsx
+ M desktop/src/react/__tests__/components/GitEnvironmentCard.test.tsx
+ M desktop/src/react/__tests__/components/MessageActivity.test.tsx
+ M desktop/src/react/__tests__/components/ModelSelector.test.tsx
+ M desktop/src/react/__tests__/components/PreviewPanel.status.test.tsx
+ M desktop/src/react/__tests__/components/SelectionQuoteActionSurface.test.tsx
+M  desktop/src/react/__tests__/components/TodoPanel.test.tsx
+ M desktop/src/react/__tests__/components/chat/ChatMessageSurface.typing-indicator.test.tsx
+ M desktop/src/react/__tests__/services/resource-events.test.ts
+ M desktop/src/react/__tests__/utils/history-builder.test.ts
+ M desktop/src/react/components/BridgePanel.tsx
+ M desktop/src/react/components/InputArea.tsx
+ M desktop/src/react/components/app/AppPages.tsx
+ M desktop/src/react/components/app/WorkspaceFileChangeBridge.tsx
+ M desktop/src/react/components/chat/ChatMessageSurface.tsx
+ M desktop/src/react/components/chat/MessageActivity.module.css
+ M desktop/src/react/components/chat/TodoPanel.module.css
+ M desktop/src/react/components/chat/TodoPanel.tsx
+ M desktop/src/react/components/desk/Desk.module.css
+ M desktop/src/react/components/desk/DeskTree.tsx
+ M desktop/src/react/components/input/ComposerToolbar.tsx
+ M desktop/src/react/components/input/ContextRing.tsx
+ M desktop/src/react/components/input/InputArea.module.css
+ M desktop/src/react/components/input/ModelSelector.tsx
+ M desktop/src/react/components/input/PlanModeButton.tsx
+ M desktop/src/react/components/input/ThinkingLevelButton.tsx
+ M desktop/src/react/components/runtime/GitChangesModal.module.css
+ M desktop/src/react/components/runtime/GitChangesModal.tsx
+ M desktop/src/react/components/runtime/GitCommitModal.module.css
+ M desktop/src/react/components/runtime/GitCommitModal.tsx
+ M desktop/src/react/components/runtime/GitEnvironmentCard.module.css
+ M desktop/src/react/components/runtime/GitEnvironmentCard.tsx
+ M desktop/src/react/components/selection/SelectionQuoteActionSurface.tsx
+ M desktop/src/react/quick-chat/QuickChatApp.tsx
+ M desktop/src/react/services/resource-events.ts
+ M desktop/src/react/stores/index.ts
+ M desktop/src/react/stores/input-slice.ts
+ M desktop/src/react/stores/model-slice.ts
+ M desktop/src/react/stores/selection-actions.ts
+ M desktop/src/react/stores/session-slice.ts
+ M desktop/src/react/utils/format-duration.ts
+ M desktop/src/react/utils/git-env-api.ts
+ M desktop/src/react/utils/history-builder.ts
+ M desktop/src/react/utils/preview-document-refresh.ts
+ M desktop/src/react/utils/tool-label.ts
+ M desktop/src/styles.css
+ M docs/README.md
+ M lib/pi-sdk/index.ts
+ M lib/tools/todo.ts
+ M lib/turn-input-presentation.ts
+ M server/git/git-command.ts
+ M server/http/route-security.ts
+ M server/routes/chat.ts
+ M server/routes/git-environment.ts
+ M server/routes/sessions.ts
+ M tests/git-command.test.ts
+ M tests/git-environment-route.test.ts
+ M tests/http-route-security.test.ts
+ M tests/sessions-route.test.ts
+ M tests/todo-write-tool.test.ts
+?? core/interrupted-turn-marker.ts
+?? desktop/src/react/__tests__/components/DeskTree.mention.test.tsx
+?? desktop/src/react/__tests__/components/SideChatPanel.test.tsx
+?? desktop/src/react/__tests__/stores/side-chat-actions.test.ts
+?? desktop/src/react/__tests__/utils/attach-workbench-item.test.ts
+?? desktop/src/react/__tests__/utils/running-status-label.test.ts
+?? desktop/src/react/components/chat/RunningStatusLine.module.css
+?? desktop/src/react/components/chat/RunningStatusLine.tsx
+?? desktop/src/react/components/input/composer-memory-mode.ts
+?? desktop/src/react/components/input/composer-permission-mode.ts
+?? desktop/src/react/components/input/composer-scope.ts
+?? desktop/src/react/components/runtime/GitBranchList.module.css
+?? desktop/src/react/components/runtime/GitBranchList.tsx
+?? desktop/src/react/components/runtime/GitWorktreeModal.module.css
+?? desktop/src/react/components/runtime/GitWorktreeModal.tsx
+?? desktop/src/react/components/session-scope-context.tsx
+?? desktop/src/react/components/side-chat/
+?? desktop/src/react/stores/side-chat-actions.ts
+?? desktop/src/react/stores/side-chat-slice.ts
+?? desktop/src/react/utils/attach-workbench-item.ts
+?? docs/architecture/side-chat.md
+?? docs/tasks/2026-09-11-todo-experience/CONTEXT-CONTINUITY.md
+?? lib/pi-sdk/todo-context-reminder.ts
+?? tests/interrupted-turn-marker.test.ts
+?? tests/todo-context-reminder.test.ts
+?? tests/todo-pipeline-consistency.test.ts
+?? tests/todo-prompt-injection.test.ts
+```
+
+</details>
+
+### 任务 1 影子快照核心（完成）
+
+- 新增 `core/workspace-snapshots.ts`：`WorkspaceSnapshotService` + `getWorkspaceSnapshotService`（按 lingxiHome 缓存）。影子仓库 `~/.lingxi/workspace-snapshots/{工作区哈希}/repo`，只经 `--git-dir`/`--work-tree` 访问；`init` 不带 `--work-tree`，用户工作区零新增文件；排除清单写影子仓库 `info/exclude`；`commit --allow-empty` 只加不删。
+- 拍照：`captureTurn`（`add -A` + commit，记 `{turnInputEntryId, commit, capturedAt}` 进侧车 `{sessionPath}.snapshots.json`）＋ `bindTurnInput` 两段式绑定（SDK 落盘才铸 turn input entry id）；失败不抛，写 degraded 记录。
+- 恢复：`collectChanges`（`git diff --name-status -z --no-renames <目标>` + `status --porcelain -z` 未跟踪）→ A 删、M/D 恢复目标 blob；恢复经注入的 ResourceIO 写回，再 `fileHistory.captureNow(origin="restore")`；逐文件报告 `{path,change,action,source,ok,reason}`。拍照失败轮次用 `CheckpointStore` 备份倒推（`list()` 增加 `sessionPath` 字段，兼容增量）。
+- 验收：`npx vitest run tests/workspace-snapshots.test.ts` → **11 passed / 0 skipped，exit 0**（五情形 + 解析器 + 绑定预览 + ResourceIO 路由 + 逐文件失败不阻塞）。
+- 反向验证：临时把 A→删除分支短路为 `false &&` → 情形1 红（`AssertionError: expected false to be true`，`report.ok` 为 false，日志 `/tmp/rev-red.log`），还原后同命令 11 passed，日志 `/tmp/rev-green.log`。
+
+### 任务 2 开关 + API（完成）
+
+- `core/preferences-manager.ts`：`getRollbackFileChanges()`（默认 `false`）/`setRollbackFileChanges()`，落 `preferences.json` 的 `rollback_file_changes`。engine.ts 不在白名单，故不经 CONFIG_SCHEMA，改由会话路由暴露开关端点。
+- 拍照挂点（`core/session-coordinator.ts`）：`_captureWorkspaceTurnSnapshot` 在 `promptSession`（`entry.session.prompt` 前）与 `deliverCustomMessage`(triggerTurn) 各拍一次，仅开关开启时执行；`_bindWorkspaceTurnSnapshot` 在 `finally`/投递后把 commit 补绑到本轮 turn input entry id（SDK 落盘才铸 id，故两段式）。
+- 恢复挂点（`core/session-turn-actions.ts`）：`opts.fileRollback='workspace'` 且开关开启时，在 `commitRetryBranch` 事务外先恢复文件再重发；`performWorkspaceFileRollback` 收拢工作区解析、ResourceIO、fileHistory、CheckpointStore 兜底，异常一律收敛成报告。
+- API（`server/routes/sessions.ts`）：`retry` 接受 `fileRollback:'none'|'workspace'`（默认 `none`）；非法值 400 `invalid_file_rollback`；`workspace` 且开关关闭 → **403 `file_rollback_disabled`**（不静默降级）；新增 `POST /sessions/turns/rollback-preview`（开关/检查点/文件数预览）、`GET|PUT /sessions/workspace-rollback`。逐文件报告经 HTTP 响应 `fileRollbackReport` 与 ws `session_branch_reset.fileRollbackReport` 双通道返回。
+- 验收：`npx vitest run tests/sessions-route.test.ts` → **121 passed**（含新增 7 例：关=403、默认 none 不透传、开=报告回传、非法值 400、GET/PUT 开关、关闭时预览不可用、开启+有检查点时文件数=2）；`tests/session-turn-actions.test.ts` 29 passed；`tests/checkpoint-store.test.ts`+`tests/workspace-snapshots.test.ts` 20 passed。
+
+### 任务 3 UI 两选项 + 清单确认 + 报告（完成）
+
+- `desktop/src/react/components/chat/SessionNodeActions.tsx`：重新生成按钮改为两选项小菜单（`ContextMenu`）。开关关闭时界面**不出现**文件回退选项（拍板 #3/完成条件）；开启但无检查点/工作区不可用 → 置灰并给原因；有检查点 → 标注影响文件数；快照降级 → 可用并标注「用备份兜底」。
+- 选后者弹 `ConfirmDialog` 文件清单 + 覆盖警告（「期间所有改动（含你手动改的）都会被覆盖」），确认才带 `fileRollback=workspace`。
+- 报告：`FileRollbackReportBanner` 逐文件展示 action/source/reason，位于 `ChatMessageSurface`，数据源 `stores/chat-slice.ts` 的 `fileRollbackReportsByPath`；HTTP 响应（`stores/message-turn-actions.ts`）与 ws `session_branch_reset`（`services/ws-message-handler.ts`）都写同一键。
+- i18n：五语言各新增 `settings.interface.rollbackFileChanges(+Hint)` 与 `chat.fileRollback.*`（18 键）；`I18nParity/flat-keys/react-locale-coverage` 6/6 通过。
+- 设置开关：`settings/tabs/InterfaceTab.tsx` 系统区新增 toggle（读写新端点，默认关，加载中置灰）。
+- 验收：`npx vitest run desktop/src/react/__tests__/components/chat/SessionRollback.test.tsx` → **7 passed / 0 skipped**；`InterfaceTab.test.tsx` 12 passed。定向回归 10 文件 **287 passed**（日志 `/tmp/t4-batch.log`）。
+
+### 任务 4 端到端与收尾（完成）
+
+- 新增 `tests/file-rollback-e2e.test.ts`（真实 core.retrySessionTurn + 临时工作区 + 真实影子快照 + 内存会话）：三轮改动（write 新建 / edit 修改 / shell 删除）→ 连文件回退第一轮 → 三处全部还原、ResourceIO/文件历史 origin=restore、报告逐文件准确、`setSessionBranchHead(replay_rewind)` 截断到空分支并重发、ws 事件携带同一份报告、侧车三条快照均绑定 turn input id 且未降级；另有开关关闭不恢复、个别文件失败不阻塞对话两例。`npx vitest run tests/file-rollback-e2e.test.ts` → **3 passed**。
+- 新增 `tests/session-coordinator-workspace-snapshots.test.ts`：直接驱动拍照挂点 → 开关关闭零开销不写侧车；开关开启拍照 + 两段式绑定 user turn input；自定义 turn input（deferred result）同样可绑定并可按记录恢复；无工作区跳过。→ **4 passed**。
+- `npm run typecheck`（tsc ×3）→ **exit 0**（最终）。
+- `npm test` 最终全量（日志 `/tmp/t4-full-test3.log`）：**14083 passed / 12 failed / 7 skipped**（1393 文件：5 failed | 1387 passed | 1 skipped），失败集合与任务 0 基线**逐条一致**（12 红同名同文件，0 新增 0 减少），通过数 +33（新增测试），skipped 仍 7。
+- 追加 `ws-message-handler.test.ts` 一例（`session_branch_reset.fileRollbackReport` 写入会话作用域报告、无报告不写）→ 该文件 **86 passed**，`npm run typecheck` 仍 exit 0。全量再跑（`/tmp/final-full-test.log`）为 14083 passed / 13 failed，多出的 1 条是无关文件 `tests/artifact-core-ustar.test.ts > refuses to pack a symlink in the source tree`，隔离复跑 10/10 通过。
+- 收尾修整：① 新增 `SessionRollback.module.css` 触发 style-discipline 棘轮（bare-spacing 12 / hardcoded-color 1）→ 全部改走 `--space-*`/`--overlay-*`/`--danger` token，该测试 8/8 通过；② 新增快照模块改变 `build/cli-runtime-closure.json`（白名单外守卫产物）→ 按守卫自带 writer 重新生成（生成器读当前源码树，保留在途改动），`tests/cli-closure-census.test.ts` 22/22 通过，`build/open-boundary-baseline.json` 未变，详见 BLOCKED.md「越界说明」；③ 因「重新生成入口改小菜单」，同步更新 3 个既有交互测试的点击路径与模块 mock，断言未放宽。
+- 全量负载下偶发 1 条与本任务无关的时序/环境失败（两次分别为 `GitChangesModal.test.tsx`、`artifact-core-ustar.test.ts`），均隔离复跑通过；连续三次全量中 `/tmp/t4-full-test3.log` 为基线集合零新增。
+- 完成条件 2：`git status --short` 对照任务 0 快照，白名单外零改动（差异仅本节列出的允许文件 + 守卫产物 repin）；HEAD 仍为 `0a098595…`（零 commit）；`~/.lingxi/workspace-snapshots` 不存在（影子数据只在临时目录，用户工作区无新增文件）。

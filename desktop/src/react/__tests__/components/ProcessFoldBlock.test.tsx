@@ -17,6 +17,15 @@ vi.mock('../../stores/message-turn-actions', () => ({
   retrySessionTurn: (...args: unknown[]) => retryMock(...args),
   forkSessionTurn: vi.fn(async () => null),
   activateForkedSession: vi.fn(async () => undefined),
+  previewWorkspaceRollback: vi.fn(async () => ({
+    enabled: false,
+    available: false,
+    degraded: false,
+    commit: null,
+    reason: 'file_rollback_disabled',
+    files: [],
+    fileCount: 0,
+  })),
 }));
 
 function t(key: string, vars?: Record<string, string | number>): string {
@@ -128,6 +137,7 @@ describe('ProcessFoldBlock', () => {
     expect(within(footer).getByTitle('重新生成')).toBeInTheDocument();
     expect(within(footer).getByTitle('分支为新会话')).toBeInTheDocument();
     fireEvent.click(within(footer).getByTitle('重新生成'));
+    fireEvent.click(screen.getByText('chat.fileRollback.conversationOnly'));
 
     expect(retryMock).toHaveBeenCalledWith(
       sessionPath,

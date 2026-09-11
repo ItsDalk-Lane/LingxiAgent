@@ -282,6 +282,49 @@ describe("HTTP route security policy", () => {
       .toMatchObject({ allowed: false, error: "insufficient_scope", requiredScope: "files.write" });
   });
 
+  it("gates every environment-card git endpoint by file scopes", async () => {
+    const { authorizeHttpRoute } = await import("../server/http/route-security.ts");
+    const reader = devicePrincipal(["files.read"]);
+    const writer = devicePrincipal(["files.read", "files.write"]);
+    const chatOnly = devicePrincipal(["chat"]);
+
+    // 新增 git 端点必须显式登记：漏登记会掉进 /api/* 兜底策略，
+    // 读被收紧或写被放宽都不可接受。
+    const readPaths = [
+      "/api/git/status",
+      "/api/git/worktree-info",
+      "/api/git/worktrees",
+      "/api/git/stashes",
+      "/api/git/branches",
+      "/api/git/log",
+      "/api/git/file-diff",
+    ];
+    const writePaths = [
+      "/api/git/checkout",
+      "/api/git/create-branch",
+      "/api/git/commit",
+      "/api/git/stash",
+      "/api/git/unstash",
+      "/api/git/discard",
+      "/api/git/push",
+      "/api/git/worktree-create",
+      "/api/git/ai-commit-message",
+    ];
+
+    for (const path of readPaths) {
+      expect(authorizeHttpRoute({ method: "GET", path, principal: reader }))
+        .toMatchObject({ allowed: true });
+      expect(authorizeHttpRoute({ method: "GET", path, principal: chatOnly }))
+        .toMatchObject({ allowed: false, error: "insufficient_scope", requiredScope: "files.read" });
+    }
+    for (const path of writePaths) {
+      expect(authorizeHttpRoute({ method: "POST", path, principal: writer }))
+        .toMatchObject({ allowed: true });
+      expect(authorizeHttpRoute({ method: "POST", path, principal: reader }))
+        .toMatchObject({ allowed: false, error: "insufficient_scope", requiredScope: "files.write" });
+    }
+  });
+
   it("gates built-in MCP connector settings by settings scopes", async () => {
     const { authorizeHttpRoute, classifyHttpRoute } = await import("../server/http/route-security.ts");
     const reader = devicePrincipal(["settings.read"]);

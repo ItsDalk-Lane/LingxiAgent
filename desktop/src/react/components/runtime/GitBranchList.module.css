@@ -1,0 +1,178 @@
+/* GitBranchList — 分支浮层内容（环境信息卡·分支行 / 提交或推送弹窗·分支条共用） */
+
+/* 立法：本模块一次性字面量收进定义行（扫描豁免位），使用点一律 var() */
+.menu {
+    --git-hover-strong: rgba(90, 118, 139, 0.16);
+    --git-shadow-smoke: rgba(0, 0, 0, 0.08);
+
+    background: var(--bg-card, var(--bg));
+    border: 1px solid var(--overlay-light);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px var(--shadow), 0 2px 8px var(--git-shadow-smoke);
+    padding: var(--space-8);
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    max-height: 260px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+/* 分支项整行可点：宽度撑满浮层，悬停/焦点高亮才有完整的行级反馈 */
+.item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    width: 100%;
+    min-height: 28px;
+    padding: var(--space-2) var(--space-8);
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-size: var(--fs-caption);
+    text-align: left;
+    cursor: default;
+    transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+/* 悬停 / 键盘焦点：底色 + 左侧强调条 + 强调色文字，明确「现在指着的是哪一项」 */
+.item:hover:not(:disabled),
+.item:focus-visible:not(:disabled) {
+    background: var(--git-hover-strong);
+    box-shadow: inset 2px 0 0 var(--accent);
+    color: var(--accent);
+}
+
+.item:focus-visible {
+    outline: none;
+}
+
+.item:disabled {
+    opacity: 0.6;
+}
+
+.itemName {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.itemCurrent {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.itemMark {
+    flex-shrink: 0;
+    color: var(--accent);
+}
+
+.itemBusy {
+    flex-shrink: 0;
+    color: var(--text-light);
+}
+
+.empty {
+    padding: var(--space-8);
+    font-size: var(--fs-hint);
+    color: var(--text-light);
+}
+
+/* ── 底部「新建分支」行 ── */
+.createRow {
+    border-top: 1px solid var(--overlay-light);
+    padding-top: var(--space-4);
+}
+
+.createToggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    width: 100%;
+    min-height: 28px;
+    padding: var(--space-2) var(--space-8);
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--text-light);
+    font: inherit;
+    font-size: var(--fs-caption);
+    text-align: left;
+    cursor: default;
+    transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+.createToggle:hover:not(:disabled),
+.createToggle:focus-visible:not(:disabled) {
+    background: var(--git-hover-strong);
+    color: var(--accent);
+}
+
+.createToggle:focus-visible {
+    outline: none;
+}
+
+.createToggle:disabled {
+    opacity: 0.6;
+}
+
+.plus {
+    flex-shrink: 0;
+}
+
+.createForm {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.createInput {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 26px;
+    padding: var(--space-2) var(--space-8);
+    border: 1px solid var(--border, var(--overlay-light));
+    border-radius: 5px;
+    background: var(--bg-card, var(--bg));
+    color: var(--text);
+    font: inherit;
+    font-size: var(--fs-caption);
+}
+
+.createInput:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.createSubmit {
+    flex-shrink: 0;
+    min-height: 26px;
+    padding: 0 var(--space-8);
+    border: 1px solid var(--border, var(--overlay-light));
+    border-radius: 5px;
+    background: var(--bg-card, var(--bg));
+    color: var(--text);
+    font: inherit;
+    font-size: var(--fs-caption);
+    cursor: default;
+    transition: border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+.createSubmit:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.createSubmit:disabled {
+    opacity: 0.5;
+}

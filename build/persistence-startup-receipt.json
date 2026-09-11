@@ -711,6 +711,16 @@
       "bootstrapSafety": null,
       "preCoordinatorReadProjection": null,
       "breakingMigrationRequiresAccessMove": false
+    },
+    {
+      "id": "workspace-snapshots",
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "opensBeforeFutureCoordinator": false,
+      "writesBeforeFutureCoordinator": false,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "breakingMigrationRequiresAccessMove": false
     }
   ]
 }

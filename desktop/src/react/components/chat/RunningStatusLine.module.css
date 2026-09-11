@@ -1,0 +1,77 @@
+/* RunningStatusLine — 本轮运行状态行：动作短句（流光扫过 + 循环省略号）+ 秒表。
+ *
+ * 流光对齐 DSH 的同款状态行：文字底色为品牌蓝，一条浅色带从右向左扫过，
+ * linear + infinite。省略号按原样保留 1→2→3 循环（用户的「三个点在动」），
+ * 与流光叠加，所以只在 .dots 上跑 steps 动画，字色不受影响。
+ * 秒表用 muted 色 + 等宽数字，读数不随动效晃。 */
+
+.status {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-8);
+    padding: 0.2rem 0 0.6rem;
+    padding-left: calc(var(--space-8) + 2px);
+    font-size: var(--fs-ui);
+    line-height: 1.5;
+    --slide-y: 8px;
+    animation: hana-fade-up var(--duration-slow) var(--ease-out);
+}
+
+.label {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    /* 三档渐变：两端是正常字色，中段一条浅色带 → 位移即「流光」。
+       颜色混合在 token 上算，不新增字面色。 */
+    background: linear-gradient(
+        90deg,
+        var(--accent) 0%,
+        var(--accent) 40%,
+        color-mix(in srgb, var(--accent) 40%, var(--bg, #fff)) 50%,
+        var(--accent) 60%,
+        var(--accent) 100%
+    );
+    background-position: 100% 0;
+    background-size: 250% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: hana-running-shimmer var(--duration-shimmer) linear infinite;
+}
+
+/* 省略号自己占一格宽度：点数变化不推动右侧秒表。
+   字色跟着流光走（currentColor → transparent 的 fill 由 .label 决定）。 */
+.dots {
+    flex: none;
+    display: inline-block;
+    min-width: 1.5em;
+    text-align: left;
+}
+
+.dots::after {
+    content: '';
+    animation: hana-cycling-dots var(--duration-dots) steps(1, end) infinite;
+}
+
+/* 秒表：等宽数字 + 静止色，读数不随流光一起晃。 */
+.timer {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+    color: var(--text-muted);
+    -webkit-text-fill-color: var(--text-muted);
+    font-size: var(--fs-hint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .status { animation: none; }
+    .label {
+        background: none;
+        color: var(--accent);
+        -webkit-text-fill-color: currentColor;
+        animation: none;
+    }
+    .dots::after { animation: none; content: '...'; }
+}

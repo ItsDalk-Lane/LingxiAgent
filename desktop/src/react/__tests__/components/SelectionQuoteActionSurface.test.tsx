@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 import { SelectionQuoteActionSurface } from '../../components/selection/SelectionQuoteActionSurface';
 import { useStore } from '../../stores';
@@ -46,6 +46,37 @@ describe('SelectionQuoteActionSurface', () => {
     expect(removeAllRanges).toHaveBeenCalledOnce();
     expect(requestInputFocus).toHaveBeenCalledOnce();
     getSelection.mockRestore();
+  });
+
+  it('offers a side-chat action next to the quote action', () => {
+    // 只断言入口存在且与引用按钮并列：真正的开面板 + 会话创建由
+    // side-chat-actions.test.ts 覆盖（这里不发起网络请求）。
+    const openSideChat = vi.fn((seedQuote?: unknown) => {
+      // 复刻真实动作对全局候选的处置，避免假动作让断言失去意义。
+      useStore.setState({ sideChatSeedQuoteForTest: seedQuote ?? null } as never);
+      useStore.getState().clearQuoteCandidate();
+    });
+    useStore.setState({ openSideChat } as never);
+    useStore.getState().setQuoteCandidate({
+      text: '旁支追问用的一段',
+      sourceTitle: 'Assistant message',
+      sourceKind: 'chat',
+      sourceSessionPath: '/session/a.jsonl',
+      sourceMessageId: 'assistant-1',
+      sourceRole: 'assistant',
+      charCount: 8,
+      anchorRect: { left: 100, right: 180, top: 120, bottom: 140, width: 80, height: 20 },
+    });
+    render(<SelectionQuoteActionSurface />);
+
+    const sideButton = screen.getByRole('button', { name: 'selection.openInSideChat' });
+    expect(sideButton).toBeTruthy();
+    const quoteButton = screen.getByRole('button', { name: 'selection.quoteToChat' });
+    expect(sideButton.parentElement).toBe(quoteButton.parentElement);
+    fireEvent.click(sideButton);
+    expect(openSideChat).toHaveBeenCalledOnce();
+    expect(openSideChat.mock.calls[0][0]).toMatchObject({ text: '旁支追问用的一段' });
+    expect(useStore.getState().quoteCandidate).toBeNull();
   });
 
   it('keeps the readable action label visible without rendering a duplicate tooltip', () => {

@@ -147,3 +147,47 @@ export function phaseForStatus(status: ToolStatus): ToolPhase {
   if (status === 'failed') return 'failed';
   return 'done';
 }
+
+/**
+ * 消息流底部「正在做什么」状态行的文案键（`chat.running.*`）。
+ *
+ * 与 `tool.<name>.<phase>` 分开：工具行文案自带 emoji、agent 名与结果口吻，
+ * 适合卡片行；状态行只要一段干净的动名词短句（「正在读取文件」），后面紧跟
+ * 秒表，所以按操作类别归一，而不是一工具一句。
+ *
+ * `thinking`（未封口思考 / 首个事件还没到）与 `writing`（在流正文、没有思考也
+ * 没有工具）不是工具名派生的，故不在 RUNNING_STATUS_BY_TOOL 表里。
+ *
+ * 归类只用精确工具名，不做前缀剥离：第三方插件里叫 read 的工具不能被说成
+ * 在读写本地文件（与 getToolLabel 同一立场），一律落到 `tool`。
+ */
+export type RunningStatusKey =
+  | 'working' | 'thinking' | 'writing' | 'reading' | 'searching' | 'editing' | 'command'
+  | 'web' | 'memory' | 'knowledge' | 'tool';
+
+/** 只有状态行动态聚合时才用到的键：没有单个工具名对应它们。 */
+export type RunningStatusToolKey = Exclude<RunningStatusKey, 'thinking' | 'writing'>;
+
+/**
+ * 工具名 → 状态行类别的唯一映射表。
+ * 导出供对账测试使用：语言包里的每个 `chat.running.*` 叶子都必须被某条映射
+ * （或 thinking / writing 两个非工具态）覆盖，不能出现查不到的孤儿文案。
+ */
+export const RUNNING_STATUS_BY_TOOL: Readonly<Record<string, RunningStatusToolKey>> = {
+  read: 'reading', materialize: 'reading',
+  grep: 'searching', find: 'searching', ls: 'searching',
+  edit: 'editing', write: 'editing',
+  bash: 'command', terminal: 'command', exec_command: 'command', write_stdin: 'command',
+  web_search: 'web', web_fetch: 'web',
+  search_memory: 'memory', pin_memory: 'memory', unpin_memory: 'memory',
+  recall_experience: 'memory', record_experience: 'memory', tenet_propose: 'memory',
+  knowledge_search: 'knowledge', knowledge_read: 'knowledge', knowledge_outline: 'knowledge',
+  knowledge_grep: 'knowledge', knowledge_manage: 'knowledge', knowledge_think: 'knowledge',
+  knowledge_read_part: 'knowledge', knowledge_supplement: 'knowledge',
+  knowledge_answer: 'knowledge', knowledge_local_search: 'knowledge',
+  ...Object.fromEntries([...KNOWLEDGE_RESEARCH_TOOL_NAMES].map(name => [name, 'knowledge' as const])),
+};
+
+export function runningStatusKey(name: string): RunningStatusToolKey {
+  return RUNNING_STATUS_BY_TOOL[name] ?? 'tool';
+}

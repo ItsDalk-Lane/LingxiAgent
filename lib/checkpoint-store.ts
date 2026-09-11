@@ -84,6 +84,8 @@ export class CheckpointStore {
           reason: obj.reason || `tool-${obj.tool}`,
           path: obj.path,
           size: obj.size,
+          // 会话归属：快照拍照失败时按 sessionPath + ts 倒推该轮的改前备份
+          sessionPath: typeof obj.sessionPath === "string" ? obj.sessionPath : null,
         });
       } catch {
         // corrupted file, skip

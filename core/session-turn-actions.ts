@@ -1,5 +1,8 @@
 import fsp from "fs/promises";
+import path from "path";
 import { detectMime } from "../lib/file-metadata.ts";
+import { CheckpointStore } from "../lib/checkpoint-store.ts";
+import { getWorkspaceSnapshotService } from "./workspace-snapshots.ts";
 import {
   AGENT_REVIEW_RECORD_TYPE,
   MESSAGE_ORIGIN_RECORD_TYPE,
@@ -193,6 +196,7 @@ async function retrySessionTurnInternal(engine, opts, deps, compatibility) {
     displayMessage,
     uiContext,
   } = opts;
+  const fileRollback = opts.fileRollback === "workspace" ? "workspace" : "none";
 
   if (!engine || typeof engine.ensureSessionLoaded !== "function") {
     throw new Error("session retry requires engine.ensureSessionLoaded");
@@ -276,6 +280,18 @@ async function retrySessionTurnInternal(engine, opts, deps, compatibility) {
       ? [retainedEntries]
       : [retainedEntries, promptText, nextDisplayMessage]);
     const invalidateDerivedState = deps.invalidateDerivedState || invalidateSessionDerivedState;
+    // 文件回退（fileRollback=workspace）：显式请求且开关打开时，在对话分支提交
+    // （commitRetryBranch）的事务语义之外执行——个别文件失败不阻塞对话回退，
+    // 逐文件报告随 HTTP 响应 + session_branch_reset 事件（fileRollbackReport）返回。
+    let fileRollbackReport = null;
+    if (fileRollback === "workspace" && engine?.preferences?.getRollbackFileChanges?.() === true) {
+      fileRollbackReport = await performWorkspaceFileRollback(engine, {
+        sessionId,
+        sessionPath,
+        turnInputEntryId: resolved.turnInputEntry.id,
+        createdAtHint: resolved.turnInputEntry?.timestamp ?? null,
+      });
+    }
     let branchCommitted = false;
     const commitRetryBranch = () => {
       if (branchCommitted) return;
@@ -382,6 +398,7 @@ async function retrySessionTurnInternal(engine, opts, deps, compatibility) {
         ...(todoSnapshot ? { todoPanel: todoPanelPayloadFromSnapshot(todoSnapshot) } : {}),
         sessionFiles: projectedSessionFiles,
         discardedTaskIds,
+        ...(fileRollbackReport ? { fileRollbackReport } : {}),
       }, sessionPath);
     };
 
@@ -427,9 +444,54 @@ async function retrySessionTurnInternal(engine, opts, deps, compatibility) {
     // Focused test doubles may not invoke the commit hook. A successful delivery
     // still commits exactly once; failed preflight paths never reach here.
     commitRetryBranch();
-    return result;
+    if (!fileRollbackReport) return result;
+    if (result && typeof result === "object" && !Array.isArray(result)) {
+      return { ...result, fileRollbackReport };
+    }
+    return { result, fileRollbackReport };
   } finally {
     releaseOperation();
+  }
+}
+
+/**
+ * 把该轮开始前的工作区状态恢复回来。工作区解析失败 / 快照不可用 / 恢复异常
+ * 都收敛成结构化报告，绝不抛出——调用方保证对话回退照常进行。
+ */
+async function performWorkspaceFileRollback(engine, { sessionId, sessionPath, turnInputEntryId, createdAtHint }) {
+  const empty = (reason) => ({
+    ok: false,
+    reason,
+    degraded: false,
+    commit: null,
+    turnInputEntryId,
+    files: [],
+    failures: [],
+  });
+  try {
+    const ownerAgentId = engine?.resolveSessionOwnership?.(sessionPath)?.agentId
+      || engine?.getSessionManifest?.(sessionId)?.ownerAgentId
+      || null;
+    const workspaceRoot = ownerAgentId
+      ? (engine?.getExplicitHomeCwd?.(ownerAgentId) || engine?.getHomeCwd?.(ownerAgentId) || null)
+      : null;
+    if (!workspaceRoot) return empty("workspace_unavailable");
+    if (!engine?.lingxiHome) return empty("lingxi_home_unavailable");
+    const service = getWorkspaceSnapshotService({
+      lingxiHome: engine.lingxiHome,
+      log: (message) => console.warn(`[workspace-snapshot] ${message}`),
+    });
+    return await service.restoreTurn({
+      sessionPath,
+      workspaceRoot,
+      turnInputEntryId,
+      createdAtHint,
+      resourceIO: engine.getResourceIO?.() || null,
+      fileHistory: engine.getFileHistoryService?.() || null,
+      backupStore: new CheckpointStore(path.join(engine.lingxiHome, "checkpoints")),
+    });
+  } catch (error) {
+    return empty(error?.message || String(error));
   }
 }
 

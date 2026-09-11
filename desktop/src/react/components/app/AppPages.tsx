@@ -5,6 +5,7 @@ import { AutomationPanel } from '../AutomationPanel';
 import { BridgePanel } from '../BridgePanel';
 import { SkillsPanel } from '../SkillsPanel';
 import { PreviewPanel } from '../PreviewPanel';
+import { SideChatPanel } from '../side-chat/SideChatPanel';
 import { ChannelMessages, ChannelMembers, ChannelInput, ChannelReadonly, ChannelAgentActivityPanel, ChannelAgentSettingsPanel, ChannelExportPanel } from '../ChannelsPanel';
 import { ChannelHeader } from '../channels/ChannelHeader';
 import { MainContent } from '../../MainContent';
@@ -120,9 +121,18 @@ function ChannelPage() {
 
 export function AppPages() {
   const currentTab = useStore(s => s.currentTab);
+  const sideChatOpen = useStore(s => s.sideChat.open);
 
   return (
     <>
+      {/* 侧边对话打开时：预览面板先让位（排到侧栏左侧，空间不足时被挤出视口），
+          保证右侧栏与主对话的输入区始终可见。 */}
+      {currentTab === 'chat' && (
+        <div className={sideChatOpen ? 'preview-panel-slot preview-panel-slot-yield' : 'preview-panel-slot'}>
+          <PreviewPanel />
+        </div>
+      )}
+
       <MainContent>
         {currentTab === 'chat' && <ChatPage />}
         {currentTab === 'knowledge' && <KnowledgePage />}
@@ -133,7 +143,7 @@ export function AppPages() {
         <BridgePanel />
       </MainContent>
 
-      {currentTab === 'chat' && <PreviewPanel />}
+      {currentTab === 'chat' && <SideChatPanel />}
     </>
   );
 }

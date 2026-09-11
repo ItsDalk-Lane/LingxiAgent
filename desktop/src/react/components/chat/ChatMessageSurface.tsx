@@ -12,6 +12,8 @@ import type { ChatListItem } from '../../stores/chat-types';
 import { ChatTimelineNavigator } from './ChatTimelineNavigator';
 import { HistoryOverviewBadge } from './HistoryOverviewBadge';
 import { ChatTranscript } from './ChatTranscript';
+import { FileRollbackReportBanner } from './FileRollbackReport';
+import { RunningStatusLine } from './RunningStatusLine';
 import { buildTimelineAnchors, type TimelineAnchor } from './timeline-anchors';
 import styles from './Chat.module.css';
 
@@ -481,15 +483,14 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
             registerMessageElement={registerMessageElement}
             enableProcessFold
           />
-          {(isKnowledgeRetrieving || isTurnPending) && !isSessionStreaming && (
-
-            <div className={`${styles.typingIndicator} ${styles.knowledgeRetrievingIndicator}`}>
-              {isKnowledgeRetrieving ? t('chat.knowledgeRetrieving') : ''}
-            </div>
+          {(isSessionStreaming || isTurnPending || isKnowledgeRetrieving) && (
+            <RunningStatusLine
+              sessionPath={sessionPath}
+              pending={isTurnPending}
+              knowledgeRetrieving={isKnowledgeRetrieving}
+            />
           )}
-          {isSessionStreaming && (
-            <div className={styles.typingIndicator} />
-          )}
+          <FileRollbackReportBanner sessionPath={sessionPath} />
           <div className={styles.sessionFooter} />
         </div>
       </div>

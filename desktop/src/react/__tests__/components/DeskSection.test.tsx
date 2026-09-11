@@ -20,6 +20,7 @@ const mocks = vi.hoisted(() => ({
   jumpToDeskSearchResult: vi.fn(async () => {}),
   retainLocalFileResourceWatch: vi.fn(() => vi.fn()),
   retainResourceWatch: vi.fn(() => vi.fn()),
+  resolvedLocalPathAlias: vi.fn((): string | null => null),
   resourceWatchKey: (ref: any) => ref.kind === 'mount'
     ? `mount:${ref.mountId}:${String(ref.path || '').replace(/^\/+|\/+$/g, '')}`
     : `local-file:${ref.path}`,
@@ -50,6 +51,7 @@ vi.mock('../../stores/desk-actions', async (importOriginal) => {
 vi.mock('../../services/resource-events', () => ({
   retainLocalFileResourceWatch: mocks.retainLocalFileResourceWatch,
   retainResourceWatch: mocks.retainResourceWatch,
+  resolvedLocalPathAlias: mocks.resolvedLocalPathAlias,
   resourceWatchKey: mocks.resourceWatchKey,
 }));
 
@@ -70,6 +72,7 @@ describe('DeskSection workspace watching', () => {
     vi.useFakeTimers();
     vi.clearAllMocks();
     mocks.loadDeskTreeFiles.mockImplementation(async () => true);
+    mocks.resolvedLocalPathAlias.mockReturnValue(null);
     localStorageData = {};
     vi.stubGlobal('localStorage', {
       getItem: vi.fn((key: string) => localStorageData[key] ?? null),
@@ -191,9 +194,11 @@ describe('DeskSection workspace watching', () => {
 
     render(<WorkspaceFileWatchBridge />);
 
-    expect(mocks.retainResourceWatch).toHaveBeenCalledWith({ kind: 'mount', mountId: 'mount_docs', path: '' });
-    expect(mocks.retainResourceWatch).toHaveBeenCalledWith({ kind: 'mount', mountId: 'mount_docs', path: 'notes' });
-    expect(mocks.retainLocalFileResourceWatch).not.toHaveBeenCalledWith('/Users/me/Documents');
+    // 服务端 mount ref 订阅不可用（default mount 不在注册表、挂载 capabilities 不含
+    // watch），local_fs 挂载统一走披露的 native 根做 local-file 订阅。
+    expect(mocks.retainResourceWatch).toHaveBeenCalledWith({ kind: 'local-file', path: '/Users/me/Documents' });
+    expect(mocks.retainResourceWatch).toHaveBeenCalledWith({ kind: 'local-file', path: '/Users/me/Documents/notes' });
+    expect(mocks.retainResourceWatch).not.toHaveBeenCalledWith({ kind: 'mount', mountId: 'mount_docs', path: '' });
   });
 
   it('flushes dirty expanded tree paths when the workspace tree mounts', async () => {
@@ -409,8 +414,43 @@ describe('DeskSection workspace watching', () => {
     expect(mocks.loadDeskTreeFiles).toHaveBeenCalledWith('drafts', { force: true });
   });
 
-  it('ignores mounted workbench tree events outside the active native root', async () => {
+  it('matches watch events delivered as server-resolved (realpath) paths', async () => {
     const { DeskSection } = await import('../../components/DeskSection');
+
+    useStore.setState({
+      deskBasePath: '/tmp/ws',
+      deskWorkspaceMountId: null,
+      deskWorkspaceNativeRoot: null,
+      deskCurrentPath: '',
+      deskTreeFilesByPath: {
+        '': [{ name: 'notes', isDir: true }],
+        notes: [],
+      },
+      deskExpandedPaths: ['notes'],
+      deskDirtyTreePaths: [],
+    } as never);
+    // 服务端 local_fs 会把 /tmp 解析成 /private/tmp，watch 事件只带解析后路径。
+    mocks.resolvedLocalPathAlias.mockReturnValue('/private/tmp/ws');
+
+    render(<DeskSection />);
+    mocks.loadDeskTreeFiles.mockClear();
+
+    const { markDeskTreeDirtyForResourceChange } = await import('../../utils/preview-document-refresh');
+    await act(async () => {
+      markDeskTreeDirtyForResourceChange({
+        resource: {
+          kind: 'local-file',
+          provider: 'local_fs',
+          path: '/private/tmp/ws/notes/new.md',
+          filePath: '/private/tmp/ws/notes/new.md',
+        },
+      } as never);
+    });
+
+    expect(mocks.loadDeskTreeFiles).toHaveBeenCalledWith('notes', { force: true });
+  });
+
+  it('ignores mounted workbench tree events outside the active native root', async () => {    const { DeskSection } = await import('../../components/DeskSection');
 
     useStore.setState({
       deskBasePath: 'studio:mount_docs',

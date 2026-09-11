@@ -6,7 +6,7 @@ import {
 export const TURN_INPUT_PRESENTATION_EVENT_TYPE = "turn_input_presentation";
 export const TURN_INPUT_CONSUMPTION_EVENT_TYPE = "turn_input_consumption";
 
-const HIDDEN_TURN_INPUT_RE = /<hana-background-result(?:\s|>)|<hana-deferred-tasks(?:\s|>)/;
+const HIDDEN_TURN_INPUT_RE = /<hana-background-result(?:\s|>)|<hana-deferred-tasks(?:\s|>)|<hana-turn-interrupted(?:\s|>)/;
 
 function messageTextContent(message) {
   const content = message?.content;

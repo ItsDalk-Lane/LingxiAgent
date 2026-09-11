@@ -6,7 +6,8 @@
   flex-direction: column;
   border: 1px solid var(--overlay-light);
   border-radius: 10px;
-  background: var(--bg-secondary, transparent);
+  /* 不透明卡片底，与输入框一致（--bg-secondary 未定义，不能用作回退） */
+  background: var(--bg-card);
   overflow: hidden;
 }
 
@@ -104,10 +105,26 @@
 
 .activeIcon {
   color: var(--accent);
+  /* 本轮流式输出期间：进行中图标持续旋转，直观表达仍在执行；
+     字面量时长按样式立法收进定义行 */
+  --todo-panel-spin-duration: 1.1s;
+  animation: todo-panel-spin var(--todo-panel-spin-duration) linear infinite;
+  transform-origin: center;
 }
 
+@keyframes todo-panel-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 用户手动停止本轮后：streaming 标记消失，图标切回静止（.stoppedIcon 无动画） */
 .stoppedIcon {
   color: var(--text-light);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .activeIcon {
+    animation: none;
+  }
 }
 
 .pendingIcon {
@@ -192,11 +209,4 @@
 .action:disabled {
   color: var(--text-light);
   opacity: 0.58;
-}
-
-.cancelNote {
-  padding: 0 var(--space-10) var(--space-8);
-  font-size: 12px;
-  line-height: 1.4;
-  color: var(--text-muted);
 }

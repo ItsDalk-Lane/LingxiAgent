@@ -17,6 +17,15 @@ vi.mock('../../stores/message-turn-actions', () => ({
   retrySessionTurn: (...args: unknown[]) => retryMock(...args),
   forkSessionTurn: vi.fn(async () => null),
   activateForkedSession: vi.fn(async () => undefined),
+  previewWorkspaceRollback: vi.fn(async () => ({
+    enabled: false,
+    available: false,
+    degraded: false,
+    commit: null,
+    reason: 'file_rollback_disabled',
+    files: [],
+    fileCount: 0,
+  })),
 }));
 
 const sessionPath = '/session/turn-time.jsonl';
@@ -201,6 +210,7 @@ describe('ChatTranscript turn timestamps', () => {
 
     const footers = screen.getAllByTestId('assistant-completion-actions');
     fireEvent.click(within(footers[0]).getByTitle('重新生成'));
+    fireEvent.click(screen.getByText('chat.fileRollback.conversationOnly'));
 
     expect(retryMock).toHaveBeenCalledWith(
       sessionPath,
@@ -237,6 +247,7 @@ describe('ChatTranscript turn timestamps', () => {
     const footers = screen.getAllByTestId('assistant-completion-actions');
     expect(footers).toHaveLength(3);
     fireEvent.click(within(footers[1]).getByTitle('重新生成'));
+    fireEvent.click(screen.getByText('chat.fileRollback.conversationOnly'));
 
     expect(retryMock).toHaveBeenCalledWith(
       sessionPath,
@@ -267,6 +278,7 @@ describe('ChatTranscript turn timestamps', () => {
 
     const assistantFooter = screen.getByTestId('assistant-completion-actions');
     fireEvent.click(within(assistantFooter).getByTitle('重新生成'));
+    fireEvent.click(screen.getByText('chat.fileRollback.conversationOnly'));
 
     expect(retryMock).toHaveBeenCalledWith(
       sessionPath,

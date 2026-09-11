@@ -144,6 +144,14 @@
     border-color: rgba(var(--accent-rgb), 0.25);
 }
 
+/* 切换型工具按钮（会话记忆开关）：开启时用强调色标出当前状态。
+   复用已有的 rgba(var(--accent-rgb), ...) 表达法，不新增色值字面量。 */
+.attach-btn.is-active {
+    color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    background: var(--overlay-light);
+}
+
 /* Plan Mode 按钮 */
 .plan-mode-btn {
     display: inline-flex;

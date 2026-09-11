@@ -1,0 +1,139 @@
+.panel {
+    /* 弹性宽度：默认宽度来自组件（可拖拽，持久化），窄窗口时先压缩自己，
+       最小宽度以下由用户拖动或关闭面板解决。 */
+    flex: 0 1 var(--side-chat-width, 460px);
+    order: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 280px;
+    max-width: 45vw;
+    height: 100%;
+    border-left: 1px solid var(--border);
+    background: var(--bg);
+    position: relative;
+}
+
+.resizeHandle {
+    position: absolute;
+    top: 0;
+    left: -3px;
+    width: 6px;
+    height: 100%;
+    cursor: col-resize;
+    z-index: 3;
+}
+
+.resizeHandle:hover {
+    background: var(--overlay-light);
+}
+
+.header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    padding: var(--space-8) var(--space-12);
+    border-bottom: 1px solid var(--border);
+    min-height: 40px;
+}
+
+.headerTitle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    font-size: var(--fs-hint);
+    font-weight: 600;
+    color: var(--text);
+    min-width: 0;
+    flex: 1;
+}
+
+.headerTitleText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.headerIcon {
+    flex: 0 0 auto;
+    color: var(--text-muted);
+}
+
+.closeButton {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: default;
+}
+
+.closeButton:hover {
+    background: var(--overlay-light);
+    color: var(--text);
+}
+
+.body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.messages {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+}
+
+.composer {
+    flex: 0 0 auto;
+    padding: var(--space-8) var(--space-12) var(--space-12);
+    border-top: 1px solid var(--border);
+}
+
+.stateNotice {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-8);
+    padding: var(--space-16);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: var(--fs-hint);
+}
+
+.stateError {
+    color: var(--danger, #d64545);
+}
+
+.stateAction {
+    padding: var(--space-4) var(--space-10);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text);
+    font-size: var(--fs-hint);
+    cursor: default;
+}
+
+.stateAction:hover {
+    background: var(--overlay-light);
+}
+
+.emptyHint {
+    padding: var(--space-16);
+    color: var(--text-muted);
+    font-size: var(--fs-hint);
+    text-align: center;
+}

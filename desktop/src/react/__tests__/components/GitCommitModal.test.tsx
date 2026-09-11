@@ -12,12 +12,14 @@ const generateGitCommitMessageMock = vi.fn();
 const gitCommitMock = vi.fn();
 const gitPushMock = vi.fn();
 const gitCheckoutMock = vi.fn();
+const gitCreateBranchMock = vi.fn();
 
 vi.mock('../../utils/git-env-api', () => ({
   generateGitCommitMessage: (...args: unknown[]) => generateGitCommitMessageMock(...args),
   gitCommit: (...args: unknown[]) => gitCommitMock(...args),
   gitPush: (...args: unknown[]) => gitPushMock(...args),
   gitCheckout: (...args: unknown[]) => gitCheckoutMock(...args),
+  gitCreateBranch: (...args: unknown[]) => gitCreateBranchMock(...args),
 }));
 
 function makeStatus(overrides: Partial<GitStatus> = {}): GitStatus {
@@ -59,7 +61,10 @@ const TABLE: Record<string, string> = {
   'gitEnv.btnCommit': '提交',
   'gitEnv.btnCommitPush': '提交并推送',
   'gitEnv.btnPush': '推送',
+  'gitEnv.genMessage': 'AI 生成',
+  'gitEnv.genMessageHint': '让模型根据当前变更生成提交信息',
   'gitEnv.aiGenerating': '正在生成提交信息…',
+  'gitEnv.aiGeneratingShort': '生成中…',
   'gitEnv.aiFailed': '提交信息生成失败',
   'gitEnv.commitDone': '提交完成',
   'gitEnv.pushDone': '推送完成',
@@ -69,6 +74,9 @@ const TABLE: Record<string, string> = {
   'gitEnv.noRemote': '未配置远程仓库',
   'gitEnv.operationFailed': '操作失败',
   'gitEnv.branchesTitle': '切换分支',
+  'gitEnv.newBranch': '新建分支…',
+  'gitEnv.newBranchPlaceholder': '新分支名称',
+  'gitEnv.createBranch': '创建并切换',
   'gitEnv.detachedHead': '分离头指针（{name}）',
 };
 
@@ -103,6 +111,7 @@ describe('GitCommitModal', () => {
     gitCommitMock.mockReset();
     gitPushMock.mockReset();
     gitCheckoutMock.mockReset();
+    gitCreateBranchMock.mockReset();
     useStore.setState({ addToast: vi.fn() } as never);
   });
 
@@ -116,6 +125,8 @@ describe('GitCommitModal', () => {
     expect(screen.getByTestId('git-commit-btn')).toBeEnabled();
     expect(screen.getByTestId('git-commit-push-btn')).toBeEnabled();
     expect(screen.getByTestId('git-push-btn')).toBeEnabled();
+    // 储藏已统一到「变更文件」弹窗，这里不再有暂存按钮
+    expect(screen.queryByTestId('git-stash-btn')).not.toBeInTheDocument();
   });
 
   it('disables commit actions when nothing to commit and push when nothing to push', () => {
@@ -206,5 +217,57 @@ describe('GitCommitModal', () => {
 
     await waitFor(() => expect(useStore.getState().addToast).toHaveBeenCalledWith('未配置远程仓库', 'error'));
     expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('generates a message from the corner button and never commits', async () => {
+    generateGitCommitMessageMock.mockResolvedValue({ httpOk: true, message: 'feat: AI 生成' });
+    const { onClose } = renderModal(makeStatus());
+
+    fireEvent.click(screen.getByTestId('git-commit-generate'));
+
+    await waitFor(() => expect(generateGitCommitMessageMock).toHaveBeenCalledWith('/ws', {
+      includeUnstaged: true,
+      sessionPath: '/sessions/s.jsonl',
+      agentId: 'hana',
+    }));
+    await waitFor(() => expect(
+      (screen.getByTestId('git-commit-message') as HTMLTextAreaElement).value,
+    ).toBe('feat: AI 生成'));
+    expect(gitCommitMock).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('surfaces AI generation failure from the corner button as a toast', async () => {
+    generateGitCommitMessageMock.mockResolvedValue({ httpOk: false, error: 'boom' });
+    renderModal(makeStatus());
+
+    fireEvent.click(screen.getByTestId('git-commit-generate'));
+
+    await waitFor(() => expect(useStore.getState().addToast).toHaveBeenCalledWith('boom', 'error'));
+    expect(gitCommitMock).not.toHaveBeenCalled();
+  });
+
+  it('opens the branch popover with the branch list and create entry, without a title row', async () => {
+    renderModal(makeStatus());
+
+    fireEvent.click(screen.getByTestId('git-commit-branch'));
+
+    expect(await screen.findByTestId('git-commit-branch-main')).toBeInTheDocument();
+    expect(screen.getByTestId('git-commit-branch-feat/demo')).toBeDisabled();
+    expect(screen.getByTestId('git-commit-branch-create-toggle')).toBeInTheDocument();
+    expect(screen.queryByText('切换分支')).not.toBeInTheDocument();
+  });
+
+  it('creates a branch from the commit modal popover', async () => {
+    gitCreateBranchMock.mockResolvedValue({ httpOk: true, ok: true, branch: 'feat/from-commit' });
+    const { refresh } = renderModal(makeStatus());
+
+    fireEvent.click(screen.getByTestId('git-commit-branch'));
+    fireEvent.click(await screen.findByTestId('git-commit-branch-create-toggle'));
+    fireEvent.change(screen.getByTestId('git-commit-branch-create-input'), { target: { value: 'feat/from-commit' } });
+    fireEvent.click(screen.getByTestId('git-commit-branch-create-submit'));
+
+    await waitFor(() => expect(gitCreateBranchMock).toHaveBeenCalledWith('/ws', 'feat/from-commit', undefined, 'hana'));
+    await waitFor(() => expect(refresh).toHaveBeenCalled());
   });
 });

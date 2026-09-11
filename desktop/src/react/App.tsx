@@ -32,6 +32,10 @@ import { AppTitlebar } from './components/app/AppTitlebar';
 import { ChatSidebar } from './components/app/ChatSidebar';
 import { AppPages } from './components/app/AppPages';
 import { ChatSearchOverlay } from './components/search/ChatSearchOverlay';
+// 桌面端工作台文件树的实时刷新订阅桥（ResourceIO watch → deskDirtyTreePaths →
+// DeskSection 重载）。此前仅移动端 WorkspaceCompanionRail 挂载，桌面端没有任何
+// 订阅，文件树只能在切换工作台时刷新。
+import { WorkspaceFileChangeBridge } from './components/app/WorkspaceFileChangeBridge';
 
 declare function t(key: string, vars?: Record<string, string | number>): string;
 
@@ -89,6 +93,7 @@ function App() {
       {/* Headless behavior components */}
       <SidebarLayout />
       <ChannelsPanel />
+      <WorkspaceFileChangeBridge />
 
       {/* ── App shell: titlebar 作为独立布局行（flex column 第一行），
            app body 占剩余高度。取代旧的 fixed overlay + 各内容区 padding-top 避让。 ── */}

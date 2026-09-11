@@ -8,20 +8,16 @@
  *   "另有 n 项进行中"，不隐藏并行事实。
  * - 展开后显示完整清单（五态图标、受阻原因、已取消标注），内部滚动
  *   最高约 240px 且不超过窗口高度 30%；长描述可换行。
- * - 收尾操作区分：收起（只隐藏）、确认剩余任务已完成、取消剩余任务、
- *   收纳已结束清单。模型输出期间禁用完成/取消（服务端同样拒绝）。
- * - 本轮已停止且仍有未完成任务时，进行中图标不再表现为仍在执行，
+ * - 任务完成状态由模型确定，面板不提供手动完成/取消入口；
+ *   唯一的收尾操作是收纳已结束清单摘要（只隐藏，不改结果）。
+ * - 本轮已停止且仍有未完成任务时，进行中图标从旋转动效变为静止，
  *   并提示真实含义（A06）。
  * - 展开偏好按会话在本次运行期间保存（store: todoPanelExpandedBySession），
  *   流式更新不重置展开状态（A03）。
  */
 import { memo, useState } from 'react';
 import { useStore } from '../../stores';
-import {
-  cancelSessionTodos,
-  completeSessionTodos,
-  dismissSessionTodoPanel,
-} from '../../stores/session-actions';
+import { dismissSessionTodoPanel } from '../../stores/session-actions';
 import { sessionScopedListIncludes, sessionScopedValue } from '../../stores/session-slice';
 import type { TodoItem } from '../../types';
 import styles from './TodoPanel.module.css';
@@ -147,8 +143,6 @@ export const TodoPanel = memo(function TodoPanel() {
     useStore.getState().setSessionTodoPanelExpanded(sessionPath, !expanded);
   }
 
-  const actionDisabled = acting || streaming;
-
   return (
     <section className={styles.panel} aria-label={t('todoPanel.title')} data-todo-panel="">
       <button
@@ -201,28 +195,6 @@ export const TodoPanel = memo(function TodoPanel() {
             ))}
           </div>
           <div className={styles.actions}>
-            {unfinished > 0 && (
-              <>
-                <button
-                  type="button"
-                  className={styles.action}
-                  disabled={actionDisabled}
-                  title={streaming ? t('todoPanel.waitForOutput') : t('todoPanel.confirmComplete')}
-                  onClick={() => void runAction(completeSessionTodos)}
-                >
-                  {t('todoPanel.confirmComplete')}
-                </button>
-                <button
-                  type="button"
-                  className={styles.action}
-                  disabled={actionDisabled}
-                  title={streaming ? t('todoPanel.waitForOutput') : t('todoPanel.cancelRemaining')}
-                  onClick={() => void runAction(cancelSessionTodos)}
-                >
-                  {t('todoPanel.cancelRemaining')}
-                </button>
-              </>
-            )}
             {finished && (
               <button
                 type="button"
@@ -234,9 +206,6 @@ export const TodoPanel = memo(function TodoPanel() {
               </button>
             )}
           </div>
-          {unfinished > 0 && (
-            <div className={styles.cancelNote}>{t('todoPanel.cancelNote')}</div>
-          )}
         </>
       )}
     </section>

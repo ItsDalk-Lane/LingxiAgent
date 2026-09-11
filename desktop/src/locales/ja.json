@@ -26,7 +26,8 @@
     }
   },
   "selection": {
-    "quoteToChat": "会話に引用"
+    "quoteToChat": "会話に引用",
+    "openInSideChat": "サイドチャットで会話"
   },
   "mermaid": {
     "viewSource": "ソースを表示",
@@ -411,17 +412,37 @@
     "back": "戻る"
   },
   "chat": {
-        "historyOverview": {
-          "records": "元レコード数",
-          "runs": "論理ターン数",
-          "tasks": "関連タスク",
-          "taskSubagent": "サブエージェント",
-          "taskWorkflow": "ワークフロー",
-          "taskMedia": "メディア生成",
-          "taskOther": "その他",
-          "unknown": "統計は取得できません",
-          "detail": "サブエージェント {subagent} · ワークフロー {workflow} · メディア {media} · その他 {other}"
-        },
+    "fileRollback": {
+      "menuTitle": "再生成",
+      "conversationOnly": "会話のみ巻き戻す",
+      "withFiles": "会話＋ファイル変更を巻き戻す",
+      "withFilesCount": "会話＋ファイル変更を巻き戻す（{count} ファイル）",
+      "withFilesDegraded": "会話＋ファイル変更を巻き戻す（スナップショット失敗、バックアップで復元）",
+      "disabledOff": "先に「設定 → インターフェース」で「巻き戻し時にファイル変更も取り消す」をオンにしてください",
+      "disabledNoCheckpoint": "このターンにはファイルチェックポイントがありません",
+      "disabledUnavailable": "ワークスペースのチェックポイントを利用できません",
+      "confirmTitle": "会話とファイル変更を巻き戻す",
+      "confirmBody": "ワークスペースをこのターン開始前の状態に戻します。次の {count} ファイルが上書きされます：",
+      "confirmWarning": "このターン開始以降のすべての変更（手動での編集を含む）が上書きされます。",
+      "confirmAction": "巻き戻す",
+      "reportTitle": "ファイル巻き戻しレポート",
+      "reportAllOk": "{count} ファイルを復元しました",
+      "reportPartial": "{failed} ファイルが失敗、{count} ファイル成功",
+      "reportDegraded": "このターンのスナップショットは利用できないため、write/edit の変更前バックアップから復元しました",
+      "reportSourceBackup": "復元元：変更前バックアップ",
+      "dismiss": "閉じる"
+    },
+    "historyOverview": {
+      "records": "元レコード数",
+      "runs": "論理ターン数",
+      "tasks": "関連タスク",
+      "taskSubagent": "サブエージェント",
+      "taskWorkflow": "ワークフロー",
+      "taskMedia": "メディア生成",
+      "taskOther": "その他",
+      "unknown": "統計は取得できません",
+      "detail": "サブエージェント {subagent} · ワークフロー {workflow} · メディア {media} · その他 {other}"
+    },
     "knowledgeResearchInterrupted": "調査が中断されました",
     "knowledgeResearchStopIncomplete": "調査の処理が正常に完了しませんでした",
     "knowledgeResearchStopUnavailable": "調査に必要なツールを利用できません",
@@ -490,6 +511,19 @@
     "knowledgeMetaUnavailable": "ナレッジ検索は利用不可",
     "knowledgeMetaDegradedTitle": "検索が劣化しました：{reason}",
     "knowledgeRetrieving": "ナレッジベースを検索中",
+    "running": {
+      "working": "{name} が作業中",
+      "thinking": "思考中",
+      "writing": "回答を生成中",
+      "reading": "ファイルを読み込み中",
+      "searching": "検索中",
+      "editing": "ファイルを編集中",
+      "command": "コマンドを実行中",
+      "web": "ウェブを閲覧中",
+      "memory": "記憶を検索中",
+      "knowledge": "ナレッジを検索中",
+      "tool": "ツール {name} を実行中"
+    },
     "knowledgeRetrievalSearched": "{n} 件の結果を検索済み",
     "knowledgeRetrievalShowMore": "さらに表示（あと {n} 件）",
     "knowledgeRetrievalTruncated": "予算超過シャード",
@@ -1539,6 +1573,8 @@
       "sidebar": "サイドバー",
       "sessionListSingleLine": "セッション一覧を 1 行表示",
       "sessionListSingleLineHint": "オンにすると各セッションを 1 行で表示します。ホバー時に右側の操作が現れ、タイトルは省略記号で短くなります。",
+      "rollbackFileChanges": "巻き戻し時にファイル変更も取り消す",
+      "rollbackFileChangesHint": "オンにすると、再生成や編集して再送信の際に「会話＋ファイル変更を巻き戻す」を選べるようになり、ワークスペースのファイルをそのターン開始前の状態に戻します。既定はオフです。",
       "shortcuts": "ショートカット",
       "voiceRecordingShortcut": "音声録音/送信",
       "voiceRecordingShortcutHint": "メインチャット画面にフォーカスがあるとき、1 回押すと録音開始、もう 1 回押すと終了して送信します。"
@@ -3868,8 +3904,7 @@
       "title": "バックグラウンド"
     },
     "todo": {
-      "title": "ToDo",
-      "waitForOutput": "Wait for output to finish"
+      "title": "ToDo"
     },
     "subagent": {
       "title": "サブエージェント",
@@ -3958,9 +3993,18 @@
     "noBranches": "ローカルブランチはありません",
     "switchDone": "{name} に切り替えました",
     "switchFailed": "ブランチ切替に失敗しました",
+    "newBranch": "新しいブランチ…",
+    "newBranchPlaceholder": "新しいブランチ名",
+    "createBranch": "作成して切替",
+    "createBranchDone": "{name} を作成して切り替えました",
+    "createBranchFailed": "ブランチの作成に失敗しました",
+    "branchExists": "ブランチは既に存在します",
+    "invalidBranchName": "ブランチ名が不正です",
+    "branchMissing": "ベースブランチが見つかりません",
     "branchesTitle": "ブランチ切替",
     "changesTitle": "変更ファイル",
     "noChanges": "変更なし",
+    "noChangesWithStash": "作業ツリーに未コミットの変更はありません。スタッシュが {n} 件残っています。「すべて取り出す」で戻せます。",
     "diffBinary": "バイナリファイル、diff は表示できません",
     "diffUnavailable": "diff を読み込めません",
     "diffTruncated": "内容が長いため省略表示しています",
@@ -3984,9 +4028,59 @@
     "noRemote": "リモートリポジトリが未設定です",
     "aiGenerating": "コミットメッセージを生成中…",
     "aiFailed": "コミットメッセージの生成に失敗しました",
+    "genMessage": "AI 生成",
+    "genMessageHint": "現在の変更からモデルにコミットメッセージを書かせます（入力欄に反映するだけでコミットはしません）",
+    "aiGeneratingShort": "生成中…",
     "commitDone": "コミットしました",
     "pushDone": "プッシュしました",
-    "operationFailed": "操作に失敗しました"
+    "nothingToStash": "スタッシュする変更がありません",
+    "stashOne": "スタッシュ",
+    "unstashOne": "取り出す",
+    "discardOne": "元に戻す",
+    "stashAll": "すべてスタッシュ",
+    "unstashAll": "すべて取り出す",
+    "discardAll": "すべて元に戻す",
+    "stashCount": "スタッシュ {n} 件",
+    "stashFileDone": "{name} をスタッシュしました",
+    "stashFileFailed": "スタッシュに失敗しました",
+    "stashAllLabel": "すべての変更をスタッシュ",
+    "stashAllDone": "すべての変更をスタッシュしました",
+    "unstashFileDone": "{name} をスタッシュから取り出しました",
+    "unstashFileFailed": "取り出しに失敗しました",
+    "unstashAllDone": "最新のスタッシュを取り出しました",
+    "unstashNoStash": "スタッシュがありません",
+    "unstashNotInStash": "このファイルはどのスタッシュにも含まれていません",
+    "unstashPathDirty": "このファイルには未コミットの変更があり、取り出すと上書きされます。先に元に戻すかコミットしてください",
+    "unstashConflict": "取り出しで競合しました。スタッシュは残してあります。解決して再試行してください",
+    "discardOneHint": "このファイルの未コミット変更を破棄して HEAD に戻します（取り消せません）",
+    "discardUntrackedHint": "未追跡の新規ファイルは誤削除を避けるため対象外です",
+    "discardFileDone": "{name} の変更を元に戻しました",
+    "discardAllDone": "追跡ファイルの変更をすべて元に戻しました",
+    "discardFailed": "元に戻せませんでした",
+    "discardNothing": "元に戻す変更がありません",
+    "discardConfirmTitle": "変更を元に戻す",
+    "discardConfirmOk": "元に戻す",
+    "discardConfirmAll": "追跡ファイルの未コミット変更（ステージ済みを含む）をすべて破棄します。取り消せません。未追跡の新規ファイルは影響を受けません。",
+    "discardConfirmFiles": "この {count} ファイルの未コミット変更（ステージ済みを含む）を破棄します。取り消せません：\n{list}",
+    "operationFailed": "操作に失敗しました",
+    "worktreeRow": "作業ツリーを新規作成",
+    "worktreeTitle": "worktree で新しいセッションを開始",
+    "worktreeDesc": "現在のプロジェクトと同じ親ディレクトリ（{root}）に隔離された worktree を作成し、新しいブランチ wt/<名前> を付けて、その中で新しいセッションを開きます。現在のチェックアウトは影響を受けません。",
+    "worktreeDescNoRoot": "現在のプロジェクトと同じ親ディレクトリに隔離された worktree を作成し、新しいブランチ wt/<名前> を付けて、その中で新しいセッションを開きます。現在のチェックアウトは影響を受けません。",
+    "worktreeNameLabel": "worktree 名",
+    "worktreeNamePlaceholder": "例: fix-login-race",
+    "invalidWorktreeName": "名前は英数字と . _ - のみ、先頭は英数字にしてください",
+    "worktreeBaseLabel": "ベースブランチ",
+    "worktreeBaseHead": "現在の HEAD",
+    "worktreeCreate": "作成してセッション開始",
+    "worktreeCreating": "作成中…",
+    "worktreeDone": "{name} で新しいセッションを開きました",
+    "worktreeFailed": "作業ツリーの作成に失敗しました",
+    "worktreeOpenFailed": "作業ツリーは作成しましたが、ワークスペース登録に失敗しセッションを開けませんでした",
+    "worktreeDirExists": "同名のディレクトリが既にあります。別の名前を使ってください",
+    "worktreeBranchExists": "対応する wt/ ブランチが既にあります。別の名前を使ってください",
+    "worktreeMainTag": "メイン",
+    "worktreeCurrentTag": "現在"
   },
   "desk": {
     "title": "デスク",
@@ -4010,6 +4104,12 @@
     "emptyHint": "デスクはアシスタントの巡回ワークスペースであり、各チャットのデフォルトディレクトリです。\n設定でフォルダを指定してください。",
     "goToSettings": "設定へ",
     "fileLabel": "ファイル",
+    "mentionToChat": {
+      "title": "会話に追加",
+      "label": "「{name}」を会話に追加",
+      "file": "ファイル",
+      "folder": "フォルダ"
+    },
     "openWithDefault": "デフォルトアプリで開く",
     "refresh": "再読み込み",
     "newMarkdownFileName": "無題.md",
@@ -5017,8 +5117,12 @@
     "fileCount": "{n} ファイル",
     "copyRetained": "保持した出力をコピー",
     "terminalRetained": "端末は最近の出力のみ保持します。コピー内容はこのプレビューと同じです。"
-  }
-,
+  },
+  "duration": {
+    "seconds": "{seconds}秒",
+    "minutes": "{minutes}分{seconds}秒",
+    "hours": "{hours}時間{minutes}分{seconds}秒"
+  },
   "todoPanel": {
     "title": "タスク",
     "expand": "タスクリストを展開",
@@ -5034,12 +5138,16 @@
     "moreInProgress": "ほか {n} 件進行中",
     "stopped": "このターンは停止しました。未完了のタスクがあります",
     "updateFailed": "ToDo の更新に失敗しました。直前の有効なリストを保持しています",
-    "confirmComplete": "残りのタスクを完了として確認",
-    "cancelRemaining": "残りのタスクをキャンセル",
-    "cancelNote": "この計画だけを変更します。ターミナル処理・ワークフローなどのバックグラウンド処理は停止しません",
     "dismiss": "たたむ",
-    "waitForOutput": "出力が終わってから操作してください",
     "blockedReason": "ブロック中: {reason}",
     "cancelledLabel": "キャンセル済み"
+  },
+  "sideChat": {
+    "title": "サイドチャット",
+    "close": "サイドチャットを閉じる",
+    "creating": "サイドセッションを作成中…",
+    "createFailed": "サイドセッションの作成に失敗しました",
+    "retry": "再試行",
+    "empty": "サイドセッションの準備ができました"
   }
 }

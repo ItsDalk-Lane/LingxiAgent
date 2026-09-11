@@ -1,30 +1,36 @@
 /**
  * GitEnvironmentCard — 「环境信息」卡（运行信息胶囊内，压平皮肤）
  *
- * 四行（如图）：
+ * 各行（如图）：
  *   变更       未提交变更行合计（+绿/-红，千分位），点击开变更文件弹窗
- *   本地       就地展开：本地主工作树 / 分支工作树
- *   分支       当前分支（截断+箭头），点击弹分支列表，点击分支即切换
- *   提交或推送  点击开提交弹窗（提交 / 提交并推送 / 推送）
+ *   本地       就地展开：该项目全部 worktree（每项两行：分支名 + 路径，带主/当前标记）
+ *   新建工作树  开「在 worktree 中开始新会话」弹窗（隔离 worktree + wt/<名称> 分支）
+ *   分支       当前分支（截断+箭头），点击弹分支列表，点击分支即切换 / 可直接新建分支
+ *   提交或推送  点击开提交弹窗（提交 / 提交并推送 / 推送 / 暂存）
  *
  * 目标目录 = 当前对话工作台的本地根（deskWorkspaceNativeRoot，退 deskBasePath）。
- * 非本地目录不渲染；非 git 目录四行降级禁用。
+ * 非本地目录不渲染；非 git 目录各行降级禁用。
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from '../../stores';
+import { applyStudioWorkspace, createLocalStudioWorkspaceFromFolder } from '../../stores/desk-actions';
 import { AnchoredPortal, Collapse, Tooltip } from '../../ui';
 import {
   fetchGitBranches,
   fetchGitStatus,
   fetchGitWorktreeInfo,
-  gitCheckout,
+  fetchGitWorktrees,
   type GitBranches,
   type GitStatus,
   type GitWorktreeInfo,
+  type GitWorktrees,
 } from '../../utils/git-env-api';
+import { GitBranchList } from './GitBranchList';
 import { GitChangesModal } from './GitChangesModal';
 import { GitCommitModal } from './GitCommitModal';
 import { GitHistoryModal } from './GitHistoryModal';
+import { GitWorktreeModal } from './GitWorktreeModal';
+import branchStyles from './GitBranchList.module.css';
 import styles from './GitEnvironmentCard.module.css';
 
 function fmt(n: number): string {
@@ -49,10 +55,11 @@ export function GitEnvironmentCard() {
   const [status, setStatus] = useState<GitStatus | null>(null);
   const [branches, setBranches] = useState<GitBranches | null>(null);
   const [worktree, setWorktree] = useState<GitWorktreeInfo | null>(null);
+  const [worktrees, setWorktrees] = useState<GitWorktrees | null>(null);
   const [loadState, setLoadState] = useState<'idle' | 'loading' | 'error'>('idle');
   const [localExpanded, setLocalExpanded] = useState(false);
   const [branchMenuOpen, setBranchMenuOpen] = useState(false);
-  const [switchingBranch, setSwitchingBranch] = useState<string | null>(null);
+  const [worktreeModalOpen, setWorktreeModalOpen] = useState(false);
   const [changesOpen, setChangesOpen] = useState(false);
   const [commitOpen, setCommitOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -62,14 +69,16 @@ export function GitEnvironmentCard() {
   const refresh = useCallback(async (): Promise<GitStatus | null> => {
     if (!dir) return null;
     try {
-      const [nextStatus, nextBranches, nextWorktree] = await Promise.all([
+      const [nextStatus, nextBranches, nextWorktree, nextWorktrees] = await Promise.all([
         fetchGitStatus(dir, currentAgentId),
         fetchGitBranches(dir, currentAgentId),
         fetchGitWorktreeInfo(dir, currentAgentId),
+        fetchGitWorktrees(dir, currentAgentId),
       ]);
       setStatus(nextStatus);
       setBranches(nextBranches);
       setWorktree(nextWorktree);
+      setWorktrees(nextWorktrees);
       setLoadState('idle');
       return nextStatus;
     } catch {
@@ -83,28 +92,37 @@ export function GitEnvironmentCard() {
     setStatus(null);
     setBranches(null);
     setWorktree(null);
+    setWorktrees(null);
     setLocalExpanded(false);
     setBranchMenuOpen(false);
+    setWorktreeModalOpen(false);
     setLoadState(dir ? 'loading' : 'idle');
     if (dir) void refresh();
   }, [dir, refresh]);
 
-  const handleSwitchBranch = useCallback(async (name: string) => {
-    if (!dir || switchingBranch) return;
-    setSwitchingBranch(name);
-    try {
-      const result = await gitCheckout(dir, name, currentAgentId);
-      if (result.httpOk && result.ok) {
-        addToast?.(t('gitEnv.switchDone', { name }), 'success');
-        setBranchMenuOpen(false);
-        await refresh();
-      } else {
-        addToast?.(result.error || t('gitEnv.switchFailed'), 'error');
-      }
-    } finally {
-      setSwitchingBranch(null);
+  /** 分支浮层里切换/新建成功后：收起浮层并让整卡重新取数 */
+  const handleBranchChanged = useCallback(async () => {
+    setBranchMenuOpen(false);
+    await refresh();
+  }, [refresh]);
+
+  /**
+   * worktree 建成 → 注册成局部工作台并切过去，落在一个新会话草稿上。
+   * 当前检出不受影响：主工作树仍在原分支，新会话跑在 wt/<名称> 上。
+   */
+  const handleWorktreeCreated = useCallback(async ({ path: worktreePath, branch }: { path: string; branch: string }) => {
+    if (!worktreePath) {
+      addToast?.(t('gitEnv.worktreeOpenFailed'), 'error');
+      return;
     }
-  }, [dir, switchingBranch, refresh, addToast, t, currentAgentId]);
+    const workspace = await createLocalStudioWorkspaceFromFolder(worktreePath);
+    if (!workspace) {
+      addToast?.(t('gitEnv.worktreeOpenFailed'), 'error');
+      return;
+    }
+    await applyStudioWorkspace(workspace);
+    addToast?.(t('gitEnv.worktreeDone', { name: branch || worktreePath }), 'success');
+  }, [addToast, t]);
 
   if (!dir) return null;
 
@@ -176,30 +194,77 @@ export function GitEnvironmentCard() {
           {localExpanded && (
             <div className={styles.localDetail} data-testid="git-env-local-detail">
               {worktree?.isRepo && (
-                <>
-                  <div>
-                    {worktree.isMain
-                      ? t('gitEnv.mainWorktree')
-                      : t('gitEnv.linkedWorktree', { name: worktree.name ?? worktree.branch ?? '' })}
-                  </div>
-                  {!worktree.isMain && worktree.mainPath && (
-                    <Tooltip content={worktree.mainPath} variant="panel" placement="bottom" align="start">
-                      {({ ref, ...tooltipProps }) => (
-                        <div
-                          ref={(node) => ref(node)}
-                          className={styles.localPath}
-                          {...tooltipProps}
-                        >
-                          {worktree.mainPath}
+                worktrees?.isRepo && worktrees.worktrees.length > 0 ? (
+                  /* 该项目下的全部 worktree，一项两行（分支名 / 路径），不再另起标题 */
+                  <div className={styles.worktreeList} data-testid="git-env-worktree-list">
+                    {worktrees.worktrees.map(entry => (
+                      <div
+                        key={entry.path}
+                        className={styles.worktreeItem}
+                        data-testid={`git-worktree-item-${entry.branch ?? entry.head ?? entry.path}`}
+                      >
+                        <div className={styles.worktreeHead}>
+                          <span className={styles.worktreeName} data-testid="git-worktree-item-name">
+                            {entry.branch ?? t('gitEnv.detachedHead', { name: entry.head?.slice(0, 7) ?? '' })}
+                          </span>
+                          {entry.isMain && <span className={styles.worktreeTag}>{t('gitEnv.worktreeMainTag')}</span>}
+                          {entry.current && <span className={styles.worktreeTag}>{t('gitEnv.worktreeCurrentTag')}</span>}
                         </div>
-                      )}
-                    </Tooltip>
-                  )}
-                </>
+                        <Tooltip content={entry.path} variant="panel" placement="bottom" align="start">
+                          {({ ref, ...tooltipProps }) => (
+                            <span
+                              ref={(node) => ref(node)}
+                              className={styles.worktreePath}
+                              data-testid="git-worktree-item-path"
+                              {...tooltipProps}
+                            >
+                              {entry.path}
+                            </span>
+                          )}
+                        </Tooltip>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  /* 降级：worktree 清单取不到时，至少说明当前工作树是哪一棵 */
+                  <>
+                    <div>
+                      {worktree.isMain
+                        ? t('gitEnv.mainWorktree')
+                        : t('gitEnv.linkedWorktree', { name: worktree.name ?? worktree.branch ?? '' })}
+                    </div>
+                    {!worktree.isMain && worktree.mainPath && (
+                      <Tooltip content={worktree.mainPath} variant="panel" placement="bottom" align="start">
+                        {({ ref, ...tooltipProps }) => (
+                          <div
+                            ref={(node) => ref(node)}
+                            className={styles.localPath}
+                            {...tooltipProps}
+                          >
+                            {worktree.mainPath}
+                          </div>
+                        )}
+                      </Tooltip>
+                    )}
+                  </>
+                )
               )}
             </div>
           )}
         </div>
+
+        <button
+          type="button"
+          className={styles.row}
+          data-testid="git-env-worktree-row"
+          disabled={!isRepo}
+          onClick={() => setWorktreeModalOpen(true)}
+        >
+          <span className={styles.rowLabel}>{t('gitEnv.worktreeRow')}</span>
+          <span className={styles.rowValue}>
+            <Chevron open={false} className={styles.chevronFlat} />
+          </span>
+        </button>
 
         <button
           type="button"
@@ -259,36 +324,17 @@ export function GitEnvironmentCard() {
         anchorRef={branchRowRef}
         onClose={() => setBranchMenuOpen(false)}
         role="dialog"
-        className={`${styles.branchMenu} runtime-capsule-anchored`}
+        className={`${branchStyles.menu} runtime-capsule-anchored`}
         align="end"
         minWidth={200}
       >
-        <div className={styles.branchMenuTitle}>{t('gitEnv.branchesTitle')}</div>
-        <div className={styles.branchList}>
-          {(branches?.branches ?? []).map(branch => (
-            <Tooltip
-              key={branch.name}
-              content={branch.checkedOutElsewhere ? t('gitEnv.checkedOutElsewhere') : ''}
-              placement="left"
-              disabled={!branch.checkedOutElsewhere}
-            >
-              <button
-                type="button"
-                className={`${styles.branchItem}${branch.current ? ` ${styles.branchItemCurrent}` : ''}`}
-                data-testid={`git-branch-${branch.name}`}
-                disabled={branch.current || branch.checkedOutElsewhere || switchingBranch != null}
-                onClick={() => void handleSwitchBranch(branch.name)}
-              >
-                <span className={styles.branchItemName}>{branch.name}</span>
-                {switchingBranch === branch.name && <span className={styles.branchBusy}>…</span>}
-                {branch.current && <span className={styles.branchCurrentMark}>✓</span>}
-              </button>
-            </Tooltip>
-          ))}
-          {branches != null && branches.branches.length === 0 && (
-            <div className={styles.branchEmpty}>{t('gitEnv.noBranches')}</div>
-          )}
-        </div>
+        <GitBranchList
+          dir={dir}
+          agentId={currentAgentId}
+          branches={branches}
+          testIdPrefix="git-branch"
+          onChanged={handleBranchChanged}
+        />
       </AnchoredPortal>
 
       <GitChangesModal
@@ -296,6 +342,8 @@ export function GitEnvironmentCard() {
         onClose={() => setChangesOpen(false)}
         dir={dir}
         files={status?.files ?? []}
+        agentId={currentAgentId}
+        refresh={refresh}
       />
       <GitCommitModal
         open={commitOpen}
@@ -312,6 +360,16 @@ export function GitEnvironmentCard() {
         onClose={() => setHistoryOpen(false)}
         dir={dir}
         agentId={currentAgentId}
+      />
+      <GitWorktreeModal
+        open={worktreeModalOpen}
+        onClose={() => setWorktreeModalOpen(false)}
+        dir={dir}
+        agentId={currentAgentId}
+        branches={branches}
+        defaultBase={status?.detached ? null : (status?.currentBranch ?? null)}
+        worktreesRoot={worktrees?.root ?? null}
+        onCreated={handleWorktreeCreated}
       />
     </section>
   );

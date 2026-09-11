@@ -1,0 +1,94 @@
+/* 「回退时撤销文件改动」报告横幅（间距/颜色一律走 token，见 style-discipline 棘轮） */
+
+.reportBanner {
+  margin: var(--space-8) var(--space-12) var(--space-4);
+  padding: var(--space-10) var(--space-12);
+  border: 1px solid var(--border, var(--overlay-light));
+  border-radius: var(--radius-md);
+  background: var(--overlay-subtle);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text, inherit);
+}
+
+.reportHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  margin-bottom: var(--space-4);
+}
+
+.reportDismiss {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, inherit);
+  cursor: pointer;
+  font-size: 12px;
+  padding: var(--space-2) var(--space-6);
+  border-radius: var(--radius-sm);
+}
+
+.reportDismiss:hover {
+  background: var(--overlay-light);
+}
+
+.reportSummary[data-report-ok='false'] {
+  color: var(--danger);
+}
+
+.reportWarning {
+  margin-top: var(--space-4);
+  color: var(--warning);
+}
+
+.reportFiles {
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 180px;
+  overflow: auto;
+}
+
+.reportFileOk,
+.reportFileFail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  align-items: baseline;
+}
+
+.reportFileFail {
+  color: var(--danger);
+}
+
+.reportFilePath {
+  font-family: var(--font-mono);
+  word-break: break-all;
+}
+
+.reportFileSource,
+.reportFileAction {
+  color: var(--text-secondary, inherit);
+}
+
+.reportFileReason {
+  opacity: 0.85;
+}
+
+.confirmFiles {
+  margin: var(--space-6) 0;
+  padding-left: var(--space-16);
+  max-height: 200px;
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.confirmWarning {
+  margin-top: var(--space-8);
+  color: var(--danger);
+}

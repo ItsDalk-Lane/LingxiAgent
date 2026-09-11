@@ -64,6 +64,27 @@ describe('resource-events', () => {
     releaseSecond();
   });
 
+  it('learns the server-resolved path alias of a watched local path', async () => {
+    lingxiFetch.mockImplementation(async (path: string) => ({
+      json: async () => (path.endsWith('/subscribe')
+        ? { ok: true, subscriptionId: 'sub-alias', resourceKeys: ['local_fs:/private/tmp/ws'] }
+        : { ok: true }),
+    }));
+    const { retainResourceWatch, resolvedLocalPathAlias } = await import('../../services/resource-events');
+
+    const release = retainResourceWatch({ kind: 'local-file', path: '/tmp/ws' });
+    expect(resolvedLocalPathAlias('/tmp/ws')).toBeNull();
+
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    // macOS：/tmp 是 /private/tmp 的符号链接，服务端 realpath 后只回解析路径。
+    expect(resolvedLocalPathAlias('/tmp/ws')).toBe('/private/tmp/ws');
+    // 已经解析过的路径没有别名，避免调用方拿到重复基准。
+    expect(resolvedLocalPathAlias('/private/tmp/ws')).toBeNull();
+
+    release();
+  });
+
   it('requests catch-up after reconnect with the last seen resource event sequence', async () => {
     const fetchImpl = vi.fn(async () => ({
       ok: true,

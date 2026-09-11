@@ -26,7 +26,8 @@
     }
   },
   "selection": {
-    "quoteToChat": "대화에 인용"
+    "quoteToChat": "대화에 인용",
+    "openInSideChat": "사이드 채팅에서 대화"
   },
   "mermaid": {
     "viewSource": "소스 보기",
@@ -411,17 +412,37 @@
     "back": "뒤로"
   },
   "chat": {
-        "historyOverview": {
-          "records": "원본 기록 수",
-          "runs": "논리 턴 수",
-          "tasks": "관련 작업",
-          "taskSubagent": "서브에이전트",
-          "taskWorkflow": "워크플로",
-          "taskMedia": "미디어 생성",
-          "taskOther": "기타",
-          "unknown": "통계를 표시할 수 없음",
-          "detail": "서브에이전트 {subagent} · 워크플로 {workflow} · 미디어 {media} · 기타 {other}"
-        },
+    "fileRollback": {
+      "menuTitle": "다시 생성",
+      "conversationOnly": "대화만 되돌리기",
+      "withFiles": "대화+파일 변경 되돌리기",
+      "withFilesCount": "대화+파일 변경 되돌리기 ({count}개 파일)",
+      "withFilesDegraded": "대화+파일 변경 되돌리기 (스냅샷 실패, 백업으로 복원)",
+      "disabledOff": "먼저 설정 → 인터페이스에서 「되돌릴 때 파일 변경도 취소」를 켜세요",
+      "disabledNoCheckpoint": "이 턴에는 파일 체크포인트가 없습니다",
+      "disabledUnavailable": "작업 공간 체크포인트를 사용할 수 없습니다",
+      "confirmTitle": "대화와 파일 변경 되돌리기",
+      "confirmBody": "작업 공간을 이 턴 시작 전 상태로 되돌립니다. 다음 {count}개 파일이 덮어써집니다:",
+      "confirmWarning": "이 턴이 시작된 이후의 모든 변경(직접 수정한 내용 포함)이 덮어써집니다.",
+      "confirmAction": "되돌리기",
+      "reportTitle": "파일 되돌리기 보고서",
+      "reportAllOk": "{count}개 파일 복원됨",
+      "reportPartial": "{failed}개 실패, {count}개 성공",
+      "reportDegraded": "이 턴의 스냅샷을 사용할 수 없어 write/edit 변경 전 백업에서 복원했습니다",
+      "reportSourceBackup": "복원 출처: 변경 전 백업",
+      "dismiss": "확인"
+    },
+    "historyOverview": {
+      "records": "원본 기록 수",
+      "runs": "논리 턴 수",
+      "tasks": "관련 작업",
+      "taskSubagent": "서브에이전트",
+      "taskWorkflow": "워크플로",
+      "taskMedia": "미디어 생성",
+      "taskOther": "기타",
+      "unknown": "통계를 표시할 수 없음",
+      "detail": "서브에이전트 {subagent} · 워크플로 {workflow} · 미디어 {media} · 기타 {other}"
+    },
     "knowledgeResearchInterrupted": "조사가 중단되었습니다",
     "knowledgeResearchStopIncomplete": "조사 절차가 정상적으로 완료되지 않았습니다",
     "knowledgeResearchStopUnavailable": "조사에 필요한 도구를 사용할 수 없습니다",
@@ -490,6 +511,19 @@
     "knowledgeMetaUnavailable": "지식 검색 사용 불가",
     "knowledgeMetaDegradedTitle": "검색이 저하됨: {reason}",
     "knowledgeRetrieving": "지식 베이스 검색 중",
+    "running": {
+      "working": "{name} 작업 중",
+      "thinking": "생각하는 중",
+      "writing": "답변 생성 중",
+      "reading": "파일 읽는 중",
+      "searching": "검색 중",
+      "editing": "파일 편집 중",
+      "command": "명령 실행 중",
+      "web": "웹 확인 중",
+      "memory": "기억 검색 중",
+      "knowledge": "지식베이스 검색 중",
+      "tool": "도구 {name} 실행 중"
+    },
     "knowledgeRetrievalSearched": "결과 {n}개 검색됨",
     "knowledgeRetrievalShowMore": "더 보기 ({n}개 더)",
     "knowledgeRetrievalTruncated": "예산 초과 샤드",
@@ -1539,6 +1573,8 @@
       "sidebar": "사이드바",
       "sessionListSingleLine": "세션 목록 한 줄 표시",
       "sessionListSingleLineHint": "켜면 각 세션이 한 줄만 사용해요. 마우스를 올리면 오른쪽 작업 버튼이 나타나고 제목은 말줄임표로 줄어들어요.",
+      "rollbackFileChanges": "되돌릴 때 파일 변경도 취소",
+      "rollbackFileChangesHint": "켜면 다시 생성하거나 편집 후 재전송할 때 「대화+파일 변경 되돌리기」를 선택할 수 있고, 작업 공간 파일을 해당 턴 시작 전 상태로 복원합니다. 기본값은 꺼짐입니다.",
       "shortcuts": "단축키",
       "voiceRecordingShortcut": "음성 녹음/전송",
       "voiceRecordingShortcutHint": "메인 채팅 화면에 포커스가 있을 때 한 번 누르면 녹음을 시작하고, 다시 누르면 종료 후 전송합니다."
@@ -3868,8 +3904,7 @@
       "title": "백그라운드 활동"
     },
     "todo": {
-      "title": "할 일",
-      "waitForOutput": "Wait for output to finish"
+      "title": "할 일"
     },
     "subagent": {
       "title": "서브 에이전트",
@@ -3958,9 +3993,18 @@
     "noBranches": "로컬 브랜치가 없습니다",
     "switchDone": "{name}(으)로 전환했습니다",
     "switchFailed": "브랜치 전환 실패",
+    "newBranch": "새 브랜치…",
+    "newBranchPlaceholder": "새 브랜치 이름",
+    "createBranch": "만들고 전환",
+    "createBranchDone": "{name} 브랜치를 만들고 전환했습니다",
+    "createBranchFailed": "브랜치 생성에 실패했습니다",
+    "branchExists": "브랜치가 이미 있습니다",
+    "invalidBranchName": "브랜치 이름이 올바르지 않습니다",
+    "branchMissing": "기준 브랜치를 찾을 수 없습니다",
     "branchesTitle": "브랜치 전환",
     "changesTitle": "변경된 파일",
     "noChanges": "변경 사항 없음",
+    "noChangesWithStash": "작업 트리에 커밋되지 않은 변경이 없습니다. 스태시가 {n}개 남아 있습니다. \"전체 꺼내기\"로 되돌릴 수 있습니다.",
     "diffBinary": "바이너리 파일, diff를 볼 수 없습니다",
     "diffUnavailable": "diff를 읽을 수 없습니다",
     "diffTruncated": "내용이 길어 일부만 표시합니다",
@@ -3984,9 +4028,59 @@
     "noRemote": "원격 저장소가 구성되지 않았습니다",
     "aiGenerating": "커밋 메시지 생성 중…",
     "aiFailed": "커밋 메시지 생성 실패",
+    "genMessage": "AI 생성",
+    "genMessageHint": "현재 변경 사항으로 모델이 커밋 메시지를 작성합니다(입력란에 채우기만 하고 커밋하지 않습니다)",
+    "aiGeneratingShort": "생성 중…",
     "commitDone": "커밋 완료",
     "pushDone": "푸시 완료",
-    "operationFailed": "작업 실패"
+    "nothingToStash": "스태시할 변경 사항이 없습니다",
+    "stashOne": "스태시",
+    "unstashOne": "꺼내기",
+    "discardOne": "되돌리기",
+    "stashAll": "전체 스태시",
+    "unstashAll": "전체 꺼내기",
+    "discardAll": "전체 되돌리기",
+    "stashCount": "스태시 {n}개",
+    "stashFileDone": "{name}을(를) 스태시했습니다",
+    "stashFileFailed": "스태시하지 못했습니다",
+    "stashAllLabel": "모든 변경 스태시",
+    "stashAllDone": "모든 변경을 스태시했습니다",
+    "unstashFileDone": "{name}을(를) 스태시에서 꺼냈습니다",
+    "unstashFileFailed": "꺼내지 못했습니다",
+    "unstashAllDone": "최신 스태시를 꺼냈습니다",
+    "unstashNoStash": "스태시가 없습니다",
+    "unstashNotInStash": "이 파일은 어떤 스태시에도 없습니다",
+    "unstashPathDirty": "이 파일에 커밋되지 않은 변경이 있어 꺼내면 덮어씁니다. 먼저 되돌리거나 커밋하세요",
+    "unstashConflict": "꺼내는 중 충돌이 발생했습니다. 스태시는 남겨 두었으니 해결 후 다시 시도하세요",
+    "discardOneHint": "이 파일의 커밋되지 않은 변경을 버리고 HEAD로 되돌립니다(되돌릴 수 없음)",
+    "discardUntrackedHint": "추적되지 않은 새 파일은 실수로 삭제하지 않도록 대상에서 제외됩니다",
+    "discardFileDone": "{name}의 변경을 되돌렸습니다",
+    "discardAllDone": "추적 중인 모든 변경을 되돌렸습니다",
+    "discardFailed": "되돌리지 못했습니다",
+    "discardNothing": "되돌릴 변경이 없습니다",
+    "discardConfirmTitle": "변경 되돌리기",
+    "discardConfirmOk": "되돌리기",
+    "discardConfirmAll": "추적 중인 파일의 커밋되지 않은 변경(스테이지 포함)을 모두 버립니다. 되돌릴 수 없습니다. 추적되지 않은 새 파일은 영향을 받지 않습니다.",
+    "discardConfirmFiles": "이 {count}개 파일의 커밋되지 않은 변경(스테이지 포함)을 버립니다. 되돌릴 수 없습니다:\n{list}",
+    "operationFailed": "작업 실패",
+    "worktreeRow": "새 작업 트리",
+    "worktreeTitle": "worktree에서 새 세션 시작",
+    "worktreeDesc": "현재 프로젝트와 같은 상위 디렉터리({root})에 격리된 worktree를 만들고 새 브랜치 wt/<이름>을 붙여 그 안에서 새 세션을 엽니다. 현재 체크아웃은 영향을 받지 않습니다.",
+    "worktreeDescNoRoot": "현재 프로젝트와 같은 상위 디렉터리에 격리된 worktree를 만들고 새 브랜치 wt/<이름>을 붙여 그 안에서 새 세션을 엽니다. 현재 체크아웃은 영향을 받지 않습니다.",
+    "worktreeNameLabel": "worktree 이름",
+    "worktreeNamePlaceholder": "예: fix-login-race",
+    "invalidWorktreeName": "이름은 영문·숫자와 . _ - 만 쓸 수 있고 영문이나 숫자로 시작해야 합니다",
+    "worktreeBaseLabel": "기준 브랜치",
+    "worktreeBaseHead": "현재 HEAD",
+    "worktreeCreate": "만들고 세션 시작",
+    "worktreeCreating": "만드는 중…",
+    "worktreeDone": "{name}에서 새 세션을 열었습니다",
+    "worktreeFailed": "작업 트리 생성에 실패했습니다",
+    "worktreeOpenFailed": "작업 트리는 만들었지만 워크스페이스 등록에 실패해 새 세션을 열지 못했습니다",
+    "worktreeDirExists": "같은 이름의 디렉터리가 이미 있습니다. 다른 이름을 쓰세요",
+    "worktreeBranchExists": "해당 wt/ 브랜치가 이미 있습니다. 다른 이름을 쓰세요",
+    "worktreeMainTag": "메인",
+    "worktreeCurrentTag": "현재"
   },
   "desk": {
     "title": "책상",
@@ -4010,6 +4104,12 @@
     "emptyHint": "책상은 어시스턴트의 순찰 작업 공간이자 모든 대화의 기본 디렉토리예요.\n설정에서 폴더를 지정하세요.",
     "goToSettings": "설정으로 이동",
     "fileLabel": "파일",
+    "mentionToChat": {
+      "title": "대화에 추가",
+      "label": "\"{name}\"을(를) 대화에 추가",
+      "file": "파일",
+      "folder": "폴더"
+    },
     "openWithDefault": "기본 앱으로 열기",
     "refresh": "새로고침",
     "newMarkdownFileName": "제목 없음.md",
@@ -5017,8 +5117,12 @@
     "fileCount": "파일 {n}개",
     "copyRetained": "보존된 출력 복사",
     "terminalRetained": "최근 터미널 출력만 보존됩니다. 복사 내용은 현재 미리 보기와 같습니다."
-  }
-,
+  },
+  "duration": {
+    "seconds": "{seconds}초",
+    "minutes": "{minutes}분 {seconds}초",
+    "hours": "{hours}시간 {minutes}분 {seconds}초"
+  },
   "todoPanel": {
     "title": "작업",
     "expand": "작업 목록 펼치기",
@@ -5034,12 +5138,16 @@
     "moreInProgress": "외 {n}개 진행 중",
     "stopped": "이번 턴이 중지되었습니다. 완료되지 않은 작업이 있습니다",
     "updateFailed": "할 일 업데이트에 실패했습니다. 마지막 유효 목록을 유지합니다",
-    "confirmComplete": "남은 작업을 완료로 확인",
-    "cancelRemaining": "남은 작업 취소",
-    "cancelNote": "이 계획만 변경합니다. 터미널 프로세스, 워크플로 등 백그라운드 작업은 종료되지 않습니다",
     "dismiss": "접어두기",
-    "waitForOutput": "출력이 끝난 후 조작하세요",
     "blockedReason": "차단됨: {reason}",
     "cancelledLabel": "취소됨"
+  },
+  "sideChat": {
+    "title": "사이드 채팅",
+    "close": "사이드 채팅 닫기",
+    "creating": "사이드 세션 생성 중…",
+    "createFailed": "사이드 세션 생성 실패",
+    "retry": "다시 시도",
+    "empty": "사이드 세션이 준비되었습니다"
   }
 }

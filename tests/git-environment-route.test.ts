@@ -301,3 +301,195 @@ describe("git-environment route", () => {
     expect((await res.json()).error).toBe("no changes");
   });
 });
+
+// ────────────────────────── 分支创建 / 暂存 / worktree ──────────────────────────
+
+/**
+ * 独立父目录 + 独立仓：worktree 落地根是 <主工作树父级>/worktrees，
+ * 与其它测试文件共用 os.tmpdir() 会互相踩。
+ */
+describe("git-environment route — branch / stash / worktree endpoints", () => {
+  let parentDir = "";
+  let opsDir = "";
+  let app!: ReturnType<typeof makeApp>;
+
+  function makeOpsApp(root: string) {
+    const engine = {
+      getExplicitHomeCwd: vi.fn(() => root),
+      getHomeCwd: vi.fn(() => null),
+      homeCwd: root,
+      deskCwd: root,
+    };
+    const hono = new Hono();
+    hono.route("/api", createGitEnvironmentRoute(engine));
+    return hono;
+  }
+
+  beforeAll(async () => {
+    parentDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-git-route-ops-"));
+    opsDir = path.join(parentDir, "repo");
+    fs.mkdirSync(opsDir);
+    try {
+      await git(opsDir, ["init", "-b", "main"]);
+    } catch {
+      await git(opsDir, ["init"]);
+    }
+    await git(opsDir, ["config", "user.name", "Lingxi Test"]);
+    await git(opsDir, ["config", "user.email", "test@lingxi.local"]);
+    fs.writeFileSync(path.join(opsDir, "a.md"), "one\n");
+    await git(opsDir, ["add", "-A"]);
+    await git(opsDir, ["commit", "-m", "init"]);
+    app = makeOpsApp(parentDir);
+  });
+
+  afterAll(() => {
+    if (parentDir) fs.rmSync(parentDir, { recursive: true, force: true });
+  });
+
+  it("creates and checks out a branch, then refuses the duplicate name", async () => {
+    const created = await post(app, "/api/git/create-branch", { dir: opsDir, name: "feat/from-route" });
+    expect(created.status).toBe(200);
+    expect(await created.json()).toMatchObject({ ok: true, branch: "feat/from-route" });
+
+    const status = await get(app, `/api/git/status?dir=${encodeURIComponent(opsDir)}`);
+    expect((await status.json()).currentBranch).toBe("feat/from-route");
+
+    const again = await post(app, "/api/git/create-branch", { dir: opsDir, name: "feat/from-route" });
+    expect(again.status).toBe(400);
+    expect((await again.json()).code).toBe("already_exists");
+
+    const bad = await post(app, "/api/git/create-branch", { dir: opsDir, name: "--upload-pack=evil" });
+    expect(bad.status).toBe(400);
+    expect((await bad.json()).code).toBe("invalid_name");
+  });
+
+  it("stashes the working tree and reports nothing_to_stash when clean", async () => {
+    fs.writeFileSync(path.join(opsDir, "a.md"), "one\ntwo\n");
+    fs.writeFileSync(path.join(opsDir, "untracked.txt"), "x\n");
+
+    const stashed = await post(app, "/api/git/stash", { dir: opsDir, message: "route: 暂存" });
+    expect(stashed.status).toBe(200);
+    expect((await stashed.json()).ok).toBe(true);
+
+    const status = await get(app, `/api/git/status?dir=${encodeURIComponent(opsDir)}`);
+    expect((await status.json()).files).toEqual([]);
+
+    const again = await post(app, "/api/git/stash", { dir: opsDir });
+    expect(again.status).toBe(400);
+    expect((await again.json()).code).toBe("nothing_to_stash");
+  });
+
+  it("lists worktrees with the landing root", async () => {
+    const res = await get(app, `/api/git/worktrees?dir=${encodeURIComponent(opsDir)}`);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.isRepo).toBe(true);
+    expect(body.root).toBe(path.join(path.dirname(body.mainPath), "worktrees"));
+    expect(body.worktrees).toHaveLength(1);
+    expect(body.worktrees[0]).toMatchObject({ isMain: true, current: true });
+  });
+
+  it("creates an isolated worktree with a wt/<name> branch", async () => {
+    const res = await post(app, "/api/git/worktree-create", { dir: opsDir, name: "fix-login-race" });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body).toMatchObject({ ok: true, branch: "wt/fix-login-race" });
+    expect(fs.existsSync(path.join(body.path, "a.md"))).toBe(true);
+
+    // 当前检出不受影响
+    const status = await get(app, `/api/git/status?dir=${encodeURIComponent(opsDir)}`);
+    expect((await status.json()).currentBranch).toBe("feat/from-route");
+
+    const list = await get(app, `/api/git/worktrees?dir=${encodeURIComponent(opsDir)}`);
+    const linked = (await list.json()).worktrees
+      .find((entry: any) => entry.branch === "wt/fix-login-race");
+    expect(linked).toMatchObject({ isMain: false, current: false });
+
+    const again = await post(app, "/api/git/worktree-create", { dir: opsDir, name: "fix-login-race" });
+    expect(again.status).toBe(400);
+    expect((await again.json()).code).toBe("exists");
+  });
+
+  it("stashes a single file, lists it, and takes it back through the route", async () => {
+    fs.writeFileSync(path.join(opsDir, "a.md"), "one\nroute-single\n");
+    const stashed = await post(app, "/api/git/stash", { dir: opsDir, paths: ["a.md"], message: "route single" });
+    expect(stashed.status).toBe(200);
+    expect(await stashed.json()).toMatchObject({ ok: true, paths: ["a.md"] });
+
+    const list = await get(app, `/api/git/stashes?dir=${encodeURIComponent(opsDir)}`);
+    expect(list.status).toBe(200);
+    const stashes = (await list.json()).stashes;
+    expect(stashes[0]).toMatchObject({ ref: "stash@{0}", tracked: ["a.md"] });
+
+    const back = await post(app, "/api/git/unstash", { dir: opsDir, path: "a.md" });
+    expect(back.status).toBe(200);
+    expect(await back.json()).toMatchObject({ ok: true, path: "a.md" });
+    expect(fs.readFileSync(path.join(opsDir, "a.md"), "utf-8")).toBe("one\nroute-single\n");
+  });
+
+  it("refuses to take back a dirty file, unknown paths and unsafe paths", async () => {
+    const dirty = await post(app, "/api/git/unstash", { dir: opsDir, path: "a.md" });
+    expect(dirty.status).toBe(400);
+    expect((await dirty.json()).code).toBe("path_dirty");
+
+    const missing = await post(app, "/api/git/unstash", { dir: opsDir, path: "nope.txt" });
+    expect(missing.status).toBe(400);
+    expect((await missing.json()).code).toBe("not_in_stash");
+
+    const badStash = await post(app, "/api/git/stash", { dir: opsDir, paths: ["../escape"] });
+    expect(badStash.status).toBe(400);
+    expect((await badStash.json()).code).toBe("invalid_path");
+
+    const badDiscard = await post(app, "/api/git/discard", { dir: opsDir, paths: ["/etc/passwd"] });
+    expect(badDiscard.status).toBe(400);
+    expect((await badDiscard.json()).code).toBe("invalid_path");
+  });
+
+  it("discards a single file and reports nothing_to_discard afterwards", async () => {
+    const discarded = await post(app, "/api/git/discard", { dir: opsDir, paths: ["a.md"] });
+    expect(discarded.status).toBe(200);
+    expect(await discarded.json()).toMatchObject({ ok: true, paths: ["a.md"] });
+    expect(fs.readFileSync(path.join(opsDir, "a.md"), "utf-8")).toBe("one\n");
+
+    const again = await post(app, "/api/git/discard", { dir: opsDir, paths: ["a.md"] });
+    expect(again.status).toBe(400);
+    expect((await again.json()).code).toBe("nothing_to_discard");
+  });
+
+  it("pops the stash stack and reports no_stash once it is empty", async () => {
+    let guard = 0;
+    for (;;) {
+      const list = await (await get(app, `/api/git/stashes?dir=${encodeURIComponent(opsDir)}`)).json();
+      if (list.stashes.length === 0) break;
+      // 先回退残留改动：整条弹出是三方合并，工作区脏了会被 git 拒绝
+      await post(app, "/api/git/discard", { dir: opsDir });
+      const popped = await post(app, "/api/git/unstash", { dir: opsDir });
+      expect(popped.status).toBe(200);
+      guard += 1;
+      expect(guard).toBeLessThan(10);
+    }
+    const none = await post(app, "/api/git/unstash", { dir: opsDir });
+    expect(none.status).toBe(400);
+    expect((await none.json()).code).toBe("no_stash");
+  });
+
+  it("rejects unapproved dirs and missing names on the new endpoints", async () => {
+    const outside = fs.mkdtempSync(path.join(os.tmpdir(), "hana-git-route-outside-"));
+    try {
+      for (const [url, payload] of [
+        ["/api/git/create-branch", { dir: outside, name: "x" }],
+        ["/api/git/stash", { dir: outside }],
+        ["/api/git/worktree-create", { dir: outside, name: "x" }],
+      ] as [string, Record<string, unknown>][]) {
+        const res = await post(app, url, payload);
+        expect(res.status).toBe(400);
+        expect((await res.json()).error).toBe("invalid dir");
+      }
+      const noName = await post(app, "/api/git/worktree-create", { dir: opsDir });
+      expect(noName.status).toBe(400);
+      expect((await noName.json()).error).toBe("name required");
+    } finally {
+      fs.rmSync(outside, { recursive: true, force: true });
+    }
+  });
+});

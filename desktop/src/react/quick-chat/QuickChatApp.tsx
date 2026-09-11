@@ -10,12 +10,16 @@ import { PlanModeButton, type PermissionMode } from '../components/input/PlanMod
 import { SendButton } from '../components/input/SendButton';
 import { AttachedFilesBar } from '../components/input/AttachedFilesBar';
 import { ChatTranscript } from '../components/chat/ChatTranscript';
+import { RunningStatusLine } from '../components/chat/RunningStatusLine';
+import { ModelSelector } from '../components/input/ModelSelector';
 import { handleServerMessage } from '../services/ws-message-handler';
 import { useStore } from '../stores';
 import { sessionScopedListIncludes, sessionScopedValue } from '../stores/session-slice';
 import { applyAgentIdentity, loadAvatars } from '../stores/agent-actions';
 import { loadMessages } from '../stores/session-actions';
 import type { ForkedSessionRef } from '../stores/message-turn-actions';
+import type { SessionModel } from '../stores/chat-types';
+import type { Model } from '../types';
 import { useI18n } from '../hooks/use-i18n';
 import inputStyles from '../components/input/InputArea.module.css';
 import chatStyles from '../components/chat/Chat.module.css';
@@ -157,6 +161,10 @@ export function QuickChatApp() {
   const [agents, setAgents] = useState<AgentOption[]>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [permissionMode, setPermissionMode] = useState<PermissionMode>('ask');
+  // 模型选择器在快捷窗里自持状态：不写主窗口的 currentSessionPath / sessionModelsByPath，
+  // 只把 /api/models 的结果与本会话的模型读到本地，切换时按本窗 sessionPath 走 per-session 分支。
+  const [models, setModels] = useState<Model[]>([]);
+  const [sessionModel, setSessionModel] = useState<SessionModel | undefined>(undefined);
   const [draft, setDraft] = useState('');
   const [attachments, setAttachments] = useState<QuickAttachment[]>([]);
   const [sessionPath, setSessionPath] = useState<string | null>(null);
@@ -203,6 +211,30 @@ export function QuickChatApp() {
   const applyRuntimePermissionMode = useCallback((mode: PermissionMode) => {
     permissionModeRef.current = mode;
     setPermissionMode(mode);
+  }, []);
+
+  /**
+   * 应用 /api/models 结果。
+   *
+   * 与主窗口 loadModels 同口径：`activeModel` 决定 isCurrent 与「本会话当前模型」。
+   * 差别只在落点——主窗口写全局 store，快捷窗只在本地持有，避免污染主窗口的
+   * currentSessionPath / sessionModelsByPath（两个窗口各有自己的 zustand 实例）。
+   */
+  const applyQuickChatModels = useCallback((data: { models?: unknown; activeModel?: unknown }) => {
+    const list = Array.isArray(data?.models) ? data.models as Model[] : [];
+    const active = data?.activeModel as { id?: string; provider?: string } | null | undefined;
+    if (!active?.id || !active?.provider) {
+      setModels(list);
+      setSessionModel(undefined);
+      return;
+    }
+    setModels(list.map(model => ({
+      ...model,
+      isCurrent: model.id === active.id && model.provider === active.provider,
+    })));
+    // 会话模型要 name 等完整字段：命中列表就用列表项，不拿 activeModel 拼半个对象。
+    const matched = list.find(model => model.id === active.id && model.provider === active.provider);
+    setSessionModel(matched ? { ...matched, available: true } : undefined);
   }, []);
 
   const applyRuntimeAgentList = useCallback((
@@ -296,7 +328,7 @@ export function QuickChatApp() {
         useStore.getState().setLocalServerConnection?.(serverPort ?? null, serverToken ?? null);
         useStore.setState({ connected: true });
 
-        const [agentsRes, healthRes, configRes, permissionRes, prefsRes] = await Promise.all([
+        const [agentsRes, healthRes, configRes, permissionRes, prefsRes, modelsRes] = await Promise.all([
           fetch(buildConnectionUrl(local, '/api/agents?fresh=1'), {
             headers: appendConnectionAuth(local),
           }),
@@ -312,13 +344,17 @@ export function QuickChatApp() {
           fetch(buildConnectionUrl(local, '/api/preferences/quick-chat'), {
             headers: appendConnectionAuth(local),
           }),
+          fetch(buildConnectionUrl(local, '/api/models'), {
+            headers: appendConnectionAuth(local),
+          }),
         ]);
-        const [agentsData, healthData, configData, permissionData, prefsData] = await Promise.all([
+        const [agentsData, healthData, configData, permissionData, prefsData, modelsData] = await Promise.all([
           agentsRes.json(),
           healthRes.json(),
           configRes.json(),
           permissionRes.json(),
           prefsRes.json(),
+          modelsRes.json().catch(() => ({})),
         ]);
         if (cancelled) return;
         const quickChatPrefs = normalizeQuickChatPreferences(prefsData?.quickChat);
@@ -337,6 +373,7 @@ export function QuickChatApp() {
           ui: { avatars: false, agents: false, welcome: true },
         });
         if (cancelled) return;
+        applyQuickChatModels(modelsData);
         loadAvatars(healthData.avatars, healthData.agentId);
 
         const nextAgents = Array.isArray(agentsData.agents) ? agentsData.agents : [];
@@ -741,7 +778,12 @@ export function QuickChatApp() {
                       />
                     )}
                     {isStreaming && (
-                      <div className={chatStyles.typingIndicator} />
+                      <RunningStatusLine
+                        sessionPath={sessionPath ?? ''}
+                        pending={sending}
+                        knowledgeRetrieving={false}
+                        agentName={normalizeAgentName(selectedAgent)}
+                      />
                     )}
                   </div>
                 </div>
@@ -812,6 +854,15 @@ export function QuickChatApp() {
                 </span>
                 <span className={styles.agentName}>{normalizeAgentName(selectedAgent)}</span>
               </div>
+
+              {/* 模型与本会话绑定：sessionPath 由本窗显式传入，不依赖主窗口的全局路径。 */}
+              <ModelSelector
+                models={models}
+                sessionModel={sessionModel}
+                isStreaming={isStreaming}
+                sessionPath={sessionPath}
+                onSessionModelChange={setSessionModel}
+              />
 
               <SendButton
                 isStreaming={false}

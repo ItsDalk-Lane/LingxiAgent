@@ -26,7 +26,8 @@
     }
   },
   "selection": {
-    "quoteToChat": "引用到對話"
+    "quoteToChat": "引用到對話",
+    "openInSideChat": "在側邊聊天中對話"
   },
   "mermaid": {
     "viewSource": "查看原始碼",
@@ -411,17 +412,37 @@
     "back": "返回"
   },
   "chat": {
-        "historyOverview": {
-          "records": "原始歷史記錄",
-          "runs": "邏輯輪次",
-          "tasks": "關聯任務",
-          "taskSubagent": "子代理",
-          "taskWorkflow": "工作流",
-          "taskMedia": "媒體生成",
-          "taskOther": "其他",
-          "unknown": "統計暫不可用",
-          "detail": "子代理 {subagent} · 工作流 {workflow} · 媒體 {media} · 其他 {other}"
-        },
+    "fileRollback": {
+      "menuTitle": "重新生成",
+      "conversationOnly": "僅回退對話",
+      "withFiles": "回退對話+撤銷檔案改動",
+      "withFilesCount": "回退對話+撤銷檔案改動（{count} 個檔案）",
+      "withFilesDegraded": "回退對話+撤銷檔案改動（快照失敗，用備份倒推）",
+      "disabledOff": "需先在設定 → 介面中開啟「回退時撤銷檔案改動」",
+      "disabledNoCheckpoint": "該輪沒有檔案檢查點",
+      "disabledUnavailable": "工作區檢查點不可用",
+      "confirmTitle": "回退對話並撤銷檔案改動",
+      "confirmBody": "將把工作區還原到該輪開始前的狀態，以下 {count} 個檔案會被覆蓋：",
+      "confirmWarning": "該輪開始以來的所有改動（含你手動改的）都會被覆蓋，請確認。",
+      "confirmAction": "確認回退",
+      "reportTitle": "檔案回退報告",
+      "reportAllOk": "{count} 個檔案已還原",
+      "reportPartial": "{failed} 個檔案還原失敗，{count} 個成功",
+      "reportDegraded": "該輪快照不可用，已用 write/edit 改前備份倒推",
+      "reportSourceBackup": "來源：改前備份",
+      "dismiss": "知道了"
+    },
+    "historyOverview": {
+      "records": "原始歷史記錄",
+      "runs": "邏輯輪次",
+      "tasks": "關聯任務",
+      "taskSubagent": "子代理",
+      "taskWorkflow": "工作流",
+      "taskMedia": "媒體生成",
+      "taskOther": "其他",
+      "unknown": "統計暫不可用",
+      "detail": "子代理 {subagent} · 工作流 {workflow} · 媒體 {media} · 其他 {other}"
+    },
     "knowledgeResearchInterrupted": "調查已中斷",
     "knowledgeResearchStopIncomplete": "調查流程未正常結束",
     "knowledgeResearchStopUnavailable": "調查所需工具無法使用",
@@ -490,6 +511,19 @@
     "knowledgeMetaUnavailable": "知識檢索不可用",
     "knowledgeMetaDegradedTitle": "檢索已降級：{reason}",
     "knowledgeRetrieving": "知識庫檢索中",
+    "running": {
+      "working": "{name}正在工作中",
+      "thinking": "正在思考中",
+      "writing": "正在生成回答",
+      "reading": "正在讀取檔案",
+      "searching": "正在搜尋內容",
+      "editing": "正在編輯檔案",
+      "command": "正在執行命令",
+      "web": "正在查閱網頁",
+      "memory": "正在檢索記憶",
+      "knowledge": "正在檢索知識庫",
+      "tool": "正在執行工具 {name}"
+    },
     "knowledgeRetrievalSearched": "已搜尋 {n} 個結果",
     "knowledgeRetrievalShowMore": "顯示更多（還有 {n} 條）",
     "knowledgeRetrievalTruncated": "超預算分片",
@@ -1539,6 +1573,8 @@
       "sidebar": "側邊欄",
       "sessionListSingleLine": "會話列表單行顯示",
       "sessionListSingleLineHint": "開啟後，每條會話只佔一行；滑鼠懸停時右側按鈕出現，標題自動縮短並顯示省略號。",
+      "rollbackFileChanges": "回退時撤銷檔案改動",
+      "rollbackFileChangesHint": "開啟後，重新生成或編輯後重送時可選「回退對話+撤銷檔案改動」，把工作區檔案還原到該輪開始前。預設關閉。",
       "shortcuts": "快捷鍵",
       "voiceRecordingShortcut": "語音錄製/傳送",
       "voiceRecordingShortcutHint": "主聊天頁面聚焦時，按一次開始錄音，再按一次結束並傳送。"
@@ -3868,8 +3904,7 @@
       "title": "背景動態"
     },
     "todo": {
-      "title": "進程",
-      "waitForOutput": "輸出完成後再標記"
+      "title": "進程"
     },
     "subagent": {
       "title": "子助手",
@@ -3958,9 +3993,18 @@
     "noBranches": "沒有本地分支",
     "switchDone": "已切換到 {name}",
     "switchFailed": "切換分支失敗",
+    "newBranch": "新建分支…",
+    "newBranchPlaceholder": "新分支名稱",
+    "createBranch": "建立並切換",
+    "createBranchDone": "已建立並切換到 {name}",
+    "createBranchFailed": "建立分支失敗",
+    "branchExists": "分支已存在",
+    "invalidBranchName": "分支名稱不合法",
+    "branchMissing": "基線分支不存在",
     "branchesTitle": "切換分支",
     "changesTitle": "變更檔案",
     "noChanges": "暫無變更",
+    "noChangesWithStash": "工作區沒有未提交的改動；儲藏裡還有 {n} 條，可點「取出全部」取回。",
     "diffBinary": "二進位檔案，不支援檢視 diff",
     "diffUnavailable": "無法讀取 diff",
     "diffTruncated": "內容過長，已截斷顯示",
@@ -3984,9 +4028,59 @@
     "noRemote": "未設定遠端儲存庫",
     "aiGenerating": "正在產生提交訊息…",
     "aiFailed": "提交訊息產生失敗",
+    "genMessage": "AI 生成",
+    "genMessageHint": "讓模型依目前變更生成提交訊息（只回填輸入框，不提交）",
+    "aiGeneratingShort": "生成中…",
     "commitDone": "提交完成",
     "pushDone": "推送完成",
-    "operationFailed": "操作失敗"
+    "nothingToStash": "沒有可暫存的修改",
+    "stashOne": "暫存",
+    "unstashOne": "取出",
+    "discardOne": "回退",
+    "stashAll": "暫存全部",
+    "unstashAll": "取出全部",
+    "discardAll": "回退全部",
+    "stashCount": "儲藏 {n} 條",
+    "stashFileDone": "已暫存 {name}",
+    "stashFileFailed": "暫存失敗",
+    "stashAllLabel": "暫存全部改動",
+    "stashAllDone": "已暫存全部改動",
+    "unstashFileDone": "已取出 {name}",
+    "unstashFileFailed": "取出失敗",
+    "unstashAllDone": "已取出最新一筆儲藏",
+    "unstashNoStash": "沒有儲藏項目",
+    "unstashNotInStash": "該檔案不在任何儲藏裡",
+    "unstashPathDirty": "該檔案目前有未提交的改動，取出會覆蓋它，請先回退或提交",
+    "unstashConflict": "取出時發生衝突，儲藏項目已保留，請手動處理後重試",
+    "discardOneHint": "丟棄該檔案未提交的改動，還原成 HEAD（不可復原）",
+    "discardUntrackedHint": "未跟蹤的新檔案不參與回退，避免誤刪",
+    "discardFileDone": "已回退 {name}",
+    "discardAllDone": "已回退全部已跟蹤改動",
+    "discardFailed": "回退失敗",
+    "discardNothing": "沒有可回退的改動",
+    "discardConfirmTitle": "回退修改",
+    "discardConfirmOk": "確認回退",
+    "discardConfirmAll": "將丟棄全部已跟蹤檔案的未提交改動（含已暫存部分），無法復原。未跟蹤的新檔案不受影響。",
+    "discardConfirmFiles": "將丟棄這 {count} 個檔案的未提交改動（含已暫存部分），無法復原：\n{list}",
+    "operationFailed": "操作失敗",
+    "worktreeRow": "新增工作樹",
+    "worktreeTitle": "在 worktree 中開始新會話",
+    "worktreeDesc": "在目前專案所在的同一上層目錄（{root}）建立隔離 worktree，攜帶新分支 wt/<名稱>，並在其中開啟新會話。目前檢出不受影響。",
+    "worktreeDescNoRoot": "在目前專案所在的同一上層目錄建立隔離 worktree，攜帶新分支 wt/<名稱>，並在其中開啟新會話。目前檢出不受影響。",
+    "worktreeNameLabel": "worktree 名稱",
+    "worktreeNamePlaceholder": "例如 fix-login-race",
+    "invalidWorktreeName": "名稱只能使用字母、數字與 . _ -，且以字母或數字開頭",
+    "worktreeBaseLabel": "基線分支",
+    "worktreeBaseHead": "目前 HEAD",
+    "worktreeCreate": "建立並開始會話",
+    "worktreeCreating": "正在建立…",
+    "worktreeDone": "已在 {name} 中開啟新會話",
+    "worktreeFailed": "建立工作樹失敗",
+    "worktreeOpenFailed": "工作樹已建立，但註冊成工作台失敗，未能開啟新會話",
+    "worktreeDirExists": "同名目錄已存在，請換個名稱",
+    "worktreeBranchExists": "此名稱對應的 wt/ 分支已存在，請換個名稱",
+    "worktreeMainTag": "主",
+    "worktreeCurrentTag": "目前"
   },
   "desk": {
     "title": "書桌",
@@ -4010,6 +4104,12 @@
     "emptyHint": "書桌是助手日常巡檢的工作台，也是每次對話的預設目錄\n去設定裡指定一個資料夾吧",
     "goToSettings": "前往設定",
     "fileLabel": "檔案",
+    "mentionToChat": {
+      "title": "加入對話",
+      "label": "把「{name}」加入對話",
+      "file": "檔案",
+      "folder": "資料夾"
+    },
     "openWithDefault": "用預設應用程式打開",
     "refresh": "重新整理",
     "newMarkdownFileName": "未命名.md",
@@ -5017,8 +5117,12 @@
     "fileCount": "{n} 個檔案",
     "copyRetained": "複製已保留輸出",
     "terminalRetained": "終端僅保留最近輸出，可複製內容與目前預覽一致"
-  }
-,
+  },
+  "duration": {
+    "seconds": "{seconds}秒",
+    "minutes": "{minutes}分{seconds}秒",
+    "hours": "{hours}小時{minutes}分{seconds}秒"
+  },
   "todoPanel": {
     "title": "任務",
     "expand": "展開清單",
@@ -5034,12 +5138,16 @@
     "moreInProgress": "另有 {n} 項進行中",
     "stopped": "本輪已停止，仍有未完成任務",
     "updateFailed": "清單更新失敗，已保留上一份清單",
-    "confirmComplete": "確認剩餘任務已完成",
-    "cancelRemaining": "取消剩餘任務",
-    "cancelNote": "只改變這份計畫，不會終止終端機進程、工作流或其他背景任務",
     "dismiss": "收納",
-    "waitForOutput": "輸出完成後再操作",
     "blockedReason": "受阻：{reason}",
     "cancelledLabel": "已取消"
+  },
+  "sideChat": {
+    "title": "側邊對話",
+    "close": "關閉側邊對話",
+    "creating": "正在建立側邊會話…",
+    "createFailed": "側邊會話建立失敗",
+    "retry": "重試",
+    "empty": "側邊會話已就緒，可以開始提問了"
   }
 }

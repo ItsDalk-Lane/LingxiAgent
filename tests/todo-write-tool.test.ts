@@ -200,4 +200,45 @@ describe("todo_write tool", () => {
     expect(warnSpy).not.toHaveBeenCalled();
     warnSpy.mockRestore();
   });
+
+  describe("收尾验证提醒（机制 4b）", () => {
+    const done = (content: string) => ({ content, activeForm: `doing ${content}`, status: "completed" as const });
+
+    it("3+ 项全部完成且无验证类条目：结果文本追加提醒", async () => {
+      const tool = createTodoTool();
+      const result = await tool.execute("tc-1", {
+        todos: [done("实现功能"), done("改样式"), done("写文档")],
+      }, null, null, {});
+      expect(result.isError).not.toBe(true);
+      expect(result.content[0].text).toMatch(/no verification step/i);
+    });
+
+    it("清单含验证类条目：不追加提醒", async () => {
+      const tool = createTodoTool();
+      const result = await tool.execute("tc-1", {
+        todos: [done("实现功能"), done("改样式"), done("运行测试验证")],
+      }, null, null, {});
+      expect(result.content[0].text).not.toMatch(/no verification step/i);
+    });
+
+    it("少于 3 项：不追加提醒", async () => {
+      const tool = createTodoTool();
+      const result = await tool.execute("tc-1", {
+        todos: [done("实现功能"), done("改样式")],
+      }, null, null, {});
+      expect(result.content[0].text).not.toMatch(/no verification step/i);
+    });
+
+    it("并非全部完成（含 pending）：不追加提醒", async () => {
+      const tool = createTodoTool();
+      const result = await tool.execute("tc-1", {
+        todos: [
+          done("实现功能"),
+          done("改样式"),
+          { content: "部署", activeForm: "正在部署", status: "pending" },
+        ],
+      }, null, null, {});
+      expect(result.content[0].text).not.toMatch(/no verification step/i);
+    });
+  });
 });

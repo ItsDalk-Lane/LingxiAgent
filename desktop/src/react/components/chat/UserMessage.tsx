@@ -131,7 +131,7 @@ export const UserMessage = memo(function UserMessage({
       ? { role: 'user', entryId: message.sourceEntryId }
       : null
   ), [message.sourceEntryId]);
-  const { actions: nodeActions, busy: nodeActionBusy } = useSessionNodeActions({
+  const { actions: nodeActions, busy: nodeActionBusy, overlay: nodeActionOverlay } = useSessionNodeActions({
     sessionPath,
     target: readOnly || unresolvedDelivery ? null : turnTarget,
     retryMessage: message,
@@ -314,6 +314,7 @@ export const UserMessage = memo(function UserMessage({
           testId="user-message-footer-actions"
         />
       )}
+      {nodeActionOverlay}
     </div>
   );
 });

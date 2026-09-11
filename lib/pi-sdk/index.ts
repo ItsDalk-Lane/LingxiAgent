@@ -39,6 +39,7 @@ import {
 import { installAssistantStreamGuard } from "./stream-guard.ts";
 import { installModelCallStreamObserver, installModelCallTraceIngress } from "./model-call-stream-observer.ts";
 import { installToolOutcomeAdapter } from "./tool-outcome-adapter.ts";
+import { installTodoContextReminder } from "./todo-context-reminder.ts";
 import { installDesktopInputCommitObserver } from "./desktop-input-commit.ts";
 import {
   createFindTool,
@@ -85,6 +86,7 @@ export async function createAgentSession(options) {
   installModelCallStreamObserver(result?.session);
   installModelCallTraceIngress(result?.session);
   installDesktopInputCommitObserver(result?.session);
+  installTodoContextReminder(result?.session);
   return result;
 }
 

@@ -20,6 +20,7 @@ import {
   type AppFileDragPayload,
 } from './utils/app-file-drag';
 import { deskNativeRootDir } from './stores/desk-actions';
+import { blockChatAttachmentOutsideChatTab } from './utils/attach-workbench-item';
 import { BrowserCard } from './components/BrowserCard';
 import { ComputerUseOverlay } from './components/ComputerUseOverlay';
 
@@ -56,16 +57,6 @@ async function installSkillFile(filePath: string, sessionPath?: string | null): 
       'error',
     );
   }
-}
-
-function blockChatAttachmentDropOutsideChat(): boolean {
-  const currentTab = useStore.getState().currentTab;
-  if (currentTab === 'chat') return false;
-  useStore.getState().addToast(
-    currentTab === 'knowledge' ? t('knowledge.useImportButton') : t('channel.filesUnsupported'),
-    'error',
-  );
-  return true;
 }
 
 function chatAudioMimeTypeForName(name: string): string {
@@ -110,7 +101,7 @@ export async function attachFilesFromPaths(
   nameMap: Record<string, string> = {},
 ): Promise<void> {
   if (srcPaths.length === 0) return;
-  if (blockChatAttachmentDropOutsideChat()) return;
+  if (blockChatAttachmentOutsideChatTab()) return;
   if (useStore.getState().attachedFiles.length >= 9) return;
 
   // .skill 文件直接安装为用户技能，不当附件处理
@@ -191,7 +182,7 @@ export async function attachFilesFromPaths(
 
 export async function attachAppFileDragPayloadToInput(payload: AppFileDragPayload): Promise<void> {
   if (payload.files.length === 0) return;
-  if (blockChatAttachmentDropOutsideChat()) return;
+  if (blockChatAttachmentOutsideChatTab()) return;
   const state = useStore.getState();
   if (state.attachedFiles.length >= 9) return;
 

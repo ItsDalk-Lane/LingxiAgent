@@ -3,7 +3,6 @@
 .card {
     /* 立法：本模块一次性字面量收进定义行（扫描豁免位），使用点一律 var() */
     --git-hover-wash: rgba(90, 118, 139, 0.09);
-    --git-shadow-smoke: rgba(0, 0, 0, 0.08);
 
     flex: 0 0 auto;
     display: flex;
@@ -142,83 +141,57 @@
     font-size: var(--fs-hint);
 }
 
-/* ── 分支弹出列表 ── */
-.branchMenu {
-    background: var(--bg-card, var(--bg));
-    border: 1px solid var(--overlay-light);
-    border-radius: var(--radius-lg);
-    box-shadow: 0 8px 32px var(--shadow), 0 2px 8px var(--git-shadow-smoke);
-    padding: var(--space-8);
-    max-width: 300px;
+/* ── 本地行里的 worktree 清单 ──
+   每项两行：上行分支名（大、加粗），下行路径（小、次要色），字号差一档 */
+.worktreeList {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-10);
+    margin-top: var(--space-2);
 }
 
-.branchMenuTitle {
-    font-size: var(--fs-hint);
-    font-weight: 600;
-    color: var(--text-light);
-    padding: var(--space-2) var(--space-8);
-}
-
-.branchList {
+.worktreeItem {
     display: flex;
     flex-direction: column;
-    max-height: 260px;
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    gap: var(--space-2);
+    min-width: 0;
 }
 
-.branchItem {
+.worktreeHead {
     display: flex;
     align-items: center;
-    gap: var(--space-8);
-    min-height: 28px;
-    padding: var(--space-2) var(--space-8);
-    border: none;
-    border-radius: 5px;
-    background: transparent;
-    color: var(--text);
-    font: inherit;
-    font-size: var(--fs-caption);
-    text-align: left;
-    cursor: default;
+    gap: var(--space-6);
+    min-width: 0;
 }
 
-.branchItem:hover:not(:disabled) {
-    background: var(--git-hover-wash);
-}
-
-.branchItem:disabled {
-    opacity: 0.6;
-}
-
-.branchItemName {
-    flex: 1 1 auto;
+.worktreeName {
+    flex: 0 1 auto;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.branchItemCurrent {
-    color: var(--accent);
+    color: var(--text);
+    font-size: var(--fs-body);
     font-weight: 600;
 }
 
-.branchCurrentMark {
+.worktreeTag {
     flex-shrink: 0;
+    padding: 0 var(--space-4);
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
     color: var(--accent);
-}
-
-.branchBusy {
-    flex-shrink: 0;
-    color: var(--text-light);
-}
-
-.branchEmpty {
-    padding: var(--space-8);
     font-size: var(--fs-hint);
-    color: var(--text-light);
 }
+
+.worktreePath {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-light);
+    font-size: var(--fs-hint);
+}
+
+/* ── 分支弹出列表 ──
+   浮层本体与分支项都在 GitBranchList.module.css（与提交弹窗共用） */

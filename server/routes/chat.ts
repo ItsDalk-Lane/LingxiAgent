@@ -102,11 +102,7 @@ const TODO_AUTO_DISMISS_MESSAGE =
 export function dismissFinishedTodosOnPromptAccepted(engine, sessionPath) {
   try {
     if (!sessionPath) return;
-    const liveSession = engine.getSessionByPath?.(sessionPath);
-    const manager = liveSession?.sessionManager
-      ?? (typeof engine.openSessionManagerAtCurrentBranch === "function"
-        ? engine.openSessionManagerAtCurrentBranch(sessionPath, path.dirname(sessionPath))
-        : null);
+    const manager = resolveTodoSessionManager(engine, sessionPath);
     if (!manager) return;
     const snapshot = extractLatestTodoSnapshot(manager.buildSessionContext?.().messages || []);
     if (!snapshot?.finished || snapshot.dismissed || snapshot.removed) return;
@@ -127,6 +123,50 @@ export function dismissFinishedTodosOnPromptAccepted(engine, sessionPath) {
     engine.emitEvent?.({ type: "todo_update", removed: true, dismissed: true, todos: [] }, sessionPath);
   } catch (err: any) {
     log.warn(`auto-dismiss finished todos failed for ${sessionPath}: ${err?.message || err}`);
+  }
+}
+
+function resolveTodoSessionManager(engine, sessionPath) {
+  const liveSession = engine.getSessionByPath?.(sessionPath);
+  return liveSession?.sessionManager
+    ?? (typeof engine.openSessionManagerAtCurrentBranch === "function"
+      ? engine.openSessionManagerAtCurrentBranch(sessionPath, path.dirname(sessionPath))
+      : null);
+}
+
+const TODO_CONTEXT_BLOCK_MARKER = "[Hana Todo] Authoritative task list state";
+
+/**
+ * 轮次注入（融合方案机制 2）：新 prompt 发送前，若存在未完成清单，把权威清单
+ * 状态拼进 promptText（不动 displayMessage，用户气泡不可见）。
+ * 借鉴 openclaude todo_reminder 的重注入思想，但数据源是持久化快照——
+ * 跨中断、跨重启、跨压缩都正确（openclaude 从内存 appState 读，重启即空）。
+ * 与自动收纳互斥：已结束 → dismissFinishedTodosOnPromptAccepted；
+ * 未完成 → 本函数注入。返回 null 表示无需注入。
+ */
+export function buildTodoContextBlockForPrompt(engine, sessionPath) {
+  try {
+    if (!sessionPath) return null;
+    const manager = resolveTodoSessionManager(engine, sessionPath);
+    if (!manager) return null;
+    const snapshot = extractLatestTodoSnapshot(manager.buildSessionContext?.().messages || []);
+    if (!snapshot || snapshot.removed || snapshot.dismissed) return null;
+    const todos = Array.isArray(snapshot.todos) ? snapshot.todos : [];
+    const unfinished = todos.filter((td) => td.status !== "completed" && td.status !== "cancelled");
+    if (unfinished.length === 0) return null;
+
+    const lines = todos.map((td, i) => {
+      const reason = td.status === "blocked" && td.blockedReason ? ` (blocked: ${td.blockedReason})` : "";
+      return `${i + 1}. [${td.status}] ${td.content}${reason}`;
+    });
+    return [
+      `${TODO_CONTEXT_BLOCK_MARKER} at the start of this turn (snapshot ${snapshot.version}):`,
+      ...lines,
+      "Items marked in_progress are not necessarily running right now (the previous turn may have been stopped); verify their real state before continuing. Continue from this list and keep finished items as they are; rewrite the whole list only when the plan itself changes.",
+    ].join("\n");
+  } catch (err: any) {
+    log.warn(`build todo context block failed for ${sessionPath}: ${err?.message || err}`);
+    return null;
   }
 }
 
@@ -1583,7 +1623,9 @@ export function createChatRoute(engine: any, hub: any, {
         ...(outcome.error ? { error: outcome.error } : {}),
         details: {
           // 既有待办与文件登记仍消费这些字段；其他内部结果不直接广播到详情。
-          ...Object.fromEntries(["todos", "sessionFile", "sessionFileRef", "writableLocalRef"]
+          // todoVersion 必须随 todos 一起透传：缺失会让前端把 v2 快照误判为
+          // v1 旧格式（全完成即移除），与历史恢复管道的语义分裂。
+          ...Object.fromEntries(["todos", "todoVersion", "sessionFile", "sessionFileRef", "writableLocalRef"]
             .filter((key) => event.result?.details?.[key] !== undefined)
             .map((key) => [key, event.result.details[key]])),
           ...outcome.details,
@@ -2719,6 +2761,12 @@ export function createChatRoute(engine: any, hub: any, {
               }
               const sessionRefBlock = buildSessionReferenceBlock(sessionRefs);
               if (sessionRefBlock) promptText = `${promptText}\n\n${sessionRefBlock}`;
+              // 轮次注入（机制 2）：未完成清单的权威状态随本轮交给模型（用户气泡不可见）。
+              // 拒绝/发送失败时只改了局部变量，不产生任何持久副作用。
+              const todoContextBlock = buildTodoContextBlockForPrompt(engine, promptSessionPath);
+              if (todoContextBlock && !promptText.includes(TODO_CONTEXT_BLOCK_MARKER)) {
+                promptText = `${promptText}\n\n${todoContextBlock}`;
+              }
               try {
                 await hub.send(promptText, {
                   sessionId: promptTarget.sessionId,

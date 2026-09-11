@@ -78,26 +78,120 @@
 }
 
 .fileRow {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) max-content;
+  display: flex;
   align-items: center;
-  gap: var(--space-12);
+  gap: var(--space-8);
   width: 100%;
   min-height: 32px;
   padding: var(--space-4) var(--space-8);
-  background: transparent;
-  border: 1px solid transparent;
   border-radius: var(--radius-input, 6px);
-  cursor: default;
-  color: var(--text, #3b3d3f);
-  font-family: inherit;
-  font-size: var(--fs-caption);
-  text-align: left;
   transition: background var(--duration-fast) ease;
 }
 
 .fileRow:hover {
   background: var(--overlay-light, rgba(0, 0, 0, 0.05));
+}
+
+/* 行主体：点开/收起该文件的 diff */
+.fileMain {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: var(--space-12);
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  cursor: default;
+  color: var(--text, #3b3d3f);
+  font-family: inherit;
+  font-size: var(--fs-caption);
+  text-align: left;
+}
+
+/* ── 顶部整体操作条 ── */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  padding: var(--space-4) var(--space-8) var(--space-8);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  flex-shrink: 0;
+}
+
+.stashCount {
+  font-size: var(--fs-hint);
+  color: var(--text-muted, rgba(0, 0, 0, 0.55));
+  white-space: nowrap;
+}
+
+.toolbarActions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+/* ── 行级操作（暂存 / 取出 / 回退）── */
+
+.fileActions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-shrink: 0;
+}
+
+.fileBtn,
+.fileBtnDanger,
+.toolBtn,
+.toolBtnDanger {
+  min-height: 24px;
+  padding: 0 var(--space-8);
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.14));
+  border-radius: var(--radius-input, 6px);
+  background: var(--bg-card, #fff);
+  color: var(--text-muted, rgba(0, 0, 0, 0.6));
+  font-family: inherit;
+  font-size: var(--fs-hint);
+  cursor: default;
+  white-space: nowrap;
+  transition: border-color var(--duration-fast) ease, color var(--duration-fast) ease;
+}
+
+.toolBtn,
+.toolBtnDanger {
+  min-height: 26px;
+  padding: 0 var(--space-12);
+  color: var(--text, #3b3d3f);
+  font-size: var(--fs-caption);
+}
+
+.fileBtn:hover:not(:disabled),
+.toolBtn:hover:not(:disabled) {
+  border-color: var(--accent, rgba(0, 0, 0, 0.35));
+  color: var(--accent, rgba(0, 0, 0, 0.85));
+}
+
+.fileBtnDanger,
+.toolBtnDanger {
+  color: var(--danger, #8B3A3A);
+}
+
+.fileBtnDanger:hover:not(:disabled),
+.toolBtnDanger:hover:not(:disabled) {
+  border-color: var(--danger, #8B3A3A);
+  color: var(--danger, #8B3A3A);
+}
+
+.fileBtn:disabled,
+.fileBtnDanger:disabled,
+.toolBtn:disabled,
+.toolBtnDanger:disabled {
+  opacity: 0.45;
 }
 
 .fileName {

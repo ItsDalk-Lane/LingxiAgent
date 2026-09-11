@@ -3,7 +3,8 @@
  *
  * 集成部分在临时目录里跑真实 git（init/commit/worktree），锁定
  * collectGitStatus / worktreeInfo / fileDiff / commitChanges / pushChanges
- * 的行为契约：环境信息卡的四行数据全部来自这些函数。
+ * 以及 createBranch / stashChanges / createWorktree 的行为契约：环境信息卡的
+ * 各行数据与操作全部来自这些函数。
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { execFile } from "node:child_process";
@@ -15,17 +16,26 @@ import {
   collectGitStatus,
   commitChanges,
   checkoutBranch,
+  createBranch,
+  createWorktree,
+  discardPaths,
   fileDiff,
   isSafeRelPath,
   isValidBranchName,
+  isValidWorktreeName,
   listBranches,
   listCommits,
+  listStashes,
+  listWorktrees,
   parseForEachBranchRef,
   parseLogRecords,
   parseNumstatZ,
   parseWorktreePorcelain,
+  popStash,
   pushChanges,
+  restoreStashedPath,
   runGit,
+  stashChanges,
   worktreeInfo,
 } from "../server/git/git-command.ts";
 
@@ -319,5 +329,245 @@ describe("checkout / commit / push (real repo)", () => {
     const second = commits[1];
     expect(head.parents[0]).toBe(second.hash);
     expect(head.shortHash).toMatch(/^[0-9a-f]{7,}$/);
+  });
+});
+
+// ────────────────────────── 分支创建 / 暂存 / 工作树 ──────────────────────────
+
+/**
+ * 独立临时仓（父级目录也独立）：worktree 落地根是 <主工作树父级>/worktrees，
+ * 共用 os.tmpdir() 会让并行测试文件互相踩，所以仓建在自己的一层父目录下。
+ */
+describe("createBranch / stashChanges / worktrees (real repo)", () => {
+  let parentDir = "";
+  let opsDir = "";
+  let worktreesRoot = "";
+
+  beforeAll(async () => {
+    parentDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-git-cmd-ops-"));
+    opsDir = path.join(parentDir, "repo");
+    fs.mkdirSync(opsDir);
+
+    try {
+      await git(opsDir, ["init", "-b", "main"]);
+    } catch {
+      await git(opsDir, ["init"]);
+    }
+    await git(opsDir, ["config", "user.name", "Lingxi Test"]);
+    await git(opsDir, ["config", "user.email", "test@lingxi.local"]);
+    write(opsDir, "a.md", "one\n");
+    await git(opsDir, ["add", "-A"]);
+    await git(opsDir, ["commit", "-m", "init"]);
+
+    const list = await listWorktrees(opsDir);
+    worktreesRoot = list.root ?? "";
+  });
+
+  afterAll(() => {
+    // 仓、worktree、worktrees/ 都在这个父目录下，整体删干净
+    if (parentDir) fs.rmSync(parentDir, { recursive: true, force: true });
+  });
+
+  it("isValidWorktreeName accepts slugs and rejects separators / dotfiles", () => {
+    expect(isValidWorktreeName("fix-login-race")).toBe(true);
+    expect(isValidWorktreeName("v1.2_x-3")).toBe(true);
+    expect(isValidWorktreeName("-nope")).toBe(false);
+    expect(isValidWorktreeName(".hidden")).toBe(false);
+    expect(isValidWorktreeName("a/b")).toBe(false);
+    expect(isValidWorktreeName("../escape")).toBe(false);
+    expect(isValidWorktreeName("")).toBe(false);
+  });
+
+  it("creates a branch and checks it out", async () => {
+    const result = await createBranch(opsDir, "feat/new-thing");
+    expect(result).toEqual({ ok: true, branch: "feat/new-thing" });
+    expect((await listBranches(opsDir)).current).toBe("feat/new-thing");
+  });
+
+  it("rejects existing branches, option-like names and missing bases", async () => {
+    expect(await createBranch(opsDir, "main")).toEqual({
+      ok: false, code: "already_exists", branch: "main",
+    });
+    expect(await createBranch(opsDir, "--upload-pack=evil")).toMatchObject({
+      ok: false, code: "invalid_name",
+    });
+    expect(await createBranch(opsDir, "from-missing", "no-such-base")).toMatchObject({
+      ok: false, code: "invalid_base",
+    });
+  });
+
+  it("stashes tracked + untracked changes and reports nothing_to_stash on a clean tree", async () => {
+    expect(await stashChanges(opsDir)).toEqual({ ok: false, code: "nothing_to_stash" });
+
+    write(opsDir, "a.md", "one\ntwo\n");
+    write(opsDir, "untracked.txt", "x\n");
+    expect(await stashChanges(opsDir, "wip: demo")).toEqual({ ok: true });
+
+    const status = await collectGitStatus(opsDir);
+    expect(status.files).toEqual([]);
+    expect(status.commitable).toBe(false);
+  });
+
+  it("lists worktrees with main/current markers and the shared landing root", async () => {
+    const list = await listWorktrees(opsDir);
+    expect(list.isRepo).toBe(true);
+    expect(list.mainPath).toBeTruthy();
+    expect(worktreesRoot).toBe(path.join(path.dirname(list.mainPath!), "worktrees"));
+    expect(list.worktrees).toHaveLength(1);
+    expect(list.worktrees[0]).toMatchObject({ isMain: true, current: true });
+  });
+
+  it("creates an isolated worktree on wt/<name> without touching the current checkout", async () => {
+    const before = await listBranches(opsDir);
+    const created = await createWorktree(opsDir, "fix-login-race");
+
+    expect(created.ok).toBe(true);
+    expect(created.branch).toBe("wt/fix-login-race");
+    expect(created.path).toBe(path.join(worktreesRoot, "fix-login-race"));
+    expect(fs.existsSync(path.join(created.path!, "a.md"))).toBe(true);
+
+    // 当前检出不受影响：仍在原来的分支上
+    expect((await listBranches(opsDir)).current).toBe(before.current);
+
+    const linked = (await listWorktrees(opsDir)).worktrees
+      .find(entry => entry.branch === "wt/fix-login-race");
+    expect(linked).toMatchObject({ isMain: false, current: false });
+
+    // 新分支确实落在新工作树里
+    const inWorktree = await listBranches(created.path!);
+    expect(inWorktree.current).toBe("wt/fix-login-race");
+  });
+
+  it("creates the worktree from an explicit base branch", async () => {
+    const created = await createWorktree(opsDir, "from-base", "main");
+    expect(created).toMatchObject({ ok: true, branch: "wt/from-base" });
+    const inWorktree = await listBranches(created.path!);
+    expect(inWorktree.current).toBe("wt/from-base");
+  });
+
+  it("refuses duplicate directory names, duplicate branches and bad names", async () => {
+    expect(await createWorktree(opsDir, "fix-login-race")).toMatchObject({
+      ok: false, code: "exists",
+    });
+    await git(opsDir, ["branch", "wt/taken"]);
+    expect(await createWorktree(opsDir, "taken")).toMatchObject({
+      ok: false, code: "branch_exists",
+    });
+    expect(await createWorktree(opsDir, "../escape")).toMatchObject({
+      ok: false, code: "invalid_name",
+    });
+    expect(await createWorktree(opsDir, "bad-base", "no-such-base")).toMatchObject({
+      ok: false, code: "invalid_base",
+    });
+  });
+
+  it("returns the isRepo:false placeholder for a non-git directory", async () => {
+    const plain = path.join(parentDir, "not-a-repo");
+    fs.mkdirSync(plain);
+    expect(await listWorktrees(plain)).toEqual({
+      isRepo: false, worktrees: [], root: null, mainPath: null,
+    });
+    expect(await createWorktree(plain, "nope")).toMatchObject({ ok: false, code: "create_failed" });
+  });
+
+  it("stashes a single path and takes it back without touching the others", async () => {
+    write(opsDir, "one.txt", "one\n");
+    write(opsDir, "two.txt", "two\n");
+    await git(opsDir, ["add", "-A"]);
+    await git(opsDir, ["commit", "-m", "two files"]);
+    write(opsDir, "one.txt", "one\nCHANGED\n");
+    write(opsDir, "two.txt", "two\nCHANGED\n");
+
+    const stashed = await stashChanges(opsDir, "wip one", ["one.txt"]);
+    expect(stashed).toMatchObject({ ok: true, paths: ["one.txt"] });
+    // 只收走了 one.txt，two.txt 仍在工作区
+    expect((await collectGitStatus(opsDir)).files.map(f => f.path)).toEqual(["two.txt"]);
+
+    const { stashes } = await listStashes(opsDir);
+    expect(stashes[0]).toMatchObject({ tracked: ["one.txt"], untracked: [] });
+
+    const back = await restoreStashedPath(opsDir, "one.txt");
+    expect(back).toMatchObject({ ok: true, path: "one.txt", stash: stashes[0].ref });
+
+    const restored = (await collectGitStatus(opsDir)).files.find(f => f.path === "one.txt");
+    expect(restored?.staged).toBe(false);
+    expect(fs.readFileSync(path.join(opsDir, "one.txt"), "utf-8")).toContain("CHANGED");
+    // 单个取出不动储藏条目本身
+    expect((await listStashes(opsDir)).stashes).toHaveLength(stashes.length);
+  });
+
+  it("takes back stashed untracked files and refuses dirty / unknown / unsafe paths", async () => {
+    write(opsDir, "fresh.txt", "brand new\n");
+    expect(await stashChanges(opsDir, "wip fresh", ["fresh.txt"])).toMatchObject({ ok: true });
+    expect(fs.existsSync(path.join(opsDir, "fresh.txt"))).toBe(false);
+
+    const { stashes } = await listStashes(opsDir);
+    expect(stashes[0]).toMatchObject({ tracked: [], untracked: ["fresh.txt"] });
+    expect(await restoreStashedPath(opsDir, "fresh.txt")).toMatchObject({ ok: true, path: "fresh.txt" });
+    expect(fs.readFileSync(path.join(opsDir, "fresh.txt"), "utf-8")).toBe("brand new\n");
+    // 取回后是未跟踪状态，不是被悄悄暂存
+    expect((await collectGitStatus(opsDir)).files.find(f => f.path === "fresh.txt"))
+      .toMatchObject({ state: "untracked", staged: false });
+
+    // 现行改动会被覆盖 → 拒绝
+    expect(await restoreStashedPath(opsDir, "two.txt")).toMatchObject({ ok: false, code: "path_dirty" });
+    // 不在任何储藏里
+    expect(await restoreStashedPath(opsDir, "b.md")).toMatchObject({ ok: false, code: "not_in_stash" });
+    // 非法路径：暂存 / 取出 / 回退 三处都拦
+    expect(await restoreStashedPath(opsDir, "../escape")).toMatchObject({ ok: false, code: "invalid_path" });
+    expect(await stashChanges(opsDir, null, ["-oops"])).toMatchObject({ ok: false, code: "invalid_path" });
+    expect(await discardPaths(opsDir, ["/etc/passwd"])).toMatchObject({ ok: false, code: "invalid_path" });
+  });
+
+  it("discards one file back to HEAD even when it was staged", async () => {
+    write(opsDir, "disc.txt", "base\n");
+    // 只提交这一个文件：one.txt / two.txt 的改动留着给「全部回退」用
+    await git(opsDir, ["add", "disc.txt"]);
+    await git(opsDir, ["commit", "-m", "disc base"]);
+    write(opsDir, "disc.txt", "base\nstaged\n");
+    await git(opsDir, ["add", "disc.txt"]);
+    write(opsDir, "disc.txt", "base\nstaged\nunstaged\n");
+
+    expect(await discardPaths(opsDir, ["disc.txt"])).toMatchObject({ ok: true, paths: ["disc.txt"] });
+    expect(fs.readFileSync(path.join(opsDir, "disc.txt"), "utf-8")).toBe("base\n");
+    expect((await collectGitStatus(opsDir)).files.find(f => f.path === "disc.txt")).toBeUndefined();
+
+    // 已经没有可回退的改动
+    expect(await discardPaths(opsDir, ["disc.txt"])).toMatchObject({ ok: false, code: "nothing_to_discard" });
+  });
+
+  it("discards every tracked change at once and leaves untracked files alone", async () => {
+    write(opsDir, "leave-me.txt", "new\n");
+    expect((await discardPaths(opsDir)).ok).toBe(true);
+
+    const status = await collectGitStatus(opsDir);
+    // 已跟踪改动全没了，未跟踪的新文件原样保留
+    expect(status.files.map(f => f.path).sort()).toEqual(["fresh.txt", "leave-me.txt"]);
+    expect(fs.existsSync(path.join(opsDir, "leave-me.txt"))).toBe(true);
+    expect(fs.readFileSync(path.join(opsDir, "one.txt"), "utf-8")).toBe("one\n");
+  });
+
+  it("pops the stash stack newest-first and reports no_stash when empty", async () => {
+    // 先把工作区彻底清干净：否则弹出含未跟踪文件的储藏会撞上同名文件
+    for (const name of fs.readdirSync(opsDir)) {
+      if (name === ".git") continue;
+      fs.rmSync(path.join(opsDir, name), { recursive: true, force: true });
+    }
+    await git(opsDir, ["checkout", "--", "."]);
+
+    const before = await listStashes(opsDir);
+    expect(before.stashes.length).toBeGreaterThanOrEqual(2);
+
+    let remaining = before.stashes.length;
+    while (remaining > 0) {
+      const newest = (await listStashes(opsDir)).stashes[0];
+      expect((await popStash(opsDir)).ok).toBe(true);
+      remaining -= 1;
+      expect((await listStashes(opsDir)).stashes).toHaveLength(remaining);
+      for (const rel of [...newest.tracked, ...newest.untracked]) {
+        expect(fs.existsSync(path.join(opsDir, ...rel.split("/")))).toBe(true);
+      }
+    }
+    expect(await popStash(opsDir)).toMatchObject({ ok: false, code: "no_stash" });
   });
 });

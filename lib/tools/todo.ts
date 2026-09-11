@@ -13,6 +13,10 @@
  *   （收尾摘要 / 收纳 / 用户取消）；失败结果不携带 todos 快照字段，
  *   实时与历史恢复据此保留最后一份有效清单（A13）。
  *
+ * 收尾验证提醒（融合方案机制 4b，借鉴 openclaude verificationNudge）：
+ * 一次性把 3+ 项清单全部标为 completed 且清单中没有任何验证类条目时，
+ * 在工具结果后追加提醒——在模型最容易跳过验证的精确时刻（收尾时）拦截。
+ *
  * 历史状态重建由 lib/tools/todo-compat.ts 的 extractLatestTodos 负责，
  * session_coordinator / sessions.js route 从 session entries 里读取。
  */
@@ -83,6 +87,25 @@ function buildSummary(todos) {
 }
 
 /**
+ * 验证类条目的识别（收尾验证提醒用）：content/activeForm 含验证语义词汇。
+ */
+const VERIFICATION_STEP_PATTERN = /verif|测试|test|check|验证|检查|核对|review|评审/i;
+
+/**
+ * 是否需要在结果后追加收尾验证提醒：3+ 项全部 completed 且没有验证类条目。
+ */
+function needsVerificationNudge(todos) {
+  if (!Array.isArray(todos) || todos.length < 3) return false;
+  if (!todos.every((td) => td.status === "completed")) return false;
+  return !todos.some(
+    (td) => VERIFICATION_STEP_PATTERN.test(td.content) || VERIFICATION_STEP_PATTERN.test(td.activeForm),
+  );
+}
+
+const VERIFICATION_NUDGE_TEXT =
+  "\n\nNote: you closed out a 3+ item list that contained no verification step. Before ending the turn, confirm every item is genuinely done and verified; if verification work is missing, do it now or honestly move the affected item back out of completed.";
+
+/**
  * 创建 todo_write 工具定义
  * @returns {import('../pi-sdk/index.ts').ToolDefinition}
  */
@@ -90,7 +113,7 @@ export function createTodoTool() {
   return {
     name: TODO_WRITE_TOOL_NAME,
     label: "Todo",
-    description: "Manage the session todo list for multi-step work. Decompose complex tasks into sub-tasks; not needed for simple single-step tasks. Each call replaces the full list (replacement style). Statuses: pending / in_progress / blocked / cancelled / completed. Multiple in_progress items are allowed when work is genuinely parallel. Mark an item blocked (with blockedReason saying what is missing) when it cannot continue; never mark blocked or cancelled items as completed. Items cancelled by the user stay cancelled unless the user explicitly reopens the work. Update each item as soon as it finishes instead of waiting for the whole list, and keep the list consistent with actual results before ending the reply.",
+    description: "Manage the session todo list for multi-step work. Decompose complex tasks into sub-tasks; skip it for simple single-step tasks. Each call replaces the entire list. Statuses: pending / in_progress / blocked / cancelled / completed. Multiple in_progress items are allowed when work is genuinely parallel. Discipline: mark an item in_progress BEFORE starting it and completed IMMEDIATELY when it finishes — never batch completions after the fact; do not let the list drift from reality while working; before ending the turn every item should reach a terminal state (completed/cancelled) or stay honestly unfinished. Never mark blocked or cancelled items as completed; blocked requires blockedReason (what is missing); items cancelled by the user stay cancelled unless the user explicitly reopens the work. If the previous turn was interrupted, reconcile against the authoritative list state injected at the start of this turn before rewriting the plan — items marked in_progress may have only partially executed. Only mark an item completed when it is truly done and verified.",
     parameters: Type.Object({
       todos: Type.Array(
         Type.Object({
@@ -135,8 +158,10 @@ export function createTodoTool() {
       }
 
       const summary = buildSummary(todos);
+      // 收尾验证提醒（机制 4b）：全部 completed 的 3+ 项清单且无验证类条目时追加。
+      const text = needsVerificationNudge(todos) ? summary + VERIFICATION_NUDGE_TEXT : summary;
       return {
-        content: [{ type: "text", text: summary }],
+        content: [{ type: "text", text }],
         details: { todos, todoVersion: TODO_FORMAT_VERSION },
       };
     },

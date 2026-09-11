@@ -433,12 +433,19 @@ function isGitEnvironmentRoute(verb, routePath) {
   if (verb !== "GET" && verb !== "POST") return false;
   return routePath === "/api/git/status"
     || routePath === "/api/git/worktree-info"
+    || routePath === "/api/git/worktrees"
     || routePath === "/api/git/branches"
     || routePath === "/api/git/log"
     || routePath === "/api/git/file-diff"
     || routePath === "/api/git/checkout"
+    || routePath === "/api/git/create-branch"
     || routePath === "/api/git/commit"
+    || routePath === "/api/git/stash"
+    || routePath === "/api/git/stashes"
+    || routePath === "/api/git/unstash"
+    || routePath === "/api/git/discard"
     || routePath === "/api/git/push"
+    || routePath === "/api/git/worktree-create"
     || routePath === "/api/git/ai-commit-message";
 }
 

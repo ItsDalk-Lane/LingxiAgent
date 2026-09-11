@@ -20,6 +20,7 @@ import {
   loadDeskTreeFiles,
 } from '../../stores/desk-actions';
 import { schedulePersistCurrentWorkspaceUiState } from '../../stores/workspace-ui-state-actions';
+import { attachWorkbenchItemToInput } from '../../utils/attach-workbench-item';
 import { isMarkdownFileName } from '../../utils/file-kind';
 import {
   canUseNativeResourcePath,
@@ -198,6 +199,11 @@ function dispatchDeskNotice(text: string): void {
   }));
 }
 
+/** 行内文案：翻译键缺失时回退到键名，避免渲染空白。 */
+function t(key: string, vars?: Record<string, string | number>): string {
+  return window.t?.(key, vars) ?? key;
+}
+
 function RenameInput({
   initialValue,
   disabled = false,
@@ -311,6 +317,7 @@ function TreeNode({
   onCommitRename,
   onCommitCreate,
   onCancelRename,
+  canMentionToChat,
 }: {
   file: DeskFile;
   parent: string;
@@ -328,6 +335,8 @@ function TreeNode({
   onCommitRename: (entry: VisibleTreeEntry, newName: string) => Promise<void>;
   onCommitCreate: (edit: Extract<NonNullable<InlineTreeEdit>, { mode: 'create' }>, newName: string) => Promise<void>;
   onCancelRename: () => void;
+  /** 该工作台有 native 路径时，行尾提供「@ 添加到对话」（远端/虚拟 mount 无入口） */
+  canMentionToChat: boolean;
 }) {
   const deskBasePath = useStore(st => st.deskBasePath);
   const deskWorkspaceMountId = useStore(st => st.deskWorkspaceMountId);
@@ -379,6 +388,20 @@ function TreeNode({
       localRootPath: deskBasePath,
       nativeRootPath: nativeRootDir,
     });
+  }, [deskBasePath, deskWorkspaceMountId, file, nativeRootDir, parent]);
+
+  // 行尾「@」：把这一条按 native 绝对路径附加到聊天输入框，等同于从文件树拖进聊天框。
+  // 路径解析失败（例如远端连接下拿不到 native 路径）时不静默附加错误路径。
+  const mentionToChat = useCallback(() => {
+    const nativePath = resolveWorkbenchNativePath({
+      file,
+      subdir: parent,
+      mountId: deskWorkspaceMountId || null,
+      localRootPath: deskBasePath,
+      nativeRootPath: nativeRootDir,
+    }, currentResourceAccessContext());
+    if (!nativePath) return;
+    attachWorkbenchItemToInput({ path: nativePath, name: file.name, isDirectory: file.isDir });
   }, [deskBasePath, deskWorkspaceMountId, file, nativeRootDir, parent]);
 
   const handleClick = useCallback((event: React.MouseEvent) => {
@@ -631,6 +654,29 @@ function TreeNode({
         ) : (
           <span className={s.itemName} title={file.name}>{file.name}</span>
         )}
+        {canMentionToChat && !isRenaming && (
+          <button
+            type="button"
+            className={s.itemMention}
+            data-desk-mention=""
+            title={t('desk.mentionToChat.title')}
+            aria-label={t('desk.mentionToChat.label', { name: file.name })}
+            tabIndex={-1}
+            // 阻止 mousedown 默认行为：避免在这颗按钮上按下时被行级 draggable 抢成拖拽，
+            // 导致点击丢失（点击事件本身不受影响）。
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={(event) => {
+              event.stopPropagation();
+              mentionToChat();
+            }}
+            onDoubleClick={(event) => event.stopPropagation()}
+          >
+            <span aria-hidden="true">@</span>
+            <span className={s.itemMentionText} aria-hidden="true">
+              {file.isDir ? t('desk.mentionToChat.folder') : t('desk.mentionToChat.file')}
+            </span>
+          </button>
+        )}
       </div>
       {expanded && (children.length > 0 || pendingChild) && (
         <div role="group" className={s.treeGroup}>
@@ -661,6 +707,7 @@ function TreeNode({
               onCommitRename={onCommitRename}
               onCommitCreate={onCommitCreate}
               onCancelRename={onCancelRename}
+              canMentionToChat={canMentionToChat}
             />
           ))}
         </div>
@@ -687,6 +734,10 @@ export function DeskTree({
   const deskBasePath = useStore(s => s.deskBasePath);
   const rootFiles = useStore(s => s.deskTreeFilesByPath[''] || s.deskFiles);
   const treeFilesByPath = useStore(s => s.deskTreeFilesByPath);
+  const nativeRootDir = useStore(deskNativeRootDir);
+  // 行尾「@ 添加到对话」只在能拿到 native 绝对路径时提供（普通文件夹工作台，
+  // 或披露了 native root 的 local_fs mount）；远端 / 虚拟 mount 没有可附加的路径。
+  const canMentionToChat = !!nativeRootDir && canUseNativeResourcePath(currentResourceAccessContext());
   const expandedPaths = useStore(s => s.deskExpandedPaths);
   const deskSelectedPath = useStore(s => s.deskSelectedPath);
   const setDeskSelectedPath = useStore(s => s.setDeskSelectedPath);
@@ -892,6 +943,7 @@ export function DeskTree({
           onCommitRename={commitRename}
           onCommitCreate={commitCreate}
           onCancelRename={cancelRename}
+          canMentionToChat={canMentionToChat}
         />
       ))}
     </div>

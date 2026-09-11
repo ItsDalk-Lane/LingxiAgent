@@ -45,7 +45,8 @@ import {
   resolveModelAudioInputTransport,
   resolveModelVideoInputTransport,
 } from "../../shared/model-capabilities.ts";
-import { replayLatestUserTurn, retrySessionTurn } from "../../core/session-turn-actions.ts";
+import { replayLatestUserTurn, resolveSessionNodeTarget, retrySessionTurn } from "../../core/session-turn-actions.ts";
+import { getWorkspaceSnapshotService } from "../../core/workspace-snapshots.ts";
 import { createRequestContext } from "../http/boundary.ts";
 import { createModuleLogger } from "../../lib/debug-log.ts";
 import { searchSessions } from "../../lib/search/session-search.ts";
@@ -1058,6 +1059,86 @@ export function createSessionsRoute(engine, hub = null) {
     }
   });
 
+  /**
+   * 会话记忆开关（可读/可写任意已存在的会话，不要求它是「当前会话」）。
+   * 侧边对话面板会为它自己的会话读取与实际开关；服务端语义与创建会话时的
+   * memoryEnabled 完全同源（manifest.memoryPolicy + session-meta）。
+   */
+  route.get("/sessions/memory", async (c) => {
+    try {
+      const requestContext = createRequestContext(c, engine);
+      const sessionPath = c.req.query("path") || null;
+      if (!sessionPath) {
+        return c.json({ error: t("error.missingParam", { param: "path" }) }, 400);
+      }
+      const auth = authorizeSessionRoute(requestContext, "sessions.read", {
+        kind: "session",
+        studioId: requestContext.studioId,
+        sessionPath,
+      });
+      if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
+      if (!isActiveDesktopSessionPath(sessionPath, engine.agentsDir)) {
+        return c.json({ error: "Invalid session path" }, 403);
+      }
+      if (isDeletedAgentSessionPath(sessionPath)) {
+        return rejectDeletedAgentSession(c);
+      }
+      if (!(await pathExists(sessionPath))) {
+        return c.json({ error: "session not found" }, 404);
+      }
+      return c.json({
+        ok: true,
+        sessionPath,
+        memoryEnabled: engine.getSessionMemoryEnabled?.(sessionPath) !== false,
+      });
+    } catch (err) {
+      return c.json({ error: err.message, code: err.code || undefined }, err.status || 500);
+    }
+  });
+
+  route.patch("/sessions/memory", async (c) => {
+    try {
+      const requestContext = createRequestContext(c, engine);
+      const body = await safeJson(c);
+      const sessionPath = body?.path || body?.sessionPath || null;
+      if (!sessionPath) {
+        return c.json({ error: t("error.missingParam", { param: "path" }) }, 400);
+      }
+      if (typeof body?.memoryEnabled !== "boolean") {
+        return c.json({ error: t("error.missingParam", { param: "memoryEnabled" }) }, 400);
+      }
+      const auth = authorizeSessionRoute(requestContext, "sessions.write", {
+        kind: "session",
+        studioId: requestContext.studioId,
+        sessionPath,
+      });
+      if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
+      if (!isActiveDesktopSessionPath(sessionPath, engine.agentsDir)) {
+        return c.json({ error: "Invalid session path" }, 403);
+      }
+      if (isDeletedAgentSessionPath(sessionPath)) {
+        return rejectDeletedAgentSession(c);
+      }
+      if (!(await pathExists(sessionPath))) {
+        return c.json({ error: "session not found" }, 404);
+      }
+      if (typeof engine.setSessionMemoryEnabled !== "function") {
+        return c.json({ error: "session memory toggle unavailable" }, 500);
+      }
+      const result = await engine.setSessionMemoryEnabled(sessionPath, body.memoryEnabled);
+      if (result?.ok === false) {
+        return c.json({ error: result.error || "failed to set session memory" }, 400);
+      }
+      return c.json({
+        ok: true,
+        sessionPath,
+        memoryEnabled: result?.memoryEnabled !== false,
+      });
+    } catch (err) {
+      return c.json({ error: err.message, code: err.code || undefined }, err.status || 500);
+    }
+  });
+
   route.get("/sessions/authorized-folders", async (c) => {
     try {
       const requestContext = createRequestContext(c, engine);
@@ -1461,6 +1542,20 @@ export function createSessionsRoute(engine, hub = null) {
         return c.json({ error: "session_busy" }, 409);
       }
 
+      // fileRollback：默认 none（保持现状行为）；workspace 必须显式开启开关，
+      // 未开启时显式 4xx，绝不静默降级成 none。
+      const rawFileRollback = body?.fileRollback;
+      if (rawFileRollback != null && rawFileRollback !== "none" && rawFileRollback !== "workspace") {
+        return c.json({ error: "invalid fileRollback", code: "invalid_file_rollback" }, 400);
+      }
+      const fileRollback = rawFileRollback === "workspace" ? "workspace" : "none";
+      if (fileRollback === "workspace" && engine.preferences?.getRollbackFileChanges?.() !== true) {
+        return c.json({
+          error: "file rollback is disabled in preferences",
+          code: "file_rollback_disabled",
+        }, 403);
+      }
+
       const result = await retrySessionTurn(engine, {
         sessionId,
         sessionPath,
@@ -1470,6 +1565,7 @@ export function createSessionsRoute(engine, hub = null) {
         replacementText: typeof body?.text === "string" ? body.text : undefined,
         displayMessage: body?.displayMessage || null,
         uiContext: body?.uiContext ?? null,
+        ...(rawFileRollback != null ? { fileRollback } : {}),
       });
       return c.json({ ok: true, ...result });
     } catch (err) {
@@ -1478,6 +1574,122 @@ export function createSessionsRoute(engine, hub = null) {
         bodyFromRouteError(err),
         statusFromRouteError(err, err?.message === "session_busy" ? 409 : 400),
       );
+    }
+  });
+
+  /**
+   * 「回退时撤销文件改动」预览：开关关闭 / 无检查点 / 拍照降级都在这里显式说明，
+   * UI 据此决定选项置灰与影响文件数，而不是先请求再失败。
+   */
+  route.post("/sessions/turns/rollback-preview", async (c) => {
+    try {
+      const requestContext = createRequestContext(c, engine);
+      const body = await safeJson(c);
+      const sessionRef = resolveSessionLocatorFromBody(body, "previewWorkspaceRollback");
+      assertManifestLifecycle(sessionRef, "active", "previewWorkspaceRollback");
+      const { sessionId, sessionPath } = sessionRef;
+      const auth = authorizeSessionRoute(requestContext, "sessions.write", {
+        kind: "session",
+        studioId: requestContext.studioId,
+        sessionPath,
+      });
+      if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
+      if (!isActiveDesktopSessionPath(sessionPath, engine.agentsDir)) {
+        return c.json({ error: "Invalid session path" }, 403);
+      }
+      if (isDeletedAgentSessionPath(sessionPath)) {
+        return rejectDeletedAgentSession(c);
+      }
+      if (!(await pathExists(sessionPath))) {
+        return c.json({ error: "session not found" }, 404);
+      }
+
+      const enabled = engine.preferences?.getRollbackFileChanges?.() === true;
+      if (!enabled) {
+        return c.json({
+          ok: true,
+          enabled: false,
+          available: false,
+          degraded: false,
+          commit: null,
+          reason: "file_rollback_disabled",
+          fileCount: 0,
+          files: [],
+        });
+      }
+      if (typeof engine.ensureSessionLoaded !== "function") {
+        return c.json({
+          ok: true,
+          enabled: true,
+          available: false,
+          degraded: false,
+          commit: null,
+          reason: "session_branch_unavailable",
+          fileCount: 0,
+          files: [],
+        });
+      }
+      const session = await engine.ensureSessionLoaded(sessionPath);
+      const branch = session?.sessionManager?.getBranch?.() || [];
+      const target = body?.target
+        || (typeof body?.turnInputEntryId === "string" ? { role: "user", entryId: body.turnInputEntryId } : null);
+      const resolved = resolveSessionNodeTarget(branch, target, { mode: "retry" });
+      const turnInputEntryId = resolved.turnInputEntry.id;
+      const ownerAgentId = engine.resolveSessionOwnership?.(sessionPath)?.agentId
+        || engine.getSessionManifest?.(sessionId)?.ownerAgentId
+        || null;
+      const workspaceRoot = ownerAgentId
+        ? (engine.getExplicitHomeCwd?.(ownerAgentId) || engine.getHomeCwd?.(ownerAgentId) || null)
+        : null;
+      if (!workspaceRoot) {
+        return c.json({
+          ok: true,
+          enabled: true,
+          available: false,
+          degraded: false,
+          commit: null,
+          reason: "workspace_unavailable",
+          turnInputEntryId,
+          fileCount: 0,
+          files: [],
+        });
+      }
+      const service = getWorkspaceSnapshotService({ lingxiHome: engine.lingxiHome });
+      const preview = await service.previewTurn({
+        sessionPath,
+        workspaceRoot,
+        turnInputEntryId,
+        createdAtHint: resolved.turnInputEntry?.timestamp ?? null,
+      });
+      return c.json({ ok: true, enabled: true, turnInputEntryId, ...preview });
+    } catch (err) {
+      return c.json(bodyFromRouteError(err), statusFromRouteError(err, 400));
+    }
+  });
+
+  /** 读取「回退时撤销文件改动」开关（全局偏好，默认关闭）。 */
+  route.get("/sessions/workspace-rollback", async (c) => {
+    try {
+      return c.json({ enabled: engine.preferences?.getRollbackFileChanges?.() === true });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
+  /** 写入「回退时撤销文件改动」开关。 */
+  route.put("/sessions/workspace-rollback", async (c) => {
+    try {
+      const body = await safeJson(c);
+      if (typeof body?.enabled !== "boolean") {
+        return c.json({ error: "enabled must be a boolean" }, 400);
+      }
+      if (typeof engine.preferences?.setRollbackFileChanges !== "function") {
+        return c.json({ error: "preference unavailable" }, 503);
+      }
+      const enabled = engine.preferences.setRollbackFileChanges(body.enabled);
+      return c.json({ ok: true, enabled });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
     }
   });
 

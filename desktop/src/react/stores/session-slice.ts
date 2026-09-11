@@ -157,6 +157,13 @@ export interface SessionSlice {
   currentSessionId: string | null;
   sessionLocatorsById: Record<string, { path: string | null }>;
   pendingSessionSwitchPath: string | null;
+  /**
+   * 「当前输入面」的会话 override：侧边会话（/side-chat 面板）挂载期间指向侧边
+   * 会话，把不接收显式 sessionPath 的共享 UI（技能斜杠菜单、拖拽附件、上下文
+   * 默认值等）导向用户正在看的那个输入区。null = 主会话。
+   * 它是「默认值」而不是权限来源：显式传入目标会话的路径始终优先。
+   */
+  currentSessionPathOverride: string | null;
   sessionStreams: Record<string, SessionStream>;
   pendingNewSession: boolean;
   /** 当前首页新会话草稿的实例身份；每次重新进入新会话页都会更换，防止迟到创建响应 ABA。 */
@@ -202,6 +209,7 @@ export interface SessionSlice {
   setCurrentSessionPath: (path: string | null) => void;
   setCurrentSessionRef: (ref: { sessionId?: string | null; path?: string | null }) => void;
   setPendingSessionSwitchPath: (path: string | null) => void;
+  setCurrentSessionPathOverride: (path: string | null) => void;
   setSessionStream: (sessionPath: string, stream: SessionStream) => void;
   removeSessionStream: (sessionPath: string) => void;
   setPendingNewSession: (pending: boolean) => void;
@@ -231,6 +239,7 @@ export const createSessionSlice = (
   currentSessionId: null,
   sessionLocatorsById: {},
   pendingSessionSwitchPath: null,
+  currentSessionPathOverride: null,
   sessionStreams: {},
   pendingNewSession: false,
   pendingDraftId: null,
@@ -252,13 +261,24 @@ export const createSessionSlice = (
     sessions,
     sessionLocatorsById: mergeSessionLocators(s.sessionLocatorsById, sessions),
   })),
-  setCurrentSessionPath: (path) => set({ currentSessionPath: path, ...(path === null ? { currentSessionId: null } : {}) }),
+  setCurrentSessionPath: (path) => set((s) => ({
+    currentSessionPath: path,
+    ...(path === null ? { currentSessionId: null } : {}),
+    // 切走主会话时清掉侧边 override：否则「默认指向侧边会话」的共享 UI
+    // 会把新主会话的引用/附件写进已经不在看的侧边会话。
+    ...(s.currentSessionPathOverride && s.currentSessionPathOverride !== path
+      ? { currentSessionPathOverride: null }
+      : {}),
+  })),
   setCurrentSessionRef: (ref) => set((s) => {
     const sessionId = normalizeSessionId(ref?.sessionId);
     const sessionPath = normalizeSessionPath(ref?.path);
     return {
       currentSessionId: sessionId,
       currentSessionPath: sessionPath,
+      ...(s.currentSessionPathOverride && s.currentSessionPathOverride !== sessionPath
+        ? { currentSessionPathOverride: null }
+        : {}),
       ...(sessionId ? {
         sessionLocatorsById: {
           ...s.sessionLocatorsById,
@@ -268,6 +288,7 @@ export const createSessionSlice = (
     };
   }),
   setPendingSessionSwitchPath: (path) => set({ pendingSessionSwitchPath: path }),
+  setCurrentSessionPathOverride: (path) => set({ currentSessionPathOverride: path }),
   setSessionStream: (sessionPath, stream) =>
     set((s) => ({
       sessionStreams: putSessionScopedValue(s, s.sessionStreams, sessionPath, stream),

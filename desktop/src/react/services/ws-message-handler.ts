@@ -805,6 +805,11 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
         sp,
         Array.isArray(msg.sessionFiles) ? msg.sessionFiles : null,
       );
+      // 「回退时撤销文件改动」逐文件报告：HTTP 响应之外的广播通道，
+      // 其它窗口/入口触发的回退也能看到同一份报告。
+      if (msg.fileRollbackReport && typeof msg.fileRollbackReport === 'object') {
+        useStore.getState().setFileRollbackReport?.(sp, msg.fileRollbackReport);
+      }
       break;
     }
 

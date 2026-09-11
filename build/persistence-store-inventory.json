@@ -2556,6 +2556,47 @@
       "preCoordinatorReadProjection": null,
       "identityContract": "runId is workflow identity; activity entries reference that ID, not the journal path.",
       "exemption": null
+    },
+    {
+      "id": "workspace-snapshots",
+      "ownerModule": "core/workspace-snapshots.ts",
+      "pathPattern": "workspace-snapshots/{workspaceHash}/**",
+      "pathPatterns": [
+        "workspace-snapshots/{workspaceHash}/**",
+        "agents/{agentId}/sessions/{sessionId}.jsonl.snapshots.json",
+        "agents/{agentId}/sessions/archived/{sessionId}.jsonl.snapshots.json",
+        "agents/{agentId}/activity/{sessionId}.jsonl.snapshots.json",
+        "agents/{agentId}/subagent-sessions/{sessionId}.jsonl.snapshots.json",
+        "agents/{agentId}/.ephemeral/{sessionId}.jsonl.snapshots.json"
+      ],
+      "pathExclusions": [],
+      "pathKind": "tree",
+      "format": "mixed-directory",
+      "schemaSource": {
+        "kind": "directory-contract",
+        "module": "core/workspace-snapshots.ts",
+        "contract": "shadow git repository layout (git init plus info/exclude allowlist, append-only commits) and the {sessionPath}.snapshots.json sidecar schema (version, workspaceRoot, snapshots[])"
+      },
+      "schemaContract": {
+        "kind": "protocol",
+        "source": "core/workspace-snapshots.ts",
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+      },
+      "openEntry": [
+        "WorkspaceSnapshotService"
+      ],
+      "migrationEntry": [],
+      "protocolModules": [],
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "epochPolicy": "regenerable",
+      "checkpointPolicy": "Excluded from epoch checkpoints; shadow repos are re-capturable workspace-derived caches, and a sidecar without its repo deliberately degrades to write/edit backup fallback during rollback.",
+      "restorePolicy": "Never restored from epoch checkpoints; rollback reads shadow commits read-only via --git-dir and writes user files back through ResourceIO, which records its own file history.",
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "identityContract": "workspaceHash (sha256 prefix of the resolved workspace root) identifies one shadow repo; the sidecar is keyed by its adjacent session JSONL locator and binds turnInputEntryId to shadow commits; sessionId remains the durable identity.",
+      "exemption": null
     }
   ],
   "discoveredSites": [
@@ -4491,6 +4532,78 @@
       "excerpt": "writeSecretJson(path.join(lingxiHome, WEB_SESSIONS_FILE), registry)",
       "reason": "Writes the web session registry.",
       "storeId": "web-session-registry",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "core/workspace-snapshots.ts",
+      "kind": "atomic-write",
+      "excerpt": "atomicWriteSync(filePath, `${JSON.stringify({ version: WORKSPACE_SNAPSHOT_VERSION, workspaceRoot: sidecar.workspaceRoot ?? null, snapshots: sidecar.snapshots, }, null, 2)}\\n`)",
+      "reason": "Creates the shadow snapshot repository and writes per-session snapshot sidecars.",
+      "storeId": "workspace-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "core/workspace-snapshots.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(path.dirname(excludePath), { recursive: true })",
+      "reason": "Creates the shadow snapshot repository and writes per-session snapshot sidecars.",
+      "storeId": "workspace-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "core/workspace-snapshots.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(path.dirname(filePath), { recursive: true })",
+      "reason": "Creates the shadow snapshot repository and writes per-session snapshot sidecars.",
+      "storeId": "workspace-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "core/workspace-snapshots.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(repoDir, { recursive: true })",
+      "reason": "Creates the shadow snapshot repository and writes per-session snapshot sidecars.",
+      "storeId": "workspace-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "core/workspace-snapshots.ts",
+      "kind": "mkdir",
+      "excerpt": "fsp.mkdir(path.dirname(absPath), { recursive: true })",
+      "reason": "Creates the shadow snapshot repository and writes per-session snapshot sidecars.",
+      "storeId": "workspace-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "core/workspace-snapshots.ts",
+      "kind": "remove-path",
+      "excerpt": "fsp.rm(absPath, { force: true })",
+      "reason": "Creates the shadow snapshot repository and writes per-session snapshot sidecars.",
+      "storeId": "workspace-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "core/workspace-snapshots.ts",
+      "kind": "write-file",
+      "excerpt": "fs.writeFileSync(excludePath, `${DEFAULT_SNAPSHOT_EXCLUDES.join(\"\\n\")}\\n`, \"utf-8\")",
+      "reason": "Creates the shadow snapshot repository and writes per-session snapshot sidecars.",
+      "storeId": "workspace-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "core/workspace-snapshots.ts",
+      "kind": "write-file",
+      "excerpt": "fsp.writeFile(absPath, content)",
+      "reason": "Creates the shadow snapshot repository and writes per-session snapshot sidecars.",
+      "storeId": "workspace-snapshots",
       "exemptionId": null,
       "ordinal": 0
     },
@@ -8176,6 +8289,15 @@
       "ordinal": 0
     },
     {
+      "sourceFile": "server/git/git-command.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdirSync(list.root, { recursive: true })",
+      "reason": "Creates the worktrees parent directory inside the caller's own git repository layout right before `git worktree add`; a user-selected repository location, outside any implied LINGXI_HOME store.",
+      "storeId": null,
+      "exemptionId": "git-worktree-user-repo-parent",
+      "ordinal": 0
+    },
+    {
       "sourceFile": "server/index.ts",
       "kind": "append-file",
       "excerpt": "fs.promises.appendFile(_bwsLogPath, chunk)",
@@ -9758,6 +9880,17 @@
         "secret-write",
         "persistent-store-constructor"
       ]
+    },
+    {
+      "id": "git-worktree-user-repo-parent",
+      "ownerModule": "server/git/git-command.ts",
+      "sourceFile": "server/git/git-command.ts",
+      "reason": "Creates the worktrees parent directory inside the caller's own git repository layout right before `git worktree add`; a user-selected repository location, outside any implied LINGXI_HOME store.",
+      "expiresOn": "2027-01-31",
+      "kinds": [
+        "mkdir"
+      ],
+      "linePattern": "list[.]root"
     },
     {
       "id": "in-memory-confirm-registry",

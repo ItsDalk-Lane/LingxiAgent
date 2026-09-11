@@ -62,6 +62,40 @@ export interface GitWorktreeInfo {
   mainPath: string | null;
 }
 
+export interface GitWorktreeEntry {
+  path: string;
+  head: string | null;
+  branch: string | null;
+  detached: boolean;
+  bare: boolean;
+  /** `git worktree list` 首块：被检出仓库的主工作树 */
+  isMain: boolean;
+  /** 该条目就是当前工作台所在的工作树 */
+  current: boolean;
+}
+
+export interface GitWorktrees {
+  isRepo: boolean;
+  worktrees: GitWorktreeEntry[];
+  /** 新建 worktree 的落地根目录：<主工作树父级>/worktrees */
+  root: string | null;
+  mainPath: string | null;
+}
+
+export interface GitStashEntry {
+  ref: string;
+  message: string;
+  /** 改动涉及的已跟踪路径（仓库根相对） */
+  tracked: string[];
+  /** 随储藏一起收进去的未跟踪路径 */
+  untracked: string[];
+}
+
+export interface GitStashList {
+  isRepo: boolean;
+  stashes: GitStashEntry[];
+}
+
 export interface GitFileDiff {
   path: string;
   patch: string;
@@ -99,6 +133,12 @@ export interface GitActionResult {
   error?: string;
   message?: string;
   head?: string;
+  /** create-branch 返回的分支名 / worktree-create 返回的目录与分支 */
+  branch?: string;
+  path?: string;
+  /** unstash 命中的储藏条目 / stash 与 discard 处理的路径 */
+  stash?: string;
+  paths?: string[];
 }
 
 function dirQuery(dir: string, extra: Record<string, string> = {}): string {
@@ -125,6 +165,11 @@ export async function fetchGitWorktreeInfo(dir: string, agentId?: string | null)
   return res.json();
 }
 
+export async function fetchGitWorktrees(dir: string, agentId?: string | null): Promise<GitWorktrees> {
+  const res = await lingxiFetch(`/api/git/worktrees?${dirQuery(dir, agentFields(agentId))}`);
+  return res.json();
+}
+
 export async function fetchGitFileDiff(dir: string, file: string): Promise<GitFileDiff> {
   const res = await lingxiFetch(`/api/git/file-diff?${dirQuery(dir, { file })}`);
   return res.json();
@@ -141,6 +186,85 @@ export async function gitCheckout(dir: string, branch: string, agentId?: string 
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ dir, branch, ...agentFields(agentId) }),
     throwOnHttpError: false,
+  });
+  return { httpOk: res.ok, ...(await res.json()) };
+}
+
+export async function gitCreateBranch(
+  dir: string,
+  name: string,
+  base?: string | null,
+  agentId?: string | null,
+): Promise<GitActionResult> {
+  const res = await lingxiFetch('/api/git/create-branch', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dir, name, ...(base ? { base } : {}), ...agentFields(agentId) }),
+    throwOnHttpError: false,
+    timeout: 60_000,
+  });
+  return { httpOk: res.ok, ...(await res.json()) };
+}
+
+export async function gitStash(
+  dir: string,
+  opts: { message?: string; paths?: string[]; agentId?: string | null } = {},
+): Promise<GitActionResult> {
+  const res = await lingxiFetch('/api/git/stash', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dir, ...opts }),
+    throwOnHttpError: false,
+    timeout: 60_000,
+  });
+  return { httpOk: res.ok, ...(await res.json()) };
+}
+
+export async function fetchGitStashes(dir: string, agentId?: string | null): Promise<GitStashList> {
+  const res = await lingxiFetch(`/api/git/stashes?${dirQuery(dir, agentFields(agentId))}`);
+  return res.json();
+}
+
+/** 带 path = 单个文件从储藏取回工作区；不带 = 弹出最新一条储藏 */
+export async function gitUnstash(
+  dir: string,
+  opts: { path?: string; agentId?: string | null } = {},
+): Promise<GitActionResult> {
+  const res = await lingxiFetch('/api/git/unstash', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dir, ...opts }),
+    throwOnHttpError: false,
+    timeout: 60_000,
+  });
+  return { httpOk: res.ok, ...(await res.json()) };
+}
+
+/** 回退未提交修改；paths 缺省 = 全部已跟踪文件（未跟踪文件不参与） */
+export async function gitDiscard(
+  dir: string,
+  opts: { paths?: string[]; agentId?: string | null } = {},
+): Promise<GitActionResult> {
+  const res = await lingxiFetch('/api/git/discard', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dir, ...opts }),
+    throwOnHttpError: false,
+    timeout: 60_000,
+  });
+  return { httpOk: res.ok, ...(await res.json()) };
+}
+
+export async function gitCreateWorktree(
+  dir: string,
+  opts: { name: string; base?: string | null; agentId?: string | null },
+): Promise<GitActionResult> {
+  const res = await lingxiFetch('/api/git/worktree-create', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dir, ...opts }),
+    throwOnHttpError: false,
+    timeout: 150_000,
   });
   return { httpOk: res.ok, ...(await res.json()) };
 }

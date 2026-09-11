@@ -13,15 +13,24 @@ function joinWorkspaceRoot(basePath: string, subdir: string): string {
   return `${basePath.replace(/[\\/]+$/, '')}${separator}${normalizedSubdir.replace(/\//g, separator)}`;
 }
 
-function workspaceWatchRefs(basePath: string, mountId: string, expandedPaths: string[]): ResourceRef[] {
+function workspaceWatchRefs(basePath: string, mountId: string, nativeRoot: string, expandedPaths: string[]): ResourceRef[] {
   const roots = new Map<string, ResourceRef>();
   const add = (ref: ResourceRef) => roots.set(resourceWatchKey(ref), ref);
 
   if (mountId) {
-    add({ kind: 'mount', mountId, path: '' });
+    // mount 形态工作台：服务端的 mount ref 订阅不可用——「default」mount 由
+    // MountAwareFileService 合成、不在挂载注册表里（resource_not_found），已创建挂载的
+    // capabilities 只有 list/read/write（capabilityDenied: watch）。因此 local_fs 挂载
+    // 对 local owner 披露的 native 根（deskWorkspaceNativeRoot）是唯一可行的 watch 入口：
+    // 统一改用 local-file 订阅。这与 markDeskTreeDirtyForResourceChange 的口径一致——
+    // mount 工作台本来就按 deskWorkspaceNativeRoot 把事件路径归位成 subdir。
+    // 无 native 根（远端/虚拟挂载）当前没有可用的服务端 watch，直接不订阅。
+    const root = nativeRoot.trim();
+    if (!root) return [];
+    add({ kind: 'local-file', path: root });
     for (const subdir of expandedPaths) {
       const normalized = normalizeSubdir(subdir);
-      if (normalized) add({ kind: 'mount', mountId, path: normalized });
+      if (normalized) add({ kind: 'local-file', path: joinWorkspaceRoot(root, normalized) });
     }
     return [...roots.values()];
   }
@@ -42,7 +51,7 @@ export function WorkspaceFileChangeBridge() {
   const deskExpandedPaths = useStore(s => s.deskExpandedPaths);
   const subscriptionsRef = useRef<Map<string, () => void>>(new Map());
   const watchedRefs = useMemo(
-    () => workspaceWatchRefs(deskWorkspaceMountId ? '' : deskBasePath, deskWorkspaceMountId || '', deskExpandedPaths),
+    () => workspaceWatchRefs(deskBasePath, deskWorkspaceMountId || '', deskWorkspaceNativeRoot || '', deskExpandedPaths),
     [deskBasePath, deskExpandedPaths, deskWorkspaceMountId, deskWorkspaceNativeRoot],
   );
   const watchedRefsKey = watchedRefs.map(resourceWatchKey).join('\n');

@@ -19,6 +19,7 @@
 | 模型调用、用量、持久化与载荷 | [模型观测](architecture/model-observatory.md) |
 | 工具身份、权限、代次与规范执行 | [工具调用路径不变量](architecture/tool-invocation-path-invariance.md) |
 | 输入接受、记忆恢复、异步任务与文件历史 | [生命周期约定](architecture/async-lifecycle-contracts.md) |
+| 选中内容开侧边对话：会话归属与配置作用域 | [侧边对话](architecture/side-chat.md) |
 
 架构入口记录源码机制，不代表某个安装包、操作系统或真实供应商已经验收。依赖版本与命令以 [package.json](../package.json) 为准，发布物要绑定其源码和独立证据。
 

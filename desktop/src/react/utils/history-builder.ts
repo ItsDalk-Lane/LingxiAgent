@@ -666,8 +666,11 @@ export function buildItemsFromHistory(data: HistoryApiResponse, options: BuildIt
         .replace(LEGACY_STEER_PREFIX_RE, '')
         .replace(/^<t>[^<]*<\/t>\s*/, '');
 
-      // 过滤系统注入的后台任务通知（steer 消息），不展示给用户
-      if (/<hana-background-result\s/.test(rawContent) || /<hana-deferred-tasks>/.test(rawContent)) {
+      // 过滤系统注入的后台任务通知（steer 消息）与中断标记，不展示给用户
+      // （模型可见；中断标记旧版明文前缀兼容开发期已写入的历史）
+      if (/<hana-background-result\s/.test(rawContent) || /<hana-deferred-tasks>/.test(rawContent)
+        || /<hana-turn-interrupted(?:\s|>)/.test(rawContent)
+        || rawContent.startsWith('[Turn interrupted by user]')) {
         continue;
       }
 

@@ -220,7 +220,8 @@
         calc(var(--tree-leading-inset) + (var(--tree-depth, 0) * var(--tree-indent-step)))
         14px
         22px
-        minmax(0, 1fr);
+        minmax(0, 1fr)
+        auto;
     align-items: center;
     column-gap: 0;
     min-width: 0;
@@ -324,6 +325,46 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     color: var(--text);
+}
+
+/* 行尾「@ 添加到对话」：默认不占位，悬停 / 键盘聚焦该行时出现 */
+.itemMention {
+    display: none;
+    align-items: center;
+    gap: var(--space-2);
+    height: 20px;
+    margin-left: var(--space-4);
+    padding: 0 var(--space-6);
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--overlay-medium);
+    color: var(--text-muted);
+    font-size: var(--fs-hint);
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background var(--duration-instant) var(--ease-out), color var(--duration-instant) var(--ease-out);
+}
+
+.treeItem:hover .itemMention,
+.treeItem:focus-within .itemMention {
+    display: inline-flex;
+}
+
+/* 触摸设备没有 hover：入口常显，否则功能不可达 */
+@media (hover: none) {
+    .itemMention {
+        display: inline-flex;
+    }
+}
+
+.treeItem:hover .itemMention:hover {
+    background: var(--overlay-strong);
+    color: var(--text);
+}
+
+.itemMentionText {
+    pointer-events: none;
 }
 
 .section.dragOver {

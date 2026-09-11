@@ -46,7 +46,7 @@ Our sincere thanks go to [openhanako](https://github.com/liliMozi/openhanako) an
 
 **Multi-Agent** — Create multiple agents, each with independent memory, personality, and scheduled tasks. Agents can collaborate via channel group chats or delegate tasks to each other.
 
-**Desk** — Each agent has a desk for files and notes (Jian). Supports drag-and-drop, file preview, and workspace file-tree change watching, serving as an async collaboration space between you and your agent.
+**Desk** — Each agent has a desk for files and notes (Jian). Supports drag-and-drop, file preview, and workspace file-tree change watching; hover a file or folder in the workbench tree and click the “@” at the end of the row to send it to the current chat's attachment bar, serving as an async collaboration space between you and your agent.
 
 **Full-Screen Media Viewer** — Click any image, SVG, or video from chat or the desk to open a dark-overlay viewer with wheel-zoom, drag-to-pan, `+` / `−` / `0` shortcuts, and left/right navigation between sibling media in the same session or folder.
 

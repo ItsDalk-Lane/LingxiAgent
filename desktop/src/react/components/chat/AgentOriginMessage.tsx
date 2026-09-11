@@ -46,7 +46,7 @@ export const AgentOriginMessage = memo(function AgentOriginMessage({
   const turnTarget = useMemo<SessionNodeTarget | null>(() => (
     message.sourceEntryId ? { role: 'user', entryId: message.sourceEntryId } : null
   ), [message.sourceEntryId]);
-  const { actions } = useSessionNodeActions({
+  const { actions, overlay } = useSessionNodeActions({
     sessionPath,
     target: readOnly ? null : turnTarget,
     retryMessage: message,
@@ -82,6 +82,7 @@ export const AgentOriginMessage = memo(function AgentOriginMessage({
             testId="agent-origin-node-actions"
           />
         )}
+        {overlay}
     </ConversationEventCard>
   );
 });

@@ -1010,6 +1010,18 @@
       "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement)."
     },
     {
+      "path": "core/interrupted-turn-marker.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/session-coordinator.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/session-coordinator.ts (import-statement)."
+    },
+    {
       "path": "core/knowledge-history-compressor.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -3852,6 +3864,28 @@
       "reason": "Reached via esbuild source module graph, imported by core/bridge-session-manager.ts (import-statement); core/session-coordinator.ts (import-statement); hub/agent-executor.ts (import-statement)."
     },
     {
+      "path": "core/workspace-snapshots.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/session-turn-actions.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/session-coordinator.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/sessions.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/session-turn-actions.ts (import-statement); core/session-coordinator.ts (import-statement); server/routes/sessions.ts (import-statement)."
+    },
+    {
       "path": "core/ws-auth-ticket.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -4759,11 +4793,16 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "core/session-turn-actions.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/engine.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-turn-actions.ts (import-statement); core/engine.ts (import-statement)."
     },
     {
       "path": "lib/checkpoint-wrapper.ts",
@@ -5029,6 +5068,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/tools/todo-compat.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/i18n.ts",
           "kind": "import-statement"
         },
@@ -5165,11 +5209,6 @@
         {
           "root": "server-bootstrap",
           "from": "core/session-list-projection-cache.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/tools/todo-compat.ts",
           "kind": "import-statement"
         },
         {
@@ -8082,6 +8121,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/tools/todo-compat.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/tools/browser-action-log.ts",
           "kind": "import-statement"
         },
@@ -8092,16 +8136,11 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "lib/tools/todo-compat.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "server/index.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/debug-log.ts (import-statement); lib/tools/browser-action-log.ts (import-statement); lib/tools/browser-tool.ts (import-statement); +2 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/debug-log.ts (import-statement); lib/tools/todo-compat.ts (import-statement); lib/tools/browser-action-log.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "lib/loop/alarm-service.ts",
@@ -8843,6 +8882,11 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "lib/tools/todo-compat.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/compaction-utils.ts",
           "kind": "import-statement"
         },
@@ -9068,11 +9112,6 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "lib/tools/todo-compat.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/session-coordinator.ts",
           "kind": "import-statement"
         },
@@ -9147,7 +9186,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/compaction-utils.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); core/session-compactor.ts (import-statement); +58 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/todo-compat.ts (import-statement); core/compaction-utils.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); +58 more importer(s)."
     },
     {
       "path": "lib/pi-sdk/model-call-stream-observer.ts",
@@ -9219,6 +9258,18 @@
     },
     {
       "path": "lib/pi-sdk/stream-guard.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/pi-sdk/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/pi-sdk/todo-context-reminder.ts",
       "inputType": "source-graph",
       "provenance": [
         {
@@ -11915,6 +11966,11 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "lib/pi-sdk/todo-context-reminder.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/session-turn-actions.ts",
           "kind": "import-statement"
         },
@@ -11949,7 +12005,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/session-turn-actions.ts (import-statement); server/routes/chat.ts (import-statement); server/history-read/projection-context.ts (import-statement); +4 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/todo-context-reminder.ts (import-statement); core/session-turn-actions.ts (import-statement); server/routes/chat.ts (import-statement); +5 more importer(s)."
     },
     {
       "path": "lib/tools/todo-constants.ts",
@@ -11957,12 +12013,12 @@
       "provenance": [
         {
           "root": "server-bootstrap",
-          "from": "lib/tools/todo.ts",
+          "from": "lib/tools/todo-compat.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
-          "from": "lib/tools/todo-compat.ts",
+          "from": "lib/tools/todo.ts",
           "kind": "import-statement"
         },
         {
@@ -11981,7 +12037,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/todo.ts (import-statement); lib/tools/todo-compat.ts (import-statement); server/routes/chat.ts (import-statement); +2 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/todo-compat.ts (import-statement); lib/tools/todo.ts (import-statement); server/routes/chat.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "lib/tools/todo.ts",
@@ -12290,6 +12346,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "core/session-coordinator.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/routes/chat.ts",
           "kind": "import-statement"
         },
@@ -12314,7 +12375,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); core/session-turn-actions.ts (import-statement); core/session-coordinator.ts (import-statement); +5 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/message-utils.ts (import-statement); core/session-turn-actions.ts (import-statement); core/session-coordinator.ts (import-statement); +6 more importer(s)."
     },
     {
       "path": "lib/user-profile-store.ts",
@@ -128503,12 +128564,17 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "lib/subagent-run-store.ts",
+          "from": "core/workspace-snapshots.ts",
           "kind": "import-statement"
         },
         {
           "root": "server-bootstrap",
           "from": "lib/checkpoint-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/subagent-run-store.ts",
           "kind": "import-statement"
         },
         {
@@ -128577,7 +128643,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/memory/tenets.ts (import-statement); core/pinned-tenets-migration.ts (import-statement); core/execution-lease-registry.ts (import-statement); +40 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/memory/tenets.ts (import-statement); core/pinned-tenets-migration.ts (import-statement); core/execution-lease-registry.ts (import-statement); +41 more importer(s)."
     },
     {
       "path": "shared/safe-parse.ts",
@@ -129195,9 +129261,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10993,
+    "totalFiles": 10996,
     "byInputType": {
-      "source-graph": 784,
+      "source-graph": 787,
       "runtime-asset": 11,
       "nft-runtime-trace": 10198
     }

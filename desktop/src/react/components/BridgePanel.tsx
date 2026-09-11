@@ -19,6 +19,7 @@ import { sanitizeBridgeVisibleText } from '../../../../shared/bridge-visible-tex
 import { useContinuousBottomScroll } from '../hooks/use-continuous-bottom-scroll';
 import type { ChatListItem } from '../stores/chat-types';
 import { ChatTranscript } from './chat/ChatTranscript';
+import { RunningStatusLine } from './chat/RunningStatusLine';
 import fp from './FloatingPanels.module.css';
 import chatStyles from './chat/Chat.module.css';
 
@@ -509,7 +510,9 @@ export function BridgeChatTranscript({
           />
         )}
         {isStreaming && (
-          <div className={chatStyles.typingIndicator} />
+          // contactName 是对面联系人的名字（用于用户气泡身份），状态行要的是本会话
+          // 归属助手的名字，所以交给 RunningStatusLine 按 sessionPath 解。
+          <RunningStatusLine sessionPath={sessionPath} pending={false} knowledgeRetrieving={false} />
         )}
       </div>
     </div>

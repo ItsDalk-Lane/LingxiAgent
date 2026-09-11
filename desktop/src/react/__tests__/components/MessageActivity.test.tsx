@@ -1,5 +1,7 @@
 // @vitest-environment jsdom
 import '@testing-library/jest-dom/vitest';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ToolGroupBlock } from '../../components/chat/ToolGroupBlock';
@@ -8,6 +10,7 @@ import type { ToolCall } from '../../stores/chat-types';
 import { useStore } from '../../stores';
 import { clearDeferredHistoryContentCacheForTests } from '../../hooks/use-deferred-history-content';
 import { openInternalLink } from '../../utils/link-open';
+const activityCss = readFileSync(path.join(process.cwd(), 'desktop/src/react/components/chat/MessageActivity.module.css'), 'utf8');
 vi.mock('../../utils/link-open', async importOriginal => ({ ...await importOriginal<typeof import('../../utils/link-open')>(), openInternalLink: vi.fn() }));
 
 const tool = (name: string, details: ToolCall['details'] = {}, args: ToolCall['args'] = {}): ToolCall => ({
@@ -190,5 +193,24 @@ describe('统一消息行与工具详情', () => {
     openTool();
     expect(screen.getByText('/workspace')).toBeInTheDocument();
     expect(screen.getByText(/\$ npm test/)).toHaveTextContent('npm run build');
+  });
+
+  it('查看弹窗 portal 到 body 后仍自带内边距，不依赖 .activity 子树里的局部 token', () => {
+    renderTool(tool('read', { input: '{"path":"a.ts"}', output: 'content' }));
+    openTool();
+    fireEvent.click(screen.getByRole('button', { name: 'messageActivity.view' }));
+    const dialog = screen.getByRole('dialog');
+    // 局部 token（--ma-pad-x / --ma-dialog-pad）定义在 .activity 上，portal 后不再继承；
+    // 弹窗自身的盒模型声明必须带 var() 回退字面量，否则 padding 整条失效（渲染成 0）。
+    const dialogRule = /\.dialog \{([^}]*)\}/.exec(activityCss)?.[1] ?? '';
+    expect(dialogRule).toMatch(/padding:\s*var\(--ma-dialog-pad,\s*[^)]+\)/);
+    expect(dialogRule).not.toMatch(/padding:\s*var\(--ma-dialog-pad\)\s*;/);
+    expect(dialogRule).toMatch(/box-shadow:\s*var\(--shadow-2xl,\s*[^)]+\)/);
+    // 关闭按钮与弹窗头部落在 .activity 之外，样式同样不能依赖局部作用域的 class。
+    const headerRule = /\.header \{([^}]*)\}/.exec(activityCss)?.[1] ?? '';
+    expect(headerRule).toMatch(/padding:\s*var\(--space-8\)\s+var\(--ma-pad-x,\s*[^)]+\)/);
+    expect(document.body.contains(dialog)).toBe(true);
+    // .activity 不在弹窗祖先链上：内边距只能来自弹窗自身带回退的声明。
+    expect(dialog.closest('[class*="activity"]')).toBeNull();
   });
 });
