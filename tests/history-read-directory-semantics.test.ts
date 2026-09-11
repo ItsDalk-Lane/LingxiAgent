@@ -31,8 +31,10 @@ import { DEFERRED_RESULT_MESSAGE_TYPE } from "../lib/deferred-result-notificatio
 import { TODO_STATE_CUSTOM_TYPE } from "../lib/tools/todo-constants.ts";
 
 const tmpDirs: string[] = [];
+const manifestStores: SessionManifestStore[] = [];
 
 afterEach(() => {
+  while (manifestStores.length) manifestStores.pop()?.close();
   while (tmpDirs.length) {
     const dir = tmpDirs.pop();
     fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
@@ -74,7 +76,7 @@ interface Harness {
 function createHarness(): Harness {
   const root = makeTmpDir();
   const agentsDir = path.join(root, "agents");
-  const store = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") });
+  const store = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") }); manifestStores.push(store);
   const cache = new HistoryDirectoryCache();
   const manifests = new Map<string, string>();
   const harness: Harness = {

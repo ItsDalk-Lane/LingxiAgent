@@ -24,9 +24,11 @@ import { buildLongRunFixtureBytes } from "../scripts/lib/history-read-fixture.mj
 import type { HistoryReadContext } from "../server/history-read/types.ts";
 
 const tmpDirs: string[] = [];
+const manifestStores: SessionManifestStore[] = [];
 
 afterEach(() => {
   resetSessionFileMutationEpochsForTest();
+  while (manifestStores.length) manifestStores.pop()?.close();
   while (tmpDirs.length) {
     const dir = tmpDirs.pop();
     fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
@@ -49,7 +51,7 @@ function createHarness() {
   const sessionPath = path.join(agentsDir, "hana", "sessions", "longrun.jsonl");
   fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
   fs.writeFileSync(sessionPath, buildLongRunFixtureBytes(10));
-  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") });
+  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") }); manifestStores.push(manifestStore);
   const manifest = manifestStore.createForPath({ sessionPath, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
   const cache = new HistoryDirectoryCache();
   const engine: any = {
@@ -223,7 +225,7 @@ describe("X10/X13：跨追加依赖更新", () => {
       jsonlLine("a1", "u1", { role: "assistant", content: [{ type: "tool_use", id: "tu-1", name: "slow", input: {} }] }),
     ];
     fs.writeFileSync(sessionPath, lines.join("\n") + "\n");
-    const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "m.db") });
+    const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "m.db") }); manifestStores.push(manifestStore);
     const manifest = manifestStore.createForPath({ sessionPath, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
     const cache = new HistoryDirectoryCache();
     const engine: any = {

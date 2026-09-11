@@ -22,8 +22,10 @@ import { SessionManager } from "../lib/pi-sdk/index.ts";
 import { buildLongRunFixtureBytes, messagesUrl } from "../scripts/lib/history-read-fixture.mjs";
 
 const tmpDirs: string[] = [];
+const manifestStores: SessionManifestStore[] = [];
 
 afterEach(() => {
+  while (manifestStores.length) manifestStores.pop()?.close();
   while (tmpDirs.length) {
     const dir = tmpDirs.pop();
     fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
@@ -43,7 +45,7 @@ function createHarness({ readFile = undefined as HistoryReadHookLike | undefined
   const sessionPath = path.join(agentsDir, "hana", "sessions", "longrun.jsonl");
   fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
   fs.writeFileSync(sessionPath, buildLongRunFixtureBytes(10));
-  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") });
+  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") }); manifestStores.push(manifestStore);
   const manifest = manifestStore.createForPath({ sessionPath, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
   const engine: any = {
     agentsDir,

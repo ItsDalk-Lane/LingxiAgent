@@ -19,8 +19,10 @@ import { SessionManager } from "../lib/pi-sdk/index.ts";
 import { buildLongRunFixtureBytes, messagesUrl } from "../scripts/lib/history-read-fixture.mjs";
 
 const tmpDirs: string[] = [];
+const manifestStores: SessionManifestStore[] = [];
 
 afterEach(() => {
+  while (manifestStores.length) manifestStores.pop()?.close();
   while (tmpDirs.length) {
     const dir = tmpDirs.pop();
     fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
@@ -39,7 +41,7 @@ function createHarness({ runtimeId = null, studioId = null }: { runtimeId?: stri
   const sessionPath = path.join(agentsDir, "hana", "sessions", "longrun.jsonl");
   fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
   fs.writeFileSync(sessionPath, buildLongRunFixtureBytes(8));
-  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") });
+  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") }); manifestStores.push(manifestStore);
   const manifest = manifestStore.createForPath({ sessionPath, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
   const cache = new HistoryDirectoryCache();
   const engine: any = {
@@ -95,7 +97,7 @@ describe("P10：跨会话/studio/runtime 隔离", () => {
     const sessionPath = path.join(agentsDir, "hana", "sessions", "shared.jsonl");
     fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
     fs.writeFileSync(sessionPath, buildLongRunFixtureBytes(8));
-    const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") });
+    const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") }); manifestStores.push(manifestStore);
     const manifest = manifestStore.createForPath({ sessionPath, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
     const cache = new HistoryDirectoryCache();
 
@@ -157,7 +159,7 @@ describe("P10：跨会话/studio/runtime 隔离", () => {
     fs.mkdirSync(path.dirname(pathA), { recursive: true });
     fs.writeFileSync(pathA, buildLongRunFixtureBytes(6));
     fs.writeFileSync(pathB, buildLongRunFixtureBytes(20));
-    const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") });
+    const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") }); manifestStores.push(manifestStore);
     const manifestA = manifestStore.createForPath({ sessionPath: pathA, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
     const manifestB = manifestStore.createForPath({ sessionPath: pathB, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
     const cache = new HistoryDirectoryCache();
