@@ -15,7 +15,7 @@
 | U1：上游目标 | `c6d0405294be67cb134c2758f6472748ee73e2be` | openhanako `v0.447.4` |
 | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
 | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
-| VERIFIED_SOURCE_SHA | `aa42fc5918a245735d2ef2b7490d7e015c525556` | 2026-09-11 任务清单改版候选：todo v2 五态/收尾/进度条 + 样式立法收账 + 边界/指纹坐标修正（分支 feat/tool-activity-presentation）；验证证据见 PROGRESS.md 最新条目 |
+| VERIFIED_SOURCE_SHA | `9c4b11114696a67e63879dbdfdc4e73947636549` | 2026-09-11 回退连文件还原/清单上下文连续性/side-chat/git worktree 批量候选 + persistence 门禁 repin（分支 feat/tool-activity-presentation）；验证证据见 PROGRESS.md 最新条目 |
 
 v0.1.35 仓库内的[功能 CI 记录](artifacts/release-v0.1.35/feature-ci-validation.json)
 对应 `2c835ac77afb1a73cd83816ad3d613297dc770a8`，不单独证明上述发布资料提交重新执行了

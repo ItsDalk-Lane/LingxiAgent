@@ -13,8 +13,8 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = aa42fc5918a245735d2ef2b7490d7e015c525556  (2026-09-11 任务清单改版候选：todo v2 五态/收尾/进度条 + 样式立法收账 + 边界/指纹坐标修正 + 证据重冻结，分支 feat/tool-activity-presentation)
-历史 VERIFIED_SOURCE_SHA = 01414f13c0e47f6eaa7cf527cb6631155adabc31  (2026-09-11 v0.1.38 发布候选：sep10 七领域/历史读取 + 三轮 CI 拦截修复 + 发布元数据，直提 main)
+VERIFIED_SOURCE_SHA   = 9c4b11114696a67e63879dbdfdc4e73947636549  (2026-09-11 回退连文件还原/清单连续性批量候选：fileRollback 影子快照 + todo 上下文注入/提醒/中断标记 + side-chat + git worktree + persistence 门禁 repin，分支 feat/tool-activity-presentation)
+历史 VERIFIED_SOURCE_SHA = aa42fc5918a245735d2ef2b7490d7e015c525556  (2026-09-11 任务清单改版候选：todo v2 五态/收尾/进度条 + 样式立法收账 + 边界/指纹坐标修正 + 证据重冻结，分支 feat/tool-activity-presentation)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1126,6 +1126,13 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 验证证据（绑定该候选树）：typecheck×3 绿；全量 13926 passed / 7 skipped / 4 failed（1380 文件）——4 个失败全部为本条目推进前的 seal 坐标预期红（post-verification-audit-seal + round2 R10-03/R10-04 + round3 manifest 守卫，均因旧坐标 01414f13 起存在非审计开发提交）；build:renderer 绿；open-boundary-lint 绿（1 条已知基线债务）；style-discipline 棘轮绿；persistence-schema-tripwire 15/15 绿；证据契约（round2 R10 + round3 + matrix）22/22 绿。
 - 未执行/受限：真实界面验收（A20 主题/缩放/移动端）与真实模型行为验证未执行（验收记录已标注）；未执行 npm run pack 与打包/发布；Windows 真机仍未实测（沿用既有 Known limitation）。
 - 提交后验证（封印推进后）：审计提交下 post-verification diff guard OK（候选之后仅 6 个审计文件）；matrix/round2/round3/seal 复跑 25/25 绿；全量复跑 13930 passed / 0 failed / 7 skipped（1379 文件通过、1 既有跳过），无任何失败。说明：round2 交付补丁在每次全量运行时由 R10-09 按当时树确定性重生成（工作区漂移为既有状态，不入审计提交）。
+
+## 2026-09-11 回退连文件还原/清单连续性批量候选与审计封印
+
+- 固定源码候选：`9c4b11114696a67e63879dbdfdc4e73947636549`（分支 feat/tool-activity-presentation，135 文件 +26535/−1550）：回退时撤销文件改动（WorkspaceSnapshotService 影子快照 + 会话侧车、preferences 开关默认关、retry fileRollback=workspace 两选项确认、逐文件报告 HTTP+ws 双通道、SessionRollback UI、e2e/挂点测试）+ 清单上下文连续性融合（tool_end 白名单补 todoVersion、权威清单注入、pi-sdk 节流提醒、中断标记、todo_write 收尾验证提醒；记录 docs/tasks/2026-09-11-todo-experience/CONTEXT-CONTINUITY.md）+ side-chat 面板与 composer 模块拆分 + git worktree 创建/列表（GitWorktreeModal/GitBranchList）+ RunningStatusLine/DeskTree mention 等 UI 增量 + i18n 五语言 + 门禁收账（store-registry 注册 workspace-snapshots 店与 git-worktree-user-repo-parent 豁免、persistence 回执再生、schema 指纹 compatible repin sha256:7edf5195…、export-manifest 增补 core/interrupted-turn-marker.ts、core/workspace-snapshots.ts、lib/pi-sdk/todo-context-reminder.ts 三模块）。
+- 验证证据（绑定该候选树，日志 /tmp/candidate-typecheck.log、/tmp/candidate-npm-test.log）：typecheck×3 exit 0；全量 npm test **14098 passed / 0 failed / 7 skipped**（1394 文件，exit 0）——任务 0 基线 12 红（persistence-schema-tripwire 4、persistence-store-registry 3、open-boundary-lint 2、persistence-startup-receipt 1、model-observability-e2e-chat 2）全部清零，其中 8 项门禁红经官方 writer/repin 收账，e2e-chat 2 项复跑即绿（基线红为暂时性）；cli-closure-census 22/22；upstream-sync-matrix 构建校验绿（133 paths 不变）。
+- 未执行/受限：npm run pack 与打包/发布未执行；真实供应商/真机验证未执行（沿用既有 Known limitation）；open-boundary 1 条既有基线债务保留（棘轮基线内）。
+- 提交后验证（封印推进后）：post-verification diff guard OK（候选之后仅审计文件）；build-sync-matrix --check 绿。
 
 ## 2026-08-25 Notebook-first Knowledge 目标
 
