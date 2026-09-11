@@ -235,7 +235,7 @@ index af3647c779dad1edd9042249023ada0cb0c81372..e742177ba5684eb2fbcf41e0997aa452
  .codex/
  
 diff --git a/.sync-audit/build-sync-matrix.mjs b/.sync-audit/build-sync-matrix.mjs
-index d978251370637d720d11094c068847b151ae235e..dd3d189897997c719e1ac69070f340eb289e4908 100644
+index d978251370637d720d11094c068847b151ae235e..db6f904ad73f014d234728fc68d543561573d1a2 100644
 --- a/.sync-audit/build-sync-matrix.mjs
 +++ b/.sync-audit/build-sync-matrix.mjs
 @@ -40,7 +40,7 @@ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source
@@ -243,12 +243,12 @@ index d978251370637d720d11094c068847b151ae235e..dd3d189897997c719e1ac69070f340eb
  // 该 commit 早于记录它的审计提交落地，无自引用（SHA = hash(contents)）问题。
  // 当前 branch HEAD 可能在其后存在纯审计 seal 提交，HEAD 由 Git ref 自身标识。
 -const VERIFIED_SOURCE_SHA = "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202";
-+const VERIFIED_SOURCE_SHA = "0275f6c5a762fc25a75a8585a8e63817cf0be115";
++const VERIFIED_SOURCE_SHA = "af0a16d36c0639f18318a967137331eaffca5d22";
  
  const ALLOWED_DISPOSITIONS = ["ADOPTED", "ADAPTED", "REGENERATED", "INTENTIONAL_DIVERGENCE"];
  
 diff --git a/.sync-audit/upstream-sync-matrix.json b/.sync-audit/upstream-sync-matrix.json
-index d6f8692829bc71ee97c3253e5482beabfdb51324..e2e1a429eaa28c312f9034583e6f11fe866f5d39 100644
+index d6f8692829bc71ee97c3253e5482beabfdb51324..dfacb48c081494a0e457c4ead989e6c58cb29775 100644
 --- a/.sync-audit/upstream-sync-matrix.json
 +++ b/.sync-audit/upstream-sync-matrix.json
 @@ -4,7 +4,7 @@
@@ -256,19 +256,19 @@ index d6f8692829bc71ee97c3253e5482beabfdb51324..e2e1a429eaa28c312f9034583e6f11fe
      "L0": "97595264ead8735a04559507ddaade25db8a4e15",
      "L1": "ca0b417e36a6a1f80947458aaed328a25718e41b",
 -    "VERIFIED_SOURCE_SHA": "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202"
-+    "VERIFIED_SOURCE_SHA": "0275f6c5a762fc25a75a8585a8e63817cf0be115"
++    "VERIFIED_SOURCE_SHA": "af0a16d36c0639f18318a967137331eaffca5d22"
    },
    "summary": {
      "total": 133,
 diff --git a/.sync-audit/verified-source-sha.txt b/.sync-audit/verified-source-sha.txt
-index 78c76634c4edc5a8962212273a593e3ddf8bd28d..2a565e28eef8be5f70fe1ff2406a35346d5c31bc 100644
+index 78c76634c4edc5a8962212273a593e3ddf8bd28d..ba27aa2893858772427c10affceda1acdc681b6e 100644
 --- a/.sync-audit/verified-source-sha.txt
 +++ b/.sync-audit/verified-source-sha.txt
 @@ -1 +1 @@
 -04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+0275f6c5a762fc25a75a8585a8e63817cf0be115
++af0a16d36c0639f18318a967137331eaffca5d22
 diff --git a/PROGRESS.md b/PROGRESS.md
-index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..8093480935ae8857325d6f504b67564c8de658cb 100644
+index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..67e91836b7d9e647eb51c661411ec9044e6b7f3b 100644
 --- a/PROGRESS.md
 +++ b/PROGRESS.md
 @@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
@@ -276,11 +276,11 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..8093480935ae8857325d6f504b67564c
  LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
  LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
 -VERIFIED_SOURCE_SHA   = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202  (2026-09-07 拆除与语音改造+三 bug 修复封印：分支 refactor/dismantle-and-voice-features)
-+VERIFIED_SOURCE_SHA   = 0275f6c5a762fc25a75a8585a8e63817cf0be115  (2026-09-10 历史读取三阶段 + 架构契约补强七领域候选 + lint/测试拦截修复，fix/pending-sep10)
++VERIFIED_SOURCE_SHA   = af0a16d36c0639f18318a967137331eaffca5d22  (2026-09-10 历史读取三阶段 + 架构契约补强七领域候选 + lint/测试拦截修复，fix/pending-sep10)
  历史上游同步工作分支  = feature/upstream-sync-0.447.4
  历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
  ```
-@@ -994,11 +994,118 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
+@@ -994,11 +994,123 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
  需要提交才能完成的封印留待相应授权步骤。不得为使检查变绿而虚报坐标、扩大白名单，
  或删除 seal 文件与 guard 测试；退役门禁属于另需明确授权的治理变更。
  
@@ -396,10 +396,15 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..8093480935ae8857325d6f504b67564c
 +- 固定源码候选：`0275f6c5a762fc25a75a8585a8e63817cf0be115`（f7f93f54 基础上：006a8054 历史读取七套件 Windows 清理加固 + 0275f6c5 证据重冻结 r2）。PR #53 首轮 CI：macOS 双腿绿；ubuntu 腿全量 1369 文件全过后 vitest worker fork 崩溃 exit 1（既有平台抖动家族，与 mac-arm64 历史同类）；windows-2025 腿 48 项失败全部定位为七套件 afterEach rmSync EPERM（Windows 句柄异步释放抖动族，生产句柄均有 finally close），按 server-composition-boundary 既有惯例补 maxRetries:20/retryDelay:250。
 +- 验证证据（绑定 006a8054 源码树；0275f6c5 相对其仅叠加 excluded 证据/再生补丁，无生产代码差异）：七套件单跑 50/50 绿；typecheck×3 绿；改动文件 eslint 0 error；全量 13820 passed / 4 失败均为坐标旧值 f7f93f54 下 seal guard 家族预期红（另 1 次本地 worker fork 抖动，与 ubuntu CI 同族）；重冻结后 sep10-seal-green-r2 绿门禁（exit 0、manifest 36f4b98e/b9676f98 未漂移）、补丁重放 VERIFIED。
 +
++## 2026-09-11 SQLite 句柄关闭修复候选与封印推进（PR #53 CI 收尾 II）
++
++- 固定源码候选：`af0a16d36c0639f18318a967137331eaffca5d22`（0275f6c5 基础上：40e0c6d3 七套件 afterEach 关闭 SessionManifestStore + af0a16d3 证据重冻结 r3）。PR #53 第二轮 CI：macOS 双腿 + ubuntu 全绿；windows-2025 同 48 项 EPERM 复现且 20×250ms 重试不可愈——实锤非异步释放抖动，而是测试未关闭 SessionManifestStore 的 SQLite 句柄（Windows 下打开文件阻塞目录删除；既有 Windows 绿测试 session-manifest-engine/history-pagination-run-continuity 均有 close 惯例）。修复：七套件登记并 afterEach close 后再 rm（rmSync 重试选项保留，对齐既有 Windows 清理惯例）。
++- 验证证据（绑定 40e0c6d3 源码树；af0a16d3 相对其仅叠加 excluded 证据/再生补丁，无生产代码差异）：七套件单跑 50/50 绿；tsconfig.test tsc 绿；全量 13821 passed / 4 失败均为坐标旧值 0275f6c5 下 seal guard 家族预期红；sep10-seal-green-r3 绿门禁（exit 0、manifest 034f8f56/9452bfed 未漂移）、补丁重放 VERIFIED。
++
  ## 2026-08-25 Notebook-first Knowledge 目标
  
  ### 当前阶段：本机闭环完成，外部证据待执行
-@@ -1503,3 +1610,28 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
+@@ -1503,3 +1615,28 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
  - 派生清单（cli-runtime-closure / open-boundary baseline / shell-surface-manifest / persistence 指纹与 inventory / startup receipt）已在受测工作树重生成并随源码提交；staged diff 密钥模式扫描无命中。
  - 本次封印只同步既有六份审计文件（verified-source-sha.txt / build-sync-matrix.mjs / upstream-sync-matrix.json / UPSTREAM_SYNC_AUDIT.md / UPSTREAM_SYNC_MATRIX.md / 本文件坐标行），矩阵重生成 133 paths 硬校验通过（ADOPTED 25 / ADAPTED 100 / REGENERATED 4 / INTENTIONAL_DIVERGENCE 4）；不合并 main。
  - 未执行/受限：全仓 lint 与 build/package 门禁本轮未跑；系统语音识别端到端未实测（开发终端无语音识别 TCC 授权，helper 正确 fail-closed，打包后首次使用需用户授权）；TTS 云端路径需配置 API key 后实测；三 bug 修复的 dev 环境用户验收仍在进行；正式发布与四平台门禁未启动。
@@ -429,7 +434,7 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..8093480935ae8857325d6f504b67564c
 +- compat 旧服务端 runner 自包含化：模板 tracked 于 `tests/compat-old-server-runner.template.mjs`，两个兼容测试 beforeAll 幂等写入 clone；clone 缺席时套件 skip 并 console 明示「四组合中旧服务端侧指定环境未验证」。
 +- 复验：compat 4/4 + 4/4（exit 0）、定向 410/410、typecheck exit 0、全量 13735 passed / 7 failed（签名=A01 基线，任务引入 0）；d-to-final（40 文件）/task-only（76 文件）补丁重生成并通过 apply 验证与树级 0 差异复验。事件与防护详见 `artifacts/history-read-directory/{PROGRESS.md, remaining-risks.md}`。
 diff --git a/UPSTREAM_SYNC_AUDIT.md b/UPSTREAM_SYNC_AUDIT.md
-index adcfa57d8a9836fe12c378f95f7448688d077896..c29d4f7aeb1be60a982248920b806fea767e2c17 100644
+index adcfa57d8a9836fe12c378f95f7448688d077896..f5a681c8f586b91fa2605923ffbbedd672ac6887 100644
 --- a/UPSTREAM_SYNC_AUDIT.md
 +++ b/UPSTREAM_SYNC_AUDIT.md
 @@ -15,7 +15,7 @@
@@ -437,12 +442,12 @@ index adcfa57d8a9836fe12c378f95f7448688d077896..c29d4f7aeb1be60a982248920b806fea
  | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
  | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
 -| VERIFIED_SOURCE_SHA | `04f90d2b26449d2f3264a5ea2a1a8bd6fb253202` | 2026-09-07 拆除与语音改造+三 bug 修复封印（分支 refactor/dismantle-and-voice-features）；typecheck×3 全绿+全量 13081 用例（唯一失败为无关模块 macOS 临时目录清理竞态 flaky、单跑 10/10 通过）后绑定，验证明细见 PROGRESS.md 最新条目 |
-+| VERIFIED_SOURCE_SHA | `0275f6c5a762fc25a75a8585a8e63817cf0be115` | 2026-09-10 历史读取三阶段 + 架构契约补强七领域 + lint/测试拦截修复（fix/pending-sep10）；验证证据见 PROGRESS.md 最新条目 |
++| VERIFIED_SOURCE_SHA | `af0a16d36c0639f18318a967137331eaffca5d22` | 2026-09-10 历史读取三阶段 + 架构契约补强七领域 + lint/测试拦截修复（fix/pending-sep10）；验证证据见 PROGRESS.md 最新条目 |
  
  v0.1.35 仓库内的[功能 CI 记录](artifacts/release-v0.1.35/feature-ci-validation.json)
  对应 `2c835ac77afb1a73cd83816ad3d613297dc770a8`，不单独证明上述发布资料提交重新执行了
 diff --git a/UPSTREAM_SYNC_MATRIX.md b/UPSTREAM_SYNC_MATRIX.md
-index 2f98daf42096994372f834d639551859919c294e..7f07b5de261bb33e5720f96c0926cfd40b1de0b0 100644
+index 2f98daf42096994372f834d639551859919c294e..9a4a212cc184dbbd863a659f899bedb5219585f6 100644
 --- a/UPSTREAM_SYNC_MATRIX.md
 +++ b/UPSTREAM_SYNC_MATRIX.md
 @@ -10,7 +10,7 @@ U0 = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
@@ -450,7 +455,7 @@ index 2f98daf42096994372f834d639551859919c294e..7f07b5de261bb33e5720f96c0926cfd4
  L0 = 97595264ead8735a04559507ddaade25db8a4e15  (Lingxi v0.444.1 同步完成点, PR #2)
  L1 = ca0b417e36a6a1f80947458aaed328a25718e41b  (本轮同步开始时 main)
 -VERIFIED_SOURCE_SHA = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+VERIFIED_SOURCE_SHA = 0275f6c5a762fc25a75a8585a8e63817cf0be115
++VERIFIED_SOURCE_SHA = af0a16d36c0639f18318a967137331eaffca5d22
  ```
  
  ## 统计（脚本计算，禁止人工填写）
@@ -337233,37 +337238,37 @@ index f810ae5a083402412102326b4a18e34157ddbc05..5dd93934851bd6c5dff26139da0a3aec
              hits, totalHits: result.hits.length, truncated: hits.length < result.hits.length,
              ...(hits.length < result.hits.length ? { notice: "本页受消息体积限制；可缩小来源或章节、改写查询继续检索。" } : {}),
 diff --git a/package-lock.json b/package-lock.json
-index 8a3dfedb012cf1673813324365e07734d24e6fc8..7de71b7957bd07dfeb242b6aa197899712093ec9 100644
+index 8a3dfedb012cf1673813324365e07734d24e6fc8..40263653f8c71df4259f8230bd4570a7ccd8f78b 100644
 --- a/package-lock.json
 +++ b/package-lock.json
 @@ -1,12 +1,12 @@
  {
    "name": "lingxi",
 -  "version": "0.1.35",
-+  "version": "0.1.37",
++  "version": "0.1.38",
    "lockfileVersion": 3,
    "requires": true,
    "packages": {
      "": {
        "name": "lingxi",
 -      "version": "0.1.35",
-+      "version": "0.1.37",
++      "version": "0.1.38",
        "hasInstallScript": true,
        "license": "Apache-2.0",
        "dependencies": {
 diff --git a/package.json b/package.json
-index c207c9bf46eb3ce00d9a745e12cd3aeaec401a6a..84116b1cffed3a537b7f8d1fa1bd3b4342aed208 100644
+index c207c9bf46eb3ce00d9a745e12cd3aeaec401a6a..84ba4a2fd90bb4dc22c26cd6ef819d88fda9cb15 100644
 --- a/package.json
 +++ b/package.json
 @@ -1,9 +1,9 @@
  {
    "name": "lingxi",
 -  "version": "0.1.35",
-+  "version": "0.1.37",
++  "version": "0.1.38",
    "lingxi": {
      "upstreamVersion": "0.447.4",
 -    "releaseGeneration": 13
-+    "releaseGeneration": 15
++    "releaseGeneration": 16
    },
    "type": "module",
    "description": "Lingxi - a personal AI agent with memory and soul",
@@ -337313,33 +337318,33 @@ index 77a040179b9683d2186b031925386b151e97327c..5080bb9d85945a35acd802d35f0ba13b
      pluginId: ctx.pluginId || "media",
    };
 diff --git a/release-digest.v1.json b/release-digest.v1.json
-index cdd2a83526dbd8ada4346bf75a93020e1545852a..35130bc4fc2dc66baa7238acf1bb4a5f2c5accb9 100644
+index cdd2a83526dbd8ada4346bf75a93020e1545852a..cc35819e0c03f2f4c0c58b50a6a751a6282a92a4 100644
 --- a/release-digest.v1.json
 +++ b/release-digest.v1.json
-@@ -1,140 +1,205 @@
+@@ -1,140 +1,169 @@
  {
    "schemaVersion": 1,
 -  "tag": "v0.1.35",
 -  "version": "0.1.35",
 -  "previousTag": "v0.1.34",
 -  "generatedAt": "2026-09-05T22:10:00.000Z",
-+  "tag": "v0.1.37",
-+  "version": "0.1.37",
-+  "previousTag": "v0.1.36",
-+  "generatedAt": "2026-09-09T13:04:48.377Z",
++  "tag": "v0.1.38",
++  "version": "0.1.38",
++  "previousTag": "v0.1.37",
++  "generatedAt": "2026-09-11T02:10:35.000Z",
    "noUserFacingChanges": false,
    "summary": {
 -    "zh": "运行信息胶囊新增「环境信息」卡：一眼查看工作台 Git 变更与分支，支持切换分支、提交、提交并推送与直接推送，提交信息可由 AI 生成（标题+正文）。新增源代码管理图表风格的提交历史泳道图，提交 ID 一键复制，悬浮提示全面升级为应用统一样式。同时修复工具调用契约的路径不变量问题。",
 -    "en": "The runtime info capsule gains an Environment card: inspect workspace git changes and branch at a glance, switch branches, commit, commit-and-push or push directly, with AI-generated commit messages (title plus body). A source-control-graph style commit history with swimlanes is included, commit IDs copy on click, and hover tips now use the unified in-app tooltip. Also fixes route-invariant tool contract execution."
-+    "zh": "这个版本让外部工具连接更省心：MCP 连接器可以自选连接时机与空闲自动断开，临时掉线不再被误判为故障；聊天里同一张图不再重复显示、视频可以直接播放；排队消息的发送结果更可信；知识引用角标与设置页交互也做了打磨。",
-+    "en": "This release makes external tool connections easier: MCP connectors now offer connection lifecycle choices with automatic idle disconnect, and a temporary drop is no longer mistaken for a failure; the same image no longer appears twice in chat and videos play inline; queued message delivery is more trustworthy; knowledge citation badges and settings interactions got a round of polish."
++    "zh": "这个版本让聊天历史又快又稳：长会话的打开与翻页显著提速，翻页失控和模型观测轨迹复用两处问题得到修复；输入排队与取消的回执更可信，记忆迁移、媒体任务、语音与外部工具连接的底层契约也做了一轮加固。",
++    "en": "This release makes chat history faster and steadier: long conversations open and page noticeably quicker, with runaway pagination and observability trace-reuse bugs fixed; queued input and cancellation receipts are more trustworthy, and the underlying contracts for memory migration, media tasks, speech, and external tool connections got a hardening pass."
    },
    "counts": {
-     "feature": 2,
--    "fix": 2,
+-    "feature": 2,
++    "feature": 1,
+     "fix": 2,
 -    "improvement": 1,
-+    "fix": 3,
-+    "improvement": 2,
++    "improvement": 3,
      "migration": 0
    },
    "source": {
@@ -337347,42 +337352,42 @@ index cdd2a83526dbd8ada4346bf75a93020e1545852a..35130bc4fc2dc66baa7238acf1bb4a5f
      "repo": "LingxiAgent",
 -    "commitRange": "v0.1.34..HEAD",
 -    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.35",
-+    "commitRange": "v0.1.36..c9494ae9b6ec3806898562863d7f25c311d388ab",
-+    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.37",
++    "commitRange": "v0.1.37..9ab5218c199620ad39075b117e8f811b30de5594",
++    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.38",
      "releaseNotes": ""
    },
    "items": [
      {
 -      "id": "git-environment-card",
-+      "id": "mcp-connector-lifecycle",
++      "id": "history-read-three-stage",
        "kind": "feature",
        "importance": "high",
        "title": {
 -        "zh": "环境信息卡：工作台 Git 状态与操作",
 -        "en": "Environment card: workspace git status and actions"
-+        "zh": "MCP 连接器可按时启停：四种连接方式与空闲自动断开",
-+        "en": "MCP connectors get connection lifecycle choices with automatic idle disconnect"
++        "zh": "聊天历史读取全面提速：目录快路径、增量续读与条件请求",
++        "en": "Chat history reads get much faster: directory fast path, incremental resume, and conditional requests"
        },
        "summary": {
 -        "zh": "运行信息胶囊内新增「环境信息」卡，显示当前工作台的未提交变更（行级增删合计与逐文件 diff）、本地/分支工作树与当前分支；支持弹层列出全部分支并一键切换，提交弹窗提供提交、提交并推送与直接推送，提交信息留空可由 AI 按标题+正文格式生成，非 Git 目录自动降级。",
 -        "en": "A new Environment card inside the runtime info capsule shows uncommitted changes (line totals plus per-file diffs), the local or branch worktree, and the current branch. A popover lists all branches for one-click switching, the commit dialog offers commit, commit-and-push and push-only, and an empty commit message can be auto-generated by AI in title-plus-body form. Non-git workspaces degrade gracefully."
-+        "zh": "每个连接器现在可以分别选择「何时连接」（启动就连，或首次使用才连）和「如何保持」（一直保持，或空闲一段时间后自动断开、下次使用再连）。连接器列表会如实显示「空闲待机」这种有意休息的状态，不再让人误以为出了故障。",
-+        "en": "Each connector can now choose when to connect (at launch, or on first use) and how to hold the connection (keep it, or park it after an idle period and start again on the next use). The connector list shows the intentional \"idle\" resting state instead of making it look like a failure."
++        "zh": "历史消息分页改走带缓存的目录快路径，再次打开同一段会话只读取新增部分；客户端翻页改用条件请求，内容没变化时不再重复传输整页；新增的历史概览让每页大小与总数声明同源。",
++        "en": "History pagination now uses a cached directory fast path, reopening a conversation only reads what was appended; client paging uses conditional requests so unchanged pages are no longer retransferred; a new history overview keeps page-size and total-count declarations consistent."
        },
        "details": [
          {
 -          "zh": "变更弹窗点击文件即可行内展开行级 diff，未跟踪的新文件以全新增补丁呈现。",
 -          "en": "Clicking a file in the changes dialog expands an inline line-level diff; untracked new files appear as all-added patches."
-+          "zh": "四种组合：保活（启动即连、一直保持）、懒保活（首次使用才连、之后保持）、急着连（启动即连、空闲即断）、懒连接（首次使用才连、空闲即断）。",
-+          "en": "Four combinations: keep-alive (connect at launch, hold), lazy keep-alive (connect on first use, then hold), eager (connect at launch, park when idle), and lazy (connect on demand, park when idle)."
++          "zh": "普通分页经目录缓存与定点读取出页，可信追加场景按增量续读，开放中的对话轮次不再随历史变长而变慢。",
++          "en": "Regular pages are served from the directory cache with pinpoint reads; trustworthy append scenarios resume incrementally, so an open conversation turn no longer slows down as history grows."
 +        },
 +        {
-+          "zh": "空闲断开时长可自定义；正在处理中的调用不会被误断，下一次使用会自动重新连接。",
-+          "en": "The idle timeout is configurable; a call in flight is never interrupted, and the next use reconnects automatically."
++          "zh": "ETag/If-None-Match 条件请求接入生产路径：表示未变化返回 304，弱比较与非法语法按协议保守处理。",
++          "en": "ETag/If-None-Match conditional requests are wired into the production path: unchanged representations return 304, and weak comparison plus malformed syntax are handled conservatively per protocol."
 +        },
 +        {
-+          "zh": "设置页新增连接生命周期与空闲断开配置，助手自查连接状态的说明同步更新。",
-+          "en": "The settings page gains lifecycle and idle-timeout fields, and the assistant-facing status tool now explains that idle is a designed resting state."
++          "zh": "历史概览聚合与客户端协议层上线，分页默认 50 条与声明头同源，授权始终先于缓存。",
++          "en": "The history overview aggregation and client protocol layer ship; the default 50-per-page and its declaration header share one source, and authorization always runs before any cache access."
          }
        ],
        "sources": [
@@ -337391,27 +337396,27 @@ index cdd2a83526dbd8ada4346bf75a93020e1545852a..35130bc4fc2dc66baa7238acf1bb4a5f
 -          "ref": "a827d5ec",
 -          "title": "新增运行信息胶囊 Git 环境信息卡及全栈实现"
 -        },
-+          "ref": "c9494ae9",
-+          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
++          "ref": "787437d3",
++          "title": "feat: 历史读取三阶段优化——目录快路径/追加增量续读/条件请求与概览协议"
 +        }
 +      ]
 +    },
 +    {
-+      "id": "mcp-transient-drop-availability",
++      "id": "history-pagination-run-continuity",
 +      "kind": "fix",
 +      "importance": "high",
 +      "title": {
-+        "zh": "连接临时掉线不再被当成「已撤销」，工具保持可用",
-+        "en": "A dropped connection is no longer treated as revoked; tools stay callable"
++        "zh": "修复长会话翻页失控：分页与对话轮次连续性对齐",
++        "en": "Fix runaway pagination in long conversations: paging aligned with conversation-turn continuity"
 +      },
 +      "summary": {
-+        "zh": "连接意外断开（而不是你主动停用）时，相关工具不再被误判为永久失效：下一次调用会自动把连接拉起来，进行中的旧会话也不会收到错误的「工具已撤销」结论。只有你亲手停用连接器，工具才真正下线。",
-+        "en": "When a connection drops unexpectedly (rather than being switched off by you), its tools are no longer misclassified as permanently unavailable: the next call brings the connector back automatically, and older sessions no longer get a false \"tool revoked\" verdict. Only a deliberate stop by you takes tools offline."
++        "zh": "长单轮会话翻页时，归并显示用的标识不再被误当作分页游标——曾经失控到 92 页的情况收敛为正确的 3 页；每一页片段的终态由投影与裁决双侧统一判定，最后一页的完成状态与全量恢复语义保持一致。",
++        "en": "When paging through a long single-turn conversation, the merged display identifier is no longer mistaken for a pagination cursor—what once ballooned to 92 pages settles into the correct 3; each page fragment's final state is decided jointly by the projector and resolver, and the last page's completion state matches a full restore."
 +      },
 +      "details": [
 +        {
-+          "zh": "通过统一桥接调用的外部工具与直连工具行为一致：结果里包含的图片、视频生成任务会照常显示占位与完成卡片。",
-+          "en": "External tools called through the unified bridge now behave like direct ones: image and video generation tasks in their results show the same placeholder and completion cards."
++          "zh": "页片段终态统一由 projector/resolver 双裁决，补 runFacts 缝合与末条终态不变量。",
++          "en": "Page-fragment final states are unified under projector/resolver dual adjudication, with runFacts stitching and a last-entry final-state invariant added."
 +        }
 +      ],
 +      "sources": [
@@ -337419,98 +337424,67 @@ index cdd2a83526dbd8ada4346bf75a93020e1545852a..35130bc4fc2dc66baa7238acf1bb4a5f
            "type": "commit",
 -          "ref": "63c4016a",
 -          "title": "feat(desktop): 环境信息卡可折叠并新增提交历史泳道图；悬浮提示自研化与哈希点击复制"
-+          "ref": "c9494ae9",
-+          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
++          "ref": "1d42b740",
++          "title": "fix: 历史分页 Run 连续性 + 轨迹复用双身份两案修复"
          }
        ]
      },
      {
 -      "id": "commit-history-graph",
-+      "id": "media-dedupe-multi-image",
+-      "kind": "feature",
++      "id": "observability-trace-reuse",
 +      "kind": "fix",
-+      "importance": "high",
-+      "title": {
-+        "zh": "同一张图片不再显示两份，多图任务逐张保留",
-+        "en": "The same image no longer appears twice; multi-image tasks keep every picture"
-+      },
-+      "summary": {
-+        "zh": "助手生成图片后，「自动贴出的结果」和「手动点开的展示」是同一张图时只保留一处，不再出现两张重复图片；一个任务产出多张图时逐张显示。完成通知迟到或重放也不会追加重复文件，重新进入会话看到的与当时一致。",
-+        "en": "After the assistant generates an image, the automatically delivered result and a manually opened presentation of the same file collapse into one card instead of duplicating; a task producing several images keeps them all. Late or replayed completion notices no longer append duplicate files, and revisiting the session shows exactly what was there."
-+      },
-+      "details": [
-+        {
-+          "zh": "是否重复按文件身份与内容版本判断：同一文件被明确更新过（内容变化）仍会作为新版本显示。",
-+          "en": "Duplication is judged by file identity and content version: the same file explicitly updated with new content still shows as a new version."
-+        }
-+      ],
-+      "sources": [
-+        {
-+          "type": "commit",
-+          "ref": "c9494ae9",
-+          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
-+        }
-+      ]
-+    },
-+    {
-+      "id": "inline-video-controlled-preview",
-       "kind": "feature",
        "importance": "medium",
        "title": {
 -        "zh": "提交历史泳道图与提交 ID 一键复制",
 -        "en": "Commit history swimlane graph with one-click commit ID copy"
-+        "zh": "视频直接在聊天里播放，媒体预览更稳",
-+        "en": "Videos play inline in chat; media previews are more robust"
++        "zh": "修复模型观测轨迹复用：按业务会话正确命中",
++        "en": "Fix observability trace reuse: now matched by business session"
        },
        "summary": {
 -        "zh": "新增源代码管理图表风格的提交历史视图：泳道图形呈现分支合并轨迹，头部提交高亮，附 refs 徽标、作者与相对时间；短哈希悬停查看完整提交信息，点击即复制完整提交 ID。",
 -        "en": "A new source-control-graph style history view renders branch merges as swimlanes with the HEAD commit highlighted, plus ref chips, author and relative time. Hovering a short hash previews the full message and clicking copies the full commit ID."
-+        "zh": "聊天里的视频卡片自带播放控件，可以直接播放和拖动进度，点击不会另开窗口。图片和视频的预览与下载优先走受控的内部地址，旧地址失效后拿到新地址能自动恢复显示，减少「有文件名却看不到内容」的情况。",
-+        "en": "Video cards in chat now carry player controls for direct playback and seeking, and clicking no longer opens a separate window. Image and video previews and downloads prefer controlled internal URLs, so a failed old URL recovers automatically once the new one arrives instead of showing a name with no content."
++        "zh": "模型调用观测的轨迹复用此前误用 SDK 文件头的 UUID 做查找，导致复用一直没有真正生效；现改为按业务会话 ID 命中，并补上幂等合并与双身份防假阳性测试。",
++        "en": "Observability trace reuse previously looked up traces by the SDK file-header UUID, so reuse never actually hit; it now matches on the business session ID, with idempotent merging and dual-identity tests guarding against false positives."
        },
--      "details": [],
+       "details": [],
        "sources": [
          {
            "type": "commit",
 -          "ref": "63c4016a",
 -          "title": "feat(desktop): 环境信息卡可折叠并新增提交历史泳道图；悬浮提示自研化与哈希点击复制"
-+          "ref": "c9494ae9",
-+          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
++          "ref": "1d42b740",
++          "title": "fix: 历史分页 Run 连续性 + 轨迹复用双身份两案修复"
          }
--      ]
-+      ],
-+      "details": []
+       ]
      },
      {
 -      "id": "tool-contract-path-invariance",
-+      "id": "queued-send-settlement",
-       "kind": "fix",
-       "importance": "high",
+-      "kind": "fix",
+-      "importance": "high",
++      "id": "input-acceptance-boundary",
++      "kind": "improvement",
++      "importance": "medium",
        "title": {
 -        "zh": "修复工具调用契约的路径不变量",
 -        "en": "Fix route-invariant tool contract execution"
-+        "zh": "排队消息的发送结果更可信，不被迟到的旧回执打断",
-+        "en": "Queued messages settle on trustworthy evidence, immune to stale receipts"
++        "zh": "输入接受与取消的回执更精确，不再跨会话重发",
++        "en": "More precise receipts for input acceptance and cancellation, no more cross-session resends"
        },
        "summary": {
 -        "zh": "工具调用契约执行改为与路由无关的不变量，规范会话路径归一，并补齐 Windows 路径夹具与最终契约校验，避免同一工具在不同调用路径下行为漂移。",
 -        "en": "Tool contract execution now enforces route invariance with normalized session paths, plus Windows path fixtures and final contract validation, so a tool behaves identically regardless of invocation route."
-+        "zh": "上一条消息的送达状态还没核实前，「立即插入」会明确提示暂缓，而不是制造顺序混乱；服务器迟到的旧结束回执不会错误地结束你刚发起的新回合，也不会触发重复发送。现在「送达回执 + 回合结束」两份证据齐全才继续队列，先后顺序不影响结论。",
-+        "en": "While the previous message's delivery is still unverified, \"insert now\" explains why it waits instead of shuffling order; a stale, late run-end receipt from the server can no longer close a newer run you just started or trigger a duplicate send. The queue now proceeds only with both the delivery receipt and the run end in hand, regardless of arrival order."
++        "zh": "尚未移交、已移交待证、已观察写入三种输入状态分开记录；准备期取消会收到明确的「接受前已取消」回执；会话忙碌时移交后的输入不再触发跨会话重发。",
++        "en": "Input states are now recorded separately as not-yet-handed-off, handed-off-awaiting-proof, and observed-written; cancelling during preparation yields an explicit cancelled-before-acceptance receipt; input already handed off no longer triggers cross-session resends when the session is busy."
        },
--      "details": [],
-+      "details": [
-+        {
-+          "zh": "多个回合身份对不上时，只按权威历史记录核实，不靠猜测续发。",
-+          "en": "Conflicting run identities are resolved only against the authoritative history, never by guesswork."
-+        }
-+      ],
+       "details": [],
        "sources": [
          {
            "type": "commit",
 -          "ref": "c45dde88",
 -          "title": "Merge pull request #43 from ItsDalk-Lane/fix/tool-contract-path-invariance-v0134"
-+          "ref": "c9494ae9",
-+          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
++          "ref": "d011e849",
++          "title": "feat: 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次"
          }
        ]
      },
@@ -337518,77 +337492,239 @@ index cdd2a83526dbd8ada4346bf75a93020e1545852a..35130bc4fc2dc66baa7238acf1bb4a5f
 -      "id": "i18n-missing-keys",
 -      "kind": "fix",
 -      "importance": "low",
-+      "id": "knowledge-citation-inline",
++      "id": "memory-migration-receipt-v4",
 +      "kind": "improvement",
 +      "importance": "medium",
        "title": {
 -        "zh": "补齐繁体/日/韩缺失文案",
 -        "en": "Fill missing zh-TW/ja/ko locale entries"
-+        "zh": "知识引用角标更干净",
-+        "en": "Cleaner knowledge citation badges"
++        "zh": "记忆迁移中断恢复更安全：v4 收据按序落盘",
++        "en": "Safer memory-migration recovery: v4 receipts persist in order"
        },
        "summary": {
 -        "zh": "补齐繁体中文、日文与韩文缺失的技能面板与项目技能文案键，五种语言与英文键位完全对齐。",
 -        "en": "Missing skill panel and project skill entries for Traditional Chinese, Japanese and Korean were added; all five locales now match the English key set."
-+        "zh": "引用角标改为小巧的上标数字，不再带底色胶囊；模型偶尔在角标外多写的括号或字段名包装会自动清理。只清理显示效果，你收到的原文与引用链接都保持原样。给模型的引用格式要求也同步收紧。",
-+        "en": "Citation badges are now small superscript numbers without a pill background, and stray brackets or field-name wrappers around them are cleaned up on display only — the original text and links you receive stay untouched. The citation format instructions to the model were tightened as well."
++        "zh": "记忆迁移收据升级到 v4，按「准备→提交中→目标已提交→源已归档→完成」顺序落盘，提交中先于目标写盘；中断后只有 v4 准备态可重放，拿不准的窗口保守地转成冲突提示而不是静默继续。",
++        "en": "Memory-migration receipts upgrade to v4, persisted in prepared→committing→target-committed→sources-archived→completed order with committing recorded before the target write; after an interruption only a v4 prepared state may replay, and ambiguous windows conservatively become conflicts instead of silently continuing."
        },
--      "details": [],
+       "details": [],
        "sources": [
          {
            "type": "commit",
 -          "ref": "9486630f",
 -          "title": "fix(test): 合并主线后收口——i18n 补键、持久化指纹与 CLI closure 重算、样式基线收账"
-+          "ref": "c9494ae9",
-+          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
++          "ref": "d011e849",
++          "title": "feat: 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次"
          }
--      ]
-+      ],
-+      "details": []
+       ]
      },
      {
 -      "id": "unified-tooltips",
-+      "id": "settings-interaction-polish",
++      "id": "media-voice-mcp-hardening",
        "kind": "improvement",
--      "importance": "low",
-+      "importance": "medium",
+       "importance": "low",
        "title": {
 -        "zh": "悬浮提示统一为应用内样式",
 -        "en": "Unified in-app tooltips"
-+        "zh": "设置页手感修复：弹层、提示与按钮状态",
-+        "en": "Settings polish: popups, toasts, and busy states"
++        "zh": "媒体任务、语音与 MCP 连接的底层契约加固",
++        "en": "Underlying contract hardening for media tasks, speech, and MCP connections"
        },
        "summary": {
 -        "zh": "Git 相关悬浮提示不再依赖系统原生 title，统一使用应用自带 Tooltip：延迟可控、跟随主题，悬停即可查看完整提交信息、完整路径与完整哈希。",
 -        "en": "Git-related hover tips no longer rely on the OS-native title; they use the in-app tooltip with controlled delay and theme support, revealing the full commit message, full paths and full hashes on hover."
-+        "zh": "按 Esc 只关闭当前打开的菜单或编辑面板并把焦点还给触发按钮，不再顺手关掉更大一层的窗口；右上角提示改为带图标的卡片，停留更久、错误更醒目；「刷新」「验证」「拉取模型」等按钮在处理中会显示进行中状态并防止重复点击。",
-+        "en": "Escape now closes only the currently open menu or editor and returns focus to its trigger instead of dismissing a whole level above; toasts became icon cards that stay longer and mark errors clearly; refresh/verify/fetch buttons show a busy state and cannot be double-fired while working."
++        "zh": "媒体任务快照损坏时明确报错而不是覆盖原件，任务结算带尝试编号；语音识别按尝试所有权结算，被取代的尝试不再重复落结果；MCP 客户端实例即连接代次，操作所有权有测试钉住。",
++        "en": "Corrupted media-task snapshots now fail loudly instead of being overwritten, and task settlement carries attempt numbers; speech recognition settles by attempt ownership so superseded attempts never write results twice; an MCP client instance is its connection generation, with operation ownership pinned by tests."
        },
--      "details": [],
-+      "details": [
-+        {
-+          "zh": "电脑控制状态刷新会明确报告成功或失败；辅助模型连通性测试在切换模型或离开页面时会作废旧结果并中止旧请求。",
-+          "en": "Computer-use status refresh reports success or failure explicitly; auxiliary model connectivity tests discard stale results and abort in-flight requests when the model changes or the page closes."
-+        }
-+      ],
+       "details": [],
        "sources": [
          {
            "type": "commit",
 -          "ref": "63c4016a",
 -          "title": "feat(desktop): 环境信息卡可折叠并新增提交历史泳道图；悬浮提示自研化与哈希点击复制"
-+          "ref": "c9494ae9",
-+          "title": "feat: MCP 连接器生命周期四档与空闲停泊 + 媒体展示去重与受控预览 + 排队回执与会话身份加固"
++          "ref": "d011e849",
++          "title": "feat: 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次"
          }
        ]
      }
 diff --git a/release-digest.v2.json b/release-digest.v2.json
-index 9743b792df653fa9ed3f7548a8c5cbf72b2eee2c..af9bc5cc8d1c29073fd1a77fb5ea929606578ab1 100644
+index 9743b792df653fa9ed3f7548a8c5cbf72b2eee2c..634c51595daee436e1aa808efbe925dad8f7e479 100644
 --- a/release-digest.v2.json
 +++ b/release-digest.v2.json
-@@ -1,6 +1,305 @@
+@@ -1,6 +1,476 @@
  {
    "schema": 2,
    "entries": [
++    {
++      "schemaVersion": 1,
++      "tag": "v0.1.38",
++      "version": "0.1.38",
++      "previousTag": "v0.1.37",
++      "generatedAt": "2026-09-11T02:10:35.000Z",
++      "noUserFacingChanges": false,
++      "summary": {
++        "zh": "这个版本让聊天历史又快又稳：长会话的打开与翻页显著提速，翻页失控和模型观测轨迹复用两处问题得到修复；输入排队与取消的回执更可信，记忆迁移、媒体任务、语音与外部工具连接的底层契约也做了一轮加固。",
++        "en": "This release makes chat history faster and steadier: long conversations open and page noticeably quicker, with runaway pagination and observability trace-reuse bugs fixed; queued input and cancellation receipts are more trustworthy, and the underlying contracts for memory migration, media tasks, speech, and external tool connections got a hardening pass."
++      },
++      "counts": {
++        "feature": 1,
++        "fix": 2,
++        "improvement": 3,
++        "migration": 0
++      },
++      "source": {
++        "owner": "ItsDalk-Lane",
++        "repo": "LingxiAgent",
++        "commitRange": "v0.1.37..9ab5218c199620ad39075b117e8f811b30de5594",
++        "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.38",
++        "releaseNotes": ""
++      },
++      "items": [
++        {
++          "id": "history-read-three-stage",
++          "kind": "feature",
++          "importance": "high",
++          "title": {
++            "zh": "聊天历史读取全面提速：目录快路径、增量续读与条件请求",
++            "en": "Chat history reads get much faster: directory fast path, incremental resume, and conditional requests"
++          },
++          "summary": {
++            "zh": "历史消息分页改走带缓存的目录快路径，再次打开同一段会话只读取新增部分；客户端翻页改用条件请求，内容没变化时不再重复传输整页；新增的历史概览让每页大小与总数声明同源。",
++            "en": "History pagination now uses a cached directory fast path, reopening a conversation only reads what was appended; client paging uses conditional requests so unchanged pages are no longer retransferred; a new history overview keeps page-size and total-count declarations consistent."
++          },
++          "details": [
++            {
++              "zh": "普通分页经目录缓存与定点读取出页，可信追加场景按增量续读，开放中的对话轮次不再随历史变长而变慢。",
++              "en": "Regular pages are served from the directory cache with pinpoint reads; trustworthy append scenarios resume incrementally, so an open conversation turn no longer slows down as history grows."
++            },
++            {
++              "zh": "ETag/If-None-Match 条件请求接入生产路径：表示未变化返回 304，弱比较与非法语法按协议保守处理。",
++              "en": "ETag/If-None-Match conditional requests are wired into the production path: unchanged representations return 304, and weak comparison plus malformed syntax are handled conservatively per protocol."
++            },
++            {
++              "zh": "历史概览聚合与客户端协议层上线，分页默认 50 条与声明头同源，授权始终先于缓存。",
++              "en": "The history overview aggregation and client protocol layer ship; the default 50-per-page and its declaration header share one source, and authorization always runs before any cache access."
++            }
++          ],
++          "sources": [
++            {
++              "type": "commit",
++              "ref": "787437d3",
++              "title": "feat: 历史读取三阶段优化——目录快路径/追加增量续读/条件请求与概览协议"
++            }
++          ]
++        },
++        {
++          "id": "history-pagination-run-continuity",
++          "kind": "fix",
++          "importance": "high",
++          "title": {
++            "zh": "修复长会话翻页失控：分页与对话轮次连续性对齐",
++            "en": "Fix runaway pagination in long conversations: paging aligned with conversation-turn continuity"
++          },
++          "summary": {
++            "zh": "长单轮会话翻页时，归并显示用的标识不再被误当作分页游标——曾经失控到 92 页的情况收敛为正确的 3 页；每一页片段的终态由投影与裁决双侧统一判定，最后一页的完成状态与全量恢复语义保持一致。",
++            "en": "When paging through a long single-turn conversation, the merged display identifier is no longer mistaken for a pagination cursor—what once ballooned to 92 pages settles into the correct 3; each page fragment's final state is decided jointly by the projector and resolver, and the last page's completion state matches a full restore."
++          },
++          "details": [
++            {
++              "zh": "页片段终态统一由 projector/resolver 双裁决，补 runFacts 缝合与末条终态不变量。",
++              "en": "Page-fragment final states are unified under projector/resolver dual adjudication, with runFacts stitching and a last-entry final-state invariant added."
++            }
++          ],
++          "sources": [
++            {
++              "type": "commit",
++              "ref": "1d42b740",
++              "title": "fix: 历史分页 Run 连续性 + 轨迹复用双身份两案修复"
++            }
++          ]
++        },
++        {
++          "id": "observability-trace-reuse",
++          "kind": "fix",
++          "importance": "medium",
++          "title": {
++            "zh": "修复模型观测轨迹复用：按业务会话正确命中",
++            "en": "Fix observability trace reuse: now matched by business session"
++          },
++          "summary": {
++            "zh": "模型调用观测的轨迹复用此前误用 SDK 文件头的 UUID 做查找，导致复用一直没有真正生效；现改为按业务会话 ID 命中，并补上幂等合并与双身份防假阳性测试。",
++            "en": "Observability trace reuse previously looked up traces by the SDK file-header UUID, so reuse never actually hit; it now matches on the business session ID, with idempotent merging and dual-identity tests guarding against false positives."
++          },
++          "details": [],
++          "sources": [
++            {
++              "type": "commit",
++              "ref": "1d42b740",
++              "title": "fix: 历史分页 Run 连续性 + 轨迹复用双身份两案修复"
++            }
++          ]
++        },
++        {
++          "id": "input-acceptance-boundary",
++          "kind": "improvement",
++          "importance": "medium",
++          "title": {
++            "zh": "输入接受与取消的回执更精确，不再跨会话重发",
++            "en": "More precise receipts for input acceptance and cancellation, no more cross-session resends"
++          },
++          "summary": {
++            "zh": "尚未移交、已移交待证、已观察写入三种输入状态分开记录；准备期取消会收到明确的「接受前已取消」回执；会话忙碌时移交后的输入不再触发跨会话重发。",
++            "en": "Input states are now recorded separately as not-yet-handed-off, handed-off-awaiting-proof, and observed-written; cancelling during preparation yields an explicit cancelled-before-acceptance receipt; input already handed off no longer triggers cross-session resends when the session is busy."
++          },
++          "details": [],
++          "sources": [
++            {
++              "type": "commit",
++              "ref": "d011e849",
++              "title": "feat: 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次"
++            }
++          ]
++        },
++        {
++          "id": "memory-migration-receipt-v4",
++          "kind": "improvement",
++          "importance": "medium",
++          "title": {
++            "zh": "记忆迁移中断恢复更安全：v4 收据按序落盘",
++            "en": "Safer memory-migration recovery: v4 receipts persist in order"
++          },
++          "summary": {
++            "zh": "记忆迁移收据升级到 v4，按「准备→提交中→目标已提交→源已归档→完成」顺序落盘，提交中先于目标写盘；中断后只有 v4 准备态可重放，拿不准的窗口保守地转成冲突提示而不是静默继续。",
++            "en": "Memory-migration receipts upgrade to v4, persisted in prepared→committing→target-committed→sources-archived→completed order with committing recorded before the target write; after an interruption only a v4 prepared state may replay, and ambiguous windows conservatively become conflicts instead of silently continuing."
++          },
++          "details": [],
++          "sources": [
++            {
++              "type": "commit",
++              "ref": "d011e849",
++              "title": "feat: 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次"
++            }
++          ]
++        },
++        {
++          "id": "media-voice-mcp-hardening",
++          "kind": "improvement",
++          "importance": "low",
++          "title": {
++            "zh": "媒体任务、语音与 MCP 连接的底层契约加固",
++            "en": "Underlying contract hardening for media tasks, speech, and MCP connections"
++          },
++          "summary": {
++            "zh": "媒体任务快照损坏时明确报错而不是覆盖原件，任务结算带尝试编号；语音识别按尝试所有权结算，被取代的尝试不再重复落结果；MCP 客户端实例即连接代次，操作所有权有测试钉住。",
++            "en": "Corrupted media-task snapshots now fail loudly instead of being overwritten, and task settlement carries attempt numbers; speech recognition settles by attempt ownership so superseded attempts never write results twice; an MCP client instance is its connection generation, with operation ownership pinned by tests."
++          },
++          "details": [],
++          "sources": [
++            {
++              "type": "commit",
++              "ref": "d011e849",
++              "title": "feat: 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次"
++            }
++          ]
++        }
++      ]
++    },
 +    {
 +      "schemaVersion": 1,
 +      "tag": "v0.1.37",
@@ -359162,7 +359298,7 @@ index 233f76e98a17abd3fb3265c1a2227b19408491c4..dfdb9b30b3784fd02473bb9534046255
      expect(() => migrateAgentPinnedTenets(agentDir, "hana", {
        at: (checkpoint) => { if (checkpoint === "archive:before:pinned.md") throw new Error("archive boom"); },
 diff --git a/tests/release-preflight.test.ts b/tests/release-preflight.test.ts
-index 2a2e9f2a53f48348d1dda35122421e1df46004ad..976b5b79de925cdbc27455968bc1c2db52bbe356 100644
+index 2a2e9f2a53f48348d1dda35122421e1df46004ad..2ad18867493b3b427de5f065c73c3d3eed9b4d61 100644
 --- a/tests/release-preflight.test.ts
 +++ b/tests/release-preflight.test.ts
 @@ -65,11 +65,11 @@ describe("release preflight", () => {
@@ -359174,11 +359310,11 @@ index 2a2e9f2a53f48348d1dda35122421e1df46004ad..976b5b79de925cdbc27455968bc1c2db
 -      historicalMaximumVersion: "0.1.34",
 -      historicalMaximumGeneration: 12,
 -      candidateGeneration: 13,
-+    expect(runReleasePreflight({ candidateTag: "v0.1.37" })).toMatchObject({
-+      candidateVersion: "0.1.37",
-+      historicalMaximumVersion: "0.1.36",
-+      historicalMaximumGeneration: 14,
-+      candidateGeneration: 15,
++    expect(runReleasePreflight({ candidateTag: "v0.1.38" })).toMatchObject({
++      candidateVersion: "0.1.38",
++      historicalMaximumVersion: "0.1.37",
++      historicalMaximumGeneration: 15,
++      candidateGeneration: 16,
      });
    });
  });

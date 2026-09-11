@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/packaged-desktop-cleanup.test.ts (9 tests) 42ms
+ ✓ tests/upstream-sync-matrix.test.ts (7 tests) 45ms
+
+ Test Files  2 passed (2)
+      Tests  16 passed (16)
+   Start at  10:14:06
+   Duration  140ms (transform 46ms, setup 38ms, import 21ms, tests 87ms, environment 0ms)
+
