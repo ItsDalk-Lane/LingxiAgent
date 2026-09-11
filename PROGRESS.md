@@ -13,7 +13,8 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 01414f13c0e47f6eaa7cf527cb6631155adabc31  (2026-09-11 v0.1.38 发布候选：sep10 七领域/历史读取 + 三轮 CI 拦截修复 + 发布元数据，直提 main)
+VERIFIED_SOURCE_SHA   = aa42fc5918a245735d2ef2b7490d7e015c525556  (2026-09-11 任务清单改版候选：todo v2 五态/收尾/进度条 + 样式立法收账 + 边界/指纹坐标修正 + 证据重冻结，分支 feat/tool-activity-presentation)
+历史 VERIFIED_SOURCE_SHA = 01414f13c0e47f6eaa7cf527cb6631155adabc31  (2026-09-11 v0.1.38 发布候选：sep10 七领域/历史读取 + 三轮 CI 拦截修复 + 发布元数据，直提 main)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1118,6 +1119,13 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - CI 证据（PR #53，合并前最终轮 34551812195）：macos-15 arm64 / macos-15-intel / ubuntu-24.04 / windows-2025 四腿全绿 + open-build-smoke + persistence-schema-guard；首轮 ubuntu worker fork 崩溃与两轮 Windows EPERM 的处置见上两条记录。
 - 未执行/受限：正式签名、四平台安装包、公证与远端发布证据由 tag 工作流执行（本条目记为待流水线验证，不以本地结果代替）；本地未执行 npm run pack；Windows NSIS 真机安装交互仍未实测（沿用既有 Known limitation）。
 - 发布结果（2026-09-11）：运行 34553989949 全绿（macos-15 arm64 首跑 better-sqlite3 node-gyp 拉取 nodejs.org 头文件网络超时，runner 网络抖动非代码问题，按惯例重跑失败作业后通过；四平台构建 + artifact-release-smoke + release + publish-train 全绿）。v0.1.38 正式发布（Latest，非草稿非预发布，18 产物），train-stable-17 与 train-beta-20 双列车同步发布；mirror-atomgit 401 Bad credentials 为 AtomGit 镜像长期故障既有状态（best-effort，不阻塞发布）。验证证据以该运行远端作业为准；本提交为纯审计收口。
+
+## 2026-09-11 任务清单改版候选与审计封印
+
+- 固定源码候选：`aa42fc5918a245735d2ef2b7490d7e015c525556`（分支 feat/tool-activity-presentation）：d759b695 任务清单改版（todo v2 五态与受阻原因、完成/取消/收纳区分、版本哈希保护的用户收尾操作、输入框上方 TodoPanel、胶囊重复清单移除、消息行摘要、失败保留原清单缺陷修复；验收记录 docs/tasks/2026-09-11-todo-experience/ACCEPTANCE.md）+ 43501abb 封印前收账（MessageActivity/TodoPanel CSS 字面量收进定义行与 token、export-manifest 补录 4 个展示层模块消除 open→closed 新耦合、persistence-schema-fingerprint compatible 重钉——search-tools.ts 仅展示层改动、managed-runtime-caches 契约零变化）+ aa42fc59 证据重冻结（round2/round3 SOURCE_MANIFEST 按候选树重算 c86a8c64/9e9cfe2f、交付补丁重生成重放 VERIFIED、sep11-todo-green 绿门禁 exit 0 且执行期间无漂移）。
+- 验证证据（绑定该候选树）：typecheck×3 绿；全量 13926 passed / 7 skipped / 4 failed（1380 文件）——4 个失败全部为本条目推进前的 seal 坐标预期红（post-verification-audit-seal + round2 R10-03/R10-04 + round3 manifest 守卫，均因旧坐标 01414f13 起存在非审计开发提交）；build:renderer 绿；open-boundary-lint 绿（1 条已知基线债务）；style-discipline 棘轮绿；persistence-schema-tripwire 15/15 绿；证据契约（round2 R10 + round3 + matrix）22/22 绿。
+- 未执行/受限：真实界面验收（A20 主题/缩放/移动端）与真实模型行为验证未执行（验收记录已标注）；未执行 npm run pack 与打包/发布；Windows 真机仍未实测（沿用既有 Known limitation）。
+- 提交后验证（封印推进后）：审计提交下 post-verification diff guard OK（候选之后仅审计文件）；matrix/round2/round3/seal 复跑全绿；全量复跑结果记录于审计提交后的本条更新。
 
 ## 2026-08-25 Notebook-first Knowledge 目标
 
