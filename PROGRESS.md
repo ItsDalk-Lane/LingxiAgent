@@ -1117,6 +1117,7 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 验证证据（绑定 15654cd1 元数据树）：release:preflight --tag v0.1.38 PASS（历史最大 0.1.37/15，21 个历史发布）；validate-release-digest v1/v2 PASS；typecheck×3 绿；升版后 test:artifact-release-smoke 305/305 复跑全绿（含读取当前包版本的实时预检用例）；全量 13825 passed / 0 failed / 7 skipped（1373 文件，exit 0）；sep11-v0138-green 绿门禁（exit 0、manifest e8789893/39862bfa 未漂移）、补丁重放 VERIFIED。
 - CI 证据（PR #53，合并前最终轮 34551812195）：macos-15 arm64 / macos-15-intel / ubuntu-24.04 / windows-2025 四腿全绿 + open-build-smoke + persistence-schema-guard；首轮 ubuntu worker fork 崩溃与两轮 Windows EPERM 的处置见上两条记录。
 - 未执行/受限：正式签名、四平台安装包、公证与远端发布证据由 tag 工作流执行（本条目记为待流水线验证，不以本地结果代替）；本地未执行 npm run pack；Windows NSIS 真机安装交互仍未实测（沿用既有 Known limitation）。
+- 发布结果（2026-09-11）：运行 34553989949 全绿（macos-15 arm64 首跑 better-sqlite3 node-gyp 拉取 nodejs.org 头文件网络超时，runner 网络抖动非代码问题，按惯例重跑失败作业后通过；四平台构建 + artifact-release-smoke + release + publish-train 全绿）。v0.1.38 正式发布（Latest，非草稿非预发布，18 产物），train-stable-17 与 train-beta-20 双列车同步发布；mirror-atomgit 401 Bad credentials 为 AtomGit 镜像长期故障既有状态（best-effort，不阻塞发布）。验证证据以该运行远端作业为准；本提交为纯审计收口。
 
 ## 2026-08-25 Notebook-first Knowledge 目标
 
