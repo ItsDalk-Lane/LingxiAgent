@@ -3,6 +3,177 @@
   "entries": [
     {
       "schemaVersion": 1,
+      "tag": "v0.1.38",
+      "version": "0.1.38",
+      "previousTag": "v0.1.37",
+      "generatedAt": "2026-09-11T02:10:35.000Z",
+      "noUserFacingChanges": false,
+      "summary": {
+        "zh": "这个版本让聊天历史又快又稳：长会话的打开与翻页显著提速，翻页失控和模型观测轨迹复用两处问题得到修复；输入排队与取消的回执更可信，记忆迁移、媒体任务、语音与外部工具连接的底层契约也做了一轮加固。",
+        "en": "This release makes chat history faster and steadier: long conversations open and page noticeably quicker, with runaway pagination and observability trace-reuse bugs fixed; queued input and cancellation receipts are more trustworthy, and the underlying contracts for memory migration, media tasks, speech, and external tool connections got a hardening pass."
+      },
+      "counts": {
+        "feature": 1,
+        "fix": 2,
+        "improvement": 3,
+        "migration": 0
+      },
+      "source": {
+        "owner": "ItsDalk-Lane",
+        "repo": "LingxiAgent",
+        "commitRange": "v0.1.37..9ab5218c199620ad39075b117e8f811b30de5594",
+        "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.38",
+        "releaseNotes": ""
+      },
+      "items": [
+        {
+          "id": "history-read-three-stage",
+          "kind": "feature",
+          "importance": "high",
+          "title": {
+            "zh": "聊天历史读取全面提速：目录快路径、增量续读与条件请求",
+            "en": "Chat history reads get much faster: directory fast path, incremental resume, and conditional requests"
+          },
+          "summary": {
+            "zh": "历史消息分页改走带缓存的目录快路径，再次打开同一段会话只读取新增部分；客户端翻页改用条件请求，内容没变化时不再重复传输整页；新增的历史概览让每页大小与总数声明同源。",
+            "en": "History pagination now uses a cached directory fast path, reopening a conversation only reads what was appended; client paging uses conditional requests so unchanged pages are no longer retransferred; a new history overview keeps page-size and total-count declarations consistent."
+          },
+          "details": [
+            {
+              "zh": "普通分页经目录缓存与定点读取出页，可信追加场景按增量续读，开放中的对话轮次不再随历史变长而变慢。",
+              "en": "Regular pages are served from the directory cache with pinpoint reads; trustworthy append scenarios resume incrementally, so an open conversation turn no longer slows down as history grows."
+            },
+            {
+              "zh": "ETag/If-None-Match 条件请求接入生产路径：表示未变化返回 304，弱比较与非法语法按协议保守处理。",
+              "en": "ETag/If-None-Match conditional requests are wired into the production path: unchanged representations return 304, and weak comparison plus malformed syntax are handled conservatively per protocol."
+            },
+            {
+              "zh": "历史概览聚合与客户端协议层上线，分页默认 50 条与声明头同源，授权始终先于缓存。",
+              "en": "The history overview aggregation and client protocol layer ship; the default 50-per-page and its declaration header share one source, and authorization always runs before any cache access."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "787437d3",
+              "title": "feat: 历史读取三阶段优化——目录快路径/追加增量续读/条件请求与概览协议"
+            }
+          ]
+        },
+        {
+          "id": "history-pagination-run-continuity",
+          "kind": "fix",
+          "importance": "high",
+          "title": {
+            "zh": "修复长会话翻页失控：分页与对话轮次连续性对齐",
+            "en": "Fix runaway pagination in long conversations: paging aligned with conversation-turn continuity"
+          },
+          "summary": {
+            "zh": "长单轮会话翻页时，归并显示用的标识不再被误当作分页游标——曾经失控到 92 页的情况收敛为正确的 3 页；每一页片段的终态由投影与裁决双侧统一判定，最后一页的完成状态与全量恢复语义保持一致。",
+            "en": "When paging through a long single-turn conversation, the merged display identifier is no longer mistaken for a pagination cursor—what once ballooned to 92 pages settles into the correct 3; each page fragment's final state is decided jointly by the projector and resolver, and the last page's completion state matches a full restore."
+          },
+          "details": [
+            {
+              "zh": "页片段终态统一由 projector/resolver 双裁决，补 runFacts 缝合与末条终态不变量。",
+              "en": "Page-fragment final states are unified under projector/resolver dual adjudication, with runFacts stitching and a last-entry final-state invariant added."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "1d42b740",
+              "title": "fix: 历史分页 Run 连续性 + 轨迹复用双身份两案修复"
+            }
+          ]
+        },
+        {
+          "id": "observability-trace-reuse",
+          "kind": "fix",
+          "importance": "medium",
+          "title": {
+            "zh": "修复模型观测轨迹复用：按业务会话正确命中",
+            "en": "Fix observability trace reuse: now matched by business session"
+          },
+          "summary": {
+            "zh": "模型调用观测的轨迹复用此前误用 SDK 文件头的 UUID 做查找，导致复用一直没有真正生效；现改为按业务会话 ID 命中，并补上幂等合并与双身份防假阳性测试。",
+            "en": "Observability trace reuse previously looked up traces by the SDK file-header UUID, so reuse never actually hit; it now matches on the business session ID, with idempotent merging and dual-identity tests guarding against false positives."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "1d42b740",
+              "title": "fix: 历史分页 Run 连续性 + 轨迹复用双身份两案修复"
+            }
+          ]
+        },
+        {
+          "id": "input-acceptance-boundary",
+          "kind": "improvement",
+          "importance": "medium",
+          "title": {
+            "zh": "输入接受与取消的回执更精确，不再跨会话重发",
+            "en": "More precise receipts for input acceptance and cancellation, no more cross-session resends"
+          },
+          "summary": {
+            "zh": "尚未移交、已移交待证、已观察写入三种输入状态分开记录；准备期取消会收到明确的「接受前已取消」回执；会话忙碌时移交后的输入不再触发跨会话重发。",
+            "en": "Input states are now recorded separately as not-yet-handed-off, handed-off-awaiting-proof, and observed-written; cancelling during preparation yields an explicit cancelled-before-acceptance receipt; input already handed off no longer triggers cross-session resends when the session is busy."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "d011e849",
+              "title": "feat: 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次"
+            }
+          ]
+        },
+        {
+          "id": "memory-migration-receipt-v4",
+          "kind": "improvement",
+          "importance": "medium",
+          "title": {
+            "zh": "记忆迁移中断恢复更安全：v4 收据按序落盘",
+            "en": "Safer memory-migration recovery: v4 receipts persist in order"
+          },
+          "summary": {
+            "zh": "记忆迁移收据升级到 v4，按「准备→提交中→目标已提交→源已归档→完成」顺序落盘，提交中先于目标写盘；中断后只有 v4 准备态可重放，拿不准的窗口保守地转成冲突提示而不是静默继续。",
+            "en": "Memory-migration receipts upgrade to v4, persisted in prepared→committing→target-committed→sources-archived→completed order with committing recorded before the target write; after an interruption only a v4 prepared state may replay, and ambiguous windows conservatively become conflicts instead of silently continuing."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "d011e849",
+              "title": "feat: 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次"
+            }
+          ]
+        },
+        {
+          "id": "media-voice-mcp-hardening",
+          "kind": "improvement",
+          "importance": "low",
+          "title": {
+            "zh": "媒体任务、语音与 MCP 连接的底层契约加固",
+            "en": "Underlying contract hardening for media tasks, speech, and MCP connections"
+          },
+          "summary": {
+            "zh": "媒体任务快照损坏时明确报错而不是覆盖原件，任务结算带尝试编号；语音识别按尝试所有权结算，被取代的尝试不再重复落结果；MCP 客户端实例即连接代次，操作所有权有测试钉住。",
+            "en": "Corrupted media-task snapshots now fail loudly instead of being overwritten, and task settlement carries attempt numbers; speech recognition settles by attempt ownership so superseded attempts never write results twice; an MCP client instance is its connection generation, with operation ownership pinned by tests."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "d011e849",
+              "title": "feat: 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
       "tag": "v0.1.37",
       "version": "0.1.37",
       "previousTag": "v0.1.36",
