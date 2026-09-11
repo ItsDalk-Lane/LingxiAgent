@@ -22,6 +22,8 @@ vi.mock('../../stores/message-turn-actions', () => ({
 function t(key: string, vars?: Record<string, string | number>): string {
   const table: Record<string, string> = {
     'thinking.done': '思考完成',
+    'messageActivity.labels.thinking': '思考',
+    'messageActivity.labels.terminal': 'Bash',
     'thinking.active': '思考中',
     'toolGroup.count': '{n} 个工具',
     'toolGroup.countWithFail': '{total} 个工具（{fail} 个失败）',
@@ -234,9 +236,9 @@ describe('ProcessFoldBlock', () => {
     fireEvent.click(summary);
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByText('npm test')).toBeInTheDocument();
+    expect(screen.getAllByText('npm test').length).toBeGreaterThan(0);
     expect(screen.getByText('现在开始执行。')).toBeInTheDocument();
-    expect(screen.getAllByText('思考完成')).toHaveLength(4);
+    expect(screen.getAllByText('思考')).toHaveLength(4);
     expect(screen.getByText(/PULSE/)).toBeInTheDocument();
   });
 
@@ -313,7 +315,7 @@ describe('ProcessFoldBlock', () => {
 
     const processButton = screen.getByRole('button', { name: /小花忙活了一阵子/ });
     expect(processButton).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByRole('button', { name: 'npm run dev' })).toBeNull();
+    expect(screen.queryByRole('button', { name: /npm run dev/ })).toBeNull();
     expect(useStore.getState().terminalsBySession[sessionPath]?.[0]?.status).toBe('running');
 
     act(() => {
@@ -321,7 +323,7 @@ describe('ProcessFoldBlock', () => {
     });
 
     await waitFor(() => expect(processButton).toHaveAttribute('aria-expanded', 'true'));
-    const execButton = await screen.findByRole('button', { name: 'npm run dev' });
+    const execButton = await screen.findByRole('button', { name: /npm run dev/ });
     await waitFor(() => expect(execButton).toHaveAttribute('aria-expanded', 'true'));
     expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalled();
     expect(useStore.getState().terminalsBySession[sessionPath]?.[0]?.status).toBe('running');

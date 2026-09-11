@@ -71,6 +71,7 @@ import {
 } from "../../shared/video-mime.ts";
 import { isAllowedChatAudioMime, isChatAudioBase64WithinLimit } from "../../shared/audio-mime.ts";
 import { summarizeToolArgs } from "../../shared/tool-arg-summary.ts";
+import { projectToolStartDetails, safeToolArguments } from "../../shared/tool-presentation.ts";
 import { projectLiveToolResultOutcome } from "../../shared/tool-outcome.ts";
 import { AssistantEventNormalizer } from "../assistant-event-normalizer.ts";
 import fs from "fs";
@@ -89,9 +90,8 @@ const log = createModuleLogger("chat");
 const wsLog = createModuleLogger("ws");
 
 export function summarizeToolStartArgs(toolName: any, rawArgs: any, startedAt = Date.now()) {
-  void toolName;
   void startedAt;
-  return summarizeToolArgs(rawArgs);
+  return summarizeToolArgs(rawArgs, toolName);
 }
 
 /**
@@ -1507,12 +1507,13 @@ export function createChatRoute(engine: any, hub: any, {
         publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishReasoning());
         emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
       }
-      // 只保留前端 extractToolDetail 需要的字段，避免广播完整文件内容
+      // 摘要保持轻量；可展开输入单独投影、遮盖并明确标记超长预览。
       const args = summarizeToolStartArgs(event.toolName || "", event.args);
+      const startDetails = projectToolStartDetails(event.toolName || "", event.args);
       if (event.toolCallId) {
         ss.pendingToolContextsByCallId?.set?.(event.toolCallId, {
           toolName: event.toolName || "",
-          args,
+          args: safeToolArguments(event.args),
         });
       }
       emitStreamEvent(sessionPath, ss, {
@@ -1520,6 +1521,7 @@ export function createChatRoute(engine: any, hub: any, {
         id: event.toolCallId || undefined,
         name: event.toolName || "",
         args,
+        ...(startDetails ? { details: startDetails } : {}),
       });
     } else if (event.type === "tool_execution_end") {
       if (!ss) return;
@@ -1538,7 +1540,13 @@ export function createChatRoute(engine: any, hub: any, {
         status: outcome.status,
         success: outcome.success,
         ...(outcome.error ? { error: outcome.error } : {}),
-        details: outcome.details || event.result?.details,
+        details: {
+          // 既有待办与文件登记仍消费这些字段；其他内部结果不直接广播到详情。
+          ...Object.fromEntries(["todos", "sessionFile", "sessionFileRef", "writableLocalRef"]
+            .filter((key) => event.result?.details?.[key] !== undefined)
+            .map((key) => [key, event.result.details[key]])),
+          ...outcome.details,
+        },
       });
 
       // Unified content_block emission for all tool results

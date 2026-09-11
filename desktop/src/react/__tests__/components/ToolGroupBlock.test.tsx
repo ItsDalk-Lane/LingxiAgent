@@ -35,8 +35,8 @@ describe('ToolGroupBlock', () => {
     );
 
     expect(screen.getByText('file not found')).toBeInTheDocument();
-    expect(screen.getByText('✗')).toBeInTheDocument();
-    expect(screen.getByText('?')).toBeInTheDocument();
+    expect(document.querySelector('[data-status="failed"]')).toBeInTheDocument();
+    expect(document.querySelector('[data-status="unknown"]')).toBeInTheDocument();
     expect(screen.queryByText('✓')).not.toBeInTheDocument();
   });
 
@@ -84,7 +84,7 @@ describe('ToolGroupBlock', () => {
 
     const detail = screen.getByTitle(command);
 
-    expect(detail.textContent).toBe('rm -rf /Users/jason/.claude/plugins/mar…');
+    expect(detail.textContent).toBe(command);
   });
 
   it('renders exec_command with the legacy bash user-facing copy', () => {
@@ -107,7 +107,7 @@ describe('ToolGroupBlock', () => {
     );
 
     expect(screen.getByText('npm test')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'npm test' })).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('button', { name: /npm test/ })).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('renders every exec_command as an expandable embedded command and output card', () => {
@@ -172,7 +172,7 @@ describe('ToolGroupBlock', () => {
     );
 
     expect(fetchMock).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: 'npm test' }));
+    fireEvent.click(screen.getByRole('button', { name: /npm test/ }));
 
     await waitFor(() => {
       expect(screen.getByText('完整输出末尾')).toBeInTheDocument();
@@ -181,7 +181,7 @@ describe('ToolGroupBlock', () => {
     expect(String(fetchMock.mock.calls[0][0])).toContain('/api/sessions/content/deferred-output-1');
   });
 
-  it('renders a model read of SKILL.md as a full-width expandable skill card', () => {
+  it('renders a model read of SKILL.md as a unified expandable skill row', () => {
     window.t = ((key: string, vars?: Record<string, unknown>) => {
       const name = String(vars?.name || '');
       if (key === 'toolGroup.skill.running') return `正在运行技能 ${name}`;
@@ -211,15 +211,15 @@ describe('ToolGroupBlock', () => {
       />,
     );
 
-    const button = screen.getByRole('button', { name: '已运行技能 leader' });
+    const button = screen.getByRole('button', { name: /leader/ });
     expect(button).toHaveAttribute('aria-expanded', 'false');
     expect(container.querySelector('[data-skill-name="leader"]')).toBeInTheDocument();
     expect(screen.queryByText('Lead the work carefully.', { exact: false })).toBeNull();
 
     fireEvent.click(button);
     expect(button).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByText('技能')).toBeInTheDocument();
-    expect(screen.getByText('leader')).toBeInTheDocument();
+    expect(screen.getByText('messageActivity.labels.skill')).toBeInTheDocument();
+    expect(screen.getAllByText('leader')).toHaveLength(2);
     expect(screen.getByText('参数')).toBeInTheDocument();
     expect(screen.getByText('把模型的用量统计页面从供应商页面独立出来到设置主界面中。')).toBeInTheDocument();
     expect(screen.queryByText('/workspace/.agents/skills/leader/SKILL.md', { exact: false })).not.toBeInTheDocument();
@@ -227,7 +227,7 @@ describe('ToolGroupBlock', () => {
     expect(screen.getByText(/Lead the work carefully\./)).toBeInTheDocument();
   });
 
-  it('keeps skill cards visible when the surrounding multi-tool group is collapsed', () => {
+  it('keeps skill and ordinary rows in the group regardless of its legacy collapsed flag', () => {
     window.t = ((key: string, vars?: Record<string, unknown>) => (
       key === 'toolGroup.skill.completed' ? `已运行技能 ${vars?.name}` : key
     )) as typeof window.t;
@@ -255,8 +255,8 @@ describe('ToolGroupBlock', () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: '已运行技能 leader' })).toBeInTheDocument();
-    expect(screen.queryByText('/tmp/report.md')).toBeNull();
+    expect(screen.getByRole('button', { name: /leader/ })).toBeInTheDocument();
+    expect(screen.getByText('/tmp/report.md')).toBeInTheDocument();
   });
 
   it('keeps the chat command card running while its background terminal is still running', () => {
@@ -298,7 +298,7 @@ describe('ToolGroupBlock', () => {
       />,
     );
 
-    expect(screen.getByText('…')).toBeInTheDocument();
+    expect(document.querySelector('[data-status="running"]')).toBeInTheDocument();
     expect(screen.queryByText('✓')).toBeNull();
   });
 
@@ -351,7 +351,7 @@ describe('ToolGroupBlock', () => {
 
     renderExecCard();
 
-    expect(screen.getByText('…')).toBeInTheDocument();
+    expect(document.querySelector('[data-status="running"]')).toBeInTheDocument();
     expect(screen.queryByText('✓')).toBeNull();
   });
 
@@ -373,12 +373,13 @@ describe('ToolGroupBlock', () => {
     } as never);
 
     renderExecCard({ done: true, success: true, status: 'succeeded' });
-    expect(screen.getByText('✓')).toBeInTheDocument();
+    expect(document.querySelector('[data-status="succeeded"]')).toBeInTheDocument();
+    expect(screen.queryByText('✓')).toBeNull();
     expect(screen.queryByText('✗')).toBeNull();
 
     cleanup();
     renderExecCard({ done: true, success: false, status: 'failed' });
-    expect(screen.getByText('✗')).toBeInTheDocument();
+    expect(document.querySelector('[data-status="failed"]')).toBeInTheDocument();
   });
 
   it('maps a non-zero exit code to failure and zero to success', () => {
@@ -387,17 +388,18 @@ describe('ToolGroupBlock', () => {
     } as never);
 
     renderExecCard();
-    expect(screen.getByText('✗')).toBeInTheDocument();
+    expect(document.querySelector('[data-status="failed"]')).toBeInTheDocument();
 
     cleanup();
     useStore.setState({
       terminalsBySession: { 'sess-sub': [execTerminal({ status: 'exited', exitCode: 0 })] },
     } as never);
     renderExecCard();
-    expect(screen.getByText('✓')).toBeInTheDocument();
+    expect(document.querySelector('[data-status="succeeded"]')).toBeInTheDocument();
+    expect(screen.queryByText('✓')).toBeNull();
   });
 
-  it('keeps exec_command cards visible even when the surrounding multi-tool group is collapsed', () => {
+  it('keeps terminal and ordinary rows visible within the outer process container', () => {
     render(
       <ToolGroupBlock
         collapsed
@@ -420,11 +422,11 @@ describe('ToolGroupBlock', () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'npm run build' })).toBeTruthy();
-    expect(screen.queryByText('/tmp/report.md')).toBeNull();
+    expect(screen.getByRole('button', { name: /npm run build/ })).toBeTruthy();
+    expect(screen.getByText('/tmp/report.md')).toBeInTheDocument();
   });
 
-  it('renders write_stdin with the legacy terminal user-facing copy', () => {
+  it('renders write_stdin with the unified terminal label', () => {
     window.t = ((key: string, vars?: Record<string, unknown>) => {
       if (key === 'tool.terminal.done') return `💻 ${vars?.name} 敲完了`;
       return key;
@@ -443,11 +445,11 @@ describe('ToolGroupBlock', () => {
       />,
     );
 
-    expect(screen.getByText('💻 Hanako 敲完了')).toBeInTheDocument();
+    expect(screen.getByText('messageActivity.labels.terminal')).toBeInTheDocument();
     expect(document.querySelector('[data-tool="write_stdin"] [title]')).toHaveAttribute('title', 'q\n');
   });
 
-  it('syncs a multi-tool group to collapsed when the completed block updates', async () => {
+  it('leaves all rows visible when the outer completed block collects the group', async () => {
     const { rerender } = render(
       <ToolGroupBlock
         collapsed={false}
@@ -471,14 +473,13 @@ describe('ToolGroupBlock', () => {
       />,
     );
 
-    // 折叠后，Collapse 组件通过 AnimatePresence 退场动画后移除内容。
-    // jsdom 下 requestAnimationFrame 可能延迟执行退场，用 waitFor 等待。
+    // 内部不再重复收纳；完成后是否可见由外层 ProcessFold 决定。
     await waitFor(() => {
-      expect(screen.queryByText('npm test')).not.toBeInTheDocument();
+      expect(screen.getByText('npm test')).toBeInTheDocument();
     });
   });
 
-  it('keeps a single tool as a plain indicator without a fold summary', () => {
+  it('keeps a single tool as an expandable row without a group summary', () => {
     render(
       <ToolGroupBlock
         collapsed={true}
@@ -651,35 +652,13 @@ describe('ToolGroupBlock', () => {
     expect(toolGroupRule).toContain('box-sizing: border-box');
   });
 
-  it('lets terminal and subagent chat cards use the full message width', () => {
-    const css = fs.readFileSync(
-      path.join(process.cwd(), 'desktop/src/react/components/chat/Chat.module.css'),
-      'utf8',
-    );
-    const execContentRule = css.match(/\.toolGroupExecContent\s*\{(?<body>[^}]*)\}/)?.groups?.body || '';
-
-    expect(execContentRule).toContain('padding: 0');
-    expect(css).not.toContain('.toolGroupWithExec');
-  });
-
-  it('keeps embedded terminal and subagent details at one fixed scrollable height', () => {
-    const css = fs.readFileSync(
-      path.join(process.cwd(), 'desktop/src/react/components/chat/Chat.module.css'),
-      'utf8',
-    );
-    const subagentPreviewRule = css.match(/\.subagentEmbeddedPreview\s*\{(?<body>[^}]*)\}/)?.groups?.body || '';
-    const execDetailsRule = css.match(/\.execCommandDetails\s*\{(?<body>[^}]*)\}/)?.groups?.body || '';
-    const execOutputRules = [...css.matchAll(/\.execCommandOutput\s*\{(?<body>[^}]*)\}/g)];
-    const execOutputRule = execOutputRules.at(-1)?.groups?.body || '';
-    const nestedTerminalRule = css.match(/\.execCommandDetails\s+:global\(\[data-testid\^="terminal-preview-"\]\)\s*\{(?<body>[^}]*)\}/)?.groups?.body || '';
-
-    expect(subagentPreviewRule).toContain('height: var(--chat-embedded-detail-height)');
-    expect(subagentPreviewRule).toContain('overflow-y: auto');
-    expect(execDetailsRule).toContain('height: var(--chat-embedded-detail-height)');
-    expect(execDetailsRule).toContain('display: flex');
-    expect(execOutputRule).toContain('overflow: auto');
-    expect(nestedTerminalRule).toContain('max-height: none');
-    expect(nestedTerminalRule).toContain('overflow: auto');
+  it('uses fixed icons and a shared row and limits terminal detail height', () => {
+    const css = fs.readFileSync(path.join(process.cwd(), 'desktop/src/react/components/chat/MessageActivity.module.css'), 'utf8');
+    expect(css).toMatch(/\.row\s*\{[^}]*font-size: 13px/);
+    expect(css).toMatch(/\.row\s*\{[^}]*line-height: 24px/);
+    expect(css).toMatch(/\.icon\s*\{[^}]*width: 14px/);
+    expect(css).toMatch(/\.terminal\s*\{[^}]*max-height: 224px/);
+    expect(css).not.toMatch(/arrow|chevron|::before|::after/);
   });
 
   it('fuses consecutive subagent cards into one rounded block', () => {

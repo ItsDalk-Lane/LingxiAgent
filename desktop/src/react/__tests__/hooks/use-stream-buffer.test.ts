@@ -806,6 +806,21 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
     ]);
   });
 
+  it('工具开始详情进入消息，失败终态清除未执行的写入预览', () => {
+    streamBufferManager.handle({
+      type: 'tool_start', sessionPath: PATH, id: 'write-preview', name: 'write', args: { path: 'a.ts' },
+      details: { input: '{"path":"a.ts"}', fileChange: { path: 'a.ts', content: 'proposed', beforeAvailable: false, reason: 'pending' } },
+    });
+    let tools = getAssistantMessage()?.blocks?.find(block => block.type === 'tool_group');
+    expect(tools?.type === 'tool_group' && tools.tools[0].details?.fileChange).toMatchObject({ reason: 'pending' });
+    streamBufferManager.handle({
+      type: 'tool_end', sessionPath: PATH, id: 'write-preview', name: 'write',
+      success: false, status: 'failed', error: 'denied', details: { input: '{"path":"a.ts"}', output: 'denied' },
+    });
+    tools = getAssistantMessage()?.blocks?.find(block => block.type === 'tool_group');
+    expect(tools?.type === 'tool_group' && tools.tools[0].details).toEqual({ input: '{"path":"a.ts"}', output: 'denied' });
+  });
+
   it('tool_end keeps the live failure outcome and short reason', () => {
     streamBufferManager.handle({ type: 'tool_start', sessionPath: PATH, id: 'call_failed', name: 'read' });
     streamBufferManager.handle({

@@ -41,11 +41,11 @@ describe('ThinkingBlock', () => {
     );
 
     expect(fetchMock).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByText('thinking.done'));
-    expect(screen.getByText('思考预览')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /messageActivity.labels.thinking/ }));
+    expect(screen.getAllByText('思考预览').length).toBeGreaterThan(0);
 
     await waitFor(() => {
-      expect(screen.getByText('完整思考末尾')).toBeInTheDocument();
+      expect(screen.getAllByText('完整思考末尾').length).toBeGreaterThan(0);
     });
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });

@@ -84,7 +84,7 @@ export interface ToolCall {
 
 export interface DeferredHistoryContent {
   id: string;
-  kind: 'assistant_segment' | 'tool_output' | 'skill_content' | 'screenshot' | 'artifact' | 'inline_image';
+  kind: 'assistant_segment' | 'tool_output' | 'tool_input' | 'tool_patch' | 'tool_file_content' | 'skill_content' | 'screenshot' | 'artifact' | 'inline_image';
   size: number;
   preview?: string;
   available: true;

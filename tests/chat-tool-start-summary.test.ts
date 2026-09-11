@@ -3,6 +3,15 @@ import { describe, expect, it } from "vitest";
 import { summarizeToolStartArgs } from "../server/routes/chat.ts";
 
 describe("chat tool_start arg summary", () => {
+  it("保留读取范围，并遮盖设置值中的凭证", () => {
+    expect(summarizeToolStartArgs("read", { path: "/tmp/a.ts", offset: 15, limit: 20 })).toEqual({
+      path: "/tmp/a.ts", offset: 15, limit: 20,
+    });
+    expect(summarizeToolStartArgs("update_settings", { key: "provider.apiKey", value: "credential-sentinel" })).toEqual({
+      key: "provider.apiKey", value: "********",
+    });
+    expect(summarizeToolStartArgs("knowledge_research_worker", { prompt: "hidden", label: "worker" })).toBeUndefined();
+  });
   it("does not leak unsummarized args for other tools", () => {
     expect(summarizeToolStartArgs("write", {
       file_path: "/tmp/a.txt",

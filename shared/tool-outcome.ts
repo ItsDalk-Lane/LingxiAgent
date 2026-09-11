@@ -1,12 +1,12 @@
+import { projectToolPresentationDetails, toolResultText, type ToolPresentationDetails } from './tool-presentation.ts';
+
 export type ToolOutcomeStatus = "succeeded" | "failed" | "unknown";
 
 export type ToolOutcome = {
   status: ToolOutcomeStatus;
   success: boolean;
   error?: string;
-  details?: {
-    output?: string;
-    outputDeferred?: unknown;
+  details?: ToolPresentationDetails & {
     execCommand?: Record<string, unknown>;
     skillInvocation?: {
       content: string;
@@ -60,11 +60,7 @@ function soleTextBlock(content: unknown): string | null {
 }
 
 function soleRawTextBlock(content: unknown): string | null {
-  if (!Array.isArray(content) || content.length !== 1) return null;
-  const block = recordOf(content[0]);
-  return block?.type === "text" && typeof block.text === "string" && block.text.length > 0
-    ? block.text
-    : null;
+  return toolResultText({ content });
 }
 
 function invocationPath(args: unknown): string | null {
@@ -128,7 +124,17 @@ function projectedDetails(
   result: ToolResultLike,
   context: ToolInvocationContext | undefined,
 ): ToolOutcome['details'] | undefined {
-  return projectedExecDetails(result) || projectedSkillDetails(result, context);
+  const generic = projectToolPresentationDetails(result, context);
+  const exec = projectedExecDetails(result);
+  const skill = projectedSkillDetails(result, context);
+  if (!generic && !exec && !skill) return undefined;
+  const details = { ...generic, ...exec, ...skill };
+  // 交互终端仍由终端快照承接，不能把协议回执当作控制台输出。
+  if (exec?.execCommand?.tty === true) {
+    delete details.output;
+    delete details.outputTruncated;
+  }
+  return details;
 }
 
 function resultErrorText(result: ToolResultLike): string | null {
@@ -184,7 +190,7 @@ export function projectToolResultOutcome(
   if (result?.isError === true) return projectLiveToolResultOutcome(result, context);
   if (!isKnownLegacyLingxiToolFailure(result)) return projectLiveToolResultOutcome(result, context);
   const error = resultErrorText(result);
-  const details = projectedExecDetails(result);
+  const details = projectedDetails({ ...result, isError: true }, context);
   return {
     status: "failed",
     success: false,

@@ -246,6 +246,28 @@ describe('buildItemsFromHistory user image restoration', () => {
     ]);
   });
 
+  it('同一条记录里的工具不能越过中间的思考段，连续工具仍保持同组顺序', () => {
+    const items = buildItemsFromHistory({ messages: [{
+      id: '1', entryId: 'mixed-entry', role: 'assistant', content: '核对完成。',
+      assistantSegments: [
+        { id: 'reasoning-between', kind: 'reasoning', semanticPhase: 'reasoning', source: '看完文件再执行检查', lifecycle: 'sealed', processOrder: 1 },
+        { id: 'final', kind: 'text', semanticPhase: 'final_answer', source: '核对完成。', lifecycle: 'sealed', processOrder: 4 },
+      ],
+      toolCalls: [
+        { id: 'read-first', name: 'read', status: 'succeeded', processOrder: 0 },
+        { id: 'exec-next', name: 'exec_command', status: 'succeeded', processOrder: 2 },
+        { id: 'edit-last', name: 'edit', status: 'succeeded', processOrder: 3 },
+      ],
+    }] });
+    const entry = items[0];
+    if (entry.type !== 'message') throw new Error('expected assistant message');
+    expect(entry.data.blocks?.map(block => block.type === 'tool_group'
+      ? block.tools.map(tool => tool.id)
+      : block.type === 'thinking' ? block.content : block.type)).toEqual([
+      ['read-first'], '看完文件再执行检查', ['exec-next', 'edit-last'], 'text',
+    ]);
+  });
+
   it('restores tool outcomes by toolCallId instead of tool name', () => {    const items = buildItemsFromHistory({
       messages: [{
         id: 'a1',

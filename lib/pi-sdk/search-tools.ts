@@ -16,6 +16,8 @@ import { arch, homedir, platform } from "os";
 import path from "path";
 import { Readable } from "stream";
 import { pipeline } from "stream/promises";
+import { boundedSearchPresentation } from "./search-presentation.ts";
+import type { ToolSearchPresentation } from "../../shared/tool-presentation.ts";
 import {
   createFindToolDefinition,
   createGrepToolDefinition,
@@ -325,6 +327,7 @@ function createGrepExecute(cwd, options: Record<string, any>, toolPaths) {
             return;
           }
 
+          const basePath = isDirectory ? searchPath : path.dirname(searchPath);
           const contextValue = context && context > 0 ? context : 0;
           const effectiveLimit = Math.max(1, limit ?? DEFAULT_GREP_LIMIT);
           const formatPath = (filePath) => {
@@ -365,6 +368,17 @@ function createGrepExecute(cwd, options: Record<string, any>, toolPaths) {
           let killedDueToLimit = false;
           const outputLines = [];
           const matches = [];
+          const resultRows: Array<{ path: string; match: { line: number; text: string; context?: boolean } }> = [];
+          let resultRowsBytes = 0;
+          let presentationTruncated = false;
+          const appendOutput = (relativePath: string, lineNumber: number, text: string, isContext = false) => {
+            outputLines.push(isContext ? `${relativePath}-${lineNumber}- ${text}` : `${relativePath}:${lineNumber}: ${text}`);
+            const bytes = Buffer.byteLength(relativePath) + Buffer.byteLength(text) + 64;
+            if (!presentationTruncated && resultRows.length < 1000 && resultRowsBytes + bytes <= 50 * 1024) {
+              resultRows.push({ path: relativePath, match: { line: lineNumber, text, ...(isContext ? { context: true } : {}) } });
+              resultRowsBytes += bytes;
+            } else presentationTruncated = true;
+          };
 
           const cleanup = () => {
             rl.close();
@@ -390,9 +404,10 @@ function createGrepExecute(cwd, options: Record<string, any>, toolPaths) {
           const formatBlock = async (filePath, lineNumber) => {
             const relativePath = formatPath(filePath);
             const lines = await getFileLines(filePath);
-            if (!lines.length) return [`${relativePath}:${lineNumber}: (unable to read file)`];
-
-            const block = [];
+            if (!lines.length) {
+              appendOutput(relativePath, lineNumber, "(unable to read file)");
+              return;
+            }
             const start = contextValue > 0 ? Math.max(1, lineNumber - contextValue) : lineNumber;
             const end = contextValue > 0 ? Math.min(lines.length, lineNumber + contextValue) : lineNumber;
             for (let current = start; current <= end; current++) {
@@ -401,13 +416,8 @@ function createGrepExecute(cwd, options: Record<string, any>, toolPaths) {
               const isMatchLine = current === lineNumber;
               const { text: truncatedText, wasTruncated } = truncateLine(sanitized);
               if (wasTruncated) linesTruncated = true;
-              block.push(
-                isMatchLine
-                  ? `${relativePath}:${current}: ${truncatedText}`
-                  : `${relativePath}-${current}- ${truncatedText}`,
-              );
+              appendOutput(relativePath, current, truncatedText, !isMatchLine);
             }
-            return block;
           };
 
           rl.on("line", (line) => {
@@ -450,7 +460,10 @@ function createGrepExecute(cwd, options: Record<string, any>, toolPaths) {
               return;
             }
             if (matchCount === 0) {
-              settle(() => resolve({ content: [{ type: "text", text: "No matches found" }], details: undefined }));
+              settle(() => resolve({
+                content: [{ type: "text", text: "No matches found" }],
+                details: { search: { kind: "grep", basePath, files: [], matchCount: 0, fileCount: 0, truncated: false } },
+              }));
               return;
             }
 
@@ -460,9 +473,9 @@ function createGrepExecute(cwd, options: Record<string, any>, toolPaths) {
                 const sanitized = match.lineText.replace(/\r\n/g, "\n").replace(/\r/g, "").replace(/\n$/, "");
                 const { text: truncatedText, wasTruncated } = truncateLine(sanitized);
                 if (wasTruncated) linesTruncated = true;
-                outputLines.push(`${relativePath}:${match.lineNumber}: ${truncatedText}`);
+                appendOutput(relativePath, match.lineNumber, truncatedText);
               } else {
-                outputLines.push(...await formatBlock(match.filePath, match.lineNumber));
+                await formatBlock(match.filePath, match.lineNumber);
               }
             }
 
@@ -483,6 +496,26 @@ function createGrepExecute(cwd, options: Record<string, any>, toolPaths) {
               details.linesTruncated = true;
             }
             if (notices.length > 0) output += `\n\n[${notices.join(". ")}]`;
+            const visibleRows = truncation.truncated ? resultRows.slice(0, truncation.outputLines) : resultRows;
+            const files: NonNullable<ToolSearchPresentation["files"]> = [];
+            const byPath = new Map<string, NonNullable<ToolSearchPresentation["files"]>[number]>();
+            for (const row of visibleRows) {
+              let file = byPath.get(row.path);
+              if (!file) {
+                file = { path: row.path, matches: [] };
+                files.push(file);
+                byPath.set(row.path, file);
+              }
+              file.matches!.push(row.match);
+            }
+            details.search = boundedSearchPresentation({
+              kind: "grep",
+              basePath,
+              files,
+              matchCount: matches.length,
+              fileCount: new Set(matches.map(match => formatPath(match.filePath))).size,
+              truncated: presentationTruncated || matchLimitReached || truncation.truncated || linesTruncated,
+            });
 
             settle(() => resolve({
               content: [{ type: "text", text: output }],
@@ -626,7 +659,7 @@ function formatFindResults(results, searchPath, effectiveLimit) {
   if (results.length === 0) {
     return {
       content: [{ type: "text", text: "No files found matching pattern" }],
-      details: undefined,
+      details: { search: { kind: "find", basePath: searchPath, files: [], fileCount: 0, truncated: false } },
     };
   }
 
@@ -646,7 +679,7 @@ function formatFindResults(results, searchPath, effectiveLimit) {
   if (relativized.length === 0) {
     return {
       content: [{ type: "text", text: "No files found matching pattern" }],
-      details: undefined,
+      details: { search: { kind: "find", basePath: searchPath, files: [], fileCount: 0, truncated: false } },
     };
   }
 
@@ -664,6 +697,14 @@ function formatFindResults(results, searchPath, effectiveLimit) {
     details.truncation = truncation;
   }
   if (notices.length > 0) resultOutput += `\n\n[${notices.join(". ")}]`;
+  const visiblePaths = truncation.truncated ? relativized.slice(0, truncation.outputLines) : relativized;
+  details.search = boundedSearchPresentation({
+    kind: "find",
+    basePath: searchPath,
+    files: visiblePaths.slice(0, 1000).map(filePath => ({ path: filePath })),
+    fileCount: relativized.length,
+    truncated: visiblePaths.length > 1000 || resultLimitReached || truncation.truncated,
+  });
 
   return {
     content: [{ type: "text", text: resultOutput }],

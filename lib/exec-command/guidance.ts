@@ -8,6 +8,7 @@ export function execCommandDescription({
 }: { platform?: NodeJS.Platform; powershellFlavor?: Win32PowerShellFlavor } = {}) {
   const common = [
     "Run a short, one-shot local command in the current session.",
+    "Provide a short description so the conversation can show the command's purpose. The description is display-only; cmd remains the actual command and justification remains the approval question when required.",
     "When the OS sandbox is enabled, one-shot commands use its network-blocked path by default on macOS/Linux.",
     "If a command that matters for the user's request fails because of sandboxing (network, PowerShell, WMI, registry or system reads), rerun it with sandbox_permissions=\"require_escalated\" and a one-sentence justification. In Auto mode the escalated request is first decided by the automatic approval reviewer (a separate model); in Ask mode it is shown to the user for confirmation. Do not ask the user yourself in the conversation for an escalated run — issue the call and let the session permission system decide.",
     "If an escalated call is rejected with the TOOL_APPROVAL_UNAVAILABLE error (the action could not be approved in the current mode), the automatic review did not complete: either the reviewer was unavailable/failed, or it asked for user confirmation that Auto mode cannot display. That is not a request for you to ask the user manually; do not keep retrying the same escalated call. Switch the session to Ask mode and retry, or check the small/large utility model settings so the reviewer can work.",

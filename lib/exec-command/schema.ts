@@ -1,6 +1,7 @@
 import path from "path";
 
 export const EXEC_COMMAND_DEFAULT_MAX_OUTPUT_TOKENS = 6000;
+export const EXEC_COMMAND_DESCRIPTION_MAX_LENGTH = 200;
 export const EXEC_COMMAND_SANDBOX_PERMISSIONS = Object.freeze({
   USE_DEFAULT: "use_default",
   REQUIRE_ESCALATED: "require_escalated",
@@ -94,6 +95,9 @@ export function normalizeExecCommandParams(params: any = {}, ctx: any = {}, {
     ok: true,
     value: {
       cmd: cmd.trimEnd(),
+      description: typeof params.description === "string"
+        ? params.description.trim().replace(/\s+/g, " ").slice(0, EXEC_COMMAND_DESCRIPTION_MAX_LENGTH)
+        : "",
       workdir: path.resolve(workdir),
       shell: typeof params.shell === "string" ? params.shell.trim() : "",
       tty: params.tty === true,

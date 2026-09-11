@@ -235,7 +235,7 @@ index af3647c779dad1edd9042249023ada0cb0c81372..e742177ba5684eb2fbcf41e0997aa452
  .codex/
  
 diff --git a/.sync-audit/build-sync-matrix.mjs b/.sync-audit/build-sync-matrix.mjs
-index d978251370637d720d11094c068847b151ae235e..db6f904ad73f014d234728fc68d543561573d1a2 100644
+index d978251370637d720d11094c068847b151ae235e..b1037c9226e9598825ca5f007066136818f87894 100644
 --- a/.sync-audit/build-sync-matrix.mjs
 +++ b/.sync-audit/build-sync-matrix.mjs
 @@ -40,7 +40,7 @@ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source
@@ -243,12 +243,12 @@ index d978251370637d720d11094c068847b151ae235e..db6f904ad73f014d234728fc68d54356
  // 该 commit 早于记录它的审计提交落地，无自引用（SHA = hash(contents)）问题。
  // 当前 branch HEAD 可能在其后存在纯审计 seal 提交，HEAD 由 Git ref 自身标识。
 -const VERIFIED_SOURCE_SHA = "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202";
-+const VERIFIED_SOURCE_SHA = "af0a16d36c0639f18318a967137331eaffca5d22";
++const VERIFIED_SOURCE_SHA = "01414f13c0e47f6eaa7cf527cb6631155adabc31";
  
  const ALLOWED_DISPOSITIONS = ["ADOPTED", "ADAPTED", "REGENERATED", "INTENTIONAL_DIVERGENCE"];
  
 diff --git a/.sync-audit/upstream-sync-matrix.json b/.sync-audit/upstream-sync-matrix.json
-index d6f8692829bc71ee97c3253e5482beabfdb51324..dfacb48c081494a0e457c4ead989e6c58cb29775 100644
+index d6f8692829bc71ee97c3253e5482beabfdb51324..d47c460591ff9fb823e6c68589223574b1bfbb94 100644
 --- a/.sync-audit/upstream-sync-matrix.json
 +++ b/.sync-audit/upstream-sync-matrix.json
 @@ -4,7 +4,7 @@
@@ -256,19 +256,19 @@ index d6f8692829bc71ee97c3253e5482beabfdb51324..dfacb48c081494a0e457c4ead989e6c5
      "L0": "97595264ead8735a04559507ddaade25db8a4e15",
      "L1": "ca0b417e36a6a1f80947458aaed328a25718e41b",
 -    "VERIFIED_SOURCE_SHA": "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202"
-+    "VERIFIED_SOURCE_SHA": "af0a16d36c0639f18318a967137331eaffca5d22"
++    "VERIFIED_SOURCE_SHA": "01414f13c0e47f6eaa7cf527cb6631155adabc31"
    },
    "summary": {
      "total": 133,
 diff --git a/.sync-audit/verified-source-sha.txt b/.sync-audit/verified-source-sha.txt
-index 78c76634c4edc5a8962212273a593e3ddf8bd28d..ba27aa2893858772427c10affceda1acdc681b6e 100644
+index 78c76634c4edc5a8962212273a593e3ddf8bd28d..84cd51c6ac46c899b6a64ccc2294a1706f95f590 100644
 --- a/.sync-audit/verified-source-sha.txt
 +++ b/.sync-audit/verified-source-sha.txt
 @@ -1 +1 @@
 -04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+af0a16d36c0639f18318a967137331eaffca5d22
++01414f13c0e47f6eaa7cf527cb6631155adabc31
 diff --git a/PROGRESS.md b/PROGRESS.md
-index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..67e91836b7d9e647eb51c661411ec9044e6b7f3b 100644
+index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..2de4ed59e8ff3fb14448118fd527cae31a50b0c5 100644
 --- a/PROGRESS.md
 +++ b/PROGRESS.md
 @@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
@@ -276,11 +276,11 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..67e91836b7d9e647eb51c661411ec904
  LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
  LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
 -VERIFIED_SOURCE_SHA   = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202  (2026-09-07 拆除与语音改造+三 bug 修复封印：分支 refactor/dismantle-and-voice-features)
-+VERIFIED_SOURCE_SHA   = af0a16d36c0639f18318a967137331eaffca5d22  (2026-09-10 历史读取三阶段 + 架构契约补强七领域候选 + lint/测试拦截修复，fix/pending-sep10)
++VERIFIED_SOURCE_SHA   = 01414f13c0e47f6eaa7cf527cb6631155adabc31  (2026-09-11 v0.1.38 发布候选：sep10 七领域/历史读取 + 三轮 CI 拦截修复 + 发布元数据，直提 main)
  历史上游同步工作分支  = feature/upstream-sync-0.447.4
  历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
  ```
-@@ -994,11 +994,123 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
+@@ -994,11 +994,130 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
  需要提交才能完成的封印留待相应授权步骤。不得为使检查变绿而虚报坐标、扩大白名单，
  或删除 seal 文件与 guard 测试；退役门禁属于另需明确授权的治理变更。
  
@@ -401,10 +401,17 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..67e91836b7d9e647eb51c661411ec904
 +- 固定源码候选：`af0a16d36c0639f18318a967137331eaffca5d22`（0275f6c5 基础上：40e0c6d3 七套件 afterEach 关闭 SessionManifestStore + af0a16d3 证据重冻结 r3）。PR #53 第二轮 CI：macOS 双腿 + ubuntu 全绿；windows-2025 同 48 项 EPERM 复现且 20×250ms 重试不可愈——实锤非异步释放抖动，而是测试未关闭 SessionManifestStore 的 SQLite 句柄（Windows 下打开文件阻塞目录删除；既有 Windows 绿测试 session-manifest-engine/history-pagination-run-continuity 均有 close 惯例）。修复：七套件登记并 afterEach close 后再 rm（rmSync 重试选项保留，对齐既有 Windows 清理惯例）。
 +- 验证证据（绑定 40e0c6d3 源码树；af0a16d3 相对其仅叠加 excluded 证据/再生补丁，无生产代码差异）：七套件单跑 50/50 绿；tsconfig.test tsc 绿；全量 13821 passed / 4 失败均为坐标旧值 0275f6c5 下 seal guard 家族预期红；sep10-seal-green-r3 绿门禁（exit 0、manifest 034f8f56/9452bfed 未漂移）、补丁重放 VERIFIED。
 +
++## 2026-09-11 v0.1.38 发布候选与审计封印
++
++- 固定源码候选：`01414f13c0e47f6eaa7cf527cb6631155adabc31`（直提 main，基于 PR #53 合并树 9ab5218c）：15654cd1 发布元数据（version 0.1.37→0.1.38、releaseGeneration 15→16、release-digest v1 重写 6 项并 prepend 进 v2 滚动史册 19 条、release-preflight 当前产品 tag 断言随版本推进——沿用 696016b7 教训同提交更新）+ 01414f13 证据重冻结。该候选相对合并树仅叠加版本/digest/预检断言与 excluded 证据，无生产代码差异。
++- 验证证据（绑定 15654cd1 元数据树）：release:preflight --tag v0.1.38 PASS（历史最大 0.1.37/15，21 个历史发布）；validate-release-digest v1/v2 PASS；typecheck×3 绿；升版后 test:artifact-release-smoke 305/305 复跑全绿（含读取当前包版本的实时预检用例）；全量 13825 passed / 0 failed / 7 skipped（1373 文件，exit 0）；sep11-v0138-green 绿门禁（exit 0、manifest e8789893/39862bfa 未漂移）、补丁重放 VERIFIED。
++- CI 证据（PR #53，合并前最终轮 34551812195）：macos-15 arm64 / macos-15-intel / ubuntu-24.04 / windows-2025 四腿全绿 + open-build-smoke + persistence-schema-guard；首轮 ubuntu worker fork 崩溃与两轮 Windows EPERM 的处置见上两条记录。
++- 未执行/受限：正式签名、四平台安装包、公证与远端发布证据由 tag 工作流执行（本条目记为待流水线验证，不以本地结果代替）；本地未执行 npm run pack；Windows NSIS 真机安装交互仍未实测（沿用既有 Known limitation）。
++
  ## 2026-08-25 Notebook-first Knowledge 目标
  
  ### 当前阶段：本机闭环完成，外部证据待执行
-@@ -1503,3 +1615,28 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
+@@ -1503,3 +1622,28 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
  - 派生清单（cli-runtime-closure / open-boundary baseline / shell-surface-manifest / persistence 指纹与 inventory / startup receipt）已在受测工作树重生成并随源码提交；staged diff 密钥模式扫描无命中。
  - 本次封印只同步既有六份审计文件（verified-source-sha.txt / build-sync-matrix.mjs / upstream-sync-matrix.json / UPSTREAM_SYNC_AUDIT.md / UPSTREAM_SYNC_MATRIX.md / 本文件坐标行），矩阵重生成 133 paths 硬校验通过（ADOPTED 25 / ADAPTED 100 / REGENERATED 4 / INTENTIONAL_DIVERGENCE 4）；不合并 main。
  - 未执行/受限：全仓 lint 与 build/package 门禁本轮未跑；系统语音识别端到端未实测（开发终端无语音识别 TCC 授权，helper 正确 fail-closed，打包后首次使用需用户授权）；TTS 云端路径需配置 API key 后实测；三 bug 修复的 dev 环境用户验收仍在进行；正式发布与四平台门禁未启动。
@@ -434,7 +441,7 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..67e91836b7d9e647eb51c661411ec904
 +- compat 旧服务端 runner 自包含化：模板 tracked 于 `tests/compat-old-server-runner.template.mjs`，两个兼容测试 beforeAll 幂等写入 clone；clone 缺席时套件 skip 并 console 明示「四组合中旧服务端侧指定环境未验证」。
 +- 复验：compat 4/4 + 4/4（exit 0）、定向 410/410、typecheck exit 0、全量 13735 passed / 7 failed（签名=A01 基线，任务引入 0）；d-to-final（40 文件）/task-only（76 文件）补丁重生成并通过 apply 验证与树级 0 差异复验。事件与防护详见 `artifacts/history-read-directory/{PROGRESS.md, remaining-risks.md}`。
 diff --git a/UPSTREAM_SYNC_AUDIT.md b/UPSTREAM_SYNC_AUDIT.md
-index adcfa57d8a9836fe12c378f95f7448688d077896..f5a681c8f586b91fa2605923ffbbedd672ac6887 100644
+index adcfa57d8a9836fe12c378f95f7448688d077896..47baf61f89492938d79ffe718b1604c6723a681f 100644
 --- a/UPSTREAM_SYNC_AUDIT.md
 +++ b/UPSTREAM_SYNC_AUDIT.md
 @@ -15,7 +15,7 @@
@@ -442,12 +449,12 @@ index adcfa57d8a9836fe12c378f95f7448688d077896..f5a681c8f586b91fa2605923ffbbedd6
  | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
  | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
 -| VERIFIED_SOURCE_SHA | `04f90d2b26449d2f3264a5ea2a1a8bd6fb253202` | 2026-09-07 拆除与语音改造+三 bug 修复封印（分支 refactor/dismantle-and-voice-features）；typecheck×3 全绿+全量 13081 用例（唯一失败为无关模块 macOS 临时目录清理竞态 flaky、单跑 10/10 通过）后绑定，验证明细见 PROGRESS.md 最新条目 |
-+| VERIFIED_SOURCE_SHA | `af0a16d36c0639f18318a967137331eaffca5d22` | 2026-09-10 历史读取三阶段 + 架构契约补强七领域 + lint/测试拦截修复（fix/pending-sep10）；验证证据见 PROGRESS.md 最新条目 |
++| VERIFIED_SOURCE_SHA | `01414f13c0e47f6eaa7cf527cb6631155adabc31` | 2026-09-11 v0.1.38 发布候选：sep10 七领域/历史读取 + 三轮 CI 拦截修复 + 发布元数据（直提 main）；验证证据见 PROGRESS.md 最新条目 |
  
  v0.1.35 仓库内的[功能 CI 记录](artifacts/release-v0.1.35/feature-ci-validation.json)
  对应 `2c835ac77afb1a73cd83816ad3d613297dc770a8`，不单独证明上述发布资料提交重新执行了
 diff --git a/UPSTREAM_SYNC_MATRIX.md b/UPSTREAM_SYNC_MATRIX.md
-index 2f98daf42096994372f834d639551859919c294e..9a4a212cc184dbbd863a659f899bedb5219585f6 100644
+index 2f98daf42096994372f834d639551859919c294e..f4921da0f6a1422762b55d6de2dfd9ee1ce087e6 100644
 --- a/UPSTREAM_SYNC_MATRIX.md
 +++ b/UPSTREAM_SYNC_MATRIX.md
 @@ -10,7 +10,7 @@ U0 = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
@@ -455,7 +462,7 @@ index 2f98daf42096994372f834d639551859919c294e..9a4a212cc184dbbd863a659f899bedb5
  L0 = 97595264ead8735a04559507ddaade25db8a4e15  (Lingxi v0.444.1 同步完成点, PR #2)
  L1 = ca0b417e36a6a1f80947458aaed328a25718e41b  (本轮同步开始时 main)
 -VERIFIED_SOURCE_SHA = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+VERIFIED_SOURCE_SHA = af0a16d36c0639f18318a967137331eaffca5d22
++VERIFIED_SOURCE_SHA = 01414f13c0e47f6eaa7cf527cb6631155adabc31
  ```
  
  ## 统计（脚本计算，禁止人工填写）

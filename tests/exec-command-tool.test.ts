@@ -29,6 +29,26 @@ function expectedRenderedCommand(command: string, platform: NodeJS.Platform, cwd
 }
 
 describe("exec_command tools", () => {
+  it("uses description only for display without changing execution or permission evidence", async () => {
+    const bashTool = { execute: vi.fn(async (_toolCallId: any, _params: any) => ({ content: [{ type: "text", text: "same output" }] })) };
+    const [tool] = createExecCommandTools({
+      bashTool, getCwd: () => DEFAULT_TEST_CWD, isOneShotSandboxEnforced: () => true, platform: "linux",
+    });
+    const params = { cmd: "printf actual-command" };
+    const described = { ...params, description: "  Inspect\n  the project  " };
+    expect((tool.parameters.properties as any).description).toBeDefined();
+    expect(tool.sessionPermission.resolveInvocation(described)).toEqual(tool.sessionPermission.resolveInvocation(params));
+    expect(tool.sessionPermission.describeSideEffect(described)).toEqual(tool.sessionPermission.describeSideEffect(params));
+
+    const plain: any = await tool.execute("plain", params, null, null, makeCtx());
+    const shown: any = await tool.execute("described", described, null, null, makeCtx());
+    expect(bashTool.execute.mock.calls[0][1]).toEqual(bashTool.execute.mock.calls[1][1]);
+    expect(shown.content).toEqual(plain.content);
+    expect(shown.details.execCommand.description).toBe("Inspect the project");
+    expect(shown.details.execCommand.cmd).toBe(params.cmd);
+    expect(plain.details.execCommand.description).toBeUndefined();
+  });
+
   it("declares contained one-shot commands routine and boundary-crossing commands reviewable", () => {
     const [contained] = createExecCommandTools({
       bashTool: { execute: vi.fn() },

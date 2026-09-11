@@ -89,7 +89,7 @@ describe("tool outcome projection", () => {
     });
   });
 
-  it("projects bounded skill content only for read calls targeting SKILL.md", () => {
+  it("preserves special skill metadata while ordinary reads expose their output", () => {
     const oversized = `# Skill\n${"x".repeat(70 * 1024)}`;
     const skill = projectLiveToolResultOutcome({
       content: [{ type: "text", text: oversized }],
@@ -116,7 +116,7 @@ describe("tool outcome projection", () => {
     }, {
       toolName: "read",
       args: { path: "/workspace/private.md" },
-    })).toEqual({ status: "succeeded", success: true });
+    })).toMatchObject({ status: "succeeded", success: true, details: { output: "private notes" } });
   });
 
   it("uses the paired assistant tool call to restore historical skill content", () => {
