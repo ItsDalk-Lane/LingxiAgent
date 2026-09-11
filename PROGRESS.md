@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 0275f6c5a762fc25a75a8585a8e63817cf0be115  (2026-09-10 历史读取三阶段 + 架构契约补强七领域候选 + lint/测试拦截修复，fix/pending-sep10)
+VERIFIED_SOURCE_SHA   = af0a16d36c0639f18318a967137331eaffca5d22  (2026-09-10 历史读取三阶段 + 架构契约补强七领域候选 + lint/测试拦截修复，fix/pending-sep10)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1105,6 +1105,11 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 
 - 固定源码候选：`0275f6c5a762fc25a75a8585a8e63817cf0be115`（f7f93f54 基础上：006a8054 历史读取七套件 Windows 清理加固 + 0275f6c5 证据重冻结 r2）。PR #53 首轮 CI：macOS 双腿绿；ubuntu 腿全量 1369 文件全过后 vitest worker fork 崩溃 exit 1（既有平台抖动家族，与 mac-arm64 历史同类）；windows-2025 腿 48 项失败全部定位为七套件 afterEach rmSync EPERM（Windows 句柄异步释放抖动族，生产句柄均有 finally close），按 server-composition-boundary 既有惯例补 maxRetries:20/retryDelay:250。
 - 验证证据（绑定 006a8054 源码树；0275f6c5 相对其仅叠加 excluded 证据/再生补丁，无生产代码差异）：七套件单跑 50/50 绿；typecheck×3 绿；改动文件 eslint 0 error；全量 13820 passed / 4 失败均为坐标旧值 f7f93f54 下 seal guard 家族预期红（另 1 次本地 worker fork 抖动，与 ubuntu CI 同族）；重冻结后 sep10-seal-green-r2 绿门禁（exit 0、manifest 36f4b98e/b9676f98 未漂移）、补丁重放 VERIFIED。
+
+## 2026-09-11 SQLite 句柄关闭修复候选与封印推进（PR #53 CI 收尾 II）
+
+- 固定源码候选：`af0a16d36c0639f18318a967137331eaffca5d22`（0275f6c5 基础上：40e0c6d3 七套件 afterEach 关闭 SessionManifestStore + af0a16d3 证据重冻结 r3）。PR #53 第二轮 CI：macOS 双腿 + ubuntu 全绿；windows-2025 同 48 项 EPERM 复现且 20×250ms 重试不可愈——实锤非异步释放抖动，而是测试未关闭 SessionManifestStore 的 SQLite 句柄（Windows 下打开文件阻塞目录删除；既有 Windows 绿测试 session-manifest-engine/history-pagination-run-continuity 均有 close 惯例）。修复：七套件登记并 afterEach close 后再 rm（rmSync 重试选项保留，对齐既有 Windows 清理惯例）。
+- 验证证据（绑定 40e0c6d3 源码树；af0a16d3 相对其仅叠加 excluded 证据/再生补丁，无生产代码差异）：七套件单跑 50/50 绿；tsconfig.test tsc 绿；全量 13821 passed / 4 失败均为坐标旧值 0275f6c5 下 seal guard 家族预期红；sep10-seal-green-r3 绿门禁（exit 0、manifest 034f8f56/9452bfed 未漂移）、补丁重放 VERIFIED。
 
 ## 2026-08-25 Notebook-first Knowledge 目标
 
