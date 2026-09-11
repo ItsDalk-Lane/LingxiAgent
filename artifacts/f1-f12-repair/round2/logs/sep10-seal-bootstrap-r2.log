@@ -1,0 +1,51 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/upstream-sync-matrix.test.ts (7 tests) 42ms
+ ❯ tests/post-verification-audit-seal.test.ts (3 tests | 1 failed) 52ms
+     ✓ VERIFIED_SOURCE_SHA is a valid 40-hex commit reachable in this repo 40ms
+     × changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced) 11ms
+     ✓ the audit-seal test and generator are both present for the guard to be self-consistent 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/post-verification-audit-seal.test.ts > post-verification audit seal (diff guard) > changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced)
+AssertionError: VERIFIED_SOURCE_SHA 之后出现了非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+tests/history-overview-route.test.ts
+tests/history-protocol-conditional.test.ts
+tests/history-read-cache-auth.test.ts
+tests/history-read-directory-incremental.test.ts
+tests/history-read-directory-semantics.test.ts
+tests/history-read-route-fallback.test.ts
+tests/history-read-shared-functions.test.ts: expected [ …(7) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "tests/history-overview-route.test.ts",
++   "tests/history-protocol-conditional.test.ts",
++   "tests/history-read-cache-auth.test.ts",
++   "tests/history-read-directory-incremental.test.ts",
++   "tests/history-read-directory-semantics.test.ts",
++   "tests/history-read-route-fallback.test.ts",
++   "tests/history-read-shared-functions.test.ts",
++ ]
+
+ ❯ tests/post-verification-audit-seal.test.ts:103:7
+    101|       `VERIFIED_SOURCE_SHA 之后出现了非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifact…
+    102|         violators.join("\n"),
+    103|     ).toEqual([]);
+       |       ^
+    104|   });
+    105|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 9 passed (10)
+   Start at  09:00:38
+   Duration  149ms (transform 46ms, setup 40ms, import 19ms, tests 95ms, environment 0ms)
+

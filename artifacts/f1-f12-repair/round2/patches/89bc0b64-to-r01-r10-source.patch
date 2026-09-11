@@ -235,7 +235,7 @@ index af3647c779dad1edd9042249023ada0cb0c81372..e742177ba5684eb2fbcf41e0997aa452
  .codex/
  
 diff --git a/.sync-audit/build-sync-matrix.mjs b/.sync-audit/build-sync-matrix.mjs
-index d978251370637d720d11094c068847b151ae235e..ffcf1a4244c5657757347ef379855ca062941442 100644
+index d978251370637d720d11094c068847b151ae235e..91a8c941ade30b50512692d5132baf59b9c02b6c 100644
 --- a/.sync-audit/build-sync-matrix.mjs
 +++ b/.sync-audit/build-sync-matrix.mjs
 @@ -40,7 +40,7 @@ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source
@@ -243,12 +243,12 @@ index d978251370637d720d11094c068847b151ae235e..ffcf1a4244c5657757347ef379855ca0
  // 该 commit 早于记录它的审计提交落地，无自引用（SHA = hash(contents)）问题。
  // 当前 branch HEAD 可能在其后存在纯审计 seal 提交，HEAD 由 Git ref 自身标识。
 -const VERIFIED_SOURCE_SHA = "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202";
-+const VERIFIED_SOURCE_SHA = "dc6e939951d964c1beffe38ce6f5bfe1084810fe";
++const VERIFIED_SOURCE_SHA = "f7f93f540701b25c7215fa3e20b29350c10a0774";
  
  const ALLOWED_DISPOSITIONS = ["ADOPTED", "ADAPTED", "REGENERATED", "INTENTIONAL_DIVERGENCE"];
  
 diff --git a/.sync-audit/upstream-sync-matrix.json b/.sync-audit/upstream-sync-matrix.json
-index d6f8692829bc71ee97c3253e5482beabfdb51324..b95717032b0a5e663362a2c8c7f64ca187269e2e 100644
+index d6f8692829bc71ee97c3253e5482beabfdb51324..b07a4b1ca0a07bb70704f4228ea4d083eed9c7ea 100644
 --- a/.sync-audit/upstream-sync-matrix.json
 +++ b/.sync-audit/upstream-sync-matrix.json
 @@ -4,7 +4,7 @@
@@ -256,19 +256,19 @@ index d6f8692829bc71ee97c3253e5482beabfdb51324..b95717032b0a5e663362a2c8c7f64ca1
      "L0": "97595264ead8735a04559507ddaade25db8a4e15",
      "L1": "ca0b417e36a6a1f80947458aaed328a25718e41b",
 -    "VERIFIED_SOURCE_SHA": "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202"
-+    "VERIFIED_SOURCE_SHA": "dc6e939951d964c1beffe38ce6f5bfe1084810fe"
++    "VERIFIED_SOURCE_SHA": "f7f93f540701b25c7215fa3e20b29350c10a0774"
    },
    "summary": {
      "total": 133,
 diff --git a/.sync-audit/verified-source-sha.txt b/.sync-audit/verified-source-sha.txt
-index 78c76634c4edc5a8962212273a593e3ddf8bd28d..66536f949121f2347a34bb50071387b6d50acb2a 100644
+index 78c76634c4edc5a8962212273a593e3ddf8bd28d..558ad222f0bd385fe52f7e80d2eccf18604914b1 100644
 --- a/.sync-audit/verified-source-sha.txt
 +++ b/.sync-audit/verified-source-sha.txt
 @@ -1 +1 @@
 -04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+dc6e939951d964c1beffe38ce6f5bfe1084810fe
++f7f93f540701b25c7215fa3e20b29350c10a0774
 diff --git a/PROGRESS.md b/PROGRESS.md
-index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..13b2d4a5d053fd9fc1d05e294ee05774ea337e70 100644
+index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..1f8d2001f07d248179aedc77ee59bd92e2e3a90b 100644
 --- a/PROGRESS.md
 +++ b/PROGRESS.md
 @@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
@@ -276,7 +276,7 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..13b2d4a5d053fd9fc1d05e294ee05774
  LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
  LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
 -VERIFIED_SOURCE_SHA   = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202  (2026-09-07 拆除与语音改造+三 bug 修复封印：分支 refactor/dismantle-and-voice-features)
-+VERIFIED_SOURCE_SHA   = dc6e939951d964c1beffe38ce6f5bfe1084810fe  (2026-09-10 历史读取三阶段 + 架构契约补强七领域候选 + lint/测试拦截修复，fix/pending-sep10)
++VERIFIED_SOURCE_SHA   = f7f93f540701b25c7215fa3e20b29350c10a0774  (2026-09-10 历史读取三阶段 + 架构契约补强七领域候选 + lint/测试拦截修复，fix/pending-sep10)
  历史上游同步工作分支  = feature/upstream-sync-0.447.4
  历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
  ```
@@ -387,8 +387,8 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..13b2d4a5d053fd9fc1d05e294ee05774
 +
 +## 2026-09-10 历史读取三阶段 + 架构契约补强七领域候选与审计封印
 +
-+- 固定源码候选：`dc6e939951d964c1beffe38ce6f5bfe1084810fe`（分支 fix/pending-sep10，基于 1d42b740）：三阶段内容（d011e849 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次；787437d3 历史读取三阶段优化——目录快路径/追加增量续读/条件请求与概览协议；433492c5 合并）+ dc6e9399 拦截修复（eslint 纳入 tracked tests/*.mjs 与 gitignored scratch 对称忽略；目录快路径表达式语句与媒体合同 it.each 换行两处 lint error；桌面冒烟就绪期限断言 90s→150s 对齐 acde46f1 加固——v0.1.37 链遗留的真实断言漂移，acde46f1 当时误记该脚本「不在测试范围」）。
-+- 验证证据（绑定该候选树）：typecheck×3 绿；eslint 0 error（9850 warnings 既有存量+新代码同风格）；全量 13821 passed / 0 实质失败（1373 文件，84s；4 项失败均为封印坐标旧值 696016b7 下的预期红：post-verification-audit-seal diff guard + round2/round3 证据家族同源下游）；packaged-desktop-cleanup 修复后单跑 9/9 绿。
++- 固定源码候选：`f7f93f540701b25c7215fa3e20b29350c10a0774`（分支 fix/pending-sep10，基于 1d42b740）：三阶段内容（d011e849 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次；787437d3 历史读取三阶段优化——目录快路径/追加增量续读/条件请求与概览协议；433492c5 合并）+ dc6e9399 拦截修复（eslint 纳入 tracked tests/*.mjs 与 gitignored scratch 对称忽略；目录快路径表达式语句与媒体合同 it.each 换行两处 lint error；桌面冒烟就绪期限断言 90s→150s 对齐 acde46f1 加固——v0.1.37 链遗留的真实断言漂移，acde46f1 当时误记该脚本「不在测试范围」）+ f7f93f54 证据重冻结（round2/round3 SOURCE_MANIFEST 与 sep10-seal-bootstrap 绿色引导门禁绑定候选树、再生补丁同步；坐标文件在候选内暂记 dc6e9399，由后继审计提交推进至本候选）。
++- 验证证据（绑定 dc6e9399 源码树；f7f93f54 相对其仅叠加 excluded 证据/manifest/日志/再生补丁与暂记坐标，无生产代码差异）：typecheck×3 绿；eslint 0 error（9850 warnings 既有存量+新代码同风格）；全量 13821 passed / 0 实质失败（1373 文件，84s；4 项失败均为封印坐标旧值 696016b7 下的预期红：post-verification-audit-seal diff guard + round2/round3 证据家族同源下游，重冻结后 15/15 复跑绿）；packaged-desktop-cleanup 修复后单跑 9/9 绿。
 +- 未执行/受限：本地未执行 npm run pack；正式签名、四平台安装包、公证与远端发布证据由后续 tag 工作流执行；Windows NSIS 真机安装交互仍未实测（沿用既有 Known limitation）。
 +
  ## 2026-08-25 Notebook-first Knowledge 目标
@@ -424,7 +424,7 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..13b2d4a5d053fd9fc1d05e294ee05774
 +- compat 旧服务端 runner 自包含化：模板 tracked 于 `tests/compat-old-server-runner.template.mjs`，两个兼容测试 beforeAll 幂等写入 clone；clone 缺席时套件 skip 并 console 明示「四组合中旧服务端侧指定环境未验证」。
 +- 复验：compat 4/4 + 4/4（exit 0）、定向 410/410、typecheck exit 0、全量 13735 passed / 7 failed（签名=A01 基线，任务引入 0）；d-to-final（40 文件）/task-only（76 文件）补丁重生成并通过 apply 验证与树级 0 差异复验。事件与防护详见 `artifacts/history-read-directory/{PROGRESS.md, remaining-risks.md}`。
 diff --git a/UPSTREAM_SYNC_AUDIT.md b/UPSTREAM_SYNC_AUDIT.md
-index adcfa57d8a9836fe12c378f95f7448688d077896..09ba4e214ce0fca4010103f0ac62b1907817a033 100644
+index adcfa57d8a9836fe12c378f95f7448688d077896..cdeffe6644fe29f6b6d862c3aa14c5b28624978e 100644
 --- a/UPSTREAM_SYNC_AUDIT.md
 +++ b/UPSTREAM_SYNC_AUDIT.md
 @@ -15,7 +15,7 @@
@@ -432,12 +432,12 @@ index adcfa57d8a9836fe12c378f95f7448688d077896..09ba4e214ce0fca4010103f0ac62b190
  | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
  | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
 -| VERIFIED_SOURCE_SHA | `04f90d2b26449d2f3264a5ea2a1a8bd6fb253202` | 2026-09-07 拆除与语音改造+三 bug 修复封印（分支 refactor/dismantle-and-voice-features）；typecheck×3 全绿+全量 13081 用例（唯一失败为无关模块 macOS 临时目录清理竞态 flaky、单跑 10/10 通过）后绑定，验证明细见 PROGRESS.md 最新条目 |
-+| VERIFIED_SOURCE_SHA | `dc6e939951d964c1beffe38ce6f5bfe1084810fe` | 2026-09-10 历史读取三阶段 + 架构契约补强七领域 + lint/测试拦截修复（fix/pending-sep10）；验证证据见 PROGRESS.md 最新条目 |
++| VERIFIED_SOURCE_SHA | `f7f93f540701b25c7215fa3e20b29350c10a0774` | 2026-09-10 历史读取三阶段 + 架构契约补强七领域 + lint/测试拦截修复（fix/pending-sep10）；验证证据见 PROGRESS.md 最新条目 |
  
  v0.1.35 仓库内的[功能 CI 记录](artifacts/release-v0.1.35/feature-ci-validation.json)
  对应 `2c835ac77afb1a73cd83816ad3d613297dc770a8`，不单独证明上述发布资料提交重新执行了
 diff --git a/UPSTREAM_SYNC_MATRIX.md b/UPSTREAM_SYNC_MATRIX.md
-index 2f98daf42096994372f834d639551859919c294e..119e2551492c6fc4ec5cc4c0300909185310af15 100644
+index 2f98daf42096994372f834d639551859919c294e..460abe57a1230005cb62faafbbe0e0aca78d6c5e 100644
 --- a/UPSTREAM_SYNC_MATRIX.md
 +++ b/UPSTREAM_SYNC_MATRIX.md
 @@ -10,7 +10,7 @@ U0 = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
@@ -445,7 +445,7 @@ index 2f98daf42096994372f834d639551859919c294e..119e2551492c6fc4ec5cc4c030090918
  L0 = 97595264ead8735a04559507ddaade25db8a4e15  (Lingxi v0.444.1 同步完成点, PR #2)
  L1 = ca0b417e36a6a1f80947458aaed328a25718e41b  (本轮同步开始时 main)
 -VERIFIED_SOURCE_SHA = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+VERIFIED_SOURCE_SHA = dc6e939951d964c1beffe38ce6f5bfe1084810fe
++VERIFIED_SOURCE_SHA = f7f93f540701b25c7215fa3e20b29350c10a0774
  ```
  
  ## 统计（脚本计算，禁止人工填写）
@@ -350500,7 +350500,7 @@ index 0000000000000000000000000000000000000000..f05cec59acdfc84e76a8cd54a4bfa998
 +}
 diff --git a/tests/history-overview-route.test.ts b/tests/history-overview-route.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..0f7927c10b87e0b7b3e90b54339763d6283b9af6
+index 0000000000000000000000000000000000000000..65535eb74331edc688fe5bbcf3287159585fd415
 --- /dev/null
 +++ b/tests/history-overview-route.test.ts
 @@ -0,0 +1,294 @@
@@ -350537,7 +350537,7 @@ index 0000000000000000000000000000000000000000..0f7927c10b87e0b7b3e90b54339763d6
 +afterEach(() => {
 +  while (tmpDirs.length) {
 +    const dir = tmpDirs.pop();
-+    fs.rmSync(dir, { recursive: true, force: true });
++    fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
 +  }
 +});
 +
@@ -352107,7 +352107,7 @@ index 0000000000000000000000000000000000000000..a815ac0e222633d66ad2e24f2198af6a
 +});
 diff --git a/tests/history-protocol-conditional.test.ts b/tests/history-protocol-conditional.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..4beb004cf4a8d9687b6383cdc687fa186bacf556
+index 0000000000000000000000000000000000000000..2bf91847e715ceeac55a8eba064ffb2890540510
 --- /dev/null
 +++ b/tests/history-protocol-conditional.test.ts
 @@ -0,0 +1,218 @@
@@ -352139,7 +352139,7 @@ index 0000000000000000000000000000000000000000..4beb004cf4a8d9687b6383cdc687fa18
 +afterEach(() => {
 +  while (tmpDirs.length) {
 +    const dir = tmpDirs.pop();
-+    fs.rmSync(dir, { recursive: true, force: true });
++    fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
 +  }
 +});
 +
@@ -352331,7 +352331,7 @@ index 0000000000000000000000000000000000000000..4beb004cf4a8d9687b6383cdc687fa18
 +});
 diff --git a/tests/history-read-cache-auth.test.ts b/tests/history-read-cache-auth.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..1f89d9bb27d373ff3b22eb3f27d4d181a6cf4e62
+index 0000000000000000000000000000000000000000..2a36c89b37b4858ef8e7d4bdc8a6285ef9cd7832
 --- /dev/null
 +++ b/tests/history-read-cache-auth.test.ts
 @@ -0,0 +1,198 @@
@@ -352360,7 +352360,7 @@ index 0000000000000000000000000000000000000000..1f89d9bb27d373ff3b22eb3f27d4d181
 +afterEach(() => {
 +  while (tmpDirs.length) {
 +    const dir = tmpDirs.pop();
-+    fs.rmSync(dir, { recursive: true, force: true });
++    fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
 +  }
 +});
 +
@@ -353758,7 +353758,7 @@ index 0000000000000000000000000000000000000000..faafaddc34efb40fe8c8f76a07287a77
 +});
 diff --git a/tests/history-read-directory-incremental.test.ts b/tests/history-read-directory-incremental.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..32b2eea325324f6b45b412f155887100ed6637ae
+index 0000000000000000000000000000000000000000..eb91fd99771a4ce5bd2db92e3fc0f5d4a57bc391
 --- /dev/null
 +++ b/tests/history-read-directory-incremental.test.ts
 @@ -0,0 +1,386 @@
@@ -353793,7 +353793,7 @@ index 0000000000000000000000000000000000000000..32b2eea325324f6b45b412f155887100
 +  resetSessionFileMutationEpochsForTest();
 +  while (tmpDirs.length) {
 +    const dir = tmpDirs.pop();
-+    fs.rmSync(dir, { recursive: true, force: true });
++    fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
 +  }
 +});
 +
@@ -354692,7 +354692,7 @@ index 0000000000000000000000000000000000000000..dfd7751a116b905b70a228f40c10ec61
 +});
 diff --git a/tests/history-read-directory-semantics.test.ts b/tests/history-read-directory-semantics.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..f36ce8dee02f43a2f2b0d66aed44e9ba5f623705
+index 0000000000000000000000000000000000000000..f4de33e25c9558939a7ea943fd6a4d0543dd6b85
 --- /dev/null
 +++ b/tests/history-read-directory-semantics.test.ts
 @@ -0,0 +1,364 @@
@@ -354733,7 +354733,7 @@ index 0000000000000000000000000000000000000000..f36ce8dee02f43a2f2b0d66aed44e9ba
 +afterEach(() => {
 +  while (tmpDirs.length) {
 +    const dir = tmpDirs.pop();
-+    fs.rmSync(dir, { recursive: true, force: true });
++    fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
 +  }
 +});
 +
@@ -355062,7 +355062,7 @@ index 0000000000000000000000000000000000000000..f36ce8dee02f43a2f2b0d66aed44e9ba
 +});
 diff --git a/tests/history-read-route-fallback.test.ts b/tests/history-read-route-fallback.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..8bbd05b28e1bc9e9baf8c21bdf94f1bbc07f4cf2
+index 0000000000000000000000000000000000000000..5007409e77c1c8db230d136d2d295692800d577c
 --- /dev/null
 +++ b/tests/history-read-route-fallback.test.ts
 @@ -0,0 +1,198 @@
@@ -355094,7 +355094,7 @@ index 0000000000000000000000000000000000000000..8bbd05b28e1bc9e9baf8c21bdf94f1bb
 +afterEach(() => {
 +  while (tmpDirs.length) {
 +    const dir = tmpDirs.pop();
-+    fs.rmSync(dir, { recursive: true, force: true });
++    fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
 +  }
 +});
 +
@@ -355266,7 +355266,7 @@ index 0000000000000000000000000000000000000000..8bbd05b28e1bc9e9baf8c21bdf94f1bb
 +});
 diff --git a/tests/history-read-shared-functions.test.ts b/tests/history-read-shared-functions.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..71c3708f94495405e406ef32d85173fa5f9aae4d
+index 0000000000000000000000000000000000000000..d80ffd7de97a0c1902d8cea2d74f44fc589d0c99
 --- /dev/null
 +++ b/tests/history-read-shared-functions.test.ts
 @@ -0,0 +1,152 @@
@@ -355293,7 +355293,7 @@ index 0000000000000000000000000000000000000000..71c3708f94495405e406ef32d85173fa
 +afterEach(() => {
 +  while (tmpDirs.length) {
 +    const dir = tmpDirs.pop();
-+    fs.rmSync(dir, { recursive: true, force: true });
++    fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
 +  }
 +});
 +
