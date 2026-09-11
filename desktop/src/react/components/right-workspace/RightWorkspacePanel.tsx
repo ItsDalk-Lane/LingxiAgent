@@ -2,7 +2,6 @@ import { useCallback } from 'react';
 import { useStore } from '../../stores';
 import { JianEditor } from '../desk/DeskEditor';
 import { WorkspaceStableBody } from './WorkspaceStableBody';
-import { SessionTodoCard } from './SessionTodoCard';
 import { TerminalCard } from './TerminalCard';
 import { WorkflowCard } from './WorkflowCard';
 import { AgentActivityCard } from './AgentActivityCard';
@@ -59,7 +58,6 @@ export function RightWorkspacePanel({ compact = false }: { compact?: boolean }) 
 
   return (
     <div className={styles.shell}>
-      {!compact && <SessionTodoCard />}
       <div
         className={`universal-card ${styles.workspaceCard}`}
         data-right-workspace-card=""

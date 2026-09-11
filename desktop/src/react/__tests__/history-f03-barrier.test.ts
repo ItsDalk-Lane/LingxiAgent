@@ -131,6 +131,11 @@ function installStore(): void {
     (mockState.sessionRegistryFilesByPath as Record<string, unknown>)[p] = files;
   });
   s.setSessionTodosForPath = vi.fn();
+  s.setSessionTodoPanel = vi.fn((path: string, panel: { todos?: unknown[] } | null) => {
+    const bySession = (mockState.todosBySession ??= {}) as Record<string, unknown>;
+    bySession[path] = panel?.todos ?? [];
+  });
+  s.markSessionTodoUpdateFailed = vi.fn();
   s.appendItem = vi.fn();
   s.prependItems = vi.fn((p: string, items: unknown[], hasMore: boolean, cursor: string | null) => {
     const chat = mockState.chatSessions as Record<string, any>;

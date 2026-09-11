@@ -4116,6 +4116,7 @@
     "pathNotFound": "パスが見つかりません",
     "missingParam": "{param} パラメータが不足しています",
     "invalidJson": "リクエストボディは JSON オブジェクトである必要があります",
+    "todoVersionMismatch": "ToDo リストが他で更新されました。最新の状態を確認してから再試行してください。",
     "sessionNotFound": "セッションファイルが見つかりません",
     "stillStreaming": "{name} はまだ応答中です。お待ちください",
     "agentNameEmpty": "アシスタント名は空にできません",
@@ -4621,7 +4622,7 @@
   "toolDef": {
     "todoWrite": {
       "summaryEmpty": "ToDo をクリアしました",
-      "summaryStats": "ToDo {total} 件: 完了 {completed}、進行中 {in_progress}、保留 {pending}"
+      "summaryStats": "ToDo {total} 件: 完了 {completed}、進行中 {in_progress}、保留 {pending}、ブロック {blocked}、キャンセル {cancelled}"
     },
     "updateSettings": {
       "searchResult": "{count} 件の設定が見つかりました:\n\n{results}\n\naction \"apply\" で key と value を指定して設定を変更してください。",
@@ -5016,5 +5017,29 @@
     "fileCount": "{n} ファイル",
     "copyRetained": "保持した出力をコピー",
     "terminalRetained": "端末は最近の出力のみ保持します。コピー内容はこのプレビューと同じです。"
+  }
+,
+  "todoPanel": {
+    "title": "タスク",
+    "expand": "タスクリストを展開",
+    "collapse": "タスクリストを折りたたむ",
+    "completed": "{n} 件完了",
+    "inProgress": "{n} 件進行中",
+    "pending": "{n} 件未着手",
+    "blocked": "{n} 件ブロック",
+    "cancelled": "{n} 件キャンセル",
+    "allDone": "すべて完了 · {n} 件",
+    "rowProgress": "完了 {done}/{total}",
+    "finishedPrefix": "終了",
+    "moreInProgress": "ほか {n} 件進行中",
+    "stopped": "このターンは停止しました。未完了のタスクがあります",
+    "updateFailed": "ToDo の更新に失敗しました。直前の有効なリストを保持しています",
+    "confirmComplete": "残りのタスクを完了として確認",
+    "cancelRemaining": "残りのタスクをキャンセル",
+    "cancelNote": "この計画だけを変更します。ターミナル処理・ワークフローなどのバックグラウンド処理は停止しません",
+    "dismiss": "たたむ",
+    "waitForOutput": "出力が終わってから操作してください",
+    "blockedReason": "ブロック中: {reason}",
+    "cancelledLabel": "キャンセル済み"
   }
 }

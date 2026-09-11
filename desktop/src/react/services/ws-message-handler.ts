@@ -36,7 +36,7 @@ import {
   updateSessionStreamMeta,
 } from './stream-resume';
 import { TODO_TOOL_NAMES, type TodoToolName } from '../utils/todo-constants';
-import { applyTodoLifecycle, migrateLegacyTodos } from '../utils/todo-compat';
+import { migrateLegacyTodos, panelSnapshotFromToolDetails } from '../utils/todo-compat';
 import { extractLeadingSkillNotes } from '../utils/message-parser';
 import { renderMarkdown } from '../utils/markdown';
 import { bumpMessageLiveVersion } from '../stores/message-live-version';
@@ -282,8 +282,23 @@ function applyTodoToolEnd(msg: any): void {
     console.warn('[ws] tool_end(todo) missing sessionPath, skipping');
     return;
   }
-  const todos = applyTodoLifecycle(migrateLegacyTodos(msg.details as { todos?: unknown[] } | null));
-  useStore.getState().setSessionTodosForPath(sp, todos);
+  // 失败或数据损坏的结果绝不能转换为空清单（A13）：保留最后一份有效
+  // 清单并标记更新失败。明确提交的空清单（details.todos = []）是合法
+  // 快照，走正常清空路径，与失败严格区分（A14）。
+  const snapshot = msg.success === false || msg.error
+    ? null
+    : panelSnapshotFromToolDetails(msg.details);
+  if (!snapshot) {
+    console.error('[ws] tool_end(todo) 更新失败或数据损坏，保留最后有效清单', {
+      sessionPath: sp,
+      success: msg.success,
+      error: msg.error,
+    });
+    useStore.getState().markSessionTodoUpdateFailed(sp);
+    useStore.getState().bumpTodosLiveVersion(sp);
+    return;
+  }
+  useStore.getState().setSessionTodoPanel(sp, snapshot.removed ? null : { ...snapshot, updateFailed: false });
   // bump 版本：若 loadMessages 正在 fetch 旧快照，回来时会发现
   // 版本号变了，主动跳过 hydrate 写入，避免覆盖本次 live 状态。
   useStore.getState().bumpTodosLiveVersion(sp);
@@ -759,8 +774,31 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       if (!truncated) {
         console.warn('[ws] session_branch_reset target message not found:', sp, targetIds);
       }
-      if (Array.isArray(msg.todos)) {
-        useStore.getState().setSessionTodosForPath(sp, msg.todos);
+      if (msg.todoPanel && Array.isArray(msg.todoPanel.todos) && msg.todoPanel.todos.length > 0) {
+        // 服务端分支重置携带的权威面板快照（含版本与收尾标志）
+        useStore.getState().setSessionTodoPanel(sp, {
+          todos: msg.todoPanel.todos,
+          version: typeof msg.todoPanel.version === 'string' ? msg.todoPanel.version : null,
+          finished: msg.todoPanel.finished === true,
+          allCompleted: msg.todoPanel.allCompleted === true,
+          dismissed: false,
+          updateFailed: false,
+        });
+        useStore.getState().bumpTodosLiveVersion(sp);
+      } else if (Array.isArray(msg.todos)) {
+        // 旧负载：服务端已完成生命周期投影，非空数组即活动清单
+        if (msg.todos.length > 0) {
+          useStore.getState().setSessionTodoPanel(sp, {
+            todos: msg.todos,
+            version: null,
+            finished: false,
+            allCompleted: false,
+            dismissed: false,
+            updateFailed: false,
+          });
+        } else {
+          useStore.getState().setSessionTodoPanel(sp, null);
+        }
         useStore.getState().bumpTodosLiveVersion(sp);
       }
       useStore.getState().applyBranchResetSessionFiles(
@@ -818,7 +856,23 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
     case 'todo_update': {
       const sp = msg.sessionPath;
       if (!sp) { console.warn('[ws] event missing sessionPath:', msg.type); break; }
-      useStore.getState().setSessionTodosForPath(sp, Array.isArray(msg.todos) ? msg.todos : []);
+      // 服务端权威收尾/收纳结果：removed 或 dismissed → 当前展示隐藏（历史保留）；
+      // 否则应用完整面板快照（含版本与收尾标志）。
+      if (msg.removed === true || msg.dismissed === true) {
+        useStore.getState().setSessionTodoPanel(sp, null);
+      } else if (Array.isArray(msg.todos) && msg.todos.length > 0) {
+        useStore.getState().setSessionTodoPanel(sp, {
+          todos: msg.todos,
+          version: typeof msg.version === 'string' ? msg.version : null,
+          finished: msg.finished === true,
+          allCompleted: msg.allCompleted === true,
+          dismissed: false,
+          updateFailed: false,
+        });
+      } else {
+        // 空清单（含旧版 {todos: []} 负载）= 当前无应显示的清单
+        useStore.getState().setSessionTodoPanel(sp, null);
+      }
       useStore.getState().bumpTodosLiveVersion(sp);
       break;
     }

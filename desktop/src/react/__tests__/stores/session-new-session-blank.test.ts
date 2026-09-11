@@ -254,6 +254,11 @@ function installStoreMethods() {
     const bySession = mockState.todosBySession as Record<string, unknown>;
     bySession[path] = todos;
   });
+  s.setSessionTodoPanel = vi.fn((path: string, panel: { todos?: unknown[] } | null) => {
+    const bySession = mockState.todosBySession as Record<string, unknown>;
+    bySession[path] = panel?.todos ?? [];
+  });
+  s.markSessionTodoUpdateFailed = vi.fn();
   s.bumpTodosLiveVersion = vi.fn((path: string) => {
     const versions = mockState.todosLiveVersionBySession as Record<string, number>;
     versions[path] = (versions[path] ?? 0) + 1;

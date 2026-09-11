@@ -40,6 +40,45 @@ describe('ToolGroupBlock', () => {
     expect(screen.queryByText('✓')).not.toBeInTheDocument();
   });
 
+  it('清单工具行显示统一标签与进度摘要（A21）', () => {
+    const zh = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'desktop/src/locales/zh.json'), 'utf8'));
+    window.t = ((key: string, vars: Record<string, string> = {}) => {
+      const value = key.split('.').reduce((node, name) => node?.[name], zh);
+      return (typeof value === 'string' ? value : key).replace(/\{(\w+)\}/g, (match, name) => vars[name] ?? match);
+    }) as typeof window.t;
+    render(
+      <ToolGroupBlock
+        collapsed={false}
+        tools={[
+          {
+            id: 'todo-1',
+            name: 'todo_write',
+            done: true,
+            success: true,
+            status: 'succeeded',
+            details: {
+              todoVersion: 2,
+              todos: [
+                { content: '读 spec', activeForm: '正在读 spec', status: 'completed' },
+                { content: '改代码', activeForm: '正在改代码', status: 'completed' },
+                { content: '检查兼容性', activeForm: '正在检查兼容性', status: 'in_progress' },
+                { content: '补测试', activeForm: '正在补测试', status: 'pending' },
+                { content: '写文档', activeForm: '正在写文档', status: 'pending' },
+                { content: '清理', activeForm: '正在清理', status: 'pending' },
+              ],
+            },
+          },
+        ]}
+      />,
+    );
+
+    // 统一消息行：标签「任务」+ 完成数量 + 当前步骤（A21）
+    const row = document.querySelector('[data-tool="todo_write"]');
+    expect(row).toBeInTheDocument();
+    expect(row).toHaveTextContent('任务');
+    expect(row).toHaveTextContent('已完成 2/6 · 正在检查兼容性');
+  });
+
   it('本地检索完成后只显示一份证据数量与耗时', () => {
     render(<ToolGroupBlock collapsed={false} tools={[{ id: 'local', name: 'knowledge_local_search',
       done: true, success: true, status: 'succeeded', resultNote: '已找到 3 条证据 · 28ms' }]} />);

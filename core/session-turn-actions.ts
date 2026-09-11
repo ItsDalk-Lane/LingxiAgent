@@ -6,7 +6,7 @@ import {
   MESSAGE_PRESENTATION_RECORD_TYPE,
   submitDesktopSessionMessage,
 } from "./desktop-session-submit.ts";
-import { extractLatestTodos } from "../lib/tools/todo-compat.ts";
+import { extractLatestTodos, extractLatestTodoSnapshot, todoPanelPayloadFromSnapshot } from "../lib/tools/todo-compat.ts";
 import { acquireSessionOperation } from "./session-operation-lock.ts";
 import { compressHistoricalKnowledgeContextMessages } from "./knowledge-history-compressor.ts";
 import { invalidateSessionDerivedStateSync } from "../lib/memory/session-derived-state.ts";
@@ -367,7 +367,9 @@ async function retrySessionTurnInternal(engine, opts, deps, compatibility) {
         taskIds: discardedTaskIds,
       });
 
-      const todos = extractLatestTodos(session.sessionManager.buildSessionContext?.().messages || []) || [];
+      const resetMessages = session.sessionManager.buildSessionContext?.().messages || [];
+      const todos = extractLatestTodos(resetMessages) || [];
+      const todoSnapshot = extractLatestTodoSnapshot(resetMessages);
       engine.emitEvent?.({
         type: "session_branch_reset",
         ...(sessionId ? { sessionId } : {}),
@@ -377,6 +379,7 @@ async function retrySessionTurnInternal(engine, opts, deps, compatibility) {
           : (resolved.turnStartAssistantEntry?.id || resolved.selectedEntry?.id || null),
         clientMessageId: clientMessageId || null,
         todos,
+        ...(todoSnapshot ? { todoPanel: todoPanelPayloadFromSnapshot(todoSnapshot) } : {}),
         sessionFiles: projectedSessionFiles,
         discardedTaskIds,
       }, sessionPath);

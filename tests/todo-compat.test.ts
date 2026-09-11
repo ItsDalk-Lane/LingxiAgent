@@ -242,7 +242,7 @@ describe("extractLatestTodos", () => {
     expect(result).toEqual([]);
   });
 
-  it("全 completed 的 todo group 按 Claude 生命周期移除", () => {
+  it("全 completed 的旧格式（v1）todo group 按旧生命周期移除", () => {
     const messages = [
       {
         role: "toolResult",
@@ -257,14 +257,19 @@ describe("extractLatestTodos", () => {
     ];
 
     expect(extractLatestTodos(messages)).toEqual([]);
-    expect(extractLatestTodoSnapshot(messages)).toEqual({
+    const snapshot = extractLatestTodoSnapshot(messages);
+    expect(snapshot).toMatchObject({
       todos: [
         { content: "read", activeForm: "reading", status: "completed" },
         { content: "write", activeForm: "writing", status: "completed" },
       ],
       removed: true,
+      finished: false,
+      dismissed: false,
+      format: 1,
       source: "tool",
     });
+    expect(typeof snapshot?.version).toBe("string");
   });
 
   it("用户完成事件覆盖旧 todo 快照并移除当前面板", () => {
@@ -418,8 +423,192 @@ describe("extractLatestTodos", () => {
   });
 });
 
-describe("extractLatestTodosFromEntries (branch-aware)", () => {
-  // 构造一个分叉 session：
+describe("v2 格式快照语义（清单改版）", () => {
+  it("v2 全部 completed → finished 收尾摘要保留，不按旧语义移除", () => {
+    const messages = [
+      {
+        role: "toolResult",
+        toolName: "todo_write",
+        details: {
+          todoVersion: 2,
+          todos: [
+            { content: "read", activeForm: "reading", status: "completed" },
+            { content: "write", activeForm: "writing", status: "completed" },
+          ],
+        },
+      },
+    ];
+    const snapshot = extractLatestTodoSnapshot(messages);
+    expect(snapshot).toMatchObject({
+      removed: false,
+      finished: true,
+      allCompleted: true,
+      dismissed: false,
+      format: 2,
+      source: "tool",
+    });
+    // extractLatestTodos 对收尾摘要返回清单本身（面板继续显示）
+    expect(extractLatestTodos(messages)).toHaveLength(2);
+  });
+
+  it("v2 完成+取消混合 → finished 但不是 allCompleted", () => {
+    const messages = [
+      {
+        role: "toolResult",
+        toolName: "todo_write",
+        details: {
+          todoVersion: 2,
+          todos: [
+            { content: "done", activeForm: "doing done", status: "completed" },
+            { content: "dropped", activeForm: "doing dropped", status: "cancelled" },
+          ],
+        },
+      },
+    ];
+    const snapshot = extractLatestTodoSnapshot(messages);
+    expect(snapshot).toMatchObject({ removed: false, finished: true, allCompleted: false });
+  });
+
+  it("v2 blocked 条目不是终态，清单保持活动并保留受阻原因", () => {
+    const messages = [
+      {
+        role: "toolResult",
+        toolName: "todo_write",
+        details: {
+          todoVersion: 2,
+          todos: [
+            { content: "done", activeForm: "doing done", status: "completed" },
+            { content: "stuck", activeForm: "doing stuck", status: "blocked", blockedReason: "缺少凭据" },
+          ],
+        },
+      },
+    ];
+    const snapshot = extractLatestTodoSnapshot(messages);
+    expect(snapshot).toMatchObject({ removed: false, finished: false });
+    expect(snapshot?.todos[1]).toMatchObject({ status: "blocked", blockedReason: "缺少凭据" });
+  });
+
+  it("v2 显式空清单 → removed（明确清空，与失败区分）", () => {
+    const messages = [
+      {
+        role: "toolResult",
+        toolName: "todo_write",
+        details: { todoVersion: 2, todos: [] },
+      },
+    ];
+    expect(extractLatestTodoSnapshot(messages)).toMatchObject({
+      removed: true, finished: false, dismissed: false, format: 2,
+    });
+    expect(extractLatestTodos(messages)).toEqual([]);
+  });
+
+  it("v2 用户取消事件：未完成项已取消，保持收尾摘要可见", () => {
+    const messages = [
+      {
+        role: "custom",
+        customType: "lingxi.todo_state",
+        details: {
+          action: "cancel_remaining",
+          source: "user",
+          todoVersion: 2,
+          removed: false,
+          dismissed: false,
+          todos: [
+            { content: "done", activeForm: "doing done", status: "completed" },
+            { content: "rest", activeForm: "doing rest", status: "cancelled" },
+          ],
+        },
+      },
+    ];
+    expect(extractLatestTodoSnapshot(messages)).toMatchObject({
+      removed: false, finished: true, allCompleted: false, source: "user",
+    });
+  });
+
+  it("v2 收纳事件 → removed + dismissed（重开会话不重新弹出）", () => {
+    const messages = [
+      {
+        role: "toolResult",
+        toolName: "todo_write",
+        details: {
+          todoVersion: 2,
+          todos: [{ content: "done", activeForm: "doing done", status: "completed" }],
+        },
+      },
+      {
+        role: "custom",
+        customType: "lingxi.todo_state",
+        details: {
+          action: "dismiss",
+          source: "user",
+          todoVersion: 2,
+          removed: true,
+          dismissed: true,
+          todos: [{ content: "done", activeForm: "doing done", status: "completed" }],
+        },
+      },
+    ];
+    expect(extractLatestTodoSnapshot(messages)).toMatchObject({
+      removed: true, dismissed: true, finished: false, source: "user",
+    });
+    expect(extractLatestTodos(messages)).toEqual([]);
+  });
+
+  it("旧手动全部完成记录（无版本标识、removed:true）不复活", () => {
+    // 旧消息样本：改版前的手动完成记录
+    const messages = [
+      {
+        role: "custom",
+        customType: "lingxi.todo_state",
+        details: {
+          action: "complete_all",
+          source: "user",
+          removed: true,
+          todos: [
+            { content: "old", activeForm: "doing old", status: "completed" },
+          ],
+        },
+      },
+    ];
+    const snapshot = extractLatestTodoSnapshot(messages);
+    expect(snapshot).toMatchObject({
+      removed: true, finished: false, dismissed: false, format: 1, source: "user",
+    });
+    expect(extractLatestTodos(messages)).toEqual([]);
+  });
+
+  it("同一清单内容算出同一版本号，内容变化版本号变化（A17 依据）", () => {
+    const base = [
+      {
+        role: "toolResult",
+        toolName: "todo_write",
+        details: {
+          todoVersion: 2,
+          todos: [{ content: "a", activeForm: "doing a", status: "pending" }],
+        },
+      },
+    ];
+    const changed = [
+      {
+        role: "toolResult",
+        toolName: "todo_write",
+        details: {
+          todoVersion: 2,
+          todos: [
+            { content: "a", activeForm: "doing a", status: "pending" },
+            { content: "b", activeForm: "doing b", status: "pending" },
+          ],
+        },
+      },
+    ];
+    const v1 = extractLatestTodoSnapshot(base)?.version;
+    expect(v1).toMatch(/^tv[0-9a-f]{8}$/);
+    expect(extractLatestTodoSnapshot(base)?.version).toBe(v1);
+    expect(extractLatestTodoSnapshot(changed)?.version).not.toBe(v1);
+  });
+});
+
+describe("extractLatestTodosFromEntries (branch-aware)", () => {  // 构造一个分叉 session：
   //   session header (S)
   //   message#1 (parent: null) — user
   //   message#2 (parent: #1) — assistant

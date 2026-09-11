@@ -8,9 +8,7 @@ import { useStore } from '../../stores';
 import { RuntimeInfoCapsule } from '../../components/runtime/RuntimeInfoCapsule';
 
 // 各运行卡有独立测试；这里用无文案 marker 聚焦胶囊的收起/展开与装载行为
-vi.mock('../../components/right-workspace/SessionTodoCard', () => ({
-  SessionTodoCard: () => <section data-testid="capsule-todo" />,
-}));
+// （会话清单已迁移到输入框上方 TodoPanel，不再出现在胶囊内）
 vi.mock('../../components/right-workspace/TerminalCard', () => ({
   TerminalCard: () => <section data-testid="capsule-terminal" />,
 }));
@@ -63,7 +61,7 @@ describe('RuntimeInfoCapsule', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('expands into one unified container holding jian, todo, terminal, workflow, agent, status and git env', () => {
+  it('expands into one unified container holding jian, terminal, workflow, agent, status and git env (todo list moved above the input)', () => {
     const { container } = render(<RuntimeInfoCapsule />);
 
     fireEvent.click(screen.getByRole('button', { name: '展开运行信息' }));
@@ -75,7 +73,8 @@ describe('RuntimeInfoCapsule', () => {
     expect(root).toContainElement(panel);
 
     expect(screen.getByTestId('capsule-jian')).toBeInTheDocument();
-    expect(screen.getByTestId('capsule-todo')).toBeInTheDocument();
+    // 胶囊内不出现第二份清单（A01）
+    expect(screen.queryByTestId('capsule-todo')).not.toBeInTheDocument();
     expect(screen.getByTestId('capsule-terminal')).toBeInTheDocument();
     expect(screen.getByTestId('capsule-workflow')).toBeInTheDocument();
     expect(screen.getByTestId('capsule-agent')).toBeInTheDocument();

@@ -4119,6 +4119,7 @@
     "pathNotFound": "Path not found",
     "missingParam": "Missing {param} parameter",
     "invalidJson": "Request body must be a JSON object",
+    "todoVersionMismatch": "The todo list was updated elsewhere. Refresh and try again.",
     "sessionNotFound": "Session file not found",
     "stillStreaming": "{name} is still responding, please wait",
     "agentNameEmpty": "Agent name cannot be empty",
@@ -4508,7 +4509,7 @@
   "toolDef": {
     "todoWrite": {
       "summaryEmpty": "Cleared todos",
-      "summaryStats": "{total} todos: {completed} completed, {in_progress} in progress, {pending} pending"
+      "summaryStats": "{total} todos: {completed} completed, {in_progress} in progress, {pending} pending, {blocked} blocked, {cancelled} cancelled"
     },
     "updateSettings": {
       "searchResult": "Found {count} matching setting(s):\n\n{results}\n\nUse action \"apply\" with key and value to change a setting.",
@@ -5020,5 +5021,29 @@
     "fileCount": "{n} file(s)",
     "copyRetained": "Copy retained output",
     "terminalRetained": "Only recent terminal output is retained; copying matches this preview."
+  }
+,
+  "todoPanel": {
+    "title": "Tasks",
+    "expand": "Expand task list",
+    "collapse": "Collapse task list",
+    "completed": "{n} completed",
+    "inProgress": "{n} in progress",
+    "pending": "{n} pending",
+    "blocked": "{n} blocked",
+    "cancelled": "{n} cancelled",
+    "allDone": "All done · {n} items",
+    "rowProgress": "{done}/{total} completed",
+    "finishedPrefix": "Finished",
+    "moreInProgress": "{n} more in progress",
+    "stopped": "This turn stopped; tasks remain unfinished",
+    "updateFailed": "Todo update failed; kept the last valid list",
+    "confirmComplete": "Confirm remaining tasks completed",
+    "cancelRemaining": "Cancel remaining tasks",
+    "cancelNote": "Only changes this plan; terminal processes, workflows and other background tasks keep running",
+    "dismiss": "Dismiss",
+    "waitForOutput": "Wait for output to finish",
+    "blockedReason": "Blocked: {reason}",
+    "cancelledLabel": "Cancelled"
   }
 }

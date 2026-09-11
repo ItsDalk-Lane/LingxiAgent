@@ -307,4 +307,118 @@ describe('remote file preview workbench refs', () => {
       storageKind: 'remote-content',
     });
   });
+
+  it('opens remote files with unknown extensions as editable code when content reads as text', async () => {
+    const { openFileRefPreview } = await import('../../utils/remote-file-preview');
+    useStore.setState({
+      activeServerConnection: {
+        connectionId: 'browser:server_lan',
+        kind: 'lan',
+        serverId: 'server_lan',
+        userId: 'user_lan',
+        studioId: 'studio_lan',
+        label: 'LAN Hana',
+        baseUrl: 'http://hana.local:14500',
+        wsUrl: 'ws://hana.local:14500',
+        token: null,
+        authState: 'paired',
+        trustState: 'lan',
+        credentialKind: 'device_credential',
+        platformAccountId: null,
+        officialServiceKind: null,
+        capabilities: ['resources', 'files'],
+      },
+    } as Partial<StoreState>);
+    const fileRef: FileRef = {
+      id: 'session-registry:/server/cache/data.bak',
+      fileId: 'sf_bak',
+      kind: 'other',
+      source: 'session-registry',
+      name: 'data.bak',
+      path: '/server/cache/data.bak',
+      ext: 'bak',
+      status: 'available',
+      resource: {
+        resourceId: 'res_sf_bak',
+        studioId: 'studio_lan',
+        links: {
+          self: '/api/resources/res_sf_bak',
+          content: '/api/resources/res_sf_bak/content',
+        },
+      },
+    };
+    mockLingxiFetch.mockResolvedValueOnce(new Response('plain text body\n', { status: 200 }));
+
+    await openFileRefPreview(fileRef, {
+      origin: 'session',
+      sessionPath: '/sessions/main.jsonl',
+      messageId: 'm1',
+      blockIdx: 0,
+    });
+
+    expect(useStore.getState().previewItems[0]).toMatchObject({
+      type: 'code',
+      title: 'data.bak',
+      content: 'plain text body\n',
+      ext: 'bak',
+      language: 'bak',
+      storageKind: 'remote-content',
+    });
+  });
+
+  it('falls back to file-info when remote content with unknown extension sniffs binary (NUL)', async () => {
+    const { openFileRefPreview } = await import('../../utils/remote-file-preview');
+    useStore.setState({
+      activeServerConnection: {
+        connectionId: 'browser:server_lan',
+        kind: 'lan',
+        serverId: 'server_lan',
+        userId: 'user_lan',
+        studioId: 'studio_lan',
+        label: 'LAN Hana',
+        baseUrl: 'http://hana.local:14500',
+        wsUrl: 'ws://hana.local:14500',
+        token: null,
+        authState: 'paired',
+        trustState: 'lan',
+        credentialKind: 'device_credential',
+        platformAccountId: null,
+        officialServiceKind: null,
+        capabilities: ['resources', 'files'],
+      },
+    } as Partial<StoreState>);
+    const fileRef: FileRef = {
+      id: 'session-registry:/server/cache/blob.bin',
+      fileId: 'sf_bin',
+      kind: 'other',
+      source: 'session-registry',
+      name: 'blob.bin',
+      path: '/server/cache/blob.bin',
+      ext: 'bin',
+      status: 'available',
+      resource: {
+        resourceId: 'res_sf_bin',
+        studioId: 'studio_lan',
+        links: {
+          self: '/api/resources/res_sf_bin',
+          content: '/api/resources/res_sf_bin/content',
+        },
+      },
+    };
+    mockLingxiFetch.mockResolvedValueOnce(new Response('PK\u0000\u0004binary-blob', { status: 200 }));
+
+    await openFileRefPreview(fileRef, {
+      origin: 'session',
+      sessionPath: '/sessions/main.jsonl',
+      messageId: 'm1',
+      blockIdx: 0,
+    });
+
+    expect(useStore.getState().previewItems[0]).toMatchObject({
+      type: 'file-info',
+      title: 'blob.bin',
+      ext: 'bin',
+      storageKind: 'remote-content',
+    });
+  });
 });

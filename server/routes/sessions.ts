@@ -25,9 +25,9 @@ import {
 } from "../../core/message-utils.ts";
 import { stripSessionReminderBlocks } from "../../core/session-reminders.ts";
 import { sessionFileRevision } from "../../core/session-list-projection-cache.ts";
-import { extractLatestTodoSnapshot } from "../../lib/tools/todo-compat.ts";
+import { extractLatestTodoSnapshot, computeTodoListVersion, todoPanelPayloadFromSnapshot } from "../../lib/tools/todo-compat.ts";
 import { SessionManager } from "../../lib/pi-sdk/index.ts";
-import { TODO_STATE_CUSTOM_TYPE } from "../../lib/tools/todo-constants.ts";
+import { TODO_FORMAT_VERSION, TODO_STATE_CUSTOM_TYPE } from "../../lib/tools/todo-constants.ts";
 import { mergeWorkspaceHistory, normalizeWorkspacePath } from "../../shared/workspace-history.ts";
 import { listStudioMountsForStudio } from "../../core/studio-mounts.ts";
 import { sanitizeBridgeVisibleText } from "../../shared/bridge-visible-text.ts";
@@ -85,11 +85,62 @@ async function pathExists(filePath) {
   }
 }
 
+// 确认剩余任务已完成：未完成项改为已完成；已取消项保持取消（不被改写）。
 function completeTodoItems(todos) {
-  return (Array.isArray(todos) ? todos : []).map((todo) => ({
-    ...todo,
-    status: "completed",
-  }));
+  return (Array.isArray(todos) ? todos : []).map((todo) => (
+    todo?.status === "cancelled" ? todo : { ...todo, status: "completed" }
+  ));
+}
+
+// 取消剩余任务：待开始/进行中/受阻项改为已取消；已完成项保持完成。
+function cancelTodoItems(todos) {
+  return (Array.isArray(todos) ? todos : []).map((todo) => (
+    todo && TERMINAL_TODO_STATUSES.has(todo.status)
+      ? todo
+      : { ...todo, status: "cancelled" }
+  ));
+}
+
+const TERMINAL_TODO_STATUSES = new Set(["cancelled", "completed"]);
+
+function hasUnfinishedTodoItems(todos) {
+  return (Array.isArray(todos) ? todos : []).some(
+    (todo) => todo && !TERMINAL_TODO_STATUSES.has(todo.status),
+  );
+}
+
+/**
+ * 用户收尾操作（完成/取消）产生的新清单必然是 v2 语义：
+ * 全部终态 → finished；removed/dismissed 均为 false（保留收尾摘要）。
+ */
+function resolveUserActionSnapshotFlags(todos) {
+  const list = Array.isArray(todos) ? todos : [];
+  const finished = list.length > 0 && list.every((item) => item && TERMINAL_TODO_STATUSES.has(item.status));
+  return {
+    removed: list.length === 0,
+    dismissed: false,
+    finished,
+    allCompleted: finished && list.every((item) => item.status === "completed"),
+    version: computeTodoListVersion(list),
+  };
+}
+
+/**
+ * 版本失配判定：客户端带来了版本且与服务端当前快照版本不同 → 拒绝。
+ * 不带版本的旧请求沿用旧行为（作用于当前快照）。
+ */
+function isTodoVersionMismatch(snapshot, clientVersion) {
+  return (
+    typeof clientVersion === "string" &&
+    clientVersion.length > 0 &&
+    !!snapshot &&
+    typeof snapshot.version === "string" &&
+    snapshot.version !== clientVersion
+  );
+}
+
+function readTodoSnapshotForManager(manager) {
+  return extractLatestTodoSnapshot(manager.buildSessionContext?.().messages || []);
 }
 
 function getWritableSessionManager(engine, sessionPath) {
@@ -194,7 +245,11 @@ function classifySessionCreationError(err) {
 }
 
 const TODO_COMPLETE_MESSAGE =
-  "[Hana Todo] The user marked the current todo list as completed and removed it from the session UI. Treat every item in that list as completed. Create a new todo list only if new work needs tracking.";
+  "[Hana Todo] The user confirmed the remaining tasks as completed. Unfinished items were marked completed; items the user previously cancelled stay cancelled. Create a new todo list only if new work needs tracking.";
+const TODO_CANCEL_MESSAGE =
+  "[Hana Todo] The user cancelled the remaining tasks in the current todo list. Pending, in-progress and blocked items were marked cancelled; completed items stay completed. Do not resume cancelled items unless the user explicitly asks to reopen that work.";
+const TODO_DISMISS_MESSAGE =
+  "[Hana Todo] The user collapsed the finished todo summary in the UI. This only changed display; task outcomes (completed/cancelled) are unchanged.";
 
 // 与 /sessions/messages 主循环的序号语义逐字对齐：
 // 只有 user/assistant 且 isDisplayableHistoryMessage 为真的消息推进 displayIdx。
@@ -1266,6 +1321,7 @@ export function createSessionsRoute(engine, hub = null) {
         } : undefined;
         return c.json({
           messages: result.messages, blocks: result.blocks, todos: result.todos,
+          todoPanel: result.todoPanel ?? null,
           hasMore: result.hasMore, nextBefore: result.nextBefore, sessionFiles: result.sessionFiles,
           revision, ...(reconciliation ? { reconciliation } : {}),
         });
@@ -1304,6 +1360,7 @@ export function createSessionsRoute(engine, hub = null) {
       // 能力后无能力回退分支才可移除（不设自动删除日期）。
       const responseBody = JSON.stringify({
         messages: outcome.result.messages, blocks: outcome.result.blocks, todos: outcome.result.todos,
+        todoPanel: outcome.result.todoPanel ?? null,
         hasMore: outcome.result.hasMore, nextBefore: outcome.result.nextBefore, sessionFiles: outcome.result.sessionFiles,
         revision,
       });
@@ -1524,16 +1581,20 @@ export function createSessionsRoute(engine, hub = null) {
       } catch {
         return c.json({ error: t("error.sessionNotFound") }, 404);
       }
+      // 模型正在输出时服务端同样拒绝收尾操作（前端禁用只是第一道）。
       if (engine.isSessionStreaming?.(sessionPath)) {
         return c.json({ error: "Cannot complete todos while session is streaming" }, 409);
       }
 
       const manager = getWritableSessionManager(engine, sessionPath);
-      const snapshot = extractLatestTodoSnapshot(
-        manager.buildSessionContext?.().messages || [],
-      );
-      const completedTodos = completeTodoItems(snapshot?.todos || []);
-      if (!snapshot?.removed && completedTodos.length > 0) {
+      const snapshot = readTodoSnapshotForManager(manager);
+      // 版本失配：用户操作针对的不是当前这一版清单，拒绝并提示刷新（A17）。
+      if (isTodoVersionMismatch(snapshot, body?.version)) {
+        return c.json({ error: t("error.todoVersionMismatch"), code: "todo_version_mismatch" }, 409);
+      }
+      let panel;
+      if (!snapshot?.removed && hasUnfinishedTodoItems(snapshot?.todos)) {
+        const completedTodos = completeTodoItems(snapshot.todos);
         manager.appendCustomMessageEntry(
           TODO_STATE_CUSTOM_TYPE,
           TODO_COMPLETE_MESSAGE,
@@ -1541,15 +1602,148 @@ export function createSessionsRoute(engine, hub = null) {
           {
             action: "complete_all",
             source: "user",
-            removed: true,
+            todoVersion: TODO_FORMAT_VERSION,
+            removed: false,
+            dismissed: false,
             todos: completedTodos,
           },
         );
         engine.syncSessionBranchHead?.(sessionPath, manager, "todo_complete_append");
+        panel = todoPanelPayloadFromSnapshot({
+          ...resolveUserActionSnapshotFlags(completedTodos),
+          todos: completedTodos,
+        });
+      } else {
+        panel = todoPanelPayloadFromSnapshot(snapshot);
       }
 
-      engine.emitEvent?.({ type: "todo_update", todos: [] }, sessionPath);
-      return c.json({ ok: true, todos: [] });
+      engine.emitEvent?.({ type: "todo_update", ...panel }, sessionPath);
+      return c.json({ ok: true, panel });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
+  route.post("/sessions/todos/cancel", async (c) => {
+    try {
+      const requestContext = createRequestContext(c, engine);
+      const body = await safeJson(c);
+      const sessionPath = body?.path;
+      if (!sessionPath) {
+        return c.json({ error: t("error.missingParam", { param: "path" }) }, 400);
+      }
+      const auth = authorizeSessionRoute(requestContext, "sessions.write", {
+        kind: "session",
+        studioId: requestContext.studioId,
+        sessionPath,
+      });
+      if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
+      if (!isActiveDesktopSessionPath(sessionPath, engine.agentsDir)) {
+        return c.json({ error: "Invalid session path" }, 403);
+      }
+      if (isDeletedAgentSessionPath(sessionPath)) {
+        return rejectDeletedAgentSession(c);
+      }
+      try {
+        await fs.access(sessionPath);
+      } catch {
+        return c.json({ error: t("error.sessionNotFound") }, 404);
+      }
+      // 只改变这份计划；不终止终端进程、工作流或其他后台任务。
+      if (engine.isSessionStreaming?.(sessionPath)) {
+        return c.json({ error: "Cannot cancel todos while session is streaming" }, 409);
+      }
+
+      const manager = getWritableSessionManager(engine, sessionPath);
+      const snapshot = readTodoSnapshotForManager(manager);
+      if (isTodoVersionMismatch(snapshot, body?.version)) {
+        return c.json({ error: t("error.todoVersionMismatch"), code: "todo_version_mismatch" }, 409);
+      }
+      let panel;
+      if (!snapshot?.removed && hasUnfinishedTodoItems(snapshot?.todos)) {
+        const cancelledTodos = cancelTodoItems(snapshot.todos);
+        manager.appendCustomMessageEntry(
+          TODO_STATE_CUSTOM_TYPE,
+          TODO_CANCEL_MESSAGE,
+          false,
+          {
+            action: "cancel_remaining",
+            source: "user",
+            todoVersion: TODO_FORMAT_VERSION,
+            removed: false,
+            dismissed: false,
+            todos: cancelledTodos,
+          },
+        );
+        engine.syncSessionBranchHead?.(sessionPath, manager, "todo_cancel_append");
+        panel = todoPanelPayloadFromSnapshot({
+          ...resolveUserActionSnapshotFlags(cancelledTodos),
+          todos: cancelledTodos,
+        });
+      } else {
+        panel = todoPanelPayloadFromSnapshot(snapshot);
+      }
+
+      engine.emitEvent?.({ type: "todo_update", ...panel }, sessionPath);
+      return c.json({ ok: true, panel });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
+  route.post("/sessions/todos/dismiss", async (c) => {
+    try {
+      const requestContext = createRequestContext(c, engine);
+      const body = await safeJson(c);
+      const sessionPath = body?.path;
+      if (!sessionPath) {
+        return c.json({ error: t("error.missingParam", { param: "path" }) }, 400);
+      }
+      const auth = authorizeSessionRoute(requestContext, "sessions.write", {
+        kind: "session",
+        studioId: requestContext.studioId,
+        sessionPath,
+      });
+      if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
+      if (!isActiveDesktopSessionPath(sessionPath, engine.agentsDir)) {
+        return c.json({ error: "Invalid session path" }, 403);
+      }
+      if (isDeletedAgentSessionPath(sessionPath)) {
+        return rejectDeletedAgentSession(c);
+      }
+      try {
+        await fs.access(sessionPath);
+      } catch {
+        return c.json({ error: t("error.sessionNotFound") }, 404);
+      }
+
+      const manager = getWritableSessionManager(engine, sessionPath);
+      const snapshot = readTodoSnapshotForManager(manager);
+      if (isTodoVersionMismatch(snapshot, body?.version)) {
+        return c.json({ error: t("error.todoVersionMismatch"), code: "todo_version_mismatch" }, 409);
+      }
+      // 只收纳"已结束且未收纳"的清单；其他情况是幂等 no-op。
+      // 收纳只改变当前展示，不改完成/取消结果；历史记录保留。
+      if (snapshot?.finished && !snapshot.dismissed && !snapshot.removed) {
+        manager.appendCustomMessageEntry(
+          TODO_STATE_CUSTOM_TYPE,
+          TODO_DISMISS_MESSAGE,
+          false,
+          {
+            action: "dismiss",
+            source: "user",
+            todoVersion: TODO_FORMAT_VERSION,
+            removed: true,
+            dismissed: true,
+            todos: snapshot.todos,
+          },
+        );
+        engine.syncSessionBranchHead?.(sessionPath, manager, "todo_dismiss_append");
+      }
+
+      const panel = { removed: true, dismissed: true, todos: [] };
+      engine.emitEvent?.({ type: "todo_update", ...panel }, sessionPath);
+      return c.json({ ok: true, panel });
     } catch (err) {
       return c.json({ error: err.message }, 500);
     }

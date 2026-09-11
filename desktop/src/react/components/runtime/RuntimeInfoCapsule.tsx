@@ -5,7 +5,8 @@
  *       数据源复用现有 store selector，不新建数据链路）。
  * 展开：胶囊自身长成统一圆角容器（单一界面，不另起弹出面板），胶囊头保留为
  *       容器标题行，下方按 Section 收纳既有运行期内容：
- *       笺（JianEditor）、Session Todo、Terminal、Workflow、Agent Activity、Session Status。
+ *       笺（JianEditor）、Terminal、Workflow、Agent Activity、Session Status。
+ *       （会话清单已迁移到输入框上方的清单进度条，不再在此重复展示。）
  *       卡片的卡片皮肤在容器内被压平（背景/边框/阴影置透明 + 分隔线），形成单一容器。
  *
  * 浮层不占文档流，展开/收起不改变 Chat Transcript 宽度。
@@ -17,7 +18,6 @@ import { useStore } from '../../stores';
 import { selectTerminals } from '../../stores/terminal-slice';
 import { selectAgentActivities } from '../../stores/agent-activity-slice';
 import { JianEditor } from '../desk/DeskEditor';
-import { SessionTodoCard } from '../right-workspace/SessionTodoCard';
 import { TerminalCard } from '../right-workspace/TerminalCard';
 import { WorkflowCard } from '../right-workspace/WorkflowCard';
 import { AgentActivityCard } from '../right-workspace/AgentActivityCard';
@@ -89,7 +89,6 @@ export function RuntimeInfoCapsule() {
               <JianEditor showHeader={false} />
             </div>
           </section>
-          <SessionTodoCard />
           <TerminalCard />
           <WorkflowCard />
           <AgentActivityCard />

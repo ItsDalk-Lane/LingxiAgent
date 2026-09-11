@@ -2108,10 +2108,10 @@ describe("sessions route", () => {
     });
   });
 
-  it("marks current todos completed and removed through an explicit session route", async () => {
+  it("marks current todos completed and keeps a finished summary through an explicit session route", async () => {
     const { createSessionsRoute } = await import("../server/routes/sessions.ts");
     const { SessionManager } = await import("../lib/pi-sdk/index.ts");
-    const { loadLatestTodosFromSessionFile, loadLatestTodoSnapshotFromSessionFile } = await import("../lib/tools/todo-compat.ts");
+    const { loadLatestTodosFromSessionFile, loadLatestTodoSnapshotFromSessionFile, computeTodoListVersion } = await import("../lib/tools/todo-compat.ts");
     const { TODO_STATE_CUSTOM_TYPE } = await import("../lib/tools/todo-constants.ts");
     const app = new Hono();
     const agentsDir = path.join(tmpDir, "agents");
@@ -2135,6 +2135,7 @@ describe("sessions route", () => {
       isError: false,
       timestamp: Date.now(),
       details: {
+        todoVersion: 2,
         todos: [
           { content: "read", activeForm: "reading", status: "completed" },
           { content: "write", activeForm: "writing", status: "in_progress" },
@@ -2167,6 +2168,10 @@ describe("sessions route", () => {
 
     app.route("/api", createSessionsRoute(engine));
 
+    const expectedTodos = [
+      { content: "read", activeForm: "reading", status: "completed" },
+      { content: "write", activeForm: "writing", status: "completed" },
+    ];
     const res = await app.request("/api/sessions/todos/complete", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -2175,23 +2180,225 @@ describe("sessions route", () => {
     const data = await res.json();
 
     expect(res.status).toBe(200);
-    expect(data).toEqual({ ok: true, todos: [] });
-    expect(await loadLatestTodosFromSessionFile(sessionPath)).toEqual([]);
+    expect(data).toEqual({
+      ok: true,
+      panel: {
+        todos: expectedTodos,
+        version: computeTodoListVersion(expectedTodos),
+        finished: true,
+        allCompleted: true,
+        dismissed: false,
+      },
+    });
+    // v2 语义：收尾摘要保留可见（不按旧语义移除）
+    expect(await loadLatestTodosFromSessionFile(sessionPath)).toEqual(expectedTodos);
     expect(await loadLatestTodoSnapshotFromSessionFile(sessionPath)).toMatchObject({
-      removed: true,
+      removed: false,
+      finished: true,
+      allCompleted: true,
       source: "user",
-      todos: [
-        { content: "read", activeForm: "reading", status: "completed" },
-        { content: "write", activeForm: "writing", status: "completed" },
-      ],
+      format: 2,
+      todos: expectedTodos,
     });
     expect(openSessionManagerAtCurrentBranch).toHaveBeenCalledWith(sessionPath, path.dirname(sessionPath));
     expect(syncSessionBranchHead).toHaveBeenCalledWith(sessionPath, manager, "todo_complete_append");
-    expect(engine.emitEvent).toHaveBeenCalledWith({ type: "todo_update", todos: [] }, sessionPath);
+    expect(engine.emitEvent).toHaveBeenCalledWith({
+      type: "todo_update",
+      todos: expectedTodos,
+      version: computeTodoListVersion(expectedTodos),
+      finished: true,
+      allCompleted: true,
+      dismissed: false,
+    }, sessionPath);
   });
 
-  it("infers subagent agent identity from child sessionPath when history details are missing", async () => {
-    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+  describe("todo v2 收尾路由（cancel / dismiss / 版本保护）", () => {
+    async function setupTodoSession(todos: any[], streaming = false) {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const { SessionManager } = await import("../lib/pi-sdk/index.ts");
+      const app = new Hono();
+      const agentsDir = path.join(tmpDir, "agents");
+      const sessionDir = path.join(agentsDir, "hana", "sessions");
+      const manager = SessionManager.create("/tmp/workspace", sessionDir);
+      const sessionPath = manager.getSessionFile();
+      // 首条普通消息才会触发 session 文件落盘；单独 toolResult 不会建文件。
+      manager.appendMessage({
+        role: "assistant",
+        content: [{ type: "text", text: "working" }],
+        api: "test",
+        provider: "test",
+        model: "test",
+        stopReason: "toolUse",
+        timestamp: Date.now(),
+      } as any);
+      manager.appendMessage({
+        role: "toolResult",
+        toolCallId: "todo-seed",
+        toolName: "todo_write",
+        content: [{ type: "text", text: "seed" }],
+        isError: false,
+        timestamp: Date.now(),
+        details: { todoVersion: 2, todos },
+      } as any);
+      const engine = {
+        agentsDir,
+        isSessionStreaming: vi.fn(() => streaming),
+        getSessionByPath: vi.fn(() => null),
+        openSessionManagerAtCurrentBranch: vi.fn(() => manager),
+        syncSessionBranchHead: vi.fn(),
+        emitEvent: vi.fn(),
+      };
+      app.route("/api", createSessionsRoute(engine));
+      return { app, engine, manager, sessionPath };
+    }
+
+    const ACTIVE_TODOS = [
+      { content: "done", activeForm: "doing done", status: "completed" },
+      { content: "working", activeForm: "doing working", status: "in_progress" },
+      { content: "stuck", activeForm: "doing stuck", status: "blocked", blockedReason: "缺少凭据" },
+      { content: "waiting", activeForm: "doing waiting", status: "pending" },
+    ];
+
+    it("cancel 把未完成项改为已取消、已完成项保持完成，并保留收尾摘要", async () => {
+      const { app, engine, sessionPath } = await setupTodoSession(ACTIVE_TODOS);
+      const { loadLatestTodoSnapshotFromSessionFile, computeTodoListVersion } = await import("../lib/tools/todo-compat.ts");
+
+      const res = await app.request("/api/sessions/todos/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: sessionPath }),
+      });
+      const data = await res.json();
+
+      const expected = [
+        { content: "done", activeForm: "doing done", status: "completed" },
+        { content: "working", activeForm: "doing working", status: "cancelled" },
+        { content: "stuck", activeForm: "doing stuck", status: "cancelled", blockedReason: "缺少凭据" },
+        { content: "waiting", activeForm: "doing waiting", status: "cancelled" },
+      ];
+      expect(res.status).toBe(200);
+      expect(data.panel).toEqual({
+        todos: expected,
+        version: computeTodoListVersion(expected),
+        finished: true,
+        allCompleted: false,
+        dismissed: false,
+      });
+      expect(await loadLatestTodoSnapshotFromSessionFile(sessionPath)).toMatchObject({
+        removed: false, finished: true, allCompleted: false, source: "user", format: 2,
+      });
+      expect(engine.emitEvent).toHaveBeenCalledWith(
+        { type: "todo_update", ...data.panel },
+        sessionPath,
+      );
+    });
+
+    it("complete 不改写已取消项", async () => {
+      const todosWithCancelled = [
+        { content: "done", activeForm: "doing done", status: "completed" },
+        { content: "dropped", activeForm: "doing dropped", status: "cancelled" },
+        { content: "working", activeForm: "doing working", status: "in_progress" },
+      ];
+      const { app, sessionPath } = await setupTodoSession(todosWithCancelled);
+      const { loadLatestTodoSnapshotFromSessionFile } = await import("../lib/tools/todo-compat.ts");
+
+      const res = await app.request("/api/sessions/todos/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: sessionPath }),
+      });
+      const data = await res.json();
+
+      expect(res.status).toBe(200);
+      expect(data.panel.todos).toEqual([
+        { content: "done", activeForm: "doing done", status: "completed" },
+        { content: "dropped", activeForm: "doing dropped", status: "cancelled" },
+        { content: "working", activeForm: "doing working", status: "completed" },
+      ]);
+      expect(data.panel.allCompleted).toBe(false);
+      expect(await loadLatestTodoSnapshotFromSessionFile(sessionPath)).toMatchObject({
+        finished: true, allCompleted: false,
+      });
+    });
+
+    it("dismiss 收纳已结束清单：当前展示隐藏，历史记录保留", async () => {
+      const finishedTodos = [
+        { content: "done", activeForm: "doing done", status: "completed" },
+        { content: "dropped", activeForm: "doing dropped", status: "cancelled" },
+      ];
+      const { app, engine, sessionPath } = await setupTodoSession(finishedTodos);
+      const { loadLatestTodoSnapshotFromSessionFile } = await import("../lib/tools/todo-compat.ts");
+
+      const res = await app.request("/api/sessions/todos/dismiss", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: sessionPath }),
+      });
+      const data = await res.json();
+
+      expect(res.status).toBe(200);
+      expect(data.panel).toEqual({ removed: true, dismissed: true, todos: [] });
+      const snapshot = await loadLatestTodoSnapshotFromSessionFile(sessionPath);
+      expect(snapshot).toMatchObject({ removed: true, dismissed: true, source: "user" });
+      // 历史记录保留：条目内容仍可查
+      expect(snapshot?.todos).toEqual(finishedTodos);
+      expect(engine.emitEvent).toHaveBeenCalledWith(
+        { type: "todo_update", removed: true, dismissed: true, todos: [] },
+        sessionPath,
+      );
+    });
+
+    it("版本失配的收尾操作被拒绝（409 todo_version_mismatch），清单不变", async () => {
+      const { app, sessionPath } = await setupTodoSession(ACTIVE_TODOS);
+      const { loadLatestTodoSnapshotFromSessionFile } = await import("../lib/tools/todo-compat.ts");
+      const before = await loadLatestTodoSnapshotFromSessionFile(sessionPath);
+
+      const res = await app.request("/api/sessions/todos/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: sessionPath, version: "tvdeadbeef" }),
+      });
+
+      expect(res.status).toBe(409);
+      const data = await res.json();
+      expect(data.code).toBe("todo_version_mismatch");
+      const after = await loadLatestTodoSnapshotFromSessionFile(sessionPath);
+      expect(after?.todos).toEqual(before?.todos);
+    });
+
+    it("版本匹配时收尾操作放行", async () => {
+      const { app, sessionPath } = await setupTodoSession(ACTIVE_TODOS);
+      const { loadLatestTodoSnapshotFromSessionFile } = await import("../lib/tools/todo-compat.ts");
+      const version = (await loadLatestTodoSnapshotFromSessionFile(sessionPath))?.version;
+
+      const res = await app.request("/api/sessions/todos/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: sessionPath, version }),
+      });
+
+      expect(res.status).toBe(200);
+    });
+
+    it("模型输出期间 complete 与 cancel 都被服务端拒绝（409）", async () => {
+      const { app, sessionPath } = await setupTodoSession(ACTIVE_TODOS, true);
+      const { loadLatestTodoSnapshotFromSessionFile } = await import("../lib/tools/todo-compat.ts");
+      const before = await loadLatestTodoSnapshotFromSessionFile(sessionPath);
+
+      for (const endpoint of ["/api/sessions/todos/complete", "/api/sessions/todos/cancel"]) {
+        const res = await app.request(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ path: sessionPath }),
+        });
+        expect(res.status).toBe(409);
+      }
+      const after = await loadLatestTodoSnapshotFromSessionFile(sessionPath);
+      expect(after?.todos).toEqual(before?.todos);
+    });
+  });
+
+  it("infers subagent agent identity from child sessionPath when history details are missing", async () => {    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
     const msgUtils = await import("../core/message-utils.ts");
     const app = new Hono();
 

@@ -421,12 +421,14 @@ export interface DeskSearchResult {
   mtime?: string;
 }
 
-export type TodoStatus = 'pending' | 'in_progress' | 'completed';
+export type TodoStatus = 'pending' | 'in_progress' | 'blocked' | 'cancelled' | 'completed';
 
 export interface TodoItem {
   content: string;
   activeForm: string;
   status: TodoStatus;
+  /** status 为 blocked 时的受阻原因（v2 新增，旧记录没有该字段） */
+  blockedReason?: string;
 }
 
 // ── 浮动面板类型 ──

@@ -4116,6 +4116,7 @@
     "pathNotFound": "경로를 찾을 수 없어요",
     "missingParam": "{param} 파라미터가 없어요",
     "invalidJson": "요청 본문은 JSON 객체여야 해요",
+    "todoVersionMismatch": "할 일 목록이 다른 곳에서 업데이트되었습니다. 새로고침 후 다시 시도하세요.",
     "sessionNotFound": "세션 파일을 찾을 수 없어요",
     "stillStreaming": "{name}이(가) 아직 응답 중이에요. 잠시 기다려 주세요",
     "agentNameEmpty": "어시스턴트 이름을 비워둘 수 없어요",
@@ -4621,7 +4622,7 @@
   "toolDef": {
     "todoWrite": {
       "summaryEmpty": "할 일 목록을 비웠어요",
-      "summaryStats": "할 일 {total}개: 완료 {completed}, 진행 중 {in_progress}, 대기 {pending}"
+      "summaryStats": "할 일 {total}개: 완료 {completed}, 진행 중 {in_progress}, 대기 {pending}, 차단 {blocked}, 취소됨 {cancelled}"
     },
     "updateSettings": {
       "searchResult": "일치하는 설정 {count}개를 찾았어요:\n\n{results}\n\n설정을 변경하려면 action \"apply\"와 key, value를 사용하세요.",
@@ -5016,5 +5017,29 @@
     "fileCount": "파일 {n}개",
     "copyRetained": "보존된 출력 복사",
     "terminalRetained": "최근 터미널 출력만 보존됩니다. 복사 내용은 현재 미리 보기와 같습니다."
+  }
+,
+  "todoPanel": {
+    "title": "작업",
+    "expand": "작업 목록 펼치기",
+    "collapse": "작업 목록 접기",
+    "completed": "{n}개 완료",
+    "inProgress": "{n}개 진행 중",
+    "pending": "{n}개 대기",
+    "blocked": "{n}개 차단됨",
+    "cancelled": "{n}개 취소됨",
+    "allDone": "모두 완료 · {n}개",
+    "rowProgress": "완료 {done}/{total}",
+    "finishedPrefix": "종료됨",
+    "moreInProgress": "외 {n}개 진행 중",
+    "stopped": "이번 턴이 중지되었습니다. 완료되지 않은 작업이 있습니다",
+    "updateFailed": "할 일 업데이트에 실패했습니다. 마지막 유효 목록을 유지합니다",
+    "confirmComplete": "남은 작업을 완료로 확인",
+    "cancelRemaining": "남은 작업 취소",
+    "cancelNote": "이 계획만 변경합니다. 터미널 프로세스, 워크플로 등 백그라운드 작업은 종료되지 않습니다",
+    "dismiss": "접어두기",
+    "waitForOutput": "출력이 끝난 후 조작하세요",
+    "blockedReason": "차단됨: {reason}",
+    "cancelledLabel": "취소됨"
   }
 }

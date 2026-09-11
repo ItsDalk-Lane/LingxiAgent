@@ -4116,6 +4116,7 @@
     "pathNotFound": "路徑不存在",
     "missingParam": "缺少 {param} 參數",
     "invalidJson": "請求本體必須是 JSON 物件",
+    "todoVersionMismatch": "清單已在別處更新，請重新整理後再操作",
     "sessionNotFound": "Session 檔案不存在",
     "stillStreaming": "{name} 還在說話，請等一下",
     "agentNameEmpty": "助手名字不能為空",
@@ -4621,7 +4622,7 @@
   "toolDef": {
     "todoWrite": {
       "summaryEmpty": "已清空待办",
-      "summaryStats": "{total} 项待办：{completed} 已完成，{in_progress} 进行中，{pending} 待处理"
+      "summaryStats": "{total} 項待辦：{completed} 已完成，{in_progress} 進行中，{pending} 待處理，{blocked} 受阻，{cancelled} 已取消"
     },
     "updateSettings": {
       "searchResult": "找到 {count} 个匹配設定：\n\n{results}\n\n使用 action \"apply\" 并提供 key 和 value 来修改設定。",
@@ -5016,5 +5017,29 @@
     "fileCount": "{n} 個檔案",
     "copyRetained": "複製已保留輸出",
     "terminalRetained": "終端僅保留最近輸出，可複製內容與目前預覽一致"
+  }
+,
+  "todoPanel": {
+    "title": "任務",
+    "expand": "展開清單",
+    "collapse": "收合清單",
+    "completed": "{n} 已完成",
+    "inProgress": "{n} 進行中",
+    "pending": "{n} 待開始",
+    "blocked": "{n} 受阻",
+    "cancelled": "{n} 已取消",
+    "allDone": "全部完成 · {n} 項",
+    "rowProgress": "已完成 {done}/{total}",
+    "finishedPrefix": "已結束",
+    "moreInProgress": "另有 {n} 項進行中",
+    "stopped": "本輪已停止，仍有未完成任務",
+    "updateFailed": "清單更新失敗，已保留上一份清單",
+    "confirmComplete": "確認剩餘任務已完成",
+    "cancelRemaining": "取消剩餘任務",
+    "cancelNote": "只改變這份計畫，不會終止終端機進程、工作流或其他背景任務",
+    "dismiss": "收納",
+    "waitForOutput": "輸出完成後再操作",
+    "blockedReason": "受阻：{reason}",
+    "cancelledLabel": "已取消"
   }
 }

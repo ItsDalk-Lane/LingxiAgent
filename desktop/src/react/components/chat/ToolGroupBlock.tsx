@@ -14,6 +14,8 @@ import { extractToolDetail } from '../../utils/message-parser';
 import { openInternalLink, resolveLinkTarget } from '../../utils/link-open';
 import { isToolCallHiddenFromProcessUi } from '../../utils/tool-call-visibility';
 import { getToolLabel, phaseForStatus, sessionToolTargetName, sessionToolTargetPath } from '../../utils/tool-label';
+import { TODO_TOOL_NAMES } from '../../utils/todo-constants';
+import { migrateLegacyTodos } from '../../utils/todo-compat';
 import { knowledgeResearchStopNote } from '../../utils/knowledge-research-status';
 import { TerminalPreview } from '../right-workspace/TerminalCard';
 import { LinkContextMenu, type LinkContextMenuState } from '../shared/LinkContextMenu';
@@ -52,6 +54,23 @@ function commandOf(tool: ToolCall): string {
 }
 const terminalNames = new Set(['exec_command', 'bash', 'terminal', 'write_stdin']);
 
+/**
+ * 清单工具的消息行短摘要（A21）："已完成 2/6 · 正在检查兼容性"。
+ * 数据源：完成后取 details.todos，进行中取 args.todos；兼容旧格式记录。
+ */
+function todoRowSummary(tool: ToolCall): string | null {
+  const raw = record(tool.details).todos ?? record(tool.args ?? {}).todos;
+  if (!Array.isArray(raw)) return null;
+  const items = migrateLegacyTodos({ todos: raw });
+  if (!items.length) return null;
+  const done = items.filter(item => item.status === 'completed').length;
+  const current = items.find(item => item.status === 'in_progress');
+  const translate = window.t ?? ((key: string) => key);
+  const progress = translate('todoPanel.rowProgress', { done, total: items.length });
+  const currentText = current ? (current.activeForm || current.content) : '';
+  return currentText ? `${progress} · ${currentText}` : progress;
+}
+
 const ToolActivity = memo(function ToolActivity({ tool, agentName, skillPrompt, sessionPath }: { tool: ToolCall; agentName: string; skillPrompt: string | null; sessionPath: string }) {
   const [expanded, setExpanded] = useState(false);
   const [linkMenu, setLinkMenu] = useState<LinkContextMenuState | null>(null);
@@ -71,9 +90,13 @@ const ToolActivity = memo(function ToolActivity({ tool, agentName, skillPrompt, 
   const candidateHref = recordedPath || detail.href;
   const detailHref = candidateHref && resolveLinkTarget(candidateHref).kind !== 'external' ? candidateHref : undefined;
   const command = commandOf(tool);
-  const summary = tool.error || (skillName ? skillName : targetName || (terminalNames.has(tool.name) ? string(tool.args?.description) || string(exec.description) || command.split('\n')[0] : detail.text));
+  const isTodoTool = (TODO_TOOL_NAMES as readonly string[]).includes(tool.name);
+  const todoSummary = isTodoTool ? todoRowSummary(tool) : null;
+  const summary = tool.error || todoSummary || (skillName ? skillName : targetName || (terminalNames.has(tool.name) ? string(tool.args?.description) || string(exec.description) || command.split('\n')[0] : detail.text));
   const label = research ? getToolLabel(tool.name, phaseForStatus(toolStatus), agentName, tool.args).replace(/^[^\p{L}\p{N}]+/u, '') : t(`labels.${skillName ? 'skill' : terminalNames.has(tool.name) ? 'terminal' : ['read', 'write', 'edit', 'grep', 'find', 'ls', 'session', 'web_search', 'web_fetch'].includes(tool.name) ? tool.name : 'tool'}`);
-  const displayLabel = label === t('labels.tool') ? tool.name : label;
+  const displayLabel = isTodoTool
+    ? (window.t?.('todoPanel.title') || tool.name)
+    : label === t('labels.tool') ? tool.name : label;
   const change = record(tool.details?.fileChange);
   const counts = typeof change.added === 'number' && typeof change.removed === 'number'
     ? { added: change.added, removed: change.removed }

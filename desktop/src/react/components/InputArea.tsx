@@ -40,6 +40,7 @@ import { SendButton } from './input/SendButton';
 import type { PermissionMode } from './input/PlanModeButton';
 import { SessionConfirmationPrompt } from './input/SessionConfirmationPrompt';
 import { TenetApprovalBanner } from './input/TenetApprovalBanner';
+import { TodoPanel } from './chat/TodoPanel';
 import { serializeEditor, insertFaithfulPasteAtSelection } from '../utils/editor-serializer';
 import { modelUnavailableMessageKey, type ComposerSendBundle } from './input/composer-send';
 import {
@@ -2469,6 +2470,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
             ))}
           </div>
         )}
+        <TodoPanel />
         <div className={styles['input-wrapper']} ref={inputCardRef}>
           <input
             ref={browserFileInputRef}

@@ -9078,6 +9078,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/sandbox/file-tool-presentation.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/resource-io/materialize-tool.ts",
           "kind": "import-statement"
         },
@@ -9142,7 +9147,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/compaction-utils.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); core/session-compactor.ts (import-statement); +57 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/compaction-utils.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); core/session-compactor.ts (import-statement); +58 more importer(s)."
     },
     {
       "path": "lib/pi-sdk/model-call-stream-observer.ts",
@@ -9170,6 +9175,23 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/index.ts (import-statement); core/bridge-session-manager.ts (import-statement); core/session-coordinator.ts (import-statement); +1 more importer(s)."
+    },
+    {
+      "path": "lib/pi-sdk/search-presentation.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/pi-sdk/search-tools.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/sandbox/file-tool-presentation.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/search-tools.ts (import-statement); lib/sandbox/file-tool-presentation.ts (import-statement)."
     },
     {
       "path": "lib/pi-sdk/search-tools.ts",
@@ -9852,6 +9874,18 @@
       "reason": "Reached via esbuild source module graph, imported by lib/resource-io/providers/local-fs-provider.ts (import-statement); lib/resource-io/providers/mount-provider.ts (import-statement); lib/resource-io/providers/resource-provider.ts (import-statement); +4 more importer(s)."
     },
     {
+      "path": "lib/resource-io/file-change-presentation.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/resource-io/pi-tool-operations.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/resource-io/pi-tool-operations.ts (import-statement)."
+    },
+    {
       "path": "lib/resource-io/materialize-tool.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -10129,6 +10163,18 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by lib/sandbox/seatbelt.ts (import-statement); lib/sandbox/bwrap.ts (import-statement); lib/sandbox/win32-exec.ts (import-statement)."
+    },
+    {
+      "path": "lib/sandbox/file-tool-presentation.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/sandbox/index.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/sandbox/index.ts (import-statement)."
     },
     {
       "path": "lib/sandbox/index.ts",
@@ -11874,6 +11920,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "server/routes/chat.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/history-read/projection-context.ts",
           "kind": "import-statement"
         },
@@ -11898,7 +11949,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by core/session-turn-actions.ts (import-statement); server/history-read/projection-context.ts (import-statement); server/history-read/incremental.ts (import-statement); +3 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by core/session-turn-actions.ts (import-statement); server/routes/chat.ts (import-statement); server/history-read/projection-context.ts (import-statement); +4 more importer(s)."
     },
     {
       "path": "lib/tools/todo-constants.ts",
@@ -11916,6 +11967,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "server/routes/chat.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/history-read/incremental.ts",
           "kind": "import-statement"
         },
@@ -11925,7 +11981,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/todo.ts (import-statement); lib/tools/todo-compat.ts (import-statement); server/history-read/incremental.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/todo.ts (import-statement); lib/tools/todo-compat.ts (import-statement); server/routes/chat.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "lib/tools/todo.ts",
@@ -128593,6 +128649,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "shared/tool-presentation.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/routes/provider-credentials.ts",
           "kind": "import-statement"
         },
@@ -128627,7 +128688,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by shared/provider-auth.ts (import-statement); core/security-audit-log.ts (import-statement); server/routes/provider-credentials.ts (import-statement); +6 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by shared/provider-auth.ts (import-statement); core/security-audit-log.ts (import-statement); shared/tool-presentation.ts (import-statement); +7 more importer(s)."
     },
     {
       "path": "shared/secret-fs.ts",
@@ -128886,11 +128947,48 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "server/history-deferred-content.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/history-read/index.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/tool-outcome-adapter.ts (import-statement); core/message-utils.ts (import-statement); server/routes/chat.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/tool-outcome-adapter.ts (import-statement); core/message-utils.ts (import-statement); server/routes/chat.ts (import-statement); +2 more importer(s)."
+    },
+    {
+      "path": "shared/tool-presentation.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "shared/tool-outcome.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "shared/tool-arg-summary.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/chat.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/history-deferred-content.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/history-read/project-page.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by shared/tool-outcome.ts (import-statement); shared/tool-arg-summary.ts (import-statement); server/routes/chat.ts (import-statement); +2 more importer(s)."
     },
     {
       "path": "shared/video-mime.ts",
@@ -129097,9 +129195,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10989,
+    "totalFiles": 10993,
     "byInputType": {
-      "source-graph": 780,
+      "source-graph": 784,
       "runtime-asset": 11,
       "nft-runtime-trace": 10198
     }

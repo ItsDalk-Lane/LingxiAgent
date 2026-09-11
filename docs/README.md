@@ -32,10 +32,17 @@
 
 ## 历史任务与证据
 
+## 待实施计划
+
+（当前没有待实施计划。）
+
+## 历史任务与证据
+
 有独有设计或验收证据的文件已移至 `docs/archives/`；重复阶段计划、进度摘要和过期草稿已删除。保留清单、删除依据及恢复方法见[档案索引](archives/README.md)，不把历史测试数或工作树状态改写为当前验证结果。
 
 | 历史主题 | 记录与适用范围 |
 | --- | --- |
+| 任务清单改版 | [执行计划](tasks/2026-09-11-todo-experience/PLAN.md)、[验收记录](tasks/2026-09-11-todo-experience/ACCEPTANCE.md)。输入框上方进度条、跨轮延续、完成与取消的区分；验收记录区分自动测试、界面验收与未覆盖环境。 |
 | Notebook-first 初版与后续安全补充 | [初版事实](archives/knowledge-notebook/findings.md)。2026-08-25 起的设计与实验记录；普通提问行为已继续演进。 |
 | 知识 P0–P3 重构 | [实施报告](archives/knowledge-retrieval-research/KNOWLEDGE_REFACTOR_IMPLEMENTATION_REPORT.md)、[验收与原始规格](archives/README.md#知识检索与-research-重构)。快速／详细双入口描述属于该阶段。 |
 | 模型观测及后续统一 | [实现记录](archives/model-observability/OBSERVABILITY_IMPLEMENTATION_NOTES.md)、[统一事实](archives/model-observability/OBSERVABILITY_UNIFICATION_FINDINGS.md)。旧 schema、视频策略、阶段状态和真实供应商验证保留原始边界。 |

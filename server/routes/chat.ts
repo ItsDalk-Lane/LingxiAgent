@@ -85,9 +85,50 @@ import {
 } from "../ws-scope.ts";
 import { createTerminalWsBridge } from "../terminal-ws-bridge.ts";
 import { ACTIVE_TASK_STATUSES } from "../../lib/task-registry.ts";
+import { extractLatestTodoSnapshot } from "../../lib/tools/todo-compat.ts";
+import { TODO_FORMAT_VERSION, TODO_STATE_CUSTOM_TYPE } from "../../lib/tools/todo-constants.ts";
 
 const log = createModuleLogger("chat");
 const wsLog = createModuleLogger("ws");
+
+const TODO_AUTO_DISMISS_MESSAGE =
+  "[Hana Todo] A new user request was formally accepted, so the finished todo summary was collapsed automatically. Task outcomes (completed/cancelled) are unchanged; create a new todo list only if the new request needs tracking.";
+
+/**
+ * 新请求被服务端正式接受后，把"已结束未收纳"的清单摘要自动收纳（PLAN §5：
+ * 已结束后开始新一轮 → 收纳旧摘要；发送失败或请求未被接受 → 不提前收纳）。
+ * 只改变当前展示，历史记录保留；失败不阻断主流程。
+ */
+export function dismissFinishedTodosOnPromptAccepted(engine, sessionPath) {
+  try {
+    if (!sessionPath) return;
+    const liveSession = engine.getSessionByPath?.(sessionPath);
+    const manager = liveSession?.sessionManager
+      ?? (typeof engine.openSessionManagerAtCurrentBranch === "function"
+        ? engine.openSessionManagerAtCurrentBranch(sessionPath, path.dirname(sessionPath))
+        : null);
+    if (!manager) return;
+    const snapshot = extractLatestTodoSnapshot(manager.buildSessionContext?.().messages || []);
+    if (!snapshot?.finished || snapshot.dismissed || snapshot.removed) return;
+    manager.appendCustomMessageEntry(
+      TODO_STATE_CUSTOM_TYPE,
+      TODO_AUTO_DISMISS_MESSAGE,
+      false,
+      {
+        action: "dismiss",
+        source: "system",
+        todoVersion: TODO_FORMAT_VERSION,
+        removed: true,
+        dismissed: true,
+        todos: snapshot.todos,
+      },
+    );
+    engine.syncSessionBranchHead?.(sessionPath, manager, "todo_auto_dismiss_append");
+    engine.emitEvent?.({ type: "todo_update", removed: true, dismissed: true, todos: [] }, sessionPath);
+  } catch (err: any) {
+    log.warn(`auto-dismiss finished todos failed for ${sessionPath}: ${err?.message || err}`);
+  }
+}
 
 export function summarizeToolStartArgs(toolName: any, rawArgs: any, startedAt = Date.now()) {
   void startedAt;
@@ -1704,6 +1745,11 @@ export function createChatRoute(engine: any, hub: any, {
       broadcast({
         type: "todo_update",
         todos: Array.isArray(event.todos) ? event.todos : [],
+        ...(event.version !== undefined ? { version: event.version } : {}),
+        ...(event.finished !== undefined ? { finished: event.finished } : {}),
+        ...(event.allCompleted !== undefined ? { allCompleted: event.allCompleted } : {}),
+        ...(event.dismissed !== undefined ? { dismissed: event.dismissed } : {}),
+        ...(event.removed !== undefined ? { removed: event.removed } : {}),
         sessionPath,
       });
     } else if (event.type === "activity_update") {
@@ -1728,6 +1774,7 @@ export function createChatRoute(engine: any, hub: any, {
         projectionMessageId: event.projectionMessageId || null,
         clientMessageId: event.clientMessageId || null,
         todos: Array.isArray(event.todos) ? event.todos : [],
+        ...(event.todoPanel ? { todoPanel: event.todoPanel } : {}),
         sessionFiles: Array.isArray(event.sessionFiles) ? event.sessionFiles : [],
       });
     } else if (event.type === "session_user_message") {
@@ -2686,6 +2733,8 @@ export function createChatRoute(engine: any, hub: any, {
                   sessionFileRefs: msg.sessionFileRefs,
                   knowledgeRefs,
                 });
+                // 请求被正式接受（未走任何拒绝/异常分支）才收纳旧的已结束摘要（A08/A09）。
+                dismissFinishedTodosOnPromptAccepted(engine, promptSessionPath);
               } catch (err) {
                 const isUserAbort = err.name === 'AbortError'
                   || (err.message === 'This operation was aborted')

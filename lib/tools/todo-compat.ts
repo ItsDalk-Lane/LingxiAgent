@@ -20,13 +20,14 @@
 
 import fs from "fs/promises";
 import { parseSessionEntries, buildSessionContext } from "../pi-sdk/index.ts";
-import { TODO_STATE_CUSTOM_TYPE, TODO_TOOL_NAMES } from "./todo-constants.ts";
+import { TODO_FORMAT_VERSION, TODO_STATE_CUSTOM_TYPE, TODO_TOOL_NAMES } from "./todo-constants.ts";
 import { createModuleLogger } from "../debug-log.ts";
 import { redactLogValue } from "../log-redactor.ts";
 
 const log = createModuleLogger("todo-compat");
 
-const VALID_STATUSES = new Set(["pending", "in_progress", "completed"]);
+const VALID_STATUSES = new Set(["pending", "in_progress", "blocked", "cancelled", "completed"]);
+const TERMINAL_STATUSES = new Set(["cancelled", "completed"]);
 
 function formatTodoDiagnostic(value) {
   const redacted = redactLogValue(value);
@@ -48,7 +49,8 @@ function isNewTodoItem(item) {
     typeof item === "object" &&
     typeof item.content === "string" &&
     typeof item.activeForm === "string" &&
-    VALID_STATUSES.has(item.status)
+    VALID_STATUSES.has(item.status) &&
+    (item.blockedReason === undefined || typeof item.blockedReason === "string")
   );
 }
 
@@ -84,8 +86,9 @@ export function migrateLegacyTodos(details) {
 }
 
 /**
- * Claude-style lifecycle: a todo group is removed once every item is completed.
- * Empty todos are also a removed/cleared group.
+ * Claude-style lifecycle (v1 旧语义): a todo group is removed once every item
+ * is completed. Empty todos are also a removed/cleared group.
+ * 仅适用于无版本标识的旧记录；v2 记录见 resolveSnapshotFlags。
  */
 export function isTodoGroupRemoved(todos) {
   if (!Array.isArray(todos)) return false;
@@ -95,6 +98,88 @@ export function isTodoGroupRemoved(todos) {
 
 export function applyTodoLifecycle(todos) {
   return isTodoGroupRemoved(todos) ? [] : todos;
+}
+
+/** v2：全部条目处于终态（completed / cancelled）且非空 → 清单已结束 */
+export function isTodoGroupFinished(todos) {
+  if (!Array.isArray(todos) || todos.length === 0) return false;
+  return todos.every((item) => item && TERMINAL_STATUSES.has(item.status));
+}
+
+/**
+ * 清单版本：对规范化后的条目内容做 FNV-1a 哈希。
+ * 纯函数、无状态，前后端镜像必须逐字一致；同一清单内容在任何路径
+ * （实时事件 / 历史恢复 / 服务端重算）得到同一版本号。用户收尾操作
+ * 携带该版本，服务端据以识别"操作针对的是不是用户看见的那一版"（A17）。
+ */
+export function computeTodoListVersion(todos) {
+  const canonical = (Array.isArray(todos) ? todos : []).map((item) => [
+    typeof item?.content === "string" ? item.content : "",
+    typeof item?.activeForm === "string" ? item.activeForm : "",
+    typeof item?.status === "string" ? item.status : "",
+    typeof item?.blockedReason === "string" ? item.blockedReason : "",
+  ]);
+  const text = JSON.stringify(canonical);
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    // FNV prime multiplication via shifts (32-bit)
+    hash = (hash + ((hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24))) >>> 0;
+  }
+  return `tv${hash.toString(16).padStart(8, "0")}`;
+}
+
+function snapshotFormat(details) {
+  return details && details.todoVersion === TODO_FORMAT_VERSION ? 2 : 1;
+}
+
+/**
+ * 统一计算快照的展示标志。
+ * v1（旧记录）：全 completed 或空 → removed（旧"已收纳"语义，不复活）。
+ * v2：空 → removed（显式清空）；dismissed → removed（已收纳）；
+ *     全部终态且未收纳 → finished（保留收尾摘要）。
+ */
+function resolveSnapshotFlags(details, todos) {
+  const format = snapshotFormat(details);
+  if (format === 2) {
+    const dismissed = details?.dismissed === true;
+    const removed = todos.length === 0 || dismissed;
+    const finished = !removed && isTodoGroupFinished(todos);
+    return {
+      format,
+      removed,
+      dismissed,
+      finished,
+      allCompleted: finished && todos.every((item) => item.status === "completed"),
+    };
+  }
+  return {
+    format,
+    removed: isTodoGroupRemoved(todos),
+    dismissed: false,
+    finished: false,
+    allCompleted: false,
+  };
+}
+
+/**
+ * 从快照构建 todo_update 广播负载 / REST 响应 panel / hydrate todoPanel。
+ * 快照缺失、已移除或已收纳 → removed 负载（当前展示隐藏，历史保留）。
+ */
+export function todoPanelPayloadFromSnapshot(snapshot) {
+  const todos = snapshot && !snapshot.removed && Array.isArray(snapshot.todos)
+    ? snapshot.todos
+    : [];
+  if (!todos.length) {
+    return { removed: true, dismissed: snapshot?.dismissed === true, todos: [] };
+  }
+  return {
+    todos,
+    version: typeof snapshot.version === "string" ? snapshot.version : computeTodoListVersion(todos),
+    finished: snapshot.finished === true,
+    allCompleted: snapshot.allCompleted === true,
+    dismissed: false,
+  };
 }
 
 /**
@@ -118,8 +203,9 @@ function snapshotFromToolResult(m) {
   const todos = migrateLegacyTodos(m.details);
   return {
     todos,
-    removed: isTodoGroupRemoved(todos),
+    ...resolveSnapshotFlags(m.details, todos),
     source: "tool",
+    version: computeTodoListVersion(todos),
   };
 }
 
@@ -134,14 +220,33 @@ function snapshotFromTodoStateMessage(m) {
     return { invalid: true };
   }
   const todos = migrateLegacyTodos(details);
+  const flags = resolveSnapshotFlags(details, todos);
   return {
     todos,
-    removed: details.removed !== false || isTodoGroupRemoved(todos),
+    // v1 旧记录额外保留显式 removed 标记的兼容语义
+    ...(flags.format === 1
+      ? { ...flags, removed: details.removed !== false || flags.removed }
+      : flags),
     source: details.source === "model" ? "tool" : "user",
+    version: computeTodoListVersion(todos),
   };
 }
 
-export function extractLatestTodoSnapshot(sourceMessages) {
+export interface TodoSnapshot {
+  todos: any[];
+  removed: boolean;
+  finished: boolean;
+  allCompleted: boolean;
+  dismissed: boolean;
+  format: number;
+  source: "tool" | "user";
+  version: string;
+}
+
+/**
+ * 从后往前找最后一个合法 todo 快照；坏快照跳过继续向前。
+ */
+export function extractLatestTodoSnapshot(sourceMessages): TodoSnapshot | null {
   if (!Array.isArray(sourceMessages)) return null;
   for (let i = sourceMessages.length - 1; i >= 0; i--) {
     const m = sourceMessages[i];
@@ -150,14 +255,14 @@ export function extractLatestTodoSnapshot(sourceMessages) {
     const stateSnapshot = snapshotFromTodoStateMessage(m);
     if (stateSnapshot) {
       if (stateSnapshot.invalid) continue;
-      return stateSnapshot;
+      return stateSnapshot as TodoSnapshot;
     }
 
     if (m.role !== "toolResult") continue;
     if (!TODO_TOOL_NAMES.includes(m.toolName)) continue;
     const toolSnapshot = snapshotFromToolResult(m);
     if (toolSnapshot.invalid) continue;
-    return toolSnapshot;
+    return toolSnapshot as TodoSnapshot;
   }
   return null;
 }
@@ -169,7 +274,9 @@ export function extractLatestTodoSnapshot(sourceMessages) {
 export function extractLatestTodos(sourceMessages) {
   const snapshot = extractLatestTodoSnapshot(sourceMessages);
   if (!snapshot) return null;
-  return snapshot.removed ? [] : applyTodoLifecycle(snapshot.todos);
+  // removed 已按格式版本覆盖旧"全完成即移除"与新"显式清空/已收纳"语义，
+  // 不再叠加 applyTodoLifecycle，避免把 v2 收尾摘要误清空。
+  return snapshot.removed ? [] : snapshot.todos;
 }
 
 /**
