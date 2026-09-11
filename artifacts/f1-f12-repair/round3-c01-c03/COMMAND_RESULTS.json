@@ -1498,5 +1498,34 @@
     "log": "logs/j62-ci-simplify-full.log",
     "logSha256": "988cf2e53d3e56fc89b9b049b361156332f0afd91065b3a0ea7939d3261a477b",
     "sourceManifestHash": "628eb4401fff73439bfafb3ba2984a7e46d91e1cd058ab7ebe191b9c89ea7884"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/post-verification-audit-seal.test.ts",
+      "tests/upstream-sync-matrix.test.ts",
+      "tests/packaged-desktop-cleanup.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-11T00:24:04.971371+00:00",
+    "end": "2026-09-11T00:24:05.695995+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "6dac53dbb711b88303ac6b6f59294363c2339ac0af55c778aba299b80a312f80",
+    "log": "logs/sep10-seal-bootstrap.log",
+    "logSha256": "6a9f04e0bed9467b04731af3e5fb22e239cef37aec42b3f8aa52e83fa2f6b6dd",
+    "sourceManifestHash": "6dac53dbb711b88303ac6b6f59294363c2339ac0af55c778aba299b80a312f80"
   }
 ]

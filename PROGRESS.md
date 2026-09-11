@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 696016b7d609b8967db095fa88912119e89b7215  (2026-09-09 v0.1.37 发布候选：MCP 生命周期等七主题 + 发布元数据 + 两轮 CI 拦截修复，直提 main)
+VERIFIED_SOURCE_SHA   = dc6e939951d964c1beffe38ce6f5bfe1084810fe  (2026-09-10 历史读取三阶段 + 架构契约补强七领域候选 + lint/测试拦截修复，fix/pending-sep10)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1094,6 +1094,12 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 
 - 固定源码候选：`5fbd96e0a287e5b88fa9ce6ba32b0fe6a332f40e`（直提 main，基于 6f5abd6d）：CI 收敛为 PR 单触发（合并进 main 后不再重复跑全量）；lint-open-boundary 独立岗哨与发布矩阵源级知识烟测退场（npm test/CI 矩阵单点覆盖，守卫契约测试已随新形状更新并钉住防回流）；发布链 quality-gate 二次考试与 release job 重复 digest 校验退场；知识库发布期性能门保留。GitHub 分支保护必过检查收敛为 macos-15 arm64 + windows-2025 x64 两腿，解除 strict（必须最新）、enforce_admins、会话清零与强制 PR 流程（已在 GitHub 侧生效，允许直推 main 热修）。
 - 验证证据（绑定该候选树）：typecheck×3 绿 + eslint 0 error；全量 13443 passed / 0 failed（round2 s35-ci-simplify-full-v3，round3 j62-ci-simplify-full 同树；s35 首跑与 v2 的失败分别为自举时序与 ustar 临时目录清理竞态，已按实录记录在 COMMAND_RESULTS）；round2/round3 交付清单与再生补丁同步。
+
+## 2026-09-10 历史读取三阶段 + 架构契约补强七领域候选与审计封印
+
+- 固定源码候选：`dc6e939951d964c1beffe38ce6f5bfe1084810fe`（分支 fix/pending-sep10，基于 1d42b740）：三阶段内容（d011e849 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次；787437d3 历史读取三阶段优化——目录快路径/追加增量续读/条件请求与概览协议；433492c5 合并）+ dc6e9399 拦截修复（eslint 纳入 tracked tests/*.mjs 与 gitignored scratch 对称忽略；目录快路径表达式语句与媒体合同 it.each 换行两处 lint error；桌面冒烟就绪期限断言 90s→150s 对齐 acde46f1 加固——v0.1.37 链遗留的真实断言漂移，acde46f1 当时误记该脚本「不在测试范围」）。
+- 验证证据（绑定该候选树）：typecheck×3 绿；eslint 0 error（9850 warnings 既有存量+新代码同风格）；全量 13821 passed / 0 实质失败（1373 文件，84s；4 项失败均为封印坐标旧值 696016b7 下的预期红：post-verification-audit-seal diff guard + round2/round3 证据家族同源下游）；packaged-desktop-cleanup 修复后单跑 9/9 绿。
+- 未执行/受限：本地未执行 npm run pack；正式签名、四平台安装包、公证与远端发布证据由后续 tag 工作流执行；Windows NSIS 真机安装交互仍未实测（沿用既有 Known limitation）。
 
 ## 2026-08-25 Notebook-first Knowledge 目标
 
