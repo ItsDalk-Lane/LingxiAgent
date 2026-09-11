@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = dc6e939951d964c1beffe38ce6f5bfe1084810fe  (2026-09-10 历史读取三阶段 + 架构契约补强七领域候选 + lint/测试拦截修复，fix/pending-sep10)
+VERIFIED_SOURCE_SHA   = f7f93f540701b25c7215fa3e20b29350c10a0774  (2026-09-10 历史读取三阶段 + 架构契约补强七领域候选 + lint/测试拦截修复，fix/pending-sep10)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1097,8 +1097,8 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 
 ## 2026-09-10 历史读取三阶段 + 架构契约补强七领域候选与审计封印
 
-- 固定源码候选：`dc6e939951d964c1beffe38ce6f5bfe1084810fe`（分支 fix/pending-sep10，基于 1d42b740）：三阶段内容（d011e849 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次；787437d3 历史读取三阶段优化——目录快路径/追加增量续读/条件请求与概览协议；433492c5 合并）+ dc6e9399 拦截修复（eslint 纳入 tracked tests/*.mjs 与 gitignored scratch 对称忽略；目录快路径表达式语句与媒体合同 it.each 换行两处 lint error；桌面冒烟就绪期限断言 90s→150s 对齐 acde46f1 加固——v0.1.37 链遗留的真实断言漂移，acde46f1 当时误记该脚本「不在测试范围」）。
-- 验证证据（绑定该候选树）：typecheck×3 绿；eslint 0 error（9850 warnings 既有存量+新代码同风格）；全量 13821 passed / 0 实质失败（1373 文件，84s；4 项失败均为封印坐标旧值 696016b7 下的预期红：post-verification-audit-seal diff guard + round2/round3 证据家族同源下游）；packaged-desktop-cleanup 修复后单跑 9/9 绿。
+- 固定源码候选：`f7f93f540701b25c7215fa3e20b29350c10a0774`（分支 fix/pending-sep10，基于 1d42b740）：三阶段内容（d011e849 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次；787437d3 历史读取三阶段优化——目录快路径/追加增量续读/条件请求与概览协议；433492c5 合并）+ dc6e9399 拦截修复（eslint 纳入 tracked tests/*.mjs 与 gitignored scratch 对称忽略；目录快路径表达式语句与媒体合同 it.each 换行两处 lint error；桌面冒烟就绪期限断言 90s→150s 对齐 acde46f1 加固——v0.1.37 链遗留的真实断言漂移，acde46f1 当时误记该脚本「不在测试范围」）+ f7f93f54 证据重冻结（round2/round3 SOURCE_MANIFEST 与 sep10-seal-bootstrap 绿色引导门禁绑定候选树、再生补丁同步；坐标文件在候选内暂记 dc6e9399，由后继审计提交推进至本候选）。
+- 验证证据（绑定 dc6e9399 源码树；f7f93f54 相对其仅叠加 excluded 证据/manifest/日志/再生补丁与暂记坐标，无生产代码差异）：typecheck×3 绿；eslint 0 error（9850 warnings 既有存量+新代码同风格）；全量 13821 passed / 0 实质失败（1373 文件，84s；4 项失败均为封印坐标旧值 696016b7 下的预期红：post-verification-audit-seal diff guard + round2/round3 证据家族同源下游，重冻结后 15/15 复跑绿）；packaged-desktop-cleanup 修复后单跑 9/9 绿。
 - 未执行/受限：本地未执行 npm run pack；正式签名、四平台安装包、公证与远端发布证据由后续 tag 工作流执行；Windows NSIS 真机安装交互仍未实测（沿用既有 Known limitation）。
 
 ## 2026-08-25 Notebook-first Knowledge 目标
