@@ -178,6 +178,11 @@ export type ModelObservabilityPersistenceHandle = {
   /**
    * 会话级轨迹复用查找（产品口径 2026-09-05）：该会话最近一次 user_turn
    * 轨迹 id；同会话后续 turn 复用同一条轨迹记录。无历史/未启用 → null。
+   *
+   * 入参是会话归属方言（attribution.sessionId → model_calls.session_id，
+   * 桌面主会话 = manifest 业务会话 ID sess_...）。调用方不得传入 Pi SDK
+   * 会话文件头 UUID——两套身份独立（2026-09-10 回归根因），传错方言
+   * 会结构性零命中、同会话每轮铸新根。
    */
   findReusableSessionTraceId(sessionId: string | null | undefined): string | null;
   /**

@@ -21,6 +21,7 @@ const MIME = {
   flac: "audio/flac",
   wav: "audio/wav",
   m4a: "audio/mp4",
+  pcm: "application/octet-stream",
 };
 
 export function createMediaRoute(engine) {
@@ -59,7 +60,7 @@ export function createMediaRoute(engine) {
   route.post("/media/speech/generate", async (c) => {
     try {
       const body = await safeJson(c);
-      const result = await requireMediaManager(engine).generateSpeechFromBus(body);
+      const result = await requireMediaManager(engine).generateSpeechFromBus(body, { signal: c.req.raw.signal });
       return c.json(result);
     } catch (err) {
       return c.json({ error: err.message }, 400);

@@ -625,7 +625,8 @@ export class LingxiEngine {
       discardForkedSessionDeferredTasks: (options) => this.discardForkedSessionDeferredTasks(options),
       getSessionIdForPath: (sessionPath) => this.getSessionIdForPath(sessionPath),
       // 会话级轨迹复用（产品口径 2026-09-05）：观测未安装/未启用时惰性读取为
-      // null，行为与旧版逐轮铸根一致。
+      // null，行为与旧版逐轮铸根一致。入参是 manifest 业务会话 ID（与 SDK
+      // 文件头 UUID 独立）；SessionCoordinator 负责按该方言传入。
       resolveSessionReusableTraceId: (sessionId) =>
         this._modelObservability?.findReusableSessionTraceId?.(sessionId) ?? null,
       forkSessionFiles: (options) => this.forkSessionFiles(options),
@@ -2063,13 +2064,13 @@ export class LingxiEngine {
   /** @deprecated Phase 2: 使用 abortSession(path) */
   async abort(options) { return this._sessionCoord.abort(options); }
   /** @deprecated Phase 2: 使用 steerSession(path, text) */
-  steer(text) { return this._sessionCoord.steer(text); }
+  steer(text): Promise<boolean> { return this._sessionCoord.steer(text); }
 
   // ── Path 感知 API（Phase 2） ──
   async promptSession(p, text, opts, submitOptions) {
     return this._sessionCoord.promptSession(p, text, opts, submitOptions);
   }
-  steerSession(p, text) { return this._sessionCoord.steerSession(p, text); }
+  steerSession(p, text): Promise<boolean> { return this._sessionCoord.steerSession(p, text); }
   async abortSession(p, options) { return this._sessionCoord.abortSession(p, options); }
   async deliverCustomMessage(p, message, options) {
     return this._sessionCoord.deliverCustomMessage(p, message, options);
@@ -3602,7 +3603,8 @@ export class LingxiEngine {
           }
         }
       }
-        this._media?.dispose?.();
+      // 媒体关闭返回可等待结果：等在途查询/提交/交付真实回收后才算关闭完成。
+      await this._media?.dispose?.();
       await this._mcp?.dispose?.();
       this._skills?.unwatch();
       this._deferredResultCoordinator?.dispose?.();

@@ -231,7 +231,7 @@ describe("媒体执行目标凭证解析", () => {
       resolutionReason: "active_provider_registry_lane" as const,
     });
     const refresh = vi.fn(() => refreshedTarget);
-    const store = { get: vi.fn(() => ({})), update: vi.fn() };
+    const store = { get: vi.fn(() => ({ status: "pending", attempt: 1 })), update: vi.fn() };
 
     await runSubmitInBackground({
       taskId: "image-task",

@@ -125,6 +125,8 @@ describe('buildItemsFromHistory user image restoration', () => {
       resultBlockIds: [],
       controlBlockIds: [],
       status: 'completed',
+      // 结局唯一裁决（F3）：投影携带权威 outcome，渲染层不再自行猜测。
+      outcome: 'completed_with_answer',
     });
     const textBlocks = first.data.blocks?.filter((block) => block.type === 'text') || [];
     expect(textBlocks.map((block) => block.source)).toEqual(['内部检查', '最终答复']);

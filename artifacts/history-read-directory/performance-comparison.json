@@ -1,0 +1,59 @@
+{
+  "generatedAt": "2026-09-11",
+  "scope": "A/D/F 固定页大小 50 对照（同 seed 20260910/同夹具/同硬件；单位 ms 除注明外）",
+  "sources": {
+    "A": "baseline/summary-a.json",
+    "D": "verification/summary-d.json",
+    "F": "verification-f/summary-f.json"
+  },
+  "rows": [
+    {
+      "metric": "热页 1k p50 (ms)",
+      "A": 7.72,
+      "D": 0.98,
+      "F": 0.76
+    },
+    {
+      "metric": "热页 10k p50 (ms)",
+      "A": 75.53,
+      "D": 0.67,
+      "F": 0.61
+    },
+    {
+      "metric": "冷首页 1k p50 (ms)",
+      "A": 9.27,
+      "D": 11.19,
+      "F": 10.6
+    },
+    {
+      "metric": "冷首页 10k p50 (ms)",
+      "A": 79.08,
+      "D": 93.2,
+      "F": 78.94
+    },
+    {
+      "metric": "完整翻页 1k (ms)",
+      "A": 176.6,
+      "D": 36.8,
+      "F": 30.8
+    },
+    {
+      "metric": "完整翻页 10k (ms)",
+      "A": 15341.3,
+      "D": 254.7,
+      "F": 226.1
+    },
+    {
+      "metric": "热页 fullFileReadCalls/请求",
+      "A": 2,
+      "D": 0,
+      "F": 0
+    },
+    {
+      "metric": "热页 jsonlParseCount (1k/10k 同值)",
+      "A": "4004/40004",
+      "D": 103,
+      "F": 103
+    }
+  ]
+}

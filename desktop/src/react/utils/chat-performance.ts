@@ -7,7 +7,8 @@ export type ChatPerformanceEventName =
   | 'transcript_projection'
   | 'turn_state_projection'
   | 'assistant_message_render'
-  | 'history_projection';
+  | 'history_projection'
+  | 'history_run_stitch';
 
 export interface ChatPerformanceEvent {
   name: ChatPerformanceEventName;

@@ -1,0 +1,90 @@
+{
+  "task": "A03",
+  "generatedAt": "2026-09-10T04:09:29.436Z",
+  "seed": 20260910,
+  "determinism": "夹具完全由索引派生（内容模板 × 序号），无随机数；seed 为任务书 A05 固定审计种子，仅作标识",
+  "construction": "writeLongRunSession()：1×{type:session,version:3,id:<SDK UUID>} 文件头 + 1×user(u1,parent=null) + N×assistant(a<i>) + (N-1)×toolResult(r<i>,toolCallId=tu-<i>)；链 u1→a1→r1→a2→r2→…→aN(parent=r<N-1>)；每条 toolResult 独立 id、parentId 指向对应 assistant",
+  "fixtures": {
+    "N=140": {
+      "n": 140,
+      "physicalLines": 281,
+      "displayCount": 141,
+      "pagesAtPageSize50": 3,
+      "bytes": 61290,
+      "sha256": "86e5cecad75fb1a465514134a0cdfb7824ad1a85fbe3d9c283efc9a6d4c7050e",
+      "trailingNewline": false
+    },
+    "N=1000": {
+      "n": 1000,
+      "physicalLines": 2001,
+      "displayCount": 1001,
+      "pagesAtPageSize50": 21,
+      "bytes": 443133,
+      "sha256": "d2b724253f961985fbfebf51433ae7126743c6a3051dec18a3138733f6dd8365",
+      "trailingNewline": false
+    },
+    "N=10000": {
+      "n": 10000,
+      "physicalLines": 20001,
+      "displayCount": 10001,
+      "pagesAtPageSize50": 201,
+      "bytes": 4520136,
+      "sha256": "09918383e568be23e7e0fd0e3ed6e546fe952e30981e6a3478949d5de2de6123",
+      "trailingNewline": false
+    }
+  },
+  "branchIdentity": {
+    "businessSessionId": "sess_0mtv0da63_d375087869c6295e72a2",
+    "businessSessionIdFormat": "sess_<base36 ts>_<20 hex>（core/session-manifest/id.ts generateSessionId）",
+    "sdkHeaderId": "7e5f1a3c-9d24-4b8e-a6c1-2f4b8d9e0a31",
+    "sdkHeaderIdFormat": "UUID v4 形态（lib/pi-sdk SessionManager 文件头身份）",
+    "distinct": true,
+    "manifestStore": "core/session-manifest/store.ts SessionManifestStore（真实 SQLite 存储）"
+  },
+  "executionPath": {
+    "branchEntry": "engine.openSessionManagerAtCurrentBranch → SessionManager.open(path, dir).getBranch()（真实现行分支服务）",
+    "messageRequests": 3,
+    "openCalls": 3,
+    "openSessionPathCalls": 3,
+    "getBranchCalls": 3,
+    "openThrows": 0,
+    "getBranchThrows": 0,
+    "fallbackReads": 0,
+    "fallbackProof": "loadSessionHistoryMessages 仅在分支读取 try 块抛错时进入兼容 raw-read fallback；openThrows=0 且 getBranchThrows=0 证明正常路径 fallback 次数为 0"
+  },
+  "gitHead": "1d42b7405c76292f617291e3a01cd2f3ef5efd04",
+  "gitBranch": "fix/pending-sep10",
+  "node": "v24.16.0",
+  "testRuns": {
+    "beforeFix": {
+      "command": "npx vitest run tests/history-pagination-run-continuity.test.ts",
+      "fixtureState": "SRC01 修复前夹具（toolResult 重复 assistant id 且 parentId 自引用）",
+      "exitCode": 0,
+      "result": "5/5 通过（T01/T04/T11/T11b/T03），92.41s",
+      "actualReadPath": "兼容 raw-read fallback（非分支路径）。取证：对修复前形状直接调用 SessionManager.open().getBranch() 复现 RangeError: Invalid array length（SDK getBranch 沿自引用 parentId 无限回溯直至数组溢出），loadSessionHistoryMessages catch 后静默落入逐行 fallback；旧 91s 耗时主要来自每请求该溢出回溯。即修复前绿断言从未覆盖生产分支读取。"
+    },
+    "afterFix": {
+      "command": "npx vitest run tests/history-pagination-run-continuity.test.ts",
+      "fixtureState": "A03 修正后合法夹具（u1→a1→r1→a2→…→aN，toolResult 独立 id）",
+      "exitCode": 0,
+      "result": "10/10 通过（原 T01/T04/T11/T11b/T03 断言未改全绿 + 新增 T12 规模定义/T12b×2 尾换行变体/T12c 死循环保护/A03 审计契约），~2.0s",
+      "actualReadPath": "生产分支路径：engine.openSessionManagerAtCurrentBranch → 真实 SessionManager.open().getBranch()，每请求 3 次分支读取零异常，fallback 0（见 executionPath）"
+    },
+    "invalidFixtureSuite": {
+      "command": "npx vitest run tests/history-pagination-invalid-fixture.test.ts",
+      "exitCode": 0,
+      "result": "8/8 通过（重复 ID/自引用/三环/缺父 严格层拒绝码 + SRC01 形状兼容降级记录 + SDK RangeError 取证 + 坏尾行修复行为）"
+    },
+    "combinedRun": {
+      "command": "npx vitest run tests/history-pagination-run-continuity.test.ts tests/history-pagination-invalid-fixture.test.ts",
+      "exitCode": 0,
+      "result": "18/18 通过，8.45s"
+    },
+    "typecheck": {
+      "command": "npm run typecheck（tsc ×3：root + tsconfig.node + tsconfig.test）",
+      "exitCode": 0
+    },
+    "semanticDefectsExposed": "无。合法夹具走分支路径后，原语义断言（3 页/141 唯一记录/单逻辑 Run/零伪无回复/all=1 逐块等价/游标契约/幂等）全部保持成立——分支路径与旧 fallback 对该数据族投影等价。修复同时暴露并消除了旧夹具的真实测试缺陷：性能样本实际从未经过分支路径（见 beforeFix.actualReadPath）。"
+  },
+  "regenerate": "A03_FIXTURE_AUDIT_OUT=<path> npx vitest run tests/history-pagination-run-continuity.test.ts -t 夹具审计（重新生成机器可验证部分；testRuns 为人工汇编的运行记录）"
+}

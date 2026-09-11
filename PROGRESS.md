@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 696016b7d609b8967db095fa88912119e89b7215  (2026-09-09 v0.1.37 发布候选：MCP 生命周期等七主题 + 发布元数据 + 两轮 CI 拦截修复，直提 main)
+VERIFIED_SOURCE_SHA   = af0a16d36c0639f18318a967137331eaffca5d22  (2026-09-10 历史读取三阶段 + 架构契约补强七领域候选 + lint/测试拦截修复，fix/pending-sep10)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1095,6 +1095,22 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 固定源码候选：`5fbd96e0a287e5b88fa9ce6ba32b0fe6a332f40e`（直提 main，基于 6f5abd6d）：CI 收敛为 PR 单触发（合并进 main 后不再重复跑全量）；lint-open-boundary 独立岗哨与发布矩阵源级知识烟测退场（npm test/CI 矩阵单点覆盖，守卫契约测试已随新形状更新并钉住防回流）；发布链 quality-gate 二次考试与 release job 重复 digest 校验退场；知识库发布期性能门保留。GitHub 分支保护必过检查收敛为 macos-15 arm64 + windows-2025 x64 两腿，解除 strict（必须最新）、enforce_admins、会话清零与强制 PR 流程（已在 GitHub 侧生效，允许直推 main 热修）。
 - 验证证据（绑定该候选树）：typecheck×3 绿 + eslint 0 error；全量 13443 passed / 0 failed（round2 s35-ci-simplify-full-v3，round3 j62-ci-simplify-full 同树；s35 首跑与 v2 的失败分别为自举时序与 ustar 临时目录清理竞态，已按实录记录在 COMMAND_RESULTS）；round2/round3 交付清单与再生补丁同步。
 
+## 2026-09-10 历史读取三阶段 + 架构契约补强七领域候选与审计封印
+
+- 固定源码候选：`f7f93f540701b25c7215fa3e20b29350c10a0774`（分支 fix/pending-sep10，基于 1d42b740）：三阶段内容（d011e849 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次；787437d3 历史读取三阶段优化——目录快路径/追加增量续读/条件请求与概览协议；433492c5 合并）+ dc6e9399 拦截修复（eslint 纳入 tracked tests/*.mjs 与 gitignored scratch 对称忽略；目录快路径表达式语句与媒体合同 it.each 换行两处 lint error；桌面冒烟就绪期限断言 90s→150s 对齐 acde46f1 加固——v0.1.37 链遗留的真实断言漂移，acde46f1 当时误记该脚本「不在测试范围」）+ f7f93f54 证据重冻结（round2/round3 SOURCE_MANIFEST 与 sep10-seal-bootstrap 绿色引导门禁绑定候选树、再生补丁同步；坐标文件在候选内暂记 dc6e9399，由后继审计提交推进至本候选）。
+- 验证证据（绑定 dc6e9399 源码树；f7f93f54 相对其仅叠加 excluded 证据/manifest/日志/再生补丁与暂记坐标，无生产代码差异）：typecheck×3 绿；eslint 0 error（9850 warnings 既有存量+新代码同风格）；全量 13821 passed / 0 实质失败（1373 文件，84s；4 项失败均为封印坐标旧值 696016b7 下的预期红：post-verification-audit-seal diff guard + round2/round3 证据家族同源下游，重冻结后 15/15 复跑绿）；packaged-desktop-cleanup 修复后单跑 9/9 绿。
+- 未执行/受限：本地未执行 npm run pack；正式签名、四平台安装包、公证与远端发布证据由后续 tag 工作流执行；Windows NSIS 真机安装交互仍未实测（沿用既有 Known limitation）。
+
+## 2026-09-11 Windows 临时目录清理加固候选与封印推进（PR #53 CI 收尾）
+
+- 固定源码候选：`0275f6c5a762fc25a75a8585a8e63817cf0be115`（f7f93f54 基础上：006a8054 历史读取七套件 Windows 清理加固 + 0275f6c5 证据重冻结 r2）。PR #53 首轮 CI：macOS 双腿绿；ubuntu 腿全量 1369 文件全过后 vitest worker fork 崩溃 exit 1（既有平台抖动家族，与 mac-arm64 历史同类）；windows-2025 腿 48 项失败全部定位为七套件 afterEach rmSync EPERM（Windows 句柄异步释放抖动族，生产句柄均有 finally close），按 server-composition-boundary 既有惯例补 maxRetries:20/retryDelay:250。
+- 验证证据（绑定 006a8054 源码树；0275f6c5 相对其仅叠加 excluded 证据/再生补丁，无生产代码差异）：七套件单跑 50/50 绿；typecheck×3 绿；改动文件 eslint 0 error；全量 13820 passed / 4 失败均为坐标旧值 f7f93f54 下 seal guard 家族预期红（另 1 次本地 worker fork 抖动，与 ubuntu CI 同族）；重冻结后 sep10-seal-green-r2 绿门禁（exit 0、manifest 36f4b98e/b9676f98 未漂移）、补丁重放 VERIFIED。
+
+## 2026-09-11 SQLite 句柄关闭修复候选与封印推进（PR #53 CI 收尾 II）
+
+- 固定源码候选：`af0a16d36c0639f18318a967137331eaffca5d22`（0275f6c5 基础上：40e0c6d3 七套件 afterEach 关闭 SessionManifestStore + af0a16d3 证据重冻结 r3）。PR #53 第二轮 CI：macOS 双腿 + ubuntu 全绿；windows-2025 同 48 项 EPERM 复现且 20×250ms 重试不可愈——实锤非异步释放抖动，而是测试未关闭 SessionManifestStore 的 SQLite 句柄（Windows 下打开文件阻塞目录删除；既有 Windows 绿测试 session-manifest-engine/history-pagination-run-continuity 均有 close 惯例）。修复：七套件登记并 afterEach close 后再 rm（rmSync 重试选项保留，对齐既有 Windows 清理惯例）。
+- 验证证据（绑定 40e0c6d3 源码树；af0a16d3 相对其仅叠加 excluded 证据/再生补丁，无生产代码差异）：七套件单跑 50/50 绿；tsconfig.test tsc 绿；全量 13821 passed / 4 失败均为坐标旧值 0275f6c5 下 seal guard 家族预期红；sep10-seal-green-r3 绿门禁（exit 0、manifest 034f8f56/9452bfed 未漂移）、补丁重放 VERIFIED。
+
 ## 2026-08-25 Notebook-first Knowledge 目标
 
 ### 当前阶段：本机闭环完成，外部证据待执行
@@ -1609,3 +1625,18 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 提交后首轮全量在 `2c178715` 暴露交付证据仍只核对工作树，13383 passed / 1 failed / 7 skipped；改为在 audit-only seal 存在时读取真实 `VERIFIED_SOURCE_SHA` Git 对象并执行 seal guard。随后逐文件 `git show` 在全量并发下先出现 `ENOBUFS`，再因 3454 次进程启动超过 60 秒；没有提高测试超时，改用一次 `git cat-file --batch`，保留全部逐文件字节数与 SHA-256 断言。上述失败日志为 `/tmp/lingxi-r01-r10-postseal-full.log`、`/tmp/lingxi-r01-r10-final-postseal-full.log`。
 - 最终源码候选 `7cf986236cb8ac5c2d22cce1e5882554a42cff28`，审计封印提交 `62c73f77`；候选 source manifest SHA-256 `c418b3ef2fc475e40ed779f21b8e087b120834e9b673baf2e67c3758138d30d8`。封印后独立 diff guard 与 133 路径矩阵通过，upstream-sync、seal、round2 delivery 三文件 20/20 通过。
 - 封印后原样 `npm test` exit 0：1334 文件通过 / 1 既有跳过，13384 测试通过 / 7 既有跳过，0 fail，82.80s；日志 `/tmp/lingxi-r01-r10-final-postseal-full-v2.log`。最终审计记录只改本 allowlist 内的 `PROGRESS.md`，不改变受测源码候选。
+
+## 2026-09-11 历史读取目录化+条件协议任务（A—F）完成
+
+- 分支 `fix/pending-sep10`（HEAD `1d42b740`）；任务改动为该提交之上的未提交工作区增量，按任务约束未提交/未推送/未发布。基线快照=APFS clone `/tmp/lingxi-baseline-1d42b740`（纯净 HEAD）。
+- 交付物：`artifacts/history-read-directory/`（TASKBOOK、acceptance-report.md、acceptance-matrix.json、verification{,-f}、protocol/、patches/ 三补丁、checksums.sha256 最后生成）。
+- 结果：P/X/Y 56 项=55 已修复并验证 + 1 已实现但指定环境未验证（Y14 真实浏览器跨源 CORS）+ 0 受阻 + 0 经证据否定。A/D/F（固定 50）：热页 10k 75.53→0.67→0.61ms、全翻 10k 15341.3→254.7→226.1ms、热页 fullFileReadCalls 2→0→0；决定性 304 两规模 20/20（bodyBytes=0、rebuilds=0）；概览替代逐页探底 201 请求/6095KiB→1 请求/≤4KiB；最终推荐 limit=100（省略 limit 旧请求仍 50、最大 200）。新旧四组合（旧/新服务端×旧/新客户端）全部通过。
+- 验证：定向 406/406 exit 0；typecheck exit 0；tripwire 15/15、持久化指纹 guard 0（compatible repin，无 DATA_EPOCH 变更）；全量 13735 passed / 7 failed（exit 1），失败签名与 A01 基线 7 项逐条一致，任务引入失败 0。
+- 三补丁（a-to-d 47 文件 / d-to-final 38 文件 / task-only 74 文件）`git apply --check` 全过，应用于 A01 副本后树级 diff 与工作区均为 0 差异（两路验证）；task-only 文件集与 git status 任务清单逐项一致，排除他人既有差异。
+- 未验证/受限：Windows/Linux/macOS x64 平台、打包与发布门禁、真实浏览器跨源 CORS（Node loopback 真实 HTTP 层已验）；详见 acceptance-report.md §八与 remaining-risks.md。
+
+### 2026-09-11 F-e 补记（历史读取任务）
+
+- A01 快照 clone `/tmp/lingxi-baseline-1d42b740` 曾被补丁验证误污染（任务内容被写入、runner 丢失）；已按 initial-status.txt（A01=porcelain=0）恢复纯净：HEAD `1d42b740`、工作区 0 差异。
+- compat 旧服务端 runner 自包含化：模板 tracked 于 `tests/compat-old-server-runner.template.mjs`，两个兼容测试 beforeAll 幂等写入 clone；clone 缺席时套件 skip 并 console 明示「四组合中旧服务端侧指定环境未验证」。
+- 复验：compat 4/4 + 4/4（exit 0）、定向 410/410、typecheck exit 0、全量 13735 passed / 7 failed（签名=A01 基线，任务引入 0）；d-to-final（40 文件）/task-only（76 文件）补丁重生成并通过 apply 验证与树级 0 差异复验。事件与防护详见 `artifacts/history-read-directory/{PROGRESS.md, remaining-risks.md}`。

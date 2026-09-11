@@ -649,7 +649,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:92a83e282cd0ba0fbb03f79be3de552e2d95f176cf187dc61d362e4d15c22a00",
+  "payloadFingerprint": "sha256:1f477c51f28e185cb7fa575fe57066d96b8a157144feb5b64c40c888d9ed65fd",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3165,8 +3165,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "MCP connector lifecycle feature: normalizeMcpConfig now persists two new optional per-connector fields (lifecycle, idleTimeoutMinutes). Read-time defaults (lifecycle keep-alive, idleTimeoutMinutes null) reproduce the pre-feature behaviour for every existing config, so old shapes read identically and no migration is needed — a compatible addition, not a breaking change.",
-    "payloadFingerprint": "sha256:92a83e282cd0ba0fbb03f79be3de552e2d95f176cf187dc61d362e4d15c22a00"
+    "compatibilityReason": "合并架构契约补强（d011e849）与历史读取三阶段优化（787437d3）两批已各自声明 compatible 的改动；无新持久化文件/表、无数据形状变化，合并不引入新形状变化。",
+    "payloadFingerprint": "sha256:1f477c51f28e185cb7fa575fe57066d96b8a157144feb5b64c40c888d9ed65fd"
   },
   "schemas": [
     {
@@ -3326,7 +3326,7 @@
       "contract": "DeferredResultStore normalization, seven-day cleanup, and atomic serializer",
       "kind": "runtime-contract",
       "module": "lib/deferred-result-store.ts",
-      "sourceHash": "sha256:43930be66cf5571a03128df9769c3ddbf01146ad8adc31bd4ae646b54b8520cc",
+      "sourceHash": "sha256:9c5d506f5d3c93e45de97263427a0604f897308b7a103edcc584030751b7d09b",
       "storeId": "deferred-result-state"
     },
     {
@@ -3854,7 +3854,7 @@
       "contract": "normalizeMcpConfig read-time normalization (servers/connectors alias, auth and OAuth field defaults, per-connector permission policy defaults, deferred-loading defaults, connection lifecycle defaults)",
       "kind": "runtime-contract",
       "module": "core/mcp/manager.ts",
-      "sourceHash": "sha256:35f0f658b7d7e11ddc24f483be71d8f99523c614dcda2b66e669d0b0ebc3e907",
+      "sourceHash": "sha256:0403ae1978c2dcf46def66a263ea29923962d15e125a2874d76ffe3713a5bdcf",
       "storeId": "mcp-config"
     },
     {
@@ -4051,9 +4051,9 @@
             "type": "table"
           }
         ],
-        "userVersion": 6
+        "userVersion": 7
       },
-      "sourceHash": "sha256:e0801ad79309b7abd0f8ccd48a4e7ae5f83d341b3ffba832ab4a80f0f5f9694c",
+      "sourceHash": "sha256:c43a6b1de8dc56dfcfc8862eb295b6f3f721429a4cb3bf445e91bc80efae9c74",
       "storeId": "model-observability-db"
     },
     {
@@ -4136,7 +4136,7 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:929e4189e0bd82df0f95f262730b9943d2d98e87a45aebecedb8a4edd8487c86",
+      "sourceHash": "sha256:c5878f3c7e8e63db612f04b9286ba87cbf2116fe8207fb92f5397477ea4c0718",
       "storeId": "server-runtime-info"
     },
     {
@@ -4150,7 +4150,7 @@
       "contract": "SessionFile payload naming, v1 sidecar, ownership, and 72-hour cold-session cleanup protocol",
       "kind": "directory-contract",
       "module": "lib/session-files/session-file-registry.ts",
-      "sourceHash": "sha256:4b3e42a5c8173c79c766ea82f7e283541cef190e804ed0cd99cc01c0d63e5617",
+      "sourceHash": "sha256:6525a4c94100e669f087ec4ce02c1a4be25fa9971d46622c8f7babf2f0f3170a",
       "storeId": "session-files"
     },
     {
@@ -4158,12 +4158,12 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:1775237db94d35ae6313085a8174a672b43a62c0f1c895b8246df00bd09a45d9"
+          "sourceHash": "sha256:4796e49f34e7c02118772e1981edbd7c57a5f7976241cd6801bc27eedcb90b54"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",
           "module": "core/session-jsonl-file.ts",
-          "sourceHash": "sha256:6a311935b1a95c7b6af0c3f2980869de4923fdb9b307cecb8475e400b389af12"
+          "sourceHash": "sha256:7c09e741858e73ceef9be030a282b5a53373bb1ee705e519d4f4e41281a0decf"
         }
       ],
       "kind": "external-versioned",

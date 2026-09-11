@@ -11,8 +11,9 @@
  * 权威来源损坏/不可读 = 明确失败，不静默按空库迁移、不凭猜测回退另一份。
  *
  * 可靠性（收据状态机，收据不含正文，正文备份在本地受控目录）：
- *   not_started → prepared → target_committed → sources_archived → completed
+ *   not_started → prepared → committing → target_committed → sources_archived → completed
  *                      ↘ failed（可重试）/ conflict（粘性，不自动重试）
+ * prepared 尚未尝试提交；committing 必须先于目标写入持久化，不能凭原目标字节重放。
  * 提交前复查源与目标未改变；目标原子写入；逐项映射只记哈希与 id。
  * completed 收据永不驱动重新导入（用户之后删除的条目不复活）。
  */
@@ -41,7 +42,7 @@ const log = createModuleLogger("pins-migration");
 export const PINNED_MD = "pinned.md";
 export const PINNED_JSON = "pinned-memory.json";
 export const PINNED_TENETS_MIGRATION_RECEIPT = "pinned-tenets-migration.receipt.json";
-const MIGRATION_VERSION = 3;
+const MIGRATION_VERSION = 4;
 const BACKUP_DIR = "pinned-migration-backup";
 
 export interface MigrationReceipt {
@@ -49,7 +50,7 @@ export interface MigrationReceipt {
   operationId?: string;
   kind: "migration" | "recovery";
   agentId: string;
-  state: "prepared" | "target_committed" | "sources_archived" | "completed" | "failed" | "conflict";
+  state: "prepared" | "committing" | "target_committed" | "sources_archived" | "completed" | "failed" | "conflict";
   sources: Array<{ file: string; sha256: string; mtimeMs: number }>;
   authority: { file: string; reason: string } | null;
   target: { existed: boolean; sha256: string | null };
@@ -114,8 +115,8 @@ export function readPinnedTenetsMigrationReceipt(agentDir: string): MigrationRec
 export function isMigrationReceipt(value: unknown, agentId: string): value is MigrationReceipt {
   if (!value || typeof value !== "object") return false;
   const r = value as MigrationReceipt;
-  if (![2, 3].includes(r.version) || r.agentId !== agentId || !["migration", "recovery"].includes(r.kind)
-    || !["prepared", "target_committed", "sources_archived", "completed", "failed", "conflict"].includes(r.state)
+  if (![2, 3, 4].includes(r.version) || r.agentId !== agentId || !["migration", "recovery"].includes(r.kind)
+    || !["prepared", "committing", "target_committed", "sources_archived", "completed", "failed", "conflict"].includes(r.state)
     || !Array.isArray(r.sources) || !Array.isArray(r.plan) || !Array.isArray(r.archived)
     || !r.target || typeof r.target.existed !== "boolean" || !r.counts
     || typeof r.createdAt !== "string" || typeof r.updatedAt !== "string") return false;
@@ -125,7 +126,8 @@ export function isMigrationReceipt(value: unknown, agentId: string): value is Mi
   if (!r.target.existed && r.target.sha256 !== null) return false;
   if (r.resultSha256 !== null && !HASH.test(r.resultSha256)) return false;
   if (!["failed", "conflict"].includes(r.state) && !r.resultSha256 && !legacyRecovery) return false;
-  if (r.version === 3 && !safeName(r.operationId)) return false;
+  if (r.version >= 3 && !safeName(r.operationId)) return false;
+  if (r.version < 4 && r.state === "committing") return false;
   if (r.sources.some(x => !x || !sourceName(x.file) || !HASH.test(x.sha256) || !Number.isFinite(x.mtimeMs))
     || new Set(r.sources.map(x => x.file)).size !== r.sources.length) return false;
   if (r.authority && (!sourceName(r.authority.file) || !r.sources.some(x => x.file === r.authority!.file))) return false;
@@ -218,13 +220,16 @@ function parsePinnedJsonItems(rawText: string, base: string): LegacyPinImportIte
     if (!raw || typeof raw !== "object" || raw.version !== 1 || !Array.isArray(raw.items)) {
       throw migrationError("MIGRATION_SOURCE_UNREADABLE", `${base} has an unsupported or damaged shape`);
     }
-    return raw.items
-      .map((item: any) => ({
+    return raw.items.map((item: any) => {
+      const content = String(item?.content ?? "").replace(/\r\n?/g, "\n").trim();
+      // 旧运行时 serializeItems 对任一空内容项都会失败；坏项不能被过滤成删除语义。
+      if (!content) throw migrationError("MIGRATION_SOURCE_UNREADABLE", `${base} contains an empty or invalid pinned item`);
+      return {
         legacyId: typeof item?.id === "string" && item.id ? item.id : null,
-        content: String(item?.content ?? "").replace(/\r\n?/g, "\n").trim(),
+        content,
         createdAt: typeof item?.createdAt === "string" ? item.createdAt : null,
-      }))
-      .filter((item: LegacyPinImportItem) => item.content);
+      };
+    });
 }
 
 // ── 权威来源选择（沿用旧版运行时 mtime 规则） ───────────────────────────────
@@ -391,6 +396,7 @@ export function executePinnedTargetTransaction(options: {
   plan: MigrationReceipt["plan"];
   prepare: () => void;
   recheck: () => void;
+  committing: () => void;
   committed: () => void;
   hooks?: MigrationFaultHooks;
 }): void {
@@ -400,6 +406,9 @@ export function executePinnedTargetTransaction(options: {
   options.hooks?.at?.("recheck:before");
   options.recheck();
   options.hooks?.at?.("commit:before");
+  // 先保存提交意图：之后即使目标被用户改回原字节，也不能据此重新导入。
+  options.committing();
+  options.hooks?.at?.("commit:intent:after");
   fs.mkdirSync(path.dirname(options.targetPath), { recursive: true });
   atomicWriteSync(options.targetPath, options.finalBytes);
   options.hooks?.at?.("commit:after");
@@ -517,7 +526,10 @@ function upgradeLegacyReceipt(agentDir: string, receipt: MigrationReceipt): bool
     ...(fs.existsSync(tenetsFilePath(agentDir)) ? [["tenets.json", tenetsFilePath(agentDir)] as const] : [])]) {
     writePinnedBackup(file, path.join(directory, `${sha256File(file)}-${name}`));
   }
-  receipt.version = 3; receipt.archived = archived; receipt.backupDir = relative;
+  receipt.version = MIGRATION_VERSION;
+  // 旧 prepared 可能已提交过；升级格式不产生“从未尝试提交”的新证据。
+  if (receipt.state === "prepared") receipt.state = "committing";
+  receipt.archived = archived; receipt.backupDir = relative;
   writeReceipt(agentDir, receipt);
   return true;
 }
@@ -560,6 +572,7 @@ function runFreshMigration(agentDir: string, agentId: string, hooks: MigrationFa
       writeReceipt(agentDir, receipt);
     },
     recheck: () => assertUnchanged(agentDir, receipt, prepared.targetPath),
+    committing: () => { receipt.state = "committing"; writeReceipt(agentDir, receipt); },
     committed: () => { receipt.state = "target_committed"; writeReceipt(agentDir, receipt); },
   });
 
@@ -623,21 +636,27 @@ function resumeMigration(agentDir: string, receipt: MigrationReceipt, hooks?: Mi
   const targetExists = fs.existsSync(targetPath);
   const targetSha256 = targetExists ? sha256File(targetPath) : null;
 
-  if (receipt.state === "target_committed" || receipt.state === "sources_archived") {
-    // 目标已提交：只校验计划条目仍在（允许后续用户写入），然后只补归档。
+  const commitUncertain = receipt.state === "committing" || (receipt.version < 4 && receipt.state === "prepared");
+  if (commitUncertain || receipt.state === "target_committed" || receipt.state === "sources_archived") {
+    // 已提交或曾尝试提交：只接受完整目标证明。原字节可能是用户删除后的结果。
     if (!targetExists || !verifyTargetCommitted(targetPath, receipt.resultSha256!, receipt.plan)) {
       receipt.state = "conflict";
-      receipt.error = { code: "MIGRATION_CONFLICT", message: "committed target no longer contains the planned entries" };
+      receipt.error = { code: "MIGRATION_CONFLICT", message: commitUncertain
+        ? "commit outcome is unverified; automatic replay is not authorized"
+        : "committed target no longer contains the planned entries" };
       writeReceipt(agentDir, receipt);
       return;
+    }
+    if (commitUncertain) {
+      receipt.state = "target_committed";
+      writeReceipt(agentDir, receipt);
     }
     archiveSources(agentDir, receipt, hooks);
     finalizeReceipt(agentDir, receipt, hooks);
     return;
   }
 
-  // state === "prepared"：目标可能已提交（崩溃在收据更新前），也可能未提交。
-  // 源必须全部在且字节一致——计划内容要从源重新推导。
+  // 仅 v4 prepared 证明尚未尝试提交；源必须全部在且字节一致，才能重新推导计划。
   for (const source of receipt.sources) {
     const filePath = path.join(agentDir, source.file);
     if (!fs.existsSync(filePath) || sha256File(filePath) !== source.sha256) {
@@ -649,7 +668,7 @@ function resumeMigration(agentDir: string, receipt: MigrationReceipt, hooks?: Mi
   }
 
   if (targetExists && targetSha256 === receipt.resultSha256 && verifyTargetCommitted(targetPath, receipt.resultSha256!, receipt.plan)) {
-    // 崩溃在 commit 之后、收据更新之前：目标已是计划终态，只补收据与归档。
+    // 当前目标已完整满足计划（例如仅有重复项）：只补收据与归档。
     receipt.state = "target_committed";
     writeReceipt(agentDir, receipt);
     archiveSources(agentDir, receipt, hooks);
@@ -698,6 +717,7 @@ function resumeMigration(agentDir: string, receipt: MigrationReceipt, hooks?: Mi
     targetPath, finalBytes, resultSha256: receipt.resultSha256!, plan: receipt.plan, hooks,
     prepare: () => { /* prepared 与备份已在上次调用持久化。 */ },
     recheck: () => assertUnchanged(agentDir, receipt, targetPath),
+    committing: () => { receipt.state = "committing"; writeReceipt(agentDir, receipt); },
     committed: () => {
       receipt.state = "target_committed";
       receipt.plan = receiptPlanEntries(entries);
@@ -718,7 +738,12 @@ export function migratePinnedMemoryToTenets(lingxiHome: string): void {
     for (const entry of fs.readdirSync(agentsDir, { withFileTypes: true })) {
       if (!entry.isDirectory() || entry.name.startsWith(".")) continue;
       try {
-        migrateAgentPinnedTenets(path.join(agentsDir, entry.name), entry.name);
+        const agentDir = path.join(agentsDir, entry.name);
+        migrateAgentPinnedTenets(agentDir, entry.name);
+        const receipt = readPinnedTenetsMigrationReceipt(agentDir);
+        if (receipt?.kind === "migration" && ["failed", "conflict"].includes(receipt.state)) {
+          log.warn(`[${entry.name}] pinned→tenets migration incomplete: ${receipt.state} (${receipt.error?.code ?? "MIGRATION_UNFINISHED"})`);
+        }
       } catch (err: any) {
         log.warn(`[${entry.name}] migration failed: ${err?.message || err}`);
       }

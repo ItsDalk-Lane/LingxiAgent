@@ -77,7 +77,7 @@ function makeSubmitCtx(ctx: any) {
 }
 
 function makeStore() {
-  return { get: vi.fn(() => ({})), update: vi.fn() };
+  return { get: vi.fn(() => ({ status: "pending", attempt: 1 })), update: vi.fn() };
 }
 
 /** provider:credentials bus mock——apiKey 携带毒丸，验证不进事件。 */

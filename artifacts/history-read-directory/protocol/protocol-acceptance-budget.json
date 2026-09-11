@@ -1,0 +1,54 @@
+{
+  "frozenAt": "2026-09-10",
+  "source": "TASKBOOK E01/E06.2（初始验收预算，先冻结后实施；不得看到失败后放宽）",
+  "phase": "E-a（E01 合同冻结 + E02 服务端条件 GET + E02.4 服务端验证）",
+  "dBaselineAnchor": {
+    "note": "D07 真实传输基线（HTTP loopback + 受控链路，rtt/带宽矩阵），E1/E3 收益对照用",
+    "requests": "artifacts/history-read-directory/protocol/baseline-d/requests-d.jsonl",
+    "summary": "artifacts/history-read-directory/protocol/baseline-d/summary-d.json",
+    "summaryMd": "artifacts/history-read-directory/protocol/baseline-d/summary-d.md",
+    "revalidationCell": "10k rtt150/bw10：重复校验现状=重新完整 GET 同页，1 请求 31.2KiB / 156.0ms",
+    "walkCell": "10k rtt150/bw10：完整翻页 201 请求 / 31,738ms / 6,061KiB",
+    "firstScreenCell": "10k rtt150/bw10：1 请求 / 158.7ms / 31.2KiB"
+  },
+  "semantic": {
+    "semanticFailureCount": 0,
+    "rule": "304 必须与同请求无条件 200 的实际当前 JSON 表示等价（oracle 对比）；语义失败（该 200 却 304、该 304 却 200、304 带正文/Content-Length、错误态 304）计数为 0 才算通过"
+  },
+  "limits": {
+    "upperBoundFixed": 200,
+    "legacyDefaultFixed": 50
+  },
+  "conditionalGet": {
+    "firstScreenP95Rule": "E1 启用后首屏（无条件新请求）p95 <= 1.20 * D 首屏 p95 + 30ms（标签计算只加一次序列化已发生+sha256，不得显著回退）",
+    "revalidationServerMsRule": "重复校验仍执行 B/C 读取与外部状态读取（不宣称省掉 hydrate/摘要计算）；304 响应体字节=0"
+  },
+  "clientPerPage": {
+    "processP95Rule": "客户端单页处理 p95 <= max(1.50 * 同环境50条对照 p95, 75ms)",
+    "peakMemoryRule": "单页新增峰值内存 <= max(2 * 同环境50条对照增量, 16 MiB)",
+    "receiptMetadataMaxBytes": 262144,
+    "receiptMetadataRule": "客户端校验记录预算 256KiB（32 条小记录/会话，超限淘汰记录不淘汰消息）；独立于服务端目录预算验证"
+  },
+  "overview": {
+    "hotJsonMaxBytes": 4096,
+    "hotJsonlReadsRule": "概览热读 0 次 JSONL 读/解析（命中目录统计路径）；超预算或语义不适合概览时返回不可用，不强制重建",
+    "note": "E04 实施；本预算先冻结"
+  },
+  "pageSizeExperiment": {
+    "kAbove50Rule": "K>50 时完整翻阅请求数必须低于 50 对照",
+    "endToEndRule": "目标受控链路总时不得变差；首屏不增加强制握手",
+    "candidateSet": [
+      50,
+      100,
+      150,
+      200
+    ],
+    "decision": "E06.2 实测选定 K=100（page-size-decision.md；201→101 请求、全翻 −49% 总时，首屏/内存预算内）；经 server/history-read/protocol.ts 单一配置点生效",
+    "measured": "artifacts/history-read-directory/protocol/page-size-experiments/summary-e.json"
+  },
+  "serverSideGuard": {
+    "diffByteEquivalence": "200 响应体与冻结参考逐字节一致（差分三模式 21/21）",
+    "noCacheResidency": "标签/字节串不写入目录或响应缓存；请求结束释放",
+    "logRule": "ETag 日志只含 requestId/结果/reason/截短不可逆摘要"
+  }
+}

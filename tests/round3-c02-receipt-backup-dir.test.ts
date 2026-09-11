@@ -29,7 +29,7 @@ import { tenetsFilePath, readTenetsFileStrict } from '../lib/memory/tenets.ts';
 const homes: string[] = [];
 afterEach(() => { for (const home of homes.splice(0)) fs.rmSync(home, { recursive: true, force: true }); });
 const sha = (s: string | Buffer) => createHash('sha256').update(s).digest('hex');
-const POSIX_BACKUP = /^memory\/pinned-migration-backup(?:\/[a-zA-Z0-9-]+)?$/;
+const POSIX_BACKUP = /^memory\/pinned-migration-backup(?:\/[a-zA-Z0-9_-]+)?$/;
 
 function fixture(content = 'synthetic item') {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'r-c02-')); homes.push(home);
@@ -100,9 +100,10 @@ describe('C02 写侧：新收据一律 POSIX 规范路径', () => {
   });
 });
 
-describe('C02 兼容读：v3 迁移收据三个续跑状态 × Windows 旧表示', () => {
+describe('C02 兼容读：v4 迁移收据可证明的续跑状态 × Windows 旧表示', () => {
   it.each([
     ['prepared', 'receipt:prepared'],
+    ['committing', 'commit:after'],
     ['target_committed', 'archive:before:pinned-memory.json'],
     ['sources_archived', 'completed:before'],
   ] as const)('Windows 旧表示的 %s 收据可读、可续跑至 completed', (expectedState, checkpoint) => {
@@ -149,7 +150,7 @@ describe('C02 兼容读：v3 迁移收据三个续跑状态 × Windows 旧表示
     expect(readTenetsFileStrict(tenetsFilePath(dir)).tenets).toHaveLength(0);
   });
 
-  it('旧 v2 中间态收据（Windows backupDir）按升级路径继续并落规范路径', () => {
+  it('旧 v2 prepared（Windows backupDir）没有目标提交证据，升级保留原件且明确冲突', () => {
     const { dir } = fixture();
     expect(() => migrateAgentPinnedTenets(dir, 'test-agent', crashAt('receipt:prepared'))).toThrow();
     const raw = readReceiptRaw(dir);
@@ -159,13 +160,16 @@ describe('C02 兼容读：v3 迁移收据三个续跑状态 × Windows 旧表示
     writeReceiptRaw(dir, raw);
     migrateAgentPinnedTenets(dir, 'test-agent');
     const after = readReceiptRaw(dir);
-    expect(after.state).toBe('completed');
-    expect(after.version).toBe(3);
+    expect(after.state).toBe('conflict');
+    expect(after.version).toBe(4);
     expect(after.backupDir).toMatch(POSIX_BACKUP);
+    expect(fs.existsSync(path.join(dir, 'pinned-memory.json'))).toBe(true);
+    expect(fs.existsSync(path.join(dir, 'pinned-memory.json.migrated'))).toBe(false);
+    expect(fs.existsSync(tenetsFilePath(dir))).toBe(false);
   });
 });
 
-describe('C02 兼容读：v3 恢复操作收据 × Windows 旧表示', () => {
+describe('C02 兼容读：v4 恢复操作收据 × Windows 旧表示', () => {
   function setupRecovery() {
     const { home, dir } = fixture();
     fs.renameSync(path.join(dir, 'pinned-memory.json'), path.join(dir, 'pinned-memory.json.migrated'));
@@ -181,7 +185,7 @@ describe('C02 兼容读：v3 恢复操作收据 × Windows 旧表示', () => {
 
   it('target_committed 中断 + Windows 旧表示：续跑完成，批准摘要与 operation 身份不变', () => {
     const f = setupRecovery();
-    // 第一轮在提交后、收据更新前崩溃（target_committed 或 prepared-with-committed-target）。
+    // 第一轮在目标已提交、完成收据更新前崩溃。
     expect(() => applyPinnedTenetsRecovery(f.home, f.approval, crashAt('completed:before'))).toThrow();
     const before = JSON.parse(fs.readFileSync(operationPath(f.dir, f.approval.operationId), 'utf8'));
     const identityBefore = { operationId: before.operationId, approvalDigest: before.approvalDigest, approval: before.approval, plan: before.plan };
@@ -236,8 +240,10 @@ describe('C02 拒绝路径：结构先行验证，危险输入一律拒绝', () 
   it.each([
     'memory/pinned-migration-backup',
     'memory/pinned-migration-backup/0e2d1f2a-1111-2222-3333-444455556666',
+    'memory/pinned-migration-backup/restore_1',
     'memory\\pinned-migration-backup',
     'memory\\pinned-migration-backup\\0e2d1f2a-1111-2222-3333-444455556666',
+    'memory\\pinned-migration-backup\\restore_1',
   ])('合法表示 %j 被接受并规范化', value => {
     const canonical = parseReceiptBackupDir(value);
     expect(canonical).toBe(String(value).replace(/\\/g, '/'));

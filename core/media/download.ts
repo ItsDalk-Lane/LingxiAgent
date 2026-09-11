@@ -23,9 +23,12 @@ const MIME_TO_EXT = {
  * @param {string} [customName] - optional filename without extension (e.g. "sunset-cat")
  * @returns {Promise<{ filename: string, filePath: string }>}
  */
-export async function saveImage(buffer, mimeType, dataDir, customName) {
-  const ext = MIME_TO_EXT[mimeType] || "png";
-  // 未知 MIME 仍回落 png（历史行为）；音频适配器只传上表内的 MIME。
+export async function saveImage(buffer, mimeType, dataDir, customName, options: { extension?: "pcm" } = {}) {
+  // 原始 PCM 没有容器头；调用方明确指定后缀，不凭通用二进制 MIME 猜格式。
+  if (options.extension && (options.extension !== "pcm" || mimeType !== "application/octet-stream")) {
+    throw new Error("unsupported explicit media extension");
+  }
+  const ext = options.extension || MIME_TO_EXT[mimeType] || "png";
   const hash = crypto.createHash("md5").update(buffer).digest("hex").slice(0, 8);
   // sanitize custom name: keep alphanumeric, CJK, hyphens, underscores
   const safeName = customName

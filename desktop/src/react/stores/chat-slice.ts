@@ -10,6 +10,7 @@ import { sessionScopedKey, sessionScopedValue } from './session-slice';
 import { recordChatPerformance } from '../utils/chat-performance';
 import { isSameFilePresentation, normalizeContentBlocks } from '../utils/content-semantics';
 import { resolveAssistantTurnOutcome } from '../utils/turn-outcome';
+import { mergePrependedHistoryItems } from '../utils/history-run-merge';
 
 export interface ChatSlice {
   chatSessions: Record<string, SessionMessages>;
@@ -26,8 +27,8 @@ export interface ChatSlice {
   _loadMessagesVersion: Record<string, number>;
   scrollPositions: Record<string, number>;
 
-  initSession: (path: string, items: ChatListItem[], hasMore: boolean, revision?: string | null) => void;
-  prependItems: (path: string, items: ChatListItem[], hasMore: boolean) => void;
+  initSession: (path: string, items: ChatListItem[], hasMore: boolean, revision?: string | null, nextBefore?: string | null) => void;
+  prependItems: (path: string, items: ChatListItem[], hasMore: boolean, nextBefore?: string | null) => void;
   appendItem: (path: string, item: ChatListItem) => void;
   appendOptimisticUserMessage: (path: string, message: ChatMessage) => void;
   confirmOptimisticUserMessage: (path: string, clientMessageId: string, message: ChatMessage) => boolean;
@@ -130,7 +131,7 @@ export const createChatSlice = (
   scrollPositions: {},
   queuedTurnInputsByPath: {},
 
-  initSession: (path, items, hasMore, revision = null) => set((s) => {
+  initSession: (path, items, hasMore, revision = null, nextBefore) => set((s) => {
     const key = keyForSession(s as any, path);
     const sessions = { ...s.chatSessions };
     const registryFiles = { ...s.sessionRegistryFilesByPath };
@@ -139,7 +140,10 @@ export const createChatSlice = (
       items,
       hasMore,
       loadingMore: false,
-      oldestId: firstMessageId(items),
+      // 游标语义（F1）：nextBefore 由调用方从服务端响应（或原始首条记录 id）传入；
+      // oldestId 仅作旧消费者兼容的显示项身份，不再承担分页边界。
+      oldestId: nextBefore ?? firstMessageId(items),
+      ...(nextBefore !== undefined ? { nextBefore } : {}),
       revision,
     };
     if (key !== path) delete sessions[path];
@@ -161,17 +165,23 @@ export const createChatSlice = (
     return { chatSessions: sessions, sessionRegistryFilesByPath: registryFiles, scrollPositions };
   }),
 
-  prependItems: (path, items, hasMore) => set((s) => {
+  prependItems: (path, items, hasMore, nextBefore) => set((s) => {
     const session = scopedMapValue<SessionMessages>(s as any, s.chatSessions, path);
     if (!session) return {};
-    const merged = [...items, ...session.items];
+    // 补页合并（F1/F2）：同 Run 片段缝合 + 重复事实幂等，绝不裸拼接；
+    // 缝合会重投影受影响 Run，未受影响的项保持对象引用不变（React 增量渲染）。
+    const { items: merged, stitchedRunKeys } = mergePrependedHistoryItems(session.items, items);
+    if (stitchedRunKeys.length > 0) {
+      recordChatPerformance('history_run_stitch', { sessionPath: path, itemCount: stitchedRunKeys.length });
+    }
     return {
       chatSessions: putScopedMapValue(s as any, s.chatSessions, path, {
           ...session,
           items: merged,
           hasMore,
           loadingMore: false,
-          oldestId: firstMessageId(items) || session.oldestId,
+          oldestId: nextBefore ?? firstMessageId(items) ?? session.oldestId,
+          ...(nextBefore !== undefined ? { nextBefore } : {}),
         }),
     };
   }),

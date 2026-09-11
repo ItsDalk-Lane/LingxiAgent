@@ -38,7 +38,7 @@ import {
   isLingxiServerListeningOnPort,
   selectLoopbackListenPort,
 } from "../core/server-port-selection.ts";
-import { isCorsOriginAllowed } from "./http/cors-policy.ts";
+import { applyCorsResponseHeaders, isCorsOriginAllowed } from "./http/cors-policy.ts";
 import { inferHttpConnectionKind } from "./http/transport-context.ts";
 import { authorizeHttpRoute, isPublicHttpRoute } from "./http/route-security.ts";
 
@@ -587,14 +587,12 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
       origin,
       configuredOrigin: corsAllowedOrigin,
     } as any);
-    if (origin && isAllowed) {
-      c.header("Access-Control-Allow-Origin", origin);
-      c.header("Access-Control-Allow-Credentials", "true");
-    }
     // PATCH 必须在列：file://（打包/dev 渲染页）发起的跨域写请求会先做 CORS 预检，
-    // 缺 PATCH 时 /api/agents/:id/skills/:name 等单项启停路由全部被浏览器预检拒绝
-    c.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-    c.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    // 缺 PATCH 时 /api/agents/:id/skills/:name 等单项启停路由全部被浏览器预检拒绝。
+    // E07：头契约单一来源 applyCorsResponseHeaders——Allow-Headers 含 If-None-Match，
+    // Expose-Headers 暴露 ETag/Lingxi-History-Protocol/Lingxi-History-Page-Limit，
+    // 来源白名单不放宽（绝不 credentials+通配）。
+    applyCorsResponseHeaders(c, { origin, configuredOrigin: corsAllowedOrigin });
     if (c.req.method === "OPTIONS") return c.text("", 204);
 
     const transport = inferHttpConnectionKind({

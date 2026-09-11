@@ -15,6 +15,7 @@
 import { dirname, join as pathJoin } from "node:path";
 import { readImageSize } from "./image-size.ts";
 import { isResponseDelivery } from "./image-task-runner.ts";
+import { isMediaTaskTerminal, mediaTaskAttempt, validateMediaOutputs } from "./task-store.ts";
 // Control-plane poller：媒体任务查询不是 Model Call（§四十七），不使用
 // model-request-accounting。usageLedger 构造参数保留以兼容既有装配，
 // 但 query 不再写模型用量账本。
@@ -61,412 +62,376 @@ export function shouldCheckThisTick(ageMs, tickCount) {
 }
 
 export class Poller {
-  declare _active: any;
-  declare _bus: any;
-  declare _cancelled: any;
-  declare _dataDir: any;
-  declare _errorCounts: any;
-  declare _generatedDir: any;
-  declare _log: any;
-  declare _registerSessionFile: any;
-  declare _registry: any;
-  declare _store: any;
-  declare _tickCount: any;
-  declare _timer: any;
-  declare _usageLedger: any;
-  /**
-   * @param {{
-   *   store: import("./task-store.ts").TaskStore,
-   *   registry: import("./adapter-registry.ts").AdapterRegistry,
- *   bus: object,
-	 *   dataDir?: string,
-	 *   generatedDir: string,
-	 *   log: object,
-	 *   registerSessionFile?: Function,
-	 *   usageLedger?: object,
-	 * }} opts
-	 */
+  _active = new Set<string>();
+  _deliveryPending = new Set<string>();
+  _errorCounts = new Map<string, number>();
+  _inFlight = new Map<string, Promise<void>>();
+  _queryControllers = new Map<string, { taskId: string; attempt: number; controller: AbortController }>();
+  _handoffs = new Map<string, Promise<void>>();
+  _submissions = new Map<string, { taskId: string; attempt: number; controller: AbortController; promise: Promise<any> }>();
+  _timer: ReturnType<typeof setInterval> | null = null;
+  _tickCount = 0;
+  _generation = 0;
+  _controller = new AbortController();
+  _started = false;
+  _emitted = new Set<string>();
+  _store: any;
+  _registry: any;
+  _bus: any;
+  _dataDir: string;
+  _generatedDir: string;
+  _log: any;
+  _registerSessionFile: any;
+  _usageLedger: any;
+
   constructor({ store, registry, bus, dataDir, generatedDir, log, registerSessionFile, usageLedger = null }) {
-    this._store        = store;
-    this._registry     = registry;
-    this._bus          = bus;
-    this._dataDir      = dataDir || dirname(generatedDir);
+    this._store = store;
+    this._registry = registry;
+    this._bus = bus;
+    this._dataDir = dataDir || dirname(generatedDir);
     this._generatedDir = generatedDir;
-    this._log          = createSafeLogger(log);
+    this._log = createSafeLogger(log);
     this._registerSessionFile = registerSessionFile || null;
     this._usageLedger = usageLedger;
-
-    /** @type {Set<string>} taskIds being tracked */
-    this._active    = new Set();
-    this._timer     = null;
-    this._tickCount = 0;
-    /** @type {Map<string, number>} consecutive query error counts per taskId */
-    this._errorCounts = new Map();
-    /** @type {Set<string>} taskIds cancelled — fence against in-flight queries */
-    this._cancelled = new Set();
   }
 
-  // ── Public API ─────────────────────────────────────────────────────────────
+  get running() { return this._started; }
 
-  get running() {
-    return this._timer !== null;
+  executionContext(signal?: AbortSignal) {
+    const generation = this._generation;
+    return {
+      signal: signal ? AbortSignal.any([signal, this._controller.signal]) : this._controller.signal,
+      isCurrent: () => this._started && this._generation === generation,
+    };
   }
 
-  /**
-   * Add a taskId to the active polling set.
-   * @param {string} taskId
-   */
+  /** 背景提交也由同一个运行实例持有；取消与停止后仍等待其真实清理完成。 */
+  runSubmission(taskId, attempt, run, signal?: AbortSignal) {
+    const controller = new AbortController();
+    const lifecycle = this.executionContext(signal);
+    const combined = AbortSignal.any([lifecycle.signal, controller.signal]);
+    const key = `${taskId}:${attempt}`;
+    const context = {
+      signal: combined,
+      isCurrent: () => lifecycle.isCurrent()
+        && !combined.aborted && this._isPendingAttempt(taskId, attempt),
+    };
+    const promise = Promise.resolve().then(() => {
+      combined.throwIfAborted();
+      if (!context.isCurrent()) throw new Error("media submission is no longer current");
+      return run(context);
+    }).finally(() => {
+      if (this._submissions.get(key)?.promise === promise) this._submissions.delete(key);
+    });
+    this._submissions.set(key, { taskId, attempt, controller, promise });
+    return promise;
+  }
+
   add(taskId) {
-    this._cancelled.delete(taskId);
+    if (!this._started) return;
     this._errorCounts.delete(taskId);
-    this._active.add(taskId);
-  }
-
-  /**
-   * Check whether a taskId is in the active set.
-   * @param {string} taskId
-   * @returns {boolean}
-   */
-  hasPending(taskId) {
-    return this._active.has(taskId);
-  }
-
-  /**
-   * Cancel a task. Adds to cancellation fence so in-flight queries are ignored.
-   * @param {string} taskId
-   */
-  cancel(taskId) {
-    if (!this._active.has(taskId)) return;
     const task = this._store.get(taskId);
-    this._cancelled.add(taskId);
+    if (task?.status === "pending") this._active.add(taskId);
+    else if (task?.deliveryState === "pending") this._deliveryPending.add(taskId);
+  }
+
+  hasPending(taskId) { return this._active.has(taskId); }
+
+  cancel(taskId) {
+    const task = this._store.get(taskId);
+    if (!task || task.status !== "pending") return Promise.resolve();
+    const attempt = mediaTaskAttempt(task);
+    for (const submission of this._submissions.values()) {
+      if (submission.taskId === taskId && submission.attempt === attempt) {
+        submission.controller.abort(new DOMException("media task cancelled", "AbortError"));
+      }
+    }
+    for (const query of this._queryControllers.values()) {
+      if (query.taskId === taskId && query.attempt === attempt) query.controller.abort(new DOMException("media task cancelled", "AbortError"));
+    }
+    this._settle(taskId, task, { status: "cancelled", failReason: "user cancelled" });
     this._active.delete(taskId);
     this._errorCounts.delete(taskId);
-    this._store.update(taskId, {
-      status: "cancelled",
-      failReason: "user cancelled",
-      completedAt: new Date().toISOString(),
-    });
-    if (!isResponseDelivery(task)) {
-      this._bus.request("deferred:abort", { taskId, reason: "user cancelled" }).catch(() => {});
-      this._bus.request("task:remove", { taskId }).catch(() => {});
-    }
     this._log.info(`[media] task ${taskId} cancelled by user`);
+    const handoff = this._deliverTask(taskId);
+    return Promise.allSettled([
+      handoff,
+      ...[...this._queryControllers.entries()].filter(([, item]) => item.taskId === taskId).map(([key]) => this._inFlight.get(key)),
+      ...[...this._submissions.values()].filter(item => item.taskId === taskId).map(item => item.promise),
+    ]).then(() => {});
   }
 
-  /**
-   * Recover pending tasks from the store and start the polling interval.
-   */
   start() {
-    const pending = this._store.listPending();
-    for (const task of pending) {
-      if (task.submitState === "submitting" && !task.adapterTaskId && !(task.files?.length)) {
-        const reason = "generation interrupted before provider submission completed";
-        this._store.update(task.taskId, {
-          status: "failed",
-          failReason: reason,
-          submitState: "failed",
-          completedAt: new Date().toISOString(),
-        });
-        this._bus.request("deferred:fail", { taskId: task.taskId, error: { message: reason } }).catch(() => {});
-        this._bus.request("task:remove", { taskId: task.taskId }).catch(() => {});
-        continue;
+    if (this._started) return;
+    this._generation += 1;
+    this._controller = new AbortController();
+    this._started = true;
+    this._active.clear();
+    this._deliveryPending.clear();
+    const tasks = this._store.listAll?.() || this._store.listPending();
+    for (const task of tasks) {
+      if (task.status === "pending") {
+        if (task.submitState === "submitting" && !task.adapterTaskId && !(task.files?.length)) {
+          this._settle(task.taskId, task, {
+            status: "failed",
+            failReason: "generation interrupted during submission; provider acceptance is unknown and generation was not retried",
+          });
+        } else {
+          this._active.add(task.taskId);
+          if (!isResponseDelivery(task)) {
+            void this._registerDeferred(task).catch(error => this._log.warn(`[media] recovery registration failed: ${error.message}`));
+            void this._bus.request("task:register", {
+              taskId: task.taskId, type: "media-generation",
+              sessionId: task.sessionId, sessionRef: task.sessionRef, parentSessionPath: task.sessionPath,
+              meta: this._deferredMeta(task),
+            }).catch(error => this._log.warn(`[media] task visibility recovery failed: ${error.message}`));
+          }
+        }
       }
-      this._active.add(task.taskId);
-      if (isResponseDelivery(task)) continue;
-      // Re-register in DeferredResultStore so resolve/fail notifications work after restart
-      this._bus.request("deferred:register", {
-        taskId: task.taskId,
-        sessionPath: task.sessionPath,
-        meta: {
-          type: task.type === "video" ? "video-generation"
-            : task.type === "speech" ? "speech-generation" : "image-generation",
-          mediaKind: task.type === "video" ? "video" : task.type === "speech" ? "speech" : "image",
-          deliveryIntent: "ui_only",
-          triggerParentTurn: false,
-          ...(task.type === "image" ? { notifyAgentOnFailure: true } : {}),
-          prompt: task.prompt,
-          ...(task.deliveryTarget ? { deliveryTarget: task.deliveryTarget } : {}),
-        },
-      }).catch(() => {}); // ignore if no active session yet
-      // Re-register in TaskRegistry so the task is visible and cancellable
-      this._bus.request("task:register", {
-        taskId: task.taskId,
-        type: "media-generation",
-        parentSessionPath: task.sessionPath,
-        meta: {
-          type: task.type === "video" ? "video-generation"
-            : task.type === "speech" ? "speech-generation" : "image-generation",
-          ...(task.deliveryTarget ? { deliveryTarget: task.deliveryTarget } : {}),
-        },
-      }).catch(() => {});
+      const latest = this._store.get(task.taskId);
+      if (isMediaTaskTerminal(latest) && latest.deliveryState === "pending") this._deliveryPending.add(task.taskId);
     }
-    if (pending.length > 0) {
-      this._log.info(`[media] poller recovered ${pending.length} pending task(s)`);
-    }
-
+    if (tasks.length) this._log.info(`[media] poller recovered ${tasks.filter(task => task.status === "pending").length} pending task(s)`);
     this._timer = setInterval(() => this._tick(), TICK_MS);
   }
 
-  /**
-   * Stop the polling interval.
-   */
+  /** 同步使旧代次失效，返回值等待已拥有的在途工作回收。 */
   stop() {
-    if (this._timer !== null) {
-      clearInterval(this._timer);
-      this._timer = null;
-    }
+    this._started = false;
+    this._generation += 1;
+    this._controller.abort(new DOMException("media runtime stopped", "AbortError"));
+    if (this._timer !== null) clearInterval(this._timer);
+    this._timer = null;
+    this._active.clear();
+    this._deliveryPending.clear();
+    return Promise.allSettled([
+      ...this._inFlight.values(), ...this._handoffs.values(),
+      ...[...this._submissions.values()].map(item => item.promise),
+    ]).then(() => {});
   }
 
-  /**
-   * Immediately check a task outside the interval, useful when a background
-   * submit just produced local files and the UI can be updated without waiting
-   * for the next 5s tick.
-   * @param {string} taskId
-   */
-  async checkNow(taskId) {
-    if (!this._active.has(taskId)) return;
+  checkNow(taskId) {
+    if (!this._started) return Promise.resolve();
     const task = this._store.get(taskId);
-    if (!task || task.status !== "pending") return;
-    try {
-      await this._checkTask(taskId, task);
-    } catch (err) {
-      this._log.error(`[media] checkNow unexpected error for ${taskId}:`, err);
-    }
+    if (isMediaTaskTerminal(task)) return this._deliverTask(taskId);
+    if (!task || !this._active.has(taskId) || task.status !== "pending") return Promise.resolve();
+    const key = `${this._generation}:${taskId}:${mediaTaskAttempt(task)}`;
+    const existing = this._inFlight.get(key);
+    if (existing) return existing;
+    const controller = new AbortController();
+    const signal = AbortSignal.any([controller.signal, this._controller.signal]);
+    this._queryControllers.set(key, { taskId, attempt: mediaTaskAttempt(task), controller });
+    const promise = this._checkTask(taskId, task, signal).catch(error => {
+      this._log.error(`[media] check failed for ${taskId}:`, error);
+    }).finally(() => {
+      if (this._inFlight.get(key) === promise) this._inFlight.delete(key);
+      this._queryControllers.delete(key);
+    });
+    this._inFlight.set(key, promise);
+    return promise;
   }
 
-  // ── Private ────────────────────────────────────────────────────────────────
+  _isPendingAttempt(taskId, attempt) {
+    const task = this._store.get(taskId);
+    return !!task && task.status === "pending" && mediaTaskAttempt(task) === attempt;
+  }
+
+  _isCurrent(taskId, attempt, generation, requirePending = true) {
+    const task = this._store.get(taskId);
+    return this._started && this._generation === generation && !!task
+      && mediaTaskAttempt(task) === attempt && (!requirePending || task.status === "pending");
+  }
 
   async _readImageDimensions(files) {
     if (!files?.length) return { imageWidth: null, imageHeight: null };
-    const filePath = pathJoin(this._generatedDir, files[0]);
-    const size = await readImageSize(filePath).catch(() => null);
-    return size
-      ? { imageWidth: (size as any).width, imageHeight: (size as any).height }
+    const size = await readImageSize(pathJoin(this._generatedDir, files[0])).catch(() => null);
+    return size ? { imageWidth: (size as any).width, imageHeight: (size as any).height }
       : { imageWidth: null, imageHeight: null };
   }
 
   _registerGeneratedFiles(task, files) {
     if (isResponseDelivery(task)) return [];
-    const sessionId = typeof task?.sessionId === "string" && task.sessionId.trim()
-      ? task.sessionId.trim()
-      : task?.sessionRef?.sessionId || null;
-    const sessionPath = typeof task?.sessionPath === "string" && task.sessionPath.trim()
-      ? task.sessionPath.trim()
-      : task?.sessionRef?.sessionPath || null;
-    const sessionRef = task?.sessionRef || (sessionId ? {
-      sessionId,
-      ...(sessionPath ? { sessionPath } : {}),
-    } : null);
-    if (!this._registerSessionFile || (!sessionId && !sessionPath) || !files?.length) return [];
-    const sessionFiles = [];
+    const sessionId = task.sessionId || task.sessionRef?.sessionId || null;
+    const sessionPath = task.sessionPath || task.sessionRef?.sessionPath || null;
+    const sessionRef = task.sessionRef || (sessionId ? { sessionId, ...(sessionPath ? { sessionPath } : {}) } : null);
+    if (!this._registerSessionFile || (!sessionId && !sessionPath)) return task.sessionFiles || [];
+    const sessionFiles = [...(task.sessionFiles || [])];
     for (const file of files) {
       const filePath = pathJoin(this._generatedDir, file);
-      try {
-        const sessionFile = this._registerSessionFile({
-          ...(sessionId ? { sessionId } : {}),
-          ...(sessionPath ? { sessionPath } : {}),
-          ...(sessionRef ? { sessionRef } : {}),
-          filePath,
-          label: file,
-          origin: "plugin_output",
-          storageKind: "plugin_data",
-        });
-        if (sessionFile) sessionFiles.push(sessionFile);
-      } catch (err) {
-        this._log.error(`[media] register generated file failed for ${file}:`, err?.message || err);
-      }
+      if (sessionFiles.some(item => item?.filePath === filePath || item?.realPath === filePath)) continue;
+      const registered = this._registerSessionFile({
+        ...(sessionId ? { sessionId } : {}), ...(sessionPath ? { sessionPath } : {}), ...(sessionRef ? { sessionRef } : {}),
+        filePath, label: file, origin: "plugin_output", storageKind: "plugin_data",
+      });
+      if (!registered) throw new Error(`media output registration returned no file: ${file}`);
+      sessionFiles.push(registered);
+      // 多文件部分登记后失败时保留已登记身份，下一次只补缺失的文件。
+      this._store.update(task.taskId, { sessionFiles: [...sessionFiles] });
+      this._store.requireFlush?.();
     }
     return sessionFiles;
+  }
+
+  _deferredMeta(task) {
+    const kind = task.type === "video" ? "video" : task.type === "speech" ? "speech" : "image";
+    return {
+      type: `${kind}-generation`, mediaKind: kind, mediaAttempt: mediaTaskAttempt(task),
+      deliveryIntent: "ui_only", triggerParentTurn: false,
+      ...(kind === "image" ? { notifyAgentOnFailure: true } : {}),
+      prompt: task.prompt,
+      ...(task.deliveryTarget ? { deliveryTarget: task.deliveryTarget } : {}),
+      ...(task.metadata ? { metadata: task.metadata } : {}),
+    };
+  }
+
+  async _registerDeferred(task) {
+    const existing = await this._bus.request("deferred:query", { taskId: task.taskId });
+    const attempt = mediaTaskAttempt(task);
+    if (existing?.status && (existing.meta?.mediaAttempt ?? 1) > attempt) throw new Error("stale media handoff attempt");
+    const operation = existing?.status && (existing.meta?.mediaAttempt ?? 1) < attempt ? "deferred:retry" : "deferred:register";
+    const result = await this._bus.request(operation, {
+      taskId: task.taskId, sessionId: task.sessionId, sessionPath: task.sessionPath,
+      sessionRef: task.sessionRef, meta: this._deferredMeta(task), durable: true,
+    });
+    if (result?.ok !== true || result?.durable !== true) throw new Error(result?.error || "media handoff registration is not durable");
+  }
+
+  _settle(taskId, task, result) {
+    try {
+      return this._store.settleTask(taskId, {
+        ...result, expectedAttempt: mediaTaskAttempt(task), generatedDir: this._generatedDir,
+      });
+    } finally {
+      const latest = this._store.get(taskId);
+      if (isMediaTaskTerminal(latest) && latest.deliveryState === "pending") this._deliveryPending.add(taskId);
+    }
   }
 
   _emitTaskDone(task, files, dims, sessionFiles) {
     const latest = this._store.get(task.taskId) || task;
     this._bus.emit({
-      type: "media-gen:task-done",
-      taskId: task.taskId,
-      batchId: task.batchId || null,
+      type: "media-gen:task-done", taskId: task.taskId, batchId: task.batchId || null,
       kind: task.type === "video" ? "video" : task.type === "speech" ? "speech" : "image",
-      files: Array.isArray(files) ? files : [],
-      generatedDir: this._generatedDir,
-      sessionFiles: Array.isArray(sessionFiles) ? sessionFiles : [],
-      imageWidth: dims?.imageWidth ?? latest.imageWidth ?? null,
-      imageHeight: dims?.imageHeight ?? latest.imageHeight ?? null,
-      providerId: latest.providerId || null,
-      modelId: latest.modelId || null,
-      protocolId: latest.protocolId || null,
-      metadata: latest.metadata || null,
-      task: latest,
+      files, generatedDir: this._generatedDir, sessionFiles,
+      imageWidth: dims?.imageWidth ?? latest.imageWidth ?? null, imageHeight: dims?.imageHeight ?? latest.imageHeight ?? null,
+      providerId: latest.providerId || null, modelId: latest.modelId || null, protocolId: latest.protocolId || null,
+      metadata: latest.metadata || null, task: latest,
       ...(latest.sessionId ? { sessionId: latest.sessionId, sessionRef: latest.sessionRef || null } : {}),
-    }, task.sessionPath || null);
+    }, latest.sessionPath || null);
+  }
+
+  _deliverTask(taskId) {
+    const task = this._store.get(taskId);
+    if (!this._started || !isMediaTaskTerminal(task) || task.deliveryState !== "pending") return Promise.resolve();
+    const attempt = mediaTaskAttempt(task);
+    const generation = this._generation;
+    const key = `${generation}:${taskId}:${attempt}`;
+    const existing = this._handoffs.get(key);
+    if (existing) return existing;
+    this._deliveryPending.add(taskId);
+    const current = () => this._isCurrent(taskId, attempt, generation, false);
+    const promise = (async () => {
+      try {
+        if (!current()) return;
+        this._store.requireFlush?.();
+        const files = task.files || [];
+        const sessionFiles = task.status === "done" ? this._registerGeneratedFiles(task, files) : [];
+        await this._registerDeferred(task);
+        if (!current()) return;
+        const operation = task.status === "done" ? "deferred:resolve"
+          : task.status === "cancelled" || task.status === "aborted" ? "deferred:abort" : "deferred:fail";
+        const receipt = await this._bus.request(operation, {
+          taskId, expectedAttempt: attempt, durable: true,
+          ...(task.status === "done" ? { files, ...(sessionFiles.length ? { sessionFiles } : {}) }
+            : { reason: task.failReason, error: { message: task.failReason } }),
+        });
+        if (receipt?.ok !== true || receipt?.durable !== true) throw new Error(receipt?.error || "media result handoff is not durable");
+        if (!current()) return;
+        const emissionKey = `${taskId}:${attempt}`;
+        if (task.status === "done" && !this._emitted.has(emissionKey)) {
+          this._emitTaskDone(task, files, task, sessionFiles);
+          this._emitted.add(emissionKey);
+        }
+        this._store.markDeliveryHandedOff(taskId, attempt);
+        this._deliveryPending.delete(taskId);
+        await this._bus.request("task:remove", { taskId });
+      } catch (error) {
+        this._log.warn(`[media] result delivery pending for ${taskId}:`, error?.message || error);
+      }
+    })().finally(() => {
+      if (this._handoffs.get(key) === promise) this._handoffs.delete(key);
+    });
+    this._handoffs.set(key, promise);
+    return promise;
   }
 
   _tick() {
     this._tickCount += 1;
-    const tick = this._tickCount;
-
     for (const taskId of [...this._active]) {
       const task = this._store.get(taskId);
-
-      // Task disappeared from store or was already resolved — drop it.
-      if (!task || task.status !== "pending") {
-        this._active.delete(taskId);
-        this._errorCounts.delete(taskId);
-        continue;
-      }
-
+      if (!task || task.status !== "pending") { this._active.delete(taskId); continue; }
       const ageMs = Date.now() - new Date(task.createdAt).getTime();
-      if (!shouldCheckThisTick(ageMs, tick)) continue;
-
-      // Fire-and-forget; errors are caught inside _checkTask.
-      this._checkTask(taskId, task).catch((err) => {
-        this._log.error(`[media] _checkTask unexpected error for ${taskId}:`, err);
-      });
+      if (shouldCheckThisTick(ageMs, this._tickCount)) void this.checkNow(taskId);
     }
+    for (const taskId of [...this._deliveryPending]) void this._deliverTask(taskId);
   }
 
-  /**
-   * Check a single task. If the task already has files (fake-async / synchronous
-   * adapter), mark it done immediately without querying the adapter. Otherwise
-   * route through the adapter registry.
-   *
-   * @param {string} taskId
-   * @param {object} task   Shallow copy from store.get()
-   */
-  async _checkTask(taskId, task) {
-    // Cancellation fence: if cancel() was called while a query was in-flight, bail out.
-    if (this._cancelled.has(taskId)) return;
-
-    // Fake-async: adapter populated files synchronously during submit.
-    if (task.files && task.files.length > 0) {
-      const dims = await this._readImageDimensions(task.files);
-      const sessionFiles = this._registerGeneratedFiles(task, task.files);
-      this._store.update(taskId, {
-        status: "done",
-        ...dims,
-        ...(sessionFiles.length ? { sessionFiles } : {}),
-        completedAt: new Date().toISOString(),
-      });
-      this._active.delete(taskId);
-      if (!isResponseDelivery(task)) {
-        this._bus.request("task:remove", { taskId }).catch(() => {});
-        await this._bus.request("deferred:resolve", {
-          taskId,
-          files: task.files,
-          ...(sessionFiles.length ? { sessionFiles } : {}),
-        });
-      }
-      this._emitTaskDone(task, task.files, dims, sessionFiles);
-      return;
-    }
-
-    if (task.submitState === "submitting" && !task.adapterTaskId) {
-      return;
-    }
-
-    // Real async: delegate to the adapter.
-    const adapter = (task.protocolId && this._registry.getProtocol?.(task.protocolId))
-      || this._registry.get(task.adapterId)
-      || this._registry.get(task.providerId);
-    if (!adapter) {
-      const err = new Error(`[media] no adapter registered for "${task.adapterId}"`);
-      this._store.update(taskId, {
-        status: "failed",
-        failReason: err.message,
-        completedAt: new Date().toISOString(),
-      });
-      this._active.delete(taskId);
-      if (!isResponseDelivery(task)) {
-        this._bus.request("task:remove", { taskId }).catch(() => {});
-        await this._bus.request("deferred:fail", { taskId, error: err });
-      }
-      return;
-    }
-
-    const baseCtx = {
-      dataDir: this._dataDir,
-      generatedDir: this._generatedDir,
-      bus: this._bus,
-      log: this._log,
-      task,
-    };
-    const ctx = this._registry.createSubmitContextForAdapter?.(adapter, baseCtx) || baseCtx;
-
+  async _checkTask(taskId, task, signal = this._controller.signal) {
+    const attempt = mediaTaskAttempt(task);
+    const generation = this._generation;
+    const current = () => this._isCurrent(taskId, attempt, generation);
+    if (!current()) return;
     let result;
-    try {
-      // 控制面（§四十七/§四十八）：query 只查询已提交任务的状态，不触发生成
-      // ——不是 Model Call。不进 ModelCallObserver，也不再写 Usage Ledger
-      // （原先每次 poll 产生一条 media/query usage_missing，污染模型统计）；
-      // 诊断继续走日志与 TaskStore 状态。
-      result = await adapter.query(task.adapterTaskId || taskId, ctx);
-      // Re-check cancellation fence after await — cancel() may have fired while query was in-flight
-      if (this._cancelled.has(taskId)) return;
-    } catch (err) {
-      const count = (this._errorCounts.get(taskId) || 0) + 1;
-      this._errorCounts.set(taskId, count);
-      if (count < MAX_CONSECUTIVE_ERRORS) {
-        this._log.warn(`[media] query ${taskId} failed (${count}/${MAX_CONSECUTIVE_ERRORS}), will retry: ${err?.message ?? err}`);
+    if (task.files?.length) result = { status: "success", files: task.files };
+    else {
+      if (task.submitState === "submitting" && !task.adapterTaskId) return;
+      const adapter = (task.protocolId && this._registry.getProtocol?.(task.protocolId))
+        || this._registry.get(task.adapterId) || this._registry.get(task.providerId);
+      if (!adapter?.query) {
+        result = { status: "failed", failReason: `no query adapter registered for "${task.adapterId}"` };
+      } else {
+        const base = { dataDir: this._dataDir, generatedDir: this._generatedDir, bus: this._bus,
+          log: this._log, task, signal };
+        const context = this._registry.createSubmitContextForAdapter?.(adapter, base) || base;
+        try {
+          result = await adapter.query(task.adapterTaskId || taskId, context);
+          if (!current()) return;
+          this._errorCounts.delete(taskId);
+        } catch (error) {
+          if (!current()) return;
+          const count = (this._errorCounts.get(taskId) || 0) + 1;
+          this._errorCounts.set(taskId, count);
+          if (count < MAX_CONSECUTIVE_ERRORS) {
+            this._log.warn(`[media] query ${taskId} failed (${count}/${MAX_CONSECUTIVE_ERRORS}), will retry: ${error?.message ?? error}`);
+            return;
+          }
+          result = { status: "failed", failReason: error?.message || String(error) };
+        }
+      }
+    }
+    if (!current()) return;
+    if (result?.status === "success" || result?.status === "done") {
+      const files = result.files || [];
+      const validation = validateMediaOutputs(files, this._generatedDir);
+      if (validation.ok === false) {
+        this._settle(taskId, task, { status: "failed", failReason: validation.error });
+        this._active.delete(taskId);
+        await this._deliverTask(taskId);
         return;
       }
-      this._log.error(`[media] query ${taskId} failed ${count} times, giving up`);
-      this._errorCounts.delete(taskId);
-      this._store.update(taskId, {
-        status: "failed",
-        failReason: err?.message ?? String(err),
-        completedAt: new Date().toISOString(),
-      });
-      this._active.delete(taskId);
-      this._bus.request("task:remove", { taskId }).catch(() => {});
-      await this._bus.request("deferred:fail", { taskId, error: err });
-      return;
-    }
-
-    // Query succeeded — reset consecutive error counter
+      const dimensions = await this._readImageDimensions(files);
+      if (!current()) return;
+      this._settle(taskId, task, { status: "done", files, ...dimensions });
+    } else if (result?.status === "failed") {
+      this._settle(taskId, task, { status: "failed", failReason: result.failReason || result.error?.message || "generation failed" });
+    } else return;
+    this._active.delete(taskId);
     this._errorCounts.delete(taskId);
-
-    const { status } = result ?? {};
-
-    if (status === "success" || status === "done") {
-      const files = result.files ?? [];
-      const dims = await this._readImageDimensions(files);
-      const sessionFiles = this._registerGeneratedFiles(task, files);
-      this._store.update(taskId, {
-        status: "done",
-        files,
-        ...(sessionFiles.length ? { sessionFiles } : {}),
-        ...dims,
-        completedAt: new Date().toISOString(),
-      });
-      this._active.delete(taskId);
-      if (!isResponseDelivery(task)) {
-        this._bus.request("task:remove", { taskId }).catch(() => {});
-        await this._bus.request("deferred:resolve", {
-          taskId,
-          files,
-          ...(sessionFiles.length ? { sessionFiles } : {}),
-        });
-      }
-      this._emitTaskDone(task, files, dims, sessionFiles);
+    const completed = this._store.get(taskId);
+    if (isResponseDelivery(completed)) {
+      if (completed?.status === "done") this._emitTaskDone(completed, completed.files, completed, []);
       return;
     }
-
-    if (status === "failed") {
-      const failReason = result.failReason ?? result.error?.message ?? "generation failed";
-      this._store.update(taskId, {
-        status: "failed",
-        failReason,
-        completedAt: new Date().toISOString(),
-      });
-      this._active.delete(taskId);
-      if (!isResponseDelivery(task)) {
-        this._bus.request("task:remove", { taskId }).catch(() => {});
-        await this._bus.request("deferred:fail", {
-          taskId,
-          error: result.error ?? { code: "GEN_FAILED", message: failReason },
-        });
-      }
-      return;
-    }
-
-    // status === "pending" or anything else — leave in active set, retry next tick.
+    await this._deliverTask(taskId);
   }
 }

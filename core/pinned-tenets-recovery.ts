@@ -102,7 +102,7 @@ function readOperation(dir: string, operationId: string): RecoveryOperation | nu
   catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return null; throw new Error("invalid or unreadable recovery operation receipt", { cause: error }); }
   if (!isMigrationReceipt(raw, path.basename(dir))) return fail("invalid recovery operation receipt");
   const r = raw as RecoveryOperation;
-  if (r.version !== 3 || r.kind !== "recovery" || r.operationId !== operationId || r.archiveStatus !== "not_applicable"
+  if (![3, 4].includes(r.version) || r.kind !== "recovery" || r.operationId !== operationId || r.archiveStatus !== "not_applicable"
     || r.approvalDigest !== digest(JSON.stringify(validatedApproval(r.approval)))
     || !r.summary || !Number.isInteger(r.summary.restored) || r.summary.restored < 0 || JSON.stringify(r.summary.entries) !== JSON.stringify(r.plan)) return fail("invalid recovery operation proof");
   const decisions = r.approval.decisions.filter(d => d.action === "restore");
@@ -193,8 +193,23 @@ export function applyPinnedTenetsRecovery(home: string, input: unknown, hooks?: 
   if (!restore.length) return fail("no restore decisions supplied");
   const targetPath = tenetsFilePath(dir);
   const targetHash = currentTargetHash(dir);
+  if (receipt && (receipt.state !== 'prepared' || receipt.version < 4)) {
+    // 已尝试提交或旧 prepared 都不能重执行；用户删回原字节仍然是后续修改。
+    if (targetHash === null || !verifyPinnedTarget(targetPath, receipt.resultSha256!, receipt.plan).ok) {
+      receipt.state = 'conflict';
+      receipt.error = { code: 'MIGRATION_CONFLICT', message: 'recovery commit outcome is unverified; automatic replay is not authorized' };
+      writeOperation(dir, receipt);
+      return fail('recovery conflict: committed target changed or commit outcome is unverified');
+    }
+    receipt.state = 'completed'; receipt.completedAt = new Date().toISOString(); writeOperation(dir, receipt); return receipt.summary;
+  }
   if (receipt && targetHash !== approval.observedTargetHash) {
-    if (!verifyPinnedTarget(targetPath,receipt.resultSha256!,receipt.plan).ok) return fail("recovery conflict: committed target changed");
+    if (!verifyPinnedTarget(targetPath,receipt.resultSha256!,receipt.plan).ok) {
+      receipt.state = 'conflict';
+      receipt.error = { code: 'MIGRATION_CONFLICT', message: 'recovery target changed after preparation' };
+      writeOperation(dir, receipt);
+      return fail("recovery conflict: target changed after preparation");
+    }
     receipt.state='completed'; receipt.completedAt=new Date().toISOString(); writeOperation(dir,receipt); return receipt.summary;
   }
   if (targetHash !== approval.observedTargetHash) return fail("stale_approval: target changed");
@@ -207,7 +222,7 @@ export function applyPinnedTenetsRecovery(home: string, input: unknown, hooks?: 
     const approvedEntries = approval.decisions.filter(d=>d.action === "restore");
     const plan = entries.map(({normalizedContent:_body,...entry}, index)=>({...entry,exemption:'legacy_migration',source:approvedEntries[index].source,sourceEntryKey:approvedEntries[index].sourceEntryKey}));
     const now=new Date().toISOString();
-    receipt={version:3,kind:'recovery',operationId:approval.operationId,agentId:approval.agentId,state:'prepared',
+    receipt={version:4,kind:'recovery',operationId:approval.operationId,agentId:approval.agentId,state:'prepared',
       sources:approval.sources.map(s=>({...s,mtimeMs:fs.statSync(path.join(dir,s.file)).mtimeMs})),authority:{file:approval.sources[0].file,reason:'explicit_recovery_approval'},
       target:{existed:targetHash!==null,sha256:targetHash},resultSha256,plan,
       counts:{sourceItems:plan.length,added:plan.filter(p=>p.outcome==='added').length,duplicateActive:plan.filter(p=>p.outcome==='duplicate_active').length,addedOverHistory:plan.filter(p=>p.outcome.startsWith('added_over')).length,duplicateInBatch:plan.filter(p=>p.outcome==='duplicate_in_batch').length},
@@ -228,6 +243,7 @@ export function applyPinnedTenetsRecovery(home: string, input: unknown, hooks?: 
       writeOperation(dir,operation);
     },
     recheck:()=>{if(currentTargetHash(dir)!==approval.observedTargetHash||approval.sources.some(s=>sha256File(path.join(dir,s.file))!==s.sha256))return fail('stale_approval: preparation snapshot changed');},
+    committing:()=>{operation.state='committing';writeOperation(dir,operation);},
     committed:()=>{operation.state='target_committed';writeOperation(dir,operation);},
   });
   hooks?.at?.('completed:before');operation.state='completed';operation.completedAt=new Date().toISOString();writeOperation(dir,operation);

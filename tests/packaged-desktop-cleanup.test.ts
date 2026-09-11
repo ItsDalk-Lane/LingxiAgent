@@ -85,7 +85,7 @@ describe("打包桌面就绪探测", () => {
   });
 
   function runLoop(options: { neverReady?: boolean; crash?: boolean } = {}) {
-    let elapsed = options.neverReady ? 90_001 : 0;
+    let elapsed = options.neverReady ? 150_001 : 0;
     const report = { packaged: false, rendererReady: false, serverReady: false };
     const inspectRenderer = vi.fn().mockResolvedValueOnce(null).mockResolvedValue({ ready: "complete", textLength: 93, controls: 7 });
     const promise = vm.runInNewContext(`(async () => {${loopSource}})()`, {
@@ -106,7 +106,7 @@ describe("打包桌面就绪探测", () => {
     expect(h.report).toMatchObject({ packaged: true, rendererReady: true, serverReady: true });
   });
 
-  it("持续未就绪仍在原有 90 秒期限失败", async () => {
+  it("持续未就绪仍在加固后的 150 秒期限失败", async () => {
     await expect(runLoop({ neverReady: true }).promise).rejects.toThrow("Packaged desktop did not become ready");
   });
 

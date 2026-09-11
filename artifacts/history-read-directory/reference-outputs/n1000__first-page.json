@@ -1,0 +1,1854 @@
+{
+  "messages": [
+    {
+      "id": "951",
+      "sourceIndex": 1901,
+      "entryId": "a951",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:951:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 951",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 951",
+      "toolCalls": [
+        {
+          "id": "tu-951",
+          "name": "read_file",
+          "args": {
+            "path": "f951"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "952",
+      "sourceIndex": 1903,
+      "entryId": "a952",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:952:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 952",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 952",
+      "toolCalls": [
+        {
+          "id": "tu-952",
+          "name": "read_file",
+          "args": {
+            "path": "f952"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "953",
+      "sourceIndex": 1905,
+      "entryId": "a953",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:953:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 953",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 953",
+      "toolCalls": [
+        {
+          "id": "tu-953",
+          "name": "read_file",
+          "args": {
+            "path": "f953"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "954",
+      "sourceIndex": 1907,
+      "entryId": "a954",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:954:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 954",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 954",
+      "toolCalls": [
+        {
+          "id": "tu-954",
+          "name": "read_file",
+          "args": {
+            "path": "f954"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "955",
+      "sourceIndex": 1909,
+      "entryId": "a955",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:955:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 955",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 955",
+      "toolCalls": [
+        {
+          "id": "tu-955",
+          "name": "read_file",
+          "args": {
+            "path": "f955"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "956",
+      "sourceIndex": 1911,
+      "entryId": "a956",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:956:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 956",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 956",
+      "toolCalls": [
+        {
+          "id": "tu-956",
+          "name": "read_file",
+          "args": {
+            "path": "f956"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "957",
+      "sourceIndex": 1913,
+      "entryId": "a957",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:957:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 957",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 957",
+      "toolCalls": [
+        {
+          "id": "tu-957",
+          "name": "read_file",
+          "args": {
+            "path": "f957"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "958",
+      "sourceIndex": 1915,
+      "entryId": "a958",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:958:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 958",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 958",
+      "toolCalls": [
+        {
+          "id": "tu-958",
+          "name": "read_file",
+          "args": {
+            "path": "f958"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "959",
+      "sourceIndex": 1917,
+      "entryId": "a959",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:959:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 959",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 959",
+      "toolCalls": [
+        {
+          "id": "tu-959",
+          "name": "read_file",
+          "args": {
+            "path": "f959"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "960",
+      "sourceIndex": 1919,
+      "entryId": "a960",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:960:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 960",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 960",
+      "toolCalls": [
+        {
+          "id": "tu-960",
+          "name": "read_file",
+          "args": {
+            "path": "f960"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "961",
+      "sourceIndex": 1921,
+      "entryId": "a961",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:961:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 961",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 961",
+      "toolCalls": [
+        {
+          "id": "tu-961",
+          "name": "read_file",
+          "args": {
+            "path": "f961"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "962",
+      "sourceIndex": 1923,
+      "entryId": "a962",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:962:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 962",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 962",
+      "toolCalls": [
+        {
+          "id": "tu-962",
+          "name": "read_file",
+          "args": {
+            "path": "f962"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "963",
+      "sourceIndex": 1925,
+      "entryId": "a963",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:963:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 963",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 963",
+      "toolCalls": [
+        {
+          "id": "tu-963",
+          "name": "read_file",
+          "args": {
+            "path": "f963"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "964",
+      "sourceIndex": 1927,
+      "entryId": "a964",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:964:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 964",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 964",
+      "toolCalls": [
+        {
+          "id": "tu-964",
+          "name": "read_file",
+          "args": {
+            "path": "f964"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "965",
+      "sourceIndex": 1929,
+      "entryId": "a965",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:965:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 965",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 965",
+      "toolCalls": [
+        {
+          "id": "tu-965",
+          "name": "read_file",
+          "args": {
+            "path": "f965"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "966",
+      "sourceIndex": 1931,
+      "entryId": "a966",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:966:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 966",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 966",
+      "toolCalls": [
+        {
+          "id": "tu-966",
+          "name": "read_file",
+          "args": {
+            "path": "f966"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "967",
+      "sourceIndex": 1933,
+      "entryId": "a967",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:967:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 967",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 967",
+      "toolCalls": [
+        {
+          "id": "tu-967",
+          "name": "read_file",
+          "args": {
+            "path": "f967"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "968",
+      "sourceIndex": 1935,
+      "entryId": "a968",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:968:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 968",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 968",
+      "toolCalls": [
+        {
+          "id": "tu-968",
+          "name": "read_file",
+          "args": {
+            "path": "f968"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "969",
+      "sourceIndex": 1937,
+      "entryId": "a969",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:969:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 969",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 969",
+      "toolCalls": [
+        {
+          "id": "tu-969",
+          "name": "read_file",
+          "args": {
+            "path": "f969"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "970",
+      "sourceIndex": 1939,
+      "entryId": "a970",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:970:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 970",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 970",
+      "toolCalls": [
+        {
+          "id": "tu-970",
+          "name": "read_file",
+          "args": {
+            "path": "f970"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "971",
+      "sourceIndex": 1941,
+      "entryId": "a971",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:971:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 971",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 971",
+      "toolCalls": [
+        {
+          "id": "tu-971",
+          "name": "read_file",
+          "args": {
+            "path": "f971"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "972",
+      "sourceIndex": 1943,
+      "entryId": "a972",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:972:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 972",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 972",
+      "toolCalls": [
+        {
+          "id": "tu-972",
+          "name": "read_file",
+          "args": {
+            "path": "f972"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "973",
+      "sourceIndex": 1945,
+      "entryId": "a973",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:973:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 973",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 973",
+      "toolCalls": [
+        {
+          "id": "tu-973",
+          "name": "read_file",
+          "args": {
+            "path": "f973"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "974",
+      "sourceIndex": 1947,
+      "entryId": "a974",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:974:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 974",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 974",
+      "toolCalls": [
+        {
+          "id": "tu-974",
+          "name": "read_file",
+          "args": {
+            "path": "f974"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "975",
+      "sourceIndex": 1949,
+      "entryId": "a975",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:975:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 975",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 975",
+      "toolCalls": [
+        {
+          "id": "tu-975",
+          "name": "read_file",
+          "args": {
+            "path": "f975"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "976",
+      "sourceIndex": 1951,
+      "entryId": "a976",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:976:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 976",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 976",
+      "toolCalls": [
+        {
+          "id": "tu-976",
+          "name": "read_file",
+          "args": {
+            "path": "f976"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "977",
+      "sourceIndex": 1953,
+      "entryId": "a977",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:977:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 977",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 977",
+      "toolCalls": [
+        {
+          "id": "tu-977",
+          "name": "read_file",
+          "args": {
+            "path": "f977"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "978",
+      "sourceIndex": 1955,
+      "entryId": "a978",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:978:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 978",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 978",
+      "toolCalls": [
+        {
+          "id": "tu-978",
+          "name": "read_file",
+          "args": {
+            "path": "f978"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "979",
+      "sourceIndex": 1957,
+      "entryId": "a979",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:979:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 979",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 979",
+      "toolCalls": [
+        {
+          "id": "tu-979",
+          "name": "read_file",
+          "args": {
+            "path": "f979"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "980",
+      "sourceIndex": 1959,
+      "entryId": "a980",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:980:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 980",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 980",
+      "toolCalls": [
+        {
+          "id": "tu-980",
+          "name": "read_file",
+          "args": {
+            "path": "f980"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "981",
+      "sourceIndex": 1961,
+      "entryId": "a981",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:981:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 981",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 981",
+      "toolCalls": [
+        {
+          "id": "tu-981",
+          "name": "read_file",
+          "args": {
+            "path": "f981"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "982",
+      "sourceIndex": 1963,
+      "entryId": "a982",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:982:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 982",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 982",
+      "toolCalls": [
+        {
+          "id": "tu-982",
+          "name": "read_file",
+          "args": {
+            "path": "f982"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "983",
+      "sourceIndex": 1965,
+      "entryId": "a983",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:983:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 983",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 983",
+      "toolCalls": [
+        {
+          "id": "tu-983",
+          "name": "read_file",
+          "args": {
+            "path": "f983"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "984",
+      "sourceIndex": 1967,
+      "entryId": "a984",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:984:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 984",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 984",
+      "toolCalls": [
+        {
+          "id": "tu-984",
+          "name": "read_file",
+          "args": {
+            "path": "f984"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "985",
+      "sourceIndex": 1969,
+      "entryId": "a985",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:985:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 985",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 985",
+      "toolCalls": [
+        {
+          "id": "tu-985",
+          "name": "read_file",
+          "args": {
+            "path": "f985"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "986",
+      "sourceIndex": 1971,
+      "entryId": "a986",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:986:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 986",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 986",
+      "toolCalls": [
+        {
+          "id": "tu-986",
+          "name": "read_file",
+          "args": {
+            "path": "f986"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "987",
+      "sourceIndex": 1973,
+      "entryId": "a987",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:987:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 987",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 987",
+      "toolCalls": [
+        {
+          "id": "tu-987",
+          "name": "read_file",
+          "args": {
+            "path": "f987"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "988",
+      "sourceIndex": 1975,
+      "entryId": "a988",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:988:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 988",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 988",
+      "toolCalls": [
+        {
+          "id": "tu-988",
+          "name": "read_file",
+          "args": {
+            "path": "f988"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "989",
+      "sourceIndex": 1977,
+      "entryId": "a989",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:989:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 989",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 989",
+      "toolCalls": [
+        {
+          "id": "tu-989",
+          "name": "read_file",
+          "args": {
+            "path": "f989"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "990",
+      "sourceIndex": 1979,
+      "entryId": "a990",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:990:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 990",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 990",
+      "toolCalls": [
+        {
+          "id": "tu-990",
+          "name": "read_file",
+          "args": {
+            "path": "f990"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "991",
+      "sourceIndex": 1981,
+      "entryId": "a991",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:991:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 991",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 991",
+      "toolCalls": [
+        {
+          "id": "tu-991",
+          "name": "read_file",
+          "args": {
+            "path": "f991"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "992",
+      "sourceIndex": 1983,
+      "entryId": "a992",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:992:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 992",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 992",
+      "toolCalls": [
+        {
+          "id": "tu-992",
+          "name": "read_file",
+          "args": {
+            "path": "f992"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "993",
+      "sourceIndex": 1985,
+      "entryId": "a993",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:993:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 993",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 993",
+      "toolCalls": [
+        {
+          "id": "tu-993",
+          "name": "read_file",
+          "args": {
+            "path": "f993"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "994",
+      "sourceIndex": 1987,
+      "entryId": "a994",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:994:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 994",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 994",
+      "toolCalls": [
+        {
+          "id": "tu-994",
+          "name": "read_file",
+          "args": {
+            "path": "f994"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "995",
+      "sourceIndex": 1989,
+      "entryId": "a995",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:995:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 995",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 995",
+      "toolCalls": [
+        {
+          "id": "tu-995",
+          "name": "read_file",
+          "args": {
+            "path": "f995"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "996",
+      "sourceIndex": 1991,
+      "entryId": "a996",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:996:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 996",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 996",
+      "toolCalls": [
+        {
+          "id": "tu-996",
+          "name": "read_file",
+          "args": {
+            "path": "f996"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "997",
+      "sourceIndex": 1993,
+      "entryId": "a997",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:997:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 997",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 997",
+      "toolCalls": [
+        {
+          "id": "tu-997",
+          "name": "read_file",
+          "args": {
+            "path": "f997"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "998",
+      "sourceIndex": 1995,
+      "entryId": "a998",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:998:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 998",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 998",
+      "toolCalls": [
+        {
+          "id": "tu-998",
+          "name": "read_file",
+          "args": {
+            "path": "f998"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "999",
+      "sourceIndex": 1997,
+      "entryId": "a999",
+      "role": "assistant",
+      "content": "",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:999:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "思考片段 999",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "思考片段 999",
+      "toolCalls": [
+        {
+          "id": "tu-999",
+          "name": "read_file",
+          "args": {
+            "path": "f999"
+          },
+          "processOrder": 1,
+          "startedAt": "2026-09-10T10:00:00Z",
+          "endedAt": "2026-09-10T10:00:00Z",
+          "status": "succeeded",
+          "success": true
+        }
+      ],
+      "timestamp": "2026-09-10T10:00:00Z"
+    },
+    {
+      "id": "1000",
+      "sourceIndex": 1999,
+      "entryId": "a1000",
+      "role": "assistant",
+      "content": "这是最终报告：任务已完成（第 1000 次调用后）。",
+      "turnStartIndex": 1,
+      "turnEndIndex": 1000,
+      "assistantSegments": [
+        {
+          "id": "assistant:1000:reasoning:default",
+          "kind": "reasoning",
+          "semanticPhase": "reasoning",
+          "source": "最终整理 1000",
+          "lifecycle": "sealed",
+          "processOrder": 0
+        },
+        {
+          "id": "assistant:1000:text:1",
+          "kind": "text",
+          "semanticPhase": "final_answer",
+          "source": "这是最终报告：任务已完成（第 1000 次调用后）。",
+          "lifecycle": "sealed",
+          "processOrder": 1
+        }
+      ],
+      "turnInputEntryId": "u1",
+      "turnInputVisible": true,
+      "thinking": "最终整理 1000",
+      "timestamp": "2026-09-10T10:00:00Z"
+    }
+  ],
+  "blocks": [],
+  "todos": null,
+  "hasMore": true,
+  "nextBefore": "951",
+  "sessionFiles": [],
+  "revision": "443133:<mtimeMs>"
+}

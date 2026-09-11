@@ -1498,5 +1498,118 @@
     "log": "logs/j62-ci-simplify-full.log",
     "logSha256": "988cf2e53d3e56fc89b9b049b361156332f0afd91065b3a0ea7939d3261a477b",
     "sourceManifestHash": "628eb4401fff73439bfafb3ba2984a7e46d91e1cd058ab7ebe191b9c89ea7884"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/post-verification-audit-seal.test.ts",
+      "tests/upstream-sync-matrix.test.ts",
+      "tests/packaged-desktop-cleanup.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-11T00:24:04.971371+00:00",
+    "end": "2026-09-11T00:24:05.695995+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "6dac53dbb711b88303ac6b6f59294363c2339ac0af55c778aba299b80a312f80",
+    "log": "logs/sep10-seal-bootstrap.log",
+    "logSha256": "6a9f04e0bed9467b04731af3e5fb22e239cef37aec42b3f8aa52e83fa2f6b6dd",
+    "sourceManifestHash": "6dac53dbb711b88303ac6b6f59294363c2339ac0af55c778aba299b80a312f80"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/post-verification-audit-seal.test.ts",
+      "tests/upstream-sync-matrix.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-11T01:00:38.667748+00:00",
+    "end": "2026-09-11T01:00:39.395693+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 9,
+      "failed": 1,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "b9676f98c0328c236496abc5ed4849cce96f04e981e352a1ebd624344579c7a2",
+    "log": "logs/sep10-seal-bootstrap-r2.log",
+    "logSha256": "33700990525e175c14785a13be16600ae38125eeff625d2482311e85c5728035",
+    "sourceManifestHash": "b9676f98c0328c236496abc5ed4849cce96f04e981e352a1ebd624344579c7a2"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/upstream-sync-matrix.test.ts",
+      "tests/packaged-desktop-cleanup.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-11T01:00:51.407352+00:00",
+    "end": "2026-09-11T01:00:52.126912+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 16,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "b9676f98c0328c236496abc5ed4849cce96f04e981e352a1ebd624344579c7a2",
+    "log": "logs/sep10-seal-green-r2.log",
+    "logSha256": "235458ece3e5204b99280f09a070eb5e1a10bcfded45d34ce8690c5390ef045b",
+    "sourceManifestHash": "b9676f98c0328c236496abc5ed4849cce96f04e981e352a1ebd624344579c7a2"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/upstream-sync-matrix.test.ts",
+      "tests/packaged-desktop-cleanup.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-11T01:40:31.918296+00:00",
+    "end": "2026-09-11T01:40:32.652879+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 16,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "9452bfedd44acf52b3ef586e1dde159403072c139d8cf0e2a7f220eaf66cd056",
+    "log": "logs/sep10-seal-green-r3.log",
+    "logSha256": "76b43105b0c6fa96f98e2baff2e77a28d9dbc4562ab980c233fefdd5fae6d73e",
+    "sourceManifestHash": "9452bfedd44acf52b3ef586e1dde159403072c139d8cf0e2a7f220eaf66cd056"
   }
 ]

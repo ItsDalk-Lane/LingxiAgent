@@ -429,6 +429,43 @@ export type ContentBlock = TextDecorator | RichBlock;
 
 // ── 消息 ──
 
+// ── 历史分页 Run 缝合事实 ──
+// 分页按原始记录切页，一个 Run 可能跨多页。被截断的 Run 项携带这些原始事实，
+// 更早页片段到达时与既有项缝合并重新投影；Run 头部记录加载完成后即丢弃（内存有界）。
+
+/** Run 缝合所需的单条原始助手记录事实（display id = 服务端 display 序号）。 */
+export interface HistoryRunRecordFact {
+  displayId: string;
+  entryId?: string;
+  content: string;
+  thinking?: string | null;
+  toolCalls?: Array<Record<string, unknown>> | null;
+  /** 该记录的持久化语义分段（原始形态，未加组内偏移）。 */
+  segments: Array<{
+    id: string;
+    kind: 'text' | 'reasoning';
+    semanticPhase: 'reasoning' | 'commentary' | 'final_answer';
+    source: string;
+    lifecycle: 'sealed';
+    deferred?: DeferredHistoryContent;
+    processOrder?: number;
+  }>;
+  turnStatus?: 'failed' | 'aborted';
+  /** 该记录锚定的页级 blocks（已在页构建时解析为记录归属，不含 interlude）。 */
+  inlineBlocks: Array<Record<string, unknown>>;
+}
+
+/** 同一 Run 的跨页缝合事实。records 按旧→新追加；runKey 即 Run 身份键。 */
+export interface HistoryRunFacts {
+  runKey: string;
+  turnStartIndex: number;
+  turnEndIndex: number;
+  turnInputEntryId?: string;
+  turnInputVisible?: boolean;
+  firstRecordTimestamp?: number;
+  records: HistoryRunRecordFact[];
+}
+
 export interface ChatMessage {
   id: string;              // UI message id；本地发送的 user message 可先使用 clientMessageId
   clientMessageId?: string; // 可验证的桌面输入关联；分页ID仍保持历史索引
@@ -466,6 +503,8 @@ export interface ChatMessage {
   // Assistant
   blocks?: ContentBlock[];
   turnProjection?: AssistantTurnProjection;
+  /** 跨页 Run 缝合事实：仅当该 Run 被分页截断（头部记录未加载）时携带。 */
+  runFacts?: HistoryRunFacts;
   // 通用
   timestamp?: number;
 }
@@ -513,6 +552,12 @@ export interface SessionMessages {
   hasMore: boolean;
   loadingMore: boolean;
   oldestId?: string;
+  /**
+   * 服务端下发的下一页游标（display 序号字符串；null=没有更早记录）。
+   * 分页边界由服务端原始页面范围决定；oldestId 是显示项身份，禁止再当游标用（F1）。
+   * 兼容旧服务端（无 nextBefore）时由原始首条记录 id 回退推导。
+   */
+  nextBefore?: string | null;
   /**
    * hydrate 时服务端返回的磁盘修订点（stat 签名）。
    * null = 未知（如 WS 端为新会话 initSession 的空状态，或服务端 stat 失败）。

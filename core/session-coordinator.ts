@@ -1094,7 +1094,7 @@ export class SessionCoordinator {
    * @param {(cwd: string, context: {agent: object, agentId: string}) => Promise<{workspacePaths?: object[]}|void>} [deps.onBeforeSessionCreate]
    * @param {(sessionPath: string, reason: string) => void|Promise<void>} [deps.onSessionRuntimeDiscarded]
    * @param {(sessionPath: string) => string|null} [deps.getSessionIdForPath]
-   * @param {(sessionId: string|null) => string|null} [deps.resolveSessionReusableTraceId] - 会话级轨迹复用查找（观测不可用时 null）
+   * @param {(sessionId: string|null) => string|null} [deps.resolveSessionReusableTraceId] - 会话级轨迹复用查找（入参为 manifest 业务会话 ID，非 SDK 文件头 UUID；观测不可用时 null）
    * @param {(sessionRef: {sessionId: string, sessionPath?: string}, reason: string) => object} [deps.abortToolExecutionsForSession]
    */
   constructor(deps: any) {
@@ -4971,6 +4971,24 @@ export class SessionCoordinator {
     return allowedModel;
   }
 
+  /**
+   * 模型观测的 canonical 会话身份 = Lingxi 业务会话 ID（session manifest）。
+   *
+   * 业务会话 ID 与 Pi SDK 会话文件头 UUID（sessionManager.getSessionId()）是
+   * 两套独立身份（c9494ae9 加固后显式分离），前者才是观测链路的会话语义：
+   * attribution.sessionId → model_calls.session_id、复用内存索引、SQL 复用
+   * 查找、历史合并、Trace Detail 会话重建全部按业务 ID 落库与读取。复用查找
+   * 若错用 SDK UUID 会结构性零命中（同会话每轮铸新根，2026-09-10 回归根因）。
+   *
+   * 解析顺序：运行态 entry（createSession 时已绑定 manifest）→ manifest
+   * locator 查询；均无 → null（调用方退化为逐轮铸根旧行为，不伪造身份）。
+   */
+  _observabilitySessionIdForTrace(sessionPath: any) {
+    const entry = sessionPath ? this._getSessionEntryByPath(sessionPath) : null;
+    if (typeof entry?.sessionId === "string" && entry.sessionId) return entry.sessionId;
+    return this._sessionIdForPath(sessionPath);
+  }
+
   async prompt(text: any, opts: any) {
     // Agent Turn = Trace 根（§二十七/§二十八）：整个用户 turn 的全部模型调用
     // （Chat 流式、工具内 Vision/Approval/Media/Subagent、compaction、turn 后
@@ -4978,14 +4996,17 @@ export class SessionCoordinator {
     // 则原样继承。
     // 产品口径（2026-09-05）：轨迹以「会话」为粒度——同一会话后续 turn 复用
     // 该会话最近一次 user_turn 轨迹，调用次数/成败在原记录上累加；新会话或
-    // 观测不可用时照旧铸新根。
+    // 观测不可用时照旧铸新根。会话身份必须是业务会话 ID（见
+    // _observabilitySessionIdForTrace），SDK 文件头 UUID 只作诊断 ref。
     const spForTrace = this._session?.sessionManager?.getSessionFile?.() || this.currentSessionPath;
-    const sessionIdForTrace = this._session?.sessionManager?.getSessionId?.() || null;
+    const sdkSessionId = this._session?.sessionManager?.getSessionId?.() || null;
+    const sessionIdForTrace = this._observabilitySessionIdForTrace(spForTrace);
     return runWithModelTraceRoot(
       {
         origin: "user_turn",
         refs: {
           ...(sessionIdForTrace ? { sessionId: sessionIdForTrace } : {}),
+          ...(sdkSessionId && sdkSessionId !== sessionIdForTrace ? { sdkSessionId } : {}),
           ...(spForTrace ? { sessionPath: spForTrace } : {}),
         },
         reuseTraceId: this._d.resolveSessionReusableTraceId?.(sessionIdForTrace) ?? null,
@@ -5069,7 +5090,7 @@ export class SessionCoordinator {
     return true;
   }
 
-  steer(text: any) {
+  async steer(text: any): Promise<boolean> {
     if (!this._session?.isStreaming) return false;
     const sp = this._session.sessionManager?.getSessionFile?.();
     if (sp) this.preflightSessionInput(sp);
@@ -5077,7 +5098,7 @@ export class SessionCoordinator {
       const entry = this._getSessionEntryByPath(sp);
       if (entry) entry.lastTouchedAt = Date.now();
     }
-    this._session.steer(text);
+    await this._session.steer(text);
     return true;
   }
 
@@ -5096,13 +5117,18 @@ export class SessionCoordinator {
     // → engine.promptSession）与 prompt() 同语义——没有这层根时，pi ingress 兜底
     // 会以 origin=unknown 逐轮铸根（实测 2026-09-05：同会话每轮一条轨迹）。
     // 产品口径（2026-09-05）：同会话复用最近轨迹；外层已有 scope（slash/bridge）
-    // 则原样继承。
-    const sessionIdForTrace = entry.session?.sessionManager?.getSessionId?.() || null;
+    // 则原样继承。会话身份必须是业务会话 ID（见
+    // _observabilitySessionIdForTrace），SDK 文件头 UUID 只作诊断 ref。
+    const sdkSessionIdForTrace = entry.session?.sessionManager?.getSessionId?.() || null;
+    const sessionIdForTrace = this._observabilitySessionIdForTrace(sessionPath);
     return runWithModelTraceRoot(
       {
         origin: "user_turn",
         refs: {
           ...(sessionIdForTrace ? { sessionId: sessionIdForTrace } : {}),
+          ...(sdkSessionIdForTrace && sdkSessionIdForTrace !== sessionIdForTrace
+            ? { sdkSessionId: sdkSessionIdForTrace }
+            : {}),
           ...(sessionPath ? { sessionPath } : {}),
         },
         reuseTraceId: this._d.resolveSessionReusableTraceId?.(sessionIdForTrace) ?? null,
@@ -5192,12 +5218,12 @@ export class SessionCoordinator {
     agent?._memoryTicker?.notifyTurn(sessionPath, { forceSummary });
   }
 
-  steerSession(sessionPath: any, text: any) {
+  async steerSession(sessionPath: any, text: any): Promise<boolean> {
     const entry = this._getSessionEntryByPath(sessionPath);
     if (!entry?.session.isStreaming) return false;
     this.preflightSessionInput(sessionPath);
     entry.lastTouchedAt = Date.now();
-    entry.session.steer(text);
+    await entry.session.steer(text);
     return true;
   }
 

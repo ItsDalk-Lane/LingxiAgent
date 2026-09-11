@@ -11,6 +11,13 @@ import { useStore } from './index';
 import { appendConnectionAuth, buildConnectionUrl, type ServerConnection } from '../services/server-connection';
 import { sessionScopedKey, sessionScopedListIncludes, sessionScopedValue } from './session-slice';
 import { lingxiFetch, lingxiUrl } from '../hooks/use-hana-fetch';
+import {
+  conditionalMessagesFetch,
+  hasMessagesValidationRecord,
+  headerGet as responseHeaderGet,
+  negotiatedHistoryPageLimit,
+  saveHistoryValidationRecord,
+} from './history-protocol-client';
 import { hydrateInputDrafts } from './input-draft-persistence';
 import { HOME_DRAFT_KEY } from '../../../../shared/input-drafts.ts';
 import { normalizeWorkspacePath } from '../../../../shared/workspace-history.ts';
@@ -379,9 +386,30 @@ function clearSessionRuntimeCaches(path: string): void {
 // 消息加载（从 app-messages-shim 迁移）
 // ══════════════════════════════════════════════════════
 
-export async function loadMessages(forPath?: string): Promise<void> {
+/**
+ * 从历史响应推导下一页游标（F1：分页边界只认服务端原始页面范围）。
+ * - 新服务端：nextBefore（string=继续翻页；null=没有更早记录）；
+ * - 旧服务端：回退用响应首条原始记录的 id（= 本页最早 display 序号），
+ *   绝不用归并后的显示项 id（那是组内最后一条记录的序号，会让每页只推进 1 条）；
+ * - undefined = 无法推导（无字段且无记录），调用方保持既有游标。
+ */
+function historyNextCursor(data: {
+  nextBefore?: string | null;
+  messages?: Array<{ id?: string } | undefined> | null;
+}): string | null | undefined {
+  if (typeof data.nextBefore === 'string') return data.nextBefore;
+  if (data.nextBefore === null) return null;
+  const firstId = Array.isArray(data.messages) ? data.messages[0]?.id : undefined;
+  return typeof firstId === 'string' ? firstId : undefined;
+}
+
+export async function loadMessages(
+  forPath?: string,
+  opts?: { preloaded?: { data: any; etag: string | null; protocolHeader: string | null } },
+): Promise<void> {
   const targetPath = forPath || useStore.getState().currentSessionPath;
   if (!targetPath) return;
+  console.error('[lm-entry] targetPath=', targetPath.slice(-24), 'preloaded=', !!opts?.preloaded);
   const messageLiveVersionBefore = readMessageLiveVersion(targetPath);
   // 捕获 hydrate 前的 live 版本：若 fetch 期间有 tool_end 更新 todos，
   // 后面就跳过 hydrate 写入，避免旧快照覆盖刚收到的实时状态。
@@ -390,13 +418,43 @@ export async function loadMessages(forPath?: string): Promise<void> {
   // messages 维度的竞态护栏：rapid switch 或并发 load 时，只有最新一次调用
   // 的响应允许 apply initSession，stale 响应直接丢弃。
   const myVersion = useStore.getState().bumpLoadMessagesVersion(targetPath);
+  // E06.3：协商页大小（能力未知 → null = 省略 limit，服务端默认 50）
+  const negotiatedLimit = negotiatedHistoryPageLimit(targetPath);
   // SessionFile flight 记录（issue #2188）：hydrate 期间到达的 upsert / branch
   // reset 会被下面的 HTTP 快照整表覆盖。开一条 flight 记录桥接两者，hydrate
   // 通过后按 flight 结果决定是丢弃快照还是应用快照 + 重放 flight 期间的 upsert。
   useStore.getState().beginSessionFilesFlight(targetPath, myVersion);
   try {
-    const res = await lingxiFetch(sessionMessagesUrl(targetPath));
-    const data = await res.json();
+    // E03 条件校验：仅当存在「已应用且未失效」的同页校验记录时发 If-None-Match
+    //（记录不存在/预检失败 → 无条件请求，与原行为一致）。304 → 保留全部已加载
+    // 状态，不解析 JSON、不 initSession、不推动游标。
+    let data: any = opts?.preloaded?.data ?? null;
+    let responseEtag: string | null = opts?.preloaded?.etag ?? null;
+    let protocolHeader: string | null = opts?.preloaded?.protocolHeader ?? null;
+    if (data == null) {
+      const conditional = await conditionalMessagesFetch(targetPath, {
+        sessionPath: targetPath,
+        url: sessionMessagesUrl(targetPath),
+        sessionId: sessionIdForPathFromState(useStore.getState() as Record<string, any>, targetPath),
+        limit: 50,
+        requestVersion: myVersion,
+        appliedLiveVersion: messageLiveVersionBefore,
+      });
+      if (conditional.kind === 'not-modified') {
+        // E03.3：304 全有效 → 只更新校验结果与结束状态；保留 messages/blocks/
+        // todos/sessionFiles/hasMore/nextBefore/Run 状态与已加载更早页。
+        useStore.getState().consumeSessionFilesFlight(targetPath, myVersion);
+        return;
+      }
+      if (conditional.kind === 'superseded') {
+        // 更新的 load 在途/目标已切换：丢弃本次（不向新目标补发旧请求）
+        useStore.getState().consumeSessionFilesFlight(targetPath, myVersion);
+        return;
+      }
+      data = await conditional.response.json();
+      responseEtag = conditional.etag;
+      protocolHeader = responseHeaderGet(conditional.response, 'lingxi-history-protocol');
+    }
     const latestVersion =
       sessionScopedValue(useStore.getState() as Record<string, any>, useStore.getState()._loadMessagesVersion, targetPath) ?? 0;
     if (latestVersion !== myVersion) {
@@ -442,29 +500,51 @@ export async function loadMessages(forPath?: string): Promise<void> {
     // per-session todos（防御性兼容层：即使后端漏转或缓存残留，这里兜底再转一次）
     const rawTodos = data.todos || [];
     const migratedTodos = migrateLegacyTodos({ todos: rawTodos });
-    const items = buildItemsFromHistory(data);
+    // In-flight guard：流仍活跃时，磁盘上的最新 Run 必然不完整（jsonl 按模型轮落盘，
+    // Run 未 settle），其历史投影不得携带终态（T06）；下方快照合并的 inflight 项
+    // 才是该 Run 的实时代表。快照必须在投影前取，保证两者看到同一事实基线。
+    const streamSnapshot = snapshotStreamBuffer(targetPath);
+    const items = buildItemsFromHistory(data, { openTailRun: !!streamSnapshot?.hasContent });
     // 修订点 stamp：记录本次快照对应的磁盘修订点，后续 reconcile 与列表投影对比。
     const revision = typeof data.revision === 'string' ? data.revision : null;
     useStore.getState().setSessionTodosForPath(targetPath, migratedTodos);
-    if (items.length > 0) {
-      useStore.getState().initSession(targetPath, items, data.hasMore ?? false, revision);
-      if (targetPath === useStore.getState().currentSessionPath) {
-        useStore.setState({ welcomeVisible: false });
-      }
-    } else {
-      useStore.getState().initSession(targetPath, [], false, revision);
+    // hasMore 永远以服务端为准：items 为空（本页全被前端过滤的隐藏消息）不等于
+    // 没有更早历史，静默截断会让旧消息永久不可达（T11b）。
+    useStore.getState().initSession(
+      targetPath,
+      items,
+      data.hasMore ?? false,
+      revision,
+      historyNextCursor(data),
+    );
+    if (items.length > 0 && targetPath === useStore.getState().currentSessionPath) {
+      useStore.setState({ welcomeVisible: false });
     }
     // In-flight guard: jsonl 仅在 turn_end 落盘。若 session 在 stream 进行中
     // 被 reload（switchSession 冷启动 / stream-resume truncated），合并 buffer
     // 当前快照作为末尾 assistant，避免 UI 上"正在写的消息消失"。
     // 同步执行，不 await，保证中途不会有 text_delta 事件插入。
-    const snapshot = snapshotStreamBuffer(targetPath);
+    const snapshot = streamSnapshot;
     if (snapshot?.hasContent) {
       useStore.getState().appendItem(targetPath, {
         type: 'message',
         data: buildInflightAssistantMessage(snapshot),
       });
     }
+    console.error('[lm-dbg] before save, etag=', responseEtag, 'proto=', protocolHeader);
+    // E03.2：initSession/todos/files 全部应用成功后原子保存校验记录
+    //（etag/协议能力头缺失 → 不保存；覆盖证明=原始记录边界 id + 游标 + revision）。
+    saveHistoryValidationRecord(targetPath, {
+      sessionPath: targetPath,
+      url: sessionMessagesUrl(targetPath, negotiatedLimit != null ? { limit: String(negotiatedLimit) } : {}),
+      sessionId: sessionIdForPathFromState(useStore.getState() as Record<string, any>, targetPath),
+      limit: negotiatedLimit ?? 50,
+      appliedLiveVersion: messageLiveVersionBefore,
+      etag: responseEtag,
+      protocolHeader,
+      data,
+      todosVersion: todosLiveVersionBefore,
+    });
   } catch (err) {
     console.error('[loadMessages] error:', err);
     // fetch 失败也要清理本次 flight 记录，避免残留记录被后续 load 误判 version 冲突
@@ -531,18 +611,28 @@ export async function loadMoreMessages(forPath?: string): Promise<void> {
 
   useStore.getState().setLoadingMore(targetPath, true);
   try {
-    const before = session.oldestId ?? '';
-    const res = await lingxiFetch(sessionMessagesUrl(targetPath, { before }));
+    // 游标（F1）：优先服务端 nextBefore；旧服务端回退 oldestId（hydrate 时已按
+    // 原始首条记录 id 写入）。两者都是原始 display 序号，不是归并显示项身份。
+    const before = session.nextBefore ?? session.oldestId ?? '';
+    const moreLimit = negotiatedHistoryPageLimit(targetPath);
+    const res = await lingxiFetch(sessionMessagesUrl(targetPath, { before, ...(moreLimit != null ? { limit: String(moreLimit) } : {}) }));
     const data = await res.json();
     if (Array.isArray(data.sessionFiles)) {
       useStore.getState().setSessionRegistryFiles(targetPath, data.sessionFiles);
     }
     const items = buildItemsFromHistory(data);
-    if (items.length > 0) {
-      useStore.getState().prependItems(targetPath, items, data.hasMore ?? false);
-    } else {
-      useStore.getState().setLoadingMore(targetPath, false);
+    const cursor = historyNextCursor(data);
+    let hasMore = data.hasMore ?? false;
+    if (hasMore && typeof cursor !== 'string') {
+      // 服务端声称还有更早记录却给不出可推进的游标（旧服务端空页/协议异常）：
+      // 不能静默截断，也不能原地死循环——显式记录诊断并终止翻页，等待下次
+      // 全量 hydrate 修正。
+      console.error('[loadMoreMessages] 分页游标缺失，终止翻页等待重新 hydrate:', targetPath, before);
+      hasMore = false;
     }
+    // 空页（全部被前端过滤 / 边界页）也要推进分页进度与 hasMore（T11b），
+    // prependItems 负责幂等合并与游标落盘。
+    useStore.getState().prependItems(targetPath, items, hasMore, cursor);
   } catch (err) {
     console.error('[loadMoreMessages] error:', err);
     useStore.getState().setLoadingMore(targetPath, false);
@@ -556,6 +646,40 @@ export async function loadMoreMessages(forPath?: string): Promise<void> {
 // per-session in-flight 去重：focus / online / WS reconnect 等触发器可能同时到达，
 // 同一会话同一时刻最多一个补拉请求在途。
 const _revisionReconcileInFlight = new Map<string, Promise<void>>();
+
+/**
+ * E03.4：同 revision 既有触发点上的条件重校验（不新增轮询/预取；调用方即
+ * reconcileCurrentSessionMessages 的既有触发链：返回会话/刷新/重连/移动端前台）。
+ * 304 → 状态保留；200 → 交给 loadMessages 既有完整归并链（preloaded，单次传输）。
+ */
+async function revalidateCurrentSessionConditional(
+  path: string,
+  reason: string,
+  listRevision: string,
+): Promise<void> {
+  try {
+    const outcome = await conditionalMessagesFetch(path, {
+      sessionPath: path,
+      url: sessionMessagesUrl(path),
+      sessionId: sessionIdForPathFromState(useStore.getState() as Record<string, any>, path),
+      limit: 50,
+      requestVersion: useStore.getState()._loadMessagesVersion?.[path] ?? 0,
+      appliedLiveVersion: readMessageLiveVersion(path),
+    });
+    if (outcome.kind !== 'ok') return; // 304：状态保留；superseded：已有更新流程在途
+    const data = await outcome.response.json();
+    if (!Array.isArray(data?.messages)) return; // 非 JSON/异常响应：按现有错误流程静默降级
+    await loadMessages(path, {
+      preloaded: {
+        data,
+        etag: outcome.etag,
+        protocolHeader: outcome.response.headers.get('lingxi-history-protocol'),
+      },
+    });
+  } catch (err) {
+    console.warn(`[session] conditional revalidate failed (${reason}):`, err);
+  }
+}
 
 /**
  * 校验「当前打开会话」的缓存内容是否落后于磁盘真相，落后则补拉。
@@ -585,7 +709,16 @@ export function reconcileCurrentSessionMessages(reason = 'unknown'): Promise<voi
   const projection = s.sessions.find((session) => session.path === target);
   const listRevision = typeof projection?.revision === 'string' ? projection.revision : null;
   if (!listRevision) return undefined;
-  if ((cached.revision ?? null) === listRevision) return undefined;
+  if ((cached.revision ?? null) === listRevision) {
+    // E03.4：既有真实触发点（返回会话/刷新/重连后拿到新鲜列表）上的条件校验。
+    // revision 相同 ≠ 外部状态相同（todos/files/表示变化不反映在文件 stat 上）：
+    // 一次条件请求；304 → 状态保留（不触发完整 hydrate）；200 → 表示已变，
+    // 交给既有 loadMessages 完整归并链（单次传递，不再补发第二个请求）。
+    if (hasMessagesValidationRecord(target, sessionIdForPathFromState(useStore.getState() as Record<string, any>, target), 50)) {
+      void revalidateCurrentSessionConditional(target, reason, listRevision);
+    }
+    return undefined;
+  }
 
   const existing = _revisionReconcileInFlight.get(target);
   if (existing) return existing;

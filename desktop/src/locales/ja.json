@@ -411,6 +411,17 @@
     "back": "戻る"
   },
   "chat": {
+        "historyOverview": {
+          "records": "元レコード数",
+          "runs": "論理ターン数",
+          "tasks": "関連タスク",
+          "taskSubagent": "サブエージェント",
+          "taskWorkflow": "ワークフロー",
+          "taskMedia": "メディア生成",
+          "taskOther": "その他",
+          "unknown": "統計は取得できません",
+          "detail": "サブエージェント {subagent} · ワークフロー {workflow} · メディア {media} · その他 {other}"
+        },
     "knowledgeResearchInterrupted": "調査が中断されました",
     "knowledgeResearchStopIncomplete": "調査の処理が正常に完了しませんでした",
     "knowledgeResearchStopUnavailable": "調査に必要なツールを利用できません",

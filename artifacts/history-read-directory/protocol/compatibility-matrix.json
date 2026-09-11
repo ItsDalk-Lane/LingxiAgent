@@ -1,0 +1,76 @@
+{
+  "generatedAt": "2026-09-11",
+  "stage": "F01",
+  "lastUpdated": "2026-09-11 F-e：runner 自包含化（模板 tracked）+ 夹具污染修复复验",
+  "baseline": {
+    "clone": "/tmp/lingxi-baseline-1d42b740",
+    "head": "1d42b7405c76292f617291e3a01cd2f3ef5efd04",
+    "note": "A01 启动快照 APFS clone（纯净 HEAD，porcelain=0）；旧 sessions 路由以 Node type-stripping 子进程真实运行。runner 模板 tracked 于主仓库 tests/compat-old-server-runner.template.mjs，测试 beforeAll 幂等写入 clone tests/compat-old-server-runner.mjs 后 spawn（F-e 起不再依赖 clone 内手工临时文件）"
+  },
+  "environmentDependency": {
+    "requires": "A01 clone 存在于 /tmp/lingxi-baseline-1d42b740（.git + server/routes/sessions.ts 可检）",
+    "absentBehavior": "clone 缺席时两个兼容套件整体 skip（describe.skipIf），模块加载时 console 明示「A01 clone 缺席……四组合中旧服务端侧指定环境未验证」（不静默 skip）；此时四组合中旧服务端侧（旧+旧/旧+新）为指定环境未验证，新服务端侧用例（新+旧/新+新）仍可独立运行",
+    "oldCodeAuthenticity": "旧代码真实性由断言固定：旧+旧/旧+新断言响应无 lingxi-history-protocol 头、无 ETag",
+    "incidentRef": "F-e 夹具污染事件与修复见 remaining-risks.md 三A、PROGRESS.md F-e 记录"
+  },
+  "fourCombos": [
+    {
+      "combo": "旧+旧",
+      "level": "真实 HTTP（clone 旧路由子进程）+ 旧客户端请求构造",
+      "result": "通过",
+      "evidence": "tests/history-protocol-compat.test.ts『旧+旧（控制组）』：200 旧 JSON（messages/hasMore）、无协议头/无 ETag"
+    },
+    {
+      "combo": "新+旧",
+      "level": "真实 HTTP（新路由真实 HTTP 服务 × 旧客户端请求构造：path+sessionId、省略 limit、无条件）",
+      "result": "通过",
+      "evidence": "tests/history-protocol-compat.test.ts『新+旧』：默认 50、七字段 JSON 可消费、新增头不影响旧解析"
+    },
+    {
+      "combo": "旧+新",
+      "level": "真实 HTTP（clone 旧路由 × 主仓库新客户端代码 loadMessages/reconcile/概览）",
+      "result": "通过",
+      "evidence": "desktop/src/react/__tests__/history-protocol-compat.test.ts 四用例：消息 200 无感回退不存记录、概览 404→unsupported 不卡住、翻页 nextBefore 照常推进、reconcile 正常触发"
+    },
+    {
+      "combo": "新+新",
+      "level": "真实 HTTP（新路由真实 HTTP 服务）",
+      "result": "通过",
+      "evidence": "tests/history-protocol-compat.test.ts『新+新』：条件请求 200→304 无正文、ETag 随 limit 变化；desktop compat 控制组断言 revision stamp"
+    }
+  ],
+  "Y": {
+    "Y01": { "status": "已修复并验证", "evidence": "四组合全部通过（本文件 fourCombos）；能力缺失回退路径=旧+新/新+旧 用例。环境依赖：旧服务端侧需 A01 clone 在位（缺席时该侧套件 skip 并 console 明示指定环境未验证，见 environmentDependency）；F-e 修复复验 4/4+4/4 真实通过（2026-09-11，exit 0）" },
+    "Y02": { "status": "已修复并验证", "evidence": "tests/history-protocol-conditional.test.ts 首次 200/同标签 304/oracle 逐字节、无正文无 Content-Length" },
+    "Y03": { "status": "已修复并验证", "evidence": "conditional『页参数不同』『跨页游标失配』『非法语法』用例；缺头=无条件 200" },
+    "Y04": { "status": "已修复并验证", "evidence": "conditional『文件不变但外部状态变化（deferred 媒体任务）→ 200』+ E04 overview-client『外部状态改变不误 304』" },
+    "Y05": { "status": "已修复并验证", "evidence": "已有用户分支操作（setBranchHead）→ branch_view_stale/rewind 用例（overview-route + run-continuity）使请求/receipt 失效；无通知外部分支修改边界另列（E04.3 信任边界），不表述为全局保证" },
+    "Y06": { "status": "已修复并验证", "evidence": "conditional『stat 失败不签发/路径拒绝 403 不泄露标签』；鉴权先于条件求值（路由顺序）；有权限主体各自生成标签（标签含主体/作用域身份）" },
+    "Y07": { "status": "已修复并验证", "evidence": "history-protocol-client freshStateGuards：chatSessions 缺失→superseded（不清空、不伪造）；同目标至多一次无条件补取（304 stale 用例）" },
+    "Y08": { "status": "已修复并验证", "evidence": "session-actions.test 竞态护栏（stale 丢弃/live version 早退）+ client todos 失配→stale 补取用例" },
+    "Y09": { "status": "已修复并验证", "evidence": "client『新页首次加载无条件』用例 + T11b 隐藏整页推进（run-continuity）+ E06 hidden-page 场景" },
+    "Y10": { "status": "已修复并验证", "evidence": "conditional『304 保留全部已加载状态』（items/nextBefore/Run 状态不变）+ client-state-machine S3" },
+    "Y11": { "status": "已修复并验证", "evidence": "conditional『all/reconciliation 不进条件快路径』+ session-find-route（共用页边界）+ shared-functions 回归" },
+    "Y12": { "status": "已修复并验证", "evidence": "route-fallback rebroadcast 恰一次用例；broadcast 先于条件求值（不因 304 取消/重复）" },
+    "Y13": { "status": "已修复并验证", "evidence": "smoke：200/304/概览 Cache-Control private, no-store（真实响应头）；无 SW/磁盘缓存新增" },
+    "Y14": { "status": "已实现但指定环境未验证", "evidence": "smoke 覆盖 CORS/预检/Expose 头（Node loopback 层）；真实浏览器跨源行为留待 F 指定环境（browser-smoke-report.md 如实标注）" },
+    "Y15": { "status": "已修复并验证", "evidence": "E07 故障场景：缺头/头部剥离（无 etag 200 与 304 缺 etag 补取）/未知版本/400 标 epoch/网络错误回退不标" },
+    "Y16": { "status": "已修复并验证", "evidence": "overview-route 手写 oracle（counts/三桶合计/去重/零与未知区分）" },
+    "Y17": { "status": "已修复并验证", "evidence": "overview-route 热路径硬断言（0 文件读/0 JSONL 解析/不 hydrate）+ cache single-flight 用例；超预算→directory_unavailable（映射测试）" },
+    "Y18": { "status": "已修复并验证", "evidence": "overview-route 追加跨桶/rewind 用例 + E06 压力场景（multi-run/hidden-page/discarded）" },
+    "Y19": { "status": "已修复并验证", "evidence": "overview-client：HTML 错误页/慢响应不阻塞/401 不吞/stale 丢弃用例" },
+    "Y20": { "status": "已修复并验证", "evidence": "E06 experiments：四候选语义通过（walk 页数断言/顺序由 nextBefore 保证/≤200 上限测试），原始数据 summary-e.json" },
+    "Y21": { "status": "已修复并验证", "evidence": "client K 协商用例：混合 limit 仅依 nextBefore（before=服务端游标）、无重叠无缺页由服务端窗口语义保证" },
+    "Y22": { "status": "已修复并验证", "evidence": "client 非法 77/超限 400→保守省略；冲突→保守 50+诊断；旧请求默认不变（compat 新+旧用例）" },
+    "Y23": { "status": "已修复并验证", "evidence": "client epoch 隔离/重启失配/32 条上限/256KiB 预算/in-flight 合并释放用例" },
+    "Y24": { "status": "已修复并验证", "evidence": "D 复测（verification/summary-d.json，固定 50 下 B/C 收益保持）；304=conditional 测试；概览=overview-route；调页=page-size-decision.md 分别举证" }
+  },
+  "counts": {
+    "Y_total": 24,
+    "已修复并验证": 23,
+    "已实现但指定环境未验证": 1,
+    "待验证或受阻": 0,
+    "经证据否定": 0
+  },
+  "countsNote": "Y14 真实浏览器跨源按 Node 真实链路验证并如实标注指定环境未验证；F 后续批次在指定环境补测后升级。四组合中旧服务端侧（Y01 旧+旧/旧+新）依赖 A01 clone：clone 缺席时该侧套件 skip 并 console 明示「指定环境未验证」（不静默 skip），新服务端侧用例不受影响"
+}

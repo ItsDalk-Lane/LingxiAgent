@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-11",
+  "phase": "F06",
+  "purpose": "E02.4 条件 GET 正确性证据（oracle 模式）+ F02 决定性 304 汇总",
+  "oracleMethod": "每个 304 断言前，先对同 URL 发无条件请求取得实际当前 JSON（200），304 结论必须与该 oracle 的表示一致；不只比较两个 hash",
+  "tests": {
+    "file": "tests/history-protocol-conditional.test.ts",
+    "count": 8,
+    "cases": [
+      "首次 200 带协议头与 ETag（W/hrp1-64hex）；同表示 → 304 无正文/无 Content-Length/ETag 与私有策略在",
+      "oracle：同请求无条件 200 的实际 JSON 与首次 200 逐字节一致；304 未解析正文（POISONED 探针）",
+      "页参数不同（limit 10 vs 50）与跨页游标 → 200（标签失配）",
+      "追加后 → 200 新内容；oracle 与新表示一致；记录更新",
+      "文件不变但外部状态变化（deferred image-generation 任务）→ 200 不误 304",
+      "stat 失败（文件缺失）→ 不签发；路径拒绝 403 不泄露标签",
+      "all=1 / reconciliation=1 带条件头 → 200 完整响应且不签发（严格证据模式不进条件快路径）",
+      "弱比较（W/ 前缀忽略）与 `*` 命中；非法语法 → 忽略条件头正常 200"
+    ],
+    "exitCode": 0
+  },
+  "decisive304": {
+    "source": "protocol/verification-f/summary-f.json .decisive304",
+    "command": "node scripts/benchmark-history-protocol.mjs --phase F --sizes 1000,10000 --seed 20260910 --page-sizes 50,100,150,200 --rtt-ms 0,50,150 --bandwidth-mbps 10,50",
+    "n1000": { "validations": 20, "all304": true, "bodyBytesTotal": 0, "clientJsonDecodeAttempts": 0, "rebuilds": 0 },
+    "n10000": { "validations": 20, "all304": true, "bodyBytesTotal": 0, "clientJsonDecodeAttempts": 0, "rebuilds": 0 },
+    "interpretation": "文件/分支/外部状态/客户端版本不变条件下，20 次校验全 304、正文 0 字节、客户端零解码、目录零重建（E02 允许的 read/hydrate/hash 成本另行计入，不归零）"
+  },
+  "etagScopeInputs": [
+    "协议版本 hrp1:v1", "进程内随机盐（不落盘，重启失配=正常 200）",
+    "principalId/serverNodeId/studioId/sessionId/规范 locator",
+    "endpoint/before(latest|n)/limit/mode(normal)/language(预留)",
+    "分支选择身份 selectedLeafId（headResolution/physicalTail 不入摘要：非表示维度）",
+    "revision", "响应 UTF-8 字节"
+  ],
+  "notIssuedWhen": ["revision=null", "身份不可靠（无规范路径）", "普通读取降级 mode=full", "all/reconciliation 模式"]
+}

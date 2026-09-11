@@ -10,59 +10,24 @@ import { Hono } from "hono";
 import { safeJson } from "../hono-helpers.ts";
 import { bodyFromRouteError, routeError, statusFromRouteError } from "./route-errors.ts";
 import { t } from "../../lib/i18n.ts";
-import { extractBlocks, resolveMediaGenerationBlocks } from "../block-extractors.ts";
-import { buildDeferredResultInterludeBlock, resolveDeferredReceiverName } from "../deferred-result-interlude.ts";
+import { resolveDeferredReceiverName } from "../deferred-result-interlude.ts";
 import { BrowserManager } from "../../lib/browser/browser-manager.ts";
 import { isSessionJsonlFilename, sessionIdFromFilename } from "../../lib/session-jsonl.ts";
-import {
-  DEFERRED_RESULT_MESSAGE_TYPE,
-  DEFERRED_RESULT_RECORD_TYPE,
-  buildDeferredResultRecord,
-  parseDeferredResultNotification,
-  parseDeferredResultRecord,
-} from "../../lib/deferred-result-notification.ts";
-import {
-  TURN_INPUT_CONSUMPTION_EVENT_TYPE,
-  TURN_INPUT_PRESENTATION_EVENT_TYPE,
-  isCustomTurnInputHistoryMessage,
-  isHiddenTurnInputMessage,
-  parseTurnInputConsumptionRecord,
-  parseTurnInputPresentationRecord,
-} from "../../lib/turn-input-presentation.ts";
-import {
-  materializeExecutorIdentity,
-  normalizeExecutorMetadata,
-  readSubagentSessionMetaSync,
-} from "../../lib/subagent-executor-metadata.ts";
+import { noteSessionFileMutation } from "../../core/session-file-mutation-epoch.ts";
+import { isHiddenTurnInputMessage } from "../../lib/turn-input-presentation.ts";
 import {
   extractTextContent,
-  contentHasThinkingBlock,
-  filterUnreferencedInlineImages,
   loadSessionHistoryMessages,
   loadSessionHistoryEvidence,
-  collectModelCallReferencesBySourceIndex,
-  loadLatestAssistantSummaryFromSessionFile,
   isValidSessionPath,
   isActiveDesktopSessionPath,
   isArchivedDesktopSessionPath,
-  annotateOriginMessages,
-  collectSessionCollabDecisions,
-  overlaySessionCollabDecision,
 } from "../../core/message-utils.ts";
-import {
-  AGENT_REVIEW_RECORD_TYPE,
-  MESSAGE_ORIGIN_RECORD_TYPE,
-  MESSAGE_PRESENTATION_RECORD_TYPE,
-} from "../../core/desktop-session-submit.ts";
 import { stripSessionReminderBlocks } from "../../core/session-reminders.ts";
 import { sessionFileRevision } from "../../core/session-list-projection-cache.ts";
-import {
-  extractLatestTodoSnapshot,
-  extractLatestTodos,
-} from "../../lib/tools/todo-compat.ts";
+import { extractLatestTodoSnapshot } from "../../lib/tools/todo-compat.ts";
 import { SessionManager } from "../../lib/pi-sdk/index.ts";
 import { TODO_STATE_CUSTOM_TYPE } from "../../lib/tools/todo-constants.ts";
-import { LOOP_TURN_MESSAGE_TYPE, LOOP_NOTICE_MESSAGE_TYPE, buildLoopInterludeBlock } from "../../lib/loop/loop-messages.ts";
 import { mergeWorkspaceHistory, normalizeWorkspacePath } from "../../shared/workspace-history.ts";
 import { listStudioMountsForStudio } from "../../core/studio-mounts.ts";
 import { sanitizeBridgeVisibleText } from "../../shared/bridge-visible-text.ts";
@@ -71,8 +36,6 @@ import {
   moveSessionFileSidecarSync,
   sessionFileSidecarPath,
 } from "../../lib/session-files/session-file-registry.ts";
-import { serializeSessionFile } from "../../lib/session-files/session-file-response.ts";
-import { browserScreenshotPath } from "../../lib/session-files/browser-screenshot-file.ts";
 import { getModelThinkingLevels, normalizeSessionThinkingLevel, modelSupportsXhigh, resolveModelDefaultThinkingLevel } from "../../core/session-thinking-level.ts";
 import {
   modelSupportsDirectAudioInput,
@@ -89,14 +52,19 @@ import { searchSessions } from "../../lib/search/session-search.ts";
 import { findInSessionMessages } from "../../lib/search/session-find.ts";
 import { SessionSearchTokenizerUnavailableError } from "../../lib/search/session-search-tokenizer.ts";
 import { MountAwareFileError, MountAwareFileService } from "../../core/mount-aware-file-service.ts";
-import { isAssistantCommentaryTextBlock } from "../../shared/text-signature.ts";
 import { collectToolOutcomesByCallId } from "../../shared/tool-outcome.ts";
-import { extractPersistedAssistantSemanticSegments } from "../../shared/assistant-semantic-segments.ts";
-import {
-  createHistoryDeferredContent,
-  resolveHistoryDeferredContent,
-  shouldDeferHistoryContent,
-} from "../history-deferred-content.ts";
+import { resolveHistoryDeferredContent } from "../history-deferred-content.ts";
+import { isDisplayableHistoryMessage } from "../history-read/projection-context.ts";
+import { createSanitizeVisibleContent, isBridgeSessionPath } from "../history-read/project-page.ts";
+import { resolveHistoryPageBounds } from "../history-read/page.ts";
+import { evaluateHistoryConditionalGet } from "../history-read/protocol.ts";
+import { readSessionHistoryOverview } from "../history-read/index.ts";
+import { projectFullHistoryPage, readSessionHistoryPage } from "../history-read/index.ts";
+import { HistoryDirectoryCache } from "../history-read/cache.ts";
+
+// B01 同源抽取：页边界语义原样移入 server/history-read/page.ts，这里 re-export
+// 保持既有 import 兼容（find 路由与定向测试按原路径引用）。
+export { resolveHistoryPageBounds };
 
 const log = createModuleLogger("sessions");
 const lifecycleLog = createModuleLogger("sessions/lifecycle");
@@ -228,87 +196,10 @@ function classifySessionCreationError(err) {
 const TODO_COMPLETE_MESSAGE =
   "[Hana Todo] The user marked the current todo list as completed and removed it from the session UI. Treat every item in that list as completed. Create a new todo list only if new work needs tracking.";
 
-function stripInlineThinkText(text) {
-  return String(text || "").replace(/<think(?:ing)?>([\s\S]*?)<\/think(?:ing)?>\n*/g, "");
-}
-
-function hasInlineImageContent(content) {
-  if (!Array.isArray(content)) return false;
-  return content.some(block => block?.type === "image" && (block.data || block.source?.data));
-}
-
-function hasTextBlockContent(content, { stripThink = false } = {}) {
-  if (typeof content === "string") {
-    const text = stripThink ? stripInlineThinkText(content) : content;
-    return text.length > 0;
-  }
-  if (!Array.isArray(content)) return false;
-  return content.some(block => block?.type === "text" && block.text && !isAssistantCommentaryTextBlock(block));
-}
-
-function hasAssistantSemanticTextContent(content) {
-  if (typeof content === "string") return stripInlineThinkText(content).length > 0;
-  if (!Array.isArray(content)) return false;
-  return content.some(block => block?.type === "text" && typeof block.text === "string" && block.text.length > 0);
-}
-
-function hasToolUseContent(content) {
-  if (!Array.isArray(content)) return false;
-  return content.some(block => (block?.type === "tool_use" || block?.type === "toolCall") && !!block.name);
-}
-
-function soleRawToolResultText(message) {
-  if (!Array.isArray(message?.content) || message.content.length !== 1) return null;
-  const block = message.content[0];
-  return block?.type === "text" && typeof block.text === "string" ? block.text : null;
-}
-
-function deferHeavyHistoryBlock(sourceMessages, sourceIndex, ordinal, block) {
-  if (block.type === "screenshot" && shouldDeferHistoryContent(block.base64)) {
-    const { base64, ...rest } = block;
-    return {
-      ...rest,
-      deferred: createHistoryDeferredContent(
-        sourceMessages,
-        sourceIndex,
-        "screenshot",
-        ordinal,
-        base64,
-        { preview: false },
-      ),
-    };
-  }
-  if (block.type === "artifact" && shouldDeferHistoryContent(block.content)) {
-    const deferred = createHistoryDeferredContent(
-      sourceMessages,
-      sourceIndex,
-      "artifact",
-      ordinal,
-      block.content,
-    );
-    return { ...block, content: deferred.preview || "", deferred };
-  }
-  return block;
-}
-
-function isDisplayableHistoryMessage(message) {
-  if (!message || typeof message !== "object") return false;
-  if (message.role === "user") {
-    return hasTextBlockContent(message.content) || hasInlineImageContent(message.content);
-  }
-  if (message.role === "assistant") {
-    return message.stopReason === "error"
-      || message.stopReason === "aborted"
-      || hasAssistantSemanticTextContent(message.content)
-      || contentHasThinkingBlock(message.content, { stripThink: true })
-      || hasToolUseContent(message.content);
-  }
-  return false;
-}
-
 // 与 /sessions/messages 主循环的序号语义逐字对齐：
 // 只有 user/assistant 且 isDisplayableHistoryMessage 为真的消息推进 displayIdx。
-// 改这里必须同步改 messages 主循环与 tests/session-find-route.test.ts 的一致性测试。
+// 改这里必须同步改 server/history-read/project-page.ts 的主循环
+// 与 tests/session-find-route.test.ts 的一致性测试。
 const FIND_LEGACY_STEER_PREFIX_RE = /^(?:（插话，无需 MOOD）|\(Interjection, no MOOD needed\))\n?/;
 const FIND_TURN_TAG_PREFIX_RE = /^<t>[^<]*<\/t>\s*/;
 
@@ -346,37 +237,6 @@ export function collectFindableHistoryEntries(sourceMessages, sanitizeVisibleCon
   return entries;
 }
 
-function nextImmediateDisplayableAssistantIndex(sourceMessages, sourceIndex, displayIdxAtSource) {
-  let displayIdx = displayIdxAtSource;
-  for (let i = sourceIndex + 1; i < sourceMessages.length; i += 1) {
-    const message = sourceMessages[i];
-    if (!isDisplayableHistoryMessage(message)) continue;
-    const currentIndex = displayIdx;
-    displayIdx += 1;
-    if (message.role === "user") return null;
-    if (message.role === "assistant") return currentIndex;
-  }
-  return null;
-}
-
-function resolveHistoryPageBounds(sourceMessages, { beforeId, limit, forceAll }) {
-  let total = 0;
-  for (const message of sourceMessages) {
-    if (isDisplayableHistoryMessage(message)) total += 1;
-  }
-  if (forceAll) return { total, startIdx: 0, endIdx: total, hasMore: false };
-  const endIdx = (beforeId != null && beforeId > 0)
-    ? Math.min(beforeId, total)
-    : total;
-  const startIdx = Math.max(0, endIdx - limit);
-  return { total, startIdx, endIdx, hasMore: startIdx > 0 };
-}
-
-function isBridgeSessionPath(sessionPath) {
-  if (typeof sessionPath !== "string" || !sessionPath) return false;
-  return sessionPath.split(/[\\/]+/).includes("bridge");
-}
-
 /**
  * 读取会话文件的磁盘修订点（stat 签名，与 /api/sessions 列表投影同源同格式）。
  * stat 失败（请求竞态中文件被归档/删除）返回 null —— 显式的「修订点未知」，
@@ -394,179 +254,11 @@ async function readSessionFileRevision(sessionPath) {
 export function createSessionsRoute(engine, hub = null) {
   const route = new Hono();
   const lifecycleLocks = new Map();
-
-  function resolveSessionCacheLocator(sessionPath) {
-    if (!sessionPath) return { cacheKey: null, readPath: null, sessionId: null };
-    const sessionId = engine.getSessionIdForPath?.(sessionPath) || null;
-    const manifest = sessionId ? engine.getSessionManifest?.(sessionId) || null : null;
-    const currentPath = typeof manifest?.currentLocator?.path === "string" && manifest.currentLocator.path
-      ? manifest.currentLocator.path
-      : sessionPath;
-    return {
-      cacheKey: sessionId || sessionPath,
-      readPath: currentPath,
-      sessionId,
-    };
-  }
-
-  function currentSessionPathForId(sessionId) {
-    if (!sessionId) return null;
-    const manifest = engine.getSessionManifest?.(sessionId) || null;
-    const currentPath = manifest?.currentLocator?.path;
-    return typeof currentPath === "string" && currentPath ? currentPath : null;
-  }
-
-  function resolveSubagentBlockSession(block, task = null, run = null) {
-    const rawSessionId =
-      block?.sessionId
-      || task?.meta?.sessionId
-      || run?.childSessionId
-      || null;
-    let sessionId = typeof rawSessionId === "string" && rawSessionId.trim() ? rawSessionId.trim() : null;
-    let sessionPath =
-      block?.streamKey
-      || task?.meta?.sessionPath
-      || run?.childSessionPath
-      || null;
-    if (typeof sessionPath !== "string" || !sessionPath.trim()) sessionPath = null;
-    if (!sessionId && sessionPath) {
-      sessionId = engine.getSessionIdForPath?.(sessionPath) || null;
-    }
-    if (sessionId) {
-      sessionPath = currentSessionPathForId(sessionId) || sessionPath;
-    }
-    return { sessionId, sessionPath };
-  }
-
-  // session-meta.json sidecar 按 session 目录共享；同一个 request 里遍历几十个 block
-  // 时不必每个 block 都重复 readFileSync + JSON.parse。调用端构造一次 Map 当 cache。
-  function createSubagentMetaCache() {
-    const map = new Map();
-    return (sessionPath) => {
-      if (!sessionPath) return null;
-      const { cacheKey, readPath, sessionId } = resolveSessionCacheLocator(sessionPath);
-      if (!cacheKey || !readPath) return null;
-      if (map.has(cacheKey)) return map.get(cacheKey);
-      const manifestMeta = normalizeExecutorMetadata(
-        engine.getSessionExecutorMetadata?.({ sessionId, sessionPath: readPath }),
-      );
-      const meta = manifestMeta || readSubagentSessionMetaSync(readPath);
-      map.set(cacheKey, meta);
-      return meta;
-    };
-  }
-
-  function applySubagentIdentity(block, task, readSessionMeta) {
-    const sessionRef = resolveSubagentBlockSession(block, task);
-    if (sessionRef.sessionId && !block.sessionId) block.sessionId = sessionRef.sessionId;
-    if (sessionRef.sessionPath) block.streamKey = sessionRef.sessionPath;
-    const sessionPath = sessionRef.sessionPath;
-    const sessionMeta = readSessionMeta(sessionPath);
-    const resolved =
-      materializeExecutorIdentity(sessionMeta, engine.getAgent?.bind(engine))
-      || materializeExecutorIdentity(task?.meta, engine.getAgent?.bind(engine))
-      || materializeExecutorIdentity(block, engine.getAgent?.bind(engine));
-
-    if (resolved) {
-      block.agentId = resolved.agentId;
-      block.agentName = resolved.agentName;
-      return;
-    }
-
-    const inferredAgentId = sessionPath
-      ? engine.resolveSessionOwnership?.(sessionPath)?.agentId || null
-      : null;
-    if (!inferredAgentId) return;
-
-    const inferredAgent = engine.getAgent?.(inferredAgentId) || null;
-    block.agentId = inferredAgentId;
-    block.agentName = inferredAgent?.agentName || "Unknown agent";
-  }
-
-  function patchBlockExecutorMetadata(block, task, readSessionMeta) {
-    const sessionRef = resolveSubagentBlockSession(block, task);
-    if (sessionRef.sessionId && !block.sessionId) block.sessionId = sessionRef.sessionId;
-    if (sessionRef.sessionPath) block.streamKey = sessionRef.sessionPath;
-    const sessionPath = sessionRef.sessionPath;
-    const sessionMeta = readSessionMeta(sessionPath);
-    const sources = [sessionMeta, task?.meta, block];
-
-    for (const source of sources) {
-      if (!source) continue;
-      if (source.executorAgentId && !block.executorAgentId) {
-        block.executorAgentId = source.executorAgentId;
-      }
-      if (source.executorAgentNameSnapshot && !block.executorAgentNameSnapshot) {
-        block.executorAgentNameSnapshot = source.executorAgentNameSnapshot;
-      }
-      if (source.executorMetaVersion && !block.executorMetaVersion) {
-        block.executorMetaVersion = source.executorMetaVersion;
-      }
-    }
-  }
-
-  function patchBlockRequestedMetadata(block, task = null) {
-    const sources = [task?.meta, block];
-
-    for (const source of sources) {
-      if (!source) continue;
-      if (source.requestedAgentId && !block.requestedAgentId) {
-        block.requestedAgentId = source.requestedAgentId;
-      }
-      if (source.requestedAgentNameSnapshot && !block.requestedAgentName) {
-        block.requestedAgentName = source.requestedAgentNameSnapshot;
-      }
-    }
-  }
-
-  function taskFromSubagentRun(run) {
-    if (!run) return null;
-    return {
-      status: run.status,
-      result: run.summary || null,
-      reason: run.reason || run.summary || null,
-      meta: {
-        sessionId: run.childSessionId || null,
-        sessionPath: run.childSessionPath || null,
-        requestedAgentId: run.requestedAgentId || null,
-        requestedAgentNameSnapshot: run.requestedAgentNameSnapshot || null,
-        executorAgentId: run.executorAgentId || null,
-        executorAgentNameSnapshot: run.executorAgentNameSnapshot || null,
-        executorMetaVersion: run.executorMetaVersion || null,
-      },
-    };
-  }
-
-  function mergeSubagentTaskMetadata(primary, fallback) {
-    if (!primary) return fallback || null;
-    if (!fallback) return primary;
-    const primaryMeta = {};
-    for (const [key, value] of Object.entries(primary.meta || {})) {
-      if (value != null) primaryMeta[key] = value;
-    }
-    return {
-      status: primary.status || fallback.status,
-      result: primary.result ?? fallback.result,
-      reason: primary.reason ?? fallback.reason,
-      meta: {
-        ...(fallback.meta || {}),
-        ...primaryMeta,
-      },
-    };
-  }
-
-  function createSubagentSummaryCache() {
-    const map = new Map();
-    return async (sessionPath) => {
-      if (!sessionPath) return null;
-      const { cacheKey, readPath } = resolveSessionCacheLocator(sessionPath);
-      if (!cacheKey || !readPath) return null;
-      if (!map.has(cacheKey)) {
-        map.set(cacheKey, loadLatestAssistantSummaryFromSessionFile(readPath));
-      }
-      return await map.get(cacheKey);
-    };
-  }
+  // B06 目录缓存：route/runtime 实例私有（非模块单例，I01）；测试可经
+  // engine.historyReadCache 注入同一实例以观测统计。
+  const historyDirectoryCache = engine.historyReadCache instanceof HistoryDirectoryCache
+    ? engine.historyReadCache
+    : new HistoryDirectoryCache();
 
   function getSessionSummaryRecord(sessionPath, agentIdHint = null) {
     if (!sessionPath) return null;
@@ -651,6 +343,9 @@ export function createSessionsRoute(engine, hub = null) {
         reason: "session_archive",
       });
       try {
+        // C02：归档 rename 使旧路径失效——写前递增源与目标路径的变更世代。
+        noteSessionFileMutation(sessionPath, "rename");
+        noteSessionFileMutation(destPath, "rename");
         await fs.rename(sessionPath, destPath);
         moveSessionFileSidecarSync(sessionPath, destPath);
       } catch (err) {
@@ -734,6 +429,9 @@ export function createSessionsRoute(engine, hub = null) {
       throw routeError("Archived session deletion is already staged", "session_delete_staged_conflict", 409);
     }
 
+    // C02：永久删除先把文件 rename 到 staged——写前递增变更世代。
+    noteSessionFileMutation(sessionPath, "delete");
+    noteSessionFileMutation(stagedPath, "delete");
     await fs.rename(sessionPath, stagedPath);
     try {
       moveSessionFileSidecarSync(sessionPath, stagedPath);
@@ -1461,6 +1159,52 @@ export function createSessionsRoute(engine, hub = null) {
   });
 
   // 获取 session 的消息（支持 ?path= 指定 session，否则读焦点 session）
+  route.get("/sessions/history-overview", async (c) => {
+    try {
+      const requestContext = createRequestContext(c, engine);
+      // 身份优先级与 /sessions/messages 逐字对齐：sessionId → manifest locator → path。
+      const querySessionId = c.req.query("sessionId") || null;
+      let queryPath = c.req.query("path") || null;
+      if (typeof querySessionId === "string" && querySessionId.trim()) {
+        const manifest = engine.getSessionManifest?.(querySessionId.trim()) || null;
+        if (!manifest?.currentLocator?.path) {
+          return c.json({ error: "Session manifest not found", code: "session_manifest_not_found" }, 404);
+        }
+        queryPath = manifest.currentLocator.path;
+      }
+      if (queryPath && !isValidSessionPath(queryPath, engine.agentsDir)) {
+        return c.json({ error: "Invalid session path" }, 403);
+      }
+      const resolvedSessionPath = queryPath || engine.currentSessionPath || null;
+      const auth = authorizeSessionRoute(requestContext, "sessions.read", {
+        kind: "session",
+        studioId: requestContext.studioId,
+        sessionPath: resolvedSessionPath || engine.currentSessionPath || null,
+      });
+      if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
+      // "只是统计"不是公开数据：复用 sessions.read；概览不新增任何执行/详情功能（E04.2）。
+      const result = await readSessionHistoryOverview({
+        engine,
+        cache: historyDirectoryCache,
+        sessionPath: resolvedSessionPath,
+        sessionId: querySessionId?.trim() || (resolvedSessionPath ? engine.getSessionIdForPath?.(resolvedSessionPath) || null : null),
+        studioId: requestContext.studioId ?? null,
+        disableCache: engine.historyReadDisableCache === true,
+      });
+      // E04 响应头按协议合同（无 ETag：条件快路径仅限普通消息页）。
+      const headers = {
+        "lingxi-history-protocol": "1",
+        "cache-control": "private, no-store",
+      };
+      if (result.kind === "unavailable") {
+        return c.body(JSON.stringify({ schemaVersion: 1, available: false, reason: result.reason }), 200, headers);
+      }
+      return c.body(JSON.stringify(result.overview), 200, headers);
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
   route.get("/sessions/messages", async (c) => {
     try {
       const requestContext = createRequestContext(c, engine);
@@ -1490,72 +1234,7 @@ export function createSessionsRoute(engine, hub = null) {
       // （前端下次触发时多补拉一次，方向安全），不会偏新（把没读到的写入
       // 标成「已同步」会让 /rc 消息永久漏掉，issue #1610 的反方向竞态）。
       const revision = await readSessionFileRevision(resolvedSessionPath);
-      const evidence = reconciling ? await loadSessionHistoryEvidence(engine, resolvedSessionPath, reconciliationSessionId) : null;
-      const sourceMessages = evidence ? evidence.messages : await loadSessionHistoryMessages(engine, resolvedSessionPath);
-      // annotateOriginMessages 会把 origin custom 条目从数组里摘掉、把 origin/displayText
-      // 并进其后第一条 user 消息。下面的主展示循环大量以 sourceIndex 回查
-      // sourceMessages[sourceIndex]（nextImmediateDisplayableAssistantIndex、
-      // recordDeferredInterlude 等），如果直接把循环换成过滤后的短数组，sourceIndex
-      // 会和 sourceMessages 错位，静默污染 deferred/subagent 块的归属。这里改用
-      // zip 只取 annotateOriginMessages 的注释结果、映射回原始下标，循环本身仍遍历
-      // 原始 sourceMessages，不破坏既有 sourceIndex 语义。
-      const originBySourceIndex = new Map();
-      {
-        const annotatedMessages = annotateOriginMessages(sourceMessages);
-        let annotatedIdx = 0;
-        for (let i = 0; i < sourceMessages.length; i += 1) {
-          const original = sourceMessages[i];
-          if (original?.role === "custom" && (
-            original.customType === MESSAGE_ORIGIN_RECORD_TYPE
-            || original.customType === AGENT_REVIEW_RECORD_TYPE
-            || original.customType === MESSAGE_PRESENTATION_RECORD_TYPE
-          )) continue;
-          const annotated = annotatedMessages[annotatedIdx];
-          annotatedIdx += 1;
-          if (original?.role === "user" && annotated?.origin) {
-            originBySourceIndex.set(i, {
-              origin: annotated.origin,
-              ...(typeof annotated.displayText === "string" ? { displayText: annotated.displayText } : {}),
-            });
-          }
-        }
-      }
-      const presentationBySourceIndex = new Map();
-      {
-        let pendingPresentation = null;
-        for (let i = 0; i < sourceMessages.length; i += 1) {
-          const message = sourceMessages[i];
-          if (message?.role === "custom" && message.customType === MESSAGE_PRESENTATION_RECORD_TYPE) {
-            pendingPresentation = message.data || null;
-            continue;
-          }
-          if (message?.role === "user") {
-            if (pendingPresentation) presentationBySourceIndex.set(i, pendingPresentation);
-            pendingPresentation = null;
-          }
-        }
-      }
-      const agentReviewBySourceIndex = new Map();
-      {
-        let pendingReview = null;
-        for (let i = 0; i < sourceMessages.length; i += 1) {
-          const message = sourceMessages[i];
-          if (message?.role === "custom" && message.customType === AGENT_REVIEW_RECORD_TYPE) {
-            pendingReview = message.data || null;
-            continue;
-          }
-          if (message?.role === "user") {
-            if (pendingReview?.status === "completed") agentReviewBySourceIndex.set(i, pendingReview);
-            pendingReview = null;
-          }
-        }
-      }
-      const sanitizeVisibleContent = (value) => {
-        const withoutReminder = stripSessionReminderBlocks(value);
-        return isBridgeSessionPath(resolvedSessionPath)
-          ? sanitizeBridgeVisibleText(withoutReminder)
-          : withoutReminder;
-      };
+      const sanitizeVisibleContent = createSanitizeVisibleContent(resolvedSessionPath);
 
       // 分页参数
       const beforeId = c.req.query("before") != null ? Number(c.req.query("before")) : null;
@@ -1563,559 +1242,94 @@ export function createSessionsRoute(engine, hub = null) {
 
       // all=1 强制全量返回（流式恢复等特殊场景）
       const forceAll = c.req.query("all") === "1";
-      const pageBounds = resolveHistoryPageBounds(sourceMessages, { beforeId, limit, forceAll });
 
-      // 提取可显示的消息（user/assistant 文本 + 文件/artifact 工具结果）。
-      // 长会话只完整 hydrate 当前页面窗口；窗口外只做轻量可见性扫描，
-      // 避免旧消息的 markdown/block/sidecar 解析拖慢当前模型运行。
-      const messages = [];
-      const blocks = [];
-      const mediaGenerationResults = new Map();
-      const standaloneMediaGenerationResults = [];
-      const deferredInterludeDeliveryIds = new Set();
-      const turnInputConsumptionDeliveryIds = new Set();
-      const turnInputConsumptionEntryIds = new Set();
-      const turnInputByAssistantEntryId = new Map<string, string>();
-      const sourceIndexByEntryId = new Map<string, number>();
-      const displayIndexByEntryId = new Map<string, number>();
-      const deferredStore = engine.deferredResults;
-      const receiverName = resolveDeferredReceiverName(engine, resolvedSessionPath);
-      // 草稿卡确认状态持久化（灰测修复 C）：决策 custom 消息本身 display:false
-      // 不会进展示（与 origin 记录同理），只用来覆盖后面 toolResult 分支产出的
-      // suggestion_card block 的 status，让重开 session 不再回弹 pending。
-      const sessionCollabDecisions = collectSessionCollabDecisions(sourceMessages);
-      const toolOutcomesByCallId = collectToolOutcomesByCallId(sourceMessages);
-      const modelCallReferenceBySourceIndex = collectModelCallReferencesBySourceIndex(sourceMessages);
-      const toolResultSourceIndexByCallId = new Map<string, number>();
-      for (let sourceIndex = 0; sourceIndex < sourceMessages.length; sourceIndex += 1) {
-        const message = sourceMessages[sourceIndex];
-        const toolCallId = typeof message?.toolCallId === "string" && message.toolCallId.trim()
-          ? message.toolCallId.trim()
-          : null;
-        if (message?.role === "toolResult" && toolCallId) {
-          toolResultSourceIndexByCallId.set(toolCallId, sourceIndex);
-        }
-      }
-      let projectedDisplayIndex = 0;
-      for (let sourceIndex = 0; sourceIndex < sourceMessages.length; sourceIndex += 1) {
-        const message = sourceMessages[sourceIndex];
-        const entryId = typeof message?.id === "string" && message.id.trim() ? message.id.trim() : null;
-        if (entryId) sourceIndexByEntryId.set(entryId, sourceIndex);
-        if (
-          (message?.role === "user" || message?.role === "assistant")
-          && isDisplayableHistoryMessage(message)
-        ) {
-          if (entryId) displayIndexByEntryId.set(entryId, projectedDisplayIndex);
-          projectedDisplayIndex += 1;
-        }
-      }
-      for (const message of sourceMessages) {
-        if (message?.role !== "custom" || message.customType !== TURN_INPUT_CONSUMPTION_EVENT_TYPE) continue;
-        const parsed = parseTurnInputConsumptionRecord(message.data);
-        const deliveryId = typeof parsed?.deliveryId === "string" && parsed.deliveryId.trim()
-          ? parsed.deliveryId.trim()
-          : null;
-        const entryId = typeof parsed?.input?.entryId === "string" && parsed.input.entryId.trim()
-          ? parsed.input.entryId.trim()
-          : null;
-        const assistantEntryId = typeof parsed?.assistant?.entryId === "string" && parsed.assistant.entryId.trim()
-          ? parsed.assistant.entryId.trim()
-          : null;
-        if (deliveryId) turnInputConsumptionDeliveryIds.add(deliveryId);
-        if (entryId) turnInputConsumptionEntryIds.add(entryId);
-        if (assistantEntryId && entryId) turnInputByAssistantEntryId.set(assistantEntryId, entryId);
-      }
-      const recordMediaGenerationResult = (parsed, afterIndex, sourceIndex = null) => {
-        if (!parsed?.taskId || !isMediaGenerationDeferredResult(parsed)) return;
-        mediaGenerationResults.set(parsed.taskId, parsed);
-        if (parsed.status === "success") {
-          standaloneMediaGenerationResults.push({
-            ...parsed,
-            afterIndex,
-            ...(Number.isInteger(sourceIndex) ? { sourceIndex } : {}),
-          });
-        }
-      };
-      const recordTurnInputConsumptionInterlude = (message, afterIndex, sourceIndex = null) => {
-        const parsed = parseTurnInputConsumptionRecord(message?.data);
-        const block = parsed?.block;
-        if (!block || block.type !== "interlude") return;
-        const assistantEntryId = typeof parsed?.assistant?.entryId === "string" && parsed.assistant.entryId.trim()
-          ? parsed.assistant.entryId.trim()
-          : null;
-        const inputEntryId = typeof parsed?.input?.entryId === "string" && parsed.input.entryId.trim()
-          ? parsed.input.entryId.trim()
-          : null;
-        const assistantDisplayIndex = assistantEntryId
-          ? displayIndexByEntryId.get(assistantEntryId)
-          : undefined;
-        const anchoredAfterIndex = Number.isInteger(assistantDisplayIndex)
-          ? Math.max(0, assistantDisplayIndex - 1)
-          : afterIndex;
-        if (!Number.isInteger(anchoredAfterIndex) || anchoredAfterIndex < 0) return;
-        const inputSourceIndex = inputEntryId ? sourceIndexByEntryId.get(inputEntryId) : undefined;
-        const anchoredSourceIndex = Number.isInteger(inputSourceIndex) ? inputSourceIndex : sourceIndex;
-        const normalizedDeliveryId = typeof parsed.deliveryId === "string" && parsed.deliveryId.trim()
-          ? parsed.deliveryId.trim()
-          : null;
-        if (normalizedDeliveryId && deferredInterludeDeliveryIds.has(normalizedDeliveryId)) return;
-        blocks.push({
-          ...block,
-          ...(normalizedDeliveryId ? { deliveryId: normalizedDeliveryId } : {}),
-          afterIndex: anchoredAfterIndex,
-          ...(Number.isInteger(anchoredSourceIndex) ? { sourceIndex: anchoredSourceIndex } : {}),
+      if (reconciling) {
+        // reconciliation=1：严格证据等级（I12）——完全不进目录/条件快路径（B07），
+        // 与普通分页共用同一全量 projector（I04）。
+        const evidence = await loadSessionHistoryEvidence(engine, resolvedSessionPath, reconciliationSessionId);
+        const result = await projectFullHistoryPage(engine, {
+          sessionPath: resolvedSessionPath,
+          sourceMessages: evidence.messages,
+          beforeId,
+          limit,
+          forceAll,
+          sanitizeVisibleContent,
         });
-        if (normalizedDeliveryId) deferredInterludeDeliveryIds.add(normalizedDeliveryId);
-      };
-      const recordTurnInputPresentationInterlude = (message, afterIndex, sourceIndex = null) => {
-        if (!Number.isInteger(afterIndex) || afterIndex < 0) return;
-        const parsed = parseTurnInputPresentationRecord(message?.data);
-        const block = parsed?.block;
-        if (!block || block.type !== "interlude") return;
-        const normalizedDeliveryId = typeof parsed.deliveryId === "string" && parsed.deliveryId.trim()
-          ? parsed.deliveryId.trim()
-          : null;
-        if (normalizedDeliveryId && deferredInterludeDeliveryIds.has(normalizedDeliveryId)) return;
-        blocks.push({
-          ...block,
-          ...(normalizedDeliveryId ? { deliveryId: normalizedDeliveryId } : {}),
-          afterIndex,
-          ...(Number.isInteger(sourceIndex) ? { sourceIndex } : {}),
+        const afterRun = reconciling ? readDesktopInputRunSnapshot(engine, reconciliationSessionId, resolvedSessionPath) : null;
+        const reconciliation = reconciling ? {
+          sessionId: reconciliationSessionId, sessionPath: resolvedSessionPath, snapshotId: randomUUID(),
+          runRevision: afterRun!.revision, complete: evidence!.complete,
+          runStatus: !evidence!.complete || beforeRun!.revision !== afterRun!.revision ? 'unknown'
+            : beforeRun!.status === 'running' || afterRun!.status === 'running' ? 'running'
+              : beforeRun!.status === 'reconciled_idle' && afterRun!.status === 'reconciled_idle' ? 'reconciled_idle' : 'unknown',
+          ...(evidence!.diagnostic ? { diagnostic: evidence!.diagnostic } : {}),
+        } : undefined;
+        return c.json({
+          messages: result.messages, blocks: result.blocks, todos: result.todos,
+          hasMore: result.hasMore, nextBefore: result.nextBefore, sessionFiles: result.sessionFiles,
+          revision, ...(reconciliation ? { reconciliation } : {}),
         });
-        if (normalizedDeliveryId) deferredInterludeDeliveryIds.add(normalizedDeliveryId);
-      };
-      const recordDeferredInterlude = (parsed, afterIndex, deliveryId = null, sourceIndex = null) => {
-        if (!parsed?.taskId || !Number.isInteger(afterIndex) || afterIndex < 0) return;
-        const normalizedDeliveryId = typeof deliveryId === "string" && deliveryId.trim() ? deliveryId.trim() : null;
-        const sourceMessage = Number.isInteger(sourceIndex) ? sourceMessages[sourceIndex] : null;
-        const sourceEntryId = typeof sourceMessage?.id === "string" && sourceMessage.id.trim()
-          ? sourceMessage.id.trim()
-          : null;
-        if (normalizedDeliveryId && turnInputConsumptionDeliveryIds.has(normalizedDeliveryId)) return;
-        if (sourceEntryId && turnInputConsumptionEntryIds.has(sourceEntryId)) return;
-        if (normalizedDeliveryId && deferredInterludeDeliveryIds.has(normalizedDeliveryId)) return;
-        const task = deferredStore?.query?.(parsed.taskId) || null;
-        const run = engine.subagentRuns?.query?.(parsed.taskId) || null;
-        const runTask = taskFromSubagentRun(run);
-        const metadataTask = mergeSubagentTaskMetadata(runTask, task);
-        const metadataMeta = metadataTask?.meta || {};
-        const meta = {
-          ...metadataMeta,
-          type: parsed.type || metadataMeta.type || task?.meta?.type || "background-task",
-        };
-        const event = {
-          taskId: parsed.taskId,
-          deliveryId: normalizedDeliveryId,
-          status: parsed.status === "failed" || parsed.status === "aborted" ? parsed.status : "success",
-          result: Object.prototype.hasOwnProperty.call(parsed, "result") ? parsed.result : metadataTask?.result,
-          reason: parsed.reason || metadataTask?.reason || null,
-          meta,
-        };
-        const block = buildDeferredResultInterludeBlock(event, { receiverName });
-        if (!block) return;
-        blocks.push({
-          ...block,
-          afterIndex,
-          ...(Number.isInteger(sourceIndex) ? { sourceIndex } : {}),
-        });
-        if (normalizedDeliveryId) deferredInterludeDeliveryIds.add(normalizedDeliveryId);
-      };
-      const recordLoopInterlude = (message, afterIndex, sourceIndex = null) => {
-        // 循环任务的 kickoff/wakeup/notice 协议消息本身 display:false（含系统协议文本，
-        // 不宜直接展示）。这里把它提炼成一条用户可见的 interlude 气泡，让用户能看到自己
-        // 当初发起的任务，否则会在聊天界面以为"输入凭空消失"。block 构造与实时路径共用
-        // buildLoopInterludeBlock，保证文案一致；实时路径的 dedup id 说明见该函数注释。
-        if (!Number.isInteger(afterIndex) || afterIndex < 0) return;
-        const block = buildLoopInterludeBlock(message);
-        if (!block) return;
-        blocks.push({
-          ...block,
-          afterIndex,
-          ...(Number.isInteger(sourceIndex) ? { sourceIndex } : {}),
-        });
-      };
-      let displayIdx = 0;
-      let latestTurnInputEntryId: string | null = null;
-      let assistantOrdinalInTurn = 0;
-      // 初始视为“可见”：会话尚无输入时投影不应带 turnInputVisible:false（如角色卡
-      // 开场白）。只有真实出现过隐藏输入（隐藏 user 消息 / 隐藏 custom 输入 / loop
-      // 协议消息置 null）时才为 false，从而对 entryId 为 null 的隐藏轮也显式下发。
-      let latestTurnInputVisible = true;
-
-      for (let sourceIndex = 0; sourceIndex < sourceMessages.length; sourceIndex += 1) {
-        const m = sourceMessages[sourceIndex];
-        if (m.role === "user") {
-          assistantOrdinalInTurn = 0;
-          latestTurnInputEntryId = typeof m.id === "string" && m.id.trim() ? m.id.trim() : null;
-          latestTurnInputVisible = !isHiddenTurnInputMessage(m);
-          if (!isDisplayableHistoryMessage(m)) continue;
-          const currentIndex = displayIdx;
-          displayIdx += 1;
-          if (currentIndex >= pageBounds.startIdx && currentIndex < pageBounds.endIdx) {
-            const { text, images } = extractTextContent(m.content);
-            const visibleImages = filterUnreferencedInlineImages(text, images).map((image, ordinal) => {
-              if (!shouldDeferHistoryContent(image?.data)) return image;
-              const { data, ...rest } = image;
-              return {
-                ...rest,
-                deferred: createHistoryDeferredContent(
-                  sourceMessages,
-                  sourceIndex,
-                  "inline_image",
-                  ordinal,
-                  data,
-                  { preview: false },
-                ),
-              };
-            });
-            const content = sanitizeVisibleContent(text);
-            const originInfo = originBySourceIndex.get(sourceIndex);
-            const agentReview = agentReviewBySourceIndex.get(sourceIndex);
-            const presentation = presentationBySourceIndex.get(sourceIndex);
-            messages.push({
-              id: String(currentIndex),
-              sourceIndex,
-              ...(m.id ? { entryId: m.id } : {}),
-              role: "user",
-              content,
-              ...(m.clientMessageId ? { clientMessageId: m.clientMessageId, sourceEntryId: m.sourceEntryId, snapshotVersion: m.snapshotVersion } : {}),
-              ...(m.acceptanceDiagnostic ? { acceptanceDiagnostic: m.acceptanceDiagnostic } : {}),
-              images: visibleImages.length ? visibleImages : undefined,
-              ...(m.timestamp ? { timestamp: m.timestamp } : {}),
-              ...(originInfo?.origin ? { origin: originInfo.origin } : {}),
-              ...(typeof originInfo?.displayText === "string" ? { displayText: originInfo.displayText } : {}),
-              ...(agentReview ? { agentReview } : {}),
-              ...(typeof agentReview?.displayText === "string" ? { displayText: agentReview.displayText } : {}),
-              ...(typeof presentation?.displayText === "string" ? { displayText: presentation.displayText } : {}),
-              ...(Array.isArray(presentation?.skills) ? { skills: presentation.skills } : {}),
-              ...(Array.isArray(presentation?.sessionRefs) ? { sessionRefs: presentation.sessionRefs } : {}),
-              ...(Array.isArray(presentation?.agentMentions) ? { agentMentions: presentation.agentMentions } : {}),
-              ...(presentation?.knowledgeRefs ? { knowledgeRefs: presentation.knowledgeRefs } : {}),
-              ...(presentation?.knowledgeRetrieval ? { knowledgeRetrieval: presentation.knowledgeRetrieval } : {}),
-              ...(presentation?.agentReviewRequest ? { agentReviewRequest: presentation.agentReviewRequest } : {}),
-            });
-          }
-        } else if (m.role === "assistant") {
-          assistantOrdinalInTurn += 1;
-          if (!isDisplayableHistoryMessage(m)) continue;
-          const assistantEntryId = typeof m.id === "string" && m.id.trim() ? m.id.trim() : null;
-          const consumedTurnInputEntryId = assistantEntryId
-            ? turnInputByAssistantEntryId.get(assistantEntryId) || null
-            : null;
-          const turnInputEntryId = consumedTurnInputEntryId || latestTurnInputEntryId;
-          const turnInputVisible = consumedTurnInputEntryId ? false : latestTurnInputVisible;
-          const currentIndex = displayIdx;
-          displayIdx += 1;
-          if (currentIndex >= pageBounds.startIdx && currentIndex < pageBounds.endIdx) {
-            const { text, thinking, toolUses } = extractTextContent(m.content, { stripThink: true });
-            const extractedAssistantSegments = extractPersistedAssistantSemanticSegments(
-              m.content,
-              assistantOrdinalInTurn,
-            );
-            const assistantSegments = extractedAssistantSegments.map((segment, ordinal) => {
-              if (segment.kind !== "reasoning" || !shouldDeferHistoryContent(segment.source)) return segment;
-              const deferred = createHistoryDeferredContent(
-                sourceMessages,
-                sourceIndex,
-                "assistant_segment",
-                ordinal,
-                segment.source,
-              );
-              return { ...segment, source: deferred.preview || "", deferred };
-            });
-            const turnStatus = m.stopReason === "error"
-              ? "failed"
-              : m.stopReason === "aborted"
-                ? "aborted"
-                : "completed";
-            const content = sanitizeVisibleContent(text);
-            const projectedToolUses = toolUses.map((toolUse) => {
-              const outcome = toolUse.id ? toolOutcomesByCallId.get(toolUse.id) : null;
-              const outcomeSourceIndex = toolUse.id
-                ? toolResultSourceIndexByCallId.get(toolUse.id)
-                : undefined;
-              let projectedOutcome = outcome;
-              if (outcome?.details && Number.isInteger(outcomeSourceIndex)) {
-                const details = { ...outcome.details };
-                const rawResultContent = soleRawToolResultText(sourceMessages[outcomeSourceIndex]);
-                if (details.output !== undefined && shouldDeferHistoryContent(rawResultContent)) {
-                  const deferred = createHistoryDeferredContent(
-                    sourceMessages,
-                    outcomeSourceIndex,
-                    "tool_output",
-                    0,
-                    rawResultContent,
-                  );
-                  details.output = deferred.preview;
-                  details.outputDeferred = deferred;
-                }
-                if (details.skillInvocation && shouldDeferHistoryContent(rawResultContent)) {
-                  const deferred = createHistoryDeferredContent(
-                    sourceMessages,
-                    outcomeSourceIndex,
-                    "skill_content",
-                    0,
-                    rawResultContent,
-                  );
-                  details.skillInvocation = {
-                    ...details.skillInvocation,
-                    content: deferred.preview || "",
-                    deferred,
-                  };
-                }
-                projectedOutcome = { ...outcome, details };
-              }
-              // 工具计时（dsh 轨迹视图同款「Session timestamps」口径）：
-              // startedAt = 携带 tool_use 的 assistant 条目时间（工具执行前落盘），
-              // endedAt = 对应 toolResult 条目时间（执行后落盘）。
-              const toolResultTimestamp = outcome !== null
-                && Number.isInteger(outcomeSourceIndex)
-                ? sourceMessages[outcomeSourceIndex]?.timestamp
-                : undefined;
-              return {
-                ...toolUse,
-                ...(m.timestamp ? { startedAt: m.timestamp } : {}),
-                ...(toolResultTimestamp ? { endedAt: toolResultTimestamp } : {}),
-                ...(projectedOutcome || { status: "unknown", success: false }),
-              };
-            });
-            const deferredThinking = assistantSegments.find((segment) => segment.kind === "reasoning")?.source;
-            messages.push({
-              id: String(currentIndex),
-              sourceIndex,
-              ...(m.id ? { entryId: m.id } : {}),
-              role: "assistant",
-              content,
-              ...(modelCallReferenceBySourceIndex.has(sourceIndex)
-                ? { modelCallRef: modelCallReferenceBySourceIndex.get(sourceIndex) }
-                : {}),
-              assistantSegments,
-              ...(turnStatus !== "completed" ? { turnStatus } : {}),
-              ...(turnInputEntryId
-                ? { turnInputEntryId, turnInputVisible }
-                // 隐藏输入轮次（如 loop 轮）entryId 被刻意置 null，但仍要显式下发
-                // turnInputVisible:false，否则前端技能卡「参数」会回退猜成前一条可见用户消息。
-                : (turnInputVisible === false ? { turnInputVisible: false } : {})),
-              ...(contentHasThinkingBlock(m.content, { stripThink: true })
-                ? { thinking: deferredThinking ?? thinking }
-                : {}),
-              toolCalls: projectedToolUses.length ? projectedToolUses : undefined,
-              ...(m.timestamp ? { timestamp: m.timestamp } : {}),
-            });
-          }
-        } else if (m.role === "toolResult") {
-          const afterIndex = displayIdx - 1;
-          if (afterIndex >= pageBounds.startIdx && afterIndex < pageBounds.endIdx) {
-            const extracted = extractBlocks(m.toolName, m.details, m);
-            for (let ordinal = 0; ordinal < extracted.length; ordinal += 1) {
-              const b = extracted[ordinal];
-              const overlaid = overlaySessionCollabDecision(b, sessionCollabDecisions);
-              blocks.push({
-                ...deferHeavyHistoryBlock(sourceMessages, sourceIndex, ordinal, overlaid),
-                afterIndex,
-                sourceIndex,
-              });
-            }
-          }
-        } else if (m.role === "custom") {
-          if (isCustomTurnInputHistoryMessage(m)) {
-            assistantOrdinalInTurn = 0;
-            latestTurnInputEntryId = typeof m.id === "string" && m.id.trim() ? m.id.trim() : null;
-            latestTurnInputVisible = false;
-          }
-          const afterIndex = displayIdx - 1;
-          if (m.display !== false && afterIndex >= pageBounds.startIdx && afterIndex < pageBounds.endIdx) {
-            const extracted = extractBlocks(m.customType, m.details, m);
-            for (let ordinal = 0; ordinal < extracted.length; ordinal += 1) {
-              const b = extracted[ordinal];
-              blocks.push({
-                ...deferHeavyHistoryBlock(sourceMessages, sourceIndex, ordinal, b),
-                afterIndex,
-                sourceIndex,
-              });
-            }
-          }
-          const parsed = parseHistoryDeferredResult(m);
-          recordMediaGenerationResult(parsed, afterIndex, sourceIndex);
-          if (m.customType === TURN_INPUT_CONSUMPTION_EVENT_TYPE) {
-            recordTurnInputConsumptionInterlude(m, afterIndex, sourceIndex);
-          }
-          if (m.customType === TURN_INPUT_PRESENTATION_EVENT_TYPE) {
-            recordTurnInputPresentationInterlude(m, afterIndex, sourceIndex);
-          }
-          if (m.customType === DEFERRED_RESULT_MESSAGE_TYPE) {
-            const nextAssistantIndex = nextImmediateDisplayableAssistantIndex(sourceMessages, sourceIndex, displayIdx);
-            recordDeferredInterlude(
-              parsed,
-              nextAssistantIndex == null ? null : nextAssistantIndex - 1,
-              historyDeferredDeliveryId(m, sourceIndex),
-              sourceIndex,
-            );
-          }
-          if (m.customType === LOOP_TURN_MESSAGE_TYPE || m.customType === LOOP_NOTICE_MESSAGE_TYPE) {
-            if (m.customType === LOOP_TURN_MESSAGE_TYPE) {
-              // kickoff/wakeup 协议消息才是驱动 loop 轮的输入，但它不是合法重试目标
-              // （isSessionTurnInputEntry 为 false）。指针不能停在 loop-user-prompt（custom
-              // 条目，重试必报错）或 /loop 之前的真实用户消息（重试会裁掉整个循环）——
-              // 置 null，让其后每个 loop 轮 assistant 回复不带 turnInputEntryId（无重试入口）。
-              latestTurnInputEntryId = null;
-              latestTurnInputVisible = false;
-            }
-            recordLoopInterlude(m, afterIndex, sourceIndex);
-          }
-        }
       }
 
-      if (resolvedSessionPath && typeof deferredStore?.listBySession === "function") {
-        for (const task of deferredStore.listBySession(resolvedSessionPath)) {
-          if (!isTerminalDeferredTask(task)) continue;
-          const parsed = buildDeferredResultRecord(task.taskId, task);
-          recordMediaGenerationResult(parsed, pageBounds.total - 1);
-          recordDeferredInterlude(parsed, null);
-        }
-      }
-      const resolvedBlocks = resolveMediaGenerationBlocks(
-        blocks,
-        mediaGenerationResults,
-        standaloneMediaGenerationResults,
-      );
-
-      // 重映射 afterIndex 到切片内偏移，过滤超出范围的
-      const slicedBlocks = forceAll
-        ? resolvedBlocks
-        : resolvedBlocks
-          .filter(b => b.afterIndex >= pageBounds.startIdx && b.afterIndex < pageBounds.endIdx)
-          .map(b => ({ ...b, afterIndex: b.afterIndex - pageBounds.startIdx }));
-      const hasMore = pageBounds.hasMore;
-
-      // 修正 subagent blocks 的状态：优先从 durable run registry 读长期映射，
-      // 再用 deferred store 作为实时投递队列。deferred 会清理，不再承担历史事实源。
-      {
-        const deferredStore = engine.deferredResults;
-        const runStore = engine.subagentRuns;
-        const readSessionMeta = createSubagentMetaCache();
-        const readSessionSummary = createSubagentSummaryCache();
-        for (const b of slicedBlocks) {
-          if (b.type !== "subagent" || !b.taskId) continue;
-          const task = deferredStore?.query?.(b.taskId) || null;
-          const run = runStore?.query?.(b.taskId) || null;
-          const runTask = taskFromSubagentRun(run);
-          const metadataTask = mergeSubagentTaskMetadata(runTask, task);
-          const durableSessionId = run?.childSessionId || null;
-          const durableSessionPath = run?.childSessionPath || null;
-          const deferredSessionId = task?.meta?.sessionId || null;
-          const deferredSessionPath = task?.meta?.sessionPath || null;
-          if (!b.sessionId && durableSessionId) b.sessionId = durableSessionId;
-          if (!b.sessionId && deferredSessionId) b.sessionId = deferredSessionId;
-          if (!b.streamKey && durableSessionPath) b.streamKey = durableSessionPath;
-          if (!b.streamKey && deferredSessionPath) b.streamKey = deferredSessionPath;
-          {
-            const sessionRef = resolveSubagentBlockSession(b, metadataTask, run);
-            if (sessionRef.sessionId && !b.sessionId) b.sessionId = sessionRef.sessionId;
-            if (sessionRef.sessionPath) b.streamKey = sessionRef.sessionPath;
-          }
-          patchBlockRequestedMetadata(b, metadataTask);
-          patchBlockExecutorMetadata(b, metadataTask, readSessionMeta);
-          applySubagentIdentity(b, metadataTask, readSessionMeta);
-
-          if (b.streamStatus !== "running") continue;
-
-          const terminalTask = run && run.status !== "pending" ? runTask : task;
-
-          // subagent 完成状态只能由 durable run registry 或 deferred store 的任务终态确认。
-          // 子 session 可能有多轮输出，尾部 assistant 文本只能作为 resolved 后的摘要来源。
-          if (terminalTask?.status === "aborted") {
-            b.streamStatus = "aborted";
-            b.summary = terminalTask.reason || "aborted";
-            if (terminalTask.meta?.sessionPath) b.streamKey = terminalTask.meta.sessionPath;
-            patchBlockRequestedMetadata(b, terminalTask);
-            patchBlockExecutorMetadata(b, terminalTask, readSessionMeta);
-            applySubagentIdentity(b, terminalTask, readSessionMeta);
-            continue;
-          }
-          if (terminalTask?.status === "failed") {
-            b.streamStatus = "failed";
-            b.summary = terminalTask.reason || "failed";
-            if (terminalTask.meta?.sessionPath) b.streamKey = terminalTask.meta.sessionPath;
-            patchBlockRequestedMetadata(b, terminalTask);
-            patchBlockExecutorMetadata(b, terminalTask, readSessionMeta);
-            applySubagentIdentity(b, terminalTask, readSessionMeta);
-            continue;
-          }
-          if (terminalTask?.status === "resolved") {
-            b.streamStatus = "done";
-            if (terminalTask.meta?.sessionPath) b.streamKey = terminalTask.meta.sessionPath;
-            patchBlockRequestedMetadata(b, terminalTask);
-            patchBlockExecutorMetadata(b, terminalTask, readSessionMeta);
-            applySubagentIdentity(b, terminalTask, readSessionMeta);
-
-            const sp = b.streamKey || terminalTask.meta?.sessionPath || null;
-            const summary = await readSessionSummary(sp);
-            b.summary = summary || (typeof terminalTask.result === "string" ? terminalTask.result.slice(0, 200) : b.summary);
-            continue;
-          }
-
-          if (run?.status === "pending" && !task) {
-            b.streamStatus = "failed";
-            b.summary = t("session.subagentRunStateUnrecoverable");
-            continue;
-          }
-
-          if (!b.streamKey && !run && !task) {
-            b.streamStatus = "failed";
-            b.summary = t("session.subagentLinkUnrecoverable");
-          }
-        }
-      }
-
-      // workflow inline 概览块回填：block_update patch 是前端瞬时事件、未持久化进 toolResult details，
-      // 重启后块保留派单时的 streamStatus:"running" + startedAt，会显示离谱「已运行 Xm」时长。
-      // 从 durable runStore 读终态修正，并用 completedAt 补 finishedAt（inline 卡算总时长用）。
-      {
-        const wfRunStore = engine.subagentRuns;
-        const wfDeferredStore = engine.deferredResults;
-        for (const b of slicedBlocks) {
-          if (b.type !== "workflow" || !b.taskId) continue;
-          if (b.streamStatus !== "running") continue;
-          const run = wfRunStore?.query?.(b.taskId) || null;
-          const task = wfDeferredStore?.query?.(b.taskId) || null;
-          const status = run?.status || task?.status || null;
-          if (status === "resolved" || status === "done") b.streamStatus = "done";
-          else if (status === "failed") b.streamStatus = "failed";
-          else if (status === "aborted") b.streamStatus = "aborted";
-          else continue; // 仍 pending / 无记录：保持 running，不误判完成
-          if (!b.finishedAt && run?.completedAt) {
-            const ts = Date.parse(run.completedAt);
-            if (Number.isFinite(ts)) b.finishedAt = ts;
-          }
-          if (!b.summary && typeof run?.summary === "string") b.summary = run.summary;
-        }
-      }
-
-      patchSessionFileLifecycleBlocks(slicedBlocks, engine, resolvedSessionPath);
-      const sessionFiles = listSessionRegistryFiles(engine, resolvedSessionPath, sourceMessages);
-
-      // 从历史中提取最新 todo 状态：branch-aware，沿当前 leaf 回溯到 root，
-      // 只在当前分支路径上找最新合法快照。避免从抛弃的分支取到错误状态。
-      const todos = extractLatestTodos(sourceMessages);
+      // 普通分页：目录快路径（B06 生产启用点）。身份解析/授权已先行（I01）；
+      // 快照/回退链内建：目录尝试 1 → invalidate+重建 → 尝试 2 → legacy 全量（P11）。
+      const outcome = await readSessionHistoryPage({
+        engine,
+        cache: historyDirectoryCache,
+        sessionPath: resolvedSessionPath,
+        sessionId: reconciliationSessionId,
+        studioId: requestContext.studioId ?? null,
+        beforeId,
+        limit,
+        forceAll,
+        sanitizeVisibleContent,
+        disableCache: engine.historyReadDisableCache === true,
+      });
+      if (outcome.mode === "error") throw outcome.error;
 
       // 重启后右侧 workflow 卡复原：ActivityHub 已从持久化背书回灌该会话的 workflow 活动，
       // 这里在「首屏载入」（非翻页）时重发一遍，让前端 agent-activity slice 重新填充。
-      // 翻页（beforeId != null）不重发，避免重复广播。WS 是全局广播、前端按 sessionPath 入库。
-      if (!reconciling && beforeId == null && resolvedSessionPath) {
+      // 翻页（beforeId != null）不重发，避免重复广播；目录重试成功后恰一次（B07）。
+      if (beforeId == null && resolvedSessionPath) {
         engine.activityHub?.rebroadcastSession?.(resolvedSessionPath);
       }
 
-      const afterRun = reconciling ? readDesktopInputRunSnapshot(engine, reconciliationSessionId, resolvedSessionPath) : null;
-      const reconciliation = reconciling ? {
-        sessionId: reconciliationSessionId, sessionPath: resolvedSessionPath, snapshotId: randomUUID(),
-        runRevision: afterRun!.revision, complete: evidence!.complete,
-        runStatus: !evidence!.complete || beforeRun!.revision !== afterRun!.revision ? 'unknown'
-          : beforeRun!.status === 'running' || afterRun!.status === 'running' ? 'running'
-            : beforeRun!.status === 'reconciled_idle' && afterRun!.status === 'reconciled_idle' ? 'reconciled_idle' : 'unknown',
-        ...(evidence!.diagnostic ? { diagnostic: evidence!.diagnostic } : {}),
-      } : undefined;
-      return c.json({ messages, blocks: slicedBlocks, todos, hasMore, sessionFiles, revision, ...(reconciliation ? { reconciliation } : {}) });
+      // E02 条件 GET：成功返回边界（授权/B-C 读取/快照复核/外部状态补齐/rebroadcast
+      // 全部完成后）。序列化当前页面一次：200 复用同一字节串发送；字节串不写入任何
+      // 缓存，请求结束即释放（E02.1）。all/reconciliation 已在上方分支返回，不进入
+      // 本段（E01 304 资格）。
+      // COMPAT：旧客户端不发 If-None-Match → 恒走无条件 200 分支；条件求值与协议头
+      // 实现见 server/history-read/protocol.ts；相关测试
+      // tests/history-protocol-conditional.test.ts；退役条件=全部连接确认协议 v1
+      // 能力后无能力回退分支才可移除（不设自动删除日期）。
+      const responseBody = JSON.stringify({
+        messages: outcome.result.messages, blocks: outcome.result.blocks, todos: outcome.result.todos,
+        hasMore: outcome.result.hasMore, nextBefore: outcome.result.nextBefore, sessionFiles: outcome.result.sessionFiles,
+        revision,
+      });
+      const conditional = evaluateHistoryConditionalGet({
+        responseBodyUtf8: responseBody,
+        revision,
+        forceAll,
+        reconciling,
+        mode: outcome.mode,
+        scope: {
+          principalId: requestContext.principalId ?? null,
+          serverNodeId: requestContext.serverNodeId ?? null,
+          studioId: requestContext.studioId ?? null,
+          sessionId: reconciliationSessionId,
+          normalizedPath: resolvedSessionPath ? path.resolve(resolvedSessionPath) : null,
+          branchIdentity: outcome.branchIdentity ?? null,
+        },
+        beforeId,
+        limit,
+        ifNoneMatch: c.req.header("If-None-Match"),
+        requestId: c.req.header("x-request-id") ?? null,
+      });
+      if (conditional.status === 304) {
+        return c.body(null, 304, conditional.headers);
+      }
+      return c.body(responseBody, 200, conditional.headers);
     } catch (err) {
       return c.json({ error: err.message }, 500);
     }
@@ -3064,6 +2278,9 @@ export function createSessionsRoute(engine, hub = null) {
           return c.json({ error: "Stage file sidecar destination already exists" }, 409);
         }
 
+        // C02：恢复 rename——写前递增源与目标路径的变更世代。
+        noteSessionFileMutation(sessionPath, "rename");
+        noteSessionFileMutation(destPath, "rename");
         await fs.rename(sessionPath, destPath);
         moveSessionFileSidecarSync(sessionPath, destPath);
         let manifest = null;
@@ -3131,100 +2348,6 @@ export function createSessionsRoute(engine, hub = null) {
   });
 
   return route;
-}
-
-function patchSessionFileLifecycleBlocks(blocks, engine, sessionPath) {
-  if (!sessionPath) return;
-  for (const block of blocks || []) {
-    if (!block) continue;
-    if (!["file", "artifact", "skill", "screenshot"].includes(block.type)) continue;
-    let file = null;
-    if (block.fileId && typeof engine?.getSessionFile === "function") {
-      file = engine.getSessionFile(block.fileId, { sessionPath });
-    }
-    if (!file && block.filePath && typeof engine?.getSessionFileByPath === "function") {
-      file = engine.getSessionFileByPath(block.filePath, { sessionPath });
-    }
-    if (!file && block.type === "screenshot" && block.base64 && engine?.lingxiHome && typeof engine?.getSessionFileByPath === "function") {
-      try {
-        const filePath = browserScreenshotPath(engine.lingxiHome, sessionPath, {
-          base64: block.base64,
-          mimeType: block.mimeType,
-          sessionId: engine.getSessionIdForPath?.(sessionPath) || null,
-        });
-        file = engine.getSessionFileByPath(filePath, { sessionPath });
-        if (file) block.type = "file";
-      } catch {}
-    }
-    if (!file) continue;
-    const patch = sessionFileLifecycleFields(file, engine);
-    Object.assign(block, patch);
-    if (block.type === "skill" && block.installedFile) {
-      block.installedFile = { ...block.installedFile, ...patch };
-    }
-  }
-}
-
-function listSessionRegistryFiles(engine, sessionPath, activeReferences = []) {
-  if (!sessionPath || typeof engine?.listSessionFiles !== "function") return [];
-  return engine.listSessionFiles(sessionPath, { references: activeReferences })
-    .map(file => {
-      if (typeof engine.serializeSessionFile === "function") return engine.serializeSessionFile(file);
-      return serializeSessionFile(file, { runtimeContext: engine?.runtimeContext || null });
-    })
-    .filter(Boolean);
-}
-
-function isMediaGenerationDeferredResult(result) {
-  return result?.type === "image-generation" || result?.type === "video-generation";
-}
-
-function parseHistoryDeferredResult(message) {
-  if (message?.customType === DEFERRED_RESULT_RECORD_TYPE) {
-    return parseDeferredResultRecord(message.data);
-  }
-  if (message?.customType === DEFERRED_RESULT_MESSAGE_TYPE) {
-    return parseDeferredResultNotification(message.content);
-  }
-  return null;
-}
-
-function historyDeferredDeliveryId(message, sourceIndex) {
-  const details = message?.details && typeof message.details === "object" ? message.details : null;
-  const fromDetails = typeof details?.deliveryId === "string" && details.deliveryId.trim()
-    ? details.deliveryId.trim()
-    : null;
-  if (fromDetails) return fromDetails;
-  return `history:${sourceIndex}`;
-}
-
-function isTerminalDeferredTask(task) {
-  return task?.status === "resolved" || task?.status === "failed" || task?.status === "aborted";
-}
-
-function sessionFileLifecycleFields(file, engine) {
-  const serialized = typeof engine?.serializeSessionFile === "function"
-    ? engine.serializeSessionFile(file)
-    : file;
-  const source = serialized || file;
-  const fileId = source.fileId || source.id || file.fileId || file.id || null;
-  return {
-    ...(fileId ? { fileId } : {}),
-    ...(source.filePath ? { filePath: source.filePath } : {}),
-    ...(source.label || source.displayName ? { label: source.label || source.displayName } : {}),
-    ...(source.ext !== undefined ? { ext: source.ext } : {}),
-    ...(source.mime ? { mime: source.mime } : {}),
-    ...(source.kind ? { kind: source.kind } : {}),
-    ...(source.storageKind ? { storageKind: source.storageKind } : {}),
-    ...(source.presentation ? { presentation: source.presentation } : {}),
-    ...(source.listed !== undefined ? { listed: source.listed !== false } : {}),
-    ...(source.status ? { status: source.status } : {}),
-    ...(source.missingAt !== undefined ? { missingAt: source.missingAt } : {}),
-    ...(source.mtimeMs !== undefined ? { mtimeMs: source.mtimeMs } : {}),
-    ...(source.size !== undefined ? { size: source.size } : {}),
-    ...(source.version ? { version: source.version } : {}),
-    ...(source.resource ? { resource: source.resource } : {}),
-  };
 }
 
 // 仅供测试使用的内部函数出口；生产调用一律走 route handler。

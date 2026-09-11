@@ -6,6 +6,7 @@ import type {
 } from '../stores/chat-types';
 import type { LiveAssistantSegment } from '../stores/live-turn-store';
 import { normalizeContentBlocks } from './content-semantics';
+import { resolveAssistantTurnOutcome } from './turn-outcome';
 
 export interface TurnProjectionDiagnostic {
   code: 'unresolved_phase_fallback';
@@ -20,6 +21,12 @@ export interface ProjectAssistantTurnInput {
   segments: readonly LiveAssistantSegment[];
   legacyBlocks: readonly ContentBlock[];
   status: AssistantTurnStatus;
+  /**
+   * 输入是否覆盖 Run 的权威尾部（默认 true）。false = Run 仍在进行、或本组只是
+   * Run 的被分页截断的更早片段：此时不得派生任何整轮终态块/结局——结局裁决
+   * 只属于 Run 尾部（F2/T06）。实时路径不传该字段，行为不变。
+   */
+  runTerminal?: boolean;
   startedAt?: number;
   completedAt?: number;
 }
@@ -145,7 +152,7 @@ function demotePreAnchorNarration(blocks: ContentBlock[]): ContentBlock[] {
 
 function turnStatusBlock(
   input: ProjectAssistantTurnInput,
-  hasToolCalls: boolean,
+  outcome: ReturnType<typeof resolveAssistantTurnOutcome> | null,
 ): Extract<ContentBlock, { type: 'turn_status' }> | null {
   if (input.status === 'streaming') return null;
   if (input.status === 'failed') {
@@ -166,12 +173,13 @@ function turnStatusBlock(
       lifecycle: 'sealed',
     };
   }
-  // 任务书 §三十四：turnStatusBlock 只在 Assistant Run 真正 terminal（sealed）时被投影，
-  // 此时 agent 循环已停，带工具但没有最终答复同样算 completed_without_user_output，
-  // 不再豁免（旧逻辑把「有工具调用」当成「循环还会继续」是 Model Turn 层级才成立的假设）。
-  void hasToolCalls;
+  // 任务书 §三十四 / 结局唯一裁决（F3）：completed 分支的「未生成最终回复」只能来自
+  // resolveAssistantTurnOutcome 的 completed_without_user_output 判定，投影器不再用
+  // 答案/结果/控制区的局部判空自行猜测（存在答案块 ≠ 非空答案；存在控制块 ≠ 待处理输出）。
+  // 状态块 id 由 Run 键派生：同一 Run 无论投影重算多少次都得到同一个 id，保证每 Run 至多一个。
+  // runTerminal=false 时 outcome 为 null：Run 尾部不在本输入内，不派生任何终态。
+  if (outcome === null || outcome.outcome !== 'completed_without_user_output') return null;
   return {
-    // id 由 Run 键派生：同一 Run 无论投影重算多少次都得到同一个 id，保证每 Run 至多一个
     id: `${input.idPrefix}:missing-final-answer`,
     type: 'turn_status',
     status: 'missing_final_answer',
@@ -188,7 +196,10 @@ export function projectAssistantTurn(input: ProjectAssistantTurnInput): ProjectA
   const hasSemanticReasoning = input.segments.some((segment) => segment.kind === 'reasoning');
   const legacyBlocks = normalizeContentBlocks(
     input.legacyBlocks.filter((block) => !(
-      (hasSemanticText && block.type === 'text')
+      // 派生 turn_status 永远不是原始事实：输入里残留的旧投影状态块在此剔除、
+      // 由本次投影按权威裁决重新生成（同 Run 稳定 id），不得作为结果存在性证据。
+      block.type === 'turn_status'
+      || (hasSemanticText && block.type === 'text')
       || (hasSemanticReasoning && block.type === 'thinking')
     )),
     {
@@ -213,15 +224,20 @@ export function projectAssistantTurn(input: ProjectAssistantTurnInput): ProjectA
   const resultBlocks = allBlocks.filter((block) => block.surfaceRole === 'result');
   const controlBlocks = allBlocks.filter((block) => block.surfaceRole === 'control');
 
+  // 结局唯一裁决（F3）：分区完成后交 resolveAssistantTurnOutcome 统一判定，
+  // 投影器与渲染层消费同一结果，不再各自按数组判空猜测整轮结局。
   // provisional 是"还没判明身份"的临时文字，不算答案：终结态下它已被回退成
-  // final_answer，这里的判空条件不会因为 provisional 而误免 missing_final_answer。
-  const hasToolCalls = allBlocks.some((block) => (
-    block.type === 'tool_group' && Array.isArray(block.tools) && block.tools.length > 0
-  ));
-  if (answerBlocks.length === 0 && resultBlocks.length === 0 && controlBlocks.length === 0) {
-    const statusBlock = turnStatusBlock(input, hasToolCalls);
-    if (statusBlock) resultBlocks.push(statusBlock);
-  }
+  // final_answer，裁决不会因为 provisional 而误免 missing_final_answer。
+  // runTerminal=false（Run 尾部不在本输入内）时不裁决：未知 ≠ 没有输出。
+  const runTerminal = input.runTerminal !== false;
+  const outcome = runTerminal
+    ? resolveAssistantTurnOutcome({
+        blocks: [...processBlocks, ...provisionalBlocks, ...answerBlocks, ...resultBlocks, ...controlBlocks],
+        status: input.status,
+      })
+    : null;
+  const statusBlock = turnStatusBlock(input, outcome);
+  if (statusBlock) resultBlocks.push(statusBlock);
 
   const blocks = [...processBlocks, ...provisionalBlocks, ...answerBlocks, ...resultBlocks, ...controlBlocks]
     // processOrder 只是投影排序的内部依据：交错完成后顺序已物化为数组位置，
@@ -242,6 +258,8 @@ export function projectAssistantTurn(input: ProjectAssistantTurnInput): ProjectA
     resultBlockIds: resultBlocks.map((block) => block.id!),
     controlBlockIds: controlBlocks.map((block) => block.id!),
     status: input.status,
+    ...(outcome ? { outcome: outcome.outcome } : {}),
+    ...(outcome?.missingFinalAnswerReason ? { missingFinalAnswerReason: outcome.missingFinalAnswerReason } : {}),
     ...(input.startedAt !== undefined ? { startedAt: input.startedAt } : {}),
     ...(input.completedAt !== undefined ? { completedAt: input.completedAt } : {}),
   };

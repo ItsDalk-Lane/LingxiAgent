@@ -3,6 +3,7 @@
 import {
   submitDesktopSessionMessageWithReceipt,
   submitDesktopSessionInterjection,
+  isDesktopInputRejectedBeforeAcceptance,
 } from "../../core/desktop-session-submit.ts";
 import { t } from "../i18n.ts";
 
@@ -34,7 +35,7 @@ export async function deliverAgentMessage(engine: any, opts: {
   const submitAccepted = () => {
     const submission = submitDesktopSessionMessageWithReceipt(engine, payload);
     submission.completion.catch((err: any) => {
-      console.warn("[session-collab] delivered turn failed after acceptance:", err?.message || err);
+      console.warn("[session-collab] message submission failed:", err?.message || err);
     });
     return submission.accepted;
   };
@@ -50,8 +51,8 @@ export async function deliverAgentMessage(engine: any, opts: {
   try {
     await primary();
   } catch (err: any) {
-    // 竞态兜底一次：提交瞬间对方恰好开跑/刚停。只兜 session_busy，其它错误原样上抛。
-    if (err?.message !== "session_busy") throw err;
+    // 只对已经证明未接受的忙态竞态换路一次，不能按错误文案重发结果未知的输入。
+    if (err?.message !== "session_busy" || !isDesktopInputRejectedBeforeAcceptance(err)) throw err;
     await fallback();
   }
   return { accepted: true, targetSessionId };

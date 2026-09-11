@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-09-11",
+  "checkpoint": {
+    "label": "D02 基线（A01 clone HEAD=1d42b740 纯净树全量）",
+    "passed": 13544,
+    "failed": 7,
+    "skipped": 7,
+    "exitCode": 1,
+    "failures": [
+      "desktop/src/react/__tests__/settings/observability/ObservabilityDateLine.test.tsx > hovering a date region shows its tooltip card; leaving hides it; hit zones cover their dots",
+      "desktop/src/react/__tests__/settings/observability/ObservabilityDateLine.test.tsx > ticks sit exactly under their dots and spread evenly (greedy min-gap)",
+      "tests/packaged-desktop-cleanup.test.ts > 持续未就绪仍在原有 90 秒期限失败",
+      "tests/post-verification-audit-seal.test.ts > changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced)",
+      "tests/round2-delivery-evidence.test.ts > R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁",
+      "tests/round2-delivery-evidence.test.ts > R10-04: tracked 与 untracked 源文件全部进入 manifest",
+      "tests/round3-delivery-evidence.test.ts > round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试"
+    ],
+    "classification": "全部为 A01 既有（HEAD 纯净树即失败）：ObservabilityDateLine×2（桌面图表几何）、packaged-desktop-cleanup（90s 超时）、audit-seal（封印坐标）、round2×2+round3×1（交付证据 manifest 复算，活工作区含任务改动即红）"
+  },
+  "final": {
+    "label": "F04 当前工作区全量（E 协议+K=100 落地后）",
+    "passed": 13735,
+    "failed": 7,
+    "skipped": 7,
+    "exitCode": 1,
+    "failures": "与基线 7 签名逐条一致（diff=空，IDENTICAL_SET）",
+    "log": "/tmp/f04-full3.log"
+  },
+  "classification": {
+    "原有失败保持": 7,
+    "任务引入失败": 0,
+    "已消除": 0,
+    "note": "E 批次期间曾出现 cli-closure×2/open-boundary×1（闭包与边界基线未随新源再生成）——已按 D03 同类约定再生成基线并登记 manifest 后消除，复跑通过"
+  },
+  "intermediateFailuresResolved": [
+    "tests/cli-closure-census.test.ts ×2（闭包基线再生后消除）",
+    "tests/open-boundary-lint.test.ts ×2（export-manifest 登记 overview/protocol + 基线再生后消除）",
+    "desktop/src/react/__tests__/history-protocol-client.test.ts 失效清单（invalidateSessionCache 动态导入异步时序）——等待微任务后消除"
+  ]
+}

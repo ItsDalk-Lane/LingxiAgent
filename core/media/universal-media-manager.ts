@@ -322,6 +322,9 @@ export class UniversalMediaManager {
   declare _sessionFiles: any;
   declare _speechRecognition: any;
   declare _store: any;
+  _generation = 0;
+  _lifecycleController = new AbortController();
+  _operations = new Set<Promise<any>>();
 
   constructor({
     lingxiHome,
@@ -558,7 +561,11 @@ export class UniversalMediaManager {
   start(bus) {
     if (!bus) throw new Error("UniversalMediaManager.start requires bus");
     if (this._bus === bus && this._poller) return;
-    this.stop({ keepStore: true });
+    // 先证明旧快照已保存；旧操作同步失效后可安全装配新一代，回收继续受 stop 持有。
+    this._store.requireFlush();
+    void this.stop({ keepStore: true }).catch(error => this._log.error?.("[media] previous runtime shutdown failed", error));
+    this._generation += 1;
+    this._lifecycleController = new AbortController();
     this._bus = bus;
     this._poller = new Poller({
       store: this._store,
@@ -571,7 +578,6 @@ export class UniversalMediaManager {
       usageLedger: this._getUsageLedger(),
     });
     this._registerBusHandlers(bus);
-    this._poller.start();
     // F12/P8.4：旧 pending 语音 response 任务在启动时幂等收尾（文件在→done、
     // 缺→failed；不重新合成、不通知会话、不产生新模型调用）。图片/视频与
     // session 投递的 pending 任务不在特例范围内。
@@ -579,20 +585,51 @@ export class UniversalMediaManager {
     if (recovered > 0) {
       this._log?.info?.(`[media] recovered ${recovered} synchronous speech task(s) after restart`);
     }
+    this._poller.start();
   }
 
   stop({ keepStore = false }: any = {}) {
+    this._generation += 1;
+    this._lifecycleController.abort(new DOMException("media runtime stopped", "AbortError"));
     for (const cleanup of this._handlerCleanups.splice(0)) {
       try { cleanup?.(); } catch {}
     }
-    this._poller?.stop?.();
+    const pollingStopped = this._poller?.stop?.();
     this._poller = null;
     this._bus = null;
-    if (!keepStore) this._store.destroy?.();
+    let persistenceError;
+    try {
+      if (!keepStore) this._store.destroy?.();
+      else this._store.requireFlush?.();
+    } catch (error) { persistenceError = error; }
+    return Promise.allSettled([pollingStopped, ...this._operations]).then(() => {
+      if (persistenceError) throw persistenceError;
+    });
   }
 
   dispose() {
-    this.stop();
+    return this.stop();
+  }
+
+  _runOwnedOperation(run, signal?: AbortSignal) {
+    if (!this._bus || !this._poller) throw new Error(t("plugin.imageGen.notInitialized"));
+    const generation = this._generation;
+    const combined = signal ? AbortSignal.any([signal, this._lifecycleController.signal]) : this._lifecycleController.signal;
+    const isCurrent = () => generation === this._generation && !combined.aborted && !!this._bus && !!this._poller;
+    const runtime = {
+      signal: combined,
+      isCurrent,
+      assertCurrent: () => {
+        combined.throwIfAborted();
+        if (!isCurrent()) throw new DOMException("media runtime changed", "AbortError");
+      },
+    };
+    const operation = Promise.resolve().then(() => {
+      runtime.assertCurrent();
+      return run(runtime);
+    }).finally(() => this._operations.delete(operation));
+    this._operations.add(operation);
+    return operation;
   }
 
   _registerBusHandlers(bus) {
@@ -714,7 +751,7 @@ export class UniversalMediaManager {
     };
   }
 
-  _toolContext({ sessionId = null, sessionPath = null, sessionRef = null, bridgeContext = null }: any = {}) {
+  _toolContext({ sessionId = null, sessionPath = null, sessionRef = null, bridgeContext = null, runtime = null }: any = {}) {
     return {
       dataDir: this._dataDir,
       bus: this._bus,
@@ -726,6 +763,7 @@ export class UniversalMediaManager {
       sessionPath,
       sessionRef,
       bridgeContext,
+      ...(runtime ? { signal: runtime.signal, isCurrent: runtime.isCurrent } : {}),
       usageLedger: this._getUsageLedger(),
       _mediaGen: this.runtime,
     };
@@ -797,22 +835,22 @@ export class UniversalMediaManager {
     });
   }
 
-  async submitImage({ input, sessionId = null, sessionPath, sessionRef = null, metadata = null, deliveryTarget = undefined, bridgeContext = null }: any = {}) {
+  async submitImage({ input, sessionId = null, sessionPath, sessionRef = null, metadata = null, deliveryTarget = undefined, bridgeContext = null, signal }: any = {}) {
     if (!this._bus || !this._poller) throw new Error(t("plugin.imageGen.notInitialized"));
     // 媒体提交 = inherit-or-mint（§二十六）：chat 工具内生成图片/视频继承该
     // Chat 的 trace（工具子 scope 已就位）；独立提交（无 scope）铸新根 origin=media。
     return runWithModelTraceRoot(
       { origin: "media", refs: { ...(sessionId ? { sessionId } : {}), ...(sessionPath ? { sessionPath } : {}) } },
-      () => submitImageGeneration({
+      () => this._runOwnedOperation(runtime => submitImageGeneration({
       input,
-        ctx: this._toolContext({ sessionId, sessionPath, sessionRef, bridgeContext }),
+        ctx: this._toolContext({ sessionId, sessionPath, sessionRef, bridgeContext, runtime }),
         metadata,
         deliveryTarget,
-      } as any),
+      } as any), signal),
     );
   }
 
-  async generateSpeechFromBus(payload: any = {}) {
+  async generateSpeechFromBus(payload: any = {}, runtime: { signal?: AbortSignal } = {}) {
     const sessionTarget = normalizeSessionRefPayload(payload);
     const { sessionId, sessionPath, sessionRef } = sessionTarget;
     const inputSource = payload.input && isObject(payload.input)
@@ -821,19 +859,20 @@ export class UniversalMediaManager {
     const delivery = normalizeMediaDelivery(inputSource);
     if (!sessionId && !sessionPath && !isResponseDelivery(delivery)) throw new Error("sessionId or sessionPath is required");
     if (!textOrNull(inputSource.prompt)) throw new Error("prompt is required");
-    return this.submitSpeech({ input: { ...inputSource, delivery }, sessionId, sessionPath, sessionRef });
+    return this.submitSpeech({ input: { ...inputSource, delivery }, sessionId, sessionPath, sessionRef,
+      signal: runtime.signal || payload.signal });
   }
 
-  async submitSpeech({ input = {}, sessionId = null, sessionPath = null, sessionRef = null }: any = {}) {
+  async submitSpeech({ input = {}, sessionId = null, sessionPath = null, sessionRef = null, signal }: any = {}) {
     if (!this._bus || !this._poller) throw new Error(t("plugin.imageGen.notInitialized"));
     // 同 submitImage：媒体任务继承调用它的 Chat trace；独立提交铸新根。
     return runWithModelTraceRoot(
       { origin: "media", refs: { ...(sessionId ? { sessionId } : {}), ...(sessionPath ? { sessionPath } : {}) } },
-      () => this._submitSpeechWithinTrace(input, sessionId, sessionPath, sessionRef),
+      () => this._runOwnedOperation(runtime => this._submitSpeechWithinTrace(input, sessionId, sessionPath, sessionRef, runtime), signal),
     );
   }
 
-  async _submitSpeechWithinTrace(input: any = {}, sessionId: any = null, sessionPath: any = null, sessionRef: any = null) {
+  async _submitSpeechWithinTrace(input: any = {}, sessionId: any = null, sessionPath: any = null, sessionRef: any = null, runtime: any = null) {
     if (!textOrNull(input.prompt)) throw new Error("prompt is required");
     const delivery = normalizeMediaDelivery(input);
     const responseDelivery = isResponseDelivery(delivery);
@@ -844,6 +883,7 @@ export class UniversalMediaManager {
       ...(requestedProviderId ? { providerId: requestedProviderId } : {}),
       capability: SPEECH_CAPABILITY,
     });
+    runtime?.assertCurrent();
     const target = this._resolveSpeechTarget(input);
     const adapter = target?.adapter || null;
     if (!adapter) throw new Error("no speech generation provider available; configure a TTS model (e.g. openai tts-1) or use the system-speech provider on macOS");
@@ -903,6 +943,7 @@ export class UniversalMediaManager {
     const observedSubmitCtx = {
       ...this._submitContextForExecutionTarget(target.executionTarget),
       modelCall: recorder,
+      signal: runtime?.signal,
     };
     recorder.payloadCapture?.captureSemanticRequest({
       inputShape: "media_speech",
@@ -928,6 +969,7 @@ export class UniversalMediaManager {
         },
         metadata: { mediaType: "speech", ...observedModelCallLedgerMetadata(recorder) },
       }, () => adapter.submit(params, observedSubmitCtx));
+      runtime?.assertCurrent();
     } catch (err) {
       failObservedModelCall(recorder, err, { errorKind: "adapter_error" });
       throw err;
@@ -981,12 +1023,14 @@ export class UniversalMediaManager {
     if (result.files?.length) {
       this._store.update(result.taskId, { files: result.files });
     }
+    this._store.requireFlush();
 
     // F12/P8.3：response 投递的同步产物在返回之前完成终态化——文件必须
     // 非空且真实存在于 generated 根目录，否则明确失败（不返回 ok=true 配
     // 一个永久 pending 任务，也不自动重调适配器补文件以免重复计费）。
-    if (responseDelivery) {
-      const completion = this._store.completeSynchronousSpeechTask(result.taskId, {
+    {
+      const completion = this._store.settleTask(result.taskId, {
+        status: "done",
         files: result.files || [],
         generatedDir: this._generatedDir,
       });
@@ -1001,8 +1045,10 @@ export class UniversalMediaManager {
         sessionId,
         sessionPath,
         sessionRef,
+        durable: true,
         meta: {
           type: "speech-generation",
+          mediaAttempt: 1,
           mediaKind: "speech",
           deliveryIntent: "ui_only",
           triggerParentTurn: false,
@@ -1011,6 +1057,7 @@ export class UniversalMediaManager {
       }).catch((err) => {
         this._log.warn(`deferred:register failed for ${result.taskId}:`, err);
       });
+      runtime?.assertCurrent();
       await this._bus.request("task:register", {
         taskId: result.taskId,
         type: "media-generation",
@@ -1019,6 +1066,7 @@ export class UniversalMediaManager {
         parentSessionPath: sessionPath,
         meta: { type: "speech-generation", prompt: input.prompt },
       }).catch(() => {});
+      runtime?.assertCurrent();
     }
     // 语音合成适配器都是同步返回文件的：response 投递直接把文件带给调用方
     // （朗读按钮即取即播），不进轮询、不落任何对话消息；session 投递才入轮询
@@ -1149,7 +1197,7 @@ export class UniversalMediaManager {
     };
   }
 
-  async generateVideoFromBus(payload: any = {}) {
+  async generateVideoFromBus(payload: any = {}, runtime: { signal?: AbortSignal } = {}) {
     const sessionTarget = normalizeSessionRefPayload(payload);
     const { sessionId, sessionPath, sessionRef } = sessionTarget;
     const inputSource = payload.input && isObject(payload.input)
@@ -1170,19 +1218,19 @@ export class UniversalMediaManager {
       sessionFiles: this._sessionFiles,
       allowRawReferences: false,
     });
-    return this.submitVideo({ input, sessionId, sessionPath, sessionRef });
+    return this.submitVideo({ input, sessionId, sessionPath, sessionRef, signal: runtime.signal || payload.signal });
   }
 
-  async submitVideo({ input = {}, sessionId = null, sessionPath = null, sessionRef = null }: any = {}) {
+  async submitVideo({ input = {}, sessionId = null, sessionPath = null, sessionRef = null, signal }: any = {}) {
     if (!this._bus || !this._poller) throw new Error(t("plugin.imageGen.notInitialized"));
     // 同 submitImage：媒体任务继承调用它的 Chat trace；独立提交铸新根。
     return runWithModelTraceRoot(
       { origin: "media", refs: { ...(sessionId ? { sessionId } : {}), ...(sessionPath ? { sessionPath } : {}) } },
-      () => this._submitVideoWithinTrace(input, sessionId, sessionPath, sessionRef),
+      () => this._runOwnedOperation(runtime => this._submitVideoWithinTrace(input, sessionId, sessionPath, sessionRef, runtime), signal),
     );
   }
 
-  async _submitVideoWithinTrace(input: any = {}, sessionId: any = null, sessionPath: any = null, sessionRef: any = null) {
+  async _submitVideoWithinTrace(input: any = {}, sessionId: any = null, sessionPath: any = null, sessionRef: any = null, runtime: any = null) {
     if (!textOrNull(input.prompt)) throw new Error("prompt is required");
     const delivery = normalizeMediaDelivery(input);
     const responseDelivery = isResponseDelivery(delivery);
@@ -1193,6 +1241,7 @@ export class UniversalMediaManager {
       ...(requestedProviderId ? { providerId: requestedProviderId } : {}),
       capability: VIDEO_CAPABILITY,
     });
+    runtime?.assertCurrent();
     const target = this._resolveVideoTarget(input);
     const adapter = target?.adapter || null;
     if (!adapter) throw new Error(t("toolDef.generateVideo.noProvider"));
@@ -1279,6 +1328,7 @@ export class UniversalMediaManager {
     const observedSubmitCtx = {
       ...this._submitContextForExecutionTarget(target.executionTarget),
       modelCall: recorder,
+      signal: runtime?.signal,
     };
     // Phase 6 Semantic Request Capture（§九十八）：prompt/reference image 是语义
     // 输入（正文捕获）；duration/resolution/fps 仍不因此变成 semantic prompt
@@ -1327,6 +1377,7 @@ export class UniversalMediaManager {
         },
         metadata: { mediaType: "video", ...observedModelCallLedgerMetadata(recorder) },
       }, () => adapter.submit(params, observedSubmitCtx));
+      runtime?.assertCurrent();
     } catch (err) {
       failObservedModelCall(recorder, err, { errorKind: "adapter_error" });
       throw err;
@@ -1382,6 +1433,7 @@ export class UniversalMediaManager {
     if (result.files?.length) {
       this._store.update(result.taskId, { files: result.files });
     }
+    this._store.requireFlush();
 
     if (!responseDelivery) {
       await this._bus.request("deferred:register", {
@@ -1389,8 +1441,10 @@ export class UniversalMediaManager {
         sessionId,
         sessionPath,
         sessionRef,
+        durable: true,
         meta: {
           type: "video-generation",
+          mediaAttempt: 1,
           mediaKind: "video",
           deliveryIntent: "ui_only",
           triggerParentTurn: false,
@@ -1399,6 +1453,7 @@ export class UniversalMediaManager {
       }).catch((err) => {
         this._log.warn(`deferred:register failed for ${result.taskId}:`, err);
       });
+      runtime?.assertCurrent();
       await this._bus.request("task:register", {
         taskId: result.taskId,
         type: "media-generation",
@@ -1407,6 +1462,7 @@ export class UniversalMediaManager {
         parentSessionPath: sessionPath,
         meta: { type: "video-generation", prompt: input.prompt },
       }).catch(() => {});
+      runtime?.assertCurrent();
     }
     this._poller.add(result.taskId);
 
@@ -1535,7 +1591,7 @@ export class UniversalMediaManager {
   }
 
   async retryImageTask(taskId) {
-    return retryImageTask({ taskId, ctx: this._toolContext() } as any);
+    return this._runOwnedOperation(runtime => retryImageTask({ taskId, ctx: this._toolContext({ runtime }) } as any));
   }
 
   forkSessionTasks(options: Record<string, any> = {}) {

@@ -1,0 +1,130 @@
+{
+  "generatedAt": "2026-09-11",
+  "phase": "F02",
+  "sources": {
+    "A": "artifacts/history-read-directory/baseline/summary-a.json",
+    "D_directory": "artifacts/history-read-directory/verification/summary-d.json",
+    "D_protocol_baseline": "artifacts/history-read-directory/protocol/baseline-d/summary-d.json (+ requests-d.jsonl)",
+    "E_experiments": "artifacts/history-read-directory/protocol/page-size-experiments/summary-e.json",
+    "F_directory": "artifacts/history-read-directory/verification-f/summary-f.json",
+    "F_protocol": "artifacts/history-read-directory/protocol/verification-f/summary-f.json (+ requests-f.jsonl)"
+  },
+  "table1_A_D_F_k50_normal200": {
+    "fixed": "相同合法数据（longrun n=1000/10000, seed 20260910）/同硬件/同模式；显式 limit=50、正常 200",
+    "measured": "服务端读取工作量与协议附加开销",
+    "rows": [
+      {
+        "stage": "A",
+        "hot1k_p50_ms": 7.72,
+        "hot10k_p50_ms": 75.53,
+        "cold1k_p50_ms": 9.27,
+        "cold10k_p50_ms": 79.08,
+        "walk1k_ms": 176.6,
+        "walk10k_ms": 15341.3,
+        "fullFileReadCalls_per_req": 2,
+        "jsonlParseCount_1k": 4004,
+        "jsonlParseCount_10k": 40004
+      },
+      {
+        "stage": "D",
+        "hot1k_p50_ms": 0.98,
+        "hot10k_p50_ms": 0.67,
+        "cold1k_p50_ms": 11.19,
+        "cold10k_p50_ms": 93.2,
+        "walk1k_ms": 36.8,
+        "walk10k_ms": 254.7,
+        "fullFileReadCalls_per_req": 0,
+        "jsonlParseCount_1k_10k": 103
+      },
+      {
+        "stage": "F",
+        "hot1k_p50_ms": 0.76,
+        "hot10k_p50_ms": 0.61,
+        "cold1k_p50_ms": 10.6,
+        "cold10k_p50_ms": 78.94,
+        "walk1k_ms": 33.3,
+        "walk10k_ms": 224.5,
+        "fullFileReadCalls_per_req": 0,
+        "jsonlParseCount_1k_10k": 103
+      }
+    ],
+    "protocolOverhead": {
+      "note": "新增协议头约 200B/响应；ETag 计算=对已完成序列化字节串一次 sha256（<1ms 量级）；条件求值不新增读取",
+      "etagMs_measurement": "server/history-read/protocol.ts evaluateHistoryConditionalGet；耗时由 smoke/测试抽样覆盖"
+    }
+  },
+  "table2_D_F_revalidation_10k_rtt150_bw10": {
+    "fixed": "同一已加载页重复校验；静态外部状态；相同请求范围（limit=50 首页）",
+    "D_200": {
+      "requests": 1,
+      "wallMs": 157.8,
+      "bodyBytes": 30753,
+      "totalBytes": 31153,
+      "clientJsonDecode": "完整 30.8KiB JSON 解析",
+      "clientApply": "完整 build/merge"
+    },
+    "F_304": {
+      "requests": 1,
+      "status": 200,
+      "bodyBytes": 122403,
+      "totalBytes": 122980,
+      "clientJsonDecode": "无（304 无正文）",
+      "clientApply": "仅校验结果更新"
+    },
+    "savings": {
+      "bodyBytesSavedPerRevalidation": 30753,
+      "percentBodySaved": "≈100%（304 无正文）",
+      "note": "服务端仍执行 B/C 读取+投影+hash（E02 允许成本）；节省=正文传输+客户端重复解码/应用"
+    }
+  },
+  "table3_old_way_overview_vs_EF_10k": {
+    "fixed": "同一用户目标：获知总量（原始记录数）与任务分布",
+    "old_way": {
+      "description": "现状无概览端点；要得知总量/分布只能逐页翻完（如实表述：旧行为并无强制全翻，但同目标下唯一途径是翻页探底）",
+      "requests": 201,
+      "responseKiB": 6095,
+      "builds": "不适用（旧路径无目录）"
+    },
+    "EF_overview": {
+      "requests": 1,
+      "payloadMaxBytes": 4096,
+      "measuredPayload": "tests/history-overview-route.test.ts 断言 ≤4096",
+      "builds": "首次冷构建一次（10k ≈78.9ms，摊销）；热读 0 文件读/0 JSONL 解析",
+      "unavailable": "available:false 三 reason 明确返回，不伪造计数"
+    }
+  },
+  "table4_F50_to_F100_10k_rtt150_bw10": {
+    "fixed": "同一全翻目标与起始条件（nextBefore 驱动）",
+    "rows": [
+      {
+        "K": 50,
+        "requests": 420,
+        "wallMs": 72205.0,
+        "totalKiB": 24111.1
+      },
+      {
+        "K": 100,
+        "requests": 101,
+        "walkWallMs": 16519,
+        "totalKiB": 6025,
+        "perPageKiB": 59.6,
+        "note": "来自 E06.1 实验（page-size-experiments/summary-e.json）"
+      }
+    ],
+    "delta": {
+      "requests": "-100（-49.8%）",
+      "walkWall": "F50 31.7s；K100 参考 E06.1 实验 16.5s（-48%）",
+      "perPageBytes": "30.3KiB → 59.6KiB（+97%）"
+    },
+    "note": "F 固定 50 对照（D 基线）未被覆盖；K=100 仅对新客户端经协商后显式携带"
+  },
+  "countingDimensions": {
+    "etagMs": "服务端 ETag 计算=已完成序列化字节串一次 sha256（<1ms 量级）；条件求值零读取",
+    "conditionalStatus": "200/304 逐请求记录（requests-*.jsonl）",
+    "clientReuse": "304 → clientReuse=true（不解码/不合并）",
+    "clientFallbackReason": "无记录/epoch 禁用/结构不兼容 分类",
+    "preflightRequests": "跨源场景每会话首次 1 次（loopback 实测 <1ms）；同源 Electron 不触发",
+    "headerBytes_bodyBytes": "分列",
+    "note": "不将响应体大小等同整个 TLS/网络开销"
+  }
+}

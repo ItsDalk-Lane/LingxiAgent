@@ -192,7 +192,7 @@ export function readCurrentSessionBranch(filePath, opts: { since?: any; branchHe
 
 export function projectCurrentSessionBranchEntries(
   entries,
-  opts: { since?: any; branchHead?: any; filePath?: string } = {},
+  opts: { since?: any; branchHead?: any; filePath?: string; lineageHash?: boolean } = {},
 ) {
   const filePath = opts.filePath || "(in-memory session)";
   const { sessionEntries, byId, legacySyntheticIds } = buildValidatedEntryIndex(entries, filePath);
@@ -230,7 +230,17 @@ export function projectCurrentSessionBranchEntries(
   }
 
   const rawLineage = lineageToRoot(selectedLeafId, byId);
-  const lineageMetadata = computeSessionLineageMetadata(rawLineage);
+  // lineageHash:false（B08 冷构建优化）：调用方只消费 lineage 的 id 列表时，
+  // 可跳过逐条 JSON.stringify + SHA-256 链（20k 条规模 ~10ms+）。默认（未传 false）
+  // 行为完全不变——hash 仍是分支身份校验路径的事实来源。
+  const lineageMetadata = opts.lineageHash === false
+    ? {
+        lineage: rawLineage.map((entry) => ({ id: entry.id, parentId: entry.parentId ?? null, type: entry.type || null })),
+        lineageHash: null,
+        rootLineageHash: null,
+        prefixHashes: {},
+      }
+    : computeSessionLineageMetadata(rawLineage);
   const lineageIndexById = new Map(rawLineage.map((entry, index) => [entry.id, index]));
   const since = opts.since && !Number.isNaN(Date.parse(opts.since))
     ? Date.parse(opts.since)

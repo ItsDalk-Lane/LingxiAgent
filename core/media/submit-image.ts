@@ -34,6 +34,8 @@ export async function submitImageGeneration({ input = {}, ctx, metadata = null, 
 
   const submitCtx = createSubmitContext(ctx);
   const target = await resolveImageTarget(input, registry, submitCtx);
+  submitCtx.signal?.throwIfAborted();
+  if (submitCtx.isCurrent?.() === false) throw new DOMException("media runtime changed", "AbortError");
   const adapter = target?.adapter || null;
   if (!adapter) throw new Error(t("plugin.imageGen.noProvider"));
   const adapterSubmitCtx = registry.createSubmitContextForAdapter?.(adapter, submitCtx) || submitCtx;
@@ -94,6 +96,7 @@ export async function submitImageGeneration({ input = {}, ctx, metadata = null, 
       submitState: "submitting",
       adapterTaskId: null,
     });
+    store.requireFlush?.();
 
     if (!responseDelivery) {
       try {
@@ -102,7 +105,8 @@ export async function submitImageGeneration({ input = {}, ctx, metadata = null, 
           sessionId,
           sessionPath,
           sessionRef,
-          meta: deferredMeta,
+          meta: { ...deferredMeta, mediaAttempt: 1 },
+          durable: true,
         });
       } catch (err) {
         ctx.log?.warn?.(`deferred:register failed for ${taskId}:`, err);
@@ -122,6 +126,8 @@ export async function submitImageGeneration({ input = {}, ctx, metadata = null, 
       }
     }
 
+    submitCtx.signal?.throwIfAborted();
+    if (submitCtx.isCurrent?.() === false) throw new DOMException("media runtime changed", "AbortError");
     poller.add(taskId);
     submitted.push({ taskId });
 

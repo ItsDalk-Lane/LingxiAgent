@@ -3,6 +3,7 @@ import os from "os";
 import path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LingxiEngine } from "../core/engine.ts";
+import { EventBus } from "../hub/event-bus.ts";
 import { autoProjectIdForCwd, UNCATEGORIZED_PROJECT_ID } from "../shared/session-projects.ts";
 
 // ---------------------------------------------------------------------------
@@ -78,6 +79,39 @@ describe("LingxiEngine Computer Use lazy runtime", () => {
     expect(dispose).toHaveBeenCalledOnce();
     expect(engine._computerHost).toBeNull();
     expect(engine._computerProviders).toBeNull();
+  });
+
+  it("等待媒体查询资源释放后才完成引擎关闭", async () => {
+    const engine = createEngine();
+    const bus = new EventBus();
+    const media = engine._media;
+    let entered!: () => void;
+    let release!: () => void;
+    const ready = new Promise<void>(resolve => { entered = resolve; });
+    const released = new Promise<void>(resolve => { release = resolve; });
+    // 仅供应商边界延迟，关闭链、任务存储和查询调度都执行真实模块。
+    media.registerAdapter({ id: "shutdown-provider", query: async () => {
+      entered();
+      await released;
+      return { status: "pending" };
+    } });
+    media.start(bus);
+    media.store.add({ taskId: "shutdown-task", adapterId: "shutdown-provider", type: "image", params: {} });
+    media.poller.add("shutdown-task");
+    const checking = media.poller.checkNow("shutdown-task");
+    await ready;
+    const closing = engine.dispose();
+    untrackEngine(engine);
+    try {
+      const outcome = await Promise.race([
+        closing.then(() => "closed"),
+        new Promise<string>(resolve => setTimeout(() => resolve("waiting"), 100)),
+      ]);
+      expect(outcome).toBe("waiting");
+    } finally {
+      release();
+      await Promise.all([checking, closing]);
+    }
   });
 
   it("stores usage ledger entries under lingxiHome so engine restarts keep them", () => {

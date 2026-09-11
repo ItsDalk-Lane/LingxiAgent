@@ -471,9 +471,15 @@ export class SessionFileRegistry {
    * Project the durable sidecar superset onto one explicit active branch.
    * Hidden branches keep their sidecar records and managed bytes for recovery,
    * while user-facing/session-scoped consumers only receive reachable files.
+   *
+   * opts.referenceIdentities（B05/B03）：目录构建期已收集的紧凑引用身份集合。
+   * 传入时跳过对 references 的深扫（热页不再每页扫全部正文）；未传时保持
+   * 原深扫路径，既有调用方行为不变。
    */
-  listReachable(sessionPath, references = []) {
-    const retainedIdentities = collectSessionFileReferenceIdentities(references);
+  listReachable(sessionPath, references = [], opts: { referenceIdentities?: Set<string> } = {}) {
+    const retainedIdentities = opts?.referenceIdentities instanceof Set
+      ? opts.referenceIdentities
+      : collectSessionFileReferenceIdentities(references);
     if (retainedIdentities.size === 0) return [];
     return this.list(sessionPath).filter((file) => sessionFileIsReachable(file, retainedIdentities));
   }
@@ -966,21 +972,29 @@ function collectSessionFileReferenceObject(value, result) {
 }
 
 function collectSessionFileReferenceText(value, result) {
-  SESSION_FILE_MARKER_RE.lastIndex = 0;
-  for (const match of value.matchAll(SESSION_FILE_MARKER_RE)) {
-    try {
-      collectSessionFileReferenceObject(JSON.parse(match[1]), result);
-    } catch {
-      // Malformed visible text is not an authorization-bearing file reference.
+  // 字面量快路径（语义精确等价）：两条标记正则分别要求 "[SessionFile]" 与
+  // "[attached_" 字面量，不含字面量的字符串不可能命中，跳过正则扫描。
+  const hasSessionFileMarker = value.indexOf("[SessionFile]") !== -1;
+  const hasAttachedMediaMarker = !hasSessionFileMarker && value.indexOf("[attached_") !== -1;
+  if (hasSessionFileMarker) {
+    SESSION_FILE_MARKER_RE.lastIndex = 0;
+    for (const match of value.matchAll(SESSION_FILE_MARKER_RE)) {
+      try {
+        collectSessionFileReferenceObject(JSON.parse(match[1]), result);
+      } catch {
+        // Malformed visible text is not an authorization-bearing file reference.
+      }
     }
   }
-  ATTACHED_MEDIA_MARKER_RE.lastIndex = 0;
-  for (const match of value.matchAll(ATTACHED_MEDIA_MARKER_RE)) {
-    addReferenceIdentity(result, match[1]);
+  if (hasSessionFileMarker || hasAttachedMediaMarker) {
+    ATTACHED_MEDIA_MARKER_RE.lastIndex = 0;
+    for (const match of value.matchAll(ATTACHED_MEDIA_MARKER_RE)) {
+      addReferenceIdentity(result, match[1]);
+    }
   }
 }
 
-function collectSessionFileReferenceIdentities(value, result = new Set(), visited = new WeakSet()) {
+export function collectSessionFileReferenceIdentities(value, result = new Set(), visited = new WeakSet()) {
   if (typeof value === "string") {
     collectSessionFileReferenceText(value, result);
     return result;

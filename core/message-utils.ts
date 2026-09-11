@@ -158,7 +158,9 @@ export async function loadSessionHistoryMessages(engine, explicitPath, options: 
   return [];
 }
 
-function projectBranchHistory(entries: any[], sessionId: string) {
+// B01 同源抽取导出：目录构建（server/history-read/）与路由共用同一投影入口，
+// 只加 export，函数体零改动。
+export function projectBranchHistory(entries: any[], sessionId: string) {
   const correlations = collectDesktopInputCorrelations(entries, sessionId);
   return entries.map(historyMessageFromEntry).filter(Boolean).map(message => projectSessionMessageForDisplay({
     ...message, ...(message.role === 'user' ? correlations.get(message.id) || {} : {}),
@@ -200,7 +202,8 @@ export async function loadSessionHistoryEvidence(engine: any, sessionPath: strin
   } catch { return unavailable('branch_read_unverified'); }
 }
 
-function historyMessageFromEntry(entry) {
+// B01 同源抽取导出：同上，只加 export，函数体零改动。
+export function historyMessageFromEntry(entry) {
   if (entry?.type === "message" && entry.message) {
     const message = entry.message.role === "toolResult"
       && entry.message.isError !== true

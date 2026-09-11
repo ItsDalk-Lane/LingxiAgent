@@ -18,25 +18,22 @@ export const parameters = {
     prompt: { type: "string", description: t("toolDef.generateSpeech.promptDesc") },
     voice: { type: "string", description: t("toolDef.generateSpeech.voiceDesc") },
     speed: { type: "number", description: t("toolDef.generateSpeech.speedDesc") },
-    format: { type: "string", enum: ["mp3", "opus", "aac", "flac", "wav"], description: t("toolDef.generateSpeech.formatDesc") },
+    format: { type: "string", enum: ["mp3", "opus", "aac", "flac", "wav", "pcm", "m4a"], description: t("toolDef.generateSpeech.formatDesc") },
     model: { type: "string", description: t("toolDef.generateSpeech.modelDesc") },
     provider: { type: "string", description: t("toolDef.generateSpeech.providerDesc") },
   },
   required: ["prompt"],
 };
 
-function present(value) {
-  return value !== undefined && value !== null && value !== "";
-}
-
 function mediaInput(input: any = {}) {
   return {
     prompt: input.prompt,
-    ...(present(input.voice) ? { voice: input.voice } : {}),
-    ...(present(input.speed) ? { speed: input.speed } : {}),
-    ...(present(input.format) ? { format: input.format } : {}),
-    ...(present(input.model) ? { model: input.model } : {}),
-    ...(present(input.provider) ? { provider: input.provider } : {}),
+    // 保留显式空值，和 HTTP 入口共用唯一参数解析器的缺省及校验规则。
+    voice: input.voice,
+    speed: input.speed,
+    format: input.format,
+    model: input.model,
+    provider: input.provider,
   };
 }
 
@@ -46,6 +43,7 @@ function sessionPayload(ctx: any = {}, input) {
     ...(ctx.sessionPath ? { sessionPath: ctx.sessionPath } : {}),
     ...(ctx.sessionRef ? { sessionRef: ctx.sessionRef } : {}),
     input,
+    ...(ctx.signal ? { signal: ctx.signal } : {}),
     ...(ctx.bridgeContext ? { bridgeContext: ctx.bridgeContext } : {}),
     pluginId: ctx.pluginId || "media",
   };

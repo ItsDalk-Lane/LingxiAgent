@@ -411,6 +411,17 @@
     "back": "Back"
   },
   "chat": {
+        "historyOverview": {
+          "records": "Raw history records",
+          "runs": "Logic turns",
+          "tasks": "Related tasks",
+          "taskSubagent": "Subagents",
+          "taskWorkflow": "Workflows",
+          "taskMedia": "Media generation",
+          "taskOther": "Other",
+          "unknown": "Stats unavailable",
+          "detail": "Subagents {subagent} · Workflows {workflow} · Media {media} · Other {other}"
+        },
     "knowledgeResearchInterrupted": "Research was interrupted",
     "knowledgeResearchStopIncomplete": "Research did not finish its workflow",
     "knowledgeResearchStopUnavailable": "Required research tools are unavailable",

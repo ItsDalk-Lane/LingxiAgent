@@ -411,6 +411,17 @@
     "back": "뒤로"
   },
   "chat": {
+        "historyOverview": {
+          "records": "원본 기록 수",
+          "runs": "논리 턴 수",
+          "tasks": "관련 작업",
+          "taskSubagent": "서브에이전트",
+          "taskWorkflow": "워크플로",
+          "taskMedia": "미디어 생성",
+          "taskOther": "기타",
+          "unknown": "통계를 표시할 수 없음",
+          "detail": "서브에이전트 {subagent} · 워크플로 {workflow} · 미디어 {media} · 기타 {other}"
+        },
     "knowledgeResearchInterrupted": "조사가 중단되었습니다",
     "knowledgeResearchStopIncomplete": "조사 절차가 정상적으로 완료되지 않았습니다",
     "knowledgeResearchStopUnavailable": "조사에 필요한 도구를 사용할 수 없습니다",

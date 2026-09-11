@@ -34,6 +34,8 @@ public final class RecognitionCoordinator: @unchecked Sendable {
     private var continuation: CheckedContinuation<String, Error>?
     private var task: (any RecognitionTaskCancelling)?
     private var latestText: String = ""
+    /// 提前到达的取消/超时：等待方尚未挂接时保存终局，挂接时恰好结算一次。
+    private var pendingTerminalError: SpeechHelperError?
 
     public init() {}
 
@@ -44,12 +46,19 @@ public final class RecognitionCoordinator: @unchecked Sendable {
     }
 
     /// 挂接识别 continuation；进入 running。一个协调器只服务一次识别。
+    /// 若取消/超时已先于挂接到达，立即以保存的终局结算本次挂接。
     public func attachContinuation(_ continuation: CheckedContinuation<String, Error>) {
         lock.lock()
-        defer { lock.unlock() }
+        if let pending = pendingTerminalError {
+            pendingTerminalError = nil
+            lock.unlock()
+            continuation.resume(throwing: pending)
+            return
+        }
         precondition(phase == .created, "continuation attached twice")
         phase = .running
         self.continuation = continuation
+        lock.unlock()
     }
 
     /// 挂接底层识别任务。若终局已先到（超时/取消先于任务创建完成），立即取消之。
@@ -114,6 +123,7 @@ public final class RecognitionCoordinator: @unchecked Sendable {
         phase = terminalPhase
         let pending = continuation
         continuation = nil
+        if pending == nil { pendingTerminalError = error }
         let pendingTask = task
         task = nil
         lock.unlock()

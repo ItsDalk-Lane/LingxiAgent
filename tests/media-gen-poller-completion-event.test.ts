@@ -19,12 +19,15 @@ describe("media-gen poller completion event", () => {
   it("emits media-gen:task-done with persisted metadata when an image task succeeds", async () => {
     const generatedDir = path.join(tmpDir, "generated");
     fs.mkdirSync(generatedDir, { recursive: true });
+    // 产物必须真实存在且非零字节：完成检查不再相信文件名列表。
+    fs.writeFileSync(path.join(generatedDir, "cover.png"), Buffer.from([1, 2, 3, 4]));
     const store = new TaskStore(tmpDir);
     const taskId = "task-cover";
     const events = [];
     const bus = {
       emit: vi.fn((event, sessionPath) => events.push({ event, sessionPath })),
-      request: vi.fn(async () => ({ ok: true })),
+      // 交接回执必须证明 deferred 记录已持久化，否则交付保持待办、事件不发生。
+      request: vi.fn(async (type) => (type === "deferred:query" ? null : { ok: true, durable: true })),
     };
     const adapter = {
       query: vi.fn(async () => ({ status: "success", files: ["cover.png"] })),
@@ -59,7 +62,10 @@ describe("media-gen poller completion event", () => {
       registerSessionFile: vi.fn(() => ({ fileId: "sf1", filePath: path.join(generatedDir, "cover.png") })),
     } as any);
 
-    await poller._checkTask(taskId, store.get(taskId));
+    // 通过运行中的公开入口触发：poller 停止态的旧调用不得结算任何任务。
+    poller.start();
+    await poller.checkNow(taskId);
+    await poller.stop();
 
     expect(events).toEqual([
       expect.objectContaining({

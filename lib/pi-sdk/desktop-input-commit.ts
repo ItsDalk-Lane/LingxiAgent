@@ -1,6 +1,14 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
-interface CommitScope { session: any; committed: (entryId: string) => void; unavailable: () => void }
+interface CommitScope {
+  session: any;
+  /** 真正把输入交给底层执行器，后续没有回执也不能推断成未接受。 */
+  handedOff?: () => void;
+  /** 插入已被底层队列接收；在让出执行权前保存仍需前置于 user 的展示元数据。 */
+  queued?: () => void;
+  committed: (entryId: string) => void;
+  unavailable: () => void;
+}
 const scopeStorage = new AsyncLocalStorage<CommitScope>();
 const installed = new WeakSet<object>();
 let runtimeRevision = 0;
@@ -35,7 +43,11 @@ export function installDesktopInputCommitObserver(session: any): void {
   });
   const remember = (input: any): object | null => {
     const scope = scopeStorage.getStore();
-    if (!scope || scope.session !== session) return null;
+    if (!scope) return null;
+    // 移交证据先于输入形状及关联校验，不能把无法关联误当成没有执行。
+    scope.handedOff?.();
+    // 运行实例已更换：不能签发旧实例的关联，也不能否认新实例已经接手输入。
+    if (scope.session !== session) { scope.unavailable(); return null; }
     const users = (Array.isArray(input) ? input : [input]).filter(message => message?.role === 'user');
     if (users.length !== 1) { scope.unavailable(); return null; }
     pending.set(users[0], scope);
@@ -51,8 +63,13 @@ export function installDesktopInputCommitObserver(session: any): void {
     const originalSteer = agent.steer;
     agent.steer = function (...args: any[]) {
       const message = remember(args[0]);
-      try { return originalSteer.apply(this, args); }
+      let result: any;
+      try { result = originalSteer.apply(this, args); }
       catch (error) { if (message) pending.delete(message); throw error; }
+      // SDK 的底层 agent.steer 同步入队。展示回调发生在入队成功后、上层 async
+      // steer 让出执行权前；回调出错也保留后续 user append 的关联观察。
+      if (message) pending.get(message)?.queued?.();
+      return result;
     };
   }
   const originalSessionPrompt = session.prompt;

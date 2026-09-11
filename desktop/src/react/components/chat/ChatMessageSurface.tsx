@@ -10,6 +10,7 @@ import { resolveLocateStep } from './locate-step';
 import { applyFindMarks, clearFindMarks } from '../../utils/find-marks';
 import type { ChatListItem } from '../../stores/chat-types';
 import { ChatTimelineNavigator } from './ChatTimelineNavigator';
+import { HistoryOverviewBadge } from './HistoryOverviewBadge';
 import { ChatTranscript } from './ChatTranscript';
 import { buildTimelineAnchors, type TimelineAnchor } from './timeline-anchors';
 import styles from './Chat.module.css';
@@ -467,6 +468,11 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
               {loadingMore ? '...' : ''}
             </div>
           )}
+          <HistoryOverviewBadge
+            sessionPath={sessionPath}
+            active={active}
+            hasRenderedContent={visibleItems.length > 0}
+          />
           <ChatTranscript
             items={visibleItems}
             sessionPath={sessionPath}

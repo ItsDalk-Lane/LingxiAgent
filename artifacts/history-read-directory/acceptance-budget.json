@@ -1,0 +1,43 @@
+{
+  "capturedAt": "2026-09-10",
+  "source": "任务书 §7（初始验收预算，非测量结论，不因失败放宽）",
+  "workloadHardConditions": {
+    "stableHotPage": {
+      "fullFileReadCalls": 0,
+      "fullHistoryProjectionCount": 0,
+      "fallbackCount": 0,
+      "jsonlParseCountRule": "等于实际需要读取的去重记录数量，每记录只解析一次",
+      "metadataVisitedRule": "O(log N + K + |Dpage|) 或更好",
+      "windowLogicalReadBytesRule": "实际读取记录行总字节 + 文件/边界验证字节 + 有界合并间隙"
+    }
+  },
+  "latencyScale": {
+    "hotPage": "p50_10k <= 3 * max(p50_1k, 5ms)",
+    "coldPage": "p50_new <= 1.25 * p50_baseline + 25ms",
+    "fullPagination": "total_10k / total_1k <= 15"
+  },
+  "incremental": {
+    "rule": "固定新增记录/字节在 1k 与 10k 历史上，新增读取/解析条数一致或仅有明确尾记录差异；不允许每次追加复制整目录/全分支重 hash/遍历全部 tools/tasks/blocks"
+  },
+  "memory": {
+    "scenarios": ["1k 单会话", "10k 单会话", "8 会话共存", ">8 轮换", "单目录超预算", "并发构建"],
+    "directoryContentRule": "目录可达对象无正文/原始 JSONL Buffer/源消息数组/含完整输出的 Map"
+  },
+  "resourceBudget": {
+    "maxSessions": 8,
+    "maxResidentIndexBytes": 67108864,
+    "maxSingleDirectoryBytes": 16777216,
+    "maxConcurrentBuilds": 2,
+    "maxConcurrentReadsPerPage": 4
+  },
+  "protocolPageSize": {
+    "candidates": [50, 100, 150, 200],
+    "maxLimitFixed": 200,
+    "legacyDefaultFixed": 50,
+    "firstScreenP95Rule": "<= 1.20 * D 首屏 p95 + 30ms",
+    "clientPageProcessP95Rule": "<= max(1.50 * 同环境50条对照p95, 75ms)",
+    "clientPerPagePeakMemoryRule": "<= max(2 * 同环境50条对照增量, 16 MiB)",
+    "overviewHotJsonMaxBytes": 4096,
+    "clientReceiptMetadataMaxBytes": 262144
+  }
+}

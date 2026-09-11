@@ -713,6 +713,10 @@ export function evaluateMcpToolEligibility(agentConfig, {
     }
     return { eligible: false, reason: "mcp_connector_stopped", code: "TRANSPORT_FAILURE", diagnostics };
   }
+  // 连接建立中可以等待现有尝试；执行入口仍复核启用和认证条件。
+  if ((status === STATUS_CONNECTING || status === STATUS_RECONNECTING) && startableOnDemand === true) {
+    return { eligible: true };
+  }
   if (status !== "running" || transportAvailable !== true) {
     return { eligible: false, reason: "mcp_transport_unavailable", code: "TRANSPORT_FAILURE", diagnostics };
   }
@@ -978,6 +982,8 @@ interface McpManagerOptions {
 }
 
 export class McpManager {
+  private _disposed = false;
+  private _startOwners = new Map<string, symbol>();
   declare Client: any;
   declare clientErrors: any;
   declare toolCollisions: any;
@@ -1105,6 +1111,7 @@ export class McpManager {
    * through the bus for agent config.
    */
   async start(bus) {
+    this._disposed = false;
     this._bus = bus || null;
     const disposeHandler = bus?.handle?.("mcp:settings-action", (payload) => this.handleSettingsAction(payload));
     if (typeof disposeHandler === "function") this._busDisposers.push(disposeHandler);
@@ -1129,6 +1136,7 @@ export class McpManager {
   }
 
   async dispose() {
+    this._disposed = true;
     this._tools = [];
     for (const dispose of this._busDisposers.splice(0)) {
       try { dispose(); } catch {}
@@ -1140,12 +1148,9 @@ export class McpManager {
       if (state?.timer) clearTimeout(state.timer);
     }
     this.reconnectState.clear();
-    for (const id of this.clients.keys()) {
-      this.desiredStates.set(id, "stopped");
-    }
-    for (const client of this.clients.values()) {
-      await client.stop().catch(() => {});
-    }
+    const stopping = [...new Set([...this.clients.keys(), ...this._lazyStarts.keys()])]
+      .map(id => this.stopConnector(id));
+    await Promise.all(stopping);
     this.clients.clear();
     this.clientErrors.clear();
     this.toolCollisions.clear();
@@ -1292,6 +1297,7 @@ export class McpManager {
   // autoReconnect off is also fair game for a one-shot on-demand start, which
   // is what callTool has always done for callers that bypass the gateway.
   _isStartableOnDemand(id) {
+    if (this._disposed) return false;
     if (this.desiredStates.get(id) === "stopped") return false;
     const config = this.getConfig();
     if (!config.enabled) return false;
@@ -1530,6 +1536,42 @@ export class McpManager {
   }
 
   async startConnector(id, options: any = {}) {
+    if (this._disposed) throw new Error("MCP manager is disposed");
+    const config = this.getConfig();
+    const connector = config.connectors.find((item) => item.id === id);
+    if (!config.enabled) throw new Error("MCP connectors are disabled globally");
+    if (!connector) throw new Error(`MCP connector "${id}" not found`);
+    if (!isConnectorEnabled(connector)) throw new Error(`MCP connector "${id}" is disabled; enable it in Settings → MCP before starting`);
+    const pending = this._lazyStarts.get(id);
+    if (pending) return pending;
+    // 手动、自动与按需启动共享一个尝试；旧尝试结束不能清除新尝试。
+    const attempt = this._startConnectorAttempt(id, options).finally(() => {
+      if (this._lazyStarts.get(id) === attempt) this._lazyStarts.delete(id);
+    });
+    this._lazyStarts.set(id, attempt);
+    return attempt;
+  }
+
+  _assertCurrentClient(id, client) {
+    const config = this.getConfig();
+    const connector = config.connectors.find((item) => item.id === id);
+    if (this._disposed || this.clients.get(id) !== client || this.desiredStates.get(id) === "stopped"
+      || !config.enabled || !isConnectorEnabled(connector) || this.connectorStatus.get(id) === STATUS_NEEDS_AUTH) {
+      throw new Error(`MCP connector "${id}" operation belongs to an obsolete connection`);
+    }
+  }
+
+  async _assertCallCurrent(connectorId, client, toolName, runtimeCtx) {
+    // 建连和多轮输入都是等待边界，旧授权不能跨过期间发生的助手停用。
+    if (runtimeCtx?.agentId) {
+      const config = await this.getAgentConfig(runtimeCtx.agentId);
+      const eligibility = this.evaluateToolEligibility(connectorId, toolName, config);
+      if (!eligibility.eligible) throw new Error(`MCP tool is unavailable: ${eligibility.reason}`);
+    }
+    this._assertCurrentClient(connectorId, client);
+  }
+
+  async _startConnectorAttempt(id, options: any = {}) {
     const config = this.getConfig();
     if (!config.enabled) throw new Error("MCP connectors are disabled globally");
     const connector = config.connectors.find((s) => s.id === id);
@@ -1544,11 +1586,14 @@ export class McpManager {
     if (!isConnectorEnabled(connector)) {
       throw new Error(`MCP connector "${id}" is disabled; enable it in Settings → MCP before starting`);
     }
+    // 失败清理期间客户端可能已从表中移除；令牌仍能区分新旧启动的状态归属。
+    const owner = Symbol(id);
+    this._startOwners.set(id, owner);
     // Record intent up front: a manual/auto start means the user wants this
     // connector running, which is what later authorizes auto-reconnect.
     this.desiredStates.set(id, "running");
     // A fresh start cancels any pending backoff from a prior death.
-    this._cancelReconnect(id);
+    if (!options.reconnectAttempt) this._cancelReconnect(id);
     const existing = this.clients.get(id);
     if (existing?.running) {
       this.connectorStatus.delete(id);
@@ -1560,19 +1605,30 @@ export class McpManager {
     const client = this._createClient(connector);
     this.clients.set(id, client);
     this.clientErrors.delete(id);
-    this.connectorStatus.set(id, STATUS_CONNECTING);
+    this.connectorStatus.set(id, options.reconnectAttempt ? STATUS_RECONNECTING : STATUS_CONNECTING);
     this.establishing.add(id);
     try {
       await client.start();
+      this._assertCurrentClient(id, client);
       await this.refreshTools(id);
+      this._assertCurrentClient(id, client);
+      this.clientErrors.delete(id);
+      this._cancelReconnect(id);
       this.connectorStatus.delete(id);
       this._resetIdleClock(id);
       this._armIdleParkTimer(id);
       return this.getConfig().connectors.find((s) => s.id === id);
     } catch (err) {
+      // 已被停止或替换的操作只回收自己的资源，不碰当前连接及其状态。
+      if (this._startOwners.get(id) !== owner || this.clients.get(id) !== client) {
+        await client.stop().catch(() => {});
+        throw err;
+      }
       this.clients.delete(id);
+      this._runtimeToolAnnotations.delete(id);
       this.clientErrors.set(id, err.message || "MCP connector failed to start");
       await client.stop().catch(() => {});
+      if (this._startOwners.get(id) !== owner) throw err;
       if (isAuthError(err)) {
         this._cancelReconnect(id);
         if (this._isDesiredLiveConnector(id)) {
@@ -1582,14 +1638,17 @@ export class McpManager {
         }
         throw err;
       }
-      if (options.retryInitialFailure === true && this._canAutoReconnect(id)) {
+      if ((options.retryInitialFailure === true || options.reconnectAttempt) && this._canAutoReconnect(id)) {
+        if (options.reconnectAttempt) {
+          this.reconnectState.set(id, { attempts: options.reconnectAttempt, timer: null });
+        }
         this._scheduleReconnect(id);
       } else {
         this.connectorStatus.delete(id);
       }
       throw err;
     } finally {
-      this.establishing.delete(id);
+      if (this._startOwners.get(id) === owner) this.establishing.delete(id);
     }
   }
 
@@ -1631,6 +1690,11 @@ export class McpManager {
     // touching the client, so a close event racing in during stop() can never
     // resurrect a connector the user just asked to stop.
     this.desiredStates.set(id, "stopped");
+    this._startOwners.delete(id);
+    this._lazyStarts.delete(id);
+    this.establishing.delete(id);
+    this._runtimeToolAnnotations.delete(id);
+    this._inFlightCalls.delete(id);
     this._cancelReconnect(id);
     this._clearIdleParkTimer(id);
     this.connectorStatus.delete(id);
@@ -1704,6 +1768,10 @@ export class McpManager {
   // the transient status override (set by the caller) driving the public view.
   _markDeadClient(id, reason) {
     const dead = this.clients.get(id);
+    this._startOwners.delete(id);
+    this._runtimeToolAnnotations.delete(id);
+    this.toolListFreshness.delete(id);
+    this._inFlightCalls.delete(id);
     if (dead) {
       this.clients.delete(id);
       dead.stop?.().catch?.(() => {});
@@ -1766,49 +1834,9 @@ export class McpManager {
       this.connectorStatus.delete(id);
       return;
     }
-    const connector = this.getConfig().connectors.find((s) => s.id === id);
     const attempt = (this.reconnectState.get(id)?.attempts || 0) + 1;
-
-    const client = this._createClient(connector);
-    this.clients.set(id, client);
-    this.connectorStatus.set(id, STATUS_RECONNECTING);
-    // While establishing, this attempt's promise is the single authoritative
-    // writer; the client's onClose is suppressed so a death during start can't
-    // be handled twice (rejected promise + close event).
-    this.establishing.add(id);
-    try {
-      await client.start();
-      await this.refreshTools(id);
-      // Success: live again. Clear transient state and the error, reset backoff.
-      this.clientErrors.delete(id);
-      this.connectorStatus.delete(id);
-      this.reconnectState.delete(id);
-      this._resetIdleClock(id);
-      this._armIdleParkTimer(id);
-    } catch (err) {
-      this.clients.delete(id);
-      await client.stop().catch(() => {});
-      this.clientErrors.set(id, err?.message || "MCP reconnect failed");
-      // Auth error during reconnect (token expired while the connection was
-      // down): retrying with the same credentials is futile. Short-circuit to
-      // needs-auth — do NOT count it as a generic failure or keep backing off.
-      // The OAuth self-heal / manual re-auth consumes this; the error is kept.
-      if (isAuthError(err)) {
-        this._cancelReconnect(id);
-        this.connectorStatus.set(id, STATUS_NEEDS_AUTH);
-        return;
-      }
-      // Still re-checking intent before scheduling the next attempt.
-      if (!this._canAutoReconnect(id)) {
-        this._cancelReconnect(id);
-        this.connectorStatus.delete(id);
-        return;
-      }
-      this.reconnectState.set(id, { attempts: attempt, timer: null });
-      this._scheduleReconnect(id);
-    } finally {
-      this.establishing.delete(id);
-    }
+    // 启动路径负责收尾与退避；这里不再建立第二套连接所有者。
+    await this.startConnector(id, { reconnectAttempt: attempt }).catch(() => {});
   }
 
   _cancelReconnect(id) {
@@ -1886,6 +1914,7 @@ export class McpManager {
     const client = this.clients.get(id);
     if (!client) return;
     this.clients.delete(id);
+    this._runtimeToolAnnotations.delete(id);
     this.clientErrors.delete(id);
     this.toolListFreshness.delete(id);
     this._toolListings.delete(id);
@@ -1900,7 +1929,9 @@ export class McpManager {
     this._clearIdleParkTimer(id);
   }
 
-  _markConnectorIdle(id) {
+  _markConnectorIdle(id, client = this.clients.get(id)) {
+    // 旧连接的 finally 不能扣减新连接的使用中计数或重置其空闲时钟。
+    if (this.clients.get(id) !== client) return;
     this._inFlightCalls.set(id, Math.max(0, (this._inFlightCalls.get(id) || 0) - 1));
     this._resetIdleClock(id);
     this._armIdleParkTimer(id);
@@ -1976,30 +2007,37 @@ export class McpManager {
       client = this.clients.get(id);
     }
     if (!client?.running) throw new Error(`MCP connector "${id}" is not running`);
-    const tools = await client.listTools();
-    this.toolListFreshness.set(id, client.toolListFreshness ?? null);
-    // Capture annotations from the raw wire objects, before normalizeTool
-    // projects them away on the way to disk. This is the only point where the
-    // live, server-declared annotations exist.
-    this._captureRuntimeToolAnnotations(id, tools);
-    // Re-read rather than reuse the snapshot taken before the listing: the call
-    // above is an await, and saving a snapshot from before it would write back
-    // whatever else changed meanwhile.
-    const latest = this.getConfig();
-    const latestConnector = latest.connectors.find((s) => s.id === id);
-    if (!latestConnector) throw new Error(`MCP connector "${id}" not found`);
-    latestConnector.tools = tools.map(normalizeTool).filter(Boolean);
-    // Hand back what was actually stored, not the pre-normalization local list:
-    // saveConfig folds duplicate names, so returning the mutation would let a
-    // caller act on tools that are not on disk.
-    const saved = this.saveConfig(latest);
-    this.registerCachedTools();
-    // Counted only once the list is on disk. A refresh that inherits this
-    // listing answers by reading the store, so bumping any earlier would make
-    // the count visible while the store still holds the previous list — the
-    // inheriting caller would hand back data this one had not written yet.
-    this._toolListings.set(id, (this._toolListings.get(id) ?? 0) + 1);
-    return saved.connectors.find((s) => s.id === id)?.tools || [];
+    this._assertCurrentClient(id, client);
+    this._markConnectorBusy(id);
+    try {
+      const tools = await client.listTools();
+      this._assertCurrentClient(id, client);
+      this.toolListFreshness.set(id, client.toolListFreshness ?? null);
+      // Capture annotations from the raw wire objects, before normalizeTool
+      // projects them away on the way to disk. This is the only point where the
+      // live, server-declared annotations exist.
+      this._captureRuntimeToolAnnotations(id, tools);
+      // Re-read rather than reuse the snapshot taken before the listing: the call
+      // above is an await, and saving a snapshot from before it would write back
+      // whatever else changed meanwhile.
+      const latest = this.getConfig();
+      const latestConnector = latest.connectors.find((s) => s.id === id);
+      if (!latestConnector) throw new Error(`MCP connector "${id}" not found`);
+      latestConnector.tools = tools.map(normalizeTool).filter(Boolean);
+      // Hand back what was actually stored, not the pre-normalization local list:
+      // saveConfig folds duplicate names, so returning the mutation would let a
+      // caller act on tools that are not on disk.
+      const saved = this.saveConfig(latest);
+      this.registerCachedTools();
+      // Counted only once the list is on disk. A refresh that inherits this
+      // listing answers by reading the store, so bumping any earlier would make
+      // the count visible while the store still holds the previous list — the
+      // inheriting caller would hand back data this one had not written yet.
+      this._toolListings.set(id, (this._toolListings.get(id) ?? 0) + 1);
+      return saved.connectors.find((s) => s.id === id)?.tools || [];
+    } finally {
+      this._markConnectorIdle(id, client);
+    }
   }
 
   /**
@@ -2082,11 +2120,14 @@ export class McpManager {
     if (typeof client.readResource !== "function") {
       throw new Error(`MCP connector "${connectorId}" does not support resources/read`);
     }
+    this._assertCurrentClient(connectorId, client);
     this._markConnectorBusy(connectorId);
     try {
-      return await client.readResource(resourceUri);
+      const result = await client.readResource(resourceUri);
+      this._assertCurrentClient(connectorId, client);
+      return result;
     } finally {
-      this._markConnectorIdle(connectorId);
+      this._markConnectorIdle(connectorId, client);
     }
   }
 
@@ -2108,11 +2149,15 @@ export class McpManager {
       client = this.clients.get(connectorId);
       if (!client?.running) throw new Error(`MCP connector "${connectorId}" is not running`);
     }
+    this._assertCurrentClient(connectorId, client);
     this._markConnectorBusy(connectorId);
     try {
-      return await client.callTool(toolName, args || {});
+      this._requireAppVisibleTool(connectorId, toolName);
+      const result = await client.callTool(toolName, args || {});
+      this._assertCurrentClient(connectorId, client);
+      return result;
     } finally {
-      this._markConnectorIdle(connectorId);
+      this._markConnectorIdle(connectorId, client);
     }
   }
 
@@ -2137,6 +2182,7 @@ export class McpManager {
     }
     // Busy counting spans the whole multi-round call: an idle park must never
     // fire while a tool call (or its input rounds) is still being served.
+    this._assertCurrentClient(connectorId, client);
     this._markConnectorBusy(connectorId);
     try {
       return await this._callToolThroughInputRounds(client, {
@@ -2147,7 +2193,7 @@ export class McpManager {
         runtimeCtx,
       });
     } finally {
-      this._markConnectorIdle(connectorId);
+      this._markConnectorIdle(connectorId, client);
     }
   }
 
@@ -2165,16 +2211,17 @@ export class McpManager {
    * plus a pointer to where the details live.
    */
   _ensureConnectorStarted(id) {
+    if (this.desiredStates.get(id) === "stopped" || this.connectorStatusFor(id) === STATUS_NEEDS_AUTH) {
+      return Promise.reject(new Error(`MCP connector "${id}" needs an explicit start or re-authentication`));
+    }
     const inFlight = this._lazyStarts.get(id);
     if (inFlight) return inFlight;
-    const attempt = this.startConnector(id, { retryInitialFailure: false })
-      .catch((err) => {
-        const reason = err?.message || String(err);
-        throw new Error(`${reason} (automatic reconnect failed; start it manually in Settings → MCP for details)`);
-      })
-      .finally(() => {
-        this._lazyStarts.delete(id);
-      });
+    const attempt = this.startConnector(id, { retryInitialFailure: false }).catch((err) => {
+      const reason = err?.message || String(err);
+      throw new Error(`${reason} (automatic reconnect failed; start it manually in Settings → MCP for details)`);
+    }).finally(() => {
+      if (this._lazyStarts.get(id) === attempt) this._lazyStarts.delete(id);
+    });
     this._lazyStarts.set(id, attempt);
     return attempt;
   }
@@ -2186,7 +2233,10 @@ export class McpManager {
   async _callToolThroughInputRounds(client, { connectorId, connectorName, toolName, args, runtimeCtx }) {
     let extra = null;
     for (let round = 0; round <= MAX_INPUT_REQUIRED_ROUNDS; round += 1) {
+      await this._assertCallCurrent(connectorId, client, toolName, runtimeCtx);
+      this._assertCurrentClient(connectorId, client);
       const result = await client.callTool(toolName, args, extra || undefined);
+      this._assertCurrentClient(connectorId, client);
       if (result?.resultType !== "input_required") return result;
       if (round === MAX_INPUT_REQUIRED_ROUNDS) {
         throw new Error(
@@ -2199,6 +2249,7 @@ export class McpManager {
       // pending work, and then the call fails with the same outcome the user
       // chose — the decline round is a courtesy to the server, not a retry.
       if (extra?.declined) {
+        this._assertCurrentClient(connectorId, client);
         await client
           .callTool(toolName, args, extra.payload)
           // Failing to deliver the "no" must not turn a refusal into a

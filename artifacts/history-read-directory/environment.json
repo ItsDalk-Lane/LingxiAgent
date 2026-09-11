@@ -1,0 +1,27 @@
+{
+  "capturedAt": "2026-09-10",
+  "git": {
+    "branch": "fix/pending-sep10",
+    "head": "1d42b7405c76292f617291e3a01cd2f3ef5efd04",
+    "headMatchesTaskbookBaseline": true,
+    "workingTreeClean": true,
+    "porcelainOutput": "",
+    "diffStat": "",
+    "diffCachedStat": ""
+  },
+  "runtime": {
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "nodeRangeRequired": ">=24.12.0 <25",
+    "nodeRangeSatisfied": true
+  },
+  "hardware": {
+    "cpu": "Apple M3 Ultra",
+    "memoryBytes": 103079215104,
+    "filesystem": "apfs (local, sealed, journaled)",
+    "diskType": "local SSD, OS page cache state unknown at sample time"
+  },
+  "notes": "HEAD == 任务书固定基线 1d42b740…。工作区干净，无未提交修改需要保护；前置历史分页修复与模型观测双身份修复已在 HEAD 提交内。"
+}

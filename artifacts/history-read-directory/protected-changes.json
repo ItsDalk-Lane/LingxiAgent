@@ -1,0 +1,24 @@
+{
+  "capturedAt": "2026-09-10",
+  "head": "1d42b7405c76292f617291e3a01cd2f3ef5efd04",
+  "uncommittedChanges": [],
+  "untrackedSourceFiles": [],
+  "committedPrerequisiteWork": [
+    {
+      "name": "历史分页与 Run 连续性修复（前置 Run）",
+      "location": "HEAD 提交内；证据目录 artifacts/history-pagination-run-continuity/",
+      "policy": "不回退、不重写 Run 归并/片段缝合/结局裁决"
+    },
+    {
+      "name": "模型观测双身份修复",
+      "location": "HEAD 提交内；相关测试 tests/model-observability-session-trace-identity.test.ts 等",
+      "policy": "不在本任务改写"
+    },
+    {
+      "name": "Pi SDK 核心",
+      "location": "node_modules/@mariozechner/pi-* 等锁定依赖",
+      "policy": "本任务不修改"
+    }
+  ],
+  "note": "工作区干净，protected-changes 为零。后续若出现他人新修改，按文件+diff 区块补登记。"
+}

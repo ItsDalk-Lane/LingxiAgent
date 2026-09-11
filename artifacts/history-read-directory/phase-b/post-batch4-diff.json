@@ -1,0 +1,327 @@
+{
+  "task": "阶段 B 目录路径差分（普通分页 vs A04 冻结参考；full=disableCache 全量 / cold=冷构建 / hot=热命中）",
+  "generatedAt": "2026-09-10T08:01:29.555Z",
+  "modes": [
+    "full",
+    "cold",
+    "hot"
+  ],
+  "seed": 20260910,
+  "sizes": [
+    1000,
+    10000
+  ],
+  "manifest": "artifacts/history-read-directory/reference-outputs/reference-manifest.json",
+  "referenceGitHead": "1d42b7405c76292f617291e3a01cd2f3ef5efd04",
+  "fixtureAuditCrossCheck": {
+    "auditPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/history-read-directory/fixture-audit.json",
+    "checked": [
+      {
+        "n": 1000,
+        "found": true,
+        "ok": true,
+        "expected": {
+          "bytes": 443133,
+          "sha256": "d2b724253f961985fbfebf51433ae7126743c6a3051dec18a3138733f6dd8365"
+        },
+        "actual": {
+          "bytes": 443133,
+          "sha256": "d2b724253f961985fbfebf51433ae7126743c6a3051dec18a3138733f6dd8365"
+        }
+      },
+      {
+        "n": 10000,
+        "found": true,
+        "ok": true,
+        "expected": {
+          "bytes": 4520136,
+          "sha256": "09918383e568be23e7e0fd0e3ed6e546fe952e30981e6a3478949d5de2de6123"
+        },
+        "actual": {
+          "bytes": 4520136,
+          "sha256": "09918383e568be23e7e0fd0e3ed6e546fe952e30981e6a3478949d5de2de6123"
+        }
+      }
+    ],
+    "auditAvailable": true
+  },
+  "total": 21,
+  "passed": 21,
+  "failed": 0,
+  "allIdentical": true,
+  "results": [
+    {
+      "fixtureId": "longrun-n1000-seed20260910",
+      "label": "first-page",
+      "mode": "full",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "920642f7b5140de9653db3b75734a6a6578455ae0b1f691dd686eb5363dd7655",
+      "referenceSha256Normalized": "920642f7b5140de9653db3b75734a6a6578455ae0b1f691dd686eb5363dd7655",
+      "firstDiff": null,
+      "runs": 1
+    },
+    {
+      "fixtureId": "longrun-n1000-seed20260910",
+      "label": "middle-page",
+      "mode": "full",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "7ee7e21b0fa08800186dc88d36d7ccb0c9b920bec2f5cb3de5131cb548e8e745",
+      "referenceSha256Normalized": "7ee7e21b0fa08800186dc88d36d7ccb0c9b920bec2f5cb3de5131cb548e8e745",
+      "firstDiff": null,
+      "runs": 1
+    },
+    {
+      "fixtureId": "longrun-n1000-seed20260910",
+      "label": "last-page",
+      "mode": "full",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "8a0c833642c979859a8dc85d1bfe76a7606f9ef4518fa30cfd13e7df19d1d9e3",
+      "referenceSha256Normalized": "8a0c833642c979859a8dc85d1bfe76a7606f9ef4518fa30cfd13e7df19d1d9e3",
+      "firstDiff": null,
+      "runs": 1
+    },
+    {
+      "fixtureId": "longrun-n1000-seed20260910",
+      "label": "all",
+      "mode": "full",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "84d9ae39aefba3cbec13984d6c85481aaed98b1cfe8dd5f6230a0477bda449cb",
+      "referenceSha256Normalized": "84d9ae39aefba3cbec13984d6c85481aaed98b1cfe8dd5f6230a0477bda449cb",
+      "firstDiff": null,
+      "runs": 1
+    },
+    {
+      "fixtureId": "longrun-n10000-seed20260910",
+      "label": "first-page",
+      "mode": "full",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "45f1c96d9e1b4558450d81ccbd1e1ffc1ea02b54f240b79edd9436d13332a297",
+      "referenceSha256Normalized": "45f1c96d9e1b4558450d81ccbd1e1ffc1ea02b54f240b79edd9436d13332a297",
+      "firstDiff": null,
+      "runs": 1
+    },
+    {
+      "fixtureId": "longrun-n10000-seed20260910",
+      "label": "middle-page",
+      "mode": "full",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "5a3c90dc1780b6944a3cd2bcfe28cae145b7beea6e1e904a5e4efbd06573a66d",
+      "referenceSha256Normalized": "5a3c90dc1780b6944a3cd2bcfe28cae145b7beea6e1e904a5e4efbd06573a66d",
+      "firstDiff": null,
+      "runs": 1
+    },
+    {
+      "fixtureId": "longrun-n10000-seed20260910",
+      "label": "last-page",
+      "mode": "full",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "167edeefb956eb5cdfb35a2b60afd5bfb6ec1a9cbc49f9d3fd58ab8ecb1ee3a9",
+      "referenceSha256Normalized": "167edeefb956eb5cdfb35a2b60afd5bfb6ec1a9cbc49f9d3fd58ab8ecb1ee3a9",
+      "firstDiff": null,
+      "runs": 1
+    },
+    {
+      "fixtureId": "longrun-n1000-seed20260910",
+      "label": "first-page",
+      "mode": "cold",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "920642f7b5140de9653db3b75734a6a6578455ae0b1f691dd686eb5363dd7655",
+      "referenceSha256Normalized": "920642f7b5140de9653db3b75734a6a6578455ae0b1f691dd686eb5363dd7655",
+      "firstDiff": null,
+      "runs": 1
+    },
+    {
+      "fixtureId": "longrun-n1000-seed20260910",
+      "label": "middle-page",
+      "mode": "cold",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "7ee7e21b0fa08800186dc88d36d7ccb0c9b920bec2f5cb3de5131cb548e8e745",
+      "referenceSha256Normalized": "7ee7e21b0fa08800186dc88d36d7ccb0c9b920bec2f5cb3de5131cb548e8e745",
+      "firstDiff": null,
+      "runs": 1
+    },
+    {
+      "fixtureId": "longrun-n1000-seed20260910",
+      "label": "last-page",
+      "mode": "cold",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "8a0c833642c979859a8dc85d1bfe76a7606f9ef4518fa30cfd13e7df19d1d9e3",
+      "referenceSha256Normalized": "8a0c833642c979859a8dc85d1bfe76a7606f9ef4518fa30cfd13e7df19d1d9e3",
+      "firstDiff": null,
+      "runs": 1
+    },
+    {
+      "fixtureId": "longrun-n1000-seed20260910",
+      "label": "all",
+      "mode": "cold",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "84d9ae39aefba3cbec13984d6c85481aaed98b1cfe8dd5f6230a0477bda449cb",
+      "referenceSha256Normalized": "84d9ae39aefba3cbec13984d6c85481aaed98b1cfe8dd5f6230a0477bda449cb",
+      "firstDiff": null,
+      "runs": 1
+    },
+    {
+      "fixtureId": "longrun-n10000-seed20260910",
+      "label": "first-page",
+      "mode": "cold",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "45f1c96d9e1b4558450d81ccbd1e1ffc1ea02b54f240b79edd9436d13332a297",
+      "referenceSha256Normalized": "45f1c96d9e1b4558450d81ccbd1e1ffc1ea02b54f240b79edd9436d13332a297",
+      "firstDiff": null,
+      "runs": 1
+    },
+    {
+      "fixtureId": "longrun-n10000-seed20260910",
+      "label": "middle-page",
+      "mode": "cold",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "5a3c90dc1780b6944a3cd2bcfe28cae145b7beea6e1e904a5e4efbd06573a66d",
+      "referenceSha256Normalized": "5a3c90dc1780b6944a3cd2bcfe28cae145b7beea6e1e904a5e4efbd06573a66d",
+      "firstDiff": null,
+      "runs": 1
+    },
+    {
+      "fixtureId": "longrun-n10000-seed20260910",
+      "label": "last-page",
+      "mode": "cold",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "167edeefb956eb5cdfb35a2b60afd5bfb6ec1a9cbc49f9d3fd58ab8ecb1ee3a9",
+      "referenceSha256Normalized": "167edeefb956eb5cdfb35a2b60afd5bfb6ec1a9cbc49f9d3fd58ab8ecb1ee3a9",
+      "firstDiff": null,
+      "runs": 1
+    },
+    {
+      "fixtureId": "longrun-n1000-seed20260910",
+      "label": "first-page",
+      "mode": "hot",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "920642f7b5140de9653db3b75734a6a6578455ae0b1f691dd686eb5363dd7655",
+      "referenceSha256Normalized": "920642f7b5140de9653db3b75734a6a6578455ae0b1f691dd686eb5363dd7655",
+      "firstDiff": null,
+      "runs": 2
+    },
+    {
+      "fixtureId": "longrun-n1000-seed20260910",
+      "label": "middle-page",
+      "mode": "hot",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "7ee7e21b0fa08800186dc88d36d7ccb0c9b920bec2f5cb3de5131cb548e8e745",
+      "referenceSha256Normalized": "7ee7e21b0fa08800186dc88d36d7ccb0c9b920bec2f5cb3de5131cb548e8e745",
+      "firstDiff": null,
+      "runs": 2
+    },
+    {
+      "fixtureId": "longrun-n1000-seed20260910",
+      "label": "last-page",
+      "mode": "hot",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "8a0c833642c979859a8dc85d1bfe76a7606f9ef4518fa30cfd13e7df19d1d9e3",
+      "referenceSha256Normalized": "8a0c833642c979859a8dc85d1bfe76a7606f9ef4518fa30cfd13e7df19d1d9e3",
+      "firstDiff": null,
+      "runs": 2
+    },
+    {
+      "fixtureId": "longrun-n1000-seed20260910",
+      "label": "all",
+      "mode": "hot",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "84d9ae39aefba3cbec13984d6c85481aaed98b1cfe8dd5f6230a0477bda449cb",
+      "referenceSha256Normalized": "84d9ae39aefba3cbec13984d6c85481aaed98b1cfe8dd5f6230a0477bda449cb",
+      "firstDiff": null,
+      "runs": 2
+    },
+    {
+      "fixtureId": "longrun-n10000-seed20260910",
+      "label": "first-page",
+      "mode": "hot",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "45f1c96d9e1b4558450d81ccbd1e1ffc1ea02b54f240b79edd9436d13332a297",
+      "referenceSha256Normalized": "45f1c96d9e1b4558450d81ccbd1e1ffc1ea02b54f240b79edd9436d13332a297",
+      "firstDiff": null,
+      "runs": 2
+    },
+    {
+      "fixtureId": "longrun-n10000-seed20260910",
+      "label": "middle-page",
+      "mode": "hot",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "5a3c90dc1780b6944a3cd2bcfe28cae145b7beea6e1e904a5e4efbd06573a66d",
+      "referenceSha256Normalized": "5a3c90dc1780b6944a3cd2bcfe28cae145b7beea6e1e904a5e4efbd06573a66d",
+      "firstDiff": null,
+      "runs": 2
+    },
+    {
+      "fixtureId": "longrun-n10000-seed20260910",
+      "label": "last-page",
+      "mode": "hot",
+      "ok": true,
+      "shaMatch": true,
+      "fieldDiffs": [],
+      "fileUnchanged": true,
+      "sha256Normalized": "167edeefb956eb5cdfb35a2b60afd5bfb6ec1a9cbc49f9d3fd58ab8ecb1ee3a9",
+      "referenceSha256Normalized": "167edeefb956eb5cdfb35a2b60afd5bfb6ec1a9cbc49f9d3fd58ab8ecb1ee3a9",
+      "firstDiff": null,
+      "runs": 2
+    }
+  ]
+}

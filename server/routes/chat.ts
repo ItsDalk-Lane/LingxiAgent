@@ -7,6 +7,7 @@
 import { Hono } from "hono";
 import { MoodParser, ThinkTagParser } from "../../core/events.ts";
 import { extractBlocks } from "../block-extractors.ts";
+import { sessionFileToContentBlock } from "../session-file-block.ts";
 import { toAppEventWsMessage } from "../app-events.ts";
 import { toResourceEventWsMessage } from "../resource-events-ws.ts";
 import {
@@ -162,35 +163,6 @@ function deferredResultFileBlocks(result: any, taskId: any = null) {
   return sessionFiles
     .map((file) => sessionFileToContentBlock(file, taskId ? { replacesTaskId: taskId } : undefined))
     .filter(Boolean);
-}
-
-function sessionFileToContentBlock(file: any, extra: any = undefined) {
-  if (!file || typeof file !== "object") return null;
-  const filePath = file.filePath || file.realPath || null;
-  if (!filePath) return null;
-  const fileId = file.fileId || file.id || null;
-  const label = file.label || file.displayName || file.filename || path.basename(filePath);
-  const ext = file.ext ?? path.extname(filePath || label).toLowerCase().replace(/^\./, "");
-  return {
-    type: "file",
-    ...(extra || {}),
-    ...(fileId ? { fileId } : {}),
-    filePath,
-    label,
-    ext,
-    ...(file.mime ? { mime: file.mime } : {}),
-    ...(file.kind ? { kind: file.kind } : {}),
-    ...(file.storageKind ? { storageKind: file.storageKind } : {}),
-    ...(file.presentation ? { presentation: file.presentation } : {}),
-    ...(file.listed !== undefined ? { listed: file.listed !== false } : {}),
-    ...(file.status ? { status: file.status } : {}),
-    ...(file.missingAt !== undefined ? { missingAt: file.missingAt } : {}),
-    ...(file.mtimeMs !== undefined ? { mtimeMs: file.mtimeMs } : {}),
-    ...(file.size !== undefined ? { size: file.size } : {}),
-    ...(file.version ? { version: file.version } : {}),
-    ...(file.waveform ? { waveform: file.waveform } : {}),
-    ...(file.resource ? { resource: file.resource } : {}),
-  };
 }
 
 function deferredResultFailureBlock(event: any) {
@@ -2264,7 +2236,7 @@ export function createChatRoute(engine: any, hub: any, {
                 rejectDeletedAgentSession(ws, steerPath);
                 return;
               }
-              if (engine.steerSession(steerPath, msg.text)) {
+              if (await engine.steerSession(steerPath, msg.text)) {
                 wsSend(ws, { type: "steered" });
                 return;
               }
@@ -2617,9 +2589,9 @@ export function createChatRoute(engine: any, hub: any, {
                   const errMessage = err.message === "session_busy"
                     ? t("error.stillStreaming", { name: engine.agentName })
                     : err.message;
-                  wsSend(ws, { type: "error", message: errMessage, sessionPath: promptSessionPath });
-                  // 提交层证明「未接受」（canonical 回执未触发）才发拒绝回执；已接受后
-                  // 的运行失败保持普通 error，客户端不得推断为未接收（C01）。
+                  const isUserAbort = err.name === 'AbortError' || err.message === 'This operation was aborted' || err.type === 'aborted';
+                  if (!isUserAbort) wsSend(ws, { type: "error", message: errMessage, sessionPath: promptSessionPath });
+                  // 只有提交层证明尚未移交的失败才发拒绝；取消也必须交付输入结算。
                   if (isDesktopInputRejectedBeforeAcceptance(err)) {
                     const info = inputRejectionInfoForSubmitError(err);
                     sendInputRejection(ws, promptTarget, msg, { ...info, message: errMessage });
@@ -2715,13 +2687,11 @@ export function createChatRoute(engine: any, hub: any, {
                     ? t("error.stillStreaming", { name: engine.agentName })
                     : err.message;
                   wsSend(ws, { type: "error", message: errMessage, sessionPath: promptSessionPath });
-                  // 提交层证明「未接受」（canonical 关联回执未触发，busy 门禁/身份
-                  // 解析/知识检索失败等）才发类型化拒绝回执；已接受后的运行错误
-                  //（供应商失败等）保持普通 error——客户端不得推断为未接收（C01）。
-                  if (isDesktopInputRejectedBeforeAcceptance(err)) {
-                    const info = inputRejectionInfoForSubmitError(err);
-                    sendInputRejection(ws, promptTarget, msg, { ...info, message: errMessage });
-                  }
+                }
+                // 接受前取消不弹普通错误，但必须结算对应输入，不能让客户端永久未知。
+                if (isDesktopInputRejectedBeforeAcceptance(err)) {
+                  const info = inputRejectionInfoForSubmitError(err);
+                  sendInputRejection(ws, promptTarget, msg, { ...info, message: err.message });
                 }
               }
             }
