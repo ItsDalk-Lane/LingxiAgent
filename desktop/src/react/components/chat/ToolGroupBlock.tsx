@@ -13,7 +13,7 @@ import { asDeferredHistoryContent, useDeferredHistoryContent } from '../../hooks
 import { extractToolDetail } from '../../utils/message-parser';
 import { openInternalLink, resolveLinkTarget } from '../../utils/link-open';
 import { isToolCallHiddenFromProcessUi } from '../../utils/tool-call-visibility';
-import { getToolLabel, phaseForStatus, sessionToolTargetName, sessionToolTargetPath } from '../../utils/tool-label';
+import { getToolLabel, phaseForStatus, activityLabel, sessionToolTargetName, sessionToolTargetPath } from '../../utils/tool-label';
 import { TODO_TOOL_NAMES } from '../../utils/todo-constants';
 import { migrateLegacyTodos } from '../../utils/todo-compat';
 import { knowledgeResearchStopNote } from '../../utils/knowledge-research-status';
@@ -92,11 +92,18 @@ const ToolActivity = memo(function ToolActivity({ tool, agentName, skillPrompt, 
   const command = commandOf(tool);
   const isTodoTool = (TODO_TOOL_NAMES as readonly string[]).includes(tool.name);
   const todoSummary = isTodoTool ? todoRowSummary(tool) : null;
-  const summary = tool.error || todoSummary || (skillName ? skillName : targetName || (terminalNames.has(tool.name) ? string(tool.args?.description) || string(exec.description) || command.split('\n')[0] : detail.text));
-  const label = research ? getToolLabel(tool.name, phaseForStatus(toolStatus), agentName, tool.args).replace(/^[^\p{L}\p{N}]+/u, '') : t(`labels.${skillName ? 'skill' : terminalNames.has(tool.name) ? 'terminal' : ['read', 'write', 'edit', 'grep', 'find', 'ls', 'session', 'web_search', 'web_fetch'].includes(tool.name) ? tool.name : 'tool'}`);
+  // 调查聚合卡每次调用自带的进展措辞（{completed}/{total}、{count}）；聚合进度卡
+  // 只画进度条，这一步只能在工具行里说，所以它进摘要而不是主标签。
+  const researchProgress = research ? getToolLabel(tool.name, phaseForStatus(toolStatus), agentName, tool.args).replace(/^[^\p{L}\p{N}]+/u, '') : '';
+  const summary = tool.error || todoSummary || (skillName ? skillName : targetName || (terminalNames.has(tool.name) ? string(tool.args?.description) || string(exec.description) || command.split('\n')[0] : research ? [detail.text, researchProgress].filter(Boolean).join(' · ') : detail.text));
+  // 行主标签只能是文案词：技能形态名 / 清单面板标题「任务」/ 五语言短标签。
+  // 裸英文工具名（search_memory、mcp_deep-search）不再作为主标签，原工具名挪到行上的
+  // 悬停提示（title）、data-tool 与完整调用弹窗的标题里。
   const displayLabel = isTodoTool
     ? (window.t?.('todoPanel.title') || tool.name)
-    : label === t('labels.tool') ? tool.name : label;
+    : activityLabel(tool.name, { skill: Boolean(skillName) }) || tool.name;
+  const labelHint = displayLabel === tool.name ? undefined : tool.name;
+  const rowHint = labelHint ?? (detail.title || command || undefined);
   const change = record(tool.details?.fileChange);
   const counts = typeof change.added === 'number' && typeof change.removed === 'number'
     ? { added: change.added, removed: change.removed }
@@ -108,12 +115,12 @@ const ToolActivity = memo(function ToolActivity({ tool, agentName, skillPrompt, 
     return true;
   }), [terminalId, tool.id]);
   return <div ref={root} className={styles.activity} data-tool={tool.name} data-tool-call-id={tool.id} data-terminal-id={terminalId || undefined} data-skill-name={skillName || undefined} data-status={status} data-done={String(tool.done)}>
-    <div role="button" tabIndex={0} aria-expanded={expanded} aria-label={`${displayLabel} · ${summary}`} className={`${styles.row} ${status === 'failed' ? styles.failed : ''}`} onClick={() => setExpanded(value => !value)} onKeyDown={event => {
+    <div role="button" tabIndex={0} aria-expanded={expanded} aria-label={`${displayLabel} · ${summary}`} title={rowHint} className={`${styles.row} ${status === 'failed' ? styles.failed : ''}`} onClick={() => setExpanded(value => !value)} onKeyDown={event => {
       if (event.target !== event.currentTarget) return;
       if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setExpanded(value => !value); }
     }}>
       <ActivityIcon kind={skillName ? 'skill' : tool.name} />
-      <span className={styles.label}>{displayLabel}</span>
+      <span className={styles.label} data-label={displayLabel}>{displayLabel}</span>
       {(summary || tool.resultNote) && <span className={styles.separator} aria-hidden="true">·</span>}
       {summary && <span className={styles.summary} title={detail.title || command || summary}>
         {(targetPath || detailHref) && !tool.error && !skillName ? <a className={styles.link} href={targetPath || detailHref} onClick={event => { event.preventDefault(); event.stopPropagation(); if (targetPath) void switchSession(targetPath); else if (detailHref) void openInternalLink(detailHref, { origin: 'session' }); }} onContextMenu={event => {

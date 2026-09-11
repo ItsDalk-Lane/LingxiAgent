@@ -5,6 +5,8 @@ import path from 'node:path';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ToolGroupBlock } from '../../components/chat/ToolGroupBlock';
+import { ActivityIcon, activityIconFamily } from '../../components/chat/MessageActivity';
+import { BUILTIN_TOOL_NAMES, BUNDLED_PLUGIN_TOOL_NAMES } from '../../utils/tool-label';
 import { ThinkingBlock } from '../../components/chat/ThinkingBlock';
 import type { ToolCall } from '../../stores/chat-types';
 import { useStore } from '../../stores';
@@ -212,5 +214,87 @@ describe('统一消息行与工具详情', () => {
     expect(document.body.contains(dialog)).toBe(true);
     // .activity 不在弹窗祖先链上：内边距只能来自弹窗自身带回退的声明。
     expect(dialog.closest('[class*="activity"]')).toBeNull();
+  });
+
+  it('工具行按家族给图标，未匹配的家族才落通用网格', () => {
+    // 家族图标写在 data-activity-family 上，data-activity-icon 仍是原工具名（选择器/排障不变）。
+    const familyOf = (name: string) => {
+      renderTool(tool(name));
+      const svg = document.querySelector(`[data-activity-icon="${name}"]`);
+      expect(svg, `${name} 的行没有图标`).toBeInTheDocument();
+      return svg!.getAttribute('data-activity-family');
+    };
+
+    // 记忆族
+    for (const name of ['search_memory', 'pin_memory', 'unpin_memory', 'recall_experience', 'record_experience', 'tenet_propose']) {
+      expect(familyOf(name), name).toBe('memory');
+      cleanup();
+    }
+    // 回归：search_memory 曾经落通用网格（格子图标），现在必须是记忆族气泡
+    renderTool(tool('search_memory'));
+    const memorySvg = document.querySelector('[data-activity-icon="search_memory"]');
+    expect(memorySvg).toHaveAttribute('data-activity-icon', 'search_memory');
+    expect(memorySvg).toHaveAttribute('data-activity-family', 'memory');
+    expect(memorySvg!.querySelectorAll('rect')).toHaveLength(0);
+    expect(memorySvg!.querySelectorAll('path')).toHaveLength(1);
+    cleanup();
+    // 知识族：knowledge_read 在旧正则下会被 /read/ 抢走，必须排在前面
+    for (const name of ['knowledge_search', 'knowledge_read', 'knowledge_outline', 'knowledge_grep', 'knowledge_manage', 'knowledge_local_search', 'knowledge_research_progress']) {
+      expect(familyOf(name), name).toBe('knowledge');
+      cleanup();
+    }
+    // 频道 / 通知 / 浏览器 / 电脑 / 文件 / 自动化 / 子代理 / 停止
+    const families: Array<[string, string]> = [
+      ['channel_read_context', 'channel'], ['channel_reply', 'channel'], ['channel_pass', 'channel'], ['channel', 'channel'],
+      ['notify', 'notify'],
+      ['browser', 'browser'],
+      ['computer', 'computer'],
+      ['file', 'file'], ['materialize', 'file'],
+      ['automation', 'automation'],
+      ['subagent_reply', 'subagent'], ['subagent_close', 'subagent'],
+      ['stop_task', 'stop'],
+    ];
+    for (const [name, family] of families) {
+      expect(familyOf(name), name).toBe(family);
+      cleanup();
+    }
+    // 未匹配家族的（MCP / 第三方插件 / 未知工具名）维持通用网格
+    for (const name of ['mcp_deep-search', 'mcp_search_issues', 'acme_read', 'brand_new_builtin_tool']) {
+      expect(familyOf(name), name).toBe('grid');
+      cleanup();
+    }
+  });
+
+  it('内置工具名都有图标家族，落网格的必须显式豁免', () => {
+    // 对账口径与 tool-label 的 BUILTIN_TOOL_NAMES 共用一份名单：新工具漏配家族图标
+    // 会静默变成通用网格，这里把它变成红灯。
+    const exempt = new Set([
+      'todo_write',       // 清单面板工具，行图标由面板标题语义决定，不做专属家族
+      'stage_files',      // 卡片承载，不进进程区
+      'subagent', 'show_card', 'hana_card_guide', 'workflow', 'install_skill', 'update_settings',
+      'present_files',    // 已下线，历史 JSONL 里的旧调用
+      ...BUNDLED_PLUGIN_TOOL_NAMES,
+    ]);
+    const unmapped = [...BUILTIN_TOOL_NAMES]
+      .filter(name => !exempt.has(name) && activityIconFamily(name) === 'grid')
+      .sort();
+    expect(unmapped, '这些内置工具会落通用网格图标，请补家族或显式豁免').toEqual([]);
+    // 反向：豁免名单里的名字必须真的是内置工具，防止名单过期后成为垃圾抽屉
+    expect([...exempt].filter(name => !BUILTIN_TOOL_NAMES.has(name))).toEqual([]);
+  });
+
+  it('原有核心工具的图标家族不变', () => {
+    const families: Array<[string, string]> = [
+      ['read', 'read'], ['skill', 'skill'], ['write', 'edit'], ['edit', 'edit'],
+      ['grep', 'search'], ['find', 'search'], ['ls', 'ls'],
+      ['bash', 'terminal'], ['exec_command', 'terminal'], ['write_stdin', 'terminal'], ['terminal', 'terminal'],
+      ['thinking', 'thinking'],
+    ];
+    for (const [name, family] of families) {
+      const { container } = render(<ActivityIcon kind={name} />);
+      const svg = container.querySelector('svg');
+      expect(svg?.getAttribute('data-activity-family'), name).toBe(family);
+      cleanup();
+    }
   });
 });

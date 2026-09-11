@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
-  BUILTIN_TOOL_NAMES, TOOL_LABEL_ALIASES as RUNTIME_ALIASES, SESSION_ACTION_LABEL_KEYS,
+  ACTIVITY_LABEL_KEYS, BUILTIN_TOOL_NAMES, BUNDLED_PLUGIN_TOOL_NAMES, TOOL_LABEL_ALIASES as RUNTIME_ALIASES,
+  SESSION_ACTION_LABEL_KEYS, activityLabel,
   isExternalTool, phaseForStatus, sessionToolTargetName, sessionToolTargetPath,
 } from '../desktop/src/react/utils/tool-label';
 
@@ -52,8 +53,42 @@ const LABELED_TOOL_NAMES = [
   'beautify_get-html-style-guide', 'beautify_list-capabilities',
   'office_read-document', 'office_html-to-pdf', 'office_list-capabilities',
   // 已下线但历史 JSONL 里仍有调用记录，回看旧会话时要能正常渲染
-  'create_artifact', 'dm',
+  'create_artifact', 'dm', 'present_files',
 ];
+
+/**
+ * 工具行主标签短文案覆盖的工具名。
+ *
+ * 取运行时的 ACTIVITY_LABEL_KEYS（登记表）加别名键：别名工具（exec_command /
+ * write_stdin）在表里指向 terminal，本身不需要独立文案键，但必须有短标签可渲染。
+ * 由登记表派生而不是再抄一份清单——抄一份就会出现"新工具只补了渲染侧、忘了对账"
+ * 的缝隙。
+ */
+const ACTIVITY_LABEL_TOOL_NAMES = [
+  ...new Set([
+    ...Object.keys(ACTIVITY_LABEL_KEYS).filter((name) => !name.startsWith('_')),
+    ...Object.keys(RUNTIME_ALIASES),
+  ]),
+];
+
+/** 家族词 / 通用兜底的键：没有对应工具名，但五语言必须都有。 */
+const ACTIVITY_FAMILY_LABEL_KEYS = Object.keys(ACTIVITY_LABEL_KEYS).filter((name) => name.startsWith('_'));
+
+/**
+ * 短标签对账豁免：这些工具有独立的面板标题，不走 messageActivity.labels。
+ * todo_write 的行标签固定取 `todoPanel.title`（「任务」），由 ToolGroupBlock 的
+ * 渲染用例守住，不在这里重复要求一个永远用不上的键。
+ */
+const ACTIVITY_LABEL_EXEMPT_TOOL_NAMES = new Set(['todo_write']);
+
+/**
+ * 已下线、只可能出现在历史 JSONL 里的工具：要有行短标签（旧会话回看时仍会渲染成
+ * 工具行），但不要求 `tool.*` 那套整句文案。
+ *
+ * `present_files` 不在 lib/tools 注册表里，历史上也没有配过三相位文案；按拍板
+ * 旧 `tool.*` 文案原样保留、不新增、不接回，所以这里显式豁免而不是补文案。
+ */
+const LEGACY_TOOL_NAMES = new Set(['present_files']);
 
 /**
  * 文案键但不是工具名：同一个工具按 action 分出来的档位。
@@ -82,6 +117,11 @@ const UNLABELED_TOOL_NAMES = new Set([
 
 function loadLocale(name: string): Record<string, any> {
   return JSON.parse(fs.readFileSync(path.join(localesDir, `${name}.json`), 'utf8'));
+}
+
+/** 按 `a.b.c` 取值；缺键返回 undefined，好让调用方区分"没翻译"和"翻译成了空串"。 */
+function loadKey(data: Record<string, any>, key: string): unknown {
+  return key.split('.').reduce<any>((node, part) => (node == null ? undefined : node[part]), data);
 }
 
 /** 从源码里抓工具注册名，粗粒度但足以发现"新工具没登记"。 */
@@ -125,6 +165,7 @@ describe('工具行文案对账', () => {
       const tool = loadLocale(locale).tool ?? {};
       const missing: string[] = [];
       for (const name of [...LABELED_TOOL_NAMES, ...ACTION_LABEL_KEYS]) {
+        if (LEGACY_TOOL_NAMES.has(name)) continue;
         const key = TOOL_LABEL_ALIASES[name] ?? name;
         for (const phase of phases) {
           const value = tool[key]?.[phase];
@@ -132,6 +173,28 @@ describe('工具行文案对账', () => {
         }
       }
       expect(missing, `${locale}.json 缺工具文案`).toEqual([]);
+    });
+    it(`${locale}.json 为每个内置工具提供行短标签`, () => {
+      // 硬指标：工具行主标签必须是文案词。缺键时 activityLabel 会落到通用兜底
+      // （或裸键名），界面就会出现"每个冷门工具都叫工具"或裸英文工具名。
+      const labels = loadLocale(locale).messageActivity?.labels ?? {};
+      const missing: string[] = [];
+      const rawNames: string[] = [];
+      for (const key of ACTIVITY_FAMILY_LABEL_KEYS) {
+        const value = labels[ACTIVITY_LABEL_KEYS[key]];
+        if (typeof value !== 'string' || !value.trim()) missing.push(`messageActivity.labels.${ACTIVITY_LABEL_KEYS[key]}`);
+      }
+      for (const name of ACTIVITY_LABEL_TOOL_NAMES) {
+        if (ACTIVITY_LABEL_EXEMPT_TOOL_NAMES.has(name)) continue;
+        const key = ACTIVITY_LABEL_KEYS[name] ?? name;
+        const value = labels[key];
+        if (typeof value !== 'string' || !value.trim()) missing.push(`messageActivity.labels.${key}`);
+        // 英文界面也不许把工具本名当标签：en 里 `read` 叫 Read、`ls` 叫 Directory，
+        // 短标签与工具名逐字相同就说明这里根本没翻译。
+        else if (value === name) rawNames.push(`${name} → ${value}`);
+      }
+      expect(missing, `${locale}.json 缺工具行短标签`).toEqual([]);
+      expect(rawNames, `${locale}.json 的行短标签退回了裸英文工具名`).toEqual([]);
     });
   }
 
@@ -162,22 +225,70 @@ describe('工具行文案对账', () => {
   });
 
   it('渲染侧的内置名单跟已登记工具对得上', () => {
-    // 内置插件的工具在运行时也带 pluginId 前缀，归外部工具那一侧，不进内置名单
-    const bundledPluginTools = LABELED_TOOL_NAMES.filter((n) => /^(media|beautify|office)_/.test(n));
+    // 内置插件（media / beautify / office）是随 Lingxi 分发的，运行时工具名带
+    // pluginId 前缀，所以它们是内置工具而不是第三方插件。
     const expected = new Set([
-      ...LABELED_TOOL_NAMES.filter((n) => !bundledPluginTools.includes(n)),
+      ...LABELED_TOOL_NAMES.filter((n) => !BUNDLED_PLUGIN_TOOL_NAMES.has(n)),
+      ...BUNDLED_PLUGIN_TOOL_NAMES,
       ...Object.keys(RUNTIME_ALIASES),
     ]);
     expect([...BUILTIN_TOOL_NAMES].sort()).toEqual([...expected].sort());
   });
 
-  it('内置工具走通用兜底，外部插件与 MCP 工具走插件兜底', () => {
+  it('内置工具走通用兜底，第三方插件与 MCP 工具走插件兜底', () => {
     expect(isExternalTool('check_pending_tasks')).toBe(false);
     expect(isExternalTool('web_search')).toBe(false);
-    expect(isExternalTool('beautify_create-cover')).toBe(true);
+    // 内置插件带 pluginId 前缀，仍是内置工具
+    expect(isExternalTool('beautify_create-cover')).toBe(false);
+    expect(isExternalTool('media_generate-image')).toBe(false);
     expect(isExternalTool('mcp_search_issues')).toBe(true);
     // 第三方插件里叫 read 的工具不能撞上内置 read 的文案
     expect(isExternalTool('acme_read')).toBe(true);
+  });
+
+  it('工具行主标签永远取文案词，不返回工具本名', () => {
+    // 报告工具里没有对应短标签的冷门工具、插件工具与 MCP 工具
+    const label = (name: string, options?: { skill?: boolean; todoTitle?: string }) => {
+      const previous = (globalThis as any).window;
+      (globalThis as any).window = { t: (key: string) => loadKey(loadLocale('zh'), key) ?? key };
+      try {
+        return activityLabel(name, options);
+      } finally {
+        (globalThis as any).window = previous;
+      }
+    };
+
+    expect(label('search_memory')).toBe('回想');
+    expect(label('knowledge_search')).toBe('查资料');
+    expect(label('channel_reply')).toBe('回频道');
+    expect(label('browser')).toBe('开网页');
+    expect(label('computer')).toBe('操控电脑');
+    expect(label('materialize')).toBe('落盘');
+    expect(label('subagent_reply')).toBe('转达子代理');
+    expect(label('create_artifact')).toBe('做卡片');
+    expect(label('dm')).toBe('私信');
+    // 别名工具走别名键，不各自要一条文案
+    expect(label('exec_command')).toBe('Bash');
+    expect(label('write_stdin')).toBe('Bash');
+    // 技能形态与清单面板标题优先于工具名
+    expect(label('read', { skill: true })).toBe('技能');
+    expect(label('todo_write', { todoTitle: '任务' })).toBe('任务');
+
+    // 第三方插件 / MCP 工具名不可预知：主标签用统一家族词「扩展」，原工具名不进主标签
+    for (const external of ['mcp_deep-search', 'mcp_memory_search', 'acme_read', 'some_plugin_tool']) {
+      const text = label(external);
+      expect(text).toBe('扩展');
+      expect(text).not.toBe(external);
+    }
+    // 没登记短标签的一方工具落通用词；带下划线又不在内置名单里的（=插件/MCP 形态）
+    // 落家族词。两条路都不返回工具本名。
+    expect(label('brandnewtool')).toBe('工具');
+    expect(label('brand_new_tool')).toBe('扩展');
+
+    // 标签链上的每一档都不能等于工具本名（英文界面最容易踩：labels.tool ≠ "Tool" 以外还要求逐工具翻译）
+    const en = loadLocale('en').messageActivity.labels;
+    expect(en.tool).toBeTypeOf('string');
+    expect(en.tool).not.toBe('');
   });
 
   it('session 按 action 分档，send/create 不用查看那套说法', () => {

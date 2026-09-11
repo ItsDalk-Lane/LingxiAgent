@@ -1827,3 +1827,79 @@ M  desktop/src/react/__tests__/components/TodoPanel.test.tsx
 - 收尾修整：① 新增 `SessionRollback.module.css` 触发 style-discipline 棘轮（bare-spacing 12 / hardcoded-color 1）→ 全部改走 `--space-*`/`--overlay-*`/`--danger` token，该测试 8/8 通过；② 新增快照模块改变 `build/cli-runtime-closure.json`（白名单外守卫产物）→ 按守卫自带 writer 重新生成（生成器读当前源码树，保留在途改动），`tests/cli-closure-census.test.ts` 22/22 通过，`build/open-boundary-baseline.json` 未变，详见 BLOCKED.md「越界说明」；③ 因「重新生成入口改小菜单」，同步更新 3 个既有交互测试的点击路径与模块 mock，断言未放宽。
 - 全量负载下偶发 1 条与本任务无关的时序/环境失败（两次分别为 `GitChangesModal.test.tsx`、`artifact-core-ustar.test.ts`），均隔离复跑通过；连续三次全量中 `/tmp/t4-full-test3.log` 为基线集合零新增。
 - 完成条件 2：`git status --short` 对照任务 0 快照，白名单外零改动（差异仅本节列出的允许文件 + 守卫产物 repin）；HEAD 仍为 `0a098595…`（零 commit）；`~/.lingxi/workspace-snapshots` 不存在（影子数据只在临时目录，用户工作区无新增文件）。
+
+## 任务台账：工具行短标签全覆盖 + 家族图标（2026-09-11，分支 feat/tool-activity-presentation，HEAD 22410318c）
+
+### 任务 0：基线核对
+- `npm run typecheck` → exit 0（复跑通过，命令输出见对话）。
+- 全量 `npm test` 基线 → 见下方「基线与收尾」；与任务书数字一致后才动工。
+
+### 理解的目标 / 顺序 / 最大风险（≤10 行）
+1. 目标：每条工具行主标签必须是语言包文案词（禁止裸英文工具名当主标签）；家族专属图标；详情区保持现状。
+2. 顺序：任务 1（五语言短标签 + ToolGroupBlock 解析 + 对账/渲染用例）→ 任务 2（ActivityIcon 家族分支）→ 任务 3（typecheck + 全量测试）。
+3. 让步顺序：全量测试绿 > 短标签全覆盖 > 图标精细。
+4. 最大风险：既有渲染用例用桩 `window.t`（返回 raw key），对账用例覆盖不到真实语言包；已加「加载真实 zh.json 的 window.t」渲染 search_memory / subagent_reply / mcp_xxx 的断言兜住。
+5. 次要风险：ActivityIcon 的旧正则分支（`/read|write/`、`/search|grep/`）会抢走新家族名，家族判定必须排在旧正则之前。
+6. 取舍记录：调查聚合卡（knowledge_research_*）原本用 `tool.*` 长文案当标签，措辞与短标签体系不一致，改走 messageActivity 家族词「调查」；旧 `tool.*` 70+ 条按拍板原样保留、不接回。
+7. 取舍记录：MCP/插件工具主标签统一「扩展」，原工具名保留在 `data-tool` 与完整调用弹窗（tool.name）；不新增悬停提示（未要求，避免动详情区）。
+8. 取舍记录：`todo_write` 维持面板标题「任务」；`exec_command`/`write_stdin` 维持别名（Bash）。
+9. 白名单内改动：ToolGroupBlock.tsx / MessageActivity.tsx / tool-label.ts / zh,zh-TW,en,ja,ko.json / ToolGroupBlock.test.tsx / MessageActivity.test.tsx / tests/tool-label-coverage.test.ts / PROGRESS.md / BLOCKED.md。
+10. 不 commit、不 push、不新增依赖；顺手活记 BLOCKED.md。
+
+### 任务 1 交付：五语言短标签全覆盖
+- `desktop/src/locales/{zh,zh-TW,en,ja,ko}.json` 的 `messageActivity.labels` 从 15 行扩到 69 行：
+  原有 13 条键值逐字保留，新增 55 条（53 个逐工具短标签 + `knowledge_research` + `present_files`），
+  另加家族词 `_plugin`（扩展/擴充/Extension/拡張/확장）。脚本核对：五个语言包"其余顶层键与
+  messageActivity 其它子键完全一致"，旧键值 100% 保留（en 曾误改 `ls`/`web_fetch`，已还原）。
+- `desktop/src/react/utils/tool-label.ts`：新增 `ACTIVITY_LABEL_KEYS`（登记表）+ `activityLabel()`
+  单一解析点（技能 → 一方短标签 → 插件/MCP 家族词「扩展」→ 通用词「工具」）；新增
+  `BUNDLED_PLUGIN_TOOL_NAMES` 并把它并入 `BUILTIN_TOOL_NAMES`（内置插件不再被 isExternalTool 误判）。
+- `ToolGroupBlock.tsx`：行主标签改走 `activityLabel()`，任何分支都不返回工具本名；原工具名降级到
+  行 `title`（悬停）、`data-tool`、完整调用弹窗。调查聚合卡每次调用的进展措辞（「已完成 2/3 个证据问题」）
+  从主标签挪到摘要，信息不丢。
+
+### 任务 2 交付：家族图标
+- `MessageActivity.tsx` 新增 `activityIconFamily()` + `ACTIVITY_ICON_FAMILIES` 登记表；
+  `data-activity-icon` 仍是工具本名（既有选择器不破），新增 `data-activity-family` 供断言与排障。
+- 家族：记忆=气泡、知识=书本、频道=喇叭、通知=铃铛、浏览器=地球、电脑=显示器、文件/落盘=文档、
+  自动化=齿轮、子代理=机器人、停止=方块；会话/文件夹/状态/清单/循环/卡片/私信另配 7 个线性图标；
+  未匹配的家族（MCP/插件/未知名）维持通用网格。
+- 取舍：家族判定由"旧正则子串匹配"改为"登记表精确匹配 + 网格兜底"。原因：`mcp_deep-search`
+  这类不可预知工具名会被 `/search/` 抢走，猜出来的家族图标不算数；未登记就落网格，语义可预期。
+
+### 任务 1/2 验收证据
+- `npx vitest run tests/tool-label-coverage.test.ts desktop/src/react/__tests__/components/ToolGroupBlock.test.tsx desktop/src/react/__tests__/components/MessageActivity.test.tsx`
+  → 3 文件全绿，75 passed（24 + 32 + 19），0 failed。
+- 对账测试新增：五语言"每个内置工具都有行短标签"（登记表派生，缺键/退回裸英文名即红灯）、
+  "工具行主标签永远取文案词"（search_memory=回想、mcp_deep-search=扩展、brand_new_tool 不露本名）、
+  家族词键齐全；渲染用例新增断言 search_memory / subagent_reply / mcp_xxx 的行标签 ≠ 工具本名。
+- 反向验证：临时删除 `en.json` 的 `search_memory` 短标签键 → 对账测试变红
+  （`messageActivity.labels.search_memory` 进 missing 列表），还原后 75 passed 全绿。红/绿输出见对话。
+
+### 任务 3：全量收尾
+- `npm run typecheck` → exit 0（三次全量运行前各跑一次，均 0）。
+- `npm test` → **14107 passed / 5 failed / 7 skipped**（1393 文件：3 failed | 1389 passed | 1 skipped）。
+- 5 条红**不是本任务引入**：把本任务 8 个文件 stash 掉、在干净工作树上单跑这 3 个文件，
+  同样 5 failed / 12 passed（round2-delivery-evidence ×2、round3-delivery-evidence ×1、
+  model-observability-e2e-chat ×2）。前三条是"提交级交付证据清单"对账（比对
+  `.sync-audit/verified-source-sha.txt` 指向的 9c4b11114 文件清单，与当前工作树路径集不一致），
+  后两条需要真实 Pi provider。详见 BLOCKED.md 置顶条。
+- 通过数 14107 ≥ 基线 14090（本次实测基线；任务书写的 14098 亦满足），skipped 7 ≤ 7，
+  且本任务新增 14 条用例全部为绿。
+
+### 白名单与清洁度
+- `git status --short` 只有 12 个文件：白名单内的 11 个（PROGRESS.md、5 个 locale、2 个测试、
+  3 个源码/工具）+ `BLOCKED.md`；另有既存未跟踪目录 `artifacts/tool-row-style-preview/`（开工时就在，
+  未动）。零 commit、零 push、零新增依赖。
+- 跑测试会被 `tests/round2-delivery-evidence.test.ts` 的 R10-09 重新生成
+  `artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch`；收尾已 `git checkout --`
+  还原，交付态零白名单外改动。
+
+### 提交与推送（2026-09-11，用户明确指示 commit + push）
+- 授权变更：任务书原写「不 commit 不 push」，本次由用户直接指示提交并推送到远程，按新授权执行。
+- 提交范围：PROGRESS.md、BLOCKED.md、5 个语言包、2 个渲染测试、tests/tool-label-coverage.test.ts、
+  ToolGroupBlock.tsx、MessageActivity.tsx、tool-label.ts。不含未跟踪目录 artifacts/tool-row-style-preview/。
+- **未重新封印**：提交推进 HEAD 后，`.sync-audit/verified-source-sha.txt`（= 9c4b11114）与 HEAD 之间
+  出现非审计文件改动，`tests/post-verification-audit-seal.test.ts` 与
+  `.sync-audit/verify-post-verification-diff.mjs` 会红。按用户裁决如实报告，不修改封印指针、
+  不扩大 allowlist、不退役门禁；正式封印需另走验证流程并绑定候选提交。
