@@ -235,7 +235,7 @@ index af3647c779dad1edd9042249023ada0cb0c81372..e742177ba5684eb2fbcf41e0997aa452
  .codex/
  
 diff --git a/.sync-audit/build-sync-matrix.mjs b/.sync-audit/build-sync-matrix.mjs
-index d978251370637d720d11094c068847b151ae235e..91a8c941ade30b50512692d5132baf59b9c02b6c 100644
+index d978251370637d720d11094c068847b151ae235e..dd3d189897997c719e1ac69070f340eb289e4908 100644
 --- a/.sync-audit/build-sync-matrix.mjs
 +++ b/.sync-audit/build-sync-matrix.mjs
 @@ -40,7 +40,7 @@ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source
@@ -243,12 +243,12 @@ index d978251370637d720d11094c068847b151ae235e..91a8c941ade30b50512692d5132baf59
  // 该 commit 早于记录它的审计提交落地，无自引用（SHA = hash(contents)）问题。
  // 当前 branch HEAD 可能在其后存在纯审计 seal 提交，HEAD 由 Git ref 自身标识。
 -const VERIFIED_SOURCE_SHA = "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202";
-+const VERIFIED_SOURCE_SHA = "f7f93f540701b25c7215fa3e20b29350c10a0774";
++const VERIFIED_SOURCE_SHA = "0275f6c5a762fc25a75a8585a8e63817cf0be115";
  
  const ALLOWED_DISPOSITIONS = ["ADOPTED", "ADAPTED", "REGENERATED", "INTENTIONAL_DIVERGENCE"];
  
 diff --git a/.sync-audit/upstream-sync-matrix.json b/.sync-audit/upstream-sync-matrix.json
-index d6f8692829bc71ee97c3253e5482beabfdb51324..b07a4b1ca0a07bb70704f4228ea4d083eed9c7ea 100644
+index d6f8692829bc71ee97c3253e5482beabfdb51324..e2e1a429eaa28c312f9034583e6f11fe866f5d39 100644
 --- a/.sync-audit/upstream-sync-matrix.json
 +++ b/.sync-audit/upstream-sync-matrix.json
 @@ -4,7 +4,7 @@
@@ -256,19 +256,19 @@ index d6f8692829bc71ee97c3253e5482beabfdb51324..b07a4b1ca0a07bb70704f4228ea4d083
      "L0": "97595264ead8735a04559507ddaade25db8a4e15",
      "L1": "ca0b417e36a6a1f80947458aaed328a25718e41b",
 -    "VERIFIED_SOURCE_SHA": "04f90d2b26449d2f3264a5ea2a1a8bd6fb253202"
-+    "VERIFIED_SOURCE_SHA": "f7f93f540701b25c7215fa3e20b29350c10a0774"
++    "VERIFIED_SOURCE_SHA": "0275f6c5a762fc25a75a8585a8e63817cf0be115"
    },
    "summary": {
      "total": 133,
 diff --git a/.sync-audit/verified-source-sha.txt b/.sync-audit/verified-source-sha.txt
-index 78c76634c4edc5a8962212273a593e3ddf8bd28d..558ad222f0bd385fe52f7e80d2eccf18604914b1 100644
+index 78c76634c4edc5a8962212273a593e3ddf8bd28d..2a565e28eef8be5f70fe1ff2406a35346d5c31bc 100644
 --- a/.sync-audit/verified-source-sha.txt
 +++ b/.sync-audit/verified-source-sha.txt
 @@ -1 +1 @@
 -04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+f7f93f540701b25c7215fa3e20b29350c10a0774
++0275f6c5a762fc25a75a8585a8e63817cf0be115
 diff --git a/PROGRESS.md b/PROGRESS.md
-index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..1f8d2001f07d248179aedc77ee59bd92e2e3a90b 100644
+index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..8093480935ae8857325d6f504b67564c8de658cb 100644
 --- a/PROGRESS.md
 +++ b/PROGRESS.md
 @@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
@@ -276,11 +276,11 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..1f8d2001f07d248179aedc77ee59bd92
  LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
  LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
 -VERIFIED_SOURCE_SHA   = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202  (2026-09-07 拆除与语音改造+三 bug 修复封印：分支 refactor/dismantle-and-voice-features)
-+VERIFIED_SOURCE_SHA   = f7f93f540701b25c7215fa3e20b29350c10a0774  (2026-09-10 历史读取三阶段 + 架构契约补强七领域候选 + lint/测试拦截修复，fix/pending-sep10)
++VERIFIED_SOURCE_SHA   = 0275f6c5a762fc25a75a8585a8e63817cf0be115  (2026-09-10 历史读取三阶段 + 架构契约补强七领域候选 + lint/测试拦截修复，fix/pending-sep10)
  历史上游同步工作分支  = feature/upstream-sync-0.447.4
  历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
  ```
-@@ -994,11 +994,113 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
+@@ -994,11 +994,118 @@ post-verification diff guard 在 `npm test` 中运行（独立可执行形态为
  需要提交才能完成的封印留待相应授权步骤。不得为使检查变绿而虚报坐标、扩大白名单，
  或删除 seal 文件与 guard 测试；退役门禁属于另需明确授权的治理变更。
  
@@ -391,10 +391,15 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..1f8d2001f07d248179aedc77ee59bd92
 +- 验证证据（绑定 dc6e9399 源码树；f7f93f54 相对其仅叠加 excluded 证据/manifest/日志/再生补丁与暂记坐标，无生产代码差异）：typecheck×3 绿；eslint 0 error（9850 warnings 既有存量+新代码同风格）；全量 13821 passed / 0 实质失败（1373 文件，84s；4 项失败均为封印坐标旧值 696016b7 下的预期红：post-verification-audit-seal diff guard + round2/round3 证据家族同源下游，重冻结后 15/15 复跑绿）；packaged-desktop-cleanup 修复后单跑 9/9 绿。
 +- 未执行/受限：本地未执行 npm run pack；正式签名、四平台安装包、公证与远端发布证据由后续 tag 工作流执行；Windows NSIS 真机安装交互仍未实测（沿用既有 Known limitation）。
 +
++## 2026-09-11 Windows 临时目录清理加固候选与封印推进（PR #53 CI 收尾）
++
++- 固定源码候选：`0275f6c5a762fc25a75a8585a8e63817cf0be115`（f7f93f54 基础上：006a8054 历史读取七套件 Windows 清理加固 + 0275f6c5 证据重冻结 r2）。PR #53 首轮 CI：macOS 双腿绿；ubuntu 腿全量 1369 文件全过后 vitest worker fork 崩溃 exit 1（既有平台抖动家族，与 mac-arm64 历史同类）；windows-2025 腿 48 项失败全部定位为七套件 afterEach rmSync EPERM（Windows 句柄异步释放抖动族，生产句柄均有 finally close），按 server-composition-boundary 既有惯例补 maxRetries:20/retryDelay:250。
++- 验证证据（绑定 006a8054 源码树；0275f6c5 相对其仅叠加 excluded 证据/再生补丁，无生产代码差异）：七套件单跑 50/50 绿；typecheck×3 绿；改动文件 eslint 0 error；全量 13820 passed / 4 失败均为坐标旧值 f7f93f54 下 seal guard 家族预期红（另 1 次本地 worker fork 抖动，与 ubuntu CI 同族）；重冻结后 sep10-seal-green-r2 绿门禁（exit 0、manifest 36f4b98e/b9676f98 未漂移）、补丁重放 VERIFIED。
++
  ## 2026-08-25 Notebook-first Knowledge 目标
  
  ### 当前阶段：本机闭环完成，外部证据待执行
-@@ -1503,3 +1605,28 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
+@@ -1503,3 +1610,28 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
  - 派生清单（cli-runtime-closure / open-boundary baseline / shell-surface-manifest / persistence 指纹与 inventory / startup receipt）已在受测工作树重生成并随源码提交；staged diff 密钥模式扫描无命中。
  - 本次封印只同步既有六份审计文件（verified-source-sha.txt / build-sync-matrix.mjs / upstream-sync-matrix.json / UPSTREAM_SYNC_AUDIT.md / UPSTREAM_SYNC_MATRIX.md / 本文件坐标行），矩阵重生成 133 paths 硬校验通过（ADOPTED 25 / ADAPTED 100 / REGENERATED 4 / INTENTIONAL_DIVERGENCE 4）；不合并 main。
  - 未执行/受限：全仓 lint 与 build/package 门禁本轮未跑；系统语音识别端到端未实测（开发终端无语音识别 TCC 授权，helper 正确 fail-closed，打包后首次使用需用户授权）；TTS 云端路径需配置 API key 后实测；三 bug 修复的 dev 环境用户验收仍在进行；正式发布与四平台门禁未启动。
@@ -424,7 +429,7 @@ index e7ecce0ba47c9b384d27b61f5de076fe21c1dcef..1f8d2001f07d248179aedc77ee59bd92
 +- compat 旧服务端 runner 自包含化：模板 tracked 于 `tests/compat-old-server-runner.template.mjs`，两个兼容测试 beforeAll 幂等写入 clone；clone 缺席时套件 skip 并 console 明示「四组合中旧服务端侧指定环境未验证」。
 +- 复验：compat 4/4 + 4/4（exit 0）、定向 410/410、typecheck exit 0、全量 13735 passed / 7 failed（签名=A01 基线，任务引入 0）；d-to-final（40 文件）/task-only（76 文件）补丁重生成并通过 apply 验证与树级 0 差异复验。事件与防护详见 `artifacts/history-read-directory/{PROGRESS.md, remaining-risks.md}`。
 diff --git a/UPSTREAM_SYNC_AUDIT.md b/UPSTREAM_SYNC_AUDIT.md
-index adcfa57d8a9836fe12c378f95f7448688d077896..cdeffe6644fe29f6b6d862c3aa14c5b28624978e 100644
+index adcfa57d8a9836fe12c378f95f7448688d077896..c29d4f7aeb1be60a982248920b806fea767e2c17 100644
 --- a/UPSTREAM_SYNC_AUDIT.md
 +++ b/UPSTREAM_SYNC_AUDIT.md
 @@ -15,7 +15,7 @@
@@ -432,12 +437,12 @@ index adcfa57d8a9836fe12c378f95f7448688d077896..cdeffe6644fe29f6b6d862c3aa14c5b2
  | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
  | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
 -| VERIFIED_SOURCE_SHA | `04f90d2b26449d2f3264a5ea2a1a8bd6fb253202` | 2026-09-07 拆除与语音改造+三 bug 修复封印（分支 refactor/dismantle-and-voice-features）；typecheck×3 全绿+全量 13081 用例（唯一失败为无关模块 macOS 临时目录清理竞态 flaky、单跑 10/10 通过）后绑定，验证明细见 PROGRESS.md 最新条目 |
-+| VERIFIED_SOURCE_SHA | `f7f93f540701b25c7215fa3e20b29350c10a0774` | 2026-09-10 历史读取三阶段 + 架构契约补强七领域 + lint/测试拦截修复（fix/pending-sep10）；验证证据见 PROGRESS.md 最新条目 |
++| VERIFIED_SOURCE_SHA | `0275f6c5a762fc25a75a8585a8e63817cf0be115` | 2026-09-10 历史读取三阶段 + 架构契约补强七领域 + lint/测试拦截修复（fix/pending-sep10）；验证证据见 PROGRESS.md 最新条目 |
  
  v0.1.35 仓库内的[功能 CI 记录](artifacts/release-v0.1.35/feature-ci-validation.json)
  对应 `2c835ac77afb1a73cd83816ad3d613297dc770a8`，不单独证明上述发布资料提交重新执行了
 diff --git a/UPSTREAM_SYNC_MATRIX.md b/UPSTREAM_SYNC_MATRIX.md
-index 2f98daf42096994372f834d639551859919c294e..460abe57a1230005cb62faafbbe0e0aca78d6c5e 100644
+index 2f98daf42096994372f834d639551859919c294e..7f07b5de261bb33e5720f96c0926cfd40b1de0b0 100644
 --- a/UPSTREAM_SYNC_MATRIX.md
 +++ b/UPSTREAM_SYNC_MATRIX.md
 @@ -10,7 +10,7 @@ U0 = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0.444.1)
@@ -445,7 +450,7 @@ index 2f98daf42096994372f834d639551859919c294e..460abe57a1230005cb62faafbbe0e0ac
  L0 = 97595264ead8735a04559507ddaade25db8a4e15  (Lingxi v0.444.1 同步完成点, PR #2)
  L1 = ca0b417e36a6a1f80947458aaed328a25718e41b  (本轮同步开始时 main)
 -VERIFIED_SOURCE_SHA = 04f90d2b26449d2f3264a5ea2a1a8bd6fb253202
-+VERIFIED_SOURCE_SHA = f7f93f540701b25c7215fa3e20b29350c10a0774
++VERIFIED_SOURCE_SHA = 0275f6c5a762fc25a75a8585a8e63817cf0be115
  ```
  
  ## 统计（脚本计算，禁止人工填写）
@@ -350500,10 +350505,10 @@ index 0000000000000000000000000000000000000000..f05cec59acdfc84e76a8cd54a4bfa998
 +}
 diff --git a/tests/history-overview-route.test.ts b/tests/history-overview-route.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..65535eb74331edc688fe5bbcf3287159585fd415
+index 0000000000000000000000000000000000000000..1c3ef05cd130237e146aa3c4ebb45d590acecc66
 --- /dev/null
 +++ b/tests/history-overview-route.test.ts
-@@ -0,0 +1,294 @@
+@@ -0,0 +1,296 @@
 +/**
 + * E04 会话概览端点测试（GET /api/sessions/history-overview，真实路由）：
 + *  - 结构/类型校验（schemaVersion/counts/三桶/task 分布/pagination；不用 any）；
@@ -350533,8 +350538,10 @@ index 0000000000000000000000000000000000000000..65535eb74331edc688fe5bbcf3287159
 +import type { HistoryOverview, HistoryOverviewUnavailable } from "../server/history-read/protocol.ts";
 +
 +const tmpDirs: string[] = [];
++const manifestStores: SessionManifestStore[] = [];
 +
 +afterEach(() => {
++  while (manifestStores.length) manifestStores.pop()?.close();
 +  while (tmpDirs.length) {
 +    const dir = tmpDirs.pop();
 +    fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
@@ -350564,7 +350571,7 @@ index 0000000000000000000000000000000000000000..65535eb74331edc688fe5bbcf3287159
 +  const sessionPath = path.join(agentsDir, "hana", "sessions", "longrun.jsonl");
 +  fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
 +  fs.writeFileSync(sessionPath, fixtureLines ? fixtureLines.join("\n") + "\n" : buildLongRunFixtureBytes(n ?? 10));
-+  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") });
++  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") }); manifestStores.push(manifestStore);
 +  const manifest = manifestStore.createForPath({ sessionPath, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
 +  const cache = new HistoryDirectoryCache();
 +  const deferredTasks: any[] = [];
@@ -352107,10 +352114,10 @@ index 0000000000000000000000000000000000000000..a815ac0e222633d66ad2e24f2198af6a
 +});
 diff --git a/tests/history-protocol-conditional.test.ts b/tests/history-protocol-conditional.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..2bf91847e715ceeac55a8eba064ffb2890540510
+index 0000000000000000000000000000000000000000..ef0318dede6c4068721c230c14a6c3e4c65886a4
 --- /dev/null
 +++ b/tests/history-protocol-conditional.test.ts
-@@ -0,0 +1,218 @@
+@@ -0,0 +1,220 @@
 +/**
 + * E02.4 服务端条件 GET 验证（真实路由 /api/sessions/messages）：
 + *  - 首次 200 带协议头/ETag/私有策略；
@@ -352135,8 +352142,10 @@ index 0000000000000000000000000000000000000000..2bf91847e715ceeac55a8eba064ffb28
 +import { buildLongRunFixtureBytes, messagesUrl } from "../scripts/lib/history-read-fixture.mjs";
 +
 +const tmpDirs: string[] = [];
++const manifestStores: SessionManifestStore[] = [];
 +
 +afterEach(() => {
++  while (manifestStores.length) manifestStores.pop()?.close();
 +  while (tmpDirs.length) {
 +    const dir = tmpDirs.pop();
 +    fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
@@ -352159,7 +352168,7 @@ index 0000000000000000000000000000000000000000..2bf91847e715ceeac55a8eba064ffb28
 +  const sessionPath = path.join(agentsDir, "hana", "sessions", "longrun.jsonl");
 +  fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
 +  fs.writeFileSync(sessionPath, buildLongRunFixtureBytes(10));
-+  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") });
++  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") }); manifestStores.push(manifestStore);
 +  const manifest = manifestStore.createForPath({ sessionPath, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
 +  const cache = new HistoryDirectoryCache();
 +  const deferredTasks: any[] = [];
@@ -352331,10 +352340,10 @@ index 0000000000000000000000000000000000000000..2bf91847e715ceeac55a8eba064ffb28
 +});
 diff --git a/tests/history-read-cache-auth.test.ts b/tests/history-read-cache-auth.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..2a36c89b37b4858ef8e7d4bdc8a6285ef9cd7832
+index 0000000000000000000000000000000000000000..befd27a0fad764d89a68280e43775a87dd46e81d
 --- /dev/null
 +++ b/tests/history-read-cache-auth.test.ts
-@@ -0,0 +1,198 @@
+@@ -0,0 +1,200 @@
 +/**
 + * 缓存身份与授权测试（X18 / P10）：
 + *  - 授权先于缓存（I01）：拒绝的请求返回 403 且缓存零读写、零失效（热缓存后拒绝仍 403）；
@@ -352356,8 +352365,10 @@ index 0000000000000000000000000000000000000000..2a36c89b37b4858ef8e7d4bdc8a6285e
 +import { buildLongRunFixtureBytes, messagesUrl } from "../scripts/lib/history-read-fixture.mjs";
 +
 +const tmpDirs: string[] = [];
++const manifestStores: SessionManifestStore[] = [];
 +
 +afterEach(() => {
++  while (manifestStores.length) manifestStores.pop()?.close();
 +  while (tmpDirs.length) {
 +    const dir = tmpDirs.pop();
 +    fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
@@ -352376,7 +352387,7 @@ index 0000000000000000000000000000000000000000..2a36c89b37b4858ef8e7d4bdc8a6285e
 +  const sessionPath = path.join(agentsDir, "hana", "sessions", "longrun.jsonl");
 +  fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
 +  fs.writeFileSync(sessionPath, buildLongRunFixtureBytes(8));
-+  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") });
++  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") }); manifestStores.push(manifestStore);
 +  const manifest = manifestStore.createForPath({ sessionPath, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
 +  const cache = new HistoryDirectoryCache();
 +  const engine: any = {
@@ -352432,7 +352443,7 @@ index 0000000000000000000000000000000000000000..2a36c89b37b4858ef8e7d4bdc8a6285e
 +    const sessionPath = path.join(agentsDir, "hana", "sessions", "shared.jsonl");
 +    fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
 +    fs.writeFileSync(sessionPath, buildLongRunFixtureBytes(8));
-+    const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") });
++    const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") }); manifestStores.push(manifestStore);
 +    const manifest = manifestStore.createForPath({ sessionPath, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
 +    const cache = new HistoryDirectoryCache();
 +
@@ -352494,7 +352505,7 @@ index 0000000000000000000000000000000000000000..2a36c89b37b4858ef8e7d4bdc8a6285e
 +    fs.mkdirSync(path.dirname(pathA), { recursive: true });
 +    fs.writeFileSync(pathA, buildLongRunFixtureBytes(6));
 +    fs.writeFileSync(pathB, buildLongRunFixtureBytes(20));
-+    const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") });
++    const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") }); manifestStores.push(manifestStore);
 +    const manifestA = manifestStore.createForPath({ sessionPath: pathA, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
 +    const manifestB = manifestStore.createForPath({ sessionPath: pathB, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
 +    const cache = new HistoryDirectoryCache();
@@ -353758,10 +353769,10 @@ index 0000000000000000000000000000000000000000..faafaddc34efb40fe8c8f76a07287a77
 +});
 diff --git a/tests/history-read-directory-incremental.test.ts b/tests/history-read-directory-incremental.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..eb91fd99771a4ce5bd2db92e3fc0f5d4a57bc391
+index 0000000000000000000000000000000000000000..b2d8c2fb48d75333fd8af660773fb67e6a22d722
 --- /dev/null
 +++ b/tests/history-read-directory-incremental.test.ts
-@@ -0,0 +1,386 @@
+@@ -0,0 +1,388 @@
 +/**
 + * 阶段 C 增量路径测试：
 + *  - P04：翻页中正常追加（真实 fs 追加 + 生产等价分支同步 setBranchHead）——
@@ -353788,9 +353799,11 @@ index 0000000000000000000000000000000000000000..eb91fd99771a4ce5bd2db92e3fc0f5d4
 +import type { HistoryReadContext } from "../server/history-read/types.ts";
 +
 +const tmpDirs: string[] = [];
++const manifestStores: SessionManifestStore[] = [];
 +
 +afterEach(() => {
 +  resetSessionFileMutationEpochsForTest();
++  while (manifestStores.length) manifestStores.pop()?.close();
 +  while (tmpDirs.length) {
 +    const dir = tmpDirs.pop();
 +    fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
@@ -353813,7 +353826,7 @@ index 0000000000000000000000000000000000000000..eb91fd99771a4ce5bd2db92e3fc0f5d4
 +  const sessionPath = path.join(agentsDir, "hana", "sessions", "longrun.jsonl");
 +  fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
 +  fs.writeFileSync(sessionPath, buildLongRunFixtureBytes(10));
-+  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") });
++  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") }); manifestStores.push(manifestStore);
 +  const manifest = manifestStore.createForPath({ sessionPath, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
 +  const cache = new HistoryDirectoryCache();
 +  const engine: any = {
@@ -353987,7 +354000,7 @@ index 0000000000000000000000000000000000000000..eb91fd99771a4ce5bd2db92e3fc0f5d4
 +      jsonlLine("a1", "u1", { role: "assistant", content: [{ type: "tool_use", id: "tu-1", name: "slow", input: {} }] }),
 +    ];
 +    fs.writeFileSync(sessionPath, lines.join("\n") + "\n");
-+    const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "m.db") });
++    const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "m.db") }); manifestStores.push(manifestStore);
 +    const manifest = manifestStore.createForPath({ sessionPath, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
 +    const cache = new HistoryDirectoryCache();
 +    const engine: any = {
@@ -354692,10 +354705,10 @@ index 0000000000000000000000000000000000000000..dfd7751a116b905b70a228f40c10ec61
 +});
 diff --git a/tests/history-read-directory-semantics.test.ts b/tests/history-read-directory-semantics.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..f4de33e25c9558939a7ea943fd6a4d0543dd6b85
+index 0000000000000000000000000000000000000000..2a7d612d624a185ef2eb8581d2e3e0963ac5b92b
 --- /dev/null
 +++ b/tests/history-read-directory-semantics.test.ts
-@@ -0,0 +1,364 @@
+@@ -0,0 +1,366 @@
 +/**
 + * B06 热页语义测试（X10/X11/X12/X14/X19 + 强不变量）：
 + *  - 强不变量：任意夹具下，热页（目录命中路径）输出 === 全量输出按窗口切片；
@@ -354729,8 +354742,10 @@ index 0000000000000000000000000000000000000000..f4de33e25c9558939a7ea943fd6a4d05
 +import { TODO_STATE_CUSTOM_TYPE } from "../lib/tools/todo-constants.ts";
 +
 +const tmpDirs: string[] = [];
++const manifestStores: SessionManifestStore[] = [];
 +
 +afterEach(() => {
++  while (manifestStores.length) manifestStores.pop()?.close();
 +  while (tmpDirs.length) {
 +    const dir = tmpDirs.pop();
 +    fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
@@ -354772,7 +354787,7 @@ index 0000000000000000000000000000000000000000..f4de33e25c9558939a7ea943fd6a4d05
 +function createHarness(): Harness {
 +  const root = makeTmpDir();
 +  const agentsDir = path.join(root, "agents");
-+  const store = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") });
++  const store = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") }); manifestStores.push(store);
 +  const cache = new HistoryDirectoryCache();
 +  const manifests = new Map<string, string>();
 +  const harness: Harness = {
@@ -355062,10 +355077,10 @@ index 0000000000000000000000000000000000000000..f4de33e25c9558939a7ea943fd6a4d05
 +});
 diff --git a/tests/history-read-route-fallback.test.ts b/tests/history-read-route-fallback.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..5007409e77c1c8db230d136d2d295692800d577c
+index 0000000000000000000000000000000000000000..3d63f0f95a2063c24bb0802b84c21b685f5b38c2
 --- /dev/null
 +++ b/tests/history-read-route-fallback.test.ts
-@@ -0,0 +1,198 @@
+@@ -0,0 +1,200 @@
 +/**
 + * B06 路由接线与快照/回退测试（X05 / P06 / P11）：
 + *  - stat 失败（文件缺失）→ 不读不写缓存，legacy 全量承接（P06/I08）；
@@ -355090,8 +355105,10 @@ index 0000000000000000000000000000000000000000..5007409e77c1c8db230d136d2d295692
 +import { buildLongRunFixtureBytes, messagesUrl } from "../scripts/lib/history-read-fixture.mjs";
 +
 +const tmpDirs: string[] = [];
++const manifestStores: SessionManifestStore[] = [];
 +
 +afterEach(() => {
++  while (manifestStores.length) manifestStores.pop()?.close();
 +  while (tmpDirs.length) {
 +    const dir = tmpDirs.pop();
 +    fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
@@ -355111,7 +355128,7 @@ index 0000000000000000000000000000000000000000..5007409e77c1c8db230d136d2d295692
 +  const sessionPath = path.join(agentsDir, "hana", "sessions", "longrun.jsonl");
 +  fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
 +  fs.writeFileSync(sessionPath, buildLongRunFixtureBytes(10));
-+  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") });
++  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") }); manifestStores.push(manifestStore);
 +  const manifest = manifestStore.createForPath({ sessionPath, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
 +  const engine: any = {
 +    agentsDir,
@@ -355266,10 +355283,10 @@ index 0000000000000000000000000000000000000000..5007409e77c1c8db230d136d2d295692
 +});
 diff --git a/tests/history-read-shared-functions.test.ts b/tests/history-read-shared-functions.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..d80ffd7de97a0c1902d8cea2d74f44fc589d0c99
+index 0000000000000000000000000000000000000000..7b4387ba4677751c4008614578189fd2b104fe6a
 --- /dev/null
 +++ b/tests/history-read-shared-functions.test.ts
-@@ -0,0 +1,152 @@
+@@ -0,0 +1,154 @@
 +/**
 + * X20：共用函数回归——all/reconciliation/find 不被目录快路径改变语义。
 + *  - all=1 与分页拼接等价（经真实路由，热/冷路径皆走新管线）；
@@ -355289,8 +355306,10 @@ index 0000000000000000000000000000000000000000..d80ffd7de97a0c1902d8cea2d74f44fc
 +import { buildLongRunFixtureBytes, messagesUrl } from "../scripts/lib/history-read-fixture.mjs";
 +
 +const tmpDirs: string[] = [];
++const manifestStores: SessionManifestStore[] = [];
 +
 +afterEach(() => {
++  while (manifestStores.length) manifestStores.pop()?.close();
 +  while (tmpDirs.length) {
 +    const dir = tmpDirs.pop();
 +    fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
@@ -355309,7 +355328,7 @@ index 0000000000000000000000000000000000000000..d80ffd7de97a0c1902d8cea2d74f44fc
 +  const sessionPath = path.join(agentsDir, "hana", "sessions", "longrun.jsonl");
 +  fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
 +  fs.writeFileSync(sessionPath, buildLongRunFixtureBytes(14));
-+  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") });
++  const manifestStore = new SessionManifestStore({ dbPath: path.join(root, "manifest.db") }); manifestStores.push(manifestStore);
 +  const manifest = manifestStore.createForPath({ sessionPath, ownerAgentId: "hana", domain: "desktop", kind: "chat" });
 +  const cache = new HistoryDirectoryCache();
 +  const engine: any = {
