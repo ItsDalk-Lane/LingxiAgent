@@ -649,7 +649,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:1f477c51f28e185cb7fa575fe57066d96b8a157144feb5b64c40c888d9ed65fd",
+  "payloadFingerprint": "sha256:b71657c5c93fc2ef85f21f72dfc5a0eb630d1464a4a5fb130ec4de4901bf629a",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3165,8 +3165,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "合并架构契约补强（d011e849）与历史读取三阶段优化（787437d3）两批已各自声明 compatible 的改动；无新持久化文件/表、无数据形状变化，合并不引入新形状变化。",
-    "payloadFingerprint": "sha256:1f477c51f28e185cb7fa575fe57066d96b8a157144feb5b64c40c888d9ed65fd"
+    "compatibilityReason": "工具活动展示层重构（74cd07fb）仅改动 lib/pi-sdk/search-tools.ts 的展示相关代码（新增 search-presentation 导入与结果 details 投影），managed-runtime-caches 目录契约与缓存验证逻辑零变化；无新持久化文件/表、无数据形状变化，属源码哈希漂移重钉。",
+    "payloadFingerprint": "sha256:b71657c5c93fc2ef85f21f72dfc5a0eb630d1464a4a5fb130ec4de4901bf629a"
   },
   "schemas": [
     {
@@ -3847,7 +3847,7 @@
       "contract": "managed search-tool binary and Windows sandbox runtime cache validation",
       "kind": "directory-contract",
       "module": "lib/pi-sdk/search-tools.ts",
-      "sourceHash": "sha256:81f425ee0d928a0e4874dc9463acfb42f90624edf8060b73f294c51691771054",
+      "sourceHash": "sha256:6d90beab5e274757b7541a5a7454e9f59ae3dcff56d9a3eac4d4a7eb7d3aa700",
       "storeId": "managed-runtime-caches"
     },
     {

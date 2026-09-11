@@ -321236,7 +321236,7 @@ index e1f283e59d272771206ba3cd3b831a8fabce91c0..73c3bf63f9d717a03fb0eb335fa84df8
        "nft-runtime-trace": 10198
      }
 diff --git a/build/persistence-schema-fingerprint.json b/build/persistence-schema-fingerprint.json
-index ed2984c4adb27400676013bc77713d3b7e2e5229..af3dd0c9a6ef2438a8f1b61631d5fd5f343dc344 100644
+index ed2984c4adb27400676013bc77713d3b7e2e5229..8f91542e4f072bf198787a39e8fa125bcbcc4077 100644
 --- a/build/persistence-schema-fingerprint.json
 +++ b/build/persistence-schema-fingerprint.json
 @@ -649,7 +649,7 @@
@@ -321244,7 +321244,7 @@ index ed2984c4adb27400676013bc77713d3b7e2e5229..af3dd0c9a6ef2438a8f1b61631d5fd5f
      "version": 3
    },
 -  "payloadFingerprint": "sha256:782ba6904f2a6ac752e3355198ad05433a803bac17e136b9730ccbfd75bdff10",
-+  "payloadFingerprint": "sha256:1f477c51f28e185cb7fa575fe57066d96b8a157144feb5b64c40c888d9ed65fd",
++  "payloadFingerprint": "sha256:b71657c5c93fc2ef85f21f72dfc5a0eb630d1464a4a5fb130ec4de4901bf629a",
    "registry": [
      {
        "affectedByEpochMigration": true,
@@ -321283,8 +321283,8 @@ index ed2984c4adb27400676013bc77713d3b7e2e5229..af3dd0c9a6ef2438a8f1b61631d5fd5f
      "classification": "compatible",
 -    "compatibilityReason": "desktop/main.cjs: speech permission IPC gains hostCanPrompt gate (dev-shell TCC SIGABRT guard, user-reported crash on mic click). IPC surface and all store schemas unchanged.",
 -    "payloadFingerprint": "sha256:782ba6904f2a6ac752e3355198ad05433a803bac17e136b9730ccbfd75bdff10"
-+    "compatibilityReason": "合并架构契约补强（d011e849）与历史读取三阶段优化（787437d3）两批已各自声明 compatible 的改动；无新持久化文件/表、无数据形状变化，合并不引入新形状变化。",
-+    "payloadFingerprint": "sha256:1f477c51f28e185cb7fa575fe57066d96b8a157144feb5b64c40c888d9ed65fd"
++    "compatibilityReason": "工具活动展示层重构（74cd07fb）仅改动 lib/pi-sdk/search-tools.ts 的展示相关代码（新增 search-presentation 导入与结果 details 投影），managed-runtime-caches 目录契约与缓存验证逻辑零变化；无新持久化文件/表、无数据形状变化，属源码哈希漂移重钉。",
++    "payloadFingerprint": "sha256:b71657c5c93fc2ef85f21f72dfc5a0eb630d1464a4a5fb130ec4de4901bf629a"
    },
    "schemas": [
      {
@@ -321297,7 +321297,12 @@ index ed2984c4adb27400676013bc77713d3b7e2e5229..af3dd0c9a6ef2438a8f1b61631d5fd5f
        "storeId": "deferred-result-state"
      },
      {
-@@ -3848,10 +3851,10 @@
+@@ -3844,14 +3847,14 @@
+       "contract": "managed search-tool binary and Windows sandbox runtime cache validation",
+       "kind": "directory-contract",
+       "module": "lib/pi-sdk/search-tools.ts",
+-      "sourceHash": "sha256:81f425ee0d928a0e4874dc9463acfb42f90624edf8060b73f294c51691771054",
++      "sourceHash": "sha256:6d90beab5e274757b7541a5a7454e9f59ae3dcff56d9a3eac4d4a7eb7d3aa700",
        "storeId": "managed-runtime-caches"
      },
      {
@@ -334150,12 +334155,23 @@ index f9fedb68f0c405b172a705c9d3e0c4fbd1a7d398..e6a26ded6d4d21972e8bcebb2a30bb8c
        anchor.setAttribute('aria-label', t('knowledge.citationNumber', { number }));
 diff --git a/desktop/src/react/components/chat/MessageActivity.module.css b/desktop/src/react/components/chat/MessageActivity.module.css
 new file mode 100644
-index 0000000000000000000000000000000000000000..5c0c97101482e93feab2bc870c2cb4f89d18b33e
+index 0000000000000000000000000000000000000000..ef983db04fa35c90fb7aa6701399ddc30bb11e02
 --- /dev/null
 +++ b/desktop/src/react/components/chat/MessageActivity.module.css
-@@ -0,0 +1,43 @@
-+.activity { width: 100%; min-width: 0; margin: 0; padding: 8px 0; color: color-mix(in srgb, var(--tool-text, #61666b) 55%, var(--text-muted, #81858c)); }
-+.row { display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 24px; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-size: 13px; line-height: 24px; text-align: left; cursor: pointer; }
+@@ -0,0 +1,54 @@
++/* MessageActivity — 字面量统一收进 .activity 定义行（样式立法：定义行是唯一合法归宿） */
++.activity {
++  --ma-pad-x: 14px;
++  --ma-dialog-pad: 18px;
++  --ma-diff-added: #16bc4b;
++  --ma-diff-removed: #ff393f;
++  --ma-syntax-keyword: #bd4ec2;
++  --ma-syntax-string: #559541;
++  --ma-syntax-number: #b97c33;
++  --ma-syntax-type: #448ad0;
++  width: 100%; min-width: 0; margin: 0; padding: var(--space-8) 0; color: color-mix(in srgb, var(--tool-text, #61666b) 55%, var(--text-muted, #81858c));
++}
++.row { display: flex; align-items: center; gap: var(--space-8); min-width: 0; min-height: 24px; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-size: 13px; line-height: 24px; text-align: left; cursor: pointer; }
 +.row:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
 +.icon { width: 14px; height: 14px; flex: 0 0 14px; color: inherit; }
 +.label { flex: 0 0 auto; white-space: nowrap; color: color-mix(in srgb, var(--tool-text, #61666b) 90%, var(--text)); }
@@ -334166,37 +334182,37 @@ index 0000000000000000000000000000000000000000..5c0c97101482e93feab2bc870c2cb4f8
 +.failed .label { color: inherit; }
 +.failed { color: var(--danger, #e5484d); }
 +.status { font-size: 11px; flex: 0 0 auto; }
-+.panel { margin-top: 4px; background: color-mix(in srgb, var(--text-muted) 6%, transparent); border-radius: 12px; min-width: 0; overflow: hidden; font-size: 12px; line-height: 22px; color: var(--text); }
-+.header { display: flex; align-items: center; gap: 12px; padding: 8px 14px; color: var(--text-muted); font-size: 12px; min-width: 0; }
++.panel { margin-top: var(--space-4); background: color-mix(in srgb, var(--text-muted) 6%, transparent); border-radius: 12px; min-width: 0; overflow: hidden; font-size: 12px; line-height: 22px; color: var(--text); }
++.header { display: flex; align-items: center; gap: var(--space-12); padding: var(--space-8) var(--ma-pad-x); color: var(--text-muted); font-size: 12px; min-width: 0; }
 +.title { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-+.action { background: none; border: 0; padding: 0 2px; color: var(--text-muted); font: inherit; font-size: 12px; cursor: pointer; flex-shrink: 0; }
++.action { background: none; border: 0; padding: 0 var(--space-2); color: var(--text-muted); font: inherit; font-size: 12px; cursor: pointer; flex-shrink: 0; }
 +.action:hover { color: var(--text); }
 +.action:disabled { opacity: .5; cursor: default; }
-+.body { padding: 0 14px 12px; min-width: 0; }
++.body { padding: 0 var(--ma-pad-x) var(--space-12); min-width: 0; }
 +.pre { font-family: var(--font-mono); font-size: 11px; line-height: 22px; margin: 0; white-space: pre; overflow: auto; }
-+.prose { padding: 0 14px 12px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; }
++.prose { padding: 0 var(--ma-pad-x) var(--space-12); white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; }
 +.lines { overflow: auto; font-family: var(--font-mono); font-size: 11px; line-height: 22px; }
 +.line { display: flex; white-space: pre; min-height: 22px; }
-+.number { user-select: none; color: var(--text-muted); min-width: 48px; padding-right: 16px; text-align: right; flex: 0 0 auto; }
++.number { user-select: none; color: var(--text-muted); min-width: 48px; padding-right: var(--space-16); text-align: right; flex: 0 0 auto; }
 +.more { display: block; border: 0; background: none; color: var(--text-muted); font: inherit; cursor: pointer; padding: 0; line-height: 22px; }
-+.added { color: color-mix(in srgb, #16bc4b 90%, var(--text)); }
-+.removed { color: color-mix(in srgb, #ff393f 90%, var(--text)); }
++.added { color: color-mix(in srgb, var(--ma-diff-added) 90%, var(--text)); }
++.removed { color: color-mix(in srgb, var(--ma-diff-removed) 90%, var(--text)); }
 +.notice { color: var(--text-muted); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
-+.section { margin: 8px 0 4px; font-size: 12px; font-weight: 500; }
-+.view { border: 1px solid var(--border, #ddd); border-radius: 12px; padding: 0 8px; margin-top: 6px; font-size: 11px; line-height: 20px; background: none; color: var(--text-muted); cursor: pointer; }
++.section { margin: var(--space-8) 0 var(--space-4); font-size: 12px; font-weight: 500; }
++.view { border: 1px solid var(--border, #ddd); border-radius: 12px; padding: 0 var(--space-8); margin-top: var(--space-6); font-size: 11px; line-height: 20px; background: none; color: var(--text-muted); cursor: pointer; }
 +.terminal { max-height: 224px; overflow: auto; }
 +.terminal :global([data-testid^="terminal-preview-"]) { height: auto; max-height: 224px; border: 0; border-radius: 0; margin: 0; background: none; overflow: auto; }
 +.terminal :global([role="log"]) { font-size: 11px; line-height: 22px; }
-+.dialog { width: min(860px, 90vw); max-height: 85vh; overflow: auto; padding: 18px; border-radius: 12px; background: var(--bg, #fff); color: var(--text); }
++.dialog { width: min(860px, 90vw); max-height: 85vh; overflow: auto; padding: var(--ma-dialog-pad); border-radius: 12px; background: var(--bg, #fff); color: var(--text); }
 +.dialog .pre { max-height: 50vh; }
-+.lines :global(.tok-keyword) { color: #bd4ec2; }
-+.lines :global(.tok-string) { color: #559541; }
-+.lines :global(.tok-number) { color: #b97c33; }
++.lines :global(.tok-keyword) { color: var(--ma-syntax-keyword); }
++.lines :global(.tok-string) { color: var(--ma-syntax-string); }
++.lines :global(.tok-number) { color: var(--ma-syntax-number); }
 +.lines :global(.tok-comment) { color: var(--text-muted); }
-+.lines :global(.tok-typeName), .lines :global(.tok-variableName.tok-definition) { color: #448ad0; }
++.lines :global(.tok-typeName), .lines :global(.tok-variableName.tok-definition) { color: var(--ma-syntax-type); }
 +
 +.meta { flex-shrink: 1; min-width: 0; white-space: nowrap; font-size: 12px; }
-+@media (max-width: 600px) { .header { flex-wrap: wrap; gap: 4px 10px; } .header .title { flex-basis: 50%; } .meta { font-size: 11px; } }
++@media (max-width: 600px) { .header { flex-wrap: wrap; gap: var(--space-4) var(--space-10); } .header .title { flex-basis: 50%; } .meta { font-size: 11px; } }
 diff --git a/desktop/src/react/components/chat/MessageActivity.tsx b/desktop/src/react/components/chat/MessageActivity.tsx
 new file mode 100644
 index 0000000000000000000000000000000000000000..5b6784eb4de2814306710c0370c3eef3823d3531
@@ -334457,7 +334473,7 @@ index 9c97f88791be1e3087db925b9562edbc7caf1722..85fa3f8cf2b08d8eb1860a09b2fd0b35
  });
 diff --git a/desktop/src/react/components/chat/TodoPanel.module.css b/desktop/src/react/components/chat/TodoPanel.module.css
 new file mode 100644
-index 0000000000000000000000000000000000000000..5083554537325e9c37d6e6758b1661e08b11dc92
+index 0000000000000000000000000000000000000000..e17b8d463cc9131e0719276d74fbb62b7ae07f56
 --- /dev/null
 +++ b/desktop/src/react/components/chat/TodoPanel.module.css
 @@ -0,0 +1,202 @@
@@ -334476,9 +334492,9 @@ index 0000000000000000000000000000000000000000..5083554537325e9c37d6e6758b1661e0
 +.header {
 +  display: flex;
 +  align-items: center;
-+  gap: 7px;
++  gap: var(--space-8);
 +  width: 100%;
-+  padding: 7px 10px;
++  padding: var(--space-6) var(--space-10);
 +  font: inherit;
 +  font-size: 13px;
 +  line-height: 1.4;
@@ -334522,19 +334538,19 @@ index 0000000000000000000000000000000000000000..5083554537325e9c37d6e6758b1661e0
 +}
 +
 +.moreParallel {
-+  margin-left: 6px;
++  margin-left: var(--space-6);
 +  color: var(--text-muted);
 +}
 +
 +.notice {
-+  padding: 0 10px 7px;
++  padding: 0 var(--space-10) var(--space-6);
 +  font-size: 12px;
 +  line-height: 1.4;
-+  color: var(--warning, #b07a2a);
++  color: var(--danger, #b07a2a);
 +}
 +
 +.stoppedNote {
-+  padding: 0 10px 7px;
++  padding: 0 var(--space-10) var(--space-6);
 +  font-size: 12px;
 +  line-height: 1.4;
 +  color: var(--text-muted);
@@ -334543,8 +334559,8 @@ index 0000000000000000000000000000000000000000..5083554537325e9c37d6e6758b1661e0
 +.list {
 +  display: flex;
 +  flex-direction: column;
-+  gap: 4px;
-+  padding: 2px 10px 8px;
++  gap: var(--space-4);
++  padding: var(--space-2) var(--space-10) var(--space-8);
 +  /* 内部滚动：最高约 240px，同时不超过可用窗口高度的 30% */
 +  max-height: min(240px, 30vh);
 +  overflow-y: auto;
@@ -334554,14 +334570,14 @@ index 0000000000000000000000000000000000000000..5083554537325e9c37d6e6758b1661e0
 +.row {
 +  display: grid;
 +  grid-template-columns: 14px minmax(0, 1fr);
-+  gap: 7px;
++  gap: var(--space-6);
 +  align-items: start;
 +  font-size: 13px;
 +  line-height: 1.5;
 +}
 +
 +.statusIcon {
-+  margin-top: 3px;
++  margin-top: var(--space-2);
 +  flex: 0 0 auto;
 +}
 +
@@ -334578,11 +334594,11 @@ index 0000000000000000000000000000000000000000..5083554537325e9c37d6e6758b1661e0
 +}
 +
 +.completedIcon {
-+  color: #5aa07a;
++  color: var(--green, #5aa07a);
 +}
 +
 +.blockedIcon {
-+  color: var(--warning, #b07a2a);
++  color: var(--danger, #b07a2a);
 +}
 +
 +.cancelledIcon {
@@ -334615,7 +334631,7 @@ index 0000000000000000000000000000000000000000..5083554537325e9c37d6e6758b1661e0
 +}
 +
 +.cancelledTag {
-+  margin-left: 6px;
++  margin-left: var(--space-6);
 +  font-size: 12px;
 +  color: var(--text-muted);
 +}
@@ -334623,19 +334639,19 @@ index 0000000000000000000000000000000000000000..5083554537325e9c37d6e6758b1661e0
 +.reason {
 +  font-size: 12px;
 +  line-height: 1.4;
-+  color: var(--warning, #b07a2a);
++  color: var(--danger, #b07a2a);
 +  overflow-wrap: anywhere;
 +}
 +
 +.actions {
 +  display: flex;
 +  flex-wrap: wrap;
-+  gap: 6px;
-+  padding: 0 10px 8px;
++  gap: var(--space-6);
++  padding: 0 var(--space-10) var(--space-8);
 +}
 +
 +.action {
-+  padding: 3px 10px;
++  padding: var(--space-4) var(--space-10);
 +  font: inherit;
 +  font-size: 12px;
 +  line-height: 1.5;
@@ -334658,7 +334674,7 @@ index 0000000000000000000000000000000000000000..5083554537325e9c37d6e6758b1661e0
 +}
 +
 +.cancelNote {
-+  padding: 0 10px 8px;
++  padding: 0 var(--space-10) var(--space-8);
 +  font-size: 12px;
 +  line-height: 1.4;
 +  color: var(--text-muted);
@@ -341480,10 +341496,10 @@ index 0000000000000000000000000000000000000000..e711b51c322b462ad33ea7868d6c9248
 +[展示归一化](../../desktop/src/react/utils/content-semantics.ts)按已有版本及任务身份生成稳定编号。相同结果重放保留位置；不同版本、独立任务和明确的多次展示保留各自编号。多文件逐个保留，语音与图片、视频都参加历史结果重建。
 diff --git a/docs/tasks/2026-09-11-todo-experience/ACCEPTANCE.md b/docs/tasks/2026-09-11-todo-experience/ACCEPTANCE.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..4185bd02a0a5c8460a4a6e66573b7bde1eeaafb7
+index 0000000000000000000000000000000000000000..72ecee39d08a7959cdf89726e5141d57174cb44f
 --- /dev/null
 +++ b/docs/tasks/2026-09-11-todo-experience/ACCEPTANCE.md
-@@ -0,0 +1,87 @@
+@@ -0,0 +1,90 @@
 +# 任务清单改版验收记录
 +
 +日期：2026-09-11
@@ -341556,13 +341572,16 @@ index 0000000000000000000000000000000000000000..4185bd02a0a5c8460a4a6e66573b7bde
 +
 +- `npm run typecheck`：通过（tsc ×3）。
 +- `npm run build:renderer`：通过。
-+- `npm test`（全量 13937）：除以下外全部通过。
-+  - 本任务基线即失败（环境/审计类，与本改动无关，改动前后均失败）：
-+    `open-boundary-lint`（2）、`persistence-schema-tripwire`（4）、`style-discipline`（1）、
-+    `post-verification-audit-seal`（1，源变更非审计白名单，需封印授权流程处理）、
-+    `round2/round3-delivery-evidence`（3，未提交源码未入历史 manifest）。
-+  - `session-new-session-crosstalk` 的 "KNOWN DEFECT" characterization 用例在全量运行中
-+    偶发失败、定向运行通过（基线同样表现），与本改动无关。
++- `npm test`（全量 13937 条）：13919 通过、7 跳过、11 失败。11 个失败全部在
++  本任务基线（未做任何改动的工作区）复现，属环境/审计类，与本改动无关：
++  - `open-boundary-lint`（2）、`persistence-schema-tripwire`（4）、`style-discipline`（1）：
++    基线环境即失败；
++  - `post-verification-audit-seal`（1）：当前已提交版本与 `.sync-audit` 已验证坐标不一致，
++    源变更非审计白名单；封印推进需要提交授权，不在本任务范围；
++  - `round2/round3-delivery-evidence`（3）：历史轮次 manifest 不含当前未提交源码，
++    需对应授权流程处理。
++  - 验证过程中曾出现 `git stash pop` 部分恢复与 `cli-closure-census` 在异常树状态下的
++    假失败；恢复完整工作区后全部相关测试通过，未遗留冲突标记或内容差异。
 +
 +## 四、未覆盖与边界
 +
@@ -341844,7 +341863,7 @@ index aaf05e3c86f54c6131666d3b6708950bcd19f44d..f9d0391086e7c2a0b7281e52a9eb44cd
        globals: {
          ...globals.node,
 diff --git a/export-manifest.json b/export-manifest.json
-index bb8f68cd206bba4a8a9a8034ab513a69c73df952..91744e3e39d4881f55e29854397958b835b0b7ff 100644
+index bb8f68cd206bba4a8a9a8034ab513a69c73df952..b23ce95c556fbdb147161cdaf821cbf3b0e7289c 100644
 --- a/export-manifest.json
 +++ b/export-manifest.json
 @@ -15,7 +15,6 @@
@@ -341925,15 +341944,34 @@ index bb8f68cd206bba4a8a9a8034ab513a69c73df952..91744e3e39d4881f55e29854397958b8
      "lib/knowledge/web-snapshot-security.ts",
      "lib/known-model-fallbacks.json",
      "lib/known-models.json",
-@@ -427,6 +430,7 @@
+@@ -427,8 +430,10 @@
      "lib/permission/tool-invocation-permission.ts",
      "lib/pi-sdk/auth-facade.ts",
      "lib/pi-sdk/compaction-request-shape.ts",
 +    "lib/pi-sdk/desktop-input-commit.ts",
      "lib/pi-sdk/index.ts",
      "lib/pi-sdk/model-call-stream-observer.ts",
++    "lib/pi-sdk/search-presentation.ts",
      "lib/pi-sdk/search-tools.ts",
-@@ -573,9 +577,9 @@
+     "lib/pi-sdk/session-options.ts",
+     "lib/pi-sdk/stream-guard.ts",
+@@ -479,6 +484,7 @@
+     "lib/providers/zhipu.ts",
+     "lib/resource-io/agent-tools.ts",
+     "lib/resource-io/errors.ts",
++    "lib/resource-io/file-change-presentation.ts",
+     "lib/resource-io/materialize-tool.ts",
+     "lib/resource-io/pi-tool-operations.ts",
+     "lib/resource-io/providers/local-fs-provider.ts",
+@@ -497,6 +503,7 @@
+     "lib/resources/resource-envelope.ts",
+     "lib/sandbox/bwrap.ts",
+     "lib/sandbox/exec-helper.ts",
++    "lib/sandbox/file-tool-presentation.ts",
+     "lib/sandbox/index.ts",
+     "lib/sandbox/managed-config-guard.ts",
+     "lib/sandbox/path-guard.ts",
+@@ -573,9 +580,9 @@
      "lib/tools/knowledge-grep-tool.ts",
      "lib/tools/knowledge-manage-tool.ts",
      "lib/tools/knowledge-outline-tool.ts",
@@ -341944,7 +341982,7 @@ index bb8f68cd206bba4a8a9a8034ab513a69c73df952..91744e3e39d4881f55e29854397958b8
      "lib/tools/loop-control-tool.ts",
      "lib/tools/media-details.ts",
      "lib/tools/notify-tool.ts",
-@@ -637,6 +641,20 @@
+@@ -637,6 +644,20 @@
      "server/deferred-result-bus-handlers.ts",
      "server/deferred-result-interlude.ts",
      "server/history-deferred-content.ts",
@@ -341965,7 +342003,7 @@ index bb8f68cd206bba4a8a9a8034ab513a69c73df952..91744e3e39d4881f55e29854397958b8
      "server/hono-helpers.ts",
      "server/http/boundary.ts",
      "server/http/capability-guard.ts",
-@@ -695,6 +713,7 @@
+@@ -695,6 +716,7 @@
      "server/routes/web-auth.ts",
      "server/routes/ws-auth.ts",
      "server/routes/ws-session-context.ts",
@@ -341973,13 +342011,14 @@ index bb8f68cd206bba4a8a9a8034ab513a69c73df952..91744e3e39d4881f55e29854397958b8
      "server/session-stream-store.ts",
      "server/session-thinking-level-state.ts",
      "server/suggestion-blocks.ts",
-@@ -795,4 +814,4 @@
-     "shared/workspace-ui-state.ts",
-     "shared/yuan-visuals.ts"
-   ]
--}
-+}
-\ No newline at end of file
+@@ -785,6 +807,7 @@
+     "shared/tool-arg-summary.ts",
+     "shared/tool-categories.ts",
+     "shared/tool-outcome.ts",
++    "shared/tool-presentation.ts",
+     "shared/video-mime.ts",
+     "shared/workspace-history.ts",
+     "shared/workspace-output.cjs",
 diff --git a/hub/index.ts b/hub/index.ts
 index 72b841fb5b0db5c95db4cf0ad227dc54f41adc54..e74f4b51343ecaea699960febc4c3bf5c30fa1e9 100644
 --- a/hub/index.ts
