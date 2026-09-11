@@ -21,6 +21,10 @@ export default [
       '.cache/**',
       // .docs/ 不入版本控制、CI 不可见；lint 覆盖它会造成本地/CI 语义不对称
       '.docs/**',
+      // 同理：gitignore 的 logs/ 与 build/*.mjs scratch（本地调试/构建临时产物）
+      // 不随 clone 分发，lint 覆盖会造成本地/CI 语义不对称
+      '**/logs/**',
+      'build/*.mjs',
       '**/*.cjs',
     ],
   },
@@ -60,7 +64,9 @@ export default [
       'scripts/**/*.{js,mjs,ts}',
       'server/**/*.{js,ts}',
       'shared/**/*.{js,ts}',
-      'tests/**/*.{js,ts,tsx}',
+      // tests/ 下的 tracked .mjs（如 compat-old-server-runner.template.mjs）
+      // 是 node 侧工具，需要 node globals
+      'tests/**/*.{js,mjs,ts,tsx}',
       // 同步审计脚本是入版本控制的 node 工具（build-sync-matrix/migration-smoke 等）
       '.sync-audit/**/*.{js,mjs}',
     ],
@@ -75,7 +81,7 @@ export default [
 
   // Vitest files mix Node helpers with jsdom/browser primitives.
   {
-    files: ['tests/**/*.{js,ts,tsx}'],
+    files: ['tests/**/*.{js,mjs,ts,tsx}'],
     languageOptions: {
       globals: {
         ...globals.node,

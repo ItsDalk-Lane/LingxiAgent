@@ -390,7 +390,7 @@ export async function buildHistoryDirectory(
     sourceMessages.length = 0;
     branchEntries.length = 0;
     byId.clear();
-    (context as any) && Object.keys(context).forEach((k) => delete (context as any)[k]);
+    if (context) Object.keys(context).forEach((k) => delete (context as any)[k]);
   };
 
   return { directory, context, released, headWriteBack };

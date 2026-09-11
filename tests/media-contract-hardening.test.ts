@@ -71,8 +71,8 @@ afterEach(async () => {
 });
 
 describe("媒体持久化与产物完成合同", () => {
-  it.each(["{broken", "{}", '[null]', '[{"taskId":"same"},{"taskId":"same"}]'])
-    ("损坏或歧义快照明确失败，原件保持不变：%s", (raw) => {
+  it.each(["{broken", "{}", '[null]', '[{"taskId":"same"},{"taskId":"same"}]'])(
+    "损坏或歧义快照明确失败，原件保持不变：%s", (raw) => {
       const dir = root();
       const filename = path.join(dir, "tasks.json");
       fs.writeFileSync(filename, raw);
