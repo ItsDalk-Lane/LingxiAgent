@@ -44,7 +44,16 @@
 - 未做（需另行授权）：推进 `VERIFIED_SOURCE_SHA`、重新生成交付/审计矩阵、把本次提交作为候选
   走封印验证流程。这些属治理动作，不在本任务白名单，也不得为使检查变绿而虚报坐标或放宽 allowlist。
 - 影响面：全量测试由「5 条先存红（round2/round3 交付证据 + model-observability-e2e-chat）」
-  变为「6 条红（+审计封印）」，其余全绿。
+  变为「6 条红（+审计封印）」，其余全绿。实测：`14106 passed / 6 failed / 7 skipped`。
+- 提交：`1f1302ac5`（已推送 `22410318c..1f1302ac5`）。守护脚本逐条列出 12 个非审计文件。
+
+### 已定位：3 条 manifest 红的根因（与本次改动无关）
+`artifacts/f1-f12-repair/round2/SOURCE_MANIFEST.json` 有 3632 条路径，而
+`.sync-audit/verified-source-sha.txt` 指向的 `9c4b11114` 有 3668 条；差集 36 条**全部**是该次交付
+新增的文件（`core/workspace-snapshots.ts`、`core/interrupted-turn-marker.ts`、
+`desktop/.../FileRollbackReport.tsx`、`.../RunningStatusLine.tsx`、side-chat/rollback 系列测试等），
+manifest 里"只在 manifest 不在提交"一侧为 0 条。即：manifest 停留在该批新增文件之前生成，
+这 3 条红在任何工作区/提交状态下都会红，与工具行标签、图标改动无交集。
 
 ## 顺手活（按任务规不自行处理，待裁决）
 - `getToolLabel`（`tool.*` 命名空间）现在只剩"行标签"以外的旧分支在用：`ToolGroupBlock` 的调查聚合卡

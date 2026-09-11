@@ -1903,3 +1903,13 @@ M  desktop/src/react/__tests__/components/TodoPanel.test.tsx
   出现非审计文件改动，`tests/post-verification-audit-seal.test.ts` 与
   `.sync-audit/verify-post-verification-diff.mjs` 会红。按用户裁决如实报告，不修改封印指针、
   不扩大 allowlist、不退役门禁；正式封印需另走验证流程并绑定候选提交。
+
+### 提交/推送结果与提交后全量测试（2026-09-11）
+- 分支 `feat/tool-activity-presentation`，提交 `1f1302ac5`，已推送：
+  `22410318c..1f1302ac5  feat/tool-activity-presentation -> feat/tool-activity-presentation`（PUSH_EXIT=0）。
+- 未提交项：未跟踪目录 `artifacts/tool-row-style-preview/`（按用户裁决不纳入）。
+- 提交后全量 `npm test` → **14106 passed / 6 failed / 7 skipped**（1393 文件：4 failed | 1388 passed | 1 skipped）。
+  比提交前多出的唯一一条红是 `tests/post-verification-audit-seal.test.ts`，原因与预期一致：
+  本提交推进了 HEAD，而 `.sync-audit/verified-source-sha.txt` 仍是 `9c4b11114`，diff 里出现 12 个非审计文件。
+  独立守护脚本同样红（GUARD_EXIT=1，逐条列出同样 12 个文件）。
+- 封印红**未处理**：不改指针、不扩 allowlist、不退役门禁，留待另行授权的封印流程。
