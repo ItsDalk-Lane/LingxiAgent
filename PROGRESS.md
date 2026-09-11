@@ -1125,7 +1125,7 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 固定源码候选：`aa42fc5918a245735d2ef2b7490d7e015c525556`（分支 feat/tool-activity-presentation）：d759b695 任务清单改版（todo v2 五态与受阻原因、完成/取消/收纳区分、版本哈希保护的用户收尾操作、输入框上方 TodoPanel、胶囊重复清单移除、消息行摘要、失败保留原清单缺陷修复；验收记录 docs/tasks/2026-09-11-todo-experience/ACCEPTANCE.md）+ 43501abb 封印前收账（MessageActivity/TodoPanel CSS 字面量收进定义行与 token、export-manifest 补录 4 个展示层模块消除 open→closed 新耦合、persistence-schema-fingerprint compatible 重钉——search-tools.ts 仅展示层改动、managed-runtime-caches 契约零变化）+ aa42fc59 证据重冻结（round2/round3 SOURCE_MANIFEST 按候选树重算 c86a8c64/9e9cfe2f、交付补丁重生成重放 VERIFIED、sep11-todo-green 绿门禁 exit 0 且执行期间无漂移）。
 - 验证证据（绑定该候选树）：typecheck×3 绿；全量 13926 passed / 7 skipped / 4 failed（1380 文件）——4 个失败全部为本条目推进前的 seal 坐标预期红（post-verification-audit-seal + round2 R10-03/R10-04 + round3 manifest 守卫，均因旧坐标 01414f13 起存在非审计开发提交）；build:renderer 绿；open-boundary-lint 绿（1 条已知基线债务）；style-discipline 棘轮绿；persistence-schema-tripwire 15/15 绿；证据契约（round2 R10 + round3 + matrix）22/22 绿。
 - 未执行/受限：真实界面验收（A20 主题/缩放/移动端）与真实模型行为验证未执行（验收记录已标注）；未执行 npm run pack 与打包/发布；Windows 真机仍未实测（沿用既有 Known limitation）。
-- 提交后验证（封印推进后）：审计提交下 post-verification diff guard OK（候选之后仅审计文件）；matrix/round2/round3/seal 复跑全绿；全量复跑结果记录于审计提交后的本条更新。
+- 提交后验证（封印推进后）：审计提交下 post-verification diff guard OK（候选之后仅 6 个审计文件）；matrix/round2/round3/seal 复跑 25/25 绿；全量复跑 13930 passed / 0 failed / 7 skipped（1379 文件通过、1 既有跳过），无任何失败。说明：round2 交付补丁在每次全量运行时由 R10-09 按当时树确定性重生成（工作区漂移为既有状态，不入审计提交）。
 
 ## 2026-08-25 Notebook-first Knowledge 目标
 
