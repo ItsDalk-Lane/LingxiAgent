@@ -15,6 +15,17 @@ import { randomUUID } from "node:crypto";
 import { collectRetainedMediaTaskState } from "./session-fork.ts";
 
 const DEBOUNCE_MS = 300;
+const TERMINAL_STATUSES = new Set(["done", "failed", "cancelled", "aborted"]);
+const TASK_STATUSES = new Set(["pending", ...TERMINAL_STATUSES]);
+const DELIVERY_STATES = new Set(["pending", "handed_off", "not_required"]);
+
+export function mediaTaskAttempt(task) {
+  return Number.isSafeInteger(task?.attempt) && task.attempt > 0 ? task.attempt : 1;
+}
+
+export function isMediaTaskTerminal(task) {
+  return TERMINAL_STATUSES.has(task?.status);
+}
 const LEGACY_PROTOCOL_BY_ADAPTER = {
   openai: "openai-images",
   "openai-codex-oauth": "openai-codex-responses-image",
@@ -26,7 +37,29 @@ const LEGACY_PROTOCOL_BY_ADAPTER = {
 };
 
 function normalizeLoadedTask(task) {
-  if (!task || typeof task.taskId !== "string") return null;
+  if (!task || typeof task !== "object" || Array.isArray(task)
+    || typeof task.taskId !== "string" || !task.taskId.trim()
+    || typeof task.adapterId !== "string" || !task.adapterId.trim()
+    || !TASK_STATUSES.has(task.status)) {
+    throw new Error("TaskStore: invalid persisted task identity or status");
+  }
+  if (task.attempt !== undefined && (!Number.isSafeInteger(task.attempt) || task.attempt < 1)) {
+    throw new Error(`TaskStore: invalid attempt for ${task.taskId}`);
+  }
+  if (task.deliveryState !== undefined && !DELIVERY_STATES.has(task.deliveryState)) {
+    throw new Error(`TaskStore: invalid delivery state for ${task.taskId}`);
+  }
+  for (const field of ["files", "sessionFiles"]) {
+    if (task[field] !== undefined && !Array.isArray(task[field])) {
+      throw new Error(`TaskStore: invalid ${field} for ${task.taskId}`);
+    }
+  }
+  if (task.files?.some((file) => typeof file !== "string" || !file.trim())) {
+    throw new Error(`TaskStore: invalid files for ${task.taskId}`);
+  }
+  if (task.params !== undefined && (!task.params || typeof task.params !== "object" || Array.isArray(task.params))) {
+    throw new Error(`TaskStore: invalid params for ${task.taskId}`);
+  }
   const sessionId = task.sessionId || task.sessionRef?.sessionId || null;
   const sessionPath = task.sessionPath || task.sessionRef?.sessionPath || null;
   const sessionRef = sessionId
@@ -57,6 +90,12 @@ function normalizeLoadedTask(task) {
     credentialLaneId: task.credentialLaneId || task.params?.credentialLaneId || null,
     deliveryMode,
     delivery: task.delivery || { mode: deliveryMode },
+    attempt: mediaTaskAttempt(task),
+    // 旧终态没有待交付证据，不能在升级后凭空重放；旧 pending 继续原任务。
+    deliveryState: task.deliveryState || (deliveryMode === "response"
+      ? "not_required" : task.status === "pending" ? "pending" : "handed_off"),
+    files: task.files || [],
+    sessionFiles: task.sessionFiles || [],
     params,
   };
 }
@@ -82,7 +121,7 @@ function fileSystemErrorCode(error: unknown): string {
  * 指向哪里，因此不用于最终接受判断。返回值只带原文件名和错误码，避免泄漏
  * canonical 绝对路径。
  */
-export function validateSynchronousSpeechOutputs(
+export function validateMediaOutputs(
   files: unknown,
   generatedDir: unknown,
 ): { ok: true; files: string[] } | { ok: false; error: string } {
@@ -109,7 +148,7 @@ export function validateSynchronousSpeechOutputs(
     }
     const file = entry;
     // 当前 files[] 合同是 generated 根下的文件名；不借本修复新增子目录合同。
-    if (path.isAbsolute(file) || file === "." || file === ".." || path.basename(file) !== file) {
+    if (path.isAbsolute(file) || file.includes("\\") || file === "." || file === ".." || path.basename(file) !== file) {
       return { ok: false, error: `speech output has an invalid file name: ${file}` };
     }
     let realTarget: string;
@@ -123,9 +162,11 @@ export function validateSynchronousSpeechOutputs(
       return { ok: false, error: `speech output escapes generated dir: ${file}` };
     }
     try {
-      if (!fs.statSync(realTarget).isFile()) {
+      const stat = fs.statSync(realTarget);
+      if (!stat.isFile()) {
         return { ok: false, error: `speech output is not a regular file: ${file}` };
       }
+      if (stat.size === 0) return { ok: false, error: `media output file is empty: ${file}` };
     } catch (error) {
       return { ok: false, error: `speech output file unavailable: ${file} (${fileSystemErrorCode(error)})` };
     }
@@ -133,6 +174,9 @@ export function validateSynchronousSpeechOutputs(
   }
   return { ok: true, files: accepted };
 }
+
+// 兼容原来的语音入口；图片、视频、重启恢复共用同一产物判断。
+export const validateSynchronousSpeechOutputs = validateMediaOutputs;
 
 // 这里刻意只做纯字符串归一，不走文件系统归一原语：比较的是 session JSONL 的
 // 定位路径（可能已经不存在，甚至属于另一台机器上的备份），一旦引入 realpath 就
@@ -339,6 +383,8 @@ export class TaskStore {
   declare _debounceTimer: any;
   declare _filePath: any;
   declare _tasks: any;
+  declare _dirty: boolean;
+  declare _lastWriteError: Error | null;
   /**
    * @param {string} dataDir  Directory where tasks.json lives (created if absent)
    */
@@ -348,6 +394,8 @@ export class TaskStore {
     /** @type {Map<string, object>} keyed by taskId */
     this._tasks = new Map();
     this._debounceTimer = null;
+    this._dirty = false;
+    this._lastWriteError = null;
     this._load();
   }
 
@@ -360,7 +408,7 @@ export class TaskStore {
    *
    * @param {{ taskId: string, adapterId: string, providerId?: string|null, modelId?: string|null, protocolId?: string|null, credentialLaneId?: string|null, batchId: string, type: string, prompt: string, params: object, sessionId?: string|null, sessionPath?: string|null, sessionRef?: object|null, deliveryMode?: string, delivery?: object|null, deliveryTarget?: object|null, metadata?: object|null, adapterTaskId?: string|null, submitState?: string }} opts
    */
-  add({ taskId, adapterId, providerId = null, modelId = null, protocolId = null, credentialLaneId = null, batchId, type, prompt, params, sessionId = null, sessionPath = null, sessionRef = null, deliveryMode = "session", delivery = null, deliveryTarget = null, metadata = null, adapterTaskId = null, submitState = "submitted" }) {
+  add({ taskId, adapterId, providerId = null, modelId = null, protocolId = null, credentialLaneId = null, credentialProviderId = null, batchId, type, prompt, params, sessionId = null, sessionPath = null, sessionRef = null, deliveryMode = "session", delivery = null, deliveryTarget = null, metadata = null, adapterTaskId = null, submitState = "submitted" }) {
     if (this._tasks.has(taskId)) {
       throw new Error(`TaskStore: duplicate taskId "${taskId}"`);
     }
@@ -371,6 +419,7 @@ export class TaskStore {
       modelId: modelId || params?.modelId || params?.model || null,
       protocolId: protocolId || params?.protocolId || null,
       credentialLaneId: credentialLaneId || params?.credentialLaneId || null,
+      credentialProviderId: credentialProviderId || params?.credentialProviderId || null,
       batchId,
       type,
       prompt,
@@ -389,7 +438,9 @@ export class TaskStore {
       metadata: metadata && typeof metadata === "object" && !Array.isArray(metadata) ? metadata : null,
       adapterTaskId: adapterTaskId || null,
       submitState,
+      attempt: 1,
       status: "pending",
+      deliveryState: (delivery?.mode || deliveryMode) === "response" ? "not_required" : "pending",
       failReason: null,
       files: [],
       sessionFiles: [],
@@ -417,30 +468,69 @@ export class TaskStore {
    * 4. 验证失败 → 任务标明确失败并返回 { ok:false }，由调用方把错误抛出。
    */
   completeSynchronousSpeechTask(taskId, { files = [], generatedDir }: Record<string, any> = {}) {
+    return this.settleTask(taskId, { status: "done", files, generatedDir });
+  }
+
+  isCurrentAttempt(taskId, attempt) {
     const task = this._tasks.get(taskId);
-    if (!task) {
-      return { ok: false, error: `TaskStore: task not found: ${taskId}` };
-    }
-    if (task.status === "done") {
-      return { ok: true, idempotent: true, task: { ...task } };
-    }
-    if (task.status === "cancelled" || task.status === "failed" || task.status === "aborted") {
-      return { ok: false, error: `TaskStore: cannot complete ${task.status} task ${taskId}` };
-    }
-    const fail = (reason) => {
-      this.update(taskId, { status: "failed", submitState: "failed", failReason: reason });
-      return { ok: false, error: reason };
-    };
-    const validation = validateSynchronousSpeechOutputs(files, generatedDir);
-    if (validation.ok === false) return fail(validation.error);
-    this.update(taskId, {
-      status: "done",
-      submitState: "completed",
-      completedAt: new Date().toISOString(),
-      failReason: null,
-      files: [...validation.files],
+    return !!task && mediaTaskAttempt(task) === attempt;
+  }
+
+  /** 只有明确重试才开启新尝试；先持久化，再允许新的供应商调用。 */
+  beginAttempt(taskId, patch: Record<string, any> = {}) {
+    const task = this._tasks.get(taskId);
+    if (!task || !isMediaTaskTerminal(task)) throw new Error(`TaskStore: task is not retryable: ${taskId}`);
+    Object.assign(task, patch, {
+      attempt: mediaTaskAttempt(task) + 1,
+      status: "pending",
+      deliveryState: task.deliveryMode === "response" ? "not_required" : "pending",
     });
-    return { ok: true, task: { ...this._tasks.get(taskId) } };
+    this._scheduleSave();
+    this.requireFlush();
+    return { ...task };
+  }
+
+  /** 所有完成路径先证明产物、写入不可倒退的终态，再将交付交给 poller。 */
+  settleTask(taskId, { status, expectedAttempt, files = [], generatedDir, ...patch }: Record<string, any>) {
+    const task = this._tasks.get(taskId);
+    if (!task) return { ok: false, stale: true, error: `TaskStore: task not found: ${taskId}` };
+    if (expectedAttempt !== undefined && mediaTaskAttempt(task) !== expectedAttempt) {
+      return { ok: false, stale: true, error: `TaskStore: stale attempt: ${taskId}` };
+    }
+    if (isMediaTaskTerminal(task)) {
+      return task.status === status
+        ? { ok: true, idempotent: true, task: { ...task } }
+        : { ok: false, stale: true, error: `TaskStore: cannot complete ${task.status} task ${taskId}` };
+    }
+    if (!TERMINAL_STATUSES.has(status)) throw new Error(`TaskStore: invalid terminal status: ${status}`);
+    const validation = status === "done" ? validateMediaOutputs(files, generatedDir) : null;
+    const outputError = validation?.ok === false ? validation.error : null;
+    const finalStatus = outputError ? "failed" : status;
+    this.update(taskId, {
+      ...patch,
+      status: finalStatus,
+      submitState: finalStatus === "done" ? "completed" : "failed",
+      completedAt: patch.completedAt || new Date().toISOString(),
+      failReason: outputError || (finalStatus === "done" ? null : patch.failReason || "generation failed"),
+      ...(validation?.ok === true ? { files: [...validation.files] } : {}),
+      deliveryState: task.deliveryMode === "response" ? "not_required" : "pending",
+    });
+    this.requireFlush();
+    return outputError
+      ? { ok: false, error: outputError, task: { ...this._tasks.get(taskId) } }
+      : { ok: true, task: { ...this._tasks.get(taskId) } };
+  }
+
+  markDeliveryHandedOff(taskId, expectedAttempt) {
+    const task = this._tasks.get(taskId);
+    if (!task || !isMediaTaskTerminal(task) || mediaTaskAttempt(task) !== expectedAttempt) return false;
+    this.update(taskId, { deliveryState: "handed_off" });
+    try { this.requireFlush(); } catch (error) {
+      task.deliveryState = "pending";
+      this._scheduleSave();
+      throw error;
+    }
+    return true;
   }
 
   /**
@@ -459,21 +549,9 @@ export class TaskStore {
       const mode = task.deliveryMode || task.delivery?.mode;
       if (mode !== "response") continue;
       if (task.status !== "pending") continue;
-      const validation = validateSynchronousSpeechOutputs(task.files, generatedDir);
-      if (validation.ok === true) {
-        this.update(task.taskId, {
-          status: "done",
-          submitState: "completed",
-          completedAt: task.completedAt || now(),
-          failReason: null,
-        });
-      } else {
-        this.update(task.taskId, {
-          status: "failed",
-          submitState: "failed",
-          failReason: `speech output invalid after restart: ${validation.error}`,
-        });
-      }
+      this.settleTask(task.taskId, {
+        status: "done", files: task.files, generatedDir, completedAt: task.completedAt || now(),
+      });
       changed += 1;
     }
     return changed;
@@ -489,6 +567,7 @@ export class TaskStore {
   update(taskId, patch) {
     const task = this._tasks.get(taskId);
     if (!task) return null;
+    if (isMediaTaskTerminal(task) && patch.status !== undefined && patch.status !== task.status) return null;
     Object.assign(task, patch);
     this._scheduleSave();
     return { ...task };
@@ -599,6 +678,7 @@ export class TaskStore {
         createdTaskIds.push(targetTaskId);
         this.update(targetTaskId, {
           status: outcome.taskStatus,
+          deliveryState: "handed_off",
           failReason: outcome.failReason,
           submitState: outcome.submitState,
           adapterTaskId: null,
@@ -757,17 +837,18 @@ export class TaskStore {
       clearTimeout(this._debounceTimer);
       this._debounceTimer = null;
     }
-    return this._writeSync();
+    return !this._dirty || this._writeSync();
+  }
+
+  requireFlush() {
+    if (!this.flushSync()) throw this._lastWriteError || new Error("TaskStore: persistence failed");
   }
 
   /**
    * Cancel any pending debounce timer. Call on plugin unload.
    */
   destroy() {
-    if (this._debounceTimer !== null) {
-      clearTimeout(this._debounceTimer);
-      this._debounceTimer = null;
-    }
+    this.requireFlush();
   }
 
   // ---------------------------------------------------------------------------
@@ -784,30 +865,27 @@ export class TaskStore {
   }
 
   _load() {
+    let raw;
     try {
-      if (fs.existsSync(this._filePath)) {
-        const raw = fs.readFileSync(this._filePath, "utf8");
-        const arr = JSON.parse(raw);
-        if (Array.isArray(arr)) {
-          let changed = false;
-          for (const task of arr) {
-            const normalized = normalizeLoadedTask(task);
-            if (normalized) {
-              if (normalized.providerId !== task.providerId || normalized.protocolId !== task.protocolId) {
-                changed = true;
-              }
-              this._tasks.set(normalized.taskId, normalized);
-            }
-          }
-          if (changed) this._writeSync();
-        }
-      }
-    } catch {
-      // Corrupted or missing file: start with empty store.
+      raw = fs.readFileSync(this._filePath, "utf8");
+    } catch (error) {
+      if (fileSystemErrorCode(error) === "ENOENT") return;
+      throw error;
     }
+    const rows = JSON.parse(raw);
+    if (!Array.isArray(rows)) throw new Error("TaskStore: persisted tasks must be an array");
+    const loaded = new Map();
+    for (const row of rows) {
+      const task = normalizeLoadedTask(row);
+      if (loaded.has(task.taskId)) throw new Error(`TaskStore: duplicate persisted taskId: ${task.taskId}`);
+      loaded.set(task.taskId, task);
+    }
+    // 整份验证成功才采用；读取兼容转换不写回，也不会覆盖损坏原件。
+    this._tasks = loaded;
   }
 
   _scheduleSave() {
+    this._dirty = true;
     if (this._debounceTimer !== null) clearTimeout(this._debounceTimer);
     this._debounceTimer = setTimeout(() => {
       this._debounceTimer = null;
@@ -821,11 +899,14 @@ export class TaskStore {
       const tmp = this._filePath + ".tmp";
       fs.writeFileSync(tmp, JSON.stringify([...this._tasks.values()]), "utf8");
       fs.renameSync(tmp, this._filePath);
+      this._dirty = false;
+      this._lastWriteError = null;
       return true;
     } catch (err) {
       // Ordinary task updates keep memory authoritative; transactional callers
       // can treat the false return as a hard persistence failure.
       process.stderr.write(`TaskStore: write failed: ${err.message}\n`);
+      this._lastWriteError = err;
       return false;
     }
   }

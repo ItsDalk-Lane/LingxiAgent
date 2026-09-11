@@ -5090,7 +5090,7 @@ export class SessionCoordinator {
     return true;
   }
 
-  steer(text: any) {
+  async steer(text: any): Promise<boolean> {
     if (!this._session?.isStreaming) return false;
     const sp = this._session.sessionManager?.getSessionFile?.();
     if (sp) this.preflightSessionInput(sp);
@@ -5098,7 +5098,7 @@ export class SessionCoordinator {
       const entry = this._getSessionEntryByPath(sp);
       if (entry) entry.lastTouchedAt = Date.now();
     }
-    this._session.steer(text);
+    await this._session.steer(text);
     return true;
   }
 
@@ -5218,12 +5218,12 @@ export class SessionCoordinator {
     agent?._memoryTicker?.notifyTurn(sessionPath, { forceSummary });
   }
 
-  steerSession(sessionPath: any, text: any) {
+  async steerSession(sessionPath: any, text: any): Promise<boolean> {
     const entry = this._getSessionEntryByPath(sessionPath);
     if (!entry?.session.isStreaming) return false;
     this.preflightSessionInput(sessionPath);
     entry.lastTouchedAt = Date.now();
-    entry.session.steer(text);
+    await entry.session.steer(text);
     return true;
   }
 

@@ -354,7 +354,7 @@ describe("E2E truth — MC-07 CLI（S15）", () => {
         generatedDir: path.join(root, "generated"),
         resolveMediaExecutionTarget,
       },
-      store: { get: vi.fn(() => ({})), update: vi.fn() },
+      store: { get: vi.fn(() => ({ status: "pending", attempt: 1 })), update: vi.fn() },
       poller: { checkNow: vi.fn() },
       ctx: { dataDir: root, bus: { request: vi.fn(async () => ({})) }, log: { error: vi.fn(), warn: vi.fn() }, config: { get: vi.fn(() => ({})) }, usageLedger: ledger, sessionId: "sess-cli-e2e", sessionPath: "/sessions/cli.jsonl" },
     } as any);

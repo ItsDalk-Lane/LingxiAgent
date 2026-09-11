@@ -105,6 +105,7 @@ export class SpeechRecognitionService {
   declare _resolveProviderCredentialsFresh: any;
   declare _registry: any;
   declare _sessionFiles: any;
+  declare _transcriptionAttempts: Map<string, { controller: AbortController; superseded: boolean }>;
   constructor({
     providerRegistry,
     resolveProviderCredentialsFresh,
@@ -133,6 +134,7 @@ export class SpeechRecognitionService {
     this._getUsageLedger = typeof getUsageLedger === "function" ? getUsageLedger : () => usageLedger;
     this._registry = new MediaAdapterRegistry();
     for (const adapter of adapters || []) this.registerAdapter(adapter);
+    this._transcriptionAttempts = new Map();
   }
 
   registerAdapter(adapter) {
@@ -290,16 +292,17 @@ export class SpeechRecognitionService {
     });
     const target = { ...resolvedTarget, executionTarget };
 
-    const pending = this._updateTranscription({ sessionId, sessionPath }, fileId, {
-      status: "pending",
-      providerId: target.providerId,
-      modelId: target.model.id,
-      protocolId: target.model.protocolId,
-      ...(language ? { language } : {}),
-    });
-    this._emitTranscriptionUpdate({ sessionId, sessionPath, sessionRef }, fileId, pending.transcription);
+    const { key: attemptKey, attempt } = this._beginTranscriptionAttempt({ sessionId, sessionPath, fileId, signal });
 
     try {
+      const pending = this._updateTranscription({ sessionId, sessionPath }, fileId, {
+        status: "pending",
+        providerId: target.providerId,
+        modelId: target.model.id,
+        protocolId: target.model.protocolId,
+        ...(language ? { language } : {}),
+      });
+      this._emitTranscriptionUpdate({ sessionId, sessionPath, sessionRef }, fileId, pending.transcription);
       const credentials = await this._resolveCredentialsFresh(target);
       const result = await this._transcribeWithAccounting({
         adapter,
@@ -310,8 +313,11 @@ export class SpeechRecognitionService {
         sessionId,
         sessionPath,
         fileId,
-        signal,
+        signal: attempt.controller.signal,
       });
+      if (!this._isCurrentTranscriptionAttempt(attemptKey, attempt)) {
+        return { status: "skipped", reason: "superseded" };
+      }
       const ready = this._updateTranscription({ sessionId, sessionPath }, fileId, {
         status: "ready",
         text: result.text || "",
@@ -324,6 +330,9 @@ export class SpeechRecognitionService {
       this._emitTranscriptionUpdate({ sessionId, sessionPath, sessionRef }, fileId, ready.transcription);
       return ready.transcription;
     } catch (err) {
+      if (!this._isCurrentTranscriptionAttempt(attemptKey, attempt)) {
+        return { status: "skipped", reason: "superseded" };
+      }
       // F7/P5.3：适配器错误码（如 SYSTEM_SPEECH_*）以 "CODE: message" 前缀沿
       // transcription.error 透出，前端据此给出区分文案；无码错误保持原文。
       const rawMessage = err?.message || String(err);
@@ -340,6 +349,8 @@ export class SpeechRecognitionService {
       });
       this._emitTranscriptionUpdate({ sessionId, sessionPath, sessionRef }, fileId, failed.transcription);
       return failed.transcription;
+    } finally {
+      this._endTranscriptionAttempt(attemptKey, attempt);
     }
   }
 
@@ -382,16 +393,17 @@ export class SpeechRecognitionService {
     });
     const target = { ...resolvedTarget, executionTarget };
 
-    const pending = this._updateTranscription({ sessionId, sessionPath }, fileId, {
-      status: "pending",
-      providerId: target.providerId,
-      modelId: target.model.id,
-      protocolId: target.model.protocolId,
-      ...(language ? { language } : {}),
-    });
-    this._emitTranscriptionUpdate({ sessionId, sessionPath, sessionRef }, fileId, pending.transcription);
+    const { key: attemptKey, attempt } = this._beginTranscriptionAttempt({ sessionId, sessionPath, fileId });
 
     try {
+      const pending = this._updateTranscription({ sessionId, sessionPath }, fileId, {
+        status: "pending",
+        providerId: target.providerId,
+        modelId: target.model.id,
+        protocolId: target.model.protocolId,
+        ...(language ? { language } : {}),
+      });
+      this._emitTranscriptionUpdate({ sessionId, sessionPath, sessionRef }, fileId, pending.transcription);
       const credentials = await this._resolveCredentialsFresh(target);
       const result = await this._transcribeWithAccounting({
         adapter,
@@ -402,7 +414,11 @@ export class SpeechRecognitionService {
         sessionId,
         sessionPath,
         fileId,
+        signal: attempt.controller.signal,
       });
+      if (!this._isCurrentTranscriptionAttempt(attemptKey, attempt)) {
+        return { status: "skipped", reason: "superseded" };
+      }
       const ready = this._updateTranscription({ sessionId, sessionPath }, fileId, {
         status: "ready",
         text: result.text || "",
@@ -415,6 +431,9 @@ export class SpeechRecognitionService {
       this._emitTranscriptionUpdate({ sessionId, sessionPath, sessionRef }, fileId, ready.transcription);
       return ready.transcription;
     } catch (err) {
+      if (!this._isCurrentTranscriptionAttempt(attemptKey, attempt)) {
+        return { status: "skipped", reason: "superseded" };
+      }
       // F7/P5.3：适配器错误码（如 SYSTEM_SPEECH_*）以 "CODE: message" 前缀沿
       // transcription.error 透出，前端据此给出区分文案；无码错误保持原文。
       const rawMessage = err?.message || String(err);
@@ -431,11 +450,43 @@ export class SpeechRecognitionService {
       });
       this._emitTranscriptionUpdate({ sessionId, sessionPath, sessionRef }, fileId, failed.transcription);
       return failed.transcription;
+    } finally {
+      this._endTranscriptionAttempt(attemptKey, attempt);
     }
   }
 
   _updateTranscription(sessionRef, fileId, transcription) {
     return this._sessionFiles.updateTranscription(fileId, transcription, sessionRef);
+  }
+
+  /**
+   * 同一会话文件的识别尝试所有权：新尝试取代旧尝试——旧尝试的取消信号立即
+   * 中止，其迟到结果（无论成功或失败）不得再写注册表或发事件，调用方收到
+   * { status: "skipped", reason: "superseded" }。观测记账仍在各自尝试内
+   * 如实结算一次。
+   */
+  _beginTranscriptionAttempt({ sessionId, sessionPath, fileId, signal = null }: any) {
+    const key = `${sessionId || ""}|${sessionPath || ""}|${fileId}`;
+    const previous = this._transcriptionAttempts.get(key);
+    if (previous) {
+      previous.superseded = true;
+      previous.controller.abort();
+    }
+    const attempt = { controller: new AbortController(), superseded: false };
+    if (signal) {
+      if (signal.aborted) attempt.controller.abort();
+      else signal.addEventListener("abort", () => attempt.controller.abort(), { once: true });
+    }
+    this._transcriptionAttempts.set(key, attempt);
+    return { key, attempt };
+  }
+
+  _isCurrentTranscriptionAttempt(key, attempt) {
+    return !attempt.superseded && this._transcriptionAttempts.get(key) === attempt;
+  }
+
+  _endTranscriptionAttempt(key, attempt) {
+    if (this._transcriptionAttempts.get(key) === attempt) this._transcriptionAttempts.delete(key);
   }
 
   async _resolveCredentialsFresh(target) {

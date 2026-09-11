@@ -170,7 +170,7 @@ describe("恢复 apply：明确批准后走同一批量写入与收据机制", (
     const receipt = JSON.parse(fs.readFileSync(receiptFile, "utf-8"));
     expect(readPinnedTenetsMigrationReceipt(agentDir)).toBeNull();
     expect(receipt.operationId).toBe(approval.operationId);
-    expect(receipt.version).toBe(3);
+    expect(receipt.version).toBe(4);
     expect(receipt!.kind).toBe("recovery");
     expect(receipt!.state).toBe("completed");
     expect(receipt!.plan).toHaveLength(2);

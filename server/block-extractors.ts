@@ -7,7 +7,7 @@
  * toolResult 消息没有 .toolCall 属性。
  */
 
-import path from "path";
+import { sessionFileFields, sessionFileToContentBlock } from "./session-file-block.ts";
 import { t } from "../lib/i18n.ts";
 import { materializeExecutorIdentity } from "../lib/subagent-executor-metadata.ts";
 import { buildAutomationSuggestionBlock } from "./suggestion-blocks.ts";
@@ -240,23 +240,6 @@ function buildComputerAppApprovalBlock(confirmation) {
   };
 }
 
-function sessionFileFields(file) {
-  if (!file || typeof file !== "object") return {};
-  const fileId = file.fileId || file.id || null;
-  return {
-    ...(fileId ? { fileId } : {}),
-    ...(file.filePath ? { filePath: file.filePath } : {}),
-    ...(file.label ? { label: file.label } : {}),
-    ...(file.ext !== undefined ? { ext: file.ext } : {}),
-    ...(file.mime ? { mime: file.mime } : {}),
-    ...(file.kind ? { kind: file.kind } : {}),
-    ...(file.size !== undefined ? { size: file.size } : {}),
-    ...(file.storageKind ? { storageKind: file.storageKind } : {}),
-    ...(file.status ? { status: file.status } : {}),
-    ...(file.missingAt !== undefined ? { missingAt: file.missingAt } : {}),
-    ...(file.resource ? { resource: file.resource } : {}),
-  };
-}
 
 function extractMediaGenerationBlocks(details, fallbackKind) {
   const media = details?.mediaGeneration;
@@ -292,28 +275,6 @@ function resultSessionFileBlocks(result, taskId, block) {
     .filter(Boolean);
 }
 
-function sessionFileToContentBlock(file, extra = undefined) {
-  if (!file || typeof file !== "object") return null;
-  const filePath = file.filePath || file.realPath || null;
-  if (!filePath) return null;
-  const fileId = file.fileId || file.id || null;
-  const label = file.label || file.displayName || file.filename || path.basename(filePath);
-  const ext = file.ext ?? path.extname(filePath || label).toLowerCase().replace(/^\./, "");
-  return {
-    type: "file",
-    ...(extra || {}),
-    ...(fileId ? { fileId } : {}),
-    filePath,
-    label,
-    ext,
-    ...(file.mime ? { mime: file.mime } : {}),
-    ...(file.kind ? { kind: file.kind } : {}),
-    ...(file.storageKind ? { storageKind: file.storageKind } : {}),
-    ...(file.status ? { status: file.status } : {}),
-    ...(file.missingAt !== undefined ? { missingAt: file.missingAt } : {}),
-    ...(file.resource ? { resource: file.resource } : {}),
-  };
-}
 
 function mediaGenerationFallbackBlock(block, result) {
   const status = result?.status === "aborted" ? "aborted" : "failed";

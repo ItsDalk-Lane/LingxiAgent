@@ -60,7 +60,7 @@ for (const [name, submit] of [["普通发送", submitDesktopSessionMessage], ["�
       await vi.waitFor(() => expect(signal).toBeInstanceOf(AbortSignal));
       expect(abortPendingDesktopSubmission(engine, { sessionPath })).toBe(true);
       expect(signal.aborted).toBe(true);
-      expect(await pending).toEqual({ text: null, toolMedia: [], ...(name === "追加消息" ? { steered: false } : {}) });
+      await expect(pending).rejects.toMatchObject({ name: 'AbortError', code: 'input_cancelled_before_acceptance' });
       expect(engine.promptSession).not.toHaveBeenCalled();
       expect(engine.steerSession).not.toHaveBeenCalled();
       expect(session.sessionManager.appendCustomEntry).not.toHaveBeenCalled();

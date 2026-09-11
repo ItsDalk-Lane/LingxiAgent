@@ -649,7 +649,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:188b55309c66624503664256eb5b135be2c887afcd40138e0a9f29aed821ba39",
+  "payloadFingerprint": "sha256:1f477c51f28e185cb7fa575fe57066d96b8a157144feb5b64c40c888d9ed65fd",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3165,8 +3165,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "E 协议阶段新增客户端渐进能力与条件请求接入，全部为可选附加路径，持久化数据结构与字段保持兼容：desktop/src/react/stores/history-protocol-client.ts（新增客户端校验记录/页大小协商，纯内存 Map，不写任何 store）、desktop/src/react/stores/history-overview-client.ts（概览非阻塞客户端，只读 GET）、server/http/cors-policy.ts（抽共享 CORS 头契约函数 applyCorsResponseHeaders，允许列表增补 If-None-Match、Expose-Headers 暴露协议头，来源白名单语义不变）、server/index.ts（CORS 中间件改调共享函数，删除内联重复）、server/routes/sessions.ts（成功返回边界新增可选条件 GET 与概览路由，失败/旧客户端回退原完整路径）、desktop/src/react/stores/selectors/file-refs.ts（invalidateSessionCache 增加校验记录失效通知，原 FileRef 缓存语义不变）。无 DATA_EPOCH 变更、无 schema 迁移、无字段增删。",
-    "payloadFingerprint": "sha256:188b55309c66624503664256eb5b135be2c887afcd40138e0a9f29aed821ba39"
+    "compatibilityReason": "合并架构契约补强（d011e849）与历史读取三阶段优化（787437d3）两批已各自声明 compatible 的改动；无新持久化文件/表、无数据形状变化，合并不引入新形状变化。",
+    "payloadFingerprint": "sha256:1f477c51f28e185cb7fa575fe57066d96b8a157144feb5b64c40c888d9ed65fd"
   },
   "schemas": [
     {
@@ -3326,7 +3326,7 @@
       "contract": "DeferredResultStore normalization, seven-day cleanup, and atomic serializer",
       "kind": "runtime-contract",
       "module": "lib/deferred-result-store.ts",
-      "sourceHash": "sha256:43930be66cf5571a03128df9769c3ddbf01146ad8adc31bd4ae646b54b8520cc",
+      "sourceHash": "sha256:9c5d506f5d3c93e45de97263427a0604f897308b7a103edcc584030751b7d09b",
       "storeId": "deferred-result-state"
     },
     {
@@ -3854,7 +3854,7 @@
       "contract": "normalizeMcpConfig read-time normalization (servers/connectors alias, auth and OAuth field defaults, per-connector permission policy defaults, deferred-loading defaults, connection lifecycle defaults)",
       "kind": "runtime-contract",
       "module": "core/mcp/manager.ts",
-      "sourceHash": "sha256:35f0f658b7d7e11ddc24f483be71d8f99523c614dcda2b66e669d0b0ebc3e907",
+      "sourceHash": "sha256:0403ae1978c2dcf46def66a263ea29923962d15e125a2874d76ffe3713a5bdcf",
       "storeId": "mcp-config"
     },
     {
@@ -4158,7 +4158,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:91f4454981f847a1337f0a0c53ab4592a77c6526d572a51bbf6fe53da3e05800"
+          "sourceHash": "sha256:4796e49f34e7c02118772e1981edbd7c57a5f7976241cd6801bc27eedcb90b54"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",

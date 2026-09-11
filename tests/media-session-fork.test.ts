@@ -332,6 +332,8 @@ describe("TaskStore media Session Fork", () => {
 
     expect(store.get("media-child")).toBeNull();
     expect(store.get("media-source")).toBeTruthy();
+    // 恢复写能力再关闭：正常关闭必须保存最新状态，写失败时 destroy 明确抛错。
+    delete (store as any)._writeSync;
     store.destroy();
   });
 });

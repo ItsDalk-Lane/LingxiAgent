@@ -109,7 +109,12 @@ function intrinsicBlockId(block: ContentBlock): string | null {
         .filter((id): id is string => !!id);
       return ids.length > 0 ? `tools:${ids.join('+')}` : null;
     }
-    case 'file': return block.fileId || block.resource?.resourceId || null;
+    case 'file': {
+      const identity = block.fileId || block.resource?.resourceId;
+      if (!identity) return null;
+      const version = fileVersionKey(block);
+      return `${identity}${version ? `:version:${version}` : ''}${block.replacesTaskId ? `:task:${block.replacesTaskId}` : ''}`;
+    }
     case 'media_generation': return block.taskId;
     case 'artifact': return block.artifactId;
     case 'skill': return block.fileId || block.skillName;
@@ -138,6 +143,14 @@ function blockId(
 }
 
 type FileBlock = Extract<ContentBlock, { type: 'file' }>;
+
+/** 只用已有的明确版本证据，不把缺省值补成 0。 */
+function fileVersionKey(block: FileBlock): string | null {
+  if (block.version?.sha256) return encodeURIComponent(block.version.sha256);
+  const size = block.version?.size ?? block.size;
+  const time = block.version?.mtimeMs ?? block.mtimeMs;
+  return size != null && time != null ? `${size}:${time}` : null;
+}
 
 function filePresentationKey(block: FileBlock): string | null {
   if (block.fileId) return `file:${block.fileId}`;
@@ -204,13 +217,21 @@ export function normalizeContentBlocks(
 ): ContentBlock[] {
   const ordinals = new Map<ContentBlock['type'], number>();
   const defaultTextPhase = options.defaultTextPhase || 'final_answer';
+  const usedIds = new Set<string>();
   return coalesceMediaFilePresentations(blocks).map((block) => {
     const ordinal = ordinals.get(block.type) || 0;
     ordinals.set(block.type, ordinal + 1);
     const semanticPhase = resolveContentSemanticPhase(block, defaultTextPhase);
+    const baseId = blockId(block, options.idPrefix, ordinal);
+    let id = baseId;
+    let occurrence = 1;
+    // 普通文件可以被有意展示多次，旧记录也可能带有重复 ID；只为后续
+    // 实例补确定性编号，保留已展示位置，重复归一化不再改变编号。
+    while (usedIds.has(id)) id = `${baseId}:presentation:${occurrence++}`;
+    usedIds.add(id);
     return {
       ...block,
-      id: blockId(block, options.idPrefix, ordinal),
+      id,
       lifecycle: resolveContentLifecycle(block, options.turnLifecycle),
       surfaceRole: resolveContentSurface(block, defaultTextPhase),
       ...(semanticPhase ? { semanticPhase } : {}),

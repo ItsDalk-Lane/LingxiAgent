@@ -1182,6 +1182,8 @@ describe("MCP app resources", () => {
       ? { config: { mcp: { connectors: { acme: { enabled: true, tools: { board: true } } } } } }
       : {}));
     await runtime.start({ request });
+    // 自动启动必须完成后才替换边界客户端，避免制造不存在的连接归属。
+    await runtime.startConnector("acme");
     runtime.clients.set("acme", {
       running: true,
       callTool: vi.fn(async () => ({ content: [{ type: "text", text: "done" }] })),
@@ -3302,12 +3304,15 @@ describe("MCP app-facing calls and the enabled switch", () => {
       await runtime.stopConnector("acme");
       expect((runtime as any)._toolListings.has("acme")).toBe(false);
 
+      // 明确停止不能由刷新暗中撤销；用户再次启动后才允许刷新。
+      await expect(runtime.refreshTools("acme")).rejects.toThrow(/explicit start/);
+      await runtime.startConnector("acme");
+      expect(listTools).toHaveBeenCalledTimes(2);
       const tools = await runtime.refreshTools("acme");
 
       expect(tools.map((tool) => tool.name)).toEqual(["fresh"]);
-      // Once for the first start, once for the restart this refresh triggered —
-      // and no third listing, because the restart's own listing was recognized.
-      expect(listTools).toHaveBeenCalledTimes(2);
+      // 初次启动、明确重启、重启后的主动刷新各获取一次目录。
+      expect(listTools).toHaveBeenCalledTimes(3);
     });
 
     it("names an unknown connector instead of reporting it as not running", async () => {

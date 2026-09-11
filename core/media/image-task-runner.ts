@@ -1,5 +1,6 @@
 import path from "node:path";
 import { t } from "../../lib/i18n.ts";
+import { mediaTaskAttempt } from "./task-store.ts";
 import { withModelRequestAccounting } from "../../lib/llm/model-request-accounting.ts";
 import {
   beginObservedModelCall,
@@ -89,6 +90,8 @@ export function createSubmitContext(ctx) {
     sessionPath: ctx.sessionPath,
     mediaAdapterRegistry: ctx?._mediaGen?.registry || null,
     resolveMediaExecutionTarget: ctx?._mediaGen?.resolveMediaExecutionTarget || null,
+    signal: ctx.signal,
+    isCurrent: ctx.isCurrent,
   };
 }
 
@@ -453,7 +456,7 @@ export async function resolveImageAdapter(input, registry, submitCtx) {
   return (await resolveImageTarget(input, registry, submitCtx))?.adapter || null;
 }
 
-export function markSubmitFailed({ taskId, err, store, ctx }) {
+export function markSubmitFailed({ taskId, err, store, ctx, poller = ctx?._mediaGen?.poller, expectedAttempt = mediaTaskAttempt(store.get(taskId)) }: any) {
   const message = errorMessage(err);
   const failureCode = typeof err?.code === "string" ? err.code : null;
   const resolutionReason = typeof err?.resolutionReason === "string"
@@ -462,15 +465,22 @@ export function markSubmitFailed({ taskId, err, store, ctx }) {
       ? err.details.resolutionReason
       : null;
   const task = store.get?.(taskId);
-  store.update(taskId, {
+  if (!task || task.status !== "pending" || mediaTaskAttempt(task) !== expectedAttempt) return;
+  const patch = {
     status: "failed",
     failReason: message,
     ...(failureCode ? { failCode: failureCode } : {}),
     ...(resolutionReason ? { resolutionReason } : {}),
     submitState: "failed",
     completedAt: new Date().toISOString(),
-  });
-  if (!isResponseDelivery(task)) {
+  };
+  if (store.settleTask) {
+    store.settleTask(taskId, { ...patch, expectedAttempt });
+    void poller?.checkNow?.(taskId);
+  } else {
+    store.update(taskId, patch);
+  }
+  if (!store.settleTask && !isResponseDelivery(task)) {
     ctx.bus.request("deferred:fail", { taskId, error: err }).catch(() => {});
     ctx.bus.request("task:remove", { taskId }).catch(() => {});
   }
@@ -510,7 +520,26 @@ export function buildImageTaskProvenanceForTest({ prompt, image, adapterId }) {
   );
 }
 
-export async function runSubmitInBackground({ taskId, adapter, params, submitCtx, store, poller, ctx }) {
+export async function runSubmitInBackground(options) {
+  const { taskId, store, poller, submitCtx } = options;
+  const attempt = mediaTaskAttempt(store.get(taskId));
+  const run = (runtime) => runSubmitForAttempt({ ...options, attempt, runtime });
+  if (poller.runSubmission) {
+    return poller.runSubmission(taskId, attempt, run, submitCtx.signal).catch((error) => {
+      // 停机或被取消的旧尝试保留其已知状态；不把取消后的迟到错误写进新尝试。
+      options.ctx.log?.warn?.(`[media] submission stopped for ${taskId}:`, error?.message || error);
+    });
+  }
+  return run({
+    signal: submitCtx.signal,
+    isCurrent: () => {
+      const current = store.get(taskId);
+      return current?.status === "pending" && mediaTaskAttempt(current) === attempt && submitCtx.isCurrent?.() !== false;
+    },
+  });
+}
+
+async function runSubmitForAttempt({ taskId, adapter, params, submitCtx, store, poller, ctx, attempt, runtime }) {
   const refreshed = await resolveMediaExecutionTarget(submitCtx, {
     direct: true,
     providerId: params?.providerId || adapter?.id,
@@ -520,8 +549,9 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
     protocolId: params?.protocolId || adapter?.protocolId || null,
     adapterId: adapter?.id,
   });
+  if (!runtime.isCurrent()) return;
   if (!refreshed.media?.executionTarget) {
-    markSubmitFailed({ taskId, err: refreshed.error, store, ctx });
+    markSubmitFailed({ taskId, err: refreshed.error, store, ctx, poller, expectedAttempt: attempt });
     return;
   }
   const executionTarget = refreshed.media.executionTarget;
@@ -530,6 +560,12 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
     credentialLaneId: executionTarget.credentialLaneId,
     credentialProviderId: executionTarget.credentialProviderId,
   };
+  store.update(taskId, {
+    params: Object.freeze(executionParams),
+    credentialLaneId: executionTarget.credentialLaneId,
+    credentialProviderId: executionTarget.credentialProviderId,
+  });
+  store.requireFlush?.();
   // MC-06 逻辑调用边界（§二十三）：一次 image generation submit = 一个 logical
   // call；poll / 资产下载不是。callId 在 adapter 网络请求之前铸好，同时写进
   // ledger metadata（observer.callId ↔ ledger.metadata.modelCallId）。
@@ -568,7 +604,7 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
   const canonicalSubmitCtx = submitCtx.mediaAdapterRegistry
     ?.createSubmitContextForExecutionTarget?.(executionTarget, submitCtx)
     || { ...submitCtx, mediaExecutionTarget: executionTarget };
-  const observedSubmitCtx = { ...canonicalSubmitCtx, modelCall: recorder };
+  const observedSubmitCtx = { ...canonicalSubmitCtx, modelCall: recorder, signal: runtime.signal };
   // Phase 6 Semantic Request Capture（§八十七）：prompt 文本允许捕获；参考图
   // 是本地路径/data URL/URL——统一 Redactor 转 local_file_reference /
   // external_blob / external_reference descriptor，不保存字节。
@@ -646,18 +682,20 @@ export async function runSubmitInBackground({ taskId, adapter, params, submitCtx
     });
     recorder.endLogicalCall("ok");
 
+    if (!runtime.isCurrent()) return;
     store.update(taskId, {
       submitState: "submitted",
       adapterTaskId,
       ...(files.length ? { files } : {}),
     });
+    store.requireFlush?.();
 
     if (files.length && typeof poller.checkNow === "function") {
       void poller.checkNow(taskId);
     }
   } catch (err) {
     failObservedModelCall(recorder, err, { errorKind: "adapter_error" });
-    markSubmitFailed({ taskId, err, store, ctx });
+    if (runtime.isCurrent()) markSubmitFailed({ taskId, err, store, ctx, poller, expectedAttempt: attempt });
   }
 }
 
@@ -715,12 +753,8 @@ export async function retryImageTask({ taskId, ctx }) {
   const deliveryTarget = task.deliveryTarget || null;
   const meta = imageDeferredMeta({ prompt, deliveryTarget });
 
-  if (!responseDelivery) {
-    await ctx.bus.request("deferred:retry", { taskId, sessionId, sessionPath, sessionRef, meta });
-  }
-
   const now = new Date().toISOString();
-  store.update(taskId, {
+  const patch = {
     status: "pending",
     failReason: null,
     submitState: "submitting",
@@ -733,7 +767,19 @@ export async function retryImageTask({ taskId, ctx }) {
     createdAt: now,
     retriedAt: now,
     retryCount: Number(task.retryCount || 0) + 1,
-  });
+  };
+  const retried = store.beginAttempt
+    ? store.beginAttempt(taskId, patch)
+    : store.update(taskId, { ...patch, attempt: mediaTaskAttempt(task) + 1 });
+
+  if (!responseDelivery) {
+    const receipt = await ctx.bus.request("deferred:retry", {
+      taskId, sessionId, sessionPath, sessionRef, meta: { ...meta, mediaAttempt: mediaTaskAttempt(retried) }, durable: true,
+    });
+    if (receipt?.ok === false) throw new Error(receipt.error || "media retry registration failed");
+  }
+  ctx.signal?.throwIfAborted();
+  if (ctx.isCurrent?.() === false) throw new DOMException("media runtime changed", "AbortError");
 
   if (!responseDelivery) {
     try {

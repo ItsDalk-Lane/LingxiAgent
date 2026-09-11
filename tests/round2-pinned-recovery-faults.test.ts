@@ -53,14 +53,14 @@ describe('R02 恢复事务、兼容与 CLI 边界', () => {
     const f = setup(); const a = approval(f.home);
     interrupt(f.home, a);
     const before = fs.readFileSync(tenetsFilePath(f.dir));
-    const prepared = JSON.parse(fs.readFileSync(operationPath(f.dir, a), 'utf8'));
-    expect(prepared.state).toBe('prepared');
+    const committing = JSON.parse(fs.readFileSync(operationPath(f.dir, a), 'utf8'));
+    expect(committing.state).toBe('committing');
     const result = applyPinnedTenetsRecovery(f.home, a);
-    expect(result).toEqual(prepared.summary);
+    expect(result).toEqual(committing.summary);
     expect(fs.readFileSync(tenetsFilePath(f.dir))).toEqual(before);
     const done = JSON.parse(fs.readFileSync(operationPath(f.dir, a), 'utf8'));
     expect(done.state).toBe('completed');
-    expect(done.plan.map((entry: { tenetId: string }) => entry.tenetId)).toEqual(prepared.plan.map((entry: { tenetId: string }) => entry.tenetId));
+    expect(done.plan.map((entry: { tenetId: string }) => entry.tenetId)).toEqual(committing.plan.map((entry: { tenetId: string }) => entry.tenetId));
     expect(readTenetsFileStrict(tenetsFilePath(f.dir)).tenets).toHaveLength(2);
   });
 

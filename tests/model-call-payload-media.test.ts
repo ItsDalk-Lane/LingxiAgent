@@ -133,7 +133,7 @@ async function runImageSubmit({ adapter, params = {}, fetchImpl, root }: {
     adapter,
     params: { prompt: POISON_PROMPT, providerId: adapter.id, ...params },
     submitCtx: makeSubmitCtx(ctx),
-    store: { get: vi.fn(() => ({})), update: vi.fn() },
+    store: { get: vi.fn(() => ({ status: "pending", attempt: 1 })), update: vi.fn() },
     poller: { checkNow: vi.fn() },
     ctx,
   });

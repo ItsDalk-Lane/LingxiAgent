@@ -950,7 +950,7 @@ describe('streamBufferManager.ensureMessage 自愈', () => {
     expect(assistant.data.turnProjection).toMatchObject({
       processBlockIds: [],
       answerBlockIds: [],
-      resultBlockIds: [`${assistant.data.id}:file:sf_late_img`],
+      resultBlockIds: [`${assistant.data.id}:file:sf_late_img:task:task-late-img`],
       controlBlockIds: [],
     });
   });

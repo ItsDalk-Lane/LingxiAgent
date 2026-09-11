@@ -3,11 +3,18 @@
  *
  * Tests for core/media/poller.ts: shouldCheckThisTick pure function and the
  * Poller class with injectable registry, fake timers, and fake-async detection.
+ *
+ * 持久化使用真实 TaskStore（临时目录）：poller 的结算是「尝试编号 + 终态
+ * 一次性 + 持久交接回执」契约的下游，假 store 无法表达这些不变量。替身只
+ * 留在外部边界：适配器（供应商）、bus（投递通道）、readImageSize（文件解码）。
  */
 
+import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { shouldCheckThisTick, Poller } from "../core/media/poller.ts";
+import { TaskStore } from "../core/media/task-store.ts";
 
 // Mock readImageSize so poller tests don't depend on real file I/O.
 vi.mock("../core/media/image-size.ts", () => ({
@@ -45,7 +52,15 @@ describe("shouldCheckThisTick", () => {
 
 // ── Poller class ─────────────────────────────────────────────────────────────
 
-function makeAdapter( overrides: any = {}) {
+const tmpDirs: string[] = [];
+
+function makeDir() {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-media-poller-"));
+  tmpDirs.push(dir);
+  return dir;
+}
+
+function makeAdapter(overrides: any = {}) {
   return {
     id: "test-adapter",
     types: ["image"],
@@ -54,17 +69,23 @@ function makeAdapter( overrides: any = {}) {
   };
 }
 
-function makePoller( overrides: any = {}) {
-  const mockAdapter = overrides.adapter ?? makeAdapter();
+/** 在 generated 目录下写入真实非零字节产物，满足完成检查的文件证据要求。 */
+function makeOutputs(generatedDir: string, names: string[]) {
+  for (const name of names) {
+    fs.writeFileSync(path.join(generatedDir, name), Buffer.from([1, 2, 3, 4]));
+  }
+}
 
-  const mockStore = {
-    listPending: vi.fn(() => []),
-    get: vi.fn(() => null),
-    update: vi.fn(() => null),
-    ...overrides.store,
-  };
+function makePoller(overrides: any = {}) {
+  const dataDir = makeDir();
+  const generatedDir = path.join(dataDir, "generated");
+  fs.mkdirSync(generatedDir, { recursive: true });
+  const store = new TaskStore(dataDir);
+  const mockAdapter = overrides.adapter ?? makeAdapter();
   const mockBus = {
-    request: vi.fn(async () => {}),
+    // deferred:query 默认无既有记录；其余交接回执证明已持久化（durable）。
+    request: vi.fn(async (type: string) => (type === "deferred:query" ? null : { ok: true, durable: true })),
+    emit: vi.fn(),
     ...overrides.bus,
   };
   const mockRegistry = {
@@ -79,17 +100,45 @@ function makePoller( overrides: any = {}) {
   };
 
   const poller = new Poller({
-    store: mockStore,
+    store,
     registry: mockRegistry,
     bus: mockBus,
-    dataDir: "/tmp/media-data",
-    generatedDir: "/tmp/media-generated",
+    dataDir,
+    generatedDir,
     log,
     registerSessionFile: overrides.registerSessionFile,
     usageLedger: overrides.usageLedger,
   });
 
-  return { poller, mockStore, mockBus, mockRegistry, mockAdapter, log };
+  return { poller, store, mockBus, mockRegistry, mockAdapter, log, dataDir, generatedDir };
+}
+
+/** 经真实 TaskStore 写入任务；add 之后再按需要补状态字段。 */
+function seedTask(store: any, overrides: any = {}) {
+  const taskId = overrides.taskId ?? "task1";
+  store.add({
+    taskId,
+    adapterId: overrides.adapterId ?? "test-adapter",
+    providerId: overrides.providerId ?? null,
+    modelId: overrides.modelId ?? null,
+    protocolId: overrides.protocolId ?? null,
+    batchId: overrides.batchId ?? `batch-${taskId}`,
+    type: overrides.type ?? "image",
+    prompt: overrides.prompt ?? "a cat in space",
+    params: overrides.params ?? {},
+    sessionId: overrides.sessionId ?? null,
+    sessionPath: overrides.sessionPath ?? null,
+    deliveryMode: overrides.deliveryMode ?? "session",
+    delivery: overrides.delivery ?? null,
+    metadata: overrides.metadata ?? null,
+    submitState: overrides.submitState ?? "submitted",
+  });
+  const patch: any = {};
+  for (const key of ["adapterTaskId", "files", "submitState"]) {
+    if (Object.prototype.hasOwnProperty.call(overrides, key) && key !== "submitState") patch[key] = overrides[key];
+  }
+  if (Object.keys(patch).length) store.update(taskId, patch);
+  return store.get(taskId);
 }
 
 describe("Poller", () => {
@@ -99,6 +148,7 @@ describe("Poller", () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    for (const dir of tmpDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
   });
 
   // ── start / stop ───────────────────────────────────────────────────────────
@@ -126,21 +176,11 @@ describe("Poller", () => {
   });
 
   it("recovers pending tasks when logger only exposes log instead of info", () => {
-    const task = {
+    const { poller, store, log } = makePoller();
+    seedTask(store, {
       taskId: "recovered-task",
-      adapterId: "test-adapter",
-      type: "image",
-      status: "pending",
-      submitState: "submitted",
-      files: [],
       prompt: "restore me",
       sessionPath: "/sessions/main.jsonl",
-      createdAt: new Date().toISOString(),
-    };
-    const { poller, log } = makePoller({
-      store: {
-        listPending: vi.fn(() => [task]),
-      },
     });
     const fallbackLog = vi.fn();
     (log as any).info = undefined;
@@ -156,78 +196,61 @@ describe("Poller", () => {
   // ── add / hasPending ───────────────────────────────────────────────────────
 
   it("adds a taskId and reports it as pending", () => {
-    const { poller } = makePoller();
+    const { poller, store } = makePoller();
+    seedTask(store, { taskId: "task1" });
     poller.start();
     poller.add("task1");
     expect(poller.hasPending("task1")).toBe(true);
     poller.stop();
   });
 
-  it("cancels a task even when the info logger fails", () => {
-    const task = {
-      taskId: "task1",
-      adapterId: "test-adapter",
-      status: "pending",
-      submitState: "submitted",
-      files: [],
-      createdAt: new Date().toISOString(),
-      sessionPath: "/sessions/main.jsonl",
-    };
-    const { poller, mockStore } = makePoller({
-      store: {
-        get: vi.fn(() => task),
-        update: vi.fn(() => task),
-      },
+  it("cancels a task even when the info logger fails", async () => {
+    const { poller, store, log } = makePoller({
       log: {
         info: vi.fn(() => {
           throw new Error("logger failed");
         }),
       },
     });
+    seedTask(store, { taskId: "task1", sessionPath: "/sessions/main.jsonl" });
 
     poller.start();
     poller.add("task1");
 
-    expect(() => poller.cancel("task1")).not.toThrow();
+    await expect(poller.cancel("task1")).resolves.toBeUndefined();
     expect(poller.hasPending("task1")).toBe(false);
-    expect(mockStore.update).toHaveBeenCalledWith("task1", expect.objectContaining({
+    expect(store.get("task1")).toMatchObject({
       status: "cancelled",
       failReason: "user cancelled",
-    }));
+    });
 
     poller.stop();
   });
 
-  it("re-adding a cancelled task clears the cancellation fence for retry", async () => {
-    const task = {
+  it("re-adding a cancelled task after an explicit retry queries the provider again", async () => {
+    const { poller, store, mockAdapter, generatedDir } = makePoller({
+      adapter: makeAdapter({ query: vi.fn(async () => ({ status: "success", files: ["retry.png"] })) }),
+    });
+    makeOutputs(generatedDir, ["retry.png"]);
+    seedTask(store, {
       taskId: "task1",
-      adapterId: "test-adapter",
-      status: "pending",
-      submitState: "submitted",
       adapterTaskId: "provider-task-1",
-      files: [],
-      createdAt: new Date().toISOString(),
       sessionPath: "/sessions/main.jsonl",
-    };
-    const { poller, mockStore, mockAdapter } = makePoller({
-      adapter: makeAdapter({ query: vi.fn(async () => ({ status: "success", files: [] })) }),
-      store: {
-        get: vi.fn(() => task),
-        update: vi.fn(() => task),
-      },
     });
 
     poller.start();
     poller.add("task1");
-    poller.cancel("task1");
+    await poller.cancel("task1");
+    expect(store.get("task1").status).toBe("cancelled");
+
+    // 只有明确重试才开启新尝试；重新 add 的是新尝试，不是复活旧尝试。
+    store.beginAttempt("task1", { submitState: "submitted", adapterTaskId: "provider-task-1", failReason: null });
     poller.add("task1");
 
     await poller.checkNow("task1");
 
     expect(mockAdapter.query).toHaveBeenCalledWith("provider-task-1", expect.any(Object));
-    expect(mockStore.update).toHaveBeenCalledWith("task1", expect.objectContaining({
-      status: "done",
-    }));
+    expect(store.get("task1").status).toBe("done");
     poller.stop();
   });
 
@@ -240,15 +263,9 @@ describe("Poller", () => {
 
   it("skips adapter.query and marks success when task already has files", async () => {
     const mockAdapter = makeAdapter();
-    const { poller, mockStore, mockBus } = makePoller({ adapter: mockAdapter });
-
-    mockStore.get.mockReturnValue({
-      taskId: "task1",
-      adapterId: "test-adapter",
-      status: "pending",
-      files: ["img1.png", "img2.png"],
-      createdAt: new Date().toISOString(),
-    });
+    const { poller, store, mockBus, generatedDir } = makePoller({ adapter: mockAdapter });
+    makeOutputs(generatedDir, ["img1.png", "img2.png"]);
+    seedTask(store, { taskId: "task1", files: ["img1.png", "img2.png"] });
 
     poller.start();
     poller.add("task1");
@@ -259,10 +276,7 @@ describe("Poller", () => {
     expect(mockAdapter.query).not.toHaveBeenCalled();
 
     // Store must be updated to done
-    expect(mockStore.update).toHaveBeenCalledWith(
-      "task1",
-      expect.objectContaining({ status: "done" })
-    );
+    expect(store.get("task1").status).toBe("done");
 
     // Bus must receive deferred:resolve with the existing files
     expect(mockBus.request).toHaveBeenCalledWith(
@@ -286,15 +300,8 @@ describe("Poller", () => {
       finish: vi.fn(),
       recordError: vi.fn(),
     };
-    const { poller, mockStore } = makePoller({ adapter: mockAdapter, usageLedger });
-
-    mockStore.get.mockReturnValue({
-      taskId: "task1",
-      adapterId: "test-adapter",
-      status: "pending",
-      files: [],
-      createdAt: new Date().toISOString(),
-    });
+    const { poller, store, dataDir, generatedDir } = makePoller({ adapter: mockAdapter, usageLedger });
+    seedTask(store, { taskId: "task1" });
 
     poller.start();
     poller.add("task1");
@@ -303,10 +310,7 @@ describe("Poller", () => {
 
     expect(mockAdapter.query).toHaveBeenCalledWith(
       "task1",
-      expect.objectContaining({
-        dataDir: "/tmp/media-data",
-        generatedDir: "/tmp/media-generated",
-      })
+      expect.objectContaining({ dataDir, generatedDir })
     );
     // 控制面锁定（§四十八）：媒体任务查询只查已提交任务的状态，不产生模型
     // 用量记录，也不再被计入 usage_missing 统计。
@@ -322,8 +326,8 @@ describe("Poller", () => {
       types: ["video"],
       query: vi.fn(async () => ({ status: "pending" })),
     });
-    const { poller, mockStore } = makePoller({ adapter: mockAdapter });
-    const task = {
+    const { poller, store } = makePoller({ adapter: mockAdapter });
+    seedTask(store, {
       taskId: "task_123",
       adapterId: "agnes-videos",
       adapterTaskId: "video_123",
@@ -331,12 +335,7 @@ describe("Poller", () => {
       modelId: "agnes-video-v2.0",
       protocolId: "agnes-videos",
       type: "video",
-      status: "pending",
-      files: [],
-      createdAt: new Date().toISOString(),
-    };
-
-    mockStore.get.mockReturnValue(task);
+    });
 
     poller.start();
     poller.add("task_123");
@@ -362,19 +361,11 @@ describe("Poller", () => {
     const mockAdapter = makeAdapter({
       query: vi.fn(async () => ({ status: "pending" })),
     });
-    const { poller, mockStore } = makePoller({ adapter: mockAdapter });
-
-    mockStore.get.mockReturnValue({
-      taskId: "local-task",
-      adapterId: "test-adapter",
-      adapterTaskId: null,
-      submitState: "submitting",
-      status: "pending",
-      files: [],
-      createdAt: new Date().toISOString(),
-    });
+    const { poller, store } = makePoller({ adapter: mockAdapter });
 
     poller.start();
+    // 提交在途的任务在 start 之后才落库，避免被恢复路径按「提交中断」结算。
+    seedTask(store, { taskId: "local-task", submitState: "submitting", adapterTaskId: null });
     poller.add("local-task");
 
     await vi.advanceTimersByTimeAsync(5_000);
@@ -389,17 +380,9 @@ describe("Poller", () => {
     const mockAdapter = makeAdapter({
       query: vi.fn(async () => ({ status: "success", files: ["abc.png"] })),
     });
-    const { poller, mockStore, mockBus } = makePoller({ adapter: mockAdapter });
-
-    mockStore.get.mockReturnValue({
-      taskId: "local-task",
-      adapterId: "test-adapter",
-      adapterTaskId: "remote-task",
-      submitState: "submitted",
-      status: "pending",
-      files: [],
-      createdAt: new Date().toISOString(),
-    });
+    const { poller, store, mockBus, dataDir, generatedDir } = makePoller({ adapter: mockAdapter });
+    makeOutputs(generatedDir, ["abc.png"]);
+    seedTask(store, { taskId: "local-task", adapterTaskId: "remote-task" });
 
     poller.start();
     poller.add("local-task");
@@ -408,10 +391,7 @@ describe("Poller", () => {
 
     expect(mockAdapter.query).toHaveBeenCalledWith(
       "remote-task",
-      expect.objectContaining({
-        dataDir: "/tmp/media-data",
-        generatedDir: "/tmp/media-generated",
-      }),
+      expect.objectContaining({ dataDir, generatedDir }),
     );
     expect(mockBus.request).toHaveBeenCalledWith(
       "deferred:resolve",
@@ -429,25 +409,16 @@ describe("Poller", () => {
       })),
     });
 
-    const { poller, mockStore, mockBus } = makePoller({ adapter: mockAdapter });
-
-    mockStore.get.mockReturnValue({
-      taskId: "task1",
-      adapterId: "test-adapter",
-      status: "pending",
-      files: [],
-      createdAt: new Date().toISOString(),
-    });
+    const { poller, store, mockBus, generatedDir } = makePoller({ adapter: mockAdapter });
+    makeOutputs(generatedDir, ["abc.png", "def.png"]);
+    seedTask(store, { taskId: "task1" });
 
     poller.start();
     poller.add("task1");
 
     await vi.advanceTimersByTimeAsync(5_000);
 
-    expect(mockStore.update).toHaveBeenCalledWith(
-      "task1",
-      expect.objectContaining({ status: "done", files: ["abc.png", "def.png"] })
-    );
+    expect(store.get("task1")).toMatchObject({ status: "done", files: ["abc.png", "def.png"] });
     expect(mockBus.request).toHaveBeenCalledWith(
       "deferred:resolve",
       expect.objectContaining({ taskId: "task1", files: ["abc.png", "def.png"] })
@@ -465,25 +436,16 @@ describe("Poller", () => {
       })),
     });
 
-    const { poller, mockStore, mockBus } = makePoller({ adapter: mockAdapter });
-
-    mockStore.get.mockReturnValue({
-      taskId: "task1",
-      adapterId: "test-adapter",
-      status: "pending",
-      files: [],
-      createdAt: new Date().toISOString(),
-    });
+    const { poller, store, mockBus, generatedDir } = makePoller({ adapter: mockAdapter });
+    makeOutputs(generatedDir, ["dashscope.png"]);
+    seedTask(store, { taskId: "task1" });
 
     poller.start();
     poller.add("task1");
 
     await vi.advanceTimersByTimeAsync(5_000);
 
-    expect(mockStore.update).toHaveBeenCalledWith(
-      "task1",
-      expect.objectContaining({ status: "done", files: ["dashscope.png"] })
-    );
+    expect(store.get("task1")).toMatchObject({ status: "done", files: ["dashscope.png"] });
     expect(mockBus.request).toHaveBeenCalledWith(
       "deferred:resolve",
       expect.objectContaining({ taskId: "task1", files: ["dashscope.png"] })
@@ -509,45 +471,35 @@ describe("Poller", () => {
         files: ["abc.png"],
       })),
     });
-    const { poller, mockStore, mockBus } = makePoller({
+    const { poller, store, mockBus, generatedDir } = makePoller({
       adapter: mockAdapter,
       registerSessionFile,
     });
-
-    mockStore.get.mockReturnValue({
-      taskId: "task1",
-      adapterId: "test-adapter",
-      status: "pending",
-      files: [],
-      sessionPath: "/sessions/media.jsonl",
-      createdAt: new Date().toISOString(),
-    });
+    makeOutputs(generatedDir, ["abc.png"]);
+    seedTask(store, { taskId: "task1", sessionPath: "/sessions/media.jsonl" });
 
     poller.start();
     poller.add("task1");
 
     await vi.advanceTimersByTimeAsync(5_000);
 
-    const expectedFilePath = path.join("/tmp/media-generated", "abc.png");
-    expect(registerSessionFile).toHaveBeenCalledWith({
+    const expectedFilePath = path.join(generatedDir, "abc.png");
+    expect(registerSessionFile).toHaveBeenCalledWith(expect.objectContaining({
       sessionPath: "/sessions/media.jsonl",
       filePath: expectedFilePath,
       label: "abc.png",
       origin: "plugin_output",
       storageKind: "plugin_data",
-    });
-    expect(mockStore.update).toHaveBeenCalledWith(
-      "task1",
+    }));
+    expect(store.get("task1").sessionFiles).toEqual([
       expect.objectContaining({
-        sessionFiles: [expect.objectContaining({
-          fileId: "sf_generated",
-          sessionPath: "/sessions/media.jsonl",
-          filePath: expectedFilePath,
-          storageKind: "plugin_data",
-          origin: "plugin_output",
-        })],
+        fileId: "sf_generated",
+        sessionPath: "/sessions/media.jsonl",
+        filePath: expectedFilePath,
+        storageKind: "plugin_data",
+        origin: "plugin_output",
       }),
-    );
+    ]);
     expect(mockBus.request).toHaveBeenCalledWith(
       "deferred:resolve",
       expect.objectContaining({
@@ -578,21 +530,12 @@ describe("Poller", () => {
         files: ["id-only.png"],
       })),
     });
-    const { poller, mockStore } = makePoller({
+    const { poller, store, generatedDir } = makePoller({
       adapter: mockAdapter,
       registerSessionFile,
     });
-
-    mockStore.get.mockReturnValue({
-      taskId: "task1",
-      adapterId: "test-adapter",
-      status: "pending",
-      files: [],
-      sessionId: "sess_image_task",
-      sessionRef: { sessionId: "sess_image_task" },
-      sessionPath: null,
-      createdAt: new Date().toISOString(),
-    });
+    makeOutputs(generatedDir, ["id-only.png"]);
+    seedTask(store, { taskId: "task1", sessionId: "sess_image_task" });
 
     poller.start();
     poller.add("task1");
@@ -602,7 +545,7 @@ describe("Poller", () => {
     expect(registerSessionFile).toHaveBeenCalledWith(expect.objectContaining({
       sessionId: "sess_image_task",
       sessionRef: { sessionId: "sess_image_task" },
-      filePath: path.join("/tmp/media-generated", "id-only.png"),
+      filePath: path.join(generatedDir, "id-only.png"),
       label: "id-only.png",
       origin: "plugin_output",
       storageKind: "plugin_data",
@@ -619,20 +562,12 @@ describe("Poller", () => {
         files: ["response.png"],
       })),
     });
-    const { poller, mockStore, mockBus } = makePoller({
+    const { poller, store, mockBus, generatedDir } = makePoller({
       adapter: mockAdapter,
       registerSessionFile,
     });
-
-    mockStore.get.mockReturnValue({
-      taskId: "task-response",
-      adapterId: "test-adapter",
-      status: "pending",
-      files: [],
-      sessionPath: null,
-      deliveryMode: "response",
-      createdAt: new Date().toISOString(),
-    });
+    makeOutputs(generatedDir, ["response.png"]);
+    seedTask(store, { taskId: "task-response", deliveryMode: "response" });
 
     poller.start();
     poller.add("task-response");
@@ -640,13 +575,10 @@ describe("Poller", () => {
     await vi.advanceTimersByTimeAsync(5_000);
 
     expect(registerSessionFile).not.toHaveBeenCalled();
-    expect(mockStore.update).toHaveBeenCalledWith(
-      "task-response",
-      expect.objectContaining({
-        status: "done",
-        files: ["response.png"],
-      }),
-    );
+    expect(store.get("task-response")).toMatchObject({
+      status: "done",
+      files: ["response.png"],
+    });
     expect(mockBus.request).not.toHaveBeenCalledWith("deferred:resolve", expect.anything());
     expect(poller.hasPending("task-response")).toBe(false);
 
@@ -661,25 +593,15 @@ describe("Poller", () => {
       })),
     });
 
-    const { poller, mockStore, mockBus } = makePoller({ adapter: mockAdapter });
-
-    mockStore.get.mockReturnValue({
-      taskId: "task1",
-      adapterId: "test-adapter",
-      status: "pending",
-      files: [],
-      createdAt: new Date().toISOString(),
-    });
+    const { poller, store, mockBus } = makePoller({ adapter: mockAdapter });
+    seedTask(store, { taskId: "task1" });
 
     poller.start();
     poller.add("task1");
 
     await vi.advanceTimersByTimeAsync(5_000);
 
-    expect(mockStore.update).toHaveBeenCalledWith(
-      "task1",
-      expect.objectContaining({ status: "failed", failReason: "content policy" })
-    );
+    expect(store.get("task1")).toMatchObject({ status: "failed", failReason: "content policy" });
     expect(mockBus.request).toHaveBeenCalledWith(
       "deferred:fail",
       expect.objectContaining({ taskId: "task1" })
@@ -694,17 +616,11 @@ describe("Poller", () => {
       query: vi.fn(async () => ({ status: "pending" })),
     });
 
-    const { poller, mockStore, mockBus } = makePoller({ adapter: mockAdapter });
-
-    mockStore.get.mockReturnValue({
-      taskId: "task1",
-      adapterId: "test-adapter",
-      status: "pending",
-      files: [],
-      createdAt: new Date().toISOString(),
-    });
+    const { poller, store, mockBus } = makePoller({ adapter: mockAdapter });
 
     poller.start();
+    // start 之后才落库，避免恢复注册的 bus 调用干扰「没有任何投递」断言。
+    seedTask(store, { taskId: "task1" });
     poller.add("task1");
 
     await vi.advanceTimersByTimeAsync(5_000);
@@ -722,15 +638,8 @@ describe("Poller", () => {
       query: vi.fn(async () => { throw queryError; }),
     });
 
-    const { poller, mockStore, mockBus } = makePoller({ adapter: mockAdapter });
-
-    mockStore.get.mockReturnValue({
-      taskId: "task1",
-      adapterId: "test-adapter",
-      status: "pending",
-      files: [],
-      createdAt: new Date().toISOString(),
-    });
+    const { poller, store, mockBus } = makePoller({ adapter: mockAdapter });
+    seedTask(store, { taskId: "task1" });
 
     poller.start();
     poller.add("task1");
@@ -740,10 +649,7 @@ describe("Poller", () => {
       await vi.advanceTimersByTimeAsync(5_000);
     }
 
-    expect(mockStore.update).toHaveBeenCalledWith(
-      "task1",
-      expect.objectContaining({ status: "failed", failReason: "network timeout" })
-    );
+    expect(store.get("task1")).toMatchObject({ status: "failed", failReason: "network timeout" });
     expect(mockBus.request).toHaveBeenCalledWith(
       "deferred:fail",
       expect.objectContaining({ taskId: "task1" })
@@ -755,23 +661,21 @@ describe("Poller", () => {
 
   // ── cancel ─────────────────────────────────────────────────────────────────
 
-  it("cancel removes task from active, marks failed in store, and calls deferred:abort + task:remove", () => {
-    const { poller, mockStore, mockBus } = makePoller();
+  it("cancel removes task from active, marks cancelled in store, and calls deferred:abort + task:remove", async () => {
+    const { poller, store, mockBus } = makePoller();
+    seedTask(store, { taskId: "task1", sessionPath: "/sessions/main.jsonl" });
 
     poller.start();
     poller.add("task1");
     expect(poller.hasPending("task1")).toBe(true);
 
-    poller.cancel("task1");
+    await poller.cancel("task1");
 
     // Removed from active set
     expect(poller.hasPending("task1")).toBe(false);
 
     // Store updated to cancelled
-    expect(mockStore.update).toHaveBeenCalledWith(
-      "task1",
-      expect.objectContaining({ status: "cancelled", failReason: "user cancelled" })
-    );
+    expect(store.get("task1")).toMatchObject({ status: "cancelled", failReason: "user cancelled" });
 
     // Bus calls: deferred:abort and task:remove
     expect(mockBus.request).toHaveBeenCalledWith(
@@ -786,13 +690,13 @@ describe("Poller", () => {
     poller.stop();
   });
 
-  it("cancel is a no-op for unknown taskId", () => {
-    const { poller, mockStore, mockBus } = makePoller();
+  it("cancel is a no-op for unknown taskId", async () => {
+    const { poller, store, mockBus } = makePoller();
     poller.start();
 
-    poller.cancel("nonexistent");
+    await poller.cancel("nonexistent");
 
-    expect(mockStore.update).not.toHaveBeenCalled();
+    expect(store.listAll()).toEqual([]);
     expect(mockBus.request).not.toHaveBeenCalled();
 
     poller.stop();
@@ -804,15 +708,9 @@ describe("Poller", () => {
     const mockAdapter = makeAdapter({
       query: vi.fn(() => new Promise((r) => { resolveQuery = r; })),
     });
-    const { poller, mockStore, mockBus } = makePoller({ adapter: mockAdapter });
-
-    mockStore.get.mockReturnValue({
-      taskId: "task1",
-      adapterId: "test-adapter",
-      status: "pending",
-      files: [],
-      createdAt: new Date().toISOString(),
-    });
+    const { poller, store, mockBus, generatedDir } = makePoller({ adapter: mockAdapter });
+    makeOutputs(generatedDir, ["img.png"]);
+    seedTask(store, { taskId: "task1", sessionPath: "/sessions/main.jsonl" });
 
     poller.start();
     poller.add("task1");
@@ -821,67 +719,56 @@ describe("Poller", () => {
     await vi.advanceTimersByTimeAsync(5_000);
     expect(mockAdapter.query).toHaveBeenCalled();
 
-    // Cancel while query is in-flight
-    poller.cancel("task1");
+    // Cancel while query is in-flight；cancel 会等在途查询回收，先不 await
+    const cancelPromise = poller.cancel("task1");
     expect(poller.hasPending("task1")).toBe(false);
 
-    // Now resolve the query — _checkTask should bail out due to cancellation fence
+    // Now resolve the query — _checkTask should bail out because the attempt is settled
     resolveQuery({ status: "success", files: ["img.png"] });
-    await vi.advanceTimersByTimeAsync(0); // flush microtasks
+    await cancelPromise;
 
     // deferred:resolve should NOT have been called (only deferred:abort and task:remove from cancel)
     const resolveCall = mockBus.request.mock.calls.find(
       ([type]) => type === "deferred:resolve"
     );
     expect(resolveCall).toBeUndefined();
+    expect(store.get("task1").status).toBe("cancelled");
 
     poller.stop();
   });
 
   // ── recover pending from store on start ───────────────────────────────────
 
-  it("recovers pending tasks from the store on start", () => {
-    const { poller, mockStore, mockBus } = makePoller({
-      store: {
-        listPending: vi.fn(() => [
-          {
-            taskId: "recovered1",
-            adapterId: "test-adapter",
-            status: "pending",
-            type: "image",
-            prompt: "moon",
-            sessionPath: "/sessions/main.jsonl",
-            createdAt: new Date().toISOString(),
-          },
-          {
-            taskId: "recovered2",
-            adapterId: "test-adapter",
-            status: "pending",
-            type: "image",
-            prompt: "sun",
-            sessionPath: "/sessions/main.jsonl",
-            createdAt: new Date().toISOString(),
-          },
-        ]),
-        get: vi.fn(() => null),
-        update: vi.fn(),
-      },
+  it("recovers pending tasks from the store on start", async () => {
+    const { poller, store, mockBus } = makePoller();
+    seedTask(store, {
+      taskId: "recovered1",
+      prompt: "moon",
+      sessionPath: "/sessions/main.jsonl",
+    });
+    seedTask(store, {
+      taskId: "recovered2",
+      prompt: "sun",
+      sessionPath: "/sessions/main.jsonl",
     });
 
     poller.start();
 
     expect(poller.hasPending("recovered1")).toBe(true);
     expect(poller.hasPending("recovered2")).toBe(true);
-    expect(mockBus.request).toHaveBeenCalledWith("deferred:register", expect.objectContaining({
-      taskId: "recovered1",
-      sessionPath: "/sessions/main.jsonl",
-      meta: expect.objectContaining({
-        type: "image-generation",
-        deliveryIntent: "ui_only",
-        triggerParentTurn: false,
-        notifyAgentOnFailure: true,
-      }),
-    }));
+    // 交接注册是异步的（先查既有记录再注册），等微任务链结算后再断言。
+    await vi.waitFor(() => {
+      expect(mockBus.request).toHaveBeenCalledWith("deferred:register", expect.objectContaining({
+        taskId: "recovered1",
+        sessionPath: "/sessions/main.jsonl",
+        meta: expect.objectContaining({
+          type: "image-generation",
+          deliveryIntent: "ui_only",
+          triggerParentTurn: false,
+          notifyAgentOnFailure: true,
+        }),
+      }));
+    });
 
     poller.stop();
   });

@@ -95,7 +95,7 @@ for (const [name, submit, interject] of [["普通发送", submitDesktopSessionMe
       expect(abortPendingDesktopSubmission(f.engine, { sessionId: f.manifest.sessionId })).toBe(true);
       expect(signal.aborted).toBe(true); await Promise.resolve(); expect(settled).toBe(false);
       cleanup();
-      expect(await pending).toEqual({ text: null, toolMedia: [], ...(interject ? { steered: false } : {}) });
+      await expect(pending).rejects.toMatchObject({ name: 'AbortError', code: 'input_cancelled_before_acceptance' });
       expect(f.engine.promptSession).not.toHaveBeenCalled(); expect(f.engine.steerSession).not.toHaveBeenCalled();
       expect(f.session.sessionManager.appendCustomEntry).not.toHaveBeenCalled();
       expect(f.engine.recordKnowledgeEvidenceManifest).not.toHaveBeenCalled();
@@ -148,7 +148,7 @@ for (const [name, submit, interject] of [["普通发送", submitDesktopSessionMe
         const pending = submit(f.engine, f.opts);
         expect(abortPendingDesktopSubmission(f.engine, { sessionId: f.manifest.sessionId })).toBe(true);
         loaded();
-        expect(await pending).toEqual({ text: null, toolMedia: [] });
+        await expect(pending).rejects.toMatchObject({ name: 'AbortError', code: 'input_cancelled_before_acceptance' });
         expect(f.engine.buildConversationKnowledgeContext).not.toHaveBeenCalled();
         expect(f.engine.promptSession).not.toHaveBeenCalled();
       });

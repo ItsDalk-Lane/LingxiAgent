@@ -713,6 +713,7 @@
     "server/routes/web-auth.ts",
     "server/routes/ws-auth.ts",
     "server/routes/ws-session-context.ts",
+    "server/session-file-block.ts",
     "server/session-stream-store.ts",
     "server/session-thinking-level-state.ts",
     "server/suggestion-blocks.ts",

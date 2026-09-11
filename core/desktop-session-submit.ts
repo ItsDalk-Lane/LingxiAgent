@@ -63,10 +63,8 @@ export const MESSAGE_PRESENTATION_RECORD_TYPE = "hana-message-presentation";
 export const AGENT_REVIEW_RECORD_TYPE = "hana-agent-review-result";
 
 /**
- * 「输入未被接受」证据标记（C01）：提交链抛错时，若本次输入的 canonical 关联
- * 回执（session_user_message 带 sourceEntryId）从未触发，说明没有任何用户输入
- * 被持久化——提交 Promise 已终结，不会再 append。调用方（chat.ts）据此发送
- * 类型化拒绝回执；标记只在有实际提交阶段证据时设置，不根据文案猜测。
+ * 「输入未被接受」证据标记：只用于确定发生在输入移交之前的失败。
+ * 关联回执缺失、关联写入失败和移交后的异常都不能证明输入没有被接受。
  */
 const INPUT_NOT_ACCEPTED = Symbol("lingxiDesktopInputNotAccepted");
 
@@ -78,6 +76,27 @@ export function markDesktopInputRejectedBeforeAcceptance(err: unknown): void {
 
 export function isDesktopInputRejectedBeforeAcceptance(err: unknown): boolean {
   return !!(err && typeof err === "object" && (err as Record<symbol, unknown>)[INPUT_NOT_ACCEPTED] === true);
+}
+
+interface DesktopInputSubmissionEvidence {
+  handoff: 'not_started' | 'started' | 'unknown';
+  committed: boolean;
+}
+
+function createDesktopInputSubmissionEvidence(): DesktopInputSubmissionEvidence {
+  return { handoff: 'not_started', committed: false };
+}
+
+function rejectUnsubmittedInput(error: unknown, evidence: DesktopInputSubmissionEvidence): void {
+  if (evidence.handoff === 'not_started' && !evidence.committed) markDesktopInputRejectedBeforeAcceptance(error);
+}
+
+function throwInputCancelledBeforeAcceptance(): never {
+  const error = Object.assign(new Error('Input cancelled before acceptance'), {
+    name: 'AbortError', code: 'input_cancelled_before_acceptance',
+  });
+  markDesktopInputRejectedBeforeAcceptance(error);
+  throw error;
 }
 
 const pendingDesktopSessionSubmissions = new class extends Set<string> {
@@ -99,18 +118,18 @@ export function readDesktopInputRunSnapshot(engine: any, sessionId: string, sess
   } catch { return { revision, status: 'unknown' }; }
 }
 
-function withInputCorrelation<T>(engine: any, session: any, identity: any, action: () => T, onCanonicalReceipt?: () => void): T {
-  if (!identity.clientMessageId || typeof identity.clientMessageId !== 'string') return action();
+function withInputCorrelation<T>(engine: any, session: any, identity: any, action: () => T, evidence: DesktopInputSubmissionEvidence, onQueued?: () => void): T {
+  const hasClientIdentity = typeof identity.clientMessageId === 'string' && !!identity.clientMessageId;
   const snapshotVersion = identity.snapshotVersion === undefined ? 1 : identity.snapshotVersion;
   const unavailable = () => {
+    if (!hasClientIdentity) return;
     console.warn('[desktop-session-submit] canonical input correlation unavailable');
     try { engine.emitEvent?.({ type: 'session_input_correlation_unavailable', sessionId: identity.sessionId, clientMessageId: identity.clientMessageId, snapshotVersion }, identity.sessionPath); }
     catch { /* 诊断投递失败也不能中断已提交的用户输入。 */ }
   };
-  if (!Number.isSafeInteger(snapshotVersion) || snapshotVersion < 1 || !identity.sessionId) { unavailable(); return action(); }
   const manager = session?.sessionManager;
   let sdkSessionId: unknown;
-  try { sdkSessionId = manager?.getSessionId?.(); } catch { unavailable(); return action(); }
+  try { sdkSessionId = manager?.getSessionId?.(); } catch { /* 下方按关联不可用处理，仍观察真实输入移交。 */ }
   // 业务会话 ID 与 SDK 文件头 UUID 独立；通过当前 manifest、文件和运行实例关联。
   const identityStillBound = () => {
     try {
@@ -122,16 +141,28 @@ function withInputCorrelation<T>(engine: any, session: any, identity: any, actio
         && engine.getSessionManifest?.(identity.sessionId)?.currentLocator?.path === identity.sessionPath;
     } catch { return false; }
   };
-  if (!identityStillBound()) { unavailable(); return action(); }
-  return withDesktopInputCommitted({ session, unavailable, committed: sourceEntryId => {
-    if (!identityStillBound()) { unavailable(); return; }
-    session.sessionManager.appendCustomEntry(DESKTOP_INPUT_CORRELATION_TYPE, { schemaVersion: 1, sessionId: identity.sessionId, clientMessageId: identity.clientMessageId, snapshotVersion, sourceEntryId });
-    const correlation = collectDesktopInputCorrelations(session.sessionManager.getBranch(), identity.sessionId).get(sourceEntryId);
-    if (!correlation?.clientMessageId) { unavailable(); return; }
-    onCanonicalReceipt?.();
-    engine.emitEvent?.({ type: 'session_user_message', sessionId: identity.sessionId, clientMessageId: identity.clientMessageId, snapshotVersion,
-      message: { ...(identity.displayMessage || {}), text: identity.displayMessage?.text ?? identity.text ?? '', id: sourceEntryId, sourceEntryId } }, identity.sessionPath);
-  } }, action);
+  const canCorrelate = hasClientIdentity && Number.isSafeInteger(snapshotVersion) && snapshotVersion >= 1
+    && !!identity.sessionId && identityStillBound();
+  if (hasClientIdentity && !canCorrelate) unavailable();
+  // 旧嵌入方没有实际 SDK 观察器，调用开始后只能保留未知，不能用缺少事件认证拒绝。
+  if (!hasDesktopInputCommitObserver(session)) evidence.handoff = 'unknown';
+  return withDesktopInputCommitted({
+    session,
+    unavailable,
+    handedOff: () => { evidence.handoff = 'started'; },
+    queued: onQueued,
+    committed: sourceEntryId => {
+      // 落盘证据不依赖关联写入及广播成功；关联失败不得使后续错误倒退成未接受。
+      evidence.committed = true;
+      if (!canCorrelate) return;
+      if (!identityStillBound()) { unavailable(); return; }
+      session.sessionManager.appendCustomEntry(DESKTOP_INPUT_CORRELATION_TYPE, { schemaVersion: 1, sessionId: identity.sessionId, clientMessageId: identity.clientMessageId, snapshotVersion, sourceEntryId });
+      const correlation = collectDesktopInputCorrelations(session.sessionManager.getBranch(), identity.sessionId).get(sourceEntryId);
+      if (!correlation?.clientMessageId) { unavailable(); return; }
+      engine.emitEvent?.({ type: 'session_user_message', sessionId: identity.sessionId, clientMessageId: identity.clientMessageId, snapshotVersion,
+        message: { ...(identity.displayMessage || {}), text: identity.displayMessage?.text ?? identity.text ?? '', id: sourceEntryId, sourceEntryId } }, identity.sessionPath);
+    },
+  }, action);
 }
 
 /**
@@ -400,10 +431,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
     onInputAccepted,
   } = opts;
 
-  // canonical 关联回执观察：committed 回调触发 = 用户输入已被 append（接受证据）。
-  // 抛错时据此判定「未接受」——早于回执的一切错误都没有持久化任何用户输入。
-  let canonicalReceiptEmitted = false;
-  const noteCanonicalReceipt = () => { canonicalReceiptEmitted = true; };
+  const inputEvidence = createDesktopInputSubmissionEvidence();
   /** 接受前确定失败：构造即标记的错误（busy 门禁/身份解析/载荷校验），调用方可据此发拒绝回执。 */
   const notAcceptedError = (message: string): never => {
     const err = new Error(message);
@@ -558,7 +586,7 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
             && !(error instanceof Error && error.name === "AbortError"))) throw error;
           engine.emitEvent?.({ type: "session_status", isStreaming: false, aborted: true, reason: "user_abort" }, sessionPath);
           earlyBusyEmitted = false;
-          return { text: null, toolMedia: [] };
+          throwInputCancelledBeforeAcceptance();
         } finally {
           for (const key of aborterKeys) {
             if (pendingKnowledgeInjectionAborters.get(key) === knowledgeAbort) {
@@ -575,11 +603,10 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
       }
     }
     if (abortedDesktopSessionSubmissions.delete(submissionKey)) {
-      // 检索期间用户点了停止：不进 promptSession、不做用户消息投影（消息视作从未
-      // 被接受；前端 optimistic 气泡随会话刷新消失），补发终止态收回提前置的忙。
+      // 准备期间停止：不进入 SDK，发送明确取消结算，让客户端保留并处置原输入。
       engine.emitEvent?.({ type: "session_status", isStreaming: false, aborted: true, reason: "user_abort" }, sessionPath);
       earlyBusyEmitted = false;
-      return { text: null, toolMedia: [] };
+      throwInputCancelledBeforeAcceptance();
     }
 
     const reminderBlock = preservePromptEnvelope ? null : renderPendingReminderBlock(engine, sessionPath);
@@ -611,6 +638,12 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
     }
 
     const afterCachePreflight = () => {
+      // SDK 预检可能异步等待凭证或压缩；停止若在期间到达，必须在真正移交前收口。
+      if ([sessionId, sessionPath].some(key => abortedDesktopSessionSubmissions.has(key))) {
+        engine.emitEvent?.({ type: "session_status", isStreaming: false, aborted: true, reason: "user_abort" }, sessionPath);
+        earlyBusyEmitted = false;
+        throwInputCancelledBeforeAcceptance();
+      }
       const commitResult = beforeInputSideEffects?.();
       if (commitResult && typeof (commitResult as any).then === "function") {
         throw new TypeError("desktop-session-submit: beforeInputSideEffects must be synchronous");
@@ -712,11 +745,11 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
         await withInputCorrelation(engine, session, { sessionId, sessionPath, clientMessageId, snapshotVersion, text, displayMessage }, () => engine.promptSession(sessionPath, promptText, promptOpts, {
           afterCachePreflight,
           afterInputAccepted: onInputAccepted,
-        }), noteCanonicalReceipt);
+        }), inputEvidence);
       } else {
         // Compatibility for older embedders. LingxiEngine always takes the guarded path above.
         afterCachePreflight();
-        await withInputCorrelation(engine, session, { sessionId, sessionPath, clientMessageId, snapshotVersion, text, displayMessage }, () => engine.promptSession(sessionPath, promptText, promptOpts), noteCanonicalReceipt);
+        await withInputCorrelation(engine, session, { sessionId, sessionPath, clientMessageId, snapshotVersion, text, displayMessage }, () => engine.promptSession(sessionPath, promptText, promptOpts), inputEvidence);
       }
       consumeRenderedReminderBlock(engine, sessionPath, reminderBlock);
     } finally {
@@ -738,10 +771,8 @@ export async function submitDesktopSessionMessage(engine: any, opts: {
       engine.emitEvent?.({ type: "session_status", isStreaming: false }, sessionPath);
       earlyBusyEmitted = false;
     }
-    // canonical 关联回执未触发 = 没有任何用户输入被 append。提交 Promise 已终结，
-    // 不会再持久化——这是「未接受」的实际提交阶段证据（afterCachePreflight 的展示
-    // 副作可能留下孤儿 presentation 条目，消费方按既有孤儿容忍规则跳过）。
-    if (!canonicalReceiptEmitted) markDesktopInputRejectedBeforeAcceptance(err);
+    // 只有完整观察到失败先于 SDK 移交时才允许重试。缺少 canonical 关联保持未知。
+    rejectUnsubmittedInput(err, inputEvidence);
     throw err;
   } finally {
     // 停止同时登记会话编号和路径，结束时一并清除，避免下一次发送继承旧停止状态。
@@ -813,19 +844,16 @@ export async function submitDesktopSessionInterjection(engine: any, opts: {
   uiContext?: any;
   context?: any;
 } = {}) {
-  // 接受证据载体：canonical 关联回执触发置 true。抛错时未触发 = 输入从未被
-  // append（steer 成功前的一切失败：busy 门禁/检索失败/装载失败），调用方可
-  // 据此发送类型化拒绝回执（C01）。
-  const receipt = { canonical: false };
+  const inputEvidence = createDesktopInputSubmissionEvidence();
   try {
-    return await runDesktopSessionInterjection(engine, opts, receipt);
+    return await runDesktopSessionInterjection(engine, opts, inputEvidence);
   } catch (err) {
-    if (!receipt.canonical) markDesktopInputRejectedBeforeAcceptance(err);
+    rejectUnsubmittedInput(err, inputEvidence);
     throw err;
   }
 }
 
-async function runDesktopSessionInterjection(engine: any, opts: Parameters<typeof submitDesktopSessionInterjection>[1], receipt: { canonical: boolean }) {
+async function runDesktopSessionInterjection(engine: any, opts: Parameters<typeof submitDesktopSessionInterjection>[1], inputEvidence: DesktopInputSubmissionEvidence) {
   const {
     sessionId: requestedSessionId,
     sessionPath: requestedSessionPath,
@@ -853,6 +881,8 @@ async function runDesktopSessionInterjection(engine: any, opts: Parameters<typeo
   if (!text && !images?.length && !videos?.length && !audios?.length) throw new Error("desktop-session-submit: text, images, videos, or audios required");
 
   if (typeof engine.isSessionStreaming === "function" && !engine.isSessionStreaming(sessionPath)) {
+    // 普通提交自行证明失败阶段，外层不能因没有观察它的移交而补发错误的拒绝标记。
+    inputEvidence.handoff = 'unknown';
     return submitDesktopSessionMessage(engine, opts);
   }
 
@@ -959,7 +989,7 @@ async function runDesktopSessionInterjection(engine: any, opts: Parameters<typeo
       if (!knowledgeAbort.signal.aborted || (error !== knowledgeAbort.signal.reason
         && !(error instanceof Error && error.name === "AbortError"))) throw error;
       engine.emitEvent?.({ type: "session_status", isStreaming: false, aborted: true, reason: "user_abort" }, sessionPath);
-      return { text: null, toolMedia: [], steered: false };
+      throwInputCancelledBeforeAcceptance();
     } finally {
       for (const key of aborterKeys) {
         if (pendingKnowledgeInjectionAborters.get(key) === knowledgeAbort) pendingKnowledgeInjectionAborters.delete(key);
@@ -972,7 +1002,7 @@ async function runDesktopSessionInterjection(engine: any, opts: Parameters<typeo
     }
     if (knowledgeAbort.signal.aborted) {
       engine.emitEvent?.({ type: "session_status", isStreaming: false, aborted: true, reason: "user_abort" }, sessionPath);
-      return { text: null, toolMedia: [], steered: false };
+      throwInputCancelledBeforeAcceptance();
     }
     knowledgeInjectionBlock = injection.block;
     knowledgeRetrievalStats = injection.stats;
@@ -990,53 +1020,64 @@ async function runDesktopSessionInterjection(engine: any, opts: Parameters<typeo
     promptText = `${reminderBlock.block}\n\n${promptText}`;
   }
 
-  const steered = withInputCorrelation(engine, session, { sessionId, sessionPath, clientMessageId, snapshotVersion, text, displayMessage }, () => engine.steerSession(sessionPath, promptText), () => { receipt.canonical = true; });
-  if (!steered) throw new Error("session_busy");
-  consumeRenderedReminderBlock(engine, sessionPath, reminderBlock);
-  engine.emitEvent?.({
-    type: "session_user_message",
-    clientMessageId: clientMessageId || null,
-    message: {
-      text: displayMessage?.text ?? text ?? "",
-      timestamp: Date.now(),
+  let inputProjected = false;
+  const projectQueuedInput = () => {
+    if (inputProjected) return;
+    inputProjected = true;
+    consumeRenderedReminderBlock(engine, sessionPath, reminderBlock);
+    engine.emitEvent?.({
+      type: "session_user_message",
+      clientMessageId: clientMessageId || null,
+      message: {
+        text: displayMessage?.text ?? text ?? "",
+        timestamp: Date.now(),
+        attachments: displayAttachments,
+        quotedText: displayMessage?.quotedText,
+        skills: displayMessage?.skills,
+        deskContext: displayMessage?.deskContext ?? null,
+        source: displayMessage?.source || "desktop",
+        bridgeSessionKey: displayMessage?.bridgeSessionKey || null,
+        origin: displayMessage?.origin || null,
+        knowledgeRefs: displayMessage?.knowledgeRefs || null,
+        knowledgeRetrieval: knowledgeRetrievalStats,
+      },
+    }, sessionPath);
+    queueVoiceInputTranscriptions({
+      speechRecognition: engine.speechRecognition,
+      sessionPath,
       attachments: displayAttachments,
-      quotedText: displayMessage?.quotedText,
-      skills: displayMessage?.skills,
-      deskContext: displayMessage?.deskContext ?? null,
-      source: displayMessage?.source || "desktop",
-      bridgeSessionKey: displayMessage?.bridgeSessionKey || null,
-      origin: displayMessage?.origin || null,
-      knowledgeRefs: displayMessage?.knowledgeRefs || null,
-      knowledgeRetrieval: knowledgeRetrievalStats,
-    },
-  }, sessionPath);
-  queueVoiceInputTranscriptions({
-    speechRecognition: engine.speechRecognition,
-    sessionPath,
-    attachments: displayAttachments,
-  });
-  // 展示投影与来源元信息在 steer 成功后持久化，避免 steer 被拒绝时产生孤儿条目。
-  // steerSession 同步返回，与 appendCustomEntry 之间无 await，紧邻性不受影响。
-  // 契约：origin 条目注释其后第一条 user message（中间可能隔着在途 assistant 输出）。
-  // forceDisplayText 同 prompt 路径：模型输入含 Reminder/知识注入块时强制持久化用户可见正文。
-  recordMessagePresentationEntry(
-    session,
-    sessionPath,
-    displayComparisonPromptText,
-    displayMessage ?? { text: text ?? "" },
-    {
-      forceDisplayText: !!reminderBlock?.block || !!knowledgeInjectionBlock,
-      knowledgeRetrieval: knowledgeRetrievalStats,
-    },
-  );
-  recordMessageOriginEntry(session, sessionPath, displayMessage);
-  // EvidenceManifest（§六十七）：与 stats 持久化同一位置/同一纪律（失败 warn 不阻断）。
-  recordKnowledgeEvidenceManifest(
-    engine,
-    sessionPath,
-    knowledgeRetrievalStats,
-    knowledgeInjectionEvidence,
-  );
+    });
+    // SDK 已同步接收队列后、上层 Promise 结束前保存元数据，确保仍前置于 user。
+    // 契约：origin 条目注释其后第一条 user message（中间可能隔着在途 assistant 输出）。
+    // forceDisplayText 同 prompt 路径：模型输入含 Reminder/知识注入块时强制持久化用户可见正文。
+    recordMessagePresentationEntry(
+      session,
+      sessionPath,
+      displayComparisonPromptText,
+      displayMessage ?? { text: text ?? "" },
+      {
+        forceDisplayText: !!reminderBlock?.block || !!knowledgeInjectionBlock,
+        knowledgeRetrieval: knowledgeRetrievalStats,
+      },
+    );
+    recordMessageOriginEntry(session, sessionPath, displayMessage);
+    // EvidenceManifest（§六十七）：与 stats 持久化同一位置/同一纪律（失败 warn 不阻断）。
+    recordKnowledgeEvidenceManifest(
+      engine,
+      sessionPath,
+      knowledgeRetrievalStats,
+      knowledgeInjectionEvidence,
+    );
+  };
+  const steered = await withInputCorrelation(engine, session, { sessionId, sessionPath, clientMessageId, snapshotVersion, text, displayMessage }, () => engine.steerSession(sessionPath, promptText), inputEvidence, projectQueuedInput);
+  if (!steered) {
+    // 显式 false 表示引擎没有把输入交给 SDK；与调用抛错但结果未知不同。
+    const error = new Error("session_busy");
+    if (!inputEvidence.committed && inputEvidence.handoff !== 'started') markDesktopInputRejectedBeforeAcceptance(error);
+    throw error;
+  }
+  // 没有 SDK 观察器的旧嵌入方，只能在明确的队列成功返回后投影一次。
+  projectQueuedInput();
   return { text: null, toolMedia: [], steered: true };
 }
 

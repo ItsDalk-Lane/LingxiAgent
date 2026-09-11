@@ -102,7 +102,7 @@ export function nextImmediateDisplayableAssistantIndex(sourceMessages, sourceInd
 }
 
 export function isMediaGenerationDeferredResult(result) {
-  return result?.type === "image-generation" || result?.type === "video-generation";
+  return result?.type === "image-generation" || result?.type === "video-generation" || result?.type === "speech-generation";
 }
 
 export function parseHistoryDeferredResult(message) {
