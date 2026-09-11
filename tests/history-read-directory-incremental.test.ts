@@ -29,7 +29,7 @@ afterEach(() => {
   resetSessionFileMutationEpochsForTest();
   while (tmpDirs.length) {
     const dir = tmpDirs.pop();
-    fs.rmSync(dir, { recursive: true, force: true });
+    fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
   }
 });
 
