@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = af0a16d36c0639f18318a967137331eaffca5d22  (2026-09-10 历史读取三阶段 + 架构契约补强七领域候选 + lint/测试拦截修复，fix/pending-sep10)
+VERIFIED_SOURCE_SHA   = 01414f13c0e47f6eaa7cf527cb6631155adabc31  (2026-09-11 v0.1.38 发布候选：sep10 七领域/历史读取 + 三轮 CI 拦截修复 + 发布元数据，直提 main)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1110,6 +1110,13 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 
 - 固定源码候选：`af0a16d36c0639f18318a967137331eaffca5d22`（0275f6c5 基础上：40e0c6d3 七套件 afterEach 关闭 SessionManifestStore + af0a16d3 证据重冻结 r3）。PR #53 第二轮 CI：macOS 双腿 + ubuntu 全绿；windows-2025 同 48 项 EPERM 复现且 20×250ms 重试不可愈——实锤非异步释放抖动，而是测试未关闭 SessionManifestStore 的 SQLite 句柄（Windows 下打开文件阻塞目录删除；既有 Windows 绿测试 session-manifest-engine/history-pagination-run-continuity 均有 close 惯例）。修复：七套件登记并 afterEach close 后再 rm（rmSync 重试选项保留，对齐既有 Windows 清理惯例）。
 - 验证证据（绑定 40e0c6d3 源码树；af0a16d3 相对其仅叠加 excluded 证据/再生补丁，无生产代码差异）：七套件单跑 50/50 绿；tsconfig.test tsc 绿；全量 13821 passed / 4 失败均为坐标旧值 0275f6c5 下 seal guard 家族预期红；sep10-seal-green-r3 绿门禁（exit 0、manifest 034f8f56/9452bfed 未漂移）、补丁重放 VERIFIED。
+
+## 2026-09-11 v0.1.38 发布候选与审计封印
+
+- 固定源码候选：`01414f13c0e47f6eaa7cf527cb6631155adabc31`（直提 main，基于 PR #53 合并树 9ab5218c）：15654cd1 发布元数据（version 0.1.37→0.1.38、releaseGeneration 15→16、release-digest v1 重写 6 项并 prepend 进 v2 滚动史册 19 条、release-preflight 当前产品 tag 断言随版本推进——沿用 696016b7 教训同提交更新）+ 01414f13 证据重冻结。该候选相对合并树仅叠加版本/digest/预检断言与 excluded 证据，无生产代码差异。
+- 验证证据（绑定 15654cd1 元数据树）：release:preflight --tag v0.1.38 PASS（历史最大 0.1.37/15，21 个历史发布）；validate-release-digest v1/v2 PASS；typecheck×3 绿；升版后 test:artifact-release-smoke 305/305 复跑全绿（含读取当前包版本的实时预检用例）；全量 13825 passed / 0 failed / 7 skipped（1373 文件，exit 0）；sep11-v0138-green 绿门禁（exit 0、manifest e8789893/39862bfa 未漂移）、补丁重放 VERIFIED。
+- CI 证据（PR #53，合并前最终轮 34551812195）：macos-15 arm64 / macos-15-intel / ubuntu-24.04 / windows-2025 四腿全绿 + open-build-smoke + persistence-schema-guard；首轮 ubuntu worker fork 崩溃与两轮 Windows EPERM 的处置见上两条记录。
+- 未执行/受限：正式签名、四平台安装包、公证与远端发布证据由 tag 工作流执行（本条目记为待流水线验证，不以本地结果代替）；本地未执行 npm run pack；Windows NSIS 真机安装交互仍未实测（沿用既有 Known limitation）。
 
 ## 2026-08-25 Notebook-first Knowledge 目标
 
