@@ -13,7 +13,9 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 9c4b11114696a67e63879dbdfdc4e73947636549  (2026-09-11 回退连文件还原/清单连续性批量候选：fileRollback 影子快照 + todo 上下文注入/提醒/中断标记 + side-chat + git worktree + persistence 门禁 repin，分支 feat/tool-activity-presentation)
+VERIFIED_SOURCE_SHA   = b2785643753f7ab64b15a36dd378316269fbd9e1  (2026-09-12 v0.1.39 发布候选：工具展示链路五项对抗审查缺陷修复 + 审查材料入库 + v0.1.39 发布元数据，分支 feat/tool-activity-presentation)
+历史 VERIFIED_SOURCE_SHA = 015e1b491fed1cfed10d1eade05851bfc6a5364e  (2026-09-12 工具展示链路五项对抗审查缺陷修复源码候选，分支 feat/tool-activity-presentation)
+历史 VERIFIED_SOURCE_SHA = 9c4b11114696a67e63879dbdfdc4e73947636549  (2026-09-11 回退连文件还原/清单连续性批量候选，分支 feat/tool-activity-presentation)
 历史 VERIFIED_SOURCE_SHA = aa42fc5918a245735d2ef2b7490d7e015c525556  (2026-09-11 任务清单改版候选：todo v2 五态/收尾/进度条 + 样式立法收账 + 边界/指纹坐标修正 + 证据重冻结，分支 feat/tool-activity-presentation)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
@@ -1111,6 +1113,17 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 
 - 固定源码候选：`af0a16d36c0639f18318a967137331eaffca5d22`（0275f6c5 基础上：40e0c6d3 七套件 afterEach 关闭 SessionManifestStore + af0a16d3 证据重冻结 r3）。PR #53 第二轮 CI：macOS 双腿 + ubuntu 全绿；windows-2025 同 48 项 EPERM 复现且 20×250ms 重试不可愈——实锤非异步释放抖动，而是测试未关闭 SessionManifestStore 的 SQLite 句柄（Windows 下打开文件阻塞目录删除；既有 Windows 绿测试 session-manifest-engine/history-pagination-run-continuity 均有 close 惯例）。修复：七套件登记并 afterEach close 后再 rm（rmSync 重试选项保留，对齐既有 Windows 清理惯例）。
 - 验证证据（绑定 40e0c6d3 源码树；af0a16d3 相对其仅叠加 excluded 证据/再生补丁，无生产代码差异）：七套件单跑 50/50 绿；tsconfig.test tsc 绿；全量 13821 passed / 4 失败均为坐标旧值 0275f6c5 下 seal guard 家族预期红；sep10-seal-green-r3 绿门禁（exit 0、manifest 034f8f56/9452bfed 未漂移）、补丁重放 VERIFIED。
+
+## 2026-09-12 v0.1.39 发布候选与审计封印
+
+- 固定源码候选：`b2785643753f7ab64b15a36dd378316269fbd9e1`（分支 feat/tool-activity-presentation），三层叠加：
+  1. `015e1b491` 工具展示链路五项对抗审查缺陷修复——P0 多文本块绕过敏感字段遮盖（保留块边界、逐块独立安全投影）、P1 搜索结构化事实被降级为文本重猜（新增 `tool_search` deferred kind）、P1 实时大结果截断缺全文引用（新增 v2 locator，正文不随 WS 传输、解析绑定已授权会话路径）、P2 工具短标签漏配（office 连字符拼写、present_files、media_generate-speech）与短标签对账改独立真相源、P2 Portal 弹窗 diff 丢 CSS token（token 声明块改挂 `.panel, .dialog`）；`build/cli-runtime-closure.json` 随新增 import 由官方 writer 确定性重生成。
+  2. `1da1d47e5` 收录两份未跟踪展示层材料（审查提示词，收录前把本机绝对路径改写为 `<REPO_ROOT>`；工具行样式预览页）——证据 runner 以 `git ls-files --cached --others` 取源文件集，未跟踪文件同样计入。
+  3. `b27856437` v0.1.39 发布元数据（version 0.1.38→0.1.39、releaseGeneration 16→17、release-digest v1 重写 7 项并 prepend 进 v2 滚动史册 20 条、release-preflight 当前产品 tag 断言随动）。
+- 摘要生成方式（如实记录）：本机无可用 deepseek 凭证——provider-catalog 无 `deepseek` 条目，唯一 `deepseek-responses` 的 key 对 `/responses`、`/chat/completions`、`/models` 三端点均 401——官方 `generate-release-digest.mjs` 无法运行；按 v0.1.37 手写摘要先例手写 v0.1.39 摘要，仍由 `validate-release-digest` 与 `assertValidReleaseDigest` 把关。
+- 验证证据（绑定该候选树）：typecheck×3 绿；release:preflight --tag v0.1.39 PASS（历史最大 0.1.38/16）；validate-release-digest v1/v2 PASS；artifact-release-smoke 305/305 绿；定向 130/130、相邻 server/shared 157/157、style-discipline + css-token-reference 9/9、cli-closure-census 22/22、build:renderer 绿。
+- 封印推进：坐标 `9c4b1111`→`b27856437`；矩阵与投影重生成（133 paths，projection sha256 `8bf6c07a873c2b25c51db12ae36addb89cbfe33f23747fcdd3d32b4c7878dbc9`）；round2/round3 交付证据按候选树重冻结并追加绿色门禁记录，与坐标推进同一提交落地（证据文件不在 audit allowlist 内，作为坐标之后的独立提交会被 diff guard 判为非审计改动）。
+- 未执行/受限：npm run pack 与打包未执行；真实供应商 live 验证未执行；Electron 真实界面与深浅主题人工验收未执行；Windows 真机与 NSIS 安装交互未实测（沿用既有 Known limitation）。
 
 ## 2026-09-11 v0.1.38 发布候选与审计封印
 

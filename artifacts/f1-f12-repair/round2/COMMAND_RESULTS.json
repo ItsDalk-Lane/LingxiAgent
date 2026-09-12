@@ -4108,5 +4108,37 @@
     "log": "logs/sep11-todo-green.log",
     "logSha256": "fe81d61b7bdd89079ecc8af7e47f50b88a325cb1df7a9feca7abc3943314e275",
     "sourceManifestHash": "c86a8c64a94f499ced7a7d4a6cc9bced3b9709abbfa754c702ddfebc64bc42dd"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--exclude",
+      "**/round2-delivery-evidence.test.ts",
+      "--exclude",
+      "**/round3-delivery-evidence.test.ts",
+      "--exclude",
+      "**/upstream-sync-matrix.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-12T00:54:32.294459+00:00",
+    "end": "2026-09-12T00:55:57.164289+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 14126,
+      "failed": 0,
+      "skipped": 7,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "f10903561611b9b09f85174b5fffb56f57c7097ba5818c0b88da5ab7581e1f65",
+    "log": "logs/sep12-v0139-seal-r2.log",
+    "logSha256": "72b355fc173ba2f55d6da3d3e8b49ba65ba2f607fad162f572d3bacefa9f0142",
+    "sourceManifestHash": "f10903561611b9b09f85174b5fffb56f57c7097ba5818c0b88da5ab7581e1f65"
   }
 ]
