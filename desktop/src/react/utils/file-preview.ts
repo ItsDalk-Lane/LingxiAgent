@@ -13,6 +13,7 @@ import {
   PREVIEWABLE_EXTS,
   BINARY_PREVIEW_TYPES,
   readFileForPreview,
+  readFileForPreviewType,
   readFileForPreviewWithVersion,
 } from './preview-file-content';
 import { showError } from './ui-helpers';
@@ -129,7 +130,25 @@ export async function openFilePreview(
       }
     }
 
-    // 无法预览的文件类型
+    // 未知扩展名：与 VS Code 一致，先按纯文本尝试打开。
+    // 主进程 readFileSnapshot 已做二进制嗅探（NUL）与大小上限，读不出来才回退文件信息卡。
+    const textRead = await readFileForPreviewType(filePath, 'code');
+    if (textRead != null) {
+      const previewItem: PreviewItem = {
+        id: `file-${filePath}`,
+        type: 'code',
+        title: fileName,
+        content: textRead.content,
+        filePath,
+        ext: normalizedExt,
+        fileVersion: textRead.fileVersion,
+        language: normalizedExt || undefined,
+      };
+      openPreview(previewItem);
+      return;
+    }
+
+    // 无法按文本预览的文件类型（二进制 / 超出大小上限 / 读取失败）
     const previewItem: PreviewItem = {
       id: `file-${filePath}`,
       type: 'file-info',

@@ -19,6 +19,14 @@ import { isImageFile, isVideoFile } from '../utils/format';
 import { isAudioFileName } from '../utils/file-kind';
 import { useI18n } from '../hooks/use-i18n';
 import {
+  SessionScopeProvider,
+  useIsSideChatScope,
+  useScopedSessionPath,
+} from './session-scope-context';
+import { useScopedAttachedFiles, useScopedDocContext, useScopedQuotedSelections } from './input/composer-scope';
+import { useScopedPermissionMode } from './input/composer-permission-mode';
+import { useScopedMemoryEnabled } from './input/composer-memory-mode';
+import {
   continueDeletedAgentSession,
   createNewSession,
   ensureSession,
@@ -40,6 +48,7 @@ import { SendButton } from './input/SendButton';
 import type { PermissionMode } from './input/PlanModeButton';
 import { SessionConfirmationPrompt } from './input/SessionConfirmationPrompt';
 import { TenetApprovalBanner } from './input/TenetApprovalBanner';
+import { TodoPanel } from './chat/TodoPanel';
 import { serializeEditor, insertFaithfulPasteAtSelection } from '../utils/editor-serializer';
 import { modelUnavailableMessageKey, type ComposerSendBundle } from './input/composer-send';
 import {
@@ -443,26 +452,43 @@ export type { SlashItem };
 
 export interface InputAreaProps {
   surface?: 'desktop' | 'mobile';
+  /**
+   * 侧边对话面板用：该输入区归属的会话 path。
+   * 省略时（主聊天页 / 移动端）用 store.currentSessionPath；显式给出（即使
+   * sessionPath 还是 null，例如侧边会话正在创建）表示「这是侧边面板」，
+   * 此后所有读取都限定在该会话桶内，绝不回落主会话的字段。
+   */
+  sessionScope?: { sessionPath: string | null; isScoped: true } | null;
 }
 
-export function InputArea({ surface = 'desktop' }: InputAreaProps = {}) {
+export function InputArea({ surface = 'desktop', sessionScope = null }: InputAreaProps = {}) {
+  if (sessionScope) {
+    return (
+      <SessionScopeProvider sessionPath={sessionScope.sessionPath}>
+        <InputAreaInner surface={surface} isScoped />
+      </SessionScopeProvider>
+    );
+  }
   return <InputAreaInner surface={surface} />;
 }
 
-function InputAreaInner({ surface }: Required<InputAreaProps>) {
+function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaProps, 'sessionScope'>> & { isScoped?: boolean }) {
   const { t, locale } = useI18n();
+  // 本输入区归属的会话：主聊天页 = 当前会话；侧边对话面板 = 面板自己的会话。
+  const scopedSessionPath = useScopedSessionPath();
+  const isSideChatScope = useIsSideChatScope();
 
   // Zustand state
-  const isStreaming = useStore(s => sessionScopedListIncludes(s, s.streamingSessions, s.currentSessionPath));
+  const isStreaming = useStore(s => sessionScopedListIncludes(s, s.streamingSessions, scopedSessionPath));
   // 发送即置位的本地「等待助手」态：知识检索/排队期间服务器尚未置 isStreaming，
   // 用它补齐发送瞬间的运行反馈（停止按钮 / 打字指示器），首个后续事件清除。
-  const isTurnPending = useStore(s => sessionScopedListIncludes(s, s.turnPendingSessions, s.currentSessionPath));
+  const isTurnPending = useStore(s => sessionScopedListIncludes(s, s.turnPendingSessions, scopedSessionPath));
   // 对输入区而言「会话忙」= 服务器流式或本地等待：按钮/发送门禁按同一语义。
   const effectiveStreaming = isStreaming || isTurnPending;
   const connected = useStore(s => s.connected);
   const pendingNewSession = useStore(s => s.pendingNewSession);
   const pendingSessionSwitchPath = useStore(s => s.pendingSessionSwitchPath);
-  const currentSessionPath = useStore(s => s.currentSessionPath);
+  const currentSessionPath = scopedSessionPath;
   useEffect(() => {
     if (currentSessionPath) void reconcileComposerSession(currentSessionPath);
   }, [currentSessionPath]);
@@ -472,19 +498,19 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   const agents = useStore(s => s.agents);
   const sessions = useStore(s => s.sessions);
   const selectedAgentId = useStore(s => s.selectedAgentId);
-  const currentSessionProjection = useStore(s => s.currentSessionPath
-    ? s.sessions.find(session => session.path === s.currentSessionPath)
+  const currentSessionProjection = useStore(s => scopedSessionPath
+    ? s.sessions.find(session => session.path === scopedSessionPath)
     : null);
   const deletedAgentReadOnly = currentSessionProjection?.agentDeleted === true;
-  const compacting = useStore(s => isSessionCompacting(s, currentSessionPath));
-  const compactionMode = useStore(s => getSessionCompactionMode(s, currentSessionPath));
+  const compacting = useStore(s => isSessionCompacting(s, scopedSessionPath));
+  const compactionMode = useStore(s => getSessionCompactionMode(s, scopedSessionPath));
   const screenshotBusy = useStore(s => s.screenshotTaskCount > 0);
   const screenshotProgress = useStore(s => s.screenshotProgress);
-  const inlineError = useStore(s => s.currentSessionPath ? (sessionScopedValue(s, s.inlineErrors, s.currentSessionPath) ?? null) : null);
-  const sessionFiles = useStore(s => (s.currentSessionPath ? selectSessionFiles(s, s.currentSessionPath) : EMPTY_FILE_REFS));
-  const attachedFiles = useStore(s => s.attachedFiles);
-  const docContextAttached = useStore(s => s.docContextAttached);
-  const quotedSelections = useStore(s => s.quotedSelections);
+  const inlineError = useStore(s => scopedSessionPath ? (sessionScopedValue(s, s.inlineErrors, scopedSessionPath) ?? null) : null);
+  const sessionFiles = useStore(s => (scopedSessionPath ? selectSessionFiles(s, scopedSessionPath) : EMPTY_FILE_REFS));
+  const attachedFiles = useScopedAttachedFiles(scopedSessionPath, isScoped);
+  const docContextAttached = useScopedDocContext(scopedSessionPath, isScoped);
+  const quotedSelections = useScopedQuotedSelections(scopedSessionPath, isScoped);
   const deskFiles = useStore(s => s.deskFiles);
   const deskBasePath = useStore(s => s.deskBasePath);
   const previewItems = useStore(selectPreviewItems);
@@ -493,13 +519,22 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   const models = useStore(s => s.models);
   const agentYuan = useStore(s => s.agentYuan);
   const welcomeVisible = useStore(s => s.welcomeVisible);
-  const thinkingLevel = useStore(s => s.thinkingLevel);
-  const setThinkingLevel = useStore(s => s.setThinkingLevel);
+  // 思考级别按会话归属：主聊天页读全局，侧边面板读侧边会话自己的级别。
+  const thinkingLevel = useStore(s => (isScoped && scopedSessionPath
+    ? s.thinkingLevelBySession[scopedSessionPath] ?? s.thinkingLevel
+    : s.thinkingLevel));
+  const setThinkingLevelGlobal = useStore(s => s.setThinkingLevel);
+  const setThinkingLevelForSession = useStore(s => s.setThinkingLevelForSession);
+  const setThinkingLevel = useCallback((level: ThinkingLevel) => {
+    // 主聊天页保持既有语义（全局写）；侧边面板写自己的会话，不动主会话显示。
+    if (isSideChatScope && scopedSessionPath) setThinkingLevelForSession(scopedSessionPath, level);
+    else setThinkingLevelGlobal(level);
+  }, [isSideChatScope, scopedSessionPath, setThinkingLevelForSession, setThinkingLevelGlobal]);
   const addToast = useStore(s => s.addToast);
   const removeToast = useStore(s => s.removeToast);
 
   const globalModelInfo = useMemo(() => models.find(m => m.isCurrent), [models]);
-  const sessionModel = useStore(s => s.currentSessionPath ? sessionScopedValue(s, s.sessionModelsByPath, s.currentSessionPath) : undefined);
+  const sessionModel = useStore(s => scopedSessionPath ? sessionScopedValue(s, s.sessionModelsByPath, scopedSessionPath) : undefined);
   const sessionModelInfo = useMemo(() => {
     if (!sessionModel) return undefined;
     const full = models.find(m => m.id === sessionModel.id && m.provider === sessionModel.provider);
@@ -509,7 +544,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   const modelUnavailableMessage = modelSelectionRequired
     ? t(modelUnavailableMessageKey(sessionModel?.unavailableReason))
     : null;
-  const capabilityRefreshing = useStore(s => sessionScopedListIncludes(s, s.capabilityRefreshingSessions, s.currentSessionPath));
+  const capabilityRefreshing = useStore(s => sessionScopedListIncludes(s, s.capabilityRefreshingSessions, scopedSessionPath));
   const compactingStatus = capabilityRefreshing || compacting;
   const compactingStatusLabel = capabilityRefreshing
     ? t('input.refreshAndCompactBusy')
@@ -527,9 +562,9 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     [currentModelInfo, models],
   );
   const modelSwitching = useStore(s => s.modelSwitching);
-  const currentSessionItems = useStore(s => s.currentSessionPath ? sessionScopedValue(s, s.chatSessions, s.currentSessionPath)?.items : undefined);
-  const storedSessionConfirmation = useStore(s => s.currentSessionPath
-    ? sessionScopedValue(s, s.pendingSessionConfirmationsByPath, s.currentSessionPath) || null
+  const currentSessionItems = useStore(s => scopedSessionPath ? sessionScopedValue(s, s.chatSessions, scopedSessionPath)?.items : undefined);
+  const storedSessionConfirmation = useStore(s => scopedSessionPath
+    ? sessionScopedValue(s, s.pendingSessionConfirmationsByPath, scopedSessionPath) || null
     : null);
   const pendingSessionConfirmation = useMemo(() => {
     return findLatestInputSessionConfirmation(currentSessionItems, undefined, true)
@@ -537,8 +572,10 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   }, [currentSessionItems, storedSessionConfirmation]);
 
   // Local state
-  const permissionMode = useStore(s => s.sessionPermissionMode);
-  const setPermissionMode = useStore(s => s.setSessionPermissionMode);
+  // 权限模式按会话归属：主聊天页读全局，侧边面板读/写侧边会话自己的模式。
+  const { mode: permissionMode, setMode: setPermissionMode } = useScopedPermissionMode();
+  // 会话记忆开关：主聊天页沿用 Welcome 页入口，侧边面板在工具栏里给出自己的开关。
+  const { enabled: memoryEnabled, showToggle: showMemoryToggle, setEnabled: setMemoryEnabled } = useScopedMemoryEnabled();
   const [sending, setSending] = useState(false);
   const [slashMenuOpen, setSlashMenuOpen] = useState(false);
   const [slashSelected, setSlashSelected] = useState(0);
@@ -636,7 +673,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   const removeAttachedFile = useStore(s => s.removeAttachedFile);
   const clearAttachedFiles = useStore(s => s.clearAttachedFiles);
   const clearAttachedFilesForSession = useStore(s => s.clearAttachedFilesForSession);
-  const setDocContextAttached = useStore(s => s.setDocContextAttached);
+  const setDocContextAttachedForSession = useStore(s => s.setDocContextAttachedForSession);
   const setDraft = useStore(s => s.setDraft);
   const clearDraft = useStore(s => s.clearDraft);
   // 草稿 key：session 内用 sessionPath（store 内解析为 sessionId）；首页 pending 态用保留键
@@ -820,8 +857,8 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
 
   // doc 消失时同步清 attach，避免悬空的 docContextAttached 干扰 hasContent / 发送态
   useEffect(() => {
-    if (!hasDoc && docContextAttached) setDocContextAttached(false);
-  }, [hasDoc, docContextAttached, setDocContextAttached]);
+    if (!hasDoc && docContextAttached && scopedSessionPath) setDocContextAttachedForSession(scopedSessionPath, false);
+  }, [hasDoc, docContextAttached, scopedSessionPath, setDocContextAttachedForSession]);
 
   // ── 统一命令发送 ──
 
@@ -830,10 +867,11 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     const ws = getWebSocket();
     if (!ws || ws.readyState !== WebSocket.OPEN) return false;
     const _s = useStore.getState();
-    if (sessionScopedListIncludes(_s, _s.streamingSessions, _s.currentSessionPath)) return false;
-    if (_s.pendingSessionSwitchPath) return false;
-    const activeSessionModel = _s.currentSessionPath
-      ? sessionScopedValue(_s, _s.sessionModelsByPath, _s.currentSessionPath)
+    if (sessionScopedListIncludes(_s, _s.streamingSessions, scopedSessionPath)) return false;
+    // 「主会话正在切换」只对主聊天页构成门禁：侧边面板的会话身份不随主会话切换。
+    if (!isSideChatScope && _s.pendingSessionSwitchPath) return false;
+    const activeSessionModel = scopedSessionPath
+      ? sessionScopedValue(_s, _s.sessionModelsByPath, scopedSessionPath)
       : undefined;
     if (activeSessionModel?.available === false) {
       _s.addToast(
@@ -852,11 +890,13 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       loadSessions();
     } else {
       const state = useStore.getState();
-      const projection = state.sessions.find(session => session.path === state.currentSessionPath);
-      const sessionId = state.currentSessionId || projection?.sessionId || null;
+      const projection = state.sessions.find(session => session.path === scopedSessionPath);
+      const sessionId = (state.currentSessionPath === scopedSessionPath ? state.currentSessionId : null)
+        || projection?.sessionId
+        || null;
       const agentId = projection?.agentId || state.currentAgentId || null;
-      if (!state.currentSessionPath || !sessionId || !agentId) return false;
-      sessionRef = Object.freeze({ sessionId, sessionPath: state.currentSessionPath, agentId });
+      if (!scopedSessionPath || !sessionId || !agentId) return false;
+      sessionRef = Object.freeze({ sessionId, sessionPath: scopedSessionPath, agentId });
     }
 
     ws.send(JSON.stringify({
@@ -868,7 +908,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       displayMessage: { text: displayText ?? text },
     }));
     return true;
-  }, [inputLocked, pendingDraftId, pendingNewSession, t]);
+  }, [inputLocked, isSideChatScope, pendingDraftId, pendingNewSession, scopedSessionPath, t]);
 
   // ── 斜杠命令 ──
 
@@ -1064,7 +1104,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
               base64Data: uploadPayload.base64Data,
               mimeType: uploadPayload.mimeType,
               ...(waveform ? { waveform } : {}),
-              ...(useStore.getState().currentSessionPath ? { sessionPath: useStore.getState().currentSessionPath } : {}),
+              ...(scopedSessionPath ? { sessionPath: scopedSessionPath } : {}),
             }),
           });
           const data = await res.json();
@@ -1091,7 +1131,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     } finally {
       restoreEditorFocus();
     }
-  }, [addAttachedFile, inputLocked, restoreEditorFocus, t]);
+  }, [addAttachedFile, inputLocked, restoreEditorFocus, scopedSessionPath, t]);
 
   const handleAttach = useCallback(async () => {
     if (inputLocked) return;
@@ -1114,10 +1154,12 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
 
   const ensureVoiceSessionRef = useCallback(async (): Promise<Readonly<SessionRef>> => {
     const state = useStore.getState();
-    const sessionPath = state.currentSessionPath;
+    const sessionPath = scopedSessionPath;
     if (sessionPath) {
       const projection = state.sessions.find(session => session.path === sessionPath);
-      const sessionId = state.currentSessionId || projection?.sessionId || null;
+      const sessionId = (state.currentSessionPath === sessionPath ? state.currentSessionId : null)
+        || projection?.sessionId
+        || null;
       const agentId = projection?.agentId || state.currentAgentId || null;
       if (!sessionId || !agentId) throw new Error('missing session identity');
       return Object.freeze({ sessionId, sessionPath, agentId });
@@ -1127,7 +1169,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     if (!ref) throw new Error('failed to create session');
     loadSessions();
     return ref;
-  }, [pendingDraftId, pendingNewSession]);
+  }, [pendingDraftId, pendingNewSession, scopedSessionPath]);
 
   const sendVoiceAudioAttachment = useCallback(async (file: {
     fileId?: string;
@@ -1604,7 +1646,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
                 name: uploadPayload.name,
                 base64Data: uploadPayload.base64Data,
                 mimeType: uploadPayload.mimeType,
-                ...(useStore.getState().currentSessionPath ? { sessionPath: useStore.getState().currentSessionPath } : {}),
+                ...(scopedSessionPath ? { sessionPath: scopedSessionPath } : {}),
               }),
             });
             const data = await res.json();
@@ -1648,7 +1690,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       return true;
     }
     return false;
-  }, [addAttachedFile, editor, inputLocked, t]);
+  }, [addAttachedFile, editor, inputLocked, scopedSessionPath, t]);
 
   pasteHandlerRef.current = handlePaste;
 
@@ -1667,13 +1709,14 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
         .catch((err: unknown) => console.warn('[InputArea] load thinking level failed', err));
     }
 
+    if (isSideChatScope) return undefined;
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail || {};
       setPermissionMode((detail.mode || (detail.enabled ? 'read_only' : 'operate')) as PermissionMode);
     };
     window.addEventListener('hana-plan-mode', handler);
     return () => window.removeEventListener('hana-plan-mode', handler);
-  }, [activeServerConnection, currentSessionPath, pendingNewSession, setPermissionMode, setThinkingLevel, surface]);
+  }, [activeServerConnection, currentSessionPath, isSideChatScope, pendingNewSession, setPermissionMode, setThinkingLevel, surface]);
 
   // ── Handle slash selection (builtin vs skill) ──
   const handleSlashSelect = useCallback((item: SlashItem) => {
@@ -1775,17 +1818,20 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     const trimmedText = rawText.trim();
     const clickState = useStore.getState();
     const clickedPendingDraftId = clickState.pendingNewSession ? clickState.pendingDraftId : null;
-    const clickedSessionPath = clickState.currentSessionPath;
+    // 点击时快照本输入区归属的会话（侧边面板 = 侧边会话，主聊天页 = 当前会话）。
+    const clickedSessionPath = scopedSessionPath;
     const clickedProjection = clickedSessionPath
       ? clickState.sessions.find(session => session.path === clickedSessionPath)
       : null;
-    const clickedSessionId = clickState.currentSessionId || clickedProjection?.sessionId || null;
+    const clickedSessionId = (clickState.currentSessionPath === clickedSessionPath ? clickState.currentSessionId : null)
+      || clickedProjection?.sessionId
+      || null;
     const clickedAgentId = clickedProjection?.agentId || clickState.currentAgentId || null;
     const clickedSessionRef: Readonly<SessionRef> | null = clickedSessionPath && clickedSessionId && clickedAgentId
       ? Object.freeze({ sessionId: clickedSessionId, sessionPath: clickedSessionPath, agentId: clickedAgentId })
       : null;
     const clickedAttachedFiles = attachedFiles.map(file => ({ ...file }));
-    const clickedQuotes = clickState.quotedSelections.map(quote => ({ ...quote }));
+    const clickedQuotes = quotedSelections.map(quote => ({ ...quote }));
     // 知识库引用在点击发送时快照（引用持续生效，每条消息显式携带；服务端无状态）
     const clickedKnowledgeRefKey = clickedSessionPath ?? (clickedPendingDraftId ? HOME_DRAFT_KEY : null);
     const selectedKnowledgeRefs = clickedKnowledgeRefKey
@@ -1877,14 +1923,18 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       // 内容已安全入队：立即清空输入区（草稿/附件/文档/引用随队清空），
       // 用户可以继续输入下一条排队消息。
       const afterEnqueue = useStore.getState();
-      const stillOwnsComposerAfterEnqueue = afterEnqueue.currentSessionId === sessionRef.sessionId
-        && afterEnqueue.currentSessionPath === queuedPath;
+      // 归属判据保持既有严格性（会话身份 + 路径同时匹配）；侧边面板另有自己的
+      // 归属权威（面板绑定的会话），主会话身份变化不影响它。
+      const stillOwnsComposerAfterEnqueue = isSideChatScope
+        ? afterEnqueue.sideChat.sessionPath === queuedPath
+        : (afterEnqueue.currentSessionId === sessionRef.sessionId
+          && afterEnqueue.currentSessionPath === queuedPath);
       if (stillOwnsComposerAfterEnqueue) {
         editor.commands.clearContent();
         clearDraft(queuedPath);
         clearAttachedFilesForSession(queuedPath);
-        if (clickedDocContextAttached) setDocContextAttached(false);
-        if (clickedQuotes.length > 0) useStore.getState().clearQuotedSelections();
+        if (clickedDocContextAttached) setDocContextAttachedForSession(queuedPath, false);
+        if (clickedQuotes.length > 0) useStore.getState().clearQuotedSelectionsForSession(queuedPath);
       }
     };
 
@@ -1913,8 +1963,8 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     if (modelSwitching) return;
     if (useStore.getState().pendingSessionSwitchPath) return;
     const guardState = useStore.getState();
-    const guardModel = guardState.currentSessionPath
-      ? sessionScopedValue(guardState, guardState.sessionModelsByPath, guardState.currentSessionPath)
+    const guardModel = clickedSessionPath
+      ? sessionScopedValue(guardState, guardState.sessionModelsByPath, clickedSessionPath)
       : undefined;
     if (guardModel?.available === false) {
       guardState.addToast(
@@ -1930,7 +1980,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
       // 可用 runtime，发消息会冷建第二个 runtime 与压缩后的 reload 竞争（#1624 I2）。
       // Enter 发送不走 canSend，必须在提交路径同样拦截；按 keyed 状态现读现查。
       const guardState = useStore.getState();
-      const guardPath = guardState.currentSessionPath;
+      const guardPath = clickedSessionPath;
       if (guardPath && (
         sessionScopedListIncludes(guardState, guardState.capabilityRefreshingSessions, guardPath)
         || isSessionCompacting(guardState, guardPath)
@@ -2040,10 +2090,10 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
           const stillOwnsPendingComposer = !!clickedPendingDraftId
             && state.pendingNewSession === true
             && state.pendingDraftId === clickedPendingDraftId;
-          const stillOwnsComposer = stillOwnsPendingComposer || (
-            state.currentSessionId === finalRef.sessionId
-            && state.currentSessionPath === finalRef.sessionPath
-          );
+          const stillOwnsComposer = stillOwnsPendingComposer || (isSideChatScope
+            ? state.sideChat.sessionPath === finalRef.sessionPath
+            : (state.currentSessionId === finalRef.sessionId
+              && state.currentSessionPath === finalRef.sessionPath));
           clearDraft(finalRef.sessionPath);
           clearAttachedFilesForSession(finalRef.sessionPath);
           if (clickedPendingDraftId && state.pendingDraftId === clickedPendingDraftId) {
@@ -2052,23 +2102,23 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
           if (stillOwnsComposer) {
             editor.commands.clearContent();
             if (stillOwnsPendingComposer) clearAttachedFiles();
-            if (clickedDocContextAttached) setDocContextAttached(false);
-            if (clickedQuotes.length > 0) useStore.getState().clearQuotedSelections();
+            if (clickedDocContextAttached) setDocContextAttachedForSession(finalRef.sessionPath, false);
+            if (clickedQuotes.length > 0) useStore.getState().clearQuotedSelectionsForSession(finalRef.sessionPath);
           }
         },
       });
     } finally {
       setSending(false);
     }
-  }, [addToast, editor, inputLocked, attachedFiles, docContextAttached, connected, effectiveStreaming, isStreaming, currentDoc, clearAttachedFiles, clearAttachedFilesForSession, clearDraft, setDocContextAttached, slashCommands, slashSelected, handleSlashSelect, modelSwitching, loadVisionAuxiliaryConfig, t]);
+  }, [addToast, editor, inputLocked, attachedFiles, docContextAttached, connected, effectiveStreaming, isSideChatScope, isStreaming, currentDoc, clearAttachedFiles, clearAttachedFilesForSession, clearDraft, quotedSelections, scopedSessionPath, setDocContextAttachedForSession, slashCommands, slashSelected, handleSlashSelect, modelSwitching, loadVisionAuxiliaryConfig, t]);
 
   const handleSend = useCallback(async () => {
     await submitEditorMessage('prompt');
   }, [submitEditorMessage]);
 
   // ── 排队消息（流式期间发送的输入）：自动续发 / 立即插入 / 编辑 / 删除 ──
-  const queuedTurnInputs = useStore(s => (s.currentSessionPath
-    ? sessionScopedValue(s, s.queuedTurnInputsByPath, s.currentSessionPath)
+  const queuedTurnInputs = useStore(s => (scopedSessionPath
+    ? sessionScopedValue(s, s.queuedTurnInputsByPath, scopedSessionPath)
     : undefined)) || EMPTY_QUEUED_TURN_INPUTS;
   const [editingQueuedId, setEditingQueuedId] = useState<string | null>(null);
   const [editQueuedText, setEditQueuedText] = useState('');
@@ -2099,17 +2149,18 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
   // 互斥、串行与失败原位保留由 composer-send-coordinator 持有——不随组件
   // 卸载/重挂载丢失，也不再「先移除队首再异步派发」（F2）。
   useEffect(() => {
-    if (!currentSessionPath || currentTab !== 'chat') return;
+    if (!currentSessionPath) return;
+    if (!isSideChatScope && currentTab !== 'chat') return;
     if (effectiveStreaming || modelSwitching || !connected) return;
     if (capabilityRefreshing || compactingStatus) return;
-    if (pendingSessionSwitchPath) return;
+    if (!isSideChatScope && pendingSessionSwitchPath) return;
     if (queuedTurnInputs.length === 0) return;
     flushScopeRef.current = requestQueueFlush(currentSessionPath, {
       loadVisionAuxiliaryConfig,
       t,
       shouldSkipItem: (item) => item.editing === true,
     }, flushOwner.current);
-  }, [activeServerConnection, currentTab, capabilityRefreshing, compactingStatus, connected, currentSessionPath, editingQueuedId, effectiveStreaming, loadVisionAuxiliaryConfig, modelSwitching, pendingSessionSwitchPath, queuedTurnInputs, t]);
+  }, [activeServerConnection, currentTab, capabilityRefreshing, compactingStatus, connected, currentSessionPath, editingQueuedId, effectiveStreaming, isSideChatScope, loadVisionAuxiliaryConfig, modelSwitching, pendingSessionSwitchPath, queuedTurnInputs, t]);
 
   const handleQueuedInsertNow = useCallback((item: QueuedTurnInput) => {
     const store = useStore.getState();
@@ -2182,13 +2233,15 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
     const ws = getWebSocket();
     if (!effectiveStreaming || !ws) return;
     const state = useStore.getState();
-    const path = state.currentSessionPath;
-    const sessionId = state.currentSessionId;
+    const path = currentSessionPath;
+    const sessionId = (state.currentSessionPath === path ? state.currentSessionId : null)
+      || state.sessions.find(session => session.path === path)?.sessionId
+      || null;
     const active = path ? sessionScopedValue(state, state.activeSessionStreams, path) : null;
     const request = createStopRequest({ sessionId, sessionPath: path, streamId: active?.streamId });
     if (!request) return;
     ws.send(JSON.stringify(request));
-  }, [effectiveStreaming]);
+  }, [currentSessionPath, effectiveStreaming]);
 
   // ── Key handler ──
   const handleEditorKeyDown = useCallback((e: InputKeyEvent): boolean => {
@@ -2469,6 +2522,7 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
             ))}
           </div>
         )}
+        <TodoPanel />
         <div className={styles['input-wrapper']} ref={inputCardRef}>
           <input
             ref={browserFileInputRef}
@@ -2557,6 +2611,12 @@ function InputAreaInner({ surface }: Required<InputAreaProps>) {
         <ComposerToolbar
           t={t}
           onNewSession={handleNewSession}
+          sideChatScope={isSideChatScope}
+          sessionPath={scopedSessionPath}
+          showMemoryToggle={showMemoryToggle}
+          memoryEnabled={memoryEnabled}
+          onMemoryChange={setMemoryEnabled}
+          sessionModelScopePath={isSideChatScope ? scopedSessionPath : undefined}
           onAttach={handleAttach}
           slashBtnRef={slashBtnRef}
           onSlashToggle={handleSlashToggle}

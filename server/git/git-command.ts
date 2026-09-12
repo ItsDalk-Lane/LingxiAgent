@@ -19,6 +19,8 @@ const execFileAsync = promisify(execFile);
 
 const DEFAULT_TIMEOUT_MS = 15_000;
 const PUSH_TIMEOUT_MS = 120_000;
+/** worktree add 要检出整棵树，给与 push 同级的宽限 */
+const WORKTREE_TIMEOUT_MS = 120_000;
 const MAX_BUFFER = 16 * 1024 * 1024;
 /** 空树对象哈希：git diff --cached 在零提交仓库里的对照基线 */
 const EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
@@ -558,6 +560,373 @@ export async function pushChanges(dir: string): Promise<GitPushResult> {
 
 function firstStderrLines(stderr: string, maxLines = 4): string {
   return stderr.split("\n").map(s => s.trim()).filter(Boolean).slice(0, maxLines).join("\n");
+}
+
+// ────────────────────────── 分支创建 / 暂存 / 工作树 ──────────────────────────
+
+export type GitCreateBranchCode = "invalid_name" | "invalid_base" | "already_exists" | "branch_failed";
+
+export interface GitCreateBranchResult {
+  ok: boolean;
+  code?: GitCreateBranchCode;
+  branch?: string;
+  message?: string;
+}
+
+/**
+ * 新建分支并检出：等价 `git checkout -b <name> [<base>]`，base 缺省为当前 HEAD。
+ * 与 checkoutBranch 同为「操作」语义：结构化返回预期失败，只有 git 之外
+ * 的意外才抛错。
+ */
+export async function createBranch(
+  dir: string,
+  name: string,
+  base?: string | null,
+): Promise<GitCreateBranchResult> {
+  const branch = typeof name === "string" ? name.trim() : "";
+  if (!isValidBranchName(branch)) return { ok: false, code: "invalid_name" };
+
+  const existing = await tryGit(dir, ["rev-parse", "--verify", "--quiet", `refs/heads/${branch}`]);
+  if (existing.ok) return { ok: false, code: "already_exists", branch };
+
+  const args = ["checkout", "-b", branch];
+  const start = typeof base === "string" ? base.trim() : "";
+  if (start) {
+    if (!isValidBranchName(start)) return { ok: false, code: "invalid_base", branch };
+    const verify = await tryGit(dir, ["rev-parse", "--verify", "--quiet", `${start}^{commit}`]);
+    if (!verify.ok) return { ok: false, code: "invalid_base", branch };
+    args.push(start);
+  }
+
+  const result = await tryGit(dir, args);
+  if (!result.ok) {
+    return { ok: false, code: "branch_failed", branch, message: firstStderrLines(result.stderr) };
+  }
+  return { ok: true, branch };
+}
+
+export interface GitStashResult {
+  ok: boolean;
+  code?: "nothing_to_stash" | "stash_failed" | "invalid_path";
+  message?: string;
+  /** 有 pathspec 时实际收进储藏的路径 */
+  paths?: string[];
+}
+
+/**
+ * 路径来自 `git status` 输出（仓库根相对），但客户端可传任意串，所以：
+ *   - `top`    ：按仓库根解释路径，子目录工作台也和在根目录一样
+ *   - `literal`：关掉 glob/attr magic，避免 `*` / `:(glob)` 之类放大匹配面
+ */
+function topLiteralPathspec(rel: string): string {
+  return `:(top,literal)${rel}`;
+}
+
+/** `null` = 不带 pathspec（整仓）；非法路径与空数组分别返回 invalid / null */
+function normalizePathList(raw: unknown): { paths: string[] | null; invalid: boolean } {
+  if (!Array.isArray(raw) || raw.length === 0) return { paths: null, invalid: false };
+  const paths: string[] = [];
+  for (const item of raw) {
+    if (typeof item !== "string" || !isSafeRelPath(item)) return { paths: null, invalid: true };
+    if (!paths.includes(item)) paths.push(item);
+  }
+  return { paths, invalid: false };
+}
+
+/**
+ * 暂存当前修改（含未跟踪文件）：`git stash push --include-untracked [-m <message>] [-- <paths>]`。
+ * paths 缺省 = 整个工作树；给了 paths 就只收这些路径（单个文件暂存）。
+ * 干净工作树先探测后返回结构化 code，不把 git 的 "No local changes to save" 当成成功。
+ */
+export async function stashChanges(
+  dir: string,
+  message?: string | null,
+  paths?: string[] | null,
+): Promise<GitStashResult> {
+  const { paths: wanted, invalid } = normalizePathList(paths);
+  if (invalid) return { ok: false, code: "invalid_path" };
+  const trimmed = typeof message === "string" ? message.trim() : "";
+  const spec = wanted ? wanted.map(topLiteralPathspec) : null;
+
+  const dirty = await tryGit(dir, [
+    "status", "--porcelain",
+    ...(spec ? ["--", ...spec] : []),
+  ]);
+  if (dirty.ok && !dirty.stdout.trim()) return { ok: false, code: "nothing_to_stash" };
+
+  const args = ["stash", "push", "--include-untracked"];
+  if (trimmed) args.push("-m", trimmed);
+  if (spec) args.push("--", ...spec);
+  const result = await tryGit(dir, args);
+  if (!result.ok) {
+    return { ok: false, code: "stash_failed", message: firstStderrLines(result.stderr) };
+  }
+  if (/No local changes to save/i.test(result.stdout)) return { ok: false, code: "nothing_to_stash" };
+  return wanted ? { ok: true, paths: wanted } : { ok: true };
+}
+
+export interface GitStashEntry {
+  ref: string;
+  /** reflog 主题，如 "On main: wip demo" */
+  message: string;
+  /** 改动涉及的已跟踪路径（仓库根相对） */
+  tracked: string[];
+  /** 随储藏一起收进去的未跟踪路径 */
+  untracked: string[];
+}
+
+/** 一条储藏覆盖的改动路径：已跟踪部分（stash show）+ 未跟踪部分（第三个父提交） */
+async function stashChangedPaths(dir: string, ref: string): Promise<{ tracked: string[]; untracked: string[] }> {
+  const [tracked, untracked] = await Promise.all([
+    tryGit(dir, ["stash", "show", "--name-only", "--no-renames", ref]),
+    tryGit(dir, ["ls-tree", "-r", "--full-tree", "--name-only", "-z", `${ref}^3`]),
+  ]);
+  const lines = (out: string, sep: string) => out.split(sep).map(s => s.trim()).filter(Boolean);
+  return {
+    tracked: tracked.ok ? lines(tracked.stdout, "\n") : [],
+    untracked: untracked.ok ? lines(untracked.stdout, "\0") : [],
+  };
+}
+
+export interface GitStashListResult {
+  isRepo: boolean;
+  stashes: GitStashEntry[];
+}
+
+/** 储藏栈（新→旧）。limit 限制条数：每条要走 git 取路径，别让卡片刷新拖垮 */
+export async function listStashes(dir: string, limit = 20): Promise<GitStashListResult> {
+  if (!(await isGitWorkTree(dir))) return { isRepo: false, stashes: [] };
+  const list = await tryGit(dir, ["stash", "list", "--format=%gd%x00%gs"]);
+  if (!list.ok) return { isRepo: true, stashes: [] };
+
+  const entries: GitStashEntry[] = [];
+  for (const line of list.stdout.split("\n").map(s => s.trim()).filter(Boolean).slice(0, limit)) {
+    const [ref, ...rest] = line.split("\0");
+    if (!ref) continue;
+    const { tracked, untracked } = await stashChangedPaths(dir, ref);
+    entries.push({ ref, message: rest.join("\0"), tracked, untracked });
+  }
+  return { isRepo: true, stashes: entries };
+}
+
+export type GitUnstashCode = "invalid_path" | "no_stash" | "not_in_stash" | "path_dirty"
+  | "unstash_conflict" | "unstash_failed";
+
+export interface GitUnstashResult {
+  ok: boolean;
+  code?: GitUnstashCode;
+  message?: string;
+  path?: string;
+  /** 命中的储藏条目（单个取出时） */
+  stash?: string;
+}
+
+/**
+ * 把单个文件从储藏里取回工作区：从新到旧找第一条含该路径的储藏，用它那份内容
+ * 覆盖工作区（只动 worktree，不动暂存区）。
+ * 路径当前已有改动时拒绝——整文件覆盖不能静默吃掉用户的现行修改。
+ * 只取单文件不会改动储藏条目本身，整条弹出时仍会带出它。
+ */
+export async function restoreStashedPath(dir: string, relPath: string): Promise<GitUnstashResult> {
+  if (!isSafeRelPath(relPath)) return { ok: false, code: "invalid_path" };
+  const spec = topLiteralPathspec(relPath);
+
+  const dirty = await tryGit(dir, ["status", "--porcelain", "--", spec]);
+  if (dirty.ok && dirty.stdout.trim()) return { ok: false, code: "path_dirty", path: relPath };
+
+  const list = await tryGit(dir, ["stash", "list", "--format=%gd"]);
+  const refs = list.ok ? list.stdout.split("\n").map(s => s.trim()).filter(Boolean) : [];
+  if (refs.length === 0) return { ok: false, code: "no_stash", path: relPath };
+
+  for (const ref of refs) {
+    const { tracked, untracked } = await stashChangedPaths(dir, ref);
+    const fromUntracked = !tracked.includes(relPath) && untracked.includes(relPath);
+    if (!tracked.includes(relPath) && !fromUntracked) continue;
+
+    const source = fromUntracked ? `${ref}^3` : ref;
+    const restored = await tryGit(dir, ["restore", "--source", source, "--worktree", "--", spec]);
+    if (!restored.ok) {
+      return {
+        ok: false, code: "unstash_failed", path: relPath, stash: ref,
+        message: firstStderrLines(restored.stderr),
+      };
+    }
+    return { ok: true, path: relPath, stash: ref };
+  }
+  return { ok: false, code: "not_in_stash", path: relPath };
+}
+
+/** 弹出最新一条储藏（全部文件）。冲突时储藏条目保留，原样把 git 的提示带出去 */
+export async function popStash(dir: string): Promise<GitUnstashResult> {
+  const list = await tryGit(dir, ["stash", "list", "--format=%gd"]);
+  if (!list.ok || !list.stdout.trim()) return { ok: false, code: "no_stash" };
+
+  const result = await tryGit(dir, ["stash", "pop"]);
+  if (!result.ok) {
+    const detail = `${result.stdout}\n${result.stderr}`;
+    return {
+      ok: false,
+      code: /conflict/i.test(detail) ? "unstash_conflict" : "unstash_failed",
+      message: firstStderrLines(result.stderr || result.stdout),
+    };
+  }
+  return { ok: true };
+}
+
+export type GitDiscardCode = "invalid_path" | "nothing_to_discard" | "discard_failed";
+
+export interface GitDiscardResult {
+  ok: boolean;
+  code?: GitDiscardCode;
+  message?: string;
+  paths?: string[];
+}
+
+/**
+ * 回退未提交修改：把已跟踪文件恢复成 HEAD 内容，暂存区与工作区一起回。
+ * paths 缺省 = 整个仓库（:/，子目录工作台也覆盖全仓）。未跟踪文件不参与，
+ * 避免「一键回退」把新文件删掉。
+ */
+export async function discardPaths(dir: string, paths?: string[] | null): Promise<GitDiscardResult> {
+  const { paths: wanted, invalid } = normalizePathList(paths);
+  if (invalid) return { ok: false, code: "invalid_path" };
+  const spec = wanted ? wanted.map(topLiteralPathspec) : [":/"];
+
+  // 零提交仓库拿空树当基线（与 cachedNumstat 同款兜底）
+  const head = await tryGit(dir, ["rev-parse", "--verify", "--quiet", "HEAD^{commit}"]);
+  const source = head.ok ? "HEAD" : EMPTY_TREE;
+
+  const diffBase = source === "HEAD" ? ["HEAD"] : [EMPTY_TREE];
+  const [unstaged, staged] = await Promise.all([
+    tryGit(dir, ["-c", "core.quotepath=false", "diff", "--name-only", ...diffBase, "--", ...spec]),
+    tryGit(dir, ["-c", "core.quotepath=false", "diff", "--cached", "--name-only", ...diffBase, "--", ...spec]),
+  ]);
+  if (!unstaged.stdout.trim() && !staged.stdout.trim()) {
+    return { ok: false, code: "nothing_to_discard", paths: wanted ?? [] };
+  }
+
+  const result = await tryGit(dir, ["restore", "--source", source, "--staged", "--worktree", "--", ...spec]);
+  if (!result.ok) {
+    return { ok: false, code: "discard_failed", message: firstStderrLines(result.stderr), paths: wanted ?? [] };
+  }
+  return { ok: true, paths: wanted ?? [] };
+}
+
+export interface GitWorktreeListEntry extends WorktreeEntry {
+  /** `git worktree list` 的首块永远是被检出仓库的主工作树 */
+  isMain: boolean;
+  /** 该条目就是 dir 所在的工作树 */
+  current: boolean;
+}
+
+export interface GitWorktreeListResult {
+  isRepo: boolean;
+  worktrees: GitWorktreeListEntry[];
+  /** 新建 worktree 的落地根：主工作树的父级 + /worktrees */
+  root: string | null;
+  mainPath: string | null;
+}
+
+/** worktree 落地根目录约定：<主工作树父级>/worktrees */
+export function worktreesRootFor(mainWorktreePath: string): string {
+  return path.join(path.dirname(mainWorktreePath), "worktrees");
+}
+
+export async function listWorktrees(dir: string): Promise<GitWorktreeListResult> {
+  if (!(await isGitWorkTree(dir))) {
+    return { isRepo: false, worktrees: [], root: null, mainPath: null };
+  }
+  const top = await tryGit(dir, ["rev-parse", "--show-toplevel"]);
+  const selfPath = top.ok ? top.stdout.trim() : dir;
+  const list = await tryGit(dir, ["worktree", "list", "--porcelain"]);
+  if (!list.ok) return { isRepo: true, worktrees: [], root: null, mainPath: null };
+
+  const entries = parseWorktreePorcelain(list.stdout);
+  const resolvedSelf = realPath(selfPath) || selfPath;
+  const main = entries[0] ?? null;
+  return {
+    isRepo: true,
+    worktrees: entries.map((entry, index) => ({
+      ...entry,
+      isMain: index === 0,
+      current: (realPath(entry.path) || entry.path) === resolvedSelf,
+    })),
+    root: main ? worktreesRootFor(main.path) : null,
+    mainPath: main?.path ?? null,
+  };
+}
+
+export type GitWorktreeCreateCode = "invalid_name" | "exists" | "branch_exists" | "invalid_base" | "create_failed";
+
+export interface GitWorktreeCreateResult {
+  ok: boolean;
+  code?: GitWorktreeCreateCode;
+  path?: string;
+  branch?: string;
+  message?: string;
+}
+
+/**
+ * worktree 目录名准入：只允许字母数字开头、后随字母数字与 . _ -。
+ * 目录名同时用来拼 `wt/<name>` 分支名，所以这里比 isValidBranchName 更严：
+ * 任何路径分隔符、前导点、空白都在此拦下。
+ */
+export function isValidWorktreeName(name: string): boolean {
+  return typeof name === "string"
+    && /^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(name)
+    && name !== "."
+    && name !== "..";
+}
+
+/**
+ * 在 <主工作树父级>/worktrees/<name> 建一个隔离工作树，携带新分支 wt/<name>。
+ * 目标目录或 wt/<name> 已存在时结构化拒绝（不覆盖、不复用），保证调用方
+ * 拿到的一定是「这个名称新开出来的」工作树。
+ */
+export async function createWorktree(
+  dir: string,
+  name: string,
+  base?: string | null,
+): Promise<GitWorktreeCreateResult> {
+  const raw = typeof name === "string" ? name.trim() : "";
+  if (!isValidWorktreeName(raw)) return { ok: false, code: "invalid_name" };
+
+  const list = await listWorktrees(dir);
+  if (!list.isRepo || !list.root || !list.mainPath) return { ok: false, code: "create_failed" };
+
+  const targetPath = path.join(list.root, raw);
+  const branch = `wt/${raw}`;
+  if (fs.existsSync(targetPath)) return { ok: false, code: "exists", path: targetPath, branch };
+
+  const branchExists = await tryGit(dir, ["rev-parse", "--verify", "--quiet", `refs/heads/${branch}`]);
+  if (branchExists.ok) return { ok: false, code: "branch_exists", path: targetPath, branch };
+
+  const args = ["worktree", "add", "-b", branch, targetPath];
+  const start = typeof base === "string" ? base.trim() : "";
+  if (start) {
+    if (!isValidBranchName(start)) return { ok: false, code: "invalid_base", branch };
+    const verify = await tryGit(dir, ["rev-parse", "--verify", "--quiet", `${start}^{commit}`]);
+    if (!verify.ok) return { ok: false, code: "invalid_base", branch };
+    args.push(start);
+  }
+
+  try {
+    fs.mkdirSync(list.root, { recursive: true });
+  } catch {
+    // 建目录失败就交给 git worktree add 报错，保持单一失败来源
+  }
+
+  const result = await tryGit(dir, args, WORKTREE_TIMEOUT_MS);
+  if (!result.ok) {
+    return {
+      ok: false,
+      code: "create_failed",
+      path: targetPath,
+      branch,
+      message: firstStderrLines(result.stderr),
+    };
+  }
+  return { ok: true, path: targetPath, branch };
 }
 
 // ────────────────────────── 提交历史 ──────────────────────────

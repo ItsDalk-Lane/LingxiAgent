@@ -5,10 +5,14 @@ import os from "os";
 import path from "path";
 import { upsertStudioMount } from "../core/studio-mounts.ts";
 import { normalizeWorkspacePath } from "../shared/workspace-history.ts";
+import { WorkspaceSnapshotService } from "../core/workspace-snapshots.ts";
 
-const { replayLatestUserTurnMock, retrySessionTurnMock } = vi.hoisted(() => ({
+const { replayLatestUserTurnMock, retrySessionTurnMock, resolveSessionNodeTargetMock } = vi.hoisted(() => ({
   replayLatestUserTurnMock: vi.fn(async () => ({ text: null, toolMedia: [] })),
   retrySessionTurnMock: vi.fn(async () => ({ text: null, toolMedia: [] })),
+  resolveSessionNodeTargetMock: vi.fn((_branch: any, target: any) => ({
+    turnInputEntry: { id: target?.turnInputEntryId || target?.entryId || null },
+  })),
 }));
 
 const browserManagerMock = {
@@ -71,6 +75,7 @@ vi.mock("../core/message-utils.js", async (importOriginal) => ({
 vi.mock("../core/session-turn-actions.js", () => ({
   replayLatestUserTurn: replayLatestUserTurnMock,
   retrySessionTurn: retrySessionTurnMock,
+  resolveSessionNodeTarget: resolveSessionNodeTargetMock,
 }));
 
 describe("sessions route", () => {
@@ -746,6 +751,62 @@ describe("sessions route", () => {
       authorizedFolders: [authorizedFolder],
       sandboxFolders: [cwd, authorizedFolder],
     });
+  });
+
+  it("reads and writes the per-session memory switch for any existing session", async () => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const app = new Hono();
+    const sessionPath = path.join(tmpDir, "agents", "hana", "sessions", "side.jsonl");
+    fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
+    fs.writeFileSync(sessionPath, "{}\n");
+    const engine = {
+      agentsDir: path.join(tmpDir, "agents"),
+      agentIdFromSessionPath: vi.fn(() => "hana"),
+      isAgentDeleted: vi.fn(() => false),
+      currentSessionPath: null,
+      getSessionMemoryEnabled: vi.fn(() => true),
+      setSessionMemoryEnabled: vi.fn(async (_path: string, enabled: boolean) => ({ ok: true, memoryEnabled: enabled })),
+    };
+
+    app.route("/api", createSessionsRoute(engine));
+
+    const read = await app.request(`/api/sessions/memory?path=${encodeURIComponent(sessionPath)}`);
+    expect(read.status).toBe(200);
+    expect(await read.json()).toMatchObject({ ok: true, sessionPath, memoryEnabled: true });
+
+    const write = await app.request("/api/sessions/memory", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: sessionPath, memoryEnabled: false }),
+    });
+    expect(write.status).toBe(200);
+    expect(engine.setSessionMemoryEnabled).toHaveBeenCalledWith(sessionPath, false);
+    expect(await write.json()).toMatchObject({ ok: true, sessionPath, memoryEnabled: false });
+  });
+
+  it("rejects a session memory write without an explicit boolean", async () => {
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    const app = new Hono();
+    const sessionPath = path.join(tmpDir, "agents", "hana", "sessions", "side.jsonl");
+    fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
+    fs.writeFileSync(sessionPath, "{}\n");
+    const engine = {
+      agentsDir: path.join(tmpDir, "agents"),
+      agentIdFromSessionPath: vi.fn(() => "hana"),
+      isAgentDeleted: vi.fn(() => false),
+      getSessionMemoryEnabled: vi.fn(() => true),
+      setSessionMemoryEnabled: vi.fn(async () => ({ ok: true, memoryEnabled: true })),
+    };
+
+    app.route("/api", createSessionsRoute(engine));
+
+    const res = await app.request("/api/sessions/memory", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: sessionPath }),
+    });
+    expect(res.status).toBe(400);
+    expect(engine.setSessionMemoryEnabled).not.toHaveBeenCalled();
   });
 
   it("assigns a new session to the requested project before broadcasting it", async () => {
@@ -1540,6 +1601,199 @@ describe("sessions route", () => {
     expect(retrySessionTurnMock).not.toHaveBeenCalled();
   });
 
+  describe("file rollback（回退时撤销文件改动）", () => {
+    function rollbackEngine(overrides: any = {}) {
+      const sessionPath = path.join(tmpDir, "agents", "hana", "sessions", "rollback.jsonl");
+      fs.mkdirSync(path.dirname(sessionPath), { recursive: true });
+      fs.writeFileSync(sessionPath, "x\n");
+      const engine = {
+        agentsDir: path.join(tmpDir, "agents"),
+        getSessionManifest: vi.fn(() => ({
+          sessionId: "sess_rollback",
+          lifecycle: "active",
+          currentLocator: { path: sessionPath },
+        })),
+        isSessionStreaming: vi.fn(() => false),
+        preferences: { getRollbackFileChanges: () => false },
+        ...overrides,
+      };
+      return { engine, sessionPath };
+    }
+
+    function retryPayload(sessionPath: string, extra: Record<string, unknown> = {}) {
+      return {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: "sess_rollback",
+          sessionPath,
+          target: { role: "user", entryId: "entry-u1" },
+          ...extra,
+        }),
+      };
+    }
+
+    it("开关关闭时 fileRollback=workspace 显式 403，不静默降级", async () => {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const app = new Hono();
+      const { engine, sessionPath } = rollbackEngine();
+      app.route("/api", createSessionsRoute(engine));
+
+      const res = await app.request("/api/sessions/turns/retry", retryPayload(sessionPath, { fileRollback: "workspace" }));
+
+      expect(res.status).toBe(403);
+      await expect(res.json()).resolves.toMatchObject({ code: "file_rollback_disabled" });
+      expect(retrySessionTurnMock).not.toHaveBeenCalled();
+    });
+
+    it("默认 fileRollback=none 与现状一致：不透传该字段", async () => {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const app = new Hono();
+      const { engine, sessionPath } = rollbackEngine({
+        preferences: { getRollbackFileChanges: () => true },
+      });
+      app.route("/api", createSessionsRoute(engine));
+
+      const res = await app.request("/api/sessions/turns/retry", retryPayload(sessionPath));
+
+      expect(res.status).toBe(200);
+      expect(retrySessionTurnMock).toHaveBeenCalledWith(engine, expect.not.objectContaining({ fileRollback: expect.anything() }));
+    });
+
+    it("开关开启时 fileRollback=workspace 透传，逐文件报告随响应返回", async () => {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const app = new Hono();
+      const { engine, sessionPath } = rollbackEngine({
+        preferences: { getRollbackFileChanges: () => true },
+      });
+      const report = {
+        ok: false,
+        reason: "partial_failure",
+        degraded: false,
+        commit: "abc123",
+        turnInputEntryId: "entry-u1",
+        files: [
+          { path: "a.txt", change: "modified", action: "restored", source: "snapshot", ok: true },
+          { path: "b.txt", change: "added", action: "failed", source: "snapshot", ok: false, reason: "permission denied" },
+        ],
+        failures: [{ path: "b.txt", change: "added", action: "failed", source: "snapshot", ok: false, reason: "permission denied" }],
+      };
+      retrySessionTurnMock.mockResolvedValueOnce({ text: null, toolMedia: [], fileRollbackReport: report } as any);
+      app.route("/api", createSessionsRoute(engine));
+
+      const res = await app.request("/api/sessions/turns/retry", retryPayload(sessionPath, { fileRollback: "workspace" }));
+
+      expect(res.status).toBe(200);
+      expect(retrySessionTurnMock).toHaveBeenCalledWith(engine, expect.objectContaining({
+        sessionId: "sess_rollback",
+        sessionPath,
+        fileRollback: "workspace",
+      }));
+      const body = await res.json();
+      expect(body.fileRollbackReport).toEqual(report);
+    });
+
+    it("非法 fileRollback 值显式 400", async () => {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const app = new Hono();
+      const { engine, sessionPath } = rollbackEngine({ preferences: { getRollbackFileChanges: () => true } });
+      app.route("/api", createSessionsRoute(engine));
+
+      const res = await app.request("/api/sessions/turns/retry", retryPayload(sessionPath, { fileRollback: "everything" }));
+
+      expect(res.status).toBe(400);
+      await expect(res.json()).resolves.toMatchObject({ code: "invalid_file_rollback" });
+      expect(retrySessionTurnMock).not.toHaveBeenCalled();
+    });
+
+    it("GET/PUT 开关：默认关闭，写入后读回落盘值", async () => {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const app = new Hono();
+      let enabled = false;
+      const engine = {
+        agentsDir: path.join(tmpDir, "agents"),
+        preferences: {
+          getRollbackFileChanges: () => enabled,
+          setRollbackFileChanges: (next: boolean) => { enabled = next; return enabled; },
+        },
+      };
+      app.route("/api", createSessionsRoute(engine));
+
+      const readInitial = await app.request("/api/sessions/workspace-rollback");
+      expect(readInitial.status).toBe(200);
+      await expect(readInitial.json()).resolves.toEqual({ enabled: false });
+
+      const write = await app.request("/api/sessions/workspace-rollback", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: true }),
+      });
+      expect(write.status).toBe(200);
+      await expect(write.json()).resolves.toEqual({ ok: true, enabled: true });
+
+      const badBody = await app.request("/api/sessions/workspace-rollback", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: "yes" }),
+      });
+      expect(badBody.status).toBe(400);
+    });
+
+    it("关闭时预览显式不可用（置灰原因），不做会话加载", async () => {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const app = new Hono();
+      const ensureSessionLoaded = vi.fn();
+      const { engine, sessionPath } = rollbackEngine({ ensureSessionLoaded });
+      app.route("/api", createSessionsRoute(engine));
+
+      const res = await app.request("/api/sessions/turns/rollback-preview", retryPayload(sessionPath));
+
+      expect(res.status).toBe(200);
+      await expect(res.json()).resolves.toMatchObject({
+        enabled: false,
+        available: false,
+        reason: "file_rollback_disabled",
+        fileCount: 0,
+      });
+      expect(ensureSessionLoaded).not.toHaveBeenCalled();
+    });
+
+    it("开启且有检查点时预览给出影响文件数", async () => {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const app = new Hono();
+      const { engine, sessionPath } = rollbackEngine({
+        preferences: { getRollbackFileChanges: () => true },
+      });
+      const lingxiHome = path.join(tmpDir, "lingxi");
+      const workspace = path.join(tmpDir, "workspace");
+      fs.mkdirSync(workspace, { recursive: true });
+      fs.writeFileSync(path.join(workspace, "preview.txt"), "v1\n");
+      const service = new WorkspaceSnapshotService({ lingxiHome });
+      await service.captureTurn({ sessionPath, workspaceRoot: workspace, turnInputEntryId: "entry-u1" });
+      fs.writeFileSync(path.join(workspace, "preview.txt"), "v2\n");
+      fs.writeFileSync(path.join(workspace, "added.txt"), "new\n");
+
+      Object.assign(engine, {
+        lingxiHome,
+        ensureSessionLoaded: vi.fn(async () => ({ sessionManager: { getBranch: () => [] } })),
+        resolveSessionOwnership: vi.fn(() => ({ agentId: "hana" })),
+        getHomeCwd: vi.fn(() => workspace),
+      });
+      app.route("/api", createSessionsRoute(engine));
+
+      const res = await app.request("/api/sessions/turns/rollback-preview", retryPayload(sessionPath));
+
+      expect(res.status).toBe(200);
+      await expect(res.json()).resolves.toMatchObject({
+        enabled: true,
+        available: true,
+        degraded: false,
+        turnInputEntryId: "entry-u1",
+        fileCount: 2,
+      });
+    });
+  });
+
   it("forks an arbitrary node into a new session and announces the child", async () => {
     const { createSessionsRoute } = await import("../server/routes/sessions.ts");
     const app = new Hono();
@@ -2108,10 +2362,10 @@ describe("sessions route", () => {
     });
   });
 
-  it("marks current todos completed and removed through an explicit session route", async () => {
+  it("marks current todos completed and keeps a finished summary through an explicit session route", async () => {
     const { createSessionsRoute } = await import("../server/routes/sessions.ts");
     const { SessionManager } = await import("../lib/pi-sdk/index.ts");
-    const { loadLatestTodosFromSessionFile, loadLatestTodoSnapshotFromSessionFile } = await import("../lib/tools/todo-compat.ts");
+    const { loadLatestTodosFromSessionFile, loadLatestTodoSnapshotFromSessionFile, computeTodoListVersion } = await import("../lib/tools/todo-compat.ts");
     const { TODO_STATE_CUSTOM_TYPE } = await import("../lib/tools/todo-constants.ts");
     const app = new Hono();
     const agentsDir = path.join(tmpDir, "agents");
@@ -2135,6 +2389,7 @@ describe("sessions route", () => {
       isError: false,
       timestamp: Date.now(),
       details: {
+        todoVersion: 2,
         todos: [
           { content: "read", activeForm: "reading", status: "completed" },
           { content: "write", activeForm: "writing", status: "in_progress" },
@@ -2167,6 +2422,10 @@ describe("sessions route", () => {
 
     app.route("/api", createSessionsRoute(engine));
 
+    const expectedTodos = [
+      { content: "read", activeForm: "reading", status: "completed" },
+      { content: "write", activeForm: "writing", status: "completed" },
+    ];
     const res = await app.request("/api/sessions/todos/complete", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -2175,23 +2434,225 @@ describe("sessions route", () => {
     const data = await res.json();
 
     expect(res.status).toBe(200);
-    expect(data).toEqual({ ok: true, todos: [] });
-    expect(await loadLatestTodosFromSessionFile(sessionPath)).toEqual([]);
+    expect(data).toEqual({
+      ok: true,
+      panel: {
+        todos: expectedTodos,
+        version: computeTodoListVersion(expectedTodos),
+        finished: true,
+        allCompleted: true,
+        dismissed: false,
+      },
+    });
+    // v2 语义：收尾摘要保留可见（不按旧语义移除）
+    expect(await loadLatestTodosFromSessionFile(sessionPath)).toEqual(expectedTodos);
     expect(await loadLatestTodoSnapshotFromSessionFile(sessionPath)).toMatchObject({
-      removed: true,
+      removed: false,
+      finished: true,
+      allCompleted: true,
       source: "user",
-      todos: [
-        { content: "read", activeForm: "reading", status: "completed" },
-        { content: "write", activeForm: "writing", status: "completed" },
-      ],
+      format: 2,
+      todos: expectedTodos,
     });
     expect(openSessionManagerAtCurrentBranch).toHaveBeenCalledWith(sessionPath, path.dirname(sessionPath));
     expect(syncSessionBranchHead).toHaveBeenCalledWith(sessionPath, manager, "todo_complete_append");
-    expect(engine.emitEvent).toHaveBeenCalledWith({ type: "todo_update", todos: [] }, sessionPath);
+    expect(engine.emitEvent).toHaveBeenCalledWith({
+      type: "todo_update",
+      todos: expectedTodos,
+      version: computeTodoListVersion(expectedTodos),
+      finished: true,
+      allCompleted: true,
+      dismissed: false,
+    }, sessionPath);
   });
 
-  it("infers subagent agent identity from child sessionPath when history details are missing", async () => {
-    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+  describe("todo v2 收尾路由（cancel / dismiss / 版本保护）", () => {
+    async function setupTodoSession(todos: any[], streaming = false) {
+      const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+      const { SessionManager } = await import("../lib/pi-sdk/index.ts");
+      const app = new Hono();
+      const agentsDir = path.join(tmpDir, "agents");
+      const sessionDir = path.join(agentsDir, "hana", "sessions");
+      const manager = SessionManager.create("/tmp/workspace", sessionDir);
+      const sessionPath = manager.getSessionFile();
+      // 首条普通消息才会触发 session 文件落盘；单独 toolResult 不会建文件。
+      manager.appendMessage({
+        role: "assistant",
+        content: [{ type: "text", text: "working" }],
+        api: "test",
+        provider: "test",
+        model: "test",
+        stopReason: "toolUse",
+        timestamp: Date.now(),
+      } as any);
+      manager.appendMessage({
+        role: "toolResult",
+        toolCallId: "todo-seed",
+        toolName: "todo_write",
+        content: [{ type: "text", text: "seed" }],
+        isError: false,
+        timestamp: Date.now(),
+        details: { todoVersion: 2, todos },
+      } as any);
+      const engine = {
+        agentsDir,
+        isSessionStreaming: vi.fn(() => streaming),
+        getSessionByPath: vi.fn(() => null),
+        openSessionManagerAtCurrentBranch: vi.fn(() => manager),
+        syncSessionBranchHead: vi.fn(),
+        emitEvent: vi.fn(),
+      };
+      app.route("/api", createSessionsRoute(engine));
+      return { app, engine, manager, sessionPath };
+    }
+
+    const ACTIVE_TODOS = [
+      { content: "done", activeForm: "doing done", status: "completed" },
+      { content: "working", activeForm: "doing working", status: "in_progress" },
+      { content: "stuck", activeForm: "doing stuck", status: "blocked", blockedReason: "缺少凭据" },
+      { content: "waiting", activeForm: "doing waiting", status: "pending" },
+    ];
+
+    it("cancel 把未完成项改为已取消、已完成项保持完成，并保留收尾摘要", async () => {
+      const { app, engine, sessionPath } = await setupTodoSession(ACTIVE_TODOS);
+      const { loadLatestTodoSnapshotFromSessionFile, computeTodoListVersion } = await import("../lib/tools/todo-compat.ts");
+
+      const res = await app.request("/api/sessions/todos/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: sessionPath }),
+      });
+      const data = await res.json();
+
+      const expected = [
+        { content: "done", activeForm: "doing done", status: "completed" },
+        { content: "working", activeForm: "doing working", status: "cancelled" },
+        { content: "stuck", activeForm: "doing stuck", status: "cancelled", blockedReason: "缺少凭据" },
+        { content: "waiting", activeForm: "doing waiting", status: "cancelled" },
+      ];
+      expect(res.status).toBe(200);
+      expect(data.panel).toEqual({
+        todos: expected,
+        version: computeTodoListVersion(expected),
+        finished: true,
+        allCompleted: false,
+        dismissed: false,
+      });
+      expect(await loadLatestTodoSnapshotFromSessionFile(sessionPath)).toMatchObject({
+        removed: false, finished: true, allCompleted: false, source: "user", format: 2,
+      });
+      expect(engine.emitEvent).toHaveBeenCalledWith(
+        { type: "todo_update", ...data.panel },
+        sessionPath,
+      );
+    });
+
+    it("complete 不改写已取消项", async () => {
+      const todosWithCancelled = [
+        { content: "done", activeForm: "doing done", status: "completed" },
+        { content: "dropped", activeForm: "doing dropped", status: "cancelled" },
+        { content: "working", activeForm: "doing working", status: "in_progress" },
+      ];
+      const { app, sessionPath } = await setupTodoSession(todosWithCancelled);
+      const { loadLatestTodoSnapshotFromSessionFile } = await import("../lib/tools/todo-compat.ts");
+
+      const res = await app.request("/api/sessions/todos/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: sessionPath }),
+      });
+      const data = await res.json();
+
+      expect(res.status).toBe(200);
+      expect(data.panel.todos).toEqual([
+        { content: "done", activeForm: "doing done", status: "completed" },
+        { content: "dropped", activeForm: "doing dropped", status: "cancelled" },
+        { content: "working", activeForm: "doing working", status: "completed" },
+      ]);
+      expect(data.panel.allCompleted).toBe(false);
+      expect(await loadLatestTodoSnapshotFromSessionFile(sessionPath)).toMatchObject({
+        finished: true, allCompleted: false,
+      });
+    });
+
+    it("dismiss 收纳已结束清单：当前展示隐藏，历史记录保留", async () => {
+      const finishedTodos = [
+        { content: "done", activeForm: "doing done", status: "completed" },
+        { content: "dropped", activeForm: "doing dropped", status: "cancelled" },
+      ];
+      const { app, engine, sessionPath } = await setupTodoSession(finishedTodos);
+      const { loadLatestTodoSnapshotFromSessionFile } = await import("../lib/tools/todo-compat.ts");
+
+      const res = await app.request("/api/sessions/todos/dismiss", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: sessionPath }),
+      });
+      const data = await res.json();
+
+      expect(res.status).toBe(200);
+      expect(data.panel).toEqual({ removed: true, dismissed: true, todos: [] });
+      const snapshot = await loadLatestTodoSnapshotFromSessionFile(sessionPath);
+      expect(snapshot).toMatchObject({ removed: true, dismissed: true, source: "user" });
+      // 历史记录保留：条目内容仍可查
+      expect(snapshot?.todos).toEqual(finishedTodos);
+      expect(engine.emitEvent).toHaveBeenCalledWith(
+        { type: "todo_update", removed: true, dismissed: true, todos: [] },
+        sessionPath,
+      );
+    });
+
+    it("版本失配的收尾操作被拒绝（409 todo_version_mismatch），清单不变", async () => {
+      const { app, sessionPath } = await setupTodoSession(ACTIVE_TODOS);
+      const { loadLatestTodoSnapshotFromSessionFile } = await import("../lib/tools/todo-compat.ts");
+      const before = await loadLatestTodoSnapshotFromSessionFile(sessionPath);
+
+      const res = await app.request("/api/sessions/todos/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: sessionPath, version: "tvdeadbeef" }),
+      });
+
+      expect(res.status).toBe(409);
+      const data = await res.json();
+      expect(data.code).toBe("todo_version_mismatch");
+      const after = await loadLatestTodoSnapshotFromSessionFile(sessionPath);
+      expect(after?.todos).toEqual(before?.todos);
+    });
+
+    it("版本匹配时收尾操作放行", async () => {
+      const { app, sessionPath } = await setupTodoSession(ACTIVE_TODOS);
+      const { loadLatestTodoSnapshotFromSessionFile } = await import("../lib/tools/todo-compat.ts");
+      const version = (await loadLatestTodoSnapshotFromSessionFile(sessionPath))?.version;
+
+      const res = await app.request("/api/sessions/todos/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: sessionPath, version }),
+      });
+
+      expect(res.status).toBe(200);
+    });
+
+    it("模型输出期间 complete 与 cancel 都被服务端拒绝（409）", async () => {
+      const { app, sessionPath } = await setupTodoSession(ACTIVE_TODOS, true);
+      const { loadLatestTodoSnapshotFromSessionFile } = await import("../lib/tools/todo-compat.ts");
+      const before = await loadLatestTodoSnapshotFromSessionFile(sessionPath);
+
+      for (const endpoint of ["/api/sessions/todos/complete", "/api/sessions/todos/cancel"]) {
+        const res = await app.request(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ path: sessionPath }),
+        });
+        expect(res.status).toBe(409);
+      }
+      const after = await loadLatestTodoSnapshotFromSessionFile(sessionPath);
+      expect(after?.todos).toEqual(before?.todos);
+    });
+  });
+
+  it("infers subagent agent identity from child sessionPath when history details are missing", async () => {    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
     const msgUtils = await import("../core/message-utils.ts");
     const app = new Hono();
 

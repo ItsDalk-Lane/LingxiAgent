@@ -27,6 +27,7 @@ import { createComputerOverlaySlice, type ComputerOverlaySlice } from './compute
 import { createScreenshotSlice, type ScreenshotSlice } from './screenshot-slice';
 import { createSidebarUiSlice, type SidebarUiSlice } from './sidebar-ui-slice';
 import { createFileHistorySlice, type FileHistorySlice } from './file-history-slice';
+import { createSideChatSlice, type SideChatSlice } from './side-chat-slice';
 import { configureMessageLiveVersionSessionKeyResolver } from './message-live-version';
 import { configureLiveTurnSessionKeyResolver } from './live-turn-store';
 
@@ -57,7 +58,8 @@ export type StoreState = ConnectionSlice &
   ComputerOverlaySlice &
   ScreenshotSlice &
   SidebarUiSlice &
-  FileHistorySlice;
+  FileHistorySlice &
+  SideChatSlice;
 
 export const useStore = create<StoreState>()((set, _get, _api) => ({
   ...createConnectionSlice(set, _get),
@@ -68,7 +70,7 @@ export const useStore = create<StoreState>()((set, _get, _api) => ({
   ...createAgentSlice(set),
   ...createChannelSlice(set),
   ...createDeskSlice(set),
-  ...createModelSlice(set),
+  ...createModelSlice(set, _get),
   ...createInputSlice(set),
   ...createKnowledgeReferenceSlice(set),
   ...createChatSlice(set, _get),
@@ -88,6 +90,7 @@ export const useStore = create<StoreState>()((set, _get, _api) => ({
   ...createScreenshotSlice(set),
   ...createSidebarUiSlice(set, _get),
   ...createFileHistorySlice(set, _get),
+  ...createSideChatSlice(set),
 }));
 
 configureMessageLiveVersionSessionKeyResolver((sessionPath) => (
@@ -127,4 +130,5 @@ export type {
   ScreenshotSlice,
   SidebarUiSlice,
   FileHistorySlice,
+  SideChatSlice,
 };

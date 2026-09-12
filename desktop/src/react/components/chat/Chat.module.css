@@ -1485,7 +1485,7 @@
 .toolGroup {
     --chat-embedded-detail-height: 260px;
     position: relative;
-    margin: var(--space-4) 0;
+    margin: 0;
     overflow: hidden;
     width: var(--chat-task-block-width);
     max-width: 100%;

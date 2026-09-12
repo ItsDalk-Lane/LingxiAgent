@@ -10,6 +10,7 @@
  */
 import { extractTextContent, contentHasThinkingBlock, filterUnreferencedInlineImages, overlaySessionCollabDecision } from "../../core/message-utils.ts";
 import { extractPersistedAssistantSemanticSegments } from "../../shared/assistant-semantic-segments.ts";
+import { projectToolPresentationDetails, safeToolInput, toolResultText } from "../../shared/tool-presentation.ts";
 import { extractBlocks } from "../block-extractors.ts";
 import { createHistoryDeferredContentFor, shouldDeferHistoryContent } from "../history-deferred-content.ts";
 import { buildDeferredResultInterludeBlock } from "../deferred-result-interlude.ts";
@@ -52,9 +53,7 @@ export function identityRecordView(sourceMessages: any[]): HistoryRecordView {
 }
 
 export function soleRawToolResultText(message) {
-  if (!Array.isArray(message?.content) || message.content.length !== 1) return null;
-  const block = message.content[0];
-  return block?.type === "text" && typeof block.text === "string" ? block.text : null;
+  return toolResultText(message);
 }
 
 export function deferHeavyHistoryBlock(records: HistoryRecordView, sourceIndex: number, ordinal: number, block) {
@@ -396,37 +395,83 @@ export function projectHistoryPage(input: PageProjectorInput): ProjectedPage {
           const outcomeSourceIndex = toolUse.id
             ? context.toolResultSourceIndexByCallId.get(toolUse.id)
             : undefined;
-          let projectedOutcome = outcome;
-          if (outcome?.details && Number.isInteger(outcomeSourceIndex)) {
-            const details = { ...outcome.details };
-            const rawResultContent = soleRawToolResultText(records.get(outcomeSourceIndex));
-            if (details.output !== undefined && shouldDeferHistoryContent(rawResultContent)) {
-              const deferred = createHistoryDeferredContentFor(
-                records.get(outcomeSourceIndex),
-                outcomeSourceIndex,
-                "tool_output",
-                0,
-                rawResultContent,
-              );
-              details.output = deferred.preview;
-              details.outputDeferred = deferred;
-            }
-            if (details.skillInvocation && shouldDeferHistoryContent(rawResultContent)) {
-              const deferred = createHistoryDeferredContentFor(
-                records.get(outcomeSourceIndex),
-                outcomeSourceIndex,
-                "skill_content",
-                0,
-                rawResultContent,
-              );
-              details.skillInvocation = {
-                ...details.skillInvocation,
-                content: deferred.preview || "",
-                deferred,
-              };
-            }
-            projectedOutcome = { ...outcome, details };
+          const rawCalls = Array.isArray(m.content) ? m.content : [];
+          const callOrdinal = rawCalls.findIndex((block) => (
+            (block?.type === "toolCall" || block?.type === "tool_use")
+            && (toolUse.id ? block.id === toolUse.id : rawCalls.indexOf(block) === toolUse.processOrder)
+          ));
+          const rawCall = rawCalls[callOrdinal];
+          const rawArgs = rawCall?.input ?? rawCall?.arguments ?? rawCall?.args ?? toolUse.args;
+          const rawResult = Number.isInteger(outcomeSourceIndex) ? records.get(outcomeSourceIndex) : null;
+          const fullPresentation = rawResult ? projectToolPresentationDetails({
+            ...rawResult,
+            isError: outcome?.status === "failed" || rawResult.isError === true,
+          }, { toolName: toolUse.name, args: rawArgs }, Infinity) : safeToolInput(toolUse.name, rawArgs, Infinity);
+          const details = { ...outcome?.details, ...fullPresentation };
+          // 历史先从实际保存内容重新投影，取消仅由实时传输上限造成的标记。
+          if (fullPresentation?.input !== undefined) delete details.inputTruncated;
+          if (fullPresentation && "output" in fullPresentation) delete details.outputTruncated;
+          if (details.execCommand?.tty === true) delete details.output;
+          if (typeof details.input === "string" && shouldDeferHistoryContent(details.input) && callOrdinal >= 0) {
+            const deferred = createHistoryDeferredContentFor(m, sourceIndex, "tool_input", callOrdinal, details.input);
+            details.input = safeToolInput(toolUse.name, rawArgs, 240)?.input || "{}";
+            details.inputDeferred = deferred;
           }
+          if (rawResult && Number.isInteger(outcomeSourceIndex)) {
+            if (typeof details.output === "string" && shouldDeferHistoryContent(details.output)) {
+              const deferred = createHistoryDeferredContentFor(rawResult, outcomeSourceIndex, "tool_output", 0, details.output);
+              details.output = deferred.preview || "";
+              details.outputDeferred = deferred;
+              // 搜索结构（path / line / context / matchCount / fileCount）是本次执行已有的
+              // 事实，首包只为体积省掉 files；省掉的是体积，不是真相，所以另给一条可加载
+              // 引用，展开时按原结构取回，而不是让前端从 output 文本里重新猜路径和行号。
+              if (details.search && Array.isArray(details.search.files) && details.search.files.length) {
+                const searchDeferred = createHistoryDeferredContentFor(
+                  rawResult,
+                  outcomeSourceIndex,
+                  "tool_search",
+                  0,
+                  JSON.stringify(details.search),
+                  // 结构预览会把刚刚省下的体积原样塞回首包；统计仍由 matchCount /
+                  // fileCount 字段承担，引用只负责按需取回完整结构。
+                  { preview: false },
+                );
+                details.search = { ...details.search, files: undefined, searchDeferred };
+              }
+            }
+            const rawResultContent = soleRawToolResultText(rawResult);
+            if (details.skillInvocation && shouldDeferHistoryContent(rawResultContent)) {
+              const deferred = createHistoryDeferredContentFor(rawResult, outcomeSourceIndex, "skill_content", 0, rawResultContent);
+              details.skillInvocation = { ...details.skillInvocation, content: deferred.preview || "", truncated: false, deferred };
+            }
+            if (details.fileChange) {
+              const change = { ...details.fileChange };
+              if (shouldDeferHistoryContent(change.patch)) {
+                const deferred = createHistoryDeferredContentFor(rawResult, outcomeSourceIndex, "tool_patch", 0, change.patch);
+                change.patch = deferred.preview || "";
+                change.patchDeferred = deferred;
+              }
+              if (shouldDeferHistoryContent(change.content)) {
+                const hasResultContent = typeof rawResult.details?.fileChange?.content === "string";
+                if (hasResultContent || callOrdinal >= 0) {
+                  const deferred = createHistoryDeferredContentFor(
+                    hasResultContent ? rawResult : m,
+                    hasResultContent ? outcomeSourceIndex : sourceIndex,
+                    "tool_file_content",
+                    hasResultContent ? 0 : callOrdinal,
+                    change.content,
+                  );
+                  change.content = deferred.preview || "";
+                  change.contentDeferred = deferred;
+                }
+              }
+              details.fileChange = change;
+            }
+          }
+          const projectedOutcome = {
+            ...(outcome || { status: "unknown", success: false }),
+            ...(Object.keys(details).length ? { details } : {}),
+          };
           // 工具计时（dsh 轨迹视图同款「Session timestamps」口径）：
           // startedAt = 携带 tool_use 的 assistant 条目时间（工具执行前落盘），
           // endedAt = 对应 toolResult 条目时间（执行后落盘）。

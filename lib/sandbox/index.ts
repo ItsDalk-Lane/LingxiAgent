@@ -13,6 +13,7 @@ import { createBwrapExec } from "./bwrap.ts";
 import { createWin32Exec } from "./win32-exec.ts";
 import { wrapBashTool, wrapCommandExec } from "./tool-wrapper.ts";
 import { createEnhancedReadFile } from "./read-enhanced.ts";
+import { createPresentedLsTool, createPresentedReadTool } from "./file-tool-presentation.ts";
 import { wrapReadImageWithVisionBridge } from "./read-image-vision.ts";
 import { wrapReadOfficeMedia } from "./read-office-media.ts";
 import { createManagedConfigWriteGuard } from "./managed-config-guard.ts";
@@ -20,13 +21,11 @@ import { t } from "../i18n.ts";
 import fs from "fs";
 import path, { extname } from "path";
 import {
-  createReadTool,
   createWriteTool,
   createEditTool,
   createBashTool,
   createGrepTool,
   createFindTool,
-  createLsTool,
 } from "../pi-sdk/index.ts";
 import { normalizeWin32ShellPath } from "./win32-path.ts";
 import { serializeSessionFile } from "../session-files/session-file-response.ts";
@@ -197,14 +196,16 @@ export function createSandboxedTools(cwd, customTools, {
     operationForPath: () => "modified",
     getSessionPath,
     recordFileOperation,
+    captureExecution: (execute) => resourceOps.withFileChangeCapture("edit", execute),
   });
   const writeToolWithResourceIO = wrapFileTouchTool(createWriteTool(cwd, { operations: resourceOps.write }), cwd, {
     origin: "agent_write",
     operationForPath: (filePath) => fs.existsSync(filePath) ? "modified" : "created",
     getSessionPath,
     recordFileOperation,
+    captureExecution: (execute) => resourceOps.withFileChangeCapture("write", execute),
   });
-  const readTool = wrapReadImageWithVisionBridge(wrapReadOfficeMedia(createReadTool(cwd, { operations: readOps }), cwd, {
+  const readTool = wrapReadImageWithVisionBridge(wrapReadOfficeMedia(createPresentedReadTool(cwd, readOps), cwd, {
     lingxiHome,
     getSessionPath,
     getSessionIdForPath,
@@ -299,7 +300,7 @@ export function createSandboxedTools(cwd, customTools, {
         ),
         createGrepTool(cwd, { ...searchToolPaths, operations: resourceOps.grep }),
         createFindTool(cwd, { ...searchToolPaths, operations: resourceOps.find }),
-        createLsTool(cwd, { operations: resourceOps.ls }),
+        createPresentedLsTool(cwd, resourceOps.ls),
         materializeTool,
       ]),
       customTools,
@@ -349,7 +350,7 @@ export function createSandboxedTools(cwd, customTools, {
       ...createExecToolsForBash(wrappedDefaultBashTool, null, wrappedEscalatedBashTool),
       createGrepTool(cwd, { ...searchToolPaths, operations: resourceOps.grep }),
       createFindTool(cwd, { ...searchToolPaths, operations: resourceOps.find }),
-      createLsTool(cwd, { operations: resourceOps.ls }),
+      createPresentedLsTool(cwd, resourceOps.ls),
       materializeTool,
     ]),
     customTools,
@@ -384,7 +385,8 @@ function wrapFileTouchTool(tool, cwd, {
   operationForPath,
   getSessionPath,
   recordFileOperation,
-}: { origin?: any; operationForPath?: any; getSessionPath?: any; recordFileOperation?: any } = {}) {
+  captureExecution,
+}: { origin?: any; operationForPath?: any; getSessionPath?: any; recordFileOperation?: any; captureExecution?: any } = {}) {
   return {
     ...tool,
     execute: async (toolCallId, params, ...rest) => {
@@ -393,12 +395,15 @@ function wrapFileTouchTool(tool, cwd, {
       const operation = absolutePath ? operationForPath?.(absolutePath) : null;
       let result;
       try {
-        result = await tool.execute(toolCallId, normalizedParams, ...rest);
+        const execute = () => tool.execute(toolCallId, normalizedParams, ...rest);
+        result = await (captureExecution ? captureExecution(execute) : execute());
       } catch (err) {
         return {
+          isError: true,
           content: [{ type: "text", text: err?.message || String(err) }],
         };
       }
+      if (result?.isError) return result;
       const sessionPath = getSessionPath?.() || null;
       if (!absolutePath || !sessionPath || typeof recordFileOperation !== "function") {
         return result;
@@ -410,7 +415,7 @@ function wrapFileTouchTool(tool, cwd, {
           filePath: absolutePath,
           label: path.basename(absolutePath),
           origin,
-          operation,
+          operation: result?.details?.fileChange?.changeType || operation,
         }));
         return appendSessionFileDetails(result, sessionFile, absolutePath);
       } catch (err) {

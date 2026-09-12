@@ -23,6 +23,7 @@ const resourceEventMocks = vi.hoisted(() => ({
 vi.mock('../../services/resource-events', () => ({
   retainLocalFileResourceWatch: resourceEventMocks.retainLocalFileResourceWatch,
   retainResourceWatch: resourceEventMocks.retainResourceWatch,
+  resolvedLocalPathAlias: () => null,
   resourceWatchKey: resourceEventMocks.resourceWatchKey,
 }));
 

@@ -92,6 +92,7 @@ export function createExecCommandTools({
     },
     parameters: Type.Object({
       cmd: Type.String({ description: "Command to execute in the session's default shell; see tool description for the platform default." }),
+      description: Type.Optional(Type.String({ description: "Short description of what this command does, shown as the chat summary only. It does not replace cmd or the approval justification." })),
       workdir: Type.Optional(Type.String({ description: "Working directory. Defaults to the current session cwd." })),
       shell: Type.Optional(Type.String({ description: "Optional shell override: auto, powershell, pwsh, cmd, bash." })),
       tty: Type.Optional(Type.Boolean({ description: "Start an interactive PTY-backed process instead of a one-shot command." })),
@@ -124,6 +125,7 @@ export function createExecCommandTools({
             execCommand: {
               ok: false,
               cmd: value.cmd,
+              ...(value.description ? { description: value.description } : {}),
               workdir: value.workdir,
               shell: WIN32_DEFAULT_ONE_SHOT_SHELL.family,
               platform,
@@ -143,6 +145,7 @@ export function createExecCommandTools({
       const renderedCommand = renderCommandForExecShell(commandWithWorkdir, shell, { platform });
       const execDetails = {
         cmd: value.cmd,
+        ...(value.description ? { description: value.description } : {}),
         commandWithWorkdir,
         renderedCommand,
         workdir: value.workdir,

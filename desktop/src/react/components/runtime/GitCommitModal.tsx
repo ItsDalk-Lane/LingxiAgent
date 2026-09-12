@@ -1,28 +1,30 @@
 /**
  * GitCommitModal — 提交或推送弹窗（环境信息卡·提交或推送行入口）
  *
- * 顶部分支条（下拉可切换分支）；提交信息输入（留空 → AI 生成并回填）；
- * 「包含未暂存的更改」勾选（默认勾选，右侧显示未暂存增删统计）；
- * 底部三操作：提交 / 提交并推送 / 推送。
+ * 顶部分支条（下拉可切换/新建分支）；提交信息输入（右上角可显式让模型生成，
+ * 提交时留空也会自动生成并回填）；「包含未暂存的更改」勾选（默认勾选，右侧显示
+ * 未暂存增删统计）；底部三操作：提交 / 提交并推送 / 推送。
  *   - 提交、提交并推送：无可提交内容时置灰
  *   - 推送：无可推送提交（且未配置建立跟踪的远程）时置灰
  *   - 提交并推送 = 先提交（若无可提交则跳过）再推送
+ * 储藏（暂存 / 取出 / 回退）不在这里：它是文件级操作，统一在「变更文件」弹窗里做。
  */
 import { useEffect, useRef, useState } from 'react';
 import { AnchoredPortal, Overlay, Tooltip } from '../../ui';
 import { useStore } from '../../stores';
 import {
   generateGitCommitMessage,
-  gitCheckout,
   gitCommit,
   gitPush,
   type GitActionResult,
   type GitBranches,
   type GitStatus,
 } from '../../utils/git-env-api';
+import { GitBranchList } from './GitBranchList';
+import branchStyles from './GitBranchList.module.css';
 import styles from './GitCommitModal.module.css';
 
-type BusyStep = null | 'ai' | 'commit' | 'commit-push' | 'push' | 'checkout';
+type BusyStep = null | 'ai' | 'commit' | 'commit-push' | 'push';
 
 function fmt(n: number): string {
   return n.toLocaleString('en-US');
@@ -89,6 +91,22 @@ export function GitCommitModal({
     }
     setMessage(ai.message);
     return ai.message;
+  };
+
+  /** 右上角按钮：只生成并回填提交信息，不提交 */
+  const handleGenerate = async () => {
+    if (busy) return;
+    setBusy('ai');
+    try {
+      const ai = await generateGitCommitMessage(dir, { includeUnstaged, sessionPath, agentId });
+      if (!ai.httpOk || !ai.message) {
+        addToast?.(ai.error || t('gitEnv.aiFailed'), 'error');
+        return;
+      }
+      setMessage(ai.message);
+    } finally {
+      setBusy(null);
+    }
   };
 
   const runCommit = async (): Promise<boolean> => {
@@ -158,22 +176,6 @@ export function GitCommitModal({
     }
   };
 
-  const handleSwitchBranch = async (name: string) => {
-    if (busy) return;
-    setBusy('checkout');
-    try {
-      const result = await gitCheckout(dir, name, agentId);
-      if (result.httpOk && result.ok) {
-        setBranchMenuOpen(false);
-        await refresh();
-      } else {
-        addToast?.(result.error || t('gitEnv.switchFailed'), 'error');
-      }
-    } finally {
-      setBusy(null);
-    }
-  };
-
   const commitLabel = busy === 'ai' ? t('gitEnv.aiGenerating') : t('gitEnv.btnCommit');
   const commitPushLabel = busy === 'ai' ? t('gitEnv.aiGenerating') : t('gitEnv.btnCommitPush');
 
@@ -226,15 +228,29 @@ export function GitCommitModal({
           </span>
         </label>
 
-        <textarea
-          className={styles.messageInput}
-          data-testid="git-commit-message"
-          rows={4}
-          value={message}
-          onChange={e => setMessage(e.target.value)}
-          placeholder={t('gitEnv.commitMessagePlaceholder')}
-          disabled={busy != null}
-        />
+        <div className={styles.messageBox}>
+          <div className={styles.messageTools}>
+            <button
+              type="button"
+              className={styles.generateBtn}
+              data-testid="git-commit-generate"
+              title={t('gitEnv.genMessageHint')}
+              disabled={busy != null}
+              onClick={() => void handleGenerate()}
+            >
+              {busy === 'ai' ? t('gitEnv.aiGeneratingShort') : t('gitEnv.genMessage')}
+            </button>
+          </div>
+          <textarea
+            className={styles.messageInput}
+            data-testid="git-commit-message"
+            rows={4}
+            value={message}
+            onChange={e => setMessage(e.target.value)}
+            placeholder={t('gitEnv.commitMessagePlaceholder')}
+            disabled={busy != null}
+          />
+        </div>
 
         <div className={styles.actions}>
           <button
@@ -272,27 +288,21 @@ export function GitCommitModal({
         anchorRef={branchButtonRef}
         onClose={() => setBranchMenuOpen(false)}
         role="dialog"
-        className={`${styles.branchMenu} runtime-capsule-anchored`}
+        className={`${branchStyles.menu} runtime-capsule-anchored`}
         align="start"
         minWidth={220}
       >
-        <div className={styles.branchMenuTitle}>{t('gitEnv.branchesTitle')}</div>
-        <div className={styles.branchList}>
-          {(branches?.branches ?? []).map(branch => (
-            <button
-              key={branch.name}
-              type="button"
-              className={`${styles.branchItem}${branch.current ? ` ${styles.branchItemCurrent}` : ''}`}
-              data-testid={`git-commit-branch-${branch.name}`}
-              disabled={branch.current || branch.checkedOutElsewhere || busy != null}
-              title={branch.checkedOutElsewhere ? t('gitEnv.checkedOutElsewhere') : undefined}
-              onClick={() => void handleSwitchBranch(branch.name)}
-            >
-              <span className={styles.branchItemName}>{branch.name}</span>
-              {branch.current && <span className={styles.branchCurrentMark}>✓</span>}
-            </button>
-          ))}
-        </div>
+        <GitBranchList
+          dir={dir}
+          agentId={agentId}
+          branches={branches}
+          busy={busy != null}
+          testIdPrefix="git-commit-branch"
+          onChanged={async () => {
+            setBranchMenuOpen(false);
+            await refresh();
+          }}
+        />
       </AnchoredPortal>
     </Overlay>
   );

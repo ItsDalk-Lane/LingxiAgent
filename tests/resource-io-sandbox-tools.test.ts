@@ -120,6 +120,33 @@ describe("ResourceIO sandbox file tools", () => {
     });
   });
 
+  it("marks failed edits as errors and does not register them as successful changes", async () => {
+    const recordFileOperation = vi.fn();
+    const { workspace, tools } = makeTools({ recordFileOperation });
+    fs.writeFileSync(path.join(workspace, "unchanged.txt"), "original");
+    const edit = tools.find(tool => tool.name === "edit");
+    const result = await edit.execute("failed-edit", {
+      path: "unchanged.txt", edits: [{ oldText: "missing", newText: "changed" }],
+    });
+    expect(result.isError).toBe(true);
+    expect(result.details?.fileChange).toBeUndefined();
+    expect(recordFileOperation).not.toHaveBeenCalled();
+    expect(fs.readFileSync(path.join(workspace, "unchanged.txt"), "utf-8")).toBe("original");
+  });
+
+  it("records a real empty file as a successful read with zero displayed lines", async () => {
+    const { workspace, tools } = makeTools();
+    fs.writeFileSync(path.join(workspace, "empty.txt"), "");
+    const read = tools.find(tool => tool.name === "read");
+    const result = await read.execute("empty-read", { path: "empty.txt" });
+    expect(result.isError).not.toBe(true);
+    expect(result.content[0]).toMatchObject({ type: "text", text: "" });
+    expect(result.details.read).toMatchObject({
+      path: path.join(workspace, "empty.txt"), startLine: 1,
+      totalLines: 0, displayedLines: 0, truncated: false,
+    });
+  });
+
   it("routes mount ResourceRefs through ResourceIO instead of local workspace paths", async () => {
     const files = new Map();
     files.set("notes/a.md", "hello");

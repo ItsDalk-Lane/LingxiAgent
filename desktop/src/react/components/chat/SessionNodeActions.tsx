@@ -1,15 +1,20 @@
 import { useCallback, useRef, useState } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 import type { ChatMessage } from '../../stores/chat-types';
 import { useStore } from '../../stores';
 import {
   activateForkedSession,
   forkSessionTurn,
+  previewWorkspaceRollback,
   retrySessionTurn,
   type ForkedSessionHandler,
   type SessionNodeTarget,
+  type WorkspaceRollbackPreview,
 } from '../../stores/message-turn-actions';
 import { presentError } from '../../errors/error-presenter';
+import { ConfirmDialog, ContextMenu } from '@/ui';
 import type { MessageFooterAction } from './MessageFooterActions';
+import styles from './SessionRollback.module.css';
 
 interface Options {
   sessionPath: string;
@@ -25,18 +30,27 @@ export function useSessionNodeActions({
   retryMessage,
   onForkCreated,
   disabled = false,
-}: Options): { actions: MessageFooterAction[]; busy: boolean } {
+}: Options): { actions: MessageFooterAction[]; busy: boolean; overlay: ReactNode } {
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
-  const t = window.t ?? ((key: string) => key);
+  const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
+  const [preview, setPreview] = useState<WorkspaceRollbackPreview | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const t: (key: string, vars?: Record<string, string | number>) => string = window.t ?? ((key: string) => key);
 
-  const handleRetry = useCallback(async () => {
+  const runRetry = useCallback(async (fileRollback: 'none' | 'workspace') => {
     if (!target || busyRef.current || disabled) return;
     busyRef.current = true;
     setBusy(true);
     try {
+      // fileRollback='none' 时完全保持现状调用形状（等价于没有这个功能）。
+      const rollbackOptions = fileRollback === 'workspace' ? { fileRollback: 'workspace' as const } : null;
       if (retryMessage) {
-        await retrySessionTurn(sessionPath, target, { message: retryMessage });
+        await retrySessionTurn(sessionPath, target, rollbackOptions
+          ? { message: retryMessage, ...rollbackOptions }
+          : { message: retryMessage });
+      } else if (rollbackOptions) {
+        await retrySessionTurn(sessionPath, target, rollbackOptions);
       } else {
         await retrySessionTurn(sessionPath, target);
       }
@@ -45,6 +59,21 @@ export function useSessionNodeActions({
       setBusy(false);
     }
   }, [disabled, retryMessage, sessionPath, target]);
+
+  const openRollbackMenu = useCallback(async (event: MouseEvent<HTMLButtonElement>) => {
+    if (!target || busyRef.current || disabled) return;
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect?.();
+    setMenuPosition({ x: rect?.left ?? 0, y: (rect?.bottom ?? 0) + 4 });
+    setPreview(null);
+    if (typeof previewWorkspaceRollback !== 'function') return;
+    try {
+      const next = await previewWorkspaceRollback(sessionPath, target);
+      setPreview(next);
+    } catch {
+      // 预览失败按「开关关闭」处理：菜单只剩默认选项。
+      setPreview({ enabled: false, available: false, degraded: false, commit: null, reason: 'preview_failed', files: [], fileCount: 0 });
+    }
+  }, [disabled, sessionPath, target]);
 
   const handleFork = useCallback(async () => {
     if (!target || busyRef.current || disabled) return;
@@ -70,7 +99,7 @@ export function useSessionNodeActions({
       id: 'regenerate',
       title: t('common.regenerate'),
       icon: <RegenerateIcon />,
-      onClick: () => { void handleRetry(); },
+      onClick: (event) => { void openRollbackMenu(event); },
       disabled: disabled || busy,
     },
     {
@@ -82,7 +111,74 @@ export function useSessionNodeActions({
     },
   ] : [];
 
-  return { actions, busy };
+  // 第二个选项的可用性完全由服务端预览裁决：开关关闭 → 置灰并给出开启位置；
+  // 无检查点 / 工作区不可用 → 置灰并说明；快照降级 → 可用但提示将用备份倒推。
+  const withFilesItem = (() => {
+    if (!preview) return { label: t('chat.fileRollback.withFiles'), disabled: true };
+    if (!preview.enabled) {
+      return { label: `${t('chat.fileRollback.withFiles')}（${t('chat.fileRollback.disabledOff')}）`, disabled: true };
+    }
+    if (!preview.available) {
+      const reason = preview.reason === 'no_checkpoint'
+        ? t('chat.fileRollback.disabledNoCheckpoint')
+        : t('chat.fileRollback.disabledUnavailable');
+      return { label: `${t('chat.fileRollback.withFiles')}（${reason}）`, disabled: true };
+    }
+    return {
+      label: preview.degraded
+        ? t('chat.fileRollback.withFilesDegraded')
+        : t('chat.fileRollback.withFilesCount', { count: preview.fileCount }),
+      disabled: false,
+    };
+  })();
+
+  const menuItems: Array<{ label: string; action: () => void; disabled?: boolean }> = [
+    {
+      label: t('chat.fileRollback.conversationOnly'),
+      action: () => { void runRetry('none'); },
+    },
+  ];
+  // 开关关闭时界面不出这个选项（拍板 #3 / 完成条件 1），而不是给一个必然 4xx 的入口。
+  if (preview?.enabled === true) {
+    menuItems.push({
+      label: withFilesItem.label,
+      disabled: withFilesItem.disabled,
+      action: () => setConfirmOpen(true),
+    });
+  }
+
+  const overlay = (
+    <>
+      {menuPosition && (
+        <ContextMenu
+          position={menuPosition}
+          onClose={() => setMenuPosition(null)}
+          items={menuItems}
+        />
+      )}
+      <ConfirmDialog
+        open={confirmOpen}
+        scope="window"
+        title={t('chat.fileRollback.confirmTitle')}
+        confirmLabel={t('chat.fileRollback.confirmAction')}
+        cancelLabel={t('common.cancel')}
+        confirmTone="danger"
+        busy={busy}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={() => { setConfirmOpen(false); void runRetry('workspace'); }}
+      >
+        <p>{t('chat.fileRollback.confirmBody', { count: preview?.fileCount ?? 0 })}</p>
+        {!!preview?.files?.length && (
+          <ul className={styles.confirmFiles} data-testid="file-rollback-confirm-list">
+            {preview.files.map((file) => <li key={file.path}>{file.path}</li>)}
+          </ul>
+        )}
+        <p className={styles.confirmWarning} data-testid="file-rollback-confirm-warning">{t('chat.fileRollback.confirmWarning')}</p>
+      </ConfirmDialog>
+    </>
+  );
+
+  return { actions, busy, overlay };
 }
 
 function RegenerateIcon() {

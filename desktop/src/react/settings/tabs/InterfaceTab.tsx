@@ -118,6 +118,8 @@ export function InterfaceTab() {
   const showToast = useSettingsStore(s => s.showToast);
   const [appearancePrefs, setAppearancePrefs] = useState<AppearancePrefs>(() => readAppearancePrefs());
   const [sidebarUiPrefs, setSidebarUiPrefs] = useState<SidebarUiPrefs | null>(null);
+  // 「回退时撤销文件改动」开关：全局偏好，默认关闭；null = 尚未加载完。
+  const [rollbackFileChanges, setRollbackFileChanges] = useState<boolean | null>(null);
   const refreshAppearancePrefs = useCallback(() => {
     setAppearancePrefs(readAppearancePrefs());
   }, []);
@@ -188,6 +190,43 @@ export function InterfaceTab() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    lingxiFetch('/api/sessions/workspace-rollback')
+      .then(res => res.json())
+      .then(data => {
+        if (!cancelled) setRollbackFileChanges(data?.enabled === true);
+      })
+      .catch(err => {
+        if (!cancelled) {
+          setRollbackFileChanges(false);
+          console.warn('[settings] workspace rollback preference load failed:', err);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const saveRollbackFileChanges = useCallback(async (next: boolean) => {
+    const previous = rollbackFileChanges;
+    setRollbackFileChanges(next);
+    try {
+      const res = await lingxiFetch('/api/sessions/workspace-rollback', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: next }),
+      });
+      const data = await res.json();
+      if (data?.error) throw new Error(data.error);
+      setRollbackFileChanges(data?.enabled === true);
+      showToast?.(t('settings.autoSaved'), 'success');
+    } catch (err: unknown) {
+      setRollbackFileChanges(previous ?? false);
+      showToast?.(t('settings.saveFailed') + ': ' + (err instanceof Error ? err.message : String(err)), 'error');
+    }
+  }, [rollbackFileChanges, showToast]);
 
   const saveEditorTypography = async (patch: Partial<EditorMarkdownTypography>) => {
     const previousConfig = useSettingsStore.getState().settingsConfig || {};
@@ -430,6 +469,17 @@ export function InterfaceTab() {
             <Toggle
               on={hardwareAccelerationEnabled}
               onChange={saveHardwareAcceleration}
+            />
+          }
+        />
+        <SettingsRow
+          label={t('settings.interface.rollbackFileChanges')}
+          hint={t('settings.interface.rollbackFileChangesHint')}
+          control={
+            <Toggle
+              on={rollbackFileChanges === true}
+              disabled={rollbackFileChanges === null}
+              onChange={saveRollbackFileChanges}
             />
           }
         />

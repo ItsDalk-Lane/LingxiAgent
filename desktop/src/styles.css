@@ -68,6 +68,8 @@
     --duration-instant: 0.1s;       /* 瞬：hover、关闭、退场、撤销 */
     --duration-fast:    0.15s;      /* 快：默认（按钮、面板、focus、状态切换）*/
     --duration-slow:    0.25s;      /* 慢：模态、大块进场、强调动作 */
+    --duration-shimmer: 1.8s;       /* 运行状态行流光一扫（与 DSH 同款节奏，linear 循环） */
+    --duration-dots:    1.4s;       /* 打字机/循环省略号一拍（点是 steps(1) 跳变，不占节奏档位） */
 
     /* 动效 · 缓动 */
     --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
@@ -527,6 +529,20 @@ html[data-platform="linux"] .tb-toggle-right {
     flex-direction: column;
     min-width: 0; /* 防止 flex 子项溢出 */
     position: relative; /* 给 drop overlay 定位 */
+}
+
+/* 预览面板槽位：侧边对话打开时把预览面板排到侧栏左侧（order 更大），
+   空间不足时它先被挤出视口，保证主对话输入区与右侧栏仍然可见。 */
+.preview-panel-slot {
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 0;
+    min-width: 0;
+    order: 2;
+}
+
+.preview-panel-slot-yield {
+    order: 3;
 }
 
 /* ========================================

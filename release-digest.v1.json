@@ -1,169 +1,239 @@
 {
   "schemaVersion": 1,
-  "tag": "v0.1.38",
-  "version": "0.1.38",
-  "previousTag": "v0.1.37",
-  "generatedAt": "2026-09-11T02:10:35.000Z",
+  "tag": "v0.1.39",
+  "version": "0.1.39",
+  "previousTag": "v0.1.38",
+  "generatedAt": "2026-09-12T00:02:00.511Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "这个版本让聊天历史又快又稳：长会话的打开与翻页显著提速，翻页失控和模型观测轨迹复用两处问题得到修复；输入排队与取消的回执更可信，记忆迁移、媒体任务、语音与外部工具连接的底层契约也做了一轮加固。",
-    "en": "This release makes chat history faster and steadier: long conversations open and page noticeably quicker, with runaway pagination and observability trace-reuse bugs fixed; queued input and cancellation receipts are more trustworthy, and the underlying contracts for memory migration, media tasks, speech, and external tool connections got a hardening pass."
+    "zh": "这个版本让工具调用看得懂也找得回：工具行改成五语言短标签与家族图标，每一步的输入、输出与改动都能按需展开完整内容，不再被省略截断。任务清单改到输入框上方，支持受阻、取消与收尾操作并跨轮保留；会话还新增了独立小聊天面板、Git worktree 管理与可恢复文件改动的回退能力。",
+    "en": "This version makes tool calls readable and recoverable: tool rows now use short localized labels with family icons, and every step's input, output and changes can be expanded to the full recorded content instead of an ellipsis. The task checklist moved above the composer with blocked, cancelled and wrap-up states that survive across turns; conversations also gain a side-chat panel, Git worktree management, and an opt-in rollback that restores file changes."
   },
   "counts": {
-    "feature": 1,
+    "feature": 4,
     "fix": 2,
-    "improvement": 3,
+    "improvement": 1,
     "migration": 0
   },
   "source": {
     "owner": "ItsDalk-Lane",
     "repo": "LingxiAgent",
-    "commitRange": "v0.1.37..9ab5218c199620ad39075b117e8f811b30de5594",
-    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.38",
+    "commitRange": "v0.1.38..015e1b491fed1cfed10d1eade05851bfc6a5364e",
+    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.39",
     "releaseNotes": ""
   },
   "items": [
     {
-      "id": "history-read-three-stage",
+      "id": "tool-activity-presentation",
       "kind": "feature",
       "importance": "high",
       "title": {
-        "zh": "聊天历史读取全面提速：目录快路径、增量续读与条件请求",
-        "en": "Chat history reads get much faster: directory fast path, incremental resume, and conditional requests"
+        "zh": "工具调用展示层重做：每一步都能看清在做什么、结果是什么",
+        "en": "Tool-call display reworked: every step shows what ran and what came back"
       },
       "summary": {
-        "zh": "历史消息分页改走带缓存的目录快路径，再次打开同一段会话只读取新增部分；客户端翻页改用条件请求，内容没变化时不再重复传输整页；新增的历史概览让每页大小与总数声明同源。",
-        "en": "History pagination now uses a cached directory fast path, reopening a conversation only reads what was appended; client paging uses conditional requests so unchanged pages are no longer retransferred; a new history overview keeps page-size and total-count declarations consistent."
+        "zh": "进程区的工具行按发生顺序逐条展示，读取、搜索、修改、终端各有自己的详情形态；读取显示真实行号范围，搜索按文件和命中行分组，编辑显示真实差异与改写后的正文，终端保留完整命令与工作目录。所有大内容首屏只给预览，展开后按保存记录取回完整原文。",
+        "en": "Tool rows in the process area are listed in order, each with its own detail shape for reads, searches, edits and terminals: reads show real line ranges, searches group by file and matching line, edits show the real diff plus the resulting content, and terminals keep the full command and working directory. Large content ships as a preview and expands to the full recorded body."
       },
       "details": [
         {
-          "zh": "普通分页经目录缓存与定点读取出页，可信追加场景按增量续读，开放中的对话轮次不再随历史变长而变慢。",
-          "en": "Regular pages are served from the directory cache with pinpoint reads; trustworthy append scenarios resume incrementally, so an open conversation turn no longer slows down as history grows."
+          "zh": "大结果不再一次塞满聊天流：首包只带计数与预览，点开才读取完整已记录内容。",
+          "en": "Large results no longer flood the transcript: the first page carries counts and a preview, and the full recorded content is read only when expanded."
         },
         {
-          "zh": "ETag/If-None-Match 条件请求接入生产路径：表示未变化返回 304，弱比较与非法语法按协议保守处理。",
-          "en": "ETag/If-None-Match conditional requests are wired into the production path: unchanged representations return 304, and weak comparison plus malformed syntax are handled conservatively per protocol."
+          "zh": "改动的增删统计取自完整补丁；补丁被截断预览时不再编造总数。",
+          "en": "Added/removed counts come from the complete patch; a truncated preview never invents a total."
         },
         {
-          "zh": "历史概览聚合与客户端协议层上线，分页默认 50 条与声明头同源，授权始终先于缓存。",
-          "en": "The history overview aggregation and client protocol layer ship; the default 50-per-page and its declaration header share one source, and authorization always runs before any cache access."
+          "zh": "失败或待执行的改动不会显示成\"已应用\"。",
+          "en": "Failed or pending changes are never presented as applied."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "787437d3",
-          "title": "feat: 历史读取三阶段优化——目录快路径/追加增量续读/条件请求与概览协议"
+          "ref": "74cd07fb7",
+          "title": "feat: 工具活动展示层重构（MessageActivity/SearchActivity 与 presentation 模块）"
         }
       ]
     },
     {
-      "id": "history-pagination-run-continuity",
+      "id": "tool-display-integrity",
       "kind": "fix",
       "importance": "high",
       "title": {
-        "zh": "修复长会话翻页失控：分页与对话轮次连续性对齐",
-        "en": "Fix runaway pagination in long conversations: paging aligned with conversation-turn continuity"
+        "zh": "修复工具详情三类显示缺陷：敏感字段遮盖、搜索结构还原、实时与历史完整度一致",
+        "en": "Three tool-detail defects fixed: secret masking, search structure recovery, and live/history completeness parity"
       },
       "summary": {
-        "zh": "长单轮会话翻页时，归并显示用的标识不再被误当作分页游标——曾经失控到 92 页的情况收敛为正确的 3 页；每一页片段的终态由投影与裁决双侧统一判定，最后一页的完成状态与全量恢复语义保持一致。",
-        "en": "When paging through a long single-turn conversation, the merged display identifier is no longer mistaken for a pagination cursor—what once ballooned to 92 pages settles into the correct 3; each page fragment's final state is decided jointly by the projector and resolver, and the last page's completion state matches a full restore."
+        "zh": "一轮对抗性审查确认了工具详情链路上三个真实缺陷，本版一并修复：结构化结果里出现多段文本时敏感字段会失去遮盖；大搜索的路径与行号在重开会话后有被字符串误读的风险；实时结果超过上限后只能复制到截断预览，重开历史却能看到全文。",
+        "en": "An adversarial review confirmed three real defects in the tool-detail path, all fixed here: sensitive fields lost their masking once a result contained several text segments; paths and line numbers in large searches risked being misread from text after reopening a conversation; and live results above the size cap could only be copied as a truncated preview while a reopened conversation showed the full body."
       },
       "details": [
         {
-          "zh": "页片段终态统一由 projector/resolver 双裁决，补 runFacts 缝合与末条终态不变量。",
-          "en": "Page-fragment final states are unified under projector/resolver dual adjudication, with runFacts stitching and a last-entry final-state invariant added."
+          "zh": "敏感字段遮盖改为按结果内的每个结构块独立进行：结构化块与普通说明混排时凭证仍然被遮盖，普通代码正文不受影响。",
+          "en": "Secret masking now runs per structure block inside a result: tokens stay masked when a structured block sits next to plain prose, and ordinary source text is left intact."
+        },
+        {
+          "zh": "大搜索的路径、行号、是否为上下文行与命中总数改为按保存记录的结构化事实恢复，不再由展示文本反推。",
+          "en": "Large-search paths, line numbers, context flags and match totals are restored from the saved structured facts instead of being inferred from display text."
+        },
+        {
+          "zh": "实时结果超过上限时同样给出可加载引用：实时查看与重开历史后查看拿到同一份完整已记录内容。",
+          "en": "Live results above the cap now carry a loadable reference: viewing right after the run and viewing after reopening the conversation yield the same complete recorded content."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "1d42b740",
-          "title": "fix: 历史分页 Run 连续性 + 轨迹复用双身份两案修复"
+          "ref": "015e1b491",
+          "title": "fix(chat): 工具展示链路五项对抗审查缺陷修复"
         }
       ]
     },
     {
-      "id": "observability-trace-reuse",
+      "id": "todo-checklist-rework",
+      "kind": "feature",
+      "importance": "high",
+      "title": {
+        "zh": "任务清单改到输入框上方：受阻、取消与收尾操作，跨轮保留",
+        "en": "Task checklist moves above the composer: blocked, cancelled and wrap-up states that persist across turns"
+      },
+      "summary": {
+        "zh": "清单现在显示在输入框上方，带完成计数、并行任务摘要与可展开的五态列表；受阻项必须写明原因，完成与收纳分开，用户自己勾选或取消的结果不会被模型的后续更新覆盖。",
+        "en": "The checklist now sits above the composer with a completion count, a parallel-task summary and an expandable five-state list; blocked items must state a reason, completing is separated from archiving, and the states you set yourself are not overwritten by later model updates."
+      },
+      "details": [
+        {
+          "zh": "清单版本哈希保护你的收尾操作：模型基于旧清单的更新会被拒绝并明确提示，不会悄悄改回。",
+          "en": "A checklist version hash protects your wrap-up actions: updates based on a stale checklist are rejected with a clear notice instead of silently reverting."
+        },
+        {
+          "zh": "工具回执失败或数据损坏时保留最后一份有效清单并标记更新失败，不再把整份清单清空。",
+          "en": "When a tool receipt fails or data is damaged, the last valid checklist is kept and flagged as an update failure instead of being wiped."
+        },
+        {
+          "zh": "消息流里的清单行显示完成数与当前步骤，右侧工作区的重复清单已移除。",
+          "en": "The in-transcript checklist row shows completed count and current step; the duplicate panel in the right workspace is gone."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "d759b6951",
+          "title": "feat: 任务清单改版——输入框上方进度条、五态与收尾操作、跨轮延续"
+        }
+      ]
+    },
+    {
+      "id": "file-rollback-restore",
+      "kind": "feature",
+      "importance": "medium",
+      "title": {
+        "zh": "重试时可以连文件改动一起撤回（默认关闭）",
+        "en": "Retry can now also roll back file changes (off by default)"
+      },
+      "summary": {
+        "zh": "开启后，重试一轮对话时可以选择把该轮写入的文件恢复到改动前的内容，并在执行前看到将要回退的文件清单、执行后看到逐文件结果。快照存放在独立影子仓库中，不会往你的项目里添加任何文件。",
+        "en": "When enabled, retrying a turn can restore the files that turn wrote back to their previous content, showing the file list before running and a per-file report afterwards. Snapshots live in a separate shadow repository and add no files to your project."
+      },
+      "details": [
+        {
+          "zh": "回退是显式选项而非默认行为：确认框里可以选择只重试、或重试并回退文件。",
+          "en": "Rollback is an explicit choice rather than the default: the confirmation offers retry only, or retry with file restore."
+        },
+        {
+          "zh": "取不到改动前内容时会明确说明原因（例如文件过大或不是文本），不会假装已回退。",
+          "en": "When the previous content cannot be obtained, the reason is stated (too large, not text, and so on) instead of pretending the file was restored."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "9c4b11114",
+          "title": "feat: 回退连文件还原、清单上下文连续性、side-chat 与 git worktree 批量交付"
+        }
+      ]
+    },
+    {
+      "id": "context-continuity",
       "kind": "fix",
       "importance": "medium",
       "title": {
-        "zh": "修复模型观测轨迹复用：按业务会话正确命中",
-        "en": "Fix observability trace reuse: now matched by business session"
+        "zh": "修复清单闪烁与中断标记：跨轮上下文更连续",
+        "en": "Checklist flicker and interruption markers fixed for more continuous context"
       },
       "summary": {
-        "zh": "模型调用观测的轨迹复用此前误用 SDK 文件头的 UUID 做查找，导致复用一直没有真正生效；现改为按业务会话 ID 命中，并补上幂等合并与双身份防假阳性测试。",
-        "en": "Observability trace reuse previously looked up traces by the SDK file-header UUID, so reuse never actually hit; it now matches on the business session ID, with idempotent merging and dual-identity tests guarding against false positives."
+        "zh": "修掉了任务清单面板在新一轮开始时短暂闪烁回空的根因；新请求会带上当前权威清单，任务中途停止会留下中断标记，模型下一轮能看出上一轮是被打断而不是正常结束。",
+        "en": "The root cause of the task panel briefly flashing empty at the start of a new turn is fixed; new requests carry the current authoritative checklist, and stopping mid-task leaves an interruption marker so the next turn can tell the previous one was cut short."
       },
-      "details": [],
+      "details": [
+        {
+          "zh": "清单与提醒按节流注入，避免每轮重复占用上下文。",
+          "en": "Checklist and reminders are injected with throttling so they do not consume context every turn."
+        }
+      ],
       "sources": [
         {
           "type": "commit",
-          "ref": "1d42b740",
-          "title": "fix: 历史分页 Run 连续性 + 轨迹复用双身份两案修复"
+          "ref": "9c4b11114",
+          "title": "feat: 回退连文件还原、清单上下文连续性、side-chat 与 git worktree 批量交付"
         }
       ]
     },
     {
-      "id": "input-acceptance-boundary",
+      "id": "side-chat-git-worktree",
+      "kind": "feature",
+      "importance": "medium",
+      "title": {
+        "zh": "新增独立小聊天面板与 Git worktree 管理",
+        "en": "New side-chat panel and Git worktree management"
+      },
+      "summary": {
+        "zh": "可以在不打断主对话的情况下开一个小聊天面板单独问一件事；Git 面板支持创建与列出 worktree 分支，并新增提交历史与分支列表接口。",
+        "en": "A side-chat panel lets you ask something separately without interrupting the main conversation; the Git panel can create and list worktree branches, with new commit-history and branch-list endpoints."
+      },
+      "details": [
+        {
+          "zh": "worktree 相关路由沿用同一套安全白名单，不接受任意路径。",
+          "en": "Worktree routes reuse the same safety allowlist and never accept arbitrary paths."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "9c4b11114",
+          "title": "feat: 回退连文件还原、清单上下文连续性、side-chat 与 git worktree 批量交付"
+        }
+      ]
+    },
+    {
+      "id": "tool-short-labels",
       "kind": "improvement",
       "importance": "medium",
       "title": {
-        "zh": "输入接受与取消的回执更精确，不再跨会话重发",
-        "en": "More precise receipts for input acceptance and cancellation, no more cross-session resends"
+        "zh": "工具行改用五语言短标签与家族图标",
+        "en": "Tool rows use short localized labels with family icons"
       },
       "summary": {
-        "zh": "尚未移交、已移交待证、已观察写入三种输入状态分开记录；准备期取消会收到明确的「接受前已取消」回执；会话忙碌时移交后的输入不再触发跨会话重发。",
-        "en": "Input states are now recorded separately as not-yet-handed-off, handed-off-awaiting-proof, and observed-written; cancelling during preparation yields an explicit cancelled-before-acceptance receipt; input already handed off no longer triggers cross-session resends when the session is busy."
+        "zh": "工具行的主标签不再是裸英文工具名，而是各语言的短词（回想、查资料、落盘……），并按记忆、知识、频道、浏览器等家族给专属图标；查不到专属文案的第三方插件与 MCP 工具统一显示为\"扩展\"，原工具名保留在悬停提示与完整调用弹窗里。",
+        "en": "Tool rows no longer lead with raw English tool names but with short words in each language, each carrying a family icon for memory, knowledge, channels, browser and so on; third-party plugins and MCP tools without their own copy show the shared \"extension\" label, while the real tool name stays in the hover hint and the full call dialog."
       },
-      "details": [],
-      "sources": [
+      "details": [
         {
-          "type": "commit",
-          "ref": "d011e849",
-          "title": "feat: 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次"
+          "zh": "图标家族由旧的正则子串匹配改为精确登记加通用网格兜底：叫 deep-search 的插件工具不会再被猜成搜索。",
+          "en": "Icon families moved from substring regexes to explicit registration with a generic grid fallback, so a plugin tool named deep-search is no longer guessed as a search."
+        },
+        {
+          "zh": "短标签覆盖改为按插件与注册面独立对账，内置插件工具漏配或写错会直接让门禁失败。",
+          "en": "Short-label coverage is now reconciled against the plugin and registry surfaces independently, so a missing or misspelled built-in plugin tool fails the gate directly."
         }
-      ]
-    },
-    {
-      "id": "memory-migration-receipt-v4",
-      "kind": "improvement",
-      "importance": "medium",
-      "title": {
-        "zh": "记忆迁移中断恢复更安全：v4 收据按序落盘",
-        "en": "Safer memory-migration recovery: v4 receipts persist in order"
-      },
-      "summary": {
-        "zh": "记忆迁移收据升级到 v4，按「准备→提交中→目标已提交→源已归档→完成」顺序落盘，提交中先于目标写盘；中断后只有 v4 准备态可重放，拿不准的窗口保守地转成冲突提示而不是静默继续。",
-        "en": "Memory-migration receipts upgrade to v4, persisted in prepared→committing→target-committed→sources-archived→completed order with committing recorded before the target write; after an interruption only a v4 prepared state may replay, and ambiguous windows conservatively become conflicts instead of silently continuing."
-      },
-      "details": [],
+      ],
       "sources": [
         {
           "type": "commit",
-          "ref": "d011e849",
-          "title": "feat: 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次"
-        }
-      ]
-    },
-    {
-      "id": "media-voice-mcp-hardening",
-      "kind": "improvement",
-      "importance": "low",
-      "title": {
-        "zh": "媒体任务、语音与 MCP 连接的底层契约加固",
-        "en": "Underlying contract hardening for media tasks, speech, and MCP connections"
-      },
-      "summary": {
-        "zh": "媒体任务快照损坏时明确报错而不是覆盖原件，任务结算带尝试编号；语音识别按尝试所有权结算，被取代的尝试不再重复落结果；MCP 客户端实例即连接代次，操作所有权有测试钉住。",
-        "en": "Corrupted media-task snapshots now fail loudly instead of being overwritten, and task settlement carries attempt numbers; speech recognition settles by attempt ownership so superseded attempts never write results twice; an MCP client instance is its connection generation, with operation ownership pinned by tests."
-      },
-      "details": [],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "d011e849",
-          "title": "feat: 架构契约补强七领域——输入接受边界/迁移收据 v4/媒体任务代次/语音 superseded/MCP 代次"
+          "ref": "1f1302ac5",
+          "title": "feat(chat): 工具行短标签全覆盖 + 家族图标"
         }
       ]
     }

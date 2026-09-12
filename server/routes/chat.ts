@@ -71,7 +71,9 @@ import {
 } from "../../shared/video-mime.ts";
 import { isAllowedChatAudioMime, isChatAudioBase64WithinLimit } from "../../shared/audio-mime.ts";
 import { summarizeToolArgs } from "../../shared/tool-arg-summary.ts";
-import { projectLiveToolResultOutcome } from "../../shared/tool-outcome.ts";
+import { projectToolStartDetails, safeToolArguments } from "../../shared/tool-presentation.ts";
+import { projectLiveToolResultOutcome, type ToolResultDeferral } from "../../shared/tool-outcome.ts";
+import { createLiveToolContentDescriptor } from "../history-deferred-content.ts";
 import { AssistantEventNormalizer } from "../assistant-event-normalizer.ts";
 import fs from "fs";
 import path from "path";
@@ -84,14 +86,94 @@ import {
 } from "../ws-scope.ts";
 import { createTerminalWsBridge } from "../terminal-ws-bridge.ts";
 import { ACTIVE_TASK_STATUSES } from "../../lib/task-registry.ts";
+import { extractLatestTodoSnapshot } from "../../lib/tools/todo-compat.ts";
+import { TODO_FORMAT_VERSION, TODO_STATE_CUSTOM_TYPE } from "../../lib/tools/todo-constants.ts";
 
 const log = createModuleLogger("chat");
 const wsLog = createModuleLogger("ws");
 
+const TODO_AUTO_DISMISS_MESSAGE =
+  "[Hana Todo] A new user request was formally accepted, so the finished todo summary was collapsed automatically. Task outcomes (completed/cancelled) are unchanged; create a new todo list only if the new request needs tracking.";
+
+/**
+ * 新请求被服务端正式接受后，把"已结束未收纳"的清单摘要自动收纳（PLAN §5：
+ * 已结束后开始新一轮 → 收纳旧摘要；发送失败或请求未被接受 → 不提前收纳）。
+ * 只改变当前展示，历史记录保留；失败不阻断主流程。
+ */
+export function dismissFinishedTodosOnPromptAccepted(engine, sessionPath) {
+  try {
+    if (!sessionPath) return;
+    const manager = resolveTodoSessionManager(engine, sessionPath);
+    if (!manager) return;
+    const snapshot = extractLatestTodoSnapshot(manager.buildSessionContext?.().messages || []);
+    if (!snapshot?.finished || snapshot.dismissed || snapshot.removed) return;
+    manager.appendCustomMessageEntry(
+      TODO_STATE_CUSTOM_TYPE,
+      TODO_AUTO_DISMISS_MESSAGE,
+      false,
+      {
+        action: "dismiss",
+        source: "system",
+        todoVersion: TODO_FORMAT_VERSION,
+        removed: true,
+        dismissed: true,
+        todos: snapshot.todos,
+      },
+    );
+    engine.syncSessionBranchHead?.(sessionPath, manager, "todo_auto_dismiss_append");
+    engine.emitEvent?.({ type: "todo_update", removed: true, dismissed: true, todos: [] }, sessionPath);
+  } catch (err: any) {
+    log.warn(`auto-dismiss finished todos failed for ${sessionPath}: ${err?.message || err}`);
+  }
+}
+
+function resolveTodoSessionManager(engine, sessionPath) {
+  const liveSession = engine.getSessionByPath?.(sessionPath);
+  return liveSession?.sessionManager
+    ?? (typeof engine.openSessionManagerAtCurrentBranch === "function"
+      ? engine.openSessionManagerAtCurrentBranch(sessionPath, path.dirname(sessionPath))
+      : null);
+}
+
+const TODO_CONTEXT_BLOCK_MARKER = "[Hana Todo] Authoritative task list state";
+
+/**
+ * 轮次注入（融合方案机制 2）：新 prompt 发送前，若存在未完成清单，把权威清单
+ * 状态拼进 promptText（不动 displayMessage，用户气泡不可见）。
+ * 借鉴 openclaude todo_reminder 的重注入思想，但数据源是持久化快照——
+ * 跨中断、跨重启、跨压缩都正确（openclaude 从内存 appState 读，重启即空）。
+ * 与自动收纳互斥：已结束 → dismissFinishedTodosOnPromptAccepted；
+ * 未完成 → 本函数注入。返回 null 表示无需注入。
+ */
+export function buildTodoContextBlockForPrompt(engine, sessionPath) {
+  try {
+    if (!sessionPath) return null;
+    const manager = resolveTodoSessionManager(engine, sessionPath);
+    if (!manager) return null;
+    const snapshot = extractLatestTodoSnapshot(manager.buildSessionContext?.().messages || []);
+    if (!snapshot || snapshot.removed || snapshot.dismissed) return null;
+    const todos = Array.isArray(snapshot.todos) ? snapshot.todos : [];
+    const unfinished = todos.filter((td) => td.status !== "completed" && td.status !== "cancelled");
+    if (unfinished.length === 0) return null;
+
+    const lines = todos.map((td, i) => {
+      const reason = td.status === "blocked" && td.blockedReason ? ` (blocked: ${td.blockedReason})` : "";
+      return `${i + 1}. [${td.status}] ${td.content}${reason}`;
+    });
+    return [
+      `${TODO_CONTEXT_BLOCK_MARKER} at the start of this turn (snapshot ${snapshot.version}):`,
+      ...lines,
+      "Items marked in_progress are not necessarily running right now (the previous turn may have been stopped); verify their real state before continuing. Continue from this list and keep finished items as they are; rewrite the whole list only when the plan itself changes.",
+    ].join("\n");
+  } catch (err: any) {
+    log.warn(`build todo context block failed for ${sessionPath}: ${err?.message || err}`);
+    return null;
+  }
+}
+
 export function summarizeToolStartArgs(toolName: any, rawArgs: any, startedAt = Date.now()) {
-  void toolName;
   void startedAt;
-  return summarizeToolArgs(rawArgs);
+  return summarizeToolArgs(rawArgs, toolName);
 }
 
 /**
@@ -1507,12 +1589,13 @@ export function createChatRoute(engine: any, hub: any, {
         publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishReasoning());
         emitStreamEvent(sessionPath, ss, { type: "thinking_end" });
       }
-      // 只保留前端 extractToolDetail 需要的字段，避免广播完整文件内容
+      // 摘要保持轻量；可展开输入单独投影、遮盖并明确标记超长预览。
       const args = summarizeToolStartArgs(event.toolName || "", event.args);
+      const startDetails = projectToolStartDetails(event.toolName || "", event.args);
       if (event.toolCallId) {
         ss.pendingToolContextsByCallId?.set?.(event.toolCallId, {
           toolName: event.toolName || "",
-          args,
+          args: safeToolArguments(event.args),
         });
       }
       emitStreamEvent(sessionPath, ss, {
@@ -1520,6 +1603,7 @@ export function createChatRoute(engine: any, hub: any, {
         id: event.toolCallId || undefined,
         name: event.toolName || "",
         args,
+        ...(startDetails ? { details: startDetails } : {}),
       });
     } else if (event.type === "tool_execution_end") {
       if (!ss) return;
@@ -1527,10 +1611,26 @@ export function createChatRoute(engine: any, hub: any, {
         ? ss.pendingToolContextsByCallId?.get?.(event.toolCallId)
         : null;
       if (event.toolCallId) ss.pendingToolContextsByCallId?.delete?.(event.toolCallId);
+      // 实时截断同样给出可加载引用：引用只记「本会话 + 本次调用」，正文由历史
+      // 读取按保存记录现场投影，用户不必重开会话才能拿到完整已记录内容。
+      const liveDeferral: ToolResultDeferral = {
+        create: (details) => {
+          if (!event.toolCallId) return undefined;
+          const outputDeferred = createLiveToolContentDescriptor(sessionPath, event.toolCallId, "tool_output", details.output?.length ?? 0);
+          if (!outputDeferred) return undefined;
+          // 搜索的结构化 files 与正文同源同寿命：首包省掉 files 只是省体积，
+          // 结构本身要能按同一条引用取回，不能等重开历史再从文本重猜。
+          const search = details.search;
+          const searchDeferred = search && Array.isArray(search.files) && search.files.length
+            ? createLiveToolContentDescriptor(sessionPath, event.toolCallId, "tool_search", JSON.stringify(search).length)
+            : null;
+          return { outputDeferred, ...(searchDeferred ? { searchDeferred } : {}) };
+        },
+      };
       const outcome = projectLiveToolResultOutcome({
         ...event.result,
         isError: event.isError === true || event.result?.isError === true,
-      }, toolContext || { toolName: event.toolName || "" });
+      }, toolContext || { toolName: event.toolName || "" }, liveDeferral);
       emitStreamEvent(sessionPath, ss, {
         type: "tool_end",
         id: event.toolCallId || undefined,
@@ -1538,7 +1638,15 @@ export function createChatRoute(engine: any, hub: any, {
         status: outcome.status,
         success: outcome.success,
         ...(outcome.error ? { error: outcome.error } : {}),
-        details: outcome.details || event.result?.details,
+        details: {
+          // 既有待办与文件登记仍消费这些字段；其他内部结果不直接广播到详情。
+          // todoVersion 必须随 todos 一起透传：缺失会让前端把 v2 快照误判为
+          // v1 旧格式（全完成即移除），与历史恢复管道的语义分裂。
+          ...Object.fromEntries(["todos", "todoVersion", "sessionFile", "sessionFileRef", "writableLocalRef"]
+            .filter((key) => event.result?.details?.[key] !== undefined)
+            .map((key) => [key, event.result.details[key]])),
+          ...outcome.details,
+        },
       });
 
       // Unified content_block emission for all tool results
@@ -1696,6 +1804,11 @@ export function createChatRoute(engine: any, hub: any, {
       broadcast({
         type: "todo_update",
         todos: Array.isArray(event.todos) ? event.todos : [],
+        ...(event.version !== undefined ? { version: event.version } : {}),
+        ...(event.finished !== undefined ? { finished: event.finished } : {}),
+        ...(event.allCompleted !== undefined ? { allCompleted: event.allCompleted } : {}),
+        ...(event.dismissed !== undefined ? { dismissed: event.dismissed } : {}),
+        ...(event.removed !== undefined ? { removed: event.removed } : {}),
         sessionPath,
       });
     } else if (event.type === "activity_update") {
@@ -1720,6 +1833,7 @@ export function createChatRoute(engine: any, hub: any, {
         projectionMessageId: event.projectionMessageId || null,
         clientMessageId: event.clientMessageId || null,
         todos: Array.isArray(event.todos) ? event.todos : [],
+        ...(event.todoPanel ? { todoPanel: event.todoPanel } : {}),
         sessionFiles: Array.isArray(event.sessionFiles) ? event.sessionFiles : [],
       });
     } else if (event.type === "session_user_message") {
@@ -2664,6 +2778,12 @@ export function createChatRoute(engine: any, hub: any, {
               }
               const sessionRefBlock = buildSessionReferenceBlock(sessionRefs);
               if (sessionRefBlock) promptText = `${promptText}\n\n${sessionRefBlock}`;
+              // 轮次注入（机制 2）：未完成清单的权威状态随本轮交给模型（用户气泡不可见）。
+              // 拒绝/发送失败时只改了局部变量，不产生任何持久副作用。
+              const todoContextBlock = buildTodoContextBlockForPrompt(engine, promptSessionPath);
+              if (todoContextBlock && !promptText.includes(TODO_CONTEXT_BLOCK_MARKER)) {
+                promptText = `${promptText}\n\n${todoContextBlock}`;
+              }
               try {
                 await hub.send(promptText, {
                   sessionId: promptTarget.sessionId,
@@ -2678,6 +2798,8 @@ export function createChatRoute(engine: any, hub: any, {
                   sessionFileRefs: msg.sessionFileRefs,
                   knowledgeRefs,
                 });
+                // 请求被正式接受（未走任何拒绝/异常分支）才收纳旧的已结束摘要（A08/A09）。
+                dismissFinishedTodosOnPromptAccepted(engine, promptSessionPath);
               } catch (err) {
                 const isUserAbort = err.name === 'AbortError'
                   || (err.message === 'This operation was aborted')

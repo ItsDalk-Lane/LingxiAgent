@@ -19,6 +19,8 @@ import { memo, useCallback, useState } from 'react';
 import { Collapse } from '@/ui';
 import type { KnowledgeRetrievalStats } from '../../../../../shared/knowledge-refs.ts';
 import styles from './Chat.module.css';
+import activityStyles from './MessageActivity.module.css';
+import { ActivityIcon } from './MessageActivity';
 import { knowledgeResearchStopNote } from '../../utils/knowledge-research-status';
 
 interface Props {
@@ -87,10 +89,14 @@ export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ ret
   return (
     <div className={styles.toolGroup} data-testid="knowledge-retrieval-fold">
       <div
-        className={`${styles.toolGroupSummary}${expandable ? ` ${styles.toolGroupSummaryClickable}` : ''}`}
+        className={activityStyles.row}
+        role={expandable ? 'button' : undefined}
+        tabIndex={expandable ? 0 : undefined}
+        aria-expanded={expandable ? expanded : undefined}
+        onKeyDown={event => { if (expandable && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); toggle(); } }}
         onClick={expandable ? toggle : undefined}
       >
-        <span className={styles.knowledgeRetrievalIcon} aria-hidden="true">📚</span>
+        <ActivityIcon kind="knowledge_read" />
         <span className={styles.toolGroupTitle}>{summary}{stopNote ? ` · ${stopNote}` : ''}</span>
         {localFast && retrieval.deadlineExceeded && !unavailable && (
           <span className={styles.knowledgeRetrievalBadge}>{t('chat.knowledgeFastDeadlineExceeded')}</span>
@@ -110,16 +116,13 @@ export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ ret
             {t(research ? 'chat.knowledgeResearchTruncated' : 'chat.knowledgeRetrievalTruncated')}
           </span>
         )}
-        {expandable && (
-          <span className={styles.toolGroupArrow} aria-hidden="true">{expanded ? '‹' : '›'}</span>
-        )}
       </div>
       {expandable && (
         <Collapse open={expanded}>
           <div className={styles.toolGroupContent}>
             {supplementalQueries.length > 0 && (
               <div className={styles.toolIndicator} data-testid="knowledge-retrieval-supplement">
-                <span className={styles.knowledgeRetrievalOrdinal}>🔍</span>
+                <ActivityIcon kind="knowledge_search" />
                 <span className={styles.toolDesc}>
                   {t('chat.knowledgeRetrievalSupplement', { n: supplementalQueries.length })}
                 </span>
@@ -131,7 +134,7 @@ export const KnowledgeRetrievalFold = memo(function KnowledgeRetrievalFold({ ret
                 className={styles.toolIndicator}
                 title={t('chat.knowledgeRetrievalSupplementTitle')}
               >
-                <span className={styles.knowledgeRetrievalOrdinal}>↻</span>
+                <ActivityIcon kind="knowledge_search" />
                 <span className={styles.toolDesc}>{query}</span>
               </div>
             ))}

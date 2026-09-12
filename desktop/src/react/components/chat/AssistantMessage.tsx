@@ -243,7 +243,7 @@ export const AssistantMessage = memo(function AssistantMessage({
       });
   }, [addToast, sessionPath, speakState, speakableText, t]);
 
-  const { actions: nodeActions, busy: nodeActionBusy } = useSessionNodeActions({
+  const { actions: nodeActions, busy: nodeActionBusy, overlay: nodeActionOverlay } = useSessionNodeActions({
     sessionPath,
     target: readOnly || !showTurnCompletionTime ? null : turnTarget,
     retryMessage: retrySourceMessage || undefined,
@@ -336,6 +336,7 @@ export const AssistantMessage = memo(function AssistantMessage({
           testId="assistant-completion-actions"
         />
       )}
+      {nodeActionOverlay}
     </div>
   );
 });

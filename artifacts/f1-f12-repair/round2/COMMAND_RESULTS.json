@@ -4060,5 +4060,117 @@
     "log": "logs/sep11-v0138-green.log",
     "logSha256": "cfaee83bf72c9be0c40384e049c6711ea02b6fc86890763b207e233ef00e3ce8",
     "sourceManifestHash": "e8789893c5ba718101991fccfc858d8e6234cbe8e76f4dfdc8403d40b837d761"
+  },
+  {
+    "command": [
+      "python3",
+      "artifacts/f1-f12-repair/round2/create-delivery-patch.py"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-11T07:45:09.353212+00:00",
+    "end": "2026-09-11T07:45:13.053202+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "c86a8c64a94f499ced7a7d4a6cc9bced3b9709abbfa754c702ddfebc64bc42dd",
+    "log": "logs/sep11-todo-patch.log",
+    "logSha256": "9cb0002075d2d7b92a1eca39e355b4ac00f733d0caa587d26660e15dbcf71474",
+    "sourceManifestHash": "c86a8c64a94f499ced7a7d4a6cc9bced3b9709abbfa754c702ddfebc64bc42dd"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/upstream-sync-matrix.test.ts",
+      "tests/packaged-desktop-cleanup.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-11T07:45:26.674151+00:00",
+    "end": "2026-09-11T07:45:27.408855+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 16,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "c86a8c64a94f499ced7a7d4a6cc9bced3b9709abbfa754c702ddfebc64bc42dd",
+    "log": "logs/sep11-todo-green.log",
+    "logSha256": "fe81d61b7bdd89079ecc8af7e47f50b88a325cb1df7a9feca7abc3943314e275",
+    "sourceManifestHash": "c86a8c64a94f499ced7a7d4a6cc9bced3b9709abbfa754c702ddfebc64bc42dd"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--exclude",
+      "**/round2-delivery-evidence.test.ts",
+      "--exclude",
+      "**/round3-delivery-evidence.test.ts",
+      "--exclude",
+      "**/upstream-sync-matrix.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-12T00:54:32.294459+00:00",
+    "end": "2026-09-12T00:55:57.164289+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 14126,
+      "failed": 0,
+      "skipped": 7,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "f10903561611b9b09f85174b5fffb56f57c7097ba5818c0b88da5ab7581e1f65",
+    "log": "logs/sep12-v0139-seal-r2.log",
+    "logSha256": "72b355fc173ba2f55d6da3d3e8b49ba65ba2f607fad162f572d3bacefa9f0142",
+    "sourceManifestHash": "f10903561611b9b09f85174b5fffb56f57c7097ba5818c0b88da5ab7581e1f65"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--exclude",
+      "**/round2-delivery-evidence.test.ts",
+      "--exclude",
+      "**/round3-delivery-evidence.test.ts",
+      "--exclude",
+      "**/upstream-sync-matrix.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-12T00:58:23.298947+00:00",
+    "end": "2026-09-12T00:59:48.823534+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 14126,
+      "failed": 0,
+      "skipped": 7,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "a347aa80f7f0fdc384da5c8ed06620d80c15d40e86b7ff879a018da7894ff2fb",
+    "log": "logs/sep12-v0139-final2-r2.log",
+    "logSha256": "aea2f2bac4132d341258575585cee15e35d2a14522e8fc459d215db7bce5bc21",
+    "sourceManifestHash": "a347aa80f7f0fdc384da5c8ed06620d80c15d40e86b7ff879a018da7894ff2fb"
   }
 ]

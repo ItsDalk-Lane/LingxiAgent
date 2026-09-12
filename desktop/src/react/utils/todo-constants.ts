@@ -19,3 +19,23 @@ export type TodoToolName = typeof TODO_TOOL_NAMES[number];
 
 /** Hana 内部 session 事件：用户手动完成并移除当前 todo group */
 export const TODO_STATE_CUSTOM_TYPE = "lingxi.todo_state" as const;
+
+/**
+ * 清单数据格式版本。details.todoVersion === TODO_FORMAT_VERSION 的记录
+ * 采用新版生命周期：全部终态（完成/取消）保留收尾摘要，直到用户收纳或
+ * 新一轮请求被正式接受；受阻/取消是合法状态。
+ * 无版本标识的旧记录保持旧语义：全部 completed 即移除，不重新弹出。
+ */
+export const TODO_FORMAT_VERSION = 2;
+
+/** 全部合法 todo 状态（含 v2 新增的 blocked / cancelled） */
+export const TODO_STATUSES = [
+  "pending",
+  "in_progress",
+  "blocked",
+  "cancelled",
+  "completed",
+] as const;
+
+/** 终态集合：完成或取消都算"已结束"，不计入剩余工作 */
+export const TODO_TERMINAL_STATUSES = ["cancelled", "completed"] as const;

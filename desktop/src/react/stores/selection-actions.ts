@@ -293,6 +293,30 @@ function isInteractiveSelectionElement(element: Element): boolean {
   return !!element.closest('input, textarea, select, button, [contenteditable="true"], [data-selection-ignore="true"], [data-mobile-gesture-ignore="true"]');
 }
 
+/**
+ * 引用浮层归属：选区来源会话决定哪个输入区承接这条引用。
+ * 主聊天页与侧边对话面板各挂一个浮层，只有与自身会话匹配的那个才渲染
+ * （sourceSessionPath 为空的 preview 选区默认归主聊天页）。
+ * 单一全局 quoteCandidate 因此不会同时弹出两个浮层，也不会把侧边会话里
+ * 选中的内容投递到主会话输入区。
+ */
+export function quoteCandidateOwnedBySession(
+  candidate: Pick<QuotedSelection, 'sourceKind' | 'sourceSessionPath'> | null | undefined,
+  scopeSessionPath: string | null | undefined,
+  currentSessionPath?: string | null,
+): boolean {
+  if (!candidate) return false;
+  const scope = scopeSessionPath ?? null;
+  const source = candidate.sourceSessionPath ?? null;
+  if (!scope) {
+    // 主聊天页的浮层：preview 选区归主聊天页；chat 选区归它所在的会话
+    // （会话已切换/尚未 hydrate 时按当前会话兜底，避免浮层无声消失）。
+    if (candidate.sourceKind === 'preview') return true;
+    return !source || !currentSessionPath || source === currentSessionPath;
+  }
+  return source === scope;
+}
+
 function clearSelectionIfInteractionLeavesQuoteAction(targetElement: Element | null): boolean {
   const current = useStore.getState().quoteCandidate;
   if (!current) return false;

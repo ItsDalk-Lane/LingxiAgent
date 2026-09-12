@@ -193,3 +193,9 @@
     from { opacity: 0; transform: translateX(-50%) translateY(4px); }
     to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
+
+/* ── Running Shimmer（运行状态行流光：浅色带从右向左扫过文字）──
+   起点由元素自身的 background-position 提供，这里只声明终点。 */
+@keyframes hana-running-shimmer {
+    to { background-position: 0 0; }
+}

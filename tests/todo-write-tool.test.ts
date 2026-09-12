@@ -70,10 +70,12 @@ describe("todo_write tool", () => {
     expect(todoItemSchema.content.minLength).toBe(1);
     expect(todoItemSchema.activeForm.type).toBe("string");
     expect(todoItemSchema.activeForm.minLength).toBe(1);
-    // status must be a string enum with exactly the three allowed values
+    // status must be a string enum with exactly the five allowed values (v2)
     expect(todoItemSchema.status.type).toBe("string");
-    expect(todoItemSchema.status.enum).toEqual(["pending", "in_progress", "completed"]);
+    expect(todoItemSchema.status.enum).toEqual(["pending", "in_progress", "blocked", "cancelled", "completed"]);
     expect(todoItemSchema.status.enum).not.toContain("bogus");
+    // blockedReason 是可选字符串（blocked 时由 execute 校验必填）
+    expect(todoItemSchema.blockedReason.type).toBe("string");
   });
 
   it("is idempotent: two instances with same input produce same output", async () => {
@@ -101,7 +103,7 @@ describe("todo_write tool", () => {
     expect(result.details.todos[0].content).toBe("b");
   });
 
-  it("warns on multiple in_progress but does not reject", async () => {
+  it("allows multiple in_progress items (genuine parallel work, no warning)", async () => {
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     const tool = createTodoTool();
     const input = {
@@ -112,10 +114,76 @@ describe("todo_write tool", () => {
     };
     const result = await tool.execute("tc-1", input, null, null, {});
 
+    expect(result.isError).toBeUndefined();
     expect(result.details.todos).toHaveLength(2);
-    expect(result.details.warning).toMatch(/in_progress/i);
-    expect(warnSpy).toHaveBeenCalled();
+    expect("warning" in result.details).toBe(false);
+    expect(warnSpy).not.toHaveBeenCalled();
     warnSpy.mockRestore();
+  });
+
+  it("marks results with the v2 format version", async () => {
+    const tool = createTodoTool();
+    const result = await tool.execute("tc-1", {
+      todos: [{ content: "a", activeForm: "doing a", status: "pending" }],
+    }, null, null, {});
+    expect(result.details.todoVersion).toBe(2);
+  });
+
+  it("trims content/activeForm whitespace", async () => {
+    const tool = createTodoTool();
+    const result = await tool.execute("tc-1", {
+      todos: [{ content: "  padded  ", activeForm: "  doing padded  ", status: "pending" }],
+    }, null, null, {});
+    expect(result.details.todos).toEqual([
+      { content: "padded", activeForm: "doing padded", status: "pending" },
+    ]);
+  });
+
+  it("rejects blank-after-trim entries without touching the stored list", async () => {
+    const tool = createTodoTool();
+    const result = await tool.execute("tc-1", {
+      todos: [{ content: "   ", activeForm: "doing", status: "pending" }],
+    }, null, null, {});
+    expect(result.isError).toBe(true);
+    expect(result.details.error).toBe("invalid_todos");
+    expect(result.details.todos).toBeUndefined();
+  });
+
+  it("rejects duplicate entries", async () => {
+    const tool = createTodoTool();
+    const result = await tool.execute("tc-1", {
+      todos: [
+        { content: "same", activeForm: "doing same", status: "pending" },
+        { content: "same", activeForm: "doing same again", status: "in_progress" },
+      ],
+    }, null, null, {});
+    expect(result.isError).toBe(true);
+    expect(result.details.error).toBe("invalid_todos");
+    expect(result.details.todos).toBeUndefined();
+  });
+
+  it("rejects blocked items without blockedReason", async () => {
+    const tool = createTodoTool();
+    const result = await tool.execute("tc-1", {
+      todos: [{ content: "stuck", activeForm: "being stuck", status: "blocked" }],
+    }, null, null, {});
+    expect(result.isError).toBe(true);
+    expect(result.details.error).toBe("invalid_todos");
+    expect(result.details.reasons[0]).toMatch(/blockedReason/);
+  });
+
+  it("keeps blockedReason on blocked items", async () => {
+    const tool = createTodoTool();
+    const result = await tool.execute("tc-1", {
+      todos: [{ content: "stuck", activeForm: "being stuck", status: "blocked", blockedReason: "  缺少 API key  " }],
+    }, null, null, {});
+    expect(result.isError).toBeUndefined();
+    expect(result.details.todos[0]).toEqual({
+      content: "stuck",
+      activeForm: "being stuck",
+      status: "blocked",
+      blockedReason: "缺少 API key",
+    });
   });
 
   it("does not warn on zero or one in_progress", async () => {
@@ -131,5 +199,46 @@ describe("todo_write tool", () => {
 
     expect(warnSpy).not.toHaveBeenCalled();
     warnSpy.mockRestore();
+  });
+
+  describe("收尾验证提醒（机制 4b）", () => {
+    const done = (content: string) => ({ content, activeForm: `doing ${content}`, status: "completed" as const });
+
+    it("3+ 项全部完成且无验证类条目：结果文本追加提醒", async () => {
+      const tool = createTodoTool();
+      const result = await tool.execute("tc-1", {
+        todos: [done("实现功能"), done("改样式"), done("写文档")],
+      }, null, null, {});
+      expect(result.isError).not.toBe(true);
+      expect(result.content[0].text).toMatch(/no verification step/i);
+    });
+
+    it("清单含验证类条目：不追加提醒", async () => {
+      const tool = createTodoTool();
+      const result = await tool.execute("tc-1", {
+        todos: [done("实现功能"), done("改样式"), done("运行测试验证")],
+      }, null, null, {});
+      expect(result.content[0].text).not.toMatch(/no verification step/i);
+    });
+
+    it("少于 3 项：不追加提醒", async () => {
+      const tool = createTodoTool();
+      const result = await tool.execute("tc-1", {
+        todos: [done("实现功能"), done("改样式")],
+      }, null, null, {});
+      expect(result.content[0].text).not.toMatch(/no verification step/i);
+    });
+
+    it("并非全部完成（含 pending）：不追加提醒", async () => {
+      const tool = createTodoTool();
+      const result = await tool.execute("tc-1", {
+        todos: [
+          done("实现功能"),
+          done("改样式"),
+          { content: "部署", activeForm: "正在部署", status: "pending" },
+        ],
+      }, null, null, {});
+      expect(result.content[0].text).not.toMatch(/no verification step/i);
+    });
   });
 });

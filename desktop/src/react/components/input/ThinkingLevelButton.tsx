@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { useI18n } from '../../hooks/use-i18n';
 import { useStore } from '../../stores';
+import { useScopedSessionPath } from '../session-scope-context';
 import { DEFAULT_THINKING_LEVELS, normalizeThinkingLevel, normalizeThinkingLevels, type ThinkingLevel } from '../../stores/model-slice';
 import { SelectWidget, type SelectOption } from '@/ui';
 import styles from './InputArea.module.css';
@@ -22,7 +23,8 @@ export function ThinkingLevelButton({ level, onChange, availableLevels }: {
   availableLevels?: readonly ThinkingLevel[];
 }) {
   const { t } = useI18n();
-  const currentSessionPath = useStore(s => s.currentSessionPath);
+  const currentSessionPath = useScopedSessionPath();
+  // pending 草稿态只属于主聊天页：侧边面板的输入区永远绑定一个已存在的会话。
   const pendingNewSession = useStore(s => s.pendingNewSession);
   const activeLevel = normalizeThinkingLevel(level);
 

@@ -61,6 +61,28 @@ function emitTool(subscriber, sessionPath, toolCallId = "t1", name = "read") {
 }
 
 describe("chat route mood segment lifecycle", () => {
+  it("工具开始与结束保留安全详情，并维持待办传输字段", () => {
+    const { subscriber, sessionPath, payloads } = makeHarness();
+    subscriber?.({ type: "turn_start" }, sessionPath);
+    subscriber?.({
+      type: "tool_execution_start", toolCallId: "details-1", toolName: "todo_write",
+      args: { label: "Task", clientSecret: "credential-sentinel" },
+    }, sessionPath);
+    subscriber?.({
+      type: "tool_execution_end", toolCallId: "details-1", toolName: "todo_write", isError: false,
+      result: {
+        content: [{ type: "text", text: "first" }, { type: "text", text: "second" }],
+        details: { todos: [], credentials: "credential-sentinel" },
+      },
+    }, sessionPath);
+    const events = payloads().filter((payload) => payload.id === "details-1");
+    expect(events).toHaveLength(2);
+    expect(JSON.parse(events[0].details.input)).toEqual({ label: "Task", clientSecret: "********" });
+    expect(events[1].details).toMatchObject({ output: "first\nsecond", todos: [] });
+    expect(JSON.stringify(events)).not.toContain("credential-sentinel");
+    expect(events[1].details).not.toHaveProperty("credentials");
+  });
+
   it("projects model skill reads as bounded tool_end details", () => {
     const { subscriber, sessionPath, payloads } = makeHarness();
     subscriber?.({ type: "turn_start" }, sessionPath);

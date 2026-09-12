@@ -41,6 +41,15 @@ vi.mock('../../stores/message-turn-actions', () => ({
   retrySessionTurn: (sessionPath: string, target: unknown, options?: unknown) => retryMock(sessionPath, target, options),
   forkSessionTurn: (sessionPath: string, target: unknown) => forkMock(sessionPath, target),
   activateForkedSession: (forked: unknown) => activateForkMock(forked),
+  previewWorkspaceRollback: vi.fn(async () => ({
+    enabled: false,
+    available: false,
+    degraded: false,
+    commit: null,
+    reason: 'file_rollback_disabled',
+    files: [],
+    fileCount: 0,
+  })),
 }));
 
 describe('AssistantMessage completion actions', () => {
@@ -139,6 +148,8 @@ describe('AssistantMessage completion actions', () => {
     ]);
 
     fireEvent.click(screen.getByTitle('重新生成'));
+    // 入口现在是两选项小菜单；默认项「仅回退对话」等价于旧的直接重试。
+    fireEvent.click(screen.getByText('chat.fileRollback.conversationOnly'));
 
     expect(retryMock).toHaveBeenCalledWith(
       sessionPath,

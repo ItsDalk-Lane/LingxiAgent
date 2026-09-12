@@ -52,6 +52,7 @@ export interface RoutePageResult {
   messages: any[];
   blocks: any[];
   todos: any[] | null;
+  todoPanel?: Record<string, unknown> | null;
   hasMore: boolean;
   nextBefore: string | null;
   sessionFiles: any[];
@@ -124,7 +125,7 @@ export async function projectFullHistoryPage(
     engine,
     receiverName,
   });
-  const { slicedBlocks, sessionFiles, todos } = await hydrateExternalState({
+  const { slicedBlocks, sessionFiles, todos, todoPanel } = await hydrateExternalState({
     engine,
     sessionPath: input.sessionPath,
     pageBounds,
@@ -141,6 +142,7 @@ export async function projectFullHistoryPage(
     messages: projected.messages,
     blocks: slicedBlocks,
     todos,
+    todoPanel,
     hasMore: pageBounds.hasMore,
     nextBefore: pageBounds.hasMore ? String(pageBounds.startIdx) : null,
     sessionFiles,
@@ -495,7 +497,7 @@ async function tryDirectoryOnce(
     if (record) todoSnapshot = extractLatestTodoSnapshot([record]);
   }
 
-  const { slicedBlocks, sessionFiles, todos } = await hydrateExternalState({
+  const { slicedBlocks, sessionFiles, todos, todoPanel } = await hydrateExternalState({
     engine,
     sessionPath: input.sessionPath,
     pageBounds: page.bounds,
@@ -515,6 +517,7 @@ async function tryDirectoryOnce(
       messages: projected.messages,
       blocks: slicedBlocks,
       todos,
+      todoPanel,
       hasMore: page.bounds.hasMore,
       nextBefore: page.bounds.hasMore ? String(page.bounds.startIdx) : null,
       sessionFiles,

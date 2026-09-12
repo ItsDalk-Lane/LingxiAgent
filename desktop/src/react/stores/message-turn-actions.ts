@@ -29,6 +29,8 @@ const SESSION_NODE_ACTION_TIMEOUT_MS = 30 * 60 * 1000;
 interface RetrySessionTurnOptions {
   message?: ChatMessage;
   replacementText?: string;
+  /** 'workspace' = 连同文件改动一起回退（需服务端开关开启，否则 4xx）。 */
+  fileRollback?: 'none' | 'workspace';
 }
 
 function resolveSessionIdentity(sessionPath: string): { sessionId: string; sessionPath: string } {
@@ -84,7 +86,7 @@ export async function retrySessionTurn(
     const state = useStore.getState();
     if (sessionScopedListIncludes(state, state.streamingSessions, sessionPath)) return false;
     const identity = resolveSessionIdentity(sessionPath);
-    const { message, replacementText } = options;
+    const { message, replacementText, fileRollback } = options;
 
     const response = await lingxiFetch('/api/sessions/turns/retry', {
       method: 'POST',
@@ -96,11 +98,17 @@ export async function retrySessionTurn(
         target,
         ...(message?.id ? { clientMessageId: message.id } : {}),
         ...(replacementText !== undefined ? { text: replacementText } : {}),
+        ...(fileRollback ? { fileRollback } : {}),
         uiContext: collectUiContext(state),
         ...(message ? { displayMessage: displayMessageEnvelope(message, replacementText) } : {}),
       }),
     });
-    await readSessionActionResponse(response, 'Retry failed');
+    const data = await readSessionActionResponse(response, 'Retry failed');
+    // 逐文件回退报告：HTTP 响应是主通道，ws session_branch_reset 是同源兜底
+    //（其它窗口/别的入口触发时也能看到）。两条路都写同一个会话作用域键。
+    if (data?.fileRollbackReport) {
+      useStore.getState().setFileRollbackReport?.(sessionPath, data.fileRollbackReport);
+    }
     return true;
   } catch (error) {
     reportActionError(sessionPath, error);
@@ -230,4 +238,75 @@ export async function activateForkedSession(forked: ForkedSessionRef): Promise<v
   });
   await loadSessions();
   await switchSession(forked.sessionPath);
+}
+
+export interface WorkspaceRollbackPreview {
+  enabled: boolean;
+  available: boolean;
+  degraded: boolean;
+  commit: string | null;
+  reason: string | null;
+  turnInputEntryId?: string | null;
+  files: Array<{ path: string; status: string }>;
+  fileCount: number;
+}
+
+/**
+ * 回退前预览：开关是否开启、该轮是否有检查点、受影响文件清单与数量。
+ * 失败返回 null（UI 按「不可用 + 未知原因」置灰），不写 inline error 干扰聊天。
+ */
+export async function previewWorkspaceRollback(
+  sessionPath: string,
+  target: SessionNodeTarget,
+): Promise<WorkspaceRollbackPreview | null> {
+  if (!sessionPath) return null;
+  try {
+    const identity = resolveSessionIdentity(sessionPath);
+    const response = await lingxiFetch('/api/sessions/turns/rollback-preview', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      throwOnHttpError: false,
+      body: JSON.stringify({ ...identity, target }),
+    });
+    const data = await readSessionActionResponse(response, 'Rollback preview failed');
+    return {
+      enabled: data?.enabled === true,
+      available: data?.available === true,
+      degraded: data?.degraded === true,
+      commit: typeof data?.commit === 'string' ? data.commit : null,
+      reason: typeof data?.reason === 'string' ? data.reason : null,
+      turnInputEntryId: typeof data?.turnInputEntryId === 'string' ? data.turnInputEntryId : null,
+      files: Array.isArray(data?.files) ? data.files : [],
+      fileCount: Number.isFinite(data?.fileCount) ? Number(data.fileCount) : 0,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** 读取「回退时撤销文件改动」开关；失败返回 null（调用方按关闭处理）。 */
+export async function readWorkspaceRollbackPreference(): Promise<boolean | null> {
+  try {
+    const response = await lingxiFetch('/api/sessions/workspace-rollback');
+    const data = await readSessionActionResponse(response, 'Read rollback preference failed');
+    return data?.enabled === true;
+  } catch {
+    return null;
+  }
+}
+
+/** 写入「回退时撤销文件改动」开关；成功返回落盘值，失败返回 null。 */
+export async function writeWorkspaceRollbackPreference(enabled: boolean): Promise<boolean | null> {
+  try {
+    const response = await lingxiFetch('/api/sessions/workspace-rollback', {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      throwOnHttpError: false,
+      body: JSON.stringify({ enabled }),
+    });
+    const data = await readSessionActionResponse(response, 'Write rollback preference failed');
+    return data?.enabled === true;
+  } catch {
+    return null;
+  }
 }

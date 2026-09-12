@@ -13,7 +13,10 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 01414f13c0e47f6eaa7cf527cb6631155adabc31  (2026-09-11 v0.1.38 发布候选：sep10 七领域/历史读取 + 三轮 CI 拦截修复 + 发布元数据，直提 main)
+VERIFIED_SOURCE_SHA   = 900d2af95b313cea6219aad5f80922692564cfa1  (2026-09-12 v0.1.39 发布候选：工具展示链路五项对抗审查缺陷修复 + 审查材料入库 + v0.1.39 发布元数据，分支 feat/tool-activity-presentation)
+历史 VERIFIED_SOURCE_SHA = 015e1b491fed1cfed10d1eade05851bfc6a5364e  (2026-09-12 工具展示链路五项对抗审查缺陷修复源码候选，分支 feat/tool-activity-presentation)
+历史 VERIFIED_SOURCE_SHA = 9c4b11114696a67e63879dbdfdc4e73947636549  (2026-09-11 回退连文件还原/清单连续性批量候选，分支 feat/tool-activity-presentation)
+历史 VERIFIED_SOURCE_SHA = aa42fc5918a245735d2ef2b7490d7e015c525556  (2026-09-11 任务清单改版候选：todo v2 五态/收尾/进度条 + 样式立法收账 + 边界/指纹坐标修正 + 证据重冻结，分支 feat/tool-activity-presentation)
 历史上游同步工作分支  = feature/upstream-sync-0.447.4
 历史知识重构执行分支  = feat/knowledge-retrieval-research-p0-p3
 ```
@@ -1111,6 +1114,17 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - 固定源码候选：`af0a16d36c0639f18318a967137331eaffca5d22`（0275f6c5 基础上：40e0c6d3 七套件 afterEach 关闭 SessionManifestStore + af0a16d3 证据重冻结 r3）。PR #53 第二轮 CI：macOS 双腿 + ubuntu 全绿；windows-2025 同 48 项 EPERM 复现且 20×250ms 重试不可愈——实锤非异步释放抖动，而是测试未关闭 SessionManifestStore 的 SQLite 句柄（Windows 下打开文件阻塞目录删除；既有 Windows 绿测试 session-manifest-engine/history-pagination-run-continuity 均有 close 惯例）。修复：七套件登记并 afterEach close 后再 rm（rmSync 重试选项保留，对齐既有 Windows 清理惯例）。
 - 验证证据（绑定 40e0c6d3 源码树；af0a16d3 相对其仅叠加 excluded 证据/再生补丁，无生产代码差异）：七套件单跑 50/50 绿；tsconfig.test tsc 绿；全量 13821 passed / 4 失败均为坐标旧值 0275f6c5 下 seal guard 家族预期红；sep10-seal-green-r3 绿门禁（exit 0、manifest 034f8f56/9452bfed 未漂移）、补丁重放 VERIFIED。
 
+## 2026-09-12 v0.1.39 发布候选与审计封印
+
+- 固定源码候选：`b2785643753f7ab64b15a36dd378316269fbd9e1`（分支 feat/tool-activity-presentation），三层叠加：
+  1. `015e1b491` 工具展示链路五项对抗审查缺陷修复——P0 多文本块绕过敏感字段遮盖（保留块边界、逐块独立安全投影）、P1 搜索结构化事实被降级为文本重猜（新增 `tool_search` deferred kind）、P1 实时大结果截断缺全文引用（新增 v2 locator，正文不随 WS 传输、解析绑定已授权会话路径）、P2 工具短标签漏配（office 连字符拼写、present_files、media_generate-speech）与短标签对账改独立真相源、P2 Portal 弹窗 diff 丢 CSS token（token 声明块改挂 `.panel, .dialog`）；`build/cli-runtime-closure.json` 随新增 import 由官方 writer 确定性重生成。
+  2. `1da1d47e5` 收录两份未跟踪展示层材料（审查提示词，收录前把本机绝对路径改写为 `<REPO_ROOT>`；工具行样式预览页）——证据 runner 以 `git ls-files --cached --others` 取源文件集，未跟踪文件同样计入。
+  3. `b27856437` v0.1.39 发布元数据（version 0.1.38→0.1.39、releaseGeneration 16→17、release-digest v1 重写 7 项并 prepend 进 v2 滚动史册 20 条、release-preflight 当前产品 tag 断言随动）。
+- 摘要生成方式（如实记录）：本机无可用 deepseek 凭证——provider-catalog 无 `deepseek` 条目，唯一 `deepseek-responses` 的 key 对 `/responses`、`/chat/completions`、`/models` 三端点均 401——官方 `generate-release-digest.mjs` 无法运行；按 v0.1.37 手写摘要先例手写 v0.1.39 摘要，仍由 `validate-release-digest` 与 `assertValidReleaseDigest` 把关。
+- 验证证据（绑定该候选树）：typecheck×3 绿；release:preflight --tag v0.1.39 PASS（历史最大 0.1.38/16）；validate-release-digest v1/v2 PASS；artifact-release-smoke 305/305 绿；定向 130/130、相邻 server/shared 157/157、style-discipline + css-token-reference 9/9、cli-closure-census 22/22、build:renderer 绿。
+- 封印推进：坐标 `9c4b1111`→`b27856437`；矩阵与投影重生成（133 paths，projection sha256 `8bf6c07a873c2b25c51db12ae36addb89cbfe33f23747fcdd3d32b4c7878dbc9`）；round2/round3 交付证据按候选树重冻结并追加绿色门禁记录，与坐标推进同一提交落地（证据文件不在 audit allowlist 内，作为坐标之后的独立提交会被 diff guard 判为非审计改动）。
+- 未执行/受限：npm run pack 与打包未执行；真实供应商 live 验证未执行；Electron 真实界面与深浅主题人工验收未执行；Windows 真机与 NSIS 安装交互未实测（沿用既有 Known limitation）。
+
 ## 2026-09-11 v0.1.38 发布候选与审计封印
 
 - 固定源码候选：`01414f13c0e47f6eaa7cf527cb6631155adabc31`（直提 main，基于 PR #53 合并树 9ab5218c）：15654cd1 发布元数据（version 0.1.37→0.1.38、releaseGeneration 15→16、release-digest v1 重写 6 项并 prepend 进 v2 滚动史册 19 条、release-preflight 当前产品 tag 断言随版本推进——沿用 696016b7 教训同提交更新）+ 01414f13 证据重冻结。该候选相对合并树仅叠加版本/digest/预检断言与 excluded 证据，无生产代码差异。
@@ -1118,6 +1132,20 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - CI 证据（PR #53，合并前最终轮 34551812195）：macos-15 arm64 / macos-15-intel / ubuntu-24.04 / windows-2025 四腿全绿 + open-build-smoke + persistence-schema-guard；首轮 ubuntu worker fork 崩溃与两轮 Windows EPERM 的处置见上两条记录。
 - 未执行/受限：正式签名、四平台安装包、公证与远端发布证据由 tag 工作流执行（本条目记为待流水线验证，不以本地结果代替）；本地未执行 npm run pack；Windows NSIS 真机安装交互仍未实测（沿用既有 Known limitation）。
 - 发布结果（2026-09-11）：运行 34553989949 全绿（macos-15 arm64 首跑 better-sqlite3 node-gyp 拉取 nodejs.org 头文件网络超时，runner 网络抖动非代码问题，按惯例重跑失败作业后通过；四平台构建 + artifact-release-smoke + release + publish-train 全绿）。v0.1.38 正式发布（Latest，非草稿非预发布，18 产物），train-stable-17 与 train-beta-20 双列车同步发布；mirror-atomgit 401 Bad credentials 为 AtomGit 镜像长期故障既有状态（best-effort，不阻塞发布）。验证证据以该运行远端作业为准；本提交为纯审计收口。
+
+## 2026-09-11 任务清单改版候选与审计封印
+
+- 固定源码候选：`aa42fc5918a245735d2ef2b7490d7e015c525556`（分支 feat/tool-activity-presentation）：d759b695 任务清单改版（todo v2 五态与受阻原因、完成/取消/收纳区分、版本哈希保护的用户收尾操作、输入框上方 TodoPanel、胶囊重复清单移除、消息行摘要、失败保留原清单缺陷修复；验收记录 docs/tasks/2026-09-11-todo-experience/ACCEPTANCE.md）+ 43501abb 封印前收账（MessageActivity/TodoPanel CSS 字面量收进定义行与 token、export-manifest 补录 4 个展示层模块消除 open→closed 新耦合、persistence-schema-fingerprint compatible 重钉——search-tools.ts 仅展示层改动、managed-runtime-caches 契约零变化）+ aa42fc59 证据重冻结（round2/round3 SOURCE_MANIFEST 按候选树重算 c86a8c64/9e9cfe2f、交付补丁重生成重放 VERIFIED、sep11-todo-green 绿门禁 exit 0 且执行期间无漂移）。
+- 验证证据（绑定该候选树）：typecheck×3 绿；全量 13926 passed / 7 skipped / 4 failed（1380 文件）——4 个失败全部为本条目推进前的 seal 坐标预期红（post-verification-audit-seal + round2 R10-03/R10-04 + round3 manifest 守卫，均因旧坐标 01414f13 起存在非审计开发提交）；build:renderer 绿；open-boundary-lint 绿（1 条已知基线债务）；style-discipline 棘轮绿；persistence-schema-tripwire 15/15 绿；证据契约（round2 R10 + round3 + matrix）22/22 绿。
+- 未执行/受限：真实界面验收（A20 主题/缩放/移动端）与真实模型行为验证未执行（验收记录已标注）；未执行 npm run pack 与打包/发布；Windows 真机仍未实测（沿用既有 Known limitation）。
+- 提交后验证（封印推进后）：审计提交下 post-verification diff guard OK（候选之后仅 6 个审计文件）；matrix/round2/round3/seal 复跑 25/25 绿；全量复跑 13930 passed / 0 failed / 7 skipped（1379 文件通过、1 既有跳过），无任何失败。说明：round2 交付补丁在每次全量运行时由 R10-09 按当时树确定性重生成（工作区漂移为既有状态，不入审计提交）。
+
+## 2026-09-11 回退连文件还原/清单连续性批量候选与审计封印
+
+- 固定源码候选：`9c4b11114696a67e63879dbdfdc4e73947636549`（分支 feat/tool-activity-presentation，135 文件 +26535/−1550）：回退时撤销文件改动（WorkspaceSnapshotService 影子快照 + 会话侧车、preferences 开关默认关、retry fileRollback=workspace 两选项确认、逐文件报告 HTTP+ws 双通道、SessionRollback UI、e2e/挂点测试）+ 清单上下文连续性融合（tool_end 白名单补 todoVersion、权威清单注入、pi-sdk 节流提醒、中断标记、todo_write 收尾验证提醒；记录 docs/tasks/2026-09-11-todo-experience/CONTEXT-CONTINUITY.md）+ side-chat 面板与 composer 模块拆分 + git worktree 创建/列表（GitWorktreeModal/GitBranchList）+ RunningStatusLine/DeskTree mention 等 UI 增量 + i18n 五语言 + 门禁收账（store-registry 注册 workspace-snapshots 店与 git-worktree-user-repo-parent 豁免、persistence 回执再生、schema 指纹 compatible repin sha256:7edf5195…、export-manifest 增补 core/interrupted-turn-marker.ts、core/workspace-snapshots.ts、lib/pi-sdk/todo-context-reminder.ts 三模块）。
+- 验证证据（绑定该候选树，日志 /tmp/candidate-typecheck.log、/tmp/candidate-npm-test.log）：typecheck×3 exit 0；全量 npm test **14098 passed / 0 failed / 7 skipped**（1394 文件，exit 0）——任务 0 基线 12 红（persistence-schema-tripwire 4、persistence-store-registry 3、open-boundary-lint 2、persistence-startup-receipt 1、model-observability-e2e-chat 2）全部清零，其中 8 项门禁红经官方 writer/repin 收账，e2e-chat 2 项复跑即绿（基线红为暂时性）；cli-closure-census 22/22；upstream-sync-matrix 构建校验绿（133 paths 不变）。
+- 未执行/受限：npm run pack 与打包/发布未执行；真实供应商/真机验证未执行（沿用既有 Known limitation）；open-boundary 1 条既有基线债务保留（棘轮基线内）。
+- 提交后验证（封印推进后）：post-verification diff guard OK（候选之后仅审计文件）；build-sync-matrix --check 绿。
 
 ## 2026-08-25 Notebook-first Knowledge 目标
 
@@ -1648,3 +1676,253 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 - A01 快照 clone `/tmp/lingxi-baseline-1d42b740` 曾被补丁验证误污染（任务内容被写入、runner 丢失）；已按 initial-status.txt（A01=porcelain=0）恢复纯净：HEAD `1d42b740`、工作区 0 差异。
 - compat 旧服务端 runner 自包含化：模板 tracked 于 `tests/compat-old-server-runner.template.mjs`，两个兼容测试 beforeAll 幂等写入 clone；clone 缺席时套件 skip 并 console 明示「四组合中旧服务端侧指定环境未验证」。
 - 复验：compat 4/4 + 4/4（exit 0）、定向 410/410、typecheck exit 0、全量 13735 passed / 7 failed（签名=A01 基线，任务引入 0）；d-to-final（40 文件）/task-only（76 文件）补丁重生成并通过 apply 验证与树级 0 差异复验。事件与防护详见 `artifacts/history-read-directory/{PROGRESS.md, remaining-risks.md}`。
+
+## 2026-09-11 回退时撤销文件改动（fileRollback）任务
+
+### 任务 0 基线（实测，非任务书转述）
+- 分支 `feat/tool-activity-presentation`，HEAD `0a098595bc9ef30b9d7d8aabce2a184e43d9abe0`；工作区含他人 103 项在途改动（70 ` M` + 1 `M ` + 5 `MM` + 27 `??`），`git status --short` 按字节排序 SHA-256 `68947a3ccce001c3209dcba1302c6b84f0ee2da028f77faac4f5b6de0ad8641b`；完整清单见本节末 details。
+- `npm test`：**14050 passed / 12 failed / 7 skipped**（1389 文件：5 failed | 1383 passed | 1 skipped），exit 1；日志 `/tmp/baseline-npm-test.log`。
+- 12 红：`model-observability-e2e-chat`「E2E truth — MC-01 真实 Pi chat」（S1+S2，2 项）；`open-boundary-lint`「real repo state (smoke)」（2 项）；`persistence-schema-tripwire`（4 项）；`persistence-startup-receipt`（1 项）；`persistence-store-registry`（3 项）。
+- `npm run typecheck`：exit 0（tsc ×3），日志 `/tmp/baseline-typecheck.log`。
+- **与任务 0 转述不符**：任务书称 14047/11/7，红集合为 tripwire(4)/store-registry(3)/open-boundary(2)/startup-receipt(1)/model-slice.test.ts(文件级)。实测 `model-slice` 已不在红集合，新增 `model-observability-e2e-chat` 2 项，总红 12 而非 11。按规矩已置顶 `BLOCKED.md`；本任务改动与这些文件无交集，继续做不受影响部分。
+
+### 开工回执（≤10 行）
+1. 任务 0 已核对：`npm run typecheck` 0 错；`npm test` 12 红，全部为预存失败。
+2. 红集合与任务书不符，已记 `BLOCKED.md` 置顶；不阻塞本任务，继续。
+3. 只改白名单：`core/`（session-turn-actions / session-coordinator / preferences-manager / 新快照模块）、`server/routes/sessions.ts`、`server/git/`、`lib/checkpoint-store.ts`、`lib/checkpoint-wrapper.ts`、`desktop/src/react/components/chat/`、`stores/message-turn-actions.ts`、`stores/chat-slice.ts`、`services/ws-message-handler.ts`、`desktop/src/react/settings/`、`types.ts`、`locales/` 五 json、相关测试。
+4. 在途 103 项他人改动一行不动；不 commit、不 push、不动 `.sync-audit`、不推进审计封印。
+5. 顺序：任务 1 影子快照核心（独立可测）→ 任务 2 开关+API → 任务 3 UI → 任务 4 收尾。
+6. 每条验收贴实际命令输出；skip/todo、放宽断言、mock 被测对象、删测试、改基线一律算失败。
+7. 每完成一项立刻更新本文件。
+
+<details><summary>任务 0 `git status --short` 基线（103 行，后续收尾按此核对）</summary>
+
+```
+ M README.md
+ M README_EN.md
+ M artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch
+ M build/cli-runtime-closure.json
+ M core/session-coordinator.ts
+ M desktop/src/animations.css
+MM desktop/src/locales/en.json
+MM desktop/src/locales/ja.json
+MM desktop/src/locales/ko.json
+MM desktop/src/locales/zh-TW.json
+MM desktop/src/locales/zh.json
+ M desktop/src/react/App.tsx
+ M desktop/src/react/MainContent.tsx
+ M desktop/src/react/__tests__/architecture/no-ui-native-watch-production.test.ts
+ M desktop/src/react/__tests__/components/DeskSection.test.tsx
+ M desktop/src/react/__tests__/components/GitChangesModal.test.tsx
+ M desktop/src/react/__tests__/components/GitCommitModal.test.tsx
+ M desktop/src/react/__tests__/components/GitEnvironmentCard.test.tsx
+ M desktop/src/react/__tests__/components/MessageActivity.test.tsx
+ M desktop/src/react/__tests__/components/ModelSelector.test.tsx
+ M desktop/src/react/__tests__/components/PreviewPanel.status.test.tsx
+ M desktop/src/react/__tests__/components/SelectionQuoteActionSurface.test.tsx
+M  desktop/src/react/__tests__/components/TodoPanel.test.tsx
+ M desktop/src/react/__tests__/components/chat/ChatMessageSurface.typing-indicator.test.tsx
+ M desktop/src/react/__tests__/services/resource-events.test.ts
+ M desktop/src/react/__tests__/utils/history-builder.test.ts
+ M desktop/src/react/components/BridgePanel.tsx
+ M desktop/src/react/components/InputArea.tsx
+ M desktop/src/react/components/app/AppPages.tsx
+ M desktop/src/react/components/app/WorkspaceFileChangeBridge.tsx
+ M desktop/src/react/components/chat/ChatMessageSurface.tsx
+ M desktop/src/react/components/chat/MessageActivity.module.css
+ M desktop/src/react/components/chat/TodoPanel.module.css
+ M desktop/src/react/components/chat/TodoPanel.tsx
+ M desktop/src/react/components/desk/Desk.module.css
+ M desktop/src/react/components/desk/DeskTree.tsx
+ M desktop/src/react/components/input/ComposerToolbar.tsx
+ M desktop/src/react/components/input/ContextRing.tsx
+ M desktop/src/react/components/input/InputArea.module.css
+ M desktop/src/react/components/input/ModelSelector.tsx
+ M desktop/src/react/components/input/PlanModeButton.tsx
+ M desktop/src/react/components/input/ThinkingLevelButton.tsx
+ M desktop/src/react/components/runtime/GitChangesModal.module.css
+ M desktop/src/react/components/runtime/GitChangesModal.tsx
+ M desktop/src/react/components/runtime/GitCommitModal.module.css
+ M desktop/src/react/components/runtime/GitCommitModal.tsx
+ M desktop/src/react/components/runtime/GitEnvironmentCard.module.css
+ M desktop/src/react/components/runtime/GitEnvironmentCard.tsx
+ M desktop/src/react/components/selection/SelectionQuoteActionSurface.tsx
+ M desktop/src/react/quick-chat/QuickChatApp.tsx
+ M desktop/src/react/services/resource-events.ts
+ M desktop/src/react/stores/index.ts
+ M desktop/src/react/stores/input-slice.ts
+ M desktop/src/react/stores/model-slice.ts
+ M desktop/src/react/stores/selection-actions.ts
+ M desktop/src/react/stores/session-slice.ts
+ M desktop/src/react/utils/format-duration.ts
+ M desktop/src/react/utils/git-env-api.ts
+ M desktop/src/react/utils/history-builder.ts
+ M desktop/src/react/utils/preview-document-refresh.ts
+ M desktop/src/react/utils/tool-label.ts
+ M desktop/src/styles.css
+ M docs/README.md
+ M lib/pi-sdk/index.ts
+ M lib/tools/todo.ts
+ M lib/turn-input-presentation.ts
+ M server/git/git-command.ts
+ M server/http/route-security.ts
+ M server/routes/chat.ts
+ M server/routes/git-environment.ts
+ M server/routes/sessions.ts
+ M tests/git-command.test.ts
+ M tests/git-environment-route.test.ts
+ M tests/http-route-security.test.ts
+ M tests/sessions-route.test.ts
+ M tests/todo-write-tool.test.ts
+?? core/interrupted-turn-marker.ts
+?? desktop/src/react/__tests__/components/DeskTree.mention.test.tsx
+?? desktop/src/react/__tests__/components/SideChatPanel.test.tsx
+?? desktop/src/react/__tests__/stores/side-chat-actions.test.ts
+?? desktop/src/react/__tests__/utils/attach-workbench-item.test.ts
+?? desktop/src/react/__tests__/utils/running-status-label.test.ts
+?? desktop/src/react/components/chat/RunningStatusLine.module.css
+?? desktop/src/react/components/chat/RunningStatusLine.tsx
+?? desktop/src/react/components/input/composer-memory-mode.ts
+?? desktop/src/react/components/input/composer-permission-mode.ts
+?? desktop/src/react/components/input/composer-scope.ts
+?? desktop/src/react/components/runtime/GitBranchList.module.css
+?? desktop/src/react/components/runtime/GitBranchList.tsx
+?? desktop/src/react/components/runtime/GitWorktreeModal.module.css
+?? desktop/src/react/components/runtime/GitWorktreeModal.tsx
+?? desktop/src/react/components/session-scope-context.tsx
+?? desktop/src/react/components/side-chat/
+?? desktop/src/react/stores/side-chat-actions.ts
+?? desktop/src/react/stores/side-chat-slice.ts
+?? desktop/src/react/utils/attach-workbench-item.ts
+?? docs/architecture/side-chat.md
+?? docs/tasks/2026-09-11-todo-experience/CONTEXT-CONTINUITY.md
+?? lib/pi-sdk/todo-context-reminder.ts
+?? tests/interrupted-turn-marker.test.ts
+?? tests/todo-context-reminder.test.ts
+?? tests/todo-pipeline-consistency.test.ts
+?? tests/todo-prompt-injection.test.ts
+```
+
+</details>
+
+### 任务 1 影子快照核心（完成）
+
+- 新增 `core/workspace-snapshots.ts`：`WorkspaceSnapshotService` + `getWorkspaceSnapshotService`（按 lingxiHome 缓存）。影子仓库 `~/.lingxi/workspace-snapshots/{工作区哈希}/repo`，只经 `--git-dir`/`--work-tree` 访问；`init` 不带 `--work-tree`，用户工作区零新增文件；排除清单写影子仓库 `info/exclude`；`commit --allow-empty` 只加不删。
+- 拍照：`captureTurn`（`add -A` + commit，记 `{turnInputEntryId, commit, capturedAt}` 进侧车 `{sessionPath}.snapshots.json`）＋ `bindTurnInput` 两段式绑定（SDK 落盘才铸 turn input entry id）；失败不抛，写 degraded 记录。
+- 恢复：`collectChanges`（`git diff --name-status -z --no-renames <目标>` + `status --porcelain -z` 未跟踪）→ A 删、M/D 恢复目标 blob；恢复经注入的 ResourceIO 写回，再 `fileHistory.captureNow(origin="restore")`；逐文件报告 `{path,change,action,source,ok,reason}`。拍照失败轮次用 `CheckpointStore` 备份倒推（`list()` 增加 `sessionPath` 字段，兼容增量）。
+- 验收：`npx vitest run tests/workspace-snapshots.test.ts` → **11 passed / 0 skipped，exit 0**（五情形 + 解析器 + 绑定预览 + ResourceIO 路由 + 逐文件失败不阻塞）。
+- 反向验证：临时把 A→删除分支短路为 `false &&` → 情形1 红（`AssertionError: expected false to be true`，`report.ok` 为 false，日志 `/tmp/rev-red.log`），还原后同命令 11 passed，日志 `/tmp/rev-green.log`。
+
+### 任务 2 开关 + API（完成）
+
+- `core/preferences-manager.ts`：`getRollbackFileChanges()`（默认 `false`）/`setRollbackFileChanges()`，落 `preferences.json` 的 `rollback_file_changes`。engine.ts 不在白名单，故不经 CONFIG_SCHEMA，改由会话路由暴露开关端点。
+- 拍照挂点（`core/session-coordinator.ts`）：`_captureWorkspaceTurnSnapshot` 在 `promptSession`（`entry.session.prompt` 前）与 `deliverCustomMessage`(triggerTurn) 各拍一次，仅开关开启时执行；`_bindWorkspaceTurnSnapshot` 在 `finally`/投递后把 commit 补绑到本轮 turn input entry id（SDK 落盘才铸 id，故两段式）。
+- 恢复挂点（`core/session-turn-actions.ts`）：`opts.fileRollback='workspace'` 且开关开启时，在 `commitRetryBranch` 事务外先恢复文件再重发；`performWorkspaceFileRollback` 收拢工作区解析、ResourceIO、fileHistory、CheckpointStore 兜底，异常一律收敛成报告。
+- API（`server/routes/sessions.ts`）：`retry` 接受 `fileRollback:'none'|'workspace'`（默认 `none`）；非法值 400 `invalid_file_rollback`；`workspace` 且开关关闭 → **403 `file_rollback_disabled`**（不静默降级）；新增 `POST /sessions/turns/rollback-preview`（开关/检查点/文件数预览）、`GET|PUT /sessions/workspace-rollback`。逐文件报告经 HTTP 响应 `fileRollbackReport` 与 ws `session_branch_reset.fileRollbackReport` 双通道返回。
+- 验收：`npx vitest run tests/sessions-route.test.ts` → **121 passed**（含新增 7 例：关=403、默认 none 不透传、开=报告回传、非法值 400、GET/PUT 开关、关闭时预览不可用、开启+有检查点时文件数=2）；`tests/session-turn-actions.test.ts` 29 passed；`tests/checkpoint-store.test.ts`+`tests/workspace-snapshots.test.ts` 20 passed。
+
+### 任务 3 UI 两选项 + 清单确认 + 报告（完成）
+
+- `desktop/src/react/components/chat/SessionNodeActions.tsx`：重新生成按钮改为两选项小菜单（`ContextMenu`）。开关关闭时界面**不出现**文件回退选项（拍板 #3/完成条件）；开启但无检查点/工作区不可用 → 置灰并给原因；有检查点 → 标注影响文件数；快照降级 → 可用并标注「用备份兜底」。
+- 选后者弹 `ConfirmDialog` 文件清单 + 覆盖警告（「期间所有改动（含你手动改的）都会被覆盖」），确认才带 `fileRollback=workspace`。
+- 报告：`FileRollbackReportBanner` 逐文件展示 action/source/reason，位于 `ChatMessageSurface`，数据源 `stores/chat-slice.ts` 的 `fileRollbackReportsByPath`；HTTP 响应（`stores/message-turn-actions.ts`）与 ws `session_branch_reset`（`services/ws-message-handler.ts`）都写同一键。
+- i18n：五语言各新增 `settings.interface.rollbackFileChanges(+Hint)` 与 `chat.fileRollback.*`（18 键）；`I18nParity/flat-keys/react-locale-coverage` 6/6 通过。
+- 设置开关：`settings/tabs/InterfaceTab.tsx` 系统区新增 toggle（读写新端点，默认关，加载中置灰）。
+- 验收：`npx vitest run desktop/src/react/__tests__/components/chat/SessionRollback.test.tsx` → **7 passed / 0 skipped**；`InterfaceTab.test.tsx` 12 passed。定向回归 10 文件 **287 passed**（日志 `/tmp/t4-batch.log`）。
+
+### 任务 4 端到端与收尾（完成）
+
+- 新增 `tests/file-rollback-e2e.test.ts`（真实 core.retrySessionTurn + 临时工作区 + 真实影子快照 + 内存会话）：三轮改动（write 新建 / edit 修改 / shell 删除）→ 连文件回退第一轮 → 三处全部还原、ResourceIO/文件历史 origin=restore、报告逐文件准确、`setSessionBranchHead(replay_rewind)` 截断到空分支并重发、ws 事件携带同一份报告、侧车三条快照均绑定 turn input id 且未降级；另有开关关闭不恢复、个别文件失败不阻塞对话两例。`npx vitest run tests/file-rollback-e2e.test.ts` → **3 passed**。
+- 新增 `tests/session-coordinator-workspace-snapshots.test.ts`：直接驱动拍照挂点 → 开关关闭零开销不写侧车；开关开启拍照 + 两段式绑定 user turn input；自定义 turn input（deferred result）同样可绑定并可按记录恢复；无工作区跳过。→ **4 passed**。
+- `npm run typecheck`（tsc ×3）→ **exit 0**（最终）。
+- `npm test` 最终全量（日志 `/tmp/t4-full-test3.log`）：**14083 passed / 12 failed / 7 skipped**（1393 文件：5 failed | 1387 passed | 1 skipped），失败集合与任务 0 基线**逐条一致**（12 红同名同文件，0 新增 0 减少），通过数 +33（新增测试），skipped 仍 7。
+- 追加 `ws-message-handler.test.ts` 一例（`session_branch_reset.fileRollbackReport` 写入会话作用域报告、无报告不写）→ 该文件 **86 passed**，`npm run typecheck` 仍 exit 0。全量再跑（`/tmp/final-full-test.log`）为 14083 passed / 13 failed，多出的 1 条是无关文件 `tests/artifact-core-ustar.test.ts > refuses to pack a symlink in the source tree`，隔离复跑 10/10 通过。
+- 收尾修整：① 新增 `SessionRollback.module.css` 触发 style-discipline 棘轮（bare-spacing 12 / hardcoded-color 1）→ 全部改走 `--space-*`/`--overlay-*`/`--danger` token，该测试 8/8 通过；② 新增快照模块改变 `build/cli-runtime-closure.json`（白名单外守卫产物）→ 按守卫自带 writer 重新生成（生成器读当前源码树，保留在途改动），`tests/cli-closure-census.test.ts` 22/22 通过，`build/open-boundary-baseline.json` 未变，详见 BLOCKED.md「越界说明」；③ 因「重新生成入口改小菜单」，同步更新 3 个既有交互测试的点击路径与模块 mock，断言未放宽。
+- 全量负载下偶发 1 条与本任务无关的时序/环境失败（两次分别为 `GitChangesModal.test.tsx`、`artifact-core-ustar.test.ts`），均隔离复跑通过；连续三次全量中 `/tmp/t4-full-test3.log` 为基线集合零新增。
+- 完成条件 2：`git status --short` 对照任务 0 快照，白名单外零改动（差异仅本节列出的允许文件 + 守卫产物 repin）；HEAD 仍为 `0a098595…`（零 commit）；`~/.lingxi/workspace-snapshots` 不存在（影子数据只在临时目录，用户工作区无新增文件）。
+
+## 任务台账：工具行短标签全覆盖 + 家族图标（2026-09-11，分支 feat/tool-activity-presentation，HEAD 22410318c）
+
+### 任务 0：基线核对
+- `npm run typecheck` → exit 0（复跑通过，命令输出见对话）。
+- 全量 `npm test` 基线 → 见下方「基线与收尾」；与任务书数字一致后才动工。
+
+### 理解的目标 / 顺序 / 最大风险（≤10 行）
+1. 目标：每条工具行主标签必须是语言包文案词（禁止裸英文工具名当主标签）；家族专属图标；详情区保持现状。
+2. 顺序：任务 1（五语言短标签 + ToolGroupBlock 解析 + 对账/渲染用例）→ 任务 2（ActivityIcon 家族分支）→ 任务 3（typecheck + 全量测试）。
+3. 让步顺序：全量测试绿 > 短标签全覆盖 > 图标精细。
+4. 最大风险：既有渲染用例用桩 `window.t`（返回 raw key），对账用例覆盖不到真实语言包；已加「加载真实 zh.json 的 window.t」渲染 search_memory / subagent_reply / mcp_xxx 的断言兜住。
+5. 次要风险：ActivityIcon 的旧正则分支（`/read|write/`、`/search|grep/`）会抢走新家族名，家族判定必须排在旧正则之前。
+6. 取舍记录：调查聚合卡（knowledge_research_*）原本用 `tool.*` 长文案当标签，措辞与短标签体系不一致，改走 messageActivity 家族词「调查」；旧 `tool.*` 70+ 条按拍板原样保留、不接回。
+7. 取舍记录：MCP/插件工具主标签统一「扩展」，原工具名保留在 `data-tool` 与完整调用弹窗（tool.name）；不新增悬停提示（未要求，避免动详情区）。
+8. 取舍记录：`todo_write` 维持面板标题「任务」；`exec_command`/`write_stdin` 维持别名（Bash）。
+9. 白名单内改动：ToolGroupBlock.tsx / MessageActivity.tsx / tool-label.ts / zh,zh-TW,en,ja,ko.json / ToolGroupBlock.test.tsx / MessageActivity.test.tsx / tests/tool-label-coverage.test.ts / PROGRESS.md / BLOCKED.md。
+10. 不 commit、不 push、不新增依赖；顺手活记 BLOCKED.md。
+
+### 任务 1 交付：五语言短标签全覆盖
+- `desktop/src/locales/{zh,zh-TW,en,ja,ko}.json` 的 `messageActivity.labels` 从 15 行扩到 69 行：
+  原有 13 条键值逐字保留，新增 55 条（53 个逐工具短标签 + `knowledge_research` + `present_files`），
+  另加家族词 `_plugin`（扩展/擴充/Extension/拡張/확장）。脚本核对：五个语言包"其余顶层键与
+  messageActivity 其它子键完全一致"，旧键值 100% 保留（en 曾误改 `ls`/`web_fetch`，已还原）。
+- `desktop/src/react/utils/tool-label.ts`：新增 `ACTIVITY_LABEL_KEYS`（登记表）+ `activityLabel()`
+  单一解析点（技能 → 一方短标签 → 插件/MCP 家族词「扩展」→ 通用词「工具」）；新增
+  `BUNDLED_PLUGIN_TOOL_NAMES` 并把它并入 `BUILTIN_TOOL_NAMES`（内置插件不再被 isExternalTool 误判）。
+- `ToolGroupBlock.tsx`：行主标签改走 `activityLabel()`，任何分支都不返回工具本名；原工具名降级到
+  行 `title`（悬停）、`data-tool`、完整调用弹窗。调查聚合卡每次调用的进展措辞（「已完成 2/3 个证据问题」）
+  从主标签挪到摘要，信息不丢。
+
+### 任务 2 交付：家族图标
+- `MessageActivity.tsx` 新增 `activityIconFamily()` + `ACTIVITY_ICON_FAMILIES` 登记表；
+  `data-activity-icon` 仍是工具本名（既有选择器不破），新增 `data-activity-family` 供断言与排障。
+- 家族：记忆=气泡、知识=书本、频道=喇叭、通知=铃铛、浏览器=地球、电脑=显示器、文件/落盘=文档、
+  自动化=齿轮、子代理=机器人、停止=方块；会话/文件夹/状态/清单/循环/卡片/私信另配 7 个线性图标；
+  未匹配的家族（MCP/插件/未知名）维持通用网格。
+- 取舍：家族判定由"旧正则子串匹配"改为"登记表精确匹配 + 网格兜底"。原因：`mcp_deep-search`
+  这类不可预知工具名会被 `/search/` 抢走，猜出来的家族图标不算数；未登记就落网格，语义可预期。
+
+### 任务 1/2 验收证据
+- `npx vitest run tests/tool-label-coverage.test.ts desktop/src/react/__tests__/components/ToolGroupBlock.test.tsx desktop/src/react/__tests__/components/MessageActivity.test.tsx`
+  → 3 文件全绿，75 passed（24 + 32 + 19），0 failed。
+- 对账测试新增：五语言"每个内置工具都有行短标签"（登记表派生，缺键/退回裸英文名即红灯）、
+  "工具行主标签永远取文案词"（search_memory=回想、mcp_deep-search=扩展、brand_new_tool 不露本名）、
+  家族词键齐全；渲染用例新增断言 search_memory / subagent_reply / mcp_xxx 的行标签 ≠ 工具本名。
+- 反向验证：临时删除 `en.json` 的 `search_memory` 短标签键 → 对账测试变红
+  （`messageActivity.labels.search_memory` 进 missing 列表），还原后 75 passed 全绿。红/绿输出见对话。
+
+### 任务 3：全量收尾
+- `npm run typecheck` → exit 0（三次全量运行前各跑一次，均 0）。
+- `npm test` → **14107 passed / 5 failed / 7 skipped**（1393 文件：3 failed | 1389 passed | 1 skipped）。
+- 5 条红**不是本任务引入**：把本任务 8 个文件 stash 掉、在干净工作树上单跑这 3 个文件，
+  同样 5 failed / 12 passed（round2-delivery-evidence ×2、round3-delivery-evidence ×1、
+  model-observability-e2e-chat ×2）。前三条是"提交级交付证据清单"对账（比对
+  `.sync-audit/verified-source-sha.txt` 指向的 9c4b11114 文件清单，与当前工作树路径集不一致），
+  后两条需要真实 Pi provider。详见 BLOCKED.md 置顶条。
+- 通过数 14107 ≥ 基线 14090（本次实测基线；任务书写的 14098 亦满足），skipped 7 ≤ 7，
+  且本任务新增 14 条用例全部为绿。
+
+### 白名单与清洁度
+- `git status --short` 只有 12 个文件：白名单内的 11 个（PROGRESS.md、5 个 locale、2 个测试、
+  3 个源码/工具）+ `BLOCKED.md`；另有既存未跟踪目录 `artifacts/tool-row-style-preview/`（开工时就在，
+  未动）。零 commit、零 push、零新增依赖。
+- 跑测试会被 `tests/round2-delivery-evidence.test.ts` 的 R10-09 重新生成
+  `artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch`；收尾已 `git checkout --`
+  还原，交付态零白名单外改动。
+
+### 提交与推送（2026-09-11，用户明确指示 commit + push）
+- 授权变更：任务书原写「不 commit 不 push」，本次由用户直接指示提交并推送到远程，按新授权执行。
+- 提交范围：PROGRESS.md、BLOCKED.md、5 个语言包、2 个渲染测试、tests/tool-label-coverage.test.ts、
+  ToolGroupBlock.tsx、MessageActivity.tsx、tool-label.ts。不含未跟踪目录 artifacts/tool-row-style-preview/。
+- **未重新封印**：提交推进 HEAD 后，`.sync-audit/verified-source-sha.txt`（= 9c4b11114）与 HEAD 之间
+  出现非审计文件改动，`tests/post-verification-audit-seal.test.ts` 与
+  `.sync-audit/verify-post-verification-diff.mjs` 会红。按用户裁决如实报告，不修改封印指针、
+  不扩大 allowlist、不退役门禁；正式封印需另走验证流程并绑定候选提交。
+
+### 提交/推送结果与提交后全量测试（2026-09-11）
+- 分支 `feat/tool-activity-presentation`，提交 `1f1302ac5`，已推送：
+  `22410318c..1f1302ac5  feat/tool-activity-presentation -> feat/tool-activity-presentation`（PUSH_EXIT=0）。
+- 未提交项：未跟踪目录 `artifacts/tool-row-style-preview/`（按用户裁决不纳入）。
+- 提交后全量 `npm test` → **14106 passed / 6 failed / 7 skipped**（1393 文件：4 failed | 1388 passed | 1 skipped）。
+  比提交前多出的唯一一条红是 `tests/post-verification-audit-seal.test.ts`，原因与预期一致：
+  本提交推进了 HEAD，而 `.sync-audit/verified-source-sha.txt` 仍是 `9c4b11114`，diff 里出现 12 个非审计文件。
+  独立守护脚本同样红（GUARD_EXIT=1，逐条列出同样 12 个文件）。
+- 封印红**未处理**：不改指针、不扩 allowlist、不退役门禁，留待另行授权的封印流程。

@@ -88,6 +88,7 @@ import {
   normalizeSessionTurnContext,
 } from "./session-turn-context.ts";
 import { isSessionTurnInputEntry } from "../lib/turn-input-presentation.ts";
+import { getWorkspaceSnapshotService } from "./workspace-snapshots.ts";
 import {
   isOfficialDeepSeekEndpoint,
   modelSupportsDirectAudioInput,
@@ -152,6 +153,7 @@ import {
   readManifestSessionBranch,
   syncSessionBranchHeadAfterAppend,
 } from "./session-branch-head.ts";
+import { appendInterruptedTurnMarker } from "./interrupted-turn-marker.ts";
 
 const log = createModuleLogger("session");
 const SESSION_META_PAYLOAD_DIR = "session-meta-payloads";
@@ -5104,6 +5106,55 @@ export class SessionCoordinator {
 
   // ── Path 感知 API（Phase 2） ──
 
+  /**
+   * 「回退时撤销文件改动」：每轮输入提交前对工作区拍一次影子快照。
+   *
+   * 只在用户开关打开时执行（默认关闭→不拍照、零开销）。拍照失败不抛、
+   * 不阻塞本轮：服务内部记 degraded，恢复侧改走 write/edit 备份兜底。
+   * 返回的 beforeIds 用于回合启动后把 commit 绑到本轮 turn input entry。
+   */
+  async _captureWorkspaceTurnSnapshot(engine: any, sessionPath: any, entry: any) {
+    try {
+      if (engine?.preferences?.getRollbackFileChanges?.() !== true) return null;
+      const agentId = entry?.agentId || null;
+      const workspaceRoot = (agentId && (engine?.getExplicitHomeCwd?.(agentId) || engine?.getHomeCwd?.(agentId))) || null;
+      if (!workspaceRoot) return null;
+      const manager = entry?.session?.sessionManager;
+      const beforeIds = new Set<string>(
+        (manager?.getBranch?.() || []).map((item: any) => item?.id).filter(Boolean),
+      );
+      const service = getWorkspaceSnapshotService({
+        lingxiHome: engine.lingxiHome,
+        log: (message: string) => log.warn(`[workspace-snapshot] ${message}`),
+      });
+      const record = await service.captureTurn({ sessionPath, workspaceRoot });
+      return { service, capturedAt: record.capturedAt, beforeIds };
+    } catch (error: any) {
+      log.warn(`workspace snapshot capture skipped for ${path.basename(String(sessionPath))}: ${error?.message || error}`);
+      return null;
+    }
+  }
+
+  /** 回合启动后把快照 commit 补绑到本轮 turn input entry id（SDK 落盘才铸 id）。 */
+  _bindWorkspaceTurnSnapshot(capture: any, sessionPath: any, manager: any) {
+    if (!capture) return;
+    try {
+      const branch = manager?.getBranch?.() || [];
+      const turnInput = branch.find((item: any) => (
+        item?.id && !capture.beforeIds.has(item.id) && isSessionTurnInputEntry(item)
+      ));
+      if (turnInput?.id) {
+        capture.service.bindTurnInput({
+          sessionPath,
+          capturedAt: capture.capturedAt,
+          turnInputEntryId: turnInput.id,
+        });
+      }
+    } catch (error: any) {
+      log.warn(`workspace snapshot binding skipped for ${path.basename(String(sessionPath))}: ${error?.message || error}`);
+    }
+  }
+
   async promptSession(sessionPath: any, text: any, opts: any, submitOptions: any = {}) {
     const turnContext = normalizeSessionTurnContext(opts?.context);
     this._assertActiveDesktopSessionPath(sessionPath, "promptSession");
@@ -5197,14 +5248,18 @@ export class SessionCoordinator {
     const promptOpts = buildPromptMediaOptions(opts, notifyPromptPreflight);
     const nativeMediaTurn = engine?.beginCurrentTurnNativeMedia?.(sessionPath, opts);
     if (turnContext) this._setRuntimeValueForPath(this._turnContextBySession, sessionPath, turnContext);
+    let workspaceSnapshotCapture = null;
     try {
       // Recheck after asynchronous media preparation. A background custom turn
       // may have started since the route-level guard; no input side effects may
       // be committed onto a now-streaming Session.
       if (entry.session.isStreaming) throw new Error("session_busy");
       this.preflightSessionInput(sessionPath);
+      // 该轮输入提交前拍影子快照（开关关闭时零开销），本轮回合结束后绑定 entry id。
+      workspaceSnapshotCapture = await this._captureWorkspaceTurnSnapshot(engine, sessionPath, entry);
       await entry.session.prompt(text, promptOpts);
     } finally {
+      this._bindWorkspaceTurnSnapshot(workspaceSnapshotCapture, sessionPath, entry.session.sessionManager);
       if (turnContext) this._deleteRuntimeValueForPath(this._turnContextBySession, sessionPath);
       engine?.endCurrentTurnNativeMedia?.(nativeMediaTurn);
       pruneSessionInlineMediaHistory(entry.session);
@@ -5276,9 +5331,12 @@ export class SessionCoordinator {
     }
 
     const triggerTurn = options?.triggerTurn !== false;
+    const engine = this._d.getEngine?.();
+    let workspaceSnapshotCapture = null;
     if (triggerTurn) {
       this._assertSessionModelAvailable(entry.session);
       this.preflightSessionInput(sessionPath);
+      workspaceSnapshotCapture = await this._captureWorkspaceTurnSnapshot(engine, sessionPath, entry);
       const commitResult = options?.beforeInputSideEffects?.();
       if (commitResult && typeof commitResult.then === "function") {
         throw new TypeError("deliverCustomMessage: beforeInputSideEffects must be synchronous");
@@ -5289,6 +5347,7 @@ export class SessionCoordinator {
       entry.lastTouchedAt = Date.now();
     }
     await entry.session.sendCustomMessage(message, { triggerTurn });
+    this._bindWorkspaceTurnSnapshot(workspaceSnapshotCapture, sessionPath, entry.session.sessionManager);
     this._syncSessionBranchHeadQuiet(sessionPath, entry.session.sessionManager, "custom_message_delivery");
     this._emitLoopInterludeIfLoop(sessionPath, message);
     return { ok: true, mode: triggerTurn ? "triggerTurn" : "notifyOnly" };
@@ -5895,9 +5954,11 @@ export class SessionCoordinator {
 
     try {
       const abortPromise = session.abort?.();
-      Promise.resolve(abortPromise).catch((err) =>
-        log.warn(`forceRelease[${reason}] ${spShort}: abort failed: ${err.message}`),
-      );
+      Promise.resolve(abortPromise)
+        .then(() => this._appendInterruptedTurnMarker(sessionPath))
+        .catch((err) =>
+          log.warn(`forceRelease[${reason}] ${spShort}: abort failed: ${err.message}`),
+        );
     } catch (err) {
       log.warn(`forceRelease[${reason}] ${spShort}: abort failed: ${err.message}`);
     }
@@ -5912,6 +5973,23 @@ export class SessionCoordinator {
       log.warn(`forceRelease[${reason}] ${spShort}: teardown failed: ${err.message}`),
     );
     return true;
+  }
+
+  /**
+   * 中断标记（机制 4a）：SDK abort settle 后调用，把模型可见的中断合成
+   * user 消息追加进会话历史（逻辑见 core/interrupted-turn-marker.ts）。
+   */
+  _appendInterruptedTurnMarker(sessionPath: any) {
+    try {
+      if (!sessionPath) return;
+      const manager = this.openSessionManagerAtCurrentBranch(sessionPath);
+      if (!manager) return;
+      if (appendInterruptedTurnMarker(manager)) {
+        this._syncSessionBranchHeadQuiet(sessionPath, manager, "interrupted_turn_marker_append");
+      }
+    } catch (err: any) {
+      log.warn(`interrupted-turn marker append failed for ${sessionPath}: ${err?.message || err}`);
+    }
   }
 
   /**

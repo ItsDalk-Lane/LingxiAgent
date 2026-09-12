@@ -23,6 +23,14 @@ import {
   pushChanges,
   listBranches,
   listCommits,
+  createBranch,
+  stashChanges,
+  listStashes,
+  restoreStashedPath,
+  popStash,
+  discardPaths,
+  listWorktrees,
+  createWorktree,
   tryGit,
 } from "../git/git-command.ts";
 
@@ -225,6 +233,16 @@ export function createGitEnvironmentRoute(engine: any, hub?: any) {
     }
   });
 
+  route.get("/git/worktrees", async (c) => {
+    try {
+      const resolved = resolveQueryDir(c);
+      if (resolved instanceof Response) return resolved;
+      return c.json(await listWorktrees(resolved.dir));
+    } catch (err: any) {
+      return c.json({ error: err instanceof GitError ? err.stderr || err.message : err.message }, 500);
+    }
+  });
+
   route.get("/git/branches", async (c) => {
     try {
       const resolved = resolveQueryDir(c);
@@ -263,6 +281,98 @@ export function createGitEnvironmentRoute(engine: any, hub?: any) {
       if (!(await isRepoDir(resolved.dir))) return c.json({ error: "not a git repo" }, 400);
       await checkoutBranch(resolved.dir, body.branch.trim());
       return c.json({ ok: true, branch: body.branch.trim() });
+    } catch (err: any) {
+      return c.json({ error: err instanceof GitError ? err.stderr || err.message : err.message }, 500);
+    }
+  });
+
+  route.post("/git/create-branch", async (c) => {
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const resolved = resolveBodyDir(body);
+      if (!resolved) return c.json({ error: "invalid dir" }, 400);
+      if (typeof body?.name !== "string" || !body.name.trim()) {
+        return c.json({ error: "name required" }, 400);
+      }
+      if (!(await isRepoDir(resolved.dir))) return c.json({ error: "not a git repo" }, 400);
+      const result = await createBranch(resolved.dir, body.name, body?.base);
+      if (!result.ok) return c.json({ ...result, error: result.message || result.code }, 400);
+      return c.json(result);
+    } catch (err: any) {
+      return c.json({ error: err instanceof GitError ? err.stderr || err.message : err.message }, 500);
+    }
+  });
+
+  route.post("/git/stash", async (c) => {
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const resolved = resolveBodyDir(body);
+      if (!resolved) return c.json({ error: "invalid dir" }, 400);
+      if (!(await isRepoDir(resolved.dir))) return c.json({ error: "not a git repo" }, 400);
+      // paths 缺省 = 整仓暂存；给了 paths 就是单个/多个文件暂存
+      const result = await stashChanges(resolved.dir, body?.message, body?.paths);
+      if (!result.ok) return c.json({ ...result, error: result.message || result.code }, 400);
+      return c.json(result);
+    } catch (err: any) {
+      return c.json({ error: err instanceof GitError ? err.stderr || err.message : err.message }, 500);
+    }
+  });
+
+  route.get("/git/stashes", async (c) => {
+    try {
+      const resolved = resolveQueryDir(c);
+      if (resolved instanceof Response) return resolved;
+      return c.json(await listStashes(resolved.dir));
+    } catch (err: any) {
+      return c.json({ error: err instanceof GitError ? err.stderr || err.message : err.message }, 500);
+    }
+  });
+
+  route.post("/git/unstash", async (c) => {
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const resolved = resolveBodyDir(body);
+      if (!resolved) return c.json({ error: "invalid dir" }, 400);
+      if (!(await isRepoDir(resolved.dir))) return c.json({ error: "not a git repo" }, 400);
+      // 带 path = 单个文件取出；不带 = 弹出最新一条储藏
+      const path = typeof body?.path === "string" && body.path.trim() ? body.path.trim() : null;
+      const result = path
+        ? await restoreStashedPath(resolved.dir, path)
+        : await popStash(resolved.dir);
+      if (!result.ok) return c.json({ ...result, error: result.message || result.code }, 400);
+      return c.json(result);
+    } catch (err: any) {
+      return c.json({ error: err instanceof GitError ? err.stderr || err.message : err.message }, 500);
+    }
+  });
+
+  route.post("/git/discard", async (c) => {
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const resolved = resolveBodyDir(body);
+      if (!resolved) return c.json({ error: "invalid dir" }, 400);
+      if (!(await isRepoDir(resolved.dir))) return c.json({ error: "not a git repo" }, 400);
+      // paths 缺省 = 回退全部已跟踪改动
+      const result = await discardPaths(resolved.dir, body?.paths);
+      if (!result.ok) return c.json({ ...result, error: result.message || result.code }, 400);
+      return c.json(result);
+    } catch (err: any) {
+      return c.json({ error: err instanceof GitError ? err.stderr || err.message : err.message }, 500);
+    }
+  });
+
+  route.post("/git/worktree-create", async (c) => {
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const resolved = resolveBodyDir(body);
+      if (!resolved) return c.json({ error: "invalid dir" }, 400);
+      if (typeof body?.name !== "string" || !body.name.trim()) {
+        return c.json({ error: "name required" }, 400);
+      }
+      if (!(await isRepoDir(resolved.dir))) return c.json({ error: "not a git repo" }, 400);
+      const result = await createWorktree(resolved.dir, body.name, body?.base);
+      if (!result.ok) return c.json({ ...result, error: result.message || result.code }, 400);
+      return c.json(result);
     } catch (err: any) {
       return c.json({ error: err instanceof GitError ? err.stderr || err.message : err.message }, 500);
     }

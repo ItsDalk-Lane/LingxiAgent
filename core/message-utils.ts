@@ -80,7 +80,7 @@ export function extractTextContent(content, { stripThink = false } = {}) {
     const block = content[index];
     if (!isToolCallBlock(block)) continue;
     const params = getToolArgs(block);
-    const args = summarizeToolArgs(params);
+    const args = summarizeToolArgs(params, block.name);
     toolUses.push({
       id: typeof block.id === "string" && block.id ? block.id : undefined,
       name: block.name,

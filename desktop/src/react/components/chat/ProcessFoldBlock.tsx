@@ -102,7 +102,7 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
   const completionTarget = turnCompletionEntry
     ? assistantTurnTargetsByCompletionIndex?.get(turnCompletionEntry.originalIndex) ?? null
     : null;
-  const { actions: completionActions } = useSessionNodeActions({
+  const { actions: completionActions, overlay: completionOverlay } = useSessionNodeActions({
     sessionPath,
     target: readOnly || !turnCompletionEntry || isStreaming ? null : completionTarget,
     retryMessage: turnCompletionEntry
@@ -182,6 +182,7 @@ export const ProcessFoldBlock = memo(function ProcessFoldBlock({
             testId="process-fold-completion-actions"
           />
         )}
+        {completionOverlay}
       </div>
     </>
   );

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useStore } from '../../stores';
+import { useScopedSessionPath } from '../session-scope-context';
 import { getSessionCompactionMode, isSessionCompacting } from '../../stores/context-slice';
 import { sessionScopedListIncludes, sessionScopedValue } from '../../stores/session-slice';
 import { useI18n } from '../../hooks/use-i18n';
@@ -30,11 +31,14 @@ export function ContextRing() {
   const anchorRef = useRef<HTMLElement | null>(null);
 
   // 从 Zustand store 同步 context 数据（keyed store 优先，compat global 兜底）
-  const currentSessionPath = useStore(s => s.currentSessionPath);
-  const currentSessionId = useStore(s => s.currentSessionId);
+  // 会话归属来自渲染面（主聊天页 = 当前会话；侧边面板 = 侧边会话）。
+  const currentSessionPath = useScopedSessionPath();
+  const currentSessionId = useStore(s => (currentSessionPath && s.currentSessionPath === currentSessionPath
+    ? s.currentSessionId
+    : null));
   const addToast = useStore(s => s.addToast);
   const contextEntry = useStore(s => (
-    s.currentSessionPath ? sessionScopedValue(s, s.contextBySession, s.currentSessionPath) : null
+    currentSessionPath ? sessionScopedValue(s, s.contextBySession, currentSessionPath) : null
   ));
   const globalContextTokens = useStore(s => s.contextTokens);
   const globalContextWindow = useStore(s => s.contextWindow);

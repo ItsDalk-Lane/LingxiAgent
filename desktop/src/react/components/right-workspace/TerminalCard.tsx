@@ -31,8 +31,8 @@ const MAX_PREVIEW_CHUNKS = 500;
 // stopping 兜底复位：3 倍于 background-process-control 的 REQUEST_TIMEOUT_MS（10s）。
 const STOPPING_FALLBACK_RESET_MS = 30_000;
 
-export function TerminalPreview({ terminal }: { terminal: TerminalPublicEntry }) {
-  const [htmlChunks, setHtmlChunks] = useState<Array<{ seq: number; html: string }>>([]);
+export function TerminalPreview({ terminal, onContentChange }: { terminal: TerminalPublicEntry; onContentChange?: (value: { content: string; truncated: boolean }) => void }) {
+  const [htmlChunks, setHtmlChunks] = useState<Array<{ seq: number; html: string; truncatedStart: boolean }>>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const { armInstantLanding } = useContinuousBottomScroll({
@@ -60,6 +60,7 @@ export function TerminalPreview({ terminal }: { terminal: TerminalPublicEntry })
           .map((chunk: TerminalTranscriptChunk) => ({
             seq: chunk.seq,
             html: parser.ansi_to_html(chunk.data),
+            truncatedStart: chunk.truncatedStart === true,
           }))
           .filter((chunk) => chunk.html.length > 0);
         setHtmlChunks((current) => {
@@ -75,6 +76,16 @@ export function TerminalPreview({ terminal }: { terminal: TerminalPublicEntry })
     });
     return unsubscribe;
   }, [armInstantLanding, sessionId, sessionPath, terminalId]);
+
+  // 复制与可见预览共用已保留的块；不把有界尾部伪装成完整终端日志。
+  useEffect(() => {
+    if (!onContentChange) return;
+    const document = new DOMParser().parseFromString(htmlChunks.map(chunk => chunk.html).join(''), 'text/html');
+    onContentChange({
+      content: document.body.textContent || '',
+      truncated: Boolean(htmlChunks[0] && (htmlChunks[0].seq > 1 || htmlChunks[0].truncatedStart)),
+    });
+  }, [htmlChunks, onContentChange]);
 
   // 首个 tail 请求可能在 socket 尚未 OPEN 时落空（requestTerminalTail 返回 false 且无人
   // 重试），此后 live 块全进 pending、预览永久空白。等连接（重）建立后再发；tail 响应

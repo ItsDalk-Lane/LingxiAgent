@@ -247,6 +247,17 @@ function installStoreMethods() {
     const bySession = mockState.todosBySession as Record<string, unknown>;
     bySession[path] = todos;
   });
+  s.setSessionTodoPanel = vi.fn((path: string, panel: { todos?: unknown[] } | null) => {
+    const panels = (mockState.todoPanelBySession ??= {}) as Record<string, unknown>;
+    if (panel) panels[path] = panel;
+    else delete panels[path];
+    const bySession = mockState.todosBySession as Record<string, unknown>;
+    bySession[path] = panel?.todos ?? [];
+  });
+  s.markSessionTodoUpdateFailed = vi.fn((path: string) => {
+    const panels = (mockState.todoPanelBySession ??= {}) as Record<string, any>;
+    panels[path] = { ...(panels[path] ?? { todos: [] }), updateFailed: true };
+  });
   s.bumpTodosLiveVersion = vi.fn((path: string) => {
     const versions = mockState.todosLiveVersionBySession as Record<string, number>;
     versions[path] = (versions[path] ?? 0) + 1;
@@ -419,18 +430,76 @@ function mockPermissionDefault(mode = 'ask') {
 
   it('completes current session todos through the explicit cleanup route', async () => {
     const sessionPath = '/session/todo-cleanup.jsonl';
-    mockFetch.mockResolvedValue(jsonResponse({ ok: true, todos: [] }));
+    Object.assign(mockState, {
+      currentSessionPath: sessionPath,
+      todoPanelBySession: {
+        [sessionPath]: {
+          todos: [{ content: 'a', activeForm: 'doing a', status: 'pending' }],
+          version: 'tv12345678',
+          finished: false,
+          allCompleted: false,
+          dismissed: false,
+          updateFailed: false,
+        },
+      },
+    });
+    const panel = {
+      todos: [{ content: 'a', activeForm: 'doing a', status: 'completed' }],
+      version: 'tvabcdef01',
+      finished: true,
+      allCompleted: true,
+      dismissed: false,
+    };
+    mockFetch.mockResolvedValue(jsonResponse({ ok: true, panel }));
 
     const ok = await completeSessionTodos(sessionPath);
 
     expect(ok).toBe(true);
+    // 新界面必须携带用户看见的那一版清单版本（A17）
     expect(mockFetch).toHaveBeenCalledWith('/api/sessions/todos/complete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ path: sessionPath }),
+      body: JSON.stringify({ path: sessionPath, version: 'tv12345678' }),
+      throwOnHttpError: false,
     });
-    expect(mockState.setSessionTodosForPath).toHaveBeenCalledWith(sessionPath, []);
+    expect(mockState.setSessionTodoPanel).toHaveBeenCalledWith(sessionPath, {
+      todos: panel.todos,
+      version: 'tvabcdef01',
+      finished: true,
+      allCompleted: true,
+      dismissed: false,
+      updateFailed: false,
+    });
     expect(mockState.bumpTodosLiveVersion).toHaveBeenCalledWith(sessionPath);
+  });
+
+  it('todo 版本失配（409）时不改动本地清单并提示刷新', async () => {
+    const sessionPath = '/session/todo-stale.jsonl';
+    Object.assign(mockState, {
+      currentSessionPath: sessionPath,
+      addToast: vi.fn(),
+      todoPanelBySession: {
+        [sessionPath]: {
+          todos: [{ content: 'a', activeForm: 'doing a', status: 'pending' }],
+          version: 'tvold00001',
+          finished: false,
+          allCompleted: false,
+          dismissed: false,
+          updateFailed: false,
+        },
+      },
+    });
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 409,
+      json: async () => ({ error: 'stale', code: 'todo_version_mismatch' }),
+    } as unknown as Response);
+
+    const ok = await completeSessionTodos(sessionPath);
+
+    expect(ok).toBe(false);
+    expect(mockState.setSessionTodoPanel).not.toHaveBeenCalled();
+    expect(mockState.addToast).toHaveBeenCalled();
   });
 
   it('does not complete session todos while that session is streaming', async () => {

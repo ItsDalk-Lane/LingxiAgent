@@ -4,6 +4,14 @@ import { AsyncLocalStorage } from "async_hooks";
 import type { ResourceIO } from "./resource-io.ts";
 import { normalizeResourceRef } from "./resource-refs.ts";
 import type { ResourceRef } from "./types.ts";
+import type { ToolFileChangePresentation } from "../../shared/tool-presentation.ts";
+import {
+  FILE_PRESENTATION_MAX_BYTES,
+  fileChangePresentation,
+  previousFileContent,
+  retainAppliedPatch,
+  type BeforeFileContent,
+} from "./file-change-presentation.ts";
 
 type ToolOperationsOptions = {
   cwd: string;
@@ -90,6 +98,11 @@ export function createResourceIoToolOperations({
   getSessionIdentity,
   detectImageMimeType,
 }: ToolOperationsOptions) {
+  const mutationCapture = new AsyncLocalStorage<{
+    kind: "write" | "edit";
+    before?: BeforeFileContent;
+    fileChange?: ToolFileChangePresentation;
+  }>();
   const operationContext = (reason: string, extra: Record<string, unknown> = {}) => {
     const identity = typeof getSessionIdentity === "function"
       ? getSessionIdentity() || {}
@@ -139,6 +152,8 @@ export function createResourceIoToolOperations({
 
   const readFile = async (filePath: string) => {
     const result = await resourceIO.read(refForPath(filePath));
+    const capture = mutationCapture.getStore();
+    if (capture?.kind === "edit") capture.before = previousFileContent(result.content);
     return result.content;
   };
 
@@ -148,11 +163,52 @@ export function createResourceIoToolOperations({
   };
 
   const writeFile = async (filePath: string, content: string | Buffer) => {
-    await resourceIO.write(refForPath(filePath), content, operationContext("agent_write"));
+    const capture = mutationCapture.getStore();
+    const ref = refForPath(filePath);
+    let before: BeforeFileContent = {};
+    if (capture) {
+      // SDK 在同一文件的写入队列内调用此操作；旧内容读取必须留在这里。
+      try {
+        const stat = await resourceIO.stat(ref);
+        before = (stat.version?.size ?? 0) > FILE_PRESENTATION_MAX_BYTES
+          ? { reason: "before_content_too_large" }
+          : previousFileContent((await resourceIO.read(ref)).content);
+      } catch (error) {
+        const code = typeof error === "object" && error !== null && "code" in error ? String(error.code) : "";
+        before = { reason: /DENIED|FORBIDDEN|EACCES|EPERM/i.test(code) ? "before_permission_denied" : "before_content_unavailable" };
+      }
+    }
+    const result = await resourceIO.write(ref, content, operationContext("agent_write"));
+    if (capture) capture.fileChange = fileChangePresentation({
+      filePath,
+      content,
+      before,
+      changeType: result.changeType,
+      generatePatch: true,
+    });
   };
 
   const editWriteFile = async (filePath: string, content: string | Buffer) => {
-    await resourceIO.write(refForPath(filePath), content, operationContext("agent_edit"));
+    const result = await resourceIO.write(refForPath(filePath), content, operationContext("agent_edit"));
+    const capture = mutationCapture.getStore();
+    if (capture) capture.fileChange = fileChangePresentation({
+      filePath,
+      content,
+      before: capture.before ?? {},
+      changeType: result.changeType,
+      // 编辑的真实补丁由 SDK 返回，不再次计算或用模型参数猜测。
+      generatePatch: false,
+    });
+  };
+
+  const withFileChangeCapture = async (kind: "write" | "edit", execute: () => Promise<any>) => {
+    const capture: { kind: "write" | "edit"; before?: BeforeFileContent; fileChange?: ToolFileChangePresentation } = { kind };
+    const result = await mutationCapture.run(capture, execute);
+    if (!capture.fileChange || result?.isError) return result;
+    const fileChange = kind === "edit"
+      ? retainAppliedPatch(capture.fileChange, result?.details?.patch)
+      : capture.fileChange;
+    return { ...result, details: { ...result?.details, fileChange } };
   };
 
   const mkdir = async (dirPath: string) => {
@@ -199,5 +255,6 @@ export function createResourceIoToolOperations({
     },
     withResourceTarget,
     hasBoundTarget,
+    withFileChangeCapture,
   };
 }

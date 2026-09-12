@@ -85,8 +85,9 @@ describe('TerminalPreview', () => {
     useStore.setState({ wsState: 'disconnected' } as never);
   });
 
-  it('keeps one ANSI parser across chunks and renders split color sequences correctly', () => {
-    render(<TerminalPreview terminal={terminal()} />);
+  it('keeps one ANSI parser across chunks and exposes the displayed text for copying', () => {
+    const onContentChange = vi.fn();
+    render(<TerminalPreview terminal={terminal()} onContentChange={onContentChange} />);
 
     act(() => {
       terminalOutputStream.handleTail({
@@ -108,6 +109,7 @@ describe('TerminalPreview', () => {
     const output = screen.getByTestId('terminal-output-term_preview');
     expect(output).toHaveTextContent('ERROR');
     expect(output.innerHTML).toContain('color:rgb(187,0,0)');
+    expect(onContentChange).toHaveBeenLastCalledWith({ content: 'ERROR', truncated: true });
   });
 
   it('escapes unsafe HTML and never creates executable or terminal-supplied links', () => {
@@ -195,9 +197,10 @@ describe('TerminalPreview', () => {
     expect(terminalClientMocks.requestTerminalTail).toHaveBeenCalledTimes(2);
   });
 
-  it('bounds rendered preview chunks, dropping the oldest converted html', () => {
+  it('bounds rendered and copied output to the same retained chunks and marks the limit', () => {
     useStore.setState({ wsState: 'connected' } as never);
-    render(<TerminalPreview terminal={terminal()} />);
+    const onContentChange = vi.fn();
+    render(<TerminalPreview terminal={terminal()} onContentChange={onContentChange} />);
 
     act(() => {
       terminalOutputStream.handleTail({
@@ -219,5 +222,6 @@ describe('TerminalPreview', () => {
     expect(renderedSeqs).toHaveLength(500);
     expect(renderedSeqs[0]).toBe(101);
     expect(renderedSeqs.at(-1)).toBe(600);
+    expect(onContentChange).toHaveBeenLastCalledWith({ content: Array.from({ length: 500 }, (_, index) => `line-${index + 101}\n`).join(''), truncated: true });
   });
 });

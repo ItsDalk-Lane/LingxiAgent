@@ -22,7 +22,7 @@ import {
 import { EditorState, Compartment, Transaction, EditorSelection } from '@codemirror/state';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import {
-  syntaxHighlighting, bracketMatching,
+  syntaxHighlighting, bracketMatching, LanguageDescription,
 } from '@codemirror/language';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { languages } from '@codemirror/language-data';
@@ -950,7 +950,30 @@ export const PreviewEditor = forwardRef<PreviewEditorHandle, PreviewEditorProps>
       emitStatsIfChanged(view);
       restoreEditorScrollSnapshot(view, initialScrollSnapshotRef.current);
 
+      // 代码模式：按文件名匹配 CodeMirror 语言并异步加载（VS Code 式语法高亮）。
+      // 语言包加载是按需的（@codemirror/language-data 动态 import），加载完成后
+      // 通过 lang compartment 热插拔，不重建编辑器、不打断正在输入的用户。
+      let langLoadCancelled = false;
+      if (!isMd && !isCsv) {
+        const fileName = (filePath || '').split(/[\\/]/).pop() || '';
+        const langDesc = (fileName ? LanguageDescription.matchFilename(languages, fileName) : null)
+          ?? (language ? LanguageDescription.matchLanguageName(languages, language, true) : null);
+        if (langDesc) {
+          void langDesc.load().then((support) => {
+            if (langLoadCancelled) return;
+            try {
+              view.dispatch({ effects: c.lang.reconfigure(support) });
+            } catch (err) {
+              console.warn('[PreviewEditor] language reconfigure failed:', err);
+            }
+          }).catch((err) => {
+            if (!langLoadCancelled) console.warn('[PreviewEditor] language load failed:', err);
+          });
+        }
+      }
+
       return () => {
+        langLoadCancelled = true;
         if (scrollTimer) {
           clearTimeout(scrollTimer);
           publishScrollSnapshot();

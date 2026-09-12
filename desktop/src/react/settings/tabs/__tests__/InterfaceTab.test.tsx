@@ -283,4 +283,36 @@ describe('InterfaceTab appearance state', () => {
       }));
     });
   });
+
+  it('loads and saves the undo-file-changes-on-rollback preference', async () => {
+    lingxiFetchMock.mockImplementation(async (path: string, init?: RequestInit) => {
+      if (path === '/api/sessions/workspace-rollback' && init?.method === 'PUT') {
+        return { json: async () => ({ ok: true, enabled: false }) };
+      }
+      if (path === '/api/sessions/workspace-rollback') {
+        return { json: async () => ({ enabled: true }) };
+      }
+      return { json: async () => ({}) };
+    });
+
+    render(React.createElement(InterfaceTab));
+
+    const label = await screen.findByText('settings.interface.rollbackFileChanges');
+    const row = label.parentElement?.parentElement;
+    expect(row).toBeTruthy();
+    const rollbackSwitch = within(row as HTMLElement).getByRole('switch') as HTMLButtonElement;
+    await waitFor(() => {
+      expect(rollbackSwitch.getAttribute('aria-checked')).toBe('true');
+    });
+
+    fireEvent.click(rollbackSwitch);
+
+    await waitFor(() => {
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/sessions/workspace-rollback', expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ enabled: false }),
+      }));
+      expect(rollbackSwitch.getAttribute('aria-checked')).toBe('false');
+    });
+  });
 });

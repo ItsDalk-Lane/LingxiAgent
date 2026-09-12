@@ -8,6 +8,8 @@ type WatchEntry = {
   ref: ResourceRef;
   refCount: number;
   subscriptionId: string | null;
+  /** 服务端实际 watch 的解析路径（realpath 后，从 subscribe 响应的 resourceKeys 习得）。 */
+  resolvedPath: string | null;
   disposed: boolean;
   released: boolean;
   ready: Promise<void>;
@@ -124,6 +126,7 @@ export function retainResourceWatch(ref: ResourceRef): () => void {
     ref: normalizedRef,
     refCount: 1,
     subscriptionId: null,
+    resolvedPath: null,
     disposed: false,
     released: false,
     ready: Promise.resolve(),
@@ -131,6 +134,22 @@ export function retainResourceWatch(ref: ResourceRef): () => void {
   entry.ready = subscribeEntry(entry);
   watches.set(key, entry);
   return () => releaseResourceWatch(key);
+}
+
+/**
+ * 从 subscribe 响应里习得服务端实际 watch 的解析路径。
+ * local_fs provider 会对路径做 realpath（macOS：/tmp → /private/tmp），而 store 中的
+ * 工作台根路径是配置/披露的未解析形式；watch 事件只携带解析后的路径。
+ */
+function resolvedLocalPathFromSubscription(ref: ResourceRef, data: any): string | null {
+  if (ref.kind !== 'local-file') return null;
+  const keys = Array.isArray(data?.resourceKeys) ? data.resourceKeys : [];
+  for (const key of keys) {
+    if (typeof key !== 'string' || !key.startsWith('local_fs:')) continue;
+    const resolved = key.slice('local_fs:'.length).trim();
+    if (resolved) return resolved;
+  }
+  return null;
 }
 
 function subscribeEntry(entry: WatchEntry): Promise<void> {
@@ -143,8 +162,12 @@ function subscribeEntry(entry: WatchEntry): Promise<void> {
   })
     .then(res => res.json())
     .then((data) => {
-      if (typeof data?.subscriptionId === 'string') entry.subscriptionId = data.subscriptionId;
-      else console.warn('[resource-events] watch failed:', data?.error || entry.ref);
+      if (typeof data?.subscriptionId === 'string') {
+        entry.subscriptionId = data.subscriptionId;
+        entry.resolvedPath = resolvedLocalPathFromSubscription(entry.ref, data);
+      } else {
+        console.warn('[resource-events] watch failed:', data?.error || entry.ref);
+      }
       if (entry.disposed) releaseEntry(entry);
     })
     .catch((err) => {
@@ -154,6 +177,19 @@ function subscribeEntry(entry: WatchEntry): Promise<void> {
 
 export function retainLocalFileResourceWatch(filePath: string): () => void {
   return retainResourceWatch({ kind: 'local-file', path: filePath });
+}
+
+/**
+ * 本地路径在服务端被解析（realpath）后的别名；路径本身已是解析形式时返回 null。
+ * watch 事件只带解析后路径，工作台根路径做前缀归位时用它兜底，避免事件被静默丢弃。
+ */
+export function resolvedLocalPathAlias(filePath: string | null | undefined): string | null {
+  if (typeof filePath !== 'string' || !filePath.trim()) return null;
+  const key = resourceWatchKey({ kind: 'local-file', path: filePath });
+  const resolved = watches.get(key)?.resolvedPath || null;
+  if (!resolved) return null;
+  const normalized = normalizeResourceRef({ kind: 'local-file', path: resolved });
+  return resourceWatchKey(normalized) === key ? null : normalized.path;
 }
 
 function releaseResourceWatch(key: string): void {

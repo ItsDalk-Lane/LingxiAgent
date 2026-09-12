@@ -47,10 +47,15 @@ export function PermissionModeIcon({ mode }: { mode: PermissionMode }) {
   );
 }
 
-export function PlanModeButton({ mode, onChange, locked = false }: {
+export function PlanModeButton({ mode, onChange, locked = false, sessionPath }: {
   mode: PermissionMode;
   onChange: (v: PermissionMode) => void;
   locked?: boolean;
+  /**
+   * 会话作用域覆盖（侧边对话面板传入侧边会话 path）：
+   * 主聊天页省略——沿用 pending 草稿 / 当前会话 / 全局默认的既有语义。
+   */
+  sessionPath?: string | null;
 }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
@@ -70,8 +75,12 @@ export function PlanModeButton({ mode, onChange, locked = false }: {
     if (nextMode === mode) return;
     try {
       const state = useStore.getState();
-      const pendingNewSession = state.pendingNewSession === true;
-      const sessionPath = pendingNewSession ? null : state.currentSessionPath;
+      // 显式给了会话作用域（侧边面板）就不再走 pending 草稿/全局默认分支：
+      // 那些分支改的是「主聊天页新建会话」的偏好，不是这个会话的模式。
+      const pendingNewSession = sessionPath === undefined && state.pendingNewSession === true;
+      const targetSessionPath = sessionPath !== undefined
+        ? sessionPath
+        : (pendingNewSession ? null : state.currentSessionPath);
       if (pendingNewSession) {
         const res = await lingxiFetch('/api/preferences/session-permission-default', {
           method: 'PUT',
@@ -85,7 +94,7 @@ export function PlanModeButton({ mode, onChange, locked = false }: {
       const body = {
         mode: nextMode,
         pendingNewSession,
-        ...(sessionPath ? { sessionPath } : {}),
+        ...(targetSessionPath ? { sessionPath: targetSessionPath } : {}),
       };
       const res = await lingxiFetch('/api/session-permission-mode', {
         method: 'POST',
@@ -102,7 +111,7 @@ export function PlanModeButton({ mode, onChange, locked = false }: {
     } catch (err) {
       console.error('[plan-mode] select failed:', err);
     }
-  }, [mode, onChange, t]);
+  }, [mode, onChange, sessionPath, t]);
 
   const label = t(permissionModeLabelKey(mode));
 

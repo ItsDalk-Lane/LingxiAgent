@@ -17,7 +17,7 @@ import {
   readSubagentSessionMetaSync,
 } from "../../lib/subagent-executor-metadata.ts";
 import { loadLatestAssistantSummaryFromSessionFile } from "../../core/message-utils.ts";
-import { applyTodoLifecycle, extractLatestTodoSnapshot } from "../../lib/tools/todo-compat.ts";
+import { extractLatestTodoSnapshot, todoPanelPayloadFromSnapshot } from "../../lib/tools/todo-compat.ts";
 import { browserScreenshotPath } from "../../lib/session-files/browser-screenshot-file.ts";
 import { serializeSessionFile } from "../../lib/session-files/session-file-response.ts";
 import { taskFromSubagentRun, mergeSubagentTaskMetadata } from "./project-page.ts";
@@ -269,6 +269,7 @@ export async function hydrateExternalState(input: HydrateExternalStateInput): Pr
   slicedBlocks: any[];
   sessionFiles: any[];
   todos: any[] | null;
+  todoPanel: ReturnType<typeof todoPanelPayloadFromSnapshot> | null;
 }> {
   const {
     engine,
@@ -418,8 +419,11 @@ export async function hydrateExternalState(input: HydrateExternalStateInput): Pr
   // 快照合法性判定在 extractLatestTodoSnapshot（scanner finalize 已调用，这里不重扫）；
   // 输出契约与 extractLatestTodos 逐字一致：无快照 → null；removed → []；否则走 lifecycle。
   const todos = todoSnapshot
-    ? (todoSnapshot.removed ? [] : applyTodoLifecycle(todoSnapshot.todos))
+    ? (todoSnapshot.removed ? [] : todoSnapshot.todos)
     : null;
+  // 面板快照（v2 收尾摘要 / 版本 / 收纳标志）随 hydrate 一起下发，
+  // 前端据此恢复与实时路径一致的面板状态。
+  const todoPanel = todoSnapshot ? todoPanelPayloadFromSnapshot(todoSnapshot) : null;
 
-  return { slicedBlocks, sessionFiles, todos };
+  return { slicedBlocks, sessionFiles, todos, todoPanel };
 }

@@ -5,6 +5,7 @@ type ToolCallLikeEvent = {
   toolCallId?: unknown;
   name?: unknown;
   args?: Record<string, unknown>;
+  details?: Record<string, unknown>;
 };
 
 export function normalizeToolCallId(value: unknown): string | undefined {
@@ -21,6 +22,7 @@ export function toolCallFromStartEvent(event: ToolCallLikeEvent): ToolCall {
     ...(id ? { id } : {}),
     name: typeof event.name === 'string' ? event.name : '',
     args: event.args,
+    ...(event.details ? { details: event.details } : {}),
     done: false,
     success: false,
   };

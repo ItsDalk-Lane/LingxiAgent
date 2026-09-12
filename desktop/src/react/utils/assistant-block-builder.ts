@@ -61,7 +61,7 @@ export function buildAssistantBlocksFromContent({
     args: toolCall.args,
   })) || [];
 
-  const pushToolGroup = (calls: NonNullable<AssistantBlockInput['toolCalls']>) => {
+  const pushContiguousToolGroup = (calls: NonNullable<AssistantBlockInput['toolCalls']>) => {
     if (!calls.length) return;
     // 工具组的位置 = 组内最早一次调用的位置，用于与思考段交错回真实时间线
     const orders = calls
@@ -82,6 +82,22 @@ export function buildAssistantBlocksFromContent({
       collapsed: calls.length > 1,
       ...(orders.length ? { processOrder: Math.min(...orders) } : {}),
     });
+  };
+
+  const pushToolGroup = (calls: NonNullable<AssistantBlockInput['toolCalls']>) => {
+    let consecutive: typeof calls = [];
+    for (const call of calls) {
+      const previousOrder = consecutive.at(-1)?.processOrder;
+      // 序号间存在正文、思考或其他调用时分组，避免把后面的工具提前。
+      // 没有位置证据的旧记录沿用原有分组，不猜测历史顺序。
+      if (previousOrder !== undefined && call.processOrder !== undefined
+        && call.processOrder !== previousOrder + 1) {
+        pushContiguousToolGroup(consecutive);
+        consecutive = [];
+      }
+      consecutive.push(call);
+    }
+    pushContiguousToolGroup(consecutive);
   };
 
   if (thinking !== null && thinking !== undefined) {

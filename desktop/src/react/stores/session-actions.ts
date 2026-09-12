@@ -33,7 +33,7 @@ import { errorWithCode, presentError, presentErrorWithLabel } from '../errors/er
 import { normalizeSessionRouteError } from '../../../../shared/error-user-messages.ts';
 import type { ChatMessage, ContentBlock } from './chat-types';
 import { readMessageLiveVersion } from './message-live-version';
-import type { SessionMetaRecoveryStatus, SessionPermissionMode } from '../types';
+import type { SessionMetaRecoveryStatus, SessionPermissionMode, TodoItem } from '../types';
 import { findPrimaryAgent, resolveAgentWorkspace } from '../utils/agent-workspace';
 
 // ── 防竞争计数器 ──
@@ -354,6 +354,8 @@ function clearSessionRuntimeCaches(path: string): void {
     const browserBySession = deleteSessionScopedStateValue(s, s.browserBySession || {}, path);
     const todosBySession = deleteSessionScopedStateValue(s, s.todosBySession || {}, path);
     const todosLiveVersionBySession = deleteSessionScopedStateValue(s, s.todosLiveVersionBySession || {}, path);
+    const todoPanelBySession = deleteSessionScopedStateValue(s, s.todoPanelBySession || {}, path);
+    const todoPanelExpandedBySession = deleteSessionScopedStateValue(s, s.todoPanelExpandedBySession || {}, path);
     const sessionAuthorizedFoldersByPath = deleteSessionScopedStateValue(s, s.sessionAuthorizedFoldersByPath || {}, path);
     let inlineErrors = s.inlineErrors;
     if (inlineErrors) {
@@ -375,6 +377,8 @@ function clearSessionRuntimeCaches(path: string): void {
       unreadOutputSessionPaths: filterSessionScopedStateList(s, s.unreadOutputSessionPaths || [], path),
       todosBySession,
       todosLiveVersionBySession,
+      todoPanelBySession,
+      todoPanelExpandedBySession,
       sessionAuthorizedFoldersByPath,
       capabilityRefreshingSessions: filterSessionScopedStateList(s, s.capabilityRefreshingSessions || [], path),
       inlineErrors,
@@ -497,7 +501,18 @@ export async function loadMessages(
       );
       return;
     }
-    // per-session todos（防御性兼容层：即使后端漏转或缓存残留，这里兜底再转一次）
+    // per-session 清单面板快照：服务端权威 todoPanel 优先（含版本/收尾/收纳标志）；
+    // 旧负载（仅 todos 数组）走防御性迁移，保持旧语义。
+    const rawPanel = data.todoPanel && Array.isArray(data.todoPanel.todos) && data.todoPanel.todos.length > 0
+      ? {
+          todos: data.todoPanel.todos as TodoItem[],
+          version: typeof data.todoPanel.version === 'string' ? data.todoPanel.version : null,
+          finished: data.todoPanel.finished === true,
+          allCompleted: data.todoPanel.allCompleted === true,
+          dismissed: false,
+          updateFailed: false,
+        }
+      : null;
     const rawTodos = data.todos || [];
     const migratedTodos = migrateLegacyTodos({ todos: rawTodos });
     // In-flight guard：流仍活跃时，磁盘上的最新 Run 必然不完整（jsonl 按模型轮落盘，
@@ -507,7 +522,21 @@ export async function loadMessages(
     const items = buildItemsFromHistory(data, { openTailRun: !!streamSnapshot?.hasContent });
     // 修订点 stamp：记录本次快照对应的磁盘修订点，后续 reconcile 与列表投影对比。
     const revision = typeof data.revision === 'string' ? data.revision : null;
-    useStore.getState().setSessionTodosForPath(targetPath, migratedTodos);
+    if (rawPanel) {
+      useStore.getState().setSessionTodoPanel(targetPath, rawPanel);
+    } else if (migratedTodos.length > 0) {
+      // 旧负载：非空即活动清单（服务端已做生命周期投影）
+      useStore.getState().setSessionTodoPanel(targetPath, {
+        todos: migratedTodos,
+        version: null,
+        finished: false,
+        allCompleted: false,
+        dismissed: false,
+        updateFailed: false,
+      });
+    } else {
+      useStore.getState().setSessionTodoPanel(targetPath, null);
+    }
     // hasMore 永远以服务端为准：items 为空（本页全被前端过滤的隐藏消息）不等于
     // 没有更早历史，静默截断会让旧消息永久不可达（T11b）。
     useStore.getState().initSession(
@@ -553,28 +582,150 @@ export async function loadMessages(
   }
 }
 
+interface TodoPanelPayload {
+  todos?: TodoItem[];
+  version?: string | null;
+  finished?: boolean;
+  allCompleted?: boolean;
+  dismissed?: boolean;
+  removed?: boolean;
+}
+
+function panelFromPayload(payload: TodoPanelPayload | null | undefined) {
+  if (!payload || !Array.isArray(payload.todos) || payload.todos.length === 0) return null;
+  if (payload.removed === true || payload.dismissed === true) return null;
+  return {
+    todos: payload.todos,
+    version: typeof payload.version === 'string' ? payload.version : null,
+    finished: payload.finished === true,
+    allCompleted: payload.allCompleted === true,
+    dismissed: false,
+    updateFailed: false,
+  };
+}
+
+function applyTodoActionResponse(sessionPath: string, payload: TodoPanelPayload | null | undefined): void {
+  useStore.getState().setSessionTodoPanel(sessionPath, panelFromPayload(payload));
+  useStore.getState().bumpTodosLiveVersion(sessionPath);
+}
+
+function presentTodoActionError(err: unknown): void {
+  const presented = presentError(err);
+  useStore.getState().addToast(
+    presented.text,
+    'error',
+    6000,
+    presented.code ? { errorCode: presented.code } : undefined,
+  );
+}
+
+/**
+ * 清单已在他处更新（版本失配）：旧版本操作被识别并拒绝，
+ * 提示刷新，不误改新加入的任务（A17）。原清单保持不变。
+ */
+function presentTodoVersionMismatch(): void {
+  const translate = window.t ?? ((key: string) => key);
+  useStore.getState().addToast(translate('todoPanel.versionMismatch'), 'error', 6000, {
+    errorCode: 'todo_version_mismatch',
+  });
+}
+
+async function postTodoAction(
+  sessionPath: string,
+  endpoint: string,
+  version: string | null,
+): Promise<boolean> {
+  const res = await lingxiFetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: sessionPath, version }),
+    throwOnHttpError: false,
+  });
+  if (res.status === 409) {
+    const data = await res.json().catch(() => null);
+    if (data?.code === 'todo_version_mismatch') {
+      presentTodoVersionMismatch();
+      return false;
+    }
+    throw errorWithCode(data?.error || `todo action conflict (${res.status})`, data?.code || 'todo_conflict');
+  }
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw errorWithCode(data?.error || `todo action failed (${res.status})`, data?.code || 'todo_action_failed');
+  }
+  const data = await res.json().catch(() => null);
+  applyTodoActionResponse(sessionPath, data?.panel ?? data);
+  return true;
+}
+
+/**
+ * 用户确认剩余任务已完成：未完成项改为已完成，已取消项保持取消。
+ * 携带用户看见的那一版清单版本；服务端版本失配会拒绝（409），
+ * 不把新加入的任务一起完成（A17）。
+ */
 export async function completeSessionTodos(sessionPath: string): Promise<boolean> {
   if (!sessionPath) return false;
   const state = useStore.getState();
   if (sessionScopedListIncludes(state as Record<string, any>, state.streamingSessions, sessionPath)) return false;
 
+  const panel = sessionScopedValue(state as Record<string, any>, state.todoPanelBySession, sessionPath);
   try {
-    await lingxiFetch('/api/sessions/todos/complete', {
+    return await postTodoAction(sessionPath, '/api/sessions/todos/complete', panel?.version ?? null);
+  } catch (err) {
+    presentTodoActionError(err);
+    return false;
+  }
+}
+
+/**
+ * 取消剩余任务：待开始/进行中/受阻项改为已取消，已完成项保持完成。
+ * 只改变这份计划，不终止终端进程、工作流或其他后台任务。
+ */
+export async function cancelSessionTodos(sessionPath: string): Promise<boolean> {
+  if (!sessionPath) return false;
+  const state = useStore.getState();
+  if (sessionScopedListIncludes(state as Record<string, any>, state.streamingSessions, sessionPath)) return false;
+
+  const panel = sessionScopedValue(state as Record<string, any>, state.todoPanelBySession, sessionPath);
+  try {
+    return await postTodoAction(sessionPath, '/api/sessions/todos/cancel', panel?.version ?? null);
+  } catch (err) {
+    presentTodoActionError(err);
+    return false;
+  }
+}
+
+/**
+ * 收纳已结束清单：只改变当前展示（隐藏收尾摘要），不改完成/取消结果，
+ * 历史记录保留。重开会话不重新弹出已收纳摘要。
+ */
+export async function dismissSessionTodoPanel(sessionPath: string): Promise<boolean> {
+  if (!sessionPath) return false;
+  const state = useStore.getState();
+  const panel = sessionScopedValue(state as Record<string, any>, state.todoPanelBySession, sessionPath);
+  try {
+    const res = await lingxiFetch('/api/sessions/todos/dismiss', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ path: sessionPath }),
+      body: JSON.stringify({ path: sessionPath, version: panel?.version ?? null }),
+      throwOnHttpError: false,
     });
-    useStore.getState().setSessionTodosForPath(sessionPath, []);
+    if (res.status === 409) {
+      const data = await res.json().catch(() => null);
+      if (data?.code === 'todo_version_mismatch') {
+        presentTodoVersionMismatch();
+        return false;
+      }
+    }
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      throw errorWithCode(data?.error || `todo dismiss failed (${res.status})`, data?.code || 'todo_action_failed');
+    }
+    useStore.getState().setSessionTodoPanel(sessionPath, null);
     useStore.getState().bumpTodosLiveVersion(sessionPath);
     return true;
   } catch (err) {
-    const presented = presentError(err);
-    useStore.getState().addToast(
-      presented.text,
-      'error',
-      6000,
-      presented.code ? { errorCode: presented.code } : undefined,
-    );
+    presentTodoActionError(err);
     return false;
   }
 }

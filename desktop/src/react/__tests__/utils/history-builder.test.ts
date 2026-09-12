@@ -246,6 +246,28 @@ describe('buildItemsFromHistory user image restoration', () => {
     ]);
   });
 
+  it('同一条记录里的工具不能越过中间的思考段，连续工具仍保持同组顺序', () => {
+    const items = buildItemsFromHistory({ messages: [{
+      id: '1', entryId: 'mixed-entry', role: 'assistant', content: '核对完成。',
+      assistantSegments: [
+        { id: 'reasoning-between', kind: 'reasoning', semanticPhase: 'reasoning', source: '看完文件再执行检查', lifecycle: 'sealed', processOrder: 1 },
+        { id: 'final', kind: 'text', semanticPhase: 'final_answer', source: '核对完成。', lifecycle: 'sealed', processOrder: 4 },
+      ],
+      toolCalls: [
+        { id: 'read-first', name: 'read', status: 'succeeded', processOrder: 0 },
+        { id: 'exec-next', name: 'exec_command', status: 'succeeded', processOrder: 2 },
+        { id: 'edit-last', name: 'edit', status: 'succeeded', processOrder: 3 },
+      ],
+    }] });
+    const entry = items[0];
+    if (entry.type !== 'message') throw new Error('expected assistant message');
+    expect(entry.data.blocks?.map(block => block.type === 'tool_group'
+      ? block.tools.map(tool => tool.id)
+      : block.type === 'thinking' ? block.content : block.type)).toEqual([
+      ['read-first'], '看完文件再执行检查', ['exec-next', 'edit-last'], 'text',
+    ]);
+  });
+
   it('restores tool outcomes by toolCallId instead of tool name', () => {    const items = buildItemsFromHistory({
       messages: [{
         id: 'a1',
@@ -366,6 +388,30 @@ describe('buildItemsFromHistory user image restoration', () => {
       turnInputEntryId: 'entry-hidden-input',
       turnInputVisible: false,
     });
+  });
+
+  it('隐藏中断标记消息（模型可见，UI 不展示，兼容旧版明文前缀）', () => {
+    const items = buildItemsFromHistory({
+      messages: [
+        { id: 'u0', role: 'user', content: '开始干活' },
+        {
+          id: 'm1',
+          role: 'user',
+          content: '<hana-turn-interrupted>The previous turn was stopped on purpose. verify the real state.</hana-turn-interrupted>',
+        },
+        {
+          id: 'm2',
+          role: 'user',
+          content: '[Turn interrupted by user] The previous turn was stopped on purpose.',
+        },
+        { id: 'u1', role: 'user', content: '继续' },
+      ],
+    });
+
+    const texts = items
+      .filter((item) => item.type === 'message')
+      .map((item) => (item.type === 'message' ? item.data.text : ''));
+    expect(texts).toEqual(['开始干活', '继续']);
   });
 
   it('隐藏 bridge 写入用户消息里的内部时间标签', () => {

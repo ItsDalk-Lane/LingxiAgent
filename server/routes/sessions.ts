@@ -25,9 +25,9 @@ import {
 } from "../../core/message-utils.ts";
 import { stripSessionReminderBlocks } from "../../core/session-reminders.ts";
 import { sessionFileRevision } from "../../core/session-list-projection-cache.ts";
-import { extractLatestTodoSnapshot } from "../../lib/tools/todo-compat.ts";
+import { extractLatestTodoSnapshot, computeTodoListVersion, todoPanelPayloadFromSnapshot } from "../../lib/tools/todo-compat.ts";
 import { SessionManager } from "../../lib/pi-sdk/index.ts";
-import { TODO_STATE_CUSTOM_TYPE } from "../../lib/tools/todo-constants.ts";
+import { TODO_FORMAT_VERSION, TODO_STATE_CUSTOM_TYPE } from "../../lib/tools/todo-constants.ts";
 import { mergeWorkspaceHistory, normalizeWorkspacePath } from "../../shared/workspace-history.ts";
 import { listStudioMountsForStudio } from "../../core/studio-mounts.ts";
 import { sanitizeBridgeVisibleText } from "../../shared/bridge-visible-text.ts";
@@ -45,7 +45,8 @@ import {
   resolveModelAudioInputTransport,
   resolveModelVideoInputTransport,
 } from "../../shared/model-capabilities.ts";
-import { replayLatestUserTurn, retrySessionTurn } from "../../core/session-turn-actions.ts";
+import { replayLatestUserTurn, resolveSessionNodeTarget, retrySessionTurn } from "../../core/session-turn-actions.ts";
+import { getWorkspaceSnapshotService } from "../../core/workspace-snapshots.ts";
 import { createRequestContext } from "../http/boundary.ts";
 import { createModuleLogger } from "../../lib/debug-log.ts";
 import { searchSessions } from "../../lib/search/session-search.ts";
@@ -85,11 +86,62 @@ async function pathExists(filePath) {
   }
 }
 
+// 确认剩余任务已完成：未完成项改为已完成；已取消项保持取消（不被改写）。
 function completeTodoItems(todos) {
-  return (Array.isArray(todos) ? todos : []).map((todo) => ({
-    ...todo,
-    status: "completed",
-  }));
+  return (Array.isArray(todos) ? todos : []).map((todo) => (
+    todo?.status === "cancelled" ? todo : { ...todo, status: "completed" }
+  ));
+}
+
+// 取消剩余任务：待开始/进行中/受阻项改为已取消；已完成项保持完成。
+function cancelTodoItems(todos) {
+  return (Array.isArray(todos) ? todos : []).map((todo) => (
+    todo && TERMINAL_TODO_STATUSES.has(todo.status)
+      ? todo
+      : { ...todo, status: "cancelled" }
+  ));
+}
+
+const TERMINAL_TODO_STATUSES = new Set(["cancelled", "completed"]);
+
+function hasUnfinishedTodoItems(todos) {
+  return (Array.isArray(todos) ? todos : []).some(
+    (todo) => todo && !TERMINAL_TODO_STATUSES.has(todo.status),
+  );
+}
+
+/**
+ * 用户收尾操作（完成/取消）产生的新清单必然是 v2 语义：
+ * 全部终态 → finished；removed/dismissed 均为 false（保留收尾摘要）。
+ */
+function resolveUserActionSnapshotFlags(todos) {
+  const list = Array.isArray(todos) ? todos : [];
+  const finished = list.length > 0 && list.every((item) => item && TERMINAL_TODO_STATUSES.has(item.status));
+  return {
+    removed: list.length === 0,
+    dismissed: false,
+    finished,
+    allCompleted: finished && list.every((item) => item.status === "completed"),
+    version: computeTodoListVersion(list),
+  };
+}
+
+/**
+ * 版本失配判定：客户端带来了版本且与服务端当前快照版本不同 → 拒绝。
+ * 不带版本的旧请求沿用旧行为（作用于当前快照）。
+ */
+function isTodoVersionMismatch(snapshot, clientVersion) {
+  return (
+    typeof clientVersion === "string" &&
+    clientVersion.length > 0 &&
+    !!snapshot &&
+    typeof snapshot.version === "string" &&
+    snapshot.version !== clientVersion
+  );
+}
+
+function readTodoSnapshotForManager(manager) {
+  return extractLatestTodoSnapshot(manager.buildSessionContext?.().messages || []);
 }
 
 function getWritableSessionManager(engine, sessionPath) {
@@ -194,7 +246,11 @@ function classifySessionCreationError(err) {
 }
 
 const TODO_COMPLETE_MESSAGE =
-  "[Hana Todo] The user marked the current todo list as completed and removed it from the session UI. Treat every item in that list as completed. Create a new todo list only if new work needs tracking.";
+  "[Hana Todo] The user confirmed the remaining tasks as completed. Unfinished items were marked completed; items the user previously cancelled stay cancelled. Create a new todo list only if new work needs tracking.";
+const TODO_CANCEL_MESSAGE =
+  "[Hana Todo] The user cancelled the remaining tasks in the current todo list. Pending, in-progress and blocked items were marked cancelled; completed items stay completed. Do not resume cancelled items unless the user explicitly asks to reopen that work.";
+const TODO_DISMISS_MESSAGE =
+  "[Hana Todo] The user collapsed the finished todo summary in the UI. This only changed display; task outcomes (completed/cancelled) are unchanged.";
 
 // 与 /sessions/messages 主循环的序号语义逐字对齐：
 // 只有 user/assistant 且 isDisplayableHistoryMessage 为真的消息推进 displayIdx。
@@ -1003,6 +1059,86 @@ export function createSessionsRoute(engine, hub = null) {
     }
   });
 
+  /**
+   * 会话记忆开关（可读/可写任意已存在的会话，不要求它是「当前会话」）。
+   * 侧边对话面板会为它自己的会话读取与实际开关；服务端语义与创建会话时的
+   * memoryEnabled 完全同源（manifest.memoryPolicy + session-meta）。
+   */
+  route.get("/sessions/memory", async (c) => {
+    try {
+      const requestContext = createRequestContext(c, engine);
+      const sessionPath = c.req.query("path") || null;
+      if (!sessionPath) {
+        return c.json({ error: t("error.missingParam", { param: "path" }) }, 400);
+      }
+      const auth = authorizeSessionRoute(requestContext, "sessions.read", {
+        kind: "session",
+        studioId: requestContext.studioId,
+        sessionPath,
+      });
+      if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
+      if (!isActiveDesktopSessionPath(sessionPath, engine.agentsDir)) {
+        return c.json({ error: "Invalid session path" }, 403);
+      }
+      if (isDeletedAgentSessionPath(sessionPath)) {
+        return rejectDeletedAgentSession(c);
+      }
+      if (!(await pathExists(sessionPath))) {
+        return c.json({ error: "session not found" }, 404);
+      }
+      return c.json({
+        ok: true,
+        sessionPath,
+        memoryEnabled: engine.getSessionMemoryEnabled?.(sessionPath) !== false,
+      });
+    } catch (err) {
+      return c.json({ error: err.message, code: err.code || undefined }, err.status || 500);
+    }
+  });
+
+  route.patch("/sessions/memory", async (c) => {
+    try {
+      const requestContext = createRequestContext(c, engine);
+      const body = await safeJson(c);
+      const sessionPath = body?.path || body?.sessionPath || null;
+      if (!sessionPath) {
+        return c.json({ error: t("error.missingParam", { param: "path" }) }, 400);
+      }
+      if (typeof body?.memoryEnabled !== "boolean") {
+        return c.json({ error: t("error.missingParam", { param: "memoryEnabled" }) }, 400);
+      }
+      const auth = authorizeSessionRoute(requestContext, "sessions.write", {
+        kind: "session",
+        studioId: requestContext.studioId,
+        sessionPath,
+      });
+      if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
+      if (!isActiveDesktopSessionPath(sessionPath, engine.agentsDir)) {
+        return c.json({ error: "Invalid session path" }, 403);
+      }
+      if (isDeletedAgentSessionPath(sessionPath)) {
+        return rejectDeletedAgentSession(c);
+      }
+      if (!(await pathExists(sessionPath))) {
+        return c.json({ error: "session not found" }, 404);
+      }
+      if (typeof engine.setSessionMemoryEnabled !== "function") {
+        return c.json({ error: "session memory toggle unavailable" }, 500);
+      }
+      const result = await engine.setSessionMemoryEnabled(sessionPath, body.memoryEnabled);
+      if (result?.ok === false) {
+        return c.json({ error: result.error || "failed to set session memory" }, 400);
+      }
+      return c.json({
+        ok: true,
+        sessionPath,
+        memoryEnabled: result?.memoryEnabled !== false,
+      });
+    } catch (err) {
+      return c.json({ error: err.message, code: err.code || undefined }, err.status || 500);
+    }
+  });
+
   route.get("/sessions/authorized-folders", async (c) => {
     try {
       const requestContext = createRequestContext(c, engine);
@@ -1113,6 +1249,9 @@ export function createSessionsRoute(engine, hub = null) {
       const resolved = resolveHistoryDeferredContent(
         sourceMessages,
         c.req.param("contentId"),
+        // 实时大结果引用只登记「哪个会话、哪次调用」；这里把已经过路径校验和
+        // read 授权的那条会话路径传下去，引用写的是别的会话就解析不出内容。
+        resolvedSessionPath,
       );
       return resolved
         ? c.json(resolved)
@@ -1266,6 +1405,7 @@ export function createSessionsRoute(engine, hub = null) {
         } : undefined;
         return c.json({
           messages: result.messages, blocks: result.blocks, todos: result.todos,
+          todoPanel: result.todoPanel ?? null,
           hasMore: result.hasMore, nextBefore: result.nextBefore, sessionFiles: result.sessionFiles,
           revision, ...(reconciliation ? { reconciliation } : {}),
         });
@@ -1304,6 +1444,7 @@ export function createSessionsRoute(engine, hub = null) {
       // 能力后无能力回退分支才可移除（不设自动删除日期）。
       const responseBody = JSON.stringify({
         messages: outcome.result.messages, blocks: outcome.result.blocks, todos: outcome.result.todos,
+        todoPanel: outcome.result.todoPanel ?? null,
         hasMore: outcome.result.hasMore, nextBefore: outcome.result.nextBefore, sessionFiles: outcome.result.sessionFiles,
         revision,
       });
@@ -1404,6 +1545,20 @@ export function createSessionsRoute(engine, hub = null) {
         return c.json({ error: "session_busy" }, 409);
       }
 
+      // fileRollback：默认 none（保持现状行为）；workspace 必须显式开启开关，
+      // 未开启时显式 4xx，绝不静默降级成 none。
+      const rawFileRollback = body?.fileRollback;
+      if (rawFileRollback != null && rawFileRollback !== "none" && rawFileRollback !== "workspace") {
+        return c.json({ error: "invalid fileRollback", code: "invalid_file_rollback" }, 400);
+      }
+      const fileRollback = rawFileRollback === "workspace" ? "workspace" : "none";
+      if (fileRollback === "workspace" && engine.preferences?.getRollbackFileChanges?.() !== true) {
+        return c.json({
+          error: "file rollback is disabled in preferences",
+          code: "file_rollback_disabled",
+        }, 403);
+      }
+
       const result = await retrySessionTurn(engine, {
         sessionId,
         sessionPath,
@@ -1413,6 +1568,7 @@ export function createSessionsRoute(engine, hub = null) {
         replacementText: typeof body?.text === "string" ? body.text : undefined,
         displayMessage: body?.displayMessage || null,
         uiContext: body?.uiContext ?? null,
+        ...(rawFileRollback != null ? { fileRollback } : {}),
       });
       return c.json({ ok: true, ...result });
     } catch (err) {
@@ -1421,6 +1577,122 @@ export function createSessionsRoute(engine, hub = null) {
         bodyFromRouteError(err),
         statusFromRouteError(err, err?.message === "session_busy" ? 409 : 400),
       );
+    }
+  });
+
+  /**
+   * 「回退时撤销文件改动」预览：开关关闭 / 无检查点 / 拍照降级都在这里显式说明，
+   * UI 据此决定选项置灰与影响文件数，而不是先请求再失败。
+   */
+  route.post("/sessions/turns/rollback-preview", async (c) => {
+    try {
+      const requestContext = createRequestContext(c, engine);
+      const body = await safeJson(c);
+      const sessionRef = resolveSessionLocatorFromBody(body, "previewWorkspaceRollback");
+      assertManifestLifecycle(sessionRef, "active", "previewWorkspaceRollback");
+      const { sessionId, sessionPath } = sessionRef;
+      const auth = authorizeSessionRoute(requestContext, "sessions.write", {
+        kind: "session",
+        studioId: requestContext.studioId,
+        sessionPath,
+      });
+      if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
+      if (!isActiveDesktopSessionPath(sessionPath, engine.agentsDir)) {
+        return c.json({ error: "Invalid session path" }, 403);
+      }
+      if (isDeletedAgentSessionPath(sessionPath)) {
+        return rejectDeletedAgentSession(c);
+      }
+      if (!(await pathExists(sessionPath))) {
+        return c.json({ error: "session not found" }, 404);
+      }
+
+      const enabled = engine.preferences?.getRollbackFileChanges?.() === true;
+      if (!enabled) {
+        return c.json({
+          ok: true,
+          enabled: false,
+          available: false,
+          degraded: false,
+          commit: null,
+          reason: "file_rollback_disabled",
+          fileCount: 0,
+          files: [],
+        });
+      }
+      if (typeof engine.ensureSessionLoaded !== "function") {
+        return c.json({
+          ok: true,
+          enabled: true,
+          available: false,
+          degraded: false,
+          commit: null,
+          reason: "session_branch_unavailable",
+          fileCount: 0,
+          files: [],
+        });
+      }
+      const session = await engine.ensureSessionLoaded(sessionPath);
+      const branch = session?.sessionManager?.getBranch?.() || [];
+      const target = body?.target
+        || (typeof body?.turnInputEntryId === "string" ? { role: "user", entryId: body.turnInputEntryId } : null);
+      const resolved = resolveSessionNodeTarget(branch, target, { mode: "retry" });
+      const turnInputEntryId = resolved.turnInputEntry.id;
+      const ownerAgentId = engine.resolveSessionOwnership?.(sessionPath)?.agentId
+        || engine.getSessionManifest?.(sessionId)?.ownerAgentId
+        || null;
+      const workspaceRoot = ownerAgentId
+        ? (engine.getExplicitHomeCwd?.(ownerAgentId) || engine.getHomeCwd?.(ownerAgentId) || null)
+        : null;
+      if (!workspaceRoot) {
+        return c.json({
+          ok: true,
+          enabled: true,
+          available: false,
+          degraded: false,
+          commit: null,
+          reason: "workspace_unavailable",
+          turnInputEntryId,
+          fileCount: 0,
+          files: [],
+        });
+      }
+      const service = getWorkspaceSnapshotService({ lingxiHome: engine.lingxiHome });
+      const preview = await service.previewTurn({
+        sessionPath,
+        workspaceRoot,
+        turnInputEntryId,
+        createdAtHint: resolved.turnInputEntry?.timestamp ?? null,
+      });
+      return c.json({ ok: true, enabled: true, turnInputEntryId, ...preview });
+    } catch (err) {
+      return c.json(bodyFromRouteError(err), statusFromRouteError(err, 400));
+    }
+  });
+
+  /** 读取「回退时撤销文件改动」开关（全局偏好，默认关闭）。 */
+  route.get("/sessions/workspace-rollback", async (c) => {
+    try {
+      return c.json({ enabled: engine.preferences?.getRollbackFileChanges?.() === true });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
+  /** 写入「回退时撤销文件改动」开关。 */
+  route.put("/sessions/workspace-rollback", async (c) => {
+    try {
+      const body = await safeJson(c);
+      if (typeof body?.enabled !== "boolean") {
+        return c.json({ error: "enabled must be a boolean" }, 400);
+      }
+      if (typeof engine.preferences?.setRollbackFileChanges !== "function") {
+        return c.json({ error: "preference unavailable" }, 503);
+      }
+      const enabled = engine.preferences.setRollbackFileChanges(body.enabled);
+      return c.json({ ok: true, enabled });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
     }
   });
 
@@ -1524,16 +1796,20 @@ export function createSessionsRoute(engine, hub = null) {
       } catch {
         return c.json({ error: t("error.sessionNotFound") }, 404);
       }
+      // 模型正在输出时服务端同样拒绝收尾操作（前端禁用只是第一道）。
       if (engine.isSessionStreaming?.(sessionPath)) {
         return c.json({ error: "Cannot complete todos while session is streaming" }, 409);
       }
 
       const manager = getWritableSessionManager(engine, sessionPath);
-      const snapshot = extractLatestTodoSnapshot(
-        manager.buildSessionContext?.().messages || [],
-      );
-      const completedTodos = completeTodoItems(snapshot?.todos || []);
-      if (!snapshot?.removed && completedTodos.length > 0) {
+      const snapshot = readTodoSnapshotForManager(manager);
+      // 版本失配：用户操作针对的不是当前这一版清单，拒绝并提示刷新（A17）。
+      if (isTodoVersionMismatch(snapshot, body?.version)) {
+        return c.json({ error: t("error.todoVersionMismatch"), code: "todo_version_mismatch" }, 409);
+      }
+      let panel;
+      if (!snapshot?.removed && hasUnfinishedTodoItems(snapshot?.todos)) {
+        const completedTodos = completeTodoItems(snapshot.todos);
         manager.appendCustomMessageEntry(
           TODO_STATE_CUSTOM_TYPE,
           TODO_COMPLETE_MESSAGE,
@@ -1541,15 +1817,148 @@ export function createSessionsRoute(engine, hub = null) {
           {
             action: "complete_all",
             source: "user",
-            removed: true,
+            todoVersion: TODO_FORMAT_VERSION,
+            removed: false,
+            dismissed: false,
             todos: completedTodos,
           },
         );
         engine.syncSessionBranchHead?.(sessionPath, manager, "todo_complete_append");
+        panel = todoPanelPayloadFromSnapshot({
+          ...resolveUserActionSnapshotFlags(completedTodos),
+          todos: completedTodos,
+        });
+      } else {
+        panel = todoPanelPayloadFromSnapshot(snapshot);
       }
 
-      engine.emitEvent?.({ type: "todo_update", todos: [] }, sessionPath);
-      return c.json({ ok: true, todos: [] });
+      engine.emitEvent?.({ type: "todo_update", ...panel }, sessionPath);
+      return c.json({ ok: true, panel });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
+  route.post("/sessions/todos/cancel", async (c) => {
+    try {
+      const requestContext = createRequestContext(c, engine);
+      const body = await safeJson(c);
+      const sessionPath = body?.path;
+      if (!sessionPath) {
+        return c.json({ error: t("error.missingParam", { param: "path" }) }, 400);
+      }
+      const auth = authorizeSessionRoute(requestContext, "sessions.write", {
+        kind: "session",
+        studioId: requestContext.studioId,
+        sessionPath,
+      });
+      if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
+      if (!isActiveDesktopSessionPath(sessionPath, engine.agentsDir)) {
+        return c.json({ error: "Invalid session path" }, 403);
+      }
+      if (isDeletedAgentSessionPath(sessionPath)) {
+        return rejectDeletedAgentSession(c);
+      }
+      try {
+        await fs.access(sessionPath);
+      } catch {
+        return c.json({ error: t("error.sessionNotFound") }, 404);
+      }
+      // 只改变这份计划；不终止终端进程、工作流或其他后台任务。
+      if (engine.isSessionStreaming?.(sessionPath)) {
+        return c.json({ error: "Cannot cancel todos while session is streaming" }, 409);
+      }
+
+      const manager = getWritableSessionManager(engine, sessionPath);
+      const snapshot = readTodoSnapshotForManager(manager);
+      if (isTodoVersionMismatch(snapshot, body?.version)) {
+        return c.json({ error: t("error.todoVersionMismatch"), code: "todo_version_mismatch" }, 409);
+      }
+      let panel;
+      if (!snapshot?.removed && hasUnfinishedTodoItems(snapshot?.todos)) {
+        const cancelledTodos = cancelTodoItems(snapshot.todos);
+        manager.appendCustomMessageEntry(
+          TODO_STATE_CUSTOM_TYPE,
+          TODO_CANCEL_MESSAGE,
+          false,
+          {
+            action: "cancel_remaining",
+            source: "user",
+            todoVersion: TODO_FORMAT_VERSION,
+            removed: false,
+            dismissed: false,
+            todos: cancelledTodos,
+          },
+        );
+        engine.syncSessionBranchHead?.(sessionPath, manager, "todo_cancel_append");
+        panel = todoPanelPayloadFromSnapshot({
+          ...resolveUserActionSnapshotFlags(cancelledTodos),
+          todos: cancelledTodos,
+        });
+      } else {
+        panel = todoPanelPayloadFromSnapshot(snapshot);
+      }
+
+      engine.emitEvent?.({ type: "todo_update", ...panel }, sessionPath);
+      return c.json({ ok: true, panel });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
+  route.post("/sessions/todos/dismiss", async (c) => {
+    try {
+      const requestContext = createRequestContext(c, engine);
+      const body = await safeJson(c);
+      const sessionPath = body?.path;
+      if (!sessionPath) {
+        return c.json({ error: t("error.missingParam", { param: "path" }) }, 400);
+      }
+      const auth = authorizeSessionRoute(requestContext, "sessions.write", {
+        kind: "session",
+        studioId: requestContext.studioId,
+        sessionPath,
+      });
+      if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
+      if (!isActiveDesktopSessionPath(sessionPath, engine.agentsDir)) {
+        return c.json({ error: "Invalid session path" }, 403);
+      }
+      if (isDeletedAgentSessionPath(sessionPath)) {
+        return rejectDeletedAgentSession(c);
+      }
+      try {
+        await fs.access(sessionPath);
+      } catch {
+        return c.json({ error: t("error.sessionNotFound") }, 404);
+      }
+
+      const manager = getWritableSessionManager(engine, sessionPath);
+      const snapshot = readTodoSnapshotForManager(manager);
+      if (isTodoVersionMismatch(snapshot, body?.version)) {
+        return c.json({ error: t("error.todoVersionMismatch"), code: "todo_version_mismatch" }, 409);
+      }
+      // 只收纳"已结束且未收纳"的清单；其他情况是幂等 no-op。
+      // 收纳只改变当前展示，不改完成/取消结果；历史记录保留。
+      if (snapshot?.finished && !snapshot.dismissed && !snapshot.removed) {
+        manager.appendCustomMessageEntry(
+          TODO_STATE_CUSTOM_TYPE,
+          TODO_DISMISS_MESSAGE,
+          false,
+          {
+            action: "dismiss",
+            source: "user",
+            todoVersion: TODO_FORMAT_VERSION,
+            removed: true,
+            dismissed: true,
+            todos: snapshot.todos,
+          },
+        );
+        engine.syncSessionBranchHead?.(sessionPath, manager, "todo_dismiss_append");
+      }
+
+      const panel = { removed: true, dismissed: true, todos: [] };
+      engine.emitEvent?.({ type: "todo_update", ...panel }, sessionPath);
+      return c.json({ ok: true, panel });
     } catch (err) {
       return c.json({ error: err.message }, 500);
     }

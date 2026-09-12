@@ -141,6 +141,12 @@ function remoteContentRefWithVersion(
   };
 }
 
+/** 远端文本内容的二进制嗅探：与主进程 readTextFileSnapshot 的 NUL 采样一致。 */
+function looksLikeBinaryText(content: string): boolean {
+  const sample = content.length > 8192 ? content.slice(0, 8192) : content;
+  return sample.includes('\u0000');
+}
+
 async function readContentForPreview(contentPath: string, previewType: string): Promise<PreviewContentSnapshot> {
   const res = await lingxiFetch(contentPath);
   const fileVersion = fileVersionFromContentHeaders(res.headers);
@@ -223,6 +229,25 @@ async function openRemoteContentPreview({
     };
     openPreview(previewItem);
     return;
+  }
+
+  // 未知扩展名：与 VS Code 一致，先按纯文本读取；内容嗅探出二进制（NUL）才回退文件信息卡。
+  if (!previewType) {
+    const read = await readContentForPreview(contentPath, 'code');
+    if (!looksLikeBinaryText(read.content)) {
+      openPreview({
+        id,
+        type: 'code',
+        title,
+        content: read.content,
+        ext,
+        language: ext || undefined,
+        storageKind: 'remote-content',
+        fileVersion: read.fileVersion,
+        remoteContentRef: remoteContentRefWithVersion(remoteContentRef, read.fileVersion),
+      });
+      return;
+    }
   }
 
   openPreview({

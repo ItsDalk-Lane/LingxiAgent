@@ -8,10 +8,17 @@ import type { SessionModel } from '../../stores/chat-types';
 import { SelectWidget, ProviderIcon, ProviderGroupHeader, selectWidgetStyles, type SelectOption } from '@/ui';
 import styles from './InputArea.module.css';
 
-export function ModelSelector({ models, sessionModel, isStreaming = false }: {
+export function ModelSelector({ models, sessionModel, isStreaming = false, sessionPath, onSessionModelChange }: {
   models: Model[];
   sessionModel?: SessionModel;
   isStreaming?: boolean;
+  /**
+   * 目标会话。缺省走全局 currentSessionPath（主窗口）；快捷聊天窗有自己的会话，
+   * 必须显式传入，否则会切到主窗口当前会话上。
+   */
+  sessionPath?: string | null;
+  /** 切换成功后回调（快捷窗本地持有会话模型，不写全局 sessionModelsByPath）。 */
+  onSessionModelChange?: (model: SessionModel) => void;
 }) {
   const { t } = useI18n();
   const [loading, setLoading] = useState(false);
@@ -46,12 +53,17 @@ export function ModelSelector({ models, sessionModel, isStreaming = false }: {
   const switchModel = useCallback(async (modelId: string, provider?: string) => {
     try {
       const state = useStore.getState();
-      const { currentSessionPath, pendingNewSession, chatSessions, sessionModelsByPath } = state;
-      const sessionHasMessages = !!(currentSessionPath && sessionScopedValue(state, chatSessions, currentSessionPath)?.items?.length);
+      const { pendingNewSession, chatSessions, sessionModelsByPath } = state;
+      // 快捷聊天窗有自己的会话与本地模型快照：显式传入的 sessionPath 优先，
+      // 缺省才用全局 currentSessionPath（主窗口）。
+      const targetSessionPath = sessionPath ?? state.currentSessionPath;
+      const sessionHasMessages = !!(targetSessionPath && sessionScopedValue(state, chatSessions, targetSessionPath)?.items?.length);
 
-      if (sessionHasMessages && currentSessionPath) {
+      if (sessionHasMessages && targetSessionPath) {
         // Same-model guard：严格复合键比较。sm 缺 provider 时视为不可比，走 global 当前。
-        const sm = sessionScopedValue(state, sessionModelsByPath, currentSessionPath);
+        const sm = sessionPath
+          ? sessionModel
+          : sessionScopedValue(state, sessionModelsByPath, targetSessionPath);
         const useSession = !!(sm?.id && sm?.provider);
         const cur = useSession ? sm : models.find(m => m.isCurrent);
         // A blocked historical model must be explicitly re-selected after its
@@ -65,18 +77,20 @@ export function ModelSelector({ models, sessionModel, isStreaming = false }: {
         const res = await lingxiFetch('/api/models/switch', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionPath: currentSessionPath, modelId, provider }),
+          body: JSON.stringify({ sessionPath: targetSessionPath, modelId, provider }),
           throwOnHttpError: false,
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.error || 'switch failed');
 
         if (data.model) {
-          useStore.getState().updateSessionModel(currentSessionPath, {
+          const nextModel: SessionModel = {
             ...data.model,
             available: true,
             unavailableReason: null,
-          });
+          };
+          if (sessionPath) onSessionModelChange?.(nextModel);
+          else useStore.getState().updateSessionModel(targetSessionPath, nextModel);
         }
         if (data.thinkingLevel) {
           useStore.getState().setThinkingLevel(data.thinkingLevel);
@@ -105,7 +119,9 @@ export function ModelSelector({ models, sessionModel, isStreaming = false }: {
           useStore.getState().setThinkingLevel(setData.thinkingLevel);
           useStore.getState().setPendingNewSessionThinkingLevel(setData.thinkingLevel);
         }
-        if (currentSessionPath && !pendingNewSession) {
+        // 只有主窗口那条路径会在切模型时另起新会话；快捷窗的会话由它自己管理，
+        // 这里保持不动（sessionPath 显式传入时不再触发全局 createNewSession）。
+        if (!sessionPath && state.currentSessionPath && !pendingNewSession) {
           const { createNewSession } = await import('../../stores/session-actions');
           await createNewSession();
         }
@@ -126,7 +142,7 @@ export function ModelSelector({ models, sessionModel, isStreaming = false }: {
       setLoading(false);
       useStore.getState().setModelSwitching(false);
     }
-  }, [models, t]);
+  }, [models, onSessionModelChange, sessionModel, sessionPath, t]);
 
   // 按 provider 分组
   const grouped = useMemo(() => {

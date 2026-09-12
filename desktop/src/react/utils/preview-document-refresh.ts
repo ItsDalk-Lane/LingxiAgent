@@ -11,7 +11,7 @@ import {
   normalizeWorkbenchContentRef,
   refreshPreviewItemsFromRemoteWorkbenchTarget,
 } from './remote-file-preview';
-import type { ResourceRef } from '../services/resource-events';
+import { resolvedLocalPathAlias, type ResourceRef } from '../services/resource-events';
 
 export type PreviewDocumentTarget =
   | { kind: 'local-file'; filePath: string }
@@ -505,8 +505,15 @@ export function markDeskTreeDirtyForResourceChange(event: ResourceChangeEvent | 
     ? (typeof state.deskWorkspaceNativeRoot === 'string' ? state.deskWorkspaceNativeRoot : '')
     : (typeof state.deskBasePath === 'string' ? state.deskBasePath : '');
   if (!basePath) return;
+  // watch 事件携带的是服务端 realpath 后的路径（macOS：/tmp → /private/tmp），而 store 里的
+  // 工作台根是配置/披露的未解析形式；两个基准都试一次，避免前缀不匹配导致事件被静默丢弃。
+  const baseCandidates = [basePath];
+  const resolvedAlias = resolvedLocalPathAlias(basePath);
+  if (resolvedAlias && resolvedAlias !== basePath) baseCandidates.push(resolvedAlias);
   for (const filePath of filePaths) {
-    const subdir = parentSubdirForWorkspaceFile(basePath, filePath);
+    const subdir = baseCandidates
+      .map(base => parentSubdirForWorkspaceFile(base, filePath))
+      .find((candidate): candidate is string => candidate != null);
     if (subdir == null) continue;
     state.markDeskTreeDirty(subdir);
   }
@@ -514,7 +521,9 @@ export function markDeskTreeDirtyForResourceChange(event: ResourceChangeEvent | 
     if (!isDirectoryResource(resource)) continue;
     const filePath = filePathFromResourceDescriptor(resource);
     if (!filePath) continue;
-    const subdir = directorySubdirForWorkspaceFile(basePath, filePath);
+    const subdir = baseCandidates
+      .map(base => directorySubdirForWorkspaceFile(base, filePath))
+      .find((candidate): candidate is string => candidate != null);
     if (subdir == null) continue;
     state.markDeskTreeDirty(subdir);
   }

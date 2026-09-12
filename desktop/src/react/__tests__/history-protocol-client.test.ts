@@ -121,6 +121,11 @@ function installStoreMethods(): void {
     noteHistoryValidationInvalidated(p);
   });
   s.setSessionTodosForPath = vi.fn();
+  s.setSessionTodoPanel = vi.fn((path: string, panel: { todos?: unknown[] } | null) => {
+    const bySession = (mockState.todosBySession ??= {}) as Record<string, unknown>;
+    bySession[path] = panel?.todos ?? [];
+  });
+  s.markSessionTodoUpdateFailed = vi.fn();
   s.appendItem = vi.fn();
   s.setLoadingMore = vi.fn((p: string, v: boolean) => {
     const chat = mockState.chatSessions as Record<string, any>;

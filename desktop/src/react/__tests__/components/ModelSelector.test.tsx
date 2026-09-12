@@ -231,4 +231,39 @@ describe('ModelSelector', () => {
       throwOnHttpError: false,
     }));
   });
+
+  // 快捷聊天窗没有全局 currentSessionPath：会话路径必须由调用方显式传入，
+  // 否则会切到主窗口当前会话上；切换结果也只回调给本窗，不写全局 sessionModelsByPath。
+  it('显式 sessionPath 时按该会话切换，并把结果回调给调用方', async () => {
+    const onSessionModelChange = vi.fn();
+    storeState.currentSessionPath = '/sessions/other-window.jsonl';
+    storeState.chatSessions = {
+      '/sessions/quick.jsonl': { items: [{ type: 'message' }] },
+      '/sessions/other-window.jsonl': { items: [{ type: 'message' }] },
+    };
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(jsonResponse({ ok: true, model: models[1] }));
+
+    render(
+      <ModelSelector
+        models={[{ ...models[0], isCurrent: true }, models[1]]}
+        sessionModel={{ ...models[0] }}
+        sessionPath="/sessions/quick.jsonl"
+        onSessionModelChange={onSessionModelChange}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: /DeepSeek V4 Flash/ }));
+    fireEvent.click(screen.getByRole('option', { name: /MiMo V2 Omni/ }));
+
+    await waitFor(() => {
+      expect(lingxiFetch).toHaveBeenCalledWith('/api/models/switch', expect.objectContaining({
+        body: JSON.stringify({
+          sessionPath: '/sessions/quick.jsonl',
+          modelId: 'mimo-v2-omni',
+          provider: 'mimo',
+        }),
+      }));
+    });
+    expect(onSessionModelChange).toHaveBeenCalledWith(expect.objectContaining({ id: 'mimo-v2-omni', available: true }));
+    expect(storeState.updateSessionModel).not.toHaveBeenCalled();
+  });
 });

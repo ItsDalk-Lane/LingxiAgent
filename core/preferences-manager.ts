@@ -313,6 +313,22 @@ export class PreferencesManager {
     this.savePreferences(prefs);
   }
 
+  /**
+   * 读取「回退时撤销文件改动」开关。默认关闭：关闭时不拍照、界面无此选项、
+   * 重试 API 收到 fileRollback=workspace 显式 4xx（见 server/routes/sessions.ts）。
+   */
+  getRollbackFileChanges() {
+    return this._cache.rollback_file_changes === true;
+  }
+
+  /** 保存「回退时撤销文件改动」开关，返回落盘值 */
+  setRollbackFileChanges(enabled) {
+    const prefs = this._mutableCopy();
+    prefs.rollback_file_changes = typeof enabled === "string" ? enabled === "true" : !!enabled;
+    this.savePreferences(prefs);
+    return prefs.rollback_file_changes;
+  }
+
   /** 读取频道系统总开关（全局，默认关闭） */
   getChannelsEnabled() {
     return this._cache.channels_enabled === true;
