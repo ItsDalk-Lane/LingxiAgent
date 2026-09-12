@@ -13,7 +13,8 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 900d2af95b313cea6219aad5f80922692564cfa1  (2026-09-12 v0.1.39 发布候选：工具展示链路五项对抗审查缺陷修复 + 审查材料入库 + v0.1.39 发布元数据，分支 feat/tool-activity-presentation)
+VERIFIED_SOURCE_SHA   = 1e13f4cb7f2496ab0ba739ecd46d064a2b75fc35  (2026-09-12 v0.1.39 发布候选：工具展示链路五项对抗审查缺陷修复 + 审查材料入库 + v0.1.39 发布元数据，分支 feat/tool-activity-presentation)
+历史 VERIFIED_SOURCE_SHA = 900d2af95b313cea6219aad5f80922692564cfa1  (2026-09-12 v0.1.39 发布候选：工具展示链路五项对抗审查缺陷修复 + 审查材料入库 + v0.1.39 发布元数据，分支 feat/tool-activity-presentation)
 历史 VERIFIED_SOURCE_SHA = 015e1b491fed1cfed10d1eade05851bfc6a5364e  (2026-09-12 工具展示链路五项对抗审查缺陷修复源码候选，分支 feat/tool-activity-presentation)
 历史 VERIFIED_SOURCE_SHA = 9c4b11114696a67e63879dbdfdc4e73947636549  (2026-09-11 回退连文件还原/清单连续性批量候选，分支 feat/tool-activity-presentation)
 历史 VERIFIED_SOURCE_SHA = aa42fc5918a245735d2ef2b7490d7e015c525556  (2026-09-11 任务清单改版候选：todo v2 五态/收尾/进度条 + 样式立法收账 + 边界/指纹坐标修正 + 证据重冻结，分支 feat/tool-activity-presentation)
@@ -1113,6 +1114,14 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 
 - 固定源码候选：`af0a16d36c0639f18318a967137331eaffca5d22`（0275f6c5 基础上：40e0c6d3 七套件 afterEach 关闭 SessionManifestStore + af0a16d3 证据重冻结 r3）。PR #53 第二轮 CI：macOS 双腿 + ubuntu 全绿；windows-2025 同 48 项 EPERM 复现且 20×250ms 重试不可愈——实锤非异步释放抖动，而是测试未关闭 SessionManifestStore 的 SQLite 句柄（Windows 下打开文件阻塞目录删除；既有 Windows 绿测试 session-manifest-engine/history-pagination-run-continuity 均有 close 惯例）。修复：七套件登记并 afterEach close 后再 rm（rmSync 重试选项保留，对齐既有 Windows 清理惯例）。
 - 验证证据（绑定 40e0c6d3 源码树；af0a16d3 相对其仅叠加 excluded 证据/再生补丁，无生产代码差异）：七套件单跑 50/50 绿；tsconfig.test tsc 绿；全量 13821 passed / 4 失败均为坐标旧值 0275f6c5 下 seal guard 家族预期红；sep10-seal-green-r3 绿门禁（exit 0、manifest 034f8f56/9452bfed 未漂移）、补丁重放 VERIFIED。
+
+## 2026-09-12 main 封印坐标同步至 v0.1.39 合并点
+
+- 背景：PR #54 合并后 main HEAD = `1e13f4cb7f2496ab0ba739ecd46d064a2b75fc35`，而封印坐标停在 `900d2af95`（v0.1.39 候选），两者之间隔着 8 个交付证据文件——它们不在 audit allowlist 内，导致 main 上 `post-verification-audit-seal` 持续红。该红项与任何源码缺陷无关，是纯坐标记账。
+- 处置：坐标推进 `900d2af95`→`1e13f4cb7f2496ab0ba739ecd46d064a2b75fc35`（即 main 合并点），`.sync-audit/build-sync-matrix.mjs` 常量随动，矩阵与 markdown 投影重生成（133 paths，projection sha256 `8bf6c07a873c2b25c51db12ae36addb89cbfe33f23747fcdd3d32b4c7878dbc9`）。
+- 关键点：坐标取「HEAD 自身」后，`git diff VERIFIED..HEAD` 为空，guard 直接绿；同时交付证据 manifest 的行集与候选树路径集相等、逐文件哈希可复算，R10-03/R10-04 也同时绿——两者不再互斥（此前误判为不可同时成立，实测证伪）。
+- 验证：`post-verification-audit-seal` 绿；`round2 R10-*` 10/10 绿；`round3` 绿；`upstream-sync-matrix` 绿。
+- 未执行/受限：无新增未执行项。本提交为纯审计提交，不含生产代码或测试逻辑改动。
 
 ## 2026-09-12 v0.1.39 发布候选与审计封印
 
