@@ -13,8 +13,8 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = 1e13f4cb7f2496ab0ba739ecd46d064a2b75fc35  (2026-09-12 v0.1.39 发布候选：工具展示链路五项对抗审查缺陷修复 + 审查材料入库 + v0.1.39 发布元数据，分支 feat/tool-activity-presentation)
-历史 VERIFIED_SOURCE_SHA = 900d2af95b313cea6219aad5f80922692564cfa1  (2026-09-12 v0.1.39 发布候选：工具展示链路五项对抗审查缺陷修复 + 审查材料入库 + v0.1.39 发布元数据，分支 feat/tool-activity-presentation)
+VERIFIED_SOURCE_SHA   = a5e596718e7a23e0ed25c11ee8a23f41fa851229  (2026-09-16 工作区技能热更新×逐个开关 + 语音模型批次 + 测试收口，main 直提候选)
+历史 VERIFIED_SOURCE_SHA = 1e13f4cb7f2496ab0ba739ecd46d064a2b75fc35  (2026-09-12 v0.1.39 发布候选：工具展示链路五项对抗审查缺陷修复 + 审查材料入库 + v0.1.39 发布元数据，分支 feat/tool-activity-presentation)
 历史 VERIFIED_SOURCE_SHA = 015e1b491fed1cfed10d1eade05851bfc6a5364e  (2026-09-12 工具展示链路五项对抗审查缺陷修复源码候选，分支 feat/tool-activity-presentation)
 历史 VERIFIED_SOURCE_SHA = 9c4b11114696a67e63879dbdfdc4e73947636549  (2026-09-11 回退连文件还原/清单连续性批量候选，分支 feat/tool-activity-presentation)
 历史 VERIFIED_SOURCE_SHA = aa42fc5918a245735d2ef2b7490d7e015c525556  (2026-09-11 任务清单改版候选：todo v2 五态/收尾/进度条 + 样式立法收账 + 边界/指纹坐标修正 + 证据重冻结，分支 feat/tool-activity-presentation)
@@ -1114,6 +1114,16 @@ Windows NSIS 已在 windows-latest 构建成功；尚未在真实 Windows 桌面
 
 - 固定源码候选：`af0a16d36c0639f18318a967137331eaffca5d22`（0275f6c5 基础上：40e0c6d3 七套件 afterEach 关闭 SessionManifestStore + af0a16d3 证据重冻结 r3）。PR #53 第二轮 CI：macOS 双腿 + ubuntu 全绿；windows-2025 同 48 项 EPERM 复现且 20×250ms 重试不可愈——实锤非异步释放抖动，而是测试未关闭 SessionManifestStore 的 SQLite 句柄（Windows 下打开文件阻塞目录删除；既有 Windows 绿测试 session-manifest-engine/history-pagination-run-continuity 均有 close 惯例）。修复：七套件登记并 afterEach close 后再 rm（rmSync 重试选项保留，对齐既有 Windows 清理惯例）。
 - 验证证据（绑定 40e0c6d3 源码树；af0a16d3 相对其仅叠加 excluded 证据/再生补丁，无生产代码差异）：七套件单跑 50/50 绿；tsconfig.test tsc 绿；全量 13821 passed / 4 失败均为坐标旧值 0275f6c5 下 seal guard 家族预期红；sep10-seal-green-r3 绿门禁（exit 0、manifest 034f8f56/9452bfed 未漂移）、补丁重放 VERIFIED。
+
+## 2026-09-16 工作区技能热更新×逐个开关 + 语音模型批次候选与封印推进
+
+- 固定源码候选：`a5e596718e7a23e0ed25c11ee8a23f41fa851229`（main 直提，用户授权"提交并推送"）：
+  1. 工作区技能两件修复：策略开关热重扫（workspace_context 补丁时对当前会话 cwd 重扫项目技能目录，无会话传 null 不拿进程 cwd 凑数）+ 项目技能逐个开关（per-agent `skills.workspace_disabled` opt-out 全链路：共享筛选 policy > user-disabled > shadow → 运行时选择 → PATCH /agents/:id/skills/:name → 设置页/技能面板开关渲染；总闸关闭即隐藏行 + 「项目」徽标 + 五语言 i18n）。
+  2. 语音模型批次（并行工作流，同树一并收口）：speechGen 接入与媒体能力面板/目录/供应商路由配套；新模块 core/media/media-family.ts、shared/media-model-classification.ts（已登记 export-manifest）。
+  3. 测试收口 12 项预存红（全部为文案/登记滞后，非产品缺陷）：提示词精简版旧断言×5、微信确认指引旧文案×1、export-manifest 登记媒体新模块×2、持久化指纹 compatible repin×4（payload `74fcbaea…`；session-coordinator Hana metadata extensions 契约文本未变、仅源码哈希漂移）。
+- 验证证据（绑定该候选树）：typecheck×3 绿；全量 14208 passed / 0 failed（1392 文件，约 80s）；真机界面点测（web 运行时 + 浏览器自动化）：总闸开→项目技能即时入列（带「项目」徽标与独立开关）→单独关闭 dsh-code-review 即时生效且 `skills.workspace_disabled` 落盘→总闸关→项目技能行即时消失；测试后配置与会话焦点已还原。
+- 封印推进：坐标 `1e13f4cb7`→`a5e596718`；`.sync-audit/build-sync-matrix.mjs` 常量随动，矩阵与 markdown 投影重生成（133 paths，projection sha256 `8bf6c07a873c2b25c51db12ae36addb89cbfe33f23747fcdd3d32b4c7878dbc9`）。
+- 未执行/受限：npm run pack 与打包未执行；真实供应商 live 验证未执行；语音合成真机链路人工验收未执行（本候选证据范围为自动化测试与界面点测）。
 
 ## 2026-09-12 main 封印坐标同步至 v0.1.39 合并点
 
