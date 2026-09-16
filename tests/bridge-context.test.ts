@@ -13,9 +13,9 @@ describe("bridge context", () => {
 
     expect(buildBridgePromptLine(context, "zh")).toBe(
       "当前用户正通过微信与你对话，仅在需要理解当前平台或“这里”等指代时参考。"
-      + "微信对话是纯文本渠道，没有可点击的卡片、按钮或确认弹窗；"
-      + "需要用户确认的操作（如自动任务建议）由用户回复文字指令完成：回复 /apply 创建最新的自动任务建议，回复 /apply <建议ID> 指定其中一项。"
-      + "需要确认时引导用户回复指令，不要让用户点击任何界面元素。",
+      + "微信中的灵犀操作用文字指令确认："
+      + "回复 /apply 创建最新建议中的自动任务，/apply <建议ID> 创建指定建议中的任务；"
+      + "引导用户回复指令，不要让用户点击桌面确认卡片。",
     );
   });
 
@@ -27,9 +27,9 @@ describe("bridge context", () => {
 
     expect(buildBridgePromptLine(context, "en")).toBe(
       "The user is currently talking with you through Feishu; use this only when interpreting the current platform or references like \"here.\" "
-      + "This Feishu conversation is a text-only channel without clickable cards, buttons, or confirmation dialogs; "
-      + "actions that need the user's confirmation (such as automation suggestions) are completed by text commands: replying /apply creates the latest automation suggestion, and /apply <id> targets a specific one. "
-      + "When confirmation is needed, guide the user to reply with the command instead of clicking any UI element.",
+      + "Confirm Lingxi actions in Feishu by text command: "
+      + "/apply creates the latest suggested task; /apply <id> creates the specified one. "
+      + "Guide users to reply instead of clicking desktop confirmation cards.",
     );
   });
 

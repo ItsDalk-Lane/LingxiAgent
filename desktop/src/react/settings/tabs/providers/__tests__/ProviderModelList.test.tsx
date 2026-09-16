@@ -66,11 +66,14 @@ function makeMedia({
   videoConfig = null,
   speechProviders = {},
   speechConfig = null,
+  speechGenProviders = {},
+  speechGenConfig = null,
 }: Record<string, any> = {}) {
   return {
     image: mediaResource(imageProviders, imageConfig),
     video: mediaResource(videoProviders, videoConfig),
     speech: mediaResource(speechProviders, speechConfig),
+    speechGen: mediaResource(speechGenProviders, speechGenConfig),
     allImageModels: [],
     allVideoModels: [],
     allSpeechModels: [],
@@ -310,7 +313,7 @@ describe('ProviderModelList (chat)', () => {
 
     await waitFor(() => expect(useSettingsStore.getState().toastMessage).toContain('model sync failed'));
     expect(useSettingsStore.getState().toastType).toBe('error');
-    expect(onRefresh).not.toHaveBeenCalled();
+    expect(onRefresh).toHaveBeenCalledTimes(1);
   });
 
   it('writes OAuth custom models through Provider Catalog instead of the legacy preferences route', async () => {
@@ -711,6 +714,55 @@ describe('ProviderModelList (unified chat/image/video/speech)', () => {
     document.body.innerHTML = '';
   });
 
+  it('offers newly discovered image, video, synthesis and recognition models in their matching groups', async () => {
+    const discovered = [
+      { id: 'new-picture', inputs: ['text'], outputs: ['image'] },
+      { id: 'new-movie', inputs: ['text'], outputs: ['video'] },
+      { id: 'new-voice', inputs: ['text'], outputs: ['audio'] },
+      { id: 'new-transcript', inputs: ['audio'], outputs: ['text'] },
+      { id: 'multimodal-chat', inputs: ['text', 'audio'], outputs: ['text', 'image'] },
+    ];
+    mocks.lingxiFetch.mockResolvedValueOnce(jsonResponse({ models: discovered }));
+    const media = makeMedia({
+      imageProviders: { prov: { models: [], availableModels: [], hasCredentials: true } },
+      videoProviders: { prov: { models: [], availableModels: [], hasCredentials: true } },
+      speechGenProviders: { prov: { models: [], availableModels: [], hasCredentials: true } },
+      speechProviders: { prov: { models: [], availableModels: [], hasCredentials: true } },
+    });
+    renderUnified({ models: [], media_capability_bindings: ['imageGeneration', 'videoGeneration', 'speechGeneration', 'speechRecognition'].map(capability => ({ capability, runtime_provider_id: 'prov' })) }, media);
+    fireEvent.click(screen.getByRole('button', { name: 'settings.api.addModel' }));
+    for (const [kind, id] of [['image', 'new-picture'], ['video', 'new-movie'], ['speechGen', 'new-voice'], ['speech', 'new-transcript']]) {
+      await waitFor(() => expect(document.querySelector(`[data-media-candidate="${kind}:prov:${id}"]`)).not.toBeNull());
+    }
+    // 支持图片输出的聊天模型保留聊天入口，也可以在图片能力里添加。
+    expect(document.querySelector('[data-media-candidate="image:prov:multimodal-chat"]')).not.toBeNull();
+    expect(screen.getAllByRole('button', { name: 'multimodal-chat' })).toHaveLength(2);
+    fireEvent.click(document.querySelector('[data-media-candidate="speechGen:prov:new-voice"]')!);
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/media/speech/providers/prov/models', expect.objectContaining({ method: 'POST', body: JSON.stringify({ model: discovered[2] }) })));
+  });
+
+  it('refreshes every media selector after editing chat model output capabilities', async () => {
+    const media = makeMedia();
+    const onRefresh = vi.fn(async () => {});
+    render(<ProviderModelList providerId="prov" summary={chatSummary({ models: [{ id: 'future-model', inputs: ['text'], outputs: ['text'] }] })} media={media} onRefresh={onRefresh} />);
+    fireEvent.click(document.querySelector('[data-unified-edit="chat"]')!);
+    const outputGroup = screen.getByRole('group', { name: 'settings.api.outputModalities' });
+    fireEvent.click(outputGroup.querySelector('[title="settings.api.modality.image"]')!);
+    fireEvent.click(screen.getByRole('button', { name: 'settings.api.save' }));
+    await waitFor(() => expect(media.refreshAll).toHaveBeenCalled());
+    expect(onRefresh).toHaveBeenCalled();
+  });
+
+  it('adds custom speech synthesis models using the synthesis endpoint', async () => {
+    const media = makeMedia({ speechGenProviders: { prov: { models: [], availableModels: [], hasCredentials: true } } });
+    renderUnified({ models: [], media_capability_bindings: [{ capability: 'speechGeneration', runtime_provider_id: 'prov' }] }, media);
+    fireEvent.click(screen.getByRole('button', { name: 'settings.api.addModel' }));
+    fireEvent.change(screen.getByLabelText('settings.api.customModelCategory.label'), { target: { value: 'speechGen' } });
+    fireEvent.change(screen.getByPlaceholderText('settings.oauth.customModelPlaceholder'), { target: { value: 'future-voice' } });
+    fireEvent.click(document.querySelector('[data-custom-model-add="true"]')!);
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/media/speech/providers/prov/models', expect.objectContaining({ method: 'POST', body: JSON.stringify({ model: { id: 'future-voice', inputs: ['text'], outputs: ['audio'] } }) })));
+  });
+
   it('lists chat, image, video and speech models in one added-models section', () => {
     const { container } = renderUnified();
     const section = container.querySelector('[data-unified-model-list="true"]');
@@ -1015,8 +1067,8 @@ describe('ProviderModelList default params buttons and modal', () => {
       expect(panel).not.toBeNull();
       const optionTexts = [...panel!.querySelectorAll('button')].map(b => b.textContent || '');
       expect(optionTexts.some(t => t.includes('gpt-4o'))).toBe(true);
-      // 词典 type=image 的候选不出现在任何分组（图片分组只展示媒体目录声明的候选）
-      expect(optionTexts.some(t => t.includes('gpt-image-1'))).toBe(false);
+      // 远端发现的图片模型应进入图片分组，不会从两边一起消失。
+      expect(document.querySelector('[data-media-candidate="image:dashscope:gpt-image-1"]')).not.toBeNull();
     });
   });
 

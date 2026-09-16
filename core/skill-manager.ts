@@ -198,6 +198,7 @@ export class SkillManager {
 
   _resolveRuntimeSkillSelection(agent, candidates = this._allSkills) {
     const enabled = new Set(agent?.config?.skills?.enabled || []);
+    const workspaceDisabled = new Set(agent?.config?.skills?.workspace_disabled || []);
     const policy = workspaceSkillPolicyFromConfig(agent?.config?.workspace_context);
     const claimedByName = new Map();
     const skills = [];
@@ -234,7 +235,7 @@ export class SkillManager {
     const resolvedWorkspace = resolveWorkspaceSkillCandidateStates(
       workspaceCandidates,
       policy,
-      { claimedByName },
+      { claimedByName, disabledNames: workspaceDisabled },
     );
     for (const resolved of resolvedWorkspace) {
       if (resolved.active) skills.push(resolved.skill);

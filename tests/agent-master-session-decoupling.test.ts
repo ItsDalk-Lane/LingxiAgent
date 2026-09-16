@@ -210,9 +210,8 @@ describe("agent.systemPrompt: master / per-session 解耦", { timeout: AGENT_INI
     const prompt = agent.buildSystemPrompt({ forceMemoryEnabled: false });
 
     expect(prompt).toContain("## Tool Usage Discipline");
-    expect(prompt).toContain("Use read/grep/find/ls to inspect files and directories");
-    expect(prompt).toContain("use edit for source-code changes and write for new or fully replaced files");
-    expect(prompt).toContain("do not use shell redirection to modify source files.");
+    expect(prompt).toContain("Inspect files with read/grep/find/ls; modify with edit, create or replace with write. No shell redirection for source edits.");
+    expect(prompt).toContain("Run commands with exec_command");
 
     await agent.dispose();
   });
@@ -226,14 +225,14 @@ describe("agent.systemPrompt: master / per-session 解耦", { timeout: AGENT_INI
     expect(prompt).toContain("## Visible UI Context");
     expect(prompt).toContain("current_status");
     expect(prompt).toContain("ui_context");
-    expect(prompt).toContain("current, open, visible, selected, pinned");
+    expect(prompt).toContain("never guess paths");
 
     agent._config.locale = "zh-CN";
     const zhPrompt = agent.buildSystemPrompt({ forceMemoryEnabled: false });
     expect(zhPrompt).toContain("## 可见 UI 上下文");
     expect(zhPrompt).toContain("current_status");
     expect(zhPrompt).toContain("ui_context");
-    expect(zhPrompt).toContain("这个、当前、打开的、可见的、选中的、置顶的");
+    expect(zhPrompt).toContain("不猜路径");
 
     await agent.dispose();
   });
@@ -246,8 +245,8 @@ describe("agent.systemPrompt: master / per-session 解耦", { timeout: AGENT_INI
     const prompt = agent.buildSystemPrompt({ forceMemoryEnabled: false });
 
     expect(prompt).toContain("## 工具使用纪律");
-    expect(prompt).toContain("查看文件和目录用 read/grep/find/ls");
-    expect(prompt).toContain("改已有源码用 edit、新建或全量替换用 write，不要用 shell 重定向改源码。");
+    expect(prompt).toContain("查文件用 read/grep/find/ls；修改用 edit，新建或全量替换用 write，不用 shell 重定向改源码。");
+    expect(prompt).toContain("命令用 exec_command");
 
     await agent.dispose();
   });
@@ -408,9 +407,8 @@ describe("agent.systemPrompt: master / per-session 解耦", { timeout: AGENT_INI
     const prompt = agent.buildSystemPrompt({ forceMemoryEnabled: false });
 
     expect(prompt).toContain("Desktop App Control");
-    expect(prompt).toContain("computer");
-    expect(prompt).toContain("AppleScript");
-    expect(prompt).toContain("osascript");
+    expect(prompt).toContain("Use computer for local GUI actions");
+    expect(prompt).toContain("Never bypass app approval with commands or scripts");
 
     await agent.dispose();
   });

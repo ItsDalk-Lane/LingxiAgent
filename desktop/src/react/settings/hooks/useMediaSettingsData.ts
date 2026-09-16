@@ -55,6 +55,7 @@ export interface SpeechModel {
   displayName?: string;
   protocolId?: string;
   adapterAvailable?: boolean;
+  unavailableMessage?: string | null;
 }
 
 export interface SpeechProvider {
@@ -165,7 +166,7 @@ export interface UseMediaSettingsDataResult {
   allImageModels: Array<MediaModel & { provider: string }>;
   allVideoModels: Array<MediaModel & { provider: string }>;
   allSpeechGenModels: Array<MediaModel & { provider: string }>;
-  allSpeechModels: Array<{ id: string; name: string; provider: string }>;
+  allSpeechModels: Array<SpeechModel & { provider: string }>;
   speechEnabled: boolean;
 
   refreshImage: () => Promise<void>;
@@ -442,7 +443,7 @@ export function useMediaSettingsData(): UseMediaSettingsDataResult {
     (speechGen.providers[pid].models || []).map(m => ({ ...m, provider: pid })),
   );
   const allSpeechModels = Object.keys(speech.providers).flatMap(pid =>
-    getRunnableSpeechModels(speech.providers[pid]).map(m => ({ ...m, provider: pid })),
+    (speech.providers[pid].models || []).map(m => ({ ...m, name: speechModelLabel(m), provider: pid })),
   );
   const speechEnabled = speech.config?.enabled === true;
 

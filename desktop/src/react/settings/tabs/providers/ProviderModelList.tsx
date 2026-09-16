@@ -12,7 +12,8 @@ import { ProviderMediaDefaultsModal } from './ProviderMediaDefaultsModal';
 import { resolveProviderMediaCapabilities, type ResolvedMediaCapability } from './provider-media-capabilities';
 import {
   buildUnifiedModelItems,
-  chatEntryMediaKind,
+  kindForCapability,
+  readModalityList,
   countAddedByKind,
   KIND_DEFAULT_INPUTS,
   KIND_DEFAULT_OUTPUTS,
@@ -20,6 +21,7 @@ import {
   type UnifiedModelKind,
 } from './unified-models';
 import styles from '../../Settings.module.css';
+import { mediaModelCapabilities, isMediaOnlyModel } from '../../../../../../shared/media-model-classification';
 
 interface DiscoveredModel {
   id: string;
@@ -55,6 +57,7 @@ const CUSTOM_CATEGORY_OPTIONS: Array<{ value: UnifiedModelKind; labelKey: string
   { value: 'chat', labelKey: 'settings.api.customModelCategory.chat' },
   { value: 'image', labelKey: 'settings.api.customModelCategory.image' },
   { value: 'video', labelKey: 'settings.api.customModelCategory.video' },
+  { value: 'speechGen', labelKey: 'settings.api.customModelCategory.speechGen' },
   { value: 'speech', labelKey: 'settings.api.customModelCategory.speech' },
 ];
 
@@ -153,9 +156,10 @@ function CapabilityIcon({ kind }: { kind: CapabilityKind }) {
 }
 
 /** 媒体增删走 manager/service 生命周期（route → manager/service → registry）。 */
-function mediaRouteOf(kind: UnifiedModelKind): 'image' | 'video' | null {
+function mediaRouteOf(kind: UnifiedModelKind): 'image' | 'video' | 'speech' | null {
   if (kind === 'image') return 'image';
   if (kind === 'video') return 'video';
+  if (kind === 'speechGen') return 'speech';
   return null;
 }
 
@@ -209,6 +213,7 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
     if (kind === 'image') await media.refreshImage();
     else if (kind === 'video') await media.refreshVideo();
     else if (kind === 'speech') await media.refreshSpeech();
+    else if (kind === 'speechGen') await media.refreshAll();
   }, [media]);
 
   const addMediaModel = async (kind: UnifiedModelKind, runtimeProviderId: string, model: Record<string, unknown>) => {
@@ -311,6 +316,7 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
     const binding = manageableMediaBindings.find((cap) => {
       if (customCategory === 'image') return cap.capability === 'imageGeneration';
       if (customCategory === 'video') return cap.capability === 'videoGeneration';
+      if (customCategory === 'speechGen') return cap.capability === 'speechGeneration';
       return cap.capability === 'speechRecognition';
     });
     if (!binding) return;
@@ -372,7 +378,7 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
       setDropdownOpen(true);
       showFetchHint(t('settings.providers.fetchSuccess', { name: providerId, n: models.length }), true);
       // 顺带同步刷新媒体 catalog 数据；不改变 media provider 原有 discovery 机制
-      media.refreshAll().catch(() => {});
+      await Promise.all([onRefresh(), media.refreshAll()]);
     } catch {
       showFetchHint(t('settings.providers.fetchFailed'), false);
     } finally {
@@ -404,16 +410,14 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
     displayName: string;
     model: Record<string, unknown>;
     added: boolean;
+    runtimeManaged: boolean;
   }
   // 媒体候选（未过搜索词）先算：chat 候选要拿它的 id 集合做互斥
   const allMediaCandidates = useMemo<MediaCandidate[]>(() => {
     const candidates: MediaCandidate[] = [];
     for (const cap of resolvedCapabilities) {
       if (!cap.available || !cap.provider) continue;
-      const kind: UnifiedModelKind | null = cap.capability === 'imageGeneration'
-        ? 'image'
-        : cap.capability === 'videoGeneration' ? 'video' : cap.capability === 'speechRecognition' ? 'speech' : null;
-      if (!kind) continue;
+      const kind = kindForCapability(cap.capability);
       const runtimeProviderId = cap.runtimeProviderId;
       const addedIds = new Set(
         unifiedItems.filter(item => item.kind === kind && item.runtimeProviderId === runtimeProviderId).map(item => item.id),
@@ -430,6 +434,7 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
           displayName: displayName || id,
           model: candidateModel,
           added: addedIds.has(id),
+          runtimeManaged: !!(cap.provider as MediaProvider).runtimeCapability,
         });
       };
       const provider = cap.provider as MediaProvider & { catalogModels?: { id: string; name: string }[] };
@@ -439,14 +444,19 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
       for (const model of provider.availableModels || []) {
         pushCandidate(model.id, model.name || model.id, model as Record<string, unknown>);
       }
-      if (kind === 'speech') {
-        for (const model of provider.catalogModels || []) {
-          pushCandidate(model.id, model.name || model.id, model as Record<string, unknown>);
+      for (const model of provider.catalogModels || []) {
+        pushCandidate(model.id, model.name || model.id, model as Record<string, unknown>);
+      }
+      // runtime 发现型供应商只服从运行时快照，普通供应商合并远端新型号。
+      if (!provider.runtimeCapability) {
+        for (const model of discoveredModels) {
+          if (!mediaModelCapabilities(model, lookupModelMeta(model.id, providerId)).includes(cap.capability)) continue;
+          pushCandidate(model.id, model.name || model.id, model as unknown as Record<string, unknown>);
         }
       }
     }
     return candidates;
-  }, [resolvedCapabilities, unifiedItems]);
+  }, [resolvedCapabilities, unifiedItems, discoveredModels, providerId]);
   const mediaCandidateIds = useMemo(() => new Set(allMediaCandidates.map(c => c.id)), [allMediaCandidates]);
   const mediaCandidates = useMemo(() => (
     query
@@ -458,23 +468,20 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
     const discoveredIds = discoveredModels.map(m => m.id);
     const all = [...new Set([...currentModelIds, ...discoveredIds, ...(summary.custom_models || [])])];
     const matched = query ? all.filter(m => m.toLowerCase().includes(query)) : all;
-    // 媒体模型的唯一入口是「图片/视频/语音识别模型」分组：远端 /models 目录和
-    // known 词典都可能把它们混进 chat 候选（agnes-image-2.1-flash 这类不在词典
-    // 里的模型靠媒体目录互斥），进 chat 组就会被写进 chat 槽造成双行重复。
-    return matched.filter(mid => !mediaCandidateIds.has(mid)
-      && chatEntryMediaKind(
-        mid,
-        rawModels.find((m: ProviderModelEntry) => modelIdOf(m) === mid) as Record<string, unknown> | undefined
-          ?? (discoveredModels.find(d => d.id === mid) as unknown as Record<string, unknown> | undefined)
-          ?? {},
-        providerId,
-      ) === null);
+    return matched.filter(mid => {
+      const saved = rawModels.find((m: ProviderModelEntry) => modelIdOf(m) === mid);
+      const model = saved && typeof saved === 'object' ? saved : discoveredModels.find(d => d.id === mid) || { id: mid };
+      // 有文本输出的多模态聊天模型继续保留聊天入口；没有媒体绑定也不藏掉模型。
+      if (!mediaCandidateIds.has(mid)) return true;
+      const known = lookupModelMeta(mid, providerId);
+      const outputs = readModalityList(model.outputs) ?? readModalityList(known?.outputs);
+      return outputs?.includes('text') === true && !isMediaOnlyModel(model, known);
+    });
   }, [currentModelIds.join('\n'), discoveredModels, summary.custom_models, query, rawModels, providerId, mediaCandidateIds]);
 
-  const chatCandidatesById = new Set(chatCandidates);
   const mediaCandidateGroups = useMemo(() => {
     const groups: Array<{ kind: UnifiedModelKind; labelKey: string; items: MediaCandidate[] }> = [];
-    for (const kind of ['image', 'video', 'speech'] as UnifiedModelKind[]) {
+    for (const kind of ['image', 'video', 'speechGen', 'speech'] as UnifiedModelKind[]) {
       const items = mediaCandidates.filter(c => c.kind === kind);
       if (items.length > 0) {
         groups.push({
@@ -493,6 +500,7 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
       const manageable = manageableMediaBindings.some((cap) => {
         if (option.value === 'image') return cap.capability === 'imageGeneration';
         if (option.value === 'video') return cap.capability === 'videoGeneration';
+        if (option.value === 'speechGen') return cap.capability === 'speechGeneration';
         return cap.capability === 'speechRecognition';
       });
       if (manageable) options.push(option);
@@ -547,6 +555,9 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
                       {meta.reasoning === true && <CapabilityIcon kind="reasoning" />}
                       {meta.toolUse && typeof meta.toolUse === 'object' && meta.toolUse.supportsTools === true && <CapabilityIcon kind="tools" />}
                     </>
+                  )}
+                  {(item.sourceModel as { adapterAvailable?: boolean })?.adapterAvailable === false && (
+                    <span title={String((item.sourceModel as Record<string, unknown>).unavailableMessage || t('settings.media.adapterMissing'))} data-model-unavailable="true">{t('settings.media.adapterMissing')}</span>
                   )}
                   {item.isDefault && <span className={styles['settings-default-badge']} data-default-badge="true">{t('settings.media.default')}</span>}
                   {modelContext !== undefined && <span className={styles['pv-model-ctx']}>{formatContext(modelContext)}</span>}
@@ -612,7 +623,7 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
               ? t('settings.api.modelGroup.image')
               : cap.capability === 'videoGeneration'
                 ? t('settings.api.modelGroup.video')
-                : t('settings.api.modelGroup.speech');
+                : t(`settings.api.modelGroup.${kindForCapability(cap.capability)}`);
             return (
               <div
                 key={`unavailable:${cap.capability}:${cap.runtimeProviderId}`}
@@ -630,6 +641,7 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
               providerId={providerId}
               runtimeProviderId={editing.item.runtimeProviderId}
               modelId={editing.item.id}
+              claimedFromChat={editing.item.claimedFromChat}
               modelMeta={editing.item.sourceModel && typeof editing.item.sourceModel === 'object'
                 ? editing.item.sourceModel as Record<string, unknown>
                 : undefined}
@@ -638,8 +650,8 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
               anchorEl={editing.anchor}
               onClose={() => setEditing(null)}
               onRefresh={async () => {
-                if (editing.item.kind === 'chat') await onRefresh();
-                else await refreshMediaKind(editing.item.kind);
+                invalidateConfigCache();
+                await Promise.all([onRefresh(), media.refreshAll()]);
               }}
             />
           )}
@@ -721,15 +733,18 @@ export function ProviderModelList({ providerId, summary, media, onRefresh }: {
                     <button
                       key={`${candidate.kind}:${candidate.runtimeProviderId}:${candidate.id}`}
                       className={`${styles['pv-model-dropdown-option']}${candidate.added ? ' ' + styles['added'] : ''}`}
+                      disabled={candidate.runtimeManaged && !candidate.added}
+                      title={candidate.model.adapterAvailable === false ? String(candidate.model.unavailableMessage || t('settings.media.adapterMissing')) : undefined}
                       data-media-candidate={`${candidate.kind}:${candidate.runtimeProviderId}:${candidate.id}`}
                       onClick={() => {
-                        if (!candidate.added) {
+                        if (!candidate.added && !candidate.runtimeManaged) {
                           // 候选模型尽量提交完整 metadata，而不是只提交 ID
                           addMediaModel(candidate.kind, candidate.runtimeProviderId, candidate.model);
                         }
                       }}
                     >
                       <span className={styles['pv-model-dropdown-option-name']}>{candidate.displayName}</span>
+                      {candidate.model.adapterAvailable === false && <span>{t('settings.media.adapterMissing')}</span>}
                       {candidate.added && <span className={styles['pv-model-dropdown-option-check']}>{'\u2713'}</span>}
                     </button>
                   ))}

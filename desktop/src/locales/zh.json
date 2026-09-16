@@ -2229,12 +2229,14 @@
         "audio": "输出：音频"
       },
       "modelGroup": {
+        "speechGen": "语音合成模型",
         "chat": "对话模型",
         "image": "图片模型",
         "video": "视频模型",
         "speech": "语音识别模型"
       },
       "customModelCategory": {
+        "speechGen": "语音合成",
         "label": "类别",
         "chat": "对话",
         "image": "图片",
@@ -2477,6 +2479,7 @@
       "disabled": "未启用",
       "noSkills": "暂无可用技能",
       "noUser": "暂无自定义技能",
+      "workspaceBadge": "项目",
       "copyToSkills": "复制到我的技能",
       "copied": "已复制 ✓",
       "copyFailed": "复制失败",
@@ -4406,6 +4409,7 @@
     "skillCannotAddSelfDir": "不能添加 灵犀 自身的技能目录",
     "skillInvalidName": "无效的技能名称",
     "skillExternalCannotDelete": "外部兼容技能无法从此处删除",
+    "workspaceSkillShadowed": "该技能已被同名技能遮蔽，无法单独开关",
     "skillNotExists": "技能不存在",
     "channelsDisabled": "频道系统已被用户关闭",
     "channelReadNeedChannel": "错误：read 需要 channel 参数",

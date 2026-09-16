@@ -4,6 +4,7 @@ import os from "os";
 import path from "path";
 
 import {
+  resolveWorkspaceSkillCandidateStates,
   resolveWorkspaceSkillCatalogPaths,
   resolveWorkspaceSkillPaths,
   workspaceSkillPolicyFromConfig,
@@ -69,5 +70,42 @@ describe("workspace skill path discovery", () => {
   it("keeps workspace skill source list free of .pi project paths", () => {
     expect(WORKSPACE_SKILL_DIRS.map((entry) => entry.sub)).not.toContain(".pi/skills");
     expect(WORKSPACE_SKILL_DIRS[0]).toMatchObject({ sub: ".agents/skills", category: "standard" });
+  });
+});
+
+describe("resolveWorkspaceSkillCandidateStates — per-Agent opt-out", () => {
+  const onPolicy = { discoverProjectSkills: true, discoverCompatibleProjectSkills: false };
+  const offPolicy = { discoverProjectSkills: false, discoverCompatibleProjectSkills: false };
+
+  function candidate(name, sourceCategory = "standard") {
+    return { name, filePath: `/repo/.agents/skills/${name}/SKILL.md`, sourceCategory };
+  }
+
+  it("marks individually disabled skills inactive with user-disabled reason", () => {
+    const states = resolveWorkspaceSkillCandidateStates(
+      [candidate("alpha"), candidate("beta")],
+      onPolicy,
+      { disabledNames: new Set(["alpha"]) },
+    );
+    expect(states).toMatchObject([
+      { name: "alpha", active: false, shadowed: false, inactiveReason: "user-disabled" },
+      { name: "beta", active: true, inactiveReason: null },
+    ]);
+  });
+
+  it("category policy still wins over the per-Agent opt-out", () => {
+    const states = resolveWorkspaceSkillCandidateStates(
+      [candidate("alpha")],
+      offPolicy,
+      { disabledNames: new Set(["alpha"]) },
+    );
+    expect(states).toMatchObject([
+      { name: "alpha", active: false, inactiveReason: "policy-disabled" },
+    ]);
+  });
+
+  it("defaults to an empty opt-out list so existing callers keep their behavior", () => {
+    const states = resolveWorkspaceSkillCandidateStates([candidate("alpha")], onPolicy);
+    expect(states).toMatchObject([{ name: "alpha", active: true, inactiveReason: null }]);
   });
 });

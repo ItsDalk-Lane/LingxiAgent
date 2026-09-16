@@ -660,7 +660,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:7edf5195d1127bbce2b05d4dea3948438f372cd84829a453568dcac81a76103f",
+  "payloadFingerprint": "sha256:74fcbaea5c71aaf08bb893c5a7dce539262bc2c77c35ab2ff7fc5c42c19c97bb",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3217,8 +3217,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Additive persistence census update: registers the new workspace-snapshots store (shadow repo tree plus per-session snapshot sidecars) and the git-worktree user-repo-parent mkdir exemption; no existing store's schema contract or phase placement changed.",
-    "payloadFingerprint": "sha256:7edf5195d1127bbce2b05d4dea3948438f372cd84829a453568dcac81a76103f"
+    "compatibilityReason": "Hash-only census refresh: in-flight media-model and workspace-skill settings work edited hashed production modules (session-coordinator Hana metadata extensions contract text unchanged; no store schema, registry entry, or phase placement changed).",
+    "payloadFingerprint": "sha256:74fcbaea5c71aaf08bb893c5a7dce539262bc2c77c35ab2ff7fc5c42c19c97bb"
   },
   "schemas": [
     {
@@ -4210,7 +4210,7 @@
         {
           "contract": "core/session-coordinator.ts Hana metadata extensions",
           "module": "core/session-coordinator.ts",
-          "sourceHash": "sha256:13fea891bae0f7e171f49749fb9cfa2672a68ce5f307e2c8cd018f4b5e5998ed"
+          "sourceHash": "sha256:86e0b42da9c99f02361475ef305a7e5d2a975fb0979c3cefa30260c06b7f68b0"
         },
         {
           "contract": "core/session-jsonl-file.ts repair contract",

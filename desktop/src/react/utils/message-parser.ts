@@ -295,6 +295,10 @@ export interface ToolDetail {
 export function extractToolDetail(name: string, args: Record<string, unknown> | undefined): ToolDetail {
   if (!args) return { text: '' };
   switch (name) {
+    case 'mcp_call':
+    case 'mcp_describe_tool':
+      // 目标身份由工具行单独展示，不再把服务名重复当作内容摘要。
+      return { text: '' };
     case 'read':
     case 'write':
     case 'edit':

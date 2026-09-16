@@ -2159,12 +2159,14 @@
         "audio": "輸出：音訊"
       },
       "modelGroup": {
+        "speechGen": "語音合成模型",
         "chat": "對話模型",
         "image": "圖片模型",
         "video": "影片模型",
         "speech": "語音識別模型"
       },
       "customModelCategory": {
+        "speechGen": "語音合成",
         "label": "類別",
         "chat": "對話",
         "image": "圖片",
@@ -2408,6 +2410,7 @@
       "disabled": "未啟用",
       "noSkills": "暫無可用技能",
       "noUser": "暫無自訂技能",
+      "workspaceBadge": "專案",
       "copyToSkills": "複製到我的技能",
       "copied": "已複製 ✓",
       "copyFailed": "複製失敗",
@@ -4307,6 +4310,7 @@
     "skillCannotAddSelfDir": "不能新增 靈犀 自身的技能目錄",
     "skillInvalidName": "無效的技能名稱",
     "skillExternalCannotDelete": "外部相容技能無法從此處刪除",
+    "workspaceSkillShadowed": "該技能已被同名技能遮蔽，無法單獨開關",
     "skillNotExists": "技能不存在",
     "channelsDisabled": "頻道系統已被使用者關閉",
     "channelReadNeedChannel": "錯誤：read 需要 channel 參數",

@@ -68,8 +68,11 @@ export function workspaceSkillCategoryEnabled(category, policy: WorkspaceSkillPo
 /**
  * Resolve ordered project candidates with the same winner/shadow contract used
  * by runtime injection and Desk catalog presentation.
+ *
+ * `disabledNames` is the per-Agent opt-out (config `skills.workspace_disabled`):
+ * skills the user individually switched off while the category policy is on.
  */
-export function resolveWorkspaceSkillCandidateStates(candidates, policy, { claimedByName = new Map() } = {}) {
+export function resolveWorkspaceSkillCandidateStates(candidates, policy, { claimedByName = new Map(), disabledNames = new Set() } = {}) {
   return (candidates || []).map((candidate) => {
     if (!workspaceSkillCategoryEnabled(candidate.sourceCategory, policy)) {
       return {
@@ -78,6 +81,15 @@ export function resolveWorkspaceSkillCandidateStates(candidates, policy, { claim
         shadowed: false,
         shadowedBy: null,
         inactiveReason: "policy-disabled",
+      };
+    }
+    if (disabledNames.has(candidate.name)) {
+      return {
+        ...candidate,
+        active: false,
+        shadowed: false,
+        shadowedBy: null,
+        inactiveReason: "user-disabled",
       };
     }
     const prior = claimedByName.get(candidate.name) || null;

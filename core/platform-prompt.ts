@@ -26,6 +26,6 @@ export function getPlatformPromptNote({
     `  <os>${osType} ${osRelease}</os>`,
     `  <sandbox_mode>${SANDBOX_MODE_LABEL}</sandbox_mode>`,
     "</environment_context>",
-    "Use structured file tools for source edits. Use shell for builds, tests, scripts, and command-line tools.",
+    "Server execution environment; the user's display device may differ.",
   ].join("\n");
 }

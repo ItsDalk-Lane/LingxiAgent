@@ -83,8 +83,11 @@ function bundleEnabledState(bundle: SkillBundleInfo, skillByName: Map<string, Sk
 function skillConfigurable(skill: SkillInfo) {
   if (skill.configurable === false) return false;
   if (skill.readonly) return false;
-  if (skill.source === 'workspace') return false;
-  if (skill.managedBy === 'workspace' || skill.managedBy === 'plugin') return false;
+  if (skill.managedBy === 'plugin') return false;
+  if (skill.source === 'workspace' || skill.managedBy === 'workspace') {
+    // 项目技能可以单独开关；总闸关闭或被同名技能遮蔽时开关无意义
+    return skill.inactiveReason !== 'policy-disabled' && skill.inactiveReason !== 'shadowed';
+  }
   return true;
 }
 

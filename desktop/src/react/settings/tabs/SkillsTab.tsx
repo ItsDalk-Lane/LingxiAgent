@@ -124,7 +124,9 @@ export function SkillsTab() {
   }, [loadSkills, loadExternalPaths]);
 
   const visible = skillsList.filter(s => !s.hidden);
-  const userSkills = visible.filter(s => s.source !== 'external');
+  // 总闸（发现项目技能）关闭时，项目技能行整体从助手视图隐藏；开启时逐个可开关
+  const userSkills = visible.filter(s => s.source !== 'external'
+    && !(s.source === 'workspace' && s.inactiveReason === 'policy-disabled'));
   const manageableSkills = userSkills.filter(s => s.source !== 'workspace' && s.managedBy !== 'workspace' && s.managedBy !== 'plugin');
   const externalSkills = visible.filter(s => s.source === 'external');
 

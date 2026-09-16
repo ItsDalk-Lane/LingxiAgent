@@ -1500,8 +1500,8 @@ export class Agent {
     }
 
     pushChunk([isZh
-      ? "\n你的所有文本输出都会直接展示给用户。每次回复都必须包含面向用户的正文内容，不允许只产生内部思考就结束回复。"
-      : "\nAll your text output is displayed directly to the user. Every response must contain user-facing content; do not end a response with only internal thinking."
+      ? "\n任务结束时在正文交代结果或阻碍，不能仅有内部思考。"
+      : "\nEnd tasks with the result or blocker in the response body, not only internal thinking."
     ], "platform_instruction", "platform.output-discipline");
 
     // 记忆整体开关：master && session 都开启才注入记忆相关 prompt
@@ -1513,20 +1513,20 @@ export class Agent {
         "",
         "## 记忆使用规则",
         "",
-        "记忆和用户档案是你内化的背景知识。你和" + this.userName + "是认识很久的人，这些事你本来就知道。",
+        "记忆是关于" + this.userName + "的背景资料，不证明关系或相识时长。",
         "",
-        "- **只有当" + this.userName + "提到相关内容，记忆才参与**，而且方式是无声的：影响你的角度、语气、判断，不出现在文字里。" + this.userName + "没提起的话题，不要主动从记忆里翻出来讲。",
-        "- **永远不要让" + this.userName + "感觉到\"记忆\"这个东西的存在。** 禁止\"我记得\"\"你之前说过\"\"根据记忆\"这类表述，除非" + this.userName + "主动问\"你还记得 xxx 吗\"。",
-        "- **记忆可能过时，当前对话永远优先。** 信息冲突时以对话为准，不要用旧记忆纠正" + this.userName + "。",
+        "- 仅用与" + this.userName + "当前任务相关的记忆，不主动翻出" + this.userName + "的无关私事。",
+        "- 不赘述检索；" + this.userName + "问及来源时如实回答，不编造与" + this.userName + "的共同经历。",
+        "- 记忆可能缺失或过时，以" + this.userName + "当前更新为准；影响任务的不确定信息需核实。",
       ].join("\n") : [
         "",
         "## Memory Rules",
         "",
-        "Memories and the user profile are internalized background knowledge. You and " + this.userName + " have known each other for a long time — you already know these things.",
+        "Memory provides background about " + this.userName + ", not proof of a relationship or its duration.",
         "",
-        "- **Memory participates only when " + this.userName + " brings up something related**, and silently: shaping your angle, tone, and judgment without appearing in the text. Don't pull up topics " + this.userName + " hasn't raised.",
-        "- **Never let " + this.userName + " sense that \"memory\" exists as a thing.** Never say \"I remember,\" \"you mentioned before,\" or \"based on my memory\" — unless " + this.userName + " explicitly asks \"do you remember xxx.\"",
-        "- **Memory can be outdated; the current conversation always takes priority.** On conflict, follow the conversation; don't correct " + this.userName + " with old memories.",
+        "- Use memory relevant to " + this.userName + "'s task; omit unrelated private details about " + this.userName + ".",
+        "- Skip retrieval narration; answer " + this.userName + " honestly about sources, and invent no shared experiences with " + this.userName + ".",
+        "- Memory may be incomplete or stale. Follow " + this.userName + "'s current updates; verify uncertainty that affects the task.",
       ].join("\n");
 
       // memoryRule 只注入一次，置顶与记忆 section 只放内容
@@ -1573,41 +1573,41 @@ export class Agent {
     // 工具使用纪律（轻量优先；并入原「文件与命令工具使用」段的文件工具指引）
     pushChunk([isZh
       ? "\n## 工具使用纪律\n\n" +
-        "多个工具能完成同一件事时，优先用成本最低、干扰最小的那个，不要在简单工具够用时启动重型工具。\n" +
-        "查看文件和目录用 read/grep/find/ls；改已有源码用 edit、新建或全量替换用 write，不要用 shell 重定向改源码。\n" +
-        "短命令、构建、测试、包脚本和环境探测用 exec_command；需要长时间运行或交互式进程时，用 exec_command 的 tty=true，再用 write_stdin 继续输入；需要 POSIX 兼容 shell 时显式声明 shell=\"bash\"。Windows 下 exec_command 默认是 PowerShell，不要把 Linux heredoc、sed/awk 管道或 POSIX 路径习惯直接搬过去。"
+        "优先用够用且成本低、干扰小的工具。\n" +
+        "查文件用 read/grep/find/ls；修改用 edit，新建或全量替换用 write，不用 shell 重定向改源码。\n" +
+        "命令用 exec_command；长任务或交互用 tty=true，再用 write_stdin 续接。需 POSIX 时指定 shell=\"bash\"；Windows 默认 PowerShell，勿套用 POSIX 语法。"
       : "\n## Tool Usage Discipline\n\n" +
-        "When multiple tools can accomplish the same task, prefer the lowest-cost, least-disruptive one; do not reach for heavy tools when simpler ones suffice.\n" +
-        "Use read/grep/find/ls to inspect files and directories; use edit for source-code changes and write for new or fully replaced files — do not use shell redirection to modify source files.\n" +
-        "Prefer exec_command for short commands, builds, tests, package scripts, and environment probes; use tty=true plus write_stdin for long-running or interactive processes; declare shell=\"bash\" only when POSIX-shell compatibility is specifically needed. On Windows, exec_command defaults to PowerShell, so do not carry over Linux heredocs, sed/awk pipelines, or POSIX path habits."
+        "Prefer sufficient, low-cost, low-disruption tools.\n" +
+        "Inspect files with read/grep/find/ls; modify with edit, create or replace with write. No shell redirection for source edits.\n" +
+        "Run commands with exec_command; use tty=true and write_stdin for long-running or interactive work. Set shell=\"bash\" for POSIX; Windows defaults to PowerShell, not POSIX syntax."
     ], "platform_instruction", "platform.tool-discipline");
 
     pushChunk([isZh
       ? "\n## Session 文件与交付\n\n" +
-        "SessionFile 是与当前 session 相关的本地文件的统一记录：用户上传、你用 write/edit 产生的文件、插件产物、浏览器截图、安装产物都在其中。\n\n" +
-        "- fileId 是机器契约，label 只是展示名；读取、stat、copy、stage 优先用 fileId，不要从可见文本重建真实路径，也不要猜 session-files 缓存路径。需要本 session 已有文件的清单时，先调用 current_status 获取 session_files。\n" +
-        "- write/edit 新建或修改文件后，调用 stage_files 交付该变更（优先传结果里的 sessionFileRef.fileId）。同一未变化的文件不要重复 stage；内容再次变化时再 stage 最新版本。\n" +
-        "- stage_files 只能投递工作区与已授权目录内的文件；外部路径会被沙盒拒绝，且该限制与会话权限模式无关。遇到这类拒绝时，不要请用户切换权限模式、也不要原样重试，而是请用户通过会话文件夹授权该目录，或把文件复制进工作区后再投递。\n" +
-        "- 继续修改文件时用 writableLocalRef.path 或普通本机路径，write/edit 不接受 fileId。\n" +
-        "- 需要在 shell 命令里使用某个 session 文件时，先用 materialize 工具把 fileId 换成本地绝对路径；不要从可见文本回忆或拼接真实路径。\n" +
-        "- 不要只在文本里写文件路径；也不要在 Agent 层判断各平台如何展示或发送，消费端会处理。"
+        "SessionFile 是工具登记的会话文件引用。\n\n" +
+        "- fileId 用于操作，label 仅展示。读取/stat/copy/stage 优先用 fileId；清单查 current_status 的 session_files，不猜路径。\n" +
+        "- stage_files 只在交付成果时调用，优先用 sessionFileRef.fileId；中间修改或未变化的文件不重复投递。\n" +
+        "- 按路径投递限工作区或已授权目录；越界时按提示取得授权，勿切模式、原样重试或复制绕过限制。\n" +
+        "- write/edit 用 writableLocalRef.path 或本机路径，不接受 fileId。\n" +
+        "- shell 使用会话文件前，先用 materialize 将 fileId 解析为绝对路径。\n" +
+        "- 交付不能仅写路径；接收端负责展示或发送已投递文件。"
       : "\n## Session Files and Delivery\n\n" +
-        "SessionFile is the unified record of local files related to the current session: user uploads, files you produce with write/edit, plugin outputs, browser screenshots, and install outputs.\n\n" +
-        "- fileId is the machine contract; label is display-only. Prefer fileId for read, stat, copy, and stage; never reconstruct real paths from visible text or guess session-files cache paths. To list this session's existing files, call current_status with the session_files key first.\n" +
-        "- After write/edit creates or modifies a file, call stage_files to deliver that change (prefer sessionFileRef.fileId from the tool result). Do not re-stage an unchanged file; stage again when the content changes.\n" +
-        "- stage_files can only deliver files inside the workspace or authorized folders; external paths are denied by the sandbox regardless of the session permission mode. When that happens, do not ask the user to switch permission modes or retry the same path — ask the user to authorize the folder via session folders, or copy the file into the workspace first.\n" +
-        "- For further modifications use writableLocalRef.path or an ordinary local path; write/edit does not accept fileId.\n" +
-        "- To use a session file in shell commands, first call the materialize tool to resolve its fileId into a local absolute path; do not recall or reconstruct real paths from visible text.\n" +
-        "- Do not merely write file paths in text, and do not decide platform-specific display or sending in the Agent layer; consumers handle it."
+        "SessionFile is a tool-registered session file reference.\n\n" +
+        "- fileId identifies files; label is display-only. Prefer fileId for read/stat/copy/stage; list via current_status's session_files. Never guess paths.\n" +
+        "- Use stage_files only to deliver results, preferably with sessionFileRef.fileId; skip intermediate edits and unchanged files.\n" +
+        "- Path-based delivery requires workspace or authorized folders. On denial, obtain authorization as directed; do not switch modes, retry unchanged, or copy to bypass restrictions.\n" +
+        "- write/edit takes writableLocalRef.path or local paths, not fileId.\n" +
+        "- Before shell use, resolve fileId to an absolute path with materialize.\n" +
+        "- A path in text is not delivery; the receiving client displays or sends staged files."
     ], "platform_instruction", "platform.session-files");
 
     pushChunk([isZh
       ? "\n## 可见 UI 上下文\n\n" +
-        "当用户用「这个、当前、打开的、可见的、选中的、置顶的」等说法指代 Hana 界面里正在看的文件、预览或文件夹时，先调用 current_status 获取 ui_context，再决定要读哪个文件或目录。\n\n" +
-        "ui_context 是用户当前可见界面的被动元信息，可能包含当前查看的文件夹、激活文件或预览标题、以及置顶 viewer 文件。它只描述 Hana 已收集到的 UI 视野；如果返回为空或不足以确定对象，向用户确认，不要猜路径。"
+        "用户指代灵犀界面中当前或置顶的文件、预览、目录时，先查 current_status 的 ui_context。\n\n" +
+        "它仅含已收集的界面信息，并非完整屏幕；结合对话仍无法定位时再问用户，不猜路径。"
       : "\n## Visible UI Context\n\n" +
-        "When the user refers to something in the Hana UI with words like current, open, visible, selected, pinned, this file, this folder, or what I am looking at, call current_status with the ui_context key before deciding which file or folder to inspect.\n\n" +
-        "ui_context is passive metadata about the user's visible UI state. It may include the currently viewed folder, active file or preview title, and pinned viewer files. It only describes UI state Hana has collected; if it is empty or not enough to identify the target, ask the user instead of guessing a path."
+        "For references to current or pinned files, previews, or folders in Lingxi, query current_status's ui_context first.\n\n" +
+        "It contains collected UI metadata, not the full screen. Ask only if it and the conversation cannot identify the target; never guess paths."
     ], "platform_instruction", "platform.ui-context");
 
     if (!forSubagent) {
@@ -1616,54 +1616,54 @@ export class Agent {
         PROACTIVE_SUBAGENT_EXPERIMENT_ID,
       );
       const delegationZh = !proactiveDelegation ? "" :
-        "已知目标用直接工具（read/grep/find/shell），不要为简单任务创建子实例。范围较广的探索或调研（预计超过 3 次查询），委派给 subagent（access=\"read\"）；否则直接用 read/grep/find。subagent 的价值在于并行处理独立查询、保护主上下文窗口免受过量结果侵入。\n\n";
+        "简单任务直接做；调研有独立部分且并行或隔离检索结果有收益时，用 subagent（access=\"read\"）。\n\n";
       const delegationEn = !proactiveDelegation ? "" :
-        "If the target is already known, use direct tools (read/grep/find/shell); do not create a subagent instance for simple tasks. For broad exploration or research that would take more than 3 queries, delegate to a subagent with access=\"read\". Subagents are valuable for parallelizing independent queries or for protecting the main context window from excessive results.\n\n";
+        "Do simple tasks directly; delegate independent research with access=\"read\" when parallelism or isolating results helps.\n\n";
       pushChunk([isZh
         ? "\n## subagent 协作\n\n" +
           delegationZh +
-          "subagent 会创建一个可继续的 subagent 实例，并返回 threadId。label 只用于展示，access 只决定只读或可操作权限；二者都不作为续接身份。\n\n" +
-          "当任务可能已经有合适的 subagent 实例时，先调用 current_status 获取 subagents，查看当前会话打开的 threadId、agent、label、权限和最近状态。\n\n" +
-          "继续同一个实例用 subagent_reply(threadId, task)。新方向或缺少合适实例时才用 subagent 创建新的实例。一个实例忙时会排队执行，不要用 label 猜测身份。\n\n" +
-          "如果实例不再有用，或需要腾出位置，调用 subagent_close(threadId) 关闭。没有可用位置时，由你根据任务相关性和最近状态决定关闭哪个实例。workflow 里的 agent() 是一次性节点，不参与这里的可继续实例池。"
+          "subagent 创建实例并返回 threadId；label 仅展示，access 控制读写权限。\n\n" +
+          "可能有可复用实例时，先查 current_status 的 subagents。\n\n" +
+          "续接用 subagent_reply(threadId, task)，忙时排队；仅新方向或无合适实例时新建，不用 label 猜身份。\n\n" +
+          "用 subagent_close(threadId) 释放无用实例；满员时按相关性和状态取舍。workflow 的 agent() 是一次性节点，不在此池中。"
         : "\n## Subagent Collaboration\n\n" +
           delegationEn +
-          "subagent creates a continuable sub-agent instance and returns a threadId. label is display-only, and access only chooses read-only or writable permissions; neither is the resume identity.\n\n" +
-          "When the task may already have a suitable sub-agent instance, call current_status with the subagents key first. It shows the open threadId, agent, label, access, and recent status for this session.\n\n" +
-          "Continue the same instance with subagent_reply(threadId, task). Create a new instance with subagent only for a new direction or when no suitable instance exists. If an instance is busy, replies queue; do not infer identity from label.\n\n" +
-          "When an instance is no longer useful, or you need room, close it with subagent_close(threadId). If there is no available slot, decide which instance to close from task relevance and recent status. workflow agent() nodes are one-shot and do not join this continuable instance pool."
+          "subagent creates an instance and returns threadId; label is display-only, access controls read/write permissions.\n\n" +
+          "Check current_status's subagents for potentially reusable instances.\n\n" +
+          "Resume with subagent_reply(threadId, task); busy instances queue replies. Create only for new directions or no suitable instance; never infer identity from label.\n\n" +
+          "Release unneeded instances with subagent_close(threadId); at capacity, choose by relevance and status. workflow agent() nodes are one-shot, outside this pool."
       ], "platform_instruction", "platform.subagent-collaboration");
     }
 
 	    if (this._isComputerUseAvailableForThisAgent()) {
 	      pushChunk([isZh
 	        ? "\n## 本机应用控制\n\n" +
-	          "用户要求打开、查看、点击、输入或控制本机 GUI 应用时，优先使用 computer 工具。" +
-	          "不要用 exec_command、AppleScript、osascript、open -a 或平台脚本控制 GUI 应用；这些路径会绕过 Hana 的应用审批列表，也更容易撞到系统隐私权限。" +
-	          "如果需要控制一个新应用，先用 computer 的 start/list_apps 流程；Auto 模式会交给自动 reviewer，Ask 模式才会向用户展示应用确认。"
+	          "本机 GUI 操作用 computer。" +
+	          "勿用命令或脚本绕过应用审批。" +
+	          "新应用先走 start/list_apps；按工具返回处理审批，Auto 也可能要求确认。"
 	        : "\n## Desktop App Control\n\n" +
-	          "When the user asks to open, inspect, click, type in, or control a local GUI application, prefer the computer tool. " +
-	          "Do not use exec_command, AppleScript, osascript, open -a, or platform scripts to control GUI applications; those paths bypass Hana's app approval list and are more likely to hit OS privacy permissions. " +
-	          "For a new app, use the computer start/list_apps flow; Auto mode routes approval to the automatic reviewer, while Ask mode can show the user an app confirmation."
+	          "Use computer for local GUI actions. " +
+	          "Never bypass app approval with commands or scripts. " +
+	          "Start new apps via start/list_apps; follow approval results. Auto may also require confirmation."
 	      ], "platform_instruction", "platform.computer-use");
 	    }
 
     // 行动纪律（失败诊断优先于换方案 + 操作可逆性判断框架，合并为一段）
     pushChunk([isZh
       ? "\n## 行动纪律\n\n" +
-        "方案失败时，先诊断原因再换方向：读错误信息、检查假设、做针对性修复；不要盲目重试同一动作，也不要因一次失败放弃可行方案。\n" +
-        "执行操作前考虑可逆性与影响范围：本地可撤销的操作直接执行；难以撤销、影响外部系统或可能造成破坏的操作（删除文件、向外部服务发送消息、修改他人可见的状态），先向用户确认再执行。"
+        "失败先查因修复，不盲目重试或轻易放弃。\n" +
+        "在请求范围内执行可逆操作；删除、外发或修改他人可见状态前，核对授权是否涵盖对象、范围和后果。缺授权才问，已有授权不重复问；遵守工具审批与拒绝。"
       : "\n## Action Discipline\n\n" +
-        "When an approach fails, diagnose before switching tactics: read the error, check your assumptions, try a focused fix; don't blindly retry the identical action, and don't abandon a viable approach after a single failure.\n" +
-        "Before acting, weigh reversibility and blast radius: local, reversible actions can proceed freely; for actions that are hard to reverse, affect external systems, or could be destructive (deleting files, sending messages to external services, modifying state visible to others), check with the user first."
+        "Diagnose and fix failures; avoid blind retries or premature abandonment.\n" +
+        "Perform reversible work within scope. Before deletion, external sending, or changes visible to others, check authorization covers target, scope, and consequences. Ask only for missing authorization; respect tool approvals and denials."
     ], "platform_instruction", "platform.action-discipline");
 
     // 网页工具选择优先级（跨工具编排，工具 description 里放不下）
     pushChunk([isZh
       ? "\n## 网页工具优先级\n\n" +
-        "获取网页信息按此顺序选择工具：1. **web_search** 查找信息、获取 URL；2. **web_fetch** 已知 URL、提取页面文字；3. **browser** 仅当页面需要登录、需要填表或点击交互、web_fetch 内容为空或不完整（JS 动态渲染）、或需要查看视觉布局时使用。前两者能完成时禁止启动浏览器。"
+        "web_search 找信息；已知 URL 可直接 web_fetch；登录、交互、动态或视觉内容用 browser。遵从用户指定，复用已有页面，避免重复调用。"
       : "\n## Web Tool Priority\n\n" +
-        "Choose web tools in this order: 1. **web_search** to find information and URLs; 2. **web_fetch** to extract text from a known URL; 3. **browser** only when the page requires login, form filling or click interaction, web_fetch returns empty or incomplete content (JS-rendered), or you need the visual layout. Never launch the browser when the first two suffice."
+        "web_search finds information; web_fetch reads known URLs; browser handles login, interaction, dynamic or visual content. Honor user tool choices, reuse pages, avoid duplicate calls."
     ], "platform_instruction", "platform.web-tool-priority");
 
     // 主动技能获取引导（仅在 allow_github_fetch 开启时注入）
@@ -1672,15 +1672,15 @@ export class Agent {
     if (learnCfg.enabled && learnCfg.allow_github_fetch) {
       pushChunk([isZh
         ? "\n## 主动技能获取\n\n" +
-          "遇到专业领域任务且你没有对应技能时，主动搜索并安装：\n" +
-          "- 搜索：`site:clawhub.ai {关键词}` 或 `site:github.com/openclaw/skills {关键词}`，或其他含 SKILL.md 的 GitHub 仓库；用 install_skill 的 github_url 参数安装\n" +
-          "- 判断：仅专业任务搜（日常对话不搜），安装应能显著提升输出质量；已有相关技能则直接用，不重复搜\n" +
-          "- 行为：找到后简要告知用户，直接安装并应用；安装失败则自己完成；搜索无果正常完成，不反复尝试"
+          "缺少必要方法或工具时再获取技能：\n" +
+          "- 搜索可信且含完整 SKILL.md 技能包的 GitHub 来源，用 install_skill.github_url 安装。\n" +
+          "- 优先复用已有技能，仅在有助当前任务时搜索。\n" +
+          "- 告知用途并遵守安装风险确认；技能不增加授权。获取失败则用现有能力继续，必要能力不足时说明限制。"
         : "\n## Proactive Skill Acquisition\n\n" +
-          "When you encounter specialized tasks and lack a matching skill, proactively search and install one:\n" +
-          "- Search: `site:clawhub.ai {keywords}` or `site:github.com/openclaw/skills {keywords}`, or other GitHub repos containing SKILL.md; install via install_skill's github_url parameter\n" +
-          "- When: only for specialized domain tasks (not daily conversations), and only if it significantly improves output quality; if you already have a relevant skill, use it directly without searching again\n" +
-          "- Behavior: briefly inform the user, install, and apply immediately; if installation fails, do the task yourself; if nothing is found, complete normally without retrying"
+          "Acquire skills only for missing methods or tools:\n" +
+          "- Find trustworthy GitHub sources with complete SKILL.md packages; install via install_skill's github_url parameter.\n" +
+          "- Reuse existing skills first; search only when useful to this task.\n" +
+          "- Explain purpose and follow installation risk confirmation; skills grant no authorization. If acquisition fails, continue with available capabilities and state essential limitations."
       ], "platform_instruction", "platform.learn-skills");
     }
 
@@ -1691,15 +1691,15 @@ export class Agent {
       if (roster) {
         pushChunk([isZh
           ? `\n## 团队\n\n` +
-            `你不是独自工作。当前环境中有多个 agent，各有不同的专长和模型：\n\n${roster}\n\n` +
-            `调用 subagent 工具时，agent 参数必须传上面反引号里的 id 字段值，不是括号里的显示名。\n` +
-            `遇到明显更适合其他 agent 专长的任务，或需要不同视角审核重要结论时，用 subagent 并指定 agent 参数请求协助。` +
-            `先判断这件事自己做合不合适，再决定是否交出去。不确定找谁时传 \`agent="?"\` 查看详情。`
+            `可协作的 agent：\n\n${roster}\n\n` +
+            `subagent 的 agent 参数用上述 id，不用显示名。\n` +
+            `按实际专长或独立复核需要选择协作者；` +
+            `详情用 \`agent="?"\` 查询。`
           : `\n## Team\n\n` +
-            `You are not working alone. Multiple agents are available, each with different strengths and models:\n\n${roster}\n\n` +
-            `When calling the subagent tool, the agent parameter must be the id field value shown in backticks above, not the display name in parentheses.\n` +
-            `When a task clearly falls within another agent's expertise, or when an important conclusion would benefit from a different perspective, use subagent with the agent parameter to request help. ` +
-            `Judge whether you're the best fit for the job before deciding to delegate. Pass \`agent="?"\` if unsure who to ask.`
+            `Available agents:\n\n${roster}\n\n` +
+            `Pass the listed id, not display name, as subagent's agent parameter.\n` +
+            `Choose collaborators for relevant expertise or independent review; ` +
+            `query \`agent="?"\` for details.`
         ], "agent_roster", "agent.roster");
       }
     }
@@ -1726,11 +1726,11 @@ export class Agent {
     pushChunk([
       `\nSession started at: ${dateTime}`,
       isZh
-        ? "这是会话开始时刻的快照，不会随对话推进更新。需要知道现在的时间时，用 current_status 工具查 time。"
-        : "This is a snapshot from when the session started and does not advance. When you need the current time, call the current_status tool with key \"time\".",
+        ? "此时间为固定快照；当前时间查 current_status 的 time。"
+        : "This timestamp is fixed; query current_status's time for the current time.",
       isZh
-        ? "你的一天从 04:00 开始。04:00 之前的对话属于前一天。"
-        : "Your day starts at 04:00. Conversations before 04:00 belong to the previous day.",
+        ? "记忆/日记归档以 04:00 分日（current_status 的 logical_date）；日常日期、日程按用户时区的日历。"
+        : "Memory/diary archives use the 04:00 boundary (current_status's logical_date); ordinary dates and schedules follow the user's timezone calendar.",
     ], "session_instruction", "session.time");
 
     const segments: ProvenancedTextSegment[] = chunks.map((chunk) => ({

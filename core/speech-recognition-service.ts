@@ -147,37 +147,36 @@ export class SpeechRecognitionService {
 
   hasAdapterForModel(providerId, model) {
     if (!model?.protocolId) return false;
-    return Boolean(this._registry.getProtocol(model.protocolId) || this._registry.get(providerId));
+    const adapter = this._registry.getProtocol(model.protocolId) || this._registry.get(providerId);
+    return typeof adapter?.transcribe === "function";
   }
 
   listProviders() {
     const next: any = {};
     for (const provider of this._providers.getMediaProviders(CAPABILITY) || []) {
       const providerId = provider.providerId;
-      const models = (provider.models || [])
-        .map((model) => ({
+      const projectModel = (model) => {
+        const adapterAvailable = this.hasAdapterForModel(providerId, model);
+        return {
           ...model,
-          adapterAvailable: this.hasAdapterForModel(providerId, model),
-        }))
-        .filter((model) => model.adapterAvailable);
-      // 候选目录：内置声明模型（未被用户添加），仅用于「添加模型」下拉；
-      // availableModels 仍然只含已添加且可运行的模型（默认模型选择的合法集合）。
-      const catalogModels = (provider.availableModels || [])
-        .filter((model) => this.hasAdapterForModel(providerId, model))
-        .map((model) => ({
-          id: model.id,
           name: model.displayName || model.name || model.id,
-        }));
+          adapterAvailable,
+          unavailableReason: adapterAvailable ? null : (model.protocolId ? "adapter_unavailable" : "protocol_unrecognized"),
+          unavailableMessage: adapterAvailable ? null : (model.protocolId
+            ? `暂不支持此模型的调用方式（${model.protocolId}）`
+            : "尚未识别此模型的调用方式，暂时无法调用"),
+        };
+      };
+      const models = (provider.models || []).map(projectModel);
+      // 候选和已添加模型都展示可用状态，选择默认模型时另行校验。
+      const catalogModels = (provider.availableModels || []).map(projectModel);
       if (!models.length && !catalogModels.length) continue;
       const credentialStatus = this._providers.getMediaProviderCredentialStatus?.(providerId, CAPABILITY) || {};
       next[providerId] = {
         ...provider,
         ...credentialStatus,
         models,
-        availableModels: models.map((model) => ({
-          id: model.id,
-          name: model.displayName || model.name || model.id,
-        })),
+        availableModels: models,
         catalogModels,
       };
     }
@@ -227,7 +226,7 @@ export class SpeechRecognitionService {
     if (next.defaultModel) {
       const listed = this.listProviders().providers;
       const provider = listed[next.defaultModel.provider];
-      if (!provider?.models?.some((model) => model.id === next.defaultModel.id)) {
+      if (!provider?.models?.some((model) => model.id === next.defaultModel.id && model.adapterAvailable)) {
         throw new Error("speech recognition default model is unavailable");
       }
     }

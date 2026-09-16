@@ -65,7 +65,7 @@ async function resolveMimoCredentialsFresh() {
 }
 
 describe("SpeechRecognitionService", () => {
-  it("lists only provider models with registered speech adapters", () => {
+  it("keeps unsupported models visible with an explanation", () => {
     const service = new SpeechRecognitionService({
       providerRegistry: makeProviderRegistry(),
       resolveProviderCredentialsFresh: resolveMimoCredentialsFresh,
@@ -82,13 +82,38 @@ describe("SpeechRecognitionService", () => {
 
     const result = service.listProviders();
 
-    expect(Object.keys(result.providers)).toEqual(["mimo"]);
+    expect(Object.keys(result.providers)).toEqual(["mimo", "ghost"]);
+    expect(result.providers.ghost.models).toEqual([
+      expect.objectContaining({ id: "ghost-asr", adapterAvailable: false, unavailableReason: "adapter_unavailable", unavailableMessage: expect.stringContaining("ghost-asr") }),
+    ]);
+    expect(result.providers.ghost.availableModels[0].adapterAvailable).toBe(false);
     expect(result.providers.mimo.models).toEqual([
       expect.objectContaining({
         id: "mimo-v2.5-asr",
         adapterAvailable: true,
       }),
     ]);
+  });
+
+  it("shows candidate models without protocols but rejects unavailable default selections", () => {
+    const providers = makeProviderRegistry();
+    providers.getMediaProviders.mockReturnValue([{
+      providerId: "ghost", displayName: "Ghost", authType: "api-key",
+      models: [{ id: "ghost-asr", displayName: "Ghost ASR", protocolId: "ghost-asr" }],
+      availableModels: [{ id: "future-asr" }],
+    }] as any);
+    const save = vi.fn();
+    const service = new SpeechRecognitionService({
+      providerRegistry: providers,
+      resolveProviderCredentialsFresh: resolveMimoCredentialsFresh,
+      preferences: { getSpeechRecognitionConfig: () => ({ enabled: false }), setSpeechRecognitionConfig: save },
+      sessionFiles: new SessionFileRegistry(),
+    });
+    expect(service.listProviders().providers.ghost.catalogModels).toEqual([
+      expect.objectContaining({ id: "future-asr", adapterAvailable: false, unavailableReason: "protocol_unrecognized", unavailableMessage: expect.any(String) }),
+    ]);
+    expect(() => service.setConfig({ defaultModel: { provider: "ghost", id: "ghost-asr" } })).toThrow("default model is unavailable");
+    expect(save).not.toHaveBeenCalled();
   });
 
   it("transcribes a voice-input SessionFile and persists pending then ready state", async () => {

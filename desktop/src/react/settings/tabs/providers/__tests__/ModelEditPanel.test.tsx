@@ -267,6 +267,22 @@ describe('ModelEditPanel (image/video/speech)', () => {
     });
   });
 
+  it('edits synthesis through its own route with text input and audio output', async () => {
+    renderPanel({ kind: 'speechGen', runtimeProviderId: 'prov', modelId: 'voice-x' });
+    expect(screen.getAllByRole('button', { name: 'settings.api.modality.text' })[0]).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getAllByRole('button', { name: 'settings.api.modality.audio' })[1]).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.change(screen.getByPlaceholderText('voice-x'), { target: { value: 'Voice X' } });
+    fireEvent.click(screen.getByRole('button', { name: 'settings.api.save' }));
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/media/speech/providers/prov/models/voice-x', expect.objectContaining({ method: 'PUT', body: JSON.stringify({ displayName: 'Voice X' }) })));
+  });
+
+  it('edits media projected from a chat entry through its original provider record', async () => {
+    renderPanel({ kind: 'image', claimedFromChat: true, runtimeProviderId: 'media-prov', modelId: 'future-image', modelMeta: { inputs: ['text'], outputs: ['image'] } });
+    fireEvent.change(screen.getByPlaceholderText('future-image'), { target: { value: 'Future Image' } });
+    fireEvent.click(screen.getByRole('button', { name: 'settings.api.save' }));
+    await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/providers/prov/models/future-image', expect.objectContaining({ method: 'PUT', body: JSON.stringify({ name: 'Future Image' }) })));
+  });
+
   it('seeds speech edits with audio input + text output', () => {
     renderPanel({ kind: 'speech', runtimeProviderId: 'v', modelId: 'm' });
     expect(screen.getAllByRole('button', { name: 'settings.api.modality.audio' })[0]).toHaveAttribute('aria-pressed', 'true');

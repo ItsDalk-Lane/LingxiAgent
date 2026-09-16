@@ -2228,12 +2228,14 @@
         "audio": "Output: audio"
       },
       "modelGroup": {
+        "speechGen": "Speech generation models",
         "chat": "Chat models",
         "image": "Image models",
         "video": "Video models",
         "speech": "Speech recognition models"
       },
       "customModelCategory": {
+        "speechGen": "Speech generation",
         "label": "Category",
         "chat": "Chat",
         "image": "Image",
@@ -2476,6 +2478,7 @@
       "disabled": "Disabled",
       "noSkills": "No skills available",
       "noUser": "No custom skills",
+      "workspaceBadge": "Project",
       "copyToSkills": "Copy to your skills",
       "copied": "Copied ✓",
       "copyFailed": "Copy failed",
@@ -4310,6 +4313,7 @@
     "skillCannotAddSelfDir": "Cannot add Lingxi's own skills directory",
     "skillInvalidName": "Invalid skill name",
     "skillExternalCannotDelete": "External skills cannot be deleted from here",
+    "workspaceSkillShadowed": "This skill is shadowed by another skill with the same name and cannot be toggled individually",
     "skillNotExists": "Skill does not exist",
     "channelsDisabled": "Channel system is disabled by the user",
     "channelReadNeedChannel": "Error: read requires channel parameter",

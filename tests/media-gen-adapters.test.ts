@@ -209,14 +209,14 @@ describe("volcengine adapter", () => {
     }, ctx)).rejects.toThrow();
   });
 
-  it("rejects an explicit unknown model before credentials or network calls", async () => {
+  it("rejects an unknown short alias before credentials or network calls", async () => {
     const { volcengineImageAdapter } = await import("../core/media-adapters/volcengine.ts");
 
     const ctx = makeBusCtx("key", "https://test.com");
     await expect(volcengineImageAdapter.submit({
       prompt: "test",
-      model: "doubao-seedream-5-0-pro-unverified",
-    }, ctx)).rejects.toThrow(/Unknown image model.*doubao-seedream-5-0-pro-unverified/i);
+      model: "999.0-pro",
+    }, ctx)).rejects.toThrow(/Unknown image model alias.*999.0-pro/i);
 
     expect(ctx.bus.request).not.toHaveBeenCalled();
     expect(mockFetch).not.toHaveBeenCalled();

@@ -97,19 +97,19 @@ export function buildBridgePromptLine(context, locale = "zh") {
 
 /**
  * 文本指令确认指引（#1619）：按平台声明的 interactionCapabilities 分叉。
- * 文本平台没有可点击的确认卡片，Agent 必须引导用户回复 /apply 等文字指令，
- * 而不是沿用桌面端"点击确认"的交互认知。
+ * 使用文字确认的渠道不提供灵犀桌面的确认卡片；引导用户回复 /apply 等指令。
+ * 这只描述灵犀操作的确认方式，不限制渠道的媒体或其他交互能力。
  */
 function buildTextCommandConfirmationGuidance(context, label, zh) {
   if (context?.interactionCapabilities?.confirmationMode !== "text_command") return "";
   if (zh) {
-    return `${label}对话是纯文本渠道，没有可点击的卡片、按钮或确认弹窗；`
-      + "需要用户确认的操作（如自动任务建议）由用户回复文字指令完成：回复 /apply 创建最新的自动任务建议，回复 /apply <建议ID> 指定其中一项。"
-      + "需要确认时引导用户回复指令，不要让用户点击任何界面元素。";
+    return `${label}中的灵犀操作用文字指令确认：`
+      + "回复 /apply 创建最新建议中的自动任务，/apply <建议ID> 创建指定建议中的任务；"
+      + "引导用户回复指令，不要让用户点击桌面确认卡片。";
   }
-  return `This ${label} conversation is a text-only channel without clickable cards, buttons, or confirmation dialogs; `
-    + "actions that need the user's confirmation (such as automation suggestions) are completed by text commands: replying /apply creates the latest automation suggestion, and /apply <id> targets a specific one. "
-    + "When confirmation is needed, guide the user to reply with the command instead of clicking any UI element.";
+  return `Confirm Lingxi actions in ${label} by text command: `
+    + "/apply creates the latest suggested task; /apply <id> creates the specified one. "
+    + "Guide users to reply instead of clicking desktop confirmation cards.";
 }
 
 export function appendBridgePromptLine(prompt, context, locale = "zh") {

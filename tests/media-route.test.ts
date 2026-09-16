@@ -137,6 +137,63 @@ describe("native media route", () => {
     });
   });
 
+  it.each([
+    ["POST", "setSpeechProviderModel", "/models", { model: { id: "future-voice", inputs: ["text"], outputs: ["audio"] } }, ["voices", { id: "future-voice", inputs: ["text"], outputs: ["audio"] }]],
+    ["PUT", "updateSpeechProviderModel", "/models/future-voice", { model: { displayName: "新版声音" } }, ["voices", "future-voice", { displayName: "新版声音" }]],
+    ["DELETE", "removeSpeechProviderModel", "/models/future-voice", undefined, ["voices", "future-voice"]],
+  ])("%s speech model management delegates through the existing provider permission", async (method, handler, suffix, body, args) => {
+    const mutate = vi.fn(async () => ({ ok: true }));
+    const app = new Hono();
+    app.use("*", async (c, next) => {
+      (c as any).set("authPrincipal", { scopes: ["providers.manage"] });
+      await next();
+    });
+    app.route("/api", createMediaRoute({ media: { [handler as string]: mutate } }));
+    const response = await app.request(`/api/media/speech/providers/voices${suffix}`, {
+      method: method as string,
+      headers: { "Content-Type": "application/json" },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true });
+    expect(mutate).toHaveBeenCalledWith(...args as any[]);
+  });
+
+  it.each([
+    ["POST", "setSpeechProviderModel", "/models"],
+    ["PUT", "updateSpeechProviderModel", "/models/future-voice"],
+    ["DELETE", "removeSpeechProviderModel", "/models/future-voice"],
+  ])("%s speech model changes require providers.manage even with settings.write", async (method, handler, suffix) => {
+    const mutate = vi.fn();
+    const app = new Hono();
+    app.use("*", async (c, next) => {
+      (c as any).set("authPrincipal", { scopes: ["settings.write"] });
+      await next();
+    });
+    app.route("/api", createMediaRoute({ media: { [handler]: mutate } }));
+    const response = await app.request(`/api/media/speech/providers/voices${suffix}`, {
+      method, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: "future-voice" }),
+    });
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({ error: "insufficient_scope", scope: "providers.manage" });
+    expect(mutate).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["POST", "setSpeechProviderModel", "/models", 400],
+    ["PUT", "updateSpeechProviderModel", "/models/missing", 404],
+    ["DELETE", "removeSpeechProviderModel", "/models/future-voice", 400],
+  ])("%s speech model failures preserve explicit errors", async (method, handler, suffix, status) => {
+    const app = new Hono();
+    const error = Object.assign(new Error("media model change rejected"), { statusCode: status });
+    app.route("/api", createMediaRoute({ media: { [handler]: vi.fn(async () => { throw error; }) } }));
+    const response = await app.request(`/api/media/speech/providers/voices${suffix}`, {
+      method, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: "future-voice" }),
+    });
+    expect(response.status).toBe(status);
+    expect(await response.json()).toEqual({ error: "media model change rejected" });
+  });
+
   it("submits image generation through the native media manager", async () => {
     const app = new Hono();
     const generateImageFromBus = vi.fn(async (payload) => ({

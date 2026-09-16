@@ -23,7 +23,7 @@ function defaultModelValue(ready: boolean, config: { default?: { id: string; pro
   return '';
 }
 
-function buildDefaultModelOptions<T extends { id: string; name?: string; adapterAvailable?: boolean }>(args: {
+function buildDefaultModelOptions<T extends { id: string; name?: string; adapterAvailable?: boolean; unavailableMessage?: unknown }>(args: {
   ready: boolean;
   configDefault?: { id: string; provider: string };
   models: Array<T & { provider: string }>;
@@ -46,7 +46,7 @@ function buildDefaultModelOptions<T extends { id: string; name?: string; adapter
             || providers[m.provider]?.unavailableReason
             || t(credentialMissingKey)
           : !adapterAvailable
-            ? t(adapterMissingKey)
+            ? (typeof m.unavailableMessage === 'string' ? m.unavailableMessage : t(adapterMissingKey))
             : '';
         return {
           value: `${m.provider}/${m.id}`,
@@ -188,20 +188,14 @@ export function MediaGlobalDefaultsSection() {
             value={speechDefaultValue}
             onChange={saveSpeechDefault}
             disabled={!speechConfigReady || !speechEnabled || (allSpeechModels.length === 0 && !speechConfig?.defaultModel)}
-            options={[
-              ...(speechConfigReady ? [{ value: '', label: '—' }] : [{ value: LOADING_SELECT_VALUE, label: t('common.loading'), disabled: true }]),
-              ...(speechConfigReady && speechConfig?.defaultModel && !allSpeechModels.some(m => `${m.provider}/${m.id}` === speechDefaultValue)
-                ? [{
-                    value: speechDefaultValue,
-                    label: `${speechConfig.defaultModel.provider} / ${speechConfig.defaultModel.id}`,
-                    disabled: true,
-                  }]
-                : []),
-              ...(speechConfigReady && speechEnabled ? allSpeechModels.map(m => ({
-                value: `${m.provider}/${m.id}`,
-                label: `${m.provider} / ${m.name || m.id}`,
-              })) : []),
-            ]}
+            options={buildDefaultModelOptions({
+              ready: speechConfigReady,
+              configDefault: speechConfig?.defaultModel,
+              models: allSpeechModels,
+              providers: speech.providers,
+              adapterMissingKey: 'settings.media.adapterMissing',
+              credentialMissingKey: 'settings.media.credentialMissing',
+            })}
           />
         }
       />

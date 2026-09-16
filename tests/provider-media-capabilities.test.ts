@@ -25,6 +25,75 @@ function readPersistedProviders() {
 }
 
 describe("ProviderRegistry media capabilities", () => {
+  it("已保存的输入输出直接投影到四种媒体用途，重新编辑后立即生效", () => {
+    const registry = new ProviderRegistry(tmpHome);
+    registry.saveProvider('openai', { models: [
+      { id: 'new-image', inputs: ['text'], outputs: ['image'] },
+      { id: 'new-voice', inputs: ['text'], outputs: ['audio'] },
+      { id: 'new-asr', inputs: ['audio'], outputs: ['text'] },
+      { id: 'multimodal-chat', inputs: ['text', 'audio', 'image'], outputs: ['text'] },
+    ] });
+    registry.saveProvider('agnes', { models: [{ id: 'new-video', inputs: ['text'], outputs: ['video'] }] });
+    for (const [provider, capability, id, protocolId] of [
+      ['openai', 'image_generation', 'new-image', 'openai-images'],
+      ['openai', 'speech_generation', 'new-voice', 'openai-audio-speech'],
+      ['openai', 'speech_recognition', 'new-asr', 'openai-audio-transcriptions'],
+      ['agnes', 'video_generation', 'new-video', 'agnes-videos'],
+    ]) {
+      expect(registry.getMediaModels(provider, capability)).toEqual([
+        expect.objectContaining({ id, protocolId, claimedFromChat: true }),
+      ]);
+      expect(registry.resolveMediaModel({ providerId: provider, capability, modelId: id }).model.id).toBe(id);
+    }
+    expect(registry.getChatModelIds('openai')).toEqual(['multimodal-chat']);
+    registry.updateModelEntry('openai', 'new-image', { outputs: ['text'] });
+    expect(registry.getMediaModels('openai', 'image_generation')).toEqual([]);
+    expect(registry.getChatModelIds('openai')).toContain('new-image');
+  });
+
+  it("远端新模型进入候选，添加后生效；刷新缓存无需重启，也不接收远端执行字段", () => {
+    const registry = new ProviderRegistry(tmpHome);
+    const cachePath = path.join(tmpHome, 'models-cache.json');
+    const saveDiscovery = (models) => {
+      fs.writeFileSync(cachePath + '.next', JSON.stringify({ openai: { models } }));
+      fs.renameSync(cachePath + '.next', cachePath);
+    };
+    saveDiscovery([{ id: 'brand-new-picture', inputs: ['text'], outputs: ['image'], protocolId: 'remote-evil', apiKey: 'sentinel', baseUrl: 'https://invalid.example' }]);
+    expect(registry.getMediaModels('openai', 'image_generation')).toEqual([]);
+    const candidate = registry.getMediaModelCatalog('openai', 'image_generation').find(m => m.id === 'brand-new-picture');
+    expect(candidate).toMatchObject({ id: 'brand-new-picture', protocolId: 'openai-images', outputs: ['image'] });
+    expect(candidate).not.toHaveProperty('apiKey');
+    expect(candidate).not.toHaveProperty('baseUrl');
+    registry.addMediaModel('openai', 'image_generation', candidate);
+    expect(registry.getMediaModels('openai', 'image_generation')).toEqual([expect.objectContaining({ id: 'brand-new-picture' })]);
+    expect(registry.getMediaModelCatalog('openai', 'image_generation').some(m => m.id === 'brand-new-picture')).toBe(false);
+    saveDiscovery([{ id: 'second-new-picture', outputs: ['image'] }]);
+    expect(registry.getMediaModelCatalog('openai', 'image_generation').some(m => m.id === 'second-new-picture')).toBe(true);
+  });
+
+  it("只有发现结果的新用途也建立绑定，不支持协议的候选仍可解释地展示", () => {
+    const registry = new ProviderRegistry(tmpHome);
+    fs.writeFileSync(path.join(tmpHome, 'models-cache.json'), JSON.stringify({
+      openai: { models: [{ id: 'new-video-model', outputs: ['video'] }] },
+    }));
+    const provider = registry.getMediaProviders('video_generation').find(p => p.providerId === 'openai');
+    expect(provider?.models).toEqual([]);
+    expect(provider?.availableModels).toEqual([expect.objectContaining({ id: 'new-video-model' })]);
+    expect(provider?.availableModels[0].protocolId).toBeUndefined();
+    expect(registry.getMediaCapabilityBindings('openai')).toContainEqual({ capability: 'videoGeneration', runtimeProviderId: 'openai' });
+  });
+
+  it("专用媒体条目优先于同名普通模型投影，混合输出仍保留聊天入口", () => {
+    const registry = new ProviderRegistry(tmpHome);
+    registry.saveProvider('openai', { models: [{ id: 'dual-output', outputs: ['text', 'image'] }] });
+    expect(registry.getChatModelIds('openai')).toEqual(['dual-output']);
+    registry.addMediaModel('openai', 'image_generation', { id: 'dual-output', displayName: '独立图片配置' });
+    const models = registry.getMediaModels('openai', 'image_generation');
+    expect(models).toHaveLength(1);
+    expect(models[0].displayName).toBe('独立图片配置');
+    expect(models[0].claimedFromChat).not.toBe(true);
+  });
+
   it("keeps built-in official image providers as an add-candidate catalog, not the effective list", () => {
     const registry = new ProviderRegistry(tmpHome);
     registry.reload();
@@ -124,6 +193,10 @@ describe("ProviderRegistry media capabilities", () => {
       }),
     }, { pluginId: "runtime-cli" });
     await registry.refreshRuntimeMediaCapabilities({ providerId: "runtime-cli" });
+
+    fs.writeFileSync(path.join(tmpHome, 'models-cache.json'), JSON.stringify({
+      'runtime-cli': { models: [{ id: 'unrelated-remote-image', outputs: ['image'] }] },
+    }));
 
     const provider = registry.getMediaProviders("image_generation")
       .find((item) => item.providerId === "runtime-cli");
@@ -1027,5 +1100,70 @@ describe("media model protocol defaults follow the provider capability, not the 
 
     expect(() => registry.addMediaModel("my-proxy", "video_generation", { id: "proxy-video-v1" }))
       .toThrow(/missing protocolId/);
+  });
+});
+
+describe("ProviderRegistry 媒体模型家族继承", () => {
+  it("同系列新款继承声明参数页：候选与认领条目都带上 modes，能力之间不串", () => {
+    const registry = new ProviderRegistry(tmpHome);
+    fs.writeFileSync(path.join(tmpHome, "models-cache.json"), JSON.stringify({
+      agnes: { models: [
+        { id: "agnes-image-2.5-flash" },
+        { id: "agnes-video-2.5-flash" },
+        { id: "agnes-3.0-flash" },
+      ] },
+    }));
+
+    // 未添加的新款先以继承候选出现：协议与参数页都从锚点声明来。
+    const imageCatalog = registry.getMediaModelCatalog("agnes", "image_generation");
+    const inheritedImage = imageCatalog.find((m: any) => m.id === "agnes-image-2.5-flash");
+    expect(inheritedImage).toMatchObject({
+      protocolId: "agnes-images",
+      inheritedFrom: "agnes-image-2.1-flash",
+    });
+    expect(Array.isArray(inheritedImage?.modes) && inheritedImage.modes.length).toBeGreaterThan(0);
+    const inheritedVideo = registry.getMediaModelCatalog("agnes", "video_generation")
+      .find((m: any) => m.id === "agnes-video-2.5-flash");
+    expect(inheritedVideo).toMatchObject({
+      protocolId: "agnes-videos",
+      inheritedFrom: "agnes-video-v2.0",
+    });
+    expect(Array.isArray(inheritedVideo?.modes) && inheritedVideo.modes.length).toBeGreaterThan(0);
+    // 能力隔离：图片新款绝不进视频视图；精确声明照旧是候选。
+    expect(registry.getMediaModelCatalog("agnes", "video_generation")
+      .some((m: any) => m.id === "agnes-image-2.5-flash")).toBe(false);
+    expect(imageCatalog.some((m: any) => m.id === "agnes-image-2.1-flash")).toBe(true);
+
+    // 用户从普通模型清单添加同款（claimedFromChat）：生效条目合并出继承参数页。
+    registry.saveProvider("agnes", { models: [
+      { id: "agnes-image-2.5-flash", name: "agnes-image-2.5-flash", inputs: ["text"], outputs: ["image"] },
+    ] });
+    const effective = registry.getMediaModels("agnes", "image_generation");
+    expect(effective).toHaveLength(1);
+    expect(effective[0]).toMatchObject({
+      id: "agnes-image-2.5-flash",
+      claimedFromChat: true,
+      protocolId: "agnes-images",
+      inheritedFrom: "agnes-image-2.1-flash",
+    });
+    expect(Array.isArray(effective[0].modes) && effective[0].modes.length).toBeGreaterThan(0);
+    // 已添加的不再重复出现在候选里。
+    expect(registry.getMediaModelCatalog("agnes", "image_generation")
+      .some((m: any) => m.id === "agnes-image-2.5-flash")).toBe(false);
+  });
+
+  it("无家族锚点时行为不变：分类候选无 modes，精确声明列表不受污染", () => {
+    const registry = new ProviderRegistry(tmpHome);
+    fs.writeFileSync(path.join(tmpHome, "models-cache.json"), JSON.stringify({
+      openai: { models: [{ id: "brand-new-picture", outputs: ["image"] }] },
+    }));
+    const candidate = registry.getMediaModelCatalog("openai", "image_generation")
+      .find((m: any) => m.id === "brand-new-picture");
+    expect(candidate).toMatchObject({ id: "brand-new-picture", protocolId: "openai-images" });
+    expect(candidate).not.toHaveProperty("modes");
+    expect(candidate).not.toHaveProperty("inheritedFrom");
+    // openai 的精确声明 dall-e-3 不受家族合成影响。
+    expect(registry.getMediaModelCatalog("openai", "image_generation")
+      .some((m: any) => m.id === "dall-e-3")).toBe(true);
   });
 });

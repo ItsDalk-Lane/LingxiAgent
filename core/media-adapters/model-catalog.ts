@@ -1,13 +1,7 @@
 /**
- * core/media-adapters/model-catalog.ts
- *
- * Single source of truth for all image-generation model catalogs.
- * Adapters use resolveModelId() for short-name → full-ID resolution.
- * Routes use getKnownModels() for provider summary and settings UI.
- *
- * Adding a new model: append one entry to the relevant provider array.
- * Set default: true only when the provider's implicit model should change.
- * Everything else (adapter fallback, settings UI, tool description) picks it up automatically.
+ * 图片模型的已知别名和缺省值，供适配器解析短名称及界面展示候选。
+ * 这不是可调用模型的白名单：供应商新增的完整模型 ID 应原样传递。
+ * default 只影响未指定模型时的选择，不改写用户明确指定的模型。
  */
 
 /**
@@ -40,19 +34,13 @@ function getDefaultEntry(catalog) {
 }
 
 /**
- * Resolve a raw model identifier to a valid API model ID.
+ * 先匹配完整 ID，再解析已知短别名；仅未指定模型时使用默认值。
+ * 完整的新模型 ID 交由供应商校验，不因内置候选目录过时而拒绝。
+ * 无法解析的版本短名需明确报错，避免误当成完整模型 ID 或改用默认值。
  *
- * Resolution order:
- *   1. Exact match on id (already a full ID)
- *   2. Alias match (short name like "5.0")
- *   3. Use the provider default only when no model was supplied
- *
- * Providers without a built-in catalog are intentionally permissive so custom
- * OpenAI-compatible providers can pass their own model IDs through unchanged.
- *
- * @param {string} provider   Provider key in MODEL_CATALOG
- * @param {string | undefined | null} raw  Raw model string from user/config
- * @returns {string} Resolved model ID guaranteed to be in the catalog
+ * @param {string} provider 供应商名称
+ * @param {string | undefined | null} raw 用户或配置指定的模型
+ * @returns {string} 解析后的 API 模型 ID
  */
 export function resolveModelId(provider, raw) {
   const catalog = MODEL_CATALOG[provider];
@@ -62,11 +50,11 @@ export function resolveModelId(provider, raw) {
     return getDefaultEntry(catalog).id;
   }
 
-  // 1. Exact ID match
+  // 优先保留已知完整 ID。
   const byId = catalog.find(m => m.id === raw);
   if (byId) return byId.id;
 
-  // 2. Alias match (case-insensitive)
+  // 已知短别名不区分大小写。
   const lower = raw.toLowerCase();
   for (const entry of catalog) {
     if (entry.aliases?.some(a => a.toLowerCase() === lower)) {
@@ -74,10 +62,12 @@ export function resolveModelId(provider, raw) {
     }
   }
 
-  throw new Error(
-    `Unknown image model "${raw}" for provider "${provider}". `
-    + `Available models: ${catalog.map(entry => entry.id).join(", ")}`,
-  );
+  if (/^\d+(?:\.\d+)*(?:-[a-z]+)?$/i.test(raw)) {
+    throw new Error(
+      `Unknown image model alias "${raw}" for provider "${provider}". Please specify the full model ID.`,
+    );
+  }
+  return raw;
 }
 
 /**

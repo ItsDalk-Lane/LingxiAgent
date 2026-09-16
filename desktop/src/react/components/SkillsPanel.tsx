@@ -249,7 +249,9 @@ export function SkillsPanel() {
   }, [agentAvatarUrl, agentName, agentYuan, agents, t]);
 
   const visibleSkills = skillsList.filter(skill => !skill.hidden);
-  const userSkills = visibleSkills.filter(skill => skill.source !== 'external');
+  // 总闸（发现项目技能）关闭时，项目技能行整体从助手视图隐藏；开启时逐个可开关
+  const userSkills = visibleSkills.filter(skill => skill.source !== 'external'
+    && !(skill.source === 'workspace' && skill.inactiveReason === 'policy-disabled'));
   // 外部 Agent 工具技能：仅在设置页「兼容技能」里启用过（= 全部技能视图助手已启用）的才显示，
   // 与内置技能同列表混排、不做分组；助手视图沿用同一可见集合，仅启停状态取当前助手。
   const externalSkillRows = useMemo(() => {

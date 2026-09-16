@@ -128,6 +128,35 @@ describe("SkillManager.getRuntimeSkillInfos", () => {
     expect(compatibleOnly.find(s => s.name === "compatible")).toMatchObject({ active: true, enabled: true });
   });
 
+  it("excludes individually disabled workspace skills from runtime selection and flags them user-disabled", () => {
+    const agent = {
+      id: "agent-a",
+      config: {
+        skills: { enabled: [], workspace_disabled: ["ws-skill"] },
+      },
+    };
+    const infos = sm.getRuntimeSkillInfos(agent);
+    expect(infos.find(s => s.name === "ws-skill")).toMatchObject({
+      enabled: false,
+      active: false,
+      shadowed: false,
+      inactiveReason: "user-disabled",
+    });
+    const selection = sm._resolveRuntimeSkillSelection(agent);
+    expect(selection.skills.map(s => s.name)).not.toContain("ws-skill");
+  });
+
+  it("keeps workspace skills active when the opt-out list does not name them", () => {
+    const agent = {
+      id: "agent-a",
+      config: {
+        skills: { enabled: [], workspace_disabled: ["other-skill"] },
+      },
+    };
+    const infos = sm.getRuntimeSkillInfos(agent);
+    expect(infos.find(s => s.name === "ws-skill")).toMatchObject({ enabled: true, active: true, inactiveReason: null });
+  });
+
   it("keeps .agents authoritative while reporting compatible same-name candidates as shadowed", () => {
     sm._allSkills = [
       makeSkill("shared", {

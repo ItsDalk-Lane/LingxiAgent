@@ -1271,8 +1271,8 @@ describe("BridgeSessionManager teardown", () => {
       "当前用户正通过微信与你对话，仅在需要理解当前平台或“这里”等指代时参考。",
     );
     // #1619：文本平台的确认协议指引必须进 owner system prompt
-    expect(createArgs.resourceLoader.getSystemPrompt()).toContain("回复 /apply 创建最新的自动任务建议");
-    expect(createArgs.resourceLoader.getSystemPrompt()).toContain("不要让用户点击任何界面元素");
+    expect(createArgs.resourceLoader.getSystemPrompt()).toContain("回复 /apply 创建最新建议中的自动任务");
+    expect(createArgs.resourceLoader.getSystemPrompt()).toContain("不要让用户点击桌面确认卡片");
     expect(manager.readIndex(agent)["wx_dm_wx-user@agent-a"]).toMatchObject({
       file: "owner/s-wechat.jsonl",
       platform: "wechat",

@@ -3,12 +3,13 @@ import { t } from '../../helpers';
 import styles from '../../Settings.module.css';
 import type { ProviderMediaCapabilityBinding, MediaCapabilityKind } from '../../store';
 
-const CAPABILITY_ORDER: MediaCapabilityKind[] = ['imageGeneration', 'videoGeneration', 'speechRecognition'];
+const CAPABILITY_ORDER: MediaCapabilityKind[] = ['imageGeneration', 'videoGeneration', 'speechGeneration', 'speechRecognition'];
 
 function capabilityLabel(capability: MediaCapabilityKind): string {
   switch (capability) {
     case 'imageGeneration': return t('settings.media.imageGeneration');
     case 'videoGeneration': return t('settings.media.videoGeneration');
+    case 'speechGeneration': return t('settings.api.modelGroup.speechGen');
     case 'speechRecognition': return t('settings.media.speechRecognition');
     default: return capability;
   }

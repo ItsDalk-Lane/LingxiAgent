@@ -2159,12 +2159,14 @@
         "audio": "出力：音声"
       },
       "modelGroup": {
+        "speechGen": "音声合成モデル",
         "chat": "対話モデル",
         "image": "画像モデル",
         "video": "動画モデル",
         "speech": "音声認識モデル"
       },
       "customModelCategory": {
+        "speechGen": "音声合成",
         "label": "カテゴリ",
         "chat": "対話",
         "image": "画像",
@@ -2408,6 +2410,7 @@
       "disabled": "無効",
       "noSkills": "利用可能なスキルはありません",
       "noUser": "カスタムスキルはありません",
+      "workspaceBadge": "プロジェクト",
       "copyToSkills": "スキルにコピー",
       "copied": "コピーしました ✓",
       "copyFailed": "コピーに失敗しました",
@@ -4307,6 +4310,7 @@
     "skillCannotAddSelfDir": "Lingxi 自身のスキルディレクトリは追加できません",
     "skillInvalidName": "無効なスキル名です",
     "skillExternalCannotDelete": "外部互換スキルはここからは削除できません",
+    "workspaceSkillShadowed": "このスキルは同名スキルに覆われており、個別に切り替えできません",
     "skillNotExists": "スキルが存在しません",
     "channelsDisabled": "チャンネル機能はユーザーによって無効化されています",
     "channelReadNeedChannel": "エラー：read には channel パラメータが必要です",

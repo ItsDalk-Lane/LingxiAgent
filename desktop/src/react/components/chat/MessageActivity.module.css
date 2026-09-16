@@ -12,6 +12,7 @@
 .label { flex: 0 0 auto; white-space: nowrap; color: color-mix(in srgb, var(--tool-text, #61666b) 90%, var(--text)); }
 .separator { opacity: .7; }
 .summary { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mcpName { flex: 0 1 auto; min-width: 0; max-width: 50%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .link { color: inherit; text-decoration: underline dotted; text-underline-offset: 4px; }
 .counts { flex: 0 0 auto; font-size: 11px; opacity: .8; white-space: nowrap; }
 .failed .label { color: inherit; }

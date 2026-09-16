@@ -96,6 +96,21 @@ describe("openaiImageAdapter", () => {
     expect(body.quality).toBe("high");
   });
 
+  it("sends a newly released built-in provider model ID unchanged", async () => {
+    const ctx = makeCtx();
+    const fetchMock = vi.fn(async (_url: string, _init: { body: string }) => ({
+      ok: true,
+      json: async () => ({ data: [{ b64_json: Buffer.from("image-bytes").toString("base64") }] }),
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await openaiImageAdapter.submit({ prompt: "a lantern", providerId: "openai", modelId: "gpt-image-future" }, ctx);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(fetchMock.mock.calls[0]![1].body).model).toBe("gpt-image-future");
+    expect(ctx.bus.request).toHaveBeenCalledWith("provider:credentials", { providerId: "openai" });
+  });
+
   it("still resolves OpenAI catalog aliases for the built-in openai provider", async () => {
     const ctx = makeCtx();
     const fetchMock = vi.fn(async (_url: string, _init: { body: string }) => ({

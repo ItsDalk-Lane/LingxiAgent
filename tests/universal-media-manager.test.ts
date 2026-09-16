@@ -910,6 +910,68 @@ describe("UniversalMediaManager response delivery", () => {
     manager.stop();
   });
 
+  it("manages speech generation models and preserves edit validation", async () => {
+    const root = makeRoot();
+    roots.push(root);
+    const providerRegistry = {
+      getMediaModels: vi.fn(() => [{ id: "future-tts", inputs: ["text"], outputs: ["audio"] }]),
+      addMediaModel: vi.fn(),
+      updateMediaModelEntry: vi.fn(),
+      removeMediaModel: vi.fn(),
+      getRuntimeMediaCapabilitySourceOwner: vi.fn(() => null),
+    };
+    const changed = vi.fn(async () => {});
+    const manager = new UniversalMediaManager({
+      lingxiHome: root, preferences: makePreferences(root), providerRegistry,
+      registerSessionFile: () => {}, onProviderChanged: changed,
+    });
+    await manager.setSpeechProviderModel("voice", { id: "future-tts" });
+    expect(providerRegistry.addMediaModel).toHaveBeenCalledWith("voice", "speech_generation", { id: "future-tts" });
+    await manager.updateSpeechProviderModel("voice", "future-tts", { displayName: "新版声音" });
+    expect(providerRegistry.updateMediaModelEntry).toHaveBeenCalledWith("voice", "speech_generation", "future-tts", { displayName: "新版声音" });
+    await expect(manager.updateSpeechProviderModel("voice", "future-tts", { outputs: ["text"] })).rejects.toThrow();
+    await expect(manager.updateSpeechProviderModel("voice", "missing", { displayName: "不存在" })).rejects.toThrow(/not added/);
+    providerRegistry.getRuntimeMediaCapabilitySourceOwner.mockReturnValue({} as any);
+    await expect(manager.updateSpeechProviderModel("voice", "future-tts", { displayName: "不可修改" })).rejects.toThrow(/Runtime-discovered/);
+    await manager.removeSpeechProviderModel("voice", "future-tts");
+    expect(providerRegistry.removeMediaModel).toHaveBeenCalledWith("voice", "speech_generation", "future-tts");
+    expect(changed).toHaveBeenCalledTimes(3);
+    manager.stop();
+  });
+
+  it.each([
+    ["listImageProviders", "image_generation", "setImageConfig", "defaultImageModel"],
+    ["listVideoProviders", "video_generation", "setVideoConfig", "defaultVideoModel"],
+    ["listSpeechProviders", "speech_generation", "setSpeechConfig", "defaultSpeechModel"],
+  ])("%s exposes unavailable models without allowing them as defaults", async (listMethod, capability, setMethod, configKey) => {
+    const root = makeRoot();
+    roots.push(root);
+    const model = { id: "future-media", protocolId: "future-protocol" };
+    const providerRegistry = {
+      resolveMediaExecutionTarget: resolveTestMediaExecutionTarget,
+      getMediaProviders: vi.fn(() => [{
+        providerId: "future-provider",
+        models: [model],
+        availableModels: [{ id: "unclassified-media" }],
+      }]),
+      getMediaProviderCredentialStatus: () => ({ hasCredentials: true, lanes: [] }),
+      resolveMediaModel: () => ({ providerId: "future-provider", model }),
+    };
+    const manager = new UniversalMediaManager({
+      lingxiHome: root, preferences: makePreferences(root), providerRegistry, registerSessionFile: () => {},
+    });
+    const listed = await manager[listMethod]();
+    expect(providerRegistry.getMediaProviders).toHaveBeenCalledWith(capability);
+    expect(listed.providers["future-provider"].models).toEqual([
+      expect.objectContaining({ id: "future-media", adapterAvailable: false, unavailableReason: "adapter_unavailable", unavailableMessage: expect.stringContaining("future-protocol") }),
+    ]);
+    expect(listed.providers["future-provider"].availableModels).toEqual([
+      expect.objectContaining({ id: "unclassified-media", adapterAvailable: false, unavailableReason: "protocol_unrecognized", unavailableMessage: expect.any(String) }),
+    ]);
+    expect(() => manager[setMethod]({ [configKey]: { provider: "future-provider", id: "future-media" } })).toThrow(/adapter registered/);
+    manager.stop();
+  });
+
   it("preserves provider-contributed video parameter schemas for settings and discovery", async () => {
     const root = makeRoot();
     roots.push(root);

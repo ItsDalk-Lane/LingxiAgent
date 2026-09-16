@@ -75,8 +75,8 @@ describe("Agent platform prompt identity", () => {
       forceExperienceEnabled: false,
     });
 
-    expect(prompt).toContain("fileId 是机器契约，label 只是展示名");
-    expect(prompt).toContain("继续修改文件时用 writableLocalRef.path 或普通本机路径，write/edit 不接受 fileId。");
+    expect(prompt).toContain("fileId 用于操作，label 仅展示");
+    expect(prompt).toContain("write/edit 用 writableLocalRef.path 或本机路径，不接受 fileId。");
     expect(prompt).toContain("materialize");
   });
 
@@ -86,8 +86,8 @@ describe("Agent platform prompt identity", () => {
       forceExperienceEnabled: false,
     });
 
-    expect(prompt).toContain("fileId is the machine contract; label is display-only.");
-    expect(prompt).toContain("For further modifications use writableLocalRef.path or an ordinary local path; write/edit does not accept fileId.");
+    expect(prompt).toContain("fileId identifies files; label is display-only.");
+    expect(prompt).toContain("write/edit takes writableLocalRef.path or local paths, not fileId.");
     expect(prompt).toContain("materialize");
   });
 
@@ -107,7 +107,8 @@ describe("Agent platform prompt identity", () => {
     expect(prompt).toContain("current_status");
     expect(prompt).not.toContain("Current date and time:");
     expect(prompt).toContain("15:53");
-    expect(prompt).toContain("Your day starts at 04:00.");
+    expect(prompt).toContain("Memory/diary archives use the 04:00 boundary");
+    expect(prompt).toContain("ordinary dates and schedules follow the user's timezone calendar.");
     expect(prompt).not.toMatch(/\b(?:AM|PM)\b/);
   });
 

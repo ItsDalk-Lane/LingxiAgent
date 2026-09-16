@@ -73,6 +73,14 @@ export function SkillRow({
         <span className={styles['skills-list-name']}>
           {skill.name}
           {nameHint && <span className={styles['skills-list-name-hint']}>{nameHint}</span>}
+          {skill.source === 'workspace' && (
+            <span
+              className={styles['skills-list-name-hint']}
+              title={skill.baseDir || t('settings.skills.workspaceBadge')}
+            >
+              {t('settings.skills.workspaceBadge')}
+            </span>
+          )}
           {titleSuffix}
         </span>
         <span className={styles['skills-list-desc']}>{displayDesc}</span>

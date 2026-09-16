@@ -152,7 +152,7 @@ export const ACTIVITY_LABEL_KEYS: Readonly<Record<string, string>> = {
  *   形态名（技能）→ 一方短标签 → 插件/MCP 家族词（「扩展」）→ 通用词（「工具」）。
  *
  * 任何分支都不返回工具本名：裸英文工具名（search_memory、mcp_deep-search）不许当
- * 行主标签，原工具名只保留在行上的 data-tool、悬停提示与完整调用弹窗里。
+ * 行主标签；MCP 身份另列在标签后，原工具名也保留在悬停提示与完整调用弹窗里。
  */
 export function activityLabel(
   name: string,
@@ -171,6 +171,20 @@ export function activityLabel(
 
 export function isExternalTool(name: string): boolean {
   return !BUILTIN_TOOL_NAMES.has(name) && name.includes('_');
+}
+
+/** MCP 身份独立于内容摘要，失败或没有摘要时也能看见来源。 */
+export function mcpActivityName(name: string, args?: Record<string, unknown>): string | null {
+  if (!name.startsWith('mcp_')) return null;
+  if (name === 'mcp_call' || name === 'mcp_describe_tool') {
+    const target = args?.[name === 'mcp_call' ? 'tool' : 'name'];
+    const server = typeof args?.server === 'string' ? args.server.trim() : '';
+    if (typeof target === 'string' && target.trim()) {
+      return [server, target.trim()].filter(Boolean).join(' / ');
+    }
+  }
+  // 注册名中的下划线不能可靠区分服务与工具，因此只去掉固定前缀。
+  return name.slice(4) || name;
 }
 
 function resolveToolCopy(key: string, phase: ToolPhase, vars: Record<string, string>): string | null {

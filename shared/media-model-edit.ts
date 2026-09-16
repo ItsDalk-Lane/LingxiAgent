@@ -83,8 +83,10 @@ export function buildMediaModelEditPatch({ capability, body, existingModel }) {
   }
 
   const kind = KIND_BY_CAPABILITY[capability] || "chat";
-  const baseInputs = normalizeModalityList(existingModel?.inputs || null) || KIND_DEFAULT_INPUTS[kind];
-  const baseOutputs = normalizeModalityList(existingModel?.outputs || null) || KIND_DEFAULT_OUTPUTS[kind];
+  const baseInputs = normalizeModalityList(existingModel?.inputs || null)
+    || (capability === "speech_generation" ? ["text"] : KIND_DEFAULT_INPUTS[kind]);
+  const baseOutputs = normalizeModalityList(existingModel?.outputs || null)
+    || (capability === "speech_generation" ? ["audio"] : KIND_DEFAULT_OUTPUTS[kind]);
   const invariantError = mediaCapabilityModalityError(
     capability,
     patch.inputs ?? baseInputs,

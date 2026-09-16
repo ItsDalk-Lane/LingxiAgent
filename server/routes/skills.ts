@@ -319,6 +319,33 @@ export function createSkillsRoute(engine) {
         return c.json({ error: "enabled must be a boolean" }, 400);
       }
       const name = c.req.param("name");
+
+      // 项目（workspace）技能不进 skills.enabled 名单：类别策略开着时默认启用，
+      // 单独关闭写入 skills.workspace_disabled（opt-out 名单），由运行时筛选消费。
+      const runtimeSkills = typeof engine.getRuntimeSkills === "function"
+        ? (engine.getRuntimeSkills(id) || [])
+        : [];
+      const workspaceSkill = runtimeSkills.find(s => s.name === name && s.source === "workspace");
+      if (workspaceSkill) {
+        if (workspaceSkill.shadowed) {
+          return c.json({ error: t("error.workspaceSkillShadowed") }, 409);
+        }
+        const result = await withAgentSkillWriteLock(id, async () => {
+          const agent = engine.getAgent?.(id);
+          const disabled = new Set(agent?.config?.skills?.workspace_disabled || []);
+          if (body.enabled) {
+            disabled.delete(name);
+          } else {
+            disabled.add(name);
+          }
+          // 走 ConfigCoordinator 路径：写盘 + syncAgentSkills 同步运行时选择
+          await engine.updateConfig({ skills: { workspace_disabled: [...disabled] } }, { agentId: id });
+          emitAppEvent(engine, "skills-changed", { agentId: id });
+          return { name, enabled: body.enabled };
+        });
+        return c.json({ ok: true, ...result });
+      }
+
       const { visibleSet } = visibleSkillsForAgent(id);
       if (!visibleSet.has(name)) {
         return c.json({ error: "skill not found" }, 404);

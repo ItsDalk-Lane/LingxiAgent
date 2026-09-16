@@ -18,7 +18,7 @@ describe("getPlatformPromptNote", () => {
     expect(out).toContain("<shell>zsh</shell>");
     expect(out).toContain("<os>TestOS 1.2.3</os>");
     expect(out).toContain(`<sandbox_mode>${SANDBOX_MODE_LABEL}</sandbox_mode>`);
-    expect(out).toContain("Use structured file tools for source edits.");
+    expect(out).toContain("Server execution environment; the user's display device may differ.");
     expect(out).toContain("</environment_context>");
   });
 

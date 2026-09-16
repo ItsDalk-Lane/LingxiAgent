@@ -14,6 +14,7 @@ import fs from "fs";
 import path from "path";
 import { fromRoot } from "../shared/hana-root.ts";
 import { lookupKnown } from "../shared/known-models.ts";
+import { mediaModelCapabilities, isMediaOnlyModel } from "../shared/media-model-classification.ts";
 import {
   normalizeProviderHeaders,
   normalizeProviderAuthType,
@@ -34,6 +35,7 @@ import {
 } from "../shared/model-capabilities.ts";
 import { validateProviderRuntime } from "./media-runtime-contract.ts";
 import { capabilityKey, inferMediaProtocolId } from "./media-protocols.ts";
+import { matchMediaFamilyDeclaration } from "./media/media-family.ts";
 import {
   resolveMediaExecutionTarget as resolveCanonicalMediaExecutionTarget,
 } from "./media/media-execution-target-resolver.ts";
@@ -341,6 +343,10 @@ function getModelType(providerId, modelEntry) {
   const isObj = typeof modelEntry === "object" && modelEntry !== null;
   const id = getModelId(modelEntry);
   const known = lookupKnown(providerId, id);
+  const model = isObj ? modelEntry : { id };
+  if (isMediaOnlyModel(model, known)) return mediaModelCapabilities(model, known)[0];
+  // 用户明确声明文本输出后，不再被旧目录中的媒体类型挡住聊天入口。
+  if (Array.isArray(model.outputs) && model.outputs.includes("text")) return "chat";
   return (isObj && modelEntry.type) || known?.type || "chat";
 }
 
@@ -374,8 +380,11 @@ function normalizeUserMediaModels(providerId, userConfig, capabilityName, declar
   const mediaConfig = userConfig?.media?.[snake] || userConfig?.media?.[camel] || {};
   const rawModels = [];
   if (Array.isArray(mediaConfig.models)) rawModels.push(...mediaConfig.models);
-  if (camel === "imageGeneration" && Array.isArray(userConfig?.models)) {
-    rawModels.push(...userConfig.models.filter((model) => getModelType(providerId, model) === "image"));
+  if (Array.isArray(userConfig?.models)) {
+    rawModels.push(...userConfig.models.filter((model) => {
+      const id = getModelId(model);
+      return mediaModelCapabilities(typeof model === "object" ? model : { id }, lookupKnown(providerId, id)).includes(camel);
+    }).map(model => ({ ...(typeof model === "object" ? model : { id: model }), claimedFromChat: true })));
   }
   const capabilityDefaultProtocol = mediaCapabilityDefaultProtocol(entry, camel);
   const declaredById = new Map(declaredModels.map((model) => [model.id, model]));
@@ -558,6 +567,7 @@ export class ProviderRegistry {
   declare _runtimeMediaCapabilities: any;
   declare _runtimeMediaCapabilitySources: any;
   declare _runtimeMediaRefreshes: any;
+  private _discoveredModelsSnapshot: { stamp: string; data: Record<string, any> } | null = null;
   /**
    * @param {string} lingxiHome - 用户数据根目录（如 ~/.lingxi-dev）
    */
@@ -1257,7 +1267,94 @@ export class ProviderRegistry {
     if (this._runtimeMediaCapabilitySources.has(providerId)) {
       return this._runtimeMediaCapabilities.get(providerId)?.media?.[key]?.models || [];
     }
-    return entry.capabilities?.media?.[key]?.models || [];
+    const declared = entry.capabilities?.media?.[key]?.models || [];
+    const byId = new Map<string, any>(declared.map(model => [model.id, model]));
+    // 家族继承视图：供应商发布同系列新款 ID（未写入插件声明）时，
+    // 合成继承锚点参数页的声明条目。只影响本读侧视图，不写回 Provider Catalog。
+    for (const id of this._mediaFamilyCandidateIds(providerId, capability)) {
+      if (byId.has(id)) continue;
+      const match = matchMediaFamilyDeclaration(declared, id);
+      if (!match) continue;
+      byId.set(id, {
+        ...match.declaration,
+        id,
+        displayName: id,
+        inheritedFrom: match.inheritedFrom,
+      });
+    }
+    for (const raw of this._discoveredModelEntries(providerId)) {
+      const id = getModelId(raw);
+      if (!id || byId.has(id)) continue;
+      const known = lookupKnown(providerId, id);
+      if (!mediaModelCapabilities(raw, known).includes(key)) continue;
+      // 发现结果只提供身份和能力，不采纳远端给出的协议、凭证或执行地址。
+      const model = normalizeMediaModel({
+        id,
+        name: typeof raw.name === "string" ? raw.name : id,
+        ...(Array.isArray(raw.inputs) ? { inputs: raw.inputs } : {}),
+        ...(Array.isArray(raw.outputs) ? { outputs: raw.outputs } : {}),
+      }, {
+        protocolId: inferMediaProtocolId(providerId, capability, id, providerProtocolContext(entry))
+          || mediaCapabilityDefaultProtocol(entry, key)
+          || entry?.runtime?.protocolId,
+      });
+      if (model) byId.set(id, model);
+    }
+    return [...byId.values()];
+  }
+
+  /**
+   * 可能属于某媒体能力家族的候选 ID：发现缓存 ∪ 用户媒体条目 ∪ 被认领的聊天模型。
+   * 仅为家族匹配提供输入，是否同族由 matchMediaFamilyDeclaration 判定。
+   */
+  _mediaFamilyCandidateIds(providerId, capability) {
+    const snake = capability;
+    const camel = capabilityKey(capability);
+    const ids = new Set<string>();
+    for (const raw of this._discoveredModelEntries(providerId)) {
+      const id = getModelId(raw);
+      if (id) ids.add(id);
+    }
+    let userConfig;
+    try {
+      userConfig = this.getAllProvidersRaw()[providerId] || {};
+    } catch {
+      userConfig = {};
+    }
+    const userMedia = userConfig?.media?.[snake] || userConfig?.media?.[camel] || {};
+    for (const raw of (Array.isArray(userMedia.models) ? userMedia.models : [])) {
+      const id = getModelId(raw);
+      if (id) ids.add(id);
+    }
+    if (Array.isArray(userConfig?.models)) {
+      for (const raw of userConfig.models) {
+        const id = getModelId(raw);
+        if (!id) continue;
+        const known = lookupKnown(providerId, id);
+        if (mediaModelCapabilities(typeof raw === "object" && raw !== null ? raw : { id }, known).includes(camel)) {
+          ids.add(id);
+        }
+      }
+    }
+    return [...ids];
+  }
+
+  /** 媒体候选复用供应商发现缓存；文件更新后立即重读，不自动启用未添加模型。 */
+  _discoveredModelEntries(providerId) {
+    const filename = path.join(this._lingxiHome, "models-cache.json");
+    try {
+      const stat = fs.statSync(filename);
+      const stamp = `${stat.ino}:${stat.mtimeMs}:${stat.size}`;
+      if (this._discoveredModelsSnapshot?.stamp !== stamp) {
+        const data = JSON.parse(fs.readFileSync(filename, "utf-8"));
+        this._discoveredModelsSnapshot = { stamp, data: isPlainObject(data) ? data : {} };
+      }
+      const models = this._discoveredModelsSnapshot.data[providerId]?.models;
+      return Array.isArray(models) ? models.filter(model => isPlainObject(model) && getModelId(model)) : [];
+    } catch (error) {
+      if (error.code !== "ENOENT") console.warn("[providers] 无法读取模型发现缓存:", error.message);
+      return [];
+    }
   }
 
   getMediaCredentialLanes(providerId, capability = "image_generation") {
@@ -1369,7 +1466,7 @@ export class ProviderRegistry {
       if (!duplicate) existing.push(binding);
     };
 
-    for (const capability of ["imageGeneration", "videoGeneration", "speechRecognition"]) {
+    for (const capability of ["imageGeneration", "videoGeneration", "speechRecognition", "speechGeneration"]) {
       const runtimeProviders = this.getMediaProviders(capability);
       for (const runtimeProvider of runtimeProviders) {
         const runtimeProviderId = runtimeProvider.providerId;
@@ -1412,12 +1509,13 @@ export class ProviderRegistry {
     const providers = [];
     for (const entry of this._entries.values()) {
       const models = this.getMediaModels(entry.id, capability);
+      const availableModels = this.getMediaModelCatalog(entry.id, capability);
       const runtimeCapability = this.getRuntimeMediaCapabilityState(entry.id);
       const runtimeMedia = this._runtimeMediaCapabilities.get(entry.id)?.media;
       const exposesCapability = entry.capabilities?.media?.[key] !== undefined || runtimeMedia?.[key] !== undefined;
       // 生效模型为空不再是跳过条件：只要供应商声明了该能力就保留在列表里，
       // 设置页展示能力卡后由用户自行「添加模型」（内置声明只作候选目录）。
-      if (models.length === 0 && !exposesCapability) continue;
+      if (models.length === 0 && !availableModels.length && !exposesCapability) continue;
       providers.push({
         providerId: entry.id,
         displayName: entry.displayName,
@@ -1427,7 +1525,7 @@ export class ProviderRegistry {
         credentialLanes: this.getMediaCredentialLanes(entry.id, capability),
         ...(runtimeCapability ? { runtimeCapability } : {}),
         models,
-        availableModels: this.getMediaModelCatalog(entry.id, capability),
+        availableModels,
       });
     }
     return providers;

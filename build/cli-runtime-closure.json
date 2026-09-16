@@ -1427,6 +1427,18 @@
       "reason": "Reached via esbuild source module graph, imported by core/media/media-execution-target-resolver.ts (import-statement); core/media/media-execution-target-resolver.ts (import-statement)."
     },
     {
+      "path": "core/media/media-family.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/provider-registry.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/provider-registry.ts (import-statement)."
+    },
+    {
       "path": "core/media/media-parameters.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -127732,6 +127744,23 @@
       "reason": "Reached via esbuild source module graph, imported by shared/error-bus.ts (import-statement); lib/log-redactor.ts (import-statement); lib/approval-gateway.ts (import-statement); +1 more importer(s)."
     },
     {
+      "path": "shared/media-model-classification.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/provider-registry.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/model-sync.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/provider-registry.ts (import-statement); core/model-sync.ts (import-statement)."
+    },
+    {
       "path": "shared/media-model-edit.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -127754,6 +127783,11 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "shared/media-model-classification.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "shared/provider-model-validation.ts",
           "kind": "import-statement"
         },
@@ -127771,9 +127805,14 @@
           "root": "server-bootstrap",
           "from": "shared/media-model-edit.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/providers.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by shared/provider-model-validation.ts (import-statement); core/model-sync.ts (import-statement); core/model-manager.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by shared/media-model-classification.ts (import-statement); shared/provider-model-validation.ts (import-statement); core/model-sync.ts (import-statement); +3 more importer(s)."
     },
     {
       "path": "shared/model-capabilities.ts",
@@ -129266,9 +129305,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 10996,
+    "totalFiles": 10998,
     "byInputType": {
-      "source-graph": 787,
+      "source-graph": 789,
       "runtime-asset": 11,
       "nft-runtime-trace": 10198
     }

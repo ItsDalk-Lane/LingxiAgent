@@ -758,6 +758,13 @@ export function createAgentsRoute(engine) {
       // its live skill list is refreshed to match; any other agent picks the new
       // policy up when it next loads. The focus decides nothing about ownership.
       if (hasWorkspaceSkillPolicyPatch(agentPartial.workspace_context) && id === engine.currentAgentId) {
+        // 策略开关只重新筛选已扫描的条目，扫描本身只挂在会话创建/切换上；
+        // 开关后不重扫的话，项目技能要等重启（重启必然重开会话）才进列表。
+        // 无会话时传 null：workspace 路径跟着会话 cwd 走，不能拿进程 cwd 凑数。
+        await engine.syncWorkspaceSkillPaths?.(
+          engine.currentSessionPath ? engine.cwd : null,
+          { reload: true, emitEvent: false, agentId: id },
+        );
         engine.syncAgentWorkspaceSkills?.(id);
       }
       // 记忆总开关：无论是否 active agent，都需要刷新运行时状态（因为 ticker 后台在跑）

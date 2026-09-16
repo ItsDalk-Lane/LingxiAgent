@@ -200,6 +200,23 @@ describe("extractTextContent", () => {
     expect(result.toolUses[0].args).toBeUndefined();
   });
 
+  it("历史 MCP 桥接记录保留目标名称，不把调用正文带入摘要", () => {
+    const result = extractTextContent([
+      {
+        type: "toolCall", id: "call_mcp", name: "mcp_call",
+        arguments: { server: "zread", tool: "read_file", arguments: { token: "credential-sentinel", content: "private body" } },
+      },
+      {
+        type: "tool_use", id: "describe_mcp", name: "mcp_describe_tool",
+        input: { server: "zread", name: "zread_read_file" },
+      },
+    ]);
+    expect(result.toolUses.map(tool => tool.args)).toEqual([
+      { server: "zread", tool: "read_file" },
+      { server: "zread", name: "zread_read_file" },
+    ]);
+  });
+
   it("content block 数组提取 image block（source.data 格式）", () => {
     const content = [
       {

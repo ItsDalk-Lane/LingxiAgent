@@ -254,6 +254,88 @@ describe("skills route", () => {
     expectAppEvent(engine.emitEvent, "skills-changed", { agentId });
   });
 
+  it("toggles a workspace skill into the per-Agent opt-out list instead of enabled", async () => {
+    const agentId = "hana";
+    const agentDir = path.join(tempRoot, agentId);
+    fs.mkdirSync(agentDir, { recursive: true });
+    fs.writeFileSync(path.join(agentDir, "config.yaml"), "agent:\n  name: Hana\n", "utf-8");
+
+    const { createSkillsRoute } = await import("../server/routes/skills.ts");
+    const app = new Hono();
+    let workspaceDisabled = ["ws-old"];
+    const engine = {
+      agentsDir: tempRoot,
+      getAllSkills: vi.fn(() => [{ name: "writer", enabled: true }]),
+      getRuntimeSkills: vi.fn(() => [
+        { name: "writer", enabled: true, source: "user" },
+        { name: "ws-skill", enabled: true, active: true, source: "workspace", managedBy: "workspace" },
+      ]),
+      getAgent: vi.fn(() => ({ id: agentId, config: { skills: { workspace_disabled: workspaceDisabled } } })),
+      updateConfig: vi.fn(async (partial) => {
+        workspaceDisabled = partial.skills.workspace_disabled;
+      }),
+      emitEvent: vi.fn(),
+    };
+
+    app.route("/api", createSkillsRoute(engine));
+
+    const disableRes = await app.request(`/api/agents/${agentId}/skills/ws-skill`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ enabled: false }),
+    });
+    expect(disableRes.status).toBe(200);
+    expect(await disableRes.json()).toEqual({ ok: true, name: "ws-skill", enabled: false });
+    expect(engine.updateConfig).toHaveBeenCalledWith(
+      { skills: { workspace_disabled: ["ws-old", "ws-skill"] } },
+      { agentId },
+    );
+    expectAppEvent(engine.emitEvent, "skills-changed", { agentId });
+
+    const enableRes = await app.request(`/api/agents/${agentId}/skills/ws-skill`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ enabled: true }),
+    });
+    expect(enableRes.status).toBe(200);
+    expect(engine.updateConfig).toHaveBeenLastCalledWith(
+      { skills: { workspace_disabled: ["ws-old"] } },
+      { agentId },
+    );
+  });
+
+  it("refuses to toggle a workspace skill that is shadowed by a same-name skill", async () => {
+    const agentId = "hana";
+    const agentDir = path.join(tempRoot, agentId);
+    fs.mkdirSync(agentDir, { recursive: true });
+    fs.writeFileSync(path.join(agentDir, "config.yaml"), "agent:\n  name: Hana\n", "utf-8");
+
+    const { createSkillsRoute } = await import("../server/routes/skills.ts");
+    const app = new Hono();
+    const engine = {
+      agentsDir: tempRoot,
+      getAllSkills: vi.fn(() => []),
+      getRuntimeSkills: vi.fn(() => [
+        { name: "ws-skill", enabled: false, source: "workspace", managedBy: "workspace", shadowed: true, shadowedBy: { source: "user" } },
+      ]),
+      getAgent: vi.fn(() => ({ id: agentId })),
+      updateConfig: vi.fn(),
+      emitEvent: vi.fn(),
+    };
+
+    app.route("/api", createSkillsRoute(engine));
+
+    const res = await app.request(`/api/agents/${agentId}/skills/ws-skill`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ enabled: true }),
+    });
+    expect(res.status).toBe(409);
+    expect((await res.json()).error).toBeTruthy();
+    expect(engine.updateConfig).not.toHaveBeenCalled();
+    expect(engine.emitEvent).not.toHaveBeenCalled();
+  });
+
   it("emits global skills-changed after reloading skills", async () => {
     const { createSkillsRoute } = await import("../server/routes/skills.ts");
     const app = new Hono();

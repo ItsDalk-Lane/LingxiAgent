@@ -32,11 +32,13 @@ function makeMedia({
   image = {},
   video = {},
   speech = {},
+  speechGen = {},
 }: Record<string, any> = {}) {
   return {
     image: mediaResource(image.providers ?? image, image.config ?? null),
     video: mediaResource(video.providers ?? video, video.config ?? null),
     speech: mediaResource(speech.providers ?? speech, speech.config ?? null),
+    speechGen: mediaResource(speechGen.providers ?? speechGen, speechGen.config ?? null),
     allImageModels: [],
     allVideoModels: [],
     allSpeechModels: [],
@@ -107,7 +109,8 @@ describe('chatEntryMediaKind', () => {
     expect(chatEntryMediaKind('sora-2', {}, 'openai')).toBe('video');
     expect(chatEntryMediaKind('kling-v2', {}, 'custom')).toBe('video');
     expect(chatEntryMediaKind('qwen-audio-3.0-asr-flash', {}, 'dashscope')).toBe('audio');
-    expect(chatEntryMediaKind('qwen-audio-3.0-realtime-plus', {}, 'dashscope')).toBe('audio');
+    // realtime 不能仅凭名字判断是识音，保留聊天入口。
+    expect(chatEntryMediaKind('qwen-audio-3.0-realtime-plus', {}, 'dashscope')).toBeNull();
     expect(chatEntryMediaKind('MiniMax/speech-2.8-hd', {}, 'dashscope')).toBe('audio');
     expect(chatEntryMediaKind('fun-asr-flash-2026-06-15', {}, 'dashscope')).toBe('audio');
     expect(chatEntryMediaKind('whisper-large-v3', {}, 'any')).toBe('audio');
@@ -199,8 +202,9 @@ describe('buildMediaUnifiedItems', () => {
       ['image', 'dashscope', 'wan-image-x', ['text'], ['image']],
       ['image', 'dashscope', 'legacy-image-no-modalities', ['text'], ['image']],
       ['video', 'agnes', 'video-x', ['text'], ['video']],
-      // adapterAvailable:false 的语音模型不进「已添加」列表
+      // 不可用模型仍展示，界面解释原因。
       ['speech', 'volcengine-speech', 'whisper-x', ['audio'], ['text']],
+      ['speech', 'volcengine-speech', 'adapter-missing', ['audio'], ['text']],
     ]);
   });
 
@@ -261,7 +265,7 @@ describe('buildUnifiedModelItems + countAddedByKind', () => {
       media,
     });
     expect(items.map(i => i.kind)).toEqual(['chat', 'chat', 'image']);
-    expect(countAddedByKind(items)).toEqual({ chat: 2, image: 1, video: 0, speech: 0 });
+    expect(countAddedByKind(items)).toEqual({ chat: 2, image: 1, video: 0, speech: 0, speechGen: 0 });
   });
 
   it('reclassifies a media model mis-stored in the chat slot into its media kind for counting', () => {
@@ -282,7 +286,7 @@ describe('buildUnifiedModelItems + countAddedByKind', () => {
     expect(items.map(i => [i.kind, i.id])).toEqual([
       ['image', 'qwen-image-3.0-pro'],
     ]);
-    expect(countAddedByKind(items)).toEqual({ chat: 0, image: 1, video: 0, speech: 0 });
+    expect(countAddedByKind(items)).toEqual({ chat: 0, image: 1, video: 0, speech: 0, speechGen: 0 });
   });
 
   it('does not reclassify a plain chat model whose outputs default to text', () => {
@@ -370,5 +374,23 @@ describe('buildUnifiedModelItems + countAddedByKind', () => {
       'chat:plain-chat-model',
       'image:jimeng-image-shared',
     ]);
+  });
+});
+
+
+describe('dynamic audio model projections', () => {
+  it('separates synthesis and recognition and preserves projected edit ownership', () => {
+    const media = makeMedia({
+      speechGen: { providers: { prov: { models: [{ id: 'future-voice', inputs: ['text'], outputs: ['audio'], claimedFromChat: true }], hasCredentials: true } }, config: { defaultSpeechModel: { provider: 'prov', id: 'future-voice' } } },
+      speech: { providers: { prov: { models: [], hasCredentials: true } } },
+    });
+    const summary = {
+      models: [{ id: 'future-voice', inputs: ['text'], outputs: ['audio'] }, { id: 'future-asr', inputs: ['audio'], outputs: ['text'] }, { id: 'audio-chat', inputs: ['text', 'audio'], outputs: ['text'] }],
+      media_capability_bindings: [{ capability: 'speechGeneration', runtime_provider_id: 'prov' }, { capability: 'speechRecognition', runtime_provider_id: 'prov' }],
+    } as unknown as ProviderSummary;
+    const items = buildUnifiedModelItems({ providerId: 'prov', summary, media });
+    expect(items.map(i => [i.kind, i.id])).toEqual([['chat', 'audio-chat'], ['speechGen', 'future-voice'], ['speech', 'future-asr']]);
+    expect(items[1]).toMatchObject({ claimedFromChat: true, isDefault: true });
+    expect(items[2].claimedFromChat).toBe(true);
   });
 });

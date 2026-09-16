@@ -1,6 +1,6 @@
-// Phase 5 Step 6：Agent system prompt 单一 canonical 装配的等价锁定。
-// golden fixture 于改造前（HEAD 6b93929e 的旧 parts.join 实现）生成——
-// 改造后 buildSystemPromptArtifact().text 必须与 golden 字节级一致（§三十四/三十六）。
+// Agent system prompt 单一 canonical 装配与已审阅文案的锁定。
+// golden fixture 随有意的文案修订更新；text 与 artifact 入口仍须逐字一致，
+// 同时保留原有分段、顺序和来源定位，避免内容优化改变提示词分层。
 // platform-prompt mock 掉 env 相关内容（$SHELL/os 版本），保证跨机器确定性。
 import fs from "fs";
 import os from "os";
@@ -98,7 +98,7 @@ const CASES = [
 
 describe("agent system prompt provenance equivalence", () => {
   for (const { locale, golden } of CASES) {
-    it(`keeps legacy byte output and produces provenance (${locale})`, () => {
+    it(`keeps reviewed copy and produces provenance (${locale})`, () => {
       vi.useFakeTimers();
       vi.setSystemTime(new Date("2026-06-04T07:53:00.000Z"));
 
@@ -109,6 +109,27 @@ describe("agent system prompt provenance equivalence", () => {
 
       const artifact = agent.buildSystemPromptArtifact({ forceMemoryEnabled: true });
       expect(artifact.text).toBe(text); // 单一装配：text API 只取 artifact.text（§四十六）
+      expect(artifact.provenance.map((s) => s.source?.id)).toEqual([
+        "platform.intro",
+        "platform.environment",
+        "user.profile",
+        "persona",
+        "agent.appearance",
+        "platform.output-discipline",
+        "platform.tool-discipline",
+        "platform.session-files",
+        "platform.ui-context",
+        "platform.subagent-collaboration",
+        "platform.computer-use",
+        "platform.action-discipline",
+        "platform.web-tool-priority",
+        "platform.learn-skills",
+        "agent.roster",
+        "memory.rules",
+        "memory.tenets",
+        "memory.longterm",
+        "session.time",
+      ]);
 
       const categories = artifact.provenance.map((s) => s.category);
       for (const expected of [

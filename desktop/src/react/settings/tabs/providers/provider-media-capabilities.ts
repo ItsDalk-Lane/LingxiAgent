@@ -42,6 +42,10 @@ export function resolveProviderMediaCapabilities(
       provider = (media.video.providers[runtimeProviderId] as MediaProvider) || null;
       config = media.video.config;
       loading = media.video.loading;
+    } else if (capability === 'speechGeneration') {
+      provider = (media.speechGen.providers[runtimeProviderId] as MediaProvider) || null;
+      config = media.speechGen.config;
+      loading = media.speechGen.loading;
     } else if (capability === 'speechRecognition') {
       provider = (media.speech.providers[runtimeProviderId] as SpeechProvider) || null;
       config = media.speech.config;

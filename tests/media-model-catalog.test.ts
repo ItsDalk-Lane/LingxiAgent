@@ -71,9 +71,15 @@ describe("resolveModelId", () => {
       .toBe("gpt-image-1.5");
   });
 
-  it("rejects an explicit unknown model instead of silently using the default", () => {
-    expect(() => resolveModelId("volcengine", "nonexistent-model"))
-      .toThrow(/Unknown image model.*nonexistent-model.*volcengine/i);
+  it("passes newly released full IDs through without substituting the old default", () => {
+    expect(resolveModelId("volcengine", "doubao-seedream-future-20270101")).toBe("doubao-seedream-future-20270101");
+    expect(resolveModelId("openai", "gpt-image-future")).toBe("gpt-image-future");
+    expect(resolveModelId("openai-codex-oauth", "gpt-image-future")).toBe("gpt-image-future");
+  });
+
+  it("rejects unknown version aliases with an explicit request for a full model ID", () => {
+    expect(() => resolveModelId("volcengine", "999.0-pro"))
+      .toThrow(/Unknown image model alias.*999.0-pro.*full model ID/i);
   });
 
   it("returns empty string for unknown providers with no raw value", () => {

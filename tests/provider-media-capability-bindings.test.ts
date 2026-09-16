@@ -101,11 +101,11 @@ describe("ProviderRegistry media capability bindings", () => {
     ]);
   });
 
-  it("returns [] for providers without any media capability", () => {
+  it("暴露已有语音合成能力，未知供应商仍无绑定", () => {
     const registry = new ProviderRegistry(tmpHome);
     registry.reload();
 
-    expect(bindings(registry, "groq")).toEqual([]);
+    expect(bindings(registry, "groq")).toEqual([{ capability: 'speechGeneration', runtimeProviderId: 'groq' }]);
     expect(bindings(registry, "unknown-provider")).toEqual([]);
   });
 

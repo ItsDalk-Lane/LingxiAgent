@@ -839,7 +839,7 @@ describe('ToolGroupBlock', () => {
     expect(screen.getByText(/subagent_reply/)).toBeInTheDocument();
   });
 
-  it('MCP / 第三方插件工具行用统一家族词，裸工具名不作主标签', () => {
+  it('MCP 在家族标签后显示名称，第三方插件维持原有标签', () => {
     useRealLocale();
     render(
       <ToolGroupBlock
@@ -859,6 +859,38 @@ describe('ToolGroupBlock', () => {
       expect(rowTitle(name)).toBe(name);
       expect(screen.queryByText(name)).toBeNull();
     }
+    expect(screen.getByText('deep-search')).toBeVisible();
+    expect(screen.getByText('search_issues')).toBeVisible();
+    expect(summarySpan('mcp_deep-search')).toHaveTextContent('周报');
+  });
+
+  it.each(['running', 'succeeded', 'failed'] as const)('MCP 在 %s 状态均显示名称并保留摘要或错误', (status) => {
+    useRealLocale();
+    const error = status === 'failed' ? '连接失败' : undefined;
+    render(<ToolGroupBlock collapsed={false} tools={[{
+      id: 'mcp-zread', name: 'mcp_zread_get_repo_structure',
+      args: { query: 'README.md' }, done: status !== 'running', success: status === 'succeeded', status, error,
+    }]} />);
+    const row = screen.getByRole('button', { name: `扩展 · zread_get_repo_structure · ${error || 'README.md'}` });
+    expect(screen.getByText('zread_get_repo_structure')).toBeVisible();
+    expect(summarySpan('mcp_zread_get_repo_structure')).toHaveTextContent(error || 'README.md');
+    fireEvent.click(row);
+    expect(row).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('mcp_zread_get_repo_structure')).toBeVisible();
+  });
+
+  it('MCP 转接调用直接显示目标服务和工具，名称不依赖完成结果', () => {
+    useRealLocale();
+    render(<ToolGroupBlock collapsed={false} tools={[
+      { id: 'call', name: 'mcp_call', args: { server: 'zread', tool: 'get_repo_structure' }, done: false, success: false },
+      { id: 'describe', name: 'mcp_describe_tool', args: { server: 'github_com', name: 'search/repositories' }, done: true, success: true },
+      { id: 'missing', name: 'mcp_call', done: true, success: false, error: '缺少参数' },
+    ]} />);
+    expect(screen.getByText('zread / get_repo_structure')).toBeVisible();
+    expect(screen.getByText('github_com / search/repositories')).toBeVisible();
+    expect(screen.getByRole('button', { name: '扩展 · zread / get_repo_structure' })).toBeVisible();
+    expect(screen.getByText('call')).toBeVisible();
+    expect(screen.getByText('缺少参数')).toBeVisible();
   });
 
   it('别名与面板标题维持现状：exec_command / write_stdin 叫 Bash，清单工具叫任务', () => {

@@ -542,9 +542,12 @@ describe("agents route", () => {
     const engine = {
       agentsDir: tempRoot,
       currentAgentId: agentId,
+      currentSessionPath: "/sessions/hana.jsonl",
+      cwd: "/repo",
       providerRegistry: { getAllProvidersRaw: vi.fn(() => ({})), get: vi.fn(() => null) },
       updateConfig: vi.fn().mockResolvedValue(undefined),
       syncAgentWorkspaceSkills: vi.fn(),
+      syncWorkspaceSkillPaths: vi.fn().mockResolvedValue(true),
       invalidateAgentListCache: vi.fn(),
       listAgents: vi.fn(() => []),
       emitEvent: vi.fn(),
@@ -558,8 +561,50 @@ describe("agents route", () => {
     });
 
     expect(res.status).toBe(200);
+    // 策略开关热更新：重扫当前会话 cwd 的项目技能目录，再同步运行时选择
+    expect(engine.syncWorkspaceSkillPaths).toHaveBeenCalledWith("/repo", {
+      reload: true,
+      emitEvent: false,
+      agentId,
+    });
     expect(engine.syncAgentWorkspaceSkills).toHaveBeenCalledWith(agentId);
     expectAppEvent(engine.emitEvent, "skills-changed", { agentId });
+  });
+
+  it("passes no cwd into the workspace rescan when no session is focused", async () => {
+    const agentId = "hana";
+    const agentDir = path.join(tempRoot, agentId);
+    fs.mkdirSync(agentDir, { recursive: true });
+    fs.writeFileSync(path.join(agentDir, "config.yaml"), "agent:\n  name: Hana\n", "utf-8");
+    const { createAgentsRoute } = await import("../server/routes/agents.ts");
+    const app = new Hono();
+    const engine = {
+      agentsDir: tempRoot,
+      currentAgentId: agentId,
+      currentSessionPath: null,
+      providerRegistry: { getAllProvidersRaw: vi.fn(() => ({})), get: vi.fn(() => null) },
+      updateConfig: vi.fn().mockResolvedValue(undefined),
+      syncAgentWorkspaceSkills: vi.fn(),
+      syncWorkspaceSkillPaths: vi.fn().mockResolvedValue(false),
+      invalidateAgentListCache: vi.fn(),
+      listAgents: vi.fn(() => []),
+      emitEvent: vi.fn(),
+    };
+    app.route("/api", createAgentsRoute(engine));
+
+    const res = await app.request(`/api/agents/${agentId}/config`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ workspace_context: { discover_project_skills: true } }),
+    });
+
+    expect(res.status).toBe(200);
+    // 无会话时不能拿进程 cwd 凑数——workspace 技能只跟会话 cwd 走
+    expect(engine.syncWorkspaceSkillPaths).toHaveBeenCalledWith(null, {
+      reload: true,
+      emitEvent: false,
+      agentId,
+    });
   });
 
   it("editing another agent config can clear saved provider credentials", async () => {

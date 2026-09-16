@@ -300,6 +300,10 @@ function projectMediaProviderModel(model, adapterAvailable) {
     protocolId: model.protocolId,
     credentialLaneId: model.credentialLaneId,
     adapterAvailable,
+    unavailableReason: adapterAvailable ? null : (model.protocolId ? "adapter_unavailable" : "protocol_unrecognized"),
+    unavailableMessage: adapterAvailable ? null : (model.protocolId
+      ? `暂不支持此模型的调用方式（${model.protocolId}）`
+      : "尚未识别此模型的调用方式，暂时无法调用"),
   };
 }
 
@@ -502,6 +506,9 @@ export class UniversalMediaManager {
       else next[key] = value;
     }
     const normalized = normalizeSpeechGenerationConfig(next);
+    if (Object.prototype.hasOwnProperty.call(patch || {}, "defaultSpeechModel") && normalized.defaultSpeechModel) {
+      this.resolveSpeechModelRef(normalized.defaultSpeechModel);
+    }
     this._preferences.setSpeechGenerationConfig?.(normalized);
     return structuredClone(normalized);
   }
@@ -1666,24 +1673,13 @@ export class UniversalMediaManager {
         .map((model) => projectMediaProviderModel(
           model,
           this.hasAdapterForImageModel(provider.providerId, model),
-        ))
-        .filter((model) => {
-          if (model.adapterAvailable) return true;
-          this._log.warn(
-            `[media] settings hide image model "${provider.providerId}/${model.id}": `
-            + (model.protocolId
-              ? `no adapter registered for protocol "${model.protocolId}"`
-              : "protocol unrecognized (model has no protocolId)"),
-          );
-          return false;
-        });
-      // 候选目录：内置声明模型（未被用户添加），按适配器可用性过滤后供「添加模型」下拉。
+        ));
+      // 保留暂不可调用的候选模型及原因，避免新模型在设置页无故消失。
       const availableModels = (provider.availableModels || [])
         .map((model) => projectMediaProviderModel(
           model,
           this.hasAdapterForImageModel(provider.providerId, model),
-        ))
-        .filter((model) => model.adapterAvailable);
+        ));
       if (!models.length && !provider.runtimeCapability && !availableModels.length) continue;
       providers[provider.providerId] = {
         ...provider,
@@ -1728,23 +1724,12 @@ export class UniversalMediaManager {
         .map((model) => projectMediaProviderModel(
           model,
           this.hasAdapterForSpeechModel(provider.providerId, model),
-        ))
-        .filter((model) => {
-          if (model.adapterAvailable) return true;
-          this._log.warn(
-            `[media] settings hide speech model "${provider.providerId}/${model.id}": `
-            + (model.protocolId
-              ? `no adapter registered for protocol "${model.protocolId}"`
-              : "protocol unrecognized (model has no protocolId)"),
-          );
-          return false;
-        });
+        ));
       const availableModels = (provider.availableModels || [])
         .map((model) => projectMediaProviderModel(
           model,
           this.hasAdapterForSpeechModel(provider.providerId, model),
-        ))
-        .filter((model) => model.adapterAvailable);
+        ));
       if (!models.length && !provider.runtimeCapability && !availableModels.length) continue;
       providers[provider.providerId] = {
         ...provider,
@@ -1774,24 +1759,13 @@ export class UniversalMediaManager {
         .map((model) => projectMediaProviderModel(
           model,
           this.hasAdapterForVideoModel(provider.providerId, model),
-        ))
-        .filter((model) => {
-          if (model.adapterAvailable) return true;
-          this._log.warn(
-            `[media] settings hide video model "${provider.providerId}/${model.id}": `
-            + (model.protocolId
-              ? `no adapter registered for protocol "${model.protocolId}"`
-              : "protocol unrecognized (model has no protocolId)"),
-          );
-          return false;
-        });
-      // 候选目录：内置声明模型（未被用户添加），按适配器可用性过滤后供「添加模型」下拉。
+        ));
+      // 保留暂不可调用的候选模型及原因，避免新模型在设置页无故消失。
       const availableModels = (provider.availableModels || [])
         .map((model) => projectMediaProviderModel(
           model,
           this.hasAdapterForVideoModel(provider.providerId, model),
-        ))
-        .filter((model) => model.adapterAvailable);
+        ));
       if (!models.length && !provider.runtimeCapability && !availableModels.length) continue;
       providers[provider.providerId] = {
         ...provider,
@@ -1879,6 +1853,24 @@ export class UniversalMediaManager {
 
   async removeVideoProviderModel(providerId, modelId) {
     this._providers.removeMediaModel(providerId, VIDEO_CAPABILITY, modelId);
+    await this._onProviderChanged();
+    return { ok: true };
+  }
+
+  async setSpeechProviderModel(providerId, model) {
+    this._providers.addMediaModel(providerId, SPEECH_CAPABILITY, model);
+    await this._onProviderChanged();
+    return { ok: true };
+  }
+
+  async updateSpeechProviderModel(providerId, modelId, patch) {
+    await this._updateMediaProviderModel(providerId, SPEECH_CAPABILITY, modelId, patch);
+    await this._onProviderChanged();
+    return { ok: true };
+  }
+
+  async removeSpeechProviderModel(providerId, modelId) {
+    this._providers.removeMediaModel(providerId, SPEECH_CAPABILITY, modelId);
     await this._onProviderChanged();
     return { ok: true };
   }

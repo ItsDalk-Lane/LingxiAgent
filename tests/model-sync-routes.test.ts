@@ -1669,6 +1669,65 @@ describe("model sync related routes", () => {
       .toMatchObject({ "remote-provider": { models: [{ id: "discovered-only" }] } });
   });
 
+  it("keeps new remote media capabilities through discovery and exposes fresh registry candidates without accepting remote execution fields", async () => {
+    const { createProvidersRoute } = await import("../server/routes/providers.ts");
+    const { ProviderRegistry } = await import("../core/provider-registry.ts");
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "lingxi-media-discovery-"));
+    agentTempRoots.push(root);
+    const registry = new ProviderRegistry(root);
+    registry.saveProvider("new-media", {
+      base_url: "https://discovery.example/v1", api: "openai-completions", api_key: "saved-key", models: [],
+    });
+    const injected = {
+      protocolId: "untrusted-protocol", credentialLaneId: "other-account", credentialProviderId: "other-account",
+      baseUrl: "https://untrusted.example", headers: { Authorization: "untrusted" }, api_key: "untrusted",
+    };
+    const remoteModels = [
+      { id: "release-a", inputs: ["image", "text", "text"], outputs: ["image"], type: "image", ...injected },
+      { id: "release-b", input_modalities: ["text"], output_modalities: ["video"], type: "video", ...injected },
+      { id: "release-c", architecture: { input_modalities: ["text"], output_modalities: ["audio"] }, type: "tts", ...injected },
+      { id: "release-d", inputs: ["audio"], outputs: ["text"], type: "asr", ...injected },
+      { id: "invalid-metadata", inputs: ["unknown"], outputs: "image", type: "untrusted-type", ...injected },
+    ];
+    vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ data: remoteModels }) })));
+    const app = new Hono();
+    const engine = withResolveCreds({
+      providerRegistry: registry, lingxiHome: root, getRegistryModelsForProvider: vi.fn(() => []),
+    });
+    app.route("/api", createProvidersRoute(engine));
+
+    const response = await app.request("/api/providers/fetch-models", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: "new-media" }),
+    });
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data.models).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "release-a", inputs: ["text", "image"], outputs: ["image"], type: "image" }),
+      expect.objectContaining({ id: "release-b", inputs: ["text"], outputs: ["video"], type: "video" }),
+      expect.objectContaining({ id: "release-c", inputs: ["text"], outputs: ["audio"], type: "tts" }),
+      expect.objectContaining({ id: "release-d", inputs: ["audio"], outputs: ["text"], type: "asr" }),
+    ]));
+    const cached = JSON.parse(fs.readFileSync(path.join(root, "models-cache.json"), "utf-8"))["new-media"].models;
+    expect(cached).toEqual(data.models);
+    for (const model of cached) {
+      for (const field of Object.keys(injected)) expect(model).not.toHaveProperty(field);
+    }
+    expect(cached.find((model) => model.id === "invalid-metadata")).not.toHaveProperty("inputs");
+    expect(cached.find((model) => model.id === "invalid-metadata")).not.toHaveProperty("outputs");
+    expect(cached.find((model) => model.id === "invalid-metadata")).not.toHaveProperty("type");
+
+    for (const [capability, id] of [
+      ["image_generation", "release-a"], ["video_generation", "release-b"],
+      ["speech_generation", "release-c"], ["speech_recognition", "release-d"],
+    ]) {
+      const provider = registry.getMediaProviders(capability).find((item) => item.providerId === "new-media");
+      expect(provider?.availableModels).toEqual(expect.arrayContaining([expect.objectContaining({ id })]));
+      expect(provider?.models).toEqual([]);
+      expect(provider?.availableModels.find((model) => model.id === id)?.protocolId).not.toBe("untrusted-protocol");
+    }
+    expect(registry.getCredentials("new-media")?.apiKey).toBe("saved-key");
+  });
+
   it("fetch-models treats explicit body headers as authoritative and never mixes saved secrets", async () => {
     const { createProvidersRoute } = await import("../server/routes/providers.ts");
     const app = new Hono();

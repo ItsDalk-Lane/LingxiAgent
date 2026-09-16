@@ -8,6 +8,7 @@
 import fs from "fs";
 import { getPiModel } from "../lib/pi-sdk/index.ts";
 import { lookupKnown, lookupKnownProvider } from "../shared/known-models.ts";
+import { isMediaOnlyModel } from "../shared/media-model-classification.ts";
 import { SECRET_FILE_MODE, writeSecretFileSync } from "../shared/secret-fs.ts";
 import {
   getEndpointDefaultReasoningCapability,
@@ -433,6 +434,8 @@ function filterChatModelEntries(provider, models) {
     const isObj = typeof m === "object" && m !== null;
     const id = getModelId(m);
     const known = lookupKnown(provider, id);
+    if (isMediaOnlyModel(isObj ? m : { id }, known)) return false;
+    if (isObj && Array.isArray(m.outputs) && m.outputs.includes("text")) return true;
     const type = (isObj && m.type) || known?.type || "chat";
     return type === "chat";
   });

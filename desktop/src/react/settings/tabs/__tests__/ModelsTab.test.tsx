@@ -280,7 +280,7 @@ describe('ModelsTab', () => {
     render(<ModelsTab />);
     const select = await screen.findByLabelText('语音条转录模型');
     const option = Array.from(select.querySelectorAll('option')).find((item) => item.value === 'openai/whisper-1');
-    expect(option).toBeUndefined();
-    expect(select).toBeDisabled();
+    expect(option).toBeDisabled();
+    expect(option).toHaveTextContent('settings.media.adapterMissing');
   });
 });

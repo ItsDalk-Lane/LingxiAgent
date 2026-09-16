@@ -16,7 +16,7 @@ export const MODALITY_ORDER = ["text", "image", "video", "audio"];
  * @param {unknown} value
  * @returns {value is import("./modality.ts").Modality}
  */
-export function isModality(value) {
+export function isModality(value: unknown): value is string {
   return typeof value === "string" && MODALITY_ORDER.includes(value);
 }
 
@@ -32,7 +32,7 @@ export function isModality(value) {
  * @param {unknown} value
  * @returns {string[] | null}
  */
-export function normalizeModalityList(value) {
+export function normalizeModalityList(value: unknown): string[] | null {
   if (!Array.isArray(value)) return null;
   if (value.length === 0) return null;
   const seen = new Set();
@@ -51,7 +51,7 @@ export function normalizeModalityList(value) {
  * @param {unknown} value
  * @returns {string[] | null}
  */
-export function readModalityListLoose(value) {
+export function readModalityListLoose(value: unknown): string[] | null {
   if (!Array.isArray(value) || value.length === 0) return null;
   const seen = new Set();
   for (const item of value) {
@@ -86,7 +86,7 @@ export function modalitiesFromLegacyFlags(flags: Record<string, unknown> = {}) {
  * @param {...(string[] | null | undefined)} lists
  * @returns {string[]}
  */
-export function unionModalities(...lists) {
+export function unionModalities(...lists: Array<string[] | null | undefined>): string[] {
   const enabled = new Set();
   for (const list of lists) {
     if (!Array.isArray(list)) continue;
@@ -123,7 +123,7 @@ export const KIND_DEFAULT_OUTPUTS = {
  * @param {string[]} outputs
  * @returns {string | null}
  */
-export function mediaCapabilityModalityError(capability, inputs, outputs) {
+export function mediaCapabilityModalityError(capability: string, inputs: string[], outputs: string[]): string | null {
   if (!Array.isArray(inputs) || !Array.isArray(outputs)) {
     return "inputs and outputs must be modality arrays";
   }

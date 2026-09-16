@@ -92,4 +92,46 @@ describe('SkillBundleTree', () => {
     fireEvent.click(screen.getByRole('button', { name: 'settings.skills.collapseBundleAriaLabel' }));
     expect(onExpandedStateChange).toHaveBeenCalledWith({ 'writing-bundle': false });
   });
+
+  it('renders a toggle for active workspace skills in agent mode', () => {
+    const skills: SkillInfo[] = [
+      { name: 'ws-skill', description: 'Project skill', enabled: true, source: 'workspace', managedBy: 'workspace', inactiveReason: null },
+    ];
+    const onToggleSkill = vi.fn();
+
+    const { container } = render(
+      <SkillBundleTree
+        mode="agent"
+        bundles={[]}
+        skills={skills}
+        nameHints={{}}
+        emptyText="No skills"
+        onToggleSkill={onToggleSkill}
+      />,
+    );
+
+    const toggle = container.querySelector<HTMLButtonElement>('.hana-toggle');
+    expect(toggle).toBeTruthy();
+    fireEvent.click(toggle!);
+    expect(onToggleSkill).toHaveBeenCalledWith('ws-skill', false);
+  });
+
+  it('renders no toggle for workspace skills whose category policy is off', () => {
+    const skills: SkillInfo[] = [
+      { name: 'ws-skill', description: 'Project skill', enabled: false, source: 'workspace', managedBy: 'workspace', inactiveReason: 'policy-disabled' },
+    ];
+
+    const { container } = render(
+      <SkillBundleTree
+        mode="agent"
+        bundles={[]}
+        skills={skills}
+        nameHints={{}}
+        emptyText="No skills"
+        onToggleSkill={vi.fn()}
+      />,
+    );
+
+    expect(container.querySelector('.hana-toggle')).toBeNull();
+  });
 });

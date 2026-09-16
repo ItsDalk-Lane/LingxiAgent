@@ -108,10 +108,10 @@ describe("agent experience toggle", () => {
     roots.push(root);
 
     const prompt = agent.buildSystemPrompt();
-    expect(prompt).toContain("SessionFile is the unified record of local files related to the current session");
-    expect(prompt).toContain("fileId is the machine contract; label is display-only.");
-    expect(prompt).toContain("After write/edit creates or modifies a file, call stage_files to deliver that change");
-    expect(prompt).toContain("Do not re-stage an unchanged file");
+    expect(prompt).toContain("SessionFile is a tool-registered session file reference");
+    expect(prompt).toContain("fileId identifies files; label is display-only");
+    expect(prompt).toContain("Use stage_files only to deliver results");
+    expect(prompt).toContain("skip intermediate edits and unchanged files");
     expect(prompt).not.toContain("create_artifact");
   });
 

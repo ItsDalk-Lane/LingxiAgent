@@ -2159,12 +2159,14 @@
         "audio": "출력: 오디오"
       },
       "modelGroup": {
+        "speechGen": "음성 합성 모델",
         "chat": "대화 모델",
         "image": "이미지 모델",
         "video": "비디오 모델",
         "speech": "음성 인식 모델"
       },
       "customModelCategory": {
+        "speechGen": "음성 합성",
         "label": "분류",
         "chat": "대화",
         "image": "이미지",
@@ -2408,6 +2410,7 @@
       "disabled": "비활성화됨",
       "noSkills": "사용 가능한 스킬이 없어요",
       "noUser": "사용자 정의 스킬 없음",
+      "workspaceBadge": "프로젝트",
       "copyToSkills": "내 스킬로 복사",
       "copied": "복사됨 ✓",
       "copyFailed": "복사 실패",
@@ -4307,6 +4310,7 @@
     "skillCannotAddSelfDir": "Lingxi 자체의 스킬 디렉토리는 추가할 수 없어요",
     "skillInvalidName": "유효하지 않은 스킬 이름이에요",
     "skillExternalCannotDelete": "외부 호환 스킬은 여기서 삭제할 수 없어요",
+    "workspaceSkillShadowed": "이 스킬은 동일한 이름의 스킬에 가려져 개별적으로 전환할 수 없습니다",
     "skillNotExists": "스킬이 존재하지 않아요",
     "channelsDisabled": "채널 기능이 사용자에 의해 비활성화되었어요",
     "channelReadNeedChannel": "오류: read에는 channel 파라미터가 필요해요",

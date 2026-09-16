@@ -36,7 +36,7 @@ export const TOOL_ARG_SUMMARY_KEYS = [
 ] as const;
 
 export type ToolArgSummaryKey = typeof TOOL_ARG_SUMMARY_KEYS[number];
-export type ToolArgSummary = Partial<Record<ToolArgSummaryKey, unknown>>;
+export type ToolArgSummary = Partial<Record<ToolArgSummaryKey | "server" | "tool" | "name", unknown>>;
 
 export function summarizeToolArgs(rawArgs: unknown, toolName?: unknown): ToolArgSummary | undefined {
   if (isSyntheticToolPresentation(toolName)) return undefined;
@@ -47,6 +47,15 @@ export function summarizeToolArgs(rawArgs: unknown, toolName?: unknown): ToolArg
     if (record[key] !== undefined) {
       const value = record[key];
       args[key] = typeof value === "string" && value.length > 2048 ? value.slice(0, 2047) + "…" : value;
+    }
+  }
+  // 桥接工具需要保留真实目标名称；不扩大其他工具的摘要范围，也不透出嵌套参数。
+  const targetKeys = toolName === "mcp_call" ? ["server", "tool"]
+    : toolName === "mcp_describe_tool" ? ["server", "name"] : [];
+  for (const key of targetKeys) {
+    const value = record[key];
+    if (typeof value === "string" && value.trim()) {
+      args[key as "server" | "tool" | "name"] = value.length > 2048 ? value.slice(0, 2047) + "…" : value;
     }
   }
   return Object.keys(args).length ? args : undefined;

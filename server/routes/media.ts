@@ -283,6 +283,53 @@ export function createMediaRoute(engine) {
     }
   });
 
+  route.post("/media/speech/providers/:providerId/models", async (c) => {
+    try {
+      const denied = denyWithoutScope(c, "providers.manage");
+      if (denied) return denied;
+      const providerId = c.req.param("providerId");
+      const body = await safeJson(c);
+      const model = body?.model || body;
+      const result = await requireMediaManager(engine).setSpeechProviderModel(providerId, model);
+      return c.json(result);
+    } catch (err) {
+      return c.json({ error: err.message }, 400);
+    }
+  });
+
+
+  route.put("/media/speech/providers/:providerId/models/:modelId", async (c) => {
+    try {
+      const denied = denyWithoutScope(c, "providers.manage");
+      if (denied) return denied;
+      const body = await safeJson(c);
+      const result = await requireMediaManager(engine).updateSpeechProviderModel(
+        c.req.param("providerId"),
+        c.req.param("modelId"),
+        body?.model && typeof body.model === "object" && !Array.isArray(body.model) ? body.model : body,
+      );
+      return c.json(result);
+    } catch (err) {
+      return c.json({ error: err.message }, err.statusCode || 400);
+    }
+  });
+
+
+  route.delete("/media/speech/providers/:providerId/models/:modelId", async (c) => {
+    try {
+      const denied = denyWithoutScope(c, "providers.manage");
+      if (denied) return denied;
+      const result = await requireMediaManager(engine).removeSpeechProviderModel(
+        c.req.param("providerId"),
+        c.req.param("modelId"),
+      );
+      return c.json(result);
+    } catch (err) {
+      return c.json({ error: err.message }, 400);
+    }
+  });
+
+
   route.get("/media/tasks/batch/:batchId", (c) => {
     try {
       const tasks = requireMediaManager(engine).getTasksByBatch(c.req.param("batchId"));

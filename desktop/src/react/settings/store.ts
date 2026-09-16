@@ -30,9 +30,13 @@ export interface SkillInfo {
   managedBy?: string | null;
   configurable?: boolean;
   deletable?: boolean;
+  /** runtime=1 视图的 workspace 技能状态：policy-disabled / user-disabled / shadowed */
+  inactiveReason?: string | null;
+  /** workspace 技能目录类别：standard（.agents）/ compatible（.claude 等） */
+  sourceCategory?: string | null;
 }
 
-export type MediaCapabilityKind = 'imageGeneration' | 'videoGeneration' | 'speechRecognition';
+export type MediaCapabilityKind = 'imageGeneration' | 'videoGeneration' | 'speechGeneration' | 'speechRecognition';
 
 export interface ProviderMediaCapabilityBinding {
   capability: MediaCapabilityKind;

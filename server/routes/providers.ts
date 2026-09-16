@@ -15,6 +15,7 @@ import {
 } from "../../shared/provider-auth.ts";
 import { filterDiscoveredProviderModels } from "../../shared/provider-model-validation.ts";
 import { lookupKnown } from "../../shared/known-models.ts";
+import { normalizeModalityList } from "../../shared/modality.ts";
 import { enrichOllamaModelMetadata } from "../../shared/ollama-model-metadata.ts";
 import { clearConfigCache } from "../../lib/memory/config-loader.ts";
 import { collectSecretPatchPaths, isMaskedSecretValue, maskSecretValue } from "../../shared/secret-custody.ts";
@@ -306,8 +307,20 @@ export function createProvidersRoute(engine: any) {
   }
 
   function normalizeRemoteModels(data: any, api: any) {
+    // 只保留模型能力声明，不能让远端目录注入协议、地址或凭证字段。
+    const modalities = (model: any) => {
+      const inputs = normalizeModalityList(model.inputs ?? model.input_modalities ?? model.architecture?.input_modalities);
+      const outputs = normalizeModalityList(model.outputs ?? model.output_modalities ?? model.architecture?.output_modalities);
+      const types = ["chat", "image", "video", "audio", "speech", "tts", "asr", "transcription", "speech_generation", "speech_recognition"];
+      return {
+        ...(inputs ? { inputs } : {}),
+        ...(outputs ? { outputs } : {}),
+        ...(types.includes(model.type) ? { type: model.type } : {}),
+      };
+    };
     if (api === "anthropic-messages") {
       return (data.data || []).map(m => ({
+        ...modalities(m),
         id: m.id,
         name: m.display_name || m.id,
         context: m.max_input_tokens ?? null,
@@ -319,6 +332,7 @@ export function createProvidersRoute(engine: any) {
       return (data.models || []).map(m => {
         const id = m.baseModelId || String(m.name || "").replace(/^models\//, "");
         return {
+          ...modalities(m),
           id,
           name: m.displayName || id,
           context: m.inputTokenLimit ?? null,
@@ -328,6 +342,7 @@ export function createProvidersRoute(engine: any) {
     }
 
     return (data.data || []).map(m => ({
+      ...modalities(m),
       id: m.id,
       name: m.id,
       context: m.context_length || m.context_window || m.max_context_length || null,

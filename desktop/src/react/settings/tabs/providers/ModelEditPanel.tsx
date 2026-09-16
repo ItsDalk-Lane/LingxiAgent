@@ -111,6 +111,7 @@ export function ModelEditPanel({
   providerId,
   runtimeProviderId,
   modelId,
+  claimedFromChat = false,
   modelMeta,
   summaryApi,
   summaryBaseUrl,
@@ -122,6 +123,7 @@ export function ModelEditPanel({
   providerId: string;
   runtimeProviderId: string;
   modelId: string;
+  claimedFromChat?: boolean;
   modelMeta?: Record<string, unknown>;
   summaryApi?: string | null;
   summaryBaseUrl?: string | null;
@@ -219,7 +221,7 @@ export function ModelEditPanel({
 
   const save = async () => {
     const name = displayName.trim();
-    if (kind === 'chat') {
+    if (kind === 'chat' || claimedFromChat) {
       if (readModalityList(inputs) === null || readModalityList(outputs) === null) {
         showToast(t('settings.api.modalityRequired'), 'error');
         return;
@@ -287,7 +289,7 @@ export function ModelEditPanel({
     }
     const base = kind === 'speech'
       ? `/api/speech-recognition/providers/${encodeURIComponent(runtimeProviderId)}`
-      : `/api/media/${kind === 'video' ? 'video' : 'image'}/providers/${encodeURIComponent(runtimeProviderId)}`;
+      : `/api/media/${kind === 'video' ? 'video' : kind === 'speechGen' ? 'speech' : 'image'}/providers/${encodeURIComponent(runtimeProviderId)}`;
     try {
       await lingxiFetchJson(`${base}/models/${encodeURIComponent(modelId)}`, {
         method: 'PUT',
