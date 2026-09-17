@@ -4,6 +4,7 @@ import { createWriteStream, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
+  EXEC_COMMAND_MAX_TIMEOUT_SECONDS,
   extractExitCode,
   firstText,
   jsonResult,
@@ -106,6 +107,108 @@ function truncateTail(content: string, {
     maxLines,
     maxBytes,
   };
+}
+
+// 保头保尾：开头常有启动/报错头，结尾常有结果摘要，两头都要；中间精确标记省略量。
+export function truncateHeadTail(content: string, {
+  maxLines = DEFAULT_MAX_LINES,
+  maxBytes = DEFAULT_MAX_BYTES,
+} = {}) {
+  const totalBytes = Buffer.byteLength(content, "utf-8");
+  const lines = content.split("\n");
+  const totalLines = lines.length;
+  if (totalLines <= maxLines && totalBytes <= maxBytes) {
+    return { ...truncateTail(content, { maxLines, maxBytes }) };
+  }
+
+  const headLineBudget = Math.max(1, Math.floor(maxLines / 2));
+  const tailLineBudget = Math.max(1, maxLines - headLineBudget);
+  const headByteBudget = Math.floor(maxBytes / 2);
+  const tailByteBudget = maxBytes - headByteBudget;
+
+  const headLines: string[] = [];
+  let headBytes = 0;
+  for (let i = 0; i < lines.length && headLines.length < headLineBudget; i++) {
+    const lineBytes = Buffer.byteLength(lines[i], "utf-8") + (headLines.length > 0 ? 1 : 0);
+    if (headBytes + lineBytes > headByteBudget) break;
+    headLines.push(lines[i]);
+    headBytes += lineBytes;
+  }
+
+  const tailLines: string[] = [];
+  let tailBytes = 0;
+  for (let i = lines.length - 1; i >= 0 && tailLines.length < tailLineBudget; i--) {
+    if (i < headLines.length) break;
+    const lineBytes = Buffer.byteLength(lines[i], "utf-8") + (tailLines.length > 0 ? 1 : 0);
+    if (tailBytes + lineBytes > tailByteBudget) break;
+    tailLines.unshift(lines[i]);
+    tailBytes += lineBytes;
+  }
+
+  const headEnd = headLines.length;
+  const tailStart = lines.length - tailLines.length;
+  if (tailStart <= headEnd) {
+    // 两段相遇说明总量只超一点点：退化为按字节的头尾切分。
+    const headPart = truncateStringToBytesFromStart(content, headByteBudget);
+    const tailPart = truncateStringToBytesFromEnd(content, tailByteBudget);
+    if (headPart.length + tailPart.length >= content.length) {
+      return { ...truncateTail(content, { maxLines, maxBytes }) };
+    }
+    const omittedBytes = totalBytes - Buffer.byteLength(headPart, "utf-8") - Buffer.byteLength(tailPart, "utf-8");
+    const outputContent = `${headPart}\n[... ${formatSize(omittedBytes)} omitted ...]\n${tailPart}`;
+    return {
+      content: outputContent,
+      truncated: true,
+      truncatedBy: "head_tail",
+      totalLines,
+      totalBytes,
+      outputLines: headPart.split("\n").length + tailPart.split("\n").length,
+      outputBytes: Buffer.byteLength(outputContent, "utf-8"),
+      headLines: headPart.split("\n").length,
+      tailLines: tailPart.split("\n").length,
+      omittedLines: 0,
+      omittedBytes,
+      lastLinePartial: false,
+      maxLines,
+      maxBytes,
+    };
+  }
+
+  const omittedLines = tailStart - headEnd;
+  const omittedLinesContent = lines.slice(headEnd, tailStart).join("\n");
+  const omittedBytes = Buffer.byteLength(omittedLinesContent, "utf-8");
+  const outputContent = `${headLines.join("\n")}\n[... ${omittedLines} lines / ${formatSize(omittedBytes)} omitted ...]\n${tailLines.join("\n")}`;
+  return {
+    content: outputContent,
+    truncated: true,
+    truncatedBy: "head_tail",
+    totalLines,
+    totalBytes,
+    outputLines: headLines.length + tailLines.length,
+    outputBytes: Buffer.byteLength(outputContent, "utf-8"),
+    headLines: headLines.length,
+    tailLines: tailLines.length,
+    omittedLines,
+    omittedBytes,
+    lastLinePartial: false,
+    maxLines,
+    maxBytes,
+  };
+}
+
+function truncateStringToBytesFromStart(str: string, maxBytes: number) {
+  const buf = Buffer.from(str, "utf-8");
+  if (buf.length <= maxBytes) return str;
+  let end = maxBytes;
+  while (end > 0 && (buf[end] & 0xc0) === 0x80) end--;
+  return buf.slice(0, end).toString("utf-8");
+}
+
+// 超时提示固定带下一步动作（默认超时注明、教长任务用 timeout/tty 续接）。
+function formatTimeoutNotice(timeoutSecs: string | number, { defaulted = false }: { defaulted?: boolean } = {}) {
+  const base = `Command timed out after ${timeoutSecs} seconds${defaulted ? " (default timeout)" : ""}`;
+  const hint = `For long-running work pass timeout=<seconds> (max ${EXEC_COMMAND_MAX_TIMEOUT_SECONDS}), or run with tty=true and continue via write_stdin.`;
+  return `${base}. ${hint}`;
 }
 
 function isValidUtf8(buffer: Buffer) {
@@ -231,7 +334,7 @@ function buildFinalCommandResult(output: string, exitCode: number | null, {
   encoding?: string;
   transcoded?: boolean;
 }) {
-  const truncation = truncateTail(output);
+  const truncation = truncateHeadTail(output);
   let outputText = truncation.content || "(no output)";
   let outputPath = fullOutputPath;
   const details: Record<string, any> = {};
@@ -247,15 +350,22 @@ function buildFinalCommandResult(output: string, exitCode: number | null, {
       }
     }
     if (outputPath) details.fullOutputPath = outputPath;
-    const startLine = truncation.totalLines - truncation.outputLines + 1;
-    const endLine = truncation.totalLines;
     const fullOutputNotice = outputPath ? `. Full output: ${outputPath}` : "";
-    if (truncation.lastLinePartial) {
+    if (truncation.truncatedBy === "head_tail") {
+      const headLabel = truncation.omittedLines > 0
+        ? `Showing first ${truncation.headLines} and last ${truncation.tailLines} of ${truncation.totalLines} lines`
+        : `Showing ${truncation.headLines + truncation.tailLines} of ${truncation.totalLines} lines`;
+      outputText += `\n\n[${headLabel}${fullOutputNotice}]`;
+    } else if (truncation.lastLinePartial) {
       const lastLineSize = formatSize(Buffer.byteLength(output.split("\n").pop() || "", "utf-8"));
-      outputText += `\n\n[Showing last ${formatSize(truncation.outputBytes)} of line ${endLine} (line is ${lastLineSize})${fullOutputNotice}]`;
+      outputText += `\n\n[Showing last ${formatSize(truncation.outputBytes)} of line ${truncation.totalLines} (line is ${lastLineSize})${fullOutputNotice}]`;
     } else if (truncation.truncatedBy === "lines") {
+      const startLine = truncation.totalLines - truncation.outputLines + 1;
+      const endLine = truncation.totalLines;
       outputText += `\n\n[Showing lines ${startLine}-${endLine} of ${truncation.totalLines}${fullOutputNotice}]`;
     } else {
+      const startLine = truncation.totalLines - truncation.outputLines + 1;
+      const endLine = truncation.totalLines;
       outputText += `\n\n[Showing lines ${startLine}-${endLine} of ${truncation.totalLines} (${formatSize(DEFAULT_MAX_BYTES)} limit)${fullOutputNotice}]`;
     }
   } else if (outputPath) {
@@ -277,6 +387,7 @@ export async function runExecCommandOnce({
   toolCallId,
   command,
   timeout,
+  timeoutDefaulted = false,
   signal,
   onUpdate,
   ctx,
@@ -294,20 +405,43 @@ export async function runExecCommandOnce({
       ok: exitCode === 0,
       exitCode,
       transportError: false,
+      ...(exitCode !== 0 ? {
+        // 命令跑完但失败：正常输出交模型判断；依赖探测失败才升级为错误。
+        isError: execDetails?.classification?.kind === "probe",
+        errorCode: execDetails?.classification?.kind === "probe"
+          ? "EXEC_COMMAND_DEPENDENCY_MISSING"
+          : "EXEC_COMMAND_EXIT_NONZERO",
+      } : {}),
     });
   } catch (err) {
     const output = normalizeThrownToolError(err, maxOutputTokens);
     const exitCode = extractExitCode(output);
-    return textResult(output, {
-      execCommand: {
-        ...execDetails,
-        ok: false,
-        exitCode,
-        transportError: false,
-        errorCode: execDetails?.classification?.kind === "probe"
+    const isTimeout = /Command timed out after \d+ seconds/.test(output);
+    const isAbort = /Command aborted/.test(output);
+    let finalOutput = output;
+    if (isTimeout && !/For long-running work pass timeout=/.test(output)) {
+      const timeoutSecs = output.match(/Command timed out after (\d+) seconds/)?.[1] ?? String(timeout ?? "");
+      finalOutput = output.replace(
+        /Command timed out after \d+ seconds/,
+        formatTimeoutNotice(timeoutSecs, { defaulted: timeoutDefaulted === true }),
+      );
+    }
+    // 非零退出与超时是命令的正常结局；中止、依赖探测失败、传输层故障才是工具错误。
+    // 注意不要经 textResult 传 errorCode——那里会因 errorCode 自动标 isError。
+    const isError = isAbort
+      || (execDetails?.classification?.kind === "probe" && !isTimeout)
+      || (exitCode === null && !isTimeout);
+    return mergeExecDetails(textResult(finalOutput), {
+      ...execDetails,
+      ok: false,
+      exitCode,
+      transportError: false,
+      isError,
+      errorCode: isTimeout
+        ? "EXEC_COMMAND_TIMEOUT"
+        : execDetails?.classification?.kind === "probe"
           ? "EXEC_COMMAND_DEPENDENCY_MISSING"
           : "EXEC_COMMAND_EXIT_NONZERO",
-      },
     });
   }
 }
@@ -317,6 +451,7 @@ export async function runExecCommandDirect({
   command,
   workdir,
   timeout,
+  timeoutDefaulted = false,
   signal,
   onUpdate,
   execDetails,
@@ -359,11 +494,13 @@ export async function runExecCommandDirect({
       ok: exitCode === 0,
       exitCode,
       transportError: false,
-      errorCode: exitCode === 0
-        ? undefined
-        : execDetails?.classification?.kind === "probe"
+      ...(exitCode !== 0 ? {
+        // 命令跑完但失败：正常输出交模型判断；依赖探测失败才升级为错误。
+        isError: execDetails?.classification?.kind === "probe",
+        errorCode: execDetails?.classification?.kind === "probe"
           ? "EXEC_COMMAND_DEPENDENCY_MISSING"
           : "EXEC_COMMAND_EXIT_NONZERO",
+      } : {}),
     });
   } catch (err) {
     collector.close();
@@ -372,19 +509,23 @@ export async function runExecCommandDirect({
         ...execDetails,
         ok: false,
         transportError: false,
+        isError: true,
         errorCode: "EXEC_COMMAND_BLOCKED",
       });
     }
 
     const decoded = collector.snapshot();
     let output = decoded.text;
+    let isTimeout = false;
+    let isAbort = false;
     if (err?.message === "aborted") {
+      isAbort = true;
       if (output) output += "\n\n";
       output += "Command aborted";
     } else if (typeof err?.message === "string" && err.message.startsWith("timeout:")) {
-      const timeoutSecs = err.message.split(":")[1];
+      isTimeout = true;
       if (output) output += "\n\n";
-      output += `Command timed out after ${timeoutSecs} seconds`;
+      output += formatTimeoutNotice(err.message.split(":")[1], { defaulted: timeoutDefaulted === true });
     } else {
       if (output) output += "\n\n";
       output += err?.message || String(err);
@@ -405,9 +546,14 @@ export async function runExecCommandDirect({
       ok: false,
       exitCode,
       transportError: false,
-      errorCode: execDetails?.classification?.kind === "probe"
-        ? "EXEC_COMMAND_DEPENDENCY_MISSING"
-        : "EXEC_COMMAND_EXIT_NONZERO",
+      isError: isTimeout ? false : isAbort ? true : exitCode !== null
+        ? execDetails?.classification?.kind === "probe"
+        : true,
+      errorCode: isTimeout
+        ? "EXEC_COMMAND_TIMEOUT"
+        : execDetails?.classification?.kind === "probe"
+          ? "EXEC_COMMAND_DEPENDENCY_MISSING"
+          : "EXEC_COMMAND_EXIT_NONZERO",
     });
   }
 }

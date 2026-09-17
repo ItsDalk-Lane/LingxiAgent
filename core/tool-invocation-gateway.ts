@@ -131,6 +131,20 @@ function availabilityDecision(
   return typeof value === "boolean" ? { eligible: value } : value;
 }
 
+/**
+ * Only a real AbortSignal may travel as an execution signal. Some call paths
+ * hand a runtime-context object in the signal position (the SDK supports both
+ * layouts), and a target reading `signal.addEventListener` on that would
+ * crash mid-execution instead of simply running unabortable.
+ */
+function abortSignalOf(value: unknown): AbortSignal | undefined {
+  return value && typeof value === "object"
+    && typeof (value as AbortSignal).aborted === "boolean"
+    && typeof (value as AbortSignal).addEventListener === "function"
+    ? value as AbortSignal
+    : undefined;
+}
+
 function abortError(
   request: ToolInvocationGatewayRequest,
   target: RegisteredToolTarget,
@@ -372,6 +386,7 @@ export class ToolInvocationGateway {
         request,
       );
     }
+    const requestSignal = abortSignalOf(request.signal);
     const target = this.registry.getByTargetId(request.targetId);
     if (target && target.getCurrentGeneration() !== target.lifecycleGeneration) {
       throw gatewayError(
@@ -447,19 +462,19 @@ export class ToolInvocationGateway {
         { reason: currentAvailability.reason ?? null },
       );
     }
-    if (request.signal?.aborted) throw abortError(request, target);
+    if (requestSignal?.aborted) throw abortError(request, target);
 
     let rawResult: unknown;
     try {
       rawResult = await target.executeCanonical(
         request.toolCallId,
         restoreHostExecutionProof(revalidatedArguments, hostExecution.stageFilesProof),
-        request.signal,
+        requestSignal,
         request.onUpdate,
         executionContext(request.ctx, request),
       );
     } catch (cause) {
-      if (request.signal?.aborted || (cause as { name?: unknown })?.name === "AbortError") {
+      if (requestSignal?.aborted || (cause as { name?: unknown })?.name === "AbortError") {
         throw abortError(request, target, cause);
       }
       if (cause instanceof ToolInvocationError) throw cause;
@@ -472,7 +487,7 @@ export class ToolInvocationGateway {
         cause,
       );
     }
-    if (request.signal?.aborted) throw abortError(request, target);
+    if (requestSignal?.aborted) throw abortError(request, target);
     try {
       return target.normalizeResult(rawResult);
     } catch (cause) {

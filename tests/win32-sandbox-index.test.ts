@@ -17,8 +17,27 @@ vi.mock("../lib/sandbox/win32-exec.js", () => ({
 }));
 
 vi.mock("../lib/pi-sdk/index.js", () => {
+    // 阶段二新工具（security_scan 等）的参数表用 StringEnum；mock 需提供与
+    // 真实导出等价的极简实现（数组→enum 字面量联合的 JSON schema）。
+    const Type = {
+      Object: (props, opts = {}) => ({ ...(opts || {}), type: "object", properties: props }),
+      String: (opts = {}) => ({ type: "string", ...(opts || {}) }),
+      Number: (opts = {}) => ({ type: "number", ...(opts || {}) }),
+      Boolean: (opts = {}) => ({ type: "boolean", ...(opts || {}) }),
+      Array: (items, opts = {}) => ({ type: "array", items, ...(opts || {}) }),
+      Union: (variants, opts = {}) => ({ ...(opts || {}), anyOf: variants }),
+      Literal: (value) => ({ const: value }),
+      Optional: (schema) => schema,
+    };
+    const StringEnum = (values: any[], opts: any = {}) => ({
+      ...(opts || {}),
+      type: "string",
+      enum: [...values],
+    });
   const makeTool = (name) => ({ name, execute: vi.fn(async () => ({ content: [] })) });
   return {
+    StringEnum,
+    Type,
     createReadTool: vi.fn(() => makeTool("read")),
     createWriteTool: vi.fn(() => makeTool("write")),
     createEditTool: vi.fn(() => makeTool("edit")),
@@ -33,7 +52,6 @@ vi.mock("../lib/pi-sdk/index.js", () => {
     createGrepTool: vi.fn(() => makeTool("grep")),
     createFindTool: vi.fn(() => makeTool("find")),
     createLsTool: vi.fn(() => makeTool("ls")),
-    Type,
   };
 });
 
@@ -86,6 +104,10 @@ describe("createSandboxedTools on Windows", () => {
       "write_stdin",
       "grep",
       "find",
+      "ast_grep",
+      "ast_edit",
+      "security_scan",
+      "lsp",
       "ls",
       "materialize",
     ]);

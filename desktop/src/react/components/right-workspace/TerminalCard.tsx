@@ -6,10 +6,19 @@ import { requestTerminalSnapshot, requestTerminalTail } from '../../services/ter
 import { terminalOutputStream } from '../../services/terminal-output-stream';
 import { stopTerminalProcess } from '../../services/background-process-control';
 import { navigateToChatCard } from '../../services/chat-card-navigation';
+import { Collapse } from '../../ui';
 import { useStore } from '../../stores';
 import { selectTerminals } from '../../stores/terminal-slice';
 import { formatElapsed } from '../../utils/format-duration';
 import styles from './TerminalCard.module.css';
+
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg className={styles.chevron} data-open={open} width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  );
+}
 
 function displayName(terminal: TerminalPublicEntry): string {
   return terminal.label.trim() || terminal.command.trim() || terminal.terminalId;
@@ -192,6 +201,8 @@ function visibleTerminals(terminals: TerminalPublicEntry[]): TerminalPublicEntry
     .sort((a, b) => b.createdAt - a.createdAt);
 }export function TerminalCard() {
   const [now, setNow] = useState(() => Date.now());
+  // 默认折叠（用户裁决）：运行信息容器内只露标题行，点击展开
+  const [collapsed, setCollapsed] = useState(true);
   const sessionId = useStore((state) => state.currentSessionId);
   const sessionPath = useStore((state) => state.currentSessionPath);
   const terminals = useStore(selectTerminals(sessionPath));
@@ -212,16 +223,24 @@ function visibleTerminals(terminals: TerminalPublicEntry[]): TerminalPublicEntry
   if (!visible.length) return null;
 
   return (
-    <section className={`universal-card ${styles.card}`} aria-label={t('rightWorkspace.terminal.title')}>
-      <div className={styles.header}>
+    <section className={`universal-card ${styles.card}`} aria-label={t('rightWorkspace.terminal.title')} data-collapsed={collapsed || undefined}>
+      <button
+        type="button"
+        className={styles.header}
+        onClick={() => setCollapsed(v => !v)}
+        aria-expanded={!collapsed}
+      >
         <span className={styles.title}>{t('rightWorkspace.terminal.title')}</span>
         <span className={styles.count}>{t('rightWorkspace.terminal.count', { n: visible.length })}</span>
-      </div>
-      <div className={styles.list}>
-        {visible.map((terminal) => (
-          <TerminalRow key={terminal.terminalId} terminal={terminal} now={now} />
-        ))}
-      </div>
+        <Chevron open={!collapsed} />
+      </button>
+      <Collapse open={!collapsed}>
+        <div className={styles.list}>
+          {visible.map((terminal) => (
+            <TerminalRow key={terminal.terminalId} terminal={terminal} now={now} />
+          ))}
+        </div>
+      </Collapse>
     </section>
   );
 }

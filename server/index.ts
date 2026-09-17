@@ -54,6 +54,11 @@ import type { CompositionRoot, CompositionContext } from "./composition/contract
 import { registerTaskRegistryBusHandlers } from "./task-bus-handlers.ts";
 import { registerDeferredResultBusHandlers } from "./deferred-result-bus-handlers.ts";
 import { registerLoopBusHandlers } from "./loop-bus-handlers.ts";
+import { registerPlanGateHandler } from "./plan-gate.ts";
+import { registerAutolearnHandler } from "./autolearn-handler.ts";
+import { createAutolearnService } from "../lib/autolearn/autolearn-service.ts";
+import { registerGoalHandler } from "./goal-handler.ts";
+import { createGoalEngine } from "../lib/goal/goal-engine.ts";
 import { resolveLingxiHome } from "../shared/hana-runtime-paths.ts";
 import { DATA_EPOCH } from "../shared/contract-versions.cjs";
 import { readDataEpochStamp } from "../shared/data-epoch.cjs";
@@ -923,6 +928,72 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     },
   });
   registerLoopBusHandlers(hub.eventBus, () => engine.loopController);
+  // 计划模式收工硬闸：与循环控制器共用同一条 turn 事件缝，互不知情
+  registerPlanGateHandler(hub.eventBus, {
+    getPermissionMode: (sp: string) => engine.getSessionPermissionMode?.(sp),
+    deliver: (sp: string, message: any) => engine.deliverCustomMessage(sp, message, { triggerTurn: true }),
+    log,
+  });
+  // 踩坑自动沉淀：同一事件缝上的第三个观察者。提炼（summarize 槽）→ 审查（guard 槽）
+  // → 建议卡；用户确认后才经 learn_lesson 落盘核心写技能，确认前不落任何文件。
+  const autolearnService = createAutolearnService({
+    isEnabled: () => engine.getAutolearnPreferences?.().enabled !== false,
+    resolveAuxModel: (slot: string, options: any) => engine.resolveAuxiliaryModelFresh(slot, options || {}),
+    getUserSkillsDir: () => engine.userSkillsDir || null,
+    getAgentDirForSession: (sp: string) => {
+      try {
+        const agentId = engine.resolveSessionOwnership(sp)?.agentId;
+        const agent = agentId ? engine.getAgent?.(agentId) : null;
+        return agent?.agentDir || null;
+      } catch {
+        return null;
+      }
+    },
+    confirmStore,
+    emitEvent: (event: any, sp: string) => { if (sp) hub.eventBus.emit(event, sp); },
+    notifyInstalled: (skillName: string, sp: string) => {
+      try {
+        const agentId = engine.resolveSessionOwnership(sp)?.agentId;
+        const agent = agentId ? engine.getAgent?.(agentId) : null;
+        void agent?.notifySkillInstalled?.(skillName);
+      } catch (err) {
+        log.warn?.(`[autolearn] notifyInstalled failed: ${(err as any)?.message || err}`);
+      }
+    },
+    log,
+  });
+  registerAutolearnHandler(hub.eventBus, {
+    observeTurn: (summary: any) => autolearnService.observeTurn(summary),
+    getPermissionMode: (sp: string) => engine.getSessionPermissionMode?.(sp),
+    log,
+  });
+  // goal 预算引擎（阶段二·10）：token_usage 记账 + 超支一次提醒 + 中止自动暂停。
+  // 单实例挂在 engine 上，agent 工具与总线 handler 共用（侧车全量原子写，双实例会丢增量）。
+  (engine as any).goalEngine = createGoalEngine({
+    notifyOverBudget: (sp: string, goal: any, kind: "tokens" | "time") => {
+      const label = kind === "tokens"
+        ? `token budget ${goal.tokenBudget} exceeded (used ${goal.tokensUsed})`
+        : "time budget exceeded";
+      void engine.deliverCustomMessage(sp, {
+        customType: "goal-over-budget",
+        content: `<hana-goal-over-budget goal="${goal.name}">${label}. Wrap up current work and hand the decision back to the user: finish now, or ask whether to continue despite the overage. Check the goal tool status for exact numbers.</hana-goal-over-budget>`,
+        display: false,
+        details: { schemaVersion: 1, kind: "goal_over_budget", goalName: goal.name, budgetKind: kind },
+      }, { triggerTurn: false }).catch(() => { /* 注入失败不吞账本 */ });
+      try {
+        engine._emitEvent?.({
+          type: "notification",
+          title: "预算提醒",
+          body: `目标「${goal.name}」已超${kind === "tokens" ? " token 预算" : "时间预算"}，助手会收尾并交还决定。`,
+        }, sp);
+      } catch { /* 同上 */ }
+    },
+  });
+  registerGoalHandler(hub.eventBus, {
+    goalEngine: (engine as any).goalEngine,
+    isEnabled: () => engine.getGoalPreferences?.().enabled !== false,
+    log,
+  });
   engine.loopController?.recoverAtBoot();
 
   // `/mobile`、`/desktop` 网页客户端入口的供货模式判定（LINGXI_RENDERER_DIST /
@@ -1256,6 +1327,29 @@ export async function startServer(root: CompositionRoot = {}): Promise<void> {
     log.error(`启动失败: ${err.message}`);
     process.exit(1);
   }
+
+
+    // 环境依赖启动自检：检测到「当前项目需要但没装」的依赖时广播一次事件，
+    // 桌面端据此弹 toast 并给「环境依赖」设置页上角标。检测失败静默降级——
+    // 环境探测永不该阻塞启动。
+    setImmediate(() => {
+      void (async () => {
+        try {
+          const { buildEnvDepsReport } = await import("./routes/env-deps.ts");
+          const report = await buildEnvDepsReport(engine, null, false);
+          if (report.summary.projectMissing.length > 0) {
+            engine.emitEvent?.({
+              type: "env_deps_status",
+              missing: report.summary.projectMissing,
+              missingCount: report.summary.projectMissing.length,
+              checkedAt: report.checkedAt,
+            }, null);
+          }
+        } catch (e: any) {
+          dlog.log("server", `env-deps startup check skipped: ${e?.message || e}`);
+        }
+      })();
+    });
 
   // 优雅退出（防止并发关闭，带超时保护）
   let _shutting = false;

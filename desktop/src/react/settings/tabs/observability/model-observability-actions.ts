@@ -204,6 +204,51 @@ export function loadObservabilityHealth(opts: SignalOptions = {}): Promise<Model
   return observabilityJson(`${API_BASE}/health`, opts);
 }
 
+/* ── 「设置」子页：存储概况 / 手动删除 ───────────────────────────────── */
+
+export type ObservabilityStorageDay = {
+  date: string;
+  calls: number;
+  mediaBytes: number;
+  payloadChars: number;
+};
+
+export type ObservabilityStorageOverview = {
+  days: number;
+  oldestAt: string | null;
+  newestAt: string | null;
+  calls: number;
+  sizes: { databaseBytes: number; mediaBytes: number; payloadEstimateChars: number };
+  perDay: ObservabilityStorageDay[];
+};
+
+export type ObservabilityDeleteWindow = { from: string; to: string };
+
+export type ObservabilityDeleteInput = {
+  categories: ('trace' | 'payload' | 'media')[];
+  /** 双闭日期窗口；空数组 = 全部数据。 */
+  windows: ObservabilityDeleteWindow[];
+};
+
+export type ObservabilityDeleteStats = {
+  deletedTraces: number;
+  deletedPayloadRecords: number;
+  deletedBlobFiles: number;
+  compacted: boolean;
+  ranAt: string;
+};
+
+export function loadObservabilityStorage(opts: SignalOptions = {}): Promise<ObservabilityStorageOverview> {
+  return observabilityJson(`${API_BASE}/storage`, opts);
+}
+
+export function deleteObservabilityData(
+  input: ObservabilityDeleteInput,
+  opts: SignalOptions = {},
+): Promise<ObservabilityDeleteStats> {
+  return observabilityJson(`${API_BASE}/maintenance/delete`, { ...opts, method: 'POST', body: input });
+}
+
 export function loadObservabilitySettings(opts: SignalOptions = {}): Promise<ModelObservabilitySettingsResponse> {
   return observabilityJson(`${API_BASE}/settings`, opts);
 }

@@ -17,6 +17,19 @@ import { createPresentedLsTool, createPresentedReadTool } from "./file-tool-pres
 import { wrapReadImageWithVisionBridge } from "./read-image-vision.ts";
 import { wrapReadOfficeMedia } from "./read-office-media.ts";
 import { createManagedConfigWriteGuard } from "./managed-config-guard.ts";
+import { createFileFreshnessTracker } from "./file-freshness.ts";
+import {
+  wrapEditToolWithErrorHints,
+  wrapFileToolWithPathSuggestions,
+  wrapMutationToolWithFreshness,
+  wrapReadToolWithFreshness,
+} from "./file-tool-guards.ts";
+import { wrapGrepToolWithModes } from "./grep-pager.ts";
+import { createAstGrepTool } from "./ast-grep-tool.ts";
+import { createAstEditTool } from "./ast-edit-tool.ts";
+import { createSecurityScanTool } from "../tools/security-scan-tool.ts";
+import { createRunCodeTool } from "../tools/run-code-tool.ts";
+import { createLspTool } from "../tools/lsp-tool.ts";
 import { t } from "../i18n.ts";
 import fs from "fs";
 import path, { extname } from "path";
@@ -87,6 +100,8 @@ export function createSandboxedTools(cwd, customTools, {
   getVisionBridge,
   isVisionAuxiliaryEnabled,
   getTerminalSessionManager,
+  getDeferredStore,
+  getTaskRegistry,
   getAgentId,
   resourceIO: providedResourceIO,
   emitEvent,
@@ -143,6 +158,8 @@ export function createSandboxedTools(cwd, customTools, {
   const permissionBoundary = {
     checkStagePath: (absolutePath) => guard.check(absolutePath, "stage"),
   };
+  // 会话级文件新鲜度登记表：read 登记 → edit/write 陈旧拦截 + 紧邻重复读去重。
+  const freshness = createFileFreshnessTracker();
 
   // 无 OS 沙盒时的 bash 工具（沙盒关闭时回退用）
   const normalBashTool = isWin32
@@ -180,6 +197,40 @@ export function createSandboxedTools(cwd, customTools, {
   const searchToolPaths = {
     managedBinDir: resolveLingxiPiSdkManagedBinDir(lingxiHome),
   };
+  // ast_grep / ast_edit（阶段二·7）：与 grep/find 同一托管二进制池与守卫链——
+  // ast_edit 复用 edit 的新鲜度登记表与 fileChange 日记/快照通道。
+  const astBinaryDeps = {
+    ...searchToolPaths,
+    offline: Boolean(process.env.PI_OFFLINE),
+    log: { warn: (msg: string) => console.warn(msg) },
+  };
+  const lspTool = createLspTool({
+    cwd,
+    getSessionPath: () => getSessionPath?.() || null,
+    readFile: async (p) => String(await resourceOps.read.readFile(p)),
+    writeFile: async (p, content) => { await resourceOps.write.writeFile(p, content); },
+  });
+  const runCodeTool = getTerminalSessionManager?.()
+    ? createRunCodeTool({
+      manager: getTerminalSessionManager(),
+      getSessionPath: () => getSessionPath?.() || null,
+      getAgentId: () => getAgentId?.() || null,
+      getCwd: () => cwd,
+    })
+    : null;
+  const securityScanTool = createSecurityScanTool({
+    cwd,
+    getAuthorizedFolders: () => resolveAuthorizedFolders(),
+    getLingxiHome: () => lingxiHome,
+  });
+  const astGrepTool = createAstGrepTool(cwd, astBinaryDeps);
+  const astEditTool = createAstEditTool(cwd, {
+    ...astBinaryDeps,
+    tracker: freshness,
+    getSessionPath,
+    recordFileOperation,
+    withFileChangeCapture: (kind, execute) => resourceOps.withFileChangeCapture(kind, execute),
+  });
   const enhancedReadFile = createEnhancedReadFile();
   const readOps = {
     ...resourceOps.read,
@@ -191,34 +242,52 @@ export function createSandboxedTools(cwd, customTools, {
       return enhancedReadFile(p);
     },
   };
-  const editTool = wrapFileTouchTool(createEditTool(cwd, { operations: resourceOps.edit }), cwd, {
-    origin: "agent_edit",
-    operationForPath: () => "modified",
-    getSessionPath,
-    recordFileOperation,
-    captureExecution: (execute) => resourceOps.withFileChangeCapture("edit", execute),
-  });
-  const writeToolWithResourceIO = wrapFileTouchTool(createWriteTool(cwd, { operations: resourceOps.write }), cwd, {
-    origin: "agent_write",
-    operationForPath: (filePath) => fs.existsSync(filePath) ? "modified" : "created",
-    getSessionPath,
-    recordFileOperation,
-    captureExecution: (execute) => resourceOps.withFileChangeCapture("write", execute),
-  });
-  const readTool = wrapReadImageWithVisionBridge(wrapReadOfficeMedia(createPresentedReadTool(cwd, readOps), cwd, {
-    lingxiHome,
-    getSessionPath,
-    getSessionIdForPath,
-    recordFileOperation,
-    getVisionBridge,
-    isVisionAuxiliaryEnabled,
-  }), cwd, {
-    getSessionPath,
-    getSessionIdForPath,
-    recordFileOperation,
-    getVisionBridge,
-    isVisionAuxiliaryEnabled,
-  });
+  const editTool = wrapFileToolWithPathSuggestions(
+    wrapMutationToolWithFreshness(
+      wrapEditToolWithErrorHints(
+        wrapFileTouchTool(createEditTool(cwd, { operations: resourceOps.edit }), cwd, {
+          origin: "agent_edit",
+          operationForPath: () => "modified",
+          getSessionPath,
+          recordFileOperation,
+          captureExecution: (execute) => resourceOps.withFileChangeCapture("edit", execute),
+        }),
+        { cwd },
+      ),
+      { tracker: freshness, getSessionPath, cwd },
+    ),
+    { cwd },
+  );
+  const writeToolWithResourceIO = wrapMutationToolWithFreshness(
+    wrapFileTouchTool(createWriteTool(cwd, { operations: resourceOps.write }), cwd, {
+      origin: "agent_write",
+      operationForPath: (filePath) => fs.existsSync(filePath) ? "modified" : "created",
+      getSessionPath,
+      recordFileOperation,
+      captureExecution: (execute) => resourceOps.withFileChangeCapture("write", execute),
+    }),
+    { tracker: freshness, getSessionPath, cwd },
+  );
+  const readTool = wrapFileToolWithPathSuggestions(
+    wrapReadToolWithFreshness(
+      wrapReadImageWithVisionBridge(wrapReadOfficeMedia(createPresentedReadTool(cwd, readOps), cwd, {
+        lingxiHome,
+        getSessionPath,
+        getSessionIdForPath,
+        recordFileOperation,
+        getVisionBridge,
+        isVisionAuxiliaryEnabled,
+      }), cwd, {
+        getSessionPath,
+        getSessionIdForPath,
+        recordFileOperation,
+        getVisionBridge,
+        isVisionAuxiliaryEnabled,
+      }),
+      { tracker: freshness, getSessionPath, cwd },
+    ),
+    { cwd },
+  );
   const materializeTool = createMaterializeTool({
     resourceIO,
     getSessionPath,
@@ -249,7 +318,8 @@ export function createSandboxedTools(cwd, customTools, {
     isOneShotSandboxEnforced,
     platform: process.platform,
     detectPowerShellFlavor: isWin32 ? detectWin32PowerShellFlavor : undefined,
-  });
+      getDeferredStore,
+    getTaskRegistry,});
 
   // ── Windows: PathGuard 包装 + restricted-token exec，关闭沙盒时走 direct fallback ──
   if (platform === "win32-restricted-token") {
@@ -298,8 +368,15 @@ export function createSandboxedTools(cwd, customTools, {
           wrappedEscalatedBashTool,
           wrappedEscalatedWin32Exec,
         ),
-        createGrepTool(cwd, { ...searchToolPaths, operations: resourceOps.grep }),
+        wrapGrepToolWithModes(createGrepTool(cwd, { ...searchToolPaths, operations: resourceOps.grep })),
         createFindTool(cwd, { ...searchToolPaths, operations: resourceOps.find }),
+        astGrepTool,
+        astEditTool,
+        securityScanTool,
+      ...(runCodeTool ? [runCodeTool] : []),
+      ...(lspTool ? [lspTool] : []),
+        ...(runCodeTool ? [runCodeTool] : []),
+        ...(lspTool ? [lspTool] : []),
         createPresentedLsTool(cwd, resourceOps.ls),
         materializeTool,
       ]),
@@ -348,8 +425,11 @@ export function createSandboxedTools(cwd, customTools, {
       writeToolWithResourceIO,
       editTool,
       ...createExecToolsForBash(wrappedDefaultBashTool, null, wrappedEscalatedBashTool),
-      createGrepTool(cwd, { ...searchToolPaths, operations: resourceOps.grep }),
+      wrapGrepToolWithModes(createGrepTool(cwd, { ...searchToolPaths, operations: resourceOps.grep })),
       createFindTool(cwd, { ...searchToolPaths, operations: resourceOps.find }),
+      astGrepTool,
+      astEditTool,
+      securityScanTool,
       createPresentedLsTool(cwd, resourceOps.ls),
       materializeTool,
     ]),

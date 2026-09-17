@@ -104,7 +104,6 @@
     "lineNumber": "{number} 行目",
     "lineRange": "{start}～{end} 行目",
     "paragraphNumber": "段落 {number}",
-    "useImportButton": "ナレッジページの「ソースを追加」からファイルを読み込んでください",
     "importUnavailable": "この環境ではローカルファイル選択を利用できません",
     "importSuccess": "{count} 件のソースを読み込みました",
     "importPartialFailure": "読み込み完了：{success}/{total} 件が成功しました",
@@ -346,20 +345,16 @@
       "restoreSelectedConfirm": "選択した {count} 件のアーカイブをチャットリストに復元しますか？",
       "restoreSelectedDone": "{count} 件を復元しました",
       "restoreSelectedPartial": "一部のみ復元：{restored}/{total}",
-      "restoreGroup": "グループを復元",
-      "restoreGroupConfirm": "「{name}」グループのアーカイブ {count} 件をチャットリストに復元しますか？",
       "deleteForever": "完全に削除",
       "deleteConfirm": "このアーカイブを完全に削除しますか？取り消せません。",
       "deleteFailed": "削除に失敗しました",
       "selectAll": "すべて選択",
+      "exitSelection": "選択をキャンセル",
       "deleteSelected": "選択項目を削除（{count}）",
       "deleteSelectedConfirm": "選択した {count} 件のアーカイブ（合計 {size}）を完全に削除します。取り消せません。続けますか？",
       "deleteSelectedDone": "{count} 件を削除しました",
       "deleteSelectedPartial": "一部のみ削除：{deleted}/{total}",
       "daysAgo": "{days} 日前にアーカイブ",
-      "deleteGroup": "グループを削除",
-      "deleteGroupConfirm": "「{name}」グループのアーカイブ {count} 件（{size}）を完全に削除しますか？この操作は元に戻せません。",
-      "deleteGroupDone": "アーカイブを {count} 件完全に削除しました",
       "group": {
         "ungrouped": "未分類",
         "workspaceRemoved": "ワークスペースは削除済み",
@@ -655,6 +650,7 @@
     "contextDetailUsed": "使用済み",
     "contextDetailWindowTotal": "コンテキストウィンドウ",
     "contextDetailRemaining": "残り容量",
+    "contextDetailCacheHit": "キャッシュヒット",
     "contextCategory": {
       "system": "システムプロンプト",
       "conversation": "会話履歴",
@@ -1057,6 +1053,16 @@
       "done": "📥 {name} はスキルを導入した",
       "failed": "📥 スキルは導入されなかった"
     },
+    "learn_lesson": {
+      "running": "📚 {name} が教訓を蓄積中",
+      "done": "📚 {name} が教訓をスキル化した",
+      "failed": "📚 教訓を保存できなかった"
+    },
+    "ask_user": {
+      "running": "❓ あなたに質問しています",
+      "done": "❓ 回答がありました",
+      "failed": "❓ 質問を送れませんでした"
+    },
     "update_settings": {
       "running": "⚙️ {name} は設定を変更中",
       "done": "⚙️ {name} は設定を変えた",
@@ -1066,6 +1072,36 @@
       "running": "🤖 {name} は自動化の段取り中",
       "done": "🤖 {name} は自動化の段取りを済ませた",
       "failed": "🤖 自動化の段取りができなかった"
+    },
+    "ast_edit": {
+      "running": "🌳 構造を書き換え中",
+      "done": "🌳 構造書き換えが完了",
+      "failed": "🌳 構造書き換えに失敗"
+    },
+    "ast_grep": {
+      "running": "🌳 構造で検索中",
+      "done": "🌳 構造検索が完了",
+      "failed": "🌳 構造検索に失敗"
+    },
+    "checkpoint": {
+      "running": "📌 チェックポイント作成中",
+      "done": "📌 チェックポイント作成済み",
+      "failed": "📌 チェックポイント失敗"
+    },
+    "context_notes": {
+      "running": "📝 ノート更新中",
+      "done": "📝 ノート更新済み",
+      "failed": "📝 ノート失敗"
+    },
+    "goal": {
+      "running": "🎯 予算ゴール処理中",
+      "done": "🎯 予算ゴール更新",
+      "failed": "🎯 予算ゴール失敗"
+    },
+    "lsp": {
+      "running": "🔍 言語サーバー照会中",
+      "done": "🔍 言語サーバー完了",
+      "failed": "🔍 言語サーバー失敗"
     },
     "computer": {
       "running": "🖥️ {name} はパソコンを操作中",
@@ -1369,6 +1405,21 @@
       "running": "✻ 回答を生成中",
       "done": "✻ 回答を生成しました",
       "failed": "✻ 回答に失敗"
+    },
+    "rewind": {
+      "running": "⏪ 巻き戻し中",
+      "done": "⏪ チェックポイントへ戻しました",
+      "failed": "⏪ 巻き戻し失敗"
+    },
+    "run_code": {
+      "running": "🧮 カーネルで実行中",
+      "done": "🧮 カーネル実行完了",
+      "failed": "🧮 カーネル実行失敗"
+    },
+    "security_scan": {
+      "running": "🛡️ セキュリティスキャン中",
+      "done": "🛡️ スキャン完了",
+      "failed": "🛡️ スキャン失敗"
     }
   },
   "file_output": {
@@ -1447,7 +1498,8 @@
       "access": "アクセスとデバイス",
       "about": "概要",
       "security": "セキュリティ",
-      "experiments": "実験機能"
+      "experiments": "実験機能",
+      "envdeps": "環境依存"
     },
     "browser": {
       "cookiesTitle": "Cookies",
@@ -1683,6 +1735,30 @@
             "label": "自動化",
             "summary": "通知とプラグインのスケジュール動作を Agent が作成できるようにします"
           },
+          "ast_edit": {
+            "label": "構造書き換え",
+            "summary": "構文構造で一括書き換え。適用前に差分をプレビュー"
+          },
+          "ast_grep": {
+            "label": "構造検索",
+            "summary": "構文構造でコードを検索（例：X という名前の全関数）"
+          },
+          "checkpoint": {
+            "label": "会話チェックポイント",
+            "summary": "現在位置に名前付きチェックポイントを置く（rewind 用）"
+          },
+          "context_notes": {
+            "label": "コンテキストノート",
+            "summary": "圧縮を越えて残る自分用メモ（制約・決定・座標）"
+          },
+          "goal": {
+            "label": "予算ゴール",
+            "summary": "長期タスクにトークン/時間予算を付け、超過時に一度だけ通知して決定を返す"
+          },
+          "lsp": {
+            "label": "言語サーバー",
+            "summary": "定義ジャンプ・参照・ホバー・診断・安全リネーム（サーバー要）"
+          },
           "beautify": {
             "label": "Lingxi Beautify",
             "summary": "Agent にドキュメントカバーと美的な強化を生成させます"
@@ -1703,6 +1779,10 @@
             "label": "スキルをインストール",
             "summary": "GitHub またはスキルライブラリから新しいスキルをインストール"
           },
+          "learn_lesson": {
+            "label": "教訓を蓄積",
+            "summary": "つまずきの教訓を再利用可能なスキルとして蓄積します"
+          },
           "update_settings": {
             "label": "設定を変更",
             "summary": "Agent にアプリ設定の変更を許可"
@@ -1714,6 +1794,18 @@
           "office": {
             "label": "Office",
             "summary": "Agent にドキュメントの読み取りと HTML から PDF への変換を許可"
+          },
+          "rewind": {
+            "label": "巻き戻し",
+            "summary": "会話を選んだチェックポイントまで戻し、以降を破棄。その時点のファイルも復元できます"
+          },
+          "run_code": {
+            "label": "コード実行",
+            "summary": "Python/Node などを永続セッションで実行。変数は呼び出し間で保持されます"
+          },
+          "security_scan": {
+            "label": "セキュリティスキャン",
+            "summary": "変更や指定パスを走査し、鍵・機密情報の漏えいを点検します"
           },
           "session": {
             "label": "セッション連携",
@@ -2487,7 +2579,11 @@
       "dissolveBundleTitle": "Bundle を解体",
       "dissolveBundleAriaLabel": "{name} を解体",
       "removeFromBundleTitle": "Bundle から外して単体スキルにする",
-      "removeFromBundleAriaLabel": "{name} を Bundle から外す"
+      "removeFromBundleAriaLabel": "{name} を Bundle から外す",
+      "autolearn": "教训の自動学習",
+      "autolearnDesc": "ツール操作が多いターンの後に再利用可能な教训を抽出し、提案カードで確認されてからスキルとして保存します。",
+      "goalToggle": "予算ゴール",
+      "goalToggleDesc": "長期タスクにトークン/時間予算を付け、超過時に一度だけ通知"
     },
     "mcp": {
       "masterTitle": "Master Switch",
@@ -2588,10 +2684,10 @@
       "deferScopeNote": "以下の設定はこのコネクタだけでなく、すべてのコネクタに適用されます。",
       "deferEnabled": "遅延読み込みを許可",
       "deferEnabledHint": "ツールが多いときは、まず目録だけをモデルに渡し、必要になったものだけ詳細を取り出します。",
-      "deferBuiltin": "内蔵ツールも遅延読み込み",
-      "deferBuiltinHint": "オンにすると内蔵ツールもカタログ経由で必要時に読み込まれます。直接読み込みの方がモデルは積極的に動くため、コンテキストが逼迫したときのみ推奨。",
+      "deferBuiltin": "内蔵・プラグインツールのオンデマンド読み込み",
+      "deferBuiltinHint": "既定でオン。読み取り・書き込み・編集・コマンド実行の4つの基本ツール以外は、すべて目録に入り必要時にだけ読み込まれます。オフにするとすべて直接読み込みになります。",
       "deferThreshold": "しきい値",
-      "deferThresholdHint": "有効なツールがこの数を超えたときだけ目録を使い、下回る場合はすべて直接読み込みます。",
+      "deferThresholdHint": "MCP コネクタの有効なツールがこの数を超えたときだけ目録に入り、下回る場合はすべて直接読み込みます。内蔵・プラグインツールはこの値の影響を受けません。",
       "agentConnectorEnabled": "このアシスタントで有効",
       "oauthWaiting": "ブラウザでの認可を待っています",
       "oauthWaitingHint": "認可ページをブラウザで開きました。完了すると自動で反映されます。いつでも中止できます。",
@@ -2900,6 +2996,10 @@
       },
       "metrics": {
         "calls": "呼び出し数",
+        "activeDays": "アクティブ日数",
+        "longestStreak": "最長連続 {count} 日",
+        "topModel": "最も使用したモデル",
+        "peakDay": "ピーク日",
         "tracesHint": "{count} 件のトレース",
         "totalTokens": "合計トークン",
         "inputTokens": "入力トークン",
@@ -2926,6 +3026,99 @@
         "dateSummary": "合計 {total} 回、ピークは {peakDate}（{peakCount} 回）",
         "filterByValue": "この値でフィルター：{value}",
         "unknownValue": "（不明）"
+      },
+      "charts": {
+        "fixedBadgeDate": "固定 · 日付",
+        "fixedBadgeModelDate": "固定 · モデル × 日付",
+        "fixedBadgeProviderDate": "固定 · プロバイダー × 日付",
+        "fixedBadgeCategoryDate": "固定 · カテゴリ × 日付",
+        "empty": "データなし",
+        "loading": "チャートデータを読み込み中…",
+        "error": "チャートの読み込みに失敗しました",
+        "callsUnit": "{count} 回",
+        "tokensUnit": "{count} Token",
+        "dailyTotal": "当日合計",
+        "metric": {
+          "calls": "呼び出し回数",
+          "tokens": "Token 使用量"
+        },
+        "heat": {
+          "title": "呼び出しヒートカレンダー",
+          "daily": "毎日",
+          "weekly": "毎週",
+          "cumulative": "累計",
+          "tooltipCalls": "呼び出し回数",
+          "tooltipTokens": "Token 合計",
+          "weekRange": "{since} – {until} の週",
+          "cumulativeUntil": "{date} までの累計",
+          "hint": {
+            "daily": "1 マス = 1 日。色が濃いほど呼び出しが集中。ホバーで当日の回数と Token 合計を表示。",
+            "weekly": "カレンダーを保ち、同じ週のマスは週合計で一括着色。ホバーで週合計を表示。",
+            "cumulative": "各マスはその日までの累計呼び出し数。ホバーで累計値を表示。"
+          }
+        },
+        "line": {
+          "title": "モデル別呼び出し推移",
+          "hint": "モデルごとに 1 本の折れ線。ホバーで当日の各モデルの量と合計を表示。"
+        },
+        "bar": {
+          "title": "プロバイダー別呼び出し分布",
+          "hint": "1 日 1 本の積み上げバー。ホバーで当日の各プロバイダーの量と合計を表示。"
+        },
+        "pie": {
+          "title": "カテゴリ構成",
+          "hint": "日付を選んで当日のカテゴリ構成を表示。スライスにホバーで内訳と当日合計を表示。",
+          "dateLabel": "表示日"
+        }
+      },
+      "storage": {
+        "retentionTitle": "保持日数",
+        "retentionHint": "トレース・Payload 本文・メディア Blob 共通の保持日数。期限を過ぎたデータは毎日自動削除されます。",
+        "retentionLabel": "直近",
+        "retentionUnit": "日分の記録（1 – 3650）",
+        "save": "保存",
+        "saved": "保存しました",
+        "overviewTitle": "ストレージ概況",
+        "overviewHint": "現在ディスクに保存されているデータ（削除で即時反映）。",
+        "savedDays": "保存済み",
+        "daysUnit": "日",
+        "startDate": "データ開始日",
+        "footprint": "使用容量",
+        "coveredCalls": "対象呼び出し",
+        "categoryTrace": "トレースとメタデータ",
+        "categoryPayload": "Payload 本文",
+        "categoryMedia": "メディア Blob",
+        "pathLabel": "保存場所",
+        "copyPath": "パスをコピー",
+        "copied": "コピーしました",
+                "clearFirstHint": "先に現在の選択をクリアしてください",
+        "clickToAdd": "クリックで追加",
+        "clickToRemove": "クリックで除去",
+        "modeDay": "日ごと",
+        "modeMonth": "月単位",
+        "modeRange": "範囲",
+        "selectedDays": "{count} 日を選択中",
+        "pickDate": "日付を選択",
+        "deleteTitle": "データ削除",
+        "deleteHint": "範囲とカテゴリを選んで削除。削除は元に戻せず、実行前に解放容量を表示します。",
+        "scopeLabel": "削除範囲",
+        "allScope": "すべてのデータ（保存済み {days} 日分）",
+        "dayScopeOption": "日付指定（複数日・月単位・範囲）",
+        "dayScope": "{date} 当日",
+        "categoryLabel": "削除カテゴリ（複数選択可）",
+        "deleteWillRemove": "{scope} の {categories} を削除します。",
+        "estimate": "解放見込み：{size}。",
+        "pickCategory": "先にカテゴリを選択してください。",
+        "deleteButton": "選択したデータを削除",
+        "confirmTitle": "削除の確認",
+        "irreversible": "この操作は元に戻せません。",
+        "cancel": "キャンセル",
+        "confirmDelete": "削除する",
+        "retentionUnifyHint": "注意：現在 3 種の保持日数が異なります。保存すると同一の値に統一されます。"
+      },
+      "subtab": {
+        "usage": "トークン使用量",
+        "settings": "設定"
       },
       "ledger": {
         "title": "呼び出し台帳",
@@ -4406,6 +4599,13 @@
     "installSkillSafetyEmpty": "安全レビューが空のレスポンスを返しました",
     "installSkillSafetyUnexpected": "安全レビューが予期しない形式を返しました: {reply}",
     "installSkillSafetyTimeout": "安全レビューがタイムアウトまたはネットワークエラー",
+    "learnLessonEmptyInput": "name・description・lesson はすべて必須です。name はスキルのディレクトリ名、description はこの教訓が使われる場面、lesson は教訓の本文です。",
+    "learnLessonPoolUnavailable": "スキルプールが利用できないため、教訓を保存できません。",
+    "learnLessonConflict": "スキル「{name}」は既に存在します。教訓の蓄積で同名スキルは上書きされません。別の名前を付けてください。",
+    "learnLessonSafetyFailed": "[セキュリティ警告] 教訓内容が安全審査を通過しなかったため保存されませんでした。\n理由：{reason}\n\n審査を通過しなかった理由をユーザーに伝えてください。ユーザーが問題ないと明示的に確認し続行を求めた場合のみ、risk_accepted=true と返された risk_confirmation_token を付けて learn_lesson を再呼び出ししてください。",
+    "learnLessonSuccess": "教訓をスキル「{name}」として蓄積し、現在の Agent で有効化し、経験インデックスに登録しました。",
+    "askUserInvalidQuestions": "質問の内容が不正です：{reason}",
+    "askUserUnavailable": "現在のセッションでは質問できません（確認チャネルが利用できません）。",
     "activeSessionOnly": "現在のアシスタントのアクティブセッションのみ昇格できます",
     "heartbeatTriggered": "ハートビートがトリガーされました",
     "dirNotAllowed": "ディレクトリが許可範囲外です",
@@ -4534,7 +4734,8 @@
       "dreamRevisionNotFound": "この Dream バージョンが見つかりません。すでに整理された可能性があります",
       "dreamRestoreFailed": "Dream バージョンを復元できませんでした。現在の記憶は変更されていません",
       "dreamRunFailed": "Dream 整理に失敗しました。元の記憶は変更されていません"
-    }
+    },
+    "rewindUnavailable": "現在巻き戻しは利用できません（確認サービスなし）。"
   },
   "main": {
     "tray": {
@@ -5001,6 +5202,26 @@
       "choose": "選択してください",
       "requiredMissing": "* の付いた必須項目を入力してください"
     },
+    "askUser": {
+      "title": "Hana からの質問",
+      "body": "{count} 件の質問——まとめて回答して送信",
+      "subject": "回答待ち",
+      "submit": "送信",
+      "dismiss": "回答しない",
+      "recommended": "おすすめ",
+      "multiHint": "複数選択可",
+      "requiredMissing": "* の質問に回答してください",
+      "unsupportedQuestion": "未対応の質問形式",
+      "unanswered": "（未回答）",
+      "autoMarker": "（タイムアウト自動選択）",
+      "answered": "ユーザーが回答しました：",
+      "answeredState": "回答済み",
+      "timedOut": "タイムアウト——推奨項目を自動選択しました：",
+      "timedOutState": "タイムアウト（推奨を適用）",
+      "dismissedState": "未回答",
+      "dismissed": "ユーザーは回答しませんでした。最善の判断で進めてください。",
+      "aborted": "セッションが中断され、質問はキャンセルされました。"
+    },
     "mcpTool": {
       "allowForSession": "このセッションでは今後聞かない",
       "allowAlways": "このツールを常に許可",
@@ -5090,6 +5311,8 @@
       "unpin_memory": "ピン解除",
       "recall_experience": "経験を探す",
       "record_experience": "経験を記録",
+      "learn_lesson": "教訓を記録",
+      "ask_user": "質問する",
       "tenet_propose": "提案",
       "knowledge_search": "資料検索",
       "knowledge_read": "資料を読む",
@@ -5122,6 +5345,12 @@
       "loop_control": "ループ制御",
       "current_status": "状態を報告",
       "automation": "自動化",
+      "ast_edit": "構造書き換え",
+      "ast_grep": "構造検索",
+      "checkpoint": "チェックポイント",
+      "context_notes": "ノート",
+      "goal": "予算ゴール",
+      "lsp": "言語サーバー",
       "subagent_reply": "サブエージェントへ伝達",
       "subagent_close": "サブエージェント終了",
       "create_artifact": "カード作成",
@@ -5138,7 +5367,10 @@
       "beautify_list-capabilities": "美化機能",
       "office_read-document": "文書を読む",
       "office_html-to-pdf": "PDF 変換",
-      "office_list-capabilities": "文書機能"
+      "office_list-capabilities": "文書機能",
+      "rewind": "巻き戻し",
+      "run_code": "コード実行",
+      "security_scan": "セキュリティスキャン"
     },
     "copy": "コピー",
     "copied": "コピー済み",
@@ -5215,5 +5447,76 @@
     "createFailed": "サイドセッションの作成に失敗しました",
     "retry": "再試行",
     "empty": "サイドセッションの準備ができました"
+  },
+  "envDeps": {
+    "title": "環境依存関係",
+    "refresh": "再検出",
+    "checking": "検出中…",
+    "loadFailed": "検出に失敗しました",
+    "lastChecked": "最終検出：{time}",
+    "sectionProjectMissing": "このプロジェクトに必要ですが未インストール",
+    "sectionProjectMissingHint": "不足している依存は対応する機能に影響します。インストール後に「再検出」を押してください。",
+    "sectionInstalled": "インストール済み",
+    "sectionMissing": "未インストール（現在のプロジェクトでは不要）",
+    "status": {
+      "installed": "インストール済み",
+      "managedInstalled": "内蔵",
+      "missing": "未インストール"
+    },
+    "neededByProject": "プロジェクトに必要",
+    "installHint": "インストール：{hint}",
+    "requiredByLabel": "用途：{features}",
+    "requiredBy": {
+      "workspace_snapshots": "ワークスペースのスナップショットとロールバック",
+      "file_history": "ファイル履歴",
+      "run_code": "コード実行",
+      "grep_tool": "コード検索",
+      "find_tool": "ファイル検索",
+      "ast_tools": "AST 構造化コードツール",
+      "security_scan": "セキュリティスキャン拡張",
+      "lsp": "言語サーバー（ジャンプ/診断）",
+      "media_video": "動画処理"
+    },
+    "startupMissing": "プロジェクトに必要な環境依存が不足しています：{names}",
+    "openSettings": "確認"
+  },
+  "autolearn": {
+    "cardTitle": "教训をスキル化",
+    "suggested": "自動学習の提案",
+    "approve": "習得する",
+    "dismiss": "無視",
+    "approvedState": "習得済み",
+    "rejectedState": "無視済み",
+    "expiredState": "期限切れ",
+    "decideFailed": "操作に失敗しました：{error}",
+    "installed": {
+      "title": "新しいスキルを習得",
+      "body": "教训はスキル「{name}」として保存され、現在のエージェントで有効になりました。"
+    },
+    "installFailed": {
+      "title": "保存に失敗",
+      "body": "スキル「{name}」を保存できませんでした。教训は書き込まれていません。"
+    }
+  },
+  "rewind": {
+    "confirm": {
+      "title": "チェックポイントへ戻しますか？",
+      "body": "会話をチェックポイント「{name}」まで戻し、それ以降を破棄します。",
+      "subject": "チェックポイント",
+      "accept": "戻す",
+      "reject": "やめておく",
+      "filesTitle": "あわせて {count} 個のファイルを復元：",
+      "noFileChanges": "スナップショットに復元すべき変更はありません。",
+      "snapshotUnavailable": "ファイルスナップショットは利用不可：会話のみ戻します。"
+    },
+    "result": {
+      "timeout": "確認がタイムアウトしたため、巻き戻しませんでした。",
+      "aborted": "確認が中断されたため、巻き戻しませんでした。",
+      "rejected": "戻さない選択をしました。何も変更していません。",
+      "done": "チェックポイント「{name}」へ戻しました（{count} 件破棄）。",
+      "filesOk": "ファイルをスナップショットから復元しました（{count} 件）。",
+      "filesDegraded": "ファイル復元は不完全：{reason}",
+      "failed": "巻き戻しに失敗"
+    }
   }
 }

@@ -43,9 +43,9 @@ export function DeferSettings({ deferEnabled, deferThreshold, builtinDeferEnable
         control={(
           <Toggle
             on={builtinDeferEnabled}
-            // The second tier only means something while the first is on: the
-            // assembly plan bails out entirely when deferral is disabled.
-            disabled={busy || !deferEnabled}
+            // 独立于 MCP 总闸：内置/插件按需加载与连接器按需加载各管各的
+            // 来源，任一开关都不应使另一个失效。
+            disabled={busy}
             ariaLabel={t('settings.mcp.deferBuiltin')}
             onChange={(on) => onChange({ builtinDeferEnabled: on })}
           />

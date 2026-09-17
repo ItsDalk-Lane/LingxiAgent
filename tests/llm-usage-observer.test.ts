@@ -78,6 +78,32 @@ describe("LLM usage observer", () => {
     });
   });
 
+  // The Pi SDK hands the reasoning count over as `usage.reasoning`: Anthropic
+  // Messages sets it only when the provider reports thinking tokens, while the
+  // OpenAI dialects fall back to 0 when nothing was reported. A real count must
+  // flow through; a zero is "no fact" and stays null so the UI hides the row.
+  it("reads the Pi SDK reasoning count and keeps an unreported zero as no fact", () => {
+    const reported = normalizeLlmUsage({
+      input: 1200,
+      output: 300,
+      cacheRead: 900,
+      cacheWrite: 0,
+      totalTokens: 2400,
+      reasoning: 832,
+    });
+    expect(reported.output.reasoningTokens).toBe(832);
+
+    const unreported = normalizeLlmUsage({
+      input: 100,
+      output: 50,
+      cacheRead: 0,
+      cacheWrite: 0,
+      totalTokens: 150,
+      reasoning: 0,
+    });
+    expect(unreported.output.reasoningTokens).toBeNull();
+  });
+
   it("normalizes Anthropic raw usage fields", () => {
     const usage = normalizeLlmUsage({
       input_tokens: 100,

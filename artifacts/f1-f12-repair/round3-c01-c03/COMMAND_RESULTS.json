@@ -1751,5 +1751,133 @@
     "log": "logs/sep12-v0139-final2-r3.log",
     "logSha256": "44af029ec72f73e5566c6426d15d5ed1853fa69ba863c62b01604d579cffbee9",
     "sourceManifestHash": "e7dee5a1053ade4c91631d051de01aa1a860c61af41ec05aa40dc42804e3ed3f"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--exclude",
+      "**/round2-delivery-evidence.test.ts",
+      "--exclude",
+      "**/round3-delivery-evidence.test.ts",
+      "--exclude",
+      "**/upstream-sync-matrix.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-17T12:21:23.350646+00:00",
+    "end": "2026-09-17T12:22:49.076872+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 14360,
+      "failed": 0,
+      "skipped": 15,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "df2c106f9b03de3bb1bb70310f86870d21ff730cd1a7d14df4d4867e41b998d2",
+    "log": "logs/phase1-20260917-final.log",
+    "logSha256": "8cbdfcdb8f700beaaff296376f77b56fdfe09411e2f5410ceaa74650b37c49f0",
+    "sourceManifestHash": "df2c106f9b03de3bb1bb70310f86870d21ff730cd1a7d14df4d4867e41b998d2"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--exclude",
+      "**/round2-delivery-evidence.test.ts",
+      "--exclude",
+      "**/round3-delivery-evidence.test.ts",
+      "--exclude",
+      "**/upstream-sync-matrix.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-17T14:24:51.875169+00:00",
+    "end": "2026-09-17T14:26:18.951088+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 14429,
+      "failed": 2,
+      "skipped": 15,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": true,
+    "endSourceManifestHash": "bad69e5610e38be6c5bf6ef6bc30290283da971de5473cb58516a4beff721519",
+    "log": "logs/phase2-green.log",
+    "logSha256": "ee91d14fd39146573e49bfe4a9ed1fcddab1c36b7c5a2fc6d6883fa7962c8867",
+    "sourceManifestHash": "28e3f813a4e4ea29a3dce64635b8a1a3faf5dd8637680d86ea73a79406ddcffb"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--exclude",
+      "**/round2-delivery-evidence.test.ts",
+      "--exclude",
+      "**/round3-delivery-evidence.test.ts",
+      "--exclude",
+      "**/upstream-sync-matrix.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-17T14:29:38.938941+00:00",
+    "end": "2026-09-17T14:31:07.348063+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 14431,
+      "failed": 0,
+      "skipped": 15,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "43b25df511d75de0b7ca5cc1b6db3927443bac87e8a382f38ec11aad64bba617",
+    "log": "logs/phase2-final.log",
+    "logSha256": "474d00cef1448893e38da73552bce88549cb40a6121829d692e9968b3f7b601b",
+    "sourceManifestHash": "43b25df511d75de0b7ca5cc1b6db3927443bac87e8a382f38ec11aad64bba617"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--exclude",
+      "**/round2-delivery-evidence.test.ts",
+      "--exclude",
+      "**/round3-delivery-evidence.test.ts",
+      "--exclude",
+      "**/upstream-sync-matrix.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-17T15:14:13.841906+00:00",
+    "end": "2026-09-17T15:15:43.571033+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 14451,
+      "failed": 0,
+      "skipped": 15,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "faaa9510302759e1bc55b9de7be863b5bcabf72a3663385154d8ad7d05bc5a33",
+    "log": "logs/phase3-final.log",
+    "logSha256": "bfffabc6984ecd3fac72ba7c63d846203c33e067669abbcc1dc10aa09699090e",
+    "sourceManifestHash": "faaa9510302759e1bc55b9de7be863b5bcabf72a3663385154d8ad7d05bc5a33"
   }
 ]

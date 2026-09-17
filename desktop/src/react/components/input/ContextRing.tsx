@@ -9,6 +9,7 @@ import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { refreshSessionCapabilities } from '../../stores/session-actions';
 import { AnchoredPortal, Tooltip } from '../../ui';
 import { shouldShowContextRingTokenLabel } from './context-ring-visibility';
+import { useSessionCacheRate } from './use-session-cache-rate';
 import {
   INSTANT_SIMPLE_COMPACTION_EXPERIMENT_ID,
   INSTANT_SIMPLE_COMPACTION_METHOD,
@@ -50,6 +51,12 @@ export function ContextRing() {
   const compactionMode = useStore(s => getSessionCompactionMode(s, currentSessionPath));
   const refreshing = useStore(s => sessionScopedListIncludes(s, s.capabilityRefreshingSessions, currentSessionPath));
   const busy = compacting || refreshing;
+  // 会话级缓存命中率：只在详情视图打开时查询；轮次边界推进上下文用量即重查。
+  const cacheHitPercent = useSessionCacheRate({
+    sessionPath: currentSessionPath,
+    enabled: detailOpen,
+    refreshKey: storeContextTokens ?? null,
+  });
 
   useEffect(() => {
     setTokens(storeContextTokens ?? null);
@@ -275,6 +282,12 @@ export function ContextRing() {
                   <span>{t('input.contextDetailRemaining')}</span>
                   <span>{detailRemaining != null ? formatDetailTokens(detailRemaining) : '—'}</span>
                 </div>
+                {cacheHitPercent != null && (
+                  <div className={styles['context-ring-detail-row']}>
+                    <span>{t('input.contextDetailCacheHit')}</span>
+                    <span>{`${cacheHitPercent}%`}</span>
+                  </div>
+                )}
                 {detailRows.map(row => (
                   <div key={row.category} className={styles['context-ring-detail-row']}>
                     <span>{t(`input.contextCategory.${row.category}`)}</span>

@@ -255,7 +255,8 @@ function WorkflowRow({ wf, nodes, agents, now, open, onToggle, expandedNodes, on
 }
 
 export function WorkflowCard() {
-  const [collapsed, setCollapsed] = useState(false);
+  // 默认折叠（用户裁决）：运行信息容器内只露标题行，点击展开
+  const [collapsed, setCollapsed] = useState(true);
   const [expandedWf, setExpandedWf] = useState<Record<string, boolean>>({});
   const [expandedNodes, setExpandedNodes] = useState<Record<string, boolean>>({});
   const sessionPath = useStore((s) => s.currentSessionPath);

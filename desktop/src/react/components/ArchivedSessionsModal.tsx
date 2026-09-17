@@ -54,6 +54,8 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
   const [list, setList] = useState<ArchivedSession[]>([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  // 选择模式：默认隐藏全部勾选框，点行/分组头才进入；退出或刷新后回到整洁视图
+  const [selectionMode, setSelectionMode] = useState(false);
   // 分组折叠态（key 稳定：mount:/path:/ungrouped），刷新列表后保留
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const studioWorkspaces = useStore(s => s.studioWorkspaces);
@@ -72,6 +74,7 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
     setLoading(true);
     setList(await listArchivedSessions());
     setSelected(new Set());
+    setSelectionMode(false);
     setLoading(false);
   }, []);
 
@@ -149,6 +152,32 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
     });
   };
 
+  // 退出选择模式：同时清空勾选，界面回到无勾选框的整洁视图
+  const exitSelectionMode = () => {
+    setSelectionMode(false);
+    setSelected(new Set());
+  };
+
+  // 选择模式下的行点击：进入模式时顺手勾中该行，之后每次点击切换勾选
+  const handleRowActivate = (item: ArchivedSession) => {
+    if (!selectionMode) {
+      setSelectionMode(true);
+      setSelected(new Set([item.path]));
+      return;
+    }
+    toggleSelected(item);
+  };
+
+  // 分组头点击（不含折叠箭头与组勾选框）：未在选择模式 → 进入并勾中整组；已在 → 切换整组勾选
+  const handleGroupActivate = (group: ArchiveGroup) => {
+    if (!selectionMode) {
+      setSelectionMode(true);
+      setSelected(new Set(group.items.map((item) => item.path)));
+      return;
+    }
+    toggleGroup(group);
+  };
+
   const handleRestore = async (item: ArchivedSession) => {
     if (!window.confirm(t('session.archived.restoreConfirm'))) return;
     const r = await restoreSession(item);
@@ -219,33 +248,6 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
     await handleRestoreBatch(targets, 'session.archived.restoreSelectedDone', { count: targets.length });
   };
 
-  // 整组删除：按工作台分组直接永久删除该组全部归档记录
-  const handleDeleteGroup = async (group: ArchiveGroup) => {
-    const size = group.items.reduce((s, x) => s + x.sizeBytes, 0);
-    const msg = t('session.archived.deleteGroupConfirm', {
-      name: group.title,
-      count: group.items.length,
-      size: formatBytes(size),
-    });
-    if (!window.confirm(msg)) return;
-    let deleted = 0;
-    for (const item of group.items) {
-      if (await deleteArchivedSession(item)) deleted += 1;
-    }
-    if (deleted < group.items.length) {
-      showSidebarToast(t('session.archived.deleteSelectedPartial', { deleted, total: group.items.length }));
-    } else {
-      showSidebarToast(t('session.archived.deleteGroupDone', { count: deleted }));
-    }
-    await refresh();
-  };
-
-  // 整组恢复：按工作台分组把该组全部归档记录恢复到会话列表
-  const handleRestoreGroup = async (group: ArchiveGroup) => {
-    if (!window.confirm(t('session.archived.restoreGroupConfirm', { name: group.title, count: group.items.length }))) return;
-    await handleRestoreBatch(group.items, 'session.archived.restoreSelectedDone', { count: group.items.length });
-  };
-
   const handleCleanup = async (days: 30 | 90) => {
     const toDelete = list.filter(
       (x) => Date.now() - new Date(x.archivedAt).getTime() > days * 86400_000,
@@ -302,15 +304,22 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
 
           <div className={styles.listCard}>
             <div className={styles.listToolbar}>
-              <label className={styles.selectAll}>
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  onChange={toggleAll}
-                  disabled={list.length === 0}
-                />
-                <span>{t('session.archived.selectAll')}</span>
-              </label>
+              {selectionMode && (
+                <div className={styles.toolbarLeft}>
+                  <label className={styles.selectAll}>
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={toggleAll}
+                      disabled={list.length === 0}
+                    />
+                    <span>{t('session.archived.selectAll')}</span>
+                  </label>
+                  <button className={styles.exitSelectionBtn} onClick={exitSelectionMode}>
+                    {t('session.archived.exitSelection')}
+                  </button>
+                </div>
+              )}
               <div className={styles.batchBtns}>
                 <button
                   className={styles.restoreSelectedBtn}
@@ -341,7 +350,8 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
                   const collapsed = collapsedGroups.has(group.key);
                   return (
                     <div key={group.key} className={styles.group} data-archive-group={group.key}>
-                      {/* 分组头可折叠整组：点击头部切换，行内勾选/删除按钮各自 stopPropagation */}
+                      {/* 分组头：点箭头折叠整组；点头部其余区域切换整组勾选（未在选择模式时先进入选择模式）。
+                          箭头/组勾选框各自 stopPropagation */}
                       <div
                         className={styles.groupHeader}
                         data-group-header={group.key}
@@ -349,27 +359,37 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
                         role="button"
                         tabIndex={0}
                         aria-expanded={!collapsed}
-                        onClick={() => toggleGroupCollapse(group.key)}
+                        onClick={() => handleGroupActivate(group)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
-                            toggleGroupCollapse(group.key);
+                            handleGroupActivate(group);
                           }
                         }}
                       >
-                        <span className={`${styles.chevron}${collapsed ? '' : ` ${styles.chevronOpen}`}`} aria-hidden="true">
+                        <span
+                          className={`${styles.chevron}${collapsed ? '' : ` ${styles.chevronOpen}`}`}
+                          data-group-chevron={group.key}
+                          aria-hidden="true"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleGroupCollapse(group.key);
+                          }}
+                        >
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <polyline points="9 18 15 12 9 6"></polyline>
                           </svg>
                         </span>
-                        <input
-                          type="checkbox"
-                          className={styles.groupCheck}
-                          checked={allInGroup}
-                          onChange={() => toggleGroup(group)}
-                          onClick={(e) => e.stopPropagation()}
-                          aria-label={group.title}
-                        />
+                        {selectionMode && (
+                          <input
+                            type="checkbox"
+                            className={styles.groupCheck}
+                            checked={allInGroup}
+                            onChange={() => toggleGroup(group)}
+                            onClick={(e) => e.stopPropagation()}
+                            aria-label={group.title}
+                          />
+                        )}
                         <span className={styles.groupName} title={group.cwd || group.mountId || undefined}>
                           {group.title}
                         </span>
@@ -385,34 +405,23 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
                         <span className={styles.groupMeta}>
                           {t('session.archived.group.meta', { count: group.items.length, size: formatBytes(groupSize) })}
                         </span>
-                        <button
-                          className={styles.groupRestoreBtn}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            void handleRestoreGroup(group);
-                          }}
-                        >
-                          {t('session.archived.restoreGroup')}
-                        </button>
-                        <button
-                          className={styles.groupDeleteBtn}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            void handleDeleteGroup(group);
-                          }}
-                        >
-                          {t('session.archived.deleteGroup')}
-                        </button>
                       </div>
                       {!collapsed && group.items.map((item) => (
-                        <div key={item.path} className={styles.row}>
-                          <input
-                            type="checkbox"
-                            className={styles.rowCheck}
-                            checked={selected.has(item.path)}
-                            onChange={() => toggleSelected(item)}
-                            aria-label={item.title || item.firstMessage || t('session.untitled')}
-                          />
+                        <div
+                          key={item.path}
+                          className={styles.row}
+                          onClick={() => handleRowActivate(item)}
+                        >
+                          {selectionMode && (
+                            <input
+                              type="checkbox"
+                              className={styles.rowCheck}
+                              checked={selected.has(item.path)}
+                              onChange={() => toggleSelected(item)}
+                              onClick={(e) => e.stopPropagation()}
+                              aria-label={item.title || item.firstMessage || t('session.untitled')}
+                            />
+                          )}
                           <div className={styles.rowMain}>
                             <div className={styles.rowTitle}>
                               {item.title || item.firstMessage || t('session.untitled')}
@@ -425,13 +434,19 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
                           <div className={styles.rowActions}>
                             <button
                               title={t('session.archived.restore')}
-                              onClick={() => handleRestore(item)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRestore(item);
+                              }}
                             >
                               {t('session.archived.restore')}
                             </button>
                             <button
                               title={t('session.archived.deleteForever')}
-                              onClick={() => handleDelete(item)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(item);
+                              }}
                             >
                               {t('session.archived.deleteForever')}
                             </button>

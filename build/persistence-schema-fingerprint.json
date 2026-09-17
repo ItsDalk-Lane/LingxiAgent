@@ -581,6 +581,16 @@
     },
     {
       "expiresOn": "2027-01-31",
+      "id": "web-fetch-spill",
+      "kinds": [
+        "write-file"
+      ],
+      "ownerModule": "lib/tools/web-fetch.ts",
+      "reason": "Writes the truncated web_fetch full text to an operating-system temporary spill file so the model can recover the remainder with the read tool; outside any implied LINGXI_HOME store.",
+      "sourceFile": "lib/tools/web-fetch.ts"
+    },
+    {
+      "expiresOn": "2027-01-31",
       "id": "windows-uia-request-temp",
       "kinds": [
         "database-open",
@@ -660,7 +670,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:74fcbaea5c71aaf08bb893c5a7dce539262bc2c77c35ab2ff7fc5c42c19c97bb",
+  "payloadFingerprint": "sha256:9aa26bee4fe7bc5ab5c531ac7eaaad379946fe51a5c2fb21f773f222055c4690",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -1531,6 +1541,42 @@
       }
     },
     {
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "checkpointPolicy": "Excluded; deleted in the same call that created it.",
+      "epochPolicy": "regenerable",
+      "exemption": null,
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "format": "mixed-directory",
+      "id": "ephemeral-scanner-scratch",
+      "identityContract": "No identity — per-call scratch keyed by mkdtemp random suffix.",
+      "migrationEntry": [],
+      "openEntry": [
+        "runGitleaks / runSemgrep"
+      ],
+      "ownerModule": "lib/security/external-scanners.ts",
+      "pathExclusions": [],
+      "pathKind": "tree",
+      "pathPattern": "(os-tmpdir)/lingxi-*",
+      "pathPatterns": [
+        "(os-tmpdir)/lingxi-*"
+      ],
+      "preCoordinatorReadProjection": null,
+      "protocolModules": [],
+      "restorePolicy": "Never restored; nothing survives the call.",
+      "schemaContract": {
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
+        "kind": "runtime-source",
+        "source": "lib/security/external-scanners.ts"
+      },
+      "schemaSource": {
+        "contract": "mkdtemp scratch dirs consumed within one call and removed in finally; no cross-call state",
+        "kind": "runtime-contract",
+        "module": "lib/security/external-scanners.ts"
+      }
+    },
+    {
       "affectedByEpochMigration": true,
       "bootstrapSafety": null,
       "checkpointPolicy": "Exclude expired leases and preserve live leases only with their grant principals.",
@@ -1928,7 +1974,8 @@
       "migrationEntry": [],
       "openEntry": [
         "search tool first use",
-        "Windows sandbox runtime preparation"
+        "Windows sandbox runtime preparation",
+        "ast tool first use"
       ],
       "ownerModule": "lib/pi-sdk/search-tools.ts",
       "pathExclusions": [],
@@ -1947,7 +1994,7 @@
         "source": "lib/pi-sdk/search-tools.ts"
       },
       "schemaSource": {
-        "contract": "managed search-tool binary and Windows sandbox runtime cache validation",
+        "contract": "managed search-tool binary and Windows sandbox runtime cache validation; ast-grep (sg/ast-grep) joins the same cache via the npm platform-package channel with sha512 integrity (lib/sandbox/ast-grep-binary.ts)",
         "kind": "directory-contract",
         "module": "lib/pi-sdk/search-tools.ts"
       }
@@ -2536,6 +2583,81 @@
       }
     },
     {
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "checkpointPolicy": "Excluded from epoch checkpoints; checkpoints are advisory rewind anchors referencing branch entryIds — losing the sidecar only loses the anchors, never conversation data (the session JSONL is the durable record).",
+      "epochPolicy": "regenerable",
+      "exemption": null,
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "format": "json",
+      "id": "session-checkpoints",
+      "identityContract": "Records are keyed by checkpoint name within the sidecar adjacent to the owning session JSONL; sessionId remains the durable identity.",
+      "migrationEntry": [],
+      "openEntry": [
+        "listSessionCheckpoints",
+        "upsertSessionCheckpoint"
+      ],
+      "ownerModule": "core/session-checkpoints.ts",
+      "pathExclusions": [],
+      "pathKind": "file",
+      "pathPattern": "agents/{agentId}/sessions/{sessionId}.jsonl.checkpoints.json",
+      "pathPatterns": [
+        "agents/{agentId}/sessions/{sessionId}.jsonl.checkpoints.json",
+        "agents/{agentId}/sessions/archived/{sessionId}.jsonl.checkpoints.json"
+      ],
+      "preCoordinatorReadProjection": null,
+      "protocolModules": [],
+      "restorePolicy": "Never restored from epoch checkpoints; a lost sidecar simply has no rewind anchors until new checkpoints are created.",
+      "schemaContract": {
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
+        "kind": "runtime-source",
+        "source": "core/session-checkpoints.ts"
+      },
+      "schemaSource": {
+        "contract": "Session checkpoint sidecar schema (schemaVersion, records[{name,target,turnInputEntryId,snapshotCommit,snapshotDegraded,createdAt,messageCount}]), 'latest' rolling slot, name uniqueness, lazy record cap",
+        "kind": "runtime-contract",
+        "module": "core/session-checkpoints.ts"
+      }
+    },
+    {
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "checkpointPolicy": "Excluded from epoch checkpoints; notes are model-authored scratch context re-injected at compaction time — losing them loses the notes, never conversation data.",
+      "epochPolicy": "regenerable",
+      "exemption": null,
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "format": "markdown",
+      "id": "session-context-notes",
+      "identityContract": "Notes sidecar is adjacent to its session JSONL locator; sessionId remains the durable identity.",
+      "migrationEntry": [],
+      "openEntry": [
+        "context_notes tool"
+      ],
+      "ownerModule": "lib/tools/context-notes-tool.ts",
+      "pathExclusions": [],
+      "pathKind": "file",
+      "pathPattern": "agents/{agentId}/sessions/{sessionId}.jsonl.context-notes.md",
+      "pathPatterns": [
+        "agents/{agentId}/sessions/{sessionId}.jsonl.context-notes.md",
+        "agents/{agentId}/sessions/archived/{sessionId}.jsonl.context-notes.md"
+      ],
+      "preCoordinatorReadProjection": null,
+      "protocolModules": [],
+      "restorePolicy": "Never restored from epoch checkpoints; a lost sidecar starts empty.",
+      "schemaContract": {
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
+        "kind": "runtime-source",
+        "source": "lib/tools/context-notes-tool.ts"
+      },
+      "schemaSource": {
+        "contract": "Per-session markdown notes sidecar, 16KiB write cap with read-side defensive truncation; read/write/append semantics",
+        "kind": "runtime-contract",
+        "module": "lib/tools/context-notes-tool.ts"
+      }
+    },
+    {
       "affectedByEpochMigration": true,
       "bootstrapSafety": null,
       "checkpointPolicy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
@@ -2607,6 +2729,43 @@
         "contract": "SessionFile payload naming, v1 sidecar, ownership, and 72-hour cold-session cleanup protocol",
         "kind": "directory-contract",
         "module": "lib/session-files/session-file-registry.ts"
+      }
+    },
+    {
+      "affectedByEpochMigration": false,
+      "bootstrapSafety": null,
+      "checkpointPolicy": "Excluded from epoch checkpoints; a budget goal is an advisory session ledger — losing it loses the budget tracking, never conversation data.",
+      "epochPolicy": "regenerable",
+      "exemption": null,
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "format": "json",
+      "id": "session-goal",
+      "identityContract": "One goal sidecar belongs to the session JSONL it is adjacent to; sessionId remains the durable identity.",
+      "migrationEntry": [],
+      "openEntry": [
+        "createGoalEngine + goal tool"
+      ],
+      "ownerModule": "lib/goal/goal-engine.ts",
+      "pathExclusions": [],
+      "pathKind": "file",
+      "pathPattern": "agents/{agentId}/sessions/{sessionId}.jsonl.goal.json",
+      "pathPatterns": [
+        "agents/{agentId}/sessions/{sessionId}.jsonl.goal.json",
+        "agents/{agentId}/sessions/archived/{sessionId}.jsonl.goal.json"
+      ],
+      "preCoordinatorReadProjection": null,
+      "protocolModules": [],
+      "restorePolicy": "Never restored from epoch checkpoints; a lost sidecar simply has no active goal.",
+      "schemaContract": {
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs.",
+        "kind": "runtime-source",
+        "source": "lib/goal/goal-engine.ts"
+      },
+      "schemaSource": {
+        "contract": "Per-session budget goal sidecar schema (schemaVersion, name, tokenBudget, timeBudgetMs, tokensUsed, startedAt, pausedMs, currentPausedAt, status, pausedReason, completedAt, overBudgetNotified, lastActiveAt); one goal per session, active/paused/completed/dropped state machine",
+        "kind": "runtime-contract",
+        "module": "lib/goal/goal-engine.ts"
       }
     },
     {
@@ -3217,8 +3376,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "Hash-only census refresh: in-flight media-model and workspace-skill settings work edited hashed production modules (session-coordinator Hana metadata extensions contract text unchanged; no store schema, registry entry, or phase placement changed).",
-    "payloadFingerprint": "sha256:74fcbaea5c71aaf08bb893c5a7dce539262bc2c77c35ab2ff7fc5c42c19c97bb"
+    "compatibilityReason": "run_code 内核的 os-tmpdir 注入草稿并入 ephemeral 草稿店；无业务 store 结构变化",
+    "payloadFingerprint": "sha256:9aa26bee4fe7bc5ab5c531ac7eaaad379946fe51a5c2fb21f773f222055c4690"
   },
   "schemas": [
     {
@@ -3436,6 +3595,13 @@
       "module": "core/device-registry.ts",
       "sourceHash": "sha256:9adfca56c417454d380ff582d53203046f19d90aa696ce14afed9975bbfc3306",
       "storeId": "device-access-registries"
+    },
+    {
+      "contract": "mkdtemp scratch dirs consumed within one call and removed in finally; no cross-call state",
+      "kind": "runtime-contract",
+      "module": "lib/security/external-scanners.ts",
+      "sourceHash": "sha256:932e4aded46a0f4d05fdf2493079efe625f1cfcd6308e026cbc6e880c4b3979d",
+      "storeId": "ephemeral-scanner-scratch"
     },
     {
       "contract": "execution lease registry validator and atomic serializer",
@@ -3896,7 +4062,7 @@
       "storeId": "loop-state"
     },
     {
-      "contract": "managed search-tool binary and Windows sandbox runtime cache validation",
+      "contract": "managed search-tool binary and Windows sandbox runtime cache validation; ast-grep (sg/ast-grep) joins the same cache via the npm platform-package channel with sha512 integrity (lib/sandbox/ast-grep-binary.ts)",
       "kind": "directory-contract",
       "module": "lib/pi-sdk/search-tools.ts",
       "sourceHash": "sha256:6d90beab5e274757b7541a5a7454e9f59ae3dcff56d9a3eac4d4a7eb7d3aa700",
@@ -3906,7 +4072,7 @@
       "contract": "normalizeMcpConfig read-time normalization (servers/connectors alias, auth and OAuth field defaults, per-connector permission policy defaults, deferred-loading defaults, connection lifecycle defaults)",
       "kind": "runtime-contract",
       "module": "core/mcp/manager.ts",
-      "sourceHash": "sha256:0403ae1978c2dcf46def66a263ea29923962d15e125a2874d76ffe3713a5bdcf",
+      "sourceHash": "sha256:535f6a985dad6b82e77f4a985fffff3b5033811fe96a9554cc09d554e14c9e16",
       "storeId": "mcp-config"
     },
     {
@@ -4188,8 +4354,22 @@
       "contract": "server-info writer and desktop bootstrap reader",
       "kind": "runtime-contract",
       "module": "server/index.ts",
-      "sourceHash": "sha256:c5878f3c7e8e63db612f04b9286ba87cbf2116fe8207fb92f5397477ea4c0718",
+      "sourceHash": "sha256:d1d399fc2ecf0f9175e99fa62b775315dcc7c080d8af71e05375a290a33c6e8d",
       "storeId": "server-runtime-info"
+    },
+    {
+      "contract": "Session checkpoint sidecar schema (schemaVersion, records[{name,target,turnInputEntryId,snapshotCommit,snapshotDegraded,createdAt,messageCount}]), 'latest' rolling slot, name uniqueness, lazy record cap",
+      "kind": "runtime-contract",
+      "module": "core/session-checkpoints.ts",
+      "sourceHash": "sha256:483dcfe2b92f2e22c265893ee677ee10c1583f767c6518fb49ec086b5d7bab9c",
+      "storeId": "session-checkpoints"
+    },
+    {
+      "contract": "Per-session markdown notes sidecar, 16KiB write cap with read-side defensive truncation; read/write/append semantics",
+      "kind": "runtime-contract",
+      "module": "lib/tools/context-notes-tool.ts",
+      "sourceHash": "sha256:c4e93502e6eeb74578e65e58ff11b5f9870589755e8f86ea904c299b7164b300",
+      "storeId": "session-context-notes"
     },
     {
       "contract": "InputDraftsStore and SessionProjectCatalogStore normalizers",
@@ -4204,6 +4384,13 @@
       "module": "lib/session-files/session-file-registry.ts",
       "sourceHash": "sha256:6525a4c94100e669f087ec4ce02c1a4be25fa9971d46622c8f7babf2f0f3170a",
       "storeId": "session-files"
+    },
+    {
+      "contract": "Per-session budget goal sidecar schema (schemaVersion, name, tokenBudget, timeBudgetMs, tokensUsed, startedAt, pausedMs, currentPausedAt, status, pausedReason, completedAt, overBudgetNotified, lastActiveAt); one goal per session, active/paused/completed/dropped state machine",
+      "kind": "runtime-contract",
+      "module": "lib/goal/goal-engine.ts",
+      "sourceHash": "sha256:ad5a482860fff66397a618f7359d5da11964819e99860d1cd58dc7aab55756b8",
+      "storeId": "session-goal"
     },
     {
       "extensions": [
@@ -4364,7 +4551,7 @@
       "contract": "PreferencesManager defaults, coercion, and _dataVersion migration driver",
       "kind": "runtime-contract",
       "module": "core/preferences-manager.ts",
-      "sourceHash": "sha256:c5b7d4f6436436f79883f621e20c4f3f7a2b94e2fa07c49c2fa241e8361b70f1",
+      "sourceHash": "sha256:75fefe36ecbcd2b872eb01f87e509b2328f1b7df41310a29d060e6dc85c64f52",
       "storeId": "user-preferences"
     },
     {
@@ -4392,7 +4579,7 @@
       "contract": "shadow git repository layout (git init plus info/exclude allowlist, append-only commits) and the {sessionPath}.snapshots.json sidecar schema (version, workspaceRoot, snapshots[])",
       "kind": "directory-contract",
       "module": "core/workspace-snapshots.ts",
-      "sourceHash": "sha256:6ad535512d171cc381f6800974aabe9c58749d4009d58983203752efae285618",
+      "sourceHash": "sha256:9aa5aa9a41af95471586569134f7c9c477ca18aafd5324a55b42be1f5b3d78b0",
       "storeId": "workspace-snapshots"
     }
   ],
@@ -5668,6 +5855,30 @@
       "reason": "Writes validated server network configuration.",
       "sourceFile": "core/server-network-config.ts",
       "storeId": "server-network-config"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Writes per-session checkpoint sidecars (atomic tmp+rename).",
+      "sourceFile": "core/session-checkpoints.ts",
+      "storeId": "session-checkpoints"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 0,
+      "reason": "Writes per-session checkpoint sidecars (atomic tmp+rename).",
+      "sourceFile": "core/session-checkpoints.ts",
+      "storeId": "session-checkpoints"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Writes per-session checkpoint sidecars (atomic tmp+rename).",
+      "sourceFile": "core/session-checkpoints.ts",
+      "storeId": "session-checkpoints"
     },
     {
       "exemptionId": null,
@@ -7463,6 +7674,30 @@
     },
     {
       "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Writes the per-session goal sidecar (atomic tmp+rename).",
+      "sourceFile": "lib/goal/goal-engine.ts",
+      "storeId": "session-goal"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 0,
+      "reason": "Writes the per-session goal sidecar (atomic tmp+rename).",
+      "sourceFile": "lib/goal/goal-engine.ts",
+      "storeId": "session-goal"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Writes the per-session goal sidecar (atomic tmp+rename).",
+      "sourceFile": "lib/goal/goal-engine.ts",
+      "storeId": "session-goal"
+    },
+    {
+      "exemptionId": null,
       "kind": "database-open",
       "ordinal": 0,
       "reason": "Creates and replaces only ANN catalog and derived index files; never deletes portable vector BLOBs.",
@@ -8670,6 +8905,54 @@
       "storeId": null
     },
     {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Populates a Hana-owned regenerable runtime cache.",
+      "sourceFile": "lib/sandbox/ast-grep-binary.ts",
+      "storeId": "managed-runtime-caches"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
+      "reason": "Populates a Hana-owned regenerable runtime cache.",
+      "sourceFile": "lib/sandbox/ast-grep-binary.ts",
+      "storeId": "managed-runtime-caches"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Populates a Hana-owned regenerable runtime cache.",
+      "sourceFile": "lib/sandbox/ast-grep-binary.ts",
+      "storeId": "managed-runtime-caches"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Populates a Hana-owned regenerable runtime cache.",
+      "sourceFile": "lib/sandbox/ast-grep-binary.ts",
+      "storeId": "managed-runtime-caches"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 0,
+      "reason": "Populates a Hana-owned regenerable runtime cache.",
+      "sourceFile": "lib/sandbox/ast-grep-binary.ts",
+      "storeId": "managed-runtime-caches"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Populates a Hana-owned regenerable runtime cache.",
+      "sourceFile": "lib/sandbox/ast-grep-binary.ts",
+      "storeId": "managed-runtime-caches"
+    },
+    {
       "exemptionId": "sandbox-office-media-temp",
       "kind": "mkdir",
       "ordinal": 0,
@@ -8780,6 +9063,14 @@
       "reason": "Populates a Hana-owned regenerable runtime cache.",
       "sourceFile": "lib/sandbox/win32-runtime-cache.ts",
       "storeId": "managed-runtime-caches"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Creates and removes per-call scratch files/directories under the OS temp dir (ast-grep-binary's own scratch sites are owned by managed-runtime-caches).",
+      "sourceFile": "lib/security/external-scanners.ts",
+      "storeId": "ephemeral-scanner-scratch"
     },
     {
       "exemptionId": null,
@@ -9241,6 +9532,30 @@
       "exemptionId": null,
       "kind": "mkdir",
       "ordinal": 0,
+      "reason": "Writes the per-session context-notes markdown sidecar (atomic tmp+rename).",
+      "sourceFile": "lib/tools/context-notes-tool.ts",
+      "storeId": "session-context-notes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "rename",
+      "ordinal": 0,
+      "reason": "Writes the per-session context-notes markdown sidecar (atomic tmp+rename).",
+      "sourceFile": "lib/tools/context-notes-tool.ts",
+      "storeId": "session-context-notes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Writes the per-session context-notes markdown sidecar (atomic tmp+rename).",
+      "sourceFile": "lib/tools/context-notes-tool.ts",
+      "storeId": "session-context-notes"
+    },
+    {
+      "exemptionId": null,
+      "kind": "mkdir",
+      "ordinal": 0,
       "reason": "Writes a user- or agent-authored Markdown record.",
       "sourceFile": "lib/tools/dm-tool.ts",
       "storeId": "agent-authored-records"
@@ -9308,6 +9623,30 @@
       "reason": "Writes a user- or agent-authored Markdown record.",
       "sourceFile": "lib/tools/experience.ts",
       "storeId": "agent-authored-records"
+    },
+    {
+      "exemptionId": null,
+      "kind": "remove-path",
+      "ordinal": 0,
+      "reason": "Creates and removes per-call scratch files/directories under the OS temp dir (ast-grep-binary's own scratch sites are owned by managed-runtime-caches).",
+      "sourceFile": "lib/tools/run-code-tool.ts",
+      "storeId": "ephemeral-scanner-scratch"
+    },
+    {
+      "exemptionId": null,
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Creates and removes per-call scratch files/directories under the OS temp dir (ast-grep-binary's own scratch sites are owned by managed-runtime-caches).",
+      "sourceFile": "lib/tools/run-code-tool.ts",
+      "storeId": "ephemeral-scanner-scratch"
+    },
+    {
+      "exemptionId": "web-fetch-spill",
+      "kind": "write-file",
+      "ordinal": 0,
+      "reason": "Writes the truncated web_fetch full text to an operating-system temporary spill file so the model can recover the remainder with the read tool; outside any implied LINGXI_HOME store.",
+      "sourceFile": "lib/tools/web-fetch.ts",
+      "storeId": null
     },
     {
       "exemptionId": null,

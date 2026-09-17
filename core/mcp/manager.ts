@@ -38,10 +38,9 @@ export const MCP_TOOL_NAMESPACE = "mcp";
 const MCP_CONFIG_KEY = "mcp";
 
 // Deferred loading defaults. A config written before defer existed carries
-// neither field, and both defaults reproduce the behaviour we want for those
-// users: defer is on, and it only engages once a session would otherwise carry
-// more than ten MCP tool schemas in its cacheable prefix.
-const DEFAULT_DEFER_THRESHOLD = 10;
+// neither field. Defer defaults on with a low threshold: connector schemas are
+// paid on every request, so anything beyond a handful is worth cataloging.
+const DEFAULT_DEFER_THRESHOLD = 4;
 
 const DEFAULT_CONFIG = {
   enabled: false,

@@ -21,10 +21,10 @@ function freshManager() {
 }
 
 describe("mcp defer configuration", () => {
-  it("defaults deferEnabled to true and deferThreshold to 10 for a config that predates them", () => {
+  it("defaults deferEnabled to true and deferThreshold to 4 for a config that predates them", () => {
     const config = normalizeMcpConfig({ enabled: true, connectors: [] });
     expect(config.deferEnabled).toBe(true);
-    expect(config.deferThreshold).toBe(10);
+    expect(config.deferThreshold).toBe(4);
   });
 
   it("honours an explicit deferEnabled false", () => {
@@ -41,9 +41,9 @@ describe("mcp defer configuration", () => {
     expect(normalizeMcpConfig({ deferThreshold: 1 }).deferThreshold).toBe(1);
   });
 
-  it("falls back to 10 for every non positive integer threshold", () => {
+  it("falls back to 4 for every non positive integer threshold", () => {
     for (const value of [0, -3, 2.5, "12", null, NaN, Infinity, {}]) {
-      expect(normalizeMcpConfig({ deferThreshold: value }).deferThreshold).toBe(10);
+      expect(normalizeMcpConfig({ deferThreshold: value }).deferThreshold).toBe(4);
     }
   });
 
@@ -85,13 +85,13 @@ describe("mcp defer configuration", () => {
     expect(config.connectors[0].toolPermissions).toEqual({ create_issue: "allow" });
     expect(config.connectors[0].pinnedTools).toEqual({});
     expect(config.deferEnabled).toBe(true);
-    expect(config.deferThreshold).toBe(10);
+    expect(config.deferThreshold).toBe(4);
   });
 });
 
 describe("builtin tool defer preference", () => {
-  it("is off by default", () => {
-    expect(freshManager().getBuiltinToolDeferEnabled()).toBe(false);
+  it("is on by default", () => {
+    expect(freshManager().getBuiltinToolDeferEnabled()).toBe(true);
   });
 
   it("round trips through the setter", () => {

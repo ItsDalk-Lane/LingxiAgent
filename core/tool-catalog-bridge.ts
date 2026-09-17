@@ -3,7 +3,10 @@
  *
  * Search and describe are pure lookups over the catalog. `mcp_call` is the
  * execution path: it resolves the real target and forwards the complete call
- * envelope to the canonical invocation gateway.
+ * envelope to the canonical invocation gateway. Deferred sources are MCP
+ * connector tools, bundled plugin tools and first-party Lingxi built-ins — the
+ * tool names stay `mcp_*` for replay compatibility with sessions that were
+ * built around the connector-only design.
  *
  * Permission is the subtle part. The bridge must not become a way to launder
  * one approval into access to every connector, so `mcp_call` never asks to be
@@ -55,14 +58,21 @@ function text(value: string) {
  * server's own name for a tool is what appears in its documentation, so both
  * are accepted. The server must own the resolved entry either way: a tool named
  * under the wrong server never resolves.
+ *
+ * A missing server is allowed for unique names — first-party built-ins have no
+ * meaningful server and requiring one would only add a failure mode. An
+ * ambiguous bare name still throws TARGET_AMBIGUOUS from the catalog, which is
+ * the fail-closed answer: the model must then qualify with a server.
  */
 function resolveTarget(catalog: ToolCatalog, server: unknown, tool: unknown): ToolCatalogEntry | null {
   const serverId = typeof server === "string" ? server.trim() : "";
   const toolName = typeof tool === "string" ? tool.trim() : "";
-  if (!serverId || !toolName) return null;
+  if (!toolName) return null;
 
   try {
-    const targetId = catalog.resolveTarget({ serverId, toolName });
+    const targetId = serverId
+      ? catalog.resolveTarget({ serverId, toolName })
+      : catalog.resolveTarget({ toolName });
     return catalog.getByTargetId(targetId);
   } catch (error) {
     if (isToolInvocationError(error) && error.code === "TARGET_NOT_FOUND") return null;
@@ -153,7 +163,7 @@ export function createBridgeTools({ catalog, gateway }: BridgeToolDeps) {
     name: SEARCH_TOOL_NAME,
     label: "Search MCP Tools",
     description:
-      "Search deferred tools supplied by MCP connectors and bundled plugins. Use it when you need a capability that is not already loaded.",
+      "Search deferred tools supplied by MCP connectors, bundled plugins and Lingxi built-ins. Use it whenever you need a capability that is not already loaded — knowledge search, subagents, media options and the like live here.",
     parameters: Type.Object({
       query: Type.String({ description: "Keywords describing the capability you need." }),
       limit: Type.Optional(Type.Number({ description: "Maximum number of results, default 5." })),
@@ -175,7 +185,7 @@ export function createBridgeTools({ catalog, gateway }: BridgeToolDeps) {
         );
       }
       const body = hits.map((hit) => renderHit(hit)).join("\n\n");
-      return text(`${hits.length} 个匹配的 connector/plugin 工具：\n\n${body}\n\n用 ${DESCRIBE_TOOL_NAME} 查看完整参数，再用 ${CALL_TOOL_NAME} 调用。`);
+      return text(`${hits.length} 个匹配的按需工具：\n\n${body}\n\n用 ${DESCRIBE_TOOL_NAME} 查看完整参数，再用 ${CALL_TOOL_NAME} 调用。`);
     },
   };
 
@@ -183,7 +193,7 @@ export function createBridgeTools({ catalog, gateway }: BridgeToolDeps) {
     name: DESCRIBE_TOOL_NAME,
     label: "Describe MCP Tool",
     description:
-      "Show the full parameter schema for one deferred MCP connector or bundled plugin tool before calling it.",
+      "Show the full parameter schema for one deferred MCP connector, bundled plugin or Lingxi built-in tool before calling it.",
     parameters: Type.Object({
       name: Type.String({ description: "Exact tool name, as returned by mcp_search_tools." }),
       server: Type.Optional(Type.String({ description: "Server or source id used to disambiguate a shared name." })),
@@ -232,9 +242,9 @@ export function createBridgeTools({ catalog, gateway }: BridgeToolDeps) {
     name: CALL_TOOL_NAME,
     label: "Call MCP Tool",
     description:
-      "Call one deferred MCP connector or bundled plugin tool by server/source and tool name. Look it up first so the arguments match its schema.",
+      "Call one deferred MCP connector, bundled plugin or Lingxi built-in tool. Look it up first so the arguments match its schema; server may be omitted when the tool name is unique (built-ins always are).",
     parameters: Type.Object({
-      server: Type.String({ description: "Server id that owns the tool." }),
+      server: Type.Optional(Type.String({ description: "Server id that owns the tool. Omit for built-in tools with unique names." })),
       tool: Type.String({ description: "Tool name to invoke." }),
       arguments: Type.Optional(Type.Object({}, {
         description: "Arguments object matching the tool's schema.",

@@ -9,6 +9,10 @@
 
 import { Type } from "../pi-sdk/index.ts";
 import { lookup } from "dns/promises";
+import { randomBytes } from "node:crypto";
+import { writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { isIP } from "net";
 import { t } from "../i18n.ts";
 import { htmlToMarkdownDocument } from "./web-reader.ts";
@@ -16,6 +20,8 @@ import { htmlToMarkdownDocument } from "./web-reader.ts";
 const MAX_CONTENT_LENGTH = 12000;  // 返回最大字符数
 const FETCH_TIMEOUT = 15000;       // 15 秒超时
 const MAX_REDIRECTS = 5;
+const MIN_FETCH_LENGTH = 200;
+const MAX_FETCH_LENGTH = 200_000;
 
 const PRIVATE_IP_RANGES = [
   /^127\./, /^::1$/, /^0\.0\.0\.0$/, /^0:0:0:0:0:0:0:1$/,    // loopback
@@ -79,16 +85,13 @@ export function createWebFetchTool() {
     parameters: Type.Object({
       url: Type.String({ description: "Full URL to fetch (including https://)" }),
       maxLength: Type.Optional(
-        Type.Number({ description: `Maximum characters to return, default ${MAX_CONTENT_LENGTH}`, default: MAX_CONTENT_LENGTH })
+        Type.Number({ description: `Maximum characters to return. Default ${MAX_CONTENT_LENGTH}; valid range ${MIN_FETCH_LENGTH}-${MAX_FETCH_LENGTH}, out-of-range values are clamped. Longer content is truncated and the full text is saved to a file whose path is included in the result.` })
       ),
     }),
     execute: async (_toolCallId, params) => {
       const url = params.url?.trim();
       if (!url) {
-        return {
-          content: [{ type: "text", text: t("error.fetchEmptyUrl") }],
-          details: {},
-        };
+        return fetchFailure(t("error.fetchEmptyUrl"), "WEB_FETCH_EMPTY_URL");
       }
 
       // 基本 URL 校验
@@ -96,16 +99,10 @@ export function createWebFetchTool() {
       try {
         parsedUrl = new URL(url);
         if (!["http:", "https:"].includes(parsedUrl.protocol)) {
-          return {
-            content: [{ type: "text", text: t("error.fetchHttpOnly") }],
-            details: {},
-          };
+          return fetchFailure(t("error.fetchHttpOnly"), "WEB_FETCH_INVALID_SCHEME");
         }
       } catch {
-        return {
-          content: [{ type: "text", text: t("error.fetchInvalidUrl", { url }) }],
-          details: {},
-        };
+        return fetchFailure(t("error.fetchInvalidUrl", { url }), "WEB_FETCH_INVALID_URL");
       }
 
       try {
@@ -115,10 +112,7 @@ export function createWebFetchTool() {
         for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
           const hopParsed = new URL(currentUrl);
           if (await isPrivateHost(hopParsed.hostname)) {
-            return {
-              content: [{ type: "text", text: t("error.fetchSsrf", { host: hopParsed.hostname }) }],
-              details: {},
-            };
+            return fetchFailure(t("error.fetchSsrf", { host: hopParsed.hostname }), "WEB_FETCH_SSRF_BLOCKED");
           }
 
           res = await fetch(currentUrl, {
@@ -141,22 +135,16 @@ export function createWebFetchTool() {
         }
 
         if (!res || [301, 302, 307, 308].includes(res.status)) {
-          return {
-            content: [{ type: "text", text: t("error.fetchRedirectLimit", { max: MAX_REDIRECTS }) }],
-            details: {},
-          };
+          return fetchFailure(t("error.fetchRedirectLimit", { max: MAX_REDIRECTS }), "WEB_FETCH_REDIRECT_LIMIT");
         }
 
         if (!res.ok) {
-          return {
-            content: [{ type: "text", text: t("error.fetchHttpError", { status: res.status, statusText: res.statusText }) }],
-            details: {},
-          };
+          return fetchFailure(t("error.fetchHttpError", { status: res.status, statusText: res.statusText }), `WEB_FETCH_HTTP_${res.status}`);
         }
 
         const contentType = res.headers.get("content-type") || "";
         const raw = await res.text();
-        const maxLen = params.maxLength ?? MAX_CONTENT_LENGTH;
+        const maxLen = clampFetchLength(params.maxLength);
 
         let text;
         let format;
@@ -185,7 +173,12 @@ export function createWebFetchTool() {
 
         const truncated = text.length > maxLen;
         if (truncated) {
-          text = text.slice(0, maxLen) + t("error.fetchTruncated", { len: text.length });
+          const totalLength = text.length;
+          const spillPath = spillFullContent(text);
+          text = text.slice(0, maxLen);
+          text += spillPath
+            ? `\n\n[Truncated: showing first ${maxLen} of ${totalLength} characters. Full content saved to ${spillPath} — read it with the read tool.]`
+            : t("error.fetchTruncated", { len: totalLength });
         }
 
         const finalUrl = new URL(currentUrl);
@@ -199,11 +192,34 @@ export function createWebFetchTool() {
         const msg = err.name === "TimeoutError"
           ? t("error.fetchTimeout", { sec: FETCH_TIMEOUT / 1000, url })
           : t("error.fetchError", { msg: err.message });
-        return {
-          content: [{ type: "text", text: msg }],
-          details: {},
-        };
+        return fetchFailure(msg, err.name === "TimeoutError" ? "WEB_FETCH_TIMEOUT" : "WEB_FETCH_ERROR");
       }
     },
+  };
+}
+
+function clampFetchLength(value: unknown) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return MAX_CONTENT_LENGTH;
+  return Math.min(MAX_FETCH_LENGTH, Math.max(MIN_FETCH_LENGTH, Math.floor(num)));
+}
+
+// 完整正文落盘，给截断结果一条「续读」路径（对照 grok web_fetch 的落盘 hint）。
+function spillFullContent(content: string): string | null {
+  try {
+    const spillPath = join(tmpdir(), `hana-web-fetch-${randomBytes(6).toString("hex")}.txt`);
+    writeFileSync(spillPath, content, "utf-8");
+    return spillPath;
+  } catch {
+    return null;
+  }
+}
+
+// 失败按工具错误返回（isError + 机器码），空结果/正常抓取仍是普通输出。
+function fetchFailure(message: string, errorCode: string) {
+  return {
+    isError: true as const,
+    content: [{ type: "text", text: message }],
+    details: { errorCode },
   };
 }

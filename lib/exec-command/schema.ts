@@ -2,6 +2,8 @@ import path from "path";
 
 export const EXEC_COMMAND_DEFAULT_MAX_OUTPUT_TOKENS = 6000;
 export const EXEC_COMMAND_DESCRIPTION_MAX_LENGTH = 200;
+export const EXEC_COMMAND_DEFAULT_TIMEOUT_SECONDS = 120;
+export const EXEC_COMMAND_MAX_TIMEOUT_SECONDS = 600;
 export const EXEC_COMMAND_SANDBOX_PERMISSIONS = Object.freeze({
   USE_DEFAULT: "use_default",
   REQUIRE_ESCALATED: "require_escalated",
@@ -87,9 +89,13 @@ export function normalizeExecCommandParams(params: any = {}, ctx: any = {}, {
       : ctx?.sessionManager?.getCwd?.() || defaultCwd || process.cwd();
   const maxOutputTokens = optionalPositiveNumber(params.max_output_tokens, EXEC_COMMAND_DEFAULT_MAX_OUTPUT_TOKENS);
   const yieldTimeMs = optionalNonNegativeNumber(params.yield_time_ms, 10000);
-  const timeout = Number.isFinite(Number(params.timeout)) && Number(params.timeout) > 0
-    ? Math.ceil(Number(params.timeout))
-    : undefined;
+  // 宽松解析接受字符串数字（"120"）；缺省 120s，钳到 600s 上限。
+  const rawTimeout = Number(params.timeout);
+  const timeoutDefaulted = !Number.isFinite(rawTimeout) || rawTimeout <= 0;
+  const timeoutClamped = !timeoutDefaulted && Math.ceil(rawTimeout) > EXEC_COMMAND_MAX_TIMEOUT_SECONDS;
+  const timeout = timeoutDefaulted
+    ? EXEC_COMMAND_DEFAULT_TIMEOUT_SECONDS
+    : Math.min(Math.ceil(rawTimeout), EXEC_COMMAND_MAX_TIMEOUT_SECONDS);
 
   return {
     ok: true,
@@ -106,6 +112,9 @@ export function normalizeExecCommandParams(params: any = {}, ctx: any = {}, {
       maxOutputTokens,
       yieldTimeMs,
       timeout,
+      timeoutDefaulted,
+      timeoutClamped,
+      waitMode: params.wait_mode === "auto" ? "auto" : "wait",
     },
   };
 }
@@ -136,7 +145,9 @@ export function normalizeWriteStdinParams(params: any = {}) {
 export function mergeExecDetails(result: any, execDetails: Record<string, any>) {
   return {
     ...(result || {}),
-    ...(execDetails?.ok === false ? { isError: true as const } : {}),
+    // isError 只留给"工具这边坏了/被策略拦/被用户中止"——命令自己跑完但失败
+    // （非零退出、超时）是交给模型判断的正常输出，细节仍在 execCommand 里。
+    ...(execDetails?.isError === true ? { isError: true as const } : {}),
     details: {
       ...(result?.details && typeof result.details === "object" ? result.details : {}),
       execCommand: execDetails,

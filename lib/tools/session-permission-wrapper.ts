@@ -744,12 +744,19 @@ export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
           mode,
           toolName: effectiveToolName,
           params: effectiveParams,
-          context: permissionContextForTool(
-            permissionTool,
-            deps,
-            invocation,
-            legacySessionPermission,
-          ),
+          context: {
+            ...permissionContextForTool(
+              permissionTool,
+              deps,
+              invocation,
+              legacySessionPermission,
+            ),
+            // 计划文件豁免需要知道这次调用属于哪个会话；绑定失败时为空，
+            // 豁免自然不命中（fail-closed）。
+            sessionPath: typeof sessionBinding.value?.sessionPath === "string"
+              ? sessionBinding.value.sessionPath
+              : null,
+          },
         });
         if (decision.action === "allow") {
           return executeWithInvocationRevalidation(

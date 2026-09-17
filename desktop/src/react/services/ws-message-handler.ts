@@ -24,6 +24,7 @@ import {
 import { showError } from '../utils/ui-helpers';
 import { errorWithCode, presentError } from '../errors/error-presenter';
 import { handleAppEvent } from './app-event-actions';
+import { openSettingsModal } from '../stores/settings-modal-actions';
 import {
   PREVIEW_DOCUMENT_CHANGE_REFRESH_OPTIONS,
   markDeskTreeDirtyForResourceChange,
@@ -986,6 +987,27 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
     case 'bridge_status':
       useStore.getState().triggerBridgeReload();
       break;
+
+    case 'env_deps_status': {
+      // 启动自检发现「项目需要但没装」的依赖：toast 提醒 + 一键打开环境依赖页。
+      const missing: string[] = Array.isArray(msg.missing) ? msg.missing.filter((x: any) => typeof x === 'string') : [];
+      if (missing.length > 0) {
+        const names = missing.join('、');
+        useStore.getState().addToast(
+          window.t?.('envDeps.startupMissing', { names }) ?? `缺少项目需要的环境依赖：${names}`,
+          'warning',
+          8000,
+          {
+            dedupeKey: 'env-deps-startup',
+            action: {
+              label: window.t?.('envDeps.openSettings') ?? '查看',
+              onClick: () => openSettingsModal('envdeps'),
+            },
+          },
+        );
+      }
+      break;
+    }
 
     case 'app_event':
       if (msg.event?.type) {

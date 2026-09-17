@@ -161,6 +161,7 @@ describe("session permission modes", () => {
       ["terminal", "terminal.start"],
       ["write_stdin", "write_stdin.write"],
       ["install_skill", "install_skill.install"],
+      ["learn_lesson", "learn_lesson.learn"],
     ]) {
       expect(classifySessionPermission({
         mode: "auto",
@@ -262,7 +263,7 @@ describe("session permission modes", () => {
     const BLOCKED = [
       "subagent",         // 防自递归
       "pin_memory", "unpin_memory", "record_experience", // 长期记忆（subagent 不碰）
-      "automation", "cron", "channel", "dm", "notify", "install_skill", "update_settings", "session_folders", // agent 生命周期/对外
+      "automation", "cron", "channel", "dm", "notify", "install_skill", "learn_lesson", "update_settings", "session_folders", // agent 生命周期/对外
       "workflow",         // 间接扇出
     ];
     for (const name of BLOCKED) {

@@ -207,14 +207,37 @@ describe('GitEnvironmentCard', () => {
     vi.useRealTimers();
   });
 
+  // 默认折叠：卡片级测试先点标题行展开，再沿用既有的行级断言
+  async function renderExpanded() {
+    render(<GitEnvironmentCard />);
+    const toggle = await waitFor(() => screen.getByRole('button', { name: /环境信息/ }));
+    fireEvent.click(toggle);
+  }
+
   it('renders nothing when no workspace dir is set', () => {
     useStore.setState({ deskBasePath: null, deskWorkspaceNativeRoot: null } as never);
     const { container } = render(<GitEnvironmentCard />);
     expect(container.querySelector('[data-testid="git-env-card"]')).not.toBeInTheDocument();
   });
 
-  it('shows formatted change totals, worktree kind and current branch on the four rows', async () => {
+  it('starts collapsed and hides the whole card when the directory is not a git repo', async () => {
+    fetchGitStatusMock.mockResolvedValue({ ...STATUS, isRepo: false, files: [], commitable: false, pushable: false });
+    fetchGitBranchesMock.mockResolvedValue({ isRepo: false, branches: [], detached: false, current: null });
+    fetchGitWorktreeInfoMock.mockResolvedValue({ ...WORKTREE, isRepo: false, isMain: true, name: null });
+
     render(<GitEnvironmentCard />);
+
+    // 默认折叠：探测进行中只露标题行，行内容不可见
+    const toggle = screen.getByRole('button', { name: /环境信息/ });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByTestId('git-env-changes-row')).not.toBeInTheDocument();
+
+    // 探测完成且非 Git 仓库 → 整卡直接隐藏，不再展示「非 Git 仓库」降级行
+    await waitFor(() => expect(screen.queryByTestId('git-env-card')).not.toBeInTheDocument());
+  });
+
+  it('shows formatted change totals, worktree kind and current branch on the four rows', async () => {
+    await renderExpanded();
 
     await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('+73,390'));
     expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('-5,000');
@@ -223,22 +246,8 @@ describe('GitEnvironmentCard', () => {
     expect(screen.getByTestId('git-env-commit-row')).toBeInTheDocument();
   });
 
-  it('degrades all rows for a non-git directory', async () => {
-    fetchGitStatusMock.mockResolvedValue({ ...STATUS, isRepo: false, files: [], commitable: false, pushable: false });
-    fetchGitBranchesMock.mockResolvedValue({ isRepo: false, branches: [], detached: false, current: null });
-    fetchGitWorktreeInfoMock.mockResolvedValue({ ...WORKTREE, isRepo: false, isMain: true, name: null });
-
-    render(<GitEnvironmentCard />);
-
-    await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('非 Git 仓库'));
-    expect(screen.getByTestId('git-env-changes-row')).toBeDisabled();
-    expect(screen.getByTestId('git-env-local-row')).toBeDisabled();
-    expect(screen.getByTestId('git-env-branch-row')).toBeDisabled();
-    expect(screen.getByTestId('git-env-commit-row')).toBeDisabled();
-  });
-
   it('opens the changes modal from the changes row and lists files with per-file stats', async () => {
-    render(<GitEnvironmentCard />);
+    await renderExpanded();
     await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('+73,390'));
 
     fireEvent.click(screen.getByTestId('git-env-changes-row'));
@@ -248,7 +257,7 @@ describe('GitEnvironmentCard', () => {
   });
 
   it('expands the local row in place without any section titles', async () => {
-    render(<GitEnvironmentCard />);
+    await renderExpanded();
     await waitFor(() => expect(screen.getByTestId('git-env-local-row')).toHaveTextContent('分支工作树'));
 
     expect(screen.queryByTestId('git-env-local-detail')).not.toBeInTheDocument();
@@ -265,7 +274,7 @@ describe('GitEnvironmentCard', () => {
   });
 
   it('lists every worktree as name-over-path two-line items', async () => {
-    render(<GitEnvironmentCard />);
+    await renderExpanded();
     await waitFor(() => expect(screen.getByTestId('git-env-local-row')).toHaveTextContent('分支工作树'));
 
     fireEvent.click(screen.getByTestId('git-env-local-row'));
@@ -296,7 +305,7 @@ describe('GitEnvironmentCard', () => {
   });
 
   it('opens the branch popover, marks the current branch and switches on click', async () => {
-    render(<GitEnvironmentCard />);
+    await renderExpanded();
     await waitFor(() => expect(screen.getByTestId('git-env-branch-row')).toHaveTextContent('feat/knowledge-retrieval-research'));
 
     fireEvent.click(screen.getByTestId('git-env-branch-row'));
@@ -314,7 +323,7 @@ describe('GitEnvironmentCard', () => {
   });
 
   it('creates a branch straight from the branch popover and refreshes the card', async () => {
-    render(<GitEnvironmentCard />);
+    await renderExpanded();
     await waitFor(() => expect(screen.getByTestId('git-env-branch-row')).toHaveTextContent('feat/knowledge-retrieval-research'));
 
     fireEvent.click(screen.getByTestId('git-env-branch-row'));
@@ -334,7 +343,7 @@ describe('GitEnvironmentCard', () => {
 
   it('surfaces branch creation failures instead of silently swallowing them', async () => {
     gitCreateBranchMock.mockResolvedValue({ httpOk: false, code: 'already_exists', error: 'already_exists' });
-    render(<GitEnvironmentCard />);
+    await renderExpanded();
     await waitFor(() => expect(screen.getByTestId('git-env-branch-row')).toHaveTextContent('feat/knowledge-retrieval-research'));
 
     fireEvent.click(screen.getByTestId('git-env-branch-row'));
@@ -358,7 +367,7 @@ describe('GitEnvironmentCard', () => {
       nativeRootPath: '/repo/worktrees/fix-login-race',
     });
 
-    render(<GitEnvironmentCard />);
+    await renderExpanded();
     await waitFor(() => expect(screen.getByTestId('git-env-worktree-row')).toBeEnabled());
 
     fireEvent.click(screen.getByTestId('git-env-worktree-row'));
@@ -385,7 +394,7 @@ describe('GitEnvironmentCard', () => {
   });
 
   it('blocks invalid worktree names before hitting the server', async () => {
-    render(<GitEnvironmentCard />);
+    await renderExpanded();
     await waitFor(() => expect(screen.getByTestId('git-env-worktree-row')).toBeEnabled());
 
     fireEvent.click(screen.getByTestId('git-env-worktree-row'));
@@ -398,7 +407,7 @@ describe('GitEnvironmentCard', () => {
   });
 
   it('opens the commit modal from the commit-or-push row', async () => {
-    render(<GitEnvironmentCard />);
+    await renderExpanded();
     await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('+73,390'));
 
     fireEvent.click(screen.getByTestId('git-env-commit-row'));
@@ -408,7 +417,7 @@ describe('GitEnvironmentCard', () => {
 
   it('shows load failure state and retries on click', async () => {
     fetchGitStatusMock.mockRejectedValueOnce(new Error('boom'));
-    render(<GitEnvironmentCard />);
+    await renderExpanded();
 
     await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('加载失败，点击重试'));
     fireEvent.click(screen.getByTestId('git-env-changes-row'));
@@ -416,23 +425,27 @@ describe('GitEnvironmentCard', () => {
     await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('+73,390'));
   });
 
-  it('collapses and expands the rows from the title bar', async () => {
+  it('starts with rows collapsed and toggles them from the title bar', async () => {
     render(<GitEnvironmentCard />);
-    await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('+73,390'));
+    await waitFor(() => expect(fetchGitStatusMock.mock.calls.length).toBeGreaterThanOrEqual(1));
 
+    // 默认折叠：数据已就绪但行内容不挂载
     const toggle = screen.getByRole('button', { name: /环境信息/ });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByTestId('git-env-changes-row')).not.toBeInTheDocument();
+
+    fireEvent.click(toggle);
+    await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('+73,390'));
+    expect(screen.getByTestId('git-env-history-row')).toBeInTheDocument();
+
     fireEvent.click(toggle);
     // Collapse 走 motion 退场动画，卸载有延迟
     await waitFor(() => expect(screen.queryByTestId('git-env-changes-row')).not.toBeInTheDocument());
     expect(screen.queryByTestId('git-env-history-row')).not.toBeInTheDocument();
-
-    fireEvent.click(toggle);
-    await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toBeInTheDocument());
-    expect(screen.getByTestId('git-env-history-row')).toBeInTheDocument();
   });
 
   it('opens the commit history modal from the history row', async () => {
-    render(<GitEnvironmentCard />);
+    await renderExpanded();
     await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('+73,390'));
 
     fireEvent.click(screen.getByTestId('git-env-history-row'));

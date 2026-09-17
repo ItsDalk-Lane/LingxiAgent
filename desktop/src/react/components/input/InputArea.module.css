@@ -1337,6 +1337,99 @@
     word-break: break-word;
 }
 
+/* ask_user 提问卡：问题上下排布，选项整行可点。
+   色值字面量收进定义行（扫描域豁免），引用位走 var() 不新增色值债务。 */
+.ask-user-question {
+    --ask-option-hover-bg: rgba(var(--accent-rgb), 0.06);
+    --ask-option-checked-bg: rgba(var(--accent-rgb), 0.1);
+    --ask-option-badge-border: rgba(var(--accent-rgb), 0.35);
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+}
+
+.ask-user-question-label {
+    font-size: var(--fs-hint);
+    line-height: 1.4;
+    color: var(--text);
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+.ask-user-question[data-missing] .ask-user-question-label {
+    color: var(--danger);
+}
+
+.ask-user-question-hint {
+    margin-left: 0.4rem;
+    font-size: var(--fs-hint);
+    color: var(--text-muted);
+}
+
+.ask-user-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.ask-user-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    min-width: 0;
+    padding: 0.25rem 0.35rem;
+    border-radius: 0;
+    cursor: pointer;
+    transition: background var(--duration-fast) ease;
+}
+
+.ask-user-option:hover {
+    background: var(--ask-option-hover-bg);
+}
+
+.ask-user-option[data-checked] {
+    background: var(--ask-option-checked-bg);
+}
+
+.ask-user-option input {
+    margin-top: 0.15rem;
+}
+
+.ask-user-option-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.ask-user-option-label {
+    font-size: var(--fs-hint);
+    line-height: 1.35;
+    color: var(--text);
+    word-break: break-word;
+}
+
+.ask-user-option-badge {
+    display: inline-block;
+    margin-left: 0.4rem;
+    padding: 0 0.35rem;
+    font-size: calc(var(--fs-hint) - 0.08rem);
+    line-height: 1.5;
+    color: rgb(var(--accent-rgb));
+    border: 1px solid var(--ask-option-badge-border);
+    border-radius: 1rem;
+    vertical-align: 0.06rem;
+}
+
+.ask-user-option-desc {
+    font-size: calc(var(--fs-hint) - 0.06rem);
+    line-height: 1.4;
+    color: var(--text-muted);
+    word-break: break-word;
+}
+
 /* The prompt sits above the composer and can get narrow. Below this width the
    fixed label column would squeeze the control to nothing, so the label takes
    its own line and is allowed to wrap instead of being clipped. */

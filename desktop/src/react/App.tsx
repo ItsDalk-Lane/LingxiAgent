@@ -111,7 +111,7 @@ function App() {
         {/* ── App body ── */}
         <div className="app">
           <ChatSidebar
-            open={sidebarOpen && currentTab !== 'knowledge'}
+            open={sidebarOpen}
             onOpenSettings={() => openSettingsModal()}
             onTogglePanel={togglePanel}
           />

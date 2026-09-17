@@ -43,7 +43,7 @@ describe('attachWorkbenchItemToInput', () => {
 
     expect(attachWorkbenchItemToInput({ path: '/Users/me/project/report.md', name: 'report.md' })).toBe(false);
     expect(useStore.getState().attachedFiles).toEqual([]);
-    expect(useStore.getState().toasts.map(toast => toast.text)).toContain('knowledge.useImportButton');
+    expect(useStore.getState().toasts.map(toast => toast.text)).toContain('channel.filesUnsupported');
   });
 
   it('stops at the nine attachment limit', () => {

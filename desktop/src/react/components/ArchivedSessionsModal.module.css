@@ -142,6 +142,28 @@
   user-select: none;
 }
 
+.toolbarLeft {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.exitSelectionBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--fs-caption);
+  font-family: inherit;
+  color: var(--text-muted, rgba(0, 0, 0, 0.55));
+  cursor: default;
+  transition: color var(--duration-fast) ease;
+}
+
+.exitSelectionBtn:hover {
+  color: var(--text, rgba(0, 0, 0, 0.85));
+}
+
 .selectAll input,
 .rowCheck {
   accent-color: var(--accent, #b8860b);
@@ -156,6 +178,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-8);
+  /* 未进入选择模式时左侧无全选区，保持批量按钮靠右 */
+  margin-left: auto;
 }
 
 .restoreSelectedBtn,
@@ -207,6 +231,8 @@
   gap: var(--space-12);
   padding: 5px var(--space-12);
   background: transparent;
+  cursor: pointer;
+  user-select: none;
   transition: background var(--duration-fast) ease;
 }
 
@@ -350,31 +376,7 @@
   color: var(--text-secondary, #888);
 }
 
-.groupRestoreBtn,
-.groupDeleteBtn {
-  flex-shrink: 0;
-  font-size: var(--text-xs, 11px);
-  background: none;
-  border: 1px solid currentColor;
-  border-radius: var(--radius-sm, 4px);
-  padding: var(--space-1, 4px) var(--space-2, 8px);
-  cursor: pointer;
-}
-
-.groupRestoreBtn {
-  color: var(--accent, #b8860b);
-}
-
-.groupDeleteBtn {
-  color: var(--danger, #d9534f);
-}
-
-.groupRestoreBtn:hover,
-.groupDeleteBtn:hover {
-  opacity: 0.85;
-}
-
-/* 分组折叠 */
+/* 分组折叠：折叠箭头独立承接点击，留出更大的命中区（负 margin 抵消位移） */
 
 .groupHeader {
   cursor: pointer;
@@ -385,8 +387,14 @@
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
+  padding: var(--space-2, 8px);
+  margin: calc(-1 * var(--space-2, 8px));
   color: var(--text-secondary, #888);
   transition: transform 0.15s ease;
+}
+
+.chevron:hover {
+  color: var(--text, rgba(0, 0, 0, 0.85));
 }
 
 .chevronOpen {

@@ -63,7 +63,8 @@ export function GitEnvironmentCard() {
   const [changesOpen, setChangesOpen] = useState(false);
   const [commitOpen, setCommitOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  // 默认折叠（用户裁决）：运行信息容器内只露标题行，点击展开
+  const [collapsed, setCollapsed] = useState(true);
   const branchRowRef = useRef<HTMLButtonElement>(null);
 
   const refresh = useCallback(async (): Promise<GitStatus | null> => {
@@ -127,6 +128,10 @@ export function GitEnvironmentCard() {
   if (!dir) return null;
 
   const isRepo = status?.isRepo ?? false;
+
+  // Git 环境检测不到（探测成功且非 Git 仓库）→ 整卡直接隐藏，不再展示降级行（用户裁决）。
+  // status 非空即探测已完成；loading / 探测失败不隐藏——git 仓库不闪跳，失败保留重试行。
+  if (status !== null && !status.isRepo) return null;
 
   const changesValue = (() => {
     if (loadState === 'loading') return '…';

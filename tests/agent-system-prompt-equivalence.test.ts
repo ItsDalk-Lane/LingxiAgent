@@ -124,6 +124,7 @@ describe("agent system prompt provenance equivalence", () => {
         "platform.action-discipline",
         "platform.web-tool-priority",
         "platform.learn-skills",
+        "platform.skill-usage",
         "agent.roster",
         "memory.rules",
         "memory.tenets",

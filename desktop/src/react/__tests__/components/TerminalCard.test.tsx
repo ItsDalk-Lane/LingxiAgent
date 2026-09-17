@@ -106,18 +106,23 @@ describe('TerminalCard', () => {
     });
   });
 
-  it('只显示运行中的终端，并固定为标题、运行时长和停止按钮', () => {
+  it('默认折叠只露标题行，展开后只显示运行中的终端', () => {
     setTerminals([
       terminal({ terminalId: 'running', label: '人类可读命令', createdAt: 5 }),
       terminal({ terminalId: 'done', label: '', command: 'done command', status: 'exited', exitCode: 0, createdAt: 4 }),
     ]);
-    const { container } = render(<TerminalCard />);
+    render(<TerminalCard />);
 
+    // 默认折叠（用户裁决）：标题行在，行内容不挂载
+    const header = screen.getByRole('button', { name: /终端进程/ });
+    expect(header).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByTestId('terminal-name-running')).toBeNull();
+
+    fireEvent.click(header);
+    expect(header).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByTestId('terminal-name-running')).toHaveTextContent('人类可读命令');
     expect(screen.queryByTestId('terminal-name-done')).toBeNull();
     expect(screen.getByRole('button', { name: '停止' })).toBeInTheDocument();
-    expect(container.querySelector('[aria-expanded]')).toBeNull();
-    expect(screen.queryByTestId('terminal-preview-running')).toBeNull();
   });
 
   it('shows every running terminal and no completed terminal', () => {
@@ -134,6 +139,8 @@ describe('TerminalCard', () => {
     }));
     setTerminals([...completed, ...running]);
     const { container } = render(<TerminalCard />);
+    // 默认折叠：先展开标题行再数行
+    fireEvent.click(screen.getByRole('button', { name: /终端进程/ }));
     const rows = Array.from(container.querySelectorAll('[data-terminal-row]'));
 
     expect(rows).toHaveLength(2);
@@ -149,6 +156,7 @@ describe('TerminalCard', () => {
   it('标题跳转到对应对话卡，停止按钮调用带会话身份的真实停止入口', async () => {
     setTerminals([terminal()]);
     render(<TerminalCard />);
+    fireEvent.click(screen.getByRole('button', { name: /终端进程/ }));
 
     fireEvent.click(screen.getByTestId('terminal-name-term_1'));
     expect(navigationMocks.navigateToChatCard).toHaveBeenCalledWith({
@@ -168,6 +176,7 @@ describe('TerminalCard', () => {
   it('resets the stopping state on a fallback timer when the authoritative event never arrives', async () => {
     setTerminals([terminal()]);
     render(<TerminalCard />);
+    fireEvent.click(screen.getByRole('button', { name: /终端进程/ }));
 
     vi.useFakeTimers();
     try {

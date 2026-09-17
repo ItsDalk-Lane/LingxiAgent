@@ -72,9 +72,11 @@ describe('RuntimeInfoCapsule', () => {
     const panel = screen.getByRole('dialog', { name: '运行信息' });
     expect(root).toContainElement(panel);
 
-    expect(screen.getByTestId('capsule-jian')).toBeInTheDocument();
-    // 胶囊内不出现第二份清单（A01）
     expect(screen.queryByTestId('capsule-todo')).not.toBeInTheDocument();
+    // 笺默认折叠：只露标题行，点击标题后编辑器才挂载（用户裁决）
+    expect(screen.queryByTestId('capsule-jian')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: '笺' }));
+    expect(screen.getByTestId('capsule-jian')).toBeInTheDocument();
     expect(screen.getByTestId('capsule-terminal')).toBeInTheDocument();
     expect(screen.getByTestId('capsule-workflow')).toBeInTheDocument();
     expect(screen.getByTestId('capsule-agent')).toBeInTheDocument();

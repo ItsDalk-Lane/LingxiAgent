@@ -266,6 +266,16 @@
       "breakingMigrationRequiresAccessMove": false
     },
     {
+      "id": "ephemeral-scanner-scratch",
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "opensBeforeFutureCoordinator": false,
+      "writesBeforeFutureCoordinator": false,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "breakingMigrationRequiresAccessMove": false
+    },
+    {
       "id": "execution-leases",
       "firstPossibleOpenPhase": "identity_seed",
       "firstPossibleWritePhase": "identity_seed",
@@ -530,6 +540,26 @@
       "breakingMigrationRequiresAccessMove": false
     },
     {
+      "id": "session-checkpoints",
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "opensBeforeFutureCoordinator": false,
+      "writesBeforeFutureCoordinator": false,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "breakingMigrationRequiresAccessMove": false
+    },
+    {
+      "id": "session-context-notes",
+      "firstPossibleOpenPhase": "runtime_ready",
+      "firstPossibleWritePhase": "runtime_ready",
+      "opensBeforeFutureCoordinator": false,
+      "writesBeforeFutureCoordinator": false,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "breakingMigrationRequiresAccessMove": false
+    },
+    {
       "id": "session-drafts-and-projects",
       "firstPossibleOpenPhase": "engine_construct",
       "firstPossibleWritePhase": "engine_construct",
@@ -542,6 +572,16 @@
     {
       "id": "session-files",
       "firstPossibleOpenPhase": "engine_construct",
+      "firstPossibleWritePhase": "runtime_ready",
+      "opensBeforeFutureCoordinator": false,
+      "writesBeforeFutureCoordinator": false,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "breakingMigrationRequiresAccessMove": false
+    },
+    {
+      "id": "session-goal",
+      "firstPossibleOpenPhase": "runtime_ready",
       "firstPossibleWritePhase": "runtime_ready",
       "opensBeforeFutureCoordinator": false,
       "writesBeforeFutureCoordinator": false,

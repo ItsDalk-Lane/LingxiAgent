@@ -167,7 +167,9 @@ describe("deferred bundled plugin parity", () => {
     return made;
   }
 
-  it("filters unavailable plugin targets before counting the defer threshold", () => {
+  it("defers the sole eligible plugin target and keeps unavailable ones out entirely", () => {
+    // 插件侧不再有数量阈值：内置按需开启时，哪怕只有一个可延迟目标也进目录
+    // （目录成本是每工具一行）。没有资格的目标既不直载也不进目录。
     const tools = Array.from({ length: 12 }, (_, index) => pluginTool(
       "office",
       `tool-${index}`,
@@ -176,9 +178,12 @@ describe("deferred bundled plugin parity", () => {
     const { result } = build(tools, { deferThreshold: 10 });
     const names = result.customTools.map((tool: { name?: string }) => tool.name);
 
-    expect(names).toContain("office_tool-0");
-    for (const bridgeName of BRIDGE_NAMES) expect(names).not.toContain(bridgeName);
-    expect(result.toolCatalogManifest).toBeNull();
+    expect(names).not.toContain("office_tool-0");
+    expect(names).not.toContain("office_tool-1");
+    for (const bridgeName of BRIDGE_NAMES) expect(names).toContain(bridgeName);
+    expect(result.toolCatalogManifest).toBeTruthy();
+    expect(result.toolCatalogManifest.text).toContain("office_tool-0");
+    expect(result.toolCatalogManifest.text).not.toContain("office_tool-1");
   });
 
   it("keeps agent-disabled office and beautify targets out of search, describe, and call", async () => {
@@ -237,7 +242,13 @@ describe("deferred bundled plugin parity", () => {
 
   it("makes direct and deferred read-only calls preserve result and invocation handles", async () => {
     const directTarget = pluginTool("demo", "read", { readOnly: true });
-    const direct = build([directTarget], { deferEnabled: false, permissionMode: "read_only" });
+    // 直连对照面必须整体退回直载：deferEnabled 只关 MCP 源，插件/内置源由
+    // builtinDefer 单独把关。
+    const direct = build([directTarget], {
+      deferEnabled: false,
+      builtinDefer: false,
+      permissionMode: "read_only",
+    });
     const directController = new AbortController();
     const directUpdate = vi.fn();
     const directResult = await invoke(

@@ -1,0 +1,20 @@
+.modal {
+  /* 色值字面量收进定义行（扫描域豁免），引用位走 var() */
+  --knowledge-modal-shadow-soft: rgba(0, 0, 0, 0.07);
+  width: min(1240px, calc(100vw - 96px));
+  height: min(780px, calc(100vh - 96px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--radius-lg, 12px);
+  background: var(--bg, #fcfaf5);
+  box-shadow: 0 16px 48px var(--shadow, rgba(0, 0, 0, 0.12)), 0 4px 14px var(--knowledge-modal-shadow-soft);
+}
+
+@media (max-width: 1050px) {
+  .modal {
+    width: calc(100vw - 48px);
+    height: calc(100vh - 48px);
+  }
+}

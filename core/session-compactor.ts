@@ -1,4 +1,6 @@
 import { randomUUID } from "node:crypto";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { runWithProviderCompatPurpose } from "./provider-compat/purpose-scope.ts";
 import {
   buildNativeCompactionRequestShapes,
@@ -34,6 +36,8 @@ import { normalizeRequestThinkingLevel } from "./session-thinking-level.ts";
 import { resolveRequestReasoningLevel } from "./request-reasoning-level.ts";
 import { createLossyLocalCompactionResult } from "./lossy-local-compaction.ts";
 import { INSTANT_SIMPLE_COMPACTION_RUNTIME_MODE } from "../shared/compaction-mode.ts";
+import { planFilePathForSession } from "../lib/plan-mode/plan-file.ts";
+import { readContextNotes, CONTEXT_NOTES_MAX_BYTES, CONTEXT_NOTES_TRUNCATION_MARKER } from "../lib/tools/context-notes-tool.ts";
 
 const DEFAULT_HARD_TRUNCATE_THRESHOLD = 0.85;
 
@@ -1251,6 +1255,258 @@ function appendHistoryRecoveryContext(summary, historyRecovery) {
     + `</history-recovery>`;
 }
 
+// ── 技能回顾（skill recall）────────────────────────────────────────────
+// 技能正文一经 read 就随旧区一起被摘要掉，模型只剩 <read-files> 里的一个路径。
+// 这里在压缩摘要尾部追加 <skill-recall> 段：扫描被摘要区里 `[Use skill: …]`
+// 前缀与 read 工具对 SKILL.md 的调用，把技能正文（从磁盘现读、按预算截头）
+// 重新贴回上下文，并从上一份摘要的 <skill-recall> 解析续传，跨多次压缩存活。
+// 对应的系统提示读法约定在 core/agent.ts 的「技能使用纪律」段，改动须同步。
+
+const SKILL_RECALL_MAX_CHARS_PER_SKILL = 6_000;
+const SKILL_RECALL_MAX_CHARS_TOTAL = 24_000;
+const SKILL_RECALL_TRUNCATION_MARKER =
+  "\n[... skill instructions truncated for compaction; read the Path above for the full text]";
+const SKILL_FILE_PATH_RE = /(?:^|[/\\])SKILL\.md$/;
+const SKILL_INVOCATION_PREFIX_RE = /^\[Use skill: ([^\]]+)\]/gm;
+
+interface SkillRecallEntry {
+  name: string;
+  path: string | null;
+  content: string | null;
+  note?: "unavailable" | "name-only" | "omitted-budget";
+}
+
+function userMessageText(message: any): string {
+  if (message?.role !== "user") return "";
+  if (typeof message.content === "string") return message.content;
+  if (!Array.isArray(message.content)) return "";
+  return message.content
+    .filter((block: any) => block?.type === "text" && typeof block.text === "string")
+    .map((block: any) => block.text)
+    .join("\n");
+}
+
+function collectInvokedSkillNames(messages: any[]): string[] {
+  const names: string[] = [];
+  for (const message of Array.isArray(messages) ? messages : []) {
+    const text = userMessageText(message);
+    if (!text) continue;
+    for (const match of text.matchAll(SKILL_INVOCATION_PREFIX_RE)) {
+      const name = match[1].trim();
+      if (name && !names.includes(name)) names.push(name);
+    }
+  }
+  return names;
+}
+
+function collectSkillFileReads(messages: any[]): Array<{ name: string; path: string }> {
+  const reads: Array<{ name: string; path: string }> = [];
+  for (const message of Array.isArray(messages) ? messages : []) {
+    if (message?.role !== "assistant" || !Array.isArray(message.content)) continue;
+    for (const block of message.content) {
+      if (block?.type !== "toolCall" || block.name !== "read") continue;
+      const readPath = typeof block?.arguments?.path === "string" ? block.arguments.path : "";
+      if (!SKILL_FILE_PATH_RE.test(readPath)) continue;
+      if (reads.some((read) => read.path === readPath)) continue;
+      reads.push({ name: path.basename(path.dirname(readPath)), path: readPath });
+    }
+  }
+  return reads;
+}
+
+/** Parse `<skill-recall>` entries back out of a previous compaction summary. */
+export function parseExistingSkillRecall(previousSummary: any): SkillRecallEntry[] {
+  if (typeof previousSummary !== "string" || !previousSummary.includes("<skill-recall>")) return [];
+  const entries: SkillRecallEntry[] = [];
+  for (const blockMatch of previousSummary.matchAll(/<skill-recall>([\s\S]*?)(?:<\/skill-recall>|$)/g)) {
+    for (const part of blockMatch[1].split(/^### Skill: /m).slice(1)) {
+      const lines = part.split("\n");
+      const name = lines[0].trim();
+      if (!name) continue;
+      const pathMatch = lines[1]?.match(/^Path: (.+)$/);
+      const contentStart = pathMatch ? 2 : 1;
+      const content = lines.slice(contentStart).join("\n").trim();
+      entries.push({ name, path: pathMatch ? pathMatch[1].trim() : null, content: content || null });
+    }
+  }
+  return entries;
+}
+
+/** Merge previous-recall entries with skills detected in the region being summarized. */
+function mergeSkillRecallEntries(
+  previous: SkillRecallEntry[],
+  invokedNames: string[],
+  fileReads: Array<{ name: string; path: string }>,
+): SkillRecallEntry[] {
+  const entries: SkillRecallEntry[] = [];
+  const byPath = new Map<string, SkillRecallEntry>();
+  const byName = new Map<string, SkillRecallEntry>();
+  const push = (entry: SkillRecallEntry) => {
+    if (byName.has(entry.name) && !entry.path) return;
+    entries.push(entry);
+    if (entry.path) byPath.set(entry.path, entry);
+    byName.set(entry.name, entry);
+  };
+  for (const prev of previous) push({ name: prev.name, path: prev.path, content: prev.content });
+  for (const read of fileReads) {
+    if (byPath.has(read.path)) continue;
+    const existing = byName.get(read.name);
+    if (existing && !existing.path) {
+      existing.path = read.path;
+      if (existing.note === "name-only") delete existing.note;
+      byPath.set(read.path, existing);
+      continue;
+    }
+    push({ name: read.name, path: read.path, content: null });
+  }
+  for (const name of invokedNames) {
+    if (byName.has(name)) continue;
+    push({ name, path: null, content: null, note: "name-only" });
+  }
+  return entries;
+}
+
+/**
+ * Fill in skill bodies from disk at compaction time. History copies may already
+ * be truncated by the tool-result guards, so the file is re-read; a file that
+ * vanished is recorded explicitly instead of silently dropped.
+ */
+async function hydrateSkillRecallContents(entries: SkillRecallEntry[]): Promise<SkillRecallEntry[]> {
+  let totalBudget = SKILL_RECALL_MAX_CHARS_TOTAL;
+  for (const entry of entries) {
+    if (!entry.path) continue;
+    if (typeof entry.content === "string") {
+      totalBudget -= entry.content.length;
+      continue;
+    }
+    if (totalBudget <= 0) {
+      entry.note = "omitted-budget";
+      continue;
+    }
+    try {
+      const raw = await readFile(entry.path, "utf-8");
+      const budget = Math.min(SKILL_RECALL_MAX_CHARS_PER_SKILL, totalBudget);
+      entry.content = raw.length > budget
+        ? raw.slice(0, Math.max(0, budget - SKILL_RECALL_TRUNCATION_MARKER.length)) + SKILL_RECALL_TRUNCATION_MARKER
+        : raw;
+      totalBudget -= entry.content.length;
+    } catch {
+      entry.content = null;
+      entry.note = "unavailable";
+    }
+  }
+  return entries;
+}
+
+async function buildSkillRecallEntries(preparation: any): Promise<SkillRecallEntry[]> {
+  const summarizedRegion = [
+    ...(Array.isArray(preparation?.messagesToSummarize) ? preparation.messagesToSummarize : []),
+    ...(Array.isArray(preparation?.turnPrefixMessages) ? preparation.turnPrefixMessages : []),
+  ];
+  const entries = mergeSkillRecallEntries(
+    parseExistingSkillRecall(preparation?.previousSummary),
+    collectInvokedSkillNames(summarizedRegion),
+    collectSkillFileReads(summarizedRegion),
+  );
+  if (entries.length === 0) return entries;
+  return await hydrateSkillRecallContents(entries);
+}
+
+function renderSkillRecallSection(entries: SkillRecallEntry[]): string | null {
+  if (!Array.isArray(entries) || entries.length === 0) return null;
+  const lines = [
+    "<skill-recall>",
+    "The following skills were invoked earlier in this session. Their instructions were compacted away; "
+    + "the excerpts below are authoritative — keep following them. Re-read the Path for the full text.",
+  ];
+  for (const entry of entries) {
+    lines.push(`### Skill: ${entry.name}`);
+    if (entry.path) lines.push(`Path: ${entry.path}`);
+    if (typeof entry.content === "string" && entry.content.length > 0) {
+      lines.push(entry.content);
+    } else if (entry.note === "unavailable") {
+      lines.push("(skill file could not be read at compaction time; re-load it from the skill catalog if still needed)");
+    } else if (entry.note === "name-only") {
+      lines.push("(invoked by name only, never read in the compacted history; load it from the skill catalog if still needed)");
+    } else {
+      lines.push("(content omitted to stay within the recall budget; read the Path above)");
+    }
+  }
+  lines.push("</skill-recall>");
+  return lines.join("\n");
+}
+
+function appendSkillRecallContext(summary: string, entries: SkillRecallEntry[]): string {
+  const section = renderSkillRecallSection(entries);
+  if (!section) return summary;
+  return `${summary.trimEnd()}\n\n${section}`;
+}
+
+// ── 计划文件保护（plan-file）────────────────────────────────────────────
+// 计划模式的唯一交付物是会话旁 plan 文件；它的 read 结果随旧区被摘要掉后，
+// 模型就忘了计划内容。照 skill-recall 的同一模式：压缩时从磁盘现读正文，
+// 追加 <plan-file> 段进摘要尾部。每次压缩都现读，跨压缩天然保鲜。
+// 路径契约在 lib/plan-mode/plan-file.ts，三处消费方共用。
+
+const PLAN_FILE_RECALL_MAX_CHARS = 8_000;
+const PLAN_FILE_TRUNCATION_MARKER =
+  "\n[... plan truncated for compaction; read the file for the full text]";
+
+async function buildPlanFileSection(preparation: any): Promise<string | null> {
+  const planPath = typeof preparation?.planFilePath === "string" ? preparation.planFilePath : "";
+  if (!planPath) return null;
+  let content: string;
+  try {
+    content = await readFile(planPath, "utf8");
+  } catch {
+    return null; // 没有计划文件 = 没有要保护的东西
+  }
+  if (!content.trim()) return null;
+  const truncated = content.length > PLAN_FILE_RECALL_MAX_CHARS;
+  const body = truncated ? content.slice(0, PLAN_FILE_RECALL_MAX_CHARS) : content;
+  return [
+    "<plan-file>",
+    `The session plan file (${planPath}) is this session's plan-mode deliverable. Its current content, read fresh from disk at compaction time:`,
+    body,
+    ...(truncated ? [PLAN_FILE_TRUNCATION_MARKER.trim()] : []),
+    "</plan-file>",
+  ].join("\n");
+}
+
+function appendPlanFileContext(summary: string, section: string | null): string {
+  if (!section) return summary;
+  return `${summary.trimEnd()}\n\n${section}`;
+}
+
+// ── 上下文笔记保护（context-notes）──────────────────────────────────────
+// 模型写给未来自己的便签（约束/决定/坐标）。压缩时从磁盘现读全文注入摘要
+// 尾部，跨压缩存活——照 skill-recall / plan-file 的同一保护族。
+async function buildContextNotesSection(preparation): Promise<string | null> {
+  const notesPath = (preparation as any)?.contextNotesPath;
+  if (typeof notesPath !== "string" || !notesPath) return null;
+  let notes = "";
+  try {
+    notes = readContextNotes(notesPath);
+  } catch {
+    return null;
+  }
+  if (!notes.trim()) return null;
+  if (Buffer.byteLength(notes, "utf8") > CONTEXT_NOTES_MAX_BYTES) {
+    notes = Buffer.from(notes, "utf8").subarray(0, CONTEXT_NOTES_MAX_BYTES).toString("utf8") + CONTEXT_NOTES_TRUNCATION_MARKER;
+  }
+  return [
+    "<context-notes>",
+    "Your own session notes (survive compaction; keep following them, update via the context_notes tool):",
+    notes,
+    "</context-notes>",
+  ].join("\n");
+}
+
+function appendContextNotesContext(summary: string, section: string | null): string {
+  if (!section) return summary;
+  return `${summary.trimEnd()}\n\n${section}`;
+}
+
 function cacheKeyParamsFromSnapshot(snapshot) {
   if (snapshot?.cacheKeyParams && typeof snapshot.cacheKeyParams === "object" && !Array.isArray(snapshot.cacheKeyParams)) {
     return snapshot.cacheKeyParams;
@@ -1638,10 +1894,19 @@ export async function createCachePreservingCompactionResult({
     ...computeFileDetails(preparation.fileOps),
     ...(historyRecovery ? { historyRecovery } : {}),
   };
+  const skillRecallEntries = await buildSkillRecallEntries(preparation);
+  const planFileSection = await buildPlanFileSection(preparation);
+  const contextNotesSection = await buildContextNotesSection(preparation);
   return {
-    summary: appendHistoryRecoveryContext(
-      appendFileOperationContext(runResult.summary, details),
-      historyRecovery,
+    summary: appendContextNotesContext(
+      appendPlanFileContext(
+        appendHistoryRecoveryContext(
+          appendSkillRecallContext(appendFileOperationContext(runResult.summary, details), skillRecallEntries),
+          historyRecovery,
+        ),
+        planFileSection,
+      ),
+      contextNotesSection,
     ),
     firstKeptEntryId: preparation.firstKeptEntryId,
     tokensBefore: preparation.tokensBefore,
@@ -1759,6 +2024,12 @@ export async function runCachePreservingCompactionForSession(session: any, {
       if (lastEntry?.type === "compaction") throw new Error("Already compacted");
       throw new Error("Nothing to compact (session too small)");
     }
+    // 计划文件压缩保护：会话旁 plan.md 的正文在摘要尾部随 <plan-file> 段存活。
+    // planFilePath 是本轮新增的旁挂字段，pi-sdk 的 CompactionPreparation 类型不含它，
+    // 这里以 any 单点挂载（下游 createCachePreservingCompactionResult 本就把 preparation 当 any 读）。
+    (preparation as any).planFilePath = planFilePathForSession(session.sessionManager.getSessionFile?.());
+    // context-notes 同一旁挂模式：压缩时按会话文件现读笔记全文
+    (preparation as any).contextNotesPath = session.sessionManager.getSessionFile?.() || null;
 
     const systemPrompt = session.agent.state?.systemPrompt ?? session.systemPrompt;
     const rawLiveMessages = session.sessionManager.buildSessionContext()?.messages;

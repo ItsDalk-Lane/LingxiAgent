@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>模型观测 · 「设置」子页 设计参考稿</title>
+<style>
+  :root {
+    --bg: #f5f2ec;
+    --card: #fffdf8;
+    --border: #e8e1d6;
+    --border-strong: #d8cfc2;
+    --text: #292524;
+    --muted: #8a8177;
+    --accent: #0e7490;
+    --accent-soft: #e0f0f4;
+    --danger: #b91c1c;
+    --danger-soft: #fdecec;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 14px;
+    padding: 24px 32px 64px;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  .mock-banner {
+    background: #fdf6e3;
+    border: 1px dashed #d3b56a;
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin-bottom: 20px;
+    color: #7c5e14;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .mock-banner b { color: #5f4a0e; }
+
+  /* 子标签行 */
+  .subtabs {
+    display: flex; align-items: stretch; justify-content: space-between;
+    border-bottom: 1px solid var(--border-strong); margin-bottom: 20px;
+  }
+  .tabgroup { display: flex; gap: 4px; }
+  .tab {
+    padding: 9px 18px; background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 14px; position: relative; bottom: -1px;
+    border-bottom: 2px solid transparent; font-family: inherit;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .tabactions { display: flex; align-items: center; gap: 8px; align-self: center; }
+  .btn {
+    padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border-strong);
+    background: var(--card); color: var(--text); font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+
+  /* 状态摘要卡 */
+  .status-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 18px; margin-bottom: 16px; font-size: 13px; line-height: 2;
+    color: var(--text);
+  }
+  .status-card .dim { color: var(--muted); }
+
+  /* 通用面板 */
+  .panel {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 18px; margin-bottom: 16px;
+  }
+  .panel h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .panel .hint { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+
+  /* 保留天数 */
+  .retention-row { display: flex; align-items: center; gap: 12px; }
+  .retention-row label { font-size: 13px; color: var(--muted); }
+  .retention-row input {
+    width: 110px; padding: 6px 10px; font-size: 14px; font-family: inherit;
+    border: 1px solid var(--border-strong); border-radius: 8px; background: #fff; color: var(--text);
+  }
+  .retention-row .unit { color: var(--muted); font-size: 13px; }
+  .retention-row .btn-primary { margin-left: auto; }
+  .btn-primary {
+    padding: 6px 18px; border-radius: 8px; border: none; cursor: pointer;
+    background: var(--accent); color: #fff; font-size: 13px; font-weight: 600; font-family: inherit;
+  }
+
+  /* 存储概况 */
+  .overview { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
+  .ov-card { background: #faf7f1; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .ov-card .label { color: var(--muted); font-size: 12px; margin-bottom: 5px; }
+  .ov-card .value { font-size: 19px; font-weight: 700; }
+  .ov-card .value small { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 3px; }
+  .ov-card .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .breakdown { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; color: var(--text); }
+  .breakdown .item { display: inline-flex; align-items: center; gap: 6px; }
+  .breakdown .dot { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
+  .breakdown .val { color: var(--muted); }
+  .path-row {
+    display: flex; align-items: center; gap: 10px; margin-top: 14px;
+    padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: #faf7f1;
+  }
+  .path-label { font-size: 12px; color: var(--muted); flex: none; }
+  .path-code {
+    font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; color: var(--text);
+    overflow-wrap: anywhere;
+  }
+  .path-copy { flex: none; font-size: 12px; }
+
+  /* 删除区 */
+  .danger-panel { border-color: #efc7c7; }
+  .danger-panel h3 { color: var(--danger); }
+  .del-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .field-label { font-size: 13px; font-weight: 600; margin-bottom: 8px; display: block; }
+  .scope-option { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 13px; }
+  .scope-option input { accent-color: var(--accent); }
+  .cat-option { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 13px; }
+  .cat-option input { accent-color: var(--accent); }
+  .cat-option .size { color: var(--muted); margin-left: auto; font-size: 12px; }
+  .date-row { display: flex; align-items: center; gap: 8px; margin: 6px 0 0 24px; }
+  .date-row select {
+    font-family: inherit; font-size: 13px; padding: 5px 8px; border-radius: 8px;
+    border: 1px solid var(--border-strong); background: #fff; color: var(--text); min-width: 150px;
+  }
+  .estimate {
+    margin-top: 14px; padding: 10px 14px; border-radius: 10px;
+    background: var(--danger-soft); color: var(--danger); font-size: 13px; line-height: 1.8;
+  }
+  .del-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
+  .btn-danger {
+    padding: 7px 20px; border-radius: 8px; border: none; cursor: pointer;
+    background: var(--danger); color: #fff; font-size: 13px; font-weight: 600; font-family: inherit;
+  }
+  .btn-danger:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-plain {
+    padding: 7px 20px; border-radius: 8px; border: 1px solid var(--border-strong);
+    background: var(--card); color: var(--text); font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+
+  /* 确认弹层 */
+  .modal-mask {
+    position: fixed; inset: 0; background: rgba(30, 25, 15, 0.45); z-index: 60;
+    display: none; align-items: center; justify-content: center;
+  }
+  .modal-mask.open { display: flex; }
+  .modal {
+    background: var(--card); border-radius: 14px; padding: 22px 24px; width: 430px; max-width: 92vw;
+    box-shadow: 0 16px 48px rgba(40, 32, 16, 0.3);
+  }
+  .modal h4 { font-size: 15px; margin-bottom: 10px; color: var(--danger); }
+  .modal .body { font-size: 13px; line-height: 2; color: var(--text); margin-bottom: 16px; }
+  .modal .actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    background: #2c2925; color: #fff; font-size: 13px; border-radius: 999px;
+    padding: 9px 20px; opacity: 0; transition: opacity 0.25s; pointer-events: none; z-index: 99;
+  }
+  .toast.show { opacity: 0.95; }
+</style>
+</head>
+<body>
+
+<div class="mock-banner">
+  <b>设计参考稿</b>（数据为虚构演示）。模型观测页增加第 4 个子标签「设置」：原「记录设置」弹窗的内容搬到这里，
+  右上角「记录设置」按钮与原弹窗移除；保留天数合并为<b>一个输入框</b>（三类记录共用同一配置）；
+  新增存储概况（已保存天数 / 数据起始日 / 各类体积）与<b>分类 + 按天/全部</b>删除。
+</div>
+
+<!-- 子标签行：4 个标签；右上角不再有「记录设置」按钮 -->
+<div class="subtabs">
+  <div class="tabgroup">
+    <button class="tab">Token 用量</button>
+    <button class="tab">调用台账</button>
+    <button class="tab">调用轨迹</button>
+    <button class="tab active">设置</button>
+  </div>
+  <div class="tabactions">
+    <button class="btn">刷新</button>
+    <button class="btn">导出</button>
+  </div>
+</div>
+
+<!-- 记录状态摘要 -->
+<div class="status-card">
+  实际状态：<b>记录中</b>　·　查询服务：就绪 · schema v7<br>
+  <span class="dim">元数据、模型正文和合格媒体始终开启，并继续执行脱敏、截断和容量保护。</span><br>
+  <span class="dim">静态加密：无（依赖本机文件权限保护）　·　最近写入：2026/09/17 20:35:17</span>
+</div>
+
+<!-- 保留配置：单一输入框 -->
+<div class="panel">
+  <h3>保留天数</h3>
+  <div class="hint">轨迹、Payload 正文、媒体 Blob 统一使用这一个天数；超过保留期的数据由系统按天自动清理。</div>
+  <div class="retention-row">
+    <label for="retention">保留最近</label>
+    <input id="retention" type="number" value="180" min="1" max="3650">
+    <span class="unit">天的记录（1 – 3650）</span>
+    <button class="btn-primary" onclick="toast('已保存：全部记录保留最近 180 天（演示）')">保存</button>
+  </div>
+</div>
+
+<!-- 存储概况 -->
+<div class="panel">
+  <h3>存储概况</h3>
+  <div class="hint">当前磁盘上实际保存的数据（随删除实时变化）。</div>
+  <div class="overview">
+    <div class="ov-card"><div class="label">已保存</div><div class="value">23<small>天</small></div></div>
+    <div class="ov-card"><div class="label">数据起始日</div><div class="value" style="font-size:15px">2026年8月26日</div><div class="sub">最早一条记录</div></div>
+    <div class="ov-card"><div class="label">占用体积</div><div class="value">2.31<small>GB</small></div></div>
+    <div class="ov-card"><div class="label">覆盖调用</div><div class="value">8,511<small>次</small></div></div>
+  </div>
+  <div class="breakdown">
+    <span class="item"><span class="dot" style="background:#0e7490"></span>轨迹与元数据 <span class="val">486 MB</span></span>
+    <span class="item"><span class="dot" style="background:#b45309"></span>Payload 正文 <span class="val">634 MB</span></span>
+    <span class="item"><span class="dot" style="background:#15803d"></span>媒体 Blob <span class="val">1.21 GB</span></span>
+  </div>
+  <div class="path-row">
+    <span class="path-label">存放路径</span>
+    <code class="path-code" id="data-path">~/.lingxi-dev/model-observability/</code>
+    <button class="btn path-copy" onclick="copyPath()">复制路径</button>
+  </div>
+</div>
+
+<!-- 删除数据 -->
+<div class="panel danger-panel">
+  <h3>删除数据</h3>
+  <div class="hint">选择范围与类别后删除；删除不可恢复，系统会先展示将释放的体积。</div>
+  <div class="del-grid">
+    <div>
+      <span class="field-label">删除范围</span>
+      <label class="scope-option"><input type="radio" name="scope" value="all" checked onchange="render()">全部数据（当前保存的所有天数）</label>
+      <label class="scope-option"><input type="radio" name="scope" value="day" onchange="render()">按天删除（选定某一天的全部记录）</label>
+      <div class="date-row" id="date-row" style="display:none">
+        <select id="day-select">
+          <option>2026年9月17日（1,204 次 · 96 MB）</option>
+          <option>2026年9月16日（988 次 · 82 MB）</option>
+          <option>2026年9月15日（1,051 次 · 88 MB）</option>
+          <option>2026年9月12日（2,570 次 · 210 MB）</option>
+          <option>2026年9月11日（836 次 · 71 MB）</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <span class="field-label">删除类别（可多选）</span>
+      <label class="cat-option"><input type="checkbox" data-cat="trace" checked onchange="render()">轨迹与元数据<span class="size">486 MB</span></label>
+      <label class="cat-option"><input type="checkbox" data-cat="payload" checked onchange="render()">Payload 正文<span class="size">634 MB</span></label>
+      <label class="cat-option"><input type="checkbox" data-cat="media" checked onchange="render()">媒体 Blob<span class="size">1.21 GB</span></label>
+    </div>
+  </div>
+  <div class="estimate" id="estimate"></div>
+  <div class="del-actions">
+    <button class="btn-danger" id="del-btn" onclick="openModal()">删除所选数据</button>
+  </div>
+</div>
+
+<!-- 确认弹层 -->
+<div class="modal-mask" id="mask">
+  <div class="modal">
+    <h4>确认删除</h4>
+    <div class="body" id="modal-body"></div>
+    <div class="actions">
+      <button class="btn-plain" onclick="closeModal()">取消</button>
+      <button class="btn-danger" onclick="doDelete()">确认删除</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const CAT_NAMES = { trace: "轨迹与元数据", payload: "Payload 正文", media: "媒体 Blob" };
+const CAT_SIZE_MB = { trace: 486, payload: 634, media: 1239 }; // 媒体约 1.21 GB
+const TOTAL_DAYS = 23, TOTAL_CALLS = 8511;
+
+function $(id) { return document.getElementById(id); }
+function toast(msg) {
+  const el = $("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove("show"), 2200);
+}
+function fmtSize(mb) {
+  return mb >= 1024 ? `${(mb / 1024).toFixed(2)} GB` : `${Math.round(mb)} MB`;
+}
+function scope() { return document.querySelector('input[name="scope"]:checked').value; }
+function selectedCats() {
+  return [...document.querySelectorAll('.cat-option input:checked')].map((el) => el.dataset.cat);
+}
+function estimateMb() {
+  const cats = selectedCats();
+  if (cats.length === 0) return 0;
+  const total = cats.reduce((s, c) => s + CAT_SIZE_MB[c], 0);
+  if (scope() === "day") {
+    // 按天：演示按所选日占全量约 1/23 估算
+    return Math.round(total / TOTAL_DAYS);
+  }
+  return total;
+}
+function render() {
+  $("date-row").style.display = scope() === "day" ? "flex" : "none";
+  const cats = selectedCats();
+  const mb = estimateMb();
+  const catText = cats.map((c) => CAT_NAMES[c]).join("、") || "（未选择类别）";
+  const scopeText = scope() === "day"
+    ? `仅 ${$("day-select").value.split("（")[0]} 一天`
+    : `全部 ${TOTAL_DAYS} 天`;
+  $("estimate").innerHTML = cats.length === 0
+    ? "请先勾选要删除的类别。"
+    : `将删除：<b>${scopeText}</b> 的 ${esc(catText)}。<br>预计释放体积：<b>${fmtSize(mb)}</b>。删除后不可恢复。`;
+  $("del-btn").disabled = cats.length === 0;
+}
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+
+function openModal() {
+  const cats = selectedCats();
+  if (cats.length === 0) return;
+  const scopeText = scope() === "day"
+    ? `仅 ${$("day-select").value.split("（")[0]} 一天`
+    : `全部 ${TOTAL_DAYS} 天（约 ${TOTAL_CALLS.toLocaleString("en-US")} 次调用）`;
+  $("modal-body").innerHTML =
+    `将删除 <b>${esc(scopeText)}</b> 的以下数据：<br>· ${cats.map((c) => esc(CAT_NAMES[c])).join("<br>· ")}<br>` +
+    `预计释放 <b>${fmtSize(estimateMb())}</b>。<br><span style="color:var(--danger)">此操作不可恢复，请确认。</span>`;
+  $("mask").classList.add("open");
+}
+function closeModal() { $("mask").classList.remove("open"); }
+function doDelete() {
+  closeModal();
+  toast("已删除（演示，不会真删数据）");
+}
+function copyPath() {
+  const text = $("data-path").textContent;
+  navigator.clipboard?.writeText(text).then(
+    () => toast("路径已复制"),
+    () => toast("复制失败，请手动选择复制"),
+  );
+}
+document.querySelectorAll('input[name="scope"]').forEach((el) => el.addEventListener("change", render));
+document.querySelectorAll('.cat-option input').forEach((el) => el.addEventListener("change", render));
+$("day-select").addEventListener("change", render);
+render();
+</script>
+</body>
+</html>

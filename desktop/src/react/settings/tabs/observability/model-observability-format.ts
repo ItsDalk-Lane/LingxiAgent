@@ -25,14 +25,31 @@ function trimUnitNumber(value: number): string {
   return fixed.endsWith('.0') ? fixed.slice(0, -2) : fixed;
 }
 
-/** 紧凑格式：1.3M / 12K / 850。 */
+/** 紧凑格式（2026-09-17 用户拍板，中文数量级）：<1 万原样整数；
+ *  之后 1.32万 / 12万 / 1.2亿 / 1200亿 / 1.2万亿；尾数 ≤2 位小数去零。 */
 export function formatCompactNumber(value: number | null | undefined): string {
   if (typeof value !== 'number' || !Number.isFinite(value)) return '—';
-  const rounded = Math.round(value);
-  const abs = Math.abs(rounded);
-  if (abs >= 1_000_000) return `${trimUnitNumber(rounded / 1_000_000)}M`;
-  if (abs >= 1_000) return `${trimUnitNumber(rounded / 1_000)}K`;
-  return numberFormat.format(rounded);
+  const units: [divisor: number, suffix: string][] = [
+    [10_000, '万'],
+    [100_000_000, '亿'],
+    [1_000_000_000_000, '万亿'],
+  ];
+  if (Math.abs(value) < units[0][0]) return String(Math.round(value));
+  let index = 0;
+  for (let i = units.length - 1; i >= 0; i -= 1) {
+    if (Math.abs(value) >= units[i][0]) { index = i; break; }
+  }
+  let mantissa = value / units[index][0];
+  // 99,999,999.99 万这类四舍五入会顶到下一数量级（如 9999.995万 → 10000万），晋级单位。
+  if (Math.abs(mantissa) >= 9_999.995 && index + 1 < units.length) {
+    index += 1;
+    mantissa = value / units[index][0];
+  }
+  const fixed = mantissa.toFixed(2);
+  const trimmed = fixed.endsWith('.00')
+    ? fixed.slice(0, -3)
+    : fixed.endsWith('0') ? fixed.slice(0, -1) : fixed;
+  return `${trimmed}${units[index][1]}`;
 }
 
 /** null（未知/不适用）→ "—"；否则 0..1 → 百分比整数。 */

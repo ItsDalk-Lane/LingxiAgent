@@ -29,6 +29,7 @@ import {
 } from '../../utils/chat-image-send-preflight';
 import { openProviderModelSettings } from '../../utils/model-settings-navigation';
 import { formatQuotedSelectionForPrompt } from '../../utils/quoted-selection';
+import { refreshQuotedSelectionFromDisk } from './quote-refresh';
 import {
   isAllowedChatVideoMime,
   isChatVideoBase64ContentCompatible,
@@ -391,10 +392,11 @@ export async function prepareComposerSend(
     docForRender = bundle.doc;
   }
 
-  // 引用片段
   const quotes = bundle.quotes;
+  let resolvedQuotes = quotes;
   if (quotes.length > 0) {
-    const quoteStr = quotes.map(formatQuotedSelectionForPrompt).join('\n\n');
+    resolvedQuotes = await Promise.all(quotes.map(refreshQuotedSelectionFromDisk));
+    const quoteStr = resolvedQuotes.map(formatQuotedSelectionForPrompt).join('\n\n');
     finalText = finalText ? `${finalText}\n\n${quoteStr}` : quoteStr;
   }
 
@@ -405,7 +407,7 @@ export async function prepareComposerSend(
   const displayMessage = {
     text,
     skills: skills.length > 0 ? skills : undefined,
-    quotedText: quotes.length > 0 ? quotes.map(q => (q as { text: string }).text).join('\n\n') : undefined,
+    quotedText: resolvedQuotes.length > 0 ? resolvedQuotes.map(q => (q as { text: string }).text).join('\n\n') : undefined,
     sessionRefs: sessionRefs.length > 0 ? sessionRefs : undefined,
     agentMentions: agentMentions.length > 0 ? agentMentions : undefined,
     // 消息投影用的知识库引用（含名称缓存，仅展示；功能字段走 wsMsg.knowledgeRefs）

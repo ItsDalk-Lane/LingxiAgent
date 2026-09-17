@@ -102,12 +102,13 @@ describe("exec_command tools", () => {
 
     expect(bashTool.execute).toHaveBeenCalledWith(
       "call-1",
-      { command: expectedRenderedCommand("python --version", platform) },
+      { command: expectedRenderedCommand("python --version", platform), timeout: 120 },
       null,
       null,
       expect.any(Object),
     );
     expect(result.content[0].text).toContain("python: not found");
+    // 依赖探测失败属于环境问题，保持 isError。
     expect(result.isError).toBe(true);
     expect(result.details.execCommand).toMatchObject({
       ok: false,
@@ -143,14 +144,16 @@ describe("exec_command tools", () => {
       expectedRenderedCommand("copy C:\\missing.txt C:\\target\\", platform),
       resolvedTestCwd(),
       expect.objectContaining({
-        timeout: undefined,
+        // 默认超时 120s 现在总是下发（此前缺省为 undefined，命令可能无限挂）。
+        timeout: 120,
         signal: null,
         onData: expect.any(Function),
       }),
     );
     expect(result.content[0].text).toContain("复制");
     expect(result.content[0].text).not.toContain("�");
-    expect(result.isError).toBe(true);
+    // 命令跑完但失败（非零退出）是正常输出，不再是 isError（键缺省即正常）；细节仍带错误码。
+    expect(result.isError).toBeUndefined();
     expect(result.details).toMatchObject({
       outputEncoding: "gbk",
       outputTranscoded: true,

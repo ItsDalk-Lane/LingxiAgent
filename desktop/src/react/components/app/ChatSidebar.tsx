@@ -3,6 +3,7 @@ import type { ActivePanel } from '../../types';
 import { useStore } from '../../stores';
 import { ArchivedSessionsModal } from '../ArchivedSessionsModal';
 import { ChannelListSidebar } from '../channels/ChannelList';
+import { KnowledgeModal } from '../knowledge/KnowledgeModal';
 import { RegionalErrorBoundary } from '../RegionalErrorBoundary';
 import { SessionList } from '../SessionList';
 import { SidebarNoticeSlot } from '../notices/SidebarNoticeSlot';
@@ -46,6 +47,8 @@ export function ChatSidebarContent({
   const t = window.t ?? ((p: string) => p);
   // 归档记录入口（用户裁决：从设置→安全迁到侧栏功能行，垃圾桶图标）
   const [archivedOpen, setArchivedOpen] = useState(false);
+  // 知识库入口（用户裁决：顶部页签移除，整页界面收进侧栏弹窗）
+  const [knowledgeOpen, setKnowledgeOpen] = useState(false);
 
   return (
     <>
@@ -88,6 +91,12 @@ export function ChatSidebarContent({
                   <line x1="10" y1="12" x2="14" y2="12"></line>
                 </svg>
               </button>
+              <button className="sidebar-icon-btn" title={t('knowledge.title')} onClick={() => setKnowledgeOpen(true)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                </svg>
+              </button>
               <button className="sidebar-icon-btn sidebar-function-row-settings" title={t('settings.title')} onClick={onOpenSettings}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="3"></circle>
@@ -115,6 +124,7 @@ export function ChatSidebarContent({
       )}
 
       <ArchivedSessionsModal open={archivedOpen} onClose={() => setArchivedOpen(false)} />
+      <KnowledgeModal open={knowledgeOpen} onClose={() => setKnowledgeOpen(false)} />
     </>
   );
 }

@@ -507,6 +507,36 @@ export class PreferencesManager {
     this.savePreferences(prefs);
   }
 
+  /** 读取踩坑自动沉淀配置（全局，跨 agent；默认开） */
+  getAutolearn() {
+    const cfg = this._cache.autolearn;
+    if (!cfg) return { enabled: true };
+    return cfg;
+  }
+
+  /** 读取 goal 预算引擎配置（全局；默认开、无默认预算=创建时必须显式给） */
+  getGoal() {
+    const cfg = this._cache.goal;
+    if (!cfg) return { enabled: true, default_token_budget: null, default_time_budget_minutes: null };
+    return cfg;
+  }
+
+  /** 合并写入 goal 预算引擎配置 */
+  setGoal(partial) {
+    const prefs = this._mutableCopy();
+    prefs.goal = { ...(prefs.goal || {}), ...partial };
+    this.savePreferences(prefs);
+    return prefs.goal;
+  }
+
+  /** 合并写入踩坑自动沉淀配置 */
+  setAutolearn(partial) {
+    const prefs = this._mutableCopy();
+    prefs.autolearn = { ...(prefs.autolearn || {}), ...partial };
+    this.savePreferences(prefs);
+    return prefs.autolearn;
+  }
+
   /** 读取语言偏好（全局） */
   getLocale() {
     return this._cache.locale || "";
@@ -727,13 +757,15 @@ export class PreferencesManager {
   }
 
   /**
-   * 读取内置/插件工具的延迟加载开关（全局，默认关闭）。
+   * 读取内置/插件工具的延迟加载开关（全局，默认开启）。
    *
-   * 默认关闭是刻意的：内置工具是 Agent 的基本能力，把它们移出前缀会改变
-   * 每个 session 的既有行为。外部 MCP 工具默认延迟，内置工具需要显式 opt-in。
+   * 默认开启是刻意的：第一方低频工具与捆绑插件工具的 schema 会随每个
+   * 请求全量常驻，按需加载后它们进目录、用到才取。核心工具（文件、
+   * 终端、搜索、记忆等）不参与延迟，始终直载；显式传 false 可整体关回
+   * 全量直载。
    */
   getBuiltinToolDeferEnabled() {
-    return this._cache.builtin_tool_defer?.enabled === true;
+    return this._cache.builtin_tool_defer?.enabled !== false;
   }
 
   /** 保存内置/插件工具的延迟加载开关 */

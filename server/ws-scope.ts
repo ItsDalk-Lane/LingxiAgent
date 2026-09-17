@@ -12,6 +12,7 @@ import {
 const SAFE_GLOBAL_EVENTS = new Set([
   "session_created",
   "notification",
+  "env_deps_status",
 ]);
 
 const WRITE_MESSAGE_TYPES = new Set([

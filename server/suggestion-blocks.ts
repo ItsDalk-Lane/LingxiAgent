@@ -48,3 +48,37 @@ export function buildAutomationSuggestionBlock({
     ],
   };
 }
+
+/**
+ * 踩坑自动沉淀的建议卡：确认后才经 learn_lesson 落盘核心写技能。
+ * 卡片实时有效（不落盘），ConfirmStore 超时后 confirm 接口 404，前端据此刻画过期。
+ */
+export function buildAutolearnSuggestionBlock({
+  confirmId = "",
+  name = "",
+  description = "",
+  lesson = "",
+  status = "pending",
+}: {
+  confirmId?: string;
+  name?: string;
+  description?: string;
+  lesson?: string;
+  status?: "pending" | "approved" | "rejected";
+}) {
+  return {
+    type: "suggestion_card",
+    kind: "autolearn_lesson",
+    ...(confirmId ? { confirmId } : {}),
+    status,
+    title: text(name),
+    description: text(description),
+    detail: {
+      kind: "autolearn_lesson",
+      name: text(name),
+      description: text(description),
+      lesson: text(lesson),
+    },
+    actions: [],
+  };
+}

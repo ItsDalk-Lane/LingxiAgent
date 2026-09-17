@@ -182,12 +182,14 @@ describe('UsageTab settings page registration (Phase 9: Model Observatory)', () 
     expect(tabIds).not.toContain('media');
   });
 
-  it('shows the honest inactive state without offering a recording enable switch', async () => {
+  it('drops the page heading, recording strip and settings button (settings is its own tab)', async () => {
     render(<UsageTab />);
+    // 「记录设置」按钮与弹窗已移除：状态与保留配置整体搬进第 4 个子标签「设置」。
     await waitFor(() => {
-      expect(screen.getByText('settings.observability.recording.configuredButInactive')).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: 'settings.observability.subtab.settings' })).toBeInTheDocument();
     });
-    expect(screen.queryByText('settings.observability.onboarding.enable')).toBeNull();
+    expect(screen.queryByText('settings.observability.recording.openSettings')).toBeNull();
+    expect(screen.queryByText('settings.observability.recording.configuredButInactive')).toBeNull();
     expect(mocks.updateObservabilitySettings).not.toHaveBeenCalled();
   });
 });

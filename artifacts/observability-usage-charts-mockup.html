@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Token 用量页 · 五常驻区域 设计参考稿 v3</title>
+<style>
+  :root {
+    --bg: #f5f2ec;
+    --card: #fffdf8;
+    --border: #e8e1d6;
+    --border-strong: #d8cfc2;
+    --text: #292524;
+    --muted: #8a8177;
+    --accent: #0e7490;
+    --accent-soft: #e0f0f4;
+    --danger: #b91c1c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 14px;
+    padding: 24px 32px 64px;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  .mock-banner {
+    background: #fdf6e3;
+    border: 1px dashed #d3b56a;
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin-bottom: 20px;
+    color: #7c5e14;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .mock-banner b { color: #5f4a0e; }
+
+  /* ── 子标签行（页首行）── */
+  .subtabs {
+    display: flex; align-items: stretch; justify-content: space-between;
+    border-bottom: 1px solid var(--border-strong); margin-bottom: 16px;
+  }
+  .tabgroup { display: flex; gap: 4px; }
+  .tab {
+    padding: 9px 18px; background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 14px; position: relative; bottom: -1px;
+    border-bottom: 2px solid transparent; font-family: inherit;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .tabactions { display: flex; align-items: center; gap: 8px; align-self: center; }
+  .btn {
+    padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border-strong);
+    background: var(--card); color: var(--text); font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+  .btn.ghost { border-color: transparent; background: none; color: var(--muted); }
+
+  /* ── 筛选条（只作用于指标卡）── */
+  .filterbar { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .filter-pill {
+    padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border-strong);
+    background: var(--card); font-size: 13px; color: var(--text); cursor: default;
+  }
+  .filter-pill::after { content: " ▾"; color: var(--muted); font-size: 11px; }
+  .filter-pill.primary { border-color: var(--accent); color: var(--accent); }
+  .filter-note { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+
+  /* ── 指标卡 ── */
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .metric { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+  .metric .label { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+  .metric .value { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .metric .value small { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 3px; }
+
+  /* ── 图表卡：每张独占一行 ── */
+  .chart-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 18px 12px; position: relative; margin-bottom: 16px;
+  }
+  .chart-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .chart-title { font-size: 15px; font-weight: 700; }
+  .fixed-badge {
+    font-size: 11px; color: var(--accent); background: var(--accent-soft);
+    border-radius: 999px; padding: 2px 10px; font-weight: 600;
+  }
+  .chart-hint { color: var(--muted); font-size: 12px; margin: 4px 0 10px; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin: 2px 0 8px; font-size: 12px; color: var(--muted); }
+  .legend .item { display: inline-flex; align-items: center; gap: 5px; }
+  .legend .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  svg { display: block; width: 100%; height: auto; }
+  svg text { font-family: inherit; }
+
+  /* 指标切换（调用次数 / Token 用量） */
+  .metric-toggle { margin-left: auto; display: inline-flex; gap: 6px; }
+  .metric-toggle button {
+    border: 1px solid var(--border-strong); background: var(--card); color: var(--muted);
+    padding: 4px 14px; font-size: 12px; border-radius: 999px; cursor: pointer; font-family: inherit;
+  }
+  .metric-toggle button.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+
+  /* 每日/每周/累计 切换 */
+  .seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: 999px; overflow: hidden; }
+  .seg button {
+    border: none; background: none; padding: 4px 14px; font-size: 12px; cursor: pointer;
+    color: var(--muted); font-family: inherit;
+  }
+  .seg button.active { background: var(--accent); color: #fff; font-weight: 600; }
+  .head-spring { margin-left: auto; display: inline-flex; gap: 10px; align-items: center; }
+
+  /* 饼图日期选择 */
+  .pie-date { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+  .pie-date select {
+    font-family: inherit; font-size: 12px; padding: 4px 8px; border-radius: 8px;
+    border: 1px solid var(--border-strong); background: var(--card); color: var(--text);
+  }
+
+  /* 悬停提示 */
+  .tip {
+    position: absolute; z-index: 40; pointer-events: none; display: none;
+    background: #2c2925; color: #f5f2ec; border-radius: 10px; padding: 9px 12px;
+    font-size: 12px; line-height: 1.75; box-shadow: 0 8px 24px rgba(40, 32, 16, 0.25);
+    white-space: nowrap;
+  }
+  .tip .t-title { font-weight: 700; margin-bottom: 3px; }
+  .tip .row { display: flex; align-items: center; gap: 6px; }
+  .tip .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: none; }
+  .tip .val { margin-left: auto; padding-left: 14px; font-weight: 600; }
+  .tip .total { border-top: 1px solid rgba(245,242,236,0.25); margin-top: 4px; padding-top: 4px; font-weight: 700; }
+
+  /* 饼图右侧明细 */
+  .pie-wrap { display: flex; align-items: center; gap: 28px; }
+  .pie-wrap svg { flex: 1.4; min-width: 0; }
+  .pie-side { flex: 1; min-width: 250px; }
+  .pie-side .row {
+    display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 8px; font-size: 13px;
+  }
+  .pie-side .row:hover { background: var(--accent-soft); }
+  .pie-side .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .pie-side .val { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .pie-side .total {
+    border-top: 1px solid var(--border); margin-top: 6px; padding-top: 10px;
+    font-weight: 700; display: flex; justify-content: space-between;
+  }
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    background: #2c2925; color: #fff; font-size: 13px; border-radius: 999px;
+    padding: 9px 20px; opacity: 0; transition: opacity 0.25s; pointer-events: none; z-index: 99;
+  }
+  .toast.show { opacity: 0.95; }
+</style>
+</head>
+<body>
+
+<div class="mock-banner">
+  <b>设计参考稿 v3</b>（数据为虚构演示）。Token 用量页 = 指标卡 + 4 张独占一行的常驻图表。
+  四张图各自按<b>固定维度</b>展示（热力=日期、折线=模型×日期、柱状=供应商×日期、饼图=类别×日期），
+  <b>不随首行筛选联动</b>——图表自身的维度已经限定了数据范围；首行筛选只作用于顶部指标卡。
+  折线 / 柱状 / 饼图右上角可切换 <b>调用次数 / Token 用量</b>（可同时显示）；热力图右上角有 每日 / 每周 / 累计 三档。
+</div>
+
+<!-- 页首行 -->
+<div class="subtabs">
+  <div class="tabgroup">
+    <button class="tab active">Token 用量</button>
+    <button class="tab">调用台账</button>
+    <button class="tab">调用轨迹</button>
+  </div>
+  <div class="tabactions">
+    <button class="btn">刷新</button>
+    <button class="btn">导出</button>
+    <button class="btn ghost">记录设置</button>
+  </div>
+</div>
+
+<div class="filterbar">
+  <span class="filter-pill primary">全部</span>
+  <span class="filter-pill">供应商</span>
+  <span class="filter-pill">模型</span>
+  <span class="filter-pill">类别</span>
+  <span class="filter-pill">状态</span>
+  <span class="filter-pill">更多筛选</span>
+</div>
+<div class="filter-note">↑ 首行筛选只作用于上面的指标卡；下方四张图按各自固定维度常驻展示。</div>
+
+<!-- 区域一 -->
+<div class="metrics">
+  <div class="metric"><div class="label">调用次数</div><div class="value">836</div></div>
+  <div class="metric"><div class="label">总 Token</div><div class="value">12.4<small>M</small></div></div>
+  <div class="metric"><div class="label">未缓存输入</div><div class="value">1.1<small>M</small></div></div>
+  <div class="metric"><div class="label">输出</div><div class="value">2.6<small>M</small></div></div>
+  <div class="metric"><div class="label">缓存读取</div><div class="value">8.9<small>M</small></div></div>
+  <div class="metric"><div class="label">缓存命中率</div><div class="value">91<small>%</small></div></div>
+  <div class="metric"><div class="label">失败 / 中止</div><div class="value">35</div></div>
+  <div class="metric"><div class="label">平均耗时</div><div class="value">14.2<small>秒</small></div></div>
+</div>
+
+<!-- 区域二：日历热力图（固定 · 日期） -->
+<div class="chart-card" id="card-heat">
+  <div class="chart-head">
+    <span class="chart-title">调用热力日历</span>
+    <span class="fixed-badge">固定 · 日期</span>
+    <span class="head-spring">
+      <span class="seg" id="heat-seg">
+        <button data-mode="daily" class="active">每日</button>
+        <button data-mode="weekly">每周</button>
+        <button data-mode="cumulative">累计</button>
+      </span>
+    </span>
+  </div>
+  <div class="chart-hint" id="heat-hint">每格是一天，颜色越深调用越密集；鼠标悬停显示当日调用次数与 Token 总量。</div>
+  <svg viewBox="0 0 1120 176" id="heat-svg"></svg>
+  <div class="tip" id="heat-tip"></div>
+</div>
+
+<!-- 区域三：折线图（固定 · 模型 × 日期） -->
+<div class="chart-card" id="card-line">
+  <div class="chart-head">
+    <span class="chart-title">模型调用趋势</span>
+    <span class="fixed-badge">固定 · 模型 × 日期</span>
+    <span class="metric-toggle" data-chart="line">
+      <button data-m="calls" class="on">调用次数</button>
+      <button data-m="tokens">Token 用量</button>
+    </span>
+  </div>
+  <div class="chart-hint">每天一条刻度；鼠标悬停显示当日每个模型的调用量与当日总量。</div>
+  <div class="legend" id="line-legend"></div>
+  <svg viewBox="0 0 1120 300" id="line-svg"></svg>
+  <div class="tip" id="line-tip"></div>
+</div>
+
+<!-- 区域四：柱状图（固定 · 供应商 × 日期） -->
+<div class="chart-card" id="card-bar">
+  <div class="chart-head">
+    <span class="chart-title">供应商调用分布</span>
+    <span class="fixed-badge">固定 · 供应商 × 日期</span>
+    <span class="metric-toggle" data-chart="bar">
+      <button data-m="calls" class="on">调用次数</button>
+      <button data-m="tokens">Token 用量</button>
+    </span>
+  </div>
+  <div class="chart-hint">每天一根柱、按供应商分段；鼠标悬停显示当日每个供应商的调用量与当日总量。</div>
+  <div class="legend" id="bar-legend"></div>
+  <svg viewBox="0 0 1120 300" id="bar-svg"></svg>
+  <div class="tip" id="bar-tip"></div>
+</div>
+
+<!-- 区域五：饼图（固定 · 类别 × 日期） -->
+<div class="chart-card" id="card-pie">
+  <div class="chart-head">
+    <span class="chart-title">类别构成</span>
+    <span class="fixed-badge">固定 · 类别 × 日期</span>
+    <span class="metric-toggle" data-chart="pie">
+      <button data-m="calls" class="on">调用次数</button>
+      <button data-m="tokens">Token 用量</button>
+    </span>
+    <span class="head-spring">
+      <span class="pie-date">查看日期 <select id="pie-date"></select></span>
+    </span>
+  </div>
+  <div class="chart-hint">选一天看当天的类别构成；鼠标悬停扇区显示该类别的调用量与占比。</div>
+  <div class="pie-wrap">
+    <svg viewBox="0 0 520 260" id="pie-svg"></svg>
+    <div class="pie-side" id="pie-side"></div>
+  </div>
+  <div class="tip" id="pie-tip"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ── 公共 ─────────────────────────────────────────────── */
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+function rand(seed) {
+  let t = seed >>> 0;
+  return function () {
+    t += 0x6D2B79F5;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function fmtInt(n) { return Math.round(n).toLocaleString("en-US"); }
+function fmtTokens(n) {
+  if (n >= 1e8) return (n / 1e8).toFixed(1) + " 亿";
+  if (n >= 1e4) return (n / 1e4).toFixed(1) + " 万";
+  return fmtInt(n);
+}
+const cnDate = (d) => `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+const shortDate = (d) => `${d.getMonth() + 1}月${d.getDate()}日`;
+
+const MODELS = [
+  { name: "MiniMax-M3", provider: "MiniMax", color: "#0e7490" },
+  { name: "agnes-3.0-flash", provider: "agnes", color: "#b45309" },
+  { name: "GLM-4.7", provider: "智谱", color: "#6d28d9" },
+  { name: "qwen3-max", provider: "Qwen", color: "#be185d" },
+  { name: "llama3.1-8b", provider: "Ollama", color: "#15803d" },
+];
+const PROVIDERS = ["agnes", "MiniMax", "智谱", "Qwen", "Ollama"];
+const PROVIDER_COLORS = { "agnes": "#b45309", "MiniMax": "#0e7490", "智谱": "#6d28d9", "Qwen": "#be185d", "Ollama": "#15803d" };
+const CATEGORIES = ["会话对话", "记忆整理", "标题生成", "知识检索"];
+const CATEGORY_COLORS = ["#0e7490", "#b45309", "#6d28d9", "#15803d"];
+
+/* 23 天：2026-08-26 → 2026-09-17；9/12 为峰值日。
+   每天每模型 / 每类别都带 calls + tokens 两套数值。 */
+const PEAK_IDX = 17;
+const DAYS = Array.from({ length: 23 }, (_, i) => {
+  const date = new Date(2026, 7, 26 + i);
+  const r = rand(1000 + i * 13);
+  const peak = i === PEAK_IDX;
+  const calls = peak ? 257 : Math.round(14 + r() * 46 + (i > 14 ? 10 : 0));
+  const mShares = norm(MODELS.map((m, mi) => {
+    const base = mi === 0 && peak ? 0.55 : [0.34, 0.26, 0.16, 0.12, 0.12][mi];
+    return base + r() * 0.12;
+  }));
+  const cShares = norm([0.58 + r() * 0.1, 0.18 + r() * 0.06, 0.12 + r() * 0.05, 0.07 + r() * 0.04]);
+  const models = {}, cats = {};
+  MODELS.forEach((m, mi) => {
+    const c = Math.round(calls * mShares[mi]);
+    models[m.name] = { calls: c, tokens: Math.round(c * (12000 + r() * 26000) * (peak && mi === 0 ? 1.5 : 1)) };
+  });
+  CATEGORIES.forEach((c, ci) => {
+    const v = Math.round(calls * cShares[ci]);
+    cats[c] = { calls: v, tokens: Math.round(v * (14000 + r() * 22000)) };
+  });
+  const dayCalls = Object.values(models).reduce((a, x) => a + x.calls, 0);
+  const dayTokens = Object.values(models).reduce((a, x) => a + x.tokens, 0);
+  return { date, calls: dayCalls, tokens: dayTokens, models, cats };
+});
+function norm(arr) { const s = arr.reduce((a, x) => a + x, 0); return arr.map((x) => x / s); }
+
+function tipHtml(title, rows, totalLabel, totalValue) {
+  return `<div class="t-title">${esc(title)}</div>`
+    + rows.map((r) => `<div class="row"><span class="dot" style="background:${r.color}"></span>${esc(r.name)}<span class="val">${esc(r.value)}</span></div>`).join("")
+    + (totalLabel ? `<div class="total">${esc(totalLabel)}<span class="val">${esc(totalValue)}</span></div>` : "");
+}
+function placeTip(card, tip, evt) {
+  const rect = card.getBoundingClientRect();
+  tip.style.display = "block";
+  const x = evt.clientX - rect.left + 16, y = evt.clientY - rect.top + 12;
+  tip.style.left = Math.min(x, rect.width - tip.offsetWidth - 8) + "px";
+  tip.style.top = Math.min(y, rect.height - tip.offsetHeight - 8) + "px";
+}
+/* 按当前勾选的指标拼值：只选一个 → 只有那项；两个都选 → "123 次 · 4.5万 Token" */
+function metricStr(obj, which) {
+  const parts = [];
+  if (which.calls) parts.push(`${fmtInt(obj.calls)} 次`);
+  if (which.tokens) parts.push(`${fmtTokens(obj.tokens)} Token`);
+  return parts.join(" · ");
+}
+
+/* ── 指标切换状态 ─────────────────────────────────────── */
+const metric = {
+  line: { calls: true, tokens: false },
+  bar: { calls: true, tokens: false },
+  pie: { calls: true, tokens: false },
+};
+
+/* ── 热力图（固定 · 日期；每日 / 每周 / 累计）──────────── */
+const HEAT_DAYS = (() => {
+  const arr = [];
+  const end = new Date(2026, 8, 17);
+  for (let d = new Date(end); arr.length < 365; d.setDate(d.getDate() - 1)) arr.unshift(new Date(d));
+  const offset = arr.length - DAYS.length;
+  return arr.map((date, i) => {
+    if (i >= offset) {
+      const src = DAYS[i - offset];
+      return { date, calls: src.calls, tokens: src.tokens };
+    }
+    const r = rand(7000 + i * 7);
+    const recent = i - (arr.length - 70);
+    let calls;
+    if (recent >= 0) calls = Math.round(10 + r() * 55 * (0.5 + recent / 70));
+    else calls = r() < 0.55 ? 0 : Math.round(r() * 8) + (r() > 0.975 ? 20 + Math.round(r() * 30) : 0);
+    return { date, calls, tokens: calls > 0 ? Math.round(calls * (14000 + r() * 18000)) : 0 };
+  });
+})();
+
+const heatSvg = document.getElementById("heat-svg");
+const heatTip = document.getElementById("heat-tip");
+const heatCard = document.getElementById("card-heat");
+let heatMode = "daily";
+
+function renderHeat() {
+  const W = 1120, L = 44, R = 16, T = 6, CH = 24;
+  const firstOffset = (HEAT_DAYS[0].date.getDay() + 6) % 7;
+  const nCols = Math.ceil((HEAT_DAYS.length + firstOffset) / 7);
+  const CW = Math.min(26, (W - L - R) / nCols);
+  const H = T + 7 * CH + 36;
+  heatSvg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+
+  const weekKey = (d) => { const m = new Date(d); m.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return m.getTime(); };
+  const weekTotal = new Map();
+  HEAT_DAYS.forEach((d) => weekTotal.set(weekKey(d.date), (weekTotal.get(weekKey(d.date)) || 0) + d.calls));
+  const cum = []; let run = 0;
+  HEAT_DAYS.forEach((d) => { run += d.calls; cum.push(run); });
+
+  const cellValue = (i) => heatMode === "weekly" ? weekTotal.get(weekKey(HEAT_DAYS[i].date))
+    : heatMode === "cumulative" ? cum[i] : HEAT_DAYS[i].calls;
+  let scaleMax;
+  if (heatMode === "weekly") scaleMax = Math.max(...weekTotal.values());
+  else if (heatMode === "cumulative") scaleMax = run;
+  else scaleMax = Math.max(...HEAT_DAYS.map((d) => d.calls));
+
+  let s = "";
+  HEAT_DAYS.forEach((d, i) => {
+    const t = Math.pow(Math.min(1, cellValue(i) / scaleMax), 0.6);
+    const x = L + Math.floor((i + firstOffset) / 7) * CW;
+    const y = T + ((d.date.getDay() + 6) % 7) * CH;
+    const fill = heatMode === "weekly" ? "#b45309" : "#0e7490";
+    const side = Math.max(10, Math.min(CW, CH) - 5);
+    s += `<rect x="${(x + (CW - side) / 2).toFixed(1)}" y="${(y + (CH - side) / 2).toFixed(1)}" width="${side}" height="${side}" rx="4" fill="${fill}" opacity="${(0.07 + t * 0.9).toFixed(2)}" data-i="${i}"/>`;
+  });
+
+  const lastDay = HEAT_DAYS[HEAT_DAYS.length - 1].date;
+  for (let k = 0; k < 12; k++) {
+    const first = new Date(lastDay.getFullYear(), lastDay.getMonth() - k, 1);
+    const idx = HEAT_DAYS.findIndex((d) => d.date.getTime() === first.getTime());
+    if (idx >= 0) {
+      const lx = L + Math.floor((idx + firstOffset) / 7) * CW + CW / 2;
+      s += `<text x="${lx.toFixed(1)}" y="${T + 7 * CH + 22}" font-size="11" fill="#8a8177" text-anchor="middle">${first.getMonth() + 1}月</text>`;
+    }
+  }
+
+  s += `<text x="${L - 10}" y="${T + CH + 16}" font-size="11" fill="#8a8177" text-anchor="end">一</text>`;
+  s += `<text x="${L - 10}" y="${T + 3 * CH + 16}" font-size="11" fill="#8a8177" text-anchor="end">三</text>`;
+  s += `<text x="${L - 10}" y="${T + 5 * CH + 16}" font-size="11" fill="#8a8177" text-anchor="end">五</text>`;
+  heatSvg.innerHTML = s;
+
+  heatSvg.querySelectorAll("rect[data-i]").forEach((rect) => {
+    rect.addEventListener("mousemove", (e) => {
+      const i = +rect.dataset.i;
+      const day = HEAT_DAYS[i];
+      let title, calls, tokens;
+      if (heatMode === "weekly") {
+        const monday = new Date(weekKey(day.date));
+        const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+        title = `${shortDate(monday)} – ${shortDate(sunday)} 当周`;
+        let c = 0, t2 = 0;
+        HEAT_DAYS.forEach((d2) => { if (weekKey(d2.date) === weekKey(day.date)) { c += d2.calls; t2 += d2.tokens; } });
+        calls = c; tokens = t2;
+      } else if (heatMode === "cumulative") {
+        title = `截至 ${shortDate(day.date)} 累计`;
+        calls = cum[i]; tokens = HEAT_DAYS.slice(0, i + 1).reduce((s2, d2) => s2 + d2.tokens, 0);
+      } else {
+        title = cnDate(day.date);
+        calls = day.calls; tokens = day.tokens;
+      }
+      heatTip.innerHTML = tipHtml(title, [
+        { color: "#9ce0d4", name: "调用次数", value: fmtInt(calls) + " 次" },
+        { color: "#f2cf8d", name: "Token 总量", value: fmtTokens(tokens) },
+      ]);
+      placeTip(heatCard, heatTip, e);
+    });
+    rect.addEventListener("mouseleave", () => { heatTip.style.display = "none"; });
+  });
+}
+document.getElementById("heat-seg").addEventListener("click", (e) => {
+  const btn = e.target.closest("button"); if (!btn) return;
+  heatMode = btn.dataset.mode;
+  document.querySelectorAll("#heat-seg button").forEach((b) => b.classList.toggle("active", b === btn));
+  document.getElementById("heat-hint").textContent = {
+    daily: "每格是一天，颜色越深调用越密集；鼠标悬停显示当日调用次数与 Token 总量。",
+    weekly: "整面日历保留，同一周的格子按当周合计统一着色；鼠标悬停显示当周合计。",
+    cumulative: "每格是截至当天的累计调用量，越到后面越饱和；悬停显示累计值。",
+  }[heatMode];
+  renderHeat();
+});
+
+/* ── 折线图（固定 · 模型 × 日期；可切指标）────────────── */
+const lineSvg = document.getElementById("line-svg");
+const lineTip = document.getElementById("line-tip");
+const lineCard = document.getElementById("card-line");
+function renderLine() {
+  const W = 1120, H = 300, L = 70, R = 16, T = 16, B = 30, n = DAYS.length;
+  const keys = ["calls", "tokens"].filter((k) => metric.line[k]);
+  const panelH = (H - T - B) / keys.length;
+  const x = (i) => L + (i / (n - 1)) * (W - L - R);
+  let s = "";
+  keys.forEach((k, ki) => {
+    const gap = keys.length > 1 ? 16 : 0;
+    const pTop = T + ki * panelH + (ki ? gap : 0);
+    const pH = panelH - (ki ? gap : 0);
+    const vals = DAYS.flatMap((d) => MODELS.map((m) => d.models[m.name][k]));
+    const max = Math.max(...vals) * 1.12 || 1;
+    const y = (v) => pTop + (1 - v / max) * pH;
+    for (let g = 0; g <= 2; g++) {
+      const gy = pTop + (g / 2) * pH;
+      s += `<line x1="${L}" y1="${gy}" x2="${W - R}" y2="${gy}" stroke="#eee7db"/>`;
+      s += `<text x="${L - 8}" y="${gy + 4}" font-size="10" fill="#8a8177" text-anchor="end">${k === "calls" ? fmtInt(max * g / 2) : fmtTokens(max * g / 2)}</text>`;
+    }
+    s += `<text x="${L + 6}" y="${pTop + 13}" font-size="11" fill="#8a8177" font-weight="600">${k === "calls" ? "调用次数" : "Token 用量"}</text>`;
+    MODELS.forEach((m, mi) => {
+      const pts = DAYS.map((d, i) => `${x(i).toFixed(1)},${y(d.models[m.name][k]).toFixed(1)}`).join(" ");
+      s += `<polyline points="${pts}" fill="none" stroke="${m.color}" stroke-width="2.2" stroke-linejoin="round"/>`;
+      DAYS.forEach((d, i) => {
+        s += `<circle cx="${x(i).toFixed(1)}" cy="${y(d.models[m.name][k]).toFixed(1)}" r="2.4" fill="${m.color}"/>`;
+      });
+    });
+    if (ki === keys.length - 1) {
+      [0, 5, 11, 17, 22].forEach((i) => {
+        s += `<text x="${x(i)}" y="${H - 8}" font-size="11" fill="#8a8177" text-anchor="middle">${shortDate(DAYS[i].date)}</text>`;
+      });
+    }
+  });
+  s += `<line id="line-guide" x1="0" y1="${T}" x2="0" y2="${H - B}" stroke="#b9ae9f" stroke-dasharray="4 3" opacity="0"/>`;
+  lineSvg.innerHTML = s;
+
+  const guide = lineSvg.querySelector("#line-guide");
+  lineSvg.onmousemove = (e) => {
+    const rect = lineSvg.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width * W;
+    const i = Math.max(0, Math.min(n - 1, Math.round((px - L) / ((W - L - R) / (n - 1)))));
+    guide.setAttribute("x1", x(i)); guide.setAttribute("x2", x(i)); guide.setAttribute("opacity", "1");
+    const d = DAYS[i];
+    const rows = MODELS.map((m) => ({ color: m.color, name: m.name, value: metricStr(d.models[m.name], metric.line) }))
+      .sort((a, b) => b.value.localeCompare(a.value, undefined, { numeric: true }));
+    const totalObj = { calls: d.calls, tokens: d.tokens };
+    lineTip.innerHTML = tipHtml(`${shortDate(d.date)} · 当日总量`, rows, "当日总量", metricStr(totalObj, metric.line));
+    placeTip(lineCard, lineTip, e);
+  };
+  lineSvg.onmouseleave = () => { lineTip.style.display = "none"; guide.setAttribute("opacity", "0"); };
+  document.getElementById("line-legend").innerHTML = MODELS.map((m) =>
+    `<span class="item"><span class="dot" style="background:${m.color}"></span>${esc(m.name)}</span>`).join("");
+}
+
+/* ── 柱状图（固定 · 供应商 × 日期；可切指标）──────────── */
+const barSvg = document.getElementById("bar-svg");
+const barTip = document.getElementById("bar-tip");
+const barCard = document.getElementById("card-bar");
+function providerDay(d, p, k) {
+  return MODELS.filter((m) => m.provider === p).reduce((a, m) => a + d.models[m.name][k], 0);
+}
+function renderBar() {
+  const W = 1120, H = 300, L = 70, R = 16, T = 16, B = 30, n = DAYS.length;
+  const keys = ["calls", "tokens"].filter((k) => metric.bar[k]);
+  const panelH = (H - T - B) / keys.length;
+  const slot = (W - L - R) / n, bw = Math.min(22, slot * 0.6);
+  const xc = (i) => L + i * slot + slot / 2;
+  let s = "";
+  keys.forEach((k, ki) => {
+    const gap = keys.length > 1 ? 16 : 0;
+    const pTop = T + ki * panelH + (ki ? gap : 0);
+    const pH = panelH - (ki ? gap : 0);
+    const totals = DAYS.map((d) => PROVIDERS.reduce((a, p) => a + providerDay(d, p, k), 0));
+    const max = Math.max(...totals) * 1.12 || 1;
+    for (let g = 0; g <= 2; g++) {
+      const gy = pTop + (g / 2) * pH;
+      s += `<line x1="${L}" y1="${gy}" x2="${W - R}" y2="${gy}" stroke="#eee7db"/>`;
+      s += `<text x="${L - 8}" y="${gy + 4}" font-size="10" fill="#8a8177" text-anchor="end">${k === "calls" ? fmtInt(max * g / 2) : fmtTokens(max * g / 2)}</text>`;
+    }
+    s += `<text x="${L + 6}" y="${pTop + 13}" font-size="11" fill="#8a8177" font-weight="600">${k === "calls" ? "调用次数" : "Token 用量"}</text>`;
+    DAYS.forEach((d, i) => {
+      let acc = 0;
+      PROVIDERS.forEach((p, pi) => {
+        const v = providerDay(d, p, k);
+        const h = (v / max) * pH;
+        s += `<rect x="${(xc(i) - bw / 2).toFixed(1)}" y="${(pTop + pH - acc - h).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(h, 0.6).toFixed(1)}" fill="${PROVIDER_COLORS[p]}"/>`;
+        acc += h;
+      });
+    });
+    if (ki === keys.length - 1) {
+      [0, 5, 11, 17, 22].forEach((i) => {
+        s += `<text x="${xc(i)}" y="${H - 8}" font-size="11" fill="#8a8177" text-anchor="middle">${shortDate(DAYS[i].date)}</text>`;
+      });
+    }
+  });
+  s += `<rect id="bar-hl" fill="#0e7490" opacity="0.07" rx="6" y="${T}" height="${H - T - B}" width="${slot}" x="0" visibility="hidden"/>`;
+  barSvg.innerHTML = s;
+  const hl = barSvg.querySelector("#bar-hl");
+  barSvg.onmousemove = (e) => {
+    const rect = barSvg.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width * W;
+    const i = Math.max(0, Math.min(n - 1, Math.floor((px - L) / slot)));
+    const d = DAYS[i];
+    hl.setAttribute("x", (L + i * slot).toFixed(1)); hl.setAttribute("visibility", "visible");
+    const rows = PROVIDERS.map((p) => ({
+      color: PROVIDER_COLORS[p],
+      name: p,
+      value: metricStr({ calls: providerDay(d, p, "calls"), tokens: providerDay(d, p, "tokens") }, metric.bar),
+    }));
+    barTip.innerHTML = tipHtml(`${shortDate(d.date)} · 当日总量`, rows, "当日总量", metricStr(d, metric.bar));
+    placeTip(barCard, barTip, e);
+  };
+  barSvg.onmouseleave = () => { barTip.style.display = "none"; hl.setAttribute("visibility", "hidden"); };
+  document.getElementById("bar-legend").innerHTML = PROVIDERS.map((p) =>
+    `<span class="item"><span class="dot" style="background:${PROVIDER_COLORS[p]}"></span>${esc(p)}</span>`).join("");
+}
+
+/* ── 饼图（固定 · 类别 × 日期；可切指标）──────────────── */
+const pieSvg = document.getElementById("pie-svg");
+const pieSide = document.getElementById("pie-side");
+const pieTip = document.getElementById("pie-tip");
+const pieCard = document.getElementById("card-pie");
+const pieDate = document.getElementById("pie-date");
+let pieIdx = DAYS.length - 1;
+DAYS.forEach((d, i) => {
+  const opt = document.createElement("option");
+  opt.value = i; opt.textContent = cnDate(d.date);
+  pieDate.prepend(opt);
+});
+pieDate.value = pieIdx;
+
+function renderPie() {
+  const d = DAYS[pieIdx];
+  const keys = ["calls", "tokens"].filter((k) => metric.pie[k]);
+  const W = 520, H = 260;
+  pieSvg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  const donut = (cx, cy, r, key, label) => {
+    const total = CATEGORIES.reduce((a, c) => a + d.cats[c][key], 0);
+    let a0 = -Math.PI / 2, out = "";
+    CATEGORIES.forEach((c, ci) => {
+      const a1 = a0 + (d.cats[c][key] / total) * Math.PI * 2;
+      const large = a1 - a0 > Math.PI ? 1 : 0;
+      const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0);
+      const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+      out += `<path d="M ${cx} ${cy} L ${x0.toFixed(1)} ${y0.toFixed(1)} A ${r} ${r} 0 ${large} 1 ${x1.toFixed(1)} ${y1.toFixed(1)} Z" fill="${CATEGORY_COLORS[ci]}" stroke="#fffdf8" stroke-width="2" data-ci="${ci}" data-key="${key}"/>`;
+      a0 = a1;
+    });
+    out += `<circle cx="${cx}" cy="${cy}" r="${r * 0.55}" fill="#fffdf8"/>`;
+    out += `<text x="${cx}" y="${cy - 2}" font-size="17" font-weight="700" fill="#292524" text-anchor="middle">${key === "calls" ? fmtInt(total) : fmtTokens(total)}</text>`;
+    out += `<text x="${cx}" y="${cy + 15}" font-size="10" fill="#8a8177" text-anchor="middle">${label}</text>`;
+    return out;
+  };
+  let s = "";
+  if (keys.length === 1) {
+    s += donut(W / 2, H / 2 + 4, 92, keys[0], keys[0] === "calls" ? "调用次数" : "Token 用量");
+  } else {
+    s += donut(W * 0.27, H / 2 + 4, 78, "calls", "调用次数");
+    s += donut(W * 0.73, H / 2 + 4, 78, "tokens", "Token 用量");
+  }
+  pieSvg.innerHTML = s;
+  pieSvg.querySelectorAll("path").forEach((path) => {
+    path.addEventListener("mousemove", (e) => {
+      const ci = +path.dataset.ci;
+      pieTip.innerHTML = tipHtml(`${CATEGORIES[ci]} · ${shortDate(d.date)}`,
+        keys.map((k) => ({
+          color: CATEGORY_COLORS[ci],
+          name: k === "calls" ? "调用次数" : "Token 用量",
+          value: k === "calls" ? `${fmtInt(d.cats[CATEGORIES[ci]].calls)} 次` : `${fmtTokens(d.cats[CATEGORIES[ci]].tokens)}`,
+        })),
+        "当日总计", metricStr(d, metric.pie));
+      placeTip(pieCard, pieTip, e);
+    });
+    path.addEventListener("mouseleave", () => { pieTip.style.display = "none"; });
+  });
+  pieSide.innerHTML = CATEGORIES.map((c, ci) => {
+    const o = { calls: d.cats[c].calls, tokens: d.cats[c].tokens };
+    return `<div class="row"><span class="dot" style="background:${CATEGORY_COLORS[ci]}"></span><span class="name">${esc(c)}</span><span class="val">${esc(metricStr(o, metric.pie))}</span></div>`;
+  }).join("") + `<div class="total"><span>当日总计</span><span>${esc(metricStr(d, metric.pie))}</span></div>`;
+}
+pieDate.addEventListener("change", () => { pieIdx = +pieDate.value; renderPie(); });
+
+/* ── 指标切换接线 ─────────────────────────────────────── */
+const RENDERERS = { line: renderLine, bar: renderBar, pie: renderPie };
+document.querySelectorAll(".metric-toggle").forEach((tg) => {
+  const chart = tg.dataset.chart;
+  tg.querySelectorAll("button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const m = metric[chart], k = btn.dataset.m;
+      if (m[k] && (m.calls + m.tokens) === 1) { toast("至少保留一项指标"); return; }
+      m[k] = !m[k];
+      tg.querySelectorAll("button").forEach((b) => b.classList.toggle("on", m[b.dataset.m]));
+      RENDERERS[chart]();
+    });
+  });
+});
+
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove("show"), 1800);
+}
+
+renderHeat(); renderLine(); renderBar(); renderPie();
+</script>
+</body>
+</html>

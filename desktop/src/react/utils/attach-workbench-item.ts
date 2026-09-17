@@ -12,16 +12,13 @@ import { useStore } from '../stores';
 declare function t(key: string, vars?: Record<string, string | number>): string;
 
 /**
- * 附件只能进聊天输入框。非聊天页签返回 true，并给出与该页签一致的提示；
+ * 附件只能进聊天输入框。非聊天页签返回 true，并提示附件仅在聊天页支持；
  * 拖拽附件与工作台 @ 按钮共用这一判据。
  */
 export function blockChatAttachmentOutsideChatTab(): boolean {
   const state = useStore.getState();
   if (state.currentTab === 'chat') return false;
-  state.addToast(
-    state.currentTab === 'knowledge' ? t('knowledge.useImportButton') : t('channel.filesUnsupported'),
-    'error',
-  );
+  state.addToast(t('channel.filesUnsupported'), 'error');
   return true;
 }
 

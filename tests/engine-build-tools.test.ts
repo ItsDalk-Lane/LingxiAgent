@@ -78,7 +78,12 @@ describe("LingxiEngine.buildTools", () => {
     engine.lingxiHome = tmpDir;
     engine.getAgent = vi.fn(() => null);
     engine._pluginManager = null;
-    engine._prefs = { getFileBackup: () => ({ enabled: false }) };
+    // 本文件聚焦权限模式/审批网关/会话引用等装配行为；按需加载会把这些
+    // 夹具工具挪进目录，与被测对象无关，统一显式退回全量直载。
+    engine._prefs = {
+      getFileBackup: () => ({ enabled: false }),
+      getBuiltinToolDeferEnabled: () => false,
+    };
     engine._readPreferences = () => ({ sandbox: true });
     engine._agentMgr = {
       agent: {
@@ -102,7 +107,12 @@ describe("LingxiEngine.buildTools", () => {
     engine.lingxiHome = tmpDir;
     engine.getAgent = vi.fn(() => agent);
     engine._pluginManager = null;
-    engine._prefs = { getFileBackup: () => ({ enabled: false }) };
+    // 本文件聚焦权限模式/审批网关/会话引用等装配行为；按需加载会把这些
+    // 夹具工具挪进目录，与被测对象无关，统一显式退回全量直载。
+    engine._prefs = {
+      getFileBackup: () => ({ enabled: false }),
+      getBuiltinToolDeferEnabled: () => false,
+    };
     engine._readPreferences = () => ({ sandbox: true });
     engine._agentMgr = { agent };
 
@@ -129,7 +139,12 @@ describe("LingxiEngine.buildTools", () => {
     engine.lingxiHome = tmpDir;
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;
-    engine._prefs = { getFileBackup: () => ({ enabled: false }) };
+    // 本文件聚焦权限模式/审批网关/会话引用等装配行为；按需加载会把这些
+    // 夹具工具挪进目录，与被测对象无关，统一显式退回全量直载。
+    engine._prefs = {
+      getFileBackup: () => ({ enabled: false }),
+      getBuiltinToolDeferEnabled: () => false,
+    };
     engine._readPreferences = () => ({ sandbox: true });
     engine._confirmStore = confirmStore;
     engine._emitEvent = vi.fn();
@@ -179,7 +194,12 @@ describe("LingxiEngine.buildTools", () => {
     engine.lingxiHome = tmpDir;
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;
-    engine._prefs = { getFileBackup: () => ({ enabled: false }) };
+    // 本文件聚焦权限模式/审批网关/会话引用等装配行为；按需加载会把这些
+    // 夹具工具挪进目录，与被测对象无关，统一显式退回全量直载。
+    engine._prefs = {
+      getFileBackup: () => ({ enabled: false }),
+      getBuiltinToolDeferEnabled: () => false,
+    };
     engine._readPreferences = () => ({ sandbox: true });
     engine._confirmStore = null;
     engine._approvalGateway = approvalGateway;
@@ -237,7 +257,12 @@ describe("LingxiEngine.buildTools", () => {
     engine.getAgent = vi.fn(() => agent);
     engine.getSessionIdForPath = vi.fn(() => "sess_isolated");
     engine._pluginManager = null;
-    engine._prefs = { getFileBackup: () => ({ enabled: false }) };
+    // 本文件聚焦权限模式/审批网关/会话引用等装配行为；按需加载会把这些
+    // 夹具工具挪进目录，与被测对象无关，统一显式退回全量直载。
+    engine._prefs = {
+      getFileBackup: () => ({ enabled: false }),
+      getBuiltinToolDeferEnabled: () => false,
+    };
     engine._readPreferences = () => ({ sandbox: true });
     engine._approvalGateway = approvalGateway;
     engine._confirmStore = null;
@@ -372,7 +397,12 @@ describe("LingxiEngine.buildTools", () => {
     engine.getAgent = vi.fn(() => agent);
     engine.isChannelsEnabled = vi.fn(() => false);
     engine._pluginManager = null;
-    engine._prefs = { getFileBackup: () => ({ enabled: false }) };
+    // 本文件聚焦权限模式/审批网关/会话引用等装配行为；按需加载会把这些
+    // 夹具工具挪进目录，与被测对象无关，统一显式退回全量直载。
+    engine._prefs = {
+      getFileBackup: () => ({ enabled: false }),
+      getBuiltinToolDeferEnabled: () => false,
+    };
     engine._readPreferences = () => ({ sandbox: true });
     engine._confirmStore = null;
     engine._emitEvent = vi.fn();
@@ -414,7 +444,12 @@ describe("LingxiEngine.buildTools", () => {
         execute,
       }],
     };
-    engine._prefs = { getFileBackup: () => ({ enabled: false }) };
+    // 本文件聚焦权限模式/审批网关/会话引用等装配行为；按需加载会把这些
+    // 夹具工具挪进目录，与被测对象无关，统一显式退回全量直载。
+    engine._prefs = {
+      getFileBackup: () => ({ enabled: false }),
+      getBuiltinToolDeferEnabled: () => false,
+    };
     engine._readPreferences = () => ({ sandbox: true });
     engine._confirmStore = null;
     engine._emitEvent = vi.fn();
@@ -458,7 +493,12 @@ describe("LingxiEngine.buildTools", () => {
     engine._mcp = {
       getAllTools: () => [{ ...permissionTool("mcp_duplicate"), _pluginId: "mcp" }],
     };
-    engine._prefs = { getFileBackup: () => ({ enabled: false }) };
+    // 本文件聚焦权限模式/审批网关/会话引用等装配行为；按需加载会把这些
+    // 夹具工具挪进目录，与被测对象无关，统一显式退回全量直载。
+    engine._prefs = {
+      getFileBackup: () => ({ enabled: false }),
+      getBuiltinToolDeferEnabled: () => false,
+    };
     engine._readPreferences = () => ({ sandbox: true });
     engine._agentMgr = { agent };
 
@@ -492,7 +532,12 @@ describe("LingxiEngine.buildTools", () => {
     engine._pluginManager = {
       getAllTools: () => [pluginPermissionTool("plugin_tool", execute)],
     };
-    engine._prefs = { getFileBackup: () => ({ enabled: false }) };
+    // 本文件聚焦权限模式/审批网关/会话引用等装配行为；按需加载会把这些
+    // 夹具工具挪进目录，与被测对象无关，统一显式退回全量直载。
+    engine._prefs = {
+      getFileBackup: () => ({ enabled: false }),
+      getBuiltinToolDeferEnabled: () => false,
+    };
     engine._readPreferences = () => ({ sandbox: true });
     engine._confirmStore = null;
     engine._emitEvent = vi.fn();
@@ -557,7 +602,12 @@ describe("LingxiEngine.buildTools", () => {
     engine._pluginManager = {
       getAllTools: () => [pluginPermissionTool("plugin_tool", execute)],
     };
-    engine._prefs = { getFileBackup: () => ({ enabled: false }) };
+    // 本文件聚焦权限模式/审批网关/会话引用等装配行为；按需加载会把这些
+    // 夹具工具挪进目录，与被测对象无关，统一显式退回全量直载。
+    engine._prefs = {
+      getFileBackup: () => ({ enabled: false }),
+      getBuiltinToolDeferEnabled: () => false,
+    };
     engine._readPreferences = () => ({ sandbox: true });
     engine._confirmStore = null;
     engine._emitEvent = vi.fn();
@@ -606,7 +656,12 @@ describe("LingxiEngine.buildTools", () => {
     engine.lingxiHome = tmpDir;
     engine.getAgent = vi.fn(() => agent);
     engine._pluginManager = null;
-    engine._prefs = { getFileBackup: () => ({ enabled: false }) };
+    // 本文件聚焦权限模式/审批网关/会话引用等装配行为；按需加载会把这些
+    // 夹具工具挪进目录，与被测对象无关，统一显式退回全量直载。
+    engine._prefs = {
+      getFileBackup: () => ({ enabled: false }),
+      getBuiltinToolDeferEnabled: () => false,
+    };
     engine._readPreferences = () => ({ sandbox: true });
     engine._confirmStore = null;
     engine._emitEvent = vi.fn();
@@ -671,7 +726,12 @@ describe("LingxiEngine.buildTools", () => {
     engine._pluginManager = {
       getAllTools: () => [pluginPermissionTool("plugin_tool", execute)],
     };
-    engine._prefs = { getFileBackup: () => ({ enabled: false }) };
+    // 本文件聚焦权限模式/审批网关/会话引用等装配行为；按需加载会把这些
+    // 夹具工具挪进目录，与被测对象无关，统一显式退回全量直载。
+    engine._prefs = {
+      getFileBackup: () => ({ enabled: false }),
+      getBuiltinToolDeferEnabled: () => false,
+    };
     engine._readPreferences = () => ({ sandbox: true });
     engine._confirmStore = null;
     engine._emitEvent = vi.fn();
@@ -736,7 +796,12 @@ describe("LingxiEngine.buildTools", () => {
     engine.registerSessionFile = registerSessionFile;
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;
-    engine._prefs = { getFileBackup: () => ({ enabled: false }) };
+    // 本文件聚焦权限模式/审批网关/会话引用等装配行为；按需加载会把这些
+    // 夹具工具挪进目录，与被测对象无关，统一显式退回全量直载。
+    engine._prefs = {
+      getFileBackup: () => ({ enabled: false }),
+      getBuiltinToolDeferEnabled: () => false,
+    };
     engine._readPreferences = () => ({ sandbox: false });
     engine._confirmStore = null;
     engine._emitEvent = vi.fn();
@@ -835,7 +900,12 @@ describe("LingxiEngine.buildTools", () => {
     engine.registerSessionFile = registerSessionFile;
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;
-    engine._prefs = { getFileBackup: () => ({ enabled: false }) };
+    // 本文件聚焦权限模式/审批网关/会话引用等装配行为；按需加载会把这些
+    // 夹具工具挪进目录，与被测对象无关，统一显式退回全量直载。
+    engine._prefs = {
+      getFileBackup: () => ({ enabled: false }),
+      getBuiltinToolDeferEnabled: () => false,
+    };
     engine._readPreferences = () => ({ sandbox: false });
     engine._confirmStore = null;
     engine._emitEvent = vi.fn();
@@ -908,7 +978,12 @@ describe("LingxiEngine.buildTools", () => {
     }));
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;
-    engine._prefs = { getFileBackup: () => ({ enabled: false }) };
+    // 本文件聚焦权限模式/审批网关/会话引用等装配行为；按需加载会把这些
+    // 夹具工具挪进目录，与被测对象无关，统一显式退回全量直载。
+    engine._prefs = {
+      getFileBackup: () => ({ enabled: false }),
+      getBuiltinToolDeferEnabled: () => false,
+    };
     engine._readPreferences = () => ({ sandbox: true });
     engine._confirmStore = null;
     engine._emitEvent = vi.fn();
@@ -967,7 +1042,12 @@ describe("LingxiEngine.buildTools", () => {
     engine.registerSessionFile = vi.fn();
     engine.getAgent = vi.fn(() => ({ id: "focus", agentDir, tools: [] }));
     engine._pluginManager = null;
-    engine._prefs = { getFileBackup: () => ({ enabled: false }) };
+    // 本文件聚焦权限模式/审批网关/会话引用等装配行为；按需加载会把这些
+    // 夹具工具挪进目录，与被测对象无关，统一显式退回全量直载。
+    engine._prefs = {
+      getFileBackup: () => ({ enabled: false }),
+      getBuiltinToolDeferEnabled: () => false,
+    };
     engine._readPreferences = () => ({ sandbox: false });
     engine._confirmStore = null;
     engine._emitEvent = vi.fn();

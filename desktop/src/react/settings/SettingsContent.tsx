@@ -31,6 +31,7 @@ import { ExperimentsTab } from './tabs/ExperimentsTab';
 import { SecurityTab } from './tabs/SecurityTab';
 import { SharingTab } from './tabs/SharingTab';
 import { AccessTab } from './tabs/AccessTab';
+import { EnvDepsTab } from './tabs/EnvDepsTab';
 import { CropOverlay } from './overlays/CropOverlay';
 import { AgentCreateOverlay } from './overlays/AgentCreateOverlay';
 import { AgentDeleteOverlay } from './overlays/AgentDeleteOverlay';
@@ -60,6 +61,7 @@ const TAB_COMPONENTS: Record<string, React.ComponentType> = {
   access: AccessTab,
   experiments: ExperimentsTab,
   security: SecurityTab,
+  envdeps: EnvDepsTab,
   about: AboutTab,
 };
 
@@ -103,6 +105,9 @@ const TAB_TITLE_KEYS: Record<string, string> = {
 const TAB_DESCRIPTION_KEYS: Record<string, string> = {
   experiments: 'settings.experiments.description',
 };
+
+/** 页内自带首行导航的 tab 不再渲染页内大标题（标题只在弹窗头部/导航出现）。 */
+const HEADINGLESS_TABS: ReadonlySet<string> = new Set(['usage']);
 
 export function normalizeSettingsTab(tab: string): string {
   return tab;
@@ -271,7 +276,7 @@ export function SettingsContent({
           <div className={styles['settings-body']}>
             <SettingsNav onTabChange={reportActiveTabChange} />
             <div className={styles['settings-main']} ref={settingsMainRef} data-settings-main>
-              {!isModal && (
+              {!isModal && !HEADINGLESS_TABS.has(effectiveActiveTab) && (
                 <div className={styles['settings-tab-heading']}>
                   <h1 className={styles['settings-tab-title']}>{activeTabTitle}</h1>
                   {activeTabDescription && (

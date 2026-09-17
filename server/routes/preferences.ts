@@ -356,6 +356,56 @@ export function createPreferencesRoute(engine: any, options: Record<string, any>
     }
   });
 
+  route.get("/preferences/autolearn", async (c) => {
+    try {
+      return c.json({ autolearn: engine.getAutolearnPreferences?.() || { enabled: true } });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
+  route.put("/preferences/autolearn", async (c) => {
+    try {
+      const body = await safeJson(c);
+      if (!body || typeof body !== "object") {
+        return c.json({ error: "invalid JSON body" }, 400);
+      }
+      if (typeof engine.setAutolearnPreferences !== "function") {
+        return c.json({ error: "autolearn preferences unavailable" }, 500);
+      }
+      const patch = body.autolearn && typeof body.autolearn === "object" ? body.autolearn : body;
+      const autolearn = engine.setAutolearnPreferences(patch);
+      return c.json({ ok: true, autolearn });
+    } catch (err) {
+      return c.json({ error: err.message }, 400);
+    }
+  });
+
+  route.get("/preferences/goal", async (c) => {
+    try {
+      return c.json({ goal: engine.getGoalPreferences?.() || { enabled: true, default_token_budget: null, default_time_budget_minutes: null } });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
+  route.put("/preferences/goal", async (c) => {
+    try {
+      const body = await safeJson(c);
+      if (!body || typeof body !== "object") {
+        return c.json({ error: "invalid JSON body" }, 400);
+      }
+      if (typeof engine.setGoalPreferences !== "function") {
+        return c.json({ error: "goal preferences unavailable" }, 500);
+      }
+      const patch = body.goal && typeof body.goal === "object" ? body.goal : body;
+      const goal = engine.setGoalPreferences(patch);
+      return c.json({ ok: true, goal });
+    } catch (err) {
+      return c.json({ error: err.message }, 400);
+    }
+  });
+
   route.get("/preferences/browser", async (c) => {
     try {
       return c.json({

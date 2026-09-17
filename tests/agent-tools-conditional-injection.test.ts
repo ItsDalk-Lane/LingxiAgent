@@ -169,4 +169,30 @@ describe("Agent.getToolsSnapshot conditional injection (A4)", () => {
     expect(toolNames).not.toContain("install_skill");
     await agent.dispose();
   });
+
+  // ── learn_lesson 工具：与 install_skill 同一个 learn_skills.enabled 门控 ──
+
+  it("includes learn_lesson tool when _cb.getLearnSkills() returns { enabled: true }", async () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "hana-tools-cond-"));
+    roots.push(root);
+    const agent = await buildAgent(root, {
+      isChannelsEnabled: () => false,
+      getLearnSkills: () => ({ enabled: true }),
+    });
+    const toolNames = agent.getToolsSnapshot({ forceMemoryEnabled: false }).map((t) => t.name);
+    expect(toolNames).toContain("learn_lesson");
+    await agent.dispose();
+  });
+
+  it("excludes learn_lesson tool when _cb.getLearnSkills() returns { enabled: false }", async () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "hana-tools-cond-"));
+    roots.push(root);
+    const agent = await buildAgent(root, {
+      isChannelsEnabled: () => false,
+      getLearnSkills: () => ({ enabled: false }),
+    });
+    const toolNames = agent.getToolsSnapshot({ forceMemoryEnabled: false }).map((t) => t.name);
+    expect(toolNames).not.toContain("learn_lesson");
+    await agent.dispose();
+  });
 });

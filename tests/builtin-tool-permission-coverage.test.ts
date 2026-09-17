@@ -92,6 +92,14 @@ const SNAPSHOT_EXEMPT_TOOL_NAMES = [
   // Agent.getToolsSnapshot；它自带的 sessionPermission 描述符由
   // tests/resource-io-materialize-tool.test.ts 直接断言覆盖。
   "materialize",
+  // ast_grep / ast_edit / security_scan 同属 createSandboxedTools 组装层
+  // （lib/sandbox/index.ts 两个分支），不经过 Agent.getToolsSnapshot；
+  // 权限契约与行为由 lib/sandbox/__tests__/ast-tools.test.ts 与
+  // lib/tools/__tests__/security-scan-tool.test.ts 直接断言覆盖，
+  // engine 侧组装由 tests/engine-build-tools.test.ts 覆盖。
+  "ast_grep", "ast_edit", "security_scan",
+  // run_code / lsp 同上（createSandboxedTools 组装层）。
+  "run_code", "lsp",
   // 插件承载的合成 OPTIONAL 分类，没有对应的内置工具对象
   // （见 shared/tool-categories.ts 的 PLUGIN_BACKED_OPTIONAL_TOOL_IDS）。
   "beautify", "office",

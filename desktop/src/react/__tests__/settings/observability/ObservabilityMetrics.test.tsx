@@ -52,19 +52,53 @@ describe('ObservabilityMetrics (§五十三～五十七)', () => {
 
   afterEach(() => cleanup());
 
-  it('renders exactly 8 metric cards from overall', () => {
+  it('renders exactly 10 metric cards (cost removed; activeDays/topModel/peakDay added)', () => {
     render(<ObservabilityMetrics overall={makeMetrics()} loading={false} />);
     const metrics = document.querySelector('[class*="observability-metrics"]');
     expect(metrics).not.toBeNull();
-    expect(metrics!.querySelectorAll('[class*="observability-metric-card"]')).toHaveLength(8);
+    expect(metrics!.querySelectorAll('[class*="observability-metric-card"]')).toHaveLength(10);
   });
 
-  it('formats real values (cost 2dp, avg duration, token totals)', () => {
+  it('insight cards: active days with streak, top model with calls and tokens', () => {
+    render(<ObservabilityMetrics
+      overall={makeMetrics()}
+      loading={false}
+      insights={{
+        activeDays: 5,
+        longestStreak: 3,
+        topModel: { name: 'model-a', calls: 24, tokens: 15_400 },
+        peakDay: { date: '2026-09-12', calls: 100, tokens: 90_000 },
+      }}
+    />);
+    const cards = [...document.querySelectorAll('[class*="observability-metric-card"]')];
+    const activeCard = cards.find((card) => card.textContent!.includes('settings.observability.metrics.activeDays'))!;
+    expect(activeCard).toBeDefined();
+    expect(activeCard.textContent).toContain('settings.observability.metrics.longestStreak:{"count":"3"}');
+    const topCard = cards.find((card) => card.textContent!.includes('settings.observability.metrics.topModel'))!;
+    expect(topCard.textContent).toContain('model-a');
+    expect(topCard.textContent).toContain('24');
+    expect(topCard.textContent).toContain('1.54万');
+    // 调用次数与 Token 上下两行（各自独立 hint 行，不拼一行）。
+    const topHints = [...topCard.querySelectorAll('[class*="observability-metric-hint"]')].map((el) => el.textContent);
+    expect(topHints).toEqual([
+      'settings.observability.charts.callsUnit:{"count":"24"}',
+      'settings.observability.charts.tokensUnit:{"count":"1.54万"}',
+    ]);
+    // 高峰日：Token 最高的一天，值 = 日期，副行同样是上下两行。
+    const peakCard = cards.find((card) => card.textContent!.includes('settings.observability.metrics.peakDay'))!;
+    expect(peakCard.textContent).toContain('settings.observability.charts.callsUnit:{"count":"100"}');
+    expect(peakCard.textContent).toContain('9万');
+    // 洞察缺事实 → 卡值走 "—"（不冒充 0）。
+    const fallback = document.querySelector('[class*="observability-metrics"]');
+    expect(fallback).not.toBeNull();
+  });
+
+  it('formats real values (avg duration, token totals; cost card removed 2026-09-17)', () => {
     render(<ObservabilityMetrics overall={makeMetrics()} loading={false} />);
-    expect(screen.getAllByText('$1.23')).toHaveLength(1);
     expect(screen.getAllByText('8.5s')).toHaveLength(1);
-    expect(screen.getAllByText('15.4K')).toHaveLength(1);
+    expect(screen.getAllByText('1.54万')).toHaveLength(1);
     expect(screen.getAllByText('100')).toHaveLength(1);
+    expect(screen.queryByText('$1.23')).toBeNull();
   });
 
   it('null cost/duration render em dash, never a fake zero (§三十三)', () => {
@@ -83,10 +117,10 @@ describe('ObservabilityMetrics (§五十三～五十七)', () => {
     expect(screen.queryByText(/cacheHitRate/)).toBeNull();
   });
 
-  it('overall=null renders 8 placeholder cards with em dashes', () => {
+  it('overall=null renders 10 placeholder cards with em dashes', () => {
     render(<ObservabilityMetrics overall={null} loading={true} />);
     const cards = document.querySelectorAll('[class*="observability-metric-card"]');
-    expect(cards).toHaveLength(8);
+    expect(cards).toHaveLength(10);
     [...cards].forEach((card) => {
       expect(card.querySelector('[class*="observability-metric-value"]')!.textContent).toBe('—');
     });

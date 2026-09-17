@@ -1,25 +1,28 @@
 /**
  * ModelObservabilitySection.tsx — Model Observatory 页面编排（Phase 9）。
  *
- * 职责：health/settings bootstrap、录制状态条（低噪声，§九十六）、
- * honest absent/degraded 状态、aggregate 唯一查询点（Metrics/Groups 共享，
- * §十四）、Inspector/TraceExplorer/Settings/Export 的挂载与导航联动。
+ * 页面分三个子标签页（Token 用量 / 调用台账 / 调用轨迹），子标签行是页首行
+ * （页内大标题与录制状态条已移除），右端挂当前子页的刷新/导出与全局记录设置。
+ * 每页一套独立筛选状态——三份 useObservabilityQueryState 实例提升持有在本壳
+ * 内，面板随子标签卸载但筛选不丢。本壳保留：health/settings bootstrap、
+ * 子标签行、Inspector 抽屉（浮层，不属于任何子页）、记录设置弹窗、导出弹窗、
+ * 台账→轨迹的跨页跳转。
  *
  * 纪律：
- *   - 刷新 = health + aggregate + 首页 ledger（§五十；绝不触发 writer flush）。
+ *   - 刷新 = health + 当前子页数据（§五十；绝不触发 writer flush）。
  *   - recording disabled 但 query ready → 历史照常浏览（§九十七）。
  *   - 分层 loading：health/aggregate/ledger 各自独立，不做整页白闪（§一百三十七）。
  *   - local-only 功能（export/settings PUT/payload 正文/blob）用
  *     isLocalOwnerConnection 灰化，route security 仍是最终裁决（§一百三十二）。
  */
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import type {
-  ModelObservabilityAggregateResult,
   ModelObservabilityHealthResponse,
   ModelObservabilitySettingsResponse,
 } from '../../../../../../shared/model-observability-api-contract.ts';
 import { t } from '../../helpers';
 import { useSettingsStore } from '../../store';
+import { Button, Tooltip } from '../../../ui';
 import { isLocalOwnerConnection } from '../../../services/server-connection';
 import styles from '../../Settings.module.css';
 import {
@@ -27,24 +30,28 @@ import {
   loadObservabilityHealth,
   loadObservabilitySettings,
   ModelObservabilityRequestError,
-  queryObservabilityAggregate,
 } from './model-observability-actions';
-import {
-  buildCallFilterInput,
-  dateBucketForGroupBy,
-} from './model-observability-filter';
 import { useObservabilityQueryState } from './use-observability-query-state';
-import { ObservabilityFilterBar } from './ObservabilityFilterBar';
-import { ObservabilityMetrics } from './ObservabilityMetrics';
-import { ObservabilityGroups } from './ObservabilityGroups';
-import { ObservabilityCallLedger } from './ObservabilityCallLedger';
+import { ObservabilityUsagePanel } from './ObservabilityUsagePanel';
+import { ObservabilityLedgerPanel } from './ObservabilityLedgerPanel';
+import { ObservabilityTracesPanel } from './ObservabilityTracesPanel';
 import { ObservabilityCallInspector } from './ObservabilityCallInspector';
-import { ObservabilityTraceExplorer } from './ObservabilityTraceExplorer';
-import { ObservabilitySettingsDialog } from './ObservabilitySettingsDialog';
+import { ObservabilitySettingsPanel } from './ObservabilitySettingsPanel';
 import { ObservabilityExportDialog } from './ObservabilityExportDialog';
-import { recordingStatusLabel } from './model-observability-labels';
 
 type BootstrapError = { kind: 'forbidden' | 'network'; message: string };
+
+type ObservabilitySubTab = 'usage' | 'ledger' | 'traces' | 'settings';
+
+const OBSERVABILITY_SUB_TABS: { key: ObservabilitySubTab; labelKey: string }[] = [
+  { key: 'usage', labelKey: 'settings.observability.subtab.usage' },
+  { key: 'ledger', labelKey: 'settings.observability.ledger.title' },
+  { key: 'traces', labelKey: 'settings.observability.trace.title' },
+  { key: 'settings', labelKey: 'settings.observability.subtab.settings' },
+];
+
+/** 有自己筛选状态的内容子页（「设置」页没有筛选条，也不参与导出）。 */
+type ContentSubTab = Exclude<ObservabilitySubTab, 'settings'>;
 
 function toBootstrapError(error: unknown): BootstrapError {
   if (error instanceof ModelObservabilityRequestError
@@ -55,22 +62,35 @@ function toBootstrapError(error: unknown): BootstrapError {
 }
 
 export function ModelObservabilitySection() {
-  const queryState = useObservabilityQueryState();
-  const { appliedFilter, groupBy } = queryState;
+  // 三个子页各自独立的筛选状态（§十四的「单一事实源」收窄为「每个子页一份」）。
+  const usageState = useObservabilityQueryState();
+  const ledgerState = useObservabilityQueryState();
+  const tracesState = useObservabilityQueryState();
+  const stateByTab: Record<ContentSubTab, typeof usageState> = {
+    usage: usageState,
+    ledger: ledgerState,
+    traces: tracesState,
+  };
 
   const isLocalOwner = isLocalOwnerConnection(useSettingsStore((s) => s.activeServerConnection));
+  const storedSubTab = useSettingsStore((s) => s.activeSubTabs.usage);
+  const subTab: ObservabilitySubTab = storedSubTab === 'ledger' || storedSubTab === 'traces' || storedSubTab === 'settings'
+    ? storedSubTab
+    : 'usage';
 
   const [health, setHealth] = useState<ModelObservabilityHealthResponse | null>(null);
   const [settings, setSettings] = useState<ModelObservabilitySettingsResponse | null>(null);
   const [bootstrapError, setBootstrapError] = useState<BootstrapError | null>(null);
-  const [aggregate, setAggregate] = useState<ModelObservabilityAggregateResult | null>(null);
-  const [aggregateLoading, setAggregateLoading] = useState(true);
-  const [aggregateError, setAggregateError] = useState<string | null>(null);
-  const [refreshToken, setRefreshToken] = useState(0);
+  const [refreshTokens, setRefreshTokens] = useState<Record<ContentSubTab | 'settings', number>>({
+    usage: 0,
+    ledger: 0,
+    traces: 0,
+    settings: 0,
+  });
   const [refreshing, setRefreshing] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
-  const aggregateGenerationRef = useRef(0);
+  // Inspector 是浮层抽屉，从台账或轨迹都能打开，不属于任何子页。
+  const [selectedCallId, setSelectedCallId] = useState<string | null>(null);
 
   /* ── bootstrap：health + settings ──────────────────────────────────── */
   const reloadControlPlane = useCallback(async (signal?: AbortSignal) => {
@@ -92,69 +112,30 @@ export function ModelObservabilitySection() {
     return () => controller.abort();
   }, [reloadControlPlane]);
 
-  /* ── aggregate：Metrics/Groups 共享唯一查询（§十四/§二十八）───────────── */
-  useEffect(() => {
-    const generation = ++aggregateGenerationRef.current;
-    const controller = new AbortController();
-    setAggregateLoading(true);
-    setAggregateError(null);
-    queryObservabilityAggregate(
-      {
-        filter: buildCallFilterInput(appliedFilter),
-        groupBy: [...groupBy],
-        dateBucket: dateBucketForGroupBy(groupBy),
-      },
-      { signal: controller.signal },
-    ).then((result) => {
-      if (aggregateGenerationRef.current !== generation) return;
-      setAggregate(result);
-      setAggregateLoading(false);
-    }).catch((error: unknown) => {
-      if (aggregateGenerationRef.current !== generation || isObservabilityAbortError(error)) return;
-      if (error instanceof ModelObservabilityRequestError && error.kind === 'not_initialized') {
-        setAggregate(null);
-        setAggregateError('not_initialized');
-      } else {
-        setAggregateError(error instanceof Error ? error.message : String(error));
-      }
-      setAggregateLoading(false);
-    });
-    return () => controller.abort();
-  }, [appliedFilter, groupBy, refreshToken]);
-
-  const refresh = useCallback(() => {
+  const refresh = useCallback((target: ContentSubTab | 'settings') => {
     setRefreshing(true);
-    setRefreshToken((token) => token + 1);
+    setRefreshTokens((prev) => ({ ...prev, [target]: prev[target] + 1 }));
     reloadControlPlane()
       .catch((error: unknown) => setBootstrapError(toBootstrapError(error)))
       .finally(() => setRefreshing(false));
   }, [reloadControlPlane]);
 
-  /* ── 导航联动：Inspector ↔ TraceExplorer ─────────────────────────────── */
+  const navigateSubTab = useCallback((target: ObservabilitySubTab) => {
+    // 切页时收起导出弹窗：它跟随当前子页的筛选，不能跨页滞留。
+    setExportOpen(false);
+    useSettingsStore.getState().navigateSettings({ tabId: 'usage', subTabId: target });
+  }, []);
+
   const handleSelectCall = useCallback((callId: string) => {
-    queryState.selectCall(callId);
-  }, [queryState]);
+    setSelectedCallId(callId);
+  }, []);
 
-  const handleSelectTrace = useCallback((traceId: string | null) => {
-    queryState.selectTrace(traceId);
-  }, [queryState]);
-
-  const handleFilterExact = useCallback((field: 'sessionId' | 'conversationId' | 'agentId' | 'taskId', value: string) => {
-    queryState.setDrafts({ [field]: value });
-    queryState.patchFilter({ [field]: value });
-  }, [queryState]);
-
-  const handleBucketFilter = useCallback((dimension: string, value: string) => {
-    if (dimension === 'provider') queryState.patchFilter({ providers: [value] });
-    else if (dimension === 'model') queryState.patchFilter({ modelIds: [value] });
-    else if (dimension === 'category') queryState.patchFilter({ categories: [value] });
-    else if (dimension === 'status') queryState.patchFilter({ terminalStatuses: [value] });
-  }, [queryState]);
-
-  const exportUnavailableReason = useMemo(() => {
-    if (isLocalOwner) return null;
-    return t('settings.observability.export.localOnlyHint');
-  }, [isLocalOwner]);
+  /* ── 跨页跳转：调用详情 → 轨迹（先收抽屉，切页，再选中轨迹）─────────── */
+  const handleOpenTraceFromCall = useCallback((traceId: string) => {
+    setSelectedCallId(null);
+    tracesState.selectTrace(traceId);
+    navigateSubTab('traces');
+  }, [tracesState, navigateSubTab]);
 
   /* ── render ─────────────────────────────────────────────────────────── */
 
@@ -169,108 +150,97 @@ export function ModelObservabilitySection() {
     );
   }
 
+  const exportButton = (
+    <Button
+      variant="secondary"
+      size="sm"
+      disabled={!isLocalOwner}
+      onClick={() => setExportOpen(true)}
+      aria-label={t('settings.observability.export.open')}
+    >
+      {t('settings.observability.export.open')}
+    </Button>
+  );
+
   return (
     <div className={styles['observability-root']}>
-      {/* 录制状态条（低噪声，§九十六；desired vs effective 分开，§一百） */}
-      {health && (
-        <div className={styles['observability-recording-strip']} data-status={health.recordingStatus}>
-          <span>{recordingStatusLabel(health.recordingStatus)}</span>
-          {health.storeDisabledReasonCode && health.recordingStatus !== 'active' && (
-            <span className={styles['observability-recording-reason']}>
-              {t('settings.observability.recording.reason', { code: health.storeDisabledReasonCode })}
-            </span>
-          )}
-          {settings?.desired.enabled
-            && (health.recordingStatus === 'disabled' || health.recordingStatus === 'closed') && (
-            <span className={styles['observability-recording-reason']}>
-              {t('settings.observability.recording.configuredButInactive')}
-            </span>
-          )}
+      <div className={styles['observability-sub-tabs']}>
+        <div className={styles['observability-sub-tab-group']} role="tablist">
+          {OBSERVABILITY_SUB_TABS.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              role="tab"
+              aria-selected={subTab === tab.key}
+              className={`${styles['observability-sub-tab']}${subTab === tab.key ? ` ${styles.active}` : ''}`}
+              onClick={() => navigateSubTab(tab.key)}
+            >
+              {t(tab.labelKey)}
+            </button>
+          ))}
         </div>
-      )}
-
-      <ObservabilityFilterBar
-        state={queryState}
-        refreshing={refreshing}
-        onRefresh={refresh}
-        onExport={() => setExportOpen(true)}
-        exportAvailable={isLocalOwner}
-        exportUnavailableReason={exportUnavailableReason}
-        onOpenRecordingSettings={() => setSettingsOpen(true)}
-      />
-
-      {aggregateError && aggregateError !== 'not_initialized' ? (
-        <div className={styles['observability-error']} role="alert" data-kind="query_failed">
-          <div className={styles['observability-error-title']}>{t('settings.observability.error.query_failed')}</div>
-          <div className={styles['observability-error-detail']}>{aggregateError}</div>
+        <div className={styles['observability-sub-tab-actions']}>
+          <Button
+            variant="secondary"
+            size="sm"
+            loading={refreshing}
+            onClick={() => refresh(subTab)}
+            aria-label={t('settings.observability.actions.refresh')}
+          >
+            {t('settings.observability.actions.refresh')}
+          </Button>
+          {subTab !== 'settings' && (isLocalOwner ? exportButton : (
+            <Tooltip content={t('settings.observability.export.localOnlyHint')}>
+              <span>{exportButton}</span>
+            </Tooltip>
+          ))}
         </div>
-      ) : (
-        <>
-          <section className={styles['observability-panel']}>
-            <ObservabilityMetrics overall={aggregate?.overall ?? null} loading={aggregateLoading} />
-          </section>
-          {groupBy.length > 0 && (
-            <section className={styles['observability-panel']}>
-              <ObservabilityGroups
-                buckets={aggregate?.groups ?? null}
-                groupBy={groupBy}
-                loading={aggregateLoading}
-                onBucketFilter={handleBucketFilter}
-              />
-            </section>
-          )}
-        </>
+      </div>
+
+      {subTab === 'usage' && (
+        <ObservabilityUsagePanel state={usageState} refreshToken={refreshTokens.usage} />
       )}
-
-      <section className={styles['observability-panel']}>
-        <h3 className={styles['observability-panel-title']}>{t('settings.observability.ledger.title')}</h3>
-        <ObservabilityCallLedger
-          appliedFilter={appliedFilter}
-          selectedCallId={queryState.selectedCallId}
-          onSelectCall={handleSelectCall}
-          onFilterExact={handleFilterExact}
-          refreshToken={refreshToken}
+      {subTab === 'settings' && (
+        <ObservabilitySettingsPanel
+          health={health}
+          settings={settings}
+          refreshToken={refreshTokens.settings}
+          onSaved={() => {
+            void reloadControlPlane().then(() => setRefreshTokens((prev) => ({
+              usage: prev.usage + 1,
+              ledger: prev.ledger + 1,
+              traces: prev.traces + 1,
+              settings: prev.settings + 1,
+            })));
+          }}
         />
-      </section>
-
-      <section className={styles['observability-panel']}>
-        <h3 className={styles['observability-panel-title']}>{t('settings.observability.trace.title')}</h3>
-        <ObservabilityTraceExplorer
-          appliedFilter={appliedFilter}
-          selectedTraceId={queryState.selectedTraceId}
-          onSelectTrace={handleSelectTrace}
+      )}
+      {subTab === 'ledger' && (
+        <ObservabilityLedgerPanel
+          state={ledgerState}
+          refreshToken={refreshTokens.ledger}
+          selectedCallId={selectedCallId}
           onSelectCall={handleSelectCall}
-          refreshToken={refreshToken}
         />
-      </section>
+      )}
+      {subTab === 'traces' && (
+        <ObservabilityTracesPanel
+          state={tracesState}
+          refreshToken={refreshTokens.traces}
+          onSelectCall={handleSelectCall}
+        />
+      )}
 
       <ObservabilityCallInspector
-        callId={queryState.selectedCallId}
+        callId={selectedCallId}
         isLocalOwner={isLocalOwner}
-        onClose={() => queryState.selectCall(null)}
-        onOpenTrace={(traceId) => {
-          // 交叉跳转对称处理：先收起调用抽屉再开轨迹弹层，避免轨迹被抽屉遮挡
-          //（与轨迹树→调用详情方向的「先收起轨迹弹窗」互逆）。
-          queryState.selectCall(null);
-          handleSelectTrace(traceId);
-        }}
-      />
-
-      <ObservabilitySettingsDialog
-        open={settingsOpen}
-        isLocalOwner={isLocalOwner}
-        settings={settings}
-        health={health}
-        onClose={() => setSettingsOpen(false)}
-        onApplied={() => {
-          setSettingsOpen(false);
-          void reloadControlPlane().then(() => setRefreshToken((token) => token + 1));
-        }}
+        onClose={() => setSelectedCallId(null)}
+        onOpenTrace={handleOpenTraceFromCall}
       />
 
       <ObservabilityExportDialog
         open={exportOpen}
-        appliedFilter={appliedFilter}
+        appliedFilter={subTab === 'settings' ? usageState.appliedFilter : stateByTab[subTab].appliedFilter}
         onClose={() => setExportOpen(false)}
       />
     </div>

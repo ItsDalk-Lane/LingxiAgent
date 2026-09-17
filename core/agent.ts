@@ -33,6 +33,14 @@ import { createExperienceTools } from "../lib/tools/experience.ts";
 import { createTenetProposeTool } from "../lib/tools/tenet-propose-tool.ts";
 import { buildTenetsPromptSection } from "../lib/memory/tenets.ts";
 import { createInstallSkillTool } from "../lib/tools/install-skill.ts";
+import { createLearnLessonTool } from "../lib/tools/learn-lesson-tool.ts";
+import { createAskUserTool } from "../lib/tools/ask-user-tool.ts";
+import { createCheckpointTool } from "../lib/tools/checkpoint-tool.ts";
+import { createRewindTool } from "../lib/tools/rewind-tool.ts";
+import { createGoalTool } from "../lib/tools/goal-tool.ts";
+import { createContextNotesTool } from "../lib/tools/context-notes-tool.ts";
+import { getSessionCheckpoint, listSessionCheckpoints } from "./session-checkpoints.ts";
+import { getWorkspaceSnapshotService } from "./workspace-snapshots.ts";
 import { createNotifyTool } from "../lib/tools/notify-tool.ts";
 import { createUpdateSettingsTool } from "../lib/tools/update-settings-tool.ts";
 import { createSessionFoldersTool } from "../lib/tools/session-folders-tool.ts";
@@ -134,6 +142,7 @@ export class Agent {
   declare _factStore: any;
   declare _getOwnerIds: any;
   declare _installSkillTool: any;
+  declare _learnLessonTool: any;
   declare _listAgents: any;
   declare _memoryMasterEnabled: any;
   declare _memorySearchTool: any;
@@ -159,6 +168,11 @@ export class Agent {
   declare _systemPrompt: any;
   declare _todoTool: any;
   declare _updateSettingsTool: any;
+  declare _askUserTool: any;
+  declare _checkpointTool: any;
+  declare _rewindTool: any;
+  declare _goalTool: any;
+  declare _contextNotesTool: any;
   declare _webFetchTool: any;
   declare _webSearchTool: any;
   declare _cardGuideTool: any;
@@ -709,6 +723,45 @@ export class Agent {
       getSessionPath: () => this._cb?.getCurrentSessionPath?.(),
       emitEvent: (event, sp) => { if (sp) this._cb?.emitEvent?.(event, sp); },
     });
+    // 10c. ask_user 结构化提问：复用 ConfirmStore 阻塞确认链 + 输入区提问卡。
+    // read 级权限（计划模式的「收工交决策」依赖它），无开关——核心交互能力。
+    this._askUserTool = createAskUserTool({
+      getConfirmStore: () => this._cb?.getConfirmStore?.(),
+      getSessionPath: () => this._cb?.getCurrentSessionPath?.(),
+      emitEvent: (event, sp) => { if (sp) this._cb?.emitEvent?.(event, sp); },
+    });
+
+    // 10d. checkpoint / rewind（阶段二·8）：会话具名存档点与回滚。
+    // rewind 走确认卡（破坏性），事务核心在 core/session-turn-actions.ts。
+    const sessionBranchInfo = (sp) => {
+      try {
+        const engine = this._cb?.getEngine?.();
+        const session = engine?.getSessionByPath?.(sp);
+        const branch = session?.sessionManager?.getBranch?.() || [];
+        let latestUser = null;
+        for (let i = branch.length - 1; i >= 0; i -= 1) {
+          const entry = branch[i];
+          if (entry?.type === "message" && entry.message?.role === "user") {
+            latestUser = { id: entry.id, turnInputEntryId: entry.id };
+            break;
+          }
+        }
+        const messages = session?.sessionManager?.buildSessionContext?.()?.messages;
+        return { latestUser, messageCount: Array.isArray(messages) ? messages.length : 0 };
+      } catch {
+        return { latestUser: null, messageCount: 0 };
+      }
+    };
+    const snapshotService = () => {
+      const engine = this._cb?.getEngine?.();
+      if (!engine?.lingxiHome) return null;
+      try {
+        // 进程级缓存的共享服务实例；失败返回 null 由调用方如实降级。
+        return getWorkspaceSnapshotService({ lingxiHome: engine.lingxiHome });
+      } catch {
+        return null;
+      }
+    };
     this._sessionFoldersTool = createSessionFoldersTool({
       getEngine: () => this._cb?.getEngine?.(),
       getConfirmStore: () => this._cb?.getConfirmStore?.(),
@@ -756,6 +809,81 @@ export class Agent {
       },
       registerSessionFile: (entry) => this._cb?.registerSessionFile?.(entry),
       resolveSessionFile: resolveActiveSessionFile,
+    });
+
+    // 10b. learn_lesson 工具：把教训结晶成技能池里的单文件技能。
+    // 与 install_skill 共用 learn_skills 总开关与 onInstalled 回调链
+    // （reload + 当前 agent 启用 + skills-changed 事件）。
+    this._learnLessonTool = createLearnLessonTool({
+      agentDir: this.agentDir,
+      getUserSkillsDir: () => this._cb?.getSkillsDir?.(),
+      isEnabled: () => {
+        const cfg = this._cb?.getLearnSkills?.() || this._config?.capabilities?.learn_skills || {};
+        return cfg.enabled !== false;
+      },
+      resolveGuardModel: () => this._cb?.getEngine?.()?.resolveAuxiliaryModelFresh?.("guard", { agentId: this.id }),
+      onLearned: async (skillName) => {
+        await this._onInstallCallback?.(skillName);
+      },
+    });
+
+    this._checkpointTool = createCheckpointTool({
+      getSessionPath: () => this._cb?.getCurrentSessionPath?.(),
+      captureSnapshot: async ({ sessionPath, label }) => {
+        const engine = this._cb?.getEngine?.();
+        const service = snapshotService();
+        if (!engine || !service) return { commit: null, degraded: true };
+        try {
+          const cwd = engine.getAgentCwd?.() || engine.getCwd?.() || process.cwd();
+          const record = await service.captureTurn({ sessionPath, workspaceRoot: cwd, turnInputEntryId: null, label });
+          return { commit: record?.commit || null, degraded: record?.degraded === true };
+        } catch {
+          return { commit: null, degraded: true };
+        }
+      },
+      getLatestUserEntry: (sp) => sessionBranchInfo(sp).latestUser,
+      getMessageCount: (sp) => sessionBranchInfo(sp).messageCount,
+    });
+    this._contextNotesTool = createContextNotesTool({
+      getSessionPath: () => this._cb?.getCurrentSessionPath?.(),
+    });
+    this._goalTool = createGoalTool({
+      getSessionPath: () => this._cb?.getCurrentSessionPath?.(),
+      getGoalEngine: () => (this._cb?.getEngine?.() as any)?.goalEngine || null,
+      getDefaultBudgets: () => {
+        const cfg = this._cb?.getEngine?.()?.getGoalPreferences?.() || {};
+        return {
+          tokenBudget: typeof cfg.default_token_budget === "number" && cfg.default_token_budget > 0 ? cfg.default_token_budget : null,
+          timeBudgetMs: typeof cfg.default_time_budget_minutes === "number" && cfg.default_time_budget_minutes > 0
+            ? Math.round(cfg.default_time_budget_minutes * 60_000)
+            : null,
+        };
+      },
+    });
+    this._rewindTool = createRewindTool({
+      getSessionPath: () => this._cb?.getCurrentSessionPath?.(),
+      getConfirmStore: () => this._cb?.getConfirmStore?.(),
+      emitEvent: (event, sp) => { if (sp) this._cb?.emitEvent?.(event, sp); },
+      rewindToCheckpoint: (opts) => {
+        const engine = this._cb?.getEngine?.();
+        if (!engine?.rewindToCheckpoint) {
+          return Promise.reject(new Error("rewind is unavailable in this runtime"));
+        }
+        return engine.rewindToCheckpoint(opts);
+      },
+      previewRestoreFiles: async ({ sessionPath, checkpointName, createdAtHint }) => {
+        const engine = this._cb?.getEngine?.();
+        const service = snapshotService();
+        const checkpoint = getSessionCheckpoint(sessionPath, checkpointName);
+        if (!engine || !service || !checkpoint) return null;
+        const cwd = engine.getAgentCwd?.() || engine.getCwd?.() || process.cwd();
+        return service.previewTurn({
+          sessionPath,
+          workspaceRoot: cwd,
+          turnInputEntryId: checkpoint.turnInputEntryId || checkpoint.target.entryId,
+          createdAtHint: createdAtHint ?? checkpoint.createdAt,
+        });
+      },
     });
 
     // 11. subagent 工具
@@ -897,6 +1025,8 @@ export class Agent {
   setCallbacks(cb) { this._cb = cb; }
   setGetOwnerIds(fn) { this._getOwnerIds = fn; }
   setOnInstallCallback(fn) { this._onInstallCallback = fn; }
+  /** 技能落盘后的公共通知入口：与 learn_lesson/install_skill 同一条回调链（reload+启用+skills-changed）。 */
+  notifySkillInstalled(skillName) { return this._onInstallCallback?.(skillName); }
   setNotifyHandler(fn) { this._notifyHandler = fn; }
   setDescriptionRefreshHandler(fn) { this._descriptionRefreshHandler = fn; }
   setDmSentHandler(fn) { this._dmSentHandler = fn; }
@@ -1062,7 +1192,7 @@ export class Agent {
       : [];
     const learnCfg = this._cb?.getLearnSkills?.() || this._config?.capabilities?.learn_skills || {};
     const installSkillTools = learnCfg.enabled === true
-      ? [this._installSkillTool]
+      ? [this._installSkillTool, this._learnLessonTool]
       : [];
     return [
       ...memTools,
@@ -1080,6 +1210,11 @@ export class Agent {
       this._notifyTool,
       this._stopTaskTool,
       this._updateSettingsTool,
+      this._askUserTool,
+      this._checkpointTool,
+      this._rewindTool,
+      this._goalTool,
+      this._contextNotesTool,
       this._sessionFoldersTool,
       this._subagentTool,
       this._subagentReplyTool,
@@ -1575,11 +1710,13 @@ export class Agent {
       ? "\n## 工具使用纪律\n\n" +
         "优先用够用且成本低、干扰小的工具。\n" +
         "查文件用 read/grep/find/ls；修改用 edit，新建或全量替换用 write，不用 shell 重定向改源码。\n" +
-        "命令用 exec_command；长任务或交互用 tty=true，再用 write_stdin 续接。需 POSIX 时指定 shell=\"bash\"；Windows 默认 PowerShell，勿套用 POSIX 语法。"
+        "命令用 exec_command；长任务或交互用 tty=true，再用 write_stdin 续接。需 POSIX 时指定 shell=\"bash\"；Windows 默认 PowerShell，勿套用 POSIX 语法。\n" +
+        "改动涉及密钥、鉴权或配置的代码后，主动用 security_scan 扫一次再交付。"
       : "\n## Tool Usage Discipline\n\n" +
         "Prefer sufficient, low-cost, low-disruption tools.\n" +
         "Inspect files with read/grep/find/ls; modify with edit, create or replace with write. No shell redirection for source edits.\n" +
-        "Run commands with exec_command; use tty=true and write_stdin for long-running or interactive work. Set shell=\"bash\" for POSIX; Windows defaults to PowerShell, not POSIX syntax."
+        "Run commands with exec_command; use tty=true and write_stdin for long-running or interactive work. Set shell=\"bash\" for POSIX; Windows defaults to PowerShell, not POSIX syntax.\n" +
+        "After code changes touching keys, auth, or config, proactively run security_scan once before handing off."
     ], "platform_instruction", "platform.tool-discipline");
 
     pushChunk([isZh
@@ -1683,6 +1820,23 @@ export class Agent {
           "- Explain purpose and follow installation risk confirmation; skills grant no authorization. If acquisition fails, continue with available capabilities and state essential limitations."
       ], "platform_instruction", "platform.learn-skills");
     }
+
+    // 技能使用纪律（读全文再动手 + 多步技能建 todo + 压缩后技能回顾的读法）。
+    // SDK 目录（<available_skills>）只给一句简介并让模型"任务匹配就读文件"，
+    // 这里加码成硬性顺序：先读完全文、多步骤先建清单；<skill-recall> 由压缩器
+    // 注入（见 core/session-compactor.ts），两处文案互相引用，改动须同步。
+    pushChunk([isZh
+      ? "\n## 技能使用纪律\n\n" +
+        "用户点名技能（消息含 [Use skill: …]）或任务匹配技能目录里某技能的描述时，先用 read 读完该技能完整的 SKILL.md 再动手；只看目录简介、或只读了一部分就开工，都算没读。\n" +
+        "技能正文要求必读的 references/ 等附属文件，按指引继续读完再执行对应步骤。读技能、领会技能指令不要派给 subagent。\n" +
+        "技能包含多个步骤或子技能时，动手前先用 todo_write 建任务清单（不在常驻工具里就先经工具目录加载），每完成一项立即标记 completed——长技能靠清单锚住进度，不靠记忆。\n" +
+        "上下文若出现 <skill-recall> 技能回顾段，那是本会话先前用过的技能指令节选，继续遵照执行；需要全文时按其中的 Path 重新 read。"
+      : "\n## Skill Usage Discipline\n\n" +
+        "When the user names a skill ([Use skill: …] in the message) or a task matches a skill's catalog description, read that skill's complete SKILL.md with the read tool before acting. Acting from the catalog summary alone, or from a partial read, does not count as having read the skill.\n" +
+        "When a skill's body requires references/ or other supporting files, read those too before executing the corresponding steps. Never delegate reading or interpreting skill instructions to a subagent.\n" +
+        "When a skill involves multiple steps or sub-skills, create a task list with todo_write before starting (load it from the tool catalog first if it is not resident), and mark each item completed immediately when done — long skills stay on track through the list, not memory.\n" +
+        "If a <skill-recall> section appears in context, it holds excerpts of skills used earlier in this session; keep following them, and re-read the listed Path for the full text."
+    ], "platform_instruction", "platform.skill-usage");
 
     // 团队协作（仅当存在其他 agent 时注入）
     // Subagent 场景下跳过：subagent 没有 subagent 工具，知道其他 agent 也使不上

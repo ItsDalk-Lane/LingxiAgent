@@ -12,8 +12,8 @@
   --knowledge-space-22: 22px;
   --knowledge-space-26: 26px;
   --knowledge-space-28: 28px;
-  --knowledge-space-56: 56px;
-  --knowledge-space-60: 60px;
+  /* 行尾悬浮操作区（两个 28px 按钮 + 间隙 + 右边距）的让位宽度 */
+  --knowledge-space-68: 68px;
   position: relative;
   flex: 1;
   min-height: 0;
@@ -91,10 +91,11 @@
 }
 
 .iconButton {
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-card, 8px);
   font-size: 19px;
+  flex: none;
 }
 
 .iconButton:hover,
@@ -151,7 +152,7 @@
 }
 
 .notebookSelect {
-  padding: var(--knowledge-space-11) var(--knowledge-space-56) var(--knowledge-space-11) var(--space-10);
+  padding: var(--knowledge-space-11) var(--knowledge-space-68) var(--knowledge-space-11) var(--space-10);
   display: flex;
   align-items: center;
   gap: var(--knowledge-space-9);
@@ -165,8 +166,9 @@
 
 .rowActions {
   position: absolute;
-  right: 5px;
+  right: var(--knowledge-space-5);
   display: flex;
+  gap: var(--space-4);
   opacity: 0;
 }
 
@@ -179,9 +181,16 @@
 .refreshSource,
 .retryIngestion,
 .removeSource {
-  width: 25px;
-  height: 25px;
-  border-radius: 7px;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-card, 8px);
+  /* ✎ × ↻ 等符号字形偏小，放大字号保证可读可点 */
+  font-size: 16px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }
 
 .inlineEditor {
@@ -211,23 +220,10 @@
   border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
 }
 
-.inlineEditor button,
-.importButton,
-.newNotebookButton {
-  border: 0;
-  border-radius: 8px;
-  color: white;
-  background: var(--accent);
-  cursor: pointer;
-}
+/* 文字按钮统一走全局 Button 组件（variant primary/ghost），这里只保留布局 */
 
-.inlineEditor button {
-  padding: var(--space-6) var(--knowledge-space-9);
-}
-
-.inlineEditor .quietButton {
-  color: var(--text-light);
-  background: transparent;
+.importButton {
+  white-space: nowrap;
 }
 
 .renameInput {
@@ -238,25 +234,17 @@
 .newNotebookButton {
   margin: var(--space-8) var(--space-12) var(--knowledge-space-14);
   padding: var(--space-10) var(--space-12);
+  border: 0;
+  border-radius: var(--radius-card, 8px);
   color: var(--text-light);
   background: transparent;
   text-align: left;
+  cursor: pointer;
 }
 
 .newNotebookButton:hover {
   color: var(--accent);
   background: var(--accent-light);
-}
-
-.importButton {
-  padding: var(--space-8) var(--knowledge-space-11);
-  white-space: nowrap;
-}
-
-.importButton:disabled,
-.inlineEditor button:disabled {
-  opacity: 0.45;
-  cursor: default;
 }
 
 .sourceImportMenu {
@@ -271,9 +259,10 @@
 }
 
 .sourceImportMenu button {
-  padding: var(--space-8) var(--knowledge-space-9);
+  min-height: 30px;
+  padding: var(--space-6) var(--space-8);
   border: 0;
-  border-radius: 7px;
+  border-radius: var(--radius-input, 6px);
   color: var(--text);
   background: transparent;
   text-align: left;
@@ -327,22 +316,6 @@
   gap: var(--space-6);
 }
 
-.sourceImportActions button {
-  padding: var(--knowledge-space-7) var(--knowledge-space-9);
-  border: 0;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.sourceImportActions .quietButton {
-  color: var(--text-light);
-  background: transparent;
-}
-
-.sourceImportActions .quietButton:hover {
-  background: var(--overlay-light);
-}
-
 .sourceActionMenu {
   position: absolute;
   top: 100%;
@@ -359,9 +332,10 @@
 }
 
 .sourceActionMenu button {
-  padding: var(--space-8) var(--knowledge-space-9);
+  min-height: 30px;
+  padding: var(--space-6) var(--space-8);
   border: 0;
-  border-radius: 7px;
+  border-radius: var(--radius-input, 6px);
   color: var(--text);
   background: transparent;
   text-align: left;
@@ -527,7 +501,7 @@
 }
 
 .sourceSelect {
-  padding: var(--space-12) var(--knowledge-space-60) var(--space-12) var(--knowledge-space-9);
+  padding: var(--space-12) var(--knowledge-space-68) var(--space-12) var(--knowledge-space-9);
   display: grid;
   grid-template-columns: 25px minmax(0, 1fr) auto;
   align-items: center;
@@ -591,11 +565,11 @@
 }
 
 .refreshSource {
-  right: 31px;
+  right: 37px;
 }
 
 .removeSource {
-  right: 5px;
+  right: var(--knowledge-space-5);
 }
 
 .sourceRow:hover .refreshSource,
@@ -780,11 +754,11 @@
 
 .retryIngestion {
   position: absolute;
-  right: 57px;
+  right: 69px;
 }
 
 .sourceSelect.hasRetry {
-  padding-right: calc(var(--knowledge-space-60) + 26px);
+  padding-right: calc(var(--knowledge-space-68) + 32px);
 }
 
 .settingsForm {

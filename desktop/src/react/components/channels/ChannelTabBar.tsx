@@ -1,5 +1,5 @@
 /**
- * ChannelTabBar — fixed top tab bar (chat / knowledge / channels)
+ * ChannelTabBar — fixed top tab bar (chat / channels)
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -35,11 +35,10 @@ export function switchTab(tab: TabType) {
 
 // ── Tab list ──
 
-const FIXED_TABS: TabType[] = ['chat', 'knowledge', 'channels'];
+const FIXED_TABS: TabType[] = ['chat', 'channels'];
 
 function getTabLabel(tab: TabType): string {
   if (tab === 'chat') return t('channel.chatTab');
-  if (tab === 'knowledge') return t('knowledge.tab');
   if (tab === 'channels') return t('channel.tab');
   return tab;
 }
@@ -86,10 +85,14 @@ export function ChannelTabBar() {
     requestAnimationFrame(() => moveSlider(useStore.getState().currentTab || 'chat', false));
   }, [moveSlider]);
 
-  // Restore saved tab on mount
+  // Restore saved tab on mount（只恢复仍存在的页签：旧版本存过已移除的 'knowledge'）
   useEffect(() => {
     const savedTab = localStorage.getItem('hana-tab');
-    if (savedTab && savedTab !== 'chat') switchTab(savedTab as TabType);
+    if (savedTab === 'chat' || savedTab === 'channels') {
+      if (savedTab !== 'chat') switchTab(savedTab);
+    } else if (savedTab) {
+      localStorage.setItem('hana-tab', 'chat');
+    }
   }, []);
 
   const handleTabClick = useCallback((tab: TabType) => {

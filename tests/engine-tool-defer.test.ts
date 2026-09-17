@@ -446,13 +446,16 @@ describe("build result carries the catalog manifest", () => {
       connectors: [{ id: "github", tools: manyTools(40) }],
       deferEnabled: false,
     }).toolCatalogManifest).toBeNull();
-    // The built-in switch is the second tier of a hierarchy: with the master
-    // defer switch off it must be inert, however many tools would qualify.
-    expect(build({
+    // The builtin switch is independent of the MCP master switch: with MCP
+    // defer off it still defers the on-demand first-party tools, so the
+    // catalog exists and carries only builtin rows.
+    const mcpOffBuiltinOn = build({
       connectors: [{ id: "github", tools: manyTools(40) }],
       deferEnabled: false,
       builtinDefer: true,
-    }).toolCatalogManifest).toBeNull();
+    }).toolCatalogManifest;
+    expect(mcpOffBuiltinOn).toBeTruthy();
+    expect(mcpOffBuiltinOn.text).not.toContain("github_t_0");
   });
 
   it("gives the same catalog the same fingerprint and a changed catalog a different one", () => {

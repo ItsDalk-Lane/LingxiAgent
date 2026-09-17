@@ -132,10 +132,9 @@ describe('ArchivedSessionsModal', () => {
     render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
     await waitFor(() => screen.getByText('Alpha'));
 
-    const checkboxes = screen.getAllByRole('checkbox');
-    // 第 0 个是「全选」，第 1 个是未归属分组的组级勾选（两条无身份记录同组），
-    // 第 2、3 个是行勾选框
-    fireEvent.click(checkboxes[2]);
+    // 默认是整洁视图，没有任何勾选框；点行标题进入选择模式并勾中该行
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    fireEvent.click(screen.getByText('Alpha'));
     const deleteSelected = screen.getByRole('button', { name: /session\.archived\.deleteSelected/ });
     fireEvent.click(deleteSelected);
 
@@ -172,6 +171,8 @@ describe('ArchivedSessionsModal', () => {
     render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
     await waitFor(() => screen.getByText('Alpha'));
 
+    // 进入选择模式后全选框才出现（第 0 个全选、第 1 个未归属组勾选、第 2、3 个行勾选）
+    fireEvent.click(screen.getByText('Alpha'));
     fireEvent.click(screen.getAllByRole('checkbox')[0]);
     fireEvent.click(screen.getByRole('button', { name: /session\.archived\.deleteSelected/ }));
 
@@ -223,7 +224,7 @@ describe('ArchivedSessionsModal', () => {
     render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
     await waitFor(() => screen.getByText('Alpha'));
 
-    fireEvent.click(screen.getAllByRole('checkbox')[2]);
+    fireEvent.click(screen.getByText('Alpha'));
     fireEvent.click(screen.getByRole('button', { name: /session\.archived\.restoreSelected/ }));
 
     await waitFor(() => expect(restoreMock).toHaveBeenCalledTimes(1));
@@ -264,6 +265,7 @@ describe('ArchivedSessionsModal', () => {
     render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
     await waitFor(() => screen.getByText('Alpha'));
 
+    fireEvent.click(screen.getByText('Alpha'));
     fireEvent.click(screen.getAllByRole('checkbox')[0]);
     fireEvent.click(screen.getByRole('button', { name: /session\.archived\.restoreSelected/ }));
 
@@ -484,28 +486,31 @@ describe('ArchivedSessionsModal workspace grouping', () => {
     expect(screen.getByText('session.archived.group.ungrouped')).toBeInTheDocument();
   });
 
-  it('deletes an entire group through the group-level button', async () => {
+  it('deletes an entire group after selecting it via the group header click', async () => {
     listMock.mockResolvedValue(groupedItems());
     deleteMock.mockResolvedValue(true);
     window.confirm = vi.fn(() => true);
     render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
     await waitFor(() => expect(screen.getByText('B-1')).toBeInTheDocument());
 
-    fireEvent.click(screen.getAllByText('session.archived.deleteGroup')[0]);
+    // 点分组标题 → 进入选择模式并勾中整组 → 删除所选
+    fireEvent.click(screen.getByText('工作台B'));
+    fireEvent.click(screen.getByRole('button', { name: /session\.archived\.deleteSelected/ }));
 
     await waitFor(() => expect(deleteMock).toHaveBeenCalledTimes(1));
     expect(deleteMock).toHaveBeenCalledWith(expect.objectContaining({ path: '/arch/mount-b.jsonl' }));
-    expect(toastMock).toHaveBeenCalledWith('session.archived.deleteGroupDone[{"count":1}]');
+    expect(toastMock).toHaveBeenCalledWith('session.archived.deleteSelectedDone[{"count":1}]');
   });
 
-  it('restores an entire group through the group-level restore button', async () => {
+  it('restores an entire group after selecting it via the group header click', async () => {
     listMock.mockResolvedValue(groupedItems());
     restoreMock.mockResolvedValue({ status: 'ok', restoredPath: '/arch/mount-b.jsonl', sessionId: 's1' });
     window.confirm = vi.fn(() => true);
     render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
     await waitFor(() => expect(screen.getByText('B-1')).toBeInTheDocument());
 
-    fireEvent.click(screen.getAllByText('session.archived.restoreGroup')[0]);
+    fireEvent.click(screen.getByText('工作台B'));
+    fireEvent.click(screen.getByRole('button', { name: /session\.archived\.restoreSelected/ }));
 
     await waitFor(() => expect(restoreMock).toHaveBeenCalledTimes(1));
     expect(restoreMock).toHaveBeenCalledWith(
@@ -515,17 +520,49 @@ describe('ArchivedSessionsModal workspace grouping', () => {
     expect(toastMock).toHaveBeenCalledWith('session.archived.restoreSelectedDone[{"count":1}]');
   });
 
-  it('toggles a whole group via the group checkbox', async () => {
+  it('reveals checkboxes only in selection mode and preselects the clicked group', async () => {
     listMock.mockResolvedValue(groupedItems());
     render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
     await waitFor(() => expect(screen.getByText('B-1')).toBeInTheDocument());
 
-    // 未归属组只有一条（N-1）：组级勾选应选中它
+    // 打开时无勾选框；点组头后勾选框出现，且整组（含全选框）可见
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    fireEvent.click(screen.getByText('工作台B'));
+    const boxes = screen.getAllByRole('checkbox');
+    // 顺序：全选0、组:工作台B1、行B-1 2、组:旧工作台3、行Gone-1 4、组:OH 5、行D-1 6、组:未归属7、行N-1 8
+    expect(boxes).toHaveLength(9);
+    expect((boxes[1] as HTMLInputElement).checked).toBe(true);
+    expect((boxes[2] as HTMLInputElement).checked).toBe(true);
+    expect((boxes[8] as HTMLInputElement).checked).toBe(false);
+  });
+
+  it('toggles a whole group via the group checkbox after entering selection mode', async () => {
+    listMock.mockResolvedValue(groupedItems());
+    render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
+    await waitFor(() => expect(screen.getByText('B-1')).toBeInTheDocument());
+
+    // 先点行进入选择模式，再用组勾选框勾中未归属组
+    fireEvent.click(screen.getByText('B-1'));
     const groupBlocks = screen.getAllByRole('checkbox');
-    // [全选, 组:工作台B, 组:旧工作台, 组:OH-WorkSpace, 组:未归属, 行B-1, 行Gone-1, 行D-1, 行N-1]
-    fireEvent.click(groupBlocks[4]);
+    // 顺序：全选0、组:工作台B1、行B-1 2、组:旧工作台3、行Gone-1 4、组:OH 5、行D-1 6、组:未归属7、行N-1 8
+    fireEvent.click(groupBlocks[7]);
+    expect((screen.getAllByRole('checkbox')[8] as HTMLInputElement).checked).toBe(true);
     const deleteSelected = screen.getByRole('button', { name: /session\.archived\.deleteSelected/ });
-    expect(deleteSelected.textContent).toContain('1');
+    expect(deleteSelected.textContent).toContain('2');
+  });
+
+  it('exits selection mode via the cancel button and clears the selection', async () => {
+    listMock.mockResolvedValue(groupedItems());
+    render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
+    await waitFor(() => expect(screen.getByText('B-1')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('工作台B'));
+    expect(screen.getAllByRole('checkbox').length).toBeGreaterThan(0);
+
+    fireEvent.click(screen.getByRole('button', { name: 'session.archived.exitSelection' }));
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    expect(screen.getByRole('button', { name: /session\.archived\.deleteSelected/ })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /session\.archived\.restoreSelected/ })).toBeDisabled();
   });
 });
 
@@ -540,7 +577,7 @@ describe('ArchivedSessionsModal group collapse', () => {
     } as never);
   });
 
-  it('collapses and expands a whole group via the group header click', async () => {
+  it('collapses and expands a whole group via the chevron without entering selection mode', async () => {
     listMock.mockResolvedValue([
       {
         path: '/arch/b1.jsonl',
@@ -560,22 +597,24 @@ describe('ArchivedSessionsModal group collapse', () => {
     await waitFor(() => expect(screen.getByText('B-Row')).toBeInTheDocument());
 
     const header = container.querySelector('[data-group-header="mount:local_fs_b"]') as HTMLElement;
+    const chevron = container.querySelector('[data-group-chevron="mount:local_fs_b"]') as HTMLElement;
     expect(header).toBeTruthy();
     expect(header.getAttribute('aria-expanded')).toBe('true');
 
-    // 折叠：组内记录整组收起，组头仍在
-    fireEvent.click(header);
+    // 折叠：组内记录整组收起，组头仍在，且不进入选择模式
+    fireEvent.click(chevron);
     expect(screen.queryByText('B-Row')).toBeNull();
     expect(screen.getByText('工作台B')).toBeInTheDocument();
     expect(header.getAttribute('aria-expanded')).toBe('false');
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
 
     // 展开：记录回来
-    fireEvent.click(header);
+    fireEvent.click(chevron);
     expect(await screen.findByText('B-Row')).toBeInTheDocument();
     expect(header.getAttribute('aria-expanded')).toBe('true');
   });
 
-  it('keeps the group delete button working without toggling collapse', async () => {
+  it('keeps row action buttons working without entering selection mode or collapsing', async () => {
     listMock.mockResolvedValue([
       {
         path: '/arch/b1.jsonl',
@@ -596,10 +635,11 @@ describe('ArchivedSessionsModal group collapse', () => {
     const { container } = render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
     await waitFor(() => expect(screen.getByText('B-Row')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByText('session.archived.deleteGroup'));
+    fireEvent.click(screen.getByText('session.archived.deleteForever'));
 
     await waitFor(() => expect(deleteMock).toHaveBeenCalledTimes(1));
-    // 删除按钮不触发折叠
+    // 行内按钮不冒泡：不进入选择模式、不触发行勾选、也不折叠分组
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
     const header = container.querySelector('[data-group-header="mount:local_fs_b"]') as HTMLElement;
     expect(header.getAttribute('aria-expanded')).toBe('true');
   });

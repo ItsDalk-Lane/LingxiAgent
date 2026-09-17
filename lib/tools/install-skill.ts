@@ -41,7 +41,8 @@ import {
 import { statFileRef } from "../file-ref/resource-io.ts";
 
 const SAFETY_REVIEW_TIMEOUT = 20_000;
-const MAX_SKILL_SIZE = 50_000; // 50KB
+// 导出给 learn_lesson 复用：同一个技能池，同一个大小上限
+export const MAX_SKILL_SIZE = 50_000; // 50KB
 const RISK_CONFIRMATION_TTL_MS = 10 * 60 * 1000;
 
 export { sanitizeSkillName };
@@ -225,13 +226,14 @@ function riskConfirmationDigest(skillContent: any) {
   return crypto.createHash("sha256").update(String(skillContent || ""), "utf-8").digest("hex");
 }
 
-function pruneExpiredRiskConfirmations(pending: any, now = Date.now()) {
+// 风险确认 token 三件套导出给 learn_lesson：技能池写入共用同一套确认协议
+export function pruneExpiredRiskConfirmations(pending: any, now = Date.now()) {
   for (const [token, entry] of pending.entries()) {
     if (!entry || entry.expiresAt <= now) pending.delete(token);
   }
 }
 
-function createRiskConfirmationToken(pending: any, { sourceKey, skillContent, reason }: any) {
+export function createRiskConfirmationToken(pending: any, { sourceKey, skillContent, reason }: any) {
   pruneExpiredRiskConfirmations(pending);
   const token = `risk_${crypto.randomUUID()}`;
   pending.set(token, {
@@ -243,7 +245,7 @@ function createRiskConfirmationToken(pending: any, { sourceKey, skillContent, re
   return token;
 }
 
-function consumeRiskAcceptance(pending: any, params: any, { sourceKey, skillContent }: any) {
+export function consumeRiskAcceptance(pending: any, params: any, { sourceKey, skillContent }: any) {
   if (params?.risk_accepted !== true) return { accepted: false };
   pruneExpiredRiskConfirmations(pending);
   const token = typeof params?.risk_confirmation_token === "string"

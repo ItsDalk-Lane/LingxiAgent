@@ -74,7 +74,7 @@ export const BUILTIN_TOOL_NAMES: ReadonlySet<string> = new Set([
   'exec_command', 'write_stdin',
   'search_memory', 'pin_memory', 'unpin_memory', 'recall_experience', 'record_experience', 'tenet_propose',
   'web_search', 'web_fetch', 'todo_write', 'automation', 'stage_files', 'file', 'channel',
-  'browser', 'computer', 'install_skill', 'notify', 'stop_task', 'update_settings',
+  'ast_grep', 'ast_edit', 'browser', 'checkpoint', 'context_notes', 'goal', 'lsp', 'rewind', 'run_code', 'security_scan', 'computer', 'install_skill', 'learn_lesson', 'ask_user', 'notify', 'stop_task', 'update_settings',
   'session_folders', 'subagent', 'subagent_reply', 'subagent_close', 'workflow',
   'check_pending_tasks', 'loop_control', 'current_status', 'session', 'knowledge_search', 'knowledge_read',
   'knowledge_outline', 'knowledge_grep', 'knowledge_manage',
@@ -128,6 +128,8 @@ export const ACTIVITY_LABEL_KEYS: Readonly<Record<string, string>> = {
   automation: 'automation', stop_task: 'stop_task', session_folders: 'session_folders',
   check_pending_tasks: 'check_pending_tasks', loop_control: 'loop_control', current_status: 'current_status',
   subagent_reply: 'subagent_reply', subagent_close: 'subagent_close',
+  learn_lesson: 'learn_lesson', ask_user: 'ask_user',
+  ast_grep: 'ast_grep', ast_edit: 'ast_edit', checkpoint: 'checkpoint', context_notes: 'context_notes', goal: 'goal', lsp: 'lsp', rewind: 'rewind', run_code: 'run_code', security_scan: 'security_scan',
   // 卡片承载（不进进程区，仍要登记文案；键形如 <pluginId>_<tool>）
   'create_artifact': 'create_artifact', 'dm': 'dm', 'present_files': 'present_files',
   'media_generate-image': 'media_generate-image', 'media_generate-video': 'media_generate-video',
@@ -180,7 +182,10 @@ export function mcpActivityName(name: string, args?: Record<string, unknown>): s
     const target = args?.[name === 'mcp_call' ? 'tool' : 'name'];
     const server = typeof args?.server === 'string' ? args.server.trim() : '';
     if (typeof target === 'string' && target.trim()) {
-      return [server, target.trim()].filter(Boolean).join(' / ');
+      // 第一方内置目标经通道调用时来源恒为 first-party，前缀没有信息量，
+      // 直接显示工具名；外部来源仍以「服务 / 工具」双元组呈现。
+      if (!server || server === 'first-party') return target.trim();
+      return [server, target.trim()].join(' / ');
     }
   }
   // 注册名中的下划线不能可靠区分服务与工具，因此只去掉固定前缀。

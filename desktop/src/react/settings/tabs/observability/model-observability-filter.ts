@@ -82,9 +82,9 @@ export type ObservabilityFilterState = {
   hasPayload: boolean | null;
 };
 
-/** 默认：Last 7 Days（§十五）。锚点 null，由 query-state hook 挂载时打点。 */
+/** 默认：All（全部时间，不设边界）。相对预设（24h/7d/30d）由 query-state hook 挂载时打锚点。 */
 export const DEFAULT_OBSERVABILITY_FILTER: ObservabilityFilterState = {
-  datePreset: '7d',
+  datePreset: 'all',
   presetAnchorMs: null,
   customSince: '',
   customUntil: '',
@@ -292,7 +292,7 @@ export function removeFilterChip(
 ): ObservabilityFilterState {
   switch (chip.kind) {
     case 'date':
-      // 锚点置空：回到默认 7d 时由调用方重新打点（新窗口，不复用旧锚）。
+      // 锚点置空：回到相对预设时由调用方重新打点（新窗口，不复用旧锚）。
       return { ...state, datePreset: DEFAULT_OBSERVABILITY_FILTER.datePreset, presetAnchorMs: null, customSince: '', customUntil: '' };
     case 'multi':
       return { ...state, [chip.field]: state[chip.field].filter((value) => value !== chip.value) };
@@ -303,7 +303,7 @@ export function removeFilterChip(
   }
 }
 
-/** Clear All：回到默认 filter（默认含 7d preset，§十五）。 */
+/** Clear All：回到默认 filter（默认「全部」preset）。 */
 export function clearAllFilterChips(): ObservabilityFilterState {
   return { ...DEFAULT_OBSERVABILITY_FILTER };
 }

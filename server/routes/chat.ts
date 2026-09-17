@@ -62,7 +62,7 @@ import {
   isHiddenTurnInputMessage,
   isSessionTurnInputEntry,
 } from "../../lib/turn-input-presentation.ts";
-import { buildAutomationSuggestionBlock } from "../suggestion-blocks.ts";
+import { buildAutomationSuggestionBlock, buildAutolearnSuggestionBlock } from "../suggestion-blocks.ts";
 import { isAllowedChatImageMime, isChatImageBase64WithinLimit } from "../../shared/image-mime.ts";
 import {
   isAllowedChatVideoMime,
@@ -1715,6 +1715,19 @@ export function createChatRoute(engine: any, hub: any, {
           confirmId: event.confirmId,
           jobData: event.jobData || {},
           operation: event.operation === "update" ? "update" : "create",
+          status: "pending",
+        }),
+      });
+    } else if (event.type === "autolearn_suggestion" && event.confirmId) {
+      // 踩坑自动沉淀的建议卡（autolearn-service 经 emitEvent 触发；确认后才落盘）
+      if (!ss) return;
+      emitStreamEvent(sessionPath, ss, {
+        type: "content_block",
+        block: buildAutolearnSuggestionBlock({
+          confirmId: event.confirmId,
+          name: event.name,
+          description: event.description,
+          lesson: event.lesson,
           status: "pending",
         }),
       });

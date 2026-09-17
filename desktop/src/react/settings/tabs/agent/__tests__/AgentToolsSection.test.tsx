@@ -45,18 +45,27 @@ describe("AgentToolsSection", () => {
   it("renders registered optional toggles while ignoring global tools", () => {
     const { container } = render(
       <AgentToolsSection
-        availableTools={["automation", "beautify", "browser", "computer", "cron", "dm", "install_skill", "office", "update_settings", "workflow", "read"]}
+        availableTools={["ast_edit", "ast_grep", "automation", "beautify", "browser", "checkpoint", "computer", "context_notes", "cron", "dm", "goal", "install_skill", "learn_lesson", "lsp", "office", "rewind", "run_code", "security_scan", "update_settings", "workflow", "read"]}
         disabled={[]}
       />
     );
-    expect(container.querySelectorAll("[data-tool-name]")).toHaveLength(7);
+    expect(container.querySelectorAll("[data-tool-name]")).toHaveLength(17);
     expect(getRow(container, "automation")).toBeTruthy();
     expect(getRow(container, "beautify")).toBeTruthy();
     expect(getRow(container, "browser")).toBeTruthy();
     expect(getRow(container, "computer")).toBeNull();
     expect(getRow(container, "cron")).toBeNull();
     expect(getRow(container, "dm")).toBeNull();
+    expect(getRow(container, "ast_grep")).toBeTruthy();
+    expect(getRow(container, "ast_edit")).toBeTruthy();
+    expect(getRow(container, "checkpoint")).toBeTruthy();
+    expect(getRow(container, "goal")).toBeTruthy();
+    expect(getRow(container, "lsp")).toBeTruthy();
+    expect(getRow(container, "rewind")).toBeTruthy();
+    expect(getRow(container, "run_code")).toBeTruthy();
+    expect(getRow(container, "security_scan")).toBeTruthy();
     expect(getRow(container, "install_skill")).toBeTruthy();
+    expect(getRow(container, "learn_lesson")).toBeTruthy();
     expect(getRow(container, "office")).toBeTruthy();
     expect(getRow(container, "update_settings")).toBeTruthy();
     expect(getRow(container, "workflow")).toBeTruthy();
@@ -70,11 +79,18 @@ describe("AgentToolsSection", () => {
         disabled={["update_settings", "dm"]}
       />
     );
-    expect(container.querySelectorAll("[data-tool-name]")).toHaveLength(8);
+    expect(container.querySelectorAll("[data-tool-name]")).toHaveLength(18);
     expect(getRow(container, "automation")).toBeTruthy();
     expect(getRow(container, "beautify")).toBeTruthy();
     expect(getRow(container, "browser")).toBeTruthy();
     expect(getRow(container, "computer")).toBeNull();
+    expect(getRow(container, "learn_lesson")).toBeTruthy();
+    expect(getRow(container, "ast_grep")).toBeTruthy();
+    expect(getRow(container, "ast_edit")).toBeTruthy();
+    expect(getRow(container, "checkpoint")).toBeTruthy();
+    expect(getRow(container, "goal")).toBeTruthy();
+    expect(getRow(container, "rewind")).toBeTruthy();
+    expect(getRow(container, "security_scan")).toBeTruthy();
     expect(getRow(container, "office")).toBeTruthy();
     expect(getRow(container, "session")).toBeTruthy();
     expect(getRow(container, "workflow")).toBeTruthy();
@@ -88,6 +104,8 @@ describe("AgentToolsSection", () => {
       />
     );
     expect(container.querySelectorAll("[data-tool-name]")).toHaveLength(5);
+    expect(getRow(container, "ast_grep")).toBeNull();
+    expect(getRow(container, "ast_edit")).toBeNull();
     expect(getRow(container, "dm")).toBeNull();
     expect(getRow(container, "beautify")).toBeTruthy();
     expect(getRow(container, "browser")).toBeTruthy();

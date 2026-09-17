@@ -24,7 +24,7 @@ import {
   type KnowledgeSourceEntryDto,
 } from './knowledge-api';
 import { NotebookSettingsDialog } from './NotebookSettingsDialog';
-import { Overlay } from '../../ui';
+import { Button, Overlay } from '../../ui';
 import styles from './KnowledgePage.module.css';
 
 const tr = (key: string, vars?: Record<string, string | number>) => window.t?.(key, vars) ?? key;
@@ -283,7 +283,7 @@ function ChunkDetailDialog({ chunk, onClose }: { chunk: KnowledgeChunkDto; onClo
   );
 }
 
-export function KnowledgePage() {
+export function KnowledgePage({ onClose }: { onClose?: () => void }) {
   const addToast = useStore(state => state.addToast);
   const [notebooks, setNotebooks] = useState<KnowledgeNotebookDto[]>([]);
   const [selectedNotebookId, setSelectedNotebookId] = useState<string | null>(null);
@@ -697,7 +697,13 @@ export function KnowledgePage() {
             <span className={styles.eyebrow}>{tr('knowledge.tab')}</span>
             <h1>{tr('knowledge.title')}</h1>
           </div>
-          <button className={styles.iconButton} onClick={() => setCreating(true)} aria-label={tr('knowledge.newNotebook')}>＋</button>
+          <div className={styles.headerActions}>
+            <button className={styles.iconButton} onClick={() => setCreating(true)} aria-label={tr('knowledge.newNotebook')}>＋</button>
+            {/* 弹窗形态（KnowledgeModal）下的关闭入口；嵌入页形态无 onClose，不渲染 */}
+            {onClose && (
+              <button className={styles.iconButton} onClick={onClose} aria-label={tr('common.close')}>×</button>
+            )}
+          </div>
         </header>
 
         {creating && (
@@ -709,11 +715,15 @@ export function KnowledgePage() {
               onChange={event => setNewName(event.target.value)}
               onKeyDown={event => {
                 if (event.key === 'Enter') void handleCreate();
-                if (event.key === 'Escape') setCreating(false);
+                if (event.key === 'Escape') {
+                  // 只取消新建编辑器，不让 Escape 冒泡关掉外层弹窗
+                  event.stopPropagation();
+                  setCreating(false);
+                }
               }}
             />
-            <button onClick={() => void handleCreate()} disabled={!newName.trim()}>{tr('knowledge.create')}</button>
-            <button className={styles.quietButton} onClick={() => setCreating(false)}>{tr('knowledge.cancel')}</button>
+            <Button variant="primary" size="sm" onClick={() => void handleCreate()} disabled={!newName.trim()}>{tr('knowledge.create')}</Button>
+            <Button variant="ghost" size="sm" onClick={() => setCreating(false)}>{tr('knowledge.cancel')}</Button>
           </div>
         )}
 
@@ -736,7 +746,11 @@ export function KnowledgePage() {
                   onBlur={() => void handleRename(notebook.id)}
                   onKeyDown={event => {
                     if (event.key === 'Enter') void handleRename(notebook.id);
-                    if (event.key === 'Escape') setRenameId(null);
+                    if (event.key === 'Escape') {
+                      // 只取消重命名，不让 Escape 冒泡关掉外层弹窗
+                      event.stopPropagation();
+                      setRenameId(null);
+                    }
                   }}
                 />
               ) : (
@@ -787,14 +801,15 @@ export function KnowledgePage() {
                 title={tr('knowledge.notebookSettings')}
               >⚙</button>
             )}
-            <button
+            <Button
+              variant="primary"
               className={styles.importButton}
               onClick={() => setShowImportMenu(value => !value)}
               disabled={!selectedNotebookId || importing}
               aria-expanded={showImportMenu}
             >
               {importing ? tr('knowledge.importing') : `＋ ${tr('knowledge.addSource')}`}
-            </button>
+            </Button>
           </div>
         </header>
 
@@ -838,12 +853,13 @@ export function KnowledgePage() {
               />
             )}
             <div className={styles.sourceImportActions}>
-              <button
-                className={styles.importButton}
+              <Button
+                variant="primary"
+                size="sm"
                 disabled={!sourceDraftValue.trim() || importing}
                 onClick={() => void handleImportManagedSource()}
-              >{tr('knowledge.importSource')}</button>
-              <button className={styles.quietButton} onClick={resetSourceDraft}>{tr('knowledge.cancel')}</button>
+              >{tr('knowledge.importSource')}</Button>
+              <Button variant="ghost" size="sm" onClick={resetSourceDraft}>{tr('knowledge.cancel')}</Button>
             </div>
           </div>
         )}

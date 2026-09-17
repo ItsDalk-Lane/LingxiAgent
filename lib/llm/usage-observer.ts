@@ -56,12 +56,19 @@ function cacheSupport(options: any): "reported" | "not_reported" | "not_supporte
 }
 
 function reasoningTokens(usage: any): number | null {
-  return maybeNumber(
+  const direct = maybeNumber(
     usage?.reasoningTokens,
     usage?.reasoning_tokens,
     usage?.completion_tokens_details?.reasoning_tokens,
     usage?.output_tokens_details?.reasoning_tokens
   );
+  if (direct !== null) return direct;
+  // The Pi SDK hands the count over as `usage.reasoning`. Anthropic Messages
+  // only sets it when the provider reports a thinking-token count, but the
+  // OpenAI dialects fall back to 0 when nothing was reported, so a zero here
+  // cannot be told apart from "no fact" and must stay null.
+  const sdk = maybeNumber(usage?.reasoning);
+  return sdk !== null && sdk > 0 ? sdk : null;
 }
 
 /**

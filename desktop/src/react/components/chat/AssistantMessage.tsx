@@ -15,6 +15,7 @@ import { SettingsConfirmCard } from './SettingsConfirmCard';
 import { SettingsUpdateCard } from './SettingsUpdateCard';
 import { InteractiveCard } from './InteractiveCard';
 import { SessionCollabDraftCard } from './SessionCollabDraftCard';
+import { AutolearnLessonCard } from './AutolearnLessonCard';
 import { useMessageFooterActions } from './MessageActions';
 import { MessageFooterActions, formatMessageTime } from './MessageFooterActions';
 import { TurnUsagePills } from './TurnUsagePills';
@@ -1368,11 +1369,15 @@ const CronConfirmBlock = memo(function CronConfirmBlock({ block, sessionPath }: 
 });
 
 // suggestion_card 分发：session 协作草稿（send / create）走 SessionCollabDraftCard，
-// 其余（automation_draft 等）沿用既有 CronConfirmBlock；类型化注册表只把
-// suggestion_card 交给这个小分发器，具体卡片选择仍由显式 kind 决定。
+// 踩坑自动沉淀建议走 AutolearnLessonCard；其余（automation_draft 等）沿用既有
+// CronConfirmBlock；类型化注册表只把 suggestion_card 交给这个小分发器，
+// 具体卡片选择仍由显式 kind 决定。
 const SuggestionCardDispatch = memo(function SuggestionCardDispatch({ block, sessionPath }: { block: any; sessionPath?: string }) {
   if (block.kind === 'session_send_draft' || block.kind === 'session_create_draft') {
     return <SessionCollabDraftCard block={block} sessionPath={sessionPath} />;
+  }
+  if (block.kind === 'autolearn_lesson') {
+    return <AutolearnLessonCard block={block} sessionPath={sessionPath} />;
   }
   return <CronConfirmBlock block={block} sessionPath={sessionPath} />;
 });

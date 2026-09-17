@@ -32,6 +32,15 @@ vi.mock('../../../hooks/use-hana-fetch', () => ({
   lingxiFetch: vi.fn(),
 }));
 
+
+/** 卡片默认折叠（用户裁决）：断言正文前先点标题展开。 */
+function renderExpandedCard() {
+  const utils = render(<SessionStatusCard />);
+  const toggle = utils.container.querySelector('button[aria-expanded="false"]');
+  if (toggle) fireEvent.click(toggle);
+  return utils;
+}
+
 describe('SessionStatusCard', () => {
   beforeEach(() => {
     mockState.currentSessionPath = null;
@@ -57,14 +66,14 @@ describe('SessionStatusCard', () => {
 
   it('无当前对话返回 null（welcome 态不显示）', () => {
     mockState.currentSessionPath = null;
-    const { container } = render(<SessionStatusCard />);
+    const { container } = renderExpandedCard();
     expect(container.querySelector('.universal-card')).toBeNull();
   });
 
   it('有对话时渲染工作目录 / 模型 / 文件数', () => {
     mockState.currentSessionPath = '/s/a.jsonl';
     mockState.sessionRegistryFilesByPath = { '/s/a.jsonl': [{}, {}, {}] };
-    const { container } = render(<SessionStatusCard />);
+    const { container } = renderExpandedCard();
     expect(container.querySelector('.universal-card')).toBeTruthy();
     expect(container.textContent).toContain('gpt-x'); // 模型 id
     expect(container.textContent).toContain('3');      // 文件数
@@ -73,7 +82,7 @@ describe('SessionStatusCard', () => {
   it('per-session 模型优先于全局 currentModel', () => {
     mockState.currentSessionPath = '/s/a.jsonl';
     mockState.sessionModelsByPath = { '/s/a.jsonl': { id: 'claude-x', provider: 'anthropic' } };
-    const { container } = render(<SessionStatusCard />);
+    const { container } = renderExpandedCard();
     expect(container.textContent).toContain('claude-x');
     mockState.sessionModelsByPath = {}; // 复位
   });
@@ -84,7 +93,7 @@ describe('SessionStatusCard', () => {
     mockState.sessionLocatorsById = { sess_a: { path: '/s/a.jsonl' } };
     mockState.sessionAuthorizedFoldersByPath = { sess_a: ['/Users/x/Assets'] };
 
-    const { container } = render(<SessionStatusCard />);
+    const { container } = renderExpandedCard();
 
     expect(container.textContent).toContain('Assets');
   });
@@ -97,7 +106,7 @@ describe('SessionStatusCard', () => {
     mockState.sessionModelsByPath = { sess_a: { id: 'claude-x', provider: 'anthropic' } };
     mockState.sessionRegistryFilesByPath = { sess_a: [{}, {}, {}] };
 
-    const { container } = render(<SessionStatusCard />);
+    const { container } = renderExpandedCard();
 
     expect(container.textContent).toContain('claude-x');
     expect(container.textContent).toContain('3');

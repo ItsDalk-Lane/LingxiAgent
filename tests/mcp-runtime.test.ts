@@ -2726,7 +2726,7 @@ describe("MCP management-center seams", () => {
         log: console,
       });
 
-      expect(runtime.getState()).toMatchObject({ deferEnabled: true, deferThreshold: 10 });
+      expect(runtime.getState()).toMatchObject({ deferEnabled: true, deferThreshold: 4 });
     });
   });
 

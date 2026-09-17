@@ -204,6 +204,38 @@ export function createModelObservabilityRoute(engine: any) {
 
   /* ── export（§七十三～八十二；LOCAL_ONLY；JSONL streaming）────────── */
 
+  /* ── 存储概况 / 手动删除（「设置」子页；均为 LOCAL_ONLY）──────────── */
+
+  route.get("/model-observability/storage", (c) => {
+    const overview = engine.getModelObservabilityStorageOverview();
+    if (!overview) {
+      return c.json({ error: "not_initialized", code: "absent", message: "model observability store has not been created" }, 404);
+    }
+    return c.json(overview);
+  });
+
+  route.post("/model-observability/maintenance/delete", async (c) => {
+    let body: unknown;
+    try {
+      body = await c.req.json();
+    } catch {
+      return c.json({ error: "invalid_json", message: "request body must be JSON" }, 400);
+    }
+    let result: unknown;
+    try {
+      result = engine.deleteModelObservabilityData(body);
+    } catch (error: any) {
+      if (error?.code === "invalid_filter") {
+        return badRequest(c, { code: "invalid_filter", message: error.message, field: error.field });
+      }
+      return c.json({ error: "query_failed", code: "delete_failed", message: String(error?.message ?? error) }, 500);
+    }
+    if (!result) {
+      return c.json({ error: "not_initialized", code: "absent", message: "model observability store has not been created" }, 404);
+    }
+    return c.json(result);
+  });
+
   route.post("/model-observability/export", async (c) => {
     let body: unknown;
     try {

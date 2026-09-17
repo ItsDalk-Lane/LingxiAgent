@@ -33,7 +33,8 @@ function FolderAddIcon() {
 }
 
 export function SessionStatusCard() {
-  const [collapsed, setCollapsed] = useState(false);
+  // 默认折叠（用户裁决）：运行信息容器内只露标题行，点击展开
+  const [collapsed, setCollapsed] = useState(true);
   const [addingFolder, setAddingFolder] = useState(false);
   const sessionPath = useStore((s) => s.currentSessionPath);
   const deskBasePath = useStore((s) => s.deskBasePath);

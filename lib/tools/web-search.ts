@@ -36,6 +36,8 @@ const ANYSEARCH_DEFAULT_RESULTS = 20;
 const ANYSEARCH_MAX_RESULTS = 100;
 const TAVILY_MAX_RESULTS = 20;
 const BROWSER_MAX_RESULTS = 10;
+// 单条摘要上限：防止超长片段刷爆上下文（对照 openclaude grep --max-columns）。
+const SEARCH_SNIPPET_MAX_CHARS = 500;
 const defaultSearchRateLimiter = createSearchRateLimiter();
 
 /**
@@ -567,6 +569,8 @@ async function doSearch(query, maxResults, { configPath, searchConfigResolver, r
   try {
     return await runProviderSearch({ provider, query, maxResults, apiKey, rateLimiter });
   } catch (err) {
+    // 限流错误保持原样上抛：execute 层按分类生成机器码并携带 retryAfterMs。
+    if (err instanceof SearchRateLimitError) throw err;
     throw new Error(t("error.searchFailed", { msg: err.message }));
   }
 }
@@ -590,17 +594,18 @@ export function createWebSearchTool({ configPath, searchConfigResolver, rateLimi
     label: "Web Search",
     description: "Search the internet for real-time information. Use when you need the latest news, technical docs, current events, or any external knowledge not in memory.",
     parameters: Type.Object({
-      query: Type.String({ description: "Search keywords" }),
+      query: Type.String({ description: "Search keywords, not natural-language questions. Results follow the interface locale." }),
       maxResults: Type.Optional(
-        Type.Number({ description: "Number of results to return, default 10", default: DEFAULT_DISPLAY_RESULTS })
+        Type.Number({ description: `Number of results to return. Default ${DEFAULT_DISPLAY_RESULTS}; per-provider caps apply (browser providers ${BROWSER_MAX_RESULTS}, Tavily ${TAVILY_MAX_RESULTS}, AnySearch ${ANYSEARCH_MAX_RESULTS}). Values above the cap are clamped.` })
       ),
     }),
     execute: async (_toolCallId, params) => {
       const query = params.query?.trim();
       if (!query) {
         return {
+          isError: true as const,
           content: [{ type: "text", text: t("error.searchEmptyQuery") }],
-          details: {},
+          details: { errorCode: "WEB_SEARCH_EMPTY_QUERY" },
         };
       }
 
@@ -616,19 +621,34 @@ export function createWebSearchTool({ configPath, searchConfigResolver, rateLimi
         }
 
         const displayLimit = maxResultsForDisplay(params.maxResults);
-        const formatted = results
-          .slice(0, displayLimit)
-          .map((r, i) => `${i + 1}. **${r.title}**\n   ${r.url}\n   ${r.content}`)
+        const shown = results.slice(0, displayLimit);
+        const formatted = shown
+          .map((r, i) => {
+            // 防刷屏：单条摘要截断，超长内容用 web_fetch/web_reader 按需取。
+            const content = r.content.length > SEARCH_SNIPPET_MAX_CHARS
+              ? `${r.content.slice(0, SEARCH_SNIPPET_MAX_CHARS)}…`
+              : r.content;
+            return `${i + 1}. **${r.title}**\n   ${r.url}\n   ${content}`;
+          })
           .join("\n\n");
+        // 诚实计数：真截断才报「Showing N of M」并教下一步。
+        const honestyFooter = results.length > shown.length
+          ? `\n\n[Showing ${shown.length} of ${results.length} results. Increase maxResults to see more.]`
+          : "";
 
         return {
-          content: [{ type: "text", text: t("error.searchResults", { provider, results: formatted }) }],
+          content: [{ type: "text", text: t("error.searchResults", { provider, results: formatted }) + honestyFooter }],
           details: searchPayload,
         };
       } catch (err) {
+        const kind = classifySearchError(err);
         return {
+          isError: true as const,
           content: [{ type: "text", text: t("error.searchError", { msg: err.message }) }],
-          details: {},
+          details: {
+            errorCode: `WEB_SEARCH_${kind.toUpperCase()}`,
+            ...(err?.retryAfterMs ? { retryAfterMs: err.retryAfterMs } : {}),
+          },
         };
       }
     },

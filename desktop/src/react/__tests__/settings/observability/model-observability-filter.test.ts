@@ -19,8 +19,8 @@ import {
 const NOW = new Date('2026-08-22T08:00:00.000Z');
 
 describe('dateRangeForState (since inclusive / until exclusive, §四十四)', () => {
-  it('default preset is last 7 days (§十五)', () => {
-    expect(DEFAULT_OBSERVABILITY_FILTER.datePreset).toBe('7d');
+  it('default preset is all (no time bounds)', () => {
+    expect(DEFAULT_OBSERVABILITY_FILTER.datePreset).toBe('all');
   });
 
   it('presets produce since=now-duration and open-ended until', () => {
@@ -175,14 +175,14 @@ describe('filter chips (§二十五: individually removable + clear all)', () =>
       sessionId: 'sess-1',
       hasPayload: true,
     };
-    expect(removeFilterChip(state, { id: 'date', kind: 'date' }).datePreset).toBe('7d');
+    expect(removeFilterChip(state, { id: 'date', kind: 'date' }).datePreset).toBe('all');
     const afterMulti = removeFilterChip(state, { id: 'multi:providers:openai', kind: 'multi', field: 'providers', value: 'openai' });
     expect(afterMulti.providers).toEqual(['anthropic']);
     expect(removeFilterChip(state, { id: 'exact:sessionId', kind: 'exact', field: 'sessionId' }).sessionId).toBe('');
     expect(removeFilterChip(state, { id: 'flag:hasPayload', kind: 'flag', field: 'hasPayload', value: true }).hasPayload).toBeNull();
   });
 
-  it('clearAllFilterChips returns the default (7d) filter', () => {
+  it('clearAllFilterChips returns the default (all) filter', () => {
     expect(clearAllFilterChips()).toEqual(DEFAULT_OBSERVABILITY_FILTER);
   });
 });

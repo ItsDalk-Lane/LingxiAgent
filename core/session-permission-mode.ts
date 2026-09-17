@@ -1,3 +1,5 @@
+import { isPlanFileWrite } from "../lib/plan-mode/plan-file.ts";
+
 export const SESSION_PERMISSION_MODES = Object.freeze({
   AUTO: "auto",
   OPERATE: "operate",
@@ -29,6 +31,7 @@ const INFORMATION_TOOLS = new Set([
   "current_status",
   "search_memory",
   "recall_experience",
+  "ask_user",
 ]);
 
 const SIDE_EFFECT_TOOLS = new Set([
@@ -43,6 +46,7 @@ const SIDE_EFFECT_TOOLS = new Set([
   "dm",
   "channel",
   "install_skill",
+  "learn_lesson",
   "update_settings",
   "todo_write",
   "stage_files",
@@ -90,6 +94,8 @@ const SUBAGENT_BLOCKED_TOOLS = new Set([
   "dm",
   "notify",
   "install_skill",
+  "learn_lesson",      // 与 install_skill 同类：写共享技能池
+  "ask_user",          // 阻塞等用户作答；子代理应把不确定上报给父会话而非隔空提问
   "update_settings",
   "session_folders",
   "loop_control",      // 循环归主会话管，子代理不得约闹钟/收束循环
@@ -369,6 +375,12 @@ export function classifySessionPermission({ mode, toolName, params, context }: {
     return { action: "allow" };
   }
   if (normalized === SESSION_PERMISSION_MODES.OPERATE) return { action: "allow" };
+  // 计划模式（只读档）唯一放行写：本会话旁 <sessionId>.plan.md。
+  // 模型在收工提醒里拿到的是绝对路径；相对路径不猜 cwd，不命中即照旧全拒。
+  if (normalized === SESSION_PERMISSION_MODES.READ_ONLY
+    && isPlanFileWrite(name, params, context?.sessionPath)) {
+    return { action: "allow" };
+  }
   if (normalized === SESSION_PERMISSION_MODES.READ_ONLY) return blockedByReadOnly(name, context);
   if (normalized === SESSION_PERMISSION_MODES.AUTO) {
     if (AUTO_REVIEW_TOOLS.has(name)) return review(name);

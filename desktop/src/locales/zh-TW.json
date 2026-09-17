@@ -104,7 +104,6 @@
     "lineNumber": "第 {number} 行",
     "lineRange": "第 {start}–{end} 行",
     "paragraphNumber": "第 {number} 段",
-    "useImportButton": "請在知識頁使用「加入來源」匯入檔案",
     "importUnavailable": "目前環境無法開啟本機檔案選擇器",
     "importSuccess": "已匯入 {count} 個來源",
     "importPartialFailure": "匯入完成：{success}/{total} 個來源成功",
@@ -346,20 +345,16 @@
       "restoreSelectedConfirm": "將選中的 {count} 條封存還原到對話列表？",
       "restoreSelectedDone": "已還原 {count} 條封存",
       "restoreSelectedPartial": "部分還原成功：{restored}/{total}",
-      "restoreGroup": "整組還原",
-      "restoreGroupConfirm": "將「{name}」分組的全部 {count} 條封存還原到對話列表？",
       "deleteForever": "永久刪除",
       "deleteConfirm": "永久刪除此封存？此操作無法復原。",
       "deleteFailed": "刪除失敗",
       "selectAll": "全選",
+      "exitSelection": "取消選擇",
       "deleteSelected": "刪除所選（{count}）",
       "deleteSelectedConfirm": "將永久刪除選中的 {count} 條封存（共 {size}），無法復原。繼續？",
       "deleteSelectedDone": "已刪除 {count} 條封存",
       "deleteSelectedPartial": "部分刪除成功：{deleted}/{total}",
       "daysAgo": "封存於 {days} 天前",
-      "deleteGroup": "刪除整組",
-      "deleteGroupConfirm": "確定永久刪除「{name}」分組的全部 {count} 條歸檔記錄（{size}）？此操作不可復原。",
-      "deleteGroupDone": "已永久刪除 {count} 條歸檔記錄",
       "group": {
         "ungrouped": "未歸屬",
         "workspaceRemoved": "該工作目錄已移除",
@@ -655,6 +650,7 @@
     "contextDetailUsed": "已用",
     "contextDetailWindowTotal": "上下文窗口",
     "contextDetailRemaining": "剩餘容量",
+    "contextDetailCacheHit": "快取命中",
     "contextCategory": {
       "system": "系統提示",
       "conversation": "歷史對話",
@@ -1057,6 +1053,16 @@
       "done": "📥 {name} 把技能裝上了",
       "failed": "📥 技能沒裝上"
     },
+    "learn_lesson": {
+      "running": "📚 {name} 正在沉澱教訓",
+      "done": "📚 {name} 把教訓沉澱成技能了",
+      "failed": "📚 教訓沒沉澱上"
+    },
+    "ask_user": {
+      "running": "❓ 正在向你提問",
+      "done": "❓ 你已作答",
+      "failed": "❓ 提問沒送達"
+    },
     "update_settings": {
       "running": "⚙️ {name} 正在改設定",
       "done": "⚙️ {name} 改好設定了",
@@ -1066,6 +1072,36 @@
       "running": "🤖 {name} 正在安排自動化任務",
       "done": "🤖 {name} 安排好自動化任務了",
       "failed": "🤖 自動化任務沒安排上"
+    },
+    "ast_edit": {
+      "running": "🌳 正在按結構改寫",
+      "done": "🌳 結構改寫完成",
+      "failed": "🌳 結構改寫失敗"
+    },
+    "ast_grep": {
+      "running": "🌳 正在按結構搜尋",
+      "done": "🌳 結構搜尋完成",
+      "failed": "🌳 結構搜尋失敗"
+    },
+    "checkpoint": {
+      "running": "📌 正在留存檔點",
+      "done": "📌 存檔點已留好",
+      "failed": "📌 存檔點沒留住"
+    },
+    "context_notes": {
+      "running": "📝 正在記情境筆記",
+      "done": "📝 筆記已更新",
+      "failed": "📝 筆記沒寫上"
+    },
+    "goal": {
+      "running": "🎯 正在處理預算目標",
+      "done": "🎯 預算目標已更新",
+      "failed": "🎯 預算目標操作失敗"
+    },
+    "lsp": {
+      "running": "🔍 正在查語言服務",
+      "done": "🔍 語言服務完成",
+      "failed": "🔍 語言服務失敗"
     },
     "computer": {
       "running": "🖥️ {name} 正在操控電腦",
@@ -1369,6 +1405,21 @@
       "running": "✻ 正在產生回答",
       "done": "✻ 產生了回答",
       "failed": "✻ 回答沒產生出來"
+    },
+    "rewind": {
+      "running": "⏪ 正在回檔",
+      "done": "⏪ 已回到存檔點",
+      "failed": "⏪ 回檔失敗"
+    },
+    "run_code": {
+      "running": "🧮 正在核心裡跑程式",
+      "done": "🧮 核心執行完成",
+      "failed": "🧮 核心執行失敗"
+    },
+    "security_scan": {
+      "running": "🛡️ 正在安全掃描",
+      "done": "🛡️ 安全掃描完成",
+      "failed": "🛡️ 安全掃描失敗"
     }
   },
   "file_output": {
@@ -1447,7 +1498,8 @@
       "access": "存取與裝置",
       "about": "關於",
       "security": "安全",
-      "experiments": "实验"
+      "experiments": "实验",
+      "envdeps": "環境依賴"
     },
     "browser": {
       "cookiesTitle": "Cookies",
@@ -1683,6 +1735,30 @@
             "label": "自動化",
             "summary": "讓 Agent 建立通知和外掛定時動作"
           },
+          "ast_edit": {
+            "label": "結構改寫",
+            "summary": "按語法結構批次改寫程式碼，先預覽差異再套用"
+          },
+          "ast_grep": {
+            "label": "結構搜尋",
+            "summary": "按語法結構搜程式碼（如「所有名為 X 的函式」），比純文字更準"
+          },
+          "checkpoint": {
+            "label": "對話存檔點",
+            "summary": "在目前對話位置留具名存檔點，配合回檔使用"
+          },
+          "context_notes": {
+            "label": "情境筆記",
+            "summary": "壓縮也帶得走的自查便箋（約束/決定/座標）"
+          },
+          "goal": {
+            "label": "預算目標",
+            "summary": "長任務掛 token/時間預算，超支提醒一次並交還決定"
+          },
+          "lsp": {
+            "label": "語言服務",
+            "summary": "定義跳轉/引用/懸停/診斷/安全重新命名（需對應語言伺服器）"
+          },
           "beautify": {
             "label": "灵犀美术",
             "summary": "讓 Agent 為文件生成封面和審美增強內容"
@@ -1703,6 +1779,10 @@
             "label": "安裝技能",
             "summary": "從 GitHub 或技能庫安裝新技能"
           },
+          "learn_lesson": {
+            "label": "沉澱教訓",
+            "summary": "把踩坑教訓沉澱成可復用的技能"
+          },
           "update_settings": {
             "label": "修改設定",
             "summary": "讓 Agent 修改應用設定項"
@@ -1714,6 +1794,18 @@
           "office": {
             "label": "Office",
             "summary": "让 Agent 读取文档、转换 HTML 到 PDF"
+          },
+          "rewind": {
+            "label": "回檔",
+            "summary": "把對話退回選定的存檔點，之後的內容作廢，也可一併還原當時的檔案"
+          },
+          "run_code": {
+            "label": "程式碼執行台",
+            "summary": "在持久會話裡執行 Python/Node 等程式碼，變數跨多次呼叫保留"
+          },
+          "security_scan": {
+            "label": "安全掃描",
+            "summary": "掃描程式碼變更或指定路徑，排查金鑰與敏感資訊外洩"
           },
           "session": {
             "label": "跨會話協作",
@@ -2487,7 +2579,11 @@
       "dissolveBundleTitle": "打散 Bundle",
       "dissolveBundleAriaLabel": "打散 {name}",
       "removeFromBundleTitle": "移出 Bundle，變為散裝 Skill",
-      "removeFromBundleAriaLabel": "將 {name} 移出 Bundle"
+      "removeFromBundleAriaLabel": "將 {name} 移出 Bundle",
+      "autolearn": "自動沉澱教訓",
+      "autolearnDesc": "在較長的工具操作回合後提煉可複用的踩坑教訓，先給你看建議卡，確認後才儲存為技能。",
+      "goalToggle": "預算目標",
+      "goalToggleDesc": "給長任務掛 token/時間預算，超支時提醒一次並交還決定"
     },
     "mcp": {
       "masterTitle": "總開關",
@@ -2588,10 +2684,10 @@
       "deferScopeNote": "以下開關對所有連接器一併生效，不只是這一個。",
       "deferEnabled": "允許延遲載入",
       "deferEnabledHint": "工具較多時先給模型一份目錄，用到哪個再取哪個的完整說明。",
-      "deferBuiltin": "內建工具也延遲",
-      "deferBuiltinHint": "開啟後，系統內建工具同樣進入目錄按需揭露。直接載入的內建工具讓模型更主動，上下文吃緊時再開。",
+      "deferBuiltin": "內建/外掛工具按需載入",
+      "deferBuiltinHint": "預設開啟。除讀寫檔案與執行命令四個基礎工具外，其餘內建與外掛工具全部進入目錄、用到才取完整說明。關閉後全部直接載入。",
       "deferThreshold": "啟用門檻",
-      "deferThresholdHint": "已啟用的工具數超過此值才走目錄，低於此值全部直接載入。",
+      "deferThresholdHint": "MCP 連接器已啟用的工具數超過此值才進目錄，低於此值全部直接載入。內建/外掛工具不受此值影響。",
       "agentConnectorEnabled": "對此助手啟用",
       "oauthWaiting": "等待在瀏覽器中完成授權",
       "oauthWaitingHint": "授權頁面已在瀏覽器中開啟。完成後這裡會自動更新，也可以隨時取消。",
@@ -2900,6 +2996,10 @@
       },
       "metrics": {
         "calls": "呼叫次数",
+        "activeDays": "活躍天數",
+        "longestStreak": "最長連續 {count} 天",
+        "topModel": "用量最高的模型",
+        "peakDay": "高峰日",
         "tracesHint": "{count} 條軌跡",
         "totalTokens": "總 Token",
         "inputTokens": "輸入 Token",
@@ -2926,6 +3026,99 @@
         "dateSummary": "共 {total} 次呼叫，峰值 {peakDate}（{peakCount} 次）",
         "filterByValue": "按此值篩選：{value}",
         "unknownValue": "（未知）"
+      },
+      "charts": {
+        "fixedBadgeDate": "固定 · 日期",
+        "fixedBadgeModelDate": "固定 · 模型 × 日期",
+        "fixedBadgeProviderDate": "固定 · 供應商 × 日期",
+        "fixedBadgeCategoryDate": "固定 · 類別 × 日期",
+        "empty": "暫無資料",
+        "loading": "載入圖表資料…",
+        "error": "圖表載入失敗",
+        "callsUnit": "{count} 次",
+        "tokensUnit": "{count} Token",
+        "dailyTotal": "當日總量",
+        "metric": {
+          "calls": "呼叫次數",
+          "tokens": "Token 用量"
+        },
+        "heat": {
+          "title": "呼叫熱力日曆",
+          "daily": "每日",
+          "weekly": "每週",
+          "cumulative": "累計",
+          "tooltipCalls": "呼叫次數",
+          "tooltipTokens": "Token 總量",
+          "weekRange": "{since} – {until} 當週",
+          "cumulativeUntil": "截至 {date} 累計",
+          "hint": {
+            "daily": "每格是一天，顏色越深呼叫越密集；滑鼠懸停顯示當日呼叫次數與 Token 總量。",
+            "weekly": "整面日曆保留，同一週的格子按當週合計統一著色；滑鼠懸停顯示當週合計。",
+            "cumulative": "每格是截至當天的累計呼叫量，越到後面越飽和；懸停顯示累計值。"
+          }
+        },
+        "line": {
+          "title": "模型呼叫趨勢",
+          "hint": "每個模型一條折線；懸停顯示當日各模型的量與當日總量。"
+        },
+        "bar": {
+          "title": "供應商呼叫分佈",
+          "hint": "每天一根柱、按供應商分段堆疊；懸停顯示當日各供應商的量與當日總量。"
+        },
+        "pie": {
+          "title": "類別構成",
+          "hint": "選一天看當天的類別構成；懸停扇區顯示該類別的量與當日總計。",
+          "dateLabel": "查看日期"
+        }
+      },
+      "storage": {
+        "retentionTitle": "保留天數",
+        "retentionHint": "軌跡、Payload 正文、媒體 Blob 統一使用這一個天數；超過保留期的資料由系統按天自動清理。",
+        "retentionLabel": "保留最近",
+        "retentionUnit": "天的記錄（1 – 3650）",
+        "save": "儲存",
+        "saved": "已儲存",
+        "overviewTitle": "儲存概況",
+        "overviewHint": "目前磁碟上實際保存的資料（隨刪除即時變化）。",
+        "savedDays": "已保存",
+        "daysUnit": "天",
+        "startDate": "資料起始日",
+        "footprint": "占用體積",
+        "coveredCalls": "覆蓋呼叫",
+        "categoryTrace": "軌跡與元資料",
+        "categoryPayload": "Payload 正文",
+        "categoryMedia": "媒體 Blob",
+        "pathLabel": "存放路徑",
+        "copyPath": "複製路徑",
+        "copied": "已複製",
+                "clearFirstHint": "請先清除目前模式的選擇",
+        "clickToAdd": "點擊加入選擇",
+        "clickToRemove": "點擊移出選擇",
+        "modeDay": "按天",
+        "modeMonth": "整月",
+        "modeRange": "區間",
+        "selectedDays": "已選 {count} 天",
+        "pickDate": "選擇日期",
+        "deleteTitle": "刪除資料",
+        "deleteHint": "選擇範圍與類別後刪除；刪除不可復原，執行前會先展示將釋放的體積。",
+        "scopeLabel": "刪除範圍",
+        "allScope": "全部資料（目前保存的 {days} 天）",
+        "dayScopeOption": "按日期刪除（可多選天、整月或區間）",
+        "dayScope": "{date} 當天",
+        "categoryLabel": "刪除類別（可多選）",
+        "deleteWillRemove": "將刪除：{scope} 的 {categories}。",
+        "estimate": "預計釋放體積：{size}。",
+        "pickCategory": "請先勾選要刪除的類別。",
+        "deleteButton": "刪除所選資料",
+        "confirmTitle": "確認刪除",
+        "irreversible": "此操作不可復原，請確認。",
+        "cancel": "取消",
+        "confirmDelete": "確認刪除",
+        "retentionUnifyHint": "注意：目前三類保留天數不一致，儲存後將統一為同一個天數。"
+      },
+      "subtab": {
+        "usage": "Token 用量",
+        "settings": "設定"
       },
       "ledger": {
         "title": "呼叫台帳",
@@ -4406,6 +4599,13 @@
     "installSkillSafetyEmpty": "安全審查回傳空回應",
     "installSkillSafetyUnexpected": "安全審查回傳未預期的格式: {reply}",
     "installSkillSafetyTimeout": "安全審查逾時或網路錯誤",
+    "learnLessonEmptyInput": "name、description、lesson 皆為必填：name 是技能目錄名，description 寫清什麼時候用這條教訓，lesson 是教訓正文。",
+    "learnLessonPoolUnavailable": "技能池不可用，無法沉澱教訓。",
+    "learnLessonConflict": "技能「{name}」已存在。沉澱教訓不會覆蓋同名技能，請換一個不同的名字。",
+    "learnLessonSafetyFailed": "[安全提醒] 教訓內容安全審查未通過，暫未沉澱。\n原因：{reason}\n\n請告知使用者審查未通過的原因；如果使用者確認這條教訓沒問題並明確要求繼續，再用 risk_accepted=true 和返回的 risk_confirmation_token 重新調用 learn_lesson。",
+    "learnLessonSuccess": "已把教訓沉澱為技能「{name}」，當前 Agent 已啟用，並寫入經驗索引。",
+    "askUserInvalidQuestions": "提問內容不合法：{reason}",
+    "askUserUnavailable": "目前會話無法向你提問（確認通道不可用）。",
     "activeSessionOnly": "只能提升當前助手的活動 session",
     "heartbeatTriggered": "心跳已觸發",
     "dirNotAllowed": "目錄不在允許範圍內",
@@ -4534,7 +4734,8 @@
       "dreamRevisionNotFound": "找不到這個 Dream 版本，它可能已經被清理",
       "dreamRestoreFailed": "恢復 Dream 版本失敗，目前記憶沒有改動",
       "dreamRunFailed": "Dream 整理失敗，原記憶沒有改動"
-    }
+    },
+    "rewindUnavailable": "回檔功能目前無法使用（沒有確認服務）。"
   },
   "main": {
     "tray": {
@@ -5001,6 +5202,26 @@
       "choose": "請選擇",
       "requiredMissing": "請填寫標有 * 的必填項"
     },
+    "askUser": {
+      "title": "助手想問你幾個問題",
+      "body": "共 {count} 個問題，一起答完再提交",
+      "subject": "待你作答",
+      "submit": "提交",
+      "dismiss": "暫不回答",
+      "recommended": "推薦",
+      "multiHint": "可多選",
+      "requiredMissing": "請回答標有 * 的問題",
+      "unsupportedQuestion": "暫不支援的問題形式",
+      "unanswered": "（未作答）",
+      "autoMarker": "（逾時自動選擇）",
+      "answered": "使用者已作答：",
+      "answeredState": "已回答",
+      "timedOut": "等待逾時——已對設有推薦項的問題按推薦自動選擇：",
+      "timedOutState": "逾時未答（已按推薦處理）",
+      "dismissedState": "未回答",
+      "dismissed": "使用者暫不回答。按你的最佳判斷繼續。",
+      "aborted": "會話已中斷，提問作廢。"
+    },
     "mcpTool": {
       "allowForSession": "本次工作階段不再詢問此工具",
       "allowAlways": "一律允許此工具",
@@ -5090,6 +5311,8 @@
       "unpin_memory": "取下",
       "recall_experience": "翻經驗",
       "record_experience": "記經驗",
+      "learn_lesson": "記教訓",
+      "ask_user": "向你提問",
       "tenet_propose": "提議",
       "knowledge_search": "查資料",
       "knowledge_read": "讀資料",
@@ -5122,6 +5345,12 @@
       "loop_control": "迴圈控制",
       "current_status": "報狀態",
       "automation": "自動化",
+      "ast_edit": "結構改寫",
+      "ast_grep": "結構搜尋",
+      "checkpoint": "存檔點",
+      "context_notes": "筆記",
+      "goal": "預算目標",
+      "lsp": "語言服務",
       "subagent_reply": "轉達子代理",
       "subagent_close": "子代理收工",
       "create_artifact": "做卡片",
@@ -5138,7 +5367,10 @@
       "beautify_list-capabilities": "看美化能力",
       "office_read-document": "讀文件",
       "office_html-to-pdf": "轉 PDF",
-      "office_list-capabilities": "看文件能力"
+      "office_list-capabilities": "看文件能力",
+      "rewind": "回檔",
+      "run_code": "跑程式",
+      "security_scan": "安全掃描"
     },
     "copy": "複製",
     "copied": "已複製",
@@ -5215,5 +5447,76 @@
     "createFailed": "側邊會話建立失敗",
     "retry": "重試",
     "empty": "側邊會話已就緒，可以開始提問了"
+  },
+  "envDeps": {
+    "title": "環境依賴",
+    "refresh": "重新檢測",
+    "checking": "檢測中…",
+    "loadFailed": "檢測失敗",
+    "lastChecked": "上次檢測：{time}",
+    "sectionProjectMissing": "目前專案需要但未安裝",
+    "sectionProjectMissingHint": "以下依賴缺失會影響對應功能，安裝後請點「重新檢測」。",
+    "sectionInstalled": "已安裝",
+    "sectionMissing": "未安裝（目前專案暫不需要）",
+    "status": {
+      "installed": "已安裝",
+      "managedInstalled": "已內建",
+      "missing": "未安裝"
+    },
+    "neededByProject": "專案需要",
+    "installHint": "安裝：{hint}",
+    "requiredByLabel": "用於：{features}",
+    "requiredBy": {
+      "workspace_snapshots": "工作區快照與回退",
+      "file_history": "檔案歷史",
+      "run_code": "程式碼執行",
+      "grep_tool": "程式碼搜尋",
+      "find_tool": "檔案尋找",
+      "ast_tools": "AST 結構化程式碼工具",
+      "security_scan": "安全掃描增強",
+      "lsp": "語言伺服器（跳轉/診斷）",
+      "media_video": "影片處理"
+    },
+    "startupMissing": "缺少專案需要的環境依賴：{names}",
+    "openSettings": "查看"
+  },
+  "autolearn": {
+    "cardTitle": "沉澱一條教訓",
+    "suggested": "自動沉澱建議",
+    "approve": "學會它",
+    "dismiss": "忽略",
+    "approvedState": "已學習",
+    "rejectedState": "已忽略",
+    "expiredState": "已過期",
+    "decideFailed": "操作失敗：{error}",
+    "installed": {
+      "title": "已沉澱新技能",
+      "body": "教訓已儲存為技能「{name}」，目前助手已啟用。"
+    },
+    "installFailed": {
+      "title": "沉澱失敗",
+      "body": "技能「{name}」儲存失敗，教訓未寫入。"
+    }
+  },
+  "rewind": {
+    "confirm": {
+      "title": "回到對話存檔點？",
+      "body": "將把對話退回存檔點「{name}」，其後的內容都會被捨棄。",
+      "subject": "存檔點",
+      "accept": "回檔",
+      "reject": "先不回",
+      "filesTitle": "同時還原 {count} 個檔案：",
+      "noFileChanges": "快照裡沒有檔案變更需要還原。",
+      "snapshotUnavailable": "檔案快照不可用：只回退對話，不動檔案。"
+    },
+    "result": {
+      "timeout": "確認逾時了，沒有回檔。",
+      "aborted": "確認卡被中止，沒有回檔。",
+      "rejected": "你選擇了不回檔，什麼都沒動。",
+      "done": "已回到存檔點「{name}」，捨棄了 {count} 條記錄。",
+      "filesOk": "檔案已按快照還原（{count} 個）。",
+      "filesDegraded": "檔案還原未完成：{reason}",
+      "failed": "回檔失敗"
+    }
   }
 }

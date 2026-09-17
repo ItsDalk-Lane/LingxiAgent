@@ -1,8 +1,10 @@
 /**
  * use-observability-query-state.ts — 统一查询状态 hook（Phase 9 §十三/十四）。
  *
- * 单一事实源：Filter Bar / Metrics / Groups / Call Ledger / Trace Explorer /
- * Export 全部消费同一份 appliedFilter——不存在「每个面板自己一套 filter」。
+ * 单一事实源：子标签页内 Filter Bar / Metrics / Groups / Call Ledger /
+ * Trace Explorer / Export 消费同一份 appliedFilter。页面分三个子标签页
+ * （Token 用量 / 调用台账 / 调用轨迹），section 为每页各持有一份实例——
+ * 「单一事实源」收窄为「每个子页一份」，子页之间筛选互不影响。
  *
  * 纪律：
  *   - 文本输入（custom 日期 / 精确 ID）draft 与 applied 分离：Enter 或

@@ -17,6 +17,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../../stores';
 import { selectTerminals } from '../../stores/terminal-slice';
 import { selectAgentActivities } from '../../stores/agent-activity-slice';
+import { Collapse } from '../../ui';
 import { JianEditor } from '../desk/DeskEditor';
 import { TerminalCard } from '../right-workspace/TerminalCard';
 import { WorkflowCard } from '../right-workspace/WorkflowCard';
@@ -25,8 +26,18 @@ import { SessionStatusCard } from '../right-workspace/SessionStatusCard';
 import { GitEnvironmentCard } from './GitEnvironmentCard';
 import styles from './RuntimeInfoCapsule.module.css';
 
+function Chevron({ open, className }: { open: boolean; className?: string }) {
+  return (
+    <svg className={className} data-open={open} width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  );
+}
+
 export function RuntimeInfoCapsule() {
   const [expanded, setExpanded] = useState(false);
+  // 笺默认折叠（用户裁决）：卡片内容不常驻展开，点击标题行切换
+  const [jianCollapsed, setJianCollapsed] = useState(true);
   const rootRef = useRef<HTMLDivElement>(null);
   const sessionPath = useStore(s => s.currentSessionPath);
   const terminals = useStore(selectTerminals(sessionPath));
@@ -81,13 +92,21 @@ export function RuntimeInfoCapsule() {
       </button>
       {expanded && (
         <div className={styles.panelBody} role="dialog" aria-label={t('runtimeCapsule.title')}>
-          <section className={styles.jianSection} aria-label={t('desk.jianLabel')}>
-            <div className={styles.jianHeader}>
+          <section className={styles.jianSection} aria-label={t('desk.jianLabel')} data-collapsed={jianCollapsed || undefined}>
+            <button
+              type="button"
+              className={styles.jianHeader}
+              onClick={() => setJianCollapsed(v => !v)}
+              aria-expanded={!jianCollapsed}
+            >
               <span className={styles.jianTitle}>{t('desk.jianLabel')}</span>
-            </div>
-            <div className={styles.jianBody}>
-              <JianEditor showHeader={false} />
-            </div>
+              <Chevron open={!jianCollapsed} className={styles.jianChevron} />
+            </button>
+            <Collapse open={!jianCollapsed}>
+              <div className={styles.jianBody}>
+                <JianEditor showHeader={false} />
+              </div>
+            </Collapse>
           </section>
           <TerminalCard />
           <WorkflowCard />

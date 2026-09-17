@@ -312,4 +312,72 @@ describe('ContextRing', () => {
     expect(screen.getByText('input.contextDetailEmpty')).toBeInTheDocument();
     expect(screen.queryByText('input.contextCategory.system')).not.toBeInTheDocument();
   });
+
+  it('shows the session cache hit rate row when the aggregate has usage facts', async () => {
+    lingxiFetchMock.mockImplementation(async (url: string) => {
+      if (String(url).includes('/api/model-observability/query/aggregate')) {
+        return new Response(JSON.stringify({
+          groups: [],
+          overall: {
+            usageAggregateAvailability: 'complete',
+            inputTokens: 1000,
+            cacheReadTokens: 800,
+            totalTokens: 1800,
+          },
+        }));
+      }
+      return new Response(JSON.stringify({
+        experiments: [{ id: 'session.instant_simple_compaction', value: false }],
+      }));
+    });
+    useStore.setState({
+      compactingSessions: [],
+      contextBySession: {
+        '/session/a.jsonl': {
+          tokens: 2000, window: 200_000, percent: 1,
+          breakdown: {
+            system: 400, skills: 100, files: 0, tools: 200, mcp: 40,
+            conversation: 800, user: 60, toolResults: 100, other: 300,
+            total: 2000, computedAt: 1,
+          },
+        },
+      },
+    } as never);
+
+    const { container } = render(<ContextRing />);
+    fireEvent.click(container.querySelector('button') as HTMLButtonElement);
+    fireEvent.click(screen.getByText('input.contextDetail'));
+
+    await waitFor(() => {
+      expect(screen.getByText('input.contextDetailCacheHit')).toBeInTheDocument();
+    });
+    expect(screen.getByText('80%')).toBeInTheDocument();
+  });
+
+  it('hides the cache hit row when the aggregate carries no usage facts', async () => {
+    // beforeEach 的默认 mock 对 aggregate 请求返回 experiments 形状 → 无 overall
+    // → 命中率保持 null，行不渲染（绝不渲染 0）。
+    useStore.setState({
+      compactingSessions: [],
+      contextBySession: {
+        '/session/a.jsonl': {
+          tokens: 2000, window: 200_000, percent: 1,
+          breakdown: {
+            system: 400, skills: 100, files: 0, tools: 200, mcp: 40,
+            conversation: 800, user: 60, toolResults: 100, other: 300,
+            total: 2000, computedAt: 1,
+          },
+        },
+      },
+    } as never);
+
+    const { container } = render(<ContextRing />);
+    fireEvent.click(container.querySelector('button') as HTMLButtonElement);
+    fireEvent.click(screen.getByText('input.contextDetail'));
+
+    await waitFor(() => {
+      expect(screen.getByText('input.contextDetailRemaining')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('input.contextDetailCacheHit')).not.toBeInTheDocument();
+  });
 });

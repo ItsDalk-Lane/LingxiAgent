@@ -12,6 +12,14 @@ import {
   readElicitationForm,
   type ElicitationValues,
 } from './elicitation-schema';
+import { AskUserForm } from './AskUserForm';
+import {
+  collectAskUserAnswers,
+  initialAskUserValues,
+  missingRequiredAskUserQuestions,
+  readAskUserForm,
+  type AskUserValues,
+} from './ask-user-schema';
 import {
   grantForSession,
   grantPermanently,
@@ -41,6 +49,18 @@ function displayTitle(block: SessionConfirmationBlock) {
     return `Allow Hana to control ${appName}`;
   }
   return block.title;
+}
+
+/** A question card's resolved states read as answers, not as approvals. */
+function resolvedLabel(block: SessionConfirmationBlock): string {
+  if (block.kind === 'ask_user') {
+    if (block.status === 'confirmed') return textWithFallback('approval.askUser.answeredState', '已回答');
+    if (block.status === 'timeout') return textWithFallback('approval.askUser.timedOutState', '超时未答（已按推荐处理）');
+    return textWithFallback('approval.askUser.dismissedState', '未回答');
+  }
+  return block.status === 'confirmed'
+    ? (window.t?.('common.approved') || '已同意')
+    : (window.t?.('common.rejected') || '已拒绝');
 }
 
 function displaySubject(block: SessionConfirmationBlock, mcpTarget: McpApprovalTarget | null) {
@@ -136,6 +156,14 @@ export function SessionConfirmationPrompt({ block, exiting = false }: SessionCon
     setFieldValues(initialElicitationValues(elicitation));
     setMissingKeys(new Set());
   }, [elicitation]);
+  const askUser = useMemo(() => readAskUserForm(block), [block]);
+  const [askValues, setAskValues] = useState<AskUserValues>(
+    () => initialAskUserValues(askUser?.questions || []),
+  );
+  useEffect(() => {
+    setAskValues(initialAskUserValues(askUser?.questions || []));
+    setMissingKeys(new Set());
+  }, [askUser]);
 
   const pending = block.status === 'pending' && !exiting;
   const submitting = submission?.confirmId === block.confirmId ? submission.action : null;
@@ -152,7 +180,8 @@ export function SessionConfirmationPrompt({ block, exiting = false }: SessionCon
   const elicitationMessage = elicitation
     ? String(block.payload?.message || block.body || '')
     : '';
-  const hasUnsupportedField = (elicitation?.unsupported.length || 0) > 0;
+  const hasUnsupportedField = (elicitation?.unsupported.length || 0) > 0
+    || (askUser?.unsupported.length || 0) > 0;
   const busy = !!submitting || switchingMode;
   // A form we cannot fill faithfully must not be sent as a half-answer.
   const confirmBlocked = busy || hasUnsupportedField;
@@ -248,11 +277,22 @@ export function SessionConfirmationPrompt({ block, exiting = false }: SessionCon
         return;
       }
     }
+    if (action === 'confirmed' && askUser) {
+      const missing = missingRequiredAskUserQuestions(askUser.questions, askValues);
+      if (missing.length > 0) {
+        setMissingKeys(new Set(missing.map(question => question.key)));
+        return;
+      }
+    }
     setMenuOpen(false);
     setSubmission({ confirmId: block.confirmId, action });
     // Only an approval carries answers; a rejection stays a bare decision.
-    const value = elicitation && action === 'confirmed'
-      ? collectElicitationValue(elicitation, fieldValues)
+    const value = action === 'confirmed'
+      ? elicitation
+        ? collectElicitationValue(elicitation, fieldValues)
+        : askUser
+          ? collectAskUserAnswers(askUser.questions, askValues)
+          : null
       : null;
     try {
       await lingxiFetch(`/api/confirm/${block.confirmId}`, {
@@ -266,7 +306,7 @@ export function SessionConfirmationPrompt({ block, exiting = false }: SessionCon
       ));
       console.warn('[session-confirmation] submit failed', err);
     }
-  }, [block.confirmId, elicitation, fieldValues, pending, submitting]);
+  }, [block.confirmId, elicitation, fieldValues, askUser, askValues, pending, submitting]);
 
   const notifyFailure = (fallback: string) => {
     window.dispatchEvent(new CustomEvent('hana-inline-notice', {
@@ -431,6 +471,23 @@ export function SessionConfirmationPrompt({ block, exiting = false }: SessionCon
           }}
         />
       )}
+      {pending && askUser && (
+        <AskUserForm
+          form={askUser}
+          values={askValues}
+          busy={busy}
+          missingKeys={missingKeys}
+          onChange={(key, value) => {
+            setAskValues((current) => ({ ...current, [key]: value }));
+            setMissingKeys((current) => {
+              if (!current.has(key)) return current;
+              const next = new Set(current);
+              next.delete(key);
+              return next;
+            });
+          }}
+        />
+      )}
       {pending ? (
         <div className={styles['session-confirmation-actions']}>
           <button
@@ -480,9 +537,7 @@ export function SessionConfirmationPrompt({ block, exiting = false }: SessionCon
         </div>
       ) : (
         <div className={styles['session-confirmation-resolved']}>
-          {block.status === 'confirmed'
-            ? (window.t?.('common.approved') || '已同意')
-            : (window.t?.('common.rejected') || '已拒绝')}
+          {resolvedLabel(block)}
         </div>
       )}
     </div>

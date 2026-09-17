@@ -15,10 +15,6 @@ vi.mock('../../MainContent', () => ({
 
 ;
 
-vi.mock('../../components/knowledge/KnowledgePage', () => ({
-  KnowledgePage: () => <section data-testid="knowledge-page" />,
-}));
-
 vi.mock('../../components/chat/ChatArea', () => ({
   ChatArea: () => <section data-testid="chat-area" />,
 }));
@@ -90,12 +86,13 @@ describe('AppPages page ownership', () => {
     expect(document.querySelector('#jianSidebar')).not.toBeInTheDocument();
   });
 
-  it('renders Knowledge as a native top-level page without the chat file preview', () => {
+  it('no longer renders a native knowledge page (knowledge moved to the sidebar KnowledgeModal)', () => {
+    // 旧版本可能残留 'knowledge' 页签存档：页面不再渲染内嵌知识库，也不显示聊天预览
     useStore.setState({ currentTab: 'knowledge' } as never);
 
     render(<AppPages />);
 
-    expect(screen.getByTestId('knowledge-page')).toBeInTheDocument();
+    expect(screen.queryByTestId('knowledge-page')).not.toBeInTheDocument();
     expect(document.querySelector('#previewPanel')).not.toBeInTheDocument();
   });
 

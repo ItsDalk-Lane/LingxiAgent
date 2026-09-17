@@ -3,6 +3,8 @@ import { getToolSessionPath } from "../tools/tool-session.ts";
 import { execCommandDescription, writeStdinDescription } from "./guidance.ts";
 import { classifyExecCommand } from "./policy.ts";
 import {
+  EXEC_COMMAND_DEFAULT_TIMEOUT_SECONDS,
+  EXEC_COMMAND_MAX_TIMEOUT_SECONDS,
   EXEC_COMMAND_SANDBOX_PERMISSIONS,
   jsonResult,
   normalizeExecCommandParams,
@@ -11,6 +13,12 @@ import {
   textResult,
 } from "./schema.ts";
 import { runExecCommandDirect, runExecCommandOnce, startExecCommandTty } from "./runner.ts";
+import {
+  waitForTtyWindow,
+  registerBackgroundExec,
+  normalizeTtyOutput,
+  EXEC_BACKGROUND_WINDOW_MS_DEFAULT,
+} from "./background.ts";
 import {
   WIN32_DEFAULT_ONE_SHOT_SHELL,
   renderCommandForExecShell,
@@ -45,7 +53,8 @@ export function createExecCommandTools({
   // ../sandbox/win32-runtime-cache.ts for why that function itself must not
   // cache across separate tool-set builds.
   detectPowerShellFlavor,
-}: any = {}) {
+  getDeferredStore,
+  getTaskRegistry,}: any = {}) {
   const execCommandTool = {
     name: "exec_command",
     label: "Exec Command",
@@ -107,7 +116,11 @@ export function createExecCommandTools({
       })),
       yield_time_ms: Type.Optional(Type.Number({ description: "Requested initial wait budget in milliseconds. Recorded for scheduling; not a command timeout." })),
       max_output_tokens: Type.Optional(Type.Number({ description: "Approximate maximum output token budget returned by this call." })),
-      timeout: Type.Optional(Type.Number({ description: "Optional one-shot timeout in seconds." })),
+      timeout: Type.Optional(Type.Number({ description: `One-shot timeout in seconds. Defaults to ${EXEC_COMMAND_DEFAULT_TIMEOUT_SECONDS}; values above ${EXEC_COMMAND_MAX_TIMEOUT_SECONDS} are capped at ${EXEC_COMMAND_MAX_TIMEOUT_SECONDS}. For interactive or unbounded processes use tty=true instead.` })),
+      wait_mode: Type.Optional(Type.Union([Type.Literal("wait"), Type.Literal("auto")], {
+        description: "wait (default): synchronous one-shot. auto: run in a PTY session and wait up to background_after_seconds; if still running by then the task moves to the background — you immediately get a task id (check_pending_tasks / stop_task work) and the full result is delivered automatically when the process exits. Prefer auto for long builds/tests/installs.",
+      })),
+      background_after_seconds: Type.Optional(Type.Number({ description: "Foreground window for wait_mode=auto before handing off to the background (default 60)." })),
     }),
     execute: async (toolCallId: any, params: any = {}, signal: any, onUpdate: any, ctx: any) => {
       const normalized = normalizeExecCommandParams(params, ctx, {
@@ -159,7 +172,98 @@ export function createExecCommandTools({
         classification,
         yieldTimeMs: value.yieldTimeMs,
         maxOutputTokens: value.maxOutputTokens,
+        timeout: value.timeout,
+        timeoutDefaulted: value.timeoutDefaulted,
+        timeoutClamped: value.timeoutClamped,
       };
+
+      // ── wait_mode=auto：PTY 起跑 + 前台窗口等待；窗口内完成=同步返回，
+      // 到窗口仍在跑=转后台（任务号立即返回，完成经延迟结果链自动回送续跑）。
+      if (value.waitMode === "auto" && !value.tty) {
+        const manager = getTerminalSessionManager?.();
+        const sessionPath = getToolSessionPath(ctx);
+        if (!manager || !sessionPath) {
+          // auto 不可用（无会话/无 PTY）：如实回落同步路径并注明
+          const fallbackExec = value.sandboxPermissions === EXEC_COMMAND_SANDBOX_PERMISSIONS.REQUIRE_ESCALATED
+            ? escalatedCommandExec || commandExec
+            : commandExec;
+          if (!fallbackExec) {
+            return textResult("wait_mode=auto requires a terminal session or a command executor; neither is available here", {
+              errorCode: "EXEC_COMMAND_AUTO_UNAVAILABLE",
+              execCommand: { ...execDetails, ok: false, waitMode: "auto" },
+            });
+          }
+          const fallback = await runExecCommandDirect({
+            commandExec: fallbackExec,
+            command: renderedCommand,
+            workdir: value.workdir,
+            timeout: value.timeout,
+            timeoutDefaulted: value.timeoutDefaulted,
+            signal,
+            onUpdate,
+            execDetails: { ...execDetails, waitMode: "auto-fallback-wait" },
+            maxOutputTokens: value.maxOutputTokens,
+            platform,
+          });
+          return fallback;
+        }
+        const ttyStart = await startExecCommandTty({
+          toolCallId,
+          manager,
+          getAgentId,
+          getCwd,
+          command: renderedCommand,
+          workdir: value.workdir,
+          label: params.label || value.cmd.slice(0, 64),
+          ctx,
+          execDetails,
+        });
+        const terminalId = ttyStart?.details?.processId || ttyStart?.details?.terminalId || null;
+        if (!terminalId) return ttyStart;
+        const windowMs = Number.isFinite(params?.background_after_seconds) && Number(params.background_after_seconds) > 0
+          ? Number(params.background_after_seconds) * 1000
+          : EXEC_BACKGROUND_WINDOW_MS_DEFAULT;
+        const outcome = await waitForTtyWindow(manager, { sessionPath, terminalId, windowMs });
+        if (outcome.finished) {
+          const output = normalizeTtyOutput(outcome.output);
+          return textResult(
+            output.trim()
+              ? `${output.trim()}\n\n[exit ${outcome.exitCode ?? "?"}]`
+              : `[no output, exit ${outcome.exitCode ?? "?"}]`,
+            {
+              waitMode: "auto",
+              backgrounded: false,
+              exitCode: outcome.exitCode,
+              execCommand: { ...execDetails, ok: outcome.exitCode === 0, exitCode: outcome.exitCode, terminalId, transportError: false },
+            },
+          );
+        }
+        // 转后台：登记两套账本（deferred=回送续跑；registry=可见/可停）
+        const registration = registerBackgroundExec(
+          {
+            manager,
+            deferredStore: getDeferredStore?.() || null,
+            taskRegistry: getTaskRegistry?.() || null,
+          },
+          { terminalId, sessionPath, agentId: getAgentId?.() || null, command: value.cmd },
+        );
+        const tailPreview = normalizeTtyOutput(outcome.output).trim().slice(-2000);
+        return textResult(
+          [
+            `still running after ${Math.round(windowMs / 1000)}s — moved to background.`,
+            `task_id: ${terminalId} (check_pending_tasks lists it; stop_task can stop it; the full result arrives automatically when it exits)`,
+            ...(tailPreview ? ["", "recent output:", tailPreview] : []),
+            ...(registration.registered ? [] : [`note: background delivery unavailable (${registration.reason}) — poll with check_pending_tasks or write_stdin`]),
+          ].join("\n"),
+          {
+            waitMode: "auto",
+            backgrounded: true,
+            taskId: terminalId,
+            deliveryRegistered: registration.registered,
+            execCommand: { ...execDetails, ok: true, exitCode: null, terminalId, transportError: false },
+          },
+        );
+      }
 
       if (value.tty) {
         return startExecCommandTty({
@@ -187,6 +291,7 @@ export function createExecCommandTools({
           command: renderedCommand,
           workdir: value.workdir,
           timeout: value.timeout,
+          timeoutDefaulted: value.timeoutDefaulted,
           signal,
           onUpdate,
           execDetails,
@@ -211,6 +316,7 @@ export function createExecCommandTools({
         toolCallId,
         command: renderedCommand,
         timeout: value.timeout,
+        timeoutDefaulted: value.timeoutDefaulted,
         signal,
         onUpdate,
         ctx,

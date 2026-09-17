@@ -6,7 +6,7 @@
  */
 
 /** 硬脱敏：检测到直接替换为 [REDACTED] */
-const HARD_PATTERNS = [
+export const HARD_PATTERNS = [
   // API keys（sk-*, AKIA*、gsk_* 等常见前缀）
   { name: "api_key", regex: /\b(sk-[a-zA-Z0-9]{20,}|AKIA[A-Z0-9]{16}|gsk_[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{36}|glpat-[a-zA-Z0-9_-]{20,}|xoxb-[a-zA-Z0-9-]+)\b/g },
 

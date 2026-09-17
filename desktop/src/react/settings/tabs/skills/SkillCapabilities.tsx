@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { t, autoSaveConfig } from '../../helpers';
+import { lingxiFetch } from '../../api';
 import { Toggle } from '@/ui';
 import { loadSettingsConfig } from '../../actions';
+import { useSettingsStore } from '../../store';
 import { SettingsSection } from '../../components/SettingsSection';
 import styles from '../../Settings.module.css';
 
@@ -22,6 +24,66 @@ export function SkillCapabilities({ installCfg }: SkillCapabilitiesProps) {
 
   const [showGithubWarning, setShowGithubWarning] = useState(false);
   const [showSafetyWarning, setShowSafetyWarning] = useState(false);
+
+  // 踩坑自动沉淀 / goal 预算是全局 preferences（不分 agent），走各自的
+  // /api/preferences/* 路由，与本区 per-agent capabilities 的 autoSaveConfig 通道不是同一条。
+  const showToast = useSettingsStore(s => s.showToast);
+  const [autolearnEnabled, setAutolearnEnabled] = useState<boolean | undefined>(undefined);
+  const [goalEnabled, setGoalEnabled] = useState<boolean | undefined>(undefined);
+  useEffect(() => {
+    let alive = true;
+    lingxiFetch('/api/preferences/goal')
+      .then(res => res.json())
+      .then((data) => {
+        if (alive) setGoalEnabled(data?.goal?.enabled !== false);
+      })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
+  const handleGoalToggle = async (on: boolean) => {
+    const previous = goalEnabled;
+    setGoalEnabled(on);
+    try {
+      const res = await lingxiFetch('/api/preferences/goal', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ goal: { enabled: on } }),
+      });
+      const data = await res.json();
+      if (data?.error) throw new Error(data.error);
+      setGoalEnabled(data?.goal?.enabled !== false);
+    } catch (err: any) {
+      setGoalEnabled(previous);
+      showToast(t('settings.saveFailed') + ': ' + (err?.message || String(err)), 'error');
+    }
+  };
+  useEffect(() => {
+    let alive = true;
+    lingxiFetch('/api/preferences/autolearn')
+      .then(res => res.json())
+      .then((data) => {
+        if (alive) setAutolearnEnabled(data?.autolearn?.enabled !== false);
+      })
+      .catch(() => { /* 读取失败保持 undefined（Toggle 显示未加载态），不打扰 */ });
+    return () => { alive = false; };
+  }, []);
+  const handleAutolearnToggle = async (on: boolean) => {
+    const previous = autolearnEnabled;
+    setAutolearnEnabled(on);
+    try {
+      const res = await lingxiFetch('/api/preferences/autolearn', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ autolearn: { enabled: on } }),
+      });
+      const data = await res.json();
+      if (data?.error) throw new Error(data.error);
+      setAutolearnEnabled(data?.autolearn?.enabled !== false);
+    } catch (err: any) {
+      setAutolearnEnabled(previous);
+      showToast(t('settings.saveFailed') + ': ' + (err?.message || String(err)), 'error');
+    }
+  };
 
   const handleGithubToggle = async (on: boolean) => {
     if (on) {
@@ -104,6 +166,26 @@ export function SkillCapabilities({ installCfg }: SkillCapabilitiesProps) {
             />
           </div>
         )}
+        <div className={styles['capability-row']}>
+          <div className={styles['capability-row-label']}>
+            <span className={styles['capability-row-name']}>{t('settings.skills.autolearn')}</span>
+            <span className={styles['capability-row-desc']}>{t('settings.skills.autolearnDesc')}</span>
+          </div>
+          <Toggle
+            on={autolearnEnabled}
+            onChange={handleAutolearnToggle}
+          />
+        </div>
+        <div className={styles['capability-row']}>
+          <div className={styles['capability-row-label']}>
+            <span className={styles['capability-row-name']}>{t('settings.skills.goalToggle')}</span>
+            <span className={styles['capability-row-desc']}>{t('settings.skills.goalToggleDesc')}</span>
+          </div>
+          <Toggle
+            on={goalEnabled}
+            onChange={handleGoalToggle}
+          />
+        </div>
         <p className={styles['settings-inline-note']} style={{ padding: 'var(--space-8) var(--space-16)', margin: 0 }}>{t('settings.skills.learnHint')}</p>
       </SettingsSection>
 

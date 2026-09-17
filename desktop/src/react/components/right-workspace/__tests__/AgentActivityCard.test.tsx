@@ -48,12 +48,21 @@ const mk = (over: any) => ({
   agentId: null, agentName: null, summary: 's', childSessionPath: null, startedAt: 1, finishedAt: null, ...over,
 });
 
+
+/** 卡片默认折叠（用户裁决）：断言正文前先点标题展开。 */
+function renderExpandedCard() {
+  const utils = render(<AgentActivityCard />);
+  const toggle = utils.container.querySelector('button[aria-expanded="false"]');
+  if (toggle) fireEvent.click(toggle);
+  return utils;
+}
+
 describe('AgentActivityCard', () => {
   afterEach(() => cleanup());
   it('无活动时返回 null（desk 撑满）', () => {
     mockState.currentSessionPath = '/s/a.jsonl';
     mockState.agentActivitiesBySession = {};
-    const { container } = render(<AgentActivityCard />);
+    const { container } = renderExpandedCard();
     expect(container.querySelector('.universal-card')).toBeNull();
   });
 
@@ -66,7 +75,7 @@ describe('AgentActivityCard', () => {
       ],
       '/s/b.jsonl': [mk({ id: 'other', agentName: '别的', summary: '别的对话', sessionPath: '/s/b.jsonl', startedAt: 9000 })],
     };
-    const { container } = render(<AgentActivityCard />);
+    const { container } = renderExpandedCard();
     const rows = container.querySelectorAll('[data-status]');
     expect(rows).toHaveLength(1);
     expect(rows[0].getAttribute('data-status')).toBe('running');
@@ -90,7 +99,7 @@ describe('AgentActivityCard', () => {
       ],
     };
 
-    const { container } = render(<AgentActivityCard />);
+    const { container } = renderExpandedCard();
 
     expect(container.textContent).toContain('点评咖啡');
     expect(container.textContent).not.toContain('旧 path bucket');
@@ -105,7 +114,7 @@ describe('AgentActivityCard', () => {
     mockState.agentActivitiesBySession = {
       '/s/a.jsonl': [mk({ id: 't1', status: 'running', agentId: 'ag1', agentName: '小黎', summary: '点评咖啡', childSessionPath: '/s/child.jsonl' })],
     };
-    const { container, queryByTestId, getByRole } = render(<AgentActivityCard />);
+    const { container, queryByTestId, getByRole } = renderExpandedCard();
     expect(queryByTestId('preview')).toBeNull();
 
     fireEvent.click(container.querySelector('[data-subagent-title="t1"]') as HTMLElement);
@@ -118,7 +127,9 @@ describe('AgentActivityCard', () => {
       sessionPath: '/s/a.jsonl',
       taskId: 't1',
     });
-    expect(container.querySelector('[aria-expanded]')).toBeNull();
+    // 卡片头自带 aria-expanded（默认折叠改动后常驻）；「不展开详情」=
+    // 除卡片头外没有第二个 aria-expanded 元素。
+    expect(container.querySelectorAll('[aria-expanded]')).toHaveLength(1);
   });
 
   it('resets the stopping state on a fallback timer when the authoritative event never arrives', async () => {
@@ -127,7 +138,7 @@ describe('AgentActivityCard', () => {
     mockState.agentActivitiesBySession = {
       '/s/a.jsonl': [mk({ id: 't1', status: 'running', agentName: '小黎', summary: '点评咖啡' })],
     };
-    const { getByRole } = render(<AgentActivityCard />);
+    const { getByRole } = renderExpandedCard();
 
     vi.useFakeTimers();
     try {
@@ -148,7 +159,7 @@ describe('AgentActivityCard', () => {
   it('无当前 session 时返回 null', () => {
     mockState.currentSessionPath = null;
     mockState.agentActivitiesBySession = { '/s/a.jsonl': [mk({ id: 'x' })] };
-    const { container } = render(<AgentActivityCard />);
+    const { container } = renderExpandedCard();
     expect(container.querySelector('.universal-card')).toBeNull();
     mockState.currentSessionPath = '/s/a.jsonl'; // 复位
   });

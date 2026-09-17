@@ -1,9 +1,11 @@
 /**
  * ObservabilityFilterBar.tsx — 统一 Filter Bar（Phase 9 §十七～二十七）。
  *
- * 一行：日期 / Provider / Model / Category / Status / 更多过滤 / Group By /
- * 刷新 / 导出 / 录制设置；下面一行是活动 filter chips（单独可删 + Clear All）。
- * 过滤器不是页面模式——metrics/groups/ledger 同屏共享 appliedFilter（§十四）。
+ * 一行：日期 / Provider / Model / Category / Status / 更多过滤 / Group By；
+ * 下面一行是活动 filter chips（单独可删 + Clear All）。每个子标签页各挂一个
+ * 实例、各持有一份 appliedFilter（子页筛选互不影响）；Group By 只有 Token
+ * 用量页消费，其余子页经 showGroupBy={false} 关闭。刷新/导出/记录设置在
+ * section 的子标签行（页首行），不属筛选条。
  */
 import React, { useCallback } from 'react';
 import {
@@ -13,7 +15,7 @@ import {
   type ModelObservabilityGroupByDimension,
 } from '../../../../../../shared/model-observability-api-contract.ts';
 import { t } from '../../helpers';
-import { Button, Tooltip } from '../../../ui';
+import { Button } from '../../../ui';
 import styles from '../../Settings.module.css';
 import type { ObservabilityQueryStateApi } from './use-observability-query-state';
 import {
@@ -165,22 +167,13 @@ function GroupByFilter({ state }: { state: ObservabilityQueryStateApi }) {
 
 type Props = {
   state: ObservabilityQueryStateApi;
-  refreshing: boolean;
-  onRefresh: () => void;
-  onExport: () => void;
-  exportAvailable: boolean;
-  exportUnavailableReason: string | null;
-  onOpenRecordingSettings: () => void;
+  /** Group By 只服务 Token 用量页的聚合视图；台账/轨迹子页传 false。 */
+  showGroupBy?: boolean;
 };
 
 export function ObservabilityFilterBar({
   state,
-  refreshing,
-  onRefresh,
-  onExport,
-  exportAvailable,
-  exportUnavailableReason,
-  onOpenRecordingSettings,
+  showGroupBy = true,
 }: Props) {
   const { appliedFilter, patchFilter, removeChip, clearAllFilters } = state;
   const wireFilter = buildCallFilterInput(appliedFilter);
@@ -190,18 +183,6 @@ export function ObservabilityFilterBar({
   const categoryFacet = useObservabilityFacetOptions('category', facetActive.category, wireFilter);
 
   const chips = listActiveFilterChips(appliedFilter);
-
-  const exportButton = (
-    <Button
-      variant="secondary"
-      size="sm"
-      disabled={!exportAvailable}
-      onClick={onExport}
-      aria-label={t('settings.observability.export.open')}
-    >
-      {t('settings.observability.export.open')}
-    </Button>
-  );
 
   return (
     <div className={styles['observability-filterbar']}>
@@ -249,26 +230,7 @@ export function ObservabilityFilterBar({
           loadingLabel={t('settings.observability.facets.loading')}
         />
         <ObservabilityAdvancedFilters state={state} />
-        <GroupByFilter state={state} />
-        <div className={styles['observability-filterbar-actions']}>
-          <Button
-            variant="secondary"
-            size="sm"
-            loading={refreshing}
-            onClick={onRefresh}
-            aria-label={t('settings.observability.actions.refresh')}
-          >
-            {t('settings.observability.actions.refresh')}
-          </Button>
-          {exportAvailable ? exportButton : (
-            <Tooltip content={exportUnavailableReason ?? ''}>
-              <span>{exportButton}</span>
-            </Tooltip>
-          )}
-          <Button variant="ghost" size="sm" onClick={onOpenRecordingSettings}>
-            {t('settings.observability.recording.openSettings')}
-          </Button>
-        </div>
+        {showGroupBy && <GroupByFilter state={state} />}
       </div>
       {chips.length > 0 && (
         <div className={styles['observability-chips']} role="list" aria-label={t('settings.observability.chips.ariaLabel')}>

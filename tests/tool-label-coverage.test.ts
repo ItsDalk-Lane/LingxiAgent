@@ -42,7 +42,7 @@ const LIVE_TOOL_FIXTURE_NAMES = [
   // Agent 自带
   'search_memory', 'pin_memory', 'unpin_memory', 'recall_experience', 'record_experience', 'tenet_propose',
   'web_search', 'web_fetch', 'todo_write', 'automation', 'stage_files', 'file', 'channel',
-  'browser', 'computer', 'install_skill', 'notify', 'stop_task', 'update_settings',
+  'ast_grep', 'ast_edit', 'browser', 'checkpoint', 'context_notes', 'goal', 'lsp', 'rewind', 'run_code', 'security_scan', 'computer', 'install_skill', 'learn_lesson', 'ask_user', 'notify', 'stop_task', 'update_settings',
   'session_folders', 'subagent', 'subagent_reply', 'subagent_close', 'workflow',
   'check_pending_tasks', 'loop_control', 'current_status', 'session', 'knowledge_search', 'knowledge_read',
   'knowledge_think', 'knowledge_read_part', 'knowledge_supplement',

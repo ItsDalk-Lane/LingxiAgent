@@ -4554,6 +4554,364 @@ a.about-link:hover {
  }
 
  /* ========================================
+    Observability Sub-Tabs（页首行：左标签组 + 右操作按钮）
+    ======================================== */
+ .observability-sub-tabs {
+     display: flex;
+     align-items: stretch;
+     justify-content: space-between;
+     gap: var(--space-8);
+     padding: 0 var(--space-16);
+     border-bottom: 1px solid var(--overlay-light);
+ }
+
+ .observability-sub-tab-group {
+     display: flex;
+     gap: var(--space-4);
+ }
+
+ .observability-sub-tab {
+     padding: var(--space-8) var(--space-16);
+     font-family: inherit;
+     font-size: var(--fs-body);
+     color: var(--text-muted);
+     background: none;
+     border: none;
+     border-bottom: 2px solid transparent;
+     cursor: pointer;
+     transition: color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+     position: relative;
+     bottom: -1px;
+ }
+
+ .observability-sub-tab:hover {
+     color: var(--text);
+ }
+
+ .observability-sub-tab.active {
+     color: var(--accent);
+     border-bottom-color: var(--accent);
+     font-weight: 500;
+ }
+
+ .observability-sub-tab-actions {
+     display: flex;
+     align-items: center;
+     gap: var(--space-8);
+     align-self: center;
+ }
+
+ .observability-sub-panel {
+     display: flex;
+     flex-direction: column;
+     gap: var(--space-16);
+ }
+
+ /* ========================================
+    Observability 常驻图表（Token 用量页）
+    ======================================== */
+ .observability-chart-head {
+     display: flex;
+     align-items: center;
+     gap: var(--space-8);
+     flex-wrap: wrap;
+     margin-bottom: var(--space-4);
+ }
+
+ .observability-chart-title {
+     font-size: var(--fs-title);
+     font-weight: 600;
+ }
+
+ .observability-chart-badge {
+     font-size: var(--fs-hint);
+     color: var(--accent);
+     background: var(--accent-soft, rgba(14, 116, 144, 0.08));
+     border-radius: 999px;
+     padding: var(--space-2) var(--space-10);
+     font-weight: 600;
+     white-space: nowrap;
+ }
+
+ .observability-chart-head-right {
+     margin-left: auto;
+     display: flex;
+     align-items: center;
+     gap: var(--space-8);
+ }
+
+ .observability-chart-hint {
+     color: var(--text-muted);
+     font-size: var(--fs-hint);
+     margin-bottom: var(--space-8);
+ }
+
+ .observability-chart-legend {
+     display: flex;
+     gap: var(--space-16);
+     flex-wrap: wrap;
+     margin-bottom: var(--space-8);
+     font-size: var(--fs-caption);
+     color: var(--text-muted);
+ }
+
+ .observability-chart-legend-item {
+     display: inline-flex;
+     align-items: center;
+     gap: var(--space-4);
+ }
+
+ .observability-chart-svg {
+     display: block;
+     width: 100%;
+     height: auto;
+ }
+
+ .observability-chart-dot {
+     display: inline-block;
+     vertical-align: middle;
+     flex: none;
+ }
+
+ .observability-chart-grid {
+     stroke: var(--overlay-light, #eee7db);
+     stroke-width: 1;
+ }
+
+ .observability-chart-guide {
+     stroke: var(--border-strong, #b9ae9f);
+     stroke-dasharray: 4 3;
+ }
+
+ .observability-chart-hover-band {
+     fill: var(--accent);
+     opacity: 0.07;
+ }
+
+ .observability-chart-panel-label {
+     fill: var(--text-muted);
+     font-weight: 600;
+ }
+
+ .observability-chart-axis-text {
+     fill: var(--text-muted);
+ }
+
+ .observability-heat-cell-daily {
+     fill: var(--accent);
+ }
+
+ .observability-heat-cell-weekly {
+     --observability-heat-weekly: #b45309;
+     fill: var(--observability-heat-weekly);
+ }
+
+ .observability-chart-bar {
+     stroke: var(--bg-card);
+     stroke-width: 1;
+ }
+
+ .observability-chart-pie-slice {
+     stroke: var(--bg-card);
+     stroke-width: 2;
+ }
+
+ .observability-chart-pie-hole {
+     fill: var(--bg-card);
+ }
+
+ .observability-chart-pie-total {
+     fill: var(--text);
+     font-weight: 700;
+ }
+
+ /* 指标切换（调用次数 / Token 用量）与 每日/每周/累计 分段 */
+ .observability-metric-toggle {
+     display: inline-flex;
+     gap: var(--space-4);
+ }
+
+ .observability-metric-toggle button {
+     border: 1px solid var(--border);
+     background: var(--bg-card);
+     color: var(--text-muted);
+     padding: var(--space-4) var(--space-12);
+     font-size: var(--fs-caption);
+     border-radius: 999px;
+     cursor: pointer;
+     font-family: inherit;
+ }
+
+ .observability-metric-toggle button[data-on] {
+     background: var(--accent);
+     border-color: var(--accent);
+     color: var(--bg-card);
+     font-weight: 600;
+ }
+
+ .observability-metric-toggle button:disabled {
+     opacity: 0.45;
+     cursor: not-allowed;
+ }
+
+ .observability-chart-seg {
+     display: inline-flex;
+     border: 1px solid var(--border);
+     border-radius: 999px;
+     overflow: hidden;
+ }
+
+ .observability-chart-seg button {
+     border: none;
+     background: none;
+     padding: var(--space-4) var(--space-12);
+     font-size: var(--fs-caption);
+     cursor: pointer;
+     color: var(--text-muted);
+     font-family: inherit;
+ }
+
+ .observability-chart-seg button[data-active] {
+     background: var(--accent);
+     color: var(--bg-card);
+     font-weight: 600;
+ }
+
+ .observability-chart-select label {
+     display: inline-flex;
+     align-items: center;
+     gap: var(--space-4);
+     font-size: var(--fs-caption);
+     color: var(--text-muted);
+ }
+
+ .observability-chart-select select {
+     font-family: inherit;
+     font-size: var(--fs-caption);
+     padding: var(--space-4) var(--space-8);
+     border-radius: var(--radius-card, 8px);
+     border: 1px solid var(--border);
+     background: var(--bg-card);
+     color: var(--text);
+ }
+
+ .observability-chart-notice {
+     color: var(--text-muted);
+     font-size: var(--fs-caption);
+     padding: var(--space-16) var(--space-4);
+     text-align: center;
+ }
+
+ .observability-chart-notice[data-kind='error'] {
+     color: var(--danger, #b91c1c);
+ }
+
+ /* 悬停提示层（位置经 --chart-tip-x/y 注入，见 placeChartTip） */
+ .observability-chart-tip {
+     /* 色值字面量收进定义行（扫描域豁免），引用位走 var() */
+     --observability-tip-bg: #2c2925;
+     --observability-tip-fg: #f5f2ec;
+     --observability-tip-shadow: rgba(40, 32, 16, 0.25);
+     --observability-shadow-soft: rgba(40, 32, 16, 0.2);
+     --observability-shadow-strong: rgba(40, 32, 16, 0.3);
+     position: absolute;
+     left: var(--chart-tip-x, 0);
+     top: var(--chart-tip-y, 0);
+     display: none;
+     z-index: 30;
+     pointer-events: none;
+     background: var(--observability-tip-bg);
+     color: var(--observability-tip-fg);
+     border-radius: 10px;
+     padding: var(--space-8) var(--space-12);
+     font-size: var(--fs-caption);
+     line-height: 1.75;
+     box-shadow: 0 var(--space-8) var(--space-24) var(--observability-tip-shadow);
+     white-space: nowrap;
+ }
+
+ .observability-chart-tip[data-open] {
+     display: block;
+ }
+
+ .observability-chart-tip-title {
+     font-weight: 700;
+     margin-bottom: var(--space-2);
+ }
+
+ .observability-chart-tip-row {
+     display: flex;
+     align-items: center;
+     gap: var(--space-4);
+ }
+
+ .observability-chart-tip-val {
+     margin-left: auto;
+     padding-left: var(--space-12);
+     font-weight: 600;
+     font-variant-numeric: tabular-nums;
+ }
+
+ .observability-chart-tip-total {
+     --observability-tip-divider: rgba(245, 242, 236, 0.25);
+     border-top: 1px solid var(--observability-tip-divider);
+     margin-top: var(--space-4);
+     padding-top: var(--space-4);
+     font-weight: 700;
+     display: flex;
+     justify-content: space-between;
+     gap: var(--space-12);
+ }
+
+ /* 饼图右侧明细 */
+ .observability-pie-wrap {
+     display: flex;
+     align-items: center;
+     gap: var(--space-24);
+ }
+
+ .observability-pie-svg {
+     flex: 1.4;
+     min-width: 0;
+     display: block;
+     height: auto;
+ }
+
+ .observability-pie-side {
+     flex: 1;
+     min-width: 240px;
+ }
+
+ .observability-pie-row {
+     display: flex;
+     align-items: center;
+     gap: var(--space-8);
+     padding: var(--space-6) var(--space-10);
+     border-radius: 8px;
+     font-size: var(--fs-body);
+ }
+
+ .observability-pie-row:hover {
+     background: var(--accent-soft, rgba(14, 116, 144, 0.08));
+ }
+
+ .observability-pie-row-val {
+     margin-left: auto;
+     color: var(--text-muted);
+     font-variant-numeric: tabular-nums;
+ }
+
+ .observability-pie-total {
+     border-top: 1px solid var(--border);
+     margin-top: var(--space-6);
+     padding-top: var(--space-10);
+     font-weight: 700;
+     display: flex;
+     justify-content: space-between;
+     gap: var(--space-12);
+ }
+
+ /* ========================================
     Provider Tab — 双栏布局（新）
     ======================================== */
 .pv-layout {
@@ -8421,6 +8779,7 @@ a.about-link:hover {
     gap: var(--space-8);
 }
 
+
 .observability-metric-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -9713,3 +10072,422 @@ a.about-link:hover {
     flex: 0 0 auto;
     min-width: 96px;
 }
+
+/* 环境依赖页状态徽章 */
+.envdeps-pill {
+    display: inline-block;
+    padding: var(--space-2) var(--space-8);
+    border-radius: 999rem;
+    font-size: 0.85em;
+    line-height: 1.4;
+    border: 0.0625rem solid var(--border);
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    white-space: nowrap;
+}
+
+.envdeps-pill-ok {
+    color: var(--success, #5a9);
+    border-color: var(--success, #5a9);
+}
+
+.envdeps-pill-missing {
+    color: var(--warning, #b58900);
+    border-color: var(--warning, #b58900);
+}
+
+.envdeps-needed {
+    margin-left: var(--space-6);
+    font-size: 0.85em;
+    color: var(--warning, #b58900);
+}
+
+.envdeps-refresh {
+    padding: var(--space-4) var(--space-12);
+    border-radius: 0.375rem;
+    border: 0.0625rem solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.envdeps-refresh:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+ /* ========================================
+    Observability 设置子页（状态卡 / 保留天数 / 存储概况 / 删除数据）
+    ======================================== */
+ .observability-status-card {
+     font-size: var(--fs-body);
+     line-height: 2;
+ }
+
+ .observability-status-dim {
+     color: var(--text-muted);
+ }
+
+ .observability-retention-row {
+     display: flex;
+     align-items: center;
+     gap: var(--space-12);
+     flex-wrap: wrap;
+ }
+
+ .observability-retention-row label {
+     font-size: var(--fs-body);
+     color: var(--text-muted);
+ }
+
+ .observability-retention-row input {
+     width: 110px;
+     padding: var(--space-6) var(--space-10);
+     font-size: var(--fs-body);
+     font-family: inherit;
+     border: 1px solid var(--border);
+     border-radius: 8px;
+     background: var(--bg-card);
+     color: var(--text);
+ }
+
+ .observability-retention-unit {
+     color: var(--text-muted);
+     font-size: var(--fs-body);
+ }
+
+ .observability-retention-row button {
+     margin-left: auto;
+ }
+
+ .observability-retention-row .btn-primary,
+ .observability-retention-row button[data-variant='primary'] {
+     margin-left: auto;
+ }
+
+ .observability-retention-saved {
+     color: var(--accent);
+     font-size: var(--fs-caption);
+ }
+
+ .observability-storage-overview {
+     display: grid;
+     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+     gap: var(--space-12);
+     margin-bottom: var(--space-12);
+ }
+
+ .observability-storage-card {
+     background: var(--bg);
+     border: 1px solid var(--border);
+     border-radius: 10px;
+     padding: var(--space-12) var(--space-16);
+ }
+
+ .observability-storage-label {
+     color: var(--text-muted);
+     font-size: var(--fs-caption);
+     margin-bottom: var(--space-4);
+ }
+
+ .observability-storage-value {
+     font-size: var(--fs-title);
+     font-weight: 700;
+ }
+
+ .observability-storage-value small {
+     font-size: var(--fs-caption);
+     font-weight: 400;
+     color: var(--text-muted);
+     margin-left: var(--space-4);
+ }
+
+ .observability-storage-breakdown {
+     display: flex;
+     gap: var(--space-16);
+     flex-wrap: wrap;
+     font-size: var(--fs-body);
+ }
+
+ .observability-storage-path {
+     display: flex;
+     align-items: center;
+     gap: var(--space-10);
+     margin-top: var(--space-12);
+     padding: var(--space-8) var(--space-12);
+     border: 1px solid var(--border);
+     border-radius: 8px;
+     background: var(--bg);
+ }
+
+ .observability-storage-path span {
+     font-size: var(--fs-caption);
+     color: var(--text-muted);
+     flex: none;
+ }
+
+ .observability-storage-path code {
+     font-family: "SF Mono", Menlo, Consolas, monospace;
+     font-size: var(--fs-caption);
+     overflow-wrap: anywhere;
+     margin-right: auto;
+ }
+
+ .observability-delete-grid {
+     display: grid;
+     grid-template-columns: 1fr 1fr;
+     gap: var(--space-24);
+ }
+
+ .observability-delete-field-label {
+     display: block;
+     font-size: var(--fs-body);
+     font-weight: 600;
+     margin-bottom: var(--space-8);
+ }
+
+ .observability-delete-option {
+     display: flex;
+     align-items: center;
+     gap: var(--space-8);
+     padding: var(--space-6) 0;
+     font-size: var(--fs-body);
+ }
+
+ .observability-delete-option input {
+     accent-color: var(--accent);
+ }
+
+ .observability-delete-option-size {
+     margin-left: auto;
+     color: var(--text-muted);
+     font-size: var(--fs-caption);
+ }
+
+ .observability-delete-day-row {
+     display: flex;
+     align-items: center;
+     gap: var(--space-8);
+     margin: var(--space-6) 0 0 var(--space-24);
+ }
+
+ .observability-delete-day-row {
+     min-height: var(--space-32);
+ }
+
+ .observability-daypicker {
+     position: relative;
+     display: inline-flex;
+ }
+
+ .observability-daypicker-trigger {
+     font-family: inherit;
+     font-size: var(--fs-body);
+     padding: var(--space-6) var(--space-12);
+     border-radius: 8px;
+     border: 1px solid var(--border);
+     background: var(--bg-card);
+     color: var(--text);
+     cursor: pointer;
+     min-width: 150px;
+     text-align: left;
+ }
+
+ .observability-daypicker-pop {
+     position: absolute;
+     bottom: calc(100% + var(--space-4));
+     left: 0;
+     z-index: 50;
+     background: var(--bg-card);
+     border: 1px solid var(--border);
+     border-radius: 10px;
+     box-shadow: 0 var(--space-8) var(--space-24) var(--observability-shadow-soft);
+     padding: var(--space-10);
+     width: 260px;
+ }
+
+ .observability-daypicker-modes {
+     display: flex;
+     gap: var(--space-4);
+     margin-bottom: var(--space-8);
+ }
+
+ .observability-daypicker-modes button {
+     flex: 1;
+     border: 1px solid var(--border);
+     background: var(--bg-card);
+     color: var(--text-muted);
+     font-size: var(--fs-caption);
+     padding: var(--space-4) 0;
+     border-radius: 999px;
+     cursor: pointer;
+     font-family: inherit;
+ }
+
+ .observability-daypicker-modes button[data-active] {
+     background: var(--accent);
+     border-color: var(--accent);
+     color: var(--bg-card);
+     font-weight: 600;
+ }
+
+ /* 当前模式有选择时其余模式锁定（防误触）：先清空当前选择才可切换 */
+ .observability-daypicker-modes button:disabled {
+     opacity: 0.4;
+     cursor: not-allowed;
+ }
+
+ .observability-daypicker-nav {
+     display: flex;
+     align-items: center;
+     gap: var(--space-4);
+     margin-bottom: var(--space-6);
+ }
+
+ .observability-daypicker-nav button {
+     border: none;
+     background: none;
+     color: var(--text-muted);
+     font-size: var(--fs-title);
+     cursor: pointer;
+     padding: 0 var(--space-4);
+ }
+
+ .observability-daypicker-nav button:hover {
+     color: var(--accent);
+ }
+
+ .observability-daypicker-nav select {
+     flex: 1;
+     min-width: 0;
+     font-family: inherit;
+     font-size: var(--fs-caption);
+     padding: var(--space-2) var(--space-4);
+     border-radius: 6px;
+     border: 1px solid var(--border);
+     background: var(--bg-card);
+     color: var(--text);
+ }
+
+ .observability-daypicker-grid {
+     display: grid;
+     grid-template-columns: repeat(7, 1fr);
+     gap: var(--space-2);
+     user-select: none;
+ }
+
+ .observability-daypicker-months {
+     display: grid;
+     grid-template-columns: repeat(3, 1fr);
+     gap: var(--space-6);
+ }
+
+ .observability-daypicker-month {
+     border: none;
+     background: none;
+     font-family: inherit;
+     font-size: var(--fs-body);
+     color: var(--text);
+     padding: var(--space-10) 0;
+     border-radius: 8px;
+     cursor: pointer;
+ }
+
+ .observability-daypicker-month:hover {
+     background: var(--accent-soft, rgba(14, 116, 144, 0.08));
+ }
+
+ .observability-daypicker-month[data-selected] {
+     background: var(--accent);
+     color: var(--bg-card);
+     font-weight: 600;
+ }
+
+ .observability-daypicker-weekday {
+     font-size: var(--fs-hint);
+     color: var(--text-muted);
+     text-align: center;
+     padding: var(--space-2) 0;
+ }
+
+ .observability-daypicker-day {
+     border: none;
+     background: none;
+     font-family: inherit;
+     font-size: var(--fs-caption);
+     color: var(--text);
+     padding: var(--space-4) 0;
+     border-radius: 6px;
+     cursor: pointer;
+ }
+
+ .observability-daypicker-day:disabled {
+     color: var(--border);
+     cursor: default;
+ }
+
+ .observability-daypicker-day:not(:disabled):hover {
+     background: var(--accent-soft, rgba(14, 116, 144, 0.08));
+ }
+
+ .observability-daypicker-day[data-selected] {
+     background: var(--accent);
+     color: var(--bg-card);
+     font-weight: 700;
+ }
+
+ .observability-daypicker-day[data-pending] {
+     box-shadow: inset 0 0 0 2px var(--accent);
+     font-weight: 700;
+ }
+
+ .observability-delete-estimate {
+     margin-top: var(--space-12);
+     padding: var(--space-10) var(--space-16);
+     border-radius: 10px;
+     background: var(--danger-soft, #fdecec);
+     color: var(--danger, #b91c1c);
+     font-size: var(--fs-body);
+     line-height: 1.8;
+ }
+
+ .observability-delete-actions {
+     display: flex;
+     justify-content: flex-end;
+     gap: var(--space-10);
+     margin-top: var(--space-12);
+ }
+
+ .observability-delete-mask {
+     --observability-delete-mask-bg: rgba(30, 25, 15, 0.45);
+     position: fixed;
+     inset: 0;
+     background: var(--observability-delete-mask-bg);
+     z-index: 60;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+ }
+
+ .observability-delete-confirm {
+     background: var(--bg-card);
+     border-radius: 14px;
+     padding: var(--space-24);
+     width: 430px;
+     max-width: 92vw;
+     box-shadow: 0 var(--space-16) var(--space-40) var(--observability-shadow-strong);
+ }
+
+ .observability-delete-confirm h4 {
+     font-size: var(--fs-title);
+     font-weight: 700;
+     margin-bottom: var(--space-10);
+     color: var(--danger, #b91c1c);
+ }
+
+ .observability-delete-confirm-body {
+     font-size: var(--fs-body);
+     line-height: 2;
+     margin-bottom: var(--space-16);
+ }

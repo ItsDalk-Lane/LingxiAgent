@@ -59,12 +59,16 @@ function textOrNull(value: unknown, max = 256): string | null {
   return typeof value === "string" && value.trim() ? value.trim().slice(0, max) : null;
 }
 
+// Number(null) 是 0、Number("") 也是 0——不做前置判空会把「供应商没报」写成真实零，
+// 下游按「null = 无事实不展示、0 = 真实零」解读，二者必须分开。
 function intOrNull(value: unknown): number | null {
+  if (value === null || value === undefined || value === "" || typeof value === "boolean") return null;
   const n = Number(value);
   return Number.isFinite(n) ? Math.trunc(n) : null;
 }
 
 function ratioOrNull(value: unknown): number | null {
+  if (value === null || value === undefined || value === "" || typeof value === "boolean") return null;
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
 }

@@ -29,6 +29,8 @@ const execFileAsync = promisify(execFile);
 export const WORKSPACE_SNAPSHOT_VERSION = 1;
 export const DEFAULT_SNAPSHOT_TIMEOUT_MS = 20_000;
 const MAX_GIT_BUFFER = 64 * 1024 * 1024;
+/** 侧车快照记录上限（阶段二·8 GC：lazy 裁最老）。 */
+const WORKSPACE_SNAPSHOT_MAX_RECORDS = 500;
 
 /**
  * 影子仓库排除清单（写进 info/exclude）。用户工作区里零新增文件，所以这些
@@ -337,6 +339,12 @@ export class WorkspaceSnapshotService {
     const sidecar = this.readSidecar(sessionPath);
     sidecar.workspaceRoot = sidecar.workspaceRoot || path.resolve(workspaceRoot);
     sidecar.snapshots.push(record);
+    // 记录上限（阶段二·8）：此前只增不删，长会话侧车无限膨胀且老快照
+    // 永远可能被 createdAtHint 回捞。裁最老记录；git 对象留着不追删
+    // （不可达即惰性垃圾，不碰仓库账本）。
+    while (sidecar.snapshots.length > WORKSPACE_SNAPSHOT_MAX_RECORDS) {
+      sidecar.snapshots.shift();
+    }
     this.writeSidecar(sessionPath, sidecar);
   }
 

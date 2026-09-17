@@ -11,6 +11,7 @@ import {
 } from "./desktop-session-submit.ts";
 import { extractLatestTodos, extractLatestTodoSnapshot, todoPanelPayloadFromSnapshot } from "../lib/tools/todo-compat.ts";
 import { acquireSessionOperation } from "./session-operation-lock.ts";
+import { getSessionCheckpoint } from "./session-checkpoints.ts";
 import { compressHistoricalKnowledgeContextMessages } from "./knowledge-history-compressor.ts";
 import { invalidateSessionDerivedStateSync } from "../lib/memory/session-derived-state.ts";
 import {
@@ -173,6 +174,173 @@ export async function retrySessionTurn(
     allowLegacyPath: false,
     latestUserOnly: false,
   });
+}
+
+/**
+ * rewindToCheckpoint（阶段二·8）：回到具名存档点，不重发消息。
+ *
+ * 语义：checkpoint.target 记录存档时的最新用户输入；rewind 把会话截断到
+ * 该轮输入的信封之前（= 存档那轮尚未发出的时点），丢弃其后的全部内容。
+ * 事务步序照搬 retry（branch → branch head → 重置标记 → deferred 屏蔽 →
+ * 运行时投影 → 派生记忆失效），差异只在收尾：不 submit 新输入，取消被丢
+ * 分支的后台任务后直接发 session_branch_reset 事件。restoreFiles=true 时
+ * 先走与 retry 同一条影子仓库还原支路（逐文件报告，失败不阻塞对话回退）。
+ */
+export async function rewindToCheckpoint(
+  engine: any,
+  opts: Record<string, any> = {},
+  deps: Record<string, any> = {},
+) {
+  const { checkpointName = "latest", restoreFiles = false, clientMessageId = null } = opts;
+  if (!engine || typeof engine.ensureSessionLoaded !== "function") {
+    throw new Error("session rewind requires engine.ensureSessionLoaded");
+  }
+  const identity = resolveSessionIdentity(engine, opts, false);
+  const { sessionId, sessionPath } = identity;
+  const operationKey = sessionId || sessionPath;
+  const releaseOperation = acquireSessionOperation(operationKey, "rewind");
+
+  try {
+    if (typeof engine.isSessionStreaming === "function" && engine.isSessionStreaming(sessionPath)) {
+      throw new Error("session_busy");
+    }
+    // 延迟 require 侧车模块会造成环（session-checkpoints 不依赖本文件，
+    // 顶层 import 即可；此处保持与文件内其他模块一致的顶层导入风格）。
+    const checkpoint = getSessionCheckpoint(sessionPath, String(checkpointName));
+    if (!checkpoint) {
+      throw new Error(`checkpoint "${checkpointName}" not found`);
+    }
+
+    const session = await engine.ensureSessionLoaded(sessionPath);
+    if (!session?.sessionManager) throw new Error(`failed to load session ${sessionPath}`);
+
+    const branch = session.sessionManager.getBranch();
+    const resolved = resolveSessionNodeTarget(branch, checkpoint.target, { mode: "retry" });
+    const retainedEntries = retainedEntriesBeforeRetry(branch, resolved.retryBranchParentId);
+    const discardedEntries = branch.slice(retainedEntries.length);
+    const retainedTaskIds = collectStructuredBackgroundTaskIds(retainedEntries);
+    const discardedTaskIds = collectStructuredBackgroundTaskIds(discardedEntries)
+      .filter((taskId) => !retainedTaskIds.includes(taskId));
+    const retainedMessageCount = countMemoryMessages(retainedEntries);
+    const projectedSessionFiles = projectSessionFilesForRetry(engine, sessionPath, [retainedEntries]);
+    const invalidateDerivedState = deps.invalidateDerivedState || invalidateSessionDerivedState;
+
+    // 可选文件回退：与 retry 同一支路（事务外、先于分支提交，失败不阻塞）。
+    let fileRollbackReport = null;
+    if (restoreFiles === true && engine?.preferences?.getRollbackFileChanges?.() === true) {
+      fileRollbackReport = await performWorkspaceFileRollback(engine, {
+        sessionId,
+        sessionPath,
+        turnInputEntryId: checkpoint.turnInputEntryId || resolved.turnInputEntry.id,
+        createdAtHint: checkpoint.createdAt,
+      });
+    }
+
+    // ── 事务体（照搬 commitRetryBranch 的可逆步序，reason 换 checkpoint_rewind）──
+    if (typeof session.sessionManager.appendCustomEntry !== "function") {
+      throw new Error("session rewind requires durable branch commits");
+    }
+    if (typeof engine.setSessionBranchHead !== "function") {
+      throw new Error("session branch persistence is unavailable");
+    }
+    const originalLeafId = session.sessionManager.getLeafId?.() || null;
+    let deferredSuppressionReceipt = null;
+    let branchHeadPersisted = false;
+    let resetMarkerAttempted = false;
+    let rollbackReason = "branch_commit_failed";
+    try {
+      branchBeforeResolvedTurnInput(session, resolved);
+      engine.setSessionBranchHead(sessionPath, {
+        leafId: session.sessionManager.getLeafId?.() ?? null,
+        reason: "checkpoint_rewind",
+      });
+      branchHeadPersisted = true;
+      resetMarkerAttempted = true;
+      session.sessionManager.appendCustomEntry(SESSION_BRANCH_RESET_RECORD_TYPE, {
+        sourceEntryId: resolved.turnInputEntry.id,
+        target: resolved.target,
+        checkpoint: checkpoint.name,
+        retainedMessageCount,
+        timestamp: Date.now(),
+      });
+
+      rollbackReason = "deferred_suppression_failed";
+      const suppression = suppressDiscardedDeferredTasks(engine, {
+        sessionId,
+        sessionPath,
+        taskIds: discardedTaskIds,
+      });
+      deferredSuppressionReceipt = suppression?.receipt || null;
+
+      rollbackReason = "runtime_projection_failed";
+      replaceAgentMessagesFromBranch(session);
+
+      rollbackReason = "memory_invalidation_failed";
+      const invalidationResult = invalidateDerivedState(engine, {
+        sessionId,
+        sessionPath,
+        retainedMessageCount,
+      });
+      if (invalidationResult && typeof invalidationResult.then === "function") {
+        throw new TypeError("session rewind memory invalidation must be synchronous");
+      }
+    } catch (error) {
+      try {
+        restoreDiscardedDeferredTasks(engine, deferredSuppressionReceipt);
+      } catch (restoreError) {
+        console.warn(`session rewind deferred rollback failed for ${sessionId || sessionPath}: ${restoreError.message}`);
+      }
+      if (resetMarkerAttempted) {
+        restoreRetryBranch(session, originalLeafId, resolved, rollbackReason);
+      } else {
+        restoreBranchLeaf(session, originalLeafId);
+      }
+      if (branchHeadPersisted) {
+        try {
+          engine.setSessionBranchHead(sessionPath, {
+            leafId: originalLeafId,
+            reason: "replay_rollback",
+          });
+        } catch (restoreError) {
+          console.warn(`session rewind branch-head rollback failed for ${sessionId || sessionPath}: ${restoreError.message}`);
+        }
+      }
+      throw error;
+    }
+
+    // 不可逆收尾：取消被丢分支的后台任务（同 retry：放最后，信号不可回滚）。
+    cancelDiscardedBackgroundTasks(engine, {
+      sessionId,
+      sessionPath,
+      taskIds: discardedTaskIds,
+    });
+
+    const resetMessages = session.sessionManager.buildSessionContext?.().messages || [];
+    const todos = extractLatestTodos(resetMessages) || [];
+    const todoSnapshot = extractLatestTodoSnapshot(resetMessages);
+    engine.emitEvent?.({
+      type: "session_branch_reset",
+      ...(sessionId ? { sessionId } : {}),
+      messageId: resolved.turnInputEntry.id,
+      projectionMessageId: resolved.turnInputEntry.id,
+      clientMessageId: clientMessageId || null,
+      todos,
+      ...(todoSnapshot ? { todoPanel: todoPanelPayloadFromSnapshot(todoSnapshot) } : {}),
+      sessionFiles: projectedSessionFiles,
+      discardedTaskIds,
+      checkpoint: checkpoint.name,
+      ...(fileRollbackReport ? { fileRollbackReport } : {}),
+    }, sessionPath);
+
+    return {
+      ok: true,
+      checkpoint: checkpoint.name,
+      discardedEntries: discardedEntries.length,
+      fileRollbackReport,
+    };
+  } finally {
+    releaseOperation();
+  }
 }
 
 /** Compatibility adapter for the existing latest-user route. */

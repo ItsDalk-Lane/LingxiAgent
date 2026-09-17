@@ -104,7 +104,6 @@
     "lineNumber": "{number}행",
     "lineRange": "{start}–{end}행",
     "paragraphNumber": "문단 {number}",
-    "useImportButton": "지식 페이지의 ‘소스 추가’로 파일을 가져오세요",
     "importUnavailable": "이 환경에서는 로컬 파일 선택기를 사용할 수 없습니다",
     "importSuccess": "소스 {count}개를 가져왔습니다",
     "importPartialFailure": "가져오기 완료: {success}/{total}개 성공",
@@ -346,20 +345,16 @@
       "restoreSelectedConfirm": "선택한 {count}개의 보관 항목을 대화 목록으로 복원할까요?",
       "restoreSelectedDone": "{count}개를 복원했습니다",
       "restoreSelectedPartial": "일부만 복원됨: {restored}/{total}",
-      "restoreGroup": "그룹 복원",
-      "restoreGroupConfirm": "\"{name}\" 그룹의 보관 기록 {count}건을 대화 목록으로 복원할까요?",
       "deleteForever": "영구 삭제",
       "deleteConfirm": "이 보관 항목을 영구 삭제할까요? 되돌릴 수 없습니다.",
       "deleteFailed": "삭제 실패",
       "selectAll": "모두 선택",
+      "exitSelection": "선택 취소",
       "deleteSelected": "선택 항목 삭제({count})",
       "deleteSelectedConfirm": "선택한 {count}개의 보관 항목({size})을 영구 삭제합니다. 되돌릴 수 없습니다. 계속할까요?",
       "deleteSelectedDone": "{count}개를 삭제했습니다",
       "deleteSelectedPartial": "일부만 삭제됨: {deleted}/{total}",
       "daysAgo": "{days}일 전 보관됨",
-      "deleteGroup": "그룹 삭제",
-      "deleteGroupConfirm": "\"{name}\" 그룹의 보관 기록 {count}건({size})을 영구 삭제할까요? 되돌릴 수 없습니다.",
-      "deleteGroupDone": "보관 기록 {count}건을 영구 삭제했습니다",
       "group": {
         "ungrouped": "미분류",
         "workspaceRemoved": "제거된 작업 공간",
@@ -655,6 +650,7 @@
     "contextDetailUsed": "사용됨",
     "contextDetailWindowTotal": "컨텍스트 창",
     "contextDetailRemaining": "남은 용량",
+    "contextDetailCacheHit": "캐시 히트",
     "contextCategory": {
       "system": "시스템 프롬프트",
       "conversation": "대화 기록",
@@ -1057,6 +1053,16 @@
       "done": "📥 {name}이(가) 스킬을 설치했어요",
       "failed": "📥 스킬이 설치되지 않았어요"
     },
+    "learn_lesson": {
+      "running": "📚 {name}이(가) 교훈을 정리하는 중",
+      "done": "📚 {name}이(가) 교훈을 스킬로 만들었어요",
+      "failed": "📚 교훈을 저장하지 못했어요"
+    },
+    "ask_user": {
+      "running": "❓ 질문하는 중",
+      "done": "❓ 답변이 도착했습니다",
+      "failed": "❓ 질문을 보내지 못했습니다"
+    },
     "update_settings": {
       "running": "⚙️ {name}이(가) 설정을 바꾸는 중",
       "done": "⚙️ {name}이(가) 설정을 바꿨어요",
@@ -1066,6 +1072,36 @@
       "running": "🤖 {name}이(가) 자동화를 준비하는 중",
       "done": "🤖 {name}이(가) 자동화를 준비했어요",
       "failed": "🤖 자동화가 준비되지 않았어요"
+    },
+    "ast_edit": {
+      "running": "🌳 구조 다시쓰는 중",
+      "done": "🌳 구조 다시쓰기 완료",
+      "failed": "🌳 구조 다시쓰기 실패"
+    },
+    "ast_grep": {
+      "running": "🌳 구조로 검색 중",
+      "done": "🌳 구조 검색 완료",
+      "failed": "🌳 구조 검색 실패"
+    },
+    "checkpoint": {
+      "running": "📌 체크포인트 생성 중",
+      "done": "📌 체크포인트 생성됨",
+      "failed": "📌 체크포인트 실패"
+    },
+    "context_notes": {
+      "running": "📝 노트 갱신 중",
+      "done": "📝 노트 갱신됨",
+      "failed": "📝 노트 실패"
+    },
+    "goal": {
+      "running": "🎯 예산 목표 처리 중",
+      "done": "🎯 예산 목표 갱신",
+      "failed": "🎯 예산 목표 실패"
+    },
+    "lsp": {
+      "running": "🔍 언어 서버 조회 중",
+      "done": "🔍 언어 서버 완료",
+      "failed": "🔍 언어 서버 실패"
     },
     "computer": {
       "running": "🖥️ {name}이(가) 컴퓨터를 다루는 중",
@@ -1369,6 +1405,21 @@
       "running": "✻ 답변 생성 중",
       "done": "✻ 답변을 생성했습니다",
       "failed": "✻ 답변 실패"
+    },
+    "rewind": {
+      "running": "⏪ 되돌리는 중",
+      "done": "⏪ 체크포인트로 되돌림",
+      "failed": "⏪ 되돌리기 실패"
+    },
+    "run_code": {
+      "running": "🧮 커널 실행 중",
+      "done": "🧮 커널 실행 완료",
+      "failed": "🧮 커널 실행 실패"
+    },
+    "security_scan": {
+      "running": "🛡️ 보안 스캔 중",
+      "done": "🛡️ 보안 스캔 완료",
+      "failed": "🛡️ 보안 스캔 실패"
     }
   },
   "file_output": {
@@ -1447,7 +1498,8 @@
       "access": "접근 및 기기",
       "about": "소개",
       "security": "보안",
-      "experiments": "실험 기능"
+      "experiments": "실험 기능",
+      "envdeps": "환경 의존성"
     },
     "browser": {
       "cookiesTitle": "Cookies",
@@ -1683,6 +1735,30 @@
             "label": "자동화",
             "summary": "Agent가 알림과 플러그인 예약 동작을 만들 수 있게 합니다"
           },
+          "ast_edit": {
+            "label": "구조 다시쓰기",
+            "summary": "문법 구조로 일괄 수정; 적용 전 차이 미리보기"
+          },
+          "ast_grep": {
+            "label": "구조 검색",
+            "summary": "문법 구조로 코드 검색(예: X라는 이름의 모든 함수)"
+          },
+          "checkpoint": {
+            "label": "대화 체크포인트",
+            "summary": "현재 지점에 이름 붙은 체크포인트를 남김(rewind용)"
+          },
+          "context_notes": {
+            "label": "컨텍스트 노트",
+            "summary": "압축을 넘어 남는 셀프 메모(제약·결정·좌표)"
+          },
+          "goal": {
+            "label": "예산 목표",
+            "summary": "긴 작업에 토큰/시간 예산을 붙이고 초과 시 한 번 알린 뒤 결정을 돌려줌"
+          },
+          "lsp": {
+            "label": "언어 서버",
+            "summary": "정의 이동/참조/호버/진단/안전 이름변경(서버 필요)"
+          },
           "beautify": {
             "label": "Lingxi Beautify",
             "summary": "Agent가 문서 커버와 미적 보강을 생성할 수 있게 합니다"
@@ -1703,6 +1779,10 @@
             "label": "스킬 설치",
             "summary": "GitHub 또는 스킬 라이브러리에서 새 스킬 설치"
           },
+          "learn_lesson": {
+            "label": "교훈 정리",
+            "summary": "시행착오의 교훈을 재사용 가능한 스킬로 정리합니다"
+          },
           "update_settings": {
             "label": "설정 변경",
             "summary": "Agent가 앱 설정을 수정할 수 있도록 허용"
@@ -1714,6 +1794,18 @@
           "office": {
             "label": "Office",
             "summary": "Agent가 문서를 읽고 HTML을 PDF로 변환할 수 있게 해요"
+          },
+          "rewind": {
+            "label": "되감기",
+            "summary": "대화를 선택한 체크포인트로 되돌리고 이후 내용은 폐기하며, 그 시점의 파일도 복원할 수 있습니다"
+          },
+          "run_code": {
+            "label": "코드 실행",
+            "summary": "Python/Node 등을 영구 세션에서 실행하며 변수가 호출 간 유지됩니다"
+          },
+          "security_scan": {
+            "label": "보안 스캔",
+            "summary": "변경 사항이나 지정 경로를 스캔해 시크릿·민감 정보 유출을 점검합니다"
           },
           "session": {
             "label": "세션 협업",
@@ -2487,7 +2579,11 @@
       "dissolveBundleTitle": "Bundle 풀기",
       "dissolveBundleAriaLabel": "{name} 풀기",
       "removeFromBundleTitle": "Bundle에서 빼내 개별 스킬로 만들기",
-      "removeFromBundleAriaLabel": "{name}을(를) Bundle에서 빼내기"
+      "removeFromBundleAriaLabel": "{name}을(를) Bundle에서 빼내기",
+      "autolearn": "교훈 자동 학습",
+      "autolearnDesc": "도구 사용이 많은 턴 후 재사용 가능한 교훈을 추출해 제안 카드로 보여주며, 확인 후에만 스킬로 저장합니다.",
+      "goalToggle": "예산 목표",
+      "goalToggleDesc": "긴 작업에 토큰/시간 예산 부여, 초과 시 한 번 알림"
     },
     "mcp": {
       "masterTitle": "Master Switch",
@@ -2588,10 +2684,10 @@
       "deferScopeNote": "아래 설정은 이 커넥터뿐 아니라 모든 커넥터에 함께 적용됩니다.",
       "deferEnabled": "지연 로딩 허용",
       "deferEnabledHint": "도구가 많을 때는 먼저 목록만 모델에 주고, 필요한 도구의 설명만 가져옵니다.",
-      "deferBuiltin": "내장 도구도 지연 로딩",
-      "deferBuiltinHint": "켜면 내장 도구도 카탈로그를 통해 필요할 때 로드됩니다. 직접 로드가 모델의 능동성에 유리하므로 컨텍스트가 부족할 때만 권장합니다.",
+      "deferBuiltin": "내장·플러그인 도구 주문 로딩",
+      "deferBuiltinHint": "기본 켜짐. 읽기·쓰기·편집·명령 실행의 4개 기본 도구를 제외한 모든 내장·플러그인 도구는 목록에 들어가 필요할 때만 로드됩니다. 끄면 모두 직접 로드됩니다.",
       "deferThreshold": "임계값",
-      "deferThresholdHint": "사용 중인 도구가 이 수를 넘을 때만 목록을 쓰고, 그 아래면 모두 직접 로드합니다.",
+      "deferThresholdHint": "MCP 커넥터의 사용 중인 도구가 이 수를 넘을 때만 목록에 들어가고, 그 아래면 모두 직접 로드합니다. 내장·플러그인 도구는 이 값의 영향을 받지 않습니다.",
       "agentConnectorEnabled": "이 어시스턴트에서 사용",
       "oauthWaiting": "브라우저에서 인증이 끝나기를 기다리는 중",
       "oauthWaitingHint": "브라우저에 인증 페이지를 열었습니다. 완료되면 자동으로 반영되며, 언제든 취소할 수 있습니다.",
@@ -2900,6 +2996,10 @@
       },
       "metrics": {
         "calls": "호출 수",
+        "activeDays": "활성 일수",
+        "longestStreak": "최장 연속 {count}일",
+        "topModel": "최다 사용 모델",
+        "peakDay": "피크일",
         "tracesHint": "트레이스 {count}개",
         "totalTokens": "총 토큰",
         "inputTokens": "입력 토큰",
@@ -2926,6 +3026,99 @@
         "dateSummary": "총 {total}회 호출, 최다 {peakDate}({peakCount}회)",
         "filterByValue": "이 값으로 필터: {value}",
         "unknownValue": "(알 수 없음)"
+      },
+      "charts": {
+        "fixedBadgeDate": "고정 · 날짜",
+        "fixedBadgeModelDate": "고정 · 모델 × 날짜",
+        "fixedBadgeProviderDate": "고정 · 공급자 × 날짜",
+        "fixedBadgeCategoryDate": "고정 · 범주 × 날짜",
+        "empty": "데이터 없음",
+        "loading": "차트 데이터 로딩 중…",
+        "error": "차트 로딩 실패",
+        "callsUnit": "{count}회",
+        "tokensUnit": "{count} Token",
+        "dailyTotal": "당일 합계",
+        "metric": {
+          "calls": "호출 횟수",
+          "tokens": "Token 사용량"
+        },
+        "heat": {
+          "title": "호출 히트 캘린더",
+          "daily": "매일",
+          "weekly": "매주",
+          "cumulative": "누적",
+          "tooltipCalls": "호출 횟수",
+          "tooltipTokens": "Token 총량",
+          "weekRange": "{since} – {until} 주",
+          "cumulativeUntil": "{date}까지 누적",
+          "hint": {
+            "daily": "한 칸이 하루입니다. 색이 짙을수록 호출이 많습니다. 마우스를 올리면 당일 호출 수와 Token 총량이 표시됩니다.",
+            "weekly": "달력 그대로 두고 같은 주의 칸은 주합계로 색을 입힙니다. 마우스를 올리면 주합계가 표시됩니다.",
+            "cumulative": "각 칸은 해당 날짜까지의 누적 호출 수입니다. 마우스를 올리면 누적 값이 표시됩니다."
+          }
+        },
+        "line": {
+          "title": "모델별 호출 추이",
+          "hint": "모델마다 하나의 꺾은선. 마우스를 올리면 당일 각 모델의 양과 합계가 표시됩니다."
+        },
+        "bar": {
+          "title": "공급자별 호출 분포",
+          "hint": "하루에 하나의 누적 막대. 마우스를 올리면 당일 각 공급자의 양과 합계가 표시됩니다."
+        },
+        "pie": {
+          "title": "범주 구성",
+          "hint": "날짜를 골라 당일의 범주 구성을 봅니다. 조각에 마우스를 올리면 세부 내역과 당일 합계가 표시됩니다.",
+          "dateLabel": "보는 날짜"
+        }
+      },
+      "storage": {
+        "retentionTitle": "보존 일수",
+        "retentionHint": "트레이스·Payload 본문·미디어 Blob가 이 하나의 일수를 공유합니다. 기간이 지난 데이터는 매일 자동 정리됩니다.",
+        "retentionLabel": "최근",
+        "retentionUnit": "일 기록 (1 – 3650)",
+        "save": "저장",
+        "saved": "저장됨",
+        "overviewTitle": "저장소 개요",
+        "overviewHint": "현재 디스크에 실제 저장된 데이터 (삭제 시 실시간 반영).",
+        "savedDays": "저장됨",
+        "daysUnit": "일",
+        "startDate": "데이터 시작일",
+        "footprint": "사용 용량",
+        "coveredCalls": "대상 호출",
+        "categoryTrace": "트레이스와 메타데이터",
+        "categoryPayload": "Payload 본문",
+        "categoryMedia": "미디어 Blob",
+        "pathLabel": "저장 경로",
+        "copyPath": "경로 복사",
+        "copied": "복사됨",
+                "clearFirstHint": "먼저 현재 선택을 지워주세요",
+        "clickToAdd": "클릭하여 추가",
+        "clickToRemove": "클릭하여 제거",
+        "modeDay": "일별",
+        "modeMonth": "월 단위",
+        "modeRange": "기간",
+        "selectedDays": "{count}일 선택됨",
+        "pickDate": "날짜 선택",
+        "deleteTitle": "데이터 삭제",
+        "deleteHint": "범위와 분류를 골라 삭제합니다. 삭제는 되돌릴 수 없으며 실행 전 해제 용량을 표시합니다.",
+        "scopeLabel": "삭제 범위",
+        "allScope": "전체 데이터 (저장된 {days}일)",
+        "dayScopeOption": "날짜별 삭제 (여러 날·월·기간)",
+        "dayScope": "{date} 당일",
+        "categoryLabel": "삭제 분류 (복수 선택)",
+        "deleteWillRemove": "{scope}의 {categories}을(를) 삭제합니다.",
+        "estimate": "예상 해제 용량: {size}.",
+        "pickCategory": "먼저 분류를 선택하세요.",
+        "deleteButton": "선택한 데이터 삭제",
+        "confirmTitle": "삭제 확인",
+        "irreversible": "이 작업은 되돌릴 수 없습니다.",
+        "cancel": "취소",
+        "confirmDelete": "삭제",
+        "retentionUnifyHint": "참고: 현재 3가지 보존 일수가 다릅니다. 저장하면 하나의 값으로 통일됩니다."
+      },
+      "subtab": {
+        "usage": "토큰 사용량",
+        "settings": "설정"
       },
       "ledger": {
         "title": "호출 장부",
@@ -4406,6 +4599,13 @@
     "installSkillSafetyEmpty": "안전 검토가 빈 응답을 반환했어요",
     "installSkillSafetyUnexpected": "안전 검토가 예상하지 못한 형식을 반환했어요: {reply}",
     "installSkillSafetyTimeout": "안전 검토 타임아웃 또는 네트워크 오류",
+    "learnLessonEmptyInput": "name, description, lesson 모두 필수입니다. name은 스킬 디렉터리 이름, description은 이 교훈이 쓰이는 상황, lesson은 교훈 본문입니다.",
+    "learnLessonPoolUnavailable": "스킬 풀을 사용할 수 없어 교훈을 저장할 수 없습니다.",
+    "learnLessonConflict": "스킬 \"{name}\"이(가) 이미 있습니다. 교훈 정리는 같은 이름의 스킬을 덮어쓰지 않습니다. 다른 이름을 선택하세요.",
+    "learnLessonSafetyFailed": "[보안 경고] 교훈 내용이 안전 검토를 통과하지 못해 저장되지 않았습니다.\n사유: {reason}\n\n검토 미통과 사유를 사용자에게 알려 주세요. 사용자가 문제없음을 명시적으로 확인하고 계속을 요청한 경우에만 risk_accepted=true와 반환된 risk_confirmation_token으로 learn_lesson을 다시 호출하세요.",
+    "learnLessonSuccess": "교훈을 스킬 \"{name}\"(으)로 저장하고 현재 Agent에 활성화했으며 경험 인덱스에 등록했습니다.",
+    "askUserInvalidQuestions": "질문 내용이 올바르지 않습니다: {reason}",
+    "askUserUnavailable": "현재 세션에서는 질문할 수 없습니다(확인 채널을 사용할 수 없음).",
     "activeSessionOnly": "현재 어시스턴트의 활성 세션만 승격할 수 있어요",
     "heartbeatTriggered": "하트비트가 트리거되었어요",
     "dirNotAllowed": "디렉토리가 허용 범위에 없어요",
@@ -4534,7 +4734,8 @@
       "dreamRevisionNotFound": "이 Dream 버전을 찾을 수 없어요. 이미 정리되었을 수 있어요",
       "dreamRestoreFailed": "Dream 버전을 복원하지 못했어요. 현재 기억은 변경되지 않았어요",
       "dreamRunFailed": "Dream 정리에 실패했어요. 기존 기억은 변경되지 않았어요"
-    }
+    },
+    "rewindUnavailable": "지금은 되돌리기를 사용할 수 없습니다(확인 서비스 없음)."
   },
   "main": {
     "tray": {
@@ -5001,6 +5202,26 @@
       "choose": "선택하세요",
       "requiredMissing": "* 표시된 필수 항목을 입력하세요"
     },
+    "askUser": {
+      "title": "Hana가 묻습니다",
+      "body": "질문 {count}개 — 함께 답하고 제출하세요",
+      "subject": "답변 대기",
+      "submit": "제출",
+      "dismiss": "답하지 않음",
+      "recommended": "추천",
+      "multiHint": "여러 개 선택 가능",
+      "requiredMissing": "* 표시된 질문에 답해 주세요",
+      "unsupportedQuestion": "지원하지 않는 질문 형식",
+      "unanswered": "(답변 없음)",
+      "autoMarker": "(시간 초과 자동 선택)",
+      "answered": "사용자가 답변했습니다:",
+      "answeredState": "답변 완료",
+      "timedOut": "시간 초과 — 추천 항목을 자동 선택했습니다:",
+      "timedOutState": "시간 초과(추천 적용)",
+      "dismissedState": "답변 없음",
+      "dismissed": "사용자가 답하지 않았습니다. 최선의 판단으로 계속하세요.",
+      "aborted": "세션이 중단되어 질문이 취소되었습니다."
+    },
     "mcpTool": {
       "allowForSession": "이 세션에서는 다시 묻지 않기",
       "allowAlways": "이 도구를 항상 허용",
@@ -5090,6 +5311,8 @@
       "unpin_memory": "고정 해제",
       "recall_experience": "경험 찾기",
       "record_experience": "경험 기록",
+      "learn_lesson": "교훈 기록",
+      "ask_user": "질문하기",
       "tenet_propose": "제안",
       "knowledge_search": "자료 검색",
       "knowledge_read": "자료 읽기",
@@ -5122,6 +5345,12 @@
       "loop_control": "루프 제어",
       "current_status": "상태 보고",
       "automation": "자동화",
+      "ast_edit": "구조 다시쓰기",
+      "ast_grep": "구조 검색",
+      "checkpoint": "체크포인트",
+      "context_notes": "노트",
+      "goal": "예산 목표",
+      "lsp": "언어 서버",
       "subagent_reply": "하위 에이전트 전달",
       "subagent_close": "하위 에이전트 종료",
       "create_artifact": "카드 만들기",
@@ -5138,7 +5367,10 @@
       "beautify_list-capabilities": "미화 기능",
       "office_read-document": "문서 읽기",
       "office_html-to-pdf": "PDF 변환",
-      "office_list-capabilities": "문서 기능"
+      "office_list-capabilities": "문서 기능",
+      "rewind": "되돌리기",
+      "run_code": "코드 실행",
+      "security_scan": "보안 스캔"
     },
     "copy": "복사",
     "copied": "복사됨",
@@ -5215,5 +5447,76 @@
     "createFailed": "사이드 세션 생성 실패",
     "retry": "다시 시도",
     "empty": "사이드 세션이 준비되었습니다"
+  },
+  "envDeps": {
+    "title": "환경 의존성",
+    "refresh": "다시 감지",
+    "checking": "감지 중…",
+    "loadFailed": "감지 실패",
+    "lastChecked": "마지막 감지: {time}",
+    "sectionProjectMissing": "현재 프로젝트에 필요하지만 설치되지 않음",
+    "sectionProjectMissingHint": "누락된 의존성은 해당 기능에 영향을 줍니다. 설치 후 「다시 감지」를 누르세요.",
+    "sectionInstalled": "설치됨",
+    "sectionMissing": "설치되지 않음 (현재 프로젝트에는 불필요)",
+    "status": {
+      "installed": "설치됨",
+      "managedInstalled": "내장됨",
+      "missing": "설치되지 않음"
+    },
+    "neededByProject": "프로젝트에 필요",
+    "installHint": "설치: {hint}",
+    "requiredByLabel": "사용처: {features}",
+    "requiredBy": {
+      "workspace_snapshots": "워크스페이스 스냅샷 및 롤백",
+      "file_history": "파일 기록",
+      "run_code": "코드 실행",
+      "grep_tool": "코드 검색",
+      "find_tool": "파일 찾기",
+      "ast_tools": "AST 구조화 코드 도구",
+      "security_scan": "보안 스캔 강화",
+      "lsp": "언어 서버(이동/진단)",
+      "media_video": "동영상 처리"
+    },
+    "startupMissing": "프로젝트에 필요한 환경 의존성이 없습니다: {names}",
+    "openSettings": "보기"
+  },
+  "autolearn": {
+    "cardTitle": "교훈을 스킬로 저장",
+    "suggested": "자동 학습 제안",
+    "approve": "학습하기",
+    "dismiss": "무시",
+    "approvedState": "학습됨",
+    "rejectedState": "무시됨",
+    "expiredState": "만료됨",
+    "decideFailed": "작업 실패: {error}",
+    "installed": {
+      "title": "새 스킬 학습 완료",
+      "body": "교훈이 스킬 \"{name}\"(으)로 저장되어 현재 어시스턴트에 활성화되었습니다."
+    },
+    "installFailed": {
+      "title": "저장 실패",
+      "body": "스킬 \"{name}\"을(를) 저장하지 못했습니다. 교훈은 기록되지 않았습니다."
+    }
+  },
+  "rewind": {
+    "confirm": {
+      "title": "체크포인트로 되돌릴까요?",
+      "body": "대화가 체크포인트 \"{name}\"(으)로 돌아가며 이후 내용은 버려집니다.",
+      "subject": "체크포인트",
+      "accept": "되돌리기",
+      "reject": "잠시 안 함",
+      "filesTitle": "{count}개 파일도 함께 복원:",
+      "noFileChanges": "스냅샷에 복원할 변경이 없습니다.",
+      "snapshotUnavailable": "파일 스냅샷 없음: 대화만 되돌립니다."
+    },
+    "result": {
+      "timeout": "확인 시간이 지나 되돌리지 않았습니다.",
+      "aborted": "확인이 중단되어 되돌리지 않았습니다.",
+      "rejected": "되돌리지 않기를 선택했습니다. 아무 것도 바뀌지 않았습니다.",
+      "done": "체크포인트 \"{name}\"(으)로 되돌렸습니다({count}건 버림).",
+      "filesOk": "파일을 스냅샷에서 복원했습니다({count}건).",
+      "filesDegraded": "파일 복원이 불완전: {reason}",
+      "failed": "되돌리기 실패"
+    }
   }
 }

@@ -28,6 +28,7 @@ const TAB_ITEMS = [
   { id: 'access', key: 'settings.tabs.access', d: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/><path d="M7 19v2"/><path d="M17 19v2"/>' },
   { id: 'experiments', key: 'settings.tabs.experiments', d: '<path d="M10 2v6.5L5.5 18a3 3 0 0 0 2.7 4h7.6a3 3 0 0 0 2.7-4L14 8.5V2"/><path d="M8 2h8"/><path d="M7.5 15h9"/>' },
   { id: 'security', key: 'settings.tabs.security', d: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>' },
+  { id: 'envdeps', key: 'settings.tabs.envdeps', d: '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M4 10H2M4 14H2M22 10h-2M22 14h-2M10 2v2M14 2v2M10 20v2M14 20v2"/>' },
   { id: 'about', key: 'settings.tabs.about', d: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>' },
 ];
 

@@ -5,6 +5,11 @@
     gap: var(--space-8);
     overflow: hidden;
     padding: var(--space-8) var(--space-16);
+    transition: gap var(--duration-slow, 0.25s) var(--ease-out);
+}
+
+.card[data-collapsed] {
+    gap: 0;
 }
 
 .header {
@@ -12,6 +17,23 @@
     align-items: center;
     gap: var(--space-6);
     padding: 0;
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font-family: inherit;
+    text-align: left;
+    cursor: default;
+}
+
+.chevron {
+    margin-left: auto;
+    color: var(--text-light);
+    transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.chevron[data-open="false"] {
+    transform: rotate(-90deg);
 }
 
 .title {

@@ -121,6 +121,37 @@ describe("Model Observability Accounting Projection", () => {
     }
   });
 
+  it("无事实字段保持 NULL，不被写成真实零（Number(null) === 0 陷阱）", () => {
+    const { db, projection } = openProjection();
+    try {
+      projection.upsertLedgerEntry(ledgerEntry({
+        usage: {
+          costTotal: null,
+          input: { totalTokens: 100, uncachedTokens: 100 },
+          output: { totalTokens: 40, reasoningTokens: null },
+          cache: {
+            readTokens: 0,
+            writeTokens: 0,
+            missTokens: null,
+            hit: false,
+            created: false,
+            hitRatio: null,
+            support: "reported",
+          },
+          totalTokens: 140,
+        },
+      }));
+      const row = db.prepare(`SELECT * FROM model_call_usage WHERE model_call_id = ?`).get("mc_p1");
+      expect(row.output_total_tokens).toBe(40);
+      expect(row.reasoning_tokens).toBeNull();
+      expect(row.cache_miss_tokens).toBeNull();
+      expect(row.cache_hit_ratio).toBeNull();
+      expect(row.cost_total).toBeNull();
+    } finally {
+      db.close();
+    }
+  });
+
   it("无 metadata.modelCallId → 不投影（不通过时间/modelId 猜，§十三）", () => {
     const { db, projection } = openProjection();
     try {

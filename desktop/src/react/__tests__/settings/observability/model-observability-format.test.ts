@@ -58,11 +58,16 @@ describe('numeric formatters', () => {
     expect(formatNumber(null)).toBe('—');
   });
 
-  it('formatCompactNumber tiers', () => {
-    expect(formatCompactNumber(1250431)).toBe('1.3M');
-    expect(formatCompactNumber(12500)).toBe('12.5K');
-    expect(formatCompactNumber(12000)).toBe('12K');
+  it('formatCompactNumber tiers（中文数量级：万/亿/万亿）', () => {
+    expect(formatCompactNumber(1250431)).toBe('125.04万');
+    expect(formatCompactNumber(12500)).toBe('1.25万');
+    expect(formatCompactNumber(12000)).toBe('1.2万');
     expect(formatCompactNumber(850)).toBe('850');
+    expect(formatCompactNumber(9999)).toBe('9999');
+    expect(formatCompactNumber(120000)).toBe('12万');
+    expect(formatCompactNumber(120_000_000)).toBe('1.2亿');
+    expect(formatCompactNumber(120_000_000_000)).toBe('1200亿');
+    expect(formatCompactNumber(1_200_000_000_000)).toBe('1.2万亿');
     expect(formatCompactNumber(null)).toBe('—');
   });
 

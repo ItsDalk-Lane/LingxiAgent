@@ -48,6 +48,13 @@ import {
   modelObservabilityDbPath,
   openModelObservabilityDatabase,
 } from "./model-observability-schema.ts";
+import {
+  computeModelObservabilityStorage,
+  deleteModelObservabilityData,
+  validateModelObservabilityDeleteInput,
+  type ModelObservabilityDeleteStats,
+  type ModelObservabilityStorageOverview,
+} from "./model-observability-data-management.ts";
 import { createModelObservabilityTraceStore } from "./model-observability-trace-store.ts";
 import { createModelObservabilityPayloadStore } from "./model-observability-payload-store.ts";
 import {
@@ -168,6 +175,10 @@ export type ModelObservabilityPersistenceHandle = {
   /** 立即 flush 队列（测试/显式触发；模型热路径永远不调用它等待）。 */
   flushSync(): void;
   runMaintenance(): ModelObservabilityMaintenanceStats | null;
+  /** 「设置」子页：存储概况（天数/起始日/体积，真实文件与元数据字节）。 */
+  getStorageOverview(): ModelObservabilityStorageOverview | null;
+  /** 「设置」子页：手动删除（全部/按天 × 轨迹/正文/媒体）；不可用 → null。 */
+  deleteObservabilityData(input: unknown): ModelObservabilityDeleteStats | null;
   /** 保存不含正文的业务来源名称快照。 */
   upsertSourceIdentitySnapshot(input: {
     kind: string;
@@ -258,6 +269,8 @@ function createDisabledHandle(
     },
     flushSync() { /* disabled：快路径 no-op */ },
     runMaintenance() { return null; },
+    getStorageOverview() { return null; },
+    deleteObservabilityData() { return null; },
     upsertSourceIdentitySnapshot() { return false; },
     findReusableSessionTraceId() { return null; },
     initializeAccounting() { return null; },
@@ -898,6 +911,34 @@ export function installModelObservabilityPersistence({
     },
     runMaintenance() {
       return runMaintenanceInternal();
+    },
+    getStorageOverview(): ModelObservabilityStorageOverview | null {
+      if (closed) return null;
+      try {
+        return computeModelObservabilityStorage({ db, dbPath: modelObservabilityDbPath(lingxiHome) });
+      } catch {
+        return null;
+      }
+    },
+    deleteObservabilityData(input: unknown): ModelObservabilityDeleteStats | null {
+      if (closed) return null;
+      const validated = validateModelObservabilityDeleteInput(input);
+      if (validated.ok === false) {
+        const error = new Error(validated.message) as Error & { field?: string; code: string };
+        error.code = "invalid_filter";
+        error.field = validated.field;
+        throw error;
+      }
+      return deleteModelObservabilityData(
+        {
+          db,
+          blobStore,
+          markPayloadAvailability: (callIds, availability) =>
+            traceStore.markPayloadAvailability(callIds, availability),
+          dbPath: modelObservabilityDbPath(lingxiHome),
+        },
+        validated.value,
+      );
     },
     upsertSourceIdentitySnapshot(input) {
       if (closed) return false;

@@ -8,12 +8,12 @@
 const REDACTED = "[redacted]";
 
 const SECRET_KEY_PATTERN = "api[_-]?key|apikey|api-key|secret[_-]?key|secret|access[_-]?token|refresh[_-]?token|auth[_-]?token|token|password|passwd|client[_-]?secret|bot[_-]?token|server[_-]?token";
-const SECRET_ASSIGN_RE = new RegExp(`\\b(${SECRET_KEY_PATTERN})\\b\\s*[:=]\\s*(?:"[^"]*"|'[^']*'|[^\\s,"'\\]}]+)`, "gi");
+export const SECRET_ASSIGN_RE = new RegExp(`\\b(${SECRET_KEY_PATTERN})\\b\\s*[:=]\\s*(?:"[^"]*"|'[^']*'|[^\\s,"'\\]}]+)`, "gi");
 const CLI_SECRET_FLAG_RE = /((?:^|\s)(?:--(?:password|passwd|token|api[-_]?key|secret|client[-_]?secret|access[-_]?token|auth(?:orization)?|cookie)|--user|-u)(?:=|\s+))(?:("?)[^\s"]+\2|('?)[^\s']+\3)/gi;
 const CONFIG_SECRET_VALUE_RE = /(\b(?:aws\s+configure\s+set\s+)(?:aws_access_key_id|aws_secret_access_key|aws_session_token)\s+)(?:("?)[^\s"]+\2|('?)[^\s']+\3)/gi;
 const SENSITIVE_OBJECT_KEY_RE = /^(api[_-]?key|apikey|api-key|authorization|cookie|set-cookie|secret[_-]?key|secret|access[_-]?token|refresh[_-]?token|auth[_-]?token|token|password|passwd|client[_-]?secret|bot[_-]?token|server[_-]?token|private[_-]?key|credential|credentials|session[_-]?key|session[_-]?id|user[_-]?id|chat[_-]?id|sender[_-]?name|avatar[_-]?url|owner|download[_-]?param|filekey)$/i;
-const URL_SECRET_QUERY_RE = /([?&](?:token|access_token|refresh_token|auth|authorization|api_key|apikey|api-key|key|secret|password|client_secret|code)=)([^&#\s]+)/gi;
-const API_KEY_VALUE_RE = /\b(sk-[a-zA-Z0-9_-]{20,}|AKIA[A-Z0-9]{16}|gsk_[a-zA-Z0-9_-]{20,}|ghp_[a-zA-Z0-9]{36}|glpat-[a-zA-Z0-9_-]{20,}|xox[abpors]-[a-zA-Z0-9-]+)\b/g;
+export const URL_SECRET_QUERY_RE = /([?&](?:token|access_token|refresh_token|auth|authorization|api_key|apikey|api-key|key|secret|password|client_secret|code)=)([^&#\s]+)/gi;
+export const API_KEY_VALUE_RE = /\b(sk-[a-zA-Z0-9_-]{20,}|AKIA[A-Z0-9]{16}|gsk_[a-zA-Z0-9_-]{20,}|ghp_[a-zA-Z0-9]{36}|glpat-[a-zA-Z0-9_-]{20,}|xox[abpors]-[a-zA-Z0-9-]+)\b/g;
 const EMAIL_RE = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
 const CREDIT_CARD_RE = /\b(?:\d{4}[- ]?){3}\d{4}\b/g;
 const CN_ID_CARD_RE = /\b\d{6}(?:19|20)\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{3}[\dXx]\b/g;

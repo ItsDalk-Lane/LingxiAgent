@@ -131,17 +131,21 @@ import {
 } from "./llm-utils.ts";
 import { debugLog, createModuleLogger } from "../lib/debug-log.ts";
 import { createSandboxedTools } from "../lib/sandbox/index.ts";
+import { rewindToCheckpoint } from "./session-turn-actions.ts";
 import { createSandboxResourceIO } from "../lib/resource-io/sandbox-resource-io.ts";
 import { ResourceEventBus } from "../lib/resource-io/resource-event-bus.ts";
 import { resourceKeyForRef } from "../lib/resource-io/resource-refs.ts";
 import { ResourceWatchRegistry } from "../lib/resource-io/resource-watch-registry.ts";
 import { FileHistoryService } from "../lib/file-history/file-history-service.ts";
 import { externalReadPathsFromSessionFiles } from "../lib/sandbox/win32-policy.ts";
-import { t } from "../lib/i18n.ts";
+import { getLocale, t } from "../lib/i18n.ts";
 import { CheckpointStore } from "../lib/checkpoint-store.ts";
 import {
   assertAllBuiltInToolsPermissionCovered,
   assertAllToolsCategorized,
+  assertOnDemandCoreToolNamesSound,
+  firstPartyDeferredInvocation,
+  ONDEMAND_CORE_TOOL_NAMES,
 } from "../shared/tool-categories.ts";
 import { workspaceRootsForSandbox } from "../shared/workspace-scope.ts";
 import { wrapWithCheckpoint } from "../lib/checkpoint-wrapper.ts";
@@ -154,11 +158,13 @@ import { summarizeToolParameters } from "./mcp/manager.ts";
 import { ToolTargetRegistry } from "./tool-target-registry.ts";
 import { ToolInvocationGateway } from "./tool-invocation-gateway.ts";
 import {
+  createFirstPartyToolIdentity,
   createToolSchemaValidator,
+  normalizeToolPermissionContract,
 } from "../lib/tools/invocation/index.ts";
 
 /** Matches the MCP config default; used when no manager config is available. */
-const DEFAULT_TOOL_DEFER_THRESHOLD = 10;
+const DEFAULT_TOOL_DEFER_THRESHOLD = 4;
 
 /**
  * Snapshots the catalog listing for the session that is being built.
@@ -168,19 +174,82 @@ const DEFAULT_TOOL_DEFER_THRESHOLD = 10;
  * it has been holding a stale listing. It deliberately ignores descriptions and
  * schemas: a reworded description is not news worth interrupting a session for.
  */
+/**
+ * One line telling the model what the deferred-tool listing is for. It rides in
+ * the same reference block as the listing, so the guidance is present exactly
+ * when deferral is, and the system prompt stays defer-mode-agnostic.
+ */
+function toolCatalogIntroLine(isZh: boolean): string {
+  return isZh
+    ? "以下目录里的工具未随会话预载：用 mcp_search_tools 按关键词查找，mcp_describe_tool 查看参数，mcp_call 调用（内置工具可省略 server）。"
+    : "The tools listed below are not preloaded: find them with mcp_search_tools, read parameters with mcp_describe_tool, and call them with mcp_call (server may be omitted for built-in tools).";
+}
+
+/**
+ * Catalog row for a builtin-origin target (bundled plugin or first-party
+ * built-in). Schemas stay behind the lazy schemaRef so they never enter the
+ * session's cacheable prefix. First-party rows group under one「内置」header in
+ * the manifest; plugin rows group per plugin id.
+ */
+function builtinCatalogEntryFromTarget(target) {
+  const isFirstParty = target.identity.origin === "first-party";
+  return {
+    targetId: target.identity.targetId,
+    origin: target.identity.origin,
+    sourceId: target.identity.sourceId,
+    publicName: target.identity.publicName,
+    toolName: target.identity.localName,
+    capabilityBase: target.identity.capabilityBase,
+    description: target.description,
+    paramsSummary: summarizeToolParameters(target.parameters),
+    serverId: target.identity.sourceId,
+    serverLabel: isFirstParty ? "内置" : target.identity.sourceId,
+    lifecycleGeneration: target.lifecycleGeneration,
+    deferrable: target.deferrable,
+    pinned: target.pinned,
+    schemaRef: () => target.parameters,
+  };
+}
+
+// Provider-visible tool order must be canonical: the tool schemas are part of
+// the cacheable request prefix, and this array is the concatenation of several
+// independently assembled segments (Pi primitives, agent snapshot, plugin,
+// MCP, bridge) whose relative arrival order can vary across restarts — MCP
+// especially follows connector completion order. Sorting by code-unit name
+// (not localeCompare, which varies with ICU locale) keeps the prefix hash
+// stable across restarts so a resumed session can re-hit the provider's warm
+// cache. Tool names are already asserted unique across both arrays.
+function canonicalToolOrder(tools) {
+  return [...tools].sort((left, right) => {
+    const leftName = typeof left?.name === "string" ? left.name : "";
+    const rightName = typeof right?.name === "string" ? right.name : "";
+    if (leftName < rightName) return -1;
+    if (leftName > rightName) return 1;
+    return 0;
+  });
+}
+
 function buildToolCatalogManifestSnapshot(catalog, modelContextWindowTokens) {
-  // Only MCP-origin names are fingerprinted. Those are the ones a connector
-  // refresh can change underneath a running session; builtin rows move only
-  // when the application itself changes, and including them here would make a
-  // builtin-defer session look like it had lost every tool.
+  // The drift fingerprint covers the origins a running app can change while a
+  // session lives: MCP connector refreshes and plugin hot loads. First-party
+  // rows move only when the application itself changes, and hashing them would
+  // make an upgraded app tell every old session it had lost its built-ins, so
+  // they stay out. The scope must match getLiveToolCatalogNames exactly — a
+  // session whose snapshot hashed fewer origins than the live view would see a
+  // false "tools added" broadcast on its first reminder.
   const names = catalog.all()
-    .filter((entry) => entry.origin === "mcp")
+    .filter((entry) => entry.origin === "mcp" || entry.origin === "plugin")
     .map((entry) => entry.name)
     .sort((left, right) => left.localeCompare(right));
   const budgetTokens = resolveReferenceBudgetTokens(modelContextWindowTokens);
   const { tier, text } = catalog.manifest(budgetTokens);
+  const intro = toolCatalogIntroLine(getLocale().startsWith("zh"));
+  // The intro spends its tokens outside the tier decision: a listing that fit
+  // tier 1 must not silently degrade to tier 2 because the hint line pushed it
+  // over, so it is prepended after the budget check and the reference-block
+  // renderer's own budget remains the backstop.
   return {
-    text,
+    text: text ? `${intro}\n\n${text}` : "",
     tier,
     // Carried so the session renders against the budget the tier was chosen
     // for, rather than re-deriving it from whatever model state is reachable
@@ -1017,6 +1086,18 @@ export class LingxiEngine {
       });
     }
     return this._modelObservabilityQuery;
+  }
+
+  /** 「设置」子页：存储概况（未启用/未创建 → null）。 */
+  getModelObservabilityStorageOverview() {
+    return this._modelObservability?.getStorageOverview?.() ?? null;
+  }
+
+  /** 「设置」子页：手动删除（本地所有者专用；入参验证在 persistence 层抛错）。 */
+  deleteModelObservabilityData(input: unknown) {
+    const handle = this._modelObservability;
+    if (!handle || typeof handle.deleteObservabilityData !== "function") return null;
+    return handle.deleteObservabilityData(input);
   }
 
   _recordModelObservabilitySourceSnapshot(kind, entityId, title) {
@@ -2917,8 +2998,14 @@ export class LingxiEngine {
     const cfg = this._prefs.getFileBackup();
     return this._checkpointStore.cleanup(cfg.retention_days || 1);
   }
+  /** 回到具名存档点（阶段二·8）：截断对话分支 + 可选文件还原；事务核心在 session-turn-actions。 */
+  rewindToCheckpoint(opts) { return rewindToCheckpoint(this, opts || {}); }
   getLearnSkills() { return this._prefs.getLearnSkills(); }
   setLearnSkills(p) { this._prefs.setLearnSkills(p); }
+  getAutolearnPreferences() { return this._prefs.getAutolearn(); }
+  setAutolearnPreferences(p) { return this._prefs.setAutolearn(p); }
+  getGoalPreferences() { return this._prefs.getGoal(); }
+  setGoalPreferences(p) { return this._prefs.setGoal(p); }
   getLocale() { return this._prefs.getLocale(); }
   setLocale(l) { this._prefs.setLocale(l); }
   getUserName() { return this._prefs.getUserName(); }
@@ -3768,21 +3855,32 @@ export class LingxiEngine {
   // ════════════════════════════
 
   /**
-   * Decide whether this tool set defers, and build the catalog if it does.
+   * Decide which tool sources defer, and build the shared catalog if any does.
    *
-   * Returns null for the ordinary case: few enough tools that loading them all
-   * costs less than the machinery to avoid it. The count is per tool across all
-   * servers, and excludes tools that cannot defer (pinned by the user, or
-   * declared non-deferrable), because those stay in the prefix either way.
+   * Three source families, each with its own gate:
    *
-   * Deferral is all-or-nothing across servers on purpose. Deferring only the
-   * larger connectors would make a tool's availability depend on which company
-   * shipped it, which is exactly the kind of hidden ranking the catalog avoids.
+   * - MCP connector tools follow the MCP config (deferEnabled, deferThreshold).
+   *   The threshold counts deferrable, unpinned tools across all servers and
+   *   stays all-or-nothing across servers on purpose: deferring only the larger
+   *   connectors would make a tool's availability depend on which company
+   *   shipped it, which is exactly the hidden ranking the catalog avoids.
+   *
+   * - Bundled plugin tools and first-party built-ins follow the builtin defer
+   *   preference (default on). Everything deferrable joins the catalog as soon
+   *   as one target qualifies — the resident surface is just
+   *   RESIDENT_CORE_TOOL_NAMES plus tools with no usable permission contract.
+   *
+   * First-party candidates arrive pre-filtered: the engine only registers
+   * on-demand names that own a normalized or synthetic permission contract, so
+   * a tool that cannot authorize a deferred invocation is never offered one.
+   *
+   * Returns null when nothing defers: no catalog, no bridge tools, and the
+   * session's tool prefix stays exactly the fully loaded set.
    */
-  _planDeferredToolAssembly(mcpTargets, pluginTargets, invocationGateway) {
+  _planDeferredToolAssembly(mcpTargets, pluginTargets, firstPartyTargets, invocationGateway) {
     const config = this._mcp?.getConfig?.() || null;
-    const deferEnabled = config ? config.deferEnabled !== false : true;
-    if (!deferEnabled) return null;
+
+    const mcpDeferEnabled = config ? config.deferEnabled !== false : true;
     const threshold = Number.isSafeInteger(config?.deferThreshold) && config.deferThreshold > 0
       ? config.deferThreshold
       : DEFAULT_TOOL_DEFER_THRESHOLD;
@@ -3790,50 +3888,49 @@ export class LingxiEngine {
     const liveMcpEntries = mcpTargets
       .filter(({ target }) => target.availability.eligible)
       .map(({ descriptor }) => descriptor.catalogMetadata);
+    const deferMcp = mcpDeferEnabled
+      && liveMcpEntries.filter((entry) => entry.deferrable !== false && entry.pinned !== true).length > threshold;
 
-    const builtinDeferEnabled = this._prefs?.getBuiltinToolDeferEnabled?.() === true;
+    // The builtin master switch covers both bundled plugins and first-party
+    // tools. An explicit false opts out; an unset preference reads as on.
+    const builtinDeferEnabled = this._prefs?.getBuiltinToolDeferEnabled?.() !== false;
     const eligiblePluginTargets = builtinDeferEnabled
       ? pluginTargets.filter(({ target }) => target.availability.eligible).map(({ target }) => target)
       : [];
-    const builtinEntries = eligiblePluginTargets
-      .filter((target) => target.deferrable)
-      .map((target) => ({
-        targetId: target.identity.targetId,
-        origin: target.identity.origin,
-        sourceId: target.identity.sourceId,
-        publicName: target.identity.publicName,
-        toolName: target.identity.localName,
-        capabilityBase: target.identity.capabilityBase,
-        description: target.description,
-        paramsSummary: summarizeToolParameters(target.parameters),
-        serverId: target.identity.sourceId,
-        serverLabel: target.identity.sourceId,
-        lifecycleGeneration: target.lifecycleGeneration,
-        deferrable: target.deferrable,
-        pinned: target.pinned,
-        schemaRef: () => target.parameters,
-      }));
+    const eligibleFirstPartyTargets = builtinDeferEnabled
+      ? firstPartyTargets.filter(({ target }) => target.availability.eligible).map(({ target }) => target)
+      : [];
+    const deferredPluginTargets = eligiblePluginTargets
+      .filter((target) => target.deferrable && !target.pinned);
+    const deferBuiltin = deferredPluginTargets.length > 0 || eligibleFirstPartyTargets.length > 0;
 
-    const deferrable = [...liveMcpEntries, ...builtinEntries]
-      .filter((entry) => entry.deferrable !== false && entry.pinned !== true);
-    if (deferrable.length <= threshold) return null;
+    if (!deferMcp && !deferBuiltin) return null;
 
     const catalog = createToolCatalog();
-    // Pinned tools are registered too: the model should be able to see that
-    // they exist and read their schema, they simply also stay loaded.
-    if (liveMcpEntries.length > 0) catalog.registerSource("mcp", liveMcpEntries);
+    // Pinned/resident tools are registered too: the model should be able to see
+    // that they exist and read their schema, they simply also stay loaded.
+    if (deferMcp && liveMcpEntries.length > 0) catalog.registerSource("mcp", liveMcpEntries);
+    const builtinEntries = [
+      ...eligiblePluginTargets.map((target) => builtinCatalogEntryFromTarget(target)),
+      ...eligibleFirstPartyTargets.map((target) => builtinCatalogEntryFromTarget(target)),
+    ];
     if (builtinEntries.length > 0) catalog.registerSource("builtin", builtinEntries);
 
     const deferredPluginTargetIds = new Set(
-      eligiblePluginTargets
-        .filter((target) => target.deferrable && !target.pinned)
-        .map((target) => target.identity.targetId),
+      deferredPluginTargets.map((target) => target.identity.targetId),
     );
-    const deferredMcpTargetIds = new Set(
-      mcpTargets
-        .map(({ target }) => target)
-        .filter((target) => target.availability.eligible && target.deferrable && !target.pinned)
-        .map((target) => target.identity.targetId),
+    const deferredMcpTargetIds = deferMcp
+      ? new Set(
+        mcpTargets
+          .map(({ target }) => target)
+          .filter((target) => target.availability.eligible && target.deferrable && !target.pinned)
+          .map((target) => target.identity.targetId),
+      )
+      : new Set();
+    const deferredFirstPartyToolNames = new Set(
+      eligibleFirstPartyTargets
+        .filter((target) => target.deferrable && !target.pinned)
+        .map((target) => target.identity.publicName),
     );
     const bridgeTools = createBridgeTools({
       catalog,
@@ -3846,6 +3943,7 @@ export class LingxiEngine {
       bridgeTools,
       deferredPluginTargetIds,
       deferredMcpTargetIds,
+      deferredFirstPartyToolNames,
       invocationGateway,
     };
   }
@@ -3878,7 +3976,7 @@ export class LingxiEngine {
     if (this._mcp) {
       for (const entry of this._liveMcpCatalogEntries()) names.add(entry.publicName);
     }
-    const pluginCatalogEnabled = this._prefs?.getBuiltinToolDeferEnabled?.() === true;
+    const pluginCatalogEnabled = this._prefs?.getBuiltinToolDeferEnabled?.() !== false;
     if (pluginCatalogEnabled && this._pluginManager) {
       // 漂移播报只读当前活跃插件的公开名称；旧会话仍保留自己的 schema/描述快照。
       for (const tool of this._pluginManager.getAllTools?.() || []) {
@@ -4109,103 +4207,11 @@ export class LingxiEngine {
       return { target, runtimeTool, descriptor };
     });
 
-    const createDirectTargetFacade = ({ target, runtimeTool }) => ({
-      ...runtimeTool,
-      name: target.identity.publicName,
-      label: target.label,
-      description: target.description,
-      parameters: target.parameters,
-      deferrable: target.deferrable,
-      pinned: target.pinned,
-      _toolLifecycleGeneration: target.lifecycleGeneration,
-      _toolTargetIdentity: target.identity,
-      _normalizedPermissionContract: target.permission,
-      sessionPermission: Object.freeze({
-        resolveInvocation: target.permission.resolveInvocation,
-      }),
-      execute: (toolCallId, args, signalOrRuntimeCtx, onUpdate, piCtx) => {
-        const { ctx: runtimeCtx } = normalizeToolRuntimeContext(signalOrRuntimeCtx, piCtx);
-        const sessionRef = resolveRuntimeSessionRef(runtimeCtx);
-        const signal = signalOrRuntimeCtx
-          && typeof signalOrRuntimeCtx === "object"
-          && typeof signalOrRuntimeCtx.aborted === "boolean"
-          && typeof signalOrRuntimeCtx.addEventListener === "function"
-          ? signalOrRuntimeCtx
-          : undefined;
-        return invocationGateway.invoke({
-          targetId: target.identity.targetId,
-          route: "direct",
-          arguments: args,
-          sessionId: runtimeCtx.sessionId || sessionRef?.sessionId || null,
-          sessionPath: runtimeCtx.sessionPath || sessionRef?.sessionPath || getSessionPath(),
-          agentId: runtimeCtx.agentId || agentId,
-          lifecycleGeneration: target.lifecycleGeneration,
-          toolCallId,
-          signal,
-          onUpdate,
-          ctx: runtimeCtx,
-          // 执行前复核与调用凭据使用同一助手身份，不能等到实际执行时才补齐。
-          runtimeContext: { ...runtimeCtx, agentId: runtimeCtx.agentId || agentId },
-        });
-      },
-    });
-
-    // Deferred assembly is decided once, here, and never revisited for the life
-    // of this tool set. The session's cacheable prefix is the tool schemas plus
-    // the system prompt, and a running session asserts that prefix on every
-    // request, so a tool set that changed shape mid-session would break the
-    // cache and fail the contract. Everything dynamic goes through the
-    // conversation stream instead.
-    const deferPlan = this._planDeferredToolAssembly(
-      registeredMcpTargets,
-      registeredPluginTargets,
-      invocationGateway,
-    );
-    const directMcpTargets = deferPlan
-      ? registeredMcpTargets.filter(({ target }) => (
-        !deferPlan.deferredMcpTargetIds.has(target.identity.targetId)
-      ))
-      : registeredMcpTargets;
-    const directPluginTargets = deferPlan
-      ? registeredPluginTargets.filter(({ target }) => (
-        !deferPlan.deferredPluginTargetIds.has(target.identity.targetId)
-      ))
-      : registeredPluginTargets;
-    const directMcpTools = directMcpTargets.map(createDirectTargetFacade);
-    const directPluginTools = directPluginTargets.map(createDirectTargetFacade);
-    const bridgeTools = deferPlan ? deferPlan.bridgeTools : [];
-
-    const runtimeCustomTools = ct.map(withRuntimeContext);
-    const wrappedMcpHostTools = mcpHostTools.map(withRuntimeContext);
-    const wrappedBridgeTools = bridgeTools.map(withRuntimeContext);
-    if (deferPlan) {
-      // withRuntimeContext returns copies, and the permission layer keys its
-      // delegation registry on object identity, so the objects that actually
-      // reach that layer are the ones that must be registered.
-      registerBridgeCapabilityDelegates(wrappedBridgeTools, {
-        gateway: deferPlan.invocationGateway,
-      });
-    }
-    assertUniqueBuiltToolNames([
-      { source: "custom tools", tools: baseCustomTools },
-      { source: "extra custom tools", tools: extraCustomTools },
-      { source: "plugin tools", tools: directPluginTools },
-      { source: "mcp tools", tools: [...directMcpTools, ...mcpHostTools] },
-      { source: "mcp bridge tools", tools: bridgeTools },
-    ]);
-    const allTools = filterToolObjectsByAvailability(
-      [
-        ...runtimeCustomTools,
-        ...directPluginTools,
-        ...directMcpTools,
-        ...wrappedMcpHostTools,
-        ...wrappedBridgeTools,
-      ],
-      toolAgent?.config || {},
-      toolAvailabilityContext,
-      toolAvailabilityOptions,
-    );
-
+    // The sandbox layer must exist before defer planning: its Pi primitives
+    // (grep/find/ls/...) are on-demand candidates under the resident-four
+    // policy, and the catalog cannot be sized without their schemas. It
+    // receives no direct tools here — the direct set is attached to the result
+    // after the plan is known.
     const effectiveAgentDir = opts.agentDir || this.agent.agentDir;
     const effectiveWorkspace = opts.workspace !== undefined ? opts.workspace : this.homeCwd;
     const workspaceFolders = opts.workspaceFolders || [];
@@ -4217,7 +4223,7 @@ export class LingxiEngine {
         }
       : () => staticAuthorizedFolders;
     const fileReadSessionPaths = Array.isArray(opts.fileReadSessionPaths)
-      ? opts.fileReadSessionPaths.filter((sp) => typeof sp === "string" && sp.trim())
+      ? opts.fileReadSessionPaths.filter((sp: string) => typeof sp === "string" && sp.trim())
       : [];
     const resolveRuntimeSessionFile = (fileId, options: any = {}) => {
       const activeSessionPath = getSessionPath() || null;
@@ -4281,7 +4287,7 @@ export class LingxiEngine {
       resourceService: this._resources || null,
       studioId: this._runtimeContext?.studioId || null,
     });
-    let result = createSandboxedTools(cwd, allTools, {
+    const sandboxLayer = createSandboxedTools(cwd, [], {
       agentDir: effectiveAgentDir,
       workspace: effectiveWorkspace,
       workspaceFolders,
@@ -4301,10 +4307,230 @@ export class LingxiEngine {
       getVisionBridge: () => this.getVisionBridge(),
       isVisionAuxiliaryEnabled: () => this.isVisionAuxiliaryEnabled(),
       getTerminalSessionManager: () => this._terminalSessions,
+      getDeferredStore: () => this._deferredResultStore || null,
+      getTaskRegistry: () => this._taskRegistry || null,
       getAgentId: () => agentId,
       resourceIO,
       emitEvent: (event, sessionPath) => this._emitEvent(event, sessionPath),
     } as any);
+    const piTools = sandboxLayer.tools;
+
+    // First-party on-demand targets. Candidates are the on-demand names of the
+    // agent snapshot plus the sandbox layer's Pi primitives — everything
+    // outside RESIDENT_CORE_TOOL_NAMES (read/write/edit/exec_command). Each
+    // target authorizes deferred invocations through its own contract: a tool
+    // with a sessionPermission resolver uses it; a host-classified gateway tool
+    // uses its audited synthetic entry in FIRST_PARTY_DEFERRED_PERMISSION_
+    // CONTRACTS; anything with neither stays resident (warned, never blind).
+    // Agent-snapshot names win over a shadowing Pi primitive of the same name.
+    assertOnDemandCoreToolNamesSound();
+    const onDemandNameSet = new Set(ONDEMAND_CORE_TOOL_NAMES);
+    const builtinDeferEnabled = this._prefs?.getBuiltinToolDeferEnabled?.() !== false;
+    const registeredFirstPartyTargets = [];
+    if (builtinDeferEnabled) {
+      const registeredFirstPartyNames = new Set();
+      for (const tool of [...baseCustomTools, ...piTools]) {
+        if (!onDemandNameSet.has(tool?.name)) continue;
+        if (registeredFirstPartyNames.has(tool.name)) continue;
+        const availability = evaluateToolAvailability(
+          tool,
+          toolAgent?.config || {},
+          toolAvailabilityContext,
+          toolAvailabilityOptions,
+        );
+        if (availability.allowed !== true) continue;
+        const identity = createFirstPartyToolIdentity({
+          publicName: tool.name,
+          capabilityBase: tool.name,
+        });
+        let permission = null;
+        try {
+          permission = normalizeToolPermissionContract(tool, identity);
+        } catch {
+          try {
+            permission = normalizeToolPermissionContract({
+              name: tool.name,
+              sessionPermission: {
+                resolveInvocation: (input) => {
+                  const descriptor = firstPartyDeferredInvocation(tool.name, input);
+                  if (!descriptor) {
+                    throw new Error(
+                      `deferred invocation of "${tool.name}" has no permission contract`,
+                    );
+                  }
+                  return descriptor;
+                },
+              },
+            }, identity);
+          } catch (syntheticError) {
+            permission = null;
+            toolAvailabilityLog.warn(
+              `tool "${tool.name}" cannot defer (no usable permission contract: `
+              + `${(syntheticError as Error)?.message || syntheticError}); keeping it resident`,
+            );
+          }
+        }
+        if (!permission) continue;
+        // 沙盒包装层（addResourceParameters 的对象展开）会把 TypeBox 的 Symbol
+        // 元数据键带进 schema；快照校验只收纯 JSON 数据。JSON 往返剥掉装饰后
+        // 重试——schema 语义不变；仍失败则该工具回退常驻，绝不带病延迟。
+        let validator = null;
+        const rawSchema = tool.parameters || { type: "object", properties: {} };
+        try {
+          validator = createToolSchemaValidator(rawSchema, identity);
+        } catch {
+          try {
+            validator = createToolSchemaValidator(
+              JSON.parse(JSON.stringify(rawSchema)),
+              identity,
+            );
+          } catch (schemaError) {
+            toolAvailabilityLog.warn(
+              `tool "${tool.name}" cannot defer (schema validation failed: `
+              + `${(schemaError as Error)?.message || schemaError}); keeping it resident`,
+            );
+          }
+        }
+        if (!validator) continue;
+        const runtimeTool = withRuntimeContext(tool);
+        const target = targetRegistry.register({
+          identity,
+          label: tool.label || tool.name,
+          description: tool.description || "",
+          parameters: validator.schema,
+          deferrable: true,
+          pinned: false,
+          permission,
+          validator,
+          availability: { eligible: true },
+          // First-party tools are frozen into the session snapshot, so their
+          // generation never moves and availability was decided above by the
+          // same filter the direct surface uses.
+          getCurrentGeneration: () => 0,
+          isCurrentlyAvailable: () => ({ eligible: true }),
+          executeCanonical: (toolCallId, args, signal, onUpdate, ctx) => (
+            runtimeTool.execute(toolCallId, args, signal, onUpdate, ctx)
+          ),
+          normalizeResult: (result) => result,
+        });
+        registeredFirstPartyNames.add(tool.name);
+        registeredFirstPartyTargets.push({ target, runtimeTool });
+      }
+    }
+
+    const createDirectTargetFacade = ({ target, runtimeTool }) => ({
+      ...runtimeTool,
+      name: target.identity.publicName,
+      label: target.label,
+      description: target.description,
+      parameters: target.parameters,
+      deferrable: target.deferrable,
+      pinned: target.pinned,
+      _toolLifecycleGeneration: target.lifecycleGeneration,
+      _toolTargetIdentity: target.identity,
+      _normalizedPermissionContract: target.permission,
+      sessionPermission: Object.freeze({
+        resolveInvocation: target.permission.resolveInvocation,
+      }),
+      execute: (toolCallId, args, signalOrRuntimeCtx, onUpdate, piCtx) => {
+        const { ctx: runtimeCtx } = normalizeToolRuntimeContext(signalOrRuntimeCtx, piCtx);
+        const sessionRef = resolveRuntimeSessionRef(runtimeCtx);
+        const signal = signalOrRuntimeCtx
+          && typeof signalOrRuntimeCtx === "object"
+          && typeof signalOrRuntimeCtx.aborted === "boolean"
+          && typeof signalOrRuntimeCtx.addEventListener === "function"
+          ? signalOrRuntimeCtx
+          : undefined;
+        return invocationGateway.invoke({
+          targetId: target.identity.targetId,
+          route: "direct",
+          arguments: args,
+          sessionId: runtimeCtx.sessionId || sessionRef?.sessionId || null,
+          sessionPath: runtimeCtx.sessionPath || sessionRef?.sessionPath || getSessionPath(),
+          agentId: runtimeCtx.agentId || agentId,
+          lifecycleGeneration: target.lifecycleGeneration,
+          toolCallId,
+          signal,
+          onUpdate,
+          ctx: runtimeCtx,
+          // 执行前复核与调用凭据使用同一助手身份，不能等到实际执行时才补齐。
+          runtimeContext: { ...runtimeCtx, agentId: runtimeCtx.agentId || agentId },
+        });
+      },
+    });
+
+    // Deferred assembly is decided once, here, and never revisited for the life
+    // of this tool set. The session's cacheable prefix is the tool schemas plus
+    // the system prompt, and a running session asserts that prefix on every
+    // request, so a tool set that changed shape mid-session would break the
+    // cache and fail the contract. Everything dynamic goes through the
+    // conversation stream instead.
+    const deferPlan = this._planDeferredToolAssembly(
+      registeredMcpTargets,
+      registeredPluginTargets,
+      registeredFirstPartyTargets,
+      invocationGateway,
+    );
+    const directMcpTargets = deferPlan
+      ? registeredMcpTargets.filter(({ target }) => (
+        !deferPlan.deferredMcpTargetIds.has(target.identity.targetId)
+      ))
+      : registeredMcpTargets;
+    const directPluginTargets = deferPlan
+      ? registeredPluginTargets.filter(({ target }) => (
+        !deferPlan.deferredPluginTargetIds.has(target.identity.targetId)
+      ))
+      : registeredPluginTargets;
+    const directMcpTools = directMcpTargets.map(createDirectTargetFacade);
+    const directPluginTools = directPluginTargets.map(createDirectTargetFacade);
+    const bridgeTools = deferPlan ? deferPlan.bridgeTools : [];
+
+    // First-party tools named by the defer plan leave the direct surface: the
+    // model reaches them through the bridge, their schemas staying in the
+    // catalog. What keeps a loaded slot is the resident four, the bridge
+    // tools, and anything that could not be registered as a deferred target.
+    const runtimeCustomTools = ct
+      .filter((tool) => !deferPlan?.deferredFirstPartyToolNames?.has(tool?.name))
+      .map(withRuntimeContext);
+    const wrappedMcpHostTools = mcpHostTools.map(withRuntimeContext);
+    const wrappedBridgeTools = bridgeTools.map(withRuntimeContext);
+    if (deferPlan) {
+      // withRuntimeContext returns copies, and the permission layer keys its
+      // delegation registry on object identity, so the objects that actually
+      // reach that layer are the ones that must be registered.
+      registerBridgeCapabilityDelegates(wrappedBridgeTools, {
+        gateway: deferPlan.invocationGateway,
+      });
+    }
+    assertUniqueBuiltToolNames([
+      { source: "custom tools", tools: baseCustomTools },
+      { source: "extra custom tools", tools: extraCustomTools },
+      { source: "plugin tools", tools: directPluginTools },
+      { source: "mcp tools", tools: [...directMcpTools, ...mcpHostTools] },
+      { source: "mcp bridge tools", tools: bridgeTools },
+    ]);
+    const allTools = filterToolObjectsByAvailability(
+      [
+        ...runtimeCustomTools,
+        ...directPluginTools,
+        ...directMcpTools,
+        ...wrappedMcpHostTools,
+        ...wrappedBridgeTools,
+      ],
+      toolAgent?.config || {},
+      toolAvailabilityContext,
+      toolAvailabilityOptions,
+    );
+
+    // The sandbox layer was created before defer planning; its Pi primitives
+    // were registered as first-party candidates there. Deferred ones leave the
+    // direct surface here; the rest keep their fully loaded slots.
+    const deferredFirstPartyToolNames = deferPlan?.deferredFirstPartyToolNames ?? new Set();
+    let result = {
+      tools: piTools.filter((tool) => !deferredFirstPartyToolNames.has(tool?.name)),
+      customTools: allTools,
+      permissionBoundary: sandboxLayer.permissionBoundary,
+    };
     assertUniqueBuiltToolNames([
       { source: "Pi built-in tools", tools: result.tools },
       { source: "runtime custom tools", tools: result.customTools },
@@ -4425,6 +4651,8 @@ export class LingxiEngine {
     // and the engine has no business keeping a map from sessions to catalogs.
     return {
       ...result,
+      tools: canonicalToolOrder(result.tools),
+      customTools: canonicalToolOrder(result.customTools),
       toolTargetRegistry: targetRegistry,
       toolInvocationGateway: invocationGateway,
       toolCatalogManifest: deferPlan

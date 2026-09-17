@@ -104,7 +104,6 @@
     "lineNumber": "Line {number}",
     "lineRange": "Lines {start}–{end}",
     "paragraphNumber": "Paragraph {number}",
-    "useImportButton": "Use Add source on the Knowledge page to import files",
     "importUnavailable": "A local file picker is unavailable in this environment",
     "importSuccess": "Imported {count} sources",
     "importPartialFailure": "Import finished: {success}/{total} sources succeeded",
@@ -346,20 +345,16 @@
       "restoreSelectedConfirm": "Restore {count} selected archives to the chat list?",
       "restoreSelectedDone": "Restored {count} archives",
       "restoreSelectedPartial": "Partially restored: {restored}/{total}",
-      "restoreGroup": "Restore group",
-      "restoreGroupConfirm": "Restore all {count} archives in the \"{name}\" group to the chat list?",
       "deleteForever": "Delete forever",
       "deleteConfirm": "Permanently delete this archive? This cannot be undone.",
       "deleteFailed": "Delete failed",
       "selectAll": "Select all",
+      "exitSelection": "Cancel selection",
       "deleteSelected": "Delete selected ({count})",
       "deleteSelectedConfirm": "Permanently delete {count} selected archives ({size} total)? This cannot be undone.",
       "deleteSelectedDone": "Deleted {count} archives",
       "deleteSelectedPartial": "Partially deleted: {deleted}/{total}",
       "daysAgo": "Archived {days} days ago",
-      "deleteGroup": "Delete group",
-      "deleteGroupConfirm": "Permanently delete all {count} archived records ({size}) in the \"{name}\" group? This cannot be undone.",
-      "deleteGroupDone": "Permanently deleted {count} archived records",
       "group": {
         "ungrouped": "Unassigned",
         "workspaceRemoved": "Workspace removed",
@@ -666,6 +661,7 @@
     "contextDetailUsed": "Used",
     "contextDetailWindowTotal": "Context window",
     "contextDetailRemaining": "Remaining",
+    "contextDetailCacheHit": "Cache hit",
     "contextCategory": {
       "system": "System prompt",
       "conversation": "Conversation",
@@ -1056,6 +1052,16 @@
       "done": "📥 {name} installed the skill",
       "failed": "📥 The skill didn't install"
     },
+    "learn_lesson": {
+      "running": "📚 {name} is crystallizing a lesson",
+      "done": "📚 {name} turned the lesson into a skill",
+      "failed": "📚 Couldn't save the lesson"
+    },
+    "ask_user": {
+      "running": "❓ Asking you",
+      "done": "❓ You answered",
+      "failed": "❓ Couldn't ask you"
+    },
     "update_settings": {
       "running": "⚙️ {name} is changing settings",
       "done": "⚙️ {name} changed the settings",
@@ -1065,6 +1071,36 @@
       "running": "🤖 {name} is setting up an automation",
       "done": "🤖 {name} set up the automation",
       "failed": "🤖 The automation didn't get set up"
+    },
+    "ast_edit": {
+      "running": "🌳 Rewriting by structure",
+      "done": "🌳 Structural rewrite done",
+      "failed": "🌳 Structural rewrite failed"
+    },
+    "ast_grep": {
+      "running": "🌳 Searching by structure",
+      "done": "🌳 Structural search done",
+      "failed": "🌳 Structural search failed"
+    },
+    "checkpoint": {
+      "running": "📌 Creating checkpoint",
+      "done": "📌 Checkpoint created",
+      "failed": "📌 Checkpoint failed"
+    },
+    "context_notes": {
+      "running": "📝 Updating context notes",
+      "done": "📝 Context notes updated",
+      "failed": "📝 Context notes failed"
+    },
+    "goal": {
+      "running": "🎯 Handling budget goal",
+      "done": "🎯 Budget goal updated",
+      "failed": "🎯 Budget goal action failed"
+    },
+    "lsp": {
+      "running": "🔍 Querying language server",
+      "done": "🔍 Language server done",
+      "failed": "🔍 Language server failed"
     },
     "computer": {
       "running": "🖥️ {name} is driving the computer",
@@ -1368,6 +1404,21 @@
       "running": "✻ Composing the answer",
       "done": "✻ Composed the answer",
       "failed": "✻ Answer failed"
+    },
+    "rewind": {
+      "running": "⏪ Rewinding",
+      "done": "⏪ Rewound to checkpoint",
+      "failed": "⏪ Rewind failed"
+    },
+    "run_code": {
+      "running": "🧮 Running code in kernel",
+      "done": "🧮 Kernel execution done",
+      "failed": "🧮 Kernel execution failed"
+    },
+    "security_scan": {
+      "running": "🛡️ Scanning for secrets",
+      "done": "🛡️ Security scan done",
+      "failed": "🛡️ Security scan failed"
     }
   },
   "file_output": {
@@ -1446,7 +1497,8 @@
       "access": "Access & Devices",
       "experiments": "Experiments",
       "about": "About",
-      "security": "Security"
+      "security": "Security",
+      "envdeps": "Environment"
     },
     "browser": {
       "cookiesTitle": "Cookies",
@@ -1723,6 +1775,30 @@
             "label": "Automation",
             "summary": "Let the agent create scheduled notifications and plugin actions"
           },
+          "ast_edit": {
+            "label": "Structural rewrite",
+            "summary": "Batch-rewrite code by syntax structure; preview the diff before applying"
+          },
+          "ast_grep": {
+            "label": "Structural search",
+            "summary": "Search code by syntax structure (e.g. all functions named X) — sharper than text grep"
+          },
+          "checkpoint": {
+            "label": "Conversation checkpoint",
+            "summary": "Drop a named checkpoint at the current point, for use with rewind"
+          },
+          "context_notes": {
+            "label": "Context notes",
+            "summary": "Self-notes that survive compaction (constraints/decisions/paths)"
+          },
+          "goal": {
+            "label": "Budget goal",
+            "summary": "Attach token/time budgets to long tasks; one over-budget notice then hand the decision back"
+          },
+          "lsp": {
+            "label": "Language server",
+            "summary": "Definition/references/hover/diagnostics/safe rename (needs the language's server)"
+          },
           "beautify": {
             "label": "Lingxi Beautify",
             "summary": "Let the agent generate document covers and aesthetic enhancements"
@@ -1743,9 +1819,25 @@
             "label": "Install Skill",
             "summary": "Install new skills from GitHub or the skill library"
           },
+          "learn_lesson": {
+            "label": "Learn Lesson",
+            "summary": "Crystallize hard-won lessons into reusable skills"
+          },
           "office": {
             "label": "Office",
             "summary": "Let the agent read documents and convert HTML to PDF"
+          },
+          "rewind": {
+            "label": "Rewind",
+            "summary": "Rewind the conversation to a chosen checkpoint, discarding what follows; can also restore files from that moment"
+          },
+          "run_code": {
+            "label": "Code runner",
+            "summary": "Run Python/Node code in a persistent session; variables survive across calls"
+          },
+          "security_scan": {
+            "label": "Security scan",
+            "summary": "Scan workspace changes or given paths for leaked secrets and sensitive data"
           },
           "session": {
             "label": "Session collaboration",
@@ -2555,7 +2647,11 @@
       "dissolveBundleTitle": "Dissolve Bundle",
       "dissolveBundleAriaLabel": "Dissolve {name}",
       "removeFromBundleTitle": "Remove from bundle, make loose skill",
-      "removeFromBundleAriaLabel": "Remove {name} from bundle"
+      "removeFromBundleAriaLabel": "Remove {name} from bundle",
+      "autolearn": "Auto-learn lessons",
+      "autolearnDesc": "After long tool-heavy turns, distill a reusable lesson and show it as a suggestion card — saved as a skill only after you confirm.",
+      "goalToggle": "Budget goals",
+      "goalToggleDesc": "Attach token/time budgets to long tasks; one over-budget notice then the decision comes back to you"
     },
     "mcp": {
       "masterTitle": "Master Switch",
@@ -2656,10 +2752,10 @@
       "deferScopeNote": "These switches apply to every connector, not only this one.",
       "deferEnabled": "Allow deferred loading",
       "deferEnabledHint": "With many tools, give the model a catalog first and fetch the full description of a tool only when it is needed.",
-      "deferBuiltin": "Defer built-in tools too",
-      "deferBuiltinHint": "Built-in tools join the on-demand catalog as well. Eagerly loaded tools keep the model more proactive; turn this on only when context runs tight.",
+      "deferBuiltin": "On-demand built-in & plugin tools",
+      "deferBuiltinHint": "On by default. Only the four base tools (read, write, edit, run commands) stay loaded; every other built-in and plugin tool joins the catalog and loads on demand. Turn off to load everything directly.",
       "deferThreshold": "Threshold",
-      "deferThresholdHint": "The catalog is used only above this many enabled tools; below it, every tool is loaded directly.",
+      "deferThresholdHint": "MCP connector tools enter the catalog only above this many enabled tools; below it they all load directly. Built-in and plugin tools are not affected by this value.",
       "agentConnectorEnabled": "Enabled for this agent",
       "oauthWaiting": "Waiting for authorization in the browser",
       "oauthWaitingHint": "The authorization page is open in your browser. This updates itself once you finish, and can be cancelled at any time.",
@@ -2898,6 +2994,10 @@
       },
       "metrics": {
         "calls": "Calls",
+        "activeDays": "Active days",
+        "longestStreak": "Longest streak: {count} days",
+        "topModel": "Top model",
+        "peakDay": "Peak day",
         "tracesHint": "{count} traces",
         "totalTokens": "Total tokens",
         "inputTokens": "Input tokens",
@@ -2924,6 +3024,99 @@
         "dateSummary": "{total} calls total, peak on {peakDate} ({peakCount})",
         "filterByValue": "Filter by value: {value}",
         "unknownValue": "(unknown)"
+      },
+      "charts": {
+        "fixedBadgeDate": "Fixed · Date",
+        "fixedBadgeModelDate": "Fixed · Model × Date",
+        "fixedBadgeProviderDate": "Fixed · Provider × Date",
+        "fixedBadgeCategoryDate": "Fixed · Category × Date",
+        "empty": "No data yet",
+        "loading": "Loading chart data…",
+        "error": "Failed to load chart",
+        "callsUnit": "{count} calls",
+        "tokensUnit": "{count} tokens",
+        "dailyTotal": "Daily total",
+        "metric": {
+          "calls": "Calls",
+          "tokens": "Token usage"
+        },
+        "heat": {
+          "title": "Call heat calendar",
+          "daily": "Daily",
+          "weekly": "Weekly",
+          "cumulative": "Cumulative",
+          "tooltipCalls": "Calls",
+          "tooltipTokens": "Total tokens",
+          "weekRange": "Week of {since} – {until}",
+          "cumulativeUntil": "Cumulative through {date}",
+          "hint": {
+            "daily": "Each cell is a day; darker means more calls. Hover for the day's calls and total tokens.",
+            "weekly": "The calendar stays put; cells of the same week share the weekly-total color. Hover for the weekly sum.",
+            "cumulative": "Each cell is the cumulative call count through that day; hover for the running total."
+          }
+        },
+        "line": {
+          "title": "Model call trend",
+          "hint": "One line per model; hover for each model's volume and the daily total."
+        },
+        "bar": {
+          "title": "Provider call distribution",
+          "hint": "One stacked bar per day; hover for each provider's volume and the daily total."
+        },
+        "pie": {
+          "title": "Category breakdown",
+          "hint": "Pick a day to see its category mix; hover a slice for details and the daily total.",
+          "dateLabel": "Date"
+        }
+      },
+      "storage": {
+        "retentionTitle": "Retention",
+        "retentionHint": "Traces, payload bodies and media blobs share this single retention; older data is purged daily.",
+        "retentionLabel": "Keep last",
+        "retentionUnit": "days of records (1 – 3650)",
+        "save": "Save",
+        "saved": "Saved",
+        "overviewTitle": "Storage overview",
+        "overviewHint": "What is actually stored on disk right now (updates as you delete).",
+        "savedDays": "Saved",
+        "daysUnit": "days",
+        "startDate": "First record",
+        "footprint": "Footprint",
+        "coveredCalls": "Calls covered",
+        "categoryTrace": "Traces & metadata",
+        "categoryPayload": "Payload bodies",
+        "categoryMedia": "Media blobs",
+        "pathLabel": "Storage path",
+        "copyPath": "Copy path",
+        "copied": "Copied",
+                "clearFirstHint": "Clear the current selection first",
+        "clickToAdd": "Click to include",
+        "clickToRemove": "Click to remove",
+        "modeDay": "Days",
+        "modeMonth": "Month",
+        "modeRange": "Range",
+        "selectedDays": "{count} days selected",
+        "pickDate": "Pick a date",
+        "deleteTitle": "Delete data",
+        "deleteHint": "Pick a scope and categories; deletion is irreversible and shows the freed size first.",
+        "scopeLabel": "Scope",
+        "allScope": "All data ({days} days currently stored)",
+        "dayScopeOption": "By date (multiple days, a month, or a range)",
+        "dayScope": "{date}",
+        "categoryLabel": "Categories (multi-select)",
+        "deleteWillRemove": "Will delete {categories} from {scope}.",
+        "estimate": "Estimated space freed: {size}.",
+        "pickCategory": "Pick at least one category first.",
+        "deleteButton": "Delete selected data",
+        "confirmTitle": "Confirm deletion",
+        "irreversible": "This cannot be undone.",
+        "cancel": "Cancel",
+        "confirmDelete": "Delete",
+        "retentionUnifyHint": "Note: the three retention values currently differ; saving will unify them."
+      },
+      "subtab": {
+        "usage": "Token usage",
+        "settings": "Settings"
       },
       "ledger": {
         "title": "Call ledger",
@@ -4409,6 +4602,13 @@
     "installSkillSafetyEmpty": "Safety review returned empty response",
     "installSkillSafetyUnexpected": "Safety review returned unexpected format: {reply}",
     "installSkillSafetyTimeout": "Safety review timeout or network error",
+    "learnLessonEmptyInput": "name, description, and lesson are all required: name is the skill directory name, description states when the lesson applies, lesson is the lesson body.",
+    "learnLessonPoolUnavailable": "Skill pool is unavailable; cannot record the lesson.",
+    "learnLessonConflict": "Skill \"{name}\" already exists. Learning a lesson never overwrites a same-name skill — pick a distinct name.",
+    "learnLessonSafetyFailed": "[Security warning] The lesson content failed the safety review and was not saved.\nReason: {reason}\n\nTell the user why the review failed. Only if the user explicitly confirms the lesson is fine and asks to continue, call learn_lesson again with risk_accepted=true and the returned risk_confirmation_token.",
+    "learnLessonSuccess": "Lesson crystallized into skill \"{name}\", enabled for the current Agent, and indexed in the experience library.",
+    "askUserInvalidQuestions": "Invalid questions payload: {reason}",
+    "askUserUnavailable": "Cannot ask the user right now (confirmation channel unavailable).",
     "activeSessionOnly": "Can only promote sessions of the current agent",
     "heartbeatTriggered": "Heartbeat triggered",
     "dirNotAllowed": "Directory not in allowed scope",
@@ -4538,7 +4738,8 @@
       "dreamRevisionNotFound": "This Dream version could not be found. It may have been cleaned up.",
       "dreamRestoreFailed": "The Dream version could not be restored. Current memory was not changed.",
       "dreamRunFailed": "Dream cleanup failed. The original memory was not changed."
-    }
+    },
+    "rewindUnavailable": "rewind is unavailable right now (no confirmation service)."
   },
   "main": {
     "tray": {
@@ -5005,6 +5206,26 @@
       "choose": "Choose…",
       "requiredMissing": "Fill in the fields marked *"
     },
+    "askUser": {
+      "title": "Hana has a few questions",
+      "body": "{count} questions — answer them together and submit",
+      "subject": "Waiting for you",
+      "submit": "Submit",
+      "dismiss": "Not now",
+      "recommended": "Recommended",
+      "multiHint": "Select all that apply",
+      "requiredMissing": "Please answer the questions marked *",
+      "unsupportedQuestion": "Unsupported question form",
+      "unanswered": "(no answer)",
+      "autoMarker": "(auto-selected on timeout)",
+      "answered": "The user answered:",
+      "answeredState": "Answered",
+      "timedOut": "Timed out — auto-selected recommended answers where defined:",
+      "timedOutState": "Timed out (recommended applied)",
+      "dismissedState": "Not answered",
+      "dismissed": "The user dismissed the question card without answering. Proceed with your best judgment.",
+      "aborted": "The session was aborted; the question was cancelled."
+    },
     "mcpTool": {
       "allowForSession": "Don’t ask again this session",
       "allowAlways": "Always allow this tool",
@@ -5094,6 +5315,8 @@
       "unpin_memory": "Unpin",
       "recall_experience": "Past experience",
       "record_experience": "Log experience",
+      "learn_lesson": "Learn lesson",
+      "ask_user": "Ask user",
       "tenet_propose": "Propose",
       "knowledge_search": "Search sources",
       "knowledge_read": "Read source",
@@ -5126,6 +5349,12 @@
       "loop_control": "Loop control",
       "current_status": "Report status",
       "automation": "Automation",
+      "ast_edit": "Structural rewrite",
+      "ast_grep": "Structural search",
+      "checkpoint": "Checkpoint",
+      "context_notes": "Notes",
+      "goal": "Budget goal",
+      "lsp": "Language server",
       "subagent_reply": "Relay to subagent",
       "subagent_close": "Close subagent",
       "create_artifact": "Make card",
@@ -5142,7 +5371,10 @@
       "beautify_list-capabilities": "Beautify capabilities",
       "office_read-document": "Read document",
       "office_html-to-pdf": "Convert to PDF",
-      "office_list-capabilities": "Office capabilities"
+      "office_list-capabilities": "Office capabilities",
+      "rewind": "Rewind",
+      "run_code": "Run code",
+      "security_scan": "Security scan"
     },
     "copy": "Copy",
     "copied": "Copied",
@@ -5219,5 +5451,76 @@
     "createFailed": "Failed to create side session",
     "retry": "Retry",
     "empty": "Side session ready — ask away"
+  },
+  "envDeps": {
+    "title": "Environment Dependencies",
+    "refresh": "Re-check",
+    "checking": "Checking…",
+    "loadFailed": "Detection failed",
+    "lastChecked": "Last checked: {time}",
+    "sectionProjectMissing": "Needed by this project but missing",
+    "sectionProjectMissingHint": "Missing dependencies affect the listed features. Re-check after installing.",
+    "sectionInstalled": "Installed",
+    "sectionMissing": "Not installed (not needed by this project yet)",
+    "status": {
+      "installed": "Installed",
+      "managedInstalled": "Bundled",
+      "missing": "Missing"
+    },
+    "neededByProject": "Needed by project",
+    "installHint": "Install: {hint}",
+    "requiredByLabel": "Used by: {features}",
+    "requiredBy": {
+      "workspace_snapshots": "Workspace snapshots & rollback",
+      "file_history": "File history",
+      "run_code": "Code execution",
+      "grep_tool": "Code search",
+      "find_tool": "File finding",
+      "ast_tools": "AST structural code tools",
+      "security_scan": "Security scan enhancements",
+      "lsp": "Language servers (navigation/diagnostics)",
+      "media_video": "Video processing"
+    },
+    "startupMissing": "Missing environment dependencies this project needs: {names}",
+    "openSettings": "View"
+  },
+  "autolearn": {
+    "cardTitle": "Crystallize a lesson",
+    "suggested": "Auto-learn suggestion",
+    "approve": "Learn it",
+    "dismiss": "Dismiss",
+    "approvedState": "Learned",
+    "rejectedState": "Dismissed",
+    "expiredState": "Expired",
+    "decideFailed": "Action failed: {error}",
+    "installed": {
+      "title": "New skill learned",
+      "body": "The lesson was saved as skill \"{name}\" and enabled for the current agent."
+    },
+    "installFailed": {
+      "title": "Learning failed",
+      "body": "Skill \"{name}\" could not be saved; the lesson was not written."
+    }
+  },
+  "rewind": {
+    "confirm": {
+      "title": "Rewind to checkpoint?",
+      "body": "The conversation will go back to checkpoint \"{name}\"; everything after it is dropped.",
+      "subject": "Checkpoint",
+      "accept": "Rewind",
+      "reject": "Not now",
+      "filesTitle": "Also restore {count} file(s):",
+      "noFileChanges": "The snapshot has no file changes to restore.",
+      "snapshotUnavailable": "File snapshot unavailable: only the conversation rewinds, files stay as-is."
+    },
+    "result": {
+      "timeout": "Confirmation timed out — nothing was rewound.",
+      "aborted": "The confirmation was aborted — nothing was rewound.",
+      "rejected": "You chose not to rewind — nothing changed.",
+      "done": "Rewound to checkpoint \"{name}\"; dropped {count} entries.",
+      "filesOk": "Files restored from the snapshot ({count}).",
+      "filesDegraded": "File restore incomplete: {reason}",
+      "failed": "rewind failed"
+    }
   }
 }

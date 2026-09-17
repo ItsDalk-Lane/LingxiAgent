@@ -10,7 +10,6 @@ import { ChannelMessages, ChannelMembers, ChannelInput, ChannelReadonly, Channel
 import { ChannelHeader } from '../channels/ChannelHeader';
 import { MainContent } from '../../MainContent';
 import { ChatPage } from './ChatPage';
-import { KnowledgePage } from '../knowledge/KnowledgePage';
 
 const tr = (key: string, vars?: Record<string, string | number>) => window.t?.(key, vars) ?? key;
 
@@ -135,7 +134,6 @@ export function AppPages() {
 
       <MainContent>
         {currentTab === 'chat' && <ChatPage />}
-        {currentTab === 'knowledge' && <KnowledgePage />}
         {currentTab === 'channels' && <ChannelPage />}
         <ActivityPanel />
         <AutomationPanel />

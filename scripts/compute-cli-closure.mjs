@@ -439,6 +439,73 @@ export const DYNAMIC_CALL_ALLOWLIST = Object.freeze([
       + "runs a command string to resolve a config value. command is a local command "
       + "expression, not an import target; vendored dependency code.",
   },
+  {
+    file: "lib/tools/lsp-tool.ts",
+    callee: "spawnSync",
+    argText: "entry.serverCommand",
+    reason:
+      "LSP availability probe: spawnSync(serverCommand, ['--version']) checks whether the language "
+      + "server binary exists (same liveness pattern as rg/fd/ast-grep). Failure just reports "
+      + "LSP_SERVER_MISSING with an install hint; never a repo module.",
+  },
+  {
+    file: "lib/lsp/jsonrpc-client.ts",
+    callee: "spawn",
+    argText: "this.options.command",
+    reason:
+      "LSP client: spawns the configured language server (typescript-language-server / "
+      + "pyright-langserver / gopls / rust-analyzer / clangd) over stdio JSON-RPC. command comes "
+      + "from the fixed LSP_LANGUAGES registry (or the test-injected mock); availability is "
+      + "probed before start and a dead server is reported honestly as LSP_EXITED.",
+  },
+  {
+    file: "lib/sandbox/ast-grep-binary.ts",
+    callee: "spawnSync",
+    argText: "probe",
+    reason:
+      "ast-grep PATH probe: spawnSync(probe, ['--version']) checks whether the sg binary "
+      + "exists on PATH (same liveness pattern rg/fd use). probe is a fixed literal "
+      + "('sg' / 'sg.exe'); failure just resolves to null, no repo module involved.",
+  },
+  {
+    file: "lib/sandbox/ast-grep-tool.ts",
+    callee: "execFile",
+    argText: "sgPath",
+    reason:
+      "ast_grep search: execFile(sgPath, ['run','--pattern',...,'--json=compact']) runs the "
+      + "managed/PATH ast-grep binary for structural search. sgPath comes from "
+      + "ensureAstGrepBinary (managed dir or PATH probe); bounded by RUN_TIMEOUT_MS with "
+      + "timeout surfaced honestly as AST_GREP_TIMEOUT.",
+  },
+  {
+    file: "lib/sandbox/ast-edit-tool.ts",
+    callee: "execFile",
+    argText: "sgPath",
+    reason:
+      "ast_edit preview/apply: execFile(sgPath, ['run','--pattern',...]) runs the managed "
+      + "ast-grep binary; apply adds '--update-all' only after freshness checks. Bounded by "
+      + "RUN_TIMEOUT_MS; timeout after partial rewrite is reported, never swallowed.",
+  },
+  {
+    file: "lib/env-deps/detect.ts",
+    callee: "execFile",
+    argText: "bin",
+    reason:
+      "env-deps probe: execFile(bin, ['--version'], {timeout, maxBuffer}) runs the target "
+      + "binary being probed (git/python3/node/semgrep/... from the dependency registry), "
+      + "never a repo module. Bounded by PROBE_TIMEOUT_MS; failure resolves to a "
+      + "not_found/probe_timeout note by design -- probing absent binaries is the feature.",
+  },
+  {
+    file: "lib/env-deps/detect.ts",
+    callee: "execFile",
+    argText: "cmd",
+    reason:
+      "env-deps which/where lookup: execFile(cmd, [bin], ...) where cmd is the platform "
+      + "literal 'which' (posix) or 'where' (win32) chosen off process.platform; resolves "
+      + "a probed binary's absolute path, never an import target. Same bounded-timeout "
+      + "probe contract as the sibling entry above.",
+  },
 ]);
 
 const SPAWN_FAMILY_NAMES = new Set([

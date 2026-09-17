@@ -5,11 +5,20 @@ import { AgentAvatar, resolveAgentDisplayInfo } from '../../utils/agent-display'
 import { formatElapsed } from '../../utils/format-duration';
 import { stopSubagentProcess } from '../../services/background-process-control';
 import { navigateToChatCard } from '../../services/chat-card-navigation';
+import { Collapse } from '../../ui';
 import type { Agent } from '../../types';
 import styles from './AgentActivityCard.module.css';
 
 // stopping 兜底复位：3 倍于 background-process-control 的 REQUEST_TIMEOUT_MS（10s）。
 const STOPPING_FALLBACK_RESET_MS = 30_000;
+
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg className={styles.chevron} data-open={open} width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  );
+}
 
 function SubagentActivityRow({
   entry,
@@ -92,6 +101,8 @@ export function AgentActivityCard() {
   const all = useStore(selectAgentActivities(sessionPath));
   const agents = useStore((state) => state.agents);
   const [now, setNow] = useState(() => Date.now());
+  // 默认折叠（用户裁决）：运行信息容器内只露标题行，点击展开
+  const [collapsed, setCollapsed] = useState(true);
   const t = window.t ?? ((key: string) => key);
   const activities = all
     .filter((entry) => entry.kind === 'subagent' && entry.status === 'running')
@@ -106,23 +117,31 @@ export function AgentActivityCard() {
   if (!sessionPath || !activities.length) return null;
 
   return (
-    <section className={`universal-card ${styles.card}`} aria-label={t('rightWorkspace.subagent.title')}>
-      <div className={styles.header}>
+    <section className={`universal-card ${styles.card}`} aria-label={t('rightWorkspace.subagent.title')} data-collapsed={collapsed || undefined}>
+      <button
+        type="button"
+        className={styles.header}
+        onClick={() => setCollapsed(v => !v)}
+        aria-expanded={!collapsed}
+      >
         <span className={styles.title}>{t('rightWorkspace.subagent.title')}</span>
         <span className={styles.count}>{t('rightWorkspace.subagent.count', { n: activities.length })}</span>
-      </div>
-      <div className={styles.list}>
-        {activities.map((entry) => (
-          <SubagentActivityRow
-            key={entry.id}
-            entry={entry}
-            agents={agents}
-            now={now}
-            sessionId={sessionId}
-            sessionPath={sessionPath}
-          />
-        ))}
-      </div>
+        <Chevron open={!collapsed} />
+      </button>
+      <Collapse open={!collapsed}>
+        <div className={styles.list}>
+          {activities.map((entry) => (
+            <SubagentActivityRow
+              key={entry.id}
+              entry={entry}
+              agents={agents}
+              now={now}
+              sessionId={sessionId}
+              sessionPath={sessionPath}
+            />
+          ))}
+        </div>
+      </Collapse>
     </section>
   );
 }

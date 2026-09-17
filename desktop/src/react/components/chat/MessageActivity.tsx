@@ -45,6 +45,10 @@ const ACTIVITY_ICON_FAMILIES: Readonly<Record<string, string>> = {
   session: 'session', session_folders: 'folder',
   current_status: 'status', check_pending_tasks: 'checklist', loop_control: 'loop',
   create_artifact: 'card', dm: 'dm',
+  // learn_lesson=技能文档；ask_user=向用户提问（对话气泡）；ast 工具=搜索/编辑
+  learn_lesson: 'skill', ask_user: 'dm',
+  ast_grep: 'search', ast_edit: 'edit',
+  checkpoint: 'checklist', rewind: 'loop', security_scan: 'search', goal: 'status', context_notes: 'read', run_code: 'terminal', lsp: 'search',
   // Pi SDK 沙盒工具
   read: 'read', write: 'edit', edit: 'edit',
   grep: 'search', find: 'search', ls: 'ls',

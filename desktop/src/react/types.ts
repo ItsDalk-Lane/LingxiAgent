@@ -433,7 +433,8 @@ export interface TodoItem {
 
 // ── 浮动面板类型 ──
 export type ActivePanel = 'activity' | 'automation' | 'bridge' | 'skills' | null;
-export type TabType = 'chat' | 'knowledge' | 'channels';
+// 知识库已从页签改为侧栏弹窗（KnowledgeModal），不再是独立 Tab
+export type TabType = 'chat' | 'channels';
 export type RightWorkspaceTab = 'session-files' | 'workspace' | 'project-skills';
 
 export interface FileVersion {

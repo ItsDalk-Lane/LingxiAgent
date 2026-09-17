@@ -43,6 +43,7 @@ export const STANDARD_TOOL_NAMES = [
   "tenet_propose",
   "check_pending_tasks",
   "current_status",
+  "ask_user",
   "session_folders",
   "stop_task",
   "hana_card_guide",
@@ -66,10 +67,20 @@ export const LEGACY_INTERNAL_TOOL_NAMES = [
 
 export const OPTIONAL_TOOL_NAMES = [
   "automation",
+  "ast_edit",
+  "ast_grep",
+  "checkpoint",
+  "goal",
+  "context_notes",
   "beautify",
   "browser",
+  "lsp",
   "install_skill",
+  "learn_lesson",
   "office",
+  "rewind",
+  "run_code",
+  "security_scan",
   "session",
   "update_settings",
   "workflow",
@@ -79,6 +90,115 @@ export const PLUGIN_BACKED_OPTIONAL_TOOL_IDS = {
   beautify: "beautify",
   office: "office",
 };
+
+/**
+ * The only first-party tools a session keeps in its cacheable tool prefix.
+ *
+ * Product rule (2026-09): the resident surface is exactly the four original
+ * Pi coding-agent tools — read, write, edit, exec_command. Everything else
+ * categorized below defers into the on-demand catalog and is reached through
+ * mcp_search_tools / mcp_describe_tool / mcp_call.
+ */
+export const RESIDENT_CORE_TOOL_NAMES = [
+  "read",
+  "write",
+  "edit",
+  "exec_command",
+];
+
+/**
+ * Permission contracts for deferred first-party tools that own no
+ * `sessionPermission` resolver (the host permission classifier adjudicates
+ * them on the direct surface). A deferred invocation authorizes through the
+ * target's own contract, so each of these must reproduce what the host
+ * classifier would decide — never wider. Values:
+ *
+ *   "read"    — allow in every mode; reserved for INFORMATION_TOOLS members
+ *               (core/session-permission-mode.ts) whose direct path always
+ *               allows.
+ *   "execute" — allow in operate, blocked in read-only, prompt/review
+ *               otherwise; matches the direct path for these tools or is one
+ *               step stricter (fail-closed).
+ *   "file" / "session-folders" — argument-aware: their read-only sub-actions
+ *               map to read, everything else to execute, mirroring
+ *               classifyFileAction / classifySessionFoldersAction.
+ *
+ * A deferred candidate missing from this map AND lacking its own resolver
+ * stays resident (engine falls back with a warning) — never deferred blind.
+ */
+export const FIRST_PARTY_DEFERRED_PERMISSION_CONTRACTS = {
+  grep: "read",
+  find: "read",
+  ls: "read",
+  web_search: "read",
+  web_fetch: "read",
+  current_status: "read",
+  search_memory: "read",
+  write_stdin: "execute",
+  computer: "execute",
+  session: "execute",
+  workflow: "execute",
+  file: "file",
+  "session_folders": "session-folders",
+};
+// Mirrors FILE_READ_ACTIONS / SESSION_COLLAB_READ_ACTIONS in
+// core/session-permission-mode.ts. Kept as literal sets with a drift note
+// rather than an import so shared/ stays dependency-free; the startup
+// assertion cannot see these, so changes there must be mirrored here.
+const FILE_TOOL_READ_ACTIONS = new Set(["stat"]);
+const SESSION_FOLDERS_READ_ACTIONS = new Set(["list"]);
+
+/**
+ * The synthetic invocation descriptor for a deferred first-party tool without
+ * its own resolver. `params` may be undefined for a static contract. Returns
+ * null when the tool's contract kind is argument-aware but the arguments are
+ * not a plain record — the caller must then fail closed.
+ */
+export function firstPartyDeferredInvocation(name: string, params?: unknown) {
+  const kind = FIRST_PARTY_DEFERRED_PERMISSION_CONTRACTS[name];
+  if (!kind) return null;
+  if (kind === "read") {
+    return { action: "read", kind: "read", capability: `${name}.read` };
+  }
+  if (kind === "execute") {
+    return { action: "execute", kind: "review", capability: `${name}.execute` };
+  }
+  if (typeof params !== "object" || params === null || Array.isArray(params)) return null;
+  const action = typeof (params as Record<string, unknown>).action === "string"
+    ? (params as Record<string, unknown>).action as string
+    : "";
+  if (kind === "file") {
+    return FILE_TOOL_READ_ACTIONS.has(action)
+      ? { action: "read", kind: "read", capability: `${name}.read` }
+      : { action: "execute", kind: "review", capability: `${name}.execute` };
+  }
+  if (kind === "session-folders") {
+    return SESSION_FOLDERS_READ_ACTIONS.has(action)
+      ? { action: "read", kind: "read", capability: `${name}.read` }
+      : { action: "execute", kind: "review", capability: `${name}.execute` };
+  }
+  return null;
+}
+
+/**
+ * On-demand (deferred) first-party tools: every categorized built-in except
+ * the resident four and the retired internal transports. Computed rather than
+ * hand-listed so the product rule stays "only read/write/edit/exec_command
+ * remain resident" when new tools are added — assertAllToolsCategorized still
+ * forces every new name into a category, and this derivation then defers it
+ * by default.
+ */
+export const ONDEMAND_CORE_TOOL_NAMES = uniqueToolNames(
+  [
+    ...CORE_TOOL_NAMES,
+    ...STANDARD_TOOL_NAMES,
+    ...GLOBAL_TOOL_NAMES,
+    ...OPTIONAL_TOOL_NAMES,
+  ].filter((name) => (
+    !RESIDENT_CORE_TOOL_NAMES.includes(name)
+    && !LEGACY_INTERNAL_TOOL_NAMES.includes(name)
+  )),
+);
 
 /**
  * Built-ins whose invocation boundary is enforced by an older host-owned
@@ -237,6 +357,40 @@ export function assertAllBuiltInToolsPermissionCovered(actualTools) {
     throw new Error(
       `Built-in tools missing invocation permission coverage: ${missing.join(", ")}.\n`
       + "Add a tool-owned sessionPermission.resolveInvocation descriptor, or explicitly document its host gateway in shared/tool-categories.js.",
+    );
+  }
+}
+
+/**
+ * Startup invariant for the on-demand split. Throwing here always means a
+ * developer broke one of these rules in this file:
+ *   - the resident set is exactly four tools, all core-categorized;
+ *   - the resident set never overlaps the on-demand set;
+ *   - every synthetic permission contract names an on-demand tool.
+ * The fix is always here — never at the call site.
+ *
+ * @throws {Error} on any violation
+ */
+export function assertOnDemandCoreToolNamesSound() {
+  const coreNames = new Set(CORE_TOOL_NAMES);
+  const problems = [];
+  for (const name of RESIDENT_CORE_TOOL_NAMES) {
+    if (!coreNames.has(name)) problems.push(`${name}: resident set must only contain CORE tools`);
+  }
+  if (problems.length === 0) {
+    const onDemand = new Set(ONDEMAND_CORE_TOOL_NAMES);
+    for (const name of RESIDENT_CORE_TOOL_NAMES) {
+      if (onDemand.has(name)) problems.push(`${name}: resident and on-demand sets overlap`);
+    }
+    for (const name of Object.keys(FIRST_PARTY_DEFERRED_PERMISSION_CONTRACTS)) {
+      if (!onDemand.has(name)) {
+        problems.push(`${name}: synthetic contract exists but the tool is resident or unknown`);
+      }
+    }
+  }
+  if (problems.length > 0) {
+    throw new Error(
+      `The on-demand split in shared/tool-categories.ts is unsound:\n  - ${problems.join("\n  - ")}`,
     );
   }
 }

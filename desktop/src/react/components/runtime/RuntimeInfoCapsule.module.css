@@ -117,7 +117,7 @@
     border-top: 1px solid var(--overlay-light);
 }
 
-/* ── 笺 Section（始终可用，无 session 时容器也不为空） ── */
+/* ── 笺 Section（始终可用，无 session 时容器也不为空；默认折叠只露标题行） ── */
 .jianSection {
     display: flex;
     flex-direction: column;
@@ -127,9 +127,17 @@
 .jianHeader {
     display: flex;
     align-items: center;
+    gap: var(--space-6);
+    width: 100%;
     min-height: 34px;
     padding: 0 var(--space-16);
     flex-shrink: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font-family: inherit;
+    text-align: left;
+    cursor: default;
 }
 
 .jianTitle {
@@ -137,6 +145,16 @@
     font-size: 0.94rem;
     font-weight: 600;
     color: var(--text-light);
+}
+
+.jianChevron {
+    margin-left: auto;
+    color: var(--text-light);
+    transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.jianChevron[data-open="false"] {
+    transform: rotate(-90deg);
 }
 
 .jianBody {
