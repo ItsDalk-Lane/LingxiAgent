@@ -37,6 +37,21 @@ function fail(msg) {
   process.exit(1);
 }
 
+/**
+ * 跨设备落位：Windows 托管机 TEMP 在 C:、工作区在 D:，renameSync 跨盘符
+ * 抛 EXDEV（v0.1.40-experimental.1 第二次 tag 的 Windows 腿实锤）；
+ * 回退 copy+delete，语义与 rename 一致（目标不存在、覆盖无残留）。
+ */
+function moveAcrossDevices(src, dest) {
+  try {
+    fs.renameSync(src, dest);
+  } catch (err) {
+    if (err?.code !== "EXDEV") throw err;
+    fs.copyFileSync(src, dest);
+    fs.rmSync(src, { force: true });
+  }
+}
+
 function parseArgs(argv) {
   const positional = [];
   let force = false;
@@ -248,7 +263,7 @@ function main() {
       const fetched = t.source === "github"
         ? fetchGithubTool({ repo: t.repo, tagPrefix: t.tagPrefix, binaryName: t.binaryFileName.replace(/\.exe$/, ""), assetName: t.assetName }, tmpDir)
         : fetchNpmPlatformPackage({ packageName: t.packageName }, tmpDir, platform);
-      fs.renameSync(fetched.found, dest);
+      moveAcrossDevices(fetched.found, dest);
       if (platform !== "win32") fs.chmodSync(dest, 0o755);
       smokeOrVerify(dest, platform, arch);
       console.log(`[bundled-bins] ${t.id} ${fetched.version} → ${dest}`);
