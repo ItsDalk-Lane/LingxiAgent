@@ -1,239 +1,185 @@
 {
   "schemaVersion": 1,
-  "tag": "v0.1.39",
-  "version": "0.1.39",
-  "previousTag": "v0.1.38",
-  "generatedAt": "2026-09-12T00:02:00.511Z",
+  "tag": "v0.1.40-experimental.1",
+  "version": "0.1.40-experimental.1",
+  "previousTag": "v0.1.39",
+  "generatedAt": "2026-09-18T13:29:56.000Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "这个版本让工具调用看得懂也找得回：工具行改成五语言短标签与家族图标，每一步的输入、输出与改动都能按需展开完整内容，不再被省略截断。任务清单改到输入框上方，支持受阻、取消与收尾操作并跨轮保留；会话还新增了独立小聊天面板、Git worktree 管理与可恢复文件改动的回退能力。",
-    "en": "This version makes tool calls readable and recoverable: tool rows now use short localized labels with family icons, and every step's input, output and changes can be expanded to the full recorded content instead of an ellipsis. The task checklist moved above the composer with blocked, cancelled and wrap-up states that survive across turns; conversations also gain a side-chat panel, Git worktree management, and an opt-in rollback that restores file changes."
+    "zh": "实验版本（不占用正式更新通道，仅进 beta 列车）：新增「编排工具」——让助手把一整串工具调用写成一段程序一次跑完：列目录、翻文件、并发搜索都可以在一个小剧本里完成，中间过程不进聊天记录，只在下方缩进列出每一步的成败与耗时，点开可看参数与完整结果；每个子步骤仍走与手动调用相同的逐项审批。这一版还带上了按需工具加载（常驻工具面瘦身约 76%）、工作区技能热更新与逐个开关、模型观测子标签页、回退检查点，以及 rg/fd/ast-grep 搜索组件随安装包内置；修复了代码运行台与语言服务工具在 macOS/Linux 上缺失的问题。",
+    "en": "Experimental build (beta train only, never Latest): adds the Orchestration tool — the assistant writes one program that runs a whole chain of tool calls (list, read, fan-out searches) in one shot; intermediate results stay out of the chat and appear as an indented list of sub-steps with status, timing, expandable arguments and full outputs, each sub-step still gated by the same per-call approvals as manual calls. Also bundled since 0.1.39: on-demand tool loading (~76% smaller resident tool surface), per-skill workspace hot toggles, observability sub-tabs, rollback checkpoints, rg/fd/ast-grep shipped inside the installer, and a fix restoring the code-runner and language-service tools on macOS/Linux."
   },
   "counts": {
-    "feature": 4,
-    "fix": 2,
-    "improvement": 1,
+    "feature": 3,
+    "fix": 1,
+    "improvement": 3,
     "migration": 0
   },
   "source": {
     "owner": "ItsDalk-Lane",
     "repo": "LingxiAgent",
-    "commitRange": "v0.1.38..015e1b491fed1cfed10d1eade05851bfc6a5364e",
-    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.39",
+    "commitRange": "v0.1.39..59c131276",
+    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.40-experimental.1",
     "releaseNotes": ""
   },
   "items": [
     {
-      "id": "tool-activity-presentation",
+      "id": "ptc-run-tools",
       "kind": "feature",
       "importance": "high",
       "title": {
-        "zh": "工具调用展示层重做：每一步都能看清在做什么、结果是什么",
-        "en": "Tool-call display reworked: every step shows what ran and what came back"
+        "zh": "编排工具：一段程序跑完一串工具调用",
+        "en": "Orchestration tool: one program runs a whole chain of tool calls"
       },
       "summary": {
-        "zh": "进程区的工具行按发生顺序逐条展示，读取、搜索、修改、终端各有自己的详情形态；读取显示真实行号范围，搜索按文件和命中行分组，编辑显示真实差异与改写后的正文，终端保留完整命令与工作目录。所有大内容首屏只给预览，展开后按保存记录取回完整原文。",
-        "en": "Tool rows in the process area are listed in order, each with its own detail shape for reads, searches, edits and terminals: reads show real line ranges, searches group by file and matching line, edits show the real diff plus the resulting content, and terminals keep the full command and working directory. Large content ships as a preview and expands to the full recorded body."
+        "zh": "助手可以把多步工作写成一段异步程序一次性执行：循环、并发、条件分支都可以，程序里 await 调用本会话的任意工具。中间结果留在沙箱里不占对话上下文，只有程序打印的内容与最终返回值回到聊天；每一步子调用单独走权限审批，与手动调用同权。",
+        "en": "The assistant can write one async program that performs multi-step work in a single call — loops, concurrency and conditionals included, awaiting any session tool. Intermediate results stay in a sandbox outside the conversation; only printed output and the return value come back. Every sub-call goes through the same per-call permission gates as manual calls."
       },
       "details": [
         {
-          "zh": "大结果不再一次塞满聊天流：首包只带计数与预览，点开才读取完整已记录内容。",
-          "en": "Large results no longer flood the transcript: the first page carries counts and a preview, and the full recorded content is read only when expanded."
+          "zh": "聊天里编排工具行下方缩进列出每一步：工具名、成败、耗时，点开可看参数与完整结果，与正常调用完全同源。",
+          "en": "Below the orchestration row, each sub-step is listed indented with tool name, status and timing, expanding to arguments and full output exactly like a normal call."
         },
         {
-          "zh": "改动的增删统计取自完整补丁；补丁被截断预览时不再编造总数。",
-          "en": "Added/removed counts come from the complete patch; a truncated preview never invents a total."
+          "zh": "程序在无文件系统与网络访问的隔离沙箱中执行，墙钟 10 分钟、内存 256MB、输出 128KB、并发 8 路封顶。",
+          "en": "The program runs in an isolated sandbox with no filesystem or network access, capped at 10 minutes wall clock, 256 MB memory, 128 KB output and 8 concurrent sub-calls."
         },
         {
-          "zh": "失败或待执行的改动不会显示成\"已应用\"。",
-          "en": "Failed or pending changes are never presented as applied."
+          "zh": "长任务的中间过程不再刷屏：一次编排内部可以递归翻目录、并发搜索，只占对话一次调用。",
+          "en": "Long tasks stop flooding the transcript: one orchestration can walk directories and fan out searches internally while occupying a single conversation call."
         }
       ],
       "sources": [
         {
           "type": "commit",
-          "ref": "74cd07fb7",
-          "title": "feat: 工具活动展示层重构（MessageActivity/SearchActivity 与 presentation 模块）"
+          "ref": "59c131276",
+          "title": "feat: PTC 程序化工具调用（run_tools）+ run_code/lsp 注册修复 + 内置二进制批次收口"
         }
       ]
     },
     {
-      "id": "tool-display-integrity",
-      "kind": "fix",
+      "id": "on-demand-tool-loading",
+      "kind": "improvement",
       "importance": "high",
       "title": {
-        "zh": "修复工具详情三类显示缺陷：敏感字段遮盖、搜索结构还原、实时与历史完整度一致",
-        "en": "Three tool-detail defects fixed: secret masking, search structure recovery, and live/history completeness parity"
+        "zh": "按需工具加载：常驻工具面瘦身约 76%",
+        "en": "On-demand tool loading: resident tool surface shrinks ~76%"
       },
       "summary": {
-        "zh": "一轮对抗性审查确认了工具详情链路上三个真实缺陷，本版一并修复：结构化结果里出现多段文本时敏感字段会失去遮盖；大搜索的路径与行号在重开会话后有被字符串误读的风险；实时结果超过上限后只能复制到截断预览，重开历史却能看到全文。",
-        "en": "An adversarial review confirmed three real defects in the tool-detail path, all fixed here: sensitive fields lost their masking once a result contained several text segments; paths and line numbers in large searches risked being misread from text after reopening a conversation; and live results above the size cap could only be copied as a truncated preview while a reopened conversation showed the full body."
+        "zh": "每轮对话常驻的工具清单收缩到最核心的四个（读、写、改、执行命令），其余全部进目录按需取用：助手先搜目录、看说明再调用。直载面从约 37KB 降到 8.9KB，长对话更省、缓存更稳。",
+        "en": "The per-turn resident tool list shrinks to the core four (read, write, edit, exec); everything else moves into a searchable catalog the assistant consults on demand. The resident surface drops from ~37KB to 8.9KB, saving tokens and stabilizing caching on long conversations."
       },
-      "details": [
-        {
-          "zh": "敏感字段遮盖改为按结果内的每个结构块独立进行：结构化块与普通说明混排时凭证仍然被遮盖，普通代码正文不受影响。",
-          "en": "Secret masking now runs per structure block inside a result: tokens stay masked when a structured block sits next to plain prose, and ordinary source text is left intact."
-        },
-        {
-          "zh": "大搜索的路径、行号、是否为上下文行与命中总数改为按保存记录的结构化事实恢复，不再由展示文本反推。",
-          "en": "Large-search paths, line numbers, context flags and match totals are restored from the saved structured facts instead of being inferred from display text."
-        },
-        {
-          "zh": "实时结果超过上限时同样给出可加载引用：实时查看与重开历史后查看拿到同一份完整已记录内容。",
-          "en": "Live results above the cap now carry a loadable reference: viewing right after the run and viewing after reopening the conversation yield the same complete recorded content."
-        }
-      ],
+      "details": [],
       "sources": [
         {
           "type": "commit",
-          "ref": "015e1b491",
-          "title": "fix(chat): 工具展示链路五项对抗审查缺陷修复"
+          "ref": "6282cf35b",
+          "title": "feat: 工作区批量收口——omp 迁移 14 件+环境依赖系统+按需工具加载+观测子标签+回退检查点"
         }
       ]
     },
     {
-      "id": "todo-checklist-rework",
-      "kind": "feature",
-      "importance": "high",
-      "title": {
-        "zh": "任务清单改到输入框上方：受阻、取消与收尾操作，跨轮保留",
-        "en": "Task checklist moves above the composer: blocked, cancelled and wrap-up states that persist across turns"
-      },
-      "summary": {
-        "zh": "清单现在显示在输入框上方，带完成计数、并行任务摘要与可展开的五态列表；受阻项必须写明原因，完成与收纳分开，用户自己勾选或取消的结果不会被模型的后续更新覆盖。",
-        "en": "The checklist now sits above the composer with a completion count, a parallel-task summary and an expandable five-state list; blocked items must state a reason, completing is separated from archiving, and the states you set yourself are not overwritten by later model updates."
-      },
-      "details": [
-        {
-          "zh": "清单版本哈希保护你的收尾操作：模型基于旧清单的更新会被拒绝并明确提示，不会悄悄改回。",
-          "en": "A checklist version hash protects your wrap-up actions: updates based on a stale checklist are rejected with a clear notice instead of silently reverting."
-        },
-        {
-          "zh": "工具回执失败或数据损坏时保留最后一份有效清单并标记更新失败，不再把整份清单清空。",
-          "en": "When a tool receipt fails or data is damaged, the last valid checklist is kept and flagged as an update failure instead of being wiped."
-        },
-        {
-          "zh": "消息流里的清单行显示完成数与当前步骤，右侧工作区的重复清单已移除。",
-          "en": "The in-transcript checklist row shows completed count and current step; the duplicate panel in the right workspace is gone."
-        }
-      ],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "d759b6951",
-          "title": "feat: 任务清单改版——输入框上方进度条、五态与收尾操作、跨轮延续"
-        }
-      ]
-    },
-    {
-      "id": "file-rollback-restore",
+      "id": "workspace-skill-hot-toggle",
       "kind": "feature",
       "importance": "medium",
       "title": {
-        "zh": "重试时可以连文件改动一起撤回（默认关闭）",
-        "en": "Retry can now also roll back file changes (off by default)"
+        "zh": "工作区技能热更新与逐个开关",
+        "en": "Workspace skills hot-reload with per-skill toggles"
       },
       "summary": {
-        "zh": "开启后，重试一轮对话时可以选择把该轮写入的文件恢复到改动前的内容，并在执行前看到将要回退的文件清单、执行后看到逐文件结果。快照存放在独立影子仓库中，不会往你的项目里添加任何文件。",
-        "en": "When enabled, retrying a turn can restore the files that turn wrote back to their previous content, showing the file list before running and a per-file report afterwards. Snapshots live in a separate shadow repository and add no files to your project."
+        "zh": "项目自带的技能改动后无需重启即生效；每个技能可以单独关闭，关掉总闸时相关条目一并隐藏。",
+        "en": "Project-bundled skills reload without a restart, and each one can be toggled off individually; closing the master switch hides them all."
       },
-      "details": [
-        {
-          "zh": "回退是显式选项而非默认行为：确认框里可以选择只重试、或重试并回退文件。",
-          "en": "Rollback is an explicit choice rather than the default: the confirmation offers retry only, or retry with file restore."
-        },
-        {
-          "zh": "取不到改动前内容时会明确说明原因（例如文件过大或不是文本），不会假装已回退。",
-          "en": "When the previous content cannot be obtained, the reason is stated (too large, not text, and so on) instead of pretending the file was restored."
-        }
-      ],
+      "details": [],
       "sources": [
         {
           "type": "commit",
-          "ref": "9c4b11114",
-          "title": "feat: 回退连文件还原、清单上下文连续性、side-chat 与 git worktree 批量交付"
+          "ref": "a5e596718",
+          "title": "feat: 工作区技能热更新×逐个开关 + 语音模型批次 + 测试收口"
         }
       ]
     },
     {
-      "id": "context-continuity",
+      "id": "run-code-lsp-registration-fix",
       "kind": "fix",
       "importance": "medium",
       "title": {
-        "zh": "修复清单闪烁与中断标记：跨轮上下文更连续",
-        "en": "Checklist flicker and interruption markers fixed for more continuous context"
+        "zh": "修复：代码运行台与语言服务工具在 macOS/Linux 上缺失",
+        "en": "Fix: code-runner and language-service tools missing on macOS/Linux"
       },
       "summary": {
-        "zh": "修掉了任务清单面板在新一轮开始时短暂闪烁回空的根因；新请求会带上当前权威清单，任务中途停止会留下中断标记，模型下一轮能看出上一轮是被打断而不是正常结束。",
-        "en": "The root cause of the task panel briefly flashing empty at the start of a new turn is fixed; new requests carry the current authoritative checklist, and stopping mid-task leaves an interruption marker so the next turn can tell the previous one was cut short."
+        "zh": "工具装配清单此前只在 Windows 分支挂载这两个工具（还重复挂了一次），macOS 与 Linux 会话完全拿不到它们；现已三平台一致。",
+        "en": "The assembly list only wired these two tools on Windows (twice, deduped silently); macOS and Linux sessions never got them. All three platforms now match."
       },
-      "details": [
-        {
-          "zh": "清单与提醒按节流注入，避免每轮重复占用上下文。",
-          "en": "Checklist and reminders are injected with throttling so they do not consume context every turn."
-        }
-      ],
+      "details": [],
       "sources": [
         {
           "type": "commit",
-          "ref": "9c4b11114",
-          "title": "feat: 回退连文件还原、清单上下文连续性、side-chat 与 git worktree 批量交付"
+          "ref": "59c131276",
+          "title": "feat: PTC 程序化工具调用（run_tools）+ run_code/lsp 注册修复 + 内置二进制批次收口"
         }
       ]
     },
     {
-      "id": "side-chat-git-worktree",
-      "kind": "feature",
-      "importance": "medium",
-      "title": {
-        "zh": "新增独立小聊天面板与 Git worktree 管理",
-        "en": "New side-chat panel and Git worktree management"
-      },
-      "summary": {
-        "zh": "可以在不打断主对话的情况下开一个小聊天面板单独问一件事；Git 面板支持创建与列出 worktree 分支，并新增提交历史与分支列表接口。",
-        "en": "A side-chat panel lets you ask something separately without interrupting the main conversation; the Git panel can create and list worktree branches, with new commit-history and branch-list endpoints."
-      },
-      "details": [
-        {
-          "zh": "worktree 相关路由沿用同一套安全白名单，不接受任意路径。",
-          "en": "Worktree routes reuse the same safety allowlist and never accept arbitrary paths."
-        }
-      ],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "9c4b11114",
-          "title": "feat: 回退连文件还原、清单上下文连续性、side-chat 与 git worktree 批量交付"
-        }
-      ]
-    },
-    {
-      "id": "tool-short-labels",
+      "id": "bundled-search-binaries",
       "kind": "improvement",
       "importance": "medium",
       "title": {
-        "zh": "工具行改用五语言短标签与家族图标",
-        "en": "Tool rows use short localized labels with family icons"
+        "zh": "搜索组件随安装包内置",
+        "en": "Search binaries ship inside the installer"
       },
       "summary": {
-        "zh": "工具行的主标签不再是裸英文工具名，而是各语言的短词（回想、查资料、落盘……），并按记忆、知识、频道、浏览器等家族给专属图标；查不到专属文案的第三方插件与 MCP 工具统一显示为\"扩展\"，原工具名保留在悬停提示与完整调用弹窗里。",
-        "en": "Tool rows no longer lead with raw English tool names but with short words in each language, each carrying a family icon for memory, knowledge, channels, browser and so on; third-party plugins and MCP tools without their own copy show the shared \"extension\" label, while the real tool name stays in the hover hint and the full call dialog."
+        "zh": "ripgrep、fd、ast-grep 改为随安装包分发，不再依赖用户机器上是否恰好装了它们；代码搜索与结构化查找开箱即用。",
+        "en": "ripgrep, fd and ast-grep now ship with the installer instead of relying on the user's machine; code search and structural queries work out of the box."
       },
-      "details": [
-        {
-          "zh": "图标家族由旧的正则子串匹配改为精确登记加通用网格兜底：叫 deep-search 的插件工具不会再被猜成搜索。",
-          "en": "Icon families moved from substring regexes to explicit registration with a generic grid fallback, so a plugin tool named deep-search is no longer guessed as a search."
-        },
-        {
-          "zh": "短标签覆盖改为按插件与注册面独立对账，内置插件工具漏配或写错会直接让门禁失败。",
-          "en": "Short-label coverage is now reconciled against the plugin and registry surfaces independently, so a missing or misspelled built-in plugin tool fails the gate directly."
-        }
-      ],
+      "details": [],
       "sources": [
         {
           "type": "commit",
-          "ref": "1f1302ac5",
-          "title": "feat(chat): 工具行短标签全覆盖 + 家族图标"
+          "ref": "59c131276",
+          "title": "feat: PTC 程序化工具调用（run_tools）+ run_code/lsp 注册修复 + 内置二进制批次收口"
+        }
+      ]
+    },
+    {
+      "id": "observability-subtabs",
+      "kind": "improvement",
+      "importance": "low",
+      "title": {
+        "zh": "模型观测页拆分子标签与用量图表",
+        "en": "Observability page gains sub-tabs and usage charts"
+      },
+      "summary": {
+        "zh": "观测页拆成三个子标签，用量页常驻四张图表与指标卡；「推理 0 tok」的显示错误也一并修复。",
+        "en": "The observability page splits into three sub-tabs with four standing charts and metric cards on the usage tab; the \"0 reasoning tokens\" display bug is fixed too."
+      },
+      "details": [],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "6282cf35b",
+          "title": "feat: 工作区批量收口——omp 迁移 14 件+环境依赖系统+按需工具加载+观测子标签+回退检查点"
+        }
+      ]
+    },
+    {
+      "id": "rollback-checkpoints",
+      "kind": "feature",
+      "importance": "low",
+      "title": {
+        "zh": "回退检查点",
+        "en": "Rollback checkpoints"
+      },
+      "summary": {
+        "zh": "重要的文件修改前自动留下检查点，可以从检查点回退而不必手动翻找旧版本。",
+        "en": "Checkpoints are captured before important file changes, so you can roll back without hunting for old copies by hand."
+      },
+      "details": [],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "6282cf35b",
+          "title": "feat: 工作区批量收口——omp 迁移 14 件+环境依赖系统+按需工具加载+观测子标签+回退检查点"
         }
       ]
     }

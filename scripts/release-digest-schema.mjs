@@ -1,6 +1,13 @@
-import announcement from "../desktop/src/shared/post-update-announcement.cjs";
+import { compareProductVersions as compareSemverProductVersions } from "../shared/artifact-core/release-order.cjs";
 
-const { compareProductVersions } = announcement;
+/**
+ * 版本先后判定走共享内核的全 SemVer 比较器（含 prerelease：0.1.40-beta.1 > 0.1.39、
+ * < 0.1.40，与 release-preflight/artifact 顺序同一套语义）。展示侧
+ * post-update-announcement.cjs 的三段式比较器保持不动——它的「无 prerelease 语义」
+ * 是 About 公告展示的刻意设计：prerelease 条目在那侧解析为 null、被过滤不显示，
+ * 正好让稳定版用户看不到实验版公告。
+ */
+const compareProductVersions = compareSemverProductVersions;
 
 export const DIGEST_SCHEMA_VERSION = 1;
 export const DIGEST_ASSET_NAME = "release-digest.v1.json";
