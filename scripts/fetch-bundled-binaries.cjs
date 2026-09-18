@@ -66,49 +66,54 @@ function parseArgs(argv) {
   return { platform, arch, force };
 }
 
-function githubLatestTag(repo) {
-  // GitHub Actions 托管机共享出口 IP，匿名 API 限流（60 次/小时）经常整段 403，
-  // CI 里必须带 GITHUB_TOKEN（workflow 的 fetch 步骤注入）；本地无 token 照旧匿名。
-  const authHeader = process.env.GITHUB_TOKEN
-    ? `process.env.GITHUB_TOKEN && (headers.Authorization = "Bearer " + process.env.GITHUB_TOKEN);`
-    : "";
-  const res = spawnSync("node", ["-e", `
-    const headers = { "User-Agent": "lingxi-bundled-bins" };
-    ${authHeader}
-    fetch("https://api.github.com/repos/${repo}/releases/latest", {
-      headers,
-      signal: AbortSignal.timeout(${NETWORK_TIMEOUT_MS}),
-    }).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-      .then(j => process.stdout.write(String(j.tag_name || "")))
-      .catch(e => { console.error(e.message); process.exit(1); });
-  `], { encoding: "utf8", timeout: NETWORK_TIMEOUT_MS + 5_000 });
-  if (res.status !== 0 || !res.stdout.trim()) fail(`GitHub latest tag for ${repo}: ${res.stderr || res.status}`);
-  return res.stdout.trim();
+/**
+ * GitHub API/资产请求的公共头：CI 里带 GITHUB_TOKEN（托管机共享出口 IP，匿名
+ * 限流 60 次/小时整段 403），本地无 token 照旧匿名。
+ */
+function githubHeaders() {
+  const headers = { "User-Agent": "lingxi-bundled-bins" };
+  if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+  return headers;
 }
 
-function downloadTo(url, dest) {
-  const authHeader = process.env.GITHUB_TOKEN
-    ? `process.env.GITHUB_TOKEN && (headers.Authorization = "Bearer " + process.env.GITHUB_TOKEN);`
-    : "";
-  execFileSync("node", ["-e", `
-    const fs = require("node:fs");
-    const { Readable } = require("node:stream");
-    const { pipeline } = require("node:stream/promises");
-    const headers = { "User-Agent": "lingxi-bundled-bins" };
-    ${authHeader}
-    fetch(process.argv[1], {
-      headers,
+/**
+ * 网络请求一律进程内 fetch，不再套 node -e 子进程：子进程成功路径的显式
+ * process.exit 在 Windows 上与 libuv 异步句柄收尾赛跑，偶发
+ * "Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)"（0xC0000409）把
+ * 下载进程带崩（v0.1.40-experimental.1 第三次 tag 的 Windows 腿实锤）。
+ * 资产走 arrayBuffer 落盘（rg/fd 包均 ~2MB 量级），无流式句柄、无退出竞态。
+ */
+async function githubLatestTag(repo) {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repo}/releases/latest`, {
+      headers: githubHeaders(),
+      signal: AbortSignal.timeout(NETWORK_TIMEOUT_MS),
+    });
+    if (!res.ok) fail(`GitHub latest tag for ${repo}: HTTP ${res.status}`);
+    const json = await res.json();
+    if (!json.tag_name) fail(`GitHub latest tag for ${repo}: empty tag_name`);
+    return String(json.tag_name);
+  } catch (err) {
+    if (err?.message?.startsWith("[bundled-bins]")) throw err;
+    fail(`GitHub latest tag for ${repo}: ${err?.message || err}`);
+  }
+}
+
+async function downloadTo(url, dest) {
+  try {
+    const res = await fetch(url, {
+      headers: githubHeaders(),
       signal: AbortSignal.timeout(180_000),
       redirect: "follow",
-    }).then(r => {
-      if (!r.ok || !r.body) throw new Error("HTTP " + r.status);
-      return pipeline(Readable.fromWeb(r.body), fs.createWriteStream(process.argv[2]));
-    }).then(() => {
-      if (!fs.existsSync(process.argv[2]) || fs.statSync(process.argv[2]).size === 0) {
-        throw new Error("empty download");
-      }
-    }).then(() => process.exit(0)).catch(e => { console.error(e.message); process.exit(1); });
-  `, url, dest], { stdio: ["ignore", "inherit", "inherit"], timeout: 200_000 });
+    });
+    if (!res.ok) fail(`download ${url}: HTTP ${res.status}`);
+    const body = Buffer.from(await res.arrayBuffer());
+    if (body.length === 0) fail(`download ${url}: empty body`);
+    fs.writeFileSync(dest, body);
+  } catch (err) {
+    if (err?.message?.startsWith("[bundled-bins]")) throw err;
+    fail(`download ${url}: ${err?.message || err}`);
+  }
 }
 
 function extractArchive(archivePath, extractDir) {
@@ -183,12 +188,12 @@ function astGrepPlatformPackage(platform, arch) {
   return `@ast-grep/cli-${osPart}-${archPart}${suffix}`;
 }
 
-function fetchGithubTool({ repo, tagPrefix, binaryName, assetName }, tmpDir) {
-  const version = githubLatestTag(repo).replace(/^v/, "");
+async function fetchGithubTool({ repo, tagPrefix, binaryName, assetName }, tmpDir) {
+  const version = (await githubLatestTag(repo)).replace(/^v/, "");
   const asset = assetName(version);
   const url = `https://github.com/${repo}/releases/download/${tagPrefix}${version}/${asset}`;
   const archivePath = path.join(tmpDir, asset);
-  downloadTo(url, archivePath);
+  await downloadTo(url, archivePath);
   const extractDir = path.join(tmpDir, `extract_${binaryName}`);
   extractArchive(archivePath, extractDir);
   // 目标平台档案里的可执行名：win 是 .exe，unix 是裸名——两个候选都试
@@ -204,25 +209,25 @@ function fetchGithubTool({ repo, tagPrefix, binaryName, assetName }, tmpDir) {
   return { found: candidates[0], version };
 }
 
-function fetchNpmPlatformPackage({ packageName }, tmpDir, targetPlatform) {
-  const registryJson = name => `https://registry.npmjs.org/${name.replace("/", "%2f")}`;
-  const getJson = url => {
-    const res = spawnSync("node", ["-e", `
-      fetch(process.argv[1], { signal: AbortSignal.timeout(${NETWORK_TIMEOUT_MS}) })
-        .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-        .then(j => process.stdout.write(JSON.stringify(j)))
-        .catch(e => { console.error(e.message); process.exit(1); });
-    `, url], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, timeout: NETWORK_TIMEOUT_MS + 15_000 });
-    if (res.status !== 0) fail(`npm metadata for ${packageName}: ${res.stderr}`);
-    return JSON.parse(res.stdout);
+async function fetchNpmPlatformPackage({ packageName }, tmpDir, targetPlatform) {
+  const registryJson = `https://registry.npmjs.org/${packageName.replace("/", "%2f")}`;
+  const fetchJson = async (url, what) => {
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(NETWORK_TIMEOUT_MS) });
+      if (!res.ok) fail(`${what}: HTTP ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      if (err?.message?.startsWith("[bundled-bins]")) throw err;
+      fail(`${what}: ${err?.message || err}`);
+    }
   };
-  const latest = getJson(`https://registry.npmjs.org/${packageName.replace("/", "%2f")}/latest`);
+  const latest = await fetchJson(`${registryJson}/latest`, `npm latest for ${packageName}`);
   const version = latest.version;
   if (!version) fail(`no latest version for ${packageName}`);
-  const dist = getJson(registryJson(packageName))?.versions?.[version]?.dist;
+  const dist = (await fetchJson(registryJson, `npm metadata for ${packageName}`))?.versions?.[version]?.dist;
   if (!dist?.tarball || !dist?.integrity) fail(`${packageName}@${version} has no tarball/integrity`);
   const archivePath = path.join(tmpDir, "ast-grep.tgz");
-  downloadTo(dist.tarball, archivePath);
+  await downloadTo(dist.tarball, archivePath);
   const integrity = String(dist.integrity);
   const actual = crypto.createHash("sha512").update(fs.readFileSync(archivePath)).digest("base64");
   if (integrity.slice(0, integrity.indexOf("-")) !== "sha512" || actual !== integrity.slice(integrity.indexOf("-") + 1)) {
@@ -236,7 +241,7 @@ function fetchNpmPlatformPackage({ packageName }, tmpDir, targetPlatform) {
   return { found, version };
 }
 
-function main() {
+async function main() {
   const { platform, arch, force } = parseArgs(process.argv.slice(2));
   const builderOs = platform === "darwin" ? "mac" : platform === "win32" ? "win" : "linux";
   const stageDir = path.resolve(__dirname, "..", "bundled-bin", `${builderOs}-${arch}`);
@@ -261,8 +266,8 @@ function main() {
       }
       if (t.source === "npm" && !t.packageName) fail(`ast-grep has no platform package for ${platform}/${arch}`);
       const fetched = t.source === "github"
-        ? fetchGithubTool({ repo: t.repo, tagPrefix: t.tagPrefix, binaryName: t.binaryFileName.replace(/\.exe$/, ""), assetName: t.assetName }, tmpDir)
-        : fetchNpmPlatformPackage({ packageName: t.packageName }, tmpDir, platform);
+        ? await fetchGithubTool({ repo: t.repo, tagPrefix: t.tagPrefix, binaryName: t.binaryFileName.replace(/\.exe$/, ""), assetName: t.assetName }, tmpDir)
+        : await fetchNpmPlatformPackage({ packageName: t.packageName }, tmpDir, platform);
       moveAcrossDevices(fetched.found, dest);
       if (platform !== "win32") fs.chmodSync(dest, 0o755);
       smokeOrVerify(dest, platform, arch);
@@ -274,4 +279,7 @@ function main() {
   console.log(`[bundled-bins] done: ${stageDir}`);
 }
 
-main();
+main().catch(err => {
+  console.error(err?.stack || err);
+  process.exit(1);
+});
