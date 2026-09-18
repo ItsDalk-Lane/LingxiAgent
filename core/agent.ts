@@ -864,12 +864,21 @@ export class Agent {
       getSessionPath: () => this._cb?.getCurrentSessionPath?.(),
       getConfirmStore: () => this._cb?.getConfirmStore?.(),
       emitEvent: (event, sp) => { if (sp) this._cb?.emitEvent?.(event, sp); },
+      isSessionStreaming: (sp) => {
+        try { return this._cb?.getEngine?.()?.isSessionStreaming?.(sp) === true; } catch { return false; }
+      },
+      getDeferredStore: () => this._cb?.getEngine?.()?.getDeferredResultStore?.() || null,
+      getTaskRegistry: () => this._cb?.getEngine?.()?.getTaskRegistry?.() || null,
       rewindToCheckpoint: (opts) => {
         const engine = this._cb?.getEngine?.();
         if (!engine?.rewindToCheckpoint) {
           return Promise.reject(new Error("rewind is unavailable in this runtime"));
         }
-        return engine.rewindToCheckpoint(opts);
+        // 事务身份解析走 manifest（非 legacy 路径必须有 sessionId），从会话路径反查补齐。
+        const sessionId = opts?.sessionId
+          || (opts?.sessionPath ? engine.getSessionIdForPath?.(opts.sessionPath) : null)
+          || undefined;
+        return engine.rewindToCheckpoint({ ...opts, sessionId });
       },
       previewRestoreFiles: async ({ sessionPath, checkpointName, createdAtHint }) => {
         const engine = this._cb?.getEngine?.();

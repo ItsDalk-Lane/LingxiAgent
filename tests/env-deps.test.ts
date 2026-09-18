@@ -26,6 +26,11 @@ describe("env-deps registry", () => {
     expect(getEnvDepEntry("git")?.label).toBe("Git");
     expect(getEnvDepEntry("nope")).toBeNull();
   });
+
+  it("ffmpeg 占位登记已撤除（视频生成走云端，本机无加工链）", () => {
+    expect(getEnvDepEntry("ffmpeg")).toBeNull();
+    expect(ENV_DEP_ENTRIES.some(e => e.id === "ffmpeg")).toBe(false);
+  });
 });
 
 describe("detectEnvDeps（注入 probe）", () => {
@@ -56,6 +61,7 @@ describe("detectEnvDeps（注入 probe）", () => {
         return { ok: true, version: "0.39.0" };
       },
       findManaged: name => (name === "ast-grep" ? "/managed/dir/ast-grep" : null),
+      findBundled: () => null,
       scanSignals: () => false,
     });
     const ast = report.deps.find(d => d.id === "ast_grep")!;
@@ -65,6 +71,19 @@ describe("detectEnvDeps（注入 probe）", () => {
     // 探测是并行的：断言托管路径被探过，且 ast-grep 没有再回落 PATH 探测
     expect(calls).toContain("/managed/dir/ast-grep");
     expect(calls.filter(c => c === "sg" || c === "ast-grep")).toEqual([]);
+  });
+
+  it("managed 类内置命中时优先于托管目录", async () => {
+    const report = await detectEnvDeps({
+      probe: async () => ({ ok: true, version: "1.2.3" }),
+      findManaged: name => (name === "ast-grep" ? "/managed/dir/ast-grep" : null),
+      findBundled: name => (name === "ast-grep" ? "/resources/bundled-bin/ast-grep" : null),
+      scanSignals: () => false,
+    });
+    const ast = report.deps.find(d => d.id === "ast_grep")!;
+    expect(ast.status).toBe("installed");
+    expect(ast.managed).toBe(true);
+    expect(ast.path).toBe("/resources/bundled-bin/ast-grep");
   });
 
   it("项目信号命中且缺失时进 projectMissing", async () => {

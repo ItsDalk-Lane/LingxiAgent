@@ -373,8 +373,6 @@ export function createSandboxedTools(cwd, customTools, {
         astGrepTool,
         astEditTool,
         securityScanTool,
-      ...(runCodeTool ? [runCodeTool] : []),
-      ...(lspTool ? [lspTool] : []),
         ...(runCodeTool ? [runCodeTool] : []),
         ...(lspTool ? [lspTool] : []),
         createPresentedLsTool(cwd, resourceOps.ls),
@@ -430,6 +428,10 @@ export function createSandboxedTools(cwd, customTools, {
       astGrepTool,
       astEditTool,
       securityScanTool,
+      // run_code / lsp 与 win32 分支同位补挂：此前只进了 win32 数组，
+      // macOS/Linux 会话整个工具面缺席这两个 OPTIONAL 工具。
+      ...(runCodeTool ? [runCodeTool] : []),
+      ...(lspTool ? [lspTool] : []),
       createPresentedLsTool(cwd, resourceOps.ls),
       materializeTool,
     ]),

@@ -1067,4 +1067,53 @@ describe('搜索结构化事实与延迟引用的展示语义', () => {
     );
     expect(labelSpan('office_html-to-pdf').textContent).toBe('转 PDF');
   });
+
+  it('目录桥转发来的 run_tools 调用按 PTC 卡片呈现：标签 + 可展开的子调用工具行', () => {
+    useRealLocale();
+    const code = 'const out = await tools.ls({ path: "/work" });\nreturn out.length;';
+    render(
+      <ToolGroupBlock
+        collapsed={false}
+        sessionPath=""
+        tools={[{
+          id: 'ptc-bridge',
+          name: 'mcp_call',
+          args: { tool: 'run_tools', arguments: { code, description: '列目录并计数' } },
+          details: {
+            description: '列目录并计数',
+            subcalls: [
+              { seq: 1, name: 'ls', argsSummary: '{"path":"/work"}', ok: true, ms: 9, args: { path: '/work' }, output: 'file-a\nfile-b' },
+              { seq: 2, name: 'grep', argsSummary: '{"pattern":"x"}', ok: false, ms: 3, error: 'boom', args: { pattern: 'x' }, output: 'grep 失败详情' },
+            ],
+            output: '2',
+          },
+          done: true, success: true, status: 'succeeded',
+        }]}
+      />,
+    );
+
+    // 行主标签是「编排工具」，不再落外部工具家族词「扩展」，也不重复桥身份。
+    const row = document.querySelector('[data-tool="mcp_call"]');
+    expect(row).toBeInTheDocument();
+    expect(row!.querySelector('[data-label]')!.textContent).toBe('编排工具');
+    expect(row!.textContent).not.toContain('扩展');
+
+    // 子调用行直接排在父行下方（不进展开面板），父行未展开也可见。
+    const lsRow = document.querySelector('[data-tool="mcp_call"] [data-tool="ls"]');
+    const grepRow = document.querySelector('[data-tool="mcp_call"] [data-tool="grep"]');
+    expect(lsRow).toBeInTheDocument();
+    expect(grepRow).toBeInTheDocument();
+    expect(grepRow!.getAttribute('data-status')).toBe('failed');
+    expect(grepRow!.textContent).toContain('boom');
+
+    // 展开父行：面板只有程序体与输出（子树在面板外）。
+    fireEvent.click(row!.querySelector('[role="button"]')!);
+    expect(screen.getByText((_, element) => element?.tagName === 'PRE' && element.textContent === code)).toBeInTheDocument();
+
+    // 子行自己可展开，展开后 = 正常调用的输入/输出面板。
+    fireEvent.click(grepRow!.querySelector('[role="button"]')!);
+    expect(grepRow!.querySelector('[role="button"]')!.getAttribute('aria-expanded')).toBe('true');
+    expect(grepRow!.textContent).toContain('grep 失败详情');
+    expect(grepRow!.textContent).toContain('"pattern": "x"');
+  });
 });

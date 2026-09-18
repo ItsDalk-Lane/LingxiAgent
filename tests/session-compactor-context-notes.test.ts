@@ -218,11 +218,11 @@ describe("context_notes 工具", () => {
     expect(r2.content[0].text).toContain("required");
   });
 
-  it("read 权限恒 read；write/append=write", () => {
+  it("read 权限恒 read；write/append=routine", () => {
     const tool = makeTool("/tmp/s.jsonl");
     expect(tool.sessionPermission.resolveInvocation({ action: "read" }).kind).toBe("read");
     expect(tool.sessionPermission.resolveInvocation(undefined).kind).toBe("read");
-    expect(tool.sessionPermission.resolveInvocation({ action: "write" }).kind).toBe("write");
-    expect(tool.sessionPermission.resolveInvocation({ action: "append" }).kind).toBe("write");
+    expect(tool.sessionPermission.resolveInvocation({ action: "write" }).kind).toBe("routine");
+    expect(tool.sessionPermission.resolveInvocation({ action: "append" }).kind).toBe("routine");
   });
 });

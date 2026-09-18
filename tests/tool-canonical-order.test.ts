@@ -72,8 +72,10 @@ describe("buildTools canonical provider tool order", () => {
       getPermissionMode: () => "operate",
     });
 
+    // run_tools（PTC 元工具）由 buildTools 自造并参与同一 canonical 排序。
     expect(customTools.map((tool) => tool.name)).toEqual([
       "notify",
+      "run_tools",
       "todo_write",
       "web_fetch",
     ]);
@@ -99,7 +101,7 @@ describe("buildTools canonical provider tool order", () => {
       return customTools.map((tool) => tool.name);
     });
 
-    expect(seen[0]).toEqual([...names].sort());
+    expect(seen[0]).toEqual([...names, "run_tools"].sort());
     expect(seen[1]).toEqual(seen[0]);
     expect(seen[2]).toEqual(seen[0]);
   });

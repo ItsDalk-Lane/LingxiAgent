@@ -1416,6 +1416,11 @@
       "done": "🧮 内核执行完成",
       "failed": "🧮 内核执行失败"
     },
+    "run_tools": {
+      "running": "🧰 正在编排工具调用",
+      "done": "🧰 工具编排完成",
+      "failed": "🧰 工具编排失败"
+    },
     "security_scan": {
       "running": "🛡️ 正在安全扫描",
       "done": "🛡️ 安全扫描完成",
@@ -1835,6 +1840,10 @@
           "run_code": {
             "label": "代码运行台",
             "summary": "在持久会话里跑 Python/Node 等代码，变量跨多次调用保留"
+          },
+          "run_tools": {
+            "label": "工具编排（PTC）",
+            "summary": "写一段小程序一次性编排多个工具调用，中间结果不占对话上下文"
           },
           "security_scan": {
             "label": "安全扫描",
@@ -3090,7 +3099,7 @@
         "pathLabel": "存放路径",
         "copyPath": "复制路径",
         "copied": "已复制",
-                "clearFirstHint": "请先清除当前模式的选择",
+        "clearFirstHint": "请先清除当前模式的选择",
         "clickToAdd": "点击加入选择",
         "clickToRemove": "点击移出选择",
         "modeDay": "按天",
@@ -5475,6 +5484,7 @@
       "office_list-capabilities": "看文档能力",
       "rewind": "回档",
       "run_code": "跑代码",
+      "run_tools": "编排工具",
       "security_scan": "安全扫描"
     },
     "copy": "复制",
@@ -5519,7 +5529,8 @@
     "recordedContent": "本次记录的内容",
     "fileCount": "{n} 个文件",
     "copyRetained": "复制已保留输出",
-    "terminalRetained": "终端仅保留最近输出，可复制内容与当前预览一致"
+    "terminalRetained": "终端仅保留最近输出，可复制内容与当前预览一致",
+    "runToolsProgram": "程序"
   },
   "duration": {
     "seconds": "{seconds}秒",
@@ -5579,8 +5590,7 @@
       "find_tool": "文件查找",
       "ast_tools": "AST 结构化代码工具",
       "security_scan": "安全扫描增强",
-      "lsp": "语言服务（跳转/诊断）",
-      "media_video": "视频处理"
+      "lsp": "语言服务（跳转/诊断）"
     },
     "startupMissing": "缺少项目需要的环境依赖：{names}",
     "openSettings": "查看"
@@ -5622,6 +5632,9 @@
       "filesOk": "文件已按快照还原（{count} 个）。",
       "filesDegraded": "文件还原未完成：{reason}",
       "failed": "回档失败"
+    },
+    "confirmed": {
+      "pending": "已确认回档到「{name}」。本回合结束后自动执行。"
     }
   }
 }

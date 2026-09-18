@@ -48,6 +48,58 @@ function record(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
 }
 function string(value: unknown): string { return typeof value === 'string' ? value : ''; }
+function safeJsonText(value: unknown): string {
+  try { return JSON.stringify(value, null, 2) ?? ''; } catch { return ''; }
+}
+
+/**
+ * PTC（run_tools）调用的两种落盘形态，details.subcalls 同构：
+ * - 直挂：name=run_tools，程序参数就在 args 里；
+ * - 目录桥转发：name=mcp_call，目标名在 args.tool、程序参数在 args.arguments。
+ * 服务端把 run_tools 的 details 原样穿过网关带回，这里只负责把两种形状归一。
+ */
+function ptcCallOf(tool: ToolCall): { args: Record<string, unknown>; details: Record<string, unknown> } | null {
+  if (tool.name === 'run_tools') return { args: record(safeToolArguments(tool.args)), details: record(tool.details) };
+  if (tool.name === 'mcp_call') {
+    const bridgeArgs = record(safeToolArguments(tool.args));
+    if (string(bridgeArgs.tool) === 'run_tools') return { args: record(bridgeArgs.arguments), details: record(tool.details) };
+  }
+  return null;
+}
+
+/**
+ * 子调用记录还原成真正的工具行记录——与正常调用同一套组件渲染（行标签/摘要/
+ * 展开面板全复用）。老记录没有 args/output 时退回摘要文本。
+ */
+function ptcChildToolsOf(tool: ToolCall): ToolCall[] {
+  const ptc = ptcCallOf(tool);
+  const subcalls = ptc && Array.isArray(ptc.details.subcalls)
+    ? (ptc.details.subcalls as unknown[]).map(record)
+    : [];
+  return subcalls.map((subcall, index) => {
+    const ok = subcall.ok === true;
+    const hasFullArgs = subcall.args !== undefined && subcall.args !== null;
+    const childArgs = hasFullArgs ? record(subcall.args) : {};
+    const childInput = hasFullArgs
+      ? safeJsonText(childArgs) || string(subcall.argsSummary)
+      : string(subcall.argsSummary);
+    return {
+      id: `${tool.id || `ptc-${index}`}:sub:${Number(subcall.seq) || index + 1}`,
+      name: string(subcall.name) || 'tool',
+      args: childArgs,
+      done: true,
+      success: ok,
+      status: ok ? 'succeeded' as const : 'failed' as const,
+      ...(string(subcall.error) ? { error: string(subcall.error) } : {}),
+      details: {
+        input: childInput,
+        output: string(subcall.output),
+        ...(subcall.outputTruncated === true ? { outputTruncated: true } : {}),
+      },
+    };
+  });
+}
+
 function commandOf(tool: ToolCall): string {
   const exec = record(tool.details?.execCommand);
   return string(tool.args?.cmd) || string(tool.args?.command) || string(exec.cmd) || string(exec.renderedCommand) || string(tool.args?.chars);
@@ -82,10 +134,13 @@ const ToolActivity = memo(function ToolActivity({ tool, agentName, skillPrompt, 
   const targetPath = useStore(state => tool.name === 'session' ? sessionToolTargetPath(state, tool.args) : null);
   const skillName = skillInvocationName({ toolName: tool.name, args: tool.args });
   const research = isSyntheticToolPresentation(tool.name);
+  // 目录桥转发来的 run_tools 调用按 PTC 行呈现：标签/图标/摘要与直挂 run_tools 一致。
+  const ptc = ptcCallOf(tool);
+  const ptcChildren = ptc ? ptcChildToolsOf(tool) : [];
   const toolStatus = tool.status || (tool.done ? tool.success ? 'succeeded' : 'failed' : 'running');
   const exitCode = terminal && Number.isFinite(terminal.exitCode) ? terminal.exitCode : null;
   const status = terminal?.status === 'running' ? 'running' : terminal?.status === 'killed' ? 'failed' : terminal?.status === 'stale' ? 'stale' : terminal?.status === 'exited' && exitCode !== null ? exitCode === 0 ? 'succeeded' : 'failed' : toolStatus;
-  const detail = research ? { text: tool.name === 'knowledge_research_worker' ? string(tool.args?.label).slice(0, 100) : '', href: undefined, title: undefined } : extractToolDetail(tool.name, record(safeToolArguments(tool.args)));
+  const detail = research ? { text: tool.name === 'knowledge_research_worker' ? string(tool.args?.label).slice(0, 100) : '', href: undefined, title: undefined } : ptc ? extractToolDetail('run_tools', ptc.args) : extractToolDetail(tool.name, record(safeToolArguments(tool.args)));
   const recordedPath = string(record(tool.details?.read).path) || string(record(tool.details?.fileChange).path);
   const candidateHref = recordedPath || detail.href;
   const detailHref = candidateHref && resolveLinkTarget(candidateHref).kind !== 'external' ? candidateHref : undefined;
@@ -96,13 +151,16 @@ const ToolActivity = memo(function ToolActivity({ tool, agentName, skillPrompt, 
   // 只画进度条，这一步只能在工具行里说，所以它进摘要而不是主标签。
   const researchProgress = research ? getToolLabel(tool.name, phaseForStatus(toolStatus), agentName, tool.args).replace(/^[^\p{L}\p{N}]+/u, '') : '';
   const summary = tool.error || todoSummary || (skillName ? skillName : targetName || (terminalNames.has(tool.name) ? string(tool.args?.description) || string(exec.description) || command.split('\n')[0] : research ? [detail.text, researchProgress].filter(Boolean).join(' · ') : detail.text));
-  const mcpName = mcpActivityName(tool.name, tool.args);
+  // PTC 行的标签已是「编排工具」，再列桥身份（run_tools）就重复了。
+  const mcpName = ptc ? null : mcpActivityName(tool.name, tool.args);
   // 行主标签只能是文案词：技能形态名 / 清单面板标题「任务」/ 五语言短标签。
   // 裸英文工具名（search_memory、mcp_deep-search）不再作为主标签，原工具名挪到行上的
   // 悬停提示（title）、data-tool 与完整调用弹窗的标题里；MCP 名称另列在标签后。
   const displayLabel = isTodoTool
     ? (window.t?.('todoPanel.title') || tool.name)
-    : activityLabel(tool.name, { skill: Boolean(skillName) }) || tool.name;
+    : ptc
+      ? activityLabel('run_tools')
+      : activityLabel(tool.name, { skill: Boolean(skillName) }) || tool.name;
   const labelHint = displayLabel === tool.name ? undefined : tool.name;
   const rowHint = labelHint ?? (detail.title || command || undefined);
   const change = record(tool.details?.fileChange);
@@ -120,7 +178,7 @@ const ToolActivity = memo(function ToolActivity({ tool, agentName, skillPrompt, 
       if (event.target !== event.currentTarget) return;
       if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setExpanded(value => !value); }
     }}>
-      <ActivityIcon kind={skillName ? 'skill' : tool.name} />
+      <ActivityIcon kind={skillName ? 'skill' : ptc ? 'run_tools' : tool.name} />
       <span className={styles.label} data-label={displayLabel}>{displayLabel}</span>
       {mcpName && <><span className={styles.separator} aria-hidden="true">·</span><span className={styles.mcpName} title={mcpName}>{mcpName}</span></>}
       {(summary || tool.resultNote) && <span className={styles.separator} aria-hidden="true">·</span>}
@@ -135,13 +193,16 @@ const ToolActivity = memo(function ToolActivity({ tool, agentName, skillPrompt, 
       {tool.resultNote && <span className={styles.summary}>{tool.resultNote}</span>}
       {status !== 'succeeded' && <span className={styles.status}>{status === 'stale' ? (window.t?.('rightWorkspace.terminal.stale') || t('unknown')) : t(status)}</span>}
     </div>
-    {expanded && <ToolActivityDetails tool={tool} skillName={skillName} skillPrompt={skillPrompt} sessionPath={sessionPath} terminal={terminal} status={status} />}
+    {/* PTC 子调用树排在父行正下方、消息流里（不进展开面板）：子行是完整工具行，
+        自己可展开；数据在编排结束时随 details 一次性到达，此前自然不显示。 */}
+    {ptcChildren.length > 0 && <div className={styles.ptcSubtree}>{ptcChildren.map((child) => <ToolActivity key={child.id} tool={child} agentName={agentName} skillPrompt={null} sessionPath={sessionPath} />)}</div>}
+    {expanded && <ToolActivityDetails tool={tool} agentName={agentName} skillName={skillName} skillPrompt={skillPrompt} sessionPath={sessionPath} terminal={terminal} status={status} />}
     {linkMenu && <LinkContextMenu state={linkMenu} onClose={() => setLinkMenu(null)} />}
   </div>;
 });
 
-function ToolActivityDetails({ tool, skillName, skillPrompt, sessionPath, terminal, status }: {
-  tool: ToolCall; skillName: string | null; skillPrompt: string | null; sessionPath: string;
+function ToolActivityDetails({ tool, agentName, skillName, skillPrompt, sessionPath, terminal, status }: {
+  tool: ToolCall; agentName: string; skillName: string | null; skillPrompt: string | null; sessionPath: string;
   terminal: ReturnType<ReturnType<typeof selectTerminalById>>; status: string;
 }) {
   const [view, setView] = useState(false);
@@ -178,6 +239,19 @@ function ToolActivityDetails({ tool, skillName, skillPrompt, sessionPath, termin
     fullInputCommand = string(args.cmd) || string(args.command) || string(args.chars);
   } catch {
     // 存量调用可能没有结构化参数，退回该调用保存的命令。
+  }
+  // PTC（run_tools）：程序体从结构化记录取；子调用树排在父行下方（ToolActivity），
+  // 不进本面板，这里只有程序与输出。目录桥转发来的调用程序参数在 args.arguments 里。
+  const ptc = ptcCallOf(tool);
+  let ptcCode = '';
+  if (ptc) {
+    if (string(ptc.args.code)) ptcCode = string(ptc.args.code);
+    else {
+      try {
+        const parsed = record(JSON.parse(input));
+        ptcCode = string(parsed.code) || string(record(parsed.arguments).code);
+      } catch { /* 存量记录无结构化参数 */ }
+    }
   }
   const patch = patchLoad.data?.content ?? string(change.patch);
   const content = contentLoad.data?.content ?? string(change.content);
@@ -228,6 +302,7 @@ function ToolActivityDetails({ tool, skillName, skillPrompt, sessionPath, termin
           : Object.keys(read).length > 0 ? <>{readOutput ? <ActivityLines content={readOutput} startLine={Number(read.startLine) || 1} language={string(read.language) || path.split('.').pop()} /> : <div className={styles.notice}>{read.displayedLines === 0 && status === 'succeeded' ? t('emptyFile') : empty}</div>}{readNotice && <div className={styles.notice}>{readNotice}</div>}</>
           : Object.keys(search).length > 0 ? <><div className={styles.notice}>{t('searchCount', { matches: typeof search.matchCount === 'number' ? search.matchCount : typeof searchFacts?.matchCount === 'number' ? searchFacts.matchCount : '—', files: typeof search.fileCount === 'number' ? search.fileCount : typeof searchFacts?.fileCount === 'number' ? searchFacts.fileCount : files.length })}</div>{files.length ? <SearchActivity kind={searchKind} basePath={string(search.basePath) || undefined} files={files.map(file => ({ path: string(file.path), matches: (Array.isArray(file.matches) ? file.matches.map(record) : []).map(match => ({ ...(typeof match.line === 'number' ? { line: match.line } : {}), text: string(match.text), context: match.context === true })) }))} /> : output ? <ActivityLines content={output} /> : <div className={styles.notice}>{empty}</div>}</>
           : changeVisible ? <><div className={styles.notice}>{t(status === 'running' ? 'proposed' : status === 'succeeded' ? 'applied' : 'unknown')}</div>{change.beforeAvailable === false && <div className={styles.notice}>{t('beforeUnavailable')}</div>}{['before_content_unavailable', 'before_permission_denied', 'before_content_too_large', 'before_content_not_text', 'patch_too_large', 'diff_too_large', 'diff_timeout', 'diff_unavailable'].includes(string(change.reason)) && <div className={styles.notice}>{t(`reasons.${string(change.reason)}`)}</div>}{patch && <ActivityLines content={patch} diff />}{counts && <div className={styles.notice}>+{counts.added} −{counts.removed} · {t('fileCount', { n: 1 })}</div>}{hasContent && <><h4 className={styles.section}>{t(status === 'running' ? 'proposedContent' : status === 'succeeded' ? 'writtenContent' : 'recordedContent')}</h4>{content ? <ActivityLines content={content} language={path.split('.').pop()} /> : <div className={styles.notice}>{t('emptyFile')}</div>}</>}{!patch && !hasContent && <div className={styles.notice}>{empty}</div>}</>
+          : ptc ? <>{ptcCode && <><h4 className={styles.section}>{t('runToolsProgram')}</h4><pre className={styles.pre}>{ptcCode}</pre></>}<h4 className={styles.section}>{t('output')}</h4><ActivityLines content={output || tool.error || empty} /></>
           : <><h4 className={styles.section}>{t('input')}</h4><ActivityLines content={input || t('unavailable')} /><h4 className={styles.section}>{t('output')}</h4><ActivityLines content={output || tool.error || empty} /></>}
         {tool.error && <div className={styles.failed}>{tool.error}</div>}
       </div>

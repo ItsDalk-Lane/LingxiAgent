@@ -49,6 +49,10 @@
 .removed { color: color-mix(in srgb, var(--ma-diff-removed) 90%, var(--text)); }
 .notice { color: var(--text-muted); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .section { margin: var(--space-8) 0 var(--space-4); font-size: 12px; font-weight: 500; }
+/* PTC 子调用树：编排工具卡里缩进列出被它调用的工具行（每行仍是完整 ToolActivity，
+   自己可展开）。左侧细线表层级；间距全用 token，别在 padding/margin/gap 写裸 px。 */
+.ptcSubtree { display: flex; flex-direction: column; gap: var(--space-2); margin: var(--space-4) 0 var(--space-8); padding-inline-start: var(--space-12); border-inline-start: 1px solid color-mix(in srgb, var(--text-muted) 30%, transparent); min-width: 0; }
+.ptcSubtree .activity { min-height: 22px; }
 .view { border: 1px solid var(--border, #ddd); border-radius: 12px; padding: 0 var(--space-8); margin-top: var(--space-6); font-size: 11px; line-height: 20px; background: none; color: var(--text-muted); cursor: pointer; }
 .terminal { max-height: 224px; overflow: auto; }
 .terminal :global([data-testid^="terminal-preview-"]) { height: auto; max-height: 224px; border: 0; border-radius: 0; margin: 0; background: none; overflow: auto; }

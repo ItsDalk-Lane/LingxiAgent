@@ -165,7 +165,7 @@ describe("LingxiEngine.buildTools", () => {
       getPermissionMode: () => "operate",
     });
 
-    const result = await customTools[0].execute(
+    const result = await customTools.find((tool) => tool.name === "stage_files").execute(
       "call-1",
       { path: "x" },
       { sessionManager: { getSessionFile: () => sessionPath } },
@@ -224,7 +224,7 @@ describe("LingxiEngine.buildTools", () => {
       getPermissionMode: () => "auto",
     });
 
-    const result = await customTools[0].execute(
+    const result = await customTools.find((tool) => tool.name === "channel").execute(
       "call-1",
       { path: "x" },
       { sessionManager: { getSessionFile: () => sessionPath } },
@@ -421,7 +421,8 @@ describe("LingxiEngine.buildTools", () => {
       getPermissionMode: () => "operate",
     });
 
-    expect(customTools.map((tool) => tool.name)).toEqual(["automation"]);
+    // run_tools 由 buildTools 自造且未被该夹具禁用，随直载面一同保留。
+    expect(customTools.map((tool) => tool.name)).toEqual(["automation", "run_tools"]);
   });
 
   it("composes MCP manager tools with the same session context as plugin tools", async () => {

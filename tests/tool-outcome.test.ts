@@ -160,4 +160,22 @@ describe("tool outcome projection", () => {
     expect(projected[1]).toBe(stored[1]);
     expect(stored[0].isError).toBe(false);
   });
+
+  it("passes PTC subcall lists through the whitelist for run_tools results", () => {
+    const subcalls = [
+      { seq: 1, name: "ls", argsSummary: '{"path":"/work"}', ok: true, ms: 8 },
+      { seq: 2, name: "grep", argsSummary: '{"pattern":"x"}', ok: false, ms: 3, error: "boom" },
+    ];
+    const result = {
+      role: "toolResult",
+      toolCallId: "tc-outer:ptc:1",
+      isError: false,
+      content: [{ type: "text", text: "run_tools 输出" }],
+      details: { description: "列目录", subcalls, durationMs: 32 },
+    };
+
+    const outcome = projectLiveToolResultOutcome(result, { toolName: "mcp_call", args: {} });
+
+    expect(outcome.details?.subcalls).toEqual(subcalls);
+  });
 });

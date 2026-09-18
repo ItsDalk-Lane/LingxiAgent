@@ -670,7 +670,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:9aa26bee4fe7bc5ab5c531ac7eaaad379946fe51a5c2fb21f773f222055c4690",
+  "payloadFingerprint": "sha256:d725deb0016913f186dc22df9411da7c340b77bf4cff2dd6e271c72699e7edd4",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3376,8 +3376,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "run_code 内核的 os-tmpdir 注入草稿并入 ephemeral 草稿店；无业务 store 结构变化",
-    "payloadFingerprint": "sha256:9aa26bee4fe7bc5ab5c531ac7eaaad379946fe51a5c2fb21f773f222055c4690"
+    "compatibilityReason": "export-manifest adds lib/bundled-bins.ts (bundled rg/fd/ast-grep resolver, read-only fs probes; no store schema or persistence behavior change); ffmpeg row removed from env-deps registry",
+    "payloadFingerprint": "sha256:d725deb0016913f186dc22df9411da7c340b77bf4cff2dd6e271c72699e7edd4"
   },
   "schemas": [
     {
@@ -4065,7 +4065,7 @@
       "contract": "managed search-tool binary and Windows sandbox runtime cache validation; ast-grep (sg/ast-grep) joins the same cache via the npm platform-package channel with sha512 integrity (lib/sandbox/ast-grep-binary.ts)",
       "kind": "directory-contract",
       "module": "lib/pi-sdk/search-tools.ts",
-      "sourceHash": "sha256:6d90beab5e274757b7541a5a7454e9f59ae3dcff56d9a3eac4d4a7eb7d3aa700",
+      "sourceHash": "sha256:42f32796e63608ebfa7eb0484a4a0dd01f5f144e546c2d43c66d0e9c2d6f527e",
       "storeId": "managed-runtime-caches"
     },
     {
@@ -4368,7 +4368,7 @@
       "contract": "Per-session markdown notes sidecar, 16KiB write cap with read-side defensive truncation; read/write/append semantics",
       "kind": "runtime-contract",
       "module": "lib/tools/context-notes-tool.ts",
-      "sourceHash": "sha256:c4e93502e6eeb74578e65e58ff11b5f9870589755e8f86ea904c299b7164b300",
+      "sourceHash": "sha256:5d4a6ded3dbfb99d013d231a441ec521c74ad5dc0d5d7db93f1425fbfcc91906",
       "storeId": "session-context-notes"
     },
     {

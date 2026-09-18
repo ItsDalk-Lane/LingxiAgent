@@ -227,12 +227,12 @@ export function createLspTool(deps: LspToolDeps) {
     name: "lsp",
     description: "Language-server powered code intelligence: go to definition, find references, hover docs, document symbols, live diagnostics, and safe rename — per language (typescript/python/go/rust/cpp). Positions are 1-based line/column. Servers start lazily per language and park when idle; the first call on a big project may be slow while indexing (the timeout message says so). A language whose server is missing reports an install hint (Env Dependencies settings page). Prefer lsp over grep for symbol navigation; rename validates via prepareRename before computing and writing edits.",
     parameters: Type.Object({
-      action: StringEnum(["status", "diagnostics", "definition", "references", "hover", "symbols", "rename"], { description: "status: which languages/servers are available. diagnostics: current file diagnostics. definition/references: symbol at file:line:column. hover: type/doc at position. symbols: document outline. rename: rename symbol at position with new_name (validated first, then applied)" }),
-      language: Type.String({ description: "typescript | python | go | rust | cpp" }),
-      file: Type.String({ description: "File path (relative to cwd ok)" }),
-      line: Type.Number({ description: "1-based line of the symbol/position" }),
-      column: Type.Number({ description: "1-based column (character) of the position" }),
-      new_name: Type.String({ description: "New name for action=rename" }),
+      action: Type.Optional(StringEnum(["status", "diagnostics", "definition", "references", "hover", "symbols", "rename"], { description: "status: which languages/servers are available. diagnostics: current file diagnostics. definition/references: symbol at file:line:column. hover: type/doc at position. symbols: document outline. rename: rename symbol at position with new_name (validated first, then applied)" })),
+      language: Type.Optional(Type.String({ description: "typescript | python | go | rust | cpp" })),
+      file: Type.Optional(Type.String({ description: "File path (relative to cwd ok)" })),
+      line: Type.Optional(Type.Number({ description: "1-based line of the symbol/position" })),
+      column: Type.Optional(Type.Number({ description: "1-based column (character) of the position" })),
+      new_name: Type.Optional(Type.String({ description: "New name for action=rename" })),
     }),
     sessionPermission: {
       resolveInvocation: (input: any = {}) => {
@@ -242,7 +242,7 @@ export function createLspTool(deps: LspToolDeps) {
         if (!input?.action) {
           return { action: "status", kind: "read", capability: "lsp.status" };
         }
-        return { action: "rename", kind: "write", capability: "lsp.rename" };
+        return { action: "rename", kind: "routine", capability: "lsp.rename" };
       },
     },
     async execute(_toolCallId: string, params: any = {}, ..._rest: any[]) {

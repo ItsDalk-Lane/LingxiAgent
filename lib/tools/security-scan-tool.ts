@@ -110,15 +110,15 @@ export function createSecurityScanTool(deps: SecurityScanToolDeps) {
     name: "security_scan",
     description: "Scan code for leaked secrets and sensitive data before shipping. Baseline JS scanner always runs (provider API keys, private keys, secret assignments, URL tokens, PII); semgrep/gitleaks join automatically when installed (see the Env Dependencies settings page). mode=changes scans the working tree's git changes (default), mode=path scans a given directory/file. Scope is limited to the workspace and authorized folders. Findings are file:line + rule id only — never secret contents. After code changes that touch auth, config, or keys, run a scan proactively.",
     parameters: Type.Object({
-      mode: StringEnum(["changes", "path"], { description: "changes: scan git working-tree changes (default). path: scan a directory or file" }),
-      path: Type.String({ description: "Target directory or file for mode=path (relative to cwd)" }),
-      max_files: Type.Number({ description: `File cap for mode=path (default ${DEFAULT_MAX_FILES}, max ${HARD_MAX_FILES})` }),
+      mode: Type.Optional(StringEnum(["changes", "path"], { description: "changes: scan git working-tree changes (default). path: scan a directory or file" })),
+      path: Type.Optional(Type.String({ description: "Target directory or file for mode=path (relative to cwd)" })),
+      max_files: Type.Optional(Type.Number({ description: `File cap for mode=path (default ${DEFAULT_MAX_FILES}, max ${HARD_MAX_FILES})` })),
     }),
     sessionPermission: {
       resolveInvocation: (_input: any = {}) => ({
         action: "scan",
         kind: "read",
-        capability: "security_scan.read",
+        capability: "security_scan.scan",
       }),
     },
     async execute(_toolCallId: string, params: any = {}, ..._rest: any[]) {

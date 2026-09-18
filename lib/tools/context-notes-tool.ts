@@ -46,14 +46,14 @@ export function createContextNotesTool(deps: { getSessionPath: () => string | nu
     description: "Notes to your future self that survive context compaction: constraints, decisions, key file paths, gotchas. Keep them terse and current — stale notes mislead. The compactor re-injects the full notes at the end of every summary, so anything important for the rest of this task belongs here, not in chat scrollback. action=read shows current notes; write replaces; append adds to the end.",
     parameters: Type.Object({
       action: StringEnum(["read", "write", "append"], { description: "read: show current notes (default). write: replace all notes. append: add a block to the end" }),
-      text: Type.String({ description: "Note text for write/append (markdown; keep it short — 16KiB cap total)" }),
+      text: Type.Optional(Type.String({ description: "Note text for write/append (markdown; keep it short — 16KiB cap total). Not needed for read." })),
     }),
     sessionPermission: {
       resolveInvocation: (input: any = {}) => {
         if (input?.action === "read" || input?.action == null) {
           return { action: "read", kind: "read", capability: "context_notes.read" };
         }
-        return { action: input.action === "append" ? "append" : "write", kind: "write", capability: "context_notes.write" };
+        return { action: input.action === "append" ? "append" : "write", kind: "routine", capability: "context_notes.write" };
       },
     },
     async execute(_toolCallId: string, params: any = {}, ..._rest: any[]) {

@@ -49,11 +49,12 @@
     "build:shell": "node scripts/build-shell.mjs",
     "generate:windows-icon": "node scripts/generate-windows-icon.cjs",
     "generate:tray-icons": "node scripts/generate-tray-icons.cjs",
-    "pack": "npm run build:computer-use-helper && npm run build:speech-helper && npm run build:speech-permissions && npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --dir",
+    "pack": "npm run fetch:bundled-bins && npm run build:computer-use-helper && npm run build:speech-helper && npm run build:speech-permissions && npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --dir",
     "install:local": "npm run pack && rm -rf /Applications/Lingxi.app /Applications/Lingxi.app && cp -R dist/mac-arm64/Lingxi.app /Applications/ && node scripts/sign-local.cjs",
-    "dist": "npm run build:computer-use-helper && npm run build:speech-helper && npm run build:speech-permissions && npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --mac dmg",
-    "dist:win": "npm run build:computer-use-helper && npm run build:windows-sandbox-helper && npm run generate:windows-icon && npm run generate:tray-icons && npm run build:client && npm run build:server && npm run verify:seed-kit && npm run pack:server:standalone && npm run verify:standalone:server && electron-builder --win nsis",
-    "dist:linux": "npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --linux AppImage deb",
+    "dist": "npm run fetch:bundled-bins && npm run build:computer-use-helper && npm run build:speech-helper && npm run build:speech-permissions && npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --mac dmg",
+    "dist:win": "npm run fetch:bundled-bins && npm run build:computer-use-helper && npm run build:windows-sandbox-helper && npm run generate:windows-icon && npm run generate:tray-icons && npm run build:client && npm run build:server && npm run verify:seed-kit && npm run pack:server:standalone && npm run verify:standalone:server && electron-builder --win nsis",
+    "dist:linux": "npm run fetch:bundled-bins && npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --linux AppImage deb",
+    "fetch:bundled-bins": "node scripts/fetch-bundled-binaries.cjs",
     "verify:seed-kit": "node scripts/verify-seed-kit.mjs",
     "pack:server:standalone": "node scripts/build-standalone-server-artifact.mjs x64",
     "verify:standalone:server": "node scripts/verify-standalone-server-artifact.mjs x64 --smoke",
@@ -186,6 +187,10 @@
       {
         "from": "dist-server-artifact/${os}-${arch}/",
         "to": "seed/"
+      },
+      {
+        "from": "bundled-bin/${os}-${arch}/",
+        "to": "bundled-bin/"
       },
       {
         "from": "desktop/src/screenshot-themes/",

@@ -105,22 +105,23 @@ function normalizeQuestions(raw: unknown): { questions: AskQuestion[] } | { erro
         return { error: invalid(`question "${key}" has a non-object option`) };
       }
       const o = rawOption as Record<string, unknown>;
-      const value = typeof o.value === "string" ? o.value.trim() : "";
-      if (!value || value.length > MAX_OPTION_VALUE_CHARS) {
-        return { error: invalid(`question "${key}" has an option with empty/oversized value`) };
-      }
-      if (seenValues.has(value)) {
-        return { error: invalid(`question "${key}" repeats option value "${value}"`) };
-      }
-      seenValues.add(value);
-      const label = typeof o.label === "string" && o.label.trim() ? o.label.trim() : value;
-      if (label.length > MAX_OPTION_LABEL_CHARS) {
-        return { error: invalid(`question "${key}" has an option label over ${MAX_OPTION_LABEL_CHARS} chars`) };
+      // value 是回传给模型的稳定答案值；模型通常只给 label——缺省用 label 顶上。
+      const label = typeof o.label === "string" && o.label.trim() ? o.label.trim() : "";
+      if (!label || label.length > MAX_OPTION_LABEL_CHARS) {
+        return { error: invalid(`question "${key}" has an option with empty/oversized label`) };
       }
       if (seenLabels.has(label)) {
         return { error: invalid(`question "${key}" repeats option label "${label}"`) };
       }
       seenLabels.add(label);
+      const value = typeof o.value === "string" && o.value.trim() ? o.value.trim() : label;
+      if (value.length > MAX_OPTION_VALUE_CHARS) {
+        return { error: invalid(`question "${key}" has an option value over ${MAX_OPTION_VALUE_CHARS} chars`) };
+      }
+      if (seenValues.has(value)) {
+        return { error: invalid(`question "${key}" repeats option value "${value}"`) };
+      }
+      seenValues.add(value);
       const description = typeof o.description === "string" && o.description.trim()
         ? o.description.trim().slice(0, MAX_OPTION_DESC_CHARS)
         : undefined;
@@ -213,8 +214,7 @@ export function createAskUserTool(deps: Record<string, any> = {}) {
             description: "Defaults to 'single' when options are given, 'text' otherwise.",
           })),
           options: Type.Optional(Type.Array(Type.Object({
-            value: Type.String({ description: "Stable machine value returned in the answer." }),
-            label: Type.Optional(Type.String({ description: "Display text; must be unique within the question. Defaults to value." })),
+            label: Type.String({ description: "Option text shown to the user; must be unique within the question. Used as the stable answer value." }),
             description: Type.Optional(Type.String({ description: "One line explaining this option's trade-off." })),
           }))),
           recommended: Type.Optional(Type.Union([Type.String(), Type.Array(Type.String())], {

@@ -1416,6 +1416,11 @@
       "done": "🧮 커널 실행 완료",
       "failed": "🧮 커널 실행 실패"
     },
+    "run_tools": {
+      "running": "🧰 도구 프로그램 실행 중",
+      "done": "🧰 도구 프로그램 완료",
+      "failed": "🧰 도구 프로그램 실패"
+    },
     "security_scan": {
       "running": "🛡️ 보안 스캔 중",
       "done": "🛡️ 보안 스캔 완료",
@@ -1802,6 +1807,10 @@
           "run_code": {
             "label": "코드 실행",
             "summary": "Python/Node 등을 영구 세션에서 실행하며 변수가 호출 간 유지됩니다"
+          },
+          "run_tools": {
+            "label": "도구 오케스트레이션(PTC)",
+            "summary": "작은 프로그램 하나로 여러 도구 호출을 한 번에 실행하고, 중간 결과는 대화에 남기지 않음"
           },
           "security_scan": {
             "label": "보안 스캔",
@@ -3091,7 +3100,7 @@
         "pathLabel": "저장 경로",
         "copyPath": "경로 복사",
         "copied": "복사됨",
-                "clearFirstHint": "먼저 현재 선택을 지워주세요",
+        "clearFirstHint": "먼저 현재 선택을 지워주세요",
         "clickToAdd": "클릭하여 추가",
         "clickToRemove": "클릭하여 제거",
         "modeDay": "일별",
@@ -5370,6 +5379,7 @@
       "office_list-capabilities": "문서 기능",
       "rewind": "되돌리기",
       "run_code": "코드 실행",
+      "run_tools": "도구 실행",
       "security_scan": "보안 스캔"
     },
     "copy": "복사",
@@ -5414,7 +5424,8 @@
     "recordedContent": "이번 호출에 기록된 내용",
     "fileCount": "파일 {n}개",
     "copyRetained": "보존된 출력 복사",
-    "terminalRetained": "최근 터미널 출력만 보존됩니다. 복사 내용은 현재 미리 보기와 같습니다."
+    "terminalRetained": "최근 터미널 출력만 보존됩니다. 복사 내용은 현재 미리 보기와 같습니다.",
+    "runToolsProgram": "프로그램"
   },
   "duration": {
     "seconds": "{seconds}초",
@@ -5474,8 +5485,7 @@
       "find_tool": "파일 찾기",
       "ast_tools": "AST 구조화 코드 도구",
       "security_scan": "보안 스캔 강화",
-      "lsp": "언어 서버(이동/진단)",
-      "media_video": "동영상 처리"
+      "lsp": "언어 서버(이동/진단)"
     },
     "startupMissing": "프로젝트에 필요한 환경 의존성이 없습니다: {names}",
     "openSettings": "보기"
@@ -5517,6 +5527,9 @@
       "filesOk": "파일을 스냅샷에서 복원했습니다({count}건).",
       "filesDegraded": "파일 복원이 불완전: {reason}",
       "failed": "되돌리기 실패"
+    },
+    "confirmed": {
+      "pending": "\"{name}\"(으)로 되돌리기 확인. 이 턴이 끝나면 자동 실행됩니다."
     }
   }
 }

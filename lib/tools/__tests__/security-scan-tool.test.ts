@@ -150,7 +150,7 @@ describe("security_scan 工具", () => {
   it("权限契约：read（计划模式可用）", () => {
     const { tool } = makeTool(freshRoot());
     expect(tool.sessionPermission.resolveInvocation({})).toEqual({
-      action: "scan", kind: "read", capability: "security_scan.read",
+      action: "scan", kind: "read", capability: "security_scan.scan",
     });
   });
 });

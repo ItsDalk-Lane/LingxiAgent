@@ -217,7 +217,7 @@ describe("ast_edit 工具", () => {
     const tool = createAstEditTool("/repo", { managedBinDir: "/managed" });
     expect(tool.sessionPermission.resolveInvocation({ action: "preview" }).kind).toBe("read");
     expect(tool.sessionPermission.resolveInvocation({ action: "apply" })).toEqual({
-      action: "apply", kind: "write", capability: "ast_edit.apply",
+      action: "apply", kind: "routine", capability: "ast_edit.apply",
     });
     // 默认（无 action）按 preview 处置
     expect(tool.sessionPermission.resolveInvocation({}).kind).toBe("read");

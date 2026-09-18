@@ -14,6 +14,8 @@ export type ToolOutcomeDetails = ToolPresentationDetails & {
     truncated?: boolean;
     deferred?: unknown;
   };
+  /** PTC（run_tools）子调用清单，从落盘 details 定向透传（见 projectedPtcSubcalls）。 */
+  subcalls?: unknown[];
 };
 
 export type ToolOutcome = {
@@ -144,6 +146,19 @@ function projectedSkillDetails(
   };
 }
 
+/**
+ * PTC 子调用清单透传。
+ *
+ * run_tools 的结果 details 带 {description, subcalls, durationMs}；目录桥调用时
+ * 这份 details 原样成为 mcp_call 的落盘 details，但上面的白名单投影不认识它，
+ * 实时事件与历史投影会在这一起丢掉 subcalls。PTC 是一方工具，subcalls 是收口
+ * 的有界清单（seq/name/argsSummary/ok/ms/error），按事实原样透传。
+ */
+function projectedPtcSubcalls(result: ToolResultLike): unknown[] | null {
+  const subcalls = recordOf(result.details)?.subcalls;
+  return Array.isArray(subcalls) ? subcalls : null;
+}
+
 function projectedDetails(
   result: ToolResultLike,
   context: ToolInvocationContext | undefined,
@@ -152,8 +167,10 @@ function projectedDetails(
   const generic = projectToolPresentationDetails(result, context);
   const exec = projectedExecDetails(result);
   const skill = projectedSkillDetails(result, context);
-  if (!generic && !exec && !skill) return undefined;
+  const ptcSubcalls = projectedPtcSubcalls(result);
+  if (!generic && !exec && !skill && !ptcSubcalls) return undefined;
   const details = { ...generic, ...exec, ...skill };
+  if (ptcSubcalls) details.subcalls = ptcSubcalls;
   // 交互终端仍由终端快照承接，不能把协议回执当作控制台输出。
   if (exec?.execCommand?.tty === true) {
     delete details.output;

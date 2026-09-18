@@ -1416,6 +1416,11 @@
       "done": "🧮 カーネル実行完了",
       "failed": "🧮 カーネル実行失敗"
     },
+    "run_tools": {
+      "running": "🧰 ツールプログラムを実行中",
+      "done": "🧰 ツールプログラム完了",
+      "failed": "🧰 ツールプログラム失敗"
+    },
     "security_scan": {
       "running": "🛡️ セキュリティスキャン中",
       "done": "🛡️ スキャン完了",
@@ -1802,6 +1807,10 @@
           "run_code": {
             "label": "コード実行",
             "summary": "Python/Node などを永続セッションで実行。変数は呼び出し間で保持されます"
+          },
+          "run_tools": {
+            "label": "ツールオーケストレーション（PTC）",
+            "summary": "小さなプログラムで複数のツール呼び出しを一括実行し、中間結果を会話に残さない"
           },
           "security_scan": {
             "label": "セキュリティスキャン",
@@ -3091,7 +3100,7 @@
         "pathLabel": "保存場所",
         "copyPath": "パスをコピー",
         "copied": "コピーしました",
-                "clearFirstHint": "先に現在の選択をクリアしてください",
+        "clearFirstHint": "先に現在の選択をクリアしてください",
         "clickToAdd": "クリックで追加",
         "clickToRemove": "クリックで除去",
         "modeDay": "日ごと",
@@ -5370,6 +5379,7 @@
       "office_list-capabilities": "文書機能",
       "rewind": "巻き戻し",
       "run_code": "コード実行",
+      "run_tools": "ツール実行",
       "security_scan": "セキュリティスキャン"
     },
     "copy": "コピー",
@@ -5414,7 +5424,8 @@
     "recordedContent": "今回記録された内容",
     "fileCount": "{n} ファイル",
     "copyRetained": "保持した出力をコピー",
-    "terminalRetained": "端末は最近の出力のみ保持します。コピー内容はこのプレビューと同じです。"
+    "terminalRetained": "端末は最近の出力のみ保持します。コピー内容はこのプレビューと同じです。",
+    "runToolsProgram": "プログラム"
   },
   "duration": {
     "seconds": "{seconds}秒",
@@ -5474,8 +5485,7 @@
       "find_tool": "ファイル検索",
       "ast_tools": "AST 構造化コードツール",
       "security_scan": "セキュリティスキャン拡張",
-      "lsp": "言語サーバー（ジャンプ/診断）",
-      "media_video": "動画処理"
+      "lsp": "言語サーバー（ジャンプ/診断）"
     },
     "startupMissing": "プロジェクトに必要な環境依存が不足しています：{names}",
     "openSettings": "確認"
@@ -5517,6 +5527,9 @@
       "filesOk": "ファイルをスナップショットから復元しました（{count} 件）。",
       "filesDegraded": "ファイル復元は不完全：{reason}",
       "failed": "巻き戻しに失敗"
+    },
+    "confirmed": {
+      "pending": "「{name}」への巻き戻しを確認。このターン終了後に自動実行します。"
     }
   }
 }

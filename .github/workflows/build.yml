@@ -359,6 +359,12 @@ jobs:
       # 在 build-server.mjs 装箱前已签好），dist-server/ 散装树不再进包。
       # --publish never：所有 publish 由 release job 单点控制，避免多 job 并发上传造成
       # latest-mac.yml 互相覆盖的时间窗口（那是 v0.98.4 "检查更新失败" 的根因之一）。
+      # 内置二进制（rg/fd/ast-grep）：与 seed kit 同理，CI 直调 electron-builder
+      # 不会走 package.json 的脚本链，抓取必须单独接线；platform/arch 显式传参。
+      - name: Fetch bundled binaries (macOS)
+        if: runner.os == 'macOS'
+        run: node scripts/fetch-bundled-binaries.cjs darwin ${{ matrix.arch }}
+
       - name: Build macOS (DMG + ZIP)
         if: runner.os == 'macOS'
         run: |
@@ -388,6 +394,11 @@ jobs:
 
       # Windows 打包
       # --publish never：和 mac 同理，由 release job 单点上传。
+      - name: Fetch bundled binaries (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: node scripts/fetch-bundled-binaries.cjs win32 ${{ matrix.arch }}
+
       - name: Build Windows installer
         if: runner.os == 'Windows'
         shell: pwsh
@@ -409,6 +420,10 @@ jobs:
 
       # Linux Preview 打包
       # AppImage 给下载即用体验，deb 给 Ubuntu/Debian 系安装。
+      - name: Fetch bundled binaries (Linux)
+        if: runner.os == 'Linux'
+        run: node scripts/fetch-bundled-binaries.cjs linux ${{ matrix.arch }}
+
       - name: Build Linux preview packages
         if: runner.os == 'Linux'
         run: |

@@ -1415,6 +1415,11 @@
       "done": "🧮 Kernel execution done",
       "failed": "🧮 Kernel execution failed"
     },
+    "run_tools": {
+      "running": "🧰 Running tool program",
+      "done": "🧰 Tool program finished",
+      "failed": "🧰 Tool program failed"
+    },
     "security_scan": {
       "running": "🛡️ Scanning for secrets",
       "done": "🛡️ Security scan done",
@@ -1834,6 +1839,10 @@
           "run_code": {
             "label": "Code runner",
             "summary": "Run Python/Node code in a persistent session; variables survive across calls"
+          },
+          "run_tools": {
+            "label": "Tool orchestration (PTC)",
+            "summary": "Run one small program that orchestrates many tool calls; intermediate results stay out of the conversation"
           },
           "security_scan": {
             "label": "Security scan",
@@ -3089,7 +3098,7 @@
         "pathLabel": "Storage path",
         "copyPath": "Copy path",
         "copied": "Copied",
-                "clearFirstHint": "Clear the current selection first",
+        "clearFirstHint": "Clear the current selection first",
         "clickToAdd": "Click to include",
         "clickToRemove": "Click to remove",
         "modeDay": "Days",
@@ -5374,6 +5383,7 @@
       "office_list-capabilities": "Office capabilities",
       "rewind": "Rewind",
       "run_code": "Run code",
+      "run_tools": "Run tools",
       "security_scan": "Security scan"
     },
     "copy": "Copy",
@@ -5418,7 +5428,8 @@
     "recordedContent": "Content recorded for this call",
     "fileCount": "{n} file(s)",
     "copyRetained": "Copy retained output",
-    "terminalRetained": "Only recent terminal output is retained; copying matches this preview."
+    "terminalRetained": "Only recent terminal output is retained; copying matches this preview.",
+    "runToolsProgram": "Program"
   },
   "duration": {
     "seconds": "{seconds}s",
@@ -5478,8 +5489,7 @@
       "find_tool": "File finding",
       "ast_tools": "AST structural code tools",
       "security_scan": "Security scan enhancements",
-      "lsp": "Language servers (navigation/diagnostics)",
-      "media_video": "Video processing"
+      "lsp": "Language servers (navigation/diagnostics)"
     },
     "startupMissing": "Missing environment dependencies this project needs: {names}",
     "openSettings": "View"
@@ -5521,6 +5531,9 @@
       "filesOk": "Files restored from the snapshot ({count}).",
       "filesDegraded": "File restore incomplete: {reason}",
       "failed": "rewind failed"
+    },
+    "confirmed": {
+      "pending": "Rewind to \"{name}\" confirmed. It runs automatically as soon as this turn finishes."
     }
   }
 }

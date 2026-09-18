@@ -80,6 +80,7 @@ export const OPTIONAL_TOOL_NAMES = [
   "office",
   "rewind",
   "run_code",
+  "run_tools",
   "security_scan",
   "session",
   "update_settings",

@@ -150,6 +150,7 @@ import {
 import { workspaceRootsForSandbox } from "../shared/workspace-scope.ts";
 import { wrapWithCheckpoint } from "../lib/checkpoint-wrapper.ts";
 import { wrapWithSessionPermission } from "../lib/tools/session-permission-wrapper.ts";
+import { createPtcBindingHolder, createPtcTool } from "../lib/tools/ptc-tool.ts";
 import { createToolCatalog } from "./tool-catalog.ts";
 import { hashCacheContractValue } from "../lib/llm/cache-prefix-contract.ts";
 import { resolveReferenceBudgetTokens } from "./session-reminders.ts";
@@ -4018,7 +4019,11 @@ export class LingxiEngine {
       agentId = opts.agentDir ? path.basename(opts.agentDir) : (this.agent?.id || "");
       toolAgent = opts.agentDir ? this.getAgent(agentId) : this.agent;
     }
-    const baseCustomTools = Array.isArray(ct) ? ct : [];
+    // PTC（程序化工具调用）元工具：只能在这里创建——它的绑定表是下方包装链
+    // 完成后的最终工具面，agent 快照拿不到那个引用。创建后走正常的第一方
+    // 分类/延迟注册路径（OPTIONAL → 目录），模型经 mcp_call 触达。
+    const ptcBinding = createPtcBindingHolder();
+    const baseCustomTools = [...(Array.isArray(ct) ? ct : []), createPtcTool({ binding: ptcBinding })];
     ct = [...baseCustomTools, ...extraCustomTools];
     const getSessionPath = runtimeSessionRef
       ? (() => runtimeSessionRef.sessionPath)
@@ -4630,6 +4635,12 @@ export class LingxiEngine {
         }),
       };
     }
+
+    // PTC 绑定表在全部包装（权限 → 取消）完成后挂上：run_tools 程序里的每个
+    // 子调用因此都重走一遍完整审批/取消管线，与模型亲自调用同权。直挂面直接
+    // 命中包装后工具；目录工具由绑定桥转发包装后的 mcp_call（以真实目标名义
+    // 呈递、未知名 fail-closed）。run_tools 自身在绑定层被排除（防递归）。
+    ptcBinding.attach({ tools: [...result.tools, ...result.customTools] });
 
     // Startup assertion: every built-in tool must be categorized in
     // shared/tool-categories.ts. All session-creation paths route through

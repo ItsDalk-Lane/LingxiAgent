@@ -139,6 +139,17 @@
       "note": "build:shell never runs build:server and never reads LINGXI_SIGN_KEY. It only runs scripts/verify-seed-kit.mjs (fail-closed) against whatever already exists at dist-server-artifact/{os}-{arch}/; a missing/mismatched kit is a hard build:shell failure with a message pointing at `npm run build:server` or fetching an already-signed artifact."
     },
     {
+      "builderEntry": "bundled-bin/${os}-${arch}/ -> bundled-bin/",
+      "platform": "all",
+      "kind": "vendoredBinary",
+      "producedBy": "fetch:bundled-bins (scripts/fetch-bundled-binaries.cjs) — downloads rg/fd/ast-grep from upstream releases at pack time",
+      "buildScript": "scripts/fetch-bundled-binaries.cjs",
+      "sourcePaths": [
+        "scripts/fetch-bundled-binaries.cjs"
+      ],
+      "note": "Built-in rg (code search) / fd (file find) / ast-grep (AST tools) so those tools run out of the box after install. The gitignored staging tree bundled-bin/{mac|win|linux}-{arch}/ must never appear here — the forward check points at the fetch script, same pattern as vendor/mingit. Runtime resolution order: lib/bundled-bins.ts (bundled -> managed dir -> PATH)."
+    },
+    {
       "builderEntry": "desktop/src/screenshot-themes/ -> screenshot-themes/",
       "platform": "all",
       "kind": "staticDir",

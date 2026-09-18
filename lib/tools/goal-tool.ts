@@ -30,17 +30,17 @@ export function createGoalTool(deps: GoalToolDeps) {
     name: "goal",
     description: "Track a budget for a long-running task: create a goal with a token budget and/or wall-clock time budget, then check status anytime. When the budget is exceeded you get exactly one over-budget notice (the user sees one too) — wrap up and hand the decision back instead of silently continuing. User aborts pause the goal automatically. Budgets are advisory reminders, not hard stops; status/pause/resume/complete/drop manage the lifecycle.",
     parameters: Type.Object({
-      action: StringEnum(["create", "status", "pause", "resume", "complete", "drop"], { description: "create: start a budgeted goal (replaces a finished/dropped one; only one active at a time). status: progress readout (default). pause/resume/complete/drop: lifecycle" }),
-      name: Type.String({ description: "Short goal name shown in status" }),
-      token_budget: Type.Number({ description: "Total token budget for the goal (omit to use the global default, or set null with time_budget_minutes given)" }),
-      time_budget_minutes: Type.Number({ description: "Wall-clock time budget in minutes (pause time excluded)" }),
+      action: Type.Optional(StringEnum(["create", "status", "pause", "resume", "complete", "drop"], { description: "create: start a budgeted goal (replaces a finished/dropped one; only one active at a time). status: progress readout (default). pause/resume/complete/drop: lifecycle" })),
+      name: Type.Optional(Type.String({ description: "Short goal name shown in status" })),
+      token_budget: Type.Optional(Type.Number({ description: "Total token budget for the goal (omit to use the global default, or set null with time_budget_minutes given)" })),
+      time_budget_minutes: Type.Optional(Type.Number({ description: "Wall-clock time budget in minutes (pause time excluded)" })),
     }),
     sessionPermission: {
       resolveInvocation: (input: any = {}) => {
         if (input?.action === "status" || input?.action == null) {
           return { action: "status", kind: "read", capability: "goal.status" };
         }
-        return { action: input?.action || "create", kind: "write", capability: "goal.write" };
+        return { action: input?.action || "create", kind: "routine", capability: `goal.${input?.action || "create"}` };
       },
     },
     async execute(_toolCallId: string, params: any = {}, ..._rest: any[]) {

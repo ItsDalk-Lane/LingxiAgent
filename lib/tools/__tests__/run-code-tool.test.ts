@@ -153,7 +153,7 @@ describe("run_code 工具", () => {
   it("权限契约：status=read；run/restart=write", () => {
     const tool = makeTool(makeManager());
     expect(tool.sessionPermission.resolveInvocation({ action: "status" }).kind).toBe("read");
-    expect(tool.sessionPermission.resolveInvocation({}).kind).toBe("write");
-    expect(tool.sessionPermission.resolveInvocation({ action: "restart" }).kind).toBe("write");
+    expect(tool.sessionPermission.resolveInvocation({}).kind).toBe("routine");
+    expect(tool.sessionPermission.resolveInvocation({ action: "restart" }).kind).toBe("routine");
   });
 });

@@ -155,11 +155,11 @@ export function createAstGrepTool(cwd: string, options: { managedBinDir?: string
     parameters: Type.Object({
       pattern: Type.String({ description: "ast-grep pattern, e.g. 'function $NAME($$$) { $$$ }' or '$OBJ.$METHOD($$$)'" }),
       language: Type.String({ description: "Language id for parsing, e.g. ts, tsx, js, py, go, rs, java, c, cpp, cs, ruby, swift, kotlin, scala, html, css" }),
-      globs: Type.Array(Type.String(), { description: "Optional glob filters, e.g. ['src/**/*.ts']" }),
-      files: Type.Array(Type.String(), { description: "Optional explicit file paths (relative to cwd) to search instead of the whole tree" }),
-      output_mode: StringEnum(["content", "files", "count"], { description: "content: file:line: snippet pages (default); files: matched files with counts, newest first; count: per-file match counts" }),
-      offset: Type.Number({ description: "0-based page offset for content mode (default 0)" }),
-      limit: Type.Number({ description: "Page size for content mode (default 100)" }),
+      globs: Type.Optional(Type.Array(Type.String(), { description: "Optional glob filters, e.g. ['src/**/*.ts']" })),
+      files: Type.Optional(Type.Array(Type.String(), { description: "Optional explicit file paths (relative to cwd) to search instead of the whole tree" })),
+      output_mode: Type.Optional(StringEnum(["content", "files", "count"], { description: "content: file:line: snippet pages (default); files: matched files with counts, newest first; count: per-file match counts" })),
+      offset: Type.Optional(Type.Number({ description: "0-based page offset for content mode (default 0)" })),
+      limit: Type.Optional(Type.Number({ description: "Page size for content mode (default 100)" })),
     }),
     sessionPermission: {
       resolveInvocation: (input: any = {}) => ({

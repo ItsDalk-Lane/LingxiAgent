@@ -105,6 +105,18 @@ describe("shell-surface-manifest.json: forward (declared sources exist)", () => 
     expect(mingit.sourcePaths).not.toContain("vendor/mingit");
   });
 
+  it("bundled-bin vendoredBinary declares the fetch script, not the gitignored staging tree", () => {
+    const bundled = manifest.extraResources.find(
+      (e: { builderEntry: string }) => e.builderEntry === "bundled-bin/${os}-${arch}/ -> bundled-bin/",
+    );
+    expect(bundled).toBeTruthy();
+    expect(bundled.kind).toBe("vendoredBinary");
+    expect(bundled.platform).toBe("all");
+    expect(bundled.sourcePaths).toEqual(["scripts/fetch-bundled-binaries.cjs"]);
+    expect(bundled.buildScript).toBe("scripts/fetch-bundled-binaries.cjs");
+    expect(bundled.sourcePaths.join("\n")).not.toContain("bundled-bin/mac");
+  });
+
   for (const hook of manifest.buildHooks) {
     it(`buildHooks "${hook.hook}" script exists at ${hook.script}`, () => {
       expect(fs.existsSync(path.join(ROOT, hook.script))).toBe(true);

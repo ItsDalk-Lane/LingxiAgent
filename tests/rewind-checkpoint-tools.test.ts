@@ -115,7 +115,7 @@ describe("rewind 工具", () => {
   it("权限契约：恒 write（只读档拦截）", () => {
     const { tool } = makeDeps();
     expect(tool.sessionPermission.resolveInvocation({})).toEqual({
-      action: "apply", kind: "write", capability: "rewind.apply",
+      action: "apply", kind: "routine", capability: "rewind.apply",
     });
   });
 });
@@ -180,7 +180,7 @@ describe("checkpoint 工具", () => {
   it("权限契约：list=read；create/drop=write", () => {
     const tool = makeDeps("/tmp/s.jsonl");
     expect(tool.sessionPermission.resolveInvocation({ action: "list" }).kind).toBe("read");
-    expect(tool.sessionPermission.resolveInvocation({ action: "create" }).kind).toBe("write");
-    expect(tool.sessionPermission.resolveInvocation({ action: "drop" }).kind).toBe("write");
+    expect(tool.sessionPermission.resolveInvocation({ action: "create" }).kind).toBe("routine");
+    expect(tool.sessionPermission.resolveInvocation({ action: "drop" }).kind).toBe("routine");
   });
 });

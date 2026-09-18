@@ -15,6 +15,7 @@ import { execFile } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { resolveLingxiPiSdkManagedBinDir } from "../../shared/hana-runtime-paths.ts";
+import { findBundledBin } from "../bundled-bins.ts";
 import { ENV_DEP_ENTRIES, type EnvDepEntry } from "./registry.ts";
 
 const PROBE_TIMEOUT_MS = 3000;
@@ -167,6 +168,8 @@ export interface DetectOptions {
   probe?: ProbeFn;
   /** 测试注入点：替换托管二进制查找 */
   findManaged?: (binName: string) => string | null;
+  /** 测试注入点：替换内置二进制查找（随安装包分发的拷贝） */
+  findBundled?: (binName: string) => string | null;
   /** 测试注入点：替换项目信号扫描 */
   scanSignals?: (roots: string[], signals: string[]) => boolean;
 }
@@ -180,6 +183,7 @@ export async function detectEnvDeps(options: DetectOptions = {}): Promise<EnvDep
   const startedAt = Date.now();
   const probe = options.probe ?? defaultProbe();
   const findManaged = options.findManaged ?? managedBinPath;
+  const findBundled = options.findBundled ?? ((binName: string) => findBundledBin(binName));
   const scanSignals = options.scanSignals ?? scanProjectSignals;
 
   const deps: EnvDepStatus[] = await Promise.all(ENV_DEP_ENTRIES.map(async entry => {
@@ -193,9 +197,9 @@ export async function detectEnvDeps(options: DetectOptions = {}): Promise<EnvDep
       installHint: pickInstallHint(entry),
     };
 
-    // managed 类先查托管目录
+    // managed 类先查内置（随安装包分发），再查托管目录
     if (entry.kind === "managed" && entry.managedBinName) {
-      const managedPath = findManaged(entry.managedBinName);
+      const managedPath = findBundled(entry.managedBinName) ?? findManaged(entry.managedBinName);
       if (managedPath) {
         const r = await probe(managedPath, entry.versionArgs);
         return { ...base, status: "installed" as const, managed: true, path: managedPath, version: r.version };

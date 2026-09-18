@@ -1416,6 +1416,11 @@
       "done": "🧮 核心執行完成",
       "failed": "🧮 核心執行失敗"
     },
+    "run_tools": {
+      "running": "🧰 正在編排工具呼叫",
+      "done": "🧰 工具編排完成",
+      "failed": "🧰 工具編排失敗"
+    },
     "security_scan": {
       "running": "🛡️ 正在安全掃描",
       "done": "🛡️ 安全掃描完成",
@@ -1802,6 +1807,10 @@
           "run_code": {
             "label": "程式碼執行台",
             "summary": "在持久會話裡執行 Python/Node 等程式碼，變數跨多次呼叫保留"
+          },
+          "run_tools": {
+            "label": "工具編排（PTC）",
+            "summary": "寫一段小程式一次性編排多個工具呼叫，中間結果不佔對話上下文"
           },
           "security_scan": {
             "label": "安全掃描",
@@ -3091,7 +3100,7 @@
         "pathLabel": "存放路徑",
         "copyPath": "複製路徑",
         "copied": "已複製",
-                "clearFirstHint": "請先清除目前模式的選擇",
+        "clearFirstHint": "請先清除目前模式的選擇",
         "clickToAdd": "點擊加入選擇",
         "clickToRemove": "點擊移出選擇",
         "modeDay": "按天",
@@ -5370,6 +5379,7 @@
       "office_list-capabilities": "看文件能力",
       "rewind": "回檔",
       "run_code": "跑程式",
+      "run_tools": "編排工具",
       "security_scan": "安全掃描"
     },
     "copy": "複製",
@@ -5414,7 +5424,8 @@
     "recordedContent": "本次記錄的內容",
     "fileCount": "{n} 個檔案",
     "copyRetained": "複製已保留輸出",
-    "terminalRetained": "終端僅保留最近輸出，可複製內容與目前預覽一致"
+    "terminalRetained": "終端僅保留最近輸出，可複製內容與目前預覽一致",
+    "runToolsProgram": "程式"
   },
   "duration": {
     "seconds": "{seconds}秒",
@@ -5474,8 +5485,7 @@
       "find_tool": "檔案尋找",
       "ast_tools": "AST 結構化程式碼工具",
       "security_scan": "安全掃描增強",
-      "lsp": "語言伺服器（跳轉/診斷）",
-      "media_video": "影片處理"
+      "lsp": "語言伺服器（跳轉/診斷）"
     },
     "startupMissing": "缺少專案需要的環境依賴：{names}",
     "openSettings": "查看"
@@ -5517,6 +5527,9 @@
       "filesOk": "檔案已按快照還原（{count} 個）。",
       "filesDegraded": "檔案還原未完成：{reason}",
       "failed": "回檔失敗"
+    },
+    "confirmed": {
+      "pending": "已確認回檔到「{name}」。本回合結束後自動執行。"
     }
   }
 }

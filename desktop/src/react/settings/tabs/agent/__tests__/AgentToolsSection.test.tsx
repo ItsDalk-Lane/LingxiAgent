@@ -79,7 +79,7 @@ describe("AgentToolsSection", () => {
         disabled={["update_settings", "dm"]}
       />
     );
-    expect(container.querySelectorAll("[data-tool-name]")).toHaveLength(18);
+    expect(container.querySelectorAll("[data-tool-name]")).toHaveLength(19);
     expect(getRow(container, "automation")).toBeTruthy();
     expect(getRow(container, "beautify")).toBeTruthy();
     expect(getRow(container, "browser")).toBeTruthy();
@@ -90,6 +90,8 @@ describe("AgentToolsSection", () => {
     expect(getRow(container, "checkpoint")).toBeTruthy();
     expect(getRow(container, "goal")).toBeTruthy();
     expect(getRow(container, "rewind")).toBeTruthy();
+    expect(getRow(container, "run_code")).toBeTruthy();
+    expect(getRow(container, "run_tools")).toBeTruthy();
     expect(getRow(container, "security_scan")).toBeTruthy();
     expect(getRow(container, "office")).toBeTruthy();
     expect(getRow(container, "session")).toBeTruthy();

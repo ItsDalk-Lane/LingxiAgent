@@ -204,7 +204,7 @@ export function createRunCodeTool(deps: RunCodeToolDeps) {
     name: "run_code",
     description: "Persistent code kernel per language (python3 / node): variables, imports and function definitions survive across calls in the same session — great for iterative data work, prototyping, and debugging with state. Send code with action=run; output returns once the kernel goes quiet. If it is still busy when the wait cap hits you get told so — for CPU-long jobs prefer exec_command with wait_mode=auto. action=restart rebuilds the kernel (state lost); action=status shows kernel state. Languages missing on this machine report an install hint (see the Env Dependencies settings page).",
     parameters: Type.Object({
-      action: StringEnum(["run", "restart", "status"], { description: "run: execute code in the persistent kernel (default). restart: kill and rebuild the kernel (state lost). status: kernel state" }),
+      action: Type.Optional(StringEnum(["run", "restart", "status"], { description: "run: execute code in the persistent kernel (default). restart: kill and rebuild the kernel (state lost). status: kernel state" })),
       language: Type.String({ description: "python3 or node" }),
       code: Type.String({ description: "Source to execute (for action=run). Use print()/console.log to surface results." }),
     }),
@@ -213,7 +213,7 @@ export function createRunCodeTool(deps: RunCodeToolDeps) {
         if (input?.action === "status") {
           return { action: "status", kind: "read", capability: "run_code.status" };
         }
-        return { action: input?.action === "restart" ? "restart" : "run", kind: "write", capability: "run_code.execute" };
+        return { action: input?.action === "restart" ? "restart" : "run", kind: "routine", capability: `run_code.${input?.action === "restart" ? "restart" : "run"}` };
       },
     },
     async execute(_toolCallId: string, params: any = {}, ..._rest: any[]) {

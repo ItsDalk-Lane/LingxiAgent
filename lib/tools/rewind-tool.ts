@@ -22,6 +22,12 @@ export interface RewindToolDeps {
   rewindToCheckpoint: (opts: Record<string, any>) => Promise<any>;
   /** 影子仓库预览：({sessionPath, checkpointName, createdAtHint}) → {available, degraded, files[], fileCount} | null */
   previewRestoreFiles: (args: { sessionPath: string; checkpointName: string; createdAtHint: number | null }) => Promise<any>;
+  /** 会话是否正在流式中（助手在自己回合里调用时必为 true——回档必须等本轮结束）。 */
+  isSessionStreaming?: (sessionPath: string) => boolean;
+  /** 延迟结果账本：流式结束后自动回送并续跑一轮。 */
+  getDeferredStore?: () => any;
+  getTaskRegistry?: () => any;
+  log?: { warn?: (msg: string) => void };
 }
 
 export function createRewindTool(deps: RewindToolDeps) {
@@ -29,15 +35,15 @@ export function createRewindTool(deps: RewindToolDeps) {
     name: "rewind",
     description: "Rewind the conversation to a named checkpoint (default 'latest'), dropping everything after it. Destructive: by default a confirmation card is shown to the user listing what will happen (and which files would be restored) — the rewind only runs after the user confirms. restoreFiles=true additionally restores workspace files from the checkpoint's snapshot (per-file report; file restore needs the rollback preference enabled). After rewind the dropped background tasks are cancelled and derived memory is invalidated automatically. Always create a checkpoint first with the checkpoint tool.",
     parameters: Type.Object({
-      checkpoint: Type.String({ description: "Checkpoint name to rewind to (default 'latest')" }),
-      restoreFiles: Type.Boolean({ description: "Also restore workspace files captured at checkpoint time (default false)" }),
+      checkpoint: Type.Optional(Type.String({ description: "Checkpoint name to rewind to (default 'latest')" })),
+      restoreFiles: Type.Optional(Type.Boolean({ description: "Also restore workspace files captured at checkpoint time (default false)" })),
       /** 模型不得自行置 true 绕过用户：仅当上一轮已确认但执行失败重试时由系统回填。 */
-      risk_accepted: Type.Boolean({ description: "Reserved; leave unset" }),
+      risk_accepted: Type.Optional(Type.Boolean({ description: "Reserved; leave unset" })),
     }),
     sessionPermission: {
       resolveInvocation: (_input: any = {}) => ({
         action: "apply",
-        kind: "write",
+        kind: "routine",
         capability: "rewind.apply",
       }),
     },
@@ -116,6 +122,58 @@ export function createRewindTool(deps: RewindToolDeps) {
       }
 
       // ── 用户已点头：执行事务 ──
+      // rewind 由助手在本回合内调用时会话必然仍在流式中（session_busy 拒绝）。
+      // 此时改为「挂起到流结束」：登记 deferred+registry，轮询空闲后执行事务，
+      // 结果经延迟结果链自动回送并续跑一轮——对用户表现为自动完成。
+      if (deps.isSessionStreaming?.(sessionPath) === true) {
+        const deferredStore = deps.getDeferredStore?.() || null;
+        const taskRegistry = deps.getTaskRegistry?.() || null;
+        if (deferredStore?.defer && deferredStore?.resolve) {
+          const taskId = `rewind-${checkpointName}-${Date.now()}`;
+          try {
+            deferredStore.defer(taskId, sessionPath, {
+              type: "rewind_deferred",
+              checkpoint: checkpointName,
+              deliveryIntent: "trigger_parent_turn",
+            });
+            taskRegistry?.register?.(taskId, {
+              type: "rewind_deferred",
+              parentSessionPath: sessionPath,
+              meta: { checkpoint: checkpointName },
+              persist: false,
+            });
+          } catch { /* 登记失败也继续——执行结果仍会直发 */ }
+          void (async () => {
+            const deadline = Date.now() + 5 * 60_000;
+            while (deps.isSessionStreaming?.(sessionPath) === true && Date.now() < deadline) {
+              await new Promise((r) => setTimeout(r, 1000));
+            }
+            try {
+              const result = await deps.rewindToCheckpoint({ sessionPath, checkpointName, restoreFiles });
+              taskRegistry?.complete?.(taskId, { ok: true });
+              deferredStore.resolve(taskId, {
+                type: "rewind_deferred",
+                checkpoint: checkpointName,
+                discardedEntries: result?.discardedEntries ?? 0,
+                fileRollbackOk: result?.fileRollbackReport?.ok ?? null,
+                summary: t("rewind.result.done", { name: checkpointName, count: result?.discardedEntries ?? 0 }),
+              });
+            } catch (err: any) {
+              taskRegistry?.fail?.(taskId, err?.message || String(err));
+              deferredStore.fail?.(taskId, `${t("rewind.result.failed")}: ${err?.message || err}`);
+            }
+          })();
+          return {
+            content: [{
+              type: "text",
+              text: `${t("rewind.confirmed.pending", { name: checkpointName })} The rewind runs automatically as soon as this turn finishes; its report arrives right after.`,
+            }],
+            details: { rewind: "scheduled", checkpoint: checkpointName },
+          };
+        }
+        // 无延迟账本：如实报 busy，让模型结束本回合后由用户再触发
+        return { isError: true, content: [{ type: "text", text: `${t("rewind.result.failed")}: session is busy — end this turn first, then rewind.` }], details: { errorCode: "SESSION_BUSY" } };
+      }
       try {
         const result = await deps.rewindToCheckpoint({ sessionPath, checkpointName, restoreFiles });
         const report = result?.fileRollbackReport;

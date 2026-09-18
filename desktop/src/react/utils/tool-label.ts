@@ -74,7 +74,7 @@ export const BUILTIN_TOOL_NAMES: ReadonlySet<string> = new Set([
   'exec_command', 'write_stdin',
   'search_memory', 'pin_memory', 'unpin_memory', 'recall_experience', 'record_experience', 'tenet_propose',
   'web_search', 'web_fetch', 'todo_write', 'automation', 'stage_files', 'file', 'channel',
-  'ast_grep', 'ast_edit', 'browser', 'checkpoint', 'context_notes', 'goal', 'lsp', 'rewind', 'run_code', 'security_scan', 'computer', 'install_skill', 'learn_lesson', 'ask_user', 'notify', 'stop_task', 'update_settings',
+  'ast_grep', 'ast_edit', 'browser', 'checkpoint', 'context_notes', 'goal', 'lsp', 'rewind', 'run_code', 'run_tools', 'security_scan', 'computer', 'install_skill', 'learn_lesson', 'ask_user', 'notify', 'stop_task', 'update_settings',
   'session_folders', 'subagent', 'subagent_reply', 'subagent_close', 'workflow',
   'check_pending_tasks', 'loop_control', 'current_status', 'session', 'knowledge_search', 'knowledge_read',
   'knowledge_outline', 'knowledge_grep', 'knowledge_manage',
@@ -129,7 +129,7 @@ export const ACTIVITY_LABEL_KEYS: Readonly<Record<string, string>> = {
   check_pending_tasks: 'check_pending_tasks', loop_control: 'loop_control', current_status: 'current_status',
   subagent_reply: 'subagent_reply', subagent_close: 'subagent_close',
   learn_lesson: 'learn_lesson', ask_user: 'ask_user',
-  ast_grep: 'ast_grep', ast_edit: 'ast_edit', checkpoint: 'checkpoint', context_notes: 'context_notes', goal: 'goal', lsp: 'lsp', rewind: 'rewind', run_code: 'run_code', security_scan: 'security_scan',
+  ast_grep: 'ast_grep', ast_edit: 'ast_edit', checkpoint: 'checkpoint', context_notes: 'context_notes', goal: 'goal', lsp: 'lsp', rewind: 'rewind', run_code: 'run_code', run_tools: 'run_tools', security_scan: 'security_scan',
   // 卡片承载（不进进程区，仍要登记文案；键形如 <pluginId>_<tool>）
   'create_artifact': 'create_artifact', 'dm': 'dm', 'present_files': 'present_files',
   'media_generate-image': 'media_generate-image', 'media_generate-video': 'media_generate-video',

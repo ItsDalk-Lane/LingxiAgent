@@ -84,19 +84,19 @@ export function createAstEditTool(cwd: string, deps: AstEditToolDeps = {}) {
     name: "ast_edit",
     description: "Structural rewrite with ast-grep two-phase semantics: action=preview (default) shows the diff without touching files; action=apply rewrites in place. Metavariables must be NAMED to be spliced into the rewrite: pattern 'console.log($$$ARGS)' + rewrite 'logger.debug($$$ARGS)' produces logger.debug('hi'); an anonymous $$$ in the rewrite side is emitted literally, so never use it there. Always preview first, then apply. Apply refuses files modified since your last read (re-read, then retry). Scope with globs or explicit files.",
     parameters: Type.Object({
-      action: StringEnum(["preview", "apply"], { description: "preview: diff only (default). apply: rewrite files in place after freshness checks" }),
+      action: Type.Optional(StringEnum(["preview", "apply"], { description: "preview: diff only (default). apply: rewrite files in place after freshness checks" })),
       pattern: Type.String({ description: "ast-grep pattern to match nodes to rewrite" }),
       rewrite: Type.String({ description: "Replacement text; may reference pattern metavariables like $VAR / $$$MULTI" }),
       language: Type.String({ description: "Language id (ts, tsx, js, py, go, rs, ...)" }),
-      globs: Type.Array(Type.String(), { description: "Optional glob filters narrowing the rewrite scope" }),
-      files: Type.Array(Type.String(), { description: "Optional explicit file paths (relative to cwd) to rewrite; recommended after previewing" }),
+      globs: Type.Optional(Type.Array(Type.String(), { description: "Optional glob filters narrowing the rewrite scope" })),
+      files: Type.Optional(Type.Array(Type.String(), { description: "Optional explicit file paths (relative to cwd) to rewrite; recommended after previewing" })),
     }),
     sessionPermission: {
       resolveInvocation: (input: any = {}) => {
         if (input?.action === "apply") {
           return {
             action: "apply",
-            kind: "write",
+            kind: "routine",
             capability: "ast_edit.apply",
           };
         }

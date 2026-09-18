@@ -100,6 +100,11 @@ const SNAPSHOT_EXEMPT_TOOL_NAMES = [
   "ast_grep", "ast_edit", "security_scan",
   // run_code / lsp 同上（createSandboxedTools 组装层）。
   "run_code", "lsp",
+  // run_tools（PTC）由 engine.buildTools 自造——它的绑定表是包装链完成后的
+  // 最终工具面，Agent.getToolsSnapshot 拿不到那个引用；权限契约与行为由
+  // lib/tools/__tests__/ptc-tool.test.ts 直接断言，引擎装配与延迟目录路径由
+  // tests/ptc-engine-assembly.test.ts 覆盖。
+  "run_tools",
   // 插件承载的合成 OPTIONAL 分类，没有对应的内置工具对象
   // （见 shared/tool-categories.ts 的 PLUGIN_BACKED_OPTIONAL_TOOL_IDS）。
   "beautify", "office",

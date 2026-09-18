@@ -29,16 +29,16 @@ export function createCheckpointTool(deps: CheckpointToolDeps) {
     name: "checkpoint",
     description: "Create named session checkpoints so a later rewind tool call can restore the conversation (and optionally workspace files) to this point. Create one before risky refactors or long experiments. Checkpoints are session-local sidecar records plus an optional workspace snapshot; 'latest' is a reserved rolling slot (re-creating overwrites it), other names are unique — creating an existing name fails.",
     parameters: Type.Object({
-      action: StringEnum(["create", "list", "drop"], { description: "create: record a checkpoint at the current conversation point (default). list: list checkpoints. drop: remove one by name" }),
-      name: Type.String({ description: "Checkpoint name; default 'latest' (rolling slot)" }),
-      snapshot: Type.Boolean({ description: "Also capture a workspace snapshot so rewind can restore files (default true)" }),
+      action: Type.Optional(StringEnum(["create", "list", "drop"], { description: "create: record a checkpoint at the current conversation point (default). list: list checkpoints. drop: remove one by name" })),
+      name: Type.Optional(Type.String({ description: "Checkpoint name; default 'latest' (rolling slot)" })),
+      snapshot: Type.Optional(Type.Boolean({ description: "Also capture a workspace snapshot so rewind can restore files (default true)" })),
     }),
     sessionPermission: {
       resolveInvocation: (input: any = {}) => {
         if (input?.action === "list") {
           return { action: "list", kind: "read", capability: "checkpoint.list" };
         }
-        return { action: input?.action === "drop" ? "drop" : "create", kind: "write", capability: "checkpoint.write" };
+        return { action: input?.action === "drop" ? "drop" : "create", kind: "routine", capability: `checkpoint.${input?.action === "drop" ? "drop" : "create"}` };
       },
     },
     async execute(_toolCallId: string, params: any = {}, ..._rest: any[]) {

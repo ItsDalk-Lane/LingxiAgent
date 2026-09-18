@@ -195,19 +195,6 @@ export const ENV_DEP_ENTRIES: readonly EnvDepEntry[] = [
       linux: "sudo apt install clangd",
     },
   },
-  {
-    id: "ffmpeg",
-    label: "FFmpeg",
-    kind: "binary",
-    binaries: ["ffmpeg"],
-    versionArgs: ["-version"],
-    requiredBy: ["media_video"],
-    installHint: {
-      darwin: "brew install ffmpeg",
-      win32: "winget install Gyan.FFmpeg",
-      linux: "sudo apt install ffmpeg",
-    },
-  },
 ];
 
 export function getEnvDepEntry(id: string): EnvDepEntry | null {

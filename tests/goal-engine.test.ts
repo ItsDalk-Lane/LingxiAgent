@@ -147,8 +147,8 @@ describe("goal 工具", () => {
     const tool = makeTool("/tmp/s.jsonl");
     expect(tool.sessionPermission.resolveInvocation({ action: "status" }).kind).toBe("read");
     expect(tool.sessionPermission.resolveInvocation(undefined).kind).toBe("read");
-    expect(tool.sessionPermission.resolveInvocation({ action: "create" }).kind).toBe("write");
-    expect(tool.sessionPermission.resolveInvocation({ action: "pause" }).kind).toBe("write");
+    expect(tool.sessionPermission.resolveInvocation({ action: "create" }).kind).toBe("routine");
+    expect(tool.sessionPermission.resolveInvocation({ action: "pause" }).kind).toBe("routine");
   });
 });
 

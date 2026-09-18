@@ -23,6 +23,7 @@ import { pipeline } from "node:stream/promises";
 import { Readable } from "node:stream";
 import { createWriteStream } from "node:fs";
 import { promisify } from "node:util";
+import { findBundledBin } from "../bundled-bins.ts";
 
 const execFileAsync = promisify(execFile);
 
@@ -88,10 +89,12 @@ async function runSgVersion(sgPath: string): Promise<string> {
 }
 
 /**
- * 解析 sg：托管目录命中 → 绝对路径；PATH 上有 → 裸命令名；否则 null。
- * PATH 探测沿用 rg/fd 的 `--version` 存活测试。
+ * 解析 sg：内置（随安装包分发）→ 托管目录命中 → 绝对路径；PATH 上有 →
+ * 裸命令名；否则 null。PATH 探测沿用 rg/fd 的 `--version` 存活测试。
  */
 export function resolveAstGrepBinary(managedBinDir: string | null | undefined): string | null {
+  const bundled = findBundledBin("ast-grep");
+  if (bundled) return bundled;
   if (managedBinDir) {
     const managed = astGrepManagedPath(managedBinDir);
     if (fs.existsSync(managed)) return managed;
@@ -173,12 +176,16 @@ export function ensureAstGrepBinary(options: {
       try {
         return { path: existing, version: await runSgVersion(existing) };
       } catch {
-        // 托管文件存在但执行失败（半截下载/架构不符）——删掉重下。
-        if (options.managedBinDir && existing === astGrepManagedPath(options.managedBinDir)) {
+        const isManagedCopy = options.managedBinDir && existing === astGrepManagedPath(options.managedBinDir);
+        const isBundledCopy = existing === findBundledBin("ast-grep");
+        if (isManagedCopy) {
+          // 托管文件存在但执行失败（半截下载/架构不符）——删掉重下。
           try { fs.rmSync(existing, { force: true }); } catch { /* 尽力 */ }
-        } else {
+        } else if (!isBundledCopy) {
+          // PATH 上的命令名执行失败：如实返回，由调用方报错
           return { path: existing, version: "unknown" };
         }
+        // 内置拷贝执行失败（架构不符/损坏）：不硬用，落到底部的运行时下载自愈
       }
     }
     if (options.offline || !options.managedBinDir) return null;

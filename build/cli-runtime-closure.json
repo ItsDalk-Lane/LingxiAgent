@@ -4828,6 +4828,28 @@
       "reason": "Reached via esbuild source module graph, imported by lib/browser/browser-manager.ts (import-statement)."
     },
     {
+      "path": "lib/bundled-bins.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/pi-sdk/search-tools.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/sandbox/ast-grep-binary.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/env-deps/detect.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/search-tools.ts (import-statement); lib/sandbox/ast-grep-binary.ts (import-statement); lib/env-deps/detect.ts (import-statement)."
+    },
+    {
       "path": "lib/channels/channel-mentions.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -6000,9 +6022,14 @@
           "root": "server-bootstrap",
           "from": "lib/exec-command/tool.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/ptc-tool.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/run-code-tool.ts (import-statement); lib/exec-command/background.ts (import-statement); lib/exec-command/tool.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/run-code-tool.ts (import-statement); lib/exec-command/background.ts (import-statement); lib/exec-command/tool.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "lib/exec-command/schema.ts",
@@ -9447,6 +9474,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/tools/ptc-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "core/tool-catalog-bridge.ts",
           "kind": "import-statement"
         },
@@ -9496,7 +9528,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/todo-compat.ts (import-statement); core/compaction-utils.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); +70 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/todo-compat.ts (import-statement); core/compaction-utils.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); +71 more importer(s)."
     },
     {
       "path": "lib/pi-sdk/model-call-stream-observer.ts",
@@ -10201,6 +10233,18 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by core/provider-registry.ts (import-statement)."
+    },
+    {
+      "path": "lib/ptc/ptc-runtime.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/ptc-tool.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/ptc-tool.ts (import-statement)."
     },
     {
       "path": "lib/resource-io/agent-tools.ts",
@@ -12415,6 +12459,18 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by core/agent.ts (import-statement)."
+    },
+    {
+      "path": "lib/tools/ptc-tool.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "core/engine.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement)."
     },
     {
       "path": "lib/tools/rewind-tool.ts",
@@ -130003,9 +130059,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 11031,
+    "totalFiles": 11034,
     "byInputType": {
-      "source-graph": 822,
+      "source-graph": 825,
       "runtime-asset": 11,
       "nft-runtime-trace": 10198
     }

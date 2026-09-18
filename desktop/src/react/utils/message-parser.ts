@@ -348,6 +348,9 @@ export function extractToolDetail(name: string, args: Record<string, unknown> | 
       return { text: truncateHead((args.query || '') as string, 40) };
     case 'subagent':
       return { text: truncateHead((args.task || '') as string, 30) };
+    case 'run_tools':
+      // PTC 程序的人类可读摘要就是它的 description；code 整段太长不进摘要行
+      return { text: truncateHead((args.description || '') as string, 60) };
     case 'dm':
       return { text: (args.to || '') as string };
     case 'channel':

@@ -134,7 +134,7 @@ describe("lsp 工具（mock server 全动作）", () => {
     const { tool } = makeTool(root);
     expect(tool.sessionPermission.resolveInvocation({ action: "definition" }).kind).toBe("read");
     expect(tool.sessionPermission.resolveInvocation({}).kind).toBe("read");
-    expect(tool.sessionPermission.resolveInvocation({ action: "rename" }).kind).toBe("write");
+    expect(tool.sessionPermission.resolveInvocation({ action: "rename" }).kind).toBe("routine");
   });
 });
 

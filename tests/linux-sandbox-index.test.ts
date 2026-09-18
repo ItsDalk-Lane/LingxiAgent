@@ -201,6 +201,25 @@ describe("createSandboxedTools on Linux", () => {
     expect(getSandboxNetworkEnabled).toHaveBeenCalledTimes(2);
   });
 
+  it("registers run_code and lsp on the Linux/macOS branch (win32-parity regression)", async () => {
+    const { createSandboxedTools } = await import("../lib/sandbox/index.ts");
+    const result = createSandboxedTools("/work", [], {
+      agentDir: "/hana/agents/hana",
+      workspace: "/work",
+      workspaceFolders: [],
+      lingxiHome: "/hana",
+      getSandboxEnabled: () => true,
+      getSessionPath: () => "/hana/agents/hana/sessions/main.jsonl",
+      getTerminalSessionManager: () => ({ list: () => [] }),
+    } as any);
+
+    // 回归钉：run_code/lsp 曾只挂进 win32 数组（还重复挂了两次靠按名去重吸收），
+    // macOS/Linux 会话的整个工具面缺席这两个 OPTIONAL 工具。
+    const names = result.tools.map((tool) => tool.name);
+    expect(names.filter((name) => name === "run_code")).toHaveLength(1);
+    expect(names.filter((name) => name === "lsp")).toHaveLength(1);
+  });
+
   it("resolves read fileId through ResourceIO before path guard and SDK execution", async () => {
     const { createSandboxedTools } = await import("../lib/sandbox/index.ts");
     tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "hana-linux-session-file-"));

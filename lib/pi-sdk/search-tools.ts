@@ -1,6 +1,7 @@
 import { createInterface } from "node:readline";
 import { spawn, spawnSync } from "child_process";
 import { extractZip } from "../extract-zip.ts";
+import { findBundledBin } from "../bundled-bins.ts";
 import {
   chmodSync,
   createWriteStream,
@@ -149,6 +150,10 @@ function managedBinaryPath(tool, managedBinDir) {
 function getToolPath(tool, toolPaths) {
   const config = TOOL_CONFIGS[tool];
   if (!config) return null;
+
+  // 内置优先：随安装包分发的拷贝，开箱即用、不依赖网络与 PATH。
+  const bundledPath = findBundledBin(config.binaryName);
+  if (bundledPath) return bundledPath;
 
   const managedPath = managedBinaryPath(tool, toolPaths.managedBinDir);
   if (existsSync(managedPath)) return managedPath;
