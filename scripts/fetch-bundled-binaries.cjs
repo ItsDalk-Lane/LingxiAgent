@@ -52,9 +52,16 @@ function parseArgs(argv) {
 }
 
 function githubLatestTag(repo) {
+  // GitHub Actions 托管机共享出口 IP，匿名 API 限流（60 次/小时）经常整段 403，
+  // CI 里必须带 GITHUB_TOKEN（workflow 的 fetch 步骤注入）；本地无 token 照旧匿名。
+  const authHeader = process.env.GITHUB_TOKEN
+    ? `process.env.GITHUB_TOKEN && (headers.Authorization = "Bearer " + process.env.GITHUB_TOKEN);`
+    : "";
   const res = spawnSync("node", ["-e", `
+    const headers = { "User-Agent": "lingxi-bundled-bins" };
+    ${authHeader}
     fetch("https://api.github.com/repos/${repo}/releases/latest", {
-      headers: { "User-Agent": "lingxi-bundled-bins" },
+      headers,
       signal: AbortSignal.timeout(${NETWORK_TIMEOUT_MS}),
     }).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
       .then(j => process.stdout.write(String(j.tag_name || "")))
@@ -65,13 +72,19 @@ function githubLatestTag(repo) {
 }
 
 function downloadTo(url, dest) {
+  const authHeader = process.env.GITHUB_TOKEN
+    ? `process.env.GITHUB_TOKEN && (headers.Authorization = "Bearer " + process.env.GITHUB_TOKEN);`
+    : "";
   execFileSync("node", ["-e", `
     const fs = require("node:fs");
     const { Readable } = require("node:stream");
     const { pipeline } = require("node:stream/promises");
+    const headers = { "User-Agent": "lingxi-bundled-bins" };
+    ${authHeader}
     fetch(process.argv[1], {
-      headers: { "User-Agent": "lingxi-bundled-bins" },
+      headers,
       signal: AbortSignal.timeout(180_000),
+      redirect: "follow",
     }).then(r => {
       if (!r.ok || !r.body) throw new Error("HTTP " + r.status);
       return pipeline(Readable.fromWeb(r.body), fs.createWriteStream(process.argv[2]));

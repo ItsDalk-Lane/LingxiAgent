@@ -364,6 +364,10 @@ jobs:
       - name: Fetch bundled binaries (macOS)
         if: runner.os == 'macOS'
         run: node scripts/fetch-bundled-binaries.cjs darwin ${{ matrix.arch }}
+        env:
+          # 托管机共享出口 IP，匿名 GitHub API 限流整段 403（v0.1.40-experimental.1
+          # 首发的 Windows 腿实锤）；带仓库 token 走 5000/hr 档。
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build macOS (DMG + ZIP)
         if: runner.os == 'macOS'
@@ -398,6 +402,8 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: node scripts/fetch-bundled-binaries.cjs win32 ${{ matrix.arch }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Windows installer
         if: runner.os == 'Windows'
@@ -423,6 +429,8 @@ jobs:
       - name: Fetch bundled binaries (Linux)
         if: runner.os == 'Linux'
         run: node scripts/fetch-bundled-binaries.cjs linux ${{ matrix.arch }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Linux preview packages
         if: runner.os == 'Linux'
