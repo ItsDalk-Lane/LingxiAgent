@@ -221,7 +221,8 @@
     "toolReadOnly": "只讀",
     "toolWrite": "寫入",
     "filesUnsupported": "頻道暫時只支援文字訊息，檔案不會加入普通聊天附件",
-    "createIntroOptional": "說明"
+    "createIntroOptional": "說明",
+    "mapTab": "會話地圖"
   },
   "announcement": {
     "title": "更新完成 · v{version}",
@@ -288,7 +289,18 @@
       "loading": "正在載入項目…",
       "empty": "還沒有項目"
     },
-    "archivedChats": "歸檔記錄"
+    "archivedChats": "歸檔記錄",
+    "runningGroup": "執行中",
+    "actionBadge": {
+      "askUser": "正在提問",
+      "approval": "待批准",
+      "confirm": "待確認"
+    },
+    "projectNewChat": "新建對話",
+    "projectMore": "更多",
+    "projectRemove": "移除工作目錄",
+    "projectArchiveAll": "歸檔全部對話",
+    "projectArchiveDone": "已歸檔 {count} 條對話"
   },
   "titlebar": {
     "currentChatTitle": "目前對話標題",
@@ -300,6 +312,12 @@
     "switchFailed": "切換 session 失敗",
     "createFailed": "新建 session 失敗",
     "archiveFailed": "歸檔 session 失敗",
+    "archiveChildrenTitle": "封存這段對話？",
+    "archiveChildrenBody": "它還有 {count} 段由它分岔出的對話，要一併封存嗎？",
+    "archiveWithChildren": "連同衍生對話一併封存",
+    "archiveDetachChildren": "僅封存這段對話",
+    "archiveChildrenNeeded": "存在衍生對話，請選擇封存方式",
+    "archiveChildSummary": "已封存 {archived} 段衍生對話，{detached} 段保持獨立",
     "rename": "重新命名",
     "pin": "置頂",
     "unpin": "取消置頂",
@@ -363,7 +381,10 @@
     },
     "rcTakingOver": "{platform} 接管中",
     "subagentRunStateUnrecoverable": "歷史 subagent 執行狀態不可恢復",
-    "subagentLinkUnrecoverable": "歷史 subagent 連結不可恢復"
+    "subagentLinkUnrecoverable": "歷史 subagent 連結不可恢復",
+    "collapseChildren": "收起子對話",
+    "expandChildren": "展開子對話",
+    "expandChildrenCount": "展開 {count} 條子對話"
   },
   "common": {
     "on": "開",
@@ -407,6 +428,27 @@
     "back": "返回"
   },
   "chat": {
+    "editedFiles": {
+      "title": "已編輯 {count} 個檔案",
+      "viewChanges": "檢視變更",
+      "viewUnavailable": "目前工作區沒有可關聯的 Git 變更",
+      "noGitRepo": "目前工作區不是 Git 倉庫，無法用 Git 檢視或還原變更",
+      "undo": "復原",
+      "undoUnavailable": "沒有可復原的檔案（可能都是本次新建的檔案）",
+      "undoConfirmTitle": "復原本輪檔案變更？",
+      "undoConfirmBody": "將用 Git 回退以下 {count} 個檔案的未提交變更（恢復到最近一次提交，新建檔案不受影響）：\n{list}",
+      "undoConfirmOk": "復原變更",
+      "undoDone": "已復原 {count} 個檔案的變更",
+      "undoFailed": "復原失敗",
+      "review": "審核",
+      "reviewUnavailable": "工作階段閒置時才能發起審核",
+      "reviewSent": "已發起審核，等待助理覆查",
+      "reviewQueued": "審核請求已排隊，將在目前回合結束後傳送",
+      "reviewFailed": "審核請求傳送失敗",
+      "reviewPrompt": "請審核你本輪修改的這些檔案：\n{files}\n檢查是否有錯誤、遺漏或可簡化之處，給出簡明結論；如需修改請直接動手。",
+      "showMore": "再顯示 {count} 個檔案",
+      "showLess": "收起"
+    },
     "fileRollback": {
       "menuTitle": "重新生成",
       "conversationOnly": "僅回退對話",
@@ -1504,7 +1546,8 @@
       "about": "關於",
       "security": "安全",
       "experiments": "实验",
-      "envdeps": "環境依賴"
+      "envdeps": "環境依賴",
+      "keybindings": "快捷鍵"
     },
     "browser": {
       "cookiesTitle": "Cookies",
@@ -1973,7 +2016,9 @@
       "copied": "已複製",
       "saved": "已儲存",
       "invalidPort": "連接埠必須是數字",
-      "loadFailed": "讀取存取設定失敗"
+      "loadFailed": "讀取存取設定失敗",
+      "publicBaseUrl": "對外存取位址",
+      "publicBaseUrlHint": "填 Tailscale 虛擬 IP 或公網網域（如 https://lingxi.example.com）；填寫後手機位址與 QR Code 優先使用它，外部網路也可連線，留空則僅區域網路"
     },
     "security": {
       "sandbox": "沙盒",
@@ -1998,7 +2043,7 @@
       "networkProxyNoProxy": "不走代理，例如 localhost, 127.0.0.1, ::1",
       "networkProxySave": "儲存代理設定",
       "fileBackup": "檔案備份",
-      "fileBackupDesc": "AI 修改或刪除檔案前自動儲存原始內容",
+      "fileBackupDesc": "AI 修改或刪除檔案前自動儲存原始內容；到期自動清理，隨會話刪除一併清除",
       "retention": "保留時間",
       "retention1d": "1 天",
       "retention3d": "3 天",
@@ -2477,7 +2522,7 @@
       "homeFolderClear": "清除",
       "homeFolderBrowse": "選擇資料夾",
       "contextFilesTitle": "工作區說明注入",
-      "contextFilesDesc": "把目前工作台專案裡的 AGENTS.md / CLAUDE.md 注入到新建會話的系統提示詞中，位置在記憶之前。",
+      "contextFilesDesc": "把目前工作台專案裡的 AGENTS.md / CLAUDE.md，以及自訂檔名的說明檔案，注入到新建會話的系統提示詞中，位置在記憶之前。",
       "injectAgentsMd": "注入 AGENTS.md",
       "injectAgentsMdDesc": "開啟後，新會話會讀取目前工作目錄到 Git 根目錄之間的 AGENTS.md。",
       "injectClaudeMd": "注入 CLAUDE.md",
@@ -2488,7 +2533,10 @@
       "discoverProjectSkillsDesc": "探索並載入目前專案 .agents/skills 中的技能。",
       "discoverCompatibleProjectSkills": "載入其他工具的專案技能",
       "discoverCompatibleProjectSkillsDesc": "同時探索專案內 Claude Code、Codex 與 OpenClaw 的技能目錄。",
-      "agentDeskSection": "Agent 工作台設定"
+      "agentDeskSection": "Agent 工作台設定",
+      "injectCustomFile": "注入自訂檔案",
+      "injectCustomFileDesc": "開啟後，新會話會讀取目前工作目錄到 Git 根目錄之間、與下方檔名同名的檔案。",
+      "customFileNamePlaceholder": "輸入自訂檔名，例如 QWEN.md"
     },
     "toolCaps": {
       "title": "技能安裝權限"
@@ -3037,10 +3085,6 @@
         "unknownValue": "（未知）"
       },
       "charts": {
-        "fixedBadgeDate": "固定 · 日期",
-        "fixedBadgeModelDate": "固定 · 模型 × 日期",
-        "fixedBadgeProviderDate": "固定 · 供應商 × 日期",
-        "fixedBadgeCategoryDate": "固定 · 類別 × 日期",
         "empty": "暫無資料",
         "loading": "載入圖表資料…",
         "error": "圖表載入失敗",
@@ -3058,6 +3102,7 @@
           "cumulative": "累計",
           "tooltipCalls": "呼叫次數",
           "tooltipTokens": "Token 總量",
+          "tooltipHint": "當日呼叫次數與 Token 用量",
           "weekRange": "{since} – {until} 當週",
           "cumulativeUntil": "截至 {date} 累計",
           "hint": {
@@ -3076,9 +3121,16 @@
         },
         "pie": {
           "title": "類別構成",
-          "hint": "選一天看當天的類別構成；懸停扇區顯示該類別的量與當日總計。",
-          "dateLabel": "查看日期"
-        }
+          "viewDaily": "按日",
+          "viewAll": "累計",
+          "allTotal": "累計總量",
+          "dateLabel": "查看日期",
+          "hint": "選一天看當天的類別構成；懸停扇區顯示該類別的量與當日總計。"
+        },
+        "fixedBadgeDate": "固定 · 日期",
+        "fixedBadgeModelDate": "固定 · 模型 × 日期",
+        "fixedBadgeProviderDate": "固定 · 供應商 × 日期",
+        "fixedBadgeCategoryDate": "固定 · 類別 × 日期"
       },
       "storage": {
         "retentionTitle": "保留天數",
@@ -3248,7 +3300,8 @@
           "dropped": "payload 在擷取时被丟棄",
           "not_captured": "該呼叫未擷取 payload",
           "unknown": "無 payload 記錄"
-        }
+        },
+        "empty": "暫無呼叫記錄"
       },
       "provenance": {
         "title": "語義輸入溯源",
@@ -3859,6 +3912,64 @@
           "less": "收起"
         }
       }
+    },
+    "keybindings": {
+      "title": "快捷鍵",
+      "searchPlaceholder": "搜尋快捷鍵",
+      "resetAll": "全部恢復預設",
+      "alreadyDefault": "目前已是預設鍵位",
+      "column": {
+        "command": "指令",
+        "binding": "按鍵綁定",
+        "scope": "作用域",
+        "actions": "操作"
+      },
+      "scope": {
+        "global": "全域",
+        "app": "應用",
+        "local": "局部",
+        "globalHint": "系統層級生效，應用程式在背景也可觸發",
+        "appHint": "應用程式內所有視窗生效",
+        "localHint": "僅在特定介面聚焦時生效"
+      },
+      "addBinding": "新增綁定",
+      "recording": "按下新的按鍵組合…",
+      "bindingEmpty": "未綁定",
+      "conflict": "該按鍵組合已綁定到其他指令",
+      "maxBindings": "每個指令最多綁定 3 組按鍵",
+      "restoreCommand": "恢復預設",
+      "removeBinding": "移除該綁定",
+      "editBinding": "修改按鍵",
+      "saved": "快捷鍵已儲存",
+      "resetDone": "已全部恢復預設",
+      "registrationFailed": "快捷鍵註冊失敗，可能已被其他應用程式佔用",
+      "noResults": "沒有符合的快捷鍵",
+      "footnote": "局部快捷鍵僅在對應介面聚焦時生效；鍵位預設區分 macOS 與 Windows/Linux。",
+      "footnoteMac": "局部快捷鍵僅在對應介面聚焦時生效；⌘ 指 Command 鍵。",
+      "commands": {
+        "quickChatToggle": "呼出快捷對話",
+        "quickChatToggleHint": "呼出或隱藏快捷對話小窗",
+        "appRestart": "重新啟動軟體",
+        "appRestartHint": "結束並重新啟動應用程式，未儲存的內容可能遺失",
+        "appOpenSettings": "開啟設定",
+        "appOpenSettingsHint": "開啟設定視窗",
+        "appNewSession": "新增會話",
+        "appNewSessionHint": "建立一個新會話",
+        "appToggleSidebar": "切換側邊欄",
+        "appToggleSidebarHint": "展開或收起左側邊欄",
+        "voiceRecordToggle": "語音錄製/傳送",
+        "voiceRecordToggleHint": "主聊天頁面聚焦時，按一次開始錄音，再按一次結束並傳送"
+      },
+      "loadFailed": "讀取快捷鍵偏好失敗",
+      "recordingModifierOnly": "放開修飾鍵本身不算按鍵，請再按一個字母、數字或功能鍵",
+      "recordingNeedsModifier": "組合鍵需要包含 ⌘/Ctrl 或 Alt（F1–F12 功能鍵可單獨使用）",
+      "systemTaken": "快速鍵 {combo} 已被系統或其他應用佔用，未儲存",
+      "availability": {
+        "ok": "可用",
+        "taken": "已被佔用",
+        "checking": "檢測中…",
+        "unavailable": "需在桌面應用內檢測"
+      }
     }
   },
   "onboarding": {
@@ -4222,15 +4333,23 @@
     "noCommits": "暫無提交",
     "copyHash": "複製提交 ID",
     "copied": "已複製提交 ID",
-    "timeJustNow": "剛剛",
-    "timeMinutesAgo": "{n} 分鐘前",
-    "timeHoursAgo": "{n} 小時前",
-    "timeDaysAgo": "{n} 天前",
+    "historyColGraph": "圖",
+    "historyColDescription": "描述",
+    "historyColDate": "日期",
+    "historyColAuthor": "作者",
+    "historyColHash": "提交",
+    "commitFiles": "{n} 個檔案",
+    "historyLoading": "提交載入中…",
     "commitTitle": "提交或推送",
-    "commitMessagePlaceholder": "提交訊息（留空將自動生成）",
-    "includeUnstaged": "包含未暫存的變更",
     "btnCommit": "提交",
     "btnCommitPush": "提交並推送",
+    "btnPull": "拉取",
+    "pullHint": "把遠端儲存庫的新提交拉到本機（僅快轉銜接，不產生合併提交）",
+    "pullDone": "已拉取遠端更新（{count} 個提交）",
+    "pullUpToDate": "已是最新，無需拉取",
+    "noUpstream": "目前分支未關聯遠端分支",
+    "pullDiverged": "本機與遠端各有新提交，無法自動合併；可在對話中請助手協助處理",
+    "pullLocalChanges": "本機未提交變更與遠端更新衝突，請先提交或儲藏後再拉取",
     "btnPush": "推送",
     "nothingToCommit": "沒有可提交的變更",
     "nothingStaged": "沒有已暫存的變更（請勾選「包含未暫存的變更」）",
@@ -4263,15 +4382,15 @@
     "unstashPathDirty": "該檔案目前有未提交的改動，取出會覆蓋它，請先回退或提交",
     "unstashConflict": "取出時發生衝突，儲藏項目已保留，請手動處理後重試",
     "discardOneHint": "丟棄該檔案未提交的改動，還原成 HEAD（不可復原）",
-    "discardUntrackedHint": "未跟蹤的新檔案不參與回退，避免誤刪",
+    "discardUntrackedHint": "未跟蹤的新檔案：放棄將刪除這個檔案（不可撤銷）",
     "discardFileDone": "已回退 {name}",
     "discardAllDone": "已回退全部已跟蹤改動",
     "discardFailed": "回退失敗",
     "discardNothing": "沒有可回退的改動",
     "discardConfirmTitle": "回退修改",
     "discardConfirmOk": "確認回退",
-    "discardConfirmAll": "將丟棄全部已跟蹤檔案的未提交改動（含已暫存部分），無法復原。未跟蹤的新檔案不受影響。",
-    "discardConfirmFiles": "將丟棄這 {count} 個檔案的未提交改動（含已暫存部分），無法復原：\n{list}",
+    "discardConfirmAll": "將丟棄全部已跟蹤檔案的未提交改動（含已暫存部分），並刪除全部未跟蹤的新檔案，無法復原。",
+    "discardConfirmFiles": "將丟棄這 {count} 個檔案的未提交改動（未跟蹤的新檔案將被刪除），無法復原：\n{list}",
     "operationFailed": "操作失敗",
     "worktreeRow": "新增工作樹",
     "worktreeTitle": "在 worktree 中開始新會話",
@@ -4290,7 +4409,48 @@
     "worktreeDirExists": "同名目錄已存在，請換個名稱",
     "worktreeBranchExists": "此名稱對應的 wt/ 分支已存在，請換個名稱",
     "worktreeMainTag": "主",
-    "worktreeCurrentTag": "目前"
+    "worktreeCurrentTag": "目前",
+    "graphTitle": "原始碼管理",
+    "graphMessagePlaceholder": "訊息(*Enter 在「{branch}」提交)",
+    "graphCleanTree": "沒有變更，工作區是乾淨的",
+    "stagedChanges": "已暫存的變更",
+    "stageAllTitle": "暫存所有變更",
+    "unstageAll": "取消所有暫存修改",
+    "stageOne": "暫存變更",
+    "unstageOne": "取消暫存修改",
+    "discardOneTitle": "放棄變更",
+    "discardAllTitle": "放棄所有變更",
+    "amendBtn": "提交（修改）",
+    "amendHint": "把變更併入上一次提交",
+    "commitSyncBtn": "提交和同步",
+    "commitSyncHint": "先拉遠端，再提交並推送",
+    "amendDone": "已併入上一次提交",
+    "stageDone": "已暫存 {name}",
+    "stageAllDone": "已暫存全部變更",
+    "unstageDone": "已取消暫存 {name}",
+    "unstageAllDone": "已取消所有暫存修改",
+    "stageFailed": "暫存失敗",
+    "unstageFailed": "取消暫存失敗",
+    "syncChanges": "同步變更",
+    "syncPushHint": "推送本地的 {n} 個提交",
+    "syncPullHint": "拉取遠端的 {n} 個新提交",
+    "syncBothHint": "先拉取遠端的 {n} 個新提交，再推送本地的 {m} 個提交",
+    "aheadHint": "本地領先遠端 {n} 個提交",
+    "letterM": "修改",
+    "letterU": "新檔案",
+    "letterA": "已暫存的新檔案",
+    "letterD": "已刪除",
+    "graphFilesMore": "還有 {n} 個檔案，可在清單內捲動查看",
+    "graphShowAll": "顯示全部 {n} 個檔案",
+    "checkBlockEof": "提交被專案的自動檢查攔下了：檔案結尾有多餘的空行（{file} 第 {line} 行），刪掉它再提交。",
+    "checkBlockWhitespace": "提交被專案的自動檢查攔下了：行尾有多餘的空格（{file} 第 {line} 行），清理後重試。",
+    "checkBlockPush": "推送被拒絕了：常見原因是①推送前的自動檢查（如整個專案的型別檢查）沒有通過，②遠端分支有你本地沒有的新提交。可先拉取一次再看，或在本機終端查看檢查輸出。",
+    "checkBlockHook": "被專案的自動檢查攔下了（提交/推送前的檢查沒有通過），按檢查輸出的提示修好後重試。",
+    "refreshInfo": "刷新遠端與本地資訊",
+    "refreshLocalOnly": "未新增遠端倉庫，僅刷新本地資訊",
+    "refreshDone": "已刷新：本地與遠端資訊都是最新的",
+    "fetchFailed": "刷新遠端資訊失敗",
+    "noRemoteNotice": "未新增遠端倉庫——提交只保存在本地，無法推送到遠端。"
   },
   "desk": {
     "title": "書桌",
@@ -4974,7 +5134,7 @@
       "theme": "主题",
       "chatModel": "聊天模型",
       "fileBackup": "文件备份",
-      "fileBackupDesc": "AI 修改文件前自动备份"
+      "fileBackupDesc": "AI 修改文件前自動備份的保留天數（天）"
     },
     "generateImage": {
       "description": "根据文字描述生成图片。非阻塞：提交后立即返回，完成后自动显示。",
@@ -5531,5 +5691,53 @@
     "confirmed": {
       "pending": "已確認回檔到「{name}」。本回合結束後自動執行。"
     }
+  },
+  "compaction": {
+    "askTitle": "上下文空間即將過半",
+    "askBody": "目前會話的上下文已使用 {percent}%（已過 {askPercent}% 詢問線，到 {forcePercent}% 時會自動壓縮）。壓縮會把較早的對話收進摘要，為後續對話騰出空間。要現在壓縮嗎？",
+    "askConfirm": "立即壓縮",
+    "askCancel": "暫不",
+    "deferredToast": "回覆結束後將自動壓縮上下文",
+    "autoCompleted": "上下文已達 {percent}%，已自動壓縮並騰出空間"
+  },
+  "map": {
+    "workspace": "工作區",
+    "locate": "定位目前",
+    "zoomIn": "放大",
+    "zoomOut": "縮小",
+    "empty": "此工作區尚無會話",
+    "loading": "載入中…",
+    "turnsLoadFailed": "載入失敗",
+    "ungrouped": "未分組",
+    "toolCount": "工具 {count}",
+    "truncated": "內容已截斷",
+    "stats": "{threads} 個會話 · {cards} 張卡片",
+    "followUp": "追問",
+    "continue": "繼續追問",
+    "branch": "建立分支",
+    "openInChat": "在對話中開啟",
+    "send": "傳送",
+    "cancel": "取消",
+    "sending": "傳送中…",
+    "waitingForAssistant": "等待助手回覆…",
+    "queued": "已加入傳送佇列，將在對話頁自動傳送",
+    "sendFailed": "傳送失敗",
+    "forkBusy": "會話正在產生回覆，稍後再試",
+    "collapseBlockedCurrent": "目前會話位於這個後續分支中，無法摺疊",
+    "hiddenCount": "隱藏 {count} 條後續",
+    "collapse": "摺疊後續",
+    "expand": "展開後續",
+    "resetLayout": "重置版面",
+    "resetLayoutConfirm": "確定要重置畫布版面嗎？",
+    "quickPhrases": "展開說明|舉例|通俗易懂|對比解釋",
+    "draftContinuePlaceholder": "接著這個問題繼續追問…",
+    "draftBranchPlaceholder": "從這裡建立分支…",
+    "editPhrases": "編輯常用語",
+    "addPhrase": "新增",
+    "processLine": "工具呼叫 {count} 次",
+    "turnLabel": "第 {index} 輪"
+  },
+  "labels": {
+    "thinking": "思考"
   }
 }

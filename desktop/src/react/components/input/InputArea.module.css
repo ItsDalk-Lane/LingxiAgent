@@ -731,10 +731,14 @@
     z-index: 100;
     display: flex;
     flex-direction: column;
-    padding: 4px;
+    gap: 2px;
+    padding: 6px;
     margin-bottom: var(--space-6);
-    max-width: 360px;
-    max-height: 308px;
+    max-width: 420px;
+    /* 恰好完整显示 10 条且第 11 条零露出：10×28(项高) + 9×2(间隙) = 298，
+       加上底部 2px 余量 = 301（经真实窗口逐像素实测校准）。
+       改动项高/间隙时需同步重算。 */
+    max-height: 301px;
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -752,9 +756,10 @@
 
 .slash-menu-item {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
+    flex-shrink: 0; /* 禁止在固定高度容器里被压缩——压缩会触发 overflow:hidden 把两行文字裁掉 */
+    align-items: flex-start;
+    gap: 12px;
+    padding: 5px 12px;
     border: none;
     background: none;
     border-radius: var(--radius-md);
@@ -778,26 +783,37 @@
 
 .slash-menu-icon {
     flex-shrink: 0;
+    margin-top: 2px; /* 与首行文字视觉对齐 */
     color: var(--text-muted);
     display: flex;
     align-items: center;
 }
 
+/* 名字在上、说明在下的两行布局，行间留白参考「添加」菜单的节奏 */
+.slash-menu-text {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline; /* 说明与命令名同行、基线对齐 */
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
 .slash-menu-label {
-    font-weight: 500;
+    font-weight: 600;
     white-space: nowrap;
-    flex-shrink: 0;
+    flex-shrink: 0; /* 名字不参与压缩，说明过长时优先截断说明 */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .slash-menu-desc {
     color: var(--text-muted);
     font-size: var(--fs-ui);
-    margin-left: auto;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
-    padding-right: 2px;
 }
 
 .file-mention-menu {

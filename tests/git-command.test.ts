@@ -15,6 +15,9 @@ import path from "node:path";
 import {
   collectGitStatus,
   commitChanges,
+  amendCommit,
+  stagePaths,
+  unstagePaths,
   checkoutBranch,
   createBranch,
   createWorktree,
@@ -25,6 +28,7 @@ import {
   isValidWorktreeName,
   listBranches,
   listCommits,
+  listCommitStats,
   listStashes,
   listWorktrees,
   parseForEachBranchRef,
@@ -32,10 +36,12 @@ import {
   parseNumstatZ,
   parseWorktreePorcelain,
   popStash,
+  pullChanges,
   pushChanges,
   restoreStashedPath,
   runGit,
   stashChanges,
+  tryGit,
   worktreeInfo,
 } from "../server/git/git-command.ts";
 
@@ -329,6 +335,262 @@ describe("checkout / commit / push (real repo)", () => {
     const second = commits[1];
     expect(head.parents[0]).toBe(second.hash);
     expect(head.shortHash).toMatch(/^[0-9a-f]{7,}$/);
+    // 元数据查询不含统计（两段加载：统计走 listCommitStats）
+    expect(head.additions).toBe(0);
+    expect(head.deletions).toBe(0);
+    expect(head.changedFiles).toBe(0);
+  });
+
+  it("listCommitStats batch-fetches per-commit stats keyed by hash with cache", async () => {
+    const commits = await listCommits(mainDir, 5);
+    expect(commits.length).toBeGreaterThan(0);
+    const stats = await listCommitStats(mainDir, commits.map(c => c.hash));
+    for (const c of commits) {
+      const s = stats.get(c.hash);
+      expect(s).toBeDefined();
+      expect(s!.additions).toBeGreaterThanOrEqual(0);
+      expect(s!.deletions).toBeGreaterThanOrEqual(0);
+      expect(s!.changedFiles).toBeGreaterThan(0);
+    }
+    // 非 40 位十六进制的输入被忽略；命中缓存的哈希仍返回
+    const again = await listCommitStats(mainDir, ["not-a-hash", "--upload-pack=evil", commits[0].hash]);
+    expect(again.has(commits[0].hash)).toBe(true);
+    expect(again.size).toBe(1);
+    // 空输入不触发 git 调用，直接返回空表
+    expect((await listCommitStats(mainDir, [])).size).toBe(0);
+  });
+});
+
+/**
+ * stagePaths / unstagePaths / amendCommit 契约：Git图谱 面板的暂存与
+ * 提交（修改）底座。独立临时仓，不与上方共享状态。
+ */
+describe("stagePaths / unstagePaths / amendCommit (real repo)", () => {
+  let dir = "";
+
+  async function stagedPaths(): Promise<string[]> {
+    const res = await tryGit(dir, ["-c", "core.quotepath=false", "diff", "--cached", "--name-only"]);
+    return res.ok ? res.stdout.split("\n").map(s => s.trim()).filter(Boolean) : [];
+  }
+
+  beforeAll(async () => {
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-git-cmd-stage-"));
+    try {
+      await git(dir, ["init", "-b", "main"]);
+    } catch {
+      await git(dir, ["init"]);
+    }
+    await git(dir, ["config", "user.name", "Lingxi Test"]);
+    await git(dir, ["config", "user.email", "test@lingxi.local"]);
+    write(dir, "a.md", "one\n");
+    write(dir, "b.md", "bee\n");
+    await git(dir, ["add", "-A"]);
+    await git(dir, ["commit", "-m", "init"]);
+
+    // 工作树脏状态：a.md 未暂存修改 + c.md 未跟踪
+    write(dir, "a.md", "one\ntwo\n");
+    write(dir, "c.md", "cee\n");
+  });
+
+  afterAll(() => {
+    if (dir) fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  it("stages everything (including untracked) with no pathspec", async () => {
+    const result = await stagePaths(dir);
+    expect(result).toEqual({ ok: true, paths: [] });
+    expect(await stagedPaths()).toEqual(expect.arrayContaining(["a.md", "c.md"]));
+    const status = await collectGitStatus(dir);
+    expect(status.files.every(f => f.staged)).toBe(true);
+  });
+
+  it("unstages everything back to HEAD, keeping worktree contents", async () => {
+    const result = await unstagePaths(dir);
+    expect(result).toEqual({ ok: true, paths: [] });
+    expect(await stagedPaths()).toEqual([]);
+    // a.md 的修改与 c.md 仍未跟踪地留在工作树
+    const status = await collectGitStatus(dir);
+    expect(status.unstagedTotal.additions).toBeGreaterThan(0);
+  });
+
+  it("stages a single path only", async () => {
+    const result = await stagePaths(dir, ["a.md"]);
+    expect(result).toEqual({ ok: true, paths: ["a.md"] });
+    expect(await stagedPaths()).toEqual(["a.md"]);
+    await unstagePaths(dir, ["a.md"]);
+    expect(await stagedPaths()).toEqual([]);
+  });
+
+  it("rejects invalid pathspecs", async () => {
+    expect(await stagePaths(dir, ["../escape"])).toEqual({ ok: false, code: "invalid_path" });
+    expect(await unstagePaths(dir, ["../escape"])).toEqual({ ok: false, code: "invalid_path" });
+  });
+
+  it("amends with the staged change, keeping the original message when empty", async () => {
+    write(dir, "a.md", "one\ntwo\nthree\n");
+    await stagePaths(dir, ["a.md"]);
+    const before = (await listCommits(dir, 1))[0];
+
+    const result = await amendCommit(dir, null);
+    expect(result.ok).toBe(true);
+    expect(result.head).toMatch(/^[0-9a-f]{7,40}$/);
+
+    const after = (await listCommits(dir, 1))[0];
+    expect(after.hash).not.toBe(before.hash);
+    expect(after.message).toBe(before.message); // --no-edit 保留原信息
+    expect(after.parents).toEqual(before.parents); // 不新增提交
+    // 暂存内容已并入：暂存区干净，工作树也不再有 a.md 的改动
+    expect(await stagedPaths()).toEqual([]);
+  });
+
+  it("amend replaces the message when one is given", async () => {
+    const result = await amendCommit(dir, "fix: 改写提交信息");
+    expect(result.ok).toBe(true);
+    expect((await listCommits(dir, 1))[0].subject).toBe("fix: 改写提交信息");
+  });
+
+  it("refuses to amend a repo without any commit", async () => {
+    const empty = fs.mkdtempSync(path.join(os.tmpdir(), "hana-git-cmd-amend-empty-"));
+    try {
+      await git(empty, ["init"]);
+      const result = await amendCommit(empty, "x");
+      expect(result).toMatchObject({ ok: false, code: "nothing_to_commit" });
+    } finally {
+      fs.rmSync(empty, { recursive: true, force: true });
+    }
+  });
+
+  it("unstages on a zero-commit repo by clearing the index, not the file", async () => {
+    const empty = fs.mkdtempSync(path.join(os.tmpdir(), "hana-git-cmd-unstage-empty-"));
+    try {
+      await git(empty, ["init"]);
+      await git(empty, ["config", "user.name", "Lingxi Test"]);
+      await git(empty, ["config", "user.email", "test@lingxi.local"]);
+      write(empty, "only.md", "data\n");
+      await stagePaths(empty);
+      // 零提交仓库探测暂存区用 ls-files（diff --cached 依赖 HEAD）
+      const lsFiles = async (): Promise<string[]> => {
+        const res = await tryGit(empty, ["ls-files"]);
+        return res.ok ? res.stdout.split("\n").map(s => s.trim()).filter(Boolean) : [];
+      };
+      expect(await lsFiles()).toEqual(["only.md"]);
+
+      const result = await unstagePaths(empty);
+      expect(result).toEqual({ ok: true, paths: [] });
+      expect(await lsFiles()).toEqual([]);
+      // 文件本体还在，退成未跟踪
+      expect(fs.existsSync(path.join(empty, "only.md"))).toBe(true);
+      const status = await collectGitStatus(empty);
+      expect(status.files[0]).toMatchObject({ path: "only.md", state: "untracked" });
+    } finally {
+      fs.rmSync(empty, { recursive: true, force: true });
+    }
+  });
+
+  it("classifies states by real name-status: pure-deletion edits are modified, not deleted", async () => {
+    // 用户场景复现：只删掉一行内容（0 增 1 删），文件还在 → 必须是 modified 而不是 deleted
+    write(dir, "a.md", "one\ntwo\n");
+    await stagePaths(dir, ["a.md"]);
+
+    let entry = (await collectGitStatus(dir)).files.find(f => f.path === "a.md");
+    expect(entry).toMatchObject({ staged: true, state: "modified" });
+
+    await unstagePaths(dir, ["a.md"]);
+    entry = (await collectGitStatus(dir)).files.find(f => f.path === "a.md");
+    expect(entry).toMatchObject({ staged: false, state: "modified" });
+
+    // 真删除：worktree 里把 b.md 整个删掉 → 未暂存 deleted
+    fs.rmSync(path.join(dir, "b.md"));
+    entry = (await collectGitStatus(dir)).files.find(f => f.path === "b.md");
+    expect(entry).toMatchObject({ staged: false, state: "deleted" });
+  });
+});
+
+/**
+ * pullChanges 契约：本地路径远端 + 真实 clone，锁定各结构化分桶。
+ * it 之间有状态依赖（同一 clone 递进），vitest 同文件内顺序执行。
+ */
+describe("pullChanges (real repo)", () => {
+  let originDir = "";
+  let cloneDir = "";
+
+  beforeAll(async () => {
+    originDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-git-pull-origin-"));
+    cloneDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-git-pull-clone-"));
+
+    try {
+      await git(originDir, ["init", "-b", "main"]);
+    } catch {
+      await git(originDir, ["init"]);
+    }
+    await git(originDir, ["config", "user.name", "Lingxi Test"]);
+    await git(originDir, ["config", "user.email", "test@lingxi.local"]);
+    write(originDir, "seed.md", "v1\n");
+    await git(originDir, ["add", "-A"]);
+    await git(originDir, ["commit", "-m", "init"]);
+
+    await execFileAsync("git", ["clone", originDir, cloneDir]);
+    await git(cloneDir, ["config", "user.name", "Lingxi Test"]);
+    await git(cloneDir, ["config", "user.email", "test@lingxi.local"]);
+  });
+
+  afterAll(() => {
+    fs.rmSync(originDir, { recursive: true, force: true });
+    fs.rmSync(cloneDir, { recursive: true, force: true });
+  });
+
+  it("reports no_remote without any remote configured", async () => {
+    const result = await pullChanges(mainDir);
+    expect(result.ok).toBe(false);
+    expect(result.code).toBe("no_remote");
+  });
+
+  it("reports already_up_to_date when the remote has nothing new", async () => {
+    const result = await pullChanges(cloneDir);
+    expect(result.ok).toBe(false);
+    expect(result.code).toBe("already_up_to_date");
+  });
+
+  it("fast-forwards and reports the pulled commit count", async () => {
+    write(originDir, "news.txt", "from remote\n");
+    await git(originDir, ["add", "-A"]);
+    await git(originDir, ["commit", "-m", "remote update"]);
+
+    const result = await pullChanges(cloneDir);
+    expect(result.ok).toBe(true);
+    expect(result.pulled).toBe(1);
+    expect(fs.readFileSync(path.join(cloneDir, "news.txt"), "utf8")).toContain("from remote");
+  });
+
+  it("returns local_changes when dirty files block the fast-forward", async () => {
+    // clone 侧 news.txt 有未提交改动，origin 又改了同一文件
+    write(cloneDir, "news.txt", "local edit\n");
+    write(originDir, "news.txt", "remote edit\n");
+    await git(originDir, ["add", "-A"]);
+    await git(originDir, ["commit", "-m", "remote news"]);
+
+    const result = await pullChanges(cloneDir);
+    expect(result.ok).toBe(false);
+    expect(result.code).toBe("local_changes");
+    // 本地改动未被覆盖
+    expect(fs.readFileSync(path.join(cloneDir, "news.txt"), "utf8")).toContain("local edit");
+
+    // 收尾：恢复干净，给下一个用例留干净树
+    await git(cloneDir, ["checkout", "--", "news.txt"]);
+    const result2 = await pullChanges(cloneDir);
+    expect(result2.ok).toBe(true);
+  });
+
+  it("returns diverged instead of creating a merge commit", async () => {
+    await git(cloneDir, ["commit", "--allow-empty", "-m", "local only"]);
+    await git(originDir, ["commit", "--allow-empty", "-m", "remote only"]);
+
+    const result = await pullChanges(cloneDir);
+    expect(result.ok).toBe(false);
+    expect(result.code).toBe("diverged");
+    // 没有自动造出 merge 提交：HEAD 仍是本地那条空提交
+    const log = await execFileAsync("git", ["log", "-1", "--pretty=%s"], { cwd: cloneDir });
+    expect(log.stdout.trim()).toBe("local only");
   });
 });
 
@@ -536,14 +798,29 @@ describe("createBranch / stashChanges / worktrees (real repo)", () => {
     expect(await discardPaths(opsDir, ["disc.txt"])).toMatchObject({ ok: false, code: "nothing_to_discard" });
   });
 
-  it("discards every tracked change at once and leaves untracked files alone", async () => {
+  it("discards one untracked file by deleting it", async () => {
+    write(opsDir, "untracked-discard.txt", "temp\n");
+    expect((await collectGitStatus(opsDir)).files.find(f => f.path === "untracked-discard.txt"))
+      .toMatchObject({ state: "untracked" });
+
+    expect(await discardPaths(opsDir, ["untracked-discard.txt"])).toMatchObject({ ok: true, paths: ["untracked-discard.txt"] });
+    // 回退新文件 = 删除：文件不在了，状态里也没有了
+    expect(fs.existsSync(path.join(opsDir, "untracked-discard.txt"))).toBe(false);
+    expect((await collectGitStatus(opsDir)).files.find(f => f.path === "untracked-discard.txt")).toBeUndefined();
+  });
+
+  it("discards every change at once, deleting untracked files and directories too", async () => {
     write(opsDir, "leave-me.txt", "new\n");
+    fs.mkdirSync(path.join(opsDir, "scratch-dir"), { recursive: true });
+    write(opsDir, "scratch-dir/nested.txt", "nested\n");
     expect((await discardPaths(opsDir)).ok).toBe(true);
 
     const status = await collectGitStatus(opsDir);
-    // 已跟踪改动全没了，未跟踪的新文件原样保留
-    expect(status.files.map(f => f.path).sort()).toEqual(["fresh.txt", "leave-me.txt"]);
-    expect(fs.existsSync(path.join(opsDir, "leave-me.txt"))).toBe(true);
+    // 已跟踪改动 + 未跟踪文件/目录一起清掉
+    expect(status.files).toEqual([]);
+    expect(fs.existsSync(path.join(opsDir, "leave-me.txt"))).toBe(false);
+    expect(fs.existsSync(path.join(opsDir, "scratch-dir"))).toBe(false);
+    expect(fs.existsSync(path.join(opsDir, "fresh.txt"))).toBe(false);
     expect(fs.readFileSync(path.join(opsDir, "one.txt"), "utf-8")).toBe("one\n");
   });
 
@@ -569,5 +846,36 @@ describe("createBranch / stashChanges / worktrees (real repo)", () => {
       }
     }
     expect(await popStash(opsDir)).toMatchObject({ ok: false, code: "no_stash" });
+  });
+});
+
+describe("collectGitStatus untracked counting budget (real repo)", () => {
+  let dir = "";
+  beforeAll(async () => {
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-git-cmd-untracked-"));
+    try {
+      await git(dir, ["init", "-b", "main"]);
+    } catch {
+      await git(dir, ["init"]);
+    }
+    await git(dir, ["config", "user.name", "Lingxi Test"]);
+    await git(dir, ["config", "user.email", "test@lingxi.local"]);
+    write(dir, "tracked.md", "x\n");
+    await git(dir, ["add", "-A"]);
+    await git(dir, ["commit", "-m", "init"]);
+    // 大量未跟踪产物文件：预算内的前段计数，末尾超出预算记 0（显式降级）
+    for (let i = 0; i < 2010; i++) write(dir, `junk/junk-${String(i).padStart(4, "0")}.txt`, "line\nline2\n");
+  });
+  afterAll(() => fs.rmSync(dir, { recursive: true, force: true }));
+
+  it("lists every untracked file but caps line counting within the budget", async () => {
+    const status = await collectGitStatus(dir);
+    const untracked = status.files.filter(f => f.state === "untracked");
+    expect(untracked).toHaveLength(2010);
+    // ls-files 输出按路径序：预算内开头有行数，超出预算的末尾为 0
+    const first = untracked.find(f => f.path.endsWith("junk-0000.txt"));
+    expect(first?.additions).toBeGreaterThan(0);
+    const last = untracked.find(f => f.path.endsWith("junk-2009.txt"));
+    expect(last?.additions).toBe(0);
   });
 });

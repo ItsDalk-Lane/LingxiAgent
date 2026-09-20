@@ -492,14 +492,14 @@ describe("mcp_search_tools", () => {
 });
 
 describe("mcp_describe_tool", () => {
-  it("renders the full schema and a call example", async () => {
+  it("renders the full schema and the call recipe", async () => {
     const { byName } = makeBridge();
     const text = await run(byName.mcp_describe_tool, { name: "github_create_issue" });
     expect(text).toContain("github_create_issue");
     expect(text).toContain("owner");
     expect(text).toContain("labels");
     expect(text).toContain("mcp_call");
-    expect(text).toContain("\"server\"");
+    expect(text).toContain("server=github");
   });
 
   it("suggests near names when the tool is unknown", async () => {

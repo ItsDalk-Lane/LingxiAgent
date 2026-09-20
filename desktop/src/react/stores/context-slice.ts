@@ -20,6 +20,14 @@ export interface ContextSlice {
   compactingSessions: string[];
   /** Compaction mode for each busy session, keyed by session identity. */
   compactionModeBySession: Record<string, string>;
+  /** 50% 压缩询问弹窗状态，按 session path 存储（服务端 compaction_suggested 事件写入）。 */
+  compactionAskBySession: Record<string, { percent: number; askPercent: number; forcePercent: number }>;
+  /** 用户确认「回复结束后自动压缩」的会话集合（session path）。 */
+  pendingAutoCompactSessions: string[];
+  addCompactionAsk: (path: string, info: { percent: number; askPercent: number; forcePercent: number }) => void;
+  clearCompactionAsk: (path: string) => void;
+  addPendingAutoCompact: (path: string) => void;
+  removePendingAutoCompact: (path: string) => void;
   addCompactingSession: (path: string, mode?: string | null) => void;
   removeCompactingSession: (path: string) => void;
 }
@@ -33,6 +41,32 @@ export const createContextSlice = (
   contextBySession: {},
   compactingSessions: [],
   compactionModeBySession: {},
+  compactionAskBySession: {},
+  pendingAutoCompactSessions: [],
+  addCompactionAsk: (path, info) => set((s) => ({
+    compactionAskBySession: {
+      ...s.compactionAskBySession,
+      [path]: {
+        percent: info.percent,
+        askPercent: info.askPercent,
+        forcePercent: info.forcePercent,
+      },
+    },
+  })),
+  clearCompactionAsk: (path) => set((s) => {
+    if (!s.compactionAskBySession[path]) return {};
+    const next = { ...s.compactionAskBySession };
+    delete next[path];
+    return { compactionAskBySession: next };
+  }),
+  addPendingAutoCompact: (path) => set((s) => (
+    s.pendingAutoCompactSessions.includes(path)
+      ? {}
+      : { pendingAutoCompactSessions: [...s.pendingAutoCompactSessions, path] }
+  )),
+  removePendingAutoCompact: (path) => set((s) => ({
+    pendingAutoCompactSessions: s.pendingAutoCompactSessions.filter((item) => item !== path),
+  })),
   addCompactingSession: (path, mode) => set((s) => {
     const key = sessionScopedKey(s as ContextSlice & SessionLocatorState, path) || path;
     const compactingSessions = s.compactingSessions.filter((item) => item !== key && item !== path);

@@ -20,6 +20,8 @@ export interface ForkedSessionRef {
   sessionId: string;
   sessionPath: string;
   agentId: string | null;
+  /** 来源（主对话）会话 id：分叉/编辑重发产生的子对话谱系，列表分组展示用。 */
+  sourceSessionId?: string | null;
 }
 
 export type ForkedSessionHandler = (forked: ForkedSessionRef) => void | Promise<void>;
@@ -147,6 +149,9 @@ export async function forkSessionTurn(
       sessionId,
       sessionPath: childPath,
       agentId: typeof data?.agentId === 'string' && data.agentId.trim() ? data.agentId : null,
+      sourceSessionId: typeof data?.sourceSessionId === 'string' && data.sourceSessionId.trim()
+        ? data.sourceSessionId.trim()
+        : null,
     };
   } catch (error) {
     reportActionError(sessionPath, error);
@@ -223,6 +228,11 @@ export async function activateForkedSession(forked: ForkedSessionRef): Promise<v
       sessionId: forked.sessionId,
       path: forked.sessionPath,
       agentId: forked.agentId || existing?.agentId || null,
+      // 谱系：乐观投影带上主对话引用，列表立即可分组到主对话名下；
+      // loadSessions 后由服务端投影接管同一字段。
+      forkedFrom: forked.sourceSessionId
+        ? { sessionId: forked.sourceSessionId, forkedAt: new Date().toISOString() }
+        : (existing?.forkedFrom ?? null),
       _optimistic: true,
     };
     const nextSessions = existingIndex >= 0

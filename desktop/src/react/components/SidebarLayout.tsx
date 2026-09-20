@@ -8,7 +8,6 @@
 
 import { useEffect, useRef } from 'react';
 import { useStore } from '../stores';
-import { createNewSession } from '../stores/session-actions';
 import { closePreview } from '../stores/preview-actions';
 import { CHAT_MIN_WIDTH } from '../layout-constants';
 
@@ -101,16 +100,10 @@ export function SidebarLayout() {
     };
     window.addEventListener('resize', onResize);
 
-    // 键盘快捷键
+    // 键盘快捷键：⌘⇧S（切侧边栏）与 ⌘N（新建会话）已收拢到 app-init 的
+    // keybindings dispatcher（可在设置→快捷键里改键位）；这里只保留与
+    // 预览面板状态强耦合的 Escape 关闭。
     const onKeydown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 's') {
-        e.preventDefault();
-        toggleSidebar();
-      }
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'n') {
-        e.preventDefault();
-        createNewSession();
-      }
       if (e.key === 'Escape' && useStore.getState().previewOpen) {
         closePreview();
       }

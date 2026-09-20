@@ -1087,7 +1087,15 @@ describe("browser workspace sync from the desktop viewer", () => {
     manager._sendCmd = vi.fn(async () => { throw new Error("not connected"); });
 
     await expect(manager.notifyViewerSession(SP1, "标题")).resolves.toBeUndefined();
-    expect(manager._sendCmd).toHaveBeenCalledWith("viewerShowSession", { sessionPath: SP1, title: "标题" }, 10000);
+    expect(manager._sendCmd).toHaveBeenCalledWith("viewerShowSession", { sessionPath: SP1, title: "标题", allowEmpty: false }, 10000);
+  });
+
+  it("notifyViewerSession forwards allowEmpty for explicit opens", async () => {
+    const manager = new BrowserManager({});
+    manager._sendCmd = vi.fn(async () => ({}));
+
+    await manager.notifyViewerSession(SP1, "标题", { allowEmpty: true });
+    expect(manager._sendCmd).toHaveBeenCalledWith("viewerShowSession", { sessionPath: SP1, title: "标题", allowEmpty: true }, 10000);
   });
 
   it("notifyViewerSession does nothing without a session path", async () => {

@@ -54,6 +54,8 @@
     --coral-rgb:    234, 178, 160;
     --danger:       #C77070;
     --danger-rgb:   199, 112, 112;
+    /* 深底上的热力图亮青：默认 #0e7490 偏暗，覆盖后格子才不致沉进背景 */
+    --chart-heat: #46c6d4;
     --overlay-subtle: rgba(255, 255, 255, 0.03);
     --overlay-light:  rgba(255, 255, 255, 0.05);
     --overlay-medium: rgba(255, 255, 255, 0.08);

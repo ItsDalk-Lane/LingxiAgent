@@ -100,6 +100,7 @@ export interface SettingsSnapshot {
   globalModels: Record<string, any>;
   preferences: {
     quickChat: Record<string, any>;
+    keybindings?: Record<string, string[]>;
     browser: Record<string, any>;
     notifications: Record<string, any>;
     bridge: {

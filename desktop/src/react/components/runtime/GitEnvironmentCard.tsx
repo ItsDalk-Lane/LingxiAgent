@@ -2,11 +2,11 @@
  * GitEnvironmentCard — 「环境信息」卡（运行信息胶囊内，压平皮肤）
  *
  * 各行（如图）：
- *   变更       未提交变更行合计（+绿/-红，千分位），点击开变更文件弹窗
+ *   Git图谱    未提交变更行合计（+绿/-红，千分位），点击开 Git图谱 弹窗
+ *              （提交或推送与变更文件合并后的面板；原「变更」「提交或推送」两行并为一行）
  *   本地       就地展开：该项目全部 worktree（每项两行：分支名 + 路径，带主/当前标记）
  *   新建工作树  开「在 worktree 中开始新会话」弹窗（隔离 worktree + wt/<名称> 分支）
  *   分支       当前分支（截断+箭头），点击弹分支列表，点击分支即切换 / 可直接新建分支
- *   提交或推送  点击开提交弹窗（提交 / 提交并推送 / 推送 / 暂存）
  *
  * 目标目录 = 当前对话工作台的本地根（deskWorkspaceNativeRoot，退 deskBasePath）。
  * 非本地目录不渲染；非 git 目录各行降级禁用。
@@ -26,8 +26,7 @@ import {
   type GitWorktrees,
 } from '../../utils/git-env-api';
 import { GitBranchList } from './GitBranchList';
-import { GitChangesModal } from './GitChangesModal';
-import { GitCommitModal } from './GitCommitModal';
+import { GitGraphPanel } from './GitGraphPanel';
 import { GitHistoryModal } from './GitHistoryModal';
 import { GitWorktreeModal } from './GitWorktreeModal';
 import branchStyles from './GitBranchList.module.css';
@@ -35,6 +34,24 @@ import styles from './GitEnvironmentCard.module.css';
 
 function fmt(n: number): string {
   return n.toLocaleString('en-US');
+}
+
+interface EnvSnapshot {
+  status: GitStatus;
+  branches: GitBranches;
+  worktree: GitWorktreeInfo;
+  worktrees: GitWorktrees;
+  at: number;
+}
+
+/** 按目录缓存最近一次快照。运行信息胶囊关闭时会卸载本卡，重开时若每次都从
+ *  空状态重新拉取，用户要盯着「…」等几秒 git 探测；先拿缓存秒出、后台再刷新
+ *  （stale-while-revalidate）。仅保留每个目录最新一份。 */
+const envSnapshotCache = new Map<string, EnvSnapshot>();
+
+/** 测试隔离用：清空快照缓存（组件模块级状态，vitest 用例间不会自动重置） */
+export function resetGitEnvSnapshotCache(): void {
+  envSnapshotCache.clear();
 }
 
 function Chevron({ open, className }: { open: boolean; className?: string }) {
@@ -60,8 +77,7 @@ export function GitEnvironmentCard() {
   const [localExpanded, setLocalExpanded] = useState(false);
   const [branchMenuOpen, setBranchMenuOpen] = useState(false);
   const [worktreeModalOpen, setWorktreeModalOpen] = useState(false);
-  const [changesOpen, setChangesOpen] = useState(false);
-  const [commitOpen, setCommitOpen] = useState(false);
+  const [graphOpen, setGraphOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   // 默认折叠（用户裁决）：运行信息容器内只露标题行，点击展开
   const [collapsed, setCollapsed] = useState(true);
@@ -80,6 +96,7 @@ export function GitEnvironmentCard() {
       setBranches(nextBranches);
       setWorktree(nextWorktree);
       setWorktrees(nextWorktrees);
+      envSnapshotCache.set(dir, { status: nextStatus, branches: nextBranches, worktree: nextWorktree, worktrees: nextWorktrees, at: Date.now() });
       setLoadState('idle');
       return nextStatus;
     } catch {
@@ -88,16 +105,26 @@ export function GitEnvironmentCard() {
     }
   }, [dir, currentAgentId]);
 
-  // 工作台切换 → 整体重载；操作（checkout/commit/push）后由 refresh() 手动刷新
+  // 工作台切换 → 整体重载；重开胶囊（重挂载）→ 有缓存先秒出再后台刷新；
+  // 操作（checkout/commit/push/pull）后由 refresh() 手动刷新
   useEffect(() => {
-    setStatus(null);
-    setBranches(null);
-    setWorktree(null);
-    setWorktrees(null);
+    const snap = dir ? envSnapshotCache.get(dir) : undefined;
+    if (snap) {
+      setStatus(snap.status);
+      setBranches(snap.branches);
+      setWorktree(snap.worktree);
+      setWorktrees(snap.worktrees);
+      setLoadState('idle');
+    } else {
+      setStatus(null);
+      setBranches(null);
+      setWorktree(null);
+      setWorktrees(null);
+      setLoadState(dir ? 'loading' : 'idle');
+    }
     setLocalExpanded(false);
     setBranchMenuOpen(false);
     setWorktreeModalOpen(false);
-    setLoadState(dir ? 'loading' : 'idle');
     if (dir) void refresh();
   }, [dir, refresh]);
 
@@ -166,11 +193,11 @@ export function GitEnvironmentCard() {
         <button
           type="button"
           className={styles.row}
-          data-testid="git-env-changes-row"
+          data-testid="git-env-graph-row"
           disabled={loadState === 'loading' || (loadState === 'idle' && !isRepo)}
-          onClick={() => (loadState === 'error' ? void refresh() : setChangesOpen(true))}
+          onClick={() => (loadState === 'error' ? void refresh() : setGraphOpen(true))}
         >
-          <span className={styles.rowLabel}>{t('gitEnv.changes')}</span>
+          <span className={styles.rowLabel}>{t('gitEnv.graphTitle')}</span>
           <span className={styles.rowValue}>
             {changesValue ?? (
               <>
@@ -299,19 +326,6 @@ export function GitEnvironmentCard() {
         <button
           type="button"
           className={styles.row}
-          data-testid="git-env-commit-row"
-          disabled={!isRepo}
-          onClick={() => setCommitOpen(true)}
-        >
-          <span className={styles.rowLabel}>{t('gitEnv.commitOrPush')}</span>
-          <span className={styles.rowValue}>
-            <Chevron open={false} className={styles.chevronFlat} />
-          </span>
-        </button>
-
-        <button
-          type="button"
-          className={styles.row}
           data-testid="git-env-history-row"
           disabled={!isRepo}
           onClick={() => setHistoryOpen(true)}
@@ -342,17 +356,9 @@ export function GitEnvironmentCard() {
         />
       </AnchoredPortal>
 
-      <GitChangesModal
-        open={changesOpen}
-        onClose={() => setChangesOpen(false)}
-        dir={dir}
-        files={status?.files ?? []}
-        agentId={currentAgentId}
-        refresh={refresh}
-      />
-      <GitCommitModal
-        open={commitOpen}
-        onClose={() => setCommitOpen(false)}
+      <GitGraphPanel
+        open={graphOpen}
+        onClose={() => setGraphOpen(false)}
         dir={dir}
         status={status}
         branches={branches}

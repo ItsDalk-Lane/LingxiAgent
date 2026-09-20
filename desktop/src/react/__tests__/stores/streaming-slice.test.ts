@@ -111,6 +111,23 @@ describe('streaming-slice', () => {
     expect(slice.unreadOutputSessionPaths).toEqual(['/s2']);
   });
 
+  it('markSessionFailed 标记失败会话并去重', () => {
+    slice.markSessionFailed('/s1');
+    slice.markSessionFailed('/s1');
+    slice.markSessionFailed('/s2');
+    expect(slice.failedSessions).toEqual(['/s1', '/s2']);
+  });
+
+  it('clearSessionFailed 清理指定会话的失败标记', () => {
+    slice.markSessionFailed('/s1');
+    slice.markSessionFailed('/s2');
+    slice.clearSessionFailed('/s1');
+    expect(slice.failedSessions).toEqual(['/s2']);
+    // 对无标记的会话清除是零 setState（返回空补丁），不炸也不产生新数组。
+    slice.clearSessionFailed('/s1');
+    expect(slice.failedSessions).toEqual(['/s2']);
+  });
+
   it('已知 locator 的流式状态用 sessionId 做存储 key，并支持 legacy path 清理', () => {
     slice = makeSlice({
       currentSessionPath: '/s1',

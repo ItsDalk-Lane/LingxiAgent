@@ -162,11 +162,9 @@ describe("sessions route", () => {
 
     const data = await res.json();
     expect(res.status).toBe(200);
-    // 切换时 viewer 保持可见，由随后的 notifyViewerSession 重绘目标 session
-    expect(browserManagerMock.suspendForSession).toHaveBeenCalledWith(
-      "/tmp/agents/a/sessions/old.jsonl",
-      { keepViewerVisible: true },
-    );
+    // 切换不再挂起旧会话的浏览器：共享窗口中上个会话的画面保持可见，
+    // 由 viewerShowSession 在目标会话有标签页时才切过去
+    expect(browserManagerMock.suspendForSession).not.toHaveBeenCalled();
     expect(browserManagerMock.notifyViewerSession.mock.calls.at(-1)?.[0])
       .toBe("/tmp/agents/a/sessions/new.jsonl");
     expect(browserManagerMock.resumeForSessionIfAvailable).toHaveBeenCalledWith("/tmp/agents/a/sessions/new.jsonl");

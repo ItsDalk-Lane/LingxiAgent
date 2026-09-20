@@ -20,6 +20,8 @@ type AgentDeskConfig = {
   workspace_context: {
     inject_agents_md: boolean;
     inject_claude_md: boolean;
+    inject_custom_file: boolean;
+    custom_file_name: string;
     discover_project_skills: boolean;
     discover_compatible_project_skills: boolean;
   };
@@ -37,6 +39,10 @@ function deskFromConfig(data: Record<string, any>): AgentDeskConfig {
     workspace_context: {
       inject_agents_md: data.workspace_context?.inject_agents_md === true,
       inject_claude_md: data.workspace_context?.inject_claude_md === true,
+      inject_custom_file: data.workspace_context?.inject_custom_file === true,
+      custom_file_name: typeof data.workspace_context?.custom_file_name === 'string'
+        ? data.workspace_context.custom_file_name
+        : '',
       discover_project_skills: data.workspace_context?.discover_project_skills !== false,
       discover_compatible_project_skills: data.workspace_context?.discover_compatible_project_skills === true,
     },
@@ -85,8 +91,10 @@ export function WorkTab() {
 
   // ── Per-agent 远程快照：null = 未加载。切 agent 时重置，避免残留上一个 agent 的值 ──
   const [agentDesk, setAgentDesk] = useState<AgentDeskConfig | null>(() => agentDeskFromStoreForAgent(initialAgentId));
-  // hbInterval 是 draft：用户编辑后点"保存"才落盘，必须独立于 agentDesk
+  // hbInterval 是 draft：用户编辑后点“保存”才落盘，必须独立于 agentDesk
   const [hbIntervalDraft, setHbIntervalDraft] = useState<number | null>(() => agentDeskFromStoreForAgent(initialAgentId)?.heartbeat_interval ?? null);
+  // 自定义注入文件名同理：输入框编辑时不直接落盘，失焦时才保存
+  const [customNameDraft, setCustomNameDraft] = useState<string | null>(() => agentDeskFromStoreForAgent(initialAgentId)?.workspace_context.custom_file_name ?? null);
 
   useEffect(() => {
     if (!selectedAgentId) return;
@@ -97,10 +105,12 @@ export function WorkTab() {
       const desk = deskFromConfig(settingsConfig);
       setAgentDesk(desk);
       setHbIntervalDraft(desk.heartbeat_interval);
+      setCustomNameDraft(desk.workspace_context.custom_file_name);
       return;
     }
     setAgentDesk(null);
     setHbIntervalDraft(null);
+    setCustomNameDraft(null);
     const ac = new AbortController();
     lingxiFetch(`/api/agents/${selectedAgentId}/config`, { signal: ac.signal })
       .then(r => r.json())
@@ -109,6 +119,7 @@ export function WorkTab() {
         const desk = deskFromConfig(data);
         setAgentDesk(desk);
         setHbIntervalDraft(desk.heartbeat_interval);
+        setCustomNameDraft(desk.workspace_context.custom_file_name);
       })
       .catch(err => {
         if (err?.name !== 'AbortError') console.warn('[work] fetch agent config failed:', err);
@@ -209,6 +220,26 @@ export function WorkTab() {
     const saved = await saveAgentConfig(agentId, { desk: { home_folder: '' } });
     if (!saved && selectedAgentIdRef.current === agentId) {
       setAgentDesk(previous);
+    }
+  };
+
+  const saveCustomFileName = async (rawName: string) => {
+    if (!agentDesk) return;
+    const agentId = selectedAgentIdRef.current;
+    if (!agentId) return;
+    const nextName = rawName.trim();
+    if (nextName === (agentDesk.workspace_context.custom_file_name || '')) return;
+    const previous = agentDesk;
+    const previousDraft = customNameDraft;
+    setAgentDesk({
+      ...agentDesk,
+      workspace_context: { ...agentDesk.workspace_context, custom_file_name: nextName },
+    });
+    setCustomNameDraft(nextName);
+    const saved = await saveAgentConfig(agentId, { workspace_context: { custom_file_name: nextName } });
+    if (!saved && selectedAgentIdRef.current === agentId) {
+      setAgentDesk(previous);
+      setCustomNameDraft(previousDraft);
     }
   };
 
@@ -346,6 +377,30 @@ export function WorkTab() {
                 />
               }
             />
+            <SettingsRow
+              label={t('settings.work.injectCustomFile')}
+              hint={t('settings.work.injectCustomFileDesc')}
+              control={
+                <Toggle
+                  on={agentDesk.workspace_context.inject_custom_file}
+                  onChange={(on) => toggleWorkspaceContext('inject_custom_file', on)}
+                  ariaLabel={t('settings.work.injectCustomFile')}
+                />
+              }
+            />
+            {/* 开关打开后，紧跟一行文件名输入；与固定两路一样按名字在目录链路里查找 */}
+            {agentDesk.workspace_context.inject_custom_file && (
+              <div className={`${styles['settings-folder-picker']} ${styles['settings-custom-file-picker']}`}>
+                <input
+                  type="text"
+                  className={`${styles['settings-input']} ${styles['settings-folder-input']}`}
+                  value={customNameDraft ?? agentDesk.workspace_context.custom_file_name}
+                  placeholder={t('settings.work.customFileNamePlaceholder')}
+                  onChange={(e) => setCustomNameDraft(e.target.value)}
+                  onBlur={(e) => saveCustomFileName(e.target.value)}
+                />
+              </div>
+            )}
           </>
         )}
       </SettingsSection>

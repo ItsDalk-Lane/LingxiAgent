@@ -8,6 +8,7 @@
 
 import { streamBufferManager } from '../hooks/use-stream-buffer';
 import { dispatchStreamKey } from './stream-key-dispatcher';
+import { getWebSocket } from './websocket';
 import { useStore } from '../stores';
 import { updateKeyed } from '../stores/create-keyed-slice';
 import { sessionScopedKey, sessionScopedListIncludes, sessionScopedValue } from '../stores/session-slice';
@@ -43,7 +44,7 @@ import { renderMarkdown } from '../utils/markdown';
 import { bumpMessageLiveVersion } from '../stores/message-live-version';
 import { terminalOutputStream } from './terminal-output-stream';
 import { handleBackgroundProcessControlResult } from './background-process-control';
-import { noteComposerServerAck, noteComposerRunEvent, noteComposerInputRejected, composerOriginConnectionKey, findSendRecordByClientMessageId } from './composer-send-coordinator';
+import { noteComposerServerAck, noteComposerRunEvent, noteComposerInputRejected, noteComposerUserAbort, extendComposerAckWindow, composerOriginConnectionKey, findSendRecordByClientMessageId } from './composer-send-coordinator';
 
 declare function t(key: string, vars?: Record<string, string>): any;
 
@@ -323,9 +324,34 @@ function applyRunEndSideEffects(msg: any): void {
   const runSp = msg.sessionPath;
   if (runSp) {
     requestContextUsage(runSp);
+    // 插话切分（runSplit）只是 Run 语义边界，会话仍在流式：
+    // 「回复结束后自动压缩」必须等真正的终态，否则会被服务端以 streaming 拒绝且丢单。
+    if (!msg.runSplit) maybeRunPendingAutoCompact(runSp);
   } else {
     console.warn('[ws] assistant_run_end missing sessionPath, skipping context_usage request');
   }
+}
+
+/**
+ * 50% 询问弹窗里用户选了「回复结束后压缩」：run 结束后自动补发 compact。
+ * 服务端在 streaming 中会拒绝压缩（session_streaming），所以等到这一刻才发。
+ */
+function maybeRunPendingAutoCompact(sessionPath: string): void {
+  const state = useStore.getState();
+  if (!state.pendingAutoCompactSessions?.includes(sessionPath)) return;
+  state.removePendingAutoCompact?.(sessionPath);
+  const locatorEntry = state.sessionLocatorsById
+    ? Object.entries(state.sessionLocatorsById as Record<string, { path?: string }>)
+      .find(([, loc]) => loc?.path === sessionPath)
+    : undefined;
+  const sessionId = nonEmptyString(locatorEntry?.[0]);
+  const ws = getWebSocket();
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  ws.send(JSON.stringify({
+    type: 'compact',
+    ...(sessionId ? { sessionId } : {}),
+    sessionPath,
+  }));
 }
 
 function compactionIdentity(msg: any): { key: string | null; sessionId: string | null; sessionPath: string | null } {
@@ -403,6 +429,12 @@ function applyCompactionMessage(msg: any): void {
   if (msg.type === 'compaction_end') {
     setCompactionBusy(msg, false);
     updateCompactionContext(msg);
+    const { sessionPath: endSp } = compactionIdentity(msg);
+    if (endSp) {
+      const st = useStore.getState();
+      st.clearCompactionAsk?.(endSp);
+      st.removePendingAutoCompact?.(endSp);
+    }
     return;
   }
   if (msg.type !== 'compaction_result') return;
@@ -432,6 +464,8 @@ export function applyStreamingStatus(
     if (isStreaming) {
       useStore.getState().addStreamingSession(sessionPath, identity);
       useStore.getState().clearInlineError(sessionPath);
+      // 新一轮输出开始 = 旧失败已进入新回合，列表红点随之撤销。
+      useStore.getState().clearSessionFailed?.(sessionPath);
     } else {
       const applied = options.force
         ? useStore.getState().forceRemoveStreamingSession(sessionPath)
@@ -855,7 +889,9 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       // 卡片的"收起"是用户意图，状态更新不该把它抹掉；只有浏览器重新启用（running false→true）
       // 才算新一轮会话，卡片回归。
       const collapsed = bRunning && !prev?.running ? false : (prev?.collapsed ?? false);
-      setBrowserStateForPath(bsp, { running: bRunning, url: bUrl, thumbnail: bThumbnail, thumbnailCapturedAt, thumbnailUrl, thumbnailFresh, collapsed });
+      // 记录最近活跃时间：切到其他会话时，聊天区卡片接力显示「最近在用」的浏览器
+      const lastActiveAt = bRunning ? Date.now() : (prev?.lastActiveAt ?? null);
+      setBrowserStateForPath(bsp, { running: bRunning, url: bUrl, thumbnail: bThumbnail, thumbnailCapturedAt, thumbnailUrl, thumbnailFresh, collapsed, lastActiveAt });
       break;
     }
 
@@ -887,7 +923,12 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       const bgSp = msg.sessionPath;
       if (!bgSp) { console.warn('[ws] event missing sessionPath:', msg.type); break; }
       const prev = browserStateForPath(useStore.getState(), bgSp);
-      setBrowserStateForPath(bgSp, { ...prev, running: !!msg.running });
+      const bgRunning = !!msg.running;
+      setBrowserStateForPath(bgSp, {
+        ...prev,
+        running: bgRunning,
+        lastActiveAt: bgRunning ? (prev?.lastActiveAt ?? Date.now()) : (prev?.lastActiveAt ?? null),
+      });
       break;
     }
 
@@ -1290,6 +1331,35 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       break;
     }
 
+    case 'compaction_auto': {
+      // 80% 强制压缩完成通知：告知用户上下文已被自动压缩。
+      const sp2 = msg.sessionPath;
+      const state2 = useStore.getState();
+      if (sp2) {
+        state2.clearCompactionAsk?.(sp2);
+        state2.removePendingAutoCompact?.(sp2);
+      }
+      state2.addToast?.(
+        t('compaction.autoCompleted', { percent: String(msg.percentBefore ?? '') }),
+        'success',
+        6000,
+        { dedupeKey: `compaction-auto:${sp2 || 'unknown'}:${msg.percentBefore ?? ''}` },
+      );
+      break;
+    }
+
+    case 'compaction_suggested': {
+      // 50% 询问线：服务端不阻塞 run，只发一次询问；由弹窗决定是否压缩。
+      const sp3 = msg.sessionPath;
+      if (!sp3) { console.warn('[ws] event missing sessionPath:', msg.type); break; }
+      useStore.getState().addCompactionAsk?.(sp3, {
+        percent: Number(msg.percent) || 0,
+        askPercent: Number(msg.askPercent) || 50,
+        forcePercent: Number(msg.forcePercent) || 80,
+      });
+      break;
+    }
+
     case 'context_usage': {
       const sp = msg.sessionPath;
       if (!sp) { console.warn('[ws] event missing sessionPath:', msg.type); break; }
@@ -1360,6 +1430,8 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
         break;
       }
       useStore.getState().setInlineError(sp, presented);
+      // 错误条有 TTL 会自动消失，列表红点则常驻到用户切回查看为止。
+      useStore.getState().markSessionFailed?.(sp);
       break;
     }
 
@@ -1422,6 +1494,10 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
     }
 
     case 'abort_result': {
+      const spAbort = msg.sessionPath || null;
+      // 停止是用户显式终局：无论本次是否命中活跃 run（already_stopped 同样成立），
+      // 都结算该会话账本（盖终局章 + 触发对账），不能只清忙闲状态。
+      if (spAbort) noteComposerUserAbort(spAbort);
       if (msg.status !== 'already_stopped') break;
       const sp = msg.sessionPath || null;
       const sid = typeof msg.sessionId === 'string' && msg.sessionId.trim() ? msg.sessionId.trim() : null;
@@ -1447,6 +1523,11 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
         streamId: msg.streamId ?? null,
         turnId: msg.turnId ?? null,
       });
+      // aborted:true 是服务器确认的「该会话运行已被终止」：用户终局信号，
+      // 结算账本（盖终局章 + 触发对账）。普通 isStreaming:false 仍不解除未决输入。
+      if (sp && msg.isStreaming === false && msg.aborted === true) {
+        noteComposerUserAbort(sp);
+      }
       break;
     }
 
@@ -1456,6 +1537,8 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       const sp = nonEmptyString(msg.sessionPath) || nonEmptyString(msg.path);
       if (!sp) { console.warn('[ws] knowledge_retrieval_started missing sessionPath, skipping'); break; }
       useStore.getState().beginKnowledgeRetrieval?.(sp);
+      // 检索会挡住回执（落盘在检索之后）：延窗再等，不按 15s 默认窗口误判投递存疑。
+      extendComposerAckWindow(sp);
       // 新一轮检索：收尾上一轮可能残留的阅读卡（跨轮 Map 泄漏防护）。
       settleKnowledgeReadCard(sp);
       break;

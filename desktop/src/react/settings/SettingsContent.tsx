@@ -18,6 +18,7 @@ import { AgentTab } from './tabs/AgentTab';
 import { MeTab } from './tabs/MeTab';
 import { InterfaceTab } from './tabs/InterfaceTab';
 import { GeneralTab } from './tabs/GeneralTab';
+import { KeybindingsTab } from './tabs/KeybindingsTab';
 import { BrowserTab } from './tabs/BrowserTab';
 import { WorkTab } from './tabs/WorkTab';
 import { SkillsTab } from './tabs/SkillsTab';
@@ -48,6 +49,7 @@ const TAB_COMPONENTS: Record<string, React.ComponentType> = {
   agent: AgentTab,
   me: MeTab,
   interface: InterfaceTab,
+  keybindings: KeybindingsTab,
   general: GeneralTab,
   browser: BrowserTab,
   work: WorkTab,

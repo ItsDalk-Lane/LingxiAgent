@@ -28,6 +28,7 @@ import { createScreenshotSlice, type ScreenshotSlice } from './screenshot-slice'
 import { createSidebarUiSlice, type SidebarUiSlice } from './sidebar-ui-slice';
 import { createFileHistorySlice, type FileHistorySlice } from './file-history-slice';
 import { createSideChatSlice, type SideChatSlice } from './side-chat-slice';
+import { createConversationMapSlice, type ConversationMapSlice } from './conversation-map-slice';
 import { configureMessageLiveVersionSessionKeyResolver } from './message-live-version';
 import { configureLiveTurnSessionKeyResolver } from './live-turn-store';
 
@@ -59,7 +60,8 @@ export type StoreState = ConnectionSlice &
   ScreenshotSlice &
   SidebarUiSlice &
   FileHistorySlice &
-  SideChatSlice;
+  SideChatSlice &
+  ConversationMapSlice;
 
 export const useStore = create<StoreState>()((set, _get, _api) => ({
   ...createConnectionSlice(set, _get),
@@ -91,6 +93,7 @@ export const useStore = create<StoreState>()((set, _get, _api) => ({
   ...createSidebarUiSlice(set, _get),
   ...createFileHistorySlice(set, _get),
   ...createSideChatSlice(set),
+  ...createConversationMapSlice(set),
 }));
 
 configureMessageLiveVersionSessionKeyResolver((sessionPath) => (
@@ -131,4 +134,5 @@ export type {
   SidebarUiSlice,
   FileHistorySlice,
   SideChatSlice,
+  ConversationMapSlice,
 };

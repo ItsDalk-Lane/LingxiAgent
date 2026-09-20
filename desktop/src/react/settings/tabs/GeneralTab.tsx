@@ -15,7 +15,6 @@ import {
 } from '../../../../../shared/notification-preferences.ts';
 import {
   DEFAULT_QUICK_CHAT_REUSE_TIMEOUT_MINUTES,
-  DEFAULT_QUICK_CHAT_SHORTCUT,
   normalizeQuickChatPreferences,
 } from '../../../../../shared/quick-chat-preferences.ts';
 import styles from '../Settings.module.css';
@@ -32,111 +31,6 @@ interface NotificationPreferences {
 interface QuickChatPreferences {
   shortcut: string;
   reuseTimeoutMinutes: number;
-}
-
-function formatShortcut(shortcut: string): string[] {
-  return String(shortcut || DEFAULT_QUICK_CHAT_SHORTCUT)
-    .split('+')
-    .map(part => part.trim())
-    .filter(Boolean);
-}
-
-function keyLabel(key: string): string {
-  if (key === 'CommandOrControl') return navigator.platform.toLowerCase().includes('mac') ? '⌘' : 'Ctrl';
-  if (key === 'Control') return 'Ctrl';
-  if (key === 'Alt') return navigator.platform.toLowerCase().includes('mac') ? '⌥' : 'Alt';
-  if (key === 'Shift') return 'Shift';
-  if (key === 'Space') return 'Space';
-  return key.length === 1 ? key.toUpperCase() : key;
-}
-
-function keyFromEvent(event: KeyboardEvent): string | null {
-  if (event.key === 'Escape') return null;
-  if (['Shift', 'Control', 'Alt', 'Meta'].includes(event.key)) return null;
-
-  const parts: string[] = [];
-  if (event.metaKey || event.ctrlKey) parts.push('CommandOrControl');
-  if (event.altKey) parts.push('Alt');
-  if (event.shiftKey) parts.push('Shift');
-
-  const rawKey = keyTokenFromKeyboardEvent(event);
-  if (!rawKey) return null;
-  const key = rawKey.length === 1 ? rawKey.toUpperCase() : rawKey;
-  const isFunctionKey = /^F([1-9]|1[0-9]|2[0-4])$/.test(key);
-  if (parts.length === 0 && !isFunctionKey) return null;
-  parts.push(key);
-  return parts.join('+');
-}
-
-function keyTokenFromKeyboardEvent(event: KeyboardEvent): string | null {
-  if (event.code === 'Space' || event.key === ' ' || event.key === '\u00A0' || event.key === 'Spacebar') {
-    return 'Space';
-  }
-  const keyMap: Record<string, string> = {
-    ArrowUp: 'Up',
-    ArrowDown: 'Down',
-    ArrowLeft: 'Left',
-    ArrowRight: 'Right',
-    Enter: 'Enter',
-    Tab: 'Tab',
-    Backspace: 'Backspace',
-    Delete: 'Delete',
-  };
-  if (keyMap[event.code]) return keyMap[event.code];
-  if (keyMap[event.key]) return keyMap[event.key];
-  if (/^Key[A-Z]$/.test(event.code)) return event.code.slice(3);
-  if (/^Digit[0-9]$/.test(event.code)) return event.code.slice(5);
-  if (/^F([1-9]|1[0-9]|2[0-4])$/.test(event.code)) return event.code;
-  const key = event.key || '';
-  return key.length === 1 ? key : key || null;
-}
-
-function ShortcutKeycaps({ shortcut }: { shortcut: string }) {
-  return (
-    <span className={styles['shortcut-keycaps']}>
-      {formatShortcut(shortcut).map((part) => (
-        <span key={part} className={styles['shortcut-keycap']}>{keyLabel(part)}</span>
-      ))}
-    </span>
-  );
-}
-
-function ShortcutRecorder({
-  value,
-  loading,
-  recording,
-  saving,
-  onStart,
-  onRestoreDefault,
-}: {
-  value: string;
-  loading?: boolean;
-  recording: boolean;
-  saving: boolean;
-  onStart: () => void;
-  onRestoreDefault: () => void;
-}) {
-  return (
-    <div className={styles['quick-chat-shortcut-control']}>
-      <button
-        type="button"
-        className={`${styles['quick-chat-shortcut-button']} ${recording ? styles['recording'] : ''}`}
-        aria-label={t('settings.general.quickChat.shortcut')}
-        onClick={onStart}
-        disabled={saving || loading}
-      >
-        {recording ? t('settings.general.quickChat.recording') : loading ? t('common.loading') : <ShortcutKeycaps shortcut={value} />}
-      </button>
-      <button
-        type="button"
-        className={styles['quick-chat-reset-button']}
-        onClick={onRestoreDefault}
-        disabled={saving || loading || value === DEFAULT_QUICK_CHAT_SHORTCUT}
-      >
-        {t('settings.general.quickChat.restoreDefault')}
-      </button>
-    </div>
-  );
 }
 
 function ReuseTimeoutInput({
@@ -193,7 +87,6 @@ export function GeneralTab() {
     return snapshot ? normalizeQuickChatPreferences(snapshot) : null;
   });
   const [quickChatSaving, setQuickChatSaving] = useState(false);
-  const [quickChatRecording, setQuickChatRecording] = useState(false);
   const [notificationSaving, setNotificationSaving] = useState(false);
   const [notificationPrefs, setNotificationPrefs] = useState<NotificationPreferences | null>(() => {
     const snapshot = useSettingsStore.getState().settingsSnapshot.data?.preferences?.notifications;
@@ -303,33 +196,10 @@ export function GeneralTab() {
     }
   }, [hana, quickChatPrefs, showToast]);
 
-  const saveQuickChatShortcut = useCallback((shortcut: string) => saveQuickChatPreferences(
-    { shortcut },
-    { reloadShortcut: true, eventName: 'quick-chat-shortcut-changed' },
-  ), [saveQuickChatPreferences]);
-
   const saveQuickChatReuseTimeout = useCallback((reuseTimeoutMinutes: number) => saveQuickChatPreferences(
     { reuseTimeoutMinutes },
     { eventName: 'quick-chat-preferences-changed' },
   ), [saveQuickChatPreferences]);
-
-  useEffect(() => {
-    if (!quickChatRecording) return undefined;
-    const handler = (event: KeyboardEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      if (event.key === 'Escape') {
-        setQuickChatRecording(false);
-        return;
-      }
-      const shortcut = keyFromEvent(event);
-      if (!shortcut) return;
-      setQuickChatRecording(false);
-      void saveQuickChatShortcut(shortcut);
-    };
-    window.addEventListener('keydown', handler, true);
-    return () => window.removeEventListener('keydown', handler, true);
-  }, [quickChatRecording, saveQuickChatShortcut]);
 
   const handleAutoLaunchToggle = useCallback(async (on: boolean) => {
     if (!hana?.setAutoLaunchEnabled) return;
@@ -430,20 +300,6 @@ export function GeneralTab() {
       </SettingsSection>
 
       <SettingsSection title={t('settings.general.quickChat.title')}>
-        <SettingsRow
-          label={t('settings.general.quickChat.shortcut')}
-          hint={t('settings.general.quickChat.shortcutHint')}
-          control={
-            <ShortcutRecorder
-              value={quickChatPrefs?.shortcut || ''}
-              loading={!quickChatPrefs}
-              recording={quickChatRecording}
-              saving={quickChatSaving || !quickChatPrefs}
-              onStart={() => setQuickChatRecording(true)}
-              onRestoreDefault={() => void saveQuickChatShortcut(DEFAULT_QUICK_CHAT_SHORTCUT)}
-            />
-          }
-        />
         <SettingsRow
           label={t('settings.general.quickChat.reuseTimeout')}
           hint={t('settings.general.quickChat.reuseTimeoutHint')}

@@ -643,4 +643,70 @@ describe('ArchivedSessionsModal group collapse', () => {
     const header = container.querySelector('[data-group-header="mount:local_fs_b"]') as HTMLElement;
     expect(header.getAttribute('aria-expanded')).toBe('true');
   });
+
+  it('collapses via any header spot except the group name, which instead reveals checkboxes', async () => {
+    listMock.mockResolvedValue([
+      {
+        path: '/arch/b1.jsonl',
+        sessionId: 's1',
+        title: 'B-Row',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 10,
+        agentId: 'a',
+        agentName: 'Hana',
+        workspaceMountId: 'local_fs_b',
+        workspaceLabel: '工作台B',
+        cwd: '/Users/test/Desktop/B',
+      },
+    ]);
+    const { ArchivedSessionsModal } = await import('../../components/ArchivedSessionsModal');
+    const { container } = render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
+    await waitFor(() => expect(screen.getByText('B-Row')).toBeInTheDocument());
+
+    const header = container.querySelector('[data-group-header="mount:local_fs_b"]') as HTMLElement;
+
+    // 点分组头本体（非目录名称）→ 折叠，且不进入选择模式
+    fireEvent.click(header);
+    expect(screen.queryByText('B-Row')).toBeNull();
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+
+    // 再点分组头 → 展开
+    fireEvent.click(header);
+    expect(await screen.findByText('B-Row')).toBeInTheDocument();
+
+    // 点目录名称 → 进入选择模式（勾选框出现），且不折叠
+    fireEvent.click(screen.getByText('工作台B'));
+    expect(screen.getAllByRole('checkbox').length).toBeGreaterThan(0);
+    expect(screen.getByText('B-Row')).toBeInTheDocument();
+  });
+
+  it('only the row title reveals checkboxes; other row spots do nothing before selection mode', async () => {
+    listMock.mockResolvedValue([
+      {
+        path: '/arch/b1.jsonl',
+        sessionId: 's1',
+        title: 'B-Row',
+        archivedAt: new Date().toISOString(),
+        sizeBytes: 10,
+        agentId: 'a',
+        agentName: 'Hana',
+        workspaceMountId: 'local_fs_b',
+        workspaceLabel: '工作台B',
+        cwd: '/Users/test/Desktop/B',
+      },
+    ]);
+    const { ArchivedSessionsModal } = await import('../../components/ArchivedSessionsModal');
+    render(<ArchivedSessionsModal open={true} onClose={() => {}} />);
+    await waitFor(() => expect(screen.getByText('B-Row')).toBeInTheDocument());
+
+    // 点行内非标题区域（元信息「Hana · 今天 · 大小」）→ 不进入选择模式
+    fireEvent.click(screen.getByText(/Hana · /));
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    expect(screen.getByRole('button', { name: /session\.archived\.deleteSelected/ })).toBeDisabled();
+
+    // 点标题名称 → 进入选择模式并勾中该行
+    fireEvent.click(screen.getByText('B-Row'));
+    expect(screen.getAllByRole('checkbox').length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: /session\.archived\.deleteSelected/ })).toBeEnabled();
+  });
 });

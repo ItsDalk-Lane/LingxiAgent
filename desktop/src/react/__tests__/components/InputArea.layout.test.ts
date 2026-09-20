@@ -100,8 +100,11 @@ describe('InputArea layout', () => {
     const mentionNameBlock = cssBlock(css, String.raw`\.mention-name`);
     const mentionDetailBlock = cssBlock(css, String.raw`\.mention-detail`);
 
-    expect(slashMenuBlock).toMatch(/max-width:\s*360px/);
-    expect(slashMenuBlock).toMatch(/max-height:\s*308px/);
+    // 斜杠菜单改为两行布局（label+说明）后的实测几何：宽 420px；
+    // 高度按 10 项完整可见校准（10×28 项高 + 9×2 间隙 + 2 余量 = 301px，
+    // 见 CSS 内逐像素校准注释）。提及菜单维持 360/308 不变。
+    expect(slashMenuBlock).toMatch(/max-width:\s*420px/);
+    expect(slashMenuBlock).toMatch(/max-height:\s*301px/);
     expect(mentionMenuBlock).toMatch(/width:\s*min\(360px,\s*calc\(100vw - 2rem\)\)/);
     expect(mentionMenuBlock).toMatch(/max-height:\s*308px/);
     expect(mentionNameBlock).toMatch(/flex:\s*0 0 auto/);

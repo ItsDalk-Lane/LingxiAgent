@@ -100,7 +100,9 @@ function seedSessions() {
     deskWorkspaceMountId: null,
     deskBasePath: '/tmp/project',
     deskWorkspaceLabel: null,
-    selectedFolder: null,
+    // 新侧栏按项目分组、非活跃组默认折叠；欢迎态身份回落 homeFolder，
+    // 这里直接给选定目录让活跃组展开（与 app-init 保证的非空身份一致）。
+    selectedFolder: '/tmp/project',
     selectedWorkspaceMountId: null,
     activeServerConnectionId: localServerConnection.connectionId,
     activeServerConnection: localServerConnection,
@@ -648,34 +650,30 @@ describe('SessionList context menu', () => {
 
     render(<SessionList />);
 
-    // 本地目录作用域（deskBasePath=/tmp/project）：只有同 cwd 的会话可见，
-    // 其他目录 / mount / 无身份会话在数据层就被排除。
+    // 新侧栏按项目分组展示全部项目：活跃组（selectedFolder=/tmp/project）展开，
+    // 其他目录组 / mount 组存在但默认折叠；无身份会话维持不显示的纪律。
     expect(sessionButton('In scope')).toBeInTheDocument();
     expect(screen.queryByText('Other dir')).not.toBeInTheDocument();
     expect(screen.queryByText('Mount session')).not.toBeInTheDocument();
     expect(screen.queryByText('No identity')).not.toBeInTheDocument();
+    // 分组头对全部项目可见（折叠的只是行，不是项目本身）。
+    expect(screen.getByRole('button', { name: 'project' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'other-project' })).toBeInTheDocument();
   });
 
-  it('re-filters the list when the workspace switches', () => {
+  it('moves the expanded group when the workspace switches', () => {
     render(<SessionList />);
     expect(sessionButton('Has summary')).toBeInTheDocument();
 
-    // 切到另一个工作台：列表跟随 desk 状态响应式重过滤。
+    // 切到没有会话的目录：原项目组收起，行不再渲染。
     act(() => {
-      useStore.setState({ deskBasePath: '/tmp/elsewhere' });
-    });
-    expect(screen.queryByText('Has summary')).not.toBeInTheDocument();
-    expect(screen.getByText('sidebar.empty')).toBeInTheDocument();
-
-    // 切回 mount 工作台：只有该 mount 的会话可见。
-    act(() => {
-      useStore.setState({ deskBasePath: '', deskWorkspaceMountId: 'mount-abc' });
+      useStore.setState({ selectedFolder: '/tmp/elsewhere' });
     });
     expect(screen.queryByText('Has summary')).not.toBeInTheDocument();
 
-    // pending 新会话：作用域取 selectedFolder。
+    // 切回原项目：分组重新展开。
     act(() => {
-      useStore.setState({ deskWorkspaceMountId: null, selectedFolder: '/tmp/project' });
+      useStore.setState({ selectedFolder: '/tmp/project' });
     });
     expect(sessionButton('Has summary')).toBeInTheDocument();
   });

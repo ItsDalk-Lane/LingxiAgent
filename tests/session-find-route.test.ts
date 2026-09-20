@@ -61,7 +61,10 @@ describe("sessions find route", () => {
       jsonlLine("m3", "t1", "user", "<hana-background-result task=\"x\"> 隐藏系统消息 lighthouse </hana-background-result>"),
       jsonlLine("m4", "m3", "user", "第二个话题：搜索定位怎么做"),
       jsonlLine("m5", "m4", "assistant", "用 displayable 序号做锚点"),
-    ].join("\n"), "utf8");
+    // 结尾补换行：与生产文件一致（pi SessionManager 写出的 JSONL 天然以 \n 结尾）。
+    // pi 0.86.0 的 SessionManager.open 会给不以换行结尾的文件补一个换行并重写，
+    // 那样首个请求就会触发重写、revision 漂移，键控缓存的新旧对比就不稳定了。
+    ].join("\n") + "\n", "utf8");
   });
 
   it("find 返回消息级命中，序号与 messages 接口一致", async () => {

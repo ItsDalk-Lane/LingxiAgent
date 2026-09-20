@@ -118,4 +118,13 @@ reviews/
 
 # Reasonix 本地 agent 状态
 .reasonix/
+
+# Mimosa 安全扫描本地状态（finding-ledger / 扫描历史 / hook 状态，208MB+，不入库）
+.mimosa/
+
+# Playwright MCP 浏览器工具产物（控制台日志 / 截图 / 页面快照）
+.playwright-mcp/
+
+# GitGraphPanel 开发期设计稿（实现已入库，mockup 留本地）
+/git-graph-panel-mockup*.html
 desktop/native/LingxiSpeechPermissions/build/

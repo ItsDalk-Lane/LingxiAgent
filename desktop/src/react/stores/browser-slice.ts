@@ -10,6 +10,10 @@ export interface BrowserSessionState {
   thumbnailFresh?: boolean;
   /** 聊天区浮动卡片被用户收起。纯前端展示状态，不影响浏览器本身是否运行。 */
   collapsed?: boolean;
+  /** 最近一次有活动（状态上报）的时间戳，用于跨会话显示时挑出"最近在用"的浏览器。 */
+  lastActiveAt?: number | null;
+  /** 该浏览器归属的会话路径（map 的键可能是 sessionId，不能直接当路径用）。 */
+  sessionPath?: string | null;
 }
 
 export interface BrowserSlice {
@@ -50,7 +54,8 @@ export function setBrowserStateForPath(
 ): void {
   useStore.setState((state) => {
     const key = sessionScopedKey(state, sessionPath) || sessionPath;
-    const browserBySession = { ...(state.browserBySession || {}), [key]: value };
+    // 把归属会话路径一并存进值里：map 键可能是 sessionId，跨会话显示时仍要能拿到真实路径。
+    const browserBySession = { ...(state.browserBySession || {}), [key]: { ...value, sessionPath } };
     if (key !== sessionPath) delete browserBySession[sessionPath];
     return { browserBySession };
   });
@@ -64,7 +69,7 @@ export function setBrowserCardCollapsed(sessionPath: string, collapsed: boolean)
   useStore.setState((state) => {
     const key = sessionScopedKey(state, sessionPath) || sessionPath;
     const prev = sessionScopedValue(state, state.browserBySession, sessionPath) || DEFAULT_BROWSER_STATE;
-    const browserBySession = { ...(state.browserBySession || {}), [key]: { ...prev, collapsed } };
+    const browserBySession = { ...(state.browserBySession || {}), [key]: { ...prev, collapsed, sessionPath } };
     if (key !== sessionPath) delete browserBySession[sessionPath];
     return { browserBySession };
   });

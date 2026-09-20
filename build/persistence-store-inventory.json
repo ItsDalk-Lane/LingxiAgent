@@ -344,6 +344,42 @@
       "exemption": null
     },
     {
+      "id": "conversation-map-layout",
+      "ownerModule": "server/routes/conversation-map.ts",
+      "pathPattern": "conversation-map.json",
+      "pathPatterns": [
+        "conversation-map.json"
+      ],
+      "pathExclusions": [],
+      "pathKind": "file",
+      "format": "json",
+      "schemaSource": {
+        "kind": "runtime-contract",
+        "module": "server/routes/conversation-map.ts",
+        "contract": "conversation-map layout normalizer (GET) and validated atomic writer (PUT)"
+      },
+      "schemaContract": {
+        "kind": "runtime-source",
+        "source": "server/routes/conversation-map.ts",
+        "compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+      },
+      "openEntry": [
+        "createConversationMapRoute"
+      ],
+      "migrationEntry": [],
+      "protocolModules": [],
+      "firstPossibleOpenPhase": "engine_construct",
+      "firstPossibleWritePhase": "runtime_ready",
+      "epochPolicy": "epoch-managed",
+      "checkpointPolicy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+      "restorePolicy": "Restore only through the owning module after reader compatibility is established.",
+      "affectedByEpochMigration": true,
+      "bootstrapSafety": null,
+      "preCoordinatorReadProjection": null,
+      "identityContract": "Layout entries are keyed by map card id; session/entry ids embedded in keys are references to session-owned data, not identities owned here.",
+      "exemption": null
+    },
+    {
       "id": "cron-automation",
       "ownerModule": "lib/desk/cron-store.ts",
       "pathPattern": "agents/{agentId}/desk/cron-jobs.json",
@@ -4759,6 +4795,24 @@
     {
       "sourceFile": "core/workspace-snapshots.ts",
       "kind": "remove-path",
+      "excerpt": "fs.rmSync(repoRoot, { recursive: true, force: true })",
+      "reason": "Creates the shadow snapshot repository and writes per-session snapshot sidecars.",
+      "storeId": "workspace-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "core/workspace-snapshots.ts",
+      "kind": "remove-path",
+      "excerpt": "fs.rmSync(sidecarPath, { force: true })",
+      "reason": "Creates the shadow snapshot repository and writes per-session snapshot sidecars.",
+      "storeId": "workspace-snapshots",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "core/workspace-snapshots.ts",
+      "kind": "remove-path",
       "excerpt": "fsp.rm(absPath, { force: true })",
       "reason": "Creates the shadow snapshot repository and writes per-session snapshot sidecars.",
       "storeId": "workspace-snapshots",
@@ -5705,6 +5759,15 @@
       "sourceFile": "lib/checkpoint-store.ts",
       "kind": "remove-path",
       "excerpt": "fs.unlinkSync(path.join(this._dir, name))",
+      "reason": "Writes or restores an existing operational checkpoint.",
+      "storeId": "operational-checkpoints",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "lib/checkpoint-store.ts",
+      "kind": "write-file",
+      "excerpt": "fs.writeFileSync(obj.path, Buffer.from(obj.content_b64, \"base64\"))",
       "reason": "Writes or restores an existing operational checkpoint.",
       "storeId": "operational-checkpoints",
       "exemptionId": null,
@@ -8839,6 +8902,33 @@
       "excerpt": "new FactStore(dbPath)",
       "reason": "Constructs or migrates a FactStore.",
       "storeId": "agent-facts-sqlite",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "server/routes/conversation-map.ts",
+      "kind": "mkdir",
+      "excerpt": "fs.mkdir(path.dirname(file), { recursive: true })",
+      "reason": "Reads and atomically writes the conversation-map canvas layout file.",
+      "storeId": "conversation-map-layout",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "server/routes/conversation-map.ts",
+      "kind": "rename",
+      "excerpt": "fs.rename(tmpFile, file)",
+      "reason": "Reads and atomically writes the conversation-map canvas layout file.",
+      "storeId": "conversation-map-layout",
+      "exemptionId": null,
+      "ordinal": 0
+    },
+    {
+      "sourceFile": "server/routes/conversation-map.ts",
+      "kind": "write-file",
+      "excerpt": "fs.writeFile(tmpFile, JSON.stringify(next, null, 2), \"utf-8\")",
+      "reason": "Reads and atomically writes the conversation-map canvas layout file.",
+      "storeId": "conversation-map-layout",
       "exemptionId": null,
       "ordinal": 0
     },

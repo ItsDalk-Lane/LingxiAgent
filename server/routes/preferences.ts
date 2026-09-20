@@ -36,6 +36,7 @@ import {
 import { normalizeSidebarUiPrefs, normalizeSidebarUiPrefsPatch } from "../../shared/sidebar-ui-state.ts";
 import { normalizeNotificationPreferences } from "../../shared/notification-preferences.ts";
 import { normalizeQuickChatPreferences } from "../../shared/quick-chat-preferences.ts";
+import { normalizeKeybindings } from "../../shared/keybindings-preferences.ts";
 import { normalizeBrowserPreferences } from "../../shared/browser-preferences.ts";
 import {
   SEARCH_API_PROVIDER_IDS,
@@ -351,6 +352,31 @@ export function createPreferencesRoute(engine: any, options: Record<string, any>
       const patch = body.quickChat && typeof body.quickChat === "object" ? body.quickChat : body;
       const quickChat = engine.setQuickChatPreferences(patch);
       return c.json({ ok: true, quickChat });
+    } catch (err) {
+      return c.json({ error: err.message }, 400);
+    }
+  });
+
+  route.get("/preferences/keybindings", async (c) => {
+    try {
+      return c.json({ keybindings: engine.getKeybindings?.() || normalizeKeybindings({}) });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
+  route.put("/preferences/keybindings", async (c) => {
+    try {
+      const body = await safeJson(c);
+      if (!body || typeof body !== "object") {
+        return c.json({ error: "invalid JSON body" }, 400);
+      }
+      if (typeof engine.setKeybindings !== "function") {
+        return c.json({ error: "keybindings preferences unavailable" }, 500);
+      }
+      const patch = body.keybindings && typeof body.keybindings === "object" ? body.keybindings : body;
+      const keybindings = engine.setKeybindings(patch);
+      return c.json({ ok: true, keybindings });
     } catch (err) {
       return c.json({ error: err.message }, 400);
     }

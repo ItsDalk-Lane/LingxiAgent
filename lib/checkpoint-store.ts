@@ -3,16 +3,13 @@ import path from "path";
 import { randomBytes } from "crypto";
 import { atomicWriteSync } from "../shared/safe-fs.ts";
 
-const BINARY_EXTENSIONS = new Set([
-  ".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".ico", ".svg",
-  ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx",
-  ".zip", ".tar", ".gz", ".bz2", ".7z", ".rar",
-  ".exe", ".dll", ".so", ".dylib", ".wasm",
-  ".mp3", ".mp4", ".wav", ".avi", ".mov", ".mkv", ".flac",
-  ".ttf", ".otf", ".woff", ".woff2",
-  ".db", ".sqlite", ".sqlite3",
-]);
-
+/**
+ * 改前存档仓库：每个存档一份完整复印件（JSON 单文件）。
+ *
+ * 覆盖范围与工作区快照对齐：任何文件类型都收（二进制走 base64 保真），
+ * 无大小上限；maxSizeKb 仅作为可选约束保留给显式传入的调用方。
+ * 会话删除时由 purgeSession 按 sessionPath 归属清理。
+ */
 export class CheckpointStore {
   declare _dir: string;
 
@@ -20,10 +17,7 @@ export class CheckpointStore {
     this._dir = checkpointsDir;
   }
 
-  async save({ sessionPath, tool, filePath, maxSizeKb, source, reason }: { sessionPath: string; tool: string; filePath: string; maxSizeKb: number; source: string; reason: string }) {
-    const ext = path.extname(filePath).toLowerCase();
-    if (BINARY_EXTENSIONS.has(ext)) return null;
-
+  async save({ sessionPath, tool, filePath, maxSizeKb = null, source, reason }: { sessionPath: string; tool: string; filePath: string; maxSizeKb?: number | null; source: string; reason: string }) {
     let stat;
     try {
       stat = fs.statSync(filePath);
@@ -31,13 +25,14 @@ export class CheckpointStore {
       return null;
     }
 
-    if (stat.size > maxSizeKb * 1024) return null;
+    // 大小上限可选：未传或非正数时不限制（与工作区快照一致，任何大小的文件都收）
+    if (typeof maxSizeKb === "number" && maxSizeKb > 0 && stat.size > maxSizeKb * 1024) return null;
 
     const buf = fs.readFileSync(filePath);
-    const sample = buf.subarray(0, 8192);
-    if (sample.includes(0)) return null;
-
-    const content = buf.toString("utf-8");
+    // 全量 round-trip 判断是否为合法 utf-8 文本：损坏字节序列经替换字符
+    // 往返后与原始字节不同，判为二进制，走 base64 存储；文本继续内嵌字符串。
+    const roundTrip = Buffer.from(buf.toString("utf-8"), "utf-8");
+    const isText = roundTrip.length === buf.length && roundTrip.equals(buf);
 
     fs.mkdirSync(this._dir, { recursive: true });
     const ts = Date.now();
@@ -53,7 +48,7 @@ export class CheckpointStore {
       source: source || "llm",
       reason: reason || `tool-${tool}`,
       path: filePath,
-      content,
+      ...(isText ? { content: buf.toString("utf-8") } : { content_b64: buf.toString("base64") }),
       size: stat.size,
     });
 
@@ -102,7 +97,12 @@ export class CheckpointStore {
     const obj = JSON.parse(raw);
 
     fs.mkdirSync(path.dirname(obj.path), { recursive: true });
-    fs.writeFileSync(obj.path, obj.content, "utf-8");
+    // 二进制存档（base64）无损写回；旧格式与文本存档继续用 utf-8 字符串。
+    if (typeof obj.content_b64 === "string" && obj.content_b64) {
+      fs.writeFileSync(obj.path, Buffer.from(obj.content_b64, "base64"));
+    } else {
+      fs.writeFileSync(obj.path, obj.content, "utf-8");
+    }
 
     return { restoredTo: obj.path };
   }
@@ -112,6 +112,18 @@ export class CheckpointStore {
     try {
       fs.unlinkSync(filePath);
     } catch {}
+  }
+
+  /** 会话删除时按归属清理：只删 sessionPath 完全匹配的存档，不动手动编辑等无会话归属的存档 */
+  async purgeSession(sessionPath: string) {
+    if (typeof sessionPath !== "string" || !sessionPath) return { purged: 0 };
+    let purged = 0;
+    for (const entry of await this.list()) {
+      if (entry.sessionPath !== sessionPath) continue;
+      await this.remove(entry.id);
+      purged += 1;
+    }
+    return { purged };
   }
 
   async cleanup(retentionDays: number) {

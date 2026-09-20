@@ -36,6 +36,7 @@ import {
   moveSessionFileSidecarSync,
   sessionFileSidecarPath,
 } from "../../lib/session-files/session-file-registry.ts";
+import { deleteSessionSnapshotsSync } from "../../core/workspace-snapshots.ts";
 import { getModelThinkingLevels, normalizeSessionThinkingLevel, modelSupportsXhigh, resolveModelDefaultThinkingLevel } from "../../core/session-thinking-level.ts";
 import {
   modelSupportsDirectAudioInput,
@@ -479,6 +480,37 @@ export function createSessionsRoute(engine, hub = null) {
     return manifest;
   }
 
+  /**
+   * 会话永久删除后的联动清理：该会话名下的改前存档（checkpoints）与
+   * 工作区快照（账本 + 独占仓库）一并清除。清理失败只记日志，不阻断
+   * 已完成的删除事务，也不触发回滚。
+   */
+  function purgeSessionArtifacts(engineRef, sessionPaths) {
+    // TS 5.9 起 new Set(<any>) 推断为 Set<unknown>，须显式给出元素类型
+    const paths = [...new Set<string>((sessionPaths || []).filter((p): p is string => typeof p === "string" && p.trim() !== ""))];
+    for (const sessionPath of paths) {
+      try {
+        engineRef.purgeSessionCheckpoints?.(sessionPath);
+      } catch (err) {
+        lifecycleLog.warn(`checkpoint purge failed for ${sessionPath}: ${err.message}`);
+      }
+    }
+    try {
+      const lingxiHome = engineRef?.lingxiHome;
+      if (lingxiHome) {
+        const report = deleteSessionSnapshotsSync(lingxiHome, paths);
+        if (report.removedRepoDirs.length) {
+          lifecycleLog.info(`snapshot repos removed for session delete: ${report.removedRepoDirs.join(", ")}`);
+        }
+        if (report.keptSharedRepoDirs.length) {
+          lifecycleLog.info(`shared snapshot repos kept (still referenced): ${report.keptSharedRepoDirs.join(", ")}`);
+        }
+      }
+    } catch (err) {
+      lifecycleLog.warn(`snapshot purge failed: ${err.message}`);
+    }
+  }
+
   async function permanentlyDeleteArchivedFile(sessionPath, reason) {
     const stagedPath = `${sessionPath}.deleting`;
     if (await pathExists(stagedPath) || await pathExists(sessionFileSidecarPath(stagedPath))) {
@@ -513,6 +545,8 @@ export function createSessionsRoute(engine, hub = null) {
     try {
       await fs.unlink(stagedPath);
       deleteSessionFileSidecarSync(stagedPath);
+      // 删除事务已提交：清理该会话的改前存档与工作区快照（活跃路径 + 归档路径都清）。
+      purgeSessionArtifacts(engine, [activePathForArchivedSession(stagedPath), stagedPath]);
     } catch (err) {
       try {
         await moveSessionLifecycleOrThrow({
@@ -778,6 +812,7 @@ export function createSessionsRoute(engine, hub = null) {
           agentId: s.agentId || null,
           agentName: s.agentName || null,
           projectId: s.projectId || null,
+          forkedFrom: s.forkedFrom || null,
           modelId: s.modelId || null,
           modelProvider: s.modelProvider || null,
           workspaceMountId: s.workspaceMountId || null,
@@ -1974,7 +2009,7 @@ export function createSessionsRoute(engine, hub = null) {
       });
       if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
       const body = await safeJson(c);
-      const { memoryEnabled, agentId, currentSessionPath: oldSessionPath, thinkingLevel } = body;
+      const { memoryEnabled, agentId, thinkingLevel } = body;
       const workspaceSelection = resolveSessionWorkspaceSelection(engine, requestContext, body);
       const cwd = workspaceSelection.cwd;
       const workspaceFolders = Array.isArray(body.workspaceFolders)
@@ -1994,12 +2029,8 @@ export function createSessionsRoute(engine, hub = null) {
         customAgent: !!agentId,
       })}`);
 
-      // 新建前挂起浏览器（保存当前 session 的浏览器状态）
-      const bm = BrowserManager.instance();
-      if (oldSessionPath && bm.isRunning(oldSessionPath)) {
-        await bm.suspendForSession(oldSessionPath);
-      }
-
+      // 浏览器不随新建会话挂起：上个会话的浏览器在共享窗口中继续显示，
+      // 新会话的浏览器以新标签页加入；数据层仍按 session 隔离。
       const createOptions: {
         workspaceFolders: any;
         visibleInSessionList: boolean;
@@ -2136,6 +2167,20 @@ export function createSessionsRoute(engine, hub = null) {
       const newAgentId = result.agentId;
       const newSessionId = result.sessionId || engine.getSessionIdForPath?.(newSessionPath) || null;
       engine.persistSessionMeta?.(newSessionPath);
+      // 谱系：侧边聊天等引用型子对话携带来源会话，挂到主对话名下（列表分组展示）。
+      const forkedFromSessionId = typeof body?.forkedFromSessionId === "string" && body.forkedFromSessionId.trim()
+        ? body.forkedFromSessionId.trim()
+        : null;
+      let forkedFromWritten: { sessionId: string } | null = null;
+      if (forkedFromSessionId && forkedFromSessionId !== newSessionId && typeof engine.setSessionForkedFrom === "function") {
+        try {
+          const written = await engine.setSessionForkedFrom({ sessionPath: newSessionPath }, { sessionId: forkedFromSessionId });
+          forkedFromWritten = written?.forkedFrom ?? { sessionId: forkedFromSessionId };
+        } catch (err) {
+          // 谱系是展示增强，写入失败不阻断会话创建；前端按无父处理。
+          lifecycleLog?.warn?.(`detached session forkedFrom write failed for ${newSessionPath}: ${err?.message || err}`);
+        }
+      }
       if (projectId && typeof engine.setSessionProjectAssignment === "function") {
         await engine.setSessionProjectAssignment({ sessionPath: newSessionPath, projectId });
       }
@@ -2152,6 +2197,7 @@ export function createSessionsRoute(engine, hub = null) {
         ok: true,
         path: newSessionPath,
         sessionId: newSessionId,
+        ...(forkedFromWritten ? { forkedFrom: forkedFromWritten } : {}),
         cwd: result.session?.sessionManager?.getCwd?.() || cwd || engine.cwd || null,
         workspaceFolders: engine.getSessionWorkspaceFolders?.(newSessionPath) || workspaceFolders,
         authorizedFolders: engine.getSessionAuthorizedFolders?.(newSessionPath) || [],
@@ -2242,7 +2288,8 @@ export function createSessionsRoute(engine, hub = null) {
   route.post("/sessions/switch", async (c) => {
     try {
       const body = await safeJson(c);
-      const { sessionId, path: legacySessionPath, currentSessionPath: oldSessionPath } = body;
+      // currentSessionPath 仍随请求传来（兼容旧前端），但切换不再挂起旧会话的浏览器
+      const { sessionId, path: legacySessionPath } = body;
       let sessionPath = typeof legacySessionPath === "string" ? legacySessionPath : null;
       if (typeof sessionId === "string" && sessionId.trim()) {
         const manifest = engine.getSessionManifest?.(sessionId.trim()) || null;
@@ -2261,13 +2308,10 @@ export function createSessionsRoute(engine, hub = null) {
       if (isDeletedAgentSessionPath(sessionPath)) {
         return rejectDeletedAgentSession(c);
       }
-      // 切换前挂起浏览器（保存当前 session 的浏览器状态）
+      // 浏览器不再随会话切换挂起：显示层各会话共享同一个浏览器窗口（标签页并存），
+      // 数据层仍按 session 一对一隔离。资源回收交给 LRU 淘汰与双闲置巡检，
+      // 切走会话时上个会话的浏览器画面保持可见。
       const bm = BrowserManager.instance();
-      const suspendPath = oldSessionPath;
-      if (suspendPath && bm.isRunning(suspendPath)) {
-        // viewer 开着就让它跟着切，不再因为切换会话把窗口藏起来
-        await bm.suspendForSession(suspendPath, { keepViewerVisible: true });
-      }
 
       await engine.switchSession(sessionPath);
 
@@ -2392,7 +2436,8 @@ export function createSessionsRoute(engine, hub = null) {
     const bm = BrowserManager.instance();
     const resume = await bm.resumeForSessionIfAvailable(sessionPath);
     const session = engine.getSessionByPath(sessionPath);
-    await bm.notifyViewerSession(sessionPath, session?.title || null);
+    // 用户显式打开：恢复失败也允许清空 viewer 到该会话的空态
+    await bm.notifyViewerSession(sessionPath, session?.title || null, { allowEmpty: true });
     return c.json({ ok: true, resume });
   });
 
@@ -2496,8 +2541,89 @@ export function createSessionsRoute(engine, hub = null) {
       if (!isActiveDesktopSessionPath(sessionPath, engine.agentsDir)) {
         return c.json({ error: "Invalid session path" }, 403);
       }
+
+      // ── 子对话策略（谱系分组配套）──
+      // 主对话名下有子对话时必须显式选择：archive_children（递归一起归档）或
+      // detach_children（先清空子对话谱系释放到顶层，再归档主对话）。
+      // 未携带策略而存在子对话 → 409，前端据此弹选择框。
+      const rawChildMode = body?.childMode;
+      const childMode = rawChildMode === "archive_children" || rawChildMode === "detach_children"
+        ? rawChildMode
+        : null;
+      const childErrors: string[] = [];
+      let directChildren: any[] = [];
+      if (sessionId && typeof engine.listSessions === "function" && typeof engine.setSessionForkedFrom === "function") {
+        const allSessions = await engine.listSessions();
+        directChildren = (Array.isArray(allSessions) ? allSessions : []).filter((s) => (
+          s?.forkedFrom?.sessionId === sessionId && s.path !== sessionPath
+        ));
+        if (directChildren.length > 0 && !childMode) {
+          return c.json({
+            error: "child sessions present",
+            code: "child_sessions_present",
+            childCount: directChildren.length,
+          }, 409);
+        }
+      }
+
+      let detachedChildren = 0;
+      if (childMode === "detach_children") {
+        for (const child of directChildren) {
+          try {
+            await engine.setSessionForkedFrom({ sessionPath: child.path }, null);
+            detachedChildren += 1;
+          } catch (err) {
+            childErrors.push(`${path.basename(child.path)}: ${err?.message || err}`);
+          }
+        }
+      }
+
       const archivedPath = await archiveActiveSessionCore(engine, sessionPath, sessionId);
-      return c.json({ ok: true, sessionId: archivedPath.sessionId, archivedPath: archivedPath.destPath });
+
+      let archivedChildren = 0;
+      let skippedStreamingChildren = 0;
+      if (childMode === "archive_children" && sessionId) {
+        // 递归归档后代（子对话的子对话跟随其主对话）；流式中的跳过并计数上报。
+        const byParent = new Map<string, any[]>();
+        const allSessions = await engine.listSessions();
+        for (const s of (Array.isArray(allSessions) ? allSessions : [])) {
+          const parent = s?.forkedFrom?.sessionId;
+          if (!parent || s.path === sessionPath) continue;
+          const list = byParent.get(parent) || [];
+          list.push(s);
+          byParent.set(parent, list);
+        }
+        const queue = [...directChildren];
+        const seen = new Set([sessionPath]);
+        while (queue.length > 0) {
+          const child = queue.shift();
+          if (!child || seen.has(child.path)) continue;
+          seen.add(child.path);
+          for (const grandchild of byParent.get(child.sessionId) || []) queue.push(grandchild);
+          if (engine.isSessionStreaming?.(child.path)) {
+            skippedStreamingChildren += 1;
+            continue;
+          }
+          try {
+            await archiveActiveSessionCore(engine, child.path, child.sessionId || null);
+            archivedChildren += 1;
+          } catch (err) {
+            childErrors.push(`${path.basename(child.path)}: ${err?.message || err}`);
+          }
+        }
+      }
+      if (childErrors.length > 0) {
+        lifecycleLog.warn(`session archive child handling incomplete: ${childErrors.join("; ")}`);
+      }
+      return c.json({
+        ok: true,
+        sessionId: archivedPath.sessionId,
+        archivedPath: archivedPath.destPath,
+        archivedChildren,
+        detachedChildren,
+        skippedStreamingChildren,
+        ...(childErrors.length > 0 ? { childErrors } : {}),
+      });
     } catch (err) {
       return c.json(bodyFromRouteError(err), statusFromRouteError(err));
     }

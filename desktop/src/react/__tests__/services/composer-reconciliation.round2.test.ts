@@ -257,14 +257,16 @@ describe('R04 未决输入与捕获连接对账', () => {
     await sendWithLease(acquired.leaseId, makeDeps());
     return getSendRecord(acquired.leaseId)!;
   }
-  it('R04-14：断线未知保留独立barrier，A不能越过而B正常发送', async () => {
+  it('R04-14：断线存疑账不再硬拦新发送，A/B 均可续发；存疑快照留给对账', async () => {
     seedStore([PATH_A, PATH_B]);
     const record = await submitted();
     noteComposerConnectionClosed();
     noteComposerConnectionOpened();
     expect(record.phase).toBe('delivery_unknown');
-    expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
-    expect(tryAcquireSendLease({identity: identityOf(PATH_A),bundle:makeBundle(PATH_A,'下一条')})).toEqual({ok:false,reason:'transport_busy'});
+    // 新语义：断线存疑账是会计问题（交给对账与 UI 显式标记），
+    // 不再否决新发送；防重复发送的底线仍是不自动重发。
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(false);
+    expect(tryAcquireSendLease({identity: identityOf(PATH_A),bundle:makeBundle(PATH_A,'下一条')}).ok).toBe(true);
     expect(tryAcquireSendLease({identity: identityOf(PATH_B),bundle:makeBundle(PATH_B,'B')} ).ok).toBe(true);
   });
   it('R04-13：超过200条历史记录不能淘汰未知快照', async () => {
@@ -296,11 +298,13 @@ describe('R04 未决输入与捕获连接对账', () => {
     expect(blocked).toEqual({ ok: false, reason: 'unresolved_limit' });
     expect(leases.every(leaseId => getSendRecord(leaseId)?.phase === 'delivery_unknown')).toBe(true);
   });
-  it('R04-11：canonical ACK仅确认接收，未证明运行结束仍保留barrier', async () => {
+  it('R04-11：canonical ACK仅确认接收，未证明运行结束；「在途」不再包含结局未定', async () => {
     const record = await submitted();
     dispatchAck(PATH_A, record.clientMessageId);
     expect(record.phase).toBe('accepted');
-    expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+    expect(record.runStatus).toBe('run_unknown');
+    // 新语义：接收账已销，结局账独立保留；下一笔的节流由回合忙闲（streaming/turnPending）把关。
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(false);
   });
   function page(record: ReturnType<typeof getSendRecord>, runStatus = 'reconciled_idle', extra: Record<string,unknown> = {}) {
     return {messages:[{id:'0',role:'user',clientMessageId:record!.clientMessageId,sourceEntryId:'entry-a',snapshotVersion:record!.snapshotVersion}],hasMore:false,
@@ -316,10 +320,11 @@ describe('R04 未决输入与捕获连接对账', () => {
     expect(items).toHaveLength(1); expect(messageData(items[0]).text).toBe('原文  \n');
     expect(messageData(items[0]).sourceEntryId).toBe('entry-a');
   });
-  it('R04-03：命中但run running不释放下一条',async()=>{
+  it('R04-03：命中但run running不释放下一条：结局账保留 running 事实',async()=>{
     const record=await submitted();historyMocks.fetch.mockResolvedValue(page(record,'running'));
     await coordinator.reconcileComposerSession(PATH_A);
-    expect(record.acceptance).toBe('accepted');expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+    expect(record.acceptance).toBe('accepted');expect(record.runStatus).toBe('running');
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(false);
   });
   it('R04-04：沿before查第二页，第一页未命中不判拒收',async()=>{
     const record=await submitted();historyMocks.fetch.mockResolvedValueOnce(page(record,'unknown',{messages:[{id:'25',role:'assistant'}],hasMore:true})).mockResolvedValueOnce(page(record));
@@ -359,7 +364,7 @@ describe('R04 未决输入与捕获连接对账', () => {
     const pending=coordinator.reconcileComposerSession(PATH_A);await vi.advanceTimersByTimeAsync(0);
     coordinator.noteComposerRunEvent({type:'assistant_run_start',sessionId:`sess-${PATH_A}`,sessionPath:PATH_A,streamId:'new-run'});
     release(page(record));await pending;expect(record.acceptance).toBe('accepted');expect(record.runStatus).toBe('running');
-    expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(false);
   });
   it('R04-17：同session单飞，完成不自动轮询；断代迟到响应丢弃',async()=>{
     const record=await submitted();let release!:(value:unknown)=>void;
@@ -384,9 +389,10 @@ describe('R04 未决输入与捕获连接对账', () => {
     historyMocks.fetch.mockResolvedValue(page(record));await coordinator.reconcileComposerSession(PATH_A);
     expect(record.acceptance).toBe('accepted');
   });
-  it('R04-18：未知普通输入阻挡立即插入，不能绕过barrier',async()=>{
+  it('R04-18：未知普通输入不再阻挡立即插入，由目标 run 复核把关',async()=>{
     const record=await submitted();noteComposerConnectionClosed();
-    expect(tryAcquireSendLease({identity:identityOf(PATH_A),bundle:makeBundle(PATH_A,'插入',{type:'interject'}),targetRun:{streamId:'run',turnId:null}}).ok).toBe(false);
+    // 新语义：存疑账不拦新输入；插入的安全性由 revalidate 的 run/streaming 复核兑现。
+    expect(tryAcquireSendLease({identity:identityOf(PATH_A),bundle:makeBundle(PATH_A,'插入',{type:'interject'}),targetRun:{streamId:'run',turnId:null}}).ok).toBe(true);
     expect(record.acceptance).toBe('unproven');
   });
   it('R04-02：慢HTTP完成时前台timer已耗尽，idle后仍只续发一次',async()=>{

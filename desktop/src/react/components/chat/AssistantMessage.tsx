@@ -30,6 +30,7 @@ import {
 } from './block-renderers';
 import { FileOutputActions } from './FileOutputActions';
 import { KnowledgeRetrievalFold } from './KnowledgeRetrievalFold';
+import { TurnEditedFilesCard, collectTurnEditedFiles } from './TurnEditedFilesCard';
 const lazyScreenshot = () => import('../../utils/screenshot').then(m => m.takeScreenshot);
 import type { ChatListItem, ChatMessage, ContentBlock } from '../../stores/chat-types';
 import type { KnowledgeRetrievalStats } from '../../../../../shared/knowledge-refs.ts';
@@ -144,7 +145,14 @@ export const AssistantMessage = memo(function AssistantMessage({
     [sourceBlocks],
   );
   const isInterludeOnly = blocks.length > 0 && blocks.every(block => block.type === 'interlude');
-  const hasWideBlock = blocks.some((block) => (
+  // 文件修改卡与消息体同宽：卡片显示时消息体也撑到 92%（messageHasWideBlock），
+  // 短答案不会出现「卡比文宽」的错位。
+  const editedFilesCount = useMemo(
+    () => collectTurnEditedFiles(message.turnProcessBlocks ?? blocks).length,
+    [message.turnProcessBlocks, blocks],
+  );
+  const showEditedFilesCard = !isInterludeOnly && !isStreaming && editedFilesCount > 0;
+  const hasWideBlock = showEditedFilesCard || blocks.some((block) => (
     block.type !== 'text' && block.type !== 'thinking' && block.type !== 'mood'
   ));
 
@@ -326,6 +334,17 @@ export const AssistantMessage = memo(function AssistantMessage({
           </ContentBlockErrorBoundary>
         ))}
       </div>
+      {/* 本轮已编辑文件卡：回合结束才出现（流式中工具行已逐条展示增删，不重复打扰）。
+          Process Fold 模式下工具块已被剥离出消息 blocks，数据走回合过程块注解；
+          未折叠路径（折叠关闭/legacy 原样渲染）回退到本消息 blocks。 */}
+      {showEditedFilesCard && (
+        <TurnEditedFilesCard
+          sessionPath={sessionPath}
+          blocks={message.turnProcessBlocks ?? blocks}
+          isStreaming={isStreaming}
+          readOnly={readOnly}
+        />
+      )}
       {!isInterludeOnly && (timeText || !!statsNode || footerActions.length > 0 || messageActions.length > 0) && (
         <MessageFooterActions
           align="left"

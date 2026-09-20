@@ -1,0 +1,654 @@
+/* GitGraphPanel — Git图谱 弹窗（提交或推送 + 变更文件 合并面板）
+   外壳取值惯例对齐 GitChangesModal.module.css；状态字母配色按定稿 M/U/A/D。 */
+
+.modal {
+    /* 立法：本模块一次性字面量收进定义行（扫描豁免位），使用点一律 var() */
+    --git-accent-text: #ffffff;
+    --git-letter-m: #e2c08d;
+
+    background: color-mix(in srgb, var(--bg, #fcfaf5) 94%, white 6%);
+    color: var(--text, #3b3d3f);
+    border: 1px solid var(--overlay-light, rgba(0, 0, 0, 0.08));
+    border-radius: var(--radius-lg, 12px);
+    width: min(520px, 92vw);
+    height: min(680px, 88vh);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: var(--font-ui, system-ui, -apple-system, "Segoe UI", sans-serif);
+    box-shadow: 0 16px 48px var(--shadow, rgba(0, 0, 0, 0.12));
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-16) var(--space-24) var(--space-8);
+    border-bottom: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+    flex-shrink: 0;
+}
+
+.headerActions {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.refreshBtn {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--bg-card, #fff) 72%, transparent);
+    border: 1px solid transparent;
+    border-radius: 50%;
+    cursor: default;
+    color: var(--text-muted, rgba(0, 0, 0, 0.55));
+    transition: all var(--duration-fast) ease;
+}
+
+.refreshBtn:hover:not(:disabled) {
+    color: var(--text, rgba(0, 0, 0, 0.85));
+    border-color: var(--overlay-light, rgba(0, 0, 0, 0.08));
+    background: var(--bg-card, #fff);
+}
+
+.refreshBtn:disabled {
+    opacity: 0.4;
+}
+
+.title {
+    font-size: var(--fs-title);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    margin: 0;
+}
+
+.closeBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: color-mix(in srgb, var(--bg-card, #fff) 72%, transparent);
+    border: 1px solid transparent;
+    border-radius: 50%;
+    cursor: default;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--text-muted, rgba(0, 0, 0, 0.55));
+    transition: all var(--duration-fast) ease;
+}
+
+.closeBtn:hover {
+    color: var(--text, rgba(0, 0, 0, 0.85));
+    border-color: var(--overlay-light, rgba(0, 0, 0, 0.08));
+    background: var(--bg-card, #fff);
+}
+
+.body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10, 10px);
+    padding: var(--space-12) var(--space-16) var(--space-16);
+}
+
+/* ── 分支胶囊 ── */
+
+.branchButton {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-6, 6px);
+    align-self: flex-start;
+    max-width: 100%;
+    min-height: 28px;
+    padding: var(--space-2, 2px) var(--space-10, 10px);
+    border: 1px solid var(--border, rgba(0, 0, 0, 0.12));
+    border-radius: 999px;
+    background: var(--bg-card, #fff);
+    color: var(--text, #3b3d3f);
+    font: inherit;
+    font-size: var(--fs-caption);
+    cursor: default;
+    transition: border-color var(--duration-fast) ease;
+}
+
+.branchButton:hover:not(:disabled) {
+    border-color: var(--accent, rgba(0, 0, 0, 0.35));
+}
+
+.branchButton:disabled {
+    opacity: 0.5;
+}
+
+.branchName {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.aheadBadge {
+    color: var(--git-letter-m);
+    font-size: var(--fs-hint);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+/* ── 提交信息输入 + AI 生成 ── */
+
+.messageWrap {
+    position: relative;
+}
+
+.messageInput {
+    width: 100%;
+    min-height: 56px;
+    max-height: 110px;
+    resize: none;
+    background: var(--bg-card, #fff);
+    border: 1px solid var(--border, rgba(0, 0, 0, 0.14));
+    border-radius: var(--radius-input, 6px);
+    color: var(--text, #3b3d3f);
+    font: inherit;
+    font-size: var(--fs-caption);
+    line-height: 1.5;
+    padding: var(--space-6, 6px) 34px var(--space-6, 6px) var(--space-10, 10px);
+    outline: none;
+    transition: border-color var(--duration-fast) ease;
+}
+
+.messageInput::placeholder {
+    color: var(--text-muted, rgba(0, 0, 0, 0.45));
+}
+
+.messageInput:focus {
+    border-color: var(--accent, rgba(0, 0, 0, 0.35));
+}
+
+.sparkBtn {
+    position: absolute;
+    right: var(--space-6, 6px);
+    top: var(--space-6, 6px);
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--text-muted, rgba(0, 0, 0, 0.5));
+    border-radius: var(--radius-input, 6px);
+    cursor: default;
+    padding: 0 var(--space-4);
+}
+
+.sparkBtn:hover:not(:disabled) {
+    background: var(--overlay-light, rgba(0, 0, 0, 0.06));
+    color: var(--text, rgba(0, 0, 0, 0.85));
+}
+
+.sparkBtn:disabled {
+    opacity: 0.4;
+}
+
+.sparkBusy {
+    font-size: var(--fs-hint);
+    white-space: nowrap;
+}
+
+/* ── 主按钮 + 提交方式菜单 ── */
+
+.menuWrap {
+    position: relative;
+}
+
+.split {
+    display: flex;
+    width: 100%;
+    border: none;
+    border-radius: var(--radius-input, 6px);
+    overflow: hidden;
+    background: var(--accent, rgba(0, 0, 0, 0.8));
+    color: var(--git-accent-text);
+    font: inherit;
+    font-size: var(--fs-caption);
+    font-weight: 500;
+    cursor: default;
+    padding: 0;
+}
+
+.splitMain {
+    flex: 1;
+    min-height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-6, 6px);
+    padding: var(--space-4) 0;
+    background: transparent;
+    border: none;
+    color: inherit;
+    font: inherit;
+    font-weight: 500;
+    cursor: default;
+}
+
+.splitMain:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--accent, rgba(0, 0, 0, 0.8)) 88%, black 12%);
+}
+
+.splitMain:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.syncCount {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    margin-left: var(--space-4);
+    font-size: var(--fs-hint);
+    font-variant-numeric: tabular-nums;
+}
+
+.splitArrow {
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-left: 1px solid color-mix(in srgb, var(--git-accent-text) 30%, transparent);
+    background: transparent;
+    color: inherit;
+    cursor: default;
+    padding: var(--space-6, 6px) 0;
+}
+
+.splitArrow:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--git-accent-text) 12%, transparent);
+}
+
+.splitArrow:disabled {
+    opacity: 0.5;
+}
+
+.menu {
+    /* 实底背景 + 描边 + 投影：不给底色会透出面板内容（GitBranchList.menu 同款取值） */
+    background: var(--bg-card, var(--bg));
+    border: 1px solid var(--overlay-light, rgba(0, 0, 0, 0.08));
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 8px 32px var(--shadow, rgba(0, 0, 0, 0.12));
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-8);
+    box-sizing: border-box;
+}
+
+/* 未配置远程仓库的提示条 */
+.noRemoteNotice {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    padding: var(--space-8) var(--space-12);
+    border: 1px dashed var(--border, rgba(0, 0, 0, 0.14));
+    border-radius: var(--radius-input, 6px);
+    color: var(--text-muted, rgba(0, 0, 0, 0.55));
+    font-size: var(--fs-hint);
+    line-height: 1.5;
+}
+
+.menuItem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    padding: var(--space-6, 6px) var(--space-10, 10px);
+    border: none;
+    border-radius: var(--radius-input, 6px);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: var(--fs-caption);
+    text-align: left;
+    cursor: default;
+}
+
+.menuItem:hover:not(:disabled) {
+    background: var(--accent-light, rgba(0, 0, 0, 0.06));
+}
+
+.menuItem:disabled {
+    opacity: 0.45;
+}
+
+.menuSub {
+    margin-left: auto;
+    font-size: var(--fs-hint);
+    color: var(--text-muted, rgba(0, 0, 0, 0.5));
+    white-space: nowrap;
+}
+
+/* ── 分区（暂存的更改 / 变更）── */
+
+.sections {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    display: flex;
+    flex-direction: column;
+}
+
+.secHead {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6, 6px);
+    padding: var(--space-4) var(--space-6, 6px);
+    border-radius: var(--radius-input, 6px);
+    margin-top: var(--space-4);
+    flex-shrink: 0;
+    cursor: pointer;
+    user-select: none;
+}
+
+.secTitle {
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    color: var(--text, #3b3d3f);
+}
+
+.secTools {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity var(--duration-fast) ease;
+}
+
+.secHead:hover .secTools {
+    opacity: 1;
+}
+
+.secTool {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--text-muted, rgba(0, 0, 0, 0.6));
+    border-radius: var(--radius-input, 6px);
+    cursor: default;
+    padding: 0;
+}
+
+.secTool:hover:not(:disabled) {
+    background: var(--overlay-light, rgba(0, 0, 0, 0.08));
+    color: var(--text, rgba(0, 0, 0, 0.85));
+}
+
+.secToolDanger:hover:not(:disabled) {
+    color: var(--danger, #8B3A3A);
+}
+
+.secTool:disabled {
+    opacity: 0.4;
+}
+
+.secBadge {
+    margin-left: var(--space-4);
+    min-width: 20px;
+    height: 17px;
+    padding: 0 var(--space-6, 6px);
+    border-radius: 9px;
+    background: var(--accent, rgba(0, 0, 0, 0.8));
+    color: var(--git-accent-text);
+    font-size: var(--fs-hint);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+}
+
+.fileList {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    padding-bottom: var(--space-4);
+}
+
+.empty {
+    padding: var(--space-24);
+    text-align: center;
+    color: var(--text-muted, rgba(0, 0, 0, 0.55));
+    font-size: var(--fs-caption);
+}
+
+/* ── 文件行 ── */
+
+.fileBlock {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    /* 长列表滚动/挂载时跳过视口外行的渲染，开面板不再随文件数变卡 */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 32px;
+}
+
+/* 同步/拉取进行中：图标旋转表示正在同步 */
+.spin {
+    animation: gitGraphSpin 0.9s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes gitGraphSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.showAllBtn {
+    margin: var(--space-4) var(--space-8) var(--space-8) 25px;
+    min-height: 26px;
+    padding: 0 var(--space-12);
+    border: 1px solid var(--border, rgba(0, 0, 0, 0.14));
+    border-radius: var(--radius-input, 6px);
+    background: transparent;
+    color: var(--text-muted, rgba(0, 0, 0, 0.6));
+    font: inherit;
+    font-size: var(--fs-hint);
+    cursor: pointer;
+    align-self: flex-start;
+}
+
+.showAllBtn:hover {
+    border-color: var(--accent, rgba(0, 0, 0, 0.35));
+    color: var(--text, rgba(0, 0, 0, 0.85));
+}
+
+.fileLine {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    min-height: 28px;
+    padding: var(--space-2, 2px) var(--space-8);
+    border-radius: var(--radius-input, 6px);
+    transition: background var(--duration-fast) ease;
+}
+
+.fileLine:hover {
+    background: var(--overlay-light, rgba(0, 0, 0, 0.05));
+}
+
+.fileGlyph {
+    width: 17px;
+    flex-shrink: 0;
+    text-align: center;
+    font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.fileMain {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: var(--text, #3b3d3f);
+    font: inherit;
+    font-size: var(--fs-caption);
+    text-align: left;
+    cursor: default;
+}
+
+.fileName {
+    flex-shrink: 0;
+    max-width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.filePath {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-muted, rgba(0, 0, 0, 0.5));
+    font-size: var(--fs-hint);
+}
+
+.fileActs {
+    display: none;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.fileLine:hover .fileActs {
+    display: inline-flex;
+}
+
+.fileAct {
+    width: 21px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--text-muted, rgba(0, 0, 0, 0.6));
+    border-radius: var(--radius-input, 6px);
+    cursor: default;
+    padding: 0;
+}
+
+.fileAct:hover:not(:disabled) {
+    background: var(--overlay-light, rgba(0, 0, 0, 0.08));
+    color: var(--text, rgba(0, 0, 0, 0.85));
+}
+
+.fileActDanger:hover:not(:disabled) {
+    color: var(--danger, #8B3A3A);
+}
+
+.fileAct:disabled {
+    opacity: 0.35;
+}
+
+.fileState {
+    width: 14px;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: var(--fs-caption);
+    font-variant-numeric: tabular-nums;
+}
+
+/* 悬停动作挤占路径空间时行尾字母保持贴右 */
+.fileLine:hover .fileMain {
+    min-width: 0;
+}
+
+.state_M {
+    color: var(--git-letter-m);
+}
+
+.state_U {
+    color: var(--green, #7BAE7F);
+}
+
+.state_A {
+    color: var(--green, #7BAE7F);
+}
+
+.state_D {
+    color: var(--danger, #8B3A3A);
+}
+
+/* ── 行内展开 diff ── */
+
+.diffPane {
+    margin: 0 var(--space-8) var(--space-8) 25px;
+    border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+    border-radius: var(--radius-card, 8px);
+    background: var(--bg-card, #fff);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 340px;
+}
+
+.diff {
+    margin: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.lineSame,
+.lineAdded,
+.lineRemoved,
+.lineHunk {
+    padding: 0 var(--space-12);
+    white-space: pre;
+}
+
+.lineSame {
+    color: var(--text-muted, rgba(0, 0, 0, 0.6));
+}
+
+.lineAdded {
+    background: color-mix(in srgb, var(--green, #7BAE7F) 14%, transparent);
+    color: var(--text, #3b3d3f);
+}
+
+.lineRemoved {
+    background: color-mix(in srgb, var(--danger, #8B3A3A) 12%, transparent);
+    color: var(--text, #3b3d3f);
+}
+
+.lineHunk {
+    color: var(--accent, rgba(0, 0, 0, 0.45));
+    background: var(--overlay-light, rgba(0, 0, 0, 0.04));
+    font-weight: 600;
+}
+
+.diffNote {
+    padding: var(--space-8) var(--space-12);
+    font-size: var(--fs-hint);
+    color: var(--text-muted, rgba(0, 0, 0, 0.55));
+}

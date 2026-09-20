@@ -4,7 +4,7 @@
  * 所有端点以 dir（工作台本地目录绝对路径）定位仓库，校验沿用 desk 路由的
  * 目录准入惯例（agent 工作区根 / engine 已知根，解析 symlink 后比较）。
  * 只读端点对非 git 目录返回 isRepo:false 的占位（200，前端降级展示），
- * 操作端点（checkout/commit/push）对非 git 目录直接 400。
+ * 操作端点（checkout/commit/push/pull）对非 git 目录直接 400。
  *
  * AI 提交信息复用 utility:call-text 总线处理器（auxiliary summarize 槽 +
  * callText + usage/trace 记账），路由侧只负责收集 diff 上下文与净化输出。
@@ -20,9 +20,15 @@ import {
   fileDiff,
   checkoutBranch,
   commitChanges,
+  amendCommit,
+  stagePaths,
+  unstagePaths,
+  fetchRemote,
   pushChanges,
+  pullChanges,
   listBranches,
   listCommits,
+  listCommitStats,
   createBranch,
   stashChanges,
   listStashes,
@@ -270,6 +276,22 @@ export function createGitEnvironmentRoute(engine: any, hub?: any) {
     }
   });
 
+  // 提交变更统计两段加载的第二段：列表先回，统计按哈希批量补齐。
+  // 只读端点（route-security 登记为 files.read），POST 仅为容纳哈希列表 body。
+  route.post("/git/log-stats", async (c) => {
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const resolved = resolveBodyDir(body);
+      if (!resolved) return c.json({ error: "invalid dir" }, 400);
+      if (!(await isRepoDir(resolved.dir))) return c.json({ isRepo: false, stats: {} });
+      const hashes = Array.isArray(body?.hashes) ? body.hashes : [];
+      const stats = await listCommitStats(resolved.dir, hashes);
+      return c.json({ isRepo: true, stats: Object.fromEntries(stats) });
+    } catch (err: any) {
+      return c.json({ error: err instanceof GitError ? err.stderr || err.message : err.message }, 500);
+    }
+  });
+
   route.post("/git/checkout", async (c) => {
     try {
       const body = await c.req.json().catch(() => ({}));
@@ -415,6 +437,81 @@ export function createGitEnvironmentRoute(engine: any, hub?: any) {
       if (!resolved) return c.json({ error: "invalid dir" }, 400);
       if (!(await isRepoDir(resolved.dir))) return c.json({ error: "not a git repo" }, 400);
       const result = await pushChanges(resolved.dir);
+      if (!result.ok) return c.json(result, 400);
+      return c.json(result);
+    } catch (err: any) {
+      return c.json({ error: err instanceof GitError ? err.stderr || err.message : err.message }, 500);
+    }
+  });
+
+  route.post("/git/pull", async (c) => {
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const resolved = resolveBodyDir(body);
+      if (!resolved) return c.json({ error: "invalid dir" }, 400);
+      if (!(await isRepoDir(resolved.dir))) return c.json({ error: "not a git repo" }, 400);
+      const result = await pullChanges(resolved.dir);
+      if (!result.ok) return c.json(result, 400);
+      return c.json(result);
+    } catch (err: any) {
+      return c.json({ error: err instanceof GitError ? err.stderr || err.message : err.message }, 500);
+    }
+  });
+
+  // 暂存（git add）：paths 缺省 = 全部改动；给 paths = 单文件进暂存区
+  route.post("/git/stage", async (c) => {
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const resolved = resolveBodyDir(body);
+      if (!resolved) return c.json({ error: "invalid dir" }, 400);
+      if (!(await isRepoDir(resolved.dir))) return c.json({ error: "not a git repo" }, 400);
+      const result = await stagePaths(resolved.dir, body?.paths);
+      if (!result.ok) return c.json(result, 400);
+      return c.json(result);
+    } catch (err: any) {
+      return c.json({ error: err instanceof GitError ? err.stderr || err.message : err.message }, 500);
+    }
+  });
+
+  // 取消暂存：index 退回 HEAD；paths 缺省 = 全部
+  route.post("/git/unstage", async (c) => {
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const resolved = resolveBodyDir(body);
+      if (!resolved) return c.json({ error: "invalid dir" }, 400);
+      if (!(await isRepoDir(resolved.dir))) return c.json({ error: "not a git repo" }, 400);
+      const result = await unstagePaths(resolved.dir, body?.paths);
+      if (!result.ok) return c.json(result, 400);
+      return c.json(result);
+    } catch (err: any) {
+      return c.json({ error: err instanceof GitError ? err.stderr || err.message : err.message }, 500);
+    }
+  });
+
+  // 提交（修改）：暂存内容并入上一次提交；message 为空 = 保留原信息
+  route.post("/git/amend", async (c) => {
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const resolved = resolveBodyDir(body);
+      if (!resolved) return c.json({ error: "invalid dir" }, 400);
+      if (!(await isRepoDir(resolved.dir))) return c.json({ error: "not a git repo" }, 400);
+      const message = typeof body?.message === "string" ? body.message : null;
+      const result = await amendCommit(resolved.dir, message);
+      if (!result.ok) return c.json(result, 400);
+      return c.json(result);
+    } catch (err: any) {
+      return c.json({ error: err instanceof GitError ? err.stderr || err.message : err.message }, 500);
+    }
+  });
+
+  // 刷新远程信息：git fetch（只拉取不合并），供面板「刷新」按钮校准领先/落后数
+  route.post("/git/fetch", async (c) => {
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const resolved = resolveBodyDir(body);
+      if (!resolved) return c.json({ error: "invalid dir" }, 400);
+      if (!(await isRepoDir(resolved.dir))) return c.json({ error: "not a git repo" }, 400);
+      const result = await fetchRemote(resolved.dir);
       if (!result.ok) return c.json(result, 400);
       return c.json(result);
     } catch (err: any) {

@@ -252,21 +252,48 @@
     padding-right: 0;
 }
 
+/* 会话状态点三态：
+ *   running = 旋转圆环（正在输出），accent 色随主题走；
+ *   unread  = 绿点（后台跑完未读），--green 各主题均配了顺眼的绿；
+ *   failed  = 红点（模型/连接错误中断），--danger 同理。
+ * 颜色一律取主题变量，保证在任何配色下都醒目而不是灰成一片。 */
 .sessionStreamingDot {
-    width: 5px;
-    height: 5px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: var(--accent, #b89a7a);
     flex-shrink: 0;
 }
 
-/* Static state cue only — continuous opacity animation kept the compositor
-   busy under software rendering (esp. WARP). Do not restore infinite pulse. */
+/* 旋转圆环：尺寸与对话标题字号同源（--fs-ui ≈ 13px），一眼可见。
+   只有 border-top 高亮，转起来才有「正在进行」的读感。
+   transform 旋转走合成器，元素小、同屏实例少，开销可控；
+   reduced-motion 下退化为静态圆环，靠形状本身表达状态。 */
 .sessionStreamingDot[data-state="running"] {
-    opacity: 1;
+    width: var(--fs-ui, 0.82rem);
+    height: var(--fs-ui, 0.82rem);
+    background: transparent;
+    border: 2px solid color-mix(in srgb, var(--accent, #b89a7a) 32%, transparent);
+    border-top-color: var(--accent, #b89a7a);
+    animation: session-status-spin 0.9s linear infinite;
+}
+
+.sessionStreamingDot[data-state="unread"] {
+    background: var(--green, #7BAE7F);
+}
+
+.sessionStreamingDot[data-state="failed"] {
+    background: var(--danger, #b56b66);
+}
+
+@keyframes session-status-spin {
+    to { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .sessionStreamingDot[data-state="running"] {
+        animation: none;
+    }
     .sessionStreamingDot {
         animation: none;
     }
@@ -412,6 +439,45 @@
     width: auto;
 }
 
+/* 「待行动」胶囊：后台会话在等用户决策时显示在行右侧。
+   ask（提问）用 accent 最显眼；approve（批准）用 warning；confirm 中性。
+   轻微呼吸提示「需要行动」，reduced-motion 下静止。 */
+.sessionActionBadge {
+    flex-shrink: 0;
+    max-width: 40%;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: var(--fs-hint, 0.7rem);
+    line-height: 1.5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--accent, #b89a7a);
+    background: color-mix(in srgb, var(--accent, #b89a7a) 12%, transparent);
+    animation: session-action-badge-breathe 2s ease-in-out infinite;
+}
+
+.sessionActionBadge[data-tone="approve"] {
+    color: var(--warning, #c9a14a);
+    background: color-mix(in srgb, var(--warning, #c9a14a) 14%, transparent);
+}
+
+.sessionActionBadge[data-tone="confirm"] {
+    color: var(--text-muted);
+    background: color-mix(in srgb, var(--text-muted) 14%, transparent);
+}
+
+@keyframes session-action-badge-breathe {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.65; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sessionActionBadge {
+        animation: none;
+    }
+}
+
 .sessionStatusSlot {
     display: inline-flex;
     align-items: center;
@@ -451,6 +517,138 @@
 .pinnedSection {
     margin: 0;
     padding: 0;
+}
+
+/* 项目分组标题行：整行 hover 背景；整行任意位置可点击折叠（左侧主按钮）；
+   右侧动作按钮（新建 / 三点）默认隐藏，行 hover 时浮现。 */
+.projectSection {
+    margin: 0;
+    padding: 0 0 var(--space-2);
+}
+
+.projectHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 28px;
+    margin: var(--space-4) var(--space-4) 0;
+    padding: 0 var(--space-4);
+    border-radius: 8px;
+    user-select: none;
+}
+
+.projectHeader:hover {
+    background: var(--hover-bg, rgba(128, 128, 128, 0.12));
+}
+
+.projectHeader[data-collapsed='true'] {
+    opacity: 0.85;
+}
+
+.projectHeaderMain {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    padding: 3px 4px;
+    border: none;
+    background: none;
+    color: var(--text);
+    font-size: var(--fs-ui);
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+
+.projectHeaderActions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity 120ms ease;
+    flex-shrink: 0;
+}
+
+.projectHeader:hover .projectHeaderActions,
+.projectHeader:focus-within .projectHeaderActions {
+    opacity: 1;
+}
+
+.projectActionButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.projectActionButton:hover {
+    background: rgba(128, 128, 128, 0.18);
+    color: var(--text);
+}
+
+.projectSectionTitle {
+    justify-content: flex-start;
+}
+
+.projectTitleIcon {
+    opacity: 0.65;
+    flex-shrink: 0;
+}
+
+.projectSectionName {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 「执行中」组头：不可折叠（始终展开），无 hover 动作，只展示脉冲点 + 标题 + 计数。 */
+.projectHeaderStatic {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    padding: 3px 4px;
+    color: var(--text);
+    font-size: var(--fs-ui);
+    font-weight: 600;
+    text-align: left;
+}
+
+.runningGroupPulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent, #b89a7a);
+    flex-shrink: 0;
+    animation: running-group-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes running-group-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.78); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .runningGroupPulse {
+        animation: none;
+    }
+}
+
+.projectSectionCount {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    opacity: 0.7;
+    flex-shrink: 0;
 }
 
 .pinnedSection .sessionSectionTitle {
@@ -551,4 +749,99 @@
     padding: var(--space-24) var(--space-8);
     color: var(--text-muted);
     font-size: var(--fs-caption);
+}
+
+/* ── 谱系子行：主对话的子对话，缩进两级 + 左侧谱系线 ── */
+.sessionItemChild {
+    padding-left: calc(var(--space-8) + 28px);
+}
+
+.sessionItemChild::before {
+    content: '';
+    position: absolute;
+    left: calc(var(--space-8) + 9px);
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    border-radius: 1px;
+    background: var(--border-color);
+    opacity: 0.55;
+}
+
+/* ── 归档带子对话的选择框 ── */
+.archiveChoiceDialog {
+    max-width: 420px;
+    padding: var(--space-16);
+    border-radius: var(--radius-lg);
+    background: var(--bg-elevated, var(--bg-primary));
+    box-shadow: var(--shadow-lg, 0 12px 32px rgba(0, 0, 0, 0.28));
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+}
+
+.archiveChoiceTitle {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.archiveChoiceBody {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.archiveChoiceActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-8);
+    flex-wrap: wrap;
+}
+
+.archiveChoiceAction {
+    min-width: 96px;
+}
+
+/* ── 主对话行：助手符号兼作子对话折叠开关（仅点击符号切换） ── */
+.sessionAgentToggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: box-shadow var(--duration-fast) ease;
+}
+
+.sessionAgentToggle:hover {
+    box-shadow: 0 0 0 2px var(--accent-light);
+}
+
+/* 折叠态：符号本身的变化——轻微内凹提示 + 右上角隐藏数徽标 */
+.sessionAgentToggle[data-folded='true'] {
+    opacity: 0.82;
+}
+
+.sessionAgentFoldCount {
+    position: absolute;
+    top: -4px;
+    right: -5px;
+    min-width: 13px;
+    height: 13px;
+    padding: 0 3px;
+    border-radius: 7px;
+    background: var(--accent, #4c8bf5);
+    color: #fff;
+    font-size: 9px;
+    line-height: 13px;
+    text-align: center;
+    font-weight: 600;
+    pointer-events: none;
+}
+
+/* 主对话行整体：略微加重引导可点击折叠 */
+.sessionItemParent .sessionItemTitle {
+    font-weight: 510;
 }

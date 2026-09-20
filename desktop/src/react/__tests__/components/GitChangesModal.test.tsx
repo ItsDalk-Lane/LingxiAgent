@@ -215,12 +215,12 @@ describe('GitChangesModal', () => {
     expect(screen.getByTestId('git-discard-all')).toBeEnabled();
     expect(fetchGitStashesMock).toHaveBeenCalledWith('/ws', 'hana');
 
-    // 在储藏里 → 可取；未跟踪的新文件不在储藏里，也不提供回退
+    // 在储藏里 → 可取；未跟踪的新文件也可回退（= 删除），但不在储藏里所以取出置灰
     expect(screen.getByTestId('git-change-stash-server/git/git-command.ts')).toBeEnabled();
     expect(screen.getByTestId('git-change-unstash-server/git/git-command.ts')).toBeEnabled();
     expect(screen.getByTestId('git-change-discard-server/git/git-command.ts')).toBeEnabled();
     expect(screen.getByTestId('git-change-unstash-scratch/new-file.ts')).toBeDisabled();
-    expect(screen.getByTestId('git-change-discard-scratch/new-file.ts')).toBeDisabled();
+    expect(screen.getByTestId('git-change-discard-scratch/new-file.ts')).toBeEnabled();
   });
 
   it('stashes one file by path and refreshes the card', async () => {

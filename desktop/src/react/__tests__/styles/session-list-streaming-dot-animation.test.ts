@@ -16,13 +16,17 @@ function cssBlock(css: string, selector: string): string {
 }
 
 describe('SessionList streaming dot animation', () => {
-  it('does not use infinite pulse on the running dot', () => {
+  it('running dot spins via compositor-friendly transform, not repaint-heavy pulse', () => {
     const css = readCss();
 
     const running = cssBlock(css, '.sessionStreamingDot[data-state="running"]');
 
     expect(running.length).toBeGreaterThan(0);
-    expect(running).not.toMatch(/\binfinite\b/);
+    // 2026-09 起 running 态按用户要求改为旋转图标：无限动画解禁，但仅限
+    // transform 旋转（合成器路径，不重绘）；opacity 脉冲依旧禁止——
+    // 软件渲染（esp. WARP）下这类动画曾把合成器压忙。
+    expect(running).toMatch(/animation:[^;]*\binfinite\b/);
+    expect(running).not.toMatch(/\bopacity\s*:/);
   });
 
   // 会话切换是本地毫秒级操作，任何加载态装饰都只会一闪而过。

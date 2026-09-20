@@ -65,7 +65,7 @@ describe('SecurityTab Windows sandbox network control', () => {
       settingsConfig: {
         sandbox: true,
         sandbox_network: false,
-        file_backup: { enabled: false, retention_days: 1, max_file_size_kb: 1024 },
+        file_backup: { retention_days: 1 },
       },
       platformName: 'win32',
       currentAgentId: 'hana',
@@ -119,8 +119,9 @@ describe('SecurityTab Windows sandbox network control', () => {
 
     render(React.createElement(SecurityTab));
 
+    // 配置未就绪时只剩沙盒与联网沙盒两个开关：文件备份已改为恒开，不再有开关
     const switches = screen.getAllByRole('switch') as HTMLButtonElement[];
-    expect(switches).toHaveLength(3);
+    expect(switches).toHaveLength(2);
     for (const item of switches) {
       expect(item.getAttribute('aria-checked')).toBe('mixed');
       expect(item.getAttribute('aria-busy')).toBe('true');

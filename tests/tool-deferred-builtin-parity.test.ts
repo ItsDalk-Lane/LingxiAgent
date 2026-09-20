@@ -212,9 +212,11 @@ describe("deferred bundled plugin parity", () => {
 
     expect(search.content[0].text).toContain("No matching connector or plugin tool");
     expect(describe.content[0].text).toContain(`No tool named ${office.name}`);
+    // 未注册目标以原始 TARGET_NOT_FOUND 透传（调用方可自纠白名单），
+    // 不再伪装成 resolver 内部故障
     expect(call).toMatchObject({
       isError: true,
-      details: { errorCode: "TOOL_INVOCATION_RESOLVER_FAILED" },
+      details: { errorCode: "TARGET_NOT_FOUND" },
     });
     expect(office.execute).not.toHaveBeenCalled();
     expect(beautify.execute).not.toHaveBeenCalled();

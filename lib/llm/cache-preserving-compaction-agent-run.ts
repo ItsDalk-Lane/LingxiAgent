@@ -350,9 +350,16 @@ export async function runCachePreservingCompactionAgentRun({
   if (signal?.aborted) throw abortError("Cache-preserving compaction AgentRun aborted", diagnostics);
 
   const placeholderTools = clonePlaceholderTools(Array.isArray(tools) ? tools : []);
+  const sourceMessages = [...(Array.isArray(liveMessages) ? liveMessages : [])];
+  // pi 0.86.0 起 AgentContext 不再接受 systemPrompt 字段：系统提示词改由消息流中的
+  // system 消息承载（pi-ai 的 normalizeContext/折叠逻辑负责还原请求头）。消息流已含
+  // system 消息时直接沿用，避免重放拼接造成提示词重复；旧形状消息流在此补一条
+  // 头部 system 消息，保持与 0.84.1（context.systemPrompt 单列）等价的线上请求。
+  const systemMessage: AgentMessage = { role: "system", content: systemPrompt, timestamp: 0 };
   const context: AgentContext = {
-    systemPrompt,
-    messages: [...(Array.isArray(liveMessages) ? liveMessages : [])],
+    messages: systemPrompt && !sourceMessages.some((message) => message?.role === "system")
+      ? [systemMessage, ...sourceMessages]
+      : sourceMessages,
     tools: placeholderTools,
   };
   const pendingUsage: Array<{ requestId?: string; settled: boolean }> = [];

@@ -141,14 +141,15 @@ const USER_ONLY_SETTINGS = {
  */
 const SETTINGS_REGISTRY = {
   file_backup: {
-    type: "toggle",
+    type: "list",
     get label() { return t("toolDef.updateSettings.fileBackup"); },
     get description() { return t("toolDef.updateSettings.fileBackupDesc"); },
-    searchTerms: ["backup", "备份", "バックアップ", "백업", "checkpoint"],
-    get: (engine, _agent) => String(engine.preferences.getFileBackup().enabled),
+    options: ["1", "3", "7"],
+    searchTerms: ["backup", "备份", "バックアップ", "백업", "checkpoint", "retention", "保留"],
+    get: (engine, _agent) => String(engine.preferences.getFileBackup().retention_days),
     apply: (engine, _agent, v) => {
-      const enabled = typeof v === "string" ? v === "true" : !!v;
-      engine.setFileBackup({ enabled });
+      const days = Number(v);
+      engine.setFileBackup({ retention_days: Number.isFinite(days) && days > 0 ? days : 1 });
     },
   },
   locale: {

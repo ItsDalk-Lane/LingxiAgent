@@ -60,6 +60,8 @@ export interface ComposerSendRecord {
   /** 取得租约时的连接代次；代次不匹配的准备任务禁止向新连接发送旧载荷。 */
   connectionGeneration: number;
   originConnectionKey: string;
+  /** 取得租约时的服务器身份（不含 connectionId）：账本主键与回执匹配用它，重连不换。 */
+  serverKey: string;
   snapshotVersion: number;
   composerRevisionAtClick: number | null;
   bundle: ComposerSendBundle;
@@ -133,6 +135,7 @@ export interface QueueFlushScope {
   sessionId: string;
   sessionPath: string;
   originConnectionKey: string;
+  serverKey: string;
   connectionGeneration: number;
 }
 interface QueueFlushIntent {
@@ -156,11 +159,24 @@ export function composerOriginConnectionKey(connection = resolveServerConnection
       connection.serverNodeId || connection.executionBoundary ? null : connection.baseUrl]
     : ['unconfigured']);
 }
+
+/**
+ * 服务器级身份（不含 connectionId）：账本主键与回执匹配用它。
+ * 重连只换 connectionId，服务器没变；若把连接身份焊进账本主键，重连后旧账
+ * 会变成既锁不了门也销不了账的孤儿（回执/对账都按新连接身份匹配不上旧账）。
+ */
+export function composerServerKey(connection = resolveServerConnection(useStore.getState())): string {
+  return JSON.stringify(connection
+    ? [connection.kind, connection.serverId, connection.studioId,
+      connection.serverNodeId ?? null, connection.executionBoundary?.boundaryId ?? null,
+      connection.serverNodeId || connection.executionBoundary ? null : connection.baseUrl]
+    : ['unconfigured']);
+}
 export function captureQueueFlushScope(sessionPath: string): QueueFlushScope | null {
   const state = useStore.getState();
   const sessionId = state.sessions.find(session => session.path === sessionPath)?.sessionId
     ?? (state.currentSessionPath === sessionPath ? state.currentSessionId : null);
-  return sessionId ? { sessionId, sessionPath, originConnectionKey: composerOriginConnectionKey(), connectionGeneration } : null;
+  return sessionId ? { sessionId, sessionPath, originConnectionKey: composerOriginConnectionKey(), serverKey: composerServerKey(), connectionGeneration } : null;
 }
 function flushScopeKey(scope: QueueFlushScope): string {
   return JSON.stringify([scope.originConnectionKey, scope.sessionId]);
@@ -206,8 +222,8 @@ export function saveQueuedItemEdit(sessionPath: string, id: string, text: string
 let connectionGeneration = 0;
 let leaseSeq = 0;
 
-function identityKey(identity: ComposerSessionIdentity, origin = composerOriginConnectionKey()): string {
-  return JSON.stringify([origin, identity.kind, identity.kind === 'session' ? identity.sessionId : identity.draftId]);
+function identityKey(identity: ComposerSessionIdentity, server = composerServerKey()): string {
+  return JSON.stringify([server, identity.kind, identity.kind === 'session' ? identity.sessionId : identity.draftId]);
 }
 
 function pruneRecords(): void {
@@ -248,14 +264,37 @@ function markAwaitingAck(record: ComposerSendRecord, attemptId: string): void {
   record.phase = 'awaiting_ack';
   record.activeAttemptId = attemptId;
   record.seenAttemptIds.add(attemptId);
+  armAckWatchdog(record, ACK_TIMEOUT_MS);
+}
+
+/** 看门狗超时只是查证起点：先转「核对中」再发起对账，不先给失败定罪。 */
+function armAckWatchdog(record: ComposerSendRecord, timeoutMs: number): void {
+  if (record.ackTimer) clearTimeout(record.ackTimer);
   record.ackTimer = setTimeout(() => {
     record.ackTimer = null;
     if (record.phase !== 'awaiting_ack') return;
     transitionToDeliveryUnknown(record, 'ack_timeout');
-    if (record.identity.kind === 'session') void reconcileComposerSession(record.identity.sessionPath);
-  }, ACK_TIMEOUT_MS);
+    if (record.identity.kind === 'session') {
+      updateReconciliationDisplay(record, true);
+      void reconcileComposerSession(record.identity.sessionPath);
+    }
+  }, timeoutMs);
   // DOM 版 setTimeout 返回 number，unref 仅 Node 存在；两端都安全。
   (record.ackTimer as unknown as { unref?: () => void }).unref?.();
+}
+
+/**
+ * 服务器进入知识检索等慢前置时调用：回执被前置流程挡住并非丢失，延窗再等。
+ * 固定 15s 赌不起服务器自己都无法预估的端到端延迟。
+ */
+export function extendComposerAckWindow(sessionPath: string, extraMs = 45_000): void {
+  const server = composerServerKey();
+  for (const record of recordsByLease.values()) {
+    if (record.phase !== 'awaiting_ack' || !record.ackTimer) continue;
+    if (record.identity.kind !== 'session' || record.identity.sessionPath !== sessionPath) continue;
+    if (record.serverKey !== server) continue;
+    armAckWatchdog(record, extraMs);
+  }
 }
 
 function transitionToDeliveryUnknown(record: ComposerSendRecord, code: string): void {
@@ -277,9 +316,24 @@ function transitionToDeliveryUnknown(record: ComposerSendRecord, code: string): 
 
 export function tryAcquireSendLease(input: AcquireSendLeaseInput): AcquireSendLeaseResult {
   const key = identityKey(input.identity);
-  if (activeLeaseByKey.has(key) || unresolvedForKey(key).some(record => input.bundle.type === 'prompt' || record.acceptance !== 'accepted' || record.runStatus === 'run_unknown')) return { ok: false, reason: 'transport_busy' };
+  // 门禁只认真冲突：
+  // 1) 本会话确有一笔发送在途（租约未释放）；
+  // 2) 已接收但回合未终局（ack 到了、run 未终结）——此刻服务器可能仍在排队/检索，
+  //    两轮并发进场会写乱会话，用户停止会盖终局章解除此防线。
+  // 投递存疑（delivery_unknown）不拦：那是会计问题，由对账与消息上的显式标记兜底，
+  // 防重复发送的底线保留在「不自动重发」。
+  if (activeLeaseByKey.has(key)
+    || unresolvedForKey(key).some(record => record.phase === 'awaiting_ack'
+      || (record.phase === 'accepted' && record.runStatus !== 'terminal' && record.runStatus !== 'reconciled_idle'))) {
+    return { ok: false, reason: 'transport_busy' };
+  }
   if ([...recordsByLease.values()].filter(isUnresolved).length >= MAX_UNRESOLVED_RECORDS) {
     return { ok:false, reason:'unresolved_limit' };
+  }
+  // 存疑账存在时顺手触发一次对账自愈；异步进行，不影响本次发送。
+  if (input.identity.kind === 'session'
+    && unresolvedForKey(key).some(record => record.phase === 'delivery_unknown')) {
+    void reconcileComposerSession(input.identity.sessionPath);
   }
   const leaseId = `composer-lease-${++leaseSeq}`;
   // 同一队列项同版本的重试/类型切换复用身份；编辑改变版本后创建新身份。
@@ -290,7 +344,7 @@ export function tryAcquireSendLease(input: AcquireSendLeaseInput): AcquireSendLe
   if (input.queueItemId) {
     for (const record of recordsByLease.values()) {
       if (record.queueItemId === input.queueItemId && record.snapshotVersion === (input.snapshotVersion ?? 1)
-        && identityKey(record.identity, record.originConnectionKey) === key) {
+        && identityKey(record.identity, record.serverKey) === key) {
         clientMessageId = record.clientMessageId;
         break;
       }
@@ -313,6 +367,7 @@ export function tryAcquireSendLease(input: AcquireSendLeaseInput): AcquireSendLe
     identity: input.identity,
     connectionGeneration,
     originConnectionKey: composerOriginConnectionKey(),
+    serverKey: composerServerKey(),
     snapshotVersion: input.snapshotVersion ?? 1,
     composerRevisionAtClick: input.composerRevisionAtClick ?? null,
     bundle: input.bundle,
@@ -340,7 +395,7 @@ export function transferLeaseIdentity(leaseId: string, next: ComposerSessionIden
   const nextKey = identityKey(next);
   const occupant = activeLeaseByKey.get(nextKey);
   if (occupant && occupant !== leaseId) return false;
-  activeLeaseByKey.delete(identityKey(record.identity, record.originConnectionKey));
+  activeLeaseByKey.delete(identityKey(record.identity, record.serverKey));
   activeLeaseByKey.set(nextKey, leaseId);
   record.identity = next;
   record.identityFreshlyCreated = true;
@@ -382,7 +437,10 @@ export function cancelQueueItemSend(queueItemId: string, code = 'send_cancelled'
 }
 
 export function hasInFlightSend(identity: ComposerSessionIdentity): boolean {
-  return activeLeaseByKey.has(identityKey(identity)) || unresolvedForKey(identityKey(identity)).length > 0;
+  // 只认真在途（准备中/等回执）：存疑与结局未定的历史账不再算「在途」，
+  // 否则会把会计问题变成运营问题（新消息被历史账误拦）。
+  return activeLeaseByKey.has(identityKey(identity))
+    || unresolvedForKey(identityKey(identity)).some(record => record.phase === 'awaiting_ack');
 }
 
 export function getSendRecord(leaseId: string): ComposerSendRecord | null {
@@ -415,7 +473,8 @@ export function noteComposerConnectionOpened(): void {
 export function noteComposerConnectionClosed(): void {
   connectionGeneration += 1;
   cancelReconciliationChains();
-  // 断线后再不会有回执：在途 awaiting_ack 一律转 delivery_unknown，禁止自动重发。
+  // 断线后再不会有回执：在途 awaiting_ack 一律转 delivery_unknown，禁止自动重发；
+  // 标记为「核对中」等重连后对账销账，不先给失败定罪。
   for (const record of recordsByLease.values()) {
     if (record.phase !== 'awaiting_ack') continue;
     if (record.ackTimer) {
@@ -423,17 +482,21 @@ export function noteComposerConnectionClosed(): void {
       record.ackTimer = null;
     }
     transitionToDeliveryUnknown(record, 'connection_closed');
+    updateReconciliationDisplay(record, true);
   }
 }
 
 /** 仅凭明确 canonical entry 的关联结算接收；ACK 不证明 run 结束。 */
 export function noteComposerServerAck(clientMessageId: string | null | undefined, evidence?: {
-  originConnectionKey: string; sessionId: string; sessionPath: string;
+  originConnectionKey: string; serverKey?: string; sessionId: string; sessionPath: string;
   snapshotVersion: number; sourceEntryId: string;
 }): boolean {
   if (!clientMessageId || !evidence || !evidence.sourceEntryId) return false;
+  // 回执匹配按服务器身份：重连只换连接身份，不换服务器；旧连接的账
+  // 必须能被新连接送达的回执销掉，否则重连本身就制造永久黑账。
+  const server = evidence.serverKey ?? composerServerKey();
   const records = [...recordsByLease.values()].filter(record => record.clientMessageId === clientMessageId
-    && record.originConnectionKey === evidence.originConnectionKey && record.identity.kind === 'session'
+    && record.serverKey === server && record.identity.kind === 'session'
     && record.identity.sessionId === evidence.sessionId && record.identity.sessionPath === evidence.sessionPath
     && record.snapshotVersion === evidence.snapshotVersion && isUnresolved(record));
   if (records.length !== 1) return false;
@@ -462,6 +525,33 @@ function settleObservedTerminal(record: ComposerSendRecord): void {
   if (record.identity.kind === 'session') resumeForegroundQueue(record.identity.sessionPath);
 }
 
+/**
+ * 用户停止是全链路语义最强的终局信号：收到服务器确认后结算该会话账本。
+ * - 已接收但结局未定的账：直接盖「用户终止」终局章，释放门禁并续发排队；
+ * - 投递仍存疑的账：立即对账（此刻服务器必然空闲，是对账最易成功的时机）。
+ */
+export function noteComposerUserAbort(sessionPath: string): void {
+  let needsReconcile = false;
+  const server = composerServerKey();
+  for (const record of recordsByLease.values()) {
+    if (record.identity.kind !== 'session' || record.identity.sessionPath !== sessionPath) continue;
+    if (record.serverKey !== server) continue;
+    if (record.phase === 'awaiting_ack' || record.phase === 'delivery_unknown') {
+      needsReconcile = true;
+      continue;
+    }
+    if (record.phase === 'accepted' && record.runStatus !== 'terminal' && record.runStatus !== 'reconciled_idle') {
+      record.runStatus = 'terminal';
+      record.observedRunConflict = false;
+      record.reconciliationStatus = undefined;
+      record.code = null;
+      clearReconciliationDisplay(record);
+    }
+  }
+  resumeForegroundQueue(sessionPath);
+  if (needsReconcile) void reconcileComposerSession(sessionPath);
+}
+
 function isUnresolved(record: ComposerSendRecord): boolean {
   return record.phase === 'awaiting_ack' || record.phase === 'delivery_unknown'
     || record.phase === 'accepted' && !['terminal', 'reconciled_idle'].includes(record.runStatus);
@@ -471,6 +561,7 @@ function isUnresolved(record: ComposerSendRecord): boolean {
 
 export interface ComposerInputRejectionEvidence {
   originConnectionKey: string;
+  serverKey?: string;
   sessionId: string;
   sessionPath: string;
   clientMessageId: string;
@@ -496,8 +587,10 @@ export function noteComposerInputRejected(
   receipt: ComposerInputRejectionReceipt,
 ): boolean {
   if (!evidence.clientMessageId || !Number.isSafeInteger(evidence.snapshotVersion)) return false;
+  // 与接受回执同口径：按服务器身份匹配，重连不使旧账失配。
+  const server = evidence.serverKey ?? composerServerKey();
   const candidates = [...recordsByLease.values()].filter(record => record.clientMessageId === evidence.clientMessageId
-    && record.originConnectionKey === evidence.originConnectionKey
+    && record.serverKey === server
     && record.identity.kind === 'session'
     && record.identity.sessionId === evidence.sessionId
     && record.identity.sessionPath === evidence.sessionPath
@@ -623,7 +716,7 @@ export function defaultComposerSendFlowDeps(): ComposerSendFlowDeps {
 }
 function unresolvedForKey(key: string): ComposerSendRecord[] {
   return [...recordsByLease.values()].filter(record => isUnresolved(record)
-    && identityKey(record.identity, record.originConnectionKey) === key);
+    && identityKey(record.identity, record.serverKey) === key);
 }
 const eventRevisions = new Map<string, number>();
 const reconciliationChains = new Map<string, { controller: AbortController; promise: Promise<void> }>();
@@ -631,17 +724,22 @@ function cancelReconciliationChains(): void {
   for (const chain of reconciliationChains.values()) chain.controller.abort();
   reconciliationChains.clear();
 }
-export function unresolvedComposerSessionPaths(origin = composerOriginConnectionKey()): string[] {
-  return [...new Set([...recordsByLease.values()].flatMap(record => record.originConnectionKey === origin
+export function unresolvedComposerSessionPaths(server = composerServerKey()): string[] {
+  return [...new Set([...recordsByLease.values()].flatMap(record => record.serverKey === server
     && record.identity.kind === 'session' && isUnresolved(record) ? [record.identity.sessionPath] : []))];
 }
 /** 只在已有协议身份校验通过之后消费；普通 status false 不解除未决输入。 */
 export function noteComposerRunEvent(message: { type: string; sessionId?: string; sessionPath?: string;
   streamId?: string; turnId?: string; runId?: string; seq?: number; turnInputEntryId?: string }, origin = composerOriginConnectionKey()): void {
   if (!message.sessionId || !message.sessionPath || origin !== composerOriginConnectionKey()) return;
-  const key = identityKey({kind:'session',sessionId:message.sessionId,sessionPath:message.sessionPath,agentId:null},origin);
+  const key = identityKey({kind:'session',sessionId:message.sessionId,sessionPath:message.sessionPath,agentId:null}, composerServerKey());
   eventRevisions.set(key, (eventRevisions.get(key) ?? 0) + 1);
   const runId = message.runId || message.streamId || message.turnId;
+  // 活动即证据：回合已开跑说明消息必然送达服务器，不等看门狗超时，
+  // 立即凭历史证据销接收账（结局账仍按 run_end / 停止结算，不提前）。
+  if (message.type === 'assistant_run_start' && unresolvedForKey(key).some(record => record.phase === 'awaiting_ack')) {
+    void reconcileComposerSession(message.sessionPath);
+  }
   for (const record of unresolvedForKey(key)) {
     if (message.type === 'assistant_run_start' && runId) {
       // 新启动使旧终态失效；不同 run 的冲突不能被迟到的旧结束通知解除。
@@ -686,7 +784,7 @@ export function reconcileComposerSession(sessionPath: string): Promise<void> {
   const connection = resolveServerConnection(useStore.getState());
   const scope = captureQueueFlushScope(sessionPath);
   if (!connection || !scope) return Promise.resolve();
-  const key = identityKey({kind:'session',sessionId:scope.sessionId,sessionPath,agentId:null}, scope.originConnectionKey);
+  const key = identityKey({kind:'session',sessionId:scope.sessionId,sessionPath,agentId:null}, scope.serverKey);
   const existing = reconciliationChains.get(key);
   if (existing) return existing.promise;
   const records = unresolvedForKey(key);
@@ -798,14 +896,16 @@ function revalidateLeaseCommit(
   if (record.cancelled || record.phase !== 'preparing') {
     return { kind: 'failed_before_submit', code: record.code ?? 'send_cancelled', retryable: true };
   }
-  if (activeLeaseByKey.get(identityKey(record.identity, record.originConnectionKey)) !== record.leaseId) {
+  if (activeLeaseByKey.get(identityKey(record.identity, record.serverKey)) !== record.leaseId) {
     return { kind: 'failed_before_submit', code: 'lease_lost', retryable: true };
   }
   // 连接代次不匹配：禁止向新连接发送旧载荷。
   if (record.connectionGeneration !== connectionGeneration || record.originConnectionKey !== composerOriginConnectionKey()) {
     return { kind: 'failed_before_submit', code: 'connection_changed', retryable: true };
   }
-  if (unresolvedForKey(identityKey(record.identity, record.originConnectionKey)).some(other => other !== record && (record.bundle.type === 'prompt' || other.acceptance !== 'accepted' || other.runStatus === 'run_unknown'))) {
+  // 准备期间同会话确有另一笔在途（等回执中）才拦；存疑/结局未定的历史账
+  // 不拦——服务器忙闲由服务器裁判，客户端账本不否决权威。
+  if (unresolvedForKey(identityKey(record.identity, record.serverKey)).some(other => other !== record && other.phase === 'awaiting_ack')) {
     return { kind:'blocked', code:'unresolved_input', retryable:false };
   }
   if (record.identity.kind === 'session') {
@@ -960,7 +1060,7 @@ export async function retrySendRecord(
   if ((record.phase !== 'failed_before_submit' && record.phase !== 'blocked' && record.phase !== 'rejected_before_acceptance') || !record.retryable) {
     return null;
   }
-  const key = identityKey(record.identity, record.originConnectionKey);
+  const key = identityKey(record.identity, record.serverKey);
   if (activeLeaseByKey.has(key)) return null;
   activeLeaseByKey.set(key, leaseId);
   record.phase = 'preparing';

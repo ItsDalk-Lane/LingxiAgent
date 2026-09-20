@@ -63,7 +63,7 @@ export function useSkillSlashItems({
       .filter(s => s.enabled && !s.hidden)
       .map(s => ({
         name: s.name,
-        label: `/${s.name}`,
+        label: s.name,
         description: s.description || '',
         busyLabel: '',
         icon: getSkillIcon(s.name),
@@ -112,7 +112,7 @@ export function useServerSlashCommandItems({
       .map(command => ({
         name: command.name,
         aliases: Array.isArray(command.aliases) ? command.aliases : [],
-        label: `/${command.name}`,
+        label: command.name,
         description: command.description || '',
         busyLabel: '',
         icon: SERVER_COMMAND_ICON,

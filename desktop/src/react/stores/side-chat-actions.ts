@@ -62,6 +62,20 @@ export async function ensureSideChatSession(openedAt: number): Promise<void> {
       memoryEnabled: initial.sideChat.memoryEnabled === true,
       recordWorkspaceHistory: false,
     };
+    // 谱系：引用来自某段对话时（侧边聊天典型场景），携带来源会话 id，
+    // 新会话挂到主对话名下（列表分组展示）；非对话引用（文档预览等）不携带。
+    const seedQuoteForOrigin = initial.sideChat.seedQuote;
+    const originSessionPath = seedQuoteForOrigin && seedQuoteForOrigin.sourceKind === 'chat'
+      && typeof seedQuoteForOrigin.sourceSessionPath === 'string'
+      ? seedQuoteForOrigin.sourceSessionPath.trim()
+      : '';
+    const originSession = originSessionPath
+      ? (useStore.getState().sessions || []).find((session: any) => session?.path === originSessionPath)
+      : null;
+    const originSessionId = originSession && typeof originSession.sessionId === 'string' && originSession.sessionId.trim()
+      ? originSession.sessionId.trim()
+      : null;
+    if (originSessionId) body.forkedFromSessionId = originSessionId;
     const agentId = initial.currentAgentId || null;
     if (agentId) body.agentId = agentId;
     if (Array.isArray(initial.workspaceFolders) && initial.workspaceFolders.length) {
@@ -109,6 +123,8 @@ export async function ensureSideChatSession(openedAt: number): Promise<void> {
           cwd: typeof data.cwd === 'string' ? data.cwd : null,
           workspaceMountId: typeof data.workspaceMountId === 'string' ? data.workspaceMountId : null,
           workspaceLabel: typeof data.workspaceLabel === 'string' ? data.workspaceLabel : null,
+          // 谱系：乐观带上主对话引用，列表立即可分组；服务端已同源落盘。
+          ...(originSessionId ? { forkedFrom: { sessionId: originSessionId, forkedAt: new Date().toISOString() } } : {}),
           _optimistic: true,
         },
         ...(state.sessions || []).filter((item: any) => item?.path !== sessionPath),

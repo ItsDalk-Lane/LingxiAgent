@@ -65,10 +65,24 @@ const BUILT_IN_SETTINGS_SEARCH_ENTRIES: SettingsSearchEntry[] = [
   },
   {
     id: 'interface-shortcuts',
-    tabId: 'interface',
-    titleKey: 'settings.interface.shortcuts',
-    pathKeys: ['settings.tabs.interface'],
-    aliases: ['shortcut', 'keyboard', 'voice shortcut', '快捷键', '键盘', '录音快捷键', '语音快捷键'],
+    tabId: 'keybindings',
+    titleKey: 'settings.keybindings.title',
+    pathKeys: ['settings.tabs.keybindings'],
+    aliases: ['shortcut', 'keyboard', 'voice shortcut', 'keybinding', '快捷键', '键盘', '录音快捷键', '语音快捷键', '绑定', '重启快捷键'],
+  },
+  {
+    id: 'keybindings-restart',
+    tabId: 'keybindings',
+    titleKey: 'settings.keybindings.commands.appRestart',
+    pathKeys: ['settings.tabs.keybindings'],
+    aliases: ['restart', 'reboot', 'relaunch', '重启', '重启软件', '重新启动'],
+  },
+  {
+    id: 'keybindings-quick-chat',
+    tabId: 'keybindings',
+    titleKey: 'settings.keybindings.commands.quickChatToggle',
+    pathKeys: ['settings.tabs.keybindings'],
+    aliases: ['quick chat', 'mini chat', 'shortcut', '快速聊天', '小窗', '呼出快捷键'],
   },
   {
     id: 'interface-sidebar',
@@ -89,7 +103,7 @@ const BUILT_IN_SETTINGS_SEARCH_ENTRIES: SettingsSearchEntry[] = [
     tabId: 'general',
     titleKey: 'settings.general.quickChat.title',
     pathKeys: ['settings.tabs.general'],
-    aliases: ['quick chat', 'mini chat', 'shortcut', 'reuse input', '快速聊天', '小窗', '快捷键', '保留输入框'],
+    aliases: ['quick chat', 'mini chat', 'reuse input', '快速聊天', '小窗', '保留输入框'],
   },
   {
     id: 'general-notifications',
@@ -118,6 +132,13 @@ const BUILT_IN_SETTINGS_SEARCH_ENTRIES: SettingsSearchEntry[] = [
     titleKey: 'settings.work.homeFolder',
     pathKeys: ['settings.tabs.work'],
     aliases: ['workspace', 'home folder', 'workbench', 'working directory', 'AGENTS.md', 'CLAUDE.md', '工作台', '工作目录', '项目目录', '说明注入'],
+  },
+  {
+    id: 'work-injection',
+    tabId: 'work',
+    titleKey: 'settings.work.contextFilesTitle',
+    pathKeys: ['settings.tabs.work'],
+    aliases: ['AGENTS.md', 'CLAUDE.md', 'injection', 'custom file', 'custom instruction', '说明注入', '注入', '自定义注入', '自定义文件', '自定义说明'],
   },
   {
     id: 'work-heartbeat',

@@ -3,7 +3,7 @@
  *
  * 与 server/routes/git-environment.ts 一一对应。所有请求都以 dir（工作台
  * 本地目录绝对路径）定位仓库。只读端点对非 git 目录返回 isRepo:false，
- * 调用方按降级展示；操作端点（commit/push/checkout）返回结构化结果对象，
+ * 调用方按降级展示；操作端点（commit/push/pull/checkout）返回结构化结果对象，
  * httpOk=false 时携带 error / code，由 UI 决定如何提示。
  */
 
@@ -119,6 +119,12 @@ export interface GitCommit {
   committedAt: number;
   refs: GitCommitRef[];
   parents: string[];
+  /** 相对第一父的新增行数（合并提交=并入分支的增量） */
+  additions: number;
+  /** 相对第一父的删除行数 */
+  deletions: number;
+  /** 变更文件数；旧 git 无 --numstat 时为 0（UI 隐藏统计行） */
+  changedFiles: number;
 }
 
 export interface GitLogResponse {
@@ -139,6 +145,8 @@ export interface GitActionResult {
   /** unstash 命中的储藏条目 / stash 与 discard 处理的路径 */
   stash?: string;
   paths?: string[];
+  /** pull 实际并入本地的提交数 */
+  pulled?: number;
 }
 
 function dirQuery(dir: string, extra: Record<string, string> = {}): string {
@@ -177,6 +185,34 @@ export async function fetchGitFileDiff(dir: string, file: string): Promise<GitFi
 
 export async function fetchGitLog(dir: string, agentId?: string | null, limit = 300): Promise<GitLogResponse> {
   const res = await lingxiFetch(`/api/git/log?${dirQuery(dir, { ...agentFields(agentId), limit: String(limit) })}`);
+  return res.json();
+}
+
+export interface GitCommitStats {
+  additions: number;
+  deletions: number;
+  changedFiles: number;
+}
+
+export interface GitLogStatsResponse {
+  isRepo: boolean;
+  stats: Record<string, GitCommitStats>;
+}
+
+/** 提交变更统计两段加载的第二段：按哈希批量拉取（服务端有进程内缓存） */
+export async function fetchGitLogStats(
+  dir: string,
+  agentId: string | null | undefined,
+  hashes: string[],
+): Promise<GitLogStatsResponse> {
+  const res = await lingxiFetch('/api/git/log-stats', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dir, ...agentFields(agentId), hashes }),
+    throwOnHttpError: false,
+    // 大仓库首跑统计慢（大合并提交 diff），给宽超时；失败由调用方按空降级
+    timeout: 150_000,
+  });
   return res.json();
 }
 
@@ -283,6 +319,51 @@ export async function gitCommit(
   return { httpOk: res.ok, ...(await res.json()) };
 }
 
+/** 提交（修改）：暂存内容并入上一次提交；message 为空 = 保留原提交信息 */
+export async function gitAmend(
+  dir: string,
+  opts: { message: string | null; agentId?: string | null },
+): Promise<GitActionResult> {
+  const res = await lingxiFetch('/api/git/amend', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dir, ...opts }),
+    throwOnHttpError: false,
+    timeout: 60_000,
+  });
+  return { httpOk: res.ok, ...(await res.json()) };
+}
+
+/** 暂存（git add）：paths 缺省 = 全部改动（含未跟踪）；给 paths = 单文件 */
+export async function gitStage(
+  dir: string,
+  opts: { paths?: string[]; agentId?: string | null } = {},
+): Promise<GitActionResult> {
+  const res = await lingxiFetch('/api/git/stage', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dir, ...opts }),
+    throwOnHttpError: false,
+    timeout: 60_000,
+  });
+  return { httpOk: res.ok, ...(await res.json()) };
+}
+
+/** 取消暂存：index 退回 HEAD；paths 缺省 = 全部 */
+export async function gitUnstage(
+  dir: string,
+  opts: { paths?: string[]; agentId?: string | null } = {},
+): Promise<GitActionResult> {
+  const res = await lingxiFetch('/api/git/unstage', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dir, ...opts }),
+    throwOnHttpError: false,
+    timeout: 60_000,
+  });
+  return { httpOk: res.ok, ...(await res.json()) };
+}
+
 export async function gitPush(dir: string, agentId?: string | null): Promise<GitActionResult> {
   const res = await lingxiFetch('/api/git/push', {
     method: 'POST',
@@ -290,6 +371,31 @@ export async function gitPush(dir: string, agentId?: string | null): Promise<Git
     body: JSON.stringify({ dir, ...agentFields(agentId) }),
     throwOnHttpError: false,
     // push 走网络，服务端上限 120s，客户端稍宽
+    timeout: 150_000,
+  });
+  return { httpOk: res.ok, ...(await res.json()) };
+}
+
+/** 拉取远程更新：fetch + 可快进时合并；已是最新返回 code=already_up_to_date */
+export async function gitPull(dir: string, agentId?: string | null): Promise<GitActionResult> {
+  const res = await lingxiFetch('/api/git/pull', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dir, ...agentFields(agentId) }),
+    throwOnHttpError: false,
+    // pull 内含 fetch 远端，与 push 同档超时
+    timeout: 150_000,
+  });
+  return { httpOk: res.ok, ...(await res.json()) };
+}
+
+/** 只拉取不合并（git fetch）：刷新远程的真实领先/落后状态，不改工作区 */
+export async function gitFetchRemote(dir: string, agentId?: string | null): Promise<GitActionResult> {
+  const res = await lingxiFetch('/api/git/fetch', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dir, ...agentFields(agentId) }),
+    throwOnHttpError: false,
     timeout: 150_000,
   });
   return { httpOk: res.ok, ...(await res.json()) };

@@ -503,6 +503,12 @@ export interface ChatMessage {
   // Assistant
   blocks?: ContentBlock[];
   turnProjection?: AssistantTurnProjection;
+  /**
+   * 渲染专用注解：Process Fold 把过程块从消息 blocks 剥离后，回合的全部过程块
+   * 引用改挂到回合末条可见消息上，供回合级视图（文件修改卡）取数。只存在于
+   * 折叠投影的临时克隆，不落库、不参与持久化。
+   */
+  turnProcessBlocks?: ContentBlock[];
   /** 跨页 Run 缝合事实：仅当该 Run 被分页截断（头部记录未加载）时携带。 */
   runFacts?: HistoryRunFacts;
   // 通用

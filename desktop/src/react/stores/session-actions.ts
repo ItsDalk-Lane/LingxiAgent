@@ -18,6 +18,7 @@ import {
   negotiatedHistoryPageLimit,
   saveHistoryValidationRecord,
 } from './history-protocol-client';
+import { persistLastProjectIdentity } from './last-project-identity';
 import { hydrateInputDrafts } from './input-draft-persistence';
 import { HOME_DRAFT_KEY } from '../../../../shared/input-drafts.ts';
 import { normalizeWorkspacePath } from '../../../../shared/workspace-history.ts';
@@ -409,7 +410,7 @@ function historyNextCursor(data: {
 
 export async function loadMessages(
   forPath?: string,
-  opts?: { preloaded?: { data: any; etag: string | null; protocolHeader: string | null } },
+  opts?: { preloaded?: { data: any; etag: string | null; protocolHeader: string | null }; all?: boolean },
 ): Promise<void> {
   const targetPath = forPath || useStore.getState().currentSessionPath;
   if (!targetPath) return;
@@ -438,7 +439,9 @@ export async function loadMessages(
     if (data == null) {
       const conditional = await conditionalMessagesFetch(targetPath, {
         sessionPath: targetPath,
-        url: sessionMessagesUrl(targetPath),
+        // all=1：服务端忽略分页返回全量历史（时间线标题补全用；
+        // 服务端对 forceAll 请求不启用 304 条件响应，不会误命中旧缓存）。
+        url: sessionMessagesUrl(targetPath, opts?.all ? { all: '1' } : {}),
         sessionId: sessionIdForPathFromState(useStore.getState() as Record<string, any>, targetPath),
         limit: 50,
         requestVersion: myVersion,
@@ -971,6 +974,19 @@ export async function loadSessions(): Promise<void> {
   useStore.getState().setSessionMetaRecovery(await metaRecoveryPromise);
 }
 
+/**
+ * 时间线标题补全：会话历史仍有未加载页时拉一次全量（all=1），
+ * 让右侧标题目录覆盖整个会话而不是只有最近一页里的提问。
+ * 懒触发（用户唤起时间线时才调用）；复用 loadMessages 全部竞态护栏，
+ * 已是全量（无 hasMore）或会话未初始化时为空操作。
+ */
+export function ensureCompleteHistoryForTimeline(sessionPath: string): Promise<void> {
+  const state = useStore.getState() as Record<string, any>;
+  const chat = sessionScopedValue(state, state.chatSessions, sessionPath) as { hasMore?: boolean } | null;
+  if (!chat || chat.hasMore !== true) return Promise.resolve();
+  return loadMessages(sessionPath, { all: true });
+}
+
 const EMPTY_FIRST_MESSAGE_PLACEHOLDER = '(no messages)';
 
 function nonPlaceholderText(value: unknown): string {
@@ -1101,6 +1117,7 @@ export async function switchSession(path: string): Promise<void> {
     useStore.setState(state => ({
       pendingSessionSwitchPath: null,
       unreadOutputSessionPaths: filterSessionScopedStateList(state as Record<string, any>, state.unreadOutputSessionPaths || [], path),
+      failedSessions: filterSessionScopedStateList(state as Record<string, any>, state.failedSessions || [], path),
     }));
     return;
   }
@@ -1202,6 +1219,9 @@ export async function switchSession(path: string): Promise<void> {
     }
 
     // 批量更新 store（切 currentSessionPath 切换对话内容；可见 desk/preview 状态由 workspace 激活流程恢复）
+    // 记录上次活跃项目身份（localStorage）：重启后欢迎态的 selected* 由它恢复，
+    // 侧栏展开规则与工作台切换器才能回到用户上次的项目。
+    persistLastProjectIdentity({ workspaceMountId: data.workspaceMountId, cwd: data.cwd, workspaceLabel: data.workspaceLabel });
     useStore.setState((prev: any) => ({
       ...currentSessionIdentityPatch(prev, path, data.sessionId),
       pendingSessionSwitchPath: null,
@@ -1228,6 +1248,7 @@ export async function switchSession(path: string): Promise<void> {
       streamingSessions,
       activeSessionStreams,
       unreadOutputSessionPaths: filterSessionScopedStateList(state as Record<string, any>, state.unreadOutputSessionPaths || [], path),
+      failedSessions: filterSessionScopedStateList(state as Record<string, any>, state.failedSessions || [], path),
       attachedFiles: sessionScopedValue(state as Record<string, any>, state.attachedFilesBySession || {}, path) || [],
       deskContextAttached: false,
       docContextAttached: false,
@@ -1254,6 +1275,8 @@ export async function switchSession(path: string): Promise<void> {
         running: !!data.browserRunning,
         url: data.browserUrl || null,
         thumbnail: data.browserRunning ? (browserStateForPath(state as any, path).thumbnail ?? null) : null,
+        // 保留活跃时间：加载会话的状态同步不该抹掉跨会话卡片接力的排序依据
+        lastActiveAt: browserStateForPath(state as any, path).lastActiveAt ?? null,
       });
     }
 
@@ -1723,7 +1746,10 @@ export async function continueDeletedAgentSession(path: string): Promise<boolean
 // 归档 Session
 // ══════════════════════════════════════════════════════
 
-export async function archiveSession(path: string): Promise<void> {
+/** 子对话归档策略：archive_children = 递归一起归档；detach_children = 先释放子对话到顶层再归档主对话。 */
+export type SessionArchiveChildMode = 'archive_children' | 'detach_children';
+
+export async function archiveSession(path: string, childMode?: SessionArchiveChildMode): Promise<void> {
   try {
     const localSessionId = sessionIdForPathFromState(useStore.getState() as Record<string, any>, path);
     const res = await lingxiFetch('/api/sessions/archive', {
@@ -1732,13 +1758,27 @@ export async function archiveSession(path: string): Promise<void> {
       body: JSON.stringify({
         path,
         ...(localSessionId ? { sessionId: localSessionId } : {}),
+        ...(childMode ? { childMode } : {}),
       }),
     });
     const data = await res.json();
+    if (data.code === 'child_sessions_present') {
+      // 本地列表没看到子对话但服务端有（列表过期）：刷新后提示重试，不带策略直归档
+      // 会被服务端拦住，不会误伤子对话。
+      await loadSessions();
+      showSidebarToast(window.t('session.archiveChildrenNeeded'));
+      return;
+    }
     if (data.error) {
       console.error('[session] archive failed:', data.error);
       showSidebarToast(window.t('session.archiveFailed'));
       return;
+    }
+    if ((Number(data.archivedChildren) > 0 || Number(data.detachedChildren) > 0)) {
+      showSidebarToast(window.t('session.archiveChildSummary', {
+        archived: String(Number(data.archivedChildren) || 0),
+        detached: String(Number(data.detachedChildren) || 0),
+      }));
     }
 
     const s = useStore.getState();

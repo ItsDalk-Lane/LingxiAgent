@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { clampMaxTokensToContext } from "@earendil-works/pi-ai/api/simple-options";
+// TranscriptContext 是品牌类型，只有 normalizeContext() 能构造（pi-ai 0.83+）
+import { normalizeContext } from "@earendil-works/pi-ai/utils/transcript";
 import type { AssistantMessage, Model } from "@earendil-works/pi-ai";
 
 // Mock compaction-utils 以便精准控制 L3 判断和硬截断结果
@@ -209,22 +211,23 @@ describe("CompactionGuardExtension", () => {
         retainedAssistant,
         { role: "user", content: [{ type: "text", text: "continue" }], timestamp: 201 },
       ];
-      const providerContextBefore = {
+      // systemPrompt:"" + tools:[] 无可折叠内容，normalizeContext 原样返回 messages
+      const providerContextBefore = normalizeContext({
         systemPrompt: "",
         tools: [],
         messages: await convertAgentMessagesToLlm(messages),
-      };
+      });
       // pi-ai 0.83.0：clampMaxTokensToContext 改用 estimateContextTokens(content)（按实际内容估算），
       // 不再把消息 usage/tokensBefore（127000）计入占用，故 before-clamp 不再被压到 1，而是满额 32000。
       // 这条断言只校验 pi-ai 的 clamp 语义变了（context 按内容算），下方才是 Hana 的 epoch 重置行为。
       expect(clampMaxTokensToContext(model, providerContextBefore, 32_000)).toBe(32_000);
 
       const result = await pi.trigger("context", { messages });
-      const providerContextAfter = {
+      const providerContextAfter = normalizeContext({
         systemPrompt: "",
         tools: [],
         messages: await convertAgentMessagesToLlm(result.messages),
-      };
+      });
 
       expect(result.messages[1].usage.totalTokens).toBe(0);
       expect(retainedAssistant.usage.totalTokens).toBe(127_000);
@@ -811,11 +814,12 @@ describe("CompactionGuardExtension", () => {
       expect(prepareArguments).toHaveBeenCalledWith({ inputPath: "notes.md" });
       expect(liveExecute).not.toHaveBeenCalled();
       expect(providerContexts).toHaveLength(2);
-      expect(providerContexts[0].tools[0]).toMatchObject({
-        name: "read",
-        label: "Read",
-        prepareArguments,
-      });
+      // pi 0.86.0：工具以声明进入 system 消息（label/prepareArguments 不随请求可见），
+      // 克隆保真由 prepareArguments 实际被调用与 liveExecute 隔离证明。
+      const toolDeclaration = providerContexts[0].messages.find(
+        (message: any) => message.role === "system" && Array.isArray(message.toolsAdded),
+      );
+      expect(toolDeclaration?.toolsAdded[0]).toMatchObject({ name: "read" });
       expect(providerContexts[1].messages.at(-1)).toMatchObject({
         role: "toolResult",
         toolCallId: "call-prepare",

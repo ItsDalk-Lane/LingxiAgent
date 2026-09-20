@@ -421,6 +421,16 @@ export const DYNAMIC_CALL_ALLOWLIST = Object.freeze([
       + "import target.",
   },
   {
+    file: "node_modules/@earendil-works/pi-coding-agent/dist/utils/shell.js",
+    callee: "spawn",
+    argText: 'join(process.env.SystemRoot ?? "C:\\\\Windows", "System32", "taskkill.exe")',
+    reason:
+      "pi-coding-agent 0.86.0 killProcessTree() Windows cleanup: spawn(taskkill.exe) kills a "
+      + "process tree via the trusted System32 executable (PATH-independent). The target is a "
+      + "join() of SystemRoot with the fixed System32 path, never an import target; vendored "
+      + "dependency code, not statically traceable repo source.",
+  },
+  {
     file: "node_modules/@earendil-works/pi-coding-agent/dist/core/resolve-config-value.js",
     callee: "spawnSync",
     argText: "shell",

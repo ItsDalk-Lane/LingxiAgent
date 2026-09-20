@@ -24,13 +24,6 @@ const RETENTION_OPTIONS = [
   { value: 7, key: 'settings.security.retention7d' },
 ];
 
-const SIZE_OPTIONS = [
-  { value: 512, label: '512 KB' },
-  { value: 1024, label: '1 MB' },
-  { value: 5120, label: '5 MB' },
-  { value: 10240, label: '10 MB' },
-];
-
 type NetworkProxyMode = 'system' | 'manual' | 'direct';
 
 interface NetworkProxyConfig {
@@ -79,8 +72,8 @@ export function SecurityTab() {
     ? isWindows || readConfigBoolean(settingsConfig, cfg => cfg.sandbox_network, true)
     : undefined;
   const sandboxNetworkDisabled = sandboxEnabled !== true || isWindows;
-  const fileBackupEnabled = readConfigBoolean(settingsConfig, cfg => cfg.file_backup?.enabled, false);
-  const fileBackup = settingsConfig?.file_backup || { enabled: fileBackupEnabled, retention_days: 1, max_file_size_kb: 1024 };
+  // 文件备份恒开：唯一可调参数是保留时长，旧配置残留的开关/大小上限字段不再读取。
+  const fileBackup = settingsConfig?.file_backup || { retention_days: 1 };
 
   const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
   const [loading, setLoading] = useState(false);
@@ -102,23 +95,10 @@ export function SecurityTab() {
     await loadSettingsConfig();
   }, []);
 
-  const handleBackupToggle = useCallback(async (on: boolean) => {
-    const current = useSettingsStore.getState().settingsConfig?.file_backup || {};
-    await autoSaveConfig({ file_backup: { ...current, enabled: on } }, { silent: true });
-    await loadSettingsConfig();
-  }, []);
-
   const handleRetentionChange = useCallback(async (value: string) => {
     const days = parseInt(value, 10);
     const current = useSettingsStore.getState().settingsConfig?.file_backup || {};
     await autoSaveConfig({ file_backup: { ...current, retention_days: days } }, { silent: true });
-    await loadSettingsConfig();
-  }, []);
-
-  const handleMaxSizeChange = useCallback(async (value: string) => {
-    const kb = parseInt(value, 10);
-    const current = useSettingsStore.getState().settingsConfig?.file_backup || {};
-    await autoSaveConfig({ file_backup: { ...current, max_file_size_kb: kb } }, { silent: true });
     await loadSettingsConfig();
   }, []);
 
@@ -152,20 +132,6 @@ export function SecurityTab() {
     }
   }, []);
 
-  const handleRestore = useCallback(async (id: string) => {
-    try {
-      const res = await lingxiFetch(`/api/checkpoints/${id}/restore`, { method: 'POST' });
-      const data = await res.json();
-      if (data.ok) {
-        showToast(t('settings.security.restoreSuccess'), 'success');
-      } else {
-        showToast(t('settings.security.restoreFailed'), 'error');
-      }
-    } catch {
-      showToast(t('settings.security.restoreFailed'), 'error');
-    }
-  }, [showToast]);
-
   const formatTime = (ts: number) => {
     const d = new Date(ts);
     return d.toLocaleString();
@@ -175,6 +141,14 @@ export function SecurityTab() {
     const parts = p.split('/').filter(Boolean);
     if (parts.length <= 2) return p;
     return '.../' + parts.slice(-2).join('/');
+  };
+
+  const formatSize = (bytes: number) => {
+    if (!Number.isFinite(bytes) || bytes < 0) return '';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    if (bytes < 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+    return `${(bytes / 1024 / 1024 / 1024).toFixed(1)} GB`;
   };
 
   return (
@@ -209,63 +183,38 @@ export function SecurityTab() {
 
       <SettingsSection title={t('settings.security.fileBackup')}>
         <SettingsRow
-          label={t('settings.security.fileBackup')}
+          label={t('settings.security.retention')}
           hint={t('settings.security.fileBackupDesc')}
-          control={<Toggle on={fileBackupEnabled} onChange={handleBackupToggle} />}
+          control={
+            <SelectWidget
+              value={String(fileBackup.retention_days)}
+              onChange={handleRetentionChange}
+              options={RETENTION_OPTIONS.map(opt => ({ value: String(opt.value), label: t(opt.key) }))}
+            />
+          }
         />
 
-        {fileBackupEnabled === true && (
-          <>
-            <SettingsRow
-              label={t('settings.security.retention')}
-              control={
-                <SelectWidget
-                  value={String(fileBackup.retention_days)}
-                  onChange={handleRetentionChange}
-                  options={RETENTION_OPTIONS.map(opt => ({ value: String(opt.value), label: t(opt.key) }))}
-                />
-              }
-            />
-
-            <SettingsRow
-              label={t('settings.security.maxFileSize')}
-              control={
-                <SelectWidget
-                  value={String(fileBackup.max_file_size_kb)}
-                  onChange={handleMaxSizeChange}
-                  options={SIZE_OPTIONS.map(opt => ({ value: String(opt.value), label: opt.label }))}
-                />
-              }
-            />
-
-            <ExpandableRow
-              label={t('settings.security.viewBackups')}
-              count={checkpoints.length || undefined}
-              onToggle={(expanded) => {
-                if (expanded) loadCheckpoints();
-              }}
-            >
-              {loading ? (
-                <span className={styles['capability-row-desc']}>...</span>
-              ) : checkpoints.length === 0 ? (
-                <span className={styles['capability-row-desc']}>{t('settings.security.noBackups')}</span>
-              ) : (
-                checkpoints.map(cp => (
-                  <div key={cp.id} className={styles['settings-backup-item']}>
-                    <span className={styles['settings-backup-time']}>{formatTime(cp.ts)}</span>
-                    <span className={styles['settings-backup-path']}>{formatPath(cp.path)}</span>
-                    <button
-                      className={styles['settings-backup-restore-btn']}
-                      onClick={() => handleRestore(cp.id)}
-                    >
-                      {t('settings.security.restoreBtn')}
-                    </button>
-                  </div>
-                ))
-              )}
-            </ExpandableRow>
-          </>
-        )}
+        <ExpandableRow
+          label={t('settings.security.viewBackups')}
+          count={checkpoints.length || undefined}
+          onToggle={(expanded) => {
+            if (expanded) loadCheckpoints();
+          }}
+        >
+          {loading ? (
+            <span className={styles['capability-row-desc']}>...</span>
+          ) : checkpoints.length === 0 ? (
+            <span className={styles['capability-row-desc']}>{t('settings.security.noBackups')}</span>
+          ) : (
+            checkpoints.map(cp => (
+              <div key={cp.id} className={styles['settings-backup-item']}>
+                <span className={styles['settings-backup-time']}>{formatTime(cp.ts)}</span>
+                <span className={styles['settings-backup-path']}>{formatPath(cp.path)}</span>
+                <span className={styles['settings-backup-size']}>{formatSize(cp.size)}</span>
+              </div>
+            ))
+          )}
+        </ExpandableRow>
       </SettingsSection>
 
       <SettingsSection title={t('settings.security.networkProxy')}>

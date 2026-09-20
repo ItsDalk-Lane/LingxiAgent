@@ -210,7 +210,7 @@ describe("agent.systemPrompt: master / per-session 解耦", { timeout: AGENT_INI
     const prompt = agent.buildSystemPrompt({ forceMemoryEnabled: false });
 
     expect(prompt).toContain("## Tool Usage Discipline");
-    expect(prompt).toContain("Inspect files with read/grep/find/ls; modify with edit, create or replace with write. No shell redirection for source edits.");
+    expect(prompt).toContain("locate with grep/find/ls, modify with edit, create or fully replace with write. No shell redirection for source edits.");
     expect(prompt).toContain("Run commands with exec_command");
 
     await agent.dispose();
@@ -225,14 +225,14 @@ describe("agent.systemPrompt: master / per-session 解耦", { timeout: AGENT_INI
     expect(prompt).toContain("## Visible UI Context");
     expect(prompt).toContain("current_status");
     expect(prompt).toContain("ui_context");
-    expect(prompt).toContain("never guess paths");
+    expect(prompt).toContain("ask the user only when it plus the conversation cannot locate the target");
 
     agent._config.locale = "zh-CN";
     const zhPrompt = agent.buildSystemPrompt({ forceMemoryEnabled: false });
     expect(zhPrompt).toContain("## 可见 UI 上下文");
     expect(zhPrompt).toContain("current_status");
     expect(zhPrompt).toContain("ui_context");
-    expect(zhPrompt).toContain("不猜路径");
+    expect(zhPrompt).toContain("结合对话仍无法定位才问用户");
 
     await agent.dispose();
   });
@@ -245,7 +245,7 @@ describe("agent.systemPrompt: master / per-session 解耦", { timeout: AGENT_INI
     const prompt = agent.buildSystemPrompt({ forceMemoryEnabled: false });
 
     expect(prompt).toContain("## 工具使用纪律");
-    expect(prompt).toContain("查文件用 read/grep/find/ls；修改用 edit，新建或全量替换用 write，不用 shell 重定向改源码。");
+    expect(prompt).toContain("定位用 grep/find/ls，修改用 edit，新建或整体替换用 write，不用 shell 重定向改源码。");
     expect(prompt).toContain("命令用 exec_command");
 
     await agent.dispose();
@@ -407,8 +407,8 @@ describe("agent.systemPrompt: master / per-session 解耦", { timeout: AGENT_INI
     const prompt = agent.buildSystemPrompt({ forceMemoryEnabled: false });
 
     expect(prompt).toContain("Desktop App Control");
-    expect(prompt).toContain("Use computer for local GUI actions");
-    expect(prompt).toContain("Never bypass app approval with commands or scripts");
+    expect(prompt).toContain("Use computer for local GUI");
+    expect(prompt).toContain("never bypass with commands or scripts");
 
     await agent.dispose();
   });

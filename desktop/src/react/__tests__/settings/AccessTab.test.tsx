@@ -272,7 +272,7 @@ describe('AccessTab', () => {
     await waitFor(() => {
       expect(mockLingxiFetch).toHaveBeenCalledWith('/api/access/network', expect.objectContaining({
         method: 'PUT',
-        body: JSON.stringify({ mode: 'lan', listenPort: 14500 }),
+        body: JSON.stringify({ mode: 'lan', listenPort: 14500, publicBaseUrl: '' }),
       }));
     });
     expect(await screen.findByDisplayValue('http://192.168.31.75:14500/mobile/')).toBeInTheDocument();

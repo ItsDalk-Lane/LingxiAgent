@@ -104,10 +104,14 @@ export function resolveContentLifecycle(
 function intrinsicBlockId(block: ContentBlock): string | null {
   switch (block.type) {
     case 'tool_group': {
-      const ids = (Array.isArray(block.tools) ? block.tools : [])
+      // 组身份锚定首个带 id 的成员，成员增减不换 key：流式合并只会向组尾追加
+      // 工具，锚点随之永久不变；历史重载按连续调用重建分组，同组首个成员相同，
+      // live 与重载得到同一身份。旧的全名单拼接让每次并组都换 key，React 整组
+      // 重建、展开状态清零（流式期「点开就被收回」的来源之一）。
+      const anchor = (Array.isArray(block.tools) ? block.tools : [])
         .map((tool) => tool.id?.trim())
-        .filter((id): id is string => !!id);
-      return ids.length > 0 ? `tools:${ids.join('+')}` : null;
+        .find((id): id is string => !!id);
+      return anchor ? `tools:${anchor}` : null;
     }
     case 'file': {
       const identity = block.fileId || block.resource?.resourceId;

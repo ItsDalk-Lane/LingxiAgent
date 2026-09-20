@@ -1,0 +1,528 @@
+/* ========================================
+   ConversationMap — 会话地图 CSS Module
+   工具栏 / 缩放平移画布 / 轮次卡片 / 连线层
+   ======================================== */
+
+.page {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* ── 顶部工具栏 ── */
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    padding: var(--space-8) var(--space-12);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.workspaceLabel {
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+}
+
+.workspaceSelect {
+    font-size: var(--fs-ui);
+    color: var(--text);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-4) var(--space-8);
+    max-width: 260px;
+}
+
+.toolbarButton {
+    font-size: var(--fs-ui);
+    color: var(--text);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-4) var(--space-10, 10px);
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out);
+}
+
+.toolbarButton:hover {
+    background: var(--overlay-light);
+}
+
+.stats {
+    margin-left: auto;
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+/* ── 画布视口 ── */
+
+.viewport {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+    cursor: grab;
+}
+
+.viewportPanning {
+    cursor: grabbing;
+}
+
+.canvasContent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;
+}
+
+.edgeLayer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.edgeChain {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 1.5;
+}
+
+.edgeFork {
+    fill: none;
+    stroke-width: 2.5;
+}
+
+/* ── 轮次卡片 ── */
+
+.card {
+    position: absolute;
+    width: 320px;
+    height: 276px;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card, var(--radius-md));
+    box-shadow: 0 2px 10px var(--shadow);
+    cursor: pointer;
+    /* visible：右缘的「+」追问按钮半压在边框上，不能被裁掉；
+       内部滚动由 .answer 自身的 overflow 消化。 */
+    overflow: visible;
+    transition: box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.card:hover {
+    box-shadow: 0 4px 16px var(--shadow);
+}
+
+.cardCurrent {
+    outline: 2px solid var(--card-accent, var(--accent));
+    outline-offset: 1px;
+}
+
+.cardSelected {
+    --map-selected-ring: rgba(var(--accent-rgb), 0.45);
+    box-shadow: 0 0 0 2px var(--map-selected-ring), 0 4px 16px var(--shadow);
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6, 6px);
+    padding: var(--space-8) var(--space-12);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    cursor: grab;
+}
+
+.cardDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.cardTitle {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.toolBadge {
+    flex-shrink: 0;
+    font-size: var(--fs-micro, 10px);
+    color: var(--text-muted);
+    background: var(--overlay-light);
+    border-radius: var(--radius-xs);
+    padding: var(--space-2) var(--space-4);
+}
+
+.cardBody {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-8) var(--space-12);
+    gap: var(--space-8);
+}
+
+.question {
+    flex-shrink: 0;
+    font-size: var(--fs-caption);
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.answer {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+}
+
+.cardFooter {
+    flex-shrink: 0;
+    padding: var(--space-4) var(--space-12);
+    border-top: 1px solid var(--border);
+    font-size: var(--fs-micro, 10px);
+    color: var(--text-muted);
+}
+
+/* ── 占位卡片（无可见轮次） ── */
+
+.cardPlaceholder {
+    align-items: center;
+    justify-content: center;
+}
+
+.placeholderText {
+    font-size: var(--fs-ui);
+    color: var(--text-muted);
+    text-align: center;
+    padding: var(--space-16);
+}
+
+/* ── 空态 / 加载态 ── */
+
+.emptyState {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: var(--fs-ui);
+}
+
+.loadingHint {
+    position: absolute;
+    top: var(--space-12);
+    right: var(--space-12);
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-4) var(--space-8);
+    pointer-events: none;
+}
+
+/* ── 画布区域（承载视口 + 详情浮层） ── */
+
+.mapArea {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    position: relative;
+}
+
+/* ── 卡片拖拽 / 折叠 ── */
+
+.cardDragging {
+    cursor: grabbing;
+    box-shadow: 0 8px 24px var(--shadow);
+    z-index: 2;
+}
+
+.collapseButton {
+    flex-shrink: 0;
+    font-size: var(--fs-micro, 10px);
+    color: var(--text-muted);
+    background: var(--overlay-light);
+    border: none;
+    border-radius: var(--radius-xs);
+    padding: var(--space-2) var(--space-4);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.card:hover .collapseButton,
+.collapseButton:focus-visible {
+    opacity: 1;
+}
+
+/* ── 卡片右缘的追问/分支「+」按钮（对齐 dsh-synapse） ── */
+
+.cardAddButton {
+    position: absolute;
+    right: -13px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-muted);
+    font-size: var(--fs-ui);
+    line-height: 1;
+    cursor: pointer;
+    z-index: 4;
+    opacity: 0.45;
+    transition: opacity var(--duration-fast) var(--ease-out),
+        color var(--duration-fast) var(--ease-out),
+        border-color var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.card:hover .cardAddButton,
+.cardAddButton:focus-visible {
+    opacity: 1;
+    color: var(--card-accent, var(--accent));
+    border-color: var(--card-accent, var(--accent));
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+/* ── 待回复卡片（已发送、等待流式答复） ── */
+
+.pendingCard {
+    cursor: default;
+}
+
+.pendingHint {
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+}
+
+/* ── 草稿卡片（继续追问 / 创建分支） ── */
+
+.edgeDraft {
+    fill: none;
+    stroke-width: 1.5;
+    stroke-dasharray: 6 4;
+}
+
+.draftCard {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border: 1.5px dashed var(--card-accent, var(--accent));
+    border-radius: var(--radius-card, var(--radius-md));
+    box-shadow: 0 2px 10px var(--shadow);
+    overflow: hidden;
+    z-index: 3;
+}
+
+.draftBody {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-8) var(--space-12);
+    gap: var(--space-8);
+}
+
+.draftTextarea {
+    flex: 1;
+    min-height: 96px;
+    resize: none;
+    font-size: var(--fs-caption);
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-8);
+    font-family: inherit;
+}
+
+.chipRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+}
+
+.chip {
+    font-size: var(--fs-micro, 10px);
+    color: var(--text);
+    background: var(--overlay-light);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xs);
+    padding: var(--space-2) var(--space-8);
+    cursor: pointer;
+}
+
+.chip:hover {
+    background: var(--border);
+}
+
+.chipRemove {
+    margin-left: var(--space-4);
+    color: var(--text-muted);
+}
+
+.chipEditRow {
+    display: flex;
+    gap: var(--space-4);
+}
+
+.chipInput {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--fs-micro, 10px);
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xs);
+    padding: var(--space-2) var(--space-8);
+}
+
+.draftActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-8);
+}
+
+.draftSendButton {
+    border-color: var(--card-accent, var(--accent));
+    color: var(--card-accent, var(--accent));
+}
+
+/* ── 选区追问浮钮 ── */
+
+.followUpButton {
+    position: absolute;
+    z-index: 4;
+    font-size: var(--fs-caption);
+    color: var(--bg);
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: var(--space-4) var(--space-10, 10px);
+    cursor: pointer;
+    box-shadow: 0 2px 10px var(--shadow);
+}
+
+/* ── 卡片详情面板 ── */
+
+.inspector {
+    position: absolute;
+    top: var(--space-12);
+    right: var(--space-12);
+    bottom: var(--space-12);
+    width: 360px;
+    max-width: calc(100% - 24px);
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card, var(--radius-md));
+    box-shadow: 0 8px 24px var(--shadow);
+    z-index: 5;
+}
+
+.inspectorHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    padding: var(--space-8) var(--space-12);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.inspectorTitle {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--fs-ui);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.inspectorClose {
+    flex-shrink: 0;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: var(--fs-ui);
+    padding: var(--space-4);
+}
+
+.inspectorBody {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: var(--space-12);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.inspectorQuestion {
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.inspectorAnswer {
+    font-size: var(--fs-caption);
+    color: var(--text);
+}
+
+.inspectorMeta {
+    font-size: var(--fs-micro, 10px);
+    color: var(--text-muted);
+}
+
+.inspectorError {
+    font-size: var(--fs-caption);
+    color: var(--danger, #dc2626);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.inspectorActions {
+    flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+    padding: var(--space-8) var(--space-12);
+    border-top: 1px solid var(--border);
+}

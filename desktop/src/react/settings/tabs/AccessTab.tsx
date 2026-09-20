@@ -25,6 +25,9 @@ interface AccessSummary {
   network: {
     mode: AccessMode;
     listenHost: string;
+    publicBaseUrl: string | null;
+    publicMobileUrl: string | null;
+    publicDesktopUrl: string | null;
     configuredPort: number;
     actualPort: number;
     runtimeMode: AccessMode;
@@ -79,6 +82,7 @@ export function AccessTab() {
   const isLocalOwner = isLocalOwnerConnection(effectiveConnection);
   const [summary, setSummary] = useState<AccessSummary | null>(() => snapshotAccess || null);
   const [mode, setMode] = useState<AccessMode | null>(() => snapshotAccess?.network?.mode || null);
+  const [publicBaseDraft, setPublicBaseDraft] = useState(() => snapshotAccess?.network?.publicBaseUrl || '');
   const [port, setPort] = useState(() => (
     Number.isInteger(snapshotAccess?.network?.configuredPort)
       ? String(snapshotAccess!.network.configuredPort)
@@ -100,6 +104,7 @@ export function AccessTab() {
     if (!snapshotAccess) return;
     setSummary(snapshotAccess);
     setMode(snapshotAccess.network.mode);
+    setPublicBaseDraft(snapshotAccess.network.publicBaseUrl || '');
     setPort(String(snapshotAccess.network.configuredPort));
     setAccountDraft({
       username: snapshotAccess.account.username || '',
@@ -119,6 +124,7 @@ export function AccessTab() {
       const data = await res.json();
       setSummary(data);
       setMode(data.network.mode);
+      setPublicBaseDraft(data.network.publicBaseUrl || '');
       setPort(String(data.network.configuredPort));
       setAccountDraft({
         username: data.account.username || '',
@@ -137,30 +143,34 @@ export function AccessTab() {
 
   const mobileUrl = useMemo(() => {
     if (!summary) return '';
+    if (summary.network.publicMobileUrl) return summary.network.publicMobileUrl;
     if (mode !== 'lan') return '';
     return summary.network.lanMobileUrl || '';
   }, [mode, summary]);
 
   const desktopUrl = useMemo(() => {
     if (!summary) return '';
+    if (summary.network.publicDesktopUrl) return summary.network.publicDesktopUrl;
     if (mode !== 'lan') return '';
     return summary.network.lanDesktopUrl || '';
   }, [mode, summary]);
 
   const qrUrl = useMemo(() => {
-    if (mode !== 'lan' || !mobileUrl || summary?.network.restartRequired) return '';
+    if (!mobileUrl || summary?.network.restartRequired) return '';
+    if (summary?.network.publicMobileUrl) return lingxiUrl('/api/access/mobile-qr.svg');
+    if (mode !== 'lan') return '';
     const query = summary?.network.actualPort
       ? `?port=${encodeURIComponent(String(summary.network.actualPort))}`
       : '';
     return lingxiUrl(`/api/access/mobile-qr.svg${query}`);
-  }, [mode, mobileUrl, summary?.network.actualPort, summary?.network.restartRequired]);
+  }, [mode, mobileUrl, summary?.network.publicMobileUrl, summary?.network.actualPort, summary?.network.restartRequired]);
 
   const canCopyMobileUrl = mobileUrl.length > 0;
   const canCopyDesktopUrl = desktopUrl.length > 0;
-  const canShowQr = mode === 'lan' && mobileUrl.length > 0 && !summary?.network.restartRequired;
+  const canShowQr = mobileUrl.length > 0 && !summary?.network.restartRequired;
   const runtimeEndpoint = summary ? `${summary.network.runtimeHost}:${summary.network.actualPort}` : '';
-  const effectiveMobileUrl = summary?.network.lanMobileUrl || summary?.network.localMobileUrl || '';
-  const effectiveDesktopUrl = summary?.network.lanDesktopUrl || summary?.network.localDesktopUrl || '';
+  const effectiveMobileUrl = summary?.network.publicMobileUrl || summary?.network.lanMobileUrl || summary?.network.localMobileUrl || '';
+  const effectiveDesktopUrl = summary?.network.publicDesktopUrl || summary?.network.lanDesktopUrl || summary?.network.localDesktopUrl || '';
   const lanAddressText = summary?.network.lanAddresses.length
     ? summary.network.lanAddresses.join(', ')
     : t('settings.access.noLanAddresses');
@@ -187,20 +197,22 @@ export function AccessTab() {
       const res = await lingxiFetch('/api/access/network', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: nextMode, listenPort }),
+        body: JSON.stringify({ mode: nextMode, listenPort, publicBaseUrl: publicBaseDraft.trim() }),
       });
       const data = await res.json();
       setSummary(prev => prev ? { ...prev, network: data.network } : prev);
       setMode(data.network.mode);
+      setPublicBaseDraft(data.network.publicBaseUrl || '');
       setPort(String(data.network.configuredPort));
       showToast(t('settings.access.saved'), 'success');
     } catch (err: any) {
       showToast(`${t('settings.saveFailed')}: ${err.message}`, 'error');
       setMode(summary?.network.mode || nextMode);
+      setPublicBaseDraft(summary?.network.publicBaseUrl || '');
     } finally {
       setSavingNetwork(false);
     }
-  }, [showToast, summary?.network.mode]);
+  }, [showToast, publicBaseDraft, summary?.network.mode, summary?.network.publicBaseUrl]);
 
   const saveNetwork = useCallback(async () => {
     if (!mode) return;
@@ -441,20 +453,81 @@ export function AccessTab() {
             <div className={styles['access-status-grid']}>
               <div className={styles['access-status-item']}>
                 <span>{t('settings.access.runtimeEndpoint')}</span>
-                <strong>{runtimeEndpoint}</strong>
+                <div className={styles['access-status-value']}>
+                  <strong>{runtimeEndpoint}</strong>
+                  <button
+                    className={styles['access-status-copy']}
+                    type="button"
+                    title={t('settings.access.copy')}
+                    onClick={() => copyText(runtimeEndpoint)}
+                    disabled={!runtimeEndpoint}
+                  >
+                    {t('settings.access.copy')}
+                  </button>
+                </div>
               </div>
               <div className={styles['access-status-item']}>
                 <span>{t('settings.access.effectiveMobileUrl')}</span>
-                <strong>{effectiveMobileUrl}</strong>
+                <div className={styles['access-status-value']}>
+                  <strong>{effectiveMobileUrl}</strong>
+                  <button
+                    className={styles['access-status-copy']}
+                    type="button"
+                    title={t('settings.access.copy')}
+                    onClick={() => copyText(effectiveMobileUrl)}
+                    disabled={!effectiveMobileUrl}
+                  >
+                    {t('settings.access.copy')}
+                  </button>
+                </div>
               </div>
               <div className={styles['access-status-item']}>
                 <span>{t('settings.access.effectiveDesktopUrl')}</span>
-                <strong>{effectiveDesktopUrl}</strong>
+                <div className={styles['access-status-value']}>
+                  <strong>{effectiveDesktopUrl}</strong>
+                  <button
+                    className={styles['access-status-copy']}
+                    type="button"
+                    title={t('settings.access.copy')}
+                    onClick={() => copyText(effectiveDesktopUrl)}
+                    disabled={!effectiveDesktopUrl}
+                  >
+                    {t('settings.access.copy')}
+                  </button>
+                </div>
               </div>
               <div className={styles['access-status-item']}>
                 <span>{t('settings.access.lanAddresses')}</span>
-                <strong>{lanAddressText}</strong>
+                <div className={styles['access-status-value']}>
+                  <strong>{lanAddressText}</strong>
+                  <button
+                    className={styles['access-status-copy']}
+                    type="button"
+                    title={t('settings.access.copy')}
+                    onClick={() => copyText(summary?.network.lanAddresses.join(', ') || '')}
+                    disabled={!summary?.network.lanAddresses.length}
+                  >
+                    {t('settings.access.copy')}
+                  </button>
+                </div>
               </div>
+            </div>
+          }
+        />
+        <SettingsRow
+          label={t('settings.access.publicBaseUrl')}
+          hint={t('settings.access.publicBaseUrlHint')}
+          layout="stacked"
+          control={
+            <div className={styles['access-url-row']}>
+              <input
+                aria-label={t('settings.access.publicBaseUrl')}
+                className={styles['settings-input']}
+                value={publicBaseDraft}
+                placeholder="https://lingxi.example.com"
+                disabled={loadingSummary || savingNetwork}
+                onChange={(event) => setPublicBaseDraft(event.target.value)}
+              />
             </div>
           }
         />

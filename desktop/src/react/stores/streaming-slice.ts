@@ -71,6 +71,14 @@ export interface StreamingSlice {
   unreadOutputSessionPaths: string[];
   markSessionOutputUnread: (path: string) => void;
   clearSessionOutputUnread: (path: string) => void;
+  /**
+   * 因模型/连接错误而中断的 session（ws error 事件写入）。
+   * 驱动会话列表红点；新一轮输出开始或用户切回该会话时清除。
+   * 与 inlineErrors（聊天内错误条，短 TTL 自动消失）互补：红点要常驻到用户看到为止。
+   */
+  failedSessions: string[];
+  markSessionFailed: (path: string) => void;
+  clearSessionFailed: (path: string) => void;
   /** 按 session path 存储的内联错误（权威源）。null 表示无 error。 */
   inlineErrors: Record<string, InlineErrorEntry | null>;
   /**
@@ -358,6 +366,18 @@ export const createStreamingSlice = (
   clearSessionOutputUnread: (path) => set((s) => {
     const key = identityKeyForPath(get, path);
     return { unreadOutputSessionPaths: filterLegacyAndIdentity(s.unreadOutputSessionPaths, path, key) };
+  }),
+  failedSessions: [],
+  markSessionFailed: (path) => set((s) => {
+    const key = identityKeyForPath(get, path);
+    // 去重：同一会话连续多条错误只记一次，避免列表里残留重复项。
+    if (s.failedSessions.includes(key) || (key !== path && s.failedSessions.includes(path))) return {};
+    return { failedSessions: [...s.failedSessions, key] };
+  }),
+  clearSessionFailed: (path) => set((s) => {
+    const key = identityKeyForPath(get, path);
+    if (!s.failedSessions.includes(key) && !(key !== path && s.failedSessions.includes(path))) return {};
+    return { failedSessions: filterLegacyAndIdentity(s.failedSessions, path, key) };
   }),
   inlineErrors: {},
   setInlineError: (path, error, ttlMs = 5000) => {

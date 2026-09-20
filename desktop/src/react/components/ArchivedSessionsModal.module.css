@@ -231,10 +231,13 @@
   gap: var(--space-12);
   padding: 5px var(--space-12);
   background: transparent;
-  cursor: pointer;
+  /* 行内默认不可点（无操作）；选择模式下整行切换勾选，才切回手型 */
+  cursor: default;
   user-select: none;
   transition: background var(--duration-fast) ease;
 }
+
+.rowSelectable { cursor: pointer; }
 
 .row:hover {
   background: var(--overlay-light, rgba(0, 0, 0, 0.05));
@@ -250,6 +253,16 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  /* 标题名称是进入选择模式（显示勾选框）的入口：
+     宽度收缩到文字本身，避免标题右侧的行内空白也被当成标题点中 */
+  width: fit-content;
+  max-width: 100%;
+  cursor: pointer;
+  border-radius: var(--radius-sm, 4px);
+}
+
+.rowTitle:hover {
+  color: var(--text-strong, rgba(0, 0, 0, 0.92));
 }
 
 .rowMeta {
@@ -349,6 +362,13 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 40%;
+  /* 目录名称是进入选择模式（显示勾选框）的入口，不触发折叠 */
+  cursor: pointer;
+  border-radius: var(--radius-sm, 4px);
+}
+
+.groupName:hover {
+  color: var(--text-strong, rgba(0, 0, 0, 0.92));
 }
 
 .groupPath {
@@ -376,7 +396,7 @@
   color: var(--text-secondary, #888);
 }
 
-/* 分组折叠：折叠箭头独立承接点击，留出更大的命中区（负 margin 抵消位移） */
+/* 分组折叠：点分组头任意位置折叠/展开（组勾选框与目录名称除外） */
 
 .groupHeader {
   cursor: pointer;

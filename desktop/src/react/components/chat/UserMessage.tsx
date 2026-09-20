@@ -23,6 +23,8 @@ import { AgentAvatar, resolveAgentDisplayInfo } from '../../utils/agent-display'
 import { openMediaViewerForRef } from '../../utils/open-media-viewer';
 import { useDeferredHistoryContent } from '../../hooks/use-deferred-history-content';
 import {
+  activateForkedSession,
+  forkSessionTurn,
   retrySessionTurn,
   type ForkedSessionHandler,
   type SessionNodeTarget,
@@ -45,7 +47,6 @@ interface Props {
   viewerIdentity: { name: string; avatarUrl: string | null };
   isStreaming: boolean;
   isSelected: boolean;
-  isLatestUserMessage?: boolean;
   onForkCreated?: ForkedSessionHandler;
   messageRef?: (element: HTMLDivElement | null) => void;
 }
@@ -60,7 +61,6 @@ export const UserMessage = memo(function UserMessage({
   viewerIdentity,
   isStreaming,
   isSelected,
-  isLatestUserMessage = false,
   onForkCreated,
   messageRef,
 }: Props) {
@@ -158,20 +158,26 @@ export const UserMessage = memo(function UserMessage({
     setEditBusy(true);
     try {
       if (!turnTarget) return;
-      const ok = await retrySessionTurn(
-        sessionPath,
-        turnTarget,
-        { message, replacementText: nextText },
-      );
-      if (ok) setEditing(false);
+      // 编辑重发 = 分支会话合并入口：原会话保持不动，复制出支线并切换过去，
+      // 再在支线内按（可能修改过的）文本重答；未改动文本即等价于“直接重新回答”。
+      const forked = await forkSessionTurn(sessionPath, turnTarget);
+      if (!forked) return;
+      setEditing(false);
+      await (onForkCreated || activateForkedSession)(forked);
+      await retrySessionTurn(forked.sessionPath, turnTarget, {
+        message,
+        replacementText: nextText,
+      });
     } finally {
       setEditBusy(false);
     }
-  }, [busy, editValue, isStreaming, message, sessionPath, turnTarget]);
+  }, [busy, editValue, isStreaming, message, onForkCreated, sessionPath, turnTarget]);
 
-  // Retry and fork preserve the recorded review envelope. Inline text editing remains
+  // Retry preserves the recorded review envelope. Inline text editing remains
   // unavailable because changing only its text would no longer match that snapshot.
-  const canEdit = !readOnly && !unresolvedDelivery && !isReviewTurn && isLatestUserMessage && !!turnTarget;
+  // 编辑已并入分支语义（fork 后在支线重答，原会话不动），任意持久化用户消息
+  // 均可编辑，不再限制为最新一条。
+  const canEdit = !readOnly && !unresolvedDelivery && !isReviewTurn && !!turnTarget;
   const timeText = formatMessageTime(message.timestamp);
   const editingActions: MessageFooterAction[] = useMemo(() => [
     {
@@ -207,7 +213,13 @@ export const UserMessage = memo(function UserMessage({
       disabled: isStreaming || busy,
     },
   ] : [], [busy, canEdit, handleEdit, isStreaming, t]);
-  const footerActions = editing ? editingActions : [...nodeActions, ...editActions];
+  // “分支为新会话”已并入编辑按钮：用户消息不再单独展示分叉入口，
+  // 编辑确认后在支线内重答（见 handleConfirmEdit）。
+  const userNodeActions = useMemo(
+    () => nodeActions.filter((action) => action.id !== 'fork-session'),
+    [nodeActions],
+  );
+  const footerActions = editing ? editingActions : [...userNodeActions, ...editActions];
   const hasSkillBadges = !!message.skills?.length;
   const hasTextBubble = editing || !!message.textHtml || hasSkillBadges;
 

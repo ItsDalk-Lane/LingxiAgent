@@ -2274,6 +2274,41 @@
     color: var(--text);
 }
 
+.access-status-value {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-8, 8px);
+    min-width: 0;
+}
+
+.access-status-value strong {
+    flex: 1;
+}
+
+.access-status-copy {
+    flex: none;
+    padding: 2px 8px;
+    font-size: var(--fs-hint);
+    line-height: 1.4;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-card);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.access-status-copy:hover:not(:disabled) {
+    color: var(--text);
+    border-color: var(--text-muted);
+}
+
+.access-status-copy:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
 .access-remote-panel {
     display: flex;
     flex-direction: column;
@@ -3289,6 +3324,11 @@
     display: flex;
     align-items: center;
     gap: 6px;
+}
+
+/* 自定义注入文件的路径行：跟随开关行之后，与行内容左右对齐，底部留白 */
+.settings-custom-file-picker {
+    padding: 0 var(--space-16) var(--space-12);
 }
 
 .settings-folder-input {
@@ -4697,13 +4737,15 @@ a.about-link:hover {
      fill: var(--text-muted);
  }
 
+ /* 热力图格子：数据可视化色，不跟主题 accent（delve 等近黑 accent 主题下
+    会整片灰掉）。默认青色与同页图表系列色一致；深色主题在各自 css 里
+    覆盖 --chart-heat 为亮青，保证深底对比度。 */
  .observability-heat-cell-daily {
-     fill: var(--accent);
+     fill: var(--chart-heat, #0e7490);
  }
 
  .observability-heat-cell-weekly {
-     --observability-heat-weekly: #b45309;
-     fill: var(--observability-heat-weekly);
+     fill: var(--chart-heat, #0e7490);
  }
 
  .observability-chart-bar {
@@ -8188,18 +8230,12 @@ a.about-link:hover {
   font-size: 12px;
 }
 
-.settings-backup-restore-btn {
+.settings-backup-size {
+  color: var(--text-muted, #8a8580);
+  white-space: nowrap;
   flex-shrink: 0;
-  padding: 2px 10px;
+  font-family: var(--font-mono, monospace);
   font-size: 12px;
-  background: none;
-  border: 1px solid var(--border, #d1cdc8);
-  cursor: default;
-  color: var(--text, #3d3833);
-}
-
-.settings-backup-restore-btn:hover {
-  background: var(--bg-hover, #f5f2ed);
 }
 
 .settings-text-btn {
@@ -8411,6 +8447,12 @@ a.about-link:hover {
     flex-direction: column;
     gap: var(--space-12);
     min-width: 0;
+}
+
+/* 四张图表卡片（data-chart）是悬停提示层 observability-chart-tip 的定位基准：
+   缺 position: relative 时 absolute 提示会逃逸到外层容器，表现为不跟随鼠标。 */
+.observability-panel[data-chart] {
+    position: relative;
 }
 
 .observability-panel-title {
@@ -10491,3 +10533,324 @@ a.about-link:hover {
      line-height: 2;
      margin-bottom: var(--space-16);
  }
+
+/* ── 快捷键标签页（KeybindingsTab）────────────────────────────── */
+
+/* ── 快捷键设置（KeybindingsTab）────────────────────────────── */
+
+.kb-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-12);
+    margin-bottom: var(--space-12);
+}
+
+.kb-search {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    flex: 1;
+    max-width: 320px;
+    height: 32px;
+    padding: 0 12px;
+    border: var(--border-width, 1px) solid var(--border);
+    border-radius: var(--radius-input, 8px);
+    background: var(--bg-card);
+    color: var(--text-muted);
+}
+
+.kb-search input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-size: var(--fs-caption);
+}
+
+.kb-reset-all {
+    height: 32px;
+    padding: 0 14px;
+    border: var(--border-width, 1px) solid var(--border);
+    border-radius: var(--radius-input, 8px);
+    background: var(--bg-card);
+    color: var(--text);
+    font: inherit;
+    font-size: var(--fs-caption);
+    cursor: default;
+    transition: border-color 0.12s ease, color 0.12s ease;
+}
+
+.kb-reset-all:hover:not(:disabled) {
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+    color: var(--accent);
+}
+
+.kb-reset-all:disabled {
+    opacity: 0.48;
+}
+
+.kb-table {
+    display: flex;
+    flex-direction: column;
+    border: var(--border-width, 1px) solid var(--border);
+    border-radius: var(--radius-input, 10px);
+    overflow: hidden;
+}
+
+.kb-head {
+    display: grid;
+    grid-template-columns: minmax(200px, 1.1fr) minmax(260px, 2fr) 92px 48px;
+    gap: var(--space-12);
+    padding: 8px var(--space-16);
+    background: color-mix(in srgb, var(--accent) 5%, var(--bg-card));
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.kb-row {
+    display: grid;
+    grid-template-columns: minmax(200px, 1.1fr) minmax(260px, 2fr) 92px 48px;
+    gap: var(--space-12);
+    padding: 10px var(--space-16);
+    border-top: var(--border-width, 1px) solid var(--border);
+    align-items: center;
+    transition: background 0.12s ease;
+}
+
+.kb-row:hover {
+    background: color-mix(in srgb, var(--accent) 3%, transparent);
+}
+
+.kb-cell-command {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.kb-command-name {
+    font-size: var(--fs-body);
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.35;
+}
+
+.kb-command-hint {
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.kb-cell-bindings {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    min-width: 0;
+}
+
+.kb-binding-line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 26px;
+}
+
+.kb-unbound {
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    padding: 0 10px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--text-muted) 8%, transparent);
+    color: var(--text-muted);
+    font-size: var(--fs-caption);
+    font-style: italic;
+}
+
+.kb-binding-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+}
+
+.kb-binding-line:hover .kb-binding-actions,
+.kb-binding-line:focus-within .kb-binding-actions {
+    opacity: 1;
+}
+
+.kb-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: default;
+}
+
+.kb-icon-btn:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent);
+}
+
+.kb-icon-btn:disabled {
+    opacity: 0.4;
+}
+
+.kb-recording-slot {
+    display: inline-flex;
+    align-items: center;
+    min-width: 168px;
+    max-width: 320px;
+    height: 26px;
+    padding: 0 10px;
+    border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border));
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--accent) 10%, var(--bg-card));
+    color: var(--accent);
+    font-size: var(--fs-caption);
+    animation: kb-recording-pulse 1.6s ease-in-out infinite;
+}
+
+.kb-recording-hinted {
+    animation: none;
+    color: var(--warning, #d97706);
+    border-color: color-mix(in srgb, var(--warning, #d97706) 45%, var(--border));
+    background: color-mix(in srgb, var(--warning, #d97706) 8%, var(--bg-card));
+}
+
+@keyframes kb-recording-pulse {
+    0%, 100% { border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); }
+    50% { border-color: color-mix(in srgb, var(--accent) 20%, var(--border)); }
+}
+
+/* 全局键位占用状态徽标 */
+.kb-availability {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 18px;
+    padding: 0 7px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.kb-availability::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 999px;
+    background: currentColor;
+}
+
+.kb-avail-ok {
+    color: #16a34a;
+    background: color-mix(in srgb, #22c55e 12%, transparent);
+}
+
+.kb-avail-taken {
+    color: #dc2626;
+    background: color-mix(in srgb, #ef4444 12%, transparent);
+}
+
+.kb-avail-checking {
+    color: var(--text-muted);
+    background: color-mix(in srgb, var(--text-muted) 8%, transparent);
+}
+
+.kb-avail-unavailable {
+    color: var(--text-muted);
+    background: color-mix(in srgb, var(--text-muted) 8%, transparent);
+}
+
+.kb-add-binding {
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    padding: 0 10px;
+    border: var(--border-width, 1px) dashed var(--border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: var(--fs-caption);
+    cursor: default;
+    transition: color 0.12s ease, border-color 0.12s ease;
+}
+
+.kb-add-binding:hover:not(:disabled) {
+    color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+}
+
+.kb-add-binding:disabled {
+    opacity: 0.4;
+}
+
+.kb-cell-scope {
+    display: flex;
+    align-items: center;
+}
+
+.kb-scope-badge {
+    display: inline-flex;
+    align-items: center;
+    height: 21px;
+    padding: 0 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.kb-scope-global {
+    background: color-mix(in srgb, var(--accent) 13%, transparent);
+    color: var(--accent);
+}
+
+.kb-scope-app {
+    background: color-mix(in srgb, #22c55e 13%, transparent);
+    color: #16a34a;
+}
+
+.kb-scope-local {
+    background: color-mix(in srgb, #f59e0b 15%, transparent);
+    color: #d97706;
+}
+
+.kb-cell-ops {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.kb-empty {
+    padding: var(--space-16);
+    border-top: var(--border-width, 1px) solid var(--border);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: var(--fs-caption);
+}
+
+.kb-footnote {
+    margin: var(--space-10) 0 0;
+    font-size: var(--fs-caption);
+    line-height: 1.5;
+    color: var(--text-muted);
+}

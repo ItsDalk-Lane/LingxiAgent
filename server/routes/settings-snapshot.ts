@@ -10,6 +10,7 @@ import { buildBridgeStatus } from "./bridge.ts";
 import { buildComputerUsePreferences } from "./preferences.ts";
 import { normalizeNotificationPreferences } from "../../shared/notification-preferences.ts";
 import { normalizeQuickChatPreferences } from "../../shared/quick-chat-preferences.ts";
+import { normalizeKeybindings } from "../../shared/keybindings-preferences.ts";
 import { normalizeBrowserPreferences } from "../../shared/browser-preferences.ts";
 import { normalizeSearchApiKeys, SEARCH_API_PROVIDER_IDS } from "../../shared/search-providers.ts";
 import { maskObjectSecrets, maskSecretValue } from "../../shared/secret-custody.ts";
@@ -217,6 +218,7 @@ export function createSettingsSnapshotRoute(engine: any, options: Record<string,
         globalModels: buildGlobalModels(engine),
         preferences: {
           quickChat: engine.getQuickChatPreferences?.() || normalizeQuickChatPreferences({}),
+          keybindings: engine.getKeybindings?.() || normalizeKeybindings({}),
           browser: engine.getBrowserPreferences?.() || normalizeBrowserPreferences({}),
           notifications: engine.getNotificationPreferences?.() || normalizeNotificationPreferences({}),
           bridge: buildBridgePreferences(engine),

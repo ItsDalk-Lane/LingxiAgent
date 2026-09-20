@@ -55,6 +55,8 @@ const PRE_REFACTOR_MOUNT_CALLS = Object.freeze([
   '"/api" :: createCommandsRoute',
   '"/api" :: createConfigRoute',
   '"/api" :: createConfirmRoute',
+  // 会话地图（conversation map）：turns 投影 + 画布布局持久化面（挂载点 open-root）。
+  '"/api" :: createConversationMapRoute',
   '"/api" :: createDeskRoute',
   '"/api" :: createDevicesRoute',
   '"/api" :: createDiaryRoute',

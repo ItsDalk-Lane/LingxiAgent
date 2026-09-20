@@ -1,5 +1,5 @@
 /**
- * ObservabilityProviderBarChart.tsx — 「供应商调用分布」（固定 · 供应商 × 日期，近 30 天）。
+ * ObservabilityProviderBarChart.tsx — 「调用分布」（近 30 天）。
  *
  * 每天一根柱、柱内按供应商分段堆叠；「调用次数 / Token 用量」可单选可
  * 同显（同显 = 上下两层）。悬停显示当日每个供应商的量 + 当日总量。
@@ -19,8 +19,8 @@ import {
   formatAxisDate,
   localDateKey,
   MetricToggle,
-  placeChartTip,
   seriesColor,
+  svgAnchor,
   useObservabilityChartBuckets,
   type ChartMetricSelection,
   type ChartTip,
@@ -98,7 +98,8 @@ export function ObservabilityProviderBarChart({ refreshToken }: { refreshToken: 
 
   const onMove = (evt: React.MouseEvent) => {
     const svg = svgRef.current;
-    if (!svg) return;
+    const card = cardRef.current;
+    if (!svg || !card) return;
     const rect = svg.getBoundingClientRect();
     const viewX = ((evt.clientX - rect.left) / rect.width) * VIEW_W;
     const index = Math.max(0, Math.min(n - 1, Math.floor((viewX - VIEW_L) / slot)));
@@ -114,22 +115,29 @@ export function ObservabilityProviderBarChart({ refreshToken }: { refreshToken: 
         name: item.name,
         value: chartMetricValue(value, metric),
       }));
+    // 锚定当日柱体：提示框放点左右，所指柱子始终可见。
+    const bar = svgAnchor(svg, card, VIEW_W, xCenter(index), VIEW_H / 2);
+    const mouseY = evt.clientY - card.getBoundingClientRect().top;
     setTip({
       title: `${formatAxisDate(day.key)} · ${t('settings.observability.charts.dailyTotal')}`,
       rows,
       total: { label: t('settings.observability.charts.dailyTotal'), value: chartMetricValue(dayTotal, metric) },
+      anchor: {
+        cx: bar.cx,
+        cy: mouseY,
+        w: Math.max(barWidth * bar.scale, 9),
+        placement: 'horizontal',
+        fy: mouseY,
+      },
     });
-    placeChartTip(tipRef.current, cardRef.current, evt);
   };
 
   return (
     <section className={styles['observability-panel']} ref={cardRef} data-chart="provider-bar">
       <ChartHead
         title={t('settings.observability.charts.bar.title')}
-        badge={t('settings.observability.charts.fixedBadgeProviderDate')}
         right={<MetricToggle value={metric} onChange={setMetric} />}
       />
-      <div className={styles['observability-chart-hint']}>{t('settings.observability.charts.bar.hint')}</div>
       {activeSeries.length > 0 && <ChartLegend items={activeSeries.map((item) => ({ color: item.color, label: item.name }))} />}
       {error ? <ChartNotice kind="error" /> : loading ? <ChartNotice kind="loading" /> : (
         <svg

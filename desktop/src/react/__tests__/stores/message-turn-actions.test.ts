@@ -98,6 +98,8 @@ describe('message turn actions', () => {
       sessionId: 'sess_child',
       sessionPath: '/sessions/child.jsonl',
       agentId: 'hana',
+      // 分叉谱系：服务端未回传源会话 id 时规范化为 null（字段不缺省）。
+      sourceSessionId: null,
     });
     const init = vi.mocked(lingxiFetch).mock.calls[0][1];
     expect(JSON.parse(String(init?.body))).toEqual({

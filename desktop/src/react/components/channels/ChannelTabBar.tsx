@@ -35,10 +35,11 @@ export function switchTab(tab: TabType) {
 
 // ── Tab list ──
 
-const FIXED_TABS: TabType[] = ['chat', 'channels'];
+const FIXED_TABS: TabType[] = ['chat', 'map', 'channels'];
 
 function getTabLabel(tab: TabType): string {
   if (tab === 'chat') return t('channel.chatTab');
+  if (tab === 'map') return t('channel.mapTab');
   if (tab === 'channels') return t('channel.tab');
   return tab;
 }
@@ -88,7 +89,7 @@ export function ChannelTabBar() {
   // Restore saved tab on mount（只恢复仍存在的页签：旧版本存过已移除的 'knowledge'）
   useEffect(() => {
     const savedTab = localStorage.getItem('hana-tab');
-    if (savedTab === 'chat' || savedTab === 'channels') {
+    if (savedTab === 'chat' || savedTab === 'map' || savedTab === 'channels') {
       if (savedTab !== 'chat') switchTab(savedTab);
     } else if (savedTab) {
       localStorage.setItem('hana-tab', 'chat');

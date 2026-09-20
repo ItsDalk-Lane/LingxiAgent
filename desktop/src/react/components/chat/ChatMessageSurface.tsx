@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useStat
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import { useStore } from '../../stores';
 import { sessionScopedListIncludes, sessionScopedValue } from '../../stores/session-slice';
-import { loadMoreMessages, reconcileCurrentSessionMessages } from '../../stores/session-actions';
+import { loadMoreMessages, reconcileCurrentSessionMessages, ensureCompleteHistoryForTimeline } from '../../stores/session-actions';
 import { useBoxSelection } from '../../hooks/use-box-selection';
 import { useContinuousBottomScroll } from '../../hooks/use-continuous-bottom-scroll';
 import { useI18n } from '../../hooks/use-i18n';
@@ -81,9 +81,11 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
     active,
     stickyThreshold: SCROLL_THRESHOLD,
   });
+  // 时间线锚点基于全部已加载消息（不只渲染窗口）：标题目录要覆盖整个会话。
+  // 流式期间 items 高频变化会重算锚点，线性扫描成本可控，不做额外缓存。
   const timelineAnchors = useMemo(() => (
-    active && timelinePrepared ? buildTimelineAnchors(visibleItems) : EMPTY_TIMELINE_ANCHORS
-  ), [active, timelinePrepared, visibleItems]);
+    active && timelinePrepared ? buildTimelineAnchors(items) : EMPTY_TIMELINE_ANCHORS
+  ), [active, timelinePrepared, items]);
   const emitScrollButton = useCallback((state: ChatScrollButtonState) => {
     onScrollButtonChange?.(state);
   }, [onScrollButtonChange]);
@@ -235,6 +237,26 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
     }
     prevLen.current = items.length;
   }, [items, items.length, active, bottomScroll]);
+
+  // 时间线被唤起（首次进入热区）且历史仍有未加载页时，拉一次全量让锚点覆盖
+  // 整个会话；普通打开会话仍走 50 条快速路径，不受影响。已是全量则为空操作。
+  useEffect(() => {
+    if (!active || variant === 'card' || !timelinePrepared || !hasMore) return;
+    void ensureCompleteHistoryForTimeline(sessionPath);
+  }, [active, hasMore, sessionPath, timelinePrepared, variant]);
+
+  // 目标锚点在渲染窗口外（无 DOM 可测位置）：走消息定位管线（扩窗 → 等元素 →
+  // 滚动 + 高亮），与查找定位同一套逻辑。历史消息 id 是数字序号；live id
+  //（新建会话）非数字且必然在窗口内，不进这条路。
+  const handleTimelineLocate = useCallback((anchor: TimelineAnchor) => {
+    const numericId = Number(anchor.messageId);
+    if (!Number.isFinite(numericId)) return;
+    useStore.getState().requestMessageLocate({
+      sessionPath,
+      messageIndex: numericId,
+      term: '',
+    });
+  }, [sessionPath]);
 
   const { t } = useI18n();
   const findState = useStore(s => sessionScopedValue(s, s.chatFindBySession, sessionPath));
@@ -501,6 +523,8 @@ export const ChatMessageSurface = memo(function ChatMessageSurface({
         messageElementsRef={messageElementsRef}
         active={active}
         railVisible={timelineRailVisible}
+        exitFollow={bottomScroll.cancelFollow}
+        onLocate={handleTimelineLocate}
       />
       {boxSelection.box && (
         <div

@@ -34,7 +34,7 @@ function makeMockPrefs( initial: any = {}) {
     },
     getThinkingLevel: () => store.thinking_level || "medium",
     setThinkingLevel(v) { store.thinking_level = v; },
-    getFileBackup: () => store.file_backup || { enabled: false, retention_days: 1, max_file_size_kb: 1024 },
+    getFileBackup: () => store.file_backup || { retention_days: 1 },
     setFileBackup(v) { store.file_backup = { ...(store.file_backup || {}), ...v }; },
     _store: store,
   };
@@ -251,13 +251,21 @@ describe("update-settings-tool", () => {
     });
   });
 
-  describe("file_backup toggle", () => {
-    it("enables file backup", async () => {
+  describe("file_backup retention", () => {
+    it("applies retention days", async () => {
       const { tool, engine } = buildTool({ prefsData: {} });
-      await tool.execute("c3", { action: "apply", key: "file_backup", value: "true" });
+      await tool.execute("c3", { action: "apply", key: "file_backup", value: "7" });
 
       expect(engine.setFileBackup).toHaveBeenCalled();
-      expect(engine.setFileBackup.mock.calls[0][0]).toEqual({ enabled: true });
+      expect(engine.setFileBackup.mock.calls[0][0]).toEqual({ retention_days: 7 });
+    });
+
+    it("rejects values outside the option list without mutating preferences", async () => {
+      const { tool, engine } = buildTool({ prefsData: {} });
+      const result = await tool.execute("c3", { action: "apply", key: "file_backup", value: "not-a-number" });
+
+      expect(engine.setFileBackup).not.toHaveBeenCalled();
+      expect(result.content[0].text).toContain("1");
     });
   });
 

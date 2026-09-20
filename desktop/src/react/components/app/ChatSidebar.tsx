@@ -139,7 +139,7 @@ export function ChatSidebar({
   return (
     <aside className={`sidebar${open ? '' : ' collapsed'}`} id="sidebar">
       <div className="sidebar-inner">
-        <div className={`sidebar-chat-content${currentTab === 'chat' ? '' : ' hidden'}`}>
+        <div className={`sidebar-chat-content${currentTab === 'chat' || currentTab === 'map' ? '' : ' hidden'}`}>
           <ChatSidebarContent {...contentProps} />
         </div>
 

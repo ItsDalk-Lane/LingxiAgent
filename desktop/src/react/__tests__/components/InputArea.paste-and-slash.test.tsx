@@ -856,10 +856,14 @@ describe('InputArea paste and slash menu behavior', () => {
       expect(mocks.wsSend).toHaveBeenCalledTimes(1);
     });
     const payload = JSON.parse(String(mocks.wsSend.mock.calls[0][0]));
+    // 聊天引用走角色标注信封（助手消息），文件引用保持标题+行号+路径信封。
     expect(payload.text).toBe([
       '请继续',
       '',
-      '[引用片段] 原句一',
+      '[引用片段] 来自对话中的助手消息',
+      '[引用原文]',
+      '原句一',
+      '[/引用原文]',
       '',
       '[引用片段] note.md（第2-2行，共3字）路径: /notes/note.md',
       '[引用原文]',

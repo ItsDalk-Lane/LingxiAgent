@@ -110,6 +110,7 @@ import {
 import { attachFilesFromPaths } from '../MainContent';
 import { searchDeskFiles } from '../stores/desk-actions';
 import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { VOICE_RECORD_TOGGLE_EVENT } from '../keybindings/useKeybindings';
 import type { DeskSearchResult } from '../types';
 import styles from './input/InputArea.module.css';
 import type { AudioWaveform, ChatListItem, QueuedTurnInput, SessionConfirmationBlock, SessionModel } from '../stores/chat-types';
@@ -946,7 +947,8 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
   }, [inputText, slashCommands]);
 
   useEffect(() => {
-    setSlashSelected(index => Math.min(index, Math.max(filteredCommands.length - 1, 0)));
+    /* -1 表示无选中（刚打开未悬停），不参与钳制，避免被误拉回第一条高亮 */
+    setSlashSelected(index => (index < 0 ? index : Math.min(index, Math.max(filteredCommands.length - 1, 0))));
   }, [filteredCommands.length]);
 
   const fileMentionItems = useMemo(() => buildFileMentionItems({
@@ -1026,6 +1028,7 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
 
   const openSlashMenu = useCallback(() => {
     slashDismissedTextRef.current = null;
+    setSlashSelected(-1); /* 每次打开不继承上次的悬停高亮，无选中态直到鼠标或方向键介入 */
     setSlashMenuOpen(true);
   }, []);
 
@@ -1428,16 +1431,14 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
 
   useEffect(() => {
     if (surface !== 'desktop') return undefined;
-    const handleVoiceShortcut = (event: KeyboardEvent) => {
-      const key = event.key.toLowerCase();
-      const mod = event.metaKey || event.ctrlKey;
-      if (!mod || !event.shiftKey || event.altKey || key !== 'm') return;
+    // 键位匹配已收拢到 app-init 的 keybindings dispatcher（设置→快捷键可改键）；
+    // 这里只监听 dispatcher 广播的命中事件，上下文门槛（聊天页聚焦、无弹层等）仍由本组件判断。
+    const handleVoiceShortcut = () => {
       if (!canUseVoiceShortcut()) return;
-      event.preventDefault();
       handleAudioRecordToggle();
     };
-    window.addEventListener('keydown', handleVoiceShortcut);
-    return () => window.removeEventListener('keydown', handleVoiceShortcut);
+    window.addEventListener(VOICE_RECORD_TOGGLE_EVENT, handleVoiceShortcut);
+    return () => window.removeEventListener(VOICE_RECORD_TOGGLE_EVENT, handleVoiceShortcut);
   }, [canUseVoiceShortcut, handleAudioRecordToggle, surface]);
 
   useEffect(() => {
@@ -2283,7 +2284,7 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
     }
     if (slashMenuOpen && filteredCommands.length > 0) {
       if (e.key === 'ArrowDown') { e.preventDefault(); setSlashSelected(i => (i + 1) % filteredCommands.length); return true; }
-      if (e.key === 'ArrowUp') { e.preventDefault(); setSlashSelected(i => (i - 1 + filteredCommands.length) % filteredCommands.length); return true; }
+      if (e.key === 'ArrowUp') { e.preventDefault(); setSlashSelected(i => (i < 0 ? filteredCommands.length - 1 : (i - 1 + filteredCommands.length) % filteredCommands.length)); return true; }
       if (e.key === 'Tab' || e.key === 'Enter') {
         e.preventDefault();
         const cmd = filteredCommands[slashSelected] || filteredCommands[0];

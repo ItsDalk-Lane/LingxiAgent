@@ -57,8 +57,6 @@ const THEME_MODE_KEYS: Record<string, string> = Object.fromEntries([
   [registry.AUTO_OPTION.id, registry.AUTO_OPTION.i18nMode],
 ]);
 
-const VOICE_RECORD_SHORTCUT_MAC = ['⌘', '⇧', 'M'];
-const VOICE_RECORD_SHORTCUT_DEFAULT = ['Ctrl', 'Shift', 'M'];
 
 type MarkdownTypographyKey = Exclude<keyof EditorMarkdownTypography, 'fontPreset'>;
 type MarkdownNumericTypographyKey = Exclude<MarkdownTypographyKey, 'contentWidth' | 'bodyFontSize'>;
@@ -114,7 +112,6 @@ function formatBodyFontSizeOffset(offset: number): string {
 
 export function InterfaceTab() {
   const settingsConfig = useSettingsStore(s => s.settingsConfig);
-  const platformName = useSettingsStore(s => s.platformName);
   const showToast = useSettingsStore(s => s.showToast);
   const [appearancePrefs, setAppearancePrefs] = useState<AppearancePrefs>(() => readAppearancePrefs());
   const [sidebarUiPrefs, setSidebarUiPrefs] = useState<SidebarUiPrefs | null>(null);
@@ -171,9 +168,6 @@ export function InterfaceTab() {
     })),
   ];
   const hardwareAccelerationEnabled = readConfigBoolean(settingsConfig, cfg => cfg.hardware_acceleration, true);
-  const voiceShortcutKeys = platformName === 'darwin'
-    ? VOICE_RECORD_SHORTCUT_MAC
-    : VOICE_RECORD_SHORTCUT_DEFAULT;
 
   useEffect(() => {
     let cancelled = false;
@@ -621,23 +615,6 @@ export function InterfaceTab() {
               value={currentTz}
               onChange={(val) => autoSaveConfig({ timezone: val })}
             />
-          }
-        />
-      </SettingsSection>
-
-      <SettingsSection title={t('settings.interface.shortcuts')}>
-        <SettingsRow
-          label={t('settings.interface.voiceRecordingShortcut')}
-          hint={t('settings.interface.voiceRecordingShortcutHint')}
-          control={
-            <div
-              className={styles['shortcut-keycaps']}
-              aria-label={voiceShortcutKeys.join(' + ')}
-            >
-              {voiceShortcutKeys.map(key => (
-                <kbd key={key} className={styles['shortcut-keycap']}>{key}</kbd>
-              ))}
-            </div>
           }
         />
       </SettingsSection>

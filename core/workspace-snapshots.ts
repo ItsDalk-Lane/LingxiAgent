@@ -721,3 +721,96 @@ export function getWorkspaceSnapshotService({ lingxiHome, log }: { lingxiHome: s
   }
   return service;
 }
+
+/** 扫描所有仍存活会话的快照侧车，收集它们引用的工作区根目录（resolve 后比较）。 */
+function collectAliveSnapshotWorkspaceRoots(lingxiHome: string): Set<string> {
+  const roots = new Set<string>();
+  const agentsDir = path.join(path.resolve(lingxiHome), "agents");
+  let agents: fs.Dirent[] = [];
+  try { agents = fs.readdirSync(agentsDir, { withFileTypes: true }); } catch { return roots; }
+  for (const agent of agents) {
+    if (!agent.isDirectory()) continue;
+    // 活跃会话与归档会话的侧车都可能存活（归档会话可恢复），两边都扫。
+    for (const sub of ["", "archived"]) {
+      const dir = path.join(agentsDir, agent.name, "sessions", sub);
+      let files: string[] = [];
+      try { files = fs.readdirSync(dir); } catch { continue; }
+      for (const name of files) {
+        if (!name.endsWith(".snapshots.json")) continue;
+        try {
+          const parsed = JSON.parse(fs.readFileSync(path.join(dir, name), "utf-8"));
+          if (typeof parsed?.workspaceRoot === "string" && parsed.workspaceRoot) {
+            roots.add(path.resolve(parsed.workspaceRoot));
+          }
+        } catch {
+          // 侧车损坏不影响清理判定，跳过
+        }
+      }
+    }
+  }
+  return roots;
+}
+
+export type DeleteSessionSnapshotsResult = {
+  removedSidecars: string[];
+  removedRepoDirs: string[];
+  keptSharedRepoDirs: string[];
+};
+
+/**
+ * 会话删除联动清理：账本（侧车文件）必删；影子仓库目录仅在没有其他
+ * 会话侧车引用同一工作区时才整目录删除。
+ *
+ * 共享仓库时保留目录是必要的：多会话共用同一工作区时 commit 链交织，
+ * git 对象模型无法按会话摘除链中间节点；等最后一个引用会话删除时
+ * 这里会把它整目录删掉，数据最终不会残留。
+ */
+export function deleteSessionSnapshotsSync(lingxiHome: string, sessionPaths: string[]): DeleteSessionSnapshotsResult {
+  const result: DeleteSessionSnapshotsResult = {
+    removedSidecars: [],
+    removedRepoDirs: [],
+    keptSharedRepoDirs: [],
+  };
+  if (!lingxiHome || !Array.isArray(sessionPaths)) return result;
+
+  const touchedWorkspaces = new Set<string>();
+  for (const sessionPath of sessionPaths) {
+    if (typeof sessionPath !== "string" || !sessionPath) continue;
+    const sidecarPath = snapshotSidecarPath(sessionPath);
+    try {
+      const raw = fs.readFileSync(sidecarPath, "utf-8");
+      const parsed = JSON.parse(raw);
+      if (typeof parsed?.workspaceRoot === "string" && parsed.workspaceRoot) {
+        touchedWorkspaces.add(path.resolve(parsed.workspaceRoot));
+      }
+    } catch {
+      // 侧车不存在或已损坏：路径本身不再可用，跳过
+    }
+    try {
+      // 只在文件确实存在时才删除并计入结果，避免把幂等空调用记成已清理
+      if (fs.existsSync(sidecarPath)) {
+        fs.rmSync(sidecarPath, { force: true });
+        result.removedSidecars.push(sidecarPath);
+      }
+    } catch {
+      // 删不掉不阻塞会话删除
+    }
+  }
+  if (!touchedWorkspaces.size) return result;
+
+  const aliveRoots = collectAliveSnapshotWorkspaceRoots(lingxiHome);
+  for (const root of touchedWorkspaces) {
+    const repoRoot = workspaceSnapshotRoot(lingxiHome, root);
+    if (aliveRoots.has(root)) {
+      result.keptSharedRepoDirs.push(repoRoot);
+      continue;
+    }
+    try {
+      fs.rmSync(repoRoot, { recursive: true, force: true });
+      result.removedRepoDirs.push(repoRoot);
+    } catch {
+      // 目录删除失败不阻塞会话删除，残留目录下次同工作区会话删除时重试
+    }
+  }
+  return result;
+}

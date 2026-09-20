@@ -37,11 +37,13 @@ function createFakeSession({
     model: { contextWindow },
     settingsManager,
     isCompacting: false,
+    _emit: vi.fn(),
     agent: {
       state: { messages: [...messages] },
     },
     sessionManager: {
       getBranch: vi.fn(() => branch),
+      getSessionFile: vi.fn(() => "/tmp/fake-session.jsonl"),
       appendCustomMessageEntry: vi.fn(() => "entry-1"),
       buildSessionContext: vi.fn(() => ({ messages: rebuiltMessages })),
     },
@@ -67,9 +69,10 @@ function createAssistantTurn(totalTokens: number, overrides: Record<string, any>
 
 describe("computeCompactionReserveTokens", () => {
   it("scales the reserve with the context window but never below the floor", () => {
-    expect(computeCompactionReserveTokens(200_000)).toBe(20_000);
-    expect(computeCompactionReserveTokens(100_000)).toBe(16_384);
-    expect(computeCompactionReserveTokens(1_048_576)).toBe(104_858);
+    // reserve = max(16384, 20% of window)，触发点即 80% 强制线
+    expect(computeCompactionReserveTokens(200_000)).toBe(40_000);
+    expect(computeCompactionReserveTokens(100_000)).toBe(20_000);
+    expect(computeCompactionReserveTokens(1_048_576)).toBe(209_716);
   });
 
   it("falls back to the floor for missing or nonsensical windows", () => {
@@ -80,10 +83,10 @@ describe("computeCompactionReserveTokens", () => {
     expect(computeCompactionReserveTokens(Number.POSITIVE_INFINITY)).toBe(16_384);
   });
 
-  it("places the trigger point at the smaller of 90% of the window and window minus the floor", () => {
+  it("places the trigger point at the smaller of 80% of the window and window minus the floor", () => {
     for (const window of [200_000, 1_048_576]) {
       const triggerPoint = window - computeCompactionReserveTokens(window);
-      expect(triggerPoint).toBe(Math.min(Math.floor(0.9 * window), window - FLOOR_RESERVE));
+      expect(triggerPoint).toBe(Math.min(Math.floor(0.8 * window), window - FLOOR_RESERVE));
     }
   });
 });
@@ -95,10 +98,10 @@ describe("installDynamicCompactionReserve", () => {
 
     installDynamicCompactionReserve(session);
 
-    expect(settingsManager.getCompactionSettings().reserveTokens).toBe(100_000);
+    expect(settingsManager.getCompactionSettings().reserveTokens).toBe(200_000);
 
     session.model = { contextWindow: 120_000 };
-    expect(settingsManager.getCompactionSettings().reserveTokens).toBe(16_384);
+    expect(settingsManager.getCompactionSettings().reserveTokens).toBe(24_000);
   });
 
   it("is idempotent", () => {
@@ -110,7 +113,7 @@ describe("installDynamicCompactionReserve", () => {
     installDynamicCompactionReserve(session);
 
     expect(settingsManager.getCompactionReserveTokens).toBe(first);
-    expect(settingsManager.getCompactionSettings().reserveTokens).toBe(100_000);
+    expect(settingsManager.getCompactionSettings().reserveTokens).toBe(200_000);
   });
 
   it("throws when the SDK no longer exposes the reserve accessor", () => {
@@ -236,5 +239,82 @@ describe("installMidRunCompaction", () => {
 
     await session.agent.prepareNextTurnWithContext(createAssistantTurn(190_000), undefined);
     expect(runCompaction).toHaveBeenCalledTimes(1);
+  });
+
+  it("emits compaction_suggested in the ask band without compacting", async () => {
+    const { session } = createFakeSession({ contextWindow: 200_000 });
+    const runCompaction = vi.fn(async (_session: any, _options: any) => ({}));
+
+    installMidRunCompaction(session, { runCompaction });
+    await session.agent.prepareNextTurnWithContext(createAssistantTurn(120_000), undefined);
+
+    expect(runCompaction).not.toHaveBeenCalled();
+    const suggestions = session._emit.mock.calls
+      .map(([event]) => event)
+      .filter((event: any) => event.type === "compaction_suggested");
+    expect(suggestions).toHaveLength(1);
+    expect(suggestions[0]).toMatchObject({
+      sessionPath: "/tmp/fake-session.jsonl",
+      percent: 60,
+      askPercent: 50,
+      forcePercent: 80,
+    });
+  });
+
+  it("forces compaction at the force line and emits compaction_auto", async () => {
+    const { session } = createFakeSession({ contextWindow: 200_000 });
+    const runCompaction = vi.fn(async (_session: any, _options: any) => ({}));
+
+    installMidRunCompaction(session, { runCompaction });
+    await session.agent.prepareNextTurnWithContext(createAssistantTurn(170_000), undefined);
+
+    expect(runCompaction).toHaveBeenCalledTimes(1);
+    const autos = session._emit.mock.calls
+      .map(([event]) => event)
+      .filter((event: any) => event.type === "compaction_auto");
+    expect(autos).toHaveLength(1);
+    expect(autos[0]).toMatchObject({ percentBefore: 85, forcePercent: 80 });
+    expect(session._emit.mock.calls.some(([event]: any[]) => event.type === "compaction_suggested")).toBe(false);
+  });
+
+  it("throttles repeated suggestions until usage grows by another 5% of the window", async () => {
+    const { session } = createFakeSession({ contextWindow: 200_000 });
+    const runCompaction = vi.fn(async (_session: any, _options: any) => ({}));
+
+    installMidRunCompaction(session, { runCompaction });
+
+    // 60%：第一次询问
+    await session.agent.prepareNextTurnWithContext(createAssistantTurn(120_000), undefined);
+    // 62.5%（+2.5% 窗口 < 5%）：静默
+    await session.agent.prepareNextTurnWithContext(createAssistantTurn(125_000), undefined);
+    // 72.5%（+12.5% 窗口 >= 5%）：再次询问
+    await session.agent.prepareNextTurnWithContext(createAssistantTurn(145_000), undefined);
+
+    expect(runCompaction).not.toHaveBeenCalled();
+    const suggestions = session._emit.mock.calls
+      .map(([event]) => event)
+      .filter((event: any) => event.type === "compaction_suggested");
+    expect(suggestions).toHaveLength(2);
+    expect(suggestions.map((event: any) => event.percent)).toEqual([60, 73]);
+  });
+
+  it("resets the ask state after a compaction-sized usage drop", async () => {
+    const { session } = createFakeSession({ contextWindow: 200_000 });
+    const runCompaction = vi.fn(async (_session: any, _options: any) => ({}));
+
+    installMidRunCompaction(session, { runCompaction });
+
+    // 60%：第一次询问
+    await session.agent.prepareNextTurnWithContext(createAssistantTurn(120_000), undefined);
+    // 用户手动压缩：用量骤降 70%（>= 20% 窗口）→ 状态重置
+    await session.agent.prepareNextTurnWithContext(createAssistantTurn(60_000), undefined);
+    // 回涨到 61%：重新询问
+    await session.agent.prepareNextTurnWithContext(createAssistantTurn(122_000), undefined);
+
+    const suggestions = session._emit.mock.calls
+      .map(([event]) => event)
+      .filter((event: any) => event.type === "compaction_suggested");
+    expect(suggestions).toHaveLength(2);
+    expect(suggestions.map((event: any) => event.percent)).toEqual([60, 61]);
   });
 });

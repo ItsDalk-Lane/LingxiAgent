@@ -5,7 +5,7 @@
  * 与 blockedReason）。完全无状态：不持有闭包变量，每次调用从参数构建返回值。
  *
  * 校验规则（计划书 §6.3）：
- * - 每次提交完整清单；content/activeForm 去除首尾空白。
+ * - 每次提交完整清单；content/activeForm 去除首尾空白；activeForm 缺省或空白时回落 content。
  * - 空白条目、重复条目明确拒绝（isError），不静默 sanitize。
  * - blocked 必须给出 blockedReason（缺少什么）。
  * - 多个 in_progress 是合法情况（工作实际并行），不再告警。
@@ -39,9 +39,12 @@ function normalizeTodos(input) {
   const rawList = Array.isArray(input) ? input : [];
   rawList.forEach((raw, index) => {
     const content = typeof raw?.content === "string" ? raw.content.trim() : "";
-    const activeForm = typeof raw?.activeForm === "string" ? raw.activeForm.trim() : "";
-    if (!content || !activeForm) {
-      errors.push(`todo[${index}]: content and activeForm must be non-empty after trimming`);
+    // activeForm 缺省或空白时回落 content：UI 需要双文本，但模型漏传时
+    // 不应整单拒绝（历史上多次调用失败均因漏传该字段）
+    const rawActiveForm = typeof raw?.activeForm === "string" ? raw.activeForm.trim() : "";
+    const activeForm = rawActiveForm || content;
+    if (!content) {
+      errors.push(`todo[${index}]: content must be non-empty after trimming`);
       return;
     }
     if (seen.has(content)) {
@@ -121,10 +124,12 @@ export function createTodoTool() {
             minLength: 1,
             description: "Static description of the todo",
           }),
-          activeForm: Type.String({
-            minLength: 1,
-            description: "In-progress form description (shown in UI while in_progress)",
-          }),
+          activeForm: Type.Optional(
+            Type.String({
+              minLength: 1,
+              description: "In-progress form description (shown in UI while in_progress); omit to fall back to content",
+            }),
+          ),
           status: StringEnum(TODO_STATUSES, {
             description: "One of: pending / in_progress / blocked / cancelled / completed",
           }),

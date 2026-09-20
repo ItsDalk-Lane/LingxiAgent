@@ -221,7 +221,8 @@
     "noModelsAvailable": "没有可用模型",
     "toolReadOnly": "只读",
     "toolWrite": "写入",
-    "filesUnsupported": "频道暂只支持文本消息，文件不会加入普通聊天附件"
+    "filesUnsupported": "频道暂只支持文本消息，文件不会加入普通聊天附件",
+    "mapTab": "会话地图"
   },
   "announcement": {
     "title": "更新完成 · v{version}",
@@ -288,7 +289,18 @@
       "loading": "正在载入项目…",
       "empty": "还没有项目"
     },
-    "archivedChats": "归档记录"
+    "archivedChats": "归档记录",
+    "actionBadge": {
+      "approval": "待批准",
+      "askUser": "正在提问",
+      "confirm": "待确认"
+    },
+    "projectArchiveAll": "归档全部对话",
+    "projectArchiveDone": "已归档 {count} 条对话",
+    "projectMore": "更多",
+    "projectNewChat": "新建对话",
+    "projectRemove": "移除工作目录",
+    "runningGroup": "执行中"
   },
   "titlebar": {
     "currentChatTitle": "当前对话标题",
@@ -363,7 +375,16 @@
     },
     "subagentRunStateUnrecoverable": "历史 subagent 运行状态不可恢复",
     "subagentLinkUnrecoverable": "历史 subagent 链接不可恢复",
-    "rcTakingOver": "{platform} 接管中"
+    "rcTakingOver": "{platform} 接管中",
+    "archiveChildrenTitle": "归档这条对话？",
+    "archiveChildrenBody": "它还有 {count} 条由它分叉出的对话，要一起归档吗？",
+    "archiveWithChildren": "连同衍生对话一起归档",
+    "archiveDetachChildren": "仅归档这条对话",
+    "archiveChildrenNeeded": "存在衍生对话，请选择归档方式",
+    "archiveChildSummary": "已归档 {archived} 条衍生对话，{detached} 条保持独立",
+    "collapseChildren": "收起子对话",
+    "expandChildren": "展开子对话",
+    "expandChildrenCount": "展开 {count} 条子对话"
   },
   "common": {
     "on": "开",
@@ -407,6 +428,27 @@
     "back": "返回"
   },
   "chat": {
+    "editedFiles": {
+      "title": "已编辑 {count} 个文件",
+      "viewChanges": "查看更改",
+      "viewUnavailable": "当前工作区没有可关联的 Git 变更",
+      "noGitRepo": "当前工作区不是 Git 仓库，无法用 Git 查看或回退改动",
+      "undo": "撤销",
+      "undoUnavailable": "没有可撤销的文件（可能都是本次新建的文件）",
+      "undoConfirmTitle": "撤销本轮文件改动？",
+      "undoConfirmBody": "将用 Git 回退以下 {count} 个文件的未提交改动（恢复到最近一次提交，新建文件不受影响）：\n{list}",
+      "undoConfirmOk": "撤销改动",
+      "undoDone": "已撤销 {count} 个文件的改动",
+      "undoFailed": "撤销失败",
+      "review": "审核",
+      "reviewUnavailable": "会话空闲时才能发起审核",
+      "reviewSent": "已发起审核，等待助手复查",
+      "reviewQueued": "审核请求已排队，将在当前回合结束后发送",
+      "reviewFailed": "审核请求发送失败",
+      "reviewPrompt": "请审核你本轮修改的这些文件：\n{files}\n检查是否有错误、遗漏或可简化之处，给出简明结论；如需修改请直接动手。",
+      "showMore": "再显示 {count} 个文件",
+      "showLess": "收起"
+    },
     "fileRollback": {
       "menuTitle": "重新生成",
       "conversationOnly": "仅回退对话",
@@ -1504,7 +1546,8 @@
       "experiments": "实验",
       "about": "关于",
       "security": "安全",
-      "envdeps": "环境依赖"
+      "envdeps": "环境依赖",
+      "keybindings": "快捷键"
     },
     "browser": {
       "cookiesTitle": "Cookies",
@@ -2043,7 +2086,9 @@
       "copied": "已复制",
       "saved": "已保存",
       "invalidPort": "端口必须是数字",
-      "loadFailed": "读取访问设置失败"
+      "loadFailed": "读取访问设置失败",
+      "publicBaseUrl": "对外访问地址",
+      "publicBaseUrlHint": "填 Tailscale 虚拟 IP 或公网域名（如 https://lingxi.example.com）；填写后手机地址与二维码优先使用它，外网也可连接，留空则仅局域网"
     },
     "security": {
       "sandbox": "沙盒",
@@ -2068,7 +2113,7 @@
       "networkProxyNoProxy": "不走代理，例如 localhost, 127.0.0.1, ::1",
       "networkProxySave": "保存代理设置",
       "fileBackup": "文件备份",
-      "fileBackupDesc": "AI 修改或删除文件前自动保存原始内容",
+      "fileBackupDesc": "AI 修改或删除文件前自动保存原始内容；到期自动清理，随会话删除一并清除",
       "retention": "保留时长",
       "retention1d": "1 天",
       "retention3d": "3 天",
@@ -2546,7 +2591,7 @@
       "homeFolderClear": "清除",
       "homeFolderBrowse": "选择文件夹",
       "contextFilesTitle": "工作台说明注入",
-      "contextFilesDesc": "把当前工作台项目里的 AGENTS.md / CLAUDE.md 注入到新建会话的系统提示词中，位置在记忆之前。",
+      "contextFilesDesc": "把工作台项目里的 AGENTS.md / CLAUDE.md，以及自定义文件名的说明文件，注入到新建会话的系统提示词中，位置在记忆之前。",
       "injectAgentsMd": "注入 AGENTS.md",
       "injectAgentsMdDesc": "开启后，新会话会读取当前工作目录到 Git 根目录之间的 AGENTS.md。",
       "injectClaudeMd": "注入 CLAUDE.md",
@@ -2557,7 +2602,10 @@
       "discoverProjectSkillsDesc": "发现并加载当前项目 .agents/skills 中的技能。",
       "discoverCompatibleProjectSkills": "加载其他工具的项目技能",
       "discoverCompatibleProjectSkillsDesc": "同时发现项目内 Claude Code、Codex 与 OpenClaw 的技能目录。",
-      "agentDeskSection": "Agent 工作台设置"
+      "agentDeskSection": "Agent 工作台设置",
+      "customFileNamePlaceholder": "输入自定义文件名，例如 QWEN.md",
+      "injectCustomFile": "注入自定义文件",
+      "injectCustomFileDesc": "开启后，新会话会读取当前工作目录到 Git 根目录之间、与下方文件名同名的文件。"
     },
     "toolCaps": {
       "title": "技能安装权限"
@@ -3036,10 +3084,6 @@
         "unknownValue": "（未知）"
       },
       "charts": {
-        "fixedBadgeDate": "固定 · 日期",
-        "fixedBadgeModelDate": "固定 · 模型 × 日期",
-        "fixedBadgeProviderDate": "固定 · 供应商 × 日期",
-        "fixedBadgeCategoryDate": "固定 · 类别 × 日期",
         "empty": "暂无数据",
         "loading": "加载图表数据…",
         "error": "图表加载失败",
@@ -3057,6 +3101,7 @@
           "cumulative": "累计",
           "tooltipCalls": "调用次数",
           "tooltipTokens": "Token 总量",
+          "tooltipHint": "当日调用次数与 Token 用量",
           "weekRange": "{since} – {until} 当周",
           "cumulativeUntil": "截至 {date} 累计",
           "hint": {
@@ -3075,9 +3120,16 @@
         },
         "pie": {
           "title": "类别构成",
-          "hint": "选一天看当天的类别构成；悬停扇区显示该类别的量与当日总计。",
-          "dateLabel": "查看日期"
-        }
+          "viewDaily": "按日",
+          "viewAll": "累计",
+          "allTotal": "累计总量",
+          "dateLabel": "查看日期",
+          "hint": "选一天看当天的类别构成；悬停扇区显示该类别的量与当日总计。"
+        },
+        "fixedBadgeDate": "固定 · 日期",
+        "fixedBadgeModelDate": "固定 · 模型 × 日期",
+        "fixedBadgeProviderDate": "固定 · 供应商 × 日期",
+        "fixedBadgeCategoryDate": "固定 · 类别 × 日期"
       },
       "storage": {
         "retentionTitle": "保留天数",
@@ -3247,7 +3299,8 @@
           "dropped": "payload 在捕获时被丢弃",
           "not_captured": "该调用未捕获 payload",
           "unknown": "无 payload 记录"
-        }
+        },
+        "empty": "暂无调用记录"
       },
       "provenance": {
         "title": "语义输入溯源",
@@ -3958,6 +4011,64 @@
           "less": "收起"
         }
       }
+    },
+    "keybindings": {
+      "title": "快捷键",
+      "addBinding": "添加绑定",
+      "alreadyDefault": "当前已是默认键位",
+      "bindingEmpty": "未绑定",
+      "column": {
+        "command": "命令",
+        "binding": "按键绑定",
+        "actions": "操作",
+        "scope": "作用域"
+      },
+      "conflict": "该按键组合已绑定到其他命令",
+      "editBinding": "修改按键",
+      "footnote": "局部快捷键仅在对应界面聚焦时生效；键位默认区分 macOS 与 Windows/Linux。",
+      "footnoteMac": "局部快捷键仅在对应界面聚焦时生效；⌘ 指 Command 键。",
+      "loadFailed": "读取快捷键偏好失败",
+      "maxBindings": "每个命令最多绑定 3 组按键",
+      "noResults": "没有匹配的快捷键",
+      "recording": "按下新的按键组合…",
+      "recordingModifierOnly": "松开修饰键本身不算按键，请再按一个字母、数字或功能键",
+      "recordingNeedsModifier": "组合键需要包含 ⌘/Ctrl 或 Alt（F1–F12 功能键可单独使用）",
+      "registrationFailed": "快捷键注册失败，可能已被其他应用占用",
+      "removeBinding": "移除该绑定",
+      "resetAll": "全部恢复默认",
+      "resetDone": "已全部恢复默认",
+      "restoreCommand": "恢复默认",
+      "saved": "快捷键已保存",
+      "searchPlaceholder": "搜索快捷键",
+      "systemTaken": "快捷键 {combo} 已被系统或其他应用占用，未保存",
+      "scope": {
+        "global": "全局",
+        "app": "应用",
+        "local": "局部",
+        "globalHint": "系统级生效，应用在后台也可触发",
+        "appHint": "应用内所有窗口生效",
+        "localHint": "仅在特定界面聚焦时生效"
+      },
+      "commands": {
+        "quickChatToggle": "呼出快捷对话",
+        "quickChatToggleHint": "呼出或隐藏快捷对话小窗",
+        "appRestart": "重启软件",
+        "appRestartHint": "退出并重新启动应用，未保存的内容可能丢失",
+        "appOpenSettings": "打开设置",
+        "appOpenSettingsHint": "打开设置窗口",
+        "appNewSession": "新建会话",
+        "appNewSessionHint": "创建一个新会话",
+        "appToggleSidebar": "切换侧边栏",
+        "appToggleSidebarHint": "展开或收起左侧边栏",
+        "voiceRecordToggle": "语音录制/发送",
+        "voiceRecordToggleHint": "主聊天页面聚焦时，按一次开始录音，再按一次结束并发送"
+      },
+      "availability": {
+        "ok": "可用",
+        "taken": "已被占用",
+        "checking": "检测中…",
+        "unavailable": "需在桌面应用内检测"
+      }
     }
   },
   "onboarding": {
@@ -4321,18 +4432,19 @@
     "noCommits": "暂无提交",
     "copyHash": "复制提交 ID",
     "copied": "已复制提交 ID",
-    "timeJustNow": "刚刚",
-    "timeMinutesAgo": "{n} 分钟前",
-    "timeHoursAgo": "{n} 小时前",
-    "timeDaysAgo": "{n} 天前",
+    "historyColGraph": "图",
+    "historyColDescription": "描述",
+    "historyColDate": "日期",
+    "historyColAuthor": "作者",
+    "historyColHash": "提交",
+    "commitFiles": "{n} 个文件",
+    "historyLoading": "提交加载中…",
     "commitTitle": "提交或推送",
-    "commitMessagePlaceholder": "提交信息（留空将自动生成）",
-    "includeUnstaged": "包含未暂存的更改",
     "btnCommit": "提交",
     "btnCommitPush": "提交并推送",
     "btnPush": "推送",
     "nothingToCommit": "没有可提交的更改",
-    "nothingStaged": "没有已暂存的更改（请勾选“包含未暂存的更改”）",
+    "nothingStaged": "没有已暂存的更改",
     "nothingToPush": "没有可推送的提交",
     "noRemote": "未配置远程仓库",
     "aiGenerating": "正在生成提交信息…",
@@ -4362,15 +4474,15 @@
     "unstashPathDirty": "该文件当前有未提交的改动，取出会覆盖它，请先回退或提交",
     "unstashConflict": "取出时发生冲突，储藏条目已保留，请手动处理后重试",
     "discardOneHint": "丢弃该文件未提交的改动，恢复成 HEAD（不可撤销）",
-    "discardUntrackedHint": "未跟踪的新文件不参与回退，避免误删",
+    "discardUntrackedHint": "未跟踪的新文件：放弃将删除这个文件（不可撤销）",
     "discardFileDone": "已回退 {name}",
     "discardAllDone": "已回退全部已跟踪改动",
     "discardFailed": "回退失败",
     "discardNothing": "没有可回退的改动",
     "discardConfirmTitle": "回退修改",
     "discardConfirmOk": "确认回退",
-    "discardConfirmAll": "将丢弃全部已跟踪文件的未提交改动（含已暂存部分），无法撤销。未跟踪的新文件不受影响。",
-    "discardConfirmFiles": "将丢弃这 {count} 个文件的未提交改动（含已暂存部分），无法撤销：\n{list}",
+    "discardConfirmAll": "将丢弃全部已跟踪文件的未提交改动（含已暂存部分），并删除全部未跟踪的新文件，无法撤销。",
+    "discardConfirmFiles": "将丢弃这 {count} 个文件的未提交改动（未跟踪的新文件将被删除），无法撤销：\n{list}",
     "operationFailed": "操作失败",
     "worktreeRow": "新建工作树",
     "worktreeTitle": "在 worktree 中开始新会话",
@@ -4389,7 +4501,55 @@
     "worktreeDirExists": "同名目录已存在，请换个名称",
     "worktreeBranchExists": "该名称对应的 wt/ 分支已存在，请换个名称",
     "worktreeMainTag": "主",
-    "worktreeCurrentTag": "当前"
+    "worktreeCurrentTag": "当前",
+    "btnPull": "拉取",
+    "pullHint": "把远程仓库的新提交拉到本地（仅自动衔接，不产生合并提交）",
+    "pullDone": "已拉取远程更新（{count} 个提交）",
+    "pullUpToDate": "已是最新，无需拉取",
+    "noUpstream": "当前分支未关联远程分支",
+    "pullDiverged": "本地与远程各有新提交，无法自动合并；可在对话中让助手帮忙处理",
+    "pullLocalChanges": "本地未提交改动与远程更新冲突，请先提交或储藏后再拉取",
+    "graphTitle": "源代码管理",
+    "graphMessagePlaceholder": "消息(*Enter 在“{branch}”提交)",
+    "graphCleanTree": "没有更改，工作区是干净的",
+    "stagedChanges": "暂存的更改",
+    "stageAllTitle": "暂存所有更改",
+    "unstageAll": "取消所有暂存修改",
+    "stageOne": "暂存更改",
+    "unstageOne": "取消暂存修改",
+    "discardOneTitle": "放弃更改",
+    "discardAllTitle": "放弃所有更改",
+    "amendBtn": "提交（修改）",
+    "amendHint": "把改动并入上一次提交",
+    "commitSyncBtn": "提交和同步",
+    "commitSyncHint": "先拉远程，再提交并推送",
+    "amendDone": "已并入上一次提交",
+    "stageDone": "已暂存 {name}",
+    "stageAllDone": "已暂存全部改动",
+    "unstageDone": "已取消暂存 {name}",
+    "unstageAllDone": "已取消所有暂存修改",
+    "stageFailed": "暂存失败",
+    "unstageFailed": "取消暂存失败",
+    "syncChanges": "同步更改",
+    "syncPushHint": "推送本地的 {n} 个提交",
+    "syncPullHint": "拉取远程的 {n} 个新提交",
+    "syncBothHint": "先拉取远程的 {n} 个新提交，再推送本地的 {m} 个提交",
+    "aheadHint": "本地领先远程 {n} 个提交",
+    "letterM": "修改",
+    "letterU": "新文件",
+    "letterA": "已暂存的新文件",
+    "letterD": "已删除",
+    "graphFilesMore": "还有 {n} 个文件，可在列表内滚动查看",
+    "graphShowAll": "显示全部 {n} 个文件",
+    "checkBlockEof": "提交被项目的自动检查拦下了：文件末尾有多余的空行（{file} 第 {line} 行），删掉它再提交。",
+    "checkBlockWhitespace": "提交被项目的自动检查拦下了：行尾有多余的空格（{file} 第 {line} 行），清理后重试。",
+    "checkBlockPush": "推送被拒绝了：常见原因是①推送前的自动检查（如整个项目的类型检查）没有通过，②远程分支有你本地没有的新提交。可先拉取一次再看，或在本机终端查看检查输出。",
+    "checkBlockHook": "被项目的自动检查拦下了（提交/推送前的检查没有通过），按检查输出的提示修好后重试。",
+    "refreshInfo": "刷新远程与本地信息",
+    "refreshLocalOnly": "未添加远程仓库，仅刷新本地信息",
+    "refreshDone": "已刷新：本地与远程信息都是最新的",
+    "fetchFailed": "刷新远程信息失败",
+    "noRemoteNotice": "没有添加远程仓库——提交只保存在本地，无法推送到远程。"
   },
   "desk": {
     "title": "书桌",
@@ -5277,7 +5437,7 @@
       "theme": "主题",
       "chatModel": "聊天模型",
       "fileBackup": "文件备份",
-      "fileBackupDesc": "AI 修改文件前自动备份"
+      "fileBackupDesc": "AI 修改文件前自动备份的保留天数（天）"
     },
     "generateImage": {
       "description": "根据文字描述生成图片。非阻塞：提交后立即返回，完成后自动显示。",
@@ -5636,5 +5796,53 @@
     "confirmed": {
       "pending": "已确认回档到「{name}」。本回合结束后自动执行。"
     }
+  },
+  "compaction": {
+    "askTitle": "上下文空间即将过半",
+    "askBody": "当前会话的上下文已使用 {percent}%（已过 {askPercent}% 询问线，到 {forcePercent}% 时会自动压缩）。压缩会把较早的对话收进摘要，为后续对话腾出空间。要现在压缩吗？",
+    "askConfirm": "立即压缩",
+    "askCancel": "暂不",
+    "autoCompleted": "上下文已达 {percent}%，已自动压缩并腾出空间",
+    "deferredToast": "回复结束后将自动压缩上下文"
+  },
+  "labels": {
+    "thinking": "思考"
+  },
+  "map": {
+    "addPhrase": "添加",
+    "branch": "创建分支",
+    "cancel": "取消",
+    "collapse": "折叠后续",
+    "collapseBlockedCurrent": "当前会话位于这个后续分支中，无法折叠",
+    "continue": "继续追问",
+    "draftBranchPlaceholder": "从这里创建分支…",
+    "draftContinuePlaceholder": "接着这个问题继续追问…",
+    "editPhrases": "编辑常用语",
+    "empty": "这个工作区还没有会话",
+    "expand": "展开后续",
+    "followUp": "追问",
+    "hiddenCount": "隐藏 {count} 条后续",
+    "loading": "加载中…",
+    "locate": "定位当前",
+    "openInChat": "在对话中打开",
+    "processLine": "工具调用 {count} 次",
+    "queued": "已加入发送队列，将在对话页自动发送",
+    "quickPhrases": "展开说明|举例|通俗易懂|对比解释",
+    "resetLayout": "重置布局",
+    "resetLayoutConfirm": "确定要重置画布布局吗？",
+    "send": "发送",
+    "sendFailed": "发送失败",
+    "sending": "发送中…",
+    "stats": "{threads} 个会话 · {cards} 张卡片",
+    "toolCount": "工具 {count}",
+    "truncated": "内容已截断",
+    "turnLabel": "第 {index} 轮",
+    "turnsLoadFailed": "加载失败",
+    "waitingForAssistant": "等待助手回复…",
+    "workspace": "工作区",
+    "zoomIn": "放大",
+    "zoomOut": "缩小",
+    "ungrouped": "未分组",
+    "forkBusy": "会话正在生成回复，稍后再试"
   }
 }

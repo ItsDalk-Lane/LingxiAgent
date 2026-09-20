@@ -394,4 +394,45 @@ describe('useContinuousBottomScroll', () => {
 
     expect((controller as unknown as ContinuousBottomScrollController).isStickyRef.current).toBe(false);
   });
+
+  it('主键按压期间冻结跟随，松手后恢复追赶', () => {
+    const metrics = { scrollHeight: 1000, clientHeight: 300, scrollTop: 700 };
+    render(<Harness onController={() => {}} />);
+    const scrollEl = document.querySelector('[data-testid="scroll"]') as HTMLElement;
+    setScrollMetrics(scrollEl, metrics);
+
+    // 按住主键：流式内容增长，跟随动画必须一动不动，卡片不能从光标下滑走。
+    act(() => {
+      scrollEl.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0 }));
+      metrics.scrollHeight = 1060;
+      MockResizeObserver.instances[0].trigger();
+      flushRaf(16);
+      flushRaf(32);
+    });
+    expect(metrics.scrollTop).toBe(700);
+
+    // 松手：从当前时刻继续平滑追赶，不跳变到底。
+    act(() => {
+      window.dispatchEvent(new MouseEvent('pointerup'));
+      flushRaf(48);
+    });
+    expect(metrics.scrollTop).toBeGreaterThan(700);
+    expect(metrics.scrollTop).toBeLessThan(760);
+  });
+
+  it('非主键按压不触发跟随冻结', () => {
+    const metrics = { scrollHeight: 1000, clientHeight: 300, scrollTop: 700 };
+    render(<Harness onController={() => {}} />);
+    const scrollEl = document.querySelector('[data-testid="scroll"]') as HTMLElement;
+    setScrollMetrics(scrollEl, metrics);
+
+    act(() => {
+      scrollEl.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 2 }));
+      metrics.scrollHeight = 1060;
+      MockResizeObserver.instances[0].trigger();
+      flushRaf(16);
+    });
+
+    expect(metrics.scrollTop).toBeGreaterThan(700);
+  });
 });

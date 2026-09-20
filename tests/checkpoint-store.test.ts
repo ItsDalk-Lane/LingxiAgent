@@ -92,18 +92,65 @@ describe("CheckpointStore", () => {
     fs.rmSync(srcDir, { recursive: true, force: true });
   });
 
-  it("save skips known binary extensions", async () => {
+  it("save stores binary files losslessly via base64 (any file type is accepted)", async () => {
     const srcDir = fs.mkdtempSync(path.join(os.tmpdir(), "ckpt-bin-"));
     const pngFile = path.join(srcDir, "image.png");
-    fs.writeFileSync(pngFile, "fake png");
+    // 含无效 utf-8 字节序列，确保走 base64 分支且能无损还原
+    const pngBytes = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0xff, 0xfe, 0x00, 0x42]);
+    fs.writeFileSync(pngFile, pngBytes);
 
     const id = await store.save({
       sessionPath: null,
       tool: "write",
       filePath: pngFile,
-      maxSizeKb: 1024,
     });
-    expect(id).toBeNull();
+    expect(id).toBeTruthy();
+
+    fs.writeFileSync(pngFile, "overwritten");
+    const result = await store.restore(id);
+    expect(result.restoredTo).toBe(pngFile);
+    expect(fs.readFileSync(pngFile)).toEqual(pngBytes);
+
+    fs.rmSync(srcDir, { recursive: true, force: true });
+  });
+
+  it("save has no size limit when maxSizeKb is omitted", async () => {
+    const srcDir = fs.mkdtempSync(path.join(os.tmpdir(), "ckpt-nolimit-"));
+    const bigFile = path.join(srcDir, "big.bin");
+    fs.writeFileSync(bigFile, Buffer.alloc(2048));
+
+    const id = await store.save({
+      sessionPath: null,
+      tool: "write",
+      filePath: bigFile,
+    });
+    expect(id).toBeTruthy();
+
+    fs.rmSync(srcDir, { recursive: true, force: true });
+  });
+
+  it("purgeSession removes only entries owned by that session", async () => {
+    const srcDir = fs.mkdtempSync(path.join(os.tmpdir(), "ckpt-purge-"));
+    const sessionA = "agents/hana/sessions/a.jsonl";
+    const sessionB = "agents/hana/sessions/b.jsonl";
+
+    const fileA = path.join(srcDir, "a.js");
+    fs.writeFileSync(fileA, "a");
+    const fileB = path.join(srcDir, "b.js");
+    fs.writeFileSync(fileB, "b");
+    const fileOrphan = path.join(srcDir, "orphan.js");
+    fs.writeFileSync(fileOrphan, "o");
+
+    await store.save({ sessionPath: sessionA, tool: "write", source: "llm", reason: "tool-write", filePath: fileA });
+    await store.save({ sessionPath: sessionB, tool: "write", source: "llm", reason: "tool-write", filePath: fileB });
+    await store.save({ sessionPath: null, tool: "user-edit", source: "user-edit", reason: "edit-start", filePath: fileOrphan });
+
+    const { purged } = await store.purgeSession(sessionA);
+    expect(purged).toBe(1);
+
+    const remaining = await store.list();
+    expect(remaining).toHaveLength(2);
+    expect(remaining.map((e) => e.path).sort()).toEqual([fileB, fileOrphan].sort());
 
     fs.rmSync(srcDir, { recursive: true, force: true });
   });

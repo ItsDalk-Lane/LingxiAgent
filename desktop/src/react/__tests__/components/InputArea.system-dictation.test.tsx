@@ -334,7 +334,7 @@ describe('输入框无话筒/听写入口（F7 前端入口移除守卫）', () 
     await act(async () => { await new Promise((r) => setTimeout(r, 20)); });
     expect(fetchCalls.some((p) => p.startsWith('/api/media/providers'))).toBe(false);
 
-    fireEvent.keyDown(window, { key: 'm', metaKey: true, shiftKey: true });
+    fireEvent(window, new CustomEvent('hana-voice-record-toggle'));
     await act(async () => { await new Promise((r) => setTimeout(r, 20)); });
     expect(navigator.mediaDevices.getUserMedia).not.toHaveBeenCalled();
     expect(capture.processor).toBeNull();
@@ -351,14 +351,14 @@ describe('输入框无话筒/听写入口（F7 前端入口移除守卫）', () 
     expect(screen.queryByTestId('voice-toggle')).toBeNull();
     expect(screen.queryByTestId('dictate-toggle')).toBeNull();
 
-    fireEvent.keyDown(window, { key: 'm', metaKey: true, shiftKey: true });
+    fireEvent(window, new CustomEvent('hana-voice-record-toggle'));
     await waitFor(() => {
       expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
     });
     // 等录音态真正建立（runtime 已登记、卡片进入 recording 标题）再灌音频块
     await screen.findByText('input.audioRecording');
     pushAudioChunk(capture);
-    fireEvent.keyDown(window, { key: 'm', metaKey: true, shiftKey: true });
+    fireEvent(window, new CustomEvent('hana-voice-record-toggle'));
 
     await waitFor(() => {
       expect(mocks.wsSend).toHaveBeenCalledTimes(1);

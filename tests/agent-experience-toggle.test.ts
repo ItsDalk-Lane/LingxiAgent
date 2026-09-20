@@ -108,10 +108,10 @@ describe("agent experience toggle", () => {
     roots.push(root);
 
     const prompt = agent.buildSystemPrompt();
-    expect(prompt).toContain("SessionFile is a tool-registered session file reference");
-    expect(prompt).toContain("fileId identifies files; label is display-only");
-    expect(prompt).toContain("Use stage_files only to deliver results");
-    expect(prompt).toContain("skip intermediate edits and unchanged files");
+    expect(prompt).toContain("## Session Files and Delivery");
+    expect(prompt).toContain("Operate on session files by fileId; label is display-only");
+    expect(prompt).toContain("Deliver results with stage_files");
+    expect(prompt).toContain("do not re-deliver intermediate or unchanged files");
     expect(prompt).not.toContain("create_artifact");
   });
 

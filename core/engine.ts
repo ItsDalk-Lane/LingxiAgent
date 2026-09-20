@@ -2296,6 +2296,7 @@ export class LingxiEngine {
   }
   async clearSessionTitle(p) { return this._sessionCoord.clearSessionTitle(p); }
   async setSessionPinned(p, pinned) { return this._sessionCoord.setSessionPinned(p, pinned); }
+  async setSessionForkedFrom(p, forkedFrom) { return this._sessionCoord.setSessionForkedFrom(p, forkedFrom); }
   async setSessionPinOrder(orderedRefs) { return this._sessionCoord.setSessionPinOrder(orderedRefs); }
   async setSessionPluginMeta(p, patch) { return this._sessionCoord.setSessionPluginMeta(p, patch); }
   createSessionContext() { return this._sessionCoord.createSessionContext(); }
@@ -2984,20 +2985,22 @@ export class LingxiEngine {
   restoreCheckpoint(id) { return this._checkpointStore.restore(id); }
   removeCheckpoint(id) { return this._checkpointStore.remove(id); }
   async createUserEditCheckpoint({ filePath, reason = "edit-start" }) {
-    const cfg = this._prefs.getFileBackup();
     const id = await this._checkpointStore.save({
       sessionPath: null,
       tool: "user-edit",
       source: "user-edit",
       reason,
       filePath,
-      maxSizeKb: cfg.max_file_size_kb || 1024,
     });
     return id ? { id, path: filePath, reason } : null;
   }
   cleanupCheckpoints() {
     const cfg = this._prefs.getFileBackup();
     return this._checkpointStore.cleanup(cfg.retention_days || 1);
+  }
+  /** 会话删除联动：清掉该会话名下的全部改前存档 */
+  purgeSessionCheckpoints(sessionPath) {
+    return this._checkpointStore.purgeSession(sessionPath);
   }
   /** 回到具名存档点（阶段二·8）：截断对话分支 + 可选文件还原；事务核心在 session-turn-actions。 */
   rewindToCheckpoint(opts) { return rewindToCheckpoint(this, opts || {}); }
@@ -3026,6 +3029,8 @@ export class LingxiEngine {
   setNotificationPreferences(p) { return this._prefs.setNotificationPreferences(p); }
   getQuickChatPreferences() { return this._prefs.getQuickChatPreferences(); }
   setQuickChatPreferences(p) { return this._prefs.setQuickChatPreferences(p); }
+  getKeybindings() { return this._prefs.getKeybindings(); }
+  setKeybindings(p) { return this._prefs.setKeybindings(p); }
   getBrowserPreferences() { return this._prefs.getBrowserPreferences(); }
   setBrowserPreferences(p) { return this._prefs.setBrowserPreferences(p); }
   getWorkspaceUiState(workspaceRoot, surface) { return this._prefs.getWorkspaceUiState(workspaceRoot, surface); }
@@ -4542,18 +4547,15 @@ export class LingxiEngine {
     ]);
 
     // Checkpoint wrapper (outside sandbox layer)
-    const backupCfg = this._prefs.getFileBackup();
-    if (backupCfg.enabled) {
-      result = {
-        ...result,
-        tools: wrapWithCheckpoint(result.tools, {
-          store: this._checkpointStore,
-          maxFileSizeKb: backupCfg.max_file_size_kb,
-          cwd,
-          getSessionPath,
-        }),
-      };
-    }
+    // 文件备份恒开：不再受开关控制，AI 改文件前一律留改前存档。
+    result = {
+      ...result,
+      tools: wrapWithCheckpoint(result.tools, {
+        store: this._checkpointStore,
+        cwd,
+        getSessionPath,
+      }),
+    };
 
     const getPermissionMode = typeof opts.getPermissionMode === "function"
       ? opts.getPermissionMode

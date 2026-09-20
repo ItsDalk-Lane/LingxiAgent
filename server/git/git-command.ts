@@ -24,8 +24,12 @@ const WORKTREE_TIMEOUT_MS = 120_000;
 const MAX_BUFFER = 16 * 1024 * 1024;
 /** 空树对象哈希：git diff --cached 在零提交仓库里的对照基线 */
 const EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
-/** 未跟踪文件行数统计的读取上限（更大文件按截断内容计行，轻微低估可接受） */
+/** 未跟踪文件行数计数的读取上限（更大文件按截断内容计行，轻微低估可接受） */
 const UNTRACKED_READ_CAP = 512 * 1024;
+/** 未跟踪文件行数计数的双预算（文件数 / 耗时，先到为准）：超出部分仍列出路径但行数记 0。
+ *  上万未跟踪产物的全量计数曾同步阻塞 3s+（环境信息卡首屏跟着变慢），预算后 ~0.3s。 */
+const UNTRACKED_COUNT_FILE_BUDGET = 2000;
+const UNTRACKED_COUNT_TIME_BUDGET_MS = 1_000;
 
 export class GitError extends Error {
   stderr: string;
@@ -119,6 +123,30 @@ export function parseNumstatZ(output: string): NumstatEntry[] {
       path: filePath,
       binary,
     });
+  }
+  return out;
+}
+
+export interface NameStatusEntry {
+  /** git 状态字母：A 新增 / M 修改 / D 删除（--no-renames 下不会出现 R/C） */
+  status: "A" | "M" | "D";
+  path: string;
+}
+
+/**
+ * `git diff --name-status -z --no-renames` 输出：`<status>\0<path>\0` 交替序列。
+ * 真实状态字母：纯删行的内容修改不会被误判成 D（那是 numstat 猜不出来的）。
+ */
+export function parseNameStatusZ(output: string): NameStatusEntry[] {
+  const fields = output.split("\0");
+  const out: NameStatusEntry[] = [];
+  for (let i = 0; i + 1 < fields.length; i += 2) {
+    const status = fields[i];
+    const filePath = fields[i + 1];
+    if (!filePath) continue;
+    if (status === "A" || status === "D" || status === "M") {
+      out.push({ status, path: filePath });
+    }
   }
   return out;
 }
@@ -304,6 +332,17 @@ async function cachedNumstat(dir: string): Promise<NumstatEntry[]> {
   return vsEmptyTree.ok ? parseNumstatZ(vsEmptyTree.stdout) : [];
 }
 
+function nameStatusArgs(extra: string[]): string[] {
+  return ["-c", "core.quotepath=false", "diff", "--name-status", "-z", "--no-renames", ...extra];
+}
+
+async function cachedNameStatus(dir: string): Promise<NameStatusEntry[]> {
+  const direct = await tryGit(dir, nameStatusArgs(["--cached"]));
+  if (direct.ok) return parseNameStatusZ(direct.stdout);
+  const vsEmptyTree = await tryGit(dir, nameStatusArgs(["--cached", EMPTY_TREE]));
+  return vsEmptyTree.ok ? parseNameStatusZ(vsEmptyTree.stdout) : [];
+}
+
 export async function isGitWorkTree(dir: string): Promise<boolean> {
   const probe = await tryGit(dir, ["rev-parse", "--is-inside-work-tree"]);
   return probe.ok && probe.stdout.trim() === "true";
@@ -331,10 +370,12 @@ export async function collectGitStatus(dir: string): Promise<GitStatusSummary> {
   };
   if (!(await isGitWorkTree(dir))) return empty;
 
-  const [showCurrent, stagedNumstat, unstagedNumstat, untrackedOut, remoteOut] = await Promise.all([
+  const [showCurrent, stagedNumstat, unstagedNumstat, stagedNameStatus, unstagedNameStatus, untrackedOut, remoteOut] = await Promise.all([
     tryGit(dir, ["branch", "--show-current"]),
     cachedNumstat(dir),
     tryGit(dir, numstatArgs([])).then(r => parseNumstatZ(r.stdout)),
+    cachedNameStatus(dir),
+    tryGit(dir, nameStatusArgs([])).then(r => parseNameStatusZ(r.stdout)),
     tryGit(dir, ["-c", "core.quotepath=false", "ls-files", "--others", "--exclude-standard", "-z"]),
     tryGit(dir, ["remote"]),
   ]);
@@ -351,6 +392,18 @@ export async function collectGitStatus(dir: string): Promise<GitStatusSummary> {
     : [];
   const stagedByPath = new Map(stagedNumstat.map(e => [e.path, e]));
   const unstagedByPath = new Map(unstagedNumstat.map(e => [e.path, e]));
+  // 真实状态字母（A/M/D）：纯删行的内容修改不该被误判成「文件已删除」
+  const stagedLetter = new Map(stagedNameStatus.map(e => [e.path, e.status]));
+  const unstagedLetter = new Map(unstagedNameStatus.map(e => [e.path, e.status]));
+
+  const stateFor = (entry: NumstatEntry, letters: Map<string, "A" | "M" | "D">): GitFileState => {
+    if (entry.binary) return "binary";
+    const letter = letters.get(entry.path);
+    if (letter === "A") return "added";
+    if (letter === "D") return "deleted";
+    if (letter === "M") return "modified";
+    return stateFromNumstat(entry);
+  };
 
   const files: GitFileChange[] = [];
   const total = emptyTotals();
@@ -376,7 +429,7 @@ export async function collectGitStatus(dir: string): Promise<GitStatusSummary> {
       path: entry.path,
       additions: entry.additions + (unstagedEntry?.additions ?? 0),
       deletions: entry.deletions + (unstagedEntry?.deletions ?? 0),
-      state: binary ? "binary" : stateFromNumstat(entry),
+      state: stateFor(entry, stagedLetter),
       staged: true,
     });
     addTotals(stagedTotal, entry.additions, entry.deletions);
@@ -389,14 +442,21 @@ export async function collectGitStatus(dir: string): Promise<GitStatusSummary> {
       path: entry.path,
       additions: entry.additions,
       deletions: entry.deletions,
-      state: entry.binary ? "binary" : stateFromNumstat(entry),
+      state: entry.binary ? "binary" : stateFor(entry, unstagedLetter),
       staged: false,
     });
     addTotals(unstagedTotal, entry.additions, entry.deletions);
   }
-  // 未跟踪
-  for (const relPath of untrackedPaths) {
-    const additions = countUntrackedLines(path.join(dir, ...relPath.split("/")));
+  // 未跟踪：逐文件读内容数行（语义对齐 git numstat）。文件数 + 耗时双预算：
+  // agent 工作区常见上万未跟踪产物文件，全量计数曾同步阻塞 3s+，环境信息卡
+  // 与图谱首屏跟着变慢。超预算的文件仍列出（untracked 状态）但行数记 0——
+  // 显式降级（本常量块即标注），总量在超大工作区为下界。
+  const untrackedDeadline = Date.now() + UNTRACKED_COUNT_TIME_BUDGET_MS;
+  for (const [index, relPath] of untrackedPaths.entries()) {
+    let additions = 0;
+    if (index < UNTRACKED_COUNT_FILE_BUDGET && Date.now() < untrackedDeadline) {
+      additions = countUntrackedLines(path.join(dir, ...relPath.split("/")));
+    }
     emit({ path: relPath, additions, deletions: 0, state: "untracked", staged: false });
     addTotals(unstagedTotal, additions, 0);
   }
@@ -505,6 +565,70 @@ export interface GitCommitResult {
   head?: string;
 }
 
+/**
+ * 提交（修改）：把当前暂存内容并入上一次提交（git commit --amend）。
+ * message 为空 = --no-edit 保留原提交信息；零提交仓库无目标可改，结构化拒绝。
+ * 注意：已推送过的提交被改写后本地/远程会分叉，与普通 git 语义一致，由使用者把握。
+ */
+export async function amendCommit(dir: string, message: string | null): Promise<GitCommitResult> {
+  const verify = await tryGit(dir, ["rev-parse", "--verify", "--quiet", "HEAD^{commit}"]);
+  if (!verify.ok) return { ok: false, code: "nothing_to_commit", message: "no commit to amend" };
+  const trimmed = typeof message === "string" ? message.trim() : "";
+  const args = trimmed ? ["commit", "--amend", "-m", trimmed] : ["commit", "--amend", "--no-edit"];
+  const result = await tryGit(dir, args);
+  if (!result.ok) {
+    if (/nothing to commit/i.test(result.stderr)) return { ok: false, code: "nothing_to_commit" };
+    throw new GitError("amend failed", result.stderr, result.exitCode);
+  }
+  const head = await tryGit(dir, ["rev-parse", "HEAD"]);
+  return { ok: true, head: head.ok ? head.stdout.trim() : undefined };
+}
+
+export interface GitStageResult {
+  ok: boolean;
+  code?: "invalid_path" | "stage_failed";
+  message?: string;
+  paths?: string[];
+}
+
+/** 暂存（git add）：paths 缺省 = 全部改动（含未跟踪）进暂存区；给了 paths 只加这些 */
+export async function stagePaths(dir: string, paths?: string[] | null): Promise<GitStageResult> {
+  const { paths: wanted, invalid } = normalizePathList(paths);
+  if (invalid) return { ok: false, code: "invalid_path" };
+  const result = wanted
+    ? await tryGit(dir, ["add", "--", ...wanted.map(topLiteralPathspec)])
+    : await tryGit(dir, ["add", "-A"]);
+  if (!result.ok) {
+    return { ok: false, code: "stage_failed", message: firstStderrLines(result.stderr), paths: wanted ?? [] };
+  }
+  return { ok: true, paths: wanted ?? [] };
+}
+
+export interface GitUnstageResult {
+  ok: boolean;
+  code?: "invalid_path" | "unstage_failed";
+  message?: string;
+  paths?: string[];
+}
+
+/**
+ * 取消暂存：index 退回 HEAD（paths 缺省 = 全部退回）。
+ * 零提交仓库没有 HEAD 可退，index 里的条目全是新增，用 rm --cached 清出。
+ */
+export async function unstagePaths(dir: string, paths?: string[] | null): Promise<GitUnstageResult> {
+  const { paths: wanted, invalid } = normalizePathList(paths);
+  if (invalid) return { ok: false, code: "invalid_path" };
+  const spec = wanted ? wanted.map(topLiteralPathspec) : [":/"];
+  const head = await tryGit(dir, ["rev-parse", "--verify", "--quiet", "HEAD^{commit}"]);
+  const result = head.ok
+    ? await tryGit(dir, ["restore", "--staged", "--", ...spec])
+    : await tryGit(dir, ["rm", "-r", "--cached", "--ignore-unmatch", "--quiet", "--", ...spec]);
+  if (!result.ok) {
+    return { ok: false, code: "unstage_failed", message: firstStderrLines(result.stderr), paths: wanted ?? [] };
+  }
+  return { ok: true, paths: wanted ?? [] };
+}
+
 export async function commitChanges(dir: string, message: string, includeUnstaged: boolean): Promise<GitCommitResult> {
   const trimmed = message.trim();
   if (!trimmed) return { ok: false, code: "nothing_to_commit", message: "empty commit message" };
@@ -556,6 +680,92 @@ export async function pushChanges(dir: string): Promise<GitPushResult> {
   const result = await tryGit(dir, ["push", "-u", remote, "HEAD"], PUSH_TIMEOUT_MS);
   if (!result.ok) return { ok: false, code: "push_failed", message: firstStderrLines(result.stderr) };
   return { ok: true };
+}
+
+export interface GitPullResult {
+  ok: boolean;
+  code?: "no_remote" | "no_upstream" | "fetch_failed" | "already_up_to_date" | "diverged" | "local_changes" | "pull_failed";
+  message?: string;
+  /** 本次实际并入本地的提交数 */
+  pulled?: number;
+}
+
+export interface GitFetchResult {
+  ok: boolean;
+  code?: "no_remote" | "fetch_failed";
+  message?: string;
+}
+
+/**
+ * 只拉取不合并（git fetch）：把远程的真实状态（领先/落后计数）带回来，
+ * 供「刷新」按钮和同步按钮在行动前校准；不产生合并、不改工作区。
+ */
+export async function fetchRemote(dir: string): Promise<GitFetchResult> {
+  const remoteOut = await tryGit(dir, ["remote"]);
+  const remote = remoteOut.ok ? remoteOut.stdout.split("\n").map(s => s.trim()).filter(Boolean)[0] : null;
+  if (!remote) return { ok: false, code: "no_remote" };
+  const result = await tryGit(dir, ["fetch", remote], PUSH_TIMEOUT_MS);
+  if (!result.ok) return { ok: false, code: "fetch_failed", message: firstStderrLines(result.stderr) };
+  return { ok: true };
+}
+
+/**
+ * 拉取远程更新：先 fetch 再本地判断，仅在可快进时合并（--ff-only）。
+ * 分桶语义（面向环境信息卡 UI，结构化返回而非抛错）：
+ *   - no_remote / no_upstream：没有可拉的对象
+ *   - fetch_failed：网络或凭据问题（GIT_TERMINAL_PROMPT=0 快速失败）
+ *   - already_up_to_date：fetch 后没有新提交
+ *   - diverged：本地与远程各有新提交。不自动造 merge 提交，留给用户在
+ *     对话里让助手处理，避免给非技术用户留下半合并状态
+ *   - local_changes：未提交改动挡住了快进（按文件重叠结构性预判，
+ *     不靠 stderr 文本匹配：git 报错随 locale 本地化，中文环境没有
+ *     "would be overwritten" 字样）
+ */
+export async function pullChanges(dir: string): Promise<GitPullResult> {
+  const remoteOut = await tryGit(dir, ["remote"]);
+  const remote = remoteOut.ok ? remoteOut.stdout.split("\n").map(s => s.trim()).filter(Boolean)[0] : null;
+  if (!remote) return { ok: false, code: "no_remote" };
+
+  const upstream = await tryGit(dir, ["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{upstream}"]);
+  if (!upstream.ok || !upstream.stdout.trim()) return { ok: false, code: "no_upstream" };
+
+  // fetch 与合并分开：fetch 失败是网络/凭据问题，单独成桶便于 UI 提示
+  const fetch = await tryGit(dir, ["fetch", remote], PUSH_TIMEOUT_MS);
+  if (!fetch.ok) return { ok: false, code: "fetch_failed", message: firstStderrLines(fetch.stderr) };
+
+  const behindRes = await tryGit(dir, ["rev-list", "--count", "HEAD..@{upstream}"]);
+  const behind = behindRes.ok ? Number.parseInt(behindRes.stdout.trim(), 10) || 0 : 0;
+  if (behind === 0) return { ok: false, code: "already_up_to_date" };
+
+  const aheadRes = await tryGit(dir, ["rev-list", "--count", "@{upstream}..HEAD"]);
+  const ahead = aheadRes.ok ? Number.parseInt(aheadRes.stdout.trim(), 10) || 0 : 0;
+  if (ahead > 0) return { ok: false, code: "diverged" };
+
+  if (await dirtyFilesClashWithIncoming(dir)) return { ok: false, code: "local_changes" };
+
+  // 快进合并不产生 merge 提交；走到这里仍失败的是意外情况，stderr 原样带给 UI
+  const merge = await tryGit(dir, ["merge", "--ff-only", "@{upstream}"]);
+  if (!merge.ok) return { ok: false, code: "pull_failed", message: firstStderrLines(merge.stderr) };
+  return { ok: true, pulled: behind };
+}
+
+/**
+ * 本地未提交/未跟踪文件与待并入文件重叠：重叠则快进会被 git 拒绝。
+ * quotepath=false 让两侧都输出原始 UTF-8 路径，保证集合可比较。
+ */
+async function dirtyFilesClashWithIncoming(dir: string): Promise<boolean> {
+  const [dirtyRes, untrackedRes, incomingRes] = await Promise.all([
+    tryGit(dir, ["-c", "core.quotepath=false", "diff", "--name-only", "HEAD"]),
+    tryGit(dir, ["-c", "core.quotepath=false", "ls-files", "--others", "--exclude-standard"]),
+    tryGit(dir, ["-c", "core.quotepath=false", "diff", "--name-only", "HEAD..@{upstream}"]),
+  ]);
+  if (!incomingRes.ok) return false;
+  const incoming = incomingRes.stdout.split("\n").map(s => s.trim()).filter(Boolean);
+  const local = new Set([
+    ...(dirtyRes.ok ? dirtyRes.stdout.split("\n") : []),
+    ...(untrackedRes.ok ? untrackedRes.stdout.split("\n") : []),
+  ].map(s => s.trim()).filter(Boolean));
+  return incoming.some(p => local.has(p));
 }
 
 function firstStderrLines(stderr: string, maxLines = 4): string {
@@ -784,8 +994,9 @@ export interface GitDiscardResult {
 
 /**
  * 回退未提交修改：把已跟踪文件恢复成 HEAD 内容，暂存区与工作区一起回。
- * paths 缺省 = 整个仓库（:/，子目录工作台也覆盖全仓）。未跟踪文件不参与，
- * 避免「一键回退」把新文件删掉。
+ * paths 缺省 = 整个仓库（:/，子目录工作台也覆盖全仓）。
+ * 未跟踪的新文件也参与：回退 = 删除该文件（git clean），UI 侧有确认弹窗挡着；
+ * ignored（.gitignore 覆盖的）文件始终不动。
  */
 export async function discardPaths(dir: string, paths?: string[] | null): Promise<GitDiscardResult> {
   const { paths: wanted, invalid } = normalizePathList(paths);
@@ -797,17 +1008,33 @@ export async function discardPaths(dir: string, paths?: string[] | null): Promis
   const source = head.ok ? "HEAD" : EMPTY_TREE;
 
   const diffBase = source === "HEAD" ? ["HEAD"] : [EMPTY_TREE];
-  const [unstaged, staged] = await Promise.all([
+  const [unstaged, staged, untracked] = await Promise.all([
     tryGit(dir, ["-c", "core.quotepath=false", "diff", "--name-only", ...diffBase, "--", ...spec]),
     tryGit(dir, ["-c", "core.quotepath=false", "diff", "--cached", "--name-only", ...diffBase, "--", ...spec]),
+    tryGit(dir, ["-c", "core.quotepath=false", "ls-files", "--others", "--exclude-standard", "-z",
+      ...(wanted ? ["--", ...spec] : [])]),
   ]);
-  if (!unstaged.stdout.trim() && !staged.stdout.trim()) {
+  const hasTracked = Boolean(unstaged.stdout.trim() || staged.stdout.trim());
+  const untrackedPaths = untracked.ok ? untracked.stdout.split("\0").filter(Boolean) : [];
+  if (!hasTracked && untrackedPaths.length === 0) {
     return { ok: false, code: "nothing_to_discard", paths: wanted ?? [] };
   }
 
-  const result = await tryGit(dir, ["restore", "--source", source, "--staged", "--worktree", "--", ...spec]);
-  if (!result.ok) {
-    return { ok: false, code: "discard_failed", message: firstStderrLines(result.stderr), paths: wanted ?? [] };
+  // 已跟踪：恢复到基线
+  if (hasTracked) {
+    const result = await tryGit(dir, ["restore", "--source", source, "--staged", "--worktree", "--", ...spec]);
+    if (!result.ok) {
+      return { ok: false, code: "discard_failed", message: firstStderrLines(result.stderr), paths: wanted ?? [] };
+    }
+  }
+  // 未跟踪：删除文件。整仓回退带 -d 连未跟踪目录一起清（ignored 默认不动）
+  if (untrackedPaths.length > 0) {
+    const clean = wanted
+      ? await tryGit(dir, ["clean", "-f", "--", ...spec])
+      : await tryGit(dir, ["clean", "-f", "-d"]);
+    if (!clean.ok) {
+      return { ok: false, code: "discard_failed", message: firstStderrLines(clean.stderr), paths: wanted ?? [] };
+    }
   }
   return { ok: true, paths: wanted ?? [] };
 }
@@ -950,26 +1177,78 @@ export interface GitCommit {
   refs: GitCommitRef[];
   /** 父提交哈希（多父=合并提交），限流截断处为空数组 */
   parents: string[];
+  /** 相对第一父的新增行数（合并提交=并入分支的增量） */
+  additions: number;
+  /** 相对第一父的删除行数 */
+  deletions: number;
+  /** 变更文件数；--numstat 不可用时为 0（UI 隐藏统计行） */
+  changedFiles: number;
 }
 
+/** 把一个 numstat 统计块累加到提交上（覆盖语义：每条提交恰好对应一个块） */
+function applyCommitStats(commit: GitCommit, lines: string[]): void {
+  const stats = statsFromNumstatLines(lines);
+  commit.additions = stats.additions;
+  commit.deletions = stats.deletions;
+  commit.changedFiles = stats.changedFiles;
+}
+
+function statsFromNumstatLines(lines: string[]): GitCommitStats {
+  let additions = 0;
+  let deletions = 0;
+  let changedFiles = 0;
+  for (const line of lines) {
+    const tab1 = line.indexOf("\t");
+    if (tab1 < 0) continue;
+    const tab2 = line.indexOf("\t", tab1 + 1);
+    if (tab2 < 0) continue;
+    changedFiles++;
+    const addRaw = line.slice(0, tab1);
+    const delRaw = line.slice(tab1 + 1, tab2);
+    if (addRaw !== "-") additions += Number.parseInt(addRaw, 10) || 0;
+    if (delRaw !== "-") deletions += Number.parseInt(delRaw, 10) || 0;
+  }
+  return { additions, deletions, changedFiles };
+}
+
+/** log 记录格式：字段以 \x00 分隔、记录以 \x1e 结束（parseLogRecords 的输入） */
+const LOG_FORMAT = "%H%x00%h%x00%s%x00%B%x00%an%x00%at%x00%D%x00%P%x1e";
+
 /**
- * `git log --pretty=format:%H%x00%h%x00%s%x00%B%x00%an%x00%at%x00%D%x00%P%x1e`
- * 输出解析：记录以 \x1e 分隔、字段以 \x00 分隔。
+ * `git log --numstat --diff-merges=first-parent --pretty=format:…%x1e` 输出解析：
+ * 记录以 \x1e 分隔、字段以 \x00 分隔；每条提交的 numstat 块紧跟在该提交 pretty
+ * 段（含末尾 \x1e）之后，即出现在**下一个** \x1e 块的开头；最后一条提交的统计
+ * 则是纯 numstat 尾块。因此逐块先扫过块首不含 \x00 的 numstat 行归给上一条
+ * 提交，再按 \x00 切字段（%B 正文可含换行但不含 \x00，切分安全）。
  * refs 解析：%D 形如 `HEAD -> main, origin/main, tag: v1.0`，空串=无装饰。
  */
 export function parseLogRecords(output: string): GitCommit[] {
   const commits: GitCommit[] = [];
+  let last: GitCommit | null = null;
   for (const record of output.split("\x1e")) {
     if (!record.trim()) continue;
-    const fields = record.replace(/^\n/, "").split("\x00");
-    if (fields.length < 8) continue;
+    const lines = record.replace(/^\n/, "").split("\n");
+    let start = 0;
+    const stats: string[] = [];
+    while (start < lines.length && !lines[start].includes("\x00")) {
+      if (lines[start].trim()) stats.push(lines[start]);
+      start++;
+    }
+    if (start >= lines.length) {
+      // 纯 numstat 尾块：属于最后一条已解析的提交
+      if (last) applyCommitStats(last, stats);
+      continue;
+    }
+    if (last) applyCommitStats(last, stats);
+    const fields = lines.slice(start).join("\n").split("\x00");
+    if (fields.length < 8) { last = null; continue; }
     const [hash, shortHash, subject, messageRaw, authorName, committedAtRaw, refsRaw, parentsRaw] = fields;
-    if (!hash || !shortHash) continue;
+    if (!hash || !shortHash) { last = null; continue; }
     const refs: GitCommitRef[] = [];
     for (const entry of (refsRaw || "").split(",")) {
       const name = entry.trim();
       if (!name) continue;
-      const headMatch = /^HEAD -> (.+)$/.exec(name);
+      const headMatch = name.match(/^HEAD -> (.+)$/);
       if (headMatch) {
         refs.push({ kind: "head", name: headMatch[1] });
         continue;
@@ -978,14 +1257,14 @@ export function parseLogRecords(output: string): GitCommit[] {
         refs.push({ kind: "head", name: "HEAD" });
         continue;
       }
-      const tagMatch = /^tag: (.+)$/.exec(name);
+      const tagMatch = name.match(/^tag: (.+)$/);
       if (tagMatch) {
         refs.push({ kind: "tag", name: tagMatch[1] });
         continue;
       }
       refs.push({ kind: name.includes("/") ? "remote" : "branch", name });
     }
-    commits.push({
+    last = {
       hash,
       shortHash,
       subject,
@@ -994,17 +1273,84 @@ export function parseLogRecords(output: string): GitCommit[] {
       committedAt: Number.parseInt(committedAtRaw, 10) || 0,
       refs,
       parents: parentsRaw ? parentsRaw.split(" ").filter(Boolean) : [],
-    });
+      additions: 0,
+      deletions: 0,
+      changedFiles: 0,
+    };
+    commits.push(last);
   }
   return commits;
 }
 
 export async function listCommits(dir: string, limit = 300): Promise<GitCommit[]> {
   const safeLimit = Math.min(Math.max(Math.floor(limit) || 1, 1), 1000);
-  const fmt = "%H%x00%h%x00%s%x00%B%x00%an%x00%at%x00%D%x00%P%x1e";
-  const res = await tryGit(dir, ["log", "--date-order", `--max-count=${safeLimit}`, `--pretty=format:${fmt}`]);
-  if (!res.ok) return [];
-  return parseLogRecords(res.stdout);
+  const maxCountArg = "--max-count=" + String(safeLimit);
+  // 纯元数据查询（实测 <0.1s）；变更统计走 listCommitStats 两段加载，
+  // 避免 --numstat 把整段历史的 diff 拖进首屏（实测本仓库 300 条 ≈16s）。
+  const res = await tryGit(dir, ["log", "--date-order", maxCountArg, "--pretty=format:" + LOG_FORMAT]);
+  return res.ok ? parseLogRecords(res.stdout) : [];
+}
+
+export interface GitCommitStats {
+  additions: number;
+  deletions: number;
+  changedFiles: number;
+}
+
+/** 提交统计缓存：同一提交的 diff 永不变化，进程内缓存跨弹窗打开复用 */
+const commitStatsCache = new Map<string, GitCommitStats>();
+const COMMIT_STATS_CACHE_CAP = 20_000;
+
+function commitStatsCacheKey(dir: string, hash: string): string {
+  return dir + "\u0000" + hash;
+}
+
+/**
+ * 批量取提交变更统计（相对第一父；合并提交=并入分支的增量）。
+ * `git log --no-walk=unsorted --numstat <hash…>` 一次进程算一批，复用
+ * parseLogRecords 归因；哈希必须严格 40 位十六进制（argv 数组 + 白名单
+ * 校验，无 shell 注入面）。失败按空处理：UI 隐藏统计行（显式降级，
+ * 字段缺省即不渲染），不影响提交列表本身。
+ */
+export async function listCommitStats(dir: string, hashes: unknown[]): Promise<Map<string, GitCommitStats>> {
+  const result = new Map<string, GitCommitStats>();
+  const pending: string[] = [];
+  const seen = new Set<string>();
+  for (const hash of hashes) {
+    if (typeof hash !== "string" || !/^[0-9a-f]{40}$/.test(hash) || seen.has(hash)) continue;
+    seen.add(hash);
+    const cached = commitStatsCache.get(commitStatsCacheKey(dir, hash));
+    if (cached) result.set(hash, cached);
+    else pending.push(hash);
+  }
+
+  // 单批 ≤100 个哈希（argv 约 4KB，Windows 32KB 命令行上限内余量充足）
+  for (let i = 0; i < pending.length; i += 100) {
+    const chunk = pending.slice(i, i + 100);
+    const res = await tryGit(
+      dir,
+      ["log", "--no-walk=unsorted", "--numstat", "--diff-merges=first-parent", "--pretty=format:" + LOG_FORMAT, ...chunk],
+      120_000,
+    );
+    if (!res.ok) continue;
+    for (const commit of parseLogRecords(res.stdout)) {
+      if (commit.additions === 0 && commit.deletions === 0 && commit.changedFiles === 0) continue;
+      const stats: GitCommitStats = {
+        additions: commit.additions,
+        deletions: commit.deletions,
+        changedFiles: commit.changedFiles,
+      };
+      commitStatsCache.set(commitStatsCacheKey(dir, commit.hash), stats);
+      result.set(commit.hash, stats);
+    }
+  }
+  if (commitStatsCache.size > COMMIT_STATS_CACHE_CAP) {
+    for (const key of commitStatsCache) {
+      commitStatsCache.delete(key[0]);
+      if (commitStatsCache.size <= COMMIT_STATS_CACHE_CAP) break;
+    }
+  }
+  return result;
 }
 
 // ────────────────────────── 单文件 diff ──────────────────────────

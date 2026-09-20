@@ -259,32 +259,6 @@ describe('GeneralTab', () => {
     await waitFor(() => expect((select as HTMLSelectElement).value).toBe('when_session_unfocused'));
   });
 
-  it('records and registers the quick chat shortcut', async () => {
-    installHana();
-    lingxiFetch
-      .mockResolvedValueOnce(jsonResponse({ quickChat: { shortcut: 'Alt+Space', reuseTimeoutMinutes: 5 } }))
-      .mockResolvedValueOnce(jsonResponse({ notifications: { chatCompletion: 'never' } }))
-      .mockResolvedValueOnce(jsonResponse({ ok: true, quickChat: { shortcut: 'CommandOrControl+Shift+K', reuseTimeoutMinutes: 5 } }));
-    quickChatReloadShortcut.mockResolvedValue({ ok: true, shortcut: 'CommandOrControl+Shift+K' });
-
-    render(<GeneralTab />);
-
-    const shortcutButton = await screen.findByLabelText('settings.general.quickChat.shortcut');
-    await waitFor(() => expect((shortcutButton as HTMLButtonElement).disabled).toBe(false));
-    fireEvent.click(shortcutButton);
-    fireEvent.keyDown(window, { key: 'k', ctrlKey: true, shiftKey: true });
-
-    await waitFor(() => expect(lingxiFetch).toHaveBeenLastCalledWith('/api/preferences/quick-chat', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ quickChat: { shortcut: 'CommandOrControl+Shift+K', reuseTimeoutMinutes: 5 } }),
-    }));
-    expect(quickChatReloadShortcut).toHaveBeenCalledOnce();
-    await waitFor(() => expect(settingsChanged).toHaveBeenCalledWith('quick-chat-shortcut-changed', {
-      quickChat: { shortcut: 'CommandOrControl+Shift+K', reuseTimeoutMinutes: 5 },
-    }));
-  });
-
   it('saves the quick chat reuse timeout without re-registering the shortcut', async () => {
     installHana();
     lingxiFetch
@@ -303,26 +277,5 @@ describe('GeneralTab', () => {
       body: JSON.stringify({ quickChat: { shortcut: 'Alt+Space', reuseTimeoutMinutes: 5 } }),
     }));
     expect(quickChatReloadShortcut).not.toHaveBeenCalled();
-  });
-
-  it('records macOS Option+Space as Alt+Space instead of an invisible character', async () => {
-    installHana();
-    lingxiFetch
-      .mockResolvedValueOnce(jsonResponse({ quickChat: { shortcut: 'CommandOrControl+Shift+K', reuseTimeoutMinutes: 10 } }))
-      .mockResolvedValueOnce(jsonResponse({ notifications: { chatCompletion: 'never' } }))
-      .mockResolvedValueOnce(jsonResponse({ ok: true, quickChat: { shortcut: 'Alt+Space', reuseTimeoutMinutes: 10 } }));
-    quickChatReloadShortcut.mockResolvedValue({ ok: true, shortcut: 'Alt+Space' });
-
-    render(<GeneralTab />);
-
-    fireEvent.click(await screen.findByLabelText('settings.general.quickChat.shortcut'));
-    fireEvent.keyDown(window, { key: '\u00A0', code: 'Space', altKey: true });
-
-    await waitFor(() => expect(lingxiFetch).toHaveBeenLastCalledWith('/api/preferences/quick-chat', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ quickChat: { shortcut: 'Alt+Space', reuseTimeoutMinutes: 10 } }),
-    }));
-    expect(quickChatReloadShortcut).toHaveBeenCalledOnce();
   });
 });

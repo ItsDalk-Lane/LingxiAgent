@@ -75,8 +75,8 @@ describe("Agent platform prompt identity", () => {
       forceExperienceEnabled: false,
     });
 
-    expect(prompt).toContain("fileId 用于操作，label 仅展示");
-    expect(prompt).toContain("write/edit 用 writableLocalRef.path 或本机路径，不接受 fileId。");
+    expect(prompt).toContain("会话文件优先用 fileId 操作，label 仅展示");
+    expect(prompt).toContain("write/edit 用 writableLocalRef.path 或本机路径，不接受 fileId；");
     expect(prompt).toContain("materialize");
   });
 
@@ -86,8 +86,8 @@ describe("Agent platform prompt identity", () => {
       forceExperienceEnabled: false,
     });
 
-    expect(prompt).toContain("fileId identifies files; label is display-only.");
-    expect(prompt).toContain("write/edit takes writableLocalRef.path or local paths, not fileId.");
+    expect(prompt).toContain("Operate on session files by fileId; label is display-only.");
+    expect(prompt).toContain("write/edit takes writableLocalRef.path or local paths, never fileId;");
     expect(prompt).toContain("materialize");
   });
 

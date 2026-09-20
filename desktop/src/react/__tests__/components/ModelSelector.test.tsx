@@ -14,6 +14,8 @@ const storeState = {
   sessionModelsByPath: {} as Record<string, unknown>,
   setModelSwitching: vi.fn(),
   updateSessionModel: vi.fn(),
+  forceRemoveStreamingSession: vi.fn(),
+  settleStreamingProjection: vi.fn(),
   setThinkingLevel: vi.fn(),
   setPendingNewSessionThinkingLevel: vi.fn(),
   addToast,

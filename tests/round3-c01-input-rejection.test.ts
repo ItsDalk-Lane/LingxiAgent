@@ -630,9 +630,10 @@ describe('C01 client settlement via real ws-message-handler', () => {
     // 跨会话。
     dispatchRejection({ clientMessageId: record.clientMessageId, sessionPath: PATH_B, sessionId: 'sess-b', clientAttemptId: record.activeAttemptId });
     expect(record.phase).toBe('awaiting_ack');
-    // 跨服务器（不同 originConnectionKey）。
+    // 跨服务器（不同 serverKey；隔离边界从连接身份改为服务器身份，重连不误伤）。
     const cross = noteComposerInputRejected({
       originConnectionKey: JSON.stringify(['other-server']),
+      serverKey: JSON.stringify(['other-server']),
       sessionId: SESSION_A, sessionPath: PATH_A,
       clientMessageId: record.clientMessageId, snapshotVersion: 1,
       clientAttemptId: record.activeAttemptId,
@@ -728,13 +729,16 @@ describe('C01 client settlement via real ws-message-handler', () => {
     expect(sentPayloads().at(-1)!.text).toContain('B 消息');
   });
 
-  it('真正的 delivery_unknown 屏障仍有效，且不阻塞其他会话', async () => {
+  it('delivery_unknown 不再拦新输入（对账兜底），且不阻塞其他会话', async () => {
     const { record } = await submitViaCoordinator('unknown barrier');
     vi.advanceTimersByTime(16_000);
     expect(record.phase).toBe('delivery_unknown');
-    // 该会话新输入被未决屏障拦下。
+    // 新语义：投递存疑是会计问题，由对账与显式标记兜底、不自动重发保底线；
+    // 本会话的新输入不再被未决屏障拦下（租约可取得，存疑账触发对账自愈）。
     const blocked = tryAcquireSendLease({ identity: identityOf(PATH_A), bundle: makeBundle(PATH_A, '第二条') });
-    expect(blocked).toMatchObject({ ok: false, reason: 'transport_busy' });
+    expect(blocked.ok).toBe(true);
+    // 存疑记录本身不被新发送改写。
+    expect(record.phase).toBe('delivery_unknown');
     // 其他会话不受影响。
     const other = tryAcquireSendLease({ identity: identityOf(PATH_B, 'sess-b'), bundle: makeBundle(PATH_B, '其他会话') });
     expect(other.ok).toBe(true);

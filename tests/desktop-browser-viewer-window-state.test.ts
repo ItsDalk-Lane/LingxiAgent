@@ -186,13 +186,15 @@ describe("desktop browser viewer window state", () => {
     expect(source).toContain('_detachActiveBrowserView({ view, sessionPath: null, destroy: true, hideIfVisible: true, reason: "emergency-stop" })');
   });
 
-  it("lets a session switch suspend without hiding the viewer window", () => {
+  it("hands the viewer over to another session's tab on suspend instead of blanking it", () => {
     const source = fs.readFileSync(MAIN_PATH, "utf-8");
     const suspend = caseBody(source, "suspend");
 
-    // 切换会话时 viewer 保持可见，随后的 viewerShowSession 重绘目标 session
-    expect(suspend).toContain("keepViewerVisible");
-    expect(suspend).toContain("hideIfVisible: params.keepViewerVisible !== true");
+    // 共享窗口：挂起不再直接清空/隐藏 viewer，先让其他会话仍存的标签接管画面；
+    // 一个都不剩时才按 keepViewerVisible 决定是否隐藏窗口
+    expect(suspend).toContain("_showFallbackBrowserTabOrIdle({ hideIfEmpty: params.keepViewerVisible !== true })");
+    expect(suspend).toContain("hideIfVisible: false");
+    expect(suspend).not.toContain("hideIfVisible: params.keepViewerVisible !== true");
   });
 
   it("repaints the viewer for the target session without changing window visibility", () => {

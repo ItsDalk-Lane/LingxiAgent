@@ -10,6 +10,7 @@ import { sessionScopedKey, sessionScopedValue } from './session-slice';
 import { recordChatPerformance } from '../utils/chat-performance';
 import { isSameFilePresentation, normalizeContentBlocks } from '../utils/content-semantics';
 import { resolveAssistantTurnOutcome } from '../utils/turn-outcome';
+import { projectAssistantTurn } from '../utils/turn-projector';
 import { mergePrependedHistoryItems } from '../utils/history-run-merge';
 
 /** 「回退时撤销文件改动」逐文件结果（服务端 WorkspaceRollbackFileResult 的前端形状）。 */
@@ -71,6 +72,13 @@ export interface ChatSlice {
     assistantProjection?: AssistantTurnProjection | null;
   }) => boolean;
   truncateSessionFromMessage: (path: string, messageId: string) => boolean;
+  /**
+   * 把该会话内投影仍停在 streaming 的助手消息结算为 completed 终态。
+   * 复用 projectAssistantTurn（与历史重载同一条投影路径），不引入第二种语义。
+   * 仅在「两轮之间的空档」调用（换模型完成时）：此刻不存在合法的进行中轮次。
+   * 返回是否有消息被结算（无残留时零 setState）。
+   */
+  settleStreamingProjection: (path: string) => boolean;
   appendInterludeItem: (sessionPath: string, block: Extract<ContentBlock, { type: 'interlude' }>) => boolean;
   resolveBlockByTaskId: (sessionPath: string, taskId: string, resolution: ContentBlock) => boolean;
   patchBlockByTaskId: (sessionPath: string, taskId: string, patch: Record<string, any>) => void;
@@ -520,6 +528,59 @@ export const createChatSlice = (
       };
     });
     return true;
+  },
+
+  settleStreamingProjection: (path) => {
+    const session = scopedMapValue<SessionMessages>(get() as any, get().chatSessions, path);
+    if (!session) return false;
+    // 快速路径：无 streaming 残留时零 setState，不越空 render。
+    const hasResidue = session.items.some((item) => (
+      item.type === 'message'
+      && item.data.role === 'assistant'
+      && item.data.turnProjection?.status === 'streaming'
+    ));
+    if (!hasResidue) return false;
+
+    let changed = false;
+    set((s) => {
+      const latest = scopedMapValue<SessionMessages>(s as any, s.chatSessions, path);
+      if (!latest) return {};
+      const items = latest.items.map((item) => {
+        if (item.type !== 'message' || item.data.role !== 'assistant') return item;
+        const projection = item.data.turnProjection;
+        if (!projection || projection.status !== 'streaming') return item;
+        // 结算走与历史重载同一条投影路径（projectAssistantTurn）：sealed 重封、
+        // 过程区交错、结局唯一裁决一并完成；segments 为空时 legacyBlocks 里
+        // 残留的 unresolved 文字会按供应商回退定身份，与正常收口语义一致。
+        const projected = projectAssistantTurn({
+          idPrefix: item.data.sourceEntryId || item.data.id,
+          inputMessageId: projection.inputMessageId,
+          assistantMessageIds: projection.assistantMessageIds,
+          segments: [],
+          legacyBlocks: item.data.blocks || [],
+          status: 'completed',
+          runTerminal: true,
+          ...(projection.startedAt !== undefined ? { startedAt: projection.startedAt } : {}),
+          completedAt: Date.now(),
+        });
+        changed = true;
+        return {
+          ...item,
+          data: {
+            ...item.data,
+            blocks: projected.blocks,
+            turnProjection: projected.projection,
+          },
+        };
+      });
+      if (!changed) return {};
+      invalidateSessionCache(path);
+      return {
+        chatSessions: putScopedMapValue(s as any, s.chatSessions, path, { ...latest, items }),
+      };
+    });
+    if (changed) bumpMessageLiveVersion(path);
+    return changed;
   },
 
   // 缓存：block_update 到达时 block 可能还没添加到 store（时序竞争）

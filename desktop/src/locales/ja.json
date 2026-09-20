@@ -221,7 +221,8 @@
     "toolReadOnly": "読取",
     "toolWrite": "書込",
     "filesUnsupported": "チャンネルは現在テキストのみ対応しています。ファイルはチャット添付に追加されません",
-    "createIntroOptional": "説明"
+    "createIntroOptional": "説明",
+    "mapTab": "セッションマップ"
   },
   "announcement": {
     "title": "アップデート完了 · v{version}",
@@ -288,7 +289,18 @@
       "loading": "プロジェクトを読み込み中…",
       "empty": "プロジェクトはまだありません"
     },
-    "archivedChats": "アーカイブ"
+    "archivedChats": "アーカイブ",
+    "runningGroup": "実行中",
+    "actionBadge": {
+      "askUser": "質問中",
+      "approval": "承認待ち",
+      "confirm": "確認待ち"
+    },
+    "projectNewChat": "新しいチャット",
+    "projectMore": "その他",
+    "projectRemove": "ワークスペースを削除",
+    "projectArchiveAll": "すべてのチャットをアーカイブ",
+    "projectArchiveDone": "{count} 件のチャットをアーカイブしました"
   },
   "titlebar": {
     "currentChatTitle": "現在のチャットタイトル",
@@ -300,6 +312,12 @@
     "switchFailed": "セッションの切り替えに失敗しました",
     "createFailed": "セッションの作成に失敗しました",
     "archiveFailed": "セッションのアーカイブに失敗しました",
+    "archiveChildrenTitle": "この会話をアーカイブしますか？",
+    "archiveChildrenBody": "この会話から分岐した会話が {count} 件あります。一緒にアーカイブしますか？",
+    "archiveWithChildren": "分岐した会話も一緒にアーカイブ",
+    "archiveDetachChildren": "この会話のみアーカイブ",
+    "archiveChildrenNeeded": "分岐した会話があります。アーカイブ方法を選んでください",
+    "archiveChildSummary": "分岐した会話 {archived} 件をアーカイブし、{detached} 件は独立のまま残しました",
     "rename": "名前を変更",
     "pin": "ピン留め",
     "unpin": "ピン留めを解除",
@@ -363,7 +381,10 @@
     },
     "rcTakingOver": "{platform} 接続中",
     "subagentRunStateUnrecoverable": "過去のサブセッションの実行状態は復元できません",
-    "subagentLinkUnrecoverable": "過去のサブセッションへのリンクは復元できません"
+    "subagentLinkUnrecoverable": "過去のサブセッションへのリンクは復元できません",
+    "collapseChildren": "子会話を折りたたむ",
+    "expandChildren": "子会話を展開",
+    "expandChildrenCount": "子会話 {count} 件を展開"
   },
   "common": {
     "on": "オン",
@@ -407,6 +428,27 @@
     "back": "戻る"
   },
   "chat": {
+    "editedFiles": {
+      "title": "{count} 個のファイルを編集しました",
+      "viewChanges": "変更を表示",
+      "viewUnavailable": "現在のワークスペースに対応する Git 変更がありません",
+      "noGitRepo": "現在のワークスペースは Git リポジトリではないため、Git 経由での変更の表示・取り消しはできません",
+      "undo": "元に戻す",
+      "undoUnavailable": "取り消せるファイルがありません（新規作成ファイルの可能性）",
+      "undoConfirmTitle": "このターンのファイル変更を取り消しますか？",
+      "undoConfirmBody": "Git で次の {count} 個のファイルの未コミット変更を破棄します（最後のコミットに戻します。新規作成ファイルは対象外）：\n{list}",
+      "undoConfirmOk": "変更を破棄",
+      "undoDone": "{count} 個のファイルの変更を取り消しました",
+      "undoFailed": "変更の取り消しに失敗しました",
+      "review": "レビュー",
+      "reviewUnavailable": "セッションがアイドル中のときのみレビューできます",
+      "reviewSent": "レビューを要求しました。助手の確認を待っています",
+      "reviewQueued": "レビュー要求をキューに追加しました。現在のターン後に送信します",
+      "reviewFailed": "レビュー要求の送信に失敗しました",
+      "reviewPrompt": "このターンで編集した次のファイルをレビューしてください：\n{files}\n誤り・漏れ・簡素化できる点を確認し、簡潔な結論を示してください。修正が必要なら直接実施してください。",
+      "showMore": "他 {count} 件のファイルを表示",
+      "showLess": "折りたたむ"
+    },
     "fileRollback": {
       "menuTitle": "再生成",
       "conversationOnly": "会話のみ巻き戻す",
@@ -1504,7 +1546,8 @@
       "about": "概要",
       "security": "セキュリティ",
       "experiments": "実験機能",
-      "envdeps": "環境依存"
+      "envdeps": "環境依存",
+      "keybindings": "ショートカットキー"
     },
     "browser": {
       "cookiesTitle": "Cookies",
@@ -1973,7 +2016,9 @@
       "copied": "コピーしました",
       "saved": "保存しました",
       "invalidPort": "ポートは数字で入力してください",
-      "loadFailed": "アクセス設定の読み込みに失敗しました"
+      "loadFailed": "アクセス設定の読み込みに失敗しました",
+      "publicBaseUrl": "外部アクセスアドレス",
+      "publicBaseUrlHint": "Tailscale の仮想 IP または公開ドメイン（例：https://lingxi.example.com）。設定すると携帯アドレスと QR コードはそれを優先し、外部ネットワークからも接続できます。空欄なら LAN のみ"
     },
     "security": {
       "sandbox": "サンドボックス",
@@ -1998,7 +2043,7 @@
       "networkProxyNoProxy": "プロキシ除外 例: localhost, 127.0.0.1, ::1",
       "networkProxySave": "プロキシ設定を保存",
       "fileBackup": "ファイルバックアップ",
-      "fileBackupDesc": "AIがファイルを変更・削除する前に元の内容を自動保存します",
+      "fileBackupDesc": "AIがファイルを変更・削除する前に元の内容を自動保存します。期限を過ぎたものは自動削除され、セッション削除時にも削除されます",
       "retention": "保持期間",
       "retention1d": "1日",
       "retention3d": "3日",
@@ -2477,7 +2522,7 @@
       "homeFolderClear": "クリア",
       "homeFolderBrowse": "参照",
       "contextFilesTitle": "ワークスペース指示の注入",
-      "contextFilesDesc": "現在のワークスペースプロジェクトの AGENTS.md / CLAUDE.md を、新規セッションのシステムプロンプトへ記憶より前に注入します。",
+      "contextFilesDesc": "現在のワークスペースプロジェクトの AGENTS.md / CLAUDE.md、およびカスタムファイル名の指示ファイルを、新規セッションのシステムプロンプトへ記憶より前に注入します。",
       "injectAgentsMd": "AGENTS.md を注入",
       "injectAgentsMdDesc": "オンにすると、新規セッションは現在の作業ディレクトリから Git ルートまでの AGENTS.md を読み込みます。",
       "injectClaudeMd": "CLAUDE.md を注入",
@@ -2488,7 +2533,10 @@
       "discoverProjectSkillsDesc": "現在のプロジェクトの .agents/skills からスキルを検出して読み込みます。",
       "discoverCompatibleProjectSkills": "他ツールのプロジェクトスキルを読み込む",
       "discoverCompatibleProjectSkillsDesc": "Claude Code、Codex、OpenClaw のプロジェクトスキルも検出します。",
-      "agentDeskSection": "Agent デスク設定"
+      "agentDeskSection": "Agent デスク設定",
+      "injectCustomFile": "カスタムファイルを注入",
+      "injectCustomFileDesc": "オンにすると、新規セッションは現在の作業ディレクトリから Git ルートまでの、以下のファイル名と同名のファイルを読み込みます。",
+      "customFileNamePlaceholder": "カスタムファイル名（例：QWEN.md）"
     },
     "toolCaps": {
       "title": "スキルインストール権限"
@@ -3037,10 +3085,6 @@
         "unknownValue": "（不明）"
       },
       "charts": {
-        "fixedBadgeDate": "固定 · 日付",
-        "fixedBadgeModelDate": "固定 · モデル × 日付",
-        "fixedBadgeProviderDate": "固定 · プロバイダー × 日付",
-        "fixedBadgeCategoryDate": "固定 · カテゴリ × 日付",
         "empty": "データなし",
         "loading": "チャートデータを読み込み中…",
         "error": "チャートの読み込みに失敗しました",
@@ -3058,6 +3102,7 @@
           "cumulative": "累計",
           "tooltipCalls": "呼び出し回数",
           "tooltipTokens": "Token 合計",
+          "tooltipHint": "その日の呼び出し回数とトークン使用量",
           "weekRange": "{since} – {until} の週",
           "cumulativeUntil": "{date} までの累計",
           "hint": {
@@ -3076,9 +3121,16 @@
         },
         "pie": {
           "title": "カテゴリ構成",
-          "hint": "日付を選んで当日のカテゴリ構成を表示。スライスにホバーで内訳と当日合計を表示。",
-          "dateLabel": "表示日"
-        }
+          "viewDaily": "日別",
+          "viewAll": "累計",
+          "allTotal": "累計合計",
+          "dateLabel": "表示日",
+          "hint": "日付を選んで当日のカテゴリ構成を表示。スライスにホバーで内訳と当日合計を表示。"
+        },
+        "fixedBadgeDate": "固定 · 日付",
+        "fixedBadgeModelDate": "固定 · モデル × 日付",
+        "fixedBadgeProviderDate": "固定 · プロバイダー × 日付",
+        "fixedBadgeCategoryDate": "固定 · カテゴリ × 日付"
       },
       "storage": {
         "retentionTitle": "保持日数",
@@ -3248,7 +3300,8 @@
           "dropped": "ペイロードはキャプチャ時にドロップされました",
           "not_captured": "この呼び出しではペイロードはキャプチャされていません",
           "unknown": "ペイロードレコードがありません"
-        }
+        },
+        "empty": "呼び出し記録はありません"
       },
       "provenance": {
         "title": "セマンティック入力プロベナンス",
@@ -3859,6 +3912,64 @@
           "less": "折りたたむ"
         }
       }
+    },
+    "keybindings": {
+      "title": "ショートカットキー",
+      "searchPlaceholder": "ショートカットを検索",
+      "resetAll": "すべて既定に戻す",
+      "alreadyDefault": "現在は既定のキーバインドです",
+      "column": {
+        "command": "コマンド",
+        "binding": "キーバインド",
+        "scope": "スコープ",
+        "actions": "操作"
+      },
+      "scope": {
+        "global": "グローバル",
+        "app": "アプリ内",
+        "local": "ローカル",
+        "globalHint": "システム全体で有効。アプリがバックグラウンドでも発動します",
+        "appHint": "アプリ内のすべてのウィンドウで有効",
+        "localHint": "特定の画面にフォーカスがあるときのみ有効"
+      },
+      "addBinding": "バインドを追加",
+      "recording": "新しいキー組み合わせを押してください…",
+      "bindingEmpty": "未割り当て",
+      "conflict": "このキーの組み合わせは既に他のコマンドに割り当てられています",
+      "maxBindings": "コマンドごとに最大 3 つのバインドを設定できます",
+      "restoreCommand": "既定に戻す",
+      "removeBinding": "バインドを削除",
+      "editBinding": "キーを変更",
+      "saved": "ショートカットを保存しました",
+      "resetDone": "すべて既定に戻しました",
+      "registrationFailed": "ショートカットの登録に失敗しました。他のアプリで使用中の可能性があります",
+      "noResults": "一致するショートカットがありません",
+      "footnote": "ローカルショートカットは対応する画面にフォーカスがあるときのみ有効です。既定のキーは macOS と Windows/Linux で異なります。",
+      "footnoteMac": "ローカルショートカットは対応する画面にフォーカスがあるときのみ有効です。⌘ は Command キーを指します。",
+      "commands": {
+        "quickChatToggle": "クイックチャットを呼び出す",
+        "quickChatToggleHint": "クイックチャットのミニウィンドウを表示・非表示にします",
+        "appRestart": "アプリを再起動",
+        "appRestartHint": "アプリを終了して再起動します。未保存の内容は失われる可能性があります",
+        "appOpenSettings": "設定を開く",
+        "appOpenSettingsHint": "設定ウィンドウを開きます",
+        "appNewSession": "新規セッション",
+        "appNewSessionHint": "新しいセッションを作成します",
+        "appToggleSidebar": "サイドバーの切り替え",
+        "appToggleSidebarHint": "左サイドバーの表示・非表示を切り替えます",
+        "voiceRecordToggle": "音声録音/送信",
+        "voiceRecordToggleHint": "メインチャットにフォーカスがあるとき、1 回押すと録音開始、もう 1 回押すと停止して送信します"
+      },
+      "loadFailed": "ショートカット設定の読み込みに失敗しました",
+      "recordingModifierOnly": "修飾キー単独では登録できません。英字・数字・ファンクションキーを併せて押してください",
+      "recordingNeedsModifier": "組み合わせには ⌘/Ctrl または Alt が必要です（F1〜F12 は単独で使用可能）",
+      "systemTaken": "{combo} はシステムまたは別のアプリで使用中のため、保存しませんでした",
+      "availability": {
+        "ok": "利用可能",
+        "taken": "使用中",
+        "checking": "確認中…",
+        "unavailable": "デスクトップアプリ内で確認できます"
+      }
     }
   },
   "onboarding": {
@@ -4222,15 +4333,23 @@
     "noCommits": "コミットはありません",
     "copyHash": "コミット ID をコピー",
     "copied": "コミット ID をコピーしました",
-    "timeJustNow": "たった今",
-    "timeMinutesAgo": "{n} 分前",
-    "timeHoursAgo": "{n} 時間前",
-    "timeDaysAgo": "{n} 日前",
+    "historyColGraph": "グラフ",
+    "historyColDescription": "説明",
+    "historyColDate": "日付",
+    "historyColAuthor": "作成者",
+    "historyColHash": "コミット",
+    "commitFiles": "{n} ファイル",
+    "historyLoading": "コミットを読み込み中…",
     "commitTitle": "コミットまたはプッシュ",
-    "commitMessagePlaceholder": "コミットメッセージ（空欄で自動生成）",
-    "includeUnstaged": "未ステージの変更を含む",
     "btnCommit": "コミット",
     "btnCommitPush": "コミットしてプッシュ",
+    "btnPull": "プル",
+    "pullHint": "リモートの新しいコミットを取り込みます（fast-forward のみ、マージコミットは作成しません）",
+    "pullDone": "リモートの更新を取り込みました（{count} コミット）",
+    "pullUpToDate": "すでに最新です",
+    "noUpstream": "現在のブランチには上流ブランチがありません",
+    "pullDiverged": "ローカルとリモートが分岐していて自動マージできません。チャットでアシスタントに相談してください",
+    "pullLocalChanges": "未コミットのローカル変更がリモートの更新と競合しています。先にコミットするか stash してください",
     "btnPush": "プッシュ",
     "nothingToCommit": "コミットする変更がありません",
     "nothingStaged": "ステージ済みの変更がありません（「未ステージの変更を含む」をチェック）",
@@ -4263,15 +4382,15 @@
     "unstashPathDirty": "このファイルには未コミットの変更があり、取り出すと上書きされます。先に元に戻すかコミットしてください",
     "unstashConflict": "取り出しで競合しました。スタッシュは残してあります。解決して再試行してください",
     "discardOneHint": "このファイルの未コミット変更を破棄して HEAD に戻します（取り消せません）",
-    "discardUntrackedHint": "未追跡の新規ファイルは誤削除を避けるため対象外です",
+    "discardUntrackedHint": "未追跡の新ファイル：破棄するとこのファイルを削除します（取り消せません）",
     "discardFileDone": "{name} の変更を元に戻しました",
     "discardAllDone": "追跡ファイルの変更をすべて元に戻しました",
     "discardFailed": "元に戻せませんでした",
     "discardNothing": "元に戻す変更がありません",
     "discardConfirmTitle": "変更を元に戻す",
     "discardConfirmOk": "元に戻す",
-    "discardConfirmAll": "追跡ファイルの未コミット変更（ステージ済みを含む）をすべて破棄します。取り消せません。未追跡の新規ファイルは影響を受けません。",
-    "discardConfirmFiles": "この {count} ファイルの未コミット変更（ステージ済みを含む）を破棄します。取り消せません：\n{list}",
+    "discardConfirmAll": "追跡ファイルの未コミット変更（ステージ済みを含む）をすべて破棄し、未追跡の新ファイルをすべて削除します。取り消せません。",
+    "discardConfirmFiles": "この {count} ファイルの未コミット変更を破棄します（未追跡の新ファイルは削除されます）。取り消せません：\n{list}",
     "operationFailed": "操作に失敗しました",
     "worktreeRow": "作業ツリーを新規作成",
     "worktreeTitle": "worktree で新しいセッションを開始",
@@ -4290,7 +4409,48 @@
     "worktreeDirExists": "同名のディレクトリが既にあります。別の名前を使ってください",
     "worktreeBranchExists": "対応する wt/ ブランチが既にあります。別の名前を使ってください",
     "worktreeMainTag": "メイン",
-    "worktreeCurrentTag": "現在"
+    "worktreeCurrentTag": "現在",
+    "graphTitle": "ソース管理",
+    "graphMessagePlaceholder": "メッセージ（*Enter で「{branch}」にコミット）",
+    "graphCleanTree": "変更なし。ワークツリーはクリーンです",
+    "stagedChanges": "ステージ済みの変更",
+    "stageAllTitle": "すべての変更をステージ",
+    "unstageAll": "すべてのステージを解除",
+    "stageOne": "変更をステージ",
+    "unstageOne": "ステージを解除",
+    "discardOneTitle": "変更を破棄",
+    "discardAllTitle": "すべての変更を破棄",
+    "amendBtn": "コミット（修正）",
+    "amendHint": "変更を前回のコミットにまとめる",
+    "commitSyncBtn": "コミットして同期",
+    "commitSyncHint": "先にリモートを取得してから、コミットしてプッシュ",
+    "amendDone": "前回のコミットにまとめました",
+    "stageDone": "{name} をステージしました",
+    "stageAllDone": "すべての変更をステージしました",
+    "unstageDone": "{name} のステージを解除しました",
+    "unstageAllDone": "すべてのステージを解除しました",
+    "stageFailed": "ステージに失敗しました",
+    "unstageFailed": "ステージ解除に失敗しました",
+    "syncChanges": "変更を同期",
+    "syncPushHint": "ローカルの {n} 件のコミットをプッシュ",
+    "syncPullHint": "リモートの新しい {n} 件のコミットを取得",
+    "syncBothHint": "リモートの新しい {n} 件を取得してから、ローカルの {m} 件をプッシュ",
+    "aheadHint": "リモートより {n} 件先行しています",
+    "letterM": "変更",
+    "letterU": "未追跡",
+    "letterA": "ステージ済みの新ファイル",
+    "letterD": "削除",
+    "graphFilesMore": "他 {n} 件 — リストをスクロールして確認できます",
+    "graphShowAll": "すべて表示（{n} 件）",
+    "checkBlockEof": "プロジェクトの自動チェックにブロックされました：ファイル末尾に余計な空行があります（{file} {line} 行目）。削除してからコミットしてください。",
+    "checkBlockWhitespace": "プロジェクトの自動チェックにブロックされました：行末に余計な空白があります（{file} {line} 行目）。整理してから再試行してください。",
+    "checkBlockPush": "プッシュが拒否されました：①プッシュ前の自動チェック（プロジェクト全体の型チェックなど）に通らなかった、②リモートに自分が持たない新しいコミットがある——のが一般的な原因です。先にプルするか、ローカルのターミナルでチェック出力を確認してください。",
+    "checkBlockHook": "プロジェクトの自動チェックにブロックされました（コミット/プッシュ前のチェックに通りませんでした）。チェック出力に従って修正してから再試行してください。",
+    "refreshInfo": "リモートとローカルの情報を更新",
+    "refreshLocalOnly": "リモート未設定 — ローカル情報のみ更新します",
+    "refreshDone": "更新しました：ローカルとリモートの情報は最新です",
+    "fetchFailed": "リモート情報の更新に失敗しました",
+    "noRemoteNotice": "リモートが未設定です — コミットはローカルにのみ保存され、プッシュできません。"
   },
   "desk": {
     "title": "デスク",
@@ -4974,7 +5134,7 @@
       "theme": "テーマ",
       "chatModel": "チャットモデル",
       "fileBackup": "ファイルバックアップ",
-      "fileBackupDesc": "AI による変更前にファイルを自動バックアップ"
+      "fileBackupDesc": "AIによる変更前に自動バックアップする保持日数（日）"
     },
     "generateImage": {
       "description": "テキスト説明から画像を生成します。非ブロッキング: 送信後すぐに返り、完了すると自動的に表示されます。",
@@ -5531,5 +5691,53 @@
     "confirmed": {
       "pending": "「{name}」への巻き戻しを確認。このターン終了後に自動実行します。"
     }
+  },
+  "compaction": {
+    "askTitle": "コンテキストが半分近くに達しました",
+    "askBody": "このセッションのコンテキスト使用量は {percent}% です（{askPercent}% の確認ラインを超過。{forcePercent}% で自動圧縮されます）。圧縮すると古い対話は要約にまとめられ、空きが生まれます。今すぐ圧縮しますか？",
+    "askConfirm": "今すぐ圧縮",
+    "askCancel": "後で",
+    "deferredToast": "返信完了後にコンテキストを自動圧縮します",
+    "autoCompleted": "コンテキストが {percent}% に達したため、自動圧縮しました"
+  },
+  "map": {
+    "workspace": "ワークスペース",
+    "locate": "現在のセッション",
+    "zoomIn": "拡大",
+    "zoomOut": "縮小",
+    "empty": "このワークスペースにはまだセッションがありません",
+    "loading": "読み込み中…",
+    "turnsLoadFailed": "読み込みに失敗しました",
+    "ungrouped": "未分類",
+    "toolCount": "ツール {count}",
+    "truncated": "内容が省略されています",
+    "stats": "{threads} セッション · {cards} カード",
+    "followUp": "追加質問",
+    "continue": "続きを聞く",
+    "branch": "ブランチを作成",
+    "openInChat": "チャットで開く",
+    "send": "送信",
+    "cancel": "キャンセル",
+    "sending": "送信中…",
+    "waitingForAssistant": "助手の返答を待っています…",
+    "queued": "送信キューに追加しました。チャットページで自動送信されます",
+    "sendFailed": "送信に失敗しました",
+    "forkBusy": "このセッションは返信を生成中です。しばらくしてから再試行してください",
+    "collapseBlockedCurrent": "現在のセッションがこの後続ブランチ内にあるため、折りたためません",
+    "hiddenCount": "後続 {count} 件を非表示",
+    "collapse": "後続を折りたたむ",
+    "expand": "後続を展開",
+    "resetLayout": "レイアウトをリセット",
+    "resetLayoutConfirm": "キャンバスのレイアウトをリセットしますか？",
+    "quickPhrases": "詳しく説明|例を挙げて|平易に説明|比較して",
+    "draftContinuePlaceholder": "この質問から続きを聞く…",
+    "draftBranchPlaceholder": "ここからブランチを作成…",
+    "editPhrases": "定型文を編集",
+    "addPhrase": "追加",
+    "processLine": "ツール呼び出し {count} 回",
+    "turnLabel": "第 {index} ターン"
+  },
+  "labels": {
+    "thinking": "思考"
   }
 }

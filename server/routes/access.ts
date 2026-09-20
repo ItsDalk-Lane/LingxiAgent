@@ -68,7 +68,8 @@ export function createAccessRoute({
     if (denied) return denied;
     const summary = createAccessSummary(engine, runtimeState, listLanAddresses);
     const port = normalizeQrPort(c.req.query("port"), summary.network.actualPort);
-    const url = buildLanMobileUrl(summary.network.lanAddresses, port);
+    const url = summary.network.publicMobileUrl
+      || buildLanMobileUrl(summary.network.lanAddresses, port);
     if (!url) {
       return c.json({ error: "lan_address_unavailable" }, 400);
     }
@@ -91,15 +92,25 @@ export function createAccessRoute({
       const mode = normalizeNetworkMode(body?.mode);
       const listenPort = normalizePort(body?.listenPort ?? body?.configuredPort ?? existing.listenPort);
       const listenHost = mode === "lan" ? "0.0.0.0" : "127.0.0.1";
+      const publicBase = body && Object.prototype.hasOwnProperty.call(body, "publicBaseUrl")
+        ? normalizePublicBaseUrl(body.publicBaseUrl)
+        : (existing.customRemote?.enabled ? existing.customRemote.baseUrl : null);
+      const customRemote = publicBase
+        ? { enabled: true, baseUrl: publicBase, wsUrl: null }
+        : { enabled: false, baseUrl: null, wsUrl: null };
       const network = saveServerNetworkConfig(engine.lingxiHome, {
         ...existing,
         mode,
         listenHost,
         listenPort,
+        customRemote,
       }, { now: now() });
       runtimeState.configuredMode = network.mode;
       runtimeState.configuredListenHost = network.listenHost;
       runtimeState.configuredPort = network.listenPort;
+      runtimeState.publicServerBaseUrl = network.customRemote?.enabled
+        ? network.customRemote.baseUrl
+        : null;
       recordSecurityAuditEvent(c, engine, {
         action: "access.network.update",
         target: "server-network",
@@ -153,7 +164,9 @@ export function createAccessRoute({
       return c.json({
         ok: true,
         secret: issued.secret,
-        accessUrl: summary.network[profile.urlField] || summary.network[profile.localUrlField],
+        accessUrl: summary.network[profile.deviceKind === "mobile" ? "publicMobileUrl" : "publicDesktopUrl"]
+          || summary.network[profile.urlField]
+          || summary.network[profile.localUrlField],
         device: sanitizeDevice(issued.device),
         credential: sanitizeCredential(issued.credential),
       });
@@ -244,6 +257,13 @@ function createNetworkSummary(network, runtimeState, listLanAddresses) {
   const lanServerUrl = lanRuntimeActive && lanAddresses.length > 0
     ? buildServerUrl(lanAddresses[0], actualPort)
     : null;
+  const publicBaseUrl = normalizePublicBaseUrl(
+    runtimeState?.publicServerBaseUrl
+    || (network.customRemote?.enabled ? network.customRemote.baseUrl : null)
+  ) || null;
+  const publicServerUrl = publicBaseUrl ? `${publicBaseUrl}/` : null;
+  const publicMobileUrl = publicBaseUrl ? `${publicBaseUrl}/mobile/` : null;
+  const publicDesktopUrl = publicBaseUrl ? `${publicBaseUrl}/desktop/` : null;
   const localMobileUrl = buildMobileUrl("127.0.0.1", actualPort);
   const candidateLanMobileUrl = buildLanMobileUrl(lanAddresses, network.listenPort);
   const lanMobileUrl = lanRuntimeActive && lanAddresses.length > 0
@@ -264,6 +284,10 @@ function createNetworkSummary(network, runtimeState, listLanAddresses) {
     restartRequired: runtimeMode !== network.mode
       || runtimeHost !== network.listenHost
       || actualPort !== network.listenPort,
+    publicBaseUrl,
+    publicServerUrl,
+    publicMobileUrl,
+    publicDesktopUrl,
     lanAddresses,
     localServerUrl,
     candidateLanServerUrl,
@@ -337,6 +361,18 @@ function normalizePort(value) {
     throw new Error("listenPort must be between 1024 and 65535");
   }
   return port;
+}
+
+function normalizePublicBaseUrl(value) {
+  if (value === undefined || value === null) return null;
+  if (typeof value !== "string") throw new Error("publicBaseUrl must be a string");
+  const trimmed = value.trim().replace(/\/+$/, "");
+  if (!trimmed) return null;
+  if (!/^https?:\/\/[^\s]+$/.test(trimmed)) {
+    throw new Error("publicBaseUrl must start with http:// or https://");
+  }
+  if (trimmed.length > 200) throw new Error("publicBaseUrl too long");
+  return trimmed;
 }
 
 function normalizeQrPort(value, fallback) {

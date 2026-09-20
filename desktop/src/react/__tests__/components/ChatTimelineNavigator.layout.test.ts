@@ -87,7 +87,10 @@ describe('ChatTimelineNavigator layout', () => {
   it('keeps timeline anchor construction behind the active hover preparation gate', () => {
     const source = readChatMessageSurfaceSource();
 
-    expect(source).toContain('active && timelinePrepared ? buildTimelineAnchors(visibleItems) : EMPTY_TIMELINE_ANCHORS');
+    // 锚点基于全部已加载消息（items，非渲染窗口 visibleItems），
+    // 标题目录覆盖整个会话；但仍被 hover 准备门控，未唤起不构建。
+    expect(source).toContain('active && timelinePrepared ? buildTimelineAnchors(items) : EMPTY_TIMELINE_ANCHORS');
+    expect(source).not.toContain('buildTimelineAnchors(visibleItems)');
     expect(source).toContain('if (active && inRailX && inRailY) setTimelinePrepared(true)');
     expect(source).toContain('setTimelinePrepared(false)');
   });

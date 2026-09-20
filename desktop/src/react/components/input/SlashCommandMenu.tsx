@@ -27,8 +27,10 @@ export const SlashCommandMenu = memo(function SlashCommandMenu({ commands, selec
           disabled={!!busy}
         >
           <span className={styles['slash-menu-icon']} dangerouslySetInnerHTML={{ __html: cmd.icon }} />
-          <span className={styles['slash-menu-label']}>{cmd.label}</span>
-          <span className={styles['slash-menu-desc']}>{cmd.description}</span>
+          <span className={styles['slash-menu-text']}>
+            <span className={styles['slash-menu-label']}>{cmd.label}</span>
+            <span className={styles['slash-menu-desc']}>{cmd.description}</span>
+          </span>
         </button>
       ))}
     </div>

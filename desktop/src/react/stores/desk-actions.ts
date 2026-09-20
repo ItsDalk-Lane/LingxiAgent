@@ -23,6 +23,7 @@ import {
 import { isWebRuntime } from '../utils/platform-runtime';
 import { mergeWorkspaceHistory, normalizeWorkspacePath, removeWorkspaceHistoryEntries } from '../../../../shared/workspace-history.ts';
 import { pendingNewSessionIdentityPatch } from './session-actions';
+import { persistLastProjectIdentity } from './last-project-identity';
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- store setState 回调及 IPC callback data */
 
@@ -315,6 +316,7 @@ export async function applyStudioWorkspace(workspace: { mountId: string | null; 
     workspaceFolders: s.workspaceFolders || [],
   }));
   void activateWorkspaceDesk(null, { mountId, label, nativeRootPath, reload: false });
+  persistLastProjectIdentity({ workspaceMountId: mountId, cwd: null, workspaceLabel: label });
   const s = useStore.getState();
   if (!s.pendingNewSession) {
     useStore.setState({ currentSessionPath: null, ...pendingNewSessionIdentityPatch() });
@@ -1361,6 +1363,7 @@ export async function applyFolder(folder: string): Promise<void> {
     workspaceFolders: (s.workspaceFolders || []).filter((p: string) => normalizeFolder(p) !== normalized),
   }));
   void activateWorkspaceDesk(normalized, { mountId: null, reload: false });
+  persistLastProjectIdentity({ workspaceMountId: null, cwd: normalized, workspaceLabel: null });
   const s = useStore.getState();
   if (!s.pendingNewSession) {
     useStore.setState({ currentSessionPath: null, ...pendingNewSessionIdentityPatch() });

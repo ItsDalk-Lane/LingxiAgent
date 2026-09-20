@@ -1945,3 +1945,24 @@ M  desktop/src/react/__tests__/components/TodoPanel.test.tsx
   本提交推进了 HEAD，而 `.sync-audit/verified-source-sha.txt` 仍是 `9c4b11114`，diff 里出现 12 个非审计文件。
   独立守护脚本同样红（GUARD_EXIT=1，逐条列出同样 12 个文件）。
 - 封印红**未处理**：不改指针、不扩 allowlist、不退役门禁，留待另行授权的封印流程。
+
+## 2026-09-20 流式期卡片点击落空双修复（工具组身份锚定 + 按压冻结跟随）
+
+- 现象：Assistant Run 进行中，消息流里的「思考」「工具调用」行点击时好时坏、无规律；Run 结束后一切正常。诊断：①浏览器只在按下与抬起命中同一元素时才派发 click，而流式追底滚动让卡片从光标下滑走；②tool_group 的 block.id 由全组工具 id 拼接，并组/补写 id 即换 key，React 整组重建、展开状态清零。
+- 修复 A（身份）：`content-semantics.ts` intrinsicBlockId 的 tool_group 分支改为锚定首个带 id 的成员（`tools:<firstId>`），成员增减不换 key；历史重载与流式合并共用该函数，两路径身份一致。新增测试：成员增加后 id 保持 `run-1:tool_group:tools:call-1`。
+- 修复 B（滚动）：`use-continuous-bottom-scroll.ts` 增加按压冻结：主键 pointerdown 置 hold、window pointerup/pointercancel 释放、runFrame 在 hold 窗口只推进时间基准不动 scrollTop，松手后平滑恢复追赶。只暂停不取消，贴底状态保持；滚轮/触摸/键盘接管路径不变；非主键不触发；组件卸载重置。滚动器共用方（聊天区/Channels/Bridge/子会话预览/终端卡）同步受益。
+- 验证：chat-semantics + history-builder + use-stream-buffer 定向 114/114 绿；use-continuous-bottom-scroll 14/14 绿（含按压冻结/非主键两个新测试）；`npx tsc --noEmit` 对本次 4 文件 0 错误；前端全量 369 文件 367 通过，唯一红 `SessionListContextMenu`（16/29）经隔离复验（仅撤销本 4 文件仍红）确认为工作区既有在途改动所致，与本修复无关。
+- 注意：工作区存在大量其他未提交改动（会话列表/侧栏/设置等约 80 文件 + 多个未跟踪文件），本次仅改动上述 4 个文件；未提交、未推送，待用户在真机流式场景验证点击。
+
+## 2026-09-21 0.1.41 候选批次收口（侧栏项目分组 + Git 图谱 + 会话地图 + 快捷键 + 压缩双阈值）
+
+- 批量提交 2026-09-18 以来全部在途工作（186 改 / 42 增 / 3 删）：侧栏按项目分组重构（分组折叠跟随当前聊天、执行中组、置顶跨项目条、fork 谱系行、上次活跃项目身份持久化）；GitGraphPanel 取代 GitCommitModal（提交/推送/拉取合一、分支胶囊、四角星生成提交信息）；会话地图（轮次级 conversation-map 组件/store/server 路由）；应用级快捷键系统（shared/keybindings-preferences 三端同源 + 设置页 + dispatcher）；上下文压缩双阈值（ASK 50% 询问 / FORCE 80% 强制，CompactionAskDialog）；换模型残留清账（model-switch-settlement）；TurnEditedFilesCard；会话删除快照联动清理（共享仓库保护）；pi-coding-agent 0.84.1→0.86.0。
+- 本次收口修复（提交前把工作区 42 项测试红全部清零或归因）：
+  - 真实 bug：SessionList 只有置顶会话时误判空态（置顶条被空态分支吞掉）——showEmptyState 补 hasPinnedItems。
+  - 测试随新契约推进：slash 菜单裸 label；聊天引用角色信封（助手/用户 + [引用原文]）；fork 返回 sourceSessionId；composer 回执隔离边界 originConnectionKey→serverKey、delivery_unknown 不再拦新输入（对账兜底 + 不自动重发保底线）；SessionListContextMenu 16 项按分组语义重写（活跃组展开、跨组折叠、置顶条独立渲染）；斜杠菜单几何 420×301（逐像素校准）。
+  - pi 0.86.0 随动：closure DYNAMIC_CALL_ALLOWLIST 登记 utils/shell.js taskkill spawn（Windows 进程树清理）；closure 可移植性检查豁免 allowlist 回显段（vendored 源码里的 "C:\Windows" 系统常量非本机路径）；export-manifest 补 utils/text.js 与两个新 shared 模块（keybindings-preferences 三件套、compaction-thresholds）。
+  - 持久化指纹三件套同源重算（scan-persistent-stores → inventory/receipt → fingerprint sha256:2024cc3…，compatible 分类：新增 conversation-map 布局存储为纯增量、快照删除清理不改持久化形状）；session-jsonl 活体钉随依赖升级 0.84.1→0.86.0。
+  - i18n 补齐 ja/ko/zh-TW 各 15 键（归档衍生对话六键、Git 拉取七键、观测空态、思考标签）——修复 HEAD 既有红。
+  - 样式基线收账（官方 --update-baseline：SessionList/Settings/GitGraphPanel/TurnEditedFilesCard 新增 UI 的灰名单入账）。
+  - round2 证据补丁从干净 89bc0b64 再生成（552,825 行 / 880 diff；.gitignore 排除 .mimosa/.playwright-mcp/mockup 后不再吸入工具本地状态）；desktop/artifacts/card-e2e-test.txt 按文件自述删除。
+- 验证（提交前，工作区=本提交内容）：typecheck x3 绿；全量 `npm test` 14700 测试：14681 通过 / 15 既有跳过 / 4 红，全部为封印坐标族（post-verification-audit-seal、round2 R10-03/04、round3 manifest——同因 VERIFIED_SOURCE_SHA 仍指 a5e596718，属旧坐标预期红，见下方审计提交推进）。

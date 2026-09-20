@@ -7,6 +7,13 @@
  * remain host-owned and must never be supplied by a tool resolver.
  */
 
+import {
+  PASSTHROUGH_INVOCATION_ERROR_CODES,
+  summarizeErrorForDiagnostics,
+  ToolInvocationError,
+  type ToolInvocationErrorCode,
+} from "../tools/invocation/errors.ts";
+
 export type ToolInvocationKind = "read" | "routine" | "review";
 
 export type ToolInvocationTargetType =
@@ -71,6 +78,14 @@ export type ToolInvocationPermissionResolution =
       message: string;
       field?: string;
       declaredCapability?: string | null;
+      /** 解析器抛出平台类型化错误（如参数校验失败）时透传的原 code。 */
+      invocationCode?: ToolInvocationErrorCode;
+      /** 类型化错误的原始描述，构造时已脱敏，供模型按指示自纠。 */
+      invocationMessage?: string;
+      /** 类型化错误的脱敏 details（字段级校验问题等）。 */
+      invocationDetails?: Readonly<Record<string, unknown>> | null;
+      /** 原始异常的脱敏摘要，无论是否透传都保留作排查底账。 */
+      cause?: { name: string; message: string } | null;
     };
   };
 
@@ -481,6 +496,10 @@ function failure({
   message,
   field,
   declaredCapability,
+  invocationCode,
+  invocationMessage,
+  invocationDetails,
+  cause,
 }: {
   toolName: string;
   code?: "TOOL_INVOCATION_RESOLVER_FAILED" | "TOOL_INVOCATION_DESCRIPTOR_INVALID";
@@ -488,6 +507,10 @@ function failure({
   message: string;
   field?: string;
   declaredCapability?: string | null;
+  invocationCode?: ToolInvocationErrorCode;
+  invocationMessage?: string;
+  invocationDetails?: Readonly<Record<string, unknown>> | null;
+  cause?: { name: string; message: string } | null;
 }): ToolInvocationPermissionResolution {
   return {
     ok: false,
@@ -499,6 +522,10 @@ function failure({
       message,
       ...(field ? { field } : {}),
       ...(declaredCapability !== undefined ? { declaredCapability } : {}),
+      ...(invocationCode ? { invocationCode } : {}),
+      ...(invocationMessage ? { invocationMessage } : {}),
+      ...(invocationDetails ? { invocationDetails } : {}),
+      ...(cause ? { cause } : {}),
     },
   };
 }
@@ -878,12 +905,26 @@ export function resolveToolInvocationPermission(
   try {
     raw = resolver(input);
   } catch (error) {
-    void error;
+    // 平台类型化错误中仅限“调用方可自纠”的白名单类别（如 mcp_call 转发目标
+    // 时的参数校验失败、目标不存在）透传原 code/message/details——它们在构造
+    // 时已脱敏，且本来就是给调用方看的反馈，模型能据此按字段修正；其余异常
+    // （包括权限结论与未知错误）保持统一脱敏文案。无论透传与否，都保留脱敏
+    // 摘要作为排查底账。
+    const passthrough = error instanceof ToolInvocationError
+      && PASSTHROUGH_INVOCATION_ERROR_CODES.has(error.code)
+      ? {
+        invocationCode: error.code as ToolInvocationErrorCode,
+        invocationMessage: error.message,
+        invocationDetails: error.details,
+      }
+      : {};
     return failure({
       toolName,
       code: "TOOL_INVOCATION_RESOLVER_FAILED",
       reason: "resolver_threw",
       message: "Tool invocation resolver failed before producing a descriptor.",
+      ...passthrough,
+      cause: summarizeErrorForDiagnostics(error),
     });
   }
   if (raw === null || raw === undefined) {

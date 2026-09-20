@@ -336,6 +336,22 @@ function projectedTurnItems(
     navigationAnchors: collectNavigationAnchors(blockRefs),
     mode,
   };
+  // 折叠把过程块从源消息 blocks 剥离后，回合级视图（文件修改卡）仍需要工具块：
+  // 把整轮过程块的引用挂到回合末条可见消息上，AssistantMessage 据此取数。
+  // 克隆消息对象注入，不改写 store 里的源消息。
+  if (sourceMessages.length > 0 && blockRefs.length > 0) {
+    const lastIndex = sourceMessages.length - 1;
+    const last = sourceMessages[lastIndex];
+    if (last.item.type === 'message') {
+      sourceMessages[lastIndex] = {
+        ...last,
+        item: {
+          type: 'message',
+          data: { ...last.item.data, turnProcessBlocks: blockRefs.flatMap((ref) => ref.blocks) },
+        },
+      };
+    }
+  }
   return [fold, ...sourceMessages];
 }
 

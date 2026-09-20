@@ -79,6 +79,8 @@ export function useContinuousBottomScroll({
   const instantLandingArmedRef = useRef(false);
   const programmaticScrollTopRef = useRef<number | null>(null);
   const lastObservedScrollHeightRef = useRef<number | null>(null);
+  // 指针按压窗口标记：按下到抬起之间冻结跟随动画（见 onPointerDown）。
+  const pointerHoldRef = useRef(false);
 
   activeRef.current = active;
   thresholdRef.current = stickyThreshold;
@@ -142,6 +144,14 @@ export function useContinuousBottomScroll({
     if (delta < 0) {
       stopFollow();
       checkSticky();
+      return;
+    }
+
+    // 按压冻结：按下期间只推进时间基准，不动 scrollTop；松手后按新时刻继续
+    // 平滑追赶（时间基准持续刷新，避免恢复瞬间 dt 猛增造成跳变）。
+    if (pointerHoldRef.current) {
+      lastFrameTimeRef.current = finiteNumber(time, lastFrameTimeRef.current ?? time);
+      rafRef.current = window.requestAnimationFrame(runFrame);
       return;
     }
 
@@ -261,10 +271,29 @@ export function useContinuousBottomScroll({
       }
     };
 
+    // 按压暂停：浏览器只在按下与抬起命中同一元素时才派发 click；流式期间逐帧
+    // 追底会让卡片从光标下滑走，点击批量落空。主键按下窗口内冻结跟随（只暂停
+    // 不取消，贴底状态保持），松手/取消后从当前时刻恢复追赶。滚轮、触摸、键盘
+    // 的既有接管路径不受影响；滚动条拖拽不经由内容区的 pointerdown，天然无关。
+    const releasePointerHold = () => {
+      if (!pointerHoldRef.current) return;
+      pointerHoldRef.current = false;
+      window.removeEventListener('pointerup', releasePointerHold);
+      window.removeEventListener('pointercancel', releasePointerHold);
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.button !== 0) return;
+      if (pointerHoldRef.current) return;
+      pointerHoldRef.current = true;
+      window.addEventListener('pointerup', releasePointerHold);
+      window.addEventListener('pointercancel', releasePointerHold);
+    };
+
     el.addEventListener('scroll', onScroll, { passive: true });
     el.addEventListener('wheel', onWheel, { passive: true });
     el.addEventListener('touchstart', onTouchStart, { passive: true });
     el.addEventListener('keydown', onKeyDown);
+    el.addEventListener('pointerdown', onPointerDown);
     onScroll();
 
     return () => {
@@ -272,6 +301,8 @@ export function useContinuousBottomScroll({
       el.removeEventListener('wheel', onWheel);
       el.removeEventListener('touchstart', onTouchStart);
       el.removeEventListener('keydown', onKeyDown);
+      el.removeEventListener('pointerdown', onPointerDown);
+      releasePointerHold();
     };
   }, [active, cancelFollow, checkSticky, scrollRef]);
 

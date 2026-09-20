@@ -2220,10 +2220,17 @@ describe("SessionCoordinator", () => {
       subscribe: vi.fn(() => vi.fn()),
       setActiveToolsByName: vi.fn(function () {
         this._baseSystemPrompt = "FINAL PROMPT CURRENT";
-        this.agent.state.systemPrompt = "FINAL PROMPT CURRENT";
       }),
       _baseSystemPrompt: "FINAL PROMPT CURRENT",
-      agent: { state: { systemPrompt: "FINAL PROMPT CURRENT" } },
+      // pi-agent-core 0.86+ 真实形状：state.systemPrompt 是从 messages 回放的只读
+      // getter，任何赋值都会抛 TypeError（正是 0.86 升级后冷启动 restore 全挂的原因）。
+      agent: {
+        state: {
+          get systemPrompt() {
+            return "TRANSCRIPT REPLAY CURRENT";
+          },
+        },
+      },
     };
     createAgentSessionMock
       .mockResolvedValueOnce({ session: freshSession })
@@ -2283,7 +2290,9 @@ describe("SessionCoordinator", () => {
     expect(restoreOptions.resourceLoader.getSkills()).toEqual({ skills: [{ name: "skill-v1" }], diagnostics: [] });
     expect(restoreOptions.resourceLoader.getAgentsFiles()).toEqual({ agentsFiles: [{ path: "/AGENTS.md", content: "rules v1" }] });
     expect(restoredSession._baseSystemPrompt).toBe("FINAL PROMPT V1");
-    expect(restoredSession.agent.state.systemPrompt).toBe("FINAL PROMPT V1");
+    // state.systemPrompt 是只读投影，冻结值走上方 loader 快照通道；投影保持原值，
+    // 证明 restore 不再试图写这个 getter（旧实现在此抛 TypeError，整个切换失败）。
+    expect(restoredSession.agent.state.systemPrompt).toBe("TRANSCRIPT REPLAY CURRENT");
     // context ring refresh keeps restore cheap: old sessions keep frozen prompt snapshots,
     // while explicit refresh/fresh compact is responsible for rebuilding capability snapshots.
     expect(agent.buildSystemPrompt).toHaveBeenCalledTimes(1);
@@ -3855,7 +3864,16 @@ Continue the restored transcript.
       firstKeptEntryId: null,
     });
     expect(providerContexts).toHaveLength(1);
-    expect(providerContexts[0].messages.slice(0, -1)).toEqual(transcriptMessages);
+    // pi 0.86：AgentContext 不再有独立 systemPrompt 字段，系统提示词物化为头部
+    // system 消息（transcript 无 system 消息时由 AgentRun 补头），线上请求与
+    // 0.84.1 的 context.systemPrompt 单列等价。
+    const [leadingSystemMessage, ...transcriptRest] = providerContexts[0].messages.slice(0, -1);
+    expect(leadingSystemMessage).toEqual({
+      role: "system",
+      content: "primary Agent system prompt",
+      timestamp: 0,
+    });
+    expect(transcriptRest).toEqual(transcriptMessages);
     expect(providerContexts[0].tools).toEqual([]);
     expect(appendCompaction).toHaveBeenCalledWith(
       summary,

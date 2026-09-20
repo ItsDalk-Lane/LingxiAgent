@@ -65,7 +65,8 @@ describe('useServerSlashCommandItems', () => {
     await waitFor(() => expect(result.current.map(item => item.name)).toEqual(['plugin_hello']));
     expect(result.current[0]).toMatchObject({
       aliases: ['hello'],
-      label: '/plugin_hello',
+      // label 现为裸命令名（菜单已按斜杠菜单语境展示，不再带前导斜杠）。
+      label: 'plugin_hello',
       type: 'server-command',
     });
     expect(mocks.lingxiFetch.mock.calls[0]?.[0]).toBe('/api/commands?agentId=mio');

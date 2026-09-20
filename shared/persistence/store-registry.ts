@@ -781,6 +781,16 @@ export const PERSISTENT_STORES: readonly StoreDescriptor[] = Object.freeze([
     ],
   }),
   defineStore({
+    id: "conversation-map-layout",
+    ownerModule: "server/routes/conversation-map.ts",
+    pathPatterns: ["conversation-map.json"],
+    format: "json",
+    schemaSource: runtimeSource("server/routes/conversation-map.ts", "conversation-map layout normalizer (GET) and validated atomic writer (PUT)"),
+    openEntry: ["createConversationMapRoute"],
+    identityContract: "Layout entries are keyed by map card id; session/entry ids embedded in keys are references to session-owned data, not identities owned here.",
+    siteRules: rules(["server/routes/conversation-map.ts"], "Reads and atomically writes the conversation-map canvas layout file."),
+  }),
+  defineStore({
     id: "channels",
     ownerModule: "lib/channels/channel-store.ts",
     pathPatterns: ["channels/{channelId}.yaml"],

@@ -29,9 +29,9 @@ const MAX_RENDER_LINES = 1500;
 
 type DiffCache = Record<string, GitFileDiff | 'error'>;
 
-/** 单文件回退不可用：未跟踪文件没有 HEAD 版本可回 */
-function canDiscard(file: GitFileChange): boolean {
-  return file.state !== 'untracked';
+/** 未跟踪文件也可回退（= 删除该文件，后端走 git clean），仅用于提示文案区分 */
+function isUntracked(file: GitFileChange): boolean {
+  return file.state === 'untracked';
 }
 
 /** 该文件是否躺在某条储藏里（决定「取出」是否可用） */
@@ -235,7 +235,7 @@ export function GitChangesModal({ open, onClose, dir, files, agentId, refresh }:
     }
   };
 
-  const discardable = files.filter(canDiscard);
+  const discardable = files;
   const frozen = busyPath != null || bulkBusy != null;
   const confirmPaths = confirmDiscard ?? [];
   const confirmWholeRepo = confirmPaths.length === 0;
@@ -352,7 +352,7 @@ export function GitChangesModal({ open, onClose, dir, files, agentId, refresh }:
                         )}
                       </Tooltip>
                       <Tooltip
-                        content={canDiscard(file) ? t('gitEnv.discardOneHint') : t('gitEnv.discardUntrackedHint')}
+                        content={isUntracked(file) ? t('gitEnv.discardUntrackedHint') : t('gitEnv.discardOneHint')}
                         placement="top"
                       >
                         {({ ref, ...tooltipProps }) => (
@@ -362,7 +362,7 @@ export function GitChangesModal({ open, onClose, dir, files, agentId, refresh }:
                             type="button"
                             className={styles.fileBtnDanger}
                             data-testid={`git-change-discard-${file.path}`}
-                            disabled={frozen || !canDiscard(file)}
+                            disabled={frozen}
                             onClick={() => void handleDiscardFile(file)}
                           >
                             {t('gitEnv.discardOne')}

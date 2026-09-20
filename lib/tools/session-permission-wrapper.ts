@@ -371,13 +371,21 @@ async function executeWithInvocationRevalidation(
     }
     const current = resolveToolInvocationPermission(tool, params);
     if (current.ok === false) {
-      return toolError("Tool invocation could not be revalidated before execution.", {
-        errorCode: current.error.code,
-        resolverReason: current.error.reason,
-        ...(current.error.field ? { resolverField: current.error.field } : {}),
-        permissionMode: mode,
-        toolName: tool.name,
-      });
+      return toolError(
+        current.error.invocationMessage
+          ?? "Tool invocation could not be revalidated before execution.",
+        {
+          errorCode: current.error.invocationCode ?? current.error.code,
+          resolverReason: current.error.reason,
+          ...(current.error.field ? { resolverField: current.error.field } : {}),
+          ...(current.error.invocationDetails
+            ? { invocationDetails: current.error.invocationDetails }
+            : {}),
+          ...(current.error.cause ? { resolverCause: current.error.cause } : {}),
+          permissionMode: mode,
+          toolName: tool.name,
+        },
+      );
     }
     if (
       expectedInvocation
@@ -693,13 +701,26 @@ export function wrapWithSessionPermission(tools: any[] = [], deps: any = {}) {
         }
         const invocationResolution = resolveToolInvocationPermission(permissionTool, params);
         if (invocationResolution.ok === false) {
-          return toolError(invocationResolution.error.message, {
-            errorCode: invocationResolution.error.code,
-            resolverReason: invocationResolution.error.reason,
-            ...(invocationResolution.error.field ? { resolverField: invocationResolution.error.field } : {}),
-            permissionMode: mode,
-            toolName: tool.name,
-          });
+          // 类型化错误（如目标参数校验失败）优先透传原始描述与 code，让模型按
+          // 指出的字段自纠；脱敏摘要写入 details 作为排查底账。
+          return toolError(
+            invocationResolution.error.invocationMessage ?? invocationResolution.error.message,
+            {
+              errorCode: invocationResolution.error.invocationCode ?? invocationResolution.error.code,
+              resolverReason: invocationResolution.error.reason,
+              ...(invocationResolution.error.field
+                ? { resolverField: invocationResolution.error.field }
+                : {}),
+              ...(invocationResolution.error.invocationDetails
+                ? { invocationDetails: invocationResolution.error.invocationDetails }
+                : {}),
+              ...(invocationResolution.error.cause
+                ? { resolverCause: invocationResolution.error.cause }
+                : {}),
+              permissionMode: mode,
+              toolName: tool.name,
+            },
+          );
         }
         const invocation = invocationResolution.source === "descriptor"
           ? invocationResolution.descriptor

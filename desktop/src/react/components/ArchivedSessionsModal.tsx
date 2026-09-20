@@ -158,7 +158,8 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
     setSelected(new Set());
   };
 
-  // 选择模式下的行点击：进入模式时顺手勾中该行，之后每次点击切换勾选
+  // 点击归档记录标题：未在选择模式 → 进入并勾中该行；已在 → 切换该行勾选。
+  // 只有标题名称承接「显示勾选框」的入口，行内其余区域不触发。
   const handleRowActivate = (item: ArchivedSession) => {
     if (!selectionMode) {
       setSelectionMode(true);
@@ -168,7 +169,8 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
     toggleSelected(item);
   };
 
-  // 分组头点击（不含折叠箭头与组勾选框）：未在选择模式 → 进入并勾中整组；已在 → 切换整组勾选
+  // 点击目录名称：未在选择模式 → 进入并勾中整组；已在 → 切换整组勾选。
+  // 目录名称不触发折叠（折叠由分组头其余区域承接）。
   const handleGroupActivate = (group: ArchiveGroup) => {
     if (!selectionMode) {
       setSelectionMode(true);
@@ -350,8 +352,8 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
                   const collapsed = collapsedGroups.has(group.key);
                   return (
                     <div key={group.key} className={styles.group} data-archive-group={group.key}>
-                      {/* 分组头：点箭头折叠整组；点头部其余区域切换整组勾选（未在选择模式时先进入选择模式）。
-                          箭头/组勾选框各自 stopPropagation */}
+                      {/* 分组头：除组勾选框外，点头部任意位置（含箭头）折叠/展开整组；
+                          只有目录名称承接「进入选择模式/切换整组勾选」，并阻断折叠冒泡 */}
                       <div
                         className={styles.groupHeader}
                         data-group-header={group.key}
@@ -359,11 +361,11 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
                         role="button"
                         tabIndex={0}
                         aria-expanded={!collapsed}
-                        onClick={() => handleGroupActivate(group)}
+                        onClick={() => toggleGroupCollapse(group.key)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
-                            handleGroupActivate(group);
+                            toggleGroupCollapse(group.key);
                           }
                         }}
                       >
@@ -371,10 +373,6 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
                           className={`${styles.chevron}${collapsed ? '' : ` ${styles.chevronOpen}`}`}
                           data-group-chevron={group.key}
                           aria-hidden="true"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleGroupCollapse(group.key);
-                          }}
                         >
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <polyline points="9 18 15 12 9 6"></polyline>
@@ -390,7 +388,23 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
                             aria-label={group.title}
                           />
                         )}
-                        <span className={styles.groupName} title={group.cwd || group.mountId || undefined}>
+                        <span
+                          className={styles.groupName}
+                          title={group.cwd || group.mountId || undefined}
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleGroupActivate(group);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleGroupActivate(group);
+                            }
+                          }}
+                        >
                           {group.title}
                         </span>
                         {/* 徽标只给「有工作台身份但已解析不到」的分组；未归属组从未有过工作台，不标 */}
@@ -409,8 +423,12 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
                       {!collapsed && group.items.map((item) => (
                         <div
                           key={item.path}
-                          className={styles.row}
-                          onClick={() => handleRowActivate(item)}
+                          className={`${styles.row}${selectionMode ? ` ${styles.rowSelectable}` : ''}`}
+                          onClick={() => {
+                            // 行内点击只在选择模式下切换勾选；未进入选择模式时不做事，
+                            // 「显示勾选框」的入口只留给标题名称
+                            if (selectionMode) toggleSelected(item);
+                          }}
                         >
                           {selectionMode && (
                             <input
@@ -423,7 +441,22 @@ export function ArchivedSessionsModal({ open, onClose, zIndex = 1000 }: Props) {
                             />
                           )}
                           <div className={styles.rowMain}>
-                            <div className={styles.rowTitle}>
+                            <div
+                              className={styles.rowTitle}
+                              role="button"
+                              tabIndex={0}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRowActivate(item);
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleRowActivate(item);
+                                }
+                              }}
+                            >
                               {item.title || item.firstMessage || t('session.untitled')}
                             </div>
                             <div className={styles.rowMeta}>

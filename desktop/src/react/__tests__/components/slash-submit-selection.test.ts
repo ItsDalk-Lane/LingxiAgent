@@ -86,7 +86,8 @@ describe('resolveSlashSubmitSelection', () => {
     const loop = commands.find(command => command.name === 'loop');
 
     expect(loop).toBeTruthy();
-    expect(loop?.label).toBe('/loop');
+    // label 现为裸命令名（不带前导斜杠），与菜单新展示一致。
+    expect(loop?.label).toBe('loop');
     expect(loop?.type).toBe('server-command');
   });
 

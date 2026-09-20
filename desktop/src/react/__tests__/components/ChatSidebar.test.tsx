@@ -5,7 +5,7 @@ import React from 'react';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useStore } from '../../stores';
-import { ChatSidebarContent } from '../../components/app/ChatSidebar';
+import { ChatSidebar, ChatSidebarContent } from '../../components/app/ChatSidebar';
 
 vi.mock('../../components/channels/ChannelList', () => ({
   ChannelListSidebar: () => <section data-testid="channel-list-sidebar" />,
@@ -129,5 +129,45 @@ describe('ChatSidebarContent', () => {
     expect(document.querySelector('.sidebar-function-row')).not.toBeInTheDocument();
     expect(document.querySelector('[data-sidebar-workspace-section]')).not.toBeInTheDocument();
     expect(screen.getByTestId('session-list')).toBeInTheDocument();
+  });
+});
+
+describe('ChatSidebar tab visibility', () => {
+  beforeEach(() => {
+    window.t = ((key: string) => key) as typeof window.t;
+    useStore.setState({
+      currentAgentId: 'agent-a',
+      currentTab: 'chat',
+    } as never);
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('shows the chat sidebar content on the chat tab', () => {
+    useStore.setState({ currentTab: 'chat' } as never);
+    render(<ChatSidebar open onTogglePanel={vi.fn()} />);
+
+    expect(document.querySelector('.sidebar-chat-content')).not.toHaveClass('hidden');
+    expect(document.querySelector('.sidebar-channel-content')).toHaveClass('hidden');
+  });
+
+  it('keeps the chat sidebar content visible on the map tab (map reuses the chat sidebar)', () => {
+    useStore.setState({ currentTab: 'map' } as never);
+    render(<ChatSidebar open onTogglePanel={vi.fn()} />);
+
+    const chatContent = document.querySelector('.sidebar-chat-content');
+    expect(chatContent).not.toHaveClass('hidden');
+    expect(screen.getByTestId('session-list')).toBeInTheDocument();
+    expect(document.querySelector('.sidebar-channel-content')).toHaveClass('hidden');
+  });
+
+  it('hides the chat sidebar content on the channels tab', () => {
+    useStore.setState({ currentTab: 'channels' } as never);
+    render(<ChatSidebar open onTogglePanel={vi.fn()} />);
+
+    expect(document.querySelector('.sidebar-chat-content')).toHaveClass('hidden');
+    expect(document.querySelector('.sidebar-channel-content')).not.toHaveClass('hidden');
   });
 });

@@ -311,7 +311,8 @@ describe('composer-send-coordinator（Q01–Q16）', () => {
     // R04 修正旧合同：canonical ACK 后仍有独立 run barrier，不能立即放行 B。
     const clientMessageId = String(sentPayloads()[0].clientMessageId);
     dispatchAck(PATH_A, clientMessageId);
-    expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+    // 新语义：接收账已销，「在途」不含结局未定；B 不抢跑由回合忙闲把关（下一行验证）。
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(false);
     await flushQueuedHeadNow(PATH_A, makeDeps());
     expect(wsMocks.current!.send).toHaveBeenCalledTimes(1);
     dispatchRunStart(PATH_A, 'run-ack');
@@ -737,11 +738,12 @@ describe('R03 最新意图与前台边界', () => {
     dispatchRunStart(PATH_A, 'new-run');
     dispatchAck(PATH_A, getSendRecord(first.leaseId)!.clientMessageId);
     expect(getSendRecord(first.leaseId)!.runStatus).toBe('running');
-    expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+    // 新语义：「在途」不含结局未定；排队项不抢跑由 streaming 忙闲把关。
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(false);
     // 即使旧结束通知重放，也不得用它结算新回合。
     dispatchRunEnd(PATH_A, 'old-run');
     await vi.advanceTimersByTimeAsync(400);
-    expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+    expect(getSendRecord(first.leaseId)!.runStatus).toBe('running');
     expect(sentPayloads()).toHaveLength(1);
   });
 
@@ -762,7 +764,10 @@ describe('R03 最新意图与前台边界', () => {
     dispatchAck(PATH_A, clientId);
     await vi.advanceTimersByTimeAsync(400);
     expect(sentPayloads()).toHaveLength(1);
-    expect(hasInFlightSend(identityOf(PATH_A))).toBe(true);
+    // 新语义：身份不符的结束事件不被采信，结局账悬而未决；
+    // 「在途」不含结局未定，排队项不抢跑由忙闲与队首门禁兑现。
+    expect(hasInFlightSend(identityOf(PATH_A))).toBe(false);
+    expect(getSendRecord(first.leaseId)!.runStatus).not.toBe('terminal');
     expect(queueOf(PATH_A)).toHaveLength(1);
   });
 

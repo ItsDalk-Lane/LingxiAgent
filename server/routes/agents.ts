@@ -165,7 +165,7 @@ function hasWorkspaceSkillPolicyPatch(workspaceContext) {
   return !!workspaceContext && WORKSPACE_SKILL_POLICY_FIELDS.some((field) => hasOwn(workspaceContext, field));
 }
 
-function validateWorkspaceSkillPolicyPatch(workspaceContext) {
+function validateWorkspaceContextPatch(workspaceContext) {
   if (workspaceContext === undefined) return null;
   if (!workspaceContext || typeof workspaceContext !== "object" || Array.isArray(workspaceContext)) {
     return "workspace_context must be an object";
@@ -173,6 +173,20 @@ function validateWorkspaceSkillPolicyPatch(workspaceContext) {
   for (const field of WORKSPACE_SKILL_POLICY_FIELDS) {
     if (hasOwn(workspaceContext, field) && typeof workspaceContext[field] !== "boolean") {
       return `workspace_context.${field} must be a boolean`;
+    }
+  }
+  // 自定义注入文件：开关必须是布尔值，文件名必须是纯文件名（不允许带路径）
+  if (hasOwn(workspaceContext, "inject_custom_file") && typeof workspaceContext.inject_custom_file !== "boolean") {
+    return "workspace_context.inject_custom_file must be a boolean";
+  }
+  if (hasOwn(workspaceContext, "custom_file_name")) {
+    const name = workspaceContext.custom_file_name;
+    if (typeof name !== "string") {
+      return "workspace_context.custom_file_name must be a string";
+    }
+    const trimmed = name.trim();
+    if (trimmed && (trimmed === "." || trimmed === ".." || trimmed.includes("/") || trimmed.includes("\\"))) {
+      return "workspace_context.custom_file_name must be a plain file name without path separators";
     }
   }
   return null;
@@ -664,9 +678,9 @@ export function createAgentsRoute(engine) {
         && typeof partial.memory.dream.auto_enabled !== "boolean") {
         return c.json({ error: "memory.dream.auto_enabled must be a boolean" }, 400);
       }
-      const workspaceSkillPolicyError = validateWorkspaceSkillPolicyPatch(partial.workspace_context);
-      if (workspaceSkillPolicyError) {
-        return c.json({ error: workspaceSkillPolicyError }, 400);
+      const workspaceContextError = validateWorkspaceContextPatch(partial.workspace_context);
+      if (workspaceContextError) {
+        return c.json({ error: workspaceContextError }, 400);
       }
 
       // ── schema-driven 全局字段分流 ──

@@ -109,7 +109,8 @@ function renderHit(entry: ToolCatalogEntry, schemaRequired?: string[]): string {
     ? `必填：${schemaRequired.join(", ")}`
     : (entry.paramsSummary ? `参数：${entry.paramsSummary}` : "无参数");
   return [
-    `${entry.name}（${entry.serverLabel}）`,
+    // serverId 是 mcp_call 实际接受的标识，一并展示，避免模型拿展示名去当 server 用
+    `${entry.name}（${entry.serverLabel}，server=${entry.serverId}）`,
     entry.description || "无描述",
     required,
   ].join("\n  ");
@@ -125,36 +126,105 @@ function nearNames(catalog: ToolCatalog, name: string, limit = 3): string[] {
     .slice(0, limit);
 }
 
-function renderSchema(schema: unknown): string {
-  const properties = schemaProperties(schema);
-  const required = new Set(requiredNames(schema));
-  const names = Object.keys(properties);
-  if (names.length === 0) return "无参数";
-  return names.map((name) => {
-    const spec = properties[name] || {};
-    const flag = required.has(name) ? "必填" : "可选";
-    const type = typeof spec.type === "string" ? spec.type : "any";
-    const description = typeof spec.description === "string" && spec.description ? ` — ${spec.description}` : "";
-    return `- ${name}（${type}，${flag}）${description}`;
-  }).join("\n");
+function isPlainObjectSpec(value: unknown): value is Record<string, any> {
+  return !!value && typeof value === "object" && !Array.isArray(value);
 }
 
-function callExample(entry: ToolCatalogEntry, schema: unknown): string {
-  const properties = schemaProperties(schema);
-  const example: Record<string, unknown> = {};
-  for (const name of requiredNames(schema)) {
-    const type = properties[name]?.type;
-    example[name] = type === "number" || type === "integer"
-      ? 0
-      : type === "boolean"
-        ? true
-        : type === "array"
-          ? []
-          : type === "object"
-            ? {}
-            : `<${name}>`;
+/**
+ * 类型名：枚举列出全部取值，联合列出分支；数组元素类型并入尖括号，
+ * 嵌套结构由 renderPropertyNode 递归展开。
+ */
+function typeNameOf(spec: Record<string, any>): string {
+  if (Array.isArray(spec.enum) && spec.enum.length > 0) {
+    return `enum ${spec.enum.map((value) => JSON.stringify(value)).join(" | ")}`;
   }
-  return JSON.stringify({ server: entry.serverId, tool: entry.name, arguments: example }, null, 2);
+  const branches = Array.isArray(spec.anyOf)
+    ? spec.anyOf
+    : Array.isArray(spec.oneOf)
+      ? spec.oneOf
+      : null;
+  if (branches && branches.length > 0) {
+    return branches
+      .map((branch) => (isPlainObjectSpec(branch) ? typeNameOf(branch) : "any"))
+      .join(" | ");
+  }
+  if (Array.isArray(spec.type)) return spec.type.join(" | ");
+  if (typeof spec.type === "string") return spec.type;
+  return "any";
+}
+
+/** 数值/长度/项数边界与 pattern 等约束：完整呈现，不静默截断。 */
+function constraintSummary(spec: Record<string, any>): string {
+  const parts: string[] = [];
+  const bounds: Array<[string, string]> = [
+    ["minimum", "最小值"], ["maximum", "最大值"],
+    ["exclusiveMinimum", "严格大于"], ["exclusiveMaximum", "严格小于"],
+    ["minLength", "最小长度"], ["maxLength", "最大长度"],
+    ["minItems", "最少项数"], ["maxItems", "最多项数"],
+    ["multipleOf", "倍数"],
+  ];
+  for (const [key, label] of bounds) {
+    const value = spec[key];
+    if (typeof value === "number") parts.push(`${label} ${value}`);
+  }
+  if (typeof spec.pattern === "string") parts.push(`格式 ${spec.pattern}`);
+  if (spec.default !== undefined) parts.push(`默认 ${JSON.stringify(spec.default)}`);
+  if (spec.additionalProperties === false) parts.push("不允许额外字段");
+  return parts.length > 0 ? `；${parts.join("，")}` : "";
+}
+
+/** 递归渲染一层字段：类型、必填、约束、描述；嵌套对象与数组元素展开。 */
+function renderPropertyNode(
+  name: string,
+  spec: Record<string, any>,
+  requiredAtLevel: ReadonlySet<string>,
+  indent: string,
+): string[] {
+  const flag = requiredAtLevel.has(name) ? "必填" : "可选";
+  const items = isPlainObjectSpec(spec.items) ? spec.items : null;
+  const baseType = typeNameOf(spec);
+  const expandItems = baseType === "array" && !!items;
+  const type = expandItems ? `array<${typeNameOf(items!)}>` : baseType;
+  const description = typeof spec.description === "string" && spec.description
+    ? ` — ${spec.description}`
+    : "";
+  const lines = [`${indent}- ${name}（${type}，${flag}${constraintSummary(spec)}）${description}`];
+  const childIndent = `${indent}  `;
+  if (expandItems && items!.properties) {
+    lines.push(...renderStructLines(items!, "每项", childIndent));
+  }
+  lines.push(...renderStructLines(spec, "", childIndent));
+  return lines;
+}
+
+/** 渲染对象规格的子字段；无显式 properties 时返回空。 */
+function renderStructLines(spec: Record<string, any>, lead: string, indent: string): string[] {
+  const properties = isPlainObjectSpec(spec.properties) ? spec.properties : {};
+  const names = Object.keys(properties);
+  if (names.length === 0) return [];
+  const required = new Set(requiredNames(spec));
+  const header = lead ? [`${indent}${lead}（object）：`] : [];
+  const childIndent = lead ? `${indent}  ` : indent;
+  return [...header, ...names.flatMap((name) => (
+    renderPropertyNode(name, properties[name] || {}, required, childIndent)
+  ))];
+}
+
+/**
+ * 完整渲染工具参数规格：与校验器看到的信息一致，嵌套结构、枚举取值、
+ * 数值与长度约束全部呈现，不静默截断。
+ */
+function renderSchema(schema: unknown): string {
+  const properties = schemaProperties(schema);
+  const names = Object.keys(properties);
+  if (names.length === 0) {
+    const noExtras = isPlainObjectSpec(schema) && schema.additionalProperties === false;
+    return noExtras ? "无参数（且不允许额外字段）" : "无参数";
+  }
+  const required = new Set(requiredNames(schema));
+  return names
+    .flatMap((name) => renderPropertyNode(name, properties[name] || {}, required, ""))
+    .join("\n");
 }
 
 export function createBridgeTools({ catalog, gateway }: BridgeToolDeps) {
@@ -225,15 +295,17 @@ export function createBridgeTools({ catalog, gateway }: BridgeToolDeps) {
           ? `No tool named ${requested}. Closest matches: ${suggestions.join(", ")}.`
           : `No tool named ${requested}. Use ${SEARCH_TOOL_NAME} to find one.`);
       }
+      const schemaText = described.schema == null
+        ? "参数定义暂不可用：来源 schema 读取失败，请重试或刷新该工具来源；不要当作无参数工具直接调用。"
+        : renderSchema(described.schema);
       return text([
-        `${described.name}（${described.serverLabel}）`,
+        `${described.name}（${described.serverLabel}，server=${described.serverId}）`,
         described.description || "无描述",
         "",
         "参数：",
-        renderSchema(described.schema),
+        schemaText,
         "",
-        `调用示例（${CALL_TOOL_NAME}）：`,
-        callExample(catalog.getByTargetId(described.targetId)!, described.schema),
+        `调用方式（${CALL_TOOL_NAME}）：传 tool: ${JSON.stringify(described.name)}；同名工具需加 server: ${JSON.stringify(described.serverId)} 消歧，名称唯一时可省略 server。arguments 按上述完整参数规格填写。`,
       ].join("\n"));
     },
   };

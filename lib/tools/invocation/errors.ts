@@ -107,6 +107,43 @@ export class ToolInvocationError extends Error {
   }
 }
 
+/**
+ * 可透传给调用方的错误码白名单：仅限“调用方可自行修复”的类别
+ * （参数不合法、目标不存在/不可见、能力不匹配）。权限类结论
+ * （PERMISSION_DENIED 等）不属于此类，保持统一脱敏文案，避免
+ * 改变 resolver 失败的外层语义。
+ */
+export const PASSTHROUGH_INVOCATION_ERROR_CODES: ReadonlySet<ToolInvocationErrorCode> = new Set<ToolInvocationErrorCode>([
+  "ARGUMENTS_NOT_OBJECT",
+  "ARGUMENT_SCHEMA_INVALID",
+  "TOOL_SCHEMA_INVALID",
+  "TARGET_NOT_FOUND",
+  "TARGET_AMBIGUOUS",
+  "TARGET_NOT_VISIBLE",
+  "TARGET_DISABLED_FOR_AGENT",
+  "TARGET_REVOKED",
+  "CAPABILITY_MISMATCH",
+]);
+
 export function isToolInvocationError(value: unknown): value is ToolInvocationError {
   return value instanceof ToolInvocationError;
+}
+
+/**
+ * 任意异常的脱敏摘要：权限层兜底捕获时无论是否透传，都保留原始错误的
+ * 名称与描述作为排查底账。脱敏规则与 ToolInvocationError 相同，仅供诊断。
+ */
+export function summarizeErrorForDiagnostics(
+  error: unknown,
+): { name: string; message: string } | null {
+  if (error instanceof Error) {
+    return {
+      name: error.name || "Error",
+      message: redactText(String(error.message || "").slice(0, 300)),
+    };
+  }
+  if (typeof error === "string" && error.trim()) {
+    return { name: "throw", message: redactText(error.slice(0, 300)) };
+  }
+  return null;
 }

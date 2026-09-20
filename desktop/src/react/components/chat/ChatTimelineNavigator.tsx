@@ -14,6 +14,10 @@ interface Props {
   messageElementsRef: RefObject<Map<string, HTMLDivElement>>;
   active: boolean;
   railVisible: boolean;
+  /** 跳转前退出贴底跟随：否则流式/内容变化会把视口拽回底部，跳转看起来没反应。 */
+  exitFollow?: () => void;
+  /** 目标消息不在渲染窗口内（无 DOM 可测位置）时回调，交给定位管线扩窗+滚动。 */
+  onLocate?: (anchor: TimelineAnchor) => void;
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -48,6 +52,8 @@ export const ChatTimelineNavigator = memo(function ChatTimelineNavigator({
   messageElementsRef,
   active,
   railVisible,
+  exitFollow,
+  onLocate,
 }: Props) {
   const [layouts, setLayouts] = useState<Record<string, MarkerLayout>>({});
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -158,25 +164,32 @@ export const ChatTimelineNavigator = memo(function ChatTimelineNavigator({
   }, [scrollRef, shouldMeasure, updateActive]);
 
   const jumpTo = useCallback((anchor: TimelineAnchor) => {
+    // 与查找定位（pendingLocate 的 finishScroll）同规则：先退出贴底跟随，
+    // 防止流式 ResizeObserver 立刻把视口拽回底部，跳转被夺走。
+    exitFollow?.();
     const panel = scrollRef.current;
     const layout = layouts[anchor.messageId];
-    if (!panel || !layout) return;
+    if (!panel || !layout) {
+      // 目标消息未挂载（渲染窗口外）：交给定位管线（扩窗 → 等元素 → 滚动）。
+      onLocate?.(anchor);
+      return;
+    }
     panel.scrollTo({ top: layout.targetTop, behavior: 'smooth' });
-  }, [layouts, scrollRef]);
+  }, [exitFollow, layouts, onLocate, scrollRef]);
 
-  const renderedAnchors = useMemo(
-    () => anchors.filter(anchor => layouts[anchor.messageId]),
-    [anchors, layouts],
+  // 锚点基于全部已加载消息生成；未挂载的锚点没有可测位置但不隐藏，
+  // 点击时经 onLocate 走定位管线。位置测量（layouts）仍只覆盖已挂载消息。
+  const railItems: Array<TimelineRailItem<TimelineAnchor>> = useMemo(
+    () => anchors.map(anchor => ({
+      id: anchor.messageId,
+      label: anchor.label,
+      markerWidthEm: anchor.markerWidthEm,
+      payload: anchor,
+    })),
+    [anchors],
   );
 
   if (!active || anchors.length === 0) return null;
-
-  const railItems: Array<TimelineRailItem<TimelineAnchor>> = renderedAnchors.map(anchor => ({
-    id: anchor.messageId,
-    label: anchor.label,
-    markerWidthEm: anchor.markerWidthEm,
-    payload: anchor,
-  }));
 
   return (
     <TimelineRailNavigator

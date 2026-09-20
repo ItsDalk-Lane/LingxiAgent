@@ -12,6 +12,8 @@ interface AnchoredPortalProps {
   offset?: number;
   minWidth?: number;
   viewportPadding?: number;
+  /** 面板宽度跟随锚点元素（下拉菜单与触发按钮同宽时用） */
+  matchAnchorWidth?: boolean;
   onClose?: () => void;
   role?: string;
 }
@@ -27,6 +29,7 @@ export function AnchoredPortal({
   offset = 6,
   minWidth,
   viewportPadding = 4,
+  matchAnchorWidth,
   onClose,
   role,
 }: AnchoredPortalProps) {
@@ -53,7 +56,9 @@ export function AnchoredPortal({
 
     const anchorRect = anchor.getBoundingClientRect();
     const panelRect = panel.getBoundingClientRect();
-    const panelWidth = panelRect.width || minWidth || anchorRect.width;
+    const panelWidth = matchAnchorWidth
+      ? anchorRect.width
+      : (panelRect.width || minWidth || anchorRect.width);
     const panelHeight = panelRect.height || 0;
     const maxLeft = Math.max(viewportPadding, window.innerWidth - panelWidth - viewportPadding);
     const preferredLeft = align === 'end'
@@ -72,10 +77,11 @@ export function AnchoredPortal({
       left,
       top,
       zIndex: TOP_LAYER_Z_INDEX,
+      width: matchAnchorWidth ? anchorRect.width : undefined,
       minWidth,
       visibility: 'visible',
     });
-  }, [align, anchorRef, minWidth, offset, viewportPadding]);
+  }, [align, anchorRef, matchAnchorWidth, minWidth, offset, viewportPadding]);
 
   useLayoutEffect(() => {
     if (!open) return;

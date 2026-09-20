@@ -797,7 +797,6 @@ describe("syncModels", () => {
       maxTokens: 98304,
       input: ["text", "image"],
       reasoning: true,
-      headers: { "User-Agent": "KimiCLI/1.5" },
       compat: {
         supportsDeveloperRole: false,
         thinkingFormat: "kimi",
@@ -877,7 +876,6 @@ describe("syncModels", () => {
       maxTokens: 12345,
       input: ["text"],
       reasoning: false,
-      headers: { "User-Agent": "KimiCLI/1.5" },
     });
   });
 
@@ -911,7 +909,6 @@ describe("syncModels", () => {
         high: "high",
         xhigh: "max",
       },
-      headers: { "User-Agent": "KimiCLI/1.5" },
     });
     expect(models[1]).toMatchObject({
       id: "k3-256k",
@@ -927,7 +924,6 @@ describe("syncModels", () => {
         high: "high",
         xhigh: "max",
       },
-      headers: { "User-Agent": "KimiCLI/1.5" },
     });
     for (const model of models) {
       expect(model).not.toHaveProperty("maxTokens");
@@ -955,7 +951,6 @@ describe("syncModels", () => {
       id: "future-kimi-code-model",
       reasoning: true,
       input: ["text"],
-      headers: { "User-Agent": "KimiCLI/1.5" },
       compat: {
         thinkingFormat: "kimi",
         reasoningProfile: "kimi-openai",
@@ -985,7 +980,9 @@ describe("syncModels", () => {
     const result = JSON.parse(fs.readFileSync(modelsJsonPath, "utf-8"));
     const model = result.providers["kimi-coding"].models[0];
     expect(model.id).toBe("kimi-for-coding");
-    expect(model.headers).toEqual({ "User-Agent": "KimiCLI/1.5" });
+    // pi 0.84.2+ Kimi 目录不再发布 KimiCLI 请求头（改用 pi 运行时 UA），
+    // 同步也不再从目录借头注入。
+    expect(model.headers).toBeUndefined();
     expect(model.compat).toMatchObject({
       supportsDeveloperRole: false,
       thinkingFormat: "kimi",
@@ -2314,7 +2311,8 @@ describe("syncModels", () => {
     }, { modelsJsonPath });
 
     const result = JSON.parse(fs.readFileSync(modelsJsonPath, "utf-8"));
-    // pi SDK 0.83.0 目录：deepseek-v4-flash 不再带 xhigh 档（0.80.3 的 xhigh:"max" 已移除）。
+    // pi SDK 0.86.0 目录：OpenCode Go 的 deepseek-v4-flash 补齐了 low 档（0.85.0 修复），
+    // xhigh 档则从 0.83.0 起就不存在。
     expect(result.providers["opencode-go"].models[0]).toMatchObject({
       id: "deepseek-v4-flash",
       contextWindow: 1_000_000,
@@ -2322,7 +2320,7 @@ describe("syncModels", () => {
       reasoning: true,
       thinkingLevelMap: {
         minimal: null,
-        low: null,
+        low: "low",
         medium: null,
         high: "high",
       },

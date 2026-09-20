@@ -974,6 +974,24 @@ function forkedSessionMeta(sourceMeta: any, input: any) {
   };
 }
 
+/**
+ * session-meta.json 里的 forkedFrom 谱系记录归一化；供会话列表投影暴露分叉来源。
+ * 字段缺失/形状非法一律归 null，不把脏数据透传给前端。
+ * entryId 可选：分叉必然携带边界条目，而侧边聊天等「引用型子对话」只有来源会话。
+ */
+function normalizeForkedFromMeta(value: any) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const sessionId = typeof value.sessionId === "string" && value.sessionId.trim() ? value.sessionId.trim() : null;
+  if (!sessionId) return null;
+  const entryId = typeof value.entryId === "string" && value.entryId.trim() ? value.entryId.trim() : null;
+  return {
+    sessionId,
+    ...(entryId ? { entryId } : {}),
+    target: value.target && typeof value.target === "object" ? value.target : null,
+    forkedAt: typeof value.forkedAt === "string" ? value.forkedAt : null,
+  };
+}
+
 function countRetainedSessionMessages(entries: any[]) {
   return Array.isArray(entries)
     ? entries.filter((entry) => (
@@ -6794,6 +6812,7 @@ export class SessionCoordinator {
           s.projectId = typeof metaEntry?.projectId === "string" && metaEntry.projectId.trim()
             ? metaEntry.projectId.trim()
             : null;
+          s.forkedFrom = normalizeForkedFromMeta(metaEntry?.forkedFrom);
           const workspaceMount = normalizeSessionWorkspaceMount(metaEntry);
           s.workspaceMountId = workspaceMount?.mountId || null;
           s.workspaceLabel = workspaceMount?.label || null;
@@ -6978,6 +6997,41 @@ export class SessionCoordinator {
   _topPinOrder() {
     const min = this._sessionManifestStore?.minPinOrder?.();
     return (Number.isFinite(min) ? min : 0) - PIN_ORDER_STEP;
+  }
+
+  /**
+   * 会话谱系（父对话引用）写入：分叉/侧边聊天等「子对话」用它挂到主对话下；
+   * 传 null 清空（归档主对话时把子对话释放为顶层）。与 normalizeForkedFromMeta
+   * 同一规则：只要求 sessionId，entryId/forkedAt 可缺省。
+   */
+  async setSessionForkedFrom(sessionRef: any, forkedFrom: {
+    sessionId: string;
+    entryId?: string | null;
+    forkedAt?: string | null;
+  } | null) {
+    const { sessionId, sessionPath, manifest } = this._resolveSessionWriteRef(sessionRef, "setSessionForkedFrom");
+    const selfSessionId = manifest?.sessionId || sessionId || null;
+    const sourceSessionId = typeof forkedFrom?.sessionId === "string" ? forkedFrom.sessionId.trim() : "";
+    if (sourceSessionId && selfSessionId && sourceSessionId === selfSessionId) {
+      const error: any = new Error("setSessionForkedFrom: session cannot reference itself");
+      error.code = "session_fork_self_reference";
+      error.status = 400;
+      throw error;
+    }
+    const normalized = sourceSessionId
+      ? {
+        sessionId: sourceSessionId,
+        ...(typeof forkedFrom?.entryId === "string" && forkedFrom.entryId.trim()
+          ? { entryId: forkedFrom.entryId.trim() }
+          : {}),
+        forkedAt: typeof forkedFrom?.forkedAt === "string" && forkedFrom.forkedAt
+          ? forkedFrom.forkedAt
+          : new Date().toISOString(),
+      }
+      : null;
+    await this.writeSessionMeta(sessionPath, { forkedFrom: normalized });
+    this._emitSessionMetadataUpdated(sessionPath, { forkedFrom: normalized });
+    return { forkedFrom: normalized };
   }
 
   /**
@@ -7501,11 +7555,13 @@ export class SessionCoordinator {
       session._baseSystemPrompt = finalSystemPrompt;
     } catch {
       // session 对象理论上可能 frozen 或 _baseSystemPrompt 带抛错 setter；
-      // 容错即可，下面 agent.state.systemPrompt 仍独立尝试写入。
+      // 这是 app 侧读取缓存（_getFinalSystemPrompt 优先消费），写不进也不影响请求路径。
     }
-    if (session?.agent?.state && typeof session.agent.state === "object") {
-      session.agent.state.systemPrompt = finalSystemPrompt;
-    }
+    // 不要写 session.agent.state.systemPrompt：pi-agent-core 0.86 起它是只读 getter
+    // （值从 messages 回放 lead system 消息），赋值直接抛 TypeError。restore 后
+    // "有效 prompt 保持冻结值"由 createSession 包装的 resourceLoader 保证——
+    // getSystemPrompt/getAppendSystemPrompt/getSkills/getAgentsFiles 吐的都是冻结
+    // 快照，SDK 从这组 options 物化 transcript 的 system 消息，不经过 state 字段。
   }
 
   /** session-meta 写入后清除对应缓存 */

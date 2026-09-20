@@ -5,7 +5,7 @@ import React from 'react';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useStore } from '../../stores';
-import { GitEnvironmentCard } from '../../components/runtime/GitEnvironmentCard';
+import { GitEnvironmentCard, resetGitEnvSnapshotCache } from '../../components/runtime/GitEnvironmentCard';
 import type { GitBranches, GitStatus, GitWorktreeInfo, GitWorktrees } from '../../utils/git-env-api';
 
 // 卡片行为聚焦：git 数据链路全部 mock 掉
@@ -40,8 +40,14 @@ vi.mock('../../utils/git-env-api', () => ({
   gitCreateWorktree: (...args: unknown[]) => gitCreateWorktreeMock(...args),
   fetchGitFileDiff: vi.fn(),
   fetchGitLog: (...args: unknown[]) => fetchGitLogMock(...args),
+  fetchGitLogStats: vi.fn().mockResolvedValue({ isRepo: true, stats: {} }),
   gitCommit: vi.fn(),
+  gitAmend: vi.fn(),
+  gitStage: vi.fn(),
+  gitUnstage: vi.fn(),
   gitPush: vi.fn(),
+  gitPull: vi.fn(),
+  gitDiscard: vi.fn(),
   gitStash: vi.fn(),
   generateGitCommitMessage: vi.fn(),
 }));
@@ -148,8 +154,6 @@ const TABLE: Record<string, string> = {
   'gitEnv.changesTitle': '变更文件',
   'gitEnv.noChanges': '暂无变更',
   'gitEnv.commitTitle': '提交或推送',
-  'gitEnv.commitMessagePlaceholder': '提交信息（留空将自动生成）',
-  'gitEnv.includeUnstaged': '包含未暂存的更改',
   'gitEnv.btnCommit': '提交',
   'gitEnv.btnCommitPush': '提交并推送',
   'gitEnv.btnPush': '推送',
@@ -159,6 +163,26 @@ const TABLE: Record<string, string> = {
   'gitEnv.commitDone': '提交完成',
   'gitEnv.pushDone': '推送完成',
   'gitEnv.operationFailed': '操作失败',
+  'gitEnv.graphTitle': '源代码管理',
+  'gitEnv.graphMessagePlaceholder': '消息(*Enter 在“{branch}”提交)',
+  'gitEnv.graphCleanTree': '没有更改，工作区是干净的',
+  'gitEnv.stagedChanges': '暂存的更改',
+  'gitEnv.syncChanges': '同步更改',
+  'gitEnv.amendBtn': '提交（修改）',
+  'gitEnv.commitSyncBtn': '提交和同步',
+  'gitEnv.btnPull': '拉取',
+  'gitEnv.unstageAll': '取消所有暂存修改',
+  'gitEnv.stageAllTitle': '暂存所有更改',
+  'gitEnv.discardAllTitle': '放弃所有更改',
+  'gitEnv.stageOne': '暂存更改',
+  'gitEnv.unstageOne': '取消暂存修改',
+  'gitEnv.discardOneTitle': '放弃更改',
+  'gitEnv.discardUntrackedHint': '未跟踪的新文件不参与回退，避免误删',
+  'gitEnv.discardConfirmTitle': '回退修改',
+  'gitEnv.discardConfirmOk': '确认回退',
+  'gitEnv.amendDone': '已并入上一次提交',
+  'gitEnv.stageAllDone': '已暂存全部改动',
+  'gitEnv.unstageAllDone': '已取消所有暂存修改',
 };
 
 function makeT() {
@@ -170,6 +194,7 @@ function makeT() {
 
 describe('GitEnvironmentCard', () => {
   beforeEach(() => {
+    resetGitEnvSnapshotCache();
     window.t = makeT();
     fetchGitStatusMock.mockReset().mockResolvedValue(STATUS);
     fetchGitBranchesMock.mockReset().mockResolvedValue(BRANCHES);
@@ -230,7 +255,7 @@ describe('GitEnvironmentCard', () => {
     // 默认折叠：探测进行中只露标题行，行内容不可见
     const toggle = screen.getByRole('button', { name: /环境信息/ });
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByTestId('git-env-changes-row')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('git-env-graph-row')).not.toBeInTheDocument();
 
     // 探测完成且非 Git 仓库 → 整卡直接隐藏，不再展示「非 Git 仓库」降级行
     await waitFor(() => expect(screen.queryByTestId('git-env-card')).not.toBeInTheDocument());
@@ -239,21 +264,26 @@ describe('GitEnvironmentCard', () => {
   it('shows formatted change totals, worktree kind and current branch on the four rows', async () => {
     await renderExpanded();
 
-    await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('+73,390'));
-    expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('-5,000');
+    await waitFor(() => expect(screen.getByTestId('git-env-graph-row')).toHaveTextContent('+73,390'));
+    expect(screen.getByTestId('git-env-graph-row')).toHaveTextContent('-5,000');
     expect(screen.getByTestId('git-env-local-row')).toHaveTextContent('分支工作树');
     expect(screen.getByTestId('git-env-branch-row')).toHaveTextContent('feat/knowledge-retrieval-research');
-    expect(screen.getByTestId('git-env-commit-row')).toBeInTheDocument();
+    // 提交或推送行已并入 Git图谱：不再有独立入口行
+    expect(screen.queryByTestId('git-env-commit-row')).not.toBeInTheDocument();
   });
 
-  it('opens the changes modal from the changes row and lists files with per-file stats', async () => {
+  it('opens the Git graph panel from the graph row with staged and unstaged sections', async () => {
     await renderExpanded();
-    await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('+73,390'));
+    await waitFor(() => expect(screen.getByTestId('git-env-graph-row')).toHaveTextContent('+73,390'));
 
-    fireEvent.click(screen.getByTestId('git-env-changes-row'));
-    expect(await screen.findByText('变更文件')).toBeInTheDocument();
-    expect(screen.getByText('desktop/src/app.tsx')).toBeInTheDocument();
-    expect(screen.getByText('server/index.ts')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('git-env-graph-row'));
+    // 面板标题（卡行同名标签也在文档里，取 heading 角色消歧）
+    expect(await screen.findByRole('heading', { name: '源代码管理' })).toBeInTheDocument();
+    // 暂存的更改 / 变更 两区分列（行名取路径末段）
+    expect(screen.getByTestId('git-graph-staged-head')).toHaveTextContent('暂存的更改');
+    expect(screen.getByTestId('git-graph-changes-head')).toHaveTextContent('变更');
+    expect(screen.getByTestId('git-graph-file-server/index.ts')).toHaveTextContent('index.ts');
+    expect(screen.getByTestId('git-graph-file-desktop/src/app.tsx')).toHaveTextContent('app.tsx');
   });
 
   it('expands the local row in place without any section titles', async () => {
@@ -406,23 +436,25 @@ describe('GitEnvironmentCard', () => {
     expect(gitCreateWorktreeMock).not.toHaveBeenCalled();
   });
 
-  it('opens the commit modal from the commit-or-push row', async () => {
+  it('opens the Git graph panel with the message box and commit split button', async () => {
     await renderExpanded();
-    await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('+73,390'));
+    await waitFor(() => expect(screen.getByTestId('git-env-graph-row')).toHaveTextContent('+73,390'));
 
-    fireEvent.click(screen.getByTestId('git-env-commit-row'));
-    expect(await screen.findByPlaceholderText('提交信息（留空将自动生成）')).toBeInTheDocument();
-    expect(screen.getByText('包含未暂存的更改')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('git-env-graph-row'));
+    expect(await screen.findByTestId('git-graph-message')).toBeInTheDocument();
+    expect(screen.getByTestId('git-graph-message')).toHaveAttribute('placeholder', '消息(*Enter 在“feat/knowledge-retrieval-research”提交)');
+    // 无领先/落后 → 主按钮是「提交」
+    expect(screen.getByTestId('git-graph-main-btn')).toHaveTextContent('提交');
   });
 
   it('shows load failure state and retries on click', async () => {
     fetchGitStatusMock.mockRejectedValueOnce(new Error('boom'));
     await renderExpanded();
 
-    await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('加载失败，点击重试'));
-    fireEvent.click(screen.getByTestId('git-env-changes-row'));
+    await waitFor(() => expect(screen.getByTestId('git-env-graph-row')).toHaveTextContent('加载失败，点击重试'));
+    fireEvent.click(screen.getByTestId('git-env-graph-row'));
     await waitFor(() => expect(fetchGitStatusMock.mock.calls.length).toBeGreaterThanOrEqual(2));
-    await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('+73,390'));
+    await waitFor(() => expect(screen.getByTestId('git-env-graph-row')).toHaveTextContent('+73,390'));
   });
 
   it('starts with rows collapsed and toggles them from the title bar', async () => {
@@ -432,24 +464,46 @@ describe('GitEnvironmentCard', () => {
     // 默认折叠：数据已就绪但行内容不挂载
     const toggle = screen.getByRole('button', { name: /环境信息/ });
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByTestId('git-env-changes-row')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('git-env-graph-row')).not.toBeInTheDocument();
 
     fireEvent.click(toggle);
-    await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('+73,390'));
+    await waitFor(() => expect(screen.getByTestId('git-env-graph-row')).toHaveTextContent('+73,390'));
     expect(screen.getByTestId('git-env-history-row')).toBeInTheDocument();
 
     fireEvent.click(toggle);
     // Collapse 走 motion 退场动画，卸载有延迟
-    await waitFor(() => expect(screen.queryByTestId('git-env-changes-row')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByTestId('git-env-graph-row')).not.toBeInTheDocument());
     expect(screen.queryByTestId('git-env-history-row')).not.toBeInTheDocument();
   });
 
   it('opens the commit history modal from the history row', async () => {
     await renderExpanded();
-    await waitFor(() => expect(screen.getByTestId('git-env-changes-row')).toHaveTextContent('+73,390'));
+    await waitFor(() => expect(screen.getByTestId('git-env-graph-row')).toHaveTextContent('+73,390'));
 
     fireEvent.click(screen.getByTestId('git-env-history-row'));
     expect(await screen.findByText('feat: 头号提交')).toBeInTheDocument();
     expect(fetchGitLogMock).toHaveBeenCalledWith('/ws/linked', null, 300);
+  });
+
+  it('re-opens instantly from the snapshot cache and refreshes in the background', async () => {
+    // 第一次挂载：正常取数并写入缓存
+    const first = render(<GitEnvironmentCard />);
+    await waitFor(() => expect(screen.getByRole('button', { name: /环境信息/ })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /环境信息/ }));
+    await waitFor(() => expect(screen.getByTestId('git-env-branch-row')).toHaveTextContent('feat/knowledge-retrieval-research'));
+    first.unmount();
+
+    // 第二次挂载：status 请求挂起不返回 → 分支值必须来自缓存（stale-while-revalidate）
+    let resolveSecond!: (v: GitStatus) => void;
+    fetchGitStatusMock.mockReset().mockImplementation(() => new Promise<GitStatus>(resolve => { resolveSecond = resolve; }));
+    render(<GitEnvironmentCard />);
+    fireEvent.click(await screen.findByRole('button', { name: /环境信息/ }));
+    await screen.findByText('feat/knowledge-retrieval-research');
+    // 后台刷新确实发起了（挂起中）
+    expect(fetchGitStatusMock).toHaveBeenCalledWith('/ws/linked', null);
+
+    // 刷新返回新分支 → 行内值更新
+    resolveSecond({ ...STATUS, currentBranch: 'feat/second-mount' });
+    await screen.findByText('feat/second-mount');
   });
 });

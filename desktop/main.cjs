@@ -110,6 +110,9 @@ const {
   normalizeQuickChatPreferences,
 } = require("../shared/quick-chat-preferences.cjs");
 const {
+  normalizeKeybindings,
+} = require("../shared/keybindings-preferences.cjs");
+const {
   decorateScreenshotMarkdownIt,
   escapeAttr,
   renderScreenshotMarkdownArticle,
@@ -187,6 +190,86 @@ function readQuickChatPreferences() {
   const prefsPath = path.join(lingxiHome, "user", "preferences.json");
   const prefs = safeReadJSON(prefsPath, {});
   return normalizeQuickChatPreferences(prefs?.quick_chat);
+}
+
+/**
+ * 读取快捷键绑定显式覆盖记录（prefs.keybindings）。主进程只关心其中
+ * global 作用域的命令（目前只有 quick-chat.toggle）；读取失败/缺失时
+ * 回落空对象，让调用方走各自默认值。
+ */
+function readKeybindingsPreferences() {
+  const prefsPath = path.join(lingxiHome, "user", "preferences.json");
+  const prefs = safeReadJSON(prefsPath, {});
+  return normalizeKeybindings(prefs?.keybindings || {});
+}
+
+/**
+ * 快捷对话呼出键：设置页的快捷键标签页写入 keybindings 覆盖项；
+ * 未覆盖时回落旧 quick_chat.shortcut 字段（老用户升级后键位不变），
+ * 再回落模块默认 Alt+Space。
+ * 命令支持多组键位（最多 3 组），主进程对每组都做 globalShortcut 注册，
+ * 避免「第二组设置了但按了没反应」。
+ */
+function readQuickChatShortcutList() {
+  const overrides = readKeybindingsPreferences();
+  const list = Array.isArray(overrides["quick-chat.toggle"])
+    ? overrides["quick-chat.toggle"].filter(key => typeof key === "string" && key)
+    : [];
+  if (list.length) return list;
+  const legacy = readQuickChatPreferences().shortcut;
+  return legacy ? [legacy] : [];
+}
+
+function registerQuickChatShortcut(shortcuts = readQuickChatShortcutList()) {
+  const list = (Array.isArray(shortcuts) ? shortcuts : [shortcuts])
+    .filter(shortcut => typeof shortcut === "string" && shortcut);
+
+  // 先注销不再需要的旧组，保留仍然有效的旧组（避免重复注册）。
+  for (const old of registeredQuickChatShortcuts) {
+    if (!list.includes(old)) globalShortcut.unregister(old);
+  }
+  registeredQuickChatShortcuts = registeredQuickChatShortcuts.filter(s => list.includes(s));
+
+  if (list.length === 0) {
+    return { ok: false, shortcut: "", error: "invalid shortcut" };
+  }
+
+  const failures = [];
+  for (const shortcut of list) {
+    if (registeredQuickChatShortcuts.includes(shortcut) && globalShortcut.isRegistered(shortcut)) continue;
+    const ok = globalShortcut.register(shortcut, toggleQuickChatWindow);
+    if (ok) {
+      registeredQuickChatShortcuts.push(shortcut);
+    } else {
+      failures.push(shortcut);
+    }
+  }
+  if (failures.length > 0) {
+    return { ok: false, shortcut: failures[0], failures, error: "shortcut is unavailable" };
+  }
+  return { ok: true, shortcuts: registeredQuickChatShortcuts.slice() };
+}
+
+/**
+ * 探测某全局快捷键是否可注册（是否被系统或其他应用占用）。
+ * 已被本应用占用的键位直接返回 ok；否则尝试注册后立即注销，
+ * 不影响既有绑定。设置页在保存前与列表展示时用它做冲突提醒。
+ */
+function testGlobalShortcutAvailability(shortcut) {
+  if (!shortcut || typeof shortcut !== "string") {
+    return { ok: false, shortcut: "", error: "invalid shortcut" };
+  }
+  try {
+    if (globalShortcut.isRegistered(shortcut)) return { ok: true, shortcut, self: true };
+    const ok = globalShortcut.register(shortcut, () => {});
+    if (ok) {
+      globalShortcut.unregister(shortcut);
+      return { ok: true, shortcut };
+    }
+    return { ok: false, shortcut, error: "shortcut is unavailable" };
+  } catch (err) {
+    return { ok: false, shortcut, error: String((err && err.message) || err) };
+  }
 }
 
 /**
@@ -398,12 +481,21 @@ app.on("gpu-info-update", () => {
   }
 });
 
+// 全局右键菜单策略：全局样式（styles.css）对 body 设置 user-select:none，
+// 普通界面文本无选区，Electron 默认上下文菜单中的“复制”项在非编辑区域永远无效。
+// 因此在非可编辑区域直接拦截默认菜单；输入框等可编辑区域保留系统菜单（右键粘贴可用）。
+app.on("web-contents-created", (_event, contents) => {
+  contents.on("context-menu", (event, params) => {
+    if (!params.isEditable) event.preventDefault();
+  });
+});
+
 let splashWindow = null;
 let mainWindow = null;
 let onboardingWindow = null;
 let quickChatWindow = null;
 let quickChatMode = "compact";
-let registeredQuickChatShortcut = null;
+let registeredQuickChatShortcuts = [];
 
 let settingsWindow = null;
 
@@ -2701,35 +2793,8 @@ function toggleQuickChatWindow() {
   showQuickChatWindow();
 }
 
-function registerQuickChatShortcut(shortcut = readQuickChatPreferences().shortcut) {
-  if (registeredQuickChatShortcut && registeredQuickChatShortcut !== shortcut) {
-    globalShortcut.unregister(registeredQuickChatShortcut);
-    registeredQuickChatShortcut = null;
-  }
-
-  if (!shortcut || typeof shortcut !== "string") {
-    return { ok: false, shortcut: shortcut || "", error: "invalid shortcut" };
-  }
-
-  if (registeredQuickChatShortcut === shortcut && globalShortcut.isRegistered(shortcut)) {
-    return { ok: true, shortcut };
-  }
-
-  if (registeredQuickChatShortcut) {
-    globalShortcut.unregister(registeredQuickChatShortcut);
-    registeredQuickChatShortcut = null;
-  }
-
-  const ok = globalShortcut.register(shortcut, toggleQuickChatWindow);
-  if (!ok) {
-    return { ok: false, shortcut, error: "shortcut is unavailable" };
-  }
-  registeredQuickChatShortcut = shortcut;
-  return { ok: true, shortcut };
-}
-
 function reloadQuickChatShortcut() {
-  return registerQuickChatShortcut(readQuickChatPreferences().shortcut);
+  return registerQuickChatShortcut();
 }
 
 function registerQuickChatShortcutBestEffort() {
@@ -2738,6 +2803,20 @@ function registerQuickChatShortcutBestEffort() {
     console.error("[desktop] Quick Chat 快捷键注册失败:", redactMainLogText(result.error || result.shortcut || "unknown"));
   }
   return result;
+}
+
+/**
+ * 重启整个应用：沿用托盘「退出」已验证过的优雅关闭路径——
+ * `isQuitting`/`isExitingServer` 置位后 `before-quit` 会先妥善关掉 owned
+ * server 再真正退出，`app.relaunch()` 排队的重启会在退出后触发。
+ * 比裸 `app.exit()` 安全，不会把 server 子进程晾成孤儿。
+ */
+function restartApp() {
+  isExitingServer = true;
+  isQuitting = true;
+  app.relaunch();
+  app.quit();
+  return { ok: true };
 }
 
 /**
@@ -3458,6 +3537,63 @@ function _activeBrowserTabRecord(workspace) {
   return workspace.tabs.get(workspace.activeTabId) || workspace.tabs.values().next().value || null;
 }
 
+/**
+ * 合并所有会话的标签页：显示层各会话共享同一个浏览器窗口（标签页并存），
+ * 数据层仍按 session 隔离。每个标签带上自己的 sessionPath，
+ * viewer 的切换/关闭操作据此路由回正确的会话。
+ */
+function _mergedBrowserTabs() {
+  const tabs = [];
+  for (const workspace of _browserViews.values()) {
+    for (const tab of workspace.tabs.values()) {
+      tabs.push({ ..._serializeBrowserTab(tab), sessionPath: workspace.sessionPath || null });
+    }
+  }
+  return tabs;
+}
+
+/** 找一个还能显示的标签页（当前 view 被摘除后的回退显示用）。 */
+function _firstLiveBrowserTab() {
+  for (const workspace of _browserViews.values()) {
+    const tab = _activeBrowserTabRecord(workspace);
+    if (tab && !_isBrowserViewDestroyed(tab.view)) {
+      return { sessionPath: workspace.sessionPath || null, tabId: tab.tabId };
+    }
+  }
+  return null;
+}
+
+/**
+ * 当前 view 被摘除后：优先切到其他会话仍存的标签页，画面不清空；
+ * 一个都不剩时推合并后的空标签条，hideIfEmpty 为真时再隐藏窗口。
+ */
+function _showFallbackBrowserTabOrIdle({ hideIfEmpty = false } = {}) {
+  const fallback = _firstLiveBrowserTab();
+  if (fallback) {
+    _switchActiveBrowserTab(fallback.sessionPath, fallback.tabId);
+    return;
+  }
+  _pushViewerTabStrip();
+  if (hideIfEmpty && browserViewerWindow && !browserViewerWindow.isDestroyed()) browserViewerWindow.hide();
+}
+
+/** 刷新 viewer 的合并标签条：有附着的 view 时附带其导航状态，没有则推空态+剩余标签。 */
+function _pushViewerTabStrip() {
+  if (!browserViewerWindow || browserViewerWindow.isDestroyed()) return;
+  if (_browserWebView && !_isBrowserViewDestroyed(_browserWebView)) {
+    _notifyViewerUrl(_tabUrlFromWebContents(_browserWebView) || "");
+    return;
+  }
+  browserViewerWindow.webContents.send("browser-update", {
+    sessionPath: null,
+    sessionTitle: null,
+    activeTabId: null,
+    tabs: _mergedBrowserTabs(),
+    canGoBack: false,
+    canGoForward: false,
+  });
+}
+
 /** 按 sessionPath 查找当前 active tab view；只有无显式 sessionPath 的旧调用才 fallback 到当前活跃 view。 */
 function _getViewForSession(sessionPath, tabId = null) {
   const explicitSessionPath = _normalizeBrowserSessionPath(sessionPath);
@@ -3525,7 +3661,17 @@ function _detachActiveBrowserView({ view = _browserWebView, sessionPath = _curre
     _removeBrowserTabRecord(view);
   }
   if (browserViewerWindow && !browserViewerWindow.isDestroyed()) {
-    browserViewerWindow.webContents.send("browser-update", { running: false, reason });
+    // 捎上其余会话仍存的合并标签列表：共享窗口里别的会话的标签不因这次摘除而消失
+    browserViewerWindow.webContents.send("browser-update", {
+      running: false,
+      reason,
+      sessionPath: null,
+      sessionTitle: null,
+      activeTabId: null,
+      tabs: _mergedBrowserTabs(),
+      canGoBack: false,
+      canGoForward: false,
+    });
     if (hideIfVisible) browserViewerWindow.hide();
   }
   return true;
@@ -3713,7 +3859,7 @@ async function _openUrlInNewBrowserTab(sessionPath, url, options = {}) {
   workspace.activeTabId = tab.tabId;
   if (show) _switchActiveBrowserTab(sessionPath, tab.tabId);
   if (url && isAllowedBrowserUrl(url)) await tab.view.webContents.loadURL(url);
-  if (tab.view === _browserWebView) _notifyViewerUrl(tab.view.webContents.getURL());
+  _pushViewerTabStrip();
   return _serializeBrowserWorkspace(workspace);
 }
 
@@ -3771,7 +3917,8 @@ function _notifyViewerUrl(url) {
       sessionPath: _currentBrowserSession,
       sessionTitle: _browserSessionTitles.get(_browserWorkspaceKey(_currentBrowserSession)) || null,
       activeTabId: _currentBrowserTabId || serialized.activeTabId,
-      tabs: serialized.tabs,
+      // 标签条跨会话合并：别的会话的标签始终保留在窗口上
+      tabs: _mergedBrowserTabs(),
     });
   }
 }
@@ -3927,6 +4074,8 @@ async function handleBrowserCommand(cmd, params) {
         }
       }
       // 否则，新 view 只存在 Map 中，不挂载到窗口（后台可操作）
+      // 合并标签条：后台 launch 也要让新标签出现在窗口标签条上
+      _pushViewerTabStrip();
       return _serializeBrowserWorkspace(workspace);
     }
 
@@ -3936,13 +4085,20 @@ async function handleBrowserCommand(cmd, params) {
       const workspace = _getBrowserWorkspace(sp);
       if (workspace) {
         const active = _activeBrowserTabRecord(workspace);
-        if (active?.view === _browserWebView) {
-          _detachActiveBrowserView({ view: active.view, sessionPath: sp || _currentBrowserSession, destroy: false, hideIfVisible: true });
+        const wasDisplayed = active?.view === _browserWebView;
+        if (wasDisplayed) {
+          _detachActiveBrowserView({ view: active.view, sessionPath: sp || _currentBrowserSession, destroy: false, hideIfVisible: false });
         }
         for (const tab of workspace.tabs.values()) {
           try { if (!tab.view.webContents.isDestroyed()) tab.view.webContents.close(); } catch {}
         }
         _browserViews.delete(_browserWorkspaceKey(sp));
+        if (wasDisplayed) {
+          // 共享窗口：被关会话让出画面时回退到其他会话的标签，都不剩才隐藏窗口
+          _showFallbackBrowserTabOrIdle({ hideIfEmpty: true });
+        } else {
+          _pushViewerTabStrip();
+        }
       }
       return {};
     }
@@ -3957,8 +4113,11 @@ async function handleBrowserCommand(cmd, params) {
         _detachActiveBrowserView({
           view,
           sessionPath: sp || _currentBrowserSession,
-          hideIfVisible: params.keepViewerVisible !== true,
+          hideIfVisible: false,
         });
+        // 共享窗口：被挂起的会话让出画面时，切到其他会话仍存的标签页；
+        // 一个都不剩时，keepViewerVisible !== true 才隐藏窗口
+        _showFallbackBrowserTabOrIdle({ hideIfEmpty: params.keepViewerVisible !== true });
       }
       return {};
     }
@@ -3982,7 +4141,9 @@ async function handleBrowserCommand(cmd, params) {
       const activeTab = _activeBrowserTabRecord(workspace);
       if (activeTab) {
         _switchActiveBrowserTab(sp, activeTab.tabId);
-      } else {
+      } else if (params.allowEmpty === true && !_browserWebView) {
+        // 只有显式打开（allowEmpty）且当前没有附着画面时才清空 viewer；
+        // 会话切换等跟随场景没有标签可显示时保持现状，不清空其他会话的画面。
         browserViewerWindow.webContents.send("browser-update", {
           sessionPath: sp,
           sessionTitle: _browserSessionTitles.get(_browserWorkspaceKey(sp)) || null,
@@ -4039,7 +4200,7 @@ async function handleBrowserCommand(cmd, params) {
       if (params.url && isAllowedBrowserUrl(params.url)) {
         await tab.view.webContents.loadURL(params.url);
       }
-      if (tab.view === _browserWebView) _notifyViewerUrl(tab.view.webContents.getURL());
+      _pushViewerTabStrip();
       return _serializeBrowserWorkspace(workspace);
     }
 
@@ -4063,30 +4224,33 @@ async function handleBrowserCommand(cmd, params) {
       const tabIds = Array.from(workspace.tabs.keys());
       const closedIndex = tabIds.indexOf(params.tabId);
       const nextTabId = tabIds[closedIndex + 1] || tabIds[closedIndex - 1] || null;
-      if (tab.view === _browserWebView) {
+      const wasDisplayed = tab.view === _browserWebView;
+      if (wasDisplayed) {
         _detachActiveBrowserView({ view: tab.view, sessionPath: sp, destroy: false, hideIfVisible: false });
       }
       workspace.tabs.delete(params.tabId);
       try { if (!tab.view.webContents.isDestroyed()) tab.view.webContents.close(); } catch {}
       if (workspace.tabs.size === 0) {
-        // 关掉最后一个标签页不销毁 workspace：session 的标签组保留为空组，viewer 显示空态。
+        // 关掉最后一个标签页不销毁 workspace：session 的标签组保留为空组。
         // 「运行中」的语义以 workspace 是否存在为准，所以这里不广播 running:false。
         workspace.activeTabId = null;
-        if (browserViewerWindow && !browserViewerWindow.isDestroyed()) {
-          browserViewerWindow.webContents.send("browser-update", {
-            sessionPath: sp,
-            activeTabId: null,
-            tabs: [],
-            canGoBack: false,
-            canGoForward: false,
-          });
+        if (wasDisplayed) {
+          // 共享窗口：被关的是当前显示的标签，回退到其他会话仍存的标签；没有才空态
+          _showFallbackBrowserTabOrIdle({ hideIfEmpty: false });
+        } else {
+          // 后台会话的标签变化：只刷新合并标签条，不动当前画面
+          _pushViewerTabStrip();
         }
         return _serializeBrowserWorkspace(workspace);
       }
       workspace.activeTabId = nextTabId && workspace.tabs.has(nextTabId)
         ? nextTabId
         : workspace.tabs.keys().next().value;
-      _switchActiveBrowserTab(sp, workspace.activeTabId);
+      if (wasDisplayed) {
+        _switchActiveBrowserTab(sp, workspace.activeTabId);
+      } else {
+        _pushViewerTabStrip();
+      }
       return _serializeBrowserWorkspace(workspace);
     }
 
@@ -4312,13 +4476,20 @@ async function handleBrowserCommand(cmd, params) {
       const sp = params.sessionPath;
       const workspace = _getBrowserWorkspace(sp);
       if (workspace) {
+        let wasDisplayed = false;
         for (const tab of workspace.tabs.values()) {
           if (tab.view === _browserWebView) {
-            _detachActiveBrowserView({ view: tab.view, sessionPath: sp, destroy: false, hideIfVisible: true });
+            wasDisplayed = true;
+            _detachActiveBrowserView({ view: tab.view, sessionPath: sp, destroy: false, hideIfVisible: false });
           }
           try { if (!tab.view.webContents.isDestroyed()) tab.view.webContents.close(); } catch {}
         }
         _browserViews.delete(_browserWorkspaceKey(sp));
+        if (wasDisplayed) {
+          _showFallbackBrowserTabOrIdle({ hideIfEmpty: true });
+        } else {
+          _pushViewerTabStrip();
+        }
       }
       return {};
     }
@@ -5262,9 +5433,14 @@ wrapIpcHandler("set-auto-launch-enabled", (_event, enabled) => setAutoLaunchEnab
 wrapIpcHandler("get-keep-awake-status", () => keepAwakeManager.getStatus());
 wrapIpcHandler("set-keep-awake-enabled", (_event, enabled) => keepAwakeManager.setEnabled(enabled === true));
 wrapIpcHandler("quick-chat-reload-shortcut", () => reloadQuickChatShortcut());
+wrapIpcHandler("app:restart", () => restartApp());
+wrapIpcHandler("keybindings:reload-global", () => reloadQuickChatShortcut());
+wrapIpcHandler("keybindings:test-register", (_event, shortcut) => testGlobalShortcutAvailability(shortcut));
 wrapIpcHandler("quick-chat-shortcut-status", () => ({
-  shortcut: registeredQuickChatShortcut || readQuickChatPreferences().shortcut,
-  registered: !!registeredQuickChatShortcut && globalShortcut.isRegistered(registeredQuickChatShortcut),
+  shortcuts: registeredQuickChatShortcuts.length
+    ? registeredQuickChatShortcuts.slice()
+    : [readQuickChatPreferences().shortcut].filter(Boolean),
+  registered: registeredQuickChatShortcuts.some(s => globalShortcut.isRegistered(s)),
 }));
 wrapIpcBestEffortHandler("quick-chat-show", () => showQuickChatWindow());
 wrapIpcBestEffortHandler("quick-chat-hide", () => hideQuickChatWindow());

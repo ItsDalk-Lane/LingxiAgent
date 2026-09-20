@@ -12,7 +12,7 @@
 
 import { useStore } from '../../stores';
 import { sessionScopedValue } from '../../stores/session-slice';
-import type { AttachedFile } from '../../stores/input-slice';
+import type { AttachedFile, QuotedSelection } from '../../stores/input-slice';
 import { upsertOptimisticSessionFirstMessage } from '../../stores/session-actions';
 import { getWebSocket } from '../../services/websocket';
 import { renderMarkdown } from '../../utils/markdown';
@@ -30,6 +30,36 @@ import {
 import { openProviderModelSettings } from '../../utils/model-settings-navigation';
 import { formatQuotedSelectionForPrompt } from '../../utils/quoted-selection';
 import { refreshQuotedSelectionFromDisk } from './quote-refresh';
+
+/**
+ * 跨会话引用片段 → 来源会话引用：引用来自另一个会话时（典型：侧边聊天引用
+ * 主对话内容），自动把来源会话并进 sessionRefs。目标会话的模型由此知道片段
+ * 出自哪段对话，上下文不足时可自行读取原对话补全语境；同会话引用不附加
+ * （模型本就有完整上下文），来源不在会话列表里（已归档等）时静默跳过。
+ */
+export function withQuoteOriginSessionRefs(
+  base: Array<{ sessionId: string; label: string }>,
+  quotes: QuotedSelection[],
+  targetSessionPath: string,
+): Array<{ sessionId: string; label: string }> {
+  const merged = [...base];
+  if (!quotes.length) return merged;
+  const sessions = useStore.getState().sessions || [];
+  for (const quote of quotes) {
+    const originPath = typeof quote?.sourceSessionPath === 'string' ? quote.sourceSessionPath.trim() : '';
+    if (!originPath || originPath === targetSessionPath) continue;
+    const origin = sessions.find((session: any) => session?.path === originPath);
+    const sessionId = typeof origin?.sessionId === 'string' && origin.sessionId.trim()
+      ? origin.sessionId.trim()
+      : null;
+    if (!sessionId || merged.some(ref => ref.sessionId === sessionId)) continue;
+    const label = (typeof origin?.title === 'string' && origin.title.trim())
+      || (typeof origin?.firstMessage === 'string' && origin.firstMessage.trim().slice(0, 40))
+      || '引用来源对话';
+    merged.push({ sessionId, label });
+  }
+  return merged;
+}
 import {
   isAllowedChatVideoMime,
   isChatVideoBase64ContentCompatible,
@@ -399,6 +429,12 @@ export async function prepareComposerSend(
     const quoteStr = resolvedQuotes.map(formatQuotedSelectionForPrompt).join('\n\n');
     finalText = finalText ? `${finalText}\n\n${quoteStr}` : quoteStr;
   }
+  // 跨会话引用片段自动附带来源会话引用（见 withQuoteOriginSessionRefs）。
+  const mergedSessionRefs = withQuoteOriginSessionRefs(
+    sessionRefs,
+    resolvedQuotes,
+    bundle.sessionRef.sessionPath,
+  );
 
   const allFiles = [...inputFiles];
   if (docForRender) allFiles.push({ path: docForRender.path, name: docForRender.name });
@@ -408,7 +444,7 @@ export async function prepareComposerSend(
     text,
     skills: skills.length > 0 ? skills : undefined,
     quotedText: resolvedQuotes.length > 0 ? resolvedQuotes.map(q => (q as { text: string }).text).join('\n\n') : undefined,
-    sessionRefs: sessionRefs.length > 0 ? sessionRefs : undefined,
+    sessionRefs: mergedSessionRefs.length > 0 ? mergedSessionRefs : undefined,
     agentMentions: agentMentions.length > 0 ? agentMentions : undefined,
     // 消息投影用的知识库引用（含名称缓存，仅展示；功能字段走 wsMsg.knowledgeRefs）
     knowledgeRefs: bundle.knowledgeRefs && bundle.knowledgeRefs.notebookIds.length > 0
@@ -471,7 +507,7 @@ export async function prepareComposerSend(
   if (videos.length > 0) wsMsg.videos = videos;
   if (audios.length > 0) wsMsg.audios = audios;
   if (skills.length > 0) wsMsg.skills = skills;
-  if (sessionRefs.length > 0) wsMsg.sessionRefs = sessionRefs;
+  if (mergedSessionRefs.length > 0) wsMsg.sessionRefs = mergedSessionRefs;
   if (agentMentions.length > 0) wsMsg.agentReviewRequests = agentMentions;
   if (bundle.knowledgeRefs && bundle.knowledgeRefs.notebookIds.length > 0) {
     wsMsg.knowledgeRefs = {

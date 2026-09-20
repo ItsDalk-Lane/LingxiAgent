@@ -229,6 +229,29 @@ describe("git-environment route", () => {
     expect(body.commits[0].parents[0]).toBe(body.commits[1].hash);
   });
 
+  it("serves per-commit stats via the log-stats batch endpoint", async () => {
+    const app = makeApp();
+    const log = await get(app, `/api/git/log?dir=${encodeURIComponent(repoDir)}&limit=10`);
+    const { commits } = await log.json();
+    expect(commits.length).toBeGreaterThan(0);
+    const res = await post(app, "/api/git/log-stats", { dir: repoDir, hashes: commits.map((c: any) => c.hash) });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.isRepo).toBe(true);
+    for (const c of commits) {
+      const s = body.stats[c.hash];
+      expect(s).toBeDefined();
+      expect(s.changedFiles).toBeGreaterThan(0);
+    }
+    // 非 40 位十六进制输入被忽略（含形如 option 的注入尝试），返回空统计
+    const bad = await post(app, "/api/git/log-stats", { dir: repoDir, hashes: ["--upload-pack=evil", "xyz", 42] });
+    expect(bad.status).toBe(200);
+    expect(Object.keys((await bad.json()).stats)).toHaveLength(0);
+    // 未准入目录（非 agent 根/挂载根）在准入层即被拒绝
+    const plain = await post(app, "/api/git/log-stats", { dir: plainDir, hashes: [] });
+    expect(plain.status).toBe(400);
+  });
+
   it("checks out a branch and reflects it in status", async () => {
     const app = makeApp();
     const res = await post(app, "/api/git/checkout", { dir: repoDir, branch: "feature" });
@@ -259,6 +282,58 @@ describe("git-environment route", () => {
     const push = await post(app, "/api/git/push", { dir: repoDir });
     expect(push.status).toBe(400);
     expect((await push.json()).code).toBe("no_remote");
+
+    const pull = await post(app, "/api/git/pull", { dir: repoDir });
+    expect(pull.status).toBe(400);
+    expect((await pull.json()).code).toBe("no_remote");
+  });
+
+  it("pulls remote updates and reports already_up_to_date through the route", async () => {
+    // 真实本地远端 + clone，走路由全链路：准入 → fetch → 快进合并
+    const originDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-git-route-pull-origin-"));
+    const cloneDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-git-route-pull-clone-"));
+    try {
+      try {
+        await git(originDir, ["init", "-b", "main"]);
+      } catch {
+        await git(originDir, ["init"]);
+      }
+      await git(originDir, ["config", "user.name", "Lingxi Test"]);
+      await git(originDir, ["config", "user.email", "test@lingxi.local"]);
+      fs.writeFileSync(path.join(originDir, "seed.md"), "v1\n");
+      await git(originDir, ["add", "-A"]);
+      await git(originDir, ["commit", "-m", "init"]);
+      await execFileAsync("git", ["clone", originDir, cloneDir]);
+
+      const engine = {
+        getExplicitHomeCwd: vi.fn(() => cloneDir),
+        getHomeCwd: vi.fn(() => null),
+        homeCwd: cloneDir,
+        deskCwd: cloneDir,
+      };
+      const app = new Hono();
+      app.route("/api", createGitEnvironmentRoute(engine));
+
+      // 无新提交：结构化返回 already_up_to_date（400），不是 500
+      const stale = await post(app, "/api/git/pull", { dir: cloneDir });
+      expect(stale.status).toBe(400);
+      expect((await stale.json()).code).toBe("already_up_to_date");
+
+      // 远端新提交：拉取成功并报告数量
+      fs.writeFileSync(path.join(originDir, "fresh.md"), "from remote\n");
+      await git(originDir, ["add", "-A"]);
+      await git(originDir, ["commit", "-m", "remote update"]);
+      const res = await post(app, "/api/git/pull", { dir: cloneDir });
+      expect(res.status).toBe(200);
+      expect(await res.json()).toMatchObject({ ok: true, pulled: 1 });
+      expect(fs.readFileSync(path.join(cloneDir, "fresh.md"), "utf8")).toContain("from remote");
+
+      // 非 git 目录直接 400
+      expect((await post(app, "/api/git/pull", { dir: "" })).status).toBe(400);
+    } finally {
+      fs.rmSync(originDir, { recursive: true, force: true });
+      fs.rmSync(cloneDir, { recursive: true, force: true });
+    }
   });
 
   it("generates and sanitizes an AI commit message (title + body) through the hub", async () => {

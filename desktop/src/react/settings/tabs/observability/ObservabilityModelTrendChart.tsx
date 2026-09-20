@@ -1,5 +1,5 @@
 /**
- * ObservabilityModelTrendChart.tsx — 「模型调用趋势」（固定 · 模型 × 日期，近 30 天）。
+ * ObservabilityModelTrendChart.tsx — 「模型调用趋势」（近 30 天）。
  *
  * 每个模型一条折线；右上角「调用次数 / Token 用量」可单选可同显
  * （同显 = 上下两层，各自独立刻度）。悬停显示当日每个模型的量 + 当日总量。
@@ -20,8 +20,8 @@ import {
   formatAxisDate,
   localDateKey,
   MetricToggle,
-  placeChartTip,
   seriesColor,
+  svgAnchor,
   useObservabilityChartBuckets,
   type ChartMetricSelection,
   type ChartTip,
@@ -98,7 +98,8 @@ export function ObservabilityModelTrendChart({ refreshToken }: { refreshToken: n
 
   const onMove = (evt: React.MouseEvent) => {
     const svg = svgRef.current;
-    if (!svg) return;
+    const card = cardRef.current;
+    if (!svg || !card) return;
     const rect = svg.getBoundingClientRect();
     const viewX = ((evt.clientX - rect.left) / rect.width) * VIEW_W;
     const index = Math.max(0, Math.min(n - 1, Math.round(((viewX - VIEW_L) / (VIEW_W - VIEW_L - VIEW_R)) * (n - 1))));
@@ -111,22 +112,29 @@ export function ObservabilityModelTrendChart({ refreshToken }: { refreshToken: n
       .filter(({ value }) => keys.some((key) => value[key] > 0))
       .sort((a, b) => b.value.calls - a.value.calls || b.value.tokens - a.value.tokens)
       .map(({ item, value }) => ({ color: item.color, name: item.name, value: chartMetricValue(value, metric) }));
+    // 锚定当日数据点：提示框放点左右，所指日期列始终可见。
+    const point = svgAnchor(svg, card, VIEW_W, xOf(index), VIEW_H / 2);
+    const mouseY = evt.clientY - card.getBoundingClientRect().top;
     setTip({
       title: `${formatAxisDate(day.key)} · ${t('settings.observability.charts.dailyTotal')}`,
       rows,
       total: { label: t('settings.observability.charts.dailyTotal'), value: chartMetricValue(dayTotal, metric) },
+      anchor: {
+        cx: point.cx,
+        cy: mouseY,
+        w: 9 * point.scale,
+        placement: 'horizontal',
+        fy: mouseY,
+      },
     });
-    placeChartTip(tipRef.current, cardRef.current, evt);
   };
 
   return (
     <section className={styles['observability-panel']} ref={cardRef} data-chart="model-trend">
       <ChartHead
         title={t('settings.observability.charts.line.title')}
-        badge={t('settings.observability.charts.fixedBadgeModelDate')}
         right={<MetricToggle value={metric} onChange={setMetric} />}
       />
-      <div className={styles['observability-chart-hint']}>{t('settings.observability.charts.line.hint')}</div>
       {activeSeries.length > 0 && <ChartLegend items={activeSeries.map((item) => ({ color: item.color, label: item.name }))} />}
       {error ? <ChartNotice kind="error" /> : loading ? <ChartNotice kind="loading" /> : (
         <svg

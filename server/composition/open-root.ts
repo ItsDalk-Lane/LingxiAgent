@@ -17,6 +17,7 @@ import type { CompositionContext } from "./contract.ts";
 import { fromRoot } from "../../shared/hana-root.ts";
 import { createChatRoute } from "../routes/chat.ts";
 import { createSessionsRoute } from "../routes/sessions.ts";
+import { createConversationMapRoute } from "../routes/conversation-map.ts";
 import { createSessionCollabRoute } from "../routes/session-collab.ts";
 import { createSessionProjectsRoute } from "../routes/session-projects.ts";
 import { createModelsRoute } from "../routes/models.ts";
@@ -98,6 +99,7 @@ export function registerOpenRoutes(app: Hono, ctx: CompositionContext): void {
     runtimeState: serverRuntimeState,
   } as any));
   app.route("/api", createSessionsRoute(engine, hub));
+  app.route("/api", createConversationMapRoute(engine));
   app.route("/api", createSessionCollabRoute(engine));
   app.route("/api", createSessionProjectsRoute(engine));
   app.route("/api", createModelsRoute(engine));

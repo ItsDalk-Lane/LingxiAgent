@@ -1,6 +1,8 @@
 import path from "path";
 
-export function wrapWithCheckpoint(tools, { store, maxFileSizeKb, cwd, getSessionPath }) {
+// maxFileSizeKb 可选：备份恒开后引擎不再设大小上限（prefs 已废弃 max_file_size_kb），
+// 只有显式传入的调用方才带约束；null/缺省 = 不限，与 checkpoint-store.save 的 maxSizeKb 约定一致。
+export function wrapWithCheckpoint(tools, { store, maxFileSizeKb = null, cwd, getSessionPath }) {
   return tools.map((tool) => {
     if (tool.name === "write" || tool.name === "edit") {
       return wrapPathTool(tool, store, maxFileSizeKb, cwd, getSessionPath);

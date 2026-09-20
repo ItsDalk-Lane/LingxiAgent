@@ -71,10 +71,14 @@ export function BrowserViewerApp() {
       if (data.running === false) {
         setCanBack(false);
         setCanForward(false);
-        setTabs([]);
-        setActiveTabId(null);
-        setSessionPath(data.sessionPath || null);
-        setSessionTitle(data.sessionTitle || null);
+        // 共享窗口：payload 携带合并标签列表时保留其他会话的标签，只清导航状态；
+        // 没带标签列表（旧行为）才整个清空。
+        if (!Array.isArray(data.tabs)) {
+          setTabs([]);
+          setActiveTabId(null);
+          setSessionPath(data.sessionPath || null);
+          setSessionTitle(data.sessionTitle || null);
+        }
       }
     });
 
@@ -187,8 +191,8 @@ export function BrowserViewerApp() {
                   key={tab.tabId}
                   className={`browser-tab${isActive ? ' active' : ''}`}
                   title={tabTitle(tab)}
-                  onClick={() => hana?.browserSwitchTab?.(tab.tabId, sessionPath)}
-                  onDoubleClick={() => hana?.browserCloseTab?.(tab.tabId, sessionPath)}
+                  onClick={() => hana?.browserSwitchTab?.(tab.tabId, tab.sessionPath || sessionPath)}
+                  onDoubleClick={() => hana?.browserCloseTab?.(tab.tabId, tab.sessionPath || sessionPath)}
                 >
                   <span className="browser-tab-title">{tabTitle(tab)}</span>
                   <span
@@ -196,7 +200,7 @@ export function BrowserViewerApp() {
                     title={tr('browser.closeTab', 'Close tab')}
                     onClick={(event) => {
                       event.stopPropagation();
-                      hana?.browserCloseTab?.(tab.tabId, sessionPath);
+                      hana?.browserCloseTab?.(tab.tabId, tab.sessionPath || sessionPath);
                     }}
                     onDoubleClick={(event) => event.stopPropagation()}
                   >

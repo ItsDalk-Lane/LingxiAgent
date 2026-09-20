@@ -20,6 +20,10 @@ import { initViewerEvents } from './stores/preview-actions';
 import { updateLayout } from './components/SidebarLayout';
 import { initErrorBusBridge } from './errors/error-bus-bridge';
 import { openSettingsModal } from './stores/settings-modal-actions';
+import { createNewSession } from './stores/session-actions';
+import { readLastProjectIdentity } from './stores/last-project-identity';
+import { toggleSidebar } from './components/SidebarLayout';
+import { initKeybindings } from './keybindings/useKeybindings';
 import { initQuotedSelectionLifecycle } from './stores/selection-actions';
 import { hydrateInputDrafts, initInputDraftPersistence } from './stores/input-draft-persistence';
 import { configureAppEventActions, handleAppEvent, readConfigCwdHistory, readConfigHomeFolder, readConfigMemoryMasterEnabled } from './services/app-event-actions';
@@ -226,10 +230,19 @@ export async function initApp(): Promise<void> {
     });
 
     // 5. 设置 desk 相关状态
+    // 恢复上次活跃项目身份（localStorage）：重启后产品停在欢迎页（下方 pendingNewSession
+    // 语义），若 selected* 回落 homeFolder，侧栏展开规则会让用户上次工作的项目组被折叠。
+    // mount 身份优先于目录身份（与 resolveSessionProjectGroupId 的合流方向一致）。
     const homeFolder = readConfigHomeFolder(agentConfig);
+    const lastIdentity = readLastProjectIdentity();
+    const restoredMountId = lastIdentity?.workspaceMountId ?? null;
+    const restoredFolder = !restoredMountId && lastIdentity?.cwd ? lastIdentity.cwd : null;
     useStore.setState({
       homeFolder,
-      selectedFolder: homeFolder,
+      selectedFolder: restoredFolder ?? homeFolder,
+      ...(restoredMountId
+        ? { selectedWorkspaceMountId: restoredMountId, selectedWorkspaceLabel: lastIdentity?.workspaceLabel ?? null }
+        : {}),
       workspaceFolders: [],
       memoryMasterEnabled: readConfigMemoryMasterEnabled(agentConfig),
     });
@@ -296,16 +309,19 @@ export async function initApp(): Promise<void> {
     useStore.setState({ bridgeDotConnected: anyConnected });
   } catch { /* ignore */ }
 
-  // 18. 设置快捷键
-  document.addEventListener('keydown', (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === ',') {
-      e.preventDefault();
-      openSettingsModal();
-    }
+  // 18. 快捷键：统一 dispatcher（键位来自 /api/preferences/keybindings）。
+  //      原先散在各处的硬编码 keydown（⌘,、⌘⇧S、⌘N、语音 ⌘⇧M）全部收拢到这里；
+  //      全局作用域（快捷对话呼出）由主进程 globalShortcut 负责，不经过这里。
+  const keybindingsRuntime = initKeybindings({
+    'app.open-settings': () => openSettingsModal(),
+    'app.new-session': () => createNewSession(),
+    'app.toggle-sidebar': () => toggleSidebar(),
+    'app.restart': () => { void window.hana?.restartApp?.(); },
   });
 
   // 19. 设置变更监听
   platform.onSettingsChanged((type: string, data: any) => {
+    if (type === 'keybindings-changed') void keybindingsRuntime.refresh();
     handleAppEvent(type, data, { source: 'desktop-ipc' });
   });
 

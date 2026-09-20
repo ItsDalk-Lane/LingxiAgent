@@ -179,21 +179,33 @@ function mapResolutionFailure(
   result: Extract<ReturnType<typeof resolveToolInvocationPermission>, { ok: false }>,
   identity: ToolTargetIdentity,
 ): never {
+  // resolver_threw 携带类型化原错（如参数校验失败）时沿用原 code 与描述，
+  // 不再一律降级为 PERMISSION_DENIED；调用方参数错误因此能以本来面目反馈。
   const code = result.error.reason === "unknown_capability"
     ? "CAPABILITY_MISMATCH"
-    : result.error.reason === "resolver_rejected" || result.error.reason === "resolver_threw"
-      ? "PERMISSION_DENIED"
-      : "PERMISSION_CONTRACT_CONFLICT";
-  throw permissionError(code, result.error.message, identity, {
-    reason: result.error.reason,
-    ...(result.error.field ? { field: result.error.field } : {}),
-    ...(code === "CAPABILITY_MISMATCH"
-      ? {
-        declaredCapability: result.error.declaredCapability ?? null,
-        capabilityBase: identity.capabilityBase,
-      }
-      : {}),
-  });
+    : result.error.invocationCode
+      ?? (result.error.reason === "resolver_rejected" || result.error.reason === "resolver_threw"
+        ? "PERMISSION_DENIED"
+        : "PERMISSION_CONTRACT_CONFLICT");
+  throw permissionError(
+    code,
+    result.error.invocationMessage ?? result.error.message,
+    identity,
+    {
+      reason: result.error.reason,
+      ...(result.error.field ? { field: result.error.field } : {}),
+      ...(result.error.invocationDetails
+        ? { invocationDetails: result.error.invocationDetails }
+        : {}),
+      ...(code === "CAPABILITY_MISMATCH"
+        ? {
+          declaredCapability: result.error.declaredCapability ?? null,
+          capabilityBase: identity.capabilityBase,
+        }
+        : {}),
+    },
+    result.error.cause ?? undefined,
+  );
 }
 
 function normalizeDescriptor(

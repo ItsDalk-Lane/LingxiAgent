@@ -32,7 +32,7 @@ describe("enrichModelFromKnownMetadata", () => {
     expect(enriched.baseUrl).toBe("https://api.kimi.com/coding/v1");
   });
 
-  it("normalizes Kimi transport and reuses request headers without replacing user model metadata", () => {
+  it("normalizes Kimi transport without replacing user model metadata or inventing request headers", () => {
     const model = {
       id: "k3",
       name: "User-defined K3",
@@ -66,7 +66,9 @@ describe("enrichModelFromKnownMetadata", () => {
         cacheWrite: 6,
       },
     });
-    expect(enriched.headers).toEqual({ "User-Agent": "KimiCLI/1.5" });
+    // pi 0.84.2+ 的 Kimi 目录不再携带 KimiCLI 请求头（改用 pi 运行时 UA），
+    // 富化不再从内置目录借头；用户自带头仍原样保留（见上一用例）。
+    expect(enriched.headers).toBeUndefined();
     expect(enriched.api).toBe("openai-completions");
     expect(enriched.baseUrl).toBe("https://api.kimi.com/coding/v1");
     expect(enriched.compat).toMatchObject({

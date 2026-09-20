@@ -14,10 +14,12 @@ import path from "node:path";
 import {
   DEFAULT_SNAPSHOT_EXCLUDES,
   WorkspaceSnapshotService,
+  deleteSessionSnapshotsSync,
   parseNameStatusZ,
   parseUntrackedZ,
   snapshotSidecarPath,
   workspaceSnapshotRepoDir,
+  workspaceSnapshotRoot,
 } from "../core/workspace-snapshots.ts";
 import { CheckpointStore } from "../lib/checkpoint-store.ts";
 
@@ -292,5 +294,53 @@ describe("workspace-snapshots 绑定与预览", () => {
     expect(report.failures[0].reason).toContain("permission denied");
     const okEntry = report.files.find((entry) => entry.path === "ok.txt");
     expect(okEntry?.ok).toBe(true);
+  });
+});
+
+describe("workspace-snapshots 会话删除清理", () => {
+  it("独占仓库：账本与仓库目录一并删除", async () => {
+    await service.captureTurn({ sessionPath, workspaceRoot: workspace, turnInputEntryId: "t1" });
+    expect(fs.existsSync(snapshotSidecarPath(sessionPath))).toBe(true);
+    const repoDir = workspaceSnapshotRepoDir(lingxiHome, workspace);
+    expect(fs.existsSync(repoDir)).toBe(true);
+
+    const report = deleteSessionSnapshotsSync(lingxiHome, [sessionPath]);
+
+    expect(report.removedSidecars).toHaveLength(1);
+    // 整个哈希目录（含 repo 与 exclude 清单）一起删，不只删 repo 子目录
+    expect(report.removedRepoDirs).toEqual([workspaceSnapshotRoot(lingxiHome, workspace)]);
+    expect(report.keptSharedRepoDirs).toEqual([]);
+    expect(fs.existsSync(snapshotSidecarPath(sessionPath))).toBe(false);
+    expect(fs.existsSync(repoDir)).toBe(false);
+  });
+
+  it("共享仓库：仅删该会话账本，仓库保留；最后一个会话删除时仓库一并清除", async () => {
+    const agentSessions = path.join(lingxiHome, "agents", "agent1", "sessions");
+    fs.mkdirSync(agentSessions, { recursive: true });
+    const sessionA = path.join(agentSessions, "a.jsonl");
+    const sessionB = path.join(agentSessions, "b.jsonl");
+
+    await service.captureTurn({ sessionPath: sessionA, workspaceRoot: workspace, turnInputEntryId: "ta" });
+    await service.captureTurn({ sessionPath: sessionB, workspaceRoot: workspace, turnInputEntryId: "tb" });
+    const repoDir = workspaceSnapshotRepoDir(lingxiHome, workspace);
+    expect(fs.existsSync(repoDir)).toBe(true);
+
+    const first = deleteSessionSnapshotsSync(lingxiHome, [sessionA]);
+    expect(fs.existsSync(snapshotSidecarPath(sessionA))).toBe(false);
+    expect(fs.existsSync(snapshotSidecarPath(sessionB))).toBe(true);
+    expect(fs.existsSync(repoDir)).toBe(true);
+    expect(first.keptSharedRepoDirs).toEqual([workspaceSnapshotRoot(lingxiHome, workspace)]);
+    expect(first.removedRepoDirs).toEqual([]);
+
+    const second = deleteSessionSnapshotsSync(lingxiHome, [sessionB]);
+    expect(fs.existsSync(snapshotSidecarPath(sessionB))).toBe(false);
+    expect(fs.existsSync(repoDir)).toBe(false);
+    expect(second.removedRepoDirs).toEqual([workspaceSnapshotRoot(lingxiHome, workspace)]);
+  });
+
+  it("侧车不存在时静默返回，不误删其他仓库", () => {
+    const report = deleteSessionSnapshotsSync(lingxiHome, [path.join(tmpRoot, "nowhere", "ghost.jsonl")]);
+    expect(report.removedSidecars).toHaveLength(0);
+    expect(report.removedRepoDirs).toEqual([]);
   });
 });

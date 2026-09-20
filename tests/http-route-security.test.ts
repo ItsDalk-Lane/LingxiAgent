@@ -307,6 +307,7 @@ describe("HTTP route security policy", () => {
       "/api/git/unstash",
       "/api/git/discard",
       "/api/git/push",
+      "/api/git/pull",
       "/api/git/worktree-create",
       "/api/git/ai-commit-message",
     ];
@@ -317,6 +318,12 @@ describe("HTTP route security policy", () => {
       expect(authorizeHttpRoute({ method: "GET", path, principal: chatOnly }))
         .toMatchObject({ allowed: false, error: "insufficient_scope", requiredScope: "files.read" });
     }
+    // log-stats 只读批量统计：POST 仅为容纳哈希列表 body，scope 按读放行
+    // （不得因 POST 被收紧成 files.write，也不得掉进 /api/* 兜底）
+    expect(authorizeHttpRoute({ method: "POST", path: "/api/git/log-stats", principal: reader }))
+      .toMatchObject({ allowed: true });
+    expect(authorizeHttpRoute({ method: "POST", path: "/api/git/log-stats", principal: chatOnly }))
+      .toMatchObject({ allowed: false, error: "insufficient_scope", requiredScope: "files.read" });
     for (const path of writePaths) {
       expect(authorizeHttpRoute({ method: "POST", path, principal: writer }))
         .toMatchObject({ allowed: true });

@@ -84,7 +84,6 @@ describe('UserMessage Codex-style actions', () => {
         message={message}
         showAvatar={false}
         sessionPath="/session/a.jsonl"
-        isLatestUserMessage
       />,
     );
 
@@ -96,7 +95,7 @@ describe('UserMessage Codex-style actions', () => {
     expect(retryMock).not.toHaveBeenCalled();
   });
 
-  it('shows retry and fork for every persisted user message while keeping edit latest-only', () => {
+  it('shows retry and edit for every persisted user message (fork merged into edit)', () => {
     const message = { id: 'u1', sourceEntryId: 'entry-u1', role: 'user' as const, text: '旧消息', textHtml: '<p>旧消息</p>', timestamp: new Date(2026, 4, 7, 5, 42).getTime() };
 
     render(
@@ -107,7 +106,6 @@ describe('UserMessage Codex-style actions', () => {
         message={message}
         showAvatar={false}
         sessionPath="/session/a.jsonl"
-        isLatestUserMessage
       />,
     );
 
@@ -115,7 +113,7 @@ describe('UserMessage Codex-style actions', () => {
     expect(screen.getByTitle('选择消息')).toBeInTheDocument();
     expect(screen.getByTitle('全选消息')).toBeInTheDocument();
     expect(screen.getByTitle('重新生成')).toBeInTheDocument();
-    expect(screen.getByTitle('分支为新会话')).toBeInTheDocument();
+    expect(screen.queryByTitle('分支为新会话')).not.toBeInTheDocument();
     expect(screen.getByTitle('编辑')).toBeInTheDocument();
     expect(screen.getByText('05:42')).toBeInTheDocument();
   });
@@ -131,7 +129,6 @@ describe('UserMessage Codex-style actions', () => {
         message={message}
         showAvatar={false}
         sessionPath="/session/a.jsonl"
-        isLatestUserMessage
       />,
     );
 
@@ -144,7 +141,6 @@ describe('UserMessage Codex-style actions', () => {
     expect(ordered).toEqual([
       '05:42',
       '重新生成',
-      '分支为新会话',
       '编辑',
       '复制文本',
       '截图',
@@ -164,7 +160,6 @@ describe('UserMessage Codex-style actions', () => {
         message={message}
         showAvatar={false}
         sessionPath="/session/a.jsonl"
-        isLatestUserMessage={false}
       />,
     );
 
@@ -180,7 +175,7 @@ describe('UserMessage Codex-style actions', () => {
     expect(useStore.getState().selectedIdsBySession['/session/a.jsonl']).toBeUndefined();
   });
 
-  it('keeps retry and fork available for older user messages without edit', () => {
+  it('keeps retry and edit available for older user messages', () => {
     const message = { id: 'u1', sourceEntryId: 'entry-u1', role: 'user' as const, text: '旧消息', textHtml: '<p>旧消息</p>', timestamp: new Date(2026, 4, 7, 5, 42).getTime() };
 
     render(
@@ -191,7 +186,6 @@ describe('UserMessage Codex-style actions', () => {
         message={message}
         showAvatar={false}
         sessionPath="/session/a.jsonl"
-        isLatestUserMessage={false}
       />,
     );
 
@@ -201,11 +195,11 @@ describe('UserMessage Codex-style actions', () => {
     expect(screen.getByTitle('全选消息')).toBeInTheDocument();
     expect(screen.getByTitle('选择消息')).toBeInTheDocument();
     expect(screen.getByTitle('重新生成')).toBeInTheDocument();
-    expect(screen.getByTitle('分支为新会话')).toBeInTheDocument();
-    expect(screen.queryByTitle('编辑')).not.toBeInTheDocument();
+    expect(screen.getByTitle('编辑')).toBeInTheDocument();
+    expect(screen.queryByTitle('分支为新会话')).not.toBeInTheDocument();
   });
 
-  it('keeps retry and fork available for review user nodes without exposing text edit', () => {
+  it('keeps retry available for review user nodes without exposing text edit', () => {
     const message = {
       id: 'u-review',
       sourceEntryId: 'entry-review',
@@ -230,16 +224,15 @@ describe('UserMessage Codex-style actions', () => {
         message={message}
         showAvatar={false}
         sessionPath="/session/a.jsonl"
-        isLatestUserMessage
       />,
     );
 
     expect(screen.getByTitle('重新生成')).toBeInTheDocument();
-    expect(screen.getByTitle('分支为新会话')).toBeInTheDocument();
     expect(screen.queryByTitle('编辑')).not.toBeInTheDocument();
+    expect(screen.queryByTitle('分支为新会话')).not.toBeInTheDocument();
   });
 
-  it('forks a user node, activates the child, then retries the copied user turn there', async () => {
+  it('merges fork into edit: forks the node, activates the child, then retries there with edited text', async () => {
     const message = { id: 'u1', sourceEntryId: 'entry-u1', role: 'user' as const, text: '旧消息', textHtml: '<p>旧消息</p>' };
     const onForkCreated = vi.fn(async () => undefined);
 
@@ -251,12 +244,13 @@ describe('UserMessage Codex-style actions', () => {
         message={message}
         showAvatar={false}
         sessionPath="/session/a.jsonl"
-        isLatestUserMessage={false}
         onForkCreated={onForkCreated}
       />,
     );
 
-    fireEvent.click(screen.getByTitle('分支为新会话'));
+    fireEvent.click(screen.getByTitle('编辑'));
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: '新消息' } });
+    fireEvent.click(screen.getByTitle('确认'));
 
     await waitFor(() => expect(forkMock).toHaveBeenCalledWith(
       '/session/a.jsonl',
@@ -270,7 +264,7 @@ describe('UserMessage Codex-style actions', () => {
     expect(retryMock).toHaveBeenLastCalledWith(
       '/session/fork.jsonl',
       { role: 'user', entryId: 'entry-u1' },
-      { message },
+      { message, replacementText: '新消息' },
     );
   });
 
@@ -285,11 +279,11 @@ describe('UserMessage Codex-style actions', () => {
         message={message}
         showAvatar={false}
         sessionPath="/session/a.jsonl"
-        isLatestUserMessage={false}
       />,
     );
 
-    fireEvent.click(screen.getByTitle('分支为新会话'));
+    fireEvent.click(screen.getByTitle('编辑'));
+    fireEvent.click(screen.getByTitle('确认'));
 
     await waitFor(() => expect(activateForkMock).toHaveBeenCalledWith({
       sessionId: 'sess_fork',
@@ -298,7 +292,7 @@ describe('UserMessage Codex-style actions', () => {
     }));
   });
 
-  it('submits inline edits through the latest-turn replay action', async () => {
+  it('submits unchanged edits as a fork re-answer with the same text', async () => {
     const message = { id: 'u1', sourceEntryId: 'entry-u1', role: 'user' as const, text: '旧消息', textHtml: '<p>旧消息</p>' };
 
     render(
@@ -309,18 +303,18 @@ describe('UserMessage Codex-style actions', () => {
         message={message}
         showAvatar={false}
         sessionPath="/session/a.jsonl"
-        isLatestUserMessage
       />,
     );
 
     fireEvent.click(screen.getByTitle('编辑'));
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: '新消息' } });
     fireEvent.click(screen.getByTitle('确认'));
 
-    expect(retryMock).toHaveBeenCalledWith(
-      '/session/a.jsonl',
+    await waitFor(() => expect(retryMock).toHaveBeenCalledWith(
+      '/session/fork.jsonl',
       { role: 'user', entryId: 'entry-u1' },
-      { message, replacementText: '新消息' },
-    );
+      { message, replacementText: '旧消息' },
+    ));
+    // 原会话上不再有原地重发：编辑链路全部落在支线会话
+    expect(retryMock).not.toHaveBeenCalledWith('/session/a.jsonl', expect.anything(), expect.anything());
   });
 });

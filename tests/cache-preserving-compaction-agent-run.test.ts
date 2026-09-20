@@ -219,9 +219,15 @@ describe("cache-preserving compaction AgentRun", () => {
 
     expect(result.summary).toBe(VALID_SUMMARY);
     expect(requests).toHaveLength(1);
-    expect(requests[0].messages).toEqual([...fixture.liveMessages, fixture.instruction]);
-    expect(requests[0].messages.slice(0, -1)).toEqual(fixture.liveMessages);
-    expect(requests[0].messages.at(-1)).toEqual(fixture.instruction);
+    // pi 0.86.0 起系统提示词与工具声明改由消息流中的 system 消息承载：
+    // 请求形状 = [system(提示词), ...live 前缀, system(工具声明), 隐藏指令]。
+    const [promptHead, ...rest] = requests[0].messages;
+    expect(promptHead).toMatchObject({ role: "system", content: fixture.systemPrompt });
+    expect(rest.slice(0, fixture.liveMessages.length)).toEqual(fixture.liveMessages);
+    const toolDeclaration = rest.at(-2);
+    expect(toolDeclaration.role).toBe("system");
+    expect(toolDeclaration.toolsAdded.map((tool: any) => tool.name)).toEqual(["read", "search"]);
+    expect(rest.at(-1)).toEqual(fixture.instruction);
   });
 
   it("keeps the old-region identity and recent-tail boundary separate in the hidden instruction", async () => {
@@ -250,8 +256,9 @@ describe("cache-preserving compaction AgentRun", () => {
       },
     });
 
-    expect(requestMessages[2].content[0].text).toBe("recent-tail-1");
-    expect(requestMessages[3].content[0].text).toBe("recent-tail-2");
+    // 索引 +1：头部多了一条 system 提示词消息（pi 0.86.0）。
+    expect(requestMessages[3].content[0].text).toBe("recent-tail-1");
+    expect(requestMessages[4].content[0].text).toBe("recent-tail-2");
     expect(requestMessages.at(-1).content[0].text).toContain(
       "The recent tail is retained context, not replacement input",
     );
@@ -259,27 +266,23 @@ describe("cache-preserving compaction AgentRun", () => {
 
   it("clones the live tool catalog exactly without mutating or executing live tools", async () => {
     const fixture = baseFixture();
-    let providerTools: any[] = [];
+    let requestMessages: any[] = [];
     await runCachePreservingCompactionAgentRun({
       ...fixture,
       streamFn: async (_model: any, context: any) => {
-        providerTools = context.tools;
+        requestMessages = [...context.messages];
         return streamOf(textResponse(VALID_SUMMARY));
       },
     });
 
-    expect(providerTools.map(({ name, description, parameters }: any) => ({
-      name,
-      description,
-      parameters,
-    }))).toEqual(fixture.tools.map(({ name, description, parameters }: any) => ({
-      name,
-      description,
-      parameters,
-    })));
-    expect(providerTools.map((tool) => tool.name)).toEqual(["read", "search"]);
-    expect(providerTools[0]).not.toBe(fixture.tools[0]);
-    expect(providerTools[0].execute).not.toBe(fixture.tools[0].execute);
+    // pi 0.86.0 起没有顶层 context.tools：工具以声明（纯数据，无 execute）写入
+    // 消息流中的 system 消息；克隆与执行隔离由 liveExecute 断言保障。
+    const normalize = ({ name, description, parameters }: any) =>
+      JSON.parse(JSON.stringify({ name, description, parameters }));
+    const declared = requestMessages
+      .find((message: any) => message.role === "system" && Array.isArray(message.toolsAdded))?.toolsAdded ?? [];
+    expect(declared.map(normalize)).toEqual(fixture.tools.map(normalize));
+    expect(declared.map((tool: any) => tool.name)).toEqual(["read", "search"]);
     expect(fixture.liveExecute).not.toHaveBeenCalled();
   });
 
@@ -302,7 +305,8 @@ describe("cache-preserving compaction AgentRun", () => {
     });
 
     expect(prepareArguments).toHaveBeenCalledWith({ inputPath: "notes.md" });
-    expect(requests[0].tools[0].prepareArguments).toBe(prepareArguments);
+    // pi 0.86.0：prepareArguments 是运行时字段，不随工具声明进入请求；
+    // 克隆保真由上面“实际以原始参数被调用”直接证明。
     expect(requests[1].messages.at(-1)).toMatchObject({
       role: "toolResult",
       toolCallId: "call-prepare",

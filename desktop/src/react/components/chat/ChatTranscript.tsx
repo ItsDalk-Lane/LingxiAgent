@@ -354,7 +354,6 @@ const TranscriptRenderItemView = memo(function TranscriptRenderItemView({
       readOnly={readOnly}
       hideUserIdentity={hideUserIdentity}
       userIdentity={userIdentity}
-      isLatestUserMessage={originalIndex === latestUserIndex}
       isLatestAssistantMessage={
         originalIndex === latestAssistantIndex
         && latestAssistantIndex > latestUserIndex
@@ -403,7 +402,6 @@ const TranscriptItemView = memo(function TranscriptItemView({
   readOnly,
   hideUserIdentity,
   userIdentity,
-  isLatestUserMessage,
   isLatestAssistantMessage,
   showTurnCompletionTime,
   assistantTurnSelectionIds,
@@ -425,7 +423,6 @@ const TranscriptItemView = memo(function TranscriptItemView({
   readOnly: boolean;
   hideUserIdentity: boolean;
   userIdentity?: { name?: string | null; avatarUrl?: string | null };
-  isLatestUserMessage: boolean;
   isLatestAssistantMessage: boolean;
   showTurnCompletionTime: boolean;
   assistantTurnSelectionIds?: readonly string[];
@@ -472,7 +469,6 @@ const TranscriptItemView = memo(function TranscriptItemView({
         viewerIdentity={viewerIdentity}
         isStreaming={isStreaming}
         isSelected={selectedIds.includes(msg.id)}
-        isLatestUserMessage={isLatestUserMessage}
         onForkCreated={onForkCreated}
         messageRef={messageRef}
       />

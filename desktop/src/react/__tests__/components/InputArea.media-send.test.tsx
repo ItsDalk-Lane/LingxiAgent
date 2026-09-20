@@ -608,7 +608,7 @@ describe('InputArea media send', () => {
 
     render(React.createElement(InputArea));
 
-    fireEvent.keyDown(window, { key: 'm', ctrlKey: true, shiftKey: true });
+    fireEvent(window, new CustomEvent('hana-voice-record-toggle'));
 
     await waitFor(() => {
       expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
@@ -641,7 +641,7 @@ describe('InputArea media send', () => {
 
     render(React.createElement(InputArea));
 
-    fireEvent.keyDown(window, { key: 'm', ctrlKey: true, shiftKey: true });
+    fireEvent(window, new CustomEvent('hana-voice-record-toggle'));
 
     expect(navigator.mediaDevices.getUserMedia).not.toHaveBeenCalled();
   });

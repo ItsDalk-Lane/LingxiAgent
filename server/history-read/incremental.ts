@@ -240,8 +240,13 @@ export async function buildHistoryDirectoryIncremental(opts: {
       current = parentOf(current) ?? null;
       guard += 1;
     }
-    if (current != null && !oldLineageHas(current) && current !== oldDir.branch.selectedLeafId) {
-      // selected 落在旧 lineage 的非叶节点（rewind/切换）→ 全量重建（保守，不混页）
+    if (
+      appendedChain.length > 0
+      && (current == null || !oldLineageHas(current) || current !== oldDir.branch.selectedLeafId)
+    ) {
+      // 新链挂点必须恰好是旧视图叶（纯延长当前分支）。挂在中途（编辑重发的
+      // rewind+append：旧视图尾段已被丢弃，如旧用户消息/旧回答）或挂在 lineage
+      // 外时，禁止把旧视图与新链直接拼接（混页），走全量重建（保守，不混页）。
       return { kind: "fail", reason: "snapshot_changed", detail: "branch_switch" };
     }
   }

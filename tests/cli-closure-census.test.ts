@@ -290,7 +290,12 @@ describe("compute-cli-closure: full generation (real esbuild + nft, slow)", () =
     const generatedClosure = await computeCliRuntimeClosure({ rootDir: REPOSITORY_ROOT, includeNftTrace: true });
     const committedClosure = JSON.parse(fs.readFileSync(CLOSURE_PATH, "utf-8"));
     expect(generatedClosure).toEqual(committedClosure);
-    expect(JSON.stringify(generatedClosure)).not.toMatch(/(?:\/Users\/|\/home\/|[A-Za-z]:\\)/);
+    // 可移植性：生成物不得泄漏本机绝对路径。dynamicCallSites 段除外——那是
+    // DYNAMIC_CALL_ALLOWLIST 的回显，argText 必须逐字匹配供应商源码里的调用点
+    // 文本；vendored 代码中的 Windows 系统常量（如 "C:\\Windows" 的 taskkill
+    // 路径 join）不是机器局部路径，若纳入扫描会永远误报。
+    const { dynamicCallSites: _echoedAllowlist, ...portableClosure } = generatedClosure;
+    expect(JSON.stringify(portableClosure)).not.toMatch(/(?:\/Users\/|\/home\/|[A-Za-z]:\\)/);
 
     const generatedBaseline = computeOpenBoundaryBaseline({ closure: generatedClosure });
     const committedBaseline = JSON.parse(fs.readFileSync(BASELINE_PATH, "utf-8"));

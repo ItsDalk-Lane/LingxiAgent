@@ -18,14 +18,18 @@ import { useStore } from '../stores';
 import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { useI18n } from '../hooks/use-i18n';
 import { formatSessionDate } from '../utils/format';
-import { switchSession, archiveSession, renameSession, pinSession, reorderPinnedSessions } from '../stores/session-actions';
+import { switchSession, archiveSession, renameSession, pinSession, reorderPinnedSessions, disposeWorkspaceSessions } from '../stores/session-actions';
 import { setBrowserStateForPath } from '../stores/browser-slice';
 import { sessionScopedListIncludes } from '../stores/session-slice';
 import type { Session, Agent } from '../types';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../utils/agent-display';
-import { buildSessionSections, filterSessionsForWorkspaceScope, resolveWorkspaceScope } from './session-sections';
+import { buildSessionSections, groupSessionsByProject, resolveSessionProjectGroupId, isPinnedSession, type ProjectGroup } from './session-sections';
+import { applyFolder, applyStudioWorkspace } from '../stores/desk-actions';
+import { removeStudioWorkspaceWithDisposal, removeWorkspaceHistoryEntry } from '../utils/workspace-switch';
 import type { SidebarSessionListRowMode } from '../../../../shared/sidebar-ui-state.ts';
 import { ContextMenu, type ContextMenuItem } from '../ui/ContextMenu';
+import { Overlay } from '../ui/Overlay';
+import { Button } from '../ui/Button';
 import { renderMarkdown } from '../utils/markdown';
 import styles from './SessionList.module.css';
 
@@ -88,6 +92,7 @@ function SessionListInner() {
   const agents = useStore(s => s.agents);
   const streamingSessions = useStore(s => s.streamingSessions);
   const unreadOutputSessionPaths = useStore(s => s.unreadOutputSessionPaths);
+  const failedSessions = useStore(s => s.failedSessions);
   const browserBySession = useStore(s => s.browserBySession);
   const metaRecovery = useStore(s => s.metaRecovery);
   // 侧边栏 UI 偏好归 store：本组件有多个实例（主侧栏 / 悬浮侧栏），
@@ -95,28 +100,60 @@ function SessionListInner() {
   const sidebarUiPrefs = useStore(s => s.sidebarUiPrefs);
   const sessionListRowMode: SidebarSessionListRowMode = sidebarUiPrefs.sessionList.rowMode;
 
-  // ── Workspace 作用域（任务七/八）──
-  // desk 状态变化（切换工作台/切会话恢复）→ 这里响应式重算，列表自动重过滤。
-  // pending 新会话（无 currentSessionPath）时作用域取 selected*（同一谓词）。
-  const deskWorkspaceMountId = useStore(s => s.deskWorkspaceMountId);
-  const deskBasePath = useStore(s => s.deskBasePath);
-  const selectedWorkspaceMountId = useStore(s => s.selectedWorkspaceMountId);
-  const selectedFolder = useStore(s => s.selectedFolder);
-  const defaultWorkspaceRootPath = useStore(s => s.defaultWorkspaceRootPath);
-  const workspaceScope = useMemo(
-    () => resolveWorkspaceScope({
-      currentSessionPath,
-      deskWorkspaceMountId,
-      deskBasePath,
-      selectedWorkspaceMountId,
-      selectedFolder,
-      defaultWorkspaceRootPath,
-    }),
-    [currentSessionPath, defaultWorkspaceRootPath, deskBasePath, deskWorkspaceMountId, selectedFolder, selectedWorkspaceMountId],
+  // ── 项目分组（全部项目可见；不再按当前工作台过滤）──
+  // 项目 = 会话的工作台身份（mount 或本地目录），mount 的 nativeRoot 与某目录
+  // 一致时双形态合流；组内按日期分组，组间按最近活动排序。工作台面板的激活
+  // 身份仍由会话切换流程（resetDeskForSessionWorkspace）跟随当前对话切换。
+  // ── 「执行中」分组 ──
+  // 多条对话同时在跑任务时集中在一个组：固定排在置顶区下面、始终展开、空了自动隐藏。
+  // 成员 = 非置顶且（正在输出 streaming 或 后台完成未查看 unread）；
+  // 用户点进查看后 unread 清除，会话自动回到原项目组。
+  // 置顶会话始终留在顶部置顶区（置顶是用户手动固定的位置，不随执行状态临时搬动；
+  // 执行状态由行首旋转图标/绿点表达，置顶区标题也不会因此消失）。
+  const activeRunningSessions = useMemo(() => {
+    const state = useStore.getState();
+    return sessions
+      .filter(s =>
+        !isPinnedSession(s)
+        && (sessionScopedListIncludes(state, streamingSessions, s.path)
+            || sessionScopedListIncludes(state, unreadOutputSessionPaths, s.path)))
+      .sort((a, b) => (Date.parse(b.modified || '') || 0) - (Date.parse(a.modified || '') || 0));
+  }, [sessions, streamingSessions, unreadOutputSessionPaths]);
+  const activeRunningPaths = useMemo(
+    () => new Set(activeRunningSessions.map(s => s.path)),
+    [activeRunningSessions],
   );
-  const scopedSessions = useMemo(
-    () => filterSessionsForWorkspaceScope(sessions, workspaceScope),
-    [sessions, workspaceScope],
+  // 执行中的会话由「执行中」组独家展示，置顶区与项目组里不再重复出现。
+  const idleSessions = useMemo(
+    () => sessions.filter(s => !activeRunningPaths.has(s.path)),
+    [sessions, activeRunningPaths],
+  );
+  const studioWorkspaces = useStore(s => s.studioWorkspaces);
+  // 子对话折叠（点击主对话收起/展开）：本地状态按主对话 sessionId 记忆；
+  // 当前正在聊的会话永远展示（即使其主对话被折叠），避免"点一下主对话，
+  // 正在聊的支线从列表里消失"。
+  const [foldedParents, setFoldedParents] = useState<Record<string, boolean>>({});
+  const toggleChildrenFold = useCallback((session: Session) => {
+    const key = session.sessionId || session.path;
+    setFoldedParents(prev => ({ ...prev, [key]: !prev[key] }));
+  }, []);
+  const foldedParentIds = useMemo(
+    () => new Set(Object.entries(foldedParents).filter(([, folded]) => folded).map(([key]) => key)),
+    [foldedParents],
+  );
+  const alwaysShowSessionPaths = useMemo(() => {
+    const paths = new Set<string>();
+    const current = pendingSessionSwitchPath || currentSessionPath;
+    if (current) paths.add(current);
+    return paths;
+  }, [currentSessionPath, pendingSessionSwitchPath]);
+  const projectGroups = useMemo(
+    () => groupSessionsByProject(idleSessions, {
+      studios: studioWorkspaces,
+      foldedParentIds,
+      alwaysShowPaths: alwaysShowSessionPaths,
+    }),
+    [idleSessions, studioWorkspaces, foldedParentIds, alwaysShowSessionPaths],
   );
 
   const [browserSessions, setBrowserSessions] = useState<Record<string, BrowserSessionState>>({});
@@ -234,6 +271,29 @@ function SessionListInner() {
     void reorderPinnedSessions(ordered.map(session => session.sessionId as string));
   }, [clearDragState, dragState, pinnedDropTarget]);
 
+  // 归档入口统一走这里：主对话名下有子对话时先弹选择框（一起归档 / 仅主对话），
+  // 无子对话直接归档。子对话数以本地列表为准，服务端仍会兑底拦截。
+  const [archiveChoice, setArchiveChoice] = useState<{ session: Session; childCount: number } | null>(null);
+  const requestArchive = useCallback((session: Session) => {
+    const state = useStore.getState();
+    const parentSessionId = session.sessionId || null;
+    if (!parentSessionId) {
+      void archiveSession(session.path);
+      return;
+    }
+    const children = (state.sessions || []).filter((item: Session) => (
+      item.sessionId
+      && item.sessionId !== parentSessionId
+      && item.path !== session.path
+      && item.forkedFrom?.sessionId === parentSessionId
+    ));
+    if (children.length === 0) {
+      void archiveSession(session.path);
+      return;
+    }
+    setArchiveChoice({ session, childCount: children.length });
+  }, []);
+
   const activeSessionPath = pendingSessionSwitchPath || currentSessionPath;
   const renderSessionItem = (
     s: Session,
@@ -246,11 +306,18 @@ function SessionListInner() {
       isPending={!pendingNewSession && pendingSessionSwitchPath === s.path}
       isStreaming={sessionScopedListIncludes(useStore.getState(), streamingSessions, s.path)}
       hasUnreadOutput={sessionScopedListIncludes(useStore.getState(), unreadOutputSessionPaths, s.path)}
+      hasFailed={sessionScopedListIncludes(useStore.getState(), failedSessions, s.path)}
       isPinned={!!s.pinnedAt}
+      isChildRow={!!s.childOfSessionId}
+      hasChildSessions={!!s.hasChildSessions}
+      childrenFolded={!!s.hasChildSessions && !!(s.sessionId && foldedParents[s.sessionId])}
+      foldedChildCount={s.foldedChildCount || 0}
+      onToggleChildren={toggleChildrenFold}
       agents={agents}
       browserState={browserSessions[s.path] || null}
       rowMode={sessionListRowMode}
       onCloseBrowser={handleCloseBrowserSession}
+      onArchiveRequest={requestArchive}
       draggable={options.draggable === true && s.agentDeleted !== true}
       onDragStart={options.onDragStart}
       onDragEnd={clearDragState}
@@ -280,48 +347,202 @@ function SessionListInner() {
     );
   };
 
-  const sections = buildSessionSections(scopedSessions, { mode: 'time' });
-  const showEmptyState = scopedSessions.length === 0;
-  const hasTodaySection = sections.some(section => section.kind === 'date' && section.group === 'today');
-  const timeContent = sections.map(section => {
-    const items = section.kind === 'pinned'
-      ? section.items.map(s => renderPinnedSessionItem(s, section.items))
-      : section.items.map(s => renderSessionItem(s));
+  // 全局置顶区：置顶是跨项目的手动顺序，保持在列表顶部渲染一次。
+  const allSections = buildSessionSections(idleSessions, { mode: 'time' });
+  const pinnedSection = allSections.find(section => section.kind === 'pinned');
+  const hasPinnedItems = !!(pinnedSection && pinnedSection.items.length > 0);
+  // 空状态只在真没对话时出现；全部会话都在执行中（项目组暂空）时不算空，
+  // 只有置顶会话时同样不算——置顶条仍要渲染。
+  const showEmptyState = sessions.length === 0
+    || (projectGroups.length === 0 && activeRunningSessions.length === 0 && !hasPinnedItems);
 
-    if (section.kind === 'pinned') {
-      return (
-        <section key={section.id} className={styles.pinnedSection}>
-          <SectionTitle className={styles.pinnedSectionTitle}>
-            <span>{t(section.titleKey)}</span>
-            <PinIcon />
-          </SectionTitle>
-          {items}
-        </section>
+  const pinnedContent = pinnedSection && pinnedSection.items.length > 0 ? (
+    <section className={styles.pinnedSection}>
+      <SectionTitle className={styles.pinnedSectionTitle}>
+        <span>{t(pinnedSection.titleKey)}</span>
+        <PinIcon />
+      </SectionTitle>
+      {pinnedSection.items.map(s => renderPinnedSessionItem(s, pinnedSection.items))}
+    </section>
+  ) : null;
+
+  // 「执行中」组：常驻展开，不给折叠交互；组头用脉冲点表达活跃，右侧只留计数。
+  const runningContent = activeRunningSessions.length > 0 ? (
+    <section className={styles.projectSection} data-running-group="true">
+      <div className={styles.projectHeader} data-collapsed="false">
+        <div className={styles.projectHeaderStatic}>
+          <span className={styles.runningGroupPulse} aria-hidden="true" />
+          <span className={styles.projectSectionName}>{t('sidebar.runningGroup')}</span>
+          <span className={styles.projectSectionCount}>{activeRunningSessions.length}</span>
+        </div>
+      </div>
+      {activeRunningSessions.map(s => renderSessionItem(s))}
+    </section>
+  ) : null;
+
+  // ── 折叠规则：跟随当前聊天所在分组 ──
+  // 当前会话（或待建会话身份）所在的分组展开，其余分组默认折叠。
+  // 点击标题在默认规则上取反，记录在本地临时覆盖；切换到别的分组的对话后
+  // 重置——展开状态随之转移到新分组。
+  const selectedWorkspaceMountId = useStore(s => s.selectedWorkspaceMountId);
+  const selectedFolder = useStore(s => s.selectedFolder);
+  const activeGroupId = useMemo(() => {
+    const current = currentSessionPath
+      ? sessions.find(s => s.path === currentSessionPath)
+      : null;
+    if (current) return resolveSessionProjectGroupId(current, studioWorkspaces);
+    // 待建会话（新对话/欢迎态）：以选定的工作台身份为准。
+    return resolveSessionProjectGroupId(
+      { workspaceMountId: selectedWorkspaceMountId, cwd: selectedFolder },
+      studioWorkspaces,
+    );
+  }, [currentSessionPath, selectedFolder, selectedWorkspaceMountId, sessions, studioWorkspaces]);
+
+  const [manualOverrides, setManualOverrides] = useState<Record<string, boolean>>({});
+  useEffect(() => {
+    // 聊天切到别的分组后，手动覆盖清空，回到默认规则（新组展开、旧组折叠）。
+    setManualOverrides({});
+  }, [activeGroupId]);
+
+  const isProjectCollapsed = useCallback((group: ProjectGroup) =>
+    manualOverrides[group.id] ?? (group.id !== activeGroupId),
+    [activeGroupId, manualOverrides]);
+  const toggleProjectCollapsed = useCallback((groupId: string) => {
+    setManualOverrides(m => {
+      // 先还原当前折叠状态（手动覆盖优先，默认规则=非活跃组折叠），取反后写入。
+      // 此前实现把「当前展开状态」原样存回覆盖表，只有首次点击碰巧生效，
+      // 第二次起值恒定不变，表现为点了没反应。
+      const collapsed = m[groupId] ?? (groupId !== activeGroupId);
+      return { ...m, [groupId]: !collapsed }; // 展开中 → 折叠；折叠中 → 展开
+    });
+  }, [activeGroupId]);
+
+  // 项目行 hover 动作：新建对话 / 三点菜单。
+  const [projectMenu, setProjectMenu] = useState<{ x: number; y: number; group: ProjectGroup } | null>(null);
+  const handleProjectNewChat = useCallback((group: ProjectGroup) => {
+    if (group.mountId) {
+      const studio = (useStore.getState().studioWorkspaces || [])
+        .find((item: any) => item.mountId === group.mountId);
+      void applyStudioWorkspace({
+        mountId: group.mountId,
+        label: group.title,
+        nativeRootPath: studio?.nativeRootPath || group.rootPath || null,
+      });
+      return;
+    }
+    if (group.rootPath) void applyFolder(group.rootPath);
+  }, []);
+  const handleProjectRemove = useCallback((group: ProjectGroup) => {
+    if (group.mountId) void removeStudioWorkspaceWithDisposal(group.mountId);
+    else if (group.rootPath) void removeWorkspaceHistoryEntry(group.rootPath);
+  }, []);
+  const handleProjectArchiveAll = useCallback(async (group: ProjectGroup) => {
+    const result = await disposeWorkspaceSessions(
+      { workspaceMountId: group.mountId, cwd: group.rootPath ?? undefined },
+      'archive',
+    );
+    if (result) {
+      useStore.getState().addToast(
+        t('sidebar.projectArchiveDone', { count: String(result.disposed) }),
+        'success',
+        6000,
       );
     }
+  }, [t]);
 
+  const projectMenuItems = useMemo<ContextMenuItem[]>(() => {
+    if (!projectMenu) return [];
+    const { group } = projectMenu;
+    return [
+      {
+        label: t('sidebar.projectRemove'),
+        danger: true,
+        action: () => handleProjectRemove(group),
+      },
+      {
+        label: t('sidebar.projectArchiveAll'),
+        action: () => void handleProjectArchiveAll(group),
+      },
+    ];
+  }, [handleProjectArchiveAll, handleProjectRemove, projectMenu, t]);
+
+  const projectContent = projectGroups.map(group => {
+    const projectCollapsed = isProjectCollapsed(group);
     return (
-      <Fragment key={section.id}>
-        <SectionTitle>
-          <span>{t(section.titleKey)}</span>
-        </SectionTitle>
-        {items}
-      </Fragment>
+      <section key={group.id} className={styles.projectSection} data-project-id={group.id}>
+        <div
+          className={styles.projectHeader}
+          data-collapsed={projectCollapsed ? 'true' : 'false'}
+        >
+          <button
+            type="button"
+            className={styles.projectHeaderMain}
+            aria-expanded={!projectCollapsed}
+            aria-label={group.title}
+            onClick={() => toggleProjectCollapsed(group.id)}
+          >
+            <FolderGlyph collapsed={projectCollapsed} />
+            <span className={styles.projectSectionName} title={group.title}>{group.title}</span>
+            <span className={styles.projectSectionCount}>{group.sessions.length}</span>
+          </button>
+          <div className={styles.projectHeaderActions}>
+            <button
+              type="button"
+              className={styles.projectActionButton}
+              aria-label={t('sidebar.projectNewChat')}
+              title={t('sidebar.projectNewChat')}
+              onClick={(event) => {
+                event.stopPropagation();
+                handleProjectNewChat(group);
+              }}
+            >
+              <NewChatGlyph />
+            </button>
+            <button
+              type="button"
+              className={styles.projectActionButton}
+              aria-label={t('sidebar.projectMore')}
+              title={t('sidebar.projectMore')}
+              onClick={(event) => {
+                event.stopPropagation();
+                const rect = event.currentTarget.getBoundingClientRect();
+                setProjectMenu({ x: rect.left, y: rect.bottom + 4, group });
+              }}
+            >
+              <DotsGlyph />
+            </button>
+          </div>
+        </div>
+        {!projectCollapsed && group.sessions.map(s => renderSessionItem(s))}
+      </section>
     );
   });
-  if (!hasTodaySection && !showEmptyState) {
-    const pinnedIndex = sections.findIndex(section => section.kind === 'pinned');
-    timeContent.splice(Math.max(0, pinnedIndex + 1), 0, (
-      <SectionTitle key="date:today-empty">
-        <span>{t('time.today')}</span>
-      </SectionTitle>
-    ));
-  }
+
   const content = showEmptyState ? (
     <div className={styles.sessionEmpty}>
       {metaRecovery?.degraded ? t('sidebar.metaRecoveryEmpty') : t('sidebar.empty')}
     </div>
-  ) : timeContent;
+  ) : (
+    <>
+      {pinnedContent}
+      {runningContent}
+      {projectContent}
+      {projectMenu && (
+        <ContextMenu
+          items={projectMenuItems}
+          position={{ x: projectMenu.x, y: projectMenu.y }}
+          onClose={() => setProjectMenu(null)}
+        />
+      )}
+      {archiveChoice && (
+        <SessionArchiveChoiceDialog
+          session={archiveChoice.session}
+          childCount={archiveChoice.childCount}
+          onClose={() => setArchiveChoice(null)}
+        />
+      )}
+    </>
+  );
 
   return (
     <>
@@ -346,6 +567,40 @@ function SectionTitle({
   );
 }
 
+function FolderGlyph({ collapsed }: { collapsed: boolean }) {
+  // 展开 = 打开的文件夹；折叠 = 闭合的文件夹。状态由图标本身表达。
+  return collapsed ? (
+    <svg className={styles.projectTitleIcon} width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+    </svg>
+  ) : (
+    <svg className={styles.projectTitleIcon} width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2" />
+    </svg>
+  );
+}
+
+// 与输入框下方「新建对话」按钮同一枚图标：对话气泡内嵌加号。
+function NewChatGlyph() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      <path d="M9 10h6" />
+      <path d="M12 7v6" />
+    </svg>
+  );
+}
+
+function DotsGlyph() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <circle cx="5" cy="12" r="1.6" />
+      <circle cx="12" cy="12" r="1.6" />
+      <circle cx="19" cy="12" r="1.6" />
+    </svg>
+  );
+}
+
 function PinIcon() {
   return (
     <svg className={styles.pinnedTitleIcon} width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -366,17 +621,30 @@ function BrowserStatusIcon() {
 
 // ── Session Item ──
 
-const SessionItem = memo(function SessionItem({ session: s, isActive, isPending, isStreaming, isPinned, hasUnreadOutput, agents, browserState, rowMode, onCloseBrowser, draggable = false, onDragStart, onDragEnd }: {
+const SessionItem = memo(function SessionItem({ session: s, isActive, isPending, isStreaming, isPinned, isChildRow, hasChildSessions, childrenFolded, foldedChildCount, hasUnreadOutput, hasFailed, agents, browserState, rowMode, onCloseBrowser, onArchiveRequest, onToggleChildren, draggable = false, onDragStart, onDragEnd }: {
   session: Session;
   isActive: boolean;
   isPending: boolean;
   isStreaming: boolean;
   isPinned: boolean;
+  /** 谱系子行：缩进两级展示（主对话的子对话） */
+  isChildRow?: boolean;
+  /** 主对话行：名下挂有子对话（展示折叠开关） */
+  hasChildSessions?: boolean;
+  /** 主对话行：子对话当前处于折叠态 */
+  childrenFolded?: boolean;
+  /** 主对话行：被折叠隐藏的子对话数（折叠时展示在助手符号上） */
+  foldedChildCount?: number;
   hasUnreadOutput: boolean;
+  hasFailed: boolean;
   agents: Agent[];
   browserState: BrowserSessionState | null;
   rowMode: SidebarSessionListRowMode;
   onCloseBrowser: (sessionPath: string) => void;
+  /** 归档入口：子对话存在时由上层弹选择框 */
+  onArchiveRequest: (session: Session) => void;
+  /** 主对话点击折叠开关：收起/展开子对话 */
+  onToggleChildren: (session: Session) => void;
   draggable?: boolean;
   onDragStart?: (event: React.DragEvent, session: Session) => void;
   onDragEnd?: () => void;
@@ -391,6 +659,25 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
   const isDeletedAgentSession = s.agentDeleted === true;
   // 循环任务状态（running/paused 才会有，来自 loop_status WS + 冷启动注入）。列表徽章据此渲染。
   const loopStatus = useStore((st) => (s.sessionId ? st.loopStatusBySession[s.sessionId] : undefined));
+  // 后台会话待用户决策的挂起块（ask_user 提问 / 工具批准 / 应用控制批准…）。
+  // 写入端以 sessionScopedKey 为 key（sessionId 优先），这里双查兼容 legacy path key。
+  const pendingConfirmation = useStore((st) => {
+    const byPath = st.pendingSessionConfirmationsByPath;
+    if (!byPath) return undefined;
+    return (s.sessionId ? byPath[s.sessionId] : undefined) || byPath[s.path];
+  });
+  // 标识按决策类型匹配文案与颜色：提问最显眼（accent），批准次之（warning），其余中性。
+  const actionBadge = useMemo(() => {
+    if (!pendingConfirmation || pendingConfirmation.status !== 'pending') return null;
+    const kind = pendingConfirmation.kind;
+    if (kind === 'ask_user') {
+      return { tone: 'ask', label: t('sidebar.actionBadge.askUser'), title: pendingConfirmation.title };
+    }
+    if (kind === 'tool_action_approval' || kind === 'computer_app_approval') {
+      return { tone: 'approve', label: t('sidebar.actionBadge.approval'), title: pendingConfirmation.title };
+    }
+    return { tone: 'confirm', label: t('sidebar.actionBadge.confirm'), title: pendingConfirmation.title };
+  }, [pendingConfirmation, t]);
   // 动态 import websocket，避免顶层静态依赖 websocket.ts 的模块加载副作用（见 InterludeBlock 同款注释）。
   const stopLoopForSession = useCallback(async (session: Session) => {
     const { getWebSocket } = await import('../services/websocket');
@@ -406,8 +693,8 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
 
   const handleArchive = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    archiveSession(s.path);
-  }, [s.path]);
+    onArchiveRequest(s);
+  }, [onArchiveRequest, s]);
 
   const handlePin = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -468,10 +755,10 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
     : null;
   const browserUrl = browserState?.url || null;
   const hasStatusSlot = !!browserUrl;
-  // 状态点只表达「这个会话自己有动静」——正在输出，或后台跑完还没看。
-  // 切换加载不属于会话状态，本地切换又快，画上去只会一闪而过。
-  const showStatusDot = isStreaming || hasUnreadOutput;
-  const statusDotState = isStreaming ? 'running' : 'unread';
+  // 状态点三态：失败（红点）> 运行中（旋转）> 完成未读（绿点）。
+  // 红点最需要用户注意，优先级最高；切换加载不属于会话状态，本地切换又快，不画。
+  const showStatusDot = hasFailed || isStreaming || hasUnreadOutput;
+  const statusDotState = hasFailed ? 'failed' : isStreaming ? 'running' : 'unread';
   const isSingleLine = rowMode === 'single-line';
   const displayTitle = s.title || s.firstMessage || t('session.untitled');
   const metaText = parts.join(' · ');
@@ -519,8 +806,9 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
   return (
     <>
       <button
-        className={`${styles.sessionItem}${isSingleLine ? ` ${styles.sessionItemSingleLine}` : ''}${isActive ? ` ${styles.sessionItemActive}` : ''}${isDeletedAgentSession ? ` ${styles.sessionItemReadOnly}` : ''}`}
+        className={`${styles.sessionItem}${isSingleLine ? ` ${styles.sessionItemSingleLine}` : ''}${isActive ? ` ${styles.sessionItemActive}` : ''}${isDeletedAgentSession ? ` ${styles.sessionItemReadOnly}` : ''}${isChildRow ? ` ${styles.sessionItemChild}` : ''}${hasChildSessions ? ` ${styles.sessionItemParent}` : ''}`}
         data-session-path={s.path}
+        data-children-folded={hasChildSessions ? (childrenFolded ? 'true' : 'false') : undefined}
         data-row-mode={rowMode}
         data-unread-output={hasUnreadOutput ? 'true' : 'false'}
         data-switch-pending={isPending ? 'true' : 'false'}
@@ -533,7 +821,22 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
       >
         <div className={styles.sessionItemHeader}>
           {s.agentId && (
-            <AgentBadge agentId={s.agentId} agentName={s.agentName} agents={agents} />
+            <AgentBadge
+              agentId={s.agentId}
+              agentName={s.agentName}
+              agents={agents}
+              interactive={hasChildSessions}
+              folded={hasChildSessions && childrenFolded}
+              foldedCount={hasChildSessions && childrenFolded ? (foldedChildCount || 0) : 0}
+              onToggle={hasChildSessions ? () => onToggleChildren(s) : undefined}
+              titleOverride={hasChildSessions
+                ? (childrenFolded
+                    ? ((foldedChildCount || 0) > 0
+                        ? t('session.expandChildrenCount', { count: String(foldedChildCount) })
+                        : t('session.expandChildren'))
+                    : t('session.collapseChildren'))
+                : undefined}
+            />
           )}
           {showStatusDot && (
             <span
@@ -568,6 +871,15 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
           ) : (
             <div className={styles.sessionItemTitle}>
               {displayTitle}
+            </div>
+          )}
+          {actionBadge && !isActive && (
+            <div
+              className={styles.sessionActionBadge}
+              data-tone={actionBadge.tone}
+              title={actionBadge.title}
+            >
+              {actionBadge.label}
             </div>
           )}
           {hasStatusSlot && (
@@ -631,6 +943,7 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
           position={menuPosition}
           onClose={() => setMenuPosition(null)}
           onRename={beginRename}
+          onArchive={() => onArchiveRequest(s)}
           onShowSummary={(position) => setSummaryPreviewPosition(position)}
         />
       )}
@@ -671,6 +984,7 @@ const SessionContextMenu = memo(function SessionContextMenu({
   position,
   onClose,
   onRename,
+  onArchive,
   onShowSummary,
 }: {
   session: Session;
@@ -678,6 +992,8 @@ const SessionContextMenu = memo(function SessionContextMenu({
   position: { x: number; y: number };
   onClose: () => void;
   onRename: () => void;
+  /** 归档入口：子对话存在时由上层弹选择框 */
+  onArchive: (session: Session) => void;
   onShowSummary: (position: { x: number; y: number }) => void;
 }) {
   const { t } = useI18n();
@@ -714,7 +1030,7 @@ const SessionContextMenu = memo(function SessionContextMenu({
       menuItems.push({
         label: t('session.archive'),
         danger: true,
-        action: () => archiveSession(session.path),
+        action: () => onArchive(session),
       });
       return menuItems;
     }
@@ -729,10 +1045,10 @@ const SessionContextMenu = memo(function SessionContextMenu({
     menuItems.push({
       label: t('session.archive'),
       danger: true,
-      action: () => archiveSession(session.path),
+      action: () => onArchive(session),
     });
     return menuItems;
-  }, [isPinned, onRename, onShowSummary, position, session.agentDeleted, session.hasSummary, session.path, session.sessionId, t]);
+  }, [isPinned, onArchive, onRename, onShowSummary, position, session.agentDeleted, session.hasSummary, session.path, session.sessionId, t]);
 
   return (
     <ContextMenu
@@ -866,10 +1182,25 @@ function formatRcPlatform(platform: string, t: (key: string) => string) {
 
 // ── Agent Avatar Badge ──
 
-const AgentBadge = memo(function AgentBadge({ agentId, agentName, agents }: {
+const AgentBadge = memo(function AgentBadge({
+  agentId,
+  agentName,
+  agents,
+  interactive = false,
+  folded = false,
+  foldedCount = 0,
+  onToggle,
+  titleOverride,
+}: {
   agentId: string;
   agentName: string | null;
   agents: Agent[];
+  /** 主对话行：助手符号兼作子对话折叠开关（仅点击符号切换，不占整行） */
+  interactive?: boolean;
+  folded?: boolean;
+  foldedCount?: number;
+  onToggle?: () => void;
+  titleOverride?: string;
 }) {
   const info = resolveAgentDisplayInfo({
     id: agentId,
@@ -877,11 +1208,94 @@ const AgentBadge = memo(function AgentBadge({ agentId, agentName, agents }: {
     fallbackAgentName: agentName || agentId,
   });
 
+  if (!interactive || !onToggle) {
+    return (
+      <AgentAvatar
+        info={info}
+        className={styles.sessionAgentBadge}
+        title={agentName || agentId}
+      />
+    );
+  }
+
   return (
-    <AgentAvatar
-      info={info}
-      className={styles.sessionAgentBadge}
-      title={agentName || agentId}
-    />
+    <span
+      className={styles.sessionAgentToggle}
+      data-agent-fold-toggle="true"
+      data-folded={folded ? 'true' : 'false'}
+      role="button"
+      tabIndex={0}
+      aria-expanded={!folded}
+      aria-label={titleOverride || agentName || agentId}
+      title={titleOverride || agentName || agentId}
+      onClick={(e) => {
+        e.stopPropagation();
+        onToggle();
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          e.stopPropagation();
+          onToggle();
+        }
+      }}
+    >
+      <AgentAvatar info={info} className={styles.sessionAgentBadge} />
+      {/* 折叠态：符号本身的变化——右上角出现被收起的子对话数徽标 */}
+      {folded && (
+        <span className={styles.sessionAgentFoldCount} data-agent-fold-count="true">{foldedCount > 0 ? foldedCount : '·'}</span>
+      )}
+    </span>
   );
 });
+
+/**
+ * 归档带子对话的主对话：三选一。
+ * 一起归档 = 递归归档全部子对话；仅归档主对话 = 先把子对话释放到列表顶层；取消。
+ */
+function SessionArchiveChoiceDialog({
+  session,
+  childCount,
+  onClose,
+}: {
+  session: Session;
+  childCount: number;
+  onClose: () => void;
+}) {
+  const { t } = useI18n();
+  const [busy, setBusy] = useState(false);
+  const run = (mode: 'archive_children' | 'detach_children') => {
+    setBusy(true);
+    void archiveSession(session.path, mode).finally(() => {
+      setBusy(false);
+      onClose();
+    });
+  };
+  return (
+    <Overlay
+      open
+      scope="window"
+      onClose={busy ? () => {} : onClose}
+      backdrop="dim"
+      zIndex={320}
+      className={styles.archiveChoiceDialog}
+      contentProps={{ role: 'dialog', 'aria-modal': true, 'data-testid': 'session-archive-choice-dialog' }}
+    >
+      <h2 className={styles.archiveChoiceTitle}>{t('session.archiveChildrenTitle')}</h2>
+      <p className={styles.archiveChoiceBody}>
+        {t('session.archiveChildrenBody', { count: String(childCount) })}
+      </p>
+      <div className={styles.archiveChoiceActions}>
+        <Button variant="secondary" onClick={onClose} disabled={busy} className={styles.archiveChoiceAction}>
+          {t('common.cancel')}
+        </Button>
+        <Button variant="secondary" onClick={() => run('detach_children')} disabled={busy} className={styles.archiveChoiceAction}>
+          {t('session.archiveDetachChildren')}
+        </Button>
+        <Button variant="danger" onClick={() => run('archive_children')} loading={busy} className={styles.archiveChoiceAction}>
+          {t('session.archiveWithChildren')}
+        </Button>
+      </div>
+    </Overlay>
+  );
+}

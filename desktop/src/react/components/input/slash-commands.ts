@@ -262,7 +262,7 @@ export function buildSlashCommands(
   const list: SlashItem[] = [
     {
       name: 'diary',
-      label: '/diary',
+      label: 'diary',
       description: t('slash.diary'),
       busyLabel: t('slash.diaryBusy'),
       icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
@@ -271,7 +271,7 @@ export function buildSlashCommands(
     },
     {
       name: 'xing',
-      label: '/xing',
+      label: 'xing',
       description: t('slash.xing'),
       busyLabel: '',
       icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg>',
@@ -280,7 +280,7 @@ export function buildSlashCommands(
     },
     {
       name: 'compact',
-      label: '/compact',
+      label: 'compact',
       description: t('slash.compact'),
       busyLabel: t('slash.compactBusy'),
       icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>',
@@ -291,7 +291,7 @@ export function buildSlashCommands(
     // 提交时由 InputArea 经 applySlashCompletion 保留参数原文，再整条发给服务端 dispatcher。
     {
       name: 'loop',
-      label: '/loop',
+      label: 'loop',
       description: t('slash.loop'),
       busyLabel: '',
       icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>',

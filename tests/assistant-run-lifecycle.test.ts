@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { createChatRoute } from "../server/routes/chat.ts";
+import { installDesktopInputCommitObserver } from "../lib/pi-sdk/desktop-input-commit.ts";
 
 /**
  * Assistant Run 生命周期回归测试（任务 §四十二/§三十九）。
@@ -198,5 +199,75 @@ describe("Assistant Run 生命周期", () => {
     expect(runEnd).toBeDefined();
     expect(runEnd.status).toBe("aborted");
     expect(of(payloads, "assistant_run_end")).toHaveLength(1);
+  });
+
+  it("插话（steer）落盘切开 Assistant Run：旧 Run 以 completed 收口，新 Run 复用 streamId", () => {
+    const { subscriber, sessionPath, payloads } = makeHarness();
+    const msg = assistantMessage();
+
+    subscriber?.({ type: "agent_start" }, sessionPath);
+    subscriber?.({ type: "turn_start" }, sessionPath);
+    subscriber?.({ type: "message_start", message: msg }, sessionPath);
+    emitTool(subscriber, sessionPath, "t1");
+    subscriber?.({ type: "message_end", message: msg }, sessionPath);
+    subscriber?.({ type: "turn_end", message: msg, toolResults: [] }, sessionPath);
+
+    expect(of(payloads, "assistant_run_start")).toHaveLength(1);
+    expect(of(payloads, "assistant_run_end")).toHaveLength(0);
+
+    // 插话走真实 steer 路径打标（SDK 包装层认出 steer 入队的 user 消息）：
+    // 历史投影以 user 消息为回合边界，实时 Run 必须在插话落盘点切开。
+    const steerSession = {
+      agent: { prompt: async () => {}, steer: (..._args: any[]) => {}, subscribe: () => () => {} },
+      prompt: async () => {},
+    };
+    installDesktopInputCommitObserver(steerSession);
+    const steered = { role: "user", content: "有一点需要纠正" };
+    steerSession.agent.steer(steered);
+    subscriber?.({ type: "message_end", message: steered }, sessionPath);
+
+    const runEnds = of(payloads, "assistant_run_end");
+    const runStarts = of(payloads, "assistant_run_start");
+    expect(runEnds).toHaveLength(1);
+    expect(runStarts).toHaveLength(2);
+    // 旧 Run 以 completed 收口（不是 aborted：它被新输入取代，终态裁决交给前端结局裁决）
+    expect(runEnds[0].runId).toBe(runStarts[0].runId);
+    expect(runEnds[0].status).toBe("completed");
+    // 新 Run 有新 runId，但整个会话复用同一个 streamId
+    expect(runStarts[1].runId).not.toBe(runStarts[0].runId);
+    expect(streamIds(payloads)).toHaveLength(1);
+
+    // 插话之后的输出属于新 Run；agent_settled 只终结新 Run（exactly-once）
+    subscriber?.({ type: "turn_start" }, sessionPath);
+    subscriber?.({ type: "message_start", message: msg }, sessionPath);
+    emitText(subscriber, sessionPath, msg, "改完了。");
+    subscriber?.({ type: "message_end", message: msg }, sessionPath);
+    subscriber?.({ type: "turn_end", message: msg, toolResults: [] }, sessionPath);
+    subscriber?.({ type: "agent_end", messages: [msg], willRetry: false }, sessionPath);
+    subscriber?.({ type: "agent_settled" }, sessionPath);
+
+    const finalEnds = of(payloads, "assistant_run_end");
+    expect(finalEnds).toHaveLength(2);
+    expect(finalEnds[1].runId).toBe(runStarts[1].runId);
+    expect(finalEnds[1].status).toBe("completed");
+    expect(streamIds(payloads)).toHaveLength(1);
+  });
+
+  it("正常 prompt 的用户消息 commit 不触发 Run 切分（即使晚于 agent_start 到达）", () => {
+    const { subscriber, sessionPath, payloads } = makeHarness();
+
+    // 未激活 Run 时的 message_end(user)：不得制造任何 Run 事件。
+    subscriber?.({ type: "message_end", message: { role: "user", content: "你好" } }, sessionPath);
+    expect(of(payloads, "assistant_run_start")).toHaveLength(0);
+    expect(of(payloads, "assistant_run_end")).toHaveLength(0);
+
+    subscriber?.({ type: "agent_start" }, sessionPath);
+    expect(of(payloads, "assistant_run_start")).toHaveLength(1);
+
+    // 真实 SDK 中 prompt 的用户消息 message_end 可能晚于 agent_start：
+    // 没有 steer 标记，不得误切 Run。
+    subscriber?.({ type: "message_end", message: { role: "user", content: "你好" } }, sessionPath);
+    expect(of(payloads, "assistant_run_start")).toHaveLength(1);
+    expect(of(payloads, "assistant_run_end")).toHaveLength(0);
   });
 });

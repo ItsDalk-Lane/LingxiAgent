@@ -20,7 +20,7 @@ function normalizeSessionId(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
-function normalizeSessionPath(value: unknown): string | null {
+export function normalizeSessionPath(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value : null;
 }
 

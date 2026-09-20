@@ -12,9 +12,9 @@ describe('computeGraphRows', () => {
       { hash: 'A', parents: [] },
     ]);
     expect(rows).toEqual([
-      { nodeLane: 0, activeLanes: [0], mergeLanes: [], laneCount: 1 },
-      { nodeLane: 0, activeLanes: [0], mergeLanes: [], laneCount: 1 },
-      { nodeLane: 0, activeLanes: [], mergeLanes: [], laneCount: 1 },
+      { nodeLane: 0, activeLanes: [0], mergeLanes: [], newLanes: [], laneCount: 1 },
+      { nodeLane: 0, activeLanes: [0], mergeLanes: [], newLanes: [], laneCount: 1 },
+      { nodeLane: 0, activeLanes: [], mergeLanes: [], newLanes: [], laneCount: 1 },
     ]);
     expect(graphLaneCount(rows)).toBe(1);
   });
@@ -27,11 +27,12 @@ describe('computeGraphRows', () => {
       { hash: 'C', parents: ['A'] },
       { hash: 'A', parents: [] },
     ]);
-    expect(rows[0]).toEqual({ nodeLane: 0, activeLanes: [0, 1], mergeLanes: [1], laneCount: 2 });
-    expect(rows[1]).toEqual({ nodeLane: 0, activeLanes: [0, 1], mergeLanes: [], laneCount: 2 });
+    // 泳道 1 为本行新建 → newLanes 标记它，渲染时跳过行顶竖线（曲线落到行底衔接）
+    expect(rows[0]).toEqual({ nodeLane: 0, activeLanes: [0, 1], mergeLanes: [1], newLanes: [1], laneCount: 2 });
+    expect(rows[1]).toEqual({ nodeLane: 0, activeLanes: [0, 1], mergeLanes: [], newLanes: [], laneCount: 2 });
     // C 在泳道 1：第一父 A 已被泳道 0 跟踪 → 会合曲线，泳道 1 释放
-    expect(rows[2]).toEqual({ nodeLane: 1, activeLanes: [0], mergeLanes: [0], laneCount: 2 });
-    expect(rows[3]).toEqual({ nodeLane: 0, activeLanes: [], mergeLanes: [], laneCount: 2 });
+    expect(rows[2]).toEqual({ nodeLane: 1, activeLanes: [0], mergeLanes: [0], newLanes: [], laneCount: 2 });
+    expect(rows[3]).toEqual({ nodeLane: 0, activeLanes: [], mergeLanes: [], newLanes: [], laneCount: 2 });
     expect(graphLaneCount(rows)).toBe(2);
   });
 
@@ -41,10 +42,10 @@ describe('computeGraphRows', () => {
       { hash: 'X', parents: ['B', 'A'] },
       { hash: 'A', parents: [] },
     ]);
-    // X: 泳道0=B；第二父 A 不在泳道 → 新泳道1
-    expect(rows[0]).toEqual({ nodeLane: 0, activeLanes: [0, 1], mergeLanes: [1], laneCount: 2 });
+    // X: 泳道0=B；第二父 A 不在泳道 → 新泳道1（newLanes 记录）
+    expect(rows[0]).toEqual({ nodeLane: 0, activeLanes: [0, 1], mergeLanes: [1], newLanes: [1], laneCount: 2 });
     // A: 节点在泳道1，无父 → 泳道1 结束；泳道0 仍跟踪 B（图底截断）
-    expect(rows[1]).toEqual({ nodeLane: 1, activeLanes: [0], mergeLanes: [], laneCount: 2 });
+    expect(rows[1]).toEqual({ nodeLane: 1, activeLanes: [0], mergeLanes: [], newLanes: [], laneCount: 2 });
   });
 
   it('handles empty input', () => {

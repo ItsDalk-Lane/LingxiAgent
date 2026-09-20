@@ -83,6 +83,8 @@ export function classifyHttpRoute({ method = "GET", path = "" } = {}) {
   if (isDeskFileWriteRoute(verb, routePath)) return scoped("files.write");
   // 环境信息卡 git 面：读 = files.read；checkout/commit/push 等 = files.write
   if (isGitEnvironmentRoute(verb, routePath)) {
+    // log-stats 是只读批量统计，POST 仅为容纳哈希列表 body，不按 POST 收紧为写
+    if (routePath === "/api/git/log-stats") return scoped("files.read");
     return verb === "GET" ? scoped("files.read") : scoped("files.write");
   }
   if (routePath === "/api/usage/llm") return verb === "GET" ? STUDIO_OWNER : LOCAL_ONLY;
@@ -440,15 +442,21 @@ function isGitEnvironmentRoute(verb, routePath) {
     || routePath === "/api/git/worktrees"
     || routePath === "/api/git/branches"
     || routePath === "/api/git/log"
+    || routePath === "/api/git/log-stats"
     || routePath === "/api/git/file-diff"
     || routePath === "/api/git/checkout"
     || routePath === "/api/git/create-branch"
     || routePath === "/api/git/commit"
+    || routePath === "/api/git/amend"
+    || routePath === "/api/git/stage"
+    || routePath === "/api/git/unstage"
+    || routePath === "/api/git/fetch"
     || routePath === "/api/git/stash"
     || routePath === "/api/git/stashes"
     || routePath === "/api/git/unstash"
     || routePath === "/api/git/discard"
     || routePath === "/api/git/push"
+    || routePath === "/api/git/pull"
     || routePath === "/api/git/worktree-create"
     || routePath === "/api/git/ai-commit-message";
 }

@@ -6,6 +6,7 @@ import { useI18n } from '../../hooks/use-i18n';
 import type { Model } from '../../types';
 import type { SessionModel } from '../../stores/chat-types';
 import { SelectWidget, ProviderIcon, ProviderGroupHeader, selectWidgetStyles, type SelectOption } from '@/ui';
+import { settleModelSwitchResidue } from '../../services/model-switch-settlement';
 import styles from './InputArea.module.css';
 
 export function ModelSelector({ models, sessionModel, isStreaming = false, sessionPath, onSessionModelChange }: {
@@ -82,6 +83,10 @@ export function ModelSelector({ models, sessionModel, isStreaming = false, sessi
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.error || 'switch failed');
+
+        // 切换成功的瞬间必处于两轮空档：把「进行中」账本归零，防止上一轮收口
+        // 被身份门禁拒收的残留让本轮停留在 live 模式（思考/工具不折叠）。
+        settleModelSwitchResidue(targetSessionPath);
 
         if (data.model) {
           const nextModel: SessionModel = {

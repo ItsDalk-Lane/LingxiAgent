@@ -966,3 +966,106 @@ describe("POST /api/sessions/cleanup (titles orphan cleanup)", () => {
     );
   });
 });
+
+describe("sessions archive child handling（谱系子对话策略）", () => {
+  let engine;
+  let app;
+  let tmpDir;
+
+  beforeEach(async () => {
+    vi.resetModules();
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-archive-children-"));
+    const sessDir = path.join(tmpDir, "agents", "a", "sessions");
+    fs.mkdirSync(sessDir, { recursive: true });
+    engine = makeEngine(tmpDir);
+    const { createSessionsRoute } = await import("../server/routes/sessions.ts");
+    app = new Hono();
+    app.route("/api", createSessionsRoute(engine));
+  });
+
+  async function seedLineage(engine, { withGrandchild = false } = {}) {
+    let lineageSeq = 0;
+    const store = new SessionManifestStore({
+      dbPath: path.join(tmpDir, `session-manifest-${Date.now()}-${Math.random().toString(36).slice(2)}.db`),
+      idGenerator: () => `sess_lineage_${lineageSeq++}`,
+    });
+    const sessDir = path.join(tmpDir, "agents", "a", "sessions");
+    const mainPath = path.join(sessDir, "main.jsonl");
+    const childPath = path.join(sessDir, "child.jsonl");
+    const grandPath = path.join(sessDir, "grand.jsonl");
+    fs.writeFileSync(mainPath, "{}\n");
+    fs.writeFileSync(childPath, "{}\n");
+    if (withGrandchild) fs.writeFileSync(grandPath, "{}\n");
+    const active = (sessionPath) => ({
+      sessionPath, ownerAgentId: "a", domain: "desktop", kind: "chat", lifecycle: "active",
+    });
+    const manifest = store.createForPath(active(mainPath));
+    const childManifest = store.createForPath(active(childPath));
+    const grandManifest = withGrandchild ? store.createForPath(active(grandPath)) : null;
+    attachManifestStore(engine, store);
+    engine.listSessions = vi.fn(async () => [
+      { path: mainPath, sessionId: manifest.sessionId },
+      { path: childPath, sessionId: childManifest.sessionId, forkedFrom: { sessionId: manifest.sessionId } },
+      ...(grandManifest
+        ? [{ path: grandPath, sessionId: grandManifest.sessionId, forkedFrom: { sessionId: childManifest.sessionId } }]
+        : []),
+    ]);
+    engine.setSessionForkedFrom = vi.fn(async () => ({ forkedFrom: null }));
+    return { store, manifest, mainPath, childPath, grandPath };
+  }
+
+  it("存在子对话且未带策略 → 409 拦截，不移动主对话", async () => {
+    const { store, manifest, mainPath } = await seedLineage(engine);
+    try {
+      const res = await app.request("/api/sessions/archive", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ sessionId: manifest.sessionId }),
+      });
+      expect(res.status).toBe(409);
+      await expect(res.json()).resolves.toMatchObject({ code: "child_sessions_present", childCount: 1 });
+      expect(fs.existsSync(mainPath)).toBe(true);
+    } finally {
+      store.close();
+    }
+  });
+
+  it("detach_children：先清空子对话谱系再归档主对话，子对话留在原地", async () => {
+    const { store, manifest, mainPath, childPath } = await seedLineage(engine);
+    try {
+      const res = await app.request("/api/sessions/archive", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ sessionId: manifest.sessionId, childMode: "detach_children" }),
+      });
+      expect(res.status).toBe(200);
+      await expect(res.json()).resolves.toMatchObject({ ok: true, detachedChildren: 1, archivedChildren: 0 });
+      expect(engine.setSessionForkedFrom).toHaveBeenCalledWith({ sessionPath: childPath }, null);
+      expect(fs.existsSync(mainPath)).toBe(false);
+      expect(fs.existsSync(childPath)).toBe(true);
+    } finally {
+      store.close();
+    }
+  });
+
+  it("archive_children：递归归档子对话与孙对话", async () => {
+    const { store, manifest, mainPath, childPath, grandPath } = await seedLineage(engine, { withGrandchild: true });
+    try {
+      const res = await app.request("/api/sessions/archive", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ sessionId: manifest.sessionId, childMode: "archive_children" }),
+      });
+      expect(res.status).toBe(200);
+      await expect(res.json()).resolves.toMatchObject({ ok: true, archivedChildren: 2 });
+      expect(fs.existsSync(mainPath)).toBe(false);
+      expect(fs.existsSync(childPath)).toBe(false);
+      expect(fs.existsSync(grandPath)).toBe(false);
+      const archivedDir = path.join(tmpDir, "agents", "a", "sessions", "archived");
+      expect(fs.existsSync(path.join(archivedDir, "child.jsonl"))).toBe(true);
+      expect(fs.existsSync(path.join(archivedDir, "grand.jsonl"))).toBe(true);
+    } finally {
+      store.close();
+    }
+  });
+});

@@ -968,11 +968,15 @@ export class BrowserManager {
    * 没有 browser host 的环境（server / PWA）里 transport 未连接，静默跳过。
    * @param {string} sessionPath - 目标 session 路径
    * @param {string|null} [title] - 会话标题，显示在 viewer 工具栏
+   * @param {object} [options]
+   * @param {boolean} [options.allowEmpty] - 目标会话没有标签页时是否允许清空 viewer 画面。
+   *   显式打开（用户点侧栏徽章）传 true；会话切换等跟随场景保持默认 false，
+   *   viewer 继续显示当前画面（通常是上个会话的浏览器）。
    */
-  async notifyViewerSession(sessionPath, title = null) {
+  async notifyViewerSession(sessionPath, title = null, { allowEmpty = false } = {}) {
     if (!sessionPath) return;
     try {
-      await this._sendCmd("viewerShowSession", { sessionPath, title }, 10000);
+      await this._sendCmd("viewerShowSession", { sessionPath, title, allowEmpty }, 10000);
     } catch (err) {
       log.warn(`viewerShowSession failed: ${_errorMessage(err)}`);
     }

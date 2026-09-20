@@ -3,6 +3,7 @@ import type { Session } from '../../types';
 import {
   buildSessionSections,
   filterSessionsForWorkspaceScope,
+  groupSessionsByProject,
   resolveWorkspaceScope,
   sessionBelongsToWorkspaceScope,
 } from '../../components/session-sections';
@@ -380,5 +381,121 @@ describe('workspace scope', () => {
       selectedWorkspaceMountId: null,
       selectedFolder: null,
     })).toEqual({ mountId: null, basePath: '/Users/test/Desktop/project-hana' });
+  });
+});
+
+describe('谱系分组：子对话归位到主对话下方', () => {
+  const NOW = new Date('2026-04-29T12:00:00.000Z');
+  const parent = makeSession({
+    path: '/sessions/main.jsonl',
+    sessionId: 'sess_main',
+    firstMessage: '主对话',
+    modified: '2026-04-29T08:00:00.000Z',
+    cwd: '/work',
+  });
+  const childFork = makeSession({
+    path: '/sessions/fork.jsonl',
+    sessionId: 'sess_fork',
+    firstMessage: '编辑重发支线',
+    modified: '2026-04-29T09:00:00.000Z',
+    cwd: '/work',
+    forkedFrom: { sessionId: 'sess_main' },
+  });
+  const childSide = makeSession({
+    path: '/sessions/side.jsonl',
+    sessionId: 'sess_side',
+    firstMessage: '侧边聊天支线',
+    modified: '2026-04-29T07:00:00.000Z',
+    cwd: '/work',
+    forkedFrom: { sessionId: 'sess_main' },
+  });
+  const orphan = makeSession({
+    path: '/sessions/orphan.jsonl',
+    sessionId: 'sess_orphan',
+    firstMessage: '主对话已归档的孤儿',
+    modified: '2026-04-29T06:00:00.000Z',
+    cwd: '/work',
+    forkedFrom: { sessionId: 'sess_gone' },
+  });
+
+  it('buildSessionSections：子对话紧跟主对话（同级按最近活动排），带 childOfSessionId 标注', () => {
+    const sections = buildSessionSections([childFork, parent, childSide, orphan], { now: NOW });
+    const today = sections.find(section => section.kind === 'date' && section.group === 'today');
+    expect(today).toBeDefined();
+    expect(today!.items.map(item => item.path)).toEqual([
+      '/sessions/main.jsonl',
+      '/sessions/fork.jsonl',
+      '/sessions/side.jsonl',
+      '/sessions/orphan.jsonl',
+    ]);
+    expect(today!.items[1].childOfSessionId).toBe('sess_main');
+    expect(today!.items[2].childOfSessionId).toBe('sess_main');
+    // 孤儿子对话释放为顶层
+    expect(today!.items[3].childOfSessionId ?? null).toBeNull();
+    // 主对话自身无子行标注
+    expect(today!.items[0].childOfSessionId ?? null).toBeNull();
+  });
+
+  it('groupSessionsByProject：子对话归位到主对话之后，组位置只由顶层会话决定', () => {
+    const groups = groupSessionsByProject([childFork, parent, childSide, orphan], { studios: [] });
+    expect(groups).toHaveLength(1);
+    const group = groups[0];
+    expect(group.sessions.map(item => item.path)).toEqual([
+      '/sessions/main.jsonl',
+      '/sessions/fork.jsonl',
+      '/sessions/side.jsonl',
+      '/sessions/orphan.jsonl',
+    ]);
+    expect(group.sessions[1].childOfSessionId).toBe('sess_main');
+  });
+
+  it('置顶的子对话保持顶层渲染（手动顺序优先于谱系）', () => {
+    const pinnedChild = { ...childFork, pinnedAt: '2026-04-28T07:00:00.000Z' };
+    const sections = buildSessionSections([parent, pinnedChild], { now: NOW });
+    const pinned = sections.find(section => section.kind === 'pinned');
+    expect(pinned!.items.map(item => item.path)).toEqual(['/sessions/fork.jsonl']);
+    expect(pinned!.items[0].childOfSessionId ?? null).toBeNull();
+    const today = sections.find(section => section.kind === 'date' && section.group === 'today');
+    expect(today!.items.map(item => item.path)).toEqual(['/sessions/main.jsonl']);
+  });
+});
+
+describe('谱系折叠：点击主对话收起子对话', () => {
+  const NOW = new Date('2026-04-29T12:00:00.000Z');
+  const parent = makeSession({
+    path: '/sessions/main.jsonl',
+    sessionId: 'sess_main',
+    firstMessage: '主对话',
+    modified: '2026-04-29T08:00:00.000Z',
+    cwd: '/work',
+  });
+  const child = makeSession({
+    path: '/sessions/fork.jsonl',
+    sessionId: 'sess_fork',
+    firstMessage: '支线',
+    modified: '2026-04-29T09:00:00.000Z',
+    cwd: '/work',
+    forkedFrom: { sessionId: 'sess_main' },
+  });
+
+  it('groupSessionsByProject：主对话标记 hasChildSessions；折叠后子对话隐藏，alwaysShow 豁免', () => {
+    const expanded = groupSessionsByProject([parent, child], { studios: [] });
+    expect(expanded[0].sessions.map(item => item.path)).toEqual(['/sessions/main.jsonl', '/sessions/fork.jsonl']);
+    expect(expanded[0].sessions[0].hasChildSessions).toBe(true);
+    expect(expanded[0].sessions[1].hasChildSessions ?? false).toBe(false);
+
+    const folded = groupSessionsByProject([parent, child], {
+      studios: [],
+      foldedParentIds: new Set(['sess_main']),
+    });
+    expect(folded[0].sessions.map(item => item.path)).toEqual(['/sessions/main.jsonl']);
+    expect(folded[0].sessions[0].hasChildSessions).toBe(true);
+
+    const foldedWithActiveChild = groupSessionsByProject([parent, child], {
+      studios: [],
+      foldedParentIds: new Set(['sess_main']),
+      alwaysShowPaths: new Set(['/sessions/fork.jsonl']),
+    });
+    expect(foldedWithActiveChild[0].sessions.map(item => item.path)).toEqual(['/sessions/main.jsonl', '/sessions/fork.jsonl']);
   });
 });

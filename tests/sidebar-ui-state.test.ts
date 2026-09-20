@@ -63,6 +63,7 @@ describe("sidebar UI preferences", () => {
       sessionList: { rowMode: "two-line" },
     });
 
+
     expect(mergeSidebarUiPrefs(current, {
       sessionList: { rowMode: "dense" },
     })).toEqual(current);

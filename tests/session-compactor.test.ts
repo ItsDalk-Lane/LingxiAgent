@@ -238,7 +238,7 @@ describe("session-compactor", () => {
     const signal = new AbortController().signal;
     let providerContext: any;
     const streamFn = vi.fn(async (_model, context) => {
-      providerContext = { ...context, messages: [...context.messages], tools: [...context.tools] };
+      providerContext = { ...context, messages: [...context.messages], tools: context.tools ?? [] };
       return agentStreamOf();
     });
     const convertToLlm = vi.fn(async (messages) => messages);
@@ -291,10 +291,12 @@ describe("session-compactor", () => {
     const [model, , options] = (streamFn.mock.calls as any)[0];
     const context = providerContext;
     expect(model).toEqual({ id: "model", reasoning: true });
-    expect(context!.systemPrompt).toBe("agent system prompt");
-    expect(context!.tools.map((tool) => tool.name)).toEqual(["read"]);
-    expect(context!.messages).toHaveLength(4);
-    expect(context!.messages.slice(0, -1)).toEqual([
+    // pi 0.86.0：提示词头与工具声明随消息流进入请求（无独立 systemPrompt/tools 字段）。
+    const [promptHead, ...rest] = context!.messages;
+    expect(promptHead).toMatchObject({ role: "system", content: "agent system prompt" });
+    expect(rest.at(-2).toolsAdded.map((tool: any) => tool.name)).toEqual(["read"]);
+    expect(context!.messages).toHaveLength(6);
+    expect(rest.slice(0, -2)).toEqual([
       previousSummaryMessage,
       oldMessage,
       retainedTail,
@@ -574,7 +576,11 @@ describe("session-compactor", () => {
       usageLedger: ledger,
       usageContext,
     });
-    expect(capturedRequests[0].slice(0, -1)).toEqual(liveBeforeFirst);
+    // pi 0.86.0：前缀 = [system(提示词头), ...live 消息, system(工具声明)]。
+    const firstPrefix = capturedRequests[0].slice(0, -1);
+    expect(firstPrefix[0]).toMatchObject({ role: "system", content: systemPrompt });
+    expect(firstPrefix.slice(1, -1)).toEqual(liveBeforeFirst);
+    expect(firstPrefix.at(-1)?.role).toBe("system");
 
     const newUser = piUser("NEW_USER_AFTER_SUMMARY_ONE", 4);
     const newAssistant = piAssistant("NEW_ASSISTANT_AFTER_SUMMARY_ONE", 5);
@@ -600,7 +606,7 @@ describe("session-compactor", () => {
     });
     const secondPrefix = capturedRequests[1].slice(0, -1);
     const secondSerialized = JSON.stringify(secondPrefix);
-    expect(secondPrefix).toEqual(liveBeforeSecond);
+    expect(secondPrefix.slice(1, -1)).toEqual(liveBeforeSecond);
     expect(secondSerialized).toContain("Summary-1 checkpoint.");
     expect(secondSerialized).toContain("TAIL_RETAINED_AFTER_SUMMARY_ONE");
     expect(secondSerialized).toContain("NEW_USER_AFTER_SUMMARY_ONE");
@@ -654,8 +660,12 @@ describe("session-compactor", () => {
       piAssistant("old deleted-agent response", 2),
     ];
     const streamFn = vi.fn(async (_model, context) => {
-      expect(context.tools).toEqual([]);
-      expect(context.messages.slice(0, -1)).toEqual(transcriptMessages);
+      // pi 0.86.0：无顶层 tools 字段；“无工具”由消息流不含工具声明体现。
+      expect(context.tools ?? []).toEqual([]);
+      expect(context.messages.some((message: any) => Array.isArray(message.toolsAdded) && message.toolsAdded.length)).toBe(false);
+      const [coldHead, ...coldRest] = context.messages;
+      expect(coldHead).toMatchObject({ role: "system", content: "new primary agent prompt" });
+      expect(coldRest.slice(0, -1)).toEqual(transcriptMessages);
       return agentStreamOf();
     });
 
@@ -1950,7 +1960,8 @@ describe("session-compactor", () => {
     } as any);
 
     const [, context] = streamFn.mock.calls[0] as any;
-    const projected = context.messages[0].content[0];
+    // pi 0.86.0：头部多了一条 system 提示词消息，直接定位 toolResult 消息断言投影。
+    const projected = context.messages.find((message: any) => message.role === "toolResult").content[0];
     expect(projected.type).toBe("text");
     expect(projected.text).toContain("uri: file:///workspace/spec.md");
     expect(projected.text).toContain("name: spec.md");

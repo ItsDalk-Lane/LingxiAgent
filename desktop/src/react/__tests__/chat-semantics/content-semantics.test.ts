@@ -133,6 +133,26 @@ describe('content semantics', () => {
     ]);
   });
 
+  it('工具组身份在成员增加时保持稳定（流式并组不换 key）', () => {
+    const options = { idPrefix: 'run-1', turnLifecycle: 'streaming' as const };
+    const single = normalizeContentBlocks([
+      { type: 'tool_group', tools: [{ id: 'call-1', name: 'read', done: false, success: false }], collapsed: false },
+    ], options);
+    const merged = normalizeContentBlocks([
+      {
+        type: 'tool_group',
+        tools: [
+          { id: 'call-1', name: 'read', done: true, success: true, status: 'succeeded' },
+          { id: 'call-2', name: 'grep', done: false, success: false, status: 'running' },
+        ],
+        collapsed: false,
+      },
+    ], options);
+
+    expect(single[0].id).toBe('run-1:tool_group:tools:call-1');
+    expect(merged[0].id).toBe('run-1:tool_group:tools:call-1');
+  });
+
   it('兼容已经带稳定标识和显式角色的旧投影结果', () => {
     const [normalized] = normalizeContentBlocks([{
       id: 'provider-segment-1',

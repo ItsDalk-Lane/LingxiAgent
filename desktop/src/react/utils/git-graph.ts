@@ -5,6 +5,8 @@
  *   nodeLane    本行提交节点所在泳道（x 位置）
  *   activeLanes 本行下方仍延续的泳道索引（画竖线）
  *   mergeLanes  从节点引出曲线连到的泳道（合并/会合）
+ *   newLanes    本行新建的泳道（画竖线时须跳过：曲线落到行底衔接下一行，
+ *               若照常从行顶画竖线会产生悬空断线段）
  *   laneCount   截至本行的泳道总数（图形宽度）
  *
  * 泳道用「槽池」管理：结束的泳道置空不前移（x 位置稳定，避免视觉跳动），
@@ -21,6 +23,7 @@ export interface GraphLaneRow {
   nodeLane: number;
   activeLanes: number[];
   mergeLanes: number[];
+  newLanes: number[];
   laneCount: number;
 }
 
@@ -45,6 +48,7 @@ export function computeGraphRows(commits: GraphInputCommit[]): GraphLaneRow[] {
 
     const [first, ...rest] = commit.parents;
     const mergeLanes: number[] = [];
+    const newLanes: number[] = [];
 
     if (!first) {
       // 根提交：泳道终止（限流截断处 parents 也可能为空，同样处理）
@@ -60,7 +64,10 @@ export function computeGraphRows(commits: GraphInputCommit[]): GraphLaneRow[] {
       }
       for (const parent of rest) {
         let lane = lanes.indexOf(parent);
-        if (lane === -1) lane = takeSlot(parent);
+        if (lane === -1) {
+          lane = takeSlot(parent);
+          newLanes.push(lane);
+        }
         if (lane !== nodeLane) mergeLanes.push(lane);
       }
     }
@@ -69,7 +76,7 @@ export function computeGraphRows(commits: GraphInputCommit[]): GraphLaneRow[] {
     lanes.forEach((tracked, index) => {
       if (tracked != null) activeLanes.push(index);
     });
-    rows.push({ nodeLane, activeLanes, mergeLanes, laneCount: lanes.length });
+    rows.push({ nodeLane, activeLanes, mergeLanes, newLanes, laneCount: lanes.length });
   }
 
   return rows;

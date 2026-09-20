@@ -42,6 +42,9 @@ import {
   normalizeQuickChatPreferences,
 } from "../shared/quick-chat-preferences.ts";
 import {
+  normalizeKeybindings,
+} from "../shared/keybindings-preferences.ts";
+import {
   mergeBrowserPreferences,
   normalizeBrowserPreferences,
 } from "../shared/browser-preferences.ts";
@@ -295,21 +298,20 @@ export class PreferencesManager {
     return prefs.session_permission_mode_default;
   }
 
-  /** 读取文件备份配置 */
+  /** 读取文件备份配置：备份恒开、无大小上限，只保留保留时长一个参数 */
   getFileBackup() {
     const cfg = this._cache.file_backup;
-    if (!cfg) return { enabled: false, retention_days: 1, max_file_size_kb: 1024 };
-    return {
-      enabled: !!cfg.enabled,
-      retention_days: cfg.retention_days || 1,
-      max_file_size_kb: cfg.max_file_size_kb || 1024,
-    };
+    const days = Number(cfg?.retention_days);
+    return { retention_days: Number.isFinite(days) && days > 0 ? days : 1 };
   }
 
-  /** 合并写入文件备份配置 */
+  /** 合并写入文件备份配置，同时剔除已废弃的旧字段（enabled / max_file_size_kb） */
   setFileBackup(partial) {
     const prefs = this._mutableCopy();
-    prefs.file_backup = { ...(prefs.file_backup || {}), ...partial };
+    const merged = { ...(prefs.file_backup || {}), ...partial };
+    delete merged.enabled;
+    delete merged.max_file_size_kb;
+    prefs.file_backup = { retention_days: Number(merged.retention_days) > 0 ? Number(merged.retention_days) : 1 };
     this.savePreferences(prefs);
   }
 
@@ -633,6 +635,20 @@ export class PreferencesManager {
     prefs.quick_chat = mergeQuickChatPreferences(prefs.quick_chat || {}, partial || {});
     this.savePreferences(prefs);
     return prefs.quick_chat;
+  }
+
+  /** 读取快捷键绑定偏好（只含显式覆盖项，空对象 = 全部默认）。 */
+  getKeybindings() {
+    return normalizeKeybindings(this._cache.keybindings || {});
+  }
+
+  /** 合并写入快捷键绑定偏好（等值默认项自动剔除）。 */
+  /** 写入快捷键绑定偏好（全量替换语义：{} = 清空全部覆盖，恢复默认）。 */
+  setKeybindings(partial) {
+    const prefs = this._mutableCopy();
+    prefs.keybindings = normalizeKeybindings(partial || {});
+    this.savePreferences(prefs);
+    return prefs.keybindings;
   }
 
   /** 读取内置浏览器偏好。 */

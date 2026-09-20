@@ -6,6 +6,7 @@ import {
   buildTranscriptRenderItems,
   isProcessOnlyAssistantMessage,
 } from '../../components/chat/process-fold';
+import { collectTurnEditedFiles } from '../../components/chat/TurnEditedFilesCard';
 
 function user(id: string, text = '请处理'): ChatListItem {
   return { type: 'message', data: { id, role: 'user', text } };
@@ -701,5 +702,115 @@ describe('knowledge-only process fold（纯检索轮折叠）', () => {
       '小文',
       translate,
     )).toBe('✨ 小文忙活了一阵子 · 2 个工具 · 1 次检索 · 1 次思考');
+  });
+});
+
+describe('折叠拆分后回合级卡片数据可达（文件修改卡回归）', () => {
+  function writeTool(callId: string, path: string): ToolCall {
+    return {
+      id: callId,
+      name: 'write',
+      args: { path },
+      done: true,
+      success: true,
+      status: 'succeeded',
+      details: { fileChange: { path, added: 3, removed: 0, beforeAvailable: false, changeType: 'created' } },
+    };
+  }
+
+  function projectedTurn(id: string, blockIds: string[], answerBlockIds: string[]): ChatMessage {
+    const msg: ChatMessage = { id, role: 'assistant', blocks: [] };
+    msg.turnProjection = {
+      id: `${id}:turn`,
+      inputMessageId: 'u1',
+      assistantMessageIds: [id],
+      processBlockIds: blockIds,
+      answerBlockIds,
+      resultBlockIds: [],
+      controlBlockIds: [],
+      status: 'completed',
+    };
+    return msg;
+  }
+
+  it('折叠剥离工具块后，末条可见消息仍携带整轮过程块供卡片收集', () => {
+    const writeBlock: ContentBlock = {
+      id: 'a1:write',
+      type: 'tool_group',
+      tools: [writeTool('call-1', '/tmp/秋信.md')],
+      collapsed: false,
+      surfaceRole: 'process',
+      lifecycle: 'sealed',
+    };
+    const answer: ContentBlock = {
+      id: 'a1:answer',
+      type: 'text',
+      html: '<p>写好了。</p>',
+      source: '写好了。',
+      surfaceRole: 'answer',
+      lifecycle: 'sealed',
+    };
+    const turn = assistant('a1', [writeBlock, answer]);
+    if (turn.type !== 'message') throw new Error('expected assistant');
+    turn.data.turnProjection = projectedTurn('a1', ['a1:write'], ['a1:answer']).turnProjection;
+
+    const rendered = buildTranscriptRenderItems([user('u1'), turn], { isStreaming: false });
+
+    const lastSource = rendered.filter((item) => item.type === 'source').at(-1);
+    if (lastSource?.type !== 'source') throw new Error('expected source item');
+    const annotated = lastSource.item.type === 'message' ? lastSource.item.data : null;
+    expect(annotated?.turnProcessBlocks).toBeDefined();
+    expect(collectTurnEditedFiles(annotated?.turnProcessBlocks ?? [])).toHaveLength(1);
+    expect(collectTurnEditedFiles(annotated?.turnProcessBlocks ?? [])[0]).toMatchObject({
+      path: '/tmp/秋信.md',
+      added: 3,
+      removed: 0,
+    });
+    // 注解只落在临时克隆上，store 源消息不被改写
+    expect(turn.data.turnProcessBlocks).toBeUndefined();
+    expect(turn.data.blocks).toHaveLength(2);
+  });
+
+  it('工具在轮内前一条消息时，过程块引用跨消息汇入末条可见消息', () => {
+    const writeBlock: ContentBlock = {
+      id: 'a1:write',
+      type: 'tool_group',
+      tools: [writeTool('call-1', '/tmp/秋信.md')],
+      collapsed: false,
+      surfaceRole: 'process',
+      lifecycle: 'sealed',
+    };
+    const toolOnly = projectedTurn('a1', ['a1:write'], []);
+    toolOnly.blocks = [writeBlock];
+    const editBlock: ContentBlock = {
+      id: 'a2:edit',
+      type: 'tool_group',
+      tools: [writeTool('call-2', '/tmp/回信.md')],
+      collapsed: false,
+      surfaceRole: 'process',
+      lifecycle: 'sealed',
+    };
+    const answer: ContentBlock = {
+      id: 'a2:answer',
+      type: 'text',
+      html: '<p>都写好了。</p>',
+      source: '都写好了。',
+      surfaceRole: 'answer',
+      lifecycle: 'sealed',
+    };
+    const withAnswer = projectedTurn('a2', ['a2:edit'], ['a2:answer']);
+    withAnswer.blocks = [editBlock, answer];
+
+    const rendered = buildTranscriptRenderItems(
+      [user('u1'), { type: 'message', data: toolOnly }, { type: 'message', data: withAnswer }],
+      { isStreaming: false },
+    );
+
+    const lastSource = rendered.filter((item) => item.type === 'source').at(-1);
+    if (lastSource?.type !== 'source') throw new Error('expected source item');
+    const annotated = lastSource.item.type === 'message' ? lastSource.item.data : null;
+    expect(annotated?.id).toBe('a2');
+    const collected = collectTurnEditedFiles(annotated?.turnProcessBlocks ?? []);
+    expect(collected.map((file) => file.path).sort()).toEqual(['/tmp/回信.md', '/tmp/秋信.md']);
   });
 });

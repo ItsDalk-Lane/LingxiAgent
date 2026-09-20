@@ -234,6 +234,12 @@ export interface Session {
   pinnedAt?: string | null;
   // 置顶区的手动顺序（升序）。null 表示还没有固化顺序，读时退回按最近活动排。
   pinOrder?: number | null;
+  /** 列表分组展示提示：构建分区时写入，非空 = 作为该会话的子行渲染。 */
+  childOfSessionId?: string | null;
+  /** 列表分组展示提示：构建分区时写入，非空 = 主对话行展示子对话折叠开关。 */
+  hasChildSessions?: boolean;
+  /** 列表分组展示提示：构建分区时写入，被折叠隐藏的子对话数（折叠时展示）。 */
+  foldedChildCount?: number;
   hasSummary?: boolean;
   agentDeleted?: boolean;
   readOnlyReason?: 'agent_deleted' | string | null;
@@ -243,6 +249,13 @@ export interface Session {
     sessionKey: string;
     platform: string;
     title?: string | null;
+  } | null;
+  /** 该会话 fork 自哪个会话及分叉边界；entryId 可缺（侧边聊天等引用型子对话只有来源会话）；null = 非子对话。 */
+  forkedFrom?: {
+    sessionId: string;
+    entryId?: string;
+    target?: unknown;
+    forkedAt?: string | null;
   } | null;
   _optimistic?: boolean;
 }
@@ -434,7 +447,7 @@ export interface TodoItem {
 // ── 浮动面板类型 ──
 export type ActivePanel = 'activity' | 'automation' | 'bridge' | 'skills' | null;
 // 知识库已从页签改为侧栏弹窗（KnowledgeModal），不再是独立 Tab
-export type TabType = 'chat' | 'channels';
+export type TabType = 'chat' | 'map' | 'channels';
 export type RightWorkspaceTab = 'session-files' | 'workspace' | 'project-skills';
 
 export interface FileVersion {
@@ -468,6 +481,8 @@ export type RemoteContentRef = RemoteWorkbenchContentRef;
 
 export interface BrowserViewerTab {
   tabId: string;
+  /** 该标签归属的会话（共享窗口下标签条跨会话合并，操作路由回正确的会话） */
+  sessionPath?: string | null;
   title?: string;
   url?: string | null;
   canGoBack?: boolean;
@@ -631,8 +646,10 @@ export interface PlatformApi {
   getKeepAwakeStatus?(): Promise<KeepAwakeStatus>;
   setKeepAwakeEnabled?(enabled: boolean): Promise<KeepAwakeStatus>;
   quickChatReloadShortcut?(): Promise<{ ok: boolean; shortcut: string; error?: string }>;
-  quickChatShortcutStatus?(): Promise<{ shortcut: string; registered: boolean }>;
-  quickChatShow?(): void;
+  keybindingsReloadGlobal?(): Promise<{ ok: boolean; shortcut: string; error?: string }>;
+  keybindingsTestRegister?(shortcut: string): Promise<{ ok: boolean; shortcut: string; self?: boolean; error?: string }>;
+  restartApp?(): Promise<{ ok: boolean }>;
+  quickChatShortcutStatus?(): Promise<{ shortcut: string; registered: boolean; shortcuts?: string[] }>;  quickChatShow?(): void;
   quickChatHide?(): void;
   quickChatResize?(request: 'compact' | 'chat' | { mode: 'compact' | 'chat'; height?: number }): void;
   quickChatOpenSession?(sessionPath: string): void;

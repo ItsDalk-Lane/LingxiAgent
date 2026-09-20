@@ -2,10 +2,10 @@
  * @vitest-environment jsdom
  *
  * Token 用量页常驻四图表测试：
- *   - 四张卡渲染 + 固定维度徽标；
- *   - 热力日历 每日/每周/累计 切换；
+ *   - 四张卡渲染（无固定维度角标、无提示行）；
+ *   - 热力日历 每日/每周/累计 切换 + 悬停提示语；
  *   - 调用次数 / Token 用量 切换（可同显、最后一路不可关）；
- *   - 饼图日期下拉取自数据；
+ *   - 饼图日期下拉取自数据 + 按日/累计口径切换；
  *   - 四张图不随首行筛选联动（改筛选只重发指标卡查询，图表查询不重发）。
  */
 import React from 'react';
@@ -154,7 +154,7 @@ describe('ObservabilityUsagePanel resident charts', () => {
 
   afterEach(() => cleanup());
 
-  it('renders the four resident chart cards with fixed-dimension badges', async () => {
+  it('renders the four resident chart cards (no fixed-dimension badges, no hints)', async () => {
     render(<Harness />);
     await waitFor(() => {
       expect(screen.getByText('settings.observability.charts.heat.title')).toBeInTheDocument();
@@ -162,10 +162,11 @@ describe('ObservabilityUsagePanel resident charts', () => {
     expect(screen.getByText('settings.observability.charts.line.title')).toBeInTheDocument();
     expect(screen.getByText('settings.observability.charts.bar.title')).toBeInTheDocument();
     expect(screen.getByText('settings.observability.charts.pie.title')).toBeInTheDocument();
-    expect(screen.getByText('settings.observability.charts.fixedBadgeDate')).toBeInTheDocument();
-    expect(screen.getByText('settings.observability.charts.fixedBadgeModelDate')).toBeInTheDocument();
-    expect(screen.getByText('settings.observability.charts.fixedBadgeProviderDate')).toBeInTheDocument();
-    expect(screen.getByText('settings.observability.charts.fixedBadgeCategoryDate')).toBeInTheDocument();
+    // 固定维度角标已从四张卡移除。
+    expect(screen.queryByText('settings.observability.charts.fixedBadgeDate')).not.toBeInTheDocument();
+    expect(screen.queryByText('settings.observability.charts.fixedBadgeModelDate')).not.toBeInTheDocument();
+    expect(screen.queryByText('settings.observability.charts.fixedBadgeProviderDate')).not.toBeInTheDocument();
+    expect(screen.queryByText('settings.observability.charts.fixedBadgeCategoryDate')).not.toBeInTheDocument();
     // 每张图独立取数：挂载 = 4 次图表聚合 + overall + 洞察按日/按模型 = 7 次。
     expect(mocks.queryObservabilityAggregate).toHaveBeenCalledTimes(7);
     // 洞察卡：两天窗口 → 活跃天数 2（D1/D2 相邻 → 最长连续 2）；最高模型 model-a。
@@ -181,14 +182,13 @@ describe('ObservabilityUsagePanel resident charts', () => {
   it('heat calendar switches 每日/每周/累计 and re-renders the same grid', async () => {
     render(<Harness />);
     await waitFor(() => {
-      expect(screen.getByText('settings.observability.charts.heat.hint.daily')).toBeInTheDocument();
+      expect(screen.getByText('settings.observability.charts.heat.daily')).toBeInTheDocument();
     });
     const seg = document.querySelector('[data-chart="heat-calendar"] [data-chart-mode]') as HTMLElement;
     expect(seg.getAttribute('data-chart-mode')).toBe('daily');
 
     fireEvent.click(within(seg).getByText('settings.observability.charts.heat.weekly'));
     expect(seg.getAttribute('data-chart-mode')).toBe('weekly');
-    expect(screen.getByText('settings.observability.charts.heat.hint.weekly')).toBeInTheDocument();
     // 日历格子不因切换模式增减（365 格恒在）。
     const cells = document.querySelectorAll('[data-chart="heat-calendar"] rect').length;
     expect(cells).toBeGreaterThan(300);
@@ -225,6 +225,18 @@ describe('ObservabilityUsagePanel resident charts', () => {
     expect(card.querySelectorAll('[class*="observability-chart-panel-label"]')).toHaveLength(1);
   });
 
+  it('heat calendar hover shows the daily calls-and-tokens hint title', async () => {
+    render(<Harness />);
+    await waitFor(() => {
+      expect(screen.getByText('settings.observability.charts.heat.daily')).toBeInTheDocument();
+    });
+    const cells = document.querySelectorAll('[data-chart="heat-calendar"] rect');
+    expect(cells.length).toBeGreaterThan(300);
+    fireEvent.mouseMove(cells[0]);
+    const tipTitle = document.querySelector('[data-chart="heat-calendar"] [class*="observability-chart-tip-title"]');
+    expect(tipTitle?.textContent).toContain('settings.observability.charts.heat.tooltipHint');
+  });
+
   it('pie chart lists data days in the date select, latest by default', async () => {
     render(<Harness />);
     await waitFor(() => {
@@ -235,6 +247,27 @@ describe('ObservabilityUsagePanel resident charts', () => {
     const options = Array.from(select.options).map((option) => option.value);
     expect(options).toEqual(DAY_KEYS.slice().reverse()); // 最新在前
     expect(select.value).toBe(keyOf(D1)); // 默认停最新一天
+  });
+
+  it('pie chart can switch to the all-days cumulative view', async () => {
+    render(<Harness />);
+    await waitFor(() => {
+      expect(screen.getByText('settings.observability.charts.pie.title')).toBeInTheDocument();
+    });
+    const card = document.querySelector('[data-chart="category-pie"]') as HTMLElement;
+    // 默认按日：日期下拉在。
+    expect(within(card).getByRole('combobox')).toBeInTheDocument();
+    // 切到累计：日期下拉隐藏，总计行改为累计总量口径。
+    fireEvent.click(within(card).getByText('settings.observability.charts.pie.viewAll'));
+    expect(within(card).queryByRole('combobox')).not.toBeInTheDocument();
+    const totalRow = card.querySelector('[class*="observability-pie-total"]') as HTMLElement;
+    expect(totalRow.textContent).toContain('settings.observability.charts.pie.allTotal');
+    expect(totalRow.textContent).toContain('settings.observability.charts.callsUnit');
+    // 切回按日：下拉恢复，总计行回到当日口径。
+    fireEvent.click(within(card).getByText('settings.observability.charts.pie.viewDaily'));
+    expect(within(card).getByRole('combobox')).toBeInTheDocument();
+    expect((card.querySelector('[class*="observability-pie-total"]') as HTMLElement).textContent)
+      .toContain('settings.observability.charts.dailyTotal');
   });
 
   it('hides members with no data for the selected metrics (line chart)', async () => {

@@ -11,6 +11,9 @@ interface CommitScope {
 }
 const scopeStorage = new AsyncLocalStorage<CommitScope>();
 const installed = new WeakSet<object>();
+/** steer 入队的 user 消息对象：message_end 落盘时凭身份识别「插话 commit」，
+ *  与 prompt 的初始用户消息区分（后者也可能在 Run 激活后才 message_end）。 */
+const steeredUserMessages = new WeakSet<object>();
 let runtimeRevision = 0;
 
 /** 只作读取期间的 ABA 检测；跨进程重启由客户端连接代次隔离。 */
@@ -19,6 +22,14 @@ export function desktopInputRuntimeRevision(): number { return runtimeRevision; 
 export function hasDesktopInputCommitObserver(session: any): boolean { return !!session && installed.has(session); }
 export function withDesktopInputCommitted<T>(scope: CommitScope, action: () => T): T {
   return scopeStorage.run(scope, action);
+}
+
+/** 消费「该 user 消息是否来自 steer」的一次性标记。message_end(user) 处调用。 */
+export function consumeSteeredUserMessage(message: any): boolean {
+  if (!message || (typeof message !== 'object' && typeof message !== 'function')) return false;
+  if (!steeredUserMessages.has(message)) return false;
+  steeredUserMessages.delete(message);
+  return true;
 }
 
 /** 本项目 SDK 包装：按输入对象身份关联，不改 SDK 消息或 append 实现。 */
@@ -63,6 +74,13 @@ export function installDesktopInputCommitObserver(session: any): void {
     const originalSteer = agent.steer;
     agent.steer = function (...args: any[]) {
       const message = remember(args[0]);
+      // steer 身份标记不依赖关联 scope：即使没有输入关联观察（旧嵌入方），
+      // 插话落盘时的 Run 切分仍然需要认出这条 user 消息。
+      const steeredInput = message
+        ?? (Array.isArray(args[0])
+          ? args[0].find((item: any) => item?.role === 'user')
+          : (args[0]?.role === 'user' ? args[0] : null));
+      if (steeredInput) steeredUserMessages.add(steeredInput);
       let result: any;
       try { result = originalSteer.apply(this, args); }
       catch (error) { if (message) pending.delete(message); throw error; }

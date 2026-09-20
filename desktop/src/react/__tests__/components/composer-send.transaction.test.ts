@@ -686,9 +686,10 @@ describe('composer-send 显式结果与快照（S01–S15）', () => {
     // 未知投递禁止盲目重试。
     expect(await retrySendRecord(acq.leaseId, makeDeps())).toBeNull();
 
-    // R04：unknown 是仍持有的输入，不可通过新 lease/普通消息绕过。
-    const blockedNew = tryAcquireSendLease({ identity: { kind: 'session', sessionId: SESSION_ID, sessionPath: PATH, agentId: 'hana' }, bundle: makeBundle('不能越过未知') });
-    expect(blockedNew.ok).toBe(false);
+    // 新语义：存疑账（delivery_unknown）是会计问题，交给对账与消息上的显式标记，
+    // 不再硬拦同会话新发送；防重复发送的底线仍由「不自动重发」兑现（上方已验证）。
+    const blockedNew = tryAcquireSendLease({ identity: { kind: 'session', sessionId: SESSION_ID, sessionPath: PATH, agentId: 'hana' }, bundle: makeBundle('存疑后可续发') });
+    expect(blockedNew.ok).toBe(true);
     expect(record.bundle.text).toBe('断线');
     expect(chatItems()).toHaveLength(1);
     expect(messageData(chatItems()[0]).text).toBe('断线');
@@ -712,7 +713,8 @@ describe('composer-send 显式结果与快照（S01–S15）', () => {
     expect(await retrySendRecord(acq2.leaseId, makeDeps())).toBeNull();
     expect(wsMocks.current!.send).toHaveBeenCalledTimes(2);
     expect(record.phase).toBe('delivery_unknown');
-    expect(tryAcquireSendLease({ identity: { kind: 'session', sessionId: timeoutSessionId, sessionPath: timeoutPath, agentId: 'hana' }, bundle: timeoutBundle }).ok).toBe(false);
+    // 新语义：超时存疑账不拦同会话新发送（对账与 UI 标记兑底），但绝不自动重发（上方已验证）。
+    expect(tryAcquireSendLease({ identity: { kind: 'session', sessionId: timeoutSessionId, sessionPath: timeoutPath, agentId: 'hana' }, bundle: timeoutBundle }).ok).toBe(true);
   });
 
   it('S11：重连后经恢复/历史找到原 clientMessageId，合并不重复追加', async () => {

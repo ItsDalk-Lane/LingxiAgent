@@ -8,9 +8,9 @@
  *      reserve of 16384 tokens is meaningless once the model window is in the
  *      millions: the trigger point sits at 98%+ of the window, so in practice
  *      the session overflows before it ever compacts. The reserve is therefore
- *      derived from the live window as `max(16384, 10% of window)`, which puts
- *      the trigger at `min(90% of window, window - 16384)` — the smaller of a
- *      proportional headroom and the original absolute headroom.
+ *      derived from the live window as `max(16384, 20% of window)`, which puts
+ *      the trigger at the FORCE line (80% of window) for windows >= 80K and
+ *      keeps the absolute 16384-token headroom as the floor for small windows.
  *
  *   2. Mid-run compaction. The SDK only checks the threshold after a whole
  *      agentic run finishes and before a new prompt, so a single long tool loop
@@ -21,6 +21,19 @@
  *      layer keeps working, and a compaction failure is swallowed: the run
  *      continues and the SDK's post-run check remains the backstop.
  *
+ *   3. Dual thresholds. At every turn boundary the usage ratio is checked
+ *      against two lines (shared/compaction-thresholds.ts):
+ *
+ *      - ASK line (50%): crossing it emits `compaction_suggested` to the
+ *        desktop renderer, which shows a dialog asking the user whether to
+ *        compact now. Core never blocks the run on the answer; re-prompts are
+ *        throttled until usage grows by a further 5% of the window, and the
+ *        prompt state resets after any compaction (a >=20% drop).
+ *
+ *      - FORCE line (80%): reaching it compacts unconditionally (the reserve
+ *        derived in (1) makes the SDK's own check agree) and emits
+ *        `compaction_auto` so the renderer can toast "context compacted".
+ *
  * After a mid-run compaction the model would otherwise wake up to a summary
  * with no idea it was interrupted mid-task, so a hidden custom message is
  * appended telling it to keep going from the summary's remaining work.
@@ -28,6 +41,14 @@
 
 import { calculateContextTokens, estimateTokens, shouldCompact } from "../lib/pi-sdk/index.ts";
 import { createModuleLogger } from "../lib/debug-log.ts";
+import {
+  COMPACTION_ASK_RATIO,
+  COMPACTION_ASK_REPROMPT_DELTA_RATIO,
+  COMPACTION_ASK_RESET_DROP_RATIO,
+  COMPACTION_AUTO_EVENT,
+  COMPACTION_FORCE_RATIO,
+  COMPACTION_SUGGESTED_EVENT,
+} from "../shared/compaction-thresholds.ts";
 import {
   isDirectCompactionInProgress,
   runCachePreservingCompactionForSession,
@@ -39,10 +60,17 @@ const log = createModuleLogger("midrun-compaction");
 export const MIN_COMPACTION_RESERVE_TOKENS = 16_384;
 
 /** Fraction of the context window kept free when it is larger than the floor implies. */
-const COMPACTION_RESERVE_RATIO = 0.1;
+const COMPACTION_RESERVE_RATIO = 1 - COMPACTION_FORCE_RATIO;
 
 const DYNAMIC_RESERVE_INSTALLED = Symbol("hanaDynamicCompactionReserve");
 const MIDRUN_COMPACTION_INSTALLED = Symbol("hanaMidRunCompaction");
+
+/**
+ * Per-session ask-line state, keyed off the session object so it dies with the
+ * session and never persists. `tokens` records the usage at the last ask so a
+ * re-prompt only fires after usage grows by another 5% of the window.
+ */
+const COMPACTION_ASK_STATE = Symbol("hanaCompactionAskState");
 
 /**
  * Custom message appended after a compaction that happened mid-task. Worded so
@@ -51,7 +79,7 @@ const MIDRUN_COMPACTION_INSTALLED = Symbol("hanaMidRunCompaction");
 export const MIDRUN_COMPACTION_NOTICE = `[System compaction notice — not a user message]
 The conversation history above was compacted while you were actively working on the user's task. You are still mid-task. Continue the work described in the summary's "In Progress" and "Next Steps" sections without pausing to ask for confirmation, and do not redo work already listed as done. If any newer user message appears after this notice, it takes precedence over this notice.`;
 
-/** Reserve tokens for a model window: the larger of the floor and 10% of the window. */
+/** Reserve tokens for a model window: the larger of the floor and (1 - force ratio) of the window. */
 export function computeCompactionReserveTokens(contextWindow: any): number {
   const window = Number(contextWindow);
   if (!Number.isFinite(window) || window <= 0) return MIN_COMPACTION_RESERVE_TOKENS;
@@ -163,25 +191,53 @@ async function maybeCompactMidRun(session: any, turn: any, signal: any, deps: {
       ? turn.toolResults.reduce((sum: number, result: any) => sum + estimateTokens(result), 0)
       : 0;
     const contextTokens = usageTokens + toolResultTokens;
+    const ratio = contextTokens / contextWindow;
 
-    if (!shouldCompact(contextTokens, contextWindow, settings)) return false;
+    // FORCE line: compact unconditionally. The reserve derived from the same
+    // ratio keeps the SDK's post-run check in agreement; the explicit ratio
+    // check guards against a user-set reserve pushing the trigger later than
+    // the promised 80%. Small windows (< 80K) fire earlier via shouldCompact
+    // so the absolute 16384-token headroom is never violated.
+    if (ratio >= COMPACTION_FORCE_RATIO || shouldCompact(contextTokens, contextWindow, settings)) {
+      const percentBefore = Math.round(ratio * 100);
+      await deps.runCompaction(session, {
+        signal,
+        emitLifecycle: true,
+        lifecycleReason: "threshold",
+        usageLedger: deps.usageLedger,
+        usageContext: typeof deps.buildUsageContext === "function" ? deps.buildUsageContext(session) : null,
+      });
 
-    await deps.runCompaction(session, {
-      signal,
-      emitLifecycle: true,
-      lifecycleReason: "threshold",
-      usageLedger: deps.usageLedger,
-      usageContext: typeof deps.buildUsageContext === "function" ? deps.buildUsageContext(session) : null,
+      // A compaction just happened: the ask line starts over, and the user
+      // gets told their context was compacted under them.
+      delete session[COMPACTION_ASK_STATE];
+      session?._emit?.({
+        type: COMPACTION_AUTO_EVENT,
+        percentBefore,
+        forcePercent: Math.round(COMPACTION_FORCE_RATIO * 100),
+      });
+
+      session.sessionManager.appendCustomMessageEntry(
+        "midrun-compaction-notice",
+        MIDRUN_COMPACTION_NOTICE,
+        false,
+      );
+      const context = session.sessionManager.buildSessionContext();
+      session.agent.state.messages = context.messages;
+      return true;
+    }
+
+    // ASK line: between 50% and the force line, hand the decision to the user
+    // via the renderer. Never blocks the run; the renderer compacts (now or
+    // after the run settles) only if the user accepts. Called unconditionally
+    // so a post-compaction usage drop can reset the ask state even while the
+    // ratio is still below the line.
+    maybeEmitCompactionSuggestion(session, {
+      contextTokens,
+      contextWindow,
+      ratio,
     });
-
-    session.sessionManager.appendCustomMessageEntry(
-      "midrun-compaction-notice",
-      MIDRUN_COMPACTION_NOTICE,
-      false,
-    );
-    const context = session.sessionManager.buildSessionContext();
-    session.agent.state.messages = context.messages;
-    return true;
+    return false;
   } catch (err: any) {
     if (err?.name === "AbortError" || signal?.aborted) {
       log.log("mid-run compaction aborted");
@@ -197,4 +253,50 @@ function findLatestCompactionEntry(branch: any[]) {
     if (branch[i]?.type === "compaction") return branch[i];
   }
   return null;
+}
+
+/**
+ * Emit `compaction_suggested` to the renderer at most once per growth segment.
+ *
+ * State machine on session[COMPACTION_ASK_STATE]:
+ *   - usage dropped >= 20% of window since last ask → a compaction happened;
+ *     reset the state and stay silent until the line is crossed again
+ *   - no state, ratio >= ask line                  → ask now, remember usage
+ *   - ratio below the ask line                     → stay silent
+ *   - usage grew < 5% of window since last ask     → stay silent
+ *   - otherwise                                    → ask again, re-record usage
+ */
+function maybeEmitCompactionSuggestion(session: any, info: {
+  contextTokens: number;
+  contextWindow: number;
+  ratio: number;
+}): void {
+  try {
+    const { contextTokens, contextWindow, ratio } = info;
+    const state = session[COMPACTION_ASK_STATE] as { tokens: number } | undefined;
+    if (state
+      && state.tokens - contextTokens >= contextWindow * COMPACTION_ASK_RESET_DROP_RATIO) {
+      // A compaction happened under us: forget the old anchor. The next
+      // crossing of the ask line prompts afresh.
+      delete session[COMPACTION_ASK_STATE];
+      return;
+    }
+    if (ratio < COMPACTION_ASK_RATIO) return;
+    if (state
+      && contextTokens - state.tokens < contextWindow * COMPACTION_ASK_REPROMPT_DELTA_RATIO) {
+      return;
+    }
+    const sessionPath = session.sessionManager?.getSessionFile?.();
+    if (!sessionPath) return;
+    session[COMPACTION_ASK_STATE] = { tokens: contextTokens };
+    session?._emit?.({
+      type: COMPACTION_SUGGESTED_EVENT,
+      sessionPath,
+      percent: Math.round(ratio * 100),
+      askPercent: Math.round(COMPACTION_ASK_RATIO * 100),
+      forcePercent: Math.round(COMPACTION_FORCE_RATIO * 100),
+    });
+  } catch (err: any) {
+    log.warn(`compaction suggestion emit failed: ${err?.message || String(err)}`);
+  }
 }

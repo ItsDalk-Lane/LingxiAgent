@@ -1,0 +1,202 @@
+/* TurnEditedFilesCard — 「本轮已编辑文件」卡（助手消息下方）
+   外观对齐截图：浅底卡片 + 图标标题行 + 操作按钮 + 文件行增删统计 + 折叠开关。
+   令牌取值惯例对齐 GitChangesModal.module.css。 */
+
+.card {
+  margin: var(--space-8) 0 0;
+  padding: var(--space-12, 12px);
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--radius-lg, 12px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  /* 与 .message 同为 messageGroup 的 flex 子项，取同一 92% 度量：
+   * 消息体带 messageHasWideBlock 时两者严格同宽（见 Chat.module.css）。 */
+  width: 92%;
+  font-family: var(--font-ui, system-ui, -apple-system, "Segoe UI", sans-serif);
+}
+
+/* ── 头部：图标 + 标题/查看更改 + 操作按钮 ── */
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-10, 10px);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: var(--radius-card, 8px);
+  background: color-mix(in srgb, var(--text, #3b3d3f) 6%, transparent);
+  color: var(--text-muted, rgba(0, 0, 0, 0.55));
+}
+
+.headText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.title {
+  font-size: var(--fs-body, 13px);
+  font-weight: 600;
+  color: var(--text, #3b3d3f);
+  line-height: 1.3;
+}
+
+.viewLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: var(--fs-caption, 12px);
+  color: var(--text-muted, rgba(0, 0, 0, 0.55));
+  transition: color var(--duration-fast, 120ms) ease;
+}
+
+.viewLink:hover:not(:disabled) {
+  color: var(--text, rgba(0, 0, 0, 0.85));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.viewLink:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.headActions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  flex-shrink: 0;
+}
+
+.ghostBtn,
+.outlineBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: var(--fs-caption, 12px);
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: all var(--duration-fast, 120ms) ease;
+}
+
+.ghostBtn {
+  border: 1px solid transparent;
+  background: none;
+  color: var(--text-muted, rgba(0, 0, 0, 0.6));
+}
+
+.ghostBtn:hover:not(:disabled) {
+  color: var(--text, rgba(0, 0, 0, 0.85));
+  background: color-mix(in srgb, var(--text, #3b3d3f) 6%, transparent);
+}
+
+.outlineBtn {
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.14));
+  background: var(--bg-card, #fff);
+  color: var(--text, #3b3d3f);
+}
+
+.outlineBtn:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--text, #3b3d3f) 35%, transparent);
+  background: color-mix(in srgb, var(--text, #3b3d3f) 4%, var(--bg-card, #fff));
+}
+
+.ghostBtn:disabled,
+.outlineBtn:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+/* ── 文件清单 ── */
+
+.fileList {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-4, 4px) 0 0;
+  border-top: 1px solid var(--border, rgba(0, 0, 0, 0.07));
+  display: flex;
+  flex-direction: column;
+}
+
+.fileRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12, 12px);
+  padding: 5px 2px;
+  min-width: 0;
+}
+
+.filePath {
+  font-family: var(--font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+  font-size: var(--fs-caption, 12px);
+  color: var(--text, #3b3d3f);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.fileStats {
+  display: inline-flex;
+  gap: var(--space-8);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-caption, 12px);
+  white-space: nowrap;
+}
+
+.added {
+  color: var(--green, #7BAE7F);
+}
+
+.deleted {
+  color: var(--danger, #8B3A3A);
+}
+
+/* ── 折叠开关 ── */
+
+.moreToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: var(--fs-caption, 12px);
+  color: var(--text-muted, rgba(0, 0, 0, 0.55));
+  transition: color var(--duration-fast, 120ms) ease;
+}
+
+.moreToggle:hover {
+  color: var(--text, rgba(0, 0, 0, 0.85));
+}
+
+.chevron {
+  transition: transform var(--duration-fast, 120ms) ease;
+}
+
+.chevron[data-open] {
+  transform: rotate(180deg);
+}

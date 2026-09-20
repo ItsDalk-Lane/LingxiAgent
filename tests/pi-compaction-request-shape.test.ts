@@ -85,12 +85,20 @@ describe("Pi native compaction request shape adapter", () => {
     expect(actualRequests).toHaveLength(2);
     expect(adapterRequests).toHaveLength(2);
     for (const adapterRequest of adapterRequests) {
+      // pi 0.86.0：compact 请求上下文经 normalizeContext 折叠，系统提示词是头部
+      // system 消息（无独立 context.systemPrompt 字段），用户提示词在其后。
       const actualRequest = actualRequests.find(({ context }) => (
-        context.messages[0].content[0].text === adapterRequest.promptText
+        context.messages.some((message: any) => (
+          message?.role === "user" && message?.content?.[0]?.text === adapterRequest.promptText
+        ))
       ));
       expect(actualRequest).toBeDefined();
-      expect(actualRequest?.context.systemPrompt).toBe(adapterRequest.systemPrompt);
-      expect(actualRequest?.context.messages[0]).toMatchObject({
+      const actualSystemMessage = actualRequest?.context.messages
+        .find((message: any) => message?.role === "system");
+      expect(actualSystemMessage?.content).toBe(adapterRequest.systemPrompt);
+      const actualPromptMessage = actualRequest?.context.messages
+        .find((message: any) => message?.role === "user");
+      expect(actualPromptMessage).toMatchObject({
         role: "user",
         content: [{ type: "text", text: adapterRequest.promptText }],
       });

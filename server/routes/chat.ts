@@ -62,6 +62,7 @@ import {
   isHiddenTurnInputMessage,
   isSessionTurnInputEntry,
 } from "../../lib/turn-input-presentation.ts";
+import { consumeSteeredUserMessage } from "../../lib/pi-sdk/desktop-input-commit.ts";
 import { buildAutomationSuggestionBlock, buildAutolearnSuggestionBlock } from "../suggestion-blocks.ts";
 import { isAllowedChatImageMime, isChatImageBase64WithinLimit } from "../../shared/image-mime.ts";
 import {
@@ -188,8 +189,7 @@ function extractText(content: any) {
     .join("");
 }
 
-function persistedTurnEntryIds(engine: any, sessionPath: string) {
-  const branch = engine.getSessionByPath?.(sessionPath)?.sessionManager?.getBranch?.();
+function persistedTurnEntryIdsFromBranch(branch: any[]) {
   if (!Array.isArray(branch) || branch.length === 0) {
     return { turnInputEntryId: null, userEntryId: null, assistantEntryId: null, assistantEntryIds: [] };
   }
@@ -237,6 +237,39 @@ function persistedTurnEntryIds(engine: any, sessionPath: string) {
     assistantEntryId,
     assistantEntryIds,
   };
+}
+
+function persistedTurnEntryIds(engine: any, sessionPath: string) {
+  const branch = engine.getSessionByPath?.(sessionPath)?.sessionManager?.getBranch?.();
+  if (!Array.isArray(branch) || branch.length === 0) {
+    return { turnInputEntryId: null, userEntryId: null, assistantEntryId: null, assistantEntryIds: [] };
+  }
+  return persistedTurnEntryIdsFromBranch(branch);
+}
+
+/**
+ * 插话（steer）落盘时的旧 Run 归属：插话用户消息在分支中的位置就是新回合边界
+ * （历史投影 runOrdinal 按 user 消息递增，同一边界），旧 Run 只能认领它之前的条目。
+ * 按对象身份定位刚落盘的那条用户消息；找不到（防御）就返回空归属，
+ * 绝不让旧 Run 冒领插话之后的 assistant 记录。
+ */
+function persistedTurnEntryIdsBeforeUserMessage(engine: any, sessionPath: string, userMessage: any) {
+  const branch = engine.getSessionByPath?.(sessionPath)?.sessionManager?.getBranch?.();
+  if (!Array.isArray(branch) || branch.length === 0) {
+    return { turnInputEntryId: null, userEntryId: null, assistantEntryId: null, assistantEntryIds: [] };
+  }
+  let userIndex = -1;
+  for (let index = branch.length - 1; index >= 0; index -= 1) {
+    const entry = branch[index];
+    if (entry?.type === "message" && entry.message === userMessage) {
+      userIndex = index;
+      break;
+    }
+  }
+  if (userIndex < 0) {
+    return { turnInputEntryId: null, userEntryId: null, assistantEntryId: null, assistantEntryIds: [] };
+  }
+  return persistedTurnEntryIdsFromBranch(branch.slice(0, userIndex));
 }
 
 function deferredResultFileBlocks(result: any, taskId: any = null) {
@@ -951,6 +984,50 @@ export function createChatRoute(engine: any, hub: any, {
       streamId: runStreamId,
     });
     return runStreamId;
+  }
+
+  /**
+   * 插话（steer）落盘触发的 Run 切分。
+   *
+   * 历史投影以 user 消息为回合边界（runOrdinal 按 user 递增）；steer 不打断 agent
+   * 循环，agent_start/agent_settled 不会再来，若实时侧不主动切，后续输出会继续
+   * 流进位于该用户消息之前的旧气泡（顺序颠倒），最终收口还会把两个逻辑回合
+   * 并成一个气泡、归属绑定到后一条输入上。
+   *
+   * 这里只切 Run 语义层：不动 stream 连接（isStreaming 保持、复用 streamId）、
+   * 不记 usage、不发完成通知、不动 watchdog——agent 循环还在跑，真正的终结
+   * 仍属于 agent_settled → finishAssistantRun（exactly-once 不变）。
+   */
+  function splitAssistantRunForSteeredInput(sessionPath, ss, userMessage) {
+    // 旧 Run 以 completed 收口：它不是被中止，而是被新输入取代；终态裁决交给前端
+    // resolveAssistantTurnOutcome（无答案 → missing_final_answer），与历史重投影逐字一致。
+    const persistedEntries = persistedTurnEntryIdsBeforeUserMessage(engine, sessionPath, userMessage);
+    emitStreamEvent(sessionPath, ss, {
+      type: "assistant_run_end",
+      runId: ss.assistantRunId,
+      status: "completed",
+      // runSplit 标记这是插话切分而非回合终结：会话仍在流式，
+      // 前端不得执行「回合结束」副作用（如回复后自动压缩）。
+      runSplit: true,
+      ...persistedEntries,
+    });
+    // 新 Run：重置 Run 级语义态（与 beginAssistantRun 同一集合），分配新 runId。
+    ss.assistantRunId = crypto.randomUUID();
+    ss.modelTurnOrdinal = 0;
+    ss.turnActive = false;
+    resetAssistantRunParsers(ss);
+    ss.hasOutput = false;
+    ss.hasToolCall = false;
+    ss.hasThinking = false;
+    ss.hasError = false;
+    ss.assistantStopReason = null;
+    ss.isAborted = false;
+    ss.pendingTurnInputConsumptions = [];
+    ss.consumedTurnInputsForCurrentTurn = [];
+    emitStreamEvent(sessionPath, ss, {
+      type: "assistant_run_start",
+      runId: ss.assistantRunId,
+    });
   }
 
   function textOrNull(value) {
@@ -2047,6 +2124,16 @@ export function createChatRoute(engine: any, hub: any, {
     } else if (event.type === "message_end") {
       // Provider 级别错误（超时、连接断开等）通过 message_end 传递，不经过 message_update
       if (!ss) return;
+      // 插话（steer）的用户消息落盘 = 权威 Run 边界：历史投影以 user 消息切回合，
+      // 实时侧必须在同一点切开 Assistant Run。只认 steer 入队的消息（SDK 包装层打的
+      // 一次性标记）：正常 prompt 的用户消息 message_end 可能晚于 agent_start 到达，
+      // 不能仅凭「Run 激活中」误判。
+      if (event.message?.role === "user") {
+        const steeredCommit = consumeSteeredUserMessage(event.message);
+        if (steeredCommit && ss.assistantRunActive) {
+          splitAssistantRunForSteeredInput(sessionPath, ss, event.message);
+        }
+      }
       if (event.message?.role === "assistant") {
         flushReservedTagParsers({ type: "text_delta" }, event.message);
         publishNormalizedAssistantBatch(ss.assistantEventNormalizer.finishMessage(event.message));

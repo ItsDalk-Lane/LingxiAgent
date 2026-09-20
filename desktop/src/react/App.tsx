@@ -19,6 +19,7 @@ import { FloatSidebar, useFloatSidebar } from './components/FloatSidebar';
 import { useSidebarResize } from './hooks/use-sidebar-resize';
 import { ToastContainer } from './components/ToastContainer';
 import { InputContextMenu } from './components/InputContextMenu';
+import { CompactionAskDialog } from './components/input/CompactionAskDialog';
 import { StatusBar } from './components/StatusBar';
 import { LeavesOverlay } from './components/LeavesOverlay';
 import { SelectionQuoteActionSurface } from './components/selection/SelectionQuoteActionSurface';
@@ -162,6 +163,9 @@ function App() {
 
       {/* Selection quote action */}
       <SelectionQuoteActionSurface />
+
+      {/* 50% compaction ask dialog (compaction_suggested events) */}
+      <CompactionAskDialog />
 
       {/* Toast notifications */}
       <ToastContainer />

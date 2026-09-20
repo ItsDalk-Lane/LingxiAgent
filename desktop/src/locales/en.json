@@ -221,7 +221,8 @@
     "toolReadOnly": "Read",
     "toolWrite": "Write",
     "filesUnsupported": "Channels currently support text only; files will not be attached to chat",
-    "createIntroOptional": "Description"
+    "createIntroOptional": "Description",
+    "mapTab": "Session Map"
   },
   "announcement": {
     "title": "What's New · v{version}",
@@ -288,7 +289,18 @@
       "loading": "Loading projects…",
       "empty": "No projects yet"
     },
-    "archivedChats": "Archived chats"
+    "archivedChats": "Archived chats",
+    "actionBadge": {
+      "approval": "Needs approval",
+      "askUser": "Asking",
+      "confirm": "Needs confirm"
+    },
+    "projectArchiveAll": "Archive all chats",
+    "projectArchiveDone": "Archived {count} chats",
+    "projectMore": "More",
+    "projectNewChat": "New chat",
+    "projectRemove": "Remove workspace",
+    "runningGroup": "Running"
   },
   "titlebar": {
     "currentChatTitle": "Current chat title",
@@ -363,7 +375,16 @@
     },
     "rcTakingOver": "{platform} active",
     "subagentRunStateUnrecoverable": "Historical sub-session run state is unrecoverable",
-    "subagentLinkUnrecoverable": "Historical sub-session link is unrecoverable"
+    "subagentLinkUnrecoverable": "Historical sub-session link is unrecoverable",
+    "archiveChildrenTitle": "Archive this conversation?",
+    "archiveChildrenBody": "It has {count} conversations forked from it. Archive them too?",
+    "archiveWithChildren": "Archive with forked conversations",
+    "archiveDetachChildren": "Archive this one only",
+    "archiveChildrenNeeded": "This conversation has forks; choose how to archive",
+    "archiveChildSummary": "Archived {archived} forked conversations; {detached} left independent",
+    "collapseChildren": "Collapse child conversations",
+    "expandChildren": "Expand child conversations",
+    "expandChildrenCount": "Expand {count} child conversation(s)"
   },
   "common": {
     "on": "On",
@@ -407,6 +428,27 @@
     "back": "Back"
   },
   "chat": {
+    "editedFiles": {
+      "title": "Edited {count} files",
+      "viewChanges": "View changes",
+      "viewUnavailable": "No matching Git changes in the current workspace",
+      "noGitRepo": "The current workspace is not a Git repository, so changes can't be viewed or reverted via Git",
+      "undo": "Undo",
+      "undoUnavailable": "Nothing to undo (files may all be newly created)",
+      "undoConfirmTitle": "Undo file changes from this turn?",
+      "undoConfirmBody": "Git will discard uncommitted changes in these {count} files (restoring the last commit; newly created files are untouched):\n{list}",
+      "undoConfirmOk": "Discard changes",
+      "undoDone": "Reverted changes in {count} files",
+      "undoFailed": "Failed to undo changes",
+      "review": "Review",
+      "reviewUnavailable": "Review can only start while the session is idle",
+      "reviewSent": "Review requested — the assistant will double-check",
+      "reviewQueued": "Review request queued; it will send after the current turn",
+      "reviewFailed": "Failed to send review request",
+      "reviewPrompt": "Please review the files you edited this turn:\n{files}\nCheck for mistakes, omissions, or simplification opportunities and give a concise verdict; apply fixes directly if needed.",
+      "showMore": "Show {count} more files",
+      "showLess": "Show less"
+    },
     "fileRollback": {
       "menuTitle": "Regenerate",
       "conversationOnly": "Conversation only",
@@ -1503,7 +1545,8 @@
       "experiments": "Experiments",
       "about": "About",
       "security": "Security",
-      "envdeps": "Environment"
+      "envdeps": "Environment",
+      "keybindings": "Keyboard Shortcuts"
     },
     "browser": {
       "cookiesTitle": "Cookies",
@@ -2042,7 +2085,9 @@
       "copied": "Copied",
       "saved": "Saved",
       "invalidPort": "Port must be a number",
-      "loadFailed": "Failed to load access settings"
+      "loadFailed": "Failed to load access settings",
+      "publicBaseUrl": "Public access URL",
+      "publicBaseUrlHint": "A Tailscale virtual IP or a public domain (e.g. https://lingxi.example.com). Mobile/desktop URLs and the QR code will prefer it so phones work outside the LAN; leave empty for LAN-only"
     },
     "security": {
       "sandbox": "Sandbox",
@@ -2067,7 +2112,7 @@
       "networkProxyNoProxy": "Bypass proxy, for example localhost, 127.0.0.1, ::1",
       "networkProxySave": "Save Proxy Settings",
       "fileBackup": "File Backup",
-      "fileBackupDesc": "Automatically save original file content before AI modifications or deletions",
+      "fileBackupDesc": "Original file content is saved automatically before AI modifications or deletions; expired backups are cleaned up and removed along with session deletion",
       "retention": "Retention",
       "retention1d": "1 day",
       "retention3d": "3 days",
@@ -2545,7 +2590,7 @@
       "homeFolderClear": "Clear",
       "homeFolderBrowse": "Browse",
       "contextFilesTitle": "Workspace instruction injection",
-      "contextFilesDesc": "Inject AGENTS.md / CLAUDE.md from the current workspace project into new session system prompts before memory.",
+      "contextFilesDesc": "Inject AGENTS.md / CLAUDE.md from the current workspace project, plus files matching a custom file name, into new session system prompts before memory.",
       "injectAgentsMd": "Inject AGENTS.md",
       "injectAgentsMdDesc": "When enabled, new sessions read AGENTS.md from the current working directory up to the Git root.",
       "injectClaudeMd": "Inject CLAUDE.md",
@@ -2556,7 +2601,10 @@
       "discoverProjectSkillsDesc": "Discover and load skills from the current project's .agents/skills directory.",
       "discoverCompatibleProjectSkills": "Load skills from other tools",
       "discoverCompatibleProjectSkillsDesc": "Also discover project skills from Claude Code, Codex, and OpenClaw directories.",
-      "agentDeskSection": "Agent desk settings"
+      "agentDeskSection": "Agent desk settings",
+      "customFileNamePlaceholder": "Custom file name, e.g. QWEN.md",
+      "injectCustomFile": "Inject custom file",
+      "injectCustomFileDesc": "When enabled, new sessions read files matching the file name below from the current working directory up to the Git root."
     },
     "toolCaps": {
       "title": "Skill Installation Permissions"
@@ -3035,10 +3083,6 @@
         "unknownValue": "(unknown)"
       },
       "charts": {
-        "fixedBadgeDate": "Fixed · Date",
-        "fixedBadgeModelDate": "Fixed · Model × Date",
-        "fixedBadgeProviderDate": "Fixed · Provider × Date",
-        "fixedBadgeCategoryDate": "Fixed · Category × Date",
         "empty": "No data yet",
         "loading": "Loading chart data…",
         "error": "Failed to load chart",
@@ -3056,6 +3100,7 @@
           "cumulative": "Cumulative",
           "tooltipCalls": "Calls",
           "tooltipTokens": "Total tokens",
+          "tooltipHint": "Calls & token usage for that day",
           "weekRange": "Week of {since} – {until}",
           "cumulativeUntil": "Cumulative through {date}",
           "hint": {
@@ -3074,9 +3119,16 @@
         },
         "pie": {
           "title": "Category breakdown",
-          "hint": "Pick a day to see its category mix; hover a slice for details and the daily total.",
-          "dateLabel": "Date"
-        }
+          "viewDaily": "By day",
+          "viewAll": "All days",
+          "allTotal": "All-time total",
+          "dateLabel": "Date",
+          "hint": "Pick a day to see its category mix; hover a slice for details and the daily total."
+        },
+        "fixedBadgeDate": "Fixed · Date",
+        "fixedBadgeModelDate": "Fixed · Model × Date",
+        "fixedBadgeProviderDate": "Fixed · Provider × Date",
+        "fixedBadgeCategoryDate": "Fixed · Category × Date"
       },
       "storage": {
         "retentionTitle": "Retention",
@@ -3246,7 +3298,8 @@
           "dropped": "Payloads were dropped at capture time",
           "not_captured": "No payloads were captured for this call",
           "unknown": "No payload records"
-        }
+        },
+        "empty": "No records"
       },
       "provenance": {
         "title": "Semantic input provenance",
@@ -3857,6 +3910,64 @@
           "less": "Show less"
         }
       }
+    },
+    "keybindings": {
+      "title": "Keyboard Shortcuts",
+      "addBinding": "Add binding",
+      "alreadyDefault": "Already using the default binding",
+      "bindingEmpty": "Unbound",
+      "column": {
+        "command": "Command",
+        "binding": "Key binding",
+        "actions": "Actions",
+        "scope": "Scope"
+      },
+      "conflict": "This key combination is already bound to another command",
+      "editBinding": "Change keys",
+      "footnote": "Local shortcuts only apply while their surface is focused. Default keys differ between macOS and Windows/Linux.",
+      "footnoteMac": "Local shortcuts only apply while their surface is focused. ⌘ refers to the Command key.",
+      "loadFailed": "Failed to load keybinding preferences",
+      "maxBindings": "Each command can have up to 3 bindings",
+      "noResults": "No matching shortcuts",
+      "recording": "Press a new key combination…",
+      "recordingModifierOnly": "Modifier keys alone don't count — press a letter, number, or function key",
+      "recordingNeedsModifier": "Combos need ⌘/Ctrl or Alt (F1–F12 can be used alone)",
+      "registrationFailed": "Failed to register shortcut; it may already be in use by another app",
+      "removeBinding": "Remove binding",
+      "resetAll": "Reset all to defaults",
+      "resetDone": "All shortcuts reset to defaults",
+      "restoreCommand": "Reset to default",
+      "saved": "Shortcut saved",
+      "searchPlaceholder": "Search shortcuts",
+      "systemTaken": "{combo} is already in use by the system or another app — not saved",
+      "scope": {
+        "global": "Global",
+        "app": "In-app",
+        "local": "Local",
+        "globalHint": "System-wide; fires even when the app is in the background",
+        "appHint": "Applies across all in-app windows",
+        "localHint": "Only applies while its surface is focused"
+      },
+      "commands": {
+        "quickChatToggle": "Toggle Quick Chat",
+        "quickChatToggleHint": "Show or hide the Quick Chat mini window",
+        "appRestart": "Restart App",
+        "appRestartHint": "Quit and relaunch the app; unsaved content may be lost",
+        "appOpenSettings": "Open Settings",
+        "appOpenSettingsHint": "Open the settings window",
+        "appNewSession": "New Session",
+        "appNewSessionHint": "Create a new session",
+        "appToggleSidebar": "Toggle Sidebar",
+        "appToggleSidebarHint": "Expand or collapse the left sidebar",
+        "voiceRecordToggle": "Voice record/send",
+        "voiceRecordToggleHint": "While the main chat is focused, press once to start recording, press again to stop and send"
+      },
+      "availability": {
+        "ok": "Available",
+        "taken": "In use",
+        "checking": "Checking…",
+        "unavailable": "Detectable in the desktop app"
+      }
     }
   },
   "onboarding": {
@@ -4220,18 +4331,19 @@
     "noCommits": "No commits yet",
     "copyHash": "Copy commit ID",
     "copied": "Commit ID copied",
-    "timeJustNow": "just now",
-    "timeMinutesAgo": "{n} min ago",
-    "timeHoursAgo": "{n} hours ago",
-    "timeDaysAgo": "{n} days ago",
+    "historyColGraph": "Graph",
+    "historyColDescription": "Description",
+    "historyColDate": "Date",
+    "historyColAuthor": "Author",
+    "historyColHash": "Commit",
+    "commitFiles": "{n} files",
+    "historyLoading": "Loading commits…",
     "commitTitle": "Commit or Push",
-    "commitMessagePlaceholder": "Commit message (leave blank to auto-generate)",
-    "includeUnstaged": "Include unstaged changes",
     "btnCommit": "Commit",
     "btnCommitPush": "Commit & Push",
     "btnPush": "Push",
     "nothingToCommit": "Nothing to commit",
-    "nothingStaged": "Nothing staged (check \"Include unstaged changes\")",
+    "nothingStaged": "Nothing staged",
     "nothingToPush": "No commits to push",
     "noRemote": "No remote configured",
     "aiGenerating": "Generating commit message…",
@@ -4261,15 +4373,15 @@
     "unstashPathDirty": "This file has uncommitted changes; taking it back would overwrite them — discard or commit first",
     "unstashConflict": "Conflicts while taking back; the stash entry was kept — resolve them and retry",
     "discardOneHint": "Discard this file's uncommitted changes and restore it from HEAD (cannot be undone)",
-    "discardUntrackedHint": "Untracked new files are never discarded here, to avoid deleting them by accident",
+    "discardUntrackedHint": "Untracked new file: discarding deletes this file (irreversible)",
     "discardFileDone": "Discarded changes in {name}",
     "discardAllDone": "Discarded all tracked changes",
     "discardFailed": "Failed to discard",
     "discardNothing": "Nothing to discard",
     "discardConfirmTitle": "Discard changes",
     "discardConfirmOk": "Discard",
-    "discardConfirmAll": "All uncommitted changes to tracked files (including staged ones) will be lost. This cannot be undone. Untracked new files are left alone.",
-    "discardConfirmFiles": "Uncommitted changes to these {count} files (including staged ones) will be lost. This cannot be undone:\n{list}",
+    "discardConfirmAll": "All uncommitted changes to tracked files (including staged ones) will be discarded, and all untracked new files will be deleted. This cannot be undone.",
+    "discardConfirmFiles": "Uncommitted changes to these {count} files will be discarded (untracked new files will be deleted). This cannot be undone:\n{list}",
     "operationFailed": "Operation failed",
     "worktreeRow": "New worktree",
     "worktreeTitle": "Start a new session in a worktree",
@@ -4288,7 +4400,55 @@
     "worktreeDirExists": "That directory already exists — pick another name",
     "worktreeBranchExists": "The matching wt/ branch already exists — pick another name",
     "worktreeMainTag": "main",
-    "worktreeCurrentTag": "current"
+    "worktreeCurrentTag": "current",
+    "btnPull": "Pull",
+    "pullHint": "Pull new commits from the remote (fast-forward only, no merge commits)",
+    "pullDone": "Pulled remote updates ({count} commits)",
+    "pullUpToDate": "Already up to date",
+    "noUpstream": "Current branch has no upstream",
+    "pullDiverged": "Local and remote have diverged and cannot be auto-merged; ask the assistant in chat to help",
+    "pullLocalChanges": "Uncommitted local changes conflict with the remote; commit or stash before pulling",
+    "graphTitle": "Source Control",
+    "graphMessagePlaceholder": "Message (*Enter to commit to “{branch}”)",
+    "graphCleanTree": "No changes — the working tree is clean",
+    "stagedChanges": "Staged Changes",
+    "stageAllTitle": "Stage All Changes",
+    "unstageAll": "Unstage All",
+    "stageOne": "Stage Changes",
+    "unstageOne": "Unstage",
+    "discardOneTitle": "Discard Changes",
+    "discardAllTitle": "Discard All Changes",
+    "amendBtn": "Amend",
+    "amendHint": "Fold changes into the previous commit",
+    "commitSyncBtn": "Commit & Sync",
+    "commitSyncHint": "Pull remote first, then commit and push",
+    "amendDone": "Folded into the previous commit",
+    "stageDone": "Staged {name}",
+    "stageAllDone": "Staged all changes",
+    "unstageDone": "Unstaged {name}",
+    "unstageAllDone": "Unstaged everything",
+    "stageFailed": "Stage failed",
+    "unstageFailed": "Unstage failed",
+    "syncChanges": "Sync Changes",
+    "syncPushHint": "Push {n} local commit(s)",
+    "syncPullHint": "Pull {n} new commit(s) from the remote",
+    "syncBothHint": "Pull {n} new commit(s) from the remote, then push {m} local commit(s)",
+    "aheadHint": "{n} commit(s) ahead of the remote",
+    "letterM": "Modified",
+    "letterU": "Untracked",
+    "letterA": "Staged new file",
+    "letterD": "Deleted",
+    "graphFilesMore": "{n} more files — scroll the list to see them",
+    "graphShowAll": "Show all {n} files",
+    "checkBlockEof": "Blocked by the project's auto-check: extra blank line at end of file ({file}, line {line}). Remove it and commit again.",
+    "checkBlockWhitespace": "Blocked by the project's auto-check: trailing whitespace ({file}, line {line}). Clean it up and retry.",
+    "checkBlockPush": "Push was rejected: usually because ① the pre-push auto-check (such as a full project typecheck) did not pass, or ② the remote branch has commits you don't have. Try pulling once, or check the output in your local terminal.",
+    "checkBlockHook": "Blocked by the project's auto-check (pre-commit/pre-push checks did not pass). Fix per the check output and retry.",
+    "refreshInfo": "Refresh remote and local info",
+    "refreshLocalOnly": "No remote configured — refreshing local info only",
+    "refreshDone": "Refreshed: local and remote info are up to date",
+    "fetchFailed": "Failed to refresh remote info",
+    "noRemoteNotice": "No remote configured — commits stay local and cannot be pushed."
   },
   "desk": {
     "title": "Desk",
@@ -4861,7 +5021,7 @@
       "theme": "Theme",
       "chatModel": "Chat Model",
       "fileBackup": "File Backup",
-      "fileBackupDesc": "Auto-backup files before AI modifications"
+      "fileBackupDesc": "Retention days for auto-backups made before AI modifications"
     },
     "generateImage": {
       "description": "Generate images from text descriptions. Non-blocking: returns immediately after submission, displays automatically when complete.",
@@ -5535,5 +5695,53 @@
     "confirmed": {
       "pending": "Rewind to \"{name}\" confirmed. It runs automatically as soon as this turn finishes."
     }
+  },
+  "compaction": {
+    "askTitle": "Context is almost half full",
+    "askBody": "This session has used {percent}% of its context window (past the {askPercent}% ask line; it will be compacted automatically at {forcePercent}%). Compacting folds earlier conversation into a summary to free up space. Compact now?",
+    "askConfirm": "Compact now",
+    "askCancel": "Not now",
+    "autoCompleted": "Context hit {percent}% and was compacted automatically",
+    "deferredToast": "Context will be compacted after the reply finishes"
+  },
+  "labels": {
+    "thinking": "Thinking"
+  },
+  "map": {
+    "addPhrase": "Add",
+    "branch": "Create branch",
+    "cancel": "Cancel",
+    "collapse": "Collapse follow-ups",
+    "collapseBlockedCurrent": "The current session lives in this subtree and cannot be collapsed",
+    "continue": "Continue thread",
+    "draftBranchPlaceholder": "Branch off from here…",
+    "draftContinuePlaceholder": "Continue from this question…",
+    "editPhrases": "Edit quick phrases",
+    "empty": "No sessions in this workspace yet",
+    "expand": "Expand follow-ups",
+    "followUp": "Follow up",
+    "hiddenCount": "{count} follow-ups hidden",
+    "loading": "Loading…",
+    "locate": "Locate current",
+    "openInChat": "Open in chat",
+    "processLine": "{count} tool calls",
+    "queued": "Queued — it will be sent automatically from the chat page",
+    "quickPhrases": "Explain more|Give an example|In simple terms|Compare",
+    "resetLayout": "Reset layout",
+    "resetLayoutConfirm": "Reset the canvas layout?",
+    "send": "Send",
+    "sendFailed": "Send failed",
+    "sending": "Sending…",
+    "stats": "{threads} sessions · {cards} cards",
+    "toolCount": "Tools {count}",
+    "truncated": "Content truncated",
+    "turnLabel": "Turn {index}",
+    "turnsLoadFailed": "Failed to load",
+    "waitingForAssistant": "Waiting for the assistant…",
+    "workspace": "Workspace",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "ungrouped": "Ungrouped",
+    "forkBusy": "This session is generating a reply — try again later"
   }
 }

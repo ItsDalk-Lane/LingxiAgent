@@ -46,6 +46,9 @@
     --link: var(--accent, #537D96);
     --link-hover: var(--accent-hover, var(--link));
     --link-rgb: var(--accent-rgb, 83, 125, 150);
+    /* 数据可视化专用热力色（观测页热力图）：不随 accent 走，避免近黑 accent
+       主题下热力图失去色相；深色主题可覆盖为亮青提升对比。 */
+    --chart-heat: #0e7490;
     --permission-auto: #5f93aa;
     --permission-auto-rgb: 95, 147, 170;
     --permission-auto-border: rgba(var(--permission-auto-rgb), 0.32);
