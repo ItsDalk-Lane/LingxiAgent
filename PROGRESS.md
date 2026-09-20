@@ -1966,3 +1966,15 @@ M  desktop/src/react/__tests__/components/TodoPanel.test.tsx
   - 样式基线收账（官方 --update-baseline：SessionList/Settings/GitGraphPanel/TurnEditedFilesCard 新增 UI 的灰名单入账）。
   - round2 证据补丁从干净 89bc0b64 再生成（552,825 行 / 880 diff；.gitignore 排除 .mimosa/.playwright-mcp/mockup 后不再吸入工具本地状态）；desktop/artifacts/card-e2e-test.txt 按文件自述删除。
 - 验证（提交前，工作区=本提交内容）：typecheck x3 绿；全量 `npm test` 14700 测试：14681 通过 / 15 既有跳过 / 4 红，全部为封印坐标族（post-verification-audit-seal、round2 R10-03/04、round3 manifest——同因 VERIFIED_SOURCE_SHA 仍指 a5e596718，属旧坐标预期红，见下方审计提交推进）。
+
+### 2026-09-21 审计封印推进（随 0.1.41 候选，已获授权的提交/发布流程）
+
+- 坐标 `a5e596718` → `2ec4bfb88ac3cfc36c2cd314e4559ef1d64fb304`（feat/pending-sep17：d6eaf6226 批次收口提交 + 2ec4bfb88 交付证据刷新提交；两提交的被覆盖文件内容即门禁 manifest 绑定树）。
+- 验证绑定：typecheck x3（root + tsconfig.node + tsconfig.test）0 错误；证据门禁（round2/round3 run-evidence，自指排除 + seal 过渡窗排除）14660 通过 / 0 失败 / 15 既有跳过、执行期无漂移、manifest 7a598a86…/78d8c3c7… 与绿色记录同哈希；坐标推进后全量 `npm test`（含 seal/matrix/round2/round3 全部自指测试）复验——结果见下条。
+- seal 过渡窗说明：证据门禁排除 post-verification-audit-seal 是因为坐标文件在证据绑定窗内为过渡态（候选树已定、本审计推进未提交），该断言在窗内必然红；seal 本身在坐标推进后随全量复验单独执行，绿即成立。
+- build-sync-matrix 常量随动，矩阵与 markdown 投影重生成（133 paths，projection 8bf6c07a…）。
+
+### 2026-09-21 坐标推进后全量复验（终态证据）
+
+- 坐标 `2ec4bfb88ac3cfc36c2cd314e4559ef1d64fb304` 就位后，全量 `npm test`（含 post-verification-audit-seal / upstream-sync-matrix / round2 / round3 全部自指门禁）：1441 文件通过 / 3 既有跳过；14685 测试通过 / 15 既有跳过 / 0 失败，exit 0。
+- R10-09 增量补丁为运行时派生产物（每次套件运行按当前树再生成并自校验 VERIFIED）；其入库副本停留在证据刷新提交时刻的树状态，套件运行后工作区出现该文件的本地改动属既有机制，不随审计提交（补丁不在 seal allowlist）。
