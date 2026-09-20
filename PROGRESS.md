@@ -1978,3 +1978,13 @@ M  desktop/src/react/__tests__/components/TodoPanel.test.tsx
 
 - 坐标 `2ec4bfb88ac3cfc36c2cd314e4559ef1d64fb304` 就位后，全量 `npm test`（含 post-verification-audit-seal / upstream-sync-matrix / round2 / round3 全部自指门禁）：1441 文件通过 / 3 既有跳过；14685 测试通过 / 15 既有跳过 / 0 失败，exit 0。
 - R10-09 增量补丁为运行时派生产物（每次套件运行按当前树再生成并自校验 VERIFIED）；其入库副本停留在证据刷新提交时刻的树状态，套件运行后工作区出现该文件的本地改动属既有机制，不随审计提交（补丁不在 seal allowlist）。
+
+### 2026-09-21 v0.1.41 发布树封印推进（发布元数据 + 证据刷新，已获授权发布流程）
+
+- 坐标 `2ec4bfb88` → `83fd6b632ad596eab62c039b55f4a17af00c04b1`（feat/pending-sep17：7a61d4b43 发布元数据提交 + 83fd6b632 发布树证据刷新提交）。
+- 验证绑定：release:preflight --tag v0.1.41 PASS（候选 0.1.41/gen19，历史最高 v0.1.40-experimental.1/gen18）；digest v1+v2 校验过；发布相关 12 文件 113 tests 绿；证据门禁（四项自指/过渡窗排除）14660 通过 / 0 失败 / 15 既有跳过、manifest 79f1c411…/82963455… 双绿绑定；坐标推进后全量 `npm test`（含全部自指门禁）复验——结果见下条。
+- build-sync-matrix 常量随动，矩阵与 markdown 投影重生成（133 paths，projection 8bf6c07a…）。
+
+### 2026-09-21 v0.1.41 发布树坐标后终态复验
+
+- 坐标 `83fd6b632ad596eab62c039b55f4a17af00c04b1` 就位后，全量 `npm test`（含全部自指门禁）：1441 文件通过 / 3 既有跳过；14685 测试通过 / 15 既有跳过 / 0 失败，exit 0。v0.1.41 标签自本树打出。
