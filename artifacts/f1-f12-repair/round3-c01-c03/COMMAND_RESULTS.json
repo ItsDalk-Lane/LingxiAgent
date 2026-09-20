@@ -1879,5 +1879,103 @@
     "log": "logs/phase3-final.log",
     "logSha256": "bfffabc6984ecd3fac72ba7c63d846203c33e067669abbcc1dc10aa09699090e",
     "sourceManifestHash": "faaa9510302759e1bc55b9de7be863b5bcabf72a3663385154d8ad7d05bc5a33"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--exclude",
+      "**/round2-delivery-evidence.test.ts",
+      "--exclude",
+      "**/round3-delivery-evidence.test.ts",
+      "--exclude",
+      "**/upstream-sync-matrix.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-20T16:53:32.843835+00:00",
+    "end": "2026-09-20T16:54:58.635840+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 14663,
+      "failed": 0,
+      "skipped": 15,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "0dc0c1d666399eaeea85b1ebd1988d86dad1fdfa7f69b90406cce5a249fc30cd",
+    "log": "logs/final-gate-20260921.log",
+    "logSha256": "d29624228bdb00b9050a0256747af013d1cb2ba9d70cb831ec94b96742fa1505",
+    "sourceManifestHash": "0dc0c1d666399eaeea85b1ebd1988d86dad1fdfa7f69b90406cce5a249fc30cd"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--exclude",
+      "**/round2-delivery-evidence.test.ts",
+      "--exclude",
+      "**/round3-delivery-evidence.test.ts",
+      "--exclude",
+      "**/upstream-sync-matrix.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-20T17:00:15.603648+00:00",
+    "end": "2026-09-20T17:01:47.749201+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 14662,
+      "failed": 1,
+      "skipped": 15,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "78d8c3c7138494b4fdc721e116c1b83576a535b2f1473912d36dbe67c0bb457b",
+    "log": "logs/final-gate-20260921b.log",
+    "logSha256": "c89f79ab51921d65de6bac2de22b08f891a3977071c93cc6b7df6851e7fc734a",
+    "sourceManifestHash": "78d8c3c7138494b4fdc721e116c1b83576a535b2f1473912d36dbe67c0bb457b"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--exclude",
+      "**/round2-delivery-evidence.test.ts",
+      "--exclude",
+      "**/round3-delivery-evidence.test.ts",
+      "--exclude",
+      "**/upstream-sync-matrix.test.ts",
+      "--exclude",
+      "**/post-verification-audit-seal.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-20T17:09:16.748580+00:00",
+    "end": "2026-09-20T17:10:43.051701+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 14660,
+      "failed": 0,
+      "skipped": 15,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "78d8c3c7138494b4fdc721e116c1b83576a535b2f1473912d36dbe67c0bb457b",
+    "log": "logs/final-gate-20260921c.log",
+    "logSha256": "f2400309673e89141823fd14a13b33e3afb4c760a0f284b296e50ed422812898",
+    "sourceManifestHash": "78d8c3c7138494b4fdc721e116c1b83576a535b2f1473912d36dbe67c0bb457b"
   }
 ]
