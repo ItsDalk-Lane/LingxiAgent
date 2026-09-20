@@ -154,19 +154,24 @@ describe('GitHistoryModal', () => {
         parents: [],
       })],
     });
-    fetchGitLogStatsMock.mockResolvedValue({
-      isRepo: true,
-      stats: { ccc3330000000000000000000000000000000000: { additions: 7, deletions: 2, changedFiles: 3 } },
-    });
+    // 手动 resolve：模拟真实网络的延迟返回（回归用例——曾经的 bug 是 effect
+    // 自身 setState 触发 cleanup 把 cancelled 置 true，晚到的结果被丢弃）
+    let resolveStats!: (v: GitLogStatsResponse) => void;
+    fetchGitLogStatsMock.mockImplementation(() => new Promise<GitLogStatsResponse>(resolve => { resolveStats = resolve; }));
     render(<GitHistoryModal open onClose={vi.fn()} dir="/ws" />);
 
     const row = await screen.findByTestId('git-commit-ccc3330');
     expect(row).toBeInTheDocument();
+    expect(fetchGitLogStatsMock).toHaveBeenCalledWith('/ws', undefined, ['ccc3330000000000000000000000000000000000']);
+
+    resolveStats({
+      isRepo: true,
+      stats: { ccc3330000000000000000000000000000000000: { additions: 7, deletions: 2, changedFiles: 3 } },
+    });
     // 列表先渲染（无统计），批量统计到达后合并进行内
     await waitFor(() => expect(row).toHaveTextContent('+7'));
     expect(row).toHaveTextContent('−2');
     expect(row).toHaveTextContent('3 个文件');
-    expect(fetchGitLogStatsMock).toHaveBeenCalledWith('/ws', undefined, ['ccc3330000000000000000000000000000000000']);
   });
 
   it('shows the empty state when the repo has no commits', async () => {

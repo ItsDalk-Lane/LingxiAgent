@@ -9,7 +9,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Overlay, Tooltip } from '../../ui';
 import { useStore } from '../../stores';
-import { fetchGitLog, fetchGitLogStats, type GitCommit, type GitCommitRef } from '../../utils/git-env-api';
+import { fetchGitLog, fetchGitLogStats, type GitCommit, type GitCommitRef, type GitLogStatsResponse } from '../../utils/git-env-api';
 import { computeGraphRows, graphLaneCount, type GraphLaneRow } from '../../utils/git-graph';
 import styles from './GitHistoryModal.module.css';
 
@@ -133,7 +133,7 @@ export function GitHistoryModal({ open, onClose, dir, agentId }: GitHistoryModal
   const [commits, setCommits] = useState<GitCommit[] | null>(null);
   const [loadState, setLoadState] = useState<'idle' | 'loading' | 'error'>('idle');
   // 统计两段加载：列表秒出渲染，变更统计按哈希分块并行补齐（服务端有缓存）
-  const [statsState, setStatsState] = useState<'idle' | 'pending' | 'loading' | 'done'>('idle');
+  const [statsState, setStatsState] = useState<'idle' | 'pending' | 'done'>('idle');
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
 
   const copyHash = async (hash: string) => {
@@ -169,12 +169,16 @@ export function GitHistoryModal({ open, onClose, dir, agentId }: GitHistoryModal
     if (!open || loadState !== 'idle' || statsState !== 'pending') return;
     if (commits == null || commits.length === 0) return;
     let cancelled = false;
-    setStatsState('loading');
+    // 注意：此处不得再 setState（曾用 'loading' 中间态，自身触发 cleanup 把
+    // cancelled 置 true，真实网络返回时结果被丢弃，统计永远合并不进来）。
     // 每块 100 个哈希（请求体约 4KB），并行发出，先到先渲染
     const chunks: string[][] = [];
     for (let i = 0; i < commits.length; i += 100) chunks.push(commits.slice(i, i + 100).map(c => c.hash));
     Promise.all(chunks.map(chunk =>
-      fetchGitLogStats(dir, agentId, chunk).catch(() => ({ isRepo: false, stats: {} }))
+      fetchGitLogStats(dir, agentId, chunk).catch((err: unknown) => {
+        console.warn('[git-history] 变更统计拉取失败（统计行隐藏）', err);
+        return { isRepo: false, stats: {} } satisfies GitLogStatsResponse;
+      })
     )).then(results => {
       if (cancelled) return;
       const merged = Object.assign({}, ...results.map(r => r.stats));
