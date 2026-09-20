@@ -1,35 +1,154 @@
 {
   "schemaVersion": 1,
-  "tag": "v0.1.40-experimental.1",
-  "version": "0.1.40-experimental.1",
-  "previousTag": "v0.1.39",
-  "generatedAt": "2026-09-18T13:29:56.000Z",
+  "tag": "v0.1.41",
+  "version": "0.1.41",
+  "previousTag": "v0.1.40-experimental.1",
+  "generatedAt": "2026-09-21T02:30:00.000Z",
   "noUserFacingChanges": false,
   "summary": {
-    "zh": "实验版本（不占用正式更新通道，仅进 beta 列车）：新增「编排工具」——让助手把一整串工具调用写成一段程序一次跑完：列目录、翻文件、并发搜索都可以在一个小剧本里完成，中间过程不进聊天记录，只在下方缩进列出每一步的成败与耗时，点开可看参数与完整结果；每个子步骤仍走与手动调用相同的逐项审批。这一版还带上了按需工具加载（常驻工具面瘦身约 76%）、工作区技能热更新与逐个开关、模型观测子标签页、回退检查点，以及 rg/fd/ast-grep 搜索组件随安装包内置；修复了代码运行台与语言服务工具在 macOS/Linux 上缺失的问题。",
-    "en": "Experimental build (beta train only, never Latest): adds the Orchestration tool — the assistant writes one program that runs a whole chain of tool calls (list, read, fan-out searches) in one shot; intermediate results stay out of the chat and appear as an indented list of sub-steps with status, timing, expandable arguments and full outputs, each sub-step still gated by the same per-call approvals as manual calls. Also bundled since 0.1.39: on-demand tool loading (~76% smaller resident tool surface), per-skill workspace hot toggles, observability sub-tabs, rollback checkpoints, rg/fd/ast-grep shipped inside the installer, and a fix restoring the code-runner and language-service tools on macOS/Linux."
+    "zh": "正式版：侧栏升级为按项目分组——对话按所属项目收拢，正在聊天的组自动展开，重启后回到上次工作的项目；Git 面板重做为「Git 图谱」，提交、推送、拉取在同一个界面按分支状态一键完成，还能让助手写提交信息。新增「会话地图」把长对话折叠成可纵览的轮次卡片图、应用级快捷键（可在设置里改键、带冲突检测）、上下文压缩双阈值（用量过半询问、超八成自动压缩并通知）。实验通道已验证的「编排工具」、按需工具加载、技能热更新与逐个开关、内置搜索组件（rg/fd/ast-grep）随本版进入正式通道。修复：换模型后第一轮思考/工具不进折叠卡、流式进行中思考/工具卡片点击时好时坏、只有置顶对话时侧栏误显示空白等。",
+    "en": "Stable release: the sidebar now groups conversations by project — the group you are chatting in stays expanded, and the app reopens on the project you worked on last. The Git panel is rebuilt as a unified Git Graph: commit, push and pull in one surface with a branch-aware primary action, plus assistant-written commit messages. New: a Conversation Map that turns long chats into a browsable card graph; app-wide keyboard shortcuts with a settings page and conflict detection; and dual compaction thresholds (ask at 50% usage, auto-compact at 80% with a notice). Features proven on the beta train — the Orchestration tool, on-demand tool loading, per-skill hot toggles, and bundled search binaries (rg/fd/ast-grep) — join the stable channel. Fixes include: first turn after a model switch leaving thoughts/tools unfolded, streaming cards being click-unreliable mid-run, and the pinned-only sidebar wrongly showing an empty state."
   },
   "counts": {
-    "feature": 3,
+    "feature": 6,
     "fix": 1,
-    "improvement": 3,
+    "improvement": 5,
     "migration": 0
   },
   "source": {
     "owner": "ItsDalk-Lane",
     "repo": "LingxiAgent",
-    "commitRange": "v0.1.39..59c131276",
-    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.40-experimental.1",
+    "commitRange": "v0.1.39..d6eaf6226",
+    "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.41",
     "releaseNotes": ""
   },
   "items": [
+    {
+      "id": "sidebar-project-groups",
+      "kind": "feature",
+      "importance": "high",
+      "title": {
+        "zh": "侧栏按项目分组，重启回到上次的项目",
+        "en": "Sidebar groups conversations by project and reopens on your last project"
+      },
+      "summary": {
+        "zh": "左侧对话列表按所属项目（工作台或目录）收拢成组：当前聊天的组自动展开、其余折叠，点组头即可切换；执行中的对话单独成组置顶提示；置顶对话跨项目常驻列表顶部。重启后自动恢复上次活跃的项目身份，不用再手动找回。",
+        "en": "The session list now collapses conversations into per-project groups: the group you are chatting in stays expanded while others fold, click a header to switch. Active runs get their own always-expanded group, and pinned conversations stay on top across projects. After a restart the sidebar reopens on the project you worked on last."
+      },
+      "details": [
+        {
+          "zh": "分叉出的子对话在主对话行内折叠展示，点主对话行展开/收起。",
+          "en": "Forked child conversations fold into their parent row and expand on click."
+        },
+        {
+          "zh": "删除会话时联动清理其快照侧车；共享同一仓库的快照目录在最后一个引用会话删除时才移除。",
+          "en": "Deleting a session also cleans its snapshot sidecars; shared snapshot repos are removed only when the last referencing session is deleted."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "d6eaf6226",
+          "title": "feat: 0.1.41 候选批次收口——侧栏项目分组 + Git 图谱面板 + 会话地图 + 快捷键系统 + 压缩双阈值"
+        }
+      ]
+    },
+    {
+      "id": "git-graph-panel",
+      "kind": "feature",
+      "importance": "high",
+      "title": {
+        "zh": "Git 图谱面板：提交、推送、拉取合一",
+        "en": "Git Graph panel: commit, push and pull in one place"
+      },
+      "summary": {
+        "zh": "Git 面板整体重做：头部是分支胶囊（点击切换/新建），主按钮跟随分支状态——无可推送时是「提交」，本地领先变「同步更改 ↑n」（推送），远程领先变「↓n」（拉取），双向分叉则先拉后推。右上角四角星可让助手生成提交信息；暂存、撤销暂存、amend、按文件丢弃都在行内完成。",
+        "en": "The Git panel is rebuilt: a branch pill up top for switching or creating branches, and a primary button that follows branch state — commit when there is nothing to push, Sync with ↑n to push when ahead, ↓n to pull when behind, and pull-then-push when diverged. A star button asks the assistant to draft the commit message; staging, unstaging, amending and per-file discard are all inline."
+      },
+      "details": [
+        {
+          "zh": "拉取仅自动衔接（fast-forward），分叉或本地脏区时给出明确指引而不是制造合并提交。",
+          "en": "Pull is fast-forward only; divergence or a dirty tree produces clear guidance instead of surprise merge commits."
+        }
+      ],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "d6eaf6226",
+          "title": "feat: 0.1.41 候选批次收口——侧栏项目分组 + Git 图谱面板 + 会话地图 + 快捷键系统 + 压缩双阈值"
+        }
+      ]
+    },
+    {
+      "id": "conversation-map",
+      "kind": "feature",
+      "importance": "medium",
+      "title": {
+        "zh": "会话地图：长对话的轮次总览",
+        "en": "Conversation Map: a turn-level overview of long chats"
+      },
+      "summary": {
+        "zh": "新增「会话地图」视图：把一段对话按轮次折叠成卡片图——每张卡片带问题摘要与回答要点，点击直达该轮；布局记忆在本地，重排后下次打开保持。超长对话不再只能靠滚动找回上下文。",
+        "en": "A new Conversation Map view folds a chat into a graph of turn cards — each card carries the question and answer highlights, click to jump to that turn. Layout is remembered locally. Long conversations no longer need pure scrolling to navigate."
+      },
+      "details": [],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "d6eaf6226",
+          "title": "feat: 0.1.41 候选批次收口——侧栏项目分组 + Git 图谱面板 + 会话地图 + 快捷键系统 + 压缩双阈值"
+        }
+      ]
+    },
+    {
+      "id": "keybindings-system",
+      "kind": "feature",
+      "importance": "medium",
+      "title": {
+        "zh": "应用级快捷键：可改键、带冲突检测",
+        "en": "App-wide keyboard shortcuts with remapping and conflict detection"
+      },
+      "summary": {
+        "zh": "常用动作（新对话、切会话、打开设置、切换模型等）有了全局快捷键；键位表在设置页集中管理，改键时实时提示冲突，主进程/服务端/渲染层共用同一份键位契约。",
+        "en": "Common actions (new chat, switch session, open settings, switch model, …) gain global shortcuts. The keymap is managed on a settings page with live conflict detection, and one shared contract feeds the main process, server and renderer."
+      },
+      "details": [],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "d6eaf6226",
+          "title": "feat: 0.1.41 候选批次收口——侧栏项目分组 + Git 图谱面板 + 会话地图 + 快捷键系统 + 压缩双阈值"
+        }
+      ]
+    },
+    {
+      "id": "compaction-dual-threshold",
+      "kind": "feature",
+      "importance": "medium",
+      "title": {
+        "zh": "上下文压缩双阈值：过半询问、超八成自动",
+        "en": "Dual compaction thresholds: ask at half, auto-compact past 80%"
+      },
+      "summary": {
+        "zh": "上下文用量越过 50% 时弹窗询问是否立即压缩（不打断进行中的回答）；到达 80% 则强制自动压缩并通知，硬截断兜底（85%）保持不变。压缩时机从「突然被截」变成「提前知情、可控」。",
+        "en": "When context usage crosses 50% a dialog offers to compact now (never interrupting a running reply); at 80% compaction runs automatically with a notice. The hard truncation backstop (85%) is unchanged. Compaction goes from a sudden cut to something expected and controllable."
+      },
+      "details": [],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "d6eaf6226",
+          "title": "feat: 0.1.41 候选批次收口——侧栏项目分组 + Git 图谱面板 + 会话地图 + 快捷键系统 + 压缩双阈值"
+        }
+      ]
+    },
     {
       "id": "ptc-run-tools",
       "kind": "feature",
       "importance": "high",
       "title": {
-        "zh": "编排工具：一段程序跑完一串工具调用",
-        "en": "Orchestration tool: one program runs a whole chain of tool calls"
+        "zh": "编排工具（实验通道转正）：一段程序跑完一串工具调用",
+        "en": "Orchestration tool (graduated from beta): one program runs a whole chain of tool calls"
       },
       "summary": {
         "zh": "助手可以把多步工作写成一段异步程序一次性执行：循环、并发、条件分支都可以，程序里 await 调用本会话的任意工具。中间结果留在沙箱里不占对话上下文，只有程序打印的内容与最终返回值回到聊天；每一步子调用单独走权限审批，与手动调用同权。",
@@ -37,16 +156,8 @@
       },
       "details": [
         {
-          "zh": "聊天里编排工具行下方缩进列出每一步：工具名、成败、耗时，点开可看参数与完整结果，与正常调用完全同源。",
-          "en": "Below the orchestration row, each sub-step is listed indented with tool name, status and timing, expanding to arguments and full output exactly like a normal call."
-        },
-        {
-          "zh": "程序在无文件系统与网络访问的隔离沙箱中执行，墙钟 10 分钟、内存 256MB、输出 128KB、并发 8 路封顶。",
-          "en": "The program runs in an isolated sandbox with no filesystem or network access, capped at 10 minutes wall clock, 256 MB memory, 128 KB output and 8 concurrent sub-calls."
-        },
-        {
-          "zh": "长任务的中间过程不再刷屏：一次编排内部可以递归翻目录、并发搜索，只占对话一次调用。",
-          "en": "Long tasks stop flooding the transcript: one orchestration can walk directories and fan out searches internally while occupying a single conversation call."
+          "zh": "聊天里编排工具行下方缩进列出每一步：工具名、成败、耗时，点开可看参数与完整结果。",
+          "en": "Below the orchestration row each sub-step is listed indented with tool name, status and timing, expandable to arguments and full outputs."
         }
       ],
       "sources": [
@@ -58,16 +169,37 @@
       ]
     },
     {
-      "id": "on-demand-tool-loading",
+      "id": "streaming-interaction-fixes",
+      "kind": "fix",
+      "importance": "high",
+      "title": {
+        "zh": "修一批交互时好时坏：流式点击、换模型、置顶空态",
+        "en": "Fixes for intermittent interactions: streaming clicks, model switch, pinned-only empty state"
+      },
+      "summary": {
+        "zh": "①流式进行中「思考/工具」卡片点击时好时坏：追底滚动会在按住时把卡片从光标下带走（浏览器视为未命中），且工具组卡片在成员变化时整组重建清掉展开状态——现在按住即冻结滚动、组身份锚定首成员不再换 key。②换模型后第一轮思考/工具不进折叠卡：切换落在轮间空档时清掉四本「进行中」账本。③只有置顶对话时侧栏误显示空白并隐藏置顶条。",
+        "en": "① Thinking/tool cards mid-run were click-unreliable: auto-scroll dragged cards out from under the pointer (counted as a miss) and tool-group cards rebuilt on member changes, wiping expanded state — scrolling now freezes while pressed and group identity anchors to the first member. ② The first turn after a model switch left thoughts/tools unfolded; settlement now clears the in-flight ledgers in the between-turns window. ③ A pinned-only sidebar wrongly showed an empty state that hid the pinned strip."
+      },
+      "details": [],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "d6eaf6226",
+          "title": "feat: 0.1.41 候选批次收口——侧栏项目分组 + Git 图谱面板 + 会话地图 + 快捷键系统 + 压缩双阈值"
+        }
+      ]
+    },
+    {
+      "id": "on-demand-tools-and-bundled-bins",
       "kind": "improvement",
       "importance": "high",
       "title": {
-        "zh": "按需工具加载：常驻工具面瘦身约 76%",
-        "en": "On-demand tool loading: resident tool surface shrinks ~76%"
+        "zh": "按需工具加载 + 内置搜索组件（实验通道转正）",
+        "en": "On-demand tool loading and bundled search binaries (graduated from beta)"
       },
       "summary": {
-        "zh": "每轮对话常驻的工具清单收缩到最核心的四个（读、写、改、执行命令），其余全部进目录按需取用：助手先搜目录、看说明再调用。直载面从约 37KB 降到 8.9KB，长对话更省、缓存更稳。",
-        "en": "The per-turn resident tool list shrinks to the core four (read, write, edit, exec); everything else moves into a searchable catalog the assistant consults on demand. The resident surface drops from ~37KB to 8.9KB, saving tokens and stabilizing caching on long conversations."
+        "zh": "常驻工具面瘦身约 76%，不常用的工具按需装载；rg/fd/ast-grep 搜索组件随安装包内置，Windows 子进程退出竞态与 CI 抓取限流已在前置修复中根治。",
+        "en": "The always-on tool surface shrinks by ~76% with rarely used tools loaded on demand; rg/fd/ast-grep ship inside the installer, with the Windows subprocess race and CI fetch rate limits already fixed in prior patches."
       },
       "details": [],
       "sources": [
@@ -75,20 +207,25 @@
           "type": "commit",
           "ref": "6282cf35b",
           "title": "feat: 工作区批量收口——omp 迁移 14 件+环境依赖系统+按需工具加载+观测子标签+回退检查点"
+        },
+        {
+          "type": "commit",
+          "ref": "34a70c0df",
+          "title": "fix: 二进制抓取全链转进程内 fetch——根治 Windows 子进程退出竞态崩溃"
         }
       ]
     },
     {
-      "id": "workspace-skill-hot-toggle",
-      "kind": "feature",
+      "id": "workspace-skills-hot-toggle",
+      "kind": "improvement",
       "importance": "medium",
       "title": {
-        "zh": "工作区技能热更新与逐个开关",
-        "en": "Workspace skills hot-reload with per-skill toggles"
+        "zh": "工作区技能热更新与逐个开关（实验通道转正）",
+        "en": "Workspace skill hot reload with per-skill toggles (graduated from beta)"
       },
       "summary": {
-        "zh": "项目自带的技能改动后无需重启即生效；每个技能可以单独关闭，关掉总闸时相关条目一并隐藏。",
-        "en": "Project-bundled skills reload without a restart, and each one can be toggled off individually; closing the master switch hides them all."
+        "zh": "工作区技能改动即时生效，不用重启；每个技能可单独开关，关掉的技能不再进提示词也不占工具面。",
+        "en": "Workspace skills reload instantly without a restart, and each skill has its own toggle — disabled skills leave both the prompt and the tool surface."
       },
       "details": [],
       "sources": [
@@ -100,79 +237,58 @@
       ]
     },
     {
-      "id": "run-code-lsp-registration-fix",
-      "kind": "fix",
-      "importance": "medium",
-      "title": {
-        "zh": "修复：代码运行台与语言服务工具在 macOS/Linux 上缺失",
-        "en": "Fix: code-runner and language-service tools missing on macOS/Linux"
-      },
-      "summary": {
-        "zh": "工具装配清单此前只在 Windows 分支挂载这两个工具（还重复挂了一次），macOS 与 Linux 会话完全拿不到它们；现已三平台一致。",
-        "en": "The assembly list only wired these two tools on Windows (twice, deduped silently); macOS and Linux sessions never got them. All three platforms now match."
-      },
-      "details": [],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "59c131276",
-          "title": "feat: PTC 程序化工具调用（run_tools）+ run_code/lsp 注册修复 + 内置二进制批次收口"
-        }
-      ]
-    },
-    {
-      "id": "bundled-search-binaries",
-      "kind": "improvement",
-      "importance": "medium",
-      "title": {
-        "zh": "搜索组件随安装包内置",
-        "en": "Search binaries ship inside the installer"
-      },
-      "summary": {
-        "zh": "ripgrep、fd、ast-grep 改为随安装包分发，不再依赖用户机器上是否恰好装了它们；代码搜索与结构化查找开箱即用。",
-        "en": "ripgrep, fd and ast-grep now ship with the installer instead of relying on the user's machine; code search and structural queries work out of the box."
-      },
-      "details": [],
-      "sources": [
-        {
-          "type": "commit",
-          "ref": "59c131276",
-          "title": "feat: PTC 程序化工具调用（run_tools）+ run_code/lsp 注册修复 + 内置二进制批次收口"
-        }
-      ]
-    },
-    {
-      "id": "observability-subtabs",
+      "id": "turn-edited-files-card",
       "kind": "improvement",
       "importance": "low",
       "title": {
-        "zh": "模型观测页拆分子标签与用量图表",
-        "en": "Observability page gains sub-tabs and usage charts"
+        "zh": "轮次编辑文件卡",
+        "en": "Per-turn edited-files card"
       },
       "summary": {
-        "zh": "观测页拆成三个子标签，用量页常驻四张图表与指标卡；「推理 0 tok」的显示错误也一并修复。",
-        "en": "The observability page splits into three sub-tabs with four standing charts and metric cards on the usage tab; the \"0 reasoning tokens\" display bug is fixed too."
+        "zh": "每轮回答下方汇总该轮实际改动的文件清单，点击即看 diff，改了什么一目了然。",
+        "en": "Each reply ends with a card listing the files it actually edited, with diffs one click away."
       },
       "details": [],
       "sources": [
         {
           "type": "commit",
-          "ref": "6282cf35b",
-          "title": "feat: 工作区批量收口——omp 迁移 14 件+环境依赖系统+按需工具加载+观测子标签+回退检查点"
+          "ref": "d6eaf6226",
+          "title": "feat: 0.1.41 候选批次收口——侧栏项目分组 + Git 图谱面板 + 会话地图 + 快捷键系统 + 压缩双阈值"
+        }
+      ]
+    },
+    {
+      "id": "pi-sdk-0-86",
+      "kind": "improvement",
+      "importance": "low",
+      "title": {
+        "zh": "pi SDK 0.84.1 → 0.86.0",
+        "en": "pi SDK 0.84.1 → 0.86.0"
+      },
+      "summary": {
+        "zh": "内核 SDK 升级到 0.86.0（会话/权限/压缩契约随动），Windows 进程树清理改走可信的 System32 taskkill，CLI 闭包与开放边界清单已随依赖重算。",
+        "en": "The core SDK moves to 0.86.0 with session/permission/compaction contract updates; Windows process-tree cleanup now uses the trusted System32 taskkill, and the CLI closure and open-boundary manifests were recomputed for the dependency bump."
+      },
+      "details": [],
+      "sources": [
+        {
+          "type": "commit",
+          "ref": "d6eaf6226",
+          "title": "feat: 0.1.41 候选批次收口——侧栏项目分组 + Git 图谱面板 + 会话地图 + 快捷键系统 + 压缩双阈值"
         }
       ]
     },
     {
       "id": "rollback-checkpoints",
-      "kind": "feature",
+      "kind": "improvement",
       "importance": "low",
       "title": {
-        "zh": "回退检查点",
-        "en": "Rollback checkpoints"
+        "zh": "回退检查点（实验通道转正）",
+        "en": "Rollback checkpoints (graduated from beta)"
       },
       "summary": {
-        "zh": "重要的文件修改前自动留下检查点，可以从检查点回退而不必手动翻找旧版本。",
-        "en": "Checkpoints are captured before important file changes, so you can roll back without hunting for old copies by hand."
+        "zh": "工具批量改动前自动留检查点，出问题可整轮回退；配合观测子标签页，回退前后各步可追溯。",
+        "en": "Checkpoints are captured before bulk tool edits so a whole turn can roll back; the observability sub-tabs keep every step traceable before and after."
       },
       "details": [],
       "sources": [
