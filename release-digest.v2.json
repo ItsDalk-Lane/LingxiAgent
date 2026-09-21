@@ -3,6 +3,127 @@
   "entries": [
     {
       "schemaVersion": 1,
+      "tag": "v0.1.42",
+      "version": "0.1.42",
+      "previousTag": "v0.1.41",
+      "generatedAt": "2026-09-21T07:20:00.000Z",
+      "noUserFacingChanges": false,
+      "summary": {
+        "zh": "Git 入口迁到工作现场：输入框上方常驻当前分支胶囊，点开即可切换分支、新建工作树/分支、查看提交记录；工作台首行新增「变更 +n -m」按钮直达源代码管理面板，原「运行信息」弹窗里的环境信息卡退役。会话谱系上限两层，超限明确拒绝并提示，历史更深层级收拢展示，谱系环不再让会话从列表消失。修复打开会话时 Git 变更统计因加载中间态被清零的问题；运行信息默认展开、轮次编辑文件卡更紧凑。",
+        "en": "Git entries move to where you work: a branch pill above the composer handles checkout, new branches and worktrees plus commit history, and a \"Changes +n −m\" button on the desk opens source control — the environment card in the run-info popover is retired. Session lineage is capped at two derived levels with explicit rejection beyond that, historical deeper items fold into the list, and lineage cycles no longer make sessions vanish. Fixes Git change stats being dropped by a loading intermediate state; run info starts expanded and the per-turn edited-files card gets tighter."
+      },
+      "counts": {
+        "feature": 2,
+        "fix": 1,
+        "improvement": 1,
+        "migration": 0
+      },
+      "source": {
+        "owner": "ItsDalk-Lane",
+        "repo": "LingxiAgent",
+        "commitRange": "v0.1.41..cfa1f5fe8",
+        "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.42",
+        "releaseNotes": ""
+      },
+      "items": [
+        {
+          "id": "git-entry-relocation",
+          "kind": "feature",
+          "importance": "high",
+          "title": {
+            "zh": "Git 入口迁到工作现场：输入框分支下拉 + 工作台变更按钮",
+            "en": "Git moves to where you work: a branch picker above the composer and a changes button on the desk"
+          },
+          "summary": {
+            "zh": "原「运行信息」弹窗里的环境信息卡退役，Git 操作入口分散到工作现场：输入框上方常驻一行 IDE 风分支胶囊，显示当前分支，点开合并管理分支与工作树（检出、新建分支、新建工作树、查看提交记录）；工作台首行新增「变更 +n -m」按钮，点击直达源代码管理面板。非 Git 目录、探测中或失败不渲染，不占位置。",
+            "en": "The environment card inside the run-info popover is retired and its Git entries move to where you work: a slim branch pill above the composer shows the current branch and opens a combined branch & worktree menu (checkout, new branch, new worktree, commit history), while the desk toolbar gains a \"Changes +n −m\" button that opens the source-control panel. Nothing renders for non-Git folders, while probing, or on failure."
+          },
+          "details": [
+            {
+              "zh": "三处入口共享同一次探测（use-git-env：同目录只探测一次，切换分支/提交/推送后自动刷新）；从菜单新建工作树会注册成工作台并落在新会话草稿上。",
+              "en": "All entries share one probe per directory (use-git-env), refreshed automatically after branch switches, commits and pushes; creating a worktree from the menu registers it as a workspace and lands on a fresh session draft."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "cfa1f5fe8",
+              "title": "feat: Git 入口迁移（分支下拉 + 变更按钮）与会话谱系两层深度上限"
+            }
+          ]
+        },
+        {
+          "id": "session-lineage-depth-limit",
+          "kind": "feature",
+          "importance": "medium",
+          "title": {
+            "zh": "会话谱系上限两层，超限明确拒绝",
+            "en": "Session lineage capped at two derived levels with explicit rejection"
+          },
+          "summary": {
+            "zh": "对话谱系最多主对话 + 子 + 孙两层：超限时创建或派生会被明确拒绝并给出可读提示，不再无限套娃，也不静默改挂别的父级；列表展示同口径，历史遗留的更深层级收拢到第一层祖先名下，保证数据在列表里就能看见。同时修复谱系环——互相挂载的会话此前会从列表双双消失。",
+            "en": "Session lineage now allows at most two derived levels (main + child + grandchild): deeper attempts are rejected with a clear message instead of nesting forever or silently re-parenting. The list renders the same two-level shape, historical deeper items fold under their first-level ancestor so nothing disappears, and lineage cycles no longer make mutually-parented sessions vanish from the list."
+          },
+          "details": [
+            {
+              "zh": "折叠组头时，正在聊的子对话与其链上父行仍会以面包屑方式显形，不会点了父级就找不到当前会话。",
+              "en": "When a group header is folded, the conversation you are in and its ancestor rows still show breadcrumb-style, so the current session never disappears after folding a parent."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "cfa1f5fe8",
+              "title": "feat: Git 入口迁移（分支下拉 + 变更按钮）与会话谱系两层深度上限"
+            }
+          ]
+        },
+        {
+          "id": "git-history-stats-loading-fix",
+          "kind": "fix",
+          "importance": "medium",
+          "title": {
+            "zh": "修复 Git 变更统计在加载中间态被清零",
+            "en": "Fix Git change stats being dropped by a loading intermediate state"
+          },
+          "summary": {
+            "zh": "打开会话时 Git 变更统计偶发显示为空：loading 中间态触发旧数据的 cleanup，已取回的统计随之被丢弃。中间态不再触发清理，统计稳定显示。",
+            "en": "Git change statistics could intermittently show empty when opening a session: a loading intermediate state triggered cleanup of already-fetched stats. The intermediate state no longer triggers cleanup, so stats stay put."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "be2941ef0",
+              "title": "fix(git-history): 修复变更统计因 loading 中间态触发 cleanup 而丢失的问题"
+            }
+          ]
+        },
+        {
+          "id": "run-info-default-expanded",
+          "kind": "improvement",
+          "importance": "low",
+          "title": {
+            "zh": "运行信息默认展开，轮次文件卡更紧凑",
+            "en": "Run info starts expanded; the per-turn edited-files card gets tighter"
+          },
+          "summary": {
+            "zh": "右侧工作区的 Workflow 卡默认展开，打开运行信息即见内容，无需再点一下；轮次编辑文件卡样式与结构精简，观感更紧凑。",
+            "en": "The Workflow card in the right workspace starts expanded so its content is visible immediately, and the per-turn edited-files card gets a leaner, tighter layout."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "cfa1f5fe8",
+              "title": "feat: Git 入口迁移（分支下拉 + 变更按钮）与会话谱系两层深度上限"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
       "tag": "v0.1.41",
       "version": "0.1.41",
       "previousTag": "v0.1.40-experimental.1",
