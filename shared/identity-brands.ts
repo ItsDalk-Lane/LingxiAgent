@@ -13,8 +13,12 @@
  *   - ModelCallId  `mc_`    model-call-identity（本仓唯一铸造厂）
  *   - ModelAttemptId `ma_`  同上
  *   - ModelTraceId `mt_`    ModelTraceScope（lib/llm/model-trace-scope.ts）
+ *   - TaskId       `task_`  task-identity（lib/tasks/task-identity.ts，P02 统一铸造厂）
  *   - ToolCallId            Provider 分配（形状随供应商：tc_/call_/…），守卫只
  *                           要求非空字符串，不伪造前缀约束。
+ *
+ * TaskId 品牌只约束 P02 之后新铸造的 ID；历史记录中的旧格式 taskId
+ * （subagent-/workflow-/rewind-/speech-/裸 ts36）不迁移、不重铸，按原值读。
  */
 
 export type Brand<T, B extends string> = T & { readonly __brand: B };
@@ -23,6 +27,7 @@ export type SessionId = Brand<string, "SessionId">;
 export type ModelCallId = Brand<string, "ModelCallId">;
 export type ModelAttemptId = Brand<string, "ModelAttemptId">;
 export type ModelTraceId = Brand<string, "ModelTraceId">;
+export type TaskId = Brand<string, "TaskId">;
 export type ToolCallId = Brand<string, "ToolCallId">;
 
 // 前缀 + 至少一段 [a-z0-9] 段（形态目标：mc_{ts36}_{seq36}_{rand6} 等）。
@@ -31,6 +36,9 @@ const SESSION_ID_PATTERN = /^sess_[a-z0-9]+(?:_[a-z0-9]+)*$/;
 const MODEL_CALL_ID_PATTERN = /^mc_[a-z0-9]+(?:_[a-z0-9]+)*$/;
 const MODEL_ATTEMPT_ID_PATTERN = /^ma_[a-z0-9]+(?:_[a-z0-9]+)*$/;
 const MODEL_TRACE_ID_PATTERN = /^mt_[a-z0-9]+(?:_[a-z0-9]+)*$/;
+// task_ 后跟 kind 段（task_subagent_…/task_media_…）；刻意不复用旧格式前缀
+// （subagent- 等），使新铸造 ID 与历史记录天然可区分。
+const TASK_ID_PATTERN = /^task_[a-z0-9]+(?:_[a-z0-9]+)*$/;
 
 function brandedString<T extends Brand<string, string>>(
   value: unknown,
@@ -53,6 +61,10 @@ export function asModelAttemptId(value: unknown): ModelAttemptId | null {
 
 export function asModelTraceId(value: unknown): ModelTraceId | null {
   return brandedString<ModelTraceId>(value, MODEL_TRACE_ID_PATTERN);
+}
+
+export function asTaskId(value: unknown): TaskId | null {
+  return brandedString<TaskId>(value, TASK_ID_PATTERN);
 }
 
 export function asToolCallId(value: unknown): ToolCallId | null {
@@ -89,6 +101,10 @@ export function requireModelAttemptId(value: unknown): ModelAttemptId {
 
 export function requireModelTraceId(value: unknown): ModelTraceId {
   return requireBranded("ModelTraceId (mt_…)", value, asModelTraceId);
+}
+
+export function requireTaskId(value: unknown): TaskId {
+  return requireBranded("TaskId (task_…)", value, asTaskId);
 }
 
 export function requireToolCallId(value: unknown): ToolCallId {

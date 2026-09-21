@@ -11784,6 +11784,33 @@
       "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement); server/routes/chat.ts (import-statement)."
     },
     {
+      "path": "lib/tasks/task-identity.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/rewind-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/subagent-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/workflow-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/media/image-task-runner.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/rewind-tool.ts (import-statement); lib/tools/subagent-tool.ts (import-statement); lib/tools/workflow-tool.ts (import-statement); +1 more importer(s)."
+    },
+    {
       "path": "lib/terminal/node-pty-backend.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -105325,9 +105352,14 @@
           "root": "server-bootstrap",
           "from": "lib/llm/model-call-identity.ts",
           "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tasks/task-identity.ts",
+          "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-identity.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-identity.ts (import-statement); lib/tasks/task-identity.ts (import-statement)."
     },
     {
       "path": "shared/image-mime.ts",
@@ -107146,9 +107178,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 8945,
+    "totalFiles": 8946,
     "byInputType": {
-      "source-graph": 831,
+      "source-graph": 832,
       "runtime-asset": 11,
       "nft-runtime-trace": 8103
     }

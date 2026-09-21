@@ -165,6 +165,41 @@ describe("runAgentSession teardown", () => {
     expect(fs.existsSync(sessionFile)).toBe(false);
   });
 
+  it("P02-A12：原任务失败且 dispose 抛错 → AggregateError 保留原失败并附清理失败，不覆盖成 success", async () => {
+    const cwd = path.join(rootDir, "cwd");
+    fs.mkdirSync(cwd, { recursive: true });
+    const agent = makeAgent(rootDir);
+    const engine = makeEngine(agent, cwd);
+    const sessionFile = path.join(agent.agentDir, "sessions", "temp", "s-a12-cleanup-fail.jsonl");
+    fs.mkdirSync(path.dirname(sessionFile), { recursive: true });
+    fs.writeFileSync(sessionFile, "", "utf-8");
+    sessionManagerCreateMock.mockReturnValue({ getSessionFile: () => sessionFile });
+
+    const session = {
+      prompt: vi.fn(async () => { throw new Error("provider stream failed"); }),
+      subscribe: vi.fn(() => () => {}),
+      dispose: vi.fn(() => { throw new Error("dispose exploded"); }),
+      sessionManager: { getSessionFile: () => sessionFile },
+      extensionRunner: { hasHandlers: vi.fn(() => false) },
+    };
+    createAgentSessionMock.mockResolvedValue({ session });
+
+    let caught = null;
+    try {
+      await runAgentSession("agent-a", [{ text: "hello", capture: true }], { engine });
+    } catch (err) {
+      caught = err;
+    }
+
+    // 原失败与清理失败都保留：既不是静默成功，也不互相覆盖。
+    expect(caught).toBeInstanceOf(AggregateError);
+    expect((caught as AggregateError).errors.map((e) => e.message)).toEqual([
+      "provider stream failed",
+      "dispose exploded",
+    ]);
+    expect(session.dispose).toHaveBeenCalledOnce();
+  });
+
   it("hub 临时 session tools follow the master memory switch instead of session memory state", async () => {
     const cwd = path.join(rootDir, "cwd");
     fs.mkdirSync(cwd, { recursive: true });

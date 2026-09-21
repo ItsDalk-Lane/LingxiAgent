@@ -657,3 +657,113 @@ describe("P01 headless vertical slice: witness provider → WS prompt → real r
     }
   }, 300000);
 });
+
+// ---------------------------------------------------------------------------
+// Part 5 — P02 server restart cycle (P02-T05/T06; scenario P02-A15).
+//
+// Controlled temp HOME pre-seeded with a pending background-task record, then
+// a real start → second-writer refusal (same-home mutex) → SIGTERM stop →
+// real restart. Proves: pending records do not crash startup; no second
+// writer shares the HOME; the stopped port is released (no orphan listener);
+// server-info.json stale lock self-cleans and the pending record survives the
+// restart untouched (recovery rules reproducible; unit-level recovering
+// semantics covered by tests/p02-recovery-restart.test.ts).
+// ---------------------------------------------------------------------------
+
+describe("composition restart cycle: pending record + second-writer refusal + clean rebind (P02-A15)", () => {
+  function spawnRestartCycleServer(lingxiHome: string) {
+    return spawn(process.execPath, ["server/bootstrap.ts"], {
+      cwd: root,
+      env: {
+        ...process.env,
+        LINGXI_HOME: lingxiHome,
+        LINGXI_PORT: "0",
+        LINGXI_ROOT: root,
+        LINGXI_SERVER_ENTRY: path.join(root, "server", "main-full.ts"),
+        LINGXI_CREATE_STARTUP_SESSION: "0",
+      },
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+  }
+
+  async function assertHealthOk(port: number, token: string) {
+    const res = await fetch(`http://127.0.0.1:${port}/api/health`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(res.status).toBe(200);
+    const body: any = await res.json();
+    expect(body.status).toBe("ok");
+  }
+
+  async function assertPortRefused(port: number) {
+    await expect(
+      fetch(`http://127.0.0.1:${port}/api/health`, { headers: { Authorization: "Bearer x" } }),
+    ).rejects.toThrow();
+  }
+
+  it("starts with a pending task record, refuses a second writer, releases the port on SIGTERM, and restarts cleanly", async () => {
+    const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-p02-restart-"));
+    const serverInfoPath = path.join(lingxiHome, "server-info.json");
+    const pendingTasksPath = path.join(lingxiHome, ".ephemeral", "plugin-tasks.json");
+
+    fs.mkdirSync(path.dirname(pendingTasksPath), { recursive: true });
+    const pendingTaskId = "task_probe_pending_1";
+    fs.writeFileSync(pendingTasksPath, JSON.stringify({
+      tasks: [{
+        taskId: pendingTaskId,
+        type: "p02-restart-probe",
+        parentSessionId: null,
+        parentSessionPath: null,
+        status: "running",
+        attempt: 1,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      }],
+      schedules: [],
+    }, null, 2), "utf8");
+
+    const first = spawnRestartCycleServer(lingxiHome);
+    let firstStderr = "";
+    first.stderr.on("data", (chunk) => { firstStderr += chunk; });
+    try {
+      const info1 = await waitForServerInfo(serverInfoPath, first);
+      await assertHealthOk(info1.port, info1.token);
+
+      const second = spawnRestartCycleServer(lingxiHome);
+      let secondStderr = "";
+      second.stderr.on("data", (chunk) => { secondStderr += chunk; });
+      await waitForExit(second, 30000);
+      expect(second.exitCode).toBe(1);
+
+      first.kill("SIGTERM");
+      await waitForExit(first, 30000);
+      expect(first.exitCode !== null || first.signalCode !== null).toBe(true);
+      const port1 = info1.port;
+      await assertPortRefused(port1);
+
+      const third = spawnRestartCycleServer(lingxiHome);
+      let thirdStderr = "";
+      third.stderr.on("data", (chunk) => { thirdStderr += chunk; });
+      try {
+        const info3 = await waitForServerInfo(serverInfoPath, third);
+        await assertHealthOk(info3.port, info3.token);
+        const persisted = JSON.parse(fs.readFileSync(pendingTasksPath, "utf8"));
+        const restored = (persisted.tasks || []).find((t: any) => t.taskId === pendingTaskId);
+        expect(restored).toMatchObject({ taskId: pendingTaskId, status: "running" });
+        if (info3.port !== port1) await assertPortRefused(port1);
+      } finally {
+        third.kill("SIGTERM");
+        await waitForExit(third, 30000);
+      }
+    } finally {
+      if (first.exitCode === null && first.signalCode === null) {
+        first.kill("SIGKILL");
+        await waitForExit(first, 15000);
+      }
+      await new Promise<void>((resolve) => fs.rm(lingxiHome, { ...TEMP_HOME_RM_OPTIONS }, () => resolve()));
+      if (process.env.LINGXI_TEST_DEBUG) {
+        process.stderr.write(firstStderr);
+      }
+    }
+  }, 240000);
+});

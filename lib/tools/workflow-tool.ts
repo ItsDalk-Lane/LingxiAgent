@@ -1,6 +1,7 @@
 // lib/tools/workflow-tool.ts
 import path from "node:path";
 import { Type } from "../pi-sdk/index.ts";
+import { mintTaskId } from "../tasks/task-identity.ts";
 import { t } from "../i18n.ts";
 import { runWorkflowScript } from "../workflow/sandbox.ts";
 import { extractMeta } from "../workflow/meta.ts";
@@ -204,7 +205,7 @@ export function createWorkflowTool(deps) {
         return _syncRun(deps, params, meta, { agentId, cwd, parentSessionPath, parentPermissionMode, parentFolderScope });
       }
 
-      const taskId = `workflow-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const taskId = mintTaskId("workflow");
       const summary = meta.name;
       const hub = deps.getActivityHub?.();
       const startedAt = Date.now();

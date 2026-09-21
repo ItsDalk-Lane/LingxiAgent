@@ -10,7 +10,7 @@ export function registerTaskRegistryBusHandlers(eventBus, taskRegistry) {
     return { ok: true };
   });
   eventBus.handle("task:register", ({ taskId, type, parentSessionPath, parentSessionId, parentSessionRef, sessionId, sessionRef, legacySessionPath, meta, pluginId, agentId, persist }) => {
-    taskRegistry.register(taskId, {
+    const task = taskRegistry.register(taskId, {
       type,
       parentSessionPath,
       parentSessionId,
@@ -23,16 +23,18 @@ export function registerTaskRegistryBusHandlers(eventBus, taskRegistry) {
       agentId,
       persist,
     });
-    return { ok: true };
+    // 返回含 attempt 的任务快照：调用方捕获本次执行的 attempt，终态回传
+    // expectedAttempt 以启用迟到回调栅栏（P02-T01/A03）。
+    return { ok: true, task };
   });
-  eventBus.handle("task:update", ({ taskId, ...patch }) => {
-    return { ok: true, task: taskRegistry.update(taskId, patch) };
+  eventBus.handle("task:update", ({ taskId, expectedAttempt, ...patch }) => {
+    return { ok: true, task: taskRegistry.update(taskId, patch, { expectedAttempt }) };
   });
-  eventBus.handle("task:complete", ({ taskId, result }) => {
-    return { ok: true, task: taskRegistry.complete(taskId, result) };
+  eventBus.handle("task:complete", ({ taskId, result, expectedAttempt }) => {
+    return { ok: true, task: taskRegistry.complete(taskId, result, { expectedAttempt }) };
   });
-  eventBus.handle("task:fail", ({ taskId, reason, error }) => {
-    return { ok: true, task: taskRegistry.fail(taskId, reason ?? error) };
+  eventBus.handle("task:fail", ({ taskId, reason, error, expectedAttempt }) => {
+    return { ok: true, task: taskRegistry.fail(taskId, reason ?? error, { expectedAttempt }) };
   });
   eventBus.handle("task:remove", ({ taskId }) => {
     taskRegistry.remove(taskId);

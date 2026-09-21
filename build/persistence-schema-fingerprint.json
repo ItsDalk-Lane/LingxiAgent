@@ -670,7 +670,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:2024cc33325ea1a1818950fcbf508b6519b5eedd3611ef5046148ff0316ee90a",
+  "payloadFingerprint": "sha256:6ddf05a32209d9af966fe55401f65791edadf06bfa9611815f1010fccd7787ee",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3412,8 +3412,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "新增 conversation-map 布局存储（新文件 conversation-map.json，纯增量注册）；workspace-snapshots 增加会话删除联动清理（读取既有侧车形状，不改写字段）；checkpoint 侧车写入改原子写（tmp+rename，落盘内容不变）。既有持久化形状全部不变。",
-    "payloadFingerprint": "sha256:2024cc33325ea1a1818950fcbf508b6519b5eedd3611ef5046148ff0316ee90a"
+    "compatibilityReason": "P02-T01 TaskRegistry attempt 字段为兼容新增：旧记录缺 attempt 按 1 读（taskAttempt 归一化），未知字段原样保留；无删除/重命名/类型变化；恢复/栅栏语义见 docs/refactor-2026/P02/IDENTITY_CONTRACT.md §3-4",
+    "payloadFingerprint": "sha256:6ddf05a32209d9af966fe55401f65791edadf06bfa9611815f1010fccd7787ee"
   },
   "schemas": [
     {
@@ -4341,7 +4341,7 @@
       "contract": "TaskRegistry task/schedule normalization and persistence serializer",
       "kind": "runtime-contract",
       "module": "lib/task-registry.ts",
-      "sourceHash": "sha256:c61d9b6038a8f21aa4d8c66a1efd2d4c5830b2fb9a3c74115780923387e9d971",
+      "sourceHash": "sha256:4b9a4f644e0b191c19c755bc0c17c0c839eccd687a0f5722e4b5ef1ae9a7c41d",
       "storeId": "plugin-task-registry"
     },
     {

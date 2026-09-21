@@ -581,6 +581,7 @@
     "lib/subagent-run-store.ts",
     "lib/subagent-thread-store.ts",
     "lib/task-registry.ts",
+    "lib/tasks/task-identity.ts",
     "lib/terminal/node-pty-backend.ts",
     "lib/terminal/shell-resolver.ts",
     "lib/terminal/terminal-session-manager.ts",

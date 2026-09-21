@@ -11,6 +11,7 @@
 
 import { Type } from "../pi-sdk/index.ts";
 import path from "node:path";
+import { mintTaskId } from "../tasks/task-identity.ts";
 import { t } from "../i18n.ts";
 import { getToolSessionCwd, getToolSessionPath } from "./tool-session.ts";
 import { resolveAgentParam } from "./agent-id-resolver.ts";
@@ -53,7 +54,7 @@ function directThreadSnapshot(thread) {
 }
 
 function taskIdForSubagentRun() {
-  return `subagent-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  return mintTaskId("subagent");
 }
 
 function errorResult(text, details = {}) {

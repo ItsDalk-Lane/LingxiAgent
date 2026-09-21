@@ -11,6 +11,11 @@ const log = createModuleLogger("task-registry");
  * Runtime handlers stay in memory because they are plugin functions. Task and
  * schedule metadata can be persisted so the host can show diagnostics and let
  * plugins recover work after restart.
+ *
+ * Attempt 栅栏（P02-T01/A03）：同一业务 taskId 允许在终态后重新 register 承接
+ * 下一次执行（合法 task 复用）；每次复用递增 task.attempt。终态写入方
+ * （complete/fail/update）可携带 expectedAttempt，attempt 不匹配的迟到回调被
+ * 拒绝（返回 null、不落盘），防止上一次执行的迟到结果覆盖下一次执行的状态。
  */
 
 const ACTIVE_STATUSES = new Set(["pending", "running", "paused", "blocked", "recovering"]);
@@ -127,6 +132,7 @@ export class TaskRegistry {
       sessionRef,
       legacySessionPath,
     }, this._getSessionIdForPath);
+    const reactivating = !!existing && FINAL_STATUSES.has(existing.status);
     const task = {
       taskId: id,
       type: taskType,
@@ -139,25 +145,30 @@ export class TaskRegistry {
       progress: existing?.progress || null,
       status: normalizeStatus(existing?.status, "running"),
       aborted: Boolean(existing?.aborted),
+      attempt: taskAttempt(existing) + (reactivating ? 1 : 0),
       createdAt: existing?.createdAt || now,
       updatedAt: now,
       persist: persist !== false,
     };
     task.meta = { ...task.meta, ...objectOrEmpty(meta) };
-    if (FINAL_STATUSES.has(task.status)) {
+    if (reactivating) {
+      // 合法 task 复用：终态清零进入新一次执行；attempt 已递增，旧 attempt 的
+      // 迟到终态回调会被 complete/fail/update 的 expectedAttempt 栅栏拒绝。
       task.status = "running";
       task.aborted = false;
       delete (task as any).completedAt;
       delete (task as any).error;
       delete (task as any).result;
+      task.progress = null;
     }
     this._tasks.set(id, task);
     this._persist();
     return clone(task);
   }
 
-  update(taskId, patch: any = {}) {
+  update(taskId, patch: any = {}, options: any = {}) {
     const task = this._requireTask(taskId);
+    if (isStaleAttempt(task, options.expectedAttempt)) return null;
     const now = Date.now();
     const next = {
       ...task,
@@ -183,8 +194,13 @@ export class TaskRegistry {
     return clone(next);
   }
 
-  complete(taskId, result = null) {
+  complete(taskId, result = null, options: any = {}) {
     const task = this._requireTask(taskId);
+    if (isStaleAttempt(task, options.expectedAttempt)) return null;
+    // 终态 first-write-wins：已完成/失败的 task 不接受再 complete/fail 改写；
+    // 需要新执行走 register（合法复用，attempt+1）。cancel 的 aborted→canceled
+    // 改名不经此路径。
+    if (FINAL_STATUSES.has(task.status)) return clone(task);
     const now = Date.now();
     const next = {
       ...task,
@@ -199,8 +215,10 @@ export class TaskRegistry {
     return clone(next);
   }
 
-  fail(taskId, error = "failed") {
+  fail(taskId, error = "failed", options: any = {}) {
     const task = this._requireTask(taskId);
+    if (isStaleAttempt(task, options.expectedAttempt)) return null;
+    if (FINAL_STATUSES.has(task.status)) return clone(task);
     const now = Date.now();
     const next = {
       ...task,
@@ -479,7 +497,7 @@ export class TaskRegistry {
       const raw = JSON.parse(fs.readFileSync(this._persistencePath, "utf8"));
       for (const task of Array.isArray(raw.tasks) ? raw.tasks : []) {
         if (!task?.taskId || !task?.type) continue;
-        const restored = { ...task };
+        const restored = { ...task, attempt: taskAttempt(task) };
         if (ACTIVE_STATUSES.has(restored.status)) {
           restored.status = "recovering";
           restored.updatedAt = Date.now();
@@ -515,6 +533,23 @@ function assertText(value, label) {
   const text = typeof value === "string" ? value.trim() : "";
   if (!text) throw new Error(`TaskRegistry: ${label} is required`);
   return text;
+}
+
+/** attempt 归一化：缺失/非法的旧记录按 1 读（旧值缺失不可猜成其他身份）。 */
+function taskAttempt(task) {
+  return Number.isSafeInteger(task?.attempt) && task.attempt > 0 ? task.attempt : 1;
+}
+
+/**
+ * 迟到回调栅栏：调用方在启动执行时从 register() 返回值捕获 attempt，终态时
+ * 以 expectedAttempt 回传。attempt 不匹配 → 拒绝写入（返回 true 表示 stale）。
+ */
+function isStaleAttempt(task, expectedAttempt) {
+  if (expectedAttempt === undefined || expectedAttempt === null) return false;
+  if (!Number.isSafeInteger(expectedAttempt) || expectedAttempt < 1) {
+    throw new Error(`TaskRegistry: expectedAttempt must be a positive integer (got ${expectedAttempt})`);
+  }
+  return taskAttempt(task) !== expectedAttempt;
 }
 
 function normalizeStatus(value, fallback) {

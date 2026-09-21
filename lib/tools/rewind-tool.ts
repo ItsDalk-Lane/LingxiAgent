@@ -10,6 +10,7 @@
  */
 import { Type } from "../pi-sdk/index.ts";
 import { t } from "../i18n.ts";
+import { mintTaskId } from "../tasks/task-identity.ts";
 
 const CONFIRM_TIMEOUT_MS = 5 * 60_000;
 const PREVIEW_FILE_CAP = 50;
@@ -129,7 +130,7 @@ export function createRewindTool(deps: RewindToolDeps) {
         const deferredStore = deps.getDeferredStore?.() || null;
         const taskRegistry = deps.getTaskRegistry?.() || null;
         if (deferredStore?.defer && deferredStore?.resolve) {
-          const taskId = `rewind-${checkpointName}-${Date.now()}`;
+          const taskId = mintTaskId("rewind");
           try {
             deferredStore.defer(taskId, sessionPath, {
               type: "rewind_deferred",
