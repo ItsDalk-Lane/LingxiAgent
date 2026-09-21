@@ -2011,5 +2011,39 @@
     "log": "logs/release-gate-v041.log",
     "logSha256": "6f053272e92394a573dad9761b708b5fe84642eacccfdd259c83abf1fc13b5b6",
     "sourceManifestHash": "82963455cfc1a88672094bae3efdb82871bf5d23dd39532ed429dfa3c1cd62e3"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--exclude",
+      "**/round2-delivery-evidence.test.ts",
+      "--exclude",
+      "**/round3-delivery-evidence.test.ts",
+      "--exclude",
+      "**/upstream-sync-matrix.test.ts",
+      "--exclude",
+      "**/post-verification-audit-seal.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-21T06:48:39.443125+00:00",
+    "end": "2026-09-21T06:50:06.335878+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 14665,
+      "failed": 0,
+      "skipped": 15,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "17dfba1bdd309b22d43208fb003ef562cfc5cfdb3bbadb80a56b083202a57eae",
+    "log": "logs/release-gate-v042.log",
+    "logSha256": "eb750d6ec66111e64f602a65e303f353c25c49ced1d5a26c5d52987c230556a0",
+    "sourceManifestHash": "17dfba1bdd309b22d43208fb003ef562cfc5cfdb3bbadb80a56b083202a57eae"
   }
 ]

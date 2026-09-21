@@ -78,7 +78,7 @@
     {
       "bytes": 54382,
       "path": ".sync-audit/build-sync-matrix.mjs",
-      "sha256": "5477e489dc08737d2839682aff10f7db885661e2f4c329d797d770b03f44032e"
+      "sha256": "6a20190d0409b32bb0eb438f17f3519b7be50bdb9d1e11a354a482a92d96e991"
     },
     {
       "bytes": 16534,
@@ -113,12 +113,12 @@
     {
       "bytes": 83922,
       "path": ".sync-audit/upstream-sync-matrix.json",
-      "sha256": "acf2756244d3a2631beb9b274bf0e4dce618bdfce703f265343b76c9ddb12739"
+      "sha256": "d45d8bf7a2f4ae976a5244b6b04ede8d8ff09d6a373d374732c7552dfc26629f"
     },
     {
       "bytes": 41,
       "path": ".sync-audit/verified-source-sha.txt",
-      "sha256": "0ae78b0480c60672ec7c3e0711be177121aff56fe14a35490d98cca68b19873a"
+      "sha256": "779c54ab2e1dcfb7af96ba945dd1fa0be6f843a894ba5848b971e16f5b49e049"
     },
     {
       "bytes": 4111,
@@ -151,9 +151,9 @@
       "sha256": "0e1c839ef037341be3443f1d2baf3112d983dceb0d3183741c1f9218b09d5b07"
     },
     {
-      "bytes": 241950,
+      "bytes": 243055,
       "path": "PROGRESS.md",
-      "sha256": "2ff3da5dcfa63936fffcd024e7a5ddbc4cd3ec7e7afe77a80874d83b4796f566"
+      "sha256": "6d9fe04db26c2cfb9a240eab39f2877181d80aac9fdf0f21897a6c3af96d8696"
     },
     {
       "bytes": 13085,
@@ -176,14 +176,14 @@
       "sha256": "ee8ea30bc27b68baabba0f2eb897b7f5b25c5db27a5322e2019059c4f8391f7e"
     },
     {
-      "bytes": 10385,
+      "bytes": 10388,
       "path": "UPSTREAM_SYNC_AUDIT.md",
-      "sha256": "4afc3bb868ca9184cb7088bf163849daee63d0b5d037588b2d4521a4e4828f23"
+      "sha256": "b6c6db34cea5584fe5b10f85e27795cd59e4fc9146f04b4ffb75686d60d6bdb1"
     },
     {
       "bytes": 37591,
       "path": "UPSTREAM_SYNC_MATRIX.md",
-      "sha256": "7d743b3925e75c0a83bc8bd653f0735da03235f827d8b2a520cfd8309c91af8d"
+      "sha256": "c15c1106e54cd1f4442503ecc2dbeaadb0e781620f218dc47d34cc4f54b28628"
     },
     {
       "bytes": 1808,
@@ -2731,29 +2731,29 @@
       "sha256": "a17a968e4e1b09515dd947423fa1e0dac1ea1d11b329e0f7d257224d47d1bc50"
     },
     {
-      "bytes": 287460,
+      "bytes": 286993,
       "path": "desktop/src/locales/en.json",
-      "sha256": "9ceaa763bf6935c890d69445f325d428fefd49cfed70f031aa6ded9edec9f3c4"
+      "sha256": "93615091fd7db5c02ae608dd2e54535c15eb2f0d48ec72377f45715a214a118f"
     },
     {
-      "bytes": 354915,
+      "bytes": 354246,
       "path": "desktop/src/locales/ja.json",
-      "sha256": "b8adb780ac759b714c07322e437868e26d7cbbc54fa966d5a221bb4978780991"
+      "sha256": "19942618899c706baad71b028bd0c5aa2ecd538906e9c8971806f51a0ff88467"
     },
     {
-      "bytes": 322217,
+      "bytes": 321669,
       "path": "desktop/src/locales/ko.json",
-      "sha256": "ed4997d46dfa4436538688329200a6b00c8322542ecee11d787a3e93a98fd1f2"
+      "sha256": "e0451e58c48dca65337242812c7982b0c7d689e1b6c476643e6fe4d6a70f8ed0"
     },
     {
-      "bytes": 276634,
+      "bytes": 276130,
       "path": "desktop/src/locales/zh-TW.json",
-      "sha256": "11bff30071c23a3b77ecb9572163347ca96bb6af86822d34116e5f87c21185e2"
+      "sha256": "cbc9ddcfd781c5433bd2b11944509bebef9534d860e78915884b20f44de075e7"
     },
     {
-      "bytes": 280147,
+      "bytes": 279649,
       "path": "desktop/src/locales/zh.json",
-      "sha256": "de784494b0e621ad61d7d19607825f177c18dbcab78a0d0a8ab37e1d897f3fa1"
+      "sha256": "d0d08780a63b04135585a002ba8a5557a443cf5b10122d0bf950b94d09c5e053"
     },
     {
       "bytes": 966,
@@ -3176,14 +3176,19 @@
       "sha256": "f09b47e1651901a2048923d7987dcb0b476019a1edeb86608847036c3d4d791f"
     },
     {
+      "bytes": 14040,
+      "path": "desktop/src/react/__tests__/components/GitBranchPicker.test.tsx",
+      "sha256": "96af74e8817794a10c7b6ff1ccc001c8f0e7ac92cba0663184dd749df1e2c782"
+    },
+    {
+      "bytes": 7257,
+      "path": "desktop/src/react/__tests__/components/GitChangesButton.test.tsx",
+      "sha256": "7f86991643454c9e8614c3336c96169cbf876e5b2a948c06ccdbabe164040569"
+    },
+    {
       "bytes": 14228,
       "path": "desktop/src/react/__tests__/components/GitChangesModal.test.tsx",
       "sha256": "e49e9e8efce973a0ef3f44ff092515aa5917b60f155ea203ac84e011f01c8dea"
-    },
-    {
-      "bytes": 24999,
-      "path": "desktop/src/react/__tests__/components/GitEnvironmentCard.test.tsx",
-      "sha256": "d03418695069625d06adc3d0b2f52f994149a9c4018e326cd57bf2e3d35661bf"
     },
     {
       "bytes": 18802,
@@ -3191,9 +3196,9 @@
       "sha256": "3d782a607a7ed3afe80460f3e82e1b3dc4c441863296f53e879caca79097868b"
     },
     {
-      "bytes": 10639,
+      "bytes": 10990,
       "path": "desktop/src/react/__tests__/components/GitHistoryModal.test.tsx",
-      "sha256": "4bb9a864c615be9cd137f163ce21a572e420d78292d790a080b613fa99e7fd2b"
+      "sha256": "c83d606ef3a32384f28f1ca3407dae2db1e306cdef5c891e3018172480851567"
     },
     {
       "bytes": 6699,
@@ -3391,9 +3396,9 @@
       "sha256": "bcf1e8ac4cc96fccba7c845375ad7ed6f791f10757b8c005764a2334314796d8"
     },
     {
-      "bytes": 5309,
+      "bytes": 5362,
       "path": "desktop/src/react/__tests__/components/RuntimeInfoCapsule.test.tsx",
-      "sha256": "3a0014ef53934da2be00c1eb924fff3d627ac54efc9bf771bdb43781cb64ca06"
+      "sha256": "bd722d0f3c1c2c24f4e3a6a0f77fd31b5c3ce96f2ab40e363dcfc1173b4672e5"
     },
     {
       "bytes": 7788,
@@ -3456,9 +3461,9 @@
       "sha256": "815f8a5aa45841eda4dddfe8b4562390ae0b5237bd2e3a95f1125c42ecc89034"
     },
     {
-      "bytes": 7521,
+      "bytes": 7618,
       "path": "desktop/src/react/__tests__/components/TerminalCard.test.tsx",
-      "sha256": "fe97c4805fa0a82bf99295aa10d3087bb576165d1ddebe7de8efeaeea45df17b"
+      "sha256": "64db446af3d0e26d96cfe69e31e64b9f2b39ea96a24beb042981e9ee6e118476"
     },
     {
       "bytes": 8028,
@@ -3656,9 +3661,9 @@
       "sha256": "5d7f8eac8b18636904a68b9ab384cc0c342c2f5de8908ee1714a9271a1af69df"
     },
     {
-      "bytes": 21362,
+      "bytes": 26087,
       "path": "desktop/src/react/__tests__/components/session-sections.test.ts",
-      "sha256": "41eb52540115b93bbfec256de77266f6919b84e3cc5131f23057e9f514f9db21"
+      "sha256": "41400f59ac12be9cf0a90bb99e83bcb02db85a01e992226fe0ee1029b314b8e2"
     },
     {
       "bytes": 6016,
@@ -4776,9 +4781,9 @@
       "sha256": "c141319c67388822924f113ffe73cfbb173a7d06d47d8656938f967f3cbf7f53"
     },
     {
-      "bytes": 8281,
+      "bytes": 8463,
       "path": "desktop/src/react/components/DeskSection.tsx",
-      "sha256": "45ceeb78100115fe8534471f70352f7b7b96a29ec083ccde28f7f551d007a442"
+      "sha256": "daeaf7b4abd35fa1a18e15e238999963a0d123ef820f71ad248a4642303b701e"
     },
     {
       "bytes": 3409,
@@ -4796,9 +4801,9 @@
       "sha256": "81ac42df542c05105aa9b92cf463e618e67135f432bcd565ae48e8af3d3da36c"
     },
     {
-      "bytes": 112152,
+      "bytes": 112402,
       "path": "desktop/src/react/components/InputArea.tsx",
-      "sha256": "32463f7b279c6ed3e0837f87265c6dca1ca3650cd61f5e77bd3b7770fe71544f"
+      "sha256": "6c3f1d67df5b683e556336f5740ad43436f065c1f612184b19b68f0c5d464c64"
     },
     {
       "bytes": 8429,
@@ -4841,14 +4846,14 @@
       "sha256": "ef09a881bcd39c1be42a0e1ed5d7d3e2698d67c79acb1fda04d35161d19acbb8"
     },
     {
-      "bytes": 19644,
+      "bytes": 20049,
       "path": "desktop/src/react/components/SessionList.module.css",
-      "sha256": "222b72bdbe9ea76943f535177a72d3c217235c652bc48f77ece5319df4ed4252"
+      "sha256": "8149d9e67a29432fa5ef36b61cd8a7ef2feff09247834d3e3135ece3de2fb001"
     },
     {
-      "bytes": 56778,
+      "bytes": 57743,
       "path": "desktop/src/react/components/SessionList.tsx",
-      "sha256": "e007654fbcaa6e17fe7de319dc9836af2d2ef6c0c86cb99445356d125f2e354c"
+      "sha256": "ecd6d63380125106381ac330a5620caad6c1e0c03f4baebc4a88ec09746f5520"
     },
     {
       "bytes": 2940,
@@ -5061,9 +5066,9 @@
       "sha256": "ed334b32e7727f1047936fd393310f03cca0c6811ce45e0fa7a45cf3af9a0e4b"
     },
     {
-      "bytes": 62781,
+      "bytes": 62972,
       "path": "desktop/src/react/components/chat/Chat.module.css",
-      "sha256": "59515485e1a769ab3f5e8f4a8c3eaa59a0a4f7d651bfb6946c62ac1310a01e90"
+      "sha256": "f7601457c153b2866608d73da0e5fac8727ad3a9fd7c2bb46445704f93fbbbd7"
     },
     {
       "bytes": 2530,
@@ -5101,9 +5106,9 @@
       "sha256": "a2ae40b4f7a461eb95785446174b3707c9b57226efaec8a6346a0c300d8bb531"
     },
     {
-      "bytes": 20145,
+      "bytes": 21309,
       "path": "desktop/src/react/components/chat/ChatTranscript.tsx",
-      "sha256": "6f0bc3a565e05ead6874a44bb080221f7ed80941a9b7e652e908a573f245442b"
+      "sha256": "1d29e50edd24008478a7c5e67c83b26f0407e1a1a675772f819b3b38c59d659b"
     },
     {
       "bytes": 1660,
@@ -5271,14 +5276,14 @@
       "sha256": "08d23d3aaf1b79ebd43f37bbfda9c74eb60aa929dbb823d10bfe09a8209bceea"
     },
     {
-      "bytes": 4471,
+      "bytes": 4625,
       "path": "desktop/src/react/components/chat/TurnEditedFilesCard.module.css",
-      "sha256": "0a21350f1cb005d09f9794cf3302b8fdb32d2f69b782137c6b2638677f110be5"
+      "sha256": "1e67c71e795dcc038e426d3fa98c848d05c182f55e8dad8f4f8e810dd73c8739"
     },
     {
-      "bytes": 15613,
+      "bytes": 17759,
       "path": "desktop/src/react/components/chat/TurnEditedFilesCard.tsx",
-      "sha256": "949db089a6f56fb02eaf663329d9ada7bc28e119944b330fdce3bf35ec116f71"
+      "sha256": "489df87f51de10b5cbb3f89e5a01208ea7210cce876c9767354b58286a4eec85"
     },
     {
       "bytes": 3014,
@@ -5781,9 +5786,9 @@
       "sha256": "92fca8edb09876243648fc27029612e34c1fec374d9c8652ef553a29a4a32664"
     },
     {
-      "bytes": 5516,
+      "bytes": 5597,
       "path": "desktop/src/react/components/right-workspace/AgentActivityCard.tsx",
-      "sha256": "caa2aa97ca301543e8f9203b5839ac3465b3a1af22621cbb8cd1eb315c162986"
+      "sha256": "8171d63dc7403bfd0e91e2745004a1515adb5fc8d17e0a101ccb4f53b71d2c34"
     },
     {
       "bytes": 14494,
@@ -5806,9 +5811,9 @@
       "sha256": "ba290bba7057365baf05ce05e99969b98539ae7fd854ad38dca706d8ce701a4d"
     },
     {
-      "bytes": 7082,
+      "bytes": 7163,
       "path": "desktop/src/react/components/right-workspace/SessionStatusCard.tsx",
-      "sha256": "a5007c10257ee1277eda93c1df2ba92f5aff50a41e291aa746579a968c869b3c"
+      "sha256": "4e4259d8a710916252ebe4512f1aa33b53dd4e6b271693bdc1f65442088e2bf2"
     },
     {
       "bytes": 2933,
@@ -5816,9 +5821,9 @@
       "sha256": "e9ada0d1635c846c8f381bd60ddaef0f3b3ca1ecd2b812c4e7316f31835538a4"
     },
     {
-      "bytes": 9794,
+      "bytes": 9875,
       "path": "desktop/src/react/components/right-workspace/TerminalCard.tsx",
-      "sha256": "1d18dc807fed106d4aafadb4b41e6b08918faaf727945c777a4aba920dc92b47"
+      "sha256": "3cd812d282585403bb469c88b7c41d1387fca571c80004477390bc4df30fcecf"
     },
     {
       "bytes": 6171,
@@ -5826,9 +5831,9 @@
       "sha256": "7467b2af7bc04dfeeb55d8b40d6b403abfdd7f466af2d0a10bf83939e08b18e8"
     },
     {
-      "bytes": 13069,
+      "bytes": 13150,
       "path": "desktop/src/react/components/right-workspace/WorkflowCard.tsx",
-      "sha256": "849f9e5f6cab569339457d324e9e86ed8c09126810061106014c6d0cc27c0f68"
+      "sha256": "6f2ed5bbefeabd45dfc88bd6fe946059b829f037cb0d99ff7b23d0afa799b65c"
     },
     {
       "bytes": 138,
@@ -5856,19 +5861,39 @@
       "sha256": "7b613cc4495e0f894e1632023a667c54544c85884af3f1e6dd00d289dd34d9d1"
     },
     {
-      "bytes": 4557,
+      "bytes": 4363,
       "path": "desktop/src/react/components/right-workspace/__tests__/WorkflowCard.test.tsx",
-      "sha256": "b49c9e53f19e73ed4a00cbfd2d9e8db92a1786b486edd05d60f91556740c71f4"
+      "sha256": "77d20dddd9dfd67d74814b51e4bf2b86d4b7c3a5e672470e332cf261e3221b1a"
     },
     {
-      "bytes": 4121,
+      "bytes": 4825,
       "path": "desktop/src/react/components/runtime/GitBranchList.module.css",
-      "sha256": "73af50d01b5cd29be191baffb4a27e5d47d9dc14ccf1d9792f6da5b6251e37b2"
+      "sha256": "c1dc2842a5694bf808ab2233f4058e0e16be90b57bf28b1e628cf45a56e354d8"
     },
     {
-      "bytes": 6347,
+      "bytes": 9348,
       "path": "desktop/src/react/components/runtime/GitBranchList.tsx",
-      "sha256": "47c1143ed4809785d487438cb4e10c97b034bdc490ee4f5c66c59ce60b83e66e"
+      "sha256": "7bc1da8f54b58aa1d3cb0ce033e61e249fabab29543b117289871c39a2e79678"
+    },
+    {
+      "bytes": 2595,
+      "path": "desktop/src/react/components/runtime/GitBranchPicker.module.css",
+      "sha256": "a96814ab252c488d5d695135efe8724aabb083b40c40fff3fe75901789438407"
+    },
+    {
+      "bytes": 6535,
+      "path": "desktop/src/react/components/runtime/GitBranchPicker.tsx",
+      "sha256": "00e7cf31329a29ef607676ae919cb5698f67f1d943af87549e9f2be18610ddd5"
+    },
+    {
+      "bytes": 1120,
+      "path": "desktop/src/react/components/runtime/GitChangesButton.module.css",
+      "sha256": "a48decc8e29f4b441da964b5dd0dda5c688b0cbbdab56ca05b447f4fd0dadb51"
+    },
+    {
+      "bytes": 2277,
+      "path": "desktop/src/react/components/runtime/GitChangesButton.tsx",
+      "sha256": "c3b7166f1f55d2994a869d8ee1ed453ead4d72b6a7497a02b3cc07dffef33ad1"
     },
     {
       "bytes": 6010,
@@ -5876,19 +5901,9 @@
       "sha256": "0453fe09a6c54fec022c254b7aa27e12b6d26a50c18fdb461e19af95478b66b8"
     },
     {
-      "bytes": 16650,
+      "bytes": 16770,
       "path": "desktop/src/react/components/runtime/GitChangesModal.tsx",
-      "sha256": "1b53e74d4fbef1f6f6d64b58e7085a8ee0421a820a7095e85489795609b8b3bd"
-    },
-    {
-      "bytes": 4328,
-      "path": "desktop/src/react/components/runtime/GitEnvironmentCard.module.css",
-      "sha256": "0959a9b670bf48703964628a0fa1aeca8efbe1535fb4b40885197196bba09f5b"
-    },
-    {
-      "bytes": 15570,
-      "path": "desktop/src/react/components/runtime/GitEnvironmentCard.tsx",
-      "sha256": "0e1731031329e2108f97a6957735a25d719a62cc3519ceac3a4cd20f15ee8297"
+      "sha256": "7484a411c5b4fd8a525c0e1a9e5164dcd6977ae477844bf01fa5dac122e246e0"
     },
     {
       "bytes": 14779,
@@ -5896,9 +5911,9 @@
       "sha256": "09ff76d1ac71d59d9535f969ae1933b1ab2cdab95c33ce126b170b6ab1e5fdfc"
     },
     {
-      "bytes": 40880,
+      "bytes": 41101,
       "path": "desktop/src/react/components/runtime/GitGraphPanel.tsx",
-      "sha256": "5a2913932765776f76f008645cbf146539248e0628fd76e0b67d38d0ef1d2cca"
+      "sha256": "5a78577154915e200423f6d33df0fb4c8a00a563ee0e9e2120930675614be626"
     },
     {
       "bytes": 7151,
@@ -5906,9 +5921,9 @@
       "sha256": "82f810d5118004b7374f1207c7c1ce3748af35e1ae19ad7ac5610efeae42d2f1"
     },
     {
-      "bytes": 12046,
+      "bytes": 12514,
       "path": "desktop/src/react/components/runtime/GitHistoryModal.tsx",
-      "sha256": "b60fba969facc82adb92ca2bead66cf0bdd1cdd727162892fb60f493b9b7038e"
+      "sha256": "cf6f88eb7fef0116ffc1c6456870d98b0ff14a37469b9beebe32d6201affefaa"
     },
     {
       "bytes": 4007,
@@ -5916,9 +5931,9 @@
       "sha256": "51fb8c15c7e5d7da908029d47e18c6e5c332f4e13e54b16681ab8db663bbdbbc"
     },
     {
-      "bytes": 6817,
+      "bytes": 6935,
       "path": "desktop/src/react/components/runtime/GitWorktreeModal.tsx",
-      "sha256": "2679ed5b187cd6eca41af5579ec42630a75713380692431ce32f592a43ae80f9"
+      "sha256": "bf38e9ad8a24786cfed0896ad6c8355e7e720313a638cbc390d32ff7b74c7ef4"
     },
     {
       "bytes": 4494,
@@ -5926,9 +5941,9 @@
       "sha256": "c105278640ab91df013aef85fffd96cfa29fff52df0a2e5dbcfa94282358c4c0"
     },
     {
-      "bytes": 5571,
+      "bytes": 5728,
       "path": "desktop/src/react/components/runtime/RuntimeInfoCapsule.tsx",
-      "sha256": "c930505340a8ebf148c8cf5576ec781d96b64e8a37d3c1f525be8c101b624e50"
+      "sha256": "243b4634766c15752975cf93229d9f63abdd1c61f3410a3786a834ac10fb54d3"
     },
     {
       "bytes": 4305,
@@ -5956,9 +5971,9 @@
       "sha256": "ecf4e8fbec6a4f844bf638ac061e6af4e5823327e43d77610108f81609745d72"
     },
     {
-      "bytes": 20208,
+      "bytes": 25262,
       "path": "desktop/src/react/components/session-sections.ts",
-      "sha256": "e2e07043ccc06a693c8a5084ffb14dc94b9ffbb876c40501a9a7c749a671bf3c"
+      "sha256": "8789779ad2ad5b24add016bdb2cb77a94c0918ab9bde7c629f4c814c13662e6a"
     },
     {
       "bytes": 1402,
@@ -6234,6 +6249,11 @@
       "bytes": 3239,
       "path": "desktop/src/react/hooks/use-deferred-history-content.ts",
       "sha256": "2c89ac3aa497f1b2caf6ce5b8880863c2af629bba7bcd8626987eb45bb447be5"
+    },
+    {
+      "bytes": 4087,
+      "path": "desktop/src/react/hooks/use-git-env.ts",
+      "sha256": "23666d077adfc24d253f75813ea792a9e3daf8ddfa56b370a217dbe3e009ffcb"
     },
     {
       "bytes": 1695,
@@ -7826,9 +7846,9 @@
       "sha256": "6baa15abae87a9909c45081521c5dda9c685cb7c72a5af6d1f0d353fd0f8059b"
     },
     {
-      "bytes": 7463,
+      "bytes": 8203,
       "path": "desktop/src/react/stores/side-chat-actions.ts",
-      "sha256": "49612245a3b8578f3cd866f17f0ed1813605761b4c9804dd7322160e37582f56"
+      "sha256": "a216fbfe978547f34dad56924a3908a266a55104aeb7a49366e1f462f71a5a78"
     },
     {
       "bytes": 3735,
@@ -7881,9 +7901,9 @@
       "sha256": "5d51b6d3db44a4f5244f135627296f857f579524d4d35fba7e28520be578eb6f"
     },
     {
-      "bytes": 25138,
+      "bytes": 25296,
       "path": "desktop/src/react/types.ts",
-      "sha256": "6ecc407367d43348e5df1ccea8064d99d1600e3c2926840cd59d814ba7223dd7"
+      "sha256": "7c290e67fe966458f2be3099273aa4aff85e5e7ac9b23df0088f22bb1127c372"
     },
     {
       "bytes": 1480,
@@ -8161,9 +8181,9 @@
       "sha256": "554c539de32cf5e6677689fa7e302319fc8a60fdf14e7c3325647a10b21eb150"
     },
     {
-      "bytes": 13108,
+      "bytes": 12703,
       "path": "desktop/src/react/utils/git-env-api.ts",
-      "sha256": "3d85b98836dd8a13ae3f28d44698a523cc6be3a25f0aa2c15f8b17a40ecedfff"
+      "sha256": "539e2dceafa1c15f3ff753bb32d9714e66fd948e1bb542284cf58dc126e80ecf"
     },
     {
       "bytes": 3019,
@@ -9519,6 +9539,11 @@
       "bytes": 33914,
       "path": "export-manifest.json",
       "sha256": "5f51eeb442d49bcdf119925be9b6e64e0baf8baec959ff6c0d0ca73c526dd3f2"
+    },
+    {
+      "bytes": 13057,
+      "path": "git-ui-relocation-mockup.html",
+      "sha256": "d4cacf96f57ae81c14ab47bcf39643903534a0ba480fc870d9aea36123ccdfa5"
     },
     {
       "bytes": 27831,
@@ -13006,9 +13031,9 @@
       "sha256": "a72a580aa6439346302b4048c4a62ccb078ca72c3e4f5788ab8fbffb46d26ba5"
     },
     {
-      "bytes": 127514,
+      "bytes": 130192,
       "path": "server/routes/sessions.ts",
-      "sha256": "ce280360f457c5fd7282bb5274a85209262ed0c4a7437a6176395a048846af5d"
+      "sha256": "9a0f2de960465dfa789e7bd835c0460105ad86f194883235ceb07e4c158b447f"
     },
     {
       "bytes": 10528,
@@ -13286,9 +13311,9 @@
       "sha256": "859a3de702877b47c75366dbaf2b95716c1fae0aaa3de55d4dd0709e16076288"
     },
     {
-      "bytes": 6996,
+      "bytes": 7060,
       "path": "shared/error-user-messages.ts",
-      "sha256": "582500c3841e8d5e02662238acb9f8d30028d4b988740e33349671adf6cc743b"
+      "sha256": "ecd5d880c59d36f43b25a438537e64779dc1b6fd158ead953216e4b24ff38b43"
     },
     {
       "bytes": 4938,
@@ -17854,6 +17879,11 @@
       "bytes": 10340,
       "path": "tests/session-folders-tool.test.ts",
       "sha256": "9b73b36932139ac6a90dcb0feb70edf94613c95ace457569a9ec1f4272b51913"
+    },
+    {
+      "bytes": 8026,
+      "path": "tests/session-fork-depth-limit.test.ts",
+      "sha256": "647617a3adbed3a191c466556625c4efc7fd067df42ed6641b161331b2d2c6b2"
     },
     {
       "bytes": 43776,
