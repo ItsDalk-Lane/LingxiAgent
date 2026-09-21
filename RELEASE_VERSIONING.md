@@ -29,7 +29,7 @@ renderer 与 server 继续独立回退。两侧发布世代不一致时不静默
 2. 运行 `npm run release:preflight -- --tag vX.Y.Z`。
 3. 用 `node scripts/generate-release-digest.mjs --tag vX.Y.Z --ref <候选提交>` 生成 `release-digest.v1.json`，再运行 `node scripts/generate-release-digest.mjs --append-history` 将该摘要写入 `release-digest.v2.json`。`--ref` 固定要总结的源码；`--append-history` 只搬运并校验既有摘要，不调用模型。两份生成摘要一并进入发布资料提交，不手改历史条目。
 4. 分别运行 `node scripts/validate-release-digest.mjs --tag vX.Y.Z --file release-digest.v1.json` 与同命令的 `--file release-digest.v2.json`。tag 工作流会在四平台构建前复核两份已提交摘要。
-5. 完成 `npm run typecheck`、`npm run lint`、`npm run build:packages`、`npm test` 和 `npm run test:artifact-release-smoke`；适用的封印流程见 [PROGRESS.md](PROGRESS.md#seal-工作流合并后现行)。本机验证结果绑定实际源码和平台，不能替代正式签名、四平台安装包与远端作业证据。
+5. 完成 `npm run typecheck`、`npm run lint`、`npm test` 和 `npm run test:artifact-release-smoke`；适用的封印流程见 [PROGRESS.md](PROGRESS.md#seal-工作流合并后现行)。本机验证结果绑定实际源码和平台，不能替代正式签名、四平台安装包与远端作业证据。
 6. 只有所有前置任务成功，tag 工作流才能创建 Release；Train 只能从已完成的源 Release 发布。实际门禁依赖以 [build.yml](.github/workflows/build.yml) 为准。
 
 正式发布前禁止仅修改 tag、文件名或 About 页版本来“修复”版本事故；这些变化不能改变客户端实际启动哪个 Artifact。

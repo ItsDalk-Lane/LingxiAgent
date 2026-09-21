@@ -21,9 +21,6 @@
 # 安装依赖并执行安装后脚本
 npm install
 
-# 构建 workspace 包（新 checkout 或包源码变更后）
-npm run build:packages
-
 # 启动 Electron（自动构建前端）
 npm start
 
@@ -44,7 +41,6 @@ npm run start:vite
 | `npm run start:vite` | 连接已运行的 Vite HMR 服务并启动 Electron |
 | `npm run server` | 仅启动 Server |
 | `npm run cli` | 运行 server-first CLI |
-| `npm run build:packages` | 构建 `packages/*` workspace 包 |
 | `npm test` | 运行测试（Vitest） |
 | `npm run test:watch` | 监听模式运行测试 |
 | `npm run typecheck` | TypeScript 类型检查 |
@@ -122,7 +118,6 @@ cli/            # 连接 Server 的命令行入口
 hub/            # 后台任务（调度器、频道路由、Agent 通信、DM 路由）
 desktop/        # Electron 应用 + React 前端
 shared/         # 跨层共享工具（config schema、error bus、模型引用等）
-packages/       # npm workspaces（插件协议、SDK、运行时和组件）
 plugins/        # 内置系统插件（随应用打包）
 skills2set/     # 内置技能定义
 scripts/        # 构建工具（server 打包、启动器、签名）

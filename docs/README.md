@@ -31,8 +31,6 @@
 - [上游同步审计](../UPSTREAM_SYNC_AUDIT.md)与[矩阵](../UPSTREAM_SYNC_MATRIX.md)：上游同步历史及后续坐标投影。矩阵由 [.sync-audit/build-sync-matrix.mjs](../.sync-audit/build-sync-matrix.mjs) 生成。
 - [历史阻塞与裁决](archives/BLOCKED.md)：恢复相关任务前须重新核对。
 
-## 历史任务与证据
-
 ## 待实施计划
 
 （当前没有待实施计划。）

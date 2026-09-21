@@ -104,7 +104,6 @@ cli/            连接 Server 的命令行入口
 hub/            调度器、频道路由、事件总线
 desktop/        Electron 应用 + React 前端
 shared/         跨层共享工具（config schema、error bus、模型引用等）
-packages/       npm workspaces（插件协议、SDK、运行时和组件）
 plugins/        内置系统插件（随应用打包）
 skills2set/     内置技能定义
 scripts/        构建工具（server 打包、启动器、签名）
@@ -150,9 +149,6 @@ Server 以独立 Node.js 进程运行（由 Electron spawn 或独立启动），
 ```bash
 # 安装依赖并运行安装后脚本
 npm install
-
-# 构建 workspace 包（新 checkout 或包源码变更后）
-npm run build:packages
 
 # Electron 启动（自动构建 renderer）
 npm start
