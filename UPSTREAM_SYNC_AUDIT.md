@@ -15,7 +15,7 @@
 | U1：上游目标 | `c6d0405294be67cb134c2758f6472748ee73e2be` | openhanako `v0.447.4` |
 | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
 | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
-| VERIFIED_SOURCE_SHA | `83fd6b632ad596eab62c039b55f4a17af00c04b1` | 2026-09-21 v0.1.41 发布树（7a61d4b43 发布元数据 + 83fd6b632 证据刷新；preflight/发布族/全量复验绿）；验证证据见 PROGRESS.md 最新条目 |
+| VERIFIED_SOURCE_SHA | `4c5a119a3e1766bf8c26b6aa11e658f4971e6cba` | 2026-09-21 0.1.42 候选树（cfa1f5fe8 Git 入口迁移 + 谱系深度上限 + 4c5a119a3 交付证据刷新；release-gate-v042 双门禁绿，全量复验见 PROGRESS.md 最新条目） |
 
 v0.1.35 仓库内的[功能 CI 记录](artifacts/release-v0.1.35/feature-ci-validation.json)
 对应 `2c835ac77afb1a73cd83816ad3d613297dc770a8`，不单独证明上述发布资料提交重新执行了

@@ -1988,3 +1988,15 @@ M  desktop/src/react/__tests__/components/TodoPanel.test.tsx
 ### 2026-09-21 v0.1.41 发布树坐标后终态复验
 
 - 坐标 `83fd6b632ad596eab62c039b55f4a17af00c04b1` 就位后，全量 `npm test`（含全部自指门禁）：1441 文件通过 / 3 既有跳过；14685 测试通过 / 15 既有跳过 / 0 失败，exit 0。v0.1.41 标签自本树打出。
+
+### 2026-09-21 0.1.42 候选树封印推进（Git 入口迁移 + 谱系深度上限，已获授权的提交/发布流程）
+
+- 坐标 `83fd6b632ad596eab62c039b55f4a17af00c04b1` → `4c5a119a3e1766bf8c26b6aa11e658f4971e6cba`（fix/git-history-stats：be2941ef0 git-history 变更统计修复 + cfa1f5fe8 Git 入口迁移批次 [GitEnvironmentCard 拆分为 GitBranchPicker 输入框分支下拉 + GitChangesButton 工作台变更按钮 + use-git-env 共享探测层；会话谱系两层深度上限 server 拒绝 + 展示收拢 + 环检测] + 4c5a119a3 交付证据刷新提交）。
+- 提交前把工作区两处真实红清零：WorkflowCard 测试随「默认展开」新契约更新（用户裁决 2026-09-21）；GitBranchPicker/GitChangesButton 新增 CSS 改走结构 token（间距 scale + var() fallback 位豁免），0 样式违例，不走基线收账。
+- 验证绑定：typecheck x3 绿；round2/round3 证据门禁（四项自指/过渡窗排除）release-gate-v042 双绿——14665 通过 / 0 失败 / 15 既有跳过、执行期无漂移、manifest 8d952f37…/17dfba1b… 同哈希绑定；round2 增量补丁从干净 89bc0b64 对 cfa1f5fe8 树再生成（707c1ea1…，R10-09 VERIFIED）；坐标推进后全量 `npm test`（含全部自指门禁）复验——结果见下条。
+- build-sync-matrix 常量随动，矩阵与 markdown 投影重生成（133 paths，projection 8bf6c07a…）。
+
+### 2026-09-21 0.1.42 候选树坐标后终态复验
+
+- 坐标 `4c5a119a3e1766bf8c26b6aa11e658f4971e6cba` 就位后，全量 `npm test`（含 post-verification-audit-seal / upstream-sync-matrix / round2 / round3 全部自指门禁）：1443 文件通过 / 3 既有跳过；14690 测试通过 / 15 既有跳过 / 0 失败，exit 0。
+- R10-09 增量补丁为运行时派生产物：套件运行按当前树再生成并自校验 VERIFIED，本提交入库副本即生成时刻树状态；后续纯审计提交留下的补丁本地改动属既有机制，不随审计提交。
