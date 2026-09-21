@@ -1,0 +1,16 @@
+
+> lingxi@0.1.42 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+tests/p02-cancellation-edges.test.ts(70,25): error TS2554: Expected 3 arguments, but got 2.
+tests/p02-cancellation-edges.test.ts(77,18): error TS2554: Expected 3 arguments, but got 2.
+tests/p02-cancellation-edges.test.ts(95,76): error TS2345: Argument of type '{ cwd: string; onData: (buf: any) => number; signal: AbortSignal; }' is not assignable to parameter of type '{ cwd: any; env: any; onData: any; onStdout?: any; onStderr?: any; signal: any; timeout: any; timeoutErrorValue?: any; killMode?: string; exitStdioGraceMs?: number; windowsVerbatimArguments?: boolean; }'.
+  Type '{ cwd: string; onData: (buf: any) => number; signal: AbortSignal; }' is missing the following properties from type '{ cwd: any; env: any; onData: any; onStdout?: any; onStderr?: any; signal: any; timeout: any; timeoutErrorValue?: any; killMode?: string; exitStdioGraceMs?: number; windowsVerbatimArguments?: boolean; }': env, timeout
+tests/p02-cancellation-edges.test.ts(126,19): error TS2339: Property 'error' does not exist on type '{ outcome: string; value: unknown; } | { outcome: string; error: any; }'.
+  Property 'error' does not exist on type '{ outcome: string; value: unknown; }'.
+tests/p02-cancellation-edges.test.ts(137,98): error TS2345: Argument of type '{ cwd: string; onData: () => void; timeout: number; timeoutErrorValue: number; }' is not assignable to parameter of type '{ cwd: any; env: any; onData: any; onStdout?: any; onStderr?: any; signal: any; timeout: any; timeoutErrorValue?: any; killMode?: string; exitStdioGraceMs?: number; windowsVerbatimArguments?: boolean; }'.
+  Type '{ cwd: string; onData: () => void; timeout: number; timeoutErrorValue: number; }' is missing the following properties from type '{ cwd: any; env: any; onData: any; onStdout?: any; onStderr?: any; signal: any; timeout: any; timeoutErrorValue?: any; killMode?: string; exitStdioGraceMs?: number; windowsVerbatimArguments?: boolean; }': env, signal
+tests/p02-cancellation-edges.test.ts(147,19): error TS2339: Property 'error' does not exist on type '{ outcome: string; value: unknown; } | { outcome: string; error: any; }'.
+  Property 'error' does not exist on type '{ outcome: string; value: unknown; }'.
+tests/p02-concurrency-edges.test.ts(62,25): error TS2554: Expected 3 arguments, but got 2.
+tests/server-composition-boundary.test.ts(763,91): error TS2794: Expected 1 arguments, but got 0. Did you forget to include 'void' in your type argument to 'Promise'?

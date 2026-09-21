@@ -1,0 +1,10 @@
+
+> lingxi@0.1.42 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+tests/p02-cancellation-edges.test.ts(70,25): error TS2554: Expected 3 arguments, but got 2.
+tests/p02-cancellation-edges.test.ts(77,18): error TS2554: Expected 3 arguments, but got 2.
+tests/p02-cancellation-edges.test.ts(128,19): error TS2339: Property 'error' does not exist on type '{ outcome: "resolved"; value: unknown; } | { outcome: "rejected"; error: any; }'.
+  Property 'error' does not exist on type '{ outcome: "resolved"; value: unknown; }'.
+tests/p02-cancellation-edges.test.ts(151,19): error TS2339: Property 'error' does not exist on type '{ outcome: "resolved"; value: unknown; } | { outcome: "rejected"; error: any; }'.
+  Property 'error' does not exist on type '{ outcome: "resolved"; value: unknown; }'.

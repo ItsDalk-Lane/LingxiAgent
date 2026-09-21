@@ -1,0 +1,30 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/open-boundary-lint.test.ts (16 tests | 2 failed) 1736ms
+     ✓ rejects a negation-pattern entry 32ms
+     ✓ throws when a manifest file entry does not exist on disk 1ms
+     ✓ throws when a manifest directory entry does not exist on disk 1ms
+     ✓ collects literal static and dynamic import/require specifiers with line numbers 4ms
+     ✓ ignores bare specifiers and non-literal dynamic calls (out of this lint's scope) 1ms
+     ✓ returns null for a bare (non-relative) specifier 0ms
+     ✓ resolves a relative specifier with an explicit extension 0ms
+     ✓ throws when a relative specifier cannot be resolved to any file 0ms
+     ✓ reports an edge when a whitelisted file imports a non-whitelisted repo path 1ms
+     ✓ reports nothing when every import target is whitelisted 1ms
+     ✓ does not scan non-JS/TS whitelisted files (e.g. markdown, JSON, HTML) for imports 1ms
+     ✓ a violation already present in the baseline is ok (known debt) 0ms
+     ✓ a violation NOT in the baseline fails closed and reports the exact from/to edge 0ms
+     ✓ readBaseline throws a clear error when the baseline file is missing 0ms
+     × the committed export-manifest.json + baseline pass cleanly against real source 923ms
+     × the CLI subprocess exits 0 against the real repo and reports the known-debt count 770ms
+ ✓ tests/cli-closure-census.test.ts (22 tests) 65581ms
+     ✓ matches the committed deterministic closure and baseline  16851ms
+     ✓ is idempotent: two independent full runs produce identical output  32525ms
+     ✓ writeCliRuntimeClosure/writeOpenBoundaryBaseline regenerate the exact committed files in place  16161ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 36 passed (38)
+   Start at  00:12:48
+   Duration  65.85s (transform 175ms, setup 39ms, import 362ms, tests 67.32s, environment 0ms)
+

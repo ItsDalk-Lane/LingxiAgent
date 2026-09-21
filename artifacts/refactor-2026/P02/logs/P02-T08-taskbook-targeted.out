@@ -1,0 +1,16 @@
+
+> lingxi@0.1.42 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' tests/agent-executor-teardown.test.ts tests/history-run-outcome-edges.test.ts
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/agent-executor-teardown.test.ts (18 tests) 139ms
+ ✓ tests/history-run-outcome-edges.test.ts (6 tests) 1202ms
+     ✓ T07：真完成但只有过程（思考+工具）→ 恰一个 missing_final_answer，不因有工具豁免  1182ms
+
+ Test Files  2 passed (2)
+      Tests  24 passed (24)
+   Start at  00:14:41
+   Duration  1.85s (transform 1.23s, setup 31ms, import 1.24s, tests 1.34s, environment 262ms)
+
