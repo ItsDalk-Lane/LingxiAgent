@@ -2000,3 +2000,14 @@ M  desktop/src/react/__tests__/components/TodoPanel.test.tsx
 
 - 坐标 `4c5a119a3e1766bf8c26b6aa11e658f4971e6cba` 就位后，全量 `npm test`（含 post-verification-audit-seal / upstream-sync-matrix / round2 / round3 全部自指门禁）：1443 文件通过 / 3 既有跳过；14690 测试通过 / 15 既有跳过 / 0 失败，exit 0。
 - R10-09 增量补丁为运行时派生产物：套件运行按当前树再生成并自校验 VERIFIED，本提交入库副本即生成时刻树状态；后续纯审计提交留下的补丁本地改动属既有机制，不随审计提交。
+
+### 2026-09-21 v0.1.42 发布树封印推进（发布元数据 + 证据刷新，已获授权发布流程）
+
+- 坐标 `4c5a119a3` → `adca95ca3947bcada920e66caabfbd059d9993e6`（fix/git-history-stats：6a9106552 发布元数据提交 [0.1.42 + gen20 + digest v1/v2 + preflight 锚点] + adca95ca3 发布树证据刷新提交）。
+- 验证绑定：release:preflight --tag v0.1.42 PASS（候选 0.1.42/gen20，历史最高 0.1.41/gen19）；digest v1+v2 校验过；发布相关 12 文件 113 tests 绿；证据门禁（四项自指/过渡窗排除）release-gate-v042b round2/round3 双绿——14665 通过 / 0 失败 / 15 既有跳过、manifest 048e63c3…/db0f3c05… 双绿绑定、执行期无漂移；坐标推进后全量 `npm test`（含全部自指门禁）复验——结果见下条。
+- round2 证据两次中跑为已知平台抖动（mac-arm64 vitest worker fork 崩溃 ×1、macOS ustar 临时目录竞态 ×1），按既有惯例重跑失败作业收绿，失败记录按 R10-07/08 并存保留。
+- build-sync-matrix 常量随动，矩阵与 markdown 投影重生成（133 paths，projection 8bf6c07a…）。
+
+### 2026-09-21 v0.1.42 发布树坐标后终态复验
+
+- 坐标 `adca95ca3947bcada920e66caabfbd059d9993e6` 就位后，全量 `npm test`（含 post-verification-audit-seal / upstream-sync-matrix / round2 / round3 全部自指门禁）：1443 文件通过 / 3 既有跳过；14690 测试通过 / 15 既有跳过 / 0 失败，exit 0。v0.1.42 标签自本树打出。
