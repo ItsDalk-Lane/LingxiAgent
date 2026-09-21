@@ -7,10 +7,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   resolve: {
     alias: {
-      "@hana/plugin-protocol": path.resolve(__dirname, "packages/plugin-protocol/src/index.ts"),
-      "@hana/plugin-sdk": path.resolve(__dirname, "packages/plugin-sdk/src/index.ts"),
-      "@hana/plugin-runtime": path.resolve(__dirname, "packages/plugin-runtime/src/index.ts"),
-      "@hana/plugin-components": path.resolve(__dirname, "packages/plugin-components/src/index.ts"),
+      // P01-T07：@hana/plugin-* 死别名清退（packages/ 已随插件生态收口拆除于
+      // 04f90d2b2；清退前核实 tests/ 零引用）。@ 别名指向有效路径，保留。
       "@": path.resolve(__dirname, "desktop/src/react"),
     },
   },

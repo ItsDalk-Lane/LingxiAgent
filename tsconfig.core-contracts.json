@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "baseUrl": "."
+  },
+  "include": [
+    "shared/identity-brands.ts",
+    "shared/hana-runtime-paths.ts",
+    "shared/model-ref.ts",
+    "shared/errors.ts",
+    "lib/llm/model-call-identity.ts",
+    "cli/local-server.ts"
+  ]
+}

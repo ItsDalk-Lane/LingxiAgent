@@ -7,7 +7,7 @@ import path from "path";
 import { randomUUID } from 'node:crypto';
 import { readDesktopInputRunSnapshot } from '../../core/desktop-session-submit.ts';
 import { Hono } from "hono";
-import { safeJson } from "../hono-helpers.ts";
+import { safeJson, strictJson, ensureJsonObjectBody, rejectWrongFieldTypes } from "../hono-helpers.ts";
 import { bodyFromRouteError, routeError, statusFromRouteError } from "./route-errors.ts";
 import { t } from "../../lib/i18n.ts";
 import { resolveDeferredReceiverName } from "../deferred-result-interlude.ts";
@@ -2050,7 +2050,16 @@ export function createSessionsRoute(engine, hub = null) {
         studioId: requestContext.studioId,
       });
       if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
-      const body = await safeJson(c);
+      // 会话创建是写入口：畸形 JSON 不允许被静默吞成空对象（P01-T05/A07）。
+      // A07 完整闭合：body 必须是对象，且契约字段类型不符时显式 400——
+      // 此前 memoryEnabled:"yes" / thinkingLevel:{} 会被静默按默认执行。
+      const body = ensureJsonObjectBody(await strictJson(c));
+      rejectWrongFieldTypes(body, {
+        memoryEnabled: "boolean",
+        thinkingLevel: "string",
+        agentId: "string",
+        currentAgentId: "string",
+      });
       const { memoryEnabled, agentId, thinkingLevel } = body;
       const workspaceSelection = resolveSessionWorkspaceSelection(engine, requestContext, body);
       const cwd = workspaceSelection.cwd;

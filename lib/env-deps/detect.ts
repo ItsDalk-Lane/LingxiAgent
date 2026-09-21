@@ -14,7 +14,7 @@
 import { execFile } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import { resolveLingxiPiSdkManagedBinDir } from "../../shared/hana-runtime-paths.ts";
+import { resolveLingxiHome, resolveLingxiPiSdkManagedBinDir } from "../../shared/hana-runtime-paths.ts";
 import { findBundledBin } from "../bundled-bins.ts";
 import { ENV_DEP_ENTRIES, type EnvDepEntry } from "./registry.ts";
 
@@ -95,7 +95,9 @@ function probeBinPath(bin: string): Promise<string | undefined> {
 
 function managedBinPath(binName: string): string | null {
   try {
-    const dir = resolveLingxiPiSdkManagedBinDir();
+    // 6282cf35b 起此处曾零参调用（运行时必 throw→静默 null，托管二进制检测
+    // 一直是死路径）。P01-T04 strict 化暴露后按设计意图显式解析 LINGXI_HOME。
+    const dir = resolveLingxiPiSdkManagedBinDir(resolveLingxiHome());
     const candidates = process.platform === "win32"
       ? [`${binName}.exe`, binName]
       : [binName, `${binName}.exe`];

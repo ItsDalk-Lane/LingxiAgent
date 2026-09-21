@@ -14,6 +14,15 @@
  * migrations.js（启动期一次性迁移）或 UI 选择层（带 provider 上下文的点击事件）。
  */
 
+/** 模型引用复合键（运行时查找/比较/持久化的唯一合法形态）。 */
+export interface ModelRef {
+  id: string;
+  provider: string;
+}
+
+/** parseModelRef 接受的输入形态（宽松入口；输出必须再经 requireModelRef 才可信）。 */
+export type ModelRefInput = string | { id?: unknown; provider?: unknown } | null | undefined;
+
 /**
  * 宽松解析：把任意历史格式规整成 {id, provider}。
  *
@@ -25,11 +34,12 @@
  * ⚠ 本函数的返回值允许 provider 为空。**只用于 UI 展示层或迁移入口**。
  * 运行时查找和比较**必须**用 requireModelRef 包一次。
  */
-export function parseModelRef(ref) {
+export function parseModelRef(ref: ModelRefInput): ModelRef | null {
   if (!ref) return null;
   if (typeof ref === "object") {
-    if (!ref.id) return null;
-    return { id: ref.id, provider: ref.provider || "" };
+    const candidate = ref as { id?: unknown; provider?: unknown };
+    if (!candidate.id) return null;
+    return { id: candidate.id as string, provider: (candidate.provider as string) || "" };
   }
   if (typeof ref !== "string") return null;
   const s = ref.trim();
@@ -47,7 +57,7 @@ export function parseModelRef(ref) {
  * 运行时（非 UI、非迁移入口）一律用这个。抛错就代表上游逻辑丢了 provider——
  * 要修的是那里，不要在这里兜底。
  */
-export function requireModelRef(ref) {
+export function requireModelRef(ref: ModelRefInput): ModelRef {
   const parsed = parseModelRef(ref);
   if (!parsed || !parsed.id || !parsed.provider) {
     throw new Error(`requireModelRef: missing id or provider (got ${JSON.stringify(ref)})`);
@@ -63,7 +73,23 @@ export function requireModelRef(ref) {
  *
  * 兼容：`findModel(available, {id, provider})` 直接传对象也行。
  */
-export function findModel(available, id, provider) {
+/**
+ * 可用模型条目的最小形状（findModel 的约束与 any 实参回退类型）。
+ * 列表元素在运行时是 SDK 模型对象（含 name/api 等更多字段）；这里只声明
+ * 调用方实际依赖的字段，可选字段访问仍需调用方判空。
+ */
+export interface AvailableModelLike {
+  id: string;
+  provider: string;
+  name?: string;
+  api?: string;
+}
+
+export function findModel<T extends AvailableModelLike>(
+  available: readonly T[] | null | undefined,
+  id: string | ModelRef | null | undefined,
+  provider?: string,
+): T | null {
   if (!available) return null;
   if (typeof id === "object" && id !== null) {
     return findModel(available, id.id, id.provider);
@@ -78,22 +104,28 @@ export function findModel(available, id, provider) {
  * 两个模型引用是否相等（严格复合键比较）。
  *
  * 任一边 id 或 provider 缺失视为不等，不做降级。
+ * 仅接受 {id, provider} 对象形态（历史行为：字符串输入直接判不等）。
  */
-export function modelRefEquals(a, b) {
-  if (!a || !b) return false;
-  if (!a.id || !b.id || !a.provider || !b.provider) return false;
-  return a.id === b.id && a.provider === b.provider;
+export function modelRefEquals(a: ModelRefInput, b: ModelRefInput): boolean {
+  if (!a || !b || typeof a !== "object" || typeof b !== "object") return false;
+  const left = a as { id?: unknown; provider?: unknown };
+  const right = b as { id?: unknown; provider?: unknown };
+  if (!left.id || !right.id || !left.provider || !right.provider) return false;
+  return left.id === right.id && left.provider === right.provider;
 }
 
 /**
  * 构造字符串形式的复合键（用于 Map key、React key、URL 等）。
  * 格式：`${provider}/${id}`
  *
- * provider 或 id 缺失时抛错。
+ * provider 或 id 缺失时抛错。仅接受 {id, provider} 对象形态（历史行为）。
  */
-export function modelRefKey(ref) {
-  if (!ref?.id || !ref?.provider) {
+export function modelRefKey(ref: ModelRefInput): string {
+  const candidate = typeof ref === "object" && ref !== null
+    ? ref as { id?: unknown; provider?: unknown }
+    : null;
+  if (!candidate?.id || !candidate?.provider) {
     throw new Error(`modelRefKey: missing id or provider (got ${JSON.stringify(ref)})`);
   }
-  return `${ref.provider}/${ref.id}`;
+  return `${candidate.provider}/${candidate.id}`;
 }

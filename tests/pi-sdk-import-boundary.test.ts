@@ -3,7 +3,11 @@ import path from "path";
 import { describe, expect, it } from "vitest";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const SCAN_DIRS = ["core", "server", "lib", "hub"];
+// P01-T02：扫描面与生产源码对齐——原 walk 只收 .js/.mjs/.cjs，而 core/server/lib/hub
+// 的生产实现几乎全是 .ts（.ts 盲区此前仅由 postinstall 的 patch-pi-sdk.cjs 兜住）。
+// 三个 pi 包 + typebox 的直接 import 在任何生产层（含 cli/shared/plugins/desktop）
+// 都必须收敛到 lib/pi-sdk 适配面内。
+const SCAN_DIRS = ["core", "server", "lib", "hub", "cli", "shared", "plugins", "desktop"];
 const ADAPTER_DIR = path.join(ROOT, "lib", "pi-sdk");
 
 function walk(dir, files = []) {
@@ -13,7 +17,7 @@ function walk(dir, files = []) {
     if (entry.isDirectory()) {
       if (entry.name === "node_modules") continue;
       walk(full, files);
-    } else if (/\.(js|mjs|cjs)$/.test(entry.name)) {
+    } else if (/\.(js|mjs|cjs|ts|tsx)$/.test(entry.name)) {
       files.push(full);
     }
   }
@@ -62,7 +66,17 @@ describe("Pi SDK import boundary", () => {
   });
 
   it("keeps production typebox imports inside lib/pi-sdk", () => {
+    // P01-T02 扩面后发现：lib/tools/invocation/schema-validator.ts 消费
+    // `typebox/value` 的 Value 校验器。typebox 是根级直接依赖（package.json），
+    // 该文件是网关参数 schema 的运行时校验基础设施（tests/tool-schema-validator
+    // 全覆盖），不是 Pi SDK 旁路——登记为唯一精确例外。schema 构造面（根模块
+    // `typebox` 的 Type）仍必须经 lib/pi-sdk 适配面 re-export。
     const pattern = /(?:from\s+["']typebox["']|import\s*\(\s*["']typebox["']|require\s*\(\s*["']typebox["'])/;
-    expect(findDirectImports(pattern)).toEqual([]);
+    const typeboxValuePattern = /(?:from\s+["']typebox\/value["']|import\s*\(\s*["']typebox\/value["']|require\s*\(\s*["']typebox\/value["'])/;
+    const rootSpecifiers = findDirectImports(pattern)
+      .filter((file) => file !== "lib/tools/invocation/schema-validator.ts");
+    expect(rootSpecifiers).toEqual([]);
+    expect(findDirectImports(typeboxValuePattern))
+      .toEqual(["lib/tools/invocation/schema-validator.ts"]);
   });
 });

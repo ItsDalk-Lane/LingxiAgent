@@ -23,6 +23,9 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { spawn } from "child_process";
+import { createServer } from "node:http";
+import WebSocket from "ws";
+import { openaiCompletionsSseBody } from "./helpers/model-observability-scenario-harness.ts";
 
 const root = process.cwd();
 
@@ -338,4 +341,319 @@ describe("composition boundary behavior lock: real request smoke against the ful
       if (process.env.LINGXI_TEST_DEBUG) process.stderr.write(stderr);
     }
   }, 60000);
+});
+
+// ---------------------------------------------------------------------------
+// Part 4 — P01 headless vertical slice (P01-T03/T07; scenarios P01-A01/A07/A10).
+//
+// Proves the full chain with zero desktop: real spawned full composition
+// (server/main-full.ts), isolated LINGXI_HOME pre-seeded with a witness
+// provider (local OpenAI-compatible protocol server = model stand-in), the
+// desktop business entry (POST /api/sessions/new + WS /ws prompt — the same
+// entry the renderer uses), a real Pi AgentSession on the locked SDK, a real
+// `read` file-tool round, and a history read-back over HTTP.
+//
+// Also asserts: A07 malformed JSON via the real HTTP entry is rejected with
+// no side effects; A10 a desktop-channel notification in a headless process
+// does not block or crash it and normal chat continues right after.
+// ---------------------------------------------------------------------------
+
+const WITNESS_KEY = "sk-P01-VERTICAL-WITNESS-5f21";
+const FILE_MARKER = "P01_VERTICAL_SLICE_FILE_CONTENT_7ad2";
+
+type WitnessRequest = { url: string; headers: Record<string, string>; bodyJson: any };
+
+class WitnessProvider {
+  // Deterministic content-routed responses: every request is answered based on
+  // its own message payload, so incidental startup background calls (agent
+  // description generation etc.) can never steal a scripted turn's reply.
+  readonly requests: WitnessRequest[] = [];
+  readonly server: ReturnType<typeof createServer>;
+  readonly ready: Promise<number>;
+
+  private respondTo(bodyJson: any): string {
+    // Route on the LAST user message only — every request carries the whole
+    // conversation history, so routing on "anywhere in the payload" would
+    // replay old turns' answers for new turns.
+    const messages = Array.isArray(bodyJson?.messages) ? bodyJson.messages : [];
+    const lastUser = [...messages].reverse().find((m: any) => m?.role === "user");
+    const lastUserText = JSON.stringify(lastUser?.content ?? "");
+    const historyText = JSON.stringify(messages);
+    if (lastUserText.includes("请读取 slice-note.txt")) {
+      if (!historyText.includes(FILE_MARKER)) {
+        return this.toolCallBody("read", JSON.stringify({ path: "slice-note.txt" }));
+      }
+      return this.textBody("P01_VERTICAL_ASSISTANT_REPLY 文件内容已读取");
+    }
+    if (lastUserText.includes("桌面通知")) {
+      if (historyText.includes("desktop channel probe")) {
+        return this.textBody("P01_NOTIFY_DONE 已尝试通知");
+      }
+      return this.toolCallBody("notify", JSON.stringify({ title: "P01 headless", body: "desktop channel probe" }));
+    }
+    if (lastUserText.includes("普通聊天继续")) {
+      return this.textBody("P01_PLAIN_CHAT_REPLY 普通聊天正常");
+    }
+    return this.textBody("witness default reply");
+  }
+
+  private textBody(content: string): string {
+    return openaiCompletionsSseBody({ content, usage: { prompt_tokens: 9, completion_tokens: 4, total_tokens: 13 } });
+  }
+
+  private toolCallBody(toolName: string, argsJson: string): string {
+    const chunk = {
+      id: "chatcmpl-p01", object: "chat.completion.chunk", created: 0, model: "witness-model",
+      choices: [{ index: 0, delta: { role: "assistant", tool_calls: [{ index: 0, id: `tc_p01_${toolName}`, type: "function", function: { name: toolName, arguments: argsJson } }] }, finish_reason: null }],
+    };
+    const done = {
+      id: "chatcmpl-p01", object: "chat.completion.chunk", created: 0, model: "witness-model",
+      choices: [{ index: 0, delta: {}, finish_reason: "tool_calls" }],
+      usage: { prompt_tokens: 9, completion_tokens: 3, total_tokens: 12 },
+    };
+    return [`data: ${JSON.stringify(chunk)}`, `data: ${JSON.stringify(done)}`, "data: [DONE]", ""].join("\n\n");
+  }
+
+  constructor() {
+    this.server = createServer((req, res) => {
+      const chunks: Buffer[] = [];
+      req.on("data", (chunk: Buffer) => chunks.push(chunk));
+      req.on("end", () => {
+        const raw = Buffer.concat(chunks).toString("utf8");
+        let bodyJson: any = null;
+        try { bodyJson = JSON.parse(raw); } catch { bodyJson = { unparseable: raw.slice(0, 512) }; }
+        this.requests.push({
+          url: req.url || "",
+          headers: (req.headers as Record<string, string>) || {},
+          bodyJson,
+        });
+        res.writeHead(200, { "content-type": "text/event-stream" });
+        res.end(this.respondTo(bodyJson));
+      });
+    });
+    this.ready = new Promise((resolve, reject) => {
+      this.server.once("error", reject);
+      this.server.listen(0, "127.0.0.1", () => {
+        const address = this.server.address();
+        if (address && typeof address === "object") resolve(address.port);
+        else reject(new Error("witness server failed to bind"));
+      });
+    });
+  }
+
+  get baseUrl(): string {
+    return `http://127.0.0.1:${(this.server.address() as { port: number }).port}`;
+  }
+
+  posts(): WitnessRequest[] { return this.requests.filter((r) => r.url.includes("/v1/chat/completions")); }
+
+  close(): Promise<void> { return new Promise((resolve) => this.server.close(() => resolve())); }
+}
+
+describe("P01 headless vertical slice: witness provider → WS prompt → real read tool → history read-back", () => {
+  it("runs the full chain without any desktop, rejects malformed JSON at the HTTP entry (A07), and keeps serving after a desktop-channel notify (A10)", async () => {
+    const witness = new WitnessProvider();
+    const witnessPort = await witness.ready;
+    const lingxiHome = fs.mkdtempSync(path.join(os.tmpdir(), "hana-p01-vertical-"));
+    const workspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-p01-ws-"));
+    const serverInfoPath = path.join(lingxiHome, "server-info.json");
+    fs.writeFileSync(path.join(workspaceDir, "slice-note.txt"), `${FILE_MARKER}\nsecond line\n`, "utf8");
+
+    // Pre-seed a valid default agent config (skips seedDefaultAgent, so the real
+    // ~/Desktop default workspace is never touched) pointing its chat model at
+    // the witness provider, plus the provider catalog v2 entry for it.
+    const agentDir = path.join(lingxiHome, "agents", "lingxi");
+    fs.mkdirSync(path.join(agentDir, "sessions"), { recursive: true });
+    const template = fs.readFileSync(path.join(root, "lib", "config.example.yaml"), "utf8");
+    // migrations #5 之后 models.chat 必为 {id, provider} 对象（字符串被判为未配置）。
+    const patched = template.replace(
+      /^(\s*chat:\s*)".*"/m,
+      "$1{id: witness-model, provider: witness}",
+    );
+    if (patched === template) throw new Error("failed to patch models.chat in config template");
+    fs.writeFileSync(path.join(agentDir, "config.yaml"), patched, "utf8");
+    fs.writeFileSync(path.join(lingxiHome, "provider-catalog.json"), JSON.stringify({
+      catalogVersion: 2,
+      providers: {
+        witness: {
+          base_url: `http://127.0.0.1:${witnessPort}/v1`,
+          api: "openai-completions",
+          api_key: WITNESS_KEY,
+          models: ["witness-model"],
+        },
+      },
+    }, null, 2), "utf8");
+
+    const child = spawn(process.execPath, ["server/bootstrap.ts"], {
+      cwd: root,
+      env: {
+        ...process.env,
+        LINGXI_HOME: lingxiHome,
+        LINGXI_PORT: "0",
+        LINGXI_ROOT: root,
+        LINGXI_SERVER_ENTRY: path.join(root, "server", "main-full.ts"),
+        LINGXI_CREATE_STARTUP_SESSION: "0",
+      },
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let stderr = "";
+    child.stderr.on("data", (chunk) => { stderr += String(chunk); });
+
+    try {
+      const info = await waitForServerInfo(serverInfoPath, child);
+      const base = `http://127.0.0.1:${info.port}`;
+      const authHeaders = { authorization: `Bearer ${info.token}`, "content-type": "application/json" };
+
+      // ── A07: malformed JSON at the real HTTP entry is rejected, no side effects ──
+      // (P01-T05 修复后：非空但不可解析的 body → 400 invalid_json，不再被 safeJson
+      //  静默吞成空对象后按默认参数建会话。)
+      const beforeList = await (await fetch(`${base}/api/sessions`, { headers: authHeaders })).json();
+      const malformed = await fetch(`${base}/api/sessions/new`, {
+        method: "POST",
+        headers: authHeaders,
+        body: '{"cwd": "/tmp", "memoryEnabled": tru', // deliberately truncated JSON
+      });
+      expect(malformed.status).toBe(400);
+      expect(await malformed.text()).toBeTruthy();
+      const afterList = await (await fetch(`${base}/api/sessions`, { headers: authHeaders })).json();
+      expect(afterList).toEqual(beforeList);
+
+      // ── A07（验收修复）：字段类型错误的合法 JSON 同样被运行时拒绝 ──
+      // 验收反例实测：修复前这三例分别被静默按默认执行（200 建会话 ×2）或以
+      // 500 崩溃；修复后必须 400 invalid_field_type 且零副作用。
+      for (const badBody of [
+        '{"memoryEnabled": "yes-please"}',
+        '{"thinkingLevel": {"hack": 1}}',
+        '{"agentId": 12345}',
+      ]) {
+        const wrongType = await fetch(`${base}/api/sessions/new`, {
+          method: "POST",
+          headers: authHeaders,
+          body: badBody,
+        });
+        expect(wrongType.status).toBe(400);
+        const wrongTypeBody = await wrongType.json();
+        expect(wrongTypeBody.code ?? wrongTypeBody.error?.code).toBe("invalid_field_type");
+      }
+      // ── A07（验收修复）：合法 JSON 但非对象（null/数字/字符串/数组）→ 400 invalid_body ──
+      // 修复前 `null` 会在解构时抛 TypeError 变 500，`123`/`"str"`/`[]` 静默按默认执行。
+      for (const nonObjectBody of ["null", "123", '"str"', "[]"]) {
+        const nonObject = await fetch(`${base}/api/sessions/new`, {
+          method: "POST",
+          headers: authHeaders,
+          body: nonObjectBody,
+        });
+        expect(nonObject.status).toBe(400);
+        const nonObjectJson = await nonObject.json();
+        expect(nonObjectJson.code ?? nonObjectJson.error?.code).toBe("invalid_body");
+      }
+      expect((await (await fetch(`${base}/api/sessions`, { headers: authHeaders })).json())).toEqual(beforeList);
+
+      // ── A01: entry → SDK → read tool → reply → history read-back ──
+      // (witness responses are content-routed, no pre-scripting needed)
+      const created = await fetch(`${base}/api/sessions/new`, {
+        method: "POST",
+        headers: authHeaders,
+        body: JSON.stringify({ cwd: workspaceDir }),
+      });
+      expect(created.status).toBe(200);
+      const session = await created.json();
+      expect(session.ok).toBe(true);
+      expect(session.sessionId).toMatch(/^sess_/);
+      expect(session.agentId).toBe("lingxi");
+
+      const events: any[] = [];
+      const ws = new WebSocket(`ws://127.0.0.1:${info.port}/ws?token=${encodeURIComponent(info.token)}`);
+      await new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error("ws connect timeout")), 15000);
+        ws.once("open", () => { clearTimeout(timer); resolve(); });
+        ws.once("error", (err) => { clearTimeout(timer); reject(err); });
+      });
+      ws.on("message", (raw) => { try { events.push(JSON.parse(String(raw))); } catch { /* ignore */ } });
+      // Settle signal seen by WS clients: assistant_run_end{status:"completed"}
+      // (agent_settled is the internal Pi event the chat route consumes).
+      const settledCount = () => events.filter((e) => e.type === "assistant_run_end" && e.status === "completed").length;
+      const waitForSettled = async (target: number) => {
+        const deadline = Date.now() + 90000;
+        while (settledCount() < target) {
+          if (Date.now() > deadline) throw new Error(`assistant_run_end wait timeout; last events: ${JSON.stringify(events.slice(-6))}`);
+          await new Promise((r) => setTimeout(r, 150));
+        }
+      };
+
+      ws.send(JSON.stringify({
+        type: "prompt",
+        clientMessageId: "p01-vertical-c1",
+        snapshotVersion: 1,
+        text: "请读取 slice-note.txt 并告诉我内容",
+        sessionId: session.sessionId,
+        sessionPath: session.path,
+      }));
+      await waitForSettled(1);
+
+      // Witness saw the real provider exchange for the chat turn (startup
+      // background calls like roster-description generation are excluded by
+      // the user-text marker): C1 carries the user prompt, C2 (post-tool)
+      // carries the read tool's result back to the model.
+      const posts = witness.posts();
+      expect(posts.some((p) => p.headers.authorization.includes(WITNESS_KEY))).toBe(true);
+      const chatPosts = posts.filter((p) => JSON.stringify(p.bodyJson).includes("请读取 slice-note.txt"));
+      expect(chatPosts.length).toBeGreaterThanOrEqual(2);
+      expect(JSON.stringify(chatPosts[1].bodyJson)).toContain(FILE_MARKER);
+
+      // The WS event stream carried the tool round-trip.
+      expect(events.filter((e) => String(e.type).startsWith("tool_")).length).toBeGreaterThanOrEqual(2);
+
+      // History read-back over HTTP contains the user turn and the assistant reply.
+      const history = await fetch(
+        `${base}/api/sessions/messages?sessionId=${encodeURIComponent(session.sessionId)}&all=1`,
+        { headers: authHeaders },
+      );
+      expect(history.status).toBe(200);
+      const historyText = JSON.stringify(await history.json());
+      expect(historyText).toContain("slice-note.txt");
+      expect(historyText).toContain("P01_VERTICAL_ASSISTANT_REPLY");
+
+      // ── A10: desktop-channel notify in a headless process does not block/crash;
+      //        a follow-up plain chat turn completes normally afterwards. ──
+      expect((await fetch(`${base}/api/health`, { headers: authHeaders })).status).toBe(200);
+      ws.send(JSON.stringify({
+        type: "prompt",
+        clientMessageId: "p01-vertical-notify",
+        snapshotVersion: 1,
+        text: "请给我发一条桌面通知",
+        sessionId: session.sessionId,
+        sessionPath: session.path,
+      }));
+      await waitForSettled(2);
+      expect((await fetch(`${base}/api/health`, { headers: authHeaders })).status).toBe(200);
+
+      ws.send(JSON.stringify({
+        type: "prompt",
+        clientMessageId: "p01-vertical-plain",
+        snapshotVersion: 1,
+        text: "普通聊天继续",
+        sessionId: session.sessionId,
+        sessionPath: session.path,
+      }));
+      await waitForSettled(3);
+
+      expect(witness.posts().filter((p) => JSON.stringify(p.bodyJson).includes("普通聊天继续")).length).toBeGreaterThanOrEqual(1);
+      const finalHistory = await fetch(
+        `${base}/api/sessions/messages?sessionId=${encodeURIComponent(session.sessionId)}&all=1`,
+        { headers: authHeaders },
+      );
+      expect(finalHistory.status).toBe(200);
+      expect(JSON.stringify(await finalHistory.json())).toContain("P01_PLAIN_CHAT_REPLY");
+
+      ws.close();
+    } finally {
+      child.kill("SIGTERM");
+      await waitForExit(child);
+      await witness.close();
+      fs.rmSync(lingxiHome, TEMP_HOME_RM_OPTIONS);
+      fs.rmSync(workspaceDir, TEMP_HOME_RM_OPTIONS);
+      if (process.env.LINGXI_TEST_DEBUG) process.stderr.write(stderr);
+    }
+  }, 300000);
 });

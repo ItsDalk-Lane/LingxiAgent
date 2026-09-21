@@ -5,6 +5,7 @@
  */
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createModelCallRecorder } from "../lib/llm/model-call-recorder.ts";
+import { requireModelAttemptId, requireModelCallId, requireModelTraceId } from "../shared/identity-brands.ts";
 import { createModelObservabilityTestHarness } from "../lib/llm/model-observability-testing.ts";
 import { installModelObservabilityPersistence } from "../lib/llm/model-observability-persistence.ts";
 
@@ -39,7 +40,7 @@ describe("Model Observability Trace Projection", () => {
     const traceId = "mt_tree1";
     const mkRecorder = (callId: string, parentCallId: string | null) => createModelCallRecorder({
       observer: harness.handle.observer,
-      identity: { mintCallId: () => callId, mintAttemptId: () => `ma_${callId}_a`, mintTraceId: () => traceId },
+      identity: { mintCallId: () => requireModelCallId(callId), mintAttemptId: () => requireModelAttemptId(`ma_${callId}_a`), mintTraceId: () => requireModelTraceId(traceId) },
       context: {
         callId, traceId, parentCallId,
         model: MODEL, source: SOURCE,
@@ -115,12 +116,12 @@ describe("Model Observability Trace Projection", () => {
     const rec = createModelCallRecorder({
       observer: harness.handle.observer,
       identity: {
-        mintCallId: () => "mc_two_attempts",
+        mintCallId: () => requireModelCallId("mc_two_attempts"),
         mintAttemptId: (() => {
           let n = 0;
-          return () => `ma_att_${++n}`;
+          return () => requireModelAttemptId(`ma_att_${++n}`);
         })(),
-        mintTraceId: () => "mt_att",
+        mintTraceId: () => requireModelTraceId("mt_att"),
       },
       context: { traceId: "mt_att", model: MODEL, source: SOURCE, attribution: attribution() },
     });
@@ -163,9 +164,9 @@ describe("Model Observability Trace Projection", () => {
     const rec = createModelCallRecorder({
       observer: harness.handle.observer,
       identity: {
-        mintCallId: () => "mc_crashed",
-        mintAttemptId: () => "ma_crashed_1",
-        mintTraceId: () => "mt_crash",
+        mintCallId: () => requireModelCallId("mc_crashed"),
+        mintAttemptId: () => requireModelAttemptId("ma_crashed_1"),
+        mintTraceId: () => requireModelTraceId("mt_crash"),
       },
       context: { traceId: "mt_crash", model: MODEL, source: SOURCE, attribution: attribution() },
     });
@@ -205,9 +206,9 @@ describe("Model Observability Trace Projection", () => {
     const rec = createModelCallRecorder({
       observer: harness.handle.observer,
       identity: {
-        mintCallId: () => "mc_rt",
-        mintAttemptId: () => "ma_rt_1",
-        mintTraceId: () => "mt_rt",
+        mintCallId: () => requireModelCallId("mc_rt"),
+        mintAttemptId: () => requireModelAttemptId("ma_rt_1"),
+        mintTraceId: () => requireModelTraceId("mt_rt"),
       },
       context: { traceId: "mt_rt", model: MODEL, source: SOURCE, attribution: attribution() },
     });
@@ -238,9 +239,9 @@ describe("Model Observability Trace Projection", () => {
     const rec = createModelCallRecorder({
       observer: harness.handle.observer,
       identity: {
-        mintCallId: () => "mc_orphan_attempt",
-        mintAttemptId: () => "ma_orphan_1",
-        mintTraceId: () => "mt_orphan",
+        mintCallId: () => requireModelCallId("mc_orphan_attempt"),
+        mintAttemptId: () => requireModelAttemptId("ma_orphan_1"),
+        mintTraceId: () => requireModelTraceId("mt_orphan"),
       },
       context: { traceId: "mt_orphan", model: MODEL, source: SOURCE, attribution: attribution() },
     });

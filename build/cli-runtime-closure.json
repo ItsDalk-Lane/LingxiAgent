@@ -105273,17 +105273,27 @@
       "inputType": "source-graph",
       "provenance": [
         {
+          "root": "cli-entry",
+          "from": "shared/hana-runtime-paths.ts",
+          "kind": "import-statement"
+        },
+        {
           "root": "server-bootstrap",
           "from": "shared/hana-runtime-paths.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by shared/hana-runtime-paths.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by shared/hana-runtime-paths.ts (import-statement); shared/hana-runtime-paths.ts (import-statement)."
     },
     {
       "path": "shared/hana-runtime-paths.ts",
       "inputType": "source-graph",
       "provenance": [
+        {
+          "root": "cli-entry",
+          "from": "cli/local-server.ts",
+          "kind": "import-statement"
+        },
         {
           "root": "server-bootstrap",
           "from": "lib/env-deps/detect.ts",
@@ -105305,7 +105315,19 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/env-deps/detect.ts (import-statement); lib/sandbox/index.ts (import-statement); core/engine.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by cli/local-server.ts (import-statement); lib/env-deps/detect.ts (import-statement); lib/sandbox/index.ts (import-statement); +2 more importer(s)."
+    },
+    {
+      "path": "shared/identity-brands.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-call-identity.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-identity.ts (import-statement)."
     },
     {
       "path": "shared/image-mime.ts",
@@ -107124,9 +107146,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 8944,
+    "totalFiles": 8945,
     "byInputType": {
-      "source-graph": 830,
+      "source-graph": 831,
       "runtime-asset": 11,
       "nft-runtime-trace": 8103
     }
