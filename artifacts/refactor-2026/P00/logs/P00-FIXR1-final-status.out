@@ -1,0 +1,23 @@
+ M artifacts/refactor-2026/P00/logs/command-log.jsonl
+ M artifacts/refactor-2026/P00/logs/deliverables.sha256
+ M artifacts/refactor-2026/P00/tools/redaction-check.mjs
+ M core/session-permission-mode.ts
+ M docs/architecture/tool-invocation-path-invariance.md
+ M docs/refactor-2026/P00/P00_REPORT.md
+ M lib/tools/run-code-tool.ts
+ M lib/tools/security-scan-tool.ts
+ M scripts/check-tool-invocation-boundaries.mjs
+ M shared/tool-categories.ts
+ M tests/engine-tool-defer.test.ts
+ M tests/mcp-http-client.test.ts
+ M tests/on-demand-first-party.test.ts
+ M tests/tool-invocation-boundary.test.ts
+ M tests/tool-invocation-gateway.test.ts
+ M tests/tool-schema-validator.test.ts
+?? docs/refactor-2026/P03/
+---diff-stat---
+ artifacts/refactor-2026/P00/logs/command-log.jsonl    | 4 ++++
+ artifacts/refactor-2026/P00/logs/deliverables.sha256  | 2 +-
+ artifacts/refactor-2026/P00/tools/redaction-check.mjs | 9 ++++-----
+ docs/refactor-2026/P00/P00_REPORT.md                  | 5 +++--
+ 4 files changed, 12 insertions(+), 8 deletions(-)

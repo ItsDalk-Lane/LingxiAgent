@@ -18,9 +18,11 @@ const EXEMPT = new Set([
   path.join(P00, "P00", "fixtures", "redaction", "synthetic-secret-sample.json"),
   // 扫描器自身必须包含待检模式的定义，豁免自扫。
   path.resolve(fileURLToPath(import.meta.url)),
-  // 受控保留：首版扫描器的错误日志引用了受控样本标记（P00-A09-redaction-check.err，
-  // 已在 P00_REPORT 差异与限制一节声明不进入公开打包）。二版起错误只打印模式名。
+  // 受控保留（仅限以下两份，验收修复轮自整族正则收窄）：首两版扫描器的错误日志
+  // 引用了受控样本标记，已在 P00_REPORT 差异与限制一节声明不进入公开打包。
+  // r3/r4 起错误只打印模式名、不含标记，无需也不应豁免。
   path.join(P00, "P00", "logs", "P00-A09-redaction-check.err"),
+  path.join(P00, "P00", "logs", "P00-A09-redaction-check-r2.err"),
 ]);
 // 公开产物白名单之外的位置（隔离 HOME 里 server 写的合成运行数据）不扫敏感，
 // 但 server-A 原始日志保留在受控位置、也不公开。
@@ -51,9 +53,6 @@ function walk(dir) {
     const p = path.join(dir, entry.name);
     if (entry.isDirectory()) { walk(p); continue; }
     if (EXEMPT.has(p)) continue;
-    // 受控保留：redaction-check 历史运行日志（r1/r2）按设计引用了受控样本标记，
-    // 声明为不进公开打包（见 P00_REPORT 差异与限制）；当前版错误只打印模式名。
-    if (/^P00-A09-redaction-check(-r\d+)?\.err$/.test(entry.name) && path.dirname(p) === path.join(P00, "P00", "logs")) continue;
     if (!/\.(json|jsonl|md|mjs|txt|log|out|err)$/.test(entry.name)) continue;
     const text = fs.readFileSync(p, "utf-8");
     for (const [re, name] of PATTERNS) {

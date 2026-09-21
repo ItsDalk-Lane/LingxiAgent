@@ -10,7 +10,7 @@
 - 任务书研究 SHA `8037fae7a` = HEAD~1，差异仅 8 个文档文件、0 源码（命令 P00-T01-drift-diff）
 - 锁文件 sha256 `a9735825cea1d018c2a42ae04f875368a003c386ca68fc86503bc8acbcd79d3c`；node_modules 与锁一致（npm ls 抽查 4 关键包）
 - OS：Darwin 27.0.0（macOS 27.0）arm64；Node v24.16.0（engines >=24.12 <25 ✓）；npm 11.13.0
-- 未提交修改保护：进入时 0 已跟踪修改 + 2 个未跟踪任务书目录；退出时原样（终检 P00-T08-final-status）；全程未 reset/clean/切换分支；**未另建分支**（当前分支干净，建分支会扰动用户环境，已在 WORKTREE_SAFETY 记录决策）
+- 未提交修改保护：进入时 0 已跟踪修改 + 1 个未跟踪任务书目录（任务书副本目录在会话中途被外部创建、终检前消失，精确时间线见 BASELINE_FAILURES.md F6）；退出时原样（终检 P00-T08-final-status）；全程未 reset/clean/切换分支；**未另建分支**（当前分支干净，建分支会扰动用户环境，已在 WORKTREE_SAFETY 记录决策）
 
 ## 任务逐项结果
 
@@ -37,7 +37,7 @@
 
 ## 验证
 
-全部命令 exit code 与原始日志：`artifacts/refactor-2026/P00/logs/command-log.jsonl`（47 条 JSONL，每条含 argv/时间/exit/digest）与同名 .out/.err。基线五命令结果见 BASELINE_TESTS.json；首次失败全部保留（A03 首跑 FAIL、lint 三连、redaction 四连、compare 语法错各留原始+重跑链）。
+全部命令 exit code 与原始日志：`artifacts/refactor-2026/P00/logs/command-log.jsonl`（47 条 JSONL，验收修复轮追加 5 条后 52 条；每条含 argv/时间/exit/digest）与同名 .out/.err。JSONL 的 `exit_code`/`status` 记录的是**日志外壳进程**的退出：管道命令（如 P00-T05-gh-ci-evidence 经 `| head` 包裹的 gh 查询）的内层失败以外壳 exit 0 记录，真实结果以 .out/.err 原文与 BASELINE_TESTS.json 的 `shell_exit`/`status` 分类为准。基线五命令结果见 BASELINE_TESTS.json；首次失败全部保留（A03 首跑 FAIL、lint 三连、redaction 四连、compare 语法错各留原始+重跑链）。
 
 ## 数据、权限与平台
 
@@ -54,6 +54,7 @@
 5. **未验证环境**：四平台 CI（F3）、Windows/Linux 实机、真供应商（无授权）。
 6. **既有非关键问题**：BASELINE_FAILURES.md「既有非关键问题登记」5 项，各有主责阶段。
 7. **验收后修正（2026-09-21，用户授权的独立验收修正）**：command-log 条数 37→47（实测 command-log.jsonl 行数）；F2 归因提交 59c131276→6282cf35b（`git log -L` 核实为三行唯一历史提交，涉及本文件、P00_RESULT.json、BASELINE_FAILURES.md）；`deliverables.sha256` 已按原生成命令刷新。原始命令日志与 .out/.err 未改动。
+8. **验收修复轮（2026-09-22，用户授权的独立验收修复）**：①更正本报告「实际输入」中「2 个未跟踪任务书目录」的不精确表述——进入快照（P00-T01-git-status.out）只有 1 个任务书目录，副本目录为会话中途外部出现/消失，时间线以 BASELINE_FAILURES.md F6 为准；②「验证」一节补充 JSONL `exit_code`/`status` 为日志外壳进程口径的说明；③redaction-check.mjs 的历史日志豁免由整族正则（`P00-A09-redaction-check(-r\d+)?.err`）收窄为仅两份声明受控文件（`P00-A09-redaction-check.err` 与 `-r2.err`，r3/r4 起无标记无需豁免）——收窄后正向复跑 PASS、负例（镜像植入合成密钥）仍被检出，证据链 P00-FIXR1-*（5 条追加）；`deliverables.sha256` 按原生成命令刷新。历史 JSONL 条目与既有 .out/.err 零改动，仅追加修复轮新条目。
 
 ## 回退与下一阶段
 
