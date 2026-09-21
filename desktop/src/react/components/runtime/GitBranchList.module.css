@@ -24,6 +24,22 @@
     overscroll-behavior: contain;
 }
 
+/* 分支 × 工作树合并显示：检出该分支的工作树标志，「主」＝与主分支共用主工作树，
+   「独」＝该分支的独立工作树；路径不直接展示，悬停标志才看得到 */
+.worktreeBadge {
+    flex-shrink: 0;
+    padding: 0 var(--space-4);
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent);
+    font-size: var(--fs-hint);
+}
+
+/* 没挂在任何分支上的工作树：整行次要色，与普通分支项区分 */
+.detachedWorktree .itemName {
+    color: var(--text-light);
+}
+
 /* 分支项整行可点：宽度撑满浮层，悬停/焦点高亮才有完整的行级反馈 */
 .item {
     display: flex;
@@ -88,8 +104,11 @@
     color: var(--text-light);
 }
 
-/* ── 底部「新建分支」行 ── */
+/* ── 底部「新建」区：新建工作树、新建分支两行上下排列 ── */
 .createRow {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
     border-top: 1px solid var(--overlay-light);
     padding-top: var(--space-4);
 }

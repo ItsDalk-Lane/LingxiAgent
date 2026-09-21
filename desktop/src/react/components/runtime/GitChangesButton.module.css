@@ -1,0 +1,47 @@
+/* GitChangesButton — 工作台首行的「变更 +n -m」按钮
+   皮肤对齐 DeskToolbar 的 sortBtn（同一行的高低与字号），
+   数字用 +绿 / -红（与源代码管理面板的变更合计一致，千分位 tabular） */
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 20px;
+    padding: var(--space-2) var(--space-8);
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font: inherit;
+    font-size: var(--fs-hint);
+    cursor: default;
+    transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+.button:hover {
+    background: var(--overlay-subtle);
+    color: var(--text);
+}
+
+.button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--focus-accent-wash, rgba(var(--accent-rgb), 0.35));
+}
+
+.label {
+    white-space: nowrap;
+}
+
+.added,
+.deleted {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.added {
+    color: var(--green, #7BAE7F);
+}
+
+.deleted {
+    color: var(--danger, #8B3A3A);
+}

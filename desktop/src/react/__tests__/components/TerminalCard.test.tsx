@@ -106,23 +106,24 @@ describe('TerminalCard', () => {
     });
   });
 
-  it('默认折叠只露标题行，展开后只显示运行中的终端', () => {
+  it('默认展开直接见运行中的终端，点击可折叠', async () => {
     setTerminals([
       terminal({ terminalId: 'running', label: '人类可读命令', createdAt: 5 }),
       terminal({ terminalId: 'done', label: '', command: 'done command', status: 'exited', exitCode: 0, createdAt: 4 }),
     ]);
     render(<TerminalCard />);
 
-    // 默认折叠（用户裁决）：标题行在，行内容不挂载
+    // 默认展开（用户裁决 2026-09-21）：打开运行信息即见内容
     const header = screen.getByRole('button', { name: /终端进程/ });
-    expect(header).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByTestId('terminal-name-running')).toBeNull();
-
-    fireEvent.click(header);
     expect(header).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByTestId('terminal-name-running')).toHaveTextContent('人类可读命令');
     expect(screen.queryByTestId('terminal-name-done')).toBeNull();
     expect(screen.getByRole('button', { name: '停止' })).toBeInTheDocument();
+
+    // 点击标题可折叠回收（Collapse 退场动画有延迟）
+    fireEvent.click(header);
+    expect(header).toHaveAttribute('aria-expanded', 'false');
+    await waitFor(() => expect(screen.queryByTestId('terminal-name-running')).toBeNull());
   });
 
   it('shows every running terminal and no completed terminal', () => {

@@ -1,0 +1,91 @@
+/* GitBranchPicker — 输入框上方的分支下拉（IDE 风：图标 + 分支名 + ▾）
+   + 菜单底部动作行（新建工作树 / 提交记录） */
+
+/* 下拉控件：输入卡片上方一行内，实色胶囊（git-ui-relocation 设计稿 .branch-pill 同款）。
+   背景必须实色：聊天滚动区底边延伸到输入卡片之后，消息文字会从胶囊背后穿过，
+   透明底会让文字与分支名重叠显示 */
+.picker {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    max-width: min(50vw, 380px);
+    height: 26px;
+    padding: 0 var(--space-12);
+    margin: 0 0 var(--space-4) var(--space-2);
+    border: 1px solid var(--border, var(--overlay-light, rgba(0, 0, 0, 0.12)));
+    border-radius: 999px;
+    background: var(--bg-card, var(--bg, #ffffff));
+    box-shadow: 0 2px 8px var(--shadow, rgba(0, 0, 0, 0.1));
+    color: var(--text-light);
+    font: inherit;
+    font-size: var(--fs-caption);
+    cursor: default;
+    transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+.picker:hover,
+.picker:focus-visible {
+    border-color: var(--accent);
+    color: var(--text);
+}
+
+.picker:focus-visible {
+    outline: none;
+}
+
+.pickerIcon {
+    flex-shrink: 0;
+}
+
+.pickerName {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ▾ 下拉箭头：展开时转 180° */
+.pickerChevron {
+    flex-shrink: 0;
+    color: var(--text-light);
+    transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.pickerChevron[data-open="true"] {
+    transform: rotate(180deg);
+}
+
+/* 菜单底部动作行（新建工作树 / 提交记录）：样式对齐 GitBranchList 的「新建分支」行 */
+.menuAction {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    width: 100%;
+    min-height: 28px;
+    padding: var(--space-2) var(--space-8);
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--text-light);
+    font: inherit;
+    font-size: var(--fs-caption);
+    text-align: left;
+    cursor: default;
+    transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+.menuAction:hover:not(:disabled),
+.menuAction:focus-visible:not(:disabled) {
+    background: var(--git-hover-wash, rgba(90, 118, 139, 0.09));
+    color: var(--accent);
+}
+
+.menuAction:focus-visible {
+    outline: none;
+}
+
+.menuActionGlyph {
+    flex-shrink: 0;
+    width: 14px;
+    text-align: center;
+}

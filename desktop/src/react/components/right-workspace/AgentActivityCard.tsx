@@ -102,7 +102,8 @@ export function AgentActivityCard() {
   const agents = useStore((state) => state.agents);
   const [now, setNow] = useState(() => Date.now());
   // 默认折叠（用户裁决）：运行信息容器内只露标题行，点击展开
-  const [collapsed, setCollapsed] = useState(true);
+  // 默认展开（用户裁决 2026-09-21）：打开运行信息即见内容
+  const [collapsed, setCollapsed] = useState(false);
   const t = window.t ?? ((key: string) => key);
   const activities = all
     .filter((entry) => entry.kind === 'subagent' && entry.status === 'running')

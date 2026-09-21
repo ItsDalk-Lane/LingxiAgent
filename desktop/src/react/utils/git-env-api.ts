@@ -53,15 +53,6 @@ export interface GitBranches {
   current: string | null;
 }
 
-export interface GitWorktreeInfo {
-  isRepo: boolean;
-  isMain: boolean;
-  name: string | null;
-  branch: string | null;
-  path: string | null;
-  mainPath: string | null;
-}
-
 export interface GitWorktreeEntry {
   path: string;
   head: string | null;
@@ -165,11 +156,6 @@ export async function fetchGitStatus(dir: string, agentId?: string | null): Prom
 
 export async function fetchGitBranches(dir: string, agentId?: string | null): Promise<GitBranches> {
   const res = await lingxiFetch(`/api/git/branches?${dirQuery(dir, agentFields(agentId))}`);
-  return res.json();
-}
-
-export async function fetchGitWorktreeInfo(dir: string, agentId?: string | null): Promise<GitWorktreeInfo> {
-  const res = await lingxiFetch(`/api/git/worktree-info?${dirQuery(dir, agentFields(agentId))}`);
   return res.json();
 }
 

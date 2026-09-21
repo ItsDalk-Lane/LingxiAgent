@@ -14,6 +14,7 @@ import { schedulePersistCurrentWorkspaceUiState } from '../stores/workspace-ui-s
 import { ContextMenu } from '../ui';
 import { DESK_SORT_KEY, type SortMode, type CtxMenuState, type FileTypeFilter } from './desk/desk-types';
 import { DeskFilterButton, DeskOpenIconButton, DeskPreviewIconButton, DeskSearchBox, DeskSortButton } from './desk/DeskToolbar';
+import { GitChangesButton } from './runtime/GitChangesButton';
 import { DeskTree, type InlineCreateKind, type InlineTreeEdit } from './desk/DeskTree';
 import { DeskDropZone } from './desk/DeskDropZone';
 import { DeskEmptyOverlay } from './desk/DeskEmptyOverlay';
@@ -184,6 +185,8 @@ export function DeskSection({
         <DeskSearchBox />
         <div className={s.toolbar}>
           <div className={s.toolbarActions}>
+            {/* 变更入口（行首）：非 Git 仓库时按钮自身不渲染 */}
+            <GitChangesButton />
             <DeskPreviewIconButton />
             <DeskOpenIconButton />
             <DeskFilterButton filters={typeFilters} onFiltersChange={handleTypeFiltersChange} onShowMenu={handleShowMenu} />

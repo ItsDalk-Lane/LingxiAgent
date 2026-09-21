@@ -23,7 +23,6 @@ import { TerminalCard } from '../right-workspace/TerminalCard';
 import { WorkflowCard } from '../right-workspace/WorkflowCard';
 import { AgentActivityCard } from '../right-workspace/AgentActivityCard';
 import { SessionStatusCard } from '../right-workspace/SessionStatusCard';
-import { GitEnvironmentCard } from './GitEnvironmentCard';
 import styles from './RuntimeInfoCapsule.module.css';
 
 function Chevron({ open, className }: { open: boolean; className?: string }) {
@@ -37,7 +36,8 @@ function Chevron({ open, className }: { open: boolean; className?: string }) {
 export function RuntimeInfoCapsule() {
   const [expanded, setExpanded] = useState(false);
   // 笺默认折叠（用户裁决）：卡片内容不常驻展开，点击标题行切换
-  const [jianCollapsed, setJianCollapsed] = useState(true);
+  // 默认展开（用户裁决 2026-09-21）：打开运行信息即见笺内容，不再只露标题行
+  const [jianCollapsed, setJianCollapsed] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const sessionPath = useStore(s => s.currentSessionPath);
   const terminals = useStore(selectTerminals(sessionPath));
@@ -112,7 +112,7 @@ export function RuntimeInfoCapsule() {
           <WorkflowCard />
           <AgentActivityCard />
           <SessionStatusCard />
-          <GitEnvironmentCard />
+          {/* 环境信息（Git）分组已移除：变更入口 → 工作台首行，分支/提交记录 → 输入框左上角下拉 */}
         </div>
       )}
     </div>

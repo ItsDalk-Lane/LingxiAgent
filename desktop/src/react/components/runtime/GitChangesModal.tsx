@@ -410,7 +410,8 @@ export function GitChangesModal({ open, onClose, dir, files, agentId, refresh }:
   );
 }
 
-function DiffBody({ patch, truncatedNote, emptyNote }: { patch: string; truncatedNote: string; emptyNote: string }) {
+/** 行级 diff 渲染（unified patch → 着色行）；变更弹窗与「本轮已编辑文件」卡共用 */
+export function DiffBody({ patch, truncatedNote, emptyNote }: { patch: string; truncatedNote: string; emptyNote: string }) {
   if (!patch.trim()) {
     return <div className={styles.diffNote}>{emptyNote}</div>;
   }

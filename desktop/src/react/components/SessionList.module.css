@@ -768,6 +768,23 @@
     opacity: 0.55;
 }
 
+/* ── 谱系孙辈行：第三层，缩进更深，谱系线随之右移 ── */
+.sessionItemGrandchild {
+    padding-left: calc(var(--space-8) + 56px);
+}
+
+.sessionItemGrandchild::before {
+    content: '';
+    position: absolute;
+    left: calc(var(--space-8) + 37px);
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    border-radius: 1px;
+    background: var(--border-color);
+    opacity: 0.55;
+}
+
 /* ── 归档带子对话的选择框 ── */
 .archiveChoiceDialog {
     max-width: 420px;

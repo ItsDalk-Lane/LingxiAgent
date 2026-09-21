@@ -1,5 +1,5 @@
 /**
- * GitGraphPanel — Git图谱 弹窗（环境信息卡·Git图谱行入口）
+ * GitGraphPanel — Git图谱 弹窗（工作台首行·变更按钮入口）
  *
  * 提交或推送与变更文件合并后的单一界面（用户定稿的 Git图谱 方案）：
  *   头部   分支胶囊（点击切换分支）＋ 本地领先数
@@ -581,8 +581,10 @@ export function GitGraphPanel({
     || (scenario === 'ahead' && ahead === 0)
     || (scenario === 'behind' && behind === 0);
 
+  // scope=window：portal 到全局浮层根，遮罩盖住整个窗口（含左侧栏）——与最早
+  // 从运行信息弹窗调出时同级，不因挂载点（工作台/输入框）层级变低而被侧栏压住
   return (
-    <Overlay scope="inline" open={open} onClose={onClose} backdrop="blur" className={styles.modal} disableContainerAnimation>
+    <Overlay scope="window" open={open} onClose={onClose} backdrop="blur" className={styles.modal} disableContainerAnimation>
       <div className={styles.header}>
         <h2 className={styles.title}>{t('gitEnv.graphTitle')}</h2>
         <div className={styles.headerActions}>

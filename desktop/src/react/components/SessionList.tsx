@@ -271,8 +271,9 @@ function SessionListInner() {
     void reorderPinnedSessions(ordered.map(session => session.sessionId as string));
   }, [clearDragState, dragState, pinnedDropTarget]);
 
-  // 归档入口统一走这里：主对话名下有子对话时先弹选择框（一起归档 / 仅主对话），
-  // 无子对话直接归档。子对话数以本地列表为准，服务端仍会兑底拦截。
+  // 归档入口统一走这里：主对话名下有派生后代时先弹选择框（一起归档 / 仅主对话），
+  // 无后代直接归档。后代数以本地列表沿 forkedFrom 逐层清点为准（谱系最多三层，
+  // 服务端 archive_children 会递归归档全部后代），服务端仍会兜底拦截。
   const [archiveChoice, setArchiveChoice] = useState<{ session: Session; childCount: number } | null>(null);
   const requestArchive = useCallback((session: Session) => {
     const state = useStore.getState();
@@ -281,17 +282,29 @@ function SessionListInner() {
       void archiveSession(session.path);
       return;
     }
-    const children = (state.sessions || []).filter((item: Session) => (
-      item.sessionId
-      && item.sessionId !== parentSessionId
-      && item.path !== session.path
-      && item.forkedFrom?.sessionId === parentSessionId
-    ));
-    if (children.length === 0) {
+    const byParent = new Map<string, Session[]>();
+    for (const item of (state.sessions || []) as Session[]) {
+      const parentId = item.forkedFrom?.sessionId;
+      if (!item.sessionId || !parentId || item.sessionId === parentId || item.path === session.path) continue;
+      const list = byParent.get(parentId) || [];
+      list.push(item);
+      byParent.set(parentId, list);
+    }
+    let childCount = 0;
+    const queue = [...(byParent.get(parentSessionId) || [])];
+    const seen = new Set<string>([session.path]);
+    while (queue.length > 0) {
+      const child = queue.shift()!;
+      if (seen.has(child.path)) continue;
+      seen.add(child.path);
+      childCount += 1;
+      for (const grandchild of byParent.get(child.sessionId as string) || []) queue.push(grandchild);
+    }
+    if (childCount === 0) {
       void archiveSession(session.path);
       return;
     }
-    setArchiveChoice({ session, childCount: children.length });
+    setArchiveChoice({ session, childCount });
   }, []);
 
   const activeSessionPath = pendingSessionSwitchPath || currentSessionPath;
@@ -627,7 +640,7 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
   isPending: boolean;
   isStreaming: boolean;
   isPinned: boolean;
-  /** 谱系子行：缩进两级展示（主对话的子对话） */
+  /** 谱系子行：按 childDepth 缩进并画谱系线（1=子对话，2=孙辈） */
   isChildRow?: boolean;
   /** 主对话行：名下挂有子对话（展示折叠开关） */
   hasChildSessions?: boolean;
@@ -803,10 +816,16 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
     action: () => onCloseBrowser(s.path),
   }]), [t, onCloseBrowser, s.path]);
 
+  // 谱系子行缩进：1=主对话的直接子对话，2=孙辈（收拢的深层历史后代也钉在这一层）。
+  const childDepth = typeof s.childDepth === 'number' ? s.childDepth : 1;
+  const childRowClass = !isChildRow
+    ? ''
+    : (childDepth >= 2 ? ` ${styles.sessionItemGrandchild}` : ` ${styles.sessionItemChild}`);
+
   return (
     <>
       <button
-        className={`${styles.sessionItem}${isSingleLine ? ` ${styles.sessionItemSingleLine}` : ''}${isActive ? ` ${styles.sessionItemActive}` : ''}${isDeletedAgentSession ? ` ${styles.sessionItemReadOnly}` : ''}${isChildRow ? ` ${styles.sessionItemChild}` : ''}${hasChildSessions ? ` ${styles.sessionItemParent}` : ''}`}
+        className={`${styles.sessionItem}${isSingleLine ? ` ${styles.sessionItemSingleLine}` : ''}${isActive ? ` ${styles.sessionItemActive}` : ''}${isDeletedAgentSession ? ` ${styles.sessionItemReadOnly}` : ''}${childRowClass}${hasChildSessions ? ` ${styles.sessionItemParent}` : ''}`}
         data-session-path={s.path}
         data-children-folded={hasChildSessions ? (childrenFolded ? 'true' : 'false') : undefined}
         data-row-mode={rowMode}

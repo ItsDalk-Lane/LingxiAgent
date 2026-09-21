@@ -106,9 +106,10 @@ export function GitWorktreeModal({
     );
   };
 
+  // scope=window：portal 到全局浮层根，遮罩盖住整个窗口（含左侧栏），与最早的呈现一致
   return (
     <Overlay
-      scope="inline"
+      scope="window"
       open={open}
       onClose={onClose}
       backdrop="blur"

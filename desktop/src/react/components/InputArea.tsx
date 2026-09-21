@@ -113,6 +113,7 @@ import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { VOICE_RECORD_TOGGLE_EVENT } from '../keybindings/useKeybindings';
 import type { DeskSearchResult } from '../types';
 import styles from './input/InputArea.module.css';
+import { GitBranchPicker } from './runtime/GitBranchPicker';
 import type { AudioWaveform, ChatListItem, QueuedTurnInput, SessionConfirmationBlock, SessionModel } from '../stores/chat-types';
 import {
   MAX_CHAT_VIDEO_SOURCE_BYTES,
@@ -2524,6 +2525,8 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
           </div>
         )}
         <TodoPanel />
+        {/* 分支下拉（输入卡片上方一行，IDE 风）：子会话输入框不重复展示；非 Git 仓库时组件自身不渲染 */}
+        {!isScoped && <GitBranchPicker />}
         <div className={styles['input-wrapper']} ref={inputCardRef}>
           <input
             ref={browserFileInputRef}

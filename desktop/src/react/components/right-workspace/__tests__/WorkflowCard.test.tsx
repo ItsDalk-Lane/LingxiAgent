@@ -29,18 +29,15 @@ const node = (over: any) => ({
 });
 
 
-/** 卡片默认折叠（用户裁决）：断言正文前先点标题展开。 */
-function renderExpandedCard() {
-  const utils = render(<WorkflowCard />);
-  const toggle = utils.container.querySelector('button[aria-expanded="false"]');
-  if (toggle) fireEvent.click(toggle);
-  return utils;
+/** 卡片默认展开（用户裁决 2026-09-21）：直接渲染即为展开态。 */
+function renderCard() {
+  return render(<WorkflowCard />);
 }
 
 describe('WorkflowCard', () => {
   it('无 workflow 返回 null（subagent 不算）', () => {
     mockState.agentActivitiesBySession = { '/s/a.jsonl': [wf({ id: 's1', kind: 'subagent' })] };
-    const { container } = renderExpandedCard();
+    const { container } = renderCard();
     expect(container.querySelector('.universal-card')).toBeNull();
   });
 
@@ -50,7 +47,7 @@ describe('WorkflowCard', () => {
     mockState.agentActivitiesBySession = {
       '/s/a.jsonl': [wf({ id: 'w1' }), node({ id: 'w1::node-1', label: '探索' }), node({ id: 'w1::node-2', label: '下笔' })],
     };
-    const { container } = renderExpandedCard();
+    const { container } = renderCard();
     expect(container.textContent).toContain('2 个 agent'); // 计数 = 子节点数
     expect(container.textContent).not.toContain('探索'); // 未展开不列节点
     delete (window as any).t;
@@ -60,7 +57,7 @@ describe('WorkflowCard', () => {
     mockState.agentActivitiesBySession = {
       '/s/a.jsonl': [wf({ id: 'w1' }), node({ id: 'w1::node-1', label: '探索' })],
     };
-    const { container } = renderExpandedCard();
+    const { container } = renderCard();
     const wfRow = container.querySelector('[data-status]') as HTMLElement; // 第一个 = workflow 行
     fireEvent.click(wfRow);
     expect(container.textContent).toContain('探索'); // 节点 label 显示
@@ -71,7 +68,7 @@ describe('WorkflowCard', () => {
     mockState.agentActivitiesBySession = {
       '/s/a.jsonl': [wf({ id: 'w1', status: 'done', startedAt: 1000, finishedAt: 6000 })],
     };
-    const { container } = renderExpandedCard();
+    const { container } = renderCard();
     expect(container.textContent).toContain('5s');
     delete (window as any).t;
   });
@@ -84,7 +81,7 @@ describe('WorkflowCard', () => {
         node({ id: 'w1::node-2', label: '验证', phaseLabel: 'Verify' }),
       ],
     };
-    const { container } = renderExpandedCard();
+    const { container } = renderCard();
     const wfRow = container.querySelector('[data-status]') as HTMLElement;
     fireEvent.click(wfRow);
     expect(container.textContent).toContain('Research');
@@ -98,7 +95,7 @@ describe('WorkflowCard', () => {
         { ...node({ id: 'w1::step-1' }), kind: 'workflow_step' as const, stepKind: 'parallel' as const, label: null, agentId: null },
       ],
     };
-    const { container } = renderExpandedCard();
+    const { container } = renderCard();
     const wfRow = container.querySelector('[data-status]') as HTMLElement;
     fireEvent.click(wfRow);
     expect(container.textContent).toContain('parallel');

@@ -2,7 +2,7 @@
 
 import '@testing-library/jest-dom/vitest';
 import React from 'react';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useStore } from '../../stores';
 import { RuntimeInfoCapsule } from '../../components/runtime/RuntimeInfoCapsule';
@@ -20,9 +20,6 @@ vi.mock('../../components/right-workspace/AgentActivityCard', () => ({
 }));
 vi.mock('../../components/right-workspace/SessionStatusCard', () => ({
   SessionStatusCard: () => <section data-testid="capsule-status" />,
-}));
-vi.mock('../../components/runtime/GitEnvironmentCard', () => ({
-  GitEnvironmentCard: () => <section data-testid="capsule-git-env" />,
 }));
 vi.mock('../../components/desk/DeskEditor', () => ({
   JianEditor: () => <div data-testid="capsule-jian" data-desk-editor="" />,
@@ -61,7 +58,7 @@ describe('RuntimeInfoCapsule', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('expands into one unified container holding jian, terminal, workflow, agent, status and git env (todo list moved above the input)', () => {
+  it('expands into one unified container holding jian, terminal, workflow, agent, status and git env (todo list moved above the input)', async () => {
     const { container } = render(<RuntimeInfoCapsule />);
 
     fireEvent.click(screen.getByRole('button', { name: '展开运行信息' }));
@@ -73,15 +70,17 @@ describe('RuntimeInfoCapsule', () => {
     expect(root).toContainElement(panel);
 
     expect(screen.queryByTestId('capsule-todo')).not.toBeInTheDocument();
-    // 笺默认折叠：只露标题行，点击标题后编辑器才挂载（用户裁决）
-    expect(screen.queryByTestId('capsule-jian')).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: '笺' }));
+    // 笺默认展开（用户裁决 2026-09-21）：打开运行信息即见编辑器，点击标题可折叠回收
     expect(screen.getByTestId('capsule-jian')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: '笺' }));
+    // Collapse 走 motion 退场动画，卸载有延迟
+    await waitFor(() => expect(screen.queryByTestId('capsule-jian')).not.toBeInTheDocument());
     expect(screen.getByTestId('capsule-terminal')).toBeInTheDocument();
     expect(screen.getByTestId('capsule-workflow')).toBeInTheDocument();
     expect(screen.getByTestId('capsule-agent')).toBeInTheDocument();
     expect(screen.getByTestId('capsule-status')).toBeInTheDocument();
-    expect(screen.getByTestId('capsule-git-env')).toBeInTheDocument();
+    // 环境信息（Git）分组已移除：不再有 git 入口行
+    expect(screen.queryByTestId('capsule-git-env')).not.toBeInTheDocument();
   });
 
   it('collapses again on pill click and on outside mousedown', () => {

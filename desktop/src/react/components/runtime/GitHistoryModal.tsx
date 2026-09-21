@@ -1,5 +1,5 @@
 /**
- * GitHistoryModal — 提交历史弹窗（环境信息卡·提交记录行入口）
+ * GitHistoryModal — 提交历史弹窗（输入框左上角分支下拉·提交记录入口）
  *
  * Git Graph 表格风格（深色）：表头 图|描述|日期|作者|提交，每行 =
  * 泳道图形（SVG，线条全连通）+ refs 徽标 + 提交标题 + 增删统计行 +
@@ -200,8 +200,9 @@ export function GitHistoryModal({ open, onClose, dir, agentId }: GitHistoryModal
     [graphRows],
   );
 
+  // scope=window：portal 到全局浮层根，遮罩盖住整个窗口（含左侧栏），与最早的呈现一致
   return (
-    <Overlay scope="inline" open={open} onClose={onClose} backdrop="blur" className={styles.modal} disableContainerAnimation>
+    <Overlay scope="window" open={open} onClose={onClose} backdrop="blur" className={styles.modal} disableContainerAnimation>
       <div className={styles.header}>
         <h2 className={styles.title}>{t('gitEnv.history')}</h2>
         <button className={styles.closeBtn} onClick={onClose} aria-label="Close">×</button>

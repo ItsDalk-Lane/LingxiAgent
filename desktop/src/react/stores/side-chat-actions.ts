@@ -2,6 +2,8 @@ import { useStore } from './index';
 import type { QuotedSelection } from './input-slice';
 import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { noteSessionMemoryEnabled } from '../components/input/composer-memory-mode';
+import { errorWithCode, presentError } from '../errors/error-presenter';
+import { errorCodeFromResponseBody } from '../../../../shared/error-user-messages.ts';
 
 /**
  * side-chat-actions.ts — 侧边对话的创建与引用投递。
@@ -90,7 +92,13 @@ export async function ensureSideChatSession(openedAt: number): Promise<void> {
     });
     const data = await res.json();
     if (!res.ok || data?.error || !data?.path) {
-      throw new Error(data?.error || res.statusText || 'side chat session creation failed');
+      // 错误码跟着异常走（如 session_fork_depth_limit），由 catch 统一翻译成人话。
+      throw errorWithCode(
+        typeof data?.error === 'string' && data.error.trim()
+          ? data.error
+          : (res.statusText || 'side chat session creation failed'),
+        errorCodeFromResponseBody(data),
+      );
     }
 
     const sessionPath = String(data.path);
@@ -138,6 +146,13 @@ export async function ensureSideChatSession(openedAt: number): Promise<void> {
   } catch (err) {
     const latest = useStore.getState();
     if (!latest.sideChat.open || latest.sideChat.createdAt !== openedAt) return;
+    // 谱系深度超限是明确的产品规则拒绝：toast + 面板失败态都说人话，重试无意义。
+    if ((err as { code?: string } | null)?.code === 'session_fork_depth_limit') {
+      const text = presentError(err).text;
+      latest.addToast?.(text, 'info', 3000);
+      latest.failSideChat(text);
+      return;
+    }
     latest.failSideChat(err instanceof Error ? err.message : String(err));
   }
 }

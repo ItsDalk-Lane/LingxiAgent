@@ -1731,6 +1731,39 @@ export function createSessionsRoute(engine, hub = null) {
     }
   });
 
+  // 谱系深度上限：主对话算第 0 层，派生最多两层（子=1、孙=2），共三层。
+  // 与展示侧（desktop session-sections 的 MAX_LINEAGE_DEPTH）同口径：
+  // 超限时 fork 拒绝并回 session_fork_depth_limit，由前端映射为可读提示。
+  const MAX_FORK_LINEAGE_DEPTH = 2;
+
+  // 来源会话沿 forkedFrom 向上到主对话的层数。链上出现不在活跃列表里的会话
+  // （已归档/删除）视为到根，与展示侧"父级缺失即顶层"的口径一致。
+  // 极简引擎桩（测试环境）没有 listSessions，无法计算谱系深度，按无谱系放行；
+  // 生产引擎恒有该方法，深度闸始终生效。
+  async function forkedFromDepthFor(engine, sourceSessionId) {
+    if (typeof engine.listSessions !== "function") return 0;
+    const allSessions = await engine.listSessions();
+    const parentOf = new Map();
+    for (const s of (Array.isArray(allSessions) ? allSessions : [])) {
+      const id = s?.sessionId;
+      const parent = s?.forkedFrom?.sessionId;
+      if (!id || !parent || parent === id) continue;
+      parentOf.set(id, parent);
+    }
+    let depth = 0;
+    const seen = new Set([sourceSessionId]);
+    let current = sourceSessionId;
+    while (parentOf.has(current)) {
+      const parent = parentOf.get(current);
+      if (!parent || seen.has(parent)) break;
+      seen.add(parent);
+      current = parent;
+      depth += 1;
+      if (depth > MAX_FORK_LINEAGE_DEPTH) break; // 已超限，无需继续向上
+    }
+    return depth;
+  }
+
   route.post("/sessions/fork", async (c) => {
     try {
       const requestContext = createRequestContext(c, engine);
@@ -1755,6 +1788,15 @@ export function createSessionsRoute(engine, hub = null) {
       }
       if (engine.isSessionStreaming?.(sessionPath)) {
         return c.json({ error: "session_busy" }, 409);
+      }
+      // 谱系深度闸：来源已在第 2 层时再 fork 会产出第 3 层派生，超出展示与派生上限
+      // （展示侧 session-sections 同口径只渲染三层）。显式拒绝，不静默改挂别的父级。
+      if (await forkedFromDepthFor(engine, sessionId) >= MAX_FORK_LINEAGE_DEPTH) {
+        throw routeError(
+          `Fork lineage exceeds the max derivation depth of ${MAX_FORK_LINEAGE_DEPTH}`,
+          "session_fork_depth_limit",
+          409,
+        );
       }
       if (typeof engine.forkSessionAtNode !== "function") {
         throw routeError("session fork is unavailable", "session_fork_unavailable", 503);
@@ -2162,15 +2204,27 @@ export function createSessionsRoute(engine, hub = null) {
         detachedOptions.workspaceLabel = workspaceSelection.mount.label || null;
       }
 
+      // 谱系：侧边聊天等引用型子对话携带来源会话，挂到主对话名下（列表分组展示）。
+      const forkedFromSessionId = typeof body?.forkedFromSessionId === "string" && body.forkedFromSessionId.trim()
+        ? body.forkedFromSessionId.trim()
+        : null;
+      // 谱系深度闸：来源已在第 2 层时拒绝建会话（建了就只能挂出第 3 层派生）。
+      // 不静默去掉谱系落成孤儿——那属于静默降级；前端把 session_fork_depth_limit
+      // 映射为可读提示。检查必须在 createDetachedSession 之前，避免建出无谱系会话。
+      if (forkedFromSessionId
+        && await forkedFromDepthFor(engine, forkedFromSessionId) >= MAX_FORK_LINEAGE_DEPTH) {
+        throw routeError(
+          `Fork lineage exceeds the max derivation depth of ${MAX_FORK_LINEAGE_DEPTH}`,
+          "session_fork_depth_limit",
+          409,
+        );
+      }
+
       const result = await engine.createDetachedSession(detachedOptions);
       const newSessionPath = result.sessionPath;
       const newAgentId = result.agentId;
       const newSessionId = result.sessionId || engine.getSessionIdForPath?.(newSessionPath) || null;
       engine.persistSessionMeta?.(newSessionPath);
-      // 谱系：侧边聊天等引用型子对话携带来源会话，挂到主对话名下（列表分组展示）。
-      const forkedFromSessionId = typeof body?.forkedFromSessionId === "string" && body.forkedFromSessionId.trim()
-        ? body.forkedFromSessionId.trim()
-        : null;
       let forkedFromWritten: { sessionId: string } | null = null;
       if (forkedFromSessionId && forkedFromSessionId !== newSessionId && typeof engine.setSessionForkedFrom === "function") {
         try {

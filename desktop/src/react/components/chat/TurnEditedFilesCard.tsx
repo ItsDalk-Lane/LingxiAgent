@@ -7,7 +7,9 @@
  *   +N −N    优先取当前工作区 Git status 的逐文件统计（Git 状态按「本会话工作区」
  *            取：会话 cwd 优先、desk 字段兜底，与右侧「环境信息」卡同一 API），
  *            匹配不上（非 Git 仓库 / 路径对不上 / 新建文件）时退回调用自带统计。
- *   查看更改  复用 GitChangesModal，只列本轮命中的文件（含逐文件 diff / 暂存 / 回退）。
+ *   回合总计  标题旁展示本轮全部文件的增删行数加总（口径与逐文件行一致）。
+ *   行内 diff 点击文件行在该行下方展开行级 diff（懒加载、会话内缓存），
+ *            渲染复用 GitChangesModal 的 DiffBody（与源代码管理界面同款式）。
  *   撤销      git discard 本轮可回退（已跟踪）的文件，带确认弹窗。
  *   审核      向本会话发送一条固定的审核请求消息，让助手复查本轮改动。
  */
@@ -16,12 +18,15 @@ import { useStore } from '../../stores';
 import { ConfirmDialog } from '../../ui';
 import type { ComposerSendBundle, ContentBlock } from '../../stores/chat-types';
 import {
+  fetchGitFileDiff,
   fetchGitStatus,
   gitDiscard,
   type GitFileChange,
+  type GitFileDiff,
   type GitStatus,
 } from '../../utils/git-env-api';
-import { GitChangesModal } from '../runtime/GitChangesModal';
+import { DiffBody } from '../runtime/GitChangesModal';
+import diffStyles from '../runtime/GitChangesModal.module.css';
 import {
   defaultComposerSendFlowDeps,
   sendWithLease,
@@ -104,15 +109,6 @@ function DiffBadgeIcon() {
   );
 }
 
-function ArrowUpRightIcon() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <line x1="7" y1="17" x2="17" y2="7" />
-      <polyline points="8 7 17 7 17 16" />
-    </svg>
-  );
-}
-
 function UndoIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -163,7 +159,9 @@ export const TurnEditedFilesCard = memo(function TurnEditedFilesCard({
 
   const [status, setStatus] = useState<GitStatus | null>(null);
   const [expanded, setExpanded] = useState(false);
-  const [changesOpen, setChangesOpen] = useState(false);
+  const [expandedPath, setExpandedPath] = useState<string | null>(null);
+  const [diffs, setDiffs] = useState<Record<string, GitFileDiff | 'error'>>({});
+  const [loadingDiffPath, setLoadingDiffPath] = useState<string | null>(null);
   const [confirmUndo, setConfirmUndo] = useState(false);
   const [undoBusy, setUndoBusy] = useState(false);
   const [reviewBusy, setReviewBusy] = useState(false);
@@ -190,10 +188,6 @@ export const TurnEditedFilesCard = memo(function TurnEditedFilesCard({
     return editedFiles.map(file => ({ file, git: matchGitFile(file.path, status.files) }));
   }, [editedFiles, status]);
 
-  const matchedGitFiles = useMemo(
-    () => (matches ?? []).map(m => m.git).filter((git): git is GitFileChange => !!git),
-    [matches],
-  );
   const discardablePaths = useMemo(
     () => (matches ?? [])
       .filter(m => m.git && m.git.state !== 'untracked')
@@ -203,17 +197,13 @@ export const TurnEditedFilesCard = memo(function TurnEditedFilesCard({
 
   if (editedFiles.length === 0) return null;
 
-  // 禁用原因要如实标注：工作区不是 Git 仓库时，「撤销/查看更改」不可用与
-  // 「文件都是新建」是两回事，tooltip 不能混用同一条解释。
+  // 禁用原因要如实标注：工作区不是 Git 仓库时，「撤销」不可用与「文件都是新建」
+  // 是两回事，tooltip 不能混用同一条解释。
   const workspaceIsNotGitRepo = !!status && !status.isRepo;
-  const viewUnavailableTitle = workspaceIsNotGitRepo
-    ? t('chat.editedFiles.noGitRepo')
-    : t('chat.editedFiles.viewUnavailable');
   const undoUnavailableTitle = workspaceIsNotGitRepo
     ? t('chat.editedFiles.noGitRepo')
     : t('chat.editedFiles.undoUnavailable');
 
-  const canViewChanges = !!dir && matchedGitFiles.length > 0;
   const canUndo = !readOnly && !isStreaming && discardablePaths.length > 0;
   const canReview = !readOnly && !isStreaming && isActiveSession && !!currentSessionId;
 
@@ -224,6 +214,42 @@ export const TurnEditedFilesCard = memo(function TurnEditedFilesCard({
     const git = matches?.find(m => m.file.path === file.path)?.git ?? null;
     if (git && git.state !== 'untracked') return { added: git.additions, removed: git.deletions };
     return { added: file.added, removed: file.removed };
+  };
+
+  // 回合总计：与逐文件行同口径（缺数的文件按 0 计）；至少一个文件有数才显示
+  const turnTotals = editedFiles.reduce(
+    (acc, file) => {
+      const stats = rowStats(file);
+      if (stats.added !== null || stats.removed !== null) {
+        acc.added += stats.added ?? 0;
+        acc.removed += stats.removed ?? 0;
+        acc.hasData = true;
+      }
+      return acc;
+    },
+    { added: 0, removed: 0, hasData: false },
+  );
+
+  /** 点击文件行展开/收起行内 diff；diff 懒加载并按路径缓存（与变更弹窗同策略） */
+  const toggleDiff = async (file: TurnEditedFile) => {
+    if (expandedPath === file.path) {
+      setExpandedPath(null);
+      return;
+    }
+    setExpandedPath(file.path);
+    if (diffs[file.path] != null) return;
+    setLoadingDiffPath(file.path);
+    try {
+      // diff API 只收仓库相对路径，而工具登记的可能是绝对路径：
+      // 优先用 Git status 匹配到的相对路径，匹配不上退回规整化原始路径
+      const relPath = matches?.find(m => m.file.path === file.path)?.git?.path ?? normalizePath(file.path);
+      const diff = await fetchGitFileDiff(dir!, relPath);
+      setDiffs(prev => ({ ...prev, [file.path]: diff }));
+    } catch {
+      setDiffs(prev => ({ ...prev, [file.path]: 'error' }));
+    } finally {
+      setLoadingDiffPath(null);
+    }
   };
 
   const enqueueReviewFallback = (text: string, bundle: ComposerSendBundle) => {
@@ -311,19 +337,17 @@ export const TurnEditedFilesCard = memo(function TurnEditedFilesCard({
           <DiffBadgeIcon />
         </span>
         <div className={styles.headText}>
-          <span className={styles.title}>
-            {t('chat.editedFiles.title', { count: editedFiles.length })}
+          <span className={styles.titleLine}>
+            <span className={styles.title}>
+              {t('chat.editedFiles.title', { count: editedFiles.length })}
+            </span>
+            {turnTotals.hasData && (
+              <span className={styles.fileStats} data-testid="turn-edited-files-total">
+                <span className={styles.added}>+{fmt(turnTotals.added)}</span>
+                <span className={styles.deleted}>−{fmt(turnTotals.removed)}</span>
+              </span>
+            )}
           </span>
-          <button
-            type="button"
-            className={styles.viewLink}
-            disabled={!canViewChanges}
-            title={canViewChanges ? undefined : viewUnavailableTitle}
-            onClick={() => setChangesOpen(true)}
-          >
-            {t('chat.editedFiles.viewChanges')}
-            <ArrowUpRightIcon />
-          </button>
         </div>
         {!readOnly && (
           <div className={styles.headActions}>
@@ -354,14 +378,35 @@ export const TurnEditedFilesCard = memo(function TurnEditedFilesCard({
         {editedFiles.slice(0, visibleCount).map((file) => {
           const stats = rowStats(file);
           const hasStats = stats.added !== null || stats.removed !== null;
+          const rowExpanded = expandedPath === file.path;
+          const diff = diffs[file.path];
           return (
             <li key={file.path} className={styles.fileRow} title={file.path}>
-              <span className={styles.filePath}>{file.path}</span>
-              {hasStats && (
-                <span className={styles.fileStats}>
-                  <span className={styles.added}>+{fmt(stats.added ?? 0)}</span>
-                  <span className={styles.deleted}>-{fmt(stats.removed ?? 0)}</span>
-                </span>
+              <button
+                type="button"
+                className={styles.fileRowMain}
+                data-testid={`turn-edited-file-${file.path}`}
+                aria-expanded={rowExpanded}
+                onClick={() => void toggleDiff(file)}
+              >
+                <span className={styles.filePath}>{file.path}</span>
+                {hasStats && (
+                  <span className={styles.fileStats}>
+                    <span className={styles.added}>+{fmt(stats.added ?? 0)}</span>
+                    <span className={styles.deleted}>-{fmt(stats.removed ?? 0)}</span>
+                  </span>
+                )}
+              </button>
+              {rowExpanded && (
+                <div className={diffStyles.diffPane} data-testid={`turn-edited-diff-${file.path}`}>
+                  {loadingDiffPath === file.path && <div className={diffStyles.diffNote}>…</div>}
+                  {loadingDiffPath !== file.path && diff === 'error' && (
+                    <div className={diffStyles.diffNote}>{t('gitEnv.diffUnavailable')}</div>
+                  )}
+                  {loadingDiffPath !== file.path && diff && diff !== 'error' && (diff.binary
+                    ? <div className={diffStyles.diffNote}>{t('gitEnv.diffBinary')}</div>
+                    : <DiffBody patch={diff.patch} truncatedNote={t('gitEnv.diffTruncated')} emptyNote={t('gitEnv.diffUnavailable')} />)}
+                </div>
               )}
             </li>
           );
@@ -380,17 +425,6 @@ export const TurnEditedFilesCard = memo(function TurnEditedFilesCard({
             : t('chat.editedFiles.showMore', { count: hiddenCount })}
           <ChevronDownIcon open={expanded} />
         </button>
-      )}
-
-      {canViewChanges && (
-        <GitChangesModal
-          open={changesOpen}
-          onClose={() => setChangesOpen(false)}
-          dir={dir!}
-          files={matchedGitFiles}
-          agentId={currentAgentId}
-          refresh={refresh}
-        />
       )}
 
       <ConfirmDialog

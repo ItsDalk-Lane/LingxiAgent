@@ -67,6 +67,30 @@ export function splitChildSessions(sessions: Session[]): ChildSessionSplit {
   for (const session of sessions) {
     if (session.sessionId) present.add(session.sessionId);
   }
+  // 先建父级索引并识别谱系环：环上的会话沿父级永远走不到根，按顶层处理，
+  // 否则它们会互相挂载、谁都不在顶层序列里，从列表里双双消失。
+  const parentOf = new Map<string, string>();
+  for (const session of sessions) {
+    const parentId = session.forkedFrom?.sessionId || null;
+    if (parentId && session.sessionId && session.sessionId !== parentId && present.has(parentId)) {
+      parentOf.set(session.sessionId, parentId);
+    }
+  }
+  const cyclic = new Set<string>();
+  for (const sessionId of parentOf.keys()) {
+    const seen = new Set<string>([sessionId]);
+    let current = sessionId;
+    while (true) {
+      const parent = parentOf.get(current);
+      if (!parent) break;
+      if (seen.has(parent)) {
+        for (const id of seen) cyclic.add(id);
+        break;
+      }
+      seen.add(parent);
+      current = parent;
+    }
+  }
   const topLevel: Session[] = [];
   const childrenByParentId = new Map<string, Session[]>();
   for (const session of sessions) {
@@ -76,6 +100,7 @@ export function splitChildSessions(sessions: Session[]): ChildSessionSplit {
       && session.sessionId
       && session.sessionId !== parentId
       && present.has(parentId)
+      && !cyclic.has(session.sessionId)
       && !isPinnedSession(session)
     ) {
       const list = childrenByParentId.get(parentId) || [];
@@ -90,12 +115,20 @@ export function splitChildSessions(sessions: Session[]): ChildSessionSplit {
 }
 
 /**
+ * 谱系树展示上限：主对话 + 两层派生（子、孙），共三层。与创建侧的 fork 深度上限
+ * （server sessions 路由 MAX_FORK_LINEAGE_DEPTH）同口径；超出两层的只可能是
+ * 历史遗留数据，展示时收拢到第一层祖先名下，保证「数据在列表里就能看见」。
+ */
+const MAX_LINEAGE_DEPTH = 2;
+
+/**
  * 顶层序列展开子行：子对话紧跟其主对话之后，克隆时写入 childOfSessionId
- * 展示提示（行渲染据此缩进）；带子对话的主对话克隆时写入 hasChildSessions 提示
- * （行渲染据此展示折叠开关）。
- * options.foldedParentIds：被折叠的主对话 sessionId 集合，其子对话不展开；
+ * 展示提示（行渲染据此缩进）；带子对话的行克隆时写入 hasChildSessions 提示
+ * （行渲染据此展示折叠开关），第二层子行再带 childDepth 供行渲染加深缩进。
+ * options.foldedParentIds：被折叠的父对话 sessionId 集合，其子对话不展开；
  * options.alwaysShowPaths：即使被折叠也必须展示的行（如当前正在聊的会话），
- * 防止“点了一下主对话，正在聊的子对话从列表消失”。
+ * 防止“点了一下主对话，正在聊的子对话从列表消失”——豁免沿子树放行，
+ * 被折叠链上的中间父行也会一并展示（面包屑式显形）。
  */
 export function expandChildRows(
   orderedTopLevel: Session[],
@@ -105,25 +138,111 @@ export function expandChildRows(
   if (childrenByParentId.size === 0) return orderedTopLevel;
   const { foldedParentIds, alwaysShowPaths } = options;
   const result: Session[] = [];
-  for (const session of orderedTopLevel) {
-    const children = session.sessionId ? childrenByParentId.get(session.sessionId) : undefined;
-    if (!children) {
-      result.push(session);
-      continue;
-    }
-    result.push({ ...session, hasChildSessions: true });
-    const folded = !!foldedParentIds?.has(session.sessionId!);
-    let foldedCount = 0;
+
+  // 展示挂载点重算：子行默认挂在真实父级名下；真实深度超过 MAX_LINEAGE_DEPTH
+  // 的历史深层后代改挂到第一层祖先名下（钉在第三层），既不丢会话也不突破三层。
+  const parentOf = new Map<string, string>();
+  for (const [parentId, children] of childrenByParentId) {
     for (const child of children) {
-      if (folded && !alwaysShowPaths?.has(child.path)) {
-        foldedCount += 1;
+      if (child.sessionId) parentOf.set(child.sessionId, parentId);
+    }
+  }
+  const depthCache = new Map<string, number>();
+  const depthOf = (sessionId: string): number => {
+    const cached = depthCache.get(sessionId);
+    if (cached !== undefined) return cached;
+    // 沿真实父级向上数层；父级不在子行表里即到顶（顶层行），visited 防环。
+    const seen = new Set<string>([sessionId]);
+    let depth = 0;
+    let current = sessionId;
+    while (true) {
+      const parent = parentOf.get(current);
+      if (!parent || seen.has(parent)) break;
+      seen.add(parent);
+      current = parent;
+      depth += 1;
+    }
+    depthCache.set(sessionId, depth);
+    return depth;
+  };
+  const effectiveChildren = new Map<string, Session[]>();
+  for (const children of childrenByParentId.values()) {
+    for (const child of children) {
+      const childId = child.sessionId;
+      if (!childId) continue;
+      const seen = new Set<string>([childId]);
+      let target = childId;
+      let effectiveParent: string | null = null;
+      while (true) {
+        const parent = parentOf.get(target);
+        if (!parent || seen.has(parent)) break;
+        seen.add(parent);
+        if (depthOf(parent) + 1 <= MAX_LINEAGE_DEPTH) {
+          effectiveParent = parent;
+          break;
+        }
+        target = parent;
+      }
+      if (!effectiveParent) continue; // 谱系环等脏数据：末尾兜底扫兜住
+      const list = effectiveChildren.get(effectiveParent) || [];
+      list.push(child);
+      effectiveChildren.set(effectiveParent, list);
+    }
+  }
+  for (const list of effectiveChildren.values()) list.sort(compareByModifiedDesc);
+  const mountedPaths = new Set<string>();
+  for (const list of effectiveChildren.values()) {
+    for (const child of list) mountedPaths.add(child.path);
+  }
+
+  // 折叠豁免沿子树放行：主对话被折叠时，正在聊的孙辈连同其父链一起显形。
+  const subtreeHasAlwaysShow = (session: Session): boolean => {
+    const stack: Session[] = [session];
+    const seen = new Set<string>();
+    while (stack.length > 0) {
+      const node = stack.pop()!;
+      if (alwaysShowPaths?.has(node.path)) return true;
+      const id = node.sessionId || '';
+      if (!id || seen.has(id)) continue;
+      seen.add(id);
+      for (const grandchild of effectiveChildren.get(id) || []) stack.push(grandchild);
+    }
+    return false;
+  };
+
+  const emitRow = (session: Session, annotation: { childOfSessionId: string; childDepth: number } | null) => {
+    const id = session.sessionId || '';
+    const base: Session = annotation ? { ...session, ...annotation } : session;
+    const children = id ? effectiveChildren.get(id) : undefined;
+    if (!id || !children || children.length === 0) {
+      result.push(base);
+      return;
+    }
+    const parentIndex = result.length;
+    result.push({ ...base, hasChildSessions: true });
+    const folded = foldedParentIds?.has(id) === true;
+    let hidden = 0;
+    const childDepth = (annotation?.childDepth ?? 0) + 1;
+    for (const child of children) {
+      if (folded && !alwaysShowPaths?.has(child.path) && !subtreeHasAlwaysShow(child)) {
+        hidden += 1;
         continue;
       }
-      result.push({ ...child, childOfSessionId: session.sessionId || '' });
+      emitRow(child, { childOfSessionId: id, childDepth });
     }
-    if (folded && foldedCount > 0) {
-      // 折叠且确有隐藏：把隐藏数写回主对话克隆（展示在助手符号上）
-      result[result.length - 1] = { ...result[result.length - 1], foldedChildCount: foldedCount };
+    if (folded && hidden > 0) {
+      // 折叠且确有隐藏：把隐藏数写回父行克隆（展示在助手符号上）
+      result[parentIndex] = { ...result[parentIndex]!, foldedChildCount: hidden };
+    }
+  };
+  for (const session of orderedTopLevel) emitRow(session, null);
+
+  // 兜底：谱系环等脏数据会让个别子行找不到合法挂载点（不在任何 effectiveChildren
+  // 桶里，折叠豁免扫不扫都到不了它）；按顶层行补在末尾，宁可顺序异常也不丢会话。
+  // 注意折叠隐藏的子行有合法挂载点，不在此列——它们靠展开父行找回。
+  for (const children of childrenByParentId.values()) {
+    for (const child of children) {
+      if (!mountedPaths.has(child.path)) result.push(child);
     }
   }
   return result;

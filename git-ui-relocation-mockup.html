@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git 界面迁移 · 样式图</title>
+<style>
+  /* ═══ 采用 midnight 主题色板，贴近当前界面观感 ═══ */
+  :root {
+    --bg: #3B4A54;
+    --bg-card: #445560;
+    --bg-sunk: #33414B;
+    --text: #E1EAF0;
+    --text-light: #B7C5CE;
+    --text-faint: #8FA0AC;
+    --accent: #C99AAF;
+    --accent-wash: rgba(201, 154, 175, 0.14);
+    --green: #8CC790;
+    --danger: #C77070;
+    --line: rgba(255, 255, 255, 0.09);
+    --line-soft: rgba(255, 255, 255, 0.05);
+    --shadow: rgba(0, 0, 0, 0.36);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #232C33;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 34px 18px 56px;
+    font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--text);
+  }
+  .page-note {
+    color: #7E8E99;
+    font-size: 12.5px;
+    letter-spacing: .04em;
+    margin-bottom: 26px;
+    text-align: center;
+    line-height: 1.9;
+    max-width: 760px;
+  }
+  .page-note b { color: #B9C7D1; font-weight: 600; }
+  .stage { display: flex; gap: 38px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
+  .col { display: flex; flex-direction: column; align-items: center; }
+  .col-caption { font-size: 12.5px; color: #93A3AE; margin-bottom: 12px; letter-spacing: .03em; }
+  .col-caption b { color: #D6E1E9; font-weight: 600; }
+  .col-hint {
+    font-size: 11.5px; color: #6E7E89; margin-top: 14px;
+    line-height: 1.9; max-width: 400px; text-align: left;
+    border-left: 2px solid #3A4750; padding-left: 10px;
+  }
+  .col-hint b { color: #9DAEB9; }
+
+  /* ══════════ ① 左侧工作台 · 首行 ══════════ */
+  .desk {
+    width: 318px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 13px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    padding: 12px 12px 14px;
+  }
+  .desk-title {
+    font-family: "Songti SC", "Noto Serif CJK SC", serif;
+    font-size: 13.5px; font-weight: 600; color: var(--accent);
+    padding: 2px 4px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .desk-search {
+    height: 28px; border-radius: 6px; background: var(--bg-sunk);
+    border: 1px solid var(--line-soft); color: var(--text-faint);
+    font-size: 12px; display: flex; align-items: center; padding: 0 10px;
+    margin-bottom: 8px;
+  }
+  .desk-toolbar { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+  .tb-btn {
+    height: 24px; padding: 0 9px; border: none; border-radius: 6px;
+    background: transparent; color: var(--text-light);
+    font-size: 12px; display: inline-flex; align-items: center; gap: 4px;
+    cursor: default; white-space: nowrap;
+  }
+  .tb-btn:hover { background: rgba(255,255,255,.07); }
+  /* ── 新的「变更」按钮：纯文字，行首 ── */
+  .changes-btn {
+    height: 24px; padding: 0 10px; border: none; border-radius: 6px;
+    background: transparent; color: var(--text);
+    font-size: 12px; display: inline-flex; align-items: center; gap: 6px;
+    cursor: default;
+  }
+  .changes-btn:hover { background: rgba(255,255,255,.07); }
+  .changes-btn .add { color: var(--green); font-variant-numeric: tabular-nums; }
+  .changes-btn .del { color: var(--danger); font-variant-numeric: tabular-nums; }
+  .tb-sep { width: 1px; height: 14px; background: var(--line); margin: 0 2px; }
+  .desk-tree { border-top: 1px solid var(--line-soft); padding-top: 6px; }
+  .tree-row {
+    display: flex; align-items: center; gap: 7px;
+    height: 26px; padding: 0 8px; border-radius: 5px;
+    color: var(--text-light); font-size: 12.5px;
+  }
+  .tree-row:nth-child(odd) { background: transparent; }
+  .tree-glyph { width: 14px; text-align: center; color: var(--text-faint); font-size: 11px; }
+
+  /* ══════════ ② 输入框 · 左上角分支下拉 ══════════ */
+  .composer-wrap { width: 430px; display: flex; flex-direction: column; align-items: center; }
+  .composer {
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 34px 14px 12px;
+    position: relative;
+    box-shadow: 0 8px 24px rgba(0,0,0,.28);
+  }
+  .composer-text { color: var(--text-faint); font-size: 13px; padding: 2px 4px; }
+  /* 分支下拉控件（输入框左上角外沿） */
+  .branch-pill {
+    position: absolute; top: -13px; left: 12px;
+    display: inline-flex; align-items: center; gap: 7px;
+    height: 26px; padding: 0 11px;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    box-shadow: 0 3px 10px rgba(0,0,0,.22);
+    cursor: default; user-select: none;
+  }
+  .branch-pill:hover { border-color: var(--accent); }
+  .branch-pill .lbl { font-size: 11px; color: var(--text-faint); }
+  .branch-pill .name {
+    font-size: 12px; color: var(--text); max-width: 220px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .branch-pill .chev {
+    width: 0; height: 0; border-left: 4.5px solid transparent;
+    border-right: 4.5px solid transparent; border-top: 5px solid var(--text-faint);
+  }
+
+  /* ── 展开的菜单浮层 ── */
+  .menu {
+    width: 252px; margin-top: 18px; align-self: flex-start; margin-left: 26px;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: 0 8px 32px var(--shadow), 0 2px 8px rgba(0,0,0,.14);
+    padding: 8px;
+    display: flex; flex-direction: column; gap: 3px;
+    font-size: 12.5px;
+  }
+  .mi {
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; min-height: 28px; padding: 3px 9px;
+    border-radius: 5px; color: var(--text);
+    position: relative; cursor: default;
+  }
+  .mi:hover { background: rgba(255,255,255,.08); box-shadow: inset 2px 0 0 var(--accent); }
+  .mi .nm { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mi.current { color: var(--accent); font-weight: 600; }
+  .mi.current .mark { color: var(--accent); }
+  .mi.disabled { opacity: .55; }
+  .mi.disabled:hover { background: transparent; box-shadow: none; }
+  /* 工作树标志：「主」＝住在主工作树；「独」＝独立工作树（悬停看路径） */
+  .wt-badge {
+    flex-shrink: 0; padding: 1px 6px; border-radius: 4px;
+    background: var(--accent-wash); color: var(--accent);
+    font-size: 10.5px; font-weight: 400;
+  }
+  .menu-sep { border-top: 1px solid var(--line); margin: 4px 0; }
+  .mi.action { color: var(--text-light); min-height: 28px; }
+  .mi.action:hover { color: var(--accent); }
+  .mi.action .plus { color: inherit; font-size: 13px; width: 14px; text-align: center; }
+  .mi.ghost { color: var(--text-faint); }
+  .menu-caption {
+    align-self: flex-start; margin: 14px 0 8px 30px;
+    font-size: 11px; color: #6E7E89; letter-spacing: .03em;
+  }
+
+  /* ══════════ ③ 运行信息弹窗（移除环境信息后） ══════════ */
+  .capsule {
+    width: 264px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    padding: 10px 14px;
+    display: flex; flex-direction: column; gap: 4px;
+    font-size: 12.5px;
+  }
+  .cap-title {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: "Songti SC", "Noto Serif CJK SC", serif;
+    color: var(--accent); font-size: 13px; font-weight: 600;
+    padding: 2px 0 6px;
+  }
+  .cap-row {
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 28px; padding: 2px 6px; border-radius: 6px; color: var(--text-light);
+  }
+  .cap-row:hover { background: rgba(255,255,255,.05); }
+  .cap-row .v { color: var(--text); font-size: 12px; }
+  .cap-removed {
+    margin-top: 6px; border: 1px dashed var(--line);
+    border-radius: 8px; padding: 8px 10px;
+    color: #7E8E99; font-size: 11.5px; line-height: 1.7;
+  }
+  .cap-removed s { color: #93A3AE; }
+</style>
+</head>
+<body>
+
+<div class="page-note">
+  Git 界面迁移样式图 · 运行信息弹窗移除<b>「环境信息」</b>分组，<b>「变更」</b>按钮上工作台首行，<b>「分支」</b>下拉挂到输入框左上角<br>
+  （非 Git 仓库时：变更按钮与分支下拉都不显示）
+</div>
+
+<div class="stage">
+
+  <!-- ① 左侧工作台 -->
+  <div class="col">
+    <div class="col-caption"><b>① 左侧工作台首行</b> · 变更按钮（行首，纯文字）</div>
+    <div class="desk">
+      <div class="desk-title">工作台 · LingxiAgent</div>
+      <div class="desk-search">搜索文件…</div>
+      <div class="desk-toolbar">
+        <button class="changes-btn">变更<span class="add">+73,390</span><span class="del">-5,000</span></button>
+        <span class="tb-sep"></span>
+        <button class="tb-btn">预览</button>
+        <button class="tb-btn">Finder</button>
+        <button class="tb-btn">过滤 ▾</button>
+        <button class="tb-btn">排序 ▾</button>
+      </div>
+      <div class="desk-tree">
+        <div class="tree-row"><span class="tree-glyph">▸</span> desktop</div>
+        <div class="tree-row"><span class="tree-glyph">▸</span> server</div>
+        <div class="tree-row"><span class="tree-glyph">▪</span> package.json</div>
+        <div class="tree-row"><span class="tree-glyph">▪</span> README.md</div>
+      </div>
+    </div>
+    <div class="col-hint">
+      点击按钮进入现在的<b>源代码管理</b>面板。<br>
+      标题随状态变化：无变更时是 <b>变更 +0 -0</b>；有变更时显示增删行数（<b>+绿 / -红</b>）。<br>
+      未配置 Git 仓库：<b>整个按钮不显示</b>，工具行维持原样。
+    </div>
+  </div>
+
+  <!-- ② 输入框 + 分支下拉 -->
+  <div class="col">
+    <div class="col-caption"><b>② 输入框左上角</b> · 分支下拉（展开态）</div>
+    <div class="composer-wrap">
+      <div class="composer">
+        <div class="branch-pill">
+          <span class="lbl">分支</span>
+          <span class="name">feat/git-history-stats</span>
+          <span class="chev"></span>
+        </div>
+        <div class="composer-text">输入消息…</div>
+      </div>
+      <div class="menu-caption">↑ 点击分支名展开的菜单 ↓</div>
+      <div class="menu">
+        <div class="mi current">
+          <span class="nm">feat/git-history-stats</span>
+          <span class="wt-badge">主</span>
+          <span class="mark">✓</span>
+        </div>
+        <div class="mi"><span class="nm">main</span></div>
+        <div class="mi">
+          <span class="nm">wt/fix-login-race</span>
+          <span class="wt-badge">独</span>
+        </div>
+        <div class="mi disabled"><span class="nm">wt-sep04</span></div>
+        <div class="mi ghost"><span class="nm">未连接分支</span></div>
+        <div class="menu-sep"></div>
+        <div class="mi action"><span class="plus">＋</span><span class="nm">新建工作树</span></div>
+        <div class="mi action"><span class="plus">＋</span><span class="nm">新建分支…</span></div>
+        <div class="mi action"><span class="plus">≡</span><span class="nm">提交记录</span></div>
+      </div>
+    </div>
+    <div class="col-hint">
+      下拉挂在输入框左上角，样式沿用分支行的胶囊观感。<br>
+      菜单内容与现在点分支一致：分支列表带<b>「主 / 独」工作树标志</b>（悬停标志看路径）、未连接分支单列末尾。<br>
+      底部按钮顺序：<b>新建工作树 → 新建分支 → 提交记录</b>（提交记录从运行信息弹窗移入此处）。<br>
+      未配置 Git 仓库：<b>整个下拉不显示</b>。
+    </div>
+  </div>
+
+  <!-- ③ 运行信息弹窗 -->
+  <div class="col">
+    <div class="col-caption"><b>③ 运行信息弹窗</b> · 移除「环境信息」后</div>
+    <div class="capsule">
+      <div class="cap-title">运行信息 <span style="font-size:11px;color:#8FA0AC;">▾</span></div>
+      <div class="cap-row"><span>本次对话</span><span class="v">12 轮</span></div>
+      <div class="cap-row"><span>终端</span><span class="v">2 个</span></div>
+      <div class="cap-row"><span>工作流</span><span class="v">—</span></div>
+      <div class="cap-row"><span>Agent 活动</span><span class="v">1</span></div>
+      <div class="cap-row"><span>会话状态</span><span class="v">正常</span></div>
+      <div class="cap-removed">
+        <s>环境信息</s>（Git图谱 / 分支 / 提交记录 / 本地 / 新建工作树）整组已从弹窗移除，入口分别迁移至 ① 与 ②。
+      </div>
+    </div>
+    <div class="col-hint">
+      弹窗内不再有任何 Git 相关行；<b>提交记录</b>的入口同步挪到 ② 的菜单底部，不再有独立弹窗入口行。
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

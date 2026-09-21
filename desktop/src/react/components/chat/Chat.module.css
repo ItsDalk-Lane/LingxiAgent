@@ -198,10 +198,13 @@
     justify-content: flex-end;
 }
 
-/* 胶囊与左侧操作分开，在当前消息宽度内靠右；窄窗口允许换行。 */
+/* 胶囊与左侧操作分开，在当前消息宽度内靠右；窄窗口允许换行。
+   行宽上限对齐正文容器（.message 的 92%）：用量/用时胶囊不越过正文右边界，
+   不再贴到消息流最右侧（用户裁决 2026-09-21）。 */
 .messageFooterActionsWithStats {
     align-self: stretch;
     flex-wrap: wrap;
+    max-width: 92%;
 }
 
 /* 最新消息的 persistent 场景：时间文本与用量/用时胶囊同操作按钮一致——

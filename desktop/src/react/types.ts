@@ -236,6 +236,8 @@ export interface Session {
   pinOrder?: number | null;
   /** 列表分组展示提示：构建分区时写入，非空 = 作为该会话的子行渲染。 */
   childOfSessionId?: string | null;
+  /** 列表分组展示提示：构建分区时写入，子行的派生层级（1=主对话直接子对话，2=孙辈）。 */
+  childDepth?: number | null;
   /** 列表分组展示提示：构建分区时写入，非空 = 主对话行展示子对话折叠开关。 */
   hasChildSessions?: boolean;
   /** 列表分组展示提示：构建分区时写入，被折叠隐藏的子对话数（折叠时展示）。 */

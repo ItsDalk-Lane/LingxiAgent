@@ -20,6 +20,7 @@ export const ERROR_CODE_MESSAGE_KEYS: Readonly<Record<string, string>> = Object.
   // 会话分支 / 重试：活跃任务无法被两个会话共享，这是 Fork 最常见的拒绝理由
   session_fork_active_task: 'error.code.sessionForkActiveTask',
   session_fork_unavailable: 'error.code.sessionForkUnavailable',
+  session_fork_depth_limit: 'error.code.sessionForkDepthLimit',
   subagent_session_fork_cycle: 'error.code.subagentSessionForkCycle',
   subagent_run_busy: 'error.code.subagentRunBusy',
   subagent_thread_busy: 'error.code.subagentThreadBusy',

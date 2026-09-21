@@ -499,3 +499,122 @@ describe('谱系折叠：点击主对话收起子对话', () => {
     expect(foldedWithActiveChild[0].sessions.map(item => item.path)).toEqual(['/sessions/main.jsonl', '/sessions/fork.jsonl']);
   });
 });
+
+describe('谱系三层渲染：深层收拢与折叠豁免', () => {
+  const NOW = new Date('2026-04-29T12:00:00.000Z');
+  const main = makeSession({
+    path: '/sessions/main.jsonl',
+    sessionId: 'sess_main',
+    firstMessage: '主对话',
+    modified: '2026-04-29T08:00:00.000Z',
+    cwd: '/work',
+  });
+  const child = makeSession({
+    path: '/sessions/child.jsonl',
+    sessionId: 'sess_child',
+    firstMessage: '子对话',
+    modified: '2026-04-29T09:00:00.000Z',
+    cwd: '/work',
+    forkedFrom: { sessionId: 'sess_main' },
+  });
+  const grandchild = makeSession({
+    path: '/sessions/grandchild.jsonl',
+    sessionId: 'sess_grandchild',
+    firstMessage: '孙对话',
+    modified: '2026-04-29T10:00:00.000Z',
+    cwd: '/work',
+    forkedFrom: { sessionId: 'sess_child' },
+  });
+  // 旧数据遗留：创建侧深度闸门之前产生过第 3 层派生
+  const greatGrandchild = makeSession({
+    path: '/sessions/great.jsonl',
+    sessionId: 'sess_great',
+    firstMessage: '曾孙对话',
+    modified: '2026-04-29T11:00:00.000Z',
+    cwd: '/work',
+    forkedFrom: { sessionId: 'sess_grandchild' },
+  });
+
+  it('三层以内的谱系逐层展开，子行带 childDepth 标注', () => {
+    const groups = groupSessionsByProject([main, child, grandchild], { studios: [], now: NOW });
+    expect(groups[0].sessions.map(item => item.path)).toEqual([
+      '/sessions/main.jsonl',
+      '/sessions/child.jsonl',
+      '/sessions/grandchild.jsonl',
+    ]);
+    const [mainRow, childRow, grandchildRow] = groups[0].sessions;
+    expect(mainRow.hasChildSessions).toBe(true);
+    expect(mainRow.childOfSessionId ?? null).toBeNull();
+    expect(childRow.childOfSessionId).toBe('sess_main');
+    expect(childRow.childDepth).toBe(1);
+    expect(childRow.hasChildSessions).toBe(true);
+    expect(grandchildRow.childOfSessionId).toBe('sess_child');
+    expect(grandchildRow.childDepth).toBe(2);
+  });
+
+  it('超过三层的旧数据收拢到第三层，不再有列表永远看不见的会话', () => {
+    const groups = groupSessionsByProject([main, child, grandchild, greatGrandchild], { studios: [], now: NOW });
+    const rows = groups[0].sessions;
+    // 收拢后同为第三层的兄弟行按最近活动排序（曾孙 11:00 新于孙对话 10:00）
+    expect(rows.map(item => item.path)).toEqual([
+      '/sessions/main.jsonl',
+      '/sessions/child.jsonl',
+      '/sessions/great.jsonl',
+      '/sessions/grandchild.jsonl',
+    ]);
+    // 曾孙不渲染第四层：改挂到第一层祖先（子对话）名下，钉在第三层
+    const greatRow = rows[2];
+    expect(greatRow.childOfSessionId).toBe('sess_child');
+    expect(greatRow.childDepth).toBe(2);
+  });
+
+  it('折叠主对话隐藏整棵子树并按直接子行计数；豁免沿子树放行面包屑', () => {
+    const folded = groupSessionsByProject([main, child, grandchild, greatGrandchild], {
+      studios: [],
+      now: NOW,
+      foldedParentIds: new Set(['sess_main']),
+    });
+    expect(folded[0].sessions.map(item => item.path)).toEqual(['/sessions/main.jsonl']);
+    expect(folded[0].sessions[0].hasChildSessions).toBe(true);
+    // 计数只算直接子行（展开主对话后立刻可见的那一层）
+    expect(folded[0].sessions[0].foldedChildCount).toBe(1);
+
+    // 正在聊的会话是第三层：豁免沿子树放行，中间父行一并显形
+    const breadcrumb = groupSessionsByProject([main, child, grandchild, greatGrandchild], {
+      studios: [],
+      now: NOW,
+      foldedParentIds: new Set(['sess_main', 'sess_child']),
+      alwaysShowPaths: new Set(['/sessions/great.jsonl']),
+    });
+    expect(breadcrumb[0].sessions.map(item => item.path)).toEqual([
+      '/sessions/main.jsonl',
+      '/sessions/child.jsonl',
+      '/sessions/great.jsonl',
+    ]);
+    expect(breadcrumb[0].sessions[1].childDepth).toBe(1);
+    expect(breadcrumb[0].sessions[2].childDepth).toBe(2);
+    expect(breadcrumb[0].sessions[1].foldedChildCount).toBe(1);
+  });
+
+  it('谱系环等脏数据按顶层行兜底渲染，不进死循环也不丢会话', () => {
+    const cyclicA = makeSession({
+      path: '/sessions/cycle-a.jsonl',
+      sessionId: 'sess_cycle_a',
+      firstMessage: '环A',
+      cwd: '/work',
+      forkedFrom: { sessionId: 'sess_cycle_b' },
+    });
+    const cyclicB = makeSession({
+      path: '/sessions/cycle-b.jsonl',
+      sessionId: 'sess_cycle_b',
+      firstMessage: '环B',
+      cwd: '/work',
+      forkedFrom: { sessionId: 'sess_cycle_a' },
+    });
+    const groups = groupSessionsByProject([cyclicA, cyclicB], { studios: [], now: NOW });
+    expect(groups[0].sessions.map(item => item.path).sort()).toEqual([
+      '/sessions/cycle-a.jsonl',
+      '/sessions/cycle-b.jsonl',
+    ]);
+  });
+});

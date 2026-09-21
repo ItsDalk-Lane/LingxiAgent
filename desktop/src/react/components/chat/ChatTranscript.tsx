@@ -310,6 +310,11 @@ const TranscriptRenderItemView = memo(function TranscriptRenderItemView({
 
   if (renderItem.type === 'process_fold') {
     const prevRole = prevMessageItem?.data.role ?? null;
+    // 会话流式期间，只有「最新一轮」的折叠组算流式；历史已完成轮次的折叠组
+    // 保持完成态展示（轮次操作/时间不再被会话级流式压掉）
+    const foldStreaming = isStreamingSession
+      && groupLastOriginalIndex(renderItem) === latestAssistantIndex
+      && latestAssistantIndex > latestUserIndex;
     return (
       <ProcessFoldBlock
         group={renderItem}
@@ -330,7 +335,7 @@ const TranscriptRenderItemView = memo(function TranscriptRenderItemView({
           && !isStreamingSession
         }
         agentDisplay={agentDisplay}
-        isStreaming={isStreamingSession}
+        isStreaming={foldStreaming}
         selectedIds={selectedIds}
         registerMessageElement={registerMessageElement}
         onForkCreated={onForkCreated}
@@ -344,6 +349,14 @@ const TranscriptRenderItemView = memo(function TranscriptRenderItemView({
       && originalIndex === latestAssistantIndex
       && latestAssistantIndex > latestUserIndex
     );
+
+  // 会话流式期间，只有「最新一轮」的助手消息算流式：历史已完成轮次保留
+  // 完成时间 / 编辑卡片 / 用量胶囊 / 操作按钮等完成信息（与上面
+  // showTurnCompletionTime 的排除口径一致；用户消息的会话级锁定不受影响）。
+  const inLiveAssistantTurn = latestAssistantIndex > latestUserIndex
+    && originalIndex > latestUserIndex
+    && originalIndex <= latestAssistantIndex;
+  const assistantStreaming = isStreamingSession && inLiveAssistantTurn;
 
   return (
     <TranscriptItemView
@@ -375,6 +388,7 @@ const TranscriptRenderItemView = memo(function TranscriptRenderItemView({
       agentDisplay={agentDisplay}
       viewerIdentity={viewerIdentity}
       isStreaming={isStreamingSession}
+      assistantStreaming={assistantStreaming}
       selectedIds={selectedIds}
       registerMessageElement={registerMessageElement}
       onForkCreated={onForkCreated}
@@ -412,6 +426,7 @@ const TranscriptItemView = memo(function TranscriptItemView({
   agentDisplay,
   viewerIdentity,
   isStreaming,
+  assistantStreaming,
   selectedIds,
   registerMessageElement,
   onForkCreated,
@@ -432,7 +447,10 @@ const TranscriptItemView = memo(function TranscriptItemView({
   knowledgeRetrieval?: KnowledgeRetrievalStats | null;
   agentDisplay: AgentDisplayInfo & { yuan: string };
   viewerIdentity: { name: string; avatarUrl: string | null };
+  /** 会话级流式（用户消息的编辑/重发锁定用它） */
   isStreaming: boolean;
+  /** 本条助手消息所属轮是否正在流式：历史完成轮次为 false，完成信息照常展示 */
+  assistantStreaming: boolean;
   selectedIds: readonly string[];
   registerMessageElement?: (messageId: string, element: HTMLDivElement | null) => void;
   onForkCreated?: ForkedSessionHandler;
@@ -483,7 +501,7 @@ const TranscriptItemView = memo(function TranscriptItemView({
       agentId={agentId}
       readOnly={readOnly}
       agentDisplay={agentDisplay}
-      isStreaming={isStreaming}
+      isStreaming={assistantStreaming}
       isSelected={selectedIds.includes(msg.id)}
       isLatestAssistantMessage={isLatestAssistantMessage}
       showTurnCompletionTime={showTurnCompletionTime}

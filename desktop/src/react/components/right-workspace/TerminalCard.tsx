@@ -202,7 +202,8 @@ function visibleTerminals(terminals: TerminalPublicEntry[]): TerminalPublicEntry
 }export function TerminalCard() {
   const [now, setNow] = useState(() => Date.now());
   // 默认折叠（用户裁决）：运行信息容器内只露标题行，点击展开
-  const [collapsed, setCollapsed] = useState(true);
+  // 默认展开（用户裁决 2026-09-21）：打开运行信息即见内容
+  const [collapsed, setCollapsed] = useState(false);
   const sessionId = useStore((state) => state.currentSessionId);
   const sessionPath = useStore((state) => state.currentSessionPath);
   const terminals = useStore(selectTerminals(sessionPath));
