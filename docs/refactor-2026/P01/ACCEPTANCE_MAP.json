@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "stage_id": "P01",
+  "generated_at": "2026-09-21",
+  "note": "字段按 92 模板§2 case 条目要求。所有命令日志在 artifacts/refactor-2026/P01/logs/。",
+  "cases": [
+    {
+      "id": "P01-A01",
+      "test_path": "tests/server-composition-boundary.test.ts",
+      "test_name": "P01 headless vertical slice: ... > runs the full chain without any desktop, rejects malformed JSON at the HTTP entry (A07), and keeps serving after a desktop-channel notify (A10)",
+      "fixture": "隔离 LINGXI_HOME（mkdtemp）+ 预置 witness provider（本地 OpenAI 兼容 SSE 协议 server）+ config.yaml models.chat={id,provider} 对象形态",
+      "production_entry": "server/main-full.ts spawn → POST /api/sessions/new → WS /ws prompt → lib/pi-sdk createAgentSession（Pi 0.86.0）→ read 工具 → GET /api/sessions/messages",
+      "expected": "链路完整；无窗口依赖；read 工具真实读文件并回流模型；历史投影含工具 args/output 与回复",
+      "actual": "与预期一致（r9 全绿；工具 output 含 FILE_MARKER，assistant_run_end completed，历史含全部字段）",
+      "command_ids": ["P01-T03-vertical-slice-r1..r9"],
+      "status": "PASS",
+      "evidence": "artifacts/refactor-2026/P01/logs/P01-T03-vertical-slice-r9.out"
+    },
+    {
+      "id": "P01-A02",
+      "test_path": "tests/model-observability-e2e-chat.test.ts",
+      "test_name": "S1 simple chat / S2 tool loop（真实 Pi AgentSession + witness SSE 协议 server）",
+      "fixture": "witness provider（注册进真实 ModelRuntime）+ SessionManager.inMemory",
+      "production_entry": "lib/pi-sdk/index.ts createAgentSession（观察者安装顺序受 pi-sdk-create-session-adapter 测试锁定）",
+      "expected": "真实 Pi 生命周期被调用；observer 不漏装、不双装；C2.parent=C1.callId",
+      "actual": "41/41 用例绿（9 个 pi-sdk 测试文件）",
+      "command_ids": ["P01-T02-pi-sdk-regression"],
+      "status": "PASS",
+      "evidence": "artifacts/refactor-2026/P01/logs/P01-T02-pi-sdk-regression.out"
+    },
+    {
+      "id": "P01-A03",
+      "test_path": "tests/dependency-boundary-check.test.ts",
+      "test_name": "A03: direct SDK import outside the adapter fails; the legal adapter sample passes",
+      "fixture": "tmpdir 合成 core/rogue-*（直导/require/动态字面量/裸 typebox/深路径）+ lib/pi-sdk/legit-adapter.ts 合法样本",
+      "production_entry": "scripts/check-dependency-boundaries.mjs（npm run check:dependency-boundaries，已接 CI）",
+      "expected": "违规失败；合法 adapter 例外通过",
+      "actual": "5 违例全中 rogue-*；合法样本零命中",
+      "command_ids": ["P01-T06-boundary-selftest"],
+      "status": "PASS",
+      "evidence": "artifacts/refactor-2026/P01/logs/P01-T06-boundary-selftest.out"
+    },
+    {
+      "id": "P01-A04",
+      "test_path": "tests/dependency-boundary-check.test.ts",
+      "test_name": "A04: electron import inside core fails and the report names the importing file",
+      "fixture": "tmpdir core/nested/host-leak.ts（import electron）+ desktop/main.cjs（合法宿主导入）",
+      "production_entry": "同上检查器 host-into-core 规则",
+      "expected": "失败且指出导入链（file:line + rule）",
+      "actual": "唯一违例 = core/nested/host-leak.ts:2 host-into-core；desktop 导入不判",
+      "command_ids": ["P01-T06-boundary-selftest"],
+      "status": "PASS",
+      "evidence": "同上"
+    },
+    {
+      "id": "P01-A05",
+      "test_path": "tests/core-contracts-strict.test.ts",
+      "test_name": "A05: a null-unsafe negative fixture fails the check with a null-check error code",
+      "fixture": "tests/fixtures/core-contracts-negative/a05-null-negative.ts（tsconfig.test.json 显式 exclude）",
+      "production_entry": "scripts/check-core-contracts-strict.mjs（npm run typecheck:core-contracts，已接 CI）",
+      "expected": "strict 命令类型失败；错误码为空值检查类；不存在 any 吞错",
+      "actual": "TS2531 类错误命中；移除负例后真实代码零诊断（正例用例）",
+      "command_ids": ["P01-T04-strict-gate-test-r2"],
+      "status": "PASS",
+      "evidence": "artifacts/refactor-2026/P01/logs/P01-T04-strict-gate-test-r2.out"
+    },
+    {
+      "id": "P01-A06",
+      "test_path": "tests/core-contracts-strict.test.ts",
+      "test_name": "A06: identity-misuse negative fixture is blocked by the brand type",
+      "fixture": "tests/fixtures/core-contracts-negative/a06-identity-misuse.ts（mintModelTraceId() 传给 ModelCallId 参数）",
+      "production_entry": "shared/identity-brands.ts 品牌类型 + lib/llm/model-call-identity.ts 铸造厂（strict 范围内）",
+      "expected": "被有效类型契约阻止；负例真实加入程序（extraFiles）而非未引用文件",
+      "actual": "TS2322/TS2345 指向 ModelCallId；删除负例（正例用例）后通过",
+      "command_ids": ["P01-T04-strict-gate-test-r2"],
+      "status": "PASS",
+      "evidence": "同上"
+    },
+    {
+      "id": "P01-A07",
+      "test_path": "tests/server-composition-boundary.test.ts（P01 headless vertical slice 内 A07 段）",
+      "test_name": "malformed JSON at the real HTTP entry is rejected, no side effects",
+      "fixture": "截断 JSON body + 3 例字段类型错误 + 4 例合法非对象 JSON（null/123/\"str\"/[]）POST /api/sessions/new（真实 spawn server + Bearer token）",
+      "production_entry": "server/hono-helpers.ts strictJson + ensureJsonObjectBody + rejectWrongFieldTypes（验收修复轮补全）→ server/routes/sessions.ts /sessions/new",
+      "expected": "运行时拒绝且无副作用（与 TS 编译无关）——三个维度：畸形 JSON、非对象 JSON、字段类型错误",
+      "actual": "修复前：截断 JSON 200（safeJson 静默）；字段类型错误 200×2/500×1（验收实测）；null 等非对象 500 或静默默认。修复后：截断→400 invalid_json、非对象→400 invalid_body、字段类型→400 invalid_field_type，七组用例后 /api/sessions 清单逐字不变",
+      "command_ids": ["P01-T03-vertical-slice-r5(修复前红)/r9(修复后绿)", "P01-ACC-FIX-vertical-slice(验收修复轮含全维度断言)"],
+      "status": "PASS",
+      "evidence": "artifacts/refactor-2026/P01/logs/P01-T03-vertical-slice-r5.out + r9.out + P01-ACC-FIX-vertical-slice.out"
+    },
+    {
+      "id": "P01-A08",
+      "test_path": "tests/tool-invocation-gateway.test.ts",
+      "test_name": "A08 严格 schema / A08 宽松 schema（模型 args 携带 principal/sessionId/agentId/cancelHandle/permissionProof/lifecycleGeneration）",
+      "fixture": "网关真实 fixture（registry+gateway+prepared invocation）",
+      "production_entry": "core/tool-invocation-gateway.ts resolvePermission/invoke（prepared 绑定宿主身份）",
+      "expected": "不覆盖宿主上下文",
+      "actual": "严格 schema：ARGUMENTS 拒绝+零执行；宽松 schema：伪造字段过校验但 prepared/执行 ctx 身份全部来自宿主 request（session-1/agent-1/call-1/generation 3）",
+      "command_ids": ["P01-T05-gateway-a08-r5"],
+      "status": "PASS",
+      "evidence": "artifacts/refactor-2026/P01/logs/P01-T05-gateway-a08-r5.out"
+    },
+    {
+      "id": "P01-A09",
+      "test_path": "tests/cli-local-server.test.ts",
+      "test_name": "A09 normal / missing field / malformed / stale",
+      "fixture": "tmpdir server-info.json（完整/缺 token/坏 JSON/死 pid 四态）",
+      "production_entry": "cli/local-server.ts readLocalServerInfo（真实 adapter，位于 strict 核心范围）",
+      "expected": "正常契约保留；缺失显式失败，不隐藏在声明文件",
+      "actual": "8/8 绿：ok:true 显式字段；incomplete/invalid/stale 三类显式失败",
+      "command_ids": ["P01-T05-cli-a09-a11"],
+      "status": "PASS",
+      "evidence": "artifacts/refactor-2026/P01/logs/P01-T05-cli-a09-a11.out"
+    },
+    {
+      "id": "P01-A10",
+      "test_path": "tests/server-composition-boundary.test.ts（P01 headless vertical slice 内 A10 段）",
+      "test_name": "desktop-channel notify in headless does not block/crash; follow-up plain chat completes",
+      "fixture": "同 A01 会话；witness 内容路由 notify 工具调用（desktop 通道）→ P01_NOTIFY_DONE → 普通聊天",
+      "production_entry": "lib/tools/notify-tool.ts → NotificationService._deliverDesktop → EventBus 广播（无订阅者）",
+      "expected": "前者明确行为不崩溃，后者正常，服务不崩",
+      "actual": "notify 工具完成（通道广播语义 status=sent=已发往通道，语义澄清登记移交 P05）；health 200；第三轮普通聊天正常完成",
+      "command_ids": ["P01-T03-vertical-slice-r9"],
+      "status": "PASS",
+      "evidence": "同 A01"
+    },
+    {
+      "id": "P01-A11",
+      "test_path": "tests/cli-local-server.test.ts + tests/server-composition-boundary.test.ts",
+      "test_name": "A11: resolveCliLingxiHome keeps legacy semantics on the shared authority + 无桌面纵向链改造后行为",
+      "fixture": "LINGXI_HOME 输入集：缺省/空串/空白/~/~/x/绝对/相对",
+      "production_entry": "cli/local-server.ts（统一到 shared/hana-runtime-paths.ts 后）",
+      "expected": "除批准内部字段差异外保持同语义",
+      "actual": "统一前后语义逐例一致（8/8）；server 侧行为由纵向链 A01 全链证明（改造后跑出）",
+      "command_ids": ["P01-T05-cli-a09-a11", "P01-T03-vertical-slice-r9"],
+      "status": "PASS",
+      "evidence": "同上"
+    },
+    {
+      "id": "P01-A12",
+      "test_path": "tests/dependency-boundary-check.test.ts",
+      "test_name": "A12: computed dynamic import that mentions an SDK name is not auto-passed; the legal adapter's dynamic loads stay clean + 验收加固用例（拼接构造）",
+      "fixture": "core/alias-loader.ts（const pkg=\"@earendil-works/pi-ai\"; import(pkg)）+ generic-loader.ts（无 SDK 名计算式）+ lib/pi-sdk/loader.ts（适配层内计算式）+ 验收加固：sdk-concat.ts（\"@earendil-works\"+\"/pi-ai\" 常量拼接）、electron-concat.ts（\"elect\"+\"ron\"）、runtime-loader.ts（运行时拼接，登记为固有静态边界）",
+      "production_entry": "同上检查器 sdk-dynamic-unproven / host-dynamic-unproven 规则（验收修复轮：常量拼接折叠+片段提及）",
+      "expected": "非法必失败；动态未证安全不得自动通过（含常量拼接构造）",
+      "actual": "alias-loader=sdk-dynamic-unproven；sdk-concat=sdk-dynamic-unproven；electron-concat=host-dynamic-unproven；通用 loader 与适配层内计算式不误报；运行时拼接维持放行（登记固有边界）",
+      "command_ids": ["P01-T06-boundary-selftest", "P01-ACC-FIX-boundary-selftest"],
+      "status": "PASS",
+      "evidence": "同 A03"
+    }
+  ]
+}

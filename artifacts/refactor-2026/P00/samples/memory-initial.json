@@ -1,0 +1,27 @@
+{
+  "workload": "server 空闲（就绪+3s）与活动后（200 次 input-draft PUT）整进程树 RSS；非峰值压测",
+  "idle": {
+    "total_kb": 477760,
+    "members": [
+      {
+        "pid": 41555,
+        "rss_kb": 477760
+      }
+    ]
+  },
+  "activity": {
+    "total_kb": 479504,
+    "members": [
+      {
+        "pid": 41555,
+        "rss_kb": 479504
+      }
+    ]
+  },
+  "put_ok": 200,
+  "env": {
+    "node": "v24.16.0",
+    "os": "Darwin 27.0.0 arm64"
+  },
+  "limitation": "活动负载为轻量 API 写；流式高负载峰值内存按 BENCHMARK_PROTOCOL 留待 P07"
+}

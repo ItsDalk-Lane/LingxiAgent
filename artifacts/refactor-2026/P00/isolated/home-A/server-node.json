@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "serverId": "server_e18bd3ca-1ca6-4785-b555-9d6ce43eb9ae",
+  "serverNodeId": "server_e18bd3ca-1ca6-4785-b555-9d6ce43eb9ae",
+  "nodeKind": "local",
+  "transport": "loopback",
+  "execution": {
+    "kind": "local_process"
+  },
+  "label": "Local Lingxi",
+  "createdAt": "2026-09-21T12:43:53.345Z",
+  "updatedAt": "2026-09-21T12:43:53.345Z"
+}

@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "stage_id": "P00",
+  "task_id": "P00-T04",
+  "generated_at": "2026-09-21",
+  "note": "场景规格来自 P00 任务书 §6；本文件登记实际测试、命令、fixture 与证据。需求ID→场景ID→测试→生产入口→证据 的关系即本表主体。",
+  "cases": [
+    {
+      "id": "P00-A01",
+      "title": "工作区保护",
+      "test_path": "docs/refactor-2026/P00/WORKTREE_SAFETY.md + 命令日志",
+      "test_name": "进入/退出 git status 对比（终检命令 P00-T08-final-status）",
+      "fixture_sha256": null,
+      "production_entry": "git 工作树（非生产代码）",
+      "expected": "用户既有未提交/未跟踪文件原样保留；新文件仅落在 docs/refactor-2026/ 与 artifacts/refactor-2026/",
+      "actual": "进入时 0 已跟踪修改+2 未跟踪任务书目录；退出时任务书目录未动，新增仅两个批准路径（终检确认）",
+      "command_ids": ["P00-T01-git-status", "P00-T08-final-status"],
+      "status": "PASS",
+      "evidence": "artifacts/refactor-2026/P00/logs/P00-T01-git-status.out + 终检日志"
+    },
+    {
+      "id": "P00-A02",
+      "title": "基线漂移",
+      "test_path": "docs/refactor-2026/P00/BASELINE.json（drift_vs_research_sha 节）",
+      "test_name": "git diff --stat/name-status 研究SHA..HEAD",
+      "fixture_sha256": null,
+      "production_entry": "git 历史（非生产代码）",
+      "expected": "不 reset；生成差异与受影响阶段列表；未核对项标待复核",
+      "actual": "差异仅 8 个文档/收尾文件、0 源码差异→P01-P08 无实现漂移影响；行号引用已按当前 HEAD 重核；研究SHA=HEAD~1",
+      "command_ids": ["P00-T01-drift-diff"],
+      "status": "PASS",
+      "evidence": "artifacts/refactor-2026/P00/logs/P00-T01-drift-diff.out"
+    },
+    {
+      "id": "P00-A03",
+      "title": "真实数据隔离",
+      "test_path": "artifacts/refactor-2026/P00/tools/isolated-server-proof.mjs",
+      "test_name": "11 步断言：启动前后路径≠真实目录、受控端口、PUT/GET input-drafts 200 往返、真实哨兵 find/stat 快照零变化、SIGTERM exit 0",
+      "fixture_sha256": "425dc9779face51d372bcb0fee62cb72437f24364105d438f630098d2ba64a23（isolation-proof.json）",
+      "production_entry": "server/main-full.ts → server/index.ts:252 resolveLingxiHome（真实生产入口，绕过 launch.js）",
+      "expected": "实际写入只到隔离目录；路径不明则拒绝启动",
+      "actual": "11/11 PASS：隔离目录拿到 server-info.json+DB+input-drafts.v1.json；~/.lingxi 与 ~/.lingxi-dev 快照 sha 零变化；进程干净退出；启动器覆盖行为另证（P00-T01-launcher-override-proof，overridden=true）",
+      "command_ids": ["P00-T01-A03-isolation-proof", "P00-T01-A03-isolation-proof-r2", "P00-T01-launcher-override-proof"],
+      "status": "PASS",
+      "evidence": "artifacts/refactor-2026/P00/isolated/isolation-proof.json + logs/P00-T01-A03-isolation-proof-r2.out"
+    },
+    {
+      "id": "P00-A04",
+      "title": "功能排除",
+      "test_path": "docs/refactor-2026/P00/FEATURE_MATRIX.md §2 + SCOPE.json",
+      "test_name": "排除项审查（子代理强制分发/独立知识研究/本地模型子系统 混入检查）",
+      "fixture_sha256": null,
+      "production_entry": "lib/experiments/registry.ts:15（proactive_delegation 实验）、lib/knowledge/knowledge-store.ts:1021-1125（research 表）、lib/providers/ollama.ts（接入）",
+      "expected": "它们不进入实现任务；旧数据兼容残留只登记",
+      "actual": "三者在 SCOPE.json excluded 节正确分类：现役替代实验保留、research 表登记为兼容残留归 P05/P08 决策、Ollama 判为接入非子系统；REFACTOR_BACKLOG 无任何恢复任务",
+      "command_ids": ["P00-T01-git-status"],
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P00/SCOPE.json + artifacts/refactor-2026/P00/logs/agent-feature-inventory-raw.md §10"
+    },
+    {
+      "id": "P00-A05",
+      "title": "失败诚实",
+      "test_path": "artifacts/refactor-2026/P00/fixtures/fail-demo/deliberate-fail.case.mjs（node:test，命名避开 vitest include）",
+      "test_name": "必失败断言 2+2===5；环境缺失命令 scripts/smoke-windows-sandbox-helper.mjs x64@darwin",
+      "fixture_sha256": "84194554e462836015cca6a412369a0fab80186894afb24309caa7c4f8d82f3b",
+      "production_entry": "无（测试基础设施；环境缺失命令为生产 smoke 脚本的 Windows 前置检查）",
+      "expected": "分别显示 FAIL 与 BLOCKED，exit code 保留，不得汇总为 PASS",
+      "actual": "deliberate-fail exit 1（FAIL，断言失败详情在日志）；windows-smoke exit 1 且 stderr 明确 'requires a Windows runner'→分类层记 BLOCKED_env_missing；两者均未影响总体报告结论",
+      "command_ids": ["P00-A05-deliberate-fail", "P00-A05-env-missing-windows-smoke"],
+      "status": "PASS",
+      "evidence": "logs/P00-A05-deliberate-fail.{out,err} + logs/P00-A05-env-missing-windows-smoke.err"
+    },
+    {
+      "id": "P00-A06",
+      "title": "证据关联",
+      "test_path": "artifacts/refactor-2026/P00/tools/evidence-check.mjs",
+      "test_name": "交付清单检查器：PASS 条目必须有可回溯命令ID+生产入口/证据；N/A 必须有理由",
+      "fixture_sha256": null,
+      "production_entry": "无（验收工具，校验对象为 P00_RESULT.json/ACCEPTANCE_MAP.json）",
+      "expected": "任务标记完成但无测试命令或生产入口时被阻止通过，并指出缺失字段",
+      "actual": "演示运行（交付物未齐时）正确拦截：报 12 项缺失（P00-A06-evidence-check-demo exit 1）；终版全量交付后终检通过（P00-T08-evidence-check exit 0）",
+      "command_ids": ["P00-A06-evidence-check-demo", "P00-T08-evidence-check"],
+      "status": "PASS",
+      "evidence": "logs/P00-A06-evidence-check-demo.err + 终检日志"
+    },
+    {
+      "id": "P00-A07",
+      "title": "轨迹口径",
+      "test_path": "tests/model-trace-scope.test.ts（21例）+ tests/model-observability-session-trace-reuse.test.ts + tests/model-call-trace-propagation.test.ts",
+      "test_name": "既有生产测试（npm test 内，本轮全量运行通过）",
+      "fixture_sha256": null,
+      "production_entry": "lib/llm/model-trace-scope.ts:156-182（runWithModelTraceRoot 复用分支）/:117-135（强制新根）/:244-271（未知因果=null）；core/session-coordinator.ts:5032 复用接线；hub/scheduler.ts:234 后台新根",
+      "expected": "user_turn 按会话规则复用，后台独立根；不得把 traceId 当 sessionId",
+      "actual": "代码与产品口径（2026-09-05）一致：复用的是会话首次铸出的 mt_ id，铁律 traceId≠sessionId 保留；后台 automation/phone_message/bridge_message 强制新根；本轮 npm test 该域测试全绿（14686 通过中包含）",
+      "command_ids": ["P00-T05-npm-test"],
+      "status": "PASS",
+      "evidence": "logs/P00-T05-npm-test.out（测试文件清单）+ OWNERSHIP_MAP.md 观测分组口径节"
+    },
+    {
+      "id": "P00-A08",
+      "title": "性能可比较",
+      "test_path": "artifacts/refactor-2026/P00/tools/bench-startup.mjs + bench-compare.mjs",
+      "test_name": "同输入两批（B1/B2 各 10 次冷启动）+ 假优化自检（--selftest）",
+      "fixture_sha256": "e205c89b6799d6e189f9fc580687b471650f1dcd5b5d1755397a8e00db8b6b91（startup-b1.json）",
+      "production_entry": "server/main-full.ts（真实启动链）",
+      "expected": "相同输入可比较；输出/任务量不等价的报告无效",
+      "actual": "B1 median 1479ms vs B2 1431ms → COMPARABLE（-3.2%）；selftest：同输入快 23.8% 判 IMPROVED、少一半样本的假优化判 INVALID 拒绝比较",
+      "command_ids": ["P00-T06-bench-startup-B1", "P00-T06-bench-startup-B2", "P00-T06-bench-compare-r2", "P00-A08-bench-compare-selftest-r3"],
+      "status": "PASS",
+      "evidence": "artifacts/refactor-2026/P00/samples/startup-{b1,b2}.json + logs/P00-A08-bench-compare-selftest-r3.out"
+    },
+    {
+      "id": "P00-A09",
+      "title": "脱敏样本",
+      "test_path": "artifacts/refactor-2026/P00/tools/redaction-check.mjs",
+      "test_name": "合成敏感标记扫描（docs+logs+fixtures+samples+tools；受控样本与扫描器/受控历史日志豁免）",
+      "fixture_sha256": "c6f57bebd82b22d005840a9553dc917edad0f6ff7188e22f17dd2563a06d24f9（synthetic-secret-sample.json）",
+      "production_entry": "无（脱敏工具；扫描对象为全部 P00 公开产物）",
+      "expected": "日志/索引无敏感标记；获批原始 payload 单独受限不公开",
+      "actual": "PASS：公开产物零命中；首两版扫描器自身/其错误日志含标记→已修复输出为模式名并豁免两份受控历史日志（声明不进公开打包）",
+      "command_ids": ["P00-A09-redaction-check", "P00-A09-redaction-check-r2", "P00-A09-redaction-check-r4", "P00-T08-redaction-final"],
+      "status": "PASS",
+      "evidence": "logs/P00-A09-redaction-check-r4.out + 终检日志"
+    },
+    {
+      "id": "P00-A10",
+      "title": "阶段边界",
+      "test_path": "docs/refactor-2026/P00/BASELINE_FAILURES.md",
+      "test_name": "分类审查：无关 UI 建议 vs 安全阻塞",
+      "fixture_sha256": null,
+      "production_entry": "无（治理分类）",
+      "expected": "UI 建议不加入当前阶段；安全阻塞明确不隐瞒",
+      "actual": "BASELINE_FAILURES.md 分节：安全阻塞=无（明示）；F1 归治理流程、F2 主责 P03、F3 BLOCKED 环境、F4 范围外（含 UI/风格类）；lint 的 3 个生产 error 不在 P00 修复",
+      "command_ids": ["P00-T05-lint-r3", "P00-T05-npm-test", "P00-T05-round23-isolated", "P00-T05-gh-ci-evidence"],
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P00/BASELINE_FAILURES.md"
+    }
+  ],
+  "fixture_inventory": [
+    { "path": "artifacts/refactor-2026/P00/fixtures/redaction/synthetic-secret-sample.json", "purpose": "A09 合成敏感标记（全伪造）", "sha256": "c6f57bebd82b22d005840a9553dc917edad0f6ff7188e22f17dd2563a06d24f9" },
+    { "path": "artifacts/refactor-2026/P00/fixtures/fail-demo/deliberate-fail.case.mjs", "purpose": "A05 必失败用例（独立运行，不入 vitest 基线）", "sha256": "84194554e462836015cca6a412369a0fab80186894afb24309caa7c4f8d82f3b" },
+    { "path": "tests/fixtures/system-prompt-golden-{zh,en}.txt", "purpose": "复用既有 golden（提示词基线 A 组分）", "sha256": "仓库跟踪文件（HEAD 状态）" },
+    { "path": "artifacts/refactor-2026/P00/samples/history-baseline/", "purpose": "复用仓库基准脚本产出的 W2 样本", "sha256": "384ce11187cdc1ba70208289f85e77c122b867ee529fa717298b6dee338c9ba7（summary-a.json）" },
+    { "path": "artifacts/refactor-2026/P00/samples/startup-{b1,b2}.json / memory-initial.json", "purpose": "W1/W5 初始样本（合成输入，固定入口）", "sha256": "见各文件；startup-b1=e205c89b…b91" }
+  ],
+  "existing_test_reuse": {
+    "coverage_layers": "contract/route（sessions、chat、gateway、history-read×9、persistence-tripwire）/ unit（stream-store、normalizer、trace-scope、task-registry、lease）/ build+audit（seal、upstream-sync、release-preflight、artifact-*）/ platform（win32×10、sandbox-policy、mac-self-install）",
+    "counts": "全仓 vitest 收集 1446 文件（tests/ 内 998 + 外部 448）；本轮 npm test 实跑 14705 用例：14686 通过 / 4 失败（F1 同根因）/ 15 skipped（平台条件门控）；零硬 skip/todo",
+    "detail": "artifacts/refactor-2026/P00/logs/agent-test-inventory-raw.md"
+  },
+  "known_failure_reproductions": [
+    { "name": "F1 封印滞后", "repro": "npx vitest run tests/post-verification-audit-seal.test.ts", "expect": "allowlist 断言失败，列出 7 个非白名单文件", "owner": "治理流程（用户授权后按 PROGRESS.md 推进）" },
+    { "name": "F2 lint 生产 error", "repro": "npx eslint lib/tools/run-code-tool.ts lib/tools/security-scan-tool.ts", "expect": "3 error", "owner": "P03" }
+  ]
+}

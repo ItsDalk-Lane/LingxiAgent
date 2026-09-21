@@ -1,0 +1,55 @@
+{
+  "catalogVersion": 2,
+  "providers": {},
+  "capabilities": {
+    "web.search": {
+      "providers": [
+        {
+          "id": "anysearch",
+          "source": "api",
+          "requiresApiKey": true
+        },
+        {
+          "id": "tavily",
+          "source": "api",
+          "requiresApiKey": true
+        },
+        {
+          "id": "brave",
+          "source": "api",
+          "requiresApiKey": true
+        },
+        {
+          "id": "serper",
+          "source": "api",
+          "requiresApiKey": true
+        },
+        {
+          "id": "anysearch_free",
+          "source": "api",
+          "requiresApiKey": false
+        },
+        {
+          "id": "bing_browser",
+          "source": "browser",
+          "requiresApiKey": false
+        },
+        {
+          "id": "google_browser",
+          "source": "browser",
+          "requiresApiKey": false
+        },
+        {
+          "id": "duckduckgo_browser",
+          "source": "browser",
+          "requiresApiKey": false
+        }
+      ]
+    }
+  },
+  "meta": {
+    "migratedAt": "2026-09-21T12:43:53.393Z",
+    "migrationSource": "added-models.yaml",
+    "deletedProviders": []
+  }
+}

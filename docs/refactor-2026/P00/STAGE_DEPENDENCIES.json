@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "stage_id": "P00",
+  "generated_at": "2026-09-21",
+  "edges": [
+    { "from": "P00", "to": "P01", "type": "handoff", "artifacts": ["BASELINE.json", "SCOPE.json", "CALLSITE_MATRIX.json", "OWNERSHIP_MAP.md", "REFACTOR_BACKLOG.md"] },
+    { "from": "P01", "to": "P02", "type": "dependency", "needs": "strict 核心入口+模块边界（P02 的身份/生命周期契约在其中落地）" },
+    { "from": "P02", "to": "P03", "type": "dependency", "needs": "taskId/run/attempt 身份与终态语义（P03 工具生命周期引用）" },
+    { "from": "P03", "to": "P04", "type": "dependency", "needs": "统一执行边界（P04 观测挂在真实执行链上验证）" },
+    { "from": "P04", "to": "P05", "type": "dependency", "needs": "流式请求与用量观测（P05 消息语义/历史引用 streamId/seq 与 modelCallRef）" },
+    { "from": "P05", "to": "P06", "type": "dependency", "needs": "历史/资源语义稳定（P06 上下文装配与预算引用历史投影）" },
+    { "from": "P06", "to": "P07", "type": "dependency", "needs": "上下文与提示词行为冻结（P07 性能对比需正确性零容忍前置）" },
+    { "from": "P07", "to": "P08", "type": "dependency", "needs": "性能非回归结论（P08 发布门禁组成）" },
+    { "from": "P00/F1", "to": "P08-1", "type": "external_governance", "needs": "用户授权推进审计封印（不阻塞 P01-P07）" },
+    { "from": "P00/F2", "to": "P03-3", "type": "defect_owner", "needs": "lint 3 生产 error 修复（CI 门禁恢复绿）" },
+    { "from": "P00/F3", "to": "P08-2", "type": "blocked_env", "needs": "gh 认证+网络修复后取回四平台 CI 证据" },
+    { "from": "P00/protocol", "to": "P06-1,P07-1", "type": "shared_protocol", "needs": "BENCHMARK_PROTOCOL 与 PROMPT_BASELINE（口径冻结，不得单方面改）" }
+  ],
+  "single_owner_rule_check": {
+    "taskId铸造": "仅 P02",
+    "LINGXI_HOME统一": "仅 P01",
+    "lint生产error": "仅 P03",
+    "research残留退役": "仅 P05 评估（执行退役需用户授权）",
+    "封印推进": "仅 P08（用户授权）",
+    "无任何网关/循环/resolver/凭证存储在多个阶段重复建设": true
+  }
+}

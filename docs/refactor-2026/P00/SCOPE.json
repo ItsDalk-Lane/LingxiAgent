@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "stage_id": "P00",
+  "task_id": "P00-T02",
+  "generated_at": "2026-09-21",
+  "evidence": {
+    "feature_inventory_raw": "artifacts/refactor-2026/P00/logs/agent-feature-inventory-raw.md",
+    "matrix_doc": "docs/refactor-2026/P00/FEATURE_MATRIX.md"
+  },
+  "keep": {
+    "stack": ["Electron 42", "React 19", "TypeScript", "Node.js >=24.12 <25", "Pi SDK @earendil-works/* 0.86.0", "electron-builder 26.15.x", "vitest"],
+    "tool_policy": "RESIDENT_CORE_TOOL_NAMES = [read, write, edit, exec_command]（shared/tool-categories.ts:103）；其余按需目录经 mcp_search_tools/mcp_describe_tool/mcp_call；启动断言三重保护（assertAllToolsCategorized / assertAllBuiltInToolsPermissionCovered / assertOnDemandCoreToolNamesSound，接线 core/engine.ts:4336,4650-4654）",
+    "features_adopted": ["F01 聊天与会话", "F02 会话管理", "F03 四基础工具+按需目录", "F04 审批与沙盒", "F05 子代理（现役工具+可选实验）", "F06 人格与MOOD", "F07 记忆", "F08 知识库（现行）", "F09 资源与交付文件", "F10 模型与媒体配置", "F11 浏览器/终端/桌面系统能力", "F12 Bridge五平台", "F13 Web/移动端", "F14 CLI", "F15 后台任务", "F16 用量观测", "F17 导入导出", "F18 更新", "F19 技能系统", "F20 i18n（范围外保护）"]
+  },
+  "excluded": [
+    {
+      "item": "专用子代理目录/强制分发改造",
+      "verdict": "HARD_EXCLUDED",
+      "current_replacement": "可选实验 subagent.proactive_delegation（lib/experiments/registry.ts:15，默认 false）",
+      "residue_action": "登记；不进入任何阶段实现任务"
+    },
+    {
+      "item": "独立知识研究（knowledge research pipeline）",
+      "verdict": "HARD_EXCLUDED",
+      "production_residue": "lib/knowledge/knowledge-store.ts:1021-1125 建表（research_runs 等 9+ 表）、lib/knowledge/types.ts:5-162、knowledge-manager.ts 删除保护",
+      "residue_action": "只登记；旧数据兼容用途保留，退出决策归 P05/P08"
+    },
+    {
+      "item": "本地模型管理子系统",
+      "verdict": "HARD_EXCLUDED_ALREADY_REMOVED",
+      "note": "生产代码无痕迹；Ollama（lib/providers/ollama.ts）是模型接入不是该子系统"
+    },
+    {
+      "item": "skills2set/lingxi-plugin-creator/（仅 __pycache__）",
+      "verdict": "REPOSITORY_RESIDUE",
+      "residue_action": "登记；删除需后续授权"
+    },
+    {
+      "item": "vitest.config.js @hana/* 与 tsconfig.test.json @lingxi/plugin-* 别名指向不存在的 packages/",
+      "verdict": "REPOSITORY_RESIDUE",
+      "residue_action": "登记；主责 P01 核实清退"
+    }
+  ],
+  "external_extensions_policy": "用户电脑外装 MCP/插件不计入内置功能；plugins/ 下 beautify/jimeng-cli/media/office 为内置插件（随包分发，已采纳）",
+  "ui_policy": "本轮不改 UI 布局、不新增产品能力",
+  "dependency_policy": "本轮零依赖升级（锁定 package-lock sha256 a9735825cea1d018c2a42ae04f875368a003c386ca68fc86503bc8acbcd79d3c）"
+}

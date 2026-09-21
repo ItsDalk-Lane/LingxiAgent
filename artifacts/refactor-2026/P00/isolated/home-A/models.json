@@ -1,0 +1,279 @@
+{
+    "providers": {
+        "openai-codex": {
+            "baseUrl": "https://chatgpt.com/backend-api",
+            "api": "openai-codex-responses",
+            "models": [
+                {
+                    "id": "gpt-5.6-sol",
+                    "name": "GPT-5.6 Sol",
+                    "input": [
+                        "text",
+                        "image"
+                    ],
+                    "contextWindow": 353400,
+                    "reasoning": true,
+                    "thinkingLevelMap": {
+                        "off": null,
+                        "minimal": null,
+                        "xhigh": "max"
+                    },
+                    "api": "openai-codex-responses",
+                    "maxTokens": 128000,
+                    "defaultThinkingLevel": "low",
+                    "compat": {
+                        "supportsDeveloperRole": false,
+                        "reasoningReplay": {
+                            "carrier": "reasoning_items",
+                            "policy": "preserve"
+                        }
+                    }
+                },
+                {
+                    "id": "gpt-5.6-terra",
+                    "name": "GPT-5.6 Terra",
+                    "input": [
+                        "text",
+                        "image"
+                    ],
+                    "contextWindow": 353400,
+                    "reasoning": true,
+                    "thinkingLevelMap": {
+                        "off": null,
+                        "minimal": null,
+                        "xhigh": "max"
+                    },
+                    "api": "openai-codex-responses",
+                    "maxTokens": 128000,
+                    "defaultThinkingLevel": "medium",
+                    "compat": {
+                        "supportsDeveloperRole": false,
+                        "reasoningReplay": {
+                            "carrier": "reasoning_items",
+                            "policy": "preserve"
+                        }
+                    }
+                },
+                {
+                    "id": "gpt-5.6-luna",
+                    "name": "GPT-5.6 Luna",
+                    "input": [
+                        "text",
+                        "image"
+                    ],
+                    "contextWindow": 353400,
+                    "reasoning": true,
+                    "thinkingLevelMap": {
+                        "off": null,
+                        "minimal": null,
+                        "xhigh": "max"
+                    },
+                    "api": "openai-codex-responses",
+                    "maxTokens": 128000,
+                    "defaultThinkingLevel": "medium",
+                    "compat": {
+                        "supportsDeveloperRole": false,
+                        "reasoningReplay": {
+                            "carrier": "reasoning_items",
+                            "policy": "preserve"
+                        }
+                    }
+                },
+                {
+                    "id": "gpt-5.5",
+                    "name": "GPT-5.5",
+                    "input": [
+                        "text",
+                        "image"
+                    ],
+                    "contextWindow": 272000,
+                    "reasoning": true,
+                    "thinkingLevelMap": {
+                        "off": null,
+                        "minimal": "low",
+                        "xhigh": "xhigh"
+                    },
+                    "api": "openai-codex-responses",
+                    "maxTokens": 128000,
+                    "defaultThinkingLevel": "medium",
+                    "compat": {
+                        "supportsDeveloperRole": false,
+                        "reasoningReplay": {
+                            "carrier": "reasoning_items",
+                            "policy": "preserve"
+                        }
+                    }
+                },
+                {
+                    "id": "gpt-5.4",
+                    "name": "GPT-5.4",
+                    "input": [
+                        "text",
+                        "image"
+                    ],
+                    "contextWindow": 272000,
+                    "reasoning": true,
+                    "thinkingLevelMap": {
+                        "off": null,
+                        "minimal": "low",
+                        "xhigh": "xhigh"
+                    },
+                    "api": "openai-codex-responses",
+                    "maxTokens": 128000,
+                    "defaultThinkingLevel": "medium",
+                    "compat": {
+                        "supportsDeveloperRole": false,
+                        "reasoningReplay": {
+                            "carrier": "reasoning_items",
+                            "policy": "preserve"
+                        }
+                    }
+                },
+                {
+                    "id": "gpt-5.4-mini",
+                    "name": "GPT-5.4 Mini",
+                    "input": [
+                        "text",
+                        "image"
+                    ],
+                    "contextWindow": 272000,
+                    "reasoning": true,
+                    "thinkingLevelMap": {
+                        "off": null,
+                        "minimal": "low",
+                        "xhigh": "xhigh"
+                    },
+                    "api": "openai-codex-responses",
+                    "maxTokens": 128000,
+                    "defaultThinkingLevel": "medium",
+                    "compat": {
+                        "supportsDeveloperRole": false,
+                        "reasoningReplay": {
+                            "carrier": "reasoning_items",
+                            "policy": "preserve"
+                        }
+                    }
+                },
+                {
+                    "id": "gpt-5.2",
+                    "name": "GPT-5.2",
+                    "input": [
+                        "text",
+                        "image"
+                    ],
+                    "contextWindow": 272000,
+                    "reasoning": true,
+                    "thinkingLevelMap": {
+                        "off": null,
+                        "minimal": "low",
+                        "xhigh": "xhigh"
+                    },
+                    "api": "openai-codex-responses",
+                    "maxTokens": 128000,
+                    "defaultThinkingLevel": "medium",
+                    "compat": {
+                        "supportsDeveloperRole": false,
+                        "reasoningReplay": {
+                            "carrier": "reasoning_items",
+                            "policy": "preserve"
+                        }
+                    }
+                }
+            ]
+        },
+        "xai-oauth": {
+            "baseUrl": "https://cli-chat-proxy.grok.com/v1",
+            "api": "openai-responses",
+            "models": [
+                {
+                    "id": "grok-4.5",
+                    "name": "Grok 4.5",
+                    "input": [
+                        "text",
+                        "image"
+                    ],
+                    "contextWindow": 500000,
+                    "reasoning": true,
+                    "api": "openai-responses",
+                    "maxTokens": 128000,
+                    "headers": {
+                        "x-grok-model-override": "grok-4.5"
+                    },
+                    "compat": {
+                        "supportsDeveloperRole": false,
+                        "reasoningReplay": {
+                            "carrier": "reasoning_items",
+                            "policy": "preserve"
+                        }
+                    }
+                },
+                {
+                    "id": "grok-4.5-latest",
+                    "name": "Grok 4.5 Latest",
+                    "input": [
+                        "text",
+                        "image"
+                    ],
+                    "contextWindow": 500000,
+                    "reasoning": true,
+                    "api": "openai-responses",
+                    "maxTokens": 128000,
+                    "headers": {
+                        "x-grok-model-override": "grok-4.5-latest"
+                    },
+                    "compat": {
+                        "supportsDeveloperRole": false,
+                        "reasoningReplay": {
+                            "carrier": "reasoning_items",
+                            "policy": "preserve"
+                        }
+                    }
+                },
+                {
+                    "id": "grok-build-latest",
+                    "name": "Grok Build Latest",
+                    "input": [
+                        "text",
+                        "image"
+                    ],
+                    "contextWindow": 500000,
+                    "reasoning": true,
+                    "api": "openai-responses",
+                    "maxTokens": 128000,
+                    "headers": {
+                        "x-grok-model-override": "grok-build-latest"
+                    },
+                    "compat": {
+                        "supportsDeveloperRole": false,
+                        "reasoningReplay": {
+                            "carrier": "reasoning_items",
+                            "policy": "preserve"
+                        }
+                    }
+                },
+                {
+                    "id": "grok-4.3",
+                    "name": "Grok 4.3",
+                    "input": [
+                        "text",
+                        "image"
+                    ],
+                    "contextWindow": 1000000,
+                    "reasoning": true,
+                    "api": "openai-responses",
+                    "maxTokens": 128000,
+                    "headers": {
+                        "x-grok-model-override": "grok-4.3"
+                    },
+                    "compat": {
+                        "supportsDeveloperRole": false,
+                        "reasoningReplay": {
+                            "carrier": "reasoning_items",
+                            "policy": "preserve"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
