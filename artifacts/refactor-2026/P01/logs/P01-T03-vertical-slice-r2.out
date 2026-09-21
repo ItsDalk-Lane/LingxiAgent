@@ -1,0 +1,60 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+[server-bootstrap] failed to import server entry: Error: Unsupported provider catalog version: missing
+    at ProviderCatalogStore._readExistingCatalog (file:///Users/study_superior/Desktop/Code/LingxiAgent/core/provider-catalog.ts:195:13)
+    at ProviderCatalogStore.load (file:///Users/study_superior/Desktop/Code/LingxiAgent/core/provider-catalog.ts:118:27)
+    at migrateLegacyApiKeyAuthToProviders (file:///Users/study_superior/Desktop/Code/LingxiAgent/core/provider-auth-migration.ts:135:25)
+    at ModelManager._removeApiKeyProviderAuthEntries (file:///Users/study_superior/Desktop/Code/LingxiAgent/core/model-manager.ts:433:5)
+    at ModelManager.init (file:///Users/study_superior/Desktop/Code/LingxiAgent/core/model-manager.ts:201:16)
+    at LingxiEngine.init (file:///Users/study_superior/Desktop/Code/LingxiAgent/core/engine.ts:3437:24)
+    at startServer (file:///Users/study_superior/Desktop/Code/LingxiAgent/server/index.ts:445:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async file:///Users/study_superior/Desktop/Code/LingxiAgent/server/main-full.ts:24:3
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+Error: Unsupported provider catalog version: missing
+    at ProviderCatalogStore._readExistingCatalog (file:///Users/study_superior/Desktop/Code/LingxiAgent/core/provider-catalog.ts:195:13)
+    at ProviderCatalogStore.load (file:///Users/study_superior/Desktop/Code/LingxiAgent/core/provider-catalog.ts:118:27)
+    at migrateLegacyApiKeyAuthToProviders (file:///Users/study_superior/Desktop/Code/LingxiAgent/core/provider-auth-migration.ts:135:25)
+    at ModelManager._removeApiKeyProviderAuthEntries (file:///Users/study_superior/Desktop/Code/LingxiAgent/core/model-manager.ts:433:5)
+    at ModelManager.init (file:///Users/study_superior/Desktop/Code/LingxiAgent/core/model-manager.ts:201:16)
+    at LingxiEngine.init (file:///Users/study_superior/Desktop/Code/LingxiAgent/core/engine.ts:3437:24)
+    at startServer (file:///Users/study_superior/Desktop/Code/LingxiAgent/server/index.ts:445:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async file:///Users/study_superior/Desktop/Code/LingxiAgent/server/main-full.ts:24:3
+
+Node.js v24.16.0
+ ❯ tests/server-composition-boundary.test.ts (9 tests | 1 failed | 8 skipped) 1457ms
+     ↓ server/index.ts + composition/open-root.ts + composition/full-root.ts together mount exactly the expected route factories, at the same prefixes, as the pre-refactor server/index.ts
+     ↓ mobile-workbench (evidence-needed) is mounted directly by server/index.ts itself, not absorbed into open-root.ts or full-root.ts
+     ↓ server/index.ts imports composition/open-root.ts unconditionally and imports no closed-product route file directly
+     ↓ full composition supplies a non-empty builtinMediaAdapters list
+     ↓ server/index.ts (the open composition) only ever forwards root.builtinMediaAdapters, never constructs or imports a closed adapter list itself
+     ↓ main-full.ts forwards full-root's builtinMediaAdapters into startServer alongside registerClosedRoutes
+     ↓ importing server/index.ts alone defines startServer but starts nothing (no port bind, no server-info.json, clean exit)
+     ↓ serves an open-root route and a full-root (closed-product) route behind the same global auth middleware
+     × runs the full chain without any desktop, rejects malformed JSON at the HTTP entry (A07), and keeps serving after a desktop-channel notify (A10) 1456ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server-composition-boundary.test.ts > P01 headless vertical slice: witness provider → WS prompt → real read tool → history read-back > runs the full chain without any desktop, rejects malformed JSON at the HTTP entry (A07), and keeps serving after a desktop-channel notify (A10)
+Error: server exited before writing server-info.json: {"code":1,"signal":null}
+ ❯ Timeout.poll [as _onTimeout] tests/server-composition-boundary.test.ts:265:16
+    263|     const poll = () => {
+    264|       if (exited) {
+    265|         reject(new Error(`server exited before writing server-info.jso…
+       |                ^
+    266|         return;
+    267|       }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 skipped (9)
+   Start at  21:51:21
+   Duration  1.74s (transform 167ms, setup 19ms, import 195ms, tests 1.46s, environment 0ms)
+

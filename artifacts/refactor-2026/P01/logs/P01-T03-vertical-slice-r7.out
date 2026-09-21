@@ -1,0 +1,56 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+[agent] 记忆系统暂不可用：memory slot 未配置且无 chat 可 fallback
+[memory-ticker] week.md 迁移失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] compileDaily 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] compileToday(daily) 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] compileFacts 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] deep-memory 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] 每日任务部分失败，已完成: []，1 小时后重试未完成步骤
+[memory-ticker] compileToday 失败: memory slot resolved to null (no model configured and no chat fallback)
+[engine] ⚠ 未找到可用模型，请在设置中配置 API key
+[server] [proxy] 出站流量正经由系统代理 http://127.0.0.1:7890；若需直连，请在设置 > 网络中切换为「直连」模式。 (Outbound is routed via system proxy http://127.0.0.1:7890; switch to "direct" in Settings > Network to bypass it.)
+[server] [proxy] 出站流量正经由系统代理 http://127.0.0.1:7890；若需直连，请在设置 > 网络中切换为「直连」模式。 (Outbound is routed via system proxy http://127.0.0.1:7890; switch to "direct" in Settings > Network to bypass it.)
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[session] cache_contract_violation {"session":"sess_0mubb7fdn_62b66507fb70a82702a0","renewReason":"new_session","requestCount":0,"diffs":[{"field":"systemPromptHash","expected":"12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126","actual":"edb8634c35b81af07bb911d31179f10c83c040160375020b8f85fe0678494780"},{"field":"cachePrefixHash","expected":"ff4785c41af9e91ac42b31a0d64d0a21ef4c0bdf5c6601bb526ede41172db8fc","actual":"eb75145900e65a9707f03747d01f578f9774562e1e926cd73606dbf4030d8ed0"}],"expected":{"version":1,"cachePrefixHash":"ff4785c41af9e91ac42b31a0d64d0a21ef4c0bdf5c6601bb526ede41172db8fc","modelHash":"f60e1415101b76d8c4b4c985c74611f1ab5f12c1fa2ab84fb117ab99cdff7019","systemPromptHash":"12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126","toolSchemaHash":"5c5c496e8cbbc6150b1e7bb882bd4f9b4ce1d572768e8d208293794b6af67e21","model":{"id":"witness-model","provider":"witness","api":"openai-completions","baseUrl":"http://127.0.0.1:62845/v1"},"toolNames":["edit","exec_command","read","write","mcp_call","mcp_describe_tool","mcp_search_tools"],"toolCount":7,"systemPromptBytes":0},"actual":{"version":1,"cachePrefixHash":"eb75145900e65a9707f03747d01f578f9774562e1e926cd73606dbf4030d8ed0","modelHash":"f60e1415101b76d8c4b4c985c74611f1ab5f12c1fa2ab84fb117ab99cdff7019","systemPromptHash":"edb8634c35b81af07bb911d31179f10c83c040160375020b8f85fe0678494780","toolSchemaHash":"5c5c496e8cbbc6150b1e7bb882bd4f9b4ce1d572768e8d208293794b6af67e21","model":{"id":"witness-model","provider":"witness","api":"openai-completions","baseUrl":"http://127.0.0.1:62845/v1"},"toolNames":["edit","exec_command","read","write","mcp_call","mcp_describe_tool","mcp_search_tools"],"toolCount":7,"systemPromptBytes":11164},"drift":{"fields":["systemPromptHash","cachePrefixHash"],"systemPrompt":{"expectedBytes":0,"actualBytes":11164,"firstDiffIndex":0,"expectedExcerpt":"","actualExcerpt":"You are running on the Lingxi (灵犀) platform.\n\n---\n\n# Environment\n\n<environment_context>\n  <platform>darwin</platform>\n  <"},"tools":null}}
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[llm-utils] summarizeTitle failed: LLM returned invalid JSON (status=200)
+[memory-ticker] 滚动摘要 (sess_0mubb7fdn_62b66507fb70a82702a0) 失败: Could not read session JSONL: ENOENT: no such file or directory, open 'sess_0mubb7fdn_62b66507fb70a82702a0'
+ ❯ tests/server-composition-boundary.test.ts (9 tests | 1 failed) 5799ms
+     ✓ server/index.ts + composition/open-root.ts + composition/full-root.ts together mount exactly the expected route factories, at the same prefixes, as the pre-refactor server/index.ts 27ms
+     ✓ mobile-workbench (evidence-needed) is mounted directly by server/index.ts itself, not absorbed into open-root.ts or full-root.ts 1ms
+     ✓ server/index.ts imports composition/open-root.ts unconditionally and imports no closed-product route file directly 0ms
+     ✓ full composition supplies a non-empty builtinMediaAdapters list  1114ms
+     ✓ server/index.ts (the open composition) only ever forwards root.builtinMediaAdapters, never constructs or imports a closed adapter list itself 1ms
+     ✓ main-full.ts forwards full-root's builtinMediaAdapters into startServer alongside registerClosedRoutes 0ms
+     ✓ importing server/index.ts alone defines startServer but starts nothing (no port bind, no server-info.json, clean exit)  1188ms
+     ✓ serves an open-root route and a full-root (closed-product) route behind the same global auth middleware  1578ms
+     × runs the full chain without any desktop, rejects malformed JSON at the HTTP entry (A07), and keeps serving after a desktop-channel notify (A10) 1890ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server-composition-boundary.test.ts > P01 headless vertical slice: witness provider → WS prompt → real read tool → history read-back > runs the full chain without any desktop, rejects malformed JSON at the HTTP entry (A07), and keeps serving after a desktop-channel notify (A10)
+AssertionError: expected '{"model":"witness-model","temperature…' to contain 'P01_VERTICAL_SLICE_FILE_CONTENT_7ad2'
+
+Expected: "P01_VERTICAL_SLICE_FILE_CONTENT_7ad2"
+Received: "{"model":"witness-model","temperature":0.3,"messages":[{"role":"system","content":"You are a third-person product roster editor. Based on the public persona material below, write a public-facing description of this AI agent. Aim for about 100 characters; 60-200 characters is acceptable. Describe the assistant from the outside, not in first person. Cover personality traits, expertise, communication style, and suitable tasks. Do not output <mood>, Vibe, Sparks, Pulse, Reflect, or any internal tags. Plain text, no markdown. Output the description directly, no explanation."},{"role":"user","content":"# Lingxi\n\nUser's personal assistant. Balancing feeling and reasoning, with both warmth and judgment.\n\n\n# Personality\n\n- You are a warm presence, not a cold tool\n- Your tone: warm enough with the user, with strong autonomy and initiative\n- You have exceptional literary and philosophical depth, strong logical ability, and powerful academic skills in math, science, and beyond\n- You have strong empathy, and when caring for the user, you're thoughtful without being excessive or sycophantic\n- When the user raises ideas or viewpoints, you can draw analogies and make creative connections\n- When explaining concepts, you must always search the web\n- Analyze things from fundamental objective principles, not from echoed ideological illusions, moral standards, or so-called consensus\n- Ground abstract concepts with analogies or concrete examples\n- Use dashes sparingly\n- Don't end with \"in summary,\" \"hope this helps,\" or \"as you can see\"\n- Unless necessary, avoid the \"it's not X, it's Y\" sentence pattern and its variants\n"}]}"
+
+ ❯ tests/server-composition-boundary.test.ts:562:49
+    560|       expect(posts.length).toBeGreaterThanOrEqual(2);
+    561|       expect(posts[0].headers.authorization).toContain(WITNESS_KEY);
+    562|       expect(JSON.stringify(posts[1].bodyJson)).toContain(FILE_MARKER);
+       |                                                 ^
+    563|
+    564|       // The WS event stream carried the tool round-trip.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 passed (9)
+   Start at  21:57:04
+   Duration  6.09s (transform 733ms, setup 22ms, import 200ms, tests 5.80s, environment 0ms)
+

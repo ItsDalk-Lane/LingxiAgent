@@ -1,0 +1,56 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+[agent] 记忆系统暂不可用：memory slot 未配置且无 chat 可 fallback
+[memory-ticker] week.md 迁移失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] compileDaily 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] compileToday(daily) 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] compileFacts 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] deep-memory 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] 每日任务部分失败，已完成: []，1 小时后重试未完成步骤
+[memory-ticker] compileToday 失败: memory slot resolved to null (no model configured and no chat fallback)
+[engine] ⚠ 未找到可用模型，请在设置中配置 API key
+[server] [proxy] 出站流量正经由系统代理 http://127.0.0.1:7890；若需直连，请在设置 > 网络中切换为「直连」模式。 (Outbound is routed via system proxy http://127.0.0.1:7890; switch to "direct" in Settings > Network to bypass it.)
+[server] [proxy] 出站流量正经由系统代理 http://127.0.0.1:7890；若需直连，请在设置 > 网络中切换为「直连」模式。 (Outbound is routed via system proxy http://127.0.0.1:7890; switch to "direct" in Settings > Network to bypass it.)
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[session] cache_contract_violation {"session":"sess_0mubb8953_36f5168655a4f6a80e6c","renewReason":"new_session","requestCount":0,"diffs":[{"field":"systemPromptHash","expected":"12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126","actual":"898c3a10744f0b4bb32660d7583f47391bb317c8a7f5e6851322effb365d12cb"},{"field":"cachePrefixHash","expected":"cbf9fcd26fa73a300f1d23b70a2df781dbc65c58d86b0eeb6299c5b3572f8098","actual":"fb844e9dd486bc4718b62d2fab9e0c5043c7fdbb1fb3cb6d4d2b44b40239224a"}],"expected":{"version":1,"cachePrefixHash":"cbf9fcd26fa73a300f1d23b70a2df781dbc65c58d86b0eeb6299c5b3572f8098","modelHash":"6bb15b014776fa7ae1744c4ad03dadcdafa3f70f75e19711111e0b6855d3aec8","systemPromptHash":"12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126","toolSchemaHash":"5c5c496e8cbbc6150b1e7bb882bd4f9b4ce1d572768e8d208293794b6af67e21","model":{"id":"witness-model","provider":"witness","api":"openai-completions","baseUrl":"http://127.0.0.1:62947/v1"},"toolNames":["edit","exec_command","read","write","mcp_call","mcp_describe_tool","mcp_search_tools"],"toolCount":7,"systemPromptBytes":0},"actual":{"version":1,"cachePrefixHash":"fb844e9dd486bc4718b62d2fab9e0c5043c7fdbb1fb3cb6d4d2b44b40239224a","modelHash":"6bb15b014776fa7ae1744c4ad03dadcdafa3f70f75e19711111e0b6855d3aec8","systemPromptHash":"898c3a10744f0b4bb32660d7583f47391bb317c8a7f5e6851322effb365d12cb","toolSchemaHash":"5c5c496e8cbbc6150b1e7bb882bd4f9b4ce1d572768e8d208293794b6af67e21","model":{"id":"witness-model","provider":"witness","api":"openai-completions","baseUrl":"http://127.0.0.1:62947/v1"},"toolNames":["edit","exec_command","read","write","mcp_call","mcp_describe_tool","mcp_search_tools"],"toolCount":7,"systemPromptBytes":11164},"drift":{"fields":["systemPromptHash","cachePrefixHash"],"systemPrompt":{"expectedBytes":0,"actualBytes":11164,"firstDiffIndex":0,"expectedExcerpt":"","actualExcerpt":"You are running on the Lingxi (灵犀) platform.\n\n---\n\n# Environment\n\n<environment_context>\n  <platform>darwin</platform>\n  <"},"tools":null}}
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[llm-utils] summarizeTitle failed: LLM returned invalid JSON (status=200)
+[memory-ticker] 滚动摘要 (sess_0mubb8953_36f5168655a4f6a80e6c) 失败: Could not read session JSONL: ENOENT: no such file or directory, open 'sess_0mubb8953_36f5168655a4f6a80e6c'
+ ❯ tests/server-composition-boundary.test.ts (9 tests | 1 failed) 6158ms
+     ✓ server/index.ts + composition/open-root.ts + composition/full-root.ts together mount exactly the expected route factories, at the same prefixes, as the pre-refactor server/index.ts 27ms
+     ✓ mobile-workbench (evidence-needed) is mounted directly by server/index.ts itself, not absorbed into open-root.ts or full-root.ts 1ms
+     ✓ server/index.ts imports composition/open-root.ts unconditionally and imports no closed-product route file directly 0ms
+     ✓ full composition supplies a non-empty builtinMediaAdapters list  1138ms
+     ✓ server/index.ts (the open composition) only ever forwards root.builtinMediaAdapters, never constructs or imports a closed adapter list itself 0ms
+     ✓ main-full.ts forwards full-root's builtinMediaAdapters into startServer alongside registerClosedRoutes 0ms
+     ✓ importing server/index.ts alone defines startServer but starts nothing (no port bind, no server-info.json, clean exit)  1192ms
+     ✓ serves an open-root route and a full-root (closed-product) route behind the same global auth middleware  1597ms
+     × runs the full chain without any desktop, rejects malformed JSON at the HTTP entry (A07), and keeps serving after a desktop-channel notify (A10) 2201ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server-composition-boundary.test.ts > P01 headless vertical slice: witness provider → WS prompt → real read tool → history read-back > runs the full chain without any desktop, rejects malformed JSON at the HTTP entry (A07), and keeps serving after a desktop-channel notify (A10)
+AssertionError: expected '{"messages":[{"id":"0","sourceIndex":…' to contain 'P01_PLAIN_CHAT_REPLY'
+
+Expected: "P01_PLAIN_CHAT_REPLY"
+Received: "{"messages":[{"id":"0","sourceIndex":2,"entryId":"9741da39","role":"user","content":"请读取 slice-note.txt 并告诉我内容","clientMessageId":"p01-vertical-c1","sourceEntryId":"9741da39","snapshotVersion":1,"timestamp":"2026-09-21T13:57:49.045Z","displayText":"请读取 slice-note.txt 并告诉我内容"},{"id":"1","sourceIndex":4,"entryId":"b89f483d","role":"assistant","content":"","turnStartIndex":1,"turnEndIndex":2,"modelCallRef":{"modelCallId":"mc_mubb896h_c_pzxzdl","traceId":"mt_mubb8968_b_tqmzwa","parentCallId":null},"assistantSegments":[],"turnInputEntryId":"9741da39","turnInputVisible":true,"toolCalls":[{"id":"tc_p01_read","name":"read","args":{"path":"slice-note.txt"},"processOrder":0,"startedAt":"2026-09-21T13:57:49.080Z","endedAt":"2026-09-21T13:57:49.087Z","status":"succeeded","success":true,"details":{"input":"{\n  \"path\": \"slice-note.txt\"\n}","output":"P01_VERTICAL_SLICE_FILE_CONTENT_7ad2\nsecond line\n","read":{"path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-p01-ws-usVrRr/slice-note.txt","startLine":1,"totalLines":3,"displayedLines":3,"language":"txt"}}}],"timestamp":"2026-09-21T13:57:49.080Z"},{"id":"2","sourceIndex":7,"entryId":"05fb30c7","role":"assistant","content":"P01_VERTICAL_ASSISTANT_REPLY 文件内容已读取","turnStartIndex":1,"turnEndIndex":2,"modelCallRef":{"modelCallId":"mc_mubb897m_e_y1443i","traceId":"mt_mubb8968_b_tqmzwa","parentCallId":"mc_mubb896h_c_pzxzdl"},"assistantSegments":[{"id":"assistant:2:text:0","kind":"text","semanticPhase":"final_answer","source":"P01_VERTICAL_ASSISTANT_REPLY 文件内容已读取","lifecycle":"sealed","processOrder":0}],"turnInputEntryId":"9741da39","turnInputVisible":true,"timestamp":"2026-09-21T13:57:49.099Z"},{"id":"3","sourceIndex":8,"entryId":"18d8dbc8","role":"user","content":"请给我发一条桌面通知","clientMessageId":"p01-vertical-notify","sourceEntryId":"18d8dbc8","snapshotVersion":1,"timestamp":"2026-09-21T13:57:49.198Z"},{"id":"4","sourceIndex":10,"entryId":"6acf28fd","role":"assistant","content":"P01_VERTICAL_ASSISTANT_REPLY 文件内容已读取","turnStartIndex":4,"turnEndIndex":4,"modelCallRef":{"modelCallId":"mc_mubb89ao_k_dxqrxu","traceId":"mt_mubb8968_b_tqmzwa","parentCallId":null},"assistantSegments":[{"id":"assistant:1:text:0","kind":"text","semanticPhase":"final_answer","source":"P01_VERTICAL_ASSISTANT_REPLY 文件内容已读取","lifecycle":"sealed","processOrder":0}],"turnInputEntryId":"18d8dbc8","turnInputVisible":true,"timestamp":"2026-09-21T13:57:49.208Z"},{"id":"5","sourceIndex":11,"entryId":"827b5444","role":"user","content":"普通聊天继续","clientMessageId":"p01-vertical-plain","sourceEntryId":"827b5444","snapshotVersion":1,"timestamp":"2026-09-21T13:57:49.358Z"},{"id":"6","sourceIndex":13,"entryId":"72ab6140","role":"assistant","content":"P01_VERTICAL_ASSISTANT_REPLY 文件内容已读取","turnStartIndex":6,"turnEndIndex":6,"modelCallRef":{"modelCallId":"mc_mubb89f3_m_avgf5c","traceId":"mt_mubb8968_b_tqmzwa","parentCallId":null},"assistantSegments":[{"id":"assistant:1:text:0","kind":"text","semanticPhase":"final_answer","source":"P01_VERTICAL_ASSISTANT_REPLY 文件内容已读取","lifecycle":"sealed","processOrder":0}],"turnInputEntryId":"827b5444","turnInputVisible":true,"timestamp":"2026-09-21T13:57:49.368Z"}],"blocks":[],"todos":null,"todoPanel":null,"hasMore":false,"nextBefore":null,"sessionFiles":[],"revision":"35495:1789999069368.3105"}"
+
+ ❯ tests/server-composition-boundary.test.ts:610:57
+    608|       );
+    609|       expect(finalHistory.status).toBe(200);
+    610|       expect(JSON.stringify(await finalHistory.json())).toContain("P01…
+       |                                                         ^
+    611|
+    612|       ws.close();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 passed (9)
+   Start at  21:57:43
+   Duration  6.44s (transform 745ms, setup 19ms, import 195ms, tests 6.16s, environment 0ms)
+

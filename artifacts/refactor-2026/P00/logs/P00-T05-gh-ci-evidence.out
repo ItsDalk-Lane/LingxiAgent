@@ -1,0 +1,7 @@
+/opt/homebrew/bin/gh
+github.com
+  X Failed to log in to github.com account ItsDalk-Lane (keyring)
+  - Active account: true
+  - The token in keyring is invalid.
+  - To re-authenticate, run: gh auth refresh -h github.com
+Get "https://api.github.com/repos/ItsDalk-Lane/LingxiAgent/actions/workflows/ci.yml": proxyconnect tcp: dial tcp 127.0.0.1:7890: connect: connection refused

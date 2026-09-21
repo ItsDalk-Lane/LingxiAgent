@@ -1,0 +1,12 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/core-contracts-strict.test.ts (5 tests) 1077ms
+     ✓ real core contract files pass strict with noUncheckedIndexedAccess and exactOptionalPropertyTypes  469ms
+     ✓ A05: injecting the null-unsafe negative fixture fails the check with a null-check error code  306ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  23:20:56
+   Duration  1.31s (transform 73ms, setup 18ms, import 158ms, tests 1.08s, environment 0ms)
+

@@ -1,0 +1,18 @@
+ BLOCKED.md                    | 110 +++------------
+ CONTRIBUTING.md               |   5 -
+ PROGRESS.md                   |   6 +-
+ README.md                     |   4 -
+ README_EN.md                  |   4 -
+ RELEASE_VERSIONING.md         |   2 +-
+ docs/README.md                |   2 -
+ git-ui-relocation-mockup.html | 309 ------------------------------------------
+ 8 files changed, 22 insertions(+), 420 deletions(-)
+---name-status---
+M	BLOCKED.md
+M	CONTRIBUTING.md
+M	PROGRESS.md
+M	README.md
+M	README_EN.md
+M	RELEASE_VERSIONING.md
+M	docs/README.md
+D	git-ui-relocation-mockup.html

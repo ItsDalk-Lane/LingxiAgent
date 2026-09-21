@@ -1,0 +1,15 @@
+
+> lingxi@0.1.42 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+tests/tool-invocation-gateway.test.ts(482,56): error TS2493: Tuple type '[_toolCallId: string, _args: Record<string, unknown>]' of length '2' has no element at index '4'.
+
+> lingxi@0.1.42 typecheck:core-contracts
+> node scripts/check-core-contracts-strict.mjs
+
+Core contracts strict check passed (6 files).
+
+> lingxi@0.1.42 check:dependency-boundaries
+> node scripts/check-dependency-boundaries.mjs
+
+Dependency boundary check passed (2025 source files).

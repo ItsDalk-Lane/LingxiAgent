@@ -1,0 +1,35 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/core-contracts-strict.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/core-contracts-strict.test.ts [ tests/core-contracts-strict.test.ts ]
+Error: Transform failed with 1 error:
+/Users/study_superior/Desktop/Code/LingxiAgent/tests/core-contracts-strict.test.ts:67:15: ERROR: "await" can only be used inside an "async" function
+  Plugin: vite:esbuild
+  File: /Users/study_superior/Desktop/Code/LingxiAgent/tests/core-contracts-strict.test.ts:67:15
+  
+  "await" can only be used inside an "async" function
+  65 |  
+  66 |    it("negative fixtures stay out of the regular test project (tsconfig.test.json excludes them)", () => {
+  67 |      const fs = await import("node:fs");
+     |                 ^
+  68 |      const config = JSON.parse(fs.readFileSync(path.join(repositoryRoot, "tsconfig.test.json"), "utf8"));
+  69 |      expect(config.exclude).toContain("tests/fixtures/**");
+  
+ ❯ failureErrorWithLog node_modules/esbuild/lib/main.js:1748:15
+ ❯ node_modules/esbuild/lib/main.js:1017:50
+ ❯ responseCallbacks.<computed> node_modules/esbuild/lib/main.js:884:9
+ ❯ handleIncomingPacket node_modules/esbuild/lib/main.js:939:12
+ ❯ Socket.readFromStdout node_modules/esbuild/lib/main.js:862:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  22:13:07
+   Duration  87ms (transform 14ms, setup 19ms, import 0ms, tests 0ms, environment 0ms)
+

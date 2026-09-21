@@ -1,0 +1,44 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/tool-invocation-gateway.test.ts (17 tests | 1 failed) 43ms
+     ✓ 合法 prepared 调用绑定完整事实并原样透传执行句柄 30ms
+     ✓ 没有 prepared 上下文时拒绝模型路径 1ms
+     ✓ prepared 后发生参数替换时 fail-closed 1ms
+     ✓ prepared 后发生目标替换时 fail-closed 1ms
+     ✓ prepared 后发生会话替换时 fail-closed 1ms
+     ✓ prepared 后发生代理替换时 fail-closed 1ms
+     ✓ prepared 后发生调用编号替换时 fail-closed 0ms
+     ✓ 参数键顺序变化但内容相同仍匹配稳定 digest 1ms
+     ✓ 把 facade 的 effective invocation 解析到真实目标后再准备和执行 1ms
+     ✓ 代次变化或实时不可用时撤销已准备调用 1ms
+     ✓ 取消在 canonical executor 前后都传播为稳定取消错误 1ms
+     ✓ 错误日志只记录安全归因字段并包含路径、来源、目标、代次和错误码 1ms
+     ✓ 本地开发入口自行准备并只调用一次宿主审批 0ms
+     ✓ 本地开发入口拒绝非本地开发主体 0ms
+     ✓ 装配时不可见目标和不合规参数在权限解析前被拒绝 1ms
+     ✓ A08 严格 schema：模型 args 携带伪造身份字段被参数契约拒绝且零执行 0ms
+     × A08 宽松 schema：伪造字段即使通过校验也不改变 prepared 绑定的宿主身份 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/tool-invocation-gateway.test.ts > 规范化工具调用网关 > A08 宽松 schema：伪造字段即使通过校验也不改变 prepared 绑定的宿主身份
+TypeError: registered tool target requires a complete identity
+ ❯ assertTarget core/tool-target-registry.ts:93:11
+     91|   const identity = target?.identity;
+     92|   if (!identity?.targetId || !identity.sourceId || !identity.publicNam…
+     93|     throw new TypeError("registered tool target requires a complete id…
+       |           ^
+     94|   }
+     95|   if (target.permission?.identity?.targetId !== identity.targetId) {
+ ❯ ToolTargetRegistry.register core/tool-target-registry.ts:126:5
+ ❯ tests/tool-invocation-gateway.test.ts:412:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 16 passed (17)
+   Start at  22:15:05
+   Duration  830ms (transform 195ms, setup 19ms, import 701ms, tests 43ms, environment 0ms)
+

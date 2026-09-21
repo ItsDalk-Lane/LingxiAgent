@@ -1,0 +1,37 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/pi-sdk-import-boundary.test.ts (3 tests | 1 failed) 345ms
+     ✓ keeps production Pi SDK imports inside lib/pi-sdk 209ms
+     ✓ the import-boundary pattern statically covers pi-agent-core 0ms
+     × keeps production typebox imports inside lib/pi-sdk 135ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/pi-sdk-import-boundary.test.ts > Pi SDK import boundary > keeps production typebox imports inside lib/pi-sdk
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "lib/tools/invocation/schema-validator.ts",
++ ]
+
+ ❯ tests/pi-sdk-import-boundary.test.ts:70:40
+     68|   it("keeps production typebox imports inside lib/pi-sdk", () => {
+     69|     const pattern = /(?:from\s+["']typebox["']|import\s*\(\s*["']typeb…
+     70|     expect(findDirectImports(pattern)).toEqual([]);
+       |                                        ^
+     71|   });
+     72| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  21:38:28
+   Duration  439ms (transform 23ms, setup 19ms, import 6ms, tests 345ms, environment 0ms)
+

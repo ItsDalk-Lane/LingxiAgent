@@ -1,0 +1,42 @@
+
+> lingxi@0.1.42 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+tests/model-observability-durable-matrix.test.ts(55,27): error TS2322: Type 'string' is not assignable to type 'ModelCallId'.
+  Type 'string' is not assignable to type '{ readonly __brand: "ModelCallId"; }'.
+tests/model-observability-durable-matrix.test.ts(56,9): error TS2322: Type '() => string' is not assignable to type '() => ModelAttemptId'.
+  Type 'string' is not assignable to type 'ModelAttemptId'.
+    Type 'string' is not assignable to type '{ readonly __brand: "ModelAttemptId"; }'.
+tests/model-observability-durable-matrix.test.ts(60,28): error TS2322: Type 'string' is not assignable to type 'ModelTraceId'.
+  Type 'string' is not assignable to type '{ readonly __brand: "ModelTraceId"; }'.
+tests/model-observability-trace-projection.test.ts(42,37): error TS2322: Type 'string' is not assignable to type 'ModelCallId'.
+  Type 'string' is not assignable to type '{ readonly __brand: "ModelCallId"; }'.
+tests/model-observability-trace-projection.test.ts(42,66): error TS2322: Type 'string' is not assignable to type 'ModelAttemptId'.
+  Type 'string' is not assignable to type '{ readonly __brand: "ModelAttemptId"; }'.
+tests/model-observability-trace-projection.test.ts(42,103): error TS2322: Type 'string' is not assignable to type 'ModelTraceId'.
+  Type 'string' is not assignable to type '{ readonly __brand: "ModelTraceId"; }'.
+tests/model-observability-trace-projection.test.ts(118,27): error TS2322: Type 'string' is not assignable to type 'ModelCallId'.
+  Type 'string' is not assignable to type '{ readonly __brand: "ModelCallId"; }'.
+tests/model-observability-trace-projection.test.ts(119,9): error TS2322: Type '() => string' is not assignable to type '() => ModelAttemptId'.
+  Type 'string' is not assignable to type 'ModelAttemptId'.
+    Type 'string' is not assignable to type '{ readonly __brand: "ModelAttemptId"; }'.
+tests/model-observability-trace-projection.test.ts(123,28): error TS2322: Type 'string' is not assignable to type 'ModelTraceId'.
+  Type 'string' is not assignable to type '{ readonly __brand: "ModelTraceId"; }'.
+tests/model-observability-trace-projection.test.ts(166,27): error TS2322: Type 'string' is not assignable to type 'ModelCallId'.
+  Type 'string' is not assignable to type '{ readonly __brand: "ModelCallId"; }'.
+tests/model-observability-trace-projection.test.ts(167,30): error TS2322: Type 'string' is not assignable to type 'ModelAttemptId'.
+  Type 'string' is not assignable to type '{ readonly __brand: "ModelAttemptId"; }'.
+tests/model-observability-trace-projection.test.ts(168,28): error TS2322: Type 'string' is not assignable to type 'ModelTraceId'.
+  Type 'string' is not assignable to type '{ readonly __brand: "ModelTraceId"; }'.
+tests/model-observability-trace-projection.test.ts(208,27): error TS2322: Type 'string' is not assignable to type 'ModelCallId'.
+  Type 'string' is not assignable to type '{ readonly __brand: "ModelCallId"; }'.
+tests/model-observability-trace-projection.test.ts(209,30): error TS2322: Type 'string' is not assignable to type 'ModelAttemptId'.
+  Type 'string' is not assignable to type '{ readonly __brand: "ModelAttemptId"; }'.
+tests/model-observability-trace-projection.test.ts(210,28): error TS2322: Type 'string' is not assignable to type 'ModelTraceId'.
+  Type 'string' is not assignable to type '{ readonly __brand: "ModelTraceId"; }'.
+tests/model-observability-trace-projection.test.ts(241,27): error TS2322: Type 'string' is not assignable to type 'ModelCallId'.
+  Type 'string' is not assignable to type '{ readonly __brand: "ModelCallId"; }'.
+tests/model-observability-trace-projection.test.ts(242,30): error TS2322: Type 'string' is not assignable to type 'ModelAttemptId'.
+  Type 'string' is not assignable to type '{ readonly __brand: "ModelAttemptId"; }'.
+tests/model-observability-trace-projection.test.ts(243,28): error TS2322: Type 'string' is not assignable to type 'ModelTraceId'.
+  Type 'string' is not assignable to type '{ readonly __brand: "ModelTraceId"; }'.

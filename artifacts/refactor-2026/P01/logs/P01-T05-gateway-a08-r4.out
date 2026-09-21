@@ -1,0 +1,53 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/tool-invocation-gateway.test.ts (17 tests | 1 failed) 40ms
+     ✓ 合法 prepared 调用绑定完整事实并原样透传执行句柄 28ms
+     ✓ 没有 prepared 上下文时拒绝模型路径 1ms
+     ✓ prepared 后发生参数替换时 fail-closed 1ms
+     ✓ prepared 后发生目标替换时 fail-closed 1ms
+     ✓ prepared 后发生会话替换时 fail-closed 0ms
+     ✓ prepared 后发生代理替换时 fail-closed 0ms
+     ✓ prepared 后发生调用编号替换时 fail-closed 0ms
+     ✓ 参数键顺序变化但内容相同仍匹配稳定 digest 0ms
+     ✓ 把 facade 的 effective invocation 解析到真实目标后再准备和执行 1ms
+     ✓ 代次变化或实时不可用时撤销已准备调用 1ms
+     ✓ 取消在 canonical executor 前后都传播为稳定取消错误 1ms
+     ✓ 错误日志只记录安全归因字段并包含路径、来源、目标、代次和错误码 0ms
+     ✓ 本地开发入口自行准备并只调用一次宿主审批 0ms
+     ✓ 本地开发入口拒绝非本地开发主体 0ms
+     ✓ 装配时不可见目标和不合规参数在权限解析前被拒绝 1ms
+     ✓ A08 严格 schema：模型 args 携带伪造身份字段被参数契约拒绝且零执行 0ms
+     × A08 宽松 schema：伪造字段即使通过校验也不改变 prepared 绑定的宿主身份 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/tool-invocation-gateway.test.ts > 规范化工具调用网关 > A08 宽松 schema：伪造字段即使通过校验也不改变 prepared 绑定的宿主身份
+AssertionError: expected undefined to match object { caller: 'model', …(2) }
+
+- Expected:
+{
+  "caller": "model",
+  "effectiveTargetId": "tool:first-party:write_note_tolerant",
+  "invocationRoute": "direct",
+}
+
++ Received:
+undefined
+
+ ❯ tests/tool-invocation-gateway.test.ts:485:25
+    483|     expect(executedCallId).toBe("call-1");
+    484|     // 执行上下文的身份仍是宿主解析的 effectiveTargetId（模型不可伪造）。
+    485|     expect(executedCtx).toMatchObject({
+       |                         ^
+    486|       caller: "model",
+    487|       invocationRoute: "direct",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 16 passed (17)
+   Start at  22:15:35
+   Duration  814ms (transform 200ms, setup 20ms, import 687ms, tests 40ms, environment 0ms)
+

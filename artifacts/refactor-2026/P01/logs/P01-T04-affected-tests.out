@@ -1,0 +1,12 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/cli-local-server.test.ts (3 tests) 40ms
+ ✓ tests/model-observability-trace-projection.test.ts (6 tests) 70ms
+ ✓ tests/model-observability-durable-matrix.test.ts (8 tests) 92ms
+
+ Test Files  3 passed (3)
+      Tests  17 passed (17)
+   Start at  22:11:10
+   Duration  298ms (transform 254ms, setup 59ms, import 264ms, tests 202ms, environment 0ms)
+

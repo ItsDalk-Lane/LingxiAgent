@@ -1,0 +1,2 @@
+PASS resolveLingxiHome(启动前) == 隔离目录 :: {"resolved":"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/P00/isolated/home-A"}
+PASS 隔离目录不在真实哨兵集合

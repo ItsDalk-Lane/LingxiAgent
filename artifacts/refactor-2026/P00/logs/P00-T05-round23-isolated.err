@@ -1,0 +1,99 @@
+✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+  - BLOCKED.md
+  - CONTRIBUTING.md
+  - README.md
+  - README_EN.md
+  - RELEASE_VERSIONING.md
+  - docs/README.md
+  - git-ui-relocation-mockup.html
+✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+  - BLOCKED.md
+  - CONTRIBUTING.md
+  - README.md
+  - README_EN.md
+  - RELEASE_VERSIONING.md
+  - docs/README.md
+  - git-ui-relocation-mockup.html
+✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+  - BLOCKED.md
+  - CONTRIBUTING.md
+  - README.md
+  - README_EN.md
+  - RELEASE_VERSIONING.md
+  - docs/README.md
+  - git-ui-relocation-mockup.html
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁
+Error: Command failed: node /Users/study_superior/Desktop/Code/LingxiAgent/.sync-audit/verify-post-verification-diff.mjs
+✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+  - BLOCKED.md
+  - CONTRIBUTING.md
+  - README.md
+  - README_EN.md
+  - RELEASE_VERSIONING.md
+  - docs/README.md
+  - git-ui-relocation-mockup.html
+
+ ❯ manifestSourceRef tests/round2-delivery-evidence.test.ts:61:17
+     59|   const verified = fs.readFileSync(path.join(ROOT, ".sync-audit", "ver…
+     60|   expect(verified).toMatch(/^[0-9a-f]{40}$/);
+     61|   const guard = execFileSync("node", [path.join(ROOT, ".sync-audit", "…
+       |                 ^
+     62|     cwd: ROOT,
+     63|     encoding: "utf8",
+ ❯ tests/round2-delivery-evidence.test.ts:129:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { status: 1, signal: null, output: [ null, '', '✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:\n  - BLOCKED.md\n  - CONTRIBUTING.md\n  - README.md\n  - README_EN.md\n  - RELEASE_VERSIONING.md\n  - docs/README.md\n  - git-ui-relocation-mockup.html\n' ], pid: 35534, stdout: '', stderr: '✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:\n  - BLOCKED.md\n  - CONTRIBUTING.md\n  - README.md\n  - README_EN.md\n  - RELEASE_VERSIONING.md\n  - docs/README.md\n  - git-ui-relocation-mockup.html\n' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示
+Error: Command failed: node /Users/study_superior/Desktop/Code/LingxiAgent/.sync-audit/verify-post-verification-diff.mjs
+✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+  - BLOCKED.md
+  - CONTRIBUTING.md
+  - README.md
+  - README_EN.md
+  - RELEASE_VERSIONING.md
+  - docs/README.md
+  - git-ui-relocation-mockup.html
+
+ ❯ manifestSourceRef tests/round2-delivery-evidence.test.ts:61:17
+     59|   const verified = fs.readFileSync(path.join(ROOT, ".sync-audit", "ver…
+     60|   expect(verified).toMatch(/^[0-9a-f]{40}$/);
+     61|   const guard = execFileSync("node", [path.join(ROOT, ".sync-audit", "…
+       |                 ^
+     62|     cwd: ROOT,
+     63|     encoding: "utf8",
+ ❯ tests/round2-delivery-evidence.test.ts:150:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { status: 1, signal: null, output: [ null, '', '✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:\n  - BLOCKED.md\n  - CONTRIBUTING.md\n  - README.md\n  - README_EN.md\n  - RELEASE_VERSIONING.md\n  - docs/README.md\n  - git-ui-relocation-mockup.html\n' ], pid: 35566, stdout: '', stderr: '✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:\n  - BLOCKED.md\n  - CONTRIBUTING.md\n  - README.md\n  - README_EN.md\n  - RELEASE_VERSIONING.md\n  - docs/README.md\n  - git-ui-relocation-mockup.html\n' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/round3-delivery-evidence.test.ts > round3 C01-C03 候选交付证据契约 > round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试
+Error: Command failed: node /Users/study_superior/Desktop/Code/LingxiAgent/.sync-audit/verify-post-verification-diff.mjs
+✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+  - BLOCKED.md
+  - CONTRIBUTING.md
+  - README.md
+  - README_EN.md
+  - RELEASE_VERSIONING.md
+  - docs/README.md
+  - git-ui-relocation-mockup.html
+
+ ❯ manifestSourceRef tests/round3-delivery-evidence.test.ts:93:17
+     91|   const verified = fs.readFileSync(path.join(ROOT, ".sync-audit", "ver…
+     92|   expect(verified).toMatch(/^[0-9a-f]{40}$/);
+     93|   const guard = execFileSync("node", [path.join(ROOT, ".sync-audit", "…
+       |                 ^
+     94|     cwd: ROOT, encoding: "utf8",
+     95|   });
+ ❯ tests/round3-delivery-evidence.test.ts:127:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { status: 1, signal: null, output: [ null, '', '✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:\n  - BLOCKED.md\n  - CONTRIBUTING.md\n  - README.md\n  - README_EN.md\n  - RELEASE_VERSIONING.md\n  - docs/README.md\n  - git-ui-relocation-mockup.html\n' ], pid: 35502, stdout: '', stderr: '✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:\n  - BLOCKED.md\n  - CONTRIBUTING.md\n  - README.md\n  - README_EN.md\n  - RELEASE_VERSIONING.md\n  - docs/README.md\n  - git-ui-relocation-mockup.html\n' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
