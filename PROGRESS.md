@@ -2015,3 +2015,9 @@ M  desktop/src/react/__tests__/components/TodoPanel.test.tsx
 ### 2026-09-21 v0.1.42 发布树坐标后终态复验
 
 - 坐标 `adca95ca3947bcada920e66caabfbd059d9993e6` 就位后，全量 `npm test`（含 post-verification-audit-seal / upstream-sync-matrix / round2 / round3 全部自指门禁）：1443 文件通过 / 3 既有跳过；14690 测试通过 / 15 既有跳过 / 0 失败，exit 0。v0.1.42 标签自本树打出。
+
+## 2026-09-22 refactor-2026 候选树封印推进（九阶段 + F01–F05 + recheck R1–R3，已获授权的提交/发布流程）
+
+- 坐标 `adca95ca3947bcada920e66caabfbd059d9993e6` → `e7e991669c7b7238c3107510c70b0fa8c95dcf20`（分支 docs/knowledge-closeout-2026-09-21：92c6646c5 知识收尾 docs + P01–P08 九阶段 refactor-2026 + 8d55046d5 F01–F05 独立审查修复 + e7e991669 recheck 轮 R1–R3 [流接纳延迟提交+水位原子化、resume 代次守卫与可选 resumeToken 端到端透传、123 个证据 .log 经 .gitignore 精确反向规则入库]）。
+- 验证绑定：坐标推进后 post-verification-audit-seal 绿（diff guard 仅审计文件变化）；upstream-sync-matrix 坐标一致性绿；round2/round3 证据门禁此刻仍红（SOURCE_MANIFEST 绑定旧树），按发布流程待 v0.1.43 发布树证据刷新提交重绑定——过渡窗如实登记，见后续发布条目。
+- build-sync-matrix 常量随动，矩阵与 markdown 投影重生成（133 paths，projection sha256 8bf6c07a873c2b25c51db12ae36addb89cbfe33f23747fcdd3d32b4c7878dbc9）。
