@@ -3,6 +3,162 @@
   "entries": [
     {
       "schemaVersion": 1,
+      "tag": "v0.1.43",
+      "version": "0.1.43",
+      "previousTag": "v0.1.42",
+      "generatedAt": "2026-09-22T14:04:38Z",
+      "noUserFacingChanges": false,
+      "summary": {
+        "zh": "一轮以稳定性为目标的全面体检收尾：断线重连后，迟到的旧回复不再串进当前对话、也不会覆盖正在进行的输出；已完成的任务不再被迟到的旧结果改写，界面上已批准的工具不会再跳回「待批准」；格式损坏的请求在进门时就被明确拒绝并给出原因，不再带病执行。日常使用无功能与界面变化，老数据无缝兼容。",
+        "en": "A stability-focused overhaul lands: after a reconnect, late stale replies no longer bleed into the current conversation or overwrite output in progress; finished tasks can no longer be rewritten by delayed old results, and tools you already approved no longer flip back to \"pending\"; malformed requests are rejected up front with a clear reason instead of half-running. No new features or UI changes in daily use, and existing data stays fully compatible."
+      },
+      "counts": {
+        "feature": 0,
+        "fix": 3,
+        "improvement": 1,
+        "migration": 0
+      },
+      "source": {
+        "owner": "ItsDalk-Lane",
+        "repo": "LingxiAgent",
+        "commitRange": "v0.1.42..e7e991669",
+        "releaseUrl": "https://github.com/ItsDalk-Lane/LingxiAgent/releases/tag/v0.1.43",
+        "releaseNotes": ""
+      },
+      "items": [
+        {
+          "id": "stream-resume-generation-guard",
+          "kind": "fix",
+          "importance": "high",
+          "title": {
+            "zh": "断线恢复不再串场：迟到的旧响应一律丢弃",
+            "en": "Reconnects no longer cross streams: late stale responses are always dropped"
+          },
+          "summary": {
+            "zh": "网络闪断重连的瞬间，一条迟到的旧「恢复」响应可能把等待期间新开的对话流覆盖或串进旧内容，表现为重复卡片、残留正文或输出错位。现在恢复请求带代次标记、服务端原样回显，旧代次的响应到达即被丢弃；同时接纳时序拆分为先校验后提交，旧帧不再对新流产生退休副作用。旧版本两端混用时协议兼容。",
+            "en": "In the moment right after a network blip and reconnect, one delayed stale \"resume\" response could overwrite a conversation stream newly accepted while waiting, showing up as duplicated cards, leftover text or misplaced output. Resume requests now carry a generation token echoed back by the server, so any stale-generation response is dropped on arrival; admission is also split into validate-then-commit so old frames can no longer retire a fresh stream. The protocol stays compatible when old and new builds mix."
+          },
+          "details": [
+            {
+              "zh": "恢复代次守卫覆盖请求与响应两端：迟到响应被静默丢弃且不计入错误，正常恢复路径行为不变；配合 7 条真实链路反例（含结束帧缺口与切流）回归验证。",
+              "en": "The generation guard covers both request and response sides: stale arrivals are dropped silently without surfacing as errors, while the normal resume path is unchanged; verified with 7 new real-socket regression cases including end-frame gaps and stream switches."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "e7e991669",
+              "title": "fix(refactor-2026): 独立审查 recheck 轮 R1–R3——流恢复接纳代次守卫与证据入库"
+            }
+          ]
+        },
+        {
+          "id": "task-final-state-protection",
+          "kind": "fix",
+          "importance": "high",
+          "title": {
+            "zh": "已完成的任务不再被翻旧账",
+            "en": "Finished tasks can no longer be rewritten by stale updates"
+          },
+          "summary": {
+            "zh": "过去一条迟到的旧回调或旧批次结果可能改写已经定稿的任务状态，界面上还出现过「已批准的工具又被显示为待批准」。现在所有状态写入都有终态保护：任务一旦结束，旧回调不能再更新、中止或取消它；重复使用的任务身份会绑定不可变批次，旧缺省批次不能冒认新执行。",
+            "en": "A delayed stale callback or an outdated batch result could previously rewrite an already-finalized task, and the UI could even show an already-approved tool flip back to \"pending approval\". All state writes now carry final-state protection: once a task ends, stale callbacks can no longer update, abort or cancel it; reused task identities bind to immutable batches so an old default batch can't impersonate a new run."
+          },
+          "details": [
+            {
+              "zh": "覆盖任务总线、后台命令、回档、子代理与媒体生产方等全部写入口；合法的展示元数据更新不受影响。",
+              "en": "Covers every write path including the task bus, background commands, rollback, sub-agents and media producers; legitimate display-metadata updates are unaffected."
+            }
+          ],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "8d55046d5",
+              "title": "fix(refactor-2026): 独立审查修复轮 F01–F05 落地（代码缺陷修复与验收勘误）"
+            }
+          ]
+        },
+        {
+          "id": "input-boundary-strict",
+          "kind": "fix",
+          "importance": "medium",
+          "title": {
+            "zh": "损坏的请求进门即拒，不再带病执行",
+            "en": "Malformed requests are rejected up front instead of half-running"
+          },
+          "summary": {
+            "zh": "两个会话创建入口过去会放过格式损坏的请求（坏 JSON、字段类型不对），到中途才以模糊的方式失败。现在在任何写入或模型调用发生之前就明确拒绝并给出原因；合法的空请求体、字段为空值、未知字段等原有语义保持不变。",
+            "en": "Two session-creation entries used to let malformed requests through (broken JSON, wrong field types), only to fail vaguely midway. They are now rejected with a clear reason before any write or model call happens, while legitimate cases keep their original semantics: empty bodies, null fields and unknown fields all behave as before."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "8d55046d5",
+              "title": "fix(refactor-2026): 独立审查修复轮 F01–F05 落地（F02 输入边界）"
+            }
+          ]
+        },
+        {
+          "id": "refactor-2026-hardening",
+          "kind": "improvement",
+          "importance": "medium",
+          "title": {
+            "zh": "九阶段全面体检：把边角都加上护栏",
+            "en": "A nine-phase overhaul: guard rails for every edge case"
+          },
+          "summary": {
+            "zh": "对任务身份与尝试栅栏、工具目录与执行边界、模型调用与用量观测、消息语义与历史恢复、数据兼容、上下文装配、启动与运行性能做了九个阶段的逐项实测与收口，并由独立审查修复了发现的问题。日常使用没有功能或界面变化；启动、对话、取消等各面实测都远低于可感阈值，老数据零迁移无缝兼容。",
+            "en": "Nine phases of measured hardening across task identity and attempt fencing, the tool catalog and execution boundary, model calls and usage observability, message semantics and history recovery, data compatibility, context assembly, and startup/runtime performance — with issues found by independent review fixed. No feature or UI changes in daily use; startup, streaming and cancellation all measure far below perceivable thresholds, and existing data migrates with zero steps."
+          },
+          "details": [],
+          "sources": [
+            {
+              "type": "commit",
+              "ref": "e2392f301",
+              "title": "refactor(P01): 模块边界、Pi适配与严格类型入口"
+            },
+            {
+              "type": "commit",
+              "ref": "9a19740ba",
+              "title": "refactor(P02): taskId 统一铸造、attempt 栅栏与清理错误上报"
+            },
+            {
+              "type": "commit",
+              "ref": "3286c96e5",
+              "title": "refactor(P03): 工具目录、参数契约与统一执行边界"
+            },
+            {
+              "type": "commit",
+              "ref": "1f0537b08",
+              "title": "refactor(P04): 模型、凭证、流式请求与用量观测"
+            },
+            {
+              "type": "commit",
+              "ref": "93b8b7265",
+              "title": "refactor(P05): 消息语义、历史恢复、资源与数据兼容"
+            },
+            {
+              "type": "commit",
+              "ref": "52dbb45f9",
+              "title": "refactor(P06): 上下文、提示词、记忆与能力集成"
+            },
+            {
+              "type": "commit",
+              "ref": "674b0151f",
+              "title": "refactor(P07): 可测量的启动、运行与界面性能优化"
+            },
+            {
+              "type": "commit",
+              "ref": "b0e911842",
+              "title": "refactor(P08): 旧路径退出、全产品回归与发布准备"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
       "tag": "v0.1.42",
       "version": "0.1.42",
       "previousTag": "v0.1.41",
