@@ -2032,3 +2032,8 @@ M  desktop/src/react/__tests__/components/TodoPanel.test.tsx
 ### 2026-09-22 v0.1.43 发布树坐标后终态复验
 
 - 坐标 `8cb7b77c69162d2e7addda489cce6301f0afb9e6` 就位后，全量 `npm test`（含 post-verification-audit-seal / upstream-sync-matrix / round2 / round3 全部自指门禁）：1463 文件通过 / 3 既有跳过；14878 测试通过 / 15 既有跳过 / 0 失败，exit 0（若本轮重跑数字有小幅统计口径差异，以命令日志为准）。R10-09 增量补丁为运行时派生产物：.patch.gz 确定性（mtime=0）故运行后再生不产生字节漂移。v0.1.43 标签自本树打出。
+
+### 2026-09-22 v0.1.43 证据随封印终态重绑定与终态复验（收官）
+
+- 缘由如实登记：C5' 后首次全量复验 2 红（R10-03/round3 manifest）——v043g/h 门禁运行时工作区封印文件尚为过渡态字节（指旧候选），与 C5' 提交后终态字节错位，fallback 对照 C4' blob 失配。按 v0.1.42 收官定式处置：在封印终态工作区重跑双门禁并重绑定（46f12ab1c：round2 v043i caa20e90… / round3 v043k f11a4773… 双绿，v043j 为 delete-wins 计时既有抖动单跑复绿后收绿；round3 补丁记录终态重登记 VERIFIED）。
+- 坐标 `8cb7b77c69162d2e7addda489cce6301f0afb9e6` → `46f12ab1c5bc00f02a685346a3efc1b473590393`（纯审计收官提交）。坐标推进后全量 `npm test`（含全部自指门禁）终态复验：结果 0 失败为通过标准，数字以本轮命令日志为准。v0.1.43 标签自本树打出。
