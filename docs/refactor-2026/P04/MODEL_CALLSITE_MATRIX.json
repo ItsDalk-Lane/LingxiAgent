@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "stage_id": "P04",
+  "task_id": "P04-T01",
+  "generated_at": "2026-09-22",
+  "source_sha": "3286c96e571fadea65143df8baabf503d30d37f2",
+  "note": "出站模型调用全量映射。行号基于本阶段 START HEAD；每条链均核对到真实出站点（HTTP fetch / SDK streamFunction / 外部进程），无『应该经过』推断。MC 编号沿用 lib/llm 既有观测文档（MC-01…MC-10）。",
+  "families": [
+    {
+      "family": "pi-stream-chat",
+      "mc_id": "MC-01/02/03",
+      "purpose": "聊天与桥接/Phone/子代理/原生 compaction 的流式模型调用",
+      "callsites": [
+        "core/session-coordinator.ts:2214-2230 组装 sessionOpts → lib/pi-sdk/index.ts:78 createAgentSession（唯一入口）",
+        "core/bridge-session-manager.ts:1305/:1456 session.prompt",
+        "core/session-coordinator.ts:8385/:8657 executeIsolated session.prompt",
+        "hub/agent-executor.ts:552/:712 session.prompt"
+      ],
+      "model_selection": "sessionOpts.model（session-coordinator.ts:2227 effectiveModel ← model-manager 从 Pi ModelRuntime 解析，findModel provider+id 联合键）",
+      "credential_owner": "Pi ModelRuntime.getAuth（AuthStorage/auth.json + provider-catalog 注册 apiKey）；lib/pi-sdk/index.ts:454 withLingxiCredentialBoundary 拒绝宿主环境变量兜底（LINGXI_AMBIENT_CREDENTIAL_FORBIDDEN）",
+      "operation_adapter": "pi-ai 各 provider adapter（SDK 内部；openai-completions/anthropic-messages/google-generative-ai/openai-responses/openai-codex-responses…）",
+      "network_execution": "pi-ai AgentLoop streamFunction（SDK 内部 HTTP/SSE）",
+      "observation": "lib/pi-sdk/model-call-stream-observer.ts:155 installModelCallStreamObserver（lib/pi-sdk/index.ts:86 安装）——三条路径（普通 chat/MC-02 AgentRun/MC-03 native summarizer）唯一公共边界",
+      "trace_rule": "lib/llm/model-trace-scope.ts（user_turn 会话级复用 mt_；bridge/phone/automation 独立根）",
+      "usage": "message_end 补账 recordAssistantUsage（session-coordinator.ts:588/2328/8560、bridge-session-manager.ts:345、hub/agent-executor）+ WeakMap 关联 modelCallId（model-call-correlation.ts）",
+      "status": "UNCHANGED_VERIFIED"
+    },
+    {
+      "family": "pi-direct-summary",
+      "mc_id": "MC-10",
+      "purpose": "日记/原生摘要等 Pi generateSummary 无 streamFn 的 completeSimple 直连",
+      "callsites": ["lib/pi-sdk/index.ts:241 generateSummary facade（core/diary 链消费）"],
+      "model_selection": "调用方传入 model 对象",
+      "credential_owner": "调用方解析后以 apiKey 形参传入（facade 不自建回退）",
+      "operation_adapter": "pi-ai completeSimple（compat 入口）",
+      "network_execution": "completeSimple 内部（强制流式聚合）",
+      "observation": "lib/llm/observed-pi-direct-summary.ts observePiDirectSummary（facade 内包装，传 streamFn 时不包——防双计）",
+      "trace_rule": "resolveModelTraceContext（singleton/继承）",
+      "usage": "observerContext.usageLedger（第 14 参显式注入）",
+      "status": "UNCHANGED_VERIFIED"
+    },
+    {
+      "family": "calltext-utility",
+      "mc_id": "MC-04",
+      "purpose": "非流式短文本：标题/摘要/记忆/视觉辅助/守卫/rc 摘要/git 环境/总线插件文本",
+      "callsites": [
+        "server/routes/chat.ts:3037 engine.summarizeTitle → core/llm-utils.ts:254 summarizeTitle（slot=title）",
+        "server/index.ts:723 utility:call-text / :759 model:sample-text 总线（slot=summarize，origin=plugin 新根或工具内继承）",
+        "core/vision-bridge.ts:917/:981 视觉辅助分析（slot=vision，含图像输入）",
+        "core/agent.ts:446-477 记忆摘要（slot=memory）、:806/:824 守卫（slot=guard）",
+        "core/slash-commands/rc-summary.ts:63 rc 摘要（slot=summarize）",
+        "server/routes/git-environment.ts git 环境摘要（callText+usage/trace 记账）"
+      ],
+      "model_selection": "core/auxiliary-model-resolver.ts AuxiliaryModelResolver（slot→ModelRef→availableModels 联合键；未配置按 slot 策略 fallback chat/image_capable_chat/none；配置错误不 fallback）",
+      "credential_owner": "resolveAuxiliaryModelFresh → ModelManager.resolveProviderCredentialsFresh（请求边界刷新；auth-storage/provider-catalog/none 三道）",
+      "operation_adapter": "core/llm-client.ts callText（SUPPORTED_BUFFERED_APIS 五协议 + provider-compat normalizeProviderPayload）",
+      "network_execution": "callText 内 fetch（单次 POST；codex 协议读 SSE 聚合）",
+      "observation": "callText 内建 ModelCallRecorder（logical call 身份先于 Provider 请求）+ Phase 6 payload capture",
+      "trace_rule": "resolveModelTraceContext（modelCallContext 显式 > TraceScope 继承 > singleton）",
+      "usage": "usageLedger.start/finish/recordError（metadata 带 modelCallId/traceId/parentCallId）",
+      "status": "UNCHANGED_VERIFIED"
+    },
+    {
+      "family": "provider-probe",
+      "mc_id": "MC-08",
+      "purpose": "设置页模型健康检查",
+      "callsites": ["server/routes/models.ts:234-292 health-check 端点"],
+      "model_selection": "engine.resolveModelWithCredentialsFresh（model-manager 联合键 + 请求边界凭证）",
+      "credential_owner": "同上（resolveProviderCredentialsFresh）",
+      "operation_adapter": "callText（固定 HEALTH_CHECK_PROMPT，maxTokens 有界）",
+      "network_execution": "callText fetch",
+      "observation": "callText 内建 recorder；runWithNewModelTrace(origin=health_check) 独立根",
+      "trace_rule": "singleton trace（origin=health_check）",
+      "usage": "usageLedger（operation=model_health，不归属 agent）",
+      "status": "UNCHANGED_VERIFIED"
+    },
+    {
+      "family": "model-operations",
+      "mc_id": "MC-05",
+      "purpose": "知识库与记忆的 embedding / rerank",
+      "callsites": [
+        "core/engine.ts:2525 _embedKnowledgeTextsForModel、:2570 _rerankKnowledgeTexts（知识摄入/检索）",
+        "core/engine.ts:2615+ _resolveMemoryEmbeddingExecution / search_memory 查询侧（记忆语义检索）",
+        "lib/knowledge/ingestion-service.ts、knowledge-manager.ts（经 engine 委托）"
+      ],
+      "model_selection": "core/model-operation-resolver.ts ModelOperationResolver（操作→显式 ref→ProviderRegistry.getOperationModel 联合键+操作能力校验；未配置=可选 null；配置错误 ModelOperationConfigurationError）",
+      "credential_owner": "resolver.deps.resolveProviderCredentialsFresh = ModelManager.resolveProviderCredentialsFresh（engine.ts:2497 注入）",
+      "operation_adapter": "core/model-operation-client.ts operationDialect（openai-embeddings/ollama-embed/gemini-embed/voyage/minimax/cohere-rerank/siliconflow-rerank/dashscope-rerank 双端点方言）",
+      "network_execution": "observedProviderFetch(this.fetchImpl(url,…))（单次 POST，combinedSignal=调用方 signal+timeout）",
+      "observation": "beginObservedModelCall（model_operation_* path）+ observedProviderFetch（attempt 精确可见）",
+      "trace_rule": "resolveModelTraceContext（知识任务 runId 在 usageContext.attribution，trace 按调用时 scope）",
+      "usage": "withModelRequestAccounting（metadata.modelCallId）",
+      "status": "UNCHANGED_VERIFIED"
+    },
+    {
+      "family": "media-generation",
+      "mc_id": "MC-06",
+      "purpose": "生图/生视频（含 Codex 图像、即梦 CLI、OpenAI 兼容媒体端点）",
+      "callsites": [
+        "core/media/universal-media-manager.ts:926/:1312 beginObservedModelCall（提交/查询边界）",
+        "core/media/image-task-runner.ts:544-558 提交前 resolveMediaExecutionTarget 现取执行目标（含失败重开同一 taskId 参数复用）"
+      ],
+      "model_selection": "core/media/media-execution-target-resolver.ts（媒体模型目录+active lane；credentialProviderId/credentialLaneId/credentialSource 显式）",
+      "credential_owner": "lane → ModelManager.resolveProviderCredentialsFresh；openai-codex 401 时 forceRefreshOAuthApiKey（staleApiKey 防重复旋转）单次重试",
+      "operation_adapter": "core/media-adapters/*（openai-codex.ts 等，保留独立媒体协议）",
+      "network_execution": "observedProviderFetch（HTTP）或 observedExternalProcessRun（Dreamina CLI，attemptVisibility=external_process_boundary）",
+      "observation": "beginObservedModelCall + observedProviderFetch/observedExternalProcessRun（media observer 测试族）",
+      "trace_rule": "chat 工具内生成继承 Chat trace（trace-propagation 测试 5）；独立生成 singleton",
+      "usage": "withModelRequestAccounting",
+      "status": "UNCHANGED_VERIFIED"
+    },
+    {
+      "family": "speech-recognition",
+      "mc_id": "MC-09",
+      "purpose": "语音转写",
+      "callsites": ["core/speech-recognition-service.ts:512 _transcribeWithAccounting（attempt supersede 语义 :480-491）"],
+      "model_selection": "语音模型目录（target.model.protocolId）",
+      "credential_owner": "speech-recognition-service.ts:492 _resolveCredentialsFresh → 注入的 resolveProviderCredentialsFresh（credentialProviderId 道）",
+      "operation_adapter": "语音 adapters（独立协议适配保留）",
+      "network_execution": "adapter HTTP（observedProviderFetch 由 adapter 层接入）",
+      "observation": "beginObservedModelCall（speech_transcribe）",
+      "trace_rule": "独立转写 singleton；turn 内继承（trace-propagation 测试 6）",
+      "usage": "withModelRequestAccounting",
+      "status": "UNCHANGED_VERIFIED"
+    }
+  ],
+  "credential_fact_owners": [
+    {
+      "fact": "provider-catalog 静态凭证（api_key/base_url/headers）",
+      "owner": "core/provider-registry.ts ProviderRegistry（provider-catalog.json）",
+      "readers": "ModelManager.resolveProviderCredentialsFresh(credentialSource=provider-catalog)、Pi ModelRuntime 注册 apiKey（chat）、媒体/语音 lane",
+      "notes": "明文查看仅权限保护的设置端点 readSavedProviderApiKey"
+    },
+    {
+      "fact": "OAuth 凭证与刷新",
+      "owner": "auth.json（AuthStorage 文件锁）+ pi ModelRuntime.getAuth/login/logout；强制旋转 core/oauth-force-refresh.ts（backend.withLockAsync 单飞，staleApiKey 复用他人结果）",
+      "readers": "ModelManager.resolveProviderCredentialsFresh(credentialSource=auth-storage)、SdkAuthFacade、openai-codex 媒体 401 重试",
+      "notes": "chat 链经 withLingxiCredentialBoundary 拒绝 ambient env 凭证；OAuth 执行凭证独占 auth-storage，不允许 catalog 旧 api_key 覆盖（model-manager.ts:622-626）"
+    },
+    {
+      "fact": "模型目录与联合身份",
+      "owner": "model-manager._availableModels（chat，findModel provider+id）+ ProviderRegistry.getOperationModelCatalog（操作，联合键）",
+      "readers": "sessionOpts.model、AuxiliaryModelResolver、ModelOperationResolver",
+      "notes": "同名 modelId 跨 provider 不互串（P04-A01 测试 + registry 联合键）"
+    },
+    {
+      "fact": "无 apiKey 合法模式判定",
+      "owner": "ProviderRegistry.allowsMissingApiKey(provider, baseUrl) ?? isLocalBaseUrl（localhost/127.0.0.1/0.0.0.0）",
+      "readers": "ModelOperationResolver.compose、AuxiliaryModelResolver、model-manager._resolvedModelCredentialResult",
+      "notes": "本地可信地址判定未扩大；header 凭证（Authorization/x-api-key 等）单独成立"
+    }
+  ],
+  "residual_unwired": [],
+  "notes_on_direct_fetch": "callText/model-operation-client 的直接 fetch 是各自协议 family 的实际网络客户端，契约归属明确（协议适配在 adapter 层、观测/用量在统一边界）；未发现绕过 resolver 自建密钥回退链的裸 fetch。"
+}

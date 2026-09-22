@@ -548,3 +548,123 @@ describe("E2E truth — 错误矩阵（S19）", () => {
     if (detail.ok) expect(detail.value.call.terminalStatus).toBe("aborted");
   }, 15_000);
 });
+
+describe("E2E truth — 知识操作协议（P04-T07：embedding/rerank 真实 HTTP）", () => {
+  it("P04-A15：EmbeddingClient 经真实 witness HTTP——凭证进请求头、观测/台账/投影齐备、毒丸不入库", async () => {
+    const { EmbeddingClient } = await import("../core/model-operation-client.ts");
+    const ledger = harness.createLedger();
+    const client = new EmbeddingClient({
+      resolveOperationFresh: async () => ({
+        operation: "embedding",
+        provider: "witness-provider",
+        api: "openai-embeddings",
+        apiKey: POISON_KEY,
+        baseUrl: `${harness.witness.baseUrl}/v1`,
+        model: { id: "witness-embed", provider: "witness-provider", dimensions: 3 },
+      }),
+      getUsageLedger: () => ledger,
+    });
+    harness.witness.scriptNext({ kind: "json", body: {
+      data: [
+        { index: 0, embedding: [1, 0, 0] },
+        { index: 1, embedding: [0, 1, 0] },
+      ],
+      usage: { prompt_tokens: 7, total_tokens: 7 },
+    } });
+
+    const result = await client.embed({
+      texts: ["P04_EMBED_甲", "P04_EMBED_乙"],
+      usageContext: {
+        source: { subsystem: "knowledge", operation: "embedding", surface: "knowledge", trigger: "user" },
+        attribution: { kind: "knowledge", taskId: "run-p04-e2e" },
+      },
+    });
+
+    /* witness 真实收到一次 openai 形状请求，凭证只在传输头 */
+    const requests = harness.witness.requestsTo("/v1/embeddings");
+    expect(requests).toHaveLength(1);
+    expect(requests[0].headers["authorization"]).toBe(`Bearer ${POISON_KEY}`);
+    expect(requests[0].bodyJson).toMatchObject({ model: "witness-embed", input: ["P04_EMBED_甲", "P04_EMBED_乙"] });
+
+    /* 业务结果：向量按 index 归位 + usage/请求 id 透出 */
+    expect(result).toMatchObject({
+      vectors: [[1, 0, 0], [0, 1, 0]],
+      dimensions: 3,
+      model: { provider: "witness-provider", id: "witness-embed", api: "openai-embeddings" },
+    });
+
+    /* 观测：1 logical call + exact attempt + ledger 关联 */
+    await flushAsync(3);
+    harness.flush();
+    const callIds = harness.observer!.callIds();
+    expect(callIds).toHaveLength(1);
+    const startEvent = harness.observer!.eventsOfType("logical_call_start").at(-1);
+    expect((startEvent?.details as any)?.path).toBe("model_operation_embedding");
+    const detail = harness.query().queryCallDetail(callIds[0]);
+    expect(detail.ok).toBe(true);
+    if (detail.ok) {
+      expect(detail.value.call.terminalStatus).toBe("ok");
+    }
+    const entries = ledger.list({ subsystem: "knowledge" }).entries ?? [];
+    expect(entries).toHaveLength(1);
+    expect(entries[0].usage).toMatchObject({ input: { totalTokens: 7, uncachedTokens: 7 }, totalTokens: 7 });
+    expect(entries[0].metadata?.modelCallId).toBe(callIds[0]);
+
+    /* 毒丸：凭证绝不入观测库 */
+    harness.observer!.assertNoSensitiveContent([POISON_KEY]);
+  }, 15_000);
+
+  it("P04-A15：RerankClient 经真实 witness HTTP——cohere 形状归一 + usage meta 记账", async () => {
+    const { RerankClient } = await import("../core/model-operation-client.ts");
+    const ledger = harness.createLedger();
+    const client = new RerankClient({
+      resolveOperationFresh: async () => ({
+        operation: "rerank",
+        provider: "witness-provider",
+        api: "siliconflow-rerank",
+        apiKey: POISON_KEY,
+        baseUrl: `${harness.witness.baseUrl}/v1`,
+        model: { id: "witness-rerank", provider: "witness-provider" },
+      }),
+      getUsageLedger: () => ledger,
+    });
+    harness.witness.scriptNext({ kind: "json", body: {
+      results: [
+        { index: 1, relevance_score: 0.8 },
+        { index: 0, relevance_score: 0.5 },
+      ],
+      meta: { tokens: { input_tokens: 12, output_tokens: 2 } },
+    } });
+
+    const result = await client.rerank({
+      query: "P04_RERANK_Q",
+      documents: ["甲文档", "乙文档"],
+      usageContext: {
+        source: { subsystem: "knowledge", operation: "rerank", surface: "knowledge", trigger: "user" },
+        attribution: { kind: "knowledge", taskId: "run-p04-e2e" },
+      },
+    });
+
+    const requests = harness.witness.requestsTo("/v1/rerank");
+    expect(requests).toHaveLength(1);
+    expect(requests[0].bodyJson).toMatchObject({
+      model: "witness-rerank",
+      query: "P04_RERANK_Q",
+      documents: ["甲文档", "乙文档"],
+      top_n: 2,
+    });
+    expect(result?.results).toEqual([
+      { index: 1, score: 0.8 },
+      { index: 0, score: 0.5 },
+    ]);
+    await flushAsync(3);
+    harness.flush();
+    const entries = ledger.list({ subsystem: "knowledge", operation: "rerank" }).entries ?? [];
+    expect(entries).toHaveLength(1);
+    expect(entries[0].usage).toMatchObject({
+      input: { totalTokens: 12, uncachedTokens: 12 },
+      output: { totalTokens: 2 },
+      totalTokens: 14,
+    });
+  }, 15_000);
+});

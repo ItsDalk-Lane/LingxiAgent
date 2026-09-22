@@ -249,6 +249,155 @@ describe("ModelOperationResolver registry integration", () => {
   });
 });
 
+describe("ModelOperationResolver credential routing boundaries (P04)", () => {
+  // P04-A01/A02/A04/A05：模型身份=provider+id 联合键；缺凭证 fail-closed 不偷回退；
+  // 配置轮换后按当前修订取新凭证；合法无 apiKey 模式（本地端点/裸 header 凭证）放行。
+  function makeResolver(ref: any, model: any, freshCredential: any) {
+    const refresh = vi.fn(async () => freshCredential);
+    const resolver = new ModelOperationResolver({
+      getOperationModelRef: () => ref,
+      resolveOperationModel: () => model,
+      resolveProviderCredentialsFresh: refresh,
+      getProviderCredentials: () => freshCredential,
+    });
+    return { resolver, refresh };
+  }
+
+  const sharedModelId = "shared-embed";
+
+  function embeddingModel(provider: string, baseUrl: string) {
+    return {
+      id: sharedModelId,
+      provider,
+      operations: ["embedding"],
+      operationProtocol: "openai-embeddings",
+      baseUrl,
+    };
+  }
+
+  it("P04-A01：同名 modelId 的两个 provider 不互串——解析与凭证刷新都锁定配置的 provider", async () => {
+    // 走真实 ProviderRegistry（生产 getOperationModel 联合键匹配），凭证按 provider 分道
+    const registry = new ProviderRegistry(tempRoot());
+    registry.saveProvider("provider-a", {
+      base_url: "https://provider-a.example/v1",
+      models: [{ id: sharedModelId, operations: ["embedding"] }],
+    });
+    registry.saveProvider("provider-b", {
+      base_url: "https://provider-b.example/v1",
+      models: [{ id: sharedModelId, operations: ["embedding"] }],
+    });
+    const refresh = vi.fn(async (provider: string) => ({
+      apiKey: `key-${provider}`,
+      baseUrl: `https://${provider}.example/v1`,
+      credentialSource: "provider-catalog",
+    }));
+    const makeResolverFor = (provider: string) => new ModelOperationResolver({
+      getOperationModelRef: () => ({ id: sharedModelId, provider }),
+      resolveOperationModel: (operation, ref) => registry.getOperationModel(operation, ref),
+      resolveProviderCredentialsFresh: refresh,
+      getProviderCredentials: () => null,
+    });
+
+    const resolved = await makeResolverFor("provider-a").resolveFresh("embedding");
+    expect(resolved).toMatchObject({
+      provider: "provider-a",
+      apiKey: "key-provider-a",
+      baseUrl: "https://provider-a.example/v1",
+    });
+    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(refresh).toHaveBeenCalledWith("provider-a");
+
+    // 反向引用同样不串：provider-b 的模型与凭证
+    const reverseResolved = await makeResolverFor("provider-b").resolveFresh("embedding");
+    expect(reverseResolved).toMatchObject({
+      provider: "provider-b",
+      apiKey: "key-provider-b",
+      baseUrl: "https://provider-b.example/v1",
+    });
+    expect(refresh).toHaveBeenLastCalledWith("provider-b");
+    expect(resolved.apiKey).not.toBe(reverseResolved.apiKey);
+  });
+
+  it("P04-A02：指定 provider 缺凭证 fail-closed——不退到另一 provider，也不发起请求", async () => {
+    const refresh = vi.fn(async (provider: string) => ({
+      apiKey: provider === "provider-a" ? "" : "key-provider-b",
+      baseUrl: `https://${provider}.example/v1`,
+      credentialSource: "provider-catalog",
+    }));
+    const resolver = new ModelOperationResolver({
+      getOperationModelRef: () => ({ id: sharedModelId, provider: "provider-a" }),
+      resolveOperationModel: () => embeddingModel("provider-a", "https://provider-a.example/v1"),
+      resolveProviderCredentialsFresh: refresh,
+      getProviderCredentials: () => null,
+    });
+
+    await expect(resolver.resolveFresh("embedding")).rejects.toMatchObject({
+      name: "ModelOperationConfigurationError",
+      code: "provider_missing_creds",
+      operation: "embedding",
+    } satisfies Partial<ModelOperationConfigurationError>);
+    // 凭证刷新只发生在被选中的 provider-a 上；provider-b 的凭证源从未被触碰
+    // （resolver 层面即无第二跳，EmbeddingClient 的 fetch 更不可能发出）。
+    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(refresh).toHaveBeenCalledWith("provider-a");
+  });
+
+  it("P04-A04：配置轮换后 resolveFresh 按当前修订取新凭证，不沿用旧快照", async () => {
+    let currentKey = "key-old";
+    const refresh = vi.fn(async () => ({
+      apiKey: currentKey,
+      baseUrl: "https://provider-a.example/v1",
+      credentialSource: "provider-catalog",
+    }));
+    const resolver = new ModelOperationResolver({
+      getOperationModelRef: () => ({ id: sharedModelId, provider: "provider-a" }),
+      resolveOperationModel: () => embeddingModel("provider-a", "https://provider-a.example/v1"),
+      resolveProviderCredentialsFresh: refresh,
+      getProviderCredentials: () => null,
+    });
+
+    const first = await resolver.resolveFresh("embedding");
+    expect(first.apiKey).toBe("key-old");
+
+    // 用户在设置里轮换了 key（provider catalog 更新）
+    currentKey = "key-rotated";
+    const second = await resolver.resolveFresh("embedding");
+    expect(second.apiKey).toBe("key-rotated");
+    // 错误信息只含 provider 名，不含任何密钥值
+    expect(first.apiKey).not.toEqual(second.apiKey);
+  });
+
+  it("P04-A05：本地端点无 apiKey（isLocalBaseUrl 默认规则）合法放行", async () => {
+    const { resolver } = makeResolver(
+      { id: sharedModelId, provider: "local-runtime" },
+      embeddingModel("local-runtime", "http://127.0.0.1:11434/v1"),
+      { apiKey: "", baseUrl: "http://127.0.0.1:11434/v1", credentialSource: "none" },
+    );
+    await expect(resolver.resolveFresh("embedding")).resolves.toMatchObject({
+      provider: "local-runtime",
+      api: "openai-embeddings",
+      baseUrl: "http://127.0.0.1:11434/v1",
+    });
+  });
+
+  it("P04-A05：仅 header 凭证（无 apiKey）的远程 provider 合法放行，header 进入执行配置", async () => {
+    const { resolver } = makeResolver(
+      { id: sharedModelId, provider: "header-auth-provider" },
+      embeddingModel("header-auth-provider", "https://header-auth.example/v1"),
+      {
+        apiKey: "",
+        baseUrl: "https://header-auth.example/v1",
+        headers: { "x-custom-auth": "header-secret" },
+        credentialSource: "provider-catalog",
+      },
+    );
+    await expect(resolver.resolveFresh("embedding")).resolves.toMatchObject({
+      provider: "header-auth-provider",
+      headers: { "x-custom-auth": "header-secret" },
+    });
+  });
+});
+
 describe("operation preference normalization", () => {
   it("v8 起知识库嵌入/重排全局字段被显式拒绝（迁移至笔记本级配置）", () => {
     // 旧客户端 PUT embedding/rerank → unknown field 400（显式拒绝，禁静默降级）。

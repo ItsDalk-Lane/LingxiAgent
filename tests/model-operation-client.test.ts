@@ -130,6 +130,36 @@ describe("EmbeddingClient", () => {
       name: "AbortError",
     });
   });
+
+  it("P04-A08：任务在凭证刷新期间被取消——刷新完成后不得发出新的模型请求", async () => {
+    const controller = new AbortController();
+    let realSends = 0;
+    // fetch 语义与真实 undici 一致：进入时 signal 已 aborted → 立即拒绝，不发送
+    const fetchMock = vi.fn(async (_url: string, init: RequestInit) => {
+      if (init?.signal?.aborted) throw new DOMException("aborted", "AbortError");
+      realSends += 1;
+      return response({ data: [{ index: 0, embedding: [1, 0, 0] }] });
+    });
+    // 刷新在飞行中任务被取消后才完成（P04-A08 场景：refresh 仍等待，随后完成）
+    const resolve = vi.fn(async () => {
+      controller.abort();
+      return execution("embedding");
+    });
+    const usageLedger = ledger();
+    const client = new EmbeddingClient({
+      resolveOperationFresh: resolve,
+      fetch: fetchMock as any,
+      getUsageLedger: () => usageLedger,
+    });
+
+    await expect(client.embed({ texts: ["text"], signal: controller.signal })).rejects.toMatchObject({
+      name: "AbortError",
+    });
+    // 刷新确实完成了（拿到凭证），但网络发送次数为 0——取消后的任务不复活
+    expect(resolve).toHaveBeenCalledWith("embedding");
+    expect(realSends).toBe(0);
+    expect(usageLedger.recordError).toHaveBeenCalledWith("usage-1", expect.anything(), "aborted", expect.objectContaining({}));
+  });
 });
 
 describe("RerankClient", () => {

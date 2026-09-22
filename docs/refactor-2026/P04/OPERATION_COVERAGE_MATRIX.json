@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "stage_id": "P04",
+  "task_id": "P04-T07",
+  "generated_at": "2026-09-22",
+  "source_sha": "3286c96e571fadea65143df8baabf503d30d37f2",
+  "note": "每个已存在操作族 → 至少一个实际生产调用入口测试。witness = 本地 loopback 真实 HTTP Fake Provider（tests/helpers/model-observability-scenario-harness.ts）。真实供应商冒烟见 blocked_items（无凭证/预算授权）。",
+  "operation_families": [
+    {
+      "family": "chat-streaming",
+      "production_entry": "lib/pi-sdk/index.ts createAgentSession → session.prompt",
+      "test": "tests/model-observability-e2e-chat.test.ts · S1 simple / S2 tool loop / S3 P04-A06 分片",
+      "fixture": "witness 真实 HTTP + SSE（S3 为字节分片投递）",
+      "status": "PASS"
+    },
+    {
+      "family": "compaction-agent-run (MC-02)",
+      "production_entry": "lib/llm/cache-preserving-compaction-agent-run.ts runCachePreservingCompactionAgentRun",
+      "test": "tests/model-call-pi-stream-observer.test.ts · MC-02 集成两例（单 turn / tool recovery 第二 call）",
+      "fixture": "真实 runner + 显式 ALS scope（进程内 streamFn）",
+      "status": "PASS"
+    },
+    {
+      "family": "native-summarization (MC-03)",
+      "production_entry": "Pi compact()/generateBranchSummary → streamFunction",
+      "test": "tests/model-call-pi-stream-observer.test.ts · isCompacting 分类 + not_correlated 运行时事实",
+      "fixture": "fake session + 真实 native stream wrapper",
+      "status": "PASS"
+    },
+    {
+      "family": "diary-direct-summary (MC-10)",
+      "production_entry": "lib/pi-sdk/index.ts generateSummary facade（无 streamFn 分支）",
+      "test": "tests/model-observability-e2e-utility.test.ts · S18 同一 diary trace；tests/model-call-diary-observer.test.ts；trace-propagation 测试 8",
+      "fixture": "witness 真实 HTTP + 真实 diary 链",
+      "status": "PASS"
+    },
+    {
+      "family": "calltext-utility (MC-04)",
+      "production_entry": "core/llm-client.ts callText（标题/摘要/记忆/守卫/rc/git 环境/总线插件文本）",
+      "test": "tests/model-observability-e2e-utility.test.ts（修复请求/compileToday/错误矩阵 429/500/invalid JSON/timeout/reset/user abort）；tests/model-call-calltext-observer.test.ts；tests/llm-client-provider-compat.test.ts",
+      "fixture": "witness 真实 HTTP（openai/anthropic/responses/codex SSE 聚合）",
+      "status": "PASS"
+    },
+    {
+      "family": "vision-auxiliary",
+      "production_entry": "core/vision-bridge.ts → resolveAuxiliaryExecution('vision') + callText（图像块）",
+      "test": "tests/vision-bridge.test.ts（生产入口行为）；tests/model-call-payload-calltext.test.ts（vision 边界 payload）",
+      "fixture": "合成图像 + callText 替身（callText 自身已由 witness e2e 覆盖）",
+      "status": "PASS"
+    },
+    {
+      "family": "provider-probe (MC-08)",
+      "production_entry": "server/routes/models.ts health-check → callText；probeProvider 生成探测",
+      "test": "tests/model-call-probe-observer.test.ts（Anthropic 生成/失败/网络失败 + GET /models 0 record）",
+      "fixture": "本地 HTTP server（探测替身）",
+      "status": "PASS"
+    },
+    {
+      "family": "embedding/rerank (MC-05)",
+      "production_entry": "core/model-operation-client.ts EmbeddingClient/RerankClient（engine 知识/记忆链注入）",
+      "test": "tests/model-observability-e2e-utility.test.ts · P04-A15 两例（本阶段新增：真实 witness HTTP + 台账 modelCallId 关联 + 毒丸不入库）；tests/model-operation-client.test.ts（协议方言/校验/取消/A08 单元）",
+      "fixture": "witness 真实 HTTP（openai-embeddings + siliconflow-rerank 形状）",
+      "status": "PASS"
+    },
+    {
+      "family": "media-generation (MC-06)",
+      "production_entry": "core/media/universal-media-manager + image-task-runner → media-adapters",
+      "test": "tests/model-observability-e2e-media-speech.test.ts（S12 openai image witness≡capture、S13 codex 401 refresh 1 call/2 attempts）；tests/model-observability-e2e-utility.test.ts（S16 agnes video submit/poll、MC-07 CLI external_process）；tests/media-gen-retry.test.ts（失败重开同 taskId）",
+      "fixture": "witness 真实 HTTP + 可控 adapter/CLI 替身",
+      "status": "PASS"
+    },
+    {
+      "family": "speech-recognition (MC-09)",
+      "production_entry": "core/speech-recognition-service.ts _transcribeWithAccounting",
+      "test": "tests/model-observability-e2e-media-speech.test.ts（S17 audio externalize + 语言 hint + 转写语义响应 + 毒丸脱敏）；tests/model-call-speech-observer.test.ts",
+      "fixture": "可控语音服务 fixture + 真实 adapter",
+      "status": "PASS"
+    },
+    {
+      "family": "oauth-credential-refresh",
+      "production_entry": "core/oauth-force-refresh.ts forceRefreshOAuthApiKey（model-manager/codex 媒体消费）",
+      "test": "tests/oauth-force-refresh.test.ts（6 例：旋转/竞态单飞/失败不写盘/非 OAuth 拒绝/损坏拒绝）；tests/model-manager-auth-storage.test.ts",
+      "fixture": "受控 auth.json 后端替身（同锁语义）",
+      "status": "PASS"
+    }
+  ],
+  "cross_cutting_scenarios": {
+    "same_modelId_two_providers": "tests/model-operation-resolver.test.ts · P04-A01（真实 ProviderRegistry）",
+    "concurrent_refresh": "tests/oauth-force-refresh.test.ts · 竞态单飞",
+    "rotation": "tests/model-operation-resolver.test.ts · P04-A04 + model-manager-auth-storage 既有族",
+    "cancellation": "tests/p02-cancellation-edges.test.ts、model-operation-client P04-A08、e2e-utility user abort",
+    "stream_break": "e2e-utility 错误矩阵（429/500/invalid JSON/timeout hang/reset）、pi-stream-observer stream error 终态",
+    "media_failure": "e2e-media-speech S13（codex 401）、e2e-utility 错误矩阵（media adapter 族）",
+    "proxy_tls": "lib/net/outbound-proxy.ts 全局策略（grep 核实无 TLS 放行）；无绕过测试缺口登记（策略本身在 server 装配层测试覆盖）"
+  },
+  "fault_injections": [
+    {
+      "id": "P04-FAULT-provider-mismatch",
+      "injection": "provider-registry.getOperationModel 删除 provider 联合键匹配",
+      "expected_failure": "tests/model-operation-resolver.test.ts P04-A01 红（1 failed，exit 1）",
+      "restore": "已还原（git diff 空）",
+      "log": "artifacts/refactor-2026/P04/logs/P04-FAULT-provider-mismatch.out"
+    },
+    {
+      "id": "P04-FAULT-observer-missing",
+      "injection": "lib/pi-sdk/index.ts 注释 installModelCallStreamObserver",
+      "expected_failure": "tests/model-observability-e2e-chat.test.ts 3/3 红（观测与用量关联全断）",
+      "restore": "已还原（git diff 空）",
+      "log": "artifacts/refactor-2026/P04/logs/P04-FAULT-observer-missing.out"
+    }
+  ],
+  "real_vendor_smoke": {
+    "status": "BLOCKED",
+    "reason": "真实付费模型请求需用户明确授权凭证与预算上限（任务书 T07-2、通用约束 §5）；本环境无授权。",
+    "compensating_evidence": "全部协议族经本地 loopback witness 真实 HTTP + 真实 Pi/callText/operation/media/speech 生产栈验证（见上表）；P04-3 要求的『两 provider 同 modelId』以真实 ProviderRegistry 双条目覆盖。"
+  }
+}

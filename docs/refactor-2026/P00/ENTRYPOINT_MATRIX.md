@@ -31,6 +31,8 @@
 
 ### 已登记旁路（合法但不走 ToolInvocationGateway，观测已覆盖）
 
+> P04 注记（2026-09-22）：下表三条旁路已由 P04 全量复核——观测包装、凭证道与用量归属见 [P04/MODEL_CALLSITE_MATRIX.json](../P04/MODEL_CALLSITE_MATRIX.json)；embedding/rerank 另有真实 loopback HTTP 测试（tests/model-observability-e2e-utility.test.ts P04-A15）。无未解释直调。
+
 | 旁路 | 位置 | 性质 |
 |---|---|---|
 | embedding/rerank 模型调用 | `core/model-operation-resolver.ts:103` → model-operation-client | 非 chat 链；主责 P04 核查观测完备性 |

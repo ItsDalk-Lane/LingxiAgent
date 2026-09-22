@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "stage_id": "P04",
+  "status": "BLOCKED",
+  "status_qualification": "实施完成且本地可验证项全绿（8/8 任务执行完毕、A01–A16 场景全部本地 PASS、410 例定向+全量 F1 基线未扩大）；唯一阻塞项=P04-T07-2 真实供应商冒烟（无凭证/预算授权，按任务书 §10 与通用约束 §4：外部验证环境受阻 → 阶段验收记 BLOCKED，不得在报告变成 PASS）。授权后仅需执行该单项即可转 PASS，无需重做本阶段其他工作。",
+  "research_sha": "8037fae7a6f621549f5b7db4c4d0bba3862ddc07",
+  "start_sha": "3286c96e571fadea65143df8baabf503d30d37f2",
+  "end_sha": null,
+  "environment": {
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "os": "darwin 27.0.0",
+    "arch": "arm64",
+    "lockfile_sha256": "a9735825cea1d0187ba440e9f16b16c5f34b0c33815ef1e4b26f7cb56a3c31e4"
+  },
+  "tasks": [
+    {
+      "id": "P04-T01",
+      "implementation_action": "UNCHANGED_VERIFIED",
+      "source_locations": ["core/model-operation-resolver.ts", "core/model-manager.ts", "lib/pi-sdk/index.ts", "lib/pi-sdk/model-call-stream-observer.ts", "lib/llm/model-trace-scope.ts", "core/llm-client.ts", "core/model-operation-client.ts", "core/auxiliary-model-resolver.ts", "core/speech-recognition-service.ts", "core/media/universal-media-manager.ts", "core/media/image-task-runner.ts", "core/oauth-force-refresh.ts"],
+      "consumer_locations": ["server/routes/chat.ts", "server/index.ts:723-809", "server/routes/models.ts", "core/agent.ts", "core/slash-commands/rc-summary.ts", "core/vision-bridge.ts", "lib/knowledge/ingestion-service.ts"],
+      "test_ids": ["P04-BASE-* 四组", "P04-VERIFY-targeted-25"],
+      "legacy_action": "无旧路径需退出（全链已收敛，census 未发现未解释直调）",
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P04/MODEL_CALLSITE_MATRIX.json（7 family + 4 凭证事实所有者 + 残留清单空）"
+    },
+    {
+      "id": "P04-T02",
+      "implementation_action": "UNCHANGED_VERIFIED（补测试）",
+      "source_locations": ["core/model-operation-resolver.ts", "core/model-manager.ts:589", "core/oauth-force-refresh.ts", "core/provider-registry.ts:1119", "lib/pi-sdk/index.ts:454"],
+      "consumer_locations": ["core/engine.ts:2497/3339", "core/auxiliary-model-resolver.ts", "core/speech-recognition-service.ts:492", "core/media/image-task-runner.ts:544"],
+      "test_ids": ["tests/model-operation-resolver.test.ts::P04-A01/A02/A04/A05×2（新增）", "tests/model-operation-client.test.ts::P04-A08（新增）", "tests/oauth-force-refresh.test.ts", "tests/model-manager-auth-storage.test.ts", "tests/fresh-credential-routing.test.ts", "tests/model-no-fallback.test.ts"],
+      "legacy_action": "无重复凭证回退链（grep 核实；AuthStorage/FileAuthStorageBackend 为 SDK 锁定合法使用保留）",
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P04/CREDENTIAL_ROUTING.md；P04-FAULT-provider-mismatch（注入红→还原绿）"
+    },
+    {
+      "id": "P04-T03",
+      "implementation_action": "UNCHANGED_VERIFIED",
+      "source_locations": ["core/llm-client.ts", "core/model-operation-client.ts operationDialect", "core/provider-compat.ts", "shared/model-operations.ts", "lib/net/outbound-proxy.ts"],
+      "consumer_locations": ["chat 链（Pi provider）", "callText 族", "知识/记忆操作", "媒体/语音 adapter"],
+      "test_ids": ["tests/llm-client-provider-compat.test.ts", "tests/provider-compat/*（16 文件）", "tests/model-operation-protocols.test.ts", "payload calltext/pi/media/speech/redaction 族"],
+      "legacy_action": "无双份 payload 组装（最终 body 与观测同源，e2e S1 hook≡witness 断言）",
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P04/REQUEST_COMPAT_MATRIX.md"
+    },
+    {
+      "id": "P04-T04",
+      "implementation_action": "UNCHANGED_VERIFIED（新增真实协议栈测试 + harness 扩展）",
+      "source_locations": ["lib/pi-sdk/stream-guard.ts", "lib/pi-sdk/model-call-stream-observer.ts", "core/llm-client.ts readCodexResponsesStream", "server assistant-event-normalizer"],
+      "consumer_locations": ["全部 chat 流消费端（前端/桥接/CLI 经规范化事件）"],
+      "test_ids": ["tests/model-observability-e2e-chat.test.ts::S3 P04-A06（新增）", "tests/pi-sdk-stream-guard.test.ts", "tests/assistant-event-normalizer.test.ts", "tests/model-call-pi-retry-visibility.test.ts", "tests/p02-cancellation-edges.test.ts"],
+      "legacy_action": "无第二套流解析（消费端不再解协议）",
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P04/STREAM_RETRY_POLICY.md；tests/helpers/model-observability-scenario-harness.ts 新增 sse-bytes 脚本"
+    },
+    {
+      "id": "P04-T05",
+      "implementation_action": "UNCHANGED_VERIFIED",
+      "source_locations": ["lib/llm/model-trace-scope.ts", "core/session-coordinator.ts:5032/5203", "lib/llm/model-call-correlation.ts"],
+      "consumer_locations": ["bridge/phone/scheduler/agent-executor 入口", "观测持久化与查询"],
+      "test_ids": ["tests/model-call-trace-propagation.test.ts（11 组）", "tests/model-trace-scope.test.ts（21 例）", "tests/model-observability-session-trace-reuse.test.ts", "tests/model-observability-session-trace-identity.test.ts"],
+      "legacy_action": "无并行 trace 体系",
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P04/TRACE_COMPAT_REPORT.md"
+    },
+    {
+      "id": "P04-T06",
+      "implementation_action": "UNCHANGED_VERIFIED",
+      "source_locations": ["lib/llm/usage-ledger.ts", "lib/llm/model-request-accounting.ts", "core/session-coordinator.ts recordAssistantUsage", "lib/llm/model-observability-accounting-projection.ts"],
+      "consumer_locations": ["server/routes/usage.ts", "server/routes/model-observability.ts", "导出/前端台账"],
+      "test_ids": ["tests/llm-usage-ledger.test.ts", "tests/model-observability-accounting-projection.test.ts", "tests/model-call-reference.test.ts", "e2e S12 usage_missing"],
+      "legacy_action": "无独立 usage 写入点（五观察点枚举+grep 核实）",
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P04/USAGE_OWNERSHIP.md"
+    },
+    {
+      "id": "P04-T07",
+      "implementation_action": "MODIFIED（仅测试：+9 用例、4 文件；生产零改动）",
+      "source_locations": ["tests/model-operation-resolver.test.ts（+6）", "tests/model-operation-client.test.ts（+1）", "tests/model-observability-e2e-chat.test.ts（+1 S3）", "tests/model-observability-e2e-utility.test.ts（+2 A15）", "tests/helpers/model-observability-scenario-harness.ts（sse-bytes 扩展）"],
+      "consumer_locations": ["操作覆盖矩阵全部 family 生产入口"],
+      "test_ids": ["P04-VERIFY-targeted-25（36 文件 410 例）"],
+      "legacy_action": "负向注入两组：provider 联合键删除→A01 红；observer 漏装→e2e 3/3 红；均还原零残留",
+      "status": "PASS（真实供应商冒烟 BLOCKED 单列）",
+      "evidence": "docs/refactor-2026/P04/OPERATION_COVERAGE_MATRIX.json；P04-FAULT-* 日志"
+    },
+    {
+      "id": "P04-T08",
+      "implementation_action": "MODIFIED（文档）",
+      "source_locations": ["docs/refactor-2026/P00/ENTRYPOINT_MATRIX.md（P04 注记）", "docs/refactor-2026/P00/REFACTOR_BACKLOG.md（P04 执行注记）"],
+      "consumer_locations": ["P05/P06（NEXT_STAGE_HANDOFF 接口）"],
+      "test_ids": ["P04-VERIFY-*（typecheck/五门禁/lint/定向/全量）"],
+      "legacy_action": "旧凭证/usage 重复路径：不存在（T01 census 结论）；无删除动作",
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P04/P04_REPORT.md + 本文件 + ACCEPTANCE_MAP.json + EVIDENCE_SHA256.txt"
+    }
+  ],
+  "acceptance_cases": "见 docs/refactor-2026/P04/ACCEPTANCE_MAP.json（A01–A16 全 PASS；真实供应商冒烟单列 BLOCKED）",
+  "commands": "原执行轮 25 条 + P04-FIXR1 修复轮 3 条（writepoints-grep/grep2/json-validate，全格式含 argv/exit_code/时间戳/digest）= 28 条，见 artifacts/refactor-2026/P04/logs/command-log.jsonl；另有清单终验 1 条直接重定向留档（P04-FIXR1-manifest-check.out，不入 jsonl 以保清单哈希稳定）",
+  "baseline_failures": [
+    {
+      "id": "F1",
+      "detail": "全量 npm test 4 红（post-verification-audit-seal×1、round2-delivery-evidence×2、round3-delivery-evidence×1）",
+      "comparison": "与 P00–P03 基线完全一致（14750→14759 绿，新增 9 例全绿；4 红未扩大）",
+      "owner": "P08（治理流程，需用户授权）"
+    },
+    {
+      "id": "F3",
+      "detail": "网络环境继承：build:server:open / 四平台 CI / Windows/Linux 实机 / 真实供应商",
+      "owner": "P08/授权后取回"
+    }
+  ],
+  "scope_deviations": [
+    "任务书建议文件名与实际不一致处：P04-T07『操作覆盖矩阵』落为 OPERATION_COVERAGE_MATRIX.json（建议名无强制）；其余建议名（MODEL_CALLSITE_MATRIX/CREDENTIAL_ROUTING/REQUEST_COMPAT_MATRIX/STREAM_RETRY_POLICY/TRACE_COMPAT_REPORT/USAGE_OWNERSHIP）按建议采用。"
+  ],
+  "legacy_paths": [],
+  "fix_rounds": [
+    {
+      "id": "P04-FIXR1",
+      "date": "2026-09-22",
+      "source": "独立验收 P04_ACCEPTANCE_REVIEW.md 问题 #1（非阻塞）：USAGE_OWNERSHIP.md §1「无其他 usage 写入点」枚举不全",
+      "changes": [
+        "USAGE_OWNERSHIP.md §1 表补 3 处生产写入点并改写枚举口径：observed-pi-direct-summary.ts:158-204（MC-10，验收指出）、provider-client.ts:344 connectivity-probe（验收指出）、cache-preserving-compaction-agent-run.ts:423（MC-02，本轮复核新发现、验收未列）；登记 session-snapshot-side-task-runner.ts:83 为不可达潜在写入点",
+        "P04_REPORT.md 追加「独立验收修复轮（P04-FIXR1）」节；P04_RESULT.json（本条）与 ACCEPTANCE_MAP.json 补 fix_rounds 记录；NEXT_STAGE_HANDOFF.md §6「usage 五观察点零变化」对齐为修订后枚举口径（写入面零变化，7 处写入边界）",
+        "EVIDENCE_SHA256.txt 刷新 6 条目并新增 6 条 P04-FIXR1 日志条目（三个 run-logged 命令各 .out/.err；64→70 行，格式不变）"
+      ],
+      "source_verified_discrepancies": [
+        "验收称两处均在 MODEL_CALLSITE_MATRIX 有归属记载：MC-10 属实；connectivity-probe 链路（server/routes/providers.ts:825→probeProvider）不在该矩阵任何 family，操作覆盖记载实际在 OPERATION_COVERAGE_MATRIX provider-probe family——矩阵未改动，登记为遗留观察",
+        "验收「漏两处」本身不全：cache-preserving-compaction-agent-run.ts:423 为第三处漏列（生产可达，core/session-compactor.ts:1878）"
+      ],
+      "keying": "三处新列写入点均以 metadata.modelCallId 键控台账（recorder.callId / mintModelCallId() / observedModelCallLedgerMetadata），与投影 A13 幂等去重一致，无重复计费路径",
+      "production_code_changed": false,
+      "verification": [
+        "P04-FIXR1-writepoints-grep（exit 0，17 行——第一版正则漏 ?. 可选链形态，留档迭代记录）",
+        "P04-FIXR1-writepoints-grep2（exit 0，36 行——修正正则全量枚举，与 §1 表 7 处写入边界逐一对应；desktop 另查无命中）",
+        "P04-FIXR1-json-validate（exit 0，四个交付 JSON 解析合法）",
+        "P04-FIXR1-manifest-check（shasum -a 256 -c，命令与 exit code 见 artifacts/refactor-2026/P04/logs/P04-FIXR1-manifest-check.out）"
+      ]
+    }
+  ],
+  "blocked_items": [
+    {
+      "id": "P04-real-vendor-smoke",
+      "reason": "真实付费模型请求需用户明确授权凭证与预算上限；本环境无授权（任务书 T07-2、通用约束 §5）",
+      "scope": "两 provider 相同 modelId / 并发刷新 / 轮换 / 取消 / 断流 / 媒体失败 / proxy-TLS 的真实账户冒烟",
+      "compensation": "本地 loopback witness 真实 HTTP + 真实生产栈全协议族覆盖；负向注入证明检查会红",
+      "affects_stage_claim": "按任务书 §10，缺该项时阶段验收记 BLOCKED——本阶段据此以『实施完成+本地验收 PASS、真供应商项 BLOCKED』表述，不宣称完整验收 PASS。"
+    }
+  ],
+  "next_stage_handoff": "docs/refactor-2026/P04/NEXT_STAGE_HANDOFF.md",
+  "implementation_performed": true,
+  "project_tests_executed": true
+}

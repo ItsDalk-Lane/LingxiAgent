@@ -286,4 +286,103 @@ describe("E2E truth — MC-01 真实 Pi chat", () => {
       }
     }
   }, 30_000);
+
+  it("S3 P04-A06：跨多 delta 交错的多 toolCall 参数分片 + UTF-8 字节边界拆分后正确组装", async () => {
+    const runtime = await createWitnessRuntime();
+
+    // 两个 toolCall 的 arguments 交错分片；含空 delta；"北"/"上海" 为多字节 UTF-8
+    const chunk = (delta: any, finish: string | null = null, usage?: any) => ({
+      id: "chatcmpl-w3", object: "chat.completion.chunk", created: 0, model: "witness-model",
+      choices: [{ index: 0, delta, finish_reason: finish }],
+      ...(usage ? { usage } : {}),
+    });
+    const events = [
+      chunk({ role: "assistant", tool_calls: [{ index: 0, id: "tc_p04_a", type: "function", function: { name: "e2e_probe", arguments: "" } }] }),
+      chunk({}), // 空 delta（无内容无 tool_calls）
+      chunk({ tool_calls: [{ index: 0, function: { arguments: "{\"city\":\"北" } }] }),
+      chunk({ tool_calls: [{ index: 1, id: "tc_p04_b", type: "function", function: { name: "e2e_probe", arguments: "{\"city\":\"" } }] }),
+      chunk({ tool_calls: [{ index: 1, function: { arguments: "上海\",\"unit\":\"f\"}" } }] }),
+      chunk({ tool_calls: [{ index: 0, function: { arguments: "京\",\"unit\":\"c\"}" } }] }),
+      chunk({}, "tool_calls", { prompt_tokens: 11, completion_tokens: 5, total_tokens: 16 }),
+    ];
+    const body = [...events.map((e) => `data: ${JSON.stringify(e)}`), "data: [DONE]", ""].join("\n\n");
+
+    // 字节级分片：固定 9 字节边界 + 强制在 "北" 的 UTF-8 3 字节序列中间切断，
+    // 多字节字符必然横跨两个 TCP 分片（真实流式栈只能靠 streaming 解码重组）。
+    const bytes = Buffer.from(body, "utf8");
+    const beiIndex = body.indexOf("北");
+    expect(beiIndex).toBeGreaterThan(0);
+    const cutInsideBei = Buffer.byteLength(body.slice(0, beiIndex), "utf8") + 1;
+    const cuts = new Set<number>([cutInsideBei]);
+    for (let i = 9; i < bytes.length; i += 9) cuts.add(i);
+    const sortedCuts = [...cuts].filter((c) => c > 0 && c < bytes.length).sort((a, b) => a - b);
+    const chunks: Buffer[] = [];
+    let prevCut = 0;
+    for (const cut of sortedCuts) {
+      chunks.push(bytes.subarray(prevCut, cut));
+      prevCut = cut;
+    }
+    chunks.push(bytes.subarray(prevCut));
+    harness.witness.scriptNext({ kind: "sse-bytes", chunks, interChunkDelayMs: 1 });
+    harness.witness.scriptNext(chatSse("E2E_P04_A06_FINAL_REPLY 两城已查"));
+
+    const created = await createAgentSession({
+      model: witnessModel(),
+      modelRuntime: runtime,
+      sessionManager: SessionManager.inMemory(),
+      noTools: "all",
+      resourceLoader: await observerResourceLoader(),
+      customTools: [{
+        name: "e2e_probe",
+        description: "e2e probe tool (p04 a06)",
+        parameters: {
+          type: "object",
+          properties: { city: { type: "string" }, unit: { type: "string" } },
+          required: ["city"],
+        },
+        async execute(_toolCallId: string, args: any) {
+          return { content: [{ type: "text", text: `E2E_A06_TOOL_${args.city}_${args.unit}` }] };
+        },
+      }],
+      cwd: harness.lingxiHome,
+    } as any);
+    session = created.session;
+
+    await session.prompt(USER_INPUT);
+    await flushAsync(6);
+    harness.flush();
+    await flushAsync(3);
+
+    /* witness：两轮 POST；第二轮携带两个按正确参数组装的 tool result */
+    expect(harness.witness.requestsTo("/chat/completions")).toHaveLength(2);
+    const secondBody = JSON.stringify(harness.witness.requestsTo("/chat/completions")[1].bodyJson);
+    expect(secondBody).toContain("E2E_A06_TOOL_北京_c");
+    expect(secondBody).toContain("E2E_A06_TOOL_上海_f");
+
+    /* observer：C1 的 semantic_response 记录两个 toolCall 及重组后的参数 */
+    const callIds = harness.observer!.callIds();
+    expect(callIds).toHaveLength(2);
+    const [c1, c2] = callIds;
+    const identity1 = harness.observer!.callIdentity(c1)!;
+    const identity2 = harness.observer!.callIdentity(c2)!;
+    expect(identity2.traceId).toBe(identity1.traceId);
+    expect(identity2.parentCallId).toBe(c1);
+    harness.observer!.assertTraceGraphValid();
+
+    const query = harness.query();
+    const detail1 = query.queryCallDetail(c1);
+    expect(detail1.ok).toBe(true);
+    if (detail1.ok) {
+      const meta = detail1.value.payloadRecords.find((r: any) => r.kind === "semantic_response");
+      const record = meta ? query.getPayloadRecord(meta.id) : null;
+      expect(record?.ok).toBe(true);
+      if (record?.ok) {
+        const toolCalls = (record.value.payload as any).toolCalls as Array<{ name: string | null; id: string | null; arguments: unknown }>;
+        expect(toolCalls).toHaveLength(2);
+        const byId = new Map(toolCalls.map((tc) => [tc.id, tc]));
+        expect(byId.get("tc_p04_a")).toMatchObject({ name: "e2e_probe", arguments: { city: "北京", unit: "c" } });
+        expect(byId.get("tc_p04_b")).toMatchObject({ name: "e2e_probe", arguments: { city: "上海", unit: "f" } });
+      }
+    }
+  }, 30_000);
 });

@@ -38,6 +38,8 @@
 | P04-2 | **UNCHANGED_VERIFIED**：mc_/ma_/mt_ 铸造与 trace 规则 | model-call-identity 唯一铸造厂；trace-scope 规则+21 测试 | 仅回归 | 观测、历史 modelCallRef |
 | P04-3 | 真供应商验证 | 需用户授权凭证/预算 | BLOCKED 项管理（不默认消耗真实账户） | provider-compat |
 
+P04 执行注记（2026-09-22，详见 docs/refactor-2026/P04/）：P04-1 已核实——全部旁路（embedding/rerank、call-text/sample-text 总线、summarizeTitle、vision/media/speech/probe/diary）均经统一观测包装并有测试（MODEL_CALLSITE_MATRIX.json 全矩阵）；P04-2 回归全绿（28+80 例含 trace 复用 21 例）；P04-3 维持 BLOCKED（无凭证/预算授权），补偿证据为本地 loopback witness 真实 HTTP 全协议族覆盖（OPERATION_COVERAGE_MATRIX.json）。
+
 ## P05｜消息语义、历史恢复、资源与数据兼容
 
 | # | 事项 | 依据 | 动作 | 受影响消费者 |
