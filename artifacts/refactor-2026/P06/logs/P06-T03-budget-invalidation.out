@@ -1,0 +1,13 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stdout | tests/p06-prompt-budget-and-invalidation.test.ts > P06-T03 resident tool schema budget (component D) > measures the resident surface at the request boundary via the production buildTools entry
+P06_RESIDENT_TOOL_BUDGET {"tools":["edit","exec_command","mcp_call","mcp_describe_tool","mcp_search_tools","read","write"],"per_tool":[{"name":"edit","tokens":440},{"name":"exec_command","tokens":1044},{"name":"read","tokens":328},{"name":"write","tokens":253},{"name":"mcp_call","tokens":144},{"name":"mcp_describe_tool","tokens":96},{"name":"mcp_search_tools","tokens":115}],"total_estimated_tokens":2420}
+
+ ✓ tests/p06-prompt-budget-and-invalidation.test.ts (7 tests) 56ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  12:27:39
+   Duration  3.21s (transform 1.96s, setup 20ms, import 3.07s, tests 56ms, environment 0ms)
+

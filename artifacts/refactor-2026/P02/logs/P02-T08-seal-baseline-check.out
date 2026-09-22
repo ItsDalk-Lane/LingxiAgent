@@ -1,0 +1,24 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/post-verification-audit-seal.test.ts (3 tests | 1 failed) 64ms
+     ✓ VERIFIED_SOURCE_SHA is a valid 40-hex commit reachable in this repo 39ms
+     × changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced) 24ms
+     ✓ the audit-seal test and generator are both present for the guard to be self-consistent 0ms
+ ❯ tests/round2-delivery-evidence.test.ts (10 tests | 2 failed) 5325ms
+     ✓ R10-01: 旧 F7/D 系列明确 superseded，当前无语音输入组件要求与保留能力写清 29ms
+     ✓ R10-02: COMMAND_RESULTS 的日志与源码 manifest 均存在且 SHA-256 可复算 212ms
+     × R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁 90ms
+     × R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示 86ms
+     ✓ R10-05: R01-R09 每项均绑定存在的真实测试文件、runner 标题、日志与源码摘要 15ms
+     ✓ S11-X2: X2-01 至 X2-12 均绑定最终联合回归的真实测试、日志与源码摘要 3ms
+     ✓ R10-06: 真机权限、真实供应商和其他平台只标 BLOCKED，不伪装成本地通过 0ms
+     ✓ R10-07/08: 失败与成功记录并存且 exit 未改写，历史缺失日志明确 unavailable 0ms
+     ✓ R10-09: 增量补丁从干净 89bc0b64 重放后，源码摘要与当前工作树完全一致  4872ms
+     ✓ R10-10: 本轮日志不泄漏真实用户路径，旧听写流程只以历史/superseded 身份出现 17ms
+
+ Test Files  2 failed (2)
+      Tests  3 failed | 10 passed (13)
+   Start at  00:18:37
+   Duration  5.43s (transform 50ms, setup 39ms, import 23ms, tests 5.39s, environment 0ms)
+

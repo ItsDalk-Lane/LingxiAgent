@@ -1,0 +1,37 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/chat-performance/chat-performance-instrumentation.test.ts (2 tests) 86ms
+ ✓ tests/session-stream-store.test.ts (9 tests) 89ms
+ ✓ tests/history-read-directory-counters.test.ts (8 tests) 49ms
+ ✓ desktop/src/react/__tests__/chat-performance/incremental-markdown-cache.test.ts (3 tests) 46ms
+stdout | tests/server-startup-diagnostics-contract.test.ts > server startup diagnostics contract > starts packaged and dev server through an early bootstrap entry
+[build-server] wrapper created
+
+ ✓ tests/server-startup-diagnostics-contract.test.ts (38 tests) 341ms
+ ✓ desktop/src/react/__tests__/chat-performance/live-turn-structural-isolation.test.ts (2 tests) 56ms
+ ✓ desktop/src/react/__tests__/chat-performance/semantic-stream-publication.test.ts (6 tests) 59ms
+ ✓ desktop/src/react/__tests__/chat-performance/chat-performance-baseline.test.ts (6 tests) 144ms
+stdout | desktop/src/react/__tests__/chat-performance/p07-stream-buffer-wallclock.test.ts > P07-T04 stream buffer wall-clock profile > canonical segment 流 50,000 delta：吞吐、有界刷新与响应度（真实计时器）
+P07_UI_SAMPLE {"deltas":50000,"burst_wall_ms":17.7,"handle_per_sec":2817172,"stream_flush_count":2,"markdown_parse_count":0,"structural_updates":1,"probe_max_drift_ms":11.7}
+
+ ✓ desktop/src/react/__tests__/chat-performance/p07-stream-buffer-wallclock.test.ts (2 tests) 476ms
+ ✓ tests/history-read-directory-memory.test.ts (3 tests) 42ms
+ ✓ tests/history-read-directory-cache.test.ts (14 tests) 54ms
+ ✓ tests/p06-feature-context-boundaries.test.ts (3 tests) 63ms
+stdout | tests/p06-final-request-assembly.test.ts > P06-T01 final request assembly capture > emits a sanitized sample index (sources + lengths only) for the report
+P06_SAMPLE_INDEX {"fixture":"合成 fixture（P06 受控临时目录；zh-CN；冻结时钟 2026-06-04T07:53:00Z）","variants":{"desktop-main":{"canonical_base_bytes":5062,"append_workspace_scope_bytes":173,"append_workspace_instructions_bytes":0,"skills_listing_bytes":625,"project_context_bytes":17,"final_system_prompt_bytes":6178,"provenance_sections":20,"sources":["platform_instruction(x6 zh)","user_profile","persona","agent.appearance","agent_roster","memory_context(x3)","session_instruction","append: workspace-scope + workspace-instructions","sdk: skills + project_context + cwd"]}}}
+
+ ✓ tests/p06-final-request-assembly.test.ts (5 tests) 141ms
+ ✓ tests/p02-cancellation-edges.test.ts (5 tests) 1099ms
+     ✓ 超时清理走同一 kill 路径：timeout 后 reject timeout 标签  1005ms
+stdout | tests/p06-prompt-budget-and-invalidation.test.ts > P06-T03 resident tool schema budget (component D) > measures the resident surface at the request boundary via the production buildTools entry
+P06_RESIDENT_TOOL_BUDGET {"tools":["edit","exec_command","mcp_call","mcp_describe_tool","mcp_search_tools","read","write"],"per_tool":[{"name":"edit","tokens":440},{"name":"exec_command","tokens":1044},{"name":"read","tokens":328},{"name":"write","tokens":253},{"name":"mcp_call","tokens":144},{"name":"mcp_describe_tool","tokens":96},{"name":"mcp_search_tools","tokens":115}],"total_estimated_tokens":2420}
+
+ ✓ tests/p06-prompt-budget-and-invalidation.test.ts (7 tests) 50ms
+
+ Test Files  15 passed (15)
+      Tests  113 passed (113)
+   Start at  14:02:29
+   Duration  2.96s (transform 6.22s, setup 285ms, import 12.08s, tests 2.79s, environment 1ms)
+

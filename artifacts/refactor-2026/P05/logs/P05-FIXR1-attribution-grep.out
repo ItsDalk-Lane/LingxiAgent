@@ -1,0 +1,6 @@
+[#1] /Users/ 残留计数（预期 0）:
+0
+[#2] 测试名归属:
+tests/data-epoch.test.ts:109:  it("requires a checkpoint receipt after the prepared phase", () => {
+[#2b] coordinator 实有 A14 用例:
+252:  it("runs checkpoint, barrier, migration, validation, and final commit in exact durable order", async () => {

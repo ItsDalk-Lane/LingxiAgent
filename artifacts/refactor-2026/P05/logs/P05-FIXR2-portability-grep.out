@@ -1,0 +1,15 @@
+[#0] artifacts/refactor-2026 下 .test.ts 枚举:
+artifacts/refactor-2026/P05/logs/P05-ACCEPTANCE-counterexample.test.ts
+artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts
+artifacts/refactor-2026/P04/logs/P04-ACCEPTANCE-counterexample.test.ts
+[#1] /Users/ 残留（预期 0 命中）:
+(0 命中)
+[#2] 绝对导入形式 from 引号+斜杠（预期 0 命中）:
+(0 命中)
+(0 命中)
+[#2b] require 绝对形式（预期 0 命中）:
+(0 命中)
+[#3] 相对前缀 ../../../../ 行计数（按文件）:
+artifacts/refactor-2026/P05/logs/P05-ACCEPTANCE-counterexample.test.ts: 6
+artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts: 12
+artifacts/refactor-2026/P04/logs/P04-ACCEPTANCE-counterexample.test.ts: 1

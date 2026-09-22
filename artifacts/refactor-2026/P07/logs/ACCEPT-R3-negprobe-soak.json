@@ -1,0 +1,126 @@
+{
+  "workload": "长运行资源 soak：stream store 全生命周期 + 终端会话循环 + 历史目录缓存淘汰/失效；进程级轨迹",
+  "env": {
+    "node": "v24.16.0",
+    "os": "Darwin 27.0.0 arm64",
+    "expose_gc": true
+  },
+  "components_ok": false,
+  "verdict": {
+    "rss": {
+      "warm_mean": 341712,
+      "tail_mean": 336011,
+      "growth_pct": -1.7
+    },
+    "heap_used": {
+      "warm_mean": 133246,
+      "tail_mean": 112975,
+      "growth_pct": -15.2
+    },
+    "external": {
+      "warm_mean": 12550,
+      "tail_mean": 11707,
+      "growth_pct": -6.7
+    },
+    "rss_monotonic_increase_gt5pct_each_batch": false,
+    "bounded_verdict": "NO_REPRODUCIBLE_UNBOUNDED_GROWTH"
+  },
+  "batches": [
+    {
+      "batch": 1,
+      "rss_kb": 325168,
+      "heap_used_kb": 100713,
+      "external_kb": 11225,
+      "array_buffers_kb": 158,
+      "active_resources": {
+        "CloseReq": 1
+      },
+      "terminal_disk_bytes": 1476048,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 4,
+      "cache_resident_bytes": 2584868,
+      "probe_verdict_after_append": "valid",
+      "probe_append_detected": false,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63569904,
+        "rssPostGc": 333021184
+      }
+    },
+    {
+      "batch": 2,
+      "rss_kb": 341152,
+      "heap_used_kb": 104965,
+      "external_kb": 11346,
+      "array_buffers_kb": 279,
+      "active_resources": {
+        "CloseReq": 1
+      },
+      "terminal_disk_bytes": 1476048,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 16,
+      "cache_resident_bytes": 2584868,
+      "probe_verdict_after_append": "valid",
+      "probe_append_detected": false,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63519000,
+        "rssPostGc": 349437952
+      }
+    },
+    {
+      "batch": 3,
+      "rss_kb": 341712,
+      "heap_used_kb": 133246,
+      "external_kb": 12550,
+      "array_buffers_kb": 1484,
+      "active_resources": {
+        "CloseReq": 1
+      },
+      "terminal_disk_bytes": 1476048,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 28,
+      "cache_resident_bytes": 2584868,
+      "probe_verdict_after_append": "valid",
+      "probe_append_detected": false,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63536896,
+        "rssPostGc": 349962240
+      }
+    }
+  ],
+  "cache_final_stats": {
+    "sessions": 8,
+    "residentBytes": 2584868,
+    "retiredBytes": 0,
+    "builds": 36,
+    "hits": 18,
+    "evictions": 28,
+    "inFlightBuilds": 0,
+    "noCacheSessions": 0,
+    "invalidations": {},
+    "incrementalUpdates": 0,
+    "incrementalFailures": 0,
+    "branchViewRebuilds": 0
+  },
+  "note": "GC 后读数单列（若可用），不作为稳态判定依据；rss/heap 以 GC 前轨迹为准"
+}

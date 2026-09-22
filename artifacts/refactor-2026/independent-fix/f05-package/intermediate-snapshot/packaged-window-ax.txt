@@ -1,0 +1,7 @@
+The following is a diff from the previous accessibility tree for Window: "Lingxi" with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 42, 63
+~						33 文本栏 (disabled) Description: 搜索工作台文件, Placeholder: 搜索工作台
+~						34 切换按钮 Description: 预览面板, Value: 0
++							90 文本 暂无文件
++								91 文本 工作台按钮可以切换或新增文件夹
+The focused UI element is 62 文本输入区 (settable) 工作台按钮可以切换或新增文件夹

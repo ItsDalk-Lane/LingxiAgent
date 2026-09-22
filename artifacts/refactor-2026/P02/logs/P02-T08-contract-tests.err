@@ -1,0 +1,41 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/open-boundary-lint.test.ts > lint-open-boundary: real repo state (smoke) > the committed export-manifest.json + baseline pass cleanly against real source
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/open-boundary-lint.test.ts:165:23
+    163|     const baseline = readBaseline({ rootDir: REPOSITORY_ROOT });
+    164|     const result = checkRatchet({ violations, baseline });
+    165|     expect(result.ok).toBe(true);
+       |                       ^
+    166|     expect(result.totalViolations).toBeGreaterThan(0); // known debt i…
+    167|   }, 30_000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/open-boundary-lint.test.ts > lint-open-boundary: real repo state (smoke) > the CLI subprocess exits 0 against the real repo and reports the known-debt count
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/open-boundary-lint.test.ts:171:27
+    169|   it("the CLI subprocess exits 0 against the real repo and reports the…
+    170|     const result = spawnSync(process.execPath, [LINT_SCRIPT], { cwd: R…
+    171|     expect(result.status).toBe(0);
+       |                           ^
+    172|     expect(result.stdout).toMatch(/lint:boundary ok/);
+    173|   }, 30_000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

@@ -8,7 +8,10 @@ export const EXACT_BOUNDARY_ALLOWLISTS = Object.freeze({
     "core/mcp/clients/http-client.ts",
     "core/mcp/manager.ts",
   ]),
-  pluginExecuteTool: Object.freeze(["core/plugin-dev-service.ts"]),
+  // pluginExecuteTool has no allowlisted file: the old plugin-dev HTTP service
+  // (core/plugin-dev-service.ts) was removed in 04f90d2b2, so any production
+  // call of PluginManager.executePluginTool is a violation by definition.
+  pluginExecuteTool: Object.freeze([]),
   canonicalTargetExecutor: Object.freeze(["core/tool-invocation-gateway.ts"]),
 });
 

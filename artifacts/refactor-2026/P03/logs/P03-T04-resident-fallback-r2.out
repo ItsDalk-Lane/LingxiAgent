@@ -1,0 +1,46 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/on-demand-first-party.test.ts (21 tests | 1 failed) 162ms
+     ✓ keeps the on-demand split sound 22ms
+     ✓ keeps exactly the four original Pi tools resident 1ms
+     ✓ defers every other categorized built-in by policy 0ms
+     ✓ gives every non-resident gateway tool a synthetic permission contract 0ms
+     ✓ maps synthetic contracts to faithful levels 0ms
+     ✓ keeps the literal read-action mirrors identical to the classifier sets 0ms
+     ✓ never classifies a synthetic contract more permissive than the direct path 1ms
+     ✓ keeps only the four Pi primitives on the direct surface 17ms
+     ✓ catalogs deferred built-ins under the 内置 group with a usage intro 7ms
+     ✓ keeps every tool direct when the builtin defer preference opts out 4ms
+     ✓ defers a garbage resolver and fails closed at call time, never at build 10ms
+     × keeps a tool resident with a warning when its schema cannot be consumed safely 8ms
+     ✓ keeps MCP tools below their threshold direct while builtins defer 6ms
+     ✓ isolates per-agent catalogs: a disabled tool never leaks across agents (P03-A07) 23ms
+     ✓ runs the real sandbox grep through the bridge without a grant 25ms
+     ✓ describes a deferred Pi primitive from the catalog 6ms
+     ✓ executes a deferred built-in without a server qualifier on a real-target grant 6ms
+     ✓ resolves by name alone and rejects a grant issued for another tool 6ms
+     ✓ fails closed for a name that is not in the catalog 6ms
+     ✓ exposes the schema through describe without loading anything 6ms
+     ✓ finds deferred built-ins by search keywords 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/on-demand-first-party.test.ts > first-party on-demand assembly > keeps a tool resident with a warning when its schema cannot be consumed safely
+AssertionError: expected [ 'mcp_call', …(2) ] to include 'notify'
+ ❯ tests/on-demand-first-party.test.ts:352:19
+    350|
+    351|     // notify 保持直载可见（不进目录、不盲延迟），knowledge_search 正常延迟。
+    352|     expect(names).toContain("notify");
+       |                   ^
+    353|     expect(names).not.toContain("knowledge_search");
+    354|     for (const bridge of BRIDGE_NAMES) expect(names).toContain(bridge);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 20 passed (21)
+   Start at  01:23:26
+   Duration  3.45s (transform 2.05s, setup 19ms, import 3.20s, tests 162ms, environment 0ms)
+

@@ -1,0 +1,27 @@
+[
+  {
+    "path": "Contents/Resources/app.asar",
+    "sha256": "2ed0933c15e8bf42d35b6428c5675d8f8d683da78639aee32015e92f97b96576",
+    "size": 41300059
+  },
+  {
+    "path": "Contents/Resources/seed/renderer-0.1.42.tar.gz",
+    "sha256": "34e652900dee561f5020a8858dc871f666f6cf38fe1842ac47a953fc03bcd16d",
+    "size": 77835025
+  },
+  {
+    "path": "Contents/Resources/seed/server-0.1.42-darwin-arm64.tar.gz",
+    "sha256": "b715d0f9ae9a3687d49ef780633acbc2679e308a02c5e082ecb3c47efd1ff3fa",
+    "size": 275867160
+  },
+  {
+    "path": "Contents/Resources/seed/seed-train-darwin-arm64.json",
+    "sha256": "8a2d235d55aba1d8ab5f783f5e2bdec586dc5f0527ad7fc605a7000760db9861",
+    "size": 880
+  },
+  {
+    "path": "Contents/MacOS/Lingxi",
+    "sha256": "4de2a4b88d3bb437e9ea193b907b2488fa16cf7f8d3fa135ecf06b203dbe9145",
+    "size": 34656
+  }
+]

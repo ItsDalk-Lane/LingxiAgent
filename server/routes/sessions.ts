@@ -7,7 +7,8 @@ import path from "path";
 import { randomUUID } from 'node:crypto';
 import { readDesktopInputRunSnapshot } from '../../core/desktop-session-submit.ts';
 import { Hono } from "hono";
-import { safeJson } from "../hono-helpers.ts";
+import { safeJson, strictJson } from "../hono-helpers.ts";
+import { parseSessionCreateInput, type SessionCreateOptions, type DetachedSessionCreateOptions } from "../session-create-input.ts";
 import { bodyFromRouteError, routeError, statusFromRouteError } from "./route-errors.ts";
 import { t } from "../../lib/i18n.ts";
 import { resolveDeferredReceiverName } from "../deferred-result-interlude.ts";
@@ -2050,13 +2051,11 @@ export function createSessionsRoute(engine, hub = null) {
         studioId: requestContext.studioId,
       });
       if (!auth.allowed) return c.json({ error: "insufficient_scope", reason: auth.reason }, 403);
-      const body = await safeJson(c);
+      const body = parseSessionCreateInput(await strictJson(c), "focused");
       const { memoryEnabled, agentId, thinkingLevel } = body;
       const workspaceSelection = resolveSessionWorkspaceSelection(engine, requestContext, body);
       const cwd = workspaceSelection.cwd;
-      const workspaceFolders = Array.isArray(body.workspaceFolders)
-        ? body.workspaceFolders.filter(p => typeof p === "string" && p.trim())
-        : [];
+      const workspaceFolders = body.workspaceFolders;
       const projectId = Object.prototype.hasOwnProperty.call(body, "projectId")
         ? (
             typeof engine.normalizeSessionProjectAssignmentId === "function"
@@ -2073,13 +2072,7 @@ export function createSessionsRoute(engine, hub = null) {
 
       // 浏览器不随新建会话挂起：上个会话的浏览器在共享窗口中继续显示，
       // 新会话的浏览器以新标签页加入；数据层仍按 session 隔离。
-      const createOptions: {
-        workspaceFolders: any;
-        visibleInSessionList: boolean;
-        thinkingLevel?: any;
-        workspaceMountId?: string;
-        workspaceLabel?: string | null;
-      } = { workspaceFolders, visibleInSessionList: true };
+      const createOptions: SessionCreateOptions = { workspaceFolders, visibleInSessionList: true };
       if (thinkingLevel !== undefined && thinkingLevel !== null) {
         createOptions.thinkingLevel = thinkingLevel;
       }
@@ -2162,13 +2155,11 @@ export function createSessionsRoute(engine, hub = null) {
         return c.json({ error: "detached session creation unavailable" }, 500);
       }
 
-      const body = await safeJson(c);
+      const body = parseSessionCreateInput(await strictJson(c), "detached");
       const { memoryEnabled, agentId, permissionMode, thinkingLevel } = body;
       const workspaceSelection = resolveSessionWorkspaceSelection(engine, requestContext, body);
       const cwd = workspaceSelection.cwd;
-      const workspaceFolders = Array.isArray(body.workspaceFolders)
-        ? body.workspaceFolders.filter(p => typeof p === "string" && p.trim())
-        : [];
+      const workspaceFolders = body.workspaceFolders;
       const memFlag = memoryEnabled !== false;
       const projectId = Object.prototype.hasOwnProperty.call(body, "projectId")
         ? (
@@ -2178,17 +2169,7 @@ export function createSessionsRoute(engine, hub = null) {
           )
         : null;
 
-      const detachedOptions: {
-        cwd: any;
-        memoryEnabled: boolean;
-        agentId: string | null;
-        workspaceFolders: any;
-        visibleInSessionList: boolean;
-        permissionMode: any;
-        thinkingLevel?: any;
-        workspaceMountId?: string;
-        workspaceLabel?: string | null;
-      } = {
+      const detachedOptions: DetachedSessionCreateOptions = {
         cwd: cwd || undefined,
         memoryEnabled: memFlag,
         agentId: typeof agentId === "string" && agentId.trim() ? agentId.trim() : null,

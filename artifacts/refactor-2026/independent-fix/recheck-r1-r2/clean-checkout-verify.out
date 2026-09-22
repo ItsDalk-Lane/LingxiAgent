@@ -1,0 +1,20 @@
+# 干净 checkout 验证（git write-tree + git archive，非原工作区）— 最终候选
+date: 2026-09-22T13:31:56Z
+candidate_tree: cb9a6248cad9deb744feae82211a1c22c1b05fc6
+base_head: 8d55046d5646a008f71f57de745b3564e94a5f21
+note: 复审点名的 f01/red.log、targeted-final.log、f02/red-corrected-fixture.log、green.log 及全部123个此前未跟踪日志均在候选树内；本文件为元验证输出，不进入 EVIDENCE_SHA256 清单。
+
+## 1) EVIDENCE_SHA256.txt 全清单校验
+evidence_exit=0
+4110 OK
+
+## 2) SOURCE_MANIFEST.json 逐文件哈希复算
+files: 3535 ok: 3535 bad: 0
+source_manifest_exit=0
+
+## 3) 复审点名文件存在性
+present: artifacts/refactor-2026/independent-fix/f01/red.log
+present: artifacts/refactor-2026/independent-fix/f01/targeted-final.log
+present: artifacts/refactor-2026/independent-fix/f02/red-corrected-fixture.log
+present: artifacts/refactor-2026/independent-fix/f02/green.log
+present: artifacts/refactor-2026/independent-fix/recheck-r1-r2/r1-red.out

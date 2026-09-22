@@ -1,0 +1,58 @@
+# P05 第二轮复验收（FIXR2 后收口复验收）命令证据索引
+# 验收子代理：全新上下文，只读验收（除本目录/ docs 目录下本轮产物外零写入）
+# 仓库：/Users/study_superior/Desktop/Code/LingxiAgent；HEAD=1f0537b0865c1f6a4a17c28eb66c6d9ebf4948a6（全程未变）
+# 运行时间：2026-09-22 11:55–12:05（local）；Node v24.16.0 / npm 11.13.0 / darwin arm64
+# 说明：本地临时输出先落 /tmp/p05x-r2a-*，关键产物复制为本目录 P05-REACC2-* 存档；未运行全量 npm test（f1 patch 重写副作用约束）
+
+[1] git status --porcelain && git log --oneline -3 && git diff HEAD --stat
+    cwd=仓库根 exit=0
+    结果：3 个已跟踪测试文件修改（+282/-0）+ 未跟踪 docs/refactor-2026/P05/ 与 artifacts/refactor-2026/P05/；HEAD=1f0537b08；与起点逐字一致（终态复核同）
+
+[2] grep 绝对路径残留（counterexample.test.ts）：/Users/study_superior、from "/、from '/、require("/ 各形态
+    cwd=仓库根 全部 0 命中（exit=1）；REPO 常量 0 残留
+
+[3] npm test -- artifacts/refactor-2026/P05/logs/P05-ACCEPTANCE-counterexample.test.ts
+    cwd=仓库根（npm test 路由，含 --exclude 配置）exit=0
+    结果：1 passed file；4 passed | 1 expected fail (5)  → P05-REACC2-counterexample-test-repo-root.out/.err
+
+[4] cd /tmp && <repo>/node_modules/.bin/vitest run --root <repo> artifacts/refactor-2026/P05/logs/P05-ACCEPTANCE-counterexample.test.ts
+    cwd=/tmp exit=0
+    结果：4 passed | 1 expected fail (5)，与 [3] 逐字同构 → P05-REACC2-counterexample-test-alt-cwd.out/.err
+
+[5] npm test -- artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts artifacts/refactor-2026/P04/logs/P04-ACCEPTANCE-counterexample.test.ts
+    cwd=仓库根 exit=0
+    结果：2 files passed；FI 2/2、P04 CE 2/2 → P05-REACC2-fi-p04-test.out（该次 stderr 未单独存档，结果与 exit 已完整记录于 .out 内）
+
+[6] npx vitest list（全默认集）| grep artifacts/refactor-2026
+    cwd=仓库根 exit=0
+    结果：恰 9 例被收集（P04 CE 2 + FI 2 + P05 CE 5），三文件均在默认集
+
+[7] shasum -a 256 -c docs/refactor-2026/P05/EVIDENCE_SHA256.txt
+    cwd=仓库根 exit=0；111 行清单 111 OK 0 NOT-OK → P05-REACC2-manifest-recheck.out
+    覆盖核算：find docs+artifacts P05 = 114 文件 − 清单 111 = FIXR1/FIXR2-manifest-check.out（声明排除）+ 清单自身（模板 §7）；零 MISSING-ON-DISK
+
+[8] shasum -a 256 <f1 patch 工作副本> vs git show HEAD:<f1 patch> | shasum -a 256
+    exit=0；两侧均 25fb315f6c5d68cedd2167321de4db9f84163daae69515714dba628ab69db709；git status artifacts/f1-f12-repair/ 无输出
+
+[9] npm test -- tests/chat-route-switching.test.ts desktop/src/react/__tests__/services/stream-resume.test.ts tests/tool-presentation-history.test.ts
+    cwd=仓库根 exit=0；3 files / 84 passed (84) → P05-REACC2-exec3-test.out/.err
+
+[10] npm run typecheck（tsc ×3）
+     cwd=仓库根 exit=0 → P05-REACC2-typecheck.out
+
+[11] npm run typecheck:core-contracts
+     cwd=仓库根 exit=0（Core contracts strict check passed (6 files)）→ P05-REACC2-core-contracts.out
+
+[12] command-log.jsonl 摘要完整性（node 脚本逐条 sha256+bytes 比对）
+     cwd=仓库根 exit=0；41 条 × stdout/stderr = 82/82 全 match，0 MISMATCH 0 MISSING
+
+[13] git check-ignore -v（P04/P05 counterexample、command-log.jsonl）
+     exit=0；三文件均命中 .gitignore:94 logs/（即被忽略，不入普通 git add）；git ls-files artifacts/refactor-2026/P04/logs/ = 0
+
+[14] git diff HEAD | grep -c "^-[^-]"
+     结果 0（纯增量）；numstat = 41/0、197/0、44/0
+
+[15] node -e JSON.parse（ACCEPTANCE_MAP.json / P05_RESULT.json）
+     exit=0；两者解析合法
+
+未运行（如实登记）：全量 npm test（编排层约束禁止；f1 patch 重写副作用）；四平台 CI、open server 冒烟（P08 范畴）；真供应商冒烟（P04-T07-2 继承 BLOCKED）。

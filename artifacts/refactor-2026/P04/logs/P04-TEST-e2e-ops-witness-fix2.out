@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/model-observability-e2e-utility.test.ts (13 tests) 625ms
+     ✓ timeout（hang）：LLM_TIMEOUT error 终态  313ms
+
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+   Start at  09:31:28
+   Duration  1.65s (transform 452ms, setup 19ms, import 947ms, tests 625ms, environment 0ms)
+

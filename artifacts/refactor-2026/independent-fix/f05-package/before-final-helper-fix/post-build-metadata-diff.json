@@ -1,0 +1,14 @@
+[
+  {
+    "file": "build/cli-runtime-closure.json",
+    "builtSnapshotSha256": "de26218a99cfe557d296d881ef98e72beca4defb0e1e8907a2b8b5574b2131fa",
+    "currentSha256": "9e8244345130d5d4fc81024b0570d6eae990d5ac117baee6a41184bc87556456",
+    "equal": false
+  },
+  {
+    "file": "build/persistence-schema-fingerprint.json",
+    "builtSnapshotSha256": "cf4433c169cc2f5275718fa5a6a96b5a44aa4dfdcf475d444dc49110cf869ed0",
+    "currentSha256": "7aad514a0fb939677d71415df2553d27e8fa4bbe2c1c80b12ee7cc58727ae365",
+    "equal": false
+  }
+]

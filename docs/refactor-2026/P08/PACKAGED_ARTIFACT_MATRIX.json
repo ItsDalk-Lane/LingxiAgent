@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "stage_id": "P08",
+  "task_id": "P08-T05",
+  "generated_at": "2026-09-22",
+  "source_sha": "674b0151fcc982d13f1d6bc5a84ff273edd3b4a3",
+  "build_commands": [
+    { "command_id": "P08-T05-pack", "command": "npm run pack（LINGXI_SIGN_KEY=一次性临时密钥 p08-local-ephemeral）", "exit": 1, "note": "全链构建完成（fetch:bundled-bins → computer-use/speech helpers → build:client 五入口 → build:server（seed 签名+verify-seed-kit OK）→ electron-builder --dir 完成打包与 ad-hoc 重签），唯一失败步=macOS 公证：需 APPLE_APP_SPECIFIC_PASSWORD（生产 Apple 凭据，本地测试产物不使用也不冒充）——按仓库既定本地路径以 SKIP_NOTARIZE=true 复跑收尾" },
+    { "command_id": "P08-T05-pack-dir-local", "command": "SKIP_NOTARIZE=true npx electron-builder --dir", "exit": 0, "note": "本地测试产物构建完成（构建产物已缓存，仅重跑打包步）" }
+  ],
+  "signing_status": {
+    "app_bundle": "ad-hoc 签名（codesign Signature=adhoc，TeamIdentifier 未设——本地测试件；resign-adhoc 全 Mach-O 统一后 verified）",
+    "seed_kit": "ed25519 签名，key-id=p08-local-ephemeral（scripts/artifact-keygen.mjs 生成的一次性密钥，仅存 /tmp/p08-sign，P08 结束即废弃；verify-seed-kit 对该 keyset 验签 OK）",
+    "explicit_disclaimer": "本产物为本地测试产物，非生产签名/公证件；生产发布需仓库 LINGXI_SIGN_KEY 凭据 + Apple 公证凭据（发布授权另属）",
+    "pinned_keyset_untouched": "shared/artifact-core/pinned-keyset.json 未改动（只追加红线未触碰；临时 keyset 经 LINGXI_SIGN_KEYSET 环境覆盖，与 CI Windows standalone 冒烟同款模式）"
+  },
+  "artifacts": [
+    { "name": "Lingxi.app（macOS arm64 unpacked --dir）", "path": "dist/mac-arm64/Lingxi.app", "size": "769M", "sha256_of_inner": { "app.asar": "42297d88d9f449ed894cf6618b10b457338360374561895246beaea138462485" }, "contents": "Frameworks/Info.plist/MacOS/PkgInfo/Resources（app.asar + bundled-bin + computer-use + speech + screenshot-themes + seed/）" },
+    { "name": "seed renderer 包", "path": "dist/mac-arm64/Lingxi.app/Contents/Resources/seed/renderer-0.1.42.tar.gz", "sha256": "dcd46bbd40632894f60b89799ab0521bd1b211ecc09c3b5fdc9bf4c932d67b64" },
+    { "name": "seed server 包（自包含：node v24.15.0 + bundle + node_modules + skills2set）", "path": "dist/mac-arm64/Lingxi.app/Contents/Resources/seed/server-0.1.42-darwin-arm64.tar.gz", "sha256": "1801d3b013cd357e5651056b5eab8310716e60c425b4350427b67a4bd98a39f8" },
+    { "name": "seed train manifest", "path": "dist/mac-arm64/Lingxi.app/Contents/Resources/seed/seed-train-darwin-arm64.json", "sha256": "cf0a291c4ada216130fa6a56e0fbe06751e6377ba819359166f1006bdf8a20bd" },
+    { "name": "seed train 签名", "path": "dist/mac-arm64/Lingxi.app/Contents/Resources/seed/seed-train-darwin-arm64.json.sig", "sha256": "41d92c3ef1be60b818ae205fa6f5e631d437831feb3cbe184305dc801f638a4b" },
+    { "name": "dist-server bundle（开发树 sidecar 形态）", "path": "dist-server/mac-arm64/bundle/index.js", "sha256_head": "1ed8fe40aca07030f527" }
+  ],
+  "version": "0.1.42（package.json；未改版本号——本轮为重构收尾，无发布授权，不以新版本号掩盖未验收）",
+  "clean_install_boot": {
+    "command_id": "P08-T05-packaged-smoke",
+    "method": "从 .app seed/ 提取 server tar.gz 至 /tmp（与开发树零耦合：自带 node 24.15.0），hana-server 启动脚本真实启动于隔离 HOME + witness 供应商",
+    "results": "7/7 PASS：server-info 就绪 / 无凭证 403+鉴权 200（产物形态安全边界 A10）/ sessions/new sess_ / WS prompt read 工具真实往返（tool_events=2）/ 历史回读含回复 / skills 可列（首启同步，且 skills2set 残留清理已随包生效——包内无 lingxi-plugin-creator）/ SIGTERM 优雅退出 exit 0",
+    "report": "artifacts/refactor-2026/P08/logs/packaged-server-smoke.json"
+  },
+  "old_data_upgrade_and_rollback": {
+    "command_id": "P08-T05-upgrade-drill",
+    "method": "旧版本=研究基线 8037fae7a git worktree（lockfile 与当前一致）真实生成数据（2 会话+真实聊天轮+设置 operate+通知+观测）→ 当前 HEAD 同 HOME 升级 → JSONL 尾部截断故障注入 → 旧版本代码回退并存",
+    "results": "14/14 PASS（A08 会话/历史/设置/观测逐项保持无静默清空；A09 半写后启动无半激活、3 会话完好；A09 旧代码可读新数据、追加后新记录不被覆盖）",
+    "report": "artifacts/refactor-2026/P08/logs/upgrade-rollback-drill.json"
+  },
+  "fingerprint_and_manifest": "check-persistence-schema-fingerprint → 170 watched 零触碰 OK（P08-T05-fingerprint-check）；export-manifest/cli-runtime-closure/open-boundary-baseline 三件套本轮生产导入图未变（生产 diff 无 cli/shared/core 新增运行时文件），cli-closure/open-boundary 契约测试全量套件内绿",
+  "blocked_platform_legs": [
+    { "item": "macOS x64 / Windows x64 / Linux x64 安装包与实机安装启动", "reason": "无对应平台实机与构建环境；Windows 专属链（sandbox helper 受限令牌冒烟、MinGit、standalone hana-server.cmd）依赖 Windows 运行器", "fallback": "四平台 CI 待触发清单见 FINAL_ENGINEERING_CHECKS.json ci_trigger_status" },
+    { "item": "DMG/AppImage/NSIS 安装器形态与双击安装流程", "reason": "本阶段只做 --dir unpacked 本地产物（npm run dist 全量安装器含公证链需生产凭据与授权）；--dir 已覆盖『依赖与 server 资源完整、非仅开发模式可用』的核心验证面", "status": "BLOCKED（安装器形态）" },
+    { "item": "Electron 窗口级真实启动（GUI）", "reason": "无 GUI 授权；server 侧已由 packaged-server-smoke 真实验证（桌面轮询的 server-info.json 为可用性权威）", "status": "BLOCKED（GUI 层）" },
+    { "item": "产物级自动更新（OTA 列车）", "reason": "无发布授权——不打 tag、不上传产物、不触发自动更新（A11 发布授权红线）；发布链路由 tests/release-preflight + artifact-* 套件锁定", "status": "NOT_ATTEMPTED（按红线）" }
+  ],
+  "cleanup": "临时签名密钥与 keyset（/tmp/p08-sign）、旧版本 worktree（/tmp/p08-old-tree，git worktree remove 待执行收尾）、seed 提取树（/tmp/p08-seed-extract）用后清理；dist/ 与 dist-server/ 为 gitignore 构建产物目录，可整体删除重建（回退步骤见 FINAL_REPORT）"
+}

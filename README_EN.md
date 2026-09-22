@@ -100,7 +100,6 @@ cli/            Command-line entrypoint connecting to the server
 hub/            Scheduler, ChannelRouter, EventBus
 desktop/        Electron app + React frontend
 shared/         Cross-layer utilities (config schema, error bus, model refs)
-packages/       npm workspaces (plugin protocol, SDK, runtime, components)
 plugins/        Built-in system plugins (bundled into app)
 skills2set/     Built-in skill definitions
 scripts/        Build tools (server bundler, launcher, signing)
@@ -146,9 +145,6 @@ Use Node.js `>=24.12.0 <25` and its compatible npm. See [Contributing](CONTRIBUT
 ```bash
 # Install dependencies and run postinstall scripts
 npm install
-
-# Build workspace packages (fresh checkout or package source changes)
-npm run build:packages
 
 # Start with Electron (builds renderer first)
 npm start

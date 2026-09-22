@@ -1,0 +1,7 @@
+[bench] n=1000: 冷首页 p50=11.0ms（3 次） | 热页 p50=0.9ms p95=1.9ms（20 样本） | 完整翻页 21 页 wall=37ms | fullFileReadCalls/请求=0 jsonlParseCount/请求=103
+[bench] n=10000: 冷首页 p50=89.1ms（3 次） | 热页 p50=0.8ms p95=0.9ms（200 样本） | 完整翻页 201 页 wall=261ms | fullFileReadCalls/请求=0 jsonlParseCount/请求=103
+[threshold] PASS cold p50 n=1000 ≤ 1.25×baseline+25ms: actual=11.04 limit=36.58
+[threshold] PASS cold p50 n=10000 ≤ 1.25×baseline+25ms: actual=89.12 limit=123.84
+[threshold] PASS hot p50 n=10k ≤ 3×max(p50 n=1k, 5ms): actual=0.75 limit=15.00
+[threshold] PASS 全翻 total_10k / total_1k ≤ 15: actual=234.54 limit=499.78
+A05 基准完成：全部校验通过；输出 artifacts/refactor-2026/P05/samples/history-bench-b

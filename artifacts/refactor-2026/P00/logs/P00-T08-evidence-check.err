@@ -1,0 +1,21 @@
+evidence-check FAIL (20):
+  - 任务 P00-T02: PASS/UNCHANGED_VERIFIED 但证据中无命令ID引用
+  - 任务 P00-T03: PASS/UNCHANGED_VERIFIED 但证据中无命令ID引用
+  - 任务 P00-T04: PASS/UNCHANGED_VERIFIED 但证据中无命令ID引用
+  - 任务 P00-T05: 引用的命令 P00-T05-lint-r3（基线可用：失败确定性+F1/F2/F3 不存在于 command-log.jsonl
+  - 任务 P00-T06: PASS/UNCHANGED_VERIFIED 但证据中无命令ID引用
+  - 任务 P00-T07: 引用的命令 P00-T08-evidence-check 不存在于 command-log.jsonl
+  - 任务 P00-T08: 引用的命令 P00-T08-evidence-check 不存在于 command-log.jsonl
+  - 任务 P00-T08: 引用的命令 P00-T08-redaction-final 不存在于 command-log.jsonl
+  - 场景 P00-A01: PASS 但无 production_entry/evidence
+  - 场景 P00-A02: PASS 但无 production_entry/evidence
+  - 场景 P00-A03: PASS 但无 production_entry/evidence
+  - 场景 P00-A04: PASS 但无 production_entry/evidence
+  - 场景 P00-A05: PASS 但无 production_entry/evidence
+  - 场景 P00-A06: PASS 但无 production_entry/evidence
+  - 场景 P00-A06: 引用的命令 P00-T08-evidence-check 不存在于 command-log.jsonl
+  - 场景 P00-A07: PASS 但无 production_entry/evidence
+  - 场景 P00-A08: PASS 但无 production_entry/evidence
+  - 场景 P00-A09: PASS 但无 production_entry/evidence
+  - 场景 P00-A09: 引用的命令 P00-T08-redaction-final 不存在于 command-log.jsonl
+  - 场景 P00-A10: PASS 但无 production_entry/evidence

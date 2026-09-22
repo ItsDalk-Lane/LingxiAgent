@@ -1,0 +1,45 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/bridge-session-teardown.test.ts (45 tests | 2 failed) 110ms
+     × executeExternalMessage 结束后走 emit -> unsub -> dispose 6ms
+     × compactSession 的临时 owner session 结束后也会 shutdown + dispose 2ms
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  2 failed | 138 passed (140)
+   Start at  17:48:18
+   Duration  5.15s (transform 2.07s, setup 35ms, import 4.27s, tests 476ms, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/bridge-session-teardown.test.ts > BridgeSessionManager teardown > executeExternalMessage 结束后走 emit -> unsub -> dispose
+AssertionError: expected "vi.fn()" to be called with arguments: [ { …(6) } ]
+
+Number of calls: 0
+
+ ❯ tests/bridge-session-teardown.test.ts:241:37
+    239|
+    240|     expect(callOrder).toEqual(["emit", "unsub", "dispose"]);
+    241|     expect(emitSessionShutdownMock).toHaveBeenCalledWith(session);
+       |                                     ^
+    242|     expect(session.dispose).toHaveBeenCalledOnce();
+    243|     expect(manager.activeSessions.has("bridge-k1")).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/bridge-session-teardown.test.ts > BridgeSessionManager teardown > compactSession 的临时 owner session 结束后也会 shutdown + dispose
+AssertionError: expected "vi.fn()" to be called with arguments: [ { isCompacting: false, …(5) } ]
+
+Number of calls: 0
+
+ ❯ tests/bridge-session-teardown.test.ts:1771:37
+    1769|     expect(result).toEqual({ tokensBefore: 900, tokensAfter: 300, cont…
+    1770|     expect(callOrder).toEqual(["emit", "dispose"]);
+    1771|     expect(emitSessionShutdownMock).toHaveBeenCalledWith(session);
+       |                                     ^
+    1772|     expect(session.dispose).toHaveBeenCalledOnce();
+    1773|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

@@ -9,10 +9,6 @@
     "useUnknownInCatchVariables": false,
     "baseUrl": ".",
     "paths": {
-      "@lingxi/plugin-protocol": ["packages/plugin-protocol/src/index.ts"],
-      "@lingxi/plugin-sdk": ["packages/plugin-sdk/src/index.ts"],
-      "@lingxi/plugin-runtime": ["packages/plugin-runtime/src/index.ts"],
-      "@lingxi/plugin-components": ["packages/plugin-components/src/index.ts"],
       "@/*": ["desktop/src/react/*"]
     }
   },
@@ -22,6 +18,7 @@
     "desktop/src/global.d.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "tests/fixtures/**"
   ]
 }

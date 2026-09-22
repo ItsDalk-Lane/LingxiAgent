@@ -1,0 +1,47 @@
+{
+ "round": "recheck-r1-r2",
+ "date": "2026-09-22",
+ "base_head_at_entry": "8d55046d5646a008f71f57de745b3564e94a5f21",
+ "environment": { "node": "v24.16.0", "platform": "darwin", "arch": "arm64" },
+ "findings": [
+  {
+   "id": "R1",
+   "status": "CONFIRMED_AND_FIXED",
+   "finding": "updateSessionStreamMeta 先调用有状态的 StreamAdmission.accepts 再做重复/缺口检查：assistant_run_end 因缺口被拒之前已经退休 runId，补发后再被拒；dispatchReplayEvent 把被拒帧无条件 markConsumedSeq 计为已消费（水位虚增）。",
+   "fix": [
+     "stream-admission.ts：accepts 拆为纯校验 wouldAccept + 延迟提交 commit；buffer 投影层保留 accepts 一次性语义。",
+     "stream-resume.ts updateSessionStreamMeta：身份纯校验 → 序号校验（按换流后前瞻基线，重复帧不新增水位证据）→ 一次性提交身份+水位+admissionEpoch；被拒/待补发帧零退休副作用。",
+     "ws-message-handler.ts handleServerMessage：水位管辖帧被拒时返回 false，其余聊天路径返回 true。",
+     "stream-resume.ts dispatchReplayEvent：仅当分发层未返回 false（真实接纳/消费或非水位帧）才推进水位。"
+   ],
+   "old_path_fate": "accepts 原子入口保留给 buffer 层（use-stream-buffer.ts:697）不变；水位层不再经过它。",
+   "red": { "command": "recheck-r1-red", "exit": 1, "result": "3 failed | 8 skipped", "logs": ["r1-red.out", "r1-red.err"] },
+   "green": { "command": "recheck-f03-regression", "exit": 0, "note": "19 文件 283 测试；R1 三例含：缺口 run_end 零退休+补发恰一次收尾+仅证据化 seq 入水位；真实服务器存储补发窗口后结束帧仍收尾；换流后新流缺口结束帧不退休新 run" }
+  },
+  {
+   "id": "R2",
+   "status": "CONFIRMED_AND_FIXED",
+   "finding": "rebuildSessionFromResume 等待 loadMessages 期间新流可被接纳（后台会话不设 rebuilding 门槛）；await 之后仅恢复版本/焦点校验不足，restore(oldStream) 覆盖新流并把它退休；迟到旧 resume 响应无请求-响应关联，可重建旧流权威。",
+   "fix": [
+     "stream-resume.ts：SessionStreamMeta 增加 admissionEpoch/authorityEpoch；rebuild 以进入 await 时存活的元数据对象为基准，等待期间同一对象上发生过真实接纳提交则整体放弃旧恢复（不写身份/消息/终态）。对象被失效重建属 hydrate/LRU 生命周期，仍由 previousAdmission 屏障按既有语义恢复。",
+     "stream-resume.ts requestStreamResume：每次请求登记恢复代次（resumeToken + 请求时刻的接纳代次与流权威），随 resume_stream 发出。",
+     "server/ws-protocol.ts + server/routes/chat.ts：stream_resume 回复可选透传 resumeToken（旧客户端/旧服务器不带，向后兼容）。",
+     "stream-resume.ts replayStreamResume：响应 token 与最新请求匹配、且其描述的流已被请求之后确立的新权威取代时丢弃迟到响应；饱和恢复/同流缺口补发不受影响。"
+   ],
+   "old_path_fate": "既有 isRetiredStream 入口守卫、nextResumeRebuildVersion 并发恢复版本守卫、isStillCurrentStreamSession 焦点守卫全部保留并被新增回归钉覆盖。",
+   "red": { "command": "recheck-r2-red", "exit": 1, "result": "2 failed | 2 passed | 7 skipped", "logs": ["r2-red.out", "r2-red.err"] },
+   "green": { "command": "recheck-f03-regression", "exit": 0, "note": "R2 四例含：后台延迟读取旧恢复不得覆盖新流（正文/身份/终态）；真实服务器回显 token 的迟到旧响应被代次关联丢弃；两个并发恢复仅最新代次落盘；焦点切换期间重建放弃并清 rebuilding 门槛" }
+  }
+ ],
+ "case_updates": [
+  { "id": "C14", "note": "接纳次序原子化后旧帧拒收语义不变；新增换流后新流缺口结束帧反例" },
+  { "id": "C16", "note": "原 delta+100 缺口用例保留；新增带退休副作用的结束帧缺口反例与水位仅证据推进断言" },
+  { "id": "C17", "note": "真实 chat WS→handleServerMessage→stream-resume→buffer/store 链新增 7 例（R1×3 + R2×4），含真实 resume_stream 请求/响应与真实服务器事件存储补发" },
+  { "id": "C19", "note": "重连/迟到恢复语义由恢复代次关联补强；历史/导出分层不变" }
+ ],
+ "protocol_change": {
+   "name": "resume_stream/stream_resume 可选 resumeToken 透传",
+   "compatibility": "旧客户端不带字段、旧服务器不回显时走原有守卫；不新增第二套历史库或恢复服务"
+ },
+ "test_counts": { "new_tests": 7, "stream_route_file_total": 11, "f03_regression": "19 files / 283 tests / exit 0", "full_suite": "1466 files / 14874 passed / 4 failed / 15 skipped / exit 1（4 例为既有旧封印/证据坐标失败，见 B01）" }
+}

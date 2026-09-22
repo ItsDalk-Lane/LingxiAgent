@@ -1,0 +1,62 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/chat-route-switching.test.ts (52 tests | 1 failed | 48 skipped) 73ms
+     ↓ uses a minute-scale default WS disconnect abort grace and allows disabling it
+     ↓ adds persisted user and assistant entry ids to turn_end
+     ↓ broadcasts entry ids on an aborted turn_end without a false empty-reply error
+     ↓ does not count a length-limited thinking-only reply as a normal success
+     ↓ marks a visible partial reply as truncated without adding a generic error
+     ↓ does not re-log a previous turn's usage on an aborted turn_end
+     ↓ still logs usage on a normally completed turn_end
+     ↓ keeps hidden background turn input separate from the nearest visible user on turn_end
+     ↓ rejects prompts through the engine public switching API
+     ↓ rejects prompt routing when sessionId and sessionPath disagree (#2078)
+     ↓ rejects a prompt with no identity before it validates the attachments
+     ↓ reports attachment problems against the resolved session locator
+     ↓ rejects mismatched steer and resume targets before touching runtime state (#2078)
+     ↓ routes compact by sessionId through the manifest current locator
+     ↓ runs instant simple compaction as an enabled one-shot method without changing ordinary compaction
+     ↓ rejects the one-shot instant method while its experiment is disabled
+     ↓ converts legacy compact paths at the boundary and never executes against the stale locator
+     ↓ routes streaming interject messages through the desktop interjection contract
+     ↓ keeps shared stream state attached to the session id when the session path moves
+     ↓ renders structured reasoning_content thinking deltas from OpenAI-compatible providers
+     ↓ publishes OpenAI Responses phase semantics while keeping commentary out of the legacy answer
+     ↓ reports engine runtime streaming separately when resume replay state is missing
+     ↓ includes the active streamId on status start and finish messages
+     ↓ preserves abort metadata on session status broadcasts
+     ↓ keeps remote and host clients on the same server-side session stream
+     ↓ passes @Session references to the Agent as resolvable IDs without linking Session metadata
+     ↓ emits file content blocks for deferred result session files
+     ↓ drops post-retry deferred content for discarded tasks but keeps retained tasks
+     ↓ removes already queued discarded-task content when the retry reset arrives
+     ↓ renders deferred interludes only when the actual hidden custom message is consumed
+     ↓ does not render successful media-generation custom inputs as deferred interludes
+     ↓ orders deferred interludes by actual custom-message consumption order
+     ↓ keeps repeated consumed custom messages for the same task as distinct interludes
+     ↓ persists a turn input consumption record only when the consumed custom input receives an assistant reply
+     ↓ renders consecutive consumed custom messages before the assistant reply that consumes them
+     ↓ delivers a turn completion desktop notification when the preference is enabled
+     ↓ fails closed for internal and missing session manifests
+     ↓ delivers a session-aware turn completion notification with the completed sessionPath
+     ↓ defers turn completion notifications until the session is no longer streaming
+     ↓ does not deliver turn completion notification after an aborted turn
+     ↓ aborts a streaming session only after the turn has been idle past the stall timeout
+     ↓ passes a user abort reason through the websocket stop path
+     ↓ binds Stop without client stream metadata to the current server stream and replies explicitly
+     ↓ rejects a delayed Stop request that names an older stream (#2078)
+     ↓ does not render interludes directly from standalone deferred result notifications
+     ↓ broadcasts browser_status events emitted outside tool execution
+     ↓ broadcasts session metadata updates emitted outside tool execution
+     ↓ does not serialize broadcast payloads for closed clients
+     ✓ A03：按 sinceSeq 增量续传不重复已接事件；同一请求重复发送幂等 35ms
+     ✓ A04：跨 stream 重连——旧 streamId 触发 reset 全量重建为当前流，seq 不跨 stream 比较 3ms
+     × A05：ring 截断——过旧 sinceSeq 恢复返回 truncated=true 且只从最早存活事件补起 30ms
+     ✓ A06：流结束缓存清空——resume 返回空事件 + isStreaming=false，恢复走历史而非已消失 ring 4ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 passed | 48 skipped (52)
+   Start at  10:34:47
+   Duration  1.21s (transform 534ms, setup 18ms, import 1.06s, tests 73ms, environment 0ms)
+

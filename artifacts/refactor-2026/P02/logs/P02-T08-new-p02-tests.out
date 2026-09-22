@@ -1,0 +1,27 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/confirm-store.test.ts (2 tests) 116ms
+ ✓ tests/session-execution-registry.test.ts (9 tests) 59ms
+ ✓ tests/deferred-result-store.test.ts (18 tests) 78ms
+ ✓ tests/cli-abort-contract.test.ts (3 tests) 76ms
+ ✓ tests/task-registry.test.ts (16 tests) 84ms
+ ✓ tests/task-bus-handlers.test.ts (3 tests) 83ms
+ ✓ tests/deferred-result-bus-handlers.test.ts (1 test) 80ms
+ ✓ tests/p02-concurrency-edges.test.ts (6 tests) 81ms
+ ✓ tests/task-identity-attempts.test.ts (12 tests) 85ms
+ ✓ tests/p02-recovery-restart.test.ts (3 tests) 141ms
+ ✓ tests/session-coordinator-isolated-abort.test.ts (3 tests) 150ms
+ ✓ tests/p02-entry-lifecycle-edges.test.ts (3 tests) 35ms
+ ✓ tests/assistant-run-lifecycle.test.ts (5 tests) 39ms
+ ✓ tests/p02-run-finalize-edges.test.ts (3 tests) 40ms
+ ✓ tests/subagent-tool.test.ts (50 tests) 322ms
+ ✓ tests/workflow-tool.test.ts (29 tests) 335ms
+ ✓ tests/p02-cancellation-edges.test.ts (5 tests) 1098ms
+     ✓ 超时清理走同一 kill 路径：timeout 后 reject timeout 标签  1007ms
+
+ Test Files  17 passed (17)
+      Tests  171 passed (171)
+   Start at  00:14:49
+   Duration  2.37s (transform 4.13s, setup 376ms, import 9.90s, tests 2.90s, environment 1ms)
+

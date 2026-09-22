@@ -1,0 +1,24 @@
+{
+  "at": "2026-09-22T18:23:34.840379",
+  "cleanup": [
+    {
+      "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-packaged-run-aZ3UYg",
+      "removed": true,
+      "reason": "unique task-created directory; no open handles"
+    },
+    {
+      "path": "/Users/study_superior/Library/Application Support/Lingxi-f05-packaged-run-aZ3UYg",
+      "removed": true,
+      "reason": "unique task-created directory; no open handles"
+    },
+    {
+      "path": "/Users/study_superior/Library/Application Support/Lingxi-f05-packaged-run-lFA3R9",
+      "removed": true,
+      "reason": "unique task-created directory; no open handles"
+    }
+  ],
+  "preserved": [
+    "existing Application Support/Data",
+    "candidate build/package temporary directory for review"
+  ]
+}

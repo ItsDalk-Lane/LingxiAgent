@@ -1,0 +1,65 @@
+stderr | tests/history-read-directory-build.test.ts > todos 指针（X13） > 坏快照跳过：指针指向此前最后一条合法快照
+[todo-compat] 跳过坏 todo 快照，继续向前扫描: {"toolName":"todo","details":{}}
+[todo-compat] 跳过坏 todo 快照，继续向前扫描: {"toolName":"todo","details":{}}
+
+stderr | tests/history-protocol-compat.test.ts
+[history-protocol-compat] A01 clone 缺席（/tmp/lingxi-baseline-1d42b740）：四组合中旧服务端侧指定环境未验证，本套件 skip（见 protocol/compatibility-matrix.json 环境依赖注记）
+
+stderr | tests/history-read-directory-incremental.test.ts > X10/X13：跨追加依赖更新 > X13：追加合法 todo 快照 → 指针前移；追加坏快照 → 跳过保持
+[todo-compat] 跳过坏 todo 快照，继续向前扫描: {"toolName":"todo","details":{}}
+[todo-compat] 跳过坏 todo 快照，继续向前扫描: {"toolName":"todo","details":{}}
+
+stderr | tests/history-read-route-fallback.test.ts > 快照/回退链（X05/P06/P11） > P06：stat 失败（文件缺失）→ revision_unknown → legacy 全量承接，缓存零读写
+[sessions/history-read] directory unavailable session=path reason=revision_unknown → legacy full
+
+stderr | tests/history-read-directory-incremental.test.ts > X05 增量版：增量途中读取失败 → 回退全量，不混合页面 > readFile 注入增量阶段失败 → legacy 全量承接，输出与全量等价
+[sessions/history-read] directory incremental failed session=sess_0muc2eou1_e6b76b7fea47b9c11bfb reason=short_read → full rebuild
+
+stderr | tests/history-read-directory-incremental.test.ts > X05 增量版：增量途中读取失败 → 回退全量，不混合页面 > readFile 注入增量阶段失败 → legacy 全量承接，输出与全量等价
+[sessions/history-read] directory build refused session=sess_0muc2eou1_e6b76b7fea47b9c11bfb reason=short_read
+
+stderr | tests/history-read-directory-incremental.test.ts > X05 增量版：增量途中读取失败 → 回退全量，不混合页面 > readFile 注入增量阶段失败 → legacy 全量承接，输出与全量等价
+[sessions/history-read] directory unavailable session=sess_0muc2eou1_e6b76b7fea47b9c11bfb reason=short_read → legacy full
+
+stderr | tests/history-read-route-fallback.test.ts > 快照/回退链（X05/P06/P11） > X05：目录读取 short_read → 尝试 1 + 重建 1 次（builds=2）→ legacy 全量，输出与全量等价
+[sessions/history-read] directory attempt1 failed session=sess_0muc2eou6_07c977053eced825e664 reason=short_read
+
+stderr | tests/history-read-route-fallback.test.ts > 快照/回退链（X05/P06/P11） > X05：目录读取 short_read → 尝试 1 + 重建 1 次（builds=2）→ legacy 全量，输出与全量等价
+[sessions/history-read] directory build refused session=sess_0muc2eou6_07c977053eced825e664 reason=short_read
+
+stderr | tests/history-read-route-fallback.test.ts > 快照/回退链（X05/P06/P11） > X05：目录读取 short_read → 尝试 1 + 重建 1 次（builds=2）→ legacy 全量，输出与全量等价
+[sessions/history-read] directory attempt2 unavailable session=sess_0muc2eou6_07c977053eced825e664 reason=short_read → legacy full
+
+stderr | tests/history-read-directory-incremental.test.ts > C01 剩余行（追加外的变化分类） > 文件缩短 → snapshot_changed → 全量重建（不混页）
+[sessions/history-read] directory build refused session=sess_0muc2eou8_b3048507b28e3a312a12 reason=directory_invalid detail=session_branch_head_missing
+
+stderr | tests/history-read-directory-incremental.test.ts > C01 剩余行（追加外的变化分类） > 文件缩短 → snapshot_changed → 全量重建（不混页）
+[sessions/history-read] directory unavailable session=sess_0muc2eou8_b3048507b28e3a312a12 reason=directory_invalid → legacy full
+
+stderr | tests/history-read-directory-incremental.test.ts > C01 剩余行（追加外的变化分类） > 同长度重写（mtime 变）→ untrusted_mutation → 全量重建
+[sessions/history-read] directory build refused session=sess_0muc2eoug_c9890906fbbc47f81348 reason=directory_invalid detail=session_branch_head_missing
+
+stderr | tests/history-read-directory-incremental.test.ts > C01 剩余行（追加外的变化分类） > 同长度重写（mtime 变）→ untrusted_mutation → 全量重建
+[sessions/history-read] directory unavailable session=sess_0muc2eoug_c9890906fbbc47f81348 reason=directory_invalid → legacy full
+
+stderr | tests/history-read-route-fallback.test.ts > 快照/回退链（X05/P06/P11） > P11：hydrate 真实故障 → mode:error → 路由既有 500 路径（不伪造空历史）
+[sessions/history-read] history read failed session=sess_0muc2eoui_8494d71019acd4f89745: registry disk failure
+
+stderr | tests/history-read-route-fallback.test.ts > 快照/回退链（X05/P06/P11） > P11：hydrate 真实故障 → mode:error → 路由既有 500 路径（不伪造空历史）
+[sessions/history-read] history read failed session=sess_0muc2eoui_8494d71019acd4f89745: registry disk failure
+
+stderr | tests/history-read-route-fallback.test.ts > 快照/回退链（X05/P06/P11） > rebroadcast 恰一次：首屏一次、翻页零次、失败不广播
+[sessions/history-read] history read failed session=sess_0muc2eouv_2b3ce6f15e0a1ff02f29: boom
+
+stderr | tests/history-read-directory-incremental.test.ts > C01 剩余行（追加外的变化分类） > stat 失败（文件缺失）→ revision_unknown：不用缓存不写缓存（I08）
+[sessions/history-read] directory unavailable session=path reason=revision_unknown → legacy full
+
+stderr | tests/history-protocol-conditional.test.ts > E02.4 条件 GET：真实路由 > stat 失败（文件缺失）→ 不签发标签；路径安全拒绝 403 不泄露标签
+[sessions/history-read] directory unavailable session=sess_0muc2eovz_7b5967fa580b766d93fd reason=revision_unknown → legacy full
+
+stderr | tests/history-pagination-invalid-fixture.test.ts > 非法/损坏夹具经真实生产读取入口的行为（按实际行为记录，不改生产代码） > SRC01 形状经 loadSessionHistoryMessages：分支读取抛错，兼容 raw-read fallback 静默接管（路由仍 200，如实记录兼容行为）
+[sessions/history-read] directory build refused session=sess_0muc2eq1k_3211309e42fa3751ad4f reason=directory_invalid detail=session_branch_duplicate_id
+
+stderr | tests/history-pagination-invalid-fixture.test.ts > 非法/损坏夹具经真实生产读取入口的行为（按实际行为记录，不改生产代码） > SRC01 形状经 loadSessionHistoryMessages：分支读取抛错，兼容 raw-read fallback 静默接管（路由仍 200，如实记录兼容行为）
+[sessions/history-read] directory unavailable session=sess_0muc2eq1k_3211309e42fa3751ad4f reason=directory_invalid → legacy full
+

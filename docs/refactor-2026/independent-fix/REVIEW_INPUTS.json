@@ -1,0 +1,27 @@
+{
+  "note": "用户提供材料的字节指纹；其原复现日志不作为本轮执行证据",
+  "inputs": [
+    {
+      "name": "ADVERSARIAL_REVIEW.md",
+      "source": "/Users/study_superior/Desktop/Code/Lingxi_Refactor_Audit/ADVERSARIAL_REVIEW.md",
+      "sha256": "fdf54d515f9a539fafad19fb982ced4d2cf51fc3ab8cd0f881c9eba64cbd4215"
+    },
+    {
+      "name": "CODEX_REPAIR_PROMPT.md",
+      "source": "/Users/study_superior/Desktop/Code/Lingxi_Refactor_Audit/CODEX_REPAIR_PROMPT.md",
+      "sha256": "23099cfb1f87a9b1dfddb47a5b0ee8ee55249ddc13539e9942fffb92c88d5a81"
+    },
+    {
+      "name": "REVIEW_FACTS.json",
+      "source": "/Users/study_superior/Desktop/Code/Lingxi_Refactor_Audit/REVIEW_FACTS.json",
+      "sha256": "4eec3349d2bdc135559d52806eb17c6d411a55276073985e30070f6938551de1"
+    }
+  ],
+  "recheck_inputs": [
+    {
+      "name": "recheck 修复提示词（用户会话内提供）",
+      "source": "会话输入，无独立文件",
+      "note": "提示词要求先读 RECHECK_REPORT.md / RECHECK_FACTS.json / probes/README.md；经全盘检索上述文件在本机不存在，未将其当作已读或已验证对象。本轮以提示词内嵌的 R1/R2/R3 事实描述为输入，并在真实源码逐条核实后实施。"
+    }
+  ]
+}

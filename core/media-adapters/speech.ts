@@ -16,6 +16,7 @@ import path from "node:path";
 import { saveImage } from "../media/download.ts";
 import { ensureEffectiveSpeechParameters } from "../media/media-parameters.ts";
 import { t } from "../../lib/i18n.ts";
+import { mintTaskId } from "../../lib/tasks/task-identity.ts";
 
 export const openaiSpeechAdapter = {
   id: "openai-speech",
@@ -83,7 +84,7 @@ export const openaiSpeechAdapter = {
       : null;
     const { filename } = await saveImage(buffer, mimeType, ctx.dataDir, customName);
     return {
-      taskId: `speech-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+      taskId: mintTaskId("speech"),
       files: [filename],
     };
   },
@@ -172,7 +173,7 @@ export const minimaxSpeechAdapter = {
     const { filename } = await saveImage(buffer, mimeType, ctx.dataDir, customName,
       format === "pcm" ? { extension: "pcm" } : {});
     return {
-      taskId: `speech-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+      taskId: mintTaskId("speech"),
       files: [filename],
     };
   },
@@ -254,7 +255,7 @@ export const dashscopeSpeechAdapter = {
       : null;
     const { filename } = await saveImage(buffer, mimeType, ctx.dataDir, customName);
     return {
-      taskId: `speech-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+      taskId: mintTaskId("speech"),
       files: [filename],
     };
   },
@@ -372,7 +373,7 @@ export const systemSpeechAdapter = {
       throw new Error("system speech produced no output");
     }
     return {
-      taskId: `speech-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+      taskId: mintTaskId("speech"),
       files: [filename],
     };
   },

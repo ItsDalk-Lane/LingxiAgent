@@ -1,0 +1,5 @@
+
+> lingxi@0.1.42 lint:boundary
+> node scripts/lint-open-boundary.mjs
+
+lint:boundary ok -- 1 known open->closed edge(s), all within the tracked ratchet baseline (existing debt, not newly introduced).

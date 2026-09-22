@@ -12,6 +12,7 @@
  * 被回档会把该任务的投递屏蔽（retry 事务既有语义）。
  */
 import type { TerminalSessionManager } from "../terminal/terminal-session-manager.ts";
+import { registerTaskExecution, type TaskExecution, type TaskRegistryClient } from "../tasks/task-execution.ts";
 import { truncateHeadTail } from "./runner.ts";
 
 export const EXEC_BACKGROUND_WINDOW_MS_DEFAULT = 60_000;
@@ -49,7 +50,7 @@ export async function waitForTtyWindow(
 export interface BackgroundExecDeps {
   manager: TerminalSessionManager;
   deferredStore: any;
-  taskRegistry: any;
+  taskRegistry: TaskRegistryClient | null;
   /** 输出截断预算（与前台路径同一常量口径）。 */
   maxOutputTokens?: number;
   maxOutputChars?: number;
@@ -73,6 +74,7 @@ export function registerBackgroundExec(
   if (!deps.deferredStore?.defer || !deps.deferredStore?.resolve) {
     return { registered: false, reason: "deferred store unavailable" };
   }
+  let execution: TaskExecution | undefined;
   try {
     deps.deferredStore.defer(terminalId, sessionPath, {
       type: "exec_command_background",
@@ -83,11 +85,14 @@ export function registerBackgroundExec(
     deps.taskRegistry?.registerHandler?.("exec_command_background", {
       abort: async (taskId: string) => {
         try {
-          deps.manager.close({ sessionPath, terminalId: taskId });
+          // 同类型处理器由多会话共用，不能借用最后一次登记的父会话。
+          const owner = deps.taskRegistry?.query?.(taskId);
+          const ownerPath = owner?.parentSessionPath || (taskId === terminalId ? sessionPath : null);
+          if (ownerPath) deps.manager.close({ sessionPath: ownerPath, terminalId: taskId });
         } catch { /* 已退出：无事 */ }
       },
     });
-    deps.taskRegistry?.register?.(terminalId, {
+    execution = registerTaskExecution(deps.taskRegistry, terminalId, {
       type: "exec_command_background",
       parentSessionPath: sessionPath,
       agentId: args.agentId || undefined,
@@ -117,7 +122,8 @@ export function registerBackgroundExec(
         const truncated = truncateHeadTail(output, { maxBytes: 50_000 }) as any;
         const truncatedText = typeof truncated === "string" ? truncated : String(truncated?.content ?? output);
         try {
-          deps.taskRegistry?.complete?.(terminalId, { exitCode });
+          const settled = execution?.complete({ exitCode });
+          if (settled === null) return;
         } catch { /* registry 只管可见性 */ }
         try {
           deps.deferredStore.resolve(terminalId, {

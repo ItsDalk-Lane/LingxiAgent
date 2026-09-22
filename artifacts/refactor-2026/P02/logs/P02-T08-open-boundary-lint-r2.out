@@ -1,0 +1,12 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/open-boundary-lint.test.ts (16 tests) 1664ms
+     ✓ the committed export-manifest.json + baseline pass cleanly against real source  877ms
+     ✓ the CLI subprocess exits 0 against the real repo and reports the known-debt count  744ms
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  00:14:34
+   Duration  1.91s (transform 77ms, setup 19ms, import 160ms, tests 1.66s, environment 0ms)
+

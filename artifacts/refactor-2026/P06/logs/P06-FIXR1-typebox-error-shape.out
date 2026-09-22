@@ -1,0 +1,5 @@
+MISSING_REQUIRED {"keys":["keyword","schemaPath","instancePath","params","message"],"instancePath":"","message":"must have required properties title","issuePaths":["/"]}
+NESTED_ARRAY {"keys":["keyword","schemaPath","instancePath","params","message"],"instancePath":"/labels/0","message":"must be string","issuePaths":["/labels/0"]}
+NESTED_OBJECT {"keys":["keyword","schemaPath","instancePath","params","message"],"instancePath":"/metadata/owner","message":"must not have fewer than 2 characters","issuePaths":["/metadata/owner"]}
+VALID PASSED_VALIDATION
+typebox_version: 1.1.38 (package.json pinned)

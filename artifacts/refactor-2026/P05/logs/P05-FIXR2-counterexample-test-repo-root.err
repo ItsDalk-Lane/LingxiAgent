@@ -1,0 +1,7 @@
+stderr | artifacts/refactor-2026/P05/logs/P05-ACCEPTANCE-counterexample.test.ts > C1 跨流迟到事件：旧流 segment 迟到 delta 不得污染新轮 Run > Run A 结束后开启 Run B，旧流(segA/streamA)迟到 delta 不得出现在 Run B 的 answer
+[stream] canonical_segment_gap: segment event without start: {
+  type: 'assistant_segment_delta',
+  segmentId: 'segA',
+  sessionPath: '/tmp/p05x-accept-c1-session.jsonl'
+}
+

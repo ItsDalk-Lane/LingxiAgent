@@ -1,0 +1,115 @@
++1267ms [server] ① ensureFirstRun...
++1268ms [first-run] 首次启动，正在创建默认助手...
++1272ms [first-run] 默认助手 "lingxi" 已创建
++1284ms [server] ① ensureFirstRun 完成
++1284ms [server] ① ensureLocalIdentityRegistries...
++1286ms [server] ① ensureLocalIdentityRegistries 完成
++1286ms [server] ② 创建 LingxiEngine...
++1311ms [server] ② LingxiEngine 构造完成，开始 init...
++1312ms [server] [migrations] _dataVersion=0，待执行 1 条迁移
++1312ms [server] [migrations] #54 完成
++1312ms [server] [credential-custody] tightened .
++1313ms [server] [credential-custody] tightened users.json
++1313ms [server] [credential-custody] tightened security
++1313ms [server] [credential-custody] tightened security/execution-leases.json
++1313ms [server] [credential-custody] tightened security/grants.json
++1316ms [server] [init] 1/5 Pi SDK 初始化...
++1343ms [server] [init] 1/5 AuthStorage + ModelRegistry + 0 个模型就绪
++1343ms [server] [init] 2/5 初始化所有 agent...
++1344ms [server]   [compat] dirs: 创建了 4 个缺失目录
++1345ms [server]   [compat] 3 项检查完成，1 项已修复
++1345ms [server]   [agent] 1. loadConfig...
++1345ms [server]   [agent] 1. loadConfig 完成
++1345ms [server]   [agent] 3. 模块初始化完成
++1345ms [server]   [agent] 4. FactStore...
++1346ms [fact-store] schema migrated: v0 → v3
++1347ms [server]   [agent] 4. FactStore + SummaryManager 完成
++1347ms [aux-resolver] resolveAuxiliaryExecution(memory): no model (unconfigured, fallback=chat)
++1347ms [agent] 记忆系统暂不可用：memory slot 未配置且无 chat 可 fallback
++1347ms [server]   [agent] 4. memoryTicker...
++1347ms [server]   [agent] 4. memoryTicker 创建完成
++1347ms [memory-ticker] v3 已启动（turn-based，每日任务备用 timer 1h）
++1348ms [server]   [agent] 7. 创建工具...
++1349ms [server]   [agent] 8. Desk 系统...
++1352ms [server]   [agent] 9. buildSystemPrompt...
++1356ms [server]   [agent] init 全部完成
++1357ms [memory-ticker] 每日任务开始 (2026-09-22)
++1357ms [aux-resolver] resolveAuxiliaryExecution(memory): no model (unconfigured, fallback=chat)
++1357ms [memory-ticker] week.md 迁移失败: memory slot resolved to null (no model configured and no chat fallback)
++1357ms [aux-resolver] resolveAuxiliaryExecution(memory): no model (unconfigured, fallback=chat)
++1357ms [server] [init] 1 个 agent 已加载配置，焦点 runtime 已就绪
++1357ms [server] [init] 2/5 1 个 agent 已就绪
++1357ms [server] [init] 3/5 ResourceLoader 初始化...
++1358ms [memory-ticker] compileDaily 失败: memory slot resolved to null (no model configured and no chat fallback)
++1358ms [aux-resolver] resolveAuxiliaryExecution(memory): no model (unconfigured, fallback=chat)
++1359ms [memory-ticker] compileToday(daily) 失败: memory slot resolved to null (no model configured and no chat fallback)
++1359ms [aux-resolver] resolveAuxiliaryExecution(memory): no model (unconfigured, fallback=chat)
++1359ms [memory-ticker] compileFacts 失败: memory slot resolved to null (no model configured and no chat fallback)
++1361ms [agent] Lingxi 记忆编译完成，system prompt 已刷新
++1361ms [aux-resolver] resolveAuxiliaryExecution(summarize): no model (unconfigured, fallback=chat)
++1362ms [aux-resolver] resolveAuxiliaryExecution(memory): no model (unconfigured, fallback=chat)
++1362ms [memory-ticker] deep-memory 失败: memory slot resolved to null (no model configured and no chat fallback)
++1362ms [memory-ticker] 每日任务部分失败，已完成: []，1 小时后重试未完成步骤
++1362ms [agent-mgr] [description] lingxi: 生成跳过（LLM 不可用或返回空）
++1362ms [aux-resolver] resolveAuxiliaryExecution(memory): no model (unconfigured, fallback=chat)
++1362ms [memory-ticker] compileToday 失败: memory slot resolved to null (no model configured and no chat fallback)
++1370ms [server] [init] 3/5 ResourceLoader 完成 (12ms, 20 skills, 16 external)
++1370ms [server] [init] 4/5 发现可用模型...
++1378ms [server] [init] 4/5 找到 0 个模型: 
++1378ms [engine] ⚠ 未找到可用模型，请在设置中配置 API key
++1380ms [server] ✿ 沙盒已启用
++1380ms [aux-resolver] resolveAuxiliaryExecution(summarize): no model (unconfigured, fallback=chat)
++1384ms [server] ✿ 初始化完成（0.1s）
++1384ms [server] ② engine.init 完成
++1385ms [server] [proxy] 出站流量正经由系统代理 http://127.0.0.1:7890；若需直连，请在设置 > 网络中切换为「直连」模式。 (Outbound is routed via system proxy http://127.0.0.1:7890; switch to "direct" in Settings > Network to bypass it.)
++1385ms [aux-resolver] resolveAuxiliaryExecutionSync(summarize): no model (unconfigured, fallback=chat)
++1386ms [agent-mgr] [description] lingxi: 生成跳过（LLM 不可用或返回空）
++1394ms [plugin-manager] loading plugin "beautify"...
++1394ms [plugin-manager] loading "beautify" tools...
++1398ms [plugin-manager] loaded "beautify" tools (4ms)
++1398ms [plugin-manager] loading "beautify" configuration...
++1398ms [plugin-manager] loaded "beautify" configuration (0ms)
++1398ms [plugin-manager] loading "beautify" lifecycle import...
++1398ms [plugin-manager] loaded "beautify" lifecycle import (0ms)
++1398ms [plugin-manager] loading "beautify" lifecycle onload...
++1399ms [plugin:beautify] beautify plugin loaded
++1399ms [plugin-manager] loaded "beautify" lifecycle onload (1ms)
++1399ms [plugin-manager] plugin "beautify" loaded (5ms)
++1399ms [plugin-manager] loading plugin "jimeng-cli"...
++1399ms [plugin-manager] loading "jimeng-cli" providers...
++1399ms [plugin-manager] loaded "jimeng-cli" providers (0ms)
++1399ms [plugin-manager] loading "jimeng-cli" lifecycle import...
++1402ms [plugin-manager] loaded "jimeng-cli" lifecycle import (3ms)
++1402ms [plugin-manager] loading "jimeng-cli" lifecycle onload...
++1402ms [media] adapter registered: jimeng-cli-images
++1402ms [plugin:jimeng-cli] jimeng-cli adapter registered: jimeng-cli-images
++1402ms [media] adapter registered: jimeng-cli-videos
++1402ms [plugin:jimeng-cli] jimeng-cli adapter registered: jimeng-cli-videos
++1402ms [plugin-manager] loaded "jimeng-cli" lifecycle onload (0ms)
++1402ms [plugin-manager] plugin "jimeng-cli" loaded (3ms)
++1403ms [plugin-manager] loading plugin "media"...
++1403ms [plugin-manager] loading "media" tools...
++1405ms [plugin-manager] loaded "media" tools (2ms)
++1405ms [plugin-manager] plugin "media" loaded (2ms)
++1405ms [plugin-manager] loading plugin "office"...
++1405ms [plugin-manager] loading "office" tools...
++1407ms [plugin-manager] loaded "office" tools (2ms)
++1407ms [plugin-manager] plugin "office" loaded (2ms)
++1416ms [cron] 调度器已启动（间隔 60 秒）
++1416ms [scheduler] Studio cron 已启动
++1419ms [server] ⚠ 无可用模型，跳过 session 创建：available models list is empty (no provider has valid api_key + models)
++1426ms [server] LingxiAgent Server 运行在 http://127.0.0.1:51293
++1426ms [server] ready: port=51293
++1426ms [server] Bridge manager 初始化...
++1437ms [READY server-info.json visible] ready=true
++1563ms [server] Bridge manager 初始化完成
++1563ms [aux-resolver] resolveAuxiliaryExecution(summarize): no model (unconfigured, fallback=chat)
++1576ms [agent-mgr] [description] lingxi: 生成跳过（LLM 不可用或返回空）
++1639ms [server] 
++1639ms 正在关闭...
++1639ms [server] HTTP server 已关闭
++1641ms [media] adapter unregistered: jimeng-cli-videos
++1641ms [media] adapter unregistered: jimeng-cli-images
++1678ms [session] sessions cleaned up
++1683ms [server] Hub + Engine 已清理
+[bench-startup-phases] child_exit=0 ready=true

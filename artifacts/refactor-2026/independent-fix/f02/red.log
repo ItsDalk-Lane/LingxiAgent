@@ -1,0 +1,271 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stdout | tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 拒绝错误 cwd
+[sessions] 新建 session {"hasCwd":false,"memoryEnabled":true,"customAgent":false}
+
+stdout | tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 拒绝错误 cwd
+[sessions] session 创建完成
+
+stdout | tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 拒绝错误 workspaceMountId
+[sessions] 新建 session {"hasCwd":false,"memoryEnabled":true,"customAgent":false}
+
+stdout | tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 拒绝错误 workspaceMountId
+[sessions] session 创建完成
+
+stdout | tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 拒绝错误 workspaceFolders
+[sessions] 新建 session {"hasCwd":false,"memoryEnabled":true,"customAgent":false}
+
+stdout | tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 拒绝错误 workspaceFolders
+[sessions] session 创建完成
+
+stdout | tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 拒绝错误 projectId
+[sessions] 新建 session {"hasCwd":false,"memoryEnabled":true,"customAgent":false}
+
+stdout | tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 拒绝错误 projectId
+[sessions] session 创建完成
+
+stdout | tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 不静默过滤错误目录元素
+[sessions] 新建 session {"hasCwd":false,"memoryEnabled":true,"customAgent":false}
+
+stdout | tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 不静默过滤错误目录元素
+[sessions] session 创建完成
+
+ ❯ tests/session-create-input-contract.test.ts (44 tests | 36 failed) 160ms
+     × C09/C11 new 拒绝 {broken 并无写入/模型副作用 48ms
+     × C09/C11 new 拒绝 null 并无写入/模型副作用 9ms
+     × C09/C11 new 拒绝 [] 并无写入/模型副作用 4ms
+     × C09/C11 new 拒绝 42 并无写入/模型副作用 3ms
+     × C09/C11 new 拒绝 "string" 并无写入/模型副作用 3ms
+     × C09/C11 new 拒绝 true 并无写入/模型副作用 3ms
+     × C10/C11 new 拒绝错误 cwd 4ms
+     × C10/C11 new 拒绝错误 workspaceMountId 3ms
+     × C10/C11 new 拒绝错误 workspaceFolders 3ms
+     × C10/C11 new 拒绝错误 memoryEnabled 3ms
+     × C10/C11 new 拒绝错误 agentId 2ms
+     × C10/C11 new 拒绝错误 thinkingLevel 2ms
+     × C10/C11 new 拒绝错误 projectId 3ms
+     × C10/C11 new 拒绝错误 currentAgentId 3ms
+     × C10/C11 new 不静默过滤错误目录元素 3ms
+     × C13 new 只读主体不能用默认输入创建 2ms
+     × C13 new 错误主体无授权不创建 2ms
+     × C09/C11 new-detached 拒绝 {broken 并无写入/模型副作用 3ms
+     × C09/C11 new-detached 拒绝 null 并无写入/模型副作用 3ms
+     × C09/C11 new-detached 拒绝 [] 并无写入/模型副作用 3ms
+     × C09/C11 new-detached 拒绝 42 并无写入/模型副作用 2ms
+     × C09/C11 new-detached 拒绝 "string" 并无写入/模型副作用 2ms
+     × C09/C11 new-detached 拒绝 true 并无写入/模型副作用 2ms
+     × C10/C11 new-detached 拒绝错误 cwd 2ms
+     × C10/C11 new-detached 拒绝错误 workspaceMountId 2ms
+     × C10/C11 new-detached 拒绝错误 workspaceFolders 2ms
+     × C10/C11 new-detached 拒绝错误 memoryEnabled 2ms
+     × C10/C11 new-detached 拒绝错误 agentId 2ms
+     × C10/C11 new-detached 拒绝错误 thinkingLevel 3ms
+     × C10/C11 new-detached 拒绝错误 projectId 2ms
+     × C10/C11 new-detached 拒绝错误 permissionMode 2ms
+     × C10/C11 new-detached 拒绝错误 forkedFromSessionId 2ms
+     × C10/C11 new-detached 拒绝错误 recordWorkspaceHistory 2ms
+     × C10/C11 new-detached 不静默过滤错误目录元素 2ms
+     × C13 new-detached 只读主体不能用默认输入创建 2ms
+     × C13 new-detached 错误主体无授权不创建 2ms
+
+ Test Files  1 failed (1)
+      Tests  36 failed | 8 passed (44)
+   Start at  17:43:18
+   Duration  1.42s (transform 599ms, setup 18ms, import 1.17s, tests 160ms, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 36 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C09/C11 new 拒绝 {broken 并无写入/模型副作用
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C09/C11 new 拒绝 null 并无写入/模型副作用
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C09/C11 new 拒绝 [] 并无写入/模型副作用
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C09/C11 new 拒绝 42 并无写入/模型副作用
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C09/C11 new 拒绝 "string" 并无写入/模型副作用
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C09/C11 new 拒绝 true 并无写入/模型副作用
+AssertionError: expected [ 'security', 'sentinel' ] to deeply equal [ 'sentinel' ]
+
+- Expected
++ Received
+
+  [
++   "security",
+    "sentinel",
+  ]
+
+ ❯ noEffects tests/session-create-input-contract.test.ts:63:31
+     61|     expect(engine.setSessionForkedFrom).not.toHaveBeenCalled();
+     62|     expect(engine.modelCall).not.toHaveBeenCalled();
+     63|     expect(readdirSync(home)).toEqual(['sentinel']);
+       |                               ^
+     64|     expect(readFileSync(path.join(home, 'sentinel'), 'utf8')).toBe('un…
+     65|   }
+ ❯ tests/session-create-input-contract.test.ts:72:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/36]⎯
+
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 拒绝错误 cwd
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 拒绝错误 workspaceMountId
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 拒绝错误 workspaceFolders
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 拒绝错误 projectId
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new-detached 拒绝错误 cwd
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new-detached 拒绝错误 workspaceMountId
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new-detached 拒绝错误 workspaceFolders
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new-detached 拒绝错误 memoryEnabled
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new-detached 拒绝错误 agentId
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new-detached 拒绝错误 thinkingLevel
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new-detached 拒绝错误 projectId
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new-detached 拒绝错误 permissionMode
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new-detached 拒绝错误 forkedFromSessionId
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new-detached 拒绝错误 recordWorkspaceHistory
+AssertionError: expected 200 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 200
+
+ ❯ tests/session-create-input-contract.test.ts:83:28
+     81|       it(`C10/C11 ${endpoint} 拒绝错误 ${field}`, async () => {
+     82|         const res = await post(endpoint, JSON.stringify({ [field]: val…
+     83|         expect(res.status).toBe(400);
+       |                            ^
+     84|         expect(await res.json()).toMatchObject({ code: 'invalid_field_…
+     85|         noEffects();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/36]⎯
+
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 拒绝错误 memoryEnabled
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 拒绝错误 agentId
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 拒绝错误 thinkingLevel
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 拒绝错误 currentAgentId
+AssertionError: expected [ 'security', 'sentinel' ] to deeply equal [ 'sentinel' ]
+
+- Expected
++ Received
+
+  [
++   "security",
+    "sentinel",
+  ]
+
+ ❯ noEffects tests/session-create-input-contract.test.ts:63:31
+     61|     expect(engine.setSessionForkedFrom).not.toHaveBeenCalled();
+     62|     expect(engine.modelCall).not.toHaveBeenCalled();
+     63|     expect(readdirSync(home)).toEqual(['sentinel']);
+       |                               ^
+     64|     expect(readFileSync(path.join(home, 'sentinel'), 'utf8')).toBe('un…
+     65|   }
+ ❯ tests/session-create-input-contract.test.ts:85:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/36]⎯
+
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new 不静默过滤错误目录元素
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C10/C11 new-detached 不静默过滤错误目录元素
+AssertionError: expected 200 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 200
+
+ ❯ tests/session-create-input-contract.test.ts:90:26
+     88|     it(`C10/C11 ${endpoint} 不静默过滤错误目录元素`, async () => {
+     89|       const res = await post(endpoint, JSON.stringify({ workspaceFolde…
+     90|       expect(res.status).toBe(400);
+       |                          ^
+     91|       expect(await res.json()).toMatchObject({ code: 'invalid_field_ty…
+     92|       noEffects();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/36]⎯
+
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C13 new 只读主体不能用默认输入创建
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C13 new-detached 只读主体不能用默认输入创建
+AssertionError: expected [ 'security', 'sentinel' ] to deeply equal [ 'sentinel' ]
+
+- Expected
++ Received
+
+  [
++   "security",
+    "sentinel",
+  ]
+
+ ❯ noEffects tests/session-create-input-contract.test.ts:63:31
+     61|     expect(engine.setSessionForkedFrom).not.toHaveBeenCalled();
+     62|     expect(engine.modelCall).not.toHaveBeenCalled();
+     63|     expect(readdirSync(home)).toEqual(['sentinel']);
+       |                               ^
+     64|     expect(readFileSync(path.join(home, 'sentinel'), 'utf8')).toBe('un…
+     65|   }
+ ❯ tests/session-create-input-contract.test.ts:115:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/36]⎯
+
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C13 new 错误主体无授权不创建
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C13 new-detached 错误主体无授权不创建
+AssertionError: expected [ 'security', 'sentinel' ] to deeply equal [ 'sentinel' ]
+
+- Expected
++ Received
+
+  [
++   "security",
+    "sentinel",
+  ]
+
+ ❯ noEffects tests/session-create-input-contract.test.ts:63:31
+     61|     expect(engine.setSessionForkedFrom).not.toHaveBeenCalled();
+     62|     expect(engine.modelCall).not.toHaveBeenCalled();
+     63|     expect(readdirSync(home)).toEqual(['sentinel']);
+       |                               ^
+     64|     expect(readFileSync(path.join(home, 'sentinel'), 'utf8')).toBe('un…
+     65|   }
+ ❯ tests/session-create-input-contract.test.ts:121:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/36]⎯
+
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C09/C11 new-detached 拒绝 {broken 并无写入/模型副作用
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C09/C11 new-detached 拒绝 [] 并无写入/模型副作用
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C09/C11 new-detached 拒绝 42 并无写入/模型副作用
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C09/C11 new-detached 拒绝 "string" 并无写入/模型副作用
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C09/C11 new-detached 拒绝 true 并无写入/模型副作用
+AssertionError: expected 200 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 200
+
+ ❯ tests/session-create-input-contract.test.ts:70:28
+     68|       it(`C09/C11 ${endpoint} 拒绝 ${body} 并无写入/模型副作用`, async () => {
+     69|         const res = await post(endpoint, body!);
+     70|         expect(res.status).toBe(400);
+       |                            ^
+     71|         expect(await res.json()).toMatchObject({ code });
+     72|         noEffects();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/36]⎯
+
+ FAIL  tests/session-create-input-contract.test.ts > F02 会话创建真实 HTTP 输入契约 C09-C13 > C09/C11 new-detached 拒绝 null 并无写入/模型副作用
+AssertionError: expected 500 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 500
+
+ ❯ tests/session-create-input-contract.test.ts:70:28
+     68|       it(`C09/C11 ${endpoint} 拒绝 ${body} 并无写入/模型副作用`, async () => {
+     69|         const res = await post(endpoint, body!);
+     70|         expect(res.status).toBe(400);
+       |                            ^
+     71|         expect(await res.json()).toMatchObject({ code });
+     72|         noEffects();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/36]⎯
+

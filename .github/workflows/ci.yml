@@ -81,6 +81,14 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=4096
         run: npm run typecheck
 
+      # P01-T04/T06：核心契约 strict 门禁 + 模块依赖纪律（SDK 直导/深路径、
+      # electron 渗入核心、适配层反向依赖、计算式动态加载保守裁决）。
+      - name: Core contracts strict typecheck
+        run: npm run typecheck:core-contracts
+
+      - name: Dependency boundary check
+        run: npm run check:dependency-boundaries
+
       - name: Lint
         run: npm run lint
 

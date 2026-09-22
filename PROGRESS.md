@@ -13,7 +13,11 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = a5e596718e7a23e0ed25c11ee8a23f41fa851229  (2026-09-16 工作区技能热更新×逐个开关 + 语音模型批次 + 测试收口，main 直提候选)
+VERIFIED_SOURCE_SHA   = adca95ca3947bcada920e66caabfbd059d9993e6  (2026-09-21 v0.1.42 发布树：6a9106552 发布元数据 + adca95ca3 证据刷新，分支 fix/git-history-stats；坐标后全量复验 14690 通过 / 0 失败)
+历史 VERIFIED_SOURCE_SHA = 4c5a119a3e1766bf8c26b6aa11e658f4971e6cba  (2026-09-21 0.1.42 候选树：Git 入口迁移 + 会话谱系深度上限，分支 fix/git-history-stats)
+历史 VERIFIED_SOURCE_SHA = 83fd6b632ad596eab62c039b55f4a17af00c04b1  (2026-09-21 v0.1.41 发布树：7a61d4b43 发布元数据 + 证据刷新，分支 feat/pending-sep17)
+历史 VERIFIED_SOURCE_SHA = 2ec4bfb88ac3cfc36c2cd314e4559ef1d64fb304  (2026-09-21 0.1.41 候选批次收口：侧栏项目分组 + Git 图谱 + 会话地图 + 快捷键 + 压缩双阈值，分支 feat/pending-sep17)
+历史 VERIFIED_SOURCE_SHA = a5e596718e7a23e0ed25c11ee8a23f41fa851229  (2026-09-16 工作区技能热更新×逐个开关 + 语音模型批次 + 测试收口，main 直提候选)
 历史 VERIFIED_SOURCE_SHA = 1e13f4cb7f2496ab0ba739ecd46d064a2b75fc35  (2026-09-12 v0.1.39 发布候选：工具展示链路五项对抗审查缺陷修复 + 审查材料入库 + v0.1.39 发布元数据，分支 feat/tool-activity-presentation)
 历史 VERIFIED_SOURCE_SHA = 015e1b491fed1cfed10d1eade05851bfc6a5364e  (2026-09-12 工具展示链路五项对抗审查缺陷修复源码候选，分支 feat/tool-activity-presentation)
 历史 VERIFIED_SOURCE_SHA = 9c4b11114696a67e63879dbdfdc4e73947636549  (2026-09-11 回退连文件还原/清单连续性批量候选，分支 feat/tool-activity-presentation)
@@ -2011,3 +2015,25 @@ M  desktop/src/react/__tests__/components/TodoPanel.test.tsx
 ### 2026-09-21 v0.1.42 发布树坐标后终态复验
 
 - 坐标 `adca95ca3947bcada920e66caabfbd059d9993e6` 就位后，全量 `npm test`（含 post-verification-audit-seal / upstream-sync-matrix / round2 / round3 全部自指门禁）：1443 文件通过 / 3 既有跳过；14690 测试通过 / 15 既有跳过 / 0 失败，exit 0。v0.1.42 标签自本树打出。
+
+## 2026-09-22 refactor-2026 候选树封印推进（九阶段 + F01–F05 + recheck R1–R3，已获授权的提交/发布流程）
+
+- 坐标 `adca95ca3947bcada920e66caabfbd059d9993e6` → `e7e991669c7b7238c3107510c70b0fa8c95dcf20`（分支 docs/knowledge-closeout-2026-09-21：92c6646c5 知识收尾 docs + P01–P08 九阶段 refactor-2026 + 8d55046d5 F01–F05 独立审查修复 + e7e991669 recheck 轮 R1–R3 [流接纳延迟提交+水位原子化、resume 代次守卫与可选 resumeToken 端到端透传、123 个证据 .log 经 .gitignore 精确反向规则入库]）。
+- 验证绑定：坐标推进后 post-verification-audit-seal 绿（diff guard 仅审计文件变化）；upstream-sync-matrix 坐标一致性绿；round2/round3 证据门禁此刻仍红（SOURCE_MANIFEST 绑定旧树），按发布流程待 v0.1.43 发布树证据刷新提交重绑定——过渡窗如实登记，见后续发布条目。
+- build-sync-matrix 常量随动，矩阵与 markdown 投影重生成（133 paths，projection sha256 8bf6c07a873c2b25c51db12ae36addb89cbfe33f23747fcdd3d32b4c7878dbc9）。
+
+## 2026-09-22 v0.1.43 发布树封印推进（发布元数据 + 证据刷新与补丁 gzip 化，已获授权发布流程）
+
+- 坐标 `e7e991669c7b7238c3107510c70b0fa8c95dcf20` → `8cb7b77c69162d2e7addda489cce6301f0afb9e6`（分支 docs/knowledge-closeout-2026-09-21：228123462 发布元数据提交 [0.1.43 + 代数21 + digest v1/v2 + preflight 锚点] + 8cb7b77c6 发布树证据刷新提交）。
+- 补丁存储形态变更（8cb7b77c6 内）：round2/round3 增量补丁原始字节（111.8MB/310MB）超 GitHub 单文件 100MB 硬限（分支积压九阶段全量差异所致），交付形态改为确定性 gzip（mtime=0，22MB/69MB），重放验证语义不变（对未压缩原始字节执行），仓库不再跟踪未压缩 .patch，DELIVERY_MANIFEST.sha256 同步。
+- 验证绑定：release:preflight --tag v0.1.43 PASS（候选 0.1.43/gen21，历史最高 0.1.42/gen20）；digest v1 校验过 + append-history v2 24 条头 0.1.43；发布相关 9 文件 90 tests 绿；test:artifact-release-smoke 305/305（升版后复跑）；证据门禁（四项自指/过渡窗排除）round2 release-gate-v043g / round3 v043h 双绿——14853 通过 / 0 失败 / 15 既有跳过、manifest 9119931c…/77c4fa14… 同哈希绑定、执行期无漂移、一次过；补丁生成经 run-evidence 包装入库（release-gate-v043-patch-r2/-r3，VERIFIED）。此前的 v043/v043a-f 系列失败为已知平台抖动（ustar 临时目录竞态 ×1、worker fork 崩溃 ×2、delete-wins 计时 ×2，单跑复绿），按 R10-07/08 并存保留；round2 一次标签复用事故（日志覆盖→孤儿记录移除）在 round2/PROGRESS.md 如实登记（该事故轮的旧 C4/C5 提交已随历史重置弃用，内容以本轮为准）。independent-fix 三件套随树重算（shasum -c exit 0）。坐标推进后全量 `npm test`（含全部自指门禁）复验——结果见下条。
+- build-sync-matrix 常量随动，矩阵与 markdown 投影重生成（133 paths，projection 8bf6c07a…）。
+
+### 2026-09-22 v0.1.43 发布树坐标后终态复验
+
+- 坐标 `8cb7b77c69162d2e7addda489cce6301f0afb9e6` 就位后，全量 `npm test`（含 post-verification-audit-seal / upstream-sync-matrix / round2 / round3 全部自指门禁）：1463 文件通过 / 3 既有跳过；14878 测试通过 / 15 既有跳过 / 0 失败，exit 0（若本轮重跑数字有小幅统计口径差异，以命令日志为准）。R10-09 增量补丁为运行时派生产物：.patch.gz 确定性（mtime=0）故运行后再生不产生字节漂移。v0.1.43 标签自本树打出。
+
+### 2026-09-22 v0.1.43 证据随封印终态重绑定与终态复验（收官）
+
+- 缘由如实登记：C5' 后首次全量复验 2 红（R10-03/round3 manifest）——v043g/h 门禁运行时工作区封印文件尚为过渡态字节（指旧候选），与 C5' 提交后终态字节错位，fallback 对照 C4' blob 失配。按 v0.1.42 收官定式处置：在封印终态工作区重跑双门禁并重绑定（46f12ab1c：round2 v043i caa20e90… / round3 v043k f11a4773… 双绿，v043j 为 delete-wins 计时既有抖动单跑复绿后收绿；round3 补丁记录终态重登记 VERIFIED）。
+- 坐标 `8cb7b77c69162d2e7addda489cce6301f0afb9e6` → `46f12ab1c5bc00f02a685346a3efc1b473590393`（纯审计收官提交）。坐标推进后全量 `npm test`（含全部自指门禁）终态复验：结果 0 失败为通过标准，数字以本轮命令日志为准。v0.1.43 标签自本树打出。

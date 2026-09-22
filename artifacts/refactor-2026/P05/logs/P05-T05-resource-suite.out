@@ -1,0 +1,18 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/resource-envelope.test.ts (3 tests) 68ms
+ ✓ tests/resource-access-service.test.ts (5 tests) 53ms
+ ✓ tests/file-history-route.test.ts (5 tests) 66ms
+ ✓ tests/http-route-security.test.ts (22 tests) 90ms
+ ✓ tests/resource-ticket-service.test.ts (1 test) 97ms
+ ✓ tests/resource-io-route.test.ts (11 tests) 68ms
+ ✓ tests/resource-io-session-file-resolver.test.ts (4 tests) 52ms
+ ✓ tests/file-history-store.test.ts (9 tests) 88ms
+ ✓ tests/file-history-service.test.ts (8 tests) 301ms
+
+ Test Files  9 passed (9)
+      Tests  68 passed (68)
+   Start at  10:44:12
+   Duration  466ms (transform 562ms, setup 177ms, import 457ms, tests 884ms, environment 0ms)
+

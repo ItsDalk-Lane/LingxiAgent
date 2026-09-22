@@ -1,0 +1,15 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/server-composition-boundary.test.ts (10 tests) 10661ms
+     ✓ full composition supplies a non-empty builtinMediaAdapters list  1120ms
+     ✓ importing server/index.ts alone defines startServer but starts nothing (no port bind, no server-info.json, clean exit)  1191ms
+     ✓ serves an open-root route and a full-root (closed-product) route behind the same global auth middleware  1655ms
+     ✓ runs the full chain without any desktop, rejects malformed JSON at the HTTP entry (A07), and keeps serving after a desktop-channel notify (A10)  2205ms
+     ✓ starts with a pending task record, refuses a second writer, releases the port on SIGTERM, and restarts cleanly  4460ms
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  00:14:56
+   Duration  10.94s (transform 729ms, setup 19ms, import 196ms, tests 10.66s, environment 0ms)
+

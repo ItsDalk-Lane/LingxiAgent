@@ -10,6 +10,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createModelObservabilityTestHarness } from "../lib/llm/model-observability-testing.ts";
 import { createModelCallRecorder } from "../lib/llm/model-call-recorder.ts";
+import { requireModelAttemptId, requireModelCallId, requireModelTraceId } from "../shared/identity-brands.ts";
 import { createModelCallPayloadCaptureSession, type ModelCallPayloadCaptureSession } from "../lib/llm/model-call-payload-capture.ts";
 
 const MODEL_PI = { provider: "anthropic", modelId: "claude-x", api: "anthropic-messages" };
@@ -52,12 +53,12 @@ describe("Model Observability Durable Matrix (MC-01～MC-10)", () => {
     const recorder = createModelCallRecorder({
       observer: harness.handle.observer,
       identity: {
-        mintCallId: () => callId,
+        mintCallId: () => requireModelCallId(callId),
         mintAttemptId: (() => {
           let n = 0;
-          return () => `${callId}_att_${++n}`;
+          return () => requireModelAttemptId(`ma_${callId}_att_${++n}`);
         })(),
-        mintTraceId: () => traceId,
+        mintTraceId: () => requireModelTraceId(traceId),
       },
       context: { callId, traceId, model, source, attribution: { kind: "session", sessionId: `sess_${callId}` } },
     });

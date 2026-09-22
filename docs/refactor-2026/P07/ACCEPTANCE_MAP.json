@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "stage_id": "P07",
+  "generated_at": "2026-09-22",
+  "head_sha": "52dbb45f9cc4eaea5b2194780a57a8899b30f21a",
+  "note": "本阶段生产代码零改动（唯一实现类产出=2 个新测试文件 + 8 个基准工具 + 文档/样本/日志）。全部性能样本先过工作量等价断言再比较；无任何优化宣称来自本阶段代码改动。",
+  "cases": [
+    {
+      "id": "P07-A01",
+      "scene": "相同负载（前后版本同 fixture 与功能开关）",
+      "test_path": "artifacts/refactor-2026/P07/tools/bench-startup.mjs（复用 P00 工具）+ artifacts/refactor-2026/P00/tools/bench-compare.mjs + scripts/benchmark-history-read-directory.mjs",
+      "test_name": "W1×10 / W2 phase A（n=1000,10000）/ W5 配对复测",
+      "fixture_sha256": "history v3 夹具 n=1000 d2b724253f961985fbfebf51433ae7126743c6a3051dec18a3138733f6dd8365；n=10000 09918383e568be23e7e0fd0e3ed6e546fe952e30981e6a3478949d5de6123（fixture audit 交叉核对通过）",
+      "production_entry": "server/main-full.ts 冷启动；server/routes/sessions.ts 历史分页；/api/input-drafts",
+      "expected": "任务数/输出/工具与资料相同，否则比较无效",
+      "actual": "W1 ready 10/10、同 workload digest；W2 fullFileReadCalls/请求=0、jsonlParse 103/页恒定、页数/唯一性断言通过；W5 200/200 ok；W3L2 输出逐字节 all-equal；功能开关零变化（本阶段零生产 diff）",
+      "command_ids": ["P07-T01-bench-startup", "P07-T01-bench-history", "P07-T01-bench-memory-r2"],
+      "status": "PASS",
+      "evidence": "artifacts/refactor-2026/P07/samples/{startup-p07-b1.json,history-p07/,memory-p07.json}；bench-compare 判定 IMPROVED -12.0%（正确性零容忍先行通过）"
+    },
+    {
+      "id": "P07-A02",
+      "scene": "启动可操作（可选模块初始化较慢；启动即提交普通任务）",
+      "test_path": "artifacts/refactor-2026/P07/tools/bench-startup-phases.mjs + tests/server-startup-diagnostics-contract.test.ts（既有，:491 bridge 延后结构锁定）",
+      "test_name": "阶段计时（spawn→server-info.json）+ 'keeps bridge platform dependencies out of the server readiness path'",
+      "fixture_sha256": null,
+      "production_entry": "server/index.ts startServer（bind:406 → engine.init:445 → server-info.json:1277 → setImmediate bridge:1312）",
+      "expected": "必要安全已就绪，可选状态明确；非只窗口可见",
+      "actual": "server-info.json 在 engine.init（迁移/凭证权限自愈/身份）与路由挂载完成后才写入；期间 HTTP 返回 503 server_starting（不虚报可用）；Bridge 经 setImmediate 后台加载且 getState() 暴露 ready/initializing/error 三态；计时终点=server-info.json（非 window.show）",
+      "command_ids": ["P07-T01-startup-phases-r2", "P07-T07-directed-suites"],
+      "status": "PASS",
+      "evidence": "logs/P07-T01-startup-phases-r2.out（+1426ms ready，各阶段增量）+ docs/refactor-2026/P07/STARTUP_CRITICAL_PATH.md §1–§2"
+    },
+    {
+      "id": "P07-A03",
+      "scene": "首次调用并发（惰性模块未加载，两个请求同时到达）",
+      "test_path": "tests/p07-startup-lazy-init.test.ts（本阶段新增）",
+      "test_name": "并发 ensureReady ×2：动态加载恰好一次 / 初始化失败错误可观察可重试 / 成功后后续调用不再触发加载（3 例）",
+      "fixture_sha256": null,
+      "production_entry": "server/index.ts:860 startBridgeManager（生产闭包源码提取+vm 逐字执行；bridgeManagerRef.ensureReady）",
+      "expected": "初始化一次，错误/取消传播明确",
+      "actual": "loader 恰好 1 次、双调用同实例；失败收口 null + getState().error 可观察 + 可重试；后续 5 次调用 loader 总数仍 1",
+      "command_ids": ["P07-T02-lazy-init", "P07-T07-lazy-init-rerun"],
+      "status": "PASS",
+      "evidence": "logs/P07-T02-lazy-init.out（3 例绿）；logs/P07-T07-lazy-init-rerun.out（类型修复后复跑绿）"
+    },
+    {
+      "id": "P07-A04",
+      "scene": "历史冷暖分离（新索引和已有索引两个副本）",
+      "test_path": "scripts/benchmark-history-read-directory.mjs --phase A / --phase B",
+      "test_name": "冷首页（全新环境×3）与热页（20/200 样本）分开报告 + 完整翻页页数/唯一性断言",
+      "fixture_sha256": "同 A01（两 phase 同 fixture）",
+      "production_entry": "server/routes/sessions.ts:316 + server/history-read/{cache,scan,directory}.ts",
+      "expected": "首建与热分页分开报告，内容等价",
+      "actual": "冷 n=1000/10000 = 10.8/72.6ms（首建索引单列）；热 p50 = 0.894/0.710ms（phase A）、0.913/0.715ms（phase B，注入可观测 cache）；页数 21/201 与输出唯一性断言两 phase 均通过",
+      "command_ids": ["P07-T01-bench-history", "P07-T03-bench-history-phaseB"],
+      "status": "PASS",
+      "evidence": "samples/history-p07/summary-a.json + samples/history-p07-phaseB/summary-b.json"
+    },
+    {
+      "id": "P07-A05",
+      "scene": "缓存失效（文件追加/截断/替换且路径相同）",
+      "test_path": "artifacts/refactor-2026/P07/tools/bench-soak-resources.mjs（组件 3）+ tests/history-read-directory-cache.test.ts / history-read-directory-counters.test.ts（既有）",
+      "test_name": "soak（P07-FIXR1 修正断言）：每批驻留文件外部追加→probe 不得判 valid（实际判定 append_candidate；12/12 批）；既有：probe 四条件/版本校验/分支隔离",
+      "fixture_sha256": null,
+      "production_entry": "server/history-read/cache.ts probe（fstat 五元组 size/mtimeMs/dev/ino/ctimeMs + publicRevision + head 三态 + locator）",
+      "expected": "不返回旧内容或错页，资源范围不串",
+      "actual": "soak 12/12 批外部追加后 probe 判非 valid（实际判定 append_candidate：目录保留、非 invalidate；P07-FIXR1 前的 probe_invalidated=1 计数基于恒真断言 !== \"fresh\"，不构成证明，已废弃并改为 probe_append_detected 承重断言）；失效基于五元组（截断/替换改变 size/ino 必失配，非 mtime 单一假设——验收 CE-2 实测四类变更判定全部正确）；每批 rebuilds=12/hits=6 由 12 会话>8 槽 LRU 颠簸驱动；既有测试锁定 invalidate/版本拒绝/分支资源范围",
+      "command_ids": ["P07-T06-bench-soak-r2", "P07-T07-directed-suites", "P07-FIXR1-soak-original", "P07-FIXR1-negprobe-inject-run", "P07-FIXR1-negprobe-verify"],
+      "status": "PASS",
+      "evidence": "samples/soak-resources.json（每批 rebuilds=12/hits=6、cache_final_stats.invalidations={}）+ logs/P07-FIXR1-soak-original.json（修正后断言原始规格复跑：全批 probe_verdict_after_append=append_candidate、exit 0）+ P07_ACCEPTANCE_REVIEW.md CE-2"
+    },
+    {
+      "id": "P07-A06",
+      "scene": "流最后事件（更新合并窗口内收到 finish/error/file）",
+      "test_path": "desktop/src/react/__tests__/chat-performance/p07-stream-buffer-wallclock.test.ts（本阶段新增，例 2）+ W3 Layer1 基准尾帧断言",
+      "test_name": "合并窗口内 content_block 与终局事件不丢（A06 形状，真实计时器）",
+      "fixture_sha256": null,
+      "production_entry": "desktop/src/react/hooks/use-stream-buffer.ts（content_block→publishBoundary；assistant_run_end→finalizeRun exactly-once）+ server/routes/chat.ts emitStreamEvent",
+      "expected": "最终 delta、错误与附件不丢",
+      "actual": "500 delta 后文件块+附件后正文 TAIL_AFTER_FILE+segment_end+run_end：全部保留（text 前缀完整、endsWith TAIL、file block 存在、markdown_parse=0）；W3L1 每轮尾帧 assistant_segment_end→model_turn_end→assistant_run_end 序列完整",
+      "command_ids": ["P07-T04-ui-wallclock", "P07-T01-bench-w3-layer1-r2"],
+      "status": "PASS",
+      "evidence": "logs/P07-T04-ui-wallclock.out（2 例绿）+ samples/stream-throughput.json last_event_types_sample"
+    },
+    {
+      "id": "P07-A07",
+      "scene": "交互响应（持续输出长代码/Markdown，用户中文输入与选中）",
+      "test_path": "desktop/src/react/__tests__/chat-performance/{p07-stream-buffer-wallclock,chat-performance-baseline}.test.ts（后者既有）",
+      "test_name": "canonical 50,000 delta wall-clock（真实计时器）+ 既有 fake-timer 基线 10k/50k/100k",
+      "fixture_sha256": null,
+      "production_entry": "desktop/src/react/hooks/use-stream-buffer.ts（STREAM_FLUSH_FPS=30 合并 + 语义边界立即发布）",
+      "expected": "交互正确，现有渲染规则不被任意切块破坏",
+      "actual": "50k delta 突发 15.6ms、探针最大漂移 8.7ms（<1 帧）、stream_flush=2、markdown_parse=0（不预解析、不切块）；本阶段渲染链零改动，输入法/选中/滚动/Markdown/代码块契约由既有 UI 测试族覆盖（全量 14797 绿）",
+      "command_ids": ["P07-T04-ui-wallclock", "P07-T07-directed-suites", "P07-T07-full-test"],
+      "status": "PASS",
+      "evidence": "logs/P07-T04-ui-wallclock.out（P07_UI_SAMPLE 行）+ docs/refactor-2026/P07/UI_PROFILE_REPORT.md §2–§3"
+    },
+    {
+      "id": "P07-A08",
+      "scene": "worker容量（超过固定并发上限的 CPU 任务：入队、取消、worker崩溃）",
+      "test_path": "tests/history-read-directory-cache.test.ts（X15/X16 既有）+ artifacts/refactor-2026/P07/tools/bench-soak-resources.mjs + W4-S3",
+      "test_name": "构建信号量（并发上限 2）+ per-key single-flight + soak 句柄有界 + 取消无孤儿",
+      "fixture_sha256": null,
+      "production_entry": "server/history-read/cache.ts（#acquireBuildPermit 信号量队列）；lib/ptc/ptc-runtime.ts:284（每次执行独立 worker：resourceLimits+wallTimer+finish terminate）",
+      "expected": "队列有界、任务归属可追、无孤儿资源",
+      "actual": "本阶段未引入任何新 worker 池（T05 决策：无实测 CPU 热点，见 A09）；既有有界设施复核：构建并发≤2+同 key 并发共享 lease（X15 测试）；PTC 每任务独立 worker 完成即 terminate、内存上限 maxOldGenerationSizeMb、超时 wallTimer；soak 12 批 active_resources 恒定（无孤儿句柄/定时器）；W4-S3 取消 5.2ms 进程树整组退出、哨兵存活",
+      "command_ids": ["P07-T07-directed-suites", "P07-T06-bench-soak-r2", "P07-T01-bench-w3l2-w4-r3"],
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P07/CPU_OFFLOAD_DECISION.md §2 + samples/soak-resources.json active_resources"
+    },
+    {
+      "id": "P07-A09",
+      "scene": "无CPU热点（profile 显示等待主要是外部网络）",
+      "test_path": "artifacts/refactor-2026/P07/samples/cpu-prof/child-startup.cpuprofile + samples/stream-model-layer.json",
+      "test_name": "启动 V8 剖析 + W3 Layer2 真实流式（本地 HTTP 替身）等待构成",
+      "fixture_sha256": null,
+      "production_entry": "（决策场景，无生产改动）",
+      "expected": "不强造 worker 改动，不承诺网络耗时降低",
+      "actual": "启动剖析：应用代码 self <3%，模块编译+I/O 主导；W3L2 满速本地替身 66k–100k deltas/s（真实网络下瓶颈为供应商节拍）；全部测量面无一段 CPU 阻塞超帧预算 → T05 判定无需卸载，零 worker 改动，无网络耗时宣称",
+      "command_ids": ["P07-T01-startup-phases-r2", "P07-T01-bench-w3l2-w4-r3"],
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P07/CPU_OFFLOAD_DECISION.md §1"
+    },
+    {
+      "id": "P07-A10",
+      "scene": "长运行资源（固定多轮会话/浏览器/任务循环）",
+      "test_path": "artifacts/refactor-2026/P07/tools/bench-soak-resources.mjs（12 批 ×2 次）",
+      "test_name": "stream store 20 会话×7000 事件全生命周期 + 终端 12×12 循环 + 历史目录 12 会话淘汰轮换",
+      "fixture_sha256": null,
+      "production_entry": "server/session-stream-store.ts；lib/terminal/terminal-session-manager.ts；server/history-read/cache.ts",
+      "expected": "无可复现无界增长，缓存上限有效",
+      "actual": "两次全量运行 verdict=NO_REPRODUCIBLE_UNBOUNDED_GROWTH（rss -1.0%/+0.3%，heap -19.1%/-2.8%，无逐批单调递增>5%）；retained≤5000、finish 全清场、cache sessions≤8、evictions 正确重建（每批 rebuilds=12/hits=6，LRU 颠簸驱动）、外部追加后 probe 判非 valid 1/1（实际判定 append_candidate；P07-FIXR1 更正，原「probe 失效 1/1」表述不准确）、磁盘 1.45MB 稳态；浏览器开合循环未纳入（见 P07_REPORT 差异与限制）",
+      "command_ids": ["P07-T06-bench-soak", "P07-T06-bench-soak-r2"],
+      "status": "PASS",
+      "evidence": "samples/soak-resources.json + docs/refactor-2026/P07/SOAK_RESOURCE_REPORT.md"
+    },
+    {
+      "id": "P07-A11",
+      "scene": "安全不能提速牺牲（临时关闭校验的假优化分支）",
+      "test_path": "artifacts/refactor-2026/P00/tools/bench-compare.mjs --selftest",
+      "test_name": "假优化拒绝自证（少处理数据 → INVALID）",
+      "fixture_sha256": null,
+      "production_entry": "（防机制验证；本阶段零生产 diff，无任何关闭校验的分支存在——git diff 为空即不可达证明）",
+      "expected": "即便更快也判 FAIL",
+      "actual": "selftest：同输入可比（IMPROVED/COMPARABLE）、假优化（runs 减半）判 INVALID 禁止比较，exit 码拒绝；本阶段全部性能样本先过工作量等价断言（fullFileReadCalls=0/输出 all-equal/witness 计数）",
+      "command_ids": ["P07-T07-bench-compare-selftest"],
+      "status": "PASS",
+      "evidence": "logs/P07-T07-bench-compare-selftest.out"
+    },
+    {
+      "id": "P07-A12",
+      "scene": "性能退步（某热点快而取消/首屏稳定慢超阈值）",
+      "test_path": "docs/refactor-2026/P07/P07_PERFORMANCE_COMPARISON.md §2 全量指标汇总",
+      "test_name": "配对汇总（W1/W2/W5 全部指标含劣化方向如实列出）",
+      "fixture_sha256": null,
+      "production_entry": "（汇总场景）",
+      "expected": "不得只报快项；回退或修复后再验收",
+      "actual": "唯一非改善项如实列出：W5 200 PUT 后 RSS +0.6%（+3MB，单样本波动区，soak 轨迹互证非持续劣化）；无任何 >10% 可复现退步，无回退项；取消/首屏均无退步（W4 1.2–5.2ms；W1 IMPROVED）",
+      "command_ids": ["P07-T01-bench-startup", "P07-T01-bench-memory-r2", "P07-T06-bench-soak-r2"],
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P07/P07_PERFORMANCE_COMPARISON.md §2/§6"
+    }
+  ],
+  "real_model_behavior": "继承 P06：真实模型工具行为评测仍 BLOCKED（无供应商凭证/费用授权，P04-T07-2 链）；本阶段性能测量全部使用本地合成输入与本地 HTTP 供应商替身，未消耗真实账户。",
+  "fix_rounds": [
+    {
+      "id": "P07-FIXR1",
+      "date": "2026-09-22",
+      "source": "独立验收 P07_ACCEPTANCE_REVIEW.md §4 低严重度发现 F-A/F-C（F-B 归 P08，不在本轮）：F-A＝bench-soak-resources.mjs 的 process.exit() 在 try 内跳过 finally 临时目录清理（每次运行泄漏 ≈12MB，与 P07_REPORT「临时目录用后即删」不符）；F-C＝probe_invalidated 断言 !== \"fresh\" 恒真（HistoryProbeVerdict 无 \"fresh\"，12/12 计数不构成证明）+「追加必失效→下批重建」机制叙述不准确（验收 CE-2 实测：外部追加判 append_candidate 而非 invalidate，每批重建由 12 会话>8 槽 LRU 颠簸驱动）",
+      "effect_on_cases": "A05 叙述与断言载体更正（test_name/actual/evidence/command_ids 补 FIXR1 复跑）+ A10 actual 一处同叙事更正（「probe 失效 1/1」→「判非 valid，实际 append_candidate」），两场景状态不变仍 PASS；其余 A01–A12 不涉及。生产代码零改动、既有测试断言零改动；F-C 断言修复后负向注入证明其承重（禁用追加→probe 判 valid→断言变红 exit 1），正跑 6/12 批均 exit 0 且逐批计数与原样本逐位一致（判定逻辑不受影响）",
+      "changes": [
+        "artifacts/refactor-2026/P07/tools/bench-soak-resources.mjs：process.exit→process.exitCode 赋值（F-A）；probe 断言改「外部追加后不得判 valid」+ 新增 probe_verdict_after_append/probe_append_detected 样本字段（F-C）；文件头与组件 3 注释机制描述同步更正",
+        "docs/refactor-2026/P07/SOAK_RESOURCE_REPORT.md：§1 组件 3 行机制更正 + 新增 §7 P07-FIXR1 更正节",
+        "docs/refactor-2026/P07/P07_REPORT.md：回退节数据保护一句更正（F-A 不实声称）+ 新增「独立验收修复轮（P07-FIXR1）」节",
+        "docs/refactor-2026/P07/HISTORY_COST_REPORT.md：§4 追加条目机制更正（验收 F-C 列出的三处文档位置之一，最小一句改写并标注 P07-FIXR1）",
+        "docs/refactor-2026/P07/ACCEPTANCE_MAP.json：A05 三字段更正 + A10 actual 同叙事一处更正 + 本 fix_rounds 条目",
+        "docs/refactor-2026/P07/P07_RESULT.json：fix_rounds 补 P07-FIXR1 条目",
+        "artifacts/refactor-2026/P07/logs/：P07-FIXR1-* 日志（含负向注入副本 negprobe-inject.mjs 与三次 soak 样本 JSON）+ command-log.jsonl 追加 10 条；两份 EVIDENCE_SHA256.txt 按既有口径刷新"
+      ],
+      "verification": [
+        "P07-FIXR1-tmpdir-before（exit 0：运行前 hana-p07-soak-* count=0）",
+        "P07-FIXR1-soak-minimal（exit 0：6 批最小规格，自然退出路径无挂起，verdict=NO_REPRODUCIBLE_UNBOUNDED_GROWTH）",
+        "P07-FIXR1-soak-original（exit 0：12 批原始规格，components_ok=true、rss_growth 0.3%、逐批 rebuilds/hits/evictions 与执行轮样本一致；--out 落 logs 不覆盖原样本）",
+        "P07-FIXR1-tmpdir-after（exit 0：两次运行后 count=0——F-A 泄漏消除）",
+        "P07-FIXR1-negprobe-inject-run（exit 1，预期：禁用追加→probe 判 valid→新断言变红；同时证实失败路径退出码非零）",
+        "P07-FIXR1-negprobe-verify（exit 0：红因核验——全批 probe_verdict_after_append=valid/probe_append_detected=false/components_ok=false，稳态判定不受影响）",
+        "P07-FIXR1-tmpdir-final（exit 0：含负向注入共三次运行后 count=0，零残留）",
+        "P07-FIXR1-lint（exit 0：npm run lint，工具改动后仓库 lint 门禁复跑）",
+        "P07-FIXR1-json-validate（exit 0：ACCEPTANCE_MAP.json/P07_RESULT.json 解析合法）",
+        "P07-FIXR1-manifest-check（exit 0：仓库根 shasum -a 256 -c 两份 EVIDENCE_SHA256 全量校验）"
+      ]
+    }
+  ],
+  "notes": [
+    "P04 NEXT_STAGE_HANDOFF §2 措辞项与 P06 fix_rounds 计数轻微记录瑕疵：本阶段未合法触碰对应文件，按编排约束保留原样（见 P07_REPORT 差异与限制）。",
+    "全量 npm test 后 f1-f12 patch 被重写（P04 起已知现象），已 git checkout 还原并复核哈希 25fb315f…。"
+  ]
+}

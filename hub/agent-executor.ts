@@ -351,12 +351,16 @@ export async function runAgentSession(agentId, rounds, { engine, signal, session
       cleanupErrors.push(err);
     }
     try {
-      if (session) await teardownSessionResources({
-        session,
-        unsub,
-        label: `hub.runAgentSession[${agentId}]`,
-        warn: (msg) => debugLog()?.warn("agent-executor", msg),
-      });
+      if (session) {
+        const teardown = await teardownSessionResources({
+          session,
+          unsub,
+          label: `hub.runAgentSession[${agentId}]`,
+          warn: (msg) => debugLog()?.warn("agent-executor", msg),
+        });
+        // P02-A12：清理失败并回原失败上报（AggregateError），不让 warn 吞掉未回收资源。
+        cleanupErrors.push(...(teardown?.errors || []));
+      }
     } catch (err) {
       cleanupErrors.push(err);
     }

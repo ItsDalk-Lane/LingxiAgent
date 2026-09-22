@@ -63,10 +63,11 @@ export class AppError extends Error {
   }
 
   static fromJSON(data: { code?: string; message?: string; context?: Record<string, unknown>; traceId?: string }): AppError {
+    // exactOptionalPropertyTypes：undefined 不能显式赋给可选属性，按字段条件展开。
     return new AppError(data.code || 'UNKNOWN', {
-      message: data.message,
-      context: data.context,
-      traceId: data.traceId,
+      ...(data.message !== undefined ? { message: data.message } : {}),
+      ...(data.context !== undefined ? { context: data.context } : {}),
+      ...(data.traceId !== undefined ? { traceId: data.traceId } : {}),
     });
   }
 

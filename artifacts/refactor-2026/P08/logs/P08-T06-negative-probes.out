@@ -1,0 +1,5 @@
+[PASS] N1 错误 token → 403 零副作用 → 403 list_unchanged=true
+[PASS] N2 伪造跨域 sessionPath → 403 拒绝 → 404 list_unchanged=true
+[PASS] N3 字段类型错误 → 400 invalid_field_type 零副作用 → 400 code=invalid_field_type list_unchanged=true
+[PASS] N0 退出 → exit=0
+negative probes: 4/4 PASS

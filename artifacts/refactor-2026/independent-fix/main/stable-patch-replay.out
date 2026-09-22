@@ -1,0 +1,13 @@
+
+> lingxi@0.1.42 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' tests/round2-delivery-evidence.test.ts -t R10-09
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 9 skipped (10)
+   Start at  18:32:42
+   Duration  6.81s (transform 28ms, setup 20ms, import 13ms, tests 6.71s, environment 0ms)
+

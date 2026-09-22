@@ -31,8 +31,6 @@
 - [上游同步审计](../UPSTREAM_SYNC_AUDIT.md)与[矩阵](../UPSTREAM_SYNC_MATRIX.md)：上游同步历史及后续坐标投影。矩阵由 [.sync-audit/build-sync-matrix.mjs](../.sync-audit/build-sync-matrix.mjs) 生成。
 - [历史阻塞与裁决](archives/BLOCKED.md)：恢复相关任务前须重新核对。
 
-## 历史任务与证据
-
 ## 待实施计划
 
 （当前没有待实施计划。）
@@ -56,3 +54,7 @@
 - 根目录保留现役入口及有固定路径依赖的审计文件。阶段计划、断点与验证流水放任务专属目录；收口后删除重复锚点，独有证据按主题归档。
 - 本地 Agent 规则位于根目录 `AGENTS.md`；它被 `.gitignore` 忽略，不随 clone 分发。共用的开发与验证说明放在上述受版本管理的文档中。本仓库没有要求另建 `CLAUDE.md` 镜像。
 - Agent 记忆只保留短索引、偏好与可复用经验；生成记忆使用宿主允许的更正入口，不能用旧记忆覆盖当前源码或当前用户指令。
+
+## 重构验收现行修订
+
+[独立审查修复报告](refactor-2026/independent-fix/FIX_REPORT.md)与[验收映射](refactor-2026/independent-fix/FIX_ACCEPTANCE_MAP.json)是本轮工作区的当前结论：核心缺陷已修复，整体验收仍BLOCKED，全量审计门禁仍FAIL。各P00—P08旧报告保留历史语境，不作为全部完成证明。

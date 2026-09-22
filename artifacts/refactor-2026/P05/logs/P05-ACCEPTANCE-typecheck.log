@@ -1,0 +1,13 @@
+
+> lingxi@0.1.42 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+EXIT:0
+
+> lingxi@0.1.42 typecheck:core-contracts
+> node scripts/check-core-contracts-strict.mjs
+
+Core contracts strict check passed (6 files).
+EXIT:0
+persistence-schema-guard: no guarded persistence sources touched (170 watched); OK.
+EXIT:0

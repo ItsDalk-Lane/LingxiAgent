@@ -1,0 +1,27 @@
+# P04 独立验收复跑记录（验收子代理，2026-09-22T01:48:12Z）
+# cwd=/Users/study_superior/Desktop/Code/LingxiAgent HEAD=3286c96e571fadea65143df8baabf503d30d37f2
+
+## 1. npx vitest run tests/model-operation-resolver.test.ts tests/model-operation-client.test.ts
+      Tests  25 passed (25)
+   Start at  09:48:12
+   Duration  916ms (transform 387ms, setup 38ms, import 883ms, tests 94ms, environment 0ms)
+
+
+## 2. npx vitest run tests/model-observability-e2e-chat.test.ts tests/model-observability-e2e-utility.test.ts
+      Tests  16 passed (16)
+   Start at  09:48:14
+   Duration  1.54s (transform 510ms, setup 38ms, import 1.52s, tests 985ms, environment 0ms)
+
+
+## 3. npm run typecheck
+exit=0
+
+## 4. npm run check:tool-invocation-boundaries
+Tool invocation boundary check passed (2244 source files).
+
+## 5. npm run lint（摘要行）
+✖ 10733 problems (0 errors, 10733 warnings)
+  0 errors and 29 warnings potentially fixable with the `--fix` option.
+
+## 6. F5 补丁文件还原校验
+       0

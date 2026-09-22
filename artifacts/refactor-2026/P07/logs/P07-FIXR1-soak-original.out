@@ -1,0 +1,13 @@
+[soak] batch=1/12 rss=302832KB heap=78115KB cache_sessions=8 evictions=4
+[soak] batch=2/12 rss=316928KB heap=73041KB cache_sessions=8 evictions=16
+[soak] batch=3/12 rss=316720KB heap=69189KB cache_sessions=8 evictions=28
+[soak] batch=4/12 rss=316848KB heap=69018KB cache_sessions=8 evictions=40
+[soak] batch=5/12 rss=318080KB heap=68969KB cache_sessions=8 evictions=52
+[soak] batch=6/12 rss=318208KB heap=68581KB cache_sessions=8 evictions=64
+[soak] batch=7/12 rss=318208KB heap=68676KB cache_sessions=8 evictions=76
+[soak] batch=8/12 rss=318224KB heap=68703KB cache_sessions=8 evictions=88
+[soak] batch=9/12 rss=318224KB heap=115904KB cache_sessions=8 evictions=100
+[soak] batch=10/12 rss=318256KB heap=68830KB cache_sessions=8 evictions=112
+[soak] batch=11/12 rss=318256KB heap=68761KB cache_sessions=8 evictions=124
+[soak] batch=12/12 rss=318256KB heap=115845KB cache_sessions=8 evictions=136
+[soak] verdict=NO_REPRODUCIBLE_UNBOUNDED_GROWTH rss_growth=0.3% heap_growth=22.3% out=artifacts/refactor-2026/P07/logs/P07-FIXR1-soak-original.json

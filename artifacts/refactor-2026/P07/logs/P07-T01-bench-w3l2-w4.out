@@ -1,0 +1,6 @@
+[W3-layer2] n=200 median=3.1ms (66727 deltas/s)
+[W3-layer2] n=2000 median=24ms (85880 deltas/s)
+[W3-layer2] n=20000 median=200.1ms (100383 deltas/s)
+[W4-S1] abort→settle median=1.4ms
+[W4-S2] abort→settle median=1.5ms
+[bench] out=/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/P07/samples/stream-model-layer.json

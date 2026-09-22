@@ -1,0 +1,39 @@
+The following is a diff from the previous accessibility tree for Window: "Lingxi" with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 430-433
++								436 文本 mcp_call
++								437 按钮 复制
++								438 标题 调用参数, Value: 4
++									439 文本 调用参数
++								440 text {   "tool": "browser",   "arguments": {     "action": "navigate",     "url": "http://127.0.0.1:52240/soak"   } }
++								441 标题 返回内容, Value: 4
++									442 文本 返回内容
++								443 text 已导航到 Local browser soak URL: http://127.0.0.1:52240/soak Browser tabId (copy exactly): "tab-0b3e714f-3ceb-4a87-a64c-85f66accabb1"
++								444 按钮 … 其余 3 行
++								445 text h1: 本地浏览器验收页面 text: Only localhost synthetic content
++								446 按钮 查看
++								447 文本 const value2 = 2; // 本地合成测试行
+const value3 = 3; // 本地合成测试行
+const value4 = 4; // 本地合成测试行
+const value5 = 5; // 本地合成测试行
+const value6 = 6; // 本地合成测试行
+const value7 = 7; // 本地合成测试行
+const value8 = 8; // 本地合成测试行
+const value9 = 9; // 本地合成测试行
+const value10 = 10; // 本地合成测试行
+const value11 = 11; // 本地合成测试行
+const value12 = 12; // 本地合成测试行
+const value13 = 13; // 本地合成测试行
+const value14 = 14; // 本地合成测试行
+const value15 = 15; // 本地合成测试行
+const value16 = 16; // 本地合成测试行
+const value17 = 17; // 本地合成测试行
+const value18 = 18; // 本地合成测试行
+c
++								448 container
++									449 切换按钮 Description: 自动换行, Value: 0
++									450 按钮 复制
+Selected text: ```
+持续输出时的中文草稿
+```
+
+Note: Pay special attention to the content selected by the user. If the user asks a question or refers to the content they are looking at on-screen, they might be referring to the selected content (but they might be referring to something else that's visible, too).

@@ -1,0 +1,26 @@
+stderr | artifacts/refactor-2026/P05/logs/P05-ACCEPTANCE-counterexample.test.ts > C1 跨流迟到事件：旧流 segment 迟到 delta 不得污染新轮 Run > Run A 结束后开启 Run B，旧流(segA/streamA)迟到 delta 不得出现在 Run B 的 answer
+[stream] canonical_segment_gap: segment event without start: {
+  type: 'assistant_segment_delta',
+  segmentId: 'segA',
+  sessionPath: '/tmp/p05x-accept-c1-session.jsonl'
+}
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  artifacts/refactor-2026/P05/logs/P05-ACCEPTANCE-counterexample.test.ts > C1 跨流迟到事件：旧流 segment 迟到 delta 不得污染新轮 Run > Run A 结束后开启 Run B，旧流(segA/streamA)迟到 delta 不得出现在 Run B 的 answer
+AssertionError: expected '[{"type":"message","data":{"id":"u1",…' not to contain '【迟到旧流尾巴】'
+
+Expected: "【迟到旧流尾巴】"
+Received: "[{"type":"message","data":{"id":"u1","role":"user","text":"第一问"}},{"type":"message","data":{"id":"u2","role":"user","text":"第二问"}},{"type":"message","data":{"id":"stream-1790070191887-1","role":"assistant","blocks":[{"id":"stream-1790070191887-1:segment:segA","type":"text","source":"A轮正文","semanticPhase":"final_answer","surfaceRole":"answer","lifecycle":"sealed"}],"timestamp":1790070191887,"turnProjection":{"id":"stream-1790070191887-1:turn","inputMessageId":null,"assistantMessageIds":["stream-1790070191887-1"],"processBlockIds":[],"provisionalBlockIds":[],"answerBlockIds":["stream-1790070191887-1:segment:segA"],"resultBlockIds":[],"controlBlockIds":[],"status":"completed","outcome":"completed_with_answer","completedAt":1790070191887}}},{"type":"message","data":{"id":"stream-1790070191888-2","role":"assistant","blocks":[{"id":"stream-1790070191888-2:segment:segB","type":"text","source":"B轮正文","semanticPhase":"final_answer","surfaceRole":"answer","lifecycle":"sealed"},{"id":"stream-1790070191888-2:segment:segA","type":"text","source":"【迟到旧流尾巴】","semanticPhase":"final_answer","surfaceRole":"answer","lifecycle":"sealed"}],"timestamp":1790070191888,"turnProjection":{"id":"stream-1790070191888-2:turn","inputMessageId":null,"assistantMessageIds":["stream-1790070191888-2"],"processBlockIds":[],"provisionalBlockIds":[],"answerBlockIds":["stream-1790070191888-2:segment:segB","stream-1790070191888-2:segment:segA"],"resultBlockIds":[],"controlBlockIds":[],"status":"completed","outcome":"completed_with_answer","completedAt":1790070191888}}}]"
+
+ ❯ artifacts/refactor-2026/P05/logs/P05-ACCEPTANCE-counterexample.test.ts:94:28
+     92|     expect(serialized).toContain('B轮正文');
+     93|     // 迟到旧流尾巴不得进入任何 live 投影正文
+     94|     expect(serialized).not.toContain('【迟到旧流尾巴】');
+       |                            ^
+     95|   });
+     96| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

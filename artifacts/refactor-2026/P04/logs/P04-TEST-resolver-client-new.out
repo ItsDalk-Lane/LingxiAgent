@@ -1,0 +1,28 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/model-operation-client.test.ts (8 tests) 49ms
+ ❯ tests/model-operation-resolver.test.ts (17 tests | 2 failed) 40ms
+     ✓ 不再预置任何内置操作模型卡，嵌入/重排目录纯由用户打标签驱动 23ms
+     ✓ 用户打标签的重排条目进入操作目录并按供应商推断协议 2ms
+     ✓ treats an unconfigured operation as optional 1ms
+     ✓ refreshes the selected provider credential at the request boundary 1ms
+     ✓ fails closed when a configured model disappears 0ms
+     ✓ ollama 自添加嵌入条目按供应商推断 ollama-embed 协议,baseUrl 继承默认 /v1(客户端剥前缀) 2ms
+     ✓ gemini 自添加嵌入条目按供应商推断 gemini-embed 协议 1ms
+     ✓ dashscope 自添加重排条目推断 dashscope-rerank 双端点方言 2ms
+     ✓ minimax 自添加嵌入条目按供应商推断 minimax-embeddings 协议 2ms
+     ✓ OpenAI 兼容供应商的自添加嵌入条目回退通用 openai-embeddings 协议 2ms
+     ✓ 用户显式声明的 operationProtocol 优先于供应商推断 2ms
+     ✓ P04-A01：同名 modelId 的两个 provider 不互串——解析与凭证刷新都锁定配置的 provider 0ms
+     ✓ P04-A02：指定 provider 缺凭证 fail-closed——不退到另一 provider，也不发起请求 0ms
+     ✓ P04-A04：配置轮换后 resolveFresh 按当前修订取新凭证，不沿用旧快照 0ms
+     × P04-A05：本地端点无 apiKey（isLocalBaseUrl 默认规则）合法放行 1ms
+     × P04-A05：仅 header 凭证（无 apiKey）的远程 provider 合法放行，header 进入执行配置 0ms
+     ✓ v8 起知识库嵌入/重排全局字段被显式拒绝（迁移至笔记本级配置） 1ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 23 passed (25)
+   Start at  09:20:21
+   Duration  907ms (transform 387ms, setup 40ms, import 873ms, tests 90ms, environment 0ms)
+

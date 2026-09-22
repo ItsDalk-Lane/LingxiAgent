@@ -1,0 +1,13 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/tool-catalog-bridge.test.ts (37 tests) 51ms
+ ✓ tests/permission-catalog-tools.test.ts (5 tests) 30ms
+ ✓ tests/ptc-engine-assembly.test.ts (4 tests) 108ms
+ ✓ tests/on-demand-first-party.test.ts (21 tests) 151ms
+
+ Test Files  4 passed (4)
+      Tests  67 passed (67)
+   Start at  13:07:31
+   Duration  3.12s (transform 3.64s, setup 69ms, import 7.23s, tests 340ms, environment 0ms)
+

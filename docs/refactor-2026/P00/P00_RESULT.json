@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "stage_id": "P00",
+  "status": "PASS",
+  "status_meaning": "PASS = 基线足够可靠可以实施；不代表基线软件全量测试全绿或无缺陷",
+  "research_sha": "8037fae7a6f621549f5b7db4c4d0bba3862ddc07",
+  "start_sha": "92c6646c581883436e026c53898e8bfc34ce4d27",
+  "end_sha": "92c6646c581883436e026c53898e8bfc34ce4d27",
+  "environment": {
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "os": "Darwin 27.0.0",
+    "arch": "arm64",
+    "lockfile_sha256": "a9735825cea1d018c2a42ae04f875368a003c386ca68fc86503bc8acbcd79d3c"
+  },
+  "tasks": [
+    { "id": "P00-T01", "implementation_action": "UNCHANGED_VERIFIED", "source_locations": ["BASELINE.json", "WORKTREE_SAFETY.md"], "consumer_locations": ["P01 handoff"], "test_ids": ["P00-T01-git-status", "P00-T01-git-coords", "P00-T01-env", "P00-T01-lockfile", "P00-T01-history-tags", "P00-T01-drift-diff", "P00-T01-npm-ls-spot", "P00-T01-launcher-override-proof", "P00-T01-A03-isolation-proof-r2"], "legacy_action": "无", "status": "PASS", "evidence": "P00-T01-git-status P00-T01-drift-diff P00-T01-A03-isolation-proof-r2" },
+    { "id": "P00-T02", "implementation_action": "UNCHANGED_VERIFIED", "source_locations": ["FEATURE_MATRIX.md", "SCOPE.json"], "consumer_locations": ["P01-P08 范围引用"], "test_ids": ["P00-T01-git-status"], "legacy_action": "排除项只登记不删除", "status": "PASS", "evidence": "agent-feature-inventory-raw.md（logs/）" },
+    { "id": "P00-T03", "implementation_action": "UNCHANGED_VERIFIED", "source_locations": ["ENTRYPOINT_MATRIX.md", "OWNERSHIP_MAP.md", "CALLSITE_MATRIX.json"], "consumer_locations": ["P01 边界工作", "P02 身份语义", "P04 观测核查"], "test_ids": ["P00-T05-npm-test"], "legacy_action": "无", "status": "PASS", "evidence": "agent-callsite-raw.md agent-ownership-raw.md（logs/）" },
+    { "id": "P00-T04", "implementation_action": "UNCHANGED_VERIFIED", "source_locations": ["ACCEPTANCE_MAP.json", "artifacts/refactor-2026/P00/fixtures/"], "consumer_locations": ["各阶段验收映射扩展"], "test_ids": ["P00-A05-deliberate-fail", "P00-A06-evidence-check-demo", "P00-A09-redaction-check-r4"], "legacy_action": "无", "status": "PASS", "evidence": "agent-test-inventory-raw.md ACCEPTANCE_MAP.json" },
+    { "id": "P00-T05", "implementation_action": "UNCHANGED_VERIFIED", "source_locations": ["BASELINE_TESTS.json", "BASELINE_FAILURES.md"], "consumer_locations": ["P03(F2)", "P08(F1/F3)"], "test_ids": ["P00-T05-typecheck", "P00-T05-lint-r3", "P00-T05-build-renderer", "P00-T05-tool-boundaries", "P00-T05-npm-test", "P00-T05-round23-isolated", "P00-T05-gh-ci-evidence"], "legacy_action": "无", "status": "PASS", "evidence": "P00-T05-npm-test P00-T05-lint-r3（基线可用：失败确定性+F1/F2/F3 定级）" },
+    { "id": "P00-T06", "implementation_action": "UNCHANGED_VERIFIED", "source_locations": ["BENCHMARK_PROTOCOL.md", "PROMPT_BASELINE.json", "artifacts/refactor-2026/P00/samples/"], "consumer_locations": ["P06-1", "P07-1/P07-2"], "test_ids": ["P00-T06-bench-startup-B1", "P00-T06-bench-startup-B2", "P00-T06-bench-compare-r2", "P00-T06-bench-history", "P00-T06-bench-memory", "P00-T06-prompt-baseline", "P00-A08-bench-compare-selftest-r3"], "legacy_action": "无", "status": "PASS", "evidence": "samples/startup-b1.json samples/history-baseline/summary-a.json samples/memory-initial.json" },
+    { "id": "P00-T07", "implementation_action": "UNCHANGED_VERIFIED", "source_locations": ["REFACTOR_BACKLOG.md", "STAGE_DEPENDENCIES.json", "NEXT_STAGE_HANDOFF.md"], "consumer_locations": ["P01 开工输入"], "test_ids": ["P00-A06-evidence-check-demo"], "legacy_action": "无", "status": "PASS", "evidence": "STAGE_DEPENDENCIES.json 单一主责规则核查 + 检查器拦截演示" },
+    { "id": "P00-T08", "implementation_action": "UNCHANGED_VERIFIED", "source_locations": ["P00_REPORT.md", "P00_RESULT.json"], "consumer_locations": ["用户验收"], "test_ids": ["P00-T08-final-status", "P00-T08-redaction-final"], "legacy_action": "无", "status": "PASS", "evidence": "终检三命令（status/redaction/evidence-check，后者在二者之后运行以避免自引用时序）" }
+  ],
+  "acceptance_cases": [
+    { "id": "P00-A01", "status": "PASS", "command_ids": ["P00-T01-git-status", "P00-T08-final-status"] },
+    { "id": "P00-A02", "status": "PASS", "command_ids": ["P00-T01-drift-diff"] },
+    { "id": "P00-A03", "status": "PASS", "command_ids": ["P00-T01-A03-isolation-proof", "P00-T01-A03-isolation-proof-r2", "P00-T01-launcher-override-proof"] },
+    { "id": "P00-A04", "status": "PASS", "command_ids": ["P00-T01-git-status"] },
+    { "id": "P00-A05", "status": "PASS", "command_ids": ["P00-A05-deliberate-fail", "P00-A05-env-missing-windows-smoke"] },
+    { "id": "P00-A06", "status": "PASS", "command_ids": ["P00-A06-evidence-check-demo"], "note": "终版 gate 见 P00-T08-evidence-check（在其余终检之后运行）" },
+    { "id": "P00-A07", "status": "PASS", "command_ids": ["P00-T05-npm-test"] },
+    { "id": "P00-A08", "status": "PASS", "command_ids": ["P00-T06-bench-startup-B1", "P00-T06-bench-startup-B2", "P00-T06-bench-compare-r2", "P00-A08-bench-compare-selftest-r3"] },
+    { "id": "P00-A09", "status": "PASS", "command_ids": ["P00-A09-redaction-check-r4", "P00-T08-redaction-final"] },
+    { "id": "P00-A10", "status": "PASS", "command_ids": ["P00-T05-lint-r3", "P00-T05-npm-test", "P00-T05-gh-ci-evidence"] }
+  ],
+  "commands": "见 artifacts/refactor-2026/P00/logs/command-log.jsonl（47 条 JSONL，全部含 exit code 与原始日志路径）",
+  "baseline_failures": [
+    { "id": "F1", "summary": "npm test 4 用例红（封印坐标滞后 docs 提交，7 非白名单文件）", "class": "治理流程（用户授权推进）", "blocks_p00": false, "blocks": "P08 发布门禁", "repro": "npx vitest run tests/post-verification-audit-seal.test.ts" },
+    { "id": "F2", "summary": "lint 3 生产 error（run-code-tool no-control-regex ×2、security-scan-tool no-constant-condition ×1，源自 6282cf35b）", "class": "后续主责 P03", "blocks_p00": false, "blocks": "CI lint 腿", "repro": "npx eslint lib/tools/run-code-tool.ts lib/tools/security-scan-tool.ts" },
+    { "id": "F3", "summary": "四平台 CI 运行证据不可取（gh token 失效+代理 127.0.0.1:7890 不通）", "class": "环境缺失 BLOCKED", "blocks_p00": false, "blocks": "P08 平台验收", "repro": "gh run list --workflow=ci.yml" },
+    { "id": "F4", "summary": "范围外建议（gitignore 完备性、warning 基线治理）", "class": "范围外", "blocks_p00": false, "blocks": null, "repro": null }
+  ],
+  "scope_deviations": [
+    { "note": "未另建重构分支（任务书允许'经授权的现有分支'；避免扰动用户环境），已记录于 WORKTREE_SAFETY §1" },
+    { "note": "P00 证据工具首轮引入 27 个 lint error（已修复，首次失败保留），由此确认 eslint . 扫全仓的事实并转 P01 决策" },
+    { "note": "A09 扫描器两轮迭代（自命中→受控豁免），两份历史 err 日志声明为受控保留不进公开打包" },
+    { "note": "F5：npm test R10-09 重写跟踪补丁吸收未跟踪文件（既有测试行为），已取证并还原至 HEAD，最终零跟踪改动" },
+    { "note": "F6：任务书副本目录被外部创建/删除（非 P00 命令所致），已如实登记提请用户知悉" }
+  ],
+  "legacy_paths": [
+    { "item": "knowledge research 生产残留（表/类型/删除保护）", "action": "登记，兼容保留，退出决策归 P05/P08" },
+    { "item": "skills2set/lingxi-plugin-creator（仅 pycache）", "action": "登记，清理需授权（P08）" },
+    { "item": "vitest/tsconfig 死别名（packages/）", "action": "登记，主责 P01" }
+  ],
+  "blocked_items": [
+    { "item": "四平台 CI 运行证据", "reason": "gh 认证失效 + 本机代理不可达 api.github.com", "unblock": "修复 gh auth/网络后由 P08-2 取回" },
+    { "item": "W3 流式吞吐 / W4 取消响应初始样本", "reason": "需本地协议 server harness 接线（本轮未建完整 e2e 流基准）", "unblock": "P07 按冻结协议执行" },
+    { "item": "真供应商验证", "reason": "无凭证/预算授权（本轮零消耗）", "unblock": "P04 获用户授权" }
+  ],
+  "next_stage_handoff": "docs/refactor-2026/P00/NEXT_STAGE_HANDOFF.md",
+  "implementation_performed": false,
+  "project_tests_executed": true,
+  "production_files_modified": 0,
+  "production_commits": 0,
+  "real_model_calls": 0,
+  "real_user_data_writes": 0
+}

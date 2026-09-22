@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/tool-invocation-boundary.test.ts (5 tests) 2775ms
+     ✓ finds no raw executor or deferred-object-map bypass in production source  2736ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  01:16:01
+   Duration  3.02s (transform 75ms, setup 19ms, import 160ms, tests 2.78s, environment 0ms)
+

@@ -1,0 +1,7 @@
+[server-bootstrap] process started pid=49663 platform=darwin arch=arm64
+[server-bootstrap] node=v24.15.0 lingxiHome=unset
+[server-bootstrap] root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-package-72WB24/runtime-seed
+[server-bootstrap] entry=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-package-72WB24/runtime-seed/bundle/index.js
+[server-bootstrap] importing server entry
+检测到同一数据目录已有内核在运行（ownerKind=desktop, version=0.1.42, pid=75215）。要接管请先退出它，再重新启动。
+A LingxiAgent kernel is already running against this data directory (ownerKind=desktop, version=0.1.42, pid=75215). Quit it first, then start this one again.

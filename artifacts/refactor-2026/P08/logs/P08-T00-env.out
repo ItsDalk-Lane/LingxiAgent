@@ -1,0 +1,14 @@
+674b0151fcc982d13f1d6bc5a84ff273edd3b4a3
+docs/knowledge-closeout-2026-09-21
+v24.16.0
+11.13.0
+Darwin arm64
+a9735825cea1d018
+?? artifacts/refactor-2026/P08/
+github.com
+  ✓ Logged in to github.com account ItsDalk-Lane (keyring)
+  - Active account: true
+  - Git operations protocol: https
+completed	failure	feat: 工具展示层重构 + 任务清单/回退还原批量交付 + 工具展示链路五项审查缺陷修复	CI	feat/tool-activity-presentation	pull_request	34663642644	30m4s	2026-09-12T01:03:28Z
+completed	failure	feat: 工具展示层重构 + 任务清单/回退还原批量交付 + 工具展示链路五项审查缺陷修复	CI	feat/tool-activity-presentation	pull_request	34629310593	26m21s	2026-09-11T17:43:41Z
+completed	success	历史读取三阶段 + 架构契约补强七领域（含审计封印）	CI	fix/pending-sep10	pull_request	34551812195	25m42s	2026-09-11T01:43:34Z

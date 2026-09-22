@@ -1,0 +1,36 @@
+{
+  "workload": "session-stream-store appendSessionStreamEvent 稳态吞吐（缓冲饱和后）",
+  "env": {
+    "node": "v24.16.0",
+    "os": "Darwin 27.0.0 arm64"
+  },
+  "results": [
+    {
+      "label": "below-cap (no trim)",
+      "n": 2000,
+      "maxEvents": 5000,
+      "steady_append_per_sec": 4273888,
+      "steady_us_per_append": 0.234,
+      "dropped": 0,
+      "retained": 4000
+    },
+    {
+      "label": "at-cap default (maxEvents=5000)",
+      "n": 20000,
+      "maxEvents": 5000,
+      "steady_append_per_sec": 88804,
+      "steady_us_per_append": 11.261,
+      "dropped": 35000,
+      "retained": 5000
+    },
+    {
+      "label": "at-cap larger (maxEvents=20000)",
+      "n": 20000,
+      "maxEvents": 20000,
+      "steady_append_per_sec": 25883,
+      "steady_us_per_append": 38.635,
+      "dropped": 20000,
+      "retained": 20000
+    }
+  ]
+}

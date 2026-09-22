@@ -1,0 +1,369 @@
+{
+  "workload": "长运行资源 soak：stream store 全生命周期 + 终端会话循环 + 历史目录缓存淘汰/失效；进程级轨迹",
+  "env": {
+    "node": "v24.16.0",
+    "os": "Darwin 27.0.0 arm64",
+    "expose_gc": true
+  },
+  "components_ok": true,
+  "verdict": {
+    "rss": {
+      "warm_mean": 325099,
+      "tail_mean": 326112,
+      "growth_pct": 0.3
+    },
+    "heap_used": {
+      "warm_mean": 87924,
+      "tail_mean": 85424,
+      "growth_pct": -2.8
+    },
+    "external": {
+      "warm_mean": 11345,
+      "tail_mean": 11225,
+      "growth_pct": -1.1
+    },
+    "rss_monotonic_increase_gt5pct_each_batch": false,
+    "bounded_verdict": "NO_REPRODUCIBLE_UNBOUNDED_GROWTH"
+  },
+  "batches": [
+    {
+      "batch": 1,
+      "rss_kb": 308048,
+      "heap_used_kb": 90694,
+      "external_kb": 11465,
+      "array_buffers_kb": 400,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1476048,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 4,
+      "cache_resident_bytes": 2584864,
+      "probe_invalidated": 1,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63591696,
+        "rssPostGc": 315260928
+      }
+    },
+    {
+      "batch": 2,
+      "rss_kb": 324320,
+      "heap_used_kb": 90974,
+      "external_kb": 11465,
+      "array_buffers_kb": 399,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1476191,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 16,
+      "cache_resident_bytes": 2327328,
+      "probe_invalidated": 1,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63332488,
+        "rssPostGc": 332120064
+      }
+    },
+    {
+      "batch": 3,
+      "rss_kb": 324496,
+      "heap_used_kb": 88153,
+      "external_kb": 11345,
+      "array_buffers_kb": 280,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1476334,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 28,
+      "cache_resident_bytes": 2327442,
+      "probe_invalidated": 1,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63295736,
+        "rssPostGc": 332349440
+      }
+    },
+    {
+      "batch": 4,
+      "rss_kb": 325296,
+      "heap_used_kb": 87992,
+      "external_kb": 11345,
+      "array_buffers_kb": 280,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1476477,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 40,
+      "cache_resident_bytes": 2327556,
+      "probe_invalidated": 1,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63319728,
+        "rssPostGc": 333266944
+      }
+    },
+    {
+      "batch": 5,
+      "rss_kb": 325504,
+      "heap_used_kb": 87628,
+      "external_kb": 11345,
+      "array_buffers_kb": 279,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1476620,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 52,
+      "cache_resident_bytes": 2327670,
+      "probe_invalidated": 1,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63233944,
+        "rssPostGc": 333316096
+      }
+    },
+    {
+      "batch": 6,
+      "rss_kb": 325648,
+      "heap_used_kb": 85291,
+      "external_kb": 11225,
+      "array_buffers_kb": 159,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1476763,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 64,
+      "cache_resident_bytes": 2327784,
+      "probe_invalidated": 1,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63286264,
+        "rssPostGc": 333479936
+      }
+    },
+    {
+      "batch": 7,
+      "rss_kb": 325680,
+      "heap_used_kb": 87416,
+      "external_kb": 11345,
+      "array_buffers_kb": 280,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1476906,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 76,
+      "cache_resident_bytes": 2327898,
+      "probe_invalidated": 1,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63257928,
+        "rssPostGc": 333496320
+      }
+    },
+    {
+      "batch": 8,
+      "rss_kb": 326096,
+      "heap_used_kb": 87488,
+      "external_kb": 11345,
+      "array_buffers_kb": 280,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1477049,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 88,
+      "cache_resident_bytes": 2328010,
+      "probe_invalidated": 1,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63275736,
+        "rssPostGc": 333922304
+      }
+    },
+    {
+      "batch": 9,
+      "rss_kb": 326096,
+      "heap_used_kb": 85329,
+      "external_kb": 11225,
+      "array_buffers_kb": 159,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1477192,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 100,
+      "cache_resident_bytes": 2328126,
+      "probe_invalidated": 1,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63297792,
+        "rssPostGc": 333922304
+      }
+    },
+    {
+      "batch": 10,
+      "rss_kb": 326112,
+      "heap_used_kb": 85446,
+      "external_kb": 11225,
+      "array_buffers_kb": 160,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1477335,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 112,
+      "cache_resident_bytes": 2328240,
+      "probe_invalidated": 1,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63345624,
+        "rssPostGc": 333938688
+      }
+    },
+    {
+      "batch": 11,
+      "rss_kb": 326112,
+      "heap_used_kb": 85406,
+      "external_kb": 11225,
+      "array_buffers_kb": 160,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1477480,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 124,
+      "cache_resident_bytes": 2328366,
+      "probe_invalidated": 1,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63387168,
+        "rssPostGc": 333938688
+      }
+    },
+    {
+      "batch": 12,
+      "rss_kb": 326112,
+      "heap_used_kb": 85419,
+      "external_kb": 11225,
+      "array_buffers_kb": 160,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1477625,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 136,
+      "cache_resident_bytes": 2328482,
+      "probe_invalidated": 1,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63351104,
+        "rssPostGc": 333955072
+      }
+    }
+  ],
+  "cache_final_stats": {
+    "sessions": 8,
+    "residentBytes": 2328482,
+    "retiredBytes": 0,
+    "builds": 144,
+    "hits": 72,
+    "evictions": 136,
+    "inFlightBuilds": 0,
+    "noCacheSessions": 0,
+    "invalidations": {},
+    "incrementalUpdates": 0,
+    "incrementalFailures": 0,
+    "branchViewRebuilds": 0
+  },
+  "note": "GC 后读数单列（若可用），不作为稳态判定依据；rss/heap 以 GC 前轨迹为准"
+}

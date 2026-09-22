@@ -11,15 +11,13 @@ import { afterEach, describe, it, expect, vi, beforeEach } from "vitest";
 
 // ── Mock Pi SDK ──
 
-const { createAgentSessionMock, emitSessionShutdownMock, sessionManagerCreateMock } = vi.hoisted(() => ({
+const { createAgentSessionMock, sessionManagerCreateMock } = vi.hoisted(() => ({
   createAgentSessionMock: vi.fn(),
-  emitSessionShutdownMock: vi.fn(async () => true),
   sessionManagerCreateMock: vi.fn(),
 }));
 
 vi.mock("../lib/pi-sdk/index.js", () => ({
   createAgentSession: createAgentSessionMock,
-  emitSessionShutdown: emitSessionShutdownMock,
   getPiModels: vi.fn(() => []),
   SessionManager: {
     create: sessionManagerCreateMock,
@@ -269,8 +267,9 @@ describe("模型选择无 fallback", () => {
       const allowedModel = { id: "allowed-model", provider: "openai" };
       const coord = makeCoordinator(tempDir, { models: makeModels([allowedModel]) });
       const dispose = vi.fn();
+      const emit = vi.fn(async () => {});
       createAgentSessionMock.mockResolvedValue({
-        session: { model: allowedModel, dispose },
+        session: { model: allowedModel, dispose, extensionRunner: { hasHandlers: () => true, emit } },
         modelFallbackMessage: "disabled-model -> allowed-model",
       });
       const sessionMgr = {
@@ -290,7 +289,8 @@ describe("模型选择无 fallback", () => {
         null,
         { restore: true },
       )).rejects.toThrow(/fallback rejected/);
-      expect(emitSessionShutdownMock).toHaveBeenCalled();
+      expect(emit).toHaveBeenCalledExactlyOnceWith({ type: "session_shutdown", reason: "quit" });
+      expect(emit.mock.invocationCallOrder[0]).toBeLessThan(dispose.mock.invocationCallOrder[0]);
       expect(dispose).toHaveBeenCalled();
     });
   });

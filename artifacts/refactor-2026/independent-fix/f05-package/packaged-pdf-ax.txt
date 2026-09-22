@@ -1,0 +1,194 @@
+Window: "Lingxi", App: Lingxi.
+0 标准窗口 Lingxi, Secondary Actions: Raise
+	1 container Lingxi
+		2 container
+			3 HTML 内容 Lingxi, URL: file:///var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-packaged-run-rIw7Tw/lingxi-f05-packaged-run-rIw7Tw/artifacts/renderer/0.1.42/index.html
+				4 container
+					5 按钮 侧边栏
+						6 图像
+					7 按钮 搜索聊天记录
+					8 container
+						9 按钮 聊天
+						10 按钮 会话地图
+						11 按钮 频道
+					12 按钮 社交平台
+						13 图像
+					14 按钮 助手活动
+						15 图像
+					16 按钮 任务计划
+						17 图像
+					18 按钮 Skills
+						19 图像
+					20 按钮 归档记录
+						21 图像
+					22 按钮 知识库
+						23 图像
+					24 按钮 设置
+						25 图像
+					26 container
+						27 按钮 Default
+							28 文本 Default
+							29 文本 1
+						30 按钮 新建对话
+						31 按钮 更多
+						32 按钮 Lingxi 隔离本地测试助手 Lingxi · OH-WorkSpace · 刚刚
+							33 图像 Lingxi
+							34 文本 隔离本地测试助手
+							35 container
+								36 图像
+							37 文本 Lingxi · OH-WorkSpace · 刚刚
+					38 弹出式按钮 Description: 选择工作台, Help: /Users/study_superior/Desktop/OH-WorkSpace
+					39 标签页组 右侧工作台
+						40 标签 (selected) 对话文件, Value: 1
+						41 标签 (settable, integer) 工作台, Value: 0
+						42 标签 (settable, integer) 项目技能, Value: 0
+					43 container 对话文件
+						44 按钮 对话文件排序
+						45 内容列表 对话文件列表
+							46 container
+								47 文本 package-test.pdf
+								48 按钮 预览 package-test.pdf
+								49 按钮 打开 package-test.pdf
+								50 按钮 定位 package-test.pdf
+								51 link Description: 下载到本机 package-test.pdf, Value: 127.0.0.1:49171/api/resources/res_sf_1bc8d95cdfc6aefc/content?token=[ISOLATED_TEST_REDACTED]&v=1790075887801.7393-652
+								52 按钮 复制路径 package-test.pdf
+					53 container
+						54 文本 package-test.pdf
+						55 图像
+					56 按钮 Collapse
+						57 图像
+					58 container
+						59 container
+							60 按钮 复制
+								61 图像
+								62 文本 复制
+							63 按钮 历史版本
+								64 图像
+							65 按钮 截图
+								66 图像
+						67 HTML 内容 file:///var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-packaged-run-rIw7Tw/lingxi-f05-packaged-run-rIw7Tw/session-files/8f156a270f85472e4a662949/package-test_muckyqwp_ec734502.pdf#toolbar=0&navpanes=0
+							68 HTML 内容 package-test_muckyqwp_ec734502.pdf, URL: chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/index.html
+								69 HTML 内容
+									70 container 包含 1 页内容的 PDF 文档
+										71 container PDF 已加载完毕
+											72 文本 PDF 已加载完毕
+										73 container 第 1 页
+											74 文本 Hello from PDF
+
+											75 文本 Second line of text
+					76 按钮 展开运行信息
+					77 container
+						78 container
+							79 文本 User
+							80 图像 User
+							81 文本 执行本地终端验收命令，完成后给出确认。
+							82 文本 19:16
+							83 按钮 重新生成
+							84 按钮 编辑
+								85 图像
+							86 按钮 复制文本
+								87 图像
+							88 按钮 截图
+								89 图像
+							90 切换按钮 Description: 全选消息, Value: 0
+								91 图像
+							92 切换按钮 Description: 选择消息, Value: 0
+								93 图像
+							94 图像 Lingxi
+							95 文本 Lingxi
+							96 按钮 ✨ Lingxi忙活了一阵子 · 1 个工具 · 1 次尝试未成功
+							97 container
+								98 text 隔离验收输出第1行：中文输入、选中、复制和滚动验证。 隔离验收输出第2行：中文输入、选中、复制和滚动验证。 隔离验收输出第3行：中文输入、选中、复制和滚动验证。 隔离验收输出第4行：中文输入、选中、复制和滚动验证。 隔离验收输出第5行：中文输入、选中、复制和滚动验证。 隔离验收输出第6行：中文输入、选中、复制和滚动验证。 隔离验收输出第7行：中文输入、选中、复制和滚动验证。 隔离验收输出第8行：中文输入、选中、复制和滚动验证。
+								99 link Description: 打开本地验收页面, Value: 127.0.0.1:65530/page
+							100 文本 19:16
+							101 按钮 重新生成
+							102 按钮 分支为新会话
+							103 按钮 复制文本
+								104 图像
+							105 按钮 截图
+								106 图像
+							107 按钮 朗读
+								108 图像
+							109 切换按钮 Description: 有帮助（记入经验库）, Value: 0
+								110 图像
+							111 切换按钮 Description: 没帮助（记入经验库）, Value: 0
+								112 图像
+							113 切换按钮 Description: 全选消息, Value: 0
+								114 图像
+							115 切换按钮 Description: 选择消息, Value: 0
+								116 图像
+							117 弹出式按钮 用量 0 tok
+							118 弹出式按钮 用时 4秒
+							119 文本 User
+							120 图像 User
+							121 text package-test.pdf 19:18
+							122 按钮 重新生成
+							123 按钮 编辑
+								124 图像
+							125 按钮 复制文本
+								126 图像
+							127 按钮 截图
+								128 图像
+							129 切换按钮 Description: 全选消息, Value: 0
+								130 图像
+							131 切换按钮 Description: 选择消息, Value: 0
+								132 图像
+							133 图像 Lingxi
+							134 文本 Lingxi
+							135 container
+								136 text 隔离验收输出第1行：中文输入、选中、复制和滚动验证。 隔离验收输出第2行：中文输入、选中、复制和滚动验证。 隔离验收输出第3行：中文输入、选中、复制和滚动验证。 隔离验收输出第4行：中文输入、选中、复制和滚动验证。 隔离验收输出第5行：中文输入、选中、复制和滚动验证。 隔离验收输出第6行：中文输入、选中、复制和滚动验证。 隔离验收输出第7行：中文输入、选中、复制和滚动验证。 隔离验收输出第8行：中文输入、选中、复制和滚动验证。
+								137 link Description: 打开本地验收页面, Value: 127.0.0.1:65530/page
+							138 文本 19:18
+							139 按钮 重新生成
+							140 按钮 分支为新会话
+							141 按钮 复制文本
+								142 图像
+							143 按钮 截图
+								144 图像
+							145 按钮 朗读
+								146 图像
+							147 切换按钮 Description: 有帮助（记入经验库）, Value: 0
+								148 图像
+							149 切换按钮 Description: 没帮助（记入经验库）, Value: 0
+								150 图像
+							151 切换按钮 Description: 全选消息, Value: 0
+								152 图像
+							153 切换按钮 Description: 选择消息, Value: 0
+								154 图像
+							155 弹出式按钮 用量 0 tok
+							156 弹出式按钮 用时 4秒
+					157 container
+						158 container
+							159 文本输入区 (settable) 说点什么...
+
+								160 文本 说点什么...
+							161 按钮 (disabled) 发送
+								162 图像
+								163 文本 发送
+						164 按钮 新对话
+							165 图像
+						166 按钮 添加文件
+							167 图像
+						168 按钮 命令菜单
+							169 图像
+						170 按钮 知识库
+							171 图像
+						172 按钮 自动审核
+							173 图像
+						174 弹出式按钮 上下文操作
+							175 图像
+						176 弹出式按钮 中等
+							177 图像
+						178 弹出式按钮 Witness Model
+					179 文本 已连接
+	180 关闭按钮
+	181 全屏幕按钮 Help: 此按钮也可以执行缩放窗口的操作, Secondary Actions: 缩放窗口
+	182 最小化按钮
+183 menu bar
+	184 Lingxi
+	185 File
+	186 Edit
+	187 View
+	188 Window
+
+The focused UI element is 48 按钮 预览 package-test.pdf

@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "stage_id": "P08",
+  "task_id": "P08-T04",
+  "generated_at": "2026-09-22",
+  "candidate_source_sha": "674b0151fcc982d13f1d6bc5a84ff273edd3b4a3",
+  "environment": "darwin arm64 / macOS 27.0 / Node v24.16.0 / npm 11.13.0 / lockfile a9735825cea1d018（与 P00-P07 全程一致，零依赖变动）",
+  "local_checks": [
+    { "command": "npm run typecheck", "command_id": "P08-T04-typecheck", "exit": 0, "note": "tsc 三腿（root + node + test）" },
+    { "command": "npm run typecheck:core-contracts", "command_id": "P08-T02-core-contracts", "exit": 0, "note": "strict 核心范围零诊断" },
+    { "command": "npx vitest run tests/core-contracts-strict.test.ts", "command_id": "P08-T02-core-contracts-negative", "exit": 0, "note": "A03 负例注入真实失败验证" },
+    { "command": "npm run check:dependency-boundaries", "command_id": "P08-T02-dependency-boundaries", "exit": 0, "note": "六规则依赖边界" },
+    { "command": "npm run check:tool-invocation-boundaries", "command_id": "P08-T01-tool-invocation-boundaries", "exit": 0, "note": "工具执行 AST 白名单" },
+    { "command": "npm run lint", "command_id": "P08-T04-lint", "exit": 0, "note": "eslint 全仓 0 error（F2 关闭状态保持，P03 起）" },
+    { "command": "npm run build:renderer", "command_id": "P08-T04-build-renderer", "exit": 0, "note": "vite renderer 构建" },
+    { "command": "npm test", "command_id": "P08-T04-full-test", "exit": 1, "status": "PASS_WITH_KNOWN_BASELINE", "note": "4 红 = F1 已知基线同一组（post-verification-audit-seal 1 + round2 R10-03/04 + round3 manifest，逐名与 P05/P06/P07 一致）；14797 绿 / 1 expected fail / 15 skipped（绿数与 P07 完全一致）；无第 5 红（R10-09 本轮未波动）；f1-f12 patch 被 R10-09 重写后已还原（哈希 25fb315f 复核，stat 留档）" },
+    { "command": "npm run build:server:open", "command_id": "P08-T04-build-server-open", "exit": 0, "note": "open 组合构建——P01 起 F3 网络阻塞项（依赖安装需 registry），本轮网络恢复后首次真实执行成功" },
+    { "command": "npm run smoke:server:open", "command_id": "P08-T04-smoke-server-open", "exit": 0, "note": "open 组合真实 spawn 冒烟：正向 identity 200 + 负向（无凭证）exit 1 attributable——闭环 P01 交接 §5 首条 BLOCKED" },
+    { "command": "node scripts/check-persistence-schema-fingerprint.mjs", "command_id": "P08-T05-fingerprint-check", "exit": 0, "note": "170 watched 受护源零触碰（A13 指纹守卫）" }
+  ],
+  "platform_matrix": [
+    { "leg": "macOS arm64 (macos-15)", "local_evidence": "本机 darwin arm64 全部本地检查 + 打包产物 + 真实启动冒烟（见 PACKAGED_ARTIFACT_MATRIX）", "ci_evidence_for_candidate_sha": "BLOCKED——见下 ci_trigger_status" },
+    { "leg": "macOS x64 (macos-15-intel)", "local_evidence": "无实机", "ci_evidence_for_candidate_sha": "BLOCKED" },
+    { "leg": "Windows x64 (windows-2025)", "local_evidence": "无实机；Windows 专属步骤（sandbox helper 构建+受限令牌冒烟、MinGit、standalone 构建与 hana-server.cmd 冒烟）全部在 ci.yml Windows 腿执行，本地无法复现", "ci_evidence_for_candidate_sha": "BLOCKED" },
+    { "leg": "Linux x64 (ubuntu-24.04)", "local_evidence": "无实机", "ci_evidence_for_candidate_sha": "BLOCKED" }
+  ],
+  "ci_trigger_status": {
+    "gh_auth": "已恢复（ItsDalk-Lane keyring 登录有效，P00 时 F3 的 keyring 失效+代理不通已不复现；gh run list 实测可用）",
+    "root_cause_of_missing_candidate_ci": "ci.yml 触发条件为 pull_request→main。当前分支 docs/knowledge-closeout-2026-09-21 无开放 PR，无任何 CI 运行记录（gh run list --branch 实测为空）。本阶段无授权开 PR / push —— 无当前候选 SHA 的四平台远程证据，按任务书 T04.5 如实标 BLOCKED，不以旧提交运行记录冒充。",
+    "historical_reference_only": "最近一次 CI 全绿 = run 34551812195（fix/pending-sep10 PR，2026-09-11，head 为本轮前代码）——仅作历史参考，不作为本轮候选证据",
+    "pending_trigger_checklist": [
+      "1. 获用户授权后从 docs/knowledge-closeout-2026-09-21 向 main 开 PR（gh pr create）——ci.yml 将在四平台矩阵（macos-15/macos-15-intel/windows-2025/ubuntu-24.04，Node 24.15.0）自动触发",
+      "2. 四腿全绿后取回证据：gh run list --workflow=ci.yml --limit 4 与 gh run view <id> --log 逐腿归档（含 Windows sandbox helper 冒烟与 standalone server 冒烟步骤）",
+      "3. persistence-schema-guard 与 open-build-smoke 两个独立 job 同 PR 内自动运行，一并取回",
+      "4. 注意：全量测试含 F1 封印 4 红基线——PR CI 会因 npm test 步骤红（与本地一致）；需先完成 F1 封印推进（见 F1 节）或在 PR 语境下按治理流程处理，不得为绿改门禁"
+    ]
+  },
+  "f1_seal_status": {
+    "current_state": "HEAD 674b0151f 领先 .sync-audit/verified-source-sha.txt（adca95ca3）；本轮 P01-P07 七个 refactor 提交 + 前置 docs 提交 92c6646c5 均在坐标之后。全量 npm test 的 4 红即由此（三个审计测试同源）。",
+    "why_blocked_this_stage": "推进 VERIFIED_SOURCE_SHA 须按 PROGRESS.md 封印工作流：对候选提交跑全量门禁并绑定提交。本阶段明确无 commit/push 授权（全部改动保留工作区，由编排层验收后统一提交）——封印推进所需的『候选提交』尚不存在，维持 BLOCKED 登记，不为绿虚报坐标/扩白名单。",
+    "post_authorization_steps": "编排层统一提交后：按 PROGRESS.md 封印流程对候选提交执行全量门禁（预期除 F1 组外全绿）→ 推进 .sync-audit/verified-source-sha.txt → 审计白名单两处同步（tests/post-verification-audit-seal.test.ts 与 .sync-audit/verify-post-verification-diff.mjs 保持一致，只允许审计文件变化）→ 复跑 npm test 应 0 红",
+    "impact": "四平台 CI 的 npm test 步骤在封印推进前会复现同组 4 红（确定性、可解释）；不影响其余门禁项判定"
+  },
+  "skips_baseline": "15 skipped 为既有基线（P00 起逐名未变）；本轮零新增 skip、零降低安全/数据断言（新增探针 32+14+7 全部真实断言）",
+  "notes": [
+    "全量 stdout 落 /tmp 后拷贝（R10-09 快照撕裂预防，P02/P03 惯例），命令 JSONL 已注明",
+    "knowledge-platform-smoke 为 CI 专属步骤（--maxWorkers=1 隔离跑同一批 tests/knowledge-* 文件）；该批文件已在全量 npm test 中全绿，本地不重复执行"
+  ]
+}

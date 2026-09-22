@@ -1,0 +1,12 @@
+node:path:1442
+    validateString(path, 'path');
+    ^
+
+TypeError [ERR_INVALID_ARG_TYPE]: The "path" argument must be of type string. Received undefined
+    at Object.dirname (node:path:1442:5)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/P08/tools/product-regression.mjs:428:19
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  code: 'ERR_INVALID_ARG_TYPE'
+}
+
+Node.js v24.16.0

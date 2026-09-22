@@ -1,0 +1,30 @@
+{
+  "tool": "P08 negative-probes",
+  "results": [
+    {
+      "id": "N1 错误 token → 403 零副作用",
+      "expect": "403 + 会话列表不变",
+      "actual": "403 list_unchanged=true",
+      "status": "PASS"
+    },
+    {
+      "id": "N2 伪造跨域 sessionPath → 403 拒绝",
+      "expect": "403/4xx + 零副作用",
+      "actual": "404 list_unchanged=true",
+      "status": "PASS"
+    },
+    {
+      "id": "N3 字段类型错误 → 400 invalid_field_type 零副作用",
+      "expect": "400 + code=invalid_field_type + 列表不变",
+      "actual": "400 code=invalid_field_type list_unchanged=true",
+      "status": "PASS"
+    },
+    {
+      "id": "N0 退出",
+      "expect": "exit 0",
+      "actual": "exit=0",
+      "status": "PASS"
+    }
+  ],
+  "all_pass": true
+}

@@ -1,3 +1,4 @@
+import { registerTaskExecution } from "../tasks/task-execution.ts";
 /**
  * subagent-tool.js — Sub-agent 工具（非阻塞）
  *
@@ -11,6 +12,7 @@
 
 import { Type } from "../pi-sdk/index.ts";
 import path from "node:path";
+import { mintTaskId } from "../tasks/task-identity.ts";
 import { t } from "../i18n.ts";
 import { getToolSessionCwd, getToolSessionPath } from "./tool-session.ts";
 import { resolveAgentParam } from "./agent-id-resolver.ts";
@@ -53,7 +55,7 @@ function directThreadSnapshot(thread) {
 }
 
 function taskIdForSubagentRun() {
-  return `subagent-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  return mintTaskId("subagent");
 }
 
 function errorResult(text, details = {}) {
@@ -428,7 +430,7 @@ export function createSubagentTool(deps) {
       let timeoutTimer = null;
 
       const registry = deps.getTaskRegistry?.();
-      registry?.register(taskId, {
+      const execution = registerTaskExecution(registry, taskId, {
         type: "subagent",
         parentSessionId,
         parentSessionPath,
@@ -631,7 +633,7 @@ export function createSubagentTool(deps) {
       }).finally(() => {
         clearTimeout(timeoutTimer);
         deps.removeSubagentController?.(taskId);
-        registry?.remove(taskId);
+        execution.remove();
         decActive(parentSessionKey);
       });
 
@@ -768,7 +770,7 @@ export function createSubagentReplyTool(deps) {
 
       const controller = new AbortController();
       let timeoutTimer = null;
-      registry?.register(taskId, {
+      const execution = registerTaskExecution(registry, taskId, {
         type: "subagent",
         parentSessionId,
         parentSessionPath,
@@ -914,7 +916,7 @@ export function createSubagentReplyTool(deps) {
       }).finally(() => {
         clearTimeout(timeoutTimer);
         deps.removeSubagentController?.(taskId);
-        registry?.remove(taskId);
+        execution.remove();
       });
 
       return {

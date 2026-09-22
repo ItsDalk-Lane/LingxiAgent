@@ -1,0 +1,277 @@
+{
+  "finding": "F03",
+  "status": "PASS",
+  "scope": "已修复的本地契约；不代表整阶段或GUI/供应商/平台验收",
+  "report": "docs/refactor-2026/independent-fix/F03.md",
+  "cases": [
+    {
+      "id": "C14",
+      "status": "PASS",
+      "original_requirements": [
+        "P05-T03",
+        "P05-A04"
+      ],
+      "production_entry": [
+        "server/routes/chat.ts:createChatRoute/emitStreamEvent",
+        "desktop/src/react/services/ws-message-handler.ts:handleServerMessage",
+        "desktop/src/react/services/stream-resume.ts:updateSessionStreamMeta/replayStreamResume",
+        "desktop/src/react/hooks/use-stream-buffer.ts:handle",
+        "desktop/src/react/services/stream-admission.ts:StreamAdmission"
+      ],
+      "tests": [
+        {
+          "file": "artifacts/refactor-2026/P05/logs/P05-ACCEPTANCE-counterexample.test.ts",
+          "name": "Run A 结束后开启 Run B，旧流(segA/streamA)迟到 delta 不得出现在 Run B 的 answer"
+        },
+        {
+          "file": "tests/stream-route-consumer-isolation.test.ts",
+          "name": "C14/C15/C17: rejects old start/delta/end/tool/status frames and preserves multiple model turns in the current run"
+        }
+      ],
+      "command_ids": [
+        "red-c1",
+        "green-c1",
+        "final-f03-regression-r2"
+      ],
+      "evidence": [
+        "artifacts/refactor-2026/independent-fix/f03/red-c1.out",
+        "artifacts/refactor-2026/independent-fix/f03/green-c1.out",
+        "artifacts/refactor-2026/independent-fix/f03/final-f03-regression-r2.out"
+      ],
+      "notes": "原C1普通正向断言，先红后绿；TCP旧帧/旧恢复响应注入。"
+    },
+    {
+      "id": "C15",
+      "status": "PASS",
+      "original_requirements": [
+        "P05-T01",
+        "P05-T03",
+        "P04-T06"
+      ],
+      "production_entry": [
+        "server/routes/chat.ts:createChatRoute/emitStreamEvent",
+        "desktop/src/react/services/ws-message-handler.ts:handleServerMessage",
+        "desktop/src/react/services/stream-resume.ts:updateSessionStreamMeta/replayStreamResume",
+        "desktop/src/react/hooks/use-stream-buffer.ts:handle",
+        "desktop/src/react/services/stream-admission.ts:StreamAdmission"
+      ],
+      "tests": [
+        {
+          "file": "tests/stream-route-consumer-isolation.test.ts",
+          "name": "C14/C15/C17: rejects old start/delta/end/tool/status frames and preserves multiple model turns in the current run"
+        },
+        {
+          "file": "tests/model-observability-session-trace-reuse.test.ts",
+          "name": "同会话第二轮复用第一轮 traceId；列表一行、计数累加"
+        },
+        {
+          "file": "desktop/src/react/__tests__/hooks/use-stream-buffer-steer-split.test.ts",
+          "name": "整套既有同流插话切Run回归"
+        }
+      ],
+      "command_ids": [
+        "final-f03-regression-r2"
+      ],
+      "evidence": [
+        "artifacts/refactor-2026/independent-fix/f03/final-f03-regression-r2.out"
+      ],
+      "notes": "服务端run UUID与stream ID实际不同，多model turn不结束run；合法新stream接纳，trace未拆分。"
+    },
+    {
+      "id": "C16",
+      "status": "PASS",
+      "original_requirements": [
+        "P05-A03",
+        "P05-A04",
+        "P05-A05",
+        "P05-A06"
+      ],
+      "production_entry": [
+        "server/routes/chat.ts:createChatRoute/emitStreamEvent",
+        "desktop/src/react/services/ws-message-handler.ts:handleServerMessage",
+        "desktop/src/react/services/stream-resume.ts:updateSessionStreamMeta/replayStreamResume",
+        "desktop/src/react/hooks/use-stream-buffer.ts:handle",
+        "desktop/src/react/services/stream-admission.ts:StreamAdmission"
+      ],
+      "tests": [
+        {
+          "file": "tests/stream-route-consumer-isolation.test.ts",
+          "name": "C16/C18: duplicate frames are idempotent, a gap resumes through the real route, and untagged old frames cannot acquire current identity"
+        },
+        {
+          "file": "tests/stream-route-consumer-isolation.test.ts",
+          "name": "C16: more than 256 runs recover through the real route without accepting previously retired starts"
+        },
+        {
+          "file": "tests/chat-route-switching.test.ts",
+          "name": "P05 stream resume semantics (real route + real stream store)"
+        },
+        {
+          "file": "desktop/src/react/__tests__/services/stream-resume.test.ts",
+          "name": "does not dedupe a new stream seq=1 against the previous stream consumed seqs"
+        }
+      ],
+      "command_ids": [
+        "final-f03-regression-r2"
+      ],
+      "evidence": [
+        "artifacts/refactor-2026/independent-fix/f03/final-f03-regression-r2.out"
+      ],
+      "notes": "真实路由reset/truncated，加真实TCP缺口恢复；两层证据分开，未把mock恢复套件当TCP测试。"
+    },
+    {
+      "id": "C17",
+      "status": "PASS",
+      "original_requirements": [
+        "P05-T07",
+        "P05-A03",
+        "P05-A04"
+      ],
+      "production_entry": [
+        "server/routes/chat.ts:createChatRoute/emitStreamEvent",
+        "desktop/src/react/services/ws-message-handler.ts:handleServerMessage",
+        "desktop/src/react/services/stream-resume.ts:updateSessionStreamMeta/replayStreamResume",
+        "desktop/src/react/hooks/use-stream-buffer.ts:handle",
+        "desktop/src/react/services/stream-admission.ts:StreamAdmission"
+      ],
+      "tests": [
+        {
+          "file": "tests/stream-route-consumer-isolation.test.ts",
+          "name": "F03 real WS route and renderer consumption"
+        }
+      ],
+      "command_ids": [
+        "final-f03-regression-r2"
+      ],
+      "evidence": [
+        "artifacts/refactor-2026/independent-fix/f03/final-f03-regression-r2.out"
+      ],
+      "notes": "本地TCP WS生产回调→实际接收分发→buffer/live projection/Zustand，消费者未mock。"
+    },
+    {
+      "id": "C18",
+      "status": "PASS",
+      "original_requirements": [
+        "P05-T02",
+        "P05-A13"
+      ],
+      "production_entry": [
+        "server/routes/chat.ts:createChatRoute/emitStreamEvent",
+        "desktop/src/react/services/ws-message-handler.ts:handleServerMessage",
+        "desktop/src/react/services/stream-resume.ts:updateSessionStreamMeta/replayStreamResume",
+        "desktop/src/react/hooks/use-stream-buffer.ts:handle",
+        "desktop/src/react/services/stream-admission.ts:StreamAdmission"
+      ],
+      "tests": [
+        {
+          "file": "tests/stream-route-consumer-isolation.test.ts",
+          "name": "C16/C18: duplicate frames are idempotent, a gap resumes through the real route, and untagged old frames cannot acquire current identity"
+        },
+        {
+          "file": "desktop/src/react/__tests__/services/ws-stream-abort-lifecycle.test.ts",
+          "name": "turn_end(aborted) ends the local turn binding so the next reply lands after the new user message"
+        },
+        {
+          "file": "desktop/src/react/__tests__/components/computer-app-approval-prompt.test.ts",
+          "name": "shows a pending input confirmation that arrived while its session was inactive and not hydrated"
+        }
+      ],
+      "command_ids": [
+        "final-f03-regression-r2",
+        "legacy-approval-real-consumer"
+      ],
+      "evidence": [
+        "artifacts/refactor-2026/independent-fix/f03/final-f03-regression-r2.out",
+        "artifacts/refactor-2026/independent-fix/f03/legacy-approval-real-consumer.out"
+      ],
+      "notes": "保留全旧协议，已知现代流不接无身份迟到内容；审批未增加streamId且真实接纳通过。"
+    },
+    {
+      "id": "C19",
+      "status": "PASS",
+      "original_requirements": [
+        "P05-A01",
+        "P05-A06",
+        "P05-A07",
+        "P05-A09",
+        "P05-A10",
+        "P05-A13"
+      ],
+      "production_entry": [
+        "server/routes/chat.ts:createChatRoute/emitStreamEvent",
+        "desktop/src/react/services/ws-message-handler.ts:handleServerMessage",
+        "desktop/src/react/services/stream-resume.ts:updateSessionStreamMeta/replayStreamResume",
+        "desktop/src/react/hooks/use-stream-buffer.ts:handle",
+        "desktop/src/react/services/stream-admission.ts:StreamAdmission"
+      ],
+      "tests": [
+        {
+          "file": "tests/live-history-reserved-tag-parity.test.ts",
+          "name": "场景一：mood-only → generate-image → mood + final answer，两条路径语义一致"
+        },
+        {
+          "file": "tests/history-run-outcome-edges.test.ts",
+          "name": "T14：文件 blocks 随 Run 片段缝合归属正确、跨页不重复"
+        },
+        {
+          "file": "tests/history-run-outcome-edges.test.ts",
+          "name": "T10b：最终失败带部分正文 → failed 终态与部分正文共存"
+        },
+        {
+          "file": "tests/history-pagination-run-continuity.test.ts",
+          "name": "整套真实历史路由/分页/store连续性"
+        },
+        {
+          "file": "tests/conversation-export.test.ts",
+          "name": "exports only the selected group channel / exports only the selected DM owner copy"
+        }
+      ],
+      "command_ids": [
+        "final-f03-regression-r2",
+        "source-and-export-scope"
+      ],
+      "evidence": [
+        "artifacts/refactor-2026/independent-fix/f03/final-f03-regression-r2.out",
+        "artifacts/refactor-2026/independent-fix/f03/source-and-export-scope.out"
+      ],
+      "notes": "现有入口分层证据：live/history/recovery/频道导出；桌面结构化聊天导出不存在，子项NOT_APPLICABLE，真实GUI退出重入操作归C25，不能把本项PASS扩大到GUI。",
+      "subitems": [
+        {
+          "name": "desktop_structured_chat_export",
+          "status": "NOT_APPLICABLE",
+          "evidence": "artifacts/refactor-2026/independent-fix/f03/source-and-export-scope.out",
+          "reason": "当前桌面和sessions路由无此产品入口；存在的是channel/dm原始Markdown导出，不新建无需求功能。"
+        },
+        {
+          "name": "existing_live_history_resume_semantics",
+          "status": "PASS"
+        },
+        {
+          "name": "existing_channel_dm_export",
+          "status": "PASS"
+        },
+        {
+          "name": "actual_gui_actions",
+          "status": "TRACKED_BY_C25",
+          "reason": "本包本地协议/投影测试不替代真实GUI动作"
+        }
+      ]
+    }
+  ],
+  "confirmationProjectionFollowup": {
+    "status": "PASS",
+    "originalHeadReproduced": true,
+    "redCommand": "confirmation-projection-red",
+    "originalHeadCommand": "confirmation-projection-original-head",
+    "greenCommand": "confirmation-projection-green",
+    "regressionCommand": "confirmation-f03-regression",
+    "tests": 276,
+    "files": 19,
+    "strictCommands": [
+      "confirmation-renderer-typecheck",
+      "confirmation-strict"
+    ],
+    "test": "keeps a resolved confirmation resolved after the next real streamed projection",
+    "scope": "实际WS消费者原始buffer与后续/终态投影，现有状态同步，无新增状态层"
+  }
+}

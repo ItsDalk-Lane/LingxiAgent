@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "stage_id": "P00",
+  "task_id": "P00-T06",
+  "captured_at": "2026-09-21T13:00:12.948Z",
+  "fixture": "tests/fixtures/system-prompt-golden-{zh,en}.txt + 生产模块常量（core/engine.ts:185, lib/tools/ptc-tool.ts）",
+  "token_metric": "estimateTextTokens（lib/llm/estimate-text-tokens.ts；CJK=1.1 token/字，其余 4 chars/token）——估算值，非精确 tokenizer",
+  "resident_tool_surface": [
+    "read",
+    "write",
+    "edit",
+    "exec_command"
+  ],
+  "deferred_catalog_policy": "其余全部按需（shared/tool-categories.ts ONDEMAND_CORE_TOOL_NAMES 推导）",
+  "components": [
+    {
+      "component": "A1 系统提示词正文（golden zh，当前真实输出）",
+      "bytes": 5194,
+      "chars": 2592,
+      "estimated_tokens": 1747
+    },
+    {
+      "component": "A2 系统提示词正文（golden en，当前真实输出）",
+      "bytes": 6114,
+      "chars": 6048,
+      "estimated_tokens": 1529
+    },
+    {
+      "component": "B1 按需目录引导（zh）",
+      "bytes": 172,
+      "chars": 92,
+      "estimated_tokens": 57
+    },
+    {
+      "component": "B2 按需目录引导（en）",
+      "bytes": 186,
+      "chars": 186,
+      "estimated_tokens": 47
+    },
+    {
+      "component": "C PTC 入口工具 run_tools 描述",
+      "bytes": 1684,
+      "chars": 1660,
+      "estimated_tokens": 419
+    }
+  ],
+  "not_measured_yet": [
+    "常驻 4 工具的 JSON schema 字节（Pi SDK 运行时产物）——P06 用 payload 捕获",
+    "动态用户资料（人格文件/记忆注入/任务资料）——P06 同一 fixture 下捕获最终 request",
+    "消息历史与工具结果正文——属会话内容，不入常驻预算"
+  ],
+  "budget_rule": "常驻平台开销（A+B+C+D）不得超过本基线；动态资料另列。不得删用户内容或关闭记忆凑数。"
+}

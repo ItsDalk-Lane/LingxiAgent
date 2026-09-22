@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "stage_id": "P00",
+  "task_id": "P00-T01",
+  "captured_at": "2026-09-21T20:38+08:00 (local, Asia/Shanghai implied by machine)",
+  "repo": {
+    "path": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "branch": "docs/knowledge-closeout-2026-09-21",
+    "head_sha": "92c6646c581883436e026c53898e8bfc34ce4d27",
+    "research_sha_taskbook": "8037fae7a6f621549f5b7db4c4d0bba3862ddc07",
+    "research_sha_relationship": "研究SHA是HEAD的第1个祖先（HEAD~1），无分叉",
+    "drift_vs_research_sha": {
+      "source_files_changed": 0,
+      "changed_files": ["BLOCKED.md", "CONTRIBUTING.md", "PROGRESS.md", "README.md", "README_EN.md", "RELEASE_VERSIONING.md", "docs/README.md", "git-ui-relocation-mockup.html(删除)"],
+      "nature": "仅文档/收尾材料差异，无生产代码差异；后续阶段任务不受实现漂移影响，行号引用需按当前HEAD复核",
+      "evidence_command": "P00-T01-drift-diff"
+    },
+    "audit_seal": {
+      "verified_source_sha": "adca95ca3947bcada920e66caabfbd059d9993e6",
+      "note": "HEAD 领先封印坐标2个提交，其中 docs 收尾提交(92c6646c5)改动了不在 seal 白名单内的 README.md/CONTRIBUTING.md 等 7 个文件；预计 tests/post-verification-audit-seal.test.ts 现为既有红，以 P00-T05 实际运行为准，不在P00修复"
+    },
+    "untracked_at_start": [
+      "Lingxi_Refactor_Taskbooks_2026-09-21/（任务书原件，本轮输入）",
+      "Lingxi_Refactor_Taskbooks_2026-09-21_副本/（任务书副本，未使用，未改动）"
+    ],
+    "tracked_modifications_at_start": 0,
+    "history_and_tags": { "commit_count": 583, "tag_count": 494, "fsck": "仅 dangling blob，无损坏" }
+  },
+  "environment": {
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "engines_requirement": ">=24.12.0 <25 — 满足",
+    "os": "Darwin 27.0.0",
+    "os_product": "macOS 27.0 (Build 26A428)",
+    "arch": "arm64",
+    "lockfile": "package-lock.json",
+    "lockfile_sha256": "a9735825cea1d018c2a42ae04f875368a003c386ca68fc86503bc8acbcd79d3c",
+    "lockfile_version": "见 P00-T01-lockfile 日志",
+    "node_modules": "存在；npm ls 抽查 better-sqlite3@12.6.2 / electron@42.8.1 / vitest@4.1.10 / typescript@5.9.3 与锁一致，无 invalid 树",
+    "package_version": "0.1.42 (upstreamVersion 0.447.4, releaseGeneration 20)"
+  },
+  "rules_read": {
+    "AGENTS.md": "存在（本地项目规则，.gitignore 忽略不随clone分发）；已读，含审计封印适用范围与验证纪律",
+    "CONTRIBUTING.md": "存在；已读，含环境要求、LINGXI_HOME 覆盖说明、指纹重钉规则、'不接受PR'",
+    "tests/README.md": "存在；已读，风险驱动测试政策与本地全量验证命令",
+    "PROGRESS.md": "存在（2017行）；定位到 seal 推进台账段落，本轮不推进封印",
+    "docs/README.md": "存在；文档入口"
+  },
+  "isolation": {
+    "dev_launcher_behavior": "scripts/launch.js → scripts/dev-env.js applyDevEnvironment() 无条件将 LINGXI_HOME 覆盖为 ~/.lingxi-dev（证据命令 P00-T01-launcher-override-proof，overridden=true）",
+    "isolation_strategy": "绕过 launch.js，直接 node server/main-full.ts + 显式 LINGXI_HOME/LINGXI_PORT/LINGXI_TOKEN",
+    "isolated_home": "artifacts/refactor-2026/P00/isolated/home-A",
+    "real_sentinels": ["~/.lingxi（生产数据，存在）", "~/.lingxi-dev（开发数据，存在）"],
+    "proof_command": "P00-T01-A03-isolation-proof-r2",
+    "proof_result": "PASS：启动前后路径断言、受控端口33462、合成写入PUT/GET /api/input-drafts 200往返、真实哨兵 find/stat 快照零变化、进程 SIGTERM 正常退出 exit 0",
+    "isolated_home_layout_observed": ["server-info.json", "session-manifest.db", "data-epoch.json", "input-drafts.v1.json", "models-store.json", "models.json", "users.json", "devices.json", "auth.json", "channels/", "knowledge/", "plugin-data/", "security/", "logs/", "model-observability/", "file-history/", "agents/", "skills/", "user/", ".ephemeral/", "provider-catalog.json", "server-network.json", "server-node.json", "pairing-sessions.json", "device-credentials.json", "studio-mounts.json", "studios.json"]
+  },
+  "authorization_boundaries": {
+    "allowed_this_stage": "本地工作区清点、只读调研、隔离fixture与测试基础设施、文档产出；不push/PR/tag/发布",
+    "branch_decision": "未另建新分支：当前分支工作树干净（除未跟踪任务书目录），切换分支会改变用户环境状态；P00 仅新增未跟踪文件于 docs/refactor-2026/ 与 artifacts/refactor-2026/，起点=HEAD 92c6646c5，回退=删除上述两个新增目录",
+    "commit_policy": "本轮零 commit（审计封印白名单不允许非审计文件提交；用户未授权提交）"
+  }
+}

@@ -1,0 +1,63 @@
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T01：固定快照下分页不重叠、单逻辑 Run、无伪无回复状态，且与全量恢复语义等价
+[lm-entry] targetPath= ssions/page-target.jsonl preloaded= false
+[cmf-entry] path= ssions/page-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fvar%2Ffolders%2F5r%2Fwq54gtms
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T01：固定快照下分页不重叠、单逻辑 Run、无伪无回复状态，且与全量恢复语义等价
+[lm-dbg] before save, etag= W/"hrp1-b57c1fc142c366b1f0ea7b2f3abb3ff81944d89962411f095e195353c1ece718" proto= 1
+[save-dbg] etag= W/"hrp1-b57c1fc142c366b1f0ea7b2f3abb3ff81944d89962411f095e195353c1ece718" proto= 1 limit= 50
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T04：重复到达的同一页幂等，不增加显示项或过程块
+[lm-entry] targetPath= ssions/page-target.jsonl preloaded= false
+[cmf-entry] path= ssions/page-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fvar%2Ffolders%2F5r%2Fwq54gtms
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T04：重复到达的同一页幂等，不增加显示项或过程块
+[lm-dbg] before save, etag= W/"hrp1-f49b2e6621b15e1a3b3345105d5dac3809cc94941e9c43d3b73776a998bea078" proto= 1
+[save-dbg] etag= W/"hrp1-f49b2e6621b15e1a3b3345105d5dac3809cc94941e9c43d3b73776a998bea078" proto= 1 limit= 50
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T11b：整页都被前端过滤（隐藏后台通知）时，分页进度仍推进、更早真实历史可达
+[lm-entry] targetPath= ssions/page-target.jsonl preloaded= false
+[cmf-entry] path= ssions/page-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fvar%2Ffolders%2F5r%2Fwq54gtms
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T11b：整页都被前端过滤（隐藏后台通知）时，分页进度仍推进、更早真实历史可达
+[lm-dbg] before save, etag= W/"hrp1-5d8afa88cbc46d09824f1e1cf4ea88ea5f875c4111d32c8477310969b1b41a1a" proto= 1
+[save-dbg] etag= W/"hrp1-5d8afa88cbc46d09824f1e1cf4ea88ea5f875c4111d32c8477310969b1b41a1a" proto= 1 limit= 50
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T12c：死循环保护保留——页数超限（人为压低上限）时显式报错而非无限翻页
+[lm-entry] targetPath= ssions/page-target.jsonl preloaded= false
+[cmf-entry] path= ssions/page-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fvar%2Ffolders%2F5r%2Fwq54gtms
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T12c：死循环保护保留——页数超限（人为压低上限）时显式报错而非无限翻页
+[lm-dbg] before save, etag= W/"hrp1-1003ceb0d81a4b8eb09528aaf0e63217e59582046944798fd1c5b92d13dd7de4" proto= 1
+[save-dbg] etag= W/"hrp1-1003ceb0d81a4b8eb09528aaf0e63217e59582046944798fd1c5b92d13dd7de4" proto= 1 limit= 50
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T12b：合法夹具变体——'不带尾换行'，经真实分支入口分页语义一致
+[lm-entry] targetPath= /page-variant-nonl.jsonl preloaded= false
+[cmf-entry] path= /page-variant-nonl.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fvar%2Ffolders%2F5r%2Fwq54gtms
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T12b：合法夹具变体——'不带尾换行'，经真实分支入口分页语义一致
+[lm-dbg] before save, etag= W/"hrp1-4452bda5e6281ebfaa0a0e84a6d6037c8bcca1389c57b5b929ce40ffc207e51f" proto= 1
+[save-dbg] etag= W/"hrp1-4452bda5e6281ebfaa0a0e84a6d6037c8bcca1389c57b5b929ce40ffc207e51f" proto= 1 limit= 50
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T12b：合法夹具变体——'带尾换行'，经真实分支入口分页语义一致
+[lm-entry] targetPath= ns/page-variant-nl.jsonl preloaded= false
+[cmf-entry] path= ns/page-variant-nl.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fvar%2Ffolders%2F5r%2Fwq54gtms
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T12b：合法夹具变体——'带尾换行'，经真实分支入口分页语义一致
+[lm-dbg] before save, etag= W/"hrp1-6568ddcf8b5d97bb2e3cf24951ab43b7324d637b984a0c12643fc9ed1aebe398" proto= 1
+[save-dbg] etag= W/"hrp1-6568ddcf8b5d97bb2e3cf24951ab43b7324d637b984a0c12643fc9ed1aebe398" proto= 1 limit= 50
+
+stderr | tests/history-pagination-run-continuity.test.ts > A03 夹具审计契约 > 夹具 sha256/字节数/数量/页数学/分支身份/执行路径计数符合 A03 定义
+[lm-entry] targetPath= sions/audit-target.jsonl preloaded= false
+[cmf-entry] path= sions/audit-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fvar%2Ffolders%2F5r%2Fwq54gtms
+
+stderr | tests/history-pagination-run-continuity.test.ts > A03 夹具审计契约 > 夹具 sha256/字节数/数量/页数学/分支身份/执行路径计数符合 A03 定义
+[lm-dbg] before save, etag= W/"hrp1-4fa7f5a80993e5021409b246528dc101fd2882973dfa54f9d4459b3339252ff6" proto= 1
+[save-dbg] etag= W/"hrp1-4fa7f5a80993e5021409b246528dc101fd2882973dfa54f9d4459b3339252ff6" proto= 1 limit= 50
+

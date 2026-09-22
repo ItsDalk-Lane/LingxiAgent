@@ -1,0 +1,12 @@
+stderr | tests/chat-route-switching.test.ts > chat route model switch guard > rejects prompt routing when sessionId and sessionPath disagree (#2078)
+[chat] ws prompt rejected: session_identity_mismatch — sessionId and sessionPath refer to different sessions (sessionId=sess_other, sessionPath=/tmp/path.jsonl)
+
+stderr | tests/chat-route-switching.test.ts > chat route model switch guard > rejects a prompt with no identity before it validates the attachments
+[chat] ws prompt rejected: internal_contract — session identity required (sessionId=none, sessionPath=none)
+
+stderr | tests/chat-route-switching.test.ts > chat route model switch guard > rejects mismatched steer and resume targets before touching runtime state (#2078)
+[chat] ws steer rejected: session_identity_mismatch — sessionId and sessionPath refer to different sessions (sessionId=sess_other, sessionPath=/tmp/path.jsonl)
+
+stderr | tests/chat-route-switching.test.ts > chat route model switch guard > rejects mismatched steer and resume targets before touching runtime state (#2078)
+[chat] ws resume_stream rejected: session_identity_mismatch — sessionId and sessionPath refer to different sessions (sessionId=sess_other, sessionPath=/tmp/path.jsonl)
+

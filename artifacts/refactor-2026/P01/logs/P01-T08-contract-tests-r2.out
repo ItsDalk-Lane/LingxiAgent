@@ -1,0 +1,72 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/quality-gates-contract.test.ts (7 tests) 31ms
+ ❯ tests/open-boundary-lint.test.ts (16 tests | 2 failed) 1826ms
+     ✓ rejects a negation-pattern entry 44ms
+     ✓ throws when a manifest file entry does not exist on disk 1ms
+     ✓ throws when a manifest directory entry does not exist on disk 1ms
+     ✓ collects literal static and dynamic import/require specifiers with line numbers 4ms
+     ✓ ignores bare specifiers and non-literal dynamic calls (out of this lint's scope) 1ms
+     ✓ returns null for a bare (non-relative) specifier 0ms
+     ✓ resolves a relative specifier with an explicit extension 0ms
+     ✓ throws when a relative specifier cannot be resolved to any file 0ms
+     ✓ reports an edge when a whitelisted file imports a non-whitelisted repo path 2ms
+     ✓ reports nothing when every import target is whitelisted 2ms
+     ✓ does not scan non-JS/TS whitelisted files (e.g. markdown, JSON, HTML) for imports 2ms
+     ✓ a violation already present in the baseline is ok (known debt) 0ms
+     ✓ a violation NOT in the baseline fails closed and reports the exact from/to edge 0ms
+     ✓ readBaseline throws a clear error when the baseline file is missing 0ms
+     × the committed export-manifest.json + baseline pass cleanly against real source 988ms
+     × the CLI subprocess exits 0 against the real repo and reports the known-debt count 781ms
+ ✓ tests/cli-closure-census.test.ts (22 tests) 66175ms
+     ✓ matches the committed deterministic closure and baseline  16943ms
+     ✓ is idempotent: two independent full runs produce identical output  32851ms
+     ✓ writeCliRuntimeClosure/writeOpenBoundaryBaseline regenerate the exact committed files in place  16322ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/open-boundary-lint.test.ts > lint-open-boundary: real repo state (smoke) > the committed export-manifest.json + baseline pass cleanly against real source
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/open-boundary-lint.test.ts:165:23
+    163|     const baseline = readBaseline({ rootDir: REPOSITORY_ROOT });
+    164|     const result = checkRatchet({ violations, baseline });
+    165|     expect(result.ok).toBe(true);
+       |                       ^
+    166|     expect(result.totalViolations).toBeGreaterThan(0); // known debt i…
+    167|   }, 30_000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/open-boundary-lint.test.ts > lint-open-boundary: real repo state (smoke) > the CLI subprocess exits 0 against the real repo and reports the known-debt count
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/open-boundary-lint.test.ts:171:27
+    169|   it("the CLI subprocess exits 0 against the real repo and reports the…
+    170|     const result = spawnSync(process.execPath, [LINT_SCRIPT], { cwd: R…
+    171|     expect(result.status).toBe(0);
+       |                           ^
+    172|     expect(result.stdout).toMatch(/lint:boundary ok/);
+    173|   }, 30_000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  2 failed | 43 passed (45)
+   Start at  22:50:41
+   Duration  66.46s (transform 226ms, setup 59ms, import 886ms, tests 68.03s, environment 0ms)
+

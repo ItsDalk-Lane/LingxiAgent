@@ -109,3 +109,9 @@ S10 RED `logs/s10-red.log`：4 failed / 4 passed，exit 1；中间 `logs/s10-fir
 增量补丁：[89bc0b64-to-r01-r10-source.patch](patches/89bc0b64-to-r01-r10-source.patch)，404617 bytes，SHA-256 `116976d9e83c03ca216b413af849d6831998b53d330ebde4de13c8fdc04d6c14`。R10-09 已从干净 `89bc0b64` 重放，源码摘要与受测工作树相等。
 
 R10-01–R10-10 全部绑定 tests/round2-delivery-evidence.test.ts 的真实标题，R10-07/08 共用同一验收标题。S11 active；尚不记录其未执行的结果，不将 S10 局部通过写成全任务闭环。
+
+## 2026-09-22 v0.1.43 门禁运行记录与一次标签复用事故登记
+
+- v0.1.43 发布树门禁：release-gate-v043（一跑 EXIT 0、manifest 1587cd75）、二跑（EXIT 1，macOS ustar 临时目录竞态，与 v0.1.42 期 v042b2 同族）、v043a/b（EXIT 1 ×2，mac-arm64 vitest worker fork 崩溃，Tests 全绿）、v043c（EXIT 1，knowledge-lifecycle delete-wins 计时抖动，单跑 16/16 绿）、v043d（EXIT 0，14853 passed / 0 failed / 15 skipped，manifest c980e9ec 绑定发布树，无漂移）。失败记录按 R10-07/08 与成功并存保留。
+- 事故如实登记：一跑与二跑误用同一标签 release-gate-v043，二跑覆盖一跑日志文件，一跑记录（exit 0 / manifest 1587cd75）日志字节不可复算成为孤儿，已将该孤儿记录从 COMMAND_RESULTS.json 移除；其 manifest 快照 manifests/1587cd75.json 仍留档。终态绿门禁以 v043d（c980e9ec）为准。后续标签均已唯一化（v043a…v043d、v043-patch）。
+- 补丁存储形态变更（2026-09-22）：89bc0b64 增量补丁原始字节 111.8MB 超 GitHub 单文件 100MB 硬限，交付形态改为确定性 gzip（mtime=0，.patch.gz 22MB）；create-delivery-patch.py 重放验证仍对未压缩原始字节执行，语义不变，输出摘要新增 patchUncompressedBytes。仓库不再跟踪未压缩 .patch。

@@ -1,0 +1,40 @@
+
+/Users/study_superior/Desktop/Code/LingxiAgent/core/session-permission-mode.ts
+  378:7  warning  'normalized' is never reassigned. Use 'const' instead  prefer-const
+
+/Users/study_superior/Desktop/Code/LingxiAgent/server/routes/sessions.ts
+    14:10   warning  'resolveDeferredReceiverName' is defined but never used  @typescript-eslint/no-unused-vars
+    58:10   warning  'collectToolOutcomesByCallId' is defined but never used  @typescript-eslint/no-unused-vars
+   356:15   warning  Empty block statement                                    no-empty
+   701:20   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+   726:16   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+   833:53   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  2422:139  warning  Empty block statement                                    no-empty
+  2542:72   warning  Empty block statement                                    no-empty
+  2544:19   warning  Empty block statement                                    no-empty
+  2559:63   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  2589:27   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  2622:42   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  2737:72   warning  Empty block statement                                    no-empty
+  2912:66   warning  Empty block statement                                    no-empty
+
+/Users/study_superior/Desktop/Code/LingxiAgent/tests/bridge-session-teardown.test.ts
+    12:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+    15:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+    18:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+    19:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   171:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   172:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   239:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   357:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1018:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1348:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1353:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1418:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1451:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1483:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1565:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 30 problems (0 errors, 30 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

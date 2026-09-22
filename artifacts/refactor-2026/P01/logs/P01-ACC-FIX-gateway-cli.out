@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/cli-local-server.test.ts (8 tests) 37ms
+ ✓ tests/tool-invocation-gateway.test.ts (17 tests) 36ms
+
+ Test Files  2 passed (2)
+      Tests  25 passed (25)
+   Start at  23:21:12
+   Duration  787ms (transform 220ms, setup 36ms, import 693ms, tests 73ms, environment 0ms)
+

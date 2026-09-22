@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/dependency-boundary-check.test.ts (7 tests) 2454ms
+     ✓ production source is clean across all scan roots  2441ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  23:20:57
+   Duration  2.69s (transform 75ms, setup 18ms, import 161ms, tests 2.45s, environment 0ms)
+

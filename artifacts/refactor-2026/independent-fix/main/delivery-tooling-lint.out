@@ -1,0 +1,7 @@
+
+/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/independent-fix/validate-delivery.mjs
+  2:8  warning  'path' is defined but never used           @typescript-eslint/no-unused-vars
+  6:7  warning  'root' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 2 problems (0 errors, 2 warnings)
+

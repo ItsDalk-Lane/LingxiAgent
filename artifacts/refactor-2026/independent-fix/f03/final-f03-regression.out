@@ -1,0 +1,12 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/services/ws-knowledge-rollup-progress.test.ts (10 tests | 2 failed) 52ms
+     × 本地快速路径只有检索卡与回答卡，不产生拆解、滚动阅读或补充检索卡 4ms
+     × answer 收口：阅读卡收尾 + 「正在生成回答」卡；正文首字到达时收尾 1ms
+
+ Test Files  1 failed | 17 passed (18)
+      Tests  2 failed | 261 passed (263)
+   Start at  17:55:28
+   Duration  5.29s (transform 8.67s, setup 286ms, import 13.70s, tests 6.12s, environment 2.94s)
+

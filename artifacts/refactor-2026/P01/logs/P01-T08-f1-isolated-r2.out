@@ -1,0 +1,157 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/post-verification-audit-seal.test.ts (3 tests | 1 failed) 59ms
+     ✓ VERIFIED_SOURCE_SHA is a valid 40-hex commit reachable in this repo 45ms
+     × changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced) 12ms
+     ✓ the audit-seal test and generator are both present for the guard to be self-consistent 0ms
+✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+  - BLOCKED.md
+  - CONTRIBUTING.md
+  - README.md
+  - README_EN.md
+  - RELEASE_VERSIONING.md
+  - docs/README.md
+  - git-ui-relocation-mockup.html
+ ❯ tests/round3-delivery-evidence.test.ts (5 tests | 1 failed) 184ms
+     ✓ C03-回归守卫: round2 交付日志全部存在且哈希可复算（缺一即失败） 46ms
+     ✓ round3: 每条命令记录的日志存在、哈希可复算、manifest 齐备 17ms
+     × round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试 78ms
+     ✓ round3: 存在与最终源码摘要一致、执行期间无漂移的绿色门禁 1ms
+     ✓ round3: 增量补丁存在且重放验证通过（生成脚本输出 VERIFIED 并入库为记录） 42ms
+✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+  - BLOCKED.md
+  - CONTRIBUTING.md
+  - README.md
+  - README_EN.md
+  - RELEASE_VERSIONING.md
+  - docs/README.md
+  - git-ui-relocation-mockup.html
+✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+  - BLOCKED.md
+  - CONTRIBUTING.md
+  - README.md
+  - README_EN.md
+  - RELEASE_VERSIONING.md
+  - docs/README.md
+  - git-ui-relocation-mockup.html
+ ❯ tests/round2-delivery-evidence.test.ts (10 tests | 2 failed) 5446ms
+     ✓ R10-01: 旧 F7/D 系列明确 superseded，当前无语音输入组件要求与保留能力写清 34ms
+     ✓ R10-02: COMMAND_RESULTS 的日志与源码 manifest 均存在且 SHA-256 可复算 220ms
+     × R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁 80ms
+     × R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示 76ms
+     ✓ R10-05: R01-R09 每项均绑定存在的真实测试文件、runner 标题、日志与源码摘要 15ms
+     ✓ S11-X2: X2-01 至 X2-12 均绑定最终联合回归的真实测试、日志与源码摘要 3ms
+     ✓ R10-06: 真机权限、真实供应商和其他平台只标 BLOCKED，不伪装成本地通过 0ms
+     ✓ R10-07/08: 失败与成功记录并存且 exit 未改写，历史缺失日志明确 unavailable 1ms
+     ✓ R10-09: 增量补丁从干净 89bc0b64 重放后，源码摘要与当前工作树完全一致  5000ms
+     ✓ R10-10: 本轮日志不泄漏真实用户路径，旧听写流程只以历史/superseded 身份出现 16ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/post-verification-audit-seal.test.ts > post-verification audit seal (diff guard) > changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced)
+AssertionError: VERIFIED_SOURCE_SHA 之后出现了非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+BLOCKED.md
+CONTRIBUTING.md
+README.md
+README_EN.md
+RELEASE_VERSIONING.md
+docs/README.md
+git-ui-relocation-mockup.html: expected [ 'BLOCKED.md', …(6) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "BLOCKED.md",
++   "CONTRIBUTING.md",
++   "README.md",
++   "README_EN.md",
++   "RELEASE_VERSIONING.md",
++   "docs/README.md",
++   "git-ui-relocation-mockup.html",
++ ]
+
+ ❯ tests/post-verification-audit-seal.test.ts:103:7
+    101|       `VERIFIED_SOURCE_SHA 之后出现了非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifact…
+    102|         violators.join("\n"),
+    103|     ).toEqual([]);
+       |       ^
+    104|   });
+    105|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁
+Error: Command failed: node /Users/study_superior/Desktop/Code/LingxiAgent/.sync-audit/verify-post-verification-diff.mjs
+✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+  - BLOCKED.md
+  - CONTRIBUTING.md
+  - README.md
+  - README_EN.md
+  - RELEASE_VERSIONING.md
+  - docs/README.md
+  - git-ui-relocation-mockup.html
+
+ ❯ manifestSourceRef tests/round2-delivery-evidence.test.ts:61:17
+     59|   const verified = fs.readFileSync(path.join(ROOT, ".sync-audit", "ver…
+     60|   expect(verified).toMatch(/^[0-9a-f]{40}$/);
+     61|   const guard = execFileSync("node", [path.join(ROOT, ".sync-audit", "…
+       |                 ^
+     62|     cwd: ROOT,
+     63|     encoding: "utf8",
+ ❯ tests/round2-delivery-evidence.test.ts:129:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示
+Error: Command failed: node /Users/study_superior/Desktop/Code/LingxiAgent/.sync-audit/verify-post-verification-diff.mjs
+✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+  - BLOCKED.md
+  - CONTRIBUTING.md
+  - README.md
+  - README_EN.md
+  - RELEASE_VERSIONING.md
+  - docs/README.md
+  - git-ui-relocation-mockup.html
+
+ ❯ manifestSourceRef tests/round2-delivery-evidence.test.ts:61:17
+     59|   const verified = fs.readFileSync(path.join(ROOT, ".sync-audit", "ver…
+     60|   expect(verified).toMatch(/^[0-9a-f]{40}$/);
+     61|   const guard = execFileSync("node", [path.join(ROOT, ".sync-audit", "…
+       |                 ^
+     62|     cwd: ROOT,
+     63|     encoding: "utf8",
+ ❯ tests/round2-delivery-evidence.test.ts:150:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/round3-delivery-evidence.test.ts > round3 C01-C03 候选交付证据契约 > round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试
+Error: Command failed: node /Users/study_superior/Desktop/Code/LingxiAgent/.sync-audit/verify-post-verification-diff.mjs
+✗ VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+  - BLOCKED.md
+  - CONTRIBUTING.md
+  - README.md
+  - README_EN.md
+  - RELEASE_VERSIONING.md
+  - docs/README.md
+  - git-ui-relocation-mockup.html
+
+ ❯ manifestSourceRef tests/round3-delivery-evidence.test.ts:93:17
+     91|   const verified = fs.readFileSync(path.join(ROOT, ".sync-audit", "ver…
+     92|   expect(verified).toMatch(/^[0-9a-f]{40}$/);
+     93|   const guard = execFileSync("node", [path.join(ROOT, ".sync-audit", "…
+       |                 ^
+     94|     cwd: ROOT, encoding: "utf8",
+     95|   });
+ ❯ tests/round3-delivery-evidence.test.ts:127:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  3 failed (3)
+      Tests  4 failed | 14 passed (18)
+   Start at  22:53:44
+   Duration  5.55s (transform 82ms, setup 60ms, import 46ms, tests 5.69s, environment 0ms)
+

@@ -42,6 +42,7 @@ import {
 describe('stream-resume', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    invalidateSessionStreamMeta();
     useStore.setState({
       currentSessionPath: '/focused.jsonl',
       streamingSessions: ['/background.jsonl'],
@@ -91,10 +92,51 @@ describe('stream-resume', () => {
     expect(useStore.getState().streamingSessions).toEqual([]);
   });
 
+  // P05-A04（消费端）：seq 只在所属 stream 内比较。旧流与新流都有 seq=1 时，
+  // 元数据换流必须清空 consumedSeqs，新流的 seq=1 不得被当成旧流已消费事件而丢弃。
+  it('does not dedupe a new stream seq=1 against the previous stream consumed seqs', async () => {
+    const handled: unknown[] = [];
+    injectHandlers((msg) => { handled.push(msg); }, () => {});
+    // 旧流：已真实消费 seq 1（含正文），随后服务端开新流
+    expect(updateSessionStreamMeta({ sessionPath: '/background.jsonl', streamId: 'stream_old', seq: 1 })).toBe(true);
+
+    // 新流的 seq=1（reset 全量重放的一部分）：不得因旧流消费过 seq 1 而被拒收
+    const accepted = updateSessionStreamMeta({ type: 'assistant_run_start', sessionPath: '/background.jsonl', streamId: 'stream_new', seq: 1 });
+    expect(accepted).toBe(true);
+
+    replayStreamResume({
+      type: 'stream_resume',
+      sessionPath: '/background.jsonl',
+      streamId: 'stream_new',
+      sinceSeq: 0,
+      nextSeq: 2,
+      isStreaming: true,
+      reset: true,
+      truncated: false,
+      events: [{ seq: 1, event: { type: 'text_delta', delta: 'new stream first event' } }],
+    });
+
+    // reset 重建是异步链（clearSession → loadMessages → 重放），等待重放完成
+    await vi.waitFor(() => {
+      expect(handled.length).toBe(1);
+    });
+    expect(handled).toEqual([
+      expect.objectContaining({
+        type: 'text_delta',
+        delta: 'new stream first event',
+        streamId: 'stream_new',
+        seq: 1,
+        __fromReplay: true,
+      }),
+    ]);
+    const meta = getSessionStreamMeta({ sessionPath: '/background.jsonl' });
+    expect(meta?.streamId).toBe('stream_new');
+  });
+
   it('replays background session events to the normal websocket handler', () => {
     const handled: unknown[] = [];
     const statuses: Array<{ isStreaming: boolean; sessionPath: string | null }> = [];
-    injectHandlers((msg) => handled.push(msg), (isStreaming, sessionPath) => {
+    injectHandlers((msg) => { handled.push(msg); }, (isStreaming, sessionPath) => {
       statuses.push({ isStreaming, sessionPath });
     });
     // 断点连续性凭证：本地此前已真实消费 seq 1（信任门槛要求）。
@@ -129,7 +171,7 @@ describe('stream-resume', () => {
 
   it('does not replay the same stream sequence twice when a resume response is repeated', () => {
     const handled: unknown[] = [];
-    injectHandlers((msg) => handled.push(msg), vi.fn());
+    injectHandlers((msg) => { handled.push(msg); }, vi.fn());
 
     // 本地已消费到 seq1；重放只补发其后的增量（信任门槛前提）。
     updateSessionStreamMeta({ sessionPath: '/background.jsonl', streamId: 'stream_dedupe', seq: 1 });
@@ -183,12 +225,17 @@ describe('stream-resume', () => {
     invalidateStreamResumeMeta('/background.jsonl');
     requestStreamResume('/background.jsonl');
 
-    expect(mocks.ws.send).toHaveBeenCalledWith(JSON.stringify({
+    expect(mocks.ws.send).toHaveBeenCalledTimes(1);
+    const sent = JSON.parse(mocks.ws.send.mock.calls[0][0] as string);
+    expect(sent).toEqual(expect.objectContaining({
       type: 'resume_stream',
       sessionPath: '/background.jsonl',
       streamId: null,
       sinceSeq: 0,
     }));
+    // 恢复代次关联：请求必须携带本次代次 token，供响应回显后判定迟到旧响应。
+    expect(typeof sent.resumeToken).toBe('string');
+    expect(sent.resumeToken.length).toBeGreaterThan(0);
   });
 
   it('includes sessionId when requesting stream resume for a known locator', () => {
@@ -199,12 +246,15 @@ describe('stream-resume', () => {
 
     requestStreamResume('/background.jsonl');
 
-    expect(mocks.ws.send).toHaveBeenCalledWith(JSON.stringify({
+    expect(mocks.ws.send).toHaveBeenCalledTimes(1);
+    const sent = JSON.parse(mocks.ws.send.mock.calls[0][0] as string);
+    expect(sent).toEqual(expect.objectContaining({
       type: 'resume_stream',
       sessionPath: '/background.jsonl',
       sessionId: 'sess_stream_resume',
       streamId: null,
       sinceSeq: 0,
+      resumeToken: expect.any(String),
     }));
   });
 
@@ -239,7 +289,7 @@ describe('stream-resume', () => {
 
   it('replays resume events through the canonical path when sessionId points away from a legacy path', () => {
     const handled: unknown[] = [];
-    injectHandlers((msg) => handled.push(msg), vi.fn());
+    injectHandlers((msg) => { handled.push(msg); }, vi.fn());
     useStore.setState({
       currentSessionId: 'sess_stream_moved',
       currentSessionPath: '/sessions/current.jsonl',

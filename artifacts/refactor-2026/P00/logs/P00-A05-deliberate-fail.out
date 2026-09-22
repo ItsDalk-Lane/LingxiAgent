@@ -1,0 +1,30 @@
+✖ P00-A05 deliberate failure: 2 + 2 must equal 5 (intentionally wrong expectation) (0.578375ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 41.768208
+
+✖ failing tests:
+
+test at artifacts/refactor-2026/P00/fixtures/fail-demo/deliberate-fail.case.mjs:9:1
+✖ P00-A05 deliberate failure: 2 + 2 must equal 5 (intentionally wrong expectation) (0.578375ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  4 !== 5
+  
+      at TestContext.<anonymous> (file:///Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/P00/fixtures/fail-demo/deliberate-fail.case.mjs:11:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1306:25)
+      at Test.start (node:internal/test_runner/test:1177:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 5,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

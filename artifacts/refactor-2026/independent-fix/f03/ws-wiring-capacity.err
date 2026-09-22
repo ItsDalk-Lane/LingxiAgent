@@ -1,0 +1,70 @@
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[stream] protocol_interrupted: assistant_run_start while another run is active: {
+  activeRunKey: 'dd02834b-e627-43aa-8881-88417e7f1e96',
+  incomingRunKey: 'a734e6e3-8782-42a3-8cf6-c211ab07ae2e',
+  sessionPath: '/synthetic/f03-session.jsonl'
+}
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+AssertionError: expected 's_muchw2fh_sa2ucb' to be 's_muchw5ci_swat6k' // Object.is equality
+
+Expected: "s_muchw5ci_swat6k"
+Received: "s_muchw2fh_sa2ucb"
+
+ ❯ tests/stream-route-consumer-isolation.test.ts:146:52
+    144|       const last = h.received.filter(e => e.type === 'assistant_run_st…
+    145|       h.inject(first); await h.drain();
+    146|       expect(getSessionStreamMeta(PATH)?.streamId).toBe(last.streamId);
+       |                                                    ^
+    147|       expect(projection()).toContain('round-259');
+    148|     } finally { await h.close(); }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

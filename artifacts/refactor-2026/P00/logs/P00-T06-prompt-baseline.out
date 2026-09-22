@@ -1,0 +1,30 @@
+{
+  "written": "docs/refactor-2026/P00/PROMPT_BASELINE.json",
+  "components": [
+    {
+      "c": "A1 系统提示词正文（golden zh，当前真实输出）",
+      "bytes": 5194,
+      "est_tokens": 1747
+    },
+    {
+      "c": "A2 系统提示词正文（golden en，当前真实输出）",
+      "bytes": 6114,
+      "est_tokens": 1529
+    },
+    {
+      "c": "B1 按需目录引导（zh）",
+      "bytes": 172,
+      "est_tokens": 57
+    },
+    {
+      "c": "B2 按需目录引导（en）",
+      "bytes": 186,
+      "est_tokens": 47
+    },
+    {
+      "c": "C PTC 入口工具 run_tools 描述",
+      "bytes": 1684,
+      "est_tokens": 419
+    }
+  ]
+}

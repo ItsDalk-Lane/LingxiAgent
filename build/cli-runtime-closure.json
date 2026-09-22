@@ -9235,11 +9235,6 @@
         },
         {
           "root": "server-bootstrap",
-          "from": "core/session-teardown.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
           "from": "core/model-image-preprocess.ts",
           "kind": "import-statement"
         },
@@ -9549,7 +9544,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/tools/todo-compat.ts (import-statement); core/compaction-utils.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); +71 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/todo-compat.ts (import-statement); core/compaction-utils.ts (import-statement); lib/llm/cache-preserving-compaction-agent-run.ts (import-statement); +70 more importer(s)."
     },
     {
       "path": "lib/pi-sdk/model-call-stream-observer.ts",
@@ -9618,6 +9613,23 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/index.ts (import-statement)."
+    },
+    {
+      "path": "lib/pi-sdk/session-shutdown.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/pi-sdk/index.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/session-teardown.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/pi-sdk/index.ts (import-statement); core/session-teardown.ts (import-statement)."
     },
     {
       "path": "lib/pi-sdk/stream-guard.ts",
@@ -11782,6 +11794,60 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by core/engine.ts (import-statement); server/routes/chat.ts (import-statement)."
+    },
+    {
+      "path": "lib/tasks/task-execution.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/rewind-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/subagent-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/exec-command/background.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/media/poller.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/rewind-tool.ts (import-statement); lib/tools/subagent-tool.ts (import-statement); lib/exec-command/background.ts (import-statement); +1 more importer(s)."
+    },
+    {
+      "path": "lib/tasks/task-identity.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/rewind-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/subagent-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tools/workflow-tool.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "core/media/image-task-runner.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/tools/rewind-tool.ts (import-statement); lib/tools/subagent-tool.ts (import-statement); lib/tools/workflow-tool.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "lib/terminal/node-pty-backend.ts",
@@ -103267,6 +103333,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "server/session-create-input.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "server/routes/sessions.ts",
           "kind": "import-statement"
         },
@@ -103386,7 +103457,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by server/routes/mobile-workbench.ts (import-statement); server/routes/sessions.ts (import-statement); server/routes/models.ts (import-statement); +22 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by server/routes/mobile-workbench.ts (import-statement); server/session-create-input.ts (import-statement); server/routes/sessions.ts (import-statement); +23 more importer(s)."
     },
     {
       "path": "server/http/boundary.ts",
@@ -104359,6 +104430,18 @@
       "reason": "Reached via esbuild source module graph, imported by server/routes/chat.ts (import-statement)."
     },
     {
+      "path": "server/session-create-input.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "server/routes/sessions.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by server/routes/sessions.ts (import-statement)."
+    },
+    {
       "path": "server/session-file-block.ts",
       "inputType": "source-graph",
       "provenance": [
@@ -105273,17 +105356,27 @@
       "inputType": "source-graph",
       "provenance": [
         {
+          "root": "cli-entry",
+          "from": "shared/hana-runtime-paths.ts",
+          "kind": "import-statement"
+        },
+        {
           "root": "server-bootstrap",
           "from": "shared/hana-runtime-paths.ts",
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by shared/hana-runtime-paths.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by shared/hana-runtime-paths.ts (import-statement); shared/hana-runtime-paths.ts (import-statement)."
     },
     {
       "path": "shared/hana-runtime-paths.ts",
       "inputType": "source-graph",
       "provenance": [
+        {
+          "root": "cli-entry",
+          "from": "cli/local-server.ts",
+          "kind": "import-statement"
+        },
         {
           "root": "server-bootstrap",
           "from": "lib/env-deps/detect.ts",
@@ -105305,7 +105398,24 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/env-deps/detect.ts (import-statement); lib/sandbox/index.ts (import-statement); core/engine.ts (import-statement); +1 more importer(s)."
+      "reason": "Reached via esbuild source module graph, imported by cli/local-server.ts (import-statement); lib/env-deps/detect.ts (import-statement); lib/sandbox/index.ts (import-statement); +2 more importer(s)."
+    },
+    {
+      "path": "shared/identity-brands.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "server-bootstrap",
+          "from": "lib/llm/model-call-identity.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/tasks/task-identity.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by lib/llm/model-call-identity.ts (import-statement); lib/tasks/task-identity.ts (import-statement)."
     },
     {
       "path": "shared/image-mime.ts",
@@ -107124,9 +107234,9 @@
     }
   ],
   "stats": {
-    "totalFiles": 8944,
+    "totalFiles": 8949,
     "byInputType": {
-      "source-graph": 830,
+      "source-graph": 835,
       "runtime-asset": 11,
       "nft-runtime-trace": 8103
     }

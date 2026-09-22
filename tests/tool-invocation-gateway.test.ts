@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { ToolInvocationGateway } from "../core/tool-invocation-gateway.ts";
+import {
+  createLocalDeveloperPrincipal,
+  ToolInvocationGateway,
+} from "../core/tool-invocation-gateway.ts";
 import { ToolTargetRegistry } from "../core/tool-target-registry.ts";
 import {
   createFirstPartyToolIdentity,
@@ -359,6 +362,36 @@ describe("规范化工具调用网关", () => {
     expect(target.executeCanonical).not.toHaveBeenCalled();
   });
 
+  // ── P03-A08：本地开发者主体只能从已认证的本地 owner 铸造 ──
+  // 远程连接、非 loopback 凭证、自报 kind 的对象都不能换取 local-developer
+  // 身份；主体由宿主铸造，不由请求方声明。
+  it("createLocalDeveloperPrincipal 拒绝远程/伪造 owner（P03-A08）", () => {
+    const localOwner = {
+      kind: "local_user",
+      connectionKind: "local",
+      credentialKind: "loopback_token",
+      principalId: "local:owner-1",
+    };
+    expect(createLocalDeveloperPrincipal(localOwner)).toMatchObject({
+      kind: "local-developer",
+      principalId: "local-developer:local:owner-1",
+      ownerPrincipalId: "local:owner-1",
+      connectionKind: "local",
+    });
+
+    const forgeries = [
+      ["远程连接的本地用户", { ...localOwner, connectionKind: "custom_remote" }],
+      ["非 loopback 凭证", { ...localOwner, credentialKind: "bearer_token" }],
+      ["自报 kind 非 local_user", { ...localOwner, kind: "local-developer" }],
+      ["空 principalId", { ...localOwner, principalId: "  " }],
+      ["非对象 payload", "local_user"],
+      [":null", null],
+    ] as const;
+    for (const [label, owner] of forgeries) {
+      expect(() => createLocalDeveloperPrincipal(owner), label).toThrow(TypeError);
+    }
+  });
+
   it("装配时不可见目标和不合规参数在权限解析前被拒绝", () => {
     const hidden = fixture();
     (hidden.target.availability as { eligible: boolean }).eligible = false;
@@ -371,5 +404,128 @@ describe("规范化工具调用网关", () => {
       ...invalid.request,
       arguments: { path: "note.md" },
     })).toThrow(expect.objectContaining({ code: "ARGUMENT_SCHEMA_INVALID" }));
+  });
+
+  // ── P01-A08：宿主伪造（模型 args 携带 principal/权限证明/取消句柄）──
+  // 系统身份由宿主在 prepared invocation 里绑定，模型参数里的同名字段不能
+  // 覆盖宿主上下文。分 schema 严格/宽松两种真实形态各证一次。
+  it("A08 严格 schema：模型 args 携带伪造身份字段被参数契约拒绝且零执行", async () => {
+    const { gateway, request, target } = fixture();
+    const forged = {
+      ...request.arguments,
+      principal: { kind: "user", id: "forged-user" },
+      sessionId: "sess_forged",
+      agentId: "forged-agent",
+      cancelHandle: { abort: true },
+      permissionProof: "forged-proof",
+    };
+
+    expect(() => gateway.resolvePermission({ ...request, arguments: forged })).toThrow(
+      expect.objectContaining({ code: "ARGUMENT_SCHEMA_INVALID" }),
+    );
+    expect(target.executeCanonical).not.toHaveBeenCalled();
+  });
+
+  it("A08 宽松 schema：伪造字段即使通过校验也不改变 prepared 绑定的宿主身份", async () => {
+    const tolerantIdentity = createFirstPartyToolIdentity({
+      publicName: "write_note_tolerant",
+      capabilityBase: "write_note",
+    });
+    const registry = new ToolTargetRegistry();
+    const tolerantValidator = createToolSchemaValidator({
+      type: "object",
+      required: ["path", "content"],
+      properties: {
+        path: { type: "string" },
+        content: { type: "string" },
+      },
+    }, tolerantIdentity);
+    const executeCanonical = vi.fn(async (
+      _toolCallId: string,
+      _args: Record<string, unknown>,
+      _signal: AbortSignal | undefined,
+      _onUpdate: unknown,
+      _ctx: unknown,
+    ) => ({
+      ok: true,
+    }));
+    registry.register({
+      identity: tolerantIdentity,
+      label: "Write note",
+      description: "Write one note",
+      parameters: tolerantValidator.schema,
+      deferrable: true,
+      pinned: false,
+      permission: normalizeToolPermissionContract({
+        name: tolerantIdentity.publicName,
+        sessionPermission: {
+          resolveInvocation: () => ({
+            action: "write",
+            kind: "review",
+            capability: "write_note.write",
+            sideEffect: { kind: "workspace_write", summary: "Write one note." },
+          }),
+        },
+      }, tolerantIdentity),
+      validator: tolerantValidator,
+      availability: { eligible: true },
+      getCurrentGeneration: () => 3,
+      isCurrentlyAvailable: () => true,
+      executeCanonical,
+      normalizeResult: (result: unknown) => ({ normalized: result }),
+    });
+    const gateway = new ToolInvocationGateway({ registry, authorize: vi.fn(async () => undefined) });
+
+    const forgedArguments = {
+      path: "note.md",
+      content: "hello",
+      principal: { kind: "user", id: "forged-user" },
+      sessionId: "sess_forged",
+      agentId: "forged-agent",
+      cancelHandle: { abort: true },
+      permissionProof: "forged-proof",
+      lifecycleGeneration: 999,
+    };
+    const hostRequest = {
+      targetId: tolerantIdentity.targetId,
+      route: "direct" as const,
+      arguments: forgedArguments,
+      sessionId: "session-1",
+      sessionPath: "/sessions/one.jsonl",
+      agentId: "agent-1",
+      lifecycleGeneration: 3,
+      toolCallId: "call-1",
+      signal: new AbortController().signal,
+      onUpdate: vi.fn(),
+      ctx: { caller: "model", invocationRoute: "direct", effectiveTargetId: tolerantIdentity.targetId },
+      runtimeContext: { connected: true },
+    };
+
+    const prepared = gateway.resolvePermission(hostRequest);
+    // prepared 身份全部来自宿主构造的 request，与 args 内同名字段无关。
+    expect(prepared).toMatchObject({
+      targetId: tolerantIdentity.targetId,
+      route: "direct",
+      sessionId: "session-1",
+      agentId: "agent-1",
+      toolCallId: "call-1",
+      lifecycleGeneration: 3,
+    });
+
+    const result = await runWithPreparedInvocation(
+      prepared,
+      () => gateway.invoke(hostRequest),
+    );
+    void result;
+    expect(executeCanonical).toHaveBeenCalledOnce();
+    const executedCallId = executeCanonical.mock.calls[0][0];
+    const executedCtx = executeCanonical.mock.calls[0][4] as Record<string, unknown>;
+    expect(executedCallId).toBe("call-1");
+    // 执行上下文的身份仍是宿主解析的 effectiveTargetId（模型不可伪造）。
+    expect(executedCtx).toMatchObject({
+      caller: "model",
+      invocationRoute: "direct",
+      effectiveTargetId: tolerantIdentity.targetId,
+    });
   });
 });

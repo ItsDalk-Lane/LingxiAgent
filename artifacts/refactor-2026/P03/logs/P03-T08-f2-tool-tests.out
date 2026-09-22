@@ -1,0 +1,16 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ lib/tools/__tests__/security-scan-tool.test.ts (10 tests) 44ms
+ ✓ lib/tools/__tests__/run-code-tool.test.ts (8 tests) 12955ms
+     ✓ 变量跨调用存活（同内核连续两次 run）+ 回显剥除 + 结果输出  2955ms
+     ✓ 内核死亡：如实报告 exit 与部分输出，指路 restart  1951ms
+     ✓ run 中途死亡：RUN_CODE_KERNEL_EXITED + 部分输出  2197ms
+     ✓ restart 重建 + status 查询  2922ms
+     ✓ label 身份兜底：工具实例重建后不重复 start（按 label 找回内核）  2925ms
+
+ Test Files  2 passed (2)
+      Tests  18 passed (18)
+   Start at  01:36:32
+   Duration  13.74s (transform 349ms, setup 38ms, import 1.39s, tests 13.00s, environment 0ms)
+

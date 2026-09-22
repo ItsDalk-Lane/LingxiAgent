@@ -1,0 +1,13 @@
+
+> lingxi@0.1.42 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' tests/core-contracts-strict.test.ts -t C21|C23
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+
+ Test Files  1 passed (1)
+      Tests  7 passed | 6 skipped (13)
+   Start at  18:06:01
+   Duration  3.02s (transform 79ms, setup 20ms, import 170ms, tests 2.76s, environment 0ms)
+

@@ -1,0 +1,132 @@
+sandbox_extension_issue_file_to_process failed for /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-package-72WB24/package/mac-arm64/Lingxi.app: 1 (Operation not permitted)
+[desktop] network proxy applied (startup): system
+[desktop] 启动 LingxiAgent Server...
+[artifact-boot] activating seed train 0 (0.1.42) from /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-package-72WB24/package/mac-arm64/Lingxi.app/Contents/Resources/seed/server-0.1.42-darwin-arm64.tar.gz
+[artifact-boot] activating renderer seed train 0 (0.1.42) from /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-package-72WB24/package/mac-arm64/Lingxi.app/Contents/Resources/seed/renderer-0.1.42.tar.gz
+[desktop] server artifact resolved: train 0 (0.1.42) slot=current [seed activated]
+[desktop] renderer artifact resolved: train 0 (0.1.42) slot=current [seed activated]
+[desktop] artifact runtime provenance {"event":"artifact-runtime-provenance","shell":{"version":"0.1.42","releaseGeneration":20,"sourceCommit":"b0e9118427e16206dcd25ecfb566d766ed476727","releasedAt":"2026-09-22T10:43:11.108Z"},"server":{"version":"0.1.42","releaseGeneration":20,"train":0,"sha256":"b715d0f9ae9a3687d49ef780633acbc2679e308a02c5e082ecb3c47efd1ff3fa","slot":"current","source":"seed","sourceCommit":"b0e9118427e16206dcd25ecfb566d766ed476727","releasedAt":"2026-09-22T10:43:11.108Z"},"renderer":{"version":"0.1.42","releaseGeneration":20,"train":0,"sha256":"34e652900dee561f5020a8858dc871f666f6cf38fe1842ac47a953fc03bcd16d","slot":"current","source":"seed","sourceCommit":"b0e9118427e16206dcd25ecfb566d766ed476727","releasedAt":"2026-09-22T10:43:11.108Z"},"compatibility":{"status":"compatible","reason":"same-release-generation"}}
+[server-bootstrap] process started pid=49943 platform=darwin arch=arm64
+[server-bootstrap] node=v24.15.0 lingxiHome=[path]
+[server-bootstrap] root=[path]/artifacts/server/0.1.42-darwin-arm64
+[server-bootstrap] entry=[path]/artifacts/server/0.1.42-darwin-arm64/bundle/index.js
+[server-bootstrap] importing server entry
+[server] ① ensureFirstRun...
+[server] ① ensureFirstRun 完成
+[server] ① ensureLocalIdentityRegistries...
+[server] ① ensureLocalIdentityRegistries 完成
+[server] ② 创建 LingxiEngine...
+[server] ② LingxiEngine 构造完成，开始 init...
+[server] [migrations] _dataVersion=0，待执行 1 条迁移
+[server] [migrations] #54 完成
+[server] [credential-custody] tightened .
+[server] [credential-custody] tightened provider-catalog.json
+[server] [credential-custody] tightened users.json
+[server] [credential-custody] tightened agents/lingxi/config.yaml
+[server] [credential-custody] tightened security
+[server] [credential-custody] tightened security/execution-leases.json
+[server] [credential-custody] tightened security/grants.json
+[server] [init] 1/5 Pi SDK 初始化...
+[server] [init] 1/5 AuthStorage + ModelRegistry + 1 个模型就绪
+[server] [init] 2/5 初始化所有 agent...
+[server]   [compat] dirs: 创建了 7 个缺失目录
+[server]   [compat] 3 项检查完成，1 项已修复
+[server]   [agent] 1. loadConfig...
+[server]   [agent] 1. loadConfig 完成
+[server]   [agent] 3. 模块初始化完成
+[server]   [agent] 4. FactStore...
+[fact-store] schema migrated: v0 → v3
+[server]   [agent] 4. FactStore + SummaryManager 完成
+[server]   [agent] 4. memoryTicker...
+[server]   [agent] 4. memoryTicker 创建完成
+[memory-ticker] v3 已启动（turn-based，每日任务备用 timer 1h）
+[server]   [agent] 7. 创建工具...
+[server]   [agent] 8. Desk 系统...
+[server]   [agent] 9. buildSystemPrompt...
+[server]   [agent] init 全部完成
+[memory-ticker] 每日任务开始 (2026-09-22)
+[server] [init] 1 个 agent 已加载配置，焦点 runtime 已就绪
+[server] [init] 2/5 1 个 agent 已就绪
+[server] [init] 3/5 ResourceLoader 初始化...
+[server] [init] 3/5 ResourceLoader 完成 (11ms, 20 skills, 16 external)
+[server] [init] 4/5 发现可用模型...
+[agent] Lingxi 记忆编译完成，system prompt 已刷新
+[memory-ticker] 每日任务完成
+[agent] Lingxi 记忆编译完成，system prompt 已刷新
+[server] [init] 4/5 找到 1 个模型: witness-a/witness-model
+[server] ✿ 使用模型: Witness Model (witness-a)
+[server] ✿ 沙盒已启用
+[server] ✿ 初始化完成（0.1s）
+[server] ② engine.init 完成
+[server] [proxy] 出站流量正经由系统代理 http://127.0.0.1:7890；若需直连，请在设置 > 网络中切换为「直连」模式。 (Outbound is routed via system proxy http://127.0.0.1:7890; switch to "direct" in Settings > Network to bypass it.)
+[plugin-manager] loading plugin "beautify"...
+[plugin-manager] loading "beautify" tools...
+[plugin-manager] loaded "beautify" tools (35ms)
+[plugin-manager] loading "beautify" configuration...
+[plugin-manager] loaded "beautify" configuration (0ms)
+[plugin-manager] loading "beautify" lifecycle import...
+[plugin-manager] loaded "beautify" lifecycle import (0ms)
+[plugin-manager] loading "beautify" lifecycle onload...
+[plugin:beautify] beautify plugin loaded
+[plugin-manager] loaded "beautify" lifecycle onload (0ms)
+[plugin-manager] plugin "beautify" loaded (36ms)
+[plugin-manager] loading plugin "jimeng-cli"...
+[plugin-manager] loading "jimeng-cli" providers...
+[plugin-manager] loaded "jimeng-cli" providers (0ms)
+[plugin-manager] loading "jimeng-cli" lifecycle import...
+[plugin-manager] loaded "jimeng-cli" lifecycle import (13ms)
+[plugin-manager] loading "jimeng-cli" lifecycle onload...
+[media] adapter registered: jimeng-cli-images
+[plugin:jimeng-cli] jimeng-cli adapter registered: jimeng-cli-images
+[media] adapter registered: jimeng-cli-videos
+[plugin:jimeng-cli] jimeng-cli adapter registered: jimeng-cli-videos
+[plugin-manager] loaded "jimeng-cli" lifecycle onload (0ms)
+[plugin-manager] plugin "jimeng-cli" loaded (14ms)
+[plugin-manager] loading plugin "media"...
+[plugin-manager] loading "media" tools...
+[plugin-manager] loaded "media" tools (3ms)
+[plugin-manager] plugin "media" loaded (4ms)
+[plugin-manager] loading plugin "office"...
+[plugin-manager] loading "office" tools...
+[plugin-manager] loaded "office" tools (3ms)
+[plugin-manager] plugin "office" loaded (3ms)
+[cron] 调度器已启动（间隔 60 秒）
+[scheduler] Studio cron 已启动
+[server] ③ 跳过启动期 session 创建
+[server] LingxiAgent Server 运行在 http://127.0.0.1:49171
+[server] ready: port=49171
+[server-bootstrap] server entry import completed
+[agent-mgr] [description] lingxi: 已更新
+[server] Bridge manager 初始化...
+[server] Bridge manager 初始化完成
+[desktop] Server 就绪，端口: 49171
+[auto-updater] no update source configured; update checks will be skipped until one is set
+[auto-updater] update check skipped (startup): no update source configured
+[desktop] Browser control WS connected
+[server] Electron browser control WS connected
+(electron) 'console-message' arguments are deprecated and will be removed. Please use Event<WebContentsConsoleMessageEventParams> object instead.
+[desktop] 主窗口 HTML 加载完成，等待前端 init...
+2026-09-22 19:16:29.292 Lingxi[49684:17347250] TSM AdjustCapsLockLEDForKeyTransitionHandling - _ISSetPhysicalKeyboardCapsLockLED Inhibit
+[session] createSession cwd=~/Desktop/OH-WorkSpace restore=false (传入: 未指定)
+[session] session created (34ms), model=Witness Model
+[session] cache_contract_violation {"session":"sess_0muckwmzs_3064433e285449a3a714","renewReason":"new_session","requestCount":0,"diffs":[{"field":"systemPromptHash","expected":"[token]","actual":"[token]"},{"field":"cachePrefixHash","expected":"[token]","actual":"[token]"}],"expected":{"version":1,"cachePrefixHash":"[token]","modelHash":"[token]","systemPromptHash":"[token]","toolSchemaHash":"[token]","model":{"id":"witness-model","provider":"witness-a","api":"openai-completions","baseUrl":"http://127.0.0.1:65530/v1"},"toolNames":["edit","exec_command","read","write","mcp_call","mcp_describe_tool","mcp_search_tools"],"toolCount":7,"systemPromptBytes":0},"actual":{"version":1,"cachePrefixHash":"[token]","modelHash":"[token]","systemPromptHash":"[token]","toolSchemaHash":"[token]","model":{"id":"witness-model","provider":"witness-a","api":"openai-completions","baseUrl":"http://127.0.0.1:65530/v1"},"toolNames":["edit","exec_command","read","write","mcp_call","mcp_describe_tool","mcp_search_tools"],"toolCount":7,"systemPromptBytes":11152},"drift":{"fields":["systemPromptHash","cachePrefixHash"],"systemPrompt":{"expectedBytes":0,"actualBytes":11152,"firstDiffIndex":0,"expectedExcerpt":"","actualExcerpt":"You are running on the Lingxi (灵犀) platform.\n\n---\n\n# Environment\n\n<environment_context>\n  <platform>darwin</platform>\n  <"},"tools":null}}
+[aux-resolver] resolveAuxiliaryExecution(approval): no model (unconfigured, fallback=none)
+[approval-reviewer] reviewer=authorization_model outcome=failure reasonCode=reviewer_not_configured attempts=0
+[ota] check skipped: no channel manifest source configured (set LINGXI_ARTIFACT_CHANNEL_BASE_URL)
+[ota] cycle: disabled
+[sessions/history-read] directory incremental update [token] appendedBytes=3663 rereadBytes=0 appendedRecords=5 affectedRelations=5 durationMs=1.29
+(electron) 'webContents.canGoBack' is deprecated and will be removed. Please use 'webContents.navigationHistory.canGoBack' instead.
+(electron) 'webContents.canGoForward' is deprecated and will be removed. Please use 'webContents.navigationHistory.canGoForward' instead.
+[browser-viewer] window focus → view.focus(), isFocused: true
+[browser-viewer] did-finish-load: view 已挂载, bounds: { x: 8, y: 48, width: 1424, height: 1024 }
+[browser-viewer] delayed focus applied, isFocused: true
+[sessions/history-read] directory incremental update [token] appendedBytes=2634 rereadBytes=0 appendedRecords=3 affectedRelations=4 durationMs=0.51
+[desktop] shutdownServer: 正在关闭 owned server...
+[server] 
+正在关闭...
+[server] HTTP server 已关闭
+[media] adapter unregistered: jimeng-cli-videos
+[media] adapter unregistered: jimeng-cli-images
+[memory-ticker] 滚动摘要 (sess_0muckwmzs_3064433e285449a3a714) 失败: Could not read session JSONL: ENOENT: no such file or directory, open 'sess_0muckwmzs_3064433e285449a3a714'
+[session] sessions cleaned up
+[server] Hub + Engine 已清理

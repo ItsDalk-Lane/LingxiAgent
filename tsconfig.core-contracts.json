@@ -1,0 +1,27 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "baseUrl": "."
+  },
+  "include": [
+    "shared/identity-brands.ts",
+    "shared/hana-runtime-paths.ts",
+    "shared/model-ref.ts",
+    "shared/errors.ts",
+    "lib/llm/model-call-identity.ts",
+    "cli/local-server.ts",
+    "lib/tasks/task-identity.ts",
+    "lib/task-registry.ts",
+    "server/task-bus-handlers.ts",
+    "server/hono-helpers.ts",
+    "server/session-create-input.ts",
+    "desktop/src/react/services/stream-admission.ts",
+    "lib/tools/invocation/schema-validator.ts",
+    "shared/tool-categories.ts",
+    "core/session-permission-mode.ts",
+    "core/session-teardown.ts",
+    "lib/tasks/task-execution.ts"
+  ]
+}

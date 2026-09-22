@@ -101,18 +101,48 @@ function compareText(left: string, right: string): number {
 }
 
 function normalizeIssues(
-  errors: Array<{ instancePath?: unknown; message?: unknown }>,
+  errors: Array<{ path?: unknown; instancePath?: unknown; message?: unknown }>,
 ): ToolSchemaIssue[] {
   return errors.map((error) => ({
-    path: typeof error.instancePath === "string" && error.instancePath
-      ? error.instancePath
-      : "/",
+    // P06：本仓 typebox@1.1.38 的 Value.Errors 错误对象键为 keyword/schemaPath/
+    // instancePath/params/message（无 path 键），instancePath 在嵌套路径（如 /labels/0）
+    // 上本就有值，修复前 details/issuePaths 并未降级；真实缺口是 message 通用文案
+    // （见下方 ARGUMENT_SCHEMA_INVALID 构造点）。兼认 path 属跨版本防御性兼容，
+    // 对本版本是 no-op（无害保留）；root（instancePath 空串）落 "/"。
+    path: typeof error.path === "string" && error.path
+      ? error.path
+      : (typeof error.instancePath === "string" && error.instancePath ? error.instancePath : "/"),
     message: typeof error.message === "string" && error.message
       ? error.message
       : "schema validation failed",
   })).sort((left, right) => (
     compareText(left.path, right.path) || compareText(left.message, right.message)
   ));
+}
+
+/**
+ * P06：给模型可见 message 提取字段定位——真实缺口是修复前 message 为通用文案
+ * （本版本 typebox@1.1.38 下 details/issuePaths 本就保真，非 FIX-1 恢复所得）。
+ * 非 root 路径直接用路径；root 路径上 TypeBox 的必填缺失只写进 message
+ * （"must have required properties title"），用保守正则提取属性名。
+ * 只影响展示文案，details 仍是权威字段明细。
+ */
+function summarizeIssueFields(issues: ToolSchemaIssue[]): string[] {
+  const fields: string[] = [];
+  for (const issue of issues) {
+    if (issue.path && issue.path !== "/") {
+      fields.push(issue.path);
+      continue;
+    }
+    const requiredMatch = /required propert(?:y|ies)\s+(.+)$/i.exec(issue.message);
+    if (requiredMatch?.[1]) {
+      for (const token of requiredMatch[1].split(/,\s*/)) {
+        const name = token.trim().replace(/^['"]|['"]$/g, "");
+        if (name) fields.push(`/${name}`);
+      }
+    }
+  }
+  return [...new Set(fields)];
 }
 
 function issueDetails(issues: ToolSchemaIssue[]): {
@@ -141,7 +171,7 @@ function invocationError(
     route,
     targetId: identity.targetId,
     sourceId: identity.sourceId,
-    details,
+    ...(details === undefined ? {} : { details }),
     cause,
   });
 }
@@ -221,12 +251,20 @@ export function createToolSchemaValidator(
         if (Value.Check(normalizedSchema, argumentsValue)) {
           return argumentsValue as Record<string, unknown>;
         }
+        // P06：把校验失败的 issue 字段定位并进 message——模型在工具结果里只能看到
+        // error.message（pi-agent-loop 用 createErrorToolResult(error.message) 渲染），
+        // 字段级明细留在 details 里到不了调用方，常驻规则「按指出的字段与约束修正」
+        // 就落空。定位（如 /title、/metadata/owner）是结构信息，不含用户内容。
+        const invalidFieldDetails = issueDetails(normalizeIssues(Value.Errors(normalizedSchema, argumentsValue)));
+        const fieldList = summarizeIssueFields(invalidFieldDetails.issues).join(", ");
         throw invocationError(
           "ARGUMENT_SCHEMA_INVALID",
-          "Tool arguments do not match the registered parameter schema.",
+          fieldList
+            ? `Tool arguments do not match the registered parameter schema. Invalid field(s): ${fieldList}.`
+            : "Tool arguments do not match the registered parameter schema.",
           identity,
           route,
-          issueDetails(normalizeIssues(Value.Errors(normalizedSchema, argumentsValue))),
+          invalidFieldDetails,
         );
       } catch (cause) {
         if (cause instanceof ToolInvocationError) throw cause;

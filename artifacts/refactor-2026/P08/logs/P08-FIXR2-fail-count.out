@@ -1,0 +1,14 @@
+command-log.jsonl total records: 57
+status==FAIL (unexpected failure events): 7
+  line 14: P08-T03-product-regression
+  line 15: P08-T03-product-regression-r2
+  line 16: P08-T03-product-regression-r3
+  line 17: P08-T03-product-regression-r4
+  line 18: P08-T03-product-regression-r5
+  line 22: P08-T05-pack
+  line 30: P08-T07-lint
+nonzero-exit records: 10 (FAIL 7 + non-FAIL 3)
+  line 2: P08-T04-full-test exit=1 status=PASS_WITH_KNOWN_BASELINE (not unexpected)
+  line 41: P08-ACCEPT-full-test exit=1 status=PASS (not unexpected)
+  line 50: P08-ACCEPT-ce2d-unknown-key exit=1 status=PASS (not unexpected)
+VERDICT: unexpected-failure-events = 7 expected; PASS

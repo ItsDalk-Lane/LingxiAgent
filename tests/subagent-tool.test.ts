@@ -91,7 +91,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
     // t() returns the key path when locale is not loaded in tests
     expect(result.content[0].text).toMatch(/task-id|subagentDispatched/);
     expect(result.details).toBeDefined();
-    expect((result.details as any).taskId).toMatch(/^subagent-/);
+    expect((result.details as any).taskId).toMatch(/^task_subagent_/);
     expect((result.details as any).streamStatus).toBe("running");
     expect((result.details as any).sessionPath).toBeNull();
     expect((result.details as any).task).toBe(task);
@@ -106,7 +106,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
 
     // store.defer is called before returning
     expect(mockStore.defer).toHaveBeenCalledWith(
-      expect.stringMatching(/^subagent-/),
+      expect.stringMatching(/^task_subagent_/),
       "/test/session.jsonl",
       expect.objectContaining({
         type: "subagent",
@@ -346,7 +346,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
 
     await vi.waitFor(() => {
       expect(mockStore.resolve).toHaveBeenCalledWith(
-        expect.stringMatching(/^subagent-/),
+        expect.stringMatching(/^task_subagent_/),
         "done",
       );
     });
@@ -496,7 +496,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
 
     await vi.waitFor(() => {
       expect(mockStore.fail).toHaveBeenCalledWith(
-        expect.stringMatching(/^subagent-/),
+        expect.stringMatching(/^task_subagent_/),
         expect.any(String),
       );
     });
@@ -520,7 +520,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
 
     await vi.waitFor(() => {
       expect(mockStore.fail).toHaveBeenCalledWith(
-        expect.stringMatching(/^subagent-/),
+        expect.stringMatching(/^task_subagent_/),
         expect.stringMatching(/length|limit|未完成|截断/),
       );
     });
@@ -544,7 +544,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
 
     await vi.waitFor(() => {
       expect(mockStore.resolve).toHaveBeenCalledWith(
-        expect.stringMatching(/^subagent-/),
+        expect.stringMatching(/^task_subagent_/),
         expect.stringContaining("/workspace/report.md"),
       );
     });
@@ -566,7 +566,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
 
     await vi.waitFor(() => {
       expect(mockStore.fail).toHaveBeenCalledWith(
-        expect.stringMatching(/^subagent-/),
+        expect.stringMatching(/^task_subagent_/),
         "boom",
       );
     });
@@ -592,7 +592,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
     expect((result.details as any).executorAgentId).toBe("butter");
     await vi.waitFor(() => {
       expect(mockStore.fail).toHaveBeenCalledWith(
-        expect.stringMatching(/^subagent-/),
+        expect.stringMatching(/^task_subagent_/),
         "delegated boom",
       );
     });
@@ -689,7 +689,7 @@ describe("subagent-tool (executeIsolated 原子模式)", () => {
     await vi.advanceTimersByTimeAsync(60 * 1000);
     await vi.waitFor(() => {
       expect(mockStore.fail).toHaveBeenCalledWith(
-        expect.stringMatching(/^subagent-/),
+        expect.stringMatching(/^task_subagent_/),
         expect.any(String),
       );
     });
@@ -1208,12 +1208,12 @@ describe("subagent-tool direct instance lifecycle", () => {
       task: "继续刚才的方向",
     }, null, null, mockCtx());
 
-    expect((res.details as any).taskId).toMatch(/^subagent-/);
+    expect((res.details as any).taskId).toMatch(/^task_subagent_/);
     expect((res.details as any).threadId).toBe("subagent-thread-1");
     expect((res.details as any).threadKind).toBe("direct");
     expect((res.details as any).label).toBe("探索一");
     expect(mockStore.defer).toHaveBeenCalledWith(
-      expect.stringMatching(/^subagent-/),
+      expect.stringMatching(/^task_subagent_/),
       "/test/session.jsonl",
       expect.objectContaining({ deliveryIntent: "trigger_parent_turn" }),
     );

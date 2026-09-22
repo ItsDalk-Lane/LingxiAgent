@@ -1,0 +1,4 @@
+[W3-layer1] n=200 median=1.731ms (115599 ev/s) evloop_p99=0.001ms
+[W3-layer1] n=2000 median=14.387ms (139043 ev/s) evloop_p99=0.001ms
+[W3-layer1] n=20000 median=225.508ms (88971 ev/s) evloop_p99=0.001ms
+[W3-layer1] out=/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/P07/samples/stream-throughput.json sanity_ok=true

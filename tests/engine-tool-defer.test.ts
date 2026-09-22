@@ -492,3 +492,105 @@ describe("build result carries the catalog manifest", () => {
     expect(result.toolCatalogManifest.text).not.toContain("github_t_0");
   });
 });
+
+// ── P03-T02：目录展示、直挂面与运行时校验器消费同一份有效 schema ──────────
+describe("P03-T02 schema single source across registry, facade and describe", () => {
+  const dirs: string[] = [];
+  afterEach(() => {
+    for (const dir of dirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  function make(options: Parameters<typeof makeEngine>[0]) {
+    const made = makeEngine(options);
+    dirs.push(made.tmpDir);
+    return made;
+  }
+
+  it("keeps direct facade parameters, registry parameters and validator schema one frozen object", () => {
+    const pluginIdentity = createPluginToolIdentity({
+      pluginId: "demo",
+      publicName: "demo_probe",
+      capabilityBase: "probe",
+    });
+    const pluginPermission = normalizeToolPermissionContract({
+      name: "demo_probe",
+      sessionPermission: { readOnly: true },
+    }, pluginIdentity);
+    const pluginTools = [{
+      name: "demo_probe",
+      description: "A plugin tool.",
+      parameters: { type: "object", properties: { owner: { type: "string" } }, required: ["owner"] },
+      _pluginId: "demo",
+      _toolTargetIdentity: pluginIdentity,
+      _normalizedPermissionContract: pluginPermission,
+      sessionPermission: { resolveInvocation: pluginPermission.resolveInvocation },
+      execute: vi.fn(),
+    }];
+    const made = make({
+      connectors: [{ id: "github", tools: manyTools(10) }],
+      deferThreshold: 10,
+      pluginTools,
+    });
+    const { customTools, toolTargetRegistry } = made.build();
+
+    // 三处同源：直挂 facade.parameters === 注册表 target.parameters === validator.schema。
+    const mcpFacade = customTools.find((tool: any) => tool.name === "mcp_github_t_0");
+    expect(mcpFacade).toBeTruthy();
+    const mcpTarget = toolTargetRegistry.resolveCatalogTarget({ toolName: "mcp_github_t_0" });
+    expect(mcpFacade.parameters).toBe(mcpTarget.parameters);
+    expect(mcpTarget.parameters).toBe(mcpTarget.validator.schema);
+    expect(Object.isFrozen(mcpTarget.validator.schema)).toBe(true);
+
+    const pluginFacade = customTools.find((tool: any) => tool.name === "demo_probe");
+    expect(pluginFacade).toBeTruthy();
+    const pluginTarget = toolTargetRegistry.resolveCatalogTarget({ toolName: "demo_probe" });
+    expect(pluginFacade.parameters).toBe(pluginTarget.parameters);
+    expect(pluginTarget.parameters).toBe(pluginTarget.validator.schema);
+  });
+
+  it("renders deferred describe from the same schema content the validator snapshot was built from", async () => {
+    const tools = manyTools(11);
+    const made = make({ connectors: [{ id: "github", name: "GitHub", tools }], deferThreshold: 10 });
+    const { customTools, toolTargetRegistry } = made.build();
+    const sessionPath = path.join(made.agentDir, "sessions", "main.jsonl");
+
+    const target = toolTargetRegistry.resolveCatalogTarget({ toolName: "mcp_github_t_0" });
+    // 注册期快照与来源 schema 内容一致（深拷贝冻结，非同一对象但同语义）。
+    expect(target.validator.schema).toEqual(tools[0].inputSchema);
+
+    const describeTool = customTools.find((entry: any) => entry.name === "mcp_describe_tool");
+    const described = await describeTool.execute("d-1", { name: "github_t_0" }, {
+      sessionPath,
+      sessionManager: { getSessionFile: () => sessionPath },
+    });
+    const text = (described as any).content[0].text as string;
+    expect(text).toContain("owner");
+    expect(text).toContain("必填");
+    expect(text).toContain("note");
+  });
+
+  it("cannot widen the execution contract by mutating the source schema after registration", async () => {
+    const tools = manyTools(11);
+    const made = make({ connectors: [{ id: "github", tools }], deferThreshold: 10 });
+    const { customTools, toolTargetRegistry } = made.build();
+    const sessionPath = path.join(made.agentDir, "sessions", "main.jsonl");
+
+    // 目录 schemaRef 读来源原件，执行校验读注册期冻结快照：装配后改写来源
+    // required 不会改变执行契约——旧契约（owner 必填）继续生效。
+    (tools[0].inputSchema as any).required = ["nonexistent"];
+
+    const target = toolTargetRegistry.resolveCatalogTarget({ toolName: "mcp_github_t_0" });
+    expect(() => target.validator.validate({ nonexistent: "x" }, "deferred"))
+      .toThrow(expect.objectContaining({ code: "ARGUMENT_SCHEMA_INVALID" }));
+
+    made.engine.getSessionAllowedInvocationCapabilities = () => ["github_t_0.invoke"];
+    const callTool = customTools.find((entry: any) => entry.name === "mcp_call");
+    const result = await callTool.execute("call-1", {
+      server: "github",
+      tool: "github_t_0",
+      arguments: { owner: "acme" },
+    }, { sessionPath, sessionManager: { getSessionFile: () => sessionPath } });
+    void result;
+    expect(made.engine._mcp.callTool).toHaveBeenCalledTimes(1);
+  });
+});

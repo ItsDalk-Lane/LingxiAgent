@@ -67,6 +67,25 @@ describe("工具参数完整 schema 校验器", () => {
     expect(error.details?.issuePaths).toEqual(["/"]);
   });
 
+  it("拒绝超过深度/数量上限的参数（P03-A02 过深对象）", () => {
+    const validator = createToolSchemaValidator({ type: "object" }, identity);
+    // MAX_INPUT_DEPTH=16：17 层嵌套在快照阶段被拒，不进入 schema 校验。
+    let tooDeep: unknown = { leaf: true };
+    for (let index = 0; index < 17; index += 1) tooDeep = { nested: tooDeep };
+    captureError(
+      () => validator.validate(tooDeep, "deferred"),
+      "ARGUMENTS_NOT_OBJECT",
+    );
+
+    // MAX_INPUT_ITEMS=4096：超量扁平字段同样被拒。
+    const tooWide: Record<string, number> = {};
+    for (let index = 0; index < 4100; index += 1) tooWide[`f${index}`] = index;
+    captureError(
+      () => validator.validate(tooWide, "deferred"),
+      "ARGUMENTS_NOT_OBJECT",
+    );
+  });
+
   it("完整执行 required、嵌套对象、数组项、enum、union、额外字段、整数和范围约束", () => {
     const validator = createToolSchemaValidator({
       type: "object",

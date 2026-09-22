@@ -1,0 +1,108 @@
+{
+  "tool": "P08 upgrade-rollback-drill",
+  "old_tree": "/tmp/p08-old-tree (8037fae7a)",
+  "new_entry": "/Users/study_superior/Desktop/Code/LingxiAgent/server/bootstrap.ts",
+  "pass": 14,
+  "fail": 0,
+  "all_pass": true,
+  "results": [
+    {
+      "phase": "OLD-GEN",
+      "action": "旧版本(8037fae7a) server 启动于隔离 HOME",
+      "expect": 200,
+      "actual": "200",
+      "status": "PASS"
+    },
+    {
+      "phase": "OLD-GEN",
+      "action": "旧版本生成 2 会话 + 1 轮真实聊天 + 设置（operate+通知）",
+      "expect": "2 会话; 历史含 P08_UPGRADE_",
+      "actual": "sessions=2 hist=true",
+      "status": "PASS"
+    },
+    {
+      "phase": "OLD-GEN",
+      "action": "旧版本设置写入 operate + 通知开启",
+      "expect": "operate",
+      "actual": "operate",
+      "status": "PASS"
+    },
+    {
+      "phase": "OLD-GEN",
+      "action": "旧版本优雅关闭",
+      "expect": "exit 0",
+      "actual": "exit=0",
+      "status": "PASS"
+    },
+    {
+      "phase": "UPGRADE",
+      "action": "A08 会话数量与 ID 完整保持（无静默清空）",
+      "expect": "ids=sess_0mucd2s1y_ecdd12b8e8a2164523c7,sess_0mucd2s3d_d5b24053b",
+      "actual": "ids=sess_0mucd2s1y_ecdd12b8e8a2164523c7,sess_0mucd2s3d_d5b24053b",
+      "status": "PASS"
+    },
+    {
+      "phase": "UPGRADE",
+      "action": "A08 升级后旧历史可读（含旧轮真实回复）",
+      "expect": "200 含 P08_UPGRADE_REPLY",
+      "actual": "200 reply=true",
+      "status": "PASS"
+    },
+    {
+      "phase": "UPGRADE",
+      "action": "A08 设置保持（permissionMode=operate 未丢）",
+      "expect": "operate",
+      "actual": "operate",
+      "status": "PASS"
+    },
+    {
+      "phase": "UPGRADE",
+      "action": "A08 权限语义：默认模式读取与旧写入一致（无越权放宽）",
+      "expect": "operate(旧写入值)",
+      "actual": "operate",
+      "status": "PASS"
+    },
+    {
+      "phase": "UPGRADE",
+      "action": "A08 观测记录可读（升级后 trace 查询非空）",
+      "expect": "200 非空",
+      "actual": "200 len=716",
+      "status": "PASS"
+    },
+    {
+      "phase": "UPGRADE",
+      "action": "升级后新增会话+聊天轮成功（新增记录写入）",
+      "expect": "3 会话",
+      "actual": "count=3",
+      "status": "PASS"
+    },
+    {
+      "phase": "FAULT",
+      "action": "A09 会话 JSONL 尾部截断（半写注入）后新版本再启动：无半激活、其余数据完好",
+      "expect": "启动成功(health 200) + 3 会话全在",
+      "actual": "health=200 sessions=3",
+      "status": "PASS"
+    },
+    {
+      "phase": "ROLLBACK",
+      "action": "A09 旧版本可读新数据：3 会话全在（含新版本写入的记录）",
+      "expect": "count=3",
+      "actual": "count=3",
+      "status": "PASS"
+    },
+    {
+      "phase": "ROLLBACK",
+      "action": "A09 旧版本读新版本会话历史（无版本挡板误伤——本轮零 schema 变更，兼容预期）",
+      "expect": "200",
+      "actual": "200",
+      "status": "PASS"
+    },
+    {
+      "phase": "ROLLBACK",
+      "action": "A09 旧版本追加新会话后，新版本记录不被覆盖（4 会话且原 3 个 ID 保持）",
+      "expect": "count=4 且原3会话ID保留",
+      "actual": "count=4 kept=true",
+      "status": "PASS"
+    }
+  ]
+}

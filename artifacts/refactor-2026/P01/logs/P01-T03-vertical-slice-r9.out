@@ -1,0 +1,32 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+[agent] 记忆系统暂不可用：memory slot 未配置且无 chat 可 fallback
+[memory-ticker] week.md 迁移失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] compileDaily 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] compileToday(daily) 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] compileFacts 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] deep-memory 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] 每日任务部分失败，已完成: []，1 小时后重试未完成步骤
+[memory-ticker] compileToday 失败: memory slot resolved to null (no model configured and no chat fallback)
+[engine] ⚠ 未找到可用模型，请在设置中配置 API key
+[server] [proxy] 出站流量正经由系统代理 http://127.0.0.1:7890；若需直连，请在设置 > 网络中切换为「直连」模式。 (Outbound is routed via system proxy http://127.0.0.1:7890; switch to "direct" in Settings > Network to bypass it.)
+[server] [proxy] 出站流量正经由系统代理 http://127.0.0.1:7890；若需直连，请在设置 > 网络中切换为「直连」模式。 (Outbound is routed via system proxy http://127.0.0.1:7890; switch to "direct" in Settings > Network to bypass it.)
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[session] cache_contract_violation {"session":"sess_0mubb97jf_a1d21c2b567e9d932029","renewReason":"new_session","requestCount":0,"diffs":[{"field":"systemPromptHash","expected":"12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126","actual":"cded7a3b661c3d15d8d0abcab1a25d643b417d532a8e198dda65c103422f9ace"},{"field":"cachePrefixHash","expected":"1ff057942c5e8fbc43ed6d0ae68314248d4fc4077fe6fca711ebd11640c297ae","actual":"250d90da7dfa9bdee7e7ea4b363fb38b076ba13aba269d57a24071fc1d49efa2"}],"expected":{"version":1,"cachePrefixHash":"1ff057942c5e8fbc43ed6d0ae68314248d4fc4077fe6fca711ebd11640c297ae","modelHash":"159dd7546f60f4175ebdd058a56eeae0c6c397837b7bf597cecd166a53008c28","systemPromptHash":"12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126","toolSchemaHash":"5c5c496e8cbbc6150b1e7bb882bd4f9b4ce1d572768e8d208293794b6af67e21","model":{"id":"witness-model","provider":"witness","api":"openai-completions","baseUrl":"http://127.0.0.1:63144/v1"},"toolNames":["edit","exec_command","read","write","mcp_call","mcp_describe_tool","mcp_search_tools"],"toolCount":7,"systemPromptBytes":0},"actual":{"version":1,"cachePrefixHash":"250d90da7dfa9bdee7e7ea4b363fb38b076ba13aba269d57a24071fc1d49efa2","modelHash":"159dd7546f60f4175ebdd058a56eeae0c6c397837b7bf597cecd166a53008c28","systemPromptHash":"cded7a3b661c3d15d8d0abcab1a25d643b417d532a8e198dda65c103422f9ace","toolSchemaHash":"5c5c496e8cbbc6150b1e7bb882bd4f9b4ce1d572768e8d208293794b6af67e21","model":{"id":"witness-model","provider":"witness","api":"openai-completions","baseUrl":"http://127.0.0.1:63144/v1"},"toolNames":["edit","exec_command","read","write","mcp_call","mcp_describe_tool","mcp_search_tools"],"toolCount":7,"systemPromptBytes":11164},"drift":{"fields":["systemPromptHash","cachePrefixHash"],"systemPrompt":{"expectedBytes":0,"actualBytes":11164,"firstDiffIndex":0,"expectedExcerpt":"","actualExcerpt":"You are running on the Lingxi (灵犀) platform.\n\n---\n\n# Environment\n\n<environment_context>\n  <platform>darwin</platform>\n  <"},"tools":null}}
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[llm-utils] summarizeTitle failed: LLM returned invalid JSON (status=200)
+[memory-ticker] 滚动摘要 (sess_0mubb97jf_a1d21c2b567e9d932029) 失败: Could not read session JSONL: ENOENT: no such file or directory, open 'sess_0mubb97jf_a1d21c2b567e9d932029'
+ ✓ tests/server-composition-boundary.test.ts (9 tests) 6109ms
+     ✓ full composition supplies a non-empty builtinMediaAdapters list  1120ms
+     ✓ importing server/index.ts alone defines startServer but starts nothing (no port bind, no server-info.json, clean exit)  1189ms
+     ✓ serves an open-root route and a full-root (closed-product) route behind the same global auth middleware  1569ms
+     ✓ runs the full chain without any desktop, rejects malformed JSON at the HTTP entry (A07), and keeps serving after a desktop-channel notify (A10)  2201ms
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  21:58:27
+   Duration  6.39s (transform 726ms, setup 19ms, import 197ms, tests 6.11s, environment 0ms)
+

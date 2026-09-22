@@ -1,0 +1,15 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/round3-delivery-evidence.test.ts (5 tests | 1 failed) 190ms
+     ✓ C03-回归守卫: round2 交付日志全部存在且哈希可复算（缺一即失败） 40ms
+     ✓ round3: 每条命令记录的日志存在、哈希可复算、manifest 齐备 16ms
+     × round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试 91ms
+     ✓ round3: 存在与最终源码摘要一致、执行期间无漂移的绿色门禁 1ms
+     ✓ round3: 增量补丁存在且重放验证通过（生成脚本输出 VERIFIED 并入库为记录） 41ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  00:19:10
+   Duration  288ms (transform 25ms, setup 19ms, import 10ms, tests 190ms, environment 0ms)
+

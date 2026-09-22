@@ -1,0 +1,56 @@
+{
+  "checkedAt": "2026-09-22T10:01:11.340Z",
+  "C25": {
+    "status": "BLOCKED",
+    "passed": [
+      "actual isolated Electron main window accepts GUI task",
+      "local provider streams 90 Chinese lines over 45 seconds",
+      "Chinese draft pasted while output at line 17",
+      "draft selection while output at line 53",
+      "copy/paste verified duplicate selected Chinese text while output at line 68",
+      "scroll away from newest output and preserved draft",
+      "runtime information panel opens after task completion"
+    ],
+    "blocked": [
+      "real Chinese IME composition: native typeText attempt produced no change; paste is not composition proof",
+      "long code/Markdown plus actual tool-card expand during output not covered by this text-only fixture"
+    ],
+    "evidence": [
+      "launch.json",
+      "electron.log",
+      "provider-count.log",
+      "stream-copy.png",
+      "stream-copy-ax.txt",
+      "runtime-expanded.png",
+      "final-gui.png",
+      "final-ax.txt"
+    ]
+  },
+  "C26": {
+    "status": "BLOCKED",
+    "performed": "Real Electron/browser-control bridge attached, one task completed, current session menu inspected; no actual browser page open/close workload or steady-state resource windows measured.",
+    "missing": [
+      "fixed repeated session/browser/media/task lifecycle workload",
+      "separate JS heap/native/browser processes/system-cache measurements",
+      "listener/timer/resource reference baselines and post-cycle windows",
+      "ring/directory/tool-description/media/task cache bounds and eviction reconstruction"
+    ],
+    "reason": "Available GUI fixture proves interaction only; no enabled browser session in text-only fixture, no performance instrumentation gathered. Concurrent full suite/build load disallows interpreting this run as paired performance evidence."
+  },
+  "sessionEvidence": [
+    {
+      "file": "2026-09-22T09-56-11-844Z_01a0c88b-5dc4-76a2-8b06-67d9d6c540eb.jsonl",
+      "bytes": 38648,
+      "lines": 9,
+      "hasRequestedPrompt": true,
+      "hasFinalLine": true
+    }
+  ],
+  "cleanup": {
+    "electronPid": 19029,
+    "remainingProcess": "",
+    "exitsFile": "exits.jsonl"
+  },
+  "provider": "synthetic local HTTP only; no real model/account",
+  "runtimeMode": "source dev Electron/Vite; not installed artifact"
+}

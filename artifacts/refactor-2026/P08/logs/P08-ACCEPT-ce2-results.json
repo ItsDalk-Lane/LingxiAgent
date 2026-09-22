@@ -1,0 +1,30 @@
+{
+  "tool": "acc-ce2-seed-tamper",
+  "all_expected": true,
+  "results": [
+    {
+      "id": "CE-2a",
+      "desc": "正确重签（验收临时密钥）→ verifyManifest 通过（阳性对照）",
+      "ok": true,
+      "detail": "keyId=acc-acceptance-key sourceCommit=674b0151fc"
+    },
+    {
+      "id": "CE-2b",
+      "desc": "manifest 内容篡改（改 server 归档 sha256 字段、不重签）→ 签名校验必拒",
+      "ok": true,
+      "detail": "rejected: manifest: signature verification failed for keyId acc-acceptance-key"
+    },
+    {
+      "id": "CE-2c",
+      "desc": "归档字节篡改（manifest+sig 有效）→ 内容哈希比对必失配",
+      "ok": true,
+      "detail": "manifest=1801d3b013cd357e actual=45f26eeb11bcb843 mismatch=true"
+    },
+    {
+      "id": "CE-2d",
+      "desc": "密钥不在 keyset（临时密钥已删的本地测试件）→ fail-closed 拒绝",
+      "ok": true,
+      "detail": "rejected: manifest: keyId \"p08-local-ephemeral\" not present in keyset"
+    }
+  ]
+}

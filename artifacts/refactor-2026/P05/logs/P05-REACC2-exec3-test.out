@@ -1,0 +1,16 @@
+
+> lingxi@0.1.42 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' tests/chat-route-switching.test.ts desktop/src/react/__tests__/services/stream-resume.test.ts tests/tool-presentation-history.test.ts
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/services/stream-resume.test.ts (12 tests) 91ms
+ ✓ tests/tool-presentation-history.test.ts (20 tests) 32ms
+ ✓ tests/chat-route-switching.test.ts (52 tests) 144ms
+
+ Test Files  3 passed (3)
+      Tests  84 passed (84)
+   Start at  12:01:44
+   Duration  1.21s (transform 974ms, setup 46ms, import 2.25s, tests 267ms, environment 276ms)
+

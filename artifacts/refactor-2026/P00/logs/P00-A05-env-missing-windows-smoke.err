@@ -1,0 +1,8 @@
+Error: [smoke-windows-sandbox] this smoke requires a Windows runner
+    at smokeWindowsSandboxHelper (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/smoke-windows-sandbox-helper.mjs:58:11)
+    at run (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/smoke-windows-sandbox-helper.mjs:242:18)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/smoke-windows-sandbox-helper.mjs:261:3
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async node:internal/modules/esm/loader:633:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)

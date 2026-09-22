@@ -43,7 +43,7 @@ describe("workflow tool", () => {
       undefined, undefined, makeCtx()
     ) as any;
     // 立即返回 taskId（不阻塞、不含同步 result）
-    expect(res.details.taskId).toMatch(/^workflow-/);
+    expect(res.details.taskId).toMatch(/^task_workflow_/);
     expect(res.details.streamStatus).toBe("running");
     expect(res.content[0].text).toMatch(/已派出后台/);
     // defer + register 登记，meta 带 type=workflow + summary=meta.name

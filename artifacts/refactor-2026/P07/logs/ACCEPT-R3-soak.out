@@ -1,0 +1,7 @@
+[soak] batch=1/6 rss=324608KB heap=100649KB cache_sessions=8 evictions=4
+[soak] batch=2/6 rss=340896KB heap=103596KB cache_sessions=8 evictions=16
+[soak] batch=3/6 rss=342496KB heap=131616KB cache_sessions=8 evictions=28
+[soak] batch=4/6 rss=342512KB heap=130090KB cache_sessions=8 evictions=40
+[soak] batch=5/6 rss=342608KB heap=91832KB cache_sessions=8 evictions=52
+[soak] batch=6/6 rss=343504KB heap=91758KB cache_sessions=8 evictions=64
+[soak] verdict=NO_REPRODUCIBLE_UNBOUNDED_GROWTH rss_growth=0.1% heap_growth=-11.3% out=artifacts/refactor-2026/P07/logs/ACCEPT-R3-soak.json

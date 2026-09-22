@@ -1,0 +1,43 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts > P05 FI-1：历史侧 commentary→final 篡改会被等价断言捕获 > 被篡改的历史投影与真实 live 投影语义 profile 不相等
+AssertionError: expected [] to deeply equal [ …(2) ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "source": "I need to inspect the current state.",
+-     "surfaceRole": "process",
+-   },
+-   {
+-     "source": "已经查到状态。",
+-     "surfaceRole": "answer",
+-   },
+- ]
++ []
+
+ ❯ artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts:195:23
+    193|
+    194|     // 未篡改基线（live 侧真值）：commentary 是 process、final 是 answer
+    195|     expect(liveTexts).toEqual([
+       |                       ^
+    196|       { surfaceRole: "process", source: "I need to inspect the current…
+    197|       { surfaceRole: "answer", source: "已经查到状态。" },
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts > P05 FI-2：游标被误用为源数组下标时连续性断言捕获 > 故障页边界使翻页拼接 ≠ 全量恢复（正确实现下两者必须相等）
+AssertionError: expected 25 not to be 25 // Object.is equality
+ ❯ artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts:250:40
+    248|     // 故障生效证明：两套序号空间分歧导致拼接结果 ≠ 全量（丢记录或错窗口）
+    249|     expect(pagedIds).not.toEqual(fullIds);
+    250|     expect(new Set(pagedIds).size).not.toBe(fullIds.length);
+       |                                        ^
+    251|   });
+    252| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

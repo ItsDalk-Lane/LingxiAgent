@@ -1,0 +1,75 @@
+
+> lingxi@0.1.42 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**'
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/post-verification-audit-seal.test.ts (3 tests | 1 failed) 259ms
+     × changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced) 100ms
+ ❯ tests/round3-delivery-evidence.test.ts (5 tests | 1 failed) 776ms
+     × round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试 524ms
+stdout | tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > uses real SQLite stores and matches the deterministic committed fingerprint
+[fact-store] schema migrated: v0 → v3
+
+ ❯ tests/persistence-schema-tripwire.test.ts (15 tests | 4 failed) 2460ms
+     × uses real SQLite stores and matches the deterministic committed fingerprint 1837ms
+     × ignores comment-only drift in the sources it hashes 50ms
+     × ignores JSDoc drift, including the file headers this guard once taxed 42ms
+     × records the digest method and the compiler in the payload it pins 28ms
+ ❯ tests/round2-delivery-evidence.test.ts (10 tests | 2 failed) 12949ms
+     × R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁 621ms
+     × R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示 523ms
+ ❯ desktop/src/react/__tests__/components/computer-app-approval-prompt.test.ts (12 tests | 1 failed) 1214ms
+     × shows a pending input confirmation that arrived while its session was inactive and not hydrated 10ms
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts (22 tests | 2 failed) 2018ms
+     × S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致 4ms
+     × S13：带首行空格与末尾换行的输入，快照逐字符保留 1020ms
+stdout | desktop/src/react/__tests__/chat-performance/p07-stream-buffer-wallclock.test.ts > P07-T04 stream buffer wall-clock profile > canonical segment 流 50,000 delta：吞吐、有界刷新与响应度（真实计时器）
+P07_UI_SAMPLE {"deltas":50000,"burst_wall_ms":15.2,"handle_per_sec":3284549,"stream_flush_count":0,"markdown_parse_count":0,"structural_updates":0,"probe_max_drift_ms":5.7}
+
+ ❯ desktop/src/react/__tests__/chat-performance/p07-stream-buffer-wallclock.test.ts (2 tests | 2 failed) 571ms
+     × canonical segment 流 50,000 delta：吞吐、有界刷新与响应度（真实计时器） 366ms
+     × 合并窗口内 content_block 与终局事件不丢（A06 形状，真实计时器） 203ms
+ ❯ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts (33 tests | 12 failed) 359ms
+     × Q02：A 已发送但回执未到时，传输租约阻止 B 发送 8ms
+     × Q03：A 回执到但 run 未结束（含 run 进行中），B 均不发 6ms
+     × Q04：model_turn_end / tool_end / mood_end 均不释放下一轮 2ms
+     × Q05：A 正确 run_end 后，B 只发一次且顺序稳定（经 400ms 调度通道） 7ms
+     × Q07：准备 A 时手动发送 C，C 不超越 B 2ms
+     × Q10：旧 run 的迟到终态不结束新 run 3ms
+     × Q11：编辑/删除正在准备的队列项，过期快照不得发送 6ms
+     × Q12：立即插入与普通续发并发，不双发、不绕过预检 4ms
+     × Q13：run 在插话准备期间结束/更换，不得插入错误的 run 2ms
+     × Q15：abort 后先收到权威终态再续发；迟到媒体结果不重开旧 run 2ms
+     × 迟到回执不能用旧回合终态结算随后启动的新回合 3ms
+     × 回合结束先于输入回执：证据齐全后自动续发一次，不需额外界面变化 6ms
+ ❯ tests/agent-executor-teardown.test.ts (18 tests | 1 failed) 397ms
+     × hub 临时 session 结束后走 emit -> unsub -> dispose 148ms
+ ❯ tests/model-no-fallback.test.ts (23 tests | 1 failed) 312ms
+       × tears down a restored session when the SDK reports a model fallback 14ms
+ ❯ tests/focus-fallback-agent-resolution.test.ts (3 tests | 1 failed) 201ms
+     × only reads the focus pointer where a comment says why that is allowed 36ms
+ ❯ tests/session-turn-actions.test.ts (29 tests | 1 failed) 241ms
+     × suppresses only pending tasks introduced by the discarded branch 5ms
+ ❯ desktop/src/react/__tests__/services/chat-turn-lifecycle.test.ts (5 tests | 5 failed) 183ms
+     × 重复的 status true 不得 finalize 当前 Turn 175ms
+     × status false 出现在真正的 turn_end 之前时，不得结束当前 Turn 2ms
+     × status 高频抖动全程：turn_end 前 fold=0 / missing=0，turn_end 后各出现一次 2ms
+     × 重复 turn_end 幂等：commit 只发生一次，不产生第二个 AssistantMessage 2ms
+     × turn_start 幂等：同一 streamId 重复 turn_start 不得结束当前 Turn 1ms
+ ❯ desktop/src/react/__tests__/services/turn-outcome-patterns.test.ts (5 tests | 4 failed) 154ms
+     × 模式 A：常规供应商一轮 —— thinking + mood + 工具 + 答案，无 turn_status 148ms
+     × 模式 B：多段生成 —— 3 mood / 2 工具 / 1 答案 / 1 个 Process Fold / 0 个 missing 2ms
+     × 模式 D：phase-at-end 供应商 —— 流式期 provisional，终结后成为答案 1ms
+     × 模式 E：真·过程轮 —— 循环停下来仍没给答复，整个用户轮恰好一个 missing_final_answer 1ms
+ ❯ tests/session-teardown.test.ts (9 tests | 1 failed) 165ms
+     × 按 emit → unsub → dispose 顺序调用 160ms
+ ❯ tests/permission-catalog-tools.test.ts (5 tests | 1 failed) 125ms
+     × stops a task owned by the caller's stable session id 8ms
+
+ Test Files  16 failed | 1447 passed | 3 skipped (1466)
+      Tests  40 failed | 14825 passed | 15 skipped (14880)
+   Start at  17:57:52
+   Duration  92.21s (transform 62.83s, setup 23.28s, import 1048.95s, tests 869.41s, environment 270.37s)
+

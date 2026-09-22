@@ -1,0 +1,7 @@
+
+> lingxi@0.1.42 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+tests/tool-categories.test.ts(112,9): error TS2353: Object literal may only specify known properties, and 'sessionPermission' does not exist in type '{ name?: unknown; }'.
+tests/tool-categories.test.ts(126,30): error TS2353: Object literal may only specify known properties, and 'sessionPermission' does not exist in type '{ name?: unknown; }'.
+tests/tool-categories.test.ts(132,36): error TS2353: Object literal may only specify known properties, and '_pluginId' does not exist in type '{ name?: unknown; }'.

@@ -1,0 +1,6 @@
+
+> lingxi@0.1.42 check:tool-invocation-boundaries
+> node scripts/check-tool-invocation-boundaries.mjs
+
+core/tool-catalog-bridge.ts:406:53 [canonical-executor-bypass] Registered target executors may only be invoked by ToolInvocationGateway.
+Tool invocation boundary check failed (1 violations).

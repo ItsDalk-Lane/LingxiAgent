@@ -1,0 +1,107 @@
+
+/Users/study_superior/Desktop/Code/LingxiAgent/core/media-adapters/speech.ts
+  278:9   warning  'timeout' is never reassigned. Use 'const' instead  prefer-const
+  323:65  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+
+/Users/study_superior/Desktop/Code/LingxiAgent/core/media/image-task-runner.ts
+   28:47   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   45:43   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  159:70   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  185:51   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  188:16   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  247:18   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  259:77   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  289:35   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  380:54   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  404:54   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  460:151  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/study_superior/Desktop/Code/LingxiAgent/hub/agent-executor.ts
+   70:18   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   79:18   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  221:213  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  221:227  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  221:271  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  221:291  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  305:30   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  321:20   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  327:56   warning  Empty block statement                     no-empty
+  419:15   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  419:29   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  419:51   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  419:98   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  419:158  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  419:176  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  419:198  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  419:244  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  453:15   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  453:29   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  453:51   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  453:98   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  453:158  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  453:176  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  453:198  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  453:244  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  587:28   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  624:20   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  631:42   warning  Empty block statement                     no-empty
+  667:56   warning  Empty block statement                     no-empty
+  670:56   warning  Empty block statement                     no-empty
+  720:43   warning  Empty block statement                     no-empty
+
+/Users/study_superior/Desktop/Code/LingxiAgent/lib/task-registry.ts
+   31:43   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   31:78   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   79:22   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   80:33   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   81:29   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   82:28   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   83:23   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   84:19   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   85:25   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  119:179  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  119:235  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  159:23   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  160:23   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  161:23   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  169:25   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  169:44   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  197:44   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  218:43   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  332:20   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  353:31   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  403:26   warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  627:20   warning  '_persist' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/study_superior/Desktop/Code/LingxiAgent/lib/tools/rewind-tool.ts
+   20:26   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   21:22   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   23:45   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   23:62   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   25:121  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   29:28   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   30:27   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   45:35   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   51:48   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   51:68   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   62:24   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   71:64   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  162:27   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  195:21   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/study_superior/Desktop/Code/LingxiAgent/lib/tools/subagent-tool.ts
+   34:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  870:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/study_superior/Desktop/Code/LingxiAgent/server/task-bus-handlers.ts
+  3:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  3:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/study_superior/Desktop/Code/LingxiAgent/tests/p02-recovery-restart.test.ts
+  20:32  warning  'vi' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/study_superior/Desktop/Code/LingxiAgent/tests/task-identity-attempts.test.ts
+  106:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 86 problems (0 errors, 86 warnings)
+

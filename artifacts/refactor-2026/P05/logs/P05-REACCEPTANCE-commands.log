@@ -1,0 +1,62 @@
+# P05 复验收（FIXR1 后）命令证据索引（验收子代理，2026-09-22 11:2x–11:4x UTC+8）
+# 环境：darwin arm64 / Node v24.16.0 / HEAD 1f0537b08（工作区 = 执行轮 + 首轮验收 + FIXR1 终态）
+# 只读验收：除本报告与证据日志外零写入；未跑全量 npm test（理由见报告 §6）；f1 patch 前后哈希一致。
+
+## 1. 工作区与基线
+$ git status --porcelain=v1 / git rev-parse HEAD
+→ HEAD=1f0537b0865c1f6a4a17c28eb66c6d9ebf4948a6；改动面 = 3 个执行轮测试文件(M) + docs/refactor-2026/P05/(??) + artifacts/refactor-2026/P05/(??)，与声明一致
+$ git diff HEAD --stat
+→ 3 files changed, 282 insertions(+)（stream-resume +41 / chat-route-switching +197 / tool-presentation-history +44），0 删除
+
+## 2. 清单独立复算
+$ shasum -a 256 -c docs/refactor-2026/P05/EVIDENCE_SHA256.txt
+→ exit 0，91/91 OK（输出 /tmp/p05-reaccept-manifest-myrun.out，临时，已留档摘要）
+$ 覆盖对比（find -type f vs 清单条目）
+→ 实际 93 文件：清单 91 + EVIDENCE_SHA256.txt 自身（模板§7 不自含，正确）+ P05-FIXR1-manifest-check.out（FIXR1 声明的自引用约束设计排除，P04 同款先例存在）
+$ command-log.jsonl digest 交叉核对（64 条 stdout/stderr_digest vs 当前字节）
+→ checked=64 match=64 mismatch=0（含修复前全部执行轮日志的防篡改证明）
+
+## 3. FI 测试可移植性（修复#1）四模式
+$ npx vitest run artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts          → 2/2 绿
+$ (cd desktop/src/react/hooks && vitest run --root <repo> <FI 文件>)                    → 2/2 绿（深层 cwd）
+$ NODE_PATH=/tmp/nonexistent-junk vitest run --root <repo> <FI 文件>                     → 2/2 绿（解析不受 NODE_PATH 干扰）
+$ npm test -- artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts              → 2/2 绿（经 npm test 默认配置）
+$ npx vitest list | grep -E "FAULT-INJECTION|ACCEPTANCE-counterexample"
+→ P05-FI（2 例）、P05-ACCEPTANCE-counterexample（5 例）、P04-ACCEPTANCE-counterexample（2 例）均为默认集成员
+$ grep -c "/Users/study_superior" <FI 文件> → 0；相对引用 grep -o 计数 → 代码 11 处 + 头注注释 1 处 = 12 次出现
+
+## 4. FI 断言载荷元反例（隔离临时目录 .tmp-p05-reaccept，已清理）
+$ 复制 FI 文件并改相对前缀，将两处 vi.mock 故障改为直通（pass-through）→ vitest run
+→ 2/2 红：FI-1 AssertionError: expected 'process' to be 'answer'；FI-2 AssertionError: expected 5 to be less than 5
+→ 证明故障注入承重、断言真实挡错（非冒充通过）；临时目录已 rm -rf
+
+## 5. P05 验收反例文件现状（新发现 R1 证据）
+$ npx vitest run artifacts/refactor-2026/P05/logs/P05-ACCEPTANCE-counterexample.test.ts
+→ Tests 1 failed | 4 passed (5)——C1（跨流迟到事件）红，与首轮留档 11:15:48 日志同象
+$ grep -c "/Users/study_superior" 该文件 → 6（5 个 import + 1 个 REPO 常量）
+$ git check-ignore -v 两个 .test.ts → 均命中 .gitignore:94 logs/（CI 影响以 force-add 为前提；本机默认集影响无条件成立）
+
+## 6. 定向测试与门禁
+$ npx vitest run tests/chat-route-switching.test.ts tests/tool-presentation-history.test.ts desktop/src/react/__tests__/services/stream-resume.test.ts
+→ Test Files 3 passed / Tests 84 passed
+$ npx vitest run tests/data-epoch.test.ts tests/data-epoch-coordinator.test.ts → 40/40 绿
+$ npm run typecheck → exit 0（tsc ×3）
+$ npm run typecheck:core-contracts → exit 0（6 files passed）
+
+## 7. A14 归属与 16 场景对账（node 脚本）
+→ A14 test_names 'runs checkpoint…' 位于 tests/data-epoch-coordinator.test.ts:252（命中）
+→ supporting 'requires a checkpoint receipt…' 位于 tests/data-epoch.test.ts:109；其余 supporting 名命中 :72/:134；coordinator 中误记名零残留
+→ A14 fixture_sha256 === sha256(tests/data-epoch-coordinator.test.ts)：true
+→ 16/16 场景 test_path 全部存在；test_names 可定位（A07/A08 三处为注解/截断式近似标题，文件归属正确——外观级）
+
+## 8. f1 patch 提交前检查项
+$ shasum -a 256 artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch（本轮运行前）
+→ 25fb315f6c5d68cedd2167321de4db9f84163daae69515714dba628ab69db709
+$ 全部验证命令结束后 shasum -a 256 -c → OK（未被触碰；本轮未运行全量，未触发重写路径）
+$ 终态 git status 与起点一致（3 M + 2 ??，无新增 tracked 改动）
+
+## 9. 提交面事实（git 视角）
+$ git status -uall -- artifacts/refactor-2026/P05 docs/refactor-2026/P05
+→ 可提交（非忽略）= docs 15 件 + samples 4 件 + tools 1 件；logs/ 全目录被 .gitignore:94 忽略
+$ git ls-files artifacts/refactor-2026/P04/ → 仅 tools 1 件；P00 曾 force-add 276 个 logs 文件（提交面由编排层决策）
+$ git ls-files | grep artifacts/.*test.ts$ → 0（HEAD 无任何已提交 artifacts 测试文件）

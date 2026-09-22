@@ -1,0 +1,67 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/mcp-http-client.test.ts (41 tests | 1 failed | 40 skipped) 60031ms
+     ↓ uses Streamable HTTP JSON-RPC POST with bearer auth and session headers
+     ↓ skips the handshake entirely against a 2026-07-28 server and carries per-request metadata
+     ↓ falls back to the legacy handshake when the probe is not a valid DiscoverResult
+     ↓ skips the probe when the connector pins a protocol version
+     ↓ mirrors method and name into routing headers on the stateless path
+     ↓ does not send routing headers on the legacy path
+     ↓ mirrors annotated tool arguments into Mcp-Param headers
+     ↓ omits an Mcp-Param header when the annotated argument is absent or null
+     ↓ base64-encodes header values that cannot travel as plain ASCII
+     ↓ excludes tools whose x-mcp-header annotation violates the spec
+     ↓ captures tool-list freshness hints when the server sends them
+     ↓ leaves tool-list freshness null when the server sends no hints
+     ↓ declares form elicitation support and carries input responses on a retry
+     ↓ sends custom connector headers while preserving protocol headers
+     ↓ falls back to the configured bearer token when the injected OAuth token lookup is empty
+     ↓ uses explicit auth precedence: OAuth token, then static bearer token, then custom Authorization header
+     ↓ reports the effective HTTP proxy from the app proxy config and ignores connector env proxy hints
+     ↓ reinitializes once when a Streamable HTTP session expires
+     ↓ reinitializes once when a Streamable HTTP session reports Invalid session ID with status 400
+     ↓ uses one initial Streamable HTTP protocol version source and then negotiated headers
+     ↓ rejects invalid Unicode in outgoing JSON-RPC payloads with a boundary diagnostic
+     ↓ does not let a legacy SSE server ping with the same id satisfy a tool response
+     ↓ answers an inbound legacy SSE server request with method-not-found instead of dropping it
+     ↓ answers an inbound server request on a Streamable HTTP SSE reply stream
+     ↓ resets running to false and reports an unexpected close when the SSE stream ends
+     ↓ reports an unexpected close when legacy SSE message POST says Invalid session ID
+     ↓ does not report an unexpected close after the SSE stream ends due to stop()
+     ↓ reports an unexpected close when a Streamable HTTP request hits a 5xx
+     ↓ marks a Streamable HTTP 401 as needs-auth without a bare rethrow swallowing context
+     ↓ does not report an unexpected close on the inline 404 session refresh path
+     ↓ falls back from Streamable HTTP to legacy SSE endpoint transport
+     ↓ forwards onClose through McpAutoHttpClient to its chosen inner transport
+     ↓ uses the injected getAuthToken for the Authorization header instead of the snapshot
+     ↓ retries a 401 once after a successful forced refresh, then succeeds
+     ↓ retries at most once: a second 401 after refresh fails the session as needs-auth
+     × does not re-send a non-idempotent call after a response timeout (P03-A12) 60030ms
+     ↓ does not retry a 401 when no refresh is possible
+     ↓ fails as needs-auth when the forced refresh itself dies with invalid_grant
+     ↓ fails as a generic (non-auth) close when the forced refresh hits a transient 5xx
+     ↓ uses the injected getAuthToken for the Authorization header on posted messages
+     ↓ retries a legacy SSE 401 once after a forced refresh, then succeeds
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/mcp-http-client.test.ts > MCP Streamable HTTP OAuth self-heal > does not re-send a non-idempotent call after a response timeout (P03-A12)
+Error: Test timed out in 60000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/mcp-http-client.test.ts:1304:3
+    1302|
+    1303|   // ── P03-A12：非幂等外发已送达但响应超时——不自动重发，结果以错误面呈现 ──
+    1304|   it("does not re-send a non-idempotent call after a response timeout …
+       |   ^
+    1305|     let sends = 0;
+    1306|     const fetchImpl = vi.fn(async (_url: string, init: RequestInit) =>…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 40 skipped (41)
+   Start at  01:31:36
+   Duration  60.22s (transform 75ms, setup 19ms, import 99ms, tests 60.03s, environment 0ms)
+

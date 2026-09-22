@@ -1,0 +1,13 @@
+
+> lingxi@0.1.42 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' tests/f01-task-write-contract.test.ts tests/core-contracts-strict.test.ts tests/media-poller.test.ts tests/media-gen-poller-completion-event.test.ts
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+
+ Test Files  4 passed (4)
+      Tests  55 passed (55)
+   Start at  18:35:59
+   Duration  5.50s (transform 496ms, setup 72ms, import 768ms, tests 5.43s, environment 0ms)
+

@@ -13,12 +13,28 @@
  *   - 不依赖数据库自增；进程内靠单调计数器防碰撞，跨进程靠随机段。
  *   - 不携带任何秘密或内容片段，适合直接进日志。
  *   - 测试可注入确定性 now/random，得到可复现 ID。
+ *
+ * P01-T04：铸造厂返回品牌类型（shared/identity-brands）。branded → string
+ * 恒可赋值（既有消费者零破坏）；把 mt_/sess_ 等其他身份或任意字符串喂给
+ * 声明为品牌参数的接口是编译错误。品牌不替代运行时校验——外来字符串
+ * 进入品牌必须经 requireModelCallId 等守卫。
  */
 
+import type {
+  ModelAttemptId,
+  ModelCallId,
+  ModelTraceId,
+} from "../../shared/identity-brands.ts";
+import {
+  requireModelAttemptId,
+  requireModelCallId,
+  requireModelTraceId,
+} from "../../shared/identity-brands.ts";
+
 export interface ModelCallIdentityFactory {
-  mintCallId(): string;
-  mintAttemptId(): string;
-  mintTraceId(): string;
+  mintCallId(): ModelCallId;
+  mintAttemptId(): ModelAttemptId;
+  mintTraceId(): ModelTraceId;
 }
 
 const CALL_PREFIX = "mc";
@@ -38,9 +54,9 @@ export function createModelCallIdentityFactory({
     return `${prefix}_${now().toString(36)}_${sequence.toString(36)}_${random()}`;
   };
   return {
-    mintCallId: () => mint(CALL_PREFIX),
-    mintAttemptId: () => mint(ATTEMPT_PREFIX),
-    mintTraceId: () => mint(TRACE_PREFIX),
+    mintCallId: () => requireModelCallId(mint(CALL_PREFIX)),
+    mintAttemptId: () => requireModelAttemptId(mint(ATTEMPT_PREFIX)),
+    mintTraceId: () => requireModelTraceId(mint(TRACE_PREFIX)),
   };
 }
 
@@ -51,14 +67,14 @@ function defaultRandom() {
 /** 进程级默认工厂。测试请用 createModelCallIdentityFactory 注入确定性源。 */
 const defaultFactory = createModelCallIdentityFactory();
 
-export function mintModelCallId(): string {
+export function mintModelCallId(): ModelCallId {
   return defaultFactory.mintCallId();
 }
 
-export function mintModelAttemptId(): string {
+export function mintModelAttemptId(): ModelAttemptId {
   return defaultFactory.mintAttemptId();
 }
 
-export function mintModelTraceId(): string {
+export function mintModelTraceId(): ModelTraceId {
   return defaultFactory.mintTraceId();
 }

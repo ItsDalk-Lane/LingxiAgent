@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "stage_id": "P05",
+  "task_id": "P05-T01",
+  "description": "语义 fixtures 索引：每类内容语义 × 现有锁定测试（文件+用例名）。这些测试用合成数据构成事实 fixtures；本文件不复制测试体，只建立可审计映射。全部为当前仓库已存在用例，无虚构。",
+  "fixtures": [
+    {
+      "content_type": "text.final_answer",
+      "semantic_source": "server/assistant-event-normalizer.ts",
+      "tests": [
+        { "path": "tests/assistant-event-normalizer.test.ts", "case": "把没有阶段能力的普通文字直接定义为最终答复，不猜自然语言" },
+        { "path": "tests/assistant-event-normalizer.test.ts", "case": "阶段只能在块结束时确定时，把 final_answer 缓冲一次性送入旧正文兼容链" },
+        { "path": "tests/assistant-event-normalizer.test.ts", "case": "text_end 契约表：无 existing segment + 有 endText → 创建 segment 并直接使用该文本" }
+      ]
+    },
+    {
+      "content_type": "text.commentary",
+      "semantic_source": "server/assistant-event-normalizer.ts + shared/text-signature.ts",
+      "tests": [
+        { "path": "tests/assistant-event-normalizer.test.ts", "case": "阶段只能在块结束时确定时，先发未决过程段，commentary 结束后不进入正文" },
+        { "path": "tests/assistant-event-normalizer.test.ts", "case": "供应商直接给出阶段时按该阶段映射，不等待也不改写" },
+        { "path": "tests/chat-route-switching.test.ts", "case": "publishes OpenAI Responses phase semantics while keeping commentary out of the legacy answer" }
+      ]
+    },
+    {
+      "content_type": "text.unresolved_late_phase",
+      "semantic_source": "server/assistant-event-normalizer.ts (PHASE_AT_END_APIS)",
+      "tests": [
+        { "path": "tests/assistant-event-normalizer.test.ts", "case": "阶段只能在块结束时确定时，先发未决过程段，commentary 结束后不进入正文" },
+        { "path": "tests/assistant-event-normalizer.test.ts", "case": "回合结束仍未拿到阶段时使用供应商约定的最终答复回退，并留下诊断" }
+      ]
+    },
+    {
+      "content_type": "reasoning",
+      "semantic_source": "core/events.ts ThinkTagParser + normalizer handleReasoningDelta",
+      "tests": [
+        { "path": "tests/assistant-event-normalizer.test.ts", "case": "把结构化推理增量归一为 reasoning 分段" },
+        { "path": "tests/chat-route-switching.test.ts", "case": "renders structured reasoning_content thinking deltas from OpenAI-compatible providers" }
+      ]
+    },
+    {
+      "content_type": "mood",
+      "semantic_source": "core/events.ts MoodParser (mood/pulse/reflect)",
+      "tests": [
+        { "path": "tests/reserved-tag-text-preservation.test.ts", "case": "T05: 已知 think/mood/mm:think 成对结构化通道不退化（完整链）" },
+        { "path": "desktop/src/react/__tests__/utils/history-builder-mood.test.ts", "case": "mood / pulse / reflect 三种标签在历史里都正确抽离" },
+        { "path": "desktop/src/react/__tests__/utils/history-builder-mood.test.ts", "case": "每条 assistant message 各自抽出 leading mood，互不吞标签" }
+      ]
+    },
+    {
+      "content_type": "legal_tag_like_text",
+      "semantic_source": "保留协议仅配对结构化；未知/示例标签保留",
+      "tests": [
+        { "path": "tests/reserved-tag-text-preservation.test.ts", "case": "T01: 正常配对的未知标记全部保留" },
+        { "path": "tests/reserved-tag-text-preservation.test.ts", "case": "T06: code fence／inline code 内闭标签字符不变" },
+        { "path": "tests/reserved-tag-text-preservation.test.ts", "case": "T11: a<b、比较式、注释、CDATA 保守保留非协议内容" },
+        { "path": "tests/reserved-tag-text-preservation.test.ts", "case": "T15: 用户输入含 HTML/XML 不进入 assistant 残渣清理" }
+      ]
+    },
+    {
+      "content_type": "tool",
+      "semantic_source": "toolResult 条目 + collectToolOutcomesByCallId + projectToolPresentationDetails",
+      "tests": [
+        { "path": "tests/tool-presentation-history.test.ts", "case": "实时终态与历史短详情一致，保留多文本结果和真实修改" },
+        { "path": "tests/tool-presentation-history.test.ts", "case": "大输入、补丁和写入内容首包仅预览，详情按保存记录完整恢复" },
+        { "path": "tests/history-run-outcome-edges.test.ts", "case": "T14：文件 blocks 随 Run 片段缝合归属正确、跨页不重复" },
+        { "path": "tests/chat-route-switching.test.ts", "case": "emits file content blocks for deferred result session files" }
+      ]
+    },
+    {
+      "content_type": "file",
+      "semantic_source": "server/session-file-block.ts + session 文件注册表 sidecar",
+      "tests": [
+        { "path": "tests/tool-presentation-history.test.ts", "case": "大搜索只传计数预览，展开恢复所有文本块而不包含图片数据" },
+        { "path": "tests/history-run-outcome-edges.test.ts", "case": "T14：文件 blocks 随 Run 片段缝合归属正确、跨页不重复" }
+      ]
+    },
+    {
+      "content_type": "control_cards",
+      "semantic_source": "server/suggestion-blocks.ts + server/block-extractors.ts",
+      "tests": [
+        { "path": "tests/tool-presentation-history.test.ts", "case": "伪造条目身份、错误工具类型和失败改动均不能恢复详情" },
+        { "path": "tests/history-run-outcome-edges.test.ts", "case": "T14：文件 blocks 随 Run 片段缝合归属正确、跨页不重复" }
+      ]
+    },
+    {
+      "content_type": "run_outcome",
+      "semantic_source": "assistant_run_end (exactly-once) → 持久 stopReason → turnStatus",
+      "tests": [
+        { "path": "tests/history-run-outcome-edges.test.ts", "case": "T07：真完成但只有过程（思考+工具）→ 恰一个 missing_final_answer，不因有工具豁免" },
+        { "path": "tests/history-run-outcome-edges.test.ts", "case": "T10a：中间失败后恢复成功 → 整轮完成，不被中间错误放大为失败" },
+        { "path": "tests/history-run-outcome-edges.test.ts", "case": "T10b：最终失败带部分正文 → failed 终态与部分正文共存" },
+        { "path": "tests/history-run-outcome-edges.test.ts", "case": "T12：相邻不同 Run（两次用户输入）不误合并，各自持有自己的结局" },
+        { "path": "tests/history-run-outcome-edges.test.ts", "case": "T06：流仍活跃时（openTailRun）最新 Run 组不派生终态；流结束后同一事实恢复终态" }
+      ]
+    },
+    {
+      "content_type": "live_history_parity",
+      "semantic_source": "projectAssistantTurn（live 与 history 汇合点）",
+      "tests": [
+        { "path": "tests/live-history-reserved-tag-parity.test.ts", "case": "场景一：mood-only → generate-image → mood + final answer，两条路径语义一致" },
+        { "path": "tests/live-history-reserved-tag-parity.test.ts", "case": "场景二：mood-only 无 final answer，两条路径都得到 missing_final_answer 且无假正文段" }
+      ]
+    }
+  ]
+}

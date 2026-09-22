@@ -1,0 +1,29 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stdout | tests/fresh-credential-routing.test.ts > AuxiliaryModelResolver fresh credential routing > returns null for an unconfigured slot with no chat fallback
+[aux-resolver] resolveAuxiliaryExecution(approval): no model (unconfigured, fallback=none)
+
+ ✓ tests/fresh-credential-routing.test.ts (5 tests) 59ms
+stdout | tests/auxiliary-slot-resolver.test.ts > Case E: approval unconfigured returns null, chat never called > approval=null → null result
+[aux-resolver] resolveAuxiliaryExecution(approval): no model (unconfigured, fallback=none)
+
+stdout | tests/auxiliary-slot-resolver.test.ts > Case G: guard unconfigured returns null > guard=null → null, neither chat nor approval consulted
+[aux-resolver] resolveAuxiliaryExecution(guard): no model (unconfigured, fallback=none)
+
+stdout | tests/auxiliary-slot-resolver.test.ts > Case H: vision capability enforcement > unconfigured vision only falls back if chat supports image
+[aux-resolver] resolveAuxiliaryExecution(vision): no model (unconfigured, fallback=image_capable_chat)
+
+ ✓ tests/auxiliary-slot-resolver.test.ts (20 tests) 77ms
+ ✓ tests/model-operation-client.test.ts (7 tests) 60ms
+ ✓ tests/model-operation-resolver.test.ts (12 tests) 45ms
+ ✓ tests/model-no-fallback.test.ts (23 tests) 86ms
+ ✓ tests/oauth-force-refresh.test.ts (6 tests) 835ms
+     ✓ refreshes exactly once when two callers race on the same stale credential  776ms
+ ✓ tests/model-manager-auth-storage.test.ts (31 tests) 508ms
+
+ Test Files  7 passed (7)
+      Tests  104 passed (104)
+   Start at  09:15:55
+   Duration  1.55s (transform 1.80s, setup 142ms, import 3.74s, tests 1.67s, environment 0ms)
+

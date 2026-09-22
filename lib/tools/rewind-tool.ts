@@ -10,6 +10,8 @@
  */
 import { Type } from "../pi-sdk/index.ts";
 import { t } from "../i18n.ts";
+import { registerTaskExecution, type TaskExecution, type TaskRegistryClient } from "../tasks/task-execution.ts";
+import { mintTaskId } from "../tasks/task-identity.ts";
 
 const CONFIRM_TIMEOUT_MS = 5 * 60_000;
 const PREVIEW_FILE_CAP = 50;
@@ -26,7 +28,7 @@ export interface RewindToolDeps {
   isSessionStreaming?: (sessionPath: string) => boolean;
   /** 延迟结果账本：流式结束后自动回送并续跑一轮。 */
   getDeferredStore?: () => any;
-  getTaskRegistry?: () => any;
+  getTaskRegistry?: () => TaskRegistryClient | null | undefined;
   log?: { warn?: (msg: string) => void };
 }
 
@@ -129,14 +131,15 @@ export function createRewindTool(deps: RewindToolDeps) {
         const deferredStore = deps.getDeferredStore?.() || null;
         const taskRegistry = deps.getTaskRegistry?.() || null;
         if (deferredStore?.defer && deferredStore?.resolve) {
-          const taskId = `rewind-${checkpointName}-${Date.now()}`;
+          const taskId = mintTaskId("rewind");
+          let execution: TaskExecution | undefined;
           try {
             deferredStore.defer(taskId, sessionPath, {
               type: "rewind_deferred",
               checkpoint: checkpointName,
               deliveryIntent: "trigger_parent_turn",
             });
-            taskRegistry?.register?.(taskId, {
+            execution = registerTaskExecution(taskRegistry, taskId, {
               type: "rewind_deferred",
               parentSessionPath: sessionPath,
               meta: { checkpoint: checkpointName },
@@ -150,7 +153,7 @@ export function createRewindTool(deps: RewindToolDeps) {
             }
             try {
               const result = await deps.rewindToCheckpoint({ sessionPath, checkpointName, restoreFiles });
-              taskRegistry?.complete?.(taskId, { ok: true });
+              execution?.complete({ ok: true });
               deferredStore.resolve(taskId, {
                 type: "rewind_deferred",
                 checkpoint: checkpointName,
@@ -159,7 +162,7 @@ export function createRewindTool(deps: RewindToolDeps) {
                 summary: t("rewind.result.done", { name: checkpointName, count: result?.discardedEntries ?? 0 }),
               });
             } catch (err: any) {
-              taskRegistry?.fail?.(taskId, err?.message || String(err));
+              execution?.fail(err?.message || String(err));
               deferredStore.fail?.(taskId, `${t("rewind.result.failed")}: ${err?.message || err}`);
             }
           })();

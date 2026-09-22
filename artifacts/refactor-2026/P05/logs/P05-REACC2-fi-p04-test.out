@@ -1,0 +1,15 @@
+
+> lingxi@0.1.42 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts artifacts/refactor-2026/P04/logs/P04-ACCEPTANCE-counterexample.test.ts
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ artifacts/refactor-2026/P04/logs/P04-ACCEPTANCE-counterexample.test.ts (2 tests) 341ms
+ ✓ artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts (2 tests) 38ms
+
+ Test Files  2 passed (2)
+      Tests  4 passed (4)
+   Start at  11:58:09
+   Duration  1.69s (transform 812ms, setup 28ms, import 1.40s, tests 380ms, environment 264ms)
+

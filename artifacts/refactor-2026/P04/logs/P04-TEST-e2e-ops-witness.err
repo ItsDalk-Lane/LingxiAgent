@@ -1,0 +1,64 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/model-observability-e2e-utility.test.ts > E2E truth — 知识操作协议（P04-T07：embedding/rerank 真实 HTTP） > P04-A15：EmbeddingClient 经真实 witness HTTP——凭证进请求头、观测/台账/投影齐备、毒丸不入库
+AssertionError: expected undefined to be 'model_operation_embedding' // Object.is equality
+
+- Expected:
+"model_operation_embedding"
+
++ Received:
+undefined
+
+ ❯ tests/model-observability-e2e-utility.test.ts:604:38
+    602|     expect(detail.ok).toBe(true);
+    603|     if (detail.ok) {
+    604|       expect(detail.value.call.path).toBe("model_operation_embedding");
+       |                                      ^
+    605|       expect(detail.value.call.terminalStatus).toBe("ok");
+    606|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/model-observability-e2e-utility.test.ts > E2E truth — 知识操作协议（P04-T07：embedding/rerank 真实 HTTP） > P04-A15：RerankClient 经真实 witness HTTP——cohere 形状归一 + usage meta 记账
+AssertionError: expected { costTotal: null, …(4) } to match object { input_tokens: 12, …(2) }
+(16 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "input_tokens": 12,
+-   "output_tokens": 2,
+-   "total_tokens": 14,
++   "cache": {
++     "created": false,
++     "hit": false,
++     "hitRatio": 0,
++     "missTokens": null,
++     "readTokens": 0,
++     "support": "reported",
++     "writeTokens": 0,
++   },
++   "costTotal": null,
++   "input": {
++     "totalTokens": 12,
++     "uncachedTokens": 12,
++   },
++   "output": {
++     "reasoningTokens": null,
++     "totalTokens": 2,
++   },
++   "totalTokens": 14,
+  }
+
+ ❯ tests/model-observability-e2e-utility.test.ts:663:30
+    661|     const entries = ledger.list({ subsystem: "knowledge", operation: "…
+    662|     expect(entries).toHaveLength(1);
+    663|     expect(entries[0].usage).toMatchObject({ input_tokens: 12, output_…
+       |                              ^
+    664|   }, 15_000);
+    665| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

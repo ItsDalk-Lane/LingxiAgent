@@ -1,0 +1,76 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/core-contracts-strict.test.ts > strict 门禁自身的致命错误 > C23: 无文件的全局致命诊断不能被丢弃
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/core-contracts-strict.test.ts:98:90
+     96|     withConfig(JSON.stringify({ compilerOptions: { noLib: true, noEmit…
+     97|       const report = runCoreContractsTypeCheck({ configPath });
+     98|       expect(report.diagnostics.some(d => d.code === "TS2318" && d.fil…
+       |                                                                                          ^
+     99|     });
+    100|   });
+ ❯ withConfig tests/core-contracts-strict.test.ts:89:7
+ ❯ tests/core-contracts-strict.test.ts:96:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/core-contracts-strict.test.ts > strict 门禁自身的致命错误 > C23: 损坏配置显式失败
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ tests/core-contracts-strict.test.ts:104:63
+    102|   it("C23: 损坏配置显式失败", () => {
+    103|     withConfig('{ "compilerOptions": ', configPath => {
+    104|       expect(() => runCoreContractsTypeCheck({ configPath })).toThrow(…
+       |                                                               ^
+    105|     });
+    106|   });
+ ❯ withConfig tests/core-contracts-strict.test.ts:89:7
+ ❯ tests/core-contracts-strict.test.ts:103:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/core-contracts-strict.test.ts > strict 门禁自身的致命错误 > C23: 缺失配置显式失败
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ tests/core-contracts-strict.test.ts:109:117
+    107|
+    108|   it("C23: 缺失配置显式失败", () => {
+    109|     expect(() => runCoreContractsTypeCheck({ configPath: path.join(rep…
+       |                                                                                                                     ^
+    110|   });
+    111|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/core-contracts-strict.test.ts > strict 门禁自身的致命错误 > C20: 报告包含真实编译闭包而非仅入口
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ tests/core-contracts-strict.test.ts:114:29
+    112|   it("C20: 报告包含真实编译闭包而非仅入口", () => {
+    113|     const report = runCoreContractsTypeCheck();
+    114|     expect(report.rootFiles.length).toBeGreaterThan(0);
+       |                             ^
+    115|     expect(report.checkedFiles.length).toBeGreaterThan(report.rootFile…
+    116|     expect(report.checkedFiles).toContain("shared/model-call-context.t…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+

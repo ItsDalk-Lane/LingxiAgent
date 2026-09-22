@@ -1,5 +1,6 @@
 import path from "node:path";
 import { t } from "../../lib/i18n.ts";
+import { mintTaskId } from "../../lib/tasks/task-identity.ts";
 import { mediaTaskAttempt } from "./task-store.ts";
 import { withModelRequestAccounting } from "../../lib/llm/model-request-accounting.ts";
 import {
@@ -13,7 +14,7 @@ import {
 } from "../../lib/llm/semantic-input-provenance.ts";
 
 export function createTaskId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  return mintTaskId("media");
 }
 
 function errorMessage(err) {
@@ -783,7 +784,7 @@ export async function retryImageTask({ taskId, ctx }) {
 
   if (!responseDelivery) {
     try {
-      await ctx.bus.request("task:register", {
+      const visibility = await ctx.bus.request("task:register", {
         taskId,
         type: "media-generation",
         sessionId,
@@ -791,6 +792,7 @@ export async function retryImageTask({ taskId, ctx }) {
         parentSessionPath: sessionPath,
         meta,
       });
+      poller.visibilityAttempts?.bindReceipt(taskId, mediaTaskAttempt(retried), visibility);
     } catch {
       // TaskRegistry is runtime visibility only; DeferredResultStore owns delivery.
     }

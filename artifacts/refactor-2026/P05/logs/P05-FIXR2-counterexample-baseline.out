@@ -1,0 +1,15 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ artifacts/refactor-2026/P05/logs/P05-ACCEPTANCE-counterexample.test.ts (5 tests | 1 failed) 35ms
+     × Run A 结束后开启 Run B，旧流(segA/streamA)迟到 delta 不得出现在 Run B 的 answer 31ms
+     ✓ 边界精确：sinceSeq=firstSeq-1 不算截断；firstSeq-2 算截断且补发从 firstSeq 起 1ms
+     ✓ 字节上限触发 trim：超 maxBytes 后旧事件被丢、resume 显式 truncated（不报完整） 0ms
+     ✓ 超大单事件压缩可观察：compacted 标记与 originalByteLength 存在，不把压缩结果当原始完整 0ms
+     ✓ 展开全文读持久 toolResult 的 details（v2 合法 kind=tool_output），不受磁盘陷阱影响；会话不匹配拒绝 2ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  11:48:44
+   Duration  1.46s (transform 557ms, setup 19ms, import 1.09s, tests 35ms, environment 256ms)
+

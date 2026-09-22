@@ -77,7 +77,7 @@ describe("stop_task stable ownership boundary", () => {
   it("stops a task owned by the caller's stable session id", async () => {
     const abort = vi.fn(() => "aborted");
     const registry = {
-      query: vi.fn(() => ({ taskId: "task-1", parentSessionId: "sess-current" })),
+      query: vi.fn(() => ({ taskId: "task-1", parentSessionId: "sess-current", attempt: 2 })),
       abort,
     };
     const tool = createStopTaskTool({
@@ -95,7 +95,7 @@ describe("stop_task stable ownership boundary", () => {
       runtimeCtx(),
     );
 
-    expect(abort).toHaveBeenCalledWith("task-1");
+    expect(abort).toHaveBeenCalledWith("task-1", "aborted", { expectedAttempt: 2 });
     expect((result as any).isError).not.toBe(true);
     expect(tool.sessionPermission.resolveInvocation({ task_id: "task-1" })).toMatchObject({
       action: "stop",

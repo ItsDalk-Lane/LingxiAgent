@@ -1,0 +1,9 @@
+[PASS] 打包产物形态：seed 提取树（自带 node）真实启动 → server-info.json 就绪
+[PASS] GET /api/health（鉴权 200 / 无凭证 403）
+[PASS] POST /api/sessions/new → sess_
+[PASS] WS prompt read 工具真实往返 + 流式回复（打包形态完整聊天链）
+[PASS] 历史回读（含 P08_PACKAGED_REPLY）
+[PASS] GET /api/skills?agentId=lingxi（首启技能同步后可列）
+[PASS] 优雅退出（SIGTERM → exit 0）
+
+packaged smoke: pass=7 fail=0 → /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/P08/logs/packaged-server-smoke.json

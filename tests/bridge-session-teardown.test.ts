@@ -6,14 +6,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const createAgentSessionMock = vi.fn();
 const sessionManagerCreateMock = vi.fn();
 const sessionManagerOpenMock = vi.fn();
-const emitSessionShutdownMock = vi.fn(async (session) => {
-  const runner = session?.extensionRunner;
-  if (runner?.hasHandlers?.("session_shutdown")) {
-    await runner.emit({ type: "session_shutdown" });
-    return true;
-  }
-  return false;
-});
 const PNG_BASE64 = "iVBORw0KGgo=";
 
 vi.mock("../lib/pi-sdk/index.js", async (importOriginal) => {
@@ -26,7 +18,6 @@ vi.mock("../lib/pi-sdk/index.js", async (importOriginal) => {
       create: (...args: any[]) => sessionManagerCreateMock(...args),
       open: (...args: any[]) => sessionManagerOpenMock(...args),
     },
-    emitSessionShutdown: (...args: any[]) => (emitSessionShutdownMock as any)(...args),
     resizeModelImageInput: async (image) => ({
       data: image.data,
       mimeType: image.mimeType,
@@ -149,7 +140,6 @@ describe("BridgeSessionManager teardown", () => {
     createAgentSessionMock.mockReset();
     sessionManagerCreateMock.mockReset();
     sessionManagerOpenMock.mockReset();
-    emitSessionShutdownMock.mockClear();
   });
 
   afterEach(() => {
@@ -238,7 +228,7 @@ describe("BridgeSessionManager teardown", () => {
     await manager.executeExternalMessage("hello", "bridge-k1", null, { agentId: "agent-a" });
 
     expect(callOrder).toEqual(["emit", "unsub", "dispose"]);
-    expect(emitSessionShutdownMock).toHaveBeenCalledWith(session);
+    expect(session.extensionRunner.emit).toHaveBeenCalledExactlyOnceWith({ type: "session_shutdown", reason: "quit" });
     expect(session.dispose).toHaveBeenCalledOnce();
     expect(manager.activeSessions.has("bridge-k1")).toBe(false);
   });
@@ -1768,7 +1758,7 @@ describe("BridgeSessionManager teardown", () => {
 
     expect(result).toEqual({ tokensBefore: 900, tokensAfter: 300, contextWindow: 128000 });
     expect(callOrder).toEqual(["emit", "dispose"]);
-    expect(emitSessionShutdownMock).toHaveBeenCalledWith(session);
+    expect(session.extensionRunner.emit).toHaveBeenCalledExactlyOnceWith({ type: "session_shutdown", reason: "quit" });
     expect(session.dispose).toHaveBeenCalledOnce();
   });
 

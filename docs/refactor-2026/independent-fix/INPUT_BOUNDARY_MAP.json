@@ -1,0 +1,228 @@
+{
+  "implemented": [
+    {
+      "route": "POST /sessions/new",
+      "parser": "server/session-create-input.ts:parseSessionCreateInput focused",
+      "fields": [
+        "cwd",
+        "workspaceMountId",
+        "workspaceFolders[]",
+        "memoryEnabled",
+        "agentId",
+        "currentAgentId",
+        "thinkingLevel",
+        "projectId"
+      ]
+    },
+    {
+      "route": "POST /sessions/new-detached",
+      "parser": "server/session-create-input.ts:parseSessionCreateInput detached",
+      "fields": [
+        "cwd",
+        "workspaceMountId",
+        "workspaceFolders[]",
+        "memoryEnabled",
+        "agentId",
+        "thinkingLevel",
+        "projectId",
+        "permissionMode",
+        "forkedFromSessionId",
+        "recordWorkspaceHistory"
+      ]
+    }
+  ],
+  "semantics": {
+    "empty_body": "legal default {}",
+    "null_body": "400 invalid_body",
+    "nullable_fields": "null remains absent/default",
+    "unknown_fields": "ignored as before; model is not consumed in either creation route; focused permissionMode also not consumed",
+    "workspaceFolders": "null/absent=>[]; strings only; previous blank-string filtering retained",
+    "enums": "existing engine normalizers remain authoritative; this package validates field types"
+  },
+  "remaining_session_safeJson_calls": [
+    {
+      "method": "post",
+      "route": "/sessions/pin",
+      "file": "server/routes/sessions.ts",
+      "line": 1017,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/pin-order",
+      "file": "server/routes/sessions.ts",
+      "line": 1055,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "patch",
+      "route": "/sessions/memory",
+      "file": "server/routes/sessions.ts",
+      "line": 1138,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "patch",
+      "route": "/sessions/authorized-folders",
+      "file": "server/routes/sessions.ts",
+      "line": 1209,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/latest-user-message/replay",
+      "file": "server/routes/sessions.ts",
+      "line": 1518,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/turns/retry",
+      "file": "server/routes/sessions.ts",
+      "line": 1561,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/turns/rollback-preview",
+      "file": "server/routes/sessions.ts",
+      "line": 1626,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "put",
+      "route": "/sessions/workspace-rollback",
+      "file": "server/routes/sessions.ts",
+      "line": 1721,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/fork",
+      "file": "server/routes/sessions.ts",
+      "line": 1771,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/todos/complete",
+      "file": "server/routes/sessions.ts",
+      "line": 1855,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/todos/cancel",
+      "file": "server/routes/sessions.ts",
+      "line": 1923,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/todos/dismiss",
+      "file": "server/routes/sessions.ts",
+      "line": 1990,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/continue-deleted-agent",
+      "file": "server/routes/sessions.ts",
+      "line": 2264,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/switch",
+      "file": "server/routes/sessions.ts",
+      "line": 2325,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/fresh-compact",
+      "file": "server/routes/sessions.ts",
+      "line": 2432,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/browser/open-session",
+      "file": "server/routes/sessions.ts",
+      "line": 2468,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/browser/close-session",
+      "file": "server/routes/sessions.ts",
+      "line": 2481,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/rename",
+      "file": "server/routes/sessions.ts",
+      "line": 2495,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/cleanup",
+      "file": "server/routes/sessions.ts",
+      "line": 2519,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/archive",
+      "file": "server/routes/sessions.ts",
+      "line": 2571,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/workspace-disposal",
+      "file": "server/routes/sessions.ts",
+      "line": 2679,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/restore",
+      "file": "server/routes/sessions.ts",
+      "line": 2815,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    },
+    {
+      "method": "post",
+      "route": "/sessions/archived/delete",
+      "file": "server/routes/sessions.ts",
+      "line": 2884,
+      "status": "UNCHANGED_OUTSIDE_CREATE_FAMILY",
+      "reason": "既有非创建默认入口；本轮不机械替换；部分入口仍需后续独立边界审计"
+    }
+  ]
+}

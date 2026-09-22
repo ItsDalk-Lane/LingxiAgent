@@ -1,0 +1,100 @@
+
+> lingxi@0.1.42 build:server:open
+> node scripts/build-server-open.mjs
+
+[build-server-open] Building open composition for darwin-arm64...
+[build-server-open] whitelist assertion passed
+[build-server] using cached Node.js v24.15.0
+[build-server] Node.js runtime ready
+[build-server] running Vite bundle...
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 1676 modules transformed.
+rendering chunks...
+computing gzip size...
+dist-server-bundle/index.js  8,114.30 kB │ gzip: 2,147.51 kB
+✓ built in 4.84s
+[build-server] Vite bundle copied to bundle/
+[build-server] running CLI bundle...
+[build-server] CLI bundle copied to bundle/cli.js
+[build-server] bootstrap copied
+[build-server]   lib/known-models.json
+[build-server]   lib/known-model-fallbacks.json
+[build-server]   lib/default-models.json
+[build-server]   lib/config.example.yaml
+[build-server]   lib/identity.example.md
+[build-server]   lib/agents.example.md
+[build-server]   lib/identity-templates/
+[build-server]   lib/agents-templates/
+[build-server]   lib/agents-public-templates/
+[build-server]   lib/yuan/
+[build-server-open] resource files copied
+[build-server] derived external deps: @node-rs/jieba, better-sqlite3, node-pty, @firecrawl/anydoc, ws, @earendil-works/pi-agent-core, @earendil-works/pi-ai, @earendil-works/pi-coding-agent, @silvia-odwyer/photon-node, @larksuiteoapi/node-sdk, node-telegram-bot-api, proxy-agent, undici, exceljs, mammoth, jsdom, qrcode, usearch
+[build-server] pinned server deps: @node-rs/jieba@2.0.1, better-sqlite3@12.6.2, node-pty@1.1.0, @firecrawl/anydoc@0.1.2, ws@8.21.0, @earendil-works/pi-agent-core@0.86.0, @earendil-works/pi-ai@0.86.0, @earendil-works/pi-coding-agent@0.86.0, @silvia-odwyer/photon-node@0.3.4, @larksuiteoapi/node-sdk@1.72.0, node-telegram-bot-api@0.67.0, proxy-agent@6.5.0, undici@7.29.0, exceljs@4.4.0, mammoth@1.11.0, jsdom@29.0.2, qrcode@1.5.4, usearch@2.26.0, lru-cache@11.5.1, underscore@1.13.8, node-gyp-build@4.8.4, bindings@1.5.0
+[build-server] installing external dependencies...
+
+> @google/genai@2.21.0 preinstall
+> echo 'preinstall: no-op'
+
+preinstall: no-op
+
+> @google/genai@2.21.0 preinstall
+> echo 'preinstall: no-op'
+
+preinstall: no-op
+
+> better-sqlite3@12.6.2 install
+> prebuild-install || node-gyp rebuild --release
+
+
+> node-pty@1.1.0 install
+> node scripts/prebuild.js || node-gyp rebuild
+
+[32m> Checking prebuilds...[0m
+
+> usearch@2.26.0 install
+> node-gyp-build
+
+
+> esbuild@0.28.2 postinstall
+> node install.js
+
+
+> node-pty@1.1.0 postinstall
+> node scripts/post-install.js
+
+[32m> Cleaning release folder...[0m
+[32m> Moving conpty.dll...[0m
+  SKIPPED (not Windows)
+
+> protobufjs@7.6.6 postinstall
+> node scripts/postinstall
+
+
+> esbuild@0.28.2 postinstall
+> node install.js
+
+
+> protobufjs@7.6.6 postinstall
+> node scripts/postinstall
+
+
+added 646 packages in 7s
+[build-server] node-pty executable bit fixed: node_modules/node-pty/prebuilds/darwin-arm64/spawn-helper
+[verify-pi-sdk] all checks passed
+[build-server] cleanup: removed 4 node_modules/.bin directories
+[build-server] dependencies installed
+[build-server] running nft trace...
+[build-server] nft: protecting 24 server deps from pruning: @node-rs/jieba, better-sqlite3, node-pty, @firecrawl/anydoc, ws, @earendil-works/pi-agent-core, @earendil-works/pi-ai, @earendil-works/pi-coding-agent, @silvia-odwyer/photon-node, @larksuiteoapi/node-sdk, node-telegram-bot-api, proxy-agent, undici, exceljs, mammoth, jsdom, qrcode, usearch, lru-cache, underscore, node-gyp-build, bindings, @node-rs/jieba-darwin-arm64, @firecrawl/anydoc-darwin-arm64
+[build-server] nft: kept 6877 files, removed 16708 files (99MB)
+[build-server] usearch runtime smoke passed: backend=hnsw
+[build-server] better-sqlite3 runtime smoke passed
+[build-server] jieba runtime smoke passed
+[build-server] @firecrawl/anydoc runtime smoke passed
+[build-server] node-pty: kept prebuilds/darwin-arm64, removed 3 other platform prebuilds
+[build-server] usearch: kept prebuilds/darwin-arm64+x64
+[build-server] cleanup: removed @larksuiteoapi/node-sdk/types/ (~15MB .d.ts)
+[build-server] cleanup: removed exceljs/dist/ (~21MB browser bundle)
+[build-server] prune: removed 9975 runtime-dead files from node_modules (68.5MB)
+[build-server] wrapper created
+[build-server-open] Done!

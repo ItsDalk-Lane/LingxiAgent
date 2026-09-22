@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-confirm-head-dnx7bhrb
+
+ ❯ tests/stream-route-consumer-isolation.test.ts (4 tests | 1 failed | 3 skipped) 84ms
+   × keeps a resolved confirmation resolved after the next real streamed projection 83ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 skipped (4)
+   Start at  18:38:01
+   Duration  1.99s (transform 886ms, setup 21ms, import 1.54s, tests 84ms, environment 265ms)
+

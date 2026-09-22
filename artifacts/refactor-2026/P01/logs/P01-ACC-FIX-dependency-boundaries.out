@@ -1,0 +1,5 @@
+
+> lingxi@0.1.42 check:dependency-boundaries
+> node scripts/check-dependency-boundaries.mjs
+
+Dependency boundary check passed (2025 source files).

@@ -1,0 +1,23 @@
+find: -exec: no terminating ";" or "+"
+node:internal/errors:985
+  const err = new Error(message);
+              ^
+
+Error: Command failed: find -L /Users/study_superior/.lingxi -type f -not -name .DS_Store -exec stat -f %m %z %N [object Object] +
+find: -exec: no terminating ";" or "+"
+
+    at genericNodeError (node:internal/errors:985:15)
+    at wrappedFn (node:internal/errors:539:14)
+    at checkExecSyncError (node:child_process:925:11)
+    at execFileSync (node:child_process:961:15)
+    at snapshot (file:///Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/P00/tools/isolated-server-proof.mjs:34:15)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/P00/tools/isolated-server-proof.mjs:57:48 {
+  status: 1,
+  signal: null,
+  output: [ null, '', 'find: -exec: no terminating ";" or "+"\n' ],
+  pid: 3767,
+  stdout: '',
+  stderr: 'find: -exec: no terminating ";" or "+"\n'
+}
+
+Node.js v24.16.0

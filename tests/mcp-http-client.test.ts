@@ -1300,6 +1300,44 @@ describe("MCP Streamable HTTP OAuth self-heal", () => {
     expect(onClose).toHaveBeenCalledWith(expect.objectContaining({ expected: false, needsAuth: true }));
   });
 
+  // ── P03-A12：非幂等外发已送达但响应超时——不自动重发，结果以错误面呈现 ──
+  it("does not re-send a non-idempotent call after a response timeout (P03-A12)", async () => {
+    let sends = 0;
+    // 模拟真实 fetch：超时中止信号到达时以 AbortError 结束（永远挂起的假 fetch
+    // 不会走产品路径——fetchWithTimeout 靠 signal 中止，不靠外层竞速）。
+    const fetchImpl = vi.fn((_url: string, init: RequestInit) => new Promise<Response>(
+      (_resolve, reject) => {
+        const body = requestBody(init);
+        if (body?.method === "tools/call") {
+          sends += 1;
+          init.signal?.addEventListener("abort", () => reject(
+            Object.assign(new Error("The operation was aborted"), { name: "AbortError" }),
+          ));
+          return;
+        }
+        reject(new Error(`unexpected method ${body?.method}`));
+      },
+    ));
+    const refreshAuthToken = vi.fn(async () => "refreshed-token");
+    const onClose = vi.fn();
+    const client = new McpStreamableHttpClient({
+      id: "a12",
+      url: "https://mcp.example.com/mcp",
+      protocolVersion: MCP_PROTOCOL_VERSION_2026_07_28,
+      timeout: 1,
+    }, { fetchImpl, refreshAuthToken, onClose });
+    await client.start();
+
+    await expect(client.callTool("send_dm", {})).rejects.toThrow();
+
+    // 外发恰好一次：超时不是 401，不触发刷新/重放路径；结果未知以异常呈现。
+    expect(sends).toBe(1);
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    expect(refreshAuthToken).not.toHaveBeenCalled();
+    // 会话按非认证性失败拆掉交由退避重连；拆会话≠重发调用。
+    expect(onClose).toHaveBeenCalledWith(expect.objectContaining({ expected: false, needsAuth: false }));
+  });
+
   it("does not retry a 401 when no refresh is possible", async () => {
     let attempts = 0;
     const fetchImpl = vi.fn(streamableInitResponder((body) => {

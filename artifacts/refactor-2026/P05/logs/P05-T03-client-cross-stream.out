@@ -1,0 +1,22 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/services/stream-resume.test.ts (12 tests | 1 failed) 36ms
+     ✓ hydrates a completed empty resume for background sessions instead of leaving them stuck streaming 29ms
+     × does not dedupe a new stream seq=1 against the previous stream consumed seqs 3ms
+     ✓ replays background session events to the normal websocket handler 0ms
+     ✓ does not replay the same stream sequence twice when a resume response is repeated 0ms
+     ✓ reports duplicate live stream sequences as already consumed 0ms
+     ✓ requests the current stream from the beginning after render state is invalidated 0ms
+     ✓ includes sessionId when requesting stream resume for a known locator 0ms
+     ✓ keeps stream metadata under sessionId when the session locator changes 0ms
+     ✓ replays resume events through the canonical path when sessionId points away from a legacy path 0ms
+     ✓ rebuilds the current session by sessionId when a reset resume carries a legacy path 0ms
+     ✓ keeps the session marked streaming when resume replay is empty but runtime says it is still running 0ms
+     ✓ force-clears a stale active stream when runtime resume says the session is no longer running 0ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 11 passed (12)
+   Start at  10:36:25
+   Duration  726ms (transform 230ms, setup 20ms, import 274ms, tests 36ms, environment 327ms)
+

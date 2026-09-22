@@ -670,7 +670,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:2024cc33325ea1a1818950fcbf508b6519b5eedd3611ef5046148ff0316ee90a",
+  "payloadFingerprint": "sha256:a4e41368790fb176e6a4b8a4756a1e59ba7e2bab324508f4d22e372e20e46589",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3412,8 +3412,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "新增 conversation-map 布局存储（新文件 conversation-map.json，纯增量注册）；workspace-snapshots 增加会话删除联动清理（读取既有侧车形状，不改写字段）；checkpoint 侧车写入改原子写（tmp+rename，落盘内容不变）。既有持久化形状全部不变。",
-    "payloadFingerprint": "sha256:2024cc33325ea1a1818950fcbf508b6519b5eedd3611ef5046148ff0316ee90a"
+    "compatibilityReason": "本轮终态批次保护、输入契约与流投影修复不改变持久数据格式；tasks/schedules与旧attempt缺省兼容保持，媒体批次索引仅进程内释放，审批卡终态同步仅运行投影。",
+    "payloadFingerprint": "sha256:a4e41368790fb176e6a4b8a4756a1e59ba7e2bab324508f4d22e372e20e46589"
   },
   "schemas": [
     {
@@ -4341,7 +4341,7 @@
       "contract": "TaskRegistry task/schedule normalization and persistence serializer",
       "kind": "runtime-contract",
       "module": "lib/task-registry.ts",
-      "sourceHash": "sha256:c61d9b6038a8f21aa4d8c66a1efd2d4c5830b2fb9a3c74115780923387e9d971",
+      "sourceHash": "sha256:11f2f3a029840a305285d58bc110077513f6de51154c013f2426b52aae2a922a",
       "storeId": "plugin-task-registry"
     },
     {

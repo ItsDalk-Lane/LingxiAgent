@@ -1,0 +1,14 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stdout | tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > uses real SQLite stores and matches the deterministic committed fingerprint
+[fact-store] schema migrated: v0 → v3
+
+ ✓ tests/persistence-schema-tripwire.test.ts (15 tests) 1388ms
+     ✓ uses real SQLite stores and matches the deterministic committed fingerprint  1000ms
+
+ Test Files  1 passed (1)
+      Tests  15 passed (15)
+   Start at  00:18:28
+   Duration  1.68s (transform 215ms, setup 18ms, import 211ms, tests 1.39s, environment 0ms)
+

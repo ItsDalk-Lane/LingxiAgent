@@ -1,0 +1,25 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stdout | tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > uses real SQLite stores and matches the deterministic committed fingerprint
+[fact-store] schema migrated: v0 → v3
+
+ ✓ tests/data-epoch.test.ts (17 tests) 372ms
+ ✓ tests/data-epoch-checkpoint-provider.test.ts (22 tests) 744ms
+ ✓ tests/data-epoch-restore.test.ts (18 tests) 1242ms
+ ✓ tests/persistence-schema-tripwire.test.ts (15 tests) 1685ms
+     ✓ uses real SQLite stores and matches the deterministic committed fingerprint  1276ms
+ ✓ tests/data-epoch-coordinator.test.ts (23 tests) 2086ms
+     ✓ leaves every injected interruption fail-closed; only a proven committed tail is auto-cleaned  1218ms
+ ✓ tests/persistence-store-registry.test.ts (14 tests) 5702ms
+     ✓ owns every production persistence site exactly once  971ms
+     ✓ rejects expired and dangling exemptions  817ms
+     ✓ generates deterministic, repository-relative receipts that match the committed inventory  1562ms
+     ✓ anchors sites by ordinal so the receipt survives line shifts  1543ms
+     ✓ still reports a genuinely new write site after the ordinal change  759ms
+
+ Test Files  6 passed (6)
+      Tests  109 passed (109)
+   Start at  10:45:16
+   Duration  6.09s (transform 850ms, setup 116ms, import 977ms, tests 11.83s, environment 0ms)
+

@@ -1,0 +1,77 @@
+{
+  "workload": "server 冷启动（spawn→server-info.json 出现；全新隔离 HOME；OS page cache 不清空）",
+  "batch": "ACCB1",
+  "runs": [
+    {
+      "run": 1,
+      "home": "artifacts/refactor-2026/P00/isolated/bench-boot-ACCB1-1",
+      "ms": 1301,
+      "ready": true
+    },
+    {
+      "run": 2,
+      "home": "artifacts/refactor-2026/P00/isolated/bench-boot-ACCB1-2",
+      "ms": 1301,
+      "ready": true
+    },
+    {
+      "run": 3,
+      "home": "artifacts/refactor-2026/P00/isolated/bench-boot-ACCB1-3",
+      "ms": 1301,
+      "ready": true
+    },
+    {
+      "run": 4,
+      "home": "artifacts/refactor-2026/P00/isolated/bench-boot-ACCB1-4",
+      "ms": 1302,
+      "ready": true
+    },
+    {
+      "run": 5,
+      "home": "artifacts/refactor-2026/P00/isolated/bench-boot-ACCB1-5",
+      "ms": 1301,
+      "ready": true
+    },
+    {
+      "run": 6,
+      "home": "artifacts/refactor-2026/P00/isolated/bench-boot-ACCB1-6",
+      "ms": 1300,
+      "ready": true
+    },
+    {
+      "run": 7,
+      "home": "artifacts/refactor-2026/P00/isolated/bench-boot-ACCB1-7",
+      "ms": 1298,
+      "ready": true
+    },
+    {
+      "run": 8,
+      "home": "artifacts/refactor-2026/P00/isolated/bench-boot-ACCB1-8",
+      "ms": 1299,
+      "ready": true
+    },
+    {
+      "run": 9,
+      "home": "artifacts/refactor-2026/P00/isolated/bench-boot-ACCB1-9",
+      "ms": 1300,
+      "ready": true
+    },
+    {
+      "run": 10,
+      "home": "artifacts/refactor-2026/P00/isolated/bench-boot-ACCB1-10",
+      "ms": 1299,
+      "ready": true
+    }
+  ],
+  "ready_count": 10,
+  "median_ms": 1301,
+  "p95_ms": 1302,
+  "min_ms": 1298,
+  "max_ms": 1302,
+  "env": {
+    "node": "v24.16.0",
+    "os": "Darwin 27.0.0 arm64",
+    "cpus": 28
+  },
+  "seed_note": "输入为空 HOME + 固定入口 server/main-full.ts；无随机输入；端口由 server 自动选择"
+}

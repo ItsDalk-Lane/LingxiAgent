@@ -1,0 +1,6 @@
+
+> lingxi@0.1.42 typecheck:core-contracts
+> node scripts/check-core-contracts-strict.mjs
+
+Core contracts strict check passed (6 files).
+EXIT=0

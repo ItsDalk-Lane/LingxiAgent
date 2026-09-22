@@ -1,0 +1,7 @@
+[PASS] CE-2a: 正确重签（验收临时密钥）→ verifyManifest 通过（阳性对照） → keyId=acc-acceptance-key sourceCommit=674b0151fc
+[PASS] CE-2b: manifest 内容篡改（改 server 归档 sha256 字段、不重签）→ 签名校验必拒 → rejected: manifest: signature verification failed for keyId acc-acceptance-key
+[PASS] CE-2c: 归档字节篡改（manifest+sig 有效）→ 内容哈希比对必失配 → manifest=1801d3b013cd357e actual=45f26eeb11bcb843 mismatch=true
+[PASS] CE-2d: 密钥不在 keyset（临时密钥已删的本地测试件）→ fail-closed 拒绝 → rejected: manifest: keyId "p08-local-ephemeral" not present in keyset
+
+CE-2 summary: 4/4 behaved as expected
+（验证走 shared/artifact-core/manifest.cjs 同一验签原语；另见 P08-ACCEPT-ce2d-unknown-key.out = scripts/verify-seed-kit.mjs 真实入口 exit 1）

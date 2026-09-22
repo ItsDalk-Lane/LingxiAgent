@@ -6,14 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const createAgentSessionMock = vi.fn();
 const sessionManagerCreateMock = vi.fn();
 const sessionManagerOpenMock = vi.fn();
-const emitSessionShutdownMock = vi.fn(async (session) => {
-  const runner = session?.extensionRunner;
-  if (runner?.hasHandlers?.("session_shutdown")) {
-    await runner.emit({ type: "session_shutdown" });
-    return true;
-  }
-  return false;
-});
+
 
 vi.mock("../lib/pi-sdk/index.js", async (importOriginal) => {
   const actual = await importOriginal() as any;
@@ -25,7 +18,6 @@ vi.mock("../lib/pi-sdk/index.js", async (importOriginal) => {
       create: (...args: any[]) => sessionManagerCreateMock(...args),
       open: (...args: any[]) => sessionManagerOpenMock(...args),
     },
-    emitSessionShutdown: (...args: any[]) => (emitSessionShutdownMock as any)(...args),
   };
 });
 
@@ -84,7 +76,6 @@ describe("runAgentSession teardown", () => {
     createAgentSessionMock.mockReset();
     sessionManagerCreateMock.mockReset();
     sessionManagerOpenMock.mockReset();
-    emitSessionShutdownMock.mockClear();
     vi.useRealTimers();
   });
 
@@ -130,7 +121,7 @@ describe("runAgentSession teardown", () => {
       "hub_temporary_cleanup",
     );
     expect(callOrder).toEqual(["emit", "unsub", "dispose"]);
-    expect(emitSessionShutdownMock).toHaveBeenCalledWith(session);
+    expect(session.extensionRunner.emit).toHaveBeenCalledExactlyOnceWith({ type: "session_shutdown", reason: "quit" });
     expect(session.dispose).toHaveBeenCalledOnce();
     expect(fs.existsSync(sessionFile)).toBe(false);
   });
@@ -163,6 +154,41 @@ describe("runAgentSession teardown", () => {
 
     expect(session.dispose).toHaveBeenCalledOnce();
     expect(fs.existsSync(sessionFile)).toBe(false);
+  });
+
+  it("P02-A12：原任务失败且 dispose 抛错 → AggregateError 保留原失败并附清理失败，不覆盖成 success", async () => {
+    const cwd = path.join(rootDir, "cwd");
+    fs.mkdirSync(cwd, { recursive: true });
+    const agent = makeAgent(rootDir);
+    const engine = makeEngine(agent, cwd);
+    const sessionFile = path.join(agent.agentDir, "sessions", "temp", "s-a12-cleanup-fail.jsonl");
+    fs.mkdirSync(path.dirname(sessionFile), { recursive: true });
+    fs.writeFileSync(sessionFile, "", "utf-8");
+    sessionManagerCreateMock.mockReturnValue({ getSessionFile: () => sessionFile });
+
+    const session = {
+      prompt: vi.fn(async () => { throw new Error("provider stream failed"); }),
+      subscribe: vi.fn(() => () => {}),
+      dispose: vi.fn(() => { throw new Error("dispose exploded"); }),
+      sessionManager: { getSessionFile: () => sessionFile },
+      extensionRunner: { hasHandlers: vi.fn(() => false) },
+    };
+    createAgentSessionMock.mockResolvedValue({ session });
+
+    let caught = null;
+    try {
+      await runAgentSession("agent-a", [{ text: "hello", capture: true }], { engine });
+    } catch (err) {
+      caught = err;
+    }
+
+    // 原失败与清理失败都保留：既不是静默成功，也不互相覆盖。
+    expect(caught).toBeInstanceOf(AggregateError);
+    expect((caught as AggregateError).errors.map((e) => e.message)).toEqual([
+      "provider stream failed",
+      "dispose exploded",
+    ]);
+    expect(session.dispose).toHaveBeenCalledOnce();
   });
 
   it("hub 临时 session tools follow the master memory switch instead of session memory state", async () => {

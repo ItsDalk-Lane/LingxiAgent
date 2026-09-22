@@ -1,0 +1,35 @@
+lib/llm/provider-client.ts:344:      const result = await withModelRequestAccounting({
+lib/llm/observed-pi-direct-summary.ts:160:      ledgerRequestId = context.usageLedger.start({
+lib/llm/observed-pi-direct-summary.ts:186:      try { context.usageLedger.recordError(ledgerRequestId, error); } catch { /* never break */ }
+lib/llm/observed-pi-direct-summary.ts:204:    try { context.usageLedger.finish(ledgerRequestId); } catch { /* never break */ }
+lib/llm/model-request-accounting.ts:7:export async function withModelRequestAccounting({
+lib/llm/model-request-accounting.ts:15:  const request = usageLedger?.start?.({
+lib/llm/model-request-accounting.ts:28:      usageLedger?.recordError?.(request.requestId, responseError, "error", {
+lib/llm/model-request-accounting.ts:34:    usageLedger?.finish?.(request?.requestId, {
+lib/llm/model-request-accounting.ts:44:      usageLedger?.recordError?.(request.requestId, error, status, {
+lib/llm/session-snapshot-side-task-runner.ts:83:  const usageRequest = usageLedger?.start?.({
+lib/llm/session-snapshot-side-task-runner.ts:96:    if (usageRequest?.requestId) usageLedger?.recordError?.(usageRequest.requestId, error);
+lib/llm/session-snapshot-side-task-runner.ts:101:    if (usageRequest?.requestId) usageLedger?.recordError?.(usageRequest.requestId, error, "error", { usage: response?.usage });
+lib/llm/session-snapshot-side-task-runner.ts:104:  usageLedger?.finish?.(usageRequest?.requestId, {
+lib/llm/cache-preserving-compaction-agent-run.ts:381:      usageLedger?.recordError?.(pending.requestId, error, "error", result);
+lib/llm/cache-preserving-compaction-agent-run.ts:384:    usageLedger?.finish?.(pending.requestId, result);
+lib/llm/cache-preserving-compaction-agent-run.ts:423:    const usageRequest = usageLedger?.start?.({
+lib/llm/cache-preserving-compaction-agent-run.ts:518:      if (pending.requestId) usageLedger?.recordError?.(pending.requestId, error);
+lib/llm/cache-preserving-compaction-agent-run.ts:563:        if (pending.requestId) usageLedger?.recordError?.(pending.requestId, error);
+core/session-coordinator.ts:612:    const request = ledger.start({
+core/session-coordinator.ts:618:    return ledger.recordError(request.requestId, new Error(errorMessage || "provider request failed"));
+core/session-coordinator.ts:621:    return ledger.record({
+core/speech-recognition-service.ts:550:      const result = await withModelRequestAccounting({
+core/bridge-session-manager.ts:348:    const request = ledger.start({
+core/bridge-session-manager.ts:354:    return ledger.recordError(request.requestId, new Error(errorMessage));
+core/bridge-session-manager.ts:357:    return ledger.record({
+core/llm-client.ts:856:  usageRequest = usageLedger?.start?.({
+core/llm-client.ts:1054:  usageLedger?.finish?.(usageRequest?.requestId, {
+core/llm-client.ts:1095:      usageLedger?.recordError?.(usageRequest.requestId, err, status, {
+core/model-operation-client.ts:546:      const result = await withModelRequestAccounting({
+core/media/image-task-runner.ts:640:    const result = await withModelRequestAccounting({
+core/media/universal-media-manager.ts:962:      result = await withModelRequestAccounting({
+core/media/universal-media-manager.ts:1370:      result = await withModelRequestAccounting({
+hub/agent-executor.ts:137:    const request = ledger.start?.({
+hub/agent-executor.ts:143:    return ledger.recordError?.(request?.requestId, new Error(errorMessage || "provider request failed"));
+hub/agent-executor.ts:146:    return ledger.record?.({

@@ -600,8 +600,8 @@ const knowledgeReadCardBySession = new Map<string, string>();
  * 的 tool_end 也会经 ensureMessage 凭空创建第二条助手消息）。 */
 const knowledgeAnswerCardSessions = new Set<string>();
 
-function feedKnowledgeToolCard(sp: string, event: Record<string, unknown>): void {
-  streamBufferManager.handle({ ...event, sessionPath: sp });
+function feedKnowledgeToolCard(sp: string, event: Record<string, unknown> & { type: string }): void {
+  streamBufferManager.handleLocal({ ...event, sessionPath: sp });
 }
 
 function feedKnowledgeThinkCard(sp: string, id: string, phase: string): void {
@@ -653,13 +653,35 @@ function settleKnowledgeReadCard(sp: string): void {
 }
 
 // ── 消息分发（大 switch） ──
-
-export function handleServerMessage(msg: any, originConnectionKey = composerOriginConnectionKey()): void {
+// 返回值：水位管辖帧（isStreamScopedMessage / REACT_CHAT_EVENTS / status）被接纳
+// 门禁拒绝时返回 false；其余路径返回 true（已消费/已分发）或不返回（非水位帧）。
+// stream-resume 的重放层据此区分“帧已消费”与“帧已调用但被拒”。
+export function handleServerMessage(msg: any, originConnectionKey = composerOriginConnectionKey()): boolean | void {
   if (originConnectionKey !== composerOriginConnectionKey()) return;
   // 高频 terminal_output 只能做只读身份校验；即使 locator 没变化，也不能调用
   // Zustand setState，否则卡片折叠时仍会让整棵状态树持续更新。
   if (!rememberSessionLocatorFromMessage(msg, { write: msg?.type !== 'terminal_output' })) return;
   const state = useStore.getState();
+
+  const rebuildingFor = isStreamResumeRebuilding();
+
+  if (rebuildingFor && msg.type === 'status' && state.currentSessionPath === rebuildingFor) {
+    return;
+  }
+
+  if (
+    rebuildingFor &&
+    isStreamScopedMessage(msg) &&
+    msg.sessionPath === rebuildingFor &&
+    !msg.__fromReplay &&
+    msg.type !== 'stream_resume'
+  ) {
+    return;
+  }
+
+  if (msg.type !== 'stream_resume' && (isStreamScopedMessage(msg) || REACT_CHAT_EVENTS.has(msg.type) || msg.type === 'status')) {
+    if (!updateSessionStreamMeta(msg)) return false;
+  }
 
   // 「知识库检索中」胶囊与「等待助手」pending 都是纯瞬态信号：该 session 的
   // 任何后续事件（status / 聊天流事件 / error…）到达都代表前一阶段已结束，
@@ -684,26 +706,6 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       useStore.getState().endKnowledgeRollup?.(retrievalDonePath);
       useStore.getState().endKnowledgeSupplement?.(retrievalDonePath);
     }
-  }
-
-  const rebuildingFor = isStreamResumeRebuilding();
-
-  if (rebuildingFor && msg.type === 'status' && state.currentSessionPath === rebuildingFor) {
-    return;
-  }
-
-  if (
-    rebuildingFor &&
-    isStreamScopedMessage(msg) &&
-    msg.sessionPath === rebuildingFor &&
-    !msg.__fromReplay &&
-    msg.type !== 'stream_resume'
-  ) {
-    return;
-  }
-
-  if (msg.type !== 'stream_resume' && isStreamScopedMessage(msg)) {
-    if (!updateSessionStreamMeta(msg)) return;
   }
 
   if (
@@ -750,7 +752,7 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
     applyTodoToolEnd(msg);
     applyToolEndSessionFile(msg);
     applyContentBlockSessionFile(msg);
-    return;
+    return true;
   }
 
   // ── React 聊天渲染路径：聊天相关事件走 StreamBufferManager ──
@@ -771,7 +773,7 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
     if (msg.type === 'content_block' && msg.block?.type === 'artifact' && state.currentTab === 'chat') {
       handleLegacyArtifactBlock({ ...msg.block, sessionPath: msg.sessionPath });
     }
-    return;
+    return true;
   }
 
   // 非聊天渲染事件走传统 switch
@@ -1436,6 +1438,7 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
     }
 
     case 'confirmation_resolved': {
+      streamBufferManager.resolveSessionConfirmation(msg.confirmId, msg.action === 'confirmed' ? 'confirmed' : msg.action === 'timeout' ? 'timeout' : 'rejected');
       // 更新所有 session 中匹配 confirmId 的确认卡片状态。确认块可能不在最后一条消息，
       // 输入区也从消息块派生 pending 状态，所以这里按 session/message/block 三层显式定位。
       const nextStatusFor = (blockType: string): string => {

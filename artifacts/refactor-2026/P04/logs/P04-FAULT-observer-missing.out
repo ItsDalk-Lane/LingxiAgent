@@ -1,0 +1,13 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/model-observability-e2e-chat.test.ts (3 tests | 3 failed) 355ms
+     × S1 simple chat：1 trace/1 call；hook body ≡ witness body；四层 payload；毒丸不入库 97ms
+     × S2 tool loop：C1 toolCall → 工具执行 → C2 text；C2.parent=C1.callId（非 toolCallId） 17ms
+     × S3 P04-A06：跨多 delta 交错的多 toolCall 参数分片 + UTF-8 字节边界拆分后正确组装 241ms
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  09:23:49
+   Duration  1.15s (transform 245ms, setup 19ms, import 710ms, tests 355ms, environment 0ms)
+

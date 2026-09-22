@@ -1,0 +1,43 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+[server] [proxy] 出站流量正经由系统代理 http://127.0.0.1:7890；若需直连，请在设置 > 网络中切换为「直连」模式。 (Outbound is routed via system proxy http://127.0.0.1:7890; switch to "direct" in Settings > Network to bypass it.)
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[session] cache_contract_violation {"session":"sess_0mubb4w1t_9810f10324c5878e024f","renewReason":"new_session","requestCount":0,"diffs":[{"field":"systemPromptHash","expected":"12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126","actual":"7b4bbdd16ef1d85a9f7bab1d351862020f77720e9193826b2fc8307867bc39c5"},{"field":"cachePrefixHash","expected":"bfbd15734ee3c68d65a5dc4b1a0aacfb5d4c317c93ac6d9eceffc5c9efdab073","actual":"5d59f9cb38feb9b917409a6504516cff4c5f6fe7aebc4d25b1e69330c1ceb564"}],"expected":{"version":1,"cachePrefixHash":"bfbd15734ee3c68d65a5dc4b1a0aacfb5d4c317c93ac6d9eceffc5c9efdab073","modelHash":"6b9136fa1b05e6fc33063c3f51bdd997530fa78a9478ac142d91c79f1a345a75","systemPromptHash":"12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126","toolSchemaHash":"5c5c496e8cbbc6150b1e7bb882bd4f9b4ce1d572768e8d208293794b6af67e21","model":{"id":"witness-model","provider":"witness","api":"openai-completions","baseUrl":"http://127.0.0.1:62605/v1"},"toolNames":["edit","exec_command","read","write","mcp_call","mcp_describe_tool","mcp_search_tools"],"toolCount":7,"systemPromptBytes":0},"actual":{"version":1,"cachePrefixHash":"5d59f9cb38feb9b917409a6504516cff4c5f6fe7aebc4d25b1e69330c1ceb564","modelHash":"6b9136fa1b05e6fc33063c3f51bdd997530fa78a9478ac142d91c79f1a345a75","systemPromptHash":"7b4bbdd16ef1d85a9f7bab1d351862020f77720e9193826b2fc8307867bc39c5","toolSchemaHash":"5c5c496e8cbbc6150b1e7bb882bd4f9b4ce1d572768e8d208293794b6af67e21","model":{"id":"witness-model","provider":"witness","api":"openai-completions","baseUrl":"http://127.0.0.1:62605/v1"},"toolNames":["edit","exec_command","read","write","mcp_call","mcp_describe_tool","mcp_search_tools"],"toolCount":7,"systemPromptBytes":11164},"drift":{"fields":["systemPromptHash","cachePrefixHash"],"systemPrompt":{"expectedBytes":0,"actualBytes":11164,"firstDiffIndex":0,"expectedExcerpt":"","actualExcerpt":"You are running on the Lingxi (灵犀) platform.\n\n---\n\n# Environment\n\n<environment_context>\n  <platform>darwin</platform>\n  <"},"tools":null}}
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[llm-utils] summarizeTitle failed: LLM returned invalid JSON (status=200)
+[memory-ticker] 滚动摘要 (sess_0mubb4w1t_9810f10324c5878e024f) 失败: Could not read session JSONL: ENOENT: no such file or directory, open 'sess_0mubb4w1t_9810f10324c5878e024f'
+ ❯ tests/server-composition-boundary.test.ts (9 tests | 1 failed | 8 skipped) 91869ms
+     ↓ server/index.ts + composition/open-root.ts + composition/full-root.ts together mount exactly the expected route factories, at the same prefixes, as the pre-refactor server/index.ts
+     ↓ mobile-workbench (evidence-needed) is mounted directly by server/index.ts itself, not absorbed into open-root.ts or full-root.ts
+     ↓ server/index.ts imports composition/open-root.ts unconditionally and imports no closed-product route file directly
+     ↓ full composition supplies a non-empty builtinMediaAdapters list
+     ↓ server/index.ts (the open composition) only ever forwards root.builtinMediaAdapters, never constructs or imports a closed adapter list itself
+     ↓ main-full.ts forwards full-root's builtinMediaAdapters into startServer alongside registerClosedRoutes
+     ↓ importing server/index.ts alone defines startServer but starts nothing (no port bind, no server-info.json, clean exit)
+     ↓ serves an open-root route and a full-root (closed-product) route behind the same global auth middleware
+     × runs the full chain without any desktop, rejects malformed JSON at the HTTP entry (A07), and keeps serving after a desktop-channel notify (A10) 91868ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server-composition-boundary.test.ts > P01 headless vertical slice: witness provider → WS prompt → real read tool → history read-back > runs the full chain without any desktop, rejects malformed JSON at the HTTP entry (A07), and keeps serving after a desktop-channel notify (A10)
+Error: agent_settled wait timeout; last events: [{"type":"assistant_segment_end","segmentId":"assistant:2:text:0","semanticPhase":"final_answer","sessionPath":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-p01-vertical-yNg7FE/agents/lingxi/sessions/2026-09-21T13-55-12-030Z_01a0c43f-d21e-7454-ab04-76fcb10fec90.jsonl","sessionId":"sess_0mubb4w1t_9810f10324c5878e024f","sessionRefVersion":2,"streamId":"s_mubb4w2k_ek5t6e","seq":12,"studioId":"studio_55f30595-a363-4a49-a9e9-1b6a2bbcbadb"},{"type":"model_turn_end","sessionPath":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-p01-vertical-yNg7FE/agents/lingxi/sessions/2026-09-21T13-55-12-030Z_01a0c43f-d21e-7454-ab04-76fcb10fec90.jsonl","sessionId":"sess_0mubb4w1t_9810f10324c5878e024f","sessionRefVersion":2,"streamId":"s_mubb4w2k_ek5t6e","seq":13,"studioId":"studio_55f30595-a363-4a49-a9e9-1b6a2bbcbadb"},{"type":"assistant_run_end","runId":"064639b9-4563-458e-b697-e35f163cc20a","status":"completed","turnInputEntryId":"d7736f4e","userEntryId":"d7736f4e","assistantEntryId":"c2a895b6","assistantEntryIds":["56690538","c2a895b6"],"sessionPath":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-p01-vertical-yNg7FE/agents/lingxi/sessions/2026-09-21T13-55-12-030Z_01a0c43f-d21e-7454-ab04-76fcb10fec90.jsonl","sessionId":"sess_0mubb4w1t_9810f10324c5878e024f","sessionRefVersion":2,"streamId":"s_mubb4w2k_ek5t6e","seq":14,"studioId":"studio_55f30595-a363-4a49-a9e9-1b6a2bbcbadb"},{"type":"status","isStreaming":false,"sessionPath":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-p01-vertical-yNg7FE/agents/lingxi/sessions/2026-09-21T13-55-12-030Z_01a0c43f-d21e-7454-ab04-76fcb10fec90.jsonl","streamId":"s_mubb4w2k_ek5t6e","studioId":"studio_55f30595-a363-4a49-a9e9-1b6a2bbcbadb"},{"type":"status","isStreaming":false,"sessionPath":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-p01-vertical-yNg7FE/agents/lingxi/sessions/2026-09-21T13-55-12-030Z_01a0c43f-d21e-7454-ab04-76fcb10fec90.jsonl","streamId":"s_mubb4w2k_ek5t6e","studioId":"studio_55f30595-a363-4a49-a9e9-1b6a2bbcbadb"},{"type":"session_title","title":"请读取 slice-note.txt 并告诉我内容","path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-p01-vertical-yNg7FE/agents/lingxi/sessions/2026-09-21T13-55-12-030Z_01a0c43f-d21e-7454-ab04-76fcb10fec90.jsonl"}]
+ ❯ waitForSettled tests/server-composition-boundary.test.ts:540:44
+    538|         const deadline = Date.now() + 90000;
+    539|         while (settledCount() < target) {
+    540|           if (Date.now() > deadline) throw new Error(`agent_settled wa…
+       |                                            ^
+    541|           await new Promise((r) => setTimeout(r, 150));
+    542|         }
+ ❯ tests/server-composition-boundary.test.ts:553:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 skipped (9)
+   Start at  21:55:10
+   Duration  92.15s (transform 167ms, setup 19ms, import 195ms, tests 91.87s, environment 0ms)
+

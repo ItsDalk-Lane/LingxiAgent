@@ -1,0 +1,354 @@
+{
+  "schema_version": 1,
+  "stage_id": "P03",
+  "status": "PASS",
+  "status_meaning": "PASS = 8/8 任务与 15/15 验收场景全部有真实执行证据（本地 darwin arm64，合成数据）；不代表软件无缺陷（F1 治理 4 红与 F3 网络环境按 P00 定级保留，状态未变化）",
+  "research_sha": "8037fae7a6f621549f5b7db4c4d0bba3862ddc07",
+  "start_sha": "5c131896a",
+  "end_sha": "5c131896a（零 commit；全部改动为工作区状态，等待用户授权提交）",
+  "environment": {
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "os": "Darwin 27.0.0",
+    "arch": "arm64",
+    "lockfile_sha256": "a9735825cea1d018c2a42ae04f875368a003c386ca68fc86503bc8acbcd79d3c"
+  },
+  "tasks": [
+    {
+      "id": "P03-T01",
+      "implementation_action": "MODIFIED（core 导出读动作集合+shared 导出镜像集合+注释更正；目标/路径机制 UNCHANGED_VERIFIED）",
+      "source_locations": [
+        "core/session-permission-mode.ts",
+        "shared/tool-categories.ts",
+        "docs/refactor-2026/P03/TOOL_PATH_MATRIX.json"
+      ],
+      "consumer_locations": [
+        "tests/on-demand-first-party.test.ts（镜像一致性测试）",
+        "engine 首方延迟注册（firstPartyDeferredInvocation）"
+      ],
+      "test_ids": [
+        "P03-T01-mirror-test",
+        "P03-T01-mirror-negative",
+        "P03-T01-mirror-test-r2"
+      ],
+      "legacy_action": "无重复路径；死白名单条目移交 T03 处置",
+      "status": "PASS",
+      "evidence": "19→21 例绿 + 负向漂移注入 2 例红后复绿"
+    },
+    {
+      "id": "P03-T02",
+      "implementation_action": "UNCHANGED_VERIFIED（注册即单一冻结 schema；三处同源本就成立）+ 补测",
+      "source_locations": [
+        "lib/tools/invocation/schema-validator.ts",
+        "core/engine.ts:4147/4198/4410",
+        "docs/refactor-2026/P03/SCHEMA_CONTRACT.md"
+      ],
+      "consumer_locations": [
+        "目录 describe（catalog schemaRef）/直挂面 parameters/网关 validator（三处）"
+      ],
+      "test_ids": [
+        "P03-T02-schema-consistency",
+        "P03-T02-depth-caps"
+      ],
+      "legacy_action": "无旧 schema 拷贝路径",
+      "status": "PASS",
+      "evidence": "对象同一性 toBe 断言 + 装配后改写来源不扩执行契约 + 深度/数量上限拒绝"
+    },
+    {
+      "id": "P03-T03",
+      "implementation_action": "MODIFIED（删除指向已删文件的死 allowlist 条目）；网关集中执行/prepared 绑定/审计字段 UNCHANGED_VERIFIED",
+      "source_locations": [
+        "scripts/check-tool-invocation-boundaries.mjs",
+        "tests/tool-invocation-boundary.test.ts",
+        "docs/architecture/tool-invocation-path-invariance.md",
+        "docs/refactor-2026/P03/EXECUTION_BOUNDARY_AUDIT.md"
+      ],
+      "consumer_locations": [
+        "AST 门禁 + 边界测试（同一扫描函数）"
+      ],
+      "test_ids": [
+        "P03-T03-boundaries",
+        "P03-T03-boundary-test"
+      ],
+      "legacy_action": "旁路删除表：死条目删除；HTTP plugin-dev 路由 04f90d2b2 已删（核实）；桥原始引用/engine 原始映射维持既有禁止",
+      "status": "PASS",
+      "evidence": "门禁 2244 文件 0 违规 + 白名单断言同步 5/5"
+    },
+    {
+      "id": "P03-T04",
+      "implementation_action": "UNCHANGED_VERIFIED + 补测（A07 目录隔离、schema 回驻）",
+      "source_locations": [
+        "core/engine.ts _planDeferredToolAssembly",
+        "docs/refactor-2026/P03/TOOL_LIFECYCLE.md"
+      ],
+      "consumer_locations": [
+        "每会话 buildTools 局部 registry/catalog/manifest 快照"
+      ],
+      "test_ids": [
+        "P03-T04-catalog-isolation-r2",
+        "P03-T04-resident-fallback-r3"
+      ],
+      "legacy_action": "无跨会话目录缓存层可退；事实更正：无契约→惰性合成→调用期 fail-closed（非注释所写常驻），见 TOOL_LIFECYCLE §5",
+      "status": "PASS",
+      "evidence": "A07 双 agent 无串扰 + B 持同名授权 0 执行；schema 不可消费显式回驻"
+    },
+    {
+      "id": "P03-T05",
+      "implementation_action": "UNCHANGED_VERIFIED + 补测；HTTP 开发路由删除为既有事实（本阶段核实+清残留）",
+      "source_locations": [
+        "core/tool-invocation-gateway.ts",
+        "server/http/route-security.ts",
+        "server/routes/mcp.ts",
+        "docs/refactor-2026/P03/DEVELOPER_ROUTE_SECURITY.md"
+      ],
+      "consumer_locations": [
+        "app-tools HTTP 入口（STUDIO_OWNER）；prepareAndInvokeForLocalDeveloper（测试消费）"
+      ],
+      "test_ids": [
+        "P03-T05-gateway-a08"
+      ],
+      "legacy_action": "HTTP plugin-dev 路由已删；PluginManager.executePluginTool 无生产调用方且白名单清零",
+      "status": "PASS",
+      "evidence": "伪造 owner 6 样例拒绝 + 既有三层证据（server-auth/route-security/mcp-routes）"
+    },
+    {
+      "id": "P03-T06",
+      "implementation_action": "UNCHANGED_VERIFIED + 补测（A12）",
+      "source_locations": [
+        "core/tool-invocation-gateway.ts（normalizeResult/取消）",
+        "core/mcp/clients/http-client.ts（超时/单次 401 重试）",
+        "docs/refactor-2026/P03/RESULT_CONTRACT.md"
+      ],
+      "consumer_locations": [
+        "结果展示投影/历史恢复/A13 大结果（SessionFile 身份）"
+      ],
+      "test_ids": [
+        "P03-T06-a12-r2"
+      ],
+      "legacy_action": "无旧结果路径",
+      "status": "PASS",
+      "evidence": "超时外发恰 1 次不重发 + 既有 401 族/取消族/历史恢复族"
+    },
+    {
+      "id": "P03-T07",
+      "implementation_action": "组合矩阵+真实树故障注入（无生产改动）",
+      "source_locations": [
+        "docs/refactor-2026/P03/COMBINATION_MATRIX.json",
+        "artifacts/refactor-2026/P03/logs/P03-T07-fault-injection-*"
+      ],
+      "consumer_locations": [
+        "22 个工具域测试文件（真实 engine/McpManager/gateway fixture）"
+      ],
+      "test_ids": [
+        "P03-T08-targeted-suite",
+        "P03-T07-fault-injection-gate",
+        "P03-T07-fault-injection-test",
+        "P03-T07-fault-injection-gate-recovered",
+        "P03-T07-fault-injection-test-recovered"
+      ],
+      "legacy_action": "无",
+      "status": "PASS",
+      "evidence": "311/311 + 注入红→还原绿零残留"
+    },
+    {
+      "id": "P03-T08",
+      "implementation_action": "MODIFIED（F2 两处修复）+ 旧路径清单 + P06 接口交接",
+      "source_locations": [
+        "lib/tools/run-code-tool.ts",
+        "lib/tools/security-scan-tool.ts",
+        "docs/refactor-2026/P03/P03_REPORT.md",
+        "docs/refactor-2026/P03/NEXT_STAGE_HANDOFF.md"
+      ],
+      "consumer_locations": [
+        "CI lint 门禁（F2 关闭）"
+      ],
+      "test_ids": [
+        "P03-T08-f2-lint-fixed",
+        "P03-T08-f2-tool-tests",
+        "P03-T08-lint-repo"
+      ],
+      "legacy_action": "旧路径退出清单见 REPORT §接线和旧路径；唯一执行裁决维持网关",
+      "status": "PASS",
+      "evidence": "eslint 全仓 0 error；两工具 18/18"
+    }
+  ],
+  "acceptance_cases": [
+    {
+      "id": "P03-A01",
+      "status": "PASS",
+      "command_ids": [
+        "P03-T08-targeted-suite"
+      ]
+    },
+    {
+      "id": "P03-A02",
+      "status": "PASS",
+      "command_ids": [
+        "P03-T08-targeted-suite"
+      ]
+    },
+    {
+      "id": "P03-A03",
+      "status": "PASS",
+      "command_ids": [
+        "P03-T08-targeted-suite"
+      ]
+    },
+    {
+      "id": "P03-A04",
+      "status": "PASS",
+      "command_ids": [
+        "P03-T08-targeted-suite"
+      ]
+    },
+    {
+      "id": "P03-A05",
+      "status": "PASS",
+      "command_ids": [
+        "P03-T08-targeted-suite"
+      ]
+    },
+    {
+      "id": "P03-A06",
+      "status": "PASS",
+      "command_ids": [
+        "P03-T08-targeted-suite"
+      ]
+    },
+    {
+      "id": "P03-A07",
+      "status": "PASS",
+      "command_ids": [
+        "P03-T08-targeted-suite"
+      ]
+    },
+    {
+      "id": "P03-A08",
+      "status": "PASS",
+      "command_ids": [
+        "P03-T08-targeted-suite"
+      ]
+    },
+    {
+      "id": "P03-A09",
+      "status": "PASS",
+      "command_ids": [
+        "P03-T08-targeted-suite"
+      ]
+    },
+    {
+      "id": "P03-A10",
+      "status": "PASS",
+      "command_ids": [
+        "P03-T08-targeted-suite"
+      ]
+    },
+    {
+      "id": "P03-A11",
+      "status": "PASS",
+      "command_ids": [
+        "P03-T08-full-suite"
+      ]
+    },
+    {
+      "id": "P03-A12",
+      "status": "PASS",
+      "command_ids": [
+        "P03-T08-targeted-suite"
+      ]
+    },
+    {
+      "id": "P03-A13",
+      "status": "PASS",
+      "command_ids": [
+        "P03-T08-full-suite"
+      ]
+    },
+    {
+      "id": "P03-A14",
+      "status": "PASS",
+      "command_ids": [
+        "P03-T08-targeted-suite"
+      ]
+    },
+    {
+      "id": "P03-A15",
+      "status": "PASS",
+      "command_ids": [
+        "P03-T07-fault-injection-gate",
+        "P03-T07-fault-injection-test",
+        "P03-T07-fault-injection-gate-recovered",
+        "P03-T07-fault-injection-test-recovered"
+      ]
+    }
+  ],
+  "commands": "run-logged 40 条（原执行期 34 + 复验收修复轮 6；初版误记 28 已按实测更正；34 条为弱格式、6 条为 P00 同构全格式——见 P03_REPORT 复验收修复轮）（artifacts/refactor-2026/P03/logs/command-log.jsonl）。关键终态：typecheck×3 绿（一轮类型修正留档）、core-contracts/dependency/pi-sdk(3/3)/tool-invocation(2244)/cli-closure/open-boundary 全绿、eslint 全仓 0 error（F2 关闭）、定向 22 文件 311/311、全量 npm test 4 红=F1 基线（14750 绿，+10 为本阶段新增）。负向验证 2 组：镜像漂移注入（2 例红）、真实树 executeCanonical 直调注入（门禁+测试双红→还原双绿零残留）",
+  "baseline_failures": [
+    {
+      "id": "F1",
+      "summary": "npm test 4 用例红（seal×1+round2×2+round3×1，与 P00/P01/P02 登记一致未扩大）",
+      "class": "治理流程（用户授权推进）",
+      "blocks_p03": false,
+      "blocks": "P08 发布门禁",
+      "repro": "npx vitest run tests/post-verification-audit-seal.test.ts tests/round2-delivery-evidence.test.ts tests/round3-delivery-evidence.test.ts"
+    },
+    {
+      "id": "F2",
+      "summary": "lint 3 生产 error（run-code-tool no-control-regex×2、security-scan-tool no-constant-condition×1）",
+      "class": "已关闭（本阶段修复：行级豁免+恒真条件显式化）",
+      "blocks_p03": false,
+      "blocks": "无（eslint 全仓 0 error）",
+      "repro": "npx eslint lib/tools/run-code-tool.ts lib/tools/security-scan-tool.ts"
+    },
+    {
+      "id": "F3",
+      "summary": "网络环境（代理不通+直连拒）",
+      "class": "环境缺失 BLOCKED（继承，本阶段未新增依赖项）",
+      "blocks_p03": false,
+      "blocks": "四平台 CI 证据、真实供应商验证（P04/P08）",
+      "repro": "curl -m 5 https://registry.npmjs.org/ → 000"
+    }
+  ],
+  "scope_deviations": [
+    {
+      "note": "T04 事实更正：engine 注释称无契约工具'keeping it resident'，实测合成契约为惰性构造（构造必成功、调用期 fail-closed），真正可达的常驻回退是 schema 不可消费分支；按实际行为落测试并在 TOOL_LIFECYCLE §5 登记（零生产代码改动）"
+    },
+    {
+      "note": "A12 测试首版 fixture 用永不 resolve 的假 fetch 触发 60s 挂起——fetchWithTimeout 靠 abort 信号中止而非外层竞速；改为 abort 感知替身后语义正确（失败留档）"
+    },
+    {
+      "note": "pi-sdk 门禁首跑命令名误写（无该 npm script），实际以 tests/pi-sdk-import-boundary.test.ts 为门禁（P02 同法）"
+    },
+    {
+      "note": "A07 测试首跑因辅助函数传假 sessionPath 触发工具会话身份冲突（产品防串会话机制按设计工作）；改用各 engine 真实 sessionPath"
+    },
+    {
+      "note": "F5 补丁再次被全量测试 R10-09 重写：取证 stat 后 git checkout 还原（P02 同款处理）"
+    }
+  ],
+  "legacy_paths": [
+    {
+      "item": "AST 白名单死条目 pluginExecuteTool:[core/plugin-dev-service.ts]",
+      "action": "删除（文件已于 04f90d2b2 删除；白名单清零=任何生产调用违规）"
+    },
+    {
+      "item": "F2 lint 3 error",
+      "action": "修复关闭（ANSI 剥除行级豁免遵循仓库先例；恒真条件显式化，语义不变）"
+    }
+  ],
+  "blocked_items": [
+    {
+      "item": "（继承 P01/P02，非本阶段验收项）build:server:open / 四平台 CI / Windows/Linux 实机 / 真实供应商执行",
+      "reason": "F3 网络环境 / 本地 darwin only / 付费与外发需授权",
+      "unblock": "P04 真供应商验证（需授权）与 P08 产物验收"
+    }
+  ],
+  "next_stage_handoff": "docs/refactor-2026/P03/NEXT_STAGE_HANDOFF.md",
+  "implementation_performed": true,
+  "project_tests_executed": true,
+  "production_files_modified": 6,
+  "test_files_modified": 6,
+  "production_commits": 0,
+  "real_model_calls": 0,
+  "real_user_data_writes": 0
+}

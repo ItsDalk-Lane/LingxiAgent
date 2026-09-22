@@ -1,0 +1,23 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/model-observability-e2e-utility.test.ts (13 tests | 2 failed) 4632ms
+     ✓ 两次真实请求分别落成调用，只有修复请求带 format_constraint 63ms
+     ✓ compileToday 生产提示经真实请求、持久化与查询保持 task_input 来源 14ms
+     ✓ 同一 diary trace：2 临时摘要（MC-10）+ 终稿（MC-04）同 trace、parent=null、凭证不入库 34ms
+     ✓ fake executable：external_process/OPAQUE；argv+stdout 毒丸不进 payload；UI 侧 OPAQUE 可见 7ms
+     ✓ agnes submit 是 Model Call（witness 真实 HTTP）；poll 0 新事件 8ms
+     ✓ HTTP 429：错误终态 + safe error + 毒丸错误正文不入库 7ms
+     ✓ HTTP 500：错误终态 + safe error + 毒丸错误正文不入库 6ms
+     ✓ invalid JSON 200：错误终态 + safe error + 毒丸错误正文不入库 6ms
+     ✓ timeout（hang）：LLM_TIMEOUT error 终态  4313ms
+     ✓ connection reset：error 终态（不 crash observer） 16ms
+     ✓ user abort：aborted ≠ error（§五十七） 113ms
+     × P04-A15：EmbeddingClient 经真实 witness HTTP——凭证进请求头、观测/台账/投影齐备、毒丸不入库 34ms
+     × P04-A15：RerankClient 经真实 witness HTTP——cohere 形状归一 + usage meta 记账 9ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 11 passed (13)
+   Start at  09:31:00
+   Duration  5.65s (transform 444ms, setup 19ms, import 932ms, tests 4.63s, environment 0ms)
+

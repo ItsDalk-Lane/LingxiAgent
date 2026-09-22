@@ -1,0 +1,82 @@
+[build-server] Building for darwin-arm64...
+[build-server] using cached Node.js v24.15.0
+[build-server] Node.js runtime ready
+[build-server] running Vite bundle...
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 1702 modules transformed.
+rendering chunks...
+computing gzip size...
+dist-server-bundle/index.js  8,326.88 kB │ gzip: 2,200.41 kB
+✓ built in 4.92s
+[build-server] Vite bundle copied to bundle/
+[build-server] running CLI bundle...
+[build-server] CLI bundle copied to bundle/cli.js
+[build-server] bootstrap copied
+[build-server]   lib/known-models.json
+[build-server]   lib/known-model-fallbacks.json
+[build-server]   lib/default-models.json
+[build-server]   lib/config.example.yaml
+[build-server]   lib/identity.example.md
+[build-server]   lib/agents.example.md
+[build-server]   lib/pinned.example.md
+[build-server]   lib/identity-templates/
+[build-server]   lib/agents-templates/
+[build-server]   lib/agents-public-templates/
+[build-server]   lib/yuan/
+[build-server]   desktop/src/locales/
+[build-server]   skills2set/
+[build-server]   desktop/src/assets/Lingxi.png
+[build-server]   desktop/src/assets/Butter.png
+[build-server]   desktop/src/assets/Ming.png
+[build-server]   desktop/src/assets/Kong.png
+[build-server]   desktop/src/assets/character-cards/
+[build-server]   desktop/src/assets/cover-gallery/
+[build-server]   desktop/dist-renderer/
+[build-server]   plugins/
+[build-server]   core/media/media-parameters.ts
+[build-server]   lib/debug-log.ts
+[build-server]   lib/i18n.ts
+[build-server]   lib/llm/model-call-identity.ts
+[build-server]   lib/llm/model-call-integration.ts
+[build-server]   lib/llm/model-call-observer.ts
+[build-server]   lib/llm/model-call-payload-capture.ts
+[build-server]   lib/llm/model-call-payload-redaction.ts
+[build-server]   lib/llm/model-call-payload-types.ts
+[build-server]   lib/llm/model-call-recorder.ts
+[build-server]   lib/llm/model-trace-scope.ts
+[build-server]   lib/llm/semantic-input-provenance.ts
+[build-server]   lib/llm/usage-context.ts
+[build-server]   lib/log-redactor.ts
+[build-server]   shared/cover-gallery-presets.ts
+[build-server]   shared/error-bus.ts
+[build-server]   shared/errors.ts
+[build-server]   shared/hana-root.ts
+[build-server]   shared/identity-brands.ts
+[build-server]   shared/log-redactor.ts
+[build-server]   shared/model-observability-api-contract.ts
+[build-server]   shared/safe-fs.ts
+[build-server]   shared/tool-categories.ts
+[build-server] resource files copied
+[build-server] derived external deps: @node-rs/jieba, better-sqlite3, node-pty, @firecrawl/anydoc, ws, @earendil-works/pi-agent-core, @earendil-works/pi-ai, @earendil-works/pi-coding-agent, @silvia-odwyer/photon-node, @larksuiteoapi/node-sdk, node-telegram-bot-api, proxy-agent, undici, exceljs, mammoth, jsdom, qrcode, js-yaml, unpdf, usearch
+[build-server] pinned server deps: @node-rs/jieba@2.0.1, better-sqlite3@12.6.2, node-pty@1.1.0, @firecrawl/anydoc@0.1.2, ws@8.21.0, @earendil-works/pi-agent-core@0.86.0, @earendil-works/pi-ai@0.86.0, @earendil-works/pi-coding-agent@0.86.0, @silvia-odwyer/photon-node@0.3.4, @larksuiteoapi/node-sdk@1.72.0, node-telegram-bot-api@0.67.0, proxy-agent@6.5.0, undici@7.29.0, exceljs@4.4.0, mammoth@1.11.0, jsdom@29.0.2, qrcode@1.5.4, js-yaml@4.3.1, unpdf@1.6.2, usearch@2.26.0, lru-cache@11.5.1, underscore@1.13.8, node-gyp-build@4.8.4, bindings@1.5.0
+[build-server] installing external dependencies...
+
+added 649 packages in 48s
+[build-server] node-pty executable bit fixed: node_modules/node-pty/prebuilds/darwin-arm64/spawn-helper
+[verify-pi-sdk] all checks passed
+[build-server] cleanup: removed 4 node_modules/.bin directories
+[build-server] dependencies installed
+[build-server] running nft trace...
+[build-server] nft: protecting 26 server deps from pruning: @node-rs/jieba, better-sqlite3, node-pty, @firecrawl/anydoc, ws, @earendil-works/pi-agent-core, @earendil-works/pi-ai, @earendil-works/pi-coding-agent, @silvia-odwyer/photon-node, @larksuiteoapi/node-sdk, node-telegram-bot-api, proxy-agent, undici, exceljs, mammoth, jsdom, qrcode, js-yaml, unpdf, usearch, lru-cache, underscore, node-gyp-build, bindings, @node-rs/jieba-darwin-arm64, @firecrawl/anydoc-darwin-arm64
+[build-server] nft: kept 6968 files, removed 16688 files (99MB)
+[build-server] usearch runtime smoke passed: backend=hnsw
+[build-server] better-sqlite3 runtime smoke passed
+[build-server] jieba runtime smoke passed
+[build-server] @firecrawl/anydoc runtime smoke passed
+[build-server] node-pty: kept prebuilds/darwin-arm64, removed 3 other platform prebuilds
+[build-server] usearch: kept prebuilds/darwin-arm64+x64
+[build-server] cleanup: removed @larksuiteoapi/node-sdk/types/ (~15MB .d.ts)
+[build-server] cleanup: removed exceljs/dist/ (~21MB browser bundle)
+[build-server] prune: removed 10084 runtime-dead files from node_modules (69.4MB)
+[build-server] wrapper created

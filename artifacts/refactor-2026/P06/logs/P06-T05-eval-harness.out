@@ -1,0 +1,17 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/resolver-error-passthrough.test.ts (4 tests) 50ms
+stdout | tests/p06-tool-behavior-eval.test.ts > P06-T05 deterministic contract scoring > scores every deterministic sample through real production components
+P06_EVAL_DETERMINISTIC {"scored":23,"results":[{"id":"F-06","status":"PASS"},{"id":"F-07","status":"PASS"},{"id":"F-08","status":"PASS"},{"id":"F-09","status":"PASS"},{"id":"F-10","status":"PASS"},{"id":"F-11","status":"PASS"},{"id":"F-12","status":"PASS"},{"id":"F-13","status":"PASS"},{"id":"F-14","status":"PASS"},{"id":"F-15","status":"PASS"},{"id":"F-16","status":"PASS"},{"id":"F-17","status":"PASS"},{"id":"F-18","status":"PASS"},{"id":"F-19","status":"PASS"},{"id":"F-20","status":"PASS"},{"id":"F-21","status":"PASS"},{"id":"F-22","status":"PASS"},{"id":"F-26","status":"PASS"},{"id":"F-27","status":"PASS"},{"id":"F-28","status":"PASS"},{"id":"F-29","status":"PASS"},{"id":"F-37","status":"PASS"},{"id":"F-38","status":"PASS"}]}
+
+stdout | tests/p06-tool-behavior-eval.test.ts > P06-T05 deterministic contract scoring > maps lifecycle/knowledge samples to existing protective suites (no scoring forgery)
+P06_EVAL_MAPPED [{"id":"F-30","suite":"tests/tool-lifecycle-revocation.test.ts","status":"delegated_to_full_suite"},{"id":"F-31","suite":"tests/tool-lifecycle-revocation.test.ts","status":"delegated_to_full_suite"},{"id":"F-32","suite":"tests/tool-lifecycle-revocation.test.ts","status":"delegated_to_full_suite"},{"id":"F-33","suite":"tests/knowledge-agent-tools.test.ts","status":"delegated_to_full_suite"},{"id":"F-34","suite":"tests/knowledge-agent-tools.test.ts","status":"delegated_to_full_suite"},{"id":"F-35","suite":"tests/knowledge-agent-tools.test.ts","status":"delegated_to_full_suite"},{"id":"F-36","suite":"tests/knowledge-agent-tools.test.ts","status":"delegated_to_full_suite"}]
+
+ ✓ tests/p06-tool-behavior-eval.test.ts (4 tests) 59ms
+
+ Test Files  2 passed (2)
+      Tests  8 passed (8)
+   Start at  12:38:37
+   Duration  2.99s (transform 1.92s, setup 34ms, import 3.55s, tests 109ms, environment 0ms)
+

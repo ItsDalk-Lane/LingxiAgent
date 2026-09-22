@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "stage_id": "P01",
+  "task_id": "P01-T04",
+  "generated_at": "2026-09-21",
+  "entry": {
+    "tsconfig": "tsconfig.core-contracts.json",
+    "npm_script": "typecheck:core-contracts",
+    "runner": "scripts/check-core-contracts-strict.mjs（TypeScript 编译器 API，无子进程）",
+    "self_test": "tests/core-contracts-strict.test.ts（4 用例：正例 + A05 负例 + A06 负例 + fixtures 隔离断言）"
+  },
+  "compiler_options": {
+    "extends": "tsconfig.base.json（strict: true 隐含 noImplicitAny/strictNullChecks/useUnknownInCatchVariables）",
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true
+  },
+  "scope": [
+    {
+      "file": "shared/identity-brands.ts",
+      "reason": "P01 新增：身份品牌类型与运行时守卫（sess_/mc_/ma_/mt_）",
+      "imports_pull_in": []
+    },
+    {
+      "file": "shared/hana-runtime-paths.ts",
+      "reason": "LINGXI_HOME 解析权威（+新增 .d.cts 声明使 .cjs 兄弟可被类型化导入）",
+      "imports_pull_in": ["shared/hana-runtime-paths.cjs（经 .d.cts 声明）"]
+    },
+    {
+      "file": "shared/model-ref.ts",
+      "reason": "模型引用复合键纯规则（本轮补显式类型）",
+      "imports_pull_in": []
+    },
+    {
+      "file": "shared/errors.ts",
+      "reason": "AppError 错误信封（本轮修 exactOptionalPropertyTypes）",
+      "imports_pull_in": []
+    },
+    {
+      "file": "lib/llm/model-call-identity.ts",
+      "reason": "mc_/ma_/mt_ 唯一铸造厂（本轮接入品牌类型）",
+      "imports_pull_in": ["shared/identity-brands.ts"]
+    },
+    {
+      "file": "cli/local-server.ts",
+      "reason": "CLI server-info 读取适配（本轮统一 LINGXI_HOME + strict 化）",
+      "imports_pull_in": ["shared/hana-runtime-paths.ts", "fs/path（node 内置）"]
+    }
+  ],
+  "scope_policy": {
+    "add_rule": "后续阶段新建/重构的核心契约随其阶段任务纳入 include；纳入即受全部 strict 开关约束。",
+    "forbidden": "any/双重断言/@ts-ignore/@ts-nocheck/伪造 .d.ts 掩盖本地源码；例外必须逐条登记（见 exceptions）。",
+    "negative_fixtures": "tests/fixtures/core-contracts-negative/（tsconfig.test.json 显式 exclude；仅由 strict 门禁测试注入）"
+  },
+  "exceptions": [
+    {
+      "item": "lib/llm/model-call-identity.ts 铸造随机段 Math.random()",
+      "kind": "非类型例外（安全工具建议登记）",
+      "justification": "mc_/ma_/mt_ 是观测关联 ID，源码注明不携带秘密；防碰撞靠单调序号+时间戳，非密码学不可预测性（Mimosa 建议关注项，如实登记不改动）",
+      "runtime_check": "requireModelCallId 等守卫在铸造出口校验前缀+形态",
+      "exit_condition": "若未来身份需不可预测性，改用 node:crypto 随机并在铸造厂内替换"
+    }
+  ],
+  "counting_note": "例外计数不因移动文件下降；当前严格例外数为 1（见上）。宽松区遗留（tsconfig.node strict=false 全量）是显式剩余账本，本轮未收窄也未扩大。"
+}

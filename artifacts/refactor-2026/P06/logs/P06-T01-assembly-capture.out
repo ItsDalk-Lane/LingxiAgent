@@ -1,0 +1,13 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stdout | tests/p06-final-request-assembly.test.ts > P06-T01 final request assembly capture > emits a sanitized sample index (sources + lengths only) for the report
+P06_SAMPLE_INDEX {"fixture":"合成 fixture（P06 受控临时目录；zh-CN；冻结时钟 2026-06-04T07:53:00Z）","variants":{"desktop-main":{"canonical_base_bytes":5062,"append_workspace_scope_bytes":173,"append_workspace_instructions_bytes":0,"skills_listing_bytes":625,"project_context_bytes":17,"final_system_prompt_bytes":6178,"provenance_sections":20,"sources":["platform_instruction(x6 zh)","user_profile","persona","agent.appearance","agent_roster","memory_context(x3)","session_instruction","append: workspace-scope + workspace-instructions","sdk: skills + project_context + cwd"]}}}
+
+ ✓ tests/p06-final-request-assembly.test.ts (5 tests) 141ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  12:23:23
+   Duration  1.99s (transform 950ms, setup 20ms, import 1.76s, tests 141ms, environment 0ms)
+

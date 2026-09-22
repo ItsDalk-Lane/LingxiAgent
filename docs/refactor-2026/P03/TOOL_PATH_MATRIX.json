@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "stage_id": "P03",
+  "task_id": "P03-T01",
+  "generated_at": "2026-09-22",
+  "start_sha": "5c131896a",
+  "evidence_scope": "源码静态列举 + 既有/新增测试坐标；未读取任何用户 MCP/插件真实配置，外装来源用合成 fixture 验证（tests/on-demand-first-party.test.ts、tests/tool-deferred-mcp-parity.test.ts、tests/tool-deferred-builtin-parity.test.ts）",
+  "execution_authorities": [
+    {
+      "id": "ToolInvocationGateway",
+      "file": "core/tool-invocation-gateway.ts",
+      "role": "唯一 executeCanonical 调用点（AST 边界 scripts/check-tool-invocation-boundaries.mjs canonical-executor-bypass 规则强制）；prepared invocation 绑定、目标/代次/能力复核、取消传播、结果归一化",
+      "status": "UNCHANGED_VERIFIED"
+    },
+    {
+      "id": "session-permission-wrapper + sandbox ResourceIO",
+      "file": "lib/tools/session-permission-wrapper.ts, core/engine.ts buildTools 包装链",
+      "role": "常驻四工具（read/write/edit/exec_command，shared/tool-categories.ts RESIDENT_CORE_TOOL_NAMES）不经网关目标注册，执行边界是宿主权限分类器 + 会话沙盒 ResourceIO + SessionExecutionRegistry 取消包装；BUILT_IN_PERMISSION_GATEWAY_TOOL_NAMES 显式列名",
+      "status": "UNCHANGED_VERIFIED"
+    }
+  ],
+  "target_sources": [
+    {
+      "sourceId": "first-party",
+      "origin": "first-party",
+      "registration": "core/engine.ts:4340-4429（on-demand 名单内 baseCustomTools+piTools 逐个注册；权限契约=自有 resolver 或 FIRST_PARTY_DEFERRED_PERMISSION_CONTRACTS 合成；无可用契约→warn 后保持常驻）",
+      "identity": "createFirstPartyToolIdentity（lib/tools/invocation/identity.ts）",
+      "generation": "冻结为 0（会话快照内不变，engine.ts:4419）",
+      "schema": "tool.parameters 经 createToolSchemaValidator 快照；target.parameters === validator.schema（engine.ts:4410）",
+      "deferrable": "true（全部 on-demand）",
+      "status": "UNCHANGED_VERIFIED"
+    },
+    {
+      "sourceId": "builtin-plugin",
+      "origin": "plugin",
+      "registration": "core/engine.ts:4126-4176（PluginManager.getAllTools 发布工具；缺 identity/permission 即抛错拒绝装配）",
+      "identity": "tool._toolTargetIdentity（createPluginToolIdentity）",
+      "generation": "tool._toolLifecycleGeneration（插件热装载推进，PluginManager._advancePluginToolGeneration）",
+      "schema": "同 first-party：target.parameters === validator.schema（engine.ts:4147）",
+      "deferrable": "tool.deferrable !== false",
+      "status": "UNCHANGED_VERIFIED"
+    },
+    {
+      "sourceId": "mcp-connector",
+      "origin": "mcp",
+      "registration": "core/mcp/manager.ts:2508-2576 getToolTargetDescriptors → core/engine.ts:4178-4218（描述符不完整即抛错；capability 无权威后缀即 TypeError）",
+      "identity": "createMcpToolIdentity（serverId+remoteToolName）",
+      "generation": "getConnectorToolGeneration(connectorId)（契约生命周期变化时推进，见 tests/tool-deferred-mcp-parity.test.ts:243）",
+      "schema": "validator=快照(publishedTool.parameters)；catalog schemaRef→publishedTool.parameters 原件（manager.ts:2560）；一致性由 P03-T02 测试锁定",
+      "deferrable": "configuredTool.deferrable !== false；pinned 由 connector.pinnedTools 指定",
+      "status": "UNCHANGED_VERIFIED"
+    },
+    {
+      "sourceId": "bridge",
+      "origin": "first-party",
+      "registration": "core/tool-catalog-bridge.ts createBridgeTools（常驻 customTools，不注册为目标；mcp_call 仅携带 _toolTargetIdentity 用于能力委托）",
+      "identity": "createFirstPartyToolIdentity({publicName:'mcp_call'})",
+      "generation": "不适用（桥自身无代次；转发时携带真实目标 entry.lifecycleGeneration）",
+      "schema": "mcp_search_tools/mcp_describe_tool/mcp_call 各自静态 TypeBox schema",
+      "deferrable": false,
+      "status": "UNCHANGED_VERIFIED"
+    }
+  ],
+  "invocation_paths": [
+    {
+      "path": "direct",
+      "consumers": "模型经 Pi 工具面对非延迟 MCP/插件目标；executeIsolated 隔离执行复用同一 buildTools 产物",
+      "entry": "core/engine.ts:4431-4470 createDirectTargetFacade execute → invocationGateway.invoke(route:'direct')",
+      "boundary": "网关 prepared 匹配 + 权限 wrapper 审批（classifySessionPermission + ConfirmStore/审批网关）",
+      "status": "UNCHANGED_VERIFIED",
+      "tests": "tests/tool-invocation-gateway.test.ts、tests/tool-invocation-path-parity.test.ts"
+    },
+    {
+      "path": "deferred",
+      "consumers": "模型经 mcp_call 调用目录内目标（延迟的第一方/插件/MCP）",
+      "entry": "core/tool-catalog-bridge.ts:381 gateway.invoke(route:'deferred')；权限面 resolveInvocation→gateway.resolvePermission 再解析真实目标（bridge:335）",
+      "boundary": "同 direct；能力委托经 registerBridgeCapabilityDelegates 由网关 canDelegateCapability 核对注册表",
+      "status": "UNCHANGED_VERIFIED",
+      "tests": "tests/tool-catalog-bridge.test.ts、tests/on-demand-first-party.test.ts、tests/tool-deferred-mcp-parity.test.ts"
+    },
+    {
+      "path": "resident-host-gateway",
+      "consumers": "常驻四工具 + 无契约回驻工具（Pi 原语）",
+      "entry": "core/engine.ts:4540 result.tools（沙盒层）→ wrapWithCheckpoint → wrapWithSessionPermission → wrapWithSessionExecutionCancellation；不经 ToolInvocationGateway",
+      "boundary": "BUILT_IN_PERMISSION_GATEWAY_TOOL_NAMES 显式白名单 + ResourceIO/沙盒 + 分类器；assertAllBuiltInToolsPermissionCovered 启动断言兜底",
+      "status": "UNCHANGED_VERIFIED",
+      "tests": "tests/builtin-tool-permission-coverage.test.ts、tests/engine-build-tools.test.ts"
+    },
+    {
+      "path": "ptc-subcall",
+      "consumers": "run_tools 程序化子调用（第一方 OPTIONAL 工具，自身延迟入目录）",
+      "entry": "core/engine.ts:4645 ptcBinding.attach({tools})——子调用重入包装后完整工具面（权限+取消），未知名 fail-closed",
+      "boundary": "与 direct 同权同边界（注释明确：'与模型亲自调用同权'）",
+      "status": "UNCHANGED_VERIFIED",
+      "tests": "tests/ptc-engine-assembly.test.ts（run_tools 入目录、mcp_call→run_tools→直挂/目录子调用端到端、只读拒绝）"
+    },
+    {
+      "path": "isolated",
+      "consumers": "hub 巡检/笺、dm-router 等临时执行（executeIsolated）",
+      "entry": "core/session-coordinator.ts:8048 executeIsolated → buildTools(deny_on_prompt 审批策略) → 同 direct 边界",
+      "boundary": "审批策略 deny_on_prompt（P02 交接 §4：'工具取消经 SessionExecutionRegistry 包装(engine.ts:4624) 是唯一工具级取消面'）",
+      "status": "UNCHANGED_VERIFIED",
+      "tests": "tests/server-composition-boundary.test.ts（P02 A15 入口回归）"
+    },
+    {
+      "path": "plugin-dev-http",
+      "consumers": "无生产消费者。原 core/plugin-dev-service.ts 已在 04f90d2b2（插件生态收口）删除；server/desktop/hub/cli 无任何 plugin-dev 路由残留（grep 复核）",
+      "entry": "core/tool-invocation-gateway.ts:506 prepareAndInvokeForLocalDeveloper（保留方法，当前仅测试消费）",
+      "boundary": "isLocalDeveloperPrincipal 硬校验（kind/principalId 前缀/connectionKind:'local'）+ 宿主 authorize 单次审批",
+      "status": "UNCHANGED_VERIFIED（入口本体）；生产路由已删除=OLD_PATH_EXITED",
+      "tests": "tests/tool-invocation-gateway.test.ts:329-360、tests/tool-invocation-path-parity.test.ts:361-410"
+    },
+    {
+      "path": "plugin-dev-chat",
+      "consumers": "无生产 wrap 站点传 invocationRoute（grep：仅类型定义与 wrapper 路由表）；作为路由标签保留兼容",
+      "entry": "lib/tools/session-permission-wrapper.ts:517 路由表内合法值；执行仍走 direct/deferred facade",
+      "boundary": "同 direct（仅路由标签差异，parity 测试锁定语义不变）",
+      "status": "UNCHANGED_VERIFIED",
+      "tests": "tests/tool-invocation-path-parity.test.ts MODEL_ROUTES 含 plugin-dev-chat"
+    }
+  ],
+  "duplicate_rule inventory": [
+    {
+      "rule": "同 targetId 重复注册",
+      "enforcement": "core/tool-target-registry.ts:135 TARGET_AMBIGUOUS 拒绝",
+      "status": "UNCHANGED_VERIFIED"
+    },
+    {
+      "rule": "同 source 同名 / 裸名歧义",
+      "enforcement": "registry resolveCatalogTarget 多匹配抛 TARGET_AMBIGUOUS；catalog _validateEntries 同源同名拒绝（core/tool-catalog.ts:464-487）",
+      "status": "UNCHANGED_VERIFIED"
+    },
+    {
+      "rule": "display name ≠ 执行身份",
+      "enforcement": "catalog entry.name 只是 publicName 的显示别名（core/tool-catalog.ts:59 注释'never used as execution identity'）；执行主键恒为 targetId；bridge resolveTarget 双名解析后仍以 targetId 调网关",
+      "status": "UNCHANGED_VERIFIED"
+    },
+    {
+      "rule": "权限动作集合镜像（shared ↔ core）",
+      "enforcement": "本次新增：tests/on-demand-first-party.test.ts 'P03-T01 deferred permission contract mirrors the host classifier'（字面集合相等 + 四模式宽松度 floor；负向验证：漂移注入后 2 例红）",
+      "status": "MODIFIED（core 导出 FILE_READ_ACTIONS/新增 SESSION_FOLDERS_READ_ACTIONS 集合常量——行为等价重构；shared 导出两个镜像集合并更正注释所指符号）"
+    }
+  ],
+  "verified_correct_marks": [
+    "四常驻+按需目录规则（RESIDENT_CORE_TOOL_NAMES 唯一定义 + assertOnDemandCoreToolNamesSound 启动断言）",
+    "网关 prepared/generation/capability/取消链（S15 17 例）",
+    "AST 边界三 allowlist（本次删除其中一条死条目，见 T03）",
+    "目录 targetId 唯一性与显示别名不冒充身份"
+  ],
+  "not_applicable": [
+    {
+      "claim": "外装 MCP 真实服务器枚举",
+      "reason": "按任务书 T01-1 以合成 fixture 验证，不读取用户私人配置；真实供应商留待授权阶段"
+    }
+  ]
+}

@@ -1,0 +1,284 @@
+{
+  "tool": "P08 product-regression (real full server, isolated HOME, witness provider)",
+  "started_features": [
+    "F01",
+    "F02",
+    "F03",
+    "F06",
+    "F07",
+    "F08",
+    "F09",
+    "F10",
+    "F11",
+    "F12",
+    "F13",
+    "F14",
+    "F16",
+    "F17",
+    "F18",
+    "F19",
+    "F20",
+    "A05"
+  ],
+  "pass": 32,
+  "fail": 0,
+  "all_pass": true,
+  "results": [
+    {
+      "feature": "BASE",
+      "action": "GET /api/health 无凭证 → 403",
+      "expect": 403,
+      "actual": "403",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:21.479Z"
+    },
+    {
+      "feature": "BASE",
+      "action": "GET /api/health 带 loopback token → 200",
+      "expect": "200 status=ok",
+      "actual": "200 ok",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:21.489Z"
+    },
+    {
+      "feature": "BASE",
+      "action": "GET /api/server/identity → 200 serverProtocol=1",
+      "expect": "200",
+      "actual": "200 1",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:21.493Z"
+    },
+    {
+      "feature": "F02",
+      "action": "POST /api/sessions/new（strictJson 入口）→ sess_ 前缀",
+      "expect": "200 ok sess_*",
+      "actual": "200 true sess_0muce44m4_0fa55906114e875e2f5c",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:21.552Z"
+    },
+    {
+      "feature": "F02/A07负向",
+      "action": "POST /api/sessions/new 畸形 JSON → 400 零副作用",
+      "expect": "400 + 会话列表不变",
+      "actual": "400",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:21.562Z"
+    },
+    {
+      "feature": "F02",
+      "action": "GET /api/sessions → 列表含新会话",
+      "expect": "200 含新会话",
+      "actual": "200 found=true",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:21.565Z"
+    },
+    {
+      "feature": "F02",
+      "action": "GET /api/sessions/search?q= → 200",
+      "expect": 200,
+      "actual": "200",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:21.627Z"
+    },
+    {
+      "feature": "F02",
+      "action": "POST /api/sessions/pin {pinned:true} → 200",
+      "expect": "200/2xx",
+      "actual": "200",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:21.631Z"
+    },
+    {
+      "feature": "F01/F03",
+      "action": "WS prompt『读取 p08-note.txt』→ read 工具真实往返 + 流式回复",
+      "expect": "≥2 tool 事件 + ≥2 次 provider 调用(工具结果回传) + 凭证可见",
+      "actual": "tool_events=2 posts=3 authed=true",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:21.787Z"
+    },
+    {
+      "feature": "F01/F09",
+      "action": "GET /api/sessions/messages 历史回读含用户轮与助手回复",
+      "expect": "含 p08-note.txt 与 P08_CHAT_REPLY",
+      "actual": "200 user=true reply=true",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:21.793Z"
+    },
+    {
+      "feature": "F02",
+      "action": "POST /api/sessions/fork（target=真实用户消息节点）→ 2xx 且生成新会话",
+      "expect": "2xx 新 sess_",
+      "actual": "200 entry=8433813c new=sess_0muce44tn_49790109e31be5aa1bce",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:21.829Z"
+    },
+    {
+      "feature": "F11",
+      "action": "WS prompt『执行命令』→ exec_command 真实 spawn + 输出回传模型",
+      "expect": "exec 输出(ECHO_MARKER)回传 provider",
+      "actual": "posts=2 echo_seen=true",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:21.982Z"
+    },
+    {
+      "feature": "F06",
+      "action": "GET /api/agents → lingxi agent 在列（人格承载）",
+      "expect": "200 含 lingxi",
+      "actual": "200 agents=1 lingxi=true",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:21.985Z"
+    },
+    {
+      "feature": "F07",
+      "action": "GET /api/memories/dream/status?agentId=lingxi → 2xx（记忆固化路由在位）",
+      "expect": "200/2xx",
+      "actual": "200",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:21.986Z"
+    },
+    {
+      "feature": "F08",
+      "action": "GET /api/knowledge/notebooks → 200（空库可列出）",
+      "expect": "200/2xx",
+      "actual": "200",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:21.988Z"
+    },
+    {
+      "feature": "F10",
+      "action": "GET /api/providers/summary → 含 witness-a/witness-b 双 provider",
+      "expect": "200 含双 provider",
+      "actual": "200 a=true b=true",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:22.041Z"
+    },
+    {
+      "feature": "F10",
+      "action": "GET /api/preferences/models → 200",
+      "expect": 200,
+      "actual": "200",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:22.042Z"
+    },
+    {
+      "feature": "A05",
+      "action": "PUT /api/preferences/session-permission-default {permissionMode:auto} → 200",
+      "expect": "200 auto",
+      "actual": "200 auto",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:22.044Z"
+    },
+    {
+      "feature": "A05",
+      "action": "PUT /api/preferences/notifications（第二设置项）→ 200",
+      "expect": "200/2xx",
+      "actual": "200",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:22.045Z"
+    },
+    {
+      "feature": "F12",
+      "action": "GET /api/bridge/status?agentId=lingxi → 200（桥接管理路由在位；真实平台外发无授权不执行）",
+      "expect": "200/2xx",
+      "actual": "200",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:22.049Z"
+    },
+    {
+      "feature": "F13",
+      "action": "GET /api/devices → 200（Web/移动设备面在位）",
+      "expect": "200/2xx",
+      "actual": "200",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:22.050Z"
+    },
+    {
+      "feature": "F16",
+      "action": "POST /api/model-observability/query/traces → 有真实 trace（上面两轮真实模型调用入账）",
+      "expect": "200 且非空",
+      "actual": "200 traces=3",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:22.054Z"
+    },
+    {
+      "feature": "F17",
+      "action": "POST /api/character-cards/export/preview → 2xx/4xx（非 5xx 即路由在位）",
+      "expect": "<500",
+      "actual": "200",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:22.056Z"
+    },
+    {
+      "feature": "F19",
+      "action": "GET /api/skills?agentId=lingxi → 200（首启同步后技能池可列）",
+      "expect": "200",
+      "actual": "200 skills=20",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:22.058Z"
+    },
+    {
+      "feature": "F14",
+      "action": "CLI status（cli/entry.ts，读同 LINGXI_HOME server-info）→ 连通输出",
+      "expect": "输出含 running/在线/端口信息",
+      "actual": "\u001b[38;2;83;125;150m✿\u001b[0m LingxiAgent Server   \u001b[2mURL\u001b[0m       http://127.0.0.1:64360   \u001b[2mVersion\u001b[0m   0.1.42   \u001b[2mStudio\u001b[0m    Personal Studio   \u001b[2mAgent\u001b[0m     Lingxi · lingxi · ✿   \u001b[2mModel",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:22.172Z"
+    },
+    {
+      "feature": "F20",
+      "action": "desktop/src/locales 五语言文件在位",
+      "expect": "5 个全在",
+      "actual": "all present",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:22.173Z"
+    },
+    {
+      "feature": "F18",
+      "action": "desktop/src/shared/github-release-check.cjs + release-digest.v1/v2.json 在位",
+      "expect": "3 文件全在",
+      "actual": "true/true/true",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:22.173Z"
+    },
+    {
+      "feature": "A05",
+      "action": "SIGTERM 优雅关闭",
+      "expect": "exit 0",
+      "actual": "exit=0",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:22.242Z"
+    },
+    {
+      "feature": "A05",
+      "action": "重启后 GET /api/preferences/session-permission-default = auto（无最后一项覆盖）",
+      "expect": "auto",
+      "actual": "200 auto",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:23.769Z"
+    },
+    {
+      "feature": "A05",
+      "action": "重启后会话列表保持（数量一致）",
+      "expect": "count=1833",
+      "actual": "count=1833",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:23.786Z"
+    },
+    {
+      "feature": "A05/F01",
+      "action": "重启后历史仍可读（含 P08_CHAT_REPLY）",
+      "expect": "200 含 P08_CHAT_REPLY",
+      "actual": "200 reply=true",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:23.799Z"
+    },
+    {
+      "feature": "A05/F10",
+      "action": "重启后 provider catalog 双 provider 仍在",
+      "expect": "含 witness-a 与 witness-b",
+      "actual": "a=true b=true",
+      "status": "PASS",
+      "at": "2026-09-22T08:06:23.842Z"
+    }
+  ]
+}

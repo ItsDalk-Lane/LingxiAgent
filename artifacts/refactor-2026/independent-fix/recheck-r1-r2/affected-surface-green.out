@@ -1,0 +1,940 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stderr | desktop/src/react/__tests__/stores/session-new-session-crosstalk.test.ts > v0.1.33 新建会话串台（characterization） > characterization: KNOWN DEFECT — 无会话态下 loadSessions 把视图强切到 sessions[0]（主工作台会话）并加载其记录
+[lm-entry] targetPath= ion/main-workspace.jsonl preloaded= false
+[cmf-entry] path= ion/main-workspace.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fmain-workspace.json
+
+stderr | desktop/src/react/__tests__/stores/session-new-session-crosstalk.test.ts > v0.1.33 新建会话串台（characterization） > characterization: KNOWN DEFECT — 无会话态下 loadSessions 把视图强切到 sessions[0]（主工作台会话）并加载其记录
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > opens deleted-agent sessions as read-only history without calling the runtime switch route
+[lm-entry] targetPath= leted/sessions/old.jsonl preloaded= false
+[cmf-entry] path= leted/sessions/old.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Ftmp%2Fagents%2Fdeleted%2Fsess
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > opens deleted-agent sessions as read-only history without calling the runtime switch route
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-new-session-blank.test.ts > v0.1.33 新建会话首屏空白（regression: FIXED） > regression: FIXED — 新会话首条消息后历史被真实加载：不种空缓存，switchSession 走 loadMessages，无 WS 事件也有内容
+[lm-entry] targetPath= /session/new-v033.jsonl preloaded= false
+[cmf-entry] path= /session/new-v033.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew-v033.jsonl&sess
+
+stderr | desktop/src/react/__tests__/stores/session-new-session-blank.test.ts > v0.1.33 新建会话首屏空白（regression: FIXED） > regression: FIXED — 新会话首条消息后历史被真实加载：不种空缓存，switchSession 走 loadMessages，无 WS 事件也有内容
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions-reorder.test.ts > reorderPinnedSessions > restores the previous order and warns when the server rejects the reorder
+[session] pin reorder failed: Error: session_not_pinned
+    at Module.reorderPinnedSessions (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:2101:13)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions-reorder.test.ts:127:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions-reorder.test.ts > reorderPinnedSessions > restores the previous order when the request throws
+[session] pin reorder failed: Error: offline
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions-reorder.test.ts:138:39
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64
+
+stderr | desktop/src/react/__tests__/stores/session-new-session-workspace.test.ts > v0.1.33 新建会话工作台继承（regression: FIXED） > regression: FIXED — reconcile 自愈链：发送后 loadSessions 发现列表 revision 前进，自动补拉 hydrate 新会话缓存
+[lm-entry] targetPath= ession/new-v033-ws.jsonl preloaded= false
+[cmf-entry] path= ession/new-v033-ws.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew-v033-ws.jsonl&s
+
+stderr | desktop/src/react/__tests__/stores/session-new-session-workspace.test.ts > v0.1.33 新建会话工作台继承（regression: FIXED） > regression: FIXED — reconcile 自愈链：发送后 loadSessions 发现列表 revision 前进，自动补拉 hydrate 新会话缓存
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > clears unread output marker when switching into a normal session
+[lm-entry] targetPath= /session/next.jsonl preloaded= false
+[cmf-entry] path= /session/next.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnext.jsonl&sessionI
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > clears unread output marker when switching into a normal session
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-new-session-workspace.test.ts > v0.1.33 新建会话工作台继承（regression: FIXED） > regression: FIXED — reconcile 自愈链：发送后 loadSessions 发现列表 revision 前进，自动补拉 hydrate 新会话缓存
+[lm-entry] targetPath= ession/new-v033-ws.jsonl preloaded= false
+[cmf-entry] path= ession/new-v033-ws.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew-v033-ws.jsonl&s
+
+stderr | desktop/src/react/__tests__/stores/session-new-session-workspace.test.ts > v0.1.33 新建会话工作台继承（regression: FIXED） > regression: FIXED — reconcile 自愈链：发送后 loadSessions 发现列表 revision 前进，自动补拉 hydrate 新会话缓存
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+ ✓ desktop/src/react/__tests__/stores/session-actions-reorder.test.ts (4 tests) 43ms
+stderr | desktop/src/react/__tests__/stores/session-new-session-crosstalk.test.ts > v0.1.33 新建会话串台（characterization） > characterization: KNOWN DEFECT — createNewSession/ensureSession 全程结束后 desk 内存（base/mountId/tree 缓存）仍指向旧（主）工作台（机制c半清空）
+[lm-entry] targetPath= /session/new-v033.jsonl preloaded= false
+[cmf-entry] path= /session/new-v033.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew-v033.jsonl&sess
+
+stderr | desktop/src/react/__tests__/stores/session-new-session-crosstalk.test.ts > v0.1.33 新建会话串台（characterization） > characterization: KNOWN DEFECT — createNewSession/ensureSession 全程结束后 desk 内存（base/mountId/tree 缓存）仍指向旧（主）工作台（机制c半清空）
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+ ✓ desktop/src/react/__tests__/stores/session-new-session-crosstalk.test.ts (2 tests) 48ms
+ ✓ desktop/src/react/__tests__/stores/session-new-session-blank.test.ts (1 test) 48ms
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > requests a terminal snapshot on the generic session-switch path (compact layout has no TerminalCard)
+[lm-entry] targetPath= /session/next.jsonl preloaded= false
+[cmf-entry] path= /session/next.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnext.jsonl&sessionI
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > requests a terminal snapshot on the generic session-switch path (compact layout has no TerminalCard)
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+ ✓ desktop/src/react/__tests__/stores/session-new-session-workspace.test.ts (6 tests) 97ms
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > clears unread output marker when switching into a deleted-agent history session
+[lm-entry] targetPath= ed/sessions/unread.jsonl preloaded= false
+[cmf-entry] path= ed/sessions/unread.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Ftmp%2Fagents%2Fdeleted%2Fsess
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > clears unread output marker when switching into a deleted-agent history session
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > continues a deleted-agent session by creating and switching to the returned primary-agent session
+[lm-entry] targetPath= /hana/sessions/new.jsonl preloaded= false
+[cmf-entry] path= /hana/sessions/new.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Ftmp%2Fagents%2Fhana%2Fsession
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > continues a deleted-agent session by creating and switching to the returned primary-agent session
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > warns when a deleted-agent continuation succeeds without fresh compaction
+[lm-entry] targetPath= /hana/sessions/new.jsonl preloaded= false
+[cmf-entry] path= /hana/sessions/new.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Ftmp%2Fagents%2Fhana%2Fsession
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > warns when a deleted-agent continuation succeeds without fresh compaction
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > sends extra workspace folders when creating a pending session
+[lm-entry] targetPath= /session/new.jsonl preloaded= false
+[cmf-entry] path= /session/new.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew.jsonl&sessionId
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > sends extra workspace folders when creating a pending session
+[loadMessages] error: TypeError: Cannot read properties of undefined (reading 'json')
+    at loadMessages (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:461:41)
+    at switchSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1217:7)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1687:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:937:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > consumes home draft on activation without copying text into the new session draft
+[lm-entry] targetPath= ssion/home-consume.jsonl preloaded= false
+[cmf-entry] path= ssion/home-consume.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fhome-consume.jsonl&
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > consumes home draft on activation without copying text into the new session draft
+[loadMessages] error: TypeError: Cannot read properties of undefined (reading 'json')
+    at loadMessages (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:461:41)
+    at switchSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1217:7)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1687:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:991:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > posts one new-session request at send time using the current pending draft
+[lm-entry] targetPath= /session/fresh.jsonl preloaded= false
+[cmf-entry] path= /session/fresh.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Ffresh.jsonl&session
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > posts one new-session request at send time using the current pending draft
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > sends workspaceMountId instead of cwd when the pending session selects a Studio workspace
+[lm-entry] targetPath= /session/new.jsonl preloaded= false
+[cmf-entry] path= /session/new.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew.jsonl&sessionId
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > sends workspaceMountId instead of cwd when the pending session selects a Studio workspace
+[loadMessages] error: TypeError: Cannot read properties of undefined (reading 'json')
+    at loadMessages (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:461:41)
+    at switchSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1217:7)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1687:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:1142:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > carries the pending new-session thinking draft into session creation
+[lm-entry] targetPath= /session/new.jsonl preloaded= false
+[cmf-entry] path= /session/new.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew.jsonl&sessionId
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > carries the pending new-session thinking draft into session creation
+[loadMessages] error: TypeError: Cannot read properties of undefined (reading 'json')
+    at loadMessages (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:461:41)
+    at switchSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1217:7)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1687:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:1190:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > carries the pending new-session permission draft into session creation
+[lm-entry] targetPath= /session/new.jsonl preloaded= false
+[cmf-entry] path= /session/new.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew.jsonl&sessionId
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > carries the pending new-session permission draft into session creation
+[loadMessages] error: TypeError: Cannot read properties of undefined (reading 'json')
+    at loadMessages (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:461:41)
+    at switchSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1217:7)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1687:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:1236:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > carries an explicit project id from the new-session draft into session creation
+[lm-entry] targetPath= /session/new.jsonl preloaded= false
+[cmf-entry] path= /session/new.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew.jsonl&sessionId
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > carries an explicit project id from the new-session draft into session creation
+[loadMessages] error: TypeError: Cannot read properties of undefined (reading 'json')
+    at loadMessages (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:461:41)
+    at switchSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1217:7)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1687:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:1291:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > surfaces the server error when pending session creation fails
+[session] create failed: Error: session skill snapshot failed
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1675:13)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:1324:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > 新建失败带错误码时说人话，原始英文留在详情区
+[session] create failed: Error: no available model
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1675:13)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:1359:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
+  code: 'no_available_model'
+}
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > 新建失败走顶层 onError 的嵌套形状时，仍读得出 code 和 message
+[session] create failed: Error: session index is rebuilding
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1675:13)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:1386:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
+  code: 'session_manifest_unavailable'
+}
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > stale 响应不覆盖新状态：v1 fetch 在飞，v2 bump 后到达时丢弃 v1
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > stale 响应不覆盖新状态：v1 fetch 在飞，v2 bump 后到达时丢弃 v1
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > 正常单次调用写入 initSession
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > 正常单次调用写入 initSession
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > 主 bug 回归（#2188）：mid-flight 收到 live message 更新时，跳过 messages hydrate 但仍写入 SessionFile registry
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stdout | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > 主 bug 回归（#2188）：mid-flight 收到 live message 更新时，跳过 messages hydrate 但仍写入 SessionFile registry
+[loadMessages] 跳过 session hydrate: mid-flight 收到 live message 更新 /a
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > mid-flight 期间收到 upsert：hydrate 后 registry 为快照与重放增量合并（重放后写胜）
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > mid-flight 期间收到 upsert：hydrate 后 registry 为快照与重放增量合并（重放后写胜）
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > mid-flight 期间收到 branch reset：hydrate 放弃旧快照，不覆盖 reset 后的权威 registry
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > mid-flight 期间收到 branch reset：hydrate 放弃旧快照，不覆盖 reset 后的权威 registry
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > stale 响应不会先把 todos 回滚到旧快照
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > stale 响应不会先把 todos 回滚到旧快照
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > mid-flight 收到 live todo 更新时，整次 hydrate 跳过，不只跳过 messages
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stdout | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > mid-flight 收到 live todo 更新时，整次 hydrate 跳过，不只跳过 messages
+[loadMessages] 跳过 session hydrate: mid-flight 收到 live todo 更新 /a
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 合并 in-flight snapshot > buf 有 in-flight 内容时，initSession 后 append 一条 assistant
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 合并 in-flight snapshot > buf 有 in-flight 内容时，initSession 后 append 一条 assistant
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 合并 in-flight snapshot > buf 为空（snapshot=null）时不 append 额外消息
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 合并 in-flight snapshot > buf 为空（snapshot=null）时不 append 额外消息
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 合并 in-flight snapshot > uses ordered snapshot blocks so a skill call stays between surrounding prose
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 合并 in-flight snapshot > uses ordered snapshot blocks so a skill call stays between surrounding prose
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > surfaces the server error when switching to an old session fails
+[session] switch failed: Invalid session path 
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 切换失败带错误码时说人话，toast 带上错误码
+[session] switch failed: session locator is not active session_locator_not_active
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 切换失败走顶层 onError 的嵌套形状时，仍读得出 code 和 message
+[session] switch failed: session index is rebuilding session_manifest_unavailable
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 后端返回 currentModelId，uncached session 仍然触发 loadMessages
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 后端返回 currentModelId，uncached session 仍然触发 loadMessages
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > hydrates audio capability fields from the switch response into the per-session model snapshot
+[lm-entry] targetPath= /audio-session preloaded= false
+[cmf-entry] path= /audio-session records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Faudio-session
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > hydrates audio capability fields from the switch response into the per-session model snapshot
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > hydrates an unavailable historical model as blocked session-owned state
+[lm-entry] targetPath= /removed-model-session preloaded= false
+[cmf-entry] path= /removed-model-session records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fremoved-model-session
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > hydrates an unavailable historical model as blocked session-owned state
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 切换完成后仍在 chat surface 时恢复输入焦点
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 切换完成后仍在 chat surface 时恢复输入焦点
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 用户已离开 chat surface 时不抢回输入焦点
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 用户已离开 chat surface 时不抢回输入焦点
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 切 session 时激活目标 cwd 的工作台面板，不携带旧 deskCurrentPath
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 切 session 时激活目标 cwd 的工作台面板，不携带旧 deskCurrentPath
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > switching across agents synchronizes the active agent home while showing the session cwd
+[lm-entry] targetPath= /mio preloaded= false
+[cmf-entry] path= /mio records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fmio
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > switching across agents synchronizes the active agent home while showing the session cwd
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 切到同一 workspace 的 session 时保留当前 desk 子目录
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 切到同一 workspace 的 session 时保留当前 desk 子目录
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 恢复切回 workspace 时该 workspace 上次打开的 desk 子目录
+[lm-entry] targetPath= /b preloaded= false
+[cmf-entry] path= /b records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fb
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 恢复切回 workspace 时该 workspace 上次打开的 desk 子目录
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 恢复切回 workspace 时该 workspace 上次打开的 desk 子目录
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 恢复切回 workspace 时该 workspace 上次打开的 desk 子目录
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 目标 session 没有 cwd 时清空 desk state，不回落到旧 workspace
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 目标 session 没有 cwd 时清空 desk state，不回落到旧 workspace
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 当前 session 附件删空后，切走时仍显式写回空数组，避免旧附件复活
+[lm-entry] targetPath= /b preloaded= false
+[cmf-entry] path= /b records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fb
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 当前 session 附件删空后，切走时仍显式写回空数组，避免旧附件复活
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > pinSession > leaves sessions unchanged and shows a toast when pinning fails
+[session] pin failed: write failed
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages revision stamp > stamps the server revision into the hydrated session cache
+[lm-entry] targetPath= session/revisioned.jsonl preloaded= false
+[cmf-entry] path= session/revisioned.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Frevisioned.jsonl&se
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages revision stamp > stamps the server revision into the hydrated session cache
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages revision stamp > stamps a null revision when the server omits it
+[lm-entry] targetPath= ession/no-revision.jsonl preloaded= false
+[cmf-entry] path= ession/no-revision.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fno-revision.jsonl
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages revision stamp > stamps a null revision when the server omits it
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > re-pulls the current session when the list revision drifts from the cached one
+[lm-entry] targetPath= /session/rc-target.jsonl preloaded= false
+[cmf-entry] path= /session/rc-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Frc-target.jsonl
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > re-pulls the current session when the list revision drifts from the cached one
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > skips the fetch when the cached revision matches the list revision
+[has-dbg] called sessionPath= /session/rc-target.jsonl sessionId= null
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > re-pulls once when the cached revision is unknown
+[lm-entry] targetPath= /session/rc-target.jsonl preloaded= false
+[cmf-entry] path= /session/rc-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Frc-target.jsonl
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > re-pulls once when the cached revision is unknown
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > deduplicates concurrent triggers into one in-flight fetch
+[lm-entry] targetPath= /session/rc-target.jsonl preloaded= false
+[cmf-entry] path= /session/rc-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Frc-target.jsonl
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > deduplicates concurrent triggers into one in-flight fetch
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > allows a follow-up reconcile after the previous one settles
+[lm-entry] targetPath= /session/rc-target.jsonl preloaded= false
+[cmf-entry] path= /session/rc-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Frc-target.jsonl
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > allows a follow-up reconcile after the previous one settles
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > allows a follow-up reconcile after the previous one settles
+[lm-entry] targetPath= /session/rc-target.jsonl preloaded= false
+[cmf-entry] path= /session/rc-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Frc-target.jsonl
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > allows a follow-up reconcile after the previous one settles
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession revision reconcile > re-pulls a cached session whose list revision drifted while it was in the background
+[lm-entry] targetPath= ssion/cached-stale.jsonl preloaded= false
+[cmf-entry] path= ssion/cached-stale.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fcached-stale.jsonl
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession revision reconcile > re-pulls a cached session whose list revision drifted while it was in the background
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession revision reconcile > does not re-pull a cached session whose revision still matches the list
+[has-dbg] called sessionPath= /session/cached-fresh.jsonl sessionId= null
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > refreshSessionCapabilities > marks busy during refresh, reloads messages, and clears busy afterward
+[lm-entry] targetPath= /session/drift.jsonl preloaded= false
+[cmf-entry] path= /session/drift.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fdrift.jsonl
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > refreshSessionCapabilities > marks busy during refresh, reloads messages, and clears busy afterward
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > refreshSessionCapabilities > surfaces a refresh failure as an inline error and clears busy
+[session] capability refresh failed: Error: already compacting
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at Module.refreshSessionCapabilities (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:2137:13)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:2847:18
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > refreshSessionCapabilities > 嵌套形状不渲染 [object Object]，错误码照样透传
+[session] capability refresh failed: Error: session is busy
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at Module.refreshSessionCapabilities (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:2137:13)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:2866:18
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
+  code: 'session_busy'
+}
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > continueDeletedAgentSession 的错误呈现 > 嵌套形状不渲染 [object Object]，toast 带上错误码
+[session] continue deleted-agent session failed: session is busy session_busy
+
+ ✓ desktop/src/react/__tests__/stores/session-actions.test.ts (90 tests) 147ms
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > treats wechat as a connected bridge when bootstrapping the sidebar dot
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+ ✓ desktop/src/react/__tests__/chat-performance/live-turn-structural-isolation.test.ts (2 tests) 40ms
+ ✓ desktop/src/react/__tests__/chat-performance/semantic-stream-publication.test.ts (6 tests) 42ms
+stderr | desktop/src/react/__tests__/chat-performance/p07-stream-buffer-wallclock.test.ts > P07-T04 stream buffer wall-clock profile > canonical segment 流 50,000 delta：吞吐、有界刷新与响应度（真实计时器）
+[stream] unresolved assistant segment finalized with fallback: seg-p07-text
+
+ ✓ desktop/src/react/__tests__/services/turn-outcome-patterns.test.ts (5 tests) 49ms
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > treats wechat as a connected bridge when bootstrapping the sidebar dot
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:190:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:241:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > treats wechat as a connected bridge when bootstrapping the sidebar dot
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:64:64)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:278:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:241:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > treats wechat as a connected bridge when bootstrapping the sidebar dot
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes the HttpOnly device web session before opening WebSocket for a persisted LAN frontend
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:64:64)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:278:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:331:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes the HttpOnly device web session before opening WebSocket for a persisted LAN frontend
+[hana-launch] app-ready
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > stops startup explicitly when server identity cannot be loaded
+[hana-launch] app-ready {"reason":"server-identity-failed"}
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > stops startup explicitly when server identity cannot be loaded
+[init] server identity failed: Error: identity unavailable
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:371:43
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > initializes the pending workspace from agent home even when cwd history points elsewhere
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:190:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:423:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > initializes the pending workspace from agent home even when cwd history points elsewhere
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:64:64)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:278:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:423:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > initializes the pending workspace from agent home even when cwd history points elsewhere
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > loads the studio workspace list during bootstrap so the default-workspace merge key is ready for the first session list
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:190:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:476:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > loads the studio workspace list during bootstrap so the default-workspace merge key is ready for the first session list
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:64:64)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:278:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:476:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > loads the studio workspace list during bootstrap so the default-workspace merge key is ready for the first session list
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > hydrates the persisted permission default before showing the pending new-session draft
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:190:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:522:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > hydrates the persisted permission default before showing the pending new-session draft
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:64:64)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:278:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:522:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > hydrates the persisted permission default before showing the pending new-session draft
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:190:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:571:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:64:64)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:278:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:571:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+[hana-launch] app-ready
+
+stdout | desktop/src/react/__tests__/services/chat-turn-lifecycle.test.ts > Turn 生命周期与 Session Busy 解耦 > 重复 turn_end 幂等：commit 只发生一次，不产生第二个 AssistantMessage
+[stream] duplicate assistant_run_end ignored (exactly-once): stream-turn-1
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local restart credentials without stealing an active remote connection
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:190:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:630:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local restart credentials without stealing an active remote connection
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:64:64)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:278:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:630:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local restart credentials without stealing an active remote connection
+[hana-launch] app-ready
+
+ ✓ desktop/src/react/__tests__/services/chat-turn-lifecycle.test.ts (5 tests) 48ms
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes the desk default workspace when settings change the current agent workspace
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:190:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:702:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes the desk default workspace when settings change the current agent workspace
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:64:64)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:278:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:702:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes the desk default workspace when settings change the current agent workspace
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > ignores workspace changes for non-current agents
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:190:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:764:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > ignores workspace changes for non-current agents
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:64:64)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:278:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:764:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > ignores workspace changes for non-current agents
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > clears the previous default desk root when settings clear the current agent workspace
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:190:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:826:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > clears the previous default desk root when settings clear the current agent workspace
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:64:64)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:278:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:826:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > clears the previous default desk root when settings clear the current agent workspace
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > configures context usage requests before settings and websocket handlers dispatch app events
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:190:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:892:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > configures context usage requests before settings and websocket handlers dispatch app events
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:64:64)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:278:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:892:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > configures context usage requests before settings and websocket handlers dispatch app events
+[hana-launch] app-ready
+
+ ✓ desktop/src/react/__tests__/services/terminal-ws-message-handler.test.ts (4 tests) 34ms
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > opens the in-window settings modal when main process requests settings
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:190:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:963:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > opens the in-window settings modal when main process requests settings
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:64:64)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:278:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:963:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > opens the in-window settings modal when main process requests settings
+[hana-launch] app-ready
+
+ ✓ desktop/src/react/__tests__/app-init.test.ts (13 tests) 592ms
+     ✓ treats wechat as a connected bridge when bootstrapping the sidebar dot  534ms
+ ✓ desktop/src/react/__tests__/chat-performance/chat-performance-baseline.test.ts (6 tests) 153ms
+stdout | desktop/src/react/__tests__/chat-performance/p07-stream-buffer-wallclock.test.ts > P07-T04 stream buffer wall-clock profile > canonical segment 流 50,000 delta：吞吐、有界刷新与响应度（真实计时器）
+P07_UI_SAMPLE {"deltas":50000,"burst_wall_ms":21.5,"handle_per_sec":2320320,"stream_flush_count":2,"markdown_parse_count":0,"structural_updates":1,"probe_max_drift_ms":16.8}
+
+stderr | desktop/src/react/__tests__/chat-performance/p07-stream-buffer-wallclock.test.ts > P07-T04 stream buffer wall-clock profile > 合并窗口内 content_block 与终局事件不丢（A06 形状，真实计时器）
+[stream] unresolved assistant segment finalized with fallback: seg-p07-a06
+
+ ✓ desktop/src/react/__tests__/services/ws-notification.test.ts (5 tests) 31ms
+ ✓ desktop/src/react/__tests__/services/channel-new-message-ws.test.ts (9 tests) 32ms
+ ✓ desktop/src/react/__tests__/services/composer-send-coordinator.test.ts (33 tests) 116ms
+stderr | desktop/src/react/__tests__/services/ws-todo-panel-lifecycle.test.ts > 清单改版阶段1：实时清单更新回归 > D1（缺陷已修复）: tool_end 失败时保留最后有效清单并标记更新失败
+[ws] tool_end(todo) 更新失败或数据损坏，保留最后有效清单 {
+  sessionPath: '/session/todo-a.jsonl',
+  success: false,
+  error: 'validation failed'
+}
+
+stderr | desktop/src/react/__tests__/services/ws-todo-panel-lifecycle.test.ts > 清单改版阶段1：实时清单更新回归 > D2（缺陷已修复）: tool_end 缺少 details.todos 时保留最后有效清单
+[ws] tool_end(todo) 更新失败或数据损坏，保留最后有效清单 {
+  sessionPath: '/session/todo-a.jsonl',
+  success: true,
+  error: undefined
+}
+
+stderr | desktop/src/react/__tests__/services/ws-todo-panel-lifecycle.test.ts > 清单改版阶段1：实时清单更新回归 > D2b（缺陷已修复）: tool_end details 完全缺失时保留最后有效清单
+[ws] tool_end(todo) 更新失败或数据损坏，保留最后有效清单 {
+  sessionPath: '/session/todo-a.jsonl',
+  success: true,
+  error: undefined
+}
+
+stderr | desktop/src/react/__tests__/services/ws-todo-panel-lifecycle.test.ts > 清单改版阶段1：实时清单更新回归 > 失败后的下一次成功更新清除失败标记
+[ws] tool_end(todo) 更新失败或数据损坏，保留最后有效清单 { sessionPath: '/session/todo-a.jsonl', success: false, error: 'boom' }
+
+ ✓ desktop/src/react/__tests__/services/ws-todo-panel-lifecycle.test.ts (13 tests) 38ms
+ ✓ desktop/src/react/__tests__/chat-performance/p07-stream-buffer-wallclock.test.ts (2 tests) 464ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+[input] failed to read video attachment Error: disk gone
+    at Object.<anonymous> (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:434:49)
+    at Object.Mock [as readFileBase64] (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at prepareComposerSend (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/composer-send.ts:393:40)
+    at sendWithLease (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1010:12)
+    at Module.flushQueuedHeadNow (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1117:3)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:440:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+[input] failed to read audio attachment Error: disk gone
+    at Object.<anonymous> (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:434:49)
+    at Object.Mock [as readFileBase64] (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at prepareComposerSend (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/composer-send.ts:365:40)
+    at sendWithLease (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1010:12)
+    at Module.flushQueuedHeadNow (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1117:3)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:461:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/services/composer-reconciliation.round2.test.ts (21 tests) 374ms
+     ✓ R04-13：未决记录达到保护阈值后显式阻止新增，不删除任何未知快照  300ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:610:64)
+    at Object.Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/composer-send.ts:577:8)
+    at Module.sendWithLease (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1036:24)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:611:20
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试
+[input] websocket send failed Error: socket exploded
+    at Object.<anonymous> (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:652:64)
+    at Object.Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/composer-send.ts:577:8)
+    at Module.sendWithLease (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1036:24)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:655:20
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:743:64)
+    at Object.Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/composer-send.ts:577:8)
+    at sendWithLease (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1036:24)
+    at Module.flushQueuedHeadNow (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1117:3)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:746:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:904:64)
+    at Object.Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/composer-send.ts:577:8)
+    at sendWithLease (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1036:24)
+    at Module.flushQueuedHeadNow (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1117:3)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:907:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts (22 tests) 734ms
+     ✓ R03-03：点击编辑同步取消慢附件，保存后仅提交新正文  410ms
+
+ Test Files  19 passed (19)
+      Tests  249 passed (249)
+   Start at  21:08:16
+   Duration  1.95s (transform 7.53s, setup 306ms, import 9.13s, tests 3.13s, environment 1.80s)
+

@@ -1,0 +1,5 @@
+
+> lingxi@0.1.42 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+tests/on-demand-first-party.test.ts(343,21): error TS2322: Type 'string' is not assignable to type '{ type: string; description: string; }'.

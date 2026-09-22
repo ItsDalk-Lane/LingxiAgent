@@ -1,0 +1,453 @@
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 21 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > does not dedupe a new stream seq=1 against the previous stream consumed seqs
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ desktop/src/react/__tests__/services/stream-resume.test.ts:100:107
+     98|     injectHandlers((msg) => handled.push(msg), () => {});
+     99|     // 旧流：已真实消费 seq 1（含正文），随后服务端开新流
+    100|     expect(updateSessionStreamMeta({ sessionPath: '/background.jsonl',…
+       |                                                                                                           ^
+    101|
+    102|     // 新流的 seq=1（reset 全量重放的一部分）：不得因旧流消费过 seq 1 而被拒收
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > replays background session events to the normal websocket handler
+AssertionError: expected [] to deeply equal [ ObjectContaining{…} ]
+
+Compared values have no visual difference.
+
+ ❯ desktop/src/react/__tests__/services/stream-resume.test.ts:158:21
+    156|     });
+    157|
+    158|     expect(handled).toEqual([
+       |                     ^
+    159|       expect.objectContaining({
+    160|         type: 'text_delta',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > does not replay the same stream sequence twice when a resume response is repeated
+AssertionError: expected [] to have a length of 2 but got +0
+
+- Expected
++ Received
+
+- 2
++ 0
+
+ ❯ desktop/src/react/__tests__/services/stream-resume.test.ts:196:21
+    194|     replayStreamResume(resume);
+    195|
+    196|     expect(handled).toHaveLength(2);
+       |                     ^
+    197|     expect(handled).toEqual([
+    198|       expect.objectContaining({ type: 'tool_start', seq: 2 }),
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > reports duplicate live stream sequences as already consumed
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ desktop/src/react/__tests__/services/stream-resume.test.ts:208:9
+    206|       streamId: 'stream_live_dedupe',
+    207|       seq: 1,
+    208|     })).toBe(true);
+       |         ^
+    209|
+    210|     expect(updateSessionStreamMeta({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > tool_end 带 sessionFile 时更新 session registry 文件状态
+AssertionError: expected undefined to deeply equal [ ObjectContaining{…} ]
+
+- Expected:
+[
+  ObjectContaining {
+    "fileId": "sf_write",
+    "filePath": "/workspace/draft.md",
+    "operations": [
+      "created",
+    ],
+  },
+]
+
++ Received:
+undefined
+
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts:754:80
+    752|     });
+    753|
+    754|     expect(useStore.getState().sessionRegistryFilesByPath['/session/a.…
+       |                                                                                ^
+    755|       expect.objectContaining({
+    756|         fileId: 'sf_write',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > content_block 文件事件把 resource envelope 同步进 session registry
+AssertionError: expected undefined to deeply equal [ ObjectContaining{…} ]
+
+- Expected:
+[
+  ObjectContaining {
+    "fileId": "sf_generated",
+    "resource": ObjectContaining {
+      "links": ObjectContaining {
+        "content": "/api/resources/res_sf_generated/content",
+      },
+      "resourceId": "res_sf_generated",
+    },
+  },
+]
+
++ Received:
+undefined
+
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts:794:80
+    792|     });
+    793|
+    794|     expect(useStore.getState().sessionRegistryFilesByPath['/session/a.…
+       |                                                                                ^
+    795|       expect.objectContaining({
+    796|         fileId: 'sf_generated',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > todo_write 全部 completed 时按生命周期移除当前 session todo
+AssertionError: expected [ { content: 'old', …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "activeForm": "doing old",
++     "content": "old",
++     "status": "in_progress",
++   },
++ ]
+
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts:828:68
+    826|     });
+    827|
+    828|     expect(useStore.getState().todosBySession['/session/a.jsonl']).toE…
+       |                                                                    ^
+    829|     expect(useStore.getState().todosLiveVersionBySession['/session/a.j…
+    830|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler background chat stream routing > 非当前 session 的正文流也进入主聊天 buffer，同时保留 streamKey 预览分发
+AssertionError: expected "vi.fn()" to be called with arguments: [ { type: 'text_delta', …(2) } ]
+
+Number of calls: 0
+
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts:1103:40
+    1101|     handleServerMessage(msg);
+    1102|
+    1103|     expect(streamBufferManager.handle).toHaveBeenCalledWith(msg);
+       |                                        ^
+    1104|     expect(dispatchStreamKey).toHaveBeenCalledWith('/session/b.jsonl',…
+    1105|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler compaction lifecycle > tracks compaction_start for a background session before stream routing returns
+AssertionError: expected [] to deeply equal [ '/session/b.jsonl' ]
+
+- Expected
++ Received
+
+- [
+-   "/session/b.jsonl",
+- ]
++ []
+
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts:1179:52
+    1177|     });
+    1178|
+    1179|     expect(useStore.getState().compactingSessions).toEqual(['/session/…
+       |                                                    ^
+    1180|     expect(useStore.getState().compactionModeBySession).toEqual({
+    1181|       '/session/b.jsonl': 'lossy_local',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler compaction lifecycle > tracks compaction_end and preserves the provided context window when tokens are unknown
+AssertionError: expected [ '/session/b.jsonl' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "/session/b.jsonl",
++ ]
+
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts:1199:52
+    1197|     });
+    1198|
+    1199|     expect(useStore.getState().compactingSessions).toEqual([]);
+       |                                                    ^
+    1200|     expect(useStore.getState().compactionModeBySession).toEqual({});
+    1201|     expect(useStore.getState().contextBySession['/session/b.jsonl']).t…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler compaction lifecycle > routes lifecycle by sessionId without trusting stale path metadata as locator truth
+AssertionError: expected [] to deeply equal [ 'sess_b' ]
+
+- Expected
++ Received
+
+- [
+-   "sess_b",
+- ]
++ []
+
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts:1222:52
+    1220|     });
+    1221|
+    1222|     expect(useStore.getState().compactingSessions).toEqual(['sess_b']);
+       |                                                    ^
+    1223|     expect(useStore.getState().sessionLocatorsById.sess_b).toEqual({ p…
+    1224|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler compaction lifecycle > clears the breakdown when compaction_end explicitly reports null
+AssertionError: expected { tokens: 500, window: 200000, …(2) } to deeply equal { tokens: null, window: 200000, …(2) }
+
+- Expected
++ Received
+
+  {
+-   "breakdown": null,
+-   "percent": null,
+-   "tokens": null,
++   "breakdown": {
++     "computedAt": 1,
++     "conversation": 200,
++     "files": 0,
++     "mcp": 0,
++     "other": 115,
++     "skills": 0,
++     "system": 100,
++     "toolResults": 30,
++     "tools": 40,
++     "total": 500,
++     "user": 15,
++   },
++   "percent": 0.25,
++   "tokens": 500,
+    "window": 200000,
+  }
+
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts:1361:70
+    1359|     });
+    1360|
+    1361|     expect(useStore.getState().contextBySession['/session/a.jsonl']).t…
+       |                                                                      ^
+    1362|       tokens: null,
+    1363|       window: 200_000,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler compaction lifecycle > keeps the breakdown when compaction_end carries a fresh one
+AssertionError: expected { tokens: 500, window: 200000, …(2) } to deeply equal { tokens: 200, window: 200000, …(2) }
+
+- Expected
++ Received
+
+  {
+-   "breakdown": {
+-     "computedAt": 2,
+-     "conversation": 50,
+-     "files": 0,
+-     "mcp": 0,
+-     "other": 10,
+-     "skills": 0,
+-     "system": 90,
+-     "toolResults": 0,
+-     "tools": 40,
+-     "total": 200,
+-     "user": 10,
+-   },
+-   "percent": 0.1,
+-   "tokens": 200,
++   "breakdown": null,
++   "percent": 0.25,
++   "tokens": 500,
+    "window": 200000,
+  }
+
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts:1391:70
+    1389|     });
+    1390|
+    1391|     expect(useStore.getState().contextBySession['/session/a.jsonl']).t…
+       |                                                                      ^
+    1392|       tokens: 200,
+    1393|       window: 200_000,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > background turn_end keeps refresh and context usage but does not request input focus
+AssertionError: expected "vi.fn()" to be called with arguments: [ '/session/b.jsonl' ]
+
+Number of calls: 0
+
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts:1522:33
+    1520|
+    1521|     expect(useStore.getState().inputFocusTrigger).toBe(0);
+    1522|     expect(requestContextUsage).toHaveBeenCalledWith('/session/b.jsonl…
+       |                                 ^
+    1523|     expect(loadSessions).not.toHaveBeenCalled();
+    1524|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > status=false requests input focus when the focused session was streaming
+AssertionError: expected [ '/session/a.jsonl' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "/session/a.jsonl",
++ ]
+
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts:1542:51
+    1540|     });
+    1541|
+    1542|     expect(useStore.getState().streamingSessions).toEqual([]);
+       |                                                   ^
+    1543|     expect(useStore.getState().inputFocusTrigger).toBe(1);
+    1544|     expect(useStore.getState().inputFocusTriggerSource).toBe('restore'…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > passes sessionId from turn_start into stream buffer lifecycle; status never touches it
+AssertionError: expected "vi.fn()" to be called with arguments: [ ObjectContaining{…} ]
+
+Number of calls: 0
+
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts:1743:40
+    1741|     });
+    1742|
+    1743|     expect(streamBufferManager.handle).toHaveBeenCalledWith(expect.obj…
+       |                                        ^
+    1744|       type: 'assistant_run_start',
+    1745|       sessionId,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > turn_end requests context usage through the injected callback
+AssertionError: expected "vi.fn()" to be called with arguments: [ '/session/a.jsonl' ]
+
+Number of calls: 0
+
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts:1776:33
+    1774|     });
+    1775|
+    1776|     expect(requestContextUsage).toHaveBeenCalledWith('/session/a.jsonl…
+       |                                 ^
+    1777|   });
+    1778|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > coalesces rapid turn_end session refreshes into one list request
+AssertionError: expected "vi.fn()" to be called 2 times, but got 0 times
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts:1892:33
+    1890|
+    1891|     expect(loadSessions).not.toHaveBeenCalled();
+    1892|     expect(requestContextUsage).toHaveBeenCalledTimes(2);
+       |                                 ^
+    1893|
+    1894|     await vi.advanceTimersByTimeAsync(300);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler knowledge_retrieval_started（知识检索中状态） > 后续 status 事件（流式开始）清除检索中状态
+AssertionError: expected [ '/focused.jsonl' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "/focused.jsonl",
++ ]
+
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts:2073:61
+    2071|     handleServerMessage({ type: 'knowledge_retrieval_started', session…
+    2072|     handleServerMessage({ type: 'status', sessionPath: '/focused.jsonl…
+    2073|     expect(useStore.getState().knowledgeRetrievingSessions).toEqual([]…
+       |                                                             ^
+    2074|     expect(useStore.getState().streamingSessions).toEqual(['/focused.j…
+    2075|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turnPending（发送后等待助手状态） > 首个后续事件（status isStreaming=true）清除 pending
+AssertionError: expected [ '/focused.jsonl' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "/focused.jsonl",
++ ]
+
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts:2143:53
+    2141|     useStore.getState().beginTurnPending('/focused.jsonl');
+    2142|     handleServerMessage({ type: 'status', sessionPath: '/focused.jsonl…
+    2143|     expect(useStore.getState().turnPendingSessions).toEqual([]);
+       |                                                     ^
+    2144|     expect(useStore.getState().streamingSessions).toEqual(['/focused.j…
+    2145|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/21]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-stream-abort-lifecycle.test.ts > ws stream lifecycle after abort > turn_end(aborted) ends the local turn binding so the next reply lands after the new user message
+AssertionError: expected [ 'user', 'user' ] to deeply equal [ 'user', 'assistant', 'user', …(1) ]
+
+- Expected
++ Received
+
+  [
+    "user",
+-   "assistant",
+    "user",
+-   "assistant",
+  ]
+
+ ❯ desktop/src/react/__tests__/services/ws-stream-abort-lifecycle.test.ts:144:44
+    142|
+    143|     const items = messageItems();
+    144|     expect(items.map((item) => item.role)).toEqual(['user', 'assistant…
+       |                                            ^
+    145|     expect(textBlockSource(items[1])).toContain('old partial');
+    146|     expect(textBlockSource(items[3])).toContain('new answer');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/21]⎯
+

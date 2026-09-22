@@ -1,0 +1,17 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/quality-gates-contract.test.ts (7 tests) 35ms
+ ✓ tests/open-boundary-lint.test.ts (16 tests) 1755ms
+     ✓ the committed export-manifest.json + baseline pass cleanly against real source  949ms
+     ✓ the CLI subprocess exits 0 against the real repo and reports the known-debt count  759ms
+ ✓ tests/cli-closure-census.test.ts (22 tests) 64919ms
+     ✓ matches the committed deterministic closure and baseline  16760ms
+     ✓ is idempotent: two independent full runs produce identical output  32200ms
+     ✓ writeCliRuntimeClosure/writeOpenBoundaryBaseline regenerate the exact committed files in place  15910ms
+
+ Test Files  3 passed (3)
+      Tests  45 passed (45)
+   Start at  23:21:24
+   Duration  65.19s (transform 220ms, setup 56ms, import 783ms, tests 66.71s, environment 0ms)
+

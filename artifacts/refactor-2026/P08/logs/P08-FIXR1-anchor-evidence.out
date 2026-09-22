@@ -1,0 +1,25 @@
+== P08-FIXR1-anchor-evidence：验收 §4-③ 前提复核与深5锚点一致性 ==
+[1] git ls-tree 92c6646c5 services/ 与 components/input/ 的 composer 文件（两文件并存检验）:
+100644 blob c9eecfe2cf032fe1b65c954471ca0ed272621595	desktop/src/react/services/composer-send-coordinator.ts
+100644 blob ee207078d79353aecac6f6376aba45eb611a5444	desktop/src/react/components/input/composer-send.ts
+[2] composer-send.ts 基线与当前 :577 内容（应均为 ws.send）:
+  基线: "ws.send(JSON.stringify(prepared.wsMsg));"
+  当前: "ws.send(JSON.stringify(prepared.wsMsg));"
+  P01-P07 改动: "" (空=零改动)
+[3] scheduler 锚点在位性（当前 HEAD）:
+  :126 => _startAgentHeartbeat(agentId, agent) {
+  :163 => onBeat: (prompt, runTools: any = {}) => this._executeActivityForAgent(agentId, p
+  :168 => this._executeActivityForAgent(agentId, prompt, "heartbeat", `${isZh ? "笺" : "jia
+  :194 => _startStudioCron() {
+  :442 => async _executeActivityForAgent(agentId, prompt, type, label, opts: any = {}) {
+[4] 深5锚点在 P00 raw log（agent-callsite-raw.md）逐字命中计数:
+  InputArea.tsx:1814 => 1 处
+  chat.ts:2672 => 2 处
+  hub/index.ts:213 => 3 处
+  desktop-session-submit.ts:385 => 1 处
+  session-coordinator.ts:5176 => 2 处
+[5] raw log 中 composer-send 完整路径引用（证明 :577 锚定 components/input/composer-send.ts）:
+7:3. `desktop/src/react/components/input/composer-send.ts:198` `prepareComposerSend`（组装 wsMsg，:495-517）→ `composer-send.ts:553` `commitPreparedComposerSend` → **`composer-send.ts:577` `ws.send(JSON.stringify(prepared.wsMsg))`**（type 为 `prompt`/`interject`）
+[6] P00 矩阵原文两处:
+  "entry_real": "desktop/src/react/components/InputArea.tsx:1814 submitEditorMessage → composer-send.ts:577 ws.send(prompt|interject)",
+  "entry_real": "hub/scheduler.ts:126 heartbeat / :194 studio-cron → :442 _executeActivityForAgent",

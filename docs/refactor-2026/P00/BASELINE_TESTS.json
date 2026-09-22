@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "stage_id": "P00",
+  "task_id": "P00-T05",
+  "executed_at": "2026-09-21",
+  "source_sha": "92c6646c581883436e026c53898e8bfc34ce4d27",
+  "environment": "darwin 27.0 arm64 / Node v24.16.0 / npm 11.13.0 / lockfile a9735825…9d3c",
+  "commands": [
+    { "id": "P00-T05-typecheck", "cmd": "npm run typecheck", "exit_code": 0, "status": "PASS", "note": "tsc x3（root+node+test）" },
+    { "id": "P00-T05-lint", "cmd": "npm run lint", "exit_code": 1, "status": "FAIL", "note": "30 error：27 个来自 P00 新增证据工具（.mjs node globals 未 import），3 个为生产文件既有 error" },
+    { "id": "P00-T05-lint-r2", "cmd": "npm run lint", "exit_code": 1, "status": "FAIL", "retry_of": "P00-T05-lint", "note": "修复大部分后剩 4 error（1 我方+3 生产）" },
+    { "id": "P00-T05-lint-r3", "cmd": "npm run lint", "exit_code": 1, "status": "FAIL_PREEXISTING", "retry_of": "P00-T05-lint", "note": "最终态：3 error 全部为生产文件既有（run-code-tool.ts:118,119 no-control-regex；security-scan-tool.ts:191 no-constant-condition）+10688 warning（纯 warning 不致败）。我方文件 0 error" },
+    { "id": "P00-T05-build-renderer", "cmd": "npm run build:renderer", "exit_code": 0, "status": "PASS", "note": "vite renderer 7 入口构建成功" },
+    { "id": "P00-T05-tool-boundaries", "cmd": "npm run check:tool-invocation-boundaries", "exit_code": 0, "status": "PASS", "note": "AST 工具调用边界检查通过" },
+    { "id": "P00-T05-npm-test", "cmd": "npm test", "exit_code": 1, "status": "FAIL_PREEXISTING", "note": "1446 文件：1440 通过/3 失败/3 skipped；14705 用例：14686 通过/4 失败/15 skipped；4 个失败同根因=封印坐标滞后（见 BASELINE_FAILURES.md F1）" },
+    { "id": "P00-T05-round23-isolated", "cmd": "npx vitest run tests/round2-delivery-evidence.test.ts tests/round3-delivery-evidence.test.ts", "exit_code": 1, "status": "FAIL_PREEXISTING", "note": "单独复跑确认 3 个失败全部由 .sync-audit/verify-post-verification-diff.mjs 报同一组 7 个非白名单文件引起" },
+    { "id": "P00-T05-gh-ci-evidence", "cmd": "gh auth status && gh run list --workflow=ci.yml", "exit_code": 0, "shell_exit": 1, "status": "BLOCKED", "note": "gh 已装但 keyring token 失效 + 本机代理 127.0.0.1:7890 不通→api.github.com 不可达。四平台 CI 运行证据无法本地获取；旧 CI 绿只能当旧证据" }
+  ],
+  "ci_boundary": {
+    "config_evidence": ".github/workflows/ci.yml：4 平台腿（macos-15 arm64 / macos-15-intel x64 / windows-2025 x64 / ubuntu-24.04 x64）、Node 24.15.0、fetch-depth 0、每腿 typecheck+lint+knowledge smoke+build:renderer、win 腿 sandbox helper+standalone 冒烟、并行 persistence-schema-guard 与 open-build-smoke job",
+    "local_vs_ci": "本地 Node 24.16.0 vs CI 24.15.0（同引擎范围内 patch 差异，如实登记）；本地结果不替代四平台 CI 与打包产物验证",
+    "ci_status": "BLOCKED_ON_EVIDENCE（无法获取当前运行记录；按 lint 3 error 推断 HEAD 的 CI lint 步骤会红，属既有 F2）"
+  },
+  "workspace_side_effects": [
+    { "id": "F5", "what": "npm test 的 tests/round2-delivery-evidence.test.ts R10-09 按设计重写跟踪补丁 artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch（+18067/-5236，吸收 60 个未跟踪新文件）", "handling": "已取证（logs/tracked-patch-side-effect.stat.txt）后 git checkout -- 还原至 HEAD；最终状态零跟踪改动", "advice": "后续阶段全量 npm test 后必须复查 git status；测试改只读属需授权变更（P08 评估）" },
+    { "id": "F6", "what": "Lingxi_Refactor_Taskbooks_2026-09-21_副本/ 目录外部创建又消失（会话开始快照无此目录、P00 首条命令时出现、终检时不存在）", "handling": "P00 无任何命令触碰（command-log.jsonl 可复核）；判定为用户侧操作，原任务书目录完好，提请知悉" }
+  ],
+  "skipped_in_p00": [
+    { "cmd": "npm run pack / dist:*", "reason": "打包与跨平台产物验证属 P08；P00 不做发布准备" },
+    { "cmd": "npm run test:knowledge-platform-smoke", "reason": "CI 每腿都跑；本地基线以 npm test 全量（含 knowledge 测试）为准，无改动不重复昂贵检查（tests/README 政策）" }
+  ]
+}

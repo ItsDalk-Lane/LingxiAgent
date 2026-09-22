@@ -1,0 +1,13 @@
+[soak] batch=1/12 rss=308048KB heap=90694KB cache_sessions=8 evictions=4
+[soak] batch=2/12 rss=324320KB heap=90974KB cache_sessions=8 evictions=16
+[soak] batch=3/12 rss=324496KB heap=88153KB cache_sessions=8 evictions=28
+[soak] batch=4/12 rss=325296KB heap=87992KB cache_sessions=8 evictions=40
+[soak] batch=5/12 rss=325504KB heap=87628KB cache_sessions=8 evictions=52
+[soak] batch=6/12 rss=325648KB heap=85291KB cache_sessions=8 evictions=64
+[soak] batch=7/12 rss=325680KB heap=87416KB cache_sessions=8 evictions=76
+[soak] batch=8/12 rss=326096KB heap=87488KB cache_sessions=8 evictions=88
+[soak] batch=9/12 rss=326096KB heap=85329KB cache_sessions=8 evictions=100
+[soak] batch=10/12 rss=326112KB heap=85446KB cache_sessions=8 evictions=112
+[soak] batch=11/12 rss=326112KB heap=85406KB cache_sessions=8 evictions=124
+[soak] batch=12/12 rss=326112KB heap=85419KB cache_sessions=8 evictions=136
+[soak] verdict=NO_REPRODUCIBLE_UNBOUNDED_GROWTH rss_growth=0.3% heap_growth=-2.8% out=/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/P07/samples/soak-resources.json

@@ -1,0 +1,25 @@
+{
+  "at": "2026-09-22T11:20:38.062Z",
+  "cleanup": [
+    {
+      "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-packaged-run-rIw7Tw",
+      "removed": true,
+      "lsofExit": 1,
+      "reason": "unique task-created directory; no open handles"
+    },
+    {
+      "path": "/Users/study_superior/Library/Application Support/Lingxi-f05-packaged-run-rIw7Tw",
+      "removed": true,
+      "lsofExit": 1,
+      "reason": "unique task-created directory; no open handles"
+    }
+  ],
+  "preserved": [
+    "existing Application Support/Data",
+    "existing /Applications/Lingxi.app and its running process",
+    "candidate build/package directory retained for review"
+  ],
+  "processSnapshot": [
+    "74882     1 /Applications/Lingxi.app/Contents/MacOS/Lingxi"
+  ]
+}

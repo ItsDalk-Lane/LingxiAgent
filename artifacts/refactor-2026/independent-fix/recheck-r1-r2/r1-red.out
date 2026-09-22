@@ -1,0 +1,21 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/stream-route-consumer-isolation.test.ts (11 tests | 3 failed | 8 skipped) 356ms
+     ↓ C14/C15/C17: rejects old start/delta/end/tool/status frames and preserves multiple model turns in the current run
+     ↓ C16/C18: duplicate frames are idempotent, a gap resumes through the real route, and untagged old frames cannot acquire current identity
+     ↓ C16: more than 256 runs recover through the real route without accepting previously retired starts
+   ↓ keeps a resolved confirmation resolved after the next real streamed projection
+     × a gap-rejected assistant_run_end retires nothing; the re-delivered seq3/seq4 complete the body, finalize exactly once, and only evidenced seqs enter the watermark 155ms
+     × a real server-store refill after a dropped window still lets the end frame finalize exactly once 66ms
+     × a gap-rejected end of a NEW stream does not retire the new run across the switch 134ms
+     ↓ a background rebuild with a delayed history read cannot overwrite a newly admitted live stream
+     ↓ a late resume response for a superseded stream is dropped by the request generation correlation
+     ↓ with two concurrent restores only the latest rebuild generation lands
+     ↓ a current-session rebuild that loses focus during its delayed read abandons the restore and clears the rebuild gate
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 8 skipped (11)
+   Start at  20:55:58
+   Duration  2.18s (transform 866ms, setup 23ms, import 1.48s, tests 356ms, environment 244ms)
+

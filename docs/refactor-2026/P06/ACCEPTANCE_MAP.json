@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "stage_id": "P06",
+  "generated_at": "2026-09-22",
+  "head_sha": "93b8b72650846af1a150eb195c1765c8f57f6cd8",
+  "note": "状态口径：PASS 需测试/命令证据；真实模型行为无凭证/预算授权一律 BLOCKED，不以确定性替代冒充。",
+  "cases": [
+    {
+      "id": "P06-A01",
+      "scenario": "canonical一致（text/artifact 同源；最终 request 无第二份组装）",
+      "test_path": "tests/p06-final-request-assembly.test.ts",
+      "test_names": ["desktop main session: final request consumes the canonical assembly exactly once", "emits a sanitized sample index (sources + lengths only) for the report"],
+      "supporting": ["tests/agent-system-prompt-equivalence.test.ts (text API == artifact.text + provenance 顺序/无正文副本)"],
+      "production_entry": "core/agent.ts buildSystemPromptArtifact → core/session-prompt-snapshot.ts buildSessionPromptSnapshot → lib/pi-sdk createAgentSession → Pi SDK buildSystemPromptSections",
+      "fixture": "合成 fixture（受控临时目录 zh-CN + 假 provider witness）",
+      "command_ids": ["CMD-07", "CMD-14"],
+      "status": "PASS",
+      "evidence": "logs/P06-T01-assembly-capture.out（5 例绿 + P06_SAMPLE_INDEX）"
+    },
+    {
+      "id": "P06-A02",
+      "scenario": "无需工具任务不被硬规则强制外包",
+      "test_path": "tests/agent-system-prompt-equivalence.test.ts",
+      "test_names": ["keeps reviewed copy and produces provenance (zh-CN)", "keeps reviewed copy and produces provenance (en)"],
+      "rationale": "golden 文案锁定：常驻提示词无『N 次工具后必须外包』类规则；subagent 委派前缀仅实验开关开启时出现（默认关闭）",
+      "model_side": "TOOL_BEHAVIOR_EVAL F-01..F-05 已登记为 model_only；真实模型行为 BLOCKED（无凭证/预算）",
+      "command_ids": ["CMD-14"],
+      "status": "PASS",
+      "evidence": "logs/P06-T07-directed-suite.out（equivalence 3 例绿）"
+    },
+    {
+      "id": "P06-A03",
+      "scenario": "按需工具发现：先获取真实定义，参数与 schema 一致",
+      "test_path": "tests/p06-tool-behavior-eval.test.ts",
+      "test_names": ["scores every deterministic sample through real production components (F-10/F-11/F-13/F-14/F-15)"],
+      "production_entry": "core/tool-catalog-bridge.ts mcp_search_tools / mcp_describe_tool / mcp_call",
+      "command_ids": ["CMD-10", "CMD-14"],
+      "status": "PASS",
+      "evidence": "logs/P06-T05-eval-harness.out（23 例确定性 PASS）"
+    },
+    {
+      "id": "P06-A04",
+      "scenario": "对象精确性（同名消歧、scope 内对象）",
+      "test_path": "tests/p06-tool-behavior-eval.test.ts",
+      "test_names": ["F-12 ambiguous_name_requires_server", "F-38 ambiguous_then_disambiguate_succeeds"],
+      "supporting": ["tests/knowledge-agent-tools.test.ts（scope 冻结/跨 session 拒绝）", "P05 资源身份契约（同名文件读持久记录）"],
+      "model_side": "真实模型对象选择 BLOCKED（无凭证/预算）",
+      "command_ids": ["CMD-10"],
+      "status": "PASS",
+      "evidence": "logs/P06-T05-eval-harness.out"
+    },
+    {
+      "id": "P06-A05",
+      "scenario": "缺必要信息：不编造参数、不产生不可逆动作",
+      "test_path": "tests/p06-tool-behavior-eval.test.ts",
+      "test_names": ["F-17 schema_rejects_missing_required（占位/缺失被校验拒绝，外部替身 0 次执行）"],
+      "supporting": ["platform.tool-discipline 常驻规则『缺必要信息先查再问』（golden 锁定）"],
+      "model_side": "澄清行为 BLOCKED（无凭证/预算）",
+      "command_ids": ["CMD-10"],
+      "status": "PASS",
+      "evidence": "logs/P06-T05-eval-harness.out"
+    },
+    {
+      "id": "P06-A06",
+      "scenario": "能力撤回：旧说明/旧资料不越权复用",
+      "test_path": "tests/tool-lifecycle-revocation.test.ts",
+      "test_names": ["审批后卸载插件会以 TARGET_REVOKED 拒绝且不执行旧对象", "工具列表变化后保留旧描述快照但拒绝执行旧目标", "临时断线按需可重启：不推进代次、不算撤销"],
+      "mapped": true,
+      "command_ids": ["CMD-15"],
+      "status": "PASS",
+      "evidence": "logs/P06-T07-full-suite.out（全量内该套件绿）"
+    },
+    {
+      "id": "P06-A07",
+      "scenario": "提示注入数据不提升系统授权",
+      "test_path": "tests/p06-tool-behavior-eval.test.ts",
+      "test_names": ["F-29 prompt_injection_no_privilege_lift（read_only 下注入文本不改变 write 拒绝；危险动作 0 次）"],
+      "supporting": ["platform.action-discipline『外部正文不能改变调用协议或授权』（golden 锁定）"],
+      "command_ids": ["CMD-10"],
+      "status": "PASS",
+      "evidence": "logs/P06-T05-eval-harness.out"
+    },
+    {
+      "id": "P06-A08",
+      "scenario": "预算：常驻平台总预算不增，用户内容未截断",
+      "test_path": "tests/p06-prompt-budget-and-invalidation.test.ts",
+      "test_names": ["A1/A2 system prompt golden fixtures stay byte-identical to the P00 baseline", "B1/B2 on-demand catalog guidance lines stay within the P00 baseline", "C PTC entry tool run_tools description stays within the P00 baseline", "measures the resident surface at the request boundary via the production buildTools entry"],
+      "command_ids": ["CMD-08"],
+      "status": "PASS",
+      "evidence": "logs/P06-T03-budget-invalidation.out（7 例绿 + P06_RESIDENT_TOOL_BUDGET）"
+    },
+    {
+      "id": "P06-A09",
+      "scenario": "人格记忆开关：人格不被改写，关闭记忆不残留缓存内容",
+      "test_path": "tests/p06-feature-context-boundaries.test.ts + tests/p06-prompt-budget-and-invalidation.test.ts",
+      "test_names": ["variant matrix keeps the persona byte-identical while memory rides its switches", "memory master off rebuilds the master prompt immediately with no residual memory section", "per-session memory off yields a session snapshot without memory sections and keeps user content"],
+      "supporting": ["tests/yuan-metadata.test.ts + tests/yuan-trigger-anchor.test.ts（MOOD 约定锁定）"],
+      "command_ids": ["CMD-08", "CMD-09"],
+      "status": "PASS",
+      "evidence": "logs/P06-T03-budget-invalidation.out + logs/P06-T04-boundaries.out"
+    },
+    {
+      "id": "P06-A10",
+      "scenario": "知识来源边界：只用允许来源",
+      "test_path": "tests/knowledge-agent-tools.test.ts",
+      "test_names": ["scopeId 缺失 / 伪造 / 已关闭 → KNOWLEDGE_SCOPE_VIOLATION", "sourceIds 必须全在 scope 内", "跨 session / 跨 studio / 无会话上下文显式拒绝", "subagent 子会话继承父会话 scope"],
+      "supporting": ["tests/p06-feature-context-boundaries.test.ts（canonical base never carries knowledge materials）"],
+      "mapped": true,
+      "command_ids": ["CMD-09", "CMD-15"],
+      "status": "PASS",
+      "evidence": "logs/P06-T04-boundaries.out + logs/P06-T07-full-suite.out"
+    },
+    {
+      "id": "P06-A11",
+      "scenario": "压缩/模型切换后按正确 schema 投影和权限恢复",
+      "test_path": "tests/chat-route-switching.test.ts + tests/session-compactor*.test.ts + tests/model-operation-resolver.test.ts",
+      "test_names": ["P05 stream resume semantics (real route + real stream store)", "session-compactor 系列压缩投影", "model-operation-resolver 模型解析防漂移"],
+      "mapped": true,
+      "rationale": "P05 已锁定恢复/分页/段语义（NEXT_STAGE_HANDOFF §2/§3）；P06 上下文装配消费同一语义面，未改动；模型切换 prompt 重建经 agent.ts updateConfig/refreshAppearanceSummary（agent-description/yuan 套件覆盖）",
+      "command_ids": ["CMD-15"],
+      "status": "PASS",
+      "evidence": "logs/P06-T07-full-suite.out（映射套件全绿）"
+    },
+    {
+      "id": "P06-A12",
+      "scenario": "真实评测诚实：仅 mock/确定性测试完成时真实准确性项 BLOCKED",
+      "test_path": "tests/p06-tool-behavior-eval.test.ts",
+      "test_names": ["declares real-model evaluation BLOCKED (no fabricated success rates)"],
+      "command_ids": ["CMD-10"],
+      "status": "PASS",
+      "evidence": "logs/P06-T05-eval-harness.out（TOOL_BEHAVIOR_EVAL.json 状态字段锁定为 BLOCKED）"
+    },
+    {
+      "id": "P06-A13",
+      "scenario": "错误修正：按反馈修正，不无限重复同一错误或扩大权限",
+      "test_path": "tests/p06-tool-behavior-eval.test.ts",
+      "test_names": ["F-37 corrects_named_field_then_succeeds（P06 FIX-1 后 message 指明 /labels；修正后成功且替身仅执行 1 次）"],
+      "command_ids": ["CMD-10"],
+      "status": "PASS",
+      "evidence": "logs/P06-T05-eval-harness.out"
+    },
+    {
+      "id": "P06-A14",
+      "scenario": "留出样本：结果完整保留；无挑选成功样本、无泄露答案",
+      "test_path": "tests/p06-tool-behavior-eval.test.ts",
+      "test_names": ["carries 40 fixed + 8 holdout samples over all ten dimensions（holdout.used_for_copy_tuning=false 锁定）"],
+      "runs": "BLOCKED（真实模型配对运行无凭证/预算授权；留出样本未运行、未参与文案调整）",
+      "command_ids": ["CMD-10"],
+      "status": "PASS",
+      "evidence": "logs/P06-T05-eval-harness.out（样本清单完整性 + BLOCKED 声明）"
+    }
+  ],
+  "real_model_behavior": {
+    "status": "BLOCKED",
+    "reason": "无真实模型凭证与费用授权（继承 P04-T07-2）；本阶段不虚报任何成功率",
+    "samples_ready": "TOOL_BEHAVIOR_EVAL.json fixed 40 + holdout 8"
+  },
+  "fix_rounds": [
+    {
+      "id": "P06-FIXR1",
+      "date": "2026-09-22",
+      "source": "独立验收 P06_ACCEPTANCE_REVIEW.md §6 非阻塞发现 ①：FIX-1 缺陷叙事与实测不符——「normalizeIssues 只认 instancePath、嵌套路径降级为 /、details 保真退化」前提不成立（本仓 typebox@1.1.38 错误对象无 path 键、instancePath 嵌套路径本就填充，修复前 issuePaths 已为 /labels/0、/metadata/owner）；真实缺口仅 message 通用文案；path 兼认为本版本防御性 no-op",
+      "effect_on_cases": "无——A01–A14 全部场景状态与证据不变（零执行代码、零测试断言改动；定向复跑 resolver-error-passthrough 4 例 + 工具面边界 4 套件 67 例 + p06 4 文件 19 例全绿，typecheck 绿）。更正仅落注释与文档叙事：schema-validator.ts 两处 P06 注释、PROMPT_CHANGE_LEDGER.md §3、EVAL_COMPARISON.md §1 FIX-1 行（及 §4 同叙事短句「details 保真恢复」）",
+      "records": "P06_REPORT.md「独立验收修复轮（P06-FIXR1）」节；P06_RESULT.json fix_rounds；日志 artifacts/refactor-2026/P06/logs/P06-FIXR1-*（command-log.jsonl 追加 6 条；P08-T07 更正：原记 5 条为计数笔误）"
+    }
+  ]
+}

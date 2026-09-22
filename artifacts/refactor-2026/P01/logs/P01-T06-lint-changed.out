@@ -1,0 +1,43 @@
+
+/Users/study_superior/Desktop/Code/LingxiAgent/server/hono-helpers.ts
+  33:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/study_superior/Desktop/Code/LingxiAgent/server/routes/sessions.ts
+    13:10   warning  'resolveDeferredReceiverName' is defined but never used  @typescript-eslint/no-unused-vars
+    57:10   warning  'collectToolOutcomesByCallId' is defined but never used  @typescript-eslint/no-unused-vars
+   355:15   warning  Empty block statement                                    no-empty
+   700:20   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+   725:16   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+   832:53   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  2078:27   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  2080:25   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  2183:14   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  2186:27   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  2188:25   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  2189:25   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  2442:139  warning  Empty block statement                                    no-empty
+  2562:72   warning  Empty block statement                                    no-empty
+  2564:19   warning  Empty block statement                                    no-empty
+  2579:63   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  2609:27   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  2642:42   warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  2757:72   warning  Empty block statement                                    no-empty
+  2932:66   warning  Empty block statement                                    no-empty
+
+/Users/study_superior/Desktop/Code/LingxiAgent/shared/errors.ts
+  47:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  78:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  78:81  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/study_superior/Desktop/Code/LingxiAgent/tests/server-composition-boundary.test.ts
+  202:21   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  257:113  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  260:19   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  364:81   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  374:31   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  379:55   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  423:23   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  534:21   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 32 problems (0 errors, 32 warnings)
+

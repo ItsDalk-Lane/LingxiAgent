@@ -1,0 +1,381 @@
+{
+  "workload": "长运行资源 soak：stream store 全生命周期 + 终端会话循环 + 历史目录缓存淘汰/失效；进程级轨迹",
+  "env": {
+    "node": "v24.16.0",
+    "os": "Darwin 27.0.0 arm64",
+    "expose_gc": true
+  },
+  "components_ok": true,
+  "verdict": {
+    "rss": {
+      "warm_mean": 317216,
+      "tail_mean": 318256,
+      "growth_pct": 0.3
+    },
+    "heap_used": {
+      "warm_mean": 69059,
+      "tail_mean": 84479,
+      "growth_pct": 22.3
+    },
+    "external": {
+      "warm_mean": 11224,
+      "tail_mean": 12551,
+      "growth_pct": 11.8
+    },
+    "rss_monotonic_increase_gt5pct_each_batch": false,
+    "bounded_verdict": "NO_REPRODUCIBLE_UNBOUNDED_GROWTH"
+  },
+  "batches": [
+    {
+      "batch": 1,
+      "rss_kb": 302832,
+      "heap_used_kb": 78115,
+      "external_kb": 11586,
+      "array_buffers_kb": 520,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1476048,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 4,
+      "cache_resident_bytes": 2584866,
+      "probe_verdict_after_append": "append_candidate",
+      "probe_append_detected": true,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63587344,
+        "rssPostGc": 312492032
+      }
+    },
+    {
+      "batch": 2,
+      "rss_kb": 316928,
+      "heap_used_kb": 73041,
+      "external_kb": 11345,
+      "array_buffers_kb": 279,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1476191,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 16,
+      "cache_resident_bytes": 2327324,
+      "probe_verdict_after_append": "append_candidate",
+      "probe_append_detected": true,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63328608,
+        "rssPostGc": 324304896
+      }
+    },
+    {
+      "batch": 3,
+      "rss_kb": 316720,
+      "heap_used_kb": 69189,
+      "external_kb": 11224,
+      "array_buffers_kb": 159,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1476334,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 28,
+      "cache_resident_bytes": 2327444,
+      "probe_verdict_after_append": "append_candidate",
+      "probe_append_detected": true,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63293624,
+        "rssPostGc": 324452352
+      }
+    },
+    {
+      "batch": 4,
+      "rss_kb": 316848,
+      "heap_used_kb": 69018,
+      "external_kb": 11224,
+      "array_buffers_kb": 159,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1476477,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 40,
+      "cache_resident_bytes": 2327558,
+      "probe_verdict_after_append": "append_candidate",
+      "probe_append_detected": true,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63316544,
+        "rssPostGc": 324468736
+      }
+    },
+    {
+      "batch": 5,
+      "rss_kb": 318080,
+      "heap_used_kb": 68969,
+      "external_kb": 11224,
+      "array_buffers_kb": 159,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1476620,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 52,
+      "cache_resident_bytes": 2327672,
+      "probe_verdict_after_append": "append_candidate",
+      "probe_append_detected": true,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63230440,
+        "rssPostGc": 325713920
+      }
+    },
+    {
+      "batch": 6,
+      "rss_kb": 318208,
+      "heap_used_kb": 68581,
+      "external_kb": 12550,
+      "array_buffers_kb": 37,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1476763,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 64,
+      "cache_resident_bytes": 2327784,
+      "probe_verdict_after_append": "append_candidate",
+      "probe_append_detected": true,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63284832,
+        "rssPostGc": 325844992
+      }
+    },
+    {
+      "batch": 7,
+      "rss_kb": 318208,
+      "heap_used_kb": 68676,
+      "external_kb": 12550,
+      "array_buffers_kb": 159,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1476906,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 76,
+      "cache_resident_bytes": 2327900,
+      "probe_verdict_after_append": "append_candidate",
+      "probe_append_detected": true,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63254960,
+        "rssPostGc": 325861376
+      }
+    },
+    {
+      "batch": 8,
+      "rss_kb": 318224,
+      "heap_used_kb": 68703,
+      "external_kb": 12550,
+      "array_buffers_kb": 159,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1477049,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 88,
+      "cache_resident_bytes": 2328014,
+      "probe_verdict_after_append": "append_candidate",
+      "probe_append_detected": true,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63273400,
+        "rssPostGc": 325861376
+      }
+    },
+    {
+      "batch": 9,
+      "rss_kb": 318224,
+      "heap_used_kb": 115904,
+      "external_kb": 12550,
+      "array_buffers_kb": 1485,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1477192,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 100,
+      "cache_resident_bytes": 2328128,
+      "probe_verdict_after_append": "append_candidate",
+      "probe_append_detected": true,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63294040,
+        "rssPostGc": 325861376
+      }
+    },
+    {
+      "batch": 10,
+      "rss_kb": 318256,
+      "heap_used_kb": 68830,
+      "external_kb": 12550,
+      "array_buffers_kb": 159,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1477335,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 112,
+      "cache_resident_bytes": 2328242,
+      "probe_verdict_after_append": "append_candidate",
+      "probe_append_detected": true,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63343008,
+        "rssPostGc": 325894144
+      }
+    },
+    {
+      "batch": 11,
+      "rss_kb": 318256,
+      "heap_used_kb": 68761,
+      "external_kb": 12551,
+      "array_buffers_kb": 37,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1477480,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 124,
+      "cache_resident_bytes": 2328368,
+      "probe_verdict_after_append": "append_candidate",
+      "probe_append_detected": true,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63384000,
+        "rssPostGc": 325894144
+      }
+    },
+    {
+      "batch": 12,
+      "rss_kb": 318256,
+      "heap_used_kb": 115845,
+      "external_kb": 12551,
+      "array_buffers_kb": 1485,
+      "active_resources": {
+        "CloseReq": 1,
+        "PipeWrap": 2
+      },
+      "terminal_disk_bytes": 1477625,
+      "stream_retained_max": 5000,
+      "stream_drop_sum": 40000,
+      "stream_finish_cleared": true,
+      "stream_resume_ok": true,
+      "cache_sessions": 8,
+      "cache_hits": 6,
+      "cache_rebuilds": 12,
+      "cache_evictions": 136,
+      "cache_resident_bytes": 2328480,
+      "probe_verdict_after_append": "append_candidate",
+      "probe_append_detected": true,
+      "within_budget": true,
+      "post_gc": {
+        "heapUsedPostGc": 63348088,
+        "rssPostGc": 325926912
+      }
+    }
+  ],
+  "cache_final_stats": {
+    "sessions": 8,
+    "residentBytes": 2328480,
+    "retiredBytes": 0,
+    "builds": 144,
+    "hits": 72,
+    "evictions": 136,
+    "inFlightBuilds": 0,
+    "noCacheSessions": 0,
+    "invalidations": {},
+    "incrementalUpdates": 0,
+    "incrementalFailures": 0,
+    "branchViewRebuilds": 0
+  },
+  "note": "GC 后读数单列（若可用），不作为稳态判定依据；rss/heap 以 GC 前轨迹为准"
+}

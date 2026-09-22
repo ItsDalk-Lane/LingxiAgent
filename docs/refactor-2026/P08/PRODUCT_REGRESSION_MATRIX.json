@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "stage_id": "P08",
+  "task_id": "P08-T03",
+  "generated_at": "2026-09-22",
+  "source_sha": "674b0151fcc982d13f1d6bc5a84ff273edd3b4a3",
+  "method": "真实产品回归双层：(1) 协议级真实动作——真实 spawn 全量组合 server（server/bootstrap.ts→main-full.ts）于隔离 LINGXI_HOME，本地 HTTP witness 供应商（OpenAI 兼容 SSE）预种 provider-catalog v2 + agent config，走 P00 CALLSITE_MATRIX E-DESKTOP 同一业务入口（POST /api/sessions/new + WS /ws prompt），工具/artifacts/refactor-2026/P08/tools/product-regression.mjs，结果 artifacts/refactor-2026/P08/logs/product-regression.json（32/32 PASS，命令 P08-T03-product-regression-r6 exit 0；r1-r5 为工具自身请求形状缺陷的首败-修复链，全部留档）；(2) 套件级真实行为——全量 npm test（P08-T04-full-test：14797 绿）中各功能专属套件。桌面 GUI 点击类步骤无 GUI 自动化授权，未执行（见 desktop_gaps），不以单元测试冒充 GUI 验收。",
+  "features": [
+    { "id": "F01", "name": "聊天与会话（桌面主界面）", "live_probe": "WS prompt → read 工具真实往返 + 流式回复 + 历史回读（PASS）", "suite_evidence": "tests/chat-route-*.test.ts、tests/sessions-route.test.ts(121) 全绿", "status": "PASS（协议级真实动作；GUI 渲染层无授权未测）" },
+    { "id": "F02", "name": "会话管理（列表/搜索/置顶/fork）", "live_probe": "new/list/search/pin/fork 5 探针全 PASS（fork 按产品语义传 target 节点，r4-r6 修复工具形状后 2xx 生成新 sess_）", "suite_evidence": "tests/sessions-route.test.ts、tests/history-read-directory-*.test.ts(9)", "status": "PASS" },
+    { "id": "F03", "name": "四基础工具常驻+按需目录", "live_probe": "read 工具真实执行（网关路径）+ exec_command 真实 spawn（PASS）", "suite_evidence": "tests/tool-invocation-gateway.test.ts、tests/on-demand-first-party.test.ts、边界检查 P08-T01-tool-invocation-boundaries exit 0", "status": "PASS" },
+    { "id": "F04", "name": "审批与沙盒（权限模式）", "live_probe": "session-permission-default 读写 + 重启保持（auto 模式，PASS）；本轮回归以 auto 模式执行（工具直接放行）", "suite_evidence": "tests/session-permission-*.test.ts、tests/*sandbox* 全绿（allow/deny/review 分类链与沙盒）", "status": "PASS（协议级+套件；GUI 审批弹窗未测）" },
+    { "id": "F05", "name": "子代理（现役）", "live_probe": "未单列（需多轮工具编排）；由套件覆盖", "suite_evidence": "tests/subagent-*.test.ts(5) 全绿（派发/权限衰减/store）", "status": "PASS（套件级）" },
+    { "id": "F06", "name": "人格与 MOOD", "live_probe": "GET /api/agents → lingxi 在列（PASS）；系统提示词人格拼装经 canonical 装配（P06 锁定）", "suite_evidence": "tests/agent-system-prompt-equivalence.test.ts（golden zh/en）", "status": "PASS" },
+    { "id": "F07", "name": "记忆（事实/总结/信条/梦境）", "live_probe": "GET /api/memories/dream/status?agentId=lingxi → 2xx（PASS）", "suite_evidence": "tests/memory-*.test.ts(19) 全绿", "status": "PASS" },
+    { "id": "F08", "name": "知识库（现行）", "live_probe": "GET /api/knowledge/notebooks → 200 空库可列（PASS）", "suite_evidence": "tests/knowledge-*.test.ts(61) 全量绿 + CI knowledge smoke 命令存在", "status": "PASS" },
+    { "id": "F09", "name": "资源与交付文件（SessionFile/Resource）", "live_probe": "历史回读含资源语义（read 工具结果入历史）（PASS）", "suite_evidence": "tests/resource-io-*.test.ts(16)、tests/history-run-outcome-edges.test.ts", "status": "PASS（协议级；桌面文件卡片 UI 未测）" },
+    { "id": "F10", "name": "模型与媒体配置", "live_probe": "providers/summary 含双 provider、preferences/models 读写、重启后 catalog 保持（PASS）", "suite_evidence": "tests/provider-compat/(16)、tests/model-manager-*.test.ts", "status": "PASS（配置面真实；真实供应商连通与媒体生成见 BLOCKED）" },
+    { "id": "F11", "name": "浏览器/终端/桌面系统能力", "live_probe": "exec_command 真实子进程执行 + 输出回传模型（PASS）", "suite_evidence": "tests/terminal-*.test.ts(4)、tests/browser-*.test.ts(8)、tests/computer-use-*.test.ts(12)", "status": "PARTIAL：终端 PASS；浏览器/computer-use 需 Electron 会话（GUI）无授权未真机测（套件绿）" },
+    { "id": "F12", "name": "Bridge 多平台（TG/飞书/钉钉/QQ/微信）", "live_probe": "GET /api/bridge/status → 200 路由在位（PASS）", "suite_evidence": "tests/bridge-*.test.ts(27) 全绿", "status": "PASS（本地面）+ BLOCKED（真实平台账户收发——无授权测试账户，不对真实联系人发送）" },
+    { "id": "F13", "name": "Web/移动端（LAN/PWA）", "live_probe": "GET /api/devices → 200（PASS）", "suite_evidence": "tests/server-*.test.ts、tests/mobile-*", "status": "PASS（协议面；真机 PWA 未测——非本轮范围）" },
+    { "id": "F14", "name": "CLI", "live_probe": "cli/entry.ts status 真实执行读同 LINGXI_HOME server-info 连通（PASS）——headless 不依赖桌面", "suite_evidence": "tests/cli-*.test.ts(9)", "status": "PASS" },
+    { "id": "F15", "name": "后台任务（心跳/定时/频道/DM）", "live_probe": "未单列（需定时窗口）；由套件覆盖", "suite_evidence": "tests/task-registry.test.ts、tests/loop/、tests/agent-executor-teardown.test.ts 全绿", "status": "PASS（套件级）" },
+    { "id": "F16", "name": "用量观测（model observability）", "live_probe": "两轮真实模型调用后 query/traces 有真实 trace（PASS）", "suite_evidence": "tests/model-observability-*.test.ts(28)、tests/model-call-*.test.ts(11)", "status": "PASS" },
+    { "id": "F17", "name": "导入导出（角色卡/技能包/观测导出）", "live_probe": "character-cards export/preview 路由在位（PASS）", "suite_evidence": "tests/character-card*、tests/model-observability-export*、observability-export IPC 测试", "status": "PASS" },
+    { "id": "F18", "name": "更新（OTA/GitHub Releases）", "live_probe": "github-release-check.cjs + release-digest.v1/v2.json 在位（PASS）", "suite_evidence": "tests/release-preflight.test.ts、tests/artifact-*、tests/publish-train.test.ts", "status": "PASS（检查更新链路文件与套件）；真实下载/应用更新未执行（无发布授权，属发布后行为）" },
+    { "id": "F19", "name": "技能系统（SKILLS/内置技能）", "live_probe": "GET /api/skills?agentId=lingxi → 200（PASS）", "suite_evidence": "tests/skill-*.test.ts(6)（本轮清理 pycache 残留后定向复跑 P08-T01-skills-tests 全绿）、tests/external-skill-paths-contract.test.ts", "status": "PASS" },
+    { "id": "F20", "name": "多语言 i18n", "live_probe": "五语言文件在位（PASS）", "suite_evidence": "tests/i18n-*.test.ts(3)", "status": "PASS（资源+套件；界面切换 GUI 未测）" }
+  ],
+  "a05_settings_restart_persistence": {
+    "scenario": "多 provider 配置（witness-a/witness-b 双条目）+ 权限默认（auto）+ 通知偏好 → SIGTERM 真实关闭（exit 0）→ 真实重启（重新 spawn 全量组合）",
+    "results": ["重启后 permissionMode=auto 保持", "重启后会话列表数量一致", "重启后历史仍可读（含助手回复）", "重启后双 provider 均在（无最后一项覆盖其余项）"],
+    "status": "PASS（4/4 探针）"
+  },
+  "desktop_gaps": [
+    { "item": "桌面 GUI 手工步骤（设置界面保存点击、文件查看卡片展开、模型切换下拉、截图留档）", "reason": "无 GUI 自动化授权（P07 交接同款限制）；本阶段以同入口协议级步骤 + 套件替代并如实标注", "status": "BLOCKED（GUI 层）" },
+    { "item": "浏览器/computer-use 真机（Electron 会话宿主）", "reason": "需桌面 GUI 环境；协议与单元层全绿", "status": "BLOCKED（真机层）" },
+    { "item": "Bridge 真实平台账户收发", "reason": "无授权测试账户与收件目标；不对真实联系人发送试验消息", "status": "BLOCKED（真实账户）" },
+    { "item": "真实付费模型连通（含媒体生成）", "reason": "无凭证/费用授权（P04-T07-2 继承）；witness 替身已覆盖全协议族真实 HTTP", "status": "BLOCKED（真实供应商）" }
+  ],
+  "no_new_features_check": "回归未新增功能、未改 UI 布局、未改权限/人格/MOOD/观测分组/知识来源/文件交付行为（生产 diff 见 LEGACY_EXIT_LEDGER §0，本轮 P08 仅删 skills2set pycache 残留与证据文件）"
+}

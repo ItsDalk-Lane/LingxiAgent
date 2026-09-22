@@ -44,7 +44,12 @@ export type WitnessScript =
   | { kind: "json"; body: unknown; status?: number; headers?: Record<string, string>; delayMs?: number }
   | { kind: "text"; body: string; status?: number; contentType?: string; delayMs?: number }
   | { kind: "hang" }
-  | { kind: "reset" };
+  | { kind: "reset" }
+  /**
+   * P04-A06：按字节分片投递 SSE（chunks 为原始字节，允许把多字节 UTF-8 字符
+   * 拆到 TCP 分片边界），验证真实流式解析栈的分片重组与工具参数拼接。
+   */
+  | { kind: "sse-bytes"; chunks: Buffer[]; status?: number; headers?: Record<string, string>; interChunkDelayMs?: number };
 
 export interface FakeProviderWitness {
   port: number;
@@ -97,7 +102,7 @@ export async function startFakeProviderWitness(
       };
       captures.push(capture);
       const entry = script.shift() ?? defaultEntry;
-      const apply = () => {
+      const apply = async () => {
         if (entry.kind === "hang") return; // 不响应（timeout/abort 场景）
         if (entry.kind === "reset") {
           res.destroy();
@@ -112,9 +117,22 @@ export async function startFakeProviderWitness(
         } else if (entry.kind === "json") {
           body = typeof entry.body === "string" ? entry.body : JSON.stringify(entry.body);
           headersOut["content-type"] ??= "application/json";
-        } else {
+        } else if (entry.kind === "text") {
           body = entry.body;
           headersOut["content-type"] ??= entry.contentType ?? "text/plain";
+        }
+        if (entry.kind === "sse-bytes") {
+          // 字节分片：逐片 write，片间可加短延迟，确保独立 TCP 分片投递
+          headersOut["content-type"] ??= "text/event-stream";
+          capture.responseStatus = status;
+          res.writeHead(status, headersOut);
+          const interChunkDelayMs = entry.interChunkDelayMs ?? 0;
+          for (const chunk of entry.chunks) {
+            if (interChunkDelayMs > 0) await new Promise((r) => setTimeout(r, interChunkDelayMs));
+            res.write(chunk);
+          }
+          res.end();
+          return;
         }
         if (entry.delayMs && entry.delayMs > 0) {
           setTimeout(() => {
@@ -128,7 +146,7 @@ export async function startFakeProviderWitness(
         res.writeHead(status, headersOut);
         res.end(body);
       };
-      apply();
+      void apply();
     });
   });
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));

@@ -1,0 +1,139 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/core-contracts-strict.test.ts > core contracts strict gate (P01-T04) > real core contract files pass strict with noUncheckedIndexedAccess and exactOptionalPropertyTypes
+AssertionError: expected [ { …(5) }, { …(5) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "character": 77,
++     "code": "TS2769",
++     "file": "lib/task-registry.ts",
++     "line": 40,
++     "message": "No overload matches this call.   Overload 1 of 2, '(predicate: (value: string, index: number, array: string[]) => value is TaskStatus, thisArg?: any): TaskStatus[]', gave the following error.     Argument of type '(status: TaskStatus) => boolean' is not assignable to parameter of type '(value: string, index: number, array: string[]) => value is TaskStatus'.       Types of parameters 'status' and 'value' are incompatible.         Type 'string' is not assignable to type 'TaskStatus'.   Overload 2 of 2, '(predicate: (value: string, index: number, array: string[]) => unknown, thisArg?: any): string[]', gave the following error.     Argument of type '(status: TaskStatus) => boolean' is not assignable to parameter of type '(value: string, index: number, array: string[]) => unknown'.       Types of parameters 'status' and 'value' are incompatible.         Type 'string' is not assignable to type 'TaskStatus'.",
++   },
++   {
++     "character": 76,
++     "code": "TS2769",
++     "file": "lib/task-registry.ts",
++     "line": 42,
++     "message": "No overload matches this call.   Overload 1 of 2, '(predicate: (value: string, index: number, array: string[]) => value is TaskStatus, thisArg?: any): TaskStatus[]', gave the following error.     Argument of type '(status: TaskStatus) => boolean' is not assignable to parameter of type '(value: string, index: number, array: string[]) => value is TaskStatus'.       Types of parameters 'status' and 'value' are incompatible.         Type 'string' is not assignable to type 'TaskStatus'.   Overload 2 of 2, '(predicate: (value: string, index: number, array: string[]) => unknown, thisArg?: any): string[]', gave the following error.     Argument of type '(status: TaskStatus) => boolean' is not assignable to parameter of type '(value: string, index: number, array: string[]) => unknown'.       Types of parameters 'status' and 'value' are incompatible.         Type 'string' is not assignable to type 'TaskStatus'.",
++   },
++ ]
+
+ ❯ tests/core-contracts-strict.test.ts:39:32
+     37|       "cli/local-server.ts",
+     38|     ]));
+     39|     expect(report.diagnostics).toEqual([]);
+       |                                ^
+     40|   });
+     41|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/core-contracts-strict.test.ts > core contracts strict gate (P01-T04) > A05: injecting the null-unsafe negative fixture fails the check with a null-check error code
+AssertionError: expected [ { …(5) }, { …(5) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "character": 77,
++     "code": "TS2769",
++     "file": "lib/task-registry.ts",
++     "line": 40,
++     "message": "No overload matches this call.   Overload 1 of 2, '(predicate: (value: string, index: number, array: string[]) => value is TaskStatus, thisArg?: any): TaskStatus[]', gave the following error.     Argument of type '(status: TaskStatus) => boolean' is not assignable to parameter of type '(value: string, index: number, array: string[]) => value is TaskStatus'.       Types of parameters 'status' and 'value' are incompatible.         Type 'string' is not assignable to type 'TaskStatus'.   Overload 2 of 2, '(predicate: (value: string, index: number, array: string[]) => unknown, thisArg?: any): string[]', gave the following error.     Argument of type '(status: TaskStatus) => boolean' is not assignable to parameter of type '(value: string, index: number, array: string[]) => unknown'.       Types of parameters 'status' and 'value' are incompatible.         Type 'string' is not assignable to type 'TaskStatus'.",
++   },
++   {
++     "character": 76,
++     "code": "TS2769",
++     "file": "lib/task-registry.ts",
++     "line": 42,
++     "message": "No overload matches this call.   Overload 1 of 2, '(predicate: (value: string, index: number, array: string[]) => value is TaskStatus, thisArg?: any): TaskStatus[]', gave the following error.     Argument of type '(status: TaskStatus) => boolean' is not assignable to parameter of type '(value: string, index: number, array: string[]) => value is TaskStatus'.       Types of parameters 'status' and 'value' are incompatible.         Type 'string' is not assignable to type 'TaskStatus'.   Overload 2 of 2, '(predicate: (value: string, index: number, array: string[]) => unknown, thisArg?: any): string[]', gave the following error.     Argument of type '(status: TaskStatus) => boolean' is not assignable to parameter of type '(value: string, index: number, array: string[]) => unknown'.       Types of parameters 'status' and 'value' are incompatible.         Type 'string' is not assignable to type 'TaskStatus'.",
++   },
++ ]
+
+ ❯ tests/core-contracts-strict.test.ts:52:88
+     50|     expect(nullErrors.length).toBeGreaterThanOrEqual(1);
+     51|     // 负例自身之外不允许有新错误（真实代码仍然干净）。
+     52|     expect(report.diagnostics.filter((d) => !d.file.endsWith("a05-null…
+       |                                                                                        ^
+     53|   });
+     54|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/core-contracts-strict.test.ts > core contracts strict gate (P01-T04) > A06: injecting the identity-misuse negative fixture is blocked by the brand type
+AssertionError: expected [ { …(5) }, { …(5) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "character": 77,
++     "code": "TS2769",
++     "file": "lib/task-registry.ts",
++     "line": 40,
++     "message": "No overload matches this call.   Overload 1 of 2, '(predicate: (value: string, index: number, array: string[]) => value is TaskStatus, thisArg?: any): TaskStatus[]', gave the following error.     Argument of type '(status: TaskStatus) => boolean' is not assignable to parameter of type '(value: string, index: number, array: string[]) => value is TaskStatus'.       Types of parameters 'status' and 'value' are incompatible.         Type 'string' is not assignable to type 'TaskStatus'.   Overload 2 of 2, '(predicate: (value: string, index: number, array: string[]) => unknown, thisArg?: any): string[]', gave the following error.     Argument of type '(status: TaskStatus) => boolean' is not assignable to parameter of type '(value: string, index: number, array: string[]) => unknown'.       Types of parameters 'status' and 'value' are incompatible.         Type 'string' is not assignable to type 'TaskStatus'.",
++   },
++   {
++     "character": 76,
++     "code": "TS2769",
++     "file": "lib/task-registry.ts",
++     "line": 42,
++     "message": "No overload matches this call.   Overload 1 of 2, '(predicate: (value: string, index: number, array: string[]) => value is TaskStatus, thisArg?: any): TaskStatus[]', gave the following error.     Argument of type '(status: TaskStatus) => boolean' is not assignable to parameter of type '(value: string, index: number, array: string[]) => value is TaskStatus'.       Types of parameters 'status' and 'value' are incompatible.         Type 'string' is not assignable to type 'TaskStatus'.   Overload 2 of 2, '(predicate: (value: string, index: number, array: string[]) => unknown, thisArg?: any): string[]', gave the following error.     Argument of type '(status: TaskStatus) => boolean' is not assignable to parameter of type '(value: string, index: number, array: string[]) => unknown'.       Types of parameters 'status' and 'value' are incompatible.         Type 'string' is not assignable to type 'TaskStatus'.",
++   },
++ ]
+
+ ❯ tests/core-contracts-strict.test.ts:65:90
+     63|     expect(brandErrors.length).toBeGreaterThanOrEqual(1);
+     64|     expect(brandErrors[0].message).toContain("ModelCallId");
+     65|     expect(report.diagnostics.filter((d) => !d.file.endsWith("a06-iden…
+       |                                                                                          ^
+     66|   });
+     67|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/core-contracts-strict.test.ts > C21: 真实实现拒绝错误批次、可空任务、入口种类和跨域身份
+AssertionError: expected [ { …(5) }, { …(5) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "character": 77,
++     "code": "TS2769",
++     "file": "lib/task-registry.ts",
++     "line": 40,
++     "message": "No overload matches this call.   Overload 1 of 2, '(predicate: (value: string, index: number, array: string[]) => value is TaskStatus, thisArg?: any): TaskStatus[]', gave the following error.     Argument of type '(status: TaskStatus) => boolean' is not assignable to parameter of type '(value: string, index: number, array: string[]) => value is TaskStatus'.       Types of parameters 'status' and 'value' are incompatible.         Type 'string' is not assignable to type 'TaskStatus'.   Overload 2 of 2, '(predicate: (value: string, index: number, array: string[]) => unknown, thisArg?: any): string[]', gave the following error.     Argument of type '(status: TaskStatus) => boolean' is not assignable to parameter of type '(value: string, index: number, array: string[]) => unknown'.       Types of parameters 'status' and 'value' are incompatible.         Type 'string' is not assignable to type 'TaskStatus'.",
++   },
++   {
++     "character": 76,
++     "code": "TS2769",
++     "file": "lib/task-registry.ts",
++     "line": 42,
++     "message": "No overload matches this call.   Overload 1 of 2, '(predicate: (value: string, index: number, array: string[]) => value is TaskStatus, thisArg?: any): TaskStatus[]', gave the following error.     Argument of type '(status: TaskStatus) => boolean' is not assignable to parameter of type '(value: string, index: number, array: string[]) => value is TaskStatus'.       Types of parameters 'status' and 'value' are incompatible.         Type 'string' is not assignable to type 'TaskStatus'.   Overload 2 of 2, '(predicate: (value: string, index: number, array: string[]) => unknown, thisArg?: any): string[]', gave the following error.     Argument of type '(status: TaskStatus) => boolean' is not assignable to parameter of type '(value: string, index: number, array: string[]) => unknown'.       Types of parameters 'status' and 'value' are incompatible.         Type 'string' is not assignable to type 'TaskStatus'.",
++   },
++ ]
+
+ ❯ tests/core-contracts-strict.test.ts:125:95
+    123|   const errors = report.diagnostics.filter(d => d.file.endsWith("repai…
+    124|   expect(errors.map(d => d.line)).toEqual(expect.arrayContaining([8, 9…
+    125|   expect(report.diagnostics.filter(d => !d.file.endsWith("repair-imple…
+       |                                                                                               ^
+    126| });
+    127|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+

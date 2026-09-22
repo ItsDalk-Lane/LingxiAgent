@@ -1,0 +1,16 @@
+lib/llm/provider-client.ts:344:      const result = await withModelRequestAccounting({
+lib/llm/observed-pi-direct-summary.ts:160:      ledgerRequestId = context.usageLedger.start({
+lib/llm/observed-pi-direct-summary.ts:186:      try { context.usageLedger.recordError(ledgerRequestId, error); } catch { /* never break */ }
+lib/llm/observed-pi-direct-summary.ts:204:    try { context.usageLedger.finish(ledgerRequestId); } catch { /* never break */ }
+lib/llm/model-request-accounting.ts:7:export async function withModelRequestAccounting({
+core/session-coordinator.ts:612:    const request = ledger.start({
+core/session-coordinator.ts:618:    return ledger.recordError(request.requestId, new Error(errorMessage || "provider request failed"));
+core/session-coordinator.ts:621:    return ledger.record({
+core/speech-recognition-service.ts:550:      const result = await withModelRequestAccounting({
+core/bridge-session-manager.ts:348:    const request = ledger.start({
+core/bridge-session-manager.ts:354:    return ledger.recordError(request.requestId, new Error(errorMessage));
+core/bridge-session-manager.ts:357:    return ledger.record({
+core/model-operation-client.ts:546:      const result = await withModelRequestAccounting({
+core/media/image-task-runner.ts:640:    const result = await withModelRequestAccounting({
+core/media/universal-media-manager.ts:962:      result = await withModelRequestAccounting({
+core/media/universal-media-manager.ts:1370:      result = await withModelRequestAccounting({

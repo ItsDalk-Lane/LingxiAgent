@@ -11,8 +11,8 @@ afterEach(() => {
 describe("TaskRegistry", () => {
   it("registerHandler validates abort method", () => {
     const reg = new TaskRegistry();
-    expect(() => reg.registerHandler("test", {})).toThrow("must have an abort");
-    expect(() => reg.registerHandler("test", { abort: "not a fn" })).toThrow("must have an abort");
+    expect(() => Reflect.apply(reg.registerHandler, reg, ["test", {}])).toThrow("must have an abort");
+    expect(() => Reflect.apply(reg.registerHandler, reg, ["test", { abort: "not a fn" }])).toThrow("must have an abort");
   });
 
   it("register + query returns task info", () => {

@@ -1,0 +1,47 @@
+# P04 复验收（FIXR1 后）复跑与独立取证记录（复验收子代理，2026-09-22T02:12Z）
+# cwd=/Users/study_superior/Desktop/Code/LingxiAgent HEAD=3286c96e571fadea65143df8baabf503d30d37f2（与执行/验收/修复轮一致）
+# 全程只读（本日志与 docs/refactor-2026/P04/P04_REACCEPTANCE_REVIEW.md 为唯一写入）；未用临时目录；未调用真实账户/未改用户数据；未 commit/push/tag。
+
+## 1. 证据清单独立复算
+$ shasum -a 256 -c docs/refactor-2026/P04/EVIDENCE_SHA256.txt
+# 输出 70 行全部 ": OK"；grep -v ": OK" 零输出；整体 exit=0
+SHASUM_EXIT=0  (70/70 OK)
+
+## 2. 独立写入面普查（与修复者不同口径：含 ?. 可选链、别名、解构、跨目录）
+# 2a. withModelRequestAccounting 生产调用方（lib/core/server/shared/hub/desktop/src，排除 *.test.* 与 *testing*）：
+#   lib/llm/provider-client.ts:344 | core/speech-recognition-service.ts:550 | core/model-operation-client.ts:546
+#   core/media/universal-media-manager.ts:962,1370 | core/media/image-task-runner.ts:640   —— 共 6 处（5 文件）
+# 2b. ledger 四写方法直调（正则 ledger(\?)?\.(start|finish|record|recordError)，含 ?. 形态，排除测试/testing）：
+#   core/llm-client.ts:856,1054,1095 | core/session-coordinator.ts:612,618,621（recordAssistantUsage:588 内，调用点 2328/8560）
+#   core/bridge-session-manager.ts:348,354,357 | hub/agent-executor.ts:137,143,146
+#   lib/llm/observed-pi-direct-summary.ts:158,160,185,186,203,204 | lib/llm/cache-preserving-compaction-agent-run.ts:381,384,423,518,563
+#   lib/llm/model-request-accounting.ts:15,28,34,44（共享 helper 内部） | lib/llm/session-snapshot-side-task-runner.ts:83,96,101,104
+#   —— 29 行直调 + helper 内 4 行；与 USAGE_OWNERSHIP §1 表 7 处写入边界 + 1 处登记不可达点逐一对应，无第 9 处
+# 2c. 台账实例唯一性：grep createUsageLedger 生产命中仅 core/engine.ts:923（单实例 this._usageLedger）
+# 2d. llm_usage 事件生产者：生产代码仅 lib/llm/usage-ledger.ts:301 eventBus.emit；插件守卫 plugin-context.ts:193-204（fullAccess 例外，见报告边界观察）；skills2set/plugins 目录 grep llm_usage 零命中
+# 2e. 别名/解构反例：workflow-tool.ts:256,438 `const ledger = deps.getUsageLedger?.()` 仅 ledger.list（读路径预算汇总，非写入）；解构 `const {start,finish} = ledger` 零命中；desktop/cli（*.ts/*.cjs/*.tsx）零写入命中
+# 2f. session-snapshot-side-task-runner 不可达复核：runMemoryReflection 全仓（排除 node_modules/dist/.git/tests）仅定义处 lib/memory/memory-reflection-runner.ts:79 + 注释/测试引用，无生产调用方 —— §1「生产不可达」登记属实
+
+## 3. 抽查复跑（执行轮关键声称沿用 + 本轮定向）
+## 3a. npx vitest run tests/model-operation-resolver.test.ts tests/model-operation-client.test.ts tests/model-observability-e2e-chat.test.ts tests/model-observability-e2e-utility.test.ts
+      Test Files  4 passed (4)
+      Tests  41 passed (41)          # = 首轮验收 25/25 + 16/16 合并口径，一致
+## 3b. npx vitest run tests/llm-usage-ledger.test.ts tests/model-observability-accounting-projection.test.ts
+      Test Files  2 passed (2)
+      Tests  20 passed (20)          # projection 10 例与 USAGE_OWNERSHIP §2 声称一致
+## 3c. npm run typecheck
+exit=0                             # tsc x3
+## 3d. npm run check:tool-invocation-boundaries
+Tool invocation boundary check passed (2244 source files).  exit=0
+
+## 4. 修复轮纪律取证
+# 4a. git diff HEAD --stat：7 个跟踪文件（4 测试 +424 行/harness +26 行、P00 两文档各 +2 行注记），无任何生产源码文件
+# 4b. 跟踪文件 mtime 全部落在 09:20–09:32（执行轮）；FIXR1 时段（09:57–10:03）仅触碰未跟踪 docs/artifacts refactor-2026/P04/
+# 4c. P04_ACCEPTANCE_REVIEW.md mtime 09:49（首轮验收产物，未被修复轮回改）；执行轮六矩阵/契约文档 mtime 09:26–09:31（未被修复轮触碰）
+# 4d. F5 副作用复核：git show HEAD:...89bc0b64-to-r01-r10-source.patch 与工作区文件 sha256 均为 25fb315f6c5d68cedd2167321de4db9f84163daae69515714dba628ab69db709（一致，无漂移）
+
+## 5. 修复轮日志核对（P04-FIXR1-*）
+# writepoints-grep.out：第一版正则 17 行（漏 ?. 形态）——失败迭代如实留档
+# writepoints-grep2.out：修正正则 36 行，与本轮独立普查（§2）结果一致
+# json-validate.out：4 JSON 解析 OK | manifest-check.out：70 行 OK + 命令行与 cwd 留档
+# command-log.jsonl 28 条：3 条 FIXR1 命令 exit=0/PASS；shasum 终验不入 jsonl 的理由已在 P04_REPORT 修复节声明（保清单哈希稳定，输出留档）

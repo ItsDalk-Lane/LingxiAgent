@@ -1,0 +1,17 @@
+{
+  "at": "2026-09-22T10:42:10.102Z",
+  "sha": "b0e9118427e16206dcd25ecfb566d766ed476727",
+  "dirty": " M artifacts/refactor-2026/P05/logs/P05-ACCEPTANCE-counterexample.test.ts\n M build/cli-runtime-closure.json\n M build/persistence-schema-fingerprint.json\n M core/media/image-task-runner.ts\n M core/media/poller.ts\n M core/media/submit-image.ts\n M core/media/universal-media-manager.ts\n M core/session-permission-mode.ts\n M core/session-teardown.ts\n M core/session-turn-actions.ts\n M desktop/src/react/__tests__/chat-performance/p07-stream-buffer-wallclock.test.ts\n M desktop/src/react/__tests__/components/composer-send.transaction.test.ts\n M desktop/src/react/__tests__/components/computer-app-approval-prompt.test.ts\n M desktop/src/react/__tests__/services/chat-turn-lifecycle.test.ts\n M desktop/src/react/__tests__/services/composer-send-coordinator.test.ts\n M desktop/src/react/__tests__/services/stream-resume.test.ts\n M desktop/src/react/__tests__/services/turn-outcome-patterns.test.ts\n M desktop/src/react/__tests__/services/ws-knowledge-rollup-progress.test.ts\n M desktop/src/react/__tests__/services/ws-message-handler.test.ts\n M desktop/src/react/__tests__/services/ws-stream-abort-lifecycle.test.ts\n M desktop/src/react/hooks/use-stream-buffer.ts\n M desktop/src/react/services/stream-resume.ts\n M desktop/src/react/services/ws-message-handler.ts\n M docs/refactor-2026/P08/STRICT_FINAL_SCOPE.json\n M export-manifest.json\n M lib/exec-command/background.ts\n M lib/permission/tool-invocation-permission.ts\n M lib/pi-sdk/index.ts\n M lib/plan-mode/plan-file.ts\n M lib/task-registry.ts\n M lib/tools/invocation/schema-validator.ts\n M lib/tools/rewind-tool.ts\n M lib/tools/stop-task-tool.ts\n M lib/tools/subagent-tool.ts\n M scripts/check-core-contracts-strict.mjs\n M server/hono-helpers.ts\n M server/routes/chat.ts\n M server/routes/sessions.ts\n M server/task-bus-handlers.ts\n M shared/safe-fs.ts\n M shared/tool-categories.ts\n M tests/agent-executor-teardown.test.ts\n M tests/bridge-session-teardown.test.ts\n M tests/core-contracts-strict.test.ts\n M tests/model-no-fallback.test.ts\n M tests/permission-catalog-tools.test.ts\n M tests/session-teardown.test.ts\n M tests/session-turn-actions.test.ts\n M tests/task-identity-attempts.test.ts\n M tests/task-registry.test.ts\n M tsconfig.core-contracts.json\n?? artifacts/refactor-2026/independent-fix/\n?? desktop/src/react/services/stream-admission.ts\n?? docs/refactor-2026/independent-fix/\n?? lib/pi-sdk/session-shutdown.ts\n?? lib/tasks/task-execution.ts\n?? server/session-create-input.ts\n?? tests/f01-task-write-contract.test.ts\n?? tests/fixtures/core-contracts-negative/repair-implementation-misuse.ts\n?? tests/fixtures/core-contracts-negative/task-execution-misuse.ts\n?? tests/session-create-input-contract.test.ts\n?? tests/stream-route-consumer-isolation.test.ts\n",
+  "node": "v24.16.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "temp": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-package-72WB24",
+  "build": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-package-72WB24/build",
+  "lockSha256": "a9735825cea1d018c2a42ae04f875368a003c386ca68fc86503bc8acbcd79d3c",
+  "localOnly": true,
+  "reusedHelpers": [
+    "dist-computer-use/mac-arm64",
+    "dist-speech/mac-arm64"
+  ],
+  "sourceSnapshot": "source-snapshot.json"
+}

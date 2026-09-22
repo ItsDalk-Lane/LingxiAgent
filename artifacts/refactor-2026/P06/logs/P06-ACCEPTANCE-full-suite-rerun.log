@@ -1,0 +1,31 @@
+P06 独立验收全量复跑记录（2026-09-22，验收子代理）
+====================================================
+
+运行 A（前台，2026-09-22 12:54 起）
+命令：npm test（cwd=/Users/study_superior/Desktop/Code/LingxiAgent）
+终态摘要（原样）：
+ Test Files  3 failed | 1455 passed | 3 skipped (1461)
+ Tests  4 failed | 14792 passed | 1 expected fail | 15 skipped (14812)
+ Duration  88.67s
+红组（由运行 B 的逐名 FAIL 与执行者日志 P06-T07-full-suite.out 对照一致）：
+ - tests/post-verification-audit-seal.test.ts > changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced)
+ - tests/round2-delivery-evidence.test.ts > R10-03 / R10-04
+ - tests/round3-delivery-evidence.test.ts > round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试
+= 4 红，与执行者 P06_REPORT/P05 基线逐名一致；14792/1/15 数字逐项相同。
+副作用：运行后 artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch
+被测试重写（sha256 25fb315f… → f1ca90e6…，+130430/-17715），验收侧已 git checkout
+还原回 25fb315f6c5d68cedd2167321de4db9f84163daae69515714dba628ab69db709（= HEAD）。
+
+运行 B（后台 grep 捕获，同命令同工作区，调度顺序不同）
+捕获的 FAIL 行（原样）：
+ FAIL  tests/post-verification-audit-seal.test.ts > post-verification audit seal (diff guard) > changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced)
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-09: 增量补丁从干净 89bc0b64 重放后，源码摘要与当前工作树完全一致
+ FAIL  tests/round3-delivery-evidence.test.ts > round3 C01-C03 候选交付证据契约 > round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试
+观察：第 5 红 R10-09 仅在运行 B（补丁处于 HEAD 还原态、且本次调度未发生运行中重写）出现。
+定性：R10-09 依赖 f1 patch 重写副作用的发生时序，属 P04 起已知现象的顺序依赖波动，
+非 P06 引入（P06 未触碰 round2/round3/audit-seal 测试与 .sync-audit；执行者运行与本
+验收运行 A 均为 4 红）。运行 B 结束后补丁仍为 HEAD 态（未被重写）。
+
+验收终态核查：git status 干净于 artifacts/f1-f12-repair/；shasum = 25fb315f…（HEAD）。

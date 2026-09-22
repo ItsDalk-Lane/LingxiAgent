@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "note": "各索引保持原格式、原退出码与各轮候选；不得累计测试数字。main最终sourceDigest与SOURCE_MANIFEST对应。",
+  "indexes": [
+    {
+      "path": "artifacts/refactor-2026/independent-fix/f01/commands.jsonl",
+      "records": 17
+    },
+    {
+      "path": "artifacts/refactor-2026/independent-fix/f02/commands.jsonl",
+      "records": 10
+    },
+    {
+      "path": "artifacts/refactor-2026/independent-fix/f03/command-log.jsonl",
+      "records": 18
+    },
+    {
+      "path": "artifacts/refactor-2026/independent-fix/f05-package/before-final-helper-fix/commands.jsonl",
+      "records": 7
+    },
+    {
+      "path": "artifacts/refactor-2026/independent-fix/f05-package/commands.jsonl",
+      "records": 8
+    },
+    {
+      "path": "artifacts/refactor-2026/independent-fix/f05-package/helper-intermediate/commands.jsonl",
+      "records": 4
+    },
+    {
+      "path": "artifacts/refactor-2026/independent-fix/f05-package/intermediate-snapshot/commands.jsonl",
+      "records": 8
+    },
+    {
+      "path": "artifacts/refactor-2026/independent-fix/f05-upgrade/commands.jsonl",
+      "records": 1
+    },
+    {
+      "path": "artifacts/refactor-2026/independent-fix/history-compat-final/commands.jsonl",
+      "records": 5
+    },
+    {
+      "path": "artifacts/refactor-2026/independent-fix/history-compat/commands.jsonl",
+      "records": 5
+    },
+    {
+      "path": "artifacts/refactor-2026/independent-fix/main/commands.jsonl",
+      "records": 59
+    },
+    {
+      "path": "artifacts/refactor-2026/independent-fix/recheck-r1-r2/commands.jsonl",
+      "records": 3
+    }
+  ],
+  "final_command_ids": [
+    "delivery-typecheck",
+    "delivery-lint",
+    "delivery-tool-boundaries",
+    "delivery-boundaries",
+    "delivery-open-build",
+    "delivery-open-smoke",
+    "engineering-full-tests-delivery",
+    "delivery-history-compat"
+  ],
+  "recheck_command_ids": [
+    "recheck-r1-red",
+    "recheck-r2-red",
+    "recheck-f03-regression",
+    "recheck-typecheck",
+    "recheck-strict-contracts",
+    "recheck-ws-protocol",
+    "recheck-lint-scope",
+    "recheck-affected-surface",
+    "engineering-full-tests-recheck"
+  ]
+}

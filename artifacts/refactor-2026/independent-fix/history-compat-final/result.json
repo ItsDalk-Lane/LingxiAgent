@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "files": 2,
+  "testsPassed": 8,
+  "skipped": 0,
+  "exitCode": 0,
+  "oldCommit": "1d42b7405c76292f617291e3a01cd2f3ef5efd04",
+  "currentCandidateSourceDigest": "0358696d350a05785af9c7d55395b22e39874aeea1124a7fbc8e07c5bce71d45",
+  "dependencyInstall": "old package-lock npm ci",
+  "cloneRemoved": true,
+  "originalSkipConditionUnchanged": true,
+  "evidence": [
+    "commands.jsonl",
+    "locked-install.log",
+    "compat-eight.log",
+    "worktree-remove.log"
+  ],
+  "scopeLimitation": "真实HTTP及当前消费者，不是完整旧GUI；本轮最后生产修复后重跑，原全量15skip不改写"
+}

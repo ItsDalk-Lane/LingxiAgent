@@ -1,0 +1,249 @@
+{
+  "package": "F01",
+  "observation": "O01",
+  "status": "PASS",
+  "head": "b0e9118427e16206dcd25ecfb566d766ed476727",
+  "candidate": "uncommitted worktree; bind final source manifest from root report",
+  "node": "v24.16.0",
+  "regressions": [
+    {
+      "id": "C01",
+      "status": "PASS",
+      "test_files": [
+        "tests/f01-task-write-contract.test.ts"
+      ],
+      "test_names": [
+        "C01/C02/C03 completed 不被任何终态写入口改写",
+        "C01/C02/C03 failed 不被任何终态写入口改写",
+        "C01/C02/C03 aborted 不被任何终态写入口改写",
+        "C01/C02/C03 canceled 不被任何终态写入口改写"
+      ],
+      "taskbook": [
+        "P02-T02",
+        "P02-A02"
+      ],
+      "command_id": "targeted-final",
+      "command_index": "artifacts/refactor-2026/independent-fix/f01/commands.jsonl",
+      "log": "artifacts/refactor-2026/independent-fix/f01/targeted-final.log",
+      "production_entry": "lib/task-registry.ts + server/task-bus-handlers.ts"
+    },
+    {
+      "id": "C02",
+      "status": "PASS",
+      "test_files": [
+        "tests/f01-task-write-contract.test.ts"
+      ],
+      "test_names": [
+        "C01/C02/C03 completed 不被任何终态写入口改写",
+        "C01/C02/C03 failed 不被任何终态写入口改写",
+        "C01/C02/C03 aborted 不被任何终态写入口改写",
+        "C01/C02/C03 canceled 不被任何终态写入口改写"
+      ],
+      "taskbook": [
+        "P02-T02",
+        "P02-A02"
+      ],
+      "command_id": "targeted-final",
+      "command_index": "artifacts/refactor-2026/independent-fix/f01/commands.jsonl",
+      "log": "artifacts/refactor-2026/independent-fix/f01/targeted-final.log",
+      "production_entry": "lib/task-registry.ts + server/task-bus-handlers.ts"
+    },
+    {
+      "id": "C03",
+      "status": "PASS",
+      "test_files": [
+        "tests/f01-task-write-contract.test.ts"
+      ],
+      "test_names": [
+        "C01/C02/C03 completed 不被任何终态写入口改写",
+        "C01/C02/C03 failed 不被任何终态写入口改写",
+        "C01/C02/C03 aborted 不被任何终态写入口改写",
+        "C01/C02/C03 canceled 不被任何终态写入口改写"
+      ],
+      "taskbook": [
+        "P02-T02",
+        "P02-A02"
+      ],
+      "command_id": "targeted-final",
+      "command_index": "artifacts/refactor-2026/independent-fix/f01/commands.jsonl",
+      "log": "artifacts/refactor-2026/independent-fix/f01/targeted-final.log",
+      "production_entry": "lib/task-registry.ts + server/task-bus-handlers.ts"
+    },
+    {
+      "id": "C04",
+      "status": "PASS",
+      "test_files": [
+        "tests/f01-task-write-contract.test.ts",
+        "tests/task-identity-attempts.test.ts"
+      ],
+      "test_names": [
+        "C04 复用后旧、缺失、null 批次的全部写入口被拒绝",
+        "C04 删除后重新登记保留批次，旧清理不会删除新执行",
+        "C04 清理墓碑有界，淘汰后仍拒绝旧批次与缺省回调"
+      ],
+      "taskbook": [
+        "P02-T01",
+        "P02-A03"
+      ],
+      "command_id": "targeted-final",
+      "command_index": "artifacts/refactor-2026/independent-fix/f01/commands.jsonl",
+      "log": "artifacts/refactor-2026/independent-fix/f01/targeted-final.log",
+      "production_entry": "lib/task-registry.ts + server/task-bus-handlers.ts"
+    },
+    {
+      "id": "C05",
+      "status": "PASS",
+      "test_files": [
+        "tests/f01-task-write-contract.test.ts"
+      ],
+      "test_names": [
+        "C05 真实总线拒绝无批次复用写入，真实后台生产回调捕获原批次"
+      ],
+      "taskbook": [
+        "P02-T01",
+        "P02-T08",
+        "P02-A03"
+      ],
+      "command_id": "targeted-final",
+      "command_index": "artifacts/refactor-2026/independent-fix/f01/commands.jsonl",
+      "log": "artifacts/refactor-2026/independent-fix/f01/targeted-final.log",
+      "production_entry": "lib/task-registry.ts + server/task-bus-handlers.ts",
+      "additional_tests": [
+        {
+          "file": "tests/f01-task-write-contract.test.ts",
+          "name": "C05 媒体交接只用宿主登记回执绑定批次，坏回执不退回缺省",
+          "status": "PASS",
+          "log": "artifacts/refactor-2026/independent-fix/f01/typed-callers-regression.log",
+          "production_entry": "TaskVisibilityAttempts → EventBus → TaskRegistry.remove"
+        }
+      ]
+    },
+    {
+      "id": "C06",
+      "status": "PASS",
+      "test_files": [
+        "tests/p02-cancellation-edges.test.ts",
+        "tests/p02-concurrency-edges.test.ts"
+      ],
+      "test_names": [
+        "abortBySession 使待审请求失效：工具执行 0 次，结果显式 aborted",
+        "审批晚到不能授权旧调用：已 abort 的 confirmId 再 resolve 返回 false",
+        "abort 后整组进程树退出；独立进程组的哨兵不受影响",
+        "超时清理走同一 kill 路径：timeout 后 reject timeout 标签",
+        "TaskRegistry.abortByParentSession(A) 不触碰 B 会话名下的任务"
+      ],
+      "taskbook": [
+        "P02-T03",
+        "P02-T04",
+        "P02-A05",
+        "P02-A06",
+        "P02-A07",
+        "P02-A08"
+      ],
+      "command_id": "targeted-final",
+      "command_index": "artifacts/refactor-2026/independent-fix/f01/commands.jsonl",
+      "log": "artifacts/refactor-2026/independent-fix/f01/targeted-final.log",
+      "production_entry": "ConfirmStore / tool permission / process-tree cleanup / TaskRegistry",
+      "additional_tests": [
+        {
+          "file": "tests/f01-task-write-contract.test.ts",
+          "name": "C06 后台任务跨会话并行，取消第一项使用它自己的父会话",
+          "red_log": "artifacts/refactor-2026/independent-fix/f01/background-parent-red.log",
+          "green_log": "artifacts/refactor-2026/independent-fix/f01/background-parent-green.log",
+          "production_entry": "lib/exec-command/background.ts registerBackgroundExec abort handler",
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "C07",
+      "status": "PASS",
+      "test_files": [
+        "tests/f01-task-write-contract.test.ts"
+      ],
+      "test_names": [
+        "C07 总线明确内存接受与落盘失败，重启不伪称保存成功"
+      ],
+      "taskbook": [
+        "P02-T05",
+        "P02-A11"
+      ],
+      "command_id": "targeted-final",
+      "command_index": "artifacts/refactor-2026/independent-fix/f01/commands.jsonl",
+      "log": "artifacts/refactor-2026/independent-fix/f01/targeted-final.log",
+      "production_entry": "lib/task-registry.ts + server/task-bus-handlers.ts"
+    },
+    {
+      "id": "C08",
+      "status": "PASS",
+      "test_files": [
+        "tests/p02-recovery-restart.test.ts"
+      ],
+      "test_names": [
+        "deferred durable 交接在 flush 失败时显式 ok:false，状态未保存可见；修复后原样重试成功",
+        "重启后不自动重复写、状态可解释未知、attempt 保留"
+      ],
+      "taskbook": [
+        "P02-T05",
+        "P02-A09",
+        "P02-A10",
+        "P02-A11"
+      ],
+      "command_id": "targeted-final",
+      "command_index": "artifacts/refactor-2026/independent-fix/f01/commands.jsonl",
+      "log": "artifacts/refactor-2026/independent-fix/f01/targeted-final.log",
+      "production_entry": "lib/deferred-result-store.ts + server/deferred-result-bus-handlers.ts"
+    }
+  ],
+  "red": {
+    "failed": 6,
+    "log": "artifacts/refactor-2026/independent-fix/f01/red.log"
+  },
+  "green": {
+    "files": 12,
+    "tests": 153,
+    "exit_code": 0
+  },
+  "additional_green": {
+    "files": 4,
+    "tests": 53,
+    "exit_code": 0,
+    "log": "artifacts/refactor-2026/independent-fix/f01/background-parent-green.log",
+    "note": "Overlap with prior targeted suite; do not add counts as unique tests"
+  },
+  "typed_production_callers": {
+    "implementation": "lib/tasks/task-execution.ts",
+    "strict_root": true,
+    "consumers": [
+      "lib/exec-command/background.ts",
+      "lib/tools/rewind-tool.ts",
+      "lib/tools/subagent-tool.ts",
+      "core/media/poller.ts",
+      "core/media/submit-image.ts",
+      "core/media/image-task-runner.ts",
+      "core/media/universal-media-manager.ts"
+    ],
+    "tests": {
+      "files": 7,
+      "tests": 124,
+      "exit_code": 0,
+      "log": "artifacts/refactor-2026/independent-fix/f01/typed-callers-regression.log"
+    },
+    "typecheck": {
+      "exit_code": 0,
+      "log": "artifacts/refactor-2026/independent-fix/f01/typed-callers-typecheck.log"
+    },
+    "negative_fixture": "tests/fixtures/core-contracts-negative/task-execution-misuse.ts"
+  },
+  "final_cleanup_validation": {
+    "test": "C07 媒体可见性清理失败保留错误并释放批次索引",
+    "file": "tests/f01-task-write-contract.test.ts",
+    "red_log": "artifacts/refactor-2026/independent-fix/f01/visibility-cleanup-red.log",
+    "green_log": "artifacts/refactor-2026/independent-fix/f01/visibility-cleanup-green.log",
+    "files": 4,
+    "tests": 55,
+    "exit_code": 0,
+    "strict_implementation": "lib/tasks/task-execution.ts",
+    "new_any_or_escape_hatch": false
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "mode": "loopback",
+  "listenHost": "127.0.0.1",
+  "listenPort": 14500,
+  "customRemote": {
+    "enabled": false,
+    "baseUrl": null,
+    "wsUrl": null
+  },
+  "createdAt": "2026-09-21T12:43:53.330Z",
+  "updatedAt": "2026-09-21T12:43:53.330Z"
+}

@@ -1,0 +1,22 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/chat-route-switching.test.ts > P05 stream resume semantics (real route + real stream store) > A05：ring 截断——过旧 sinceSeq 恢复返回 truncated=true 且只从最早存活事件补起
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/chat-route-switching.test.ts:3292:31
+    3290|     const current = await h.resume({ sinceSeq: 0 });
+    3291|     // 该 resume 以当前流从头重放（无 streamId → 视为当前流），不应误报截断
+    3292|     expect(current.truncated).toBe(false);
+       |                               ^
+    3293|     const nextSeq = current.nextSeq;
+    3294|     expect(nextSeq).toBeGreaterThan(5000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

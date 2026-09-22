@@ -1,0 +1,2566 @@
+[
+  {
+    "path": "desktop/dist-renderer/icon.png",
+    "sha256": "a168fc2bb9a976aecbd05dde4ed3bef6b884a1f5c5c8f411a968fea470270112"
+  },
+  {
+    "path": "desktop/dist-renderer/index.html",
+    "sha256": "9c4286f2b05314f27f89bb9dcc5c1fdd73498ccff4e7f9ec63526a20e388193a"
+  },
+  {
+    "path": "desktop/dist-renderer/animations.css",
+    "sha256": "d4280f67c90feffc9ff0118f780fe71c98b433142df16c99229f85d2f7969494"
+  },
+  {
+    "path": "desktop/dist-renderer/browser-viewer.html",
+    "sha256": "6f121af5063ed17053476bbdd8e13c916ddeca2059ae1a7103518cbdc2994c62"
+  },
+  {
+    "path": "desktop/dist-renderer/styles.css",
+    "sha256": "0be59dcad5ac9cdaf0949544eb07f50cb62325e3cfcb4a1275cd5e938627b007"
+  },
+  {
+    "path": "desktop/dist-renderer/quick-chat.html",
+    "sha256": "e8d87025bb22ae8ac16188d72424c0dc8106d98a3db9d766534a55bc852133df"
+  },
+  {
+    "path": "desktop/dist-renderer/mobile.html",
+    "sha256": "92ec614bfa503a68498647cbb41b10f3657d739ee2d460b6ef8c23149eef43db"
+  },
+  {
+    "path": "desktop/dist-renderer/viewer-window.html",
+    "sha256": "e8018d3b4f1b50a4fe277c784b133164483fd60fc3216a25057752942b85bfe4"
+  },
+  {
+    "path": "desktop/dist-renderer/manifest.webmanifest",
+    "sha256": "8a02080a232678d03aee02e977120d7ac0904382f2dc90355c9e26c1cbeed9d0"
+  },
+  {
+    "path": "desktop/dist-renderer/settings.html",
+    "sha256": "73574c3197563b7cbe8da3706642aa40c004181d0c742c808ed02a7d26a9090e"
+  },
+  {
+    "path": "desktop/dist-renderer/sw.js",
+    "sha256": "7cab349fcbafce406bb02a8d78ce82860706b5449449a067442a42f92343e648"
+  },
+  {
+    "path": "desktop/dist-renderer/onboarding.html",
+    "sha256": "de78757d36d3ef2010c7552f508e7c4523d4c599b2f06b2353aff3bfe1e8770b"
+  },
+  {
+    "path": "desktop/dist-renderer/locales/zh.json",
+    "sha256": "d0d08780a63b04135585a002ba8a5557a443cf5b10122d0bf950b94d09c5e053"
+  },
+  {
+    "path": "desktop/dist-renderer/locales/ja.json",
+    "sha256": "19942618899c706baad71b028bd0c5aa2ecd538906e9c8971806f51a0ff88467"
+  },
+  {
+    "path": "desktop/dist-renderer/locales/en.json",
+    "sha256": "93615091fd7db5c02ae608dd2e54535c15eb2f0d48ec72377f45715a214a118f"
+  },
+  {
+    "path": "desktop/dist-renderer/locales/ko.json",
+    "sha256": "e0451e58c48dca65337242812c7982b0c7d689e1b6c476643e6fe4d6a70f8ed0"
+  },
+  {
+    "path": "desktop/dist-renderer/locales/zh-TW.json",
+    "sha256": "cbc9ddcfd781c5433bd2b11944509bebef9534d860e78915884b20f44de075e7"
+  },
+  {
+    "path": "desktop/dist-renderer/locales/.mimosa/hook-state/sess_56de8fde-af55-443f-b7a4-7735302216aa.continue.json",
+    "sha256": "9bf5f1b5ef6f4734743f097fe50c09434956b53ef130b0a01baa6a2834ef5473"
+  },
+  {
+    "path": "desktop/dist-renderer/locales/.mimosa/hook-state/sess_ca865dbe-09ff-4306-8f2c-e7445b32a00f.json",
+    "sha256": "07e7055c94bbbde565585729147bb177641bac505b0e65cc6597629ed10a5bcd"
+  },
+  {
+    "path": "desktop/dist-renderer/locales/.mimosa/hook-state/sess_56de8fde-af55-443f-b7a4-7735302216aa.json",
+    "sha256": "4a372cd1a6a49a2306910e7bd8b870c4806e807ebac374a4fdc78e99f4bf21ad"
+  },
+  {
+    "path": "desktop/dist-renderer/locales/.mimosa/hook-status/sess_ca865dbe-09ff-4306-8f2c-e7445b32a00f-6e54ab4e89.json",
+    "sha256": "a28a3c92df5461ca47cfa7a165c55ec44f15ac0557cd976904c8e0cfa97d4d2a"
+  },
+  {
+    "path": "desktop/dist-renderer/locales/.mimosa/hook-status/sess_56de8fde-af55-443f-b7a4-7735302216aa-ccff5ee153.json",
+    "sha256": "e9c9ab5dac9b64a70e703316f6d23f911124adcfc861d6879f3c48095d9554f6"
+  },
+  {
+    "path": "desktop/dist-renderer/lib/theme.js",
+    "sha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73"
+  },
+  {
+    "path": "desktop/dist-renderer/lib/theme.js.map",
+    "sha256": "7f53a9589cc9da9d8eed382ea081baf9dacd480ce5e15b8e7ec1844c3e00902e"
+  },
+  {
+    "path": "desktop/dist-renderer/lib/i18n.js",
+    "sha256": "a17a968e4e1b09515dd947423fa1e0dac1ea1d11b329e0f7d257224d47d1bc50"
+  },
+  {
+    "path": "desktop/dist-renderer/modules/connection-csp.js",
+    "sha256": "97deca6a94087cea65f4fd47fcb2e56d2c12cef0eeb1a4ee256aabfc4d9492ae"
+  },
+  {
+    "path": "desktop/dist-renderer/modules/platform.js",
+    "sha256": "9e251e7f1782adcd58492a31bdf51c108a17f853b6cc575d17af0deffa4050d4"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/spring-gauze-room-Bf5WWav_.jpg",
+    "sha256": "63a547045bb6eb382f453dbd4723e84ef8094972ad304f536db1015f7291c317"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/nature-plate-print-CxT7qrCp.jpg",
+    "sha256": "d76dfad317d3d00061b5c2c56e45f92fe3adcb0b418996fa704b4df4b11d8dea"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-70c693c26388-VPiiOlSj.woff2",
+    "sha256": "0af5a04314200627801ed9dff0c8cb2526c30dc76981fcede443a06cd35aace6"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Script-Regular-D3wIWfF6.woff2",
+    "sha256": "036d4e95149b69ff9bcc0cd55771efeb25ffa3947293e69acd78d5ac328c684b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/blue-island-watercolor-DnVNAM28.jpg",
+    "sha256": "a5fbc788f7c9e1d2dfbaf831a0c9a4388de92261a25127b02e609d90b5c1e336"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-e99de0e215f7-CjOpyANj.woff2",
+    "sha256": "f3666a14f5ab7707c2e9ec73cb2a4075e1c66bcfddcef479c0144aaf03e09ca4"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/dockerfile-BKs6k2Af.js",
+    "sha256": "95f163ab68a8f7365d9a168beafab67b4eaaf73ed8a051cad2bbb445d3dbd208"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ebgaramond-9947e6f6e128-DJEpPxNl.woff2",
+    "sha256": "79d17b52365a2d5bd8995c8c54939d384e9888ed2038c7201fd8d4118d6f0a35"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-10e9099bd7ee-B76Oja2x.woff2",
+    "sha256": "ae2d278a2ec633ead9e47ba12d777e073cb7c5f923d0eea282268f207c88ee7a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/SessionStatusCard-Ax9v4HRn.css",
+    "sha256": "f84e0f3fd71a73665e9b70cab8853b76cba0b57450fabe4213cfd7ab8c160ca7"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/oz-BzwKVEFT.js",
+    "sha256": "930fe68084255ef156188a29a640431ca0f276d323ce07241b92f1b678390777"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-7885a1dee93b-Dhje0hsk.woff2",
+    "sha256": "7240ed44b7738d40ffd8c01dd46ddc674fb329b7e46b307880d4fe69e4ce846f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_AMS-Regular-DRggAlZN.ttf",
+    "sha256": "68534840bcfdd2bffb6f0e8deb48684dd01e7f04ea2813267577afb906de1d13"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-f0f75f7d6cc3-Dogymtyn.woff2",
+    "sha256": "49e34eb82b76e0ebab35f4cf977b2a4828feaca62fabbc7b0fe52954cf266771"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-80beb326b682-FRizZili.woff2",
+    "sha256": "a56ca5009b41ad39553bcb89aba95e1d7ccde2e91cc07f6787af05c5dbef898b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-Rn9-Taj6.js",
+    "sha256": "faa31f3ac9167b7c338df24a8eb02490f8a538b2c11633a8f2f7749d54e5b158"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/http-DBlCnlav.js",
+    "sha256": "269060ee11376e85e7b8d4c7dd15c014fe4b755289a85d084d125a2615488e75"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-BbHlmgKX.js",
+    "sha256": "824c30e855569dd11c5d81658fd160892e6634c50fc697bab1cf9cd046dcd3d9"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/SettingsModalShell-WhfnfkbG.css",
+    "sha256": "a8293301995e2ea399dc1aec225d399c4b1a18a29506f950737835e49e7bb92a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/mermaid.core-DFUzhup7.js",
+    "sha256": "3631080b0668ec01b7b398c9987f38bbb7483de1a056022a62bf6b0d431165dc"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-8738086c4201-LCwHHLSt.woff2",
+    "sha256": "2e7fd9066d4e2e3da7be15336a87da9d1725cbe4f796cd9c3a969d80f048100a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Fraktur-Regular-CTYiF6lA.woff2",
+    "sha256": "51814d270d06ff0255dba0799994fa4d8c84d11f09951d47595f4abb1f3602dc"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/railroadDiagram-AXF67PYL-DqrCEjxv.js",
+    "sha256": "74c7009982139fba30709e8f98bf530e80a4ec939fe6324e02456e1cfe4ec605"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ganttDiagram-PKOTCBZU-B2c_PsxL.js",
+    "sha256": "838e633c7160afd90ff05bdd00a3c9b5c9e4947466ce4b4cc38ec0a6dbc8988a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Caligraphic-Regular-wX97UBjC.ttf",
+    "sha256": "ed0b74372feefcbb9c0666b2e210da37b7e49fa7fbbf3eeb11db5f693dacfbb7"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/solr-DehyRSwq.js",
+    "sha256": "c4f3f72687c813db9a8a676f52b958aec08292b294aade4f43ee53222bafb2cd"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/Toggle-DKRysKr8.css",
+    "sha256": "87ef9540e6574d0b21b8caaa47dbc919c084cc570c6c7506ac9c2fb94d4b6dcd"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-f50ab6a52acf-AY3XH7OX.woff2",
+    "sha256": "c295abb1cb77ccdaceac3704c57853df46a761ba53a47c5260b1cb6992e8fda6"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/forth-Ffai-XNe.js",
+    "sha256": "f6680528a050997990fd2eac73d2fee5e3c5432b34aaf52fe1fdc2f984db261b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-7f25644ebb96-rghfHuOV.woff2",
+    "sha256": "80cbe1f2b9c2cd4db4e491003f7d09806d5b60ada1792bc17c7d4d81aa5a79a0"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/timeline-definition-Z64GVDOM-tiwLW_Su.js",
+    "sha256": "d346a008f5257ad1184b0543754d3528c15fd935df0811846286c1bc8c092ebe"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-cfe56591799a-CNQP8_f5.woff2",
+    "sha256": "89a5c6ab5b4faa068df9c289cf79d1bab3e068f3e07b7fad019f0bc17333d1bc"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/nsis-LdVXkNf5.js",
+    "sha256": "b57b168755b7a19fc7100fb4dba6b50b66e3e8561606232b8be6020c13ef4f1b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/classDiagram-v2-OCEON4UE-CdIior43.js",
+    "sha256": "acc6adc6bed4b33067a560ca88ea5ea44acbc9a3cce93e4ee8bb9fc46a5f5cf0"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/quick-chat-eDWijwAf.js",
+    "sha256": "bf5d4644675d53aaa7326c4d0eaacd4168d4c7c33e4e59c63e57211c05110555"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-9bd4092a33fb-DVGQb5q5.woff2",
+    "sha256": "266ad8c16bc7f8282dad4b55e6fddd6e21f43520aee248647ae5715d59552dfa"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/sequenceDiagram-SI44F4Z6-gahX5HCg.js",
+    "sha256": "685b6d25a2be4b27dd468381bab5837c4f71d35d09bbcb9e41926eba48868648"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/apl-B4CMkyY2.js",
+    "sha256": "f242eda34c4a72bd8e51c278934ec62fe4804f129733e27d0441e1dc8bbc07a9"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/theme-registry-BBmOuR54.js",
+    "sha256": "df986d3fe383858f593964b12386b76aec4447e4044b3ad67033cb1f67ccc064"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/xychartDiagram-ELKLHX3M-DNQck0pl.js",
+    "sha256": "b7b9056b751f371d6f38683d3ab723344834caa6d285bdcafe63c12404e3bcab"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/protobuf-ChK-085T.js",
+    "sha256": "872320ac45a7915b0f7aed71325ae2adb105b51cadd2a6fc74b65f5a552791ae"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/SessionStatusCard-CR5lio5J.js",
+    "sha256": "ad2629831af066da7579419cb24032c69d5428049c93f51c0a81c7ad5bc7effd"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/icon-BaVFOTDl.png",
+    "sha256": "a168fc2bb9a976aecbd05dde4ed3bef6b884a1f5c5c8f411a968fea470270112"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/commonlisp-DBKNyK5s.js",
+    "sha256": "5ab53180afeb19f45f2adb48571c37465b9b697129377d2745eb0948ee8add01"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Main-Regular-Dr94JaBh.woff",
+    "sha256": "c6368d87e8a1a3a5d337623d83d8dc4b868f242a9ad476237d6f8d1e0f168cdc"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-4dca2c601897-BE6r3Lb4.woff2",
+    "sha256": "3789541ab21901c4ada9ebc8056a24b6efcd423eef7c6b897251380f697c3193"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/chunk-5RXB4S5H-B6IFwdNg.js",
+    "sha256": "2df16b028a4e8b61b5d4a7ffac80ef84b161a7bfed09dcf8a5bcd7a5f480d2dd"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/swimlanes-SLNWSIFB-DjSAH3_D.js",
+    "sha256": "1badd609d989969529c700091a3a02c7e7d1552667098005e73ea87044581015"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-CGr5kfvE.js",
+    "sha256": "d6dd2e0957dfa6c57504fcc7bc2071d1eb881bd32c25ab7a6bd98497a3877597"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Size3-Regular-DgpXs0kz.ttf",
+    "sha256": "500e04d54f0d51666332c9d2089aa803be22aa878eca539e59fa53c6e522b082"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/pascal--L3eBynH.js",
+    "sha256": "19eb54c507f12be735989dcfebb5dc2f7a139777cdd71665896fb4bd287f89ca"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/brainfuck-C4LP7Hcl.js",
+    "sha256": "de73a71178f148e59b5a6d7ca989842599d46d92836517bad1ddf005a968ab4e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/tiddlywiki-DO-Gjzrf.js",
+    "sha256": "0bf0e719c5c34298e72e308cd6be69ca63680a0bf538086adf4939a16f41aa8a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-119da54bda94-CODiDIwp.woff2",
+    "sha256": "90cc9eda826a15b41d93c8546e3e4c98708ecae34cd6f1317bff6bed6863d9e3"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/SettingsModalShell-DT8c1rMW.js",
+    "sha256": "b909d44bf315c47fefcd9561c0fc9523f62070152ebd356246c812d99f979a1f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/classDiagram-JCYQIIEL-CdIior43.js",
+    "sha256": "acc6adc6bed4b33067a560ca88ea5ea44acbc9a3cce93e4ee8bb9fc46a5f5cf0"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/Kong.png",
+    "sha256": "6a58d038fd4d3450d699f734833575f60ee4b422039ea90001f02958daa0cf95"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-971f0defb8b3-DWOslWgF.woff2",
+    "sha256": "4693770f950c84313f48173b13106c966b471a1aff3b110440093bf4b77ffebe"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/nginx-DdIZxoE0.js",
+    "sha256": "67487e9c0fa87bca9b8e9be91aad97fca8b610627731156b4ae44116a2b33b36"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/quick-chat-Dn69UIxs.css",
+    "sha256": "c26eac1d15447c7c961452a7cf533d557b35b0458e81a2db6b1d4a828b71074a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-ad7e45295d7c-CPKL0KQm.woff2",
+    "sha256": "cfbda09fec2567865a8a761ef93062ae5f711889b7523026b0ec0ca4f7a68e92"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ebgaramond-dcf7f6fa2702-CYvOc2FV.woff2",
+    "sha256": "289219741ea10d13ceb82f32920af4f3d53c934bbcdc4a02372f7a955baf57d0"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ecl-Cabwm37j.js",
+    "sha256": "af42e9e8b926913548f8cf9d90bbe9ea829ced5b235a49d8b59e4f8010113fc1"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/main-D-nAkBJH.js",
+    "sha256": "4954b0fab71e557553c07935ac85ba70bbe88f28ca523e369d45742d56935285"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_SansSerif-Regular-BNo7hRIc.ttf",
+    "sha256": "f36ea897e19f4a2e571d1e900e4e3710e438deb05a842486045ba0a3e616a4ad"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/chunk-2Q5K7J3B-BCFo7OW7.js",
+    "sha256": "da0266e159f0ede594e0e948e1d7095dcc84f9853e1d600d3d073eeb3f073725"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cobol-CWcv1MsR.js",
+    "sha256": "b5708cea6e07765d16bd3cea07d4a10a3672636bbc45ce2d2646c9f1833a4372"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_SansSerif-Bold-CFMepnvq.ttf",
+    "sha256": "1ece03f79f95277d57dc7f6b435a74e1379b0d46104a8530286b60ff49369ea0"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/AnimationPrimitives-CE8Toi-_.css",
+    "sha256": "7ea0451291b26440b16dce1a580087191aa0d077d9b3b09cc68a993c4461f4d4"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ebgaramond-34b1bfba6955-CdJs288I.woff2",
+    "sha256": "e51a27d5d3e54c7728636791cdd303d3c9f0417fe69e9866ecbeb48ad0a49a3a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-62212c5d7cd3-DGMc2Zfc.woff2",
+    "sha256": "17d443c3d5ed4bcf621fdb09c5171725681a5e845b4cc05ebddb4fc995373f17"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/dylan-DwRh75JA.js",
+    "sha256": "9b7382fd95169a9a2b34765109c2bf6c7ae30b3dd0bd62759b04a49c3d394acc"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/summer-sea-fantasy-FXC6YBH_.jpg",
+    "sha256": "4a94368706c40f197146b6ade0fcdfae6115c2f74d375f6626c22c5222c3f834"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-aed56436e8a4-v69Q45Hq.woff2",
+    "sha256": "584785876a5f0cc425fce0736406554ad747fdc18aab43c4ad9a7e679c75e759"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/sakura-desktop-TfbbzJUH.png",
+    "sha256": "8baa4229868dcd0726ce92d3dd893e6911ff63d9f864240a7f01d68120e0ca18"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-cb2738af0113-CkD1k5Pb.woff2",
+    "sha256": "9576332f2a473094fb110562da8e21b547dcb69073dfe8e24167f0cf3dc3a231"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/mscgen-BA5vi2Kp.js",
+    "sha256": "f0e7bd8988241778eac8d6093bee63f099bcd957994a35c58979ff33f5a137cc"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/warm-paper-WMgL8WU0.css",
+    "sha256": "2c3afa526e559270f162c50dd1b48b37744c577680613d32675ca5fa8186c92f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/diff-DbItnlRl.js",
+    "sha256": "100f04b4d542403a267b0beed52abb489c507eb75bd1cff9e11447af2dbf9eda"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/dark-desktop-BgqqId7_.png",
+    "sha256": "ca2f7c1c82a87160cc7052c122daa012493bd695f9378f401bae610520060336"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Main-Regular-B22Nviop.woff2",
+    "sha256": "c2342cd8b869e01752a9321dc17213fc40d4d04c79688c1d43f2cf316abd7866"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/viewer-window-Dit96m-g.js",
+    "sha256": "3d1e715346955dd661f07befb177c25343939a44c15931802a6cb8d43f4f2b1a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/pastel-spring-bookmark-BHYaXbBt.jpg",
+    "sha256": "a9eecfe03c7cfa6dd102257486fd940648933a66a5bd9e9e153ac21d04c5bc7c"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cynefinDiagram-MW4NZA55-CuXnlxCw.js",
+    "sha256": "d068155bd531ae15dc4c34284d37fbed1c8058d3846b48c1989357ae86a10bde"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-49ed372fb213-BcAFbsNn.woff2",
+    "sha256": "e46ff0466edbaacfcf88f826d2acf6658b705983d8563f62baf9a12728474504"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/jetbrainsmono-b87346fdc77f-Db4Uuiha.woff2",
+    "sha256": "2c32b9b3ee358c119e210f6f5195f9bd34894d78a785ff2e95d60e718e400af4"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/PreviewPanel-3wH64KSe.css",
+    "sha256": "cf61a3441c368ed21a729849ead7660a7740f09b58acfb8066c3483b0fa3fe01"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/four-seasons-storybook-BNRFnnXC.jpg",
+    "sha256": "16c3ddf41b2bc2d40b23539f9b40096c7d759dfc41f1a52a843c3f3191785d29"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/browser-viewer-BqS7qqHc.js",
+    "sha256": "8daf75f34c04120490c320275971390f399ffe0f1af0d3836055e3f415cc5576"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/PlanModeButton-Bx0Lly_Z.css",
+    "sha256": "69c899ca04dc6988337a03f44b529fb6f766aae752a891f31533d477e0c12737"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/Toggle-u9TyOf30.js",
+    "sha256": "360662199eb7facb5ac859df237d1cb394bccb67510a172c9ab548025078faa5"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ttcn-cfg-B9xdYoR4.js",
+    "sha256": "8d367f5c728e0a125912df85cc96c61e1bd2616e3617535c70783494e6361653"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/light-mobile-CIcNIMlP.png",
+    "sha256": "8bb599db35c075362b502e60ba99462c3e22dc202902a73445a8df3751435a37"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/light-desktop-BVd6O_E5.png",
+    "sha256": "962d070d4ebe48391e40678caa1f855fedcf8548230e48e6c5220158db75d53a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/sql-D0XecflT.js",
+    "sha256": "de179cb192745a50f178503fd65ae5ff2488f34b4d421de85961a1207930a125"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ebgaramond-9dadaee72759-DVjXSTkF.woff2",
+    "sha256": "5e3fe3bc99526f4edd5f6ab046af54261aa4fbeb59412aa3e32a88cd30e20350"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-458b4ea6bede-Cbi9mu-9.woff2",
+    "sha256": "c704af2f7f454c232781096f5dd48f7438174db64b40abf28963dc847045ec2a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-DKrfUygp.js",
+    "sha256": "6737b2daf38264675f15f07e59ea3ff9f927187d7247bd9b042890af68a51977"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ChatPage-C2eGeBJN.css",
+    "sha256": "1bb7d9e7da4167cb06c992e4c628783bad29ecace2fdf297f689c64840672136"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ishikawaDiagram-WSZJBQD7-B_ohz3q4.js",
+    "sha256": "6e9a0646bfad874b2e0c366567cec545579a62987ff6a704c6339ad791925487"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-20a28253a539-CasMW42f.woff2",
+    "sha256": "d1a88f1ead7d8a19b91e6811a1e4e2114dd15516d8751d57f8f90360c289d885"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/gherkin-heZmZLOM.js",
+    "sha256": "75d36502feb18a52191c195ac7fd3b5f7e57a29b6e73ae30422815efc689fc81"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/scheme-C41bIUwD.js",
+    "sha256": "7ddaa1a5f63ea49d2ba6007ee977de4495644082218253d0c107f7b6865ce8fe"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/requirementDiagram-LRYGKXZP-U1T7Vktg.js",
+    "sha256": "1322de140dc3e880ce072bd4442fba1b3d40babe10aa5b21292261f052942a8f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/stex-C3f8Ysf7.js",
+    "sha256": "bee5f7a433d45272561fef44f62f4c354b7c849efbadfe2143da5595ce0c1537"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/dagre-VZM6K2ZE-C1rnwW_A.js",
+    "sha256": "7945c2829c6ff8c24a8ff1dc4dcfaa4ddffca454ea9ebe50a8e0076ea11116c2"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/infoDiagram-6WML65LV-CELZdTzm.js",
+    "sha256": "6c5ae3e2e3988c21d211c05026483afbbe31ea93c1a59988c75cff75a15ba98b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-C_SbvwU8.js",
+    "sha256": "79d26a6d012cee51ac3f1e398862c13c8422b82410de9df4faae1194fbcae3d0"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/Lingxi.png",
+    "sha256": "adca5a4c656c90eecd7d8caad722cba36aff314617fc2ba3f37ee0e8e3ad0f13"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-86f085af9be6-zZPAzzfH.woff2",
+    "sha256": "49cceeaa9f25f307a2dd4d3ce02bb9c33b035cbb461031c9dd2ffc1e90385557"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_AMS-Regular-DMm9YOAa.woff",
+    "sha256": "30da91e84c893f875e252689faebdc590b2871145e8adc7f9a9d4dbd8ce0b251"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-8e4c4d6a156f-PcsIAuB4.woff2",
+    "sha256": "ad1ec109702ef31152c19acc3a59e8fedbd237f15556be071d404e7ef3055e39"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cmake-BQqOBYOt.js",
+    "sha256": "754963f9ba8388c27113791b9da35a6291f5784fd853027081091ae4b9018ca7"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/tray-template.png",
+    "sha256": "a5f905b666bf3341ad7e9d57b2b46f0521b08474864d16d680427bda55c4f7e7"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/livescript-BwQOo05w.js",
+    "sha256": "63b490e7cca07ce077a7c204e930a01413d0d5e18064eed03b1e662e01c22103"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-0b5a20cd55e5-CyXfzl2w.woff2",
+    "sha256": "fb4e744db699c2b01be2831d9a090524456b800099aa42ec81a95c3225bb86ac"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ttcn-CfJYG6tj.js",
+    "sha256": "09fd86d60a4bf3f39f56146b8444dab213087d567f3685f91b810499020f5255"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-6893df85cc12-C5MZZycU.woff2",
+    "sha256": "6cf3eb9cad4cc2f78c164e83306cc9451bd3c4bfbacffc66fdaa9ae32da21e38"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/z80-Hz9HOZM7.js",
+    "sha256": "af74ec9a00d4224b94ceb13fc87cac85fadc218e26b64a2d6e4f7e47a8fede01"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/tcl-DVfN8rqt.js",
+    "sha256": "dd357643696c69931e253fb64d0cd3911ac609616448c3197958a821dcbbbd08"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/vhdl-lSbBsy5d.js",
+    "sha256": "9e808646c19567daf6856e0e835ea01b94fc38e4b8529c526872ecf587041256"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-14a8af0d052a-Ckbr6Eqg.woff2",
+    "sha256": "c8476db3fbba41856cbb3c1683a97df0964b804f6818bb96d34c4325514f9fd7"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Math-BoldItalic-iY-2wyZ7.woff",
+    "sha256": "850c0af5c2238497febaf5e461d880bf458c341f42f4f330f1b1ab5698b1998e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Main-BoldItalic-SpSLRI95.woff",
+    "sha256": "a6f7ec0d846ac7ad975adb8959c37ed49b94acbc4ae436db9ce9e20287e4a64c"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/linear-C9onPyKO.js",
+    "sha256": "a9af276086aef27486ab66a36f863beb50527a0d528e8be495e587c2ebe8121e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Size2-Regular-oD1tc_U0.woff",
+    "sha256": "2014c523c3210bcc166648c4d4cc57f05b747df07a24277bf71c51e67dc79e3d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-CeTfx1TE.js",
+    "sha256": "7cad8b6ab1282a7178af1f224a485e70cfa0b0e06adf7fba050ba58bc9c593c4"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-980e2eba29ea-CeuJVuxq.woff2",
+    "sha256": "c93234bd053cc53f0f71f1cc13565b2d1f6bec16d4ebc90420430c06541c4f4d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/sankeyDiagram-W5VNT64P-ubqZmsgs.js",
+    "sha256": "e3d3ced47e8b14d6c12a28488bccd64000a2c6add156165dfc7887f7357b633c"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-b1147beae592-BrXA0D8h.woff2",
+    "sha256": "5b70b8ca00cc3467f3fe5df9005fcb00e9f5d1df3a9bd945aafeecde2e9d243a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/main-BnuZz7HT.css",
+    "sha256": "5b09d92f9b7fb73eb4c662df0a5b1391ca8b226a1feb5a9757ac3dc9a1f51359"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/sunlit-window-leaves-fdzYiWFe.jpg",
+    "sha256": "92d1debd8fb63df342f8b1b09c74e6c34eacb83fa9d4bc234f1937d169043bf9"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-39696e8777d8-C5jYuwQI.woff2",
+    "sha256": "973a1037dceead92639ef647fdb7526c40846e3428976198c4ab04596ecee072"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/velocity-D8B20fx6.js",
+    "sha256": "a83193ff3101931e7df5a8e2c0fcd29d4b9db08d1464e270efdcfd589ad3dc17"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-3e2b58117077-DV6j7UiD.woff2",
+    "sha256": "bc2ea3b31632e0588757317f7816124337dd7cfcb87bf7f2e15ef72dc3e5aea0"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/channel-Cdr8kACa.js",
+    "sha256": "27033c15c0691440aa2da83e3fb76825f09d3f6773f0a30e142e24d0cdc34a82"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Main-Italic-3WenGoN9.ttf",
+    "sha256": "0d85ae7cc30f23790a7f1a58c4a112fdca8aae769b6ba11429af1d98b1b6cb3a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_SansSerif-Regular-CS6fqUqJ.woff",
+    "sha256": "11e4dc8a6471ff6d6ee561d53d10fde8f7489e798257ff449c5d37c197435605"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-9da7bc751cbc-AfeC7JBK.woff2",
+    "sha256": "ad7f9aece198ec03ecc186052adcab633e889bbb06cd20b8c059f3e94374803e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-CC5k3Vj_.js",
+    "sha256": "986800dd45da5a65a5334a5d74922cd683be881de2c451c5e8ce724d59932965"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-703603f23e9c-Cysi8Bi_.woff2",
+    "sha256": "c9ce19df1e39eaa09e3a60aa7b67c54c949e64f68972327c1105d1c76e61b955"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/gas-Bneqetm1.js",
+    "sha256": "548fd06740ff7e7e6dab57021f454462c6899e78043f5d70e1902e4ca7c317a0"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/WindowControls-CzvQK11H.css",
+    "sha256": "626850c76293fa9822192354428a5a48c3b09fc0fbcc4a7737e58120188c43d1"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/bootstrap-WW70tMIY.js",
+    "sha256": "c46d909aedd8e4037c59d38b047380218c798d94733caadb22ada7c08fb7f196"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/puppet-DMA9R1ak.js",
+    "sha256": "c614d78e96603483b265bdb548e7cdd7a54a68df8b7a3556829d7b7ea874eb4e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-43a71a06f59d-DkfN8W-u.woff2",
+    "sha256": "042630ccc1f10a3c076c6358ec1100579053752045e3e3b6ac9229a4b90d8c11"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/journeyDiagram-NVQOT4AX-Bf80uEaP.js",
+    "sha256": "bf87231c951e292677c0e6cc39a636047dcbafe1f98fbba92ea57f95bc0abba4"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Fraktur-Bold-BsDP51OF.woff",
+    "sha256": "9be7ceb88004ab8ad124082246fbfcca4091e36385d4ec6ed1df67375dad50fb"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/tray-template@2x.png",
+    "sha256": "f2b038eec403b1d0b6eef995f52ad147d6936d86651e1f58ad88db85c8de3cb8"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ntriples-BfvgReVJ.js",
+    "sha256": "46bcf88e08c9250fac68671aa5bb4b5314a3ff62c487736825f6bdc41f02392b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/inter-367ba69ac0a2-B_-bZUTo.woff2",
+    "sha256": "a28eb6d3ccb534ae0c94ca999371df024aab60b08c3c8a5720ee9e32fa0faaa2"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/wardleyDiagram-T6FBY63Y-jjNy-y4g.js",
+    "sha256": "d9e02e0aed982de399eb88687ea7e73438e01f877dfbc6d67486da24e4e6dc0e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/diagram-Q27KOJAE-CtRzSdPu.js",
+    "sha256": "966881b6e08a437916463d43eb3aec4c2882ac0d9f3c88493a4ff4f32a0d47ea"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/leaves-overlay-BXWrfE3_.mp4",
+    "sha256": "530dbbb600a70781a492b0b65aca5adf8fef8bd16b66b2b532d9049adee3f257"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/defaultLocale-DX6XiGOO.js",
+    "sha256": "0cefbd76f932c4eea4758d28169802589b1ad15b46607253de4bd82328998ece"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-09c866380734-CDrO05nK.woff2",
+    "sha256": "34de79ce62e48683ab06d69a248d275911403326cb26f91e081b0ed7105059a6"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/Ming.png",
+    "sha256": "685b54b7027e1a7c0df855d5c7d08f644ec77888e9d8acaa3b1393cd690edfa9"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-0701600f7996-cnN_1NYz.woff2",
+    "sha256": "40ffb358e64eedca24fae79dd9400f47f4f8da5250bc8a5289493da9c67941ac"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/mathematica-DTrFuWx2.js",
+    "sha256": "d3613780e5d57d3809324863462a59a54fb9b83f31e223d59f504a77b04dc495"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/tiki-DGYXhP31.js",
+    "sha256": "3bdc3135821a80ff86d40c2d4fbae733f59b7dcf86a43a2367a17d1df5cb1b80"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-DRE3ABQr.js",
+    "sha256": "17d1ffa880618e8b92893364b14611c6264b983cb15c580b5982fd47941ecea8"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/spreadsheet-BCZA_wO0.js",
+    "sha256": "44d7acba2c5b735fbda1649b9845fbb6de24821882d2a34682bc726c1925bb03"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Caligraphic-Bold-Dq_IR9rO.woff2",
+    "sha256": "de7701e42cf1f4cf0b766c03fb27977207eee2f4fd5d76fa82188406da43ea4c"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/eiffel-CnydiIhH.js",
+    "sha256": "6a7536ca49edb77b3af0b9a68caeb900aa05f71ae09babb95591fa4699ccb07f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/erDiagram-JOGREHBK-dYoX9JS0.js",
+    "sha256": "52dd37414d4f8ab7190694fa9cb2e43da274118736e0dfc69618ca03f6f9ffb5"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-DVXdEgHE.js",
+    "sha256": "92dfa790a7d3ce29d66b0d533ca6dabdfeb7e99dbbcb8ffb5323e185509afb71"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/PlanModeButton-Cw6f4xzg.js",
+    "sha256": "1b840a2a889bf7d4de3a73956c15626d7bb03f9e287e73d21885d9f4189390f1"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/factor-kuTfRLto.js",
+    "sha256": "c3f0ab8713e16d718edae2753adce49b7d87b3ee36d3a529db49e4c7ae209335"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-29e2eaccf9e6-B8zDV4OO.woff2",
+    "sha256": "1b8db7f344c8b80f918a87aab300f386f3f6094a8b638d2e6a2479d582af894a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-2361a25d9c5d-BIMDlG7A.woff2",
+    "sha256": "381f1fa4ceaacc9e5431b13c4aac8b936945692efb290b332642696bde00c32d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/stylus-B533Al4x.js",
+    "sha256": "352405ae3d7bbf0dfcd087d128510cb3cd5f4763bc2e58136e069c7e915be77e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-C-xRNrk2.js",
+    "sha256": "09f1f70baad9c26c12d60978b266d68a9a6e9868f6052ad3c4b6ed10d463b60b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Caligraphic-Regular-CTRA-rTL.woff",
+    "sha256": "3398dd02302557a793f2863f88e02d96ce10df2abffa07c8e9fa90775116e65c"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/PreviewPanel-K6x6Ns9H.js",
+    "sha256": "8b4e4608b1d586b7b14809c99b79f623a0d8846086aa86ccd1b45b73c2e41028"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/chunk-XXDRQBXY-BDhv1MqW.js",
+    "sha256": "315cf30514bd0a115f4a1e1f94395acad2edcc7be63aee3fc15bf674be35aa97"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-72d07829dd10-BOeBTU1n.woff2",
+    "sha256": "655f4f75ebad483019e8741e32622e0692fb4cdb1c471dc512f865d471fdae51"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/groovy-D9Dt4D0W.js",
+    "sha256": "6912e83a4950c0e255f200359253bfb636344600ab03ad7178aaa166041fb79e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/Butter.png",
+    "sha256": "5771ec6b3b80e9f17d692fb265da1e328e83f875865edc6200dff04a34f141a9"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/MobileApp-BTluGXAj.js",
+    "sha256": "05169d0590fd7d34f3cac8c96d8918931d3c15c5c6beb51b74e1ed56f57bdd93"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-f3bae039eee9-Rbj__hJv.woff2",
+    "sha256": "6d50a9587f5e3b2b7b6061d7ceb17972b6ae471c6edc38d0e1db76ece7859324"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/swimlanesDiagram-ULZ7WXOC-B6T--6Gn.js",
+    "sha256": "dd66a2e75dd81503a064d197ca32d32c24911b48287cf2d796af1ef967fc1a1f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/bamboo-shadow-minimal-C7QuuvR9.jpg",
+    "sha256": "187e960e8bcbb49f20c62223eabdf2a9332973881668448058b707a10c0b5f7f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/powershell-CFHJl5sT.js",
+    "sha256": "5eef7d073bc36b86d7cfd0804c38c091931f20dadc61b176ca2d70ce6bb488d2"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/quick-chat-preferences-CSToqHJZ.js",
+    "sha256": "f0c4d09a61a7b7579f20bd972cf61882b2a0f65b63f4c0130f46fb4acef8f3ee"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-0a103913f647-CQuMlsDC.woff2",
+    "sha256": "84997861676c9bae5324a52de385c0467858d168805998d3509be31090d5ebf1"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/flowDiagram-UKHOOZJN-CVQKs1a0.js",
+    "sha256": "32d1e226c354308a0351c0b58a212b220015a8cdcd3a29ef56bd47c642449e40"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-37c839e39cb9-x3003gEd.woff2",
+    "sha256": "782452cbe372494b23f634e8b5d6c7893352def1a005c63f48b252dff79487b3"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/pt-serif-v11-latin-italic-CEtjl2Xq.woff2",
+    "sha256": "be5daba1b69c2dad0eed50cc17bea9659ab23d79d8d412dc8e5c6013b41f39c3"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-eouLO8-c.js",
+    "sha256": "d5ce012510314bfb9e1e93df3db63225918cd86d117ed7d09135c4abaac9de06"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-b791af3a4fd9-CST-wosT.woff2",
+    "sha256": "bd365c058c05a9c6ef219b39a80be18443c2137767c2f3fef2249bf68c7f9b1d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/rainy-street-cafe-DQYauh3o.jpg",
+    "sha256": "7fc4266ce8fdf6c5d84d94c2f036e9ddc58a18727ffd3a1e1f4f78d68af1ca6b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/asterisk-B-8jnY81.js",
+    "sha256": "47dfc80fb04e1d00d31d9f5286c817e3a75d012bc8c88b97585ea4776a4761c7"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/white-cat-blossom-a0XCfhl-.jpg",
+    "sha256": "2023a465e621ac4fcce7a5d8bca53600d481741f0e5bbd9044668a0586afce5d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/tray-dev-template.png",
+    "sha256": "bb4593d9bcd23acba9b7ea6fc3b91a918b61ac047a5dc0af8e9a59e6c4c77af8"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Size4-Regular-BF-4gkZK.woff",
+    "sha256": "99f9c6750b489c9462bf04900bd3f939df9b829339daaaaa99ef5495cdddea58"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/MediaViewer-BAIeGOlq.css",
+    "sha256": "fdedfdfbd02d278e6dd58aca8aec190b78bb91e3f3cded9c9cfa3b7f0769f399"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/wasteland-rider-CuGmSLSQ.jpg",
+    "sha256": "9b99bcff5a6c4677b5d8c088d653f722064c76e6ab8725175b71f26e0996e7b2"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-573fbe56c828-C7wk1mOb.woff2",
+    "sha256": "bca890604cda0fca672386ec2a65d585832704c09dd628d141213fecfbb35074"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Main-Italic-NWA7e6Wa.woff2",
+    "sha256": "97479ca6cce906abc961ecac96faa5f9ca2e61b8e7670d475826bcdee9a7c267"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/settings-CH9Apt1W.js",
+    "sha256": "e30aa698e4818410311dde7fe64e7e1763dead64996ef2919c548ce95b07e882"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/tray.ico",
+    "sha256": "32b455ab6fa6d486d779bf879922ecb1d8c741452029a191354bbcf504b6238e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/SendButton-33xLsh3I.css",
+    "sha256": "0d0e85515feaa262597136efe6b092aad3940a8f0a4f1b974f9c513f313d59ca"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/RuntimeInfoCapsule-CMGEIckg.css",
+    "sha256": "39b07e14f958e7e38bc58365d9fdfc872f21a27aeeeb43a5d67623aea3c894eb"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Size2-Regular-Dy4dx90m.woff2",
+    "sha256": "d04c54219f9eaec6d4d4fd42dfb28785975a4794d6b2fc71e566b9cd6db842dd"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-YOSmQsbR.js",
+    "sha256": "4e3a10e654ae6844fa77caeaca8211b23edcc9109cea5fae61a90043d9177d86"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Main-Bold-Jm3AIy58.woff",
+    "sha256": "c76c5d696297d51b9cb1639c7da4334f0e7dec81b42b11213b5e25ef671bb822"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-970d339b07c4-BXmpcdfC.woff2",
+    "sha256": "c5f3e637af016af27ab86cfbd694243dce1d6b3c3562377803ff7f70188ff80c"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/shell-CjFT_Tl9.js",
+    "sha256": "b4da8a11db1127e003f10a94ff707474af1392051c41f1e0ef78152e9bd0ea95"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/toml-Bm5Em-hy.js",
+    "sha256": "b7f8416bfb193fea056e2ea29ac97d5569055b02829786fae1f23d619a3b08d6"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_SansSerif-Regular-DDBCnlJ7.woff2",
+    "sha256": "68e8c73ef42afd3ccec58bf0fba302cce448938e7fc020a5e31f8a952eee1342"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-DuKUrHq2.js",
+    "sha256": "005ebf51be7a7796c83d529f4b8aa12303406ece1cd5e2a311b0f3594986396b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-2903b3a155b9-D2HrRQAr.woff2",
+    "sha256": "837c860c57686f1918dbeb348ad6811e9b26992e3ac8c574ea20642790dc4bae"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/grass-horizon-dream-0Ft_zPyc.jpg",
+    "sha256": "c161357d00b165a1bed86303de46bdaf5a232845151201c20071099774507643"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-947e30fba0b9-B21I0vV4.woff2",
+    "sha256": "8a255b870c7bd24499b1b64e7e36d691cd5ad4e02e890967158ce72d0bba241b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/lua-BgMRiT3U.js",
+    "sha256": "dabbc2ffcce570b8ac8374c85c98d9f58bf0c51031bd0e9a1a02f080420a2521"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/clike-B9uivgTg.js",
+    "sha256": "362289d801a4f7b5abb548e9220660731b08cf3e00989bb8462ebed73bf28e96"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-452bfc2a7099-Bo3scZnE.woff2",
+    "sha256": "d12f6642ce00cabbc23a5f7abf7b5cefb6a93554d6bfa9808398922b5e645af1"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/idl-BEugSyMb.js",
+    "sha256": "24a7719ff1d38588f4889f8d0f6bca90690f58436a048ef8e3c644aabf1aaffd"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/sparql-DkYu6x3z.js",
+    "sha256": "35e5e4f888aac0249bb3570ac5f07f7dbb45cef40eb8444ec2a3a0772776d0f0"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/RuntimeInfoCapsule-DX96zrkz.js",
+    "sha256": "be642535a6d54f577f21c24d6f8b5c7e0202b6f72c4e80358e2d78fcce1035ae"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/WindowControls-DtaZJi5s.js",
+    "sha256": "1489664ee8eb640f7fa26c94a28df0903143987540d4f4c1e82358e3c6b5d38c"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/MediaViewer-C0dsRnuq.js",
+    "sha256": "41b5789d2c7f6c4018c36cebbe56944bf212865e7c23fa70829a7165bfd06260"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/modelica-Dc1JOy9r.js",
+    "sha256": "03c2e8fe9a47723c0e6eb8a2394543d7e2bdddace7770b4ae9c54005d6ae4be9"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-8d616f18e8e9-B3_0m8O1.woff2",
+    "sha256": "cbd375808a8f32d3bf51e277d238f9de60a56ec1c3c791a61993bf5cb2864b03"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/chunk-GF5L2VYU-CrzrrafN.js",
+    "sha256": "649844fa674c09adfad99e3f0b7aa4050a2d2c4f4475da1ce706fe96fe44a687"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/arc-DSDAvfnP.js",
+    "sha256": "30aaa5cf00ccc5c93e39a5a3bb0d2eff2520e6eb102546f54fd135810e35b54c"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-DZEarHUq.js",
+    "sha256": "09ed3e2866ec25d16cb12aada3081a9617b21668b18f0e94230524e5e7bb575a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/app-file-drag-DmqYrV53.js",
+    "sha256": "180b7f950bfdc563772b3f3d7a186b9014006ca26600b8ff069087d2d9bb9d40"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/c4Diagram-5PPSVZJV-uQ-GAc2J.js",
+    "sha256": "e75668a22cc9758d85f02d434bb2ce7ba904d645ee70d56f1a0d5087d80ab407"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/pegDiagram-VL7TDLO6-D4XAdo0m.js",
+    "sha256": "3f9790e92178750535231f848b15710d5d2f969703ee5860cffb32ff549d055e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/abnfDiagram-N423BO3Z-BnzVOUnx.js",
+    "sha256": "8500dc1e4cfc8ce10111bcb0d3d5ef653e5252359fec4c8531e53afbd10e96bc"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ordinal-BENe2yWM.js",
+    "sha256": "3ce262b86ce2b43675ae9f29f85d3f176dbd7ff1acfd55db38870992230a832f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/graph-DOmOIIwC.js",
+    "sha256": "97862517e3f2f5d40c14fb4b720dc42fd3219a1ab5abd1c560b0ebb06c82c4a2"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/asciiarmor-Df11BRmG.js",
+    "sha256": "a4f24c2097052635b21234f8995ea0bc9aa6eb4627e9aad3d4c7da5fb3eb9321"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/mbox-CNhZ1qSd.js",
+    "sha256": "19086bb5a8b00d893a7b6aceea1d06a0cc34c24bdb053031f880cb1bb1994ced"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/sakura-mobile-CMtQ2gOD.png",
+    "sha256": "8cd622466062076daa7cd187f437a93b5daa4c8341cf0ba0398a2aee157a00d0"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-f275145955ab-DVDewunY.woff2",
+    "sha256": "5315cd7852f4556ef0d06d95d22d6f7cde9e2fcff135134e1cec61f3d325ce2a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-bc4605da4006-DD19CHwv.woff2",
+    "sha256": "ce58eeb39a4a8a05a5f88929082030939424aae8b7e4bf174fb31e2185f77476"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/coffeescript-S37ZYGWr.js",
+    "sha256": "140d96ba54d87483b611e343940304fd55d851a31289ffb6b9ab1a2c8b4793a2"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-1c1dcf1b5233-BdrnE5zQ.woff2",
+    "sha256": "19d4b346d120e63dd134d241c07b954ba26785b045f7b48e3f3a8821b5bf8403"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/SettingsContent-CnMUIAG8.js",
+    "sha256": "39c146a15428114a00f68ec8c82432202ce4e1f30f0ba604d31a1672771aa12b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/indigo-window-silhouette-BU0MTsCo.jpg",
+    "sha256": "ee5d99ed00cc7ed185651f54892dc4894aff75406de4f91bbb70ee6e194d2e5a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cynefin-VYW2F7L2-CaYOPgiC.js",
+    "sha256": "6cfe666e78cbde66b01167003caf5f6dfdb15f9a5624731568fd8f732e7d95b4"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-DMVZakKz.js",
+    "sha256": "cd5199b1fc2249b186a098ae65a4b0e1cdfd9f06fb2a9b43d506e629720b8b16"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_SansSerif-Bold-DbIhKOiC.woff",
+    "sha256": "ece03cfd83e22c212cdef66feb8442d25a083beb988db3f1883f3f9738d750ba"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-c58e73e29360-D6QDc2Ub.woff2",
+    "sha256": "4769ea1f9d54b8f3ba8ad8cdced84deaf2806103d5423326c437039ecb418580"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/julia-DuME0IfC.js",
+    "sha256": "9c693e030ec08a516cdbb591c88c08c69a6525445481ba74a899961e8704b9d6"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/diagram-7IWD3JNH-BqFiuQ4w.js",
+    "sha256": "1764b144215031e09297c1f4e601e8c17ec888e9d6b28f8a9b9690cb97dfc02a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/quadrantDiagram-CIZ2JOQS-pbq7vFsZ.js",
+    "sha256": "9a00106dd6ac5df137eeb27aa91651947f88168eebed4de204dbe96026238832"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-7edfe6d77834-DgcOD5Gk.woff2",
+    "sha256": "c5f2c63f333640d2f7c24498c0ace4447e54f3bc0751c019ed98b55a8c319c5a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-05f8cf9fbab6-LNOPy50O.woff2",
+    "sha256": "a7edea1ab0808d6aabe3ebade5131abdd4fcc8841c66e7b74aa0f9f6e38053aa"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/dragon-pillar-palace-B7ZsJUTn.jpg",
+    "sha256": "5cc7739eaba037c3311ccf95e166167763badc2edabd9e076f6c4bb91d543f62"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-4a0fda035b92-BPZEtD2W.woff2",
+    "sha256": "c49561885d2802a1eb759aa7b152a0d8f68842b789f3e16089d14e697f73bb92"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/chunk-5VM5RSS4-2nCYcCee.js",
+    "sha256": "36498ecb293319196e5dc17e280b2cf6fe6e175fbbf701c7d41763ed30c52007"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ebnfDiagram-BXEA7PRR-_k5H_i7j.js",
+    "sha256": "f0f13e651407f6c3fee57d51d504551a32d00b81352493bd0e534204faeff3fa"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-673c20cc0be0-CUqhUPCi.woff2",
+    "sha256": "751bd5775c805c8e26c96e062d00d7632e3b93ccc4703f366649509ab211ebaf"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-baf4512e0f02-CkAzoaGU.woff2",
+    "sha256": "14be1e31de35528e95e5732b588f3c6d25a14117e152fd94f7f1677f709b01e7"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-98c488529f4a-BVzBU6X7.woff2",
+    "sha256": "296b358f385d00a0e592fec49e8d6e2bebacfe3d3a482b4ec17ba1f83657b196"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/pt-serif-v11-latin-regular-DXlWFzIq.woff2",
+    "sha256": "ef391572f9fbb7bab7fef6ce2c4fc92ad68a8c148889a79cb9f9b1452d851fab"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-BA6TvP6M.js",
+    "sha256": "f1713799141a77adcbcc15322a9457dc58701c12c922101da81b04bfb8143493"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-CG3fYosG.js",
+    "sha256": "01f6ae696a63d7df02df4b78f8fe4850913a6536f8d77d83a93ae21ad7c5bb26"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/mobile-D5iP21cB.js",
+    "sha256": "732d1160626b6c376a667feee3e8d3f8d391073413b7a65cd2e58a108c56d50d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-52e8ecde552b-DiyOHxWt.woff2",
+    "sha256": "0a47a21c2e7dca05341574000500a55eaa7e21e6bfa9a9f1a6323303b4101c60"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-bf14121917e9-BdieFRag.woff2",
+    "sha256": "ebe07064881bbfab65b1afc054cf484d77440374d98a138bf66d44cf5c671e59"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/d-pRatUO7H.js",
+    "sha256": "7d17f349f6b8da47c4e024e6646b867bcae32da8f1262291e93eb551f2d6f15d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/history-protocol-client-Cw3U_Cpt.js",
+    "sha256": "b3904d168b4a809e779e1a727639c9cf9ad603ce716c5e4731b7bddd35ded71b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Fraktur-Regular-CB_wures.ttf",
+    "sha256": "1e6f9579e90e2cac37f8f60a597c436e075c114385652b7cbeb0dec0421291b3"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-154f9e92b91b-_K8Bock6.woff2",
+    "sha256": "2da04fe98e7eb332524d395cd4f13d9a4626c037d77599c50e1ad731af907e6e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-ae9faf529fb6-C8k_qLFa.woff2",
+    "sha256": "1f868051a8bf937bb03c809f1ad52dc1d2fb78037a1c4f942f0f1c4142d0e466"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-64718129350d-BTpM1pAZ.woff2",
+    "sha256": "ea40e335d816d52492ef32686cb4439ff65dc65b53c8baedfcbdeab6d44514b5"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-aXNGBZOz.js",
+    "sha256": "a98429c5be82b0aca2fe5dd839d1f23adbf8e5033bb154449a22061620e32760"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/mindmap-definition-FAOFIHXS-C86EUjUM.js",
+    "sha256": "6981513953e3f02a04a0eb7e34ab26f2bf96d7a4189618ae9f671f049b7b4e65"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/maximalist-four-seasons-llfYIlEK.jpg",
+    "sha256": "c46d06a1fb707c6070a640601160810596dac34eac194de0ab6fac61e31bec55"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/chunk-KBJHAD2P-uwPLHTPl.js",
+    "sha256": "8cebc4571011548a927078703d73940619d1e7f4b184445860233a19178589fe"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/vbscript-BuJXcnF6.js",
+    "sha256": "6ca48951cc338f55899631cf06bae1f31e0ab9068225eb7a1c4a2bcbe35b1693"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/textile-CnDTJFAw.js",
+    "sha256": "0f2de1a421c605520b0c8b876bd124369085c5fb7f13b12c9dfbcc60bd27c394"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Script-Regular-C5JkGWo-.ttf",
+    "sha256": "1c67f068fea8bb09bf099c088b1cf64bd27516a6e07f4684344873564bb66a67"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/haxe-H-WmDvRZ.js",
+    "sha256": "3754ffb01bd31420d626dd6139d4fc5b12f58485c5779552a99710740ee0f5da"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-f1fff56ea705-DgSytTm6.woff2",
+    "sha256": "889cb2eeb801941d1675036b3bd596c0d370faea1947d198468d6bc3f53107a3"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/r-B6wPVr8A.js",
+    "sha256": "e32bc0fe55b99eb76ad25438a9c224ee4ae4d9ed482e95c40af328e44ea70a64"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/diagram-B4RE2ZJO-DZSkwL5C.js",
+    "sha256": "363609e8d1002fe933127b0e701a183d87fa27f4f558474d232988a62561b853"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ebnf-CDyGwa7X.js",
+    "sha256": "ef22ca54434ab2be0f6ed0dc36b246cdcfa507556fed7a847d77064c5fb1c0ef"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Main-BoldItalic-DzxPMmG6.ttf",
+    "sha256": "70ee1f64a20f2048c21940ef46d0144fd215baa953ca69afd1e31e98544f708f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Size4-Regular-Dl5lxZxV.woff2",
+    "sha256": "a4af7d414440a1c1790825cfb700cf9cf43b0f2c4b04f0ebc523011ad9853ec0"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/kong-banner-B6cdlZ4M.jpg",
+    "sha256": "ca4b5ec8ecbaabe0b1b761c18e5002b5b40d977690d169973f681fe715293bda"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/stateDiagram-v2-UEYNNEHI-CjY9Foc1.js",
+    "sha256": "d3767e7311786d466fa2e10fe446941ff010e7cf41ea605f8cf4f71afebf2c29"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Main-Bold-waoOVXN0.ttf",
+    "sha256": "138ac28d1663b3037e9c5f52371fa5c63d8324f4a38d22cd573e6ea3a3fd0cf8"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/inter-bec94a4daf06-8kRkwJBP.woff2",
+    "sha256": "c940764593d0fe5d596be327ca7558855e018039fb78509aa21921fd3644c3e4"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/simple-mode-GW_nhZxv.js",
+    "sha256": "8ae187bd3b7d02dbf9bd195a73c4c8635c67a557825c91a00ef476d4e1113db2"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/theme-registry-DLVrwanO.css",
+    "sha256": "9b8eb0b05728591a84e3bcee4f6a8b4368f94bd5f141c202695af9e6121e7d59"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/mirc-CjQqDB4T.js",
+    "sha256": "76ae2e410f90b453529c367ac69d476e5fb516964c0bf8ffb2676d875b8522b4"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Math-BoldItalic-B3XSjfu4.ttf",
+    "sha256": "f9377ab0271cda59af24bcffbd46a4d0c8a3572ffafdbb38de2ad5ea7b0d5ee5"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-c1e9e2e9d350-BrvFI2Dm.woff2",
+    "sha256": "4af6147be9f2e61c3aad5c855e12a5089c25a0d7bfe94b53d0a28eeb24729d5a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/diagram-LBJQPF4R-BD3RkprN.js",
+    "sha256": "e0845fd97295f0cf1464e7353db1925ef5b7882278b96b9dc3a7d61a31c58b92"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-e97b7ba2830a-kZ4DCjFN.woff2",
+    "sha256": "9ce339361b4d508f7d520796890d38be17fe5e3b7b3241303fd756d9ffda3162"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-2f47f914b65f-ChPqEi51.woff2",
+    "sha256": "1ff783685059ccf2299afbcf41f485a330ea888f62b95c5f2c9c83bac5f78125"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-9d126fb68ebd-SMUeI1bg.woff2",
+    "sha256": "e8f01587de1e099b2ca32cb37ce6ffad2af11199048efa9f0cf13783784a333e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-39cf261ef310-BHPX_wu_.woff2",
+    "sha256": "4708a6c176466c7823f3ce335ec94d5e9b008c0b0cf510f5802565887006e2b4"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/mllike-CXdrOF99.js",
+    "sha256": "0bf60c6883fe103d813759f1b69baa46af8b5dc0b502aae492c247838a5d8784"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/misty-blossoms-DRZPoLl5.jpg",
+    "sha256": "3b912f2b71f78d6e31b3fc61e38c4a99e282f91fdc5ec3db225980f947e090b3"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-588f1b62c790-DW5DRof6.woff2",
+    "sha256": "e5313bcb399e45e9cca8c2337314e99d3c95972e38dbe0dce5585be0dc284d7e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/tray-dev.ico",
+    "sha256": "5e78024793e7bb4a85b173cb73fb540c7e056d59ad5889410c571edc265ae076"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/webidl-ZXfAyPTL.js",
+    "sha256": "bce47d0d06b098cede3bbb8ffee3d534c1cd85610afe7463f579e357037a3bd2"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-5d0ae2cebbd3-KIfZT998.woff2",
+    "sha256": "83bf094bd8a87732a5d2e79069c22b30ca46890e18c7fc9e539612873070c204"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/hidden-ragdoll-cat-bqhuTFfN.jpg",
+    "sha256": "f24d65ac17ceb6ad2ed0f46109a8657a0c8b0ee3ef09890530c496bfa6ae6b0b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Caligraphic-Regular-Di6jR-x-.woff2",
+    "sha256": "5d53e70ad607c2352162dec9e0923fb54ecdafaccbf604cd8dcf7d00facb989b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/javascript-iXu5QeM3.js",
+    "sha256": "182fdca66238d12ed737c8fd2d3f5a4bfec8d6559889f9c79117a1caab05d649"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-1e4ff3a38cc2-Bt4hCpm_.woff2",
+    "sha256": "8b3ae6c6a94924aedf8be6328745608a012f8d6042ef3ca6c3d6bb4f61bde86d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/troff-wAsdV37c.js",
+    "sha256": "8e77af30b3dfad9e8c5fb316df448139905aeb2ec55ed63970c1c5f1e43758cd"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cose-bilkent-JH36ORCC-B7EBg3pI.js",
+    "sha256": "36bf022be8543fff651937528c7367df6d045526cc8ce5ce192e685fa17aee12"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/WorkspaceFileChangeBridge-Ipqtt4xC.js",
+    "sha256": "25331ee1f4aaa76a6ea03b563cae67486a0bb5a959d31b44c15d8b2cfce0ca3d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/properties-C78fOPTZ.js",
+    "sha256": "5b083077fe05a0376e6ca5536d04fb555ba72e848b7a8ba2cd8a7236a3a5d6b9"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Math-Italic-DA0__PXp.woff",
+    "sha256": "8a8d244581371912b8f3f5a23e2437cb2a59cd9bcaebb0346e722c05737a2571"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/rice-paper-Cag6H2vS.png",
+    "sha256": "a09b093b715fc9e8fd0f91ac02fcdc68636e825fa9555820ef8d6b8b7889d64b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-gSf8wvFn.js",
+    "sha256": "c0abbb686e2e0624e9639b49e0ed95d557589365f0daf0527fa54570fc756c35"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/mumps-BT43cFF4.js",
+    "sha256": "1eee059f667d792d74620cbb7e83406488e209e548c7de0f880cd8830d97a58f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/AnimationPrimitives-C3GBxf51.js",
+    "sha256": "6c72705656501b52085a6251965f63b3f4a63a9b1eff25aeb14b0ae168626355"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-CUnnBQ_0.js",
+    "sha256": "495368823234f7836efd19d5391c4699a126451f06d8b4828da641b47a95050f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/vb-CmGdzxic.js",
+    "sha256": "a6d39b887d52687053a94f7fd6438d9e193c78735e36ec0d7585ab54873e0e3a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Script-Regular-D5yQViql.woff",
+    "sha256": "d96cdf2b3bdd4d64a8fd5f74a4c467f123a8a73931cd435889f08ffaf9bf947a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/green-plain-clouds-0ZIPMWcs.jpg",
+    "sha256": "9534c16237f6161b6a64387fbec4504825688a4f6c6161b7e3c02de6952e981e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/blockDiagram-VBNYF7ZC-BGZ12MY8.js",
+    "sha256": "1e028f109bb35c7cafb36115e9a02d216739b580e46de49410e13354d58b1d06"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/PreviewEditor-DEyWPTjJ.js",
+    "sha256": "0c088c0fbd9b00c56140971e22861b85c26367d904a6fa818d8494a8759778c5"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/pt-serif-v11-latin-700-I0dYHjsp.woff2",
+    "sha256": "e548abcd8734bfcf8b4ebbbca1af98f9e8ae1e0ff884c0971f29498a4fc108f4"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Caligraphic-Bold-BEiXGLvX.woff",
+    "sha256": "1ae6bd7475590e97e7f145a89e09ccde322f7a6bc0b91607b1c8b8ee28290fed"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/architectureDiagram-T3A2C74G-AD3r8mOe.js",
+    "sha256": "a7b9524c7518097f0d07b3f5bf2159d5d66c9ebe91dc1b2928830764998dc967"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-17c2b137692d-BgVQ_oBz.woff2",
+    "sha256": "ae5cdcb1c4faf5acef0b9045f060a8e83d7c3266a4fe8ab930dd023ebf22870e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-f82e85c61f90--UOi5Q_h.woff2",
+    "sha256": "67d2655f88a0451e16d24831795ecc3f497feef462b2dae5a91dd0bc0c517172"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ChatPage-D5-qr3r0.js",
+    "sha256": "632650c2d0373987b8b02981bdc9c0cafdd71a63b71dd0f9c8d9630f14d4c97f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_SansSerif-Italic-DN2j7dab.woff",
+    "sha256": "91ee67500cc0129aa0ace3ac5c61ff1692102f0f31d02b69347fba35dcb75bf2"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Fraktur-Regular-Dxdc4cR9.woff",
+    "sha256": "5e28753be717dac97f559f49bc10be9cf3c124ddcabda6659d11cb68febc6463"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-852eb7d1ab3e-Bynlg3tq.woff2",
+    "sha256": "3fa16c7d779824151a721cf2101aa3acda5b843f5e094e7602aa9ab258eb08fe"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Fraktur-Bold-CL6g_b3V.woff2",
+    "sha256": "74444efd593c005e3f4573b44524704c0af0a937fe911cca9e94068d0d140d3f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/fortran-DYz_wnZ1.js",
+    "sha256": "91936d3b97248972ef6db720395a5f811a4f560a34920d60ebcf3add475162b1"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-d0696d5de749-CyyN6WaI.woff2",
+    "sha256": "4587b84a41332990e380cba554e06e5dcdda3e3e17f29b25e81447488dd89217"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Size1-Regular-C195tn64.woff",
+    "sha256": "c943cc986384f59e86bea5fd7dc50a9c4dfe567a7c05eb40d6790720dead97c9"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/clojure-BMjYHr_A.js",
+    "sha256": "498a60106d02e5d91242032d01e8c02c8405cc0dd2d089d69f55eab8e78d1a20"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/swift-BzpIVaGY.js",
+    "sha256": "6fdd63ef4febc2aaff6b39553ef9b5d60a76a59a4ddfedbbd260b0ebded352f9"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/preload-helper-PPVm8Dsz.js",
+    "sha256": "0bcb72f8ec0d95f592f3a84b3554b9ef5a5325ff5416a9114d6913e03c1c9eb4"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/python-BuPzkPfP.js",
+    "sha256": "ac31cf70d1ebf5ecde918d2284e736615fab53442c2b3c230bfa83f85f806d78"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-f0605f0725c5-Ddkv-0tT.woff2",
+    "sha256": "803d6e7987b319aeb7c1f1c5671cb0005c50044483140832356fae0f046ca5dc"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-491d99d2666b-DDrnzmJW.woff2",
+    "sha256": "f52842471f7a4d931b81fcaa37ddcc7da2281ccc043b593c10f4dd351ad30fd2"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/WorkspaceCompanionRail-Cq25GGGM.js",
+    "sha256": "56df415ea17e73c3879cfbd99072424353503191380c2a32caac2427b780e2c4"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/yacas-BJ4BC0dw.js",
+    "sha256": "5f69a3c388a14c26bd6060c2eddb3970b6e3e8a40fc6419ce705783685526bf5"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/chunk-RYQCIY6F-DtmeOc4s.js",
+    "sha256": "b04af5b190075ce085ffc5072edd9cbff035e49ed5cd81a76130fad4c745fc12"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-f8c6255eb7b3-B0KMUUhR.woff2",
+    "sha256": "3538f75012bbf8d8934125d5f2701ad16075d5c0257bda002a75b3d5ac2abede"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/mobile-CeGvsHkI.css",
+    "sha256": "06ad2425d8ae4d7b9f2cb629c5ba625fed8021f3713954425d519a9fb6ce2954"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-693014a08415-VJ5yaBjq.woff2",
+    "sha256": "f86b1d47d8682617190bb64133f5548428a325ac9fb38eb34d9459cd31acfb7b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/chunk-6Q2QTUOP-8hxEGtFs.js",
+    "sha256": "ea6381813d7048b08a642afcbc22224519bd4b44cf51f37178825743ce15d1a7"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/SkillViewerOverlay-DW494d3A.js",
+    "sha256": "26d8493acd57092215a7ec61a1f232fb45bc0a5c2b7fa9e6e414ae69a57f5c8d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/css-BnMrqG3P.js",
+    "sha256": "aa3e47bd7d7e6f2b9aed7b342b7d6aa059ff6e770c86d64cb0eaf97b403ec98a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-81323d079a9a-BoMw1WPP.woff2",
+    "sha256": "815811bd7585bd7028bab0035b5258df50420917150bb02737002bb9b8ecb4e1"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/tray-dev-template@2x.png",
+    "sha256": "5824b4ae6384fb7e05d8b86f386ae1d5294f900b7b7fa90e931bba9b2fb314ea"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cypher-C_CwsFkJ.js",
+    "sha256": "4a2a3e7313e1339de833d287d518acc97046ddd16fb244a28b34f15f01f01b4b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/perl-CdXCOZ3F.js",
+    "sha256": "195216883cd9274b5414861746c3ca02f4df013330b91440c785561fbc188f37"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-0a3849a51147-CGuemfeD.woff2",
+    "sha256": "dbffed4fb73d0173f3bc41a8751c5c78f850f010a089ceecf85454769641e78b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Size1-Regular-Dbsnue_I.ttf",
+    "sha256": "95b6d2f1a50173bfedb8c63e1d1c99b10427d0a4df4201cb44513b226951a22b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/xquery-DzFWVndE.js",
+    "sha256": "c98f053278244c215c51c68f20cc352f038a2fd3c99436400785a6d36a9853bd"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Size4-Regular-DWFBv043.ttf",
+    "sha256": "c647367d1dd4e162468717d020e1fc0f1dc5c26ebfdffbe55261713bf88c5877"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/story-garden-objects-Bvfa5cw6.jpg",
+    "sha256": "cc78249279cdabf75d9c2691c74e27a1f42b434938b86deba2effbe5d709fee9"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/pink-flower-fisherman-voDGy0VM.jpg",
+    "sha256": "d3828239a2769a9073f2f67cf5bf2bcc8da681df0df67cd1232f0ea82e083fb3"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-abf820f52f82-DWEdeAOH.woff2",
+    "sha256": "2c7385493055759bb67da7ddf9e88375a5c335c8693aabaaa83810d02c09ffb7"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Size3-Regular-CTq5MqoE.woff",
+    "sha256": "6ab6b62e9b62dae2c00dd90f791bd10950be0ecc3490d7d6045f51c2e8fe0949"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Main-BoldItalic-DxDJ3AOS.woff2",
+    "sha256": "99cd42a3c072d918f2f44984a807cf7aa16e13545fd0875fc07c6c65f99e715b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/pug-DeIclll2.js",
+    "sha256": "803a888b8468015a2133ca30b67d5ad7d18a7b67e0715cbb8b0fb5426f790d20"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/sas-B4kiWyti.js",
+    "sha256": "f8c7889fa764fc5a840cbe7010e1d9f931865efee9d4c510425d62b0ac84075d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-bb1bf6128360-iq8DnZbm.woff2",
+    "sha256": "1868620dcde3a615ff47531bb0032e0bdfcbbb7696c7b7168492940a39d519cd"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-C42D-w2K.js",
+    "sha256": "6951d276a78b6d9c2c41cd26124ec1d569dbc16b12fad2226700758fb51a35da"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ruby-B2Rjki9n.js",
+    "sha256": "5cd3a5c7aab2013878c02b629ac364781ffd33eea086457f1d1c28f5cdede906"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/fcl-Kvtd6kyn.js",
+    "sha256": "685d86c935fa25d282da3444b211803edf318f1723b0e3db5a665ec50db10151"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/map-DxJ2ADlA.js",
+    "sha256": "caf684b7a25676e3f43a63d91ea1ca8016cadb1ffa8aa59336f0bd692b9d130c"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/smalltalk-CnHTOXQT.js",
+    "sha256": "6fea82ec5301f1b147fda0b2e757be2c8dd8b4792c74dac06261c07718290762"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/dark-mobile-Bbda13st.png",
+    "sha256": "f154462b8201c6ffa811277509c8d358133b7a3b07634f69b7ad89c15d175733"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_SansSerif-Italic-YYjJ1zSn.ttf",
+    "sha256": "3931dd81faed86ba021bb2bbdc36f5bed9a38d6b4f4077aca59b265aa1b02083"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-b87733964a7f-B11R7jkn.woff2",
+    "sha256": "17eb7afd55036b86748f51a779b9424a2a64563e949a70fea03a71d662ce486d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Main-Bold-Cx986IdX.woff2",
+    "sha256": "0f60d1b897938ec918c8ce073092411baf9438f6739465693ff18b0f9d20b021"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/kong-banner.jpg",
+    "sha256": "ca4b5ec8ecbaabe0b1b761c18e5002b5b40d977690d169973f681fe715293bda"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Main-Regular-ypZvNtVU.ttf",
+    "sha256": "d0332f52868370fd83ae7fa46470f90c8f2eab2fcf12bc4f88080b340c95a830"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/pt-serif-v11-latin-700italic-DYZzHVUi.woff2",
+    "sha256": "e1bd3f9f50d4876fc67111ab41b60880f08b2eb89f8a0075c2ad3394a79c4063"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-6c22b14e790d-Di7KJ6RO.woff2",
+    "sha256": "6ef9dbc0196f0e56763181b5ee0ac59f65c3b93b9a73e40bf0784fd41bf9fb9e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/pieDiagram-7S7Q4E2Y-Bqze1LR7.js",
+    "sha256": "96cff7bba0ae272779ab844b89069d649bafafa02ab12c81eae9bd566634509b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/chunk-JWPE2WC7-piEoIvdh.js",
+    "sha256": "c849b9884cfc6c8b67ccccc6e6a22c826909b1fcee06a9f5cad693e66f0d6709"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/sieve-C3Gn_uJK.js",
+    "sha256": "e30edd162cbd37962e7e62440bf9835dad2bb1234288486f24ad4e4940fd1e8f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/pig-CevX1Tat.js",
+    "sha256": "8a443e606edc2da2658abe26c048af2a468c4f3244434957fe11320a15938043"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-D5Dmcfsy.js",
+    "sha256": "99c0113b006a9910038af12aa17042bf1dae1f1983cbf8e5e63b0a673fe0f0ff"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-ee8d1b5f86ed-C0ai0E4c.woff2",
+    "sha256": "834c8d0622f63a1ebab08a4e5da9f661c75141eb0b779c8a423b2eba418967e7"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/haskell-Cw1EW3IL.js",
+    "sha256": "b47ca38b34ea1f8fb65c1f4f1043277796f6437c9852bad46a7c6cf1445d6f20"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Math-BoldItalic-CZnvNsCZ.woff2",
+    "sha256": "dc47344dbb6cb5b655c8460d561f4df5f501b90c804ad3c6cec65fe322351ab1"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/onboarding-Mh9AhA3n.js",
+    "sha256": "d5d086ca4e625922856578664b06b4527ce00bfb7b488d51dbe8f9b2b5e69ff2"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_AMS-Regular-BQhdFMY1.woff2",
+    "sha256": "0cdd387c9590a1a9f9794560022dbb59654a7d86f187aa0c81495ad42d3a7308"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Fraktur-Bold-BdnERNNW.ttf",
+    "sha256": "9163df9c7122432e6495b4229fa9071cf9ae86a758ae5efc4924ec2e1a6dbce1"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/SendButton-8Fz1IyPt.js",
+    "sha256": "a24ce04f99227d13c1ea1b8d01ba21b91968a9e2c5d1c3a4f4908cf60d295b34"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Typewriter-Regular-D3Ib7_Hf.ttf",
+    "sha256": "f01f3e87d9c6a61c0c081ceb577abd864eb00a612f7ac1620dd6915fad2ef5aa"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/layout-D-LzfAck.js",
+    "sha256": "b598229dc48b69077ee6c3c2092783ebb4fee75cb8fe6a2e76167eccd874aa98"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/crystal-SjHAIU92.js",
+    "sha256": "66127e5531035963dfda0a8bc314538018e1205865fa9371da29ddc850b3fd7b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/verilog-C6RDOZhf.js",
+    "sha256": "51f07eed339c5f2fb36a10c69b0311f6888e5b93694ac2ba8527da651317091d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Typewriter-Regular-CO6r4hn1.woff2",
+    "sha256": "71d517d67827787cfabdf186914cc3358eda539e37931941f2b2fd4a21f68c0b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/default-workspace-constants-BgxV258V.js",
+    "sha256": "d05043db130dacc526b6647f33f8a3ad63e426c04736dd7e6aa9c713f61a2be2"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/dtd-DF_7sFjM.js",
+    "sha256": "e107c8a82ea6a638f3350669326809c15eb5e227e6dae8d8dd41ca139cd522ee"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Math-Italic-flOr_0UB.ttf",
+    "sha256": "08ce98e51b04d58945a301e639e02b6998af29fdfd61a7b8afdd07bbfc479d4a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-D_9xcQcc.js",
+    "sha256": "b8b1dd36eb0a79de80cd95a2333d5533c047e968ee7c0a18ad02d68e498eb02d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-6ee866c3e2ac-DIigI9PF.woff2",
+    "sha256": "650a939f03de55a5cdca17ca8e4f43f54bf2687c25819102a76f62d99fee48f1"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/ochre-silhouette-4CXSB5dO.jpg",
+    "sha256": "f5d5a4afd322638735a233e0bf1ac859de45242f3dc0f3b8e6c52f1a8e536b3f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Size1-Regular-mCD8mA8B.woff2",
+    "sha256": "6b47c40166b6dbe21a5dfca7718413f2147fd2399be1ba605d8ad39cedf25dfe"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Math-Italic-t53AETM-.woff2",
+    "sha256": "7af58c5ec8f132a2ddde9027c6d7814decce4d3b822a11192a42a20e2e973264"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/tree-lined-path-Am98Uns8.jpg",
+    "sha256": "9c05a080a5539d9a6144c6961dd0aa2920850eee0d8e96ae400a4f9cf3f54dcb"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Main-Italic-BMLOBm91.woff",
+    "sha256": "f1d6ef86f3b11a528bd5185199bd2443ecb2b0dead96d88674b5a2c12be24bdf"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/asn1-EdZsLKOL.js",
+    "sha256": "ae03ba33f00f6d244c134c98deb75db9ef27894ed42661b6b96cf897561e1bab"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-5274ec774f6a-D1m19SnQ.woff2",
+    "sha256": "6ceb5902615653f16ba0549272530f180107a9e5e8ef4503f1503637859648cc"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/stateDiagram-OKZ733FA-FZyCIn5R.js",
+    "sha256": "b7acb8c18a972fb4782e36f64f3154263568142d63e9dd23aa395403657f03e5"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_SansSerif-Bold-D1sUS0GD.woff2",
+    "sha256": "e99ae51144bf1232efcc1bfe5add36262c6866b0faab24fa75740e1b98577a62"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/jetbrainsmono-9326b4c9bf1d-Bnd2h4Br.woff2",
+    "sha256": "9c38cb2d0d2d93c1ee6e21fa78db76f13ea7e15e15cc64214c7ca89b6aaa35c4"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/vennDiagram-T6HMQDX7-C6Ev_-Oa.js",
+    "sha256": "cecbe697598a5bc780707e6782a105c190bc850d3a94b881856658dbde3223a7"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-27a0f60856fd-CW0DmeUz.woff2",
+    "sha256": "7e395932ef1c5961d6b92263bfe71309648dcda03151d3873a3b1fa99dac0f1b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-ad640617781e-YRUD9SO3.woff2",
+    "sha256": "67bf8f9ba0a97c38d49bb52e11ba09bbe6cb966df6d194883bdda5c017b080fa"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Size2-Regular-B7gKUWhC.ttf",
+    "sha256": "a6b2099fb555c60e3a0db3a08842ebf1d732c6eb4e4bf44913613bed4fc4e39b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/octave-Ck1zUtKM.js",
+    "sha256": "2050e71c70081d414f73ab9b72ccf17a7319d311d6aba18193ba050705d661e9"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/gitGraphDiagram-DS77QQ5N-BPjB-f2w.js",
+    "sha256": "80576df3474971661cc5c7ba14d076cbb9e0a1273acb7662d025aa3d884272e6"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/chunk-2GRJ4B5K-Dp0bsSXf.js",
+    "sha256": "10df788c460c0988faf2cd57b5721ae668bb1ef79dc3a7c5b5b0b09c97149418"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-32ae389c9e2b-BTtNpg6c.woff2",
+    "sha256": "a866e74045fa35af957ea063623a4759955c57e1d2dece7b4f14a10a71a2d1c1"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-DMUMUxYH.js",
+    "sha256": "9af235febe362e9c3854b6ab3ccbc4ee12f4c81a477098d957c28da6bc8c6915"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/index-rusf3s97.js",
+    "sha256": "a61bca5043465016fea78ae524b7cd86d68b7d618fd20464f7e75067e5aafed8"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/katex-HP8lGamR.js",
+    "sha256": "0b89c21cb463fd8180e300cb79a3e9e538accb78df5bdec67f0cbba4bdb7949e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-522f9a92410a-CrkU_Tl4.woff2",
+    "sha256": "36b0ad95f7484b64dabb96fcf83423c8e5fdd343290467a38f9fad93d3fe2bbc"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/kanban-definition-27J2QSJJ-HYe_cEy3.js",
+    "sha256": "850c87c5e2c11aac07ce164f9e6e90dc10064a3a6614aea9b18decc394db0fb0"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_SansSerif-Italic-C3H0VqGB.woff2",
+    "sha256": "00b26ac825e2095056396e0553b8ac26d3f8ad158c3826e28b4c45b385c4714a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/blue-sky-screenprint-C6ZkN7f9.jpg",
+    "sha256": "b5649573a3e29dd572ea0ef7b56b3c9d31b96bb9625e35d023a89cf76e45b281"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Caligraphic-Bold-ATXxdsX0.ttf",
+    "sha256": "07d8e303ce4fc12b4bb54f1004170dd190a1f3db45d400fe68060df3e0897268"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/sizeCapture-X5ZJPWSS-BLksUD5v.js",
+    "sha256": "8f0b4229e3a6b4d0b93e958dd72fc392928cef28eb575900fb64eb23051dfe6d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-1355c4e2b8f4-Bikvs3-T.woff2",
+    "sha256": "b6ce0831978c5889d28317fc03ba5d2ab08384976b1841e578f2edc66876abd9"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/init-Gi6I4Gst.js",
+    "sha256": "379fa880c14ad48f43b0c23ff56b30b2b808e8460fd9f9cad8bf7cb278c5b814"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/erlang-BNw1qcRV.js",
+    "sha256": "8a3a9b30601fc689347511fed678378f5db855c49743cbf971043e1c10b19fed"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-7afaced7df43-wRXWgR9_.woff2",
+    "sha256": "740e31fb7861be945ef6a565aeca97b49b4d5573f1c148aa4d6ada67619c2e37"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-7defc4186128-D40SqE86.woff2",
+    "sha256": "a71cf1538eb30d8f5fddd86ade1973aa7deb20b237edc3e8945ffd8d1cf03c3a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/elm-vLlmbW-K.js",
+    "sha256": "649698475e1b2b949f3af3c199a7e4cb72dbc4e51a111984437689b8893865ad"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/SettingsContent-BDeXod49.css",
+    "sha256": "f94d4011d1f331f897f4f82e99deb111f8f9930e5d6695c219a5930c450bc423"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/scribble-black-cat-DgIL9p9K.jpg",
+    "sha256": "7d5254583978aa9b210682680aac18ef5875e06d3b9f2ba64671acadbd8fa1dd"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/KaTeX_Typewriter-Regular-C0xS9mPB.woff",
+    "sha256": "e14fed02b1aba7ce9f5afd5844b5d0321b22351febc720e0de8b8723527609f7"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/diagram-UB23O5K3-8v5JsFLT.js",
+    "sha256": "72384570b3ee9c172fcd3e77f98f707bdc1cc9efcf353a6dc23fdedf1593c757"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cytoscape.esm-DH6-wILU.js",
+    "sha256": "d81d819cc023378a3bfebc018fd191ec21503ed9c263023f70e97e91618e6cba"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/rpm-CTu-6PCP.js",
+    "sha256": "60f8f25323f47996c1e5a299f87f42de42bd6c13a584733c4fe3d71ec48ba65a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/felt-blue-storybook-C4thRLzI.jpg",
+    "sha256": "ba2473976583621162c44629c0525ebac4ba7a5fc21508c5f6d5b7ddd4141600"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-00551c9c8ee6-PA_g5E4w.woff2",
+    "sha256": "4670539162ec83c4603b5cc552e8492491b54622a408bcd98101aa239c7d2930"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/notoserifsc-1914ad003732-BUMl0SMN.woff2",
+    "sha256": "2fea10a32b2490f49afda7a78f2d5c8ceae389933297bbb3684ea7b8181f46dd"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/q-pXgVlZs6.js",
+    "sha256": "c4828fd3608a4a8a9b322b6e5653aea3b21aa2556267680d5d27520796320fd9"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/turtle-B1tBg_DP.js",
+    "sha256": "7aee24b54c788eb05f03336ac595622a7e26d5a51d7d175fc95b12bd139f948a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/textures/leaves-overlay.mp4",
+    "sha256": "530dbbb600a70781a492b0b65aca5adf8fef8bd16b66b2b532d9049adee3f257"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/textures/rice-paper-2.png",
+    "sha256": "174f73c3d151185688172ebaa41f295823a7c0cd137ae8467be7d1f7b0da3908"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/textures/rice-paper-3.png",
+    "sha256": "3aa411635243064ee677bb034a1ec6e0c00019fecbbf1dc6a356f8318fdbdc84"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/textures/rice-paper.png",
+    "sha256": "a09b093b715fc9e8fd0f91ac02fcdc68636e825fa9555820ef8d6b8b7889d64b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/character-cards/yuan-hanako-emblem.png",
+    "sha256": "6976f3102fe740597035c86a0c71e1fd2eda0594b59a952978c8db14880848cf"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/character-cards/yuan-kong-card-back.png",
+    "sha256": "54dbe1945347273ec3c87c57a138573caefa3e7b717ebef8a0581dfc305dd37d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/character-cards/yuan-butter-card-back.png",
+    "sha256": "ff18a0a7e75f70a36ee33bc9423365f01b2e22584ec5674843f0d8836a59be2b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/character-cards/yuan-ming-emblem.png",
+    "sha256": "ab8b2c59fdbf83d58765ab2baf05760df11eed86601e34a9328f6430de6806e0"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/character-cards/yuan-lingxi-emblem.png",
+    "sha256": "46b9806e280811ea85e2bb773416d9f224d12d59e0bda5076d0f4f5a0cb0131d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/character-cards/yuan-kong-emblem.png",
+    "sha256": "9bf5628af0dd251a009d573388d42fc46915c051eecdfe122a990622f78f3a72"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/character-cards/yuan-hanako-card-back.png",
+    "sha256": "6ecb768ae9c0320027d70a9452a4d6172a73c5ff73ea289ca802b5fcaad314a7"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/character-cards/yuan-ming-card-back.png",
+    "sha256": "8ef33ab8c3448f629726f9b27ab5b76f2140c8af9e7d415869cbbeb512dd5a72"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/character-cards/yuan-butter-emblem.png",
+    "sha256": "8362fc2a2036f2216a09eadeaf8190c6d6e44fb58deac10652cda55592e3cc19"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/character-cards/yuan-lingxi-card-back.png",
+    "sha256": "16c7f5aa1c495ef90a82f2ee46e65848538ab77140ce4284c9c565bcb6b43097"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/ochre-silhouette.jpg",
+    "sha256": "f5d5a4afd322638735a233e0bf1ac859de45242f3dc0f3b8e6c52f1a8e536b3f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/pink-flower-fisherman.jpg",
+    "sha256": "d3828239a2769a9073f2f67cf5bf2bcc8da681df0df67cd1232f0ea82e083fb3"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/sunlit-window-leaves.jpg",
+    "sha256": "92d1debd8fb63df342f8b1b09c74e6c34eacb83fa9d4bc234f1937d169043bf9"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/scribble-black-cat.jpg",
+    "sha256": "7d5254583978aa9b210682680aac18ef5875e06d3b9f2ba64671acadbd8fa1dd"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/spring-gauze-room.jpg",
+    "sha256": "63a547045bb6eb382f453dbd4723e84ef8094972ad304f536db1015f7291c317"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/indigo-window-silhouette.jpg",
+    "sha256": "ee5d99ed00cc7ed185651f54892dc4894aff75406de4f91bbb70ee6e194d2e5a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/misty-blossoms.jpg",
+    "sha256": "3b912f2b71f78d6e31b3fc61e38c4a99e282f91fdc5ec3db225980f947e090b3"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/grass-horizon-dream.jpg",
+    "sha256": "c161357d00b165a1bed86303de46bdaf5a232845151201c20071099774507643"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/bamboo-shadow-minimal.jpg",
+    "sha256": "187e960e8bcbb49f20c62223eabdf2a9332973881668448058b707a10c0b5f7f"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/dragon-pillar-palace.jpg",
+    "sha256": "5cc7739eaba037c3311ccf95e166167763badc2edabd9e076f6c4bb91d543f62"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/four-seasons-storybook.jpg",
+    "sha256": "16c3ddf41b2bc2d40b23539f9b40096c7d759dfc41f1a52a843c3f3191785d29"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/green-plain-clouds.jpg",
+    "sha256": "9534c16237f6161b6a64387fbec4504825688a4f6c6161b7e3c02de6952e981e"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/story-garden-objects.jpg",
+    "sha256": "cc78249279cdabf75d9c2691c74e27a1f42b434938b86deba2effbe5d709fee9"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/summer-sea-fantasy.jpg",
+    "sha256": "4a94368706c40f197146b6ade0fcdfae6115c2f74d375f6626c22c5222c3f834"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/rainy-street-cafe.jpg",
+    "sha256": "7fc4266ce8fdf6c5d84d94c2f036e9ddc58a18727ffd3a1e1f4f78d68af1ca6b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/maximalist-four-seasons.jpg",
+    "sha256": "c46d06a1fb707c6070a640601160810596dac34eac194de0ab6fac61e31bec55"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/felt-blue-storybook.jpg",
+    "sha256": "ba2473976583621162c44629c0525ebac4ba7a5fc21508c5f6d5b7ddd4141600"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/pastel-spring-bookmark.jpg",
+    "sha256": "a9eecfe03c7cfa6dd102257486fd940648933a66a5bd9e9e153ac21d04c5bc7c"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/blue-sky-screenprint.jpg",
+    "sha256": "b5649573a3e29dd572ea0ef7b56b3c9d31b96bb9625e35d023a89cf76e45b281"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/white-cat-blossom.jpg",
+    "sha256": "2023a465e621ac4fcce7a5d8bca53600d481741f0e5bbd9044668a0586afce5d"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/hidden-ragdoll-cat.jpg",
+    "sha256": "f24d65ac17ceb6ad2ed0f46109a8657a0c8b0ee3ef09890530c496bfa6ae6b0b"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/wasteland-rider.jpg",
+    "sha256": "9b99bcff5a6c4677b5d8c088d653f722064c76e6ab8725175b71f26e0996e7b2"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/nature-plate-print.jpg",
+    "sha256": "d76dfad317d3d00061b5c2c56e45f92fe3adcb0b418996fa704b4df4b11d8dea"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/tree-lined-path.jpg",
+    "sha256": "9c05a080a5539d9a6144c6961dd0aa2920850eee0d8e96ae400a4f9cf3f54dcb"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/cover-gallery/blue-island-watercolor.jpg",
+    "sha256": "a5fbc788f7c9e1d2dfbaf831a0c9a4388de92261a25127b02e609d90b5c1e336"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/screenshot-previews/dark-desktop.png",
+    "sha256": "ca2f7c1c82a87160cc7052c122daa012493bd695f9378f401bae610520060336"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/screenshot-previews/light-mobile.png",
+    "sha256": "8bb599db35c075362b502e60ba99462c3e22dc202902a73445a8df3751435a37"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/screenshot-previews/sakura-mobile.png",
+    "sha256": "8cd622466062076daa7cd187f437a93b5daa4c8341cf0ba0398a2aee157a00d0"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/screenshot-previews/sakura-desktop.png",
+    "sha256": "8baa4229868dcd0726ce92d3dd893e6911ff63d9f864240a7f01d68120e0ca18"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/screenshot-previews/light-desktop.png",
+    "sha256": "962d070d4ebe48391e40678caa1f855fedcf8548230e48e6c5220158db75d53a"
+  },
+  {
+    "path": "desktop/dist-renderer/assets/screenshot-previews/dark-mobile.png",
+    "sha256": "f154462b8201c6ffa811277509c8d358133b7a3b07634f69b7ad89c15d175733"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/grass-aroma.css",
+    "sha256": "62e60a2da5af16a7e94e46b7e9804d64fc099959f86a21619c0f9e9c7a1cb5f5"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/new-warm-paper.css",
+    "sha256": "ce4e804ed190bc8edc32cdbd09fe8330597b0205805dd903afdfa59bb1d1f07a"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/midnight.css",
+    "sha256": "f0b0f8ad0c3569eb0f7bf7f668e6fe36a145da1f07c2bcf4e97c052cc9a7e989"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/delve.css",
+    "sha256": "a2965ec3b3d8c07eb5e5d166ccd9f56d6bd0305012f1af4bf6ad953c4c99925b"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/high-contrast.css",
+    "sha256": "4b1ba973df4ae446df2f534accc3c2a9f7e001c0b889dd3aba91b2602ee2e757"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/warm-paper.css",
+    "sha256": "572713f86290e39461876def7f6b528286a70297c9a7e28dd6a1f68e0fedf746"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/deep-think.css",
+    "sha256": "7a4a1b4f424246f8777e9706e0d1e3914ec894f2f65a0d1f937a4c9c5cee7d20"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/absolutely.css",
+    "sha256": "01f3ac56e0199c7be12c9d2c6b36240a23a32898c5c9545131f2823f73f7cb77"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/new-warm-paper-fonts.css",
+    "sha256": "105c6aa0930127dac4fb80885ef3c4abf3e5b5a2ce6969e581ab70ddaeb6a57c"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/coral.css",
+    "sha256": "610b5aa5a9ce4d9aebeec63f3aeba24fea3bee21d4259f600c75b9a669684152"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/midnight-contrast.css",
+    "sha256": "6400aa08cb7b8c0d20390febecb70d0eba0d7eed7866cd31d8fbde2b957cd2f3"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/contemplation.css",
+    "sha256": "aac60189de948a675af36f7cd35390ed88a80a77f27d10095a08da224df48586"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-98c488529f4a.woff2",
+    "sha256": "296b358f385d00a0e592fec49e8d6e2bebacfe3d3a482b4ec17ba1f83657b196"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-7edfe6d77834.woff2",
+    "sha256": "c5f2c63f333640d2f7c24498c0ace4447e54f3bc0751c019ed98b55a8c319c5a"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-e97b7ba2830a.woff2",
+    "sha256": "9ce339361b4d508f7d520796890d38be17fe5e3b7b3241303fd756d9ffda3162"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-c58e73e29360.woff2",
+    "sha256": "4769ea1f9d54b8f3ba8ad8cdced84deaf2806103d5423326c437039ecb418580"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-f3bae039eee9.woff2",
+    "sha256": "6d50a9587f5e3b2b7b6061d7ceb17972b6ae471c6edc38d0e1db76ece7859324"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-d0696d5de749.woff2",
+    "sha256": "4587b84a41332990e380cba554e06e5dcdda3e3e17f29b25e81447488dd89217"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-27a0f60856fd.woff2",
+    "sha256": "7e395932ef1c5961d6b92263bfe71309648dcda03151d3873a3b1fa99dac0f1b"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-f50ab6a52acf.woff2",
+    "sha256": "c295abb1cb77ccdaceac3704c57853df46a761ba53a47c5260b1cb6992e8fda6"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-971f0defb8b3.woff2",
+    "sha256": "4693770f950c84313f48173b13106c966b471a1aff3b110440093bf4b77ffebe"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-6ee866c3e2ac.woff2",
+    "sha256": "650a939f03de55a5cdca17ca8e4f43f54bf2687c25819102a76f62d99fee48f1"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-32ae389c9e2b.woff2",
+    "sha256": "a866e74045fa35af957ea063623a4759955c57e1d2dece7b4f14a10a71a2d1c1"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-20a28253a539.woff2",
+    "sha256": "d1a88f1ead7d8a19b91e6811a1e4e2114dd15516d8751d57f8f90360c289d885"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-bc4605da4006.woff2",
+    "sha256": "ce58eeb39a4a8a05a5f88929082030939424aae8b7e4bf174fb31e2185f77476"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/pt-serif-v11-latin-700italic.woff2",
+    "sha256": "e1bd3f9f50d4876fc67111ab41b60880f08b2eb89f8a0075c2ad3394a79c4063"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-39696e8777d8.woff2",
+    "sha256": "973a1037dceead92639ef647fdb7526c40846e3428976198c4ab04596ecee072"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-80beb326b682.woff2",
+    "sha256": "a56ca5009b41ad39553bcb89aba95e1d7ccde2e91cc07f6787af05c5dbef898b"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-09c866380734.woff2",
+    "sha256": "34de79ce62e48683ab06d69a248d275911403326cb26f91e081b0ed7105059a6"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-cfe56591799a.woff2",
+    "sha256": "89a5c6ab5b4faa068df9c289cf79d1bab3e068f3e07b7fad019f0bc17333d1bc"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-2aa248281b4e.woff2",
+    "sha256": "474b4dbfe6db34fdc1b2edf4c5c8b7ebdad9ecb72c5d19dc00c1b10f5de8f010"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-119da54bda94.woff2",
+    "sha256": "90cc9eda826a15b41d93c8546e3e4c98708ecae34cd6f1317bff6bed6863d9e3"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/pt-serif-v11-latin-italic.woff2",
+    "sha256": "be5daba1b69c2dad0eed50cc17bea9659ab23d79d8d412dc8e5c6013b41f39c3"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-0a3849a51147.woff2",
+    "sha256": "dbffed4fb73d0173f3bc41a8751c5c78f850f010a089ceecf85454769641e78b"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-aed56436e8a4.woff2",
+    "sha256": "584785876a5f0cc425fce0736406554ad747fdc18aab43c4ad9a7e679c75e759"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-37c839e39cb9.woff2",
+    "sha256": "782452cbe372494b23f634e8b5d6c7893352def1a005c63f48b252dff79487b3"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-9bd4092a33fb.woff2",
+    "sha256": "266ad8c16bc7f8282dad4b55e6fddd6e21f43520aee248647ae5715d59552dfa"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-452bfc2a7099.woff2",
+    "sha256": "d12f6642ce00cabbc23a5f7abf7b5cefb6a93554d6bfa9808398922b5e645af1"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-7885a1dee93b.woff2",
+    "sha256": "7240ed44b7738d40ffd8c01dd46ddc674fb329b7e46b307880d4fe69e4ce846f"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-522f9a92410a.woff2",
+    "sha256": "36b0ad95f7484b64dabb96fcf83423c8e5fdd343290467a38f9fad93d3fe2bbc"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-ee8d1b5f86ed.woff2",
+    "sha256": "834c8d0622f63a1ebab08a4e5da9f661c75141eb0b779c8a423b2eba418967e7"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-baf4512e0f02.woff2",
+    "sha256": "14be1e31de35528e95e5732b588f3c6d25a14117e152fd94f7f1677f709b01e7"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-1355c4e2b8f4.woff2",
+    "sha256": "b6ce0831978c5889d28317fc03ba5d2ab08384976b1841e578f2edc66876abd9"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-05f8cf9fbab6.woff2",
+    "sha256": "a7edea1ab0808d6aabe3ebade5131abdd4fcc8841c66e7b74aa0f9f6e38053aa"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-70c693c26388.woff2",
+    "sha256": "0af5a04314200627801ed9dff0c8cb2526c30dc76981fcede443a06cd35aace6"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-c1e9e2e9d350.woff2",
+    "sha256": "4af6147be9f2e61c3aad5c855e12a5089c25a0d7bfe94b53d0a28eeb24729d5a"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-43a71a06f59d.woff2",
+    "sha256": "042630ccc1f10a3c076c6358ec1100579053752045e3e3b6ac9229a4b90d8c11"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-10e9099bd7ee.woff2",
+    "sha256": "ae2d278a2ec633ead9e47ba12d777e073cb7c5f923d0eea282268f207c88ee7a"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-ad640617781e.woff2",
+    "sha256": "67bf8f9ba0a97c38d49bb52e11ba09bbe6cb966df6d194883bdda5c017b080fa"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-8738086c4201.woff2",
+    "sha256": "2e7fd9066d4e2e3da7be15336a87da9d1725cbe4f796cd9c3a969d80f048100a"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/inter-bec94a4daf06.woff2",
+    "sha256": "c940764593d0fe5d596be327ca7558855e018039fb78509aa21921fd3644c3e4"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-9da7bc751cbc.woff2",
+    "sha256": "ad7f9aece198ec03ecc186052adcab633e889bbb06cd20b8c059f3e94374803e"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-0701600f7996.woff2",
+    "sha256": "40ffb358e64eedca24fae79dd9400f47f4f8da5250bc8a5289493da9c67941ac"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-0a103913f647.woff2",
+    "sha256": "84997861676c9bae5324a52de385c0467858d168805998d3509be31090d5ebf1"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-17c2b137692d.woff2",
+    "sha256": "ae5cdcb1c4faf5acef0b9045f060a8e83d7c3266a4fe8ab930dd023ebf22870e"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-588f1b62c790.woff2",
+    "sha256": "e5313bcb399e45e9cca8c2337314e99d3c95972e38dbe0dce5585be0dc284d7e"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-2361a25d9c5d.woff2",
+    "sha256": "381f1fa4ceaacc9e5431b13c4aac8b936945692efb290b332642696bde00c32d"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-f275145955ab.woff2",
+    "sha256": "5315cd7852f4556ef0d06d95d22d6f7cde9e2fcff135134e1cec61f3d325ce2a"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/pt-serif-v11-latin-regular.woff2",
+    "sha256": "ef391572f9fbb7bab7fef6ce2c4fc92ad68a8c148889a79cb9f9b1452d851fab"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/ebgaramond-34b1bfba6955.woff2",
+    "sha256": "e51a27d5d3e54c7728636791cdd303d3c9f0417fe69e9866ecbeb48ad0a49a3a"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-8e4c4d6a156f.woff2",
+    "sha256": "ad1ec109702ef31152c19acc3a59e8fedbd237f15556be071d404e7ef3055e39"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-947e30fba0b9.woff2",
+    "sha256": "8a255b870c7bd24499b1b64e7e36d691cd5ad4e02e890967158ce72d0bba241b"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-5274ec774f6a.woff2",
+    "sha256": "6ceb5902615653f16ba0549272530f180107a9e5e8ef4503f1503637859648cc"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-62212c5d7cd3.woff2",
+    "sha256": "17d443c3d5ed4bcf621fdb09c5171725681a5e845b4cc05ebddb4fc995373f17"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-81323d079a9a.woff2",
+    "sha256": "815811bd7585bd7028bab0035b5258df50420917150bb02737002bb9b8ecb4e1"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-e99de0e215f7.woff2",
+    "sha256": "f3666a14f5ab7707c2e9ec73cb2a4075e1c66bcfddcef479c0144aaf03e09ca4"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-b791af3a4fd9.woff2",
+    "sha256": "bd365c058c05a9c6ef219b39a80be18443c2137767c2f3fef2249bf68c7f9b1d"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-7afaced7df43.woff2",
+    "sha256": "740e31fb7861be945ef6a565aeca97b49b4d5573f1c148aa4d6ada67619c2e37"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/ebgaramond-dcf7f6fa2702.woff2",
+    "sha256": "289219741ea10d13ceb82f32920af4f3d53c934bbcdc4a02372f7a955baf57d0"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-f82e85c61f90.woff2",
+    "sha256": "67d2655f88a0451e16d24831795ecc3f497feef462b2dae5a91dd0bc0c517172"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-4a0fda035b92.woff2",
+    "sha256": "c49561885d2802a1eb759aa7b152a0d8f68842b789f3e16089d14e697f73bb92"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-00551c9c8ee6.woff2",
+    "sha256": "4670539162ec83c4603b5cc552e8492491b54622a408bcd98101aa239c7d2930"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-693014a08415.woff2",
+    "sha256": "f86b1d47d8682617190bb64133f5548428a325ac9fb38eb34d9459cd31acfb7b"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-f0f75f7d6cc3.woff2",
+    "sha256": "49e34eb82b76e0ebab35f4cf977b2a4828feaca62fabbc7b0fe52954cf266771"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-b1147beae592.woff2",
+    "sha256": "5b70b8ca00cc3467f3fe5df9005fcb00e9f5d1df3a9bd945aafeecde2e9d243a"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-970d339b07c4.woff2",
+    "sha256": "c5f3e637af016af27ab86cfbd694243dce1d6b3c3562377803ff7f70188ff80c"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-573fbe56c828.woff2",
+    "sha256": "bca890604cda0fca672386ec2a65d585832704c09dd628d141213fecfbb35074"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-72d07829dd10.woff2",
+    "sha256": "655f4f75ebad483019e8741e32622e0692fb4cdb1c471dc512f865d471fdae51"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-1c1dcf1b5233.woff2",
+    "sha256": "19d4b346d120e63dd134d241c07b954ba26785b045f7b48e3f3a8821b5bf8403"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-1914ad003732.woff2",
+    "sha256": "2fea10a32b2490f49afda7a78f2d5c8ceae389933297bbb3684ea7b8181f46dd"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-7defc4186128.woff2",
+    "sha256": "a71cf1538eb30d8f5fddd86ade1973aa7deb20b237edc3e8945ffd8d1cf03c3a"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-39cf261ef310.woff2",
+    "sha256": "4708a6c176466c7823f3ce335ec94d5e9b008c0b0cf510f5802565887006e2b4"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-64718129350d.woff2",
+    "sha256": "ea40e335d816d52492ef32686cb4439ff65dc65b53c8baedfcbdeab6d44514b5"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/ebgaramond-9947e6f6e128.woff2",
+    "sha256": "79d17b52365a2d5bd8995c8c54939d384e9888ed2038c7201fd8d4118d6f0a35"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-49ed372fb213.woff2",
+    "sha256": "e46ff0466edbaacfcf88f826d2acf6658b705983d8563f62baf9a12728474504"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-ad7e45295d7c.woff2",
+    "sha256": "cfbda09fec2567865a8a761ef93062ae5f711889b7523026b0ec0ca4f7a68e92"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/inter-367ba69ac0a2.woff2",
+    "sha256": "a28eb6d3ccb534ae0c94ca999371df024aab60b08c3c8a5720ee9e32fa0faaa2"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-154f9e92b91b.woff2",
+    "sha256": "2da04fe98e7eb332524d395cd4f13d9a4626c037d77599c50e1ad731af907e6e"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-f0605f0725c5.woff2",
+    "sha256": "803d6e7987b319aeb7c1f1c5671cb0005c50044483140832356fae0f046ca5dc"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-703603f23e9c.woff2",
+    "sha256": "c9ce19df1e39eaa09e3a60aa7b67c54c949e64f68972327c1105d1c76e61b955"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-f8c6255eb7b3.woff2",
+    "sha256": "3538f75012bbf8d8934125d5f2701ad16075d5c0257bda002a75b3d5ac2abede"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-52e8ecde552b.woff2",
+    "sha256": "0a47a21c2e7dca05341574000500a55eaa7e21e6bfa9a9f1a6323303b4101c60"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-bb1bf6128360.woff2",
+    "sha256": "1868620dcde3a615ff47531bb0032e0bdfcbbb7696c7b7168492940a39d519cd"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-673c20cc0be0.woff2",
+    "sha256": "751bd5775c805c8e26c96e062d00d7632e3b93ccc4703f366649509ab211ebaf"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-458b4ea6bede.woff2",
+    "sha256": "c704af2f7f454c232781096f5dd48f7438174db64b40abf28963dc847045ec2a"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-2f47f914b65f.woff2",
+    "sha256": "1ff783685059ccf2299afbcf41f485a330ea888f62b95c5f2c9c83bac5f78125"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-14a8af0d052a.woff2",
+    "sha256": "c8476db3fbba41856cbb3c1683a97df0964b804f6818bb96d34c4325514f9fd7"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-491d99d2666b.woff2",
+    "sha256": "f52842471f7a4d931b81fcaa37ddcc7da2281ccc043b593c10f4dd351ad30fd2"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-5d0ae2cebbd3.woff2",
+    "sha256": "83bf094bd8a87732a5d2e79069c22b30ca46890e18c7fc9e539612873070c204"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-abf820f52f82.woff2",
+    "sha256": "2c7385493055759bb67da7ddf9e88375a5c335c8693aabaaa83810d02c09ffb7"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-3e2b58117077.woff2",
+    "sha256": "bc2ea3b31632e0588757317f7816124337dd7cfcb87bf7f2e15ef72dc3e5aea0"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-852eb7d1ab3e.woff2",
+    "sha256": "3fa16c7d779824151a721cf2101aa3acda5b843f5e094e7602aa9ab258eb08fe"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-4dca2c601897.woff2",
+    "sha256": "3789541ab21901c4ada9ebc8056a24b6efcd423eef7c6b897251380f697c3193"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-1e4ff3a38cc2.woff2",
+    "sha256": "8b3ae6c6a94924aedf8be6328745608a012f8d6042ef3ca6c3d6bb4f61bde86d"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-6c22b14e790d.woff2",
+    "sha256": "6ef9dbc0196f0e56763181b5ee0ac59f65c3b93b9a73e40bf0784fd41bf9fb9e"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-b87733964a7f.woff2",
+    "sha256": "17eb7afd55036b86748f51a779b9424a2a64563e949a70fea03a71d662ce486d"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-29e2eaccf9e6.woff2",
+    "sha256": "1b8db7f344c8b80f918a87aab300f386f3f6094a8b638d2e6a2479d582af894a"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-cb2738af0113.woff2",
+    "sha256": "9576332f2a473094fb110562da8e21b547dcb69073dfe8e24167f0cf3dc3a231"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/jetbrainsmono-9326b4c9bf1d.woff2",
+    "sha256": "9c38cb2d0d2d93c1ee6e21fa78db76f13ea7e15e15cc64214c7ca89b6aaa35c4"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-f1fff56ea705.woff2",
+    "sha256": "889cb2eeb801941d1675036b3bd596c0d370faea1947d198468d6bc3f53107a3"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-6893df85cc12.woff2",
+    "sha256": "6cf3eb9cad4cc2f78c164e83306cc9451bd3c4bfbacffc66fdaa9ae32da21e38"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-9d126fb68ebd.woff2",
+    "sha256": "e8f01587de1e099b2ca32cb37ce6ffad2af11199048efa9f0cf13783784a333e"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-8d616f18e8e9.woff2",
+    "sha256": "cbd375808a8f32d3bf51e277d238f9de60a56ec1c3c791a61993bf5cb2864b03"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-86f085af9be6.woff2",
+    "sha256": "49cceeaa9f25f307a2dd4d3ce02bb9c33b035cbb461031c9dd2ffc1e90385557"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-0b5a20cd55e5.woff2",
+    "sha256": "fb4e744db699c2b01be2831d9a090524456b800099aa42ec81a95c3225bb86ac"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/ebgaramond-9dadaee72759.woff2",
+    "sha256": "5e3fe3bc99526f4edd5f6ab046af54261aa4fbeb59412aa3e32a88cd30e20350"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/jetbrainsmono-b87346fdc77f.woff2",
+    "sha256": "2c32b9b3ee358c119e210f6f5195f9bd34894d78a785ff2e95d60e718e400af4"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-2903b3a155b9.woff2",
+    "sha256": "837c860c57686f1918dbeb348ad6811e9b26992e3ac8c574ea20642790dc4bae"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-bf14121917e9.woff2",
+    "sha256": "ebe07064881bbfab65b1afc054cf484d77440374d98a138bf66d44cf5c671e59"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-980e2eba29ea.woff2",
+    "sha256": "c93234bd053cc53f0f71f1cc13565b2d1f6bec16d4ebc90420430c06541c4f4d"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-ae9faf529fb6.woff2",
+    "sha256": "1f868051a8bf937bb03c809f1ad52dc1d2fb78037a1c4f942f0f1c4142d0e466"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/pt-serif-v11-latin-700.woff2",
+    "sha256": "e548abcd8734bfcf8b4ebbbca1af98f9e8ae1e0ff884c0971f29498a4fc108f4"
+  },
+  {
+    "path": "desktop/dist-renderer/themes/fonts/notoserifsc-7f25644ebb96.woff2",
+    "sha256": "80cbe1f2b9c2cd4db4e491003f7d09806d5b60ada1792bc17c7d4d81aa5a79a0"
+  }
+]

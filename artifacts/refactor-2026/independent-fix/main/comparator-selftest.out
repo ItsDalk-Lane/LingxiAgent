@@ -1,0 +1,14 @@
+{
+  "same_input": {
+    "verdict": "IMPROVED",
+    "delta_pct": -23.8,
+    "reason": "中位数改善 23.8%；正确性零容忍检查另行确认后才能接受"
+  },
+  "fake_optimization": {
+    "verdict": "INVALID",
+    "reason": "工作负载不等价（digest 90feb1dd vs fe21028d）：样本数/工作负载描述不同，禁止比较",
+    "d1": "90feb1ddcec8e067ba1237fa9c4370b67311d3c9a9a04376e9860759a7515361",
+    "d2": "fe21028db96193b9ad33f158bace637a9feb1b863c23f80ecb492d2792cc16c3"
+  }
+}
+[bench-compare selftest] PASS：同输入给出可比判定（IMPROVED/COMPARABLE）、假优化被拒（INVALID）
