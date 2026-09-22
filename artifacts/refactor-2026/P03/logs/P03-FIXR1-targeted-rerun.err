@@ -1,0 +1,9 @@
+stderr | tests/mcp-http-client.test.ts > MCP HTTP clients > excludes tools whose x-mcp-header annotation violates the spec
+[mcp:modern] dropped tool "number_param": its x-mcp-header annotations break the header-mirroring rules
+[mcp:modern] dropped tool "dupe": its x-mcp-header annotations break the header-mirroring rules
+[mcp:modern] dropped tool "nested": its x-mcp-header annotations break the header-mirroring rules
+[mcp:modern] dropped tool "bad_token": its x-mcp-header annotations break the header-mirroring rules
+
+stderr | tests/on-demand-first-party.test.ts > first-party on-demand assembly > keeps a tool resident with a warning when its schema cannot be consumed safely
+[tool-availability] tool "notify" cannot defer (schema validation failed: Tool parameter schema contains invalid schema fields.); keeping it resident
+

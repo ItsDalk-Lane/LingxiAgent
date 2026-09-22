@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "stage_id": "P03",
+  "task_id": "P03-T07",
+  "generated_at": "2026-09-22",
+  "method": "在既有真实 registry/gateway/engine fixture 上扩展（本阶段新增用例见 P03_REPORT §任务逐项）；外部执行器/传输用替身，网关、注册表、目录、权限包装、审批链全为真实实现。安全关键组合全路径展开，正常参数按有界组合。",
+  "sources": ["first-party(真实 engine.buildTools)", "plugin(真实 PluginManager fixture)", "mcp(真实 McpManager)"],
+  "matrix": [
+    {
+      "dimension": "来源×路径 端到端接线",
+      "cells": [
+        { "cell": "first-party×direct", "status": "COVERED", "evidence": "tests/on-demand-first-party.test.ts（常驻四+回驻）；tests/engine-build-tools.test.ts" },
+        { "cell": "first-party×deferred", "status": "COVERED", "evidence": "tests/on-demand-first-party.test.ts first-party bridge invocation 族（真实 grep 执行、授权串、fail-closed）" },
+        { "cell": "plugin×direct", "status": "COVERED", "evidence": "tests/engine-tool-defer.test.ts 插件直载；tests/tool-lifecycle-revocation.test.ts 旧插件会话撤销" },
+        { "cell": "plugin×deferred", "status": "COVERED", "evidence": "tests/tool-deferred-builtin-parity.test.ts；tests/tool-lifecycle-revocation.test.ts" },
+        { "cell": "mcp×direct", "status": "COVERED", "evidence": "tests/tool-deferred-mcp-parity.test.ts 直接与延迟调用复用同一发布适配器" },
+        { "cell": "mcp×deferred", "status": "COVERED", "evidence": "tests/tool-deferred-mcp-parity.test.ts（真实 McpManager + mcp_call）" },
+        { "cell": "任意×plugin-dev-http", "status": "COVERED", "evidence": "tests/tool-invocation-path-parity.test.ts HTTP developer route（网关层；生产路由已删见 T05）" },
+        { "cell": "任意×isolated", "status": "COVERED", "evidence": "tests/server-composition-boundary.test.ts（P02 A15 八入口真实 server；executeIsolated 复用 buildTools 产物）" },
+        { "cell": "任意×ptc-subcall", "status": "COVERED", "evidence": "tests/ptc-engine-assembly.test.ts（mcp_call→run_tools→直挂/目录子调用端到端+只读拒绝）" }
+      ]
+    },
+    {
+      "dimension": "安全关键组合（每用例断言执行次数=0 / 外部替身计数未增 / 文件未变）",
+      "cells": [
+        { "cell": "拒绝：畸形参数×3模型路径", "status": "COVERED", "evidence": "tool-invocation-path-parity 'keeps model-route schema failures on the same stable error code'（executor 0 次）；tool-schema-validator（缺失/错型/额外字段/枚举/深宽超限）" },
+        { "cell": "拒绝：越界资源（A11）", "status": "COVERED", "evidence": "tool-invocation-path-parity grants-narrow（ACTION_BLOCKED_BY_WORKSPACE_BOUNDARY + executor 恰 1 次仅限合法调用）；sandbox-policy 符号链接/工作区根；resource-io-sandbox-tools" },
+        { "cell": "身份伪造（A03/A08）", "status": "COVERED", "evidence": "tool-invocation-gateway A08 严格/宽松（args 伪造身份字段不改宿主绑定，执行 ctx 断言）；createLocalDeveloperPrincipal 伪造 owner 6 样例；prepareAndInvoke 拒绝远程主体" },
+        { "cell": "审批后变更（A04）", "status": "COVERED", "evidence": "tool-invocation-gateway mismatch 族 5 例（参数/目标/会话/代理/调用编号替换→PREPARED_INVOCATION_MISMATCH，executor 0 次）；path-parity grants-narrow（参数变则授权不跟随）" },
+        { "cell": "审批后禁用/卸载/升级（A05/A06）", "status": "COVERED", "evidence": "path-parity 'revokes %s after approval'（3 路由×可用性/代次，executor 0 次）；tool-lifecycle-revocation（卸载/列表变化/断线三态）；gateway 代次变化" },
+        { "cell": "跨会话（A07/A13）", "status": "COVERED", "evidence": "on-demand-first-party 'isolates per-agent catalogs'（本阶段新增：B 持同名授权仍 0 执行）；tool-presentation-history '搜索结构引用不能跨会话解析'" },
+        { "cell": "负向防旁路（A15）", "status": "COVERED", "evidence": "①静态：tool-invocation-boundary 合成违规 fixture（5 规则全报）+ 本阶段真实树故障注入（core/tool-catalog-bridge 注入 executeCanonical 直调→门禁 exit 1 + 测试红→还原后双绿，日志 P03-T07-fault-injection-*）；②运行时：gateway '没有 prepared 上下文时拒绝模型路径'" }
+      ]
+    },
+    {
+      "dimension": "有界正常组合",
+      "cells": [
+        { "cell": "3 模型路由×正常调用语义一致（A01）", "status": "COVERED", "evidence": "path-parity 'keeps model routes semantically identical'（审批 1 次/执行 1 次/结构化输出逐字节相等/checkStagePath 9 次）" },
+        { "cell": "常驻/按需预算（A09）", "status": "COVERED", "evidence": "on-demand-first-party 直载面断言；engine-tool-defer 阈值族；manifest tier1/tier2" },
+        { "cell": "压缩恢复（A10）", "status": "COVERED", "evidence": "session-manifest-delivery（reminder 按 compactionRevision 重投+不再重复投递）；on-demand-first-party describe 族" },
+        { "cell": "取消传播（A14）", "status": "COVERED", "evidence": "gateway 取消前后传播；path-parity streaming+取消 3 路由" },
+        { "cell": "超时不重发（A12）", "status": "COVERED", "evidence": "mcp-http-client P03-A12（本阶段新增）+401 单次重试族" },
+        { "cell": "大结果全文（A13）", "status": "COVERED", "evidence": "tool-presentation-history 预览/全文/防伪造/跨会话族" }
+      ]
+    }
+  ],
+  "not_reachable": [
+    { "cell": "生产 plugin-dev-chat HTTP 端点", "reason": "无生产 wrap 站点传该路由（TOOL_PATH_MATRIX 引用 grep 证据）；以网关/包装层 parity 测试覆盖其语义" },
+    { "cell": "真实远程供应商执行", "reason": "F3 网络环境（继承 P01/P02）；外装服务以本地协议替身验证，真实验证归 P04/P08 授权阶段" }
+  ],
+  "fault_injection_log": [
+    {
+      "step": 1,
+      "action": "在 core/tool-catalog-bridge.ts 注入 export const __p03FaultInjection = (target) => target.executeCanonical(...) 直调旁路",
+      "command": "npm run check:tool-invocation-boundaries",
+      "exit_code": 1,
+      "observed": "core/tool-catalog-bridge.ts:406:53 [canonical-executor-bypass] … check failed (1 violations)",
+      "log": "artifacts/refactor-2026/P03/logs/P03-T07-fault-injection-gate.out"
+    },
+    {
+      "step": 2,
+      "action": "同一注入下运行路径安全测试",
+      "command": "npx vitest run tests/tool-invocation-boundary.test.ts",
+      "exit_code": 1,
+      "observed": "finds no raw executor or deferred-object-map bypass in production source 失败",
+      "log": "artifacts/refactor-2026/P03/logs/P03-T07-fault-injection-test.out"
+    },
+    {
+      "step": 3,
+      "action": "还原注入后复跑两项",
+      "exit_code": 0,
+      "observed": "边界门禁 2244 文件通过；测试 5/5 绿；git diff 确认零残留",
+      "log": "artifacts/refactor-2026/P03/logs/P03-T07-fault-injection-gate-recovered.out / -test-recovered.out"
+    }
+  ]
+}

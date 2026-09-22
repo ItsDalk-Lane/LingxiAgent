@@ -107,7 +107,12 @@ const SUBAGENT_BLOCKED_TOOLS = new Set([
 // 故不进 AUTO_REVIEW（LLM 审查双重把关且非确定，灰测已实证会误拒）。
 const SESSION_COLLAB_READ_ACTIONS = new Set(["?", "list", "read"]);
 
-const FILE_READ_ACTIONS = new Set([
+// session_folders 的免审动作集。shared/tool-categories.ts 用字面集合镜像了
+// 这两个集合（shared 层不依赖 core），tests/on-demand-first-party.test.ts
+// 逐字比对两侧防止漂移；这里导出以便该测试直接引用权威定义。
+export const SESSION_FOLDERS_READ_ACTIONS = new Set(["list"]);
+
+export const FILE_READ_ACTIONS = new Set([
   "stat",
 ]);
 
@@ -330,7 +335,7 @@ function classifyExecCommandAction(mode, params, context) {
 }
 
 function classifySessionFoldersAction(mode, action, context) {
-  if (action === "list") return { action: "allow" };
+  if (SESSION_FOLDERS_READ_ACTIONS.has(action)) return { action: "allow" };
   if (mode === SESSION_PERMISSION_MODES.READ_ONLY) return blockedByReadOnly("session_folders", context);
   return { action: "allow" };
 }

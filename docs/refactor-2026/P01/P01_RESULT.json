@@ -56,7 +56,7 @@
   "legacy_paths": [
     { "item": "cli resolveCliLingxiHome 独立复刻（OWNERSHIP_MAP 🔴）", "action": "收口：wrapper → shared/hana-runtime-paths（A11 语义逐例保持）" },
     { "item": "@lingxi/plugin-* 与 @hana/plugin-* 死别名", "action": "删除（清退前核实零引用；tsconfig.json packages include glob 因契约保留）" },
-    { "item": "safeJson 静默吞畸形 JSON", "action": "/sessions/new 已换 strictJson + 对象形状/字段类型校验（验收修复轮闭合 A07 全维度）；其余读取面保留（显式账本，P02+ 按需切换，复用 hono-helpers 三件套勿新建第二套）" },
+    { "item": "safeJson 静默吞畸形 JSON", "action": "/sessions/new 已换 strictJson + 对象形状/字段类型校验（验收修复轮闭合 A07 全维度）；其余 150+ 调用点保留为显式推迟账本（2026-09-22 复验收正：绝大多数为写路由 POST/PUT/PATCH，含 /sessions/new-detached 同族，非读取面；后续阶段按需逐个切换，复用 hono-helpers 三件套勿新建第二套）" },
     { "item": "tests/pi-sdk-import-boundary .ts 扫描盲区", "action": "关闭（+.ts/.tsx + 四个生产根）" },
     { "item": "依赖检查器拼接构造绕过（\"elect\"+\"ron\" 等）", "action": "验收修复轮闭合：常量拼接折叠 + 片段提及 + host-dynamic-unproven；运行时拼接（env/函数返回值）登记为固有静态边界" }
   ],

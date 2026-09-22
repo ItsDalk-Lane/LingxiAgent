@@ -1,0 +1,3 @@
+stderr | tests/p02-recovery-restart.test.ts > A10 只读恢复（可安全重试的中途退出） > 崩溃后关联（父会话/类型）保留，恢复不伪造已完成副作用；同 attempt 合法续执行
+[task-registry] no handler for type "readonly-probe", task task_read_probe registered without abort support
+

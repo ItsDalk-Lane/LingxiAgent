@@ -1,0 +1,13 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stderr | tests/on-demand-first-party.test.ts > first-party on-demand assembly > keeps a tool resident with a warning when its schema cannot be consumed safely
+[tool-availability] tool "notify" cannot defer (schema validation failed: Tool parameter schema contains invalid schema fields.); keeping it resident
+
+ ✓ tests/on-demand-first-party.test.ts (21 tests) 159ms
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  01:23:50
+   Duration  3.43s (transform 2.04s, setup 19ms, import 3.19s, tests 159ms, environment 0ms)
+

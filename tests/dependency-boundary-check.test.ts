@@ -154,6 +154,28 @@ describe("dependency boundary static gate (P01-T06)", () => {
           'export const load = () => import(m);',
         ].join("\n"),
       );
+      // 验收修复轮（2026-09-22）：全字面量 substitution 的模板表达式与二元
+      // "+" 拼接静态等价，同受折叠约束（此前 `` `elect${''}ron` `` 全放行）。
+      fs.writeFileSync(
+        path.join(root, "core", "electron-template.ts"),
+        [
+          'export const load = () => import(`elect${""}ron`);',
+        ].join("\n"),
+      );
+      fs.writeFileSync(
+        path.join(root, "core", "sdk-template.ts"),
+        [
+          'const pkg = `@earendil-works${"/pi-ai"}`;',
+          'export const load = () => import(pkg);',
+        ].join("\n"),
+      );
+      // 含变量 substitution 的模板 = 运行时拼接，维持放行（固有静态边界）。
+      fs.writeFileSync(
+        path.join(root, "core", "runtime-template.ts"),
+        [
+          'export const load = (s: string) => import(`elect${s}ron`);',
+        ].join("\n"),
+      );
       // 真计算式（运行时拼接）+ 文件内零敏感名 → 维持放行（固有静态边界）。
       fs.writeFileSync(
         path.join(root, "core", "runtime-loader.ts"),
@@ -166,7 +188,9 @@ describe("dependency boundary static gate (P01-T06)", () => {
     const flagged = report.violations.map((v) => `${v.file}:${v.rule}`).sort();
     expect(flagged).toEqual([
       "core/electron-concat.ts:host-dynamic-unproven",
+      "core/electron-template.ts:host-into-core",
       "core/sdk-concat.ts:sdk-dynamic-unproven",
+      "core/sdk-template.ts:sdk-dynamic-unproven",
     ]);
   });
 

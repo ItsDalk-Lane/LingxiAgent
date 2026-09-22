@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { ToolInvocationGateway } from "../core/tool-invocation-gateway.ts";
+import {
+  createLocalDeveloperPrincipal,
+  ToolInvocationGateway,
+} from "../core/tool-invocation-gateway.ts";
 import { ToolTargetRegistry } from "../core/tool-target-registry.ts";
 import {
   createFirstPartyToolIdentity,
@@ -357,6 +360,36 @@ describe("规范化工具调用网关", () => {
       } as never,
     )).rejects.toMatchObject({ code: "PERMISSION_DENIED" });
     expect(target.executeCanonical).not.toHaveBeenCalled();
+  });
+
+  // ── P03-A08：本地开发者主体只能从已认证的本地 owner 铸造 ──
+  // 远程连接、非 loopback 凭证、自报 kind 的对象都不能换取 local-developer
+  // 身份；主体由宿主铸造，不由请求方声明。
+  it("createLocalDeveloperPrincipal 拒绝远程/伪造 owner（P03-A08）", () => {
+    const localOwner = {
+      kind: "local_user",
+      connectionKind: "local",
+      credentialKind: "loopback_token",
+      principalId: "local:owner-1",
+    };
+    expect(createLocalDeveloperPrincipal(localOwner)).toMatchObject({
+      kind: "local-developer",
+      principalId: "local-developer:local:owner-1",
+      ownerPrincipalId: "local:owner-1",
+      connectionKind: "local",
+    });
+
+    const forgeries = [
+      ["远程连接的本地用户", { ...localOwner, connectionKind: "custom_remote" }],
+      ["非 loopback 凭证", { ...localOwner, credentialKind: "bearer_token" }],
+      ["自报 kind 非 local_user", { ...localOwner, kind: "local-developer" }],
+      ["空 principalId", { ...localOwner, principalId: "  " }],
+      ["非对象 payload", "local_user"],
+      [":null", null],
+    ] as const;
+    for (const [label, owner] of forgeries) {
+      expect(() => createLocalDeveloperPrincipal(owner), label).toThrow(TypeError);
+    }
   });
 
   it("装配时不可见目标和不合规参数在权限解析前被拒绝", () => {

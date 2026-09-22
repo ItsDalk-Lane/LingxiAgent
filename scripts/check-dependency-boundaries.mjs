@@ -24,9 +24,10 @@
  * 里的包名不会误报；但计算式动态 import 只能按上面的保守规则处理。
  *
  * 已知静态边界（验收加固后仍存在的）：字符串提及检测覆盖字面量与**常量拼接
- * 折叠**（"@earendil-works" + "/pi-ai" 这类二元拼接会被求值），不覆盖运行时
- * 拼接（process.env、函数返回值、数组 join）——后者静态不可判定，登记为固有
- * 盲区；适配层内的动态加载属其职责，始终豁免。
+ * 折叠**（二元 "+" 拼接与全字面量 substitution 的模板表达式 `` `a${'b'}c` ``
+ * 均被求值），不覆盖运行时拼接（process.env、函数返回值、数组 join、含变量
+ * substitution 的模板）——后者静态不可判定，登记为固有盲区；适配层内的动态
+ * 加载属其职责，始终豁免。
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -66,13 +67,24 @@ const SDK_DEEP_PATH_PATTERN = /node_modules\/@(?:earendil-works|mariozechner)\//
 const SDK_NAME_FRAGMENTS = ["@earendil-works", "@mariozechner", "pi-ai", "pi-coding-agent", "pi-agent-core"];
 const HOST_NAME = "electron";
 
-/** 常量字符串折叠：字面量与纯字面量 "+" 拼接可静态求值；其余返回 null。 */
+/** 常量字符串折叠：字面量、纯字面量 "+" 拼接与全字面量 substitution 的模板
+ *  表达式可静态求值（`` `elect${''}ron` `` 与 "elect"+"ron" 静态等价，同受
+ *  约束）；其余（变量/表达式 substitution、运行时拼接）返回 null。 */
 function constantStringOf(node) {
   if (ts.isStringLiteralLike(node)) return node.text;
   if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.PlusToken) {
     const left = constantStringOf(node.left);
     const right = constantStringOf(node.right);
     return left !== null && right !== null ? left + right : null;
+  }
+  if (ts.isTemplateExpression(node)) {
+    let folded = node.head.text;
+    for (const span of node.templateSpans) {
+      const literal = constantStringOf(span.expression);
+      if (literal === null) return null;
+      folded += literal + span.literal.text;
+    }
+    return folded;
   }
   return null;
 }
@@ -189,6 +201,9 @@ function scanSourceFile(rootDir, filename, violations) {
     } else if (ts.isStringLiteral(node)) {
       noteMention(node.text);
     } else if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.PlusToken) {
+      const folded = constantStringOf(node);
+      if (folded !== null) noteMention(folded);
+    } else if (ts.isTemplateExpression(node)) {
       const folded = constantStringOf(node);
       if (folded !== null) noteMention(folded);
     }

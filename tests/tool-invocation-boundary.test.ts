@@ -12,12 +12,14 @@ const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url))
 
 describe("tool invocation static boundaries", () => {
   it("uses exact-file allowlists for every raw execution boundary", () => {
+    // pluginExecuteTool 的白名单为空：原 core/plugin-dev-service.ts 已随插件
+    // 生态收口（04f90d2b2）删除，任何生产 executePluginTool 调用都按违规报。
     expect(EXACT_BOUNDARY_ALLOWLISTS).toEqual({
       mcpCallTool: [
         "core/mcp/clients/http-client.ts",
         "core/mcp/manager.ts",
       ],
-      pluginExecuteTool: ["core/plugin-dev-service.ts"],
+      pluginExecuteTool: [],
       canonicalTargetExecutor: ["core/tool-invocation-gateway.ts"],
     });
   });

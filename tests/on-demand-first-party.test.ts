@@ -7,13 +7,21 @@ import {
   assertOnDemandCoreToolNamesSound,
   BUILT_IN_PERMISSION_GATEWAY_TOOL_NAMES,
   CORE_TOOL_NAMES,
+  FILE_TOOL_READ_ACTIONS,
   FIRST_PARTY_DEFERRED_PERMISSION_CONTRACTS,
   firstPartyDeferredInvocation,
   ONDEMAND_CORE_TOOL_NAMES,
   OPTIONAL_TOOL_NAMES,
   RESIDENT_CORE_TOOL_NAMES,
+  SESSION_FOLDERS_TOOL_READ_ACTIONS,
   STANDARD_TOOL_NAMES,
 } from "../shared/tool-categories.ts";
+import {
+  classifySessionPermission,
+  FILE_READ_ACTIONS,
+  SESSION_FOLDERS_READ_ACTIONS,
+  SESSION_PERMISSION_MODES,
+} from "../core/session-permission-mode.ts";
 
 const BRIDGE_NAMES = ["mcp_search_tools", "mcp_describe_tool", "mcp_call"];
 const RESIDENT_FOUR = ["edit", "exec_command", "read", "write"];
@@ -64,16 +72,18 @@ function makeEngine({
   tools = [],
   builtinDefer = true,
   mcpTools = 0,
+  agentConfig = {},
 }: {
   tools?: any[];
   builtinDefer?: boolean;
   mcpTools?: number;
+  agentConfig?: Record<string, unknown>;
 } = {}) {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hana-on-demand-"));
   const agentDir = path.join(tmpDir, "agents", "focus");
   const workspace = path.join(tmpDir, "workspace");
   fs.mkdirSync(workspace, { recursive: true });
-  const agent = { id: "focus", agentDir, config: {}, tools };
+  const agent = { id: "focus", agentDir, config: agentConfig, tools };
 
   // Raw MCP tools below the default threshold keep the MCP source from
   // deferring, so the catalog exercises the first-party source alone.
@@ -172,6 +182,79 @@ describe("on-demand partition invariants", () => {
   });
 });
 
+// ── P03-T01：合成契约镜像与宿主分类器一致性 ──────────────────────────────
+// shared 层不依赖 core，动作集合靠字面镜像；这里同时锁定“字面集合相等”和
+// “行为语义永不宽于直载路径”两层，任何一侧改动而另一侧未跟都会变红。
+describe("P03-T01 deferred permission contract mirrors the host classifier", () => {
+  const MODES = [
+    SESSION_PERMISSION_MODES.READ_ONLY,
+    SESSION_PERMISSION_MODES.AUTO,
+    SESSION_PERMISSION_MODES.ASK,
+    SESSION_PERMISSION_MODES.OPERATE,
+  ] as const;
+  // 宽松度排序：deny < prompt < review < allow（延迟路径只能等于或更严）。
+  const PERMISSIVENESS: Record<string, number> = {
+    deny: 0,
+    prompt: 1,
+    review: 2,
+    allow: 3,
+  };
+  const PROBE_ACTIONS = ["stat", "list", "read", "?", "write", "copy", "move", "send", ""];
+
+  function deferredDecision(name: string, params: unknown) {
+    const descriptor = firstPartyDeferredInvocation(name, params);
+    expect(descriptor).toBeTruthy();
+    return MODES.map((mode) => classifySessionPermission({
+      mode,
+      toolName: name,
+      params: {},
+      context: { toolInvocation: descriptor },
+    }).action);
+  }
+
+  function directDecisions(name: string, params: unknown) {
+    return MODES.map((mode) => classifySessionPermission({
+      mode,
+      toolName: name,
+      params,
+      context: {},
+    }).action);
+  }
+
+  function allAllow(actions: string[]) {
+    return actions.every((action) => action === "allow");
+  }
+
+  it("keeps the literal read-action mirrors identical to the classifier sets", () => {
+    expect([...FILE_TOOL_READ_ACTIONS].sort()).toEqual([...FILE_READ_ACTIONS].sort());
+    expect([...SESSION_FOLDERS_TOOL_READ_ACTIONS].sort())
+      .toEqual([...SESSION_FOLDERS_READ_ACTIONS].sort());
+  });
+
+  it("never classifies a synthetic contract more permissive than the direct path", () => {
+    for (const [name, kind] of Object.entries(FIRST_PARTY_DEFERRED_PERMISSION_CONTRACTS)) {
+      const paramSets = kind === "file" || kind === "session-folders"
+        ? PROBE_ACTIONS.map((action) => ({ action }))
+        : [{}];
+      for (const params of paramSets) {
+        const deferred = deferredDecision(name, params);
+        const direct = directDecisions(name, params);
+        deferred.forEach((action, index) => {
+          expect(
+            PERMISSIVENESS[action] ?? -1,
+            `${name} ${JSON.stringify(params)} mode=${MODES[index]}: deferred ${action} vs direct ${direct[index]}`,
+          ).toBeLessThanOrEqual(PERMISSIVENESS[direct[index]] ?? -1);
+        });
+        // read 类合成契约承诺“直载路径全模式放行”，因此两侧必须同为 allow。
+        if (kind === "read") {
+          expect(allAllow(deferred), name).toBe(true);
+          expect(allAllow(direct), name).toBe(true);
+        }
+      }
+    }
+  });
+});
+
 describe("first-party on-demand assembly", () => {
   const dirs: string[] = [];
   afterEach(() => {
@@ -249,6 +332,31 @@ describe("first-party on-demand assembly", () => {
     expect(broken.execute).not.toHaveBeenCalled();
   });
 
+  // ── P03-T04-3：schema 无法安全消费时显式回退常驻（warn，不静默、不盲延迟）──
+  it("keeps a tool resident with a warning when its schema cannot be consumed safely", () => {
+    // properties 值不是 schema 节点：注册期元 schema 检查即抛错，JSON 往返后
+    // 仍抛——该工具显式回退常驻（带 warn 日志），绝不带病延迟；它自带
+    // resolver，启动断言（权限覆盖）仍满足。
+    const unvalidatable = firstPartyTool("notify", { kind: "review" });
+    // 故意构造非法 schema（properties 值非节点）；类型系统如实拒绝，这里显式越型注入。
+    (unvalidatable as { parameters: unknown }).parameters = {
+      type: "object",
+      properties: { query: "not-a-schema-node" },
+      required: ["query"],
+    };
+    const deferred = firstPartyTool("knowledge_search", { kind: "review" });
+    const made = make({ tools: [unvalidatable, deferred] });
+    const { customTools, toolCatalogManifest } = made.build();
+    const names = customTools.map((tool: any) => tool.name);
+
+    // notify 保持直载可见（不进目录、不盲延迟），knowledge_search 正常延迟。
+    expect(names).toContain("notify");
+    expect(names).not.toContain("knowledge_search");
+    for (const bridge of BRIDGE_NAMES) expect(names).toContain(bridge);
+    expect(toolCatalogManifest.text).toContain("knowledge_search");
+    expect(toolCatalogManifest.text).not.toContain("notify");
+  });
+
   it("keeps MCP tools below their threshold direct while builtins defer", () => {
     // MCP 源与内置源独立把关：3 个连接器工具低于阈值保持直载，而内置按需
     // 已让目录存在——桥接工具就该在，目录只含内置行。
@@ -261,6 +369,56 @@ describe("first-party on-demand assembly", () => {
     expect(toolCatalogManifest).toBeTruthy();
     expect(toolCatalogManifest.text).toContain("内置");
     expect(toolCatalogManifest.text).not.toContain("mcp_srv_t_0");
+  });
+
+  // ── P03-A07：目录按会话隔离，两个 agent 的禁用列表互不泄漏 ──
+  it("isolates per-agent catalogs: a disabled tool never leaks across agents (P03-A07)", async () => {
+    const officeFor = () => firstPartyTool("office", { kind: "review" });
+    const agentA = makeEngine({ tools: [officeFor()], agentConfig: {} });
+    const agentB = makeEngine({
+      tools: [officeFor()],
+      agentConfig: { tools: { disabled: ["office"] } },
+    });
+    dirs.push(agentA.tmpDir, agentB.tmpDir);
+    const builtA = agentA.build();
+    const builtB = agentB.build();
+
+    // A 可见 office；B 的目录与清单都不含它（engine 对不可用目标直接不注册）。
+    expect(builtA.toolCatalogManifest.text).toContain("office");
+    expect(builtB.toolCatalogManifest.text).not.toContain("office");
+    expect(builtA.toolTargetRegistry.resolveCatalogTarget({ toolName: "office" })).toBeTruthy();
+    expect(() => builtB.toolTargetRegistry.resolveCatalogTarget({ toolName: "office" }))
+      .toThrow(expect.objectContaining({ code: "TARGET_NOT_FOUND" }));
+
+    const search = (built: ReturnType<typeof agentA.build>, made: { sessionPath: string }) => {
+      const searchTool = built.customTools.find((entry: any) => entry.name === "mcp_search_tools");
+      return searchTool.execute("s", { query: "office" }, {
+        sessionPath: made.sessionPath,
+        sessionManager: { getSessionFile: () => made.sessionPath },
+      });
+    };
+    const aFirst = await search(builtA, agentA);
+    // 先 A 查询、再 B 查询、再回 A：A 的结果不受 B 的禁用影响，B 永远查不到。
+    await search(builtB, agentB);
+    const aAgain = await search(builtA, agentA);
+    expect(((aFirst as any).content[0].text as string)).toContain("office");
+    expect(((aAgain as any).content[0].text as string)).toBe(((aFirst as any).content[0].text as string));
+
+    const officeB = officeFor();
+    const grantedB = makeEngine({
+      tools: [officeB],
+      agentConfig: { tools: { disabled: ["office"] } },
+    });
+    dirs.push(grantedB.tmpDir);
+    grantedB.engine.getSessionAllowedInvocationCapabilities = () => ["office.execute"];
+    const builtGranted = grantedB.build();
+    const callTool = builtGranted.customTools.find((entry: any) => entry.name === "mcp_call");
+    await callTool.execute("call-b", { tool: "office", arguments: { query: "x" } }, {
+      sessionPath: grantedB.sessionPath,
+      sessionManager: { getSessionFile: () => grantedB.sessionPath },
+    });
+    // B 即使握有同名 capability 授权，也执行不到未注册目标（0 执行）。
+    expect(officeB.execute).not.toHaveBeenCalled();
   });
 });
 

@@ -1,0 +1,45 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/tool-invocation-boundary.test.ts (5 tests | 1 failed) 2733ms
+     ✓ uses exact-file allowlists for every raw execution boundary 31ms
+     × finds no raw executor or deferred-object-map bypass in production source 2694ms
+     ✓ reports every protected boundary when a synthetic source bypasses it 6ms
+     ✓ keeps the route-invariant architecture contract documented 0ms
+     ✓ keeps repair reports and machine facts complete without self-referential SHAs 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/tool-invocation-boundary.test.ts > tool invocation static boundaries > finds no raw executor or deferred-object-map bypass in production source
+AssertionError: expected [ { …(5) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "column": 53,
++     "file": "core/tool-catalog-bridge.ts",
++     "line": 406,
++     "message": "Registered target executors may only be invoked by ToolInvocationGateway.",
++     "rule": "canonical-executor-bypass",
++   },
++ ]
+
+ ❯ tests/tool-invocation-boundary.test.ts:31:31
+     29|
+     30|     expect(report.scannedFiles).toBeGreaterThan(0);
+     31|     expect(report.violations).toEqual([]);
+       |                               ^
+     32|   });
+     33|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  01:35:09
+   Duration  2.98s (transform 74ms, setup 18ms, import 160ms, tests 2.73s, environment 0ms)
+

@@ -1,0 +1,29 @@
+
+/Users/study_superior/Desktop/Code/LingxiAgent/lib/tools/run-code-tool.ts
+   21:7    warning  'execFileAsync' is assigned a value but never used                             @typescript-eslint/no-unused-vars
+   72:12   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+   84:63   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  118:14   error    Unexpected control character(s) in regular expression: \x1b                    no-control-regex
+  119:14   error    Unexpected control character(s) in regular expression: \x1b, \x07, \x07, \x1b  no-control-regex
+  128:38   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  134:67   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  156:66   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  157:58   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  166:28   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  167:28   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  212:34   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  219:48   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  219:68   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  297:105  warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  326:99   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+
+/Users/study_superior/Desktop/Code/LingxiAgent/lib/tools/security-scan-tool.ts
+   47:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   70:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  124:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  124:68  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  191:13  error    Unexpected constant condition             no-constant-condition
+
+✖ 22 problems (3 errors, 19 warnings)
+

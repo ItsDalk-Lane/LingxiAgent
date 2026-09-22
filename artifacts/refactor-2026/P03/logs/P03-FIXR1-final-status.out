@@ -1,0 +1,28 @@
+ M artifacts/refactor-2026/P02/tools/crash-probe-child.mjs
+ M core/session-permission-mode.ts
+ M docs/architecture/tool-invocation-path-invariance.md
+ M docs/refactor-2026/P01/P01_REPORT.md
+ M docs/refactor-2026/P01/P01_RESULT.json
+ M docs/refactor-2026/P02/P02_REPORT.md
+ M lib/tools/run-code-tool.ts
+ M lib/tools/security-scan-tool.ts
+ M scripts/check-dependency-boundaries.mjs
+ M scripts/check-tool-invocation-boundaries.mjs
+ M shared/tool-categories.ts
+ M tests/dependency-boundary-check.test.ts
+ M tests/engine-tool-defer.test.ts
+ M tests/mcp-http-client.test.ts
+ M tests/on-demand-first-party.test.ts
+ M tests/tool-invocation-boundary.test.ts
+ M tests/tool-invocation-gateway.test.ts
+ M tests/tool-schema-validator.test.ts
+?? artifacts/refactor-2026/P03/
+?? docs/refactor-2026/P03/
+---
+ docs/refactor-2026/P01/P01_REPORT.md         |  9 ++++++++-
+ docs/refactor-2026/P01/P01_RESULT.json       |  2 +-
+ docs/refactor-2026/P02/P02_REPORT.md         |  7 +++++++
+ scripts/check-dependency-boundaries.mjs      | 23 +++++++++++++++++++----
+ scripts/check-tool-invocation-boundaries.mjs |  5 ++++-
+ tests/dependency-boundary-check.test.ts      | 24 ++++++++++++++++++++++++
+ 6 files changed, 63 insertions(+), 7 deletions(-)

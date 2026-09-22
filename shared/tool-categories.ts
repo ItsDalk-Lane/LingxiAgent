@@ -142,12 +142,13 @@ export const FIRST_PARTY_DEFERRED_PERMISSION_CONTRACTS = {
   file: "file",
   "session_folders": "session-folders",
 };
-// Mirrors FILE_READ_ACTIONS / SESSION_COLLAB_READ_ACTIONS in
-// core/session-permission-mode.ts. Kept as literal sets with a drift note
-// rather than an import so shared/ stays dependency-free; the startup
-// assertion cannot see these, so changes there must be mirrored here.
-const FILE_TOOL_READ_ACTIONS = new Set(["stat"]);
-const SESSION_FOLDERS_READ_ACTIONS = new Set(["list"]);
+// Mirrors FILE_READ_ACTIONS / SESSION_FOLDERS_READ_ACTIONS in
+// core/session-permission-mode.ts (the read sets classifyFileAction /
+// classifySessionFoldersAction actually consult). Kept as literal sets rather
+// than an import so shared/ stays dependency-free; tests/on-demand-first-
+// party.test.ts compares both sides literally so the mirror cannot drift.
+export const FILE_TOOL_READ_ACTIONS = new Set(["stat"]);
+export const SESSION_FOLDERS_TOOL_READ_ACTIONS = new Set(["list"]);
 
 /**
  * The synthetic invocation descriptor for a deferred first-party tool without
@@ -174,7 +175,7 @@ export function firstPartyDeferredInvocation(name: string, params?: unknown) {
       : { action: "execute", kind: "review", capability: `${name}.execute` };
   }
   if (kind === "session-folders") {
-    return SESSION_FOLDERS_READ_ACTIONS.has(action)
+    return SESSION_FOLDERS_TOOL_READ_ACTIONS.has(action)
       ? { action: "read", kind: "read", capability: `${name}.read` }
       : { action: "execute", kind: "review", capability: `${name}.execute` };
   }

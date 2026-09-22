@@ -1,0 +1,248 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/tool-capability-delegate.test.ts (11 tests) 138ms
+ ✓ tests/tool-availability.test.ts (5 tests) 139ms
+ ✓ tests/tool-categories.test.ts (26 tests) 215ms
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > uses Streamable HTTP JSON-RPC POST with bearer auth and session headers
+[mcp:github] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > falls back to the legacy handshake when the probe is not a valid DiscoverResult
+[mcp:legacy] discovery probe failed (network down); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > falls back to the legacy handshake when the probe is not a valid DiscoverResult
+[mcp:legacy] discovery did not establish a supported stateless version; using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > falls back to the legacy handshake when the probe is not a valid DiscoverResult
+[mcp:legacy] discovery did not establish a supported stateless version; using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > falls back to the legacy handshake when the probe is not a valid DiscoverResult
+[mcp:legacy] discovery did not establish a supported stateless version; using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > falls back to the legacy handshake when the probe is not a valid DiscoverResult
+[mcp:legacy] discovery did not establish a supported stateless version; using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > falls back to the legacy handshake when the probe is not a valid DiscoverResult
+[mcp:legacy] discovery did not establish a supported stateless version; using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > falls back to the legacy handshake when the probe is not a valid DiscoverResult
+[mcp:legacy] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > does not send routing headers on the legacy path
+[mcp:legacy] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stderr | tests/mcp-http-client.test.ts > MCP HTTP clients > excludes tools whose x-mcp-header annotation violates the spec
+[mcp:modern] dropped tool "number_param": its x-mcp-header annotations break the header-mirroring rules
+[mcp:modern] dropped tool "dupe": its x-mcp-header annotations break the header-mirroring rules
+[mcp:modern] dropped tool "nested": its x-mcp-header annotations break the header-mirroring rules
+[mcp:modern] dropped tool "bad_token": its x-mcp-header annotations break the header-mirroring rules
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > sends custom connector headers while preserving protocol headers
+[mcp:private] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > falls back to the configured bearer token when the injected OAuth token lookup is empty
+[mcp:bearer] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > reinitializes once when a Streamable HTTP session expires
+[mcp:github] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > reinitializes once when a Streamable HTTP session reports Invalid session ID with status 400
+[mcp:github] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > rejects invalid Unicode in outgoing JSON-RPC payloads with a boundary diagnostic
+[mcp:metaso] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > does not let a legacy SSE server ping with the same id satisfy a tool response
+[mcp:legacy] rejected unsupported server request "ping" (id 1)
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > does not let a legacy SSE server ping with the same id satisfy a tool response
+[mcp:legacy] rejected unsupported server request "ping" (id 1)
+[mcp:legacy] could not deliver method-not-found for "ping": unexpected request https://legacy.example.com/messages
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > does not let a legacy SSE server ping with the same id satisfy a tool response
+[mcp:legacy] could not deliver method-not-found for "ping": unexpected request https://legacy.example.com/messages
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > answers an inbound legacy SSE server request with method-not-found instead of dropping it
+[mcp:legacy] rejected unsupported server request "elicitation/create" (id 99)
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > answers an inbound server request on a Streamable HTTP SSE reply stream
+[mcp:stateful] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > answers an inbound server request on a Streamable HTTP SSE reply stream
+[mcp:stateful] rejected unsupported server request "elicitation/create" (id 4242)
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > reports an unexpected close when a Streamable HTTP request hits a 5xx
+[mcp:github] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > marks a Streamable HTTP 401 as needs-auth without a bare rethrow swallowing context
+[mcp:github] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > does not report an unexpected close on the inline 404 session refresh path
+[mcp:github] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > falls back from Streamable HTTP to legacy SSE endpoint transport
+[mcp:legacy] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP HTTP clients > forwards onClose through McpAutoHttpClient to its chosen inner transport
+[mcp:auto] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP Streamable HTTP OAuth self-heal > uses the injected getAuthToken for the Authorization header instead of the snapshot
+[mcp:github] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP Streamable HTTP OAuth self-heal > retries a 401 once after a successful forced refresh, then succeeds
+[mcp:github] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP Streamable HTTP OAuth self-heal > retries at most once: a second 401 after refresh fails the session as needs-auth
+[mcp:github] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+ ✓ tests/tool-target-identity.test.ts (3 tests) 99ms
+ ✓ tests/tool-invocation-errors.test.ts (4 tests) 100ms
+ ✓ tests/tool-target-registry.test.ts (7 tests) 106ms
+ ✓ tests/tool-schema-validator.test.ts (10 tests) 125ms
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loading plugin "beautify"...
+[plugin-manager] loading "beautify" tools...
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loaded "beautify" tools (60ms)
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loading "beautify" configuration...
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loaded "beautify" configuration (0ms)
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loading "beautify" lifecycle import...
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loaded "beautify" lifecycle import (3ms)
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loading "beautify" lifecycle onload...
+[plugin:beautify] beautify plugin loaded
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loaded "beautify" lifecycle onload (0ms)
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] plugin "beautify" loaded (64ms)
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loading plugin "jimeng-cli"...
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loading "jimeng-cli" providers...
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loaded "jimeng-cli" providers (3ms)
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loading "jimeng-cli" lifecycle import...
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loaded "jimeng-cli" lifecycle import (34ms)
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loading "jimeng-cli" lifecycle onload...
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin:jimeng-cli] jimeng-cli adapter registered: jimeng-cli-images
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin:jimeng-cli] jimeng-cli adapter registered: jimeng-cli-videos
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loaded "jimeng-cli" lifecycle onload (0ms)
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] plugin "jimeng-cli" loaded (38ms)
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loading plugin "media"...
+[plugin-manager] loading "media" tools...
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loaded "media" tools (36ms)
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] plugin "media" loaded (37ms)
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loading plugin "office"...
+[plugin-manager] loading "office" tools...
+
+ ✓ tests/tool-defer-config.test.ts (12 tests) 82ms
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] loaded "office" tools (33ms)
+
+stdout | tests/tool-permission-adapter.test.ts > 工具权限方言适配器 > 真实 PluginManager 为 12 个 bundled 工具建立有效规范化契约
+[plugin-manager] plugin "office" loaded (33ms)
+
+ ✓ tests/tool-permission-adapter.test.ts (8 tests) 285ms
+stdout | tests/mcp-http-client.test.ts > MCP Streamable HTTP OAuth self-heal > does not retry a 401 when no refresh is possible
+[mcp:github] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP Streamable HTTP OAuth self-heal > fails as needs-auth when the forced refresh itself dies with invalid_grant
+[mcp:github] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+stdout | tests/mcp-http-client.test.ts > MCP Streamable HTTP OAuth self-heal > fails as a generic (non-auth) close when the forced refresh hits a transient 5xx
+[mcp:github] discovery probe failed (MCP connector session expired or endpoint was not found); using the handshake
+
+ ✓ tests/mcp-http-client.test.ts (41 tests) 1159ms
+     ✓ does not re-send a non-idempotent call after a response timeout (P03-A12)  1002ms
+ ✓ tests/tool-invocation-gateway.test.ts (18 tests) 55ms
+ ✓ tests/tool-catalog-bridge.test.ts (37 tests) 61ms
+ ✓ tests/tool-invocation-path-parity.test.ts (12 tests) 60ms
+ ✓ tests/tool-invocation-permission.test.ts (28 tests) 57ms
+ ✓ tests/session-manifest-delivery.test.ts (12 tests) 35ms
+stdout | tests/builtin-tool-permission-coverage.test.ts > built-in tool permission/category coverage (full snapshot) > covers invocation permission for every built-in tool in the fully-enabled snapshot
+[fact-store] schema migrated: v0 → v3
+
+stdout | tests/builtin-tool-permission-coverage.test.ts > built-in tool permission/category coverage (full snapshot) > categorizes every tool in the fully-enabled snapshot
+[fact-store] schema migrated: v0 → v3
+
+stdout | tests/builtin-tool-permission-coverage.test.ts > built-in tool permission/category coverage (full snapshot) > assembles every non-exempt catalogued built-in into the snapshot
+[fact-store] schema migrated: v0 → v3
+
+ ✓ tests/builtin-tool-permission-coverage.test.ts (3 tests) 87ms
+stdout | tests/tool-lifecycle-revocation.test.ts > 旧插件会话撤销 > 审批后卸载插件会以 TARGET_REVOKED 拒绝且不执行旧对象
+[plugin-manager] loading plugin "lifecycle-unload"...
+
+stdout | tests/tool-lifecycle-revocation.test.ts > 旧插件会话撤销 > 审批后卸载插件会以 TARGET_REVOKED 拒绝且不执行旧对象
+[plugin-manager] plugin "lifecycle-unload" loaded (1ms)
+
+ ✓ tests/tool-lifecycle-revocation.test.ts (4 tests) 47ms
+stderr | tests/tool-deferred-mcp-parity.test.ts > MCP direct/deferred 路径等价 > SDK 上下文不携带 agentId 时仍使用当前会话身份（延迟=false）
+[tool-availability] {"route":"direct","origin":"mcp","targetId":"tool:mcp:alpha:search","sourceId":"alpha","generation":1,"code":"TARGET_DISABLED_FOR_AGENT"}
+
+stderr | tests/tool-deferred-mcp-parity.test.ts > MCP direct/deferred 路径等价 > SDK 上下文不携带 agentId 时仍使用当前会话身份（延迟=true）
+[tool-availability] {"route":"deferred","origin":"mcp","targetId":"tool:mcp:alpha:search","sourceId":"alpha","generation":1,"code":"TARGET_DISABLED_FOR_AGENT"}
+
+ ✓ tests/tool-invocation-boundary.test.ts (5 tests) 3255ms
+     ✓ finds no raw executor or deferred-object-map bypass in production source  3169ms
+stderr | tests/on-demand-first-party.test.ts > first-party on-demand assembly > keeps a tool resident with a warning when its schema cannot be consumed safely
+[tool-availability] tool "notify" cannot defer (schema validation failed: Tool parameter schema contains invalid schema fields.); keeping it resident
+
+stderr | tests/tool-deferred-mcp-parity.test.ts > MCP direct/deferred 路径等价 > Agent 禁用后直接与延迟调用返回同一稳定错误
+[tool-availability] {"route":"direct","origin":"mcp","targetId":"tool:mcp:alpha:search","sourceId":"alpha","generation":1,"code":"TARGET_DISABLED_FOR_AGENT"}
+
+stderr | tests/tool-deferred-mcp-parity.test.ts > MCP direct/deferred 路径等价 > Agent 禁用后直接与延迟调用返回同一稳定错误
+[tool-availability] {"route":"deferred","origin":"mcp","targetId":"tool:mcp:alpha:search","sourceId":"alpha","generation":1,"code":"TARGET_DISABLED_FOR_AGENT"}
+
+ ✓ tests/tool-deferred-mcp-parity.test.ts (15 tests) 102ms
+stderr | tests/tool-deferred-builtin-parity.test.ts > deferred bundled plugin parity > rejects argument replacement and approval reuse across assembled plugin targets
+[tool-availability] {"route":"direct","origin":"plugin","targetId":"tool:plugin:demo:first","sourceId":"demo","generation":0,"code":"PREPARED_INVOCATION_MISMATCH"}
+
+stderr | tests/tool-deferred-builtin-parity.test.ts > deferred bundled plugin parity > rejects argument replacement and approval reuse across assembled plugin targets
+[tool-availability] {"route":"direct","origin":"plugin","targetId":"tool:plugin:demo:second","sourceId":"demo","generation":0,"code":"PREPARED_INVOCATION_MISMATCH"}
+
+ ✓ tests/tool-deferred-builtin-parity.test.ts (8 tests) 122ms
+ ✓ tests/engine-tool-defer.test.ts (21 tests) 203ms
+ ✓ tests/on-demand-first-party.test.ts (21 tests) 201ms
+
+ Test Files  22 passed (22)
+      Tests  311 passed (311)
+   Start at  01:37:13
+   Duration  3.88s (transform 13.35s, setup 406ms, import 33.53s, tests 6.73s, environment 1ms)
+

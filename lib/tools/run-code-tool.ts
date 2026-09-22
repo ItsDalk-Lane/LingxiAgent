@@ -112,10 +112,12 @@ function stripEcho(text: string, spec: LanguageSpec, sentCode: string, rawCode =
   return out;
 }
 
-/** ANSI 转义序列（颜色/光标/括号粘贴模式）整体剥除。 */
+/** ANSI 转义序列（颜色/光标/括号粘贴模式）整体剥除。ESC/BEL 本身就是要匹配的目标。 */
 export function stripAnsi(text: string): string {
   return text
+    // eslint-disable-next-line no-control-regex
     .replace(/\x1b\[[0-9;?]*[a-zA-Z]/g, "")
+    // eslint-disable-next-line no-control-regex
     .replace(/\x1b\][^\x07]*(\x07|\x1b\\)/g, "");
 }
 

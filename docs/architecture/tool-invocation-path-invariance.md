@@ -97,7 +97,7 @@ flowchart LR
 | 原始边界 | 允许文件 |
 | --- | --- |
 | MCP `callTool` | `core/mcp/manager.ts`、`core/mcp/clients/http-client.ts` |
-| Plugin `executePluginTool` | `core/plugin-dev-service.ts` |
+| Plugin `executePluginTool` | （无——原 `core/plugin-dev-service.ts` 已随插件生态收口删除，任何生产调用都按违规报） |
 | 注册目标 `executeCanonical` 调用 | `core/tool-invocation-gateway.ts` |
 
 `scripts/check-tool-invocation-boundaries.mjs` 使用 TypeScript AST 扫描生产源码，`tests/tool-invocation-boundary.test.ts` 调用同一扫描函数，因此本地测试和独立门禁不会产生两套规则。白名单只能写精确文件，不能豁免整个目录。

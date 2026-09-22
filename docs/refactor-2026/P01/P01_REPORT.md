@@ -21,7 +21,7 @@
 | P01-T02 Pi 适配清点 | UNCHANGED_VERIFIED（适配层零修改）+ 1 处测试盲区关闭 | lib/pi-sdk/index.ts（唯一入口）；深路径例外 2 处（适配层内）+ 构建脚本 2 个 + 注释 1 处；锁定版本实测 0.86.0 | P01-T02-pi-sdk-regression.out（9 文件 41 用例绿，含真实 SDK+witness e2e） | tests/pi-sdk-import-boundary.test.ts 扫描面 .js/.mjs/.cjs→+.ts/.tsx、根目录 +cli/shared/plugins/desktop（旧盲区由 postinstall 兜住，现双层） | PASS |
 | P01-T03 宿主可替换 | 纯文档 + 集成测试（核心零改动） | docs/refactor-2026/P01/HOST_CAPABILITY_MAP.md；core 对 electron 依赖实测 0 处 | tests/server-composition-boundary.test.ts Part 4（9/9 绿） | 无桌下能力语义实测登记（通知=通道广播；ComputerUse=显式不可用） | PASS |
 | P01-T04 strict 核心入口 | MODIFIED（新增工程/脚本/品牌模块 + 4 文件类型化） | tsconfig.core-contracts.json + scripts/check-core-contracts-strict.mjs + npm run typecheck:core-contracts；范围 6 文件（identity-brands/hana-runtime-paths(.d.cts)/model-ref/errors/model-call-identity/local-server）；strict+noUncheckedIndexedAccess+exactOptionalPropertyTypes | tests/core-contracts-strict.test.ts 4/4（正例+A05+A06+fixtures 隔离） | 宽松区（tsconfig.node strict=false）保持原样=显式剩余账本，未扩大 | PASS |
-| P01-T05 运行时契约 | MODIFIED（1 处生产缺口修复 + 测试扩展） | server/hono-helpers.ts strictJson（新增）→ /sessions/new 切换；A08 网关用例×2；A09/A11 CLI 用例×5 | vertical-slice（A07 修复前红 r5→修复后绿 r9）；gateway-a08 17/17；cli 8/8 | safeJson 其余调用点不动（宽松读取面维持既有行为；写入口按需逐个切换，属后续阶段） | PASS |
+| P01-T05 运行时契约 | MODIFIED（1 处生产缺口修复 + 测试扩展） | server/hono-helpers.ts strictJson（新增）→ /sessions/new 切换；A08 网关用例×2；A09/A11 CLI 用例×5 | vertical-slice（A07 修复前红 r5→修复后绿 r9）；gateway-a08 17/17；cli 8/8 | safeJson 其余调用点不动（**推迟账本**：经 2026-09-22 复验收正，剩余调用点绝大多数为写入口 POST/PUT/PATCH——含同族 /sessions/new-detached——而非"读取面"；按需逐个切换属后续阶段，复用 hono-helpers 三件套勿新建第二套） | PASS |
 | P01-T06 依赖纪律检查 | MODIFIED（新检查器 + CI 两步） | scripts/check-dependency-boundaries.mjs（5 规则：sdk-direct-import/sdk-deep-path/host-into-core/adapter-reverse-dep/sdk-dynamic-unproven）+ npm run check:dependency-boundaries + ci.yml 两步（未删任何原门禁） | tests/dependency-boundary-check.test.ts 6/6（A03/A04/A12）；生产 2025 文件零违例 | check-tool-invocation-boundaries 保持原职责（2243 文件绿），不重复建设 | PASS |
 | P01-T07 纵向链+清退 | MODIFIED（LINGXI_HOME 统一 + 死别名清退） | cli/local-server.ts 统一到 shared/hana-runtime-paths；tsconfig.json/tsconfig.test.json @lingxi/plugin-* 与 vitest.config.js @hana/plugin-* 死别名清退（先核实零引用）；tsconfig.json packages/ include 移除 | cli-local-server 8/8（A11 语义逐例保持）；vertical-slice 9/9 | resolveCliLingxiHome 保留为 thin wrapper（env 取值+trim 后调 shared 权威）——双实现收口，非删除 API | PASS |
 
@@ -107,3 +107,10 @@
 **重验轮新登记（发现 6，不阻塞、移交治理域）**：全量首轮（P01-ACC-FIX-full-npm-test）出现 R10-09 偶发红——`create-delivery-patch.py` 的校验流程对工作树做两次 `git add -A` 快照，全量运行期间任何对扫描范围内文件的并发写入（本轮为 run-logged 实时追加的 stdout 日志文件）会使两次快照撕裂导致 manifest 不一致；输出重定向到工作区外复跑即绿、单独复跑亦绿（4 failed 基线逐字恢复）。属 round2 交付证据契约的运行期脆弱性（F1/治理域，P01 无权修改），登记移交；本仓后续全量验证建议 stdout 落 /tmp 或等待测试静默期。
 
 **验收结论状态变化**：首轮 FAIL → 修复轮后 PASS。修复未触碰 F1/F2/F3 定级、未修改任何审计封印文件；A07 现覆盖场景规格全部三个维度（畸形 JSON / 非对象 JSON / 字段类型错误）。
+
+## 复验收修复轮（2026-09-22，全阶段重验收发现，两项）
+
+| # | 发现 | 修复 |
+|---|---|---|
+| 6 | **依赖检查器模板拼接绕过**：`constantStringOf` 只折叠二元 "+" 与无 substitution 模板，`` import(`elect${''}ron`) `` 与 `"elect"+"ron"` 静态等价却被放行（实测 0 违例），与 A12"常量拼接必拦"语义不自洽 | `check-dependency-boundaries.mjs` 折叠器补 TemplateExpression 分支（head/spans 全字面量才求值，含变量 substitution 仍为运行时盲区）；mention 检测同步覆盖模板折叠；`tests/dependency-boundary-check.test.ts` 增补 electron-template/sdk-template/runtime-template 三反例（7/7 绿）；全仓门禁复扫 2026 文件 0 误报。证据见 P03 阶段日志 P03-FIXR1-* |
+| 7 | **safeJson 推迟账本失实**：报告 T05 行与 RESULT legacy_paths 称其余调用点为"读取面"，实测 150+ 调用点绝大多数在写路由（POST/PUT/PATCH，含 /sessions/new-detached 同族入口） | 推迟决定本身不变（避免无边界重写），账本措辞按实际构成更正（本表 #6 同日修改 T05 行与 P01_RESULT.json legacy_paths；逐路由切换归属后续阶段按需推进） |

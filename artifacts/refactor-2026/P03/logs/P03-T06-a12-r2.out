@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/mcp-http-client.test.ts (41 tests | 40 skipped) 1031ms
+     ✓ does not re-send a non-idempotent call after a response timeout (P03-A12)  1031ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 40 skipped (41)
+   Start at  01:34:16
+   Duration  1.22s (transform 75ms, setup 19ms, import 99ms, tests 1.03s, environment 0ms)
+

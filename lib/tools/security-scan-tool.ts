@@ -188,8 +188,9 @@ export function createSecurityScanTool(deps: SecurityScanToolDeps) {
       const engines = ["baseline"];
       if (availability.semgrep) {
         const found = await runSemgrep(cwd, inputs.slice(0, DEFAULT_MAX_FILES).map((f) => f.path));
-        if (found.length || true) engines.push("semgrep");
         externalFindings.push(...found);
+        // 引擎账记"本次实际启用"，与是否命中无关（原 `found.length || true` 恒真的显式化）。
+        engines.push("semgrep");
       }
       if (availability.gitleaks) {
         const found = await runGitleaks(cwd);

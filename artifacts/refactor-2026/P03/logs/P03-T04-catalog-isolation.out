@@ -1,0 +1,54 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/on-demand-first-party.test.ts (20 tests | 1 failed) 147ms
+     ✓ keeps the on-demand split sound 21ms
+     ✓ keeps exactly the four original Pi tools resident 1ms
+     ✓ defers every other categorized built-in by policy 0ms
+     ✓ gives every non-resident gateway tool a synthetic permission contract 0ms
+     ✓ maps synthetic contracts to faithful levels 0ms
+     ✓ keeps the literal read-action mirrors identical to the classifier sets 0ms
+     ✓ never classifies a synthetic contract more permissive than the direct path 1ms
+     ✓ keeps only the four Pi primitives on the direct surface 17ms
+     ✓ catalogs deferred built-ins under the 内置 group with a usage intro 7ms
+     ✓ keeps every tool direct when the builtin defer preference opts out 5ms
+     ✓ defers a garbage resolver and fails closed at call time, never at build 8ms
+     ✓ keeps MCP tools below their threshold direct while builtins defer 7ms
+     × isolates per-agent catalogs: a disabled tool never leaks across agents (P03-A07) 17ms
+     ✓ runs the real sandbox grep through the bridge without a grant 25ms
+     ✓ describes a deferred Pi primitive from the catalog 6ms
+     ✓ executes a deferred built-in without a server qualifier on a real-target grant 7ms
+     ✓ resolves by name alone and rejects a grant issued for another tool 6ms
+     ✓ fails closed for a name that is not in the catalog 5ms
+     ✓ exposes the schema through describe without loading anything 5ms
+     ✓ finds deferred built-ins by search keywords 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/on-demand-first-party.test.ts > first-party on-demand assembly > isolates per-agent catalogs: a disabled tool never leaks across agents (P03-A07)
+Error: Tool session identity conflict: /sessions/unused.jsonl != /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-on-demand-MPH0Qy/agents/focus/sessions/main.jsonl
+ ❯ identityConflict lib/tools/tool-session.ts:29:22
+     27|
+     28| function identityConflict(sessionIds: Set<string>) {
+     29|   const error: any = new Error(`Tool session identity conflict: ${[...…
+       |                      ^
+     30|   error.code = "session_identity_conflict";
+     31|   return error;
+ ❯ resolveToolSessionRef lib/tools/tool-session.ts:54:38
+ ❯ resolveRuntimeSessionRef core/engine.ts:4049:24
+ ❯ Object.execute core/engine.ts:4101:30
+ ❯ execute lib/tools/session-permission-wrapper.ts:451:30
+ ❯ runWithPreparedInvocation lib/tools/invocation/prepared-invocation-context.ts:99:36
+ ❯ executeWithInvocationRevalidation lib/tools/session-permission-wrapper.ts:459:7
+ ❯ Object.execute lib/tools/session-permission-wrapper.ts:783:18
+ ❯ search tests/on-demand-first-party.test.ts:370:25
+ ❯ tests/on-demand-first-party.test.ts:374:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 19 passed (20)
+   Start at  01:18:17
+   Duration  3.40s (transform 2.04s, setup 18ms, import 3.17s, tests 147ms, environment 0ms)
+

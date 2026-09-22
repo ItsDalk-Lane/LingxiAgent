@@ -103,3 +103,10 @@
 | 3 | attempt 栅栏"就绪但在库消费为 0"的状态未显式标注（expectedAttempt 仅总线面，仓库内无 task:complete/fail 生产发送方） | IDENTITY_CONTRACT §3 增加"当前消费状态"标注与 cancel/abort 显式排除边界；P03+ 接线要求指向 HANDOFF §6 |
 
 验收轮 1 的独立复跑证据：typecheck×3/core-contracts/boundaries/pi-sdk 门禁全绿、新增+受影响测试 129/129、assistant-run-lifecycle+history-run-outcome-edges+tripwire 26/26、composition 10/10（含 A15）、全量 npm test 4 红（=F1 基线）/14740 绿，与 §4 命令日志逐位一致；EVIDENCE_SHA256 全部 44 条重算匹配。反例探针（隔离于 /tmp，仓库零污染）证实：重复 complete first-write-wins、迟到栅栏拒绝且不落盘、默认工厂 2 万 ID 零碰撞、非法 expectedAttempt 防御性抛错；同时确认无栅栏迟到终态（向后兼容路径）与迟到 cancel 的行为边界与文档声明一致。未验证边界（Windows/Linux 实机、四平台 CI、真实供应商）维持 F3/环境受限登记，不属本阶段缺陷。
+
+## 11. 复验收修复轮（2026-09-22，全阶段重验收发现，两项，零生产代码改动）
+
+| # | 发现 | 修复 |
+|---|---|---|
+| 4 | **EVIDENCE_SHA256.txt 自引用条目**：第 51 行列入了清单自身哈希（fb3d22af…），逻辑上永不可匹配，`shasum -c` 恒报 1 失败，削弱清单作为门禁的可用性 | 移除自引用条目并重生成全清单（含本报告更新后的新哈希；command-log.jsonl 本轮零追加、哈希不变；重生成后 56/56 单次全过） |
+| 5 | **crash-probe-child.mjs 硬编码绝对路径**：`import … from "/Users/study_superior/Desktop/Code/LingxiAgent/lib/task-registry.ts"` 使 tests/p02-recovery-restart.test.ts 只能在唯一机器路径下通过（任何其他 clone/工作树必红：exit 1≠70） | 改为相对本文件的 `../../../../lib/task-registry.ts`；主检出复跑 3/3 绿 + 独立 worktree 复跑 3/3 绿（可移植性证明；证据记于 P03 阶段日志 P03-FIXR1-*，P02 自身 command-log 不追加以保清单哈希稳定） |
