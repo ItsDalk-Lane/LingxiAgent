@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import gzip
 import hashlib
 import json
 import os
@@ -9,7 +10,9 @@ import tempfile
 BASE = "89bc0b64bf0a9b84ef3532efaa66c23213affb70"
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 OUT = ROOT / "artifacts/f1-f12-repair/round2"
-PATCH = OUT / "patches/89bc0b64-to-r01-r10-source.patch"
+# 存储为确定性 gzip（mtime=0）：补丁体积随分支积压增长，v0.1.43 起 107MB 超
+# GitHub 单文件 100MB 硬限；压缩后 22MB。重放验证仍对未压缩原始字节执行，语义不变。
+PATCH = OUT / "patches/89bc0b64-to-r01-r10-source.patch.gz"
 
 
 def sha256(data: bytes) -> str:
@@ -100,7 +103,7 @@ def temp_index(prefix: str) -> str:
     return name
 
 
-def build_patch() -> bytes:
+def build_patch() -> tuple[bytes, bytes]:
     PATCH.parent.mkdir(parents=True, exist_ok=True)
     index_name = temp_index("lingxi-r01-r10-index-")
     try:
@@ -115,11 +118,12 @@ def build_patch() -> bytes:
         pathlib.Path(index_name).unlink(missing_ok=True)
     if not content:
         raise RuntimeError("delivery source patch is empty")
-    PATCH.write_bytes(content)
-    return content
+    stored = gzip.compress(content, compresslevel=6, mtime=0)
+    PATCH.write_bytes(stored)
+    return content, stored
 
 
-def replay_and_verify(patch: bytes) -> dict:
+def replay_and_verify(patch: bytes, stored: bytes) -> dict:
     current_index = temp_index("lingxi-r01-r10-current-")
     replay_index = temp_index("lingxi-r01-r10-replay-")
     try:
@@ -144,8 +148,9 @@ def replay_and_verify(patch: bytes) -> dict:
         return {
             "base": BASE,
             "patch": str(PATCH.relative_to(ROOT)),
-            "patchBytes": len(patch),
-            "patchSha256": sha256(patch),
+            "patchBytes": len(stored),
+            "patchSha256": sha256(stored),
+            "patchUncompressedBytes": len(patch),
             "sourceManifestHash": sha256(current),
             "replayedSourceManifestHash": sha256(replayed),
             "result": "VERIFIED",
@@ -156,5 +161,5 @@ def replay_and_verify(patch: bytes) -> dict:
 
 
 if __name__ == "__main__":
-    patch = build_patch()
-    print(json.dumps(replay_and_verify(patch), ensure_ascii=False, sort_keys=True))
+    patch, stored = build_patch()
+    print(json.dumps(replay_and_verify(patch, stored), ensure_ascii=False, sort_keys=True))

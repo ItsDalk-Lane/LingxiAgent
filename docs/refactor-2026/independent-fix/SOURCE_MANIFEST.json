@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-22T13:31:38.265Z",
-  "head": "8d55046d5646a008f71f57de745b3564e94a5f21",
-  "tree": "519fab23eacce8417b6504fd6ffec07e6abb7564",
+  "generated_at": "2026-09-22T14:14:59.014Z",
+  "head": "228123462bfac76cc84ed745e6f90bf879551bf3",
+  "tree": "67e5632afdf9fbf7c2324aa8b9da555abec69cd5",
   "dirty": true,
   "verification_snapshot": "artifacts/refactor-2026/independent-fix/main/engineering-full-tests-recheck.source.json",
   "verification_source_digest": "4e0d80b30c889c0c20f22441f44a7f0a3c0cd67773d89ac58850c80960d91a1b",
@@ -10,7 +10,7 @@
     "node": "v24.16.0",
     "platform": "darwin",
     "arch": "arm64",
-    "lock_sha256": "a9735825cea1d018c2a42ae04f875368a003c386ca68fc86503bc8acbcd79d3c"
+    "lock_sha256": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b"
   },
   "scope": "与最终全量相同的生产/测试/构建/CI精确字节，另纳入P05反例；文档与原始证据由EVIDENCE_SHA256覆盖。未提交修复不等于HEAD。",
   "files": [
@@ -8592,11 +8592,11 @@
     },
     {
       "path": "package-lock.json",
-      "sha256": "a9735825cea1d018c2a42ae04f875368a003c386ca68fc86503bc8acbcd79d3c"
+      "sha256": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b"
     },
     {
       "path": "package.json",
-      "sha256": "d00a3f09fe98354942c1bccf854eba7869cffc1ec2209f541cd24bb2ee11c1f5"
+      "sha256": "473d36a785d6d16db7b08a684e65855823cb15e1c7fb21003a63dd5c7cc4acfc"
     },
     {
       "path": "scripts/artifact-keygen.mjs",
@@ -12728,7 +12728,7 @@
     },
     {
       "path": "tests/release-preflight.test.ts",
-      "sha256": "25ea36b99cf129baa1d91b34f5d3eb44ff60d7b1b055b52f38a6fa89cd21da88"
+      "sha256": "c3a23f1715efd33a708a60d7130487fec6cf7271acf09622faed5df80f5ddd70"
     },
     {
       "path": "tests/release-workflow-gates.test.ts",

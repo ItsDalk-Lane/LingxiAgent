@@ -7,6 +7,7 @@ git index blob（归一化字节）计算：Windows autocrlf 会拆开工作树�
 字节（CRLF/LF），读工作树的对比在 Windows 上天然不一致。
 输出 JSON 摘要（exit 0 = VERIFIED）。
 """
+import gzip
 import hashlib
 import json
 import os
@@ -17,7 +18,9 @@ import tempfile
 BASE = "67dee5d2de9d3b9fc75ec5ef5c555e93c65b3ccd"
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 OUT = ROOT / "artifacts/f1-f12-repair/round3-c01-c03"
-PATCH = OUT / "patches/67dee5d2-to-round3-c01-c03.patch"
+# 存储为确定性 gzip（mtime=0）：补丁体积随分支积压增长，v0.1.43 起 310MB 超
+# GitHub 单文件 100MB 硬限；压缩后 69MB。重放验证仍对未压缩原始字节执行，语义不变。
+PATCH = OUT / "patches/67dee5d2-to-round3-c01-c03.patch.gz"
 
 
 def sha256(data: bytes) -> str:
@@ -109,7 +112,8 @@ def main() -> None:
         )
         if not patch:
             raise SystemExit("round3 patch is empty")
-        PATCH.write_bytes(patch)
+        stored = gzip.compress(patch, compresslevel=6, mtime=0)
+        PATCH.write_bytes(stored)
 
         replay_env = os.environ.copy()
         replay_env["GIT_INDEX_FILE"] = replay_index
@@ -132,8 +136,9 @@ def main() -> None:
         "base": BASE,
         "result": "VERIFIED" if identical else "MISMATCH",
         "patch": str(PATCH.relative_to(ROOT)),
-        "patchBytes": len(patch),
-        "patchSha256": sha256(patch),
+        "patchBytes": len(stored),
+        "patchSha256": sha256(stored),
+        "patchUncompressedBytes": len(patch),
         "sourceManifestHash": sha256(current),
         "replayedSourceManifestHash": sha256(replayed),
     }
