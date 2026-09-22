@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/stream-route-consumer-isolation.test.ts (4 tests | 1 failed | 3 skipped) 83ms
+   × keeps a resolved confirmation resolved after the next real streamed projection 83ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 skipped (4)
+   Start at  18:36:38
+   Duration  2.19s (transform 993ms, setup 21ms, import 1.74s, tests 83ms, environment 276ms)
+

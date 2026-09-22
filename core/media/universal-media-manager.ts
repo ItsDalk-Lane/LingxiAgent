@@ -1065,14 +1065,15 @@ export class UniversalMediaManager {
         this._log.warn(`deferred:register failed for ${result.taskId}:`, err);
       });
       runtime?.assertCurrent();
-      await this._bus.request("task:register", {
+      const visibility = await this._bus.request("task:register", {
         taskId: result.taskId,
         type: "media-generation",
         sessionId,
         sessionRef,
         parentSessionPath: sessionPath,
         meta: { type: "speech-generation", prompt: input.prompt },
-      }).catch(() => {});
+      }).catch(() => null);
+      this._poller.visibilityAttempts?.bindReceipt(result.taskId, 1, visibility);
       runtime?.assertCurrent();
     }
     // 语音合成适配器都是同步返回文件的：response 投递直接把文件带给调用方
@@ -1461,14 +1462,15 @@ export class UniversalMediaManager {
         this._log.warn(`deferred:register failed for ${result.taskId}:`, err);
       });
       runtime?.assertCurrent();
-      await this._bus.request("task:register", {
+      const visibility = await this._bus.request("task:register", {
         taskId: result.taskId,
         type: "media-generation",
         sessionId,
         sessionRef,
         parentSessionPath: sessionPath,
         meta: { type: "video-generation", prompt: input.prompt },
-      }).catch(() => {});
+      }).catch(() => null);
+      this._poller.visibilityAttempts?.bindReceipt(result.taskId, 1, visibility);
       runtime?.assertCurrent();
     }
     this._poller.add(result.taskId);

@@ -669,7 +669,7 @@ describe("retrySessionTurn", () => {
       const engine = makeStableEngine(session) as any;
       engine.deferredResults = store;
       engine.taskRegistry = {
-        query: vi.fn((taskId) => ({ taskId, parentSessionId: "sess-main", status: "running" })),
+        query: vi.fn((taskId) => ({ taskId, parentSessionId: "sess-main", status: "running", attempt: 2 })),
         abort: vi.fn(() => "aborted"),
       };
       engine.subagentRuns = {
@@ -693,7 +693,7 @@ describe("retrySessionTurn", () => {
         deliverySuppressed: true,
       });
       expect(engine.taskRegistry.abort).toHaveBeenCalledTimes(1);
-      expect(engine.taskRegistry.abort).toHaveBeenCalledWith("task-tail", "discarded by session retry");
+      expect(engine.taskRegistry.abort).toHaveBeenCalledWith("task-tail", "discarded by session retry", { expectedAttempt: 2 });
       expect(engine.subagentRuns.abort).toHaveBeenCalledTimes(1);
       expect(engine.subagentRuns.abort).toHaveBeenCalledWith("task-tail", "discarded by session retry");
 

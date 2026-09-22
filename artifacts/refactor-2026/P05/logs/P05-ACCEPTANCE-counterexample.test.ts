@@ -57,12 +57,8 @@ function feedC1(msgs: any[]) {
 }
 
 describe('C1 跨流迟到事件：旧流 segment 迟到 delta 不得污染新轮 Run', () => {
-  // P05-FIXR2（R1）：it.fails 演示已登记的纵深防御缺口——use-stream-buffer.ts 消费端
-  // 无 streamId 闸门，旧流迟到 delta 当前会污染新轮 Run 投影（服务端发送侧同样未闭环，
-  // 该路径当前不可达），故本用例在缺口修复前恒红、以 it.fails 计为预期；
-  // 缺口修复后本用例会转红（it.fails 下转红）作为回归提示，届时移除 .fails 即可。
-  // 断言内容未改动，改的仅是期望方向的元语义。
-  it.fails('Run A 结束后开启 Run B，旧流(segA/streamA)迟到 delta 不得出现在 Run B 的 answer', async () => {
+  // F03：原反例保留全部断言，恢复普通正向验收。
+  it('Run A 结束后开启 Run B，旧流(segA/streamA)迟到 delta 不得出现在 Run B 的 answer', async () => {
     resetC1Store();
 
     feedC1([

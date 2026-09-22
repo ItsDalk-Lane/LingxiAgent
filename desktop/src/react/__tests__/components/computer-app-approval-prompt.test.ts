@@ -123,12 +123,8 @@ vi.mock('../../utils/paste-upload-feedback', () => ({
   notifyPasteUploadFailure: vi.fn(),
 }));
 
-vi.mock('../../services/stream-resume', () => ({
-  replayStreamResume: vi.fn(),
-  isStreamResumeRebuilding: () => null,
-  isStreamScopedMessage: () => false,
-  updateSessionStreamMeta: vi.fn(),
-}));
+// F03：保留真实流接纳器，确认旧协议的无流元数据审批仍按会话投影。
+import { invalidateSessionStreamMeta } from '../../services/stream-resume';
 
 function seedSession() {
   useStore.setState({
@@ -178,6 +174,7 @@ describe('computer app approval prompt', () => {
   });
 
   beforeEach(() => {
+    invalidateSessionStreamMeta();
     vi.clearAllMocks();
     installWindowTestT();
     seedSession();

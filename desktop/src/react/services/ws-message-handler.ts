@@ -600,8 +600,8 @@ const knowledgeReadCardBySession = new Map<string, string>();
  * 的 tool_end 也会经 ensureMessage 凭空创建第二条助手消息）。 */
 const knowledgeAnswerCardSessions = new Set<string>();
 
-function feedKnowledgeToolCard(sp: string, event: Record<string, unknown>): void {
-  streamBufferManager.handle({ ...event, sessionPath: sp });
+function feedKnowledgeToolCard(sp: string, event: Record<string, unknown> & { type: string }): void {
+  streamBufferManager.handleLocal({ ...event, sessionPath: sp });
 }
 
 function feedKnowledgeThinkCard(sp: string, id: string, phase: string): void {
@@ -661,6 +661,26 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
   if (!rememberSessionLocatorFromMessage(msg, { write: msg?.type !== 'terminal_output' })) return;
   const state = useStore.getState();
 
+  const rebuildingFor = isStreamResumeRebuilding();
+
+  if (rebuildingFor && msg.type === 'status' && state.currentSessionPath === rebuildingFor) {
+    return;
+  }
+
+  if (
+    rebuildingFor &&
+    isStreamScopedMessage(msg) &&
+    msg.sessionPath === rebuildingFor &&
+    !msg.__fromReplay &&
+    msg.type !== 'stream_resume'
+  ) {
+    return;
+  }
+
+  if (msg.type !== 'stream_resume' && (isStreamScopedMessage(msg) || REACT_CHAT_EVENTS.has(msg.type) || msg.type === 'status')) {
+    if (!updateSessionStreamMeta(msg)) return;
+  }
+
   // 「知识库检索中」胶囊与「等待助手」pending 都是纯瞬态信号：该 session 的
   // 任何后续事件（status / 聊天流事件 / error…）到达都代表前一阶段已结束，
   // 保守清除（各 end 内部对未命中 session 都是零成本 no-op）。
@@ -684,26 +704,6 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       useStore.getState().endKnowledgeRollup?.(retrievalDonePath);
       useStore.getState().endKnowledgeSupplement?.(retrievalDonePath);
     }
-  }
-
-  const rebuildingFor = isStreamResumeRebuilding();
-
-  if (rebuildingFor && msg.type === 'status' && state.currentSessionPath === rebuildingFor) {
-    return;
-  }
-
-  if (
-    rebuildingFor &&
-    isStreamScopedMessage(msg) &&
-    msg.sessionPath === rebuildingFor &&
-    !msg.__fromReplay &&
-    msg.type !== 'stream_resume'
-  ) {
-    return;
-  }
-
-  if (msg.type !== 'stream_resume' && isStreamScopedMessage(msg)) {
-    if (!updateSessionStreamMeta(msg)) return;
   }
 
   if (
@@ -1436,6 +1436,7 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
     }
 
     case 'confirmation_resolved': {
+      streamBufferManager.resolveSessionConfirmation(msg.confirmId, msg.action === 'confirmed' ? 'confirmed' : msg.action === 'timeout' ? 'timeout' : 'rejected');
       // 更新所有 session 中匹配 confirmId 的确认卡片状态。确认块可能不在最后一条消息，
       // 输入区也从消息块派生 pending 状态，所以这里按 session/message/block 三层显式定位。
       const nextStatusFor = (blockType: string): string => {

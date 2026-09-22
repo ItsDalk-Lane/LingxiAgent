@@ -2,8 +2,10 @@
  * hono-helpers.js — Hono migration utilities
  */
 
+type JsonRequestContext = { req: { text(): Promise<string> } };
+
 /** Safe JSON body parse — returns fallback on empty body or non-JSON */
-export async function safeJson(c, fallback = {}) {
+export async function safeJson(c: JsonRequestContext, fallback = {}) {
   try {
     const text = await c.req.text();
     return text ? JSON.parse(text) : fallback;
@@ -19,7 +21,7 @@ export async function safeJson(c, fallback = {}) {
  * 400 invalid_json——写入口把畸形载荷静默当空对象处理，会让调用方拿到
  * "按默认参数执行成功"的假象（例如不带 cwd 的会话创建）。
  */
-export async function strictJson(c, fallback = {}) {
+export async function strictJson(c: JsonRequestContext, fallback: unknown = {}): Promise<unknown> {
   const text = await c.req.text();
   if (!text) return fallback;
   try {
@@ -33,11 +35,8 @@ export function strictJsonError() {
   return httpJsonError(400, "invalid_json", "Request body is not valid JSON");
 }
 
-function httpJsonError(status: number, code: string, message: string) {
-  const error: any = new Error(message);
-  error.status = status;
-  error.code = code;
-  return error;
+export function httpJsonError(status: number, code: string, message: string) {
+  return Object.assign(new Error(message), { status, code });
 }
 
 /**

@@ -30,8 +30,9 @@ export function isPlanFilePath(sessionPath: unknown, targetPath: unknown): boole
 const PLAN_WRITE_TOOL_NAMES = new Set(["write", "edit"]);
 
 /** 一次工具调用是否是对本会话计划文件的写。 */
-export function isPlanFileWrite(toolName: unknown, params: any, sessionPath: unknown): boolean {
+export function isPlanFileWrite(toolName: unknown, params: unknown, sessionPath: unknown): boolean {
   const name = typeof toolName === "string" ? toolName : "";
   if (!PLAN_WRITE_TOOL_NAMES.has(name)) return false;
-  return isPlanFilePath(sessionPath, params?.path);
+  const fields = params !== null && typeof params === "object" ? params as Record<string, unknown> : {};
+  return isPlanFilePath(sessionPath, fields.path);
 }

@@ -17,7 +17,8 @@ vi.mock('../../services/stream-resume', () => ({
   replayStreamResume: vi.fn(),
   isStreamResumeRebuilding: () => null,
   isStreamScopedMessage: () => false,
-  updateSessionStreamMeta: vi.fn(),
+  // F03：真实接纳器明确返回 boolean；本套仅替换恢复边界，不拒绝合法事件。
+  updateSessionStreamMeta: vi.fn(() => true),
   injectHandlers: vi.fn(),
   injectWebSocketGetter: vi.fn(),
   requestStreamResume: vi.fn(),

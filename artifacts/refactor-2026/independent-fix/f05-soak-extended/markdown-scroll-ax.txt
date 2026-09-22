@@ -1,0 +1,97 @@
+The following is a diff from the previous accessibility tree for Window: "Lingxi" with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 373-374, 407-421, 447-453, 459, 465-467
+~						27 text 执行中 30
++						447 按钮 Lingxi 隔离本地测试助手 Lingxi · lingxi-c26-extended-q0CwEM · 1 分钟前
++							448 图像 Lingxi
++							449 文本 隔离本地测试助手
++							450 container
++								451 图像
++							452 文本 Lingxi · lingxi-c26-extended-q0CwEM · 1 分钟前
+~							242 按钮 (disabled) 重新生成
+~							243 按钮 (disabled) 编辑
+~							245 按钮 (disabled) 复制文本
+~							247 按钮 (disabled) 截图
+~							249 切换按钮 (disabled) Description: 全选消息, Value: 0
+~							251 切换按钮 (disabled) Description: 选择消息, Value: 0
++							453 弹出式按钮 用量 0 tok
++							454 弹出式按钮 用时 0秒
+~							298 按钮 (disabled) 重新生成
+~							299 按钮 (disabled) 编辑
+~							301 按钮 (disabled) 复制文本
+~							303 按钮 (disabled) 截图
+~							305 切换按钮 (disabled) Description: 全选消息, Value: 0
+~							307 切换按钮 (disabled) Description: 选择消息, Value: 0
+~							311 按钮 (disabled) 重新生成
+~							312 按钮 (disabled) 编辑
+~							314 按钮 (disabled) 复制文本
+~							316 按钮 (disabled) 截图
+~							318 切换按钮 (disabled) Description: 全选消息, Value: 0
+~							320 切换按钮 (disabled) Description: 选择消息, Value: 0
++							455 弹出式按钮 用量 0 tok
++							456 弹出式按钮 用时 45秒
+~							426 按钮 (disabled) 重新生成
+~							427 按钮 (disabled) 编辑
+~							429 按钮 (disabled) 复制文本
+~							431 按钮 (disabled) 截图
+~							433 切换按钮 (disabled) Description: 全选消息, Value: 0
+~							435 切换按钮 (disabled) Description: 选择消息, Value: 0
++							457 文本 18:31
+~							458 按钮 重新生成
++							459 按钮 分支为新会话
+~							460 按钮 复制文本
+~							462 按钮 截图
+~							464 按钮 朗读
++								465 图像
++							466 切换按钮 Description: 有帮助（记入经验库）, Value: 0
++								467 图像
++							468 切换按钮 Description: 没帮助（记入经验库）, Value: 0
++								469 图像
++							470 切换按钮 Description: 全选消息, Value: 0
++								471 图像
++							472 切换按钮 Description: 选择消息, Value: 0
++								473 图像
++							474 弹出式按钮 用量 0 tok
++							475 弹出式按钮 用时 45秒
++							476 文本 User
++							477 图像 User
++							478 文本 SOAK_LONG_MARKDOWN_GUI
++							479 文本 18:31
++							480 按钮 (disabled) 复制文本
++								481 图像
++							482 按钮 (disabled) 截图
++								483 图像
++							484 切换按钮 (disabled) Description: 全选消息, Value: 0
++								485 图像
++							486 切换按钮 (disabled) Description: 选择消息, Value: 0
++								487 图像
++							488 图像 Lingxi
++							489 文本 Lingxi
++							490 container
++								491 标题 持续输出代码验收, Value: 2
++									492 文本 持续输出代码验收
++								493 文本 const value2 = 2; // 本地合成测试行
+const value3 = 3; // 本地合成测试行
+const value4 = 4; // 本地合成测试行
+const value5 = 5; // 本地合成测试行
+const value6 = 6; // 本地合成测试行
+const value7 = 7; // 本地合成测试行
+const value8 = 8; // 本地合成测试行
+const value9 = 9; // 本地合成测试行
+const value10 = 10; // 本地合成测试行
+const value11 = 11; // 本地合成测试行
+const value12 = 12; // 本地合成测试行
+const value13 = 13; // 本地合成测试行
+const value14 = 14; // 本地合成测试行
+
++								494 container
++									495 切换按钮 Description: 自动换行, Value: 0
++									496 按钮 复制
++							497 文本 Lingxi正在工作中
+~							379 按钮 排队
++								498 图像
++								499 文本 排队
+Selected text: ```
+持续输出时的中文草稿
+```
+
+Note: Pay special attention to the content selected by the user. If the user asks a question or refers to the content they are looking at on-screen, they might be referring to the selected content (but they might be referring to something else that's visible, too).

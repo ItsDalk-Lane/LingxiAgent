@@ -1,0 +1,11 @@
+The following is a diff from the previous accessibility tree for Window: "Lingxi" with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+~							218 HTML 内容 package-test.pdf, URL: chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/index.html
++								219 HTML 内容
++									220 container 包含 1 页内容的 PDF 文档
++										221 container PDF 已加载完毕
++											222 文本 PDF 已加载完毕
++										223 container 第 1 页
++											224 文本 Hello from PDF
+
++											225 文本 Second line of text
+The focused UI element is 107 row (selected) package-test.pdf

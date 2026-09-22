@@ -1,0 +1,29 @@
+{
+  "id": "C30",
+  "status": "BLOCKED",
+  "source_level_status": "PASS",
+  "source_level_assertions": 14,
+  "source_level_exit_code": 0,
+  "taskbook": [
+    "P08-T05",
+    "P08-A08",
+    "P08-A09"
+  ],
+  "evidence": [
+    "artifacts/refactor-2026/independent-fix/f05-upgrade/result.json",
+    "artifacts/refactor-2026/independent-fix/f05-upgrade/run.log",
+    "artifacts/refactor-2026/independent-fix/f05-upgrade/commands.jsonl",
+    "artifacts/refactor-2026/independent-fix/f05-upgrade/environment.json"
+  ],
+  "blockers": [
+    "真实安装产物的版本激活/失败回退及安装器未在此源码级演练覆盖",
+    "不同目标平台环境/安装产物验证待授权与环境"
+  ],
+  "limits": [
+    "两版本从源码启动并共用锁定node_modules，不是独立安装包",
+    "仅loopback协议模型替身，不是真实供应商效果",
+    "FAULT只验证JSONL尾部半写后可启动/会话数保留，不能推广为所有升级激活事务失败恢复",
+    "ROLLBACK验证会话ID保留/旧版本读新历史200及追加第四会话，不声明截断尾部所有字节均可恢复",
+    "观测探针仅200与非空响应长度，不证明每条轨迹逐项一致"
+  ]
+}

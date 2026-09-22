@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "regressions": 32,
+  "scenarios": 124,
+  "tasks": 68,
+  "sourceFiles": 3535,
+  "negativeControls": "blocked child and missing evidence rejected",
+  "note": "仅交付一致性通过，不授予产品/平台总体PASS"
+}

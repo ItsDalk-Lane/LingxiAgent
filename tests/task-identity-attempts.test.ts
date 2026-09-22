@@ -98,7 +98,7 @@ describe("TaskRegistry attempt 栅栏（P02-A03）", () => {
     expect(done).toMatchObject({ attempt: 2, status: "completed", result: { ok: true } });
   });
 
-  it("不带 expectedAttempt 的调用保持旧语义（不栅栏）；非法 expectedAttempt 抛错", () => {
+  it("首次未复用任务兼容缺省 expectedAttempt；非法 expectedAttempt 抛错", () => {
     const reg = makeRegistry();
     reg.register("t1", { type: "render" });
     expect(reg.update("t1", { progress: { current: 1, total: 2 } })).toMatchObject({ attempt: 1 });
@@ -169,7 +169,7 @@ describe("task:register / task:complete 总线透传 attempt（迟到回调栅�
     expect(second.task.attempt).toBe(2);
 
     const late = eventBus.request("task:complete", { taskId: first.task.taskId, result: "late", expectedAttempt: 1 });
-    expect(late.ok).toBe(true);
+    expect(late.ok).toBe(false);
     expect(late.task).toBeNull();
     expect(registry.query(first.task.taskId)).toMatchObject({ attempt: 2, status: "running" });
 

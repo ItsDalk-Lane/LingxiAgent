@@ -57,12 +57,17 @@ function allBlocks(): NonNullable<ChatMessage['blocks']> {
   return assistantMessages().flatMap((message) => message.blocks ?? []);
 }
 
+// 真实 emitStreamEvent 会给每个内容/生命周期帧附流身份，不混用新起点和无身份正文。
+function feed(event: Record<string, unknown>): void {
+  streamBufferManager.handle({ streamId: 'stream-run-1', ...event });
+}
+
 // Assistant Run 生命周期（一个用户 Run 一个）。
 function runStart(runId = 'run-1') {
-  streamBufferManager.handle({ type: 'assistant_run_start', sessionPath: PATH, runId, streamId: 'stream-' + runId });
+  feed({ type: 'assistant_run_start', sessionPath: PATH, runId, streamId: 'stream-' + runId });
 }
 function runEnd(turnInputEntryId: string, assistantEntryId: string) {
-  streamBufferManager.handle({
+  feed({
     type: 'assistant_run_end',
     sessionPath: PATH,
     runId: 'run-1',
@@ -75,33 +80,33 @@ function runEnd(turnInputEntryId: string, assistantEntryId: string) {
 
 // Pi Model Turn 边界（一个 Assistant Run 内可有多个）。
 function turnStart(turnId: string) {
-  streamBufferManager.handle({ type: 'model_turn_start', sessionPath: PATH, turnId, streamId: 'stream-run-1' });
+  feed({ type: 'model_turn_start', sessionPath: PATH, turnId, streamId: 'stream-run-1' });
 }
 function turnEnd() {
-  streamBufferManager.handle({ type: 'model_turn_end', sessionPath: PATH });
+  feed({ type: 'model_turn_end', sessionPath: PATH });
 }
 
 function moodCycle(text: string) {
-  streamBufferManager.handle({ type: 'mood_start', sessionPath: PATH });
-  streamBufferManager.handle({ type: 'mood_text', sessionPath: PATH, delta: text });
-  streamBufferManager.handle({ type: 'mood_end', sessionPath: PATH });
+  feed({ type: 'mood_start', sessionPath: PATH });
+  feed({ type: 'mood_text', sessionPath: PATH, delta: text });
+  feed({ type: 'mood_end', sessionPath: PATH });
 }
 
 function toolCycle(id: string, name = 'read') {
-  streamBufferManager.handle({ type: 'tool_start', sessionPath: PATH, id, name, args: { path: '/tmp/a.md' } });
-  streamBufferManager.handle({ type: 'tool_end', sessionPath: PATH, id, name, success: true, status: 'succeeded' });
+  feed({ type: 'tool_start', sessionPath: PATH, id, name, args: { path: '/tmp/a.md' } });
+  feed({ type: 'tool_end', sessionPath: PATH, id, name, success: true, status: 'succeeded' });
 }
 
 function canonicalSegment(segmentId: string, kind: string, phaseAtStart: string, delta: string, phaseAtEnd: string) {
-  streamBufferManager.handle({
+  feed({
     type: 'assistant_segment_start', sessionPath: PATH,
     segmentId, kind, semanticPhase: phaseAtStart,
   });
-  streamBufferManager.handle({
+  feed({
     type: 'assistant_segment_delta', sessionPath: PATH,
     segmentId, delta, semanticPhase: phaseAtStart,
   });
-  streamBufferManager.handle({
+  feed({
     type: 'assistant_segment_end', sessionPath: PATH,
     segmentId, semanticPhase: phaseAtEnd,
   });
@@ -180,20 +185,20 @@ describe('Turn Outcome 模式回归', () => {
       runStart();
       turnStart('turn-c');
       if (withStatusFlap) {
-        streamBufferManager.handle({ type: 'status', sessionPath: PATH, isStreaming: false });
-        streamBufferManager.handle({ type: 'status', sessionPath: PATH, isStreaming: true });
+        feed({ type: 'status', sessionPath: PATH, isStreaming: false });
+        feed({ type: 'status', sessionPath: PATH, isStreaming: true });
       }
       canonicalSegment('assistant:1:text:0', 'text', 'commentary', '过程', 'commentary');
       if (withStatusFlap) {
-        streamBufferManager.handle({ type: 'status', sessionPath: PATH, isStreaming: false });
-        streamBufferManager.handle({ type: 'status', sessionPath: PATH, isStreaming: true });
-        streamBufferManager.handle({ type: 'status', sessionPath: PATH, isStreaming: false });
+        feed({ type: 'status', sessionPath: PATH, isStreaming: false });
+        feed({ type: 'status', sessionPath: PATH, isStreaming: true });
+        feed({ type: 'status', sessionPath: PATH, isStreaming: false });
       }
       canonicalSegment('assistant:2:text:0', 'text', 'final_answer', '答案', 'final_answer');
       turnEnd();
       runEnd('entry-u1', 'entry-a1');
       if (withStatusFlap) {
-        streamBufferManager.handle({ type: 'status', sessionPath: PATH, isStreaming: false });
+        feed({ type: 'status', sessionPath: PATH, isStreaming: false });
       }
       // 逐字段比较语义内容；block.id / turnProjection.id 因 stream message id 非
       // 确定性（每次 resetStore 生成新 id）而不同，属于测试夹具噪声，不是内容差异。
@@ -216,11 +221,11 @@ describe('Turn Outcome 模式回归', () => {
   it('模式 D：phase-at-end 供应商 —— 流式期 provisional，终结后成为答案', () => {
     runStart();
     turnStart('turn-d');
-    streamBufferManager.handle({
+    feed({
       type: 'assistant_segment_start', sessionPath: PATH,
       segmentId: 'assistant:1:text:0', kind: 'text', semanticPhase: 'unresolved',
     });
-    streamBufferManager.handle({
+    feed({
       type: 'assistant_segment_delta', sessionPath: PATH,
       segmentId: 'assistant:1:text:0', delta: '身份未判明的文字', semanticPhase: 'unresolved',
     });
@@ -238,7 +243,7 @@ describe('Turn Outcome 模式回归', () => {
     });
 
     // text_end 时刻供应商才给出身份：final_answer
-    streamBufferManager.handle({
+    feed({
       type: 'assistant_segment_end', sessionPath: PATH,
       segmentId: 'assistant:1:text:0', semanticPhase: 'final_answer',
     });

@@ -1,0 +1,20 @@
+{
+  "note": "用户提供材料的字节指纹；其原复现日志不作为本轮执行证据",
+  "inputs": [
+    {
+      "name": "ADVERSARIAL_REVIEW.md",
+      "source": "/Users/study_superior/Desktop/Code/Lingxi_Refactor_Audit/ADVERSARIAL_REVIEW.md",
+      "sha256": "fdf54d515f9a539fafad19fb982ced4d2cf51fc3ab8cd0f881c9eba64cbd4215"
+    },
+    {
+      "name": "CODEX_REPAIR_PROMPT.md",
+      "source": "/Users/study_superior/Desktop/Code/Lingxi_Refactor_Audit/CODEX_REPAIR_PROMPT.md",
+      "sha256": "23099cfb1f87a9b1dfddb47a5b0ee8ee55249ddc13539e9942fffb92c88d5a81"
+    },
+    {
+      "name": "REVIEW_FACTS.json",
+      "source": "/Users/study_superior/Desktop/Code/Lingxi_Refactor_Audit/REVIEW_FACTS.json",
+      "sha256": "4eec3349d2bdc135559d52806eb17c6d411a55276073985e30070f6938551de1"
+    }
+  ]
+}

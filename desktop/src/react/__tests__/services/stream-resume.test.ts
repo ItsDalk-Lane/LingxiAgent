@@ -42,6 +42,7 @@ import {
 describe('stream-resume', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    invalidateSessionStreamMeta();
     useStore.setState({
       currentSessionPath: '/focused.jsonl',
       streamingSessions: ['/background.jsonl'],
@@ -100,7 +101,7 @@ describe('stream-resume', () => {
     expect(updateSessionStreamMeta({ sessionPath: '/background.jsonl', streamId: 'stream_old', seq: 1 })).toBe(true);
 
     // 新流的 seq=1（reset 全量重放的一部分）：不得因旧流消费过 seq 1 而被拒收
-    const accepted = updateSessionStreamMeta({ sessionPath: '/background.jsonl', streamId: 'stream_new', seq: 1 });
+    const accepted = updateSessionStreamMeta({ type: 'assistant_run_start', sessionPath: '/background.jsonl', streamId: 'stream_new', seq: 1 });
     expect(accepted).toBe(true);
 
     replayStreamResume({

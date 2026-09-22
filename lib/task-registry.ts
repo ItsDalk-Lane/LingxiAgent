@@ -3,6 +3,31 @@ import path from "path";
 import { atomicWriteSync } from "../shared/safe-fs.ts";
 import { createModuleLogger } from "./debug-log.ts";
 
+export type TaskStatus = "pending" | "running" | "paused" | "blocked" | "recovering" | "completed" | "failed" | "canceled" | "aborted";
+const STATUS_KIND: Record<TaskStatus, "active" | "final"> = {
+  pending: "active", running: "active", paused: "active", blocked: "active", recovering: "active",
+  completed: "final", failed: "final", canceled: "final", aborted: "final",
+};
+export interface AttemptOptions { expectedAttempt?: number | null | undefined }
+export interface TaskRecord {
+  taskId: string; type: string; attempt: number; status: TaskStatus; aborted: boolean;
+  parentSessionId: string | null; parentSessionPath: string | null; parentSessionRef: Record<string, unknown> | null;
+  pluginId: string | null; agentId: string | null; meta: Record<string, unknown>; progress: unknown;
+  createdAt: number; updatedAt: number; completedAt?: number; result?: unknown; error?: string; persist: boolean;
+}
+export interface TaskPatch {
+  status?: TaskStatus; result?: unknown; error?: unknown; progress?: unknown; meta?: unknown;
+  parentSessionPath?: string | null; parentSessionId?: string | null; parentSessionRef?: Record<string, unknown> | null;
+  agentId?: string | null; pluginId?: string | null;
+}
+export interface TaskRegistration {
+  type?: string | undefined; parentSessionPath?: string | null | undefined; parentSessionId?: string | null | undefined;
+  parentSessionRef?: unknown; sessionId?: string | null | undefined; sessionRef?: unknown; legacySessionPath?: string | null | undefined;
+  meta?: unknown; pluginId?: string | null | undefined; agentId?: string | null | undefined; persist?: boolean | undefined;
+}
+export interface TaskRegistryOptions { persistencePath?: string; getSessionIdForPath?: (path: string | null) => string | null }
+export interface TaskHandler { abort: (taskId: string) => unknown; run?: ((schedule: unknown) => unknown) | undefined }
+export interface PersistenceFeedback { durable: boolean; status: "disabled" | "saved" | "failed"; error: string | null }
 const log = createModuleLogger("task-registry");
 
 /**
@@ -14,34 +39,31 @@ const log = createModuleLogger("task-registry");
  *
  * Attempt 栅栏（P02-T01/A03）：同一业务 taskId 允许在终态后重新 register 承接
  * 下一次执行（合法 task 复用）；每次复用递增 task.attempt。终态写入方
- * （complete/fail/update）可携带 expectedAttempt，attempt 不匹配的迟到回调被
+ * 必须在启动时捕获并携带 expectedAttempt；只对从未复用的首次执行兼容缺省。批次不匹配的迟到回调被
  * 拒绝（返回 null、不落盘），防止上一次执行的迟到结果覆盖下一次执行的状态。
  */
 
-const ACTIVE_STATUSES = new Set(["pending", "running", "paused", "blocked", "recovering"]);
+const ACTIVE_STATUSES = new Set<TaskStatus>((Object.keys(STATUS_KIND) as TaskStatus[]).filter((status) => STATUS_KIND[status] === "active"));
 export const ACTIVE_TASK_STATUSES = ACTIVE_STATUSES;
-const FINAL_STATUSES = new Set(["completed", "failed", "canceled", "aborted"]);
+const FINAL_STATUSES = new Set<TaskStatus>((Object.keys(STATUS_KIND) as TaskStatus[]).filter((status) => STATUS_KIND[status] === "final"));
 const KNOWN_STATUSES = new Set([...ACTIVE_STATUSES, ...FINAL_STATUSES]);
 const MAX_TIMER_DELAY = 2_147_483_647;
 
-function textOrNull(value) {
+function textOrNull(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
-function normalizeParentSessionRef(input: any = {}, resolveSessionIdForPath: any = null) {
-  if (typeof input === "string") {
-    const parentSessionPath = textOrNull(input);
+function normalizeParentSessionRef(value: unknown = {}, resolveSessionIdForPath: ((path: string | null) => string | null) | null = null) {
+  if (typeof value === "string") {
+    const parentSessionPath = textOrNull(value);
     const parentSessionId = textOrNull(resolveSessionIdForPath?.(parentSessionPath));
     const parentSessionRef = parentSessionId
       ? { sessionId: parentSessionId, ...(parentSessionPath ? { sessionPath: parentSessionPath, legacySessionPath: parentSessionPath } : {}) }
       : null;
     return { parentSessionId, parentSessionPath, parentSessionRef };
   }
-  const rawRef = input.parentSessionRef && typeof input.parentSessionRef === "object"
-    ? input.parentSessionRef
-    : input.sessionRef && typeof input.sessionRef === "object"
-      ? input.sessionRef
-      : null;
+  const input = objectOrEmpty(value);
+  const rawRef = objectOrEmpty(input.parentSessionRef || input.sessionRef);
   const parentSessionId =
     textOrNull(input.parentSessionId)
     || textOrNull(input.sessionId)
@@ -66,7 +88,7 @@ function normalizeParentSessionRef(input: any = {}, resolveSessionIdForPath: any
   return { parentSessionId: resolvedParentSessionId, parentSessionPath, parentSessionRef };
 }
 
-function matchesParentSession(task, input, resolveSessionIdForPath = null) {
+function matchesParentSession(task: TaskRecord, input: unknown, resolveSessionIdForPath: ((path: string | null) => string | null) | null = null) {
   const target = normalizeParentSessionRef(input, resolveSessionIdForPath);
   if (target.parentSessionId) {
     return task.parentSessionId === target.parentSessionId
@@ -76,13 +98,22 @@ function matchesParentSession(task, input, resolveSessionIdForPath = null) {
 }
 
 export class TaskRegistry {
-  declare _handlers: any;
-  declare _getSessionIdForPath: any;
-  declare _persistencePath: any;
-  declare _scheduleTimers: any;
+  declare _handlers: Map<string, TaskHandler>;
+  declare _getSessionIdForPath: (path: string | null) => string | null;
+  declare _persistencePath: string | null;
+  declare _scheduleTimers: Map<string, ReturnType<typeof setTimeout>>;
   declare _schedules: any;
-  declare _tasks: any;
-  constructor( options: any = {}) {
+  declare _tasks: Map<string, TaskRecord>;
+  // 删除记录的有限墓碑；淘汰时提升分配下限，旧批次仍不能冒认新执行。
+  private _lastAttempts = new Map<string, number>();
+  private _attemptFloor = 1;
+  private _maxAttempt = 1;
+  private _persistence: PersistenceFeedback = { durable: false, status: "disabled", error: null };
+  persistenceStatus(task?: TaskRecord | null): PersistenceFeedback {
+    if (task?.persist === false) return { durable: false, status: "disabled", error: null };
+    return { ...this._persistence };
+  }
+  constructor(options: TaskRegistryOptions = {}) {
     this._persistencePath = typeof options.persistencePath === "string" ? options.persistencePath : null;
     this._getSessionIdForPath = typeof options.getSessionIdForPath === "function" ? options.getSessionIdForPath : () => null;
     /** @type {Map<string, { abort: (taskId: string) => void, run?: Function }>} */
@@ -98,7 +129,7 @@ export class TaskRegistry {
 
   // ── 类型处理器注册（启动时调用） ──
 
-  registerHandler(type, handler) {
+  registerHandler(type: string, handler: TaskHandler) {
     const key = assertText(type, "task handler type");
     if (!handler?.abort || typeof handler.abort !== "function") {
       throw new Error(`TaskRegistry: handler for "${key}" must have an abort(taskId) method`);
@@ -110,13 +141,13 @@ export class TaskRegistry {
     this._armSchedulesForType(key);
   }
 
-  unregisterHandler(type) {
+  unregisterHandler(type: string) {
     this._handlers.delete(type);
   }
 
   // ── 任务实例生命周期 ──
 
-  register(taskId, { type, parentSessionPath = null, parentSessionId = null, parentSessionRef = null, sessionId = null, sessionRef = null, legacySessionPath = null, meta = {} as any, pluginId = null, agentId = null, persist = true }: any = {}) {
+  register(taskId: string, { type, parentSessionPath = null, parentSessionId = null, parentSessionRef = null, sessionId = null, sessionRef = null, legacySessionPath = null, meta = {}, pluginId = null, agentId = null, persist = true }: TaskRegistration = {}) {
     const id = assertText(taskId, "taskId");
     const taskType = assertText(type, "task type");
     if (!this._handlers.has(taskType)) {
@@ -133,7 +164,7 @@ export class TaskRegistry {
       legacySessionPath,
     }, this._getSessionIdForPath);
     const reactivating = !!existing && FINAL_STATUSES.has(existing.status);
-    const task = {
+    const task: TaskRecord = {
       taskId: id,
       type: taskType,
       parentSessionId: parentRef.parentSessionId || existing?.parentSessionId || null,
@@ -145,7 +176,7 @@ export class TaskRegistry {
       progress: existing?.progress || null,
       status: normalizeStatus(existing?.status, "running"),
       aborted: Boolean(existing?.aborted),
-      attempt: taskAttempt(existing) + (reactivating ? 1 : 0),
+      attempt: existing ? taskAttempt(existing) + (reactivating ? 1 : 0) : Math.max(this._attemptFloor, (this._lastAttempts.get(id) || 0) + 1),
       createdAt: existing?.createdAt || now,
       updatedAt: now,
       persist: persist !== false,
@@ -156,25 +187,35 @@ export class TaskRegistry {
       // 迟到终态回调会被 complete/fail/update 的 expectedAttempt 栅栏拒绝。
       task.status = "running";
       task.aborted = false;
-      delete (task as any).completedAt;
-      delete (task as any).error;
-      delete (task as any).result;
+      delete task.completedAt;
+      delete task.error;
+      delete task.result;
       task.progress = null;
     }
+    if (!Number.isSafeInteger(task.attempt)) throw new Error("TaskRegistry: attempt capacity exhausted");
     this._tasks.set(id, task);
+    this._maxAttempt = Math.max(this._maxAttempt, task.attempt);
+    this._lastAttempts.delete(id);
     this._persist();
     return clone(task);
   }
 
-  update(taskId, patch: any = {}, options: any = {}) {
+  update(taskId: string, patch: TaskPatch = {}, options: AttemptOptions = {}) {
     const task = this._requireTask(taskId);
     if (isStaleAttempt(task, options.expectedAttempt)) return null;
+    if (FINAL_STATUSES.has(task.status) && Object.keys(patch).some(key => key !== "meta")) return clone(task);
     const now = Date.now();
-    const next = {
+    const next: TaskRecord = {
       ...task,
       updatedAt: now,
     };
-    if (patch.status !== undefined) next.status = normalizeStatus(patch.status, task.status);
+    if (patch.status !== undefined) {
+      next.status = normalizeStatus(patch.status, task.status);
+      if (FINAL_STATUSES.has(next.status)) {
+        next.completedAt = now;
+        next.aborted = next.status === "aborted" || next.status === "canceled";
+      }
+    }
     if (patch.progress !== undefined) next.progress = normalizeProgress(patch.progress);
     if (patch.meta !== undefined) next.meta = { ...objectOrEmpty(task.meta), ...objectOrEmpty(patch.meta) };
     if (patch.result !== undefined) next.result = patch.result;
@@ -194,15 +235,14 @@ export class TaskRegistry {
     return clone(next);
   }
 
-  complete(taskId, result = null, options: any = {}) {
+  complete(taskId: string, result: unknown = null, options: AttemptOptions = {}) {
     const task = this._requireTask(taskId);
     if (isStaleAttempt(task, options.expectedAttempt)) return null;
     // 终态 first-write-wins：已完成/失败的 task 不接受再 complete/fail 改写；
-    // 需要新执行走 register（合法复用，attempt+1）。cancel 的 aborted→canceled
-    // 改名不经此路径。
+    // 需要新执行走 register（合法复用，attempt+1）。取消直接写入其最终分类。
     if (FINAL_STATUSES.has(task.status)) return clone(task);
     const now = Date.now();
-    const next = {
+    const next: TaskRecord = {
       ...task,
       status: "completed",
       result,
@@ -215,12 +255,12 @@ export class TaskRegistry {
     return clone(next);
   }
 
-  fail(taskId, error = "failed", options: any = {}) {
+  fail(taskId: string, error: unknown = "failed", options: AttemptOptions = {}) {
     const task = this._requireTask(taskId);
     if (isStaleAttempt(task, options.expectedAttempt)) return null;
     if (FINAL_STATUSES.has(task.status)) return clone(task);
     const now = Date.now();
-    const next = {
+    const next: TaskRecord = {
       ...task,
       status: "failed",
       error: normalizeError(error),
@@ -232,47 +272,36 @@ export class TaskRegistry {
     return clone(next);
   }
 
-  cancel(taskId, reason = "canceled") {
-    const result = this.abort(taskId);
-    if (result === "aborted" || result === "already_aborted") {
-      const task = this._requireTask(taskId);
-      const now = Date.now();
-      const next = {
-        ...task,
-        status: "canceled",
-        error: normalizeError(reason),
-        aborted: true,
-        updatedAt: now,
-        completedAt: now,
-      };
-      this._tasks.set(task.taskId, next);
-      this._persist();
-      return { result, canceled: true };
-    }
-    return { result, canceled: false };
+  cancel(taskId: string, reason = "canceled", options: AttemptOptions = {}) {
+    const result = this._abort(taskId, reason, options, "canceled");
+    return { result, canceled: result === "aborted" };
   }
 
-  abort(taskId, reason = "aborted") {
+  abort(taskId: string, reason = "aborted", options: AttemptOptions = {}) {
+    return this._abort(taskId, reason, options, "aborted");
+  }
+
+  private _abort(taskId: string, reason: string, options: AttemptOptions, status: "aborted" | "canceled") {
     const task = this._tasks.get(taskId);
     if (!task) return "not_found";
-    if (task.aborted) return "already_aborted";
-
+    if (isStaleAttempt(task, options.expectedAttempt)) return "stale_attempt";
+    if (FINAL_STATUSES.has(task.status)) return task.aborted ? "already_aborted" : "already_final";
     const handler = this._handlers.get(task.type);
     if (!handler) return "no_handler";
-
     task.aborted = true;
-    task.status = "aborted";
+    task.status = status;
     task.updatedAt = Date.now();
     task.completedAt = task.updatedAt;
     task.error = normalizeError(reason);
+    // 状态只表示已发起停止；执行器/外部动作是否停止由对应域负责证明。
     try { handler.abort(taskId); } catch (err) {
-      log.error(`abort handler error for ${taskId}: ${err.message}`);
+      log.error(`abort handler error for ${taskId}: ${normalizeError(err)}`);
     }
     this._persist();
     return "aborted";
   }
 
-  abortByParentSession(parentSessionPath, reason = "parent session aborted") {
+  abortByParentSession(parentSessionPath: string | { sessionId?: string; sessionPath?: string; parentSessionId?: string; parentSessionPath?: string }, reason = "parent session aborted") {
     const summary = {
       matched: 0,
       aborted: 0,
@@ -289,7 +318,7 @@ export class TaskRegistry {
         summary.skippedFinal++;
         continue;
       }
-      const result = this.abort(task.taskId, reason);
+      const result = this.abort(task.taskId, reason, { expectedAttempt: task.attempt });
       if (result === "aborted") {
         summary.aborted++;
         continue;
@@ -311,17 +340,26 @@ export class TaskRegistry {
     return summary;
   }
 
-  remove(taskId) {
+  remove(taskId: string, options: AttemptOptions = {}) {
+    const task = this._tasks.get(taskId);
+    if (!task || isStaleAttempt(task, options.expectedAttempt)) return false;
     this._tasks.delete(taskId);
+    this._lastAttempts.set(taskId, task.attempt);
+    if (this._lastAttempts.size > 1024) {
+      const oldest = this._lastAttempts.keys().next().value;
+      if (oldest !== undefined) this._lastAttempts.delete(oldest);
+      this._attemptFloor = this._maxAttempt + 1;
+    }
     this._persist();
+    return true;
   }
 
-  query(taskId) {
+  query(taskId: string) {
     const task = this._tasks.get(taskId);
     return task ? clone(task) : null;
   }
 
-  listByType(type) {
+  listByType(type: string) {
     const result = [];
     for (const task of this._tasks.values()) {
       if (task.type === type) result.push(clone(task));
@@ -329,7 +367,7 @@ export class TaskRegistry {
     return result;
   }
 
-  listAll( filter: any = {}) {
+  listAll(filter: { type?: string; status?: TaskStatus; pluginId?: string | null; parentSessionId?: string | null; sessionId?: string; parentSessionPath?: string | null } = {}) {
     const tasks = [...this._tasks.values()].filter((task) => {
       if (filter.type && task.type !== filter.type) return false;
       if (filter.status && task.status !== filter.status) return false;
@@ -342,7 +380,7 @@ export class TaskRegistry {
   }
 
   /** 该会话是否还有未到终态的后台任务（循环守恒检查与闹钟护栏共用）。 */
-  hasActiveForParentSession(parentSessionPath) {
+  hasActiveForParentSession(parentSessionPath: string) {
     if (!parentSessionPath) return false;
     return this.listAll({ parentSessionPath })
       .some((task) => ACTIVE_STATUSES.has(task.status));
@@ -350,7 +388,7 @@ export class TaskRegistry {
 
   // ── 计划任务 ──
 
-  schedule(scheduleId, input: any = {}) {
+  schedule(scheduleId: string, input: any = {}) {
     const id = assertText(scheduleId, "scheduleId");
     const type = assertText(input.type, "schedule type");
     const existing = this._schedules.get(id);
@@ -387,7 +425,7 @@ export class TaskRegistry {
     return clone(schedule);
   }
 
-  unschedule(scheduleId) {
+  unschedule(scheduleId: string) {
     const id = assertText(scheduleId, "scheduleId");
     this._clearScheduleTimer(id);
     const deleted = this._schedules.delete(id);
@@ -395,7 +433,7 @@ export class TaskRegistry {
     return deleted;
   }
 
-  querySchedule(scheduleId) {
+  querySchedule(scheduleId: string) {
     const schedule = this._schedules.get(scheduleId);
     return schedule ? clone(schedule) : null;
   }
@@ -417,19 +455,19 @@ export class TaskRegistry {
     }
   }
 
-  _requireTask(taskId) {
+  _requireTask(taskId: string) {
     const task = this._tasks.get(taskId);
     if (!task) throw new Error(`TaskRegistry: task "${taskId}" not found`);
     return task;
   }
 
-  _armSchedulesForType(type) {
+  _armSchedulesForType(type: string) {
     for (const schedule of this._schedules.values()) {
       if (schedule.type === type) this._armSchedule(schedule.scheduleId);
     }
   }
 
-  _armSchedule(scheduleId) {
+  _armSchedule(scheduleId: string) {
     this._clearScheduleTimer(scheduleId);
     const schedule = this._schedules.get(scheduleId);
     if (!schedule?.enabled || !schedule.nextRunAt) return;
@@ -437,20 +475,20 @@ export class TaskRegistry {
     const timer = setTimeout(() => {
       this._scheduleTimers.delete(scheduleId);
       this._runSchedule(scheduleId).catch((err) => {
-        log.error(`schedule ${scheduleId} failed: ${err.message}`);
+        log.error(`schedule ${scheduleId} failed: ${normalizeError(err)}`);
       });
     }, delay);
     if (typeof timer.unref === "function") timer.unref();
     this._scheduleTimers.set(scheduleId, timer);
   }
 
-  _clearScheduleTimer(scheduleId) {
+  _clearScheduleTimer(scheduleId: string) {
     const timer = this._scheduleTimers.get(scheduleId);
     if (timer) clearTimeout(timer);
     this._scheduleTimers.delete(scheduleId);
   }
 
-  async _runSchedule(scheduleId) {
+  async _runSchedule(scheduleId: string) {
     const schedule = this._schedules.get(scheduleId);
     if (!schedule?.enabled) return;
     const handler = this._handlers.get(schedule.type);
@@ -503,6 +541,7 @@ export class TaskRegistry {
           restored.updatedAt = Date.now();
         }
         this._tasks.set(restored.taskId, restored);
+        this._maxAttempt = Math.max(this._maxAttempt, restored.attempt);
       }
       for (const schedule of Array.isArray(raw.schedules) ? raw.schedules : []) {
         if (!schedule?.scheduleId || !schedule?.type) continue;
@@ -510,7 +549,7 @@ export class TaskRegistry {
         this._armSchedule(schedule.scheduleId);
       }
     } catch (err) {
-      log.warn(`failed to load persisted tasks: ${err.message}`);
+      log.warn(`failed to load persisted tasks: ${normalizeError(err)}`);
     }
   }
 
@@ -523,70 +562,74 @@ export class TaskRegistry {
         .map(stripRuntimeTaskFields);
       const schedules = [...this._schedules.values()];
       atomicWriteSync(this._persistencePath, JSON.stringify({ tasks, schedules }, null, 2));
+      this._persistence = { durable: true, status: "saved", error: null };
     } catch (err) {
-      log.warn(`failed to persist tasks: ${err.message}`);
+      this._persistence = { durable: false, status: "failed", error: normalizeError(err) };
+      log.warn(`failed to persist tasks: ${normalizeError(err)}`);
     }
   }
 }
 
-function assertText(value, label) {
+function assertText(value: unknown, label: string) {
   const text = typeof value === "string" ? value.trim() : "";
   if (!text) throw new Error(`TaskRegistry: ${label} is required`);
   return text;
 }
 
 /** attempt 归一化：缺失/非法的旧记录按 1 读（旧值缺失不可猜成其他身份）。 */
-function taskAttempt(task) {
-  return Number.isSafeInteger(task?.attempt) && task.attempt > 0 ? task.attempt : 1;
+function taskAttempt(task: { attempt?: number } | null | undefined) {
+  return typeof task?.attempt === "number" && Number.isSafeInteger(task.attempt) && task.attempt > 0 ? task.attempt : 1;
 }
 
 /**
  * 迟到回调栅栏：调用方在启动执行时从 register() 返回值捕获 attempt，终态时
  * 以 expectedAttempt 回传。attempt 不匹配 → 拒绝写入（返回 true 表示 stale）。
  */
-function isStaleAttempt(task, expectedAttempt) {
-  if (expectedAttempt === undefined || expectedAttempt === null) return false;
+function isStaleAttempt(task: TaskRecord, expectedAttempt: number | null | undefined) {
+  if (expectedAttempt === undefined) return taskAttempt(task) !== 1;
+  if (expectedAttempt === null) return true;
   if (!Number.isSafeInteger(expectedAttempt) || expectedAttempt < 1) {
     throw new Error(`TaskRegistry: expectedAttempt must be a positive integer (got ${expectedAttempt})`);
   }
   return taskAttempt(task) !== expectedAttempt;
 }
 
-function normalizeStatus(value, fallback) {
+function normalizeStatus(value: unknown, fallback: TaskStatus): TaskStatus {
   const status = typeof value === "string" ? value.trim() : "";
   if (!status) return fallback;
-  if (!KNOWN_STATUSES.has(status)) {
+  if (!KNOWN_STATUSES.has(status as TaskStatus)) {
     throw new Error(`TaskRegistry: unknown task status "${status}"`);
   }
-  return status;
+  return status as TaskStatus;
 }
 
-function normalizeProgress(value) {
+function normalizeProgress(value: unknown) {
   if (value === null) return null;
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw new Error("TaskRegistry: progress must be an object or null");
   }
-  const current = normalizeOptionalNumber(value.current, "progress.current");
-  const total = normalizeOptionalNumber(value.total, "progress.total");
-  const percent = value.percent !== undefined
-    ? normalizeOptionalNumber(value.percent, "progress.percent")
+  const record = value as Record<string, unknown>;
+  const current = normalizeOptionalNumber(record.current, "progress.current");
+  const total = normalizeOptionalNumber(record.total, "progress.total");
+  const percent = record.percent !== undefined
+    ? normalizeOptionalNumber(record.percent, "progress.percent")
     : derivePercent(current, total);
   return {
     ...(current !== undefined ? { current } : {}),
     ...(total !== undefined ? { total } : {}),
     ...(percent !== undefined ? { percent } : {}),
-    ...(typeof value.message === "string" ? { message: value.message } : {}),
+    ...(typeof record.message === "string" ? { message: record.message } : {}),
   };
 }
 
-function normalizeOptionalNumber(value, label) {
+function normalizeOptionalNumber(value: unknown, label: string) {
   if (value === undefined || value === null || value === "") return undefined;
   const number = Number(value);
   if (!Number.isFinite(number)) throw new Error(`TaskRegistry: ${label} must be a finite number`);
   return number;
 }
 
-function normalizePositiveNumber(value, label) {
+function normalizePositiveNumber(value: unknown, label: string) {
   if (value === undefined || value === null || value === "") return null;
   const number = Number(value);
   if (!Number.isFinite(number) || number <= 0) {
@@ -595,7 +638,7 @@ function normalizePositiveNumber(value, label) {
   return number;
 }
 
-function normalizeOptionalTime(value, label) {
+function normalizeOptionalTime(value: unknown, label: string) {
   if (value === undefined || value === null || value === "") return null;
   if (value instanceof Date) return value.getTime();
   const number = typeof value === "number" ? value : Date.parse(String(value));
@@ -603,33 +646,33 @@ function normalizeOptionalTime(value, label) {
   return number;
 }
 
-function derivePercent(current, total) {
+function derivePercent(current: number | undefined, total: number | undefined) {
   if (current === undefined || total === undefined || total <= 0) return undefined;
   return Math.max(0, Math.min(100, Math.round((current / total) * 100)));
 }
 
-function normalizeError(error) {
+function normalizeError(error: unknown) {
   if (error instanceof Error) return error.message;
   if (typeof error === "string") return error;
-  if (error && typeof error === "object" && typeof error.message === "string") return error.message;
+  if (error && typeof error === "object" && "message" in error && typeof error.message === "string") return error.message;
   return String(error);
 }
 
-function objectOrEmpty(value) {
+function objectOrEmpty(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? { ...value } : {};
 }
 
-function clone(value) {
-  return value === undefined ? undefined : structuredClone(value);
+function clone<T>(value: T): T {
+  return structuredClone(value);
 }
 
-function stripRuntimeTaskFields(task) {
+function stripRuntimeTaskFields(task: TaskRecord) {
   const { persist: _persist, ...rest } = task;
   return rest;
 }
 
-function resolveNextRunAt({ intervalMs, runAt, existing, now }) {
+function resolveNextRunAt({ intervalMs, runAt, existing, now }: { intervalMs: number | null; runAt: number | null; existing?: {nextRunAt?: number}; now: number }) {
   if (existing?.nextRunAt && existing.nextRunAt > now) return existing.nextRunAt;
   if (runAt) return runAt;
-  return now + intervalMs;
+  return now + (intervalMs || 0);
 }

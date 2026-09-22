@@ -1,0 +1,701 @@
+{
+  "id": "C26",
+  "status": "BLOCKED",
+  "reason": "浏览器上限及进程回收通过；新增会话与复用同批会话均有RSS增长，缓存保留和泄漏尚未区分，不能声称整体资源验收通过。",
+  "primaryWorkload": {
+    "start": "2026-09-22T10:23:04.339Z",
+    "end": "2026-09-22T10:28:01.709Z",
+    "elapsedMs": 297370,
+    "cycles": 30,
+    "status": "completed",
+    "sessions": [
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-23-09-042Z_01a0c8a4-0af2-7262-a921-60fa25850450.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-23-09-504Z_01a0c8a4-0cc0-7262-a921-60fd786a8ae0.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-23-09-874Z_01a0c8a4-0e32-7262-a921-60ff80f5095a.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-23-10-242Z_01a0c8a4-0fa2-7262-a921-610145e739d2.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-23-10-597Z_01a0c8a4-1105-7262-a921-61028459b1a2.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-23-10-952Z_01a0c8a4-1268-7262-a921-6104eb8e8e91.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-24-07-305Z_01a0c8a4-ee89-7262-a921-61060adf5c63.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-24-07-674Z_01a0c8a4-effa-7262-a921-6109e8cd96de.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-24-08-025Z_01a0c8a4-f159-7262-a921-610a6b7a9f66.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-24-08-387Z_01a0c8a4-f2c3-7262-a921-610dc5edbbf1.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-24-08-743Z_01a0c8a4-f427-7262-a921-610e9a428359.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-24-09-094Z_01a0c8a4-f586-7262-a921-61118beb898e.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-25-05-483Z_01a0c8a5-d1cb-7262-a921-611201399668.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-25-05-854Z_01a0c8a5-d33e-7262-a921-6114b7f51722.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-25-06-196Z_01a0c8a5-d494-7262-a921-6116cbdfa618.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-25-06-540Z_01a0c8a5-d5ec-7262-a921-6118c5e68ba1.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-25-06-892Z_01a0c8a5-d74c-7262-a921-611a52001cb8.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-25-07-247Z_01a0c8a5-d8af-7262-a921-611dd106cce6.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-26-03-697Z_01a0c8a6-b531-7262-a921-611eb6db0575.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-26-04-069Z_01a0c8a6-b6a5-7262-a921-612103522041.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-26-04-413Z_01a0c8a6-b7fd-7262-a921-61226e6d6e60.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-26-04-760Z_01a0c8a6-b958-7262-a921-6124fe104930.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-26-05-116Z_01a0c8a6-babc-7262-a921-61279ce781cf.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-26-05-469Z_01a0c8a6-bc1d-7262-a921-612934ff3860.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-02-152Z_01a0c8a7-9988-7262-a921-612a9e56c741.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-02-654Z_01a0c8a7-9b7e-7262-a921-612c8051b5f6.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-03-164Z_01a0c8a7-9d7c-7262-a921-612eb107e30e.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-03-685Z_01a0c8a7-9f85-7262-a921-6130d9ab177c.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-04-246Z_01a0c8a7-a1b5-7262-a921-6132da1aa810.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-04-811Z_01a0c8a7-a3eb-7262-a921-61357bb3d0ff.jsonl"
+    ]
+  },
+  "reuseWorkload": {
+    "start": "2026-09-22T10:32:15.594Z",
+    "end": "2026-09-22T10:34:16.140Z",
+    "elapsedMs": 120546,
+    "cycles": 12,
+    "status": "completed",
+    "sessions": [
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-02-152Z_01a0c8a7-9988-7262-a921-612a9e56c741.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-02-654Z_01a0c8a7-9b7e-7262-a921-612c8051b5f6.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-03-164Z_01a0c8a7-9d7c-7262-a921-612eb107e30e.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-03-685Z_01a0c8a7-9f85-7262-a921-6130d9ab177c.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-04-246Z_01a0c8a7-a1b5-7262-a921-6132da1aa810.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-04-811Z_01a0c8a7-a3eb-7262-a921-61357bb3d0ff.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-02-152Z_01a0c8a7-9988-7262-a921-612a9e56c741.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-02-654Z_01a0c8a7-9b7e-7262-a921-612c8051b5f6.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-03-164Z_01a0c8a7-9d7c-7262-a921-612eb107e30e.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-03-685Z_01a0c8a7-9f85-7262-a921-6130d9ab177c.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-04-246Z_01a0c8a7-a1b5-7262-a921-6132da1aa810.jsonl",
+      "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-c26-extended-q0CwEM/lingxi-c26-extended-q0CwEM-data/agents/lingxi/sessions/2026-09-22T10-27-04-811Z_01a0c8a7-a3eb-7262-a921-61357bb3d0ff.jsonl"
+    ]
+  },
+  "windows": [
+    {
+      "window": "baseline",
+      "at": [
+        "2026-09-22T10:23:05.898Z",
+        "2026-09-22T10:23:06.955Z",
+        "2026-09-22T10:23:08.011Z"
+      ],
+      "rssKB": [
+        1653200,
+        1526544,
+        1526832
+      ],
+      "processCount": [
+        6,
+        6,
+        6
+      ]
+    },
+    {
+      "window": "batch-1-open",
+      "at": [
+        "2026-09-22T10:23:12.873Z",
+        "2026-09-22T10:23:13.933Z",
+        "2026-09-22T10:23:14.993Z"
+      ],
+      "rssKB": [
+        2248480,
+        2248624,
+        2248704
+      ],
+      "processCount": [
+        13,
+        13,
+        13
+      ]
+    },
+    {
+      "window": "batch-1-settled-open",
+      "at": [
+        "2026-09-22T10:23:33.538Z",
+        "2026-09-22T10:23:34.580Z",
+        "2026-09-22T10:23:35.636Z"
+      ],
+      "rssKB": [
+        2098816,
+        2098864,
+        2098960
+      ],
+      "processCount": [
+        13,
+        13,
+        13
+      ]
+    },
+    {
+      "window": "batch-1-closed",
+      "at": [
+        "2026-09-22T10:23:41.509Z",
+        "2026-09-22T10:23:42.568Z",
+        "2026-09-22T10:23:43.628Z"
+      ],
+      "rssKB": [
+        1598096,
+        1598112,
+        1598128
+      ],
+      "processCount": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "window": "batch-1-settled-closed",
+      "at": [
+        "2026-09-22T10:24:04.170Z",
+        "2026-09-22T10:24:05.220Z",
+        "2026-09-22T10:24:06.299Z"
+      ],
+      "rssKB": [
+        1582944,
+        1582992,
+        1583024
+      ],
+      "processCount": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "window": "batch-2-open",
+      "at": [
+        "2026-09-22T10:24:11.014Z",
+        "2026-09-22T10:24:12.075Z",
+        "2026-09-22T10:24:13.131Z"
+      ],
+      "rssKB": [
+        2158320,
+        2158576,
+        2158672
+      ],
+      "processCount": [
+        13,
+        13,
+        13
+      ]
+    },
+    {
+      "window": "batch-2-settled-open",
+      "at": [
+        "2026-09-22T10:24:31.678Z",
+        "2026-09-22T10:24:32.738Z",
+        "2026-09-22T10:24:33.784Z"
+      ],
+      "rssKB": [
+        2158160,
+        2158176,
+        2158192
+      ],
+      "processCount": [
+        13,
+        13,
+        13
+      ]
+    },
+    {
+      "window": "batch-2-closed",
+      "at": [
+        "2026-09-22T10:24:39.652Z",
+        "2026-09-22T10:24:40.719Z",
+        "2026-09-22T10:24:41.779Z"
+      ],
+      "rssKB": [
+        1637216,
+        1637264,
+        1637344
+      ],
+      "processCount": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "window": "batch-2-settled-closed",
+      "at": [
+        "2026-09-22T10:25:02.348Z",
+        "2026-09-22T10:25:03.411Z",
+        "2026-09-22T10:25:04.476Z"
+      ],
+      "rssKB": [
+        1637136,
+        1637184,
+        1637168
+      ],
+      "processCount": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "window": "batch-3-open",
+      "at": [
+        "2026-09-22T10:25:09.167Z",
+        "2026-09-22T10:25:10.227Z",
+        "2026-09-22T10:25:11.293Z"
+      ],
+      "rssKB": [
+        2179568,
+        2179728,
+        2179888
+      ],
+      "processCount": [
+        13,
+        13,
+        13
+      ]
+    },
+    {
+      "window": "batch-3-settled-open",
+      "at": [
+        "2026-09-22T10:25:29.861Z",
+        "2026-09-22T10:25:30.929Z",
+        "2026-09-22T10:25:31.994Z"
+      ],
+      "rssKB": [
+        2179760,
+        2179808,
+        2179792
+      ],
+      "processCount": [
+        13,
+        13,
+        13
+      ]
+    },
+    {
+      "window": "batch-3-closed",
+      "at": [
+        "2026-09-22T10:25:37.875Z",
+        "2026-09-22T10:25:38.942Z",
+        "2026-09-22T10:25:39.991Z"
+      ],
+      "rssKB": [
+        1652608,
+        1652640,
+        1652640
+      ],
+      "processCount": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "window": "batch-3-settled-closed",
+      "at": [
+        "2026-09-22T10:26:00.557Z",
+        "2026-09-22T10:26:01.624Z",
+        "2026-09-22T10:26:02.690Z"
+      ],
+      "rssKB": [
+        1652896,
+        1652912,
+        1652912
+      ],
+      "processCount": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "window": "batch-4-open",
+      "at": [
+        "2026-09-22T10:26:07.388Z",
+        "2026-09-22T10:26:08.450Z",
+        "2026-09-22T10:26:09.517Z"
+      ],
+      "rssKB": [
+        2193536,
+        2193680,
+        2193856
+      ],
+      "processCount": [
+        13,
+        13,
+        13
+      ]
+    },
+    {
+      "window": "batch-4-settled-open",
+      "at": [
+        "2026-09-22T10:26:28.085Z",
+        "2026-09-22T10:26:29.151Z",
+        "2026-09-22T10:26:30.226Z"
+      ],
+      "rssKB": [
+        2193856,
+        2193904,
+        2193904
+      ],
+      "processCount": [
+        13,
+        13,
+        13
+      ]
+    },
+    {
+      "window": "batch-4-closed",
+      "at": [
+        "2026-09-22T10:26:36.344Z",
+        "2026-09-22T10:26:37.421Z",
+        "2026-09-22T10:26:38.487Z"
+      ],
+      "rssKB": [
+        1662944,
+        1663008,
+        1662976
+      ],
+      "processCount": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "window": "batch-4-settled-closed",
+      "at": [
+        "2026-09-22T10:26:59.043Z",
+        "2026-09-22T10:27:00.096Z",
+        "2026-09-22T10:27:01.148Z"
+      ],
+      "rssKB": [
+        1662288,
+        1662304,
+        1662336
+      ],
+      "processCount": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "window": "batch-5-open",
+      "at": [
+        "2026-09-22T10:27:06.951Z",
+        "2026-09-22T10:27:08.015Z",
+        "2026-09-22T10:27:09.074Z"
+      ],
+      "rssKB": [
+        2210336,
+        2210384,
+        2210320
+      ],
+      "processCount": [
+        13,
+        13,
+        13
+      ]
+    },
+    {
+      "window": "batch-5-settled-open",
+      "at": [
+        "2026-09-22T10:27:27.634Z",
+        "2026-09-22T10:27:28.685Z",
+        "2026-09-22T10:27:29.737Z"
+      ],
+      "rssKB": [
+        2243328,
+        2243344,
+        2243376
+      ],
+      "processCount": [
+        13,
+        13,
+        13
+      ]
+    },
+    {
+      "window": "batch-5-closed",
+      "at": [
+        "2026-09-22T10:27:35.913Z",
+        "2026-09-22T10:27:36.969Z",
+        "2026-09-22T10:27:38.024Z"
+      ],
+      "rssKB": [
+        1723296,
+        1718848,
+        1718848
+      ],
+      "processCount": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "window": "batch-5-settled-closed",
+      "at": [
+        "2026-09-22T10:27:58.587Z",
+        "2026-09-22T10:27:59.647Z",
+        "2026-09-22T10:28:00.708Z"
+      ],
+      "rssKB": [
+        1718320,
+        1718336,
+        1718352
+      ],
+      "processCount": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "window": "recovery-tail-1",
+      "at": [
+        "2026-09-22T10:28:06.100Z",
+        "2026-09-22T10:28:07.162Z",
+        "2026-09-22T10:28:08.224Z"
+      ],
+      "rssKB": [
+        1716432,
+        1716480,
+        1716512
+      ],
+      "processCount": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "window": "recovery-tail-2",
+      "at": [
+        "2026-09-22T10:28:28.776Z",
+        "2026-09-22T10:28:29.833Z",
+        "2026-09-22T10:28:30.888Z"
+      ],
+      "rssKB": [
+        1718192,
+        1718272,
+        1718336
+      ],
+      "processCount": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "window": "recovery-tail-3",
+      "at": [
+        "2026-09-22T10:28:51.448Z",
+        "2026-09-22T10:28:52.504Z",
+        "2026-09-22T10:28:53.562Z"
+      ],
+      "rssKB": [
+        1719248,
+        1719280,
+        1719344
+      ],
+      "processCount": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "window": "reuse-baseline",
+      "at": [
+        "2026-09-22T10:32:17.150Z",
+        "2026-09-22T10:32:18.206Z",
+        "2026-09-22T10:32:19.257Z"
+      ],
+      "rssKB": [
+        1436240,
+        1436240,
+        1436208
+      ],
+      "processCount": [
+        6,
+        6,
+        6
+      ]
+    },
+    {
+      "window": "reuse-batch-1-open",
+      "at": [
+        "2026-09-22T10:32:23.889Z",
+        "2026-09-22T10:32:24.944Z",
+        "2026-09-22T10:32:25.995Z"
+      ],
+      "rssKB": [
+        1988608,
+        1984032,
+        1984208
+      ],
+      "processCount": [
+        12,
+        12,
+        12
+      ]
+    },
+    {
+      "window": "reuse-batch-1-settled-open",
+      "at": [
+        "2026-09-22T10:32:44.539Z",
+        "2026-09-22T10:32:45.580Z",
+        "2026-09-22T10:32:46.621Z"
+      ],
+      "rssKB": [
+        1952672,
+        1952720,
+        1952736
+      ],
+      "processCount": [
+        12,
+        12,
+        12
+      ]
+    },
+    {
+      "window": "reuse-batch-1-closed",
+      "at": [
+        "2026-09-22T10:32:52.380Z",
+        "2026-09-22T10:32:53.434Z",
+        "2026-09-22T10:32:54.484Z"
+      ],
+      "rssKB": [
+        1468176,
+        1463440,
+        1463456
+      ],
+      "processCount": [
+        6,
+        6,
+        6
+      ]
+    },
+    {
+      "window": "reuse-batch-1-settled-closed",
+      "at": [
+        "2026-09-22T10:33:15.040Z",
+        "2026-09-22T10:33:16.096Z",
+        "2026-09-22T10:33:17.147Z"
+      ],
+      "rssKB": [
+        1463408,
+        1463456,
+        1463504
+      ],
+      "processCount": [
+        6,
+        6,
+        6
+      ]
+    },
+    {
+      "window": "reuse-batch-2-open",
+      "at": [
+        "2026-09-22T10:33:21.779Z",
+        "2026-09-22T10:33:22.835Z",
+        "2026-09-22T10:33:23.878Z"
+      ],
+      "rssKB": [
+        2025088,
+        2020704,
+        2020864
+      ],
+      "processCount": [
+        12,
+        12,
+        12
+      ]
+    },
+    {
+      "window": "reuse-batch-2-settled-open",
+      "at": [
+        "2026-09-22T10:33:42.432Z",
+        "2026-09-22T10:33:43.487Z",
+        "2026-09-22T10:33:44.542Z"
+      ],
+      "rssKB": [
+        2021600,
+        2021664,
+        2021696
+      ],
+      "processCount": [
+        12,
+        12,
+        12
+      ]
+    },
+    {
+      "window": "reuse-batch-2-closed",
+      "at": [
+        "2026-09-22T10:33:50.366Z",
+        "2026-09-22T10:33:51.417Z",
+        "2026-09-22T10:33:52.472Z"
+      ],
+      "rssKB": [
+        1516448,
+        1511664,
+        1511664
+      ],
+      "processCount": [
+        6,
+        6,
+        6
+      ]
+    },
+    {
+      "window": "reuse-batch-2-settled-closed",
+      "at": [
+        "2026-09-22T10:34:13.034Z",
+        "2026-09-22T10:34:14.081Z",
+        "2026-09-22T10:34:15.139Z"
+      ],
+      "rssKB": [
+        1511360,
+        1511376,
+        1511408
+      ],
+      "processCount": [
+        6,
+        6,
+        6
+      ]
+    }
+  ],
+  "samples": 99,
+  "browserTasks": 42,
+  "cancelledTasks": 42,
+  "maxRunningBrowsers": 5,
+  "finalBrowserStates": {},
+  "confirmedLocalCommandsOnly": true,
+  "primaryDurationMs": 297370,
+  "recoveryTailWindows": 3,
+  "sha": "b0e9118427e16206dcd25ecfb566d766ed476727",
+  "packageLockSha256": "a9735825cea1d018c2a42ae04f875368a003c386ca68fc86503bc8acbcd79d3c",
+  "node": "v24.16.0",
+  "limits": [
+    "真实macOS arm64开发Electron，localhost协议供应商，非正式安装包",
+    "无强制GC；观测进程树总RSS，不等同JS堆",
+    "首次5批保留DevTools；GUI操作关闭后复用2批另设baseline，不能跨段直接比较",
+    "同机全量测试可能影响调度；进程树仅本壳后代",
+    "主循环完成后额外3次45秒Markdown GUI流、1次审批wire见证，未混入固定工作负载样本"
+  ],
+  "commands": [
+    {
+      "file": "run-soak.mjs",
+      "exitCode": 0
+    },
+    {
+      "file": "run-tail.mjs",
+      "exitCode": 0
+    },
+    {
+      "file": "run-reuse.mjs",
+      "exitCode": 0
+    },
+    {
+      "file": "run-long-gui.mjs",
+      "exitCode": 0
+    },
+    {
+      "file": "run-confirmation-witness.mjs",
+      "exitCode": 0
+    }
+  ]
+}

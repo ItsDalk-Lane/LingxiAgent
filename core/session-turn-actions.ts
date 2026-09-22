@@ -796,9 +796,9 @@ function cancelDiscardedBackgroundTasks(engine, { sessionId, sessionPath, taskId
       && backgroundRecordBelongsToSession(task, { sessionId, sessionPath })
     ) {
       try {
-        const result = engine.taskRegistry.abort?.(taskId, reason);
+        const result = engine.taskRegistry.abort?.(taskId, reason, { expectedAttempt: task.attempt ?? null });
         if (result === "no_handler") {
-          engine.taskRegistry.update?.(taskId, { status: "aborted", error: reason });
+          engine.taskRegistry.update?.(taskId, { status: "aborted", error: reason }, { expectedAttempt: task.attempt ?? null });
         }
       } catch (error) {
         failures.push(`task ${taskId}: ${error.message}`);

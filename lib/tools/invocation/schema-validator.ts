@@ -135,7 +135,7 @@ function summarizeIssueFields(issues: ToolSchemaIssue[]): string[] {
       continue;
     }
     const requiredMatch = /required propert(?:y|ies)\s+(.+)$/i.exec(issue.message);
-    if (requiredMatch) {
+    if (requiredMatch?.[1]) {
       for (const token of requiredMatch[1].split(/,\s*/)) {
         const name = token.trim().replace(/^['"]|['"]$/g, "");
         if (name) fields.push(`/${name}`);
@@ -171,7 +171,7 @@ function invocationError(
     route,
     targetId: identity.targetId,
     sourceId: identity.sourceId,
-    details,
+    ...(details === undefined ? {} : { details }),
     cause,
   });
 }

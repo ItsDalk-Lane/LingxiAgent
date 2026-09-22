@@ -1,0 +1,28 @@
+{
+  "regression": "C29",
+  "status": "BLOCKED",
+  "candidate": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-package-PSLvCZ/package/mac-arm64/Lingxi.app",
+  "sourceSnapshot": "source-snapshot.json",
+  "sourceDifferences": [],
+  "generatedMetadataDifference": "post-build-metadata-diff.json",
+  "passed": [
+    "client/server build",
+    "seed verification",
+    "electron-builder --dir",
+    "packaged server 7 checks",
+    "packaged Node PTY execution",
+    "actual packaged Electron new-session completion",
+    "actual PDF preview",
+    "actual embedded browser localhost page"
+  ],
+  "blocked": [
+    "formal signed/notarized installer and clean external install",
+    "other platforms",
+    "terminal GUI card",
+    "real provider and update rollback"
+  ],
+  "secretsDeleted": true,
+  "actualUserData": "/Users/study_superior/Library/Application Support/Lingxi-f05-packaged-run-aZ3UYg",
+  "cacheIsolationCaveat": "initial basename data collision; existing Data untouched",
+  "at": "2026-09-22T18:23:17.134272"
+}

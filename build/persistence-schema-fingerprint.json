@@ -670,7 +670,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:6ddf05a32209d9af966fe55401f65791edadf06bfa9611815f1010fccd7787ee",
+  "payloadFingerprint": "sha256:a4e41368790fb176e6a4b8a4756a1e59ba7e2bab324508f4d22e372e20e46589",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3412,8 +3412,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "P02-T01 TaskRegistry attempt 字段为兼容新增：旧记录缺 attempt 按 1 读（taskAttempt 归一化），未知字段原样保留；无删除/重命名/类型变化；恢复/栅栏语义见 docs/refactor-2026/P02/IDENTITY_CONTRACT.md §3-4",
-    "payloadFingerprint": "sha256:6ddf05a32209d9af966fe55401f65791edadf06bfa9611815f1010fccd7787ee"
+    "compatibilityReason": "本轮终态批次保护、输入契约与流投影修复不改变持久数据格式；tasks/schedules与旧attempt缺省兼容保持，媒体批次索引仅进程内释放，审批卡终态同步仅运行投影。",
+    "payloadFingerprint": "sha256:a4e41368790fb176e6a4b8a4756a1e59ba7e2bab324508f4d22e372e20e46589"
   },
   "schemas": [
     {
@@ -4341,7 +4341,7 @@
       "contract": "TaskRegistry task/schedule normalization and persistence serializer",
       "kind": "runtime-contract",
       "module": "lib/task-registry.ts",
-      "sourceHash": "sha256:4b9a4f644e0b191c19c755bc0c17c0c839eccd687a0f5722e4b5ef1ae9a7c41d",
+      "sourceHash": "sha256:11f2f3a029840a305285d58bc110077513f6de51154c013f2426b52aae2a922a",
       "storeId": "plugin-task-registry"
     },
     {

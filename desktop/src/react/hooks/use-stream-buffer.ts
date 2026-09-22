@@ -8,6 +8,7 @@
  * app-ws-shim 直接调用 streamBufferManager.handle(msg)。
  */
 
+import { StreamAdmission } from '../services/stream-admission';
 import type { ChatMessage, ContentBlock } from '../stores/chat-types';
 import { useStore } from '../stores';
 import { sessionScopedKey, sessionScopedValue } from '../stores/session-slice';
@@ -45,6 +46,7 @@ function nextStreamMessageId(): string {
 }
 
 interface Buffer {
+  admission: StreamAdmission;
   sessionPath: string;
   blocks: ContentBlock[];
   segmentsById: Map<string, LiveAssistantSegment>;
@@ -96,6 +98,7 @@ interface Buffer {
 
 function createBuffer(sessionPath: string): Buffer {
   return {
+    admission: new StreamAdmission(),
     sessionPath,
     blocks: [],
     segmentsById: new Map(),
@@ -633,6 +636,19 @@ class StreamBufferManager {
 
   // ── 公开事件处理器 ──
 
+  /** 确认完成同步到当前流的原始块，避免下一次增量把已确认状态覆盖回待批准。 */
+  resolveSessionConfirmation(confirmId: string, status: 'confirmed' | 'rejected' | 'timeout'): void {
+    for (const buf of this.buffers.values()) {
+      if (!buf.blocks.some(block => block.type === 'session_confirmation' && block.confirmId === confirmId)) continue;
+      this.publishBoundary(buf, message => ({
+        ...message,
+        blocks: (message.blocks || []).map(block => block.type === 'session_confirmation' && block.confirmId === confirmId
+          ? { ...block, status }
+          : block),
+      }));
+    }
+  }
+
   isRunActive(sessionPath: string): boolean {
     return this.lookupBuffer(sessionPath)?.runActive === true;
   }
@@ -665,7 +681,12 @@ class StreamBufferManager {
     if (item?.type === 'message' && store.updateMessageById(sessionPath, item.data.id, update)) bumpMessageLiveVersion(sessionPath);
   }
 
-  handle(msg: any): void {
+  /** 宿主本地生成的知识卡没有传输身份，不经过远端事件兼容规则。 */
+  handleLocal(msg: { type: string; sessionPath: string; [key: string]: unknown }): void {
+    this.handle(msg, true);
+  }
+
+  handle(msg: any, local = false): void {
     const sessionPath = msg.sessionPath;
     if (!sessionPath) {
       console.warn('[ws] stream event missing sessionPath:', msg.type);
@@ -673,6 +694,7 @@ class StreamBufferManager {
     }
     const sessionId = normalizeSessionId(msg.sessionId);
     const buf = this.getBuffer(sessionPath, sessionId);
+    if (!local && !buf.admission.accepts(msg)) return;
 
     switch (msg.type) {
       case 'assistant_run_start':
@@ -919,13 +941,6 @@ class StreamBufferManager {
         if (!buf.runActive && runKey && runKey === buf.lastFinalizedRunKey) {
           console.debug('[stream] duplicate assistant_run_end ignored (exactly-once):', runKey);
           break;
-        }
-        if (buf.runActive && runKey && buf.activeRunKey && runKey !== buf.activeRunKey) {
-          // 身份不匹配：Run 仍必须终结（服务端是 Run 结束的权威），但记录诊断。
-          console.warn('[stream] assistant_run_end identity mismatch; finalizing active run:', {
-            activeRunKey: buf.activeRunKey,
-            runEndKey: runKey,
-          });
         }
         if ((msg.aborted || msg.failed) && !this.hasRunState(buf)) {
           this.ensureMessage(buf);

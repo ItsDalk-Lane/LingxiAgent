@@ -86,18 +86,18 @@ describe('P07-T04 stream buffer wall-clock profile', () => {
 
     streamBufferManager.handle({ type: 'assistant_run_start', sessionPath: PATH, runId: 'run-p07', streamId: 's_p07' });
     streamBufferManager.handle({
-      type: 'assistant_segment_start', sessionPath: PATH, segmentId: SEGMENT, kind: 'text', semanticPhase: 'answer',
+      type: 'assistant_segment_start', sessionPath: PATH, streamId: 's_p07', segmentId: SEGMENT, kind: 'text', semanticPhase: 'answer',
     });
     const t0 = performance.now();
     for (let i = 0; i < DELTAS; i++) {
       streamBufferManager.handle({
-        type: 'assistant_segment_delta', sessionPath: PATH, segmentId: SEGMENT,
+        type: 'assistant_segment_delta', sessionPath: PATH, streamId: 's_p07', segmentId: SEGMENT,
         delta: deltaText, seq: i + 1, semanticPhase: 'answer',
       });
     }
     const burstMs = performance.now() - t0;
     streamBufferManager.handle({
-      type: 'assistant_segment_end', sessionPath: PATH, segmentId: SEGMENT, semanticPhase: 'answer',
+      type: 'assistant_segment_end', sessionPath: PATH, streamId: 's_p07', segmentId: SEGMENT, semanticPhase: 'answer',
     });
     streamBufferManager.handle({
       type: 'assistant_run_end', sessionPath: PATH, runId: 'run-p07', streamId: 's_p07',
@@ -141,25 +141,25 @@ describe('P07-T04 stream buffer wall-clock profile', () => {
 
     streamBufferManager.handle({ type: 'assistant_run_start', sessionPath: PATH, runId: 'run-a06', streamId: 's_a06' });
     streamBufferManager.handle({
-      type: 'assistant_segment_start', sessionPath: PATH, segmentId: SEGMENT, kind: 'text', semanticPhase: 'answer',
+      type: 'assistant_segment_start', sessionPath: PATH, streamId: 's_a06', segmentId: SEGMENT, kind: 'text', semanticPhase: 'answer',
     });
     // 尚未过合并窗口（同步连发）时：最后一批 delta + 文件块 + 收口紧随其后。
     for (let i = 0; i < 500; i++) {
       streamBufferManager.handle({
-        type: 'assistant_segment_delta', sessionPath: PATH, segmentId: SEGMENT,
+        type: 'assistant_segment_delta', sessionPath: PATH, streamId: 's_a06', segmentId: SEGMENT,
         delta: deltaText, seq: i + 1, semanticPhase: 'answer',
       });
     }
     streamBufferManager.handle({
-      type: 'content_block', sessionPath: PATH,
+      type: 'content_block', sessionPath: PATH, streamId: 's_a06',
       block: { type: 'file', path: '/tmp/p07-a06-artifact.md', name: 'p07-a06-artifact.md' } as never,
     });
     streamBufferManager.handle({
-      type: 'assistant_segment_delta', sessionPath: PATH, segmentId: SEGMENT,
+      type: 'assistant_segment_delta', sessionPath: PATH, streamId: 's_a06', segmentId: SEGMENT,
       delta: 'TAIL_AFTER_FILE', seq: 501, semanticPhase: 'answer',
     });
     streamBufferManager.handle({
-      type: 'assistant_segment_end', sessionPath: PATH, segmentId: SEGMENT, semanticPhase: 'answer',
+      type: 'assistant_segment_end', sessionPath: PATH, streamId: 's_a06', segmentId: SEGMENT, semanticPhase: 'answer',
     });
     streamBufferManager.handle({
       type: 'assistant_run_end', sessionPath: PATH, runId: 'run-a06', streamId: 's_a06',

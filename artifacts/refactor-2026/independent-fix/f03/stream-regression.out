@@ -1,0 +1,33 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/services/ws-stream-abort-lifecycle.test.ts (1 test | 1 failed) 37ms
+     × turn_end(aborted) ends the local turn binding so the next reply lands after the new user message 37ms
+ ❯ desktop/src/react/__tests__/services/stream-resume.test.ts (12 tests | 4 failed) 43ms
+     × does not dedupe a new stream seq=1 against the previous stream consumed seqs 3ms
+     × replays background session events to the normal websocket handler 2ms
+     × does not replay the same stream sequence twice when a resume response is repeated 1ms
+     × reports duplicate live stream sequences as already consumed 0ms
+ ❯ desktop/src/react/__tests__/services/ws-message-handler.test.ts (86 tests | 16 failed) 95ms
+     × tool_end 带 sessionFile 时更新 session registry 文件状态 4ms
+     × content_block 文件事件把 resource envelope 同步进 session registry 1ms
+     × todo_write 全部 completed 时按生命周期移除当前 session todo 1ms
+     × 非当前 session 的正文流也进入主聊天 buffer，同时保留 streamKey 预览分发 1ms
+     × tracks compaction_start for a background session before stream routing returns 0ms
+     × tracks compaction_end and preserves the provided context window when tokens are unknown 0ms
+     × routes lifecycle by sessionId without trusting stale path metadata as locator truth 0ms
+     × clears the breakdown when compaction_end explicitly reports null 1ms
+     × keeps the breakdown when compaction_end carries a fresh one 1ms
+     × background turn_end keeps refresh and context usage but does not request input focus 1ms
+     × status=false requests input focus when the focused session was streaming 0ms
+     × passes sessionId from turn_start into stream buffer lifecycle; status never touches it 1ms
+     × turn_end requests context usage through the injected callback 0ms
+     × coalesces rapid turn_end session refreshes into one list request 0ms
+     × 后续 status 事件（流式开始）清除检索中状态 0ms
+     × 首个后续事件（status isStreaming=true）清除 pending 0ms
+
+ Test Files  3 failed | 6 passed (9)
+      Tests  21 failed | 183 passed (204)
+   Start at  17:44:39
+   Duration  1.47s (transform 3.24s, setup 132ms, import 4.49s, tests 552ms, environment 1.16s)
+

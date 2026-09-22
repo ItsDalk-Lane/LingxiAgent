@@ -113,7 +113,7 @@ export async function submitImageGeneration({ input = {}, ctx, metadata = null, 
       }
 
       try {
-        await ctx.bus.request("task:register", {
+        const visibility = await ctx.bus.request("task:register", {
           taskId,
           type: "media-generation",
           sessionId,
@@ -121,6 +121,7 @@ export async function submitImageGeneration({ input = {}, ctx, metadata = null, 
           parentSessionPath: sessionPath,
           meta: deferredMeta,
         });
+        poller.visibilityAttempts?.bindReceipt(taskId, 1, visibility);
       } catch {
         // TaskRegistry is best-effort visibility; generation delivery still uses deferred results.
       }

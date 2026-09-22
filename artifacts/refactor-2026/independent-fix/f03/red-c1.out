@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ artifacts/refactor-2026/P05/logs/P05-ACCEPTANCE-counterexample.test.ts (5 tests | 1 failed) 43ms
+     × Run A 结束后开启 Run B，旧流(segA/streamA)迟到 delta 不得出现在 Run B 的 answer 40ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  17:43:10
+   Duration  1.75s (transform 579ms, setup 23ms, import 1.25s, tests 43ms, environment 365ms)
+

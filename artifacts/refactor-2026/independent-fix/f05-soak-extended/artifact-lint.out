@@ -1,0 +1,28 @@
+
+/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/independent-fix/f05-soak-extended/launch-isolated.mjs
+  56:114  warning  Empty block statement  no-empty
+
+/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/independent-fix/f05-soak-extended/observe-confirmations.mjs
+  15:16  warning  'task' is defined but never used    @typescript-eslint/no-unused-vars
+  16:16  warning  'sample' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/independent-fix/f05-soak-extended/run-confirmation-witness.mjs
+  16:16  warning  'sample' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/independent-fix/f05-soak-extended/run-long-gui.mjs
+  16:16  warning  'sample' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/independent-fix/f05-soak-extended/run-tail.mjs
+  15:16  warning  'task' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/independent-fix/f05-soak/control.mjs
+  8:18  warning  'args' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/independent-fix/f05-soak/launch-isolated.mjs
+  55:114  warning  Empty block statement  no-empty
+
+/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/independent-fix/f05-soak/run-long-gui.mjs
+  13:16  warning  'sample' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 9 problems (0 errors, 9 warnings)
+

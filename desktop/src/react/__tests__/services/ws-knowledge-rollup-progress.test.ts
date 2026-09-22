@@ -13,14 +13,14 @@ vi.mock('../../services/stream-resume', () => ({
   replayStreamResume: vi.fn(),
   isStreamResumeRebuilding: () => null,
   isStreamScopedMessage: () => false,
-  updateSessionStreamMeta: vi.fn(),
+  updateSessionStreamMeta: vi.fn(() => true),
   injectHandlers: vi.fn(),
   injectWebSocketGetter: vi.fn(),
   requestStreamResume: vi.fn(),
 }));
 vi.mock('../../services/stream-key-dispatcher', () => ({ dispatchStreamKey: vi.fn() }));
 vi.mock('../../hooks/use-stream-buffer', () => ({
-  streamBufferManager: { handle: vi.fn(), finishRun: vi.fn() },
+  streamBufferManager: { handle: vi.fn(), handleLocal: vi.fn(), finishRun: vi.fn() },
 }));
 
 import { handleServerMessage } from '../../services/ws-message-handler';
@@ -105,7 +105,7 @@ describe('知识过程 → 合成工具卡（2026-08-31 四轮）', () => {
   beforeEach(() => {
     // 归零跨用例的阅读卡状态（上一用例可能残留 kt-read-* 开卡），再清 mock。
     handleServerMessage({ type: 'knowledge_retrieval_started', sessionPath: PATH });
-    vi.mocked(streamBufferManager.handle).mockClear();
+    vi.mocked(streamBufferManager.handleLocal).mockClear();
     useStore.setState({
       currentSessionPath: PATH,
       pendingNewSession: false,
@@ -135,7 +135,7 @@ describe('知识过程 → 合成工具卡（2026-08-31 四轮）', () => {
     handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'search-1', kind: 'search', phase: 'done', query: '风险准备金', hits: 50 });
     handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'think-1', kind: 'think', phase: 'done' });
 
-    const calls = vi.mocked(streamBufferManager.handle).mock.calls.map(call => call[0]);
+    const calls = vi.mocked(streamBufferManager.handleLocal).mock.calls.map(call => call[0]);
     console.log('RECEIVED_CALLS', JSON.stringify(calls, null, 1));
     expect(calls).toEqual([
       { type: 'tool_start', sessionPath: PATH, id: 'kt-think-1', name: 'knowledge_think' },
@@ -150,7 +150,7 @@ describe('知识过程 → 合成工具卡（2026-08-31 四轮）', () => {
     handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'fast-local', kind: 'search', phase: 'start', detail: 'fast_local' });
     handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'fast-local', kind: 'search', phase: 'done', detail: 'fast_local', hits: 3, elapsedMs: 28.4 });
     handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, id: 'answer', kind: 'note', phase: 'start', detail: 'answer' });
-    const calls = vi.mocked(streamBufferManager.handle).mock.calls.map(call => call[0]);
+    const calls = vi.mocked(streamBufferManager.handleLocal).mock.calls.map(call => call[0]);
     expect(calls).toEqual([
       { type: 'tool_start', sessionPath: PATH, id: 'kt-fast-local', name: 'knowledge_local_search' },
       { type: 'tool_end', sessionPath: PATH, id: 'kt-fast-local', success: true, resultNote: 'chat.knowledgeLocalEvidenceFound' },
@@ -163,7 +163,7 @@ describe('知识过程 → 合成工具卡（2026-08-31 四轮）', () => {
     handleServerMessage({ type: 'knowledge_rollup_progress', sessionPath: PATH, current: 1, total: 3 });
     handleServerMessage({ type: 'knowledge_rollup_progress', sessionPath: PATH, current: 2, total: 3 });
 
-    const calls = vi.mocked(streamBufferManager.handle).mock.calls.map(call => call[0]);
+    const calls = vi.mocked(streamBufferManager.handleLocal).mock.calls.map(call => call[0]);
     expect(calls).toEqual([
       { type: 'tool_start', sessionPath: PATH, id: 'kt-read-1', name: 'knowledge_read_part', args: { current: '1', total: '3' } },
       { type: 'tool_end', sessionPath: PATH, id: 'kt-read-1', success: true },
@@ -177,7 +177,7 @@ describe('知识过程 → 合成工具卡（2026-08-31 四轮）', () => {
     handleServerMessage({ type: 'text_delta', sessionPath: PATH, streamId: 's1', delta: '答' });
 
     // 只断言合成卡：text_delta 本身也会正常喂缓冲（真实流事件），不属于翻译层。
-    const calls = vi.mocked(streamBufferManager.handle).mock.calls
+    const calls = vi.mocked(streamBufferManager.handleLocal).mock.calls
       .map(call => call[0])
       .filter(event => event.type === 'tool_start' || event.type === 'tool_end');
     expect(calls).toEqual([
@@ -190,7 +190,7 @@ describe('知识过程 → 合成工具卡（2026-08-31 四轮）', () => {
 
   it('补充检索：决策卡瞬时完成（随后真实检索各自成卡）', () => {
     handleServerMessage({ type: 'knowledge_supplement_search', sessionPath: PATH, queries: ['交付节点'], round: 2 });
-    const calls = vi.mocked(streamBufferManager.handle).mock.calls.map(call => call[0]);
+    const calls = vi.mocked(streamBufferManager.handleLocal).mock.calls.map(call => call[0]);
     expect(calls).toEqual([
       { type: 'tool_start', sessionPath: PATH, id: 'kt-supplement-2', name: 'knowledge_supplement' },
       expect.objectContaining({ type: 'tool_end', id: 'kt-supplement-2', success: true, resultNote: expect.any(String) }),
@@ -200,6 +200,6 @@ describe('知识过程 → 合成工具卡（2026-08-31 四轮）', () => {
   it('非法载荷（缺 id / 缺 sessionPath）不喂卡且不炸', () => {
     expect(() => handleServerMessage({ type: 'knowledge_trace', sessionPath: PATH, kind: 'think', phase: 'start' })).not.toThrow();
     expect(() => handleServerMessage({ type: 'knowledge_trace', id: 'x', kind: 'think', phase: 'start' })).not.toThrow();
-    expect(streamBufferManager.handle).not.toHaveBeenCalled();
+    expect(streamBufferManager.handleLocal).not.toHaveBeenCalled();
   });
 });

@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "files": 2,
+  "testsPassed": 8,
+  "skipped": 0,
+  "exitCode": 0,
+  "oldCommit": "1d42b7405c76292f617291e3a01cd2f3ef5efd04",
+  "dependencyInstall": "old package-lock npm ci (1282 packages)",
+  "cloneRemoved": true,
+  "originalSkipConditionUnchanged": true,
+  "evidence": [
+    "commands.jsonl",
+    "locked-install.log",
+    "compat-eight.log",
+    "worktree-remove.log"
+  ],
+  "scopeLimitation": "real HTTP routes and actual current client consumers; not complete old renderer GUI",
+  "harnessLintExitCode": 0
+}

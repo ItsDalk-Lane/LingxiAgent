@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { createRequire } from 'node:module';
 import { AppError } from './errors.ts';
 import { errorBus } from './error-bus.ts';
 
@@ -32,8 +33,12 @@ export async function safeReadYAML(filePath: string, fallback: any = null): Prom
   const text = safeReadFile(filePath, null);
   if (text === null) return fallback;
   try {
-    const yaml = await import('js-yaml');
-    return yaml.default?.load?.(text) ?? yaml.load(text);
+    // 锁定的 js-yaml 没有类型声明：在第三方边界检查实际导出，不伪造声明。
+    const yaml: unknown = createRequire(import.meta.url)('js-yaml');
+    if (typeof yaml !== 'object' || yaml === null || !('load' in yaml) || typeof yaml.load !== 'function') {
+      throw new TypeError('js-yaml must export load');
+    }
+    return yaml.load(text);
   } catch (err) {
     errorBus.report(new AppError('CONFIG_PARSE', { cause: err, context: { filePath } }));
     return fallback;

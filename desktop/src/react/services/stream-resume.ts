@@ -7,6 +7,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- WS 消息协议为动态 JSON，类型无法静态收窄 */
 
+import { StreamAdmission } from './stream-admission';
 import { streamBufferManager } from '../hooks/use-stream-buffer';
 import { useStore } from '../stores';
 import { sessionIdForPathFromLocatorState, sessionScopedKey } from '../stores/session-slice';
@@ -49,6 +50,7 @@ let _streamResumeRebuildingFor: string | null = null;
 const MAX_CONSUMED_SEQS = 10_000;
 
 type SessionStreamMeta = {
+  admission: StreamAdmission;
   streamId: string | null;
   lastSeq: number;
   consumedSeqs: Set<number>;
@@ -148,7 +150,7 @@ export function getSessionStreamMeta(sessionRef?: StreamSessionInput): SessionSt
   const key = target.key || path;
   if (!key) return null;
   if (!_sessionStreams[key]) {
-    _sessionStreams[key] = (path ? _sessionStreams[path] : null) || { streamId: null, lastSeq: 0, consumedSeqs: new Set() };
+    _sessionStreams[key] = (path ? _sessionStreams[path] : null) || { admission: new StreamAdmission(), streamId: null, lastSeq: 0, consumedSeqs: new Set() };
     if (path && key !== path) delete _sessionStreams[path];
   }
   return _sessionStreams[key];
@@ -164,6 +166,13 @@ export function updateSessionStreamMeta(meta: any = {}): boolean {
   if (!target.key && !target.sessionPath) return true;
   const entry = getSessionStreamMeta(target);
   if (!entry) return true;
+  if (!entry.admission.accepts(meta)) {
+    if (entry.admission.recoveryRequired && !entry.admission.recoveryRequested) {
+      entry.admission.recoveryRequested = true;
+      requestStreamResume(target, { fromStart: true, streamId: null });
+    }
+    return false;
+  }
 
   if (meta.streamId) {
     if (entry.streamId && entry.streamId !== meta.streamId) {
@@ -175,7 +184,12 @@ export function updateSessionStreamMeta(meta: any = {}): boolean {
 
   if (Number.isFinite(meta.seq)) {
     const seq = Math.max(0, Math.floor(meta.seq));
-    if (entry.consumedSeqs.has(seq)) return false;
+    if (entry.consumedSeqs.has(seq) || seq <= entry.lastSeq) return false;
+    // 实际 WS 帧发现缺口时不提前投影，向已有恢复通道补取连续前缀。
+    if (typeof meta.type === 'string' && seq > entry.lastSeq + 1 && !meta.__fromReplay) {
+      requestStreamResume(target, { sinceSeq: entry.lastSeq });
+      return false;
+    }
     markConsumedSeq(entry, seq);
   }
 
@@ -251,6 +265,7 @@ function prepareStreamMeta(sessionRef: StreamSessionInput, streamId: string | nu
     meta.streamId = streamId;
   }
   if (opts.resetConsumed) {
+    meta.admission.restore(streamId);
     meta.lastSeq = 0;
     meta.consumedSeqs.clear();
   }
@@ -297,6 +312,7 @@ async function rebuildSessionFromResume(msg: any, opts: { finishTurnBeforeHydrat
   const sessionPath = target.sessionPath;
   if (!sessionPath) return;
 
+  const previousAdmission = getSessionStreamMeta(target)?.admission;
   const isCurrentSession = target.isCurrent;
   const myVersion = nextResumeRebuildVersion(target);
   if (isCurrentSession) _streamResumeRebuildingFor = sessionPath;
@@ -313,12 +329,21 @@ async function rebuildSessionFromResume(msg: any, opts: { finishTurnBeforeHydrat
     } else {
       useStore.getState().clearSession?.(sessionPath);
     }
+    // clearSession 会使水位失效，但不能遗忘已确认的旧流身份；并发恢复共享此屏障。
+    if (previousAdmission) {
+      const pending = getSessionStreamMeta(target);
+      if (pending) pending.admission = previousAdmission;
+    }
     await loadMessages(sessionPath);
 
     if (!isLatestResumeRebuild(target, myVersion)) return;
     if (isCurrentSession && !isStillCurrentStreamSession(target)) return;
 
     const streamId = msg.streamId || null;
+    if (previousAdmission) {
+      const existing = getSessionStreamMeta(target);
+      if (existing) existing.admission = previousAdmission;
+    }
     const meta = prepareStreamMeta(target, streamId, { resetConsumed: true });
 
     for (const entry of msg.events || []) {
@@ -369,6 +394,9 @@ export function replayStreamResume(msg: any): void {
   const target = resolveStreamSession(msg);
   const sessionPath = target.sessionPath;
   if (!sessionPath) return;
+
+  // 旧请求的迟到响应也不能清空已切换到新流的投影。
+  if (getSessionStreamMeta(target)?.admission.isRetiredStream(msg.streamId)) return;
 
   const completedEmptyResume = shouldHydrateCompletedEmptyResume(msg);
   const replayEvents = Array.isArray(msg.events) ? msg.events : [];

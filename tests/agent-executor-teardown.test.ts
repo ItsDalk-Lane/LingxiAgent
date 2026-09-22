@@ -6,14 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const createAgentSessionMock = vi.fn();
 const sessionManagerCreateMock = vi.fn();
 const sessionManagerOpenMock = vi.fn();
-const emitSessionShutdownMock = vi.fn(async (session) => {
-  const runner = session?.extensionRunner;
-  if (runner?.hasHandlers?.("session_shutdown")) {
-    await runner.emit({ type: "session_shutdown" });
-    return true;
-  }
-  return false;
-});
+
 
 vi.mock("../lib/pi-sdk/index.js", async (importOriginal) => {
   const actual = await importOriginal() as any;
@@ -25,7 +18,6 @@ vi.mock("../lib/pi-sdk/index.js", async (importOriginal) => {
       create: (...args: any[]) => sessionManagerCreateMock(...args),
       open: (...args: any[]) => sessionManagerOpenMock(...args),
     },
-    emitSessionShutdown: (...args: any[]) => (emitSessionShutdownMock as any)(...args),
   };
 });
 
@@ -84,7 +76,6 @@ describe("runAgentSession teardown", () => {
     createAgentSessionMock.mockReset();
     sessionManagerCreateMock.mockReset();
     sessionManagerOpenMock.mockReset();
-    emitSessionShutdownMock.mockClear();
     vi.useRealTimers();
   });
 
@@ -130,7 +121,7 @@ describe("runAgentSession teardown", () => {
       "hub_temporary_cleanup",
     );
     expect(callOrder).toEqual(["emit", "unsub", "dispose"]);
-    expect(emitSessionShutdownMock).toHaveBeenCalledWith(session);
+    expect(session.extensionRunner.emit).toHaveBeenCalledExactlyOnceWith({ type: "session_shutdown", reason: "quit" });
     expect(session.dispose).toHaveBeenCalledOnce();
     expect(fs.existsSync(sessionFile)).toBe(false);
   });

@@ -1,3 +1,4 @@
+import { TaskVisibilityAttempts } from "../../lib/tasks/task-execution.ts";
 /**
  * core/media/poller.ts
  *
@@ -62,6 +63,7 @@ export function shouldCheckThisTick(ageMs, tickCount) {
 }
 
 export class Poller {
+  readonly visibilityAttempts = new TaskVisibilityAttempts();
   _active = new Set<string>();
   _deliveryPending = new Set<string>();
   _errorCounts = new Map<string, number>();
@@ -184,7 +186,7 @@ export class Poller {
               taskId: task.taskId, type: "media-generation",
               sessionId: task.sessionId, sessionRef: task.sessionRef, parentSessionPath: task.sessionPath,
               meta: this._deferredMeta(task),
-            }).catch(error => this._log.warn(`[media] task visibility recovery failed: ${error.message}`));
+            }).then(receipt => this.visibilityAttempts.bindReceipt(task.taskId, mediaTaskAttempt(task), receipt)).catch(error => this._log.warn(`[media] task visibility recovery failed: ${error.message}`));
           }
         }
       }
@@ -354,7 +356,7 @@ export class Poller {
         }
         this._store.markDeliveryHandedOff(taskId, attempt);
         this._deliveryPending.delete(taskId);
-        await this._bus.request("task:remove", { taskId });
+        await this.visibilityAttempts.remove(this._bus, taskId, attempt);
       } catch (error) {
         this._log.warn(`[media] result delivery pending for ${taskId}:`, error?.message || error);
       }

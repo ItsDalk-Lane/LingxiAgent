@@ -1,0 +1,146 @@
+{
+  "id": "C26",
+  "status": "PASS_LOCAL_BOUNDED_WORKLOAD",
+  "startedAt": "2026-09-22T10:17:46.135Z",
+  "endedAt": "2026-09-22T10:18:21.831Z",
+  "durationSeconds": 35.696,
+  "browserTasks": 6,
+  "browserRunningCounts": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    5,
+    0
+  ],
+  "cancelledTasks": 6,
+  "windows": [
+    {
+      "window": "baseline",
+      "samples": 3,
+      "rssKB": [
+        1651296,
+        1651408,
+        1651184
+      ],
+      "processCount": [
+        6,
+        6,
+        6
+      ]
+    },
+    {
+      "window": "open-1",
+      "samples": 3,
+      "rssKB": [
+        1902448,
+        1898208,
+        1923920
+      ],
+      "processCount": [
+        8,
+        8,
+        8
+      ]
+    },
+    {
+      "window": "open-3",
+      "samples": 3,
+      "rssKB": [
+        2130448,
+        1979600,
+        1979552
+      ],
+      "processCount": [
+        10,
+        10,
+        10
+      ]
+    },
+    {
+      "window": "open-6",
+      "samples": 3,
+      "rssKB": [
+        1846256,
+        1846208,
+        1846320
+      ],
+      "processCount": [
+        12,
+        12,
+        12
+      ]
+    },
+    {
+      "window": "closed-1",
+      "samples": 3,
+      "rssKB": [
+        1735968,
+        1731440,
+        1708624
+      ],
+      "processCount": [
+        11,
+        11,
+        11
+      ]
+    },
+    {
+      "window": "closed-3",
+      "samples": 3,
+      "rssKB": [
+        1515968,
+        1515968,
+        1515968
+      ],
+      "processCount": [
+        9,
+        9,
+        9
+      ]
+    },
+    {
+      "window": "closed-6",
+      "samples": 3,
+      "rssKB": [
+        1248704,
+        1248480,
+        1243472
+      ],
+      "processCount": [
+        6,
+        6,
+        6
+      ]
+    }
+  ],
+  "limits": [
+    "约38秒固定工作负载，不能外推小时级增长或其他平台",
+    "源码开发壳，非安装包，localhost假供应商",
+    "F02并行产物验证可能影响调度；RSS仅记录本壳后代",
+    "未记录每类JavaScript监听器数；实际浏览器运行实例上限5已验证",
+    "初次Data缓存未完全隔离且无法证明全属本次，保留不清理；后续唯一目录已核实并清理"
+  ],
+  "evidence": [
+    "actions.jsonl",
+    "events.jsonl",
+    "resources.jsonl",
+    "task-results.jsonl",
+    "user-data-paths.log",
+    "cleanup.json"
+  ],
+  "commands": [
+    {
+      "command": "node artifacts/refactor-2026/independent-fix/f05-soak/run-soak.mjs",
+      "exitCode": 0
+    },
+    {
+      "command": "node artifacts/refactor-2026/independent-fix/f05-soak/launch-isolated.mjs",
+      "exitCode": 0,
+      "termination": "SIGTERM自建supervisor触发优雅清理"
+    }
+  ],
+  "sha": "b0e9118427e16206dcd25ecfb566d766ed476727",
+  "lockSha256": "a9735825cea1d018c2a42ae04f875368a003c386ca68fc86503bc8acbcd79d3c"
+}

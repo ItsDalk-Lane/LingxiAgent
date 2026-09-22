@@ -784,7 +784,7 @@ export async function retryImageTask({ taskId, ctx }) {
 
   if (!responseDelivery) {
     try {
-      await ctx.bus.request("task:register", {
+      const visibility = await ctx.bus.request("task:register", {
         taskId,
         type: "media-generation",
         sessionId,
@@ -792,6 +792,7 @@ export async function retryImageTask({ taskId, ctx }) {
         parentSessionPath: sessionPath,
         meta,
       });
+      poller.visibilityAttempts?.bindReceipt(taskId, mediaTaskAttempt(retried), visibility);
     } catch {
       // TaskRegistry is runtime visibility only; DeferredResultStore owns delivery.
     }

@@ -1,3 +1,4 @@
+import { registerTaskExecution } from "../tasks/task-execution.ts";
 /**
  * subagent-tool.js — Sub-agent 工具（非阻塞）
  *
@@ -429,7 +430,7 @@ export function createSubagentTool(deps) {
       let timeoutTimer = null;
 
       const registry = deps.getTaskRegistry?.();
-      registry?.register(taskId, {
+      const execution = registerTaskExecution(registry, taskId, {
         type: "subagent",
         parentSessionId,
         parentSessionPath,
@@ -632,7 +633,7 @@ export function createSubagentTool(deps) {
       }).finally(() => {
         clearTimeout(timeoutTimer);
         deps.removeSubagentController?.(taskId);
-        registry?.remove(taskId);
+        execution.remove();
         decActive(parentSessionKey);
       });
 
@@ -769,7 +770,7 @@ export function createSubagentReplyTool(deps) {
 
       const controller = new AbortController();
       let timeoutTimer = null;
-      registry?.register(taskId, {
+      const execution = registerTaskExecution(registry, taskId, {
         type: "subagent",
         parentSessionId,
         parentSessionPath,
@@ -915,7 +916,7 @@ export function createSubagentReplyTool(deps) {
       }).finally(() => {
         clearTimeout(timeoutTimer);
         deps.removeSubagentController?.(taskId);
-        registry?.remove(taskId);
+        execution.remove();
       });
 
       return {

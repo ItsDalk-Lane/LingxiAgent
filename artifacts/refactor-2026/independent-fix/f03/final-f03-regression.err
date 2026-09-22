@@ -1,0 +1,29 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-knowledge-rollup-progress.test.ts > 知识过程 → 合成工具卡（2026-08-31 四轮） > 本地快速路径只有检索卡与回答卡，不产生拆解、滚动阅读或补充检索卡
+TypeError: streamBufferManager.handle is not a function
+ ❯ Module.handleServerMessage desktop/src/react/services/ws-message-handler.ts:759:25
+    757|   // ── React 聊天渲染路径：聊天相关事件走 StreamBufferManager ──
+    758|   if (REACT_CHAT_EVENTS.has(msg.type)) {
+    759|     streamBufferManager.handle(msg);
+       |                         ^
+    760|     // assistant_run_end 后仍需执行部分通用逻辑（loadSessions、context_usage）
+    761|     if (msg.type === 'assistant_run_end') {
+ ❯ desktop/src/react/__tests__/services/ws-knowledge-rollup-progress.test.ts:159:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  desktop/src/react/__tests__/services/ws-knowledge-rollup-progress.test.ts > 知识过程 → 合成工具卡（2026-08-31 四轮） > answer 收口：阅读卡收尾 + 「正在生成回答」卡；正文首字到达时收尾
+TypeError: streamBufferManager.handle is not a function
+ ❯ Module.handleServerMessage desktop/src/react/services/ws-message-handler.ts:759:25
+    757|   // ── React 聊天渲染路径：聊天相关事件走 StreamBufferManager ──
+    758|   if (REACT_CHAT_EVENTS.has(msg.type)) {
+    759|     streamBufferManager.handle(msg);
+       |                         ^
+    760|     // assistant_run_end 后仍需执行部分通用逻辑（loadSessions、context_usage）
+    761|     if (msg.type === 'assistant_run_end') {
+ ❯ desktop/src/react/__tests__/services/ws-knowledge-rollup-progress.test.ts:177:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import process from 'node:process';
+import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
+const { console }=globalThis;
+const out=path.dirname(fileURLToPath(import.meta.url));
+const context=JSON.parse(fs.readFileSync(path.join(out,'build-context.json'),'utf8'));
+const seed=path.join(context.temp,'runtime-seed');
+const code=`const pty=require('node-pty');let output='';const child=pty.spawn('/bin/sh',['-c','printf LINGXI_PACKAGED_PTY_OK'],{cwd:process.cwd(),env:process.env});const timer=setTimeout(()=>{child.kill();process.exit(1)},10000);child.onData(x=>output+=x);child.onExit(({exitCode})=>{clearTimeout(timer);const ok=exitCode===0&&output.includes('LINGXI_PACKAGED_PTY_OK');console.log(JSON.stringify({node:process.version,execPath:process.execPath,exitCode,output,ok}));process.exit(ok?0:1)});`;
+const start=new Date().toISOString();
+const result=spawnSync(path.join(seed,'node'),['-e',code],{cwd:seed,env:{...process.env,LINGXI_HOME:path.join(context.temp,'native-probe-home')},encoding:'utf8'});
+fs.writeFileSync(path.join(out,'packaged-pty.log'),result.stdout+result.stderr);
+fs.appendFileSync(path.join(out,'commands.jsonl'),JSON.stringify({id:'packaged-pty',command:[path.join(seed,'node'),'-e',code],cwd:seed,start,end:new Date().toISOString(),exit:result.status})+'\n');
+console.log(result.stdout);process.exit(result.status??1);

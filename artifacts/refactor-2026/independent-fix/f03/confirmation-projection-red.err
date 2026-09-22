@@ -1,0 +1,26 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/stream-route-consumer-isolation.test.ts > keeps a resolved confirmation resolved after the next real streamed projection
+AssertionError: expected { type: 'session_confirmation', …(7) } to match object { confirmId: 'f03-confirm', …(1) }
+(6 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "confirmId": "f03-confirm",
+-   "status": "confirmed",
++   "status": "pending",
+  }
+
+ ❯ tests/stream-route-consumer-isolation.test.ts:167:26
+    165|     await h.drain();
+    166|     const confirmation = streamBufferManager.snapshot(PATH)?.blocks.fi…
+    167|     expect(confirmation).toMatchObject({ confirmId: 'f03-confirm', sta…
+       |                          ^
+    168|     expect(projection()).not.toContain('"status":"pending"');
+    169|   } finally { await h.close(); }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

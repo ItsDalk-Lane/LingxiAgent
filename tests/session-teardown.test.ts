@@ -73,7 +73,7 @@ describe("SessionCoordinator._teardownSessionEntry", () => {
     await coord._teardownSessionEntry(entry, "/tmp/fake/session.jsonl", "test");
 
     expect(callOrder).toEqual(["emit", "unsub", "dispose"]);
-    expect(spies.emit).toHaveBeenCalledWith({ type: "session_shutdown" });
+    expect(spies.emit).toHaveBeenCalledExactlyOnceWith({ type: "session_shutdown", reason: "quit" });
   });
 
   it("无 session_shutdown handler 时跳过 emit 但仍 unsub + dispose", async () => {

@@ -1,56 +1,75 @@
 {
-  "schema_version": 1,
-  "stage_id": "P08",
-  "task_id": "P08-T02",
-  "generated_at": "2026-09-22",
-  "source_sha": "674b0151fcc982d13f1d6bc5a84ff273edd3b4a3",
-  "strict_final_scope": {
-    "checker": "scripts/check-core-contracts-strict.mjs（TypeScript 编译器 API，非子进程 tsc；负例可经 extraFiles 注入同一检查器）",
-    "config": "tsconfig.core-contracts.json（extends tsconfig.base.json + noUncheckedIndexedAccess + exactOptionalPropertyTypes）",
-    "files": [
-      "shared/identity-brands.ts",
-      "shared/hana-runtime-paths.ts",
-      "shared/model-ref.ts",
-      "shared/errors.ts",
-      "lib/llm/model-call-identity.ts",
-      "cli/local-server.ts"
-    ],
-    "dependency_note": "include 之外文件不被假装覆盖；被 include 文件 import 的源码随依赖图实际进入检查（exclude 不能假装隔离——P01 验收修复加固）",
-    "ci_wiring": ".github/workflows/ci.yml 'Core contracts strict typecheck' 步骤（四平台矩阵每腿执行）",
-    "p08_verification": {
-      "P08-T02-core-contracts": "exit 0（零诊断，含依赖图）",
-      "P08-T02-core-contracts-negative": "exit 0：a05-null-negative / a06-identity-misuse 两 fixture 经 extraFiles 注入真实检查器，错误码 TS2531/TS18047/TS2349 与 TS2322/TS2345 且指向 fixture 自身、不污染其余文件——A03 错误必失败实证"
-    }
-  },
-  "loose_zone_ledger": {
-    "claim": "不声称全库 strict。root tsconfig（生产源码主体）沿用仓库既有 strict 设置；tsconfig.node.json / tsconfig.test.json 为历史宽松区，本轮未扩大其范围以逃避检查（本轮生产改动文件全部位于既有目录，无文件被移动）",
-    "registered_additions_this_round": [
+  "schema_version": 2,
+  "status": "SUPERSEDED",
+  "current_scope": "docs/refactor-2026/independent-fix/STRICT_SCOPE.json",
+  "current_report": "docs/refactor-2026/independent-fix/F04.md",
+  "correction": "旧六入口与新增options:any范围外判断已撤销；以下原始对象仅保留历史语境，不作为当前验收依据。",
+  "historical_snapshot": {
+    "schema_version": 1,
+    "stage_id": "P08",
+    "task_id": "P08-T02",
+    "generated_at": "2026-09-22",
+    "source_sha": "674b0151fcc982d13f1d6bc5a84ff273edd3b4a3",
+    "strict_final_scope": {
+      "checker": "scripts/check-core-contracts-strict.mjs（TypeScript 编译器 API，非子进程 tsc；负例可经 extraFiles 注入同一检查器）",
+      "config": "tsconfig.core-contracts.json（extends tsconfig.base.json + noUncheckedIndexedAccess + exactOptionalPropertyTypes）",
+      "files": [
+        "shared/identity-brands.ts",
+        "shared/hana-runtime-paths.ts",
+        "shared/model-ref.ts",
+        "shared/errors.ts",
+        "lib/llm/model-call-identity.ts",
+        "cli/local-server.ts"
+      ],
+      "dependency_note": "include 之外文件不被假装覆盖；被 include 文件 import 的源码随依赖图实际进入检查（exclude 不能假装隔离——P01 验收修复加固）",
+      "ci_wiring": ".github/workflows/ci.yml 'Core contracts strict typecheck' 步骤（四平台矩阵每腿执行）",
+      "p08_verification": {
+        "P08-T02-core-contracts": "exit 0（零诊断，含依赖图）",
+        "P08-T02-core-contracts-negative": "exit 0：a05-null-negative / a06-identity-misuse 两 fixture 经 extraFiles 注入真实检查器，错误码 TS2531/TS18047/TS2349 与 TS2322/TS2345 且指向 fixture 自身、不污染其余文件——A03 错误必失败实证"
+      }
+    },
+    "loose_zone_ledger": {
+      "claim": "不声称全库 strict。root tsconfig（生产源码主体）沿用仓库既有 strict 设置；tsconfig.node.json / tsconfig.test.json 为历史宽松区，本轮未扩大其范围以逃避检查（本轮生产改动文件全部位于既有目录，无文件被移动）",
+      "registered_additions_this_round": [
+        {
+          "file": "lib/task-registry.ts",
+          "items": "update/complete/fail 签名新增 options 参数（`options: any = {}`，与相邻既有 `patch: any` 同风格；:169/:197/:218，P02 9a19740ba 引入）；register 复用清零路径 `delete (task as any).completedAt` 等三处既有 cast 的沿用（该三行原样存在，仅缩进/上下文变化，不计入增量）",
+          "zone": "宽松区（该文件不在 strict 范围，P02 接入 attempt 栅栏时保持文件既有签名风格）",
+          "justification": "非为清除编译错误批量加 any：文件本为 any 风格存量；attempt 栅栏行为由 tests/task-identity-attempts.test.ts + tests/p02-*.test.ts 真实锁定；升级为 strict 属范围外债务（未在本轮承诺内）",
+          "count": 3
+        },
+        {
+          "file": "server/hono-helpers.ts",
+          "items": "`const error: any = new Error(message)`（:37，httpJsonError 内，P01 e2392f301 随该文件新建引入——P08-FIXR1 更正：初版账本误将此行记为 lib/task-registry.ts「:788 附近，P02 清理错误上报」，实测该文件仅 635 行且无此行，系归属笔误；文件归属/行号/引入阶段以 git blame e2392f301 与源码实测为准）",
+          "zone": "宽松区（该文件不在 tsconfig.core-contracts include，本体不在 strict 范围；消费方为 server/routes/* 等服务器侧文件）",
+          "justification": "httpJsonError 构造携带 status/code 的 HTTP 错误对象（error.status/error.code 赋值），any 为保持该既有错误对象形态的最小写法，非为清除编译错误批量加 any",
+          "count": 1
+        }
+      ],
+      "scan_method": "git diff 92c6646c5..HEAD 生产目录 +行内 grep ': any|@ts-ignore|@ts-nocheck|as any' → 4 命中分归上两条（task-registry ×3 + hono-helpers ×1）；@ts-expect-error 仅允许在专用负例 fixture（tests/fixtures/core-contracts-negative/，本轮 0 新增生产使用）"
+    },
+    "temp_exit_ledger": [
       {
-        "file": "lib/task-registry.ts",
-        "items": "update/complete/fail 签名新增 options 参数（`options: any = {}`，与相邻既有 `patch: any` 同风格；:169/:197/:218，P02 9a19740ba 引入）；register 复用清零路径 `delete (task as any).completedAt` 等三处既有 cast 的沿用（该三行原样存在，仅缩进/上下文变化，不计入增量）",
-        "zone": "宽松区（该文件不在 strict 范围，P02 接入 attempt 栅栏时保持文件既有签名风格）",
-        "justification": "非为清除编译错误批量加 any：文件本为 any 风格存量；attempt 栅栏行为由 tests/task-identity-attempts.test.ts + tests/p02-*.test.ts 真实锁定；升级为 strict 属范围外债务（未在本轮承诺内）",
-        "count": 3
+        "item": "本轮新增生产抽象消费者核验",
+        "result": "lib/tasks/task-identity.ts（消费：rewind/subagent/workflow-tool、speech、image-task-runner 共 5 生产文件）；shared/identity-brands.ts（消费：task-identity.ts、lib/llm/model-call-identity.ts）；shared/hana-runtime-paths.d.cts（消费：cli/local-server.ts import 的类型声明）。无零消费者抽象"
       },
       {
-        "file": "server/hono-helpers.ts",
-        "items": "`const error: any = new Error(message)`（:37，httpJsonError 内，P01 e2392f301 随该文件新建引入——P08-FIXR1 更正：初版账本误将此行记为 lib/task-registry.ts「:788 附近，P02 清理错误上报」，实测该文件仅 635 行且无此行，系归属笔误；文件归属/行号/引入阶段以 git blame e2392f301 与源码实测为准）",
-        "zone": "宽松区（该文件不在 tsconfig.core-contracts include，本体不在 strict 范围；消费方为 server/routes/* 等服务器侧文件）",
-        "justification": "httpJsonError 构造携带 status/code 的 HTTP 错误对象（error.status/error.code 赋值），any 为保持该既有错误对象形态的最小写法，非为清除编译错误批量加 any",
-        "count": 1
+        "item": "feature flag",
+        "result": "本轮零新增 feature flag / 双轨开关（diff +行 grep 0 命中）"
+      },
+      {
+        "item": "测试故障注入入口",
+        "result": "prepareAndInvokeForLocalDeveloper（P03 保留项）：非外部可开启的生产面（边界脚本白名单已清零 pluginExecuteTool，P03 门禁）；负例注入仅经检查器 API extraFiles（测试内），生产 CLI 不可注入"
+      },
+      {
+        "item": "临时回归测试合并",
+        "result": "本轮各阶段新增测试（tests/p02-*.test.ts ×5、task-identity-attempts、model-operation-resolver、on-demand-first-party 扩展、p06-* ×4、p07-* ×2、server-composition-boundary 等）全部为稳定行为契约测试，无标记临时/skip 的过渡用例（15 个 skipped 为既有基线，逐名未变）；无需合并"
+      },
+      {
+        "item": "R10-09 补丁重写行为（F5）改造评估",
+        "result": "BASELINE_FAILURES F5 建议主责 P08 评估（需授权）。评估结论：round2-delivery-evidence.test.ts 属既有审计证据链测试，改造其写入语义属测试逻辑变更且涉审计面，超出本阶段任务书授权；维持既有缓解措施（全量后 git checkout 还原 + stat 留档，本轮 P08-T04-full-test 已按此执行）并继续登记"
       }
     ],
-    "scan_method": "git diff 92c6646c5..HEAD 生产目录 +行内 grep ': any|@ts-ignore|@ts-nocheck|as any' → 4 命中分归上两条（task-registry ×3 + hono-helpers ×1）；@ts-expect-error 仅允许在专用负例 fixture（tests/fixtures/core-contracts-negative/，本轮 0 新增生产使用）"
-  },
-  "temp_exit_ledger": [
-    {
-      "item": "本轮新增生产抽象消费者核验",
-      "result": "lib/tasks/task-identity.ts（消费：rewind/subagent/workflow-tool、speech、image-task-runner 共 5 生产文件）；shared/identity-brands.ts（消费：task-identity.ts、lib/llm/model-call-identity.ts）；shared/hana-runtime-paths.d.cts（消费：cli/local-server.ts import 的类型声明）。无零消费者抽象"
-    },
-    { "item": "feature flag", "result": "本轮零新增 feature flag / 双轨开关（diff +行 grep 0 命中）" },
-    { "item": "测试故障注入入口", "result": "prepareAndInvokeForLocalDeveloper（P03 保留项）：非外部可开启的生产面（边界脚本白名单已清零 pluginExecuteTool，P03 门禁）；负例注入仅经检查器 API extraFiles（测试内），生产 CLI 不可注入" },
-    { "item": "临时回归测试合并", "result": "本轮各阶段新增测试（tests/p02-*.test.ts ×5、task-identity-attempts、model-operation-resolver、on-demand-first-party 扩展、p06-* ×4、p07-* ×2、server-composition-boundary 等）全部为稳定行为契约测试，无标记临时/skip 的过渡用例（15 个 skipped 为既有基线，逐名未变）；无需合并" },
-    { "item": "R10-09 补丁重写行为（F5）改造评估", "result": "BASELINE_FAILURES F5 建议主责 P08 评估（需授权）。评估结论：round2-delivery-evidence.test.ts 属既有审计证据链测试，改造其写入语义属测试逻辑变更且涉审计面，超出本阶段任务书授权；维持既有缓解措施（全量后 git checkout 还原 + stat 留档，本轮 P08-T04-full-test 已按此执行）并继续登记" }
-  ],
-  "test_merge_mapping": "见 temp_exit_ledger[4]：本轮无临时回归需合并；各 p0X 测试为长期契约锚点，其断言→任务映射见各阶段 ACCEPTANCE_MAP.json（P08 汇总见 P08_REPORT.md；无独立「功能→契约→代码→测试」索引节，映射散见各阶段 ACCEPTANCE_MAP 系文件——P08-FIXR2 更正：原引 FINAL_REPORT.md 系任务书建议文件名，实际不存在）"
+    "test_merge_mapping": "见 temp_exit_ledger[4]：本轮无临时回归需合并；各 p0X 测试为长期契约锚点，其断言→任务映射见各阶段 ACCEPTANCE_MAP.json（P08 汇总见 P08_REPORT.md；无独立「功能→契约→代码→测试」索引节，映射散见各阶段 ACCEPTANCE_MAP 系文件——P08-FIXR2 更正：原引 FINAL_REPORT.md 系任务书建议文件名，实际不存在）"
+  }
 }

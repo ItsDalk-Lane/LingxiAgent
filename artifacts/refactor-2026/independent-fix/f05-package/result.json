@@ -1,0 +1,38 @@
+{
+  "regression": "C29",
+  "status": "BLOCKED",
+  "candidate": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-package-72WB24/package/mac-arm64/Lingxi.app",
+  "sourceSnapshot": "source-snapshot.json",
+  "sourceComparison": "source-comparison.json",
+  "sourceDifferences": [],
+  "sourceFilesCompared": 2000,
+  "artifactHashes": "candidate-hashes.json",
+  "platform": "darwin-arm64",
+  "buildNode": "v24.16.0",
+  "bundledNode": "v24.15.0",
+  "passed": [
+    "final client/server build",
+    "final seed verification",
+    "final electron-builder --dir",
+    "final packaged server 7 checks",
+    "final packaged Node PTY execution",
+    "final actual packaged Electron new-session completion",
+    "final actual PDF preview",
+    "final actual embedded browser localhost page"
+  ],
+  "blocked": [
+    "formal signed/notarized installer and clean external install",
+    "other platforms",
+    "terminal GUI execution: product auto-review auxiliary model not configured; action refused",
+    "real provider and install/update rollback"
+  ],
+  "secretsDeleted": true,
+  "evidenceReuse": "No earlier GUI pass reused; final app browser/PDF/chat rerun after renderer changes. Native mac-arm64 speech/computer-use helpers reused from existing local build cache; not newly rebuilt.",
+  "isolationCaveats": [
+    "Initial final seed smoke launch lost LINGXI_HOME due harness edit error; existing kernel ownership lock rejected launch, no takeover. Failure retained and corrected rerun passed.",
+    "Final GUI uses unique LINGXI_HOME and unique actual Electron userData. HOME was not changed. Initial session displayed existing default OH-WorkSpace; exec was refused by product review before execution, no workspace write tool ran. Test attachment was explicitly selected from task temporary directory and copied into isolated session-files.",
+    "Replay launcher now explicitly sets desk.home_folder to task temporary workspace; this additional harness setting was added after this GUI run and is not claimed as exercised evidence."
+  ],
+  "actualUserData": "/Users/study_superior/Library/Application Support/Lingxi-f05-packaged-run-rIw7Tw",
+  "at": "2026-09-22T11:21:30.567110+00:00"
+}

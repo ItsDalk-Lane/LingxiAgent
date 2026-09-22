@@ -76,7 +76,7 @@ export type ToolInvocationPermissionResolution =
       reason: string;
       toolName: string;
       message: string;
-      field?: string;
+      field?: string | undefined;
       declaredCapability?: string | null;
       /** 解析器抛出平台类型化错误（如参数校验失败）时透传的原 code。 */
       invocationCode?: ToolInvocationErrorCode;
@@ -505,7 +505,7 @@ function failure({
   code?: "TOOL_INVOCATION_RESOLVER_FAILED" | "TOOL_INVOCATION_DESCRIPTOR_INVALID";
   reason: string;
   message: string;
-  field?: string;
+  field?: string | undefined;
   declaredCapability?: string | null;
   invocationCode?: ToolInvocationErrorCode;
   invocationMessage?: string;

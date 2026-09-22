@@ -90,7 +90,7 @@ export function createStopTaskTool(deps) {
         );
       }
 
-      const result = registry.abort(taskId);
+      const result = registry.abort(taskId, "aborted", { expectedAttempt: task.attempt ?? null });
 
       if (result === "not_found") {
         return { content: [{ type: "text", text: t("error.stopTaskNotFound", { taskId }) }] };

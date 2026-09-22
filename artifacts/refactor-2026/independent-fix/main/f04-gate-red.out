@@ -1,0 +1,14 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/core-contracts-strict.test.ts (9 tests | 4 failed) 2327ms
+     × C23: 无文件的全局致命诊断不能被丢弃 295ms
+     × C23: 损坏配置显式失败 289ms
+     × C23: 缺失配置显式失败 287ms
+     × C20: 报告包含真实编译闭包而非仅入口 311ms
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 5 passed (9)
+   Start at  17:43:34
+   Duration  2.58s (transform 75ms, setup 19ms, import 164ms, tests 2.33s, environment 0ms)
+

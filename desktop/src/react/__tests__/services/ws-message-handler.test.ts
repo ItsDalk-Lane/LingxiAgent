@@ -41,7 +41,7 @@ vi.mock('../../services/stream-resume', () => ({
   replayStreamResume: vi.fn(),
   isStreamResumeRebuilding: () => null,
   isStreamScopedMessage: () => false,
-  updateSessionStreamMeta: vi.fn(),
+  updateSessionStreamMeta: vi.fn(() => true),
   injectHandlers: vi.fn(),
   injectWebSocketGetter: vi.fn(),
   requestStreamResume: vi.fn(),

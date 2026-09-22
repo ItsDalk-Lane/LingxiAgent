@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/stream-route-consumer-isolation.test.ts (3 tests | 1 failed) 3959ms
+     × C16: more than 256 runs recover through the real route without accepting previously retired starts 3815ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  17:52:01
+   Duration  5.74s (transform 832ms, setup 19ms, import 1.44s, tests 3.96s, environment 248ms)
+

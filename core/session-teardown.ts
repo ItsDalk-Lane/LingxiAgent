@@ -1,4 +1,4 @@
-import { emitSessionShutdown } from "../lib/pi-sdk/index.ts";
+import { emitSessionShutdown, type ShutdownSession } from "../lib/pi-sdk/session-shutdown.ts";
 
 /**
  * 统一释放 session 相关资源。
@@ -19,29 +19,34 @@ import { emitSessionShutdown } from "../lib/pi-sdk/index.ts";
  * @param {(msg: string) => void} [args.warn]
  * @returns {Promise<{ errors: unknown[] }>} 三步中实际抛出的清理错误（已 warn）
  */
-export async function teardownSessionResources({ session, unsub, label, warn }) {
-  const errors = [];
+export async function teardownSessionResources({ session, unsub, label, warn }: {
+  session: ShutdownSession | null | undefined;
+  unsub?: (() => void) | null | undefined;
+  label: string;
+  warn?: ((message: string) => void) | undefined;
+}): Promise<{ errors: unknown[] }> {
+  const errors: unknown[] = [];
   try {
     if (session) {
       await emitSessionShutdown(session);
     }
   } catch (err) {
     errors.push(err);
-    warn?.(`${label}: emitSessionShutdown failed: ${err.message}`);
+    warn?.(`${label}: emitSessionShutdown failed: ${err instanceof Error ? err.message : String(err)}`);
   }
 
   try {
     unsub?.();
   } catch (err) {
     errors.push(err);
-    warn?.(`${label}: unsub failed: ${err.message}`);
+    warn?.(`${label}: unsub failed: ${err instanceof Error ? err.message : String(err)}`);
   }
 
   try {
     session?.dispose?.();
   } catch (err) {
     errors.push(err);
-    warn?.(`${label}: session.dispose failed: ${err.message}`);
+    warn?.(`${label}: session.dispose failed: ${err instanceof Error ? err.message : String(err)}`);
   }
   return { errors };
 }

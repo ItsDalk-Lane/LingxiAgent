@@ -503,7 +503,7 @@ export function createChatRoute(engine: any, hub: any, {
     if (!ACTIVE_TASK_STATUSES.has(task.status)) {
       return { status: "already_stopped" };
     }
-    const result = registry.abort(taskId);
+    const result = registry.abort(taskId, "aborted", { expectedAttempt: task.attempt ?? null });
     if (result === "aborted") return { status: "aborted" };
     if (result === "already_aborted") return { status: "already_stopped" };
     return { status: "rejected", reason: result || "abort_failed" };

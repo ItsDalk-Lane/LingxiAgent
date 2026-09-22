@@ -14,7 +14,7 @@ export const SESSION_APPROVAL_POLICIES = Object.freeze({
 });
 
 export const DEFAULT_SESSION_PERMISSION_MODE = SESSION_PERMISSION_MODES.AUTO;
-const BRIDGE_PERMISSION_MODE_VALUES = new Set([
+const BRIDGE_PERMISSION_MODE_VALUES = new Set<string>([
   SESSION_PERMISSION_MODES.AUTO,
   SESSION_PERMISSION_MODES.OPERATE,
   SESSION_PERMISSION_MODES.READ_ONLY,
@@ -136,7 +136,22 @@ const EXTERNAL_ROUTINE_TARGET_TYPES = new Set([
   "notification_route",
 ]);
 
-export function normalizeSessionPermissionMode(raw) {
+export type SessionPermissionMode = typeof SESSION_PERMISSION_MODES[keyof typeof SESSION_PERMISSION_MODES];
+type PermissionContext = Record<string, unknown>;
+type PermissionDecision = {
+  action: 'allow' | 'deny' | 'prompt' | 'review';
+  code?: string;
+  message?: string;
+  kind?: string;
+  details?: { toolName: string; layer?: string };
+};
+
+function objectFields(value: unknown): Record<string, unknown> {
+  return value !== null && typeof value === 'object' ? value as Record<string, unknown> : {};
+}
+
+export function normalizeSessionPermissionMode(input: unknown): SessionPermissionMode {
+  const raw = typeof input === 'string' ? input : objectFields(input);
   if (typeof raw === "string") return normalizeSessionPermissionMode({ permissionMode: raw });
   if (raw?.permissionMode === SESSION_PERMISSION_MODES.AUTO) return SESSION_PERMISSION_MODES.AUTO;
   if (raw?.permissionMode === SESSION_PERMISSION_MODES.OPERATE) return SESSION_PERMISSION_MODES.OPERATE;
@@ -148,28 +163,31 @@ export function normalizeSessionPermissionMode(raw) {
   return DEFAULT_SESSION_PERMISSION_MODE;
 }
 
-export function normalizeBridgePermissionMode(raw) {
-  const source = typeof raw === "string" ? raw : raw?.permissionMode;
-  if (BRIDGE_PERMISSION_MODE_VALUES.has(source)) return source;
+export function normalizeBridgePermissionMode(input: unknown) {
+  const raw = objectFields(input);
+  const source = typeof input === "string" ? input : raw.permissionMode;
+  if (typeof source === "string" && BRIDGE_PERMISSION_MODE_VALUES.has(source)) return source;
   if (raw?.readOnly === true) return SESSION_PERMISSION_MODES.READ_ONLY;
   return SESSION_PERMISSION_MODES.AUTO;
 }
 
-export function normalizeAutomationPermissionMode(raw) {
-  const source = typeof raw === "string" ? raw : raw?.permissionMode;
-  if (AUTOMATION_PERMISSION_MODE_VALUES.has(source)) return source;
+export function normalizeAutomationPermissionMode(input: unknown) {
+  const raw = objectFields(input);
+  const source = typeof input === "string" ? input : raw.permissionMode;
+  if (typeof source === "string" && AUTOMATION_PERMISSION_MODE_VALUES.has(source)) return source;
   return SESSION_PERMISSION_MODES.AUTO;
 }
 
-export function normalizeSessionApprovalPolicy(raw) {
-  const source = typeof raw === "string" ? raw : raw?.approvalPolicy;
+export function normalizeSessionApprovalPolicy(input: unknown) {
+  const raw = objectFields(input);
+  const source = typeof input === "string" ? input : raw.approvalPolicy;
   if (source === SESSION_APPROVAL_POLICIES.INTERACTIVE) return SESSION_APPROVAL_POLICIES.INTERACTIVE;
   if (source === SESSION_APPROVAL_POLICIES.DENY_ON_PROMPT) return SESSION_APPROVAL_POLICIES.DENY_ON_PROMPT;
   if (source === SESSION_APPROVAL_POLICIES.NEVER) return SESSION_APPROVAL_POLICIES.NEVER;
   return SESSION_APPROVAL_POLICIES.INTERACTIVE;
 }
 
-export function resolveSessionApprovalPolicy({ mode, approvalPolicy, allowHumanApproval }: { mode?: any; approvalPolicy?: any; allowHumanApproval?: any } = {}) {
+export function resolveSessionApprovalPolicy({ mode, approvalPolicy, allowHumanApproval }: { mode?: unknown; approvalPolicy?: unknown; allowHumanApproval?: boolean } = {}) {
   const normalizedMode = normalizeSessionPermissionMode(mode);
   if (normalizedMode === SESSION_PERMISSION_MODES.OPERATE) return SESSION_APPROVAL_POLICIES.NEVER;
   if (normalizedMode === SESSION_PERMISSION_MODES.AUTO) return SESSION_APPROVAL_POLICIES.DENY_ON_PROMPT;
@@ -178,11 +196,11 @@ export function resolveSessionApprovalPolicy({ mode, approvalPolicy, allowHumanA
   return SESSION_APPROVAL_POLICIES.INTERACTIVE;
 }
 
-export function legacyAccessModeFromPermissionMode(mode) {
+export function legacyAccessModeFromPermissionMode(mode: unknown) {
   return normalizeSessionPermissionMode(mode) === SESSION_PERMISSION_MODES.READ_ONLY ? "read_only" : "operate";
 }
 
-export function isReadOnlyPermissionMode(mode) {
+export function isReadOnlyPermissionMode(mode: unknown) {
   return normalizeSessionPermissionMode(mode) === SESSION_PERMISSION_MODES.READ_ONLY;
 }
 
@@ -191,7 +209,7 @@ export function isReadOnlyPermissionMode(mode) {
 //   - subagent_access：subagent 只读档（出路：access:"write" 重派 + 父会话可操作）
 //   - conversation：conversation tool mode（出路：会话设置面板切到 write）
 //   - session：普通会话只读档，如 plan 模式（出路：切换会话权限档）
-function blocked(toolName, { code = "ACTION_BLOCKED_BY_READ_ONLY", message, layer = "session" }: { code?: string; message?: string; layer?: string } = {}) {
+function blocked(toolName: string, { code = "ACTION_BLOCKED_BY_READ_ONLY", message, layer = "session" }: { code?: string; message?: string; layer?: string } = {}): PermissionDecision {
   return {
     action: "deny",
     code,
@@ -200,7 +218,7 @@ function blocked(toolName, { code = "ACTION_BLOCKED_BY_READ_ONLY", message, laye
   };
 }
 
-function blockedByReadOnly(toolName, context) {
+function blockedByReadOnly(toolName: string, context: PermissionContext): PermissionDecision {
   if (context?.isSubagent) {
     return blocked(toolName, {
       layer: "subagent_access",
@@ -222,7 +240,7 @@ function blockedByReadOnly(toolName, context) {
   });
 }
 
-function prompt(toolName) {
+function prompt(toolName: string): PermissionDecision {
   return {
     action: "prompt",
     kind: "tool_action_approval",
@@ -230,7 +248,7 @@ function prompt(toolName) {
   };
 }
 
-function review(toolName) {
+function review(toolName: string): PermissionDecision {
   return {
     action: "review",
     kind: "tool_action_approval",
@@ -238,12 +256,12 @@ function review(toolName) {
   };
 }
 
-function declaredToolSessionPermission(context) {
+function declaredToolSessionPermission(context: PermissionContext) {
   const value = context?.toolSessionPermission || context?.sessionPermission;
-  return value && typeof value === "object" ? value : null;
+  return value && typeof value === "object" ? objectFields(value) : null;
 }
 
-function hasDeclaredPermissionBoundary(permission) {
+function hasDeclaredPermissionBoundary(permission: Record<string, unknown> | null) {
   if (!permission) return false;
   return permission.readOnly === true
     || typeof permission.kind === "string"
@@ -251,20 +269,20 @@ function hasDeclaredPermissionBoundary(permission) {
     || permission.auto === "review";
 }
 
-function isDeclaredReadOnly(permission) {
+function isDeclaredReadOnly(permission: Record<string, unknown> | null) {
   if (!permission) return false;
   if (permission.readOnly === true) return true;
   return typeof permission.kind === "string" && DECLARED_READ_KINDS.has(permission.kind);
 }
 
-function isDeclaredAutoAllow(permission) {
+function isDeclaredAutoAllow(permission: Record<string, unknown> | null) {
   if (!permission) return false;
   if (permission.auto === "allow") return true;
   if (permission.auto === "review") return false;
   return typeof permission.kind === "string" && DECLARED_AUTO_ALLOW_KINDS.has(permission.kind);
 }
 
-function classifyDeclaredToolPermission(mode, toolName, context) {
+function classifyDeclaredToolPermission(mode: SessionPermissionMode, toolName: string, context: PermissionContext): PermissionDecision | null {
   const permission = declaredToolSessionPermission(context);
   if (!hasDeclaredPermissionBoundary(permission)) return null;
   if (isDeclaredReadOnly(permission)) return { action: "allow" };
@@ -276,9 +294,9 @@ function classifyDeclaredToolPermission(mode, toolName, context) {
   return prompt(toolName);
 }
 
-function classifyResolvedToolInvocation(mode, toolName, context) {
-  const invocation = context?.toolInvocation;
-  if (!invocation || typeof invocation !== "object") return null;
+function classifyResolvedToolInvocation(mode: SessionPermissionMode, toolName: string, context: PermissionContext): PermissionDecision | null {
+  const invocation = objectFields(context.toolInvocation);
+  if (!context.toolInvocation || typeof context.toolInvocation !== "object") return null;
   if (invocation.kind === "read") return { action: "allow" };
   const routineIsHostPreAuthorized =
     invocation.kind === "routine"
@@ -307,9 +325,10 @@ function classifyResolvedToolInvocation(mode, toolName, context) {
   // hard safety policy are routine work, so they continue without a reviewer.
   // Only boundary-crossing actions use automatic approval review.
   if (invocation.kind === "routine") {
+    const targetType = objectFields(invocation.target).type;
     if (
       context?.isPluginTool === true
-      || EXTERNAL_ROUTINE_TARGET_TYPES.has(invocation.target?.type)
+      || (typeof targetType === "string" && EXTERNAL_ROUTINE_TARGET_TYPES.has(targetType))
     ) {
       return mode === SESSION_PERMISSION_MODES.AUTO
         ? review(toolName)
@@ -325,7 +344,7 @@ function classifyResolvedToolInvocation(mode, toolName, context) {
   return prompt(toolName);
 }
 
-function classifyExecCommandAction(mode, params, context) {
+function classifyExecCommandAction(mode: SessionPermissionMode, params: Record<string, unknown>, context: PermissionContext): PermissionDecision {
   if (mode === SESSION_PERMISSION_MODES.READ_ONLY) return blockedByReadOnly("exec_command", context);
   if (params?.tty === true) {
     if (mode === SESSION_PERMISSION_MODES.ASK) return prompt("exec_command");
@@ -334,26 +353,28 @@ function classifyExecCommandAction(mode, params, context) {
   return { action: "allow" };
 }
 
-function classifySessionFoldersAction(mode, action, context) {
-  if (SESSION_FOLDERS_READ_ACTIONS.has(action)) return { action: "allow" };
+function classifySessionFoldersAction(mode: SessionPermissionMode, action: unknown, context: PermissionContext): PermissionDecision {
+  if (typeof action === "string" && SESSION_FOLDERS_READ_ACTIONS.has(action)) return { action: "allow" };
   if (mode === SESSION_PERMISSION_MODES.READ_ONLY) return blockedByReadOnly("session_folders", context);
   return { action: "allow" };
 }
 
-function classifyFileAction(mode, action, context) {
-  if (FILE_READ_ACTIONS.has(action)) return { action: "allow" };
+function classifyFileAction(mode: SessionPermissionMode, action: unknown, context: PermissionContext): PermissionDecision {
+  if (typeof action === "string" && FILE_READ_ACTIONS.has(action)) return { action: "allow" };
   if (mode === SESSION_PERMISSION_MODES.READ_ONLY) return blockedByReadOnly("file", context);
   if (mode === SESSION_PERMISSION_MODES.ASK) return prompt("file");
   return { action: "allow" };
 }
 
-function classifySessionCollabAction(mode, action, context) {
-  if (SESSION_COLLAB_READ_ACTIONS.has(action)) return { action: "allow" };
+function classifySessionCollabAction(mode: SessionPermissionMode, action: unknown, context: PermissionContext): PermissionDecision {
+  if (typeof action === "string" && SESSION_COLLAB_READ_ACTIONS.has(action)) return { action: "allow" };
   if (mode === SESSION_PERMISSION_MODES.READ_ONLY) return blockedByReadOnly("session", context);
   return { action: "allow" };
 }
 
-export function classifySessionPermission({ mode, toolName, params, context }: { mode?: any; toolName?: any; params?: any; context?: any } = {}) {
+export function classifySessionPermission({ mode, toolName, params: rawParams, context: rawContext }: { mode?: unknown; toolName?: unknown; params?: unknown; context?: unknown } = {}): PermissionDecision {
+  const params = objectFields(rawParams);
+  const context = objectFields(rawContext);
   let normalized = normalizeSessionPermissionMode(mode);
   const name = typeof toolName === "string" ? toolName : "";
   if (!name) return { action: "allow" };

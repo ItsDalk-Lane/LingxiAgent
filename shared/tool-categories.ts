@@ -87,7 +87,7 @@ export const OPTIONAL_TOOL_NAMES = [
   "workflow",
 ];
 
-export const PLUGIN_BACKED_OPTIONAL_TOOL_IDS = {
+export const PLUGIN_BACKED_OPTIONAL_TOOL_IDS: Readonly<Record<string, string>> = {
   beautify: "beautify",
   office: "office",
 };
@@ -127,7 +127,7 @@ export const RESIDENT_CORE_TOOL_NAMES = [
  * A deferred candidate missing from this map AND lacking its own resolver
  * stays resident (engine falls back with a warning) — never deferred blind.
  */
-export const FIRST_PARTY_DEFERRED_PERMISSION_CONTRACTS = {
+export const FIRST_PARTY_DEFERRED_PERMISSION_CONTRACTS: Readonly<Record<string, "read" | "execute" | "file" | "session-folders">> = {
   grep: "read",
   find: "read",
   ls: "read",
@@ -238,7 +238,7 @@ const OPTIONAL_TOOL_NAMES_SET = new Set(OPTIONAL_TOOL_NAMES);
  */
 export const DEFAULT_DISABLED_TOOL_NAMES = ["workflow"];
 
-export function uniqueToolNames(names) {
+export function uniqueToolNames(names: readonly unknown[] | null | undefined) {
   const seen = new Set();
   const result = [];
   for (const name of names || []) {
@@ -260,7 +260,7 @@ export function uniqueToolNames(names) {
  * @param {{ pluginTools?: Array<{ _pluginId?: string }> }} [options]
  * @returns {string[]}
  */
-export function computeSettingsAvailableToolNames(runtimeToolNames, options: { pluginTools?: Array<{ _pluginId?: string }> } = {}) {
+export function computeSettingsAvailableToolNames(runtimeToolNames: readonly unknown[] | null | undefined, options: { pluginTools?: Array<{ _pluginId?: string }> } = {}) {
   const result = new Set(uniqueToolNames(runtimeToolNames));
   const pluginTools = Array.isArray(options.pluginTools) ? options.pluginTools : [];
   for (const name of OPTIONAL_TOOL_NAMES) {
@@ -281,7 +281,7 @@ export function computeSettingsAvailableToolNames(runtimeToolNames, options: { p
  * @param {string[]} actualToolNames
  * @throws {Error} if any tool is uncategorized
  */
-export function assertAllToolsCategorized(actualToolNames) {
+export function assertAllToolsCategorized(actualToolNames: readonly string[]) {
   const categorized = new Set([
     ...CORE_TOOL_NAMES,
     ...STANDARD_TOOL_NAMES,
@@ -299,7 +299,7 @@ export function assertAllToolsCategorized(actualToolNames) {
   }
 }
 
-function hasOwnDataPluginId(tool) {
+function hasOwnDataPluginId(tool: unknown) {
   if (!tool || (typeof tool !== "object" && typeof tool !== "function")) return false;
   try {
     const descriptor = Object.getOwnPropertyDescriptor(tool, "_pluginId");
@@ -312,7 +312,7 @@ function hasOwnDataPluginId(tool) {
   }
 }
 
-function hasOwnInvocationPermissionResolver(tool) {
+function hasOwnInvocationPermissionResolver(tool: unknown) {
   if (!tool || (typeof tool !== "object" && typeof tool !== "function")) return false;
   try {
     const permissionDescriptor = Object.getOwnPropertyDescriptor(tool, "sessionPermission");
@@ -345,7 +345,7 @@ function hasOwnInvocationPermissionResolver(tool) {
  * @param {Array<object>} actualTools
  * @throws {Error} if a built-in has no permission boundary
  */
-export function assertAllBuiltInToolsPermissionCovered(actualTools) {
+export function assertAllBuiltInToolsPermissionCovered(actualTools: readonly { name?: unknown; sessionPermission?: unknown; _pluginId?: unknown }[] | null | undefined) {
   const gatewayNames = new Set(BUILT_IN_PERMISSION_GATEWAY_TOOL_NAMES);
   const missing = uniqueToolNames((actualTools || [])
     .filter((tool) => !hasOwnDataPluginId(tool))
@@ -409,7 +409,7 @@ export function assertOnDemandCoreToolNamesSound() {
  * @param {{ extraDisabled?: string[] }} [options]
  * @returns {string[]} filtered tool names, order preserved from allNames
  */
-export function computeToolSnapshot(allNames, disabled, options: { extraDisabled?: string[] } = {}) {
+export function computeToolSnapshot(allNames: readonly unknown[] | null | undefined, disabled: readonly string[] | null | undefined, options: { extraDisabled?: string[] } = {}) {
   const effectivelyDisabled = new Set(
     (disabled || []).filter((n) => OPTIONAL_TOOL_NAMES_SET.has(n))
   );
