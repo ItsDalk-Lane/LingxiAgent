@@ -1,0 +1,16 @@
+[PASS] OLD-GEN | 旧版本(8037fae7a) server 启动于隔离 HOME
+[PASS] OLD-GEN | 旧版本生成 2 会话 + 1 轮真实聊天 + 设置（operate+通知）
+[PASS] OLD-GEN | 旧版本设置写入 operate + 通知开启
+[PASS] OLD-GEN | 旧版本优雅关闭
+[PASS] UPGRADE | A08 会话数量与 ID 完整保持（无静默清空）
+[PASS] UPGRADE | A08 升级后旧历史可读（含旧轮真实回复）
+[PASS] UPGRADE | A08 设置保持（permissionMode=operate 未丢）
+[PASS] UPGRADE | A08 权限语义：默认模式读取与旧写入一致（无越权放宽）
+[PASS] UPGRADE | A08 观测记录可读（升级后 trace 查询非空）
+[PASS] UPGRADE | 升级后新增会话+聊天轮成功（新增记录写入）
+[PASS] FAULT | A09 会话 JSONL 尾部截断（半写注入）后新版本再启动：无半激活、其余数据完好
+[PASS] ROLLBACK | A09 旧版本可读新数据：3 会话全在（含新版本写入的记录）
+[PASS] ROLLBACK | A09 旧版本读新版本会话历史（无版本挡板误伤——本轮零 schema 变更，兼容预期）
+[PASS] ROLLBACK | A09 旧版本追加新会话后，新版本记录不被覆盖（4 会话且原 3 个 ID 保持）
+
+P08 upgrade-rollback drill: pass=14 fail=0 → /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/independent-fix/f05-upgrade/result.json

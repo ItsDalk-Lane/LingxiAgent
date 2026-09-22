@@ -36,7 +36,12 @@ export class StreamAdmission {
     return !!stream && stream !== this.streamId && this.retiredStreams.has(stream);
   }
 
-  accepts(event: StreamIdentityEvent): boolean {
+  /**
+   * 纯身份校验：不改变退休集合与当前身份。被拒帧（含序号缺口待补发帧）必须在
+   * 这里保持零退休副作用；recoveryRequired/Requested 是恢复通道的请求簿记，
+   * 不属于身份退休状态。
+   */
+  wouldAccept(event: StreamIdentityEvent): boolean {
     const stream = identity(event.streamId);
     const run = identity(event.runId);
     const starts = event.type === 'assistant_run_start';
@@ -53,19 +58,47 @@ export class StreamAdmission {
       if (this.authoritativeSwitchOnly || this.retiredStreams.size >= MAX_RETIRED_IDENTITIES) {
         this.authoritativeSwitchOnly = true; this.recoveryRequired = true; return false;
       }
-      this.retiredStreams.add(this.streamId);
     }
     if (run && this.runId && run !== this.runId) {
       if (!starts) return false;
       if (this.retiredRuns.size >= MAX_RETIRED_IDENTITIES) { this.recoveryRequired = true; return false; }
+    }
+    if (event.type === 'assistant_run_end' && run && this.retiredRuns.size >= MAX_RETIRED_IDENTITIES) {
+      this.recoveryRequired = true; return false;
+    }
+    return true;
+  }
+
+  /**
+   * 身份提交：只有当整帧（身份校验 + 序号校验）都通过后才允许调用，
+   * 否则被拒/待补发帧会留下退休副作用（例如 run_end 因缺口被拒却退休了 runId，
+   * 补发后永远无法收尾）。
+   */
+  commit(event: StreamIdentityEvent): void {
+    const stream = identity(event.streamId);
+    const run = identity(event.runId);
+    const starts = event.type === 'assistant_run_start';
+    const opensStream = starts || (event.type === 'status' && event.isStreaming === true)
+      || event.type === 'session_user_message';
+    if (stream && this.streamId && stream !== this.streamId && opensStream
+      && !this.authoritativeSwitchOnly && this.retiredStreams.size < MAX_RETIRED_IDENTITIES) {
+      this.retiredStreams.add(this.streamId);
+    }
+    if (run && this.runId && run !== this.runId && starts
+      && this.retiredRuns.size < MAX_RETIRED_IDENTITIES) {
       this.retiredRuns.add(this.runId);
     }
-    if (event.type === 'assistant_run_end' && run) {
-      if (this.retiredRuns.size >= MAX_RETIRED_IDENTITIES) { this.recoveryRequired = true; return false; }
+    if (event.type === 'assistant_run_end' && run && this.retiredRuns.size < MAX_RETIRED_IDENTITIES) {
       this.retiredRuns.add(run);
     }
     if (stream) this.streamId = stream;
     if (run && (starts || !this.runId)) this.runId = run;
+  }
+
+  /** buffer 投影层旧入口：无独立序号层，校验通过即投影，一次完成校验+提交。 */
+  accepts(event: StreamIdentityEvent): boolean {
+    if (!this.wouldAccept(event)) return false;
+    this.commit(event);
     return true;
   }
 }

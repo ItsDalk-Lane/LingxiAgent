@@ -2,9 +2,18 @@
 
 **总体：BLOCKED；工程全量门禁：FAIL。不能宣布九阶段全部完成。** F01—F04 的实际代码缺陷已修复并通过本地针对性验证；F05 的证据核对、真实桌面/产物补验及阻塞登记已交付，必需验收仍有未闭合项。逐项机器结果以 FIX_RESULT.json 和 FIX_ACCEPTANCE_MAP.json 为准，不把某份旧阶段报告当当前结论。
 
+## recheck 轮追加（R1/R2/R3，2026-09-22）
+
+复审对前轮候选提出 R1（接纳先于序号校验产生退休副作用）、R2（旧异步恢复覆盖等待期间接纳的新流）、R3（证据清单引用未被版本管理跟踪的原始日志）。三者在真实环境确认并处理，逐项证据见 `artifacts/refactor-2026/independent-fix/recheck-r1-r2/`：
+
+- R1/R2 均真实复现（红基线 3+2 例）后修复：接纳拆分为纯校验与延迟提交、水位原子化、重放层按真实接纳计数；恢复按会话接纳代次守卫，resume 请求/响应新增可选 `resumeToken` 代次关联（服务器透传，旧两端兼容）。新增长 7 例真实 WS 链路反例（含结束帧缺口与切流），原 C1/C14—C19 族全部保留普通通过，F03 定向回归 19 文件 283 测试 exit 0。细节见 F03.md recheck 节。
+- R3：EVIDENCE_SHA256.txt 的 4070 项引用中 123 个原始 `.log` 被 `*.log` 忽略规则排除在版本管理外（干净 checkout 不可复核）。全部经脱敏审计（0 密钥；"Application Support" 命中均为随机后缀隔离测试目录；机器路径与已跟踪 commands.jsonl 先例一致，见 redaction-audit.md），以 `.gitignore` 精确反向规则纳入暂存候选；清单按同一规则重生成并经干净 checkout（write-tree + archive，非本工作区）验证引用存在与哈希一致（4110/4110、源码 3535/3535，见 clean-checkout-verify.out）。验证还暴露并修复了 123 之外的同族缺陷：两个 f05-package 的 pdf-ax 快照 txt 磁盘为 CRLF 而 git blob 已按 `* text=auto eol=lf` 归一化为 LF，旧清单哈希在任何干净 checkout 都必然失败——已把磁盘字节对齐为已入库的 LF 版本（各仅 1 处行尾差异，内容不变）。新增 recheck 证据以新命令/新时间登记，未改写早先记录；未发现需要"丢失登记"的清单引用（盘上 4070/4070 存在）。
+- 本轮入场 HEAD 8d55046d5646a008f71f57de745b3564e94a5f21（前轮修复提交），工作区干净；Node v24.16.0、锁文件未变。全量复跑（`engineering-full-tests-recheck`）：1466 文件，14874 通过、4 失败、15 跳过，退出码 1——4 例与上一轮完全相同（旧封印/证据坐标检查，B01 范畴），无新增回归。typecheck 三连、lint（0 error）、严格契约 28 文件、受影响面 19 文件 249 测试均通过。
+- 复审所引 RECHECK_REPORT.md / RECHECK_FACTS.json / probes/README.md 未在本机存在；本轮以复审提示词内嵌的 R1/R2/R3 事实描述为输入，并在真实源码逐条核实后实施，未将无法核对的描述当作已验证结论。
+
 ## 基线与执行边界
 
-分支 docs/knowledge-closeout-2026-09-21，进入与退出 HEAD 均为 b0e9118427e16206dcd25ecfb566d766ed476727，提交树 b43a2a1528c5d8f91884aae1e57ae5bd92788b76；入场工作区干净。修复留在未提交工作区，**该 HEAD 不包含修复**，最终实际字节由 SOURCE_MANIFEST.json 及校验和绑定。Node v24.16.0、npm 11.13.0、macOS arm64；package-lock 的安装版本对照通过，没有升级依赖。
+分支 docs/knowledge-closeout-2026-09-21，F01—F05 轮进入与退出 HEAD 均为 b0e9118427e16206dcd25ecfb566d766ed476727，提交树 b43a2a1528c5d8f91884aae1e57ae5bd92788b76；入场工作区干净。该轮修复随后以提交 8d55046d5646a008f71f57de745b3564e94a5f21 落库；recheck 轮（R1/R2/R3）在该提交之上进行，修复留在未提交工作区，最终实际字节由 SOURCE_MANIFEST.json 及校验和绑定。Node v24.16.0、npm 11.13.0、macOS arm64；package-lock 的安装版本对照通过，没有升级依赖。
 
 已阅读三份独立审查材料、原任务书入口/通用约束/相关阶段及当前工程规则。审查的源码摘录日志没有当作本轮执行证据。F01、F02、F03 和检查器反例均在真实 Node 24、锁定依赖和生产模块中重新复现；真实总线、HTTP、WS、Pi、实际消费者的范围分别标明。
 

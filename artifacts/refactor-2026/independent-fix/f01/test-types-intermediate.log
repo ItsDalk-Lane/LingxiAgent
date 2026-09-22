@@ -1,0 +1,7 @@
+tests/task-bus-handlers.test.ts(92,42): error TS2345: Argument of type '{ sessionId: string; sessionPath: string; }' is not assignable to parameter of type 'string'.
+tests/task-registry.test.ts(14,46): error TS2345: Argument of type '{}' is not assignable to parameter of type 'TaskHandler'.
+  Property 'abort' is missing in type '{}' but required in type 'TaskHandler'.
+tests/task-registry.test.ts(15,48): error TS2322: Type 'string' is not assignable to type '(taskId: string) => unknown'.
+tests/tool-categories.test.ts(112,9): error TS2353: Object literal may only specify known properties, and 'sessionPermission' does not exist in type '{ name?: unknown; }'.
+tests/tool-categories.test.ts(126,30): error TS2353: Object literal may only specify known properties, and 'sessionPermission' does not exist in type '{ name?: unknown; }'.
+tests/tool-categories.test.ts(132,36): error TS2353: Object literal may only specify known properties, and '_pluginId' does not exist in type '{ name?: unknown; }'.

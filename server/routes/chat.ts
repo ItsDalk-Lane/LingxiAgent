@@ -2485,6 +2485,9 @@ export function createChatRoute(engine: any, hub: any, {
                   isStreaming: resumed.isStreaming,
                   runtimeIsStreaming,
                   events: resumed.events,
+                  ...(typeof msg.resumeToken === "string" && msg.resumeToken
+                    ? { resumeToken: msg.resumeToken }
+                    : {}),
                 }));
               } else {
                 wsSend(ws, createStreamResumeWsMessage({
@@ -2498,6 +2501,9 @@ export function createChatRoute(engine: any, hub: any, {
                   isStreaming: false,
                   runtimeIsStreaming,
                   events: [],
+                  ...(typeof msg.resumeToken === "string" && msg.resumeToken
+                    ? { resumeToken: msg.resumeToken }
+                    : {}),
                 }));
               }
               return;

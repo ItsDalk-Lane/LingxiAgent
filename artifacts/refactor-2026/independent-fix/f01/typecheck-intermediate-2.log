@@ -1,0 +1,40 @@
+
+> lingxi@0.1.42 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+core/bridge-session-manager.ts(1471,11): error TS2322: Type 'AgentSession' is not assignable to type 'ShutdownSession'.
+  The types of 'extensionRunner.emit' are incompatible between these types.
+    Type '<TEvent extends RunnerEmitEvent>(event: TEvent) => Promise<RunnerEmitResult<TEvent>>' is not assignable to type '(event: { type: "session_shutdown"; }) => unknown'.
+      Types of parameters 'event' and 'event' are incompatible.
+        Type '{ type: "session_shutdown"; }' is not assignable to type 'RunnerEmitEvent'.
+          Property 'reason' is missing in type '{ type: "session_shutdown"; }' but required in type 'SessionShutdownEvent'.
+core/session-coordinator.ts(2234,11): error TS2322: Type 'AgentSession' is not assignable to type 'ShutdownSession'.
+  The types of 'extensionRunner.emit' are incompatible between these types.
+    Type '<TEvent extends RunnerEmitEvent>(event: TEvent) => Promise<RunnerEmitResult<TEvent>>' is not assignable to type '(event: { type: "session_shutdown"; }) => unknown'.
+      Types of parameters 'event' and 'event' are incompatible.
+        Type '{ type: "session_shutdown"; }' is not assignable to type 'RunnerEmitEvent'.
+          Property 'reason' is missing in type '{ type: "session_shutdown"; }' but required in type 'SessionShutdownEvent'.
+core/session-coordinator.ts(2255,9): error TS2322: Type 'AgentSession' is not assignable to type 'ShutdownSession'.
+  The types of 'extensionRunner.emit' are incompatible between these types.
+    Type '<TEvent extends RunnerEmitEvent>(event: TEvent) => Promise<RunnerEmitResult<TEvent>>' is not assignable to type '(event: { type: "session_shutdown"; }) => unknown'.
+      Types of parameters 'event' and 'event' are incompatible.
+        Type '{ type: "session_shutdown"; }' is not assignable to type 'RunnerEmitEvent'.
+          Property 'reason' is missing in type '{ type: "session_shutdown"; }' but required in type 'SessionShutdownEvent'.
+core/session-coordinator.ts(8419,11): error TS2322: Type 'AgentSession' is not assignable to type 'ShutdownSession'.
+  The types of 'extensionRunner.emit' are incompatible between these types.
+    Type '<TEvent extends RunnerEmitEvent>(event: TEvent) => Promise<RunnerEmitResult<TEvent>>' is not assignable to type '(event: { type: "session_shutdown"; }) => unknown'.
+      Types of parameters 'event' and 'event' are incompatible.
+        Type '{ type: "session_shutdown"; }' is not assignable to type 'RunnerEmitEvent'.
+          Property 'reason' is missing in type '{ type: "session_shutdown"; }' but required in type 'SessionShutdownEvent'.
+core/session-coordinator.ts(8636,11): error TS2322: Type 'AgentSession' is not assignable to type 'ShutdownSession'.
+  The types of 'extensionRunner.emit' are incompatible between these types.
+    Type '<TEvent extends RunnerEmitEvent>(event: TEvent) => Promise<RunnerEmitResult<TEvent>>' is not assignable to type '(event: { type: "session_shutdown"; }) => unknown'.
+      Types of parameters 'event' and 'event' are incompatible.
+        Type '{ type: "session_shutdown"; }' is not assignable to type 'RunnerEmitEvent'.
+          Property 'reason' is missing in type '{ type: "session_shutdown"; }' but required in type 'SessionShutdownEvent'.
+hub/agent-executor.ts(722,7): error TS2322: Type 'AgentSession' is not assignable to type 'ShutdownSession'.
+  The types of 'extensionRunner.emit' are incompatible between these types.
+    Type '<TEvent extends RunnerEmitEvent>(event: TEvent) => Promise<RunnerEmitResult<TEvent>>' is not assignable to type '(event: { type: "session_shutdown"; }) => unknown'.
+      Types of parameters 'event' and 'event' are incompatible.
+        Type '{ type: "session_shutdown"; }' is not assignable to type 'RunnerEmitEvent'.
+          Property 'reason' is missing in type '{ type: "session_shutdown"; }' but required in type 'SessionShutdownEvent'.

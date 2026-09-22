@@ -1,0 +1,115 @@
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C14/C15/C17: rejects old start/delta/end/tool/status frames and preserves multiple model turns in the current run
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C14/C15/C17: rejects old start/delta/end/tool/status frames and preserves multiple model turns in the current run
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R1 admission atomicity over the real route > a gap-rejected assistant_run_end retires nothing; the re-delivered seq3/seq4 complete the body, finalize exactly once, and only evidenced seqs enter the watermark
+[stream] unresolved assistant segment finalized with fallback: seg-r1
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R1 admission atomicity over the real route > a gap-rejected end of a NEW stream does not retire the new run across the switch
+[stream] unresolved assistant segment finalized with fallback: seg-r1c
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R2 restore generations over the real route > a background rebuild with a delayed history read cannot overwrite a newly admitted live stream
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R2 restore generations over the real route > a background rebuild with a delayed history read cannot overwrite a newly admitted live stream
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R2 restore generations over the real route > with two concurrent restores only the latest rebuild generation lands
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R2 restore generations over the real route > with two concurrent restores only the latest rebuild generation lands
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R2 restore generations over the real route > with two concurrent restores only the latest rebuild generation lands
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R2 restore generations over the real route > a current-session rebuild that loses focus during its delayed read abandons the restore and clears the rebuild gate
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R2 restore generations over the real route > a current-session rebuild that loses focus during its delayed read abandons the restore and clears the rebuild gate
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+

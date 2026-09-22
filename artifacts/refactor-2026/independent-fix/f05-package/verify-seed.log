@@ -1,0 +1,7 @@
+
+> lingxi@0.1.42 verify:seed-kit
+> node scripts/verify-seed-kit.mjs
+
+[verify-seed-kit] using LINGXI_SIGN_KEYSET override: /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-package-72WB24/ephemeral-public.json
+[verify-seed-kit] verifying /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-package-72WB24/build/dist-server-artifact/mac-arm64 (platformArch=darwin-arm64)...
+[verify-seed-kit] OK — seed kit at /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-package-72WB24/build/dist-server-artifact/mac-arm64 matches its manifest and verifies against the pinned keyset.

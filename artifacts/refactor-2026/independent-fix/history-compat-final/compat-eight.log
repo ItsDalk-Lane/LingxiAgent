@@ -1,0 +1,43 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stderr | desktop/src/react/__tests__/history-protocol-compat.test.ts > F01 旧+新：新客户端对旧服务端无感回退（真实 HTTP） > loadMessages 对旧服务端：200 正常应用、不保存校验记录（无 ETag 可复用）
+[lm-entry] targetPath= a/sessions/longrun.jsonl preloaded= false
+[cmf-entry] path= a/sessions/longrun.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fvar%2Ffolders%2F5r%2Fwq54gtms
+
+stderr | desktop/src/react/__tests__/history-protocol-compat.test.ts > F01 旧+新：新客户端对旧服务端无感回退（真实 HTTP） > loadMessages 对旧服务端：200 正常应用、不保存校验记录（无 ETag 可复用）
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/history-protocol-compat.test.ts > F01 旧+新：新客户端对旧服务端无感回退（真实 HTTP） > loadMessages 对旧服务端：200 正常应用、不保存校验记录（无 ETag 可复用）
+[old-dbg] status= 200 body0= {"messages":[{"id":"0","sourceIndex":0,"entryId":"u1","role":"user","content":"开始","timestamp":"2026-09-10T10:00:00Z"},{"id":"1","sourceIndex":1,"entryId":"a1",
+[has-dbg] called sessionPath= /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-history-compat-ETyZEM/compat-old-server-HdAwMt/agents/hana/sessions/longrun.jsonl sessionId= 
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/history-protocol-compat.test.ts > F01 旧+新：新客户端对旧服务端无感回退（真实 HTTP） > reconcile 对旧服务端正常触发既有补拉链（不因概览/条件层卡住）
+[lm-entry] targetPath= a/sessions/longrun.jsonl preloaded= false
+[cmf-entry] path= a/sessions/longrun.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fvar%2Ffolders%2F5r%2Fwq54gtms
+
+stderr | desktop/src/react/__tests__/history-protocol-compat.test.ts > F01 旧+新：新客户端对旧服务端无感回退（真实 HTTP） > reconcile 对旧服务端正常触发既有补拉链（不因概览/条件层卡住）
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+ ✓ desktop/src/react/__tests__/history-protocol-compat.test.ts > F01 旧+新：新客户端对旧服务端无感回退（真实 HTTP） > loadMessages 对旧服务端：200 正常应用、不保存校验记录（无 ETag 可复用） 58ms
+ ✓ desktop/src/react/__tests__/history-protocol-compat.test.ts > F01 旧+新：新客户端对旧服务端无感回退（真实 HTTP） > 概览对旧服务端 404 → epoch 记为不支持（不卡住、不弹持续错误） 2ms
+ ✓ desktop/src/react/__tests__/history-protocol-compat.test.ts > F01 旧+新：新客户端对旧服务端无感回退（真实 HTTP） > 翻页对旧服务端照常推进（hasMore+nextBefore 旧协议不变） 1ms
+ ✓ desktop/src/react/__tests__/history-protocol-compat.test.ts > F01 旧+新：新客户端对旧服务端无感回退（真实 HTTP） > reconcile 对旧服务端正常触发既有补拉链（不因概览/条件层卡住） 2ms
+stdout | tests/history-protocol-compat.test.ts > F01 四组合兼容矩阵（真实 HTTP） > 新+新：真实 HTTP 条件请求 200→304；ETag 随 limit 变化
+[sessions/history-read] history protocol conditional: request=- result=304 tag=rp1-a94cc775af51…
+
+ ✓ tests/history-protocol-compat.test.ts > F01 四组合兼容矩阵（真实 HTTP） > 旧+旧（控制组）：旧服务端 + 旧客户端请求构造 → 200 旧 JSON、无协议头 34ms
+ ✓ tests/history-protocol-compat.test.ts > F01 四组合兼容矩阵（真实 HTTP） > 新+旧：新服务端对旧客户端构造 → 省略 limit 默认 50、正常 200、七字段 JSON 可消费、新增头不破坏旧解析 24ms
+ ✓ tests/history-protocol-compat.test.ts > F01 四组合兼容矩阵（真实 HTTP） > 旧+新：旧服务端对概览返回 404、消息无 ETag/协议头（新客户端据此无感回退） 4ms
+ ✓ tests/history-protocol-compat.test.ts > F01 四组合兼容矩阵（真实 HTTP） > 新+新：真实 HTTP 条件请求 200→304；ETag 随 limit 变化 10ms
+
+ Test Files  2 passed (2)
+      Tests  8 passed (8)
+   Start at  19:29:16
+   Duration  1.92s (transform 749ms, setup 36ms, import 1.33s, tests 1.81s, environment 0ms)
+

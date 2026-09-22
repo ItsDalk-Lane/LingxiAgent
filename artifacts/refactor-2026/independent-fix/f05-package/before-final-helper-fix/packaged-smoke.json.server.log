@@ -1,0 +1,112 @@
+[server-bootstrap] process started pid=309 platform=darwin arch=arm64
+[server-bootstrap] node=v24.15.0 lingxiHome=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-p08-packaged-dHC2Si
+[server-bootstrap] root=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-package-PSLvCZ/runtime-seed
+[server-bootstrap] entry=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f05-package-PSLvCZ/runtime-seed/bundle/index.js
+[server-bootstrap] importing server entry
+[server] ① ensureFirstRun...
+[server] ① ensureFirstRun 完成
+[server] ① ensureLocalIdentityRegistries...
+[server] ① ensureLocalIdentityRegistries 完成
+[server] ② 创建 LingxiEngine...
+[server] ② LingxiEngine 构造完成，开始 init...
+[server] [migrations] _dataVersion=0，待执行 1 条迁移
+[server] [migrations] #54 完成
+[server] [credential-custody] tightened provider-catalog.json
+[server] [credential-custody] tightened users.json
+[server] [credential-custody] tightened agents/lingxi/config.yaml
+[server] [credential-custody] tightened security
+[server] [credential-custody] tightened security/execution-leases.json
+[server] [credential-custody] tightened security/grants.json
+[server] [init] 1/5 Pi SDK 初始化...
+[server] [init] 1/5 AuthStorage + ModelRegistry + 1 个模型就绪
+[server] [init] 2/5 初始化所有 agent...
+[server]   [compat] dirs: 创建了 7 个缺失目录
+[server]   [compat] 3 项检查完成，1 项已修复
+[server]   [agent] 1. loadConfig...
+[server]   [agent] 1. loadConfig 完成
+[server]   [agent] 3. 模块初始化完成
+[server]   [agent] 4. FactStore...
+[fact-store] schema migrated: v0 → v3
+[server]   [agent] 4. FactStore + SummaryManager 完成
+[server]   [agent] 4. memoryTicker...
+[server]   [agent] 4. memoryTicker 创建完成
+[memory-ticker] v3 已启动（turn-based，每日任务备用 timer 1h）
+[server]   [agent] 7. 创建工具...
+[server]   [agent] 8. Desk 系统...
+[server]   [agent] 9. buildSystemPrompt...
+[server]   [agent] init 全部完成
+[memory-ticker] 每日任务开始 (2026-09-22)
+[server] [init] 1 个 agent 已加载配置，焦点 runtime 已就绪
+[server] [init] 2/5 1 个 agent 已就绪
+[server] [init] 3/5 ResourceLoader 初始化...
+[server] [init] 3/5 ResourceLoader 完成 (10ms, 4 skills)
+[server] [init] 4/5 发现可用模型...
+[agent] Lingxi 记忆编译完成，system prompt 已刷新
+[memory-ticker] 每日任务完成
+[agent] Lingxi 记忆编译完成，system prompt 已刷新
+[server] [init] 4/5 找到 1 个模型: witness/witness-model
+[server] ✿ 使用模型: Witness Model (witness)
+[server] ✿ 沙盒已启用
+[server] ✿ 初始化完成（0.1s）
+[server] ② engine.init 完成
+[plugin-manager] loading plugin "beautify"...
+[plugin-manager] loading "beautify" tools...
+[plugin-manager] loaded "beautify" tools (37ms)
+[plugin-manager] loading "beautify" configuration...
+[plugin-manager] loaded "beautify" configuration (0ms)
+[plugin-manager] loading "beautify" lifecycle import...
+[plugin-manager] loaded "beautify" lifecycle import (0ms)
+[plugin-manager] loading "beautify" lifecycle onload...
+[plugin:beautify] beautify plugin loaded
+[plugin-manager] loaded "beautify" lifecycle onload (1ms)
+[plugin-manager] plugin "beautify" loaded (39ms)
+[plugin-manager] loading plugin "jimeng-cli"...
+[plugin-manager] loading "jimeng-cli" providers...
+[plugin-manager] loaded "jimeng-cli" providers (1ms)
+[plugin-manager] loading "jimeng-cli" lifecycle import...
+[plugin-manager] loaded "jimeng-cli" lifecycle import (13ms)
+[plugin-manager] loading "jimeng-cli" lifecycle onload...
+[media] adapter registered: jimeng-cli-images
+[plugin:jimeng-cli] jimeng-cli adapter registered: jimeng-cli-images
+[media] adapter registered: jimeng-cli-videos
+[plugin:jimeng-cli] jimeng-cli adapter registered: jimeng-cli-videos
+[plugin-manager] loaded "jimeng-cli" lifecycle onload (1ms)
+[plugin-manager] plugin "jimeng-cli" loaded (15ms)
+[plugin-manager] loading plugin "media"...
+[plugin-manager] loading "media" tools...
+[plugin-manager] loaded "media" tools (3ms)
+[plugin-manager] plugin "media" loaded (3ms)
+[plugin-manager] loading plugin "office"...
+[plugin-manager] loading "office" tools...
+[plugin-manager] loaded "office" tools (3ms)
+[plugin-manager] plugin "office" loaded (3ms)
+[cron] 调度器已启动（间隔 60 秒）
+[scheduler] Studio cron 已启动
+[server] ③ 跳过启动期 session 创建
+[server] LingxiAgent Server 运行在 http://127.0.0.1:51932
+[server] ready: port=51932
+[server-bootstrap] server entry import completed
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[agent-mgr] [description] lingxi: 生成跳过（LLM 不可用或返回空）
+[server] Bridge manager 初始化...
+[server] Bridge manager 初始化完成
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[agent-mgr] [description] lingxi: 生成跳过（LLM 不可用或返回空）
+[sessions] 新建 session {"hasCwd":true,"memoryEnabled":true,"customAgent":false}
+[session] createSession cwd=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-p08-pkg-ws-LxAg9X restore=false (传入: /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-p08-pkg-ws-LxAg9X)
+[session] session created (29ms), model=Witness Model
+[config] updateConfig: keys=[last_cwd,cwd_history]
+[sessions] session 创建完成
+[session] cache_contract_violation {"session":"sess_0muciwco4_d292930a8315fc29f971","renewReason":"new_session","requestCount":0,"diffs":[{"field":"systemPromptHash","expected":"12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126","actual":"d12ac9298bbd371d34705a248c0e90f5a9a7e4dd0071727ad9848d195376e17c"},{"field":"cachePrefixHash","expected":"aeca1fc62d55fe60db19213b6147da46778a67d0fc6b19f04bdb3c0f6b774927","actual":"a4c72e186105f09eb02f44270ef1c5b03906a26644b3148e6b2bc7676b36c6bb"}],"expected":{"version":1,"cachePrefixHash":"aeca1fc62d55fe60db19213b6147da46778a67d0fc6b19f04bdb3c0f6b774927","modelHash":"572949a332ab2bee1983e5e8555b92590bde229de210e5a9b22f128dfc2b6320","systemPromptHash":"12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126","toolSchemaHash":"5c5c496e8cbbc6150b1e7bb882bd4f9b4ce1d572768e8d208293794b6af67e21","model":{"id":"witness-model","provider":"witness","api":"openai-completions","baseUrl":"http://127.0.0.1:51927/v1"},"toolNames":["edit","exec_command","read","write","mcp_call","mcp_describe_tool","mcp_search_tools"],"toolCount":7,"systemPromptBytes":0},"actual":{"version":1,"cachePrefixHash":"a4c72e186105f09eb02f44270ef1c5b03906a26644b3148e6b2bc7676b36c6bb","modelHash":"572949a332ab2bee1983e5e8555b92590bde229de210e5a9b22f128dfc2b6320","systemPromptHash":"d12ac9298bbd371d34705a248c0e90f5a9a7e4dd0071727ad9848d195376e17c","toolSchemaHash":"5c5c496e8cbbc6150b1e7bb882bd4f9b4ce1d572768e8d208293794b6af67e21","model":{"id":"witness-model","provider":"witness","api":"openai-completions","baseUrl":"http://127.0.0.1:51927/v1"},"toolNames":["edit","exec_command","read","write","mcp_call","mcp_describe_tool","mcp_search_tools"],"toolCount":7,"systemPromptBytes":11173},"drift":{"fields":["systemPromptHash","cachePrefixHash"],"systemPrompt":{"expectedBytes":0,"actualBytes":11173,"firstDiffIndex":0,"expectedExcerpt":"","actualExcerpt":"You are running on the Lingxi (灵犀) platform.\n\n---\n\n# Environment\n\n<environment_context>\n  <platform>darwin</platform>\n  <"},"tools":null}}
+[llm-utils] generateDescription failed: LLM returned invalid JSON (status=200)
+[agent-mgr] [description] lingxi: 生成跳过（LLM 不可用或返回空）
+[llm-utils] summarizeTitle failed: LLM returned invalid JSON (status=200)
+[chat] session 标题 API 失败，使用 fallback: 请读取 packaged-note.txt 并告诉我内容
+[server] 
+正在关闭...
+[server] HTTP server 已关闭
+[media] adapter unregistered: jimeng-cli-videos
+[media] adapter unregistered: jimeng-cli-images
+[memory-ticker] 滚动摘要 (sess_0muciwco4_d292930a8315fc29f971) 失败: Could not read session JSONL: ENOENT: no such file or directory, open 'sess_0muciwco4_d292930a8315fc29f971'
+[session] sessions cleaned up
+[server] Hub + Engine 已清理

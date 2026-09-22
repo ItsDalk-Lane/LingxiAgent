@@ -1,0 +1,13 @@
+
+> lingxi@0.1.42 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' tests/f01-task-write-contract.test.ts tests/task-identity-attempts.test.ts tests/task-registry.test.ts tests/task-bus-handlers.test.ts tests/p02-recovery-restart.test.ts tests/p02-cancellation-edges.test.ts tests/p02-concurrency-edges.test.ts tests/media-poller.test.ts tests/media-gen-poller-completion-event.test.ts tests/rewind-checkpoint-tools.test.ts tests/subagent-tool.test.ts lib/exec-command/__tests__/background.test.ts
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+
+ Test Files  12 passed (12)
+      Tests  152 passed (152)
+   Start at  17:52:12
+   Duration  5.81s (transform 1.86s, setup 244ms, import 4.57s, tests 6.95s, environment 1ms)
+

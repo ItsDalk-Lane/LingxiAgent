@@ -1,0 +1,46 @@
+
+> lingxi@0.1.42 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' tests/f01-task-write-contract.test.ts
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/f01-task-write-contract.test.ts (10 tests | 1 failed) 44ms
+   × C06 后台任务跨会话并行，取消第一项使用它自己的父会话 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/f01-task-write-contract.test.ts > C06 后台任务跨会话并行，取消第一项使用它自己的父会话
+AssertionError: expected "vi.fn()" to be called once with arguments: [ { sessionPath: '/a', …(1) } ]
+
+Received:
+
+  1st vi.fn() call:
+
+  [
+    {
+-     "sessionPath": "/a",
++     "sessionPath": "/b",
+      "terminalId": "a",
+    },
+  ]
+
+
+Number of calls: 1
+
+ ❯ tests/f01-task-write-contract.test.ts:110:27
+    108|     registerBackgroundExec(deps,{terminalId:'b',sessionPath:'/b',agent…
+    109|     reg.abort('a','user',{expectedAttempt:1});
+    110|     expect(manager.close).toHaveBeenCalledExactlyOnceWith({sessionPath…
+       |                           ^
+    111|     expect(reg.query('b')).toMatchObject({status:'running'});
+    112|   } finally {vi.clearAllTimers();vi.useRealTimers();}
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 9 passed (10)
+   Start at  18:02:12
+   Duration  210ms (transform 82ms, setup 19ms, import 79ms, tests 44ms, environment 0ms)
+

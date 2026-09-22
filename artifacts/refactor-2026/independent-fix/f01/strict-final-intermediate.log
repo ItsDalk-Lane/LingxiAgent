@@ -1,0 +1,8 @@
+server/task-bus-handlers.ts(20,48): error TS2379: Argument of type '{ type: string; parentSessionPath: string | null | undefined; parentSessionId: string | null | undefined; parentSessionRef: Record<string, unknown> | null | undefined; sessionId: string | undefined; ... 5 more ...; persist: boolean | undefined; }' is not assignable to parameter of type 'TaskRegistration' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'parentSessionPath' are incompatible.
+    Type 'string | null | undefined' is not assignable to type 'string | null'.
+      Type 'undefined' is not assignable to type 'string | null'.
+server/task-bus-handlers.ts(57,33): error TS2379: Argument of type 'TaskBusPayload' is not assignable to parameter of type '{ type?: string; status?: TaskStatus; pluginId?: string; parentSessionId?: string; sessionId?: string; parentSessionPath?: string; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'pluginId' are incompatible.
+    Type 'string | null' is not assignable to type 'string'.
+      Type 'null' is not assignable to type 'string'.

@@ -1,0 +1,13 @@
+
+> lingxi@0.1.42 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' tests/session-create-input-contract.test.ts -t 拒绝错误 cwd
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 42 skipped (44)
+   Start at  18:06:45
+   Duration  1.32s (transform 595ms, setup 19ms, import 1.18s, tests 57ms, environment 0ms)
+

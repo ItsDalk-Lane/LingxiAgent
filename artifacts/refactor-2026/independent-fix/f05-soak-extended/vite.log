@@ -1,0 +1,13 @@
+▲ [WARNING] The "assert" keyword is not supported in the configured target environment ("node24.16.0") [assert-to-with]
+
+    vite.config.ts:7:33:
+      7 │ import pkg from './package.json' assert { type: 'json' };
+        │                                  ~~~~~~
+        ╵                                  with
+
+  Did you mean to use "with" instead of "assert"?
+
+
+  VITE v7.3.6  ready in 87 ms
+
+  ➜  Local:   http://127.0.0.1:52241/

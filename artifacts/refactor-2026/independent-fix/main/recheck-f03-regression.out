@@ -1,0 +1,64 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/session-stream-store.test.ts (9 tests) 77ms
+ ✓ tests/conversation-export.test.ts (3 tests) 47ms
+ ✓ tests/model-observability-session-trace-reuse.test.ts (6 tests) 77ms
+ ✓ desktop/src/react/__tests__/hooks/use-stream-buffer.test.ts (35 tests) 75ms
+stdout | desktop/src/react/__tests__/services/ws-knowledge-rollup-progress.test.ts > 知识过程 → 合成工具卡（2026-08-31 四轮） > think/search 事件各翻译成一张工具卡：start 成卡、done 收尾带结果注记
+RECEIVED_CALLS [
+ {
+  "type": "tool_start",
+  "id": "kt-think-1",
+  "name": "knowledge_think",
+  "sessionPath": "/session/knowledge-rollup.jsonl"
+ },
+ {
+  "type": "tool_start",
+  "id": "kt-search-1",
+  "name": "knowledge_search",
+  "args": {
+   "query": "风险准备金"
+  },
+  "sessionPath": "/session/knowledge-rollup.jsonl"
+ },
+ {
+  "type": "tool_end",
+  "id": "kt-search-1",
+  "success": true,
+  "resultNote": "chat.knowledgeTraceResults",
+  "sessionPath": "/session/knowledge-rollup.jsonl"
+ },
+ {
+  "type": "tool_end",
+  "id": "kt-think-1",
+  "success": true,
+  "sessionPath": "/session/knowledge-rollup.jsonl"
+ }
+]
+
+ ✓ desktop/src/react/__tests__/services/ws-knowledge-rollup-progress.test.ts (10 tests) 43ms
+ ✓ desktop/src/react/__tests__/services/ws-stream-abort-lifecycle.test.ts (1 test) 43ms
+ ✓ desktop/src/react/__tests__/hooks/use-stream-buffer-steer-split.test.ts (1 test) 39ms
+ ✓ desktop/src/react/__tests__/hooks/use-stream-buffer-dedupe.test.ts (3 tests) 42ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts (86 tests) 95ms
+ ✓ desktop/src/react/__tests__/services/stream-resume.test.ts (12 tests) 95ms
+ ✓ desktop/src/react/__tests__/services/stream-resume-gate.test.ts (5 tests) 33ms
+ ✓ tests/model-call-trace-propagation.test.ts (14 tests) 90ms
+ ✓ tests/chat-route-switching.test.ts (52 tests) 159ms
+ ✓ tests/live-history-reserved-tag-parity.test.ts (2 tests) 40ms
+ ✓ artifacts/refactor-2026/P05/logs/P05-ACCEPTANCE-counterexample.test.ts (5 tests) 29ms
+ ✓ tests/history-run-outcome-edges.test.ts (6 tests) 1104ms
+     ✓ T07：真完成但只有过程（思考+工具）→ 恰一个 missing_final_answer，不因有工具豁免  1082ms
+ ✓ tests/history-pagination-run-continuity.test.ts (10 tests) 593ms
+     ✓ T01：固定快照下分页不重叠、单逻辑 Run、无伪无回复状态，且与全量恢复语义等价  386ms
+ ✓ desktop/src/react/__tests__/components/computer-app-approval-prompt.test.ts (12 tests) 1011ms
+     ✓ shows full tool action parameters in a tooltip outside the clipped confirmation card  510ms
+ ✓ tests/stream-route-consumer-isolation.test.ts (11 tests) 4675ms
+     ✓ C16: more than 256 runs recover through the real route without accepting previously retired starts  3628ms
+
+ Test Files  19 passed (19)
+      Tests  283 passed (283)
+   Start at  21:15:35
+   Duration  6.53s (transform 10.51s, setup 287ms, import 16.24s, tests 8.37s, environment 3.26s)
+

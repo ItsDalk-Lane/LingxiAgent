@@ -1,0 +1,47 @@
+
+> lingxi@0.1.42 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' tests/f01-task-write-contract.test.ts -t 清理失败保留错误
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/f01-task-write-contract.test.ts (12 tests | 1 failed | 11 skipped) 36ms
+   × C07 媒体可见性清理失败保留错误并释放批次索引 36ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/f01-task-write-contract.test.ts > C07 媒体可见性清理失败保留错误并释放批次索引
+AssertionError: expected "vi.fn()" to be called with arguments: [ 'task:remove', …(1) ]
+
+Received:
+
+  1st vi.fn() call:
+
+  [
+    "task:remove",
+    {
+-     "expectedAttempt": null,
++     "expectedAttempt": 2,
+      "taskId": "media",
+    },
+  ]
+
+
+Number of calls: 1
+
+ ❯ tests/f01-task-write-contract.test.ts:140:28
+    138|   const laterBus={request:vi.fn(async () => ({ok:false}))};
+    139|   await bindings.remove(laterBus,'media',1);
+    140|   expect(laterBus.request).toHaveBeenCalledWith('task:remove',{taskId:…
+       |                            ^
+    141| });
+    142|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 11 skipped (12)
+   Start at  18:35:42
+   Duration  205ms (transform 84ms, setup 19ms, import 81ms, tests 36ms, environment 0ms)
+

@@ -1,0 +1,222 @@
+stderr | desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > drops a websocket event whose sessionId is already bound to a different known path (#2078)
+[ws] session locator mismatch; dropping non-authoritative event {
+  sessionId: 'sess_a',
+  sessionPath: '/session/b.jsonl',
+  knownLocatorPath: '/session/a.jsonl'
+}
+
+stderr | desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > drops an ordinary stream event that tries to move a known sessionId to an unknown new path
+[ws] session locator mismatch; dropping non-authoritative event {
+  sessionId: 'sess_ws_moved',
+  sessionPath: '/session/new-a.jsonl',
+  knownLocatorPath: '/session/old-a.jsonl'
+}
+
+stderr | desktop/src/react/__tests__/services/ws-knowledge-rollup-progress.test.ts > knowledge_rollup_progress / knowledge_supplement_search 前端消费（2026-08-31） > 非法载荷（缺 sessionPath）跳过且不炸
+[ws] knowledge_rollup_progress missing sessionPath, skipping
+[ws] knowledge_supplement_search missing sessionPath, skipping
+
+stderr | desktop/src/react/__tests__/services/ws-knowledge-rollup-progress.test.ts > 知识过程 → 合成工具卡（2026-08-31 四轮） > 非法载荷（缺 id / 缺 sessionPath）不喂卡且不炸
+[ws] knowledge_trace missing id, skipping
+[ws] knowledge_trace missing sessionPath, skipping
+
+stderr | desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_branch_reset 携带 fileRollbackReport 时写入会话作用域报告，无报告则不写
+[ws] session_branch_reset target message not found: /session/a.jsonl [ 'u1' ]
+
+stderr | desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler knowledge_retrieval_started（知识检索中状态） > 缺少 sessionPath 的 knowledge_retrieval_started 不写 store
+[ws] knowledge_retrieval_started missing sessionPath, skipping
+
+stderr | tests/chat-route-switching.test.ts > chat route model switch guard > rejects prompt routing when sessionId and sessionPath disagree (#2078)
+[chat] ws prompt rejected: session_identity_mismatch — sessionId and sessionPath refer to different sessions (sessionId=sess_other, sessionPath=/tmp/path.jsonl)
+
+stderr | tests/chat-route-switching.test.ts > chat route model switch guard > rejects a prompt with no identity before it validates the attachments
+[chat] ws prompt rejected: internal_contract — session identity required (sessionId=none, sessionPath=none)
+
+stderr | tests/chat-route-switching.test.ts > chat route model switch guard > rejects mismatched steer and resume targets before touching runtime state (#2078)
+[chat] ws steer rejected: session_identity_mismatch — sessionId and sessionPath refer to different sessions (sessionId=sess_other, sessionPath=/tmp/path.jsonl)
+
+stderr | tests/chat-route-switching.test.ts > chat route model switch guard > rejects mismatched steer and resume targets before touching runtime state (#2078)
+[chat] ws resume_stream rejected: session_identity_mismatch — sessionId and sessionPath refer to different sessions (sessionId=sess_other, sessionPath=/tmp/path.jsonl)
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C14/C15/C17: rejects old start/delta/end/tool/status frames and preserves multiple model turns in the current run
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C14/C15/C17: rejects old start/delta/end/tool/status frames and preserves multiple model turns in the current run
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T01：固定快照下分页不重叠、单逻辑 Run、无伪无回复状态，且与全量恢复语义等价
+[lm-entry] targetPath= ssions/page-target.jsonl preloaded= false
+[cmf-entry] path= ssions/page-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fvar%2Ffolders%2F5r%2Fwq54gtms
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T01：固定快照下分页不重叠、单逻辑 Run、无伪无回复状态，且与全量恢复语义等价
+[lm-dbg] before save, etag= W/"hrp1-4627a3d31798e96cca35b56fde8fa337d4367d8ceb3f59a07e85028d98647de3" proto= 1
+[save-dbg] etag= W/"hrp1-4627a3d31798e96cca35b56fde8fa337d4367d8ceb3f59a07e85028d98647de3" proto= 1 limit= 50
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T04：重复到达的同一页幂等，不增加显示项或过程块
+[lm-entry] targetPath= ssions/page-target.jsonl preloaded= false
+[cmf-entry] path= ssions/page-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fvar%2Ffolders%2F5r%2Fwq54gtms
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T04：重复到达的同一页幂等，不增加显示项或过程块
+[lm-dbg] before save, etag= W/"hrp1-d7dea2363b5723914ed18e246caad4c2f163648446d1defc7852d79080932ce3" proto= 1
+[save-dbg] etag= W/"hrp1-d7dea2363b5723914ed18e246caad4c2f163648446d1defc7852d79080932ce3" proto= 1 limit= 50
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T11b：整页都被前端过滤（隐藏后台通知）时，分页进度仍推进、更早真实历史可达
+[lm-entry] targetPath= ssions/page-target.jsonl preloaded= false
+[cmf-entry] path= ssions/page-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fvar%2Ffolders%2F5r%2Fwq54gtms
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T11b：整页都被前端过滤（隐藏后台通知）时，分页进度仍推进、更早真实历史可达
+[lm-dbg] before save, etag= W/"hrp1-75cade46854fadef1f317c39ef6f033325d9d72852c212f541b96fd1d5d5e587" proto= 1
+[save-dbg] etag= W/"hrp1-75cade46854fadef1f317c39ef6f033325d9d72852c212f541b96fd1d5d5e587" proto= 1 limit= 50
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T12c：死循环保护保留——页数超限（人为压低上限）时显式报错而非无限翻页
+[lm-entry] targetPath= ssions/page-target.jsonl preloaded= false
+[cmf-entry] path= ssions/page-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fvar%2Ffolders%2F5r%2Fwq54gtms
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T12c：死循环保护保留——页数超限（人为压低上限）时显式报错而非无限翻页
+[lm-dbg] before save, etag= W/"hrp1-4a2da4e8bb0807075c8e8bbbb7f9cc635b45a782d6574047474fd5c97a48f318" proto= 1
+[save-dbg] etag= W/"hrp1-4a2da4e8bb0807075c8e8bbbb7f9cc635b45a782d6574047474fd5c97a48f318" proto= 1 limit= 50
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T12b：合法夹具变体——'不带尾换行'，经真实分支入口分页语义一致
+[lm-entry] targetPath= /page-variant-nonl.jsonl preloaded= false
+[cmf-entry] path= /page-variant-nonl.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fvar%2Ffolders%2F5r%2Fwq54gtms
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T12b：合法夹具变体——'不带尾换行'，经真实分支入口分页语义一致
+[lm-dbg] before save, etag= W/"hrp1-690099c120f6a0cf03ad99150404e5bc9086d6802fa5ac23fc577f9bc82181d4" proto= 1
+[save-dbg] etag= W/"hrp1-690099c120f6a0cf03ad99150404e5bc9086d6802fa5ac23fc577f9bc82181d4" proto= 1 limit= 50
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T12b：合法夹具变体——'带尾换行'，经真实分支入口分页语义一致
+[lm-entry] targetPath= ns/page-variant-nl.jsonl preloaded= false
+[cmf-entry] path= ns/page-variant-nl.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fvar%2Ffolders%2F5r%2Fwq54gtms
+
+stderr | tests/history-pagination-run-continuity.test.ts > 长单轮会话历史分页 × Run 连续性 > T12b：合法夹具变体——'带尾换行'，经真实分支入口分页语义一致
+[lm-dbg] before save, etag= W/"hrp1-48dd65b6e7c2e3eb1d4f0828f002f0169b1b1677f63b3dda639bd5a98b451547" proto= 1
+[save-dbg] etag= W/"hrp1-48dd65b6e7c2e3eb1d4f0828f002f0169b1b1677f63b3dda639bd5a98b451547" proto= 1 limit= 50
+
+stderr | tests/history-pagination-run-continuity.test.ts > A03 夹具审计契约 > 夹具 sha256/字节数/数量/页数学/分支身份/执行路径计数符合 A03 定义
+[lm-entry] targetPath= sions/audit-target.jsonl preloaded= false
+[cmf-entry] path= sions/audit-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fvar%2Ffolders%2F5r%2Fwq54gtms
+
+stderr | tests/history-pagination-run-continuity.test.ts > A03 夹具审计契约 > 夹具 sha256/字节数/数量/页数学/分支身份/执行路径计数符合 A03 定义
+[lm-dbg] before save, etag= W/"hrp1-d5103b79f8f459d45c7521a72ca6de22b608b74e1f2894eeab0bae203d628e89" proto= 1
+[save-dbg] etag= W/"hrp1-d5103b79f8f459d45c7521a72ca6de22b608b74e1f2894eeab0bae203d628e89" proto= 1 limit= 50
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > F03 real WS route and renderer consumption > C16: more than 256 runs recover through the real route without accepting previously retired starts
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R1 admission atomicity over the real route > a gap-rejected assistant_run_end retires nothing; the re-delivered seq3/seq4 complete the body, finalize exactly once, and only evidenced seqs enter the watermark
+[stream] unresolved assistant segment finalized with fallback: seg-r1
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R1 admission atomicity over the real route > a gap-rejected end of a NEW stream does not retire the new run across the switch
+[stream] unresolved assistant segment finalized with fallback: seg-r1c
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R2 restore generations over the real route > a background rebuild with a delayed history read cannot overwrite a newly admitted live stream
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R2 restore generations over the real route > a background rebuild with a delayed history read cannot overwrite a newly admitted live stream
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R2 restore generations over the real route > with two concurrent restores only the latest rebuild generation lands
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R2 restore generations over the real route > with two concurrent restores only the latest rebuild generation lands
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R2 restore generations over the real route > with two concurrent restores only the latest rebuild generation lands
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R2 restore generations over the real route > a current-session rebuild that loses focus during its delayed read abandons the restore and clears the rebuild gate
+[lm-entry] targetPath= thetic/f03-session.jsonl preloaded= false
+[cmf-entry] path= thetic/f03-session.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsynthetic%2Ff03-session.jsonl
+
+stderr | tests/stream-route-consumer-isolation.test.ts > R2 restore generations over the real route > a current-session rebuild that loses focus during its delayed read abandons the restore and clears the rebuild gate
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+

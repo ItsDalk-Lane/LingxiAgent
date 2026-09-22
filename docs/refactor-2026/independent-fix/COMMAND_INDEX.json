@@ -44,7 +44,11 @@
     },
     {
       "path": "artifacts/refactor-2026/independent-fix/main/commands.jsonl",
-      "records": 52
+      "records": 59
+    },
+    {
+      "path": "artifacts/refactor-2026/independent-fix/recheck-r1-r2/commands.jsonl",
+      "records": 3
     }
   ],
   "final_command_ids": [
@@ -56,5 +60,16 @@
     "delivery-open-smoke",
     "engineering-full-tests-delivery",
     "delivery-history-compat"
+  ],
+  "recheck_command_ids": [
+    "recheck-r1-red",
+    "recheck-r2-red",
+    "recheck-f03-regression",
+    "recheck-typecheck",
+    "recheck-strict-contracts",
+    "recheck-ws-protocol",
+    "recheck-lint-scope",
+    "recheck-affected-surface",
+    "engineering-full-tests-recheck"
   ]
 }

@@ -1,0 +1,13 @@
+
+> lingxi@0.1.42 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' tests/session-turn-actions.test.ts tests/permission-catalog-tools.test.ts
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+
+ Test Files  2 passed (2)
+      Tests  34 passed (34)
+   Start at  18:00:10
+   Duration  1.08s (transform 512ms, setup 39ms, import 1.72s, tests 130ms, environment 0ms)
+

@@ -134,6 +134,9 @@ export function createStreamResumeWsMessage(input) {
   const truncated = assertBoolean(payload.truncated, "truncated", context);
   const isStreaming = assertBoolean(payload.isStreaming, "isStreaming", context);
   const events = assertReplayEvents(payload.events, context);
+  // 恢复代次关联（可选透传）：客户端在 resume_stream 请求里带上 resumeToken，
+  // 服务器原样回显，客户端据此丢弃迟到的旧响应。旧客户端/旧服务器不带此字段。
+  const resumeToken = optionalNonEmptyString(payload.resumeToken, "resumeToken", context);
 
   const message: Record<string, unknown> = {
     type: "stream_resume",
@@ -147,6 +150,8 @@ export function createStreamResumeWsMessage(input) {
     isStreaming,
     events,
   };
+
+  if (resumeToken) message.resumeToken = resumeToken;
 
   if (Object.prototype.hasOwnProperty.call(payload, "runtimeIsStreaming")) {
     message.runtimeIsStreaming = assertBoolean(payload.runtimeIsStreaming, "runtimeIsStreaming", context);

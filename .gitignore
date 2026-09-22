@@ -98,6 +98,10 @@ logs/
 !artifacts/f1-f12-repair/round2/logs/**
 !artifacts/f1-f12-repair/round3-c01-c03/logs/
 !artifacts/f1-f12-repair/round3-c01-c03/logs/**
+# refactor-2026 独立修复轮交付证据例外（R3）：EVIDENCE_SHA256.txt 引用的原始
+# 先红后绿/回归/打包日志必须在干净 checkout 可复核；已逐文件脱敏审计（见
+# recheck-r1-r2/redaction-audit.md），无密钥与真实用户数据。仅放行该证据树。
+!artifacts/refactor-2026/independent-fix/**/*.log
 
 # 系统文件
 .DS_Store

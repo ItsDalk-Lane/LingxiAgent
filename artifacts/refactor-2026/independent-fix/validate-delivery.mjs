@@ -21,7 +21,7 @@ check(mapping.phases.flatMap(p=>p.tasks).length===catalog.phases.flatMap(p=>p.ta
 for(const phase of mapping.phases){if(phase.status==='PASS')check(phase.cases.every(c=>['PASS','NOT_APPLICABLE'].includes(c.status)),phase.id+'阶段误报PASS');for(const task of phase.tasks){check(fs.existsSync(task.original_taskbook),'缺原任务书'+task.original_taskbook);if(task.status==='PASS')check(task.acceptance_cases.every(id=>['PASS','NOT_APPLICABLE'].includes(mapping.scenarios.find(c=>c.id===id)?.status)),task.id+'任务误报PASS');}}
 for(const c of result.regressions){for(const p of [...(c.evidence||[]),...(c.log?[c.log]:[]),...(c.command_index?[c.command_index]:[])])check(fs.existsSync(p),'缺证据'+c.id+' '+p);if(c.status==='PASS'){check(Boolean(c.production_entry),'PASS缺真实入口'+c.id);check(Boolean(c.command_index||c.command_ids||c.command_id),'PASS缺命令'+c.id);}}
 check(result.overall_status!=='PASS','必需阻塞不能整体PASS');
-const full=read('artifacts/refactor-2026/independent-fix/main/full-tests-delivery.json');
+const full=read('artifacts/refactor-2026/independent-fix/main/full-tests-recheck-delivery.json');
 check(result.full_test.failed===full.numFailedTests,'全量失败数量不一致');
 check(result.full_test.passed===full.numPassedTests,'全量通过数量不一致');
 check(result.full_test.exit_code===1 && result.engineering_gate==='FAIL','原exit1被误改绿');

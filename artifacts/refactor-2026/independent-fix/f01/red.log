@@ -1,0 +1,223 @@
+
+> lingxi@0.1.42 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' tests/f01-task-write-contract.test.ts
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stderr | tests/f01-task-write-contract.test.ts > F01 全写入口生命周期 > C07 总线明确内存接受与落盘失败，重启不伪称保存成功
+[task-registry] no handler for type "x", task t registered without abort support
+[task-registry] failed to persist tasks: EEXIST: file already exists, mkdir '/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/f01-iu9p3x/blocked'
+
+ ❯ tests/f01-task-write-contract.test.ts (6 tests | 6 failed) 38ms
+     × C01/C02/C03 completed 不被任何终态写入口改写 33ms
+     × C01/C02/C03 failed 不被任何终态写入口改写 1ms
+     × C01/C02/C03 aborted 不被任何终态写入口改写 1ms
+     × C01/C02/C03 canceled 不被任何终态写入口改写 0ms
+     × C04 复用后旧、缺失、null 批次的全部写入口被拒绝 1ms
+     × C07 总线明确内存接受与落盘失败，重启不伪称保存成功 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/f01-task-write-contract.test.ts > F01 全写入口生命周期 > C01/C02/C03 completed 不被任何终态写入口改写
+AssertionError: expected { taskId: 't', type: 'x', …(16) } to deeply equal { taskId: 't', type: 'x', …(15) }
+
+- Expected
++ Received
+
+  {
+-   "aborted": false,
++   "aborted": true,
+    "agentId": null,
+    "attempt": 1,
+    "completedAt": 1790070207204,
+    "createdAt": 1790070207203,
++   "error": "canceled",
+    "meta": {},
+    "parentSessionId": null,
+    "parentSessionPath": null,
+    "parentSessionRef": null,
+    "persist": true,
+    "pluginId": null,
+    "progress": null,
+-   "result": "first",
+-   "status": "completed",
++   "result": "late",
++   "status": "canceled",
+    "taskId": "t",
+    "type": "x",
+    "updatedAt": 1790070207204,
+  }
+
+ ❯ tests/f01-task-write-contract.test.ts:21:30
+     19|       reg.update('t',{status:'running',result:'late',error:'late'});
+     20|       reg.abort('t'); reg.cancel('t');
+     21|       expect(reg.query('t')).toEqual(before); expect(abort).toHaveBeen…
+       |                              ^
+     22|       reg.update('t', {meta:{label:'shown'}});
+     23|       expect(reg.query('t').meta.label).toBe('shown');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/f01-task-write-contract.test.ts > F01 全写入口生命周期 > C01/C02/C03 failed 不被任何终态写入口改写
+AssertionError: expected { taskId: 't', type: 'x', …(16) } to deeply equal { taskId: 't', type: 'x', …(15) }
+
+- Expected
++ Received
+
+  {
+-   "aborted": false,
++   "aborted": true,
+    "agentId": null,
+    "attempt": 1,
+    "completedAt": 1790070207207,
+    "createdAt": 1790070207207,
+-   "error": "first",
++   "error": "canceled",
+    "meta": {},
+    "parentSessionId": null,
+    "parentSessionPath": null,
+    "parentSessionRef": null,
+    "persist": true,
+    "pluginId": null,
+    "progress": null,
+-   "status": "failed",
++   "result": "late",
++   "status": "canceled",
+    "taskId": "t",
+    "type": "x",
+    "updatedAt": 1790070207207,
+  }
+
+ ❯ tests/f01-task-write-contract.test.ts:21:30
+     19|       reg.update('t',{status:'running',result:'late',error:'late'});
+     20|       reg.abort('t'); reg.cancel('t');
+     21|       expect(reg.query('t')).toEqual(before); expect(abort).toHaveBeen…
+       |                              ^
+     22|       reg.update('t', {meta:{label:'shown'}});
+     23|       expect(reg.query('t').meta.label).toBe('shown');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/f01-task-write-contract.test.ts > F01 全写入口生命周期 > C01/C02/C03 aborted 不被任何终态写入口改写
+AssertionError: expected { taskId: 't', type: 'x', …(16) } to deeply equal { taskId: 't', type: 'x', …(15) }
+
+- Expected
++ Received
+
+@@ -2,18 +2,19 @@
+    "aborted": true,
+    "agentId": null,
+    "attempt": 1,
+    "completedAt": 1790070207208,
+    "createdAt": 1790070207208,
+-   "error": "aborted",
++   "error": "canceled",
+    "meta": {},
+    "parentSessionId": null,
+    "parentSessionPath": null,
+    "parentSessionRef": null,
+    "persist": true,
+    "pluginId": null,
+    "progress": null,
+-   "status": "aborted",
++   "result": "late",
++   "status": "canceled",
+    "taskId": "t",
+    "type": "x",
+    "updatedAt": 1790070207208,
+  }
+
+ ❯ tests/f01-task-write-contract.test.ts:21:30
+     19|       reg.update('t',{status:'running',result:'late',error:'late'});
+     20|       reg.abort('t'); reg.cancel('t');
+     21|       expect(reg.query('t')).toEqual(before); expect(abort).toHaveBeen…
+       |                              ^
+     22|       reg.update('t', {meta:{label:'shown'}});
+     23|       expect(reg.query('t').meta.label).toBe('shown');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/f01-task-write-contract.test.ts > F01 全写入口生命周期 > C01/C02/C03 canceled 不被任何终态写入口改写
+AssertionError: expected { taskId: 't', type: 'x', …(16) } to deeply equal { taskId: 't', type: 'x', …(15) }
+
+- Expected
++ Received
+
+@@ -10,10 +10,11 @@
+    "parentSessionPath": null,
+    "parentSessionRef": null,
+    "persist": true,
+    "pluginId": null,
+    "progress": null,
++   "result": "late",
+    "status": "canceled",
+    "taskId": "t",
+    "type": "x",
+    "updatedAt": 1790070207209,
+  }
+
+ ❯ tests/f01-task-write-contract.test.ts:21:30
+     19|       reg.update('t',{status:'running',result:'late',error:'late'});
+     20|       reg.abort('t'); reg.cancel('t');
+     21|       expect(reg.query('t')).toEqual(before); expect(abort).toHaveBeen…
+       |                              ^
+     22|       reg.update('t', {meta:{label:'shown'}});
+     23|       expect(reg.query('t').meta.label).toBe('shown');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/f01-task-write-contract.test.ts > F01 全写入口生命周期 > C04 复用后旧、缺失、null 批次的全部写入口被拒绝
+AssertionError: expected { taskId: 't', type: 'x', …(15) } to match object { status: 'running', attempt: 2 }
+(15 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "attempt": 2,
+-   "status": "running",
++   "status": "canceled",
+  }
+
+ ❯ tests/f01-task-write-contract.test.ts:33:30
+     31|       reg.update('t',{status:'failed'},options); reg.complete('t','lat…
+     32|       reg.abort('t','late',options); reg.cancel('t','late',options);
+     33|       expect(reg.query('t')).toMatchObject({status:'running',attempt:2…
+       |                              ^
+     34|     }
+     35|     expect(reg.complete('t','fresh',{expectedAttempt:2})).toMatchObjec…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  tests/f01-task-write-contract.test.ts > F01 全写入口生命周期 > C07 总线明确内存接受与落盘失败，重启不伪称保存成功
+AssertionError: expected { ok: true, …(1) } to match object { ok: true, persistence: { …(2) } }
+(16 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "ok": true,
+-   "persistence": {
+-     "durable": false,
+-     "status": "failed",
+-   },
+  }
+
+ ❯ tests/f01-task-write-contract.test.ts:45:23
+     43|       registerTaskRegistryBusHandlers(bus,reg);
+     44|       const receipt=handlers.get('task:register')({taskId:'t',type:'x'…
+     45|       expect(receipt).toMatchObject({ok:true,persistence:{durable:fals…
+       |                       ^
+     46|       expect(receipt.persistence.error).toBeTruthy();
+     47|       expect(new TaskRegistry({persistencePath:path.join(blocked,'task…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed (6)
+   Start at  17:43:27
+   Duration  175ms (transform 54ms, setup 18ms, import 45ms, tests 38ms, environment 0ms)
+

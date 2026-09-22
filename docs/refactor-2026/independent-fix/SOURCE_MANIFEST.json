@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-22T11:31:08.501Z",
-  "head": "b0e9118427e16206dcd25ecfb566d766ed476727",
-  "tree": "b43a2a1528c5d8f91884aae1e57ae5bd92788b76",
+  "generated_at": "2026-09-22T13:31:38.265Z",
+  "head": "8d55046d5646a008f71f57de745b3564e94a5f21",
+  "tree": "519fab23eacce8417b6504fd6ffec07e6abb7564",
   "dirty": true,
-  "verification_snapshot": "artifacts/refactor-2026/independent-fix/main/engineering-full-tests-delivery.source.json",
-  "verification_source_digest": "0358696d350a05785af9c7d55395b22e39874aeea1124a7fbc8e07c5bce71d45",
+  "verification_snapshot": "artifacts/refactor-2026/independent-fix/main/engineering-full-tests-recheck.source.json",
+  "verification_source_digest": "4e0d80b30c889c0c20f22441f44a7f0a3c0cd67773d89ac58850c80960d91a1b",
   "environment": {
     "node": "v24.16.0",
     "platform": "darwin",
@@ -15,24 +15,24 @@
   "scope": "与最终全量相同的生产/测试/构建/CI精确字节，另纳入P05反例；文档与原始证据由EVIDENCE_SHA256覆盖。未提交修复不等于HEAD。",
   "files": [
     {
-      "path": ".github/assets/banner.jpg",
-      "sha256": "a5f5f71e1a2c151a417323f05ad114cff8a067dd45b6d2c81e1f923358d8ec02"
-    },
-    {
-      "path": ".github/assets/Lingxi-280.png",
-      "sha256": "23e14edb8e795120fce8cd9ad3cd20662b9d4e17943b9174085b5546bf52bb8e"
-    },
-    {
-      "path": ".github/assets/screenshot-main.jpg",
-      "sha256": "ddbdd327bd6a3f632f2f176de03c3440b5d25e07bb0b141bb20c3da020020615"
-    },
-    {
       "path": ".github/ISSUE_TEMPLATE/bug_report.md",
       "sha256": "df16539ba51c8e6dd596086cce031b491189bbabd2350d98580c3abb220dd7cf"
     },
     {
       "path": ".github/ISSUE_TEMPLATE/feature_request.md",
       "sha256": "e0502b6da26108f82493d0fd78b63c3c239d95d31448d47a040981a155527402"
+    },
+    {
+      "path": ".github/assets/Lingxi-280.png",
+      "sha256": "23e14edb8e795120fce8cd9ad3cd20662b9d4e17943b9174085b5546bf52bb8e"
+    },
+    {
+      "path": ".github/assets/banner.jpg",
+      "sha256": "a5f5f71e1a2c151a417323f05ad114cff8a067dd45b6d2c81e1f923358d8ec02"
+    },
+    {
+      "path": ".github/assets/screenshot-main.jpg",
+      "sha256": "ddbdd327bd6a3f632f2f176de03c3440b5d25e07bb0b141bb20c3da020020615"
     },
     {
       "path": ".github/workflows/build.yml",
@@ -583,6 +583,10 @@
       "sha256": "9f525eaacea92d6a168a34ccf82d22e3e4a8d71592087002bba0b9b34a04c4ed"
     },
     {
+      "path": "core/provider-compat/README.md",
+      "sha256": "2c005247cb18c9cd85d1822a4826ac675d7eac98f96c5216625b67d296b4d46f"
+    },
+    {
       "path": "core/provider-compat/agnes.ts",
       "sha256": "3d135d04f303fb7b316b99a2ca228c3617883d649668ee745528842e2784976f"
     },
@@ -649,10 +653,6 @@
     {
       "path": "core/provider-compat/qwen.ts",
       "sha256": "ce3240bcb4ba4d0c5b0101559117386de0b1ff4adb375a9cdb79d2845b4b92ac"
-    },
-    {
-      "path": "core/provider-compat/README.md",
-      "sha256": "2c005247cb18c9cd85d1822a4826ac675d7eac98f96c5216625b67d296b4d46f"
     },
     {
       "path": "core/provider-compat/reasoning-content-replay.ts",
@@ -1115,6 +1115,18 @@
       "sha256": "5771ec6b3b80e9f17d692fb265da1e328e83f875865edc6200dff04a34f141a9"
     },
     {
+      "path": "desktop/src/assets/Kong.png",
+      "sha256": "6a58d038fd4d3450d699f734833575f60ee4b422039ea90001f02958daa0cf95"
+    },
+    {
+      "path": "desktop/src/assets/Lingxi.png",
+      "sha256": "adca5a4c656c90eecd7d8caad722cba36aff314617fc2ba3f37ee0e8e3ad0f13"
+    },
+    {
+      "path": "desktop/src/assets/Ming.png",
+      "sha256": "685b54b7027e1a7c0df855d5c7d08f644ec77888e9d8acaa3b1393cd690edfa9"
+    },
+    {
       "path": "desktop/src/assets/character-cards/yuan-butter-card-back.png",
       "sha256": "ff18a0a7e75f70a36ee33bc9423365f01b2e22584ec5674843f0d8836a59be2b"
     },
@@ -1257,18 +1269,6 @@
     {
       "path": "desktop/src/assets/kong-banner.jpg",
       "sha256": "ca4b5ec8ecbaabe0b1b761c18e5002b5b40d977690d169973f681fe715293bda"
-    },
-    {
-      "path": "desktop/src/assets/Kong.png",
-      "sha256": "6a58d038fd4d3450d699f734833575f60ee4b422039ea90001f02958daa0cf95"
-    },
-    {
-      "path": "desktop/src/assets/Lingxi.png",
-      "sha256": "adca5a4c656c90eecd7d8caad722cba36aff314617fc2ba3f37ee0e8e3ad0f13"
-    },
-    {
-      "path": "desktop/src/assets/Ming.png",
-      "sha256": "685b54b7027e1a7c0df855d5c7d08f644ec77888e9d8acaa3b1393cd690edfa9"
     },
     {
       "path": "desktop/src/assets/screenshot-previews/dark-desktop.png",
@@ -1447,6 +1447,14 @@
       "sha256": "2404dc093fcdc157362f48e40f753ef81f1ae6e9a61975913ec6971cc692e272"
     },
     {
+      "path": "desktop/src/react/App.tsx",
+      "sha256": "21d5e17232a23f9284a84aef1814d00b00f4cbbbe5c20e390dd3f8aefcf09522"
+    },
+    {
+      "path": "desktop/src/react/MainContent.tsx",
+      "sha256": "d2f94e1d18a44f388ca650a889cd6891791a502c348e18203cc9942c69221e30"
+    },
+    {
       "path": "desktop/src/react/__tests__/app-init.test.ts",
       "sha256": "67cf317ab41aea715fcbb317a72bb385756d2e1979b096fcf8c629b02c5f4c94"
     },
@@ -1559,14 +1567,6 @@
       "sha256": "09db2ef3738dd75708a47288a951c2d1b88064c102e2d2aec3aaee14cac99359"
     },
     {
-      "path": "desktop/src/react/__tests__/components/ask-user-prompt.test.tsx",
-      "sha256": "e861b2ddfde1bb6fcafdf00f2c852f03d64293bb6c2480c7224bdc73fef61b1a"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/ask-user-schema.test.ts",
-      "sha256": "205e34c474018966cb5269333b88f1ee8856bbc2bb4cfbbcb155f7c54b5fd591"
-    },
-    {
       "path": "desktop/src/react/__tests__/components/AssistantMessage.automation-suggestion.test.tsx",
       "sha256": "3aea70b4d3448a58a161e2bab9784c195d6d7fc09af293be4e961159bd5ceeba"
     },
@@ -1591,16 +1591,16 @@
       "sha256": "53d5b6b1b1777272f1e72777e29e3d13dc448c462b899bb1ec0a1979af6733f5"
     },
     {
+      "path": "desktop/src/react/__tests__/components/AutoUpdateStatus.test.tsx",
+      "sha256": "38ef45cfed964b9f086c4d30b85cb2f8d43f00b0bede524469c35913653d38e1"
+    },
+    {
       "path": "desktop/src/react/__tests__/components/AutolearnLessonCard.test.tsx",
       "sha256": "26ad652947f8a3577cbe9323f9e0cefd0900f97e1efe4a4a28c221311ae02b0e"
     },
     {
       "path": "desktop/src/react/__tests__/components/AutomationPanel.test.tsx",
       "sha256": "d6310df5fe2c69465c2ed8076c1930726ce8df0bc3cd90f1abb428b89056ce66"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/AutoUpdateStatus.test.tsx",
-      "sha256": "38ef45cfed964b9f086c4d30b85cb2f8d43f00b0bede524469c35913653d38e1"
     },
     {
       "path": "desktop/src/react/__tests__/components/BridgeChatTranscript.continuous-scroll.test.tsx",
@@ -1625,34 +1625,6 @@
     {
       "path": "desktop/src/react/__tests__/components/ChannelWarningModal.test.tsx",
       "sha256": "bcf26eb70a7f89d19b80562607504ec24942c62720113392cfe82e5e8b039c96"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/chat-timeline-anchors.test.ts",
-      "sha256": "d1e9581e35a6e0bacfe9b2ed5c6ab364b95868a7ecd68972d5bdf5be2df55adb"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/chat/block-renderers.test.tsx",
-      "sha256": "d9e039af1c592ece90d571159bd6cbd6cfd62d539bdeb062f13095d981a67661"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/chat/ChatFindBar.test.tsx",
-      "sha256": "f014657e4729ee6ac4278e4ef601c588fde7d8c469b94d626a5255f3b9e03d8b"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/chat/ChatMessageSurface.locate.test.tsx",
-      "sha256": "d6b22ce1397b8d8accefdd59ed44e09ab85103baef59210cb24571c08795dd51"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/chat/ChatMessageSurface.typing-indicator.test.tsx",
-      "sha256": "c8df4b327ce5b39b8ca7ff454de3898a86ed2b58aa8320ebda67962504d4ef50"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/chat/locate-step.test.ts",
-      "sha256": "7d04ae9acc27e02ad7e20693cadae4e1581d1b6d2e270e4b26d32d890e6d4200"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/chat/SessionRollback.test.tsx",
-      "sha256": "abb0e7f1af0e1f1bbeccf1d0a84b3a6137a077d6f25bbef6f58d7686d94b2185"
     },
     {
       "path": "desktop/src/react/__tests__/components/ChatArea.continuous-scroll.test.tsx",
@@ -1699,40 +1671,12 @@
       "sha256": "31efd1fe97cc395ef2607bac591709e446fa273bcaadc7c3d90a3566701c21db"
     },
     {
-      "path": "desktop/src/react/__tests__/components/composer-send.transaction.test.ts",
-      "sha256": "21535916b065e9051c2cac16652f7939956b95ff99bd4c4845706aabb5551d88"
-    },
-    {
       "path": "desktop/src/react/__tests__/components/ComposerToolbar.test.tsx",
       "sha256": "b7e9be2e06b8dd34e97ef3d848d77bee22fe3d4bc76d79b6d340b833013f45fc"
     },
     {
-      "path": "desktop/src/react/__tests__/components/computer-app-approval-prompt.test.ts",
-      "sha256": "aae1cc22e966ec836897912e05533c42a977c296cdcdc8a16752a09d0844411e"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/computer-use-overlay.test.tsx",
-      "sha256": "1bbc4e68b6b4e0ae89edf66d5fc155548c92ff5418d8481043a67a8f827a54f1"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/context-ring-visibility.test.ts",
-      "sha256": "45da9dc5eface89feadb02ff6594076ef89156bb475917dfc2e948c5c78f5f1a"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/context-ring.test.tsx",
-      "sha256": "f4a5b26eba2d973f83e5033741327a00c813ae3d304e2ce48d5dc6689d2be88b"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/conversation-map/conversation-map.test.ts",
-      "sha256": "0b6f92cc76efaf2742065f37a6b01c9640c7946fb08526b36c475717e404d535"
-    },
-    {
       "path": "desktop/src/react/__tests__/components/ConversationEventCard.layout.test.ts",
       "sha256": "01f6247fd4089113c2d89e860aaa719fb7401e90b3a92c87041ee699f9508f6f"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/desk-types.test.ts",
-      "sha256": "42210195bfc84eda459ed5b967ffffb9e3e476f2568a6da6f6a5e2e539c2fea0"
     },
     {
       "path": "desktop/src/react/__tests__/components/DeskCwdSkills.test.tsx",
@@ -1759,10 +1703,6 @@
       "sha256": "2de434f5298c1100225269c339be1f778be2429c39bff39ed173d52c4fc6a429"
     },
     {
-      "path": "desktop/src/react/__tests__/components/elicitation-schema.test.ts",
-      "sha256": "b43a77af42cfeb637f5d3bc58d174ee3595e55acdc9b941149bf1033aa2c29eb"
-    },
-    {
       "path": "desktop/src/react/__tests__/components/FileBadgeView.test.tsx",
       "sha256": "e209e7057529ab1673733c0d3e1c1ad24d5d9e07e9ff38357eea78c1cc1cb7ce"
     },
@@ -1777,10 +1717,6 @@
     {
       "path": "desktop/src/react/__tests__/components/FileOutputActions.screenshot-share.test.tsx",
       "sha256": "9b2342ad7ddf7358d99a30658b4e3b62e9eae7041935a8c26b2d0612f68bfdb2"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/floating-input-position.test.ts",
-      "sha256": "8e9f42e4056935d7f43c80ef84fa11084703c5ff502fbfce7cb744284d9c2785"
     },
     {
       "path": "desktop/src/react/__tests__/components/FloatingActions.cover-gallery.test.tsx",
@@ -1809,14 +1745,6 @@
     {
       "path": "desktop/src/react/__tests__/components/GitHistoryModal.test.tsx",
       "sha256": "c83d606ef3a32384f28f1ca3407dae2db1e306cdef5c891e3018172480851567"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/input-context-chip-layout.test.ts",
-      "sha256": "41d93a5df618d4df83ac98633d3322e2edeaeaaa67bb1a1f49dd826f657af168"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/input-editor-extensions.test.ts",
-      "sha256": "bd11317c9bd18074db1049b02f4b49d647a5c5fb6637a9faf887f7680ba02e8b"
     },
     {
       "path": "desktop/src/react/__tests__/components/InputArea.composer-layout.test.tsx",
@@ -1899,24 +1827,8 @@
       "sha256": "f0959d0809baf252aa0c6f6cb945b03516629c293a9b746046deef767ab5aacf"
     },
     {
-      "path": "desktop/src/react/__tests__/components/markdown-editor-selection-style.test.ts",
-      "sha256": "2701dcb2ad345b4b0512339374ff87dfaea25cdccabe88a38b10eeeb67f499f8"
-    },
-    {
       "path": "desktop/src/react/__tests__/components/MarkdownChrome.layout.test.tsx",
       "sha256": "32d83e737716329805f16b591802467d28907112a0b2f113bc5d28d35b025aa2"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/mcp-approval-actions.test.ts",
-      "sha256": "ef2a1f75b3b8f45c5e455ccfe9974fa7194e8de3e862916bbecc39df10f4bff5"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/mcp-elicitation-prompt.test.tsx",
-      "sha256": "10a66b5cb43383c6f0d89b2b1ed10dae6a3a0d94655a099350273d5753a67f59"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/mcp-tool-approval-prompt.test.tsx",
-      "sha256": "ac03677b9f03c7ea713c0d4571f8e057bfd65e49ab830c7e7690913a2d45a779"
     },
     {
       "path": "desktop/src/react/__tests__/components/MentionBadgeView.test.tsx",
@@ -1947,10 +1859,6 @@
       "sha256": "bd1047e7ed9c6572fb5e30b1eb161ca67711d984669a3a645e40822348da2205"
     },
     {
-      "path": "desktop/src/react/__tests__/components/plan-mode-button.test.tsx",
-      "sha256": "fc7ee1e7f519f38d0524e48660be96bca368d959bced0de7da5a27fd82475e4c"
-    },
-    {
       "path": "desktop/src/react/__tests__/components/PreviewEditor.block-handles.test.tsx",
       "sha256": "c78c6a40f3ac3f995f062d1e2af76ae199958531ce38812b20c7dcb23dcb36e8"
     },
@@ -1979,10 +1887,6 @@
       "sha256": "1ab7439fd119ec924240bb04d11b321ae1a1ea7ebeba45cdf6f3fb95abf93f71"
     },
     {
-      "path": "desktop/src/react/__tests__/components/process-fold.test.ts",
-      "sha256": "60fd12b56684092a0ac7e788203c3dd654a55bb40152410c1712e6290b2abfc2"
-    },
-    {
       "path": "desktop/src/react/__tests__/components/ProcessFoldBlock.test.tsx",
       "sha256": "ad64f5d10790409044ff246f35877b4e1e601c6b0d495e4c26628aee556eed70"
     },
@@ -2003,20 +1907,8 @@
       "sha256": "bd722d0f3c1c2c24f4e3a6a0f77fd31b5c3ce96f2ab40e363dcfc1173b4672e5"
     },
     {
-      "path": "desktop/src/react/__tests__/components/selection-toolbar-layout.test.ts",
-      "sha256": "bb9dc0eb21116a2d919b6ce25d3e6f98c3dc8abd455bf01c7960694c4116bc8b"
-    },
-    {
       "path": "desktop/src/react/__tests__/components/SelectionQuoteActionSurface.test.tsx",
       "sha256": "ae1f41ea13dcdd3a51668354c449064df2e15db2b29e94b122b06108b534fd11"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/session-file-expired.test.tsx",
-      "sha256": "5d7f8eac8b18636904a68b9ab384cc0c342c2f5de8908ee1714a9271a1af69df"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/session-sections.test.ts",
-      "sha256": "41400f59ac12be9cf0a90bb99e83bcb02db85a01e992226fe0ee1029b314b8e2"
     },
     {
       "path": "desktop/src/react/__tests__/components/SessionCollabDraftCard.test.tsx",
@@ -2043,56 +1935,16 @@
       "sha256": "558557695bb47777a4bbeda6afa1af91664341344f60655ecf162c640f37d5cb"
     },
     {
-      "path": "desktop/src/react/__tests__/components/shared/MediaViewer/ImageStage.test.tsx",
-      "sha256": "6cd7dbe05c90fbe1cdf2a68e652166d8f808b006662829430752665157ca64ce"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/shared/MediaViewer/media-source.test.ts",
-      "sha256": "963347bb602094bd4c63401babf0f13432c2ec1d451a14bc916a1a64442629b0"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/shared/MediaViewer/MediaViewer.test.tsx",
-      "sha256": "1e631dde0a38a4e053dc9bbb40d1255b3b394c5382564fe8d6975181f971b2ca"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/shared/MediaViewer/use-media-transform.test.ts",
-      "sha256": "a462cdebcd7b64d5791f69bcd304145354c75fbac8ccc94bfce1414e44456d4b"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/shared/MediaViewer/VideoStage.test.tsx",
-      "sha256": "820cb05f7b5f762fd4e98c0e120befffc5887ddd7aa70ce6c2ff0e1c976b1d61"
+      "path": "desktop/src/react/__tests__/components/SideChatPanel.test.tsx",
+      "sha256": "832cf27f24cf11a61394f66013bf186b72101b2790c10cb02829f6a677ccd16e"
     },
     {
       "path": "desktop/src/react/__tests__/components/SidebarNoticeSlot.test.tsx",
       "sha256": "df17fb94a6589f90d6b99a10974b920ff1d3f025c2b0afda6b28b02fc7c40c63"
     },
     {
-      "path": "desktop/src/react/__tests__/components/SideChatPanel.test.tsx",
-      "sha256": "832cf27f24cf11a61394f66013bf186b72101b2790c10cb02829f6a677ccd16e"
-    },
-    {
       "path": "desktop/src/react/__tests__/components/SkillsPanel.test.tsx",
       "sha256": "9f5abb9e4998596a1de029faa1643f6051106e8c81c12cacd0cadc441481d12b"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/slash-apply-completion.test.ts",
-      "sha256": "8d0d2a7e9f1ba7c079267bf269af18d877a6b92cfed9ff3ad1f74aab81844ffb"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/slash-commands-compact.test.ts",
-      "sha256": "c2d9325ea9f5ca956cabf218a966efcd86d12ec499b7bd3e5461847b0fb5f670"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/slash-commands-diary.test.ts",
-      "sha256": "ccb955fc679b75829fa295fd60081daeff4089d1536e7f613fef9c1f6d1fd7b3"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/slash-commands-ws.test.ts",
-      "sha256": "b3ac9745dcf2c55b1d6dd0a7752ed7e0c8b57b793adc1b552bdeeb14d1d34925"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/slash-submit-selection.test.ts",
-      "sha256": "e10a7bd77d1c3c329cc6a48cdffcd17b9fe8c6ded14560108b9ec49f915c34b4"
     },
     {
       "path": "desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx",
@@ -2103,24 +1955,12 @@
       "sha256": "815f8a5aa45841eda4dddfe8b4562390ae0b5237bd2e3a95f1125c42ecc89034"
     },
     {
-      "path": "desktop/src/react/__tests__/components/subagent-preview-interaction.test.tsx",
-      "sha256": "6b428b156bb8b5b6fd68347058be863d313d5c5233088ebd6ffaa070ff8345ed"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/subagent-preview-session-binding.test.tsx",
-      "sha256": "4021bc28797d6bec1e9114448a93a910437af134051586fa58511956306aacc7"
-    },
-    {
       "path": "desktop/src/react/__tests__/components/TerminalCard.test.tsx",
       "sha256": "64db446af3d0e26d96cfe69e31e64b9f2b39ea96a24beb042981e9ee6e118476"
     },
     {
       "path": "desktop/src/react/__tests__/components/TerminalPreview.test.tsx",
       "sha256": "e0fba89131ed64d0ab581796952748da92fc5d24eb606b2eaacb38d750a3d708"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/thinking-level-button.test.tsx",
-      "sha256": "47294441b4197f747d1cd8f7a36aca8f5093444234cf2ab73b4a1afe638a5278"
     },
     {
       "path": "desktop/src/react/__tests__/components/ThinkingBlock.test.tsx",
@@ -2137,10 +1977,6 @@
     {
       "path": "desktop/src/react/__tests__/components/Tooltip.test.tsx",
       "sha256": "43d80eca79dd9176c091317f9174cf285c2e0fda301b2c5ce12afc4a1d9b3d03"
-    },
-    {
-      "path": "desktop/src/react/__tests__/components/use-session-cache-rate.test.ts",
-      "sha256": "9011ad3a41707c1972d8bbb62772ff43a827efdf7c330f202af0d463547ea4a0"
     },
     {
       "path": "desktop/src/react/__tests__/components/UserMessageActions.test.tsx",
@@ -2165,6 +2001,178 @@
     {
       "path": "desktop/src/react/__tests__/components/WorkspaceSwitcher.test.tsx",
       "sha256": "eeaf9542b4f0bd1de562f6917537cf9a3387f90ba78ec23778b436a54a211aae"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/ask-user-prompt.test.tsx",
+      "sha256": "e861b2ddfde1bb6fcafdf00f2c852f03d64293bb6c2480c7224bdc73fef61b1a"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/ask-user-schema.test.ts",
+      "sha256": "205e34c474018966cb5269333b88f1ee8856bbc2bb4cfbbcb155f7c54b5fd591"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/chat-timeline-anchors.test.ts",
+      "sha256": "d1e9581e35a6e0bacfe9b2ed5c6ab364b95868a7ecd68972d5bdf5be2df55adb"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/chat/ChatFindBar.test.tsx",
+      "sha256": "f014657e4729ee6ac4278e4ef601c588fde7d8c469b94d626a5255f3b9e03d8b"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/chat/ChatMessageSurface.locate.test.tsx",
+      "sha256": "d6b22ce1397b8d8accefdd59ed44e09ab85103baef59210cb24571c08795dd51"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/chat/ChatMessageSurface.typing-indicator.test.tsx",
+      "sha256": "c8df4b327ce5b39b8ca7ff454de3898a86ed2b58aa8320ebda67962504d4ef50"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/chat/SessionRollback.test.tsx",
+      "sha256": "abb0e7f1af0e1f1bbeccf1d0a84b3a6137a077d6f25bbef6f58d7686d94b2185"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/chat/block-renderers.test.tsx",
+      "sha256": "d9e039af1c592ece90d571159bd6cbd6cfd62d539bdeb062f13095d981a67661"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/chat/locate-step.test.ts",
+      "sha256": "7d04ae9acc27e02ad7e20693cadae4e1581d1b6d2e270e4b26d32d890e6d4200"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/composer-send.transaction.test.ts",
+      "sha256": "21535916b065e9051c2cac16652f7939956b95ff99bd4c4845706aabb5551d88"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/computer-app-approval-prompt.test.ts",
+      "sha256": "aae1cc22e966ec836897912e05533c42a977c296cdcdc8a16752a09d0844411e"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/computer-use-overlay.test.tsx",
+      "sha256": "1bbc4e68b6b4e0ae89edf66d5fc155548c92ff5418d8481043a67a8f827a54f1"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/context-ring-visibility.test.ts",
+      "sha256": "45da9dc5eface89feadb02ff6594076ef89156bb475917dfc2e948c5c78f5f1a"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/context-ring.test.tsx",
+      "sha256": "f4a5b26eba2d973f83e5033741327a00c813ae3d304e2ce48d5dc6689d2be88b"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/conversation-map/conversation-map.test.ts",
+      "sha256": "0b6f92cc76efaf2742065f37a6b01c9640c7946fb08526b36c475717e404d535"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/desk-types.test.ts",
+      "sha256": "42210195bfc84eda459ed5b967ffffb9e3e476f2568a6da6f6a5e2e539c2fea0"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/elicitation-schema.test.ts",
+      "sha256": "b43a77af42cfeb637f5d3bc58d174ee3595e55acdc9b941149bf1033aa2c29eb"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/floating-input-position.test.ts",
+      "sha256": "8e9f42e4056935d7f43c80ef84fa11084703c5ff502fbfce7cb744284d9c2785"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/input-context-chip-layout.test.ts",
+      "sha256": "41d93a5df618d4df83ac98633d3322e2edeaeaaa67bb1a1f49dd826f657af168"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/input-editor-extensions.test.ts",
+      "sha256": "bd11317c9bd18074db1049b02f4b49d647a5c5fb6637a9faf887f7680ba02e8b"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/markdown-editor-selection-style.test.ts",
+      "sha256": "2701dcb2ad345b4b0512339374ff87dfaea25cdccabe88a38b10eeeb67f499f8"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/mcp-approval-actions.test.ts",
+      "sha256": "ef2a1f75b3b8f45c5e455ccfe9974fa7194e8de3e862916bbecc39df10f4bff5"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/mcp-elicitation-prompt.test.tsx",
+      "sha256": "10a66b5cb43383c6f0d89b2b1ed10dae6a3a0d94655a099350273d5753a67f59"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/mcp-tool-approval-prompt.test.tsx",
+      "sha256": "ac03677b9f03c7ea713c0d4571f8e057bfd65e49ab830c7e7690913a2d45a779"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/plan-mode-button.test.tsx",
+      "sha256": "fc7ee1e7f519f38d0524e48660be96bca368d959bced0de7da5a27fd82475e4c"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/process-fold.test.ts",
+      "sha256": "60fd12b56684092a0ac7e788203c3dd654a55bb40152410c1712e6290b2abfc2"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/selection-toolbar-layout.test.ts",
+      "sha256": "bb9dc0eb21116a2d919b6ce25d3e6f98c3dc8abd455bf01c7960694c4116bc8b"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/session-file-expired.test.tsx",
+      "sha256": "5d7f8eac8b18636904a68b9ab384cc0c342c2f5de8908ee1714a9271a1af69df"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/session-sections.test.ts",
+      "sha256": "41400f59ac12be9cf0a90bb99e83bcb02db85a01e992226fe0ee1029b314b8e2"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/shared/MediaViewer/ImageStage.test.tsx",
+      "sha256": "6cd7dbe05c90fbe1cdf2a68e652166d8f808b006662829430752665157ca64ce"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/shared/MediaViewer/MediaViewer.test.tsx",
+      "sha256": "1e631dde0a38a4e053dc9bbb40d1255b3b394c5382564fe8d6975181f971b2ca"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/shared/MediaViewer/VideoStage.test.tsx",
+      "sha256": "820cb05f7b5f762fd4e98c0e120befffc5887ddd7aa70ce6c2ff0e1c976b1d61"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/shared/MediaViewer/media-source.test.ts",
+      "sha256": "963347bb602094bd4c63401babf0f13432c2ec1d451a14bc916a1a64442629b0"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/shared/MediaViewer/use-media-transform.test.ts",
+      "sha256": "a462cdebcd7b64d5791f69bcd304145354c75fbac8ccc94bfce1414e44456d4b"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/slash-apply-completion.test.ts",
+      "sha256": "8d0d2a7e9f1ba7c079267bf269af18d877a6b92cfed9ff3ad1f74aab81844ffb"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/slash-commands-compact.test.ts",
+      "sha256": "c2d9325ea9f5ca956cabf218a966efcd86d12ec499b7bd3e5461847b0fb5f670"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/slash-commands-diary.test.ts",
+      "sha256": "ccb955fc679b75829fa295fd60081daeff4089d1536e7f613fef9c1f6d1fd7b3"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/slash-commands-ws.test.ts",
+      "sha256": "b3ac9745dcf2c55b1d6dd0a7752ed7e0c8b57b793adc1b552bdeeb14d1d34925"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/slash-submit-selection.test.ts",
+      "sha256": "e10a7bd77d1c3c329cc6a48cdffcd17b9fe8c6ded14560108b9ec49f915c34b4"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/subagent-preview-interaction.test.tsx",
+      "sha256": "6b428b156bb8b5b6fd68347058be863d313d5c5233088ebd6ffaa070ff8345ed"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/subagent-preview-session-binding.test.tsx",
+      "sha256": "4021bc28797d6bec1e9114448a93a910437af134051586fa58511956306aacc7"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/thinking-level-button.test.tsx",
+      "sha256": "47294441b4197f747d1cd8f7a36aca8f5093444234cf2ab73b4a1afe638a5278"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/use-session-cache-rate.test.ts",
+      "sha256": "9011ad3a41707c1972d8bbb62772ff43a827efdf7c330f202af0d463547ea4a0"
     },
     {
       "path": "desktop/src/react/__tests__/editor/cover-field.test.ts",
@@ -2271,16 +2279,16 @@
       "sha256": "aa998f784fa5c5442d91800c413458ae32f8d45ca87e12dd964af719cba9bf5e"
     },
     {
-      "path": "desktop/src/react/__tests__/mobile/mobile-platform.test.ts",
-      "sha256": "b17f9d3bcdb0222c381c54e35d399c3e046ef20619a717ce25ff7e21325ea433"
-    },
-    {
       "path": "desktop/src/react/__tests__/mobile/MobileApp.test.tsx",
       "sha256": "a8ac9a7c37dbcf60107aa5f4e566b002a1ac043b800e08fa389abf519831765d"
     },
     {
       "path": "desktop/src/react/__tests__/mobile/MobileEntrySplit.test.ts",
       "sha256": "9cd1aa2f0bc6bc597f405243bd937a331249440828d9edc13aacf41318a9dfc3"
+    },
+    {
+      "path": "desktop/src/react/__tests__/mobile/mobile-platform.test.ts",
+      "sha256": "b17f9d3bcdb0222c381c54e35d399c3e046ef20619a717ce25ff7e21325ea433"
     },
     {
       "path": "desktop/src/react/__tests__/modules/platform-web.test.ts",
@@ -2344,7 +2352,7 @@
     },
     {
       "path": "desktop/src/react/__tests__/services/stream-resume.test.ts",
-      "sha256": "1c28a6f708cc38d447a35830928ee1d8141d6665c7f87eb115cc00665fbc640d"
+      "sha256": "4613f9e3f0b8d85c084abaf1fe6946ba1d08c908210505d04ec16bb5f77310e3"
     },
     {
       "path": "desktop/src/react/__tests__/services/studio-access.test.ts",
@@ -2395,10 +2403,6 @@
       "sha256": "9a99e2497c1d54b085cd3d0abd90ffe8e864f82ff97bef1918b608b95e2af2c6"
     },
     {
-      "path": "desktop/src/react/__tests__/settings/actions.test.ts",
-      "sha256": "f31682b6b116a527ca1b19f56903434ca890c0e94903d9bf23e493d6eba26675"
-    },
-    {
       "path": "desktop/src/react/__tests__/settings/AgentCardStack.test.ts",
       "sha256": "02447e86ac4c7c66d6939b201a74838ab2d0dd9fbd2aba788a49b6526cc1558b"
     },
@@ -2413,14 +2417,6 @@
     {
       "path": "desktop/src/react/__tests__/settings/AgentTab.test.tsx",
       "sha256": "c0fdcc69356e5d66981017d3d698dd5a3cc7e285116a074d1e4090242cdb9b99"
-    },
-    {
-      "path": "desktop/src/react/__tests__/settings/api-key-credentials.test.ts",
-      "sha256": "6972d21c816a7d57da1bdf697990e46c9581639ef8a1c52784b89a7d1a5bbdc0"
-    },
-    {
-      "path": "desktop/src/react/__tests__/settings/api.test.ts",
-      "sha256": "aeadaf14aed3c42c285b252e65e8d7b2771fd52f097b80ab323db72783e73b8b"
     },
     {
       "path": "desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx",
@@ -2439,16 +2435,12 @@
       "sha256": "35f45680fcb106e54b6db4b956147a19c7b9e39adf4a735c638bc6cd3fd78b0b"
     },
     {
-      "path": "desktop/src/react/__tests__/settings/helpers.test.ts",
-      "sha256": "af5ab51bb0cfd6fe9c9af7e36b301905bb1d3db30be4872db7a1cd5f413a95c2"
+      "path": "desktop/src/react/__tests__/settings/MeTab.test.tsx",
+      "sha256": "d443e6fe0e9e9317990c1bb4445198da73a3f50f6071dccde58eb54c06bf60d5"
     },
     {
       "path": "desktop/src/react/__tests__/settings/MemoryViewerLayout.test.ts",
       "sha256": "d86c5c5b9bea947f995c5f9d7ec27945ea40e5d04669625fc3ab0e98344547fe"
-    },
-    {
-      "path": "desktop/src/react/__tests__/settings/MeTab.test.tsx",
-      "sha256": "d443e6fe0e9e9317990c1bb4445198da73a3f50f6071dccde58eb54c06bf60d5"
     },
     {
       "path": "desktop/src/react/__tests__/settings/ModelWidget.test.tsx",
@@ -2457,6 +2449,66 @@
     {
       "path": "desktop/src/react/__tests__/settings/OAuthCredentials.test.tsx",
       "sha256": "72beb2f5350cc70b4139f371b70fc45af90579987ef8c07a39fb4e8ed590935a"
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx",
+      "sha256": "d50714fa8a347868466ed472e4772c65caf06bac21dc9ff8989b00a0a1ac9129"
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/SettingsContent.test.tsx",
+      "sha256": "b56fd7e789dfaec09944680a04b5ace8ff4b4fb5a9f59cbe878a2ee857d1ae50"
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/UsageTab.test.tsx",
+      "sha256": "4f0eaf249464b1795e994f1a7262d9efc5bd537af5bdb861b02b0cd6345c564c"
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/WorkTab.test.tsx",
+      "sha256": "0b7349bee3753662b72f5cb37cb81aa7ef4f6437041683af1797528154f0188d"
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/actions.test.ts",
+      "sha256": "f31682b6b116a527ca1b19f56903434ca890c0e94903d9bf23e493d6eba26675"
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/api-key-credentials.test.ts",
+      "sha256": "6972d21c816a7d57da1bdf697990e46c9581639ef8a1c52784b89a7d1a5bbdc0"
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/api.test.ts",
+      "sha256": "aeadaf14aed3c42c285b252e65e8d7b2771fd52f097b80ab323db72783e73b8b"
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/helpers.test.ts",
+      "sha256": "af5ab51bb0cfd6fe9c9af7e36b301905bb1d3db30be4872db7a1cd5f413a95c2"
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/observability/ObservabilityDateLine.test.tsx",
+      "sha256": "5563011986cc6fcf0642656a4f79dab632ace5aaf509c3c1384321f2e76c76fb"
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/observability/ObservabilityMetrics.test.tsx",
+      "sha256": "2e5ecfb9bc3a93d94c56a1184da2b6e7e87756e8cff9ada80b9091c220ddf7c4"
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/observability/ObservabilityPayloadCard.test.tsx",
+      "sha256": "1d50eba248198d7b8ffc5ab54a5088242bbd565d317e43533ae8a2306b979740"
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/observability/ObservabilityTraceForest.test.ts",
+      "sha256": "1a1146125d4df4fe4583c252c5021804e3f45a3606a654791c65b94c90489af2"
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/observability/PayloadPlainText.test.ts",
+      "sha256": "af64eb28a037a4a2845df100d5c1b151c08d88adec59b99313d324e9b65ef504"
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/observability/TraceConversationModel.test.ts",
+      "sha256": "a4fcc3bfdbfadcd0b88a607e1a408aad2fab3a13da2d50e6642674a72f05211a"
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/observability/TraceDetailOverlayRendering.test.tsx",
+      "sha256": "2ed27213d6c2fc4fc7e418269a866c4cb4b0cfbb53733afab1d547d54c9829c5"
     },
     {
       "path": "desktop/src/react/__tests__/settings/observability/model-observability-actions.test.ts",
@@ -2499,34 +2551,6 @@
       "sha256": "123c61eb543f8fa281dfd7d413011463f4abddbb8719e2225c1f29a2724941db"
     },
     {
-      "path": "desktop/src/react/__tests__/settings/observability/ObservabilityDateLine.test.tsx",
-      "sha256": "5563011986cc6fcf0642656a4f79dab632ace5aaf509c3c1384321f2e76c76fb"
-    },
-    {
-      "path": "desktop/src/react/__tests__/settings/observability/ObservabilityMetrics.test.tsx",
-      "sha256": "2e5ecfb9bc3a93d94c56a1184da2b6e7e87756e8cff9ada80b9091c220ddf7c4"
-    },
-    {
-      "path": "desktop/src/react/__tests__/settings/observability/ObservabilityPayloadCard.test.tsx",
-      "sha256": "1d50eba248198d7b8ffc5ab54a5088242bbd565d317e43533ae8a2306b979740"
-    },
-    {
-      "path": "desktop/src/react/__tests__/settings/observability/ObservabilityTraceForest.test.ts",
-      "sha256": "1a1146125d4df4fe4583c252c5021804e3f45a3606a654791c65b94c90489af2"
-    },
-    {
-      "path": "desktop/src/react/__tests__/settings/observability/PayloadPlainText.test.ts",
-      "sha256": "af64eb28a037a4a2845df100d5c1b151c08d88adec59b99313d324e9b65ef504"
-    },
-    {
-      "path": "desktop/src/react/__tests__/settings/observability/TraceConversationModel.test.ts",
-      "sha256": "a4fcc3bfdbfadcd0b88a607e1a408aad2fab3a13da2d50e6642674a72f05211a"
-    },
-    {
-      "path": "desktop/src/react/__tests__/settings/observability/TraceDetailOverlayRendering.test.tsx",
-      "sha256": "2ed27213d6c2fc4fc7e418269a866c4cb4b0cfbb53733afab1d547d54c9829c5"
-    },
-    {
       "path": "desktop/src/react/__tests__/settings/observability/use-observability-facets.test.tsx",
       "sha256": "bb0434430e7da7d5d904614ff61b209290264dc931584694ede8100b6cd4877d"
     },
@@ -2535,32 +2559,16 @@
       "sha256": "a779891600623b12421278ae84bf982a6fb111d32efef05fede9b22464ceb62d"
     },
     {
-      "path": "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx",
-      "sha256": "d50714fa8a347868466ed472e4772c65caf06bac21dc9ff8989b00a0a1ac9129"
-    },
-    {
       "path": "desktop/src/react/__tests__/settings/resource-state.test.ts",
       "sha256": "f43b01c6c47870d90cd272af5c48158da977566c2977b34ac9d64422e39722a4"
-    },
-    {
-      "path": "desktop/src/react/__tests__/settings/SettingsContent.test.tsx",
-      "sha256": "b56fd7e789dfaec09944680a04b5ace8ff4b4fb5a9f59cbe878a2ee857d1ae50"
     },
     {
       "path": "desktop/src/react/__tests__/settings/switch-agent-error-boundary.test.ts",
       "sha256": "36fa5261765ba5bdc7ea0d2da9bc271ea917ca48cbf3b8132bb970cd348b3878"
     },
     {
-      "path": "desktop/src/react/__tests__/settings/UsageTab.test.tsx",
-      "sha256": "4f0eaf249464b1795e994f1a7262d9efc5bd537af5bdb861b02b0cd6345c564c"
-    },
-    {
       "path": "desktop/src/react/__tests__/settings/useBridgeState.snapshot.test.tsx",
       "sha256": "819b942abc6b837a2dd6f3715c0dbbf134a33a246a6cbc4f4e07751d8055da3f"
-    },
-    {
-      "path": "desktop/src/react/__tests__/settings/WorkTab.test.tsx",
-      "sha256": "0b7349bee3753662b72f5cb37cb81aa7ef4f6437041683af1797528154f0188d"
     },
     {
       "path": "desktop/src/react/__tests__/shared/agent-avatar-path.test.ts",
@@ -2947,10 +2955,6 @@
       "sha256": "73ef50a5a07d4d6c8c69eafa0d9df8121bc63e140853305ebcd8fd5bf007c30d"
     },
     {
-      "path": "desktop/src/react/App.tsx",
-      "sha256": "21d5e17232a23f9284a84aef1814d00b00f4cbbbe5c20e390dd3f8aefcf09522"
-    },
-    {
       "path": "desktop/src/react/bootstrap.ts",
       "sha256": "b278cec7bd640a6ff6fe1e8085db0379992dd78a17fb027d4f8cf8d5fe75f05d"
     },
@@ -2965,6 +2969,154 @@
     {
       "path": "desktop/src/react/components/ActivityPanel.tsx",
       "sha256": "519283509999fe9f6fdf3f18643860ec59c0318720df89ed8d0f325ff9c6f877"
+    },
+    {
+      "path": "desktop/src/react/components/ArchivedSessionsModal.module.css",
+      "sha256": "a84fe76fca632e3ab2afa95ba53433fd40993ea94355de3b6981fc4ff8bee352"
+    },
+    {
+      "path": "desktop/src/react/components/ArchivedSessionsModal.tsx",
+      "sha256": "3266c3d442b8e4237a28ab770becd63913686e7e8300e03cbe33867ebb7971a0"
+    },
+    {
+      "path": "desktop/src/react/components/AutoUpdateStatus.module.css",
+      "sha256": "94237f54ee38979d045d7db18348a61b731d2c9861ce9710b7c928d2e68a9195"
+    },
+    {
+      "path": "desktop/src/react/components/AutoUpdateStatus.tsx",
+      "sha256": "913b3f40bceb45940213a3fb848ee025ea0a7b0c65fd376a007ca8f982862d6c"
+    },
+    {
+      "path": "desktop/src/react/components/AutomationPanel.tsx",
+      "sha256": "57ef516b5048ef1e106e7bd527ab6a3f684218ee65780ef2d779cdda3be2213a"
+    },
+    {
+      "path": "desktop/src/react/components/BridgePanel.tsx",
+      "sha256": "b3b92f858d9669ffe1ac1565985d23aea63c7f2e1af1894350e08e7a76d8f763"
+    },
+    {
+      "path": "desktop/src/react/components/BrowserCard.tsx",
+      "sha256": "79f504f542d903c3c7841ac73f809601c0e7c1d907bb1d7be71261c6d148b51c"
+    },
+    {
+      "path": "desktop/src/react/components/ChannelsPanel.tsx",
+      "sha256": "8caefc3d46992909d26714ebb0ebf3b69c7ebab436f572feab37b545247e0740"
+    },
+    {
+      "path": "desktop/src/react/components/ComputerUseOverlay.module.css",
+      "sha256": "1902c8674b2c28e8b2f5b23fbed4b264b0fb9a32240574c7eaafdfe35a237942"
+    },
+    {
+      "path": "desktop/src/react/components/ComputerUseOverlay.tsx",
+      "sha256": "c141319c67388822924f113ffe73cfbb173a7d06d47d8656938f967f3cbf7f53"
+    },
+    {
+      "path": "desktop/src/react/components/DeskSection.tsx",
+      "sha256": "daeaf7b4abd35fa1a18e15e238999963a0d123ef820f71ad248a4642303b701e"
+    },
+    {
+      "path": "desktop/src/react/components/ErrorBoundary.tsx",
+      "sha256": "7d237b9fceb5c31414658710eee06bc03b651bc4851c83985eed83bb562d8a32"
+    },
+    {
+      "path": "desktop/src/react/components/FloatSidebar.tsx",
+      "sha256": "a6e98789872b49413f4c82b8f7ed8cbdf9874837269184c882143a2bd9b881d9"
+    },
+    {
+      "path": "desktop/src/react/components/FloatingPanels.module.css",
+      "sha256": "81ac42df542c05105aa9b92cf463e618e67135f432bcd565ae48e8af3d3da36c"
+    },
+    {
+      "path": "desktop/src/react/components/InputArea.tsx",
+      "sha256": "6c3f1d67df5b683e556336f5740ad43436f065c1f612184b19b68f0c5d464c64"
+    },
+    {
+      "path": "desktop/src/react/components/InputContextMenu.tsx",
+      "sha256": "c54d8944ea2bdd5cd8d7f591b333e4410861b60adad086c06c2b9524ac37760b"
+    },
+    {
+      "path": "desktop/src/react/components/LeavesOverlay.tsx",
+      "sha256": "38b867b5e678af4177e9f05695730ab4c1a5a6cf09d31753a34086943a747224"
+    },
+    {
+      "path": "desktop/src/react/components/PostUpdateAnnouncement.tsx",
+      "sha256": "54187df644de1b5b68ca239956433366fb026199cd6da08cbff84c2c425a6902"
+    },
+    {
+      "path": "desktop/src/react/components/Preview.module.css",
+      "sha256": "b7dade7e9f8177c38cdf8664c3132c4f2cf33e32f71581ff6c4789637b1c49f7"
+    },
+    {
+      "path": "desktop/src/react/components/PreviewEditor.tsx",
+      "sha256": "f842c797447d268df692178165cc3a48c7da4268babdd94ff3408ebd6fbf6f4e"
+    },
+    {
+      "path": "desktop/src/react/components/PreviewPanel.tsx",
+      "sha256": "a182b044a7f864a0d1bd5b2f095b6a17c33a27ca55fe5e2b296c59bcb5735780"
+    },
+    {
+      "path": "desktop/src/react/components/RegionalErrorBoundary.module.css",
+      "sha256": "a78d520b0924955364191cb69bbe792a4a3818e9a9cc25e97eb50a588ee3d40e"
+    },
+    {
+      "path": "desktop/src/react/components/RegionalErrorBoundary.tsx",
+      "sha256": "ef09a881bcd39c1be42a0e1ed5d7d3e2698d67c79acb1fda04d35161d19acbb8"
+    },
+    {
+      "path": "desktop/src/react/components/SessionList.module.css",
+      "sha256": "8149d9e67a29432fa5ef36b61cd8a7ef2feff09247834d3e3135ece3de2fb001"
+    },
+    {
+      "path": "desktop/src/react/components/SessionList.tsx",
+      "sha256": "ecd6d63380125106381ac330a5620caad6c1e0c03f4baebc4a88ec09746f5520"
+    },
+    {
+      "path": "desktop/src/react/components/SettingsModalShell.module.css",
+      "sha256": "ee44a72adaf9e880f94c55691a9c627ce143f0fa4161dfc1e1971c60b57a8e0b"
+    },
+    {
+      "path": "desktop/src/react/components/SettingsModalShell.tsx",
+      "sha256": "4b466b2ea4d467314448afbf57243356c4aef22472d654dfbdc9670ffabdc05d"
+    },
+    {
+      "path": "desktop/src/react/components/SidebarLayout.tsx",
+      "sha256": "6facdf2d158567d70587eec7198b457be379cd5113f18c03b2e3deeeedc82b46"
+    },
+    {
+      "path": "desktop/src/react/components/SkillViewerOverlay.tsx",
+      "sha256": "fec97dfff521280b18593906a025723c9b9d1b803ab91d2d88bbfc19f038e9e8"
+    },
+    {
+      "path": "desktop/src/react/components/SkillsPanel.module.css",
+      "sha256": "552db8063feb08db56f7e186fa4163a6b51f43e364017f1a0e5cca6c21a61e49"
+    },
+    {
+      "path": "desktop/src/react/components/SkillsPanel.tsx",
+      "sha256": "13a631ddcec85ef6c67dbc3c7fbc0f6a788ad250ea233f9114d2d64bf68881ea"
+    },
+    {
+      "path": "desktop/src/react/components/StatusBar.module.css",
+      "sha256": "a93431ac371af3a1a258ae9b7c56c59c3f9e36e31aa86f2bb559f94b2940b4ce"
+    },
+    {
+      "path": "desktop/src/react/components/StatusBar.tsx",
+      "sha256": "555b95589fb177836b25bc8c8078f2163dd0c64047ff92ac1ba77a63987eca53"
+    },
+    {
+      "path": "desktop/src/react/components/ToastContainer.tsx",
+      "sha256": "0e88d475896f061f5b52fe1b702cad814a44f134ac573a6c392c0e80ebbf8dbe"
+    },
+    {
+      "path": "desktop/src/react/components/Welcome.module.css",
+      "sha256": "803653e1a6200a0c94cec201808a6550f1e540605ae887c516930999ef03f0de"
+    },
+    {
+      "path": "desktop/src/react/components/WelcomeScreen.tsx",
+      "sha256": "6d17266b64c5aec9eb0ea60c396e1e9ab1f9ef7400c401b7f4aa8b9a8bfa2186"
+    },
+    {
+      "path": "desktop/src/react/components/WindowControls.tsx",
+      "sha256": "8b39b01e3b154753e6b7b8019dfa766f8bde97cabaf0d3db1a4bd818acbccaa3"
     },
     {
       "path": "desktop/src/react/components/app/AppPages.tsx",
@@ -2995,36 +3147,8 @@
       "sha256": "21051638f9c05eed27971b5c3ae47e71bf70e160dd53ea10956607f6b64e4961"
     },
     {
-      "path": "desktop/src/react/components/ArchivedSessionsModal.module.css",
-      "sha256": "a84fe76fca632e3ab2afa95ba53433fd40993ea94355de3b6981fc4ff8bee352"
-    },
-    {
-      "path": "desktop/src/react/components/ArchivedSessionsModal.tsx",
-      "sha256": "3266c3d442b8e4237a28ab770becd63913686e7e8300e03cbe33867ebb7971a0"
-    },
-    {
-      "path": "desktop/src/react/components/automation/__tests__/AutomationCard.test.tsx",
-      "sha256": "b1627b34174604d24178f9b7fbaf8da50a2c79dab32e15d9d4f4f28db143285b"
-    },
-    {
-      "path": "desktop/src/react/components/automation/__tests__/schedule-draft.test.ts",
-      "sha256": "5e7a818edc5fda961d25492f27b1e765710d685a80d25b486a8e504320be9f14"
-    },
-    {
-      "path": "desktop/src/react/components/automation/__tests__/ScheduleEditor.test.tsx",
-      "sha256": "f0e5c6ea41152d479d9542e7cba4caa2c5879b4d07b103cce442fc7b1ff6d24e"
-    },
-    {
       "path": "desktop/src/react/components/automation/AgentTabScroller.tsx",
       "sha256": "e7803d6e01057b0c4a17230e0083e692ef1a3e54465518d7bbd6dd666271d5dc"
-    },
-    {
-      "path": "desktop/src/react/components/automation/automation-types.ts",
-      "sha256": "c34a720b13cca8665dd5423edcb5f29219d5b23e29f8efbc5ac3fb4c7ef9d33d"
-    },
-    {
-      "path": "desktop/src/react/components/automation/automation-utils.ts",
-      "sha256": "2c03c8c9c0e2699773e6d87cc285c043ea54fe88d8431bb6c8f3da61d0549bdd"
     },
     {
       "path": "desktop/src/react/components/automation/AutomationCard.tsx",
@@ -3035,32 +3159,32 @@
       "sha256": "c7a833ef4ca4f694f1a857280250b30a6e6453c8a4d48180e34ccbb51747f437"
     },
     {
-      "path": "desktop/src/react/components/automation/schedule-draft.ts",
-      "sha256": "05ae114c09b1f49e1256e687875a7da50fef8cb57541185dc8195d043ad00ad8"
-    },
-    {
       "path": "desktop/src/react/components/automation/ScheduleEditor.tsx",
       "sha256": "db4988c6410c1d845f80f8bf07dccc55e725aab6fed5db2873fce5062c1c771b"
     },
     {
-      "path": "desktop/src/react/components/AutomationPanel.tsx",
-      "sha256": "57ef516b5048ef1e106e7bd527ab6a3f684218ee65780ef2d779cdda3be2213a"
+      "path": "desktop/src/react/components/automation/__tests__/AutomationCard.test.tsx",
+      "sha256": "b1627b34174604d24178f9b7fbaf8da50a2c79dab32e15d9d4f4f28db143285b"
     },
     {
-      "path": "desktop/src/react/components/AutoUpdateStatus.module.css",
-      "sha256": "94237f54ee38979d045d7db18348a61b731d2c9861ce9710b7c928d2e68a9195"
+      "path": "desktop/src/react/components/automation/__tests__/ScheduleEditor.test.tsx",
+      "sha256": "f0e5c6ea41152d479d9542e7cba4caa2c5879b4d07b103cce442fc7b1ff6d24e"
     },
     {
-      "path": "desktop/src/react/components/AutoUpdateStatus.tsx",
-      "sha256": "913b3f40bceb45940213a3fb848ee025ea0a7b0c65fd376a007ca8f982862d6c"
+      "path": "desktop/src/react/components/automation/__tests__/schedule-draft.test.ts",
+      "sha256": "5e7a818edc5fda961d25492f27b1e765710d685a80d25b486a8e504320be9f14"
     },
     {
-      "path": "desktop/src/react/components/BridgePanel.tsx",
-      "sha256": "b3b92f858d9669ffe1ac1565985d23aea63c7f2e1af1894350e08e7a76d8f763"
+      "path": "desktop/src/react/components/automation/automation-types.ts",
+      "sha256": "c34a720b13cca8665dd5423edcb5f29219d5b23e29f8efbc5ac3fb4c7ef9d33d"
     },
     {
-      "path": "desktop/src/react/components/BrowserCard.tsx",
-      "sha256": "79f504f542d903c3c7841ac73f809601c0e7c1d907bb1d7be71261c6d148b51c"
+      "path": "desktop/src/react/components/automation/automation-utils.ts",
+      "sha256": "2c03c8c9c0e2699773e6d87cc285c043ea54fe88d8431bb6c8f3da61d0549bdd"
+    },
+    {
+      "path": "desktop/src/react/components/automation/schedule-draft.ts",
+      "sha256": "05ae114c09b1f49e1256e687875a7da50fef8cb57541185dc8195d043ad00ad8"
     },
     {
       "path": "desktop/src/react/components/channels/ChannelCreateOverlay.tsx",
@@ -3075,10 +3199,6 @@
       "sha256": "12fa5cd8de7b665e95f1f501a434a67dae29b276d2bb613457df5a9214b644a4"
     },
     {
-      "path": "desktop/src/react/components/channels/Channels.module.css",
-      "sha256": "fa1902f79f71cb56b81dffe9d716292411fa0dac3731ed16d1119e5d6f3962a6"
-    },
-    {
       "path": "desktop/src/react/components/channels/ChannelTabBar.tsx",
       "sha256": "4b910c2906095270d408dc1b47adb0009091a6fe24284428dbcab8cd40110ba3"
     },
@@ -3087,20 +3207,8 @@
       "sha256": "84f4dfd3ac4d93a90350ed8832da280b749aa88e47f941b446dd9fe9bafa9ee3"
     },
     {
-      "path": "desktop/src/react/components/ChannelsPanel.tsx",
-      "sha256": "8caefc3d46992909d26714ebb0ebf3b69c7ebab436f572feab37b545247e0740"
-    },
-    {
-      "path": "desktop/src/react/components/chat/__tests__/InterludeBlock.test.tsx",
-      "sha256": "e9c29126164e78a7797a490cd2f2249b1d8d072df12d48101734ceb35fcdef15"
-    },
-    {
-      "path": "desktop/src/react/components/chat/__tests__/TurnEditedFilesCard.test.tsx",
-      "sha256": "ca58678b9cdc2f74ae5e62ae4830f464560662baf327de9ef4d7ef239cf967b1"
-    },
-    {
-      "path": "desktop/src/react/components/chat/__tests__/WorkflowInlineCard.test.tsx",
-      "sha256": "8e62e3339ecc78d78205fcf333fde66b3e0297646adfa53bc2403c3bc23a4e67"
+      "path": "desktop/src/react/components/channels/Channels.module.css",
+      "sha256": "fa1902f79f71cb56b81dffe9d716292411fa0dac3731ed16d1119e5d6f3962a6"
     },
     {
       "path": "desktop/src/react/components/chat/AgentOriginMessage.tsx",
@@ -3129,10 +3237,6 @@
     {
       "path": "desktop/src/react/components/chat/AutolearnLessonCard.tsx",
       "sha256": "ed334b32e7727f1047936fd393310f03cca0c6811ce45e0fa7a45cf3af9a0e4b"
-    },
-    {
-      "path": "desktop/src/react/components/chat/block-renderers.ts",
-      "sha256": "eaff2572440659cf03a7b64da800680fcc359c35833c2d6c7fb21e19915c6fc5"
     },
     {
       "path": "desktop/src/react/components/chat/Chat.module.css",
@@ -3199,10 +3303,6 @@
       "sha256": "89904fc9000e65be97676c5abc4a8c1094dae75aaeaf21d52ef6e029a7077aa3"
     },
     {
-      "path": "desktop/src/react/components/chat/knowledge-citation-scope.tsx",
-      "sha256": "7de54776ea4a00d56a64b9457e157220a04c7f2ba8317cf24db7ebb304af2b12"
-    },
-    {
       "path": "desktop/src/react/components/chat/KnowledgeCitation.module.css",
       "sha256": "74026b1a796a4ee70589bcb8aec5a8212173b486337b825dedc60bdbc1d17717"
     },
@@ -3217,10 +3317,6 @@
     {
       "path": "desktop/src/react/components/chat/KnowledgeRetrievalFold.tsx",
       "sha256": "593a3a3ea59825eb5685d233994c63b8cef322dce3114c0d6586d61afd3d0a8b"
-    },
-    {
-      "path": "desktop/src/react/components/chat/locate-step.ts",
-      "sha256": "6a4661245575f6a02b586caa38c8a3ef48e61a2209cd13cad5465522f53c8900"
     },
     {
       "path": "desktop/src/react/components/chat/MarkdownContent.tsx",
@@ -3245,10 +3341,6 @@
     {
       "path": "desktop/src/react/components/chat/MoodBlock.tsx",
       "sha256": "5b2ad97c9b25088ca28cb7fa2668091dc5d72e13ef09691c3ba60d085747bb4e"
-    },
-    {
-      "path": "desktop/src/react/components/chat/process-fold.ts",
-      "sha256": "6d2cf6e9e95805c1171da01e734688a49267b0e6df0b4c31ef001967bc7f5415"
     },
     {
       "path": "desktop/src/react/components/chat/ProcessFoldBlock.tsx",
@@ -3303,10 +3395,6 @@
       "sha256": "fcfdf0f8fe744059206e968c8f8ac36d81ea7964d3118933649184efbecec9f7"
     },
     {
-      "path": "desktop/src/react/components/chat/timeline-anchors.ts",
-      "sha256": "82212b48d9cc4374191c5f5d7659a7e2541877965e364ad384829fa321690c49"
-    },
-    {
       "path": "desktop/src/react/components/chat/TodoPanel.module.css",
       "sha256": "ed371becbddbd516fb768ee86baf27f10c5d9bed88795deeda2c63f41abdcc10"
     },
@@ -3317,10 +3405,6 @@
     {
       "path": "desktop/src/react/components/chat/ToolGroupBlock.tsx",
       "sha256": "08d23d3aaf1b79ebd43f37bbfda9c74eb60aa929dbb823d10bfe09a8209bceea"
-    },
-    {
-      "path": "desktop/src/react/components/chat/turn-usage.ts",
-      "sha256": "a077de8b530bfd4db2e2a5ce36c9275ff37c70e23b2123df2539f43d8b83fc1c"
     },
     {
       "path": "desktop/src/react/components/chat/TurnEditedFilesCard.module.css",
@@ -3339,10 +3423,6 @@
       "sha256": "a64225f5c8abcbcda24afa355719af8ef515962e2f9eb190d6b284fe6394b135"
     },
     {
-      "path": "desktop/src/react/components/chat/use-turn-usage-stats.ts",
-      "sha256": "ba7f324936267f0c8e642593b3ea38e6c1dfc9edf10a91dd7e473055dbf3e467"
-    },
-    {
       "path": "desktop/src/react/components/chat/UserMessage.tsx",
       "sha256": "95fc1909517e2fdebf2f5646342b7739ddd62aa838d11dd860970301dd7a089c"
     },
@@ -3351,24 +3431,44 @@
       "sha256": "6394c56f3bf42b544ad42d64550efe2a31d3b128fe07ca50ebb6ca1bfa3c1683"
     },
     {
-      "path": "desktop/src/react/components/ComputerUseOverlay.module.css",
-      "sha256": "1902c8674b2c28e8b2f5b23fbed4b264b0fb9a32240574c7eaafdfe35a237942"
+      "path": "desktop/src/react/components/chat/__tests__/InterludeBlock.test.tsx",
+      "sha256": "e9c29126164e78a7797a490cd2f2249b1d8d072df12d48101734ceb35fcdef15"
     },
     {
-      "path": "desktop/src/react/components/ComputerUseOverlay.tsx",
-      "sha256": "c141319c67388822924f113ffe73cfbb173a7d06d47d8656938f967f3cbf7f53"
+      "path": "desktop/src/react/components/chat/__tests__/TurnEditedFilesCard.test.tsx",
+      "sha256": "ca58678b9cdc2f74ae5e62ae4830f464560662baf327de9ef4d7ef239cf967b1"
     },
     {
-      "path": "desktop/src/react/components/conversation-map/conversation-map-layout.ts",
-      "sha256": "d4b9238e92c34246996e3d2c56dcc0fdee5765e1a71cfe0482be3de50376d019"
+      "path": "desktop/src/react/components/chat/__tests__/WorkflowInlineCard.test.tsx",
+      "sha256": "8e62e3339ecc78d78205fcf333fde66b3e0297646adfa53bc2403c3bc23a4e67"
     },
     {
-      "path": "desktop/src/react/components/conversation-map/conversation-map-projection.ts",
-      "sha256": "3429914d1b02a4c4cc2d97f3222931e39c7d7a6110024f66a8a660ede8c346b2"
+      "path": "desktop/src/react/components/chat/block-renderers.ts",
+      "sha256": "eaff2572440659cf03a7b64da800680fcc359c35833c2d6c7fb21e19915c6fc5"
     },
     {
-      "path": "desktop/src/react/components/conversation-map/conversation-map-send.ts",
-      "sha256": "bd86bc2d95457abab06340abee82471d3e88f951dbda2735f2941a97321c6dbc"
+      "path": "desktop/src/react/components/chat/knowledge-citation-scope.tsx",
+      "sha256": "7de54776ea4a00d56a64b9457e157220a04c7f2ba8317cf24db7ebb304af2b12"
+    },
+    {
+      "path": "desktop/src/react/components/chat/locate-step.ts",
+      "sha256": "6a4661245575f6a02b586caa38c8a3ef48e61a2209cd13cad5465522f53c8900"
+    },
+    {
+      "path": "desktop/src/react/components/chat/process-fold.ts",
+      "sha256": "6d2cf6e9e95805c1171da01e734688a49267b0e6df0b4c31ef001967bc7f5415"
+    },
+    {
+      "path": "desktop/src/react/components/chat/timeline-anchors.ts",
+      "sha256": "82212b48d9cc4374191c5f5d7659a7e2541877965e364ad384829fa321690c49"
+    },
+    {
+      "path": "desktop/src/react/components/chat/turn-usage.ts",
+      "sha256": "a077de8b530bfd4db2e2a5ce36c9275ff37c70e23b2123df2539f43d8b83fc1c"
+    },
+    {
+      "path": "desktop/src/react/components/chat/use-turn-usage-stats.ts",
+      "sha256": "ba7f324936267f0c8e642593b3ea38e6c1dfc9edf10a91dd7e473055dbf3e467"
     },
     {
       "path": "desktop/src/react/components/conversation-map/ConversationCard.tsx",
@@ -3399,8 +3499,16 @@
       "sha256": "f9779125dcd7baa2b82182fe3458941ced7cf08566cfa18d9da44ec0b92704d5"
     },
     {
-      "path": "desktop/src/react/components/desk/desk-types.ts",
-      "sha256": "0f5d049487293fdb37be37d33e6ce8904bc664e62cc23b3d8696683fb991620a"
+      "path": "desktop/src/react/components/conversation-map/conversation-map-layout.ts",
+      "sha256": "d4b9238e92c34246996e3d2c56dcc0fdee5765e1a71cfe0482be3de50376d019"
+    },
+    {
+      "path": "desktop/src/react/components/conversation-map/conversation-map-projection.ts",
+      "sha256": "3429914d1b02a4c4cc2d97f3222931e39c7d7a6110024f66a8a660ede8c346b2"
+    },
+    {
+      "path": "desktop/src/react/components/conversation-map/conversation-map-send.ts",
+      "sha256": "bd86bc2d95457abab06340abee82471d3e88f951dbda2735f2941a97321c6dbc"
     },
     {
       "path": "desktop/src/react/components/desk/Desk.module.css",
@@ -3431,12 +3539,8 @@
       "sha256": "b218ab8209044521acb2fc2eee7da85ee3c6053b95ae4dfd3e71fc7bbc71e189"
     },
     {
-      "path": "desktop/src/react/components/DeskSection.tsx",
-      "sha256": "daeaf7b4abd35fa1a18e15e238999963a0d123ef820f71ad248a4642303b701e"
-    },
-    {
-      "path": "desktop/src/react/components/ErrorBoundary.tsx",
-      "sha256": "7d237b9fceb5c31414658710eee06bc03b651bc4851c83985eed83bb562d8a32"
+      "path": "desktop/src/react/components/desk/desk-types.ts",
+      "sha256": "0f5d049487293fdb37be37d33e6ce8904bc664e62cc23b3d8696683fb991620a"
     },
     {
       "path": "desktop/src/react/components/file-history/FileHistoryModal.module.css",
@@ -3459,22 +3563,6 @@
       "sha256": "3eb7d35497792eeab57307355cd38ed6720d332723b6ebeac4205d7f1a21cec8"
     },
     {
-      "path": "desktop/src/react/components/FloatingPanels.module.css",
-      "sha256": "81ac42df542c05105aa9b92cf463e618e67135f432bcd565ae48e8af3d3da36c"
-    },
-    {
-      "path": "desktop/src/react/components/FloatSidebar.tsx",
-      "sha256": "a6e98789872b49413f4c82b8f7ed8cbdf9874837269184c882143a2bd9b881d9"
-    },
-    {
-      "path": "desktop/src/react/components/input/__tests__/quote-refresh.test.ts",
-      "sha256": "510885aeddc89a809ab5ddd4db47903ffc0aeb8a70d2c91f5b9d2908aa4aa85f"
-    },
-    {
-      "path": "desktop/src/react/components/input/ask-user-schema.ts",
-      "sha256": "30b5c35b8e18344cf7d4074708d2c63ba81f5448922a467f3c8a327ab450c18d"
-    },
-    {
       "path": "desktop/src/react/components/input/AskUserForm.tsx",
       "sha256": "e28ae1e8a9f0c1bd5b1950756500bcb32b421a16e6653d18372d9a6f3fffe1be"
     },
@@ -3487,56 +3575,16 @@
       "sha256": "947d9a1a45ffe464064fa0d3906744a857b3e73b16c17555784676f36f12a6f4"
     },
     {
-      "path": "desktop/src/react/components/input/composer-memory-mode.ts",
-      "sha256": "53dccb3740625845fbd4605fac470651043403906a3ffacfbdeefce4b82bf19e"
-    },
-    {
-      "path": "desktop/src/react/components/input/composer-permission-mode.ts",
-      "sha256": "d396ce0047f6d544e9a9f7d42a84d6f9c07b5b4d1c84e993d1a2e5fb0497024d"
-    },
-    {
-      "path": "desktop/src/react/components/input/composer-scope.ts",
-      "sha256": "0a5ca4db5309e183c887fa0c6e35f8e08b2bf926762d0769ccc013c933e61fc5"
-    },
-    {
-      "path": "desktop/src/react/components/input/composer-send.ts",
-      "sha256": "afc030053d9399010598bfa58b5fcf668eb57aba11deda72443b4fc9cdf8f560"
-    },
-    {
       "path": "desktop/src/react/components/input/ComposerToolbar.tsx",
       "sha256": "ed5d4328df945097a768e7de627c61eff1d27e15c47e78769d3c2449469eac97"
-    },
-    {
-      "path": "desktop/src/react/components/input/context-ring-visibility.ts",
-      "sha256": "aa6c5861d5a304322a8dfcf392ef91b052ff17d841aa362ede5967a7b5bd64b1"
     },
     {
       "path": "desktop/src/react/components/input/ContextRing.tsx",
       "sha256": "3b72677580e158ae0ba1bd87c5ec614e7fa7bdf54a7ae6565e21f1c297871da3"
     },
     {
-      "path": "desktop/src/react/components/input/elicitation-schema.ts",
-      "sha256": "a65a1df1dfb8abab9de9c2ed361c0b5e39bc9582fbdd8e7761dfa7b50358848c"
-    },
-    {
       "path": "desktop/src/react/components/input/ElicitationForm.tsx",
       "sha256": "8e5a62974d4c2593bf37eb8024029ff8adff3daf660d630661b1fce5af1a5293"
-    },
-    {
-      "path": "desktop/src/react/components/input/extensions/agent-badge.ts",
-      "sha256": "00abb891914a5e7123875f9d22b9ba2806c486d0ac3c5ada5aefbad28aaa305f"
-    },
-    {
-      "path": "desktop/src/react/components/input/extensions/file-badge.ts",
-      "sha256": "01ab63ba5d9d3cbc7fcf60eb39b843795d4ddc235d9a9fc3c269c697252caa94"
-    },
-    {
-      "path": "desktop/src/react/components/input/extensions/session-badge.ts",
-      "sha256": "cd1674eba85e7d762948723b413b056948ff180d4bc195c1d491658c1fc28691"
-    },
-    {
-      "path": "desktop/src/react/components/input/extensions/skill-badge.ts",
-      "sha256": "85cb8de0863954e754877ea4d003220ff31817954f03e8fe5c732c4f96591977"
     },
     {
       "path": "desktop/src/react/components/input/FileBadgeView.module.css",
@@ -3549,10 +3597,6 @@
     {
       "path": "desktop/src/react/components/input/FileMentionMenu.tsx",
       "sha256": "43eabf3c419c0419873886a4f9528bcf8b229c3dc4a5c5132ca02f152da7f852"
-    },
-    {
-      "path": "desktop/src/react/components/input/input-editor-extensions.ts",
-      "sha256": "68b9db9444c4fa211174fdc57043b4a37833d960f054bf5e4c53aa47a961486a"
     },
     {
       "path": "desktop/src/react/components/input/InputArea.module.css",
@@ -3575,10 +3619,6 @@
       "sha256": "c95ad82747a94c35c0eeefd56bf3229141667219d5cb578d7e36fdc6a22c5fec"
     },
     {
-      "path": "desktop/src/react/components/input/mcp-approval-actions.ts",
-      "sha256": "2504e8449eb24eb646ea4246a274f836596cd66a9da157f6f5fd41cb971ec69c"
-    },
-    {
       "path": "desktop/src/react/components/input/MentionBadgeView.module.css",
       "sha256": "8c0d3c0f4cfebbd6b9dfccf063b1f093157286982f285a24232127a652728c16"
     },
@@ -3597,10 +3637,6 @@
     {
       "path": "desktop/src/react/components/input/PlanModeButton.tsx",
       "sha256": "1b0a894192acc95756e54995fbef1c1c054df7d55cc09f3105b1853838c08a87"
-    },
-    {
-      "path": "desktop/src/react/components/input/quote-refresh.ts",
-      "sha256": "4139d17e330ab7d2ab89a7c941e0c580785f4538c2cb38c796633e1b18fb4e78"
     },
     {
       "path": "desktop/src/react/components/input/QuotedSelectionCard.tsx",
@@ -3623,10 +3659,6 @@
       "sha256": "ca9f93e8a2d204e16ee2149461f9b9f7b7ad3a0c7bd785cd1002ccfa9218f9f1"
     },
     {
-      "path": "desktop/src/react/components/input/slash-commands.ts",
-      "sha256": "a993d16e06df4748616b6074913cc5a833a13374c42c6501cd2448db2f97738a"
-    },
-    {
       "path": "desktop/src/react/components/input/SlashCommandMenu.tsx",
       "sha256": "ff636061fce391b3f4d48e37f7bc2799e04353cba3666c10cf39ea7d9092053d"
     },
@@ -3639,20 +3671,72 @@
       "sha256": "f1ee0961a9a97ce340f85c7281b39c0382ae50e3199981e3a7bfb1e82d320846"
     },
     {
+      "path": "desktop/src/react/components/input/__tests__/quote-refresh.test.ts",
+      "sha256": "510885aeddc89a809ab5ddd4db47903ffc0aeb8a70d2c91f5b9d2908aa4aa85f"
+    },
+    {
+      "path": "desktop/src/react/components/input/ask-user-schema.ts",
+      "sha256": "30b5c35b8e18344cf7d4074708d2c63ba81f5448922a467f3c8a327ab450c18d"
+    },
+    {
+      "path": "desktop/src/react/components/input/composer-memory-mode.ts",
+      "sha256": "53dccb3740625845fbd4605fac470651043403906a3ffacfbdeefce4b82bf19e"
+    },
+    {
+      "path": "desktop/src/react/components/input/composer-permission-mode.ts",
+      "sha256": "d396ce0047f6d544e9a9f7d42a84d6f9c07b5b4d1c84e993d1a2e5fb0497024d"
+    },
+    {
+      "path": "desktop/src/react/components/input/composer-scope.ts",
+      "sha256": "0a5ca4db5309e183c887fa0c6e35f8e08b2bf926762d0769ccc013c933e61fc5"
+    },
+    {
+      "path": "desktop/src/react/components/input/composer-send.ts",
+      "sha256": "afc030053d9399010598bfa58b5fcf668eb57aba11deda72443b4fc9cdf8f560"
+    },
+    {
+      "path": "desktop/src/react/components/input/context-ring-visibility.ts",
+      "sha256": "aa6c5861d5a304322a8dfcf392ef91b052ff17d841aa362ede5967a7b5bd64b1"
+    },
+    {
+      "path": "desktop/src/react/components/input/elicitation-schema.ts",
+      "sha256": "a65a1df1dfb8abab9de9c2ed361c0b5e39bc9582fbdd8e7761dfa7b50358848c"
+    },
+    {
+      "path": "desktop/src/react/components/input/extensions/agent-badge.ts",
+      "sha256": "00abb891914a5e7123875f9d22b9ba2806c486d0ac3c5ada5aefbad28aaa305f"
+    },
+    {
+      "path": "desktop/src/react/components/input/extensions/file-badge.ts",
+      "sha256": "01ab63ba5d9d3cbc7fcf60eb39b843795d4ddc235d9a9fc3c269c697252caa94"
+    },
+    {
+      "path": "desktop/src/react/components/input/extensions/session-badge.ts",
+      "sha256": "cd1674eba85e7d762948723b413b056948ff180d4bc195c1d491658c1fc28691"
+    },
+    {
+      "path": "desktop/src/react/components/input/extensions/skill-badge.ts",
+      "sha256": "85cb8de0863954e754877ea4d003220ff31817954f03e8fe5c732c4f96591977"
+    },
+    {
+      "path": "desktop/src/react/components/input/input-editor-extensions.ts",
+      "sha256": "68b9db9444c4fa211174fdc57043b4a37833d960f054bf5e4c53aa47a961486a"
+    },
+    {
+      "path": "desktop/src/react/components/input/mcp-approval-actions.ts",
+      "sha256": "2504e8449eb24eb646ea4246a274f836596cd66a9da157f6f5fd41cb971ec69c"
+    },
+    {
+      "path": "desktop/src/react/components/input/quote-refresh.ts",
+      "sha256": "4139d17e330ab7d2ab89a7c941e0c580785f4538c2cb38c796633e1b18fb4e78"
+    },
+    {
+      "path": "desktop/src/react/components/input/slash-commands.ts",
+      "sha256": "a993d16e06df4748616b6074913cc5a833a13374c42c6501cd2448db2f97738a"
+    },
+    {
       "path": "desktop/src/react/components/input/use-session-cache-rate.ts",
       "sha256": "9cc009f80f700793a55574637978f2d8191a49f1979800f01aca84caeab0dd95"
-    },
-    {
-      "path": "desktop/src/react/components/InputArea.tsx",
-      "sha256": "6c3f1d67df5b683e556336f5740ad43436f065c1f612184b19b68f0c5d464c64"
-    },
-    {
-      "path": "desktop/src/react/components/InputContextMenu.tsx",
-      "sha256": "c54d8944ea2bdd5cd8d7f591b333e4410861b60adad086c06c2b9524ac37760b"
-    },
-    {
-      "path": "desktop/src/react/components/knowledge/knowledge-api.ts",
-      "sha256": "666971435a19c18435bb4448dc8a6bd2314baa281fe79242470fca23fae61abd"
     },
     {
       "path": "desktop/src/react/components/knowledge/KnowledgeModal.module.css",
@@ -3675,8 +3759,8 @@
       "sha256": "c3fb64d80fc2e5b3d85e243ecb5d5f52d4023f4d3e5d5ce7f091660da2bf3dfc"
     },
     {
-      "path": "desktop/src/react/components/LeavesOverlay.tsx",
-      "sha256": "38b867b5e678af4177e9f05695730ab4c1a5a6cf09d31753a34086943a747224"
+      "path": "desktop/src/react/components/knowledge/knowledge-api.ts",
+      "sha256": "666971435a19c18435bb4448dc8a6bd2314baa281fe79242470fca23fae61abd"
     },
     {
       "path": "desktop/src/react/components/notices/SidebarNoticeSlot.module.css",
@@ -3685,18 +3769,6 @@
     {
       "path": "desktop/src/react/components/notices/SidebarNoticeSlot.tsx",
       "sha256": "dbca3c418a230b9db511a01aa9de5fe59fbf49057ad32062ca41e1d08cfb154a"
-    },
-    {
-      "path": "desktop/src/react/components/PostUpdateAnnouncement.tsx",
-      "sha256": "54187df644de1b5b68ca239956433366fb026199cd6da08cbff84c2c425a6902"
-    },
-    {
-      "path": "desktop/src/react/components/Preview.module.css",
-      "sha256": "b7dade7e9f8177c38cdf8664c3132c4f2cf33e32f71581ff6c4789637b1c49f7"
-    },
-    {
-      "path": "desktop/src/react/components/preview/cover-gallery-assets.ts",
-      "sha256": "c0190a1cd298074304bf348a35c2fa47e9c18c0d22448a045fcab5acddf8a5e8"
     },
     {
       "path": "desktop/src/react/components/preview/EditorContextMenu.tsx",
@@ -3735,32 +3807,8 @@
       "sha256": "6db40fd28a1bd8b8e83a77af70eb0e156c72df63d9a902b00efc86067469d771"
     },
     {
-      "path": "desktop/src/react/components/PreviewEditor.tsx",
-      "sha256": "f842c797447d268df692178165cc3a48c7da4268babdd94ff3408ebd6fbf6f4e"
-    },
-    {
-      "path": "desktop/src/react/components/PreviewPanel.tsx",
-      "sha256": "a182b044a7f864a0d1bd5b2f095b6a17c33a27ca55fe5e2b296c59bcb5735780"
-    },
-    {
-      "path": "desktop/src/react/components/RegionalErrorBoundary.module.css",
-      "sha256": "a78d520b0924955364191cb69bbe792a4a3818e9a9cc25e97eb50a588ee3d40e"
-    },
-    {
-      "path": "desktop/src/react/components/RegionalErrorBoundary.tsx",
-      "sha256": "ef09a881bcd39c1be42a0e1ed5d7d3e2698d67c79acb1fda04d35161d19acbb8"
-    },
-    {
-      "path": "desktop/src/react/components/right-workspace/__tests__/AgentActivityCard.test.tsx",
-      "sha256": "85fac2a01036c030290c5f3da828a6bb5b8c094c36b921d837d5d58274055b76"
-    },
-    {
-      "path": "desktop/src/react/components/right-workspace/__tests__/SessionStatusCard.test.tsx",
-      "sha256": "7b613cc4495e0f894e1632023a667c54544c85884af3f1e6dd00d289dd34d9d1"
-    },
-    {
-      "path": "desktop/src/react/components/right-workspace/__tests__/WorkflowCard.test.tsx",
-      "sha256": "77d20dddd9dfd67d74814b51e4bf2b86d4b7c3a5e672470e332cf261e3221b1a"
+      "path": "desktop/src/react/components/preview/cover-gallery-assets.ts",
+      "sha256": "c0190a1cd298074304bf348a35c2fa47e9c18c0d22448a045fcab5acddf8a5e8"
     },
     {
       "path": "desktop/src/react/components/right-workspace/AgentActivityCard.module.css",
@@ -3817,6 +3865,18 @@
     {
       "path": "desktop/src/react/components/right-workspace/WorkspaceSwitcher.tsx",
       "sha256": "b53f819ad657113e49e408296a21e9d8200c8e3e46b76c5456617f04e40b2b7b"
+    },
+    {
+      "path": "desktop/src/react/components/right-workspace/__tests__/AgentActivityCard.test.tsx",
+      "sha256": "85fac2a01036c030290c5f3da828a6bb5b8c094c36b921d837d5d58274055b76"
+    },
+    {
+      "path": "desktop/src/react/components/right-workspace/__tests__/SessionStatusCard.test.tsx",
+      "sha256": "7b613cc4495e0f894e1632023a667c54544c85884af3f1e6dd00d289dd34d9d1"
+    },
+    {
+      "path": "desktop/src/react/components/right-workspace/__tests__/WorkflowCard.test.tsx",
+      "sha256": "77d20dddd9dfd67d74814b51e4bf2b86d4b7c3a5e672470e332cf261e3221b1a"
     },
     {
       "path": "desktop/src/react/components/runtime/GitBranchList.module.css",
@@ -3907,22 +3967,6 @@
       "sha256": "8789779ad2ad5b24add016bdb2cb77a94c0918ab9bde7c629f4c814c13662e6a"
     },
     {
-      "path": "desktop/src/react/components/SessionList.module.css",
-      "sha256": "8149d9e67a29432fa5ef36b61cd8a7ef2feff09247834d3e3135ece3de2fb001"
-    },
-    {
-      "path": "desktop/src/react/components/SessionList.tsx",
-      "sha256": "ecd6d63380125106381ac330a5620caad6c1e0c03f4baebc4a88ec09746f5520"
-    },
-    {
-      "path": "desktop/src/react/components/SettingsModalShell.module.css",
-      "sha256": "ee44a72adaf9e880f94c55691a9c627ce143f0fa4161dfc1e1971c60b57a8e0b"
-    },
-    {
-      "path": "desktop/src/react/components/SettingsModalShell.tsx",
-      "sha256": "4b466b2ea4d467314448afbf57243356c4aef22472d654dfbdc9670ffabdc05d"
-    },
-    {
       "path": "desktop/src/react/components/shared/AttachmentChip.module.css",
       "sha256": "de7f2b382043887f3abe6494243d8d5febe6cd5d387536710a3f6f8facdf5113"
     },
@@ -3943,10 +3987,6 @@
       "sha256": "78b1f2133def40ce18675b8aaa4b2109246b2fa0dd4c3250c95037c44ac4faca"
     },
     {
-      "path": "desktop/src/react/components/shared/folder-icons.ts",
-      "sha256": "f1c474bd443de3855d2504b89266f2b25e1e4f78feab8ffd4c9e54a25d014f09"
-    },
-    {
       "path": "desktop/src/react/components/shared/FolderIcon.tsx",
       "sha256": "a11973d376a4bcf6e4d64f7da9ce83634a91d7722ad45cc0213929d65d41cf90"
     },
@@ -3959,10 +3999,6 @@
       "sha256": "16f67ae64c7d10ce2a3ab8e843133aa5d9a5aca9e496234ec9cb4510a062c9ad"
     },
     {
-      "path": "desktop/src/react/components/shared/MediaViewer/media-source.ts",
-      "sha256": "c714ec7b1d4eb173eca7870aa2eda36c26b6ea70fea7023caa55a639e7795d03"
-    },
-    {
       "path": "desktop/src/react/components/shared/MediaViewer/MediaViewer.module.css",
       "sha256": "9ea94219b188cfe8f1b7aba8db79fe2206c0346b2ccc2b348ef961e13ee762ee"
     },
@@ -3971,20 +4007,16 @@
       "sha256": "81a8dad4431314aef373c8ce1cb816e590a9f0d89b2c3a0a377e2dddf88d2685"
     },
     {
-      "path": "desktop/src/react/components/shared/MediaViewer/use-media-transform.ts",
-      "sha256": "71356b9bec5f13741cb9c1d3c458a0f7e5a57c1725df7134874c9480051f61d6"
-    },
-    {
       "path": "desktop/src/react/components/shared/MediaViewer/VideoStage.tsx",
       "sha256": "f623c9d5393ad64aa85395ecbe34c0eb26a6a2b7952dcae33e91fba559f58d0d"
     },
     {
-      "path": "desktop/src/react/components/shared/release-digest-text.ts",
-      "sha256": "3bb5aee6cea37c0008e017bb8e530137220cf2a226b2ff93a57282d438a4dd52"
+      "path": "desktop/src/react/components/shared/MediaViewer/media-source.ts",
+      "sha256": "c714ec7b1d4eb173eca7870aa2eda36c26b6ea70fea7023caa55a639e7795d03"
     },
     {
-      "path": "desktop/src/react/components/shared/timeline-marker-width.ts",
-      "sha256": "848cefc3a894a6df75f5c99e58be4c1203a01d8f8ab894afe44d155ff5076eb9"
+      "path": "desktop/src/react/components/shared/MediaViewer/use-media-transform.ts",
+      "sha256": "71356b9bec5f13741cb9c1d3c458a0f7e5a57c1725df7134874c9480051f61d6"
     },
     {
       "path": "desktop/src/react/components/shared/TimelineRailNavigator.module.css",
@@ -4007,52 +4039,24 @@
       "sha256": "8ac8e272396273ff80e681bff20bb7d302a2aa9c6988de19d838c15a8154b31c"
     },
     {
+      "path": "desktop/src/react/components/shared/folder-icons.ts",
+      "sha256": "f1c474bd443de3855d2504b89266f2b25e1e4f78feab8ffd4c9e54a25d014f09"
+    },
+    {
+      "path": "desktop/src/react/components/shared/release-digest-text.ts",
+      "sha256": "3bb5aee6cea37c0008e017bb8e530137220cf2a226b2ff93a57282d438a4dd52"
+    },
+    {
+      "path": "desktop/src/react/components/shared/timeline-marker-width.ts",
+      "sha256": "848cefc3a894a6df75f5c99e58be4c1203a01d8f8ab894afe44d155ff5076eb9"
+    },
+    {
       "path": "desktop/src/react/components/side-chat/SideChatPanel.module.css",
       "sha256": "0a89dfeeba38c5900c1f3b6ce2e07b115e4611ede5c0d7500a21c707a3ca3946"
     },
     {
       "path": "desktop/src/react/components/side-chat/SideChatPanel.tsx",
       "sha256": "f8544916af39378dd7c284a7828a0cbc84ed3acf1dd35afbc8ebb558ac5dd254"
-    },
-    {
-      "path": "desktop/src/react/components/SidebarLayout.tsx",
-      "sha256": "6facdf2d158567d70587eec7198b457be379cd5113f18c03b2e3deeeedc82b46"
-    },
-    {
-      "path": "desktop/src/react/components/SkillsPanel.module.css",
-      "sha256": "552db8063feb08db56f7e186fa4163a6b51f43e364017f1a0e5cca6c21a61e49"
-    },
-    {
-      "path": "desktop/src/react/components/SkillsPanel.tsx",
-      "sha256": "13a631ddcec85ef6c67dbc3c7fbc0f6a788ad250ea233f9114d2d64bf68881ea"
-    },
-    {
-      "path": "desktop/src/react/components/SkillViewerOverlay.tsx",
-      "sha256": "fec97dfff521280b18593906a025723c9b9d1b803ab91d2d88bbfc19f038e9e8"
-    },
-    {
-      "path": "desktop/src/react/components/StatusBar.module.css",
-      "sha256": "a93431ac371af3a1a258ae9b7c56c59c3f9e36e31aa86f2bb559f94b2940b4ce"
-    },
-    {
-      "path": "desktop/src/react/components/StatusBar.tsx",
-      "sha256": "555b95589fb177836b25bc8c8078f2163dd0c64047ff92ac1ba77a63987eca53"
-    },
-    {
-      "path": "desktop/src/react/components/ToastContainer.tsx",
-      "sha256": "0e88d475896f061f5b52fe1b702cad814a44f134ac573a6c392c0e80ebbf8dbe"
-    },
-    {
-      "path": "desktop/src/react/components/Welcome.module.css",
-      "sha256": "803653e1a6200a0c94cec201808a6550f1e540605ae887c516930999ef03f0de"
-    },
-    {
-      "path": "desktop/src/react/components/WelcomeScreen.tsx",
-      "sha256": "6d17266b64c5aec9eb0ea60c396e1e9ab1f9ef7400c401b7f4aa8b9a8bfa2186"
-    },
-    {
-      "path": "desktop/src/react/components/WindowControls.tsx",
-      "sha256": "8b39b01e3b154753e6b7b8019dfa766f8bde97cabaf0d3db1a4bd818acbccaa3"
     },
     {
       "path": "desktop/src/react/editor/cover-field.ts",
@@ -4251,8 +4255,12 @@
       "sha256": "911965881317e1bc27705fcf499560c89a5b561fb5c1d2ca153bdc2040f7c33c"
     },
     {
-      "path": "desktop/src/react/MainContent.tsx",
-      "sha256": "d2f94e1d18a44f388ca650a889cd6891791a502c348e18203cc9942c69221e30"
+      "path": "desktop/src/react/mobile/MobileApp.css",
+      "sha256": "ceddbb65a4a825f752fe35ce77a7cd1304327d2862fbebcd96ba39344364418f"
+    },
+    {
+      "path": "desktop/src/react/mobile/MobileApp.tsx",
+      "sha256": "82b1aacaf087de5178ff62e6fdc50015b14acd9d54923acb74ef6799b6d904d6"
     },
     {
       "path": "desktop/src/react/mobile/mobile-entry.css",
@@ -4267,20 +4275,16 @@
       "sha256": "34fd6fe744b4688033ddc11900a492941505321302b88eb3647bbb0322958175"
     },
     {
-      "path": "desktop/src/react/mobile/MobileApp.css",
-      "sha256": "ceddbb65a4a825f752fe35ce77a7cd1304327d2862fbebcd96ba39344364418f"
-    },
-    {
-      "path": "desktop/src/react/mobile/MobileApp.tsx",
-      "sha256": "82b1aacaf087de5178ff62e6fdc50015b14acd9d54923acb74ef6799b6d904d6"
-    },
-    {
-      "path": "desktop/src/react/onboarding/__tests__/onboarding-actions.test.ts",
-      "sha256": "204ac907d01ba2aa778db2db60894ab716ddbec0fee3f2cf667564aa856a5b10"
+      "path": "desktop/src/react/onboarding/OnboardingApp.tsx",
+      "sha256": "32596dd3cf11e7557534a7401762f4843dc09df52a0938ee9a0b39cfde9ac453"
     },
     {
       "path": "desktop/src/react/onboarding/__tests__/OnboardingApp.test.tsx",
       "sha256": "307b0d14cd1f1ef157670f9bd58db7c51b1dabc23609ba78f4b062b63734d67a"
+    },
+    {
+      "path": "desktop/src/react/onboarding/__tests__/onboarding-actions.test.ts",
+      "sha256": "204ac907d01ba2aa778db2db60894ab716ddbec0fee3f2cf667564aa856a5b10"
     },
     {
       "path": "desktop/src/react/onboarding/constants.ts",
@@ -4297,26 +4301,6 @@
     {
       "path": "desktop/src/react/onboarding/onboarding-ui.tsx",
       "sha256": "00570b90612c459fce8a879eb4bc562ca1a52f11cbaedc810cc06f2dc1e4245d"
-    },
-    {
-      "path": "desktop/src/react/onboarding/OnboardingApp.tsx",
-      "sha256": "32596dd3cf11e7557534a7401762f4843dc09df52a0938ee9a0b39cfde9ac453"
-    },
-    {
-      "path": "desktop/src/react/onboarding/steps/__tests__/ModelStep.test.tsx",
-      "sha256": "cc719e064ba084cfa4702ccc34ac838d05996a22dc40667cb1c80e5c6b456cba"
-    },
-    {
-      "path": "desktop/src/react/onboarding/steps/__tests__/NameStep.test.tsx",
-      "sha256": "5dd5c582e0fdb07b334b362d39b5ad85e2e83130fcc6be97f16a76b1a06754bf"
-    },
-    {
-      "path": "desktop/src/react/onboarding/steps/__tests__/ProviderStep.test.tsx",
-      "sha256": "ad84f45b346abd9d7fa053d79cc9e85f0dc297067be0861a30f121b3a776ed7a"
-    },
-    {
-      "path": "desktop/src/react/onboarding/steps/__tests__/TutorialStep.test.tsx",
-      "sha256": "25080615f8b5ee64283bb3c4fb7b1ca24d655fefcc994520ae8eabeecd3c36d7"
     },
     {
       "path": "desktop/src/react/onboarding/steps/LocaleStep.tsx",
@@ -4343,6 +4327,30 @@
       "sha256": "3e088ac19479e6dd232efed5cde312adc2ca945d479c96d640da2da03415c275"
     },
     {
+      "path": "desktop/src/react/onboarding/steps/__tests__/ModelStep.test.tsx",
+      "sha256": "cc719e064ba084cfa4702ccc34ac838d05996a22dc40667cb1c80e5c6b456cba"
+    },
+    {
+      "path": "desktop/src/react/onboarding/steps/__tests__/NameStep.test.tsx",
+      "sha256": "5dd5c582e0fdb07b334b362d39b5ad85e2e83130fcc6be97f16a76b1a06754bf"
+    },
+    {
+      "path": "desktop/src/react/onboarding/steps/__tests__/ProviderStep.test.tsx",
+      "sha256": "ad84f45b346abd9d7fa053d79cc9e85f0dc297067be0861a30f121b3a776ed7a"
+    },
+    {
+      "path": "desktop/src/react/onboarding/steps/__tests__/TutorialStep.test.tsx",
+      "sha256": "25080615f8b5ee64283bb3c4fb7b1ca24d655fefcc994520ae8eabeecd3c36d7"
+    },
+    {
+      "path": "desktop/src/react/quick-chat/QuickChatApp.module.css",
+      "sha256": "2108b660956a87f7acad8db33f6ac75b2fb1c49dee7180a57a6a452d15a3abfe"
+    },
+    {
+      "path": "desktop/src/react/quick-chat/QuickChatApp.tsx",
+      "sha256": "daa983aa53f4df49cfacd90a7a5aac59e88006d45a2417b2d15d625dcf346c6f"
+    },
+    {
       "path": "desktop/src/react/quick-chat/__tests__/quick-chat-layout.test.ts",
       "sha256": "27afae1f909d16fd154f064ad2713533c3bfb534bd5b4ba63d183e0d1a69a941"
     },
@@ -4365,14 +4373,6 @@
     {
       "path": "desktop/src/react/quick-chat/quick-chat-runtime.ts",
       "sha256": "df347295fe8ae24ec45a313a4a38ce24ccd31160f49d448826afdc7b6738b8fd"
-    },
-    {
-      "path": "desktop/src/react/quick-chat/QuickChatApp.module.css",
-      "sha256": "2108b660956a87f7acad8db33f6ac75b2fb1c49dee7180a57a6a452d15a3abfe"
-    },
-    {
-      "path": "desktop/src/react/quick-chat/QuickChatApp.tsx",
-      "sha256": "daa983aa53f4df49cfacd90a7a5aac59e88006d45a2417b2d15d625dcf346c6f"
     },
     {
       "path": "desktop/src/react/quick-chat/use-quick-chat-auto-scroll.ts",
@@ -4428,7 +4428,7 @@
     },
     {
       "path": "desktop/src/react/services/stream-admission.ts",
-      "sha256": "32c1de426b003e8baecd9740e75089247599a0e162dbdd15564f54b5c97df25e"
+      "sha256": "42c12f775783bc1b4e61c391d5180a289bf47a3474be7666929ee713d0d6a5e0"
     },
     {
       "path": "desktop/src/react/services/stream-key-dispatcher.ts",
@@ -4436,7 +4436,7 @@
     },
     {
       "path": "desktop/src/react/services/stream-resume.ts",
-      "sha256": "a73b9b6961810831100be94a55d1cc121f2d23b2e6d03f42f4861538e5e56379"
+      "sha256": "6968fc5512aa6054441d1dc90257c4f7fafc9621793851c0dafcf6dcc74347eb"
     },
     {
       "path": "desktop/src/react/services/studio-access.ts",
@@ -4460,7 +4460,39 @@
     },
     {
       "path": "desktop/src/react/services/ws-message-handler.ts",
-      "sha256": "28c72e3ec460edbbb43c1113f415e7e9d647e8fe2470128b825da2ce56fea3f1"
+      "sha256": "21b6255536ba2b51115e6176daaedf6b85fb3a03d6bc9398a83233dee1b42e53"
+    },
+    {
+      "path": "desktop/src/react/settings/Settings.module.css",
+      "sha256": "75085ccaa5c01f5164fe3f033cde2607bcf8a619e38434299957e402c199c665"
+    },
+    {
+      "path": "desktop/src/react/settings/SettingsApp.tsx",
+      "sha256": "a3819f4bea096cfdb9022e5a6ec2627bd26db1c8cfc924562d0a00dbf9f34667"
+    },
+    {
+      "path": "desktop/src/react/settings/SettingsContent.tsx",
+      "sha256": "b79bdeaea30bd72af08e01c28f16949854d186aff1e7041a5bd3576852a7c7ef"
+    },
+    {
+      "path": "desktop/src/react/settings/SettingsNav.tsx",
+      "sha256": "cfee03b7897c0493edd104e218f7dbc7f13d6e7de39129191aa1fe517531d35d"
+    },
+    {
+      "path": "desktop/src/react/settings/Toast.tsx",
+      "sha256": "73040c9f27c3c8ab6b95ab62aa56e3124f79a12ff134d4c5ade19a22326e37f5"
+    },
+    {
+      "path": "desktop/src/react/settings/__tests__/SettingsContent.test.tsx",
+      "sha256": "34e59097f99c9ba6f1997911b0128414b036781ec61b638ed2166f70ab1e8589"
+    },
+    {
+      "path": "desktop/src/react/settings/__tests__/SettingsNav.search.test.tsx",
+      "sha256": "e548d105682141127ef8a0ba001dda73c1c2cc095b14dd8e8cb7dc4032a79efd"
+    },
+    {
+      "path": "desktop/src/react/settings/__tests__/Toast.test.tsx",
+      "sha256": "273477caeac481e53b4b76fda4d62153eb4bb066e62acd08c886b08263b94bd5"
     },
     {
       "path": "desktop/src/react/settings/__tests__/settings-primitives-contract.test.ts",
@@ -4475,20 +4507,8 @@
       "sha256": "480a67b759dd81a617fa2ecdfbeb36f26af991f6eb4bc82c548a2863d78d64d5"
     },
     {
-      "path": "desktop/src/react/settings/__tests__/SettingsContent.test.tsx",
-      "sha256": "34e59097f99c9ba6f1997911b0128414b036781ec61b638ed2166f70ab1e8589"
-    },
-    {
-      "path": "desktop/src/react/settings/__tests__/SettingsNav.search.test.tsx",
-      "sha256": "e548d105682141127ef8a0ba001dda73c1c2cc095b14dd8e8cb7dc4032a79efd"
-    },
-    {
       "path": "desktop/src/react/settings/__tests__/skill-scroll-contract.test.ts",
       "sha256": "e49d65c7af1be0ed4b01ed6781ebe6f32586bc64889dde2482a2fcf017f1bc22"
-    },
-    {
-      "path": "desktop/src/react/settings/__tests__/Toast.test.tsx",
-      "sha256": "273477caeac481e53b4b76fda4d62153eb4bb066e62acd08c886b08263b94bd5"
     },
     {
       "path": "desktop/src/react/settings/actions.ts",
@@ -4499,20 +4519,12 @@
       "sha256": "d6c1ed6c783f7eb23185f170a89cc90bc1458970a7b3931ea30dd81d858433f0"
     },
     {
-      "path": "desktop/src/react/settings/components/__tests__/SettingsSection.test.tsx",
-      "sha256": "69abb1f43d022966d5a1d0306019e7810060938afdca108d9de5d40fbc01b694"
-    },
-    {
       "path": "desktop/src/react/settings/components/ExpandableRow.tsx",
       "sha256": "408e775943da3196c6605add6eb3909d411a581030a3aa63ecca4c1a42302ad4"
     },
     {
       "path": "desktop/src/react/settings/components/NumberInput.tsx",
       "sha256": "69ec43c26657f3f390bc89b2966dab73ac593eadd5e6cbeee8f2486587d1fed5"
-    },
-    {
-      "path": "desktop/src/react/settings/components/settings-components.module.css",
-      "sha256": "e869ff84760b6254ee25b1b5c7be9ce7c6936436deeb378e5aee5d418b04146e"
     },
     {
       "path": "desktop/src/react/settings/components/SettingsPrimitives.tsx",
@@ -4531,6 +4543,14 @@
       "sha256": "ba85832c7e18ebbf2552bd120281f2070c28267f1947d17865a7a6cdd461fc35"
     },
     {
+      "path": "desktop/src/react/settings/components/__tests__/SettingsSection.test.tsx",
+      "sha256": "69abb1f43d022966d5a1d0306019e7810060938afdca108d9de5d40fbc01b694"
+    },
+    {
+      "path": "desktop/src/react/settings/components/settings-components.module.css",
+      "sha256": "e869ff84760b6254ee25b1b5c7be9ce7c6936436deeb378e5aee5d418b04146e"
+    },
+    {
       "path": "desktop/src/react/settings/helpers.ts",
       "sha256": "32c1efeaff2da85610783643a03a394afce03aeb1f9bcb0a9c928137685ddd61"
     },
@@ -4545,14 +4565,6 @@
     {
       "path": "desktop/src/react/settings/hooks/useMediaSettingsData.ts",
       "sha256": "b452ff5876f00345f5f81138ffc1caee022f5eae24567a82eaf6975aa608a351"
-    },
-    {
-      "path": "desktop/src/react/settings/overlays/__tests__/AgentCreateOverlay.yuan.test.tsx",
-      "sha256": "3e30a74ec63ed42aac8100d828fb446804d2b9bdf4d0f92c081c191546976962"
-    },
-    {
-      "path": "desktop/src/react/settings/overlays/__tests__/CompiledMemoryViewer.test.tsx",
-      "sha256": "fd7b961579adf8b13dc671743a1fb211d3e21dc79b5aab3e43b835725515bf99"
     },
     {
       "path": "desktop/src/react/settings/overlays/AgentCreateOverlay.tsx",
@@ -4595,6 +4607,14 @@
       "sha256": "2757f37156b4682395408da982a65ab6330fe4326739e61e694b84dde3be6f7f"
     },
     {
+      "path": "desktop/src/react/settings/overlays/__tests__/AgentCreateOverlay.yuan.test.tsx",
+      "sha256": "3e30a74ec63ed42aac8100d828fb446804d2b9bdf4d0f92c081c191546976962"
+    },
+    {
+      "path": "desktop/src/react/settings/overlays/__tests__/CompiledMemoryViewer.test.tsx",
+      "sha256": "fd7b961579adf8b13dc671743a1fb211d3e21dc79b5aab3e43b835725515bf99"
+    },
+    {
       "path": "desktop/src/react/settings/resource-state.ts",
       "sha256": "530392ff17b957c035df5c6de5e993f03f18cfabb9ee2bc608ec5bedaeb34940"
     },
@@ -4603,24 +4623,92 @@
       "sha256": "768c5b05006adeca73fe231b9cc267d3c43d121cd4fa1348da4ccaeb15b1b09e"
     },
     {
-      "path": "desktop/src/react/settings/Settings.module.css",
-      "sha256": "75085ccaa5c01f5164fe3f033cde2607bcf8a619e38434299957e402c199c665"
-    },
-    {
-      "path": "desktop/src/react/settings/SettingsApp.tsx",
-      "sha256": "a3819f4bea096cfdb9022e5a6ec2627bd26db1c8cfc924562d0a00dbf9f34667"
-    },
-    {
-      "path": "desktop/src/react/settings/SettingsContent.tsx",
-      "sha256": "b79bdeaea30bd72af08e01c28f16949854d186aff1e7041a5bd3576852a7c7ef"
-    },
-    {
-      "path": "desktop/src/react/settings/SettingsNav.tsx",
-      "sha256": "cfee03b7897c0493edd104e218f7dbc7f13d6e7de39129191aa1fe517531d35d"
-    },
-    {
       "path": "desktop/src/react/settings/store.ts",
       "sha256": "5a5ad3f00920c9ac857c590ab62c14cce6bc7f71f55c09d64bc0f4890b57979b"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/AboutTab.tsx",
+      "sha256": "603ca85045b7739518168ae68588434e321c731ef52be5085c3deb8f2e62fad9"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/AccessTab.tsx",
+      "sha256": "90d9737ed85db0e6b1301562ba8f394cb20fd0bb3f88b616b6221215072de2ee"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/AgentTab.tsx",
+      "sha256": "70810947355727f0f1ee29c11de440f81c2e7bead7c58d119302bd2a5a115107"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/BridgeTab.module.css",
+      "sha256": "445cbcd3dc157e8a18cdac0b0415dba3d46ecdf0082924c7039222d055c83e80"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/BridgeTab.tsx",
+      "sha256": "b940ed16055a6e513b2dfcf6cb18e09c6f9623a4c3424d1cddf137da8a274a86"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/BrowserTab.tsx",
+      "sha256": "d4e85f475301e86dc14815d7689769f1508b009a376a6358f3c3b681cfa78965"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/ComputerUseSection.tsx",
+      "sha256": "b6b6cf4f387fd49e39bcca0d5aa2c41af4c4ecf73232213d1bf0dc0ab89472e7"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/EnvDepsTab.tsx",
+      "sha256": "8b6ad0d8dd448e5e4d4b23690fa5a3fc4cbc3a7c34d72dba4262a6ab90bdebb1"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/ExperimentsTab.tsx",
+      "sha256": "8bd468b0a4090b1a00e66993736fcae2d5ae3d6c09c7b727ba538ee518270f63"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/GeneralTab.tsx",
+      "sha256": "4aee129cbb41d7b05895de69ecbedebd7eca069fc781e12289d5a4448f9f3439"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/InterfaceTab.tsx",
+      "sha256": "e2164c15725488f806b93d3419ed1c654c77e6d22f3924325eb85a0a70f11e21"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/KeybindingsTab.tsx",
+      "sha256": "ec70096a8b7f3b2aa20e6c23379fa88c38c1aea18b82475509a6043ccef04dc4"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/McpTab.tsx",
+      "sha256": "8a8c21d57512a1bd7451da595a0c8538ff4c8cd64635bee3cbdd60f6403cecd3"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/MeTab.tsx",
+      "sha256": "8c3d1c3aff47ad90782f7d1b6926ee60a8401d781e766e5968bde66c895a19cc"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/ModelsTab.tsx",
+      "sha256": "7a9a9bc24feb935c0fa97681bba365c66a69ecc4430a2e0a0880e9123fabb2c7"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/ProvidersTab.tsx",
+      "sha256": "6b8f3ed0519ae0edf3782d384b9971dd50f7a26feca08bc5d08b776791182c21"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/SecurityTab.tsx",
+      "sha256": "fb4d3859e09b1b6b8f24be68237d22ad11b29634b55d05078dc02f4e11406814"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/SharingTab.tsx",
+      "sha256": "da234935189a3b4a31094c26aa15e7e17a3ed917fc71441f6bcef5ab3b9b9a5f"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/SkillsTab.tsx",
+      "sha256": "68743b4bae993f41f3baf391a70d9d5d74eae2b6ad98327e497f830bfc815102"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/UsageTab.tsx",
+      "sha256": "6e542f0c9e8380072d1586f81c7eb34ba33b55537f4e1d42fc2aede8380db046"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/WorkTab.tsx",
+      "sha256": "afffb093d692a97d8563bd70518c19cf9fad2c8efeab529df7e600303737c0ba"
     },
     {
       "path": "desktop/src/react/settings/tabs/__tests__/AboutTab.test.tsx",
@@ -4667,34 +4755,6 @@
       "sha256": "950c3e28a5072dba15d42d2bea3062680dcc0ba79a52a96b3049d9cdc9720461"
     },
     {
-      "path": "desktop/src/react/settings/tabs/AboutTab.tsx",
-      "sha256": "603ca85045b7739518168ae68588434e321c731ef52be5085c3deb8f2e62fad9"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/AccessTab.tsx",
-      "sha256": "90d9737ed85db0e6b1301562ba8f394cb20fd0bb3f88b616b6221215072de2ee"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/agent/__tests__/AgentCardStack.test.tsx",
-      "sha256": "9501e571ef7b26328b4641d4e4fa06bb2c3988f7ec33e22f7d2542a06a8c9ce9"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/agent/__tests__/AgentToolsSection.test.tsx",
-      "sha256": "2658dcaea765ec51b229f1f60860378ad307801bdd9da48083f732152bdf3ab6"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/agent/__tests__/DreamRevisionBrowser.test.tsx",
-      "sha256": "7f3de81349784dcc0b9a2b8c34ee8b8f698e7c521e0d5c13ea0136cb87a558d4"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/agent/__tests__/YuanSelector.test.tsx",
-      "sha256": "d77f1c9afc16d9a2e9c15546d8e52c05617cb3ef9d49fe33391130b2a9af108a"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/agent/agent-memory-dream-actions.ts",
-      "sha256": "dbc490a7fd2105f0b54cc98281a229d227262fab909a3b912fd881cf26ca4754"
-    },
-    {
       "path": "desktop/src/react/settings/tabs/agent/AgentCardStack.tsx",
       "sha256": "509715ae3ec1157c10b4a5fa0bb029f88c7d2790a6f889634197536ad25f27fd"
     },
@@ -4723,10 +4783,6 @@
       "sha256": "ef47be947f5025b25c279b5bedabb23e094e857055a6d92b1c93cdd45eef80af"
     },
     {
-      "path": "desktop/src/react/settings/tabs/agent/dream-error-presenter.ts",
-      "sha256": "ac51fb00b6f3a1f9cf015211f322e118108c674d9778296eb7e3cd2ffce86190"
-    },
-    {
       "path": "desktop/src/react/settings/tabs/agent/DreamRevisionBrowser.module.css",
       "sha256": "9de3a553d6aeb3d1ebafd4d15b2babb6830c36a208dd34851e5e3cd7c93f1d07"
     },
@@ -4739,12 +4795,28 @@
       "sha256": "8148936a9302bfb36fb4277041dbf9a697564d2b86dada7eecbd30d3cc36ec2c"
     },
     {
-      "path": "desktop/src/react/settings/tabs/AgentTab.tsx",
-      "sha256": "70810947355727f0f1ee29c11de440f81c2e7bead7c58d119302bd2a5a115107"
+      "path": "desktop/src/react/settings/tabs/agent/__tests__/AgentCardStack.test.tsx",
+      "sha256": "9501e571ef7b26328b4641d4e4fa06bb2c3988f7ec33e22f7d2542a06a8c9ce9"
     },
     {
-      "path": "desktop/src/react/settings/tabs/bridge/__tests__/BridgeWidgets.test.tsx",
-      "sha256": "8ef55743370751d1a5197442f6d0a400dc17ea5c2aaf96504696629596c70eb0"
+      "path": "desktop/src/react/settings/tabs/agent/__tests__/AgentToolsSection.test.tsx",
+      "sha256": "2658dcaea765ec51b229f1f60860378ad307801bdd9da48083f732152bdf3ab6"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/agent/__tests__/DreamRevisionBrowser.test.tsx",
+      "sha256": "7f3de81349784dcc0b9a2b8c34ee8b8f698e7c521e0d5c13ea0136cb87a558d4"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/agent/__tests__/YuanSelector.test.tsx",
+      "sha256": "d77f1c9afc16d9a2e9c15546d8e52c05617cb3ef9d49fe33391130b2a9af108a"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/agent/agent-memory-dream-actions.ts",
+      "sha256": "dbc490a7fd2105f0b54cc98281a229d227262fab909a3b912fd881cf26ca4754"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/agent/dream-error-presenter.ts",
+      "sha256": "ac51fb00b6f3a1f9cf015211f322e118108c674d9778296eb7e3cd2ffce86190"
     },
     {
       "path": "desktop/src/react/settings/tabs/bridge/AgentSelect.tsx",
@@ -4763,6 +4835,14 @@
       "sha256": "8e633e7ff73018607196181dc6e8e723d54a89d69bcca59fb8b84139c74883c4"
     },
     {
+      "path": "desktop/src/react/settings/tabs/bridge/WechatSection.tsx",
+      "sha256": "2b562f5d1eadd692d31cee326c9ab682192c36a8a34595202e9d7bf41c4565ff"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/bridge/__tests__/BridgeWidgets.test.tsx",
+      "sha256": "8ef55743370751d1a5197442f6d0a400dc17ea5c2aaf96504696629596c70eb0"
+    },
+    {
       "path": "desktop/src/react/settings/tabs/bridge/useBridgeSecretDrafts.ts",
       "sha256": "472deb86005856507b23d3ab02981b3af8c9a069a8b19c43919737e0b6e72e9e"
     },
@@ -4771,44 +4851,28 @@
       "sha256": "b423812d2d89ae22a3e8b57969c9e2c7e2a8f8354752e85fab467bca166390cf"
     },
     {
-      "path": "desktop/src/react/settings/tabs/bridge/WechatSection.tsx",
-      "sha256": "2b562f5d1eadd692d31cee326c9ab682192c36a8a34595202e9d7bf41c4565ff"
+      "path": "desktop/src/react/settings/tabs/mcp/ConnectorDetail.tsx",
+      "sha256": "930c9be76c0e2c8a77a8e39b5628df458f04abc6624e5e8b7a8cf723e00ba02d"
     },
     {
-      "path": "desktop/src/react/settings/tabs/BridgeTab.module.css",
-      "sha256": "445cbcd3dc157e8a18cdac0b0415dba3d46ecdf0082924c7039222d055c83e80"
+      "path": "desktop/src/react/settings/tabs/mcp/ConnectorForm.tsx",
+      "sha256": "4638b7e0fca3fc35493076a2f86fbe94970353c73756eca8bd818b6a78528bdd"
     },
     {
-      "path": "desktop/src/react/settings/tabs/BridgeTab.tsx",
-      "sha256": "b940ed16055a6e513b2dfcf6cb18e09c6f9623a4c3424d1cddf137da8a274a86"
+      "path": "desktop/src/react/settings/tabs/mcp/ConnectorImport.tsx",
+      "sha256": "afeb05668a4a23e2c227cbc9ea083b12be8ed153795fecb58afde9fa77907534"
     },
     {
-      "path": "desktop/src/react/settings/tabs/BrowserTab.tsx",
-      "sha256": "d4e85f475301e86dc14815d7689769f1508b009a376a6358f3c3b681cfa78965"
+      "path": "desktop/src/react/settings/tabs/mcp/ConnectorList.tsx",
+      "sha256": "6de528aa8d116d7cadcef2eee211118d91b78694fc1b4f8707e0936e96dff76b"
     },
     {
-      "path": "desktop/src/react/settings/tabs/ComputerUseSection.tsx",
-      "sha256": "b6b6cf4f387fd49e39bcca0d5aa2c41af4c4ecf73232213d1bf0dc0ab89472e7"
+      "path": "desktop/src/react/settings/tabs/mcp/DeferSettings.tsx",
+      "sha256": "0f3ff3bf7d0f5a2313df95a8cae243bbc0595319ac17f759b05dd497a9d38fbb"
     },
     {
-      "path": "desktop/src/react/settings/tabs/EnvDepsTab.tsx",
-      "sha256": "8b6ad0d8dd448e5e4d4b23690fa5a3fc4cbc3a7c34d72dba4262a6ab90bdebb1"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/ExperimentsTab.tsx",
-      "sha256": "8bd468b0a4090b1a00e66993736fcae2d5ae3d6c09c7b727ba538ee518270f63"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/GeneralTab.tsx",
-      "sha256": "4aee129cbb41d7b05895de69ecbedebd7eca069fc781e12289d5a4448f9f3439"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/InterfaceTab.tsx",
-      "sha256": "e2164c15725488f806b93d3419ed1c654c77e6d22f3924325eb85a0a70f11e21"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/KeybindingsTab.tsx",
-      "sha256": "ec70096a8b7f3b2aa20e6c23379fa88c38c1aea18b82475509a6043ccef04dc4"
+      "path": "desktop/src/react/settings/tabs/mcp/OAuthWaitCard.tsx",
+      "sha256": "f3c33c91987cfdd64a6e1138730c8f057818f7f8dbda4268cd728ec1257bce6d"
     },
     {
       "path": "desktop/src/react/settings/tabs/mcp/__tests__/ConnectorForm.interaction.test.tsx",
@@ -4835,26 +4899,6 @@
       "sha256": "c5e6bb705d201970683be721ea683853ffbf1b05107892e620e0a2896d109460"
     },
     {
-      "path": "desktop/src/react/settings/tabs/mcp/ConnectorDetail.tsx",
-      "sha256": "930c9be76c0e2c8a77a8e39b5628df458f04abc6624e5e8b7a8cf723e00ba02d"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/mcp/ConnectorForm.tsx",
-      "sha256": "4638b7e0fca3fc35493076a2f86fbe94970353c73756eca8bd818b6a78528bdd"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/mcp/ConnectorImport.tsx",
-      "sha256": "afeb05668a4a23e2c227cbc9ea083b12be8ed153795fecb58afde9fa77907534"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/mcp/ConnectorList.tsx",
-      "sha256": "6de528aa8d116d7cadcef2eee211118d91b78694fc1b4f8707e0936e96dff76b"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/mcp/DeferSettings.tsx",
-      "sha256": "0f3ff3bf7d0f5a2313df95a8cae243bbc0595319ac17f759b05dd497a9d38fbb"
-    },
-    {
       "path": "desktop/src/react/settings/tabs/mcp/detail/ConnectorPermissionZone.tsx",
       "sha256": "76b23194b08daf34b5f2417864cfe8d8abc3b8c5753fb08c371b52b814e90196"
     },
@@ -4879,64 +4923,20 @@
       "sha256": "23561ef00f17fc00396e4fd36a6efa7760acdc72e94260f2349b978f4da1e87c"
     },
     {
-      "path": "desktop/src/react/settings/tabs/mcp/OAuthWaitCard.tsx",
-      "sha256": "f3c33c91987cfdd64a6e1138730c8f057818f7f8dbda4268cd728ec1257bce6d"
-    },
-    {
       "path": "desktop/src/react/settings/tabs/mcp/types.ts",
       "sha256": "fa39cec95c1cd99e62dd4f9e7c5c6673eb65d5abd4ee38bb923d84e09f7dc1d1"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/McpTab.tsx",
-      "sha256": "8a8c21d57512a1bd7451da595a0c8538ff4c8cd64635bee3cbdd60f6403cecd3"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/MeTab.tsx",
-      "sha256": "8c3d1c3aff47ad90782f7d1b6926ee60a8401d781e766e5968bde66c895a19cc"
     },
     {
       "path": "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx",
       "sha256": "7afdc7e0a4effbe38adfa370571273ee1683d4669d71d9539f3979b1f1f5117e"
     },
     {
-      "path": "desktop/src/react/settings/tabs/ModelsTab.tsx",
-      "sha256": "7a9a9bc24feb935c0fa97681bba365c66a69ecc4430a2e0a0880e9123fabb2c7"
-    },
-    {
       "path": "desktop/src/react/settings/tabs/observability/JsonValueViewer.tsx",
       "sha256": "bf5b7ab1e34850bee965c03a05699d35d9dde030886dd310bab2fe82370b61c8"
     },
     {
-      "path": "desktop/src/react/settings/tabs/observability/model-observability-actions.ts",
-      "sha256": "c256ac905af7226ddfc074753e5758380af0b392815253d2a14287213f3edb23"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/observability/model-observability-filter.ts",
-      "sha256": "eae8957032ec63a9c744d139c9ed0f7381f976be1b136db912fe9b4484f21689"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/observability/model-observability-format.ts",
-      "sha256": "f75ab9e9d9de123787996c15db273301b1c151207fee4a723f89004646636d24"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/observability/model-observability-labels.ts",
-      "sha256": "223d7c91a4b057e9608f55ce7f7e3d18aa299f1b681fda887e388e3f9b7716f6"
-    },
-    {
       "path": "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx",
       "sha256": "6c320901c73492c536398af3447c2164bf9cb928ce3368520614fa365f11dbc2"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/observability/observability-charts.tsx",
-      "sha256": "d0149dc1022e230caec1d95936764433c4a2514ca645e6a646e3fe1a772bdbbb"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/observability/observability-export-save.ts",
-      "sha256": "8eba9789024b3b3e4922c59c738ff8da16ead451f0ab8c4810728acfff8a4a53"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/observability/observability-provenance-resolve.ts",
-      "sha256": "13436028a77c41239f3f07a009f703b725499d97490d7a23f8a6df20d90721e1"
     },
     {
       "path": "desktop/src/react/settings/tabs/observability/ObservabilityAdvancedFilters.tsx",
@@ -5027,20 +5027,32 @@
       "sha256": "806e6ad3537f76f74a06843808529660e0b1e181308dff5e4e0f34ee7296f546"
     },
     {
-      "path": "desktop/src/react/settings/tabs/observability/trace-detail/payload-plain-text.ts",
-      "sha256": "7e180b55de4d6efaf0583ecc3984d507f9d62ee4fd32bb7a0a61c9781e9559a2"
+      "path": "desktop/src/react/settings/tabs/observability/model-observability-actions.ts",
+      "sha256": "c256ac905af7226ddfc074753e5758380af0b392815253d2a14287213f3edb23"
     },
     {
-      "path": "desktop/src/react/settings/tabs/observability/trace-detail/timeline.ts",
-      "sha256": "b862847e66a118853b78b5f66b3beb4d18005bd2c5be34665367bd803c515ecd"
+      "path": "desktop/src/react/settings/tabs/observability/model-observability-filter.ts",
+      "sha256": "eae8957032ec63a9c744d139c9ed0f7381f976be1b136db912fe9b4484f21689"
     },
     {
-      "path": "desktop/src/react/settings/tabs/observability/trace-detail/trace-conversation-model.ts",
-      "sha256": "2d7122da3aae8a0feb2d812cb304f51c91349138582de0220388e81188fad607"
+      "path": "desktop/src/react/settings/tabs/observability/model-observability-format.ts",
+      "sha256": "f75ab9e9d9de123787996c15db273301b1c151207fee4a723f89004646636d24"
     },
     {
-      "path": "desktop/src/react/settings/tabs/observability/trace-detail/trace-layout.ts",
-      "sha256": "5a137479bb9701fa200414a49b3aa50155e28acbaa553cf5564c7cf683338c24"
+      "path": "desktop/src/react/settings/tabs/observability/model-observability-labels.ts",
+      "sha256": "223d7c91a4b057e9608f55ce7f7e3d18aa299f1b681fda887e388e3f9b7716f6"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/observability/observability-charts.tsx",
+      "sha256": "d0149dc1022e230caec1d95936764433c4a2514ca645e6a646e3fe1a772bdbbb"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/observability/observability-export-save.ts",
+      "sha256": "8eba9789024b3b3e4922c59c738ff8da16ead451f0ab8c4810728acfff8a4a53"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/observability/observability-provenance-resolve.ts",
+      "sha256": "13436028a77c41239f3f07a009f703b725499d97490d7a23f8a6df20d90721e1"
     },
     {
       "path": "desktop/src/react/settings/tabs/observability/trace-detail/TraceDetailOverlay.module.css",
@@ -5049,22 +5061,6 @@
     {
       "path": "desktop/src/react/settings/tabs/observability/trace-detail/TraceDetailOverlay.tsx",
       "sha256": "d5249b652e28f9735adc056ea692829e81f4288fff677159dcd18ab6517da0fc"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/observability/trace-detail/trajectory-preview.ts",
-      "sha256": "96aa25be40c600f45c441f735e60a67f912feab0bf75c97ced3eb352c2ce8f62"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/observability/trace-detail/trajectory-record.ts",
-      "sha256": "468a9051f3be79966812d915be208d9daef86b9eb68f7188674badc7f035a608"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/observability/trace-detail/trajectory-search-index.ts",
-      "sha256": "83be15153745bbda9d840942cae59e788056c66453fb9683ef623cab5c08ad59"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/observability/trace-detail/trajectory-virtual-rows.ts",
-      "sha256": "585e92879b0f7b2ff46185dba2e53261ed0a3856f203910deacc89b5499e31cb"
     },
     {
       "path": "desktop/src/react/settings/tabs/observability/trace-detail/TrajectoryTable.module.css",
@@ -5095,6 +5091,38 @@
       "sha256": "703dea070a7001d5b306134a4884e553735982b9b4c5950fd18cbeba152de873"
     },
     {
+      "path": "desktop/src/react/settings/tabs/observability/trace-detail/payload-plain-text.ts",
+      "sha256": "7e180b55de4d6efaf0583ecc3984d507f9d62ee4fd32bb7a0a61c9781e9559a2"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/observability/trace-detail/timeline.ts",
+      "sha256": "b862847e66a118853b78b5f66b3beb4d18005bd2c5be34665367bd803c515ecd"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/observability/trace-detail/trace-conversation-model.ts",
+      "sha256": "2d7122da3aae8a0feb2d812cb304f51c91349138582de0220388e81188fad607"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/observability/trace-detail/trace-layout.ts",
+      "sha256": "5a137479bb9701fa200414a49b3aa50155e28acbaa553cf5564c7cf683338c24"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/observability/trace-detail/trajectory-preview.ts",
+      "sha256": "96aa25be40c600f45c441f735e60a67f912feab0bf75c97ced3eb352c2ce8f62"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/observability/trace-detail/trajectory-record.ts",
+      "sha256": "468a9051f3be79966812d915be208d9daef86b9eb68f7188674badc7f035a608"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/observability/trace-detail/trajectory-search-index.ts",
+      "sha256": "83be15153745bbda9d840942cae59e788056c66453fb9683ef623cab5c08ad59"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/observability/trace-detail/trajectory-virtual-rows.ts",
+      "sha256": "585e92879b0f7b2ff46185dba2e53261ed0a3856f203910deacc89b5499e31cb"
+    },
+    {
       "path": "desktop/src/react/settings/tabs/observability/use-observability-facets.ts",
       "sha256": "0db4583b28376c7c1443cd2aaf880038281c8b9add2124216b3ccba961ae614a"
     },
@@ -5103,52 +5131,12 @@
       "sha256": "c706cf0d2746bf0ccdb42312dabd1f8afc837a3ac549023f953b1c17db26cf40"
     },
     {
-      "path": "desktop/src/react/settings/tabs/providers/__tests__/AuxiliaryModelsSection.test.tsx",
-      "sha256": "35a5b4c2fa751c2555e768dfe4339f074cd8e10603d8725179306d9e8037f63f"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/providers/__tests__/ModelEditPanel.test.tsx",
-      "sha256": "0a4e2beb7cc643cd739bfb4b4669a25d2791fc86cab68101ec9f1e96040a15ce"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/providers/__tests__/provider-media-capabilities.test.ts",
-      "sha256": "7d5e3f1bf1bed8f84e92f4b81ef5322af1185864d00bb030fd35d007849f0991"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/providers/__tests__/ProviderMediaDefaults.test.tsx",
-      "sha256": "5727f91dd48cf832677769433a34e9a7360f24dd67d2786d10708fedf1f4001e"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/providers/__tests__/ProviderModelList.test.tsx",
-      "sha256": "ee66436b1f66f8c84ebcb92abd1fd992043a52c99dea594b1496cd86ca4db6ed"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/providers/__tests__/SearchApiKeyConfig.test.tsx",
-      "sha256": "d62d3b48285a973f6804b06aeb502cc40ce3122a7ebb80f756a34a93c92ff6ee"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/providers/__tests__/SearchProviderSection.test.tsx",
-      "sha256": "e86ece9dd97ad5cb1f0c189ff2ffc8f0582cb00c09db5e7cf4b29c802257f86e"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/providers/__tests__/unified-models.test.ts",
-      "sha256": "52d434a32d0d0616a03988e377dcb228924a11493f7f706c628c292af8caa58d"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/providers/api-key-save-plan.ts",
-      "sha256": "00bb744306da616c8eaad515ffa7ea0ea65dbfcbb0346a5db68b04ca121264e9"
-    },
-    {
       "path": "desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx",
       "sha256": "a6bd207bca368069fa91f32295fa1f7355e8b2aed60abc0ccefb8af747c24938"
     },
     {
       "path": "desktop/src/react/settings/tabs/providers/AuxiliaryModelsSection.tsx",
       "sha256": "f27aa3083710bcb2a548badeba8c09f450bf712490f139614fcce4030129ee4d"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/providers/capability-contracts.ts",
-      "sha256": "bcbcb0df6b4f17e44be7ad269f3d14ccffa9a377b95dabb2e0e8a4e756080845"
     },
     {
       "path": "desktop/src/react/settings/tabs/providers/MediaCapabilityIcons.tsx",
@@ -5165,10 +5153,6 @@
     {
       "path": "desktop/src/react/settings/tabs/providers/OutputModalityIcons.tsx",
       "sha256": "d7913c34b5c5fc52d2407167834fe91deec606fa867908c7af78f6594e84e66b"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/providers/provider-media-capabilities.ts",
-      "sha256": "f7d20c76321d67b8c43160792f0f1bcfbf7728b4107ee93f0129d54b7c121590"
     },
     {
       "path": "desktop/src/react/settings/tabs/providers/ProviderDetail.tsx",
@@ -5203,24 +5187,52 @@
       "sha256": "da953af54738405f29e3ee2739adfc1ed90184b7af29828d076b19e9cbb3eed4"
     },
     {
+      "path": "desktop/src/react/settings/tabs/providers/__tests__/AuxiliaryModelsSection.test.tsx",
+      "sha256": "35a5b4c2fa751c2555e768dfe4339f074cd8e10603d8725179306d9e8037f63f"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/providers/__tests__/ModelEditPanel.test.tsx",
+      "sha256": "0a4e2beb7cc643cd739bfb4b4669a25d2791fc86cab68101ec9f1e96040a15ce"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/providers/__tests__/ProviderMediaDefaults.test.tsx",
+      "sha256": "5727f91dd48cf832677769433a34e9a7360f24dd67d2786d10708fedf1f4001e"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/providers/__tests__/ProviderModelList.test.tsx",
+      "sha256": "ee66436b1f66f8c84ebcb92abd1fd992043a52c99dea594b1496cd86ca4db6ed"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/providers/__tests__/SearchApiKeyConfig.test.tsx",
+      "sha256": "d62d3b48285a973f6804b06aeb502cc40ce3122a7ebb80f756a34a93c92ff6ee"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/providers/__tests__/SearchProviderSection.test.tsx",
+      "sha256": "e86ece9dd97ad5cb1f0c189ff2ffc8f0582cb00c09db5e7cf4b29c802257f86e"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/providers/__tests__/provider-media-capabilities.test.ts",
+      "sha256": "7d5e3f1bf1bed8f84e92f4b81ef5322af1185864d00bb030fd35d007849f0991"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/providers/__tests__/unified-models.test.ts",
+      "sha256": "52d434a32d0d0616a03988e377dcb228924a11493f7f706c628c292af8caa58d"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/providers/api-key-save-plan.ts",
+      "sha256": "00bb744306da616c8eaad515ffa7ea0ea65dbfcbb0346a5db68b04ca121264e9"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/providers/capability-contracts.ts",
+      "sha256": "bcbcb0df6b4f17e44be7ad269f3d14ccffa9a377b95dabb2e0e8a4e756080845"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/providers/provider-media-capabilities.ts",
+      "sha256": "f7d20c76321d67b8c43160792f0f1bcfbf7728b4107ee93f0129d54b7c121590"
+    },
+    {
       "path": "desktop/src/react/settings/tabs/providers/unified-models.ts",
       "sha256": "d7c87ce69fbcb688e6f4611d0f9ecec9e327a6bd671556007ffbb6ece76fd274"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/ProvidersTab.tsx",
-      "sha256": "6b8f3ed0519ae0edf3782d384b9971dd50f7a26feca08bc5d08b776791182c21"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/SecurityTab.tsx",
-      "sha256": "fb4d3859e09b1b6b8f24be68237d22ad11b29634b55d05078dc02f4e11406814"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/SharingTab.tsx",
-      "sha256": "da234935189a3b4a31094c26aa15e7e17a3ed917fc71441f6bcef5ab3b9b9a5f"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/skills/__tests__/SkillBundleTree.test.tsx",
-      "sha256": "bfdbbf8be8e1172b5d21a20bb6e69ef592e30ebda9f28ac160b9cc30c21522ea"
     },
     {
       "path": "desktop/src/react/settings/tabs/skills/CompatPathDrawer.tsx",
@@ -5239,28 +5251,12 @@
       "sha256": "e7e4c927db97280eda2de3f63cc5fc6b1e6e4fe5f5fa251970c4f83431bfcaa8"
     },
     {
-      "path": "desktop/src/react/settings/tabs/SkillsTab.tsx",
-      "sha256": "68743b4bae993f41f3baf391a70d9d5d74eae2b6ad98327e497f830bfc815102"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/UsageTab.tsx",
-      "sha256": "6e542f0c9e8380072d1586f81c7eb34ba33b55537f4e1d42fc2aede8380db046"
-    },
-    {
-      "path": "desktop/src/react/settings/tabs/WorkTab.tsx",
-      "sha256": "afffb093d692a97d8563bd70518c19cf9fad2c8efeab529df7e600303737c0ba"
-    },
-    {
-      "path": "desktop/src/react/settings/Toast.tsx",
-      "sha256": "73040c9f27c3c8ab6b95ab62aa56e3124f79a12ff134d4c5ade19a22326e37f5"
+      "path": "desktop/src/react/settings/tabs/skills/__tests__/SkillBundleTree.test.tsx",
+      "sha256": "bfdbbf8be8e1172b5d21a20bb6e69ef592e30ebda9f28ac160b9cc30c21522ea"
     },
     {
       "path": "desktop/src/react/settings/update-history-actions.ts",
       "sha256": "6eeaa56074a8ce9611b86dd6c899c83ed0a9635a2b21c266f51b53285aefdd5f"
-    },
-    {
-      "path": "desktop/src/react/settings/widgets/__tests__/Toggle.test.tsx",
-      "sha256": "5c2ae1ff050c477e0b67b16d11ad100cf81450313f6dd480388877c027302863"
     },
     {
       "path": "desktop/src/react/settings/widgets/ComboInput.tsx",
@@ -5281,6 +5277,10 @@
     {
       "path": "desktop/src/react/settings/widgets/Toggle.tsx",
       "sha256": "4130ebf8c1d2348b74c83c980422fe16d5edca814e85b42a21f2b1ba6a3e1d8c"
+    },
+    {
+      "path": "desktop/src/react/settings/widgets/__tests__/Toggle.test.tsx",
+      "sha256": "5c2ae1ff050c477e0b67b16d11ad100cf81450313f6dd480388877c027302863"
     },
     {
       "path": "desktop/src/react/splash/SplashApp.tsx",
@@ -5563,14 +5563,6 @@
       "sha256": "a0a74e645e8d2c5fd30917ab376c2f1bacab42ac8ab8f519054ddeeb5d71c75c"
     },
     {
-      "path": "desktop/src/react/ui/index.ts",
-      "sha256": "0717616d72fe32a7f4db2ed3cfcfb24213a5665de8aa3b1e5eadd6a36020ca2a"
-    },
-    {
-      "path": "desktop/src/react/ui/motion.ts",
-      "sha256": "9f3841d482f52ea8c06bf6ef9fa825f319c24831958e2cd0ef60a3b7fe97e8f1"
-    },
-    {
       "path": "desktop/src/react/ui/NoticeDialog.module.css",
       "sha256": "baffb4251044b3f148bfae50ceb0ca65a76345f93b854fb8abdc50b980fdd550"
     },
@@ -5585,10 +5577,6 @@
     {
       "path": "desktop/src/react/ui/Overlay.tsx",
       "sha256": "4e4091cf3f24791bc010726ee2e8c21e35ac976db44d8166de97aa453b568341"
-    },
-    {
-      "path": "desktop/src/react/ui/provider-icons.ts",
-      "sha256": "84d38003cbd904811e1e408dbc3aee10deabda864fc14199aeb694181c1d44fd"
     },
     {
       "path": "desktop/src/react/ui/ProviderIcon.module.css",
@@ -5621,6 +5609,18 @@
     {
       "path": "desktop/src/react/ui/Tooltip.tsx",
       "sha256": "edf346e87eef59e37070bcf99678910451c06fecbf93d0bc75679b9effbbefab"
+    },
+    {
+      "path": "desktop/src/react/ui/index.ts",
+      "sha256": "0717616d72fe32a7f4db2ed3cfcfb24213a5665de8aa3b1e5eadd6a36020ca2a"
+    },
+    {
+      "path": "desktop/src/react/ui/motion.ts",
+      "sha256": "9f3841d482f52ea8c06bf6ef9fa825f319c24831958e2cd0ef60a3b7fe97e8f1"
+    },
+    {
+      "path": "desktop/src/react/ui/provider-icons.ts",
+      "sha256": "84d38003cbd904811e1e408dbc3aee10deabda864fc14199aeb694181c1d44fd"
     },
     {
       "path": "desktop/src/react/ui/window-surface.tsx",
@@ -9184,7 +9184,7 @@
     },
     {
       "path": "server/routes/chat.ts",
-      "sha256": "76ca2f7b848df3b5073753d984421c9030207355394fbbdf6678375cf74b4040"
+      "sha256": "68a2b46bf07054122eef3fd998823bc8a716dc17f8bd59d95613fb619151dd76"
     },
     {
       "path": "server/routes/checkpoints.ts",
@@ -9408,7 +9408,7 @@
     },
     {
       "path": "server/ws-protocol.ts",
-      "sha256": "c4917e7aa651513b06b08b440e990322b0386b722c1b3e4ea7094cbc2c6f4913"
+      "sha256": "d555fe84c58687281097a7c7b673766a8e1764e7a264b680103cbfac3fad9055"
     },
     {
       "path": "server/ws-scope.ts",
@@ -9845,6 +9845,10 @@
     {
       "path": "shared/yuan-visuals.ts",
       "sha256": "560be363001de625a5c82f6af0107a4dfea386c88a9d8287dd9b7521324361c3"
+    },
+    {
+      "path": "tests/README.md",
+      "sha256": "cdd031a6999bdd60fef677dd1d3f50a3a9a9f07bda83a379cd855185e5307ac2"
     },
     {
       "path": "tests/access-route.test.ts",
@@ -12715,10 +12719,6 @@
       "sha256": "e593e8364f346fd27eb9b1d6d51991a1ab9e982df242c93e47b562b00c185459"
     },
     {
-      "path": "tests/README.md",
-      "sha256": "cdd031a6999bdd60fef677dd1d3f50a3a9a9f07bda83a379cd855185e5307ac2"
-    },
-    {
       "path": "tests/release-digest-schema.test.ts",
       "sha256": "6fc6ac7b910bc8b0f36932a361d8c97e55f1066cb5283ce365f23eb0b1778700"
     },
@@ -13552,7 +13552,7 @@
     },
     {
       "path": "tests/stream-route-consumer-isolation.test.ts",
-      "sha256": "d16ebcb810acd9c152bde06ff08bc6975d2134ea532157edc7db38c0cb521537"
+      "sha256": "655a0f5bfd5f5b81335f0444013983ec380bf2b5fc195115f2d8e7d26d5cd9f7"
     },
     {
       "path": "tests/studio-access-contract.test.ts",

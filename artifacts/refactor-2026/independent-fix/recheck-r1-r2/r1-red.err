@@ -1,0 +1,60 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/stream-route-consumer-isolation.test.ts > R1 admission atomicity over the real route > a gap-rejected assistant_run_end retires nothing; the re-delivered seq3/seq4 complete the body, finalize exactly once, and only evidenced seqs enter the watermark
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/stream-route-consumer-isolation.test.ts:242:53
+    240|       // 正文完整、结束恰一次、消费者真实收尾。
+    241|       await vi.waitFor(() => { expect(projection()).toContain('R1正文');…
+    242|       expect(streamBufferManager.isRunActive(PATH)).toBe(false);
+       |                                                     ^
+    243|       expect(useStore.getState().streamingSessions).not.toContain(ID);
+    244|       // 水位不虚增：被拒帧不得进入 consumedSeqs；已接纳帧都有投影证据。
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/stream-route-consumer-isolation.test.ts > R1 admission atomicity over the real route > a real server-store refill after a dropped window still lets the end frame finalize exactly once
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/stream-route-consumer-isolation.test.ts:288:53
+    286|       h.inject({ ...runStart, type: 'assistant_run_end', seq: maxDropp…
+    287|       await h.drain();
+    288|       expect(streamBufferManager.isRunActive(PATH)).toBe(false);
+       |                                                     ^
+    289|       expect(getSessionStreamMeta(PATH)!.streamId).toBe(S);
+    290|       expect(getSessionStreamMeta(PATH)!.lastSeq).toBe(maxDroppedSeq +…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/stream-route-consumer-isolation.test.ts > R1 admission atomicity over the real route > a gap-rejected end of a NEW stream does not retire the new run across the switch
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/stream-route-consumer-isolation.test.ts:325:53
+    323|       await h.drain(); await h.drain();
+    324|       await vi.waitFor(() => { expect(projection()).toContain('第二流结束')…
+    325|       expect(streamBufferManager.isRunActive(PATH)).toBe(false);
+       |                                                     ^
+    326|       expect(getSessionStreamMeta(PATH)?.lastSeq).toBe(base + 3);
+    327|     } finally { await h.close(); }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+

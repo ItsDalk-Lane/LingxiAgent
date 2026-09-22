@@ -16,7 +16,7 @@ import { loadMessages } from '../stores/session-actions';
 import { registerStreamResumeMetaInvalidator } from '../stores/stream-invalidator';
 
 // 延迟导入，打破循环依赖
-let _handleServerMessage: ((msg: any) => void) | null = null;
+let _handleServerMessage: ((msg: any) => boolean | void) | null = null;
 let _applyStreamingStatus: ((
   isStreaming: boolean,
   sessionPath: string | null,
@@ -26,7 +26,7 @@ let _applyStreamingStatus: ((
 let _getWebSocket: (() => WebSocket | null) | null = null;
 
 export function injectHandlers(
-  handleServerMessage: (msg: any) => void,
+  handleServerMessage: (msg: any) => boolean | void,
   applyStreamingStatus: (
     isStreaming: boolean,
     sessionPath: string | null,
@@ -54,9 +54,30 @@ type SessionStreamMeta = {
   streamId: string | null;
   lastSeq: number;
   consumedSeqs: Set<number>;
+  /**
+   * 恢复代次：每次真实接纳提交（updateSessionStreamMeta 返回 true 或恢复重建
+   * 重置水位）+1。rebuild 在 await 历史读取前后对比它，等待期间发生过任何
+   * 接纳提交（例如新流经真实 WS 被接纳）就整体放弃旧恢复，防止旧快照覆盖新流。
+   */
+  admissionEpoch: number;
+  /** 当前流权威是何时确立的（admissionEpoch 值）：迟到的旧 resume 响应据此判定过期。 */
+  authorityEpoch: number;
 };
 
 const _sessionStreams: Record<string, SessionStreamMeta> = {};
+
+/** 按 session 记录最近一次 resume 请求的恢复代次（请求-响应关联）。 */
+type ResumeRequestGeneration = {
+  token: string;
+  epochAtRequest: number;
+  authorityAtRequest: string | null;
+};
+const _resumeRequestGenerations: Record<string, ResumeRequestGeneration> = {};
+let _resumeTokenCounter = 0;
+function nextResumeToken(): string {
+  _resumeTokenCounter += 1;
+  return `rrg-${Date.now().toString(36)}-${_resumeTokenCounter}-${Math.random().toString(36).slice(2, 8)}`;
+}
 
 type StreamSessionInput = string | {
   sessionId?: unknown;
@@ -136,12 +157,19 @@ function streamIdentityKey(input?: StreamSessionInput): string | null {
 export function invalidateSessionStreamMeta(sessionRef?: StreamSessionInput): void {
   if (sessionRef == null) {
     for (const key of Object.keys(_sessionStreams)) delete _sessionStreams[key];
+    for (const key of Object.keys(_resumeRequestGenerations)) delete _resumeRequestGenerations[key];
     return;
   }
   const target = resolveStreamSession(sessionRef, { fallbackToCurrent: false });
   const key = target.key || target.sessionPath;
-  if (key) delete _sessionStreams[key];
-  if (target.sessionPath && target.sessionPath !== key) delete _sessionStreams[target.sessionPath];
+  if (key) {
+    delete _sessionStreams[key];
+    delete _resumeRequestGenerations[key];
+  }
+  if (target.sessionPath && target.sessionPath !== key) {
+    delete _sessionStreams[target.sessionPath];
+    delete _resumeRequestGenerations[target.sessionPath];
+  }
 }
 
 export function getSessionStreamMeta(sessionRef?: StreamSessionInput): SessionStreamMeta | null {
@@ -150,10 +178,25 @@ export function getSessionStreamMeta(sessionRef?: StreamSessionInput): SessionSt
   const key = target.key || path;
   if (!key) return null;
   if (!_sessionStreams[key]) {
-    _sessionStreams[key] = (path ? _sessionStreams[path] : null) || { admission: new StreamAdmission(), streamId: null, lastSeq: 0, consumedSeqs: new Set() };
+    _sessionStreams[key] = (path ? _sessionStreams[path] : null) || {
+      admission: new StreamAdmission(),
+      streamId: null,
+      lastSeq: 0,
+      consumedSeqs: new Set(),
+      admissionEpoch: 0,
+      authorityEpoch: 0,
+    };
     if (path && key !== path) delete _sessionStreams[path];
   }
   return _sessionStreams[key];
+}
+
+/** 只读查看：不惰性创建条目（rebuild 的代次守卫用它避免为检查而产生副作用）。 */
+function peekSessionStreamMeta(sessionRef?: StreamSessionInput): SessionStreamMeta | null {
+  const target = resolveStreamSession(sessionRef);
+  const key = target.key || target.sessionPath;
+  if (!key) return null;
+  return _sessionStreams[key] || null;
 }
 
 export function isStreamScopedMessage(msg: any): boolean {
@@ -166,7 +209,10 @@ export function updateSessionStreamMeta(meta: any = {}): boolean {
   if (!target.key && !target.sessionPath) return true;
   const entry = getSessionStreamMeta(target);
   if (!entry) return true;
-  if (!entry.admission.accepts(meta)) {
+
+  // ① 身份校验先行且无副作用：被拒帧不得改变退休集合或当前身份
+  //（例如 run_end 因缺口被拒时先退休了 runId，补发后会被当成旧 Run 永远拒收）。
+  if (!entry.admission.wouldAccept(meta)) {
     if (entry.admission.recoveryRequired && !entry.admission.recoveryRequested) {
       entry.admission.recoveryRequested = true;
       requestStreamResume(target, { fromStart: true, streamId: null });
@@ -174,25 +220,37 @@ export function updateSessionStreamMeta(meta: any = {}): boolean {
     return false;
   }
 
-  if (meta.streamId) {
-    if (entry.streamId && entry.streamId !== meta.streamId) {
-      entry.lastSeq = 0;
-      entry.consumedSeqs.clear();
-    }
-    entry.streamId = meta.streamId;
-  }
+  const stream = normalizeStreamString(meta.streamId);
+  // 换流会把序号基线重置为 0：序号校验按切换后的前瞻视图进行，但提交必须等
+  // 全部校验通过后一次性完成，被拒帧不得留下半套切换状态。
+  const switchesStream = !!stream && !!entry.streamId && entry.streamId !== stream;
 
   if (Number.isFinite(meta.seq)) {
     const seq = Math.max(0, Math.floor(meta.seq));
-    if (entry.consumedSeqs.has(seq) || seq <= entry.lastSeq) return false;
-    // 实际 WS 帧发现缺口时不提前投影，向已有恢复通道补取连续前缀。
-    if (typeof meta.type === 'string' && seq > entry.lastSeq + 1 && !meta.__fromReplay) {
-      requestStreamResume(target, { sinceSeq: entry.lastSeq });
+    // 幂等重复：不重投影；水位证据必须来自先前真实消费，不为重复帧新增证据。
+    if (!switchesStream && (entry.consumedSeqs.has(seq) || seq <= entry.lastSeq)) return false;
+    // ② 实际 WS 帧发现缺口时不提前提交（含身份切换），向已有恢复通道补取连续前缀。
+    const baseline = switchesStream ? 0 : entry.lastSeq;
+    if (typeof meta.type === 'string' && seq > baseline + 1 && !meta.__fromReplay) {
+      requestStreamResume(
+        target,
+        switchesStream ? { fromStart: true, streamId: stream } : { sinceSeq: entry.lastSeq },
+      );
       return false;
     }
-    markConsumedSeq(entry, seq);
   }
 
+  // ③ 全部校验通过后一次性提交身份与水位。
+  const authorityBefore = entry.admission.streamId;
+  entry.admission.commit(meta);
+  if (switchesStream) {
+    entry.lastSeq = 0;
+    entry.consumedSeqs.clear();
+  }
+  if (stream) entry.streamId = stream;
+  if (Number.isFinite(meta.seq)) markConsumedSeq(entry, Math.max(0, Math.floor(meta.seq)));
+  entry.admissionEpoch += 1;
+  if (entry.admission.streamId !== authorityBefore) entry.authorityEpoch = entry.admissionEpoch;
   return true;
 }
 
@@ -206,18 +264,28 @@ export function requestStreamResume(sessionRef?: StreamSessionInput, opts: any =
   const ws = _getWebSocket?.() || null;
   if (!path || !ws || ws.readyState !== WebSocket.OPEN) return;
   const sessionId = target.sessionId || sessionIdForPathFromLocatorState(useStore.getState(), path);
-  const meta = getSessionStreamMeta(target) || { streamId: null, lastSeq: 0 };
+  const existing = peekSessionStreamMeta(target);
   const fromStart = !!opts.fromStart;
-  const streamId = opts.streamId !== undefined ? opts.streamId : (meta.streamId || null);
+  const streamId = opts.streamId !== undefined ? opts.streamId : (existing?.streamId || null);
   const sinceSeq = Number.isFinite(opts.sinceSeq)
     ? Math.max(0, Math.floor(opts.sinceSeq))
-    : (fromStart ? 0 : (meta.lastSeq || 0));
+    : (fromStart ? 0 : (existing?.lastSeq || 0));
+  // 恢复代次：每次请求登记“发出时刻的接纳代次与流权威”，响应携带同一 token 回来时
+  // 用于丢弃迟到的旧响应（等待期间本地已接纳新流）。
+  const generationKey = target.key || path;
+  const generation: ResumeRequestGeneration = {
+    token: nextResumeToken(),
+    epochAtRequest: existing?.admissionEpoch ?? 0,
+    authorityAtRequest: existing?.admission.streamId ?? null,
+  };
+  _resumeRequestGenerations[generationKey] = generation;
   ws.send(JSON.stringify({
     type: 'resume_stream',
     sessionPath: path,
     ...(sessionId ? { sessionId } : {}),
     streamId,
     sinceSeq,
+    resumeToken: generation.token,
   }));
 }
 
@@ -257,10 +325,12 @@ function shouldForceApplyRuntimeStreamingStatus(msg: any): boolean {
 function prepareStreamMeta(sessionRef: StreamSessionInput, streamId: string | null, opts: { resetConsumed?: boolean } = {}): SessionStreamMeta | null {
   const meta = getSessionStreamMeta(sessionRef);
   if (!meta) return null;
+  const authorityBefore = meta.admission.streamId;
   if (streamId) {
     if (meta.streamId && meta.streamId !== streamId) {
       meta.lastSeq = 0;
       meta.consumedSeqs.clear();
+      meta.admissionEpoch += 1;
     }
     meta.streamId = streamId;
   }
@@ -268,7 +338,9 @@ function prepareStreamMeta(sessionRef: StreamSessionInput, streamId: string | nu
     meta.admission.restore(streamId);
     meta.lastSeq = 0;
     meta.consumedSeqs.clear();
+    meta.admissionEpoch += 1;
   }
+  if (meta.admission.streamId !== authorityBefore) meta.authorityEpoch = meta.admissionEpoch;
   return meta;
 }
 
@@ -294,7 +366,7 @@ function dispatchReplayEvent(sessionPath: string, streamId: string | null, entry
   const seq = Number.isFinite(entry?.seq) ? Math.max(0, Math.floor(Number(entry.seq))) : null;
   if (seq !== null && meta?.consumedSeqs.has(seq)) return;
 
-  _handleServerMessage?.({
+  const consumed = _handleServerMessage?.({
     ...entry.event,
     sessionPath,
     streamId,
@@ -302,7 +374,9 @@ function dispatchReplayEvent(sessionPath: string, streamId: string | null, entry
     __fromReplay: true,
   });
 
-  if (seq !== null && meta) {
+  // 只有真实接纳/消费（或非水位管辖帧）才推进水位；分发层返回 false 表示该帧被
+  // 接纳门禁拒绝，不得把“函数已经调用”当成“帧已消费”而虚增 consumedSeqs。
+  if (seq !== null && meta && consumed !== false) {
     markConsumedSeq(meta, seq);
   }
 }
@@ -312,7 +386,8 @@ async function rebuildSessionFromResume(msg: any, opts: { finishTurnBeforeHydrat
   const sessionPath = target.sessionPath;
   if (!sessionPath) return;
 
-  const previousAdmission = getSessionStreamMeta(target)?.admission;
+  const snapshot = getSessionStreamMeta(target);
+  const previousAdmission = snapshot?.admission ?? null;
   const isCurrentSession = target.isCurrent;
   const myVersion = nextResumeRebuildVersion(target);
   if (isCurrentSession) _streamResumeRebuildingFor = sessionPath;
@@ -334,10 +409,19 @@ async function rebuildSessionFromResume(msg: any, opts: { finishTurnBeforeHydrat
       const pending = getSessionStreamMeta(target);
       if (pending) pending.admission = previousAdmission;
     }
+    // 恢复代次：以“进入 await 时存活的元数据对象”为基准。等待期间同一对象上
+    // 发生过真实接纳提交（后台会话经真实 WS 接纳的新 run/stream、增量重放等）
+    // 时，本次旧恢复整体放弃——不写身份、消息或终态，新流保持权威；
+    // restore(oldStream) 不得把新流退休。对象被失效重建属于 hydrate/LRU 生命
+    // 周期，由上方 previousAdmission 屏障按既有语义恢复身份连续性。
+    const entryAtAwait = getSessionStreamMeta(target);
+    const epochAtAwait = entryAtAwait?.admissionEpoch ?? 0;
     await loadMessages(sessionPath);
 
     if (!isLatestResumeRebuild(target, myVersion)) return;
     if (isCurrentSession && !isStillCurrentStreamSession(target)) return;
+    const current = peekSessionStreamMeta(target);
+    if (current && current === entryAtAwait && current.admissionEpoch !== epochAtAwait) return;
 
     const streamId = msg.streamId || null;
     if (previousAdmission) {
@@ -397,6 +481,22 @@ export function replayStreamResume(msg: any): void {
 
   // 旧请求的迟到响应也不能清空已切换到新流的投影。
   if (getSessionStreamMeta(target)?.admission.isRetiredStream(msg.streamId)) return;
+
+  // 恢复代次关联：带 token 的响应若描述的流已被“请求发出之后才接纳的新流”取代，
+  // 该响应早于新流存在，整体丢弃；本地权威未变或新权威早于请求时照常处理
+  //（饱和恢复/普通缺口补发不受影响）。
+  const generationKey = target.key || sessionPath;
+  const generation = generationKey ? _resumeRequestGenerations[generationKey] : null;
+  if (generation && typeof msg.resumeToken === 'string' && msg.resumeToken === generation.token) {
+    const meta = peekSessionStreamMeta(target);
+    const authorityNow = meta?.admission.streamId ?? null;
+    const responseStream = normalizeStreamString(msg.streamId);
+    if (authorityNow
+      && responseStream !== authorityNow
+      && (meta?.authorityEpoch ?? 0) > generation.epochAtRequest) {
+      return;
+    }
+  }
 
   const completedEmptyResume = shouldHydrateCompletedEmptyResume(msg);
   const replayEvents = Array.isArray(msg.events) ? msg.events : [];

@@ -1,0 +1,349 @@
+[96mlib/task-registry.ts[0m:[93m27[0m:[93m21[0m - [91merror[0m[90m TS7006: [0mParameter 'value' implicitly has an 'any' type.
+
+[7m27[0m function textOrNull(value) {
+[7m  [0m [91m                    ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m69[0m:[93m31[0m - [91merror[0m[90m TS7006: [0mParameter 'task' implicitly has an 'any' type.
+
+[7m69[0m function matchesParentSession(task, input, resolveSessionIdForPath = null) {
+[7m  [0m [91m                              ~~~~[0m
+[96mlib/task-registry.ts[0m:[93m69[0m:[93m37[0m - [91merror[0m[90m TS7006: [0mParameter 'input' implicitly has an 'any' type.
+
+[7m69[0m function matchesParentSession(task, input, resolveSessionIdForPath = null) {
+[7m  [0m [91m                                    ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m101[0m:[93m19[0m - [91merror[0m[90m TS7006: [0mParameter 'type' implicitly has an 'any' type.
+
+[7m101[0m   registerHandler(type, handler) {
+[7m   [0m [91m                  ~~~~[0m
+[96mlib/task-registry.ts[0m:[93m101[0m:[93m25[0m - [91merror[0m[90m TS7006: [0mParameter 'handler' implicitly has an 'any' type.
+
+[7m101[0m   registerHandler(type, handler) {
+[7m   [0m [91m                        ~~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m113[0m:[93m21[0m - [91merror[0m[90m TS7006: [0mParameter 'type' implicitly has an 'any' type.
+
+[7m113[0m   unregisterHandler(type) {
+[7m   [0m [91m                    ~~~~[0m
+[96mlib/task-registry.ts[0m:[93m119[0m:[93m12[0m - [91merror[0m[90m TS7006: [0mParameter 'taskId' implicitly has an 'any' type.
+
+[7m119[0m   register(taskId, { type, parentSessionPath = null, parentSessionId = null, parentSessionRef = null, sessionId = null, sessionRef = null, legacySessionPath = null, meta = {} as any, pluginId = null, agentId = null, persist = true }: any = {}) {
+[7m   [0m [91m           ~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m169[0m:[93m10[0m - [91merror[0m[90m TS7006: [0mParameter 'taskId' implicitly has an 'any' type.
+
+[7m169[0m   update(taskId, patch: any = {}, options: any = {}) {
+[7m   [0m [91m         ~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m197[0m:[93m12[0m - [91merror[0m[90m TS7006: [0mParameter 'taskId' implicitly has an 'any' type.
+
+[7m197[0m   complete(taskId, result = null, options: any = {}) {
+[7m   [0m [91m           ~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m218[0m:[93m8[0m - [91merror[0m[90m TS7006: [0mParameter 'taskId' implicitly has an 'any' type.
+
+[7m218[0m   fail(taskId, error = "failed", options: any = {}) {
+[7m   [0m [91m       ~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m235[0m:[93m10[0m - [91merror[0m[90m TS7006: [0mParameter 'taskId' implicitly has an 'any' type.
+
+[7m235[0m   cancel(taskId, reason = "canceled") {
+[7m   [0m [91m         ~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m255[0m:[93m9[0m - [91merror[0m[90m TS7006: [0mParameter 'taskId' implicitly has an 'any' type.
+
+[7m255[0m   abort(taskId, reason = "aborted") {
+[7m   [0m [91m        ~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m269[0m:[93m55[0m - [91merror[0m[90m TS18046: [0m'err' is of type 'unknown'.
+
+[7m269[0m       log.error(`abort handler error for ${taskId}: ${err.message}`);
+[7m   [0m [91m                                                      ~~~[0m
+[96mlib/task-registry.ts[0m:[93m275[0m:[93m24[0m - [91merror[0m[90m TS7006: [0mParameter 'parentSessionPath' implicitly has an 'any' type.
+
+[7m275[0m   abortByParentSession(parentSessionPath, reason = "parent session aborted") {
+[7m   [0m [91m                       ~~~~~~~~~~~~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m314[0m:[93m10[0m - [91merror[0m[90m TS7006: [0mParameter 'taskId' implicitly has an 'any' type.
+
+[7m314[0m   remove(taskId) {
+[7m   [0m [91m         ~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m319[0m:[93m9[0m - [91merror[0m[90m TS7006: [0mParameter 'taskId' implicitly has an 'any' type.
+
+[7m319[0m   query(taskId) {
+[7m   [0m [91m        ~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m324[0m:[93m14[0m - [91merror[0m[90m TS7006: [0mParameter 'type' implicitly has an 'any' type.
+
+[7m324[0m   listByType(type) {
+[7m   [0m [91m             ~~~~[0m
+[96mlib/task-registry.ts[0m:[93m345[0m:[93m29[0m - [91merror[0m[90m TS7006: [0mParameter 'parentSessionPath' implicitly has an 'any' type.
+
+[7m345[0m   hasActiveForParentSession(parentSessionPath) {
+[7m   [0m [91m                            ~~~~~~~~~~~~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m353[0m:[93m12[0m - [91merror[0m[90m TS7006: [0mParameter 'scheduleId' implicitly has an 'any' type.
+
+[7m353[0m   schedule(scheduleId, input: any = {}) {
+[7m   [0m [91m           ~~~~~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m390[0m:[93m14[0m - [91merror[0m[90m TS7006: [0mParameter 'scheduleId' implicitly has an 'any' type.
+
+[7m390[0m   unschedule(scheduleId) {
+[7m   [0m [91m             ~~~~~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m398[0m:[93m17[0m - [91merror[0m[90m TS7006: [0mParameter 'scheduleId' implicitly has an 'any' type.
+
+[7m398[0m   querySchedule(scheduleId) {
+[7m   [0m [91m                ~~~~~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m420[0m:[93m16[0m - [91merror[0m[90m TS7006: [0mParameter 'taskId' implicitly has an 'any' type.
+
+[7m420[0m   _requireTask(taskId) {
+[7m   [0m [91m               ~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m426[0m:[93m24[0m - [91merror[0m[90m TS7006: [0mParameter 'type' implicitly has an 'any' type.
+
+[7m426[0m   _armSchedulesForType(type) {
+[7m   [0m [91m                       ~~~~[0m
+[96mlib/task-registry.ts[0m:[93m432[0m:[93m16[0m - [91merror[0m[90m TS7006: [0mParameter 'scheduleId' implicitly has an 'any' type.
+
+[7m432[0m   _armSchedule(scheduleId) {
+[7m   [0m [91m               ~~~~~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m447[0m:[93m23[0m - [91merror[0m[90m TS7006: [0mParameter 'scheduleId' implicitly has an 'any' type.
+
+[7m447[0m   _clearScheduleTimer(scheduleId) {
+[7m   [0m [91m                      ~~~~~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m453[0m:[93m22[0m - [91merror[0m[90m TS7006: [0mParameter 'scheduleId' implicitly has an 'any' type.
+
+[7m453[0m   async _runSchedule(scheduleId) {
+[7m   [0m [91m                     ~~~~~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m513[0m:[93m51[0m - [91merror[0m[90m TS18046: [0m'err' is of type 'unknown'.
+
+[7m513[0m       log.warn(`failed to load persisted tasks: ${err.message}`);
+[7m   [0m [91m                                                  ~~~[0m
+[96mlib/task-registry.ts[0m:[93m527[0m:[93m44[0m - [91merror[0m[90m TS18046: [0m'err' is of type 'unknown'.
+
+[7m527[0m       log.warn(`failed to persist tasks: ${err.message}`);
+[7m   [0m [91m                                           ~~~[0m
+[96mlib/task-registry.ts[0m:[93m532[0m:[93m21[0m - [91merror[0m[90m TS7006: [0mParameter 'value' implicitly has an 'any' type.
+
+[7m532[0m function assertText(value, label) {
+[7m   [0m [91m                    ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m532[0m:[93m28[0m - [91merror[0m[90m TS7006: [0mParameter 'label' implicitly has an 'any' type.
+
+[7m532[0m function assertText(value, label) {
+[7m   [0m [91m                           ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m539[0m:[93m22[0m - [91merror[0m[90m TS7006: [0mParameter 'task' implicitly has an 'any' type.
+
+[7m539[0m function taskAttempt(task) {
+[7m   [0m [91m                     ~~~~[0m
+[96mlib/task-registry.ts[0m:[93m547[0m:[93m25[0m - [91merror[0m[90m TS7006: [0mParameter 'task' implicitly has an 'any' type.
+
+[7m547[0m function isStaleAttempt(task, expectedAttempt) {
+[7m   [0m [91m                        ~~~~[0m
+[96mlib/task-registry.ts[0m:[93m547[0m:[93m31[0m - [91merror[0m[90m TS7006: [0mParameter 'expectedAttempt' implicitly has an 'any' type.
+
+[7m547[0m function isStaleAttempt(task, expectedAttempt) {
+[7m   [0m [91m                              ~~~~~~~~~~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m555[0m:[93m26[0m - [91merror[0m[90m TS7006: [0mParameter 'value' implicitly has an 'any' type.
+
+[7m555[0m function normalizeStatus(value, fallback) {
+[7m   [0m [91m                         ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m555[0m:[93m33[0m - [91merror[0m[90m TS7006: [0mParameter 'fallback' implicitly has an 'any' type.
+
+[7m555[0m function normalizeStatus(value, fallback) {
+[7m   [0m [91m                                ~~~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m564[0m:[93m28[0m - [91merror[0m[90m TS7006: [0mParameter 'value' implicitly has an 'any' type.
+
+[7m564[0m function normalizeProgress(value) {
+[7m   [0m [91m                           ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m582[0m:[93m34[0m - [91merror[0m[90m TS7006: [0mParameter 'value' implicitly has an 'any' type.
+
+[7m582[0m function normalizeOptionalNumber(value, label) {
+[7m   [0m [91m                                 ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m582[0m:[93m41[0m - [91merror[0m[90m TS7006: [0mParameter 'label' implicitly has an 'any' type.
+
+[7m582[0m function normalizeOptionalNumber(value, label) {
+[7m   [0m [91m                                        ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m589[0m:[93m34[0m - [91merror[0m[90m TS7006: [0mParameter 'value' implicitly has an 'any' type.
+
+[7m589[0m function normalizePositiveNumber(value, label) {
+[7m   [0m [91m                                 ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m589[0m:[93m41[0m - [91merror[0m[90m TS7006: [0mParameter 'label' implicitly has an 'any' type.
+
+[7m589[0m function normalizePositiveNumber(value, label) {
+[7m   [0m [91m                                        ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m598[0m:[93m32[0m - [91merror[0m[90m TS7006: [0mParameter 'value' implicitly has an 'any' type.
+
+[7m598[0m function normalizeOptionalTime(value, label) {
+[7m   [0m [91m                               ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m598[0m:[93m39[0m - [91merror[0m[90m TS7006: [0mParameter 'label' implicitly has an 'any' type.
+
+[7m598[0m function normalizeOptionalTime(value, label) {
+[7m   [0m [91m                                      ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m606[0m:[93m24[0m - [91merror[0m[90m TS7006: [0mParameter 'current' implicitly has an 'any' type.
+
+[7m606[0m function derivePercent(current, total) {
+[7m   [0m [91m                       ~~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m606[0m:[93m33[0m - [91merror[0m[90m TS7006: [0mParameter 'total' implicitly has an 'any' type.
+
+[7m606[0m function derivePercent(current, total) {
+[7m   [0m [91m                                ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m611[0m:[93m25[0m - [91merror[0m[90m TS7006: [0mParameter 'error' implicitly has an 'any' type.
+
+[7m611[0m function normalizeError(error) {
+[7m   [0m [91m                        ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m618[0m:[93m24[0m - [91merror[0m[90m TS7006: [0mParameter 'value' implicitly has an 'any' type.
+
+[7m618[0m function objectOrEmpty(value) {
+[7m   [0m [91m                       ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m622[0m:[93m16[0m - [91merror[0m[90m TS7006: [0mParameter 'value' implicitly has an 'any' type.
+
+[7m622[0m function clone(value) {
+[7m   [0m [91m               ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m626[0m:[93m33[0m - [91merror[0m[90m TS7006: [0mParameter 'task' implicitly has an 'any' type.
+
+[7m626[0m function stripRuntimeTaskFields(task) {
+[7m   [0m [91m                                ~~~~[0m
+[96mlib/task-registry.ts[0m:[93m631[0m:[93m29[0m - [91merror[0m[90m TS7031: [0mBinding element 'intervalMs' implicitly has an 'any' type.
+
+[7m631[0m function resolveNextRunAt({ intervalMs, runAt, existing, now }) {
+[7m   [0m [91m                            ~~~~~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m631[0m:[93m41[0m - [91merror[0m[90m TS7031: [0mBinding element 'runAt' implicitly has an 'any' type.
+
+[7m631[0m function resolveNextRunAt({ intervalMs, runAt, existing, now }) {
+[7m   [0m [91m                                        ~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m631[0m:[93m48[0m - [91merror[0m[90m TS7031: [0mBinding element 'existing' implicitly has an 'any' type.
+
+[7m631[0m function resolveNextRunAt({ intervalMs, runAt, existing, now }) {
+[7m   [0m [91m                                               ~~~~~~~~[0m
+[96mlib/task-registry.ts[0m:[93m631[0m:[93m58[0m - [91merror[0m[90m TS7031: [0mBinding element 'now' implicitly has an 'any' type.
+
+[7m631[0m function resolveNextRunAt({ intervalMs, runAt, existing, now }) {
+[7m   [0m [91m                                                         ~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m1[0m:[93m49[0m - [91merror[0m[90m TS7006: [0mParameter 'eventBus' implicitly has an 'any' type.
+
+[7m1[0m export function registerTaskRegistryBusHandlers(eventBus, taskRegistry) {
+[7m [0m [91m                                                ~~~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m1[0m:[93m59[0m - [91merror[0m[90m TS7006: [0mParameter 'taskRegistry' implicitly has an 'any' type.
+
+[7m1[0m export function registerTaskRegistryBusHandlers(eventBus, taskRegistry) {
+[7m [0m [91m                                                          ~~~~~~~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m2[0m:[93m47[0m - [91merror[0m[90m TS7031: [0mBinding element 'type' implicitly has an 'any' type.
+
+[7m2[0m   eventBus.handle("task:register-handler", ({ type, abort, run }) => {
+[7m [0m [91m                                              ~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m2[0m:[93m53[0m - [91merror[0m[90m TS7031: [0mBinding element 'abort' implicitly has an 'any' type.
+
+[7m2[0m   eventBus.handle("task:register-handler", ({ type, abort, run }) => {
+[7m [0m [91m                                                    ~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m2[0m:[93m60[0m - [91merror[0m[90m TS7031: [0mBinding element 'run' implicitly has an 'any' type.
+
+[7m2[0m   eventBus.handle("task:register-handler", ({ type, abort, run }) => {
+[7m [0m [91m                                                           ~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m8[0m:[93m49[0m - [91merror[0m[90m TS7031: [0mBinding element 'type' implicitly has an 'any' type.
+
+[7m8[0m   eventBus.handle("task:unregister-handler", ({ type }) => {
+[7m [0m [91m                                                ~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m12[0m:[93m39[0m - [91merror[0m[90m TS7031: [0mBinding element 'taskId' implicitly has an 'any' type.
+
+[7m12[0m   eventBus.handle("task:register", ({ taskId, type, parentSessionPath, parentSessionId, parentSessionRef, sessionId, sessionRef, legacySessionPath, meta, pluginId, agentId, persist }) => {
+[7m  [0m [91m                                      ~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m12[0m:[93m47[0m - [91merror[0m[90m TS7031: [0mBinding element 'type' implicitly has an 'any' type.
+
+[7m12[0m   eventBus.handle("task:register", ({ taskId, type, parentSessionPath, parentSessionId, parentSessionRef, sessionId, sessionRef, legacySessionPath, meta, pluginId, agentId, persist }) => {
+[7m  [0m [91m                                              ~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m12[0m:[93m53[0m - [91merror[0m[90m TS7031: [0mBinding element 'parentSessionPath' implicitly has an 'any' type.
+
+[7m12[0m   eventBus.handle("task:register", ({ taskId, type, parentSessionPath, parentSessionId, parentSessionRef, sessionId, sessionRef, legacySessionPath, meta, pluginId, agentId, persist }) => {
+[7m  [0m [91m                                                    ~~~~~~~~~~~~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m12[0m:[93m72[0m - [91merror[0m[90m TS7031: [0mBinding element 'parentSessionId' implicitly has an 'any' type.
+
+[7m12[0m   eventBus.handle("task:register", ({ taskId, type, parentSessionPath, parentSessionId, parentSessionRef, sessionId, sessionRef, legacySessionPath, meta, pluginId, agentId, persist }) => {
+[7m  [0m [91m                                                                       ~~~~~~~~~~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m12[0m:[93m89[0m - [91merror[0m[90m TS7031: [0mBinding element 'parentSessionRef' implicitly has an 'any' type.
+
+[7m12[0m   eventBus.handle("task:register", ({ taskId, type, parentSessionPath, parentSessionId, parentSessionRef, sessionId, sessionRef, legacySessionPath, meta, pluginId, agentId, persist }) => {
+[7m  [0m [91m                                                                                        ~~~~~~~~~~~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m12[0m:[93m107[0m - [91merror[0m[90m TS7031: [0mBinding element 'sessionId' implicitly has an 'any' type.
+
+[7m12[0m   eventBus.handle("task:register", ({ taskId, type, parentSessionPath, parentSessionId, parentSessionRef, sessionId, sessionRef, legacySessionPath, meta, pluginId, agentId, persist }) => {
+[7m  [0m [91m                                                                                                          ~~~~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m12[0m:[93m118[0m - [91merror[0m[90m TS7031: [0mBinding element 'sessionRef' implicitly has an 'any' type.
+
+[7m12[0m   eventBus.handle("task:register", ({ taskId, type, parentSessionPath, parentSessionId, parentSessionRef, sessionId, sessionRef, legacySessionPath, meta, pluginId, agentId, persist }) => {
+[7m  [0m [91m                                                                                                                     ~~~~~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m12[0m:[93m130[0m - [91merror[0m[90m TS7031: [0mBinding element 'legacySessionPath' implicitly has an 'any' type.
+
+[7m12[0m   eventBus.handle("task:register", ({ taskId, type, parentSessionPath, parentSessionId, parentSessionRef, sessionId, sessionRef, legacySessionPath, meta, pluginId, agentId, persist }) => {
+[7m  [0m [91m                                                                                                                                 ~~~~~~~~~~~~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m12[0m:[93m149[0m - [91merror[0m[90m TS7031: [0mBinding element 'meta' implicitly has an 'any' type.
+
+[7m12[0m   eventBus.handle("task:register", ({ taskId, type, parentSessionPath, parentSessionId, parentSessionRef, sessionId, sessionRef, legacySessionPath, meta, pluginId, agentId, persist }) => {
+[7m  [0m [91m                                                                                                                                                    ~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m12[0m:[93m155[0m - [91merror[0m[90m TS7031: [0mBinding element 'pluginId' implicitly has an 'any' type.
+
+[7m12[0m   eventBus.handle("task:register", ({ taskId, type, parentSessionPath, parentSessionId, parentSessionRef, sessionId, sessionRef, legacySessionPath, meta, pluginId, agentId, persist }) => {
+[7m  [0m [91m                                                                                                                                                          ~~~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m12[0m:[93m165[0m - [91merror[0m[90m TS7031: [0mBinding element 'agentId' implicitly has an 'any' type.
+
+[7m12[0m   eventBus.handle("task:register", ({ taskId, type, parentSessionPath, parentSessionId, parentSessionRef, sessionId, sessionRef, legacySessionPath, meta, pluginId, agentId, persist }) => {
+[7m  [0m [91m                                                                                                                                                                    ~~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m12[0m:[93m174[0m - [91merror[0m[90m TS7031: [0mBinding element 'persist' implicitly has an 'any' type.
+
+[7m12[0m   eventBus.handle("task:register", ({ taskId, type, parentSessionPath, parentSessionId, parentSessionRef, sessionId, sessionRef, legacySessionPath, meta, pluginId, agentId, persist }) => {
+[7m  [0m [91m                                                                                                                                                                             ~~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m30[0m:[93m37[0m - [91merror[0m[90m TS7031: [0mBinding element 'taskId' implicitly has an 'any' type.
+
+[7m30[0m   eventBus.handle("task:update", ({ taskId, expectedAttempt, ...patch }) => {
+[7m  [0m [91m                                    ~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m30[0m:[93m45[0m - [91merror[0m[90m TS7031: [0mBinding element 'expectedAttempt' implicitly has an 'any' type.
+
+[7m30[0m   eventBus.handle("task:update", ({ taskId, expectedAttempt, ...patch }) => {
+[7m  [0m [91m                                            ~~~~~~~~~~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m33[0m:[93m39[0m - [91merror[0m[90m TS7031: [0mBinding element 'taskId' implicitly has an 'any' type.
+
+[7m33[0m   eventBus.handle("task:complete", ({ taskId, result, expectedAttempt }) => {
+[7m  [0m [91m                                      ~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m33[0m:[93m47[0m - [91merror[0m[90m TS7031: [0mBinding element 'result' implicitly has an 'any' type.
+
+[7m33[0m   eventBus.handle("task:complete", ({ taskId, result, expectedAttempt }) => {
+[7m  [0m [91m                                              ~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m33[0m:[93m55[0m - [91merror[0m[90m TS7031: [0mBinding element 'expectedAttempt' implicitly has an 'any' type.
+
+[7m33[0m   eventBus.handle("task:complete", ({ taskId, result, expectedAttempt }) => {
+[7m  [0m [91m                                                      ~~~~~~~~~~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m36[0m:[93m35[0m - [91merror[0m[90m TS7031: [0mBinding element 'taskId' implicitly has an 'any' type.
+
+[7m36[0m   eventBus.handle("task:fail", ({ taskId, reason, error, expectedAttempt }) => {
+[7m  [0m [91m                                  ~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m36[0m:[93m43[0m - [91merror[0m[90m TS7031: [0mBinding element 'reason' implicitly has an 'any' type.
+
+[7m36[0m   eventBus.handle("task:fail", ({ taskId, reason, error, expectedAttempt }) => {
+[7m  [0m [91m                                          ~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m36[0m:[93m51[0m - [91merror[0m[90m TS7031: [0mBinding element 'error' implicitly has an 'any' type.
+
+[7m36[0m   eventBus.handle("task:fail", ({ taskId, reason, error, expectedAttempt }) => {
+[7m  [0m [91m                                                  ~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m36[0m:[93m58[0m - [91merror[0m[90m TS7031: [0mBinding element 'expectedAttempt' implicitly has an 'any' type.
+
+[7m36[0m   eventBus.handle("task:fail", ({ taskId, reason, error, expectedAttempt }) => {
+[7m  [0m [91m                                                         ~~~~~~~~~~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m39[0m:[93m37[0m - [91merror[0m[90m TS7031: [0mBinding element 'taskId' implicitly has an 'any' type.
+
+[7m39[0m   eventBus.handle("task:remove", ({ taskId }) => {
+[7m  [0m [91m                                    ~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m43[0m:[93m36[0m - [91merror[0m[90m TS7031: [0mBinding element 'taskId' implicitly has an 'any' type.
+
+[7m43[0m   eventBus.handle("task:query", ({ taskId }) => {
+[7m  [0m [91m                                   ~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m49[0m:[93m36[0m - [91merror[0m[90m TS7031: [0mBinding element 'taskId' implicitly has an 'any' type.
+
+[7m49[0m   eventBus.handle("task:abort", ({ taskId }) => {
+[7m  [0m [91m                                   ~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m52[0m:[93m37[0m - [91merror[0m[90m TS7031: [0mBinding element 'taskId' implicitly has an 'any' type.
+
+[7m52[0m   eventBus.handle("task:cancel", ({ taskId, reason }) => {
+[7m  [0m [91m                                    ~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m52[0m:[93m45[0m - [91merror[0m[90m TS7031: [0mBinding element 'reason' implicitly has an 'any' type.
+
+[7m52[0m   eventBus.handle("task:cancel", ({ taskId, reason }) => {
+[7m  [0m [91m                                            ~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m55[0m:[93m39[0m - [91merror[0m[90m TS7031: [0mBinding element 'scheduleId' implicitly has an 'any' type.
+
+[7m55[0m   eventBus.handle("task:schedule", ({ scheduleId, ...input }) => {
+[7m  [0m [91m                                      ~~~~~~~~~~[0m
+[96mserver/task-bus-handlers.ts[0m:[93m58[0m:[93m41[0m - [91merror[0m[90m TS7031: [0mBinding element 'scheduleId' implicitly has an 'any' type.
+
+[7m58[0m   eventBus.handle("task:unschedule", ({ scheduleId }) => {
+[7m  [0m [91m                                        ~~~~~~~~~~[0m
+[96mshared/safe-fs.ts[0m:[93m35[0m:[93m31[0m - [91merror[0m[90m TS7016: [0mCould not find a declaration file for module 'js-yaml'. '/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/js-yaml/dist/js-yaml.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/js-yaml` if it exists or add a new declaration (.d.ts) file containing `declare module 'js-yaml';`
+
+[7m35[0m     const yaml = await import('js-yaml');
+[7m  [0m [91m                              ~~~~~~~~~[0m
