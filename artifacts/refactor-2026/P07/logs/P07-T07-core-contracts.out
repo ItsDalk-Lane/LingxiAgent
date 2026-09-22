@@ -1,0 +1,4 @@
+Core contracts strict check passed (6 files).
+Tool invocation boundary check passed (2245 source files).
+Dependency boundary check passed (2027 source files).
+lint:boundary ok -- 1 known open->closed edge(s), all within the tracked ratchet baseline (existing debt, not newly introduced).

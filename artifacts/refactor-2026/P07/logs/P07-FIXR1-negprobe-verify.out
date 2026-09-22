@@ -1,0 +1,5 @@
+probe_verdict_after_append all valid: true
+probe_append_detected all false: true
+components_ok: false (expected false)
+bounded_verdict: NO_REPRODUCIBLE_UNBOUNDED_GROWTH (steady-state logic unaffected)
+NEGPROBE_VERIFY_PASS: assertion is load-bearing

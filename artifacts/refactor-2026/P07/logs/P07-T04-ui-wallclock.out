@@ -1,0 +1,13 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stdout | desktop/src/react/__tests__/chat-performance/p07-stream-buffer-wallclock.test.ts > P07-T04 stream buffer wall-clock profile > canonical segment 流 50,000 delta：吞吐、有界刷新与响应度（真实计时器）
+P07_UI_SAMPLE {"deltas":50000,"burst_wall_ms":15.6,"handle_per_sec":3211665,"stream_flush_count":2,"markdown_parse_count":0,"structural_updates":1,"probe_max_drift_ms":8.5}
+
+ ✓ desktop/src/react/__tests__/chat-performance/p07-stream-buffer-wallclock.test.ts (2 tests) 463ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  13:45:04
+   Duration  781ms (transform 204ms, setup 16ms, import 239ms, tests 463ms, environment 0ms)
+

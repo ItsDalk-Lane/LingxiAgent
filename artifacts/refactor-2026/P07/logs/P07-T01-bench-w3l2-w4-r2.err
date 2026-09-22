@@ -1,0 +1,19 @@
+node:internal/modules/esm/translators:442
+    throw new ERR_UNKNOWN_BUILTIN_MODULE(url);
+          ^
+
+Error [ERR_UNKNOWN_BUILTIN_MODULE]: No such built-in module: node:abort-controller
+    at ModuleLoader.builtinStrategy (node:internal/modules/esm/translators:442:11)
+    at #translate (node:internal/modules/esm/loader:435:20)
+    at afterLoad (node:internal/modules/esm/loader:491:29)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:496:12)
+    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:549:36)
+    at afterResolve (node:internal/modules/esm/loader:597:52)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:12)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:253:17)
+    at new ModuleJob (node:internal/modules/esm/module_job:232:26) {
+  code: 'ERR_UNKNOWN_BUILTIN_MODULE'
+}
+
+Node.js v24.16.0

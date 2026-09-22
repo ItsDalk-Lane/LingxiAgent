@@ -1,0 +1,77 @@
+{
+  "workload": "server 冷启动（bundle 形态：node dist-server/mac-arm64/bootstrap.js → server-info.json；全新隔离 HOME；OS page cache 不清空）",
+  "batch": "P07BUNDLE",
+  "runs": [
+    {
+      "run": 1,
+      "home": "artifacts/refactor-2026/P07/isolated/bench-boot-P07BUNDLE-1",
+      "ms": 1042,
+      "ready": true
+    },
+    {
+      "run": 2,
+      "home": "artifacts/refactor-2026/P07/isolated/bench-boot-P07BUNDLE-2",
+      "ms": 1041,
+      "ready": true
+    },
+    {
+      "run": 3,
+      "home": "artifacts/refactor-2026/P07/isolated/bench-boot-P07BUNDLE-3",
+      "ms": 1041,
+      "ready": true
+    },
+    {
+      "run": 4,
+      "home": "artifacts/refactor-2026/P07/isolated/bench-boot-P07BUNDLE-4",
+      "ms": 1041,
+      "ready": true
+    },
+    {
+      "run": 5,
+      "home": "artifacts/refactor-2026/P07/isolated/bench-boot-P07BUNDLE-5",
+      "ms": 1041,
+      "ready": true
+    },
+    {
+      "run": 6,
+      "home": "artifacts/refactor-2026/P07/isolated/bench-boot-P07BUNDLE-6",
+      "ms": 1040,
+      "ready": true
+    },
+    {
+      "run": 7,
+      "home": "artifacts/refactor-2026/P07/isolated/bench-boot-P07BUNDLE-7",
+      "ms": 1042,
+      "ready": true
+    },
+    {
+      "run": 8,
+      "home": "artifacts/refactor-2026/P07/isolated/bench-boot-P07BUNDLE-8",
+      "ms": 1040,
+      "ready": true
+    },
+    {
+      "run": 9,
+      "home": "artifacts/refactor-2026/P07/isolated/bench-boot-P07BUNDLE-9",
+      "ms": 1041,
+      "ready": true
+    },
+    {
+      "run": 10,
+      "home": "artifacts/refactor-2026/P07/isolated/bench-boot-P07BUNDLE-10",
+      "ms": 1041,
+      "ready": true
+    }
+  ],
+  "ready_count": 10,
+  "median_ms": 1041,
+  "p95_ms": 1042,
+  "min_ms": 1040,
+  "max_ms": 1042,
+  "env": {
+    "node": "v24.16.0",
+    "os": "Darwin 27.0.0 arm64",
+    "cpus": 28
+  },
+  "seed_note": "输入为空 HOME + 打包 bundle 入口；无随机输入；与源码形态（W1）同机同口径成对"
+}

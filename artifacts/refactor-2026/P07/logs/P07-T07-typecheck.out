@@ -1,0 +1,5 @@
+
+> lingxi@0.1.42 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+tests/p07-startup-lazy-init.test.ts(159,53): error TS2304: Cannot find name 'Retried'.

@@ -1,0 +1,104 @@
+{
+  "w3_layer2_model_stream": {
+    "workload": "真实 Pi agent session + 本地 HTTP 供应商替身（scenario harness witness）：SSE N delta → prompt() 全程墙钟",
+    "results": {
+      "n200": {
+        "runs": 30,
+        "prompt_wall_ms": {
+          "n": 30,
+          "median": 3.1,
+          "p95": 4.8,
+          "min": 2.5,
+          "max": 5.9
+        },
+        "deltas_per_sec": {
+          "n": 30,
+          "median": 65577,
+          "p95": 79660,
+          "min": 33695,
+          "max": 80496
+        },
+        "output_equivalence": "all-equal"
+      },
+      "n2000": {
+        "runs": 30,
+        "prompt_wall_ms": {
+          "n": 30,
+          "median": 23.9,
+          "p95": 35.7,
+          "min": 20.6,
+          "max": 36.3
+        },
+        "deltas_per_sec": {
+          "n": 30,
+          "median": 88305,
+          "p95": 97157,
+          "min": 55148,
+          "max": 97228
+        },
+        "output_equivalence": "all-equal"
+      },
+      "n20000": {
+        "runs": 30,
+        "prompt_wall_ms": {
+          "n": 30,
+          "median": 200.5,
+          "p95": 209.1,
+          "min": 194.2,
+          "max": 209.6
+        },
+        "deltas_per_sec": {
+          "n": 30,
+          "median": 99830,
+          "p95": 102783,
+          "min": 95434,
+          "max": 102967
+        },
+        "output_equivalence": "all-equal"
+      }
+    }
+  },
+  "w4_cancel_latency": {
+    "workload": "取消响应时延：abort→prompt settled（S1/S2）与 abort→子进程树退出（S3）",
+    "s1_pre_first_byte_abort_at_500ms": {
+      "runs": 10,
+      "abort_to_settle_ms": {
+        "n": 10,
+        "median": 1.5,
+        "p95": 1.7,
+        "min": 1.2,
+        "max": 1.7
+      },
+      "outcomes": [
+        "resolved:"
+      ],
+      "witness_request_delta_per_run": 1
+    },
+    "s2_mid_stream_abort_at_5s": {
+      "runs": 6,
+      "abort_to_settle_ms": {
+        "n": 6,
+        "median": 1.6,
+        "p95": 3.7,
+        "min": 1.5,
+        "max": 3.7
+      },
+      "outcomes": [
+        "resolved"
+      ],
+      "note": "每轮含 5s 流等待（名义总时长约 100s 流在 5s 处被取消）；样本 6 轮（时长受限于协议场景，如实登记）"
+    },
+    "s3_tool_exec_abort": {
+      "abort_to_settle_ms": 2.4,
+      "outcome": "rejected",
+      "error_name": "Error",
+      "grandchild_exited": true,
+      "sentinel_survived": true,
+      "correctness": "PASS"
+    }
+  },
+  "env": {
+    "node": "v24.16.0",
+    "os": "Darwin 27.0.0 arm64"
+  }
+}

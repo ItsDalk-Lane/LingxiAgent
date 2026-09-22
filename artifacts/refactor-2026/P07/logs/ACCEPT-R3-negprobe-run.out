@@ -1,0 +1,4 @@
+[soak] batch=1/3 rss=325168KB heap=100713KB cache_sessions=8 evictions=4
+[soak] batch=2/3 rss=341152KB heap=104965KB cache_sessions=8 evictions=16
+[soak] batch=3/3 rss=341712KB heap=133246KB cache_sessions=8 evictions=28
+[soak] verdict=NO_REPRODUCIBLE_UNBOUNDED_GROWTH rss_growth=-1.7% heap_growth=-15.2% out=artifacts/refactor-2026/P07/logs/ACCEPT-R3-negprobe-soak.json

@@ -1,0 +1,6 @@
+stderr | desktop/src/react/__tests__/chat-performance/p07-stream-buffer-wallclock.test.ts > P07-T04 stream buffer wall-clock profile > canonical segment 流 50,000 delta：吞吐、有界刷新与响应度（真实计时器）
+[stream] unresolved assistant segment finalized with fallback: seg-p07-text
+
+stderr | desktop/src/react/__tests__/chat-performance/p07-stream-buffer-wallclock.test.ts > P07-T04 stream buffer wall-clock profile > 合并窗口内 content_block 与终局事件不丢（A06 形状，真实计时器）
+[stream] unresolved assistant segment finalized with fallback: seg-p07-a06
+
