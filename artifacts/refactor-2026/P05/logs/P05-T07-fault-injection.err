@@ -1,0 +1,15 @@
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts [ artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts ]
+ReferenceError: Cannot access '__vi_import_0__' before initialization
+ ❯ artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts:19:9
+     17| // ── FI-1 ───────────────────────────────────────────────────────────…
+     18| // 篡改历史段语义：commentary → final_answer（模拟"来源错误地把 commentary 当 final"）。
+     19| vi.mock(path.join(REPO, "shared/assistant-semantic-segments.ts"), asyn…
+       |         ^
+     20|   const orig = await importOriginal<typeof import("/Users/study_superi…
+     21|   return {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

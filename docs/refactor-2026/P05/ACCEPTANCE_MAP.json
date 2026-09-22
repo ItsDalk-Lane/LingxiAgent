@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "stage_id": "P05",
+  "generated": "2026-09-22",
+  "source_sha": "1f0537b08",
+  "note": "fixture_sha256 = 锁定该场景的测试文件 sha256（合成数据内嵌于测试，非独立 fixture 文件）。全部条目本轮真实执行且通过；命令见 artifacts/refactor-2026/P05/logs/command-log.jsonl。",
+  "cases": [
+    {
+      "id": "P05-A01",
+      "scenario": "实时历史一致",
+      "test_path": "tests/live-history-reserved-tag-parity.test.ts",
+      "test_names": ["场景一：mood-only → generate-image → mood + final answer，两条路径语义一致", "场景二：mood-only 无 final answer，两条路径都得到 missing_final_answer 且无假正文段"],
+      "fixture_sha256": "0bf11bfb0b4614d9d453c5d1a2c850f6d0223e0f9e6fa32ffff89295324b3409",
+      "production_entry": "server/routes/chat.ts createChatRoute → desktop use-stream-buffer → projectAssistantTurn；history: server/history-read/project-page.ts → desktop history-builder → projectAssistantTurn",
+      "command_ids": ["P05-T07-parity-and-fi"],
+      "status": "PASS"
+    },
+    {
+      "id": "P05-A02",
+      "scenario": "合法标签文本",
+      "test_path": "tests/reserved-tag-text-preservation.test.ts",
+      "test_names": ["T01: 正常配对的未知标记全部保留", "T06: code fence／inline code 内闭标签字符不变", "T11: a<b、比较式、注释、CDATA 保守保留非协议内容", "T15: 用户输入含 HTML/XML 不进入 assistant 残渣清理"],
+      "fixture_sha256": "（既有套件，本轮 P05-T07-parity-and-fi 全绿执行）",
+      "production_entry": "core/events.ts ReservedTagParserBase（协议边界仅识别配对保留标签）；history-builder sanitizePersistedSegments",
+      "command_ids": ["P05-T07-parity-and-fi"],
+      "status": "PASS"
+    },
+    {
+      "id": "P05-A03",
+      "scenario": "重复和乱序流",
+      "test_path": "tests/chat-route-switching.test.ts",
+      "test_names": ["A03：按 sinceSeq 增量续传不重复已接事件；同一请求重复发送幂等"],
+      "fixture_sha256": "d1419362eca285f7e8780b07c0655fbe0d262672e0d3edbf9be8e8b3a355dd19",
+      "production_entry": "server/routes/chat.ts resume_stream handler → server/session-stream-store.ts resumeSessionStream（真实路由，store 不 mock）",
+      "supporting": ["desktop/src/react/__tests__/services/stream-resume.test.ts does not replay the same stream sequence twice when a resume response is repeated", "desktop/src/react/__tests__/hooks/use-stream-buffer-dedupe.test.ts canonical delta 重放不再叠加"],
+      "command_ids": ["P05-T03-ws-resume-route-r2", "P05-T03-store-regression"],
+      "status": "PASS"
+    },
+    {
+      "id": "P05-A04",
+      "scenario": "跨stream重连",
+      "test_path": "tests/chat-route-switching.test.ts",
+      "test_names": ["A04：跨 stream 重连——旧 streamId 触发 reset 全量重建为当前流，seq 不跨 stream 比较"],
+      "fixture_sha256": "d1419362eca285f7e8780b07c0655fbe0d262672e0d3edbf9be8e8b3a355dd19",
+      "production_entry": "resumeSessionStream 跨流 reset 分支（session-stream-store.ts:114-124）；消费端 updateSessionStreamMeta 换流清空 consumedSeqs（stream-resume.ts:162-183）",
+      "supporting": ["desktop/src/react/__tests__/services/stream-resume.test.ts does not dedupe a new stream seq=1 against the previous stream consumed seqs（本阶段新增）"],
+      "command_ids": ["P05-T03-ws-resume-route-r2", "P05-T03-client-cross-stream-r3"],
+      "status": "PASS"
+    },
+    {
+      "id": "P05-A05",
+      "scenario": "ring截断",
+      "test_path": "tests/chat-route-switching.test.ts",
+      "test_names": ["A05：ring 截断——过旧 sinceSeq 恢复返回 truncated=true 且只从最早存活事件补起"],
+      "fixture_sha256": "d1419362eca285f7e8780b07c0655fbe0d262672e0d3edbf9be8e8b3a355dd19",
+      "production_entry": "session-stream-store.ts trimEvents（5000 事件上限真实触发）+ resumeSessionStream truncated 分支",
+      "supporting": ["tests/session-stream-store.test.ts 容量截断时会标记 truncated / 按总字节上限截断旧事件 / 压缩单个超大事件"],
+      "command_ids": ["P05-T03-ws-resume-route-r2", "P05-T03-store-regression"],
+      "status": "PASS"
+    },
+    {
+      "id": "P05-A06",
+      "scenario": "流结束缓存清空",
+      "test_path": "tests/chat-route-switching.test.ts",
+      "test_names": ["A06：流结束缓存清空——resume 返回空事件 + isStreaming=false，恢复走历史而非已消失 ring"],
+      "fixture_sha256": "d1419362eca285f7e8780b07c0655fbe0d262672e0d3edbf9be8e8b3a355dd19",
+      "production_entry": "chat.ts finishAssistantRun → finishSessionStream（清 events 保终态）；消费端 shouldHydrateCompletedEmptyResume → 历史重建",
+      "supporting": ["desktop/src/react/__tests__/services/stream-resume.test.ts hydrates a completed empty resume for background sessions instead of leaving them stuck streaming"],
+      "command_ids": ["P05-T03-ws-resume-route-r2", "P05-T03-store-regression"],
+      "status": "PASS"
+    },
+    {
+      "id": "P05-A07",
+      "scenario": "分页长Run",
+      "test_path": "tests/history-pagination-run-continuity.test.ts",
+      "test_names": ["T01：固定快照下分页不重叠、单逻辑 Run、无伪无回复状态，且与全量恢复语义等价（1k=21页/10k=201页）", "T03：任意页大小切页，串联结果与全量恢复同序同集合", "T04：重复到达的同一页幂等"],
+      "fixture_sha256": "ee3262e60a1eeccfe7aef6ae87b68d3cc4421174e8405885973e2da21d7b0fe1",
+      "production_entry": "server/history-read/index.ts readSessionHistoryPage（真实 Hono sessions 路由 + 真实 manifest store + 真实前端 store 驱动）",
+      "command_ids": ["P05-T04-history-parity"],
+      "status": "PASS"
+    },
+    {
+      "id": "P05-A08",
+      "scenario": "整页过滤",
+      "test_path": "tests/history-pagination-run-continuity.test.ts",
+      "test_names": ["T11b：整页都被前端过滤（隐藏后台通知）时，分页进度仍推进、更早真实历史可达", "T11：before=0 返回空页并终结分页，不回退到最新页"],
+      "fixture_sha256": "ee3262e60a1eeccfe7aef6ae87b68d3cc4421174e8405885973e2da21d7b0fe1",
+      "production_entry": "page.ts resolveHistoryPageBounds（before=display 序号读取位置）+ 前端 loadMoreMessages 游标推进",
+      "command_ids": ["P05-T04-history-parity"],
+      "status": "PASS"
+    },
+    {
+      "id": "P05-A09",
+      "scenario": "不同Run相邻",
+      "test_path": "tests/history-run-outcome-edges.test.ts",
+      "test_names": ["T12：相邻不同 Run（两次用户输入）不误合并，各自持有自己的结局"],
+      "fixture_sha256": "ce99e75de271ca2c7403bd5da06cefe76f7bd86c2ebb4b2115c144d67033c310",
+      "production_entry": "history-read Run 小表（runBoundsByOrdinal）+ history-builder sameHistoryRun 边界",
+      "command_ids": ["P05-T04-history-parity"],
+      "status": "PASS"
+    },
+    {
+      "id": "P05-A10",
+      "scenario": "大工具结果",
+      "test_path": "tests/sessions-route.test.ts",
+      "test_names": ["defers large command output and legacy screenshot/artifact payloads", "defers large historical thinking and reads the full source only through its content id"],
+      "fixture_sha256": "（既有套件，本轮全量执行）",
+      "production_entry": "server/history-deferred-content.ts（locator 定位持久记录；/api/sessions/content/:id 每请求授权）",
+      "supporting": ["tests/tool-presentation-history.test.ts 大输入、补丁和写入内容首包仅预览，详情按保存记录完整恢复 / 大搜索只传计数预览，展开恢复所有文本块而不包含图片数据"],
+      "command_ids": ["P05-T05-a11-tool-history", "P05-T08-full-suite"],
+      "status": "PASS"
+    },
+    {
+      "id": "P05-A11",
+      "scenario": "历史文件同名变化",
+      "test_path": "tests/tool-presentation-history.test.ts",
+      "test_names": ["A11：历史交付不受工作区同名文件当前内容影响（真实磁盘文件对照）"],
+      "fixture_sha256": "3627736b2c1ce68811309654fde479dbbd6ff930c00cd126d8c05910ef29eb02",
+      "production_entry": "resolveHistoryDeferredContent（持久记录定位，不读当前磁盘文件）；ResourceService._reconcileFileAvailability（当前文件如实刷新 mtime/etag，不冒充历史版本）",
+      "command_ids": ["P05-T05-a11-tool-history"],
+      "status": "PASS"
+    },
+    {
+      "id": "P05-A12",
+      "scenario": "逐块脱敏与授权",
+      "test_path": "tests/resource-access-service.test.ts",
+      "test_names": ["denies remote content when policy denies access", "sanitizes remote metadata without exposing local paths", "keeps content compatible with existing resources.read grants", "blocks remote base64-like media events unless they are local-owner events"],
+      "fixture_sha256": "（既有套件，本轮 P05-T05-resource-suite 全绿）",
+      "production_entry": "core/resource-access-service.ts（逐资源逐请求裁决 + removePathFields 递归数组/嵌套对象）；sessions/content/:id 每请求 sessions.read 授权",
+      "supporting": ["tests/tool-presentation-history.test.ts（credential-sentinel 合成 secret：tool_input 展开 apiKey=********）", "tests/http-route-security.test.ts（scoped device 仅开 resources 读）"],
+      "command_ids": ["P05-T05-resource-suite"],
+      "status": "PASS"
+    },
+    {
+      "id": "P05-A13",
+      "scenario": "旧记录缺字段",
+      "test_path": "tests/assistant-event-normalizer.test.ts",
+      "test_names": ["text_end 契约表：无 existing segment + 空 endText → 不创建 text segment", "text_end 契约表：无 existing segment + 有 endText → 创建 segment 并直接使用该文本", "text_end 契约表：有 existing segment + 空 endText → 正常结束，不重复正文"],
+      "fixture_sha256": "（既有套件，本轮全量执行）",
+      "production_entry": "shared/assistant-semantic-segments.ts（textSignature 缺失→final_answer 缺省，不伪造）；history-protocol-compat 旧协议字段",
+      "supporting": ["tests/tool-presentation-history.test.ts 旧写入从调用参数恢复新正文，不捏造覆盖前内容（before_content_unavailable 显式化）"],
+      "command_ids": ["P05-T08-full-suite", "P05-T05-a11-tool-history"],
+      "status": "PASS"
+    },
+    {
+      "id": "P05-A14",
+      "scenario": "迁移中断",
+      "test_path": "tests/data-epoch-coordinator.test.ts",
+      "test_names": ["runs checkpoint, barrier, migration, validation, and final commit in exact durable order"],
+      "fixture_sha256": "2a2fa3d806e4e1edcb526b3d275cfc9ca090a94b679618a7fddfb703cf15c48d",
+      "production_entry": "core/data-epoch-coordinator.ts + core/data-epoch-migrations.ts（journal 相位机；中断态 fail-closed）",
+      "supporting": ["tests/data-epoch.test.ts fails closed on corrupt JSON and impossible v2 epoch relationships / rejects malformed or unknown journal phases instead of guessing / requires a checkpoint receipt after the prepared phase（P05-FIXR1 归属修正：该例实际位于 tests/data-epoch.test.ts:109，初版误记于 coordinator 文件名下；测试本身未改动）"],
+      "command_ids": ["P05-T06-data-epoch-suite"],
+      "status": "PASS"
+    },
+    {
+      "id": "P05-A15",
+      "scenario": "回退新数据保护",
+      "test_path": "tests/data-epoch-restore.test.ts",
+      "test_names": ["quarantineDestination: never overwrite, keep both copies attributable", "exercises the collision path end-to-end through a real restore: a file re-swept on retry lands beside, not over, its first quarantined copy", "rejects a confirmToken that differs by even one character"],
+      "fixture_sha256": "e34214a12cc49bac8cf9eb2d715c3db603f79379b674a5a69bbed6709a0b3baa",
+      "production_entry": "core/data-epoch-restore.ts（隔离永不覆盖 + .dup-N 归因）；coordinator blocks a lower reader, permits only the explicit steady-state override, and never lowers the stamp",
+      "command_ids": ["P05-T06-data-epoch-suite"],
+      "status": "PASS"
+    },
+    {
+      "id": "P05-A16",
+      "scenario": "损坏索引与磁盘错误",
+      "test_path": "tests/history-read-directory-incremental.test.ts",
+      "test_names": ["readFile 注入增量阶段失败 → legacy 全量承接，输出与全量等价", "文件缩短 → snapshot_changed → 全量重建（不混页）"],
+      "fixture_sha256": "（既有套件，本轮 P05-T04-directory-suite 全绿 117 例）",
+      "production_entry": "history-read 目录失效链（尝试1→失效重建→尝试2→legacy 全量，fallbackReason 记录）；window-reader 短读/EOF/身份校验显式报错；原始会话文件不被修改",
+      "supporting": ["tests/history-read-window-reader.test.ts 注入短读/异常 EOF/读取途中截断", "tests/history-read-cache-auth.test.ts 授权先于缓存"],
+      "command_ids": ["P05-T04-directory-suite"],
+      "status": "PASS"
+    }
+  ],
+  "fix_rounds": [
+    {
+      "id": "P05-FIXR1",
+      "date": "2026-09-22",
+      "source": "独立验收 P05_ACCEPTANCE_REVIEW.md §6 非阻塞发现 1/2：P05-FAULT-INJECTION.test.ts 含机器绝对路径（提交后 CI 必红）+ 头注「不进入默认测试集」与事实矛盾；ACCEPTANCE_MAP A14 一处测试名文件归属错位",
+      "effect_on_cases": "无——A01–A16 全部场景状态与证据不变（本轮零生产代码、零测试改动）。A14 仅修正归属字段：'requires a checkpoint receipt after the prepared phase' 实际位于 tests/data-epoch.test.ts:109（coordinator 文件无此用例），移入 supporting 的 data-epoch.test.ts 条目；其余 15 个场景零触碰。FI 测试文件改动 = 路径可移植化 + 头注事实修正，断言与 mock 语义零变化（2/2 绿复验）",
+      "records": "P05_REPORT.md「独立验收修复轮（P05-FIXR1）」节；P05_RESULT.json fix_rounds；日志 artifacts/refactor-2026/P05/logs/P05-FIXR1-*（command-log.jsonl 全格式）"
+    },
+    {
+      "id": "P05-FIXR2",
+      "date": "2026-09-22",
+      "source": "复验收 P05_REACCEPTANCE_REVIEW.md §7 新发现 R1（提交/收尾前必须处理）：首轮验收交付物 P05-ACCEPTANCE-counterexample.test.ts 落入 vitest 默认集且 C1 恒红 + 6 处机器绝对导入（下一次全量 npm test 4 红 → 5 红，污染 F1 基线）",
+      "effect_on_cases": "无——A01–A16 全部场景状态与证据不变（本轮零生产代码、零执行轮测试改动）。首轮验收反例证据文件（不属于 ACCEPTANCE_MAP 任何场景的 test_path）改动 = 路径可移植化（import×5 + REPO 常量清退）+ C1 期望方向元语义 it → it.fails（断言内容零改动，基线 .err 与首轮 RED 日志失败点为同一污染断言）+ 头注事实修正；同类文件 P04-ACCEPTANCE-counterexample.test.ts 仅绝对导入改相对（2 例本就全绿）；FI 文件零改动（2/2 绿旁证复验）",
+      "records": "P05_REPORT.md「独立验收修复轮二（P05-FIXR2）」节；P05_RESULT.json fix_rounds；日志 artifacts/refactor-2026/P05/logs/P05-FIXR2-*（command-log.jsonl 全格式）"
+    }
+  ]
+}

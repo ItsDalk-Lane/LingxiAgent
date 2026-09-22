@@ -1,0 +1,14 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/ws-protocol.test.ts (6 tests) 44ms
+ ✓ tests/session-stream-store.test.ts (9 tests) 46ms
+ ✓ desktop/src/react/__tests__/hooks/use-stream-buffer-dedupe.test.ts (3 tests) 35ms
+ ✓ desktop/src/react/__tests__/services/stream-resume.test.ts (12 tests) 92ms
+ ✓ desktop/src/react/__tests__/services/stream-resume-gate.test.ts (5 tests) 25ms
+
+ Test Files  5 passed (5)
+      Tests  35 passed (35)
+   Start at  10:37:34
+   Duration  767ms (transform 750ms, setup 71ms, import 945ms, tests 242ms, environment 879ms)
+

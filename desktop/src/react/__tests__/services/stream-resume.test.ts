@@ -91,6 +91,47 @@ describe('stream-resume', () => {
     expect(useStore.getState().streamingSessions).toEqual([]);
   });
 
+  // P05-A04（消费端）：seq 只在所属 stream 内比较。旧流与新流都有 seq=1 时，
+  // 元数据换流必须清空 consumedSeqs，新流的 seq=1 不得被当成旧流已消费事件而丢弃。
+  it('does not dedupe a new stream seq=1 against the previous stream consumed seqs', async () => {
+    const handled: unknown[] = [];
+    injectHandlers((msg) => handled.push(msg), () => {});
+    // 旧流：已真实消费 seq 1（含正文），随后服务端开新流
+    expect(updateSessionStreamMeta({ sessionPath: '/background.jsonl', streamId: 'stream_old', seq: 1 })).toBe(true);
+
+    // 新流的 seq=1（reset 全量重放的一部分）：不得因旧流消费过 seq 1 而被拒收
+    const accepted = updateSessionStreamMeta({ sessionPath: '/background.jsonl', streamId: 'stream_new', seq: 1 });
+    expect(accepted).toBe(true);
+
+    replayStreamResume({
+      type: 'stream_resume',
+      sessionPath: '/background.jsonl',
+      streamId: 'stream_new',
+      sinceSeq: 0,
+      nextSeq: 2,
+      isStreaming: true,
+      reset: true,
+      truncated: false,
+      events: [{ seq: 1, event: { type: 'text_delta', delta: 'new stream first event' } }],
+    });
+
+    // reset 重建是异步链（clearSession → loadMessages → 重放），等待重放完成
+    await vi.waitFor(() => {
+      expect(handled.length).toBe(1);
+    });
+    expect(handled).toEqual([
+      expect.objectContaining({
+        type: 'text_delta',
+        delta: 'new stream first event',
+        streamId: 'stream_new',
+        seq: 1,
+        __fromReplay: true,
+      }),
+    ]);
+    const meta = getSessionStreamMeta({ sessionPath: '/background.jsonl' });
+    expect(meta?.streamId).toBe('stream_new');
+  });
+
   it('replays background session events to the normal websocket handler', () => {
     const handled: unknown[] = [];
     const statuses: Array<{ isStreaming: boolean; sessionPath: string | null }> = [];

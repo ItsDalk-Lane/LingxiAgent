@@ -1,0 +1,12 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts (2 tests | 2 failed) 43ms
+     × 被篡改的历史投影与真实 live 投影语义 profile 不相等 39ms
+     × 故障页边界使翻页拼接 ≠ 全量恢复（正确实现下两者必须相等） 3ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  10:49:24
+   Duration  1.84s (transform 812ms, setup 21ms, import 1.43s, tests 43ms, environment 269ms)
+

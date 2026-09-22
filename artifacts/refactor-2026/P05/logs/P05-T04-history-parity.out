@@ -1,0 +1,13 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/history-run-outcome-edges.test.ts (6 tests) 1009ms
+     ✓ T07：真完成但只有过程（思考+工具）→ 恰一个 missing_final_answer，不因有工具豁免  986ms
+ ✓ tests/history-pagination-run-continuity.test.ts (10 tests) 548ms
+     ✓ T01：固定快照下分页不重叠、单逻辑 Run、无伪无回复状态，且与全量恢复语义等价  347ms
+
+ Test Files  2 passed (2)
+      Tests  16 passed (16)
+   Start at  10:38:21
+   Duration  1.88s (transform 1.18s, setup 41ms, import 1.27s, tests 1.56s, environment 542ms)
+

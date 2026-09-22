@@ -1,0 +1,18 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > does not dedupe a new stream seq=1 against the previous stream consumed seqs
+AssertionError: expected [] to deeply equal [ ObjectContaining{…} ]
+
+Compared values have no visual difference.
+
+ ❯ desktop/src/react/__tests__/services/stream-resume.test.ts:118:21
+    116|     });
+    117|
+    118|     expect(handled).toEqual([
+       |                     ^
+    119|       expect.objectContaining({
+    120|         type: 'text_delta',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

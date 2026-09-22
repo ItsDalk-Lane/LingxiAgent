@@ -3137,3 +3137,200 @@ describe("chat route model switch guard", () => {
     handlers.onClose({}, closedWs);
   });
 });
+
+// ── P05-T03：流恢复语义（真实 WS 路由 × 真实 session-stream-store）──
+// 覆盖验收场景 P05-A03（重复/乱序续传）、A04（跨 stream 重连）、A05（ring 截断）、
+// A06（流结束缓存清空）。全部经真实 createChatRoute 的 onMessage(resume_stream) →
+// resumeSessionStream（server/session-stream-store.ts 生产实现），store 不 mock。
+describe("P05 stream resume semantics (real route + real stream store)", () => {
+  const SESSION_PATH = "/tmp/p05-resume-session.jsonl";
+  const SESSION_ID = "sess_p05_resume";
+
+  function makeHarness() {
+    let createHandlers;
+    let subscriber;
+    const upgradeWebSocket = vi.fn((factory) => {
+      createHandlers = factory;
+      return () => new Response(null);
+    });
+    const hub = {
+      subscribe: vi.fn((fn) => { subscriber = fn; }),
+      send: vi.fn(async () => {}),
+      eventBus: { emit: vi.fn() },
+    };
+    const engine = {
+      agentName: "Hana",
+      abortAllStreaming: vi.fn(async () => {}),
+      getSessionByPath: vi.fn(() => ({ entries: [] })),
+      getSessionIdForPath: vi.fn(() => SESSION_ID),
+      getSessionManifest: vi.fn(() => ({ currentLocator: { path: SESSION_PATH } })),
+      isSessionStreaming: vi.fn(() => false),
+      isSessionSwitching: vi.fn(() => false),
+      steerSession: vi.fn(() => false),
+      slashDispatcher: null,
+    };
+    createChatRoute(engine, hub, { upgradeWebSocket });
+    const handlers = createHandlers({});
+    const ws = { readyState: 1, send: vi.fn() };
+    handlers.onOpen({}, ws);
+    const resume = async (opts) => {
+      handlers.onMessage({
+        data: JSON.stringify({ type: "resume_stream", sessionPath: SESSION_PATH, sessionId: SESSION_ID, ...opts }),
+      }, ws);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const calls = ws.send.mock.calls.map(([raw]) => JSON.parse(raw));
+      return calls.filter((payload) => payload.type === "stream_resume").pop() || null;
+    };
+    const payloads = () => ws.send.mock.calls.map(([raw]) => JSON.parse(raw));
+    return { subscriber, resume, payloads, close: () => handlers.onClose({}, ws) };
+  }
+
+  function assistantMessage(text) {
+    return { role: "assistant", api: "anthropic-messages", content: [{ type: "text", text }] };
+  }
+
+  /** 驱动一个完整的可见正文 Run（不含 agent_settled，由调用方决定何时收尾）。 */
+  function emitTextRun(subscriber, text, { settle = false } = {}) {
+    const msg = assistantMessage(text);
+    subscriber?.({ type: "agent_start" }, SESSION_PATH);
+    subscriber?.({ type: "turn_start" }, SESSION_PATH);
+    subscriber?.({ type: "message_start", message: msg }, SESSION_PATH);
+    subscriber?.({
+      type: "message_update", message: msg,
+      assistantMessageEvent: { type: "text_delta", contentIndex: 0, delta: text, partial: msg },
+    }, SESSION_PATH);
+    subscriber?.({
+      type: "message_update", message: msg,
+      assistantMessageEvent: { type: "text_end", contentIndex: 0, content: text, partial: msg },
+    }, SESSION_PATH);
+    subscriber?.({ type: "message_end", message: msg }, SESSION_PATH);
+    subscriber?.({ type: "turn_end", message: msg, toolResults: [] }, SESSION_PATH);
+    if (settle) subscriber?.({ type: "agent_settled" }, SESSION_PATH);
+  }
+
+  it("A03：按 sinceSeq 增量续传不重复已接事件；同一请求重复发送幂等", async () => {
+    const h = makeHarness();
+    emitTextRun(h.subscriber, "第一段回复正文。");
+
+    const first = await h.resume({ sinceSeq: 0 });
+    expect(first.reset).toBe(false);
+    expect(first.truncated).toBe(false);
+    expect(first.events.length).toBeGreaterThan(0);
+    expect(first.events.map((e) => e.seq)).toEqual(first.events.map((e) => e.seq).sort((a, b) => a - b));
+
+    // 重复同一 resume 请求（重复帧/重试）：返回相同增量，服务端不双计、不推进 nextSeq 之外的状态
+    const firstSeqs = first.events.map((e) => e.seq);
+    const nextSeqBefore = first.nextSeq;
+    const again = await h.resume({ streamId: first.streamId, sinceSeq: 0 });
+    expect(again.nextSeq).toBe(nextSeqBefore);
+    expect(again.events.map((e) => e.seq)).toEqual(firstSeqs);
+
+    // 断点续传：只补 seq > sinceSeq 的事件，已接事件不再下发
+    const midSeq = firstSeqs[Math.floor(firstSeqs.length / 2)];
+    const delta = await h.resume({ streamId: first.streamId, sinceSeq: midSeq });
+    expect(delta.events.every((e) => e.seq > midSeq)).toBe(true);
+    expect(delta.sinceSeq).toBe(midSeq);
+
+    // 乱序/越界断点（客户端伪造了未到达的位置）：诚实返回空增量与真实 nextSeq，
+    // 不伪造完整性（客户端信任门槛对未消费断点一律重建，见 stream-resume-gate 测试）。
+    const future = await h.resume({ streamId: first.streamId, sinceSeq: nextSeqBefore + 500 });
+    expect(future.events).toEqual([]);
+    expect(future.nextSeq).toBe(nextSeqBefore);
+    expect(future.truncated).toBe(false);
+
+    h.close();
+  });
+
+  it("A04：跨 stream 重连——旧 streamId 触发 reset 全量重建为当前流，seq 不跨 stream 比较", async () => {
+    const h = makeHarness();
+    // Run 1：完整结束（缓存随 finishSessionStream 清空）
+    emitTextRun(h.subscriber, "旧一轮的正文。", { settle: true });
+    const streamEvents = h.payloads().filter((p) => p.type === "assistant_segment_start");
+    const oldStreamId = streamEvents[0].streamId;
+
+    // Run 2：新一轮（新 streamId，seq 从 1 重新计数）
+    emitTextRun(h.subscriber, "新一轮的正文。");
+    const newStreamEvents = h.payloads().filter((p) => p.type === "assistant_segment_start");
+    const newStreamId = newStreamEvents[newStreamEvents.length - 1].streamId;
+    expect(newStreamId).not.toBe(oldStreamId);
+
+    // 用旧 streamId + 高位 sinceSeq 恢复：不得把旧流的 seq 空间当作当前流断点，
+    // 必须返回 reset=true 且 sinceSeq 归零、重放当前流全部事件（seq 从 1 起）。
+    const resumed = await h.resume({ streamId: oldStreamId, sinceSeq: 999 });
+    expect(resumed.reset).toBe(true);
+    expect(resumed.streamId).toBe(newStreamId);
+    expect(resumed.sinceSeq).toBe(0);
+    expect(resumed.events.length).toBeGreaterThan(0);
+    expect(resumed.events[0].seq).toBe(1);
+    // 重放内容全部来自当前流：正文是新轮的，不携带旧轮内容
+    const replayedText = resumed.events
+      .filter((e) => e.event?.type === "assistant_segment_delta")
+      .map((e) => e.event.delta)
+      .join("");
+    expect(replayedText).toContain("新一轮的正文。");
+    expect(replayedText).not.toContain("旧一轮的正文。");
+
+    h.close();
+  });
+
+  it("A05：ring 截断——过旧 sinceSeq 恢复返回 truncated=true 且只从最早存活事件补起", async () => {
+    const h = makeHarness();
+    h.subscriber?.({ type: "agent_start" }, SESSION_PATH);
+    // 每个 thinking_delta 产生 2 条流事件（canonical reasoning delta + thinking_delta），
+    // 加上 run 开头的 assistant_run_start / thinking_start，超过 DEFAULT_MAX_EVENTS=5000
+    // 触发生产 trimEvents（按数量硬上限丢最旧）。
+    const msg = { role: "assistant", api: "anthropic-messages", content: [] };
+    for (let i = 0; i < 2600; i += 1) {
+      h.subscriber?.({
+        type: "message_update", message: msg,
+        assistantMessageEvent: { type: "thinking_delta", delta: `推理片段${i}；` },
+      }, SESSION_PATH);
+    }
+
+    const current = await h.resume({ sinceSeq: 0 });
+    const nextSeq = current.nextSeq;
+    expect(nextSeq).toBeGreaterThan(5000);
+    // ring 已 trim：从头恢复同样落在存活窗口之前，truncated 如实可见（不假装完整）
+
+    // 从已被 trim 掉的远古位置恢复：truncated 必须可见，且补发从最早存活事件开始
+    const truncated = await h.resume({ streamId: current.streamId, sinceSeq: 0 });
+    expect(truncated.truncated).toBe(true);
+    expect(current.truncated).toBe(true);
+    expect(truncated.events.length).toBeGreaterThan(0);
+    expect(truncated.events.length).toBeLessThan(nextSeq - 1);
+    const firstAliveSeq = truncated.events[0].seq;
+    expect(firstAliveSeq).toBeGreaterThan(1);
+    expect(truncated.sinceSeq).toBe(firstAliveSeq - 1);
+    // 不把缺字段当完整：截断后的 nextSeq 仍是流的真实前进位置
+    expect(truncated.nextSeq).toBe(nextSeq);
+
+    h.close();
+  });
+
+  it("A06：流结束缓存清空——resume 返回空事件 + isStreaming=false，恢复走历史而非已消失 ring", async () => {
+    const h = makeHarness();
+    emitTextRun(h.subscriber, "即将结束的正文。", { settle: true });
+    const streamId = h.payloads().find((p) => p.type === "assistant_segment_start").streamId;
+    const nextSeqBeforeSettle = Math.max(
+      ...h.payloads().filter((p) => Number.isFinite(p.seq)).map((p) => p.seq),
+    );
+
+    // 流已结束：finishSessionStream 清空 events 但保留 streamId/nextSeq 终态
+    const resumed = await h.resume({ streamId, sinceSeq: 0 });
+    expect(resumed.streamId).toBe(streamId);
+    expect(resumed.isStreaming).toBe(false);
+    expect(resumed.events).toEqual([]);
+    expect(resumed.nextSeq).toBe(nextSeqBeforeSettle + 1);
+    expect(resumed.nextSeq).toBeGreaterThan(1);
+    // sinceSeq=0 落在已清空窗口之前 → 缺口显式标 truncated（客户端据此整段重建，
+    // 从持久历史恢复终态，而不是等一个已经不存在的 ring buffer）
+    expect(resumed.truncated).toBe(true);
+    // 已追平的客户端（sinceSeq=nextSeq-1）恢复：空增量、无截断、无假事件
+    const caughtUp = await h.resume({ streamId, sinceSeq: resumed.nextSeq - 1 });
+    expect(caughtUp.events).toEqual([]);
+    expect(caughtUp.truncated).toBe(false);
+    expect(caughtUp.isStreaming).toBe(false);
+
+    h.close();
+  });
+});

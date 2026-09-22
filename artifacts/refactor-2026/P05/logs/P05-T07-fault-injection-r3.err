@@ -1,0 +1,43 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts > P05 FI-1：历史侧 commentary→final 篡改会被等价断言捕获 > 被篡改的历史投影与真实 live 投影语义 profile 不相等
+AssertionError: expected [] to deeply equal [ …(2) ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "source": "I need to inspect the current state.",
+-     "surfaceRole": "process",
+-   },
+-   {
+-     "source": "已经查到状态。",
+-     "surfaceRole": "answer",
+-   },
+- ]
++ []
+
+ ❯ artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts:202:23
+    200|
+    201|     // 未篡改基线（live 侧真值）：commentary 是 process、final 是 answer
+    202|     expect(liveTexts).toEqual([
+       |                       ^
+    203|       { surfaceRole: "process", source: "I need to inspect the current…
+    204|       { surfaceRole: "answer", source: "已经查到状态。" },
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts > P05 FI-2：游标被误用为源数组下标时连续性断言捕获 > 故障页边界使翻页拼接 ≠ 全量恢复（正确实现下两者必须相等）
+AssertionError: expected 5 not to be 5 // Object.is equality
+ ❯ artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts:272:49
+    270|       sanitizeVisibleContent: sanitize,
+    271|     });
+    272|     expect(correctBoundary.messages.length).not.toBe(PAGE_SIZE);
+       |                                                 ^
+    273|   });
+    274| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

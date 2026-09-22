@@ -1,0 +1,39 @@
+# P05 独立验收复跑记录（验收子代理，2026-09-22 11:0x–11:1x UTC+8）
+# 环境：darwin arm64 / Node v24.16.0 / HEAD 1f0537b08（工作区 = 执行者交付态）
+
+## 1. 新增测试复跑（真实入口）
+$ npx vitest run tests/chat-route-switching.test.ts -t "P05 stream resume semantics"
+→ Tests 4 passed | 48 skipped (52)  [A03–A06]
+
+$ npx vitest run tests/tool-presentation-history.test.ts -t "A11"
+→ Tests 1 passed | 19 skipped (20)  [A11]
+
+$ npx vitest run desktop/src/react/__tests__/services/stream-resume.test.ts -t "does not dedupe a new stream"
+→ Tests 1 passed | 11 skipped (12)  [A04 消费端]
+
+$ npx vitest run tests/data-epoch.test.ts tests/data-epoch-coordinator.test.ts
+→ Tests 40 passed (40)  [A14 证据核（注：'requires a checkpoint receipt after the prepared phase' 实际位于 data-epoch.test.ts:109，ACCEPTANCE_MAP 误记在 coordinator 文件）]
+
+## 2. benchmark 独立复跑（隔离输出目录 /tmp/p05-accept-bench）
+$ node scripts/benchmark-history-read-directory.mjs --phase B --sizes 1000,10000 --page-size 50 --seed 20260910 --output /tmp/p05-accept-bench
+→ exit 0；n=1000 与 n=10000 热页 fullFileReadCalls/请求=0、jsonlParseCount/请求=103（与执行者样本一致，声称复现）
+→ 阈值断言全部 PASS；样本目录文件清单与 artifacts/refactor-2026/P05/samples/history-bench-b/ 一致（4 文件）
+
+## 3. 门禁/typecheck/指纹
+$ npm run typecheck → exit 0（tsc x3）
+$ npm run typecheck:core-contracts → exit 0
+$ node scripts/check-persistence-schema-fingerprint.mjs → "no guarded persistence sources touched (170 watched); OK" exit 0
+
+## 4. 全量套件（后台，86.9s）
+$ npm test → exit 1（F1 基线）
+→ Test Files 3 failed | 1450 passed | 3 skipped (1456)；Tests 4 failed | 14769 passed | 15 skipped (14788)
+→ 4 红 = post-verification-audit-seal(1) + round2 R10-03/R10-04 + round3 manifest，与执行者 F1 登记同组，未扩大
+→ FI 文件（artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts）在全量中执行：✓ 2 tests
+
+## 5. 已知副作用复核
+→ 全量运行后 artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch 被测试重写（+127140/-17715，与执行者 stat.txt 同象）；验收侧已 git checkout 还原，工作区回到验收起点
+
+## 6. 反例（详见 P05-ACCEPTANCE-counterexample.log）
+→ C1 跨流迟到事件（消费端 live 投影）：RED——旧流 segA 迟到 delta 被拼进新 Run B 的 answer（详见报告定性：当前服务端不可达，非阻塞加固项）
+→ C2 ring 边界/字节上限/大事件压缩：3/3 GREEN
+→ C3 v2 实时引用磁盘陷阱/会话不匹配/幽灵 callId：GREEN

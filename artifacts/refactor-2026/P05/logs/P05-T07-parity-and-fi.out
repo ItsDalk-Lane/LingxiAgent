@@ -1,0 +1,14 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/utils/history-builder-mood.test.ts (4 tests) 51ms
+ ✓ desktop/src/react/__tests__/utils/history-builder.test.ts (30 tests) 60ms
+ ✓ tests/live-history-reserved-tag-parity.test.ts (2 tests) 53ms
+ ✓ tests/reserved-tag-text-preservation.test.ts (18 tests) 74ms
+ ✓ artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts (2 tests) 39ms
+
+ Test Files  5 passed (5)
+      Tests  56 passed (56)
+   Start at  10:52:05
+   Duration  1.94s (transform 2.37s, setup 68ms, import 4.66s, tests 278ms, environment 920ms)
+

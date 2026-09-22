@@ -1,0 +1,15 @@
+
+> lingxi@0.1.42 typecheck:core-contracts
+> node scripts/check-core-contracts-strict.mjs
+
+Core contracts strict check passed (6 files).
+
+> lingxi@0.1.42 check:dependency-boundaries
+> node scripts/check-dependency-boundaries.mjs
+
+Dependency boundary check passed (2026 source files).
+
+> lingxi@0.1.42 check:tool-invocation-boundaries
+> node scripts/check-tool-invocation-boundaries.mjs
+
+Tool invocation boundary check passed (2244 source files).

@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "stage_id": "P05",
+  "status": "PASS",
+  "status_note": "本地验证口径。全量 14769 绿/4 红 = F1 已知基线（与 P04 同一组 4 红，未扩大）。真供应商冒烟为 P04 继承 BLOCKED，非本阶段必需场景。",
+  "research_sha": "8037fae7a6f621549f5b7db4c4d0bba3862ddc07",
+  "start_sha": "1f0537b08",
+  "end_sha": "1f0537b08",
+  "environment": {
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "os": "darwin",
+    "arch": "arm64",
+    "lockfile_sha256": "a9735825cea1d018c2a42ae04f875368a003c386ca68fc86503bc8acbcd79d3c"
+  },
+  "tasks": [
+    {
+      "id": "P05-T01",
+      "implementation_action": "UNCHANGED_VERIFIED",
+      "source_locations": ["server/assistant-event-normalizer.ts", "server/routes/chat.ts:1449-1577", "shared/assistant-semantic-segments.ts", "shared/text-signature.ts", "core/events.ts:96-118", "server/history-read/project-page.ts:359-391", "desktop/src/react/utils/turn-projector.ts:192"],
+      "consumer_locations": ["desktop/src/react/hooks/use-stream-buffer.ts", "desktop/src/react/utils/history-builder.ts"],
+      "test_ids": ["tests/assistant-event-normalizer.test.ts (9 例)", "tests/reserved-tag-text-preservation.test.ts (T01-T16)", "tests/live-history-reserved-tag-parity.test.ts", "tests/history-run-outcome-edges.test.ts"],
+      "legacy_action": "无旧路径需退出（无第三套解析器）",
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P05/MESSAGE_SEMANTICS.md + SEMANTIC_FIXTURES.json; 命令 P05-T07-parity-and-fi / P05-T08-full-suite"
+    },
+    {
+      "id": "P05-T02",
+      "implementation_action": "UNCHANGED_VERIFIED",
+      "source_locations": ["server/routes/chat.ts:1564-1577", "server/ws-protocol.ts:24,93-156", "desktop/src/react/hooks/use-stream-buffer.ts:688-720"],
+      "consumer_locations": ["desktop use-stream-buffer（canonical 主真相）", "desktop ChannelsPanel:540 / SubagentSessionPreview:241（legacy 兼容 adapter 消费）", "上游 provider 子事件消费者（session-coordinator/bridge/desktop-session-submit/rc-router/cli，非本任务输出面）"],
+      "test_ids": ["tests/chat-route-switching.test.ts publishes OpenAI Responses phase semantics…", "desktop use-stream-buffer.test.ts", "tests/live-history-reserved-tag-parity.test.ts（双投影只读对照）"],
+      "legacy_action": "text_delta 保留为兼容 adapter；退出条件成文（主聊天回退/面板精简视图/旧远程客户端），删除决策归 P08",
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P05/CONSUMER_MIGRATION.md; 命令 P05-T07-parity-and-fi"
+    },
+    {
+      "id": "P05-T03",
+      "implementation_action": "UNCHANGED_VERIFIED",
+      "source_locations": ["server/session-stream-store.ts", "server/routes/chat.ts:2464-2504", "desktop/src/react/services/stream-resume.ts"],
+      "consumer_locations": ["desktop ws-message-handler → streamBufferManager", "terminal-client/远程客户端（同一 resume 协议）"],
+      "test_ids": ["tests/chat-route-switching.test.ts P05 stream resume semantics A03-A06（新增 4 例）", "desktop stream-resume.test.ts 跨流 seq 例（新增 1 例）", "tests/session-stream-store.test.ts", "desktop stream-resume-gate.test.ts (5 例)", "desktop use-stream-buffer-dedupe.test.ts"],
+      "legacy_action": "协议零新增字段；无旧协议废弃",
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P05/RECONNECT_CONTRACT.md; 命令 P05-T03-ws-resume-route-r2 / P05-T03-client-cross-stream-r3 / P05-T03-store-regression（首跑失败与重跑均留档）"
+    },
+    {
+      "id": "P05-T04",
+      "implementation_action": "UNCHANGED_VERIFIED",
+      "source_locations": ["server/history-read/index.ts", "server/history-read/page.ts:38-49", "server/history-read/cache.ts", "server/history-read/incremental.ts", "server/history-read/window-reader.ts"],
+      "consumer_locations": ["/api/sessions/messages 路由", "desktop session-actions loadMessages/loadMoreMessages"],
+      "test_ids": ["tests/history-run-outcome-edges.test.ts (6)", "tests/history-pagination-run-continuity.test.ts (10)", "tests/history-read-directory-*.test.ts + window-reader + cache-auth + protocol-compat/conditional + invalid-fixture (117 绿/4 跳过)", "benchmark phase B（热页 fullFileReadCalls=0、jsonlParseCount=103 与规模无关）"],
+      "legacy_action": "all=1 仅显式请求（B07）；无全量加载逃避",
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P05/HISTORY_PARITY.md; artifacts/refactor-2026/P05/samples/history-bench-b/; 命令 P05-T04-*"
+    },
+    {
+      "id": "P05-T05",
+      "implementation_action": "UNCHANGED_VERIFIED",
+      "source_locations": ["server/history-deferred-content.ts", "core/resource-service.ts", "core/resource-access-service.ts", "server/routes/resources.ts", "server/routes/sessions.ts:1259-1297", "server/session-file-block.ts", "lib/file-history/file-history-service.ts"],
+      "consumer_locations": ["/api/sessions/content/:id", "/api/resources/*", "/api/file-history/*", "desktop file-refs selectors / FileHistoryModal / 文件卡片"],
+      "test_ids": ["tests/tool-presentation-history.test.ts A11 例（新增）+ 既有 7 例", "tests/resource-access-service.test.ts (5)", "tests/http-route-security.test.ts", "tests/file-history-{route,store,service}.test.ts", "tests/resource-{envelope,ticket-service}.test.ts", "tests/resource-io-{route,session-file-resolver}.test.ts", "tests/sessions-route.test.ts 大结果 defers 系列"],
+      "legacy_action": "PDF/媒体生成链未触碰（现状正确）",
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P05/RESOURCE_HISTORY_CONTRACT.md; 命令 P05-T05-*"
+    },
+    {
+      "id": "P05-T06",
+      "implementation_action": "UNCHANGED_VERIFIED",
+      "source_locations": ["lib/llm/model-observability-schema.ts:30 (v7)", "lib/knowledge/knowledge-store.ts:56 (v19)", "lib/file-history/history-store.ts:20 (v1)", "core/session-manifest/store.ts", "core/data-epoch-*.ts"],
+      "consumer_locations": ["全部持久化读写面（本阶段零改动）"],
+      "test_ids": ["tests/data-epoch.test.ts", "tests/data-epoch-coordinator.test.ts", "tests/data-epoch-restore.test.ts", "tests/data-epoch-checkpoint-provider.test.ts", "tests/persistence-schema-tripwire.test.ts", "tests/persistence-store-registry.test.ts（合计 109 例）"],
+      "legacy_action": "无 schema 变更、无迁移、无 repin；knowledge research 残留决策=保留只读兼容（退役需授权）",
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P05/DATA_COMPATIBILITY.md; 命令 P05-T06-data-epoch-suite / P05-T06-fingerprint-check"
+    },
+    {
+      "id": "P05-T07",
+      "implementation_action": "UNCHANGED_VERIFIED",
+      "source_locations": ["等价汇合点 desktop/src/react/utils/turn-projector.ts:192", "故障注入对象 shared/assistant-semantic-segments.ts / server/history-read/page.ts（仅测试内 mock，生产未动）"],
+      "consumer_locations": ["全部 §1 矩阵采样面"],
+      "test_ids": ["tests/live-history-reserved-tag-parity.test.ts", "tests/reserved-tag-text-preservation.test.ts", "desktop history-builder*.test.ts", "artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts（FI-1/FI-2，新增）"],
+      "legacy_action": "生产函数零 mock；FI 经 vi.mock 文件级隔离（同进程验证不污染）",
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P05/LIVE_HISTORY_REPLAY_REPORT.md; 命令 P05-T07-fault-injection-r4 / P05-T07-parity-and-fi（三次迭代失败均留档）"
+    },
+    {
+      "id": "P05-T08",
+      "implementation_action": "UNCHANGED_VERIFIED",
+      "source_locations": ["审计结论：无可删旧输出（全部消费者在用）", "P05-3 收口 docs/refactor-2026/P05/SESSION_IDENTITY_CONTRACT.md"],
+      "consumer_locations": ["ws-session-context.test.ts (13 例) / chat-route-session-identity.test.ts（防误用锁定）"],
+      "test_ids": ["typecheck×3", "typecheck:core-contracts", "check:dependency-boundaries", "check:tool-invocation-boundaries", "scripts/compute-cli-closure.mjs", "lint:boundary", "lint (eslint 0 error)", "export/obs/bridge 7 文件"],
+      "legacy_action": "无双写事实源；旧输出去向全部成文",
+      "status": "PASS",
+      "evidence": "docs/refactor-2026/P05/P05_REPORT.md; 命令 P05-T08-*（gates 两次脚本名试错留档）"
+    }
+  ],
+  "acceptance_cases": "见 ACCEPTANCE_MAP.json（P05-A01…A16 全 PASS，含 test_path/test_names/fixture_sha256/production_entry/command_ids）",
+  "commands": "见 artifacts/refactor-2026/P05/logs/command-log.jsonl（27 条全格式 JSONL；5 组 retry 链完整；全部原始 stdout/stderr 落同目录）",
+  "baseline_failures": [
+    {
+      "id": "F1",
+      "tests": ["tests/post-verification-audit-seal.test.ts > changes since VERIFIED_SOURCE_SHA are audit-only", "tests/round3-delivery-evidence.test.ts > round3: 源码 manifest 可复算", "tests/round3-delivery-evidence.test.ts > R10-03", "tests/round3-delivery-evidence.test.ts > R10-04"],
+      "note": "与 P04 基线完全同一组（audit-seal 坐标旧 + round3 manifest 三联）；本阶段未扩大（14759→14769 绿，4 红不变）"
+    }
+  ],
+  "scope_deviations": [],
+  "legacy_paths": [
+    {"path": "WS text_delta 兼容输出", "action": "保留（兼容 adapter）", "exit_condition": "主聊天回退不可达 + 面板迁移 + 远程客户端最低版本升级（P08 决策）"},
+    {"path": "knowledge research 残留表族", "action": "保留只读兼容（删除保护读取）", "exit_condition": "用户授权退役（P08/治理变更）"},
+    {"path": "history-read legacy 全量回退链", "action": "保留（降级路径，fallbackReason 显式）", "exit_condition": "不退出（正确性兜底）"}
+  ],
+  "fix_rounds": [
+    {
+      "id": "P05-FIXR1",
+      "date": "2026-09-22",
+      "source": "独立验收 P05_ACCEPTANCE_REVIEW.md §6 非阻塞发现 1/2：artifacts/refactor-2026/P05/logs/P05-FAULT-INJECTION.test.ts 的 vi.mock/import 使用本机绝对路径（本机绿但提交后 CI/其他机器必红），且头注「不进入默认测试集」与 NEXT_STAGE_HANDOFF §3「已并入默认 vitest 集」矛盾；发现 2/2：ACCEPTANCE_MAP.json A14 场景测试名 'requires a checkpoint receipt after the prepared phase' 归属错记于 tests/data-epoch-coordinator.test.ts 名下（实际位于 tests/data-epoch.test.ts:109）",
+      "changes": [
+        "P05-FAULT-INJECTION.test.ts：本机绝对路径前缀全部替换为相对本文件的仓库相对路径 ../../../../（vi.mock×2 + importOriginal 类型导入×2 + import×8，共 12 处相对引用；与 tests/ 同类测试同款写法）；断言与 mock 语义零变化",
+        "同文件头注事实修正：以全量套件证据为准（P05-T08-full-suite.out:4164 该文件 2/2 绿真实执行、npm test --exclude 不含 artifacts/）——「不进入默认测试集」为错误一侧，改记「已并入默认测试集」；NEXT_STAGE_HANDOFF §3 表述核实为正确、未改动",
+        "ACCEPTANCE_MAP.json A14：'requires a checkpoint receipt after the prepared phase' 从 coordinator 条目的 test_names 移入 supporting 的 tests/data-epoch.test.ts 条目（附行号与修正说明）；fixture_sha256 保持 coordinator 文件哈希（test_path 未变）；测试本身零改动",
+        "P05_REPORT.md 追加「独立验收修复轮（P05-FIXR1）」节；P05_RESULT.json（本条）与 ACCEPTANCE_MAP.json 补 fix_rounds 记录；EVIDENCE_SHA256.txt 按既有口径更新（本轮改动条目刷新 + 验收轮产物与本轮日志条目补入；路径列规范化为全仓相对路径——P02–P04 口径，初版 docs 条目缺前缀致 shasum -c 无法从单一 cwd 全量执行，哈希↔文件绑定关系不变）"
+      ],
+      "production_code_changed": false,
+      "existing_test_assertions_changed": false,
+      "verification": [
+        "P05-FIXR1-fi-test-repo-root（exit 0：npx vitest run <FI 文件>，2/2 绿）",
+        "P05-FIXR1-fi-test-alt-cwd（exit 0：进程 cwd=/tmp + vitest --root=仓库，2/2 绿——相对路径解析不依赖执行 cwd）",
+        "P05-FIXR1-json-validate（exit 0：ACCEPTANCE_MAP.json / P05_RESULT.json 解析合法）",
+        "P05-FIXR1-attribution-grep（exit 0：FI 文件 Users/ 残留=0；A14 测试名位于 tests/data-epoch.test.ts:109、coordinator 零命中）",
+        "P05-FIXR1-manifest-check（shasum -a 256 -c 全量校验 exit 0，命令与输出见 artifacts/refactor-2026/P05/logs/P05-FIXR1-manifest-check.out）"
+      ]
+    },
+    {
+      "id": "P05-FIXR2",
+      "date": "2026-09-22",
+      "source": "复验收 P05_REACCEPTANCE_REVIEW.md §7 新发现 R1（提交/收尾前必须处理）：首轮验收交付物 artifacts/refactor-2026/P05/logs/P05-ACCEPTANCE-counterexample.test.ts 落入 vitest 默认集（5 例），C1 跨流迟到事件反例恒红（演示已登记纵深防御缺口，属预期红）且含 6 处机器绝对导入——下一次全量 npm test 将从 F1 基线 4 红变 5 红",
+      "changes": [
+        "P05-ACCEPTANCE-counterexample.test.ts：6 处机器绝对路径（import×5 + 未使用 REPO 常量）替换/删除，import 改相对本文件的 ../../../../ 仓库相对路径（与修复后 FI 文件及 tests/ 同类探针一致）；C1 用例 it → it.fails 并加注释（演示已登记的 use-stream-buffer.ts 无 streamId 闸门缺口，缺口修复后转红作回归提示；断言内容零改动，仅改期望方向元语义）；头注「不进入默认测试集」事实修正为「已并入默认测试集」（FIXR1 问题 #1 同款）；其余 4 例保持普通 it 且全绿；未给 npm test 增加 artifacts/** exclude（复验收明确要求勿做）",
+        "同类文件同口径：枚举 artifacts/refactor-2026 下 .test.ts 共 3 个（复验收预告 2 个）；artifacts/refactor-2026/P04/logs/P04-ACCEPTANCE-counterexample.test.ts 第 4 行同款机器绝对导入改 ../../../../core/model-operation-client.ts（该文件 2 例本就全绿，仅可移植化；P04 EVIDENCE_SHA256 不引用该文件，零失配）；P05-FAULT-INJECTION.test.ts 零改动（绝对路径残留复核 0）",
+        "P05_REPORT.md 追加「独立验收修复轮二（P05-FIXR2）」节；P05_RESULT.json（本条）与 ACCEPTANCE_MAP.json 补 fix_rounds 记录；EVIDENCE_SHA256.txt 按既有口径更新（本轮改动条目刷新；复验收轮产物 P05_REACCEPTANCE_REVIEW.md + P05-REACCEPTANCE-commands.log 与本轮 P05-FIXR2-* 日志补入——复验收 §9 声明留作提交前动作，FIXR1 先例同款由修复轮完成；manifest-check.out 不入清单，P04-FIXR1/P05-FIXR1 同款）"
+      ],
+      "production_code_changed": false,
+      "existing_test_assertions_changed": false,
+      "verification": [
+        "P05-FIXR2-counterexample-baseline（exit 1：修复前基线独立复现 1 failed | 4 passed，C1 红在与首轮 RED 证据同一污染断言 expect(serialized).not.toContain('【迟到旧流尾巴】')，.err 留档）",
+        "P05-FIXR2-portability-grep（exit 0：三文件 /Users/ 残留 0、绝对导入形式 0；相对前缀行计数 CE 6 / FI 12 / P04 CE 1）",
+        "P05-FIXR2-counterexample-test-repo-root（exit 0：4 passed | 1 expected fail (5)）",
+        "P05-FIXR2-counterexample-test-alt-cwd（exit 0：cwd=/tmp + vitest --root=仓库，4 passed | 1 expected fail (5)——相对路径解析不依赖执行 cwd）",
+        "P05-FIXR2-fi-test-repo-root / P05-FIXR2-fi-test-alt-cwd（exit 0：FI 零改动旁证，2/2 绿）",
+        "P05-FIXR2-p04-counterexample-test-repo-root / P05-FIXR2-p04-counterexample-test-alt-cwd（exit 0：P04 同类文件修复后 2/2 绿）",
+        "P05-FIXR2-json-validate（exit 0：ACCEPTANCE_MAP.json / P05_RESULT.json 解析合法）",
+        "P05-FIXR2-manifest-check（shasum -a 256 -c 全量校验 exit 0，命令与输出见 artifacts/refactor-2026/P05/logs/P05-FIXR2-manifest-check.out）"
+      ]
+    }
+  ],
+  "blocked_items": [
+    {"id": "P04-T07-2 真供应商冒烟", "reason": "无凭证/预算授权（P04 继承）", "scope": "非 P05 必需场景"}
+  ],
+  "next_stage_handoff": "docs/refactor-2026/P05/NEXT_STAGE_HANDOFF.md",
+  "implementation_performed": true,
+  "implementation_note": "生产代码零改动（implementation_performed=true 指本阶段实际实施了测试与文档交付；3 个既有测试文件 +282 行，无新测试文件、无新模块）",
+  "project_tests_executed": true,
+  "full_suite_result": {"passed": 14769, "failed": 4, "skipped": 15, "files": "3 failed | 1450 passed | 3 skipped (1456)", "command": "P05-T08-full-suite"}
+}

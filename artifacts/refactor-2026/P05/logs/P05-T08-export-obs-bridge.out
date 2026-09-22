@@ -1,0 +1,25 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/bridge-media-normalizer.test.ts (5 tests) 83ms
+ ✓ tests/conversation-export.test.ts (3 tests) 45ms
+ ✓ tests/model-observability-export.test.ts (7 tests) 151ms
+ ✓ tests/bridge-media-delivery-service.test.ts (13 tests) 44ms
+ ✓ tests/bridge-manager-session-file-media.test.ts (7 tests) 40ms
+stdout | tests/export-open-tree.test.ts > export-open-tree: exportOpenTree materialization > copies exactly the planned file set into destDir, byte-identical content
+[export-open-tree] exported 2 file(s) to /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-export-fixture-oZAUP3/out
+
+stdout | tests/export-open-tree.test.ts > export-open-tree: exportOpenTree materialization > with force: true, wipes a non-empty destDir and re-exports cleanly (idempotent rerun)
+[export-open-tree] exported 1 file(s) to /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-export-fixture-VG2LZJ/out
+[export-open-tree] exported 1 file(s) to /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-export-fixture-VG2LZJ/out
+
+ ✓ tests/session-manifest-delivery.test.ts (12 tests) 32ms
+ ✓ tests/export-open-tree.test.ts (20 tests) 1883ms
+     ✓ materializes the real export-manifest.json + EXPORT_SKELETON, is idempotent under --force  466ms
+     ✓ the CLI subprocess exports into a given destination directory and exits 0  357ms
+
+ Test Files  7 passed (7)
+      Tests  67 passed (67)
+   Start at  10:57:08
+   Duration  2.27s (transform 1.85s, setup 135ms, import 3.04s, tests 2.28s, environment 0ms)
+

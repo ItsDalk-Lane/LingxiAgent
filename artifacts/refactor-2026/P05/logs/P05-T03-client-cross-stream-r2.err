@@ -1,0 +1,25 @@
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/stream-resume.test.ts [ desktop/src/react/__tests__/services/stream-resume.test.ts ]
+Error: Transform failed with 1 error:
+/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/services/stream-resume.test.ts:119:4: ERROR: "await" can only be used inside an "async" function
+  Plugin: vite:esbuild
+  File: /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/services/stream-resume.test.ts:119:4
+  
+  "await" can only be used inside an "async" function
+  117 |  
+  118 |      // reset 重建是异步链（clearSession → loadMessages → 重放），等待重放完成
+  119 |      await vi.waitFor(() => {
+      |      ^
+  120 |        expect(handled.length).toBe(1);
+  121 |      });
+  
+ ❯ failureErrorWithLog node_modules/esbuild/lib/main.js:1748:15
+ ❯ node_modules/esbuild/lib/main.js:1017:50
+ ❯ responseCallbacks.<computed> node_modules/esbuild/lib/main.js:884:9
+ ❯ handleIncomingPacket node_modules/esbuild/lib/main.js:939:12
+ ❯ Socket.readFromStdout node_modules/esbuild/lib/main.js:862:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

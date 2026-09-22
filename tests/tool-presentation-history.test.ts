@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { projectFullHistoryPage } from '../server/history-read/index.ts';
 import { createHistoryDeferredContentFor, createLiveToolContentDescriptor, resolveHistoryDeferredContent } from '../server/history-deferred-content.ts';
@@ -100,6 +103,47 @@ describe('工具详情历史恢复', () => {
     expect(details.fileChange).toMatchObject({ beforeAvailable: false, reason: 'before_content_unavailable' });
     expect(details.fileChange).not.toHaveProperty('patch');
     expect(resolveHistoryDeferredContent(sources, details.fileChange.contentDeferred.id)?.content).toBe(content);
+  });
+
+  // P05-A11：生成资源后工作区同名文件被修改。历史交付读取的是持久记录里的交付内容，
+  // 绝不读当前磁盘文件——真实文件作为陷阱存在，错误实现（读当前文件）会拿到 current 标记。
+  it('A11：历史交付不受工作区同名文件当前内容影响（真实磁盘文件对照）', async () => {
+    const workspaceFile = path.join(os.tmpdir(), `p05-a11-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.txt`);
+    const delivered = 'D'.repeat(9000) + ':delivered-end';
+    fs.writeFileSync(workspaceFile, delivered);
+    try {
+      const sources = [
+        {
+          id: 'assistant-a11', role: 'assistant',
+          content: [call('write-a11', 'write', { path: workspaceFile, content: delivered })],
+        },
+        {
+          id: 'result-a11', role: 'toolResult', toolCallId: 'write-a11', toolName: 'write',
+          content: [{ type: 'text', text: 'written' }],
+          details: { fileChange: { path: workspaceFile, content: delivered, beforeAvailable: true, changeType: 'modified' } },
+        },
+      ];
+      // 交付之后，工作区同名文件被外部修改
+      fs.writeFileSync(workspaceFile, 'C'.repeat(9000) + ':current-end');
+
+      const history = await page(sources);
+      const details = history.messages[0].toolCalls[0].details;
+      expect(details.fileChange.contentDeferred.kind).toBe('tool_file_content');
+      // 首包：当前内容不进入历史响应
+      expect(JSON.stringify(history)).not.toContain(':current-end');
+
+      // 展开全文：恢复交付时内容（持久记录），不是当前磁盘文件
+      const resolved = resolveHistoryDeferredContent(sources, details.fileChange.contentDeferred.id)!;
+      expect(resolved.content).toBe(delivered);
+      expect(resolved.content).not.toContain(':current-end');
+
+      // 文件被删除后：历史交付内容依旧完整可读（记录仍在），当前文件缺失不伪造空内容
+      fs.rmSync(workspaceFile, { force: true });
+      const afterDelete = resolveHistoryDeferredContent(sources, details.fileChange.contentDeferred.id)!;
+      expect(afterDelete.content).toBe(delivered);
+    } finally {
+      fs.rmSync(workspaceFile, { force: true });
+    }
   });
 
   it('大搜索只传计数预览，展开恢复所有文本块而不包含图片数据', async () => {

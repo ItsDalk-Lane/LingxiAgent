@@ -1,0 +1,54 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/history-read-directory-counters.test.ts (8 tests) 56ms
+ ✓ tests/history-read-directory-scanner.test.ts (14 tests) 110ms
+ ✓ tests/history-read-directory-memory.test.ts (3 tests) 61ms
+ ✓ tests/history-read-directory-cache.test.ts (14 tests) 74ms
+ ✓ tests/history-read-window-reader.test.ts (11 tests) 71ms
+stdout | tests/history-read-directory-incremental.test.ts > P04：翻页中正常追加（真实 fs 追加 + 生产等价分支同步） > 追加新 assistant：旧页不变（旧 Run end 过期但记录坐标稳定）、新页可见、增量命中非重建
+[sessions/history-read] directory incremental update session=sess_0muc2eoso_e42bd5e9f75100408a0d appendedBytes=595 rereadBytes=0 appendedRecords=2 affectedRelations=2 durationMs=0.97
+
+ ✓ tests/history-read-directory-build.test.ts (22 tests) 117ms
+ ↓ tests/history-protocol-compat.test.ts (4 tests | 4 skipped)
+stdout | tests/history-read-directory-incremental.test.ts > P04：翻页中正常追加（真实 fs 追加 + 生产等价分支同步） > C04：开放 Run 追加 assistant → Run 小表 end 更新，重读旧页得新 turnEndIndex
+[sessions/history-read] directory incremental update session=sess_0muc2eot6_811910c08222c8e7bb7c appendedBytes=395 rereadBytes=0 appendedRecords=1 affectedRelations=1 durationMs=0.28
+
+stdout | tests/history-read-directory-incremental.test.ts > P04：翻页中正常追加（真实 fs 追加 + 生产等价分支同步） > C03 回归：无尾换行末条（lastUndelimitedRow）重读后续追加 → 新条物理下标连续、热页与全量等价
+[sessions/history-read] directory incremental update session=sess_0muc2eote_dc2fb612773f5d019da1 appendedBytes=395 rereadBytes=0 appendedRecords=1 affectedRelations=1 durationMs=0.20
+
+stdout | tests/history-read-directory-incremental.test.ts > X10/X13：跨追加依赖更新 > X10：旧 toolCall 的结果追加后，旧页结局从 unknown 刷新
+[sessions/history-read] directory incremental update session=sess_0muc2eotm_aa8291c55123762deb54 appendedBytes=199 rereadBytes=0 appendedRecords=1 affectedRelations=1 durationMs=0.18
+
+stdout | tests/history-read-directory-incremental.test.ts > X10/X13：跨追加依赖更新 > X13：追加合法 todo 快照 → 指针前移；追加坏快照 → 跳过保持
+[sessions/history-read] directory incremental update session=sess_0muc2eots_1262447343c32f2a65a9 appendedBytes=519 rereadBytes=0 appendedRecords=1 affectedRelations=2 durationMs=0.35
+
+stdout | tests/history-read-directory-incremental.test.ts > X10/X13：跨追加依赖更新 > X13：追加合法 todo 快照 → 指针前移；追加坏快照 → 跳过保持
+[sessions/history-read] directory incremental update session=sess_0muc2eots_1262447343c32f2a65a9 appendedBytes=183 rereadBytes=0 appendedRecords=1 affectedRelations=1 durationMs=1.69
+
+stdout | tests/history-protocol-conditional.test.ts > E02.4 条件 GET：真实路由 > 首次 200 带协议头与 ETag；同表示 → 304（oracle=无条件 200 的实际 JSON；无正文/无 Content-Length）
+[sessions/history-read] history protocol conditional: request=- result=304 tag=rp1-133ea0ad08e2…
+
+ ✓ tests/history-read-directory-incremental.test.ts (11 tests) 124ms
+ ✓ tests/history-read-route-fallback.test.ts (6 tests) 89ms
+stdout | tests/history-protocol-conditional.test.ts > E02.4 条件 GET：真实路由 > 追加后 → 200 新表示（旧标签失配）；oracle 与新内容一致
+[sessions/history-read] directory incremental update session=sess_0muc2eovd_d7a2ba84d2a576082228 appendedBytes=426 rereadBytes=0 appendedRecords=1 affectedRelations=1 durationMs=0.89
+
+ ✓ tests/history-read-cache-auth.test.ts (3 tests) 80ms
+stdout | tests/history-protocol-conditional.test.ts > E02.4 条件 GET：真实路由 > 弱比较（W/ 前缀忽略）与 `*`；非法语法忽略 → 200
+[sessions/history-read] history protocol conditional: request=- result=304 tag=rp1-e82d2c0abe43…
+
+stdout | tests/history-protocol-conditional.test.ts > E02.4 条件 GET：真实路由 > 弱比较（W/ 前缀忽略）与 `*`；非法语法忽略 → 200
+[sessions/history-read] history protocol conditional: request=- result=304 tag=rp1-e82d2c0abe43…
+
+ ✓ tests/history-protocol-conditional.test.ts (8 tests) 124ms
+ ✓ tests/history-read-directory-semantics.test.ts (9 tests) 125ms
+ ✓ tests/history-pagination-invalid-fixture.test.ts (8 tests) 7344ms
+     ✓ SDK 分支读取层（SessionManager.getBranch）对自引用/环不校验，实测以 RangeError 崩溃——即修复前性能样本静默落入兼容 fallback 的原因  2054ms
+     ✓ SRC01 形状经 loadSessionHistoryMessages：分支读取抛错，兼容 raw-read fallback 静默接管（路由仍 200，如实记录兼容行为）  5215ms
+
+ Test Files  12 passed | 1 skipped (13)
+      Tests  117 passed | 4 skipped (121)
+   Start at  10:38:37
+   Duration  8.53s (transform 4.01s, setup 297ms, import 16.76s, tests 8.37s, environment 1ms)
+
