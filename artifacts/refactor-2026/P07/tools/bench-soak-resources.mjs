@@ -33,7 +33,8 @@ const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", ".
 
 const argv = process.argv.slice(2);
 let batches = 12;
-let outPath = path.join(REPO, "artifacts", "refactor-2026", "P07", "samples", "soak-resources.json");
+// P08（P07-F-B 修复）：默认输出路径带 run-id 后缀，复跑不再覆盖已留档样本；显式 --out 不变。
+let outPath = path.join(REPO, "artifacts", "refactor-2026", "P07", "samples", `soak-resources-${new Date().toISOString().replace(/[-:T]/g, "").slice(0, 14)}.json`);
 for (let i = 0; i < argv.length; i++) {
   if (argv[i] === "--batches") batches = Number(argv[++i]);
   else if (argv[i] === "--out") outPath = argv[++i];

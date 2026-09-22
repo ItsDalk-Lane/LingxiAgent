@@ -66,7 +66,10 @@ const result = {
   env: { node: process.version, os: `${os.type()} ${os.release()} ${os.arch()}`, cpus: os.cpus().length },
   seed_note: "输入为空 HOME + 打包 bundle 入口；无随机输入；与源码形态（W1）同机同口径成对",
 };
-const out = path.join(P07, "samples", "startup-bundle.json");
+// P08（P07-F-B 修复）：默认输出路径带 run-id 后缀，复跑不再覆盖已留档样本；
+// 显式 --out 仍按调用方精确路径写入（FIXR1 复跑惯例保持不变）。
+let out = path.join(P07, "samples", `startup-bundle-${new Date().toISOString().replace(/[-:T]/g, "").slice(0, 14)}.json`);
+for (let i = 0; i < argv.length; i++) if (argv[i] === "--out") out = argv[++i];
 fs.writeFileSync(out, JSON.stringify(result, null, 2));
 console.log(`[bench-startup-bundle] ready=${times.length}/${runs} median=${result.median_ms}ms p95=${result.p95_ms}ms out=${out}`);
 process.exit(times.length === runs ? 0 : 1);

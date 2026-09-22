@@ -1,0 +1,18 @@
+== app bundle ==
+769M	dist/mac-arm64/Lingxi.app
+== codesign ==
+Executable=/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/MacOS/Lingxi
+Identifier=com.lingxi.app
+Format=app bundle with Mach-O thin (arm64)
+== seed kit ==
+dcd46bbd40632894f60b89799ab0521bd1b211ecc09c3b5fdc9bf4c932d67b64  renderer-0.1.42.tar.gz
+cf0a291c4ada216130fa6a56e0fbe06751e6377ba819359166f1006bdf8a20bd  seed-train-darwin-arm64.json
+41d92c3ef1be60b818ae205fa6f5e631d437831feb3cbe184305dc801f638a4b  seed-train-darwin-arm64.json.sig
+1801d3b013cd357e5651056b5eab8310716e60c425b4350427b67a4bd98a39f8  server-0.1.42-darwin-arm64.tar.gz
+== asar ==
+42297d88d9f449ed894cf6618b10b457338360374561895246beaea138462485  app.asar
+== dist-server bundle ==
+--help-arm64
+mac-arm64
+== version ==
+0.1.42

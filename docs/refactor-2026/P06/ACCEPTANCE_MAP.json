@@ -161,7 +161,7 @@
       "date": "2026-09-22",
       "source": "独立验收 P06_ACCEPTANCE_REVIEW.md §6 非阻塞发现 ①：FIX-1 缺陷叙事与实测不符——「normalizeIssues 只认 instancePath、嵌套路径降级为 /、details 保真退化」前提不成立（本仓 typebox@1.1.38 错误对象无 path 键、instancePath 嵌套路径本就填充，修复前 issuePaths 已为 /labels/0、/metadata/owner）；真实缺口仅 message 通用文案；path 兼认为本版本防御性 no-op",
       "effect_on_cases": "无——A01–A14 全部场景状态与证据不变（零执行代码、零测试断言改动；定向复跑 resolver-error-passthrough 4 例 + 工具面边界 4 套件 67 例 + p06 4 文件 19 例全绿，typecheck 绿）。更正仅落注释与文档叙事：schema-validator.ts 两处 P06 注释、PROMPT_CHANGE_LEDGER.md §3、EVAL_COMPARISON.md §1 FIX-1 行（及 §4 同叙事短句「details 保真恢复」）",
-      "records": "P06_REPORT.md「独立验收修复轮（P06-FIXR1）」节；P06_RESULT.json fix_rounds；日志 artifacts/refactor-2026/P06/logs/P06-FIXR1-*（command-log.jsonl 追加 5 条）"
+      "records": "P06_REPORT.md「独立验收修复轮（P06-FIXR1）」节；P06_RESULT.json fix_rounds；日志 artifacts/refactor-2026/P06/logs/P06-FIXR1-*（command-log.jsonl 追加 6 条；P08-T07 更正：原记 5 条为计数笔误）"
     }
   ]
 }

@@ -1,0 +1,9 @@
+
+> lingxi@0.1.42 smoke:server:open
+> node scripts/smoke-open-server.mjs
+
+[smoke-open-server] positive smoke: darwin-arm64...
+[smoke-open-server] positive smoke PASSED: GET http://127.0.0.1:27142/api/server/identity -> 200, serverProtocol=1
+[smoke-open-server] negative smoke: darwin-arm64...
+[smoke-open-server] negative smoke PASSED: exit code=1, attributable stderr confirmed
+[smoke-open-server] all smoke checks passed

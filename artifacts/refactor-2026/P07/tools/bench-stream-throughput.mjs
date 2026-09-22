@@ -29,7 +29,9 @@ import { fileURLToPath } from "node:url";
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..");
 
 const argv = process.argv.slice(2);
-let out = path.join(REPO, "artifacts", "refactor-2026", "P07", "samples", "stream-throughput.json");
+// P08（P07-F-B 修复）：默认输出路径带 run-id 后缀，复跑不再覆盖已留档样本；
+// 显式 --out 仍按调用方精确路径写入（FIXR1 复跑惯例保持不变）。
+let out = path.join(REPO, "artifacts", "refactor-2026", "P07", "samples", `stream-throughput-${new Date().toISOString().replace(/[-:T]/g, "").slice(0, 14)}.json`);
 for (let i = 0; i < argv.length; i++) if (argv[i] === "--out") out = argv[++i];
 
 const { createChatRoute } = await import(`${REPO}/server/routes/chat.ts`);

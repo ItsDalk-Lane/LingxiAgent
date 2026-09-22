@@ -13,7 +13,7 @@
 | 文件 | 对 P05 的用途 |
 |---|---|
 | docs/refactor-2026/P04/MODEL_CALLSITE_MATRIX.json | 全部出站调用族与观测/凭证/用量归属——P05 消息语义只消费本表事实，不重新推断 |
-| docs/refactor-2026/P04/USAGE_OWNERSHIP.md §1 | 五个计量观察点与 modelCallId 去重身份——P05 历史投影不得新增 usage 写入 |
+| docs/refactor-2026/P04/USAGE_OWNERSHIP.md §1 | 计量观察点生产写入面全枚举（P04-FIXR1 修订后为 §1 表 8 行：7 处生产写入边界 + 1 消费投影）与 modelCallId 去重身份——P05 历史投影不得新增 usage 写入。（P08-T07 更正：本行原写「五个计量观察点」，与本表 P04-FIXR1 修订后的枚举不一致，系措辞遗留，非事实变化） |
 | docs/refactor-2026/P04/TRACE_COMPAT_REPORT.md | mt_ 会话级复用、独立根枚举、parentCallId 因果规则——P05 历史恢复沿用同一 trace 语义 |
 | docs/refactor-2026/P04/STREAM_RETRY_POLICY.md §1 | 消费端只见 assistant_event_normalizer 规范化事件——P05 的实时/历史/重连同语义以此为准 |
 

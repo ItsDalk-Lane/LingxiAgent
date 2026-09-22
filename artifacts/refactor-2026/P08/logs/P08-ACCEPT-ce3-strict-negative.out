@@ -1,0 +1,5 @@
+CE-3（strict 负例独立构造）：自建无逃逸 fixture（裸字符串赋给品牌类型 ModelCallId，零 cast）
+  with_fixture: total=1 mine=1 → TS2322 指向自建 fixture
+  without_fixture: total=0（干净基线）
+注：首轮尝试经 `as unknown as string as never` 逃逸 cast 的变体 0 诊断——为 TS 语义合法逃逸（非检查器缺陷），
+改用无 cast fixture 后真实检查器必红，与 A03 声称一致。

@@ -63,7 +63,11 @@ const result = {
   env: { node: process.version, os: `${os.type()} ${os.release()} ${os.arch()}` },
   limitation: "活动负载为轻量 API 写；流式高负载峰值内存按 BENCHMARK_PROTOCOL 留待 P07",
 };
-const out = path.join(P00, "samples", "memory-p07.json");
+// P08（P07-F-B 修复）：默认输出路径带 run-id 后缀，复跑不再覆盖已留档样本；
+// 显式 --out 仍按调用方精确路径写入。
+const argv = process.argv.slice(2);
+let out = path.join(P00, "samples", `memory-p07-${new Date().toISOString().replace(/[-:T]/g, "").slice(0, 14)}.json`);
+for (let i = 0; i < argv.length; i++) if (argv[i] === "--out") out = argv[++i];
 fs.writeFileSync(out, JSON.stringify(result, null, 2));
 fs.rmSync(home, { recursive: true, force: true });
 console.log(`[bench-mem] idle=${idle.total_kb}KB after200puts=${afterActivity.total_kb}KB ok=${ok200}/200 out=${out}`);

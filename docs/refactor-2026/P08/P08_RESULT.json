@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "stage_id": "P08",
+  "status": "PASS_WITH_BLOCKED_ITEMS",
+  "status_note": "12/14 场景 PASS + 1 带限定 PASS（A07：macOS arm64 --dir 形态，安装器形态与其它平台 BLOCKED 已单列；未计入 pass=12 桶）+ 1 BLOCKED（A06 四平台 CI）+ 0 FAIL（12+1+1=14；P08-FIXR2 精确化：原「12/14 场景 PASS + 1 BLOCKED + 0 FAIL」分母悬挂，A07 系带限定 PASS 未入任何桶）；BLOCKED 均为授权/环境受限且逐项带原因与解锁条件。本轮整体=实现与本地验收完成；四平台远程证据与 F1 封印推进待授权——不写『全部完成』，正式发布准备不标完成（任务书 §10/通用约束 §8）。",
+  "research_sha": "8037fae7a6f621549f5b7db4c4d0bba3862ddc07",
+  "start_sha": "674b0151fcc982d13f1d6bc5a84ff273edd3b4a3",
+  "end_sha": null,
+  "end_sha_note": "零生产 commit（编排层约束）：全部改动保留工作区待统一提交；候选 END = 提交后的编排层产物",
+  "environment": {
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "os": "darwin 27.0.0",
+    "arch": "arm64",
+    "lockfile_sha256": "a9735825cea1d018…（P00→P08 一致，零依赖变动）"
+  },
+  "round_production_diff": "92c6646c5..674b0151f 共 36 文件（P01-P07 七个 refactor 提交）；本阶段（P08）零生产代码改动：仅删未跟踪残留 skills2set/lingxi-plugin-creator/、P07 六个 bench 工具 run-id 修复（验收移交 P07-F-B）、P04/P06 三处证据笔误更正（带注记）、P08 证据目录",
+  "tasks": [
+    {
+      "id": "P08-T01",
+      "implementation_action": "UNCHANGED_VERIFIED + REMOVED（skills2set 残留）",
+      "source_locations": "docs/refactor-2026/P08/FINAL_CALLSITE_MATRIX.json、LEGACY_EXIT_LEDGER.md",
+      "consumer_locations": "编排层/后续治理（旧路径账本消费者）",
+      "test_ids": [
+        "P08-T01-tool-invocation-boundaries",
+        "P08-T01-skills-residue-cleanup",
+        "P08-T01-skills-tests"
+      ],
+      "legacy_action": "5 退出+6 兼容保留+3 不退出，逐项理由/测试/退出条件",
+      "status": "PASS",
+      "evidence": "十入口重定位+第二事实所有者扫描零新增+隐式回退扫描零命中"
+    },
+    {
+      "id": "P08-T02",
+      "implementation_action": "UNCHANGED_VERIFIED + 审计收口",
+      "source_locations": "docs/refactor-2026/P08/STRICT_FINAL_SCOPE.json",
+      "consumer_locations": "CI（ci.yml core-contracts 步骤，四平台每腿）",
+      "test_ids": [
+        "P08-T02-core-contracts",
+        "P08-T02-core-contracts-negative",
+        "P08-T02-dependency-boundaries"
+      ],
+      "legacy_action": "any 增量 4 处入宽松区账本；零 flag/双轨；R10-09 改造评估不越权",
+      "status": "PASS",
+      "evidence": "A03 负例注入真实失败验证 + 依赖边界绿"
+    },
+    {
+      "id": "P08-T03",
+      "implementation_action": "MODIFIED（新增回归工具，非生产代码）",
+      "source_locations": "artifacts/refactor-2026/P08/tools/product-regression.mjs；docs/refactor-2026/P08/PRODUCT_REGRESSION_MATRIX.json",
+      "consumer_locations": "真实全量组合 server（E-DESKTOP 同入口）+ witness 供应商",
+      "test_ids": [
+        "P08-T03-product-regression-r6（32/32）",
+        "P08-T04-full-test（套件映射）"
+      ],
+      "legacy_action": "无（不新增功能不改 UI）",
+      "status": "PASS",
+      "evidence": "F01-F20 逐项结果 + A05 重启持久化 4/4；GUI/真账户层 BLOCKED 如实标注"
+    },
+    {
+      "id": "P08-T04",
+      "implementation_action": "UNCHANGED_VERIFIED + 全门禁执行",
+      "source_locations": "docs/refactor-2026/P08/FINAL_ENGINEERING_CHECKS.json",
+      "consumer_locations": "发布门禁（四平台 CI 待触发）",
+      "test_ids": [
+        "P08-T04-typecheck",
+        "P08-T04-lint",
+        "P08-T04-build-renderer",
+        "P08-T04-full-test",
+        "P08-T04-build-server-open",
+        "P08-T04-smoke-server-open"
+      ],
+      "legacy_action": "F3 open build/smoke 网络阻塞解除闭环",
+      "status": "PASS（本地 darwin arm64 一腿）",
+      "evidence": "全量 4 红=F1 同组逐名一致；open build+smoke 首次真跑成功；四平台 BLOCKED+待触发清单"
+    },
+    {
+      "id": "P08-T05",
+      "implementation_action": "UNCHANGED_VERIFIED + 打包/演练工具新增",
+      "source_locations": "docs/refactor-2026/P08/PACKAGED_ARTIFACT_MATRIX.json；artifacts/refactor-2026/P08/tools/{packaged-server-smoke,upgrade-rollback-drill}.mjs",
+      "consumer_locations": "dist/mac-arm64/Lingxi.app（0.1.42，ad-hoc 本地测试件）",
+      "test_ids": [
+        "P08-T05-pack",
+        "P08-T05-pack-dir-local",
+        "P08-T05-packaged-smoke（7/7）",
+        "P08-T05-upgrade-drill（14/14）",
+        "P08-T05-fingerprint-check",
+        "P08-T05-artifact-hashes"
+      ],
+      "legacy_action": "零版本号/指纹/封印改动",
+      "status": "PASS（mac arm64 --dir；安装器/他平台 BLOCKED）",
+      "evidence": "seed sha256×4 + asar + bundle 清单；干净安装产物真实聊天链；旧数据升级/半写注入/回退并存全过"
+    },
+    {
+      "id": "P08-T06",
+      "implementation_action": "新增独立复核（本子代理即独立上下文）",
+      "source_locations": "docs/refactor-2026/P08/INDEPENDENT_REVIEW.md；tools/negative-probes.mjs",
+      "consumer_locations": "真实入口（产物+开发树双形态）",
+      "test_ids": [
+        "P08-T06-negative-probes（4/4）",
+        "P08-T06-negative-probes-r2"
+      ],
+      "legacy_action": "排除项未重引入（7 项核对通过）",
+      "status": "PASS",
+      "evidence": "十组反例全挡 + 交付物抽查重算一致 + 未验证边界诚实清单"
+    },
+    {
+      "id": "P08-T07",
+      "implementation_action": "交付包组装",
+      "source_locations": "docs/refactor-2026/P08/{P08_REPORT.md,FINAL_RESULT.json,ACCEPTANCE_MAP.json,EVIDENCE_SHA256.txt} + artifacts/refactor-2026/P08/logs/",
+      "consumer_locations": "用户/编排层验收",
+      "test_ids": [
+        "P08-T07-json-validate",
+        "P08-T07-lint-r2",
+        "P08-T07-cleanup"
+      ],
+      "legacy_action": "P07-F-B 移交落地：6 工具 run-id 后缀（真实复跑验证不覆盖）+ tools/samples 入 EVIDENCE_SHA256（147 条）",
+      "status": "PASS",
+      "evidence": "P04(70)/P06(11)/P07(147) 三份清单 shasum -c 全 OK（P08-FIXR1 更正：P06 原记 12 条，实测 11 条哈希行，12 为含头注总行数）；lint 0 error"
+    }
+  ],
+  "acceptance_cases": "见 docs/refactor-2026/P08/ACCEPTANCE_MAP.json（A01-A14 逐条：12 PASS + 1 带限定 PASS（A07，summary pass=12 桶未含）+ 1 BLOCKED + 0 FAIL = 14；P08-FIXR2 精确化分母口径）",
+  "commands": "34 条全留档 artifacts/refactor-2026/P08/logs/command-log.jsonl（P08-FIXR1 更正：原记 33 条为计数笔误，实 34 条 = 33 + P08-T07-manifest-check 收尾追加，报告先行；含 7 个首败-重跑链非预期失败事件：product-regression r1-r5 工具缺陷、pack 公证凭据、lint 全局纪律——P08-FIXR2 更正：原记 6 条为计数漏计，command-log.jsonl 实测 status=FAIL 共 7 个 = product-regression ×5 + pack ×1 + lint ×1，逐 ID 可枚举；另 3 条非零退出不属非预期失败：T04-full-test 系 F1 基线 4 红 PASS_WITH_KNOWN_BASELINE、ACCEPT-full-test 与 ACCEPT-ce2d-unknown-key 系负向测试预期非零 status=PASS）",
+  "baseline_failures": [
+    "F1 封印 4 红（audit-seal 1 + round2 2 + round3 1）——与 P05/P06/P07 逐名一致，未扩大；推进待候选提交+授权（FINAL_ENGINEERING_CHECKS f1_seal_status）",
+    "R10-09 本轮未波动（无第 5 红）；f1-f12 patch 重写副作用已还原并留档 stat"
+  ],
+  "scope_deviations": [
+    "P07-F-B 结构建议（验收明确移交 P08）：6 个 bench 工具默认输出加 run-id 后缀 + P07 logs 清单补 pin tools/samples——属本阶段合法范围",
+    "P04 措辞 + P06 计数笔误更正：带 P08 注记与清单头注的证据链更正，历史 PASS 证明未改写",
+    "无其它范围偏差：未新增功能/UI/权限变化；未 push/PR/tag/发布/自动更新"
+  ],
+  "legacy_paths": "见 docs/refactor-2026/P08/LEGACY_EXIT_LEDGER.md（§1 已退出 5 / §2 兼容保留 6 / §3 明确不退出 / §5 移交 3）",
+  "blocked_items": [
+    {
+      "id": "P08-A06",
+      "item": "四平台候选 SHA CI 证据",
+      "reason": "ci.yml 仅 pull_request→main 触发；当前分支无 PR；无授权开 PR/push",
+      "unlock": "授权开 PR → 四腿自动跑 → gh 取回逐腿日志（注意 npm test 步骤会复现 F1 4 红直到封印推进）"
+    },
+    {
+      "id": "F1",
+      "item": "审计封印推进",
+      "reason": "需候选提交存在（本阶段零 commit）+ PROGRESS.md 流程授权",
+      "unlock": "编排层统一提交后按封印工作流推进坐标并复跑全量（预期 0 红）"
+    },
+    {
+      "id": "P04-T07-2/P06",
+      "item": "真供应商冒烟 + 真模型行为评测",
+      "reason": "无凭证/费用授权（P04 起继承）",
+      "unlock": "凭证/预算授权后按 TOOL_BEHAVIOR_EVAL.json §budget_authorization_record 执行"
+    },
+    {
+      "id": "GUI",
+      "item": "桌面 GUI 层验收（点击/截图/浏览器真机/Electron 窗口启动）",
+      "reason": "无 GUI 自动化授权（P07 同款限制）；协议+套件层已覆盖",
+      "unlock": "GUI 环境授权"
+    },
+    {
+      "id": "PKG-OTHER",
+      "item": "macOS x64/Windows/Linux 实机 + DMG/NSIS/AppImage 安装器形态 + 产物级 OTA",
+      "reason": "无平台实机；安装器全链含公证需生产凭据与发布授权（A11 红线不触发）",
+      "unlock": "平台环境 + 发布授权"
+    }
+  ],
+  "next_stage_handoff": "本轮九阶段（P00-P08）至此收官。后续动作全部需用户明确授权：统一提交 → F1 封印推进 → PR 取回四平台 CI → 正式发布列车。移交的技术登记项（H1 热点、P05 C1 闸门、R10-09 治理、task-registry strict 化）见 INDEPENDENT_REVIEW.md §4 范围外建议。",
+  "fix_rounds": [
+    {
+      "id": "P08-FIXR1",
+      "date": "2026-09-22",
+      "source": "独立验收 P08_ACCEPTANCE_REVIEW.md §4 非阻塞发现 ①–③（均不改门禁结果）。① STRICT_FINAL_SCOPE.json 宽松区账本第 4 处 any 归属笔误；② command-log 计数 33 vs 实测 34、P06 清单 12 vs 实测 11 条哈希行；③ 「锚点行号与 P00 逐字一致」措辞过强",
+      "changes": [
+        "STRICT_FINAL_SCOPE.json：宽松区账本拆两条——lib/task-registry.ts（update/complete/fail options ×3，:169/:197/:218，P02 9a19740ba，count 3）+ server/hono-helpers.ts（`const error: any = new Error(message)` :37 httpJsonError 内，P01 e2392f301 随文件新建引入，count 1）。实测依据：git blame -L 37,37 e2392f301 命中该行；lib/task-registry.ts 全文 635 行无此行；scan_method 原口径复算 92c6646c5..HEAD 4 命中不变，总数 4 与宽松区定性不动",
+        "P08_REPORT.md：验证节标题 33→34（附笔误注记）+「其余 22 条」→「其余 23 条」（1+6+2+2 显式 + 23 = 34，command-log.jsonl 逐 ID 枚举复核）；P08_RESULT.json / FINAL_RESULT.json commands 同步 33→34",
+        "INDEPENDENT_REVIEW.md §2 + P08_RESULT.json T07 evidence + FINAL_RESULT.json T07 evidence：P06 清单计数 12→11（实测 docs/refactor-2026/P06/EVIDENCE_SHA256.txt = 1 行头注 + 11 条哈希行，12 为含头注总行数）",
+        "FINAL_CALLSITE_MATRIX.json：note 与 E-DESKTOP p08_verification 的「锚点行号与 P00（完全）逐字一致」精确化为「核心链文件零改动、行号未移位；深 5 锚点与 P00 原始证据（agent-callsite-raw.md / ENTRYPOINT_MATRIX.md）逐字一致」+ 锚点选取差异登记。与验收描述的分歧（如实登记，不虚报）：验收 §4-③ 称 composer-send.ts:577 为「旧文件名（P00 基线时该文件已名 composer-send-coordinator.ts）」，经本轮实测不成立——git ls-tree 92c6646c5 证实 desktop/src/react/components/input/composer-send.ts 与 desktop/src/react/services/composer-send-coordinator.ts 基线即两文件并存，composer-send.ts P01-P07 零改动且 :577 基线与当前均为 ws.send(JSON.stringify(prepared.wsMsg))（617 行），与 P00 raw log `composer-send.ts:577` 逐字一致；故按「段位选取差异（本表锚租约协调器 :583，P00 锚 ws.send :577）」而非「陈旧锚点重定位」表述；scheduler 差异（P00 定义位 :126/:194/:442 vs 本表 onBeat 位 :163/:168）两者皆真，同为选取差异。P00 历史文档与 P08_ACCEPTANCE_REVIEW.md 均不改写",
+        "记录与清单：P08_REPORT.md 追加「独立验收修复轮（P08-FIXR1）」节；本文件与 ACCEPTANCE_MAP.json 补 fix_rounds；command-log.jsonl 追加 P08-FIXR1-* 4 条（any-scan/counts/anchor-evidence/json-validate；manifest-check 不入 jsonl 以保清单哈希稳定）；EVIDENCE_SHA256.txt（docs + logs 两份）按既有口径刷新——docs 清单本轮改动条目哈希刷新 + 补入头注已声称但缺失的 P08_ACCEPTANCE_REVIEW.md 条目（对齐 P06 惯例与自身头注）；logs 清单补入 P08-FIXR1-* 日志并刷新 command-log.jsonl 哈希"
+      ],
+      "production_code_changed": false,
+      "existing_test_assertions_changed": false,
+      "verification": [
+        "P08-FIXR1-any-scan（exit 0：scan_method 原口径复算 4 命中；hono-helpers.ts:37/task-registry.ts:169,197,218 sed 实测；lib/task-registry.ts wc -l=635）",
+        "P08-FIXR1-counts（exit 0：command-log.jsonl 逐 ID 枚举执行轮 34 条；P06 EVIDENCE_SHA256.txt 1 头注 + 11 哈希行；P04 70 / P07 logs 147 复点）",
+        "P08-FIXR1-anchor-evidence（exit 0：git ls-tree 92c6646c5 双 composer 文件并存；基线与当前 :577 均 ws.send；scheduler :126/:194/:442 定义位与 :163/:168 onBeat 位均在位；深 5 锚点在 agent-callsite-raw.md 逐字命中）",
+        "P08-FIXR1-json-validate（exit 0：P08 docs 目录 8 个 JSON 含本轮改动 5 个全部解析合法）",
+        "P08-FIXR1-manifest-check（shasum -a 256 -c 两清单全量 exit 0，留档 artifacts/refactor-2026/P08/logs/P08-FIXR1-manifest-check.out，不入 jsonl 以保清单哈希稳定）"
+      ]
+    },
+    {
+      "id": "P08-FIXR2",
+      "date": "2026-09-22",
+      "source": "终验收 P08_RECLOSURE_REVIEW.md §6 本轮新增发现 ①–③ 预批准随手更正（终验收 PASS_WITH_SEAL_CONDITIONS，均文档级，零生产代码/测试改动，不动任何门禁结果与 A07 自身状态字段）。① 悬空引用 ×2：STRICT_FINAL_SCOPE.json 与 INDEPENDENT_REVIEW.md 各一处引用不存在的 FINAL_REPORT.md；② commands「6 条首败-重跑链」计数口径（实测 7 个非预期失败事件）；③ status_note「12/14 + 1 BLOCKED + 0 FAIL」分母悬挂（A07 带限定 PASS 未计入任何桶）",
+      "changes": [
+        "STRICT_FINAL_SCOPE.json test_merge_mapping：「P08 汇总索引见 FINAL_REPORT.md §功能→契约→代码→测试」→「P08 汇总见 P08_REPORT.md；无独立『功能→契约→代码→测试』索引节，映射散见各阶段 ACCEPTANCE_MAP 系文件」+ 注记原引系任务书建议文件名实际不存在",
+        "INDEPENDENT_REVIEW.md §5：「见 FINAL_REPORT.md / FINAL_RESULT.json」→「见 P08_REPORT.md（§结论 + §差异与限制）/ FINAL_RESULT.json」+ 同款注记",
+        "P08_RESULT.json / FINAL_RESULT.json commands：首败-重跑链 6→7 并补口径（command-log.jsonl 实测 status=FAIL 共 7 = P08-T03-product-regression r1-r5（jsonl line 14-18）+ P08-T05-pack（line 22）+ P08-T07-lint（line 30）；另 3 条非零退出不属非预期失败：T04-full-test=PASS_WITH_KNOWN_BASELINE（F1 基线 4 红）、P08-ACCEPT-full-test 与 P08-ACCEPT-ce2d-unknown-key=负向测试预期非零 status=PASS）",
+        "P08_RESULT.json / FINAL_RESULT.json status_note 与 acceptance_cases、P08_REPORT.md §结论与 §场景逐项结果：「12 PASS + 1 BLOCKED + 0 FAIL」→「12 PASS + 1 带限定 PASS（A07：macOS arm64 --dir 形态，未计入 pass=12 桶）+ 1 BLOCKED（A06 四平台 CI）+ 0 FAIL（12+1+1=14）」等价精确表述；ACCEPTANCE_MAP.json summary 计数与 A07 状态字段不动",
+        "记录与清单：P08_REPORT.md 追加「终验收随手更正轮（P08-FIXR2，微型三项）」节；本文件补 fix_rounds（FINAL_RESULT.json 无 fix_rounds 字段，不加）；command-log.jsonl 追加 P08-FIXR2-* 2 条（fail-count/json-validate；manifest-check 不入 jsonl 以保清单哈希稳定，沿 FIXR1 口径）；EVIDENCE_SHA256.txt（docs + logs 两份）按既有口径刷新——docs 清单本轮改动 5 条目哈希刷新 + 头注追加；logs 清单补入 P08-FIXR2-* 日志并刷新 command-log.jsonl 哈希"
+      ],
+      "production_code_changed": false,
+      "existing_test_assertions_changed": false,
+      "verification": [
+        "P08-FIXR2-fail-count（exit 0：command-log.jsonl 逐条解析 status=FAIL=7 逐 ID 列出；另 3 条非零=1 基线 + 2 负向预期，口径闭合）",
+        "P08-FIXR2-json-validate（exit 0：P08 docs 目录 8 个 JSON 含本轮改动 3 个全部解析合法）",
+        "P08-FIXR2-manifest-check（shasum -a 256 -c 两清单全量 exit 0，仓库根执行，留档 artifacts/refactor-2026/P08/logs/P08-FIXR2-manifest-check.out，不入 jsonl 以保清单哈希稳定）",
+        "f1 patch 改前改后 sha256 均 25fb315f6c5d68cedd2167321de4db9f84163daae69515714dba628ab69db709（与 HEAD 零 diff，P08_REPORT/P05/P07 引用一致）"
+      ]
+    }
+  ],
+  "implementation_performed": true,
+  "project_tests_executed": true,
+  "schema_note": "P08_RESULT.json = 本阶段结构化结果（92 模板 §2 命名惯例）；FINAL_RESULT.json 为 T07 指定交付名，两者内容同源，本文件为阶段权威"
+}

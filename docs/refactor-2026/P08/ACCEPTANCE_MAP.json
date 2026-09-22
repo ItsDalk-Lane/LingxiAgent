@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "stage_id": "P08",
+  "generated_at": "2026-09-22",
+  "source_sha": "674b0151fcc982d13f1d6bc5a84ff273edd3b4a3",
+  "note": "任务书 §6 场景规格 → 实际测试/执行/证据映射。命令 ID 均可在 artifacts/refactor-2026/P08/logs/command-log.jsonl 逐条对账。",
+  "cases": [
+    {
+      "id": "P08-A01",
+      "scenario": "旧路径不可达",
+      "execution": "FINAL_CALLSITE_MATRIX.json 十入口逐一在当前 HEAD 重定位（真实符号+行号+消费者）；LEGACY_EXIT_LEDGER §0/§4 双写与隐式回退扫描（本轮生产 diff 36 文件全核查 + flag/配置扫描 0 命中）",
+      "actual": "全部入口 UNCHANGED_VERIFIED/登记旁路；无配置默认走旧实现、无失败静默回退、无仅改名规避",
+      "command_ids": ["P08-T01-tool-invocation-boundaries", "P08-T02-dependency-boundaries", "P08-T01-skills-residue-cleanup"],
+      "evidence": "docs/refactor-2026/P08/FINAL_CALLSITE_MATRIX.json、LEGACY_EXIT_LEDGER.md",
+      "status": "PASS"
+    },
+    {
+      "id": "P08-A02",
+      "scenario": "必要兼容不误删",
+      "execution": "LEGACY_EXIT_LEDGER §2 逐项：knowledge research 表族（仅建表兼容，零运行时入口）、WS text_delta（产品契约）、fork 克隆三处 store 行 ID（登记）、L9/L10 tsconfig glob（无害保留）",
+      "actual": "读兼容全部保留且无新增授权面（research 表不注册工具/路由；升级演练证实旧数据全量可读）",
+      "command_ids": ["P08-T05-upgrade-drill"],
+      "evidence": "LEGACY_EXIT_LEDGER.md §2、logs/upgrade-rollback-drill.json",
+      "status": "PASS"
+    },
+    {
+      "id": "P08-A03",
+      "scenario": "strict 范围真实",
+      "execution": "tests/core-contracts-strict.test.ts：两份负例 fixture 经 extraFiles 注入真实检查器 → 必须产生 TS 错误且指向 fixture 自身；正向检查零诊断",
+      "actual": "负例注入红/正向绿双向验证 exit 0；strict 范围 6 文件 + 依赖图实际进入检查",
+      "command_ids": ["P08-T02-core-contracts", "P08-T02-core-contracts-negative"],
+      "evidence": "STRICT_FINAL_SCOPE.json、logs/P08-T02-core-contracts-negative.out",
+      "status": "PASS"
+    },
+    {
+      "id": "P08-A04",
+      "scenario": "全功能入口",
+      "execution": "PRODUCT_REGRESSION_MATRIX.json：F01-F20 逐项（协议级真实动作 32 探针 + 全量套件 14797 绿映射）；无『其余应正常』式笼统勾选",
+      "actual": "20 项全部有结果：17 PASS（其中 3 项注明协议级/套件级组合）、F11 PARTIAL（终端 PASS/浏览器 GUI BLOCKED）、F12 PASS+真实账户 BLOCKED",
+      "command_ids": ["P08-T03-product-regression-r6", "P08-T04-full-test"],
+      "evidence": "PRODUCT_REGRESSION_MATRIX.json、logs/product-regression.json",
+      "status": "PASS（含如实标注的受限层）"
+    },
+    {
+      "id": "P08-A05",
+      "scenario": "设置重启持久化",
+      "execution": "product-regression A05 节：多 provider（witness-a/b 双条目）+ permissionMode=auto + 通知偏好 → SIGTERM 真实关闭（exit 0）→ 真实重启 → 逐项比对",
+      "actual": "重启后 permissionMode=auto、会话列表数量一致、历史可读、双 provider 均在——无最后一项覆盖其余项（4/4 探针 PASS）",
+      "command_ids": ["P08-T03-product-regression-r6"],
+      "evidence": "logs/product-regression.json（A05 6 探针）",
+      "status": "PASS"
+    },
+    {
+      "id": "P08-A06",
+      "scenario": "四组平台/架构证据",
+      "execution": "本地 darwin arm64 一腿全量证据完成；gh 认证恢复但 ci.yml 仅 PR 触发、当前分支无 PR、无授权开 PR/push",
+      "actual": "四平台候选 SHA 远程证据缺失——按任务书 T04.5 标 BLOCKED，附待触发清单（开 PR→四腿→取回日志）；不以 2026-09-11 旧运行冒充",
+      "command_ids": ["P08-T00-env"],
+      "evidence": "FINAL_ENGINEERING_CHECKS.json platform_matrix + ci_trigger_status",
+      "status": "BLOCKED（本地一腿 PASS）"
+    },
+    {
+      "id": "P08-A07",
+      "scenario": "干净安装",
+      "execution": "从 Lingxi.app seed 提取自包含 server 树（自带 node 24.15.0，与开发树零耦合）真实启动 + 完整聊天链（read 工具真实往返）+ 历史回读 + 优雅退出",
+      "actual": "7/7 PASS：依赖与 server 资源完整、非仅开发模式可用；skills2set 清理随包生效",
+      "command_ids": ["P08-T05-pack", "P08-T05-pack-dir-local", "P08-T05-packaged-smoke"],
+      "evidence": "PACKAGED_ARTIFACT_MATRIX.json、logs/packaged-server-smoke.json",
+      "status": "PASS（macOS arm64 --dir 形态；安装器形态与其它平台 BLOCKED 已单列）"
+    },
+    {
+      "id": "P08-A08",
+      "scenario": "旧数据升级",
+      "execution": "upgrade-drill OLD-GEN→UPGRADE：旧版本（8037fae7a worktree）真实生成 2 会话+聊天轮+设置+观测 → 当前 HEAD 同 HOME 升级逐项比对",
+      "actual": "会话 ID 完整、历史可读、设置 operate 保持、观测可读、无静默清空（5/5 PASS）",
+      "command_ids": ["P08-T05-old-worktree-setup", "P08-T05-upgrade-drill"],
+      "evidence": "logs/upgrade-rollback-drill.json",
+      "status": "PASS"
+    },
+    {
+      "id": "P08-A09",
+      "scenario": "升级失败回退",
+      "execution": "FAULT：JSONL 尾部截断（半写注入）后再启动；ROLLBACK：旧版本代码再启动读新数据并追加",
+      "actual": "半写后启动无半激活、其余会话完好；旧代码读全部新数据、追加后新记录不被覆盖（ROLLBACK 3/3 + FAULT 1/1 PASS）",
+      "command_ids": ["P08-T05-upgrade-drill"],
+      "evidence": "logs/upgrade-rollback-drill.json",
+      "status": "PASS"
+    },
+    {
+      "id": "P08-A10",
+      "scenario": "产物安全边界",
+      "execution": "打包产物形态（非开发环境）真实越权请求：无凭证 health 403；开发树另测错误 token 403/伪造跨域路径 404 fail-closed/字段类型 400，全部零副作用",
+      "actual": "拒绝 + 零副作用在产物与开发树双形态成立（negative-probes 4/4 + packaged-smoke）",
+      "command_ids": ["P08-T05-packaged-smoke", "P08-T06-negative-probes"],
+      "evidence": "logs/negative-probes.json、INDEPENDENT_REVIEW.md §1",
+      "status": "PASS"
+    },
+    {
+      "id": "P08-A11",
+      "scenario": "发布授权",
+      "execution": "本阶段全程无 push/PR/tag/发布/自动更新触发；gh 仅只读查询（run list/auth status）；签名用一次性临时密钥并显式标注非生产签名",
+      "actual": "只产本地证据；发布类动作全部 NOT_ATTEMPTED/BLOCKED 登记",
+      "command_ids": ["P08-T00-env"],
+      "evidence": "command-log.jsonl 全量 argv 审计（无任何写远程命令）、PACKAGED_ARTIFACT_MATRIX signing_status",
+      "status": "PASS"
+    },
+    {
+      "id": "P08-A12",
+      "scenario": "受阻诚实",
+      "execution": "FINAL_RESULT.json 汇总：真供应商冒烟、真模型评测、四平台 CI、GUI 层、安装器形态等全部 BLOCKED 逐项带原因",
+      "actual": "总体=PASS_WITH_BLOCKED_ITEMS（非『全部完成』）；正式发布准备不得标完成的项逐列",
+      "command_ids": [],
+      "evidence": "FINAL_RESULT.json blocked_items",
+      "status": "PASS（受阻如实）"
+    },
+    {
+      "id": "P08-A13",
+      "scenario": "历史封印保护",
+      "execution": "本阶段对前序阶段证据的更正（P04 措辞、P06 计数）均带 P08 注记、对应 EVIDENCE_SHA256 头部注明更正原因并重算哈希；审计封印坐标/白名单零触碰；pinned-keyset 零改动；指纹守卫 170 watched 零触碰",
+      "actual": "历史日志/旧 PASS 证明无静默改写；新清单哈希绑定当前真实文件（shasum -c 全 OK：P04 70/P06 12/P07 logs 147 条）；F1 封印 4 红如实保留待授权推进",
+      "command_ids": ["P08-T05-fingerprint-check"],
+      "evidence": "docs/refactor-2026/P0{4,6,7}/EVIDENCE_SHA256.txt 头注、FINAL_ENGINEERING_CHECKS f1_seal_status",
+      "status": "PASS"
+    },
+    {
+      "id": "P08-A14",
+      "scenario": "独立反例",
+      "execution": "INDEPENDENT_REVIEW.md：C1-C10 十组反例（权限旁路/凭证伪造/身份串线/校验绕过/升级窗口丢失/旧程序覆盖/工具旁路/隐藏回退/观测旁路/假优化）+ 交付物抽查重算 + 范围核对 7 项",
+      "actual": "全部反例被现有边界挡住或如实归类；未验证边界诚实列出；发现=3 项继承阻塞 + 4 项范围外建议，无本轮新增验收缺口",
+      "command_ids": ["P08-T06-negative-probes", "P08-P07FB-trim-rerun"],
+      "evidence": "INDEPENDENT_REVIEW.md",
+      "status": "PASS"
+    }
+  ],
+  "summary": { "pass": 12, "blocked": 1, "fail": 0, "note": "A06 四平台 BLOCKED（本地一腿 PASS）；A04/A07 含如实标注的受限层（GUI/真账户/安装器形态），其协议与套件层全 PASS——按任务书『缺一不冒充全过』如实呈现" },
+  "fix_rounds": [
+    {
+      "id": "P08-FIXR1",
+      "date": "2026-09-22",
+      "source": "独立验收 P08_ACCEPTANCE_REVIEW.md §4 非阻塞发现 ①–③：① STRICT_FINAL_SCOPE.json 第 4 处 any 归属笔误（实为 server/hono-helpers.ts:37，P01 e2392f301；原记 lib/task-registry.ts「:788 附近」——该文件仅 635 行）；② command-log 计数笔误 33→34、P06 清单 12→11 条哈希行；③ 「锚点行号与 P00 逐字一致」措辞过强",
+      "effect_on_cases": "无——A01–A14 场景状态与证据不变（零生产代码、零测试断言改动）。三处均为证据文档更正：账本归属拆条（总数 4 与宽松区定性不变）、计数更正（command-log 本体未动，34 条逐 ID 枚举复核）、锚点措辞精确化（深 5 锚点与 P00 原始证据逐字一致成立；composer-send.ts:577 经 git ls-tree/sed 实测为在位锚点而非「旧文件名」，验收该定性不成立，按段位选取差异登记；scheduler 定义位/onBeat 位两者皆真）",
+      "records": "P08_REPORT.md「独立验收修复轮（P08-FIXR1）」节；P08_RESULT.json / FINAL_RESULT.json / INDEPENDENT_REVIEW.md / STRICT_FINAL_SCOPE.json / FINAL_CALLSITE_MATRIX.json 对应更正；日志 artifacts/refactor-2026/P08/logs/P08-FIXR1-*（command-log.jsonl 追加 4 条；manifest-check 不入 jsonl）"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+node:timers:116
+  validateFunction(callback, 'callback');
+  ^
+
+TypeError [ERR_INVALID_ARG_TYPE]: The "callback" argument must be of type function. Received type number (150)
+    at setTimeout (node:timers:116:3)
+    at waitForServerInfo (file:///Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/P08/tools/product-regression.mjs:131:11)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/P08/tools/product-regression.mjs:170:22
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  code: 'ERR_INVALID_ARG_TYPE'
+}
+
+Node.js v24.16.0

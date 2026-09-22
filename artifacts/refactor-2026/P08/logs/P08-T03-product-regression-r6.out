@@ -1,0 +1,34 @@
+[PASS] BASE: GET /api/health 无凭证 → 403
+[PASS] BASE: GET /api/health 带 loopback token → 200
+[PASS] BASE: GET /api/server/identity → 200 serverProtocol=1
+[PASS] F02: POST /api/sessions/new（strictJson 入口）→ sess_ 前缀
+[PASS] F02/A07负向: POST /api/sessions/new 畸形 JSON → 400 零副作用
+[PASS] F02: GET /api/sessions → 列表含新会话
+[PASS] F02: GET /api/sessions/search?q= → 200
+[PASS] F02: POST /api/sessions/pin {pinned:true} → 200
+[PASS] F01/F03: WS prompt『读取 p08-note.txt』→ read 工具真实往返 + 流式回复
+[PASS] F01/F09: GET /api/sessions/messages 历史回读含用户轮与助手回复
+[PASS] F02: POST /api/sessions/fork（target=真实用户消息节点）→ 2xx 且生成新会话
+[PASS] F11: WS prompt『执行命令』→ exec_command 真实 spawn + 输出回传模型
+[PASS] F06: GET /api/agents → lingxi agent 在列（人格承载）
+[PASS] F07: GET /api/memories/dream/status?agentId=lingxi → 2xx（记忆固化路由在位）
+[PASS] F08: GET /api/knowledge/notebooks → 200（空库可列出）
+[PASS] F10: GET /api/providers/summary → 含 witness-a/witness-b 双 provider
+[PASS] F10: GET /api/preferences/models → 200
+[PASS] A05: PUT /api/preferences/session-permission-default {permissionMode:auto} → 200
+[PASS] A05: PUT /api/preferences/notifications（第二设置项）→ 200
+[PASS] F12: GET /api/bridge/status?agentId=lingxi → 200（桥接管理路由在位；真实平台外发无授权不执行）
+[PASS] F13: GET /api/devices → 200（Web/移动设备面在位）
+[PASS] F16: POST /api/model-observability/query/traces → 有真实 trace（上面两轮真实模型调用入账）
+[PASS] F17: POST /api/character-cards/export/preview → 2xx/4xx（非 5xx 即路由在位）
+[PASS] F19: GET /api/skills?agentId=lingxi → 200（首启同步后技能池可列）
+[PASS] F14: CLI status（cli/entry.ts，读同 LINGXI_HOME server-info）→ 连通输出
+[PASS] F20: desktop/src/locales 五语言文件在位
+[PASS] F18: desktop/src/shared/github-release-check.cjs + release-digest.v1/v2.json 在位
+[PASS] A05: SIGTERM 优雅关闭
+[PASS] A05: 重启后 GET /api/preferences/session-permission-default = auto（无最后一项覆盖）
+[PASS] A05: 重启后会话列表保持（数量一致）
+[PASS] A05/F01: 重启后历史仍可读（含 P08_CHAT_REPLY）
+[PASS] A05/F10: 重启后 provider catalog 双 provider 仍在
+
+P08 product regression: pass=32 fail=0 → /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/refactor-2026/P08/logs/product-regression.json

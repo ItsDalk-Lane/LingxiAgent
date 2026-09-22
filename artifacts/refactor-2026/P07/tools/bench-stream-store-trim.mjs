@@ -45,6 +45,10 @@ const report = {
   env: { node: process.version, os: `${os.type()} ${os.release()} ${os.arch()}` },
   results: out,
 };
-const outPath = path.join(REPO, "artifacts", "refactor-2026", "P07", "samples", "stream-store-trim-microbench.json");
+// P08（P07-F-B 修复）：默认输出路径带 run-id 后缀，复跑不再覆盖已留档样本；
+// 显式 --out 仍按调用方精确路径写入。
+const argv = process.argv.slice(2);
+let outPath = path.join(REPO, "artifacts", "refactor-2026", "P07", "samples", `stream-store-trim-microbench-${new Date().toISOString().replace(/[-:T]/g, "").slice(0, 14)}.json`);
+for (let i = 0; i < argv.length; i++) if (argv[i] === "--out") outPath = argv[++i];
 fs.writeFileSync(outPath, JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report, null, 2));

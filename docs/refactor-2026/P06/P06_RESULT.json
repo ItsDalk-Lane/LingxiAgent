@@ -106,7 +106,7 @@
         "lib/tools/invocation/schema-validator.ts：仅两处 P06 注释更正（normalizeIssues 块注释 + summarizeIssueFields docstring），如实描述 message 通用文案为真实缺口、path 兼认为本版本防御性 no-op；执行代码行零改动（git diff HEAD 非注释行 = 执行轮 FIX-1 同一组代码）",
         "docs/refactor-2026/P06/PROMPT_CHANGE_LEDGER.md §3：问题/修复两段叙事更正（嵌套降级/details 保真退化/恢复保真表述按实测改写，标注 P06-FIXR1）",
         "docs/refactor-2026/P06/EVAL_COMPARISON.md：§1 表 FIX-1 行（验收指定）+ §4「details 保真恢复」同叙事短句一并更正",
-        "P06_REPORT.md 追加「独立验收修复轮（P06-FIXR1）」节；P06_RESULT.json（本条）与 ACCEPTANCE_MAP.json 补 fix_rounds 记录；command-log.jsonl 追加 P06-FIXR1-* 5 条；EVIDENCE_SHA256.txt（docs + logs 两份）刷新：本轮改动条目哈希刷新 + 验收轮产物（P06_ACCEPTANCE_REVIEW.md + P06-ACCEPTANCE-* 4 件）与本轮日志补入 + 路径列规范化为全仓相对路径（P05-FIXR1 同款，支持仓库根 shasum -c 全量校验）"
+        "P06_REPORT.md 追加「独立验收修复轮（P06-FIXR1）」节；P06_RESULT.json（本条）与 ACCEPTANCE_MAP.json 补 fix_rounds 记录；command-log.jsonl 追加 P06-FIXR1-* 6 条（P08-T07 更正：原记 5 条为计数笔误，实追加 6 条，与 command-log.jsonl 实测及复验收报告一致）；EVIDENCE_SHA256.txt（docs + logs 两份）刷新：本轮改动条目哈希刷新 + 验收轮产物（P06_ACCEPTANCE_REVIEW.md + P06-ACCEPTANCE-* 4 件）与本轮日志补入 + 路径列规范化为全仓相对路径（P05-FIXR1 同款，支持仓库根 shasum -c 全量校验）"
       ],
       "production_code_changed": false,
       "existing_test_assertions_changed": false,

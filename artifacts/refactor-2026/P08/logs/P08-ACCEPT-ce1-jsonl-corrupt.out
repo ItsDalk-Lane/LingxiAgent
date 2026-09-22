@@ -1,0 +1,9 @@
+[PASS] CE-1-setup: 3 会话各 1 轮真实聊天 + operate 设置（基线建立） → sessions=3
+[PASS] CE-1a: 中部垃圾字节+最旧会话半行截断后再启动：就绪且 health 200（无半激活/崩溃循环） → health=200
+[PASS] CE-1b: 会话清单无静默清空（3 会话仍在） → sessions=3
+[PASS] CE-1c: 未受损会话 C 历史完整可读（含真实回复） → status=200 reply=true
+[PASS] CE-1d: 设置保持（permissionMode=operate，损坏未波及配置） → mode=operate
+[PASS] CE-1e: 观测记录仍可查（非空） → status=200
+
+CE-1 summary: 6/6 behaved as expected
+（细节见同目录 P08-ACCEPT-ce1-results.json；脚本见 .mjs；比本轮 FAULT 注入更狠：中部垃圾字节×最旧会话截断到 1/3 处）

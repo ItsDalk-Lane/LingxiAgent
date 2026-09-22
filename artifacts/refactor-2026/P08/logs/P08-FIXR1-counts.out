@@ -1,0 +1,42 @@
+== P08-FIXR1-counts ==
+command-log.jsonl 总行数(wc -l): 53
+逐条 JSON.parse 全部合法; 执行轮(stage_id=P08): 34 条; 验收轮(P08-ACCEPT): 19 条
+执行轮 command_id 枚举:
+  P08-T00-env
+  P08-T04-full-test
+  P08-T04-typecheck
+  P08-T02-core-contracts
+  P08-T02-dependency-boundaries
+  P08-T01-tool-invocation-boundaries
+  P08-T04-lint
+  P08-T04-build-renderer
+  P08-T01-skills-residue-cleanup
+  P08-T01-skills-tests
+  P08-T04-build-server-open
+  P08-T04-smoke-server-open
+  P08-T02-core-contracts-negative
+  P08-T03-product-regression
+  P08-T03-product-regression-r2
+  P08-T03-product-regression-r3
+  P08-T03-product-regression-r4
+  P08-T03-product-regression-r5
+  P08-T03-product-regression-r6
+  P08-T05-old-worktree-setup
+  P08-T05-upgrade-drill
+  P08-T05-pack
+  P08-T05-pack-dir-local
+  P08-T05-packaged-smoke
+  P08-T05-fingerprint-check
+  P08-T05-artifact-hashes
+  P08-P07FB-trim-rerun
+  P08-T06-negative-probes
+  P08-T07-cleanup
+  P08-T07-lint
+  P08-T07-lint-r2
+  P08-T06-negative-probes-r2
+  P08-T07-json-validate
+  P08-T07-manifest-check
+显式首败族: full-test=1, product-regression 族=6, pack 族=2, lint 族=2 → 其余 = 23 条
+
+P06 EVIDENCE_SHA256.txt: 总行(含头注) 12 = 1 行头注 +  11 条哈希行
+P04 docs 哈希行: 70 ; P07 logs 哈希行: 147

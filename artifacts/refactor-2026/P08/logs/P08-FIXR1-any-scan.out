@@ -1,0 +1,20 @@
+== P08-FIXR1-any-scan：STRICT_FINAL_SCOPE.scan_method 原口径复算 ==
+命中数: 4
++  update(taskId, patch: any = {}, options: any = {}) {
++  complete(taskId, result = null, options: any = {}) {
++  fail(taskId, error = "failed", options: any = {}) {
++  const error: any = new Error(message);
+
+== 第 4 处归属实测 ==
+server/hono-helpers.ts:37 => const error: any = new Error(message);
+git blame -L 37,37 e2392f301 => e2392f3017 (lingxi-dev 2026-09-21 23:32:57 +0800 37)   const error: any = new Error(message);
+lib/task-registry.ts 行数 => 635
+lib/task-registry.ts 中 "const error: any = new Error" 命中 => 0
+task-registry options 行 => 169: update(taskId, patch: any = {}, options: any = {}) { ; 197: complete(taskId, result = null, options: any = {}) { ; 218: fail(taskId, error = "failed", options: any = {}) {
+options 引入 commit => 9a19740ba refactor(P02): taskId 统一铸造、attempt 栅栏与清理错误上报（含独立验收修复轮）
+
+== 基线既有同名行（非本轮增量） ==
+lib/activity-hub.ts 基线命中: 1
+lib/memory/deep-memory.ts 基线命中: 1
+core/session-coordinator.ts 基线命中: 25
+core/session-manifest/ref.ts 基线命中: 1

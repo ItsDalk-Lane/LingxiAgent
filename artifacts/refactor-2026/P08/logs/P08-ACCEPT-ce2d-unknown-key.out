@@ -1,0 +1,3 @@
+[verify-seed-kit] verifying /Users/study_superior/Desktop/Code/LingxiAgent/dist-server-artifact/mac-arm64 (platformArch=darwin-arm64)...
+[verify-seed-kit] FAILED — 1 problem(s):
+  - signature verification failed: manifest: keyId "p08-local-ephemeral" not present in keyset
