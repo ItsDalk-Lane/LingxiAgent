@@ -2293,5 +2293,95 @@
     "log": "logs/release-gate-v043-patch-r3.log",
     "logSha256": "7df4c377f869598b8c2b443fa631ec239ca032b7eb73fb026eb8525d08b16408",
     "sourceManifestHash": "77c4fa1494ed450019dc2eec636722f95b3b7f34d01bc3df10ac15c814e088bd"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--maxWorkers=4",
+      "--exclude",
+      "**/round2-delivery-evidence.test.ts",
+      "--exclude",
+      "**/round3-delivery-evidence.test.ts",
+      "--exclude",
+      "**/upstream-sync-matrix.test.ts",
+      "--exclude",
+      "**/post-verification-audit-seal.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-22T15:28:56.195274+00:00",
+    "end": "2026-09-22T15:32:14.396821+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 14852,
+      "failed": 1,
+      "skipped": 15,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "f11a4773d5dc2a9e21752a390b7102a76c07fc04163ea5552e425c130eadc14c",
+    "log": "logs/release-gate-v043j.log",
+    "logSha256": "b761e5e23f51a3068b78c03f352caaf5ec28a03bb9b5ea88c2c140a02ef3e0a5",
+    "sourceManifestHash": "f11a4773d5dc2a9e21752a390b7102a76c07fc04163ea5552e425c130eadc14c"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--maxWorkers=4",
+      "--exclude",
+      "**/round2-delivery-evidence.test.ts",
+      "--exclude",
+      "**/round3-delivery-evidence.test.ts",
+      "--exclude",
+      "**/upstream-sync-matrix.test.ts",
+      "--exclude",
+      "**/post-verification-audit-seal.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-22T15:32:25.058542+00:00",
+    "end": "2026-09-22T15:35:42.359360+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 14853,
+      "failed": 0,
+      "skipped": 15,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "f11a4773d5dc2a9e21752a390b7102a76c07fc04163ea5552e425c130eadc14c",
+    "log": "logs/release-gate-v043k.log",
+    "logSha256": "d7785d14589314e610f404fda40dadcf3259702ae51ed350788fa693a7148f92",
+    "sourceManifestHash": "f11a4773d5dc2a9e21752a390b7102a76c07fc04163ea5552e425c130eadc14c"
+  },
+  {
+    "command": [
+      "python3",
+      "artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-22T15:36:00.207700+00:00",
+    "end": "2026-09-22T15:36:09.968655+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "f11a4773d5dc2a9e21752a390b7102a76c07fc04163ea5552e425c130eadc14c",
+    "log": "logs/release-gate-v043-patch-final.log",
+    "logSha256": "5ec178b81db3dcb5e634b9f0a552732212f92c7c0e58022e87466564fb1e36df",
+    "sourceManifestHash": "f11a4773d5dc2a9e21752a390b7102a76c07fc04163ea5552e425c130eadc14c"
   }
 ]

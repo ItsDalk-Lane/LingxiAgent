@@ -78,7 +78,7 @@
     {
       "bytes": 54382,
       "path": ".sync-audit/build-sync-matrix.mjs",
-      "sha256": "887b026aa5c89613bcc0f6ab1115e3c0ca57048d666035ca360668053c1ee8e2"
+      "sha256": "69cbda40eafd8ab621bf9cea6a0277b0b132d3ab6d7bfb43485da8b963cfa979"
     },
     {
       "bytes": 16534,
@@ -113,12 +113,12 @@
     {
       "bytes": 83922,
       "path": ".sync-audit/upstream-sync-matrix.json",
-      "sha256": "15548d26027b69b191f60a3c1b363ec11e9c6c5f8de2134f5678fdf063f05f39"
+      "sha256": "728f1917cb8f6823cb9d2c43ca3426cd3da6c0f006d522841a3b9fc9e6d1930b"
     },
     {
       "bytes": 41,
       "path": ".sync-audit/verified-source-sha.txt",
-      "sha256": "53d330d7fc4395e772fcfddc676bd04519386212f94ab7907a4af9939502970b"
+      "sha256": "7ac8b8a73e20ab9341a9273a5d332f454c00f48237159ff98778eef47f96099a"
     },
     {
       "bytes": 4111,
@@ -236,9 +236,9 @@
       "sha256": "541d12213c0066157ab767000be7b525292ba93e0fda4e1a8f6ac209b7f1bbda"
     },
     {
-      "bytes": 250352,
+      "bytes": 251016,
       "path": "PROGRESS.md",
-      "sha256": "686723ebd40a02ebec3cd843ee808937c8fd4cc5e4820471940f03255de28760"
+      "sha256": "25f5a53b7aca42311c16937512ea45c752f00ed1b106394aa2f5f50648f6fadd"
     },
     {
       "bytes": 12922,
@@ -261,14 +261,14 @@
       "sha256": "ee8ea30bc27b68baabba0f2eb897b7f5b25c5db27a5322e2019059c4f8391f7e"
     },
     {
-      "bytes": 10434,
+      "bytes": 10452,
       "path": "UPSTREAM_SYNC_AUDIT.md",
-      "sha256": "7f348ca07c79e00c570cca133ab496ded0915510d4cecd4dcabcdfecbc098fe0"
+      "sha256": "f6040ab3fda1b4cf5b04172004107030b9c02a44c218a42906da4a81caf11d45"
     },
     {
       "bytes": 37591,
       "path": "UPSTREAM_SYNC_MATRIX.md",
-      "sha256": "9a6cf5faded0a27aac97814faf033e640bb4e386a1becda7c3af325a379a263c"
+      "sha256": "500bd8d2d3874b5e115ffe9024f1bc7d4fcdf01f63e6ab4960c17dacdd1485b4"
     },
     {
       "bytes": 1808,
