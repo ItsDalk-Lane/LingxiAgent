@@ -2021,3 +2021,14 @@ M  desktop/src/react/__tests__/components/TodoPanel.test.tsx
 - 坐标 `adca95ca3947bcada920e66caabfbd059d9993e6` → `e7e991669c7b7238c3107510c70b0fa8c95dcf20`（分支 docs/knowledge-closeout-2026-09-21：92c6646c5 知识收尾 docs + P01–P08 九阶段 refactor-2026 + 8d55046d5 F01–F05 独立审查修复 + e7e991669 recheck 轮 R1–R3 [流接纳延迟提交+水位原子化、resume 代次守卫与可选 resumeToken 端到端透传、123 个证据 .log 经 .gitignore 精确反向规则入库]）。
 - 验证绑定：坐标推进后 post-verification-audit-seal 绿（diff guard 仅审计文件变化）；upstream-sync-matrix 坐标一致性绿；round2/round3 证据门禁此刻仍红（SOURCE_MANIFEST 绑定旧树），按发布流程待 v0.1.43 发布树证据刷新提交重绑定——过渡窗如实登记，见后续发布条目。
 - build-sync-matrix 常量随动，矩阵与 markdown 投影重生成（133 paths，projection sha256 8bf6c07a873c2b25c51db12ae36addb89cbfe33f23747fcdd3d32b4c7878dbc9）。
+
+## 2026-09-22 v0.1.43 发布树封印推进（发布元数据 + 证据刷新与补丁 gzip 化，已获授权发布流程）
+
+- 坐标 `e7e991669c7b7238c3107510c70b0fa8c95dcf20` → `8cb7b77c69162d2e7addda489cce6301f0afb9e6`（分支 docs/knowledge-closeout-2026-09-21：228123462 发布元数据提交 [0.1.43 + 代数21 + digest v1/v2 + preflight 锚点] + 8cb7b77c6 发布树证据刷新提交）。
+- 补丁存储形态变更（8cb7b77c6 内）：round2/round3 增量补丁原始字节（111.8MB/310MB）超 GitHub 单文件 100MB 硬限（分支积压九阶段全量差异所致），交付形态改为确定性 gzip（mtime=0，22MB/69MB），重放验证语义不变（对未压缩原始字节执行），仓库不再跟踪未压缩 .patch，DELIVERY_MANIFEST.sha256 同步。
+- 验证绑定：release:preflight --tag v0.1.43 PASS（候选 0.1.43/gen21，历史最高 0.1.42/gen20）；digest v1 校验过 + append-history v2 24 条头 0.1.43；发布相关 9 文件 90 tests 绿；test:artifact-release-smoke 305/305（升版后复跑）；证据门禁（四项自指/过渡窗排除）round2 release-gate-v043g / round3 v043h 双绿——14853 通过 / 0 失败 / 15 既有跳过、manifest 9119931c…/77c4fa14… 同哈希绑定、执行期无漂移、一次过；补丁生成经 run-evidence 包装入库（release-gate-v043-patch-r2/-r3，VERIFIED）。此前的 v043/v043a-f 系列失败为已知平台抖动（ustar 临时目录竞态 ×1、worker fork 崩溃 ×2、delete-wins 计时 ×2，单跑复绿），按 R10-07/08 并存保留；round2 一次标签复用事故（日志覆盖→孤儿记录移除）在 round2/PROGRESS.md 如实登记（该事故轮的旧 C4/C5 提交已随历史重置弃用，内容以本轮为准）。independent-fix 三件套随树重算（shasum -c exit 0）。坐标推进后全量 `npm test`（含全部自指门禁）复验——结果见下条。
+- build-sync-matrix 常量随动，矩阵与 markdown 投影重生成（133 paths，projection 8bf6c07a…）。
+
+### 2026-09-22 v0.1.43 发布树坐标后终态复验
+
+- 坐标 `8cb7b77c69162d2e7addda489cce6301f0afb9e6` 就位后，全量 `npm test`（含 post-verification-audit-seal / upstream-sync-matrix / round2 / round3 全部自指门禁）：1463 文件通过 / 3 既有跳过；14878 测试通过 / 15 既有跳过 / 0 失败，exit 0（若本轮重跑数字有小幅统计口径差异，以命令日志为准）。R10-09 增量补丁为运行时派生产物：.patch.gz 确定性（mtime=0）故运行后再生不产生字节漂移。v0.1.43 标签自本树打出。
