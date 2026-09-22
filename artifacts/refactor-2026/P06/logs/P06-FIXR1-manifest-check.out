@@ -1,0 +1,50 @@
+# P06-FIXR1 清单终验（2026-09-22，仓库根单一 cwd 执行）
+$ shasum -a 256 -c docs/refactor-2026/P06/EVIDENCE_SHA256.txt artifacts/refactor-2026/P06/logs/EVIDENCE_SHA256.txt
+
+docs/refactor-2026/P06/ACCEPTANCE_MAP.json: OK
+docs/refactor-2026/P06/CONTEXT_ASSEMBLY_MAP.md: OK
+docs/refactor-2026/P06/EVAL_COMPARISON.md: OK
+docs/refactor-2026/P06/FEATURE_CONTEXT_COMPAT.md: OK
+docs/refactor-2026/P06/NEXT_STAGE_HANDOFF.md: OK
+docs/refactor-2026/P06/P06_ACCEPTANCE_REVIEW.md: OK
+docs/refactor-2026/P06/P06_REPORT.md: OK
+docs/refactor-2026/P06/P06_RESULT.json: OK
+docs/refactor-2026/P06/PROMPT_BUDGET_REPORT.md: OK
+docs/refactor-2026/P06/PROMPT_CHANGE_LEDGER.md: OK
+docs/refactor-2026/P06/TOOL_BEHAVIOR_EVAL.json: OK
+artifacts/refactor-2026/P06/logs/ITERATIONS.md: OK
+artifacts/refactor-2026/P06/logs/P06-ACCEPTANCE-fix1-repro-and-injections.log: OK
+artifacts/refactor-2026/P06/logs/P06-ACCEPTANCE-full-suite-rerun.log: OK
+artifacts/refactor-2026/P06/logs/P06-ACCEPTANCE-p06-tests-rerun.log: OK
+artifacts/refactor-2026/P06/logs/P06-ACCEPTANCE-regression-rerun.log: OK
+artifacts/refactor-2026/P06/logs/P06-FIXR1-json-validate.err: OK
+artifacts/refactor-2026/P06/logs/P06-FIXR1-json-validate.out: OK
+artifacts/refactor-2026/P06/logs/P06-FIXR1-p06-tests.err: OK
+artifacts/refactor-2026/P06/logs/P06-FIXR1-p06-tests.out: OK
+artifacts/refactor-2026/P06/logs/P06-FIXR1-resolver-error-passthrough.err: OK
+artifacts/refactor-2026/P06/logs/P06-FIXR1-resolver-error-passthrough.out: OK
+artifacts/refactor-2026/P06/logs/P06-FIXR1-tool-boundary-suites.err: OK
+artifacts/refactor-2026/P06/logs/P06-FIXR1-tool-boundary-suites.out: OK
+artifacts/refactor-2026/P06/logs/P06-FIXR1-typebox-error-shape.err: OK
+artifacts/refactor-2026/P06/logs/P06-FIXR1-typebox-error-shape.out: OK
+artifacts/refactor-2026/P06/logs/P06-FIXR1-typecheck.err: OK
+artifacts/refactor-2026/P06/logs/P06-FIXR1-typecheck.out: OK
+artifacts/refactor-2026/P06/logs/P06-T01-assembly-capture.err: OK
+artifacts/refactor-2026/P06/logs/P06-T01-assembly-capture.out: OK
+artifacts/refactor-2026/P06/logs/P06-T03-budget-invalidation.err: OK
+artifacts/refactor-2026/P06/logs/P06-T03-budget-invalidation.out: OK
+artifacts/refactor-2026/P06/logs/P06-T04-boundaries.err: OK
+artifacts/refactor-2026/P06/logs/P06-T04-boundaries.out: OK
+artifacts/refactor-2026/P06/logs/P06-T05-eval-harness.err: OK
+artifacts/refactor-2026/P06/logs/P06-T05-eval-harness.out: OK
+artifacts/refactor-2026/P06/logs/P06-T07-core-contracts.out: OK
+artifacts/refactor-2026/P06/logs/P06-T07-directed-suite.err: OK
+artifacts/refactor-2026/P06/logs/P06-T07-directed-suite.out: OK
+artifacts/refactor-2026/P06/logs/P06-T07-full-suite.err: OK
+artifacts/refactor-2026/P06/logs/P06-T07-full-suite.out: OK
+artifacts/refactor-2026/P06/logs/P06-T07-lint-boundary.out: OK
+artifacts/refactor-2026/P06/logs/P06-T07-tool-invocation-boundaries.out: OK
+artifacts/refactor-2026/P06/logs/P06-T07-typecheck.err: OK
+artifacts/refactor-2026/P06/logs/P06-T07-typecheck.out: OK
+artifacts/refactor-2026/P06/logs/command-log.jsonl: OK
+exit=0

@@ -55,6 +55,8 @@ P04 执行注记（2026-09-22，详见 docs/refactor-2026/P04/）：P04-1 已核
 | P06-1 | payload 捕获补全提示词预算 | PROMPT_BASELINE not_measured_yet | 用既有 payload 捕获基础设施按同 fixture 截获最终 request 分解 | 预算回归 |
 | P06-2 | 人格/记忆/资料边界评测 | golden 双语等价测试已存在 | 扩展动态资料组分测试 | agent 系统提示词 |
 
+P06 执行注记（2026-09-22，详见 docs/refactor-2026/P06/）：P06-1 已完成——真实 Pi 会话 + witness 的最终 request 捕获（tests/p06-final-request-assembly.test.ts）+ D 常驻工具 schema 计量（2420 tok）+ E 动态资料单列（PROMPT_BUDGET_REPORT）；P06-2 已完成——开关/来源/隐私变体测试（p06-feature-context-boundaries / p06-prompt-budget-and-invalidation）；配套 40+8 例工具行为评测集（TOOL_BEHAVIOR_EVAL.json，确定性 23 例 PASS，真模型 BLOCKED 继承 P04-T07-2）。接口修复一处：schema-validator 参数校验反馈字段化（EVAL_COMPARISON FIX-1）。
+
 ## P07｜性能
 
 | # | 事项 | 依据 | 动作 | 受影响消费者 |

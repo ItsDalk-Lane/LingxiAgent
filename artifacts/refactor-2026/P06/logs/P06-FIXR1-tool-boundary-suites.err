@@ -1,0 +1,3 @@
+stderr | tests/on-demand-first-party.test.ts > first-party on-demand assembly > keeps a tool resident with a warning when its schema cannot be consumed safely
+[tool-availability] tool "notify" cannot defer (schema validation failed: Tool parameter schema contains invalid schema fields.); keeping it resident
+

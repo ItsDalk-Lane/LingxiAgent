@@ -1,0 +1,100 @@
+typebox_version: 1.1.38
+=== raw typebox Value.Errors shape (comment narrative check) ===
+MISSING_TITLE {"keys":["keyword","schemaPath","instancePath","params","message"],"instancePath":"","message":"must have required properties title","hasPathKey":false}
+MISSING_TWO {"keys":["keyword","schemaPath","instancePath","params","message"],"instancePath":"","message":"must have required properties repo, title","hasPathKey":false}
+NESTED_ARRAY {"keys":["keyword","schemaPath","instancePath","params","message"],"instancePath":"/labels/0","message":"must be string","hasPathKey":false}
+NESTED_OBJECT {"keys":["keyword","schemaPath","instancePath","params","message"],"instancePath":"/metadata/owner","message":"must not have fewer than 2 characters","hasPathKey":false}
+=== current validator behavior (real production module, post-FIXR1) ===
+R_MISSING_TITLE {"code":"ARGUMENT_SCHEMA_INVALID","message":"Tool arguments do not match the registered parameter schema. Invalid field(s): /title.","issuePaths":["/"]}
+R_MISSING_TWO {"code":"ARGUMENT_SCHEMA_INVALID","message":"Tool arguments do not match the registered parameter schema. Invalid field(s): /repo, /title.","issuePaths":["/"]}
+R_NESTED_ARRAY {"code":"ARGUMENT_SCHEMA_INVALID","message":"Tool arguments do not match the registered parameter schema. Invalid field(s): /labels/0.","issuePaths":["/labels/0"]}
+R_NESTED_OBJECT {"code":"ARGUMENT_SCHEMA_INVALID","message":"Tool arguments do not match the registered parameter schema. Invalid field(s): /metadata/owner.","issuePaths":["/metadata/owner"]}
+R_VALID PASSED_VALIDATION
+
+================================================================================
+P06 复验收（FIXR1 后收口轮）定向复跑与核对记录（2026-09-22，复验收子代理，全新上下文）
+================================================================================
+方法：只读验收；验证脚本于 /tmp 隔离目录执行并清理；主仓零生产/测试/文档改动
+（本日志与 P06_REACCEPTANCE_REVIEW.md 为模板允许的唯一写入）。
+
+一、工作区与 HEAD 核对
+--------------------------------------------------------------------------------
+HEAD = 93b8b72650846af1a150eb195c1765c8f57f6cd8（refactor(P05)，与编排层声明一致）
+git status --porcelain：
+ M docs/refactor-2026/P00/REFACTOR_BACKLOG.md
+ M lib/tools/invocation/schema-validator.ts
+ ?? docs/refactor-2026/P06/
+ ?? tests/p06-feature-context-boundaries.test.ts
+ ?? tests/p06-final-request-assembly.test.ts
+ ?? tests/p06-prompt-budget-and-invalidation.test.ts
+ ?? tests/p06-tool-behavior-eval.test.ts
+（与本轮复验收前、后各核对一次，一致；复跑命令未产生任何额外工作区改动）
+f1 patch（artifacts/f1-f12-repair/round2/patches/）git diff HEAD = 0 行，与 HEAD 一致。
+
+二、schema-validator.ts diff 定量核对（问题①「仅注释更正」声称）
+--------------------------------------------------------------------------------
+当前 git diff HEAD --stat：+44/−6；首轮验收记录 FIX-1 为 +41/−6 → 净 +3 行。
+新增 44 行分类：16 行注释（normalizeIssues 块注释 5 行 @107-111 + summarizeIssueFields
+docstring 7 行 @123-129 + ARGUMENT_SCHEMA_INVALID 构造点注释 4 行）+ 27 行执行代码
++ 1 行空行。非注释新增行结构 = 验收 §1 逐 hunk 描述的 FIX-1 三部分（normalizeIssues
+path→instancePath→"/" 回退链、summarizeIssueFields、message 追加 Invalid field(s) 列表
++ invalidFieldDetails 提升），未触碰 Value.Check/错误码集合/白名单/details 结构。
+行为级等价证据：上方反例输出与验收轮 FIX-1 态日志（P06-ACCEPTANCE-fix1-repro-and-injections.log
+第 16-18 行）三违例 message/issuePaths 逐字节一致；全部定向测试绿。
+[边界声明] FIX-1 态文件未被提交也未纳入任何 EVIDENCE 清单（两清单范围仅 P06 目录），
+字节级「逐行一致」无法直接复核；本结论基于 stat 数学（+3 恰为注释增量）+ 结构比对 +
+行为逐字节一致三重佐证。另：验收 §6-① 引用第二处注释位于 121-124，现位于 123-129，
+2 行定位差无法在缺失 FIX-1 工件下消解（行为无差别，登记为验证边界而非缺陷）。
+
+三、typebox@1.1.38 错误形状独立复核（见上方原始输出，node --experimental-strip-types）
+--------------------------------------------------------------------------------
+keys = [keyword, schemaPath, instancePath, params, message]，无 path 键（4/4 违例
+hasPathKey=false）→ 「兼认 path 对本版本 no-op」注释属实。
+instancePath 嵌套路径本就填充（/labels/0、/metadata/owner）→ 「修复前 details/issuePaths
+并未降级」注释属实。root（instancePath 空串）经 normalizeIssues 落 "/"（MISSING_TITLE
+issuePaths=["/"]）→ 注释「root 落 "/"」属实。
+额外反例 MISSING_TWO（双必填缺失）：message "must have required properties repo, title"
+→ 提取 "/repo, /title."，与 docblock「保守正则提取属性名」描述一致（首轮未覆盖的形态）。
+
+四、双 EVIDENCE_SHA256 独立复算（仓库根）
+--------------------------------------------------------------------------------
+{ cat docs/refactor-2026/P06/EVIDENCE_SHA256.txt; grep -v '^#' artifacts/refactor-2026/P06/logs/EVIDENCE_SHA256.txt; }
+| grep -v '^#' | grep -v '^\s*$' | shasum -a 256 -c -
+→ 46/46 全部 OK，exit=0（docs 11 条 + logs 35 条）。
+交叉一致性：TOOL_BEHAVIOR_EVAL.json 清单哈希 8e91c139b29c… 与 P06_REPORT T05 行内
+引用的 sha256 一致（该文件自执行轮未变）。P06-ACCEPTANCE-* 4 件 + P06_ACCEPTANCE_REVIEW.md
+已按 FIXR1 声明补入清单；manifest-check.out 不入清单（P04/P05-FIXR 同款）。
+command-log.jsonl：26 条（CMD-01..20 + P06-FIXR1-* 6 条）逐条 JSON 解析合法，字段
+command_id/stage_id/cwd/source_sha/argv/exit_code/status/reason/log 齐全。
+[轻微记录瑕疵] RESULT/ACCEPTANCE_MAP fix_rounds 写「command-log.jsonl 追加 5 条」，
+实际 FIXR1 条目为 6 条（json-validate 为清单刷新后的自举校验，追加时机晚于记录文字）。
+
+五、定向复跑（vitest v4.1.10，2026-09-22 13:18）
+--------------------------------------------------------------------------------
+$ npx vitest run tests/p06-final-request-assembly.test.ts tests/p06-prompt-budget-and-invalidation.test.ts tests/p06-feature-context-boundaries.test.ts tests/p06-tool-behavior-eval.test.ts tests/resolver-error-passthrough.test.ts
+ → Test Files 5 passed (5)；Tests 23 passed (23)（p06 19 + resolver 4）
+ → P06_EVAL_DETERMINISTIC scored=23 全 PASS（含 F-17/F-37）；P06_EVAL_MAPPED 7 条 delegated_to_full_suite
+$ npx vitest run tests/on-demand-first-party.test.ts tests/tool-catalog-bridge.test.ts tests/ptc-engine-assembly.test.ts tests/permission-catalog-tools.test.ts
+ → Test Files 4 passed (4)；Tests 67 passed (67)
+$ npm run typecheck
+ → tsc --noEmit && tsc -p tsconfig.node.json && tsc -p tsconfig.test.json，exit=0
+（未跑全量 npm test——约束；定向面与 FIXR1/验收轮基线数字逐项一致）
+
+六、FIXR1 范围纪律核对
+--------------------------------------------------------------------------------
+改动面 = 声明清单：schema-validator.ts 两处注释、PROMPT_CHANGE_LEDGER §3、
+EVAL_COMPARISON §1(+§4)、P06_REPORT 增补节、P06_RESULT/ACCEPTANCE_MAP fix_rounds、
+两份 EVIDENCE_SHA256 刷新、command-log 追加、logs 新增 13 文件（P06-FIXR1-*×12 +
+manifest-check.out）。
+P00 REFACTOR_BACKLOG diff = 仅 +2 行执行轮注记（与首轮验收记录一致，未被 FIXR1 触碰）。
+4 个 p06 测试文件：F-17（schema_rejects_missing_required → toThrow(/title/i)）与
+F-37（corrects_named_field_then_succeeds → toThrow(/labels/i)）承重断言与验收描述一致，
+例数 5/7/3/4=19 与验收 §3 一致（untracked 无字节基线，属语义+行为级核对）。
+旧叙事残留扫描：全 P06 文档中「降级/保真退化/保真恢复」仅出现在更正标记内
+（引述初版表述），无未更正残留；NEXT_STAGE_HANDOFF/PROMPT_BUDGET_REPORT 的 FIX-1
+描述与新叙事相容。
+
+七、清理
+--------------------------------------------------------------------------------
+/tmp/p06-reacc* 已删除；主仓工作区终态 = 起点（新增本日志与复验收报告两文件除外，
+均在允许写入目录内，不纳入 EVIDENCE_SHA256——沿验收轮先例，属编排层提交前动作）。

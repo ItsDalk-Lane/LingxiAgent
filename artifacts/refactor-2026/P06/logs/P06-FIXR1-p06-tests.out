@@ -1,0 +1,25 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/p06-feature-context-boundaries.test.ts (3 tests) 44ms
+stdout | tests/p06-final-request-assembly.test.ts > P06-T01 final request assembly capture > emits a sanitized sample index (sources + lengths only) for the report
+P06_SAMPLE_INDEX {"fixture":"合成 fixture（P06 受控临时目录；zh-CN；冻结时钟 2026-06-04T07:53:00Z）","variants":{"desktop-main":{"canonical_base_bytes":5062,"append_workspace_scope_bytes":173,"append_workspace_instructions_bytes":0,"skills_listing_bytes":625,"project_context_bytes":17,"final_system_prompt_bytes":6178,"provenance_sections":20,"sources":["platform_instruction(x6 zh)","user_profile","persona","agent.appearance","agent_roster","memory_context(x3)","session_instruction","append: workspace-scope + workspace-instructions","sdk: skills + project_context + cwd"]}}}
+
+ ✓ tests/p06-final-request-assembly.test.ts (5 tests) 154ms
+stdout | tests/p06-prompt-budget-and-invalidation.test.ts > P06-T03 resident tool schema budget (component D) > measures the resident surface at the request boundary via the production buildTools entry
+P06_RESIDENT_TOOL_BUDGET {"tools":["edit","exec_command","mcp_call","mcp_describe_tool","mcp_search_tools","read","write"],"per_tool":[{"name":"edit","tokens":440},{"name":"exec_command","tokens":1044},{"name":"read","tokens":328},{"name":"write","tokens":253},{"name":"mcp_call","tokens":144},{"name":"mcp_describe_tool","tokens":96},{"name":"mcp_search_tools","tokens":115}],"total_estimated_tokens":2420}
+
+ ✓ tests/p06-prompt-budget-and-invalidation.test.ts (7 tests) 56ms
+stdout | tests/p06-tool-behavior-eval.test.ts > P06-T05 deterministic contract scoring > scores every deterministic sample through real production components
+P06_EVAL_DETERMINISTIC {"scored":23,"results":[{"id":"F-06","status":"PASS"},{"id":"F-07","status":"PASS"},{"id":"F-08","status":"PASS"},{"id":"F-09","status":"PASS"},{"id":"F-10","status":"PASS"},{"id":"F-11","status":"PASS"},{"id":"F-12","status":"PASS"},{"id":"F-13","status":"PASS"},{"id":"F-14","status":"PASS"},{"id":"F-15","status":"PASS"},{"id":"F-16","status":"PASS"},{"id":"F-17","status":"PASS"},{"id":"F-18","status":"PASS"},{"id":"F-19","status":"PASS"},{"id":"F-20","status":"PASS"},{"id":"F-21","status":"PASS"},{"id":"F-22","status":"PASS"},{"id":"F-26","status":"PASS"},{"id":"F-27","status":"PASS"},{"id":"F-28","status":"PASS"},{"id":"F-29","status":"PASS"},{"id":"F-37","status":"PASS"},{"id":"F-38","status":"PASS"}]}
+
+stdout | tests/p06-tool-behavior-eval.test.ts > P06-T05 deterministic contract scoring > maps lifecycle/knowledge samples to existing protective suites (no scoring forgery)
+P06_EVAL_MAPPED [{"id":"F-30","suite":"tests/tool-lifecycle-revocation.test.ts","status":"delegated_to_full_suite"},{"id":"F-31","suite":"tests/tool-lifecycle-revocation.test.ts","status":"delegated_to_full_suite"},{"id":"F-32","suite":"tests/tool-lifecycle-revocation.test.ts","status":"delegated_to_full_suite"},{"id":"F-33","suite":"tests/knowledge-agent-tools.test.ts","status":"delegated_to_full_suite"},{"id":"F-34","suite":"tests/knowledge-agent-tools.test.ts","status":"delegated_to_full_suite"},{"id":"F-35","suite":"tests/knowledge-agent-tools.test.ts","status":"delegated_to_full_suite"},{"id":"F-36","suite":"tests/knowledge-agent-tools.test.ts","status":"delegated_to_full_suite"}]
+
+ ✓ tests/p06-tool-behavior-eval.test.ts (4 tests) 70ms
+
+ Test Files  4 passed (4)
+      Tests  19 passed (19)
+   Start at  13:07:39
+   Duration  2.56s (transform 3.42s, setup 70ms, import 7.83s, tests 324ms, environment 0ms)
+

@@ -1,0 +1,50 @@
+P06 独立验收：FIX-1 前后行为复现 + 负向注入记录（2026-09-22，验收子代理）
+==========================================================================
+
+方法：git worktree（--detach 于 HEAD 93b8b7265，/tmp/p06-head-check，node_modules 符号链接）
+承载修复前版本；主仓工作区承载修复后版本。全部临时产物已清理（worktree remove + 校验无残留）。
+
+一、FIX-1 前后行为对比（同一 schema：required owner/repo/title；labels: string[]；metadata.owner minLength 2）
+------------------------------------------------------------------------------------
+修复前（HEAD 93b8b7265，worktree 内真实 createToolSchemaValidator）：
+ P06ACC_MISSING_REQUIRED {"code":"ARGUMENT_SCHEMA_INVALID","message":"Tool arguments do not match the registered parameter schema.","issuePaths":["/"]}
+ P06ACC_NESTED_ARRAY    {"code":"ARGUMENT_SCHEMA_INVALID","message":"Tool arguments do not match the registered parameter schema.","issuePaths":["/labels/0"]}
+ P06ACC_NESTED_OBJECT   {"code":"ARGUMENT_SCHEMA_INVALID","message":"Tool arguments do not match the registered parameter schema.","issuePaths":["/metadata/owner"]}
+ P06ACC_VALID PASSED_VALIDATION
+
+修复后（工作区）：
+ P06ACC_MISSING_REQUIRED {"code":"ARGUMENT_SCHEMA_INVALID","message":"Tool arguments do not match the registered parameter schema. Invalid field(s): /title.","issuePaths":["/"]}
+ P06ACC_NESTED_ARRAY    {"code":"ARGUMENT_SCHEMA_INVALID","message":"Tool arguments do not match the registered parameter schema. Invalid field(s): /labels/0.","issuePaths":["/labels/0"]}
+ P06ACC_NESTED_OBJECT   {"code":"ARGUMENT_SCHEMA_INVALID","message":"Tool arguments do not match the registered parameter schema. Invalid field(s): /metadata/owner.","issuePaths":["/metadata/owner"]}
+ P06ACC_VALID PASSED_VALIDATION
+
+结论：
+ 1. message 字段化（/title、/labels/0、/metadata/owner）真实生效；错误码、issuePaths、
+    通过/拒绝判定前后一致（校验语义未变）。
+ 2. 【重要事实更正】修复前 issuePaths 嵌套路径本就保真（/labels/0、/metadata/owner）——
+    本仓 typebox@1.1.38 的 Value.Errors 错误对象带 instancePath 且嵌套路径已填充
+    （keys=[keyword,schemaPath,instancePath,params,message]，无 path 键）。
+    「只认 instancePath 会把嵌套路径降级为 /」的表述与实测不符：normalizeIssues 兼认
+    path 对本版本为无害防御性改动（no-op），非必要修复。模型只见 message 的缺口为真，
+    message 字段化才是 FIX-1 的实际有效成分。
+
+二、负向注入（隔离 worktree 内改生产代码，验证测试承重；主仓零触碰）
+------------------------------------------------------------------------------------
+注入 1：在 HEAD worktree 运行 tests/p06-tool-behavior-eval.test.ts（含 40+8 样本 JSON 副本）
+ → "scores every deterministic sample through real production components" 红
+ （schema_rejects_missing_required 在修复前 message 无 /title）——证明 F-17/F-37 承重于
+ FIX-1，且 ITERATIONS.md 第 5 条第 4 点（修复前红）属实。
+
+注入 2：worktree 内 tests/fixtures/system-prompt-golden-zh.txt 追加 1 字节后运行
+ tests/p06-prompt-budget-and-invalidation.test.ts
+ → "A1/A2 system prompt golden fixtures stay byte-identical to the P00 baseline" 红
+ ——证明预算 golden 比对真实读取文件并逐字节比较（非 mock 自证）。
+
+注入 3：worktree 内 core/session-prompt-snapshot.ts 将 systemPrompt 追加一个空格后运行
+ tests/p06-final-request-assembly.test.ts
+ → desktop main session 例与 subagent 例红（AssertionError: preamble !== artifact.text）
+ ——证明「结构化 preamble 与 canonical artifact.text 逐字节相等」断言在真实请求边界
+ （Pi witness HTTP + 观测库 semantic_request）承重：单字符保真破坏即红。
+
+清理：worktree 内文件已还原；git worktree remove --force /tmp/p06-head-check；
+worktree list 仅剩主仓；/tmp 残留已删。
