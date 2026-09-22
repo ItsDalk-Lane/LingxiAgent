@@ -1,0 +1,60 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/model-observability-e2e-utility.test.ts > E2E truth — 知识操作协议（P04-T07：embedding/rerank 真实 HTTP） > P04-A15：EmbeddingClient 经真实 witness HTTP——凭证进请求头、观测/台账/投影齐备、毒丸不入库
+AssertionError: expected { costTotal: null, …(4) } to match object { input: 7, totalTokens: 7 }
+(12 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "input": 7,
++   "input": {
++     "totalTokens": 7,
++     "uncachedTokens": 7,
++   },
+    "totalTokens": 7,
+  }
+
+ ❯ tests/model-observability-e2e-utility.test.ts:610:30
+    608|     const entries = ledger.list({ subsystem: "knowledge" }).entries ??…
+    609|     expect(entries).toHaveLength(1);
+    610|     expect(entries[0].usage).toMatchObject({ input: 7, totalTokens: 7 …
+       |                              ^
+    611|     expect(entries[0].metadata?.modelCallId).toBe(callIds[0]);
+    612|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/model-observability-e2e-utility.test.ts > E2E truth — 知识操作协议（P04-T07：embedding/rerank 真实 HTTP） > P04-A15：RerankClient 经真实 witness HTTP——cohere 形状归一 + usage meta 记账
+AssertionError: expected { costTotal: null, …(4) } to match object { input: 12, output: 2, …(1) }
+(9 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "input": 12,
+-   "output": 2,
++   "input": {
++     "totalTokens": 12,
++     "uncachedTokens": 12,
++   },
++   "output": {
++     "reasoningTokens": null,
++     "totalTokens": 2,
++   },
+    "totalTokens": 14,
+  }
+
+ ❯ tests/model-observability-e2e-utility.test.ts:664:30
+    662|     const entries = ledger.list({ subsystem: "knowledge", operation: "…
+    663|     expect(entries).toHaveLength(1);
+    664|     expect(entries[0].usage).toMatchObject({ input: 12, output: 2, tot…
+       |                              ^
+    665|   }, 15_000);
+    666| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

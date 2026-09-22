@@ -1,0 +1,10 @@
+# P04 独立验收反例测试（真实 globalThis.fetch + 真实 loopback HTTP server，无 mock fetch）
+# 隔离临时目录执行：/tmp/p04x-acceptance（vitest --root /tmp/p04x-acceptance，node_modules symlink 至仓库）
+# 测试文件源档：P04-ACCEPTANCE-counterexample.test.ts
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  09:49:05
+   Duration  488ms (transform 81ms, setup 0ms, import 106ms, tests 316ms, environment 0ms)
+

@@ -1,0 +1,27 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/model-operation-resolver.test.ts > ModelOperationResolver credential routing boundaries (P04) > P04-A05：本地端点无 apiKey（isLocalBaseUrl 默认规则）合法放行
+TypeError: resolver.resolveFresh is not a function
+ ❯ tests/model-operation-resolver.test.ts:384:27
+    382|       { apiKey: "", baseUrl: "http://127.0.0.1:11434/v1", credentialSo…
+    383|     );
+    384|     await expect(resolver.resolveFresh("embedding")).resolves.toMatchO…
+       |                           ^
+    385|       provider: "local-runtime",
+    386|       api: "openai-embeddings",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/model-operation-resolver.test.ts > ModelOperationResolver credential routing boundaries (P04) > P04-A05：仅 header 凭证（无 apiKey）的远程 provider 合法放行，header 进入执行配置
+TypeError: resolver.resolveFresh is not a function
+ ❯ tests/model-operation-resolver.test.ts:402:27
+    400|       },
+    401|     );
+    402|     await expect(resolver.resolveFresh("embedding")).resolves.toMatchO…
+       |                           ^
+    403|       provider: "header-auth-provider",
+    404|       headers: { "x-custom-auth": "header-secret" },
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

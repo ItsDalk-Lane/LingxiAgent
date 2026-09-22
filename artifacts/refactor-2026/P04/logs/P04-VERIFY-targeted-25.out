@@ -1,0 +1,59 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/assistant-event-normalizer.test.ts (9 tests) 131ms
+ ✓ tests/model-call-payload-redaction.test.ts (52 tests) 91ms
+ ✓ tests/model-trace-scope.test.ts (21 tests) 102ms
+stdout | tests/auxiliary-slot-resolver.test.ts > Case E: approval unconfigured returns null, chat never called > approval=null → null result
+[aux-resolver] resolveAuxiliaryExecution(approval): no model (unconfigured, fallback=none)
+
+stdout | tests/auxiliary-slot-resolver.test.ts > Case G: guard unconfigured returns null > guard=null → null, neither chat nor approval consulted
+[aux-resolver] resolveAuxiliaryExecution(guard): no model (unconfigured, fallback=none)
+
+stdout | tests/auxiliary-slot-resolver.test.ts > Case H: vision capability enforcement > unconfigured vision only falls back if chat supports image
+[aux-resolver] resolveAuxiliaryExecution(vision): no model (unconfigured, fallback=image_capable_chat)
+
+ ✓ tests/auxiliary-slot-resolver.test.ts (20 tests) 62ms
+stdout | tests/fresh-credential-routing.test.ts > AuxiliaryModelResolver fresh credential routing > returns null for an unconfigured slot with no chat fallback
+[aux-resolver] resolveAuxiliaryExecution(approval): no model (unconfigured, fallback=none)
+
+ ✓ tests/fresh-credential-routing.test.ts (5 tests) 66ms
+ ✓ tests/pi-sdk-stream-guard.test.ts (7 tests) 64ms
+ ✓ tests/model-call-pi-retry-visibility.test.ts (4 tests) 84ms
+ ✓ tests/model-observability-accounting-projection.test.ts (10 tests) 142ms
+ ✓ tests/model-call-speech-observer.test.ts (6 tests) 104ms
+ ✓ tests/model-call-payload-speech.test.ts (7 tests) 108ms
+ ✓ tests/llm-usage-ledger.test.ts (10 tests) 89ms
+ ✓ tests/llm-usage-observer.test.ts (11 tests) 73ms
+ ✓ tests/model-call-probe-observer.test.ts (6 tests) 95ms
+ ✓ tests/model-observability-session-trace-reuse.test.ts (6 tests) 155ms
+ ✓ tests/model-operation-client.test.ts (8 tests) 87ms
+ ✓ tests/model-call-observer.test.ts (15 tests) 72ms
+ ✓ tests/model-call-media-observer.test.ts (15 tests) 110ms
+ ✓ tests/model-call-payload-media.test.ts (13 tests) 115ms
+ ✓ tests/model-call-safety-gate.test.ts (8 tests) 95ms
+ ✓ tests/model-call-payload-calltext.test.ts (12 tests) 107ms
+ ✓ tests/model-call-calltext-observer.test.ts (11 tests) 134ms
+ ✓ tests/model-observability-e2e-media-speech.test.ts (5 tests) 188ms
+ ✓ tests/model-observability-e2e-calltext.test.ts (5 tests) 187ms
+ ✓ tests/model-call-pi-stream-observer.test.ts (15 tests) 98ms
+ ✓ tests/model-no-fallback.test.ts (23 tests) 146ms
+ ✓ tests/model-observability-session-trace-identity.test.ts (4 tests) 204ms
+ ✓ tests/model-call-trace-propagation.test.ts (14 tests) 103ms
+ ✓ tests/model-observability-e2e-chat.test.ts (3 tests) 441ms
+ ✓ tests/model-call-diary-observer.test.ts (4 tests) 91ms
+ ✓ tests/model-call-reference.test.ts (2 tests) 31ms
+ ✓ tests/media-credential-routing-parity.test.ts (10 tests) 44ms
+ ✓ tests/model-operation-resolver.test.ts (17 tests) 55ms
+ ✓ tests/model-call-control-plane.test.ts (2 tests) 30ms
+ ✓ tests/model-manager-auth-storage.test.ts (31 tests) 636ms
+ ✓ tests/model-observability-e2e-utility.test.ts (13 tests) 630ms
+     ✓ timeout（hang）：LLM_TIMEOUT error 终态  313ms
+ ✓ tests/oauth-force-refresh.test.ts (6 tests) 1746ms
+     ✓ refreshes exactly once when two callers race on the same stale credential  1643ms
+
+ Test Files  36 passed (36)
+      Tests  410 passed (410)
+   Start at  09:34:08
+   Duration  2.60s (transform 11.46s, setup 766ms, import 25.61s, tests 6.72s, environment 2ms)
+

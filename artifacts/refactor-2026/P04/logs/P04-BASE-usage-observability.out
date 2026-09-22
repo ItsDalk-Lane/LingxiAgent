@@ -1,0 +1,16 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/llm-usage-observer.test.ts (11 tests) 46ms
+ ✓ tests/llm-usage-ledger.test.ts (10 tests) 52ms
+ ✓ tests/model-call-observer.test.ts (15 tests) 39ms
+ ✓ tests/model-observability-accounting-projection.test.ts (10 tests) 76ms
+ ✓ tests/model-call-safety-gate.test.ts (8 tests) 55ms
+ ✓ tests/model-call-reference.test.ts (2 tests) 24ms
+ ✓ tests/model-call-control-plane.test.ts (2 tests) 27ms
+
+ Test Files  7 passed (7)
+      Tests  58 passed (58)
+   Start at  09:16:24
+   Duration  1.18s (transform 1.49s, setup 137ms, import 2.74s, tests 319ms, environment 0ms)
+

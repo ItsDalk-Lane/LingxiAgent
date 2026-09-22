@@ -1,0 +1,12 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/model-operation-client.test.ts (8 tests) 51ms
+ ✓ tests/model-operation-resolver.test.ts (17 tests) 50ms
+ ✓ tests/model-observability-e2e-chat.test.ts (3 tests) 369ms
+
+ Test Files  3 passed (3)
+      Tests  28 passed (28)
+   Start at  09:24:14
+   Duration  1.17s (transform 517ms, setup 58ms, import 1.57s, tests 470ms, environment 0ms)
+

@@ -1,0 +1,17 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/model-observability-durable-matrix.test.ts (8 tests) 102ms
+ ✓ tests/model-observability-e2e-dst.test.ts (2 tests) 106ms
+ ✓ tests/model-observability-e2e-media-speech.test.ts (5 tests) 137ms
+ ✓ tests/model-observability-e2e-calltext.test.ts (5 tests) 146ms
+ ✓ tests/model-observability-e2e-concurrency-perf.test.ts (2 tests) 256ms
+ ✓ tests/model-observability-e2e-security-blob.test.ts (6 tests) 311ms
+ ✓ tests/model-observability-e2e-utility.test.ts (11 tests) 581ms
+     ✓ timeout（hang）：LLM_TIMEOUT error 终态  314ms
+
+ Test Files  7 passed (7)
+      Tests  39 passed (39)
+   Start at  09:22:41
+   Duration  1.61s (transform 1.70s, setup 145ms, import 2.68s, tests 1.64s, environment 0ms)
+

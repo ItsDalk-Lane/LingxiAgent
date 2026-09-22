@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/model-operation-client.test.ts (8 tests) 50ms
+ ✓ tests/model-operation-resolver.test.ts (17 tests) 41ms
+
+ Test Files  2 passed (2)
+      Tests  25 passed (25)
+   Start at  09:20:56
+   Duration  917ms (transform 386ms, setup 39ms, import 885ms, tests 91ms, environment 0ms)
+

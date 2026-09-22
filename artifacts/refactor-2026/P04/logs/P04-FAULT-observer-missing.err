@@ -1,0 +1,60 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/model-observability-e2e-chat.test.ts > E2E truth — MC-01 真实 Pi chat > S1 simple chat：1 trace/1 call；hook body ≡ witness body；四层 payload；毒丸不入库
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/model-observability-e2e-chat.test.ts:128:21
+    126|     /* observer：1 call、attempt logical 边界内可见 */
+    127|     const callIds = harness.observer!.callIds();
+    128|     expect(callIds).toHaveLength(1);
+       |                     ^
+    129|     const callId = callIds[0];
+    130|     const identity = harness.observer!.callIdentity(callId)!;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/model-observability-e2e-chat.test.ts > E2E truth — MC-01 真实 Pi chat > S2 tool loop：C1 toolCall → 工具执行 → C2 text；C2.parent=C1.callId（非 toolCallId）
+AssertionError: expected [] to have a length of 2 but got +0
+
+- Expected
++ Received
+
+- 2
++ 0
+
+ ❯ tests/model-observability-e2e-chat.test.ts:260:21
+    258|     /* observer：2 calls，C2.parent=C1（因果：loop 内工具回流后继续推理） */
+    259|     const callIds = harness.observer!.callIds();
+    260|     expect(callIds).toHaveLength(2);
+       |                     ^
+    261|     const [c1, c2] = callIds;
+    262|     const identity1 = harness.observer!.callIdentity(c1)!;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/model-observability-e2e-chat.test.ts > E2E truth — MC-01 真实 Pi chat > S3 P04-A06：跨多 delta 交错的多 toolCall 参数分片 + UTF-8 字节边界拆分后正确组装
+AssertionError: expected [] to have a length of 2 but got +0
+
+- Expected
++ Received
+
+- 2
++ 0
+
+ ❯ tests/model-observability-e2e-chat.test.ts:364:21
+    362|     /* observer：C1 的 semantic_response 记录两个 toolCall 及重组后的参数 */
+    363|     const callIds = harness.observer!.callIds();
+    364|     expect(callIds).toHaveLength(2);
+       |                     ^
+    365|     const [c1, c2] = callIds;
+    366|     const identity1 = harness.observer!.callIdentity(c1)!;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+

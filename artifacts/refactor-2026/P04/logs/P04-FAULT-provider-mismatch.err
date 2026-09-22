@@ -1,0 +1,29 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/model-operation-resolver.test.ts > ModelOperationResolver credential routing boundaries (P04) > P04-A01：同名 modelId 的两个 provider 不互串——解析与凭证刷新都锁定配置的 provider
+AssertionError: expected { model: { …(8) }, …(7) } to match object { provider: 'provider-b', …(2) }
+(13 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "apiKey": "key-provider-b",
+-   "baseUrl": "https://provider-b.example/v1",
+-   "provider": "provider-b",
++   "apiKey": "key-provider-a",
++   "baseUrl": "https://provider-a.example/v1",
++   "provider": "provider-a",
+  }
+
+ ❯ tests/model-operation-resolver.test.ts:312:29
+    310|     // 反向引用同样不串：provider-b 的模型与凭证
+    311|     const reverseResolved = await makeResolverFor("provider-b").resolv…
+    312|     expect(reverseResolved).toMatchObject({
+       |                             ^
+    313|       provider: "provider-b",
+    314|       apiKey: "key-provider-b",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
