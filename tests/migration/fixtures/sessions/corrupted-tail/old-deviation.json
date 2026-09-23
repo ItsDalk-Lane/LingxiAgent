@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "fixture_id": "corrupted-tail",
+  "record_kind": "OLD_SYSTEM_DEVIATION_NOT_STANDARD",
+  "summary": "旧实现读取含损坏尾记录的会话时：严格层会抛结构化错误，但用户可见的历史读取路由不走它；路由与生产入口返回成功且响应体零标注（用户无从得知第 4 条消息被丢弃）。路由/生产入口在磁盘上留下 .repair.json 回执作为事后审计线索，但该回执不进入响应；宽容层 readSessionMessages 连磁盘回执都不产生，纯静默丢弃。old_actual 为分层归因观察：route 与 productionEntry 各用独立新鲜副本测量，receipt 存在性互不污染。",
+  "partial_mitigations": [
+    "路由与生产入口触发 repairOversizedSessionEntriesInFile 落盘 <session>.repair.json 并移除坏行（磁盘级回执存在）",
+    "该回执不体现在任何用户可见响应字段中（bodyAnnotationAbsent/annotationAbsent=true）",
+    "宽容层 readSessionMessages（记忆/日记链路使用）不触发修复也不留回执"
+  ],
+  "deviation_sites": [
+    {
+      "layer": "lenient_reader",
+      "location": "lib/session-jsonl.ts:349-363",
+      "behavior": "JSON.parse 失败的行被 catch 后直接丢弃，返回的 messages 无任何 dropped/标注字段（注释自述：单行损坏只丢弃该行）"
+    },
+    {
+      "layer": "production_history_entry",
+      "location": "core/message-utils.ts:118-158",
+      "behavior": "先 repairOversizedSessionEntriesInFile（落盘 .repair.json 并移除坏行，但返回值不带 repaired/dropped 计数）；SDK 分支读取成功（SDK 对坏行返回 null 跳过）→ 正常投影返回；分支抛错时 catch 后静默降级 raw-read fallback（:134-136），fallback 内部同样跳过坏行（:148-151），响应零标注"
+    },
+    {
+      "layer": "user_facing_route",
+      "location": "server/routes/sessions.ts GET /api/sessions/messages + server/history-read",
+      "behavior": "对含损坏尾记录的会话返回 200 与 3 条 display 消息，响应体无任何丢弃标注；磁盘留下 .repair.json（回执不进响应）"
+    },
+    {
+      "layer": "sdk_session_manager",
+      "location": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js:268-320",
+      "behavior": "loadEntriesFromFile/parseSessionEntryLine 对 malformed 行返回 null 跳过；文件尾无换行时自动补 \\n"
+    }
+  ],
+  "test_evidence": [
+    "tests/history-pagination-invalid-fixture.test.ts:13-16（文件头注释原文钉死『静默降级…路由仍返回 200』）",
+    "tests/history-pagination-invalid-fixture.test.ts:245-296（分支读取抛错 → fallback 接管 → 路由 200 且 7 条 display 消息全部返回）",
+    "tests/session-jsonl-file.test.ts:88-120（超长行修复会返回 repaired/projected 计数并落盘 .repair.json——对照面：显式标注在该仓库是既定可达做法）"
+  ],
+  "violated_rule": "AGENTS-REDLINE-NO-SILENT-DEGRADATION（见 expected.json rule_sources）",
+  "old_actual_snapshot": "由 R00-T05 回放生成并冻结于本文件 old_actual 字段；三次重放的原始/规范化结果在 artifacts/rust-tauri/R00/T05；机器断言位于 tests/migration/r00-a10-old-defect.test.ts",
+  "old_actual": {
+    "lenientReader": {
+      "annotationAbsent": true,
+      "messageCount": 3,
+      "roles": [
+        "user",
+        "assistant",
+        "assistant"
+      ]
+    },
+    "productionEntry": {
+      "annotationAbsent": true,
+      "messageCount": 4,
+      "repairReceiptExists": true,
+      "roles": [
+        "user",
+        "assistant",
+        "toolResult",
+        "assistant"
+      ]
+    },
+    "route": {
+      "bodyAnnotationAbsent": true,
+      "messageCount": 3,
+      "repairReceiptExists": true,
+      "status": 200
+    },
+    "strictReader": {
+      "code": "session_branch_invalid_json",
+      "details": {
+        "cause": "Unterminated string in JSON at position 84 (line 1 column 85)",
+        "filePath": "<tmp-path>",
+        "line": 6
+      },
+      "name": "SessionBranchError",
+      "threw": true
+    }
+  }
+}

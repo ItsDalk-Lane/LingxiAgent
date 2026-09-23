@@ -1,0 +1,271 @@
+{
+  "schema_version": 1,
+  "task_id": "R00-T05",
+  "stage_id": "R00",
+  "title": "旧系统行为与故障夹具清单（跨语言共享）",
+  "purpose": "为 Rust/Tauri 迁移提供外部可观察的行为标准：输入、协议帧、输出、文件结果与错误码全部来自真实旧实现回放，不把私有字段 mock 当新系统权威。",
+  "replay": {
+    "test": "tests/migration/r00-t05-replay.test.ts（A09 三次重放驱动：scripts/rust-tauri/r00-t05-replay.mjs）",
+    "rule": "expected.json 冻结自首次验证运行，且逐项对照过既有公开测试断言（锚点见各 fixture 的 source.anchors 与 OLD_BEHAVIOR_ORACLE.md）；回放走真实旧入口，不是对 JSON 自比。",
+    "offline": "LINGXI_MIGRATION_BLOCK_NETWORK=1 时测试 worker 内阻断 net/tls/dns 外连；所有文件/进程只使用 os.tmpdir() 临时目录。"
+  },
+  "global_normalization": {
+    "allowed_varying_keys": ["timestamp", "labelTimestamp", "createdAt", "updatedAt", "mtime", "mtimeMs", "pid"],
+    "allowed_varying_patterns": [
+      { "placeholder": "<tmp-path>", "reason": "os.tmpdir() 下各次重放不同的 mkdtemp 前缀与文件路径" },
+      { "placeholder": "<uuid>", "reason": "SDK 生成的会话 UUID（fork 子会话头、业务侧生成 id）" },
+      { "placeholder": "<sf-id>", "reason": "SessionFileRegistry 生成的 sf_<16hex> 文件 id" },
+      { "placeholder": "<iso-ts>", "reason": "ISO 时间戳字符串" },
+      { "placeholder": "<file-ts>", "reason": "SDK 文件名时间戳（冒号/点替换为连字符的形式）" }
+    ],
+    "canonicalization": "tests/migration/normalize.ts：值→占位符替换（不删键、不重排语义），键按字母稳定排序后逐字节比较"
+  },
+  "privacy_review": {
+    "scope": "全部 9 组夹具",
+    "result": "通过（合成内容）",
+    "details": "所有会话内容、附件文件、错误消息、工具参数均为本任务合成的中文占位文本；无真实用户数据、真实人名、凭证、真实附件或用户目录内容；时间戳为固定过去值（2026-09-10）或被规范化屏蔽；认证用 token 为显式标注 not-a-secret 的合成值。"
+  },
+  "fixtures": [
+    {
+      "fixture_id": "multi-turn-basic",
+      "category": "multi_turn_conversation",
+      "input": "sessions/multi-turn-basic/session.jsonl",
+      "expected": "sessions/multi-turn-basic/expected.json",
+      "source": {
+        "origin": "synthetic（会话行结构复刻 Pi SDK session-manager 写入格式）",
+        "anchors": [
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js:782-791（消息行 schema）",
+          "lib/session-jsonl.ts:334（readSessionMessages 宽容读取）",
+          "lib/session-jsonl.ts:188（readCurrentSessionBranch 严格读取）",
+          "server/routes/sessions.ts:1383（GET /api/sessions/messages）",
+          "tests/session-jsonl.test.ts:24-45（root→leaf 投影契约）"
+        ]
+      },
+      "replay_entry": {
+        "layers": [
+          "真实路由 GET /api/sessions/messages?all=1（Hono app.request 进程内调用，engine 仅身份映射桩，读取逻辑零桩）",
+          "真实 readCurrentSessionBranch / readSessionMessages",
+          "真实 SessionManifestStore（SQLite，临时目录）"
+        ]
+      },
+      "expected_verifier": ["R00-T05（本轮已验证）", "R06/R08：Rust 历史读取对同一 JSONL 重放须得到等价 display 投影"],
+      "observable_assertions": [
+        "严格层 lineage = u1,a1,r1,a2,u2,a3，headResolution=legacy_tail",
+        "宽容层只返回 user/assistant 消息（toolResult 不入 display）",
+        "路由 200，display id 为顺序字符串序号（\"0\"..\"4\"），assistant 消息带 toolCalls/assistantSegments 投影"
+      ],
+      "allowed_varying": { "note": "路由消息含 timestamp 键（被键名规则屏蔽）；其余全静态" }
+    },
+    {
+      "fixture_id": "pagination-corpus",
+      "category": "history_pagination",
+      "input": "sessions/pagination-corpus/session.jsonl",
+      "expected": "sessions/pagination-corpus/expected.json",
+      "source": {
+        "origin": "synthetic（run-continuity 长单轮链形状的缩小版：1 user + 23 assistant + 22 toolResult = 24 display）",
+        "anchors": [
+          "server/history-read/page.ts:38-49（resolveHistoryPageBounds 游标语义）",
+          "server/routes/sessions.ts:1383-1512（before/limit/all 参数与响应形状）",
+          "tests/history-pagination-run-continuity.test.ts:315-330（display 计数与零重叠/等价不变量）"
+        ]
+      },
+      "replay_entry": {
+        "layers": ["真实路由 limit=10 游标走页至耗尽", "真实 all=1 全量对照", "同参数二次走页（确定性对照）"]
+      },
+      "expected_verifier": ["R00-T05（本轮已验证）", "R06：Rust 分页须满足同游标语义与切页≡全量等价"],
+      "observable_assertions": [
+        "页序 10/10/4，nextBefore 链 14→4→null，末页 hasMore=false",
+        "页序反转（旧→新）拼接与 all=1 逐项同序同数（orderEqual=true）",
+        "无重叠（noOverlap=true）且同参数重走结果确定（walkDeterministic=true）"
+      ],
+      "allowed_varying": { "note": "无变化字段（全静态）" }
+    },
+    {
+      "fixture_id": "corrupted-tail",
+      "category": "corrupted_tail_record",
+      "input": "sessions/corrupted-tail/session.jsonl",
+      "expected": "sessions/corrupted-tail/expected.json（修正后不变量——新系统标准）",
+      "old_deviation": "sessions/corrupted-tail/old-deviation.json（含冻结的 old_actual：旧实现真实行为）",
+      "source": {
+        "origin": "synthetic（合法链 + 截断 JSON 尾行）",
+        "anchors": [
+          "lib/session-jsonl.ts:37-42（严格层 session_branch_invalid_json）",
+          "lib/session-jsonl.ts:349-363（宽容层静默丢弃）",
+          "core/message-utils.ts:118-158（生产入口修复+回退）",
+          "tests/history-pagination-invalid-fixture.test.ts:2-17,245-296（分层行为钉死）",
+          "AGENTS.md 红线「禁止静默降级」（修正后不变量的规则来源）"
+        ]
+      },
+      "replay_entry": {
+        "layers": [
+          "真实 readCurrentSessionBranch（严格）",
+          "真实 readSessionMessages（宽容）",
+          "真实路由 all=1（独立新鲜副本，观察响应与 .repair.json 归因）",
+          "真实 loadSessionHistoryMessages（独立新鲜副本）"
+        ]
+      },
+      "expected_verifier": [
+        "R00-T05/A10（本轮已机器验证旧实现命中 forbidden silent_success）",
+        "R06/R08：Rust 实现对同一输入必须命中 acceptable_outcomes 之一（结构化错误或带 droppedCorruptLines 标注的显式降级），禁止复刻静默丢弃"
+      ],
+      "observable_assertions": [
+        "严格层抛 SessionBranchError code=session_branch_invalid_json，details.line=6",
+        "旧路由 200 + 3 条消息 + 响应体零标注（磁盘留 .repair.json 但不进响应）——已登记偏差",
+        "旧宽容层 3 条消息零标注零回执；旧生产入口 4 条（含 toolResult）零标注"
+      ],
+      "allowed_varying": { "note": "严格层 details.filePath 为临时路径（<tmp-path>）" }
+    },
+    {
+      "fixture_id": "fork-lineage",
+      "category": "session_fork",
+      "input": "sessions/fork-lineage/session.jsonl + fork-request.json",
+      "expected": "sessions/fork-lineage/expected.json",
+      "source": {
+        "origin": "synthetic（源会话复刻多轮链；fork 请求对应生产 fork 边界形状）",
+        "anchors": [
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js:1113-1180（createBranchedSession：保留 root→boundary、重挂父链、新文件头带 parentSession）",
+          "core/session-coordinator.ts:3690（生产 fork 链路调用点）",
+          "tests/session-fork.test.ts:366-373（源文件字节不变、子链含边界不含后续）"
+        ]
+      },
+      "replay_entry": { "layers": ["真实 SDK SessionManager.open + createBranchedSession('a2')，临时目录落盘"] },
+      "expected_verifier": ["R00-T05（本轮已验证）", "R06：Rust 会话 fork 须保持边界包含性、源不可变、parentSession 关联"],
+      "observable_assertions": [
+        "子会话 lineage = u1,a1,r1,a2（u2/a3 不进入）",
+        "源文件 SHA-256 前后不变（fork 不改写源）",
+        "子文件头 version=3、parentSession=源路径、id 为新生成 UUID（headerIsNewSession=true）"
+      ],
+      "allowed_varying": { "note": "子会话 UUID 与文件名（<uuid>/<tmp-path>/<file-ts> 屏蔽）" }
+    },
+    {
+      "fixture_id": "mood-stream-scripts",
+      "category": "mood_tags",
+      "input": "mood/stream-scripts/scripts.json",
+      "expected": "mood/stream-scripts/expected.json",
+      "source": {
+        "origin": "synthetic（模型替身固定流片段；断言形状取自既有公开测试）",
+        "anchors": [
+          "core/events.ts:96-120（MoodParser/ThinkTagParser 流式权威入口）",
+          "shared/internal-mood-block.ts:6-10（词表 mood/pulse/reflect）",
+          "shared/reserved-tag-stream.ts:421（splitReservedTagSegments 历史切分权威）",
+          "tests/mood-parser.test.ts:20-50,124-139,147-166,184-198",
+          "tests/chat-route-mood-segment.test.ts:261-341（跨 chunk/截断尾巴用例）",
+          "tests/live-history-reserved-tag-parity.test.ts（生产级实时/历史等价契约）"
+        ]
+      },
+      "replay_entry": {
+        "layers": [
+          "真实 ThinkTagParser→MoodParser 流式链（模型替身按脚本喂帧）",
+          "真实 splitReservedTagSegments 历史切分（同一全文）",
+          "两入口 visibleText 等价性对照"
+        ]
+      },
+      "expected_verifier": ["R00-T05（本轮已验证）", "R06：Rust 的 MOOD 解析须单一权威入口并保持实时/历史等价（02 契约 §7）"],
+      "observable_assertions": [
+        "leading-mood：mood_start/mood_text/mood_end/text 事件序（与 mood-parser.test.ts:20-26 同形）",
+        "代码围栏与反引号内标签按字面透传；转义 \\<mood> 保留反斜杠",
+        "标签跨 chunk 撕裂仍解析（tag-split-across-chunks）",
+        "未闭合块 flush 补 mood_end（live）；raw 切分器则按字面文本——模块级分歧已如实冻结（见 ORACLE）",
+        "闭标签后紧跟换行：live 丢弃该换行、raw 切分保留——模块级分歧已如实冻结（见 ORACLE）"
+      ],
+      "allowed_varying": { "note": "无变化字段（全静态）" }
+    },
+    {
+      "fixture_id": "tool-invocation-matrix",
+      "category": "tool_invocation",
+      "input": "tool/cases.json",
+      "expected": "tool/expected.json",
+      "source": {
+        "origin": "synthetic（请求/目标形状取自生产类型；用例矩阵镜像既有网关测试）",
+        "anchors": [
+          "core/tool-invocation-gateway.ts:19-32,379-504（请求形状与执行/失败语义）",
+          "lib/tools/invocation/errors.ts:3-22（公开错误码全集）",
+          "tests/tool-invocation-gateway.test.ts:120-186,278-330（prepared 绑定/篡改/键序/取消/脱敏断言）",
+          "tests/tool-invocation-path-parity.test.ts:253-330（路由等价）"
+        ]
+      },
+      "replay_entry": { "layers": ["真实 ToolInvocationGateway + resolvePermission + runWithPreparedInvocation；执行边界为记录型工具替身（外部执行器替身）"] },
+      "expected_verifier": ["R00-T05（本轮已验证）", "R04：Rust 统一工具网关须保持同错误码集与 prepared 事实绑定"],
+      "observable_assertions": [
+        "baseline：执行一次，ctx 身份被网关强制覆写（invocationRoute=direct、effectiveTargetId=tool:first-party:write_note）",
+        "prepared 缺失→PREPARED_INVOCATION_MISSING；prepared 后篡改参数→PREPARED_INVOCATION_MISMATCH（零执行）",
+        "仅键序变化→稳定 digest 匹配成功执行",
+        "registry generation 变化→TARGET_REVOKED（零执行）",
+        "执行器普通异常→TRANSPORT_FAILURE（一次执行）"
+      ],
+      "allowed_varying": { "note": "无变化字段（全静态）" }
+    },
+    {
+      "fixture_id": "cancel-edges",
+      "category": "cancellation",
+      "input": "cancel/cases.json",
+      "expected": "cancel/expected.json",
+      "source": {
+        "origin": "synthetic（取消用例矩阵镜像既有取消测试链路）",
+        "anchors": [
+          "core/tool-invocation-gateway.ts:465-490（执行前/执行中/完成后取消语义）",
+          "lib/confirm-store.ts + lib/tools/session-permission-wrapper.ts（ask 模式审批中止）",
+          "tests/p02-cancellation-edges.test.ts:37-72（A05 等审批取消与迟到审批）"
+        ]
+      },
+      "replay_entry": { "layers": ["真实网关三时点取消（工具替身 + AbortController）", "真实 ConfirmStore + 真实权限 wrapper ask 模式", "真实 ConfirmStore 迟到 resolve"] },
+      "expected_verifier": ["R00-T05（本轮已验证）", "R03/R04：Rust 取消语义须同构（含完成后复查不复活完成态）"],
+      "observable_assertions": [
+        "执行前 abort→EXECUTION_CANCELLED 且零执行",
+        "执行器抛 AbortError→EXECUTION_CANCELLED",
+        "执行器完成时刻 abort→完成后复查仍 EXECUTION_CANCELLED（gateway:490）",
+        "等审批时 abortBySession→工具零执行，结果 {isError:true, confirmation.status:'aborted'}，store 清空",
+        "已 abort 的 confirmId 迟到 resolve 返回 false"
+      ],
+      "allowed_varying": { "note": "无变化字段（全静态）" }
+    },
+    {
+      "fixture_id": "auth-server-deny",
+      "category": "auth_failure",
+      "input": "auth/cases.json",
+      "expected": "auth/expected.json",
+      "source": {
+        "origin": "synthetic（runtimeContext/凭证全为合成标识；token 显式标注 not-a-secret）",
+        "anchors": [
+          "core/server-auth.ts:47,65,75,153-160（deny reasons 与结构化 deny 形状）",
+          "server/http/request-principal.ts:53-84（HTTP 面 403 forbidden 消费点）",
+          "tests/server-auth.test.ts:32-58,204-225（loopback/结构化 deny 断言）"
+        ]
+      },
+      "replay_entry": { "layers": ["真实 createServerAuthService().authenticateRequestDetailed（临时 lingxiHome）"] },
+      "expected_verifier": ["R00-T05（本轮已验证）", "R02/R05：Rust 认证层须保持结构化 deny 与传输绑定语义"],
+      "observable_assertions": [
+        "正确 loopback token + local→principal{kind:local_user,trustState:local}（对照面）",
+        "错误 token→denied{error:'forbidden',reason:'invalid_credential'}",
+        "loopback 凭证过 lan/custom_remote→denied reason=loopback_token_requires_local_transport",
+        "缺失凭证→denied reason=missing_credential"
+      ],
+      "allowed_varying": { "note": "无变化字段（三次重放 raw 层亦逐字节一致）" }
+    },
+    {
+      "fixture_id": "attachments-lifecycle",
+      "category": "attachments",
+      "input": "attachments/scenario.json",
+      "expected": "attachments/expected.json",
+      "source": {
+        "origin": "synthetic（文件内容均为合成文本；sessionId 为合成格式）",
+        "anchors": [
+          "lib/session-files/session-file-registry.ts:72-177（registerFile 引用式登记）",
+          "lib/session-files/session-file-registry.ts:255-360（forkSessionFiles 只复制 reachable、legacyFileIds 链）",
+          "tests/session-file-registry.test.ts:86-133,680-760,925-945（跨会话隔离/fork/丢弃断言）",
+          "tests/upload-route.test.ts:56-203（上传错误码面，供 R04/R07 扩展）"
+        ]
+      },
+      "replay_entry": { "layers": ["真实 SessionFileRegistry（sidecar .files.json 真实落盘于临时目录）", "真实 forkSessionFiles/discardForkedSessionFiles"] },
+      "expected_verifier": ["R00-T05（本轮已验证）", "R04/R06：Rust 文件资源须保持会话隔离、reachable 复制与源存活语义"],
+      "observable_assertions": [
+        "external 登记零拷贝（filePath 不变）；registerFile 为引用式登记（managed 物化由上传流程负责）",
+        "fileId 形状 sf_<16hex>；sidecar version=1",
+        "跨 sessionPath 查询同 fileId→null 且不写他人 sidecar",
+        "fork 只复制 reachable 文件（retained 引用 note→复制 1 个；未引用 csv 不复制），子条目带 legacyFileIds",
+        "discard 返回 {sidecarDeleted,managedCacheDeleted,unloaded} 且源会话文件存活"
+      ],
+      "allowed_varying": { "note": "sf_ id（<sf-id>）与临时路径（<tmp-path>）；createdAt/mtime 被键名规则屏蔽" }
+    }
+  ]
+}

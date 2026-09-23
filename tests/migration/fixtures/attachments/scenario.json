@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "note": "附件/SessionFile 生命周期。回放走真实 lib/session-files/session-file-registry.ts，sidecar 落盘在临时隔离目录；文件内容全部合成。",
+  "files": {
+    "note.md": "# 合成笔记\n仅用于迁移夹具。\n",
+    "data.csv": "id,value\n1,10\n2,20\n",
+    "forked-extra.md": "fork 后新增内容\n"
+  },
+  "steps": [
+    {
+      "id": "register-user-attachment",
+      "action": "registerFile",
+      "input": { "file": "note.md", "origin": "user_attachment", "storageKind": "external", "presentation": "attachment", "listed": true },
+      "expectation": "sidecar 登记外部引用（零拷贝），fileId 形如 sf_<16hex>"
+    },
+    {
+      "id": "register-managed-cache",
+      "action": "registerFile",
+      "input": { "file": "data.csv", "origin": "bridge_inbound", "storageKind": "managed_cache", "presentation": "attachment", "listed": true },
+      "expectation": "登记为 managed_cache 引用（registerFile 是引用式登记，物化副本由上传/桥接流程负责；与 lib/session-files/session-file-registry.ts registerFile 行为一致）"
+    },
+    {
+      "id": "cross-session-lookup-denied",
+      "action": "get",
+      "input": { "via": "other-session.jsonl" },
+      "expectation": "另一 sessionPath 查询同一 fileId → null，且不改写他人 sidecar（会话隔离不变量）"
+    },
+    {
+      "id": "fork-copies-reachable-files",
+      "action": "forkSessionFiles",
+      "input": { "target": "fork-session.jsonl" },
+      "expectation": "fork 只复制 reachable 文件；managed_cache 字节独立；目标 sidecar 独立"
+    },
+    {
+      "id": "discard-fork-idempotent",
+      "action": "discardForkedSessionFiles",
+      "input": { "target": "fork-session.jsonl" },
+      "expectation": "丢弃幂等且不删除源会话文件"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "note": "工具调用网关矩阵。回放走真实 core/tool-invocation-gateway.ts：registry/prepare/执行句柄透传全部为生产逻辑，仅 executeCanonical 边界使用记录型工具替身（外部执行器替身，符合 05 验收协议第1层替身边界）。",
+  "target": {
+    "publicName": "write_note",
+    "capabilityBase": "write_note",
+    "schema": {
+      "type": "object",
+      "required": ["path", "content"],
+      "additionalProperties": false,
+      "properties": { "path": { "type": "string" }, "content": { "type": "string" } }
+    },
+    "permission": {
+      "action": "write",
+      "kind": "review",
+      "capability": "write_note.write",
+      "sideEffect": { "kind": "workspace_write", "summary": "Write one note." }
+    }
+  },
+  "request": {
+    "route": "direct",
+    "arguments": { "path": "note.md", "content": "hello" },
+    "sessionId": "session-1",
+    "sessionPath": "/sessions/one.jsonl",
+    "agentId": "agent-1",
+    "lifecycleGeneration": 3,
+    "toolCallId": "call-1",
+    "ctx": { "caller": "model", "invocationRoute": "forged", "effectiveTargetId": "forged" }
+  },
+  "cases": [
+    { "id": "baseline-valid", "expectation": "成功执行一次，执行句柄 ctx 身份被网关强制覆写为宿主解析值" },
+    { "id": "prepared-missing", "expectation": "无 prepared 上下文 → PREPARED_INVOCATION_MISSING，零执行" },
+    { "id": "tampered-arguments", "expectation": "prepared 后篡改参数 → PREPARED_INVOCATION_MISMATCH，零执行" },
+    { "id": "key-order-only", "expectation": "仅参数键序变化 → 稳定 digest 匹配，成功执行" },
+    { "id": "target-revoked", "expectation": "generation 变化 → TARGET_REVOKED，零执行" },
+    { "id": "executor-generic-failure", "expectation": "执行器抛普通错误 → TRANSPORT_FAILURE，一次执行" }
+  ]
+}

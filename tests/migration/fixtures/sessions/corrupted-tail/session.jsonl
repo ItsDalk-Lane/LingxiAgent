@@ -1,0 +1,6 @@
+{"type":"session","version":3,"id":"7e5f1a3c-9d24-4b8e-a6c1-2f4b8d9e0a33","cwd":"/synthetic/work","timestamp":"2026-09-10T09:00:00Z"}
+{"type":"message","id":"u1","parentId":null,"timestamp":"2026-09-10T10:00:00Z","message":{"role":"user","content":"请生成周报"}}
+{"type":"message","id":"a1","parentId":"u1","timestamp":"2026-09-10T10:00:01Z","message":{"role":"assistant","content":[{"type":"thinking","thinking":"思考片段 1"},{"type":"tool_use","id":"tu-1","name":"read_file","input":{"path":"weekly.txt"}}]}}
+{"type":"message","id":"r1","parentId":"a1","timestamp":"2026-09-10T10:00:02Z","message":{"role":"toolResult","toolCallId":"tu-1","toolName":"read_file","content":"周报素材 1"}}
+{"type":"message","id":"a2","parentId":"r1","timestamp":"2026-09-10T10:00:03Z","message":{"role":"assistant","content":[{"type":"text","text":"周报草稿已生成。"}]}}
+{"type":"message","id":"a3","parentId":"a2","timestamp":"2026-09-10T10:00:04Z","mess

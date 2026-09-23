@@ -1,0 +1,167 @@
+{
+  "lenientReader": [
+    {
+      "content": "请帮我整理项目笔记并保存为文件",
+      "role": "user"
+    },
+    {
+      "content": [
+        {
+          "thinking": "思考片段 1：需要先写文件",
+          "type": "thinking"
+        },
+        {
+          "id": "tu-1",
+          "input": {
+            "content": "# 项目笔记\n第一行",
+            "path": "notes.md"
+          },
+          "name": "write_file",
+          "type": "tool_use"
+        }
+      ],
+      "role": "assistant"
+    },
+    {
+      "content": [
+        {
+          "text": "第一轮完成：已保存 notes.md。",
+          "type": "text"
+        }
+      ],
+      "role": "assistant"
+    },
+    {
+      "content": "再读出来确认一下内容",
+      "role": "user"
+    },
+    {
+      "content": [
+        {
+          "text": "最终回复：文件内容与写入一致。",
+          "type": "text"
+        }
+      ],
+      "role": "assistant"
+    }
+  ],
+  "route": {
+    "hasMore": false,
+    "messages": [
+      {
+        "content": "请帮我整理项目笔记并保存为文件",
+        "entryId": "u1",
+        "id": "0",
+        "role": "user",
+        "sourceIndex": 0,
+        "timestamp": "2026-09-10T10:00:00Z"
+      },
+      {
+        "assistantSegments": [
+          {
+            "id": "assistant:1:reasoning:default",
+            "kind": "reasoning",
+            "lifecycle": "sealed",
+            "processOrder": 0,
+            "semanticPhase": "reasoning",
+            "source": "思考片段 1：需要先写文件"
+          }
+        ],
+        "content": "",
+        "entryId": "a1",
+        "id": "1",
+        "role": "assistant",
+        "sourceIndex": 1,
+        "thinking": "思考片段 1：需要先写文件",
+        "timestamp": "2026-09-10T10:00:01Z",
+        "toolCalls": [
+          {
+            "args": {
+              "path": "notes.md"
+            },
+            "details": {
+              "input": "{\n  \"path\": \"notes.md\",\n  \"content\": \"# 项目笔记\\n第一行\"\n}"
+            },
+            "endedAt": "2026-09-10T10:00:02Z",
+            "id": "tu-1",
+            "name": "write_file",
+            "processOrder": 1,
+            "startedAt": "2026-09-10T10:00:01Z",
+            "status": "succeeded",
+            "success": true
+          }
+        ],
+        "turnEndIndex": 2,
+        "turnInputEntryId": "u1",
+        "turnInputVisible": true,
+        "turnStartIndex": 1
+      },
+      {
+        "assistantSegments": [
+          {
+            "id": "assistant:2:text:0",
+            "kind": "text",
+            "lifecycle": "sealed",
+            "processOrder": 0,
+            "semanticPhase": "final_answer",
+            "source": "第一轮完成：已保存 notes.md。"
+          }
+        ],
+        "content": "第一轮完成：已保存 notes.md。",
+        "entryId": "a2",
+        "id": "2",
+        "role": "assistant",
+        "sourceIndex": 3,
+        "timestamp": "2026-09-10T10:00:03Z",
+        "turnEndIndex": 2,
+        "turnInputEntryId": "u1",
+        "turnInputVisible": true,
+        "turnStartIndex": 1
+      },
+      {
+        "content": "再读出来确认一下内容",
+        "entryId": "u2",
+        "id": "3",
+        "role": "user",
+        "sourceIndex": 4,
+        "timestamp": "2026-09-10T10:01:00Z"
+      },
+      {
+        "assistantSegments": [
+          {
+            "id": "assistant:1:text:0",
+            "kind": "text",
+            "lifecycle": "sealed",
+            "processOrder": 0,
+            "semanticPhase": "final_answer",
+            "source": "最终回复：文件内容与写入一致。"
+          }
+        ],
+        "content": "最终回复：文件内容与写入一致。",
+        "entryId": "a3",
+        "id": "4",
+        "role": "assistant",
+        "sourceIndex": 5,
+        "timestamp": "2026-09-10T10:01:05Z",
+        "turnEndIndex": 4,
+        "turnInputEntryId": "u2",
+        "turnInputVisible": true,
+        "turnStartIndex": 4
+      }
+    ],
+    "nextBefore": null,
+    "status": 200
+  },
+  "sessionIdShape": true,
+  "strictReader": {
+    "headResolution": "legacy_tail",
+    "lineageIds": [
+      "u1",
+      "a1",
+      "r1",
+      "a2",
+      "u2",
+      "a3"
+    ]
+  }
+}

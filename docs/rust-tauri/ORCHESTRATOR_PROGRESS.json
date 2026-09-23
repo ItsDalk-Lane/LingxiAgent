@@ -4,7 +4,7 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "ffcb85830ffdc75da5fe39b7a8cfddb4617f1aec",
+  "current_head": "6f58b9351046e8dccfeb83be6976f197acb2de8d",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -651,7 +651,7 @@
     "R00-T04": {
       "name": "盘点入口、身份、数据与权限",
       "stage_id": "R00",
-      "status": "COMMITTING",
+      "status": "DONE",
       "task_base_sha": "ffcb85830ffdc75da5fe39b7a8cfddb4617f1aec",
       "executor_id": "ZCode:R00-T04 执行（ZCode）",
       "execution_result": "READY_FOR_REVIEW",
@@ -687,8 +687,8 @@
         "R00-A07": "PASS",
         "R00-A08": "PASS"
       },
-      "task_commit_sha": null,
-      "push_result": null,
+      "task_commit_sha": "6f58b9351046e8dccfeb83be6976f197acb2de8d",
+      "push_result": "CONFIRMED",
       "blockers": [],
       "candidate_digest_sha256": "888df87a31771c7eaea1bbcbeb367e5df070a069004c03a509f90c0cbc087087",
       "candidate_file_count": 8,
@@ -706,28 +706,73 @@
         "large_files": "no untracked T04 file exceeds 2 MiB; max 145678 bytes",
         "product_code_diff": "none",
         "git_diff_check": "PASS"
-      }
+      },
+      "remote_verified_sha": "6f58b9351046e8dccfeb83be6976f197acb2de8d"
     },
     "R00-T05": {
       "name": "建立旧行为与故障夹具",
       "stage_id": "R00",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "COMMITTING",
+      "task_base_sha": "6f58b9351046e8dccfeb83be6976f197acb2de8d",
+      "executor_id": "ZCode:R00-T05 执行（ZCode）",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 1,
+      "reviewer_id": "ZCode:R00-T05 独立验收 R1（ZCode）",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-F01",
+          "severity": "MEDIUM",
+          "summary": "network-guard misses net.createConnection, http.request and positional net.connect forms; independent stronger guard proved zero external calls in A09 replay",
+          "review_report": "docs/rust-tauri/R00/R00-T05_REVIEW_R1.md",
+          "follow_up": "R00-T08 before R00 stage acceptance"
+        },
+        {
+          "id": "R1-F02",
+          "severity": "LOW",
+          "summary": "auth fixture manifest prose lists four assertions while machine cases cover five",
+          "review_report": "docs/rust-tauri/R00/R00-T05_REVIEW_R1.md",
+          "follow_up": "R00-T08"
+        },
+        {
+          "id": "R1-F03",
+          "severity": "LOW",
+          "summary": "model stub controlled hang capability is implemented but not exercised by this replay",
+          "review_report": "docs/rust-tauri/R00/R00-T05_REVIEW_R1.md",
+          "follow_up": "R03 cancellation matrix"
+        },
+        {
+          "id": "R1-F04",
+          "severity": "INFO",
+          "summary": "tmp-path normalization regex may over-mask future mixed-content strings; current raw evidence consists of pure paths",
+          "review_report": "docs/rust-tauri/R00/R00-T05_REVIEW_R1.md",
+          "follow_up": "R00-T08"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R00-A09": "NOT_STARTED",
-        "R00-A10": "NOT_STARTED"
+        "R00-A09": "PASS",
+        "R00-A10": "PASS"
       },
       "task_commit_sha": null,
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "candidate_digest_sha256": "96c39f787e2f7230a28e6118c027302a1ed20843f003c316279cb841f990d052",
+      "candidate_file_count": 88,
+      "candidate_report_sha256": "924a8c8a3ae211665729339cf0c9ba2c98daeb12eeba25c583fe0cb694ceb460",
+      "candidate_current_head": "6f58b9351046e8dccfeb83be6976f197acb2de8d",
+      "candidate_note": "88 candidate files exclude self-referential R00-T05_REPORT.md and orchestrator ledger; independent R1 review must verify report separately. Replay driver supports --out to isolate fresh evidence.",
+      "review_report": "docs/rust-tauri/R00/R00-T05_REVIEW_R1.md",
+      "review_report_sha256": "971aed7cf8e81abc896c4bb3ffa9b904d6ef0183205ca6cf50ad7ea2ffb9f060",
+      "precommit_checks": {
+        "candidate_fingerprint": "88/88 match R1 frozen aggregate",
+        "sensitive_pattern_scan": "no PEM private-key or common credential-token pattern in 90 untracked T05 files",
+        "large_files": "no untracked T05 file exceeds 2 MiB; max 32682 bytes",
+        "scope": "all 90 untracked files within T05 docs, tests/migration, artifacts/T05, replay driver",
+        "product_code_diff": "none",
+        "git_diff_check": "source/docs PASS; full check exits 2 only for 3 generated stdout.txt files with original trailing blank line; raw evidence preserved byte-for-byte after independent PASS"
+      }
     },
     "R00-T06": {
       "name": "测量旧版本并冻结性能协议",
@@ -2725,7 +2770,7 @@
       "blockers": []
     }
   },
-  "current_task": "R00-T04",
+  "current_task": "R00-T05",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",

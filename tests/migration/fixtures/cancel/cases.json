@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "note": "取消边界。前三个用例走真实 core/tool-invocation-gateway.ts（执行边界使用记录型工具替身）；approval-abort 用例走真实 lib/confirm-store.ts + lib/tools/session-permission-wrapper.ts（权限 wrapper 的 ask 模式），与 tests/p02-cancellation-edges.test.ts A05 同链路；late-resolve 用例直接使用真实 ConfirmStore（与 p02「审批晚到」同链路）。",
+  "cases": [
+    {
+      "id": "abort-before-execution",
+      "expectation": "进入网关后执行前 signal 已 abort → EXECUTION_CANCELLED，执行器零调用"
+    },
+    {
+      "id": "abort-error-from-executor",
+      "expectation": "执行器抛 {name:'AbortError'} → 归一为 EXECUTION_CANCELLED，一次调用"
+    },
+    {
+      "id": "abort-after-completion",
+      "expectation": "执行器完成时刻经 AbortController 置 abort 后返回 → 网关完成后复查（tool-invocation-gateway.ts:490）仍按 EXECUTION_CANCELLED 收口，完成态不复活"
+    },
+    {
+      "id": "approval-wait-aborted",
+      "expectation": "ask 模式等待审批时会话中止 → 工具零执行，结果 {isError:true, details.confirmation.status:'aborted'}，store 清空"
+    },
+    {
+      "id": "late-resolve-rejected",
+      "expectation": "已 abort 的 confirmId 再 resolve 返回 false（审批晚到不能授权旧调用）"
+    }
+  ]
+}

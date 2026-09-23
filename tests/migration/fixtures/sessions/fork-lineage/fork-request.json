@@ -1,0 +1,6 @@
+{
+  "boundaryEntryId": "a2",
+  "boundaryRole": "assistant",
+  "intent": "在第一轮助手结论 a2 处分叉，保留 root→a2 路径，后续 u2/a3 不进入子会话",
+  "producer_entry": "core/session-coordinator.ts createBranchedSession 调用点（生产 fork 链路 engine.forkSessionAtNode → sourceManager.createBranchedSession(boundaryEntry.id)）"
+}

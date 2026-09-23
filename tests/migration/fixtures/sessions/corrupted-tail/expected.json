@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "fixture_id": "corrupted-tail",
+  "invariant": "会话历史读取遇到损坏尾记录时必须响亮失败或显式降级并标注；静默丢弃不可接受",
+  "rule_sources": [
+    {
+      "id": "AGENTS-REDLINE-NO-SILENT-DEGRADATION",
+      "quote": "红线：禁止静默降级（错误要么抛要么显式降级并标注）",
+      "location": "AGENTS.md「目录与约定」节（本地项目规则，随仓库工作区维护）"
+    },
+    {
+      "id": "REPAIR-RECEIPT-PRECEDENT",
+      "quote": "超长行修复落盘 .repair.json 备份并在结果中带 repaired/projected 计数",
+      "location": "core/session-jsonl-file.ts repairOversizedSessionEntriesInFile；tests/session-jsonl-file.test.ts:88-120"
+    },
+    {
+      "id": "STRICT-LAYER-PRECEDENT",
+      "quote": "严格层对同一输入抛 SessionBranchError code=session_branch_invalid_json（含行号）",
+      "location": "lib/session-jsonl.ts:37-42；tests/history-pagination-invalid-fixture.test.ts:8-10"
+    }
+  ],
+  "acceptable_outcomes": [
+    {
+      "mode": "structured_error",
+      "shape": { "name": "SessionBranchError", "code": "session_branch_invalid_json", "details_contains": ["line"] }
+    },
+    {
+      "mode": "annotated_degradation",
+      "shape": { "returns_messages": true, "required_annotation": { "droppedCorruptLines": 1, "example_reason": "session_branch_invalid_json" } }
+    }
+  ],
+  "forbidden_outcomes": [
+    {
+      "mode": "silent_success",
+      "shape": { "returns_messages": true, "droppedCorruptLines": "absent", "error": "absent" }
+    }
+  ],
+  "old_deviation_record": "old-deviation.json（旧实现真实行为快照，仅为偏差登记，不是新标准）",
+  "expected_verifier": [
+    "R00-T05（本轮）：机器验证旧实现命中 forbidden_outcome.silent_success，且与 old-deviation.json 一致",
+    "R06/R08 Rust 历史读取实现：对同一 session.jsonl 重放，必须命中 acceptable_outcomes 之一，禁止复刻静默丢弃"
+  ]
+}

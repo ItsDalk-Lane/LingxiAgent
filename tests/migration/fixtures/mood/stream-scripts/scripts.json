@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "note": "固定流片段（模型替身脚本）。chunk 序列由 scripts/migration 替身按序喂给真实 MoodParser/ThinkTagParser（实时权威入口）与 splitReservedTagSegments（历史权威入口），两侧必须等价。",
+  "scripts": [
+    {
+      "id": "leading-mood",
+      "chunks": ["<mood>专注</mood>\n", "好的，我来处理。"]
+    },
+    {
+      "id": "mid-body-multi-blocks",
+      "chunks": ["先做了一点事 ", "<mood>思考中</mood>", " 继续", "<pulse>稳定</pulse>", "最终回答"]
+    },
+    {
+      "id": "tag-split-across-chunks",
+      "chunks": ["<re", "flect>整理</re", "flect>", "答案"]
+    },
+    {
+      "id": "literal-tag-in-code",
+      "chunks": ["`<mood>` 是标签语法 ", "```\n<pulse>code block</pulse>\n```", " 尾部文本"]
+    },
+    {
+      "id": "unclosed-block-flush",
+      "chunks": ["<mood>未闭合"]
+    },
+    {
+      "id": "escaped-tag",
+      "chunks": ["\\<mood>A</mood>"]
+    }
+  ]
+}
