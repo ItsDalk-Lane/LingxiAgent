@@ -1,0 +1,25 @@
+[server-bootstrap] failed to import server entry: Error: EPERM: operation not permitted, mkdir '/tmp/lingxi-r00-t01-nfu62j16/isolated/lingxi-home'
+    at async Object.mkdir (node:internal/fs/promises:859:10)
+    at async durableWriteJson (/Users/study_superior/Desktop/Code/LingxiAgent/shared/data-epoch.cjs:227:3)
+    at async writeDataEpochStamp (/Users/study_superior/Desktop/Code/LingxiAgent/shared/data-epoch.cjs:269:3)
+    at async coordinateDataEpochStartup (file:///Users/study_superior/Desktop/Code/LingxiAgent/core/data-epoch-coordinator.ts:593:7)
+    at async startServer (file:///Users/study_superior/Desktop/Code/LingxiAgent/server/index.ts:299:25)
+    at async file:///Users/study_superior/Desktop/Code/LingxiAgent/server/main-full.ts:24:3
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+Error: EPERM: operation not permitted, mkdir '/tmp/lingxi-r00-t01-nfu62j16/isolated/lingxi-home'
+    at async Object.mkdir (node:internal/fs/promises:859:10)
+    at async durableWriteJson (/Users/study_superior/Desktop/Code/LingxiAgent/shared/data-epoch.cjs:227:3)
+    at async writeDataEpochStamp (/Users/study_superior/Desktop/Code/LingxiAgent/shared/data-epoch.cjs:269:3)
+    at async coordinateDataEpochStartup (file:///Users/study_superior/Desktop/Code/LingxiAgent/core/data-epoch-coordinator.ts:593:7)
+    at async startServer (file:///Users/study_superior/Desktop/Code/LingxiAgent/server/index.ts:299:25)
+    at async file:///Users/study_superior/Desktop/Code/LingxiAgent/server/main-full.ts:24:3 {
+  errno: -1,
+  code: 'EPERM',
+  syscall: 'mkdir',
+  path: '/tmp/lingxi-r00-t01-nfu62j16/isolated/lingxi-home'
+}
+
+Node.js v24.16.0

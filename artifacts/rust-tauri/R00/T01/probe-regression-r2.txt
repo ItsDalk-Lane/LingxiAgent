@@ -1,0 +1,8 @@
+test_changed_sentinel_is_not_cleaned (__main__.ProbeRegression.test_changed_sentinel_is_not_cleaned) ... ok
+test_equal_length_edit_with_preserved_mtime_changes_content_digest (__main__.ProbeRegression.test_equal_length_edit_with_preserved_mtime_changes_content_digest) ... ok
+test_sentinel_is_exclusive_readonly_and_only_original_is_removed (__main__.ProbeRegression.test_sentinel_is_exclusive_readonly_and_only_original_is_removed) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+OK

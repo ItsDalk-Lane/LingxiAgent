@@ -1,0 +1,15 @@
+started_utc=2026-09-23T04:23:04.225225+00:00
+test_root=/tmp/lingxi-r00-a01-tests-gtqusyat
+command=/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/.bin/vitest run tests/startup-contract.test.ts tests/hana-runtime-paths.test.ts tests/server-composition-boundary.test.ts
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+
+ Test Files  3 passed (3)
+      Tests  26 passed (26)
+   Start at  12:23:04
+   Duration  10.77s (transform 756ms, setup 68ms, import 305ms, tests 10.56s, environment 0ms)
+
+
+exit_code=0
+ended_utc=2026-09-23T04:23:15.265424+00:00

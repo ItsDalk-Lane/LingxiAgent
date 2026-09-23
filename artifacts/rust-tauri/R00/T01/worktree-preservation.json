@@ -1,0 +1,17 @@
+{
+  "candidate_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+  "checks": {
+    "head_unchanged": true,
+    "branch_unchanged": true,
+    "old_deletions_unchanged": true,
+    "old_diff_unchanged": true,
+    "new_taskbook_unchanged": true,
+    "other_tracked_diff_absent": true
+  },
+  "all_preserved": true,
+  "old_diff_sha256": "55789bbdb322dc1ea6e64af683e5820238c5083ed67f23ca5d6d1f1f5876b54b",
+  "new_taskbook_file_count": 33,
+  "new_taskbook_aggregate_sha256": "655348a5c4a34037053027dd74dc0f25b1020d74d090198c8f2754abf620345c",
+  "evidence_before": "artifacts/rust-tauri/R00/T01/worktree-before.json",
+  "evidence_after": "artifacts/rust-tauri/R00/T01/worktree-after.json"
+}

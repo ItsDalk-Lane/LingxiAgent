@@ -1,0 +1,13 @@
+{
+  "verified_utc": "2026-09-23T05:41:46.262803+00:00",
+  "command": "python3 -B artifacts/rust-tauri/R00/T01/verify_candidate_r2.py",
+  "exit_code": 0,
+  "verifier_sha256": "745c18a16c6cff74aa14f406c222400600dcd37215b8efe58e79de24101a9309",
+  "summary_sha256": "645840f9db192ae83fccaa847710c262d73e6cb22cb850a5b2a27e9822129a93",
+  "result": {
+    "ok": true,
+    "errors": [],
+    "candidate_sha256": "1806a4932675d9d04a27f6bb418d538f1043ec8b249f71d6a18af2bb92c8e145",
+    "candidate_file_count": 92
+  }
+}

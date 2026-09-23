@@ -1,0 +1,13 @@
+test_attempt_aggregation_retains_same_window_failure (__main__.ProbeRegression.test_attempt_aggregation_retains_same_window_failure) ... ok
+test_changed_sentinel_is_not_cleaned (__main__.ProbeRegression.test_changed_sentinel_is_not_cleaned) ... ok
+test_creation_failures_clean_only_owned_partial_file (__main__.ProbeRegression.test_creation_failures_clean_only_owned_partial_file) ... ok
+test_equal_length_edit_with_preserved_mtime_changes_content_digest (__main__.ProbeRegression.test_equal_length_edit_with_preserved_mtime_changes_content_digest) ... ok
+test_replaced_directory_is_not_followed (__main__.ProbeRegression.test_replaced_directory_is_not_followed) ... ok
+test_second_directory_failure_cleans_both (__main__.ProbeRegression.test_second_directory_failure_cleans_both) ... ok
+test_sentinel_is_exclusive_readonly_and_only_original_is_removed (__main__.ProbeRegression.test_sentinel_is_exclusive_readonly_and_only_original_is_removed) ... ok
+test_zero_and_short_write (__main__.ProbeRegression.test_zero_and_short_write) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.010s
+
+OK

@@ -1,0 +1,91 @@
+{
+  "started_utc": "2026-09-23T03:56:54.816290+00:00",
+  "candidate_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+  "command": [
+    "sandbox-exec",
+    "-f",
+    "/tmp/lingxi-r00-t01-nfu62j16/probe.sb",
+    "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+    "server/bootstrap.ts"
+  ],
+  "pid": 63747,
+  "process_args": "63747 63746 /Users/study_superior/.nvm/versions/node/v24.16.0/bin/node server/bootstrap.ts",
+  "test_root": "/tmp/lingxi-r00-t01-nfu62j16",
+  "isolated_home_env": "/tmp/lingxi-r00-t01-nfu62j16/isolated/lingxi-home",
+  "home_env": "/tmp/lingxi-r00-t01-nfu62j16/isolated",
+  "sandbox_profile": "/tmp/lingxi-r00-t01-nfu62j16/probe.sb",
+  "before": {
+    "production": {
+      "exists": true,
+      "inventory_sha256": "e08dd8207ffdca9cd576d44c6e6421f2d0ce29ed60182e68d5d0b4651f7372fe",
+      "files": 56630,
+      "directories": 8694,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "development": {
+      "exists": true,
+      "inventory_sha256": "627a014b4aee9f89b60cf5ca6f97e2f25c10a339e87d38941456e3b671c367d3",
+      "files": 6569,
+      "directories": 582,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "protected": {
+      "exists": true,
+      "inventory_sha256": "0516a699b2441ae4c6fd3fb1dd4cc0d8cd4a9b9e6d228d722a839b171bfaf17c",
+      "files": 1,
+      "directories": 0,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "protected_sentinel_sha256": "58542f896165ebb6e44533820e7b9ca29c3ce8f2b5a209699f0cb2405267cc8d",
+    "real_production_sentinel_sha256": "88ebeb5c45e3578982b275047a7f7a287dbdc88c6cdea8fb8e4cb262f463d8b4"
+  },
+  "startup": {
+    "error": "server exited before ready: 1"
+  },
+  "exit_code": 1,
+  "server_info_removed": true,
+  "after": {
+    "production": {
+      "exists": true,
+      "inventory_sha256": "e08dd8207ffdca9cd576d44c6e6421f2d0ce29ed60182e68d5d0b4651f7372fe",
+      "files": 56630,
+      "directories": 8694,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "development": {
+      "exists": true,
+      "inventory_sha256": "627a014b4aee9f89b60cf5ca6f97e2f25c10a339e87d38941456e3b671c367d3",
+      "files": 6569,
+      "directories": 582,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "protected": {
+      "exists": true,
+      "inventory_sha256": "0516a699b2441ae4c6fd3fb1dd4cc0d8cd4a9b9e6d228d722a839b171bfaf17c",
+      "files": 1,
+      "directories": 0,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "protected_sentinel_sha256": "58542f896165ebb6e44533820e7b9ca29c3ce8f2b5a209699f0cb2405267cc8d",
+    "real_production_sentinel_sha256": "88ebeb5c45e3578982b275047a7f7a287dbdc88c6cdea8fb8e4cb262f463d8b4",
+    "isolated": {
+      "exists": true,
+      "inventory_sha256": "7a803d018cbf1eb4fc18b7bfe29671827116922bf8f751db5c10726ef7e02a73",
+      "files": 0,
+      "directories": 1,
+      "symlinks": 0,
+      "errors": 0
+    }
+  },
+  "controlled_production_unchanged": true,
+  "real_production_inventory_unchanged": true,
+  "real_development_inventory_unchanged": true,
+  "real_production_sentinel_unchanged": true,
+  "ended_utc": "2026-09-23T03:56:57.859696+00:00"
+}

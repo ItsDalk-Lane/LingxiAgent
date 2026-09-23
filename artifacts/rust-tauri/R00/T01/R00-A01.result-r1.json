@@ -1,0 +1,82 @@
+{
+  "spec_version": "1.0",
+  "stage_id": "R00",
+  "task_id": "R00-T01",
+  "tested_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+  "working_tree_digest": "8866ff76394cfc372da6d783b047dfb3d587967e1ce71e8a25310386f339a8cd",
+  "platform": "macOS 27.0 arm64",
+  "toolchain": {
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "python": "3.14.3",
+    "vitest": "4.1.10"
+  },
+  "dependency_lock_hashes": {
+    "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b"
+  },
+  "review": null,
+  "blocked_reason": null,
+  "latest_unblock_stage": null,
+  "acceptance_id": "R00-A01",
+  "status": "PASS",
+  "timestamp_utc": "2026-09-23T04:03:00.412084+00:00",
+  "command": "python3 artifacts/rust-tauri/R00/T01/startup_probe.py; sandbox-exec -f <recorded profile> node -e <denied-write assertion>",
+  "exit_code": 0,
+  "expected": "真实 full composition 在隔离 HOME/LINGXI_HOME 启动及关闭；真实目录前后摘要、受控只读哨兵不变；数据/日志位于隔离目录；拒写真实 HOME",
+  "observed": {
+    "health": {
+      "http_status": 200,
+      "body_status": "ok",
+      "version": "0.1.43"
+    },
+    "server_exit_code": 0,
+    "server_info_removed": true,
+    "controlled_production_unchanged": true,
+    "real_production_inventory_unchanged": true,
+    "real_development_inventory_unchanged": true,
+    "real_production_sentinel_unchanged": true,
+    "sandbox_denial": "EPERM",
+    "isolated_home": "/tmp/lingxi-r00-t01-bdmbvepw/isolated/lingxi-home",
+    "known_limit": "真实生产应用并发运行；真实目录为元数据摘要，受控哨兵为完整文件哈希",
+    "acceptance_checks": {
+      "health_ok": true,
+      "closed_cleanly": true,
+      "actual_home_logged": true,
+      "isolated_data_and_logs_present": true,
+      "protected_production_unchanged": true,
+      "real_production_inventory_unchanged": true,
+      "real_development_inventory_unchanged": true,
+      "real_production_sentinel_unchanged": true
+    }
+  },
+  "mock_boundary": [
+    "未调用外部模型或账户；本机健康检查和真实服务无 mock"
+  ],
+  "evidence": [
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe.json",
+      "sha256": "cf9c520347e334ab97faae86bfe6bf39129e44068ac03d54be286b7aaf42ca43"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/sandbox-denial.txt",
+      "sha256": "223036dad0eae25fa9f0f26be0972ca38fddeba3038a316621cc779689cb9d28"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/isolated-tree-summary.json",
+      "sha256": "519e16742fc063fe85c22a1f527e8a2fa7ebf5a86bc872d812f06a358abe191a"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stdout.txt",
+      "sha256": "7208902186c14f80e7bf7aefe1b8a0702d4c8b6982d3629f6ed24751f561a77f"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stderr.txt",
+      "sha256": "5645f45065b29d055efa286f5ec96b1bd1858b3fbd1687687f7febd6b826f72e"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup_probe.py",
+      "sha256": "a765df7b2f3b518c742d974d3e4e05ae12dfd68a6ea2e8282591d3ec9409a534"
+    }
+  ],
+  "working_tree_digest_scope": "HEAD + preexisting tracked deletion diff + original untracked taskbook file hashes + package-lock; generated R00 evidence excluded to avoid self-reference"
+}

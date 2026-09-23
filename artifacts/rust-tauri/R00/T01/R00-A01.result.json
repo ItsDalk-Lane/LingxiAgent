@@ -1,0 +1,489 @@
+{
+  "spec_version": "1.0",
+  "stage_id": "R00",
+  "task_id": "R00-T01",
+  "tested_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+  "working_tree_digest": "8866ff76394cfc372da6d783b047dfb3d587967e1ce71e8a25310386f339a8cd",
+  "platform": "macOS 27.0 arm64",
+  "toolchain": {
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "python": "3.14.3",
+    "vitest": "4.1.10"
+  },
+  "dependency_lock_hashes": {
+    "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b"
+  },
+  "review": null,
+  "working_tree_digest_scope": "HEAD + preexisting tracked deletion diff + original untracked taskbook file hashes + package-lock; generated R00 evidence excluded to avoid self-reference",
+  "acceptance_id": "R00-A01",
+  "status": "PASS",
+  "timestamp_utc": "2026-09-23T05:36:29.484622+00:00",
+  "command": "python3 -B artifacts/rust-tauri/R00/T01/startup_probe_r2.py",
+  "exit_code": 0,
+  "execution_exit_codes": [
+    1,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "expected": "真实 ~/.lingxi 与 ~/.lingxi-dev 内只读哨兵及完整目录摘要在隔离真实服务启动/关闭前后均不变；数据日志只在测试目录；OS 拒写；应处于无其他写者的可归因窗口",
+  "observed": {
+    "real_directories": {
+      "production": {
+        "before_full": "8f9fc83ab1c92cc1ce97a42f6f9cc5c31aaeaa3391c31ea122a16056b14d9bf2",
+        "after_full": "8f9fc83ab1c92cc1ce97a42f6f9cc5c31aaeaa3391c31ea122a16056b14d9bf2",
+        "before_content": "f761e1f3e0aab37e31671214bfdd0412d0e58f7130cf13944ab2787964679437",
+        "after_content": "f761e1f3e0aab37e31671214bfdd0412d0e58f7130cf13944ab2787964679437",
+        "cleanup": {
+          "removed": true,
+          "quarantine_path": "/Users/study_superior/.lingxi/.r00-a01-quarantine-b6923c5a7fe60ea93e509e64f6c19e86",
+          "reason": null,
+          "absent_after": true,
+          "removed_utc": "2026-09-23T05:34:58.490341+00:00",
+          "quarantine_removed": true
+        }
+      },
+      "development": {
+        "before_full": "3952e40e789a5f858802dbfd370a6ac6b2e9d68fbb016b941cacf8fef520c9f8",
+        "after_full": "3952e40e789a5f858802dbfd370a6ac6b2e9d68fbb016b941cacf8fef520c9f8",
+        "before_content": "005048b92379978aaff09e94d7222d707d23e9716492a3427ea80738e67be9e0",
+        "after_content": "005048b92379978aaff09e94d7222d707d23e9716492a3427ea80738e67be9e0",
+        "cleanup": {
+          "removed": true,
+          "quarantine_path": "/Users/study_superior/.lingxi-dev/.r00-a01-quarantine-80ae239a22e1911676d0efe0a2d28225",
+          "reason": null,
+          "absent_after": true,
+          "removed_utc": "2026-09-23T05:34:58.490623+00:00",
+          "quarantine_removed": true
+        }
+      }
+    },
+    "quiet_before": {
+      "related_process_pids": [],
+      "open_handle_pids": [],
+      "quiet": true,
+      "checked_utc": "2026-09-23T05:34:33.421627+00:00"
+    },
+    "quiet_after": {
+      "related_process_pids": [],
+      "open_handle_pids": [],
+      "quiet": true,
+      "checked_utc": "2026-09-23T05:34:59.575851+00:00"
+    },
+    "health": {
+      "http_status": 200,
+      "body_status": "ok"
+    },
+    "server_exit_code": 0,
+    "checks": {
+      "production_full_content_unchanged": true,
+      "production_sentinel_unchanged": true,
+      "production_denied_by_os": true,
+      "production_cleanup": true,
+      "development_full_content_unchanged": true,
+      "development_sentinel_unchanged": true,
+      "development_denied_by_os": true,
+      "development_cleanup": true,
+      "service_health": true,
+      "service_closed": true,
+      "isolated_home_effective": true,
+      "isolated_data_and_logs": true,
+      "quiet_window": true,
+      "real_app_absent": true
+    }
+  },
+  "blocked_reason": null,
+  "unblock_condition": null,
+  "latest_unblock_stage": "R00",
+  "mock_boundary": [
+    "No external model/account; actual full composition service, local HTTP health and macOS OS sandbox were used."
+  ],
+  "evidence": [
+    {
+      "path": "artifacts/rust-tauri/R00/T01/R00-A01.result-r1.json",
+      "sha256": "3f5c3003486e4f660a700306fae2b6727ee341b9540b4f1cf77ac5f52804c5a7"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/finalize_results_r3.py",
+      "sha256": "1254785d9559e4a81753424fcdcedd495366a99c6addb40fb940bf808fecdd1b"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/probe-regression-r2.txt",
+      "sha256": "d84c18235c7350c40f157ba64db80b7b0e475c3da8dac0845c020c58cf40ff9f"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/probe-regression-r3-final.txt",
+      "sha256": "c2a9240f18d47e9dbb40f246094fbb9d03d3ae61a8d34ccc09a4598ac239b016"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/probe-regression-r4-c7c5019be0a2d94ac4e7d95d.txt",
+      "sha256": "f0e3f1db5a9916aeda8ac251d76f6be90ea863c1fb7fe145116ee0305cc68ca6"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/probe-regression-r4-f5bbd803bf18758f73a76379.txt",
+      "sha256": "0fb7934b5effb21e743dfd12cf5a589adb13a5a034c768ff7ed46bf18535032e"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/probe-regression-r4-final.txt",
+      "sha256": "42e07e15aeec0a7a87c06c4bc8a67e6b0736363a76e7ce25e094c090ce0b4053"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stderr-attempt1.txt",
+      "sha256": "5645f45065b29d055efa286f5ec96b1bd1858b3fbd1687687f7febd6b826f72e"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stderr-attempt2-deny-all.txt",
+      "sha256": "bb8026e25090d01dd59a1745d93186945236a4f561d050ea1b5aefda55bf4030"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stderr-attempt3.txt",
+      "sha256": "5645f45065b29d055efa286f5ec96b1bd1858b3fbd1687687f7febd6b826f72e"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stderr-r2-attempt1.txt",
+      "sha256": "5645f45065b29d055efa286f5ec96b1bd1858b3fbd1687687f7febd6b826f72e"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stderr-r2.txt",
+      "sha256": "5645f45065b29d055efa286f5ec96b1bd1858b3fbd1687687f7febd6b826f72e"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stderr-r3-5cc673966167ef10c4b0332f.txt",
+      "sha256": "5645f45065b29d055efa286f5ec96b1bd1858b3fbd1687687f7febd6b826f72e"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stderr-r3-81810c93302dd6e4dbd26aef.txt",
+      "sha256": "5645f45065b29d055efa286f5ec96b1bd1858b3fbd1687687f7febd6b826f72e"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stderr-r3-b0e1de4a10026986fc615e34.txt",
+      "sha256": "5645f45065b29d055efa286f5ec96b1bd1858b3fbd1687687f7febd6b826f72e"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stderr-r3-c7c5019be0a2d94ac4e7d95d.txt",
+      "sha256": "5645f45065b29d055efa286f5ec96b1bd1858b3fbd1687687f7febd6b826f72e"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stderr-r3-e0d8c213225442074a0373b0.txt",
+      "sha256": "5645f45065b29d055efa286f5ec96b1bd1858b3fbd1687687f7febd6b826f72e"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stderr-r3-f5bbd803bf18758f73a76379.txt",
+      "sha256": "5645f45065b29d055efa286f5ec96b1bd1858b3fbd1687687f7febd6b826f72e"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stdout-attempt1.txt",
+      "sha256": "40ea4ec7bd67a29dc1ffca7f8d6be7e7b1bf64702b0304e6a02022954b7e3b99"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stdout-attempt2-deny-all.txt",
+      "sha256": "71a670e826fde607e2b4c1b150b8207a0f13244c4d860ebbd6dcfb41f7389c37"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stdout-attempt3.txt",
+      "sha256": "3f3eb5c305541a1488459e89343d4668dea81bdfd7a074303552ed0a56c8f8e7"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stdout-r2-attempt1.txt",
+      "sha256": "bd955b67bf6d2271c7439510a30365e1f0c0b3c31f9b3f368a69687b5f615c4f"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stdout-r2.txt",
+      "sha256": "05d87dfede4eb207143c0b1e13910da89e048b231d26aaa81715dac044ee8190"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stdout-r3-5cc673966167ef10c4b0332f.txt",
+      "sha256": "6177f3b2afcf639b6f7596dacc2ef5848d04b349732ed11b54845bb68f0b42c8"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stdout-r3-81810c93302dd6e4dbd26aef.txt",
+      "sha256": "600109b372a6cf56d9b643936953c0cc7e405c0ef8c0cd98bc4a550502234ac3"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stdout-r3-b0e1de4a10026986fc615e34.txt",
+      "sha256": "8cea3a82b4b18d458432e5dd8bf9402cbc0981db488df6edf788d5403a770d32"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stdout-r3-c7c5019be0a2d94ac4e7d95d.txt",
+      "sha256": "c1acd04bd084f83b60e32ac96a401e1f7a962bf9132f1e2daf809860ca78d5c8"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stdout-r3-e0d8c213225442074a0373b0.txt",
+      "sha256": "0c43ab86e914bf8aa33ab07bd17fc5c5b3079bcd403168ecbd102fa5e167a177"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/server-stdout-r3-f5bbd803bf18758f73a76379.txt",
+      "sha256": "19c49329950c83f42165e516309017bb9e20946539aaebec653e5e97ad287478"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-attempt1.json",
+      "sha256": "4f9d1b559b01dbcf322156f2e6f6a7cc88297f6c71123ee43a2655aa1f9b60f9"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-attempt2-deny-all.json",
+      "sha256": "e4da438155bf408f3af0de1c41b822ae0ce27baf233b6d07db4a007323d2b76e"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-attempt3.json",
+      "sha256": "0a7938b05465a9b94ae04f5b46a75ece0921990611a7a26d0822628b3b8483e4"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-r2-attempt1.json",
+      "sha256": "b28f4ee8adb470eff3387de715d03e775dec2935235e59c116248a0e58fb7a78"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-r2.json",
+      "sha256": "203dd78a88bf074d7d213d2fef714876a9231c67268444242414eaf7c71fe0d6"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-r3-5cc673966167ef10c4b0332f.json",
+      "sha256": "88655194cb501b82bff7cfda6d289fce153da43093ab5da35eee7f98501896d0"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-r3-81810c93302dd6e4dbd26aef.json",
+      "sha256": "dfc6faa06a630a4e40358f3183329448fe579db00954481535984fb71b5c901b"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-r3-b0e1de4a10026986fc615e34.json",
+      "sha256": "29587fabda9880726f7d689d48fda89db3e1cd3f060fa0886c0b368cb50f24ee"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-r3-c7c5019be0a2d94ac4e7d95d.json",
+      "sha256": "3e2a10de241b992b112cacf0986288d27a85ad1983b2754c8ba51ed1375a3ab3"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-r3-e0d8c213225442074a0373b0.json",
+      "sha256": "2d4e5664d02452601a09f259b45b07d8162a094b6268d50065a3c22dc59dfea5"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-r3-f5bbd803bf18758f73a76379.json",
+      "sha256": "c562f17e5d708f878d163babb121d8108a38d756d85ab3aaafe00a77dd0c51b8"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup_probe_r2.py",
+      "sha256": "4079f323b787912e67fb3baca0c59426a1d3ef2dd3ec1c672823e04255da303a"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/targeted-tests-r2.txt",
+      "sha256": "7ab94576957a2419a0e9278f74dbd00e9fc79613998779839ca4d9dac04ea0d8"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/targeted-tests-r3.txt",
+      "sha256": "698f9e21507da5ef9d6e8539976ca06e869e918d4860abbb9c8d90562c92705a"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/targeted-tests-r4-c7c5019be0a2d94ac4e7d95d.txt",
+      "sha256": "aeb6402aa9a9b33e58b6ef534ac0245b75fb7f0f2fb8eec8c5fded8bc267f1e2"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/targeted-tests-r4-f5bbd803bf18758f73a76379.txt",
+      "sha256": "8e2b817bcdc1a028551eff8cda968bb8dc0da62d62399fe7ec6032f76613f6c8"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/test_startup_probe_r2.py",
+      "sha256": "26430ecad29d1123d814ea63387bd69d3abe4d83d7243bd9ecba61cb72edc8a3"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/test_startup_probe_r4.py",
+      "sha256": "c5990e7da42ba306b8a818019a964fbed589f9ea11ad24b7c59f91b649326977"
+    },
+    {
+      "path": "docs/rust-tauri/R00/R00-T01_REVIEW_R1.md",
+      "sha256": "e08ccc64ed8c791514a10bded3d351cb7dd60990e47825a8ad25c49cd575fccc"
+    },
+    {
+      "path": "docs/rust-tauri/R00/R00-T01_REVIEW_R2.md",
+      "sha256": "3ffce34f9cd95b69f889a4c563469c788cced97ae4b89cdb8a6816f794a69d66"
+    },
+    {
+      "path": "docs/rust-tauri/R00/R00-T01_REVIEW_R3.md",
+      "sha256": "01ce19a79c09d24afd9e0f7c99a01155859202bb7126ca0eeb432e16b46dd355"
+    }
+  ],
+  "historical_observed": {
+    "first_attempt_status": "BLOCKED",
+    "first_attempt_checks": {
+      "production_full_content_unchanged": false,
+      "production_sentinel_unchanged": true,
+      "production_denied_by_os": true,
+      "production_cleanup": true,
+      "development_full_content_unchanged": true,
+      "development_sentinel_unchanged": true,
+      "development_denied_by_os": true,
+      "development_cleanup": true,
+      "service_health": true,
+      "service_closed": true,
+      "isolated_home_effective": true,
+      "isolated_data_and_logs": true,
+      "real_app_preserved": true
+    },
+    "first_production_before": "5d573013af4f455d30e1bd1d023496855274935544fe1afb890404af545656f8",
+    "first_production_after": "d12088452f325e252d1eff4f70748e05b822238196b925c5a0a84827633eb683",
+    "first_production_content_equal": true,
+    "last_attempt_status": "PASS",
+    "last_attempt_checks": {
+      "production_full_content_unchanged": true,
+      "production_sentinel_unchanged": true,
+      "production_denied_by_os": true,
+      "production_cleanup": true,
+      "development_full_content_unchanged": true,
+      "development_sentinel_unchanged": true,
+      "development_denied_by_os": true,
+      "development_cleanup": true,
+      "service_health": true,
+      "service_closed": true,
+      "isolated_home_effective": true,
+      "isolated_data_and_logs": true,
+      "real_app_preserved": true
+    },
+    "last_health": {
+      "http_status": 200,
+      "body_status": "ok"
+    },
+    "last_server_exit_code": 0,
+    "lingxi_app_pids_before": [
+      29489
+    ],
+    "lingxi_app_pids_after": [
+      29489
+    ],
+    "sentinel_cleanup_first": {
+      "production": {
+        "removed": true,
+        "absent_after": true,
+        "removed_utc": "2026-09-23T04:16:11.323299+00:00"
+      },
+      "development": {
+        "removed": true,
+        "absent_after": true,
+        "removed_utc": "2026-09-23T04:16:11.323396+00:00"
+      }
+    },
+    "sentinel_cleanup_last": {
+      "production": {
+        "removed": true,
+        "absent_after": true,
+        "removed_utc": "2026-09-23T04:22:25.520928+00:00"
+      },
+      "development": {
+        "removed": true,
+        "absent_after": true,
+        "removed_utc": "2026-09-23T04:22:25.520999+00:00"
+      }
+    }
+  },
+  "historical_blocked_reason": "While real Lingxi.app remained active, the first complete ~/.lingxi tree digest changed between scans. A later stable single run cannot establish a writer-free quiet window or erase the observed concurrent variation.",
+  "attempts": [
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-r2-attempt1.json",
+      "environment_epoch": "legacy-app-running",
+      "status": "BLOCKED",
+      "exit_code": 1,
+      "reason": "real directory metadata changed while app was running"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-r2.json",
+      "environment_epoch": "legacy-app-running",
+      "status": "OBSERVED_STABLE",
+      "exit_code": 0,
+      "reason": "one stable observation with app still running"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-r3-b0e1de4a10026986fc615e34.json",
+      "environment_epoch": "post-exit-probe-before-schema-fix",
+      "status": "BLOCKED",
+      "exit_code": 1,
+      "reason": "probe expected an absent server-info field; real directory checks were stable"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-r3-81810c93302dd6e4dbd26aef.json",
+      "environment_epoch": "post-exit-corrected-probe",
+      "status": "OBSERVED_STABLE",
+      "exit_code": 0,
+      "quiet_window": true,
+      "cleanup_safe": true,
+      "all_checks": true,
+      "reason": "corrected probe; final script hash was added afterward"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-r3-e0d8c213225442074a0373b0.json",
+      "environment_epoch": "post-exit-final-probe",
+      "status": "OBSERVED_STABLE",
+      "exit_code": 0,
+      "quiet_window": true,
+      "cleanup_safe": true,
+      "all_checks": true,
+      "reason": "probe with version hash before final file-race correction"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-r3-5cc673966167ef10c4b0332f.json",
+      "environment_epoch": "post-exit-file-race-corrected",
+      "status": "OBSERVED_STABLE",
+      "exit_code": 0,
+      "quiet_window": true,
+      "cleanup_safe": true,
+      "all_checks": true,
+      "reason": "final file-race-corrected probe in confirmed quiet window"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-r3-f5bbd803bf18758f73a76379.json",
+      "environment_epoch": "post-r3-atomic-exclusive-rename-r4-before-capability-close-fix",
+      "status": "OBSERVED_STABLE",
+      "exit_code": 0,
+      "quiet_window": true,
+      "cleanup_safe": true,
+      "all_checks": true,
+      "reason": "stable R4 observation; probe code then changed to cover capability close failure"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-r3-c7c5019be0a2d94ac4e7d95d.json",
+      "environment_epoch": "post-r3-atomic-exclusive-rename-r4-final",
+      "status": "OBSERVED_STABLE",
+      "exit_code": 0,
+      "quiet_window": true,
+      "cleanup_safe": true,
+      "all_checks": true,
+      "reason": "R4 atomic quarantine cleanup and live A01 quiet-window observation"
+    }
+  ],
+  "current_attempt": {
+    "path": "artifacts/rust-tauri/R00/T01/startup-probe-r3-c7c5019be0a2d94ac4e7d95d.json",
+    "quiet_window": true,
+    "all_checks": true,
+    "cleanup_safe": true,
+    "probe_status": "OBSERVED_STABLE",
+    "exit_code": 0,
+    "probe_sha256": "4079f323b787912e67fb3baca0c59426a1d3ef2dd3ec1c672823e04255da303a"
+  },
+  "review_findings_history": [
+    "docs/rust-tauri/R00/R00-T01_REVIEW_R1.md",
+    "docs/rust-tauri/R00/R00-T01_REVIEW_R2.md",
+    "docs/rust-tauri/R00/R00-T01_REVIEW_R3.md"
+  ],
+  "limitations": [
+    "本机安静窗口验收不覆盖同 UID 主动进入 0700 隔离目录并在最终核对与删除之间换名；/tmp 反例见 probe-regression-r4-final.txt。",
+    "目录摘要不是原子快照；本次通过前后无相关进程/句柄与摘要稳定建立可归因窗口。"
+  ],
+  "historical_r1_attempts": [
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-attempt1.json",
+      "exit_code": 0,
+      "adjudication": "R1 review FAIL: actual real-directory sentinel/content prerequisite absent"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-attempt2-deny-all.json",
+      "exit_code": 1,
+      "adjudication": "R1 review FAIL: actual real-directory sentinel/content prerequisite absent"
+    },
+    {
+      "path": "artifacts/rust-tauri/R00/T01/startup-probe-attempt3.json",
+      "exit_code": 0,
+      "adjudication": "R1 review FAIL: actual real-directory sentinel/content prerequisite absent"
+    }
+  ]
+}

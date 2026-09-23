@@ -1,0 +1,9 @@
+[agent] 记忆系统暂不可用：memory slot 未配置且无 chat 可 fallback
+[memory-ticker] week.md 迁移失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] compileDaily 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] compileToday(daily) 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] compileFacts 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] deep-memory 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] 每日任务部分失败，已完成: []，1 小时后重试未完成步骤
+[memory-ticker] compileToday 失败: memory slot resolved to null (no model configured and no chat fallback)
+[engine] ⚠ 未找到可用模型，请在设置中配置 API key

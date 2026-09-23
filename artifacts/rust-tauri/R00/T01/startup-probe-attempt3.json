@@ -1,0 +1,109 @@
+{
+  "started_utc": "2026-09-23T03:57:28.673197+00:00",
+  "candidate_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+  "command": [
+    "sandbox-exec",
+    "-f",
+    "/tmp/lingxi-r00-t01-arr8n39h/probe.sb",
+    "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+    "server/bootstrap.ts"
+  ],
+  "pid": 63820,
+  "process_args": "63820 63818 /Users/study_superior/.nvm/versions/node/v24.16.0/bin/node server/bootstrap.ts",
+  "test_root": "/tmp/lingxi-r00-t01-arr8n39h",
+  "isolated_home_env": "/tmp/lingxi-r00-t01-arr8n39h/isolated/lingxi-home",
+  "home_env": "/tmp/lingxi-r00-t01-arr8n39h/isolated",
+  "sandbox_profile": "/tmp/lingxi-r00-t01-arr8n39h/probe.sb",
+  "before": {
+    "production": {
+      "exists": true,
+      "inventory_sha256": "0b71ba1d5fad62b4aa25ea718fe6b58ef13ca6be6b8c032745efa9504088346a",
+      "files": 56630,
+      "directories": 8694,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "development": {
+      "exists": true,
+      "inventory_sha256": "627a014b4aee9f89b60cf5ca6f97e2f25c10a339e87d38941456e3b671c367d3",
+      "files": 6569,
+      "directories": 582,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "protected": {
+      "exists": true,
+      "inventory_sha256": "704402a06ddeb5e4fca20cf49843fd9deaa73a1410ea52132497e250d637e066",
+      "files": 1,
+      "directories": 0,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "protected_sentinel_sha256": "58542f896165ebb6e44533820e7b9ca29c3ce8f2b5a209699f0cb2405267cc8d",
+    "real_production_sentinel_sha256": "88ebeb5c45e3578982b275047a7f7a287dbdc88c6cdea8fb8e4cb262f463d8b4"
+  },
+  "startup": {
+    "server_info_path": "/tmp/lingxi-r00-t01-arr8n39h/isolated/lingxi-home/server-info.json",
+    "server_info_pid": 63820,
+    "server_info_port": 50145,
+    "server_info_token_present": true,
+    "server_info_home": null,
+    "server_process_args": "63820 63818 /Users/study_superior/.nvm/versions/node/v24.16.0/bin/node server/bootstrap.ts",
+    "health": {
+      "http_status": 200,
+      "body_status": "ok",
+      "version": "0.1.43"
+    },
+    "isolated_inventory_during": {
+      "exists": true,
+      "inventory_sha256": "cd95963d7c934ea99429ace98dc7ddc229805030453f16de888b3596aa659203",
+      "files": 71,
+      "directories": 46,
+      "symlinks": 0,
+      "errors": 0
+    }
+  },
+  "exit_code": 0,
+  "server_info_removed": true,
+  "after": {
+    "production": {
+      "exists": true,
+      "inventory_sha256": "0b71ba1d5fad62b4aa25ea718fe6b58ef13ca6be6b8c032745efa9504088346a",
+      "files": 56630,
+      "directories": 8694,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "development": {
+      "exists": true,
+      "inventory_sha256": "627a014b4aee9f89b60cf5ca6f97e2f25c10a339e87d38941456e3b671c367d3",
+      "files": 6569,
+      "directories": 582,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "protected": {
+      "exists": true,
+      "inventory_sha256": "704402a06ddeb5e4fca20cf49843fd9deaa73a1410ea52132497e250d637e066",
+      "files": 1,
+      "directories": 0,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "protected_sentinel_sha256": "58542f896165ebb6e44533820e7b9ca29c3ce8f2b5a209699f0cb2405267cc8d",
+    "real_production_sentinel_sha256": "88ebeb5c45e3578982b275047a7f7a287dbdc88c6cdea8fb8e4cb262f463d8b4",
+    "isolated": {
+      "exists": true,
+      "inventory_sha256": "e086468e5dd9dc9bf86f310ee6b18a3bbc0494e7ccaf291f28170ff93849c7e8",
+      "files": 56,
+      "directories": 46,
+      "symlinks": 0,
+      "errors": 0
+    }
+  },
+  "controlled_production_unchanged": true,
+  "real_production_inventory_unchanged": true,
+  "real_development_inventory_unchanged": true,
+  "real_production_sentinel_unchanged": true,
+  "ended_utc": "2026-09-23T03:57:32.017717+00:00"
+}

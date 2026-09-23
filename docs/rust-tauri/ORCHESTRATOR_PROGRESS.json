@@ -1,0 +1,2458 @@
+{
+  "schema_version": 1,
+  "objective": "Lingxi Rust + Tauri R00–R11逐Task独立执行与验收",
+  "start_branch": "main",
+  "implementation_branch": "codex/rust-tauri-migration",
+  "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+  "current_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+  "remote": "origin",
+  "remote_default_branch": "main",
+  "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
+  "initial_worktree": [
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/00_README_总入口.md"
+    },
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/01_通用执行约束.md"
+    },
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/90_源码依据与参考资料.md"
+    },
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/91_执行提示词.md"
+    },
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/92_交付与验收模板.md"
+    },
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/93_任务书质量检查报告.md"
+    },
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/MANIFEST.sha256"
+    },
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/P00_基线、范围与验收地图.md"
+    },
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/P01_模块边界、Pi适配与严格类型入口.md"
+    },
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/P02_运行身份、生命周期、取消与恢复.md"
+    },
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/P03_工具目录、参数契约与统一执行边界.md"
+    },
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/P04_模型、凭证、流式请求与用量观测.md"
+    },
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/P05_消息语义、历史恢复、资源与数据兼容.md"
+    },
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/P06_上下文、提示词、记忆与能力集成.md"
+    },
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/P07_可测量的启动、运行与界面性能优化.md"
+    },
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/P08_旧路径退出、全产品回归与发布准备.md"
+    },
+    {
+      "status": " D",
+      "path": "Lingxi_Refactor_Taskbooks_2026-09-21/acceptance-catalog.json"
+    },
+    {
+      "status": "??",
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/"
+    }
+  ],
+  "initial_worktree_note": "均为启动前已有改动；不得覆盖、删除或混入Task提交。",
+  "stages": {
+    "R00": {
+      "title": "基线、功能保护与验收地图",
+      "status": "IN_PROGRESS",
+      "task_ids": [
+        "R00-T01",
+        "R00-T02",
+        "R00-T03",
+        "R00-T04",
+        "R00-T05",
+        "R00-T06",
+        "R00-T07",
+        "R00-T08"
+      ],
+      "stage_base_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+      "stage_review_round": 0,
+      "stage_verdict": null,
+      "stage_acceptance_commit_sha": null,
+      "blockers": []
+    },
+    "R01": {
+      "title": "目标契约与高风险替代验证",
+      "status": "PENDING",
+      "task_ids": [
+        "R01-T01",
+        "R01-T02",
+        "R01-T03",
+        "R01-T04",
+        "R01-T05",
+        "R01-T06",
+        "R01-T07",
+        "R01-T08"
+      ],
+      "stage_base_sha": null,
+      "stage_review_round": 0,
+      "stage_verdict": null,
+      "stage_acceptance_commit_sha": null,
+      "blockers": []
+    },
+    "R02": {
+      "title": "Rust独立服务、存储与事件基础",
+      "status": "PENDING",
+      "task_ids": [
+        "R02-T01",
+        "R02-T02",
+        "R02-T03",
+        "R02-T04",
+        "R02-T05",
+        "R02-T06",
+        "R02-T07",
+        "R02-T08"
+      ],
+      "stage_base_sha": null,
+      "stage_review_round": 0,
+      "stage_verdict": null,
+      "stage_acceptance_commit_sha": null,
+      "blockers": []
+    },
+    "R03": {
+      "title": "运行状态机、并发、取消与恢复",
+      "status": "PENDING",
+      "task_ids": [
+        "R03-T01",
+        "R03-T02",
+        "R03-T03",
+        "R03-T04",
+        "R03-T05",
+        "R03-T06",
+        "R03-T07",
+        "R03-T08"
+      ],
+      "stage_base_sha": null,
+      "stage_review_round": 0,
+      "stage_verdict": null,
+      "stage_acceptance_commit_sha": null,
+      "blockers": []
+    },
+    "R04": {
+      "title": "统一工具网关、四基础工具与沙盒",
+      "status": "PENDING",
+      "task_ids": [
+        "R04-T01",
+        "R04-T02",
+        "R04-T03",
+        "R04-T04",
+        "R04-T05",
+        "R04-T06",
+        "R04-T07",
+        "R04-T08"
+      ],
+      "stage_base_sha": null,
+      "stage_review_round": 0,
+      "stage_verdict": null,
+      "stage_acceptance_commit_sha": null,
+      "blockers": []
+    },
+    "R05": {
+      "title": "模型协议、凭证、流式处理与最小完整闭环",
+      "status": "PENDING",
+      "task_ids": [
+        "R05-T01",
+        "R05-T02",
+        "R05-T03",
+        "R05-T04",
+        "R05-T05",
+        "R05-T06",
+        "R05-T07",
+        "R05-T08"
+      ],
+      "stage_base_sha": null,
+      "stage_review_round": 0,
+      "stage_verdict": null,
+      "stage_acceptance_commit_sha": null,
+      "blockers": []
+    },
+    "R06": {
+      "title": "上下文、会话语义、记忆与知识库",
+      "status": "PENDING",
+      "task_ids": [
+        "R06-T01",
+        "R06-T02",
+        "R06-T03",
+        "R06-T04",
+        "R06-T05",
+        "R06-T06",
+        "R06-T07",
+        "R06-T08"
+      ],
+      "stage_base_sha": null,
+      "stage_review_round": 0,
+      "stage_verdict": null,
+      "stage_acceptance_commit_sha": null,
+      "blockers": []
+    },
+    "R07": {
+      "title": "外围能力、后台自动化与多入口接入",
+      "status": "PENDING",
+      "task_ids": [
+        "R07-T01",
+        "R07-T02",
+        "R07-T03",
+        "R07-T04",
+        "R07-T05",
+        "R07-T06",
+        "R07-T07",
+        "R07-T08",
+        "R07-T09",
+        "R07-T10",
+        "R07-T11",
+        "R07-T12"
+      ],
+      "stage_base_sha": null,
+      "stage_review_round": 0,
+      "stage_verdict": null,
+      "stage_acceptance_commit_sha": null,
+      "blockers": []
+    },
+    "R08": {
+      "title": "旧Electron客户端接入与数据迁移演练",
+      "status": "PENDING",
+      "task_ids": [
+        "R08-T01",
+        "R08-T02",
+        "R08-T03",
+        "R08-T04",
+        "R08-T05",
+        "R08-T06",
+        "R08-T07",
+        "R08-T08"
+      ],
+      "stage_base_sha": null,
+      "stage_review_round": 0,
+      "stage_verdict": null,
+      "stage_acceptance_commit_sha": null,
+      "blockers": []
+    },
+    "R09": {
+      "title": "Tauri桌面宿主、原生能力与跨平台集成",
+      "status": "PENDING",
+      "task_ids": [
+        "R09-T01",
+        "R09-T02",
+        "R09-T03",
+        "R09-T04",
+        "R09-T05",
+        "R09-T06",
+        "R09-T07",
+        "R09-T08"
+      ],
+      "stage_base_sha": null,
+      "stage_review_round": 0,
+      "stage_verdict": null,
+      "stage_acceptance_commit_sha": null,
+      "blockers": []
+    },
+    "R10": {
+      "title": "对抗性验收、跨平台产物与性能证明",
+      "status": "PENDING",
+      "task_ids": [
+        "R10-T01",
+        "R10-T02",
+        "R10-T03",
+        "R10-T04",
+        "R10-T05",
+        "R10-T06",
+        "R10-T07",
+        "R10-T08"
+      ],
+      "stage_base_sha": null,
+      "stage_review_round": 0,
+      "stage_verdict": null,
+      "stage_acceptance_commit_sha": null,
+      "blockers": []
+    },
+    "R11": {
+      "title": "旧路径退出、发布迁移与最终交付",
+      "status": "PENDING",
+      "task_ids": [
+        "R11-T01",
+        "R11-T02",
+        "R11-T03",
+        "R11-T04",
+        "R11-T05",
+        "R11-T06",
+        "R11-T07",
+        "R11-T08"
+      ],
+      "stage_base_sha": null,
+      "stage_review_round": 0,
+      "stage_verdict": null,
+      "stage_acceptance_commit_sha": null,
+      "blockers": []
+    }
+  },
+  "tasks": {
+    "R00-T01": {
+      "name": "固定基线与隔离工作区",
+      "stage_id": "R00",
+      "status": "COMMITTING",
+      "task_base_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+      "executor_id": "/root/exec_r00_t01",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 4,
+      "reviewer_id": "/root/review_r00_t01_r4",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "F01",
+          "severity": "HIGH/BLOCKING",
+          "summary": "哨兵建立后父目录关闭失败会遗留文件",
+          "review_report": "docs/rust-tauri/R00/R00-T01_REVIEW_R3.md",
+          "resolution": "resolved in R4 PASS"
+        },
+        {
+          "id": "F02",
+          "severity": "HIGH/BLOCKING",
+          "summary": "身份检查与删除之间目标被替换可误删外来文件",
+          "review_report": "docs/rust-tauri/R00/R00-T01_REVIEW_R3.md",
+          "resolution": "resolved in R4 PASS"
+        },
+        {
+          "id": "F03",
+          "severity": "MEDIUM",
+          "summary": "候选校验器不重新核对当前A02工作树",
+          "review_report": "docs/rust-tauri/R00/R00-T01_REVIEW_R3.md",
+          "resolution": "resolved in R4 PASS"
+        }
+      ],
+      "repair_agent_id": "/root/repair_r00_t01_r3",
+      "root_cause_agent_id": "/root/root_cause_r00_t01_r3",
+      "acceptance_results": {
+        "R00-A01": "PASS",
+        "R00-A02": "PASS"
+      },
+      "task_commit_sha": null,
+      "push_result": "PENDING",
+      "blockers": [],
+      "candidate_digest_sha256": "21fd76c1201456207fb88222b2dd166da799253e4699d3778f32eaa61f3fa6f7",
+      "candidate_file_count": 94,
+      "review_report": "docs/rust-tauri/R00/R00-T01_REVIEW_R4.md",
+      "repair_rounds_completed": 3,
+      "root_cause_sweeps_completed": 2,
+      "precommit_checks": {
+        "scope": "96 staged files only docs/rust-tauri/R00, artifacts/rust-tauri/R00 and ledger; preexisting taskbooks excluded",
+        "sensitive_pattern_scan": "no matches",
+        "large_files": "none above 1 MiB",
+        "git_diff_check": "warned only on original server/test stdout trailing spaces and blank EOF; raw output preserved to keep evidence hashes valid",
+        "authored_docs_diff_check": "PASS",
+        "whitespace_excluding_raw_log_rules": "PASS"
+      }
+    },
+    "R00-T02": {
+      "name": "重建完整保留功能清单",
+      "stage_id": "R00",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R00-A03": "NOT_STARTED",
+        "R00-A04": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R00-T03": {
+      "name": "盘点 Pi 与 Node 隐含职责",
+      "stage_id": "R00",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R00-A05": "NOT_STARTED",
+        "R00-A06": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R00-T04": {
+      "name": "盘点入口、身份、数据与权限",
+      "stage_id": "R00",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R00-A07": "NOT_STARTED",
+        "R00-A08": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R00-T05": {
+      "name": "建立旧行为与故障夹具",
+      "stage_id": "R00",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R00-A09": "NOT_STARTED",
+        "R00-A10": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R00-T06": {
+      "name": "测量旧版本并冻结性能协议",
+      "stage_id": "R00",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R00-A11": "NOT_STARTED",
+        "R00-A12": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R00-T07": {
+      "name": "建立可执行验收账本",
+      "stage_id": "R00",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R00-A13": "NOT_STARTED",
+        "R00-A14": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R00-T08": {
+      "name": "封存并交接基线",
+      "stage_id": "R00",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R00-A15": "NOT_STARTED",
+        "R00-A16": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R01-T01": {
+      "name": "确定模块和进程所有权",
+      "stage_id": "R01",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R01-A01": "NOT_STARTED",
+        "R01-A02": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R01-T02": {
+      "name": "定义单一协议源及兼容边界",
+      "stage_id": "R01",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R01-A03": "NOT_STARTED",
+        "R01-A04": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R01-T03": {
+      "name": "锁定依赖与构建原型",
+      "stage_id": "R01",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R01-A05": "NOT_STARTED",
+        "R01-A06": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R01-T04": {
+      "name": "浏览器替代原型",
+      "stage_id": "R01",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R01-A07": "NOT_STARTED",
+        "R01-A08": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R01-T05": {
+      "name": "HTML/PDF与办公处理原型",
+      "stage_id": "R01",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R01-A09": "NOT_STARTED",
+        "R01-A10": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R01-T06": {
+      "name": "系统能力与桌面安全原型",
+      "stage_id": "R01",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R01-A11": "NOT_STARTED",
+        "R01-A12": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R01-T07": {
+      "name": "确定存储切换与旧版本拒写策略",
+      "stage_id": "R01",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R01-A13": "NOT_STARTED",
+        "R01-A14": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R01-T08": {
+      "name": "冻结架构关卡与风险决策",
+      "stage_id": "R01",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R01-A15": "NOT_STARTED",
+        "R01-A16": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R02-T01": {
+      "name": "实现 workspace 与组合根",
+      "stage_id": "R02",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R02-A01": "NOT_STARTED",
+        "R02-A02": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R02-T02": {
+      "name": "配置、路径与安全启动",
+      "stage_id": "R02",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R02-A03": "NOT_STARTED",
+        "R02-A04": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R02-T03": {
+      "name": "实现 HTTP/WS 认证与资源范围",
+      "stage_id": "R02",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R02-A05": "NOT_STARTED",
+        "R02-A06": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R02-T04": {
+      "name": "实现存储 ports 与运行库事务",
+      "stage_id": "R02",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R02-A07": "NOT_STARTED",
+        "R02-A08": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R02-T05": {
+      "name": "事件顺序、快照和断线续读",
+      "stage_id": "R02",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R02-A09": "NOT_STARTED",
+        "R02-A10": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R02-T06": {
+      "name": "备份、关闭与启动恢复",
+      "stage_id": "R02",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R02-A11": "NOT_STARTED",
+        "R02-A12": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R02-T07": {
+      "name": "日志、错误和有界资源",
+      "stage_id": "R02",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R02-A13": "NOT_STARTED",
+        "R02-A14": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R02-T08": {
+      "name": "独立服务交付与门禁",
+      "stage_id": "R02",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R02-A15": "NOT_STARTED",
+        "R02-A16": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R03-T01": {
+      "name": "实现运行与尝试状态机",
+      "stage_id": "R03",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R03-A01": "NOT_STARTED",
+        "R03-A02": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R03-T02": {
+      "name": "会话串行化和全局限流",
+      "stage_id": "R03",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R03-A03": "NOT_STARTED",
+        "R03-A04": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R03-T03": {
+      "name": "取消树和子任务监督",
+      "stage_id": "R03",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R03-A05": "NOT_STARTED",
+        "R03-A06": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R03-T04": {
+      "name": "attempt/stream 栅栏处理迟到结果",
+      "stage_id": "R03",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R03-A07": "NOT_STARTED",
+        "R03-A08": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R03-T05": {
+      "name": "运行日志与副作用收据",
+      "stage_id": "R03",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R03-A09": "NOT_STARTED",
+        "R03-A10": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R03-T06": {
+      "name": "子代理、后台运行与权限继承",
+      "stage_id": "R03",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R03-A11": "NOT_STARTED",
+        "R03-A12": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R03-T07": {
+      "name": "故障恢复与服务退出策略",
+      "stage_id": "R03",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R03-A13": "NOT_STARTED",
+        "R03-A14": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R03-T08": {
+      "name": "状态机验收与 R04 接口交接",
+      "stage_id": "R03",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R03-A15": "NOT_STARTED",
+        "R03-A16": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R04-T01": {
+      "name": "建立工具目录与参数契约",
+      "stage_id": "R04",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R04-A01": "NOT_STARTED",
+        "R04-A02": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R04-T02": {
+      "name": "实现唯一工具执行网关",
+      "stage_id": "R04",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R04-A03": "NOT_STARTED",
+        "R04-A04": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R04-T03": {
+      "name": "批准、撤销与只读模式",
+      "stage_id": "R04",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R04-A05": "NOT_STARTED",
+        "R04-A06": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R04-T04": {
+      "name": "原生读写改文件与资源权限",
+      "stage_id": "R04",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R04-A07": "NOT_STARTED",
+        "R04-A08": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R04-T05": {
+      "name": "命令、PTY与真实进程树取消",
+      "stage_id": "R04",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R04-A09": "NOT_STARTED",
+        "R04-A10": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R04-T06": {
+      "name": "跨平台沙盒与逃逸防护",
+      "stage_id": "R04",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R04-A11": "NOT_STARTED",
+        "R04-A12": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R04-T07": {
+      "name": "MCP与插件worker接入",
+      "stage_id": "R04",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R04-A13": "NOT_STARTED",
+        "R04-A14": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R04-T08": {
+      "name": "工具结果、产物与全矩阵验收",
+      "stage_id": "R04",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R04-A15": "NOT_STARTED",
+        "R04-A16": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R05-T01": {
+      "name": "统一ModelGateway与能力矩阵",
+      "stage_id": "R05",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R05-A01": "NOT_STARTED",
+        "R05-A02": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R05-T02": {
+      "name": "凭证所有权与并发刷新",
+      "stage_id": "R05",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R05-A03": "NOT_STARTED",
+        "R05-A04": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R05-T03": {
+      "name": "实现实际使用的文本协议",
+      "stage_id": "R05",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R05-A05": "NOT_STARTED",
+        "R05-A06": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R05-T04": {
+      "name": "流式解析与消息阶段规范化",
+      "stage_id": "R05",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R05-A07": "NOT_STARTED",
+        "R05-A08": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R05-T05": {
+      "name": "网络策略、超时与安全重试",
+      "stage_id": "R05",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R05-A09": "NOT_STARTED",
+        "R05-A10": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R05-T06": {
+      "name": "多模态及辅助调用接线",
+      "stage_id": "R05",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R05-A11": "NOT_STARTED",
+        "R05-A12": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R05-T07": {
+      "name": "用量观测与因果关联",
+      "stage_id": "R05",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R05-A13": "NOT_STARTED",
+        "R05-A14": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R05-T08": {
+      "name": "完成无Pi的最小任务闭环",
+      "stage_id": "R05",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R05-A15": "NOT_STARTED",
+        "R05-A16": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R06-T01": {
+      "name": "上下文编译器与短提示词",
+      "stage_id": "R06",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R06-A01": "NOT_STARTED",
+        "R06-A02": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R06-T02": {
+      "name": "token预算、压缩与长会话",
+      "stage_id": "R06",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R06-A03": "NOT_STARTED",
+        "R06-A04": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R06-T03": {
+      "name": "会话树、重试、fork与回退",
+      "stage_id": "R06",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R06-A05": "NOT_STARTED",
+        "R06-A06": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R06-T04": {
+      "name": "统一消息历史、重连与导出",
+      "stage_id": "R06",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R06-A07": "NOT_STARTED",
+        "R06-A08": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R06-T05": {
+      "name": "会话文件、资源与产物身份",
+      "stage_id": "R06",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R06-A09": "NOT_STARTED",
+        "R06-A10": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R06-T06": {
+      "name": "人格、记忆与技能系统",
+      "stage_id": "R06",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R06-A11": "NOT_STARTED",
+        "R06-A12": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R06-T07": {
+      "name": "现役知识库迁移",
+      "stage_id": "R06",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R06-A13": "NOT_STARTED",
+        "R06-A14": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R06-T08": {
+      "name": "工具行为评测与上下文交接",
+      "stage_id": "R06",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R06-A15": "NOT_STARTED",
+        "R06-A16": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R07-T01": {
+      "name": "定时任务、心跳与统一调度",
+      "stage_id": "R07",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R07-A01": "NOT_STARTED",
+        "R07-A02": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R07-T02": {
+      "name": "五平台Bridge接入",
+      "stage_id": "R07",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R07-A03": "NOT_STARTED",
+        "R07-A04": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R07-T03": {
+      "name": "频道、DM与多Agent协作",
+      "stage_id": "R07",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R07-A05": "NOT_STARTED",
+        "R07-A06": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R07-T04": {
+      "name": "生产级浏览器宿主",
+      "stage_id": "R07",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R07-A07": "NOT_STARTED",
+        "R07-A08": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R07-T05": {
+      "name": "Office、PDF、美化和内置插件",
+      "stage_id": "R07",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R07-A09": "NOT_STARTED",
+        "R07-A10": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R07-T06": {
+      "name": "媒体生成、语音与视觉桥",
+      "stage_id": "R07",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R07-A11": "NOT_STARTED",
+        "R07-A12": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R07-T07": {
+      "name": "工作台、文件历史与工作流能力",
+      "stage_id": "R07",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R07-A13": "NOT_STARTED",
+        "R07-A14": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R07-T08": {
+      "name": "配置、管理与导入导出接口",
+      "stage_id": "R07",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R07-A15": "NOT_STARTED",
+        "R07-A16": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R07-T09": {
+      "name": "CLI、移动端与LAN服务",
+      "stage_id": "R07",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R07-A17": "NOT_STARTED",
+        "R07-A18": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R07-T10": {
+      "name": "观测查询、筛选与导出",
+      "stage_id": "R07",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R07-A19": "NOT_STARTED",
+        "R07-A20": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R07-T11": {
+      "name": "开发入口与扩展生命周期收口",
+      "stage_id": "R07",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R07-A21": "NOT_STARTED",
+        "R07-A22": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R07-T12": {
+      "name": "逐功能真实闭环与残留清账",
+      "stage_id": "R07",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R07-A23": "NOT_STARTED",
+        "R07-A24": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R08-T01": {
+      "name": "完成旧API到Rust的兼容映射",
+      "stage_id": "R08",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R08-A01": "NOT_STARTED",
+        "R08-A02": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R08-T02": {
+      "name": "抽取React桌面能力接口",
+      "stage_id": "R08",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R08-A03": "NOT_STARTED",
+        "R08-A04": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R08-T03": {
+      "name": "Electron启动Rust服务的预览模式",
+      "stage_id": "R08",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R08-A05": "NOT_STARTED",
+        "R08-A06": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R08-T04": {
+      "name": "旧数据导入器与未知字段保护",
+      "stage_id": "R08",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R08-A07": "NOT_STARTED",
+        "R08-A08": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R08-T05": {
+      "name": "停写、备份、切换与单写者",
+      "stage_id": "R08",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R08-A09": "NOT_STARTED",
+        "R08-A10": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R08-T06": {
+      "name": "回滚与迁移后新增数据保留",
+      "stage_id": "R08",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R08-A11": "NOT_STARTED",
+        "R08-A12": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R08-T07": {
+      "name": "现有界面全功能验收",
+      "stage_id": "R08",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R08-A13": "NOT_STARTED",
+        "R08-A14": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R08-T08": {
+      "name": "迁移试用关卡与交接",
+      "stage_id": "R08",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R08-A15": "NOT_STARTED",
+        "R08-A16": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R09-T01": {
+      "name": "建立薄Tauri宿主和前端构建",
+      "stage_id": "R09",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R09-A01": "NOT_STARTED",
+        "R09-A02": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R09-T02": {
+      "name": "服务启动、就绪、退出与远端模式",
+      "stage_id": "R09",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R09-A03": "NOT_STARTED",
+        "R09-A04": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R09-T03": {
+      "name": "桌面基础能力等价实现",
+      "stage_id": "R09",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R09-A05": "NOT_STARTED",
+        "R09-A06": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R09-T04": {
+      "name": "语音、屏幕与辅助功能权限",
+      "stage_id": "R09",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R09-A07": "NOT_STARTED",
+        "R09-A08": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R09-T05": {
+      "name": "浏览器、PDF和媒体展示最终接线",
+      "stage_id": "R09",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R09-A09": "NOT_STARTED",
+        "R09-A10": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R09-T06": {
+      "name": "Tauri权限、CSP与自定义命令收口",
+      "stage_id": "R09",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R09-A11": "NOT_STARTED",
+        "R09-A12": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R09-T07": {
+      "name": "跨WebView界面与原生E2E",
+      "stage_id": "R09",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R09-A13": "NOT_STARTED",
+        "R09-A14": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R09-T08": {
+      "name": "Tauri替壳关卡与交接",
+      "stage_id": "R09",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R09-A15": "NOT_STARTED",
+        "R09-A16": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R10-T01": {
+      "name": "核验全范围覆盖与完成定义",
+      "stage_id": "R10",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R10-A01": "NOT_STARTED",
+        "R10-A02": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R10-T02": {
+      "name": "完整链路安全与路径无关性",
+      "stage_id": "R10",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R10-A03": "NOT_STARTED",
+        "R10-A04": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R10-T03": {
+      "name": "故障注入、取消与未知副作用",
+      "stage_id": "R10",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R10-A05": "NOT_STARTED",
+        "R10-A06": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R10-T04": {
+      "name": "数据迁移、回滚与旧版本回归",
+      "stage_id": "R10",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R10-A07": "NOT_STARTED",
+        "R10-A08": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R10-T05": {
+      "name": "真实供应商、平台与扩展验证",
+      "stage_id": "R10",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R10-A09": "NOT_STARTED",
+        "R10-A10": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R10-T06": {
+      "name": "性能、稳定性与完整进程成本",
+      "stage_id": "R10",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R10-A11": "NOT_STARTED",
+        "R10-A12": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R10-T07": {
+      "name": "真实安装包、升级候选与签名",
+      "stage_id": "R10",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R10-A13": "NOT_STARTED",
+        "R10-A14": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R10-T08": {
+      "name": "独立审查与最终缺口清零",
+      "stage_id": "R10",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R10-A15": "NOT_STARTED",
+        "R10-A16": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R11-T01": {
+      "name": "清退旧Pi和Node Agent核心",
+      "stage_id": "R11",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R11-A01": "NOT_STARTED",
+        "R11-A02": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R11-T02": {
+      "name": "清退Electron与重复宿主链",
+      "stage_id": "R11",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R11-A03": "NOT_STARTED",
+        "R11-A04": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R11-T03": {
+      "name": "兼容路径有明确退出规则",
+      "stage_id": "R11",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R11-A05": "NOT_STARTED",
+        "R11-A06": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R11-T04": {
+      "name": "发布版本、更新与安装迁移",
+      "stage_id": "R11",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R11-A07": "NOT_STARTED",
+        "R11-A08": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R11-T05": {
+      "name": "面向用户与维护者的交付文档",
+      "stage_id": "R11",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R11-A09": "NOT_STARTED",
+        "R11-A10": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R11-T06": {
+      "name": "删除后的最终全量验证",
+      "stage_id": "R11",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R11-A11": "NOT_STARTED",
+        "R11-A12": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R11-T07": {
+      "name": "授权边界内的发布与迁移",
+      "stage_id": "R11",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R11-A13": "NOT_STARTED",
+        "R11-A14": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    },
+    "R11-T08": {
+      "name": "最终总验收与停止条件",
+      "stage_id": "R11",
+      "status": "PENDING",
+      "task_base_sha": null,
+      "executor_id": null,
+      "execution_result": null,
+      "review_round": 0,
+      "reviewer_id": null,
+      "review_verdict": null,
+      "findings": [],
+      "repair_agent_id": null,
+      "root_cause_agent_id": null,
+      "acceptance_results": {
+        "R11-A15": "NOT_STARTED",
+        "R11-A16": "NOT_STARTED"
+      },
+      "task_commit_sha": null,
+      "push_result": null,
+      "blockers": []
+    }
+  },
+  "current_task": "R00-T01"
+}

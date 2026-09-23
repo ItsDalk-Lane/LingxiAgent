@@ -1,0 +1,198 @@
+{
+  "run_id": "81810c93302dd6e4dbd26aef",
+  "started_utc": "2026-09-23T04:46:33.582682+00:00",
+  "tested_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "real_directories": {
+    "production": {
+      "sentinel_name": ".r00-a01-readonly-81810c93302dd6e4dbd26aef",
+      "sentinel_created": {
+        "created_utc": "2026-09-23T04:46:34.795071+00:00",
+        "mode": "0o400",
+        "sha256": "e824d9df4c081fdb6f730e84bd157bf874a8a4871a18b97267a58a74b49b90b5",
+        "dev": 16777230,
+        "ino": 102804354
+      },
+      "before": {
+        "sha256": "8057624d27296028a3879f6f83dffa75e853fa15759b868cbb8260b6e4f04588",
+        "content_sha256": "b5aa6ddf5a97154244500696ebdee61b82caf65ae848f4f4d26c537156462683",
+        "files": 56618,
+        "directories": 8694,
+        "symlinks": 0,
+        "other": 0,
+        "bytes": 5381798245,
+        "errors": 0,
+        "error_kinds": []
+      },
+      "denied_open": {
+        "exit_code": 1,
+        "errno_eperm": true,
+        "stderr_sha256": "4543b379cd2c545493a973fbacb2b75ce64873e353febd0839cb1b4d7a372096"
+      },
+      "after": {
+        "sha256": "8057624d27296028a3879f6f83dffa75e853fa15759b868cbb8260b6e4f04588",
+        "content_sha256": "b5aa6ddf5a97154244500696ebdee61b82caf65ae848f4f4d26c537156462683",
+        "files": 56618,
+        "directories": 8694,
+        "symlinks": 0,
+        "other": 0,
+        "bytes": 5381798245,
+        "errors": 0,
+        "error_kinds": []
+      },
+      "sentinel_after": {
+        "mode": "0o400",
+        "sha256": "e824d9df4c081fdb6f730e84bd157bf874a8a4871a18b97267a58a74b49b90b5",
+        "dev": 16777230,
+        "ino": 102804354
+      }
+    },
+    "development": {
+      "sentinel_name": ".r00-a01-readonly-81810c93302dd6e4dbd26aef",
+      "sentinel_created": {
+        "created_utc": "2026-09-23T04:46:34.795309+00:00",
+        "mode": "0o400",
+        "sha256": "e824d9df4c081fdb6f730e84bd157bf874a8a4871a18b97267a58a74b49b90b5",
+        "dev": 16777230,
+        "ino": 102804355
+      },
+      "before": {
+        "sha256": "b80499182bd7865de7baf633a536e444a00846ee2a6f530c413d40f09a6b6ff7",
+        "content_sha256": "2ac947678b5bd0b88d516cf4aac43ac295a52b1308a590080fd95bf5d91cbe70",
+        "files": 6570,
+        "directories": 582,
+        "symlinks": 0,
+        "other": 0,
+        "bytes": 21651895342,
+        "errors": 0,
+        "error_kinds": []
+      },
+      "denied_open": {
+        "exit_code": 1,
+        "errno_eperm": true,
+        "stderr_sha256": "8f378a5205dcd0ff9357e2bd2a4503a8fee4af958bdadbd8a06da1191b29b854"
+      },
+      "after": {
+        "sha256": "b80499182bd7865de7baf633a536e444a00846ee2a6f530c413d40f09a6b6ff7",
+        "content_sha256": "2ac947678b5bd0b88d516cf4aac43ac295a52b1308a590080fd95bf5d91cbe70",
+        "files": 6570,
+        "directories": 582,
+        "symlinks": 0,
+        "other": 0,
+        "bytes": 21651895342,
+        "errors": 0,
+        "error_kinds": []
+      },
+      "sentinel_after": {
+        "mode": "0o400",
+        "sha256": "e824d9df4c081fdb6f730e84bd157bf874a8a4871a18b97267a58a74b49b90b5",
+        "dev": 16777230,
+        "ino": 102804355
+      }
+    }
+  },
+  "cleanup": {
+    "production": {
+      "removed": true,
+      "absent_after": true,
+      "removed_utc": "2026-09-23T04:47:01.087218+00:00"
+    },
+    "development": {
+      "removed": true,
+      "absent_after": true,
+      "removed_utc": "2026-09-23T04:47:01.087316+00:00"
+    }
+  },
+  "errors": [],
+  "test_root": "/tmp/lingxi-r00-a01-r2-x16e_86u",
+  "isolated_home": "/tmp/lingxi-r00-a01-r2-x16e_86u/isolated/lingxi-home",
+  "lingxi_app_pids_before": [],
+  "attempt_kind": "single observation; scenario result is recorded separately",
+  "evidence_files": {
+    "probe": "startup-probe-r3-81810c93302dd6e4dbd26aef.json",
+    "stdout": "server-stdout-r3-81810c93302dd6e4dbd26aef.txt",
+    "stderr": "server-stderr-r3-81810c93302dd6e4dbd26aef.txt"
+  },
+  "quiet_before": {
+    "related_process_pids": [],
+    "open_handle_pids": [],
+    "quiet": true,
+    "checked_utc": "2026-09-23T04:46:34.794299+00:00"
+  },
+  "sandbox_profile_sha256": "185488220d558f12462154cc44c30cf600afe2cf61a0f28041b0cab784b06d7e",
+  "command": [
+    "sandbox-exec",
+    "-f",
+    "/tmp/lingxi-r00-a01-r2-x16e_86u/probe.sb",
+    "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+    "server/bootstrap.ts"
+  ],
+  "env": {
+    "HOME": "/tmp/lingxi-r00-a01-r2-x16e_86u/isolated",
+    "TMPDIR": "/tmp/lingxi-r00-a01-r2-x16e_86u/isolated/tmp",
+    "LINGXI_HOME": "/tmp/lingxi-r00-a01-r2-x16e_86u/isolated/lingxi-home",
+    "LINGXI_ROOT": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "LINGXI_SERVER_ENTRY": "/Users/study_superior/Desktop/Code/LingxiAgent/server/main-full.ts",
+    "LINGXI_PORT": "0"
+  },
+  "pid": 74511,
+  "process_args": "74511 74501 sandbox-exec -f /tmp/lingxi-r00-a01-r2-x16e_86u/probe.sb /Users/study_superior/.nvm/versions/node/v24.16.0/bin/node server/bootstrap.ts",
+  "server_info_observed_in_isolated_home": true,
+  "server_pid": 74511,
+  "server_process_args": "74511 74501 /Users/study_superior/.nvm/versions/node/v24.16.0/bin/node server/bootstrap.ts",
+  "health": {
+    "http_status": 200,
+    "body_status": "ok"
+  },
+  "isolated_during": {
+    "sha256": "398bc07d1eb6ecc18455cce8e7648b2295cdc455e3af3180d10bb6ca4442f7ac",
+    "content_sha256": "58f174902018a7bcc16340f5ed4e0f529a89b56bebd5cd602a368c9d8ffae9d9",
+    "files": 71,
+    "directories": 46,
+    "symlinks": 0,
+    "other": 0,
+    "bytes": 1849421,
+    "errors": 0,
+    "error_kinds": []
+  },
+  "server_exit_code": 0,
+  "server_info_removed": true,
+  "isolated_after": {
+    "sha256": "0801c2e4f4650724d10769be7e8815d5d5f8990edf79d37466d222af4bf74a7e",
+    "content_sha256": "384a89645e35939cce391ee43ab92c2c9615c93030aa58c45528a0a37352136d",
+    "files": 56,
+    "directories": 46,
+    "symlinks": 0,
+    "other": 0,
+    "bytes": 1499171,
+    "errors": 0,
+    "error_kinds": []
+  },
+  "isolated_logs_present": true,
+  "actual_home_logged": true,
+  "lingxi_app_pids_after": [],
+  "quiet_after": {
+    "related_process_pids": [],
+    "open_handle_pids": [],
+    "quiet": true,
+    "checked_utc": "2026-09-23T04:47:02.259043+00:00"
+  },
+  "ended_utc": "2026-09-23T04:47:02.259084+00:00",
+  "acceptance_checks": {
+    "production_full_content_unchanged": true,
+    "production_sentinel_unchanged": true,
+    "production_denied_by_os": true,
+    "production_cleanup": true,
+    "development_full_content_unchanged": true,
+    "development_sentinel_unchanged": true,
+    "development_denied_by_os": true,
+    "development_cleanup": true,
+    "service_health": true,
+    "service_closed": true,
+    "isolated_home_effective": true,
+    "isolated_data_and_logs": true,
+    "quiet_window": true,
+    "real_app_absent": true
+  },
+  "status": "OBSERVED_STABLE"
+}

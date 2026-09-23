@@ -1,0 +1,119 @@
+{
+  "started_utc": "2026-09-23T04:02:57.250254+00:00",
+  "candidate_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+  "command": [
+    "sandbox-exec",
+    "-f",
+    "/tmp/lingxi-r00-t01-bdmbvepw/probe.sb",
+    "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+    "server/bootstrap.ts"
+  ],
+  "pid": 64379,
+  "process_args": "64379 64365 /Users/study_superior/.nvm/versions/node/v24.16.0/bin/node server/bootstrap.ts",
+  "test_root": "/tmp/lingxi-r00-t01-bdmbvepw",
+  "isolated_home_env": "/tmp/lingxi-r00-t01-bdmbvepw/isolated/lingxi-home",
+  "home_env": "/tmp/lingxi-r00-t01-bdmbvepw/isolated",
+  "sandbox_profile": "/tmp/lingxi-r00-t01-bdmbvepw/probe.sb",
+  "before": {
+    "production": {
+      "exists": true,
+      "inventory_sha256": "953781e6a341a14d86a7fbf224d8661991d0dd6ed8cf39b934f44488d31940d5",
+      "files": 56630,
+      "directories": 8694,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "development": {
+      "exists": true,
+      "inventory_sha256": "627a014b4aee9f89b60cf5ca6f97e2f25c10a339e87d38941456e3b671c367d3",
+      "files": 6569,
+      "directories": 582,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "protected": {
+      "exists": true,
+      "inventory_sha256": "c47c4238a3a9b695fb1c0c36acc2eeb22cef751a6cca0331f5f6770c3ccbf659",
+      "files": 1,
+      "directories": 0,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "protected_sentinel_sha256": "58542f896165ebb6e44533820e7b9ca29c3ce8f2b5a209699f0cb2405267cc8d",
+    "real_production_sentinel_sha256": "88ebeb5c45e3578982b275047a7f7a287dbdc88c6cdea8fb8e4cb262f463d8b4"
+  },
+  "startup": {
+    "server_info_path": "/tmp/lingxi-r00-t01-bdmbvepw/isolated/lingxi-home/server-info.json",
+    "server_info_pid": 64379,
+    "server_info_port": 50717,
+    "server_info_token_present": true,
+    "server_info_home": null,
+    "server_process_args": "64379 64365 /Users/study_superior/.nvm/versions/node/v24.16.0/bin/node server/bootstrap.ts",
+    "health": {
+      "http_status": 200,
+      "body_status": "ok",
+      "version": "0.1.43"
+    },
+    "isolated_inventory_during": {
+      "exists": true,
+      "inventory_sha256": "c053f969a32dad8b301078082bdf116aacf8637c17840dd162303fc784a202e2",
+      "files": 71,
+      "directories": 46,
+      "symlinks": 0,
+      "errors": 0
+    }
+  },
+  "exit_code": 0,
+  "server_info_removed": true,
+  "after": {
+    "production": {
+      "exists": true,
+      "inventory_sha256": "953781e6a341a14d86a7fbf224d8661991d0dd6ed8cf39b934f44488d31940d5",
+      "files": 56630,
+      "directories": 8694,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "development": {
+      "exists": true,
+      "inventory_sha256": "627a014b4aee9f89b60cf5ca6f97e2f25c10a339e87d38941456e3b671c367d3",
+      "files": 6569,
+      "directories": 582,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "protected": {
+      "exists": true,
+      "inventory_sha256": "c47c4238a3a9b695fb1c0c36acc2eeb22cef751a6cca0331f5f6770c3ccbf659",
+      "files": 1,
+      "directories": 0,
+      "symlinks": 0,
+      "errors": 0
+    },
+    "protected_sentinel_sha256": "58542f896165ebb6e44533820e7b9ca29c3ce8f2b5a209699f0cb2405267cc8d",
+    "real_production_sentinel_sha256": "88ebeb5c45e3578982b275047a7f7a287dbdc88c6cdea8fb8e4cb262f463d8b4",
+    "isolated": {
+      "exists": true,
+      "inventory_sha256": "009d92c5401528d2ab196e5d0c2570f2a2197f39dec533c4b286fa2e41fcb0bf",
+      "files": 56,
+      "directories": 46,
+      "symlinks": 0,
+      "errors": 0
+    }
+  },
+  "controlled_production_unchanged": true,
+  "real_production_inventory_unchanged": true,
+  "real_development_inventory_unchanged": true,
+  "real_production_sentinel_unchanged": true,
+  "ended_utc": "2026-09-23T04:03:00.412084+00:00",
+  "acceptance_checks": {
+    "health_ok": true,
+    "closed_cleanly": true,
+    "actual_home_logged": true,
+    "isolated_data_and_logs_present": true,
+    "protected_production_unchanged": true,
+    "real_production_inventory_unchanged": true,
+    "real_development_inventory_unchanged": true,
+    "real_production_sentinel_unchanged": true
+  }
+}

@@ -1,0 +1,26 @@
+test_attempt_aggregation_retains_same_window_failure (test_startup_probe_r2.ProbeRegression.test_attempt_aggregation_retains_same_window_failure) ... ok
+test_changed_sentinel_is_not_cleaned (test_startup_probe_r2.ProbeRegression.test_changed_sentinel_is_not_cleaned) ... ok
+test_creation_failures_clean_only_owned_partial_file (test_startup_probe_r2.ProbeRegression.test_creation_failures_clean_only_owned_partial_file) ... ok
+test_equal_length_edit_with_preserved_mtime_changes_content_digest (test_startup_probe_r2.ProbeRegression.test_equal_length_edit_with_preserved_mtime_changes_content_digest) ... ok
+test_replaced_directory_is_not_followed (test_startup_probe_r2.ProbeRegression.test_replaced_directory_is_not_followed) ... ok
+test_replaced_file_is_not_read (test_startup_probe_r2.ProbeRegression.test_replaced_file_is_not_read) ... ok
+test_replaced_sentinel_link_and_parent_are_not_deleted (test_startup_probe_r2.ProbeRegression.test_replaced_sentinel_link_and_parent_are_not_deleted) ... ok
+test_second_directory_failure_cleans_both (test_startup_probe_r2.ProbeRegression.test_second_directory_failure_cleans_both) ... ok
+test_sentinel_is_exclusive_readonly_and_only_original_is_removed (test_startup_probe_r2.ProbeRegression.test_sentinel_is_exclusive_readonly_and_only_original_is_removed) ... ok
+test_zero_and_short_write (test_startup_probe_r2.ProbeRegression.test_zero_and_short_write) ... ok
+test_capability_probe_failure_prevents_sentinel_creation (test_startup_probe_r4.AtomicCleanupRegression.test_capability_probe_failure_prevents_sentinel_creation) ... ok
+test_creation_failure_uses_same_foreign_safe_cleanup (test_startup_probe_r4.AtomicCleanupRegression.test_creation_failure_uses_same_foreign_safe_cleanup) ... ok
+test_exclusive_move_errors_and_target_preoccupied_fail (test_startup_probe_r4.AtomicCleanupRegression.test_exclusive_move_errors_and_target_preoccupied_fail) ... ok
+test_foreign_moved_but_source_recreated_is_retained (test_startup_probe_r4.AtomicCleanupRegression.test_foreign_moved_but_source_recreated_is_retained) ... ok
+test_foreign_regular_and_link_swapped_at_atomic_move_survive (test_startup_probe_r4.AtomicCleanupRegression.test_foreign_regular_and_link_swapped_at_atomic_move_survive) ... ok
+test_last_parent_close_before_and_after_effect_in_both_roots (test_startup_probe_r4.AtomicCleanupRegression.test_last_parent_close_before_and_after_effect_in_both_roots) ... ok
+test_move_after_effect_error_and_unlink_after_effect_error_fail (test_startup_probe_r4.AtomicCleanupRegression.test_move_after_effect_error_and_unlink_after_effect_error_fail) ... ok
+test_quarantine_replacement_and_occupied_target_fail_closed (test_startup_probe_r4.AtomicCleanupRegression.test_quarantine_replacement_and_occupied_target_fail_closed) ... ok
+test_rmdir_failure_cannot_report_success (test_startup_probe_r4.AtomicCleanupRegression.test_rmdir_failure_cannot_report_success) ... ok
+test_same_uid_quarantine_replacement_remains_documented_risk (test_startup_probe_r4.AtomicCleanupRegression.test_same_uid_quarantine_replacement_remains_documented_risk) ... ok
+test_source_recreated_after_owned_move_fails_without_deleting_foreign (test_startup_probe_r4.AtomicCleanupRegression.test_source_recreated_after_owned_move_fails_without_deleting_foreign) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.042s
+
+OK

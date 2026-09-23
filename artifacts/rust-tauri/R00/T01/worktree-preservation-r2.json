@@ -1,0 +1,22 @@
+{
+  "captured_utc": "2026-09-23T05:35:55.833497+00:00",
+  "tested_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+  "checks": {
+    "head_unchanged": true,
+    "branch_unchanged": true,
+    "old_tracked_count_unchanged": true,
+    "old_deleted_count_unchanged": true,
+    "old_diff_unchanged": true,
+    "new_untracked_files_unchanged": true,
+    "new_taskbook_untracked_set_unchanged": true,
+    "staged_diff_absent": true,
+    "other_tracked_diff_absent": true
+  },
+  "all_preserved": true,
+  "old_deleted_count": 17,
+  "new_untracked_count": 33,
+  "old_diff_sha256": "55789bbdb322dc1ea6e64af683e5820238c5083ed67f23ca5d6d1f1f5876b54b",
+  "new_aggregate_sha256": "295f906e80211678fa7ab41afa2f5d0eaad3392bcaa64558bc456fd8c3c0e1cb",
+  "first_snapshot_sha256": "7e83f4dd2c1c3606747cd6609233f913e8d45c15ec004f9fcb2d523a44b43562",
+  "current_worktree_fingerprint": "185b848813ae0eb8a96ae71087daa7bf8841e68475175645216173606af0b0fd"
+}
