@@ -1,0 +1,3775 @@
+{
+ "schema_version": 1,
+ "task_id": "R00-T04",
+ "generated_by": "docs/rust-tauri/R00/r00_t04_scan.py --generate-stores",
+ "registry_source": "shared/persistence/store-registry.ts (PERSISTENT_STORES)",
+ "registry_enforcement": [
+  "tests/persistence-store-registry.test.ts — AST census: every production persistence site owned exactly once (store or exemption)",
+  "tests/persistence-schema-tripwire.test.ts + scripts/check-persistence-schema-fingerprint.mjs — guarded persistence source fingerprints"
+ ],
+ "classification_semantics": {
+  "authoritative": "epochPolicy=epoch-managed — 权威数据，受 data-epoch 契约管理，旧内核低于 stamp 最低读取代次时拒绝启动",
+  "rebuildable_cache": "epochPolicy=regenerable — 可重建缓存；rebuild_or_loss_semantics 引用注册表声明的丢失/重建语义（可核实）",
+  "adjacent_compatible": "epochPolicy=compatible — 与 epoch 契约并存的壳/观测/诊断状态，不由 epoch 迁移改写"
+ },
+ "counts": {
+  "stores": 69,
+  "by_classification": {
+   "adjacent_compatible": 14,
+   "rebuildable_cache": 13,
+   "authoritative": 42
+  },
+  "by_subcategory": {
+   "epoch_meta": 3,
+   "logs_diagnostics": 4,
+   "runtime_state": 9,
+   "user_data": 27,
+   "credentials": 5,
+   "config_credentials": 1,
+   "cache": 12,
+   "derived_data": 3,
+   "shell_state": 5
+  },
+  "registry_exemptions": 38
+ },
+ "stores": [
+  {
+   "id": "data-epoch-stamp",
+   "owner_module": "shared/data-epoch.cjs",
+   "path_patterns": [
+    "data-epoch.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "compatible",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "epoch_meta"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "shared/data-epoch.cjs",
+    "contract": "DATA_EPOCH stamp parser and atomic writer",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "coordinateDataEpochStartup",
+     "inspectDataEpochMaintenance"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "shared/data-epoch.cjs"
+    ]
+   },
+   "first_possible_open_phase": "epoch_read_preflight",
+   "first_possible_write_phase": "epoch_transition",
+   "processes": {
+    "writers": [
+     "server",
+     "cli(data)"
+    ],
+    "readers": [
+     "server",
+     "cli"
+    ]
+   },
+   "epoch_checkpoint_policy": "Never restore this stamp independently of the data tree it describes.",
+   "epoch_restore_policy": "Recreate only as the final commit record of a coordinated epoch transition.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "One high-water stamp belongs to one canonical LINGXI_HOME.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 2,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "data-epoch-transition-journal",
+   "owner_module": "core/data-epoch-coordinator.ts",
+   "path_patterns": [
+    "data-epoch-transition.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "compatible",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "epoch_meta"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "shared/data-epoch.cjs",
+    "contract": "transition journal parser, invariant checks, and durable writer",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "coordinateDataEpochStartup",
+     "inspectDataEpochMaintenance"
+    ],
+    "migration_entry": [
+     "core/data-epoch-migrations.ts DATA_EPOCH_MIGRATIONS"
+    ],
+    "protocol_modules": [
+     "core/data-epoch-coordinator.ts",
+     "core/data-epoch-migrations.ts"
+    ],
+    "site_rule_files": [
+     "shared/data-epoch.cjs"
+    ]
+   },
+   "first_possible_open_phase": "epoch_read_preflight",
+   "first_possible_write_phase": "epoch_transition",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server",
+     "cli"
+    ]
+   },
+   "epoch_checkpoint_policy": "Never include the transition journal in the affected-store checkpoint it coordinates.",
+   "epoch_restore_policy": "Never restore independently; maintenance interprets it together with the epoch stamp and verified checkpoint receipt.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "transitionId identifies one in-progress transition for one canonical LINGXI_HOME.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 3,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "data-epoch-checkpoints",
+   "owner_module": "core/data-epoch-checkpoint-provider.ts",
+   "path_patterns": [
+    "data-epoch-checkpoints/{transitionId}/**"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "compatible",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "epoch_meta"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/data-epoch-checkpoint-provider.ts",
+    "contract": "checkpoint metadata.json layout, per-store capture strategy, and verify byte/sha256 reconciliation",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "createDataEpochCheckpointProvider",
+     "pruneDataEpochCheckpoints"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/data-epoch-checkpoint-provider.ts"
+    ]
+   },
+   "first_possible_open_phase": "epoch_transition",
+   "first_possible_write_phase": "epoch_transition",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "cli(data)"
+    ]
+   },
+   "epoch_checkpoint_policy": "This store holds captured checkpoint bytes for other stores; it is never itself listed as an affected store inside the snapshot it produces.",
+   "epoch_restore_policy": "Read only through the provider's verify contract; a published checkpoint directory is never hand-edited or restored independently of the coordinator's restore path.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "transitionId identifies one published or in-progress checkpoint directory for one canonical LINGXI_HOME; provider-internal .tmp-/.invalid- suffixes on that name are staging, not separate identities.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 11,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "data-epoch-restore-quarantine",
+   "owner_module": "core/data-epoch-restore.ts",
+   "path_patterns": [
+    "data-epoch-restore-quarantine/{restoreId}/**",
+    "data-epoch-restores.log"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "compatible",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "logs_diagnostics"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/data-epoch-restore.ts",
+    "contract": "restore quarantine layout, restore-receipt.json schema, and append-only data-epoch-restores.log line shape",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "restoreDataEpochCheckpoint"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/data-epoch-restore.ts"
+    ]
+   },
+   "first_possible_open_phase": "epoch_transition",
+   "first_possible_write_phase": "epoch_transition",
+   "processes": {
+    "writers": [
+     "cli(data)"
+    ],
+    "readers": [
+     "cli(data)"
+    ]
+   },
+   "epoch_checkpoint_policy": "Excluded from epoch checkpoints; this store only ever holds the output of an already-completed restore, never an affected store's forward-transition input.",
+   "epoch_restore_policy": "Never restored; quarantined bytes are historical evidence retained for manual forensic recovery, not replayed automatically by any restore.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "restoreId identifies one restore transaction's quarantined bytes for one canonical LINGXI_HOME; data-epoch-restores.log is one shared append-only audit trail across every restore for that home.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 7,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "server-runtime-info",
+   "owner_module": "server/index.ts",
+   "path_patterns": [
+    "server-info.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "regenerable",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "runtime_state"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "server/index.ts",
+    "contract": "server-info writer and desktop bootstrap reader",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "server/index.ts bootstrap"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "desktop/main.cjs",
+     "server/index.ts"
+    ]
+   },
+   "first_possible_open_phase": "home_guard",
+   "first_possible_write_phase": "home_guard",
+   "processes": {
+    "writers": [
+     "server",
+     "desktop(unlink-only)"
+    ],
+    "readers": [
+     "desktop",
+     "cli"
+    ],
+    "note": "desktop 仅做删除性 unlink，不创建/写入内容（4 个 remove-path 位点：stale/死内核探测清理 desktop/main.cjs:1364/1368、spawn 前清旧文件 :1915、shutdownServer 关停去留 :6635）；server-info.json 内容唯一写者为 server"
+   },
+   "epoch_checkpoint_policy": "Excluded; it is live process discovery state.",
+   "epoch_restore_policy": "Regenerate after transport binding.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "At most one current server discovery record per LINGXI_HOME.",
+   "rebuild_or_loss_semantics": "Excluded; it is live process discovery state.",
+   "evidence": {
+    "inventory_sites_owned": 7,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "server-node-identity",
+   "owner_module": "core/server-identity.ts",
+   "path_patterns": [
+    "server-node.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/server-identity.ts",
+    "contract": "server-node identity parser and ensureLocalIdentityRegistries seed",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "loadServerIdentity",
+     "ensureLocalIdentityRegistries"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/server-identity.ts"
+    ]
+   },
+   "first_possible_open_phase": "identity_seed",
+   "first_possible_write_phase": "identity_seed",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Include with the identity registries for the same LINGXI_HOME.",
+   "epoch_restore_policy": "Restore before remote transport accepts identity-bound requests.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "serverNodeId is the stable identity of one LINGXI_HOME server node.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 1,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "user-studio-registries",
+   "owner_module": "core/server-identity.ts",
+   "path_patterns": [
+    "users.json",
+    "studios.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/server-identity.ts",
+    "contract": "user/studio registry readers",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "loadServerIdentity",
+     "ensureLocalIdentityRegistries"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/local-user-account.ts",
+     "core/server-identity.ts"
+    ]
+   },
+   "first_possible_open_phase": "identity_seed",
+   "first_possible_write_phase": "identity_seed",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Checkpoint users and studios together.",
+   "epoch_restore_policy": "Restore users/studios before dependent grants or mounts.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "userId and studioId are durable identities.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 5,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "local-user-auth",
+   "owner_module": "core/local-user-account.ts",
+   "path_patterns": [
+    "local-user-auth.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "credentials"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/local-user-account.ts",
+    "contract": "local authentication secret reader and atomic serializer",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "ensureLocalUserAccount",
+     "authenticateLocalUser"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/local-user-account.ts"
+    ]
+   },
+   "first_possible_open_phase": "identity_seed",
+   "first_possible_write_phase": "identity_seed",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Checkpoint as permission-preserving secret material with its matching users.json identity.",
+   "epoch_restore_policy": "Restore atomically before local authentication is enabled.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "The credential belongs to the local userId in the same LINGXI_HOME.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 2,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "device-access-registries",
+   "owner_module": "core/device-registry.ts",
+   "path_patterns": [
+    "devices.json",
+    "device-credentials.json",
+    "pairing-sessions.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "credentials"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/device-registry.ts",
+    "contract": "device, credential, and pairing-session validators/serializers",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "ensureDeviceAccessRegistries",
+     "loadDeviceAccessRegistries"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/device-registry.ts"
+    ]
+   },
+   "first_possible_open_phase": "identity_seed",
+   "first_possible_write_phase": "identity_seed",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Checkpoint all three registries as one referential set.",
+   "epoch_restore_policy": "Restore atomically before paired-device authentication is enabled.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "deviceId, credentialId, and pairingSessionId are durable cross-registry keys.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 6,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "server-network-config",
+   "owner_module": "core/server-network-config.ts",
+   "path_patterns": [
+    "server-network.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/server-network-config.ts",
+    "contract": "server network mode/listen configuration validator",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "ensureServerNetworkConfig",
+     "loadServerNetworkConfig"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/server-network-config.ts"
+    ]
+   },
+   "first_possible_open_phase": "post_epoch_pre_bind",
+   "first_possible_write_phase": "post_epoch_pre_bind",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server",
+     "desktop"
+    ]
+   },
+   "epoch_checkpoint_policy": "Include as operator configuration.",
+   "epoch_restore_policy": "Validate before binding; invalid restored values fail explicitly.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "One network configuration belongs to one LINGXI_HOME server.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 4,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "studio-mount-registry",
+   "owner_module": "core/studio-mounts.ts",
+   "path_patterns": [
+    "studio-mounts.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/studio-mounts.ts",
+    "contract": "schemaVersion 1 studio mount registry validator",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "ensureStudioMountRegistry",
+     "loadStudioMountRegistry"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/studio-mounts.ts"
+    ]
+   },
+   "first_possible_open_phase": "identity_seed",
+   "first_possible_write_phase": "identity_seed",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Include mount declarations but never copy external mounted content implicitly.",
+   "epoch_restore_policy": "Restore declarations, then revalidate each external root before granting access.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "mountId is durable; external paths are locators that require revalidation.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 5,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "web-session-registry",
+   "owner_module": "core/web-session-store.ts",
+   "path_patterns": [
+    "web-sessions.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "credentials"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/web-session-store.ts",
+    "contract": "web session registry validator, expiry, and serializer",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "ensureWebSessionRegistry",
+     "WebSessionStore"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/web-session-store.ts"
+    ]
+   },
+   "first_possible_open_phase": "identity_seed",
+   "first_possible_write_phase": "identity_seed",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Exclude expired sessions; preserve only live sessions when auth continuity is required.",
+   "epoch_restore_policy": "Load through WebSessionStore so expiry and validation run before use.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "webSessionId is durable only for the validated lifetime of its user-bound session.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 4,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "security-grants",
+   "owner_module": "core/grant-registry.ts",
+   "path_patterns": [
+    "security/grants.json",
+    "security/grants.json.corrupt-{timestamp}",
+    "security/grants.json.corrupt-{timestamp}.reason.txt"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "credentials"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/grant-registry.ts",
+    "contract": "grant registry validator, quarantine, and atomic serializer",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "ensureGrantRegistry",
+     "loadGrantRegistry"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/grant-registry.ts"
+    ]
+   },
+   "first_possible_open_phase": "identity_seed",
+   "first_possible_write_phase": "identity_seed",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Checkpoint the validated registry; quarantine evidence is diagnostic and optional.",
+   "epoch_restore_policy": "Validate before enabling grants; corrupt input is quarantined and fails visibly.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "grantId and its principal/resource scope are the durable authorization identity.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 7,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "execution-leases",
+   "owner_module": "core/execution-lease-registry.ts",
+   "path_patterns": [
+    "security/execution-leases.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "runtime_state"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/execution-lease-registry.ts",
+    "contract": "execution lease registry validator and atomic serializer",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "ensureExecutionLeaseRegistry",
+     "loadExecutionLeaseRegistry"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/execution-lease-registry.ts"
+    ]
+   },
+   "first_possible_open_phase": "identity_seed",
+   "first_possible_write_phase": "identity_seed",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Exclude expired leases and preserve live leases only with their grant principals.",
+   "epoch_restore_policy": "Reload through the lease validator and re-evaluate expiry before execution resumes.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "leaseId is durable only within its principal, grant, and expiry scope.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 4,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "security-key-material",
+   "owner_module": "core/resource-ticket-service.ts",
+   "path_patterns": [
+    "security/resource-ticket-key"
+   ],
+   "path_kind": "file",
+   "format": "mixed-directory",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "credentials"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "core/resource-ticket-service.ts",
+    "contract": "independent 0600 random key-file protocol for the resource ticket service",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "security ticket service construction"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/resource-ticket-service.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "engine_construct",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Checkpoint exact bytes with restrictive permissions when continuity of issued tickets is required.",
+   "epoch_restore_policy": "Restore before constructing the matching service; missing keys rotate and invalidate old tickets.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "Each fixed filename is a distinct service signing boundary; key bytes must never be interchanged.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 2,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "security-audit-log",
+   "owner_module": "core/security-audit-log.ts",
+   "path_patterns": [
+    "logs/security-audit.jsonl"
+   ],
+   "path_kind": "file",
+   "format": "append-only-log",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "logs_diagnostics"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/security-audit-log.ts",
+    "contract": "one JSON object per append-only security audit line",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "appendSecurityAuditRecord"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/security-audit-log.ts"
+    ]
+   },
+   "first_possible_open_phase": "runtime_ready",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Preserve byte order and complete lines; never merge by object key.",
+   "epoch_restore_policy": "Append only after the restored final newline; malformed tails require explicit repair.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "Log sequence and record timestamps provide provenance; the path is a fixed locator.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 2,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "user-preferences",
+   "owner_module": "core/preferences-manager.ts",
+   "path_patterns": [
+    "user/preferences.json",
+    "user/preferences.json.corrupt-{timestamp}"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/preferences-manager.ts",
+    "contract": "PreferencesManager defaults, coercion, and _dataVersion migration driver",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "PreferencesManager is intentionally permissive; _dataVersion is the legacy migration cursor, not a strict schema validator. Unreadable source bytes are preserved before any replacement document is written."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new PreferencesManager"
+    ],
+    "migration_entry": [
+     "core/preferences-manager.ts unreadable-source preservation",
+     "core/migrations.ts runMigrations"
+    ],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/engine.ts",
+     "core/preferences-manager.ts"
+    ]
+   },
+   "first_possible_open_phase": "desktop_bootstrap",
+   "first_possible_write_phase": "first_run_seed",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server",
+     "desktop"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "One preferences document belongs to the local user in one LINGXI_HOME.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 5,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "provider-state",
+   "owner_module": "core/provider-catalog.ts",
+   "path_patterns": [
+    "provider-catalog.json",
+    "added-models.yaml",
+    "models.json",
+    "auth.json",
+    "provider-plugins/{storageId}/manifest.json",
+    "provider-plugins/{storageId}/providers/{storageId}.json"
+   ],
+   "path_kind": "file",
+   "format": "mixed-directory",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "config_credentials"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "core/provider-catalog.ts",
+    "contract": "ProviderCatalogStore plus provider plugin/config runtime readers",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new ProviderRegistry",
+     "new ProviderCatalogStore"
+    ],
+    "migration_entry": [
+     "core/provider-auth-migration.ts"
+    ],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/credential-backup-retention.ts",
+     "core/local-provider-plugin-store.ts",
+     "core/model-sync.ts",
+     "core/provider-auth-migration.ts",
+     "core/provider-catalog.ts",
+     "server/routes/providers.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "engine_construct",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "providerId is the durable key; YAML/JSON paths are storage locators. Locally defined provider plugins live under a filesystem-safe storage identifier derived from that key, which is why their patterns say storageId rather than providerId.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 15,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "agent-profile",
+   "owner_module": "core/agent-manager.ts",
+   "path_patterns": [
+    "agents/{agentId}/config.yaml",
+    "agents/{agentId}/identity.md",
+    "agents/{agentId}/AGENTS.md",
+    "agents/{agentId}/AGENTS.public.md",
+    "agents/{agentId}/appearance-summary.json",
+    "agents/{agentId}/avatars/{fileName}",
+    "agents/{agentId}/channels.md",
+    "user/avatars/{fileName}"
+   ],
+   "path_kind": "file",
+   "format": "mixed-directory",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "core/agent-manager.ts",
+    "contract": "agent config and authored Markdown/image profile protocol",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "AgentManager.loadAgents",
+     "new LingxiAgent"
+    ],
+    "migration_entry": [
+     "lib/compat/checks/config-yaml.ts",
+     "core/agents-md-migration.ts"
+    ],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/agent-manager.ts",
+     "core/agents-md-migration.ts",
+     "lib/agent-appearance-summary.ts",
+     "lib/compat/checks/config-yaml.ts",
+     "server/routes/agents.ts",
+     "server/routes/avatar.ts"
+    ]
+   },
+   "first_possible_open_phase": "first_run_seed",
+   "first_possible_write_phase": "first_run_seed",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "agentId owns the profile; each filename has a fixed semantic role.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 29,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "agent-facts-sqlite",
+   "owner_module": "lib/memory/fact-store.ts",
+   "path_patterns": [
+    "agents/{agentId}/memory/facts.db"
+   ],
+   "path_kind": "file",
+   "format": "sqlite",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "sqlite-runtime",
+    "source": "lib/memory/fact-store.ts",
+    "contract": "FactStore runtime DDL, PRAGMA user_version, and introspection",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The FactStore runtime and its introspection are canonical; test-only v1 DDL is migration fixture data, never the schema source."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new FactStore"
+    ],
+    "migration_entry": [
+     "FactStore store-local migrations",
+     "lib/compat/checks/facts-db.ts"
+    ],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/agent.ts",
+     "hub/channel-router.ts",
+     "lib/character-cards/service.ts",
+     "lib/compat/checks/facts-db.ts",
+     "lib/memory/fact-store.ts",
+     "server/routes/config.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "One facts database belongs to one agentId; SQLite user_version is store-local and never DATA_EPOCH.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 10,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "agent-memory",
+   "owner_module": "lib/memory/compile.ts",
+   "path_patterns": [
+    "agents/{agentId}/memory/memory.md",
+    "agents/{agentId}/memory/navigation.md",
+    "agents/{agentId}/memory/tenets.json",
+    "agents/{agentId}/memory/pinned-tenets-migration.receipt.json",
+    "agents/{agentId}/memory/pinned-recovery-operations/{operationId}.json",
+    "agents/{agentId}/memory/pinned-migration-backup/{backupFile}",
+    "agents/{agentId}/memory/pinned-migration-backup/{operationId}/{backupFile}",
+    "agents/{agentId}/memory/facts.md",
+    "agents/{agentId}/memory/today.md",
+    "agents/{agentId}/memory/week.md",
+    "agents/{agentId}/memory/longterm.md",
+    "agents/{agentId}/memory/editable-facts-state.json",
+    "agents/{agentId}/memory/today-state.json",
+    "agents/{agentId}/memory/daily-state.json",
+    "agents/{agentId}/memory/summaries/{sessionId}.json",
+    "agents/{agentId}/memory/daily/{date}.md",
+    "agents/{agentId}/memory/dream/state.json",
+    "agents/{agentId}/memory/dream/pending-apply.json",
+    "agents/{agentId}/memory/dream/revisions/{revisionId}.json",
+    "agents/{agentId}/memory/memories.db",
+    "agents/{agentId}/memory/.v2-migrated"
+   ],
+   "path_kind": "file",
+   "format": "mixed-directory",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/memory/compiled-memory-state.ts",
+    "contract": "compiled memory, rolling-summary, tenets, and daily-state runtime readers",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "LingxiAgent.init",
+     "memory ticker and summary stores"
+    ],
+    "migration_entry": [
+     "LingxiAgent v1 memories.db import"
+    ],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/agent.ts",
+     "core/pinned-tenets-migration.ts",
+     "core/pinned-tenets-recovery.ts",
+     "lib/memory/cache-snapshot-observation.ts",
+     "lib/memory/compile.ts",
+     "lib/memory/compiled-memory-snapshot.ts",
+     "lib/memory/compiled-memory-state.ts",
+     "lib/memory/config-loader.ts",
+     "lib/memory/dream/revision-store.ts",
+     "lib/memory/dream/state-store.ts",
+     "lib/memory/memory-ticker.ts",
+     "lib/memory/navigation.ts",
+     "lib/memory/session-summary.ts",
+     "lib/memory/tenets.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "agentId owns long-term memory; session summaries are keyed by sessionId, never by sessionPath.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 72,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "file-history-sqlite",
+   "owner_module": "lib/file-history/history-store.ts",
+   "path_patterns": [
+    "file-history/{workspaceHash}/history.sqlite",
+    "file-history/{workspaceHash}/history.sqlite-wal",
+    "file-history/{workspaceHash}/history.sqlite-shm"
+   ],
+   "path_kind": "file",
+   "format": "sqlite",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "sqlite-runtime",
+    "source": "lib/file-history/history-store.ts",
+    "contract": "FileHistoryStore runtime DDL and meta.schema_version",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new FileHistoryStore"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/file-history/file-history-service.ts",
+     "lib/file-history/history-store.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "engine_construct",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "workspaceHash derives from the resolved workspace root path; one database per workspace; rel_path inside is workspace-relative posix.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 3,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "session-manifest-sqlite",
+   "owner_module": "core/session-manifest/store.ts",
+   "path_patterns": [
+    "session-manifest.db",
+    "session-manifest.db-wal",
+    "session-manifest.db-shm"
+   ],
+   "path_kind": "file",
+   "format": "sqlite",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "sqlite-runtime",
+    "source": "core/session-manifest/store.ts",
+    "contract": "SessionManifestStore runtime DDL and store-local PRAGMA user_version",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new SessionManifestStore"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/engine.ts",
+     "core/session-manifest/db-files.ts",
+     "core/session-manifest/store.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "engine_construct",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "sessionId is the durable identity; sessionPath is only the current JSONL locator.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 5,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "session-jsonl",
+   "owner_module": "core/session-coordinator.ts",
+   "path_patterns": [
+    "agents/{agentId}/sessions/{sessionId}.jsonl",
+    "agents/{agentId}/sessions/archived/{sessionId}.jsonl",
+    "agents/{agentId}/activity/{sessionId}.jsonl",
+    "agents/{agentId}/subagent-sessions/{sessionId}.jsonl",
+    "agents/{agentId}/.ephemeral/{sessionId}.jsonl"
+   ],
+   "path_kind": "file",
+   "format": "jsonl",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "external-versioned",
+    "source": "@earendil-works/pi-coding-agent",
+    "contract": null,
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The locked Pi package schema/version plus Hana repair and extension readers are canonical; Hana does not duplicate Pi's session schema."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "SessionCoordinator create/restore",
+     "Pi SessionManager"
+    ],
+    "migration_entry": [
+     "core/session-jsonl-file.ts"
+    ],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/engine.ts",
+     "core/session-coordinator.ts",
+     "core/session-jsonl-file.ts",
+     "core/slash-commands/session-ops.ts",
+     "hub/agent-executor.ts",
+     "server/routes/sessions.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "sessionId is identity. sessionPath is a mutable locator and must be resolved at boundaries before keyed state access.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 44,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "session-sidecars",
+   "owner_module": "core/bridge-session-manager.ts",
+   "path_patterns": [
+    "agents/{agentId}/sessions/session-meta.json",
+    "agents/{agentId}/sessions/session-titles.json",
+    "agents/{agentId}/sessions/bridge/bridge-sessions.json",
+    "agents/{agentId}/sessions/session-vision-notes.json",
+    "agents/{agentId}/subagent-sessions/session-meta.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/bridge-session-manager.ts",
+    "contract": "bridge index, legacy session metadata, title, and vision sidecar readers",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "SessionCoordinator",
+     "BridgeSessionManager",
+     "VisionBridge"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/bridge-session-manager.ts",
+     "core/vision-bridge.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "Entries are keyed by sessionId where available; any sessionPath field is only a locator compatibility field.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 7,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "workspace-snapshots",
+   "owner_module": "core/workspace-snapshots.ts",
+   "path_patterns": [
+    "workspace-snapshots/{workspaceHash}/**",
+    "agents/{agentId}/sessions/{sessionId}.jsonl.snapshots.json",
+    "agents/{agentId}/sessions/archived/{sessionId}.jsonl.snapshots.json",
+    "agents/{agentId}/activity/{sessionId}.jsonl.snapshots.json",
+    "agents/{agentId}/subagent-sessions/{sessionId}.jsonl.snapshots.json",
+    "agents/{agentId}/.ephemeral/{sessionId}.jsonl.snapshots.json"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "regenerable",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "core/workspace-snapshots.ts",
+    "contract": "shadow git repository layout (git init plus info/exclude allowlist, append-only commits) and the {sessionPath}.snapshots.json sidecar schema (version, workspaceRoot, snapshots[])",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "WorkspaceSnapshotService"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/workspace-snapshots.ts"
+    ]
+   },
+   "first_possible_open_phase": "runtime_ready",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Excluded from epoch checkpoints; shadow repos are re-capturable workspace-derived caches, and a sidecar without its repo deliberately degrades to write/edit backup fallback during rollback.",
+   "epoch_restore_policy": "Never restored from epoch checkpoints; rollback reads shadow commits read-only via --git-dir and writes user files back through ResourceIO, which records its own file history.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "workspaceHash (sha256 prefix of the resolved workspace root) identifies one shadow repo; the sidecar is keyed by its adjacent session JSONL locator and binds turnInputEntryId to shadow commits; sessionId remains the durable identity.",
+   "rebuild_or_loss_semantics": "Excluded from epoch checkpoints; shadow repos are re-capturable workspace-derived caches, and a sidecar without its repo deliberately degrades to write/edit backup fallback during rollback.",
+   "evidence": {
+    "inventory_sites_owned": 10,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "session-checkpoints",
+   "owner_module": "core/session-checkpoints.ts",
+   "path_patterns": [
+    "agents/{agentId}/sessions/{sessionId}.jsonl.checkpoints.json",
+    "agents/{agentId}/sessions/archived/{sessionId}.jsonl.checkpoints.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "regenerable",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/session-checkpoints.ts",
+    "contract": "Session checkpoint sidecar schema (schemaVersion, records[{name,target,turnInputEntryId,snapshotCommit,snapshotDegraded,createdAt,messageCount}]), 'latest' rolling slot, name uniqueness, lazy record cap",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "listSessionCheckpoints",
+     "upsertSessionCheckpoint"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/session-checkpoints.ts"
+    ]
+   },
+   "first_possible_open_phase": "runtime_ready",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Excluded from epoch checkpoints; checkpoints are advisory rewind anchors referencing branch entryIds — losing the sidecar only loses the anchors, never conversation data (the session JSONL is the durable record).",
+   "epoch_restore_policy": "Never restored from epoch checkpoints; a lost sidecar simply has no rewind anchors until new checkpoints are created.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "Records are keyed by checkpoint name within the sidecar adjacent to the owning session JSONL; sessionId remains the durable identity.",
+   "rebuild_or_loss_semantics": "Excluded from epoch checkpoints; checkpoints are advisory rewind anchors referencing branch entryIds — losing the sidecar only loses the anchors, never conversation data (the session JSONL is the durable record).",
+   "evidence": {
+    "inventory_sites_owned": 3,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "ephemeral-scanner-scratch",
+   "owner_module": "lib/security/external-scanners.ts",
+   "path_patterns": [
+    "(os-tmpdir)/lingxi-*"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "regenerable",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "lib/security/external-scanners.ts",
+    "contract": "mkdtemp scratch dirs consumed within one call and removed in finally; no cross-call state",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "runGitleaks / runSemgrep"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/security/external-scanners.ts",
+     "lib/tools/run-code-tool.ts"
+    ]
+   },
+   "first_possible_open_phase": "runtime_ready",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Excluded; deleted in the same call that created it.",
+   "epoch_restore_policy": "Never restored; nothing survives the call.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "No identity — per-call scratch keyed by mkdtemp random suffix.",
+   "rebuild_or_loss_semantics": "Excluded; deleted in the same call that created it.",
+   "evidence": {
+    "inventory_sites_owned": 3,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "session-goal",
+   "owner_module": "lib/goal/goal-engine.ts",
+   "path_patterns": [
+    "agents/{agentId}/sessions/{sessionId}.jsonl.goal.json",
+    "agents/{agentId}/sessions/archived/{sessionId}.jsonl.goal.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "regenerable",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "lib/goal/goal-engine.ts",
+    "contract": "Per-session budget goal sidecar schema (schemaVersion, name, tokenBudget, timeBudgetMs, tokensUsed, startedAt, pausedMs, currentPausedAt, status, pausedReason, completedAt, overBudgetNotified, lastActiveAt); one goal per session, active/paused/completed/dropped state machine",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "createGoalEngine + goal tool"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/goal/goal-engine.ts"
+    ]
+   },
+   "first_possible_open_phase": "runtime_ready",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Excluded from epoch checkpoints; a budget goal is an advisory session ledger — losing it loses the budget tracking, never conversation data.",
+   "epoch_restore_policy": "Never restored from epoch checkpoints; a lost sidecar simply has no active goal.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "One goal sidecar belongs to the session JSONL it is adjacent to; sessionId remains the durable identity.",
+   "rebuild_or_loss_semantics": "Excluded from epoch checkpoints; a budget goal is an advisory session ledger — losing it loses the budget tracking, never conversation data.",
+   "evidence": {
+    "inventory_sites_owned": 3,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "session-context-notes",
+   "owner_module": "lib/tools/context-notes-tool.ts",
+   "path_patterns": [
+    "agents/{agentId}/sessions/{sessionId}.jsonl.context-notes.md",
+    "agents/{agentId}/sessions/archived/{sessionId}.jsonl.context-notes.md"
+   ],
+   "path_kind": "file",
+   "format": "markdown",
+   "epoch_policy": "regenerable",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "lib/tools/context-notes-tool.ts",
+    "contract": "Per-session markdown notes sidecar, 16KiB write cap with read-side defensive truncation; read/write/append semantics",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "context_notes tool"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/tools/context-notes-tool.ts"
+    ]
+   },
+   "first_possible_open_phase": "runtime_ready",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Excluded from epoch checkpoints; notes are model-authored scratch context re-injected at compaction time — losing them loses the notes, never conversation data.",
+   "epoch_restore_policy": "Never restored from epoch checkpoints; a lost sidecar starts empty.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "Notes sidecar is adjacent to its session JSONL locator; sessionId remains the durable identity.",
+   "rebuild_or_loss_semantics": "Excluded from epoch checkpoints; notes are model-authored scratch context re-injected at compaction time — losing them loses the notes, never conversation data.",
+   "evidence": {
+    "inventory_sites_owned": 3,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "session-files",
+   "owner_module": "lib/session-files/session-file-registry.ts",
+   "path_patterns": [
+    "session-files/{sessionHash}"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/session-files/session-file-registry.ts",
+    "contract": "SessionFile payload naming, v1 sidecar, ownership, and 72-hour cold-session cleanup protocol",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "SessionFileRegistry"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "hub/index.ts",
+     "lib/session-files/bridge-inbound-files.ts",
+     "lib/session-files/browser-screenshot-file.ts",
+     "lib/session-files/session-file-registry.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Checkpoint sidecar and payload bytes together; exclude expired cold-session cache entries.",
+   "epoch_restore_policy": "Restore by sessionId ownership and rebuild locators through SessionFileRegistry.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "SessionFile ID and owning sessionId are identities; the hash directory and payload paths are locators.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 27,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "session-drafts-and-projects",
+   "owner_module": "core/input-drafts-store.ts",
+   "path_patterns": [
+    "input-drafts.v1.json",
+    "user/session-projects.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/input-drafts-store.ts",
+    "contract": "InputDraftsStore and SessionProjectCatalogStore normalizers",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new InputDraftsStore",
+     "new SessionProjectCatalogStore"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/engine.ts",
+     "core/input-drafts-store.ts",
+     "core/session-project-catalog-store.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "engine_construct",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "Draft/project records are keyed by sessionId; any saved sessionPath is a locator only.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 7,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "conversation-map-layout",
+   "owner_module": "server/routes/conversation-map.ts",
+   "path_patterns": [
+    "conversation-map.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "server/routes/conversation-map.ts",
+    "contract": "conversation-map layout normalizer (GET) and validated atomic writer (PUT)",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "createConversationMapRoute"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "server/routes/conversation-map.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "Layout entries are keyed by map card id; session/entry ids embedded in keys are references to session-owned data, not identities owned here.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 3,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "channels",
+   "owner_module": "lib/channels/channel-store.ts",
+   "path_patterns": [
+    "channels/{channelId}.yaml"
+   ],
+   "path_kind": "file",
+   "format": "yaml",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "lib/channels/channel-store.ts",
+    "contract": "channel YAML parser, serializer, and generation contract",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "ChannelManager",
+     "ChannelStore"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/channel-manager.ts",
+     "core/engine.ts",
+     "lib/channels/channel-store.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "channelId is durable; YAML filename is its canonical locator.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 11,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "desk-activity",
+   "owner_module": "lib/desk/activity-store.ts",
+   "path_patterns": [
+    "agents/{agentId}/desk/activities.json"
+   ],
+   "path_kind": "file",
+   "format": "mixed-directory",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/desk/activity-store.ts",
+    "contract": "activity index and activity-session JSONL lifecycle",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new ActivityStore",
+     "DeskManager"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/agent-manager.ts",
+     "lib/desk/activity-store.ts",
+     "lib/desk/desk-manager.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "activityId/sessionId identify records; session files remain agent-owned locators.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 6,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "cron-automation",
+   "owner_module": "lib/desk/cron-store.ts",
+   "path_patterns": [
+    "agents/{agentId}/desk/cron-jobs.json",
+    "agents/{agentId}/desk/cron-runs/{runId}.json",
+    "studios/{studioId}/desk/cron-jobs.json",
+    "studios/{studioId}/desk/cron-runs/{runId}.json"
+   ],
+   "path_kind": "file",
+   "format": "mixed-directory",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/desk/cron-store.ts",
+    "contract": "CronStore job registry and run receipt protocol",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new CronStore",
+     "StudioCronService"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/agent.ts",
+     "core/studio-cron-service.ts",
+     "lib/desk/cron-store.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "jobId and runId are scoped to their agentId or studioId owner.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 13,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "agent-authored-records",
+   "owner_module": "lib/tools/experience.ts",
+   "path_patterns": [
+    "user/user.md",
+    "agents/{agentId}/dm/{peerId}.md",
+    "agents/{agentId}/experience.md",
+    "agents/{agentId}/experience/{category}.md",
+    "agents/{agentId}/diary/{date}.md"
+   ],
+   "path_kind": "file",
+   "format": "markdown",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/tools/experience.ts",
+    "contract": "user profile, DM, experience index, and diary Markdown conventions",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "user profile and agent tools"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/diary/diary-writer.ts",
+     "lib/tools/dm-tool.ts",
+     "lib/tools/experience.ts",
+     "lib/user-profile-store.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "Files are owned by userId or agentId; peer/category/date names define stable logical records.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 13,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "agent-phone",
+   "owner_module": "lib/conversations/agent-phone-projection.ts",
+   "path_patterns": [
+    "agents/{agentId}/phone/conversations/{conversationId}.md",
+    "agents/{agentId}/phone/session-runtime/{conversationId}.json"
+   ],
+   "path_kind": "file",
+   "format": "mixed-directory",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/conversations/agent-phone-projection.ts",
+    "contract": "phone projection Markdown and session-runtime JSON readers",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "Agent Phone conversation runtime"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/conversations/agent-phone-projection.ts",
+     "lib/conversations/agent-phone-runtime.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "conversationId is identity within agentId; projection/runtime paths are locators.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 9,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "workflow-state",
+   "owner_module": "lib/workflow/journal.ts",
+   "path_patterns": [
+    "agents/{agentId}/workflow-journals/{runId}.jsonl",
+    "agents/{agentId}/workflow-sessions/{runId}",
+    "workflow-activity.json"
+   ],
+   "path_kind": "file",
+   "format": "mixed-directory",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "runtime_state"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/workflow/journal.ts",
+    "contract": "WorkflowJournal append protocol and WorkflowActivityStore runtime reader",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "WorkflowJournal",
+     "new WorkflowActivityStore"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/tools/workflow-tool.ts",
+     "lib/workflow-activity-store.ts",
+     "lib/workflow/journal.ts",
+     "server/index.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "runId is workflow identity; activity entries reference that ID, not the journal path.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 7,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "subagent-state",
+   "owner_module": "lib/subagent-run-store.ts",
+   "path_patterns": [
+    "subagent-runs.json",
+    "subagent-threads.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "runtime_state"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "lib/subagent-run-store.ts",
+    "contract": "SubagentRunStore and SubagentThreadStore permissive runtime readers",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "Current readers are permissive and repair legacy shapes; this inventory does not claim strict validation."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new SubagentRunStore",
+     "new SubagentThreadStore"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/subagent-executor-metadata.ts",
+     "lib/subagent-run-store.ts",
+     "lib/subagent-thread-store.ts",
+     "server/index.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "runId and threadId are durable; parent session references prefer sessionId and retain path only as a locator.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 8,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "plugin-task-registry",
+   "owner_module": "lib/task-registry.ts",
+   "path_patterns": [
+    ".ephemeral/plugin-tasks.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "runtime_state"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "lib/task-registry.ts",
+    "contract": "TaskRegistry task/schedule normalization and persistence serializer",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new TaskRegistry"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/engine.ts",
+     "lib/task-registry.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "engine_construct",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Include persisted task/schedule metadata when plugin recovery must survive the checkpoint; handlers remain runtime-only.",
+   "epoch_restore_policy": "Load through TaskRegistry, then let each plugin register its handler before recovery is attempted.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "taskId/scheduleId are durable registry keys; parent session ownership prefers sessionId.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 3,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "deferred-result-state",
+   "owner_module": "lib/deferred-result-store.ts",
+   "path_patterns": [
+    ".ephemeral/deferred-tasks.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "runtime_state"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "lib/deferred-result-store.ts",
+    "contract": "DeferredResultStore normalization, seven-day cleanup, and atomic serializer",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new DeferredResultStore"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/deferred-result-store.ts",
+     "server/index.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "engine_construct",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Include undelivered deferred results needed for restart notification; expired/delivered entries may be pruned.",
+   "epoch_restore_policy": "Load through DeferredResultStore so cleanup and delivery flags are applied before events resume.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "taskId is durable; session ownership prefers sessionId and retains sessionPath only as a locator.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 3,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "loop-state",
+   "owner_module": "lib/loop/loop-store.ts",
+   "path_patterns": [
+    ".ephemeral/loop-state.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "runtime_state"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "lib/loop/loop-store.ts",
+    "contract": "LoopStore schemaVersion-1 sessionId-keyed record shape, corrupt-file quarantine, and atomic serializer",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new LoopStore"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/loop/loop-store.ts",
+     "server/index.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "engine_construct",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Include running/paused loop records so restart recovery can re-arm alarms; terminal records may be pruned.",
+   "epoch_restore_policy": "Load through LoopStore so corrupt-file quarantine and record normalization apply before recovery runs.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "sessionId is the loop key for desktop and bridge targets alike; bridge sessionKey and any session path are delivery locators only.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 4,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "terminal-session-state",
+   "owner_module": "lib/terminal/terminal-session-manager.ts",
+   "path_patterns": [
+    ".ephemeral/terminal-sessions/{terminalId}.json",
+    ".ephemeral/terminal-sessions/{terminalId}.jsonl"
+   ],
+   "path_kind": "file",
+   "format": "mixed-directory",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "runtime_state"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/terminal/terminal-session-manager.ts",
+    "contract": "terminal metadata JSON plus ordered transcript JSONL protocol",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "sessionId and toolCallId are optional additive metadata fields. Older entries without them still load; ownership resolves from the persisted sessionPath when no stable id is present, and chat navigation falls back to terminalId when no toolCallId is present."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new TerminalSessionManager"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/terminal/terminal-session-manager.ts"
+    ]
+   },
+   "first_possible_open_phase": "runtime_ready",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Preserve metadata and transcript together only for diagnostic continuity; a live PTY handle is never checkpointed.",
+   "epoch_restore_policy": "Load through TerminalSessionManager; persisted running entries are historical metadata, not resumable processes.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "terminalId identifies metadata/transcript; session ownership must resolve to sessionId before keyed access.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 5,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "skill-translation-cache",
+   "owner_module": "lib/skills/skill-name-translation-cache.ts",
+   "path_patterns": [
+    ".ephemeral/skill-name-translations.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "regenerable",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "lib/skills/skill-name-translation-cache.ts",
+    "contract": "CACHE_VERSION and translation normalization",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "skill name translation lookup"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/skills/skill-name-translation-cache.ts"
+    ]
+   },
+   "first_possible_open_phase": "runtime_ready",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Excluded; translations are a versioned cache.",
+   "epoch_restore_policy": "Delete and regenerate when CACHE_VERSION or normalization becomes incompatible.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "Cache keys derive from skill names/content; the file path is not a durable identity.",
+   "rebuild_or_loss_semantics": "Excluded; translations are a versioned cache.",
+   "evidence": {
+    "inventory_sites_owned": 3,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "knowledge-database",
+   "owner_module": "lib/knowledge/knowledge-store.ts",
+   "path_patterns": [
+    "knowledge/knowledge.db",
+    "knowledge/knowledge.db-wal",
+    "knowledge/knowledge.db-shm"
+   ],
+   "path_kind": "file",
+   "format": "sqlite",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "sqlite-runtime",
+    "source": "lib/knowledge/knowledge-store.ts",
+    "contract": "KnowledgeStore runtime DDL, transactional migration, and store-local PRAGMA user_version",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "schema v6 adds notebook config columns (embedding_model_ref/rerank_model_ref inherit the global preference when NULL; chunk_target_chars/retrieval_top_k fall back to built-in defaults 1200/12) and the ingestion_jobs queue table, and drops the V3-V5 research tables in the same transaction; research rows were derived artifacts, so the V1-V2 source-of-truth tables migrate untouched. schema v7 adds ingestion_jobs.progress_done (NOT NULL DEFAULT 0) and progress_total (NULL = embed phase not reached) for embedding progress; existing rows backfill 0/NULL and no other persisted shape changes. schema v8 is a pure data migration: retrieval_top_k is reset to NULL for all active notebooks (NULL = uncapped retrieval; the DDL DEFAULT 12 from v6 is a legacy artifact new notebooks no longer receive). schema v9 (P0 index identity) is purely additive: it creates the chunk_profiles and retrieval_profiles identity registries plus the notebooks.retrieval_profile_id binding column, and backfills chunk_profiles from ingestion_jobs.chunker_config_id history (unresolvable hashes become profile_type='legacy' rows with NULL config, never fabricated); no existing column or index/vector data is touched and no re-embedding is triggered. schema v10 adds ingestion_jobs.embedding_stats (JSON, NULL = embed phase never ran); schema v11 adds the KnowledgeTurnScope tables knowledge_turn_scopes and knowledge_turn_scope_sources. schema v12 (lifecycle governance) is additive: sources.orphaned_at marks zero-membership orphans for retention-based GC, ingestion_jobs.cancelled_at marks jobs cancelled by explicit source deletion (the status CHECK cannot gain a 'cancelled' value, so cancellation reuses the failed terminal state plus this explicit column, and requeue rejects cancelled rows), and a partial unique index enforces one active job per (notebook_id, source_id) after collapsing pre-existing duplicate active rows to failed with an explicit error. schema v13 (Phase 7 coverage planner) is purely additive: the knowledge_coverage_plans table persists structured KnowledgeCoveragePlan results only (intent/coverage_mode/requires_completeness/scope_level/sub_queries_json/confidence/matched_rule_ids_json/classifier_used/degrade_reason plus a nullable turn_scope_id reference); no chain-of-thought or raw model output is ever stored, and no existing table or row changes. schema v14 (Phase 9 exhaustive coverage execution) is purely additive: the coverage_runs and coverage_shards tables persist the frozen coverage manifest identity (manifest_hash plus manifest_json with unit texts for resume), deterministic shard rows with attempt counts, and worker ShardResult JSON only (structured findings with provenance; no chain-of-thought); recovery reuses completed shard results and resets running shards to pending, and no existing table or row changes. schema v15 (EvidenceManifest, task spec 67) is purely additive: the evidence_manifests and evidence_manifest_entries tables persist per-answer evidence identity chains only (turn scope/session/turn/coverage mode references plus per-source snapshot/artifact/chunk-profile/chunk-and-vector-variant ids, neighbor ids, block offsets, and citation labels); no chunk text, chain-of-thought, or model output is ever stored, entries are re-verified server-side against the frozen turn-scope source set on insert, and orphan GC plus deleteSource now skip sources referenced by any manifest; no existing table or row changes. schema v16 (Phase 12 ProcessingArtifact pipeline, task spec 58/59/69) is purely additive: the processing_artifacts table persists binary-format conversion generations keyed by the processor identity quadruple (content_snapshot_id, processor_id, processor_version, processor_config_hash) with fidelity, output locator, locatorMap JSON and warnings; parse_artifacts gains fidelity (legacy rows default to 'citation_grade') and processing_artifact_id; notebook_sources gains directory organization path columns (relative_path/folder_node/display_order, NULL = no directory context); no existing table, row, or index/vector data is touched and no re-processing is triggered. schema v18 新增七张研究台账表：knowledge_research_runs、knowledge_evidence_needs、knowledge_research_rounds、knowledge_research_read_receipts、knowledge_evidence_items、knowledge_need_evidence、knowledge_research_actions；建表与 user_version 同事务提交。保留既有资料和派生索引，新增记录通过外键与原始来源定位关联，约束状态、数量、偏移、摘要格式和 JSON 形状。阅读凭据只存定位与 hash，证据表只保存经宿主核实的短引文，动作只保存结构化请求/结果摘要，不保存完整提示、模型原始回答或隐藏思考。 schema v19 仅新增 knowledge_completeness_checks、knowledge_completeness_units、knowledge_completeness_unit_evidence、knowledge_completeness_coverage_runs 四张完整性记录表；在同一事务中建表和更新版本，已有资料、原文凭据及研究证据逐行保持不变。新表仅保存计数、核查状态和既有资料/证据/覆盖运行的身份关联，约束唯一性、引用、偏移和完整性计数，不复制正文或模型输出。"
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new KnowledgeStore",
+     "new KnowledgeManager"
+    ],
+    "migration_entry": [
+     "KnowledgeStore store-local migrations"
+    ],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/knowledge/knowledge-store.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Checkpoint with the managed source snapshots and citation-grade parse artifacts from the same Knowledge generation.",
+   "epoch_restore_policy": "Restore through KnowledgeManager before queries resume; validate SQLite user_version and referenced managed bytes together.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "One Knowledge database belongs to one canonical LINGXI_HOME; Notebook, Source, Snapshot, and later run IDs are durable identities, while storage paths are relative locators.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 2,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "knowledge-source-snapshots",
+   "owner_module": "lib/knowledge/knowledge-manager.ts",
+   "path_patterns": [
+    "knowledge/sources/**"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/knowledge/knowledge-manager.ts",
+    "contract": "ContentSnapshot relative locator, immutable byte publication, SHA-256 verification, and rollback protocol",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new KnowledgeManager",
+     "KnowledgeManager.importFile",
+     "KnowledgeManager.readContentSnapshot"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/knowledge/knowledge-manager.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Checkpoint every referenced immutable snapshot byte together with knowledge.db; unreferenced staging files are excluded.",
+   "epoch_restore_policy": "Restore immutable bytes at their relative locators, then verify byte length and SHA-256 before serving citations or analysis.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "snapshotId and SHA-256 identify immutable captured bytes; the managed relative path is a locator and the external origin path is metadata only.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 22,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "knowledge-parse-artifacts",
+   "owner_module": "lib/knowledge/knowledge-manager.ts",
+   "path_patterns": [
+    "knowledge/artifacts/**"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "derived_data"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/knowledge/knowledge-manager.ts",
+    "contract": "ParseArtifact generation directories referenced by knowledge.db and never treated as source content versions",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new KnowledgeManager"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/knowledge/knowledge-manager.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Checkpoint citation-grade parse artifacts that are referenced by knowledge.db together with their ContentSnapshot generations.",
+   "epoch_restore_policy": "Restore only artifacts whose parser identity and source snapshot still validate; rebuild derived semantic views when compatibility requires it.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "parseArtifactId identifies one parser/config generation for one immutable ContentSnapshot; it never changes the ContentSnapshot identity.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 8,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "knowledge-processing-artifacts",
+   "owner_module": "lib/knowledge/knowledge-manager.ts",
+   "path_patterns": [
+    "knowledge/processed/**"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "derived_data"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/knowledge/knowledge-manager.ts",
+    "contract": "ProcessingArtifact output files (binary office formats converted to structured text) referenced by knowledge.db processing_artifacts rows, with locatorMap held in the database",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "schema v16 introduces the processing_artifacts table (processor identity quadruple, fidelity, output locator, locatorMap JSON) and these managed output files; parse_artifacts gains fidelity plus processing_artifact_id back-references, and notebook_sources gains directory organization paths (relative_path/folder_node/display_order)."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new KnowledgeManager",
+     "KnowledgeManager.parseSource"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/knowledge/knowledge-manager.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Checkpoint ready ProcessingArtifact outputs that are referenced by knowledge.db together with their ContentSnapshot generations; unreferenced staging files are excluded.",
+   "epoch_restore_policy": "Restore only outputs whose processor identity and content snapshot still validate; re-run the processor when compatibility requires it.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "(contentSnapshotId, processorId, processorVersion, processorConfigHash) identifies one conversion generation; outputs are deterministic projections of immutable snapshot bytes and never change ContentSnapshot identity.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 7,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "knowledge-indexes",
+   "owner_module": "lib/knowledge/knowledge-index-store.ts",
+   "path_patterns": [
+    "knowledge/indexes/**"
+   ],
+   "path_kind": "tree",
+   "format": "binary-cache",
+   "epoch_policy": "regenerable",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/knowledge/knowledge-index-store.ts",
+    "contract": "Lexical SQLite schema v3, portable vector SQLite schema v3, and rebuildable ANN catalog schema v1. ANN files derive from retained portable vector BLOBs; ANN failure never deletes those BLOBs",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "P3-04 将 FTS v3 增量升级为 v4：新增来源/章节与对应全文索引、片段追加可空 section_id；旧行、旧 v2 分块配置和向量保留，后台分批建立 v3 512-token 片段，未就绪时继续读旧索引。迁移失败整笔回滚且保留旧库。P1 adds chunk_index_variant_metadata (FTS v3) and a separate ann_variants catalog (ANN v1); portable vector schema stays v3 and retains BLOBs for exact fallback and ANN rebuild. Historical knowledge-fts.db schema v2 and knowledge-vector.db schema v2 (P0 index identity) migrate v1 in a single transaction each: chunk identity moves from (parse_artifact_id, ordinal) to ChunkIndexVariant (parse_artifact_id, chunk_profile_hash) + ordinal via chunk_index_variants backfill (artifact_indexes is retired after backfill), and vector identity moves from (parse_artifact_id, model_key) to VectorIndexVariant (chunk_index_variant_id, model_key) via vector_index_variants backfill (vector_artifacts is retired after backfill). Rows whose chunk profile cannot be resolved are filed under the explicit legacy_unknown identity instead of being dropped; migrations only establish identities and remap existing rows, never re-chunk or re-embed."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new KnowledgeManager",
+     "new KnowledgeIndexStore",
+     "new PortableVectorIndexAdapter",
+     "new AnnIndexStore"
+    ],
+    "migration_entry": [
+     "KnowledgeIndexStore runtime DDL",
+     "PortableVectorIndexAdapter runtime DDL",
+     "AnnIndexStore runtime DDL"
+    ],
+    "protocol_modules": [
+     "lib/knowledge/vector-index-adapter.ts",
+     "lib/knowledge/ann-index-store.ts",
+     "lib/knowledge/usearch-vector-backend.ts",
+     "lib/knowledge/vector-search-backend-factory.ts"
+    ],
+    "site_rule_files": [
+     "lib/knowledge/ann-index-store.ts",
+     "lib/knowledge/knowledge-index-store.ts",
+     "lib/knowledge/knowledge-manager.ts",
+     "lib/knowledge/usearch-vector-backend.ts",
+     "lib/knowledge/vector-index-adapter.ts",
+     "lib/knowledge/vector-search-backend-factory.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Portable vector BLOBs retain ingestion batch checkpoints and remain the recovery input for ANN; regenerable ANN files are not a checkpoint authority. Epoch checkpoint exclusion for this projection store remains unchanged.",
+   "epoch_restore_policy": "ANN corruption rebuilds only knowledge-ann.db and knowledge-ann files from retained portable vector BLOBs. Lexical projections rebuild from parse artifacts; never use an ANN file as the sole vector recovery source.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "Index generation IDs are disposable projection identities; ChunkIndexVariant (parseArtifactId, chunkProfileHash) and VectorIndexVariant (chunkIndexVariantId, modelKey) are deterministic derived identities, while Notebook, Source, Snapshot, Artifact, Evidence, and Claim facts never originate here.",
+   "rebuild_or_loss_semantics": "Portable vector BLOBs retain ingestion batch checkpoints and remain the recovery input for ANN; regenerable ANN files are not a checkpoint authority. Epoch checkpoint exclusion for this projection store remains unchanged.",
+   "evidence": {
+    "inventory_sites_owned": 15,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "usage-ledger",
+   "owner_module": "lib/llm/usage-ledger.ts",
+   "path_patterns": [
+    "usage-ledger.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "lib/llm/usage-ledger.ts",
+    "contract": "UsageLedger reader and atomic serializer",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "new UsageLedger"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/llm/usage-ledger.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "Usage buckets are keyed by their runtime dimensions inside one LINGXI_HOME ledger.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 2,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "model-observability-db",
+   "owner_module": "lib/llm/model-observability-schema.ts",
+   "path_patterns": [
+    "model-observability/observability.sqlite",
+    "model-observability/observability.sqlite-wal",
+    "model-observability/observability.sqlite-shm"
+   ],
+   "path_kind": "file",
+   "format": "sqlite",
+   "epoch_policy": "compatible",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "sqlite-runtime",
+    "source": "lib/llm/model-observability-schema.ts",
+    "contract": "Model Observatory runtime DDL, PRAGMA user_version open/migration contract, and disable-on-failure semantics",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "openModelObservabilityDatabase",
+     "installModelObservabilityPersistence"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/llm/model-observability-persistence.ts",
+     "lib/llm/model-observability-read-database.ts",
+     "lib/llm/model-observability-schema.ts",
+     "lib/llm/model-observability-testing.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "engine_construct",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Excluded from business data-epoch migration checkpoints: the observatory is not required to restore Agent/Session correctness and may be very large. Its own schema evolves through SQLite user_version migrations, never through DATA_EPOCH transitions.",
+   "epoch_restore_policy": "Never restored by epoch migrations. Observability rows that reference sessions rolled back by an epoch restore are allowed historical facts; query surfaces report them as session-unavailable rather than deleting them.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "One global observatory database per LINGXI_HOME; callId/attemptId/traceId are runtime observation identities correlated with (but never owned by) business epoch identities.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 5,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "model-observability-blobs",
+   "owner_module": "lib/llm/model-observability-blob-store.ts",
+   "path_patterns": [
+    "model-observability/blobs/**"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "compatible",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "derived_data"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/llm/model-observability-blob-store.ts",
+    "contract": "observatory blob shard layout, random blobId file names, atomic staging rename, owner-only permissions, and ref-count-based GC protocol",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "createModelObservabilityBlobStore"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/llm/model-observability-blob-store.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "engine_construct",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Excluded from epoch checkpoints: blob bytes are privileged observability captures whose lifetime is governed by payload retention and ref-count GC, not by business epoch transitions.",
+   "epoch_restore_policy": "Never restored by epoch migrations; orphan blob files left by crashes are reclaimed through the observatory's own grace-period recovery, never replayed as business state.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "blobId is a random observatory identity (mb_<random>); files never carry original filenames and metadata keeps only mime type and byte length.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 10,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "mcp-config",
+   "owner_module": "core/mcp/manager.ts",
+   "path_patterns": [
+    "plugin-data/mcp"
+   ],
+   "path_kind": "tree",
+   "format": "json",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "core/mcp/manager.ts",
+    "contract": "normalizeMcpConfig read-time normalization (servers/connectors alias, auth and OAuth field defaults, per-connector permission policy defaults, deferred-loading defaults, connection lifecycle defaults)",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "Engine constructor via McpManager"
+    ],
+    "migration_entry": [
+     "normalizeMcpConfig read-time normalization (servers→connectors alias)",
+     "normalizeMcpConfig read-time permission policy defaults (permissionMode/toolPermissions/trustReadOnlyHint)",
+     "normalizeMcpConfig read-time deferred-loading defaults (deferEnabled true, deferThreshold 10)",
+     "normalizeMcpConfig read-time connection lifecycle defaults (lifecycle keep-alive, idleTimeoutMinutes null → mode default)"
+    ],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/mcp/manager.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Single JSON config; checkpoint the whole file.",
+   "epoch_restore_policy": "Restore the whole file; read-time normalization absorbs older shapes.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "core/mcp owns plugin-data/mcp exclusively.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 1,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "plugin-runtime-data",
+   "owner_module": "core/plugin-config.ts",
+   "path_patterns": [
+    "plugin-data/{pluginId}"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "narrow-exemption",
+    "source": null,
+    "contract": null,
+    "schema_contract_kind": "exempt",
+    "schema_contract_compatibility": "No strict reader contract is claimed by this inventory."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "PluginManager activation with plugin-scoped dataDir"
+    ],
+    "migration_entry": [
+     "plugin manifest/migrationVersion hook; no host-wide implicit migration"
+    ],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/media-adapters/agnes.ts",
+     "core/media-adapters/speech.ts",
+     "core/media/download.ts",
+     "core/media/local-cli-wrapper.ts",
+     "core/media/task-store.ts",
+     "core/media/universal-media-manager.ts",
+     "core/plugin-config.ts",
+     "plugins/jimeng-cli/adapters/dreamina.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Checkpoint by pluginId and declared migrationVersion; never infer one schema for plugin-data/**.",
+   "epoch_restore_policy": "Restore only when the same pluginId and a compatible manifest/migrationVersion are available.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "pluginId from the active manifest owns exactly its plugin-data subtree.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 14,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "skill-state",
+   "owner_module": "lib/skill-bundles/store.ts",
+   "path_patterns": [
+    "skills/{skillName}",
+    "skill-bundles.json",
+    ".ephemeral/skill-bundle-exports/{token}"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "epoch-managed",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/skills/skill-package-installer.ts",
+    "contract": "SKILL.md package, bundle registry, and export staging protocols",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "skill loader",
+     "SkillBundleStore"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/engine.ts",
+     "lib/character-cards/service.ts",
+     "lib/skill-bundles/package-service.ts",
+     "lib/skill-bundles/store.ts",
+     "lib/skills/skill-package-installer.ts",
+     "lib/skills/skill-removal.ts",
+     "server/utils/uploaded-skill-package.ts"
+    ]
+   },
+   "first_possible_open_phase": "first_run_seed",
+   "first_possible_write_phase": "first_run_seed",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Included in a future epoch checkpoint unless the coordinator explicitly classifies it otherwise.",
+   "epoch_restore_policy": "Restore only through the owning module after reader compatibility is established.",
+   "affected_by_epoch_migration": true,
+   "identity_contract": "skillName is identity within the user skill root; bundle IDs are registry keys.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 25,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "operational-checkpoints",
+   "owner_module": "lib/checkpoint-store.ts",
+   "path_patterns": [
+    "checkpoints/{checkpointId}"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "compatible",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "runtime_state"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/checkpoint-store.ts",
+    "contract": "file-copy checkpoint manifest and session-manifest SQLite checkpoint protocol",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "CheckpointStore",
+     "createSessionManifestCheckpoint"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "core/session-manifest/checkpoint.ts",
+     "lib/checkpoint-store.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "This is the existing operational checkpoint facility, not an epoch checkpoint system.",
+   "epoch_restore_policy": "Existing restore APIs copy declared files; they provide no cross-store epoch transaction guarantee.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "checkpointId names an operational snapshot; it does not establish a global data epoch.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 13,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "runtime-diagnostics",
+   "owner_module": "lib/debug-log.ts",
+   "path_patterns": [
+    "logs/{timestamp}.log",
+    "browser-worker.log",
+    "switch-error.log",
+    "user/browser-sessions.json",
+    "bridge/wechat/sync-{accountHash}.json",
+    "bridge/wechat/context-{accountHash}.json"
+   ],
+   "path_kind": "file",
+   "format": "mixed-directory",
+   "epoch_policy": "compatible",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "logs_diagnostics"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/debug-log.ts",
+    "contract": "debug logs, browser cold state, switch diagnostics, and WeChat cache readers",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "runtime logging and bridge/browser startup"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "desktop/auto-updater.cjs",
+     "lib/bridge/wechat-adapter.ts",
+     "lib/browser/browser-manager.ts",
+     "lib/debug-log.ts",
+     "server/index.ts",
+     "server/routes/sessions.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server",
+     "desktop"
+    ]
+   },
+   "epoch_checkpoint_policy": "Exclude rotating logs; browser/bridge cold state may be included as best-effort compatible cache.",
+   "epoch_restore_policy": "Logs are append history; cache records may be dropped if incompatible.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "Diagnostic filenames are locators; browser and bridge cache keys are runtime-owned account/session keys.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 15,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "desktop-diagnostics",
+   "owner_module": "desktop/src/shared/desktop-launch-diagnostics.cjs",
+   "path_patterns": [
+    "diagnostics/desktop-launch",
+    "crash.log",
+    "browser-cmd.log"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "compatible",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "logs_diagnostics"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "desktop/src/shared/desktop-launch-diagnostics.cjs",
+    "contract": "desktop launch, renderer, server-crash, and browser-command diagnostic logs",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "desktop/bootstrap.cjs",
+     "desktop main-process diagnostics"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "desktop/bootstrap.cjs",
+     "desktop/main.cjs",
+     "desktop/src/shared/desktop-launch-diagnostics.cjs",
+     "desktop/src/shared/launch-integrity.cjs"
+    ]
+   },
+   "first_possible_open_phase": "desktop_bootstrap",
+   "first_possible_write_phase": "desktop_bootstrap",
+   "processes": {
+    "writers": [
+     "desktop"
+    ],
+    "readers": [
+     "desktop"
+    ]
+   },
+   "epoch_checkpoint_policy": "Exclude best-effort diagnostic logs from epoch checkpoints.",
+   "epoch_restore_policy": "Do not restore as application state; retain only as independent troubleshooting evidence.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "Diagnostic filenames are fixed locators and never provide user, session, or epoch identity.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 15,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "desktop-gpu-startup-state",
+   "owner_module": "desktop/src/shared/gpu-startup-policy.cjs",
+   "path_patterns": [
+    "user/gpu-startup.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "compatible",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "shell_state"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "desktop/src/shared/gpu-startup-policy.cjs",
+    "contract": "GPU startup state version, crash evidence, recovery mode, and legacy migration markers",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "resolveGpuStartupPolicy",
+     "desktop GPU startup markers"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "desktop/src/shared/gpu-startup-policy.cjs"
+    ]
+   },
+   "first_possible_open_phase": "desktop_bootstrap",
+   "first_possible_write_phase": "desktop_bootstrap",
+   "processes": {
+    "writers": [
+     "desktop"
+    ],
+    "readers": [
+     "desktop"
+    ]
+   },
+   "epoch_checkpoint_policy": "Exclude or preserve independently as launch-recovery metadata; never use it as an epoch checkpoint.",
+   "epoch_restore_policy": "Load only through the GPU startup policy reader; corrupt exact-migration evidence fails explicitly.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "One fixed GPU startup record belongs to one desktop installation data home.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 1,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "desktop-win32-install-acl-heal-state",
+   "owner_module": "desktop/src/shared/win32-install-acl-heal.cjs",
+   "path_patterns": [
+    "user/win32-install-acl-heal.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "compatible",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "shell_state"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "desktop/src/shared/win32-install-acl-heal.cjs",
+    "contract": "install ACL heal state version, per install-identity grant bookkeeping, recovery probe result, and ineffective probe count",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "maybeHealWin32InstallAcl",
+     "desktop install ACL heal bookkeeping"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "desktop/src/shared/win32-install-acl-heal.cjs"
+    ]
+   },
+   "first_possible_open_phase": "desktop_bootstrap",
+   "first_possible_write_phase": "desktop_bootstrap",
+   "processes": {
+    "writers": [
+     "desktop"
+    ],
+    "readers": [
+     "desktop"
+    ]
+   },
+   "epoch_checkpoint_policy": "Exclude or preserve independently as launch-recovery metadata; never use it as an epoch checkpoint.",
+   "epoch_restore_policy": "Load only through the install ACL heal reader; an unreadable record is treated as absent and the idempotent grant simply runs again.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "One heal record belongs to one desktop installation data home and is keyed inside the record by install directory and shell version.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 3,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "desktop-window-version-state",
+   "owner_module": "desktop/main.cjs",
+   "path_patterns": [
+    "user/window-state.json",
+    "user/quick-chat-window-state.json",
+    "user/last-seen-version.json",
+    "last-update-version"
+   ],
+   "path_kind": "file",
+   "format": "mixed-directory",
+   "epoch_policy": "compatible",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "shell_state"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "desktop/main.cjs",
+    "contract": "desktop window bounds, release announcement bookmark, and update cache version marker readers",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "desktop window creation",
+     "post-update announcement",
+     "desktop update cache cleanup"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "desktop/auto-updater.cjs",
+     "desktop/main.cjs"
+    ]
+   },
+   "first_possible_open_phase": "runtime_ready",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "desktop"
+    ],
+    "readers": [
+     "desktop"
+    ]
+   },
+   "epoch_checkpoint_policy": "Optional compatible shell metadata; it is not required for restoring durable agent/session state.",
+   "epoch_restore_policy": "Read through each desktop owner; invalid or absent shell metadata is recreated from safe defaults.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "Each fixed path is shell-local presentation or update metadata, never durable application identity.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 9,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "desktop-update-channel",
+   "owner_module": "desktop/auto-updater.cjs",
+   "path_patterns": [
+    "update-channel.json"
+   ],
+   "path_kind": "file",
+   "format": "json",
+   "epoch_policy": "compatible",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "shell_state"
+   },
+   "schema": {
+    "source_kind": "runtime-contract",
+    "source": "desktop/auto-updater.cjs",
+    "contract": "update channel record version, activation flag, update feed address, and activation time (legacy records may still carry a device identifier and held invite codes, which are ignored)",
+    "schema_contract_kind": "runtime-source",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "desktop update feed resolution",
+     "activated channel feed selection"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "desktop/auto-updater.cjs"
+    ]
+   },
+   "first_possible_open_phase": "runtime_ready",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "desktop"
+    ],
+    "readers": [
+     "desktop"
+    ]
+   },
+   "epoch_checkpoint_policy": "Optional compatible shell metadata; which update address this installation follows is not durable agent or session state.",
+   "epoch_restore_policy": "Read only through the desktop updater reader; an unparsable or unknown-version record falls back to the default update address and reports the reason to the user instead of degrading silently.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "One record per desktop installation data home; the record only selects which update feed this installation follows.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 2,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "managed-runtime-caches",
+   "owner_module": "lib/pi-sdk/search-tools.ts",
+   "path_patterns": [
+    "runtime/pi-sdk/bin/{toolName}",
+    ".ephemeral/win32-sandbox-runtime/{fingerprint}"
+   ],
+   "path_kind": "tree",
+   "format": "binary-cache",
+   "epoch_policy": "regenerable",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/pi-sdk/search-tools.ts",
+    "contract": "managed search-tool binary and Windows sandbox runtime cache validation; ast-grep (sg/ast-grep) joins the same cache via the npm platform-package channel with sha512 integrity (lib/sandbox/ast-grep-binary.ts)",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "search tool first use",
+     "Windows sandbox runtime preparation",
+     "ast tool first use"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/pi-sdk/search-tools.ts",
+     "lib/sandbox/ast-grep-binary.ts",
+     "lib/sandbox/win32-runtime-cache.ts"
+    ]
+   },
+   "first_possible_open_phase": "engine_construct",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Excluded; validated caches are rebuilt or recopied from trusted sources.",
+   "epoch_restore_policy": "Delete and regenerate on incompatibility.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "Cache key is tool/runtime fingerprint; cached paths are never persistent business identity.",
+   "rebuild_or_loss_semantics": "Excluded; validated caches are rebuilt or recopied from trusted sources.",
+   "evidence": {
+    "inventory_sites_owned": 19,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "signed-artifacts",
+   "owner_module": "shared/artifact-core/pointer-store.cjs",
+   "path_patterns": [
+    "artifacts"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "compatible",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "shell_state"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "shared/artifact-core/pointer-store.cjs",
+    "contract": "signed artifact pointers, verified receipts, quarantine, lock, and OTA state protocol",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "artifact activation and OTA check"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "desktop/src/shared/artifact-gc.cjs",
+     "desktop/src/shared/artifact-repair.cjs",
+     "shared/artifact-core/activation.cjs",
+     "shared/artifact-core/ota-core.cjs",
+     "shared/artifact-core/pointer-store.cjs"
+    ]
+   },
+   "first_possible_open_phase": "desktop_bootstrap",
+   "first_possible_write_phase": "desktop_bootstrap",
+   "processes": {
+    "writers": [
+     "desktop",
+     "cli(bundle)"
+    ],
+    "readers": [
+     "desktop",
+     "server",
+     "cli"
+    ]
+   },
+   "epoch_checkpoint_policy": "Exclude downloaded payload caches; preserve only if signature/pointer verification remains valid.",
+   "epoch_restore_policy": "Re-verify every pointer and artifact before activation.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "Signed digest/version identify artifacts; pointer and staging paths are locators.",
+   "rebuild_or_loss_semantics": null,
+   "evidence": {
+    "inventory_sites_owned": 41,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "legacy-upload-cache",
+   "owner_module": "server/routes/upload.ts",
+   "path_patterns": [
+    "uploads/{uploadName}"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "regenerable",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "server/routes/upload.ts",
+    "contract": "sessionless upload naming and age-based cleanup protocol",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "resolveUploadTarget without sessionPath"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "server/routes/upload.ts"
+    ]
+   },
+   "first_possible_open_phase": "runtime_ready",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Excluded; sessionless uploads are a short-lived compatibility cache.",
+   "epoch_restore_policy": "Discard and ask the caller to upload again; age cleanup removes stale entries.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "Generated uploadName is a cache locator, not a durable file or session identity.",
+   "rebuild_or_loss_semantics": "Excluded; sessionless uploads are a short-lived compatibility cache.",
+   "evidence": {
+    "inventory_sites_owned": 1,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "character-card-staging",
+   "owner_module": "lib/character-cards/service.ts",
+   "path_patterns": [
+    ".ephemeral/character-card-uploads/{fileName}",
+    ".ephemeral/character-card-imports/{token}",
+    ".ephemeral/character-card-exports/{token}"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "regenerable",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "lib/character-cards/service.ts",
+    "contract": "token-scoped import plan/package and export package protocol",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "character card upload, import planning, or export"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "lib/character-cards/service.ts",
+     "server/routes/character-cards.ts"
+    ]
+   },
+   "first_possible_open_phase": "runtime_ready",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Excluded; plans and packages are request-scoped staging.",
+   "epoch_restore_policy": "Discard incomplete tokens and restart import/export from the original package.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "Random token owns one staging subtree; staged paths never become agent or skill identities.",
+   "rebuild_or_loss_semantics": "Excluded; plans and packages are request-scoped staging.",
+   "evidence": {
+    "inventory_sites_owned": 10,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "desk-cover-upload-staging",
+   "owner_module": "server/routes/desk.ts",
+   "path_patterns": [
+    "tmp/markdown-cover-uploads/{token}"
+   ],
+   "path_kind": "tree",
+   "format": "directory-tree",
+   "epoch_policy": "regenerable",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "server/routes/desk.ts",
+    "contract": "bounded base64 cover upload temporary-directory lifecycle",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "writeUploadedCoverImage"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "server/routes/desk.ts"
+    ]
+   },
+   "first_possible_open_phase": "runtime_ready",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Excluded; each cover upload is request-scoped temporary input.",
+   "epoch_restore_policy": "Delete the temporary directory and upload the cover again.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "Temporary directory token owns the upload bytes; the final Markdown attachment has separate workspace ownership.",
+   "rebuild_or_loss_semantics": "Excluded; each cover upload is request-scoped temporary input.",
+   "evidence": {
+    "inventory_sites_owned": 3,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  },
+  {
+   "id": "office-render-jobs",
+   "owner_module": "plugins/office/lib/html-to-pdf.ts",
+   "path_patterns": [
+    "plugin-data/office/jobs",
+    "plugin-data/office/generated"
+   ],
+   "path_kind": "tree",
+   "format": "mixed-directory",
+   "epoch_policy": "regenerable",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "schema": {
+    "source_kind": "directory-contract",
+    "source": "plugins/office/lib/html-to-pdf.ts",
+    "contract": "job.json/input.html request contract and generated PDF output lifecycle",
+    "schema_contract_kind": "protocol",
+    "schema_contract_compatibility": "The named runtime reader is canonical; this inventory does not imply stricter validation than runtime currently performs."
+   },
+   "readers_writers": {
+    "open_entry": [
+     "renderHtmlToPdf"
+    ],
+    "migration_entry": [],
+    "protocol_modules": [],
+    "site_rule_files": [
+     "plugins/office/lib/html-to-pdf.ts"
+    ]
+   },
+   "first_possible_open_phase": "runtime_ready",
+   "first_possible_write_phase": "runtime_ready",
+   "processes": {
+    "writers": [
+     "server"
+    ],
+    "readers": [
+     "server"
+    ]
+   },
+   "epoch_checkpoint_policy": "Excluded; jobs are request-scoped and generated PDFs are re-creatable outputs.",
+   "epoch_restore_policy": "Discard incomplete jobs; rerun rendering from source HTML when output is still needed.",
+   "affected_by_epoch_migration": false,
+   "identity_contract": "jobId scopes one render request; outputPath is a locator and SessionFile registration supplies durable session ownership.",
+   "rebuild_or_loss_semantics": "Excluded; jobs are request-scoped and generated PDFs are re-creatable outputs.",
+   "evidence": {
+    "inventory_sites_owned": 4,
+    "registry_enforced_by": "tests/persistence-store-registry.test.ts (owns every production persistence site exactly once)"
+   }
+  }
+ ]
+}

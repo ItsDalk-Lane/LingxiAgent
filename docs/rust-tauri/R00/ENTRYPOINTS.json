@@ -1,0 +1,792 @@
+{
+  "schema_version": 1,
+  "task_id": "R00-T04",
+  "generated_at": "2026-09-24",
+  "tested_head": "ffcb85830ffdc75da5fe39b7a8cfddb4617f1aec",
+  "artifact_kind": "INVENTORY_CURRENT_SOURCE",
+  "anchor_semantics": "anchors[].file 为仓库相对路径；line 为 1 起行号；expect 为该行必须包含的子串（validate 时机械校验）。status: active=现役生产入口；residual=路由/分类残留但链路已删；dormant=网关能力存在但无生产接线。",
+  "principal_kinds": {
+    "local_user": "环回 token（LINGXI_TOKEN 或 server-info.json 内 128-bit token）+ local 连接 → owner 级全部权限（core/server-auth.ts:63-71）",
+    "device": "设备凭据（devices.json 注册表）+ lan/tunnel 连接 → 按 scopes 限权（core/device-registry.ts authenticateDeviceCredential）",
+    "web_session": "Web 登录会话 cookie hana_session → 按 scopes 限权（core/web-session-store.ts:31-77）",
+    "ws_ticket": "已认证 principal 经 POST /api/ws-ticket 换取短期 ticket 连 /ws（server/routes/ws-auth.ts:11-21）",
+    "automation": "无用户 principal；cron/heartbeat 由调度器以 actorAgentId + permissionContext.surface=automation 进入（hub/scheduler.ts:389-402）",
+    "bridge_platform_user": "外部 IM 平台用户；owner 由 agent.config.bridge[platform].owner 判定，guest 受限（lib/bridge/owner-policy.ts:8-17）"
+  },
+  "entries": [
+    {
+      "id": "EP-DESK-01",
+      "category": "desktop_shell",
+      "title": "Electron 进程入口 bootstrap.cjs（含 LINGXI_HOME 固化与 Windows 安装面校验）",
+      "status": "active",
+      "anchors": [
+        { "file": "package.json", "line": 22, "expect": "desktop/bootstrap.cjs" },
+        { "file": "desktop/bootstrap.cjs", "line": 182, "expect": "loadDesktopMain" },
+        { "file": "desktop/bootstrap.cjs", "line": 218, "expect": "--hana-office-html-to-pdf" }
+      ],
+      "principal_source": "桌面用户（OS 会话）；对 server 的身份由 spawn 注入的环回 token 建立",
+      "binding": "不直接绑定 agent/session；渲染层经 HTTP/WS 绑定会话",
+      "auth": "无（进程入口）；复用/关闭 server 时读 server-info.json 的 token（desktop/main.cjs:1203-1276）",
+      "permission_domain": "OS 用户全权（本地文件、子进程、系统 API）；对 server 为 LOCAL_ONLY owner",
+      "runtime_owner": "Electron main 进程（desktop/main.cjs）",
+      "resource_ownership": "desktop-* 系列注册 store（窗口状态/GPU/更新通道/诊断）+ artifacts 列车目录",
+      "shutdown": "will-quit 清理托盘/快捷键（main.cjs:6547-6556）；shutdownServer 决定 server-info 去留（main.cjs:6558-6640）",
+      "notes": "packaged 加载 main.bundle.cjs，dev 加载 main.cjs"
+    },
+    {
+      "id": "EP-DESK-02",
+      "category": "desktop_shell",
+      "title": "桌面 spawn/复用独立 Node server（LINGXI_SERVER_OWNER=desktop）",
+      "status": "active",
+      "anchors": [
+        { "file": "desktop/main.cjs", "line": 1282, "expect": "startServer" },
+        { "file": "desktop/main.cjs", "line": 1815, "expect": "_spawnServerOnce" },
+        { "file": "desktop/main.cjs", "line": 1879, "expect": "hana-server" }
+      ],
+      "principal_source": "桌面 shell 以 owner 身份持有 server token（server-info.json 0o600）",
+      "binding": "server 侧全局引擎/会话；ownerKind=desktop 标记归属",
+      "auth": "复用验证带 token 请求 /api/health 与 /api/server/identity（main.cjs:1203-1276）",
+      "permission_domain": "LOCAL_ONLY 全量；不可复用时可信旧 server 走认证 /api/shutdown + 击杀（main.cjs:1015,1307-1365）",
+      "runtime_owner": "desktop main（父）→ 独立 server 进程（子）",
+      "resource_ownership": "LINGXI_HOME 全部 store 的进程级唯一写者由 server 承担（desktop 只写 desktop-* store）",
+      "shutdown": "退出时 shutdownServer；server 意外退出 monitorServer 自动重启一次（main.cjs:2064-2111）",
+      "notes": "Windows 经 lingxi-win-sandbox.exe guardian 作为 launcher（main.cjs:1926-1944）"
+    },
+    {
+      "id": "EP-DESK-03",
+      "category": "desktop_shell",
+      "title": "主窗口（React 前端，file:// 加载）",
+      "status": "active",
+      "anchors": [
+        { "file": "desktop/main.cjs", "line": 2888, "expect": "createMainWindow" },
+        { "file": "desktop/main.cjs", "line": 2939, "expect": "index" }
+      ],
+      "principal_source": "渲染层经 preload window.hana.getServerToken 取环回 token（preload.cjs:34-35）",
+      "binding": "HTTP/WS 按当前会话 sessionPath 提交；pending-new-session 首发消息时创建",
+      "auth": "环回 token → local_user principal；file:// 源过 CORS 白名单",
+      "permission_domain": "LOCAL_ONLY 全量 + chat/settings/files/resources 等 scope",
+      "runtime_owner": "渲染进程 → server（LingxiEngine）",
+      "resource_ownership": "会话/文件经 server API；本地对话框/文件 IO 经 IPC（wrapIpcHandler ~85 通道）",
+      "shutdown": "窗口关闭不等于取消任务（server 常驻）；window-all-closed 托盘驻留（main.cjs:6528-6535）",
+      "notes": ""
+    },
+    {
+      "id": "EP-DESK-04",
+      "category": "desktop_shell",
+      "title": "Splash / Onboarding / 设置 / Quick Chat / Browser Viewer / Viewer 窗口面",
+      "status": "active",
+      "anchors": [
+        { "file": "desktop/main.cjs", "line": 2427, "expect": "createSplashWindow" },
+        { "file": "desktop/main.cjs", "line": 2696, "expect": "createQuickChatWindow" },
+        { "file": "desktop/main.cjs", "line": 3056, "expect": "createSettingsWindow" },
+        { "file": "desktop/main.cjs", "line": 3192, "expect": "createBrowserViewerWindow" },
+        { "file": "desktop/main.cjs", "line": 4598, "expect": "createOnboardingWindow" },
+        { "file": "desktop/main.cjs", "line": 5583, "expect": "spawn-viewer" }
+      ],
+      "principal_source": "同主窗口（环回 token）；Browser Viewer 由 server 经 /internal/browser WS 下发指令",
+      "binding": "设置页写全局配置；Quick Chat 复用当前 agent 会话",
+      "auth": "环回 token；/internal/browser 升级前 authenticateRequest + authorizeHttpRoute（server/index.ts:1187-1199）",
+      "permission_domain": "同主窗口；Quick Chat 全局快捷键默认 Alt+Space（main.cjs:223-256）",
+      "runtime_owner": "各 BrowserWindow + server",
+      "resource_ownership": "窗口状态 store（user/window-state.json 等 desktop-window-version-state）",
+      "shutdown": "viewer 多实例随主窗退出；browser 会话 server 侧 suspendForSession 冷保存",
+      "notes": "无深链/协议注册（全 desktop 源码无 setAsDefaultProtocolClient）"
+    },
+    {
+      "id": "EP-DESK-05",
+      "category": "desktop_shell",
+      "title": "托盘 / 单实例 / 通知 / 自启动 / 防休眠 / 代理",
+      "status": "active",
+      "anchors": [
+        { "file": "desktop/main.cjs", "line": 2151, "expect": "createTray" },
+        { "file": "desktop/src/shared/single-instance-lock.cjs", "line": 41, "expect": "configureClientSingleInstance" },
+        { "file": "desktop/login-item-settings.cjs", "line": 47, "expect": "getAutoLaunchStatus" },
+        { "file": "desktop/keep-awake.cjs", "line": 5, "expect": "createKeepAwakeManager" }
+      ],
+      "principal_source": "桌面用户；无 server 身份",
+      "binding": "无（shell 能力）",
+      "auth": "OS 会话；单实例锁按 LINGXI_HOME 命名空间隔离 userData",
+      "permission_domain": "OS 级（通知/登录项/powerSaveBlocker）",
+      "runtime_owner": "desktop main",
+      "resource_ownership": "OS 注册项 + preferences 只读（keybindings/quick_chat/keep_awake，main.cjs:176-212）",
+      "shutdown": "will-quit 注销快捷键与托盘",
+      "notes": "desktop 只读 user/preferences.json，写者唯一是 server（PUT /api/config）——跨进程单写者事实"
+    },
+    {
+      "id": "EP-DESK-06",
+      "category": "desktop_shell",
+      "title": "更新链：electron-updater / GitHub Releases 检查 / OTA 内容列车",
+      "status": "active",
+      "anchors": [
+        { "file": "desktop/auto-updater.cjs", "line": 795, "expect": "initAutoUpdater" },
+        { "file": "desktop/src/shared/github-release-check.cjs", "line": 24, "expect": "releases/latest" },
+        { "file": "desktop/src/shared/train-update-apply.cjs", "line": 29, "expect": "shutdown-server" },
+        { "file": "shared/artifact-core/ota-core.cjs", "line": 1056, "expect": "isPreloadContractSatisfied" }
+      ],
+      "principal_source": "桌面用户",
+      "binding": "无会话绑定；更新指纹独立 store",
+      "auth": "GitHub Releases 公开 API + 产物签名校验（pinned-keyset 只追加）",
+      "permission_domain": "写 LINGXI_HOME/update-channel.json、last-seen-version、artifacts 列车目录",
+      "runtime_owner": "desktop main（auto-updater + OTA scheduler main.cjs:2855-2885）",
+      "resource_ownership": "desktop-update-channel / desktop-window-version-state / signed-artifacts store",
+      "shutdown": "列车应用走固定序列 stop-server→promote→start-server（train-update-apply.cjs:29-45），避免与 server 并发写",
+      "notes": "契约闸：列车 manifest contract.preload > 壳 PRELOAD_API_VERSION 时拒绝激活（ota-core.cjs:1051-1065）"
+    },
+    {
+      "id": "EP-DESK-07",
+      "category": "desktop_shell",
+      "title": "辅助原生/子进程：office-pdf helper、computer-use、speech、win sandbox guardian",
+      "status": "active",
+      "anchors": [
+        { "file": "desktop/src/office-pdf-helper.cjs", "line": 135, "expect": "runOfficePdfHelperFromArgv" },
+        { "file": "core/computer-use/providers/macos-cua-provider.ts", "line": 680, "expect": "serve" },
+        { "file": "core/speech-recognition/system-speech-adapter.ts", "line": 555, "expect": "spawn" },
+        { "file": "desktop/src/shared/windows-server-guardian.cjs", "line": 5, "expect": "lingxi-win-sandbox" }
+      ],
+      "principal_source": "由 server（office/speech/computer-use 工具）或 desktop（guardian）以本机用户 spawn",
+      "binding": "office 渲染 job 绑定会话产物；computer-use 绑定工具调用",
+      "auth": "argv 旗标 / Unix socket 本地；无网络暴露",
+      "permission_domain": "单次外围能力（PDF 打印、屏幕/语音采集、进程守护）；不拥有 Agent loop",
+      "runtime_owner": "外围 worker（R00-T03 W 表 PERIPHERAL_CANDIDATE 正例：office 单次解析）",
+      "resource_ownership": "plugin-data/office/{jobs,generated}（office-render-jobs store，regenerable）",
+      "shutdown": "job 完成退出；guardian 随 server 生命周期",
+      "notes": "屏幕/麦克风属客户端采集能力，远端使用需独立授权（契约 §9）"
+    },
+    {
+      "id": "EP-REND-01",
+      "category": "renderer_clients",
+      "title": "Vite 多入口渲染面（main/mobile/settings/quick-chat/onboarding/browser-viewer/viewer-window + splash 独立构建）",
+      "status": "active",
+      "anchors": [
+        { "file": "vite.config.ts", "line": 341, "expect": "rollupOptions" },
+        { "file": "vite.config.ts", "line": 344, "expect": "mobile" }
+      ],
+      "principal_source": "桌面窗口内=环回 token；经 HTTP 供货时=web/device principal",
+      "binding": "各入口按其页面绑定会话（mobile 为 PWA，service worker mobile-sw.js）",
+      "auth": "同 HTTP/WS 面",
+      "permission_domain": "按 principal scopes",
+      "runtime_owner": "渲染进程；业务事实全部由 server 拥有",
+      "resource_ownership": "renderer 状态经认证 server API，不落盘自有权威（SOURCE_EXCLUSIONS desktop-renderer-*）",
+      "shutdown": "随窗口/浏览器标签",
+      "notes": ""
+    },
+    {
+      "id": "EP-REND-02",
+      "category": "renderer_clients",
+      "title": "Mobile/LAN 网页客户端供货路由 /mobile 与 /desktop（PWA）",
+      "status": "active",
+      "anchors": [
+        { "file": "server/routes/mobile-static.ts", "line": 57, "expect": "/mobile" },
+        { "file": "server/http/route-security.ts", "line": 293, "expect": "isMobileStaticRoute" }
+      ],
+      "principal_source": "静态资源 PUBLIC；后续 API 调用需 web 会话 cookie 或设备凭据",
+      "binding": "经 /api/mobile/bootstrap（scope chat）绑定会话",
+      "auth": "静态路径 GET/HEAD PUBLIC（route-security.ts:53）；数据面走 web-auth/device",
+      "permission_domain": "chat/files.read/files.write 等按 scope；LOCAL_ONLY 面不可达",
+      "runtime_owner": "server",
+      "resource_ownership": "无本地持久化（PWA 缓存除外）",
+      "shutdown": "断开即断；任务不取消",
+      "notes": "LAN 模式由 server-network.json mode 决定绑定地址"
+    },
+    {
+      "id": "EP-HTTP-01",
+      "category": "http_ws_server",
+      "title": "HTTP 全局中间件：传输判定 → 公共路由 → principal 解析 → 路由授权",
+      "status": "active",
+      "anchors": [
+        { "file": "server/index.ts", "line": 589, "expect": "app.use" },
+        { "file": "server/index.ts", "line": 626, "expect": "resolveHttpRequestPrincipal" },
+        { "file": "server/http/route-security.ts", "line": 8, "expect": "authorizeHttpRoute" }
+      ],
+      "principal_source": "Bearer 环回 token（local_user）| 设备凭据（device）| web cookie（web_session）；plugin surface session 后备仅 missing_credential 时",
+      "binding": "principal 与请求级绑定；会话绑定在具体路由内按 sessionPath 解析",
+      "auth": "server-auth.ts authenticateRequestDetailed：环回 token 仅 local 连接；device 限 lan/tunnel；连接类型由 inferHttpConnectionKind 判定",
+      "permission_domain": "PUBLIC/authenticated/local_only/studio_owner/scope 五类（classifyHttpRoute）+ scopeAllows 命名空间通配",
+      "runtime_owner": "server（Hono app）",
+      "resource_ownership": "server 全部 store 的唯一写进程（desktop/CLI 经 API）",
+      "shutdown": "POST /api/shutdown（LOCAL_ONLY）→ gracefulShutdown（server/index.ts:1155-1160, 1354-1406）",
+      "notes": "资源 ticket 内容请求 GET/HEAD ?ticket= 走旁路（index.ts:639-644）"
+    },
+    {
+      "id": "EP-HTTP-02",
+      "category": "http_ws_server",
+      "title": "开放/闭集路由组合：composition/open-root.ts（45+ 路由工厂）+ full-root 闭集五路由 + mobile-workbench",
+      "status": "active",
+      "anchors": [
+        { "file": "server/composition/open-root.ts", "line": 72, "expect": "registerOpenRoutes" },
+        { "file": "server/composition/full-root.ts", "line": 26, "expect": "registerClosedRoutes" },
+        { "file": "server/index.ts", "line": 1022, "expect": "createMobileWorkbenchRoute" }
+      ],
+      "principal_source": "同 EP-HTTP-01",
+      "binding": "各路由自带（sessions/chat/fs/desk/knowledge/usage/observability/...）",
+      "auth": "同上；闭集路由仅 main-full.ts 组合入口 import（进程启动前静态决定）",
+      "permission_domain": "逐路由 scope：chat/settings.read|write/files.read|write/providers.manage/bridge.manage/resources.read|write/studio_owner/local_only",
+      "runtime_owner": "server",
+      "resource_ownership": "读写对应注册 store（见 STORES.json）",
+      "shutdown": "随 server",
+      "notes": "REST 字面路由约 390 条（r00_t04_scan.py 提取）；main-open.ts 仅开放面"
+    },
+    {
+      "id": "EP-HTTP-03",
+      "category": "http_ws_server",
+      "title": "聊天 WS /ws（事件流/提示/打断/steer）+ 短期 ws-ticket",
+      "status": "active",
+      "anchors": [
+        { "file": "server/routes/chat.ts", "line": 2256, "expect": "wsRoute.get" },
+        { "file": "server/routes/ws-auth.ts", "line": 8, "expect": "ws-ticket" }
+      ],
+      "principal_source": "ticket 由已认证 principal 换取（scope chat）；CLI 亦可 Bearer/查询 token 直连",
+      "binding": "订阅 sessionPath 维度事件；WRITE_MESSAGE_TYPES（prompt/abort/steer/...）与 READ 分离（server/ws-scope.ts:16-29）",
+      "auth": "POST /api/ws-ticket（scope chat）→ ticket 连接 /ws；principal 决定订阅可见性（wsClientCanReceiveEvent）",
+      "permission_domain": "chat scope；跨会话订阅受 studioId/sessionPath 归属约束",
+      "runtime_owner": "server",
+      "resource_ownership": "无独立持久化；事件源为引擎会话",
+      "shutdown": "断线重连走 resume_stream + 快照 cursor（chat WS 协议）",
+      "notes": "终端/资源事件是 /ws 内的消息类型（terminal-ws-bridge.ts、resource-events-ws.ts），不是独立端口"
+    },
+    {
+      "id": "EP-HTTP-04",
+      "category": "http_ws_server",
+      "title": "内部浏览器控制 WS /internal/browser（raw ws，绕过 Hono）",
+      "status": "active",
+      "anchors": [
+        { "file": "server/index.ts", "line": 1171, "expect": "WebSocketServer" },
+        { "file": "server/index.ts", "line": 1194, "expect": "authorizeHttpRoute" }
+      ],
+      "principal_source": "desktop 渲染层（Browser Viewer）持环回 token",
+      "binding": "BrowserManager 单传输通道绑定运行中 browser 会话",
+      "auth": "升级前 authenticateRequest（allowQueryToken=true 仅 local）+ authorizeHttpRoute GET /internal/browser",
+      "permission_domain": "LOCAL_ONLY 面；浏览器指令由 server BrowserManager 下发",
+      "runtime_owner": "server BrowserManager ↔ desktop WebContentsView",
+      "resource_ownership": "user/browser-sessions.json（runtime-diagnostics store，冷保存恢复）",
+      "shutdown": "gracefulShutdown 第 2 步 suspendForSession 全量挂起（index.ts:1376-1385）",
+      "notes": "与 Hono WS 升级互斥过滤防止双处理（index.ts:1252-1264）"
+    },
+    {
+      "id": "EP-HTTP-05",
+      "category": "http_ws_server",
+      "title": "Web 登录面 /api/web-auth/login|session|logout（PUBLIC bootstrap）",
+      "status": "active",
+      "anchors": [
+        { "file": "server/routes/web-auth.ts", "line": 32, "expect": "/web-auth/login" },
+        { "file": "server/http/route-security.ts", "line": 313, "expect": "isWebAuthBootstrapRoute" }
+      ],
+      "principal_source": "本地账号口令（local-user-auth.json verifyLocalAccountPassword）→ 签发 web 会话",
+      "binding": "会话 cookie hana_session（14 天默认 TTL，web-session-registry store）",
+      "auth": "口令登录要求安全上下文；cookie 会话过期/吊销显式状态机",
+      "permission_domain": "登录后按会话 scopes；连接类型限制 principalAllowsConnection",
+      "runtime_owner": "server",
+      "resource_ownership": "web-sessions.json + local-user-auth.json",
+      "shutdown": "会话随 TTL/登出失效",
+      "notes": ""
+    },
+    {
+      "id": "EP-HTTP-06",
+      "category": "http_ws_server",
+      "title": "设备接入面 /api/devices/*（配对审批、凭据签发/吊销）",
+      "status": "active",
+      "anchors": [
+        { "file": "server/routes/devices.ts", "line": 34, "expect": "pairing-sessions" },
+        { "file": "server/routes/devices.ts", "line": 64, "expect": "approve" }
+      ],
+      "principal_source": "owner 在 LOCAL_ONLY 面审批配对 → 设备获得凭据（device principal）",
+      "binding": "凭据绑定设备身份与 scopes；连接限定 lan/tunnel",
+      "auth": "devices.json/device-credentials.json/pairing-sessions.json 注册表；authenticateDeviceCredential 校验",
+      "permission_domain": "设备 scopes（chat/files/...），LOCAL_ONLY 路由仍不可达",
+      "runtime_owner": "server",
+      "resource_ownership": "device-access-registries store；审计入 security-audit.jsonl",
+      "shutdown": "凭据吊销即时生效",
+      "notes": "/api/devices/* 全部 LOCAL_ONLY（route-security.ts:349）"
+    },
+    {
+      "id": "EP-HTTP-07",
+      "category": "http_ws_server",
+      "title": "网络模式面 /api/access/*（loopback/lan/custom 切换）与 server attach CLI（--cli/--chat TTY）",
+      "status": "active",
+      "anchors": [
+        { "file": "server/http/route-security.ts", "line": 348, "expect": "/api/access/" },
+        { "file": "server/index.ts", "line": 1317, "expect": "--cli" }
+      ],
+      "principal_source": "access=owner LOCAL_ONLY；attach CLI=server 进程内直启（环回 token）",
+      "binding": "attach CLI 复用 server 会话（startCLI 传 SERVER_TOKEN）",
+      "auth": "环回 token；access 变更写 server-network.json",
+      "permission_domain": "网络暴露面变更即权限域变更（lan 后 device principal 可达）",
+      "runtime_owner": "server",
+      "resource_ownership": "server-network-config store",
+      "shutdown": "随 server；模式变更需重启生效",
+      "notes": "server/cli.ts 580 行交互循环"
+    },
+    {
+      "id": "EP-CLI-01",
+      "category": "cli",
+      "title": "hana CLI：serve/chat/continue/status/sessions/bundle/data（server-first 客户端）",
+      "status": "active",
+      "anchors": [
+        { "file": "cli/entry.ts", "line": 33, "expect": "serve" },
+        { "file": "cli/entry.ts", "line": 89, "expect": "startChat" },
+        { "file": "cli/chat.ts", "line": 104, "expect": "createWebSocket" }
+      ],
+      "principal_source": "读 LINGXI_HOME/server-info.json 的环回 token（local_user owner）；--url/--token 显式指定时为裸 Bearer",
+      "binding": "chat/continue 绑定具体 sessionPath；WS 提交 prompt 与桌面同链",
+      "auth": "Bearer 头（server-info 来源时允许查询 token 连 WS）；连接必须 local（环回 token 限制）",
+      "permission_domain": "owner 全量（local_user principal）",
+      "runtime_owner": "server（CLI 为瘦客户端）；serve 子命令前台拉起 server",
+      "resource_ownership": "CLI 自身仅读 server-info/data-epoch 元数据；无权威写",
+      "shutdown": "CLI 退出不影响 server 任务；serve 前台模式随终端信号",
+      "notes": "bundle 子命令不启 server（纯本地+发布架操作）"
+    },
+    {
+      "id": "EP-CLI-02",
+      "category": "cli",
+      "title": "hana data 维护面（diagnose/checkpoints/restore，data-epoch 安全链）",
+      "status": "active",
+      "anchors": [
+        { "file": "cli/entry.ts", "line": 52, "expect": "data" },
+        { "file": "core/data-epoch-restore.ts", "line": 161, "expect": "isForeignServerBlocking" }
+      ],
+      "principal_source": "本机 OS 用户直接操作数据目录（无 principal）",
+      "binding": "作用于整个 LINGXI_HOME 的 epoch 受管 store",
+      "auth": "restore 前强制探测同宅活内核（token 探测 probeServerInfo），活内核在即拒绝（data-epoch-restore.ts:145-164）",
+      "permission_domain": "文件系统全权（维护面）；confirm token 防误触",
+      "runtime_owner": "CLI 进程（独立于 server）",
+      "resource_ownership": "data-epoch-checkpoints / restore-quarantine / stamp+journal",
+      "shutdown": "一次性命令",
+      "notes": "跨进程写风险已由活内核探测保护；残余风险=冷启动竞态窗口（见 OWNERSHIP_CURRENT.md 风险表）"
+    },
+    {
+      "id": "EP-CLI-03",
+      "category": "cli",
+      "title": "cli/server-runner.ts：serve 前台 spawn 与 chat 自动拉起本地 server",
+      "status": "active",
+      "anchors": [
+        { "file": "cli/server-runner.ts", "line": 1, "expect": "import" },
+        { "file": "cli/entry.ts", "line": 67, "expect": "startLocalServerAndWait" }
+      ],
+      "principal_source": "同 EP-CLI-01；spawn 的 server ownerKind=standalone",
+      "binding": "server 独立进程；CLI 客户端连之",
+      "auth": "同宅互斥闸在 server 侧先跑（probeServerInfo）",
+      "permission_domain": "同 server",
+      "runtime_owner": "server 进程",
+      "resource_ownership": "LINGXI_HOME（standalone owner）",
+      "shutdown": "前台信号传递；后台拉起模式 server 随 CLI 退出策略",
+      "notes": "allowDataDowngrade 透传 LINGXI_ALLOW_DATA_DOWNGRADE"
+    },
+    {
+      "id": "EP-BRG-01",
+      "category": "bridge",
+      "title": "五平台 Bridge：telegram/feishu/dingtalk/qq/wechat 适配器（长轮询/长连接，无入站 webhook）",
+      "status": "active",
+      "anchors": [
+        { "file": "lib/bridge/bridge-manager.ts", "line": 117, "expect": "ADAPTER_REGISTRY" },
+        { "file": "lib/bridge/telegram-adapter.ts", "line": 112, "expect": "polling" },
+        { "file": "lib/bridge/feishu-adapter.ts", "line": 571, "expect": "WSClient" },
+        { "file": "lib/bridge/dingtalk-adapter.ts", "line": 254, "expect": "WebSocket" },
+        { "file": "lib/bridge/qq-adapter.ts", "line": 367, "expect": "WebSocket" },
+        { "file": "lib/bridge/wechat-adapter.ts", "line": 550, "expect": "pollLoop" },
+        { "file": "server/index.ts", "line": 1313, "expect": "startBridgeManager" }
+      ],
+      "principal_source": "外部 IM 平台用户（platform userId）；server 侧无 HTTP principal，身份来自平台消息",
+      "binding": "sessionKey（platform:chat）→ BridgeSessionManager owner/guest 会话；实例键 platform:agentId 支持多 agent",
+      "auth": "平台凭据（bot token 等）存于 agent config.yaml（无独立凭据文件）；出站调平台 API",
+      "permission_domain": "owner=完整代理；guest=GuestHandler 受限上下文（hub/index.ts:326）；斜杠命令仅 owner（bridge-manager.ts:1140-1157）",
+      "runtime_owner": "server 内 BridgeManager（setImmediate 后台加载，不阻塞 HTTP readiness）",
+      "resource_ownership": "bridge 会话文件（session-sidecars bridge-sessions.json）、wechat sync 游标、媒体收发经 media-delivery-service",
+      "shutdown": "gracefulShutdown 第 3 步 bridgeManager.stopAll()（index.ts:1388）",
+      "notes": "autoStart 遍历每个 agent config.bridge（bridge-manager.ts:846-864）"
+    },
+    {
+      "id": "EP-BRG-02",
+      "category": "bridge",
+      "title": "Bridge owner 判定与投递（owner-policy）",
+      "status": "active",
+      "anchors": [
+        { "file": "lib/bridge/owner-policy.ts", "line": 3, "expect": "getConfiguredBridgeOwner" },
+        { "file": "lib/bridge/owner-policy.ts", "line": 8, "expect": "isBridgeOwner" }
+      ],
+      "principal_source": "agent.config.bridge[platform].owner 配置的平台 userId（wechat DM 全员视为 owner 视角）",
+      "binding": "owner 消息 → engine.executeExternalMessage 持久会话；guest → GuestHandler",
+      "auth": "配置比对（非凭据）；QQ 额外 aliases 匹配",
+      "permission_domain": "bridgeRole owner|guest 决定路由（bridge-manager.ts:1127-1128）",
+      "runtime_owner": "server",
+      "resource_ownership": "owner 配置回写经 /api/bridge/owner（scope bridge.manage）",
+      "shutdown": "随 server",
+      "notes": ""
+    },
+    {
+      "id": "EP-BRG-03",
+      "category": "bridge",
+      "title": "Bridge 管理面 /api/bridge/*（status/config/owner/settings/stop/test/messages/sessions/media）",
+      "status": "active",
+      "anchors": [
+        { "file": "server/routes/bridge.ts", "line": 383, "expect": "/bridge/config" },
+        { "file": "server/http/route-security.ts", "line": 539, "expect": "isBridgeManagementRoute" }
+      ],
+      "principal_source": "HTTP principal（scope bridge.manage；LOCAL_ONLY 面对 owner 直通）",
+      "binding": "按 agent+platform 定位实例",
+      "auth": "同 HTTP 面",
+      "permission_domain": "bridge.manage scope；POST 面",
+      "runtime_owner": "server",
+      "resource_ownership": "写 agent config（bridge 段）",
+      "shutdown": "stop 端点停单平台",
+      "notes": ""
+    },
+    {
+      "id": "EP-SCH-01",
+      "category": "schedulers",
+      "title": "Hub 心跳（patrol，per-agent 31 分钟对齐槽位）",
+      "status": "active",
+      "anchors": [
+        { "file": "hub/scheduler.ts", "line": 120, "expect": "startHeartbeat" },
+        { "file": "lib/desk/heartbeat.ts", "line": 602, "expect": "createHeartbeat" }
+      ],
+      "principal_source": "无用户 principal；automation 主体（agentId）",
+      "binding": "persist 到 <agentDir>/activity 的隔离会话；permissionContext.surface=automation",
+      "auth": "进程内调度（无外部认证）——身份=调度器对 engine 的进程内信任",
+      "permission_domain": "executeIsolated 选项：permissionMode=auto（或 getAutomationPermissionMode）、approvalPolicy=deny_on_prompt、allowHumanApproval=false（scheduler.ts:389-391）",
+      "runtime_owner": "server Hub Scheduler",
+      "resource_ownership": "activity JSONL（session-jsonl store 的 activity 形态）",
+      "shutdown": "stopHeartbeat 暂停/恢复于 agent 切换；dispose 停 ticker",
+      "notes": "启用条件 desk.heartbeat_enabled===true"
+    },
+    {
+      "id": "EP-SCH-02",
+      "category": "schedulers",
+      "title": "Studio cron（60s tick，触发收据 + CAS configRevision + 退避）",
+      "status": "active",
+      "anchors": [
+        { "file": "hub/scheduler.ts", "line": 194, "expect": "_startStudioCron" },
+        { "file": "lib/desk/cron-scheduler.ts", "line": 42, "expect": "createCronScheduler" },
+        { "file": "lib/desk/cron-store.ts", "line": 746, "expect": "markRun" }
+      ],
+      "principal_source": "无用户 principal；actorAgentId 记录在 job",
+      "binding": "执行范围绑定来源会话（_resolveCronExecutionScope 校验 manifest.ownerAgentId 与会话归属，scheduler.ts:340-364）",
+      "auth": "同 EP-SCH-01；同 job 并发锁（_executingJobs AbortController，重复触发 skipped 不推进 nextRunAt）",
+      "permission_domain": "同 EP-SCH-01 + authorizedFolders/workspaceFolders 会话范围",
+      "runtime_owner": "server Hub Scheduler + engine.executeIsolated",
+      "resource_ownership": "cron-jobs.json + cron-runs/{runId}.json 收据（cron-automation store，500→300 行修剪）",
+      "shutdown": "20 分钟执行超时；睡眠错过任务唤醒后首个 tick 补触发",
+      "notes": "HTTP 管理面 /api/desk/cron（desk 路由）"
+    },
+    {
+      "id": "EP-SCH-03",
+      "category": "schedulers",
+      "title": "Loop 闹钟（schedule/唤醒/桥接投递）与 fresh-compact 日常维护",
+      "status": "active",
+      "anchors": [
+        { "file": "lib/loop/alarm-service.ts", "line": 107, "expect": "_arm" },
+        { "file": "lib/tools/loop-control-tool.ts", "line": 22, "expect": "loop_control" },
+        { "file": "server/index.ts", "line": 913, "expect": "executeLoopTurn" }
+      ],
+      "principal_source": "工具调用所属会话的 principal 上下文；唤醒重放无新 principal",
+      "binding": "sessionKey 绑定桥接会话；loop 状态 .ephemeral/loop-state.json",
+      "auth": "loop_control 工具经会话权限包装器；桥接投递 fail-closed（未就绪抛错，index.ts:905-909）",
+      "permission_domain": "循环保由 LoopController 管理；busy 顺延 _deferBusy",
+      "runtime_owner": "server（engine.setLoopServices + loopController.recoverAtBoot）",
+      "resource_ownership": "loop-state.json（epoch-managed）；唤醒消息经 bridge 投递",
+      "shutdown": "重启后 recoverAtBoot 重新武装闹钟",
+      "notes": "scheduler.start() 含 fresh-compact-maintainer 日常调度（scheduler.ts:80-84）"
+    },
+    {
+      "id": "EP-CHN-01",
+      "category": "channels_dm",
+      "title": "频道轮次（ChannelRouter + channel-ticker，channels/*.md 为 truth）",
+      "status": "active",
+      "anchors": [
+        { "file": "hub/channel-router.ts", "line": 365, "expect": "start()" },
+        { "file": "hub/channel-router.ts", "line": 820, "expect": "runAgentPhoneSession" }
+      ],
+      "principal_source": "无用户 principal；agent 间协作（频道作者身份记录在 md）",
+      "binding": "频道工具发帖触发其他 agent phone 送达 + channel_new_message 事件",
+      "auth": "进程内路由；总开关 engine.isChannelsEnabled",
+      "permission_domain": "runAgentPhoneSession 的 phone 权限档 + 预授权 channel_reply.post/channel_pass.decide",
+      "runtime_owner": "server ChannelRouter",
+      "resource_ownership": "channels/{channelId}.yaml|md（channels store）+ agent-phone 活动",
+      "shutdown": "stopSchedulers 停 ticker",
+      "notes": "不走 BridgeManager（内部多 agent 会话）"
+    },
+    {
+      "id": "EP-CHN-02",
+      "category": "channels_dm",
+      "title": "DM 路由（DmRouter：agent 间私信，最多 3 轮，双写双方 dm 文件）",
+      "status": "active",
+      "anchors": [
+        { "file": "hub/dm-router.ts", "line": 144, "expect": "handleNewDm" },
+        { "file": "hub/dm-router.ts", "line": 239, "expect": "runAgentPhoneSession" }
+      ],
+      "principal_source": "无用户 principal；agent 发送 hook（agent.setDmSentHandler，hub/index.ts:1041-1048）",
+      "binding": "agents/<toId>/dm/<fromId>.markdown 双向文件",
+      "auth": "进程内；防重入 + 5 分钟超时清理 + 10s 冷却",
+      "permission_domain": "phone 会话权限档",
+      "runtime_owner": "server DmRouter",
+      "resource_ownership": "agent-authored-records store 的 dm 形态",
+      "shutdown": "随 server",
+      "notes": "<done/>/[NO_REPLY] 终止条件"
+    },
+    {
+      "id": "EP-CHN-03",
+      "category": "channels_dm",
+      "title": "电话会话执行器 runAgentPhoneSession + 临时会话 runAgentSession（hub/agent-executor.ts）",
+      "status": "active",
+      "anchors": [
+        { "file": "hub/agent-executor.ts", "line": 221, "expect": "runAgentSession" },
+        { "file": "hub/agent-executor.ts", "line": 404, "expect": "runAgentPhoneSession" }
+      ],
+      "principal_source": "无外部 principal；子系统（频道/DM/压缩等）进程内调用",
+      "binding": "phone=per agent+conversation 复用会话（domain=phone kind=phone_conversation）；temporary=临时 SessionManager.create，非 keep 时 tombstone+删除",
+      "auth": "进程内信任；工具集 filterAgentPhoneTools + 预授权能力",
+      "permission_domain": "getAgentPhonePermissionMode(toolMode)；readOnly→READ_ONLY；abort 注册 engine.registerAgentPhoneAbortHandler",
+      "runtime_owner": "server（Hub 调度）",
+      "resource_ownership": "phone conversations md + session-runtime json（agent-phone store）",
+      "shutdown": "会话结束 teardownSessionResources",
+      "notes": "R00-T03 W 表已判 KERNEL_MIGRATION（含模型循环/终态）"
+    },
+    {
+      "id": "EP-CHN-04",
+      "category": "channels_dm",
+      "title": "Bridge guest 链（GuestHandler 受限上下文）与 hub.send 四路路由表",
+      "status": "active",
+      "anchors": [
+        { "file": "hub/guest-handler.ts", "line": 31, "expect": "handle" },
+        { "file": "hub/index.ts", "line": 299, "expect": "routes" }
+      ],
+      "principal_source": "guest=非 owner 平台用户；路由表按 role/sessionKey/ephemeral 分流",
+      "binding": "guest 会话目录 <sessionDir>/bridge/guests/",
+      "auth": "guest 上下文前缀注入（无工具越权面：受限提示词）",
+      "permission_domain": "guest 不进入 owner 会话；ephemeral 路由固定 deny_on_prompt",
+      "runtime_owner": "server Hub",
+      "resource_ownership": "guest 会话 JSONL",
+      "shutdown": "随 server",
+      "notes": "路由表：desktop owner / bridge guest / bridge owner / ephemeral（hub/index.ts:299-348）"
+    },
+    {
+      "id": "EP-SUB-01",
+      "category": "subagents",
+      "title": "子代理三工具 subagent/subagent_reply/subagent_close + 权限衰减 + 运行/线程 store",
+      "status": "active",
+      "anchors": [
+        { "file": "lib/tools/subagent-tool.ts", "line": 226, "expect": "createSubagentTool" },
+        { "file": "lib/tools/subagent-tool.ts", "line": 253, "expect": "subagent" },
+        { "file": "lib/tools/subagent-tool-policy.ts", "line": 91, "expect": "resolveSubagentToolAccess" },
+        { "file": "server/index.ts", "line": 664, "expect": "SubagentRunStore" }
+      ],
+      "principal_source": "继承父会话 agent 身份；无独立 principal",
+      "binding": "parentSessionPath + subagentTaskId；会话在 <agentDir>/subagent-sessions/",
+      "auth": "父会话工具调用链（会话权限包装器）；并发限制 per-session 10 / global 20",
+      "permission_domain": "access=read→READ_ONLY；write 需父会话非只读（SubagentAccessDeniedError 衰减）；策略 intercept/strip（env LINGXI_SUBAGENT_TOOL_STRATEGY）",
+      "runtime_owner": "server（executeIsolated subagentContext）",
+      "resource_ownership": "subagent-runs.json(v1)/subagent-threads.json(v2) + 会话 JSONL；fork 时丢弃/改写（session-coordinator.ts:4164-4202）",
+      "shutdown": "父会话取消传播；close 工具显式关闭",
+      "notes": "agent 参数 \"?\" 列 roster"
+    },
+    {
+      "id": "EP-PLG-01",
+      "category": "plugins_mcp",
+      "title": "内置插件扫描与激活（office/beautify/media/jimeng-cli；freshImport 生命周期加载）",
+      "status": "active",
+      "anchors": [
+        { "file": "core/engine.ts", "line": 3747, "expect": "initPlugins" },
+        { "file": "core/fresh-import.ts", "line": 12, "expect": "pathToFileURL" },
+        { "file": "core/plugin-manager.ts", "line": 534, "expect": "builtin" }
+      ],
+      "principal_source": "插件无独立 principal；工具调用携带所属会话/agent 身份（withRuntimeContext 合并 agentId/会话）",
+      "binding": "pluginId 命名空间（发布名 <pluginId>_<toolName>）；配置 scope global/per-agent/per-session",
+      "auth": "进程内加载（manifest.json 描述符校验）；lingxiHome/plugins 用户自装目录不再加载（收口 04f90d2b2）",
+      "permission_domain": "插件工具经会话权限包装器（同一授权边界）；capability 校验在 plugin-context",
+      "runtime_owner": "server PluginManager（onStartup 在 framework extension 之后）",
+      "resource_ownership": "plugin-data/{pluginId}（plugin-runtime-data store）+ mcp 配置（plugin-data/mcp）",
+      "shutdown": "engine.syncPluginExtensions 热重载空闲会话；dispose 停插件",
+      "notes": "用户自装 MCP/插件不属于仓库内置能力（合成实例测协议边界）"
+    },
+    {
+      "id": "EP-MCP-01",
+      "category": "plugins_mcp",
+      "title": "MCP 接入面 /api/mcp + /api/plugins/mcp（连接器/服务器 CRUD、OAuth、session-permissions、app-tools 调用）",
+      "status": "active",
+      "anchors": [
+        { "file": "server/http/route-security.ts", "line": 325, "expect": "MCP_ROUTE_PREFIXES" },
+        { "file": "server/routes/mcp.ts", "line": 310, "expect": "app-tools" },
+        { "file": "server/routes/mcp.ts", "line": 385, "expect": "plugins/mcp" }
+      ],
+      "principal_source": "HTTP principal；OAuth 回调 PUBLIC（route-security.ts:334-336）",
+      "binding": "per-agent 连接器配置（PUT /agents/:agentId/connectors/:id）",
+      "auth": "settings.read/write scope 分面；session-permissions 走 chat scope + handler 内 sessions.write 复核；app-tools call=STUDIO_OWNER（route-security.ts:589-594）",
+      "permission_domain": "连接器启停/刷新= settings.write；模型侧调用经会话权限包装器 + MCP 目标 permission 契约（engine buildTools registeredMcpTargets）",
+      "runtime_owner": "server McpManager（clients Map + busy 计数 + _assertCurrentClient 代次校验）",
+      "resource_ownership": "plugin-data/mcp 配置；OAuth token 存连接器配置（redact 面）",
+      "shutdown": "stop 端点停连接器；dispose 停全部",
+      "notes": "app-tools call 直接 client.callTool（manager.ts:2133-2165），不经 ToolInvocationGateway —— 属 UI 面直调，授权依赖路由 STUDIO_OWNER"
+    },
+    {
+      "id": "EP-DEV-01",
+      "category": "plugins_mcp",
+      "title": "网关本地开发者调用面（prepareAndInvokeForLocalDeveloper，route=plugin-dev-http）",
+      "status": "dormant",
+      "anchors": [
+        { "file": "core/tool-invocation-gateway.ts", "line": 506, "expect": "prepareAndInvokeForLocalDeveloper" },
+        { "file": "core/tool-invocation-gateway.ts", "line": 65, "expect": "createLocalDeveloperPrincipal" }
+      ],
+      "principal_source": "local-developer principal，必须由已认证 local_user（环回 token owner）派生（createLocalDeveloperPrincipal 硬校验）",
+      "binding": "显式清空 sessionId/sessionPath/agentId（脱离会话的开发直调）",
+      "auth": "双重校验：route 必须 plugin-dev-http + principal 必须合法 local-developer；再走同一 authorize + resolvePermission",
+      "permission_domain": "目标 permission.resolveInvocation + authorize 回调（engine.ts:4119 模型面 authorize 直接抛错，开发者面依赖注入）",
+      "runtime_owner": "（无生产接线——仅 tests/tool-invocation-gateway.test.ts 等消费）",
+      "resource_ownership": "无独立资源",
+      "shutdown": "n/a",
+      "notes": "对应生产路由 /api/plugins/dev 已随 04f90d2b2 删除；本能力保留在网关层为休眠面，R04 设计统一网关时必须显式裁决去留"
+    },
+    {
+      "id": "EP-DEV-02",
+      "category": "plugins_mcp",
+      "title": "残留：/api/plugins/install|dev 的 LOCAL_ONLY 路由分类与 plugin-manager source:dev 死分支",
+      "status": "residual",
+      "anchors": [
+        { "file": "server/http/route-security.ts", "line": 351, "expect": "plugins/install" },
+        { "file": "server/http/route-security.ts", "line": 352, "expect": "plugins/dev" }
+      ],
+      "principal_source": "n/a（路由已不存在，分类仍在）",
+      "binding": "n/a",
+      "auth": "分类残留不影响运行（无路由命中）；plugin-manager.ts:108-130 dev 分支为死代码",
+      "permission_domain": "n/a",
+      "runtime_owner": "n/a",
+      "resource_ownership": "n/a",
+      "shutdown": "n/a",
+      "notes": "迁移时按残留清理项登记，不得当作现役入口恢复"
+    },
+    {
+      "id": "EP-DEV-03",
+      "category": "plugins_mcp",
+      "title": "开发调用链：vite dev 渲染端（npm run dev:renderer + start:vite）经 CORS 白名单连本地 server",
+      "status": "active",
+      "anchors": [
+        { "file": "server/http/cors-policy.ts", "line": 1, "expect": "localhost" },
+        { "file": "desktop/main.cjs", "line": 1854, "expect": "LINGXI_RENDERER_DIST" }
+      ],
+      "principal_source": "环回 token（dev 下 preload 同样下发 getServerPort/getServerToken）",
+      "binding": "与桌面主窗口同链（hub.send role=owner）",
+      "auth": "默认 CORS 白名单允许 localhost/127.0.0.1 任意端口的 dev 前端（可经 LINGXI_CORS_ORIGIN 收紧）；token 仍必须持有",
+      "permission_domain": "local_user owner 全量（与打包态一致）",
+      "runtime_owner": "server",
+      "resource_ownership": "同桌面链",
+      "shutdown": "dev 进程退出",
+      "notes": "A08 的『开发调用』实际链选用此条（见 R00-T04_REPORT.md）"
+    },
+    {
+      "id": "EP-TL-01",
+      "category": "tool_boundary",
+      "title": "工具执行边界：ToolInvocationGateway（注册表+prepared invocation）+ 会话权限包装器（真实授权点）",
+      "status": "active",
+      "anchors": [
+        { "file": "core/engine.ts", "line": 4119, "expect": "ToolInvocationGateway" },
+        { "file": "lib/tools/session-permission-wrapper.ts", "line": 656, "expect": "wrapWithSessionPermission" },
+        { "file": "core/tool-invocation-gateway.ts", "line": 268, "expect": "resolvePermission" }
+      ],
+      "principal_source": "模型侧调用携带会话绑定（sessionBinding：sessionId/sessionPath/agentId）；开发者侧需 local-developer principal",
+      "binding": "PreparedInvocation 绑定 targetId/route/args 摘要/会话/generation（内核内不可伪造句柄）",
+      "auth": "engine.ts:4119-4124 模型面 authorize 显式抛错 → 授权由 wrapWithSessionPermission 强制：硬安全规则 → 工具契约 resolver → classifySessionPermission(mode) → allow/deny/prompt",
+      "permission_domain": "会话权限模式（read_only/plan/accept_edits/...）× approvalPolicy（含 deny_on_prompt）× 工具 permission 契约；执行前重检撤销（executeWithInvocationRevalidation）",
+      "runtime_owner": "server（engine buildTools 每会话组装）",
+      "resource_ownership": "全部工具副作用（文件/命令/网络）的唯一执行边界",
+      "shutdown": "AbortSignal 贯穿；EXECUTION_CANCELLED 语义",
+      "notes": "外部协议 schema 与执行 schema 同源（createToolSchemaValidator）"
+    },
+    {
+      "id": "EP-TL-02",
+      "category": "tool_boundary",
+      "title": "hub.send 统一提交路由表（四路：desktop owner / bridge guest / bridge owner / ephemeral）",
+      "status": "active",
+      "anchors": [
+        { "file": "hub/index.ts", "line": 330, "expect": "executeExternalMessage" },
+        { "file": "hub/index.ts", "line": 334, "expect": "executeIsolated" }
+      ],
+      "principal_source": "调用方上下文（HTTP principal 或平台身份或 automation）",
+      "binding": "desktop→sessionPath 或新会话；bridge→sessionKey；ephemeral→隔离会话",
+      "auth": "上游各自认证（HTTP 中间件/平台配置/进程内）；hub 不再重复认证",
+      "permission_domain": "ephemeral 路由固定 permissionMode auto + deny_on_prompt（hub/index.ts:334-339）",
+      "runtime_owner": "server Hub",
+      "resource_ownership": "n/a（路由层）",
+      "shutdown": "hub.dispose 停 ticker 等",
+      "notes": "所有非桌面入口最终汇入此表 → engine → 会话 → 工具边界"
+    }
+  ],
+  "entrypoint_status_counts": {
+    "active": 35,
+    "dormant": 1,
+    "residual": 1,
+    "total": 37
+  },
+  "entrypoint_category_counts": {
+    "desktop_shell": { "active": 7, "total": 7 },
+    "renderer_clients": { "active": 2, "total": 2 },
+    "http_ws_server": { "active": 7, "total": 7 },
+    "cli": { "active": 3, "total": 3 },
+    "bridge": { "active": 3, "total": 3 },
+    "schedulers": { "active": 3, "total": 3 },
+    "channels_dm": { "active": 4, "total": 4 },
+    "subagents": { "active": 1, "total": 1 },
+    "plugins_mcp": { "active": 3, "total": 5 },
+    "tool_boundary": { "active": 2, "total": 2 }
+  },
+  "a08_chains": [
+    {
+      "id": "A08-CLI",
+      "surface": "CLI",
+      "chain": [
+        "cli/entry.ts:88 startChat → cli/chat.ts:104 client.createWebSocket()",
+        "cli/client.ts:66-77 WS /ws + Bearer（server-info token）| 查询 token（仅 local）",
+        "server/index.ts:589-637 中间件 → resolveHttpRequestPrincipal → local_user principal（core/server-auth.ts:63-71 环回 token 仅 local）",
+        "server/routes/chat.ts:2256 /ws → hub.send(promptText,{sessionPath,role:'owner'})（chat.ts:2894）",
+        "hub/index.ts:305-315 desktop owner 路由 → engine.prompt / submitDesktopSessionMessage",
+        "core/engine.ts buildTools → wrapWithSessionPermission（lib/tools/session-permission-wrapper.ts:656：硬安全→resolver→classifySessionPermission）",
+        "工具 execute（四基础/按需/插件/MCP）→ 副作用（文件/PTY/网络）"
+      ],
+      "identity_authority": "身份=server-info.json 环回 token（server 写入 0o600，server/index.ts:1277-1300）；授权=会话权限模式+工具契约，deny/prompt 语义与桌面完全同链",
+      "unverified": "未实测真实 CLI 交互会话（本任务不跑真实模型）；链路结论来自源码+既有测试"
+    },
+    {
+      "id": "A08-BRIDGE",
+      "surface": "Bridge",
+      "chain": [
+        "lib/bridge/telegram-adapter.ts:112 长轮询收到平台消息 → onMessage 回调（bridge-manager.ts:914 装配）",
+        "lib/bridge/bridge-manager.ts:1097-1233 _handleMessage：群聊入队串行/私聊 debounce → :1127 owner 判定（owner-policy.ts:8-17）",
+        "bridge-manager.ts:1995-2009 hub.send(text,{sessionKey,agentId,role:owner|guest,meta})",
+        "hub/index.ts:326 guest→GuestHandler | :330 owner→engine.executeExternalMessage",
+        "core/bridge-session-manager.ts:1162-1181 executeExternalMessage → :764-813 _openOrCreateOwnerSession（<sessionDir>/bridge/owner/）",
+        "会话 prompt → 同 EP-TL-01 工具边界（bridgeContext 注入 usage 归因，engine.ts:4113 mergeCtx）"
+      ],
+      "identity_authority": "身份=平台 userId 与 agent.config.bridge[platform].owner 配置比对（非凭据认证）；授权=bridge 会话创建时的权限档 + 会话权限包装器；guest 额外受 GuestHandler 上下文限制",
+      "unverified": "未连接真实平台账号（任务书允许延后真实账号验证至 R10）；owner 伪造风险=平台账号体系，属外部信任边界，已列为风险而非已证实安全"
+    },
+    {
+      "id": "A08-CRON",
+      "surface": "cron（Studio 定时任务）",
+      "chain": [
+        "hub/scheduler.ts:194-226 _startStudioCron → lib/desk/cron-scheduler.ts:42 60s tick",
+        "lib/desk/cron-store.ts:746-779 markRun 触发收据（CAS expectedConfigRevision + 退避 + 一次性任务自动禁用）",
+        "hub/scheduler.ts:442-463 _executeActivityForAgent → engine.executeIsolated(prompt,{agentId,persist:<agentDir>/activity,...opts})",
+        "opts 来自 scheduler.ts:367-403 _cronExecutionOptions：permissionMode=auto、approvalPolicy=deny_on_prompt、allowHumanApproval=false、permissionContext.surface=automation（含 actorAgentId/configRevision/scopeKey）",
+        "core/session-coordinator.ts:8048 executeIsolated 建隔离会话（tombstone 清理链 :8069-8103）",
+        "工具执行同 EP-TL-01（deny_on_prompt → 需批准工具返回结构化 unavailable，不弹人工批准）"
+      ],
+      "identity_authority": "身份=无用户 principal 的 automation 主体（actorAgentId + permissionContext）；授权=调度器固定选项（auto/deny_on_prompt/no human approval）+ 执行范围绑定来源会话（scheduler.ts:340-364 校验 manifest.ownerAgentId 与会话归属）",
+      "unverified": "唤醒补触发语义按源码记录（睡眠错过→唤醒后首 tick），未做真实睡眠注入实测"
+    },
+    {
+      "id": "A08-DEV",
+      "surface": "开发调用（vite dev 渲染端）",
+      "chain": [
+        "npm run dev:renderer（vite.config.ts:341-356 多入口）+ npm run start:vite → desktop/main.cjs spawn server（dev: LINGXI_SERVER_ENTRY=server/bootstrap.ts，main.cjs:1876-1912 dev 分支）",
+        "渲染页从 preload window.hana.getServerToken/getServerPort 取环回 token（desktop/preload.cjs:34-35）",
+        "CORS：server/http/cors-policy.ts:1 默认白名单允许 http(s)://localhost|127.0.0.1:* 开发源（绝不 credentials+通配）",
+        "POST /api/chat（或 WS /ws）→ 同 EP-HTTP-01 认证 → hub.send role=owner → engine.prompt → EP-TL-01 工具边界"
+      ],
+      "identity_authority": "身份=环回 token（与打包态同源）；授权=同桌面链；dev 与打包态差异仅在渲染页来源（CORS 白名单）而非权限域",
+      "unverified": "dev 窗口实际启动未在本任务执行（需 GUI）；链路以源码+server/bootstrap.ts 既有测试（T01 启动探针）支撑"
+    }
+  ],
+  "enumeration_gaps": [
+    "无深链/自定义协议注册（全 desktop 源码无 setAsDefaultProtocolClient/open-url）",
+    "无入站 webhook 路由：五平台 adapter 全部为出站长轮询/长连接客户端",
+    "/api/plugins/dev 生产路由已删除（04f90d2b2），仅 route-security 分类与 plugin-manager dev 分支残留",
+    "server 无 utilityProcess/fork；子进程统一 spawn/execFile（office helper/guardian/computer-use/speech）"
+  ]
+}

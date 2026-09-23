@@ -4,7 +4,7 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "60dbe0384e553f0a0aab7d173b2dc1ba43987b82",
+  "current_head": "ffcb85830ffdc75da5fe39b7a8cfddb4617f1aec",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -569,7 +569,7 @@
     "R00-T03": {
       "name": "盘点 Pi 与 Node 隐含职责",
       "stage_id": "R00",
-      "status": "COMMITTING",
+      "status": "DONE",
       "task_base_sha": "4b4a1d98f6d2d0e03f9573aa75b7992efed03db6",
       "executor_id": "/root/exec_r00_t03",
       "execution_result": "READY_FOR_REVIEW",
@@ -619,8 +619,8 @@
         "R00-A05": "PASS",
         "R00-A06": "PASS"
       },
-      "task_commit_sha": null,
-      "push_result": "PENDING",
+      "task_commit_sha": "ffcb85830ffdc75da5fe39b7a8cfddb4617f1aec",
+      "push_result": "CONFIRMED",
       "blockers": [],
       "concurrent_head_change": {
         "from": "4b4a1d98f6d2d0e03f9573aa75b7992efed03db6",
@@ -645,28 +645,68 @@
         "large_files": "no untracked T03 file exceeds 2 MiB; import graph is 1.2 MiB JSON evidence",
         "candidate_fingerprint": "8/8 match R3 frozen aggregate",
         "product_code_diff": "none"
-      }
+      },
+      "remote_verified_sha": "ffcb85830ffdc75da5fe39b7a8cfddb4617f1aec"
     },
     "R00-T04": {
       "name": "盘点入口、身份、数据与权限",
       "stage_id": "R00",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
-      "repair_agent_id": null,
+      "status": "COMMITTING",
+      "task_base_sha": "ffcb85830ffdc75da5fe39b7a8cfddb4617f1aec",
+      "executor_id": "ZCode:R00-T04 执行（ZCode）",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 2,
+      "reviewer_id": "ZCode:R00-T04 独立验收 R2（ZCode）",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-F01",
+          "severity": "BLOCKING",
+          "summary": "Ignored .log is included in frozen 8-file candidate and hash manifest, preventing tracked evidence closure",
+          "review_report": "docs/rust-tauri/R00/R00-T04_REVIEW_R1.md",
+          "resolution": "R2 independent review confirms resolved"
+        },
+        {
+          "id": "R1-F02",
+          "severity": "MAJOR",
+          "summary": "ENTRYPOINTS actual 35 active plus 1 dormant plus 1 residual, but category counts and prose claim 36 active",
+          "review_report": "docs/rust-tauri/R00/R00-T04_REVIEW_R1.md",
+          "resolution": "R2 independent review confirms resolved"
+        },
+        {
+          "id": "R1-F03",
+          "severity": "MINOR",
+          "summary": "STORES server-runtime-info writers omits desktop shutdown unlink role",
+          "review_report": "docs/rust-tauri/R00/R00-T04_REVIEW_R1.md",
+          "resolution": "R2 independent review confirms resolved"
+        }
+      ],
+      "repair_agent_id": "ZCode:R00-T04 修复 R1（ZCode）",
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R00-A07": "NOT_STARTED",
-        "R00-A08": "NOT_STARTED"
+        "R00-A07": "PASS",
+        "R00-A08": "PASS"
       },
       "task_commit_sha": null,
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "candidate_digest_sha256": "888df87a31771c7eaea1bbcbeb367e5df070a069004c03a509f90c0cbc087087",
+      "candidate_file_count": 8,
+      "candidate_report_sha256": "8fb0731960491f6c7c2388fe50d70769057c517bde2ed2551b37a73cc187f909",
+      "candidate_current_head": "ffcb85830ffdc75da5fe39b7a8cfddb4617f1aec",
+      "candidate_note": "R1 repair: final-run-stdout.txt is tracked-addable; ENTRYPOINTS count and validator updated; server-runtime-info desktop unlink role recorded. Frozen 8-file candidate awaits independent R2 review.",
+      "review_report": "docs/rust-tauri/R00/R00-T04_REVIEW_R2.md",
+      "review_report_sha256": "5504d42a7ae83b0a7d3d8021996efc8632124ffef81020ef0086f285624f3751",
+      "repair_agent_status": "COMPLETE",
+      "repair_report": "docs/rust-tauri/R00/R00-T04_R1_REPAIR.md",
+      "candidate_repair_summary_sha256": "447ad03dcf4302eaf8d6f9a35b019309f2bf7b80961a999d0b392f23b1a05300",
+      "precommit_checks": {
+        "candidate_fingerprint": "8/8 match R2 frozen aggregate",
+        "sensitive_pattern_scan": "no PEM private key or common credential-token pattern in 11 untracked T04 files",
+        "large_files": "no untracked T04 file exceeds 2 MiB; max 145678 bytes",
+        "product_code_diff": "none",
+        "git_diff_check": "PASS"
+      }
     },
     "R00-T05": {
       "name": "建立旧行为与故障夹具",
@@ -2685,7 +2725,7 @@
       "blockers": []
     }
   },
-  "current_task": "R00-T03",
+  "current_task": "R00-T04",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",

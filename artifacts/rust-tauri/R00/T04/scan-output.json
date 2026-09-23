@@ -1,0 +1,116 @@
+{
+ "mode": "validate",
+ "checks": {
+  "A_anchors": {
+   "anchors_checked": 101,
+   "errors": []
+  },
+  "A2_entrypoint_counts": {
+   "errors": []
+  },
+  "B_routes": {
+   "route_sites": 470,
+   "unique_literal_paths": 392,
+   "files_with_routes": 50,
+   "errors": []
+  },
+  "C_stores": {
+   "doc_store_count": 69,
+   "registry_store_count": 69,
+   "errors": []
+  },
+  "D_oracle": {
+   "files_with_persistence_tokens": 146,
+   "inventory_covered_files": 168,
+   "classified_uncovered": {
+    "core/session-inline-media-prune.ts": {
+     "class": "substring-fp",
+     "token_line": 47,
+     "reason": "'sessionManager._rewriteFile()' 命中 'writeFile('；本文件无直接 fs 调用，实际写经 Pi SessionManager / core/session-jsonl-file.ts（后者已由 session-jsonl store 注册，inventory:4472）"
+    },
+    "desktop/mac-self-install.cjs": {
+     "class": "di-receiver",
+     "token_line": 290,
+     "reason": "真实 writeFileSync，但接收器是注入的 fsImpl（AST 常谱只追踪直接 fs 绑定，故未收录）；目标为 os.tmpdir 一次性自装脚本（mkdtemp lingxi-self-install-*），不在 LINGXI_HOME、非权威、安装后清理。属常谱盲区类发现，见 R00-T04_REPORT.md 风险 R-T04-03"
+    },
+    "desktop/src/shared/server-readiness.cjs": {
+     "class": "substring-fp",
+     "token_line": 22,
+     "reason": "'better-sqlite3' 是待存在性检查的模块名字符串，非 Database 打开"
+    },
+    "lib/sandbox/index.ts": {
+     "class": "forwarding-facade",
+     "token_line": 211,
+     "reason": "lspTool 的 writeFile 转发 shim → createResourceIoToolOperations → LocalFsProvider；真实落盘在 lib/resource-io/providers/local-fs-provider.ts（已注册，store-registry.ts:1767）"
+    },
+    "lib/search/session-search-tokenizer.ts": {
+     "class": "substring-fp",
+     "token_line": 22,
+     "reason": "'better-sqlite3 1000 eng' 为词元样例字符串，非 Database 打开"
+    }
+   },
+   "unclassified_uncovered_files": [],
+   "stale_classifications": []
+  },
+  "E_sampling": {
+   "samples": [
+    {
+     "file": "core/agent-manager.ts",
+     "storeId": "agent-profile",
+     "exemptionId": null,
+     "kind": "copy-file"
+    },
+    {
+     "file": "core/local-user-account.ts",
+     "storeId": null,
+     "exemptionId": "local-user-account-atomic-helper",
+     "kind": "mkdir"
+    },
+    {
+     "file": "core/session-manifest/store.ts",
+     "storeId": "session-manifest-sqlite",
+     "exemptionId": null,
+     "kind": "database-open"
+    },
+    {
+     "file": "hub/index.ts",
+     "storeId": "session-files",
+     "exemptionId": null,
+     "kind": "write-file"
+    },
+    {
+     "file": "lib/knowledge/ann-index-store.ts",
+     "storeId": "knowledge-indexes",
+     "exemptionId": null,
+     "kind": "database-open"
+    },
+    {
+     "file": "lib/memory/compiled-memory-state.ts",
+     "storeId": "agent-memory",
+     "exemptionId": null,
+     "kind": "remove-path"
+    },
+    {
+     "file": "lib/skill-bundles/package-service.ts",
+     "storeId": "skill-state",
+     "exemptionId": null,
+     "kind": "mkdir"
+    },
+    {
+     "file": "server/routes/desk.ts",
+     "storeId": "desk-cover-upload-staging",
+     "exemptionId": null,
+     "kind": "mkdir"
+    }
+   ],
+   "errors": []
+  }
+ },
+ "negative_self_checks": {
+  "tampered_anchor_detected": true,
+  "tampered_counts_detected": true,
+  "fake_store_detected": true,
+  "fake_uncovered_detected": true
+ },
+ "fatal": []
+}
