@@ -1,0 +1,3607 @@
+{
+  "schema": "r00-t03-pi-replacement-v2",
+  "task": "R00-T03",
+  "base_sha": "4b4a1d98f6d2d0e03f9573aa75b7992efed03db6",
+  "observed_head": "60dbe0384e553f0a0aab7d173b2dc1ba43987b82",
+  "evidence_level": "源码静态分类及生产组合调用链人工复核；没有启动真实服务、模型或外部平台",
+  "graph_artifact": "R00-T03_IMPORT_GRAPH.json",
+  "capabilities": [
+    {
+      "id": "PI-01",
+      "current_duty": "正常、Bridge、临时代理、电话代理和隔离子会话的模型/工具循环；Pi 决定下一步和停止。",
+      "adapter_symbols": [
+        "createAgentSession",
+        "runAgentLoop",
+        "AgentContext",
+        "AgentEvent",
+        "AgentLoopConfig",
+        "AgentMessage",
+        "AgentTool",
+        "StreamFn"
+      ],
+      "source_refs": [
+        "lib/pi-sdk/index.ts:14",
+        "lib/pi-sdk/index.ts:60",
+        "core/session-coordinator.ts:2230",
+        "core/session-coordinator.ts:8385",
+        "core/bridge-session-manager.ts:1305",
+        "hub/agent-executor.ts:290",
+        "hub/agent-executor.ts:556",
+        "lib/llm/cache-preserving-compaction-agent-run.ts:550"
+      ],
+      "rust_owner": "Rust RunSupervisor 与 AgentLoop",
+      "permitted_peripheral": "无；单次工具 worker 不能调用 prompt/runAgentLoop。",
+      "protocol_test": "受控模型流产生工具请求→授权执行→再请求→唯一终态；各入口及取消/重试/临时子会话协议对照。",
+      "retirement_evidence": "生产进程树和最终打包依赖图无 Pi AgentLoop；禁用旧 Node 服务仍能完成真实工具任务。",
+      "target_stage": "R03/R05/R06/R07/R11",
+      "disposition": "KERNEL_MIGRATION"
+    },
+    {
+      "id": "PI-02",
+      "current_duty": "JSONL 会话树、分支/回退、消息读取和旧格式兼容；多个调用者直接打开 SessionManager。",
+      "adapter_symbols": [
+        "SessionManager",
+        "parseSessionEntries",
+        "buildSessionContext"
+      ],
+      "source_refs": [
+        "core/session-coordinator.ts:1831",
+        "core/session-coordinator.ts:4825",
+        "core/bridge-session-manager.ts:777",
+        "hub/agent-executor.ts:240",
+        "server/routes/sessions.ts:30",
+        "lib/tools/todo-compat.ts:22"
+      ],
+      "rust_owner": "Rust SessionService 与规范化消息存储",
+      "permitted_peripheral": "旧 JSONL 只读导入器可暂留，不作为新消息权威写者。",
+      "protocol_test": "旧 ID/分支/fork/坏行/分页/导出 round-trip 与跨入口同一历史投影。",
+      "retirement_evidence": "新任务只写 Rust 权威存储；旧 SDK SessionManager 不在生产写链，旧资料只读可导入。",
+      "target_stage": "R02/R06/R08/R11",
+      "disposition": "KERNEL_MIGRATION"
+    },
+    {
+      "id": "PI-03",
+      "current_duty": "上下文估算、截断点、压缩触发、原生压缩与缓存保留压缩旁路。",
+      "adapter_symbols": [
+        "calculateContextTokens",
+        "estimateTokens",
+        "findCutPoint",
+        "serializeConversation",
+        "shouldCompact",
+        "prepareCompaction",
+        "buildNativeCompactionRequestShapes",
+        "convertAgentMessagesToLlm"
+      ],
+      "source_refs": [
+        "core/session-compaction-runtime.ts:42",
+        "core/session-compactor.ts:5",
+        "lib/extensions/compaction-guard-ext.ts:237",
+        "lib/llm/cache-preserving-compaction-agent-run.ts:550"
+      ],
+      "rust_owner": "Rust ContextService、Compactor 与 ModelGateway",
+      "permitted_peripheral": "分词实现可封装库调用，但预算、保护段和历史写入由 Rust 决定。",
+      "protocol_test": "长会话预算、工具配对、压缩失败不覆原历史、native/cache 路径、取消及 trace 对照。",
+      "retirement_evidence": "Pi prepareCompaction/generateSummary/runAgentLoop 不在新上下文路径；压缩摘要由 Rust 归档。",
+      "target_stage": "R05/R06/R11",
+      "disposition": "KERNEL_MIGRATION"
+    },
+    {
+      "id": "PI-04",
+      "current_duty": "资源加载、技能/扩展发现、系统提示词组装及 extension 生命周期。",
+      "adapter_symbols": [
+        "DefaultResourceLoader",
+        "createExtensionRuntime",
+        "LoadExtensionsResult"
+      ],
+      "source_refs": [
+        "core/engine.ts:3577",
+        "core/session-coordinator.ts:2012",
+        "core/session-coordinator.ts:2171",
+        "server/index.ts:493"
+      ],
+      "rust_owner": "Rust ContextService、SkillRegistry 与 ExtensionPort",
+      "permitted_peripheral": "文件解析可受控 worker；用户自装扩展若需要兼容必须收窄为单项调用。",
+      "protocol_test": "同配置下 prompt、技能/角色卡、扩展启停/热更新、hook 次序与错误传播对照。",
+      "retirement_evidence": "旧 ResourceLoader/ExtensionRuntime 不参与 Rust 任务装配；所有活跃 hook 有新 port 或明确弃用证据。",
+      "target_stage": "R06/R07/R11",
+      "disposition": "KERNEL_MIGRATION"
+    },
+    {
+      "id": "PI-05",
+      "current_duty": "基础文件/命令/搜索工具工厂与 allowlist/customTools 转换、同名执行去重。",
+      "adapter_symbols": [
+        "createReadTool",
+        "createWriteTool",
+        "createEditTool",
+        "createBashTool",
+        "createLsTool",
+        "createGrepTool",
+        "createFindTool"
+      ],
+      "source_refs": [
+        "lib/pi-sdk/session-options.ts:165",
+        "lib/sandbox/index.ts:36",
+        "lib/sandbox/file-tool-presentation.ts:3",
+        "lib/pi-sdk/search-tools.ts:22"
+      ],
+      "rust_owner": "Rust ToolRegistry、InvocationGateway、ResourceService 与 ProcessService",
+      "permitted_peripheral": "具体搜索算法可库化；worker 只能处理已授权单次调用。",
+      "protocol_test": "read/write/edit/exec 与 grep/find/ls 参数、权限、路径、取消、结果 schema 和副作用收据对照。",
+      "retirement_evidence": "Rust 路径不加载 Pi 工厂；工具目录与执行统一走同一 Rust 网关。",
+      "target_stage": "R04/R07/R11",
+      "disposition": "KERNEL_MIGRATION"
+    },
+    {
+      "id": "PI-06",
+      "current_duty": "模型目录、可用性、供应商注册/刷新、当前会话模型对象重绑。",
+      "adapter_symbols": [
+        "getPiModel",
+        "getPiModels",
+        "createModelRegistry",
+        "registerModelProvider",
+        "unregisterModelProvider",
+        "refreshSessionModelFromRegistry"
+      ],
+      "source_refs": [
+        "core/model-manager.ts:12",
+        "core/model-sync.ts:9",
+        "core/model-known-enrichment.ts:1",
+        "lib/providers/opencode.ts:9",
+        "lib/pi-sdk/index.ts:473"
+      ],
+      "rust_owner": "Rust ModelGateway 与 ConfigService",
+      "permitted_peripheral": "供应商 HTTP 编解码适配可独立库；模型选择与配置代次由 Rust 持有。",
+      "protocol_test": "同名模型跨 provider 不混、注册/禁用/刷新/旧模型对象、Ollama 与配置保留。",
+      "retirement_evidence": "Rust 生产模型选择不调用 Pi ModelRegistry/compat 目录；停用旧 Node 不改变可用模型集合。",
+      "target_stage": "R05/R07/R11",
+      "disposition": "KERNEL_MIGRATION"
+    },
+    {
+      "id": "PI-07",
+      "current_duty": "auth.json 凭证锁、OAuth 登录/刷新/撤销、环境凭证禁止回退和 provider 认证路由。",
+      "adapter_symbols": [
+        "AuthStorage",
+        "FileAuthStorageBackend",
+        "SdkAuthFacade",
+        "loginOAuthProvider",
+        "OAuthLoginCallbacks",
+        "SdkOAuthProvider"
+      ],
+      "source_refs": [
+        "core/model-manager.ts:12",
+        "server/routes/auth.ts:18",
+        "lib/pi-sdk/auth-facade.ts:32",
+        "lib/pi-sdk/index.ts:353"
+      ],
+      "rust_owner": "Rust CredentialService 与 ModelGateway",
+      "permitted_peripheral": "OAuth 浏览器交互可在受控 UI/OS helper，密钥读取及刷新判断留 Rust。",
+      "protocol_test": "并发刷新、撤销后迟到请求、环境变量偷读、provider 隔离与 auth.json 兼容导入。",
+      "retirement_evidence": "生产凭证不通过 Pi AuthStorage/ModelRuntime 读取；旧文件只读迁移并校验轮换。",
+      "target_stage": "R05/R08/R11",
+      "disposition": "KERNEL_MIGRATION"
+    },
+    {
+      "id": "PI-08",
+      "current_duty": "Pi provider 流/非流式调用、消息转换、直接摘要/快照旁路与媒体协议内容。",
+      "adapter_symbols": [
+        "completeSimple",
+        "generateSummary"
+      ],
+      "source_refs": [
+        "lib/llm/session-snapshot-side-task-runner.ts:94",
+        "lib/diary/diary-writer.ts:376",
+        "lib/pi-sdk/index.ts:234",
+        "core/llm-client.ts:520"
+      ],
+      "rust_owner": "Rust ModelGateway，所有模型目的均走同一凭证与用量边界",
+      "permitted_peripheral": "图片/音频编码器可做单次 worker；不得自行路由密钥或执行多轮模型循环。",
+      "protocol_test": "实际启用协议族的流片段、工具调用、错误、特殊签名块、摘要和旁路用量对账。",
+      "retirement_evidence": "新内核所有模型目的均无 Pi complete/stream；本地 direct HTTP 旁路也收归同一网关。",
+      "target_stage": "R05/R07/R11",
+      "disposition": "KERNEL_MIGRATION"
+    },
+    {
+      "id": "PI-09",
+      "current_duty": "streamFunction/afterToolCall/transformContext 包装：损坏工具片段防护、工具错误语义、轮中待办提醒。",
+      "adapter_symbols": [],
+      "source_refs": [
+        "lib/pi-sdk/index.ts:82",
+        "lib/pi-sdk/stream-guard.ts:8",
+        "lib/pi-sdk/tool-outcome-adapter.ts:9",
+        "lib/pi-sdk/todo-context-reminder.ts:88"
+      ],
+      "rust_owner": "Rust StreamNormalizer、ToolResult 与 ContextService",
+      "permitted_peripheral": "无 Agent 决策型 worker；纯图像解码可作为有界单次处理。",
+      "protocol_test": "畸形 toolcall、工具 isError、输出截断/注入、待办节流和历史不污染对照。",
+      "retirement_evidence": "Pi agent 方法猴补丁退出；相应效果由 Rust 规范化事件和上下文产物证明。",
+      "target_stage": "R04/R05/R06/R11",
+      "disposition": "KERNEL_MIGRATION"
+    },
+    {
+      "id": "PI-10",
+      "current_duty": "用量字段、模型调用 ingress/trace、provider 前后 hook 与直接摘要观测。",
+      "adapter_symbols": [
+        "getLastAssistantUsage"
+      ],
+      "source_refs": [
+        "server/routes/chat.ts:22",
+        "lib/pi-sdk/model-call-stream-observer.ts:1",
+        "lib/extensions/model-call-observer-ext.ts:30",
+        "lib/pi-sdk/index.ts:234"
+      ],
+      "rust_owner": "Rust Trace/UsageService 与唯一 ModelCall 记录",
+      "permitted_peripheral": "观测存储后端可替换，关联 ID/去重事实由 Rust 持有。",
+      "protocol_test": "普通/压缩/辅助/失败调用的 callId、attempt、usage 去重及不可观测字段标注。",
+      "retirement_evidence": "不依赖 Pi streamFunction/hooks 获取关键 trace；旧记录只读可查询。",
+      "target_stage": "R05/R07/R11",
+      "disposition": "KERNEL_MIGRATION"
+    },
+    {
+      "id": "PI-11",
+      "current_duty": "steer/followUp、轮中输入提交、abort/消息落盘事件和 shutdown 扩展清理。",
+      "adapter_symbols": [],
+      "source_refs": [
+        "core/session-coordinator.ts:5121",
+        "core/session-coordinator.ts:5299",
+        "core/session-coordinator.ts:5344",
+        "lib/pi-sdk/desktop-input-commit.ts:36",
+        "lib/pi-sdk/session-shutdown.ts:26"
+      ],
+      "rust_owner": "Rust RunSupervisor、SessionService 与 EventService",
+      "permitted_peripheral": "UI 输入可以是客户端事件，但队列身份和提交收据由 Rust 生成。",
+      "protocol_test": "插话/跟进顺序、取消竞争、重复提交、关窗后任务存活、shutdown 清理对照。",
+      "retirement_evidence": "新入口不调 Pi session.steer/sendCustomMessage/abort；同一 run 的终态只有 Rust 写入。",
+      "target_stage": "R03/R06/R08/R11",
+      "disposition": "KERNEL_MIGRATION"
+    },
+    {
+      "id": "PI-12",
+      "current_duty": "SettingsManager 的 session 默认设置、thinking/config 兼容。",
+      "adapter_symbols": [
+        "SettingsManager"
+      ],
+      "source_refs": [
+        "core/engine.ts:45",
+        "core/session-defaults.ts:1",
+        "core/session-coordinator.ts:8388"
+      ],
+      "rust_owner": "Rust ConfigService 与 SessionService",
+      "permitted_peripheral": "旧设置只读迁移可保留，不作业务设置权威。",
+      "protocol_test": "旧模型/思考级别/工具模式默认值与用户覆盖、配置变更代次。",
+      "retirement_evidence": "新 session 设置不依赖 Pi SettingsManager。",
+      "target_stage": "R05/R06/R08/R11",
+      "disposition": "KERNEL_MIGRATION"
+    },
+    {
+      "id": "PI-13",
+      "current_duty": "图片模型入参重采样和尺寸提示；Pi 内部通过 photon 原生/WASM。",
+      "adapter_symbols": [
+        "*"
+      ],
+      "source_refs": [
+        "core/model-image-preprocess.ts:203",
+        "lib/pi-sdk/index.ts:18",
+        "lib/pi-sdk/index.ts:334"
+      ],
+      "rust_owner": "Rust ModelGateway 输入预算与错误策略",
+      "permitted_peripheral": "单次图像转换可保留 photon/替代编码 worker，输入、输出与取消有界。",
+      "protocol_test": "base64/MIME/上限/转换失败及尺寸提示对照；模型请求不得超预算。",
+      "retirement_evidence": "Rust 模型入口不调用 Pi resizeImage；可保留独立图像执行器且不读凭证。",
+      "target_stage": "R05/R07/R11",
+      "disposition": "KERNEL_MIGRATION"
+    },
+    {
+      "id": "PI-14",
+      "current_duty": "工具参数 TypeBox schema 与 StringEnum 的 Pi 适配导出。",
+      "adapter_symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "source_refs": [
+        "lib/pi-sdk/index.ts:299",
+        "lib/pi-sdk/index.ts:309",
+        "lib/tools/browser-tool.ts:26",
+        "core/tool-catalog-bridge.ts:20"
+      ],
+      "rust_owner": "Rust ToolRegistry/Protocol schema 生成与校验",
+      "permitted_peripheral": "TypeScript 类型或前端 schema 消费可保留；执行时 Rust 同源校验。",
+      "protocol_test": "全量工具描述/执行 schema 一致、未知 dialect 明确失败、optional/default/union/enum 对照。",
+      "retirement_evidence": "Rust 执行器不依赖 Pi/typebox 决定参数有效性；生成协议与客户端一致。",
+      "target_stage": "R01/R04/R11",
+      "disposition": "KERNEL_MIGRATION"
+    }
+  ],
+  "production_entrypoint_capabilities": [
+    {
+      "id": "E01",
+      "surface": "完整 Node 服务",
+      "chain": [
+        "scripts/launch.js:36",
+        "server/main-full.ts:17",
+        "server/index.ts:120",
+        "core/engine.ts:45"
+      ],
+      "capabilities": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-09",
+        "PI-10",
+        "PI-11",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "activation": "正常启动；部分功能按用户动作激活"
+    },
+    {
+      "id": "E02",
+      "surface": "开放组合服务",
+      "chain": [
+        "scripts/build-server-open.mjs:57",
+        "server/main-open.ts:23",
+        "server/index.ts:120",
+        "core/engine.ts:45"
+      ],
+      "capabilities": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-09",
+        "PI-10",
+        "PI-11",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "activation": "构建 open 版本时"
+    },
+    {
+      "id": "E03",
+      "surface": "Electron 主进程及渲染端",
+      "chain": [
+        "desktop/bootstrap.cjs:195",
+        "desktop/main.cjs:1904",
+        "desktop/main.cjs:1959",
+        "server/bootstrap.ts:62",
+        "desktop/src/index.html:17",
+        "desktop/src/react/app-init.ts:267",
+        "server/routes/chat.ts:2894",
+        "hub/index.ts:213",
+        "core/session-coordinator.ts:5278"
+      ],
+      "capabilities": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-09",
+        "PI-10",
+        "PI-11",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "activation": "Electron 客户端启动 Node 服务；HTML/React 经 HTTP/WS 调用，非源码静态 import 到 Pi"
+    },
+    {
+      "id": "E04",
+      "surface": "CLI",
+      "chain": [
+        "cli/entry.ts:17",
+        "cli/server-runner.ts:163",
+        "server/main-full.ts:17",
+        "cli/client.ts:66",
+        "server/routes/chat.ts:2894"
+      ],
+      "capabilities": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-09",
+        "PI-10",
+        "PI-11"
+      ],
+      "activation": "CLI serve 或连接本地服务后提交任务"
+    },
+    {
+      "id": "E05",
+      "surface": "Hub 临时/电话代理",
+      "chain": [
+        "hub/channel-router.ts:820",
+        "hub/agent-executor.ts:290",
+        "hub/agent-executor.ts:343",
+        "hub/agent-executor.ts:556",
+        "hub/agent-executor.ts:716"
+      ],
+      "capabilities": [
+        "PI-01",
+        "PI-02",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-09",
+        "PI-10",
+        "PI-11"
+      ],
+      "activation": "频道、电话或临时任务触发"
+    },
+    {
+      "id": "E06",
+      "surface": "Bridge 五平台",
+      "chain": [
+        "server/index.ts:860",
+        "server/index.ts:1313",
+        "lib/bridge/bridge-manager.ts:2093",
+        "hub/index.ts:213",
+        "core/bridge-session-manager.ts:1305",
+        "core/bridge-session-manager.ts:1456"
+      ],
+      "capabilities": [
+        "PI-01",
+        "PI-02",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-09",
+        "PI-10",
+        "PI-11"
+      ],
+      "activation": "服务 ready 后 manager 可延迟加载；平台连接须启用并有凭证"
+    },
+    {
+      "id": "E07",
+      "surface": "Cron / 心跳 / 后台",
+      "chain": [
+        "server/index.ts:557",
+        "hub/index.ts:367",
+        "hub/scheduler.ts:163",
+        "hub/scheduler.ts:308",
+        "hub/scheduler.ts:457",
+        "core/session-coordinator.ts:8385",
+        "core/session-coordinator.ts:8657"
+      ],
+      "capabilities": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-09",
+        "PI-10",
+        "PI-11"
+      ],
+      "activation": "定时/心跳开启且到触发时间"
+    },
+    {
+      "id": "E08",
+      "surface": "压缩 AgentRun 旁路",
+      "chain": [
+        "server/index.ts:496",
+        "lib/extensions/compaction-guard-ext.ts:237",
+        "lib/llm/cache-preserving-compaction-agent-run.ts:550"
+      ],
+      "capabilities": [
+        "PI-01",
+        "PI-03",
+        "PI-08",
+        "PI-10"
+      ],
+      "activation": "达到压缩阈值或显式压缩"
+    }
+  ],
+  "adapter_import_coverage": [
+    {
+      "source_ref": "core/bridge-session-manager.ts:9",
+      "symbols": [
+        "createAgentSession",
+        "SessionManager"
+      ],
+      "capability_ids": [
+        "PI-01",
+        "PI-02"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "core/bridge-session-manager.ts:10",
+      "symbols": [
+        "registerSessionModelCallContext"
+      ],
+      "capability_ids": [
+        "PI-10"
+      ],
+      "scope": "production_source",
+      "note": "子模块直接导入按 hook/adapter 账本覆盖"
+    },
+    {
+      "source_ref": "core/compaction-utils.ts:14",
+      "symbols": [
+        "findCutPoint",
+        "estimateTokens"
+      ],
+      "capability_ids": [
+        "PI-03"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "core/desktop-session-submit.ts:33",
+      "symbols": [
+        "withDesktopInputCommitted",
+        "noteDesktopInputRuntimeChange",
+        "desktopInputRuntimeRevision",
+        "hasDesktopInputCommitObserver"
+      ],
+      "capability_ids": [
+        "PI-11"
+      ],
+      "scope": "production_source",
+      "note": "子模块直接导入按 hook/adapter 账本覆盖"
+    },
+    {
+      "source_ref": "core/engine.ts:45",
+      "symbols": [
+        "DefaultResourceLoader",
+        "SessionManager",
+        "SettingsManager"
+      ],
+      "capability_ids": [
+        "PI-02",
+        "PI-04",
+        "PI-12"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "core/message-utils.ts:9",
+      "symbols": [
+        "SessionManager"
+      ],
+      "capability_ids": [
+        "PI-02"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "core/model-image-preprocess.ts:2",
+      "symbols": [
+        "*"
+      ],
+      "capability_ids": [
+        "PI-13"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "core/model-known-enrichment.ts:1",
+      "symbols": [
+        "getPiModel"
+      ],
+      "capability_ids": [
+        "PI-06"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "core/model-manager.ts:12",
+      "symbols": [
+        "AuthStorage",
+        "FileAuthStorageBackend",
+        "createModelRegistry",
+        "registerModelProvider",
+        "unregisterModelProvider",
+        "SdkAuthFacade"
+      ],
+      "capability_ids": [
+        "PI-06",
+        "PI-07"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "core/model-sync.ts:9",
+      "symbols": [
+        "getPiModel"
+      ],
+      "capability_ids": [
+        "PI-06"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "core/session-compaction-runtime.ts:42",
+      "symbols": [
+        "calculateContextTokens",
+        "estimateTokens",
+        "shouldCompact"
+      ],
+      "capability_ids": [
+        "PI-03"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "core/session-compactor.ts:5",
+      "symbols": [
+        "buildNativeCompactionRequestShapes",
+        "convertAgentMessagesToLlm",
+        "estimateTokens",
+        "prepareCompaction"
+      ],
+      "capability_ids": [
+        "PI-03"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "core/session-coordinator.ts:11",
+      "symbols": [
+        "createAgentSession",
+        "createExtensionRuntime",
+        "SessionManager",
+        "estimateTokens",
+        "refreshSessionModelFromRegistry",
+        "LoadExtensionsResult"
+      ],
+      "capability_ids": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-06"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "core/session-coordinator.ts:12",
+      "symbols": [
+        "registerSessionModelCallContext"
+      ],
+      "capability_ids": [
+        "PI-10"
+      ],
+      "scope": "production_source",
+      "note": "子模块直接导入按 hook/adapter 账本覆盖"
+    },
+    {
+      "source_ref": "core/session-defaults.ts:1",
+      "symbols": [
+        "SettingsManager"
+      ],
+      "capability_ids": [
+        "PI-12"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "core/session-teardown.ts:1",
+      "symbols": [
+        "emitSessionShutdown",
+        "ShutdownSession"
+      ],
+      "capability_ids": [
+        "PI-11"
+      ],
+      "scope": "production_source",
+      "note": "子模块直接导入按 hook/adapter 账本覆盖"
+    },
+    {
+      "source_ref": "core/tool-catalog-bridge.ts:20",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "hub/agent-executor.ts:12",
+      "symbols": [
+        "createAgentSession",
+        "SessionManager"
+      ],
+      "capability_ids": [
+        "PI-01",
+        "PI-02"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "hub/agent-executor.ts:13",
+      "symbols": [
+        "registerSessionModelCallContext"
+      ],
+      "capability_ids": [
+        "PI-10"
+      ],
+      "scope": "production_source",
+      "note": "子模块直接导入按 hook/adapter 账本覆盖"
+    },
+    {
+      "source_ref": "hub/channel-router.ts:19",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/auth/xai-oauth.ts:1",
+      "symbols": [
+        "OAuthLoginCallbacks",
+        "SdkOAuthProvider"
+      ],
+      "capability_ids": [
+        "PI-07"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/desk/heartbeat.ts:16",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/diary/diary-writer.ts:24",
+      "symbols": [
+        "generateSummary"
+      ],
+      "capability_ids": [
+        "PI-08"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/exec-command/tool.ts:1",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/extensions/compaction-guard-ext.ts:64",
+      "symbols": [
+        "convertAgentMessagesToLlm"
+      ],
+      "capability_ids": [
+        "PI-03"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/llm/cache-preserving-compaction-agent-run.ts:1",
+      "symbols": [
+        "runAgentLoop",
+        "AgentContext",
+        "AgentEvent",
+        "AgentLoopConfig",
+        "AgentMessage",
+        "AgentTool",
+        "StreamFn"
+      ],
+      "capability_ids": [
+        "PI-01"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/llm/context-usage-breakdown.ts:17",
+      "symbols": [
+        "estimateTokens"
+      ],
+      "capability_ids": [
+        "PI-03"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/llm/session-snapshot-side-task-runner.ts:1",
+      "symbols": [
+        "completeSimple"
+      ],
+      "capability_ids": [
+        "PI-08"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/memory/memory-search.ts:11",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/pi-sdk/search-tools.ts:20",
+      "symbols": [
+        "boundedSearchPresentation"
+      ],
+      "capability_ids": [
+        "PI-05"
+      ],
+      "scope": "production_source",
+      "note": "子模块直接导入按 hook/adapter 账本覆盖"
+    },
+    {
+      "source_ref": "lib/providers/opencode.ts:9",
+      "symbols": [
+        "getPiModels"
+      ],
+      "capability_ids": [
+        "PI-06"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/resource-io/materialize-tool.ts:1",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/sandbox/ast-edit-tool.ts:17",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/sandbox/ast-grep-tool.ts:16",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/sandbox/file-tool-presentation.ts:3",
+      "symbols": [
+        "createLsTool",
+        "createReadTool"
+      ],
+      "capability_ids": [
+        "PI-05"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/sandbox/file-tool-presentation.ts:4",
+      "symbols": [
+        "boundedSearchPresentation"
+      ],
+      "capability_ids": [
+        "PI-05"
+      ],
+      "scope": "production_source",
+      "note": "子模块直接导入按 hook/adapter 账本覆盖"
+    },
+    {
+      "source_ref": "lib/sandbox/grep-pager.ts:16",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/sandbox/index.ts:36",
+      "symbols": [
+        "createWriteTool",
+        "createEditTool",
+        "createBashTool",
+        "createGrepTool",
+        "createFindTool"
+      ],
+      "capability_ids": [
+        "PI-05"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/ask-user-tool.ts:18",
+      "symbols": [
+        "StringEnum",
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/automation-tool.ts:9",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/browser-tool.ts:26",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/card-guide-tool.ts:9",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/channel-tool.ts:11",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/check-deferred-tool.ts:9",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/checkpoint-tool.ts:9",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/computer-use-tool.ts:1",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/context-notes-tool.ts:13",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/current-status-tool.ts:9",
+      "symbols": [
+        "StringEnum",
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/dm-tool.ts:12",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/experience.ts:11",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/file-tool.ts:2",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/goal-tool.ts:9",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/install-skill.ts:29",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/knowledge-grep-tool.ts:23",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/knowledge-manage-tool.ts:20",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/knowledge-outline-tool.ts:2",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/knowledge-read-tool.ts:18",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/knowledge-search-tool.ts:1",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/learn-lesson-tool.ts:19",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/loop-control-tool.ts:9",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/lsp-tool.ts:14",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/notify-tool.ts:8",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/output-file-tool.ts:17",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/pinned-memory.ts:10",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/ptc-tool.ts:20",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/rewind-tool.ts:11",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/run-code-tool.ts:17",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/security-scan-tool.ts:16",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/session-folders-tool.ts:8",
+      "symbols": [
+        "StringEnum",
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/session-tool.ts:4",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/show-card-tool.ts:8",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/stop-task-tool.ts:7",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/subagent-tool.ts:13",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/tenet-propose-tool.ts:9",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/terminal-tool.ts:1",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/todo-compat.ts:22",
+      "symbols": [
+        "parseSessionEntries",
+        "buildSessionContext"
+      ],
+      "capability_ids": [
+        "PI-02"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/todo.ts:24",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/update-settings-tool.ts:9",
+      "symbols": [
+        "Type",
+        "StringEnum"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/web-fetch.ts:10",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/web-search.ts:9",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "lib/tools/workflow-tool.ts:3",
+      "symbols": [
+        "Type"
+      ],
+      "capability_ids": [
+        "PI-14"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "scripts/lib/history-read-fixture.mjs:105",
+      "symbols": [],
+      "capability_ids": [
+        "PI-02"
+      ],
+      "scope": "test_fixture",
+      "note": null
+    },
+    {
+      "source_ref": "server/routes/auth.ts:18",
+      "symbols": [
+        "loginOAuthProvider",
+        "OAuthLoginCallbacks"
+      ],
+      "capability_ids": [
+        "PI-07"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "server/routes/chat.ts:22",
+      "symbols": [
+        "getLastAssistantUsage"
+      ],
+      "capability_ids": [
+        "PI-10"
+      ],
+      "scope": "production_source",
+      "note": null
+    },
+    {
+      "source_ref": "server/routes/chat.ts:65",
+      "symbols": [
+        "consumeSteeredUserMessage"
+      ],
+      "capability_ids": [
+        "PI-11"
+      ],
+      "scope": "production_source",
+      "note": "子模块直接导入按 hook/adapter 账本覆盖"
+    },
+    {
+      "source_ref": "server/routes/sessions.ts:30",
+      "symbols": [
+        "SessionManager"
+      ],
+      "capability_ids": [
+        "PI-02"
+      ],
+      "scope": "production_source",
+      "note": null
+    }
+  ],
+  "pi_vendor_import_coverage": [
+    {
+      "source_ref": "lib/pi-sdk/auth-facade.ts:32",
+      "specifier": "../../node_modules/@earendil-works/pi-coding-agent/dist/core/auth-storage.js",
+      "capability_ids": [
+        "PI-07"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/compaction-request-shape.ts:1",
+      "specifier": "@earendil-works/pi-coding-agent",
+      "capability_ids": [
+        "PI-03"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/index.ts:14",
+      "specifier": "@earendil-works/pi-coding-agent",
+      "capability_ids": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-10",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/index.ts:25",
+      "specifier": "../../node_modules/@earendil-works/pi-coding-agent/dist/core/auth-storage.js",
+      "capability_ids": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-10",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/index.ts:30",
+      "specifier": "@earendil-works/pi-ai/compat",
+      "capability_ids": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-10",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/index.ts:52",
+      "specifier": "../../node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/compaction.js",
+      "capability_ids": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-10",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/index.ts:57",
+      "specifier": "@earendil-works/pi-coding-agent",
+      "capability_ids": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-10",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/index.ts:60",
+      "specifier": "@earendil-works/pi-agent-core",
+      "capability_ids": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-10",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/index.ts:61",
+      "specifier": "@earendil-works/pi-agent-core",
+      "capability_ids": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-10",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/index.ts:97",
+      "specifier": "@earendil-works/pi-coding-agent",
+      "capability_ids": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-10",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/index.ts:104",
+      "specifier": "@earendil-works/pi-coding-agent",
+      "capability_ids": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-10",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/index.ts:105",
+      "specifier": "@earendil-works/pi-coding-agent",
+      "capability_ids": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-10",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/index.ts:108",
+      "specifier": "@earendil-works/pi-coding-agent",
+      "capability_ids": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-10",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/index.ts:217",
+      "specifier": "@earendil-works/pi-coding-agent",
+      "capability_ids": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-10",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/index.ts:234",
+      "specifier": "@earendil-works/pi-coding-agent",
+      "capability_ids": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-10",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/index.ts:299",
+      "specifier": "@earendil-works/pi-ai",
+      "capability_ids": [
+        "PI-01",
+        "PI-02",
+        "PI-03",
+        "PI-04",
+        "PI-05",
+        "PI-06",
+        "PI-07",
+        "PI-08",
+        "PI-10",
+        "PI-12",
+        "PI-13",
+        "PI-14"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/search-tools.ts:22",
+      "specifier": "@earendil-works/pi-coding-agent",
+      "capability_ids": [
+        "PI-05"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/stream-guard.ts:1",
+      "specifier": "@earendil-works/pi-ai",
+      "capability_ids": [
+        "PI-09"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "lib/pi-sdk/stream-guard.ts:2",
+      "specifier": "@earendil-works/pi-ai",
+      "capability_ids": [
+        "PI-09"
+      ],
+      "production_reachable": true,
+      "static_runtime_reachable": true
+    },
+    {
+      "source_ref": "scripts/sync-known-models-from-pi.mjs:28",
+      "specifier": "../node_modules/@earendil-works/pi-ai/dist/models.generated.js",
+      "capability_ids": [
+        "PI-06"
+      ],
+      "production_reachable": false,
+      "static_runtime_reachable": false
+    }
+  ],
+  "facade_exports_without_named_import": [
+    {
+      "symbol": "createModelRuntime",
+      "source_ref": "lib/pi-sdk/index.ts:354",
+      "finding": "internal facade call"
+    },
+    {
+      "symbol": "emitSessionShutdown",
+      "source_ref": "lib/pi-sdk/index.ts:317",
+      "finding": "direct submodule consumer exists"
+    },
+    {
+      "symbol": "formatModelImageDimensionNote",
+      "source_ref": "lib/pi-sdk/index.ts:341",
+      "finding": "namespace call in core/model-image-preprocess.ts:203"
+    },
+    {
+      "symbol": "formatSkillsForPrompt",
+      "source_ref": "lib/pi-sdk/index.ts:108",
+      "finding": "no named import found in scanned tracked source; dynamic plugin/reflection not disproved"
+    },
+    {
+      "symbol": "LegacyOAuthProvider",
+      "source_ref": "lib/pi-sdk/index.ts:50",
+      "finding": "no named import found in scanned tracked source; dynamic plugin/reflection not disproved"
+    },
+    {
+      "symbol": "NATIVE_SUMMARIZATION_SYSTEM_PROMPT",
+      "source_ref": "lib/pi-sdk/index.ts:285",
+      "finding": "no named import found in scanned tracked source; dynamic plugin/reflection not disproved"
+    },
+    {
+      "symbol": "PI_BUILTIN_TOOL_NAMES",
+      "source_ref": "lib/pi-sdk/index.ts:94",
+      "finding": "no named import found in scanned tracked source; dynamic plugin/reflection not disproved"
+    },
+    {
+      "symbol": "resizeModelImageInput",
+      "source_ref": "lib/pi-sdk/index.ts:333",
+      "finding": "namespace call in core/model-image-preprocess.ts:203"
+    },
+    {
+      "symbol": "SdkProviderRegistrationConfig",
+      "source_ref": "lib/pi-sdk/index.ts:132",
+      "finding": "no named import found in scanned tracked source; dynamic plugin/reflection not disproved"
+    },
+    {
+      "symbol": "serializeConversation",
+      "source_ref": "lib/pi-sdk/index.ts:217",
+      "finding": "no named import found in scanned tracked source; dynamic plugin/reflection not disproved"
+    }
+  ],
+  "extension_hooks": [
+    {
+      "source_ref": "lib/extensions/agent-loop-guard-ext.ts:105",
+      "event": "session_start",
+      "capability_id": "PI-04"
+    },
+    {
+      "source_ref": "lib/extensions/agent-loop-guard-ext.ts:110",
+      "event": "agent_start",
+      "capability_id": "PI-01"
+    },
+    {
+      "source_ref": "lib/extensions/agent-loop-guard-ext.ts:114",
+      "event": "session_shutdown",
+      "capability_id": "PI-11"
+    },
+    {
+      "source_ref": "lib/extensions/agent-loop-guard-ext.ts:118",
+      "event": "tool_call",
+      "capability_id": "PI-05"
+    },
+    {
+      "source_ref": "lib/extensions/agent-loop-guard-ext.ts:164",
+      "event": "tool_result",
+      "capability_id": "PI-09"
+    },
+    {
+      "source_ref": "lib/extensions/compaction-guard-ext.ts:203",
+      "event": "context",
+      "capability_id": "PI-03"
+    },
+    {
+      "source_ref": "lib/extensions/compaction-guard-ext.ts:209",
+      "event": "tool_result",
+      "capability_id": "PI-09"
+    },
+    {
+      "source_ref": "lib/extensions/compaction-guard-ext.ts:237",
+      "event": "session_before_compact",
+      "capability_id": "PI-03"
+    },
+    {
+      "source_ref": "lib/extensions/deferred-result-ext.ts:51",
+      "event": "session_start",
+      "capability_id": "PI-04"
+    },
+    {
+      "source_ref": "lib/extensions/deferred-result-ext.ts:80",
+      "event": "session_shutdown",
+      "capability_id": "PI-11"
+    },
+    {
+      "source_ref": "lib/extensions/model-call-observer-ext.ts:30",
+      "event": "before_provider_request",
+      "capability_id": "PI-08"
+    },
+    {
+      "source_ref": "lib/extensions/model-call-observer-ext.ts:69",
+      "event": "after_provider_response",
+      "capability_id": "PI-10"
+    },
+    {
+      "source_ref": "core/engine.ts:3497",
+      "event": "context",
+      "capability_id": "PI-03"
+    },
+    {
+      "source_ref": "core/engine.ts:3509",
+      "event": "before_provider_request",
+      "capability_id": "PI-08"
+    },
+    {
+      "source_ref": "core/engine.ts:3542",
+      "event": "context",
+      "capability_id": "PI-03"
+    }
+  ],
+  "opaque_dynamic_imports": [
+    {
+      "file": "core/fresh-import.ts",
+      "line": 14,
+      "kind": "dynamic_import",
+      "expression": "url.href",
+      "classification": "生产插件目录按路径加载；不能以静态图证明用户自装插件无 Pi，R07/R11 需运行时登记并阻断第二内核"
+    },
+    {
+      "file": "desktop/bootstrap.cjs",
+      "line": 195,
+      "kind": "require",
+      "expression": "app.isPackaged ? \"./main.bundle.cjs\" : \"./main.cjs\"",
+      "classification": "生产条件 require 主进程 bundle/source；另从 desktop/main.cjs 与服务启动链人工复核"
+    },
+    {
+      "file": "desktop/speech-permissions.cjs",
+      "line": 178,
+      "kind": "require",
+      "expression": "override",
+      "classification": "桌面权限 helper 的可选候选路径；属于宿主动态加载，未发现 Pi 字面量"
+    },
+    {
+      "file": "desktop/speech-permissions.cjs",
+      "line": 196,
+      "kind": "require",
+      "expression": "candidate",
+      "classification": "桌面权限 helper 的可选候选路径；属于宿主动态加载，未发现 Pi 字面量"
+    },
+    {
+      "file": "desktop/speech-permissions.cjs",
+      "line": 204,
+      "kind": "require",
+      "expression": "devCandidate",
+      "classification": "桌面权限 helper 的可选候选路径；属于宿主动态加载，未发现 Pi 字面量"
+    },
+    {
+      "file": "scripts/build-server-phases.mjs",
+      "line": 376,
+      "kind": "dynamic_import",
+      "expression": "pathToFileURL(path.join(rootDir, \"vite.config.server.js\")).href",
+      "classification": "构建、基准或 smoke 脚本；不在产品服务入口，但需保留开发依赖区分"
+    },
+    {
+      "file": "scripts/generate-persistence-schema-fingerprint.mjs",
+      "line": 233,
+      "kind": "require",
+      "expression": "path.join(rootDir, \"shared\", \"contract-versions.cjs\")",
+      "classification": "构建/校验脚本；其中 PI_SESSION_PACKAGE 为 Pi 会话版本校验，不是运行服务入口"
+    },
+    {
+      "file": "scripts/generate-persistence-schema-fingerprint.mjs",
+      "line": 289,
+      "kind": "dynamic_import",
+      "expression": "pathToFileURL(path.join(rootDir, ...modulePath.split(\"/\"))).href",
+      "classification": "构建/校验脚本；其中 PI_SESSION_PACKAGE 为 Pi 会话版本校验，不是运行服务入口"
+    },
+    {
+      "file": "scripts/generate-persistence-schema-fingerprint.mjs",
+      "line": 299,
+      "kind": "dynamic_import",
+      "expression": "pathToFileURL(path.join(rootDir, ...modulePath.split(\"/\"))).href",
+      "classification": "构建/校验脚本；其中 PI_SESSION_PACKAGE 为 Pi 会话版本校验，不是运行服务入口"
+    },
+    {
+      "file": "scripts/generate-persistence-schema-fingerprint.mjs",
+      "line": 311,
+      "kind": "dynamic_import",
+      "expression": "pathToFileURL(path.join(rootDir, ...modulePath.split(\"/\"))).href",
+      "classification": "构建/校验脚本；其中 PI_SESSION_PACKAGE 为 Pi 会话版本校验，不是运行服务入口"
+    },
+    {
+      "file": "scripts/generate-persistence-schema-fingerprint.mjs",
+      "line": 321,
+      "kind": "dynamic_import",
+      "expression": "pathToFileURL(path.join(rootDir, ...modulePath.split(\"/\"))).href",
+      "classification": "构建/校验脚本；其中 PI_SESSION_PACKAGE 为 Pi 会话版本校验，不是运行服务入口"
+    },
+    {
+      "file": "scripts/generate-persistence-schema-fingerprint.mjs",
+      "line": 331,
+      "kind": "dynamic_import",
+      "expression": "pathToFileURL(path.join(rootDir, ...modulePath.split(\"/\"))).href",
+      "classification": "构建/校验脚本；其中 PI_SESSION_PACKAGE 为 Pi 会话版本校验，不是运行服务入口"
+    },
+    {
+      "file": "scripts/generate-persistence-schema-fingerprint.mjs",
+      "line": 453,
+      "kind": "dynamic_import",
+      "expression": "PI_SESSION_PACKAGE",
+      "classification": "构建/校验脚本；其中 PI_SESSION_PACKAGE 为 Pi 会话版本校验，不是运行服务入口"
+    },
+    {
+      "file": "scripts/pinned-tenets-recovery.mjs",
+      "line": 47,
+      "kind": "dynamic_import",
+      "expression": "pathToFileURL(path.join(__dirname, \"..\", \"core\", \"pinned-tenets-recovery.ts\")).href",
+      "classification": "构建、基准或 smoke 脚本；不在产品服务入口，但需保留开发依赖区分"
+    },
+    {
+      "file": "scripts/smoke-history-protocol.mjs",
+      "line": 31,
+      "kind": "dynamic_import",
+      "expression": "new URL(\"./lib/history-read-fixture.mjs\", import.meta.url).href.replace(\"file://\", \"file:///\").replace(\"///\", \"///\")",
+      "classification": "构建、基准或 smoke 脚本；不在产品服务入口，但需保留开发依赖区分"
+    },
+    {
+      "file": "scripts/smoke-history-protocol.mjs",
+      "line": 33,
+      "kind": "dynamic_import",
+      "expression": "new URL(\"./lib/history-read-counters.mjs\", import.meta.url).href",
+      "classification": "构建、基准或 smoke 脚本；不在产品服务入口，但需保留开发依赖区分"
+    },
+    {
+      "file": "server/bootstrap.ts",
+      "line": 62,
+      "kind": "dynamic_import",
+      "expression": "pathToFileURL(serverEntry).href",
+      "classification": "生产打包服务入口；另从 main-full/main-open 静态组合根复核"
+    }
+  ],
+  "nonimport_dynamic_boundaries": [
+    {
+      "source_ref": "lib/pi-sdk/session-options.ts:9",
+      "fact": "import.meta.resolve 在运行时解析 Pi 包版本",
+      "capability_id": "PI-05"
+    },
+    {
+      "source_ref": "server/bootstrap.ts:62",
+      "fact": "运行时 URL 导入已打包服务入口；图中静态链从 main-full/main-open 另行追踪",
+      "capability_id": "PI-01"
+    },
+    {
+      "source_ref": "desktop/bootstrap.cjs:195",
+      "fact": "条件 require 主进程 bundle 或源码；图中静态链从 desktop/main.cjs 另行追踪",
+      "capability_id": "PI-01"
+    },
+    {
+      "source_ref": "server/index.ts:871",
+      "fact": "BridgeManager 延迟加载，平台 SDK 静态导入与实际连接分开判定",
+      "capability_id": "PI-01"
+    },
+    {
+      "source_ref": "scripts/patch-pi-sdk.cjs:1",
+      "fact": "postinstall 名为 patch，但当前仅验证包版本、导出标记与生产 import 边界，不修改 node_modules",
+      "capability_id": "PI-05"
+    },
+    {
+      "source_ref": "lib/pi-sdk/index.ts:28",
+      "fact": "直接使用 node_modules 的 AuthStorage 深路径",
+      "capability_id": "PI-07"
+    },
+    {
+      "source_ref": "lib/pi-sdk/index.ts:54",
+      "fact": "直接使用 node_modules 的 prepareCompaction 深路径",
+      "capability_id": "PI-03"
+    }
+  ],
+  "worker_counterexamples": [
+    {
+      "id": "W1-1",
+      "candidate": "hub/agent-executor.ts",
+      "role": "Hub 临时/电话代理执行器",
+      "evidence": [
+        "hub/agent-executor.ts:290",
+        "hub/agent-executor.ts:343",
+        "hub/agent-executor.ts:556",
+        "hub/agent-executor.ts:716"
+      ],
+      "terminal_state_sinks": [
+        {
+          "note": "activity 终态由调用方 scheduler 写（W1-3 sink）"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "hub/index.ts:334",
+          "note": "ephemeral 分支"
+        },
+        {
+          "ref": "hub/channel-router.ts:820"
+        },
+        {
+          "ref": "hub/dm-router.ts:187"
+        }
+      ],
+      "activation": "频道、电话或临时任务触发",
+      "observed": "创建 Pi session 并多轮 prompt，持有模型循环；电话会话结果交由 router/ticker 决定回复或跳过。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust RunSupervisor/AgentLoop",
+      "allowed_peripheral": "仅可保留已授权单项平台收发/编解码",
+      "protocol_test": "临时/电话会话取消、超时、重试与唯一终态对照",
+      "retirement_evidence": "生产调用图无该执行器；Hub 轮次由 Rust 调度"
+    },
+    {
+      "id": "W1-2",
+      "candidate": "lib/llm/cache-preserving-compaction-agent-run.ts",
+      "role": "压缩旁路 AgentRun",
+      "evidence": [
+        "lib/llm/cache-preserving-compaction-agent-run.ts:550",
+        "lib/extensions/compaction-guard-ext.ts:237"
+      ],
+      "terminal_state_sinks": [
+        {
+          "note": "压缩摘要写回会话历史（经 PI-03 压缩链），不自持独立任务终态"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "lib/extensions/compaction-guard-ext.ts:237",
+          "note": "达到阈值触发"
+        }
+      ],
+      "activation": "达到压缩阈值或显式压缩",
+      "observed": "直接运行 Pi runAgentLoop，可能产生工具意图与模型调用。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust ContextService/ModelGateway",
+      "allowed_peripheral": "纯摘要文本格式化可保留为确定性函数",
+      "protocol_test": "压缩失败不覆原历史、取消及 trace 对照",
+      "retirement_evidence": "Pi runAgentLoop 不在新上下文路径"
+    },
+    {
+      "id": "W1-3",
+      "candidate": "hub/scheduler.ts",
+      "role": "Hub 后台任务调度器",
+      "evidence": [
+        "hub/scheduler.ts:440",
+        "hub/scheduler.ts:457",
+        "hub/scheduler.ts:473",
+        "hub/scheduler.ts:514"
+      ],
+      "terminal_state_sinks": [
+        {
+          "ref": "hub/scheduler.ts:514",
+          "note": "activity 终态写入"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "server/index.ts:557"
+        },
+        {
+          "ref": "hub/index.ts:367",
+          "note": "engine.executeIsolated 注入"
+        }
+      ],
+      "activation": "cron/heartbeat 到触发时间",
+      "observed": "调用隔离 Agent session 且写 activity status，不能整体留作工具 worker。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust Scheduler/RunSupervisor",
+      "allowed_peripheral": "OS 定时唤醒可做无决策通知",
+      "protocol_test": "任务终态唯一写者、取消/超时、重启恢复对照",
+      "retirement_evidence": "旧 Node 调度器不再决策任何任务执行"
+    },
+    {
+      "id": "W1-4",
+      "candidate": "lib/bridge/bridge-manager.ts",
+      "role": "Bridge 平台管理器",
+      "evidence": [
+        "lib/bridge/bridge-manager.ts:2093",
+        "lib/bridge/bridge-manager.ts:2369",
+        "server/index.ts:913"
+      ],
+      "terminal_state_sinks": [
+        {
+          "note": "进行中/完成结果状态维护（bridge turn 结果），终态落会话与活动链"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "server/index.ts:871",
+          "note": "延迟加载"
+        },
+        {
+          "ref": "core/bridge-session-manager.ts:1305"
+        }
+      ],
+      "activation": "平台连接启用且有凭证",
+      "observed": "触发 loop turn 并维护进行中/完成结果，不是纯 SDK 编解码。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust Bridge ingress/Scheduler/RunSupervisor",
+      "allowed_peripheral": "平台 SDK 消息接收/发送可保留为单次外围操作",
+      "protocol_test": "多平台轮次预算、取消、重投去重对照",
+      "retirement_evidence": "Bridge 轮次决策全部在 Rust"
+    },
+    {
+      "id": "W1-5",
+      "candidate": "plugins/office/lib/read-document.ts",
+      "role": "Office 文档单次解析",
+      "evidence": [
+        "plugins/office/lib/read-document.ts:1",
+        "plugins/office/tools/read-document.ts:1"
+      ],
+      "terminal_state_sinks": [
+        {
+          "note": "无；一次解析返回结果，不写任务/会话终态"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "note": "Office 内置插件工具注册"
+        }
+      ],
+      "activation": "用户读取 Office 文件",
+      "observed": "一次文档解析；不创建 Pi session 或写 run 终态。",
+      "verdict": "PERIPHERAL_CANDIDATE",
+      "rust_owner": "Rust ToolInvocationGateway 授权和结果归属",
+      "allowed_peripheral": "受控解析 worker；限定文件、字节、超时和输出",
+      "protocol_test": "文件授权、字节上限、超时与取消对照",
+      "retirement_evidence": "外围正例：无 session、无终态写入、无多轮模型调用"
+    },
+    {
+      "id": "W2",
+      "candidate": "lib/tools/subagent-tool.ts",
+      "role": "子代理新建/续接/中止",
+      "evidence": [
+        "lib/tools/subagent-tool.ts:466",
+        "lib/tools/subagent-tool.ts:551",
+        "lib/tools/subagent-tool.ts:802",
+        "lib/tools/subagent-tool.ts:865"
+      ],
+      "terminal_state_sinks": [
+        {
+          "ref": "lib/tools/subagent-tool.ts:382",
+          "note": "defer"
+        },
+        {
+          "ref": "lib/tools/subagent-tool.ts:576,619",
+          "note": "fail"
+        },
+        {
+          "ref": "lib/tools/subagent-tool.ts:584,883",
+          "note": "resolve"
+        },
+        {
+          "ref": "lib/tools/subagent-tool.ts:567,592,627",
+          "note": "hub 终态 upsert"
+        },
+        {
+          "ref": "lib/subagent-thread-store.ts:248",
+          "note": "finishRun"
+        },
+        {
+          "ref": "lib/subagent-run-store.ts:159,243-285",
+          "note": "runStore resolve/fail 持久 sink"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "core/agent.ts:936"
+        },
+        {
+          "ref": "core/engine.ts:2304"
+        },
+        {
+          "ref": "core/session-coordinator.ts:8048,8385,8657",
+          "note": "executeIsolated 实现"
+        }
+      ],
+      "activation": "用户调用 subagent 工具即激活；主动委派实验开关只管自动建议",
+      "observed": "后台派出/续接隔离 Agent，自行对 deferred store、run store、thread store 和 hub 写 resolved/failed/aborted 终态。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust RunSupervisor/TaskRegistry/DeferredResult/Thread",
+      "allowed_peripheral": "无；单次检索/编码可另走工具网关",
+      "protocol_test": "新建/续接/取消/重复回调/重启恢复、完成/失败/中止终态唯一写者对照",
+      "retirement_evidence": "旧 store 不再是权威；Node 不再裁决子代理终态"
+    },
+    {
+      "id": "W3",
+      "candidate": "lib/tools/workflow-tool.ts",
+      "role": "Workflow 节点执行/恢复",
+      "evidence": [
+        "lib/tools/workflow-tool.ts:283",
+        "lib/tools/workflow-tool.ts:304",
+        "lib/tools/workflow-tool.ts:320",
+        "lib/tools/workflow-tool.ts:418"
+      ],
+      "terminal_state_sinks": [
+        {
+          "ref": "lib/tools/workflow-tool.ts:336,344",
+          "note": "store.resolve/fail"
+        },
+        {
+          "ref": "lib/tools/workflow-tool.ts:418-429",
+          "note": "thread finishRun"
+        },
+        {
+          "ref": "lib/tools/workflow-tool.ts:338,345",
+          "note": "hub done/failed"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "core/agent.ts:940"
+        },
+        {
+          "ref": "lib/workflow/host-api.ts:278",
+          "note": "脚本节点调隔离 Agent"
+        },
+        {
+          "ref": "lib/workflow/sandbox.ts",
+          "note": "runWorkflowScript 执行宿主"
+        }
+      ],
+      "activation": "per-agent tools.disabled 控制，源码注释默认关；启用后节点产生多次模型调用",
+      "observed": "后台运行脚本节点的隔离 Agent，并自行写 done/failed 终态与 deferred/thread/hub。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust RunSupervisor/Workflow journal/TaskRegistry",
+      "allowed_peripheral": "脚本沙箱可限权外围执行单步；不得决定节点终态",
+      "protocol_test": "成功/失败/取消/恢复/重复节点与父 turn 交付对照",
+      "retirement_evidence": "关闭开关不等于可漏账；workflow 终态由 Rust 唯一写入"
+    },
+    {
+      "id": "W4",
+      "candidate": "lib/loop/loop-controller.ts",
+      "role": "循环任务控制器",
+      "evidence": [
+        "lib/loop/loop-controller.ts:125",
+        "lib/loop/loop-controller.ts:145",
+        "lib/loop/loop-controller.ts:179",
+        "lib/loop/loop-controller.ts:280",
+        "lib/loop/loop-controller.ts:353",
+        "lib/loop/loop-controller.ts:366"
+      ],
+      "terminal_state_sinks": [
+        {
+          "ref": "lib/loop/loop-controller.ts:185",
+          "note": "status completed"
+        },
+        {
+          "ref": "lib/loop/loop-controller.ts:125,280,353",
+          "note": "stopped"
+        },
+        {
+          "ref": "lib/loop/loop-controller.ts:366",
+          "note": "paused"
+        },
+        {
+          "ref": "lib/loop/loop-store.ts",
+          "note": "持久 loop-state"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "server/index.ts:488,910",
+          "note": "LoopStore 注入"
+        },
+        {
+          "ref": "core/engine.ts:1435",
+          "note": "LoopController 装配"
+        },
+        {
+          "ref": "lib/tools/loop-control-tool.ts:49",
+          "note": "工具入口"
+        },
+        {
+          "ref": "core/engine.ts:1441",
+          "note": "deliverCustomMessage triggerTurn"
+        }
+      ],
+      "activation": "用户启动循环后按闹钟/恢复触发；桌面走 deliverCustomMessage(triggerTurn)，Bridge 走 executeLoopTurn",
+      "observed": "写持久化 completed/stopped/paused 并触发后续 turn。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust LoopService/RunSupervisor",
+      "allowed_peripheral": "无；闹钟唤醒可由 OS timer 通知，但决策与终态在 Rust",
+      "protocol_test": "完成/暂停/恢复/会话换代/后台任务守恒对照",
+      "retirement_evidence": "Node 不再写 loop-state"
+    },
+    {
+      "id": "W5",
+      "candidate": "server/routes/desk.ts",
+      "role": "桌面封面生成路由",
+      "evidence": [
+        "server/routes/desk.ts:488",
+        "server/routes/desk.ts:836",
+        "server/routes/desk.ts:888"
+      ],
+      "terminal_state_sinks": [
+        {
+          "ref": "server/routes/desk.ts:903",
+          "note": "done/error"
+        },
+        {
+          "ref": "server/routes/desk.ts:913",
+          "note": "error"
+        },
+        {
+          "ref": "lib/desk/activity-store.ts:65",
+          "note": "持久化"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "server/routes/desk.ts:888",
+          "note": "engine.executeIsolated，超时 abort"
+        }
+      ],
+      "activation": "美化插件及工具启用、图片模型可用、用户发起生成",
+      "observed": "HTTP 路由建活动并 executeIsolated，超时 abort，自写 done/error。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust ActivityService/RunSupervisor",
+      "allowed_peripheral": "图片格式转换可外围",
+      "protocol_test": "HTTP 成功/失败/超时/并发重复收尾及 ActivityStore 退出对照",
+      "retirement_evidence": "活动终态由 Rust 唯一写"
+    },
+    {
+      "id": "W6",
+      "candidate": "lib/desk/cron-scheduler.ts",
+      "role": "desk/studio cron 内层调度器",
+      "evidence": [
+        "lib/desk/cron-scheduler.ts:63",
+        "lib/desk/cron-scheduler.ts:137",
+        "lib/desk/cron-scheduler.ts:175"
+      ],
+      "terminal_state_sinks": [
+        {
+          "ref": "lib/desk/cron-scheduler.ts:137",
+          "note": "logRun success"
+        },
+        {
+          "ref": "lib/desk/cron-scheduler.ts:175",
+          "note": "logRun error"
+        },
+        {
+          "ref": "lib/desk/cron-store.ts",
+          "note": "logRun/markRun 持久"
+        },
+        {
+          "ref": "core/studio-cron-service.ts:194",
+          "note": "studio 转发"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "lib/desk/automation-executors.ts",
+          "note": "agent_session executor 描述缺省"
+        },
+        {
+          "ref": "hub/scheduler.ts:457",
+          "note": "executeIsolated"
+        }
+      ],
+      "activation": "到期且 job 启用；heartbeat 按配置；一次失败也推进游标",
+      "observed": "独自判到期、超时、推进游标、logRun 成败，与 hub scheduler 同属任务决策，不能只迁 Agent 调用。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust CronService/Scheduler/RunSupervisor",
+      "allowed_peripheral": "无；OS 定时唤醒仅通知",
+      "protocol_test": "配置换代、超时、失败退避、重启、恰好一次游标对照",
+      "retirement_evidence": "旧 CronStore 不写权威"
+    },
+    {
+      "id": "W7",
+      "candidate": "hub/channel-router.ts",
+      "role": "频道轮次路由",
+      "evidence": [
+        "hub/channel-router.ts:370",
+        "hub/channel-router.ts:508",
+        "hub/channel-router.ts:790",
+        "hub/channel-router.ts:820"
+      ],
+      "terminal_state_sinks": [
+        {
+          "ref": "lib/channels/channel-ticker.ts:280",
+          "note": "轮询/重试"
+        },
+        {
+          "ref": "lib/channels/channel-ticker.ts:452",
+          "note": "已读书签推进"
+        },
+        {
+          "ref": "lib/channels/channel-store.ts",
+          "note": "updateBookmark 持久 sink"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "lib/channels/channel-ticker.ts:452",
+          "note": "注入 router"
+        },
+        {
+          "ref": "hub/channel-router.ts:820",
+          "note": "runAgentPhoneSession"
+        }
+      ],
+      "activation": "频道总开关默认关；开启、有频道成员/新消息或主动提醒时",
+      "observed": "轮询/重试、更新已读书签，调 runAgentPhoneSession 并决定 reply/pass。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust ChannelService/RunSupervisor",
+      "allowed_peripheral": "平台消息读写可外围单次执行",
+      "protocol_test": "多 agent、重试、取消、书签不提前推进对照",
+      "retirement_evidence": "旧 ticker/router 不再决策"
+    },
+    {
+      "id": "W8",
+      "candidate": "hub/dm-router.ts",
+      "role": "Agent 私信多轮路由",
+      "evidence": [
+        "hub/dm-router.ts:144",
+        "hub/dm-router.ts:187",
+        "hub/dm-router.ts:189",
+        "hub/dm-router.ts:292"
+      ],
+      "terminal_state_sinks": [
+        {
+          "ref": "hub/dm-router.ts:189-343",
+          "note": "MAX_ROUNDS 循环内写双方 DM 文件与 phone activity"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "hub/index.ts:1041",
+          "note": "注入回调"
+        },
+        {
+          "ref": "hub/agent-executor.ts:556,716",
+          "note": "runAgentPhoneSession"
+        }
+      ],
+      "activation": "频道总开关默认关；启用后新私信触发",
+      "observed": "去重/冷却后最多 MAX_ROUNDS 轮调用 runAgentPhoneSession，按 [NO_REPLY]/<done/> 停止并写双方 DM 与 phone activity。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust DmSessionService/RunSupervisor",
+      "allowed_peripheral": "文件/平台收发可外围",
+      "protocol_test": "无回复、done、轮数上限、重复回调/重启、双边消息一致性对照",
+      "retirement_evidence": "Node 不再决定 DM 终止"
+    },
+    {
+      "id": "W9",
+      "candidate": "lib/deferred-result-coordinator.ts",
+      "role": "延迟结果协调器",
+      "evidence": [
+        "lib/deferred-result-coordinator.ts:20",
+        "lib/deferred-result-coordinator.ts:55",
+        "lib/deferred-result-coordinator.ts:127"
+      ],
+      "terminal_state_sinks": [
+        {
+          "ref": "lib/deferred-result-store.ts:139,159,204,243-285,470",
+          "note": "结果/中止写入"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "server/index.ts:480-486",
+          "note": "store 创建"
+        },
+        {
+          "ref": "core/engine.ts:994-1005",
+          "note": "coordinator 启动"
+        },
+        {
+          "ref": "lib/deferred-result-coordinator.ts:127-130",
+          "note": "deliverCustomMessage triggerTurn"
+        }
+      ],
+      "activation": "任一后台任务返回、重启后补投或重试",
+      "observed": "决定是否 deliverCustomMessage(...,{triggerTurn}) 续跑父会话，是父 turn 续跑决策者。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust DeferredResult/RunSupervisor",
+      "allowed_peripheral": "外围只能回传结果",
+      "protocol_test": "结果先到/会话失效/重复/崩溃恢复、交付屏蔽与幂等对照",
+      "retirement_evidence": "旧 deferred JSON 不再权威"
+    },
+    {
+      "id": "W10",
+      "candidate": "server/task-bus-handlers.ts",
+      "role": "通用任务状态入口与取消",
+      "evidence": [
+        "server/task-bus-handlers.ts:20",
+        "server/task-bus-handlers.ts:44",
+        "server/deferred-result-bus-handlers.ts:91",
+        "server/deferred-result-bus-handlers.ts:110"
+      ],
+      "terminal_state_sinks": [
+        {
+          "ref": "server/task-bus-handlers.ts:20-63",
+          "note": "register/update/complete/fail/abort"
+        },
+        {
+          "ref": "server/deferred-result-bus-handlers.ts:91-115",
+          "note": "deferred:resolve/fail/abort"
+        },
+        {
+          "ref": "lib/task-registry.ts",
+          "note": "TaskRegistry 持久 sink 与 attempt 栅栏"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "core/engine.ts:866-889",
+          "note": "TaskRegistry 持久"
+        },
+        {
+          "ref": "server/routes/chat.ts:485-509",
+          "note": "停止子代理"
+        },
+        {
+          "ref": "lib/tools/stop-task-tool.ts:93"
+        },
+        {
+          "ref": "core/session-turn-actions.ts:789-808",
+          "note": "中止/回档旧任务"
+        }
+      ],
+      "activation": "插件/用户停任务、重试与回档",
+      "observed": "对插件暴露任务登记/更新/完成/失败/中止与 deferred 结果写入口；插件不得直接裁决任务终态。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust TaskRegistry 公共写入口与主体/attempt 校验",
+      "allowed_peripheral": "单次插件操作可外围；所有 bus 写者可枚举",
+      "protocol_test": "旧 attempt、重复/跨会话/插件消息、取消竞态对照",
+      "retirement_evidence": "任务终态唯一写者为 Rust"
+    },
+    {
+      "id": "W11",
+      "candidate": "lib/exec-command/background.ts",
+      "role": "命令转后台",
+      "evidence": [
+        "lib/exec-command/tool.ts:120",
+        "lib/exec-command/tool.ts:180",
+        "lib/exec-command/background.ts:125",
+        "lib/exec-command/background.ts:129"
+      ],
+      "terminal_state_sinks": [
+        {
+          "ref": "lib/exec-command/background.ts:125",
+          "note": "TaskRegistry.complete"
+        },
+        {
+          "ref": "lib/exec-command/background.ts:129",
+          "note": "DeferredResultStore.resolve"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "lib/exec-command/tool.ts:180-260",
+          "note": "wait_mode=auto 转后台"
+        }
+      ],
+      "activation": "长命令超出前台窗口后才转后台；PTY 退出触发",
+      "observed": "进程退出后 TaskRegistry.complete + DeferredResultStore.resolve，决定父 turn 回送。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust TaskRegistry/DeferredResult",
+      "allowed_peripheral": "命令/PTY 可限权外围",
+      "protocol_test": "窗口内退出、超窗、非零退出、取消、迟到结果/旧 attempt 对照",
+      "retirement_evidence": "任务登记、终态与父 turn 属 Rust"
+    },
+    {
+      "id": "W12",
+      "candidate": "lib/tools/rewind-tool.ts",
+      "role": "回档后台化",
+      "evidence": [
+        "lib/tools/rewind-tool.ts:131",
+        "lib/tools/rewind-tool.ts:160"
+      ],
+      "terminal_state_sinks": [
+        {
+          "ref": "lib/tools/rewind-tool.ts:160-170",
+          "note": "execution resolve/fail + deferredStore.fail"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "core/agent.ts:863",
+          "note": "装配"
+        },
+        {
+          "ref": "core/agent.ts:1224",
+          "note": "纳入快照"
+        }
+      ],
+      "activation": "用户确认回档且会话仍流式；否则走直接回档",
+      "observed": "当前轮仍流式时延迟回档，写 registry/deferred 成败。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust SessionService 回档事务/TaskRegistry",
+      "allowed_peripheral": "文件恢复可受控单次操作",
+      "protocol_test": "确认、流结束后执行、失败回滚、被丢弃后台任务取消对照",
+      "retirement_evidence": "会话回档事务与后台终态属 Rust"
+    },
+    {
+      "id": "W13",
+      "candidate": "core/media/poller.ts",
+      "role": "媒体生成/轮询",
+      "evidence": [
+        "core/media/poller.ts:154",
+        "core/media/poller.ts:303",
+        "core/media/poller.ts:326",
+        "core/media/poller.ts:343",
+        "core/media/poller.ts:379"
+      ],
+      "terminal_state_sinks": [
+        {
+          "ref": "core/media/poller.ts:154",
+          "note": "cancelled"
+        },
+        {
+          "ref": "core/media/poller.ts:303",
+          "note": "settleTask"
+        },
+        {
+          "ref": "core/media/poller.ts:343-347",
+          "note": "deferred:resolve/fail/abort"
+        },
+        {
+          "ref": "core/media/task-store.ts:391-393,471,505",
+          "note": "持久终态"
+        },
+        {
+          "ref": "core/media/image-task-runner.ts:458",
+          "note": "提交失败直接终态"
+        },
+        {
+          "ref": "core/media/submit-image.ts",
+          "note": "提交路径登记任务"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "core/engine.ts:583,3748",
+          "note": "UniversalMediaManager 装配"
+        },
+        {
+          "ref": "core/media/universal-media-manager.ts:577-595",
+          "note": "poller 启动"
+        }
+      ],
+      "activation": "媒体任务提交、供应商异步查询或重启恢复",
+      "observed": "写 done/failed/cancelled 并经 deferred bus 交付，含仅 UI 记录与父 turn 两种交付。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust MediaTaskService/DeferredResult",
+      "allowed_peripheral": "供应商查询/下载可外围",
+      "protocol_test": "重启 pending、同一 attempt、提交失败、取消、两种交付对照",
+      "retirement_evidence": "持久 task 与交付决策属 Rust"
+    },
+    {
+      "id": "W14",
+      "candidate": "lib/memory/dream/runner.ts",
+      "role": "记忆 Dream 多阶段作业",
+      "evidence": [
+        "lib/memory/dream/runner.ts:98",
+        "lib/memory/dream/runner.ts:150",
+        "lib/memory/dream/runner.ts:250",
+        "lib/memory/dream/runner.ts:314"
+      ],
+      "terminal_state_sinks": [
+        {
+          "ref": "lib/memory/dream/runner.ts:250-309",
+          "note": "多阶段执行"
+        },
+        {
+          "ref": "lib/memory/dream/state-store.ts:39,71-76,121-129",
+          "note": "succeeded/failed 落盘"
+        },
+        {
+          "ref": "lib/memory/dream/model-runner.ts",
+          "note": "阶段模型调用编排"
+        },
+        {
+          "ref": "lib/memory/dream/revision-store.ts",
+          "note": "修订持久与回滚"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "server/routes/memory-dream.ts:66-82",
+          "note": "手动触发"
+        },
+        {
+          "ref": "lib/memory/memory-ticker.ts:744-752",
+          "note": "自动触发"
+        }
+      ],
+      "activation": "手动或自动条件满足",
+      "observed": "多阶段模型调用并持久写 succeeded/failed；不调用 Pi AgentLoop，但独立持有模型作业与终态，不能因无 executeIsolated 而遗漏。",
+      "verdict": "KERNEL_MIGRATION",
+      "rust_owner": "Rust MemoryJobService/ModelGateway",
+      "allowed_peripheral": "单次文本处理算法可外围",
+      "protocol_test": "阶段失败、输入变更、重启、取消、修订回滚对照",
+      "retirement_evidence": "模型作业编排与记忆写入权属 Rust"
+    },
+    {
+      "id": "W15",
+      "candidate": "lib/goal/goal-engine.ts",
+      "role": "会话目标相邻状态",
+      "evidence": [
+        "lib/goal/goal-engine.ts:128",
+        "lib/goal/goal-engine.ts:213",
+        "lib/tools/goal-tool.ts:105"
+      ],
+      "terminal_state_sinks": [
+        {
+          "ref": "lib/goal/goal-engine.ts:213-225",
+          "note": "finish completed/dropped"
+        }
+      ],
+      "injection_or_call_source": [
+        {
+          "ref": "server/index.ts:972",
+          "note": "单实例挂 engine"
+        }
+      ],
+      "activation": "用户/模型目标工具及聊天 turn",
+      "observed": "不是独立后台 worker，但写会话 goal 完成/放弃，属会话预算与状态权威；普通 assistant run 终态是 RunSupervisor 基线，不以 worker 反例重复计数。",
+      "verdict": "ADJACENT_SESSION_STATE",
+      "rust_owner": "Rust SessionService/RunSupervisor（PI-11 交接）",
+      "allowed_peripheral": "无",
+      "protocol_test": "状态、用量、steer 切分与恰好一次收尾对照",
+      "retirement_evidence": "goal 状态随会话服务迁移，Node 不再写权威"
+    }
+  ],
+  "worker_discovery": {
+    "method": "源头子串：execute 入口/注入转发；终点子串：终态 sink。子串匹配故意过近似，逐文件分类解释；闭合要求发现集合与分类台账（含手工相邻补入）双向差集为空。",
+    "source_patterns": [
+      "executeIsolated",
+      "runAgentLoop",
+      "createAgentSession",
+      "runAgentPhoneSession",
+      "executeLoopTurn",
+      "deliverCustomMessage",
+      "runWorkflowScript",
+      "deliverLoopMessage"
+    ],
+    "sink_patterns": [
+      "finishRun",
+      "settleTask",
+      "logRun",
+      "markRun",
+      "TaskRegistry",
+      "DeferredResultStore",
+      "deferredStore",
+      "deferred:",
+      "LoopStore",
+      "LoopController",
+      "Dream",
+      "updateBookmark"
+    ],
+    "discovered_files": [
+      "core/agent-manager.ts",
+      "core/agent.ts",
+      "core/bridge-session-manager.ts",
+      "core/engine.ts",
+      "core/media/image-task-runner.ts",
+      "core/media/poller.ts",
+      "core/media/submit-image.ts",
+      "core/media/task-store.ts",
+      "core/media/universal-media-manager.ts",
+      "core/model-manager.ts",
+      "core/session-coordinator.ts",
+      "core/session-turn-actions.ts",
+      "core/studio-cron-service.ts",
+      "desktop/src/react/components/input/CompactionAskDialog.tsx",
+      "desktop/src/react/components/preview/cover-gallery-assets.ts",
+      "desktop/src/react/hooks/use-stream-buffer.ts",
+      "desktop/src/react/services/stream-resume.ts",
+      "desktop/src/react/services/ws-message-handler.ts",
+      "desktop/src/react/settings/tabs/AgentTab.tsx",
+      "desktop/src/react/settings/tabs/agent/AgentMemory.tsx",
+      "desktop/src/react/settings/tabs/agent/AgentMemoryDream.tsx",
+      "desktop/src/react/settings/tabs/agent/DreamRevisionBrowser.tsx",
+      "desktop/src/react/settings/tabs/agent/agent-memory-dream-actions.ts",
+      "desktop/src/react/settings/tabs/agent/dream-error-presenter.ts",
+      "desktop/src/react/utils/history-builder.ts",
+      "desktop/src/react/utils/turn-projector.ts",
+      "hub/agent-executor.ts",
+      "hub/channel-router.ts",
+      "hub/dm-router.ts",
+      "hub/event-bus-capabilities.ts",
+      "hub/index.ts",
+      "hub/scheduler.ts",
+      "lib/bridge/bridge-manager.ts",
+      "lib/channels/channel-store.ts",
+      "lib/channels/channel-ticker.ts",
+      "lib/deferred-result-coordinator.ts",
+      "lib/deferred-result-store.ts",
+      "lib/desk/agent-run-automation.ts",
+      "lib/desk/automation-normalizer.ts",
+      "lib/desk/cron-scheduler.ts",
+      "lib/desk/cron-store.ts",
+      "lib/exec-command/background.ts",
+      "lib/exec-command/tool.ts",
+      "lib/extensions/deferred-result-ext.ts",
+      "lib/llm/cache-preserving-compaction-agent-run.ts",
+      "lib/llm/model-call-integration.ts",
+      "lib/llm/model-trace-scope.ts",
+      "lib/loop/loop-controller.ts",
+      "lib/loop/loop-store.ts",
+      "lib/memory/dream/memory-units.ts",
+      "lib/memory/dream/model-runner.ts",
+      "lib/memory/dream/revision-store.ts",
+      "lib/memory/dream/runner.ts",
+      "lib/memory/dream/state-store.ts",
+      "lib/memory/memory-ticker.ts",
+      "lib/memory/prompts/dream.ts",
+      "lib/pi-sdk/index.ts",
+      "lib/pi-sdk/model-call-stream-observer.ts",
+      "lib/pi-sdk/session-options.ts",
+      "lib/sandbox/index.ts",
+      "lib/sandbox/win32-runtime-cache.ts",
+      "lib/subagent-thread-store.ts",
+      "lib/task-registry.ts",
+      "lib/tasks/task-execution.ts",
+      "lib/tasks/task-identity.ts",
+      "lib/tools/automation-draft.ts",
+      "lib/tools/automation-tool.ts",
+      "lib/tools/check-deferred-tool.ts",
+      "lib/tools/loop-control-tool.ts",
+      "lib/tools/rewind-tool.ts",
+      "lib/tools/stop-task-tool.ts",
+      "lib/tools/subagent-tool-policy.ts",
+      "lib/tools/subagent-tool.ts",
+      "lib/tools/workflow-tool.ts",
+      "lib/workflow/host-api.ts",
+      "lib/workflow/node-folder-scope.ts",
+      "lib/workflow/sandbox.ts",
+      "plugins/jimeng-cli/adapters/dreamina.ts",
+      "plugins/jimeng-cli/index.ts",
+      "plugins/jimeng-cli/lib/dreamina-capabilities.ts",
+      "scripts/patch-pi-sdk.cjs",
+      "scripts/scan-persistent-stores.mjs",
+      "server/composition/open-root.ts",
+      "server/deferred-result-bus-handlers.ts",
+      "server/deferred-result-interlude.ts",
+      "server/history-read/hydrate.ts",
+      "server/history-read/project-page.ts",
+      "server/index.ts",
+      "server/routes/channels.ts",
+      "server/routes/chat.ts",
+      "server/routes/desk.ts",
+      "server/routes/memory-dream.ts",
+      "server/task-bus-handlers.ts",
+      "shared/error-user-messages.ts",
+      "shared/persistence/store-registry.ts"
+    ],
+    "classification": {
+      "core/agent-manager.ts": {
+        "klass": "SUPPORTING_WIRING",
+        "worker_ref": "W2",
+        "reason": "agent 装配处转发 executeIsolated"
+      },
+      "core/agent.ts": {
+        "klass": "SUPPORTING_WIRING",
+        "worker_ref": "W2/W3/W10/W12",
+        "reason": "创建 subagent/workflow 工具并注入执行器"
+      },
+      "core/bridge-session-manager.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W1-4",
+        "reason": "Bridge owner 会话创建（createAgentSession）"
+      },
+      "core/engine.ts": {
+        "klass": "SUPPORTING_WIRING",
+        "worker_ref": "W2/W3/W4/W9/W10/W13",
+        "reason": "注入枢纽：转发 executeIsolated、装配 LoopController/TaskRegistry/DeferredResult/Media"
+      },
+      "core/media/image-task-runner.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W13",
+        "reason": "提交失败直接写终态"
+      },
+      "core/media/poller.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W13",
+        "reason": "媒体轮询写 done/failed/cancelled 并经 deferred 交付"
+      },
+      "core/media/submit-image.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W13",
+        "reason": "图片提交路径登记任务"
+      },
+      "core/media/task-store.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W13",
+        "reason": "媒体任务持久终态 sink"
+      },
+      "core/media/universal-media-manager.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W13",
+        "reason": "媒体管理器装配 poller 与恢复"
+      },
+      "core/model-manager.ts": {
+        "klass": "COMMENT_OR_DOC_ONLY",
+        "worker_ref": "PI-01",
+        "reason": "createAgentSession 仅出现在装配注释"
+      },
+      "core/session-coordinator.ts": {
+        "klass": "KERNEL_INFRASTRUCTURE",
+        "worker_ref": "W2/W3",
+        "reason": "executeIsolated 实现位：创建 Pi session 并 prompt；PI-01 内核本体"
+      },
+      "core/session-turn-actions.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W10",
+        "reason": "turn 动作：中止/回档旧任务与 deliverCustomMessage"
+      },
+      "core/studio-cron-service.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W6",
+        "reason": "studio cron 持久存储转发"
+      },
+      "desktop/src/react/components/input/CompactionAskDialog.tsx": {
+        "klass": "RENDERER_PROJECTION",
+        "worker_ref": "-",
+        "reason": "渲染端压缩确认对话框；deferred: 为样式/状态字符串"
+      },
+      "desktop/src/react/components/preview/cover-gallery-assets.ts": {
+        "klass": "RENDERER_PROJECTION",
+        "worker_ref": "W5",
+        "reason": "封面资产描述；Dream 命中来自封面主题/模型名"
+      },
+      "desktop/src/react/hooks/use-stream-buffer.ts": {
+        "klass": "RENDERER_PROJECTION",
+        "worker_ref": "-",
+        "reason": "渲染端流缓冲投影；finishRun 为 UI 流状态，不写服务端任务终态"
+      },
+      "desktop/src/react/services/stream-resume.ts": {
+        "klass": "RENDERER_PROJECTION",
+        "worker_ref": "-",
+        "reason": "渲染端断线续流投影"
+      },
+      "desktop/src/react/services/ws-message-handler.ts": {
+        "klass": "RENDERER_PROJECTION",
+        "worker_ref": "-",
+        "reason": "渲染端 WS 消息投影"
+      },
+      "desktop/src/react/settings/tabs/AgentTab.tsx": {
+        "klass": "RENDERER_PROJECTION",
+        "worker_ref": "W14",
+        "reason": "设置页含 Dream 入口 UI"
+      },
+      "desktop/src/react/settings/tabs/agent/AgentMemory.tsx": {
+        "klass": "RENDERER_PROJECTION",
+        "worker_ref": "W14",
+        "reason": "记忆设置 UI"
+      },
+      "desktop/src/react/settings/tabs/agent/AgentMemoryDream.tsx": {
+        "klass": "RENDERER_PROJECTION",
+        "worker_ref": "W14",
+        "reason": "Dream 设置 UI"
+      },
+      "desktop/src/react/settings/tabs/agent/DreamRevisionBrowser.tsx": {
+        "klass": "RENDERER_PROJECTION",
+        "worker_ref": "W14",
+        "reason": "Dream 修订浏览 UI"
+      },
+      "desktop/src/react/settings/tabs/agent/agent-memory-dream-actions.ts": {
+        "klass": "RENDERER_PROJECTION",
+        "worker_ref": "W14",
+        "reason": "Dream 设置动作"
+      },
+      "desktop/src/react/settings/tabs/agent/dream-error-presenter.ts": {
+        "klass": "RENDERER_PROJECTION",
+        "worker_ref": "W14",
+        "reason": "Dream 错误展示"
+      },
+      "desktop/src/react/utils/history-builder.ts": {
+        "klass": "RENDERER_PROJECTION",
+        "worker_ref": "W9",
+        "reason": "历史渲染中的 deferred 任务块投影"
+      },
+      "desktop/src/react/utils/turn-projector.ts": {
+        "klass": "RENDERER_PROJECTION",
+        "worker_ref": "W9",
+        "reason": "turn 投影中的 deferred 状态"
+      },
+      "hub/agent-executor.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W1-1",
+        "reason": "临时/电话执行器创建 Pi session 并 prompt"
+      },
+      "hub/channel-router.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W7",
+        "reason": "频道轮次决策：runAgentPhoneSession 后决定 reply/pass"
+      },
+      "hub/dm-router.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W8",
+        "reason": "私信多轮决策：MAX_ROUNDS 内写双方 DM 与 phone activity"
+      },
+      "hub/event-bus-capabilities.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W10",
+        "reason": "event bus 能力清单含 deferred:* 处理器声明"
+      },
+      "hub/index.ts": {
+        "klass": "SUPPORTING_WIRING",
+        "worker_ref": "W7/W8",
+        "reason": "ephemeral 分支直调 executeIsolated；注入 DM 回调"
+      },
+      "hub/scheduler.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W1-3",
+        "reason": "后台任务调度：隔离执行并写 activity 终态"
+      },
+      "lib/bridge/bridge-manager.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W1-4",
+        "reason": "Bridge loop turn 触发与结果状态维护"
+      },
+      "lib/channels/channel-store.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W7",
+        "reason": "频道已读书签 updateBookmark 持久 sink"
+      },
+      "lib/channels/channel-ticker.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W7",
+        "reason": "频道轮询/重试与已读书签推进"
+      },
+      "lib/deferred-result-coordinator.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W9",
+        "reason": "延迟结果协调：决定父 turn 续跑"
+      },
+      "lib/deferred-result-store.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W9",
+        "reason": "deferred 结果/中止持久 sink"
+      },
+      "lib/desk/agent-run-automation.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W6",
+        "reason": "名称含 createAgentSession 但只构造 {kind:'agent_session'} 执行描述对象"
+      },
+      "lib/desk/automation-normalizer.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W6",
+        "reason": "automation 执行描述规范化"
+      },
+      "lib/desk/cron-scheduler.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W6",
+        "reason": "desk/studio cron 内层调度：判到期/超时/游标/logRun"
+      },
+      "lib/desk/cron-store.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W6",
+        "reason": "cron logRun/markRun 持久 sink"
+      },
+      "lib/exec-command/background.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W11",
+        "reason": "PTY 退出后 TaskRegistry.complete + deferred resolve"
+      },
+      "lib/exec-command/tool.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W11",
+        "reason": "wait_mode=auto 前台窗口与转后台决策"
+      },
+      "lib/extensions/deferred-result-ext.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W9",
+        "reason": "扩展把 deferred 结果面暴露给 agent"
+      },
+      "lib/llm/cache-preserving-compaction-agent-run.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W1-2",
+        "reason": "压缩旁路直接 runAgentLoop"
+      },
+      "lib/llm/model-call-integration.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "PI-10",
+        "reason": "Dream 命中来自 MC-07 Dreamina CLI 注释；外部进程 attempt 观测"
+      },
+      "lib/llm/model-trace-scope.ts": {
+        "klass": "COMMENT_OR_DOC_ONLY",
+        "worker_ref": "PI-10",
+        "reason": "runAgentLoop 仅出现在注释（trace scope 文档）"
+      },
+      "lib/loop/loop-controller.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W4",
+        "reason": "循环控制器写 completed/stopped/paused 并触发后续 turn"
+      },
+      "lib/loop/loop-store.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W4",
+        "reason": "loop-state 持久 sink"
+      },
+      "lib/memory/dream/memory-units.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W14",
+        "reason": "Dream 记忆单元文本处理"
+      },
+      "lib/memory/dream/model-runner.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W14",
+        "reason": "Dream 各阶段模型调用编排"
+      },
+      "lib/memory/dream/revision-store.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W14",
+        "reason": "Dream 修订持久 sink（applyDreamSections/回滚）"
+      },
+      "lib/memory/dream/runner.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W14",
+        "reason": "Dream 多阶段模型作业并写 succeeded/failed"
+      },
+      "lib/memory/dream/state-store.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W14",
+        "reason": "Dream succeeded/failed 持久 sink"
+      },
+      "lib/memory/memory-ticker.ts": {
+        "klass": "SUPPORTING_WIRING",
+        "worker_ref": "W14",
+        "reason": "Dream 自动触发位（executeIsolated 仅注释提及）"
+      },
+      "lib/memory/prompts/dream.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W14",
+        "reason": "Dream 阶段提示词模板"
+      },
+      "lib/pi-sdk/index.ts": {
+        "klass": "PI_ADAPTER",
+        "worker_ref": "PI-01",
+        "reason": "Pi facade：runAgentLoop/createAgentSession 适配层本体"
+      },
+      "lib/pi-sdk/model-call-stream-observer.ts": {
+        "klass": "PI_ADAPTER",
+        "worker_ref": "PI-10",
+        "reason": "观测适配；runAgentLoop/createAgentSession 为注释/文档提及"
+      },
+      "lib/pi-sdk/session-options.ts": {
+        "klass": "PI_ADAPTER",
+        "worker_ref": "PI-01",
+        "reason": "createAgentSession 参数装配适配"
+      },
+      "lib/sandbox/index.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W10",
+        "reason": "沙盒工具依赖接口暴露 getTaskRegistry"
+      },
+      "lib/sandbox/win32-runtime-cache.ts": {
+        "klass": "COMMENT_OR_DOC_ONLY",
+        "worker_ref": "-",
+        "reason": "executeIsolated 仅出现在注释"
+      },
+      "lib/subagent-thread-store.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W2",
+        "reason": "thread run 序列化与 finishRun 持久 sink"
+      },
+      "lib/task-registry.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W10",
+        "reason": "TaskRegistry 持久 sink 与 attempt 栅栏"
+      },
+      "lib/tasks/task-execution.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W10",
+        "reason": "TaskExecution attempt 栅栏支持库"
+      },
+      "lib/tasks/task-identity.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W10",
+        "reason": "taskId 身份语义支持库"
+      },
+      "lib/tools/automation-draft.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W6",
+        "reason": "automation 草稿配置工具"
+      },
+      "lib/tools/automation-tool.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W6",
+        "reason": "automation notify 配置；实际执行经 hub scheduler"
+      },
+      "lib/tools/check-deferred-tool.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W9",
+        "reason": "只读查询 deferred 结果工具"
+      },
+      "lib/tools/loop-control-tool.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W4",
+        "reason": "循环启停工具入口"
+      },
+      "lib/tools/rewind-tool.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W12",
+        "reason": "流式中延迟回档并写 registry/deferred 终态"
+      },
+      "lib/tools/stop-task-tool.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W10",
+        "reason": "停止任务入口"
+      },
+      "lib/tools/subagent-tool-policy.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W2",
+        "reason": "子代理工具策略过滤（executeIsolated 仅注释提及）"
+      },
+      "lib/tools/subagent-tool.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W2",
+        "reason": "子代理后台执行并写 deferred/run/thread/hub 终态"
+      },
+      "lib/tools/workflow-tool.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W3",
+        "reason": "workflow 节点后台执行并写终态"
+      },
+      "lib/workflow/host-api.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W3",
+        "reason": "脚本节点经 host-api 调用隔离 Agent"
+      },
+      "lib/workflow/node-folder-scope.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W3",
+        "reason": "解析节点写作用域为 executeIsolated 的 folder 入参（注释提及）"
+      },
+      "lib/workflow/sandbox.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W3",
+        "reason": "runWorkflowScript 脚本执行宿主"
+      },
+      "plugins/jimeng-cli/adapters/dreamina.ts": {
+        "klass": "BUNDLED_PLUGIN_ADAPTER",
+        "worker_ref": "W13",
+        "reason": "Dream 命中来自 Dreamina 模型名（即梦 CLI 插件），与记忆 Dream 无关；供应商调用按 W13/R07 外围边界处理"
+      },
+      "plugins/jimeng-cli/index.ts": {
+        "klass": "BUNDLED_PLUGIN_ADAPTER",
+        "worker_ref": "W13",
+        "reason": "即梦 CLI 插件入口；Dream 命中同上"
+      },
+      "plugins/jimeng-cli/lib/dreamina-capabilities.ts": {
+        "klass": "BUNDLED_PLUGIN_ADAPTER",
+        "worker_ref": "W13",
+        "reason": "即梦模型能力描述；Dream 命中同上"
+      },
+      "scripts/patch-pi-sdk.cjs": {
+        "klass": "BUILD_OR_TEST_SCRIPT",
+        "worker_ref": "-",
+        "reason": "postinstall 只读校验脚本，字符串检查含 runAgentLoop/createAgentSession"
+      },
+      "scripts/scan-persistent-stores.mjs": {
+        "klass": "BUILD_OR_TEST_SCRIPT",
+        "worker_ref": "-",
+        "reason": "持久 store 扫描脚本"
+      },
+      "server/composition/open-root.ts": {
+        "klass": "SUPPORTING_WIRING",
+        "worker_ref": "W14",
+        "reason": "open 组合根注册 memory-dream 路由"
+      },
+      "server/deferred-result-bus-handlers.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W10",
+        "reason": "deferred:resolve/fail/abort 公共写入口"
+      },
+      "server/deferred-result-interlude.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W9",
+        "reason": "deferred 等待期间的用户提示投影"
+      },
+      "server/history-read/hydrate.ts": {
+        "klass": "READ_ONLY_PROJECTION",
+        "worker_ref": "W9",
+        "reason": "历史读取对 deferredStore 只读投影"
+      },
+      "server/history-read/project-page.ts": {
+        "klass": "READ_ONLY_PROJECTION",
+        "worker_ref": "W9",
+        "reason": "历史分页只读投影"
+      },
+      "server/index.ts": {
+        "klass": "SUPPORTING_WIRING",
+        "worker_ref": "W4/W9/W10/W15",
+        "reason": "服务接线：LoopStore/DeferredResultStore/TaskRegistry/goalEngine 装配与 executeLoopTurn 桥"
+      },
+      "server/routes/channels.ts": {
+        "klass": "SUPPORTING_WIRING",
+        "worker_ref": "W7",
+        "reason": "频道书签/成员 HTTP 入口"
+      },
+      "server/routes/chat.ts": {
+        "klass": "SUPPORTING_WIRING",
+        "worker_ref": "W10/W15",
+        "reason": "assistant run 终态与停止子代理任务的 HTTP 入口"
+      },
+      "server/routes/desk.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W5",
+        "reason": "封面生成路由建活动、executeIsolated、自写 done/error"
+      },
+      "server/routes/memory-dream.ts": {
+        "klass": "SUPPORTING_WIRING",
+        "worker_ref": "W14",
+        "reason": "Dream 手动触发 HTTP 入口"
+      },
+      "server/task-bus-handlers.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W10",
+        "reason": "任务状态公共写入口（register/update/complete/fail/abort）"
+      },
+      "shared/error-user-messages.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W14",
+        "reason": "Dream 稳定错误码文案"
+      },
+      "shared/persistence/store-registry.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W10",
+        "reason": "持久 store 登记基础设施"
+      }
+    },
+    "manual_adjacent": {
+      "lib/desk/activity-store.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W5",
+        "reason": "封面活动持久 sink（W5 终态落盘）"
+      },
+      "lib/desk/automation-executors.ts": {
+        "klass": "SUPPORTING_LIBRARY",
+        "worker_ref": "W6",
+        "reason": "cron job executor 描述缺省构造"
+      },
+      "lib/goal/goal-engine.ts": {
+        "klass": "ADJACENT_SESSION_STATE",
+        "worker_ref": "W15",
+        "reason": "写会话 goal completed/dropped；相邻会话状态权威"
+      },
+      "lib/subagent-run-store.ts": {
+        "klass": "KERNEL_MIGRATION",
+        "worker_ref": "W2",
+        "reason": "subagent run 持久 sink（runStore.resolve/fail）"
+      },
+      "lib/tools/goal-tool.ts": {
+        "klass": "ADJACENT_SESSION_STATE",
+        "worker_ref": "W15",
+        "reason": "goal 工具入口调 engine.complete"
+      }
+    },
+    "closure": {
+      "unclassified": [],
+      "stale": [],
+      "discovered_count": 95,
+      "classified_count": 95,
+      "manual_adjacent_count": 5
+    }
+  },
+  "coverage_difference": {
+    "unmapped_index_symbols": [],
+    "unmapped_vendor_files": [],
+    "unmapped_adapter_submodules": [],
+    "unmapped_hooks": [],
+    "index_symbols_seen": [
+      "*",
+      "AgentContext",
+      "AgentEvent",
+      "AgentLoopConfig",
+      "AgentMessage",
+      "AgentTool",
+      "AuthStorage",
+      "DefaultResourceLoader",
+      "FileAuthStorageBackend",
+      "LoadExtensionsResult",
+      "OAuthLoginCallbacks",
+      "SdkAuthFacade",
+      "SdkOAuthProvider",
+      "SessionManager",
+      "SettingsManager",
+      "StreamFn",
+      "StringEnum",
+      "Type",
+      "buildNativeCompactionRequestShapes",
+      "buildSessionContext",
+      "calculateContextTokens",
+      "completeSimple",
+      "convertAgentMessagesToLlm",
+      "createAgentSession",
+      "createBashTool",
+      "createEditTool",
+      "createExtensionRuntime",
+      "createFindTool",
+      "createGrepTool",
+      "createLsTool",
+      "createModelRegistry",
+      "createReadTool",
+      "createWriteTool",
+      "estimateTokens",
+      "findCutPoint",
+      "generateSummary",
+      "getLastAssistantUsage",
+      "getPiModel",
+      "getPiModels",
+      "loginOAuthProvider",
+      "parseSessionEntries",
+      "prepareCompaction",
+      "refreshSessionModelFromRegistry",
+      "registerModelProvider",
+      "runAgentLoop",
+      "shouldCompact",
+      "unregisterModelProvider"
+    ],
+    "static_adapter_imports": 97,
+    "static_vendor_imports": 20,
+    "worker_discovery_closure": {
+      "unclassified": [],
+      "stale": [],
+      "discovered_count": 95,
+      "classified_count": 95,
+      "manual_adjacent_count": 5
+    },
+    "caveat": "静态闭包不证明条件分支实际运行；用户自装插件与反射式动态加载需后续真实运行取证"
+  }
+}

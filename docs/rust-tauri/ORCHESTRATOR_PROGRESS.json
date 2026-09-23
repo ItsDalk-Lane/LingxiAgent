@@ -4,7 +4,7 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+  "current_head": "60dbe0384e553f0a0aab7d173b2dc1ba43987b82",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -381,7 +381,7 @@
     "R00-T02": {
       "name": "重建完整保留功能清单",
       "stage_id": "R00",
-      "status": "COMMITTING",
+      "status": "DONE",
       "task_base_sha": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
       "executor_id": "/root/exec_r00_t02",
       "execution_result": "READY_FOR_REVIEW",
@@ -536,8 +536,8 @@
         "R00-A03": "PASS",
         "R00-A04": "PASS"
       },
-      "task_commit_sha": null,
-      "push_result": "PENDING",
+      "task_commit_sha": "4b4a1d98f6d2d0e03f9573aa75b7992efed03db6",
+      "push_result": "CONFIRMED",
       "blockers": [],
       "candidate_digest_sha256": "972317079442203a8da67609ddcfc8661b304361934fcbd9db999be0c5244ad1",
       "candidate_file_count": 20,
@@ -563,28 +563,89 @@
         "large_files": "seven JSON audit/inventory artifacts exceed 1 MiB; each is reviewed Task evidence, no binary or raw user data",
         "candidate_fingerprint": "20/20 match independent R10 reviewer frozen aggregate",
         "product_code_diff": "none"
-      }
+      },
+      "remote_verified_sha": "4b4a1d98f6d2d0e03f9573aa75b7992efed03db6"
     },
     "R00-T03": {
       "name": "盘点 Pi 与 Node 隐含职责",
       "stage_id": "R00",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
-      "repair_agent_id": null,
-      "root_cause_agent_id": null,
+      "status": "COMMITTING",
+      "task_base_sha": "4b4a1d98f6d2d0e03f9573aa75b7992efed03db6",
+      "executor_id": "/root/exec_r00_t03",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 3,
+      "reviewer_id": "ZCode:R00-T03 独立验收 R3（ZCode）",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-F01",
+          "severity": "BLOCKING",
+          "summary": "运行依赖加载时点、服务端/桌面消费者和归属被模板化误写",
+          "review_report": "docs/rust-tauri/R00/R00-T03_REVIEW_R1.md",
+          "resolution": "R3 independent review confirms resolved"
+        },
+        {
+          "id": "R2-F01",
+          "severity": "BLOCKING",
+          "summary": "export type 节点被误标为运行时依赖且验证器同源漏检",
+          "review_report": "docs/rust-tauri/R00/R00-T03_REVIEW_R2.md",
+          "resolution": "R3 independent review confirms resolved"
+        },
+        {
+          "id": "R2-F02",
+          "severity": "BLOCKING",
+          "summary": "子代理、workflow、loop-controller 经注入执行并写终态却未列为内核迁移反例",
+          "review_report": "docs/rust-tauri/R00/R00-T03_REVIEW_R2.md",
+          "resolution": "R3 independent review confirms resolved"
+        },
+        {
+          "id": "R3-F01",
+          "severity": "LOW",
+          "summary": "heartbeat mechanism source has no line-level W1-3 sink anchor; classification remains correct",
+          "review_report": "docs/rust-tauri/R00/R00-T03_REVIEW_R3.md",
+          "follow_up": "R00-T07 or R07"
+        },
+        {
+          "id": "R3-F02",
+          "severity": "LOW",
+          "summary": "autolearn supporting model job not explicitly listed as adjacent; PI-08 boundary covers model calls",
+          "review_report": "docs/rust-tauri/R00/R00-T03_REVIEW_R3.md",
+          "follow_up": "R00-T07 or R07"
+        }
+      ],
+      "repair_agent_id": "ZCode:R00-T03 修复 R2（ZCode）",
+      "root_cause_agent_id": "/root/root_cause_r00_t03_r2",
       "acceptance_results": {
-        "R00-A05": "NOT_STARTED",
-        "R00-A06": "NOT_STARTED"
+        "R00-A05": "PASS",
+        "R00-A06": "PASS"
       },
       "task_commit_sha": null,
-      "push_result": null,
-      "blockers": []
+      "push_result": "PENDING",
+      "blockers": [],
+      "concurrent_head_change": {
+        "from": "4b4a1d98f6d2d0e03f9573aa75b7992efed03db6",
+        "to": "60dbe0384e553f0a0aab7d173b2dc1ba43987b82",
+        "summary": "Concurrent non-Task commit updates .gitignore and removes old taskbook directory from Git tracking; no product source or T03 candidate changed",
+        "treatment": "Preserve external commit; retain original Task base and bind final validation/review to current HEAD"
+      },
+      "candidate_digest_sha256": "bc708f4c3015de1246bfd31804ddf24a1ce24ea2c15ac2313f48ce0eada72f9a",
+      "candidate_file_count": 8,
+      "candidate_report_sha256": "3f020296c7e51f39b4914a0e557c3a738d14f5f0c5b0888883d63507e2d1cbda",
+      "candidate_current_head": "60dbe0384e553f0a0aab7d173b2dc1ba43987b82",
+      "review_report": "docs/rust-tauri/R00/R00-T03_REVIEW_R3.md",
+      "candidate_repair_summary_sha256": "9cce57a6d7587550784c859f38052a38c04ec0f81a4b63492f2cd0ae9c812299",
+      "root_cause_report": "docs/rust-tauri/R00/R00-T03_ROOT_CAUSE_R2.md",
+      "repair_attempt_note": "Initial Codex repair_r00_t03_r2 failed before work because Codex subagent usage limit was reached; no candidate edits attributed to it.",
+      "repair_agent_status": "COMPLETE",
+      "repair_report": "docs/rust-tauri/R00/R00-T03_R2_REPAIR.md",
+      "review_report_sha256": "f000cdf169726184d94e9647dbc5f6e9b00f86b24e5de0cf2337e3e35773fc4f",
+      "precommit_checks": {
+        "git_diff_check": "PASS",
+        "sensitive_pattern_scan": "no PEM/private-key or common token pattern matches in 14 untracked T03 files",
+        "large_files": "no untracked T03 file exceeds 2 MiB; import graph is 1.2 MiB JSON evidence",
+        "candidate_fingerprint": "8/8 match R3 frozen aggregate",
+        "product_code_diff": "none"
+      }
     },
     "R00-T04": {
       "name": "盘点入口、身份、数据与权限",
@@ -2624,5 +2685,15 @@
       "blockers": []
     }
   },
-  "current_task": "R00-T02"
+  "current_task": "R00-T03",
+  "orchestration_mode": {
+    "effective_from": "R00-T03 R2 repair",
+    "task_executor": "new ZCode task per Rxx-Tyy",
+    "task_reviewer": "separate new ZCode task per review round",
+    "task_repair": "new ZCode task per failed review round",
+    "stage_reviewer": "fresh Codex subagent created by root after all stage tasks complete",
+    "stage_repair": "new ZCode task after failed stage review",
+    "stage_rereviewer": "fresh Codex subagent created by root after stage repair",
+    "scope_note": "User changed execution mode on 2026-09-24; prior completed task history remains unchanged."
+  }
 }
