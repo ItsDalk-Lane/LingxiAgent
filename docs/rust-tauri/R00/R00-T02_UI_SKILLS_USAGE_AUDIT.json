@@ -1,0 +1,1337 @@
+{
+  "schema_version": 1,
+  "task_id": "R00-T02",
+  "role": "R8 独立只读定向核源辅助报告；不判 PASS",
+  "matrix_sha256_at_report_read": "88f9bd853cfc2cee6dd62d06ed6dace718687bef40ece1a9d5d1e17db0185d90",
+  "matrix_sha256_initial_observation": "136cfaccaa29149956f49c0acffe6b3832f2776091de6c24b15779a1ad9f92fb",
+  "source_sha_kind": "git HEAD",
+  "source_sha": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+  "scope": [
+    "ui:settings:skills",
+    "ui:settings:usage"
+  ],
+  "action_count": 25,
+  "control_variant_count": 62,
+  "status_meaning": {
+    "SOURCE_CITED_CORRECT": "所列源码证实该候选说法与目标；仍不等于运行时验收",
+    "WRONG": "所列源码与候选描述/边不符或漏出影响结果的边",
+    "MANUAL": "当前只读核源无法确认完整结果，不标正确"
+  },
+  "findings": [
+    {
+      "id": "SKILLS-02-BRANCH",
+      "severity": "REPAIRED_IN_CONCURRENT_CANDIDATE",
+      "description": "拖入文件按是否能获得真实路径分为 path 与 base64 file；安装后刷新当前助手视图。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:170-191",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:61-89"
+      ]
+    },
+    {
+      "id": "SKILLS-07-FAILED-SAVE-READ",
+      "severity": "REPAIRED_IN_CONCURRENT_CANDIDATE",
+      "description": "autoSaveConfig 失败返回 false 后调用方仍执行 loadSettingsConfig，相关重读不以保存成功为条件。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:117-132",
+        "desktop/src/react/settings/helpers.ts:92-112"
+      ]
+    },
+    {
+      "id": "SKILLS-10-VIEWER-CHAIN",
+      "severity": "REPAIRED_IN_CONCURRENT_CANDIDATE",
+      "description": "技能查看器打开后还需主窗口事件、listSkillFiles、readSkillFile；主窗口不存在或读取失败不能认定内容已打开。",
+      "source_refs": [
+        "desktop/main.cjs:3158-3165",
+        "desktop/main.cjs:5871-5954",
+        "desktop/src/react/components/SkillViewerOverlay.tsx:58-75"
+      ]
+    },
+    {
+      "id": "USAGE-10-SESSION-READS",
+      "severity": "REPAIRED_IN_CONCURRENT_CANDIDATE",
+      "description": "轨迹详情有 sessionId 时还自动读取会话消息和提示词快照，两条 HTTP/消费者未入 #10。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/trace-detail/TraceDetailOverlay.tsx:56-90",
+        "desktop/src/react/settings/tabs/observability/trace-detail/TraceDetailOverlay.tsx:151-170"
+      ]
+    },
+    {
+      "id": "USAGE-REFRESH-ORDER",
+      "severity": "REPAIRED_IN_CONCURRENT_CANDIDATE",
+      "description": "原快照四子页写控制面先于子页；后续候选已改为 refreshToken 先变化、控制面并发读取。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:115-120"
+      ]
+    },
+    {
+      "id": "USAGE-08-DEAD-ROUTE",
+      "severity": "REPAIRED_IN_CONCURRENT_CANDIDATE",
+      "description": "原快照将未被前端调用的 /calls/:callId/payloads 挂入 #08；后续候选已删，正文在打开 call detail 后自动读取。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ObservabilityCallInspector.tsx:77-93",
+        "desktop/src/react/settings/tabs/observability/model-observability-actions.ts:330-335"
+      ]
+    },
+    {
+      "id": "USAGE-12-STATS",
+      "severity": "REPAIRED_IN_CONCURRENT_CANDIDATE",
+      "description": "原快照说删除后显示统计；后续候选已写明返回统计被丢弃，界面仅刷新。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ObservabilitySettingsPanel.tsx:132-145"
+      ]
+    },
+    {
+      "id": "USAGE-13-ZERO-EXPORT",
+      "severity": "REPAIRED_IN_CONCURRENT_CANDIDATE",
+      "description": "零匹配仍流出 manifest(totalCalls:0) 并由 UI 作为保存成功展示；矩阵空态说“按服务端结果提示”缺可观察结果。",
+      "source_refs": [
+        "lib/llm/model-observability-export.ts:101-150",
+        "desktop/src/react/settings/tabs/observability/ObservabilityExportDialog.tsx:97-115",
+        "desktop/src/react/settings/tabs/observability/ObservabilityExportDialog.tsx:208-214"
+      ]
+    },
+    {
+      "id": "USAGE-11-12-AFTER-SAVE-READ",
+      "severity": "WRONG",
+      "description": "设置保存/删除成功后的四子页刷新依赖控制面 health/settings 重读成功；其失败 Promise 无 catch，也不会进入手动刷新路径的 bootstrapError。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ObservabilitySettingsPanel.tsx:90-101",
+        "desktop/src/react/settings/tabs/observability/ObservabilitySettingsPanel.tsx:132-145",
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:95-103",
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:208-215"
+      ]
+    }
+  ],
+  "action_reviews": [
+    {
+      "action_id": "ui:settings:skills#00",
+      "trigger": "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "连接三要素先完成，助手加载后读取快照，模型并行；摘要在 ready 后发起。",
+      "source_refs": [
+        "desktop/src/react/settings/SettingsContent.tsx:323-400",
+        "desktop/src/react/settings/actions.ts:29-50",
+        "desktop/src/react/settings/actions.ts:87-113",
+        "desktop/src/react/settings/actions.ts:246-308"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "desktop-behavior:service-connection",
+          "target_feature_id": "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+          "target_scenario_id": "R00-T02-LA-D1BEE19A95BB",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/SettingsContent.tsx:323-400",
+            "desktop/src/react/settings/actions.ts:29-50",
+            "desktop/preload.cjs:165",
+            "desktop/src/react/settings/SettingsContent.tsx:187",
+            "desktop/main.cjs:2086",
+            "desktop/main.cjs:2090",
+            "desktop/preload.cjs:34",
+            "desktop/main.cjs:5394",
+            "desktop/src/react/settings/SettingsContent.tsx:343",
+            "desktop/preload.cjs:35",
+            "desktop/main.cjs:5395",
+            "desktop/src/react/settings/SettingsContent.tsx:344"
+          ]
+        },
+        {
+          "index": 1,
+          "effect_entry_id": "semantic-effect:config.config.read",
+          "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3",
+          "target_scenario_id": "R00-T02-LA-A524D3723654",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/SettingsContent.tsx:323-400",
+            "desktop/src/react/settings/actions.ts:29-50",
+            "server/routes/config.ts:190"
+          ]
+        },
+        {
+          "index": 2,
+          "effect_entry_id": "semantic-effect:agents./agents.read",
+          "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-READ-26AE36",
+          "target_scenario_id": "R00-T02-LA-26AE3688B8DE",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/SettingsContent.tsx:323-400",
+            "desktop/src/react/settings/actions.ts:29-50",
+            "server/routes/agents.ts:274"
+          ]
+        },
+        {
+          "index": 3,
+          "effect_entry_id": "semantic-effect:settings-snapshot.settings_snapshot.read",
+          "target_feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+          "target_scenario_id": "R00-T02-LA-F6235778F816",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/SettingsContent.tsx:323-400",
+            "desktop/src/react/settings/actions.ts:29-50",
+            "server/routes/settings-snapshot.ts:185",
+            "server/composition/open-root.ts:35"
+          ]
+        },
+        {
+          "index": 4,
+          "effect_entry_id": "semantic-effect:models:/models:查看可用模型",
+          "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+          "target_scenario_id": "R00-T02-LA-EB074679FAE5",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/SettingsContent.tsx:323-400",
+            "desktop/src/react/settings/actions.ts:29-50",
+            "server/routes/models.ts:201",
+            "server/composition/open-root.ts:23"
+          ]
+        },
+        {
+          "index": 5,
+          "effect_entry_id": "semantic-effect:providers.providers_summary.read",
+          "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F",
+          "target_scenario_id": "R00-T02-LA-766F5F3C47C3",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/SettingsContent.tsx:323-400",
+            "desktop/src/react/settings/actions.ts:29-50",
+            "server/routes/providers.ts:122"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:skills#01",
+      "trigger": "自动读技能、组合、外部目录和后台译名",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "技能/组合读取需已选助手；目录另行读取；翻译只在非英文且有可见技能时后台触发。技能读取失败仅日志，首次失败可能显空态。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:61-115",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:133-150",
+        "server/routes/skills.ts:183-192",
+        "server/routes/skills.ts:264-282",
+        "server/routes/skills.ts:466-472",
+        "server/routes/skills.ts:561-576"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "semantic-effect:skills./skills.read",
+          "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-READ-8E11FA",
+          "target_scenario_id": "R00-T02-LA-8E11FAF4CC01",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:61-115",
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:133-150",
+            "server/routes/skills.ts:264"
+          ]
+        },
+        {
+          "index": 1,
+          "effect_entry_id": "semantic-effect:skills./skills/bundles.read",
+          "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-READ-0D8358",
+          "target_scenario_id": "R00-T02-LA-0D8358645191",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:61-115",
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:133-150",
+            "server/routes/skills.ts:183"
+          ]
+        },
+        {
+          "index": 2,
+          "effect_entry_id": "semantic-effect:skills./skills/external-paths.read",
+          "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-EXTERNAL-PATHS-REA-295F9F",
+          "target_scenario_id": "R00-T02-LA-295F9F22981B",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:61-115",
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:133-150",
+            "server/routes/skills.ts:466"
+          ]
+        },
+        {
+          "index": 3,
+          "effect_entry_id": "semantic-effect:skills./skills/translate.post",
+          "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-TRANSLATE-POST-7803B2",
+          "target_scenario_id": "R00-T02-LA-7803B231FC36",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:61-115",
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:133-150",
+            "server/routes/skills.ts:562"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:skills#02",
+      "trigger": "拖入文件或选文件安装全局技能",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "并行修复后的候选已明确 path 与 base64 两支，以及按当前助手 runtime=1 重读。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:152-205",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:474-551",
+        "server/routes/skills.ts:382-455"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "desktop-behavior:select-skill",
+          "target_feature_id": "F-D21-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SELECT-SKILL-52A5D1",
+          "target_scenario_id": "R00-T02-LA-52A5D1660088",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "仅桌面选择按钮调用；取消不发安装请求。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:152-205",
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:474-551",
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:197",
+            "desktop/preload.cjs:105",
+            "desktop/main.cjs:5767"
+          ]
+        },
+        {
+          "index": 1,
+          "effect_entry_id": "semantic-effect:skill.install_global",
+          "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILL-INSTALL-GLOBAL-A3FE8F",
+          "target_scenario_id": "R00-T02-LA-A3FE8FD26CB4",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "现行候选已明确上传有路径走 path，无路径走 base64 file；目标是全局用户技能安装。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:152-205",
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:474-551",
+            "server/routes/skills.ts:382"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:skills#03",
+      "trigger": "删除技能",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "删除按钮受可删除条件控制；确认后发含 agentId 的 DELETE，失败 toast。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:207-227",
+        "desktop/src/react/settings/tabs/skills/SkillBundleTree.tsx:94-99",
+        "server/routes/skills.ts:498-544"
+      ],
+      "control_variants": []
+    },
+    {
+      "action_id": "ui:settings:skills#04",
+      "trigger": "创建/改名/删除/排序/导出组合及移动组合内技能",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "创建、改名、解散、排序、移动成员分别对应 POST/PUT/DELETE/PUT；导出成功且有 filePath 才调用 showInFinder。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:229-406",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:654-722",
+        "desktop/src/react/settings/tabs/skills/SkillBundleTree.tsx:140-185",
+        "server/routes/skills.ts:194-261",
+        "desktop/main.cjs:5986-5989"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "semantic-effect:skills./skills/bundles.post",
+          "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-POST-EFEEEF",
+          "target_scenario_id": "R00-T02-LA-EFEEEFFCD60A",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:229-406",
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:654-722",
+            "server/routes/skills.ts:194"
+          ]
+        },
+        {
+          "index": 1,
+          "effect_entry_id": "semantic-effect:skills./skills/bundles/.id.put",
+          "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-ID-PUT-F54ED9",
+          "target_scenario_id": "R00-T02-LA-F54ED990E939",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:229-406",
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:654-722",
+            "server/routes/skills.ts:226"
+          ]
+        },
+        {
+          "index": 2,
+          "effect_entry_id": "semantic-effect:skills./skills/bundles/.id.delete",
+          "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-ID-DELETE-B0D407",
+          "target_scenario_id": "R00-T02-LA-B0D4073E6AEB",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:229-406",
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:654-722",
+            "server/routes/skills.ts:244"
+          ]
+        },
+        {
+          "index": 3,
+          "effect_entry_id": "semantic-effect:skills./skills/bundles/order.put",
+          "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-ORDER-PUT-6E2054",
+          "target_scenario_id": "R00-T02-LA-6E205433F474",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:229-406",
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:654-722",
+            "server/routes/skills.ts:210"
+          ]
+        },
+        {
+          "index": 4,
+          "effect_entry_id": "semantic-effect:skills./skills/bundles/.id/export.post",
+          "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-ID-EXPORT--FAE2BD",
+          "target_scenario_id": "R00-T02-LA-FAE2BDEFDB04",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:229-406",
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:654-722",
+            "server/routes/skills.ts:255"
+          ]
+        },
+        {
+          "index": 5,
+          "effect_entry_id": "desktop-behavior:file-open",
+          "target_feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-OPEN-CAA876",
+          "target_scenario_id": "R00-T02-LA-CAA876503B1B",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:229-406",
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:654-722",
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:280",
+            "desktop/preload.cjs:109",
+            "desktop/main.cjs:5986"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:skills#05",
+      "trigger": "按助手启停技能与组合",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "普通/组合开关通过两个 PATCH 及 enabled 布尔值区分；失败回滚或重读。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:408-472",
+        "desktop/src/react/settings/tabs/skills/SkillBundleTree.tsx:72-91",
+        "server/routes/skills.ts:312-379"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "semantic-effect:agent.skill.enable",
+          "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-SKILL-ENABLE-D5128A",
+          "target_scenario_id": "R00-T02-LA-D5128ABAABCF",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:408-472",
+            "desktop/src/react/settings/tabs/skills/SkillBundleTree.tsx:72-91",
+            "server/routes/skills.ts:312"
+          ]
+        },
+        {
+          "index": 1,
+          "effect_entry_id": "semantic-effect:agent.skill.disable",
+          "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-SKILL-DISABLE-9A4766",
+          "target_scenario_id": "R00-T02-LA-9A47666127D3",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:408-472",
+            "desktop/src/react/settings/tabs/skills/SkillBundleTree.tsx:72-91",
+            "server/routes/skills.ts:312"
+          ]
+        },
+        {
+          "index": 2,
+          "effect_entry_id": "semantic-effect:agent.skill_bundle.enable",
+          "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-SKILL-BUNDLE-ENABLE-52055F",
+          "target_scenario_id": "R00-T02-LA-52055FF0CAC2",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:408-472",
+            "desktop/src/react/settings/tabs/skills/SkillBundleTree.tsx:72-91",
+            "server/routes/skills.ts:360"
+          ]
+        },
+        {
+          "index": 3,
+          "effect_entry_id": "semantic-effect:agent.skill_bundle.disable",
+          "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-SKILL-BUNDLE-DISABLE-A7B51C",
+          "target_scenario_id": "R00-T02-LA-A7B51C282C77",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:408-472",
+            "desktop/src/react/settings/tabs/skills/SkillBundleTree.tsx:72-91",
+            "server/routes/skills.ts:360"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:skills#06",
+      "trigger": "添加或移除外部兼容目录",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "目录选择取消不发 PUT；添加/移除发送 paths 数组；非 2xx 由 lingxiFetch 抛错，进入失败 toast。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:482-514",
+        "desktop/src/react/settings/api.ts:24-55",
+        "server/routes/skills.ts:474-495",
+        "desktop/src/react/settings/tabs/skills/CompatPathDrawer.tsx:25-75"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "desktop-behavior:file-picker",
+          "target_feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-PICKER-2FB382",
+          "target_scenario_id": "R00-T02-LA-2FB382A137FC",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:482-514",
+            "desktop/src/react/settings/api.ts:24-55",
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:482",
+            "desktop/preload.cjs:103",
+            "desktop/main.cjs:5741"
+          ]
+        },
+        {
+          "index": 1,
+          "effect_entry_id": "semantic-effect:skills./skills/external-paths.put",
+          "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-EXTERNAL-PATHS-PUT-BDEDEF",
+          "target_scenario_id": "R00-T02-LA-BDEDEF118670",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/SkillsTab.tsx:482-514",
+            "desktop/src/react/settings/api.ts:24-55",
+            "server/routes/skills.ts:474"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:skills#07",
+      "trigger": "技能创建/远端拉取/安全审查三种能力开关",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "并行修复后的候选已将写入目标改为助手 config，并明确保存尝试后即重读、即使 autoSaveConfig 返回 false。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:88-107",
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:117-165",
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:234-241",
+        "desktop/src/react/settings/helpers.ts:77-112",
+        "desktop/src/react/settings/actions.ts:147-174",
+        "server/routes/agents.ts:636"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "semantic-effect:agents./agents/.id/config.read",
+          "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_scenario_id": "R00-T02-LA-BC675C664910",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:88-107",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:117-165",
+            "desktop/src/react/settings/helpers.ts:92",
+            "desktop/src/react/settings/helpers.ts:77",
+            "server/routes/agents.ts:1"
+          ]
+        },
+        {
+          "index": 1,
+          "effect_entry_id": "semantic-effect:agents./agents/.id/identity.read",
+          "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+          "target_scenario_id": "R00-T02-LA-A9B0BBAD449C",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "现行候选已写保存尝试后重读；源代码未检查 autoSaveConfig 返回值。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:88-107",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:117-165",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:92",
+            "desktop/src/react/settings/actions.ts:147",
+            "server/routes/agents.ts:805"
+          ]
+        },
+        {
+          "index": 2,
+          "effect_entry_id": "semantic-effect:agents./agents/.id/agents-md.read",
+          "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+          "target_scenario_id": "R00-T02-LA-07A5CE3637C7",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "现行候选已写保存尝试后重读；源代码未检查 autoSaveConfig 返回值。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:88-107",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:117-165",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:92",
+            "desktop/src/react/settings/actions.ts:147",
+            "server/routes/agents.ts:880"
+          ]
+        },
+        {
+          "index": 3,
+          "effect_entry_id": "semantic-effect:agents./agents/.id/public-agents-md.read",
+          "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+          "target_scenario_id": "R00-T02-LA-3D7A957EF7FF",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "现行候选已写保存尝试后重读；源代码未检查 autoSaveConfig 返回值。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:88-107",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:117-165",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:92",
+            "desktop/src/react/settings/actions.ts:147",
+            "server/routes/agents.ts:930"
+          ]
+        },
+        {
+          "index": 4,
+          "effect_entry_id": "semantic-effect:config.user_profile.read",
+          "target_feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "target_scenario_id": "R00-T02-LA-429D86C4F952",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "现行候选已写保存尝试后重读；源代码未检查 autoSaveConfig 返回值。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:88-107",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:117-165",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:92",
+            "desktop/src/react/settings/actions.ts:147",
+            "server/routes/config.ts:376"
+          ]
+        },
+        {
+          "index": 5,
+          "effect_entry_id": "semantic-effect:preferences./preferences/models.read",
+          "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+          "target_scenario_id": "R00-T02-LA-7EC5F0F2FF7C",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "现行候选已写保存尝试后重读；源代码未检查 autoSaveConfig 返回值。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:88-107",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:117-165",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:92",
+            "desktop/src/react/settings/actions.ts:147",
+            "server/routes/preferences.ts:166"
+          ]
+        },
+        {
+          "index": 6,
+          "effect_entry_id": "semantic-effect:agents./agents/.id/experience.read",
+          "target_feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+          "target_scenario_id": "R00-T02-LA-C8380CD5D08B",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "现行候选已写保存尝试后重读；源代码未检查 autoSaveConfig 返回值。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:88-107",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:117-165",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:92",
+            "desktop/src/react/settings/actions.ts:147",
+            "server/routes/agents.ts:994"
+          ]
+        },
+        {
+          "index": 7,
+          "effect_entry_id": "semantic-effect:agent.config.update",
+          "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-CONFIG-UPDATE-8C8083",
+          "target_scenario_id": "R00-T02-LA-8C8083F2A5FC",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "现行候选已写保存尝试后重读；源代码未检查 autoSaveConfig 返回值。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:88-107",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:117-165",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:117",
+            "desktop/src/react/settings/helpers.ts:99",
+            "server/routes/agents.ts:636"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:skills#08",
+      "trigger": "自动读取 goal/autolearn 全局偏好",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "两个 GET 挂载自动发起；失败静默保持 undefined。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:33-42",
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:60-69"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "semantic-effect:preferences./preferences/goal.read",
+          "target_feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-GOAL-REA-1F41AF",
+          "target_scenario_id": "R00-T02-LA-1F41AFB4207D",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:33-42",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:60-69",
+            "server/routes/preferences.ts:410"
+          ]
+        },
+        {
+          "index": 1,
+          "effect_entry_id": "semantic-effect:preferences./preferences/autolearn.read",
+          "target_feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-AUTOLEAR-C3FB70",
+          "target_scenario_id": "R00-T02-LA-C3FB70F9925E",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:33-42",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:60-69",
+            "server/routes/preferences.ts:385"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:skills#09",
+      "trigger": "目标预算/踩坑自动沉淀开关",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "两个独立 PUT；先乐观显示，失败回滚并 toast。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:43-59",
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:70-86"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "semantic-effect:preferences./preferences/goal.put",
+          "target_feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-GOAL-PUT-2CB7D4",
+          "target_scenario_id": "R00-T02-LA-2CB7D4AE4478",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:43-59",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:70-86",
+            "server/routes/preferences.ts:418"
+          ]
+        },
+        {
+          "index": 1,
+          "effect_entry_id": "semantic-effect:preferences./preferences/autolearn.put",
+          "target_feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-AUTOLEAR-1685D5",
+          "target_scenario_id": "R00-T02-LA-1685D5E08812",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:43-59",
+            "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:70-86",
+            "server/routes/preferences.ts:393"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:skills#10",
+      "trigger": "点击已列出的技能行打开技能查看器",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "并行修复后的候选已补主窗口事件、listSkillFiles 与 readSkillFile；结果按主窗口接收和读文件成功条件表达。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/skills/SkillRow.tsx:61-70",
+        "desktop/preload.cjs:189-191",
+        "desktop/main.cjs:3158-3165",
+        "desktop/main.cjs:5871-5954",
+        "desktop/src/react/app-init.ts:359-362",
+        "desktop/src/react/components/SkillViewerOverlay.tsx:58-75"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "desktop-behavior:skill-viewer",
+          "target_feature_id": "F-D21-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SKILL-VIEWER-9CA8A4",
+          "target_scenario_id": "R00-T02-LA-9CA8A47BE208",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "条件链是行点击→open IPC→主窗口事件→viewer list-files/read-file；空/失败不能保证正文显示。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/skills/SkillRow.tsx:61-70",
+            "desktop/preload.cjs:189-191",
+            "desktop/src/react/settings/tabs/skills/SkillRow.tsx:54",
+            "desktop/preload.cjs:189",
+            "desktop/src/react/components/SkillViewerOverlay.tsx:58",
+            "desktop/preload.cjs:190",
+            "desktop/main.cjs:5935"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:usage#00",
+      "trigger": "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "与技能页相同的设置容器初始化。",
+      "source_refs": [
+        "desktop/src/react/settings/SettingsContent.tsx:323-400",
+        "desktop/src/react/settings/actions.ts:29-50",
+        "desktop/src/react/settings/actions.ts:87-113",
+        "desktop/src/react/settings/actions.ts:246-308"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "desktop-behavior:service-connection",
+          "target_feature_id": "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+          "target_scenario_id": "R00-T02-LA-D1BEE19A95BB",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/SettingsContent.tsx:323-400",
+            "desktop/src/react/settings/actions.ts:29-50",
+            "desktop/preload.cjs:165",
+            "desktop/src/react/settings/SettingsContent.tsx:187",
+            "desktop/main.cjs:2086",
+            "desktop/main.cjs:2090",
+            "desktop/preload.cjs:34",
+            "desktop/main.cjs:5394",
+            "desktop/src/react/settings/SettingsContent.tsx:343",
+            "desktop/preload.cjs:35",
+            "desktop/main.cjs:5395",
+            "desktop/src/react/settings/SettingsContent.tsx:344"
+          ]
+        },
+        {
+          "index": 1,
+          "effect_entry_id": "semantic-effect:config.config.read",
+          "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3",
+          "target_scenario_id": "R00-T02-LA-A524D3723654",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/SettingsContent.tsx:323-400",
+            "desktop/src/react/settings/actions.ts:29-50",
+            "server/routes/config.ts:190"
+          ]
+        },
+        {
+          "index": 2,
+          "effect_entry_id": "semantic-effect:agents./agents.read",
+          "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-READ-26AE36",
+          "target_scenario_id": "R00-T02-LA-26AE3688B8DE",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/SettingsContent.tsx:323-400",
+            "desktop/src/react/settings/actions.ts:29-50",
+            "server/routes/agents.ts:274"
+          ]
+        },
+        {
+          "index": 3,
+          "effect_entry_id": "semantic-effect:settings-snapshot.settings_snapshot.read",
+          "target_feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+          "target_scenario_id": "R00-T02-LA-F6235778F816",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/SettingsContent.tsx:323-400",
+            "desktop/src/react/settings/actions.ts:29-50",
+            "server/routes/settings-snapshot.ts:185",
+            "server/composition/open-root.ts:35"
+          ]
+        },
+        {
+          "index": 4,
+          "effect_entry_id": "semantic-effect:models:/models:查看可用模型",
+          "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+          "target_scenario_id": "R00-T02-LA-EB074679FAE5",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/SettingsContent.tsx:323-400",
+            "desktop/src/react/settings/actions.ts:29-50",
+            "server/routes/models.ts:201",
+            "server/composition/open-root.ts:23"
+          ]
+        },
+        {
+          "index": 5,
+          "effect_entry_id": "semantic-effect:providers.providers_summary.read",
+          "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F",
+          "target_scenario_id": "R00-T02-LA-766F5F3C47C3",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/SettingsContent.tsx:323-400",
+            "desktop/src/react/settings/actions.ts:29-50",
+            "server/routes/providers.ts:122"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:usage#01",
+      "trigger": "打开页自动加载 settings 控制面",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "挂载时与 health 并发 GET settings；任一失败写 bootstrapError，全页 alert。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:95-113",
+        "desktop/src/react/settings/tabs/observability/model-observability-actions.ts:252-254",
+        "server/routes/model-observability.ts:89-91"
+      ],
+      "control_variants": []
+    },
+    {
+      "action_id": "ui:settings:usage#02",
+      "trigger": "打开页自动加载 health 控制面",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "挂载时与 settings 并发 GET health；请求失败按 forbidden/network 呈全页 alert。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:95-113",
+        "desktop/src/react/settings/tabs/observability/model-observability-actions.ts:203-205",
+        "server/routes/model-observability.ts:85-87"
+      ],
+      "control_variants": []
+    },
+    {
+      "action_id": "ui:settings:usage#03",
+      "trigger": "Token 用量筛选、刷新与十卡",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "十卡取 groupBy=[]；顶部刷新先递增当前子页 token，同时并发重读控制面，未等待。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:115-120",
+        "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:102-126",
+        "desktop/src/react/settings/tabs/observability/ObservabilityMetrics.tsx:44-47",
+        "server/routes/model-observability.ts:159-171"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "behavior:model-observability:/model-observability/health:READ",
+          "target_feature_id": "F-D22-ROUTE_BEHAVIOR-BEHAVIOR-MODEL-OBSERVABILITY-MODEL-OBSERVABILITY-204546",
+          "target_scenario_id": "R00-T02-LA-2045462C0D98",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:115-120",
+            "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:102-126",
+            "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:115",
+            "server/routes/model-observability.ts:1"
+          ]
+        },
+        {
+          "index": 1,
+          "effect_entry_id": "semantic-effect:model-observability.model_observability_settings.read",
+          "target_feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-5BEFE4",
+          "target_scenario_id": "R00-T02-LA-5BEFE4A3A61C",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:115-120",
+            "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:102-126",
+            "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:115",
+            "server/routes/model-observability.ts:1"
+          ]
+        },
+        {
+          "index": 2,
+          "effect_entry_id": "semantic-effect:model-observability.model_observability_query_aggregate.post",
+          "target_feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-85BCDA",
+          "target_scenario_id": "R00-T02-LA-85BCDAD6E3AE",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:115-120",
+            "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:102-126",
+            "server/routes/model-observability.ts:159"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:usage#04",
+      "trigger": "自动加载活跃天数/最长连续/模型洞察",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "date/model 两个聚合并发，失败保留旧 insights。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:37-90",
+        "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:128-144",
+        "desktop/src/react/settings/tabs/observability/ObservabilityMetrics.tsx:131-159"
+      ],
+      "control_variants": []
+    },
+    {
+      "action_id": "ui:settings:usage#05",
+      "trigger": "四张常驻图表各自自动取数",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "四图各以固定天数/分组发独立聚合，不依赖首行 appliedFilter。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:161-164",
+        "desktop/src/react/settings/tabs/observability/observability-charts.tsx:36-76",
+        "desktop/src/react/settings/tabs/observability/ObservabilityHeatCalendar.tsx:32-47",
+        "desktop/src/react/settings/tabs/observability/ObservabilityModelTrendChart.tsx:31-44",
+        "desktop/src/react/settings/tabs/observability/ObservabilityProviderBarChart.tsx:30-43",
+        "desktop/src/react/settings/tabs/observability/ObservabilityCategoryPieChart.tsx:31-41"
+      ],
+      "control_variants": []
+    },
+    {
+      "action_id": "ui:settings:usage#06",
+      "trigger": "台账筛选、自动加载、更多",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "filter/刷新重置 cursor，更多追加；更多失败 alert 遮住旧行。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ObservabilityCallLedger.tsx:132-185",
+        "desktop/src/react/settings/tabs/observability/ObservabilityCallLedger.tsx:187-210",
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:115-120",
+        "server/routes/model-observability.ts:131-143"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "behavior:model-observability:/model-observability/health:READ",
+          "target_feature_id": "F-D22-ROUTE_BEHAVIOR-BEHAVIOR-MODEL-OBSERVABILITY-MODEL-OBSERVABILITY-204546",
+          "target_scenario_id": "R00-T02-LA-2045462C0D98",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ObservabilityCallLedger.tsx:132-185",
+            "desktop/src/react/settings/tabs/observability/ObservabilityCallLedger.tsx:187-210",
+            "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:115",
+            "server/routes/model-observability.ts:1"
+          ]
+        },
+        {
+          "index": 1,
+          "effect_entry_id": "semantic-effect:model-observability.model_observability_settings.read",
+          "target_feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-5BEFE4",
+          "target_scenario_id": "R00-T02-LA-5BEFE4A3A61C",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ObservabilityCallLedger.tsx:132-185",
+            "desktop/src/react/settings/tabs/observability/ObservabilityCallLedger.tsx:187-210",
+            "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:115",
+            "server/routes/model-observability.ts:1"
+          ]
+        },
+        {
+          "index": 2,
+          "effect_entry_id": "semantic-effect:model-observability.model_observability_query_calls.post",
+          "target_feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-AB2CF6",
+          "target_scenario_id": "R00-T02-LA-AB2CF6B28D08",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ObservabilityCallLedger.tsx:132-185",
+            "desktop/src/react/settings/tabs/observability/ObservabilityCallLedger.tsx:187-210",
+            "server/routes/model-observability.ts:131"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:usage#07",
+      "trigger": "点台账调用行打开详情",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "点行设置 callId；Inspector GET detail；错误仅在抽屉内显示。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ObservabilityCallLedger.tsx:245-256",
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:129-130",
+        "desktop/src/react/settings/tabs/observability/ObservabilityCallInspector.tsx:72-104",
+        "server/routes/model-observability.ts:175-179"
+      ],
+      "control_variants": []
+    },
+    {
+      "action_id": "ui:settings:usage#08",
+      "trigger": "打开调用详情后自动加载该调用的 payload 正文",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "现行矩阵已删未调用的 /calls/:id/payloads；有 records 时详情加载后自动并发 GET 正文，折叠仅本地显示。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ObservabilityCallInspector.tsx:77-93",
+        "desktop/src/react/settings/tabs/observability/ObservabilityCallInspector.tsx:164-189",
+        "desktop/src/react/settings/tabs/observability/model-observability-actions.ts:330-335",
+        "server/routes/model-observability.ts:195-203"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "semantic-effect:model-observability.model_observability_payloads_recordid.read",
+          "target_feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-FA8EA4",
+          "target_scenario_id": "R00-T02-LA-FA8EA4339EFF",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ObservabilityCallInspector.tsx:77-93",
+            "desktop/src/react/settings/tabs/observability/ObservabilityCallInspector.tsx:164-189",
+            "server/routes/model-observability.ts:195"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:usage#09",
+      "trigger": "轨迹筛选、自动加载、更多",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "自动列表、筛选、分页走 query/traces；顶部刷新与控制面并发。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ObservabilityTraceExplorer.tsx:124-173",
+        "desktop/src/react/settings/tabs/observability/ObservabilityTraceExplorer.tsx:175-187",
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:115-120",
+        "server/routes/model-observability.ts:145-157"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "behavior:model-observability:/model-observability/health:READ",
+          "target_feature_id": "F-D22-ROUTE_BEHAVIOR-BEHAVIOR-MODEL-OBSERVABILITY-MODEL-OBSERVABILITY-204546",
+          "target_scenario_id": "R00-T02-LA-2045462C0D98",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ObservabilityTraceExplorer.tsx:124-173",
+            "desktop/src/react/settings/tabs/observability/ObservabilityTraceExplorer.tsx:175-187",
+            "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:115",
+            "server/routes/model-observability.ts:1"
+          ]
+        },
+        {
+          "index": 1,
+          "effect_entry_id": "semantic-effect:model-observability.model_observability_settings.read",
+          "target_feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-5BEFE4",
+          "target_scenario_id": "R00-T02-LA-5BEFE4A3A61C",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ObservabilityTraceExplorer.tsx:124-173",
+            "desktop/src/react/settings/tabs/observability/ObservabilityTraceExplorer.tsx:175-187",
+            "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:115",
+            "server/routes/model-observability.ts:1"
+          ]
+        },
+        {
+          "index": 2,
+          "effect_entry_id": "semantic-effect:model-observability.model_observability_query_traces.post",
+          "target_feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-AFDC77",
+          "target_scenario_id": "R00-T02-LA-AFDC77ECAE8B",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ObservabilityTraceExplorer.tsx:124-173",
+            "desktop/src/react/settings/tabs/observability/ObservabilityTraceExplorer.tsx:175-187",
+            "server/routes/model-observability.ts:145"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:usage#10",
+      "trigger": "点轨迹查看详情、从 call 跳轨迹",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "并行修复后的候选已补有 sessionId 时并行读取会话消息与提示词快照及其降级分支。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ObservabilityTraceExplorer.tsx:205-252",
+        "desktop/src/react/settings/tabs/observability/trace-detail/TraceDetailOverlay.tsx:56-90",
+        "desktop/src/react/settings/tabs/observability/trace-detail/TraceDetailOverlay.tsx:151-177",
+        "server/routes/model-observability.ts:181-185"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "semantic-effect:sessions:/sessions/messages:阅读会话消息页",
+          "target_feature_id": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-MESSAGES-AA9EB3",
+          "target_scenario_id": "R00-T02-LA-AA9EB3FD034D",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "有 sessionId 时的实际条件读取或轨迹详情路由，均有源码对应。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ObservabilityTraceExplorer.tsx:205-252",
+            "desktop/src/react/settings/tabs/observability/trace-detail/TraceDetailOverlay.tsx:56-90",
+            "desktop/src/react/settings/tabs/observability/trace-detail/TraceDetailOverlay.tsx:56",
+            "desktop/src/react/settings/tabs/observability/trace-detail/TraceDetailOverlay.tsx:157",
+            "server/routes/sessions.ts:1383"
+          ]
+        },
+        {
+          "index": 1,
+          "effect_entry_id": "semantic-effect:sessions:/sessions/prompt-snapshot:查看会话提示词快照",
+          "target_feature_id": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-PROMPT-SNAPSHO-FF4F06",
+          "target_scenario_id": "R00-T02-LA-FF4F06011B48",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "有 sessionId 时的实际条件读取或轨迹详情路由，均有源码对应。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ObservabilityTraceExplorer.tsx:205-252",
+            "desktop/src/react/settings/tabs/observability/trace-detail/TraceDetailOverlay.tsx:56-90",
+            "desktop/src/react/settings/tabs/observability/trace-detail/TraceDetailOverlay.tsx:78",
+            "desktop/src/react/settings/tabs/observability/trace-detail/TraceDetailOverlay.tsx:157",
+            "server/routes/sessions.ts:1302"
+          ]
+        },
+        {
+          "index": 2,
+          "effect_entry_id": "semantic-effect:model-observability.model_observability_traces_traceid.read",
+          "target_feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-ECC851",
+          "target_scenario_id": "R00-T02-LA-ECC851003BBF",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "有 sessionId 时的实际条件读取或轨迹详情路由，均有源码对应。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ObservabilityTraceExplorer.tsx:205-252",
+            "desktop/src/react/settings/tabs/observability/trace-detail/TraceDetailOverlay.tsx:56-90",
+            "server/routes/model-observability.ts:181"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:usage#11",
+      "trigger": "设置页加载、保存留存天数",
+      "verdict": "WRONG",
+      "finding": "留存设置 PUT 成功后 onSaved 调用 reloadControlPlane().then(setRefreshTokens)；若 health/settings 任一 GET 失败，四子页刷新不会发生，且该后置 Promise 无 catch。矩阵成功态写成无条件刷新，失败态把顶部手动 refresh 的 bootstrapError 行为泛化到后置 onSaved。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ObservabilitySettingsPanel.tsx:59-79",
+        "desktop/src/react/settings/tabs/observability/ObservabilitySettingsPanel.tsx:90-101",
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:115-120",
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:203-216",
+        "server/routes/model-observability.ts:89-126",
+        "server/routes/model-observability.ts:209-215",
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:95-103",
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:208-215"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "semantic-effect:model-observability.model_observability_storage.read",
+          "target_feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-08EB52",
+          "target_scenario_id": "R00-T02-LA-08EB520C2ECC",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ObservabilitySettingsPanel.tsx:59-79",
+            "desktop/src/react/settings/tabs/observability/ObservabilitySettingsPanel.tsx:90-101",
+            "server/routes/model-observability.ts:209"
+          ]
+        },
+        {
+          "index": 1,
+          "effect_entry_id": "semantic-effect:model-observability.model_observability_settings.put",
+          "target_feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-0E9326",
+          "target_scenario_id": "R00-T02-LA-0E9326840E66",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ObservabilitySettingsPanel.tsx:59-79",
+            "desktop/src/react/settings/tabs/observability/ObservabilitySettingsPanel.tsx:90-101",
+            "server/routes/model-observability.ts:93"
+          ]
+        },
+        {
+          "index": 2,
+          "effect_entry_id": "behavior:model-observability:/model-observability/health:READ",
+          "target_feature_id": "F-D22-ROUTE_BEHAVIOR-BEHAVIOR-MODEL-OBSERVABILITY-MODEL-OBSERVABILITY-204546",
+          "target_scenario_id": "R00-T02-LA-2045462C0D98",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ObservabilitySettingsPanel.tsx:59-79",
+            "desktop/src/react/settings/tabs/observability/ObservabilitySettingsPanel.tsx:90-101",
+            "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:115",
+            "server/routes/model-observability.ts:1"
+          ]
+        },
+        {
+          "index": 3,
+          "effect_entry_id": "semantic-effect:model-observability.model_observability_settings.read",
+          "target_feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-5BEFE4",
+          "target_scenario_id": "R00-T02-LA-5BEFE4A3A61C",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ObservabilitySettingsPanel.tsx:59-79",
+            "desktop/src/react/settings/tabs/observability/ObservabilitySettingsPanel.tsx:90-101",
+            "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:115",
+            "server/routes/model-observability.ts:1"
+          ]
+        }
+      ]
+    },
+    {
+      "action_id": "ui:settings:usage#12",
+      "trigger": "设置页按日期/类别删除观测数据",
+      "verdict": "WRONG",
+      "finding": "删除成功时只调用 onSaved；四子页刷新需 health/settings 后置重读成功。重读失败的 Promise 无 catch，虽删除已发生也不会触发子页刷新，矩阵未记此分支。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ObservabilitySettingsPanel.tsx:132-145",
+        "desktop/src/react/settings/tabs/observability/ObservabilitySettingsPanel.tsx:285-315",
+        "server/routes/model-observability.ts:217-237",
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:208-215"
+      ],
+      "control_variants": []
+    },
+    {
+      "action_id": "ui:settings:usage#13",
+      "trigger": "导出当前子页筛选到文件",
+      "verdict": "SOURCE_CITED_CORRECT",
+      "finding": "并行修复后的候选已明确零匹配时仍保存 manifest(totalCalls:0) 且显示已保存；导出及双通道存储链与源码一致。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:153-162",
+        "desktop/src/react/settings/tabs/observability/ObservabilityExportDialog.tsx:82-117",
+        "desktop/src/react/settings/tabs/observability/observability-export-save.ts:35-43",
+        "desktop/src/react/settings/tabs/observability/observability-export-save.ts:58-127",
+        "server/routes/model-observability.ts:239-255",
+        "desktop/main.cjs:5804-5868"
+      ],
+      "control_variants": [
+        {
+          "index": 0,
+          "effect_entry_id": "semantic-effect:model-observability.model_observability_export.post",
+          "target_feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-96CA6D",
+          "target_scenario_id": "R00-T02-LA-96CA6DBF8317",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:153-162",
+            "desktop/src/react/settings/tabs/observability/ObservabilityExportDialog.tsx:82-117",
+            "server/routes/model-observability.ts:239"
+          ]
+        },
+        {
+          "index": 1,
+          "effect_entry_id": "desktop-behavior:observability-export",
+          "target_feature_id": "F-D22-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OBSERVABILITY-EXPORT-0F2842",
+          "target_scenario_id": "R00-T02-LA-0F28429F329E",
+          "verdict": "SOURCE_CITED_CORRECT",
+          "finding": "对应 JSX/回调与路由入口已核；条件和错误态按本动作备注。",
+          "source_refs": [
+            "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:153-162",
+            "desktop/src/react/settings/tabs/observability/ObservabilityExportDialog.tsx:82-117",
+            "desktop/preload.cjs:130",
+            "desktop/main.cjs:5863",
+            "desktop/src/react/settings/tabs/observability/observability-export-save.ts:89",
+            "desktop/preload.cjs:127",
+            "desktop/main.cjs:5804",
+            "desktop/src/react/settings/tabs/observability/observability-export-save.ts:69",
+            "desktop/preload.cjs:129",
+            "desktop/main.cjs:5854",
+            "desktop/src/react/settings/tabs/observability/observability-export-save.ts:86",
+            "desktop/preload.cjs:128",
+            "desktop/main.cjs:5834",
+            "desktop/src/react/settings/tabs/observability/observability-export-save.ts:81",
+            "desktop/src/react/settings/tabs/observability/observability-export-save.ts:38"
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "只读源码定向核查，没有运行 UI/服务器。",
+    "候选矩阵并行修改；本报告绑定 matrix_sha256_at_report_read。后续 SHA 改变需按差异复核。"
+  ]
+}

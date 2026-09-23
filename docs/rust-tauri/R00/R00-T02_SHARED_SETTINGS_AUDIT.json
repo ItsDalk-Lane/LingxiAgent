@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "task_id": "R00-T02",
+  "role": "R8 独立只读共享设置调用链核查；不判独立验收 PASS",
+  "source_read_sha": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+  "source_read_sha_kind": "git HEAD",
+  "matrix_read_sha256": "89dc456f0b0ff53be2f05ca38e3aaf70004c55a3679096c88ff4dfb3584ad86b",
+  "feature_inventory_read_sha256": "a475309722648f76f55e7aa65c13b7c678e2ef1fce280622b036d4fb09544acf",
+  "scope": [
+    "desktop/src/react/settings/SettingsContent.tsx:initSettings",
+    "desktop/src/react/settings/actions.ts:loadSettingsConfig",
+    "desktop/src/react/settings/helpers.ts:autoSaveConfig",
+    "desktop/src/react/settings/helpers.ts:autoSaveGlobalModels",
+    "从设置页控件到上述 helper 的调用，以及相关 settingsChanged IPC"
+  ],
+  "shared_contract": {
+    "transport": "lingxiFetch 拼接当前 server connection 的 URL 和认证 header；默认 GET；非 2xx 抛错。参考 desktop/src/react/settings/api.ts:18-54。",
+    "initSettings": {
+      "source_refs": ["desktop/src/react/settings/SettingsContent.tsx:323", "desktop/src/react/settings/SettingsContent.tsx:352", "desktop/src/react/settings/SettingsContent.tsx:382"],
+      "requests": ["IPC 并行 getServerPort/getServerToken/getPlatform", "GET /api/config 供 i18n；失败回退 zh-CN", "GET /api/agents 完成后 GET /api/settings/snapshot?agentId=<selected> 与 GET /api/health", "并行 GET /api/models", "ready 后异步 GET /api/providers/summary"],
+      "important_boundary": "初始化调用 loadSettingsSnapshot，不调用 loadSettingsConfig 的六路读取；供应商摘要失败被静默吞掉，十五秒超时仅强制显示界面。"
+    },
+    "loadSettingsConfig": {
+      "source_ref": "desktop/src/react/settings/actions.ts:116-207",
+      "requests": ["GET /api/agents/:id/config", "GET /api/agents/:id/identity", "GET /api/agents/:id/agents-md", "GET /api/agents/:id/public-agents-md", "GET /api/user-profile", "GET /api/preferences/models", "仅 config.experience.enabled===true 时 GET /api/agents/:id/experience"],
+      "method_and_body": "全部 GET、无 body；前六项 Promise.all 并发，经验条件读取在后。",
+      "result": "成功同时替换 settingsConfig、globalModelsConfig、homeFolder；保留请求版本与 owner 隔离。缺 agentId 不发请求，置 error。失败仅设 settingsConfigStatus/error 并记录日志，不向调用者抛出；调用者 await 完成不等于刷新成功。"
+    },
+    "autoSaveConfig": {
+      "source_ref": "desktop/src/react/settings/helpers.ts:92-114",
+      "request": "PUT /api/agents/:id/config，Content-Type application/json，body 为调用者传入的 partial 原样 JSON",
+      "result": "2xx 且无 data.error 后，非 silent 先显示保存成功，再 GET /api/agents/:currentId/config 刷新 settingsConfig 单份快照；不会自行重读 identity/AGENTS.md/user-profile/globalModels。成功返回 true，PUT 或后续 GET 失败均显示保存失败并返回 false，因此可能已写入却提示失败。",
+      "persistence_scope": "URL 带 id 不能代表字段一定每助手。server/routes/agents.ts:687 使用 splitByScope；shared/config-schema.ts:20-46 声明的 global 字段先由 engine setter 写到全局 preferences；其余字段才进入该助手 config.yaml。GET config 又由 injectGlobalFields 注入全局值（server/routes/agents.ts:581）。"
+    },
+    "autoSaveGlobalModels": {
+      "source_ref": "desktop/src/react/settings/helpers.ts:116-138",
+      "request": "PUT /api/preferences/models，Content-Type application/json，body 为 partial 原样 JSON",
+      "result": "2xx 且无 data.error 后，非 silent 先显示保存成功，再 GET /api/preferences/models 并更新 globalModelsConfig；PUT 或 GET 失败显示保存失败，但 catch 吞错且 helper 无布尔返回。GET 失败时可能已写入、配置视图仍旧。helper 本身不调用 settingsChanged；server/routes/preferences.ts:244-251 可发 models-changed app event。"
+    },
+    "global_fields_relevant_here": ["locale", "timezone", "sandbox", "sandbox_network", "hardware_acceleration", "file_backup", "update_channel", "auto_check_updates", "keep_awake", "editor", "capabilities.learn_skills", "desk.heartbeat_master", "automation.permissionMode", "network_proxy"],
+    "agent_fields_relevant_here": ["models.chat", "memory.enabled", "experience.enabled", "tools.disabled", "chat", "memory.embedding_model", "memory.dream.auto_enabled"]
+  },
+  "action_traces": [
+    {"matrix_action":"各 ui:settings:*#00","operation":"打开设置容器","helper":"initSettings","write":"无","read":"初始化路径见 shared_contract.initSettings","scope":"当前所选助手快照与全局模型/供应商摘要混合","extra_ipc":"只取连接与平台数据；无 settingsChanged"},
+    {"matrix_action":"ui:settings:about#03/#04","operation":"测试版渠道/自动检查更新","helper":"autoSaveConfig 然后 loadSettingsConfig，不检查保存布尔值","write":"PUT /api/agents/:id/config {update_channel:stable|beta} 或 {auto_check_updates:boolean}","scope":"global","read":"helper GET config；无论保存结果再做六类 GET，经验启用时第七类","failure":"保存失败仍重读；读失败只记录 config error","extra_ipc":"渠道切换另调用 autoUpdateSetChannel，不是 settingsChanged"},
+    {"matrix_action":"ui:settings:agent#01/#02/#03","operation":"浏览/切换/删除后重读；改名、元设定和 Yuan 保存后重读；主模型选择","helper":"browseAgent/switchToAgent、loadSettingsConfig、autoSaveConfig","write":"主模型 PUT /api/agents/:id/config {models:{chat:{id,provider}}}；改名/Yuan 为同 URL 直接 PUT；身份与 AGENTS.md 各走独立 PUT","scope":"这些配置字段每助手","read":"主模型仅 helper GET config；浏览、切换、改名/Yuan、身份保存、删除后追加六类 GET（条件第七类）；部分路径另 GET /api/agents","failure":"主模型 PUT 成功但 helper GET 失败可报保存失败；直接 PUT 成功后 loadSettingsConfig 失败被吞，不等于保存失败","extra_ipc":"无直接 settingsChanged；服务端模型/助手变更可发 app event"},
+    {"matrix_action":"ui:settings:agent#04/#05/#08/#09/#10","operation":"记忆、经验和可选工具开关","helper":"autoSaveConfig；经验成功后另 loadSettingsConfig","write":"PUT /api/agents/:id/config {memory:{enabled}}、{experience:{enabled}}、{tools:{disabled:[...]}}","scope":"每助手","read":"记忆/工具仅 helper GET config；经验 helper 成功后还做六类 GET，条件第七类","failure":"记忆/工具调用未 await；经验检查 helper 布尔值。helper GET 失败可在已写入后报失败；工具 disabledRef 乐观值可能暂不一致","extra_ipc":"无直接 settingsChanged"},
+    {"matrix_action":"ui:settings:general#02","operation":"保持唤醒开关","helper":"autoSaveConfig；IPC 失败回滚时再次 autoSaveConfig 并 loadSettingsConfig","write":"PUT /api/agents/:id/config {keep_awake:boolean}","scope":"global","read":"每次 helper GET config；IPC 异常回滚后额外六类 GET、条件第七类","failure":"第一次保存 false 则不调 OS IPC；OS IPC 失败尝试回写旧配置，回写结果未检查","extra_ipc":"保存 true 后 setKeepAwakeEnabled；服务端另发 keep-awake-changed app event"},
+    {"matrix_action":"ui:settings:interface#03/#04/#06","operation":"编辑器排版、聊天布局、硬件加速、语言、时区","helper":"autoSaveConfig","write":"PUT /api/agents/:id/config，body 分别为 {editor:next}、{chat:next}、{hardware_acceleration:next}、{locale:val}、{timezone:val}","scope":"editor/hardware_acceleration/locale/timezone 是 global；chat 是每助手","read":"每次仅 helper GET config；无 loadSettingsConfig 六类读","failure":"editor/chat 先乐观广播，helper false 后回滚并再广播；硬件加速仅成功后广播；语言忽略 false，仍 i18n.load 且显示成功 toast；时区只由 helper 提示","extra_ipc":"editor-typography-changed、chat-layout-changed 可在保存前及回滚时发送；hardware-acceleration-changed 仅 helper true 后发送；语言/时区无直接 settingsChanged，locale 服务端 app event 可通知其他窗口"},
+    {"matrix_action":"ui:settings:security#01/#02/#03","operation":"沙箱、沙箱网络、备份保留天数、网络代理","helper":"autoSaveConfig 然后 loadSettingsConfig；代理仅 helper true 后广播与全量重读","write":"PUT /api/agents/:id/config {sandbox:on}、{sandbox_network:on}、{file_backup:{...,retention_days:days}}、{network_proxy:proxyDraft}","scope":"四类字段均 global","read":"helper GET config；前三类即使 helper false 仍做六类 GET，条件第七类；代理成功后也做全量读","failure":"PUT 成功但 helper GET 失败可报失败；loadSettingsConfig 失败被吞；代理 helper false 则不广播/不做全量读","extra_ipc":"代理 helper true 后 settingsChanged('network-proxy-changed',{network_proxy:latest})；服务端同类 app event 亦可能广播；主进程应用代理失败仅 log"},
+    {"matrix_action":"ui:settings:work#02","operation":"全局心跳主开关与自动化权限模式","helper":"autoSaveConfig","write":"PUT /api/agents/:id/config {desk:{heartbeat_master:on}} 或 {automation:{permissionMode:mode}}","scope":"两字段均 global；每助手心跳/工作目录属于其他直接保存动作","read":"仅 helper GET config；无 loadSettingsConfig 六类读","failure":"helper GET 失败可在已持久化后显示保存失败","extra_ipc":"无直接 settingsChanged"},
+    {"matrix_action":"ui:settings:skills#07","operation":"技能创建、远端拉取、安全审查开关","helper":"autoSaveConfig 然后 loadSettingsConfig；未检查布尔值","write":"PUT /api/agents/:id/config {capabilities:{learn_skills:{enabled|allow_github_fetch|safety_review:bool}}}","scope":"global，shared/config-schema.ts 明确列 capabilities.learn_skills","read":"helper GET config；无论 helper 结果仍做六类 GET，条件第七类","failure":"失败后仍重读；helper GET 失败可在已写入后报失败","extra_ipc":"无直接 settingsChanged"},
+    {"matrix_action":"ui:settings:models#02/#03","operation":"七个辅助槽与视觉辅助开关","helper":"autoSaveGlobalModels，调用方不 await","write":"PUT /api/preferences/models {models:{[slot.field]:ref}} 或 {models:{vision_enabled:on}}","scope":"global","read":"成功后仅 GET /api/preferences/models；服务端 models-changed 可让设置窗口另 GET /api/models","failure":"PUT 或 GET 失败 helper toast；GET 失败可已写入且当前控件保留旧值","extra_ipc":"无直接 settingsChanged；服务端 models-changed 经 app-event-actions 可能转发 IPC"},
+    {"matrix_action":"ui:settings:providers#08","operation":"选择搜索供应商","helper":"autoSaveGlobalModels，调用方不 await","write":"PUT /api/preferences/models {search:{provider:val}}；无需 key 的候选另带 api_key:''","scope":"global","read":"成功后 GET /api/preferences/models","failure":"PUT 或读回失败 helper toast；选择动作不等于 API key 验证","extra_ipc":"无直接 settingsChanged；服务端可发 models-changed app event"},
+    {"matrix_action":"ui:settings:me#02","operation":"保存用户姓名或个人资料后重读","helper":"loadSettingsConfig","write":"直接 PUT /api/config 与/或 PUT /api/user-profile；非 helper 写入","scope":"用户全局资料","read":"写入成功后六类 GET，条件第七类","failure":"先显示保存成功；loadSettingsConfig 失败只改 status、无保存失败 toast","extra_ipc":"无直接 settingsChanged"},
+    {"matrix_action":"ui:settings:bridge#05","operation":"全局 Bridge 权限、回执、流式设置后重读","helper":"loadSettingsConfig","write":"直接 POST /api/bridge/settings partial；非 helper 写入","scope":"global","read":"成功后并行 Bridge status GET 与六类 GET，条件第七类","failure":"loadStatus 和 loadSettingsConfig 各自吞读取异常；POST 成功提示可与刷新失败并存","extra_ipc":"此路径无直接 settingsChanged"},
+    {"matrix_action":"ui:settings:providers#02/#03/#04/#05/#06/#10/#11/#12","operation":"供应商新建、删除、凭据、模型、测试前保存与 OAuth 后的 onRefresh","helper":"经 ProvidersTab.refreshProviderState 或 ProviderList 自定义提交调用 loadSettingsConfig","write":"各动作直接调用 /api/config、模型/凭据/OAuth 路由；非上述保存 helper","scope":"供应商目录/凭据全局，个别模型配置另按其专门路由","read":"成功刷新时六类 GET、条件第七类，再 GET /api/providers/summary；刷新入口检查 settingsConfigStatus=error 并可将读失败当操作失败","failure":"若直接写入已成功而配置/摘要读失败，调用方可能提示保存失败；实际持久化需独立读回判断","extra_ipc":"无由 loadSettingsConfig 直接触发的 settingsChanged"},
+    {"matrix_action":"ui:settings:providers#08","operation":"搜索 API key 验证成功后重读","helper":"loadSettingsConfig","write":"直接 POST /api/search/verify {provider,api_key,search_provider}，不是 autoSaveGlobalModels","scope":"搜索服务配置由专用路由处理","read":"data.ok 后六类 GET、条件第七类","failure":"验证成功 toast 可与配置重读失败并存，因为 loadSettingsConfig 吞错","extra_ipc":"无直接 settingsChanged"}
+  ],
+  "confirmed_matrix_and_inventory_findings": [
+    {"kind":"WRONG_SCOPE","actions":["ui:settings:security#01","ui:settings:security#02","ui:settings:security#03"],"finding":"矩阵/主功能清单把 sandbox、sandbox_network、file_backup、network_proxy 写成所选助手专用或每助手 config；请求虽带 agentId，服务端 schema 将四字段分流到全局 preferences。","evidence":["shared/config-schema.ts:25-28","shared/config-schema.ts:47","server/routes/agents.ts:687","shared/config-scope.ts:31-59"]},
+    {"kind":"WRONG_SCOPE","actions":["ui:settings:general#02","ui:settings:interface#03","ui:settings:interface#04","ui:settings:interface#06","ui:settings:skills#07","ui:settings:work#02"],"finding":"矩阵中若将 keep_awake、editor、hardware_acceleration、locale/timezone、capabilities.learn_skills、desk.heartbeat_master、automation.permissionMode 归为每助手持久化均错误；这些是全局字段。interface#03 的 chat 布局仍是每助手。work#02 成功文案说全局是对的，但失败文案又写每助手，内部矛盾。","evidence":["shared/config-schema.ts:20-47","server/routes/agents.ts:687","desktop/src/react/settings/tabs/WorkTab.tsx:130-136"]},
+    {"kind":"WRONG_HELPER_AND_READBACK","actions":["ui:settings:agent#14","ui:settings:agent#16"],"finding":"矩阵/主功能清单套入 autoSaveConfig 的自动读回文案，但 embedding 直接 PUT 后仅更新本地选项，没有追加 GET；自动梦直接 PUT 后调用 refreshSettingsConfigSnapshot。","evidence":["desktop/src/react/settings/tabs/agent/AgentMemoryEmbedding.tsx:81-103","desktop/src/react/settings/tabs/agent/agent-memory-dream-actions.ts:126-135"]},
+    {"kind":"OVERBROAD_HELPER_ATTACHMENT","actions":["ui:settings:interface#02"],"finding":"主题、字体、纸纹、落叶操作走 persistAppearancePreferences 和外观状态，不调用 autoSaveConfig；矩阵/主清单把该动作整体附上 autoSaveConfig 保存后重读的文案会误测外观控件。","evidence":["desktop/src/react/settings/tabs/InterfaceTab.tsx:123-127","desktop/src/react/settings/tabs/InterfaceTab.tsx:340-450"]},
+    {"kind":"READ_RESULT_BOUNDARY","actions":["ui:settings:bridge#05","ui:settings:me#02","ui:settings:providers#08"],"finding":"loadSettingsConfig 自己吞读取异常并只更新 status。Bridge 和 Me 的写入成功提示、Search 验证成功提示之后，后续配置读失败不会自动变成保存失败；矩阵中笼统的“失败 toast/失败提示”不能覆盖该读失败分支。","evidence":["desktop/src/react/settings/actions.ts:185-205","desktop/src/react/settings/tabs/bridge/useBridgeState.ts:447-480","desktop/src/react/settings/tabs/MeTab.tsx:60-74","desktop/src/react/settings/tabs/providers/SearchApiKeyConfig.tsx:62-76"]}
+  ],
+  "settings_changed_boundary": "四个共享 helper 自身都不调用 settingsChanged。额外 IPC 来自具体控件（editor/chat、硬件加速、网络代理）或服务端 app event 的主窗口转发；ExperimentsTab.tsx:415 的 experiment-changed 是直接 PATCH /api/experiments/:id 成功后的独立动作，不属于四 helper。preload.cjs:147 用 ipcRenderer.send，主进程在 desktop/main.cjs:5653 转发；不能把 IPC 发送当成落盘成功。",
+  "verification": {"method":"固定 HEAD 源码与读取时矩阵、FEATURE_INVENTORY 逐动作只读比对；未运行产品或测试","source_sha_verified":true,"independent_acceptance":"NOT_ASSESSED"}
+}

@@ -1,0 +1,1234 @@
+{
+  "schema_version": 1,
+  "task_id": "R00-T02",
+  "role": "独立只读定向核源；不判任务 PASS",
+  "scope": [
+    "ui:settings:bridge",
+    "ui:settings:models"
+  ],
+  "matrix_sha256": "d9c4b89683d6819347caff01d8d0642044c1afaee98d2ed16c253e061a32ae1a",
+  "matrix_sha256_initial_observation": "136cfaccaa29149956f49c0acffe6b3832f2776091de6c24b15779a1ad9f92fb",
+  "matrix_source_sha": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+  "source_head": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+  "checked_at_utc": "2026-09-23T12:48:17Z",
+  "counts": {
+    "actions": 18,
+    "control_variants": 51,
+    "wrong_actions": 0,
+    "wrong_variants": 0
+  },
+  "rule": "SOURCE_CITED_CORRECT 仅表示静态源码支持该目标绑定和效果，不代表运行验收；动作级问题单独列在 action_reviews。",
+  "action_reviews": [
+    {
+      "action_id": "ui:settings:bridge#00",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已核对当前 JSX/hook、请求、本地状态与路由的对应；各变体另列。",
+      "source_refs": [
+        "desktop/src/react/settings/SettingsContent.tsx:323-400",
+        "server/routes/settings-snapshot.ts:185-199"
+      ],
+      "target_feature_ids": [
+        "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-READ-26AE36",
+        "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-D1BEE19A95BB",
+        "R00-T02-LA-A524D3723654",
+        "R00-T02-LA-26AE3688B8DE",
+        "R00-T02-LA-F6235778F816",
+        "R00-T02-LA-EB074679FAE5",
+        "R00-T02-LA-766F5F3C47C3"
+      ],
+      "consumer_source_refs": [
+        "desktop/src/react/settings/store.ts:1"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#01",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已按当前候选重核：本动作的触发、请求与显示结果和源码一致。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:266-331",
+        "server/routes/bridge.ts:356-365"
+      ],
+      "target_feature_ids": [
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-STATUS-READ-5CB577"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-5CB57741F1BB"
+      ],
+      "consumer_source_refs": [
+        "server/routes/bridge.ts:183-315",
+        "desktop/src/react/settings/tabs/bridge/BridgeWidgets.tsx:100-117"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#02",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已核对当前 JSX/hook、请求、本地状态与路由的对应；各变体另列。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:72-294",
+        "server/routes/bridge.ts:367-488"
+      ],
+      "target_feature_ids": [
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-CREDENTIALS-SAVE-21BCAF",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-ENABLE-29FD2C",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-DISABLE-C16CB9",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-OWNER-CLEAR-809F2D",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-STATUS-READ-5CB577"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-21BCAF26AB04",
+        "R00-T02-LA-29FD2CE83BB4",
+        "R00-T02-LA-C16CB9FD3738",
+        "R00-T02-LA-809F2DF0CB86",
+        "R00-T02-LA-5CB57741F1BB"
+      ],
+      "consumer_source_refs": [
+        "lib/bridge/bridge-manager.ts:869-895",
+        "lib/bridge/owner-policy.ts:4"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#03",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已核对当前 JSX/hook、请求、本地状态与路由的对应；各变体另列。",
+      "source_refs": [
+        "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx:34-121",
+        "server/routes/bridge.ts:963-974"
+      ],
+      "target_feature_ids": [
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-WECHAT-QRCODE-POST-ECA3EA",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-WECHAT-QRCODE-STAT-57B232",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-CREDENTIALS-SAVE-21BCAF",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-ENABLE-29FD2C",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-OWNER-SET-34B747",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-STATUS-READ-5CB577"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-ECA3EAB38C12",
+        "R00-T02-LA-57B2329825A0",
+        "R00-T02-LA-21BCAF26AB04",
+        "R00-T02-LA-29FD2CE83BB4",
+        "R00-T02-LA-34B7475C9BAD",
+        "R00-T02-LA-5CB57741F1BB"
+      ],
+      "consumer_source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:305-356"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#04",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已核对当前 JSX/hook、请求、本地状态与路由的对应；各变体另列。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:380-445",
+        "server/routes/bridge.ts:367-380"
+      ],
+      "target_feature_ids": [
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-TEST-POST-2F5ED5",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-OWNER-SET-34B747",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-OWNER-CLEAR-809F2D",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-STATUS-READ-5CB577"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-2F5ED5999431",
+        "R00-T02-LA-34B7475C9BAD",
+        "R00-T02-LA-809F2DF0CB86",
+        "R00-T02-LA-5CB57741F1BB"
+      ],
+      "consumer_source_refs": [
+        "lib/bridge/owner-policy.ts:4",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:432-441"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#05",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已按当前候选重核：本动作的触发、请求与显示结果和源码一致。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:447-479",
+        "server/routes/bridge.ts:491-527",
+        "desktop/src/react/settings/actions.ts:147-173"
+      ],
+      "target_feature_ids": [
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PERMISSION-SET-F4C513",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-RECEIPT-TOGGLE-09D567",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-RICH-STREAMING-TOGGLE-D5514B",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-STATUS-READ-5CB577",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+        "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+        "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-F4C513BAD52E",
+        "R00-T02-LA-09D567E99524",
+        "R00-T02-LA-D5514BBDBF88",
+        "R00-T02-LA-5CB57741F1BB",
+        "R00-T02-LA-BC675C664910",
+        "R00-T02-LA-A9B0BBAD449C",
+        "R00-T02-LA-07A5CE3637C7",
+        "R00-T02-LA-3D7A957EF7FF",
+        "R00-T02-LA-429D86C4F952",
+        "R00-T02-LA-7EC5F0F2FF7C",
+        "R00-T02-LA-C8380CD5D08B"
+      ],
+      "consumer_source_refs": [
+        "core/engine.ts:2378-2387",
+        "desktop/src/react/settings/actions.ts:147-173"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#06",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已核对当前 JSX/hook、请求、本地状态与路由的对应；各变体另列。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:230-264",
+        "server/routes/agents.ts:889-933"
+      ],
+      "target_feature_ids": [
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-7C699F"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-3D7A957EF7FF",
+        "R00-T02-LA-7C699FD2A740"
+      ],
+      "consumer_source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:230-264"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#07",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已核对当前 JSX/hook、请求、本地状态与路由的对应；各变体另列。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:363-367",
+        "desktop/src/react/settings/overlays/BridgeTutorial.tsx:8-12"
+      ],
+      "target_feature_ids": [
+        "F-D17-UI-UI-SETTINGS-BRIDGE-DF1F77"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-DF1F77F2D776"
+      ],
+      "consumer_source_refs": [
+        "desktop/src/react/settings/overlays/BridgeTutorial.tsx:8-64"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#00",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已核对当前 JSX/hook、请求、本地状态与路由的对应；各变体另列。",
+      "source_refs": [
+        "desktop/src/react/settings/SettingsContent.tsx:323-400",
+        "server/routes/models.ts:201-215"
+      ],
+      "target_feature_ids": [
+        "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-READ-26AE36",
+        "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-D1BEE19A95BB",
+        "R00-T02-LA-A524D3723654",
+        "R00-T02-LA-26AE3688B8DE",
+        "R00-T02-LA-F6235778F816",
+        "R00-T02-LA-EB074679FAE5",
+        "R00-T02-LA-766F5F3C47C3"
+      ],
+      "consumer_source_refs": [
+        "desktop/src/react/settings/store.ts:1"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#01",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已核对当前 JSX/hook、请求、本地状态与路由的对应；各变体另列。",
+      "source_refs": [
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:253-337",
+        "server/routes/media.ts:70-75"
+      ],
+      "target_feature_ids": [
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-READ-27A9F0",
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-READ-1EA9E4",
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-REA-2E137D",
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-62106F"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-7EC5F0F2FF7C",
+        "R00-T02-LA-EB074679FAE5",
+        "R00-T02-LA-27A9F02FCD58",
+        "R00-T02-LA-1EA9E4819E27",
+        "R00-T02-LA-2E137D5F14B9",
+        "R00-T02-LA-62106F57675C"
+      ],
+      "consumer_source_refs": [
+        "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:65-201"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#02",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已核对当前 JSX/hook、请求、本地状态与路由的对应；各变体另列。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/AuxiliaryModelsSection.tsx:150-186",
+        "server/routes/preferences.ts:187-249"
+      ],
+      "target_feature_ids": [
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-SHARED-MODELS-UPDATE-A1F51A",
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-A1F51A12AD61",
+        "R00-T02-LA-7EC5F0F2FF7C"
+      ],
+      "consumer_source_refs": [
+        "core/config-coordinator.ts:218-266"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#03",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已核对当前 JSX/hook、请求、本地状态与路由的对应；各变体另列。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/AuxiliaryModelsSection.tsx:163-172",
+        "server/routes/preferences.ts:201-224"
+      ],
+      "target_feature_ids": [
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-SHARED-MODELS-UPDATE-A1F51A",
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-A1F51A12AD61",
+        "R00-T02-LA-7EC5F0F2FF7C"
+      ],
+      "consumer_source_refs": [
+        "core/config-coordinator.ts:254-265",
+        "core/engine.ts:2405"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#04",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已核对当前 JSX/hook、请求、本地状态与路由的对应；各变体另列。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/AuxiliaryModelsSection.tsx:19-99",
+        "server/routes/models.ts:228-265"
+      ],
+      "target_feature_ids": [
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-HEALTH-990A22"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-990A225D8A35"
+      ],
+      "consumer_source_refs": [
+        "server/routes/models.ts:228-265"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#05",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已核对当前 JSX/hook、请求、本地状态与路由的对应；各变体另列。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:90-95",
+        "server/routes/media.ts:154-174"
+      ],
+      "target_feature_ids": [
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-CONFIG-PUT-1B65B0"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-1B65B0793D67"
+      ],
+      "consumer_source_refs": [
+        "core/media/universal-media-manager.ts:460-479"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#06",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已核对当前 JSX/hook、请求、本地状态与路由的对应；各变体另列。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:97-102",
+        "server/routes/media.ts:176-196"
+      ],
+      "target_feature_ids": [
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-CONFIG-PUT-6ADB2A"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-6ADB2A53988A"
+      ],
+      "consumer_source_refs": [
+        "core/media/universal-media-manager.ts:516-538"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#07",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已核对当前 JSX/hook、请求、本地状态与路由的对应；各变体另列。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:104-109",
+        "server/routes/media.ts:78-98"
+      ],
+      "target_feature_ids": [
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-CONFIG-PUT-595235"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-595235FD7113"
+      ],
+      "consumer_source_refs": [
+        "core/media/universal-media-manager.ts:497-514"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#08",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已核对当前 JSX/hook、请求、本地状态与路由的对应；各变体另列。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:111-116",
+        "server/routes/speech-recognition.ts:67-86"
+      ],
+      "target_feature_ids": [
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-6C23FF"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-6C23FF248130"
+      ],
+      "consumer_source_refs": [
+        "core/speech-recognition-service.ts:220-234"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#09",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "已核对当前 JSX/hook、请求、本地状态与路由的对应；各变体另列。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:174-201",
+        "server/routes/speech-recognition.ts:67-86"
+      ],
+      "target_feature_ids": [
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-6C23FF"
+      ],
+      "target_scenario_ids": [
+        "R00-T02-LA-6C23FF248130"
+      ],
+      "consumer_source_refs": [
+        "core/speech-recognition-service.ts:220-234"
+      ]
+    }
+  ],
+  "control_variant_reviews": [
+    {
+      "action_id": "ui:settings:bridge#00",
+      "variant_index": 0,
+      "effect_entry_id": "desktop-behavior:service-connection",
+      "target_feature_id": "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+      "target_scenario_id": "R00-T02-LA-D1BEE19A95BB",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/SettingsContent.tsx:323-400",
+        "desktop/preload.cjs:165",
+        "desktop/src/react/settings/SettingsContent.tsx:187",
+        "desktop/main.cjs:2086",
+        "desktop/main.cjs:2090",
+        "desktop/preload.cjs:34",
+        "desktop/main.cjs:5394",
+        "desktop/src/react/settings/SettingsContent.tsx:343",
+        "desktop/preload.cjs:35",
+        "desktop/main.cjs:5395",
+        "desktop/src/react/settings/SettingsContent.tsx:344",
+        "server/routes/settings-snapshot.ts:185-199"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#00",
+      "variant_index": 1,
+      "effect_entry_id": "semantic-effect:config.config.read",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3",
+      "target_scenario_id": "R00-T02-LA-A524D3723654",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/SettingsContent.tsx:323-400",
+        "server/routes/config.ts:190",
+        "server/routes/settings-snapshot.ts:185-199"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#00",
+      "variant_index": 2,
+      "effect_entry_id": "semantic-effect:agents./agents.read",
+      "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-READ-26AE36",
+      "target_scenario_id": "R00-T02-LA-26AE3688B8DE",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/SettingsContent.tsx:323-400",
+        "server/routes/agents.ts:274",
+        "server/routes/settings-snapshot.ts:185-199"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#00",
+      "variant_index": 3,
+      "effect_entry_id": "semantic-effect:settings-snapshot.settings_snapshot.read",
+      "target_feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+      "target_scenario_id": "R00-T02-LA-F6235778F816",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/SettingsContent.tsx:323-400",
+        "server/routes/settings-snapshot.ts:185",
+        "server/composition/open-root.ts:35",
+        "server/routes/settings-snapshot.ts:185-199"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#00",
+      "variant_index": 4,
+      "effect_entry_id": "semantic-effect:models:/models:查看可用模型",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+      "target_scenario_id": "R00-T02-LA-EB074679FAE5",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/SettingsContent.tsx:323-400",
+        "server/routes/models.ts:201",
+        "server/composition/open-root.ts:23",
+        "server/routes/settings-snapshot.ts:185-199"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#00",
+      "variant_index": 5,
+      "effect_entry_id": "semantic-effect:providers.providers_summary.read",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F",
+      "target_scenario_id": "R00-T02-LA-766F5F3C47C3",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/SettingsContent.tsx:323-400",
+        "server/routes/providers.ts:122",
+        "server/routes/settings-snapshot.ts:185-199"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#02",
+      "variant_index": 0,
+      "effect_entry_id": "semantic-effect:bridge.platform.credentials.save",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-CREDENTIALS-SAVE-21BCAF",
+      "target_scenario_id": "R00-T02-LA-21BCAF26AB04",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:72-294",
+        "server/routes/bridge.ts:383",
+        "server/routes/bridge.ts:367-488"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#02",
+      "variant_index": 1,
+      "effect_entry_id": "semantic-effect:bridge.platform.enable",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-ENABLE-29FD2C",
+      "target_scenario_id": "R00-T02-LA-29FD2CE83BB4",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:72-294",
+        "server/routes/bridge.ts:383",
+        "server/routes/bridge.ts:367-488"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#02",
+      "variant_index": 2,
+      "effect_entry_id": "semantic-effect:bridge.platform.disable",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-DISABLE-C16CB9",
+      "target_scenario_id": "R00-T02-LA-C16CB9FD3738",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:72-294",
+        "server/routes/bridge.ts:383",
+        "server/routes/bridge.ts:367-488"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#02",
+      "variant_index": 3,
+      "effect_entry_id": "semantic-effect:bridge.owner.clear",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-OWNER-CLEAR-809F2D",
+      "target_scenario_id": "R00-T02-LA-809F2DF0CB86",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:72-294",
+        "desktop/src/react/settings/tabs/bridge/WechatSection.tsx:32",
+        "server/routes/bridge.ts:367",
+        "server/routes/bridge.ts:367-488"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#02",
+      "variant_index": 4,
+      "effect_entry_id": "semantic-effect:bridge./bridge/status.read",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-STATUS-READ-5CB577",
+      "target_scenario_id": "R00-T02-LA-5CB57741F1BB",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:72-294",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:358",
+        "server/routes/bridge.ts:1",
+        "server/routes/bridge.ts:367-488"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#03",
+      "variant_index": 0,
+      "effect_entry_id": "semantic-effect:bridge./bridge/wechat/qrcode.post",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-WECHAT-QRCODE-POST-ECA3EA",
+      "target_scenario_id": "R00-T02-LA-ECA3EAB38C12",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx:34-121",
+        "server/routes/bridge.ts:963",
+        "server/routes/bridge.ts:963-974"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#03",
+      "variant_index": 1,
+      "effect_entry_id": "semantic-effect:bridge./bridge/wechat/qrcode-status.post",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-WECHAT-QRCODE-STAT-57B232",
+      "target_scenario_id": "R00-T02-LA-57B2329825A0",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx:34-121",
+        "server/routes/bridge.ts:969",
+        "server/routes/bridge.ts:963-974"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#03",
+      "variant_index": 2,
+      "effect_entry_id": "semantic-effect:bridge.platform.credentials.save",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-CREDENTIALS-SAVE-21BCAF",
+      "target_scenario_id": "R00-T02-LA-21BCAF26AB04",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx:34-121",
+        "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx:76",
+        "server/routes/bridge.ts:383",
+        "server/routes/bridge.ts:963-974"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#03",
+      "variant_index": 3,
+      "effect_entry_id": "semantic-effect:bridge.platform.enable",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-ENABLE-29FD2C",
+      "target_scenario_id": "R00-T02-LA-29FD2CE83BB4",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx:34-121",
+        "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx:80",
+        "server/routes/bridge.ts:383",
+        "server/routes/bridge.ts:963-974"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#03",
+      "variant_index": 4,
+      "effect_entry_id": "semantic-effect:bridge.owner.set",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-OWNER-SET-34B747",
+      "target_scenario_id": "R00-T02-LA-34B7475C9BAD",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx:34-121",
+        "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx:89",
+        "server/routes/bridge.ts:367",
+        "server/routes/bridge.ts:963-974"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#03",
+      "variant_index": 5,
+      "effect_entry_id": "semantic-effect:bridge./bridge/status.read",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-STATUS-READ-5CB577",
+      "target_scenario_id": "R00-T02-LA-5CB57741F1BB",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx:34-121",
+        "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx:96",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:340",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:276",
+        "server/routes/bridge.ts:356",
+        "server/routes/bridge.ts:963-974"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#04",
+      "variant_index": 0,
+      "effect_entry_id": "semantic-effect:bridge./bridge/test.post",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-TEST-POST-2F5ED5",
+      "target_scenario_id": "R00-T02-LA-2F5ED5999431",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:380-445",
+        "server/routes/bridge.ts:781",
+        "server/routes/bridge.ts:367-380"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#04",
+      "variant_index": 1,
+      "effect_entry_id": "semantic-effect:bridge.owner.set",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-OWNER-SET-34B747",
+      "target_scenario_id": "R00-T02-LA-34B7475C9BAD",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:380-445",
+        "server/routes/bridge.ts:368",
+        "server/routes/bridge.ts:367-380"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#04",
+      "variant_index": 2,
+      "effect_entry_id": "semantic-effect:bridge.owner.clear",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-OWNER-CLEAR-809F2D",
+      "target_scenario_id": "R00-T02-LA-809F2DF0CB86",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:380-445",
+        "server/routes/bridge.ts:368",
+        "server/routes/bridge.ts:367-380"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#04",
+      "variant_index": 3,
+      "effect_entry_id": "semantic-effect:bridge./bridge/status.read",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-STATUS-READ-5CB577",
+      "target_scenario_id": "R00-T02-LA-5CB57741F1BB",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:380-445",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:358",
+        "server/routes/bridge.ts:1",
+        "server/routes/bridge.ts:367-380"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#05",
+      "variant_index": 0,
+      "effect_entry_id": "semantic-effect:bridge.permission.set",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PERMISSION-SET-F4C513",
+      "target_scenario_id": "R00-T02-LA-F4C513BAD52E",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:447-479",
+        "server/routes/bridge.ts:491",
+        "server/routes/bridge.ts:491-527"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#05",
+      "variant_index": 1,
+      "effect_entry_id": "semantic-effect:bridge.receipt.toggle",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-RECEIPT-TOGGLE-09D567",
+      "target_scenario_id": "R00-T02-LA-09D567E99524",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:447-479",
+        "server/routes/bridge.ts:491",
+        "server/routes/bridge.ts:491-527"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#05",
+      "variant_index": 2,
+      "effect_entry_id": "semantic-effect:bridge.rich_streaming.toggle",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-RICH-STREAMING-TOGGLE-D5514B",
+      "target_scenario_id": "R00-T02-LA-D5514BBDBF88",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:447-479",
+        "server/routes/bridge.ts:491",
+        "server/routes/bridge.ts:491-527"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#05",
+      "variant_index": 3,
+      "effect_entry_id": "semantic-effect:bridge./bridge/status.read",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-STATUS-READ-5CB577",
+      "target_scenario_id": "R00-T02-LA-5CB57741F1BB",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "按调用时 selectedAgentIdRef 读取当前助手 status，与当前候选表述一致。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:447-479",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:358",
+        "server/routes/bridge.ts:1",
+        "server/routes/bridge.ts:491-527",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:301-303"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#05",
+      "variant_index": 4,
+      "effect_entry_id": "semantic-effect:agents./agents/.id/config.read",
+      "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+      "target_scenario_id": "R00-T02-LA-BC675C664910",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:447-479",
+        "desktop/src/react/settings/actions.ts:147",
+        "server/routes/agents.ts:557",
+        "server/routes/bridge.ts:491-527"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#05",
+      "variant_index": 5,
+      "effect_entry_id": "semantic-effect:agents./agents/.id/identity.read",
+      "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+      "target_scenario_id": "R00-T02-LA-A9B0BBAD449C",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:447-479",
+        "desktop/src/react/settings/actions.ts:147",
+        "server/routes/agents.ts:805",
+        "server/routes/bridge.ts:491-527"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#05",
+      "variant_index": 6,
+      "effect_entry_id": "semantic-effect:agents./agents/.id/agents-md.read",
+      "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+      "target_scenario_id": "R00-T02-LA-07A5CE3637C7",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:447-479",
+        "desktop/src/react/settings/actions.ts:147",
+        "server/routes/agents.ts:880",
+        "server/routes/bridge.ts:491-527"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#05",
+      "variant_index": 7,
+      "effect_entry_id": "semantic-effect:agents./agents/.id/public-agents-md.read",
+      "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+      "target_scenario_id": "R00-T02-LA-3D7A957EF7FF",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:447-479",
+        "desktop/src/react/settings/actions.ts:147",
+        "server/routes/agents.ts:930",
+        "server/routes/bridge.ts:491-527"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#05",
+      "variant_index": 8,
+      "effect_entry_id": "semantic-effect:config.user_profile.read",
+      "target_feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+      "target_scenario_id": "R00-T02-LA-429D86C4F952",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:447-479",
+        "desktop/src/react/settings/actions.ts:147",
+        "server/routes/config.ts:376",
+        "server/routes/bridge.ts:491-527"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#05",
+      "variant_index": 9,
+      "effect_entry_id": "semantic-effect:preferences./preferences/models.read",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+      "target_scenario_id": "R00-T02-LA-7EC5F0F2FF7C",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:447-479",
+        "desktop/src/react/settings/actions.ts:147",
+        "server/routes/preferences.ts:166",
+        "server/routes/bridge.ts:491-527"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#05",
+      "variant_index": 10,
+      "effect_entry_id": "semantic-effect:agents./agents/.id/experience.read",
+      "target_feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+      "target_scenario_id": "R00-T02-LA-C8380CD5D08B",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:447-479",
+        "desktop/src/react/settings/actions.ts:147",
+        "server/routes/agents.ts:994",
+        "server/routes/bridge.ts:491-527"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#06",
+      "variant_index": 0,
+      "effect_entry_id": "semantic-effect:agents./agents/.id/public-agents-md.read",
+      "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+      "target_scenario_id": "R00-T02-LA-3D7A957EF7FF",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:230-264",
+        "server/routes/agents.ts:930",
+        "server/routes/agents.ts:931",
+        "server/routes/agents.ts:889-933"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#06",
+      "variant_index": 1,
+      "effect_entry_id": "semantic-effect:agents./agents/.id/public-agents-md.put",
+      "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-7C699F",
+      "target_scenario_id": "R00-T02-LA-7C699FD2A740",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:230-264",
+        "server/routes/agents.ts:932",
+        "server/routes/agents.ts:933",
+        "server/routes/agents.ts:889-933"
+      ]
+    },
+    {
+      "action_id": "ui:settings:bridge#07",
+      "variant_index": 0,
+      "effect_entry_id": "ui:settings:bridge",
+      "target_feature_id": "F-D17-UI-UI-SETTINGS-BRIDGE-DF1F77",
+      "target_scenario_id": "R00-T02-LA-DF1F77F2D776",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:363-367",
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:363",
+        "desktop/src/react/settings/overlays/BridgeTutorial.tsx:10",
+        "desktop/src/react/settings/overlays/BridgeTutorial.tsx:8-12"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#00",
+      "variant_index": 0,
+      "effect_entry_id": "desktop-behavior:service-connection",
+      "target_feature_id": "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+      "target_scenario_id": "R00-T02-LA-D1BEE19A95BB",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/SettingsContent.tsx:323-400",
+        "desktop/preload.cjs:165",
+        "desktop/src/react/settings/SettingsContent.tsx:187",
+        "desktop/main.cjs:2086",
+        "desktop/main.cjs:2090",
+        "desktop/preload.cjs:34",
+        "desktop/main.cjs:5394",
+        "desktop/src/react/settings/SettingsContent.tsx:343",
+        "desktop/preload.cjs:35",
+        "desktop/main.cjs:5395",
+        "desktop/src/react/settings/SettingsContent.tsx:344",
+        "server/routes/models.ts:201-215"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#00",
+      "variant_index": 1,
+      "effect_entry_id": "semantic-effect:config.config.read",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3",
+      "target_scenario_id": "R00-T02-LA-A524D3723654",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/SettingsContent.tsx:323-400",
+        "server/routes/config.ts:190",
+        "server/routes/models.ts:201-215"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#00",
+      "variant_index": 2,
+      "effect_entry_id": "semantic-effect:agents./agents.read",
+      "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-READ-26AE36",
+      "target_scenario_id": "R00-T02-LA-26AE3688B8DE",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/SettingsContent.tsx:323-400",
+        "server/routes/agents.ts:274",
+        "server/routes/models.ts:201-215"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#00",
+      "variant_index": 3,
+      "effect_entry_id": "semantic-effect:settings-snapshot.settings_snapshot.read",
+      "target_feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+      "target_scenario_id": "R00-T02-LA-F6235778F816",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/SettingsContent.tsx:323-400",
+        "server/routes/settings-snapshot.ts:185",
+        "server/composition/open-root.ts:35",
+        "server/routes/models.ts:201-215"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#00",
+      "variant_index": 4,
+      "effect_entry_id": "semantic-effect:models:/models:查看可用模型",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+      "target_scenario_id": "R00-T02-LA-EB074679FAE5",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/SettingsContent.tsx:323-400",
+        "server/routes/models.ts:201",
+        "server/composition/open-root.ts:23",
+        "server/routes/models.ts:201-215"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#00",
+      "variant_index": 5,
+      "effect_entry_id": "semantic-effect:providers.providers_summary.read",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F",
+      "target_scenario_id": "R00-T02-LA-766F5F3C47C3",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/SettingsContent.tsx:323-400",
+        "server/routes/providers.ts:122",
+        "server/routes/models.ts:201-215"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#01",
+      "variant_index": 0,
+      "effect_entry_id": "semantic-effect:preferences./preferences/models.read",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+      "target_scenario_id": "R00-T02-LA-7EC5F0F2FF7C",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:253-337",
+        "server/routes/preferences.ts:166",
+        "server/routes/media.ts:70-75"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#01",
+      "variant_index": 1,
+      "effect_entry_id": "semantic-effect:models:/models:查看可用模型",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+      "target_scenario_id": "R00-T02-LA-EB074679FAE5",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:253-337",
+        "server/routes/models.ts:201",
+        "server/composition/open-root.ts:23",
+        "server/routes/media.ts:70-75"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#01",
+      "variant_index": 2,
+      "effect_entry_id": "semantic-effect:media.media_image_providers.read",
+      "target_feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-READ-27A9F0",
+      "target_scenario_id": "R00-T02-LA-27A9F02FCD58",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:253-337",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:327",
+        "server/routes/media.ts:138",
+        "server/routes/media.ts:70-75"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#01",
+      "variant_index": 3,
+      "effect_entry_id": "semantic-effect:media.media_video_providers.read",
+      "target_feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-READ-1EA9E4",
+      "target_scenario_id": "R00-T02-LA-1EA9E4819E27",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:253-337",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:327",
+        "server/routes/media.ts:146",
+        "server/routes/media.ts:70-75"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#01",
+      "variant_index": 4,
+      "effect_entry_id": "semantic-effect:media.media_speech_providers.read",
+      "target_feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-REA-2E137D",
+      "target_scenario_id": "R00-T02-LA-2E137D5F14B9",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:253-337",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:327",
+        "server/routes/media.ts:70",
+        "server/routes/media.ts:70-75"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#01",
+      "variant_index": 5,
+      "effect_entry_id": "semantic-effect:speech-recognition.speech_recognition_providers.read",
+      "target_feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-62106F",
+      "target_scenario_id": "R00-T02-LA-62106F57675C",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:253-337",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:327",
+        "server/routes/speech-recognition.ts:9",
+        "server/routes/media.ts:70-75"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#02",
+      "variant_index": 0,
+      "effect_entry_id": "semantic-effect:preferences./preferences/models.read",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+      "target_scenario_id": "R00-T02-LA-7EC5F0F2FF7C",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/AuxiliaryModelsSection.tsx:150-186",
+        "desktop/src/react/settings/helpers.ts:116",
+        "server/routes/preferences.ts:1",
+        "server/routes/preferences.ts:187-249"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#02",
+      "variant_index": 1,
+      "effect_entry_id": "semantic-effect:preferences.shared_models.update",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-SHARED-MODELS-UPDATE-A1F51A",
+      "target_scenario_id": "R00-T02-LA-A1F51A12AD61",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/AuxiliaryModelsSection.tsx:150-186",
+        "server/routes/preferences.ts:187",
+        "server/routes/preferences.ts:187-249"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#03",
+      "variant_index": 0,
+      "effect_entry_id": "semantic-effect:preferences./preferences/models.read",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+      "target_scenario_id": "R00-T02-LA-7EC5F0F2FF7C",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/AuxiliaryModelsSection.tsx:163-172",
+        "desktop/src/react/settings/helpers.ts:116",
+        "server/routes/preferences.ts:1",
+        "server/routes/preferences.ts:201-224"
+      ]
+    },
+    {
+      "action_id": "ui:settings:models#03",
+      "variant_index": 1,
+      "effect_entry_id": "semantic-effect:preferences.shared_models.update",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-SHARED-MODELS-UPDATE-A1F51A",
+      "target_scenario_id": "R00-T02-LA-A1F51A12AD61",
+      "status": "SOURCE_CITED_CORRECT",
+      "finding": "JSX/hook 到目标效果可追踪；F-ID 和场景与 FEATURE_INVENTORY 同一 entry_id 对应。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/AuxiliaryModelsSection.tsx:163-172",
+        "server/routes/preferences.ts:187",
+        "server/routes/preferences.ts:201-224"
+      ]
+    }
+  ],
+  "crosswalk_check": {
+    "feature_inventory": "docs/rust-tauri/R00/FEATURE_INVENTORY.json",
+    "method": "所有 control_variants 的 effect_entry_id/F-ID/target_scenario_id 与 inventory entry_id/feature_id/supplemental_acceptance_id 逐一比对",
+    "result": "MATCHED"
+  },
+  "limitations": [
+    "仅静态核源，未执行 UI 或服务端运行验收。",
+    "并行修订的矩阵以 matrix_sha256 对应的字节内容为准。"
+  ],
+  "resolved_during_audit": [
+    {
+      "finding": "微信扫码先显示 confirmed，配置保存失败可停在成功画面；当前候选已如实写明 HTTP 非 2xx/网络异常会抛出并被静默捕获。",
+      "source_refs": [
+        "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx:74-113",
+        "desktop/src/react/settings/api.ts:44-55"
+      ]
+    },
+    {
+      "finding": "扫码后的 bridge status GET、教程入口、本地公共说明无助手仍可输入、辅助槽加载前可操作、媒体默认 PUT 后无独立 GET，均已在当前候选补正。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:305-356",
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:347-367",
+        "desktop/src/react/settings/tabs/providers/AuxiliaryModelsSection.tsx:150-186",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:346-434"
+      ]
+    },
+    {
+      "finding": "bridge status 仅本页读取；全局设置保存后调用 loadStatus/loadSettingsConfig；二者在当前候选已分明。",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:266-331",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:447-473",
+        "desktop/src/react/settings/actions.ts:147-173"
+      ]
+    }
+  ]
+}

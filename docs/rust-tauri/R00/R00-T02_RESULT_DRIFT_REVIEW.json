@@ -1,0 +1,1284 @@
+{
+  "role": "只读独立结果字段漂移审查；不作 R8 PASS 裁决",
+  "basis": "R7 冻结候选首次读取时的 67 行差异；修复代理随后改动候选，以下 old_field_paths 指冻结观察，不代表当前文件仍存在差异。",
+  "parent_reported_frozen_matrix_sha256_prefix": "ec4943e7",
+  "initial_observed_difference_count": 67,
+  "initial_observed_pages": 22,
+  "decisions": [
+    {
+      "no": 1,
+      "action_id": "ui:page:channels#01",
+      "decision": "FIX",
+      "reason": "频道/私信目录 HTTP 非成功会写空数组，网络异常仅留旧列表并记日志。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[0].error_empty_paths[0].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[0].actions[0].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:139",
+        "desktop/src/react/components/ChannelsPanel.tsx:71",
+        "desktop/src/react/stores/channel-actions.ts:18",
+        "server/routes/channels.ts:424"
+      ]
+    },
+    {
+      "no": 2,
+      "action_id": "ui:page:channels#02",
+      "decision": "FIX",
+      "reason": "选中会话后请求失败不会统一恢复旧视图或给提示。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[0].error_empty_paths[1].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[0].actions[1].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/channels/ChannelList.tsx:168",
+        "desktop/src/react/stores/channel-actions.ts:252",
+        "desktop/src/react/stores/channel-actions.ts:331",
+        "server/routes/channels.ts:524"
+      ]
+    },
+    {
+      "no": 3,
+      "action_id": "ui:page:channels#03",
+      "decision": "FIX",
+      "reason": "发送失败虽不追加消息，输入草稿仍被清空且无 toast。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[0].error_empty_paths[2].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[0].actions[2].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:139",
+        "desktop/src/react/components/ChannelsPanel.tsx:1139",
+        "desktop/src/react/components/ChannelsPanel.tsx:1210",
+        "desktop/src/react/stores/channel-actions.ts:489"
+      ]
+    },
+    {
+      "no": 4,
+      "action_id": "ui:page:map#02",
+      "decision": "FIX",
+      "reason": "地图卡先选中，切会话失败时不能称整幅视图保留原样。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[2].error_empty_paths[1].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[2].actions[1].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:138",
+        "desktop/src/react/components/conversation-map/ConversationMapPage.tsx:274",
+        "desktop/src/react/components/conversation-map/ConversationMapCanvas.tsx:84",
+        "desktop/src/react/stores/session-actions.ts:63"
+      ]
+    },
+    {
+      "no": 5,
+      "action_id": "ui:panel:activity#01",
+      "decision": "SPECIFY",
+      "reason": "HTTP 200 错误体会写假空列表；异常保留旧表但只记日志。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[3].error_empty_paths[0].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[3].actions[0].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:140",
+        "desktop/src/react/components/ActivityPanel.tsx:126",
+        "desktop/src/react/components/ActivityPanel.tsx:131",
+        "desktop/src/react/components/ActivityPanel.tsx:200"
+      ]
+    },
+    {
+      "no": 6,
+      "action_id": "ui:panel:activity#03",
+      "decision": "FIX_BOTH",
+      "reason": "旧、新两处都误承诺失败 toast；源码仅 return 或 console.error。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[3].error_empty_paths[2].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[3].actions[2].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:140",
+        "desktop/src/react/components/ActivityPanel.tsx:160",
+        "desktop/src/react/components/ActivityPanel.tsx:360",
+        "server/routes/desk.ts:996"
+      ]
+    },
+    {
+      "no": 7,
+      "action_id": "ui:panel:activity#04",
+      "decision": "FIX",
+      "reason": "保存失败回滚开关，不显示错误 toast。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[3].error_empty_paths[3].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[3].actions[3].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:140",
+        "desktop/src/react/components/ActivityPanel.tsx:147",
+        "desktop/src/react/components/ActivityPanel.tsx:184",
+        "server/routes/config.ts:289"
+      ]
+    },
+    {
+      "no": 8,
+      "action_id": "ui:panel:automation#02",
+      "decision": "FIX",
+      "reason": "新增允许空提示词停用草稿，HTTP 和网络错误均 toast。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[4].error_empty_paths[1].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[4].error_empty_paths[1].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[4].actions[1].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[4].actions[1].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/AutomationPanel.tsx:149",
+        "desktop/src/react/components/automation/AutomationCard.tsx:124",
+        "server/routes/desk.ts:331",
+        "server/routes/desk.ts:1062"
+      ]
+    },
+    {
+      "no": 9,
+      "action_id": "ui:panel:automation#03",
+      "decision": "FIX",
+      "reason": "空提示词只拦启用，停用不受限；启用实际走 update，停用走 toggle。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[4].error_empty_paths[2].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[4].error_empty_paths[2].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[4].actions[2].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[4].actions[2].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/automation/AutomationCard.tsx:132",
+        "desktop/src/react/components/automation/AutomationCard.tsx:118",
+        "desktop/src/react/components/automation/AutomationCard.tsx:127",
+        "desktop/src/react/components/AutomationPanel.tsx:258"
+      ]
+    },
+    {
+      "no": 10,
+      "action_id": "ui:panel:automation#04",
+      "decision": "FIX",
+      "reason": "删除不受空提示词限制，请求异常不走新增时的 toast。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[4].error_empty_paths[3].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[4].error_empty_paths[3].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[4].actions[3].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[4].actions[3].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/AutomationPanel.tsx:117",
+        "desktop/src/react/components/automation/AutomationCard.tsx:124",
+        "server/routes/desk.ts:331",
+        "server/routes/desk.ts:1062"
+      ]
+    },
+    {
+      "no": 11,
+      "action_id": "ui:panel:automation#05",
+      "decision": "FIX",
+      "reason": "停用草稿可空提示词，无字段变更不发请求，更新失败不走新增 toast。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[4].error_empty_paths[4].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[4].error_empty_paths[4].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[4].actions[4].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[4].actions[4].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/AutomationPanel.tsx:126",
+        "desktop/src/react/components/automation/AutomationCard.tsx:124",
+        "server/routes/desk.ts:331",
+        "server/routes/desk.ts:1062"
+      ]
+    },
+    {
+      "no": 12,
+      "action_id": "ui:panel:bridge#01",
+      "decision": "SPECIFY",
+      "reason": "状态异常保留旧态，HTTP 200 错误体的会话目录可能变假空。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[5].error_empty_paths[0].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[5].actions[0].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:143",
+        "desktop/src/react/components/BridgePanel.tsx:86",
+        "desktop/src/react/components/BridgePanel.tsx:102",
+        "desktop/src/react/components/BridgePanel.tsx:103"
+      ]
+    },
+    {
+      "no": 13,
+      "action_id": "ui:panel:bridge#02",
+      "decision": "SCOPE",
+      "reason": "本动作读取共享会话消息，旧文混入独立 bridge/messages 路由的失败要求。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[5].error_empty_paths[1].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[5].actions[1].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:143",
+        "desktop/src/react/components/BridgePanel.tsx:359",
+        "desktop/src/react/components/BridgePanel.tsx:390",
+        "desktop/src/react/components/BridgePanel.tsx:489"
+      ]
+    },
+    {
+      "no": 14,
+      "action_id": "ui:panel:bridge#03",
+      "decision": "FIX",
+      "reason": "reset 响应业务失败仍可清本地会话，异常仅记日志无 toast。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[5].error_empty_paths[2].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[5].actions[2].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:143",
+        "desktop/src/react/components/BridgePanel.tsx:236",
+        "desktop/src/react/components/BridgePanel.tsx:381",
+        "server/routes/bridge.ts:658"
+      ]
+    },
+    {
+      "no": 15,
+      "action_id": "ui:panel:bridge#04",
+      "decision": "FIX",
+      "reason": "打开设置是本地状态动作，无窗口 IPC 错误提示。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[5].error_empty_paths[3].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[5].actions[3].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:143",
+        "desktop/src/react/components/BridgePanel.tsx:338",
+        "desktop/src/react/stores/settings-modal-actions.ts:9"
+      ]
+    },
+    {
+      "no": 16,
+      "action_id": "ui:panel:skills#01",
+      "decision": "FIX",
+      "reason": "技能读取失败虽 toast 并保留旧表，首次加载仍可能显示 noUser 空态。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[6].error_empty_paths[0].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[6].actions[0].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:142",
+        "desktop/src/react/components/SkillsPanel.tsx:180",
+        "desktop/src/react/components/SkillsPanel.tsx:202",
+        "desktop/src/react/components/SkillsPanel.tsx:213"
+      ]
+    },
+    {
+      "no": 17,
+      "action_id": "ui:panel:skills#04",
+      "decision": "SPECIFY",
+      "reason": "批量移动 Promise.all 允许部分成功，错误 toast 不代表整体回滚。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[6].error_empty_paths[3].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[6].actions[3].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:142",
+        "desktop/src/react/components/SkillsPanel.tsx:480",
+        "desktop/src/react/components/SkillsPanel.tsx:504",
+        "desktop/src/react/components/SkillsPanel.tsx:526"
+      ]
+    },
+    {
+      "no": 18,
+      "action_id": "ui:settings:about#03",
+      "decision": "EQUIVALENT",
+      "reason": "旧文对壳更新失败可见状态成立，新文收窄到 About 页消费者。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[7].error_empty_paths[3].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[7].actions[3].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/AboutTab.tsx:195",
+        "desktop/src/react/settings/tabs/AboutTab.tsx:235",
+        "desktop/src/react/settings/tabs/AboutTab.tsx:390",
+        "desktop/src/react/settings/tabs/AboutTab.tsx:475"
+      ]
+    },
+    {
+      "no": 19,
+      "action_id": "ui:settings:about#04",
+      "decision": "FIX",
+      "reason": "外链打开 void 调用未等待，失败无页面提示。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[7].error_empty_paths[4].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[7].actions[4].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/AboutTab.tsx:397",
+        "desktop/src/react/settings/tabs/AboutTab.tsx:459",
+        "desktop/src/react/settings/helpers.ts:91",
+        "server/routes/agents.ts:636"
+      ]
+    },
+    {
+      "no": 20,
+      "action_id": "ui:settings:access#04",
+      "decision": "FIX",
+      "reason": "剪贴板缺失可显示 copied，写入拒绝未捕获；连接失败另有提示。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[8].error_empty_paths[4].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[8].error_empty_paths[4].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[8].actions[4].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[8].actions[4].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/AccessTab.tsx:462",
+        "desktop/src/react/settings/tabs/AccessTab.tsx:587",
+        "desktop/src/react/settings/tabs/AccessTab.tsx:632",
+        "desktop/src/react/settings/tabs/AccessTab.tsx:681"
+      ]
+    },
+    {
+      "no": 21,
+      "action_id": "ui:settings:agent#03",
+      "decision": "FIX",
+      "reason": "Yuan 切换失败仅记日志，不能要求每项写失败都有可见提示。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[9].error_empty_paths[3].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[9].actions[3].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/AgentTab.tsx:340",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:350",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:380",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:129"
+      ]
+    },
+    {
+      "no": 22,
+      "action_id": "ui:settings:agent#04",
+      "decision": "SCOPE",
+      "reason": "旧文把独立记忆查看、清理和梦动作写进开关动作，漏辅助模型前置条件。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[9].error_empty_paths[4].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[9].error_empty_paths[4].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[9].actions[4].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[9].actions[4].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/AgentTab.tsx:227",
+        "desktop/src/react/settings/tabs/agent/AgentMemory.tsx:150",
+        "desktop/src/react/settings/tabs/agent/AgentMemory.tsx:156",
+        "desktop/src/react/settings/helpers.ts:91"
+      ]
+    },
+    {
+      "no": 23,
+      "action_id": "ui:settings:agent#05",
+      "decision": "SPECIFY",
+      "reason": "经验列表先乐观更新，PUT 失败 toast 但不自动回滚。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[9].error_empty_paths[5].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[9].actions[5].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/AgentTab.tsx:402",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:415",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:420",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:426"
+      ]
+    },
+    {
+      "no": 24,
+      "action_id": "ui:settings:bridge#01",
+      "decision": "SPECIFY",
+      "reason": "平台 status GET 失败返回 null 且仅记日志；加载失败不能当未配置。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[10].error_empty_paths[1].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[10].actions[1].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:72",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:274",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:328",
+        "server/routes/bridge.ts:356"
+      ]
+    },
+    {
+      "no": 25,
+      "action_id": "ui:settings:bridge#02",
+      "decision": "FIX",
+      "reason": "配置 2xx 后未检查 body.ok，可能假成功。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[10].error_empty_paths[2].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[10].actions[2].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:83",
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:129",
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:194",
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:248"
+      ]
+    },
+    {
+      "no": 26,
+      "action_id": "ui:settings:bridge#04",
+      "decision": "FIX",
+      "reason": "owner 写入 body.ok=false 仍可能显示成功 toast。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[10].error_empty_paths[4].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[10].actions[4].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:83",
+        "desktop/src/react/settings/tabs/bridge/PlatformSection.tsx:43",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:380",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:423"
+      ]
+    },
+    {
+      "no": 27,
+      "action_id": "ui:settings:bridge#06",
+      "decision": "FIX",
+      "reason": "公共说明读失败只 warn，保存异常 toast，响应状态检查不完整。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[10].error_empty_paths[6].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[10].actions[6].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:340",
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:347",
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:357",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:140"
+      ]
+    },
+    {
+      "no": 28,
+      "action_id": "ui:settings:experiments#01",
+      "decision": "FIX",
+      "reason": "目录 GET 异常没有专门错误态，观察记录失败写 null。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[13].error_empty_paths[1].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[13].actions[1].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:200",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:385",
+        "server/routes/experiments.ts:33",
+        "server/routes/experiments.ts:53"
+      ]
+    },
+    {
+      "no": 29,
+      "action_id": "ui:settings:experiments#02",
+      "decision": "FIX",
+      "reason": "PATCH 异常未由按钮转换为 toast 或统一回滚。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[13].error_empty_paths[2].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[13].actions[2].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:249",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:313",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:350",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:392"
+      ]
+    },
+    {
+      "no": 30,
+      "action_id": "ui:settings:experiments#03",
+      "decision": "FIX",
+      "reason": "DELETE 异常未由按钮转换为失败提示。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[13].error_empty_paths[3].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[13].actions[3].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:170",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:227",
+        "server/routes/experiments.ts:62",
+        "server/composition/open-root.ts:36"
+      ]
+    },
+    {
+      "no": 31,
+      "action_id": "ui:settings:general#01",
+      "decision": "FIX",
+      "reason": "开机启动 GET 失败隐藏开关，不能统一说保留快照或 toast。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[14].error_empty_paths[1].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[14].actions[1].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/GeneralTab.tsx:97",
+        "desktop/src/react/settings/tabs/GeneralTab.tsx:117",
+        "desktop/src/react/settings/tabs/GeneralTab.tsx:138",
+        "desktop/preload.cjs:73"
+      ]
+    },
+    {
+      "no": 32,
+      "action_id": "ui:settings:general#02",
+      "decision": "FIX",
+      "reason": "开机启动 IPC 失败只恢复旧开关，无 toast；保持唤醒另有 toast。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[14].error_empty_paths[2].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[14].actions[2].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/GeneralTab.tsx:204",
+        "desktop/src/react/settings/tabs/GeneralTab.tsx:218",
+        "desktop/src/react/settings/tabs/GeneralTab.tsx:282",
+        "desktop/src/react/settings/tabs/GeneralTab.tsx:294"
+      ]
+    },
+    {
+      "no": 33,
+      "action_id": "ui:settings:interface#02",
+      "decision": "FIX",
+      "reason": "外观保存失败仅 warn，当前外观不回滚且无 toast。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[15].error_empty_paths[2].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[15].actions[2].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:337",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:358",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:390",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:405"
+      ]
+    },
+    {
+      "no": 34,
+      "action_id": "ui:settings:interface#06",
+      "decision": "SPECIFY",
+      "reason": "语言保存失败仍可能成功 toast，时区失败另有错误 toast。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[15].error_empty_paths[6].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[15].actions[6].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:585",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:599",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:616",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:592"
+      ]
+    },
+    {
+      "no": 35,
+      "action_id": "ui:settings:keybindings#02",
+      "decision": "SPECIFY",
+      "reason": "快捷键重载失败可回滚前端，但服务端新绑定可能已持久化。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[16].error_empty_paths[2].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[16].actions[2].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/KeybindingsTab.tsx:169",
+        "desktop/src/react/settings/tabs/KeybindingsTab.tsx:219",
+        "desktop/src/react/settings/tabs/KeybindingsTab.tsx:428",
+        "desktop/src/react/settings/tabs/KeybindingsTab.tsx:438"
+      ]
+    },
+    {
+      "no": 36,
+      "action_id": "ui:settings:keybindings#03",
+      "decision": "FIX",
+      "reason": "恢复默认值的重载失败可回滚显示，服务端默认值可能已持久化。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[16].error_empty_paths[3].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[16].actions[3].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/KeybindingsTab.tsx:305",
+        "desktop/src/react/settings/tabs/KeybindingsTab.tsx:310",
+        "desktop/src/react/settings/tabs/KeybindingsTab.tsx:316",
+        "desktop/src/react/settings/tabs/KeybindingsTab.tsx:371"
+      ]
+    },
+    {
+      "no": 37,
+      "action_id": "ui:settings:mcp#01",
+      "decision": "FIX",
+      "reason": "连接器或权限读取失败仅记日志，保留旧状态，无专门错误态或 toast。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[17].error_empty_paths[1].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[17].actions[1].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/McpTab.tsx:68",
+        "desktop/src/react/settings/tabs/mcp/mcp-api.ts:22",
+        "desktop/src/react/settings/tabs/McpTab.tsx:311",
+        "server/routes/mcp.ts:41"
+      ]
+    },
+    {
+      "no": 38,
+      "action_id": "ui:settings:mcp#06",
+      "decision": "FIX",
+      "reason": "取消和外链拒绝不按旧文分别提示，轮询 cancelled 后仍可能刷新并提示保存成功。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[17].error_empty_paths[6].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[17].error_empty_paths[6].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[17].actions[6].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[17].actions[6].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/McpTab.tsx:177",
+        "desktop/src/react/settings/tabs/mcp/OAuthWaitCard.tsx:24",
+        "desktop/src/react/settings/tabs/mcp/mcp-api.ts:22",
+        "server/routes/mcp.ts:351"
+      ]
+    },
+    {
+      "no": 39,
+      "action_id": "ui:settings:models#05",
+      "decision": "FIX",
+      "reason": "图片配置 GET 失败未显示专门提示，PUT 失败才 toast。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[19].error_empty_paths[5].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[19].actions[5].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:95",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:328",
+        "server/routes/media.ts:154"
+      ]
+    },
+    {
+      "no": 40,
+      "action_id": "ui:settings:models#06",
+      "decision": "FIX",
+      "reason": "视频配置 GET 失败未显示专门提示，PUT 失败才 toast。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[19].error_empty_paths[6].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[19].actions[6].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:111",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:328",
+        "server/routes/media.ts:176"
+      ]
+    },
+    {
+      "no": 41,
+      "action_id": "ui:settings:models#07",
+      "decision": "FIX",
+      "reason": "合成配置 GET 失败未显示专门提示，PUT 失败才 toast。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[19].error_empty_paths[7].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[19].actions[7].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:127",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:328",
+        "server/routes/media.ts:78"
+      ]
+    },
+    {
+      "no": 42,
+      "action_id": "ui:settings:models#08",
+      "decision": "EQUIVALENT",
+      "reason": "转录配置 GET 和 PUT 失败均有 toast，新文另补占位状态。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[19].error_empty_paths[8].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[19].actions[8].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:143",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:328",
+        "server/routes/speech-recognition.ts:67"
+      ]
+    },
+    {
+      "no": 43,
+      "action_id": "ui:settings:providers#01",
+      "decision": "FIX",
+      "reason": "摘要请求失败被空 catch 吞下，无摘要专用错误状态。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].error_empty_paths[1].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].error_empty_paths[1].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].actions[1].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].actions[1].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/ProvidersTab.tsx:13",
+        "desktop/src/react/settings/tabs/../actions.ts:29",
+        "server/routes/providers.ts:122",
+        "server/routes/config.ts:190"
+      ]
+    },
+    {
+      "no": 44,
+      "action_id": "ui:settings:providers#02",
+      "decision": "SPECIFY",
+      "reason": "选择供应商只是本地状态，提交自定义表单才保存；旧文只谈保存失败。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].error_empty_paths[2].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].error_empty_paths[2].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].actions[2].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].actions[2].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/ProvidersTab.tsx:82",
+        "desktop/src/react/settings/tabs/ProvidersTab.tsx:164",
+        "desktop/src/react/settings/tabs/providers/ProviderList.tsx:92",
+        "desktop/src/react/settings/tabs/providers/ProviderList.tsx:96"
+      ]
+    },
+    {
+      "no": 45,
+      "action_id": "ui:settings:providers#04",
+      "decision": "SCOPE",
+      "reason": "无凭据 needs_setup 等价；旧文把连接测试的认证失败混入保存动作。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].error_empty_paths[4].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].error_empty_paths[4].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].actions[4].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].actions[4].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/ProviderDetail.tsx:54",
+        "desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx:18",
+        "desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx:159",
+        "server/routes/config.ts:183"
+      ]
+    },
+    {
+      "no": 46,
+      "action_id": "ui:settings:providers#05",
+      "decision": "FIX",
+      "reason": "发现零项显示失败提示；发现候选并非已保存模型。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].error_empty_paths[5].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].error_empty_paths[5].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].actions[5].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].actions[5].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:179",
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:225",
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:247",
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:362"
+      ]
+    },
+    {
+      "no": 47,
+      "action_id": "ui:settings:providers#06",
+      "decision": "FIX",
+      "reason": "输入框空仍可用已存凭据测试，不能一律禁用。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].error_empty_paths[6].empty_or_uninitialized"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].actions[6].empty_or_uninitialized"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx:236",
+        "desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx:239",
+        "desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx:242",
+        "desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx:186"
+      ]
+    },
+    {
+      "no": 48,
+      "action_id": "ui:settings:providers#07",
+      "decision": "FIX",
+      "reason": "无已添加媒体模型时按钮不出现，不是禁用选项。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].error_empty_paths[7].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].error_empty_paths[7].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].actions[7].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].actions[7].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:690",
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:698",
+        "desktop/src/react/settings/tabs/providers/ProviderMediaDefaultsModal.tsx:17",
+        "server/routes/media.ts:154"
+      ]
+    },
+    {
+      "no": 49,
+      "action_id": "ui:settings:providers#08",
+      "decision": "SPECIFY",
+      "reason": "偏好保存和 API key 验证为不同结果，选择不等于验证。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].error_empty_paths[8].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].error_empty_paths[8].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].actions[8].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].actions[8].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/ProvidersTab.tsx:256",
+        "desktop/src/react/settings/tabs/providers/SearchProviderSection.tsx:36",
+        "desktop/src/react/settings/tabs/providers/SearchApiKeyConfig.tsx:62",
+        "server/routes/preferences.ts:187"
+      ]
+    },
+    {
+      "no": 50,
+      "action_id": "ui:settings:providers#09",
+      "decision": "FIX",
+      "reason": "启动失败 toast，但 openExternal 未等待，拒绝不会进入启动 catch。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].error_empty_paths[9].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].actions[9].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/ProviderDetail.tsx:50",
+        "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx:25",
+        "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx:40",
+        "server/routes/auth.ts:194"
+      ]
+    },
+    {
+      "no": 51,
+      "action_id": "ui:settings:providers#11",
+      "decision": "FIX",
+      "reason": "轮询不检查 res.ok，非成功且无 status 可直到超时而无错误 toast。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].error_empty_paths[11].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].actions[11].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx:82",
+        "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx:100",
+        "server/routes/auth.ts:322",
+        "server/routes/auth.ts:133"
+      ]
+    },
+    {
+      "no": 52,
+      "action_id": "ui:settings:providers#12",
+      "decision": "FIX",
+      "reason": "退出 HTTP 错误响应未检查，可能显示成功并刷新。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].error_empty_paths[12].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[20].actions[12].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx:107",
+        "server/routes/auth.ts:72",
+        "server/routes/auth.ts:372"
+      ]
+    },
+    {
+      "no": 53,
+      "action_id": "ui:settings:security#01",
+      "decision": "FIX",
+      "reason": "sandbox 未初始化是 undefined/loading，只有明确 false 才警告。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[21].error_empty_paths[1].empty_or_uninitialized"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[21].actions[1].empty_or_uninitialized"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:88",
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:93",
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:156",
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:172"
+      ]
+    },
+    {
+      "no": 54,
+      "action_id": "ui:settings:security#02",
+      "decision": "FIX",
+      "reason": "检查点列表读取失败设空且无警告，可能假空态。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[21].error_empty_paths[2].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[21].actions[2].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:98",
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:122",
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:184",
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:200"
+      ]
+    },
+    {
+      "no": 55,
+      "action_id": "ui:settings:sharing#01",
+      "decision": "EQUIVALENT",
+      "reason": "旧、新文都描述 localStorage 写失败无捕获或错误 UI；新文更具体。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[22].error_empty_paths[1].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[22].actions[1].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SharingTab.tsx:35",
+        "desktop/src/react/settings/tabs/SharingTab.tsx:81",
+        "desktop/src/react/settings/tabs/SharingTab.tsx:92",
+        "desktop/src/react/utils/screenshot-segments.ts:8"
+      ]
+    },
+    {
+      "no": 56,
+      "action_id": "ui:settings:sharing#02",
+      "decision": "EQUIVALENT",
+      "reason": "旧、新文都描述 localStorage 写失败无捕获或错误 UI；新文更具体。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[22].error_empty_paths[2].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[22].actions[2].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SharingTab.tsx:38",
+        "desktop/src/react/settings/tabs/SharingTab.tsx:101",
+        "desktop/src/react/settings/tabs/SharingTab.tsx:113"
+      ]
+    },
+    {
+      "no": 57,
+      "action_id": "ui:settings:sharing#03",
+      "decision": "EQUIVALENT",
+      "reason": "旧、新文都描述 localStorage 写失败无捕获或错误 UI；新文更具体。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[22].error_empty_paths[3].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[22].actions[3].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SharingTab.tsx:41",
+        "desktop/src/react/settings/tabs/SharingTab.tsx:52",
+        "desktop/src/react/settings/tabs/SharingTab.tsx:130",
+        "desktop/src/react/settings/tabs/SharingTab.tsx:144"
+      ]
+    },
+    {
+      "no": 58,
+      "action_id": "ui:settings:skills#07",
+      "decision": "FIX",
+      "reason": "配置未就绪不是明确无配置的缺省，autoSaveConfig 失败不能视为保存成功。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[23].error_empty_paths[7].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[23].error_empty_paths[7].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[23].actions[7].empty_or_uninitialized",
+        "R00-T02_UI_ACTION_MATRIX.json.pages[23].actions[7].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:577",
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:117",
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:143",
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:155"
+      ]
+    },
+    {
+      "no": 59,
+      "action_id": "ui:settings:skills#08",
+      "decision": "SCOPE",
+      "reason": "旧文把后续 PUT 失败错误绑到自动 GET 动作。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[23].error_empty_paths[8].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[23].actions[8].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:32",
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:59",
+        "server/routes/preferences.ts:410",
+        "server/routes/preferences.ts:385"
+      ]
+    },
+    {
+      "no": 60,
+      "action_id": "ui:settings:usage#01",
+      "decision": "SCOPE",
+      "reason": "health/settings 初始均 null 属整个控制面；本行动只记 settings 自动加载。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[24].error_empty_paths[1].empty_or_uninitialized"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[24].actions[1].empty_or_uninitialized"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/UsageTab.tsx:11",
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:95",
+        "desktop/src/react/settings/tabs/observability/model-observability-actions.ts:246",
+        "server/routes/model-observability.ts:89"
+      ]
+    },
+    {
+      "no": 61,
+      "action_id": "ui:settings:usage#02",
+      "decision": "EQUIVALENT",
+      "reason": "加载期保留控制面容器与 health 未就绪不算零用量相容。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[24].error_empty_paths[2].empty_or_uninitialized"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[24].actions[2].empty_or_uninitialized"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:95",
+        "desktop/src/react/settings/tabs/observability/model-observability-actions.ts:204",
+        "server/routes/model-observability.ts:80"
+      ]
+    },
+    {
+      "no": 62,
+      "action_id": "ui:settings:usage#04",
+      "decision": "FIX",
+      "reason": "用量指标现役十卡，旧文字八卡错误。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[24].error_empty_paths[4].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[24].actions[4].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:128",
+        "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:133",
+        "desktop/src/react/settings/tabs/observability/ObservabilityMetrics.tsx:67",
+        "server/routes/model-observability.ts:159"
+      ]
+    },
+    {
+      "no": 63,
+      "action_id": "ui:settings:usage#05",
+      "decision": "FIX",
+      "reason": "四图各自失败不清其他图，且现役十卡，不是八卡。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[24].error_empty_paths[5].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[24].actions[5].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:160",
+        "desktop/src/react/settings/tabs/observability/observability-charts.tsx:52",
+        "desktop/src/react/settings/tabs/observability/ObservabilityHeatCalendar.tsx:46",
+        "desktop/src/react/settings/tabs/observability/ObservabilityModelTrendChart.tsx:43"
+      ]
+    },
+    {
+      "no": 64,
+      "action_id": "ui:settings:usage#06",
+      "decision": "FIX",
+      "reason": "点击更多失败时全页 alert 遮住已加载行，旧文称继续保留行会误验。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[24].error_empty_paths[6].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[24].actions[6].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:219",
+        "desktop/src/react/settings/tabs/observability/ObservabilityLedgerPanel.tsx:29",
+        "desktop/src/react/settings/tabs/observability/ObservabilityCallLedger.tsx:133",
+        "desktop/src/react/settings/tabs/observability/ObservabilityCallLedger.tsx:333"
+      ]
+    },
+    {
+      "no": 65,
+      "action_id": "ui:settings:usage#09",
+      "decision": "SPECIFY",
+      "reason": "首次失败和更多失败均 alert；更多失败时遮住已加载行。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[24].error_empty_paths[9].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[24].actions[9].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:227",
+        "desktop/src/react/settings/tabs/observability/ObservabilityTracesPanel.tsx:21",
+        "desktop/src/react/settings/tabs/observability/ObservabilityTraceExplorer.tsx:124",
+        "desktop/src/react/settings/tabs/observability/ObservabilityTraceExplorer.tsx:241"
+      ]
+    },
+    {
+      "no": 66,
+      "action_id": "ui:settings:usage#13",
+      "decision": "SPECIFY",
+      "reason": "FSA 写入中断可留部分文件，Electron IPC abort 会清理目标文件。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[24].error_empty_paths[13].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[24].actions[13].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:162",
+        "desktop/src/react/settings/tabs/observability/ObservabilityExportDialog.tsx:247",
+        "desktop/src/react/settings/tabs/observability/model-observability-actions.ts:344",
+        "desktop/src/react/settings/tabs/observability/observability-export-save.ts:36"
+      ]
+    },
+    {
+      "no": 67,
+      "action_id": "ui:settings:work#01",
+      "decision": "FIX",
+      "reason": "desk 配置 GET 失败只 warn 且 agentDesk 为 null，无专门错误提示。",
+      "old_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[25].error_empty_paths[1].failure_or_forbidden"
+      ],
+      "current_action_field_paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[25].actions[1].failure_or_forbidden"
+      ],
+      "source_refs": [
+        "desktop/src/react/settings/tabs/WorkTab.tsx:115",
+        "desktop/src/react/settings/tabs/WorkTab.tsx:265",
+        "desktop/src/react/settings/tabs/WorkTab.tsx:284",
+        "server/routes/agents.ts:557"
+      ]
+    }
+  ],
+  "additional_findings": [
+    {
+      "id": "A1",
+      "kind": "CURRENT_ACTION_WRONG",
+      "paths": [
+        "R00-T02_UI_ACTION_MATRIX.json.pages[3].actions[2].failure_or_forbidden",
+        "FEATURE_STAGE_ACCEPTANCE.json.supplemental_scenarios[697].assertions"
+      ],
+      "finding": "活动升级失败未 toast；现役 ActivityPanel.tsx:155-169 仅直接 return 或 console.error。"
+    },
+    {
+      "id": "A2",
+      "kind": "MASTER_INVENTORY_CONTRADICTION",
+      "paths": [
+        "FEATURE_INVENTORY.json.features[697].user_action",
+        "FEATURE_INVENTORY.json.features[697].visible_result",
+        "R00-T02_NONHTTP_AUDIT_UI.json.reviews[57].user_action"
+      ],
+      "finding": "活动升级为普通会话，不创建定时任务。"
+    },
+    {
+      "id": "A3",
+      "kind": "MASTER_INVENTORY_MISSING_ACTIONS",
+      "paths": [
+        "FEATURE_INVENTORY.json.features[696].user_action",
+        "FEATURE_INVENTORY.json.features[696].visible_result",
+        "FEATURE_INVENTORY.json.features[696].refusal_or_boundary",
+        "FEATURE_INVENTORY.json.features[703].user_action",
+        "FEATURE_INVENTORY.json.features[703].visible_result",
+        "FEATURE_INVENTORY.json.features[703].refusal_or_boundary"
+      ],
+      "finding": "map 页摘要只列 6 项，漏矩阵 #07；agent 页摘要只列 10 项，漏矩阵 #11-#18。"
+    },
+    {
+      "id": "A4",
+      "kind": "MASTER_INVENTORY_CONTRADICTION",
+      "paths": [
+        "FEATURE_INVENTORY.json.features[695].user_action",
+        "FEATURE_INVENTORY.json.features[695].visible_result",
+        "FEATURE_INVENTORY.json.features[701].user_action",
+        "FEATURE_INVENTORY.json.features[714].user_action",
+        "FEATURE_INVENTORY.json.features[714].visible_result",
+        "FEATURE_INVENTORY.json.features[718].user_action",
+        "FEATURE_INVENTORY.json.features[718].visible_result"
+      ],
+      "finding": "slash 不要求流式回答；About 历史只在点击后加载；provider 默认参数弹窗不改变全局默认模型；用量为十卡。"
+    }
+  ],
+  "note": "字段数组下标按首次读取时页和动作顺序定位；修复后须重算位置与 SHA。"
+}

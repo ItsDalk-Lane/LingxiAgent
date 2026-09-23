@@ -1,0 +1,519 @@
+{
+  "schema_version": "r00-t02-branch-closure-evidence.v1",
+  "role": "第五轮修复的只读源码分支与消费者闭包证据；不是独立验收或 PASS 裁决",
+  "source_sha": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+  "input_audit": "docs/rust-tauri/R00/R00-T02_SOURCE_BRANCH_AUDIT.json",
+  "inventory_gate_findings": [
+    {
+      "id": "R5-F01",
+      "generator": "docs/rust-tauri/R00/r00_t02_inventory.py:450-500,506-559",
+      "why_passes": "统一行仅核登记/场景 ID、候选逐叶记录摘要、候选自报 source_scope 与当前文件 SHA；逐叶报告仅核字段非空及自报源码摘要。branch_selectors 未与源码 action 值集逐值双向比较。改源码后同步逐叶源码摘要、统一行源码摘要和 audit_record_sha256，旧分支文字、结果、断言不动仍可通过。"
+    },
+    {
+      "id": "R5-F02",
+      "generator": "docs/rust-tauri/R00/r00_t02_inventory.py:485-500",
+      "why_passes": "required_sources 只并集登记、叶和审查自报 source_ref/哈希，不从 JSX、hook、API、状态与最终显示独立求闭包；ui:settings:usage 的范围只有 SettingsNav、SettingsContent、UsageTab，实际 setAggregate 所在文件不入摘要。"
+    },
+    {
+      "id": "R5-F03",
+      "generator": "docs/rust-tauri/R00/r00_t02_inventory.py:506-559,1389",
+      "why_passes": "SUPPORT 只查 supported_feature_ids 非空、ID 存在且非自身，场景 ID 又从支持 ID 机械推得；缺少页面动作到实际效果叶及成功/失败投影的反向核对。"
+    }
+  ],
+  "extraction_rules": [
+    {
+      "id": "source-entry",
+      "method": "以生产注册和路由/工具/页面真实调用点为根，解析 TS/TSX/JS/CJS AST；给每个函数、组件、可见控件、API 路径建立符号身份。解析 import/export、别名和静态对象映射；遇未知目标输出 MANUAL，不能当作无分支。",
+      "output": "入口→绑定符号→调用边及定位"
+    },
+    {
+      "id": "branch-values",
+      "method": "追踪由输入或异步返回值解构、别名赋值、可选链传播的判定值；抽取 if/else-if、switch case、三元、短路、includes、提前 return/throw/catch 中的比较值与默认剩余分支。条件规范化为「来源符号/属性路径、运算符、字面值集合、优先顺序、结果终点」。与独立人工分支契约双向比较；新增/删改字面值、默认边或终点，即使 SHA 全同步也须过期。",
+      "output": "每个来源变量的 value/guard/default/result 签名；不可静态确定的值标 MANUAL"
+    },
+    {
+      "id": "reachability",
+      "method": "从上游生产者寻找值来源、校验和调用路径；分清当前真实可达值、仅在修改上游后可达值与未知扩展。人工裁决 SAME_EFFECT_WITH_VARIANTS/SPLIT/INTERNAL_STEP/UNREACHABLE 必须附上游约束和可见结果；不能仅凭值名自动判同效。",
+      "output": "可达性证据、正/拒绝结果、F-ID 与适用场景"
+    },
+    {
+      "id": "consumer-closure",
+      "method": "从页面 JSX 组合根追 import、条件渲染、props 回调、自定义 hook/store action、请求客户端、API 路由/服务；从 API 成功数据与错误类型反向追转换、state setter、最终可见文本/卡/图/alert。必要路径文件和分支与 source_scope 双向比对；对动态 import、订阅与回调目标不明列 MANUAL。",
+      "output": "带 source/target/line/branch 的 consumer_edges 和必要范围"
+    },
+    {
+      "id": "support-bijection",
+      "method": "每个可见控件或自动加载分别建立入口→请求/桥→实际效果叶→成功/失败场景；反向确认被支持叶确由该入口触发。多动作页面允许一对多。检查场景断言是否区分成功、正常零数据、未初始化、请求失败、无权限。",
+      "output": "动作覆盖差集和错挂支持边"
+    },
+    {
+      "id": "change-gate",
+      "method": "独立提取器输出与人工维护、不得由本轮候选自生的契约相比。源码 SHA 只使结论过期；全套摘要同步不能使新值或新消费者自动结案。人工契约也可同时被修改时，仍需未参与修复者复审语义。",
+      "output": "精确入口、源码位置、遗漏值/消费者/动作及非零退出"
+    }
+  ],
+  "branch_signature_candidates": [
+    {
+      "entry_id": "tool:ask_user",
+      "source": "lib/tools/ask-user-tool.ts:231-315",
+      "producer_edges": [
+        "lib/tools/ask-user-tool.ts:247-275 ConfirmStore.create(\"ask_user\")→promise",
+        "lib/confirm-store.ts:70-75 timer→action=timeout",
+        "lib/confirm-store.ts:97-103 resolve(confirmId,action,value)→action 任意传入值",
+        "lib/confirm-store.ts:126-134 abortBySession→action=aborted",
+        "server/routes/confirm.ts:17-20 HTTP action 校验仅 confirmed/rejected；:37 resolve 传值"
+      ],
+      "tracked_value": "decision?.action → action",
+      "current_guards": [
+        {
+          "guard": "action === \"confirmed\"",
+          "loc": "lib/tools/ask-user-tool.ts:279-293",
+          "result": "toolOk answered=true,timedOut=false,映射用户答案"
+        },
+        {
+          "guard": "action === \"timeout\"",
+          "loc": "lib/tools/ask-user-tool.ts:295-309",
+          "result": "toolOk answered=true,timedOut=true，按推荐项自动选择"
+        },
+        {
+          "guard": "action === \"aborted\"",
+          "loc": "lib/tools/ask-user-tool.ts:311-312",
+          "result": "toolOk answered=false,aborted=true,answers=[]"
+        },
+        {
+          "guard": "remaining/default",
+          "loc": "lib/tools/ask-user-tool.ts:314",
+          "result": "toolOk answered=false,dismissed=true,answers=[]；当前 rejected 落此路径"
+        }
+      ],
+      "important_boundary": "现行 HTTP 校验只放 confirmed/rejected；R5 反例在工具判定前新增 skipped 分支但上游仍未产生 skipped。它是语法上可执行的新分流；要声称当前生产可达，应同时证明或新增上游产值。静态门禁至少报未审新分支，不得因当前上游闭集擅自吞掉。",
+      "reviewed_selector_text": [
+        "single/multi/text",
+        "confirmed",
+        "timeout（有/无推荐）",
+        "dismissed",
+        "aborted"
+      ],
+      "candidate_ast_key": "await promise → decision?.action → ordered equality cases confirmed|timeout|aborted|default；结果 toolOk/toolError 与 flags"
+    },
+    {
+      "entry_id": "route:confirm:POST:/confirm/:confirmId",
+      "source": "server/routes/confirm.ts:14-50",
+      "tracked_value": "body.action",
+      "current_guards": [
+        {
+          "guard": "!action || ![\"confirmed\",\"rejected\"].includes(action)",
+          "loc": "server/routes/confirm.ts:19-21",
+          "result": "400 invalid action"
+        },
+        {
+          "guard": "!pending",
+          "loc": "server/routes/confirm.ts:23-26",
+          "result": "404"
+        },
+        {
+          "guard": "!auth.allowed",
+          "loc": "server/routes/confirm.ts:28-35",
+          "result": "403 insufficient_scope"
+        },
+        {
+          "guard": "!confirmStore.resolve(...)",
+          "loc": "server/routes/confirm.ts:37-40",
+          "result": "404"
+        },
+        {
+          "guard": "remaining",
+          "loc": "server/routes/confirm.ts:42-50",
+          "result": "广播 confirmation_resolved，200 ok"
+        }
+      ],
+      "candidate_ast_key": "body.action ∈ {confirmed,rejected} + invalid/default；授权/待决/resolve 早退及 status/result"
+    },
+    {
+      "entry_id": "builtin-plugin-tool:beautify:create-cover",
+      "source": "plugins/beautify/tools/create-cover.ts:45-103",
+      "current_guards": [
+        {
+          "guard": "target path 缺失/非绝对或后缀非 md",
+          "loc": "plugins/beautify/tools/create-cover.ts:61-67",
+          "result": "失败文本；不复制"
+        },
+        {
+          "guard": "generated path 缺失/非绝对",
+          "loc": "plugins/beautify/tools/create-cover.ts:69-72",
+          "result": "失败文本；不复制"
+        },
+        {
+          "guard": "service success/catch",
+          "loc": "plugins/beautify/tools/create-cover.ts:74-103",
+          "result": "附件复制与 Markdown cover；异常转失败文本"
+        }
+      ],
+      "helper": "plugins/beautify/lib/markdown-cover-service.ts:189-220 绝对路径/扩展名/stat 预检后先复制附件、再解析 frontmatter；解析失败可能留附件",
+      "candidate_ast_key": "两个别名路径解析 + 拒绝守卫 + helper 副作用顺序 + success/catch"
+    },
+    {
+      "entry_id": "builtin-plugin-tool:beautify:apply-cover-candidate",
+      "source": "plugins/beautify/tools/apply-cover-candidate.ts:31-70",
+      "current_guards": [
+        {
+          "guard": "target path 缺失/非绝对",
+          "loc": "plugins/beautify/tools/apply-cover-candidate.ts:32-34",
+          "result": "失败文本"
+        },
+        {
+          "guard": "generated path 缺失/非绝对",
+          "loc": "plugins/beautify/tools/apply-cover-candidate.ts:35-37",
+          "result": "失败文本"
+        },
+        {
+          "guard": "service success/catch",
+          "loc": "plugins/beautify/tools/apply-cover-candidate.ts:39-69",
+          "result": "封面写入或失败文本"
+        }
+      ],
+      "helper": "plugins/beautify/lib/markdown-cover-service.ts:189-220 负责后缀/存在性及复制后 frontmatter；本入口没有 create-cover 的目标 md 后缀前置守卫",
+      "candidate_ast_key": "直接参数 + 两条绝对路径守卫 + 同一 helper 副作用顺序 + success/catch"
+    }
+  ],
+  "consumer_edges": [
+    {
+      "from": "desktop/src/react/settings/SettingsContent.tsx",
+      "to": "desktop/src/react/settings/tabs/UsageTab.tsx",
+      "relation": "选中 usage 页签后渲染",
+      "necessity": "页面入口"
+    },
+    {
+      "from": "desktop/src/react/settings/tabs/UsageTab.tsx:2,14",
+      "to": "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:64",
+      "relation": "静态 import 与 JSX 组件挂载",
+      "necessity": "必需；当前 source_scope 缺失目标"
+    },
+    {
+      "from": "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:66-72,200-202",
+      "to": "desktop/src/react/settings/tabs/observability/use-observability-query-state.ts:70-89,95-105",
+      "relation": "usageState 的 appliedFilter、立即选择和草稿提交",
+      "necessity": "筛选到请求必需；当前 source_scope 缺失目标"
+    },
+    {
+      "from": "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:200-202",
+      "to": "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:93-126",
+      "relation": "usage 子标签条件渲染并传 state/refreshToken",
+      "necessity": "用量消费者必需；当前 source_scope 缺失目标"
+    },
+    {
+      "from": "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:93-110",
+      "to": "desktop/src/react/settings/tabs/observability/model-observability-filter.ts",
+      "relation": "appliedFilter 经 buildCallFilterInput 转查询过滤条件",
+      "necessity": "筛选语义必需"
+    },
+    {
+      "from": "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:108-124",
+      "to": "desktop/src/react/settings/tabs/observability/model-observability-actions.ts:303-307",
+      "relation": "整体用量 queryObservabilityAggregate(groupBy=[])；成功 setAggregate(result):113；not_initialized 置 null；普通错误存 aggregateError",
+      "necessity": "请求和结果分流必需"
+    },
+    {
+      "from": "desktop/src/react/settings/tabs/observability/model-observability-actions.ts:303-307",
+      "to": "desktop/src/react/settings/tabs/observability/model-observability-actions.ts:115-153,188-197",
+      "relation": "POST JSON 经连接和授权头送服务端；非 2xx/业务错误抛 ModelObservabilityRequestError",
+      "necessity": "API 成功/失败语义必需"
+    },
+    {
+      "from": "desktop/src/react/settings/tabs/observability/model-observability-actions.ts:307",
+      "to": "server/routes/model-observability.ts:159-170",
+      "relation": "POST /api/model-observability/query/aggregate；normalize 后 queryAggregate，返回结果或错误",
+      "necessity": "后端效果叶，需与 semantic-effect:model-observability.model_observability_query_aggregate.post 对接"
+    },
+    {
+      "from": "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:113,150-159",
+      "to": "desktop/src/react/settings/tabs/observability/ObservabilityMetrics.tsx:67-100",
+      "relation": "aggregate?.overall→指标卡；null→占位横线；普通错误→role=alert data-kind=query_failed，不渲染指标卡",
+      "necessity": "最终可见成功/空态/错误投影必需"
+    },
+    {
+      "from": "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:129-144",
+      "to": "desktop/src/react/settings/tabs/observability/ObservabilityMetrics.tsx:67-100",
+      "relation": "date/model 两组聚合→computeInsights→setInsights→附加指标；失败保持上次值",
+      "necessity": "洞察指标独立请求，不可与 overall 失败混作一个结果"
+    },
+    {
+      "from": "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:161-164",
+      "to": "desktop/src/react/settings/tabs/observability/observability-charts.tsx:36-76",
+      "relation": "四图各经 useObservabilityChartBuckets 独立按固定窗口和维度请求聚合，setBuckets 或错误",
+      "necessity": "图表独立消费支路；setAggregate(null) 反例影响指标卡，不必然破坏四图"
+    },
+    {
+      "from": "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:95-113,142-151",
+      "to": "desktop/src/react/settings/tabs/observability/model-observability-actions.ts:203-204,252-253",
+      "relation": "health/settings bootstrap；失败以 role=alert 的 forbidden/network 显示",
+      "necessity": "控制面错误支路；现行「请求失败显示空态」与源码相反"
+    },
+    {
+      "from": "desktop/src/react/settings/tabs/ModelsTab.tsx:5-6,18-22",
+      "to": "desktop/src/react/settings/tabs/providers/AuxiliaryModelsSection.tsx:149-186",
+      "relation": "辅助模型槽选择/保存/测试；并非 Anthropic 唯一效果",
+      "necessity": "models 多动作页一条必需子链"
+    },
+    {
+      "from": "desktop/src/react/settings/tabs/ModelsTab.tsx:5-6,21",
+      "to": "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:90-115",
+      "relation": "图片/视频/语音生成与转录四种默认模型保存",
+      "necessity": "models 多动作页另一条必需子链"
+    },
+    {
+      "from": "desktop/src/react/settings/tabs/ProvidersTab.tsx:82-125,194-258",
+      "to": "desktop/src/react/settings/tabs/providers/ProviderDetail.tsx",
+      "relation": "运行时供应商集合列表选择、详情设置及添加/搜索子页；非 Anthropic 唯一动作",
+      "necessity": "providers 动态列表需保守展开或 MANUAL"
+    }
+  ],
+  "r5_negative_controls": [
+    {
+      "id": "R5-F01-ask-skipped-all-digests",
+      "mutation": "在 lib/tools/ask-user-tool.ts:279 confirmed 前插入 if(action === \"skipped\") return toolError(\"skipped\")；同步逐叶 reviewed_source_sha256、统一 reviewed_source_sha256/audit_record_sha256，其余裁决和场景不变",
+      "r5_observed": "完整 build() 返回 735 叶",
+      "required_new_gate": "非零；定位 tool:ask_user 新值 skipped、对应结果 toolError 与未审场景。若上游尚无 skipped，须记录上游不可达证明，仍不可静默并入旧 default。"
+    },
+    {
+      "id": "R5-F02-usage-final-setter",
+      "mutation": "仅在内存把 ObservabilityUsagePanel.tsx:113 setAggregate(result) 改为 setAggregate(null)，现有候选及摘要不变",
+      "r5_observed": "完整 build() 返回 832 登记、735 叶",
+      "required_new_gate": "非零；报告 ui:settings:usage 必需消费者/成功赋值不在冻结范围或签名变化；成功聚合指标变占位。四图独立请求，不据此声称四图必然归零。"
+    },
+    {
+      "id": "R5-F03-wrong-support-edge",
+      "mutation": "保持 ui:settings:usage→observability-export、ui:settings:models/providers→provider:anthropic 的现存非空目标，仍不登记实际聚合/模型/供应商动作边",
+      "r5_observed": "自报 ID/场景存在校验可通过；真实源码显示动作错挂",
+      "required_new_gate": "非零；逐控件/自动加载指出无对应效果叶及正反断言；普通请求错误须为 alert，不能写空态。"
+    }
+  ],
+  "risk_count_method": "从 832 个 R00-T02_SOURCE_BRANCH_AUDIT.reviews 逐行按 kind 精确计数；empty_branch_selectors 仅说明统一行未列值，HTTP 另有 G1/G2/G3 逐叶审查，不能由空数组单独推断语义错误。source_scope 文件数只能度量宽度，不能证明闭包。",
+  "by_kind_risk_counts": {
+    "bridge_adapter": {
+      "entries": 5,
+      "support_entries": 0,
+      "empty_branch_selectors": 0,
+      "source_scope_file_count_min": 2,
+      "source_scope_file_count_max": 2
+    },
+    "builtin_plugin": {
+      "entries": 4,
+      "support_entries": 4,
+      "empty_branch_selectors": 0,
+      "source_scope_file_count_min": 4,
+      "source_scope_file_count_max": 9
+    },
+    "builtin_plugin_adapter": {
+      "entries": 2,
+      "support_entries": 0,
+      "empty_branch_selectors": 0,
+      "source_scope_file_count_min": 3,
+      "source_scope_file_count_max": 4
+    },
+    "builtin_plugin_tool": {
+      "entries": 13,
+      "support_entries": 6,
+      "empty_branch_selectors": 0,
+      "source_scope_file_count_min": 7,
+      "source_scope_file_count_max": 9
+    },
+    "cli": {
+      "entries": 13,
+      "support_entries": 0,
+      "empty_branch_selectors": 13,
+      "source_scope_file_count_min": 2,
+      "source_scope_file_count_max": 3
+    },
+    "experiment": {
+      "entries": 1,
+      "support_entries": 0,
+      "empty_branch_selectors": 0,
+      "source_scope_file_count_min": 3,
+      "source_scope_file_count_max": 3
+    },
+    "ipc": {
+      "entries": 86,
+      "support_entries": 13,
+      "empty_branch_selectors": 3,
+      "source_scope_file_count_min": 2,
+      "source_scope_file_count_max": 15
+    },
+    "ipc_event": {
+      "entries": 19,
+      "support_entries": 6,
+      "empty_branch_selectors": 0,
+      "source_scope_file_count_min": 3,
+      "source_scope_file_count_max": 8
+    },
+    "plugin_toggle": {
+      "entries": 2,
+      "support_entries": 0,
+      "empty_branch_selectors": 0,
+      "source_scope_file_count_min": 3,
+      "source_scope_file_count_max": 4
+    },
+    "provider": {
+      "entries": 39,
+      "support_entries": 0,
+      "empty_branch_selectors": 0,
+      "source_scope_file_count_min": 5,
+      "source_scope_file_count_max": 5
+    },
+    "route": {
+      "entries": 468,
+      "support_entries": 0,
+      "empty_branch_selectors": 464,
+      "source_scope_file_count_min": 1,
+      "source_scope_file_count_max": 62
+    },
+    "route_alias": {
+      "entries": 2,
+      "support_entries": 2,
+      "empty_branch_selectors": 2,
+      "source_scope_file_count_min": 5,
+      "source_scope_file_count_max": 5
+    },
+    "route_mount": {
+      "entries": 49,
+      "support_entries": 49,
+      "empty_branch_selectors": 48,
+      "source_scope_file_count_min": 3,
+      "source_scope_file_count_max": 62
+    },
+    "scheduler": {
+      "entries": 3,
+      "support_entries": 0,
+      "empty_branch_selectors": 0,
+      "source_scope_file_count_min": 2,
+      "source_scope_file_count_max": 3
+    },
+    "slash_alias": {
+      "entries": 6,
+      "support_entries": 6,
+      "empty_branch_selectors": 0,
+      "source_scope_file_count_min": 5,
+      "source_scope_file_count_max": 5
+    },
+    "slash_command": {
+      "entries": 11,
+      "support_entries": 0,
+      "empty_branch_selectors": 0,
+      "source_scope_file_count_min": 5,
+      "source_scope_file_count_max": 5
+    },
+    "tool": {
+      "entries": 59,
+      "support_entries": 1,
+      "empty_branch_selectors": 0,
+      "source_scope_file_count_min": 8,
+      "source_scope_file_count_max": 11
+    },
+    "ui": {
+      "entries": 26,
+      "support_entries": 26,
+      "empty_branch_selectors": 0,
+      "source_scope_file_count_min": 2,
+      "source_scope_file_count_max": 3
+    },
+    "ui_behavior": {
+      "entries": 10,
+      "support_entries": 0,
+      "empty_branch_selectors": 0,
+      "source_scope_file_count_min": 2,
+      "source_scope_file_count_max": 6
+    },
+    "update": {
+      "entries": 2,
+      "support_entries": 2,
+      "empty_branch_selectors": 0,
+      "source_scope_file_count_min": 1,
+      "source_scope_file_count_max": 2
+    },
+    "ws_in": {
+      "entries": 12,
+      "support_entries": 1,
+      "empty_branch_selectors": 12,
+      "source_scope_file_count_min": 1,
+      "source_scope_file_count_max": 2
+    }
+  },
+  "high_risk_groups": [
+    {
+      "group": "ui_top_level_only",
+      "entries": 26,
+      "breakdown": "19 个 settings 页签只列 SettingsNav/SettingsContent/Tab；7 个 page/panel 只列 AppPages 与顶层页面/面板",
+      "evidence": "26/26 decision=SUPPORT，26/26 统一 branch_selectors 同为「导航/容器、对应数据加载、页内操作另验」；R5 根因另核 26/26 逐叶仅一个 supported_feature_id",
+      "action": "逐页追 JSX 子组件、自动加载、控件回调、API、状态与可见结果；已证 usage/models/providers/skills/automation 有单目标风险；其余不能一概判错。"
+    },
+    {
+      "group": "ws_dispatcher_scope",
+      "entries": 12,
+      "breakdown": "11 行 source_scope 仅 server/routes/chat.ts，1 行另含 shared/compaction-mode.ts；12/12 统一 branch_selectors 为空",
+      "action": "沿消息 type 路由、会话状态和发回前端的状态/result 分支；动态 dispatcher/订阅无法解时 MANUAL。"
+    },
+    {
+      "group": "provider_uniform_scope",
+      "entries": 39,
+      "breakdown": "39 行各 5 文件，均为 provider 变体；包含 ProvidersTab 顶层但不能覆盖其 ProviderDetail/新增/搜索操作",
+      "action": "区分目录注册、具体供应商调用能力与页面操作；动态 providerId 集合需 MANUAL 范围。"
+    },
+    {
+      "group": "route_mount_and_alias_support",
+      "entries": 57,
+      "breakdown": "route_mount 49 + route_alias 2 + slash_alias 6，均为 SUPPORT；部分 route_mount 范围包含大量 route/helper 文件，故不能称全部仅注册",
+      "action": "逐条证明别名/挂载为同效果入口；不应以 SUPPORT 的非空目标替代实际 handler 分支。"
+    },
+    {
+      "group": "ordinary_http_unified_selector_empty",
+      "entries": 464,
+      "breakdown": "route 468 中统一 branch_selectors 为空 464；这些行另有 G1/G2/G3 逐项语义报告，应核真实源码分支与该报告，而非按空数组直接判错",
+      "action": "对高风险安全/写入/同址异效路由应用 AST 值与状态码分支提取，动态中间件列 MANUAL。"
+    },
+    {
+      "group": "cli_no_unified_branch_values",
+      "entries": 13,
+      "breakdown": "cli 13/13 统一 branch_selectors 为空，scope 2–3 文件",
+      "action": "从命令入口追参数解析、HTTP client、结果打印及异常退出。"
+    },
+    {
+      "group": "tools_and_builtin_tools",
+      "entries": 72,
+      "breakdown": "tool 59 + builtin_plugin_tool 13；ask_user 双摘要反例已证；两项 beautify 工具共用 helper 却有不同预检",
+      "action": "优先按输入值、权限、helper 副作用顺序和最终工具结果抽签名；插件动态启用列 MANUAL。"
+    },
+    {
+      "group": "ipc_and_events",
+      "entries": 105,
+      "breakdown": "ipc 86 + ipc_event 19；scope 宽度 2–15/3–8，部分含前端组件，仍须沿桥到实际状态消费者复核",
+      "action": "优先权限、文件/更新/预览事件的发送与最终接收；仅有 main/preload 不足以证明可见结果。"
+    }
+  ],
+  "manual_boundaries": [
+    {
+      "case": "动态插件/供应商注册与配置驱动列表",
+      "locator": "core/plugin-manager.ts；core/provider-registry.ts；desktop/src/react/settings/tabs/ProvidersTab.tsx:55-125",
+      "required_record": "注册表来源、可配置值集合、运行时新增项、人工抽样与适用叶；静态只给保守上界"
+    },
+    {
+      "case": "JSX props 回调、懒加载、事件订阅和 store 间接分发",
+      "locator": "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:123-138,200-245",
+      "required_record": "回调实际绑定控件/目标、事件来源、可观察状态；目标无法唯一确定则显式 MANUAL"
+    },
+    {
+      "case": "跨文件 CJS/Electron IPC 与权限装饰器",
+      "locator": "desktop/main.cjs；desktop/preload.cjs；server/http/route-security.ts",
+      "required_record": "通道名、请求作用域、handler 与最终消费者映射；静态别名失败不得默认为通过"
+    },
+    {
+      "case": "外部服务、平台能力、定时与竞争条件",
+      "locator": "lib/confirm-store.ts:70-75,97-103,126-134；desktop/src/react/settings/tabs/observability/model-observability-actions.ts:115-153",
+      "required_record": "源码可达边界与未执行运行验证分开；真实供应商、异步时序或权限仍需后续阶段执行"
+    },
+    {
+      "case": "分支语义同效与不可达判定",
+      "locator": "lib/tools/ask-user-tool.ts:275-314；server/routes/confirm.ts:17-20",
+      "required_record": "人工写明上游值约束、正/拒绝结果、F-ID、适用场景和裁决者；AST 只发现候选不能自判同效或 PASS"
+    }
+  ]
+}

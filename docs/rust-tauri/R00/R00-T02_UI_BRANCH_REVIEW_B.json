@@ -1,0 +1,913 @@
+{
+  "role": "independent_read_only_settings_ui_branch_evidence",
+  "verdict": "EVIDENCE_ONLY_NOT_R8_ACCEPTANCE",
+  "baseline": {
+    "r7_frozen_matrix_sha256": "ec4943e76fd2d5bf0eff358d635660ab67851ae8232c5ffe897b96037c83989f",
+    "r7_source_head": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+    "evidence_for_frozen_sha": "R00-T02_R7_REPAIR.md and R00-T02_UI_BRANCH_REVIEW.json",
+    "live_matrix_sha256_at_first_read": "8b43e9c240ad7644203e779ff11b19ad364d48e770b2674ac47e336bd1f45ab0",
+    "live_matrix_sha256_during_review": "b6dcd0040b77c57d3df7c6891b5c4374e8f89452b297191e8a3e5077492901f4",
+    "source_worktree_check": "git status --short on desktop/src/react/settings, desktop/main.cjs, desktop/preload.cjs and touched server routes was empty; HEAD stayed at the R7 source SHA",
+    "interpretation": "The live candidate changed concurrently. Findings compare R7 frozen action semantics recorded in the R7 report and prior branch review with unchanged production source. They do not adjudicate the concurrent repair.",
+    "live_matrix_sha256_at_final_source_check": "06128e96e7002a9866e391ec23ff3599074aab35f97ac67d799bc182ac875b24"
+  },
+  "scope": {
+    "pages": [
+      "ui:settings:bridge",
+      "ui:settings:models",
+      "ui:settings:skills",
+      "ui:settings:usage",
+      "ui:settings:work",
+      "ui:settings:access",
+      "ui:settings:agent",
+      "ui:settings:providers",
+      "ui:settings:browser",
+      "ui:settings:envdeps",
+      "ui:settings:sharing",
+      "ui:settings:general",
+      "ui:settings:interface",
+      "ui:settings:keybindings",
+      "ui:settings:experiments",
+      "ui:settings:security",
+      "ui:settings:me"
+    ],
+    "method": "从 JSX 事件或挂载条件追到 hook/回调、请求或 IPC，再反查既有 F-ID 和补充场景；共用设置容器 #00 沿用前一份审查，没有逐页重证。 注意 loadSettingsConfig 为六路 GET 加经验条件 GET，autoSaveConfig 成功另有 agent config GET。",
+    "limit": "静态源码证据；未执行 Electron UI、真实服务端或 Rust/Tauri 迁移场景；本文件不判独立验收 PASS。"
+  },
+  "confirmed_missing_edges": [
+    {
+      "id": "B01",
+      "page": "ui:settings:bridge",
+      "baseline_action": "ui:settings:bridge#03",
+      "condition": "微信扫码窗口轮询返回 status=confirmed 且有 botToken；有 userId 时再绑定 owner",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/bridge/WechatSection.tsx:70",
+        "desktop/src/react/settings/tabs/bridge/WechatSection.tsx:80",
+        "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx:123-143",
+        "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx:64-96",
+        "server/routes/bridge.ts:367-380",
+        "server/routes/bridge.ts:383-487"
+      ],
+      "effects": [
+        "POST /api/bridge/wechat/qrcode",
+        "POST /api/bridge/wechat/qrcode-status {qrcodeId}",
+        "POST /api/bridge/config?agentId=... {platform:'wechat',credentials:{botToken},enabled:true}",
+        "if userId: POST /api/bridge/owner?agentId=... {platform:'wechat',userId}"
+      ],
+      "missing_feature_ids": [
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-CREDENTIALS-SAVE-21BCAF",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-ENABLE-29FD2C",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-OWNER-SET-34B747"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-21BCAF26AB04",
+        "R00-T02-LA-29FD2CE83BB4",
+        "R00-T02-LA-34B7475C9BAD"
+      ],
+      "baseline_gap": "#03 只有二维码生成和轮询两叶；#02 限 Telegram/飞书/钉钉/QQ，#04 的 owner 是另一控件，页面并集不能代验扫码成功后的两次追加写入。",
+      "visible_result": "扫码确认后写入微信 botToken 并启用；若有 userId 再设 owner，随后触发 bridge 状态重载。配置写入前已将轮询标记停止，写入抛错会被轮询 catch 静默吞下并停在 confirmed 显示，不能把该显示直接当作持久成功。",
+      "decision": "CONFIRMED_MISSING_ACTION_EDGE_AND_PAGE_SCENARIO"
+    },
+    {
+      "id": "B02",
+      "page": "ui:settings:bridge",
+      "baseline_action": "UNLISTED_WECHAT_TOGGLE_AND_UNBIND",
+      "condition": "微信状态区开关；已有 token 时出现解绑按钮",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/bridge/WechatSection.tsx:21-56",
+        "desktop/src/react/settings/tabs/bridge/WechatSection.tsx:64-83",
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:74-80",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:358-378",
+        "server/routes/bridge.ts:367-380",
+        "server/routes/bridge.ts:383-487"
+      ],
+      "effects": [
+        "开关 on=true 且无 token: toast 阻止；其余 POST /api/bridge/config {platform:'wechat',credentials:null,enabled:on}",
+        "解绑: Promise.all 同时 POST /api/bridge/config {platform:'wechat',credentials:{botToken:''},enabled:false} 和 POST /api/bridge/owner {platform:'wechat',userId:null}，之后重载 status"
+      ],
+      "missing_feature_ids": [
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-CREDENTIALS-SAVE-21BCAF",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-ENABLE-29FD2C",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-DISABLE-C16CB9",
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-OWNER-CLEAR-809F2D"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-21BCAF26AB04",
+        "R00-T02-LA-29FD2CE83BB4",
+        "R00-T02-LA-C16CB9FD3738",
+        "R00-T02-LA-809F2DF0CB86"
+      ],
+      "baseline_gap": "冻结 #02 限四个非微信平台，#03 限扫码，#04 测试及 owner 控件；没有微信开关/解绑的状态分流和页面场景。",
+      "visible_result": "开关保存后重读状态；解绑两个请求任一抛错才显示错误，但 HTTP 非 2xx 的响应未在该函数检查，可能显示成功并重载。",
+      "decision": "CONFIRMED_UNLISTED_CONTROL"
+    },
+    {
+      "id": "B03",
+      "page": "ui:settings:bridge",
+      "baseline_action": [
+        "ui:settings:bridge#02",
+        "ui:settings:bridge#04",
+        "ui:settings:bridge#05"
+      ],
+      "condition": "config 保存成功且仍选同一助手；owner 响应无可用 status；全局设置保存成功",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:358-378",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:423-445",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:447-473",
+        "desktop/src/react/settings/actions.ts:116-173"
+      ],
+      "effects": [
+        "GET /api/bridge/status?agentId=...",
+        "全局设置后 loadSettingsConfig() 并行 GET /api/agents/:id/config、/identity、/agents-md、/public-agents-md、/api/user-profile、/api/preferences/models；experience.enabled 时再 GET /api/agents/:id/experience；owner 响应有完整 status 时直接 applyStatus 而不重读"
+      ],
+      "missing_feature_ids": [
+        "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-STATUS-READ-5CB577",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+        "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+        "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-5CB57741F1BB",
+        "R00-T02-LA-BC675C664910",
+        "R00-T02-LA-A9B0BBAD449C",
+        "R00-T02-LA-07A5CE3637C7",
+        "R00-T02-LA-3D7A957EF7FF",
+        "R00-T02-LA-429D86C4F952",
+        "R00-T02-LA-7EC5F0F2FF7C",
+        "R00-T02-LA-C8380CD5D08B"
+      ],
+      "baseline_gap": "写入动作只挂写入叶；#01 的初始 status 读取与 #00 初始化读取不能代验保存后的条件刷新。",
+      "visible_result": "保存后重读并刷新显示；换助手时 config 保存不重读旧助手，owner 响应有 status 时免重复请求。",
+      "decision": "CONFIRMED_CONDITIONAL_POST_SUCCESS_READ_EDGES"
+    },
+    {
+      "id": "B04",
+      "page": "ui:settings:models",
+      "baseline_action": "ui:settings:models#01",
+      "condition": "挂载 ModelsTab 的媒体默认值组件；窗口 focus 时另外重读前三类",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/ModelsTab.tsx:17-18",
+        "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:65-70",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:253-337"
+      ],
+      "effects": [
+        "GET /api/media/image/providers",
+        "GET /api/media/video/providers",
+        "GET /api/media/speech/providers",
+        "GET /api/speech-recognition/providers",
+        "window focus 只重读 image/video/speech 三个媒体 providers"
+      ],
+      "missing_feature_ids": [
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-READ-27A9F0",
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-READ-1EA9E4",
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-REA-2E137D",
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-62106F"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-27A9F02FCD58",
+        "R00-T02-LA-1EA9E4819E27",
+        "R00-T02-LA-2E137D5F14B9",
+        "R00-T02-LA-62106F57675C"
+      ],
+      "baseline_gap": "#01 只有辅助模型全局偏好与普通 models 读取；#05—#09 是默认值保存，不能代验四类自动加载。",
+      "visible_result": "四个下拉各自从对应资源得到模型/配置；四请求独立失败，识别服务失败另弹 toast；focus 重读前三类。",
+      "decision": "CONFIRMED_MISSING_AUTOMATIC_READ_EDGES"
+    },
+    {
+      "id": "B05",
+      "page": "ui:settings:providers",
+      "baseline_action": [
+        "ui:settings:providers#01",
+        "ui:settings:providers#04",
+        "ui:settings:providers#05",
+        "ui:settings:providers#10",
+        "ui:settings:providers#11",
+        "ui:settings:providers#12"
+      ],
+      "condition": "API 子页有选中 provider 才挂 ProviderDetail；窗口 focus 重读前三类；凭据或 OAuth 状态成功后 onCredentialRefresh 重读四类；模型操作依类别与结果条件重读一类或四类",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/ProvidersTab.tsx:153-216",
+        "desktop/src/react/settings/tabs/providers/ProviderDetail.tsx:21-29",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:253-344",
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:212-217",
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:219-312",
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:348-381",
+        "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx:56-115",
+        "desktop/src/react/settings/actions.ts:116-173"
+      ],
+      "effects": [
+        "选中详情后四个 providers GET 同 B04；credential/OAuth 成功后 onRefresh() 触发 loadSettingsConfig 的六 GET（experience.enabled 额外一 GET）+ providers summary，然后 refreshAll 四媒体 GET",
+        "媒体模型新增/删除后按 kind 重读对应 GET，speechGen 当前实现 refreshAll；chat/认领模型改动与远端候选成功非空后执行同组 loadSettingsConfig+summary 和四媒体 GET"
+      ],
+      "missing_feature_ids": [
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-READ-27A9F0",
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-READ-1EA9E4",
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-REA-2E137D",
+        "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-62106F",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+        "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+        "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-27A9F02FCD58",
+        "R00-T02-LA-1EA9E4819E27",
+        "R00-T02-LA-2E137D5F14B9",
+        "R00-T02-LA-62106F57675C",
+        "R00-T02-LA-BC675C664910",
+        "R00-T02-LA-A9B0BBAD449C",
+        "R00-T02-LA-07A5CE3637C7",
+        "R00-T02-LA-3D7A957EF7FF",
+        "R00-T02-LA-429D86C4F952",
+        "R00-T02-LA-7EC5F0F2FF7C",
+        "R00-T02-LA-C8380CD5D08B",
+        "R00-T02-LA-766F5F3C47C3"
+      ],
+      "baseline_gap": "#01 仅摘要和配置读取，#05 仅写/远端候选叶；成功后的条件读取也不能由页面初始读取并集代验。",
+      "visible_result": "选中供应商才出现媒体模型与配置；写入或授权后，详情能力和目录刷新；未选详情时不产生这四 GET。",
+      "decision": "CONFIRMED_CONDITIONAL_AUTO_AND_POST_SUCCESS_READ_EDGES"
+    },
+    {
+      "id": "B06",
+      "page": "ui:settings:skills",
+      "baseline_action": "ui:settings:skills#02",
+      "condition": "点击安装卡，桌面 selectSkill 可用；选择路径后才安装，取消时不发 HTTP；拖入文件与浏览器文件回退不经过 selectSkill",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:170-205",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:527-549",
+        "desktop/preload.cjs:105",
+        "desktop/main.cjs:5766-5779",
+        "server/routes/skills.ts:382"
+      ],
+      "effects": [
+        "ipc:select-skill",
+        "POST /api/skills/install {path} 或 {file:{filename,contentBase64}}"
+      ],
+      "missing_feature_ids": [
+        "F-D21-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SELECT-SKILL-52A5D1"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-52A5D1660088"
+      ],
+      "baseline_gap": "#02 只挂全局技能安装叶，遗漏前置原生技能选择及取消边界。",
+      "visible_result": "原生对话框返回技能文件/目录路径，取消则页面无安装结果。",
+      "decision": "CONFIRMED_MISSING_IPC_EDGE"
+    },
+    {
+      "id": "B07",
+      "page": "ui:settings:skills",
+      "baseline_action": "UNLISTED_SKILL_ROW_VIEW",
+      "condition": "点击技能行且 skill.baseDir 存在；组合内、未分组、外部兼容目录均使用 SkillRow；行内删除/开关阻止冒泡",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:558-572",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:600-608",
+        "desktop/src/react/settings/tabs/skills/SkillBundleTree.tsx:319-373",
+        "desktop/src/react/settings/tabs/skills/CompatPathDrawer.tsx:65-75",
+        "desktop/src/react/settings/tabs/skills/SkillRow.tsx:54-70",
+        "desktop/preload.cjs:189",
+        "desktop/main.cjs:5871"
+      ],
+      "effects": [
+        "ipc:open-skill-viewer {name,baseDir,filePath,installed:true}"
+      ],
+      "missing_feature_ids": [
+        "F-D21-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SKILL-VIEWER-9CA8A4"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-9CA8A47BE208"
+      ],
+      "baseline_gap": "冻结 Skills 十条动作中无点击行查看技能；已有 skill-viewer 叶未挂本页具体控件。",
+      "visible_result": "打开技能查看器；缺 baseDir 时点击无效果。",
+      "decision": "CONFIRMED_UNLISTED_CONTROL"
+    },
+    {
+      "id": "B08",
+      "page": "ui:settings:skills",
+      "baseline_action": "ui:settings:skills#04",
+      "condition": "导出组合成功且服务端响应带 filePath；其他组合操作不调用此 IPC",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:280-298",
+        "desktop/preload.cjs:109",
+        "desktop/main.cjs:5986"
+      ],
+      "effects": [
+        "POST /api/skills/bundles/:id/export",
+        "ipc:show-in-finder(filePath)"
+      ],
+      "missing_feature_ids": [
+        "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-OPEN-CAA876"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-CAA876503B1B"
+      ],
+      "baseline_gap": "#04 导出叶只覆盖服务端生成文件，未覆盖成功返回路径后在系统中显示。",
+      "visible_result": "导出 toast 后在系统文件管理器定位文件；无 filePath 时不打开。",
+      "decision": "CONFIRMED_POST_SUCCESS_IPC_EDGE"
+    },
+    {
+      "id": "B09",
+      "page": "ui:settings:skills",
+      "baseline_action": "ui:settings:skills#06",
+      "condition": "点击添加外部目录；选择系统目录后才 PUT；取消时不发请求",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:482-498",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:645",
+        "desktop/preload.cjs:103",
+        "desktop/main.cjs:5740-5751"
+      ],
+      "effects": [
+        "ipc:select-folder",
+        "PUT /api/skills/external-paths {paths}"
+      ],
+      "missing_feature_ids": [
+        "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-PICKER-2FB382"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-2FB382A137FC"
+      ],
+      "baseline_gap": "#06 只有外部目录保存叶，没有前置目录对话框和取消分支。",
+      "visible_result": "选定目录后列表刷新；取消不改变配置。",
+      "decision": "CONFIRMED_MISSING_IPC_EDGE"
+    },
+    {
+      "id": "B10",
+      "page": "ui:settings:work",
+      "baseline_action": "ui:settings:work#03",
+      "condition": "点击主页目录文本框或浏览按钮；取消目录选择不保存",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/WorkTab.tsx:198-211",
+        "desktop/src/react/settings/tabs/WorkTab.tsx:300-313",
+        "desktop/preload.cjs:103",
+        "desktop/main.cjs:5740-5751",
+        "server/routes/agents.ts:636"
+      ],
+      "effects": [
+        "ipc:select-folder",
+        "选定才 PUT /api/agents/:id/config {desk:{home_folder:folder}}"
+      ],
+      "missing_feature_ids": [
+        "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-PICKER-2FB382"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-2FB382A137FC"
+      ],
+      "baseline_gap": "#03 只有每助手配置更新叶，没有目录选择 IPC。",
+      "visible_result": "目录选择后先乐观显示再保存，保存失败且仍选原助手时回滚；清除主页目录直接 PUT，不经过 IPC。",
+      "decision": "CONFIRMED_MISSING_IPC_EDGE"
+    },
+    {
+      "id": "B11",
+      "page": "ui:settings:access",
+      "baseline_action": "ui:settings:access#04",
+      "condition": "远端连接成功，或返回本机且本机连接可用",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/AccessTab.tsx:273-314",
+        "desktop/preload.cjs:138",
+        "desktop/main.cjs:6239"
+      ],
+      "effects": [
+        "保存当前服务连接选择并更新本地 store",
+        "ipc:reload-main-window"
+      ],
+      "missing_feature_ids": [
+        "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-RELOAD-MAIN-WINDOW-322E02"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-322E02C7F2F9"
+      ],
+      "baseline_gap": "#04 只挂 service-connection 叶，其现有入口不含 reload-main-window；页面其他动作也未覆盖成功后重载。",
+      "visible_result": "用户见成功提示后主窗口重载；远端连接异常或本机连接不可用时不重载。",
+      "decision": "CONFIRMED_POST_SUCCESS_IPC_EDGE"
+    },
+    {
+      "id": "B12",
+      "page": "ui:settings:agent",
+      "baseline_action": "ui:settings:agent#06",
+      "condition": "人物卡导出成功且响应带 filePath；预览不触发文件管理器",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/AgentTab.tsx:175-212",
+        "desktop/preload.cjs:109",
+        "desktop/main.cjs:5986"
+      ],
+      "effects": [
+        "POST /api/character-cards/export",
+        "ipc:show-in-finder(filePath)"
+      ],
+      "missing_feature_ids": [
+        "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-OPEN-CAA876"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-CAA876503B1B"
+      ],
+      "baseline_gap": "#06 只挂人物卡预览/导出两 HTTP 叶，没有成功后桌面显示文件叶。",
+      "visible_result": "导出后在系统文件管理器定位人物卡文件；无 filePath 时只显示导出结果。",
+      "decision": "CONFIRMED_POST_SUCCESS_IPC_EDGE"
+    },
+    {
+      "id": "B13",
+      "page": "ui:settings:providers",
+      "baseline_action": "ui:settings:providers#09",
+      "condition": "OAuth start 请求成功并返回 URL",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx:23-49",
+        "desktop/preload.cjs:108"
+      ],
+      "effects": [
+        "POST /api/auth/oauth/start {provider,loginMethod}",
+        "ipc:open-external(data.url)",
+        "随后按 instructions/polling/其他分流设备码轮询或手输 code"
+      ],
+      "missing_feature_ids": [
+        "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-EXTERNAL-ACA2C4"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-ACA2C4C1158D"
+      ],
+      "baseline_gap": "#09 只挂 OAuth start 叶；#10/#11 复用 OAuth F-ID 可覆盖 callback/poll 服务端入口，但无法代验打开浏览器。",
+      "visible_result": "系统浏览器打开授权 URL；start 失败不打开。",
+      "decision": "CONFIRMED_POST_SUCCESS_IPC_EDGE"
+    },
+    {
+      "id": "B14",
+      "page": "ui:settings:usage",
+      "baseline_action": [
+        "ui:settings:usage#03",
+        "ui:settings:usage#06",
+        "ui:settings:usage#09",
+        "ui:settings:usage#11"
+      ],
+      "condition": "顶部刷新按钮在 usage/ledger/traces/settings 四个子页之一被点击",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:95-121",
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:183-188",
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:200-232"
+      ],
+      "effects": [
+        "每次并行 GET observability health 和 settings",
+        "只增加当前子页 refreshToken，并由对应子组件重取本页数据"
+      ],
+      "missing_feature_ids": [
+        "F-D22-ROUTE_BEHAVIOR-BEHAVIOR-MODEL-OBSERVABILITY-MODEL-OBSERVABILITY-204546",
+        "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-5BEFE4"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-2045462C0D98",
+        "R00-T02-LA-5BEFE4A3A61C"
+      ],
+      "baseline_gap": "#01/#02 写打开页自动加载控制面，不能代验手动刷新；当前子页动作只挂其数据查询叶。",
+      "visible_result": "控制面 health/settings 每次刷新；只有当前子页重取数据显示。刷新不触发 writer flush；控制面失败显示顶部错误。",
+      "decision": "CONFIRMED_STATE_SPLIT_AND_SHARED_REFRESH_EDGES"
+    },
+    {
+      "id": "B15",
+      "page": "ui:settings:access",
+      "baseline_action": [
+        "ui:settings:access#01",
+        "ui:settings:access#03"
+      ],
+      "condition": "访问摘要给出可用 mobileUrl 且网络配置不要求重启时，页面渲染二维码 img；无 mobileUrl 或需重启时不渲染",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/AccessTab.tsx:158-166",
+        "desktop/src/react/settings/tabs/AccessTab.tsx:567",
+        "server/routes/access.ts:66"
+      ],
+      "effects": [
+        "浏览器图片加载自动 GET /api/access/mobile-qr.svg，可带 ?port=实际端口"
+      ],
+      "missing_feature_ids": [
+        "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-QR-SVG-READ-5E4A9C"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-5E4A9CF58BED"
+      ],
+      "baseline_gap": "#01 只有总览 GET，#03 只有生成手机/桌面密钥 POST；页面未登记二维码图片资源读取与可见条件。",
+      "visible_result": "局域网或公开手机地址可用时显示二维码；重启待生效时二维码不出现。",
+      "decision": "CONFIRMED_UNLISTED_AUTOMATIC_RESOURCE_EDGE"
+    },
+    {
+      "id": "B16",
+      "page": "ui:settings:experiments",
+      "baseline_action": "ui:settings:experiments#02",
+      "condition": "缓存快照实验开关或只观察按钮使 next mode 等于 shadow；PATCH 成功后才重读观察记录；其他模式不重读",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:193-222",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:245-262",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:391-416"
+      ],
+      "effects": [
+        "PATCH /api/experiments/:id {value:'shadow'}",
+        "GET /api/experiments/memory/cache-snapshot-reflection/observation?agentId=primary"
+      ],
+      "missing_feature_ids": [
+        "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-EXPERIMENTS-EXPERIMENTS-MEMORY-C-AD0384"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-AD0384FBE1F2"
+      ],
+      "baseline_gap": "#02 只挂实验 PATCH/设置事件；#01 的自动观察读取不证明切 shadow 后追加 GET。",
+      "visible_result": "切到只观察后重新显示观察记录；读取失败静默，保留此前显示状态。",
+      "decision": "CONFIRMED_CONDITIONAL_POST_SUCCESS_READ_EDGE"
+    },
+    {
+      "id": "B17",
+      "page": "ui:settings:experiments",
+      "baseline_action": "ui:settings:experiments#04",
+      "condition": "电脑使用区域显示批准列表，但没有批准或撤销控件",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:376-421",
+        "desktop/src/react/settings/tabs/ComputerUseSection.tsx:73-167",
+        "desktop/src/react/settings/tabs/ComputerUseSection.tsx:182-233",
+        "server/routes/preferences.ts:593-623"
+      ],
+      "effects": [
+        "本页仅 GET/PUT /api/preferences/computer-use 和 POST /api/preferences/computer-use/request-permissions；批准列表为只读 StatusText"
+      ],
+      "unsupported_feature_ids": [
+        "F-D15-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-COMPUTER-USE-AP-3FA31D",
+        "F-D15-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-COMPUTER-USE-AP-38B14B"
+      ],
+      "baseline_gap": "#04 将服务端存在的 POST/DELETE /api/preferences/computer-use/approvals 挂到此页，却无现役 JSX→回调→请求链。",
+      "visible_result": "用户只能查看已有批准文字，不能在此页批准或撤销应用；系统权限申请按钮仍实际可用。",
+      "decision": "CONFIRMED_MATRIX_TO_SOURCE_EXTRA_EDGES"
+    },
+    {
+      "id": "B18",
+      "page": "ui:settings:security",
+      "baseline_action": [
+        "ui:settings:security#01",
+        "ui:settings:security#02",
+        "ui:settings:security#03"
+      ],
+      "condition": "沙箱、沙箱网络、保留天数保存尝试之后；代理保存成功且已广播运行时事件之后",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:88-103",
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:113-120",
+        "desktop/src/react/settings/helpers.ts:92-108",
+        "desktop/src/react/settings/actions.ts:116-173"
+      ],
+      "effects": [
+        "autoSaveConfig 成功后由 helpers.ts:92-108 先 GET /api/agents/:id/config；随后显式 loadSettingsConfig() 并行读取每助手 config、identity、agents-md、public-agents-md、用户资料、全局模型偏好，经验启用时额外读 experience；前三个处理函数即使保存返回 false 仍调用 loadSettingsConfig"
+      ],
+      "missing_feature_ids": [
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+        "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+        "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-BC675C664910",
+        "R00-T02-LA-A9B0BBAD449C",
+        "R00-T02-LA-07A5CE3637C7",
+        "R00-T02-LA-3D7A957EF7FF",
+        "R00-T02-LA-429D86C4F952",
+        "R00-T02-LA-7EC5F0F2FF7C",
+        "R00-T02-LA-C8380CD5D08B"
+      ],
+      "baseline_gap": "#01/#02/#03 仅挂配置写叶或事件叶，共用初始化 #00 不代验每次操作后的多路读取。",
+      "visible_result": "操作后设置页用各项权威读取结果刷新当前值；代理保存失败保留草稿且不执行显式 loadSettingsConfig。",
+      "decision": "CONFIRMED_POST_ACTION_READ_EDGE"
+    },
+    {
+      "id": "B19",
+      "page": "ui:settings:me",
+      "baseline_action": "ui:settings:me#02",
+      "condition": "姓名或个人资料至少一项变化且所发 PUT 均完成；无变化只 toast，不发请求或重读",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/MeTab.tsx:27-74",
+        "desktop/src/react/settings/tabs/MeTab.tsx:143-147",
+        "desktop/src/react/settings/actions.ts:116-173"
+      ],
+      "effects": [
+        "PUT /api/config {user:{name}} 和/或 PUT /api/user-profile {content}，成功后 loadSettingsConfig() 并行读取每助手 config、identity、agents-md、public-agents-md、用户资料、全局模型偏好，经验启用时额外读 experience"
+      ],
+      "missing_feature_ids": [
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+        "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+        "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-BC675C664910",
+        "R00-T02-LA-A9B0BBAD449C",
+        "R00-T02-LA-07A5CE3637C7",
+        "R00-T02-LA-3D7A957EF7FF",
+        "R00-T02-LA-429D86C4F952",
+        "R00-T02-LA-7EC5F0F2FF7C",
+        "R00-T02-LA-C8380CD5D08B"
+      ],
+      "baseline_gap": "#02 只挂配置/资料写和头像叶；#01 的打开页配置读取不代验保存后六路刷新及经验条件读取。",
+      "visible_result": "保存成功 toast、store 用户名更新，再重读设置配置；读取失败会进入 catch 追加保存失败 toast，即可能连续显示成功和失败。",
+      "decision": "CONFIRMED_POST_SUCCESS_READ_EDGE"
+    },
+    {
+      "id": "B20",
+      "page": [
+        "ui:settings:general",
+        "ui:settings:interface",
+        "ui:settings:work",
+        "ui:settings:agent"
+      ],
+      "baseline_action": [
+        "ui:settings:general#02",
+        "ui:settings:interface#03",
+        "ui:settings:interface#04",
+        "ui:settings:interface#06",
+        "ui:settings:work#02",
+        "ui:settings:agent#02",
+        "ui:settings:agent#04",
+        "ui:settings:agent#05",
+        "ui:settings:agent#08"
+      ],
+      "condition": "上述控件调用 autoSaveConfig，per-agent config PUT 成功后 helper 继续刷新配置；General 保持唤醒 IPC 失败回滚时再次调用该 helper",
+      "source_trace": [
+        "desktop/src/react/settings/helpers.ts:77-113",
+        "desktop/src/react/settings/tabs/GeneralTab.tsx:218-235",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:225-277",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:599-616",
+        "desktop/src/react/settings/tabs/WorkTab.tsx:130-136",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:281-292",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:402-405",
+        "desktop/src/react/settings/tabs/agent/AgentMemory.tsx:157-159",
+        "desktop/src/react/settings/tabs/agent/AgentToolsSection.tsx:70-77"
+      ],
+      "effects": [
+        "autoSaveConfig: PUT /api/agents/:id/config 后 GET /api/agents/:id/config；后 GET 失败时 helper 返回 false/弹保存失败，尽管先前 PUT 可能已持久化"
+      ],
+      "missing_feature_ids": [
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-BC675C664910"
+      ],
+      "baseline_gap": "这些动作只挂写叶/通知叶；共用设置初始化和其他动作的 config read 并集不能检查 helper 固定后续 GET 及读失败结果。Security 同机制见 B18。",
+      "visible_result": "保存后刷新权威配置；刷新异常可能显示保存失败，虽写入已成功。",
+      "decision": "CONFIRMED_SHARED_HELPER_POST_WRITE_READ_EDGE"
+    },
+    {
+      "id": "B21",
+      "page": [
+        "ui:settings:models",
+        "ui:settings:providers"
+      ],
+      "baseline_action": [
+        "ui:settings:models#02",
+        "ui:settings:models#03",
+        "ui:settings:providers#08"
+      ],
+      "condition": "辅助模型槽、视觉开关或搜索供应商选择调用 autoSaveGlobalModels，偏好 PUT 成功后立即重读偏好",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/providers/AuxiliaryModelsSection.tsx:163-181",
+        "desktop/src/react/settings/tabs/providers/SearchProviderSection.tsx:30-41",
+        "desktop/src/react/settings/helpers.ts:115-135"
+      ],
+      "effects": [
+        "PUT /api/preferences/models 后 GET /api/preferences/models；后 GET 失败弹保存失败 toast，前一 PUT 可能已生效"
+      ],
+      "missing_feature_ids": [
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-7EC5F0F2FF7C"
+      ],
+      "baseline_gap": "这些控件只挂 shared-models/update 或搜索更新写叶；#00/#01 的首次模型读取不是保存后 GET 的场景。",
+      "visible_result": "更改后重载全局模型偏好并更新下拉；后读失败可见保存失败，但先前写入可能完成。",
+      "decision": "CONFIRMED_SHARED_HELPER_POST_WRITE_READ_EDGE"
+    },
+    {
+      "id": "B22",
+      "page": "ui:settings:skills",
+      "baseline_action": "ui:settings:skills#07",
+      "condition": "技能创建/远端拉取/安全审查开关提交配置后，组件总是调用 loadSettingsConfig；某些状态先打开警告弹窗，确认后才提交",
+      "source_trace": [
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:88-107",
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:117-165",
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:192-244",
+        "desktop/src/react/settings/helpers.ts:92-113",
+        "desktop/src/react/settings/actions.ts:116-173"
+      ],
+      "effects": [
+        "autoSaveConfig 成功后先 GET /api/agents/:id/config；组件随后 loadSettingsConfig 六路 GET（agent config/identity/agents-md/public-agents-md、user-profile、preferences/models），经验启用时另 GET experience"
+      ],
+      "missing_feature_ids": [
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+        "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+        "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+        "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C"
+      ],
+      "existing_leaf_scenario_ids": [
+        "R00-T02-LA-BC675C664910",
+        "R00-T02-LA-A9B0BBAD449C",
+        "R00-T02-LA-07A5CE3637C7",
+        "R00-T02-LA-3D7A957EF7FF",
+        "R00-T02-LA-429D86C4F952",
+        "R00-T02-LA-7EC5F0F2FF7C",
+        "R00-T02-LA-C8380CD5D08B"
+      ],
+      "baseline_gap": "#07 只有全局配置写叶，未列辅助读取及独立适用场景；#00 的设置初始化不能代验开关或警告确认后刷新。",
+      "visible_result": "确认或直接切换后刷新能力状态；确认取消不写入、不刷新。",
+      "decision": "CONFIRMED_POST_ACTION_READ_EDGES"
+    }
+  ],
+  "already_reported_by_first_branch_review": [
+    "R00-T02_UI_BRANCH_REVIEW.json 已记录 agent#01/#02/#03/#05、未列出的助手卡片排序、providers#06 凭据先保存后验证及 API Key reveal 等冻结候选漏边；本文件不重复签收这些修复。"
+  ],
+  "manual_boundaries": [
+    {
+      "page": "ui:settings:skills",
+      "source": "desktop/src/react/settings/tabs/SkillsTab.tsx:170-205",
+      "reason": "拖入的 File 若可从 window.platform.getFilePath 或 file.path 取路径走 path 安装，否则 FileReader base64 安装。不同浏览器/平台下是否能给出路径需运行时裁决；两种请求形态在源码可确认。"
+    },
+    {
+      "page": "ui:settings:providers",
+      "source": "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx:36",
+      "reason": "openExternal 为可选桥调用；实际 Electron 存在时可达，桥不存在时仍按后续 OAuth 状态推进。迁移验收需分别执行有/无桥形态。"
+    },
+    {
+      "page": "ui:settings:providers",
+      "source": "desktop/src/react/settings/tabs/providers/ProviderMediaDefaults.tsx:80-170",
+      "reason": "媒体参数控件由服务端动态 schema 构造，具体字段集合只能运行时/契约样本裁决；已确认终点是 image/video config PUT，不能据静态字段数量声称全字段完备。"
+    },
+    {
+      "page": "ui:settings:usage",
+      "source": "desktop/src/react/settings/tabs/observability/ObservabilityExportDialog.tsx:1-245",
+      "reason": "文件系统访问 API 与 Electron IPC 保存通道由运行环境决定；冻结 #13 已列 HTTP 导出+IPC 叶，但两种通道的运行结果仍需后续执行证据。"
+    }
+  ],
+  "page_status": [
+    {
+      "page": "ui:settings:bridge",
+      "status": "CONFIRMED_GAPS",
+      "finding_ids": [
+        "B01",
+        "B02",
+        "B03"
+      ],
+      "page_specific_trace": "MANUAL",
+      "trace_limit": "confirmed gaps and/or dynamic or shared callback branches prevent a full closed-set claim in this read-only supplement"
+    },
+    {
+      "page": "ui:settings:models",
+      "status": "CONFIRMED_GAPS",
+      "finding_ids": [
+        "B04",
+        "B21"
+      ],
+      "page_specific_trace": "MANUAL",
+      "trace_limit": "confirmed gaps and/or dynamic or shared callback branches prevent a full closed-set claim in this read-only supplement"
+    },
+    {
+      "page": "ui:settings:skills",
+      "status": "CONFIRMED_GAPS",
+      "finding_ids": [
+        "B06",
+        "B07",
+        "B08",
+        "B09",
+        "B22"
+      ],
+      "page_specific_trace": "MANUAL",
+      "trace_limit": "confirmed gaps and/or dynamic or shared callback branches prevent a full closed-set claim in this read-only supplement"
+    },
+    {
+      "page": "ui:settings:usage",
+      "status": "CONFIRMED_GAP",
+      "finding_ids": [
+        "B14"
+      ],
+      "page_specific_trace": "MANUAL",
+      "trace_limit": "confirmed gaps and/or dynamic or shared callback branches prevent a full closed-set claim in this read-only supplement"
+    },
+    {
+      "page": "ui:settings:work",
+      "status": "CONFIRMED_GAPS",
+      "finding_ids": [
+        "B10",
+        "B20"
+      ],
+      "page_specific_trace": "MANUAL",
+      "trace_limit": "confirmed gaps and/or dynamic or shared callback branches prevent a full closed-set claim in this read-only supplement"
+    },
+    {
+      "page": "ui:settings:access",
+      "status": "CONFIRMED_GAPS",
+      "finding_ids": [
+        "B11",
+        "B15"
+      ],
+      "page_specific_trace": "MANUAL",
+      "trace_limit": "confirmed gaps and/or dynamic or shared callback branches prevent a full closed-set claim in this read-only supplement"
+    },
+    {
+      "page": "ui:settings:agent",
+      "status": "CONFIRMED_GAPS_PLUS_PRIOR_REVIEW",
+      "finding_ids": [
+        "B12",
+        "B20"
+      ],
+      "page_specific_trace": "MANUAL",
+      "trace_limit": "confirmed gaps and/or dynamic or shared callback branches prevent a full closed-set claim in this read-only supplement"
+    },
+    {
+      "page": "ui:settings:providers",
+      "status": "CONFIRMED_GAPS_PLUS_PRIOR_REVIEW",
+      "finding_ids": [
+        "B05",
+        "B13",
+        "B21"
+      ],
+      "page_specific_trace": "MANUAL",
+      "trace_limit": "confirmed gaps and/or dynamic or shared callback branches prevent a full closed-set claim in this read-only supplement"
+    },
+    {
+      "page": "ui:settings:browser",
+      "status": "PAGE_SPECIFIC_TRACE_COMPLETE_SHARED_INIT_MANUAL",
+      "finding_ids": [],
+      "page_specific_trace": "COMPLETE",
+      "trace_limit": "shared settings #00 not independently re-proved here"
+    },
+    {
+      "page": "ui:settings:envdeps",
+      "status": "PAGE_SPECIFIC_TRACE_COMPLETE_SHARED_INIT_MANUAL",
+      "finding_ids": [],
+      "page_specific_trace": "COMPLETE",
+      "trace_limit": "shared settings #00 not independently re-proved here"
+    },
+    {
+      "page": "ui:settings:sharing",
+      "status": "PAGE_SPECIFIC_TRACE_COMPLETE_SHARED_INIT_MANUAL",
+      "finding_ids": [],
+      "page_specific_trace": "COMPLETE",
+      "trace_limit": "shared settings #00 not independently re-proved here"
+    },
+    {
+      "page": "ui:settings:general",
+      "status": "CONFIRMED_GAPS_PLUS_PRIOR_REVIEW",
+      "finding_ids": [
+        "B20"
+      ],
+      "page_specific_trace": "MANUAL",
+      "trace_limit": "confirmed gaps and/or dynamic or shared callback branches prevent a full closed-set claim in this read-only supplement"
+    },
+    {
+      "page": "ui:settings:interface",
+      "status": "CONFIRMED_GAPS_PLUS_PRIOR_REVIEW",
+      "finding_ids": [
+        "B20"
+      ],
+      "page_specific_trace": "MANUAL",
+      "trace_limit": "confirmed gaps and/or dynamic or shared callback branches prevent a full closed-set claim in this read-only supplement"
+    },
+    {
+      "page": "ui:settings:keybindings",
+      "status": "MANUAL_PLUS_PRIOR_REVIEW",
+      "finding_ids": [],
+      "page_specific_trace": "MANUAL",
+      "trace_limit": "confirmed gaps and/or dynamic or shared callback branches prevent a full closed-set claim in this read-only supplement"
+    },
+    {
+      "page": "ui:settings:experiments",
+      "status": "CONFIRMED_GAPS",
+      "finding_ids": [
+        "B16",
+        "B17"
+      ],
+      "page_specific_trace": "MANUAL",
+      "trace_limit": "confirmed gaps and/or dynamic or shared callback branches prevent a full closed-set claim in this read-only supplement"
+    },
+    {
+      "page": "ui:settings:security",
+      "status": "CONFIRMED_GAP_PLUS_PRIOR_REVIEW",
+      "finding_ids": [
+        "B18"
+      ],
+      "page_specific_trace": "MANUAL",
+      "trace_limit": "confirmed gaps and/or dynamic or shared callback branches prevent a full closed-set claim in this read-only supplement"
+    },
+    {
+      "page": "ui:settings:me",
+      "status": "CONFIRMED_GAP_PLUS_PRIOR_REVIEW",
+      "finding_ids": [
+        "B19"
+      ],
+      "page_specific_trace": "MANUAL",
+      "trace_limit": "confirmed gaps and/or dynamic or shared callback branches prevent a full closed-set claim in this read-only supplement"
+    }
+  ]
+}

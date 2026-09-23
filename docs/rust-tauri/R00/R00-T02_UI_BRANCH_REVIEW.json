@@ -1,0 +1,777 @@
+{
+  "role": "read_only_ui_branch_evidence_for_R7_repair",
+  "verdict": "EVIDENCE_ONLY_NOT_R8_ACCEPTANCE",
+  "baseline_matrix_sha256": "ec4943e76fd2d5bf0eff358d635660ab67851ae8232c5ffe897b96037c83989f",
+  "baseline_source_sha": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+  "baseline_action_count": 170,
+  "scope_note": "Frozen R7 baseline matrix SHA and 170 action labels recorded before concurrent repair; 26 page entries are indexed. Eight assigned focus pages now have page-specific JSX/event-to-effect traces below; chat dynamic plugin attachment/WS rejection paths remain MANUAL. Other pages retain the original review status and are not a full 26-page independent closure. This report does not review or approve the repaired candidate.",
+  "page_review": [
+    {
+      "page": "ui:page:channels",
+      "baseline_actions": 7,
+      "status": "CONFIRMED_GAP_SOURCE_TRACED",
+      "action_ids": [
+        "#01",
+        "#05",
+        "#06",
+        "UNLISTED_CREATE"
+      ]
+    },
+    {
+      "page": "ui:page:chat",
+      "baseline_actions": 4,
+      "status": "CONFIRMED_GAP_DYNAMIC_MANUAL",
+      "action_ids": [
+        "#01",
+        "UNLISTED_MODEL",
+        "UNLISTED_THINKING"
+      ]
+    },
+    {
+      "page": "ui:page:map",
+      "baseline_actions": 7,
+      "status": "CONFIRMED_GAP_SOURCE_TRACED",
+      "action_ids": [
+        "#01",
+        "#02",
+        "#07"
+      ]
+    },
+    {
+      "page": "ui:panel:activity",
+      "baseline_actions": 4,
+      "status": "CONFIRMED_GAP_SOURCE_TRACED",
+      "action_ids": [
+        "#01",
+        "#03"
+      ]
+    },
+    {
+      "page": "ui:panel:automation",
+      "baseline_actions": 5,
+      "status": "CONFIRMED_GAP",
+      "action_ids": [
+        "ui:panel:automation#03"
+      ]
+    },
+    {
+      "page": "ui:panel:bridge",
+      "baseline_actions": 4,
+      "status": "CONFIRMED_GAP_SOURCE_TRACED",
+      "action_ids": [
+        "#03"
+      ]
+    },
+    {
+      "page": "ui:panel:skills",
+      "baseline_actions": 4,
+      "status": "CONFIRMED_GAP_SOURCE_TRACED",
+      "action_ids": [
+        "#02",
+        "#03",
+        "#04"
+      ]
+    },
+    {
+      "page": "ui:settings:about",
+      "baseline_actions": 5,
+      "status": "CONFIRMED_GAP_SOURCE_TRACED",
+      "action_ids": [
+        "#01",
+        "#02",
+        "#03",
+        "#04"
+      ]
+    },
+    {
+      "page": "ui:settings:access",
+      "baseline_actions": 7,
+      "status": "SOURCE_SPOT_CHECKED"
+    },
+    {
+      "page": "ui:settings:agent",
+      "baseline_actions": 18,
+      "status": "CONFIRMED_GAP",
+      "action_ids": [
+        "ui:settings:agent#01",
+        "ui:settings:agent#02",
+        "ui:settings:agent#03",
+        "ui:settings:agent#05"
+      ]
+    },
+    {
+      "page": "ui:settings:bridge",
+      "baseline_actions": 7,
+      "status": "INDEXED_ONLY"
+    },
+    {
+      "page": "ui:settings:browser",
+      "baseline_actions": 4,
+      "status": "PAGE_SPECIFIC_TRACE_COMPLETE_SHARED_INIT_MANUAL"
+    },
+    {
+      "page": "ui:settings:envdeps",
+      "baseline_actions": 3,
+      "status": "PAGE_SPECIFIC_TRACE_COMPLETE_SHARED_INIT_MANUAL"
+    },
+    {
+      "page": "ui:settings:experiments",
+      "baseline_actions": 5,
+      "status": "CONFIRMED_GAP",
+      "action_ids": [
+        "ui:settings:experiments#02"
+      ]
+    },
+    {
+      "page": "ui:settings:general",
+      "baseline_actions": 5,
+      "status": "CONFIRMED_GAP",
+      "action_ids": [
+        "ui:settings:general#02",
+        "ui:settings:general#03"
+      ]
+    },
+    {
+      "page": "ui:settings:interface",
+      "baseline_actions": 7,
+      "status": "CONFIRMED_GAP",
+      "action_ids": [
+        "ui:settings:interface#02",
+        "ui:settings:interface#03",
+        "ui:settings:interface#04",
+        "ui:settings:interface#05"
+      ]
+    },
+    {
+      "page": "ui:settings:keybindings",
+      "baseline_actions": 4,
+      "status": "CONFIRMED_GAP",
+      "action_ids": [
+        "ui:settings:keybindings#02",
+        "ui:settings:keybindings#03"
+      ]
+    },
+    {
+      "page": "ui:settings:mcp",
+      "baseline_actions": 7,
+      "status": "CONFIRMED_GAP_SOURCE_TRACED",
+      "action_ids": [
+        "#02",
+        "#03",
+        "#04",
+        "#05",
+        "#06"
+      ]
+    },
+    {
+      "page": "ui:settings:me",
+      "baseline_actions": 3,
+      "status": "CONFIRMED_GAP",
+      "action_ids": [
+        "ui:settings:me#02"
+      ]
+    },
+    {
+      "page": "ui:settings:models",
+      "baseline_actions": 10,
+      "status": "INDEXED_ONLY"
+    },
+    {
+      "page": "ui:settings:providers",
+      "baseline_actions": 13,
+      "status": "CONFIRMED_GAP",
+      "action_ids": [
+        "ui:settings:providers#06",
+        "UNLISTED_PROVIDER_API_KEY_REVEAL"
+      ]
+    },
+    {
+      "page": "ui:settings:security",
+      "baseline_actions": 4,
+      "status": "CONFIRMED_GAP",
+      "action_ids": [
+        "ui:settings:security#03"
+      ]
+    },
+    {
+      "page": "ui:settings:sharing",
+      "baseline_actions": 4,
+      "status": "PAGE_SPECIFIC_TRACE_COMPLETE_SHARED_INIT_MANUAL"
+    },
+    {
+      "page": "ui:settings:skills",
+      "baseline_actions": 10,
+      "status": "INDEXED_ONLY"
+    },
+    {
+      "page": "ui:settings:usage",
+      "baseline_actions": 14,
+      "status": "INDEXED_ONLY"
+    },
+    {
+      "page": "ui:settings:work",
+      "baseline_actions": 5,
+      "status": "SOURCE_SPOT_CHECKED"
+    }
+  ],
+  "confirmed_baseline_missing_edges": [
+    {
+      "action": "ui:panel:automation#03",
+      "condition": "enabled=false and prompt valid",
+      "trace": "AutomationCard.tsx:132-139,118-127 -> AutomationPanel.tsx:126-132 POST /api/desk/cron action=update -> server/routes/desk.ts:1202-1259",
+      "target_feature_id": "F-D18-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CRON-UPDATE-267BDF",
+      "other_branch": "enabled=true -> AutomationCard.tsx:119-121 -> AutomationPanel.tsx:108-113 action=toggle -> desk.ts:1188-1200; empty Agent prompt -> card toast and no request"
+    },
+    {
+      "action": "ui:settings:agent#01",
+      "condition": "click an unselected card",
+      "trace": "AgentCardStack.tsx:332-337 -> AgentTab.tsx:231 -> settings/actions.ts:314-318,287-295 GET /api/settings/snapshot?agentId=...",
+      "target_feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357"
+    },
+    {
+      "action": "ui:settings:agent#01",
+      "condition": "create manually",
+      "trace": "AgentTab.tsx:251 -> AgentCreateOverlay.tsx:46-68 POST /api/agents then switchToAgent -> settings/actions.ts:320-348 POST /api/agents/switch",
+      "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-SWITCH-POST-8B48FD"
+    },
+    {
+      "action": "ui:settings:agent#01",
+      "condition": "create from character card file",
+      "trace": "AgentCreateOverlay.tsx:78-120 POST /api/character-cards/plan then POST /api/character-cards/import then switchToAgent",
+      "target_feature_ids": [
+        "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHARACTER-CARDS-CHARACTER-CARDS--FC999E",
+        "F-D21-ROUTE_BEHAVIOR-BEHAVIOR-CHARACTER-CARDS-CHARACTER-CARDS-IMPORT--1ED782",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-SWITCH-POST-8B48FD"
+      ]
+    },
+    {
+      "action": "ui:settings:agent#01",
+      "condition": "open delete confirmation",
+      "trace": "AgentTab.tsx:247-249 -> AgentDeleteOverlay.tsx:55-69,34-52 GET /api/agents/:id/skills/cleanup-preview before confirmation",
+      "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-SKILLS-CLEANUP--6EA03A"
+    },
+    {
+      "action": "UNLISTED_AGENT_CARD_REORDER",
+      "condition": "drag card then release at different index",
+      "trace": "AgentCardStack.tsx:158-280,243-256 PUT /api/agents/order -> server/routes/agents.ts:461-485; cancelled or unchanged drag sends nothing",
+      "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ORDER-PUT-8D4356"
+    },
+    {
+      "action": "ui:settings:agent#02",
+      "condition": "click Set Primary",
+      "trace": "AgentCardStack.tsx:384-393 -> AgentTab.tsx:246 -> settings/actions.ts:350-370 PUT /api/agents/primary -> server/routes/agents.ts:442-455",
+      "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-PRIMARY-PUT-C0ADBA"
+    },
+    {
+      "action": "ui:settings:agent#03",
+      "condition": "identity or AGENTS.md changed; either or both",
+      "trace": "AgentTab.tsx:379-383,129-164 conditionally PUT /api/agents/:id/identity and /agents-md -> server/routes/agents.ts:818-833,860-883; no change sends neither",
+      "target_feature_ids": [
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-PUT-856B28",
+        "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-PUT-487080"
+      ]
+    },
+    {
+      "action": "ui:settings:agent#05",
+      "condition": "edit or delete experience list item",
+      "trace": "AgentTab.tsx:415-428 -> AgentExperience.tsx:32-49 PUT /api/agents/:id/experience -> server/routes/agents.ts:1018+; toggle uses config update separately",
+      "target_feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-PUT-DCF083"
+    },
+    {
+      "action": "ui:settings:providers#06",
+      "condition": "test icon clicked with edited API key",
+      "trace": "ApiKeyCredentials.tsx:236-245,124-175 first PUT /api/config through saveProviderConfigPatch :17-23 then optionally POST /api/providers/test :158-169; unedited key calls verifyOnly :186-215; edited empty non-local key saves without test per api-key-save-plan.ts:46-49",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDER-GLOBAL-SAVE-9FBBC2"
+    },
+    {
+      "action": "UNLISTED_PROVIDER_API_KEY_REVEAL",
+      "condition": "click Show Key while saved value is masked",
+      "trace": "KeyInput.tsx:121-128,33-57 -> ApiKeyCredentials.tsx:222-234,180-184 GET /api/providers/:name/api-key; Hide Key and unmasked value only change local state",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-NAME-API-KEY-7ADA0D"
+    },
+    {
+      "action": "ui:settings:me#02",
+      "condition": "select avatar then confirm crop",
+      "trace": "MeTab.tsx:76-110 -> CropOverlay.tsx:151-187 POST /api/avatar/user",
+      "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AVATAR-AVATAR-ROLE-AGENT-7570BE"
+    },
+    {
+      "action": "ui:settings:general#02",
+      "condition": "toggle Keep Awake",
+      "trace": "GeneralTab.tsx:218-235 autoSaveConfig keep_awake then setKeepAwakeEnabled IPC; if IPC fails restore prior config",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-GLOBAL-UPDATE-FBB939"
+    },
+    {
+      "action": "ui:settings:keybindings#03",
+      "condition": "restore all default bindings",
+      "trace": "KeybindingsTab.tsx:315-332 PUT /api/preferences/keybindings then keybindingsReloadGlobal -> preload.cjs:78 IPC; #02's global shortcut leaf does not cover this action",
+      "target_feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-GLOBAL-SHORTCUT-5D5938"
+    },
+    {
+      "action": "ui:settings:about#01",
+      "condition": "mount",
+      "trace": "AboutTab.tsx:335-341 -> preload.cjs:37 -> main.cjs:5410 get-app-version",
+      "target_feature_id": "F-D24-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-GET-APP-VERSION-01A133"
+    },
+    {
+      "action": "ui:page:map#02",
+      "condition": "different session; no cache or stale/conditionally revalidated cache",
+      "trace": "ConversationMapPage.tsx:230-242 or ConversationMapCanvas.tsx:440-445 -> session-actions.ts:1110-1217,1258-1263,856-889 GET /api/sessions/messages when cache/revision conditions require it",
+      "target_feature_id": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-MESSAGES-AA9EB3"
+    },
+    {
+      "action": "ui:page:map#07",
+      "condition": "branch send accepted or queued",
+      "trace": "conversation-map-send.ts:124-146 -> session-actions.ts:1110-1217 POST /api/sessions/switch and cache/revision-conditional GET messages",
+      "target_feature_id": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-SWITCH-FBDEED"
+    },
+    {
+      "action": "ui:page:map#01",
+      "condition": "external session change hidden under collapsed ancestor",
+      "trace": "ConversationMapPage.tsx:158-185 -> conversation-map-projection.ts:211-219 PUT layout.collapsed",
+      "target_feature_id": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONVERSATION-MAP-COLLAPSED-REPLA-94B9BE"
+    },
+    {
+      "action": "ui:settings:mcp#06",
+      "condition": "OAuth start returns URL",
+      "trace": "McpTab.tsx:177-185 -> platform.openExternal(url)",
+      "target_feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-EXTERNAL-ACA2C4"
+    },
+    {
+      "action": "ui:settings:mcp#02..#06",
+      "condition": "successful mutation or OAuth wait resolves",
+      "trace": "McpTab.tsx:92-107,129-132,177-185,207-208 -> mcp-api.ts:22-37 GET /api/mcp/state",
+      "target_feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-STATE-MCP-DD4727"
+    },
+    {
+      "action": "ui:settings:about#03..#04",
+      "condition": "agent selected after beta or auto-check toggle",
+      "trace": "AboutTab.tsx:390-400 -> helpers.ts:92-113 -> actions.ts:116-174 GET config, identity, agents-md, public-agents-md, user-profile, preferences/models; experience enabled GET experience",
+      "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C"
+    },
+    {
+      "action": "ui:page:channels#01",
+      "condition": "sidebar toggle",
+      "trace": "ChannelList.tsx:93-105,150-157 -> channel-actions.ts:614-649 POST /api/channels/toggle",
+      "target_feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHANNELS-CHANNELS-TOGGLE-POST-AB6659"
+    },
+    {
+      "action": "UNLISTED_CHANNEL_CREATE",
+      "condition": "valid name and at least two members",
+      "trace": "ChannelList.tsx:112-130 -> ChannelCreateOverlay.tsx:78-108 -> channel-actions.ts:661-681 POST /api/channels",
+      "target_feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHANNELS-CHANNELS-POST-65D875"
+    },
+    {
+      "action": "ui:page:channels#06",
+      "condition": "member activity with uncached session path",
+      "trace": "ChannelsPanel.tsx:703-723 -> ChannelsPanel.tsx:408-454 GET /api/sessions/messages",
+      "target_feature_id": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-MESSAGES-AA9EB3"
+    },
+    {
+      "action": "ui:panel:activity#01",
+      "condition": "config cache miss",
+      "trace": "ActivityPanel.tsx:130-138 -> use-config.ts:32-39 GET /api/config",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3"
+    },
+    {
+      "action": "ui:panel:activity#03",
+      "condition": "promote success with sessionPath",
+      "trace": "ActivityPanel.tsx:158-169 -> session-actions.ts:909-915,1110-1153 GET sessions then POST switch",
+      "target_feature_id": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-SWITCH-FBDEED"
+    },
+    {
+      "action": "ui:panel:bridge#03",
+      "condition": "reset success",
+      "trace": "BridgePanel.tsx:231-249 -> :95-116 GET status + sessions",
+      "target_feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-STATUS-READ-5CB577"
+    },
+    {
+      "action": "ui:panel:skills#02",
+      "condition": "desktop file install chooser",
+      "trace": "SkillsPanel.tsx:353-361 -> preload.cjs:105 select-skill IPC",
+      "target_feature_id": "F-D21-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SELECT-SKILL-52A5D1"
+    },
+    {
+      "action": "ui:panel:skills#02..#04",
+      "condition": "successful mutation and selected failure subpaths",
+      "trace": "SkillsPanel.tsx:170-198,307,345,392,416,422,460,467,490,514,556,600,604,631,646 GET skills + bundles",
+      "target_feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-READ-8E11FA"
+    },
+    {
+      "action": "ui:settings:about#02",
+      "condition": "shell update error or macOS DMG manual download fallback",
+      "trace": "AboutTab.tsx:228-240,258-275,369-372 -> preload.cjs:108 open-external IPC with releaseUrl or releases/latest",
+      "target_feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-EXTERNAL-ACA2C4"
+    },
+    {
+      "action": "ui:panel:skills#04",
+      "condition": "export succeeded and response.filePath is nonempty",
+      "trace": "SkillsPanel.tsx:524-543 -> preload.cjs:109 ipc:show-in-finder -> main.cjs:5986",
+      "target_feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-OPEN-CAA876"
+    },
+    {
+      "action": "ui:page:map#02",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "trace": "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746"
+    },
+    {
+      "action": "ui:page:map#02",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "trace": "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29",
+      "target_feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DESK-DESK-FILES-READ-B8313F"
+    },
+    {
+      "action": "ui:page:map#02",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "trace": "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29",
+      "target_feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-WORKBENCH-WORKBENCH-FILES-BD5448"
+    },
+    {
+      "action": "ui:page:map#07",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "trace": "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746"
+    },
+    {
+      "action": "ui:page:map#07",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "trace": "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29",
+      "target_feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DESK-DESK-FILES-READ-B8313F"
+    },
+    {
+      "action": "ui:page:map#07",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "trace": "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29",
+      "target_feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-WORKBENCH-WORKBENCH-FILES-BD5448"
+    },
+    {
+      "action": "ui:panel:activity#03",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "trace": "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29",
+      "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746"
+    },
+    {
+      "action": "ui:panel:activity#03",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "trace": "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29",
+      "target_feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DESK-DESK-FILES-READ-B8313F"
+    },
+    {
+      "action": "ui:panel:activity#03",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "trace": "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29",
+      "target_feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-WORKBENCH-WORKBENCH-FILES-BD5448"
+    }
+  ],
+  "settings_changed_ipc_missing": {
+    "target_feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-CHANGED-15E163",
+    "consumer": "desktop/preload.cjs:147 -> desktop/main.cjs:5653+",
+    "action_source_refs": {
+      "ui:settings:experiments#02": "ExperimentsTab.tsx:391-416; experiment PATCH succeeds before event",
+      "ui:settings:general#03": "GeneralTab.tsx:153-202; quick-chat preference PUT succeeds before event",
+      "ui:settings:interface#02": "InterfaceTab.tsx:344-375,431,449; theme/font/appearance events",
+      "ui:settings:interface#03": "InterfaceTab.tsx:225-263; editor typography/chat layout events before save and rollback events on failed save",
+      "ui:settings:interface#04": "InterfaceTab.tsx:265-277; hardware event after successful save",
+      "ui:settings:interface#05": "InterfaceTab.tsx:279-305; sidebar event after successful PUT",
+      "ui:settings:keybindings#02": "KeybindingsTab.tsx:219-240; event after successful PUT and optional global shortcut reload",
+      "ui:settings:keybindings#03": "KeybindingsTab.tsx:315-332; event after successful PUT and global shortcut reload",
+      "ui:settings:security#03": "SecurityTab.tsx:113-120 after config save; main.cjs:5667-5670 applies desktop network proxy"
+    }
+  },
+  "manual_boundaries": [
+    "Chat InputArea plugin attachment, voice upload, WS payload projection and final rejection branches remain MANUAL; only model/thinking/initial GET counterexamples are statically confirmed.",
+    "Settings shared initialization #00 was not re-proved for every tab; focused page action traces exclude this common mount contract.",
+    "Non-focus pages with INDEXED_ONLY or SOURCE_SPOT_CHECKED status require independent action-by-action review; this report cannot close all 26 pages/170 actions.",
+    "The concurrently repaired matrix requires a fresh R8 independent review; this evidence is tied to frozen R7 SHA only.",
+    "switchSession after successful UI-initiated navigation can request stream resume, terminal snapshot, and context usage over WS (session-actions.ts:1320-1336); state-dependent transport/server leaf projection was not exhaustively resolved here."
+  ],
+  "focus_page_action_traces": {
+    "ui:page:channels": [
+      {
+        "action": "ui:page:channels#01",
+        "source_chain": "ChannelList.tsx:93-105,150-157 -> channel-actions.ts:614-649",
+        "condition_effect": "disable POST /api/channels/toggle then clear local directory; enable after warning confirmation POST toggle then loadChannels GET channels and DM; cancel no request",
+        "baseline_assessment": "R7 missed toggle and enable follow-up reads"
+      },
+      {
+        "action": "ui:page:channels#02",
+        "source_chain": "channel-actions.ts:252-345",
+        "condition_effect": "select channel or DM -> openChannel GET details/messages and possibly POST mark-read; same selected channel may avoid repeated work",
+        "baseline_assessment": "R7 three read/mark-read branches accounted; dynamic stale session effects MANUAL"
+      },
+      {
+        "action": "ui:page:channels#03",
+        "source_chain": "ChannelsPanel.tsx:1095-1100 -> channel-actions.ts:489-514 POST /api/channels/:id/messages",
+        "condition_effect": "valid channel text sends message; empty/DM without composer no send",
+        "baseline_assessment": "R7 send leaf accounted"
+      },
+      {
+        "action": "ui:page:channels#04",
+        "source_chain": "ChannelsPanel.tsx:305-318 -> channel-actions.ts:586-608 POST /api/channels/:id/members or DELETE /api/channels/:id/members/:memberId",
+        "condition_effect": "add member and remove member distinct routes; unavailable actor/disabled control no request",
+        "baseline_assessment": "R7 both write leaves accounted"
+      },
+      {
+        "action": "ui:page:channels#05",
+        "source_chain": "channel-actions.ts:554-579",
+        "condition_effect": "DELETE channel success -> loadChannels at :573 GET channels and DM; failure no reread",
+        "baseline_assessment": "R7 missed both post-delete reads"
+      },
+      {
+        "action": "ui:page:channels#06",
+        "source_chain": "ChannelsPanel.tsx:703-723,408-454,600-602,810-818",
+        "condition_effect": "expand member activity with sessionPath and empty cache GET /api/sessions/messages; turn_end rereads; model list empty GET /api/models; four settings controls retain own leaves",
+        "baseline_assessment": "R7 missed conditional messages and models reads"
+      },
+      {
+        "action": "ui:page:channels#07",
+        "source_chain": "ChannelsPanel.tsx:757-763 -> channel-actions.ts:525-545 GET /api/conversations/:id/export then browser download",
+        "condition_effect": "export current conversation via existing export endpoint; missing selection no request",
+        "baseline_assessment": "R7 export leaf accounted"
+      },
+      {
+        "action": "UNLISTED_CREATE",
+        "source_chain": "ChannelList.tsx:112-130 -> App.tsx:130 -> ChannelCreateOverlay.tsx:78-108 -> channel-actions.ts:661-681",
+        "condition_effect": "valid name and >=2 members POST /api/channels, then reload channels and open new channel; invalid form no request",
+        "baseline_assessment": "R7 seven actions omitted visible add button and create leaf F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHANNELS-CHANNELS-POST-65D875"
+      }
+    ],
+    "ui:page:chat": [
+      {
+        "action": "ui:page:chat#01",
+        "source_chain": "InputArea.tsx:1699-1721",
+        "condition_effect": "connected non-mobile mount GET /api/session-thinking-level with pending/current path; offline/mobile no GET",
+        "baseline_assessment": "R7 missed thinking level read ...8ED658"
+      },
+      {
+        "action": "ui:page:chat#02",
+        "source_chain": "InputArea.tsx:1813-2030 submitEditorMessage -> input-slice.ts / composer-send-coordinator; WS prompt vs slash",
+        "condition_effect": "ordinary prompt and slash reach separate WS messages; empty/forbidden input blocked",
+        "baseline_assessment": "R7 two WS leaves accounted; plugin payload projection MANUAL"
+      },
+      {
+        "action": "ui:page:chat#03",
+        "source_chain": "InputArea.tsx:1914-2029,2122-2192 queue/interject runtime controls -> input-slice.ts / composer-send-coordinator",
+        "condition_effect": "abort/interject/resume and busy send queue depend on stream state",
+        "baseline_assessment": "R7 WS branches accounted at inventory level; dynamic rejection MANUAL"
+      },
+      {
+        "action": "ui:page:chat#04",
+        "source_chain": "InputArea.tsx:1140-1157 plus SideChatPanel/PreviewPanel",
+        "condition_effect": "desktop file selection IPC versus mobile/browser input; attachment/voice upload and preview depend on surface",
+        "baseline_assessment": "R7 file-preview included; transport and plugin-derived payload projection MANUAL"
+      },
+      {
+        "action": "UNLISTED_MODEL",
+        "source_chain": "InputArea.tsx:2615-2637 -> ComposerToolbar.tsx:121-124 -> ModelSelector.tsx:54-132",
+        "condition_effect": "same selector: established session with messages POST /api/models/switch; no messages/new draft POST /api/models/set; same available model no request",
+        "baseline_assessment": "R7 four actions omitted both model leaves ...A48BCE and ...05A577"
+      },
+      {
+        "action": "UNLISTED_THINKING",
+        "source_chain": "ThinkingLevelButton.tsx:36-67",
+        "condition_effect": "established session POST /api/session-thinking-level with sessionPath; pending/no session POST without sessionPath; failed write only console.error",
+        "baseline_assessment": "R7 omitted distinct session set ...F8935B and default set ...39AD35"
+      }
+    ],
+    "ui:page:map": [
+      {
+        "action": "ui:page:map#01",
+        "source_chain": "ConversationMapPage.tsx:94-117,158-185 -> conversation-map-projection.ts:169-234",
+        "condition_effect": "first mount GET layout and stale workspace turns; external currentSessionId hidden under collapsed ancestor auto PUT layout.collapsed; cached turns skip GET",
+        "baseline_assessment": "R7 missed conditional collapsed.replace ...94B9BE"
+      },
+      {
+        "action": "ui:page:map#02",
+        "source_chain": "ConversationMapPage.tsx:230-242; ConversationMapCanvas.tsx:440-445 -> session-actions.ts:1110-1217",
+        "condition_effect": "different session POST /api/sessions/switch; after switch, no cached chatSessions GET /api/sessions/messages; with cache, revision mismatch GET messages or equal revision plus validation record conditional GET; streaming/no revision may skip; same current session local return; successful switchSession also activates workspace: if workspace key exists GET /api/desk/files or mount GET /api/workbench/files (and expanded tree paths), then GET /api/models; active stream/WS terminal/context follow-ups remain MANUAL",
+        "baseline_assessment": "R7 missed messages ...AA9EB3"
+      },
+      {
+        "action": "ui:page:map#03",
+        "source_chain": "ConversationMapPage.tsx:280-302; ConversationMapCanvas.tsx:219-272",
+        "condition_effect": "zoom, pan and locate are local camera effects",
+        "baseline_assessment": "R7 local UI leaf accounted"
+      },
+      {
+        "action": "ui:page:map#04",
+        "source_chain": "ConversationMapCanvas.tsx:290-346 -> conversation-map-projection.ts:211-219",
+        "condition_effect": "drag with changed final position PUT layout.positions merge; no move does not write",
+        "baseline_assessment": "R7 merge leaf accounted"
+      },
+      {
+        "action": "ui:page:map#05",
+        "source_chain": "ConversationMapCanvas.tsx:350-370",
+        "condition_effect": "collapse/expand PUT layout.collapsed; attempt hiding current session may be blocked with toast",
+        "baseline_assessment": "R7 collapsed.replace leaf accounted"
+      },
+      {
+        "action": "ui:page:map#06",
+        "source_chain": "ConversationMapPage.tsx:245-251",
+        "condition_effect": "confirm reset PUT layout.positions={} replacePositions=true, cancel no request",
+        "baseline_assessment": "R7 positions.replace leaf accounted"
+      },
+      {
+        "action": "ui:page:map#07",
+        "source_chain": "ConversationMapDraftCard.tsx:103-111 -> conversation-map-send.ts:108-147 -> message-turn-actions.ts:121-159",
+        "condition_effect": "continue sends prompt/queues without fork/switch; branch with anchor POST fork, prompt/queue, successful or queued send then switchSession POST switch and conditional message GET according to cache/revision; blank text no action; successful switchSession also activates workspace: if workspace key exists GET /api/desk/files or mount GET /api/workbench/files (and expanded tree paths), then GET /api/models; active stream/WS terminal/context follow-ups remain MANUAL",
+        "baseline_assessment": "R7 missed switch ...FBDEED and conditional messages ...AA9EB3"
+      }
+    ],
+    "ui:panel:activity": [
+      {
+        "action": "ui:panel:activity#01",
+        "source_chain": "ActivityPanel.tsx:130-138 -> use-config.ts:32-39",
+        "condition_effect": "open GET activities and on config cache miss GET /api/config; cached config skips GET",
+        "baseline_assessment": "R7 missed config.read ...A524D3"
+      },
+      {
+        "action": "ui:panel:activity#02",
+        "source_chain": "ActivityPanel expand callback",
+        "condition_effect": "expand activity with sessionFile GET /api/desk/activities/:id/session; absent file, cached messages, or prior loadError skips GET; no path no request",
+        "baseline_assessment": "R7 messages read accounted"
+      },
+      {
+        "action": "ui:panel:activity#03",
+        "source_chain": "ActivityPanel.tsx:158-169 -> session-actions.ts:909-915,1110-1217",
+        "condition_effect": "POST promote success with sessionPath -> loadSessions GET /api/sessions plus health probe, then switchSession POST switch unless already current, and GET messages if uncached; failure/missing path skips; successful switchSession also activates workspace: if workspace key exists GET /api/desk/files or mount GET /api/workbench/files (and expanded tree paths), then GET /api/models; active stream/WS terminal/context follow-ups remain MANUAL",
+        "baseline_assessment": "R7 missed sessions.read ...38EEA9 and switch ...FBDEED; messages conditional"
+      },
+      {
+        "action": "ui:panel:activity#04",
+        "source_chain": "ActivityPanel heartbeat toggle",
+        "condition_effect": "heartbeat enable/disable PUT config through shown control; unavailable disabled state no write",
+        "baseline_assessment": "R7 heartbeat leaf accounted"
+      }
+    ],
+    "ui:panel:bridge": [
+      {
+        "action": "ui:panel:bridge#01",
+        "source_chain": "BridgePanel.tsx:86-116",
+        "condition_effect": "open/change platform/agent GET bridge status and sessions; stale response guarded",
+        "baseline_assessment": "R7 both read leaves accounted"
+      },
+      {
+        "action": "ui:panel:bridge#02",
+        "source_chain": "BridgePanel.tsx:390-489",
+        "condition_effect": "select session loads transcript and subsequent live message updates; empty session no messages",
+        "baseline_assessment": "R7 session/messages leaves accounted"
+      },
+      {
+        "action": "ui:panel:bridge#03",
+        "source_chain": "BridgePanel.tsx:231-249 -> :95-116",
+        "condition_effect": "valid selected session POST reset then success GET bridge status and sessions; no key or failure skips rereads",
+        "baseline_assessment": "R7 missed status.read ...5CB577 and sessions.read ...2424DA on this action"
+      },
+      {
+        "action": "ui:panel:bridge#04",
+        "source_chain": "BridgePanel.tsx:338 -> settings-modal-actions.ts:9",
+        "condition_effect": "overlay click opens bridge settings modal in local store",
+        "baseline_assessment": "R7 local UI leaf accounted"
+      }
+    ],
+    "ui:panel:skills": [
+      {
+        "action": "ui:panel:skills#01",
+        "source_chain": "SkillsPanel.tsx:170-224",
+        "condition_effect": "visible and agent selected GET /api/skills?runtime=1 and GET /api/skills/bundles; all-view external GET skills separately; no agent skips",
+        "baseline_assessment": "R7 both reads accounted"
+      },
+      {
+        "action": "ui:panel:skills#02",
+        "source_chain": "SkillsPanel.tsx:288-361 -> preload.cjs:105",
+        "condition_effect": "desktop install choose file calls selectSkill IPC; browser file input otherwise; valid path/base64 POST install then successful loadSkillsForAgent GET skills + bundles; cancel/failed install no reread",
+        "baseline_assessment": "R7 missed picker ...SELECT-SKILL-52A5D1 and post-write reads ...8E11FA/...0D8358"
+      },
+      {
+        "action": "ui:panel:skills#03",
+        "source_chain": "SkillsPanel.tsx:380-470,734-743",
+        "condition_effect": "delete confirmed success reads both; skill/bundle toggle success or failure reads both only if agent unchanged; external remove calls toggleSkill(false) then always all-view GET skills if allViewAgentId; cancel/no agent/stale agent gates as source",
+        "baseline_assessment": "R7 missed conditional post-write reads; external remove always GET skills even toggle failed"
+      },
+      {
+        "action": "ui:panel:skills#04",
+        "source_chain": "SkillsPanel.tsx:476-651",
+        "condition_effect": "bundle create/rename/delete/move/remove success reads both; reorder success/failure reads both; export only POST and, when response.filePath is nonempty, showInFinder IPC F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-OPEN-CAA876; no change or missing agent skips",
+        "baseline_assessment": "R7 missed conditional post-write reads and export-success file-open; export itself does not reread"
+      }
+    ],
+    "ui:settings:about": [
+      {
+        "action": "ui:settings:about#00",
+        "source_chain": "SettingsContent.tsx shared init",
+        "condition_effect": "settings container shared network init",
+        "baseline_assessment": "Shared init not independently re-proved here"
+      },
+      {
+        "action": "ui:settings:about#01",
+        "source_chain": "AboutTab.tsx:335-352,378-388 -> preload.cjs:37 -> main.cjs:5410",
+        "condition_effect": "mount getAppVersion IPC plus releaseCheckLatest; history GET digest only on button; no hana optional IPC no request",
+        "baseline_assessment": "R7 missed get-app-version ...01A133"
+      },
+      {
+        "action": "ui:settings:about#02",
+        "source_chain": "AboutTab.tsx:187-305,357-376 -> desktop/preload.cjs:108 open-external -> desktop/main.cjs IPC handler",
+        "condition_effect": "release idle/latest retry invokes releaseCheck; available/shell error retry invokes autoUpdateCheck; DMG or shell error fallback openExternal",
+        "baseline_assessment": "R7 missed fallback openExternal ...ACA2C4; release status error Retry calls releaseCheckLatest, shell error Retry calls autoUpdateCheck, DMG only manual download"
+      },
+      {
+        "action": "ui:settings:about#03",
+        "source_chain": "AboutTab.tsx:374-395 -> helpers.ts:92-113 -> actions.ts:116-174",
+        "condition_effect": "downloaded install autoUpdateInstall; beta toggle autoUpdateSetChannel then PUT agent config; successful save GET config; regardless save result reload config/identity/agents-md/public-agents-md/user-profile/preferences/models, conditional experience GET",
+        "baseline_assessment": "R7 missed all follow-up read leaves; no agent/resource key no network"
+      },
+      {
+        "action": "ui:settings:about#04",
+        "source_chain": "AboutTab.tsx:397-400,454-475 -> helpers.ts:92-113 -> actions.ts:116-174",
+        "condition_effect": "auto-check Toggle PUT agent config then same conditional reads; upstream link openExternal; no agent/resource key no network",
+        "baseline_assessment": "R7 missed post-save read leaves"
+      }
+    ],
+    "ui:settings:mcp": [
+      {
+        "action": "ui:settings:mcp#00",
+        "source_chain": "SettingsContent.tsx shared init",
+        "condition_effect": "settings container shared network init",
+        "baseline_assessment": "Shared init not independently re-proved here"
+      },
+      {
+        "action": "ui:settings:mcp#01",
+        "source_chain": "McpTab.tsx:68-90 -> mcp-api.ts:22-37",
+        "condition_effect": "mount or agent change GET /api/mcp/state if agentId; no agent skips; stale response ignored",
+        "baseline_assessment": "R7 state.read accounted"
+      },
+      {
+        "action": "ui:settings:mcp#02",
+        "source_chain": "McpTab.tsx:92-119,174-175",
+        "condition_effect": "global toggle PUT enabled or defer PUT settings/defer; each success run() GET state; failure no reread",
+        "baseline_assessment": "R7 missed action-specific state.read ...DD4727"
+      },
+      {
+        "action": "ui:settings:mcp#03",
+        "source_chain": "McpTab.tsx:121-133 -> mcp-api.ts:55-84",
+        "condition_effect": "single add POST connectors success run() GET state; bulk POST connectors/bulk success GET state; invalid/error no reload",
+        "baseline_assessment": "R7 missed action-specific state.read"
+      },
+      {
+        "action": "ui:settings:mcp#04",
+        "source_chain": "McpTab.tsx:126-143 -> mcp-api.ts:98-122",
+        "condition_effect": "edit/delete/start/stop/refresh-tools distinct endpoints; each success run() GET state; failure no reread",
+        "baseline_assessment": "R7 missed action-specific state.read"
+      },
+      {
+        "action": "ui:settings:mcp#05",
+        "source_chain": "McpTab.tsx:145-172 -> mcp-api.ts:124-186",
+        "condition_effect": "agent connector/tool toggle PUT agent connector; policy/pin/permission PUT connector; each success run() GET state; no agent throws then no write/read",
+        "baseline_assessment": "R7 missed action-specific state.read"
+      },
+      {
+        "action": "ui:settings:mcp#06",
+        "source_chain": "McpTab.tsx:177-208,340-348 -> mcp-api.ts:189-213",
+        "condition_effect": "OAuth start POST then desktop openExternal(url), poll GET until done/cancel/error/timeout; successful/returned wait GET state; cancel callback itself only POST cancel; an already running OAuth poll returning cancelled causes waitForOAuth to resolve and the prior connectOAuth task to GET state; poll error/timeout skips GET; logout success run() GET state; Electron platform.js:10-13 routes openExternal to preload.cjs:108 IPC, web platform.js:95/mobile-platform.ts:28 use window.open",
+        "baseline_assessment": "R7 missed openExternal ...ACA2C4 and action-specific state.read; poll is part of OAuth start semantic leaf ...2DA782"
+      }
+    ]
+  }
+}

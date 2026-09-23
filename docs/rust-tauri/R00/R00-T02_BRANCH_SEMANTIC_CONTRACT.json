@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "role": "人工逐值语义契约；不能从源码摘要或统一审查行自动生成",
+  "entry_id": "tool:ask_user",
+  "selector": "decision?.action",
+  "producer_evidence": [
+    "lib/tools/ask-user-tool.ts:275-277 从 ConfirmStore promise 取得 action",
+    "lib/confirm-store.ts:70-74、97-103、132：timeout、resolve 传入 action、aborted",
+    "server/routes/confirm.ts:17-20：现行 HTTP 只允许 confirmed/rejected",
+    "core/slash-commands/bridge-commands.ts:155,165,316-329：/confirm、/reject 经 _resolvePendingConfirmation 传 confirmed/rejected"
+  ],
+  "branches": [
+    {
+      "value": "confirmed",
+      "source_condition": "action === confirmed",
+      "reachability": "REACHABLE",
+      "decision": "SAME_EFFECT_WITH_VARIANTS",
+      "observable_result": "返回 answered=true、timedOut=false 与按 key 映射的答案",
+      "source_result_signature": "toolOk:answered=true,timedOut=false",
+      "scenario_assertion": "提交值与key及label映射一致",
+      "source_result_digest": "631ff733ca53d46105b0d2c9d83043bfb76261a0754b1feeb677a5e368ba36a0"
+    },
+    {
+      "value": "timeout",
+      "source_condition": "action === timeout；推荐项有/无分别检查",
+      "reachability": "REACHABLE",
+      "decision": "SAME_EFFECT_WITH_VARIANTS",
+      "observable_result": "返回 timedOut=true；仅自动填推荐项",
+      "source_result_signature": "toolOk:answered=true,timedOut=true",
+      "scenario_assertion": "超时只选推荐项",
+      "source_result_digest": "841244d3adcac9f2e8fafbb580a59041a0da1e8586fa2a62d8b99959e8d38ae4"
+    },
+    {
+      "value": "aborted",
+      "source_condition": "action === aborted",
+      "reachability": "REACHABLE",
+      "decision": "SAME_EFFECT_WITH_VARIANTS",
+      "observable_result": "返回 answered=false、aborted=true、空答案",
+      "source_result_signature": "toolOk:answered=false,aborted=true",
+      "scenario_assertion": "拒答和中止均无答案",
+      "source_result_digest": "502293eadabd0cf3703d30fef45c3384cdd6d00276cfb4eec213330bc821a64c"
+    },
+    {
+      "value": "<default>",
+      "source_condition": "上述显式值以外；现行 rejected 经此路径",
+      "reachability": "REACHABLE",
+      "decision": "SAME_EFFECT_WITH_VARIANTS",
+      "observable_result": "返回 answered=false、dismissed=true、空答案",
+      "source_result_signature": "toolOk:answered=false,dismissed=true",
+      "scenario_assertion": "拒答和中止均无答案",
+      "source_result_digest": "1443cef4dc271370c06bde7e2b35c86b037114620293ef7fbb821741aac2bd9e"
+    }
+  ],
+  "manual_boundary": "AST 沿 decision?.action 来源发现严格相等、数组/Set、switch、取反、布尔组合及本地 helper；新增分支无论结果标志是否相同均先报未裁决。动态集合或结果依赖无法确定时列 MANUAL 并使自动通过失败；只有跨调用方约束及反证可证明不可达。",
+  "source_condition_digest": "d690cfa14803202c33860797300d1193fce354bca8d3d05e7192ce0c4c832ba6"
+}

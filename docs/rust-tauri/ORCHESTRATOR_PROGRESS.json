@@ -4,7 +4,7 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+  "current_head": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -321,7 +321,7 @@
     "R00-T01": {
       "name": "固定基线与隔离工作区",
       "stage_id": "R00",
-      "status": "COMMITTING",
+      "status": "DONE",
       "task_base_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
       "executor_id": "/root/exec_r00_t01",
       "execution_result": "READY_FOR_REVIEW",
@@ -357,8 +357,12 @@
         "R00-A01": "PASS",
         "R00-A02": "PASS"
       },
-      "task_commit_sha": null,
-      "push_result": "PENDING",
+      "task_commit_sha": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+      "push_result": {
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084"
+      },
       "blockers": [],
       "candidate_digest_sha256": "21fd76c1201456207fb88222b2dd166da799253e4699d3778f32eaa61f3fa6f7",
       "candidate_file_count": 94,
@@ -377,23 +381,189 @@
     "R00-T02": {
       "name": "重建完整保留功能清单",
       "stage_id": "R00",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
-      "repair_agent_id": null,
-      "root_cause_agent_id": null,
+      "status": "COMMITTING",
+      "task_base_sha": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+      "executor_id": "/root/exec_r00_t02",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 10,
+      "reviewer_id": "/root/review_r00_t02_r10",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "F01",
+          "severity": "BLOCKING",
+          "summary": "桌面IPC生产入口未纳入清单",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R1.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "F02",
+          "severity": "BLOCKING",
+          "summary": "核心slash命令被泛化入口遮盖",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R1.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "F03",
+          "severity": "BLOCKING",
+          "summary": "兼容别名与内部端点机械计为用户叶子",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R1.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "F04",
+          "severity": "BLOCKING",
+          "summary": "MOOD实时历史和五语言等显性子功能缺失",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R1.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "R2-F01",
+          "severity": "BLOCKING",
+          "summary": "同一路径不同方法合并，副作用和结果语义失真",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R2.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "R2-F02",
+          "severity": "BLOCKING",
+          "summary": "文件预览被并入编辑且缺少桌面验收映射",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R2.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "R3-F01",
+          "severity": "BLOCKING",
+          "summary": "同一方法下请求体不同动作仍合成一叶",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R3.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "R3-F02",
+          "severity": "BLOCKING",
+          "summary": "382 个待核路由缺实际结果和适用验收",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R3.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "R4-F01",
+          "severity": "BLOCKING",
+          "summary": "240 个非 HTTP 叶缺具体结果或适用子场景",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R4.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "R4-F02",
+          "severity": "BLOCKING",
+          "summary": "确认接口新同方法动作可绕过分支复审门禁",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R4.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "R5-F01",
+          "severity": "BLOCKING",
+          "summary": "新增工具动作仅同步两层摘要仍沿用旧语义裁决",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R5.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "R5-F02",
+          "severity": "BLOCKING",
+          "summary": "模型观测实际消费者未纳入统一源码范围",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R5.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "R5-F03",
+          "severity": "BLOCKING",
+          "summary": "设置页支持目标错挂且失败结果断言相反",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R5.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "R6-F01",
+          "severity": "BLOCKING",
+          "summary": "等价 includes(action) 新分支同步摘要仍绕过门禁",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R6.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "R6-F02",
+          "severity": "BLOCKING",
+          "summary": "供应商页面加载失败与本地选择结果断言错误",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R6.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "R6-F03",
+          "severity": "BLOCKING",
+          "summary": "自动化停用空提示词草稿结果断言错误",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R6.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "R7-F01",
+          "severity": "BLOCKING",
+          "summary": "自动化启用走 cron.update 且合并草稿，启停动作只挂 cron.toggle 叶和场景",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R7.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "R7-F02",
+          "severity": "BLOCKING",
+          "summary": "22 页 67 行当前 UI 摘要与动作断言漂移，旧错误结果还进入主功能清单",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R7.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "R8-F01",
+          "severity": "BLOCKING",
+          "summary": "九个全局字段设置动作错挂助手 config.yaml 叶，mixed patch 双归属与门禁反向拒绝",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R8.md",
+          "resolution": "resolved in R10 PASS"
+        },
+        {
+          "id": "R9-F01",
+          "severity": "BLOCKING",
+          "summary": "供应商权威目录与焦点助手 YAML 重写、部分成功边界被清单和场景错述",
+          "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R9.md",
+          "resolution": "resolved in R10 PASS"
+        }
+      ],
+      "repair_agent_id": "/root/repair_r00_t02_r9",
+      "root_cause_agent_id": "/root/root_cause_r00_t02_r9",
       "acceptance_results": {
-        "R00-A03": "NOT_STARTED",
-        "R00-A04": "NOT_STARTED"
+        "R00-A03": "PASS",
+        "R00-A04": "PASS"
       },
       "task_commit_sha": null,
-      "push_result": null,
-      "blockers": []
+      "push_result": "PENDING",
+      "blockers": [],
+      "candidate_digest_sha256": "972317079442203a8da67609ddcfc8661b304361934fcbd9db999be0c5244ad1",
+      "candidate_file_count": 20,
+      "review_report": "docs/rust-tauri/R00/R00-T02_REVIEW_R10.md",
+      "root_cause_report": "docs/rust-tauri/R00/R00-T02_ROOT_CAUSE_R9.md",
+      "candidate_limitations": [
+        "736 个未来迁移子场景尚未执行，交 R00-T07 纳账及实施任务执行",
+        "静态源码核验不等于真实 OAuth、远端供应商、跨平台桌面或 Rust/Tauri 运行验收",
+        "动态平台调用与网络结果由后续对应任务实测"
+      ],
+      "repair_support_agents": [
+        "/root/audit_r00_t02_ui_oracles",
+        "/root/audit_r00_t02_ast_conditions"
+      ],
+      "candidate_digest_algorithm": "SHA256 of sorted filename lines for 20 non-report files: per-file SHA256, two spaces, filename, newline; report and repair summary SHA256 separate",
+      "candidate_report_sha256": "cbdfff4afcc17b327a68b16bdb7a5bd40dcbcdae1e4f008cde015d58b99f2ac4",
+      "candidate_repair_summary_sha256": "6b84b6e47a2f76651baed75edde512db37c8881d1f7e6ab4ef0cc878cffb0fba",
+      "candidate_review_report_sha256": "2bbea6e665d46b0187f9a99e13bb40b9596e6087ceadfe805f36b9d2986c499f",
+      "precommit_checks": {
+        "scope": "54 staged files only docs/rust-tauri/R00 and ledger; original taskbook changes excluded",
+        "git_diff_check": "PASS",
+        "sensitive_pattern_scan": "no private-key or common token pattern matches",
+        "large_files": "seven JSON audit/inventory artifacts exceed 1 MiB; each is reviewed Task evidence, no binary or raw user data",
+        "candidate_fingerprint": "20/20 match independent R10 reviewer frozen aggregate",
+        "product_code_diff": "none"
+      }
     },
     "R00-T03": {
       "name": "盘点 Pi 与 Node 隐含职责",
@@ -2454,5 +2624,5 @@
       "blockers": []
     }
   },
-  "current_task": "R00-T01"
+  "current_task": "R00-T02"
 }
