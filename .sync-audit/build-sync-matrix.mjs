@@ -1059,6 +1059,19 @@ function main() {
       console.error(`✗ VERIFIED_SOURCE_SHA 非 40 位十六进制: ${verifiedSourceSha}`);
       process.exit(1);
     }
+    // 坐标必须精确指向 commit 对象：tree/tag 同样被 git diff/ls-tree 接受，
+    // 40 位格式与六处字符串一致性检查不足以证明坐标是真实源码提交（C3 独立复核 F1）。
+    let verifiedObjectType;
+    try {
+      verifiedObjectType = execSync(`git cat-file -t ${verifiedSourceSha}`, { cwd: ROOT, encoding: "utf-8" }).trim();
+    } catch {
+      console.error(`✗ VERIFIED_SOURCE_SHA 必须指向真实 commit 对象（对象不存在或不可读）: ${verifiedSourceSha}`);
+      process.exit(1);
+    }
+    if (verifiedObjectType !== "commit") {
+      console.error(`✗ VERIFIED_SOURCE_SHA 必须指向真实 commit 对象（git cat-file -t 实际返回 ${verifiedObjectType}）: ${verifiedSourceSha}`);
+      process.exit(1);
+    }
   } else {
     console.error("✗ 缺少 .sync-audit/verified-source-sha.txt（审计坐标文件）");
     process.exit(1);

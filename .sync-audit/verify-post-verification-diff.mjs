@@ -78,6 +78,18 @@ if (!/^[0-9a-f]{40}$/.test(sha)) {
   fail(`VERIFIED_SOURCE_SHA 非 40 位十六进制: ${sha}`);
 }
 
+// 坐标必须精确指向 commit 对象：tree/tag 同样被 git diff/ls-tree 接受，
+// 40 位格式检查不足以证明坐标是真实源码提交（C3 独立复核 F1）。
+let objectType;
+try {
+  objectType = execSync(`git cat-file -t ${sha}`, { cwd: ROOT, encoding: "utf-8" }).trim();
+} catch {
+  fail(`VERIFIED_SOURCE_SHA 必须指向真实 commit 对象（对象不存在或不可读）: ${sha}`);
+}
+if (objectType !== "commit") {
+  fail(`VERIFIED_SOURCE_SHA 必须指向真实 commit 对象（git cat-file -t 实际返回 ${objectType}）: ${sha}`);
+}
+
 let changed;
 try {
   const out = execSync(`git diff --name-only ${sha}..HEAD`, { cwd: ROOT, encoding: "utf-8" });

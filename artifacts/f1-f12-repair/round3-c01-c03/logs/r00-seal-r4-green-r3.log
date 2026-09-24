@@ -1,0 +1,58 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/upstream-sync-matrix.test.ts (7 tests) 61ms
+ ✓ tests/round2-delivery-evidence.test.ts (32 tests) 21822ms
+     ✓ R10-02: COMMAND_RESULTS 的日志与源码 manifest 均存在且 SHA-256 可复算  320ms
+     ✓ R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁  653ms
+     ✓ R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示  323ms
+     ✓ R10-09: 增量补丁从干净 89bc0b64 重放后按 source/seal 两状态验收  10314ms
+     ✓ source 状态：当前==完整冻结 manifest 时 seal guard 红不否决 VERIFIED  420ms
+     ✓ seal 状态：冻结==VERIFIED、VERIFIED..HEAD 仅审计、当前==HEAD → VERIFIED  469ms
+     ✓ 负向：冻结 manifest 任一条目被篡改 → MISMATCH  464ms
+     ✓ 负向：当前未提交的源码修改 → MISMATCH（guard 只看 commits，需当前==HEAD）  480ms
+     ✓ 负向：当前未跟踪的新增源码文件 → MISMATCH  491ms
+     ✓ 负向：当前未提交的源码删除 → MISMATCH  475ms
+     ✓ 负向：当前未提交的审计文件变化 → MISMATCH（防候选字节冒充 HEAD）  468ms
+     ✓ 负向：VERIFIED..HEAD 含非白名单已提交路径 → MISMATCH  473ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向不存在的对象 → MISMATCH  432ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 tree 对象（存在且树内容相同）→ 脚本与 guard 均拒绝（C3 F1）  445ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 annotated tag 对象 → 脚本与 guard 均拒绝  450ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 blob 对象 → 脚本与 guard 均拒绝  475ms
+     ✓ 负向（source 通道）：tree 对象坐标（内容匹配、重冻后命中快捷返回）→ MISMATCH（R2 F1）  458ms
+     ✓ 负向（source 通道）：annotated tag 对象坐标 → MISMATCH  468ms
+     ✓ 负向（source 通道）：blob 对象坐标 → MISMATCH  446ms
+     ✓ 负向（source 通道）：坐标指向不存在的对象 → MISMATCH  442ms
+     ✓ 负向（source 通道）：坐标非 40 位十六进制 → MISMATCH  420ms
+     ✓ 负向（source 通道）：坐标文件缺失 → MISMATCH  420ms
+     ✓ 负向：MISMATCH 不改写交付补丁（哨兵字节保留 / 原本不存在则仍不存在）  691ms
+     ✓ 负向：VERIFIED 指向树不等于冻结 manifest（错误冻结）→ MISMATCH  514ms
+     ✓ 负向：补丁损坏 → 重放校验拒绝（非零退出）  361ms
+     ✓ 负向：重放与当前 index 不等 → MISMATCH（保留原有重放校验）  377ms
+ ✓ tests/round3-delivery-evidence.test.ts (26 tests) 22301ms
+     ✓ round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试  643ms
+     ✓ round3: 现场重放增量补丁并按 source/seal 两状态验收（不只读历史 VERIFIED 记录）  13274ms
+     ✓ source 状态：当前==完整冻结 manifest 时 seal guard 红不否决 VERIFIED  354ms
+     ✓ seal 状态：冻结==VERIFIED、VERIFIED..HEAD 仅审计、当前==HEAD → VERIFIED  405ms
+     ✓ 负向：冻结 manifest 任一条目被篡改 → MISMATCH  400ms
+     ✓ 负向：当前未提交/未跟踪的源码变化 → MISMATCH（guard 只看 commits，需当前==HEAD）  812ms
+     ✓ 负向：当前未提交的审计文件变化 → MISMATCH（防候选字节冒充 HEAD）  397ms
+     ✓ 负向：VERIFIED..HEAD 含非白名单已提交路径 → MISMATCH  411ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向不存在的对象 → MISMATCH  396ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 tree 对象（存在且树内容相同）→ 脚本与 guard 均拒绝（C3 F1）  412ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 annotated tag 对象 → 脚本与 guard 均拒绝  416ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 blob 对象 → 脚本与 guard 均拒绝  406ms
+     ✓ 负向（source 通道）：tree 对象坐标（内容匹配、重冻后命中快捷返回）→ MISMATCH（R2 F1）  385ms
+     ✓ 负向（source 通道）：annotated tag 对象坐标 → MISMATCH  390ms
+     ✓ 负向（source 通道）：blob 对象坐标 → MISMATCH  378ms
+     ✓ 负向（source 通道）：坐标指向不存在的对象 → MISMATCH  371ms
+     ✓ 负向（source 通道）：坐标非 40 位十六进制 → MISMATCH  353ms
+     ✓ 负向（source 通道）：坐标文件缺失 → MISMATCH  352ms
+     ✓ 负向：MISMATCH 不改写交付补丁（哨兵字节保留 / 原本不存在则仍不存在）  606ms
+     ✓ 负向：VERIFIED 指向树不等于冻结 manifest（错误冻结）→ MISMATCH  481ms
+     ✓ 负向：补丁损坏 → 重放校验拒绝（非零退出）  311ms
+
+ Test Files  3 passed (3)
+      Tests  65 passed (65)
+   Start at  00:26:02
+   Duration  22.42s (transform 128ms, setup 56ms, import 95ms, tests 44.18s, environment 0ms)

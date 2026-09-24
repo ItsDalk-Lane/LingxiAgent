@@ -1,0 +1,44 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/upstream-sync-matrix.test.ts (7 tests) 58ms
+ ✓ tests/round2-delivery-evidence.test.ts (25 tests) 18994ms
+     ✓ R10-02: COMMAND_RESULTS 的日志与源码 manifest 均存在且 SHA-256 可复算  308ms
+     ✓ R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁  700ms
+     ✓ R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示  341ms
+     ✓ R10-09: 增量补丁从干净 89bc0b64 重放后按 source/seal 两状态验收  10694ms
+     ✓ source 状态：当前==完整冻结 manifest 时 seal guard 红不否决 VERIFIED  436ms
+     ✓ seal 状态：冻结==VERIFIED、VERIFIED..HEAD 仅审计、当前==HEAD → VERIFIED  481ms
+     ✓ 负向：冻结 manifest 任一条目被篡改 → MISMATCH  473ms
+     ✓ 负向：当前未提交的源码修改 → MISMATCH（guard 只看 commits，需当前==HEAD）  491ms
+     ✓ 负向：当前未跟踪的新增源码文件 → MISMATCH  479ms
+     ✓ 负向：当前未提交的源码删除 → MISMATCH  461ms
+     ✓ 负向：当前未提交的审计文件变化 → MISMATCH（防候选字节冒充 HEAD）  464ms
+     ✓ 负向：VERIFIED..HEAD 含非白名单已提交路径 → MISMATCH  485ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向不存在的对象 → MISMATCH  450ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 tree 对象（存在且树内容相同）→ 脚本与 guard 均拒绝（C3 F1）  462ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 annotated tag 对象 → 脚本与 guard 均拒绝  472ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 blob 对象 → 脚本与 guard 均拒绝  469ms
+     ✓ 负向：VERIFIED 指向树不等于冻结 manifest（错误冻结）→ MISMATCH  522ms
+     ✓ 负向：补丁损坏 → 重放校验拒绝（非零退出）  360ms
+     ✓ 负向：重放与当前 index 不等 → MISMATCH（保留原有重放校验）  371ms
+ ✓ tests/round3-delivery-evidence.test.ts (19 tests) 19794ms
+     ✓ round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试  695ms
+     ✓ round3: 现场重放增量补丁并按 source/seal 两状态验收（不只读历史 VERIFIED 记录）  13536ms
+     ✓ source 状态：当前==完整冻结 manifest 时 seal guard 红不否决 VERIFIED  341ms
+     ✓ seal 状态：冻结==VERIFIED、VERIFIED..HEAD 仅审计、当前==HEAD → VERIFIED  406ms
+     ✓ 负向：冻结 manifest 任一条目被篡改 → MISMATCH  403ms
+     ✓ 负向：当前未提交/未跟踪的源码变化 → MISMATCH（guard 只看 commits，需当前==HEAD）  822ms
+     ✓ 负向：当前未提交的审计文件变化 → MISMATCH（防候选字节冒充 HEAD）  417ms
+     ✓ 负向：VERIFIED..HEAD 含非白名单已提交路径 → MISMATCH  432ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向不存在的对象 → MISMATCH  392ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 tree 对象（存在且树内容相同）→ 脚本与 guard 均拒绝（C3 F1）  406ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 annotated tag 对象 → 脚本与 guard 均拒绝  406ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 blob 对象 → 脚本与 guard 均拒绝  412ms
+     ✓ 负向：VERIFIED 指向树不等于冻结 manifest（错误冻结）→ MISMATCH  473ms
+     ✓ 负向：补丁损坏 → 重放校验拒绝（非零退出）  305ms
+
+ Test Files  3 passed (3)
+      Tests  51 passed (51)
+   Start at  22:24:31
+   Duration  19.91s (transform 117ms, setup 60ms, import 83ms, tests 38.85s, environment 0ms)

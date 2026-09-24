@@ -76,9 +76,9 @@
       "sha256": "ce00fe5025692993005d3a5350ff13f8a568d604158041df74f1d229a2dfb607"
     },
     {
-      "bytes": 54382,
+      "bytes": 55164,
       "path": ".sync-audit/build-sync-matrix.mjs",
-      "sha256": "38b5f527ba1201600c5ec929a2397ea942530c038b426224d3637fdc63a211d4"
+      "sha256": "9f27b38dd3ae8ed3d0ec2c6355ce1631563d5178461a51f64cbeb20ec9096f76"
     },
     {
       "bytes": 16534,
@@ -121,9 +121,9 @@
       "sha256": "b2d8dc46821888fcf79bd04ffe3b017439463581a37ddf9cf25c8d31e44d33da"
     },
     {
-      "bytes": 4111,
+      "bytes": 4677,
       "path": ".sync-audit/verify-post-verification-diff.mjs",
-      "sha256": "c3d1b604ac0e7293cd760875eaf6583f47b5f1eb81e10271d106fa994922076b"
+      "sha256": "f53088951c569a6df2708f4751692b3f0114d932a37b53e169c6da7f1f2e26de"
     },
     {
       "bytes": 3795,
@@ -211,9 +211,9 @@
       "sha256": "5a8f3e3f07ffa7e3edf546739bfcfd742e573b34086bc3353e7776e2a0da66e5"
     },
     {
-      "bytes": 8834,
+      "bytes": 16512,
       "path": "artifacts/f1-f12-repair/round2/create-delivery-patch.py",
-      "sha256": "e1a9b87057c753bfb21248a722cd87485a245502739acb1a370b984ac7200dc7"
+      "sha256": "b93c2edaab809141963f2647b4442a53b5dfa0d5be8e9a4aac03b5de7b1edfb5"
     },
     {
       "bytes": 2984,
@@ -221,9 +221,9 @@
       "sha256": "576ad9902037f3dded9c1291c9b48ad594daa7f0f8d32ef4c70151256de45358"
     },
     {
-      "bytes": 8477,
+      "bytes": 16799,
       "path": "artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py",
-      "sha256": "ec583eb2c0c33deb44cc1b2851f01225f8bfd1f521867d95825039fa466f95f8"
+      "sha256": "92238fea7f9f4b33c5f27b5340a418edc748471c3091d16124843b72cbdf15c0"
     },
     {
       "bytes": 3806,
@@ -20356,9 +20356,9 @@
       "sha256": "46c3fb23fae07c950c8644b9bd792ae100fd9811dd66e607b9cd8b657832d1e3"
     },
     {
-      "bytes": 30611,
+      "bytes": 40064,
       "path": "docs/rust-tauri/R00/R00_AUDIT_SEAL_EXECUTION.md",
-      "sha256": "679f2cbc820c75d4ecae6c3d31c2272545e57272505115b4e5d81048e21df5ac"
+      "sha256": "b9ec35126fe667420d75cc517c5150f08047e4859622f3047fc1cd0bcb33b851"
     },
     {
       "bytes": 11666,
@@ -26591,6 +26591,11 @@
       "sha256": "878f38c1b50449c9885f1814a508b0eae837b58a0c0c38694c1255e7e24aafb9"
     },
     {
+      "bytes": 18002,
+      "path": "tests/helpers/patch-seal-fixture.ts",
+      "sha256": "69e77ab460aaf4fd739ce36703089ed91be03007a8fee3f70ed6143b7a8f567c"
+    },
+    {
       "bytes": 15601,
       "path": "tests/history-overview-route.test.ts",
       "sha256": "2877aef0b98c4b4edf60d85bce562efae4db95e9091b46321f4ab53e43a92e56"
@@ -28326,9 +28331,9 @@
       "sha256": "5eb4db8f88806e002d1bb8fe49bf4b96520a04d3d05bed9aa9f5a9792f3afbfb"
     },
     {
-      "bytes": 5079,
+      "bytes": 5305,
       "path": "tests/post-verification-audit-seal.test.ts",
-      "sha256": "a1520e300e2e3baded81a618e30fc46d605f71ea247ba6156d6247e0368728ed"
+      "sha256": "1489e53bdd139ea0fcc1a83edb841ba248e07c5a26f10e6cbb7febbe9eba2a34"
     },
     {
       "bytes": 1650,
@@ -28751,9 +28756,9 @@
       "sha256": "8490a08650c89a6ac3877ed4989272323d5c904984133131795ccec87c43bef4"
     },
     {
-      "bytes": 11241,
+      "bytes": 23829,
       "path": "tests/round2-delivery-evidence.test.ts",
-      "sha256": "c21bb8fc79185e3dd164f0f9cf5642f15a06f85b8adf0cbdfce2432de550a991"
+      "sha256": "9f427654dc86a1ce234f78106683b424e08eea119531517bfbb53e6a536a1be5"
     },
     {
       "bytes": 11662,
@@ -28791,9 +28796,9 @@
       "sha256": "8f1dc53bdf373bd107e85c5f32561cdf03ca254dc438feea328a504bc0de8688"
     },
     {
-      "bytes": 8235,
+      "bytes": 21299,
       "path": "tests/round3-delivery-evidence.test.ts",
-      "sha256": "a11fbcced9da2b993d698d772c384fac4e77a999ad06eee92f7c293b8f31e101"
+      "sha256": "ae5fc22721f03770b9b88a30eee3451243ae70ea7599a35780d048a6d56cb8de"
     },
     {
       "bytes": 4356,
@@ -29966,9 +29971,9 @@
       "sha256": "017ae9e355d64965b8e773fe8bf3a11373db4e399dad5b5944e3ee2f2a0496a8"
     },
     {
-      "bytes": 5617,
+      "bytes": 6092,
       "path": "tests/upstream-sync-matrix.test.ts",
-      "sha256": "397b3f1a50efb27dc993d3fff692894558cd01ab288b8e2ed0ad822c270a02b4"
+      "sha256": "a52663d36049c378ea95f7d01f809f7184ef22d4b01940c7b636764a67db83aa"
     },
     {
       "bytes": 2693,

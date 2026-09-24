@@ -11,6 +11,7 @@
  *   四类之和 = 133；每行 test_evidence 具体（不允许 full suite 式占位）。
  */
 import crypto from "crypto";
+import { execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
 import { describe, expect, it } from "vitest";
@@ -112,6 +113,10 @@ describe("upstream sync matrix audit (Gate A)", () => {
     expect(fs.existsSync(shaFile)).toBe(true);
     const verifiedSourceSha = fs.readFileSync(shaFile, "utf-8").trim();
     expect(verifiedSourceSha).toMatch(/^[0-9a-f]{40}$/);
+    // 坐标字面必须即 commit 对象本身：tree/tag 同样被 git diff/ls-tree 接受，
+    // 「矩阵绿」不得被误读为坐标合法（C3 独立复核 F1）。
+    const objectType = execFileSync("git", ["cat-file", "-t", verifiedSourceSha], { cwd: ROOT, encoding: "utf-8" }).trim();
+    expect(objectType, "VERIFIED_SOURCE_SHA 必须指向真实 commit 对象（拒绝 tree/tag/blob/缺失）").toBe("commit");
 
     const matrix = loadMatrix();
     expect(matrix.coordinates.VERIFIED_SOURCE_SHA, "JSON coordinates").toBe(verifiedSourceSha);

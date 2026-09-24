@@ -201,6 +201,8 @@ git commit -m "chore: 审计封印推进——VERIFIED_SOURCE_SHA → ${C1:0:9}�
 
 上一轮方法：在副本内用 `git write-tree` / `git commit-tree` 生成临时提交对象 C1'（parent=89c24455b，内容=旧 C1 候选）与 C2'（parent=C1'，内容=§6 六文件，其中坐标填 C1'），再将副本分支指针移至 C2' 复跑门禁：guard exit 0、`build-sync-matrix.mjs --check` exit 0、封印四文件 25/25 绿、全量 0 失败。**该预演只在 `/tmp` 副本的对象库中产生对象，不改本仓任何 ref；预演 SHA 与总控实际提交 SHA 必然不同，仅验证机制与文件集自洽。** 本轮未重做 C2'：C2 的文件集与生成器路径未变（脚本修复只影响证据生成，不触碰六白名单文件与矩阵生成器），正式结论以总控 postcommit 复验（§9）为准。
 
+**适用性追记（2026-09-24，C3 修复轮，不改写上述历史记录）：** 上述「全绿」预演运行于 F2 修复前的旧脚本（无「重放树 == 完整冻结 manifest」逐项对盘），对现行脚本不再成立：现行脚本下 C2 候选使当前树与 C1 冻结树恰差六个审计文件，round2 R10-09 与 round3 补丁脚本现场重放均确定性 exit 1（C2 独立复核 R1 实测：四文件门禁 24/25、全量 1 失败，VERDICT FAIL）。该冲突由 C3 的双状态验收修复（见 §12）；§9.6/§9.7 的 0 失败通过标准保留不变。
+
 ## 8. 局限与未执行项
 
 - 平台：仅 macOS 27.0 arm64 实测；Windows/Linux/Intel 未运行；真实 Windows 安装/NSIS 交互沿用既有 Known limitation。
@@ -215,20 +217,27 @@ git commit -m "chore: 审计封印推进——VERIFIED_SOURCE_SHA → ${C1:0:9}�
 
 ## 9. Postcommit 必须执行的检验（总控 / 独立验收代理）
 
-**C1 提交后、C2 之前：**
+**本节已按 C3/C4 现状改写：下方带 C1/C2 编号与 6071 条目数的步骤是历史流程存档
+（对应已被判 FAIL 的 C2 候选形态），不得照旧执行。现行执行以真实 C3/C4 提交、
+冻结清单实测条目数（当前 6072，以生成时实测为准）与 0 失败标准为准。**
 
-1. `git log -1 --format=%H` 确认 C1；`git diff --stat 89c24455b..C1` 应仅含 §5.1 清单的 22 个路径（8 修改 + 14 新增），生产运行面零差异；两份修复脚本的提交字节应等于 §5.0 记录的新 SHA-256。
-2. 只读复算 manifest 与树一致（注意 R10-09 所在文件会确定性再生成 round2 `patch.gz`：同一树字节一致、无漂移）。
-3. 独立验收代理按本报告 §3/§7 复核证据链（R10-02 逐记录日志哈希、`manifests/` 快照、两份补丁摘要中 `frozenManifestEntries=6071` 且 `replayedMatchesFrozenManifest=true`）；并按审查 §4 矩阵自行从各自 BASE 独立重放对盘。
+**C3 提交后、C4 之前（现行）：**
 
-**C2 提交后：**
+1. `git log -1 --format=%H` 确认真实 C3，`git cat-file -t C3` 必须输出 `commit`；`git diff --stat C1..C3` 仅含本轮修复候选的精确路径清单（source/evidence 修复 + 证据重冻结，以仓库外终报 `/tmp/r00-seal-c3-repair-r3.md` 为准），生产运行面零差异。
+2. 只读复算两份 SOURCE_MANIFEST 与 C3 全树逐项一致（keep() 范围内逐路径/字节数/SHA-256，当前实测 6072 条）；两份交付补丁从各自 BASE 独立重放，与 C3 同范围全树全等。
+3. 独立验收代理复核证据链（R10-02 逐记录日志哈希、`manifests/` 快照、补丁摘要中 `frozenManifestEntries` 等于实测条目数；source 与 seal 两态的 VERIFIED 都必须回报 `verifiedSourceSha` 且 `verifiedSourceObjectType="commit"`；seal 状态下另须 `frozenMatchesVerifiedCommit=true`）。
+4. 旧审计坐标（`46f12ab1…`）下全量 `npm test` 只允许 post-verification guard「audit-only」结构性 1 红；四文件门禁其余全绿。
 
-4. `node .sync-audit/verify-post-verification-diff.mjs` → exit 0（diff C1..C2 恰 6 个白名单文件）。
-5. `node .sync-audit/build-sync-matrix.mjs --check` → exit 0。
-6. `npx vitest run tests/post-verification-audit-seal.test.ts tests/upstream-sync-matrix.test.ts tests/round2-delivery-evidence.test.ts tests/round3-delivery-evidence.test.ts` → 25/25 绿。
-7. `npm test` 全量终态复验 → **0 失败为通过标准**；既有平台抖动家族（ustar ENOTEMPTY、worker fork、speech SIGTERM 回收竞态等）按惯例单跑甄别登记。
-8. `git diff --check`；`git status --porcelain` 除 round2 `patch.gz` 可能的运行时再生漂移外应为空。
-9. 远端推送后核对远端 ref == C2；封印终态以推送后的真实提交 SHA 为准再登记。
+**C4 提交后（现行）：**
+
+5. `node .sync-audit/verify-post-verification-diff.mjs` → exit 0（先验证坐标为 commit 对象，再断言 diff C3..C4 恰 6 个白名单文件）。
+6. `node .sync-audit/build-sync-matrix.mjs --check` → exit 0（含坐标 commit 类型校验）。
+7. `npx vitest run tests/post-verification-audit-seal.test.ts tests/upstream-sync-matrix.test.ts tests/round2-delivery-evidence.test.ts tests/round3-delivery-evidence.test.ts` → 0 失败（用例数以现行套件实测为准，不预填数字）。
+8. `npm test` 全量终态复验 → **0 失败为通过标准**；既有平台抖动家族（ustar ENOTEMPTY、worker fork、speech SIGTERM 回收竞态等）按惯例单跑甄别登记。
+9. `git diff --check`；`git status --porcelain` 除 round2 `patch.gz` 可能的运行时再生漂移外应为空。
+10. 远端推送后核对远端 ref == C4；封印终态以推送后的真实提交 SHA 为准再登记。
+
+**历史存档（C1/C2 流程，勿照执行）：** 原 §9 以「C1 提交后 `git diff --stat 89c24455b..C1` 恰 22 路径、补丁摘要 `frozenManifestEntries=6071` 且 `replayedMatchesFrozenManifest=true`、C2 提交后 diff C1..C2 恰 6 白名单文件」为步骤；C2 形态已被独立复核判 FAIL（重放树==冻结清单与纯审计 seal 互斥），6071 为当时条目数。现行条目数与双状态字段语义以 §12/§13 与实际冻结清单为准；0 失败门槛不变。
 
 ## 10. 回退方案
 
@@ -251,3 +260,35 @@ git commit -m "chore: 审计封印推进——VERIFIED_SOURCE_SHA → ${C1:0:9}�
 | 不用排除规则/测试改动掩盖覆盖缺口 | F2 经脚本修复真实纳入 932 个已跟踪忽略证据文件并与完整 manifest 逐项对盘；排除规则与测试零改动 |
 | 审查报告字节保持不变 | `R00_AUDIT_SEAL_REVIEW_C1_R1.md` SHA-256 恒为 `02070406…4102b5` |
 | 保留现有候选与用户改动 | 旧候选 34 文件逐字节备份于 `/tmp/r00-c1fix-r1/backup/`；任务开始时工作区除旧候选外无其他改动，无他人改动被覆盖 |
+
+## 12. 追记（2026-09-24）：C2 候选 FAIL 与 C3 双状态修复
+
+**本节为修复轮追记，不改写 §1–§11 的历史事实与既有验收结论。**
+
+- C2 候选（纯审计六文件、坐标 → C1）经独立复核 R1 判 **FAIL**：C1 的 F2 修复给两份补丁脚本加入「重放树 == 完整冻结 manifest 逐项对盘」，与纯审计 seal 状态（HEAD 与冻结树恰差六个审计文件）结构性互斥——round2 R10-09 与 round3 现场重放在 C2 树下确定性 exit 1，四文件门禁实测 24/25、全量 1 失败。复核报告在仓库外：`/tmp/r00-seal-c2-review-r1.md`（SHA-256 `fb22b1d91810d97b2c5a5d787d4596cb2000813ffd96d0dd558edbe11beb02ce`）。
+- C3 修复（紧随本追记的候选）：两份补丁脚本改为**双状态验收**——source 状态原样保留 C1 F2 的「当前清单 == 完整冻结 manifest」严格对盘（seal guard 红不否决该状态）；纯审计 seal 状态要求冻结 manifest == `VERIFIED_SOURCE_SHA` 指向的真实 commit 全树（逐路径、字节数、SHA-256）、现有 diff guard 绿（两份 allowlist 零改动）、当前清单 == HEAD 同一范围全等（防未提交/未跟踪源码与审计改动冒充），输出以 `state` / `frozenMatchesVerifiedCommit` / `currentMatchesHead` / `sealGuardPassed` / `replayedMatchesCurrent` 如实区分，`result=VERIFIED` 仅当各适用条件全部满足；seal 状态 `replayedMatchesFrozenManifest` 必为 false，不再解释为逐字全等。「补丁从各自 BASE 重放 == 当前清单」的不变式原样保留。
+- 测试锁定：round2 R10-09 锁定双状态与输出字段；round3 新增现场重放用例（不再只读历史 VERIFIED 记录）；两份证据测试各增 `/tmp` 合成夹具回归矩阵（source/seal 正向 + 篡改冻结、未提交/未跟踪源码变化、未提交审计变化、非白名单提交、VERIFIED 不存在/错误冻结、补丁损坏、重放不等负向场景）。
+- 通过标准：§9 现行步骤的「0 失败」不变；用例总数随新增断言以现行套件实测为准，不预填 25/25。本轮证据以两份 `COMMAND_RESULTS.json` 的 `r00-seal-r2-*` 记录与仓库外终报 `/tmp/r00-seal-c3-repair-r1.md` 为准；C3 候选在旧审计坐标下的预期形态为「仅 post-verification guard ｢audit-only｣ 1 红」（坐标推进的结构性前置，C4 就位后转绿）。
+
+## 13. 追记（2026-09-24）：C3 候选 FAIL 与坐标对象类型修复（R2）
+
+**本节为修复轮追记，不改写 §1–§12 的历史事实与既有验收结论。**
+
+- C3 候选经独立复核 R1 判 **FAIL**：seal 分支只校验坐标为 40 位十六进制后用 `git ls-tree` 读树，独立 guard 只做格式检查后 `git diff SHA..HEAD`——Git tree 对象 SHA 同样被两者接受，`/tmp` 预演中把坐标换成真实 C3' 的 tree 对象后双补丁脚本与独立 guard 均 exit 0 并误报 VERIFIED。复核报告在仓库外：`/tmp/r00-seal-c3-review-r1.md`（SHA-256 `4dc0f3a8d8cb8238f9dfdd6b8923dbac5e6a25ac7346af7c5bd9e80cc2a59afe`）；根因扫查：`/tmp/r00-seal-root-cause-r2.md`（SHA-256 `69dc9bfb886decd4cb9f569e5f1510ecdf4505f2235f6941c02947dc6804d606`）。
+- 本轮修复：所有会独立返回成功的 seal 范围入口——round2/round3 补丁脚本、独立 guard（`.sync-audit/verify-post-verification-diff.mjs`）、矩阵生成器（`build-sync-matrix.mjs`）、Vitest guard 与矩阵坐标一致性测试——统一对原始坐标执行精确 Git 对象类型校验（`git cat-file -t` 必须为 `commit`，拒绝 tree/tag/blob/缺失对象）。source/seal 双状态、frozen==真实 source commit 全树、current==HEAD、replay==current、VERIFIED..HEAD 仅白名单差异等原有约束原样保留；两份 allowlist 内容零改动。
+- 回归矩阵新增负向：存在且树内容与冻结清单相同的 tree 坐标、annotated tag 坐标、blob 坐标、缺失对象坐标（补丁脚本与独立 guard 均须拒绝，输出如实报告 `verifiedSourceObjectType`）；原负向（篡改冻结、未提交源码改/增/删、未提交审计变化、非白名单提交、错误冻结、补丁损坏、重放不等）全部保留。
+- §9 已改写为现行 C3/C4 步骤：旧 C1/C2 编号与 6071 条目数仅为历史存档；现行按真实 C3/C4 提交、实测条目数（当前 6072）与 0 失败标准推进；预演 SHA 一律不得当作正式 SHA 登记。
+- 本轮证据以两份 `COMMAND_RESULTS.json` 的 `r00-seal-r3-*` 记录与仓库外终报 `/tmp/r00-seal-c3-repair-r2.md` 为准；本追记不宣布封印 PASS，正式 C3/C4 提交与推送为后续授权任务。
+
+## 14. 追记（2026-09-25）：C3 候选 FAIL（R2）与 source 通道坐标校验修复（R3）
+
+**本节为修复轮追记，不改写 §1–§13 的历史事实与既有验收结论。**
+
+- C3 候选（R2 修复后）经独立复核 R2 判 **FAIL**：两份补丁脚本的 **source 状态**快捷返回（`replay_rows == frozen` 即 VERIFIED）发生在 VERIFIED_SOURCE_SHA 读取与 `git cat-file -t == commit` 精确类型检查之前——以真实 tree 对象坐标并同步重冻清单后，两脚本均 exit 0 / VERIFIED / `verifiedSourceObjectType=null`。复核报告：`/tmp/r00-seal-c3-review-r2.md`（SHA-256 `5dde66fecbd61625ebeab46c2cc2b8a1e16bfe6dc48bf04773c1aa5fa4353b57`）；根因扫查：`/tmp/r00-seal-root-cause-r3.md`（SHA-256 `56ca4b7ef429813ec7d64c147e47737d6318041d2b4ead734462985a1d97e34f`）。
+- 本轮修复（一次覆盖式）：
+  1. 两份补丁脚本把坐标的 40 位格式、坐标文件存在性、Git 对象存在性与 `git cat-file -t == commit` 精确校验上移到 source/seal 共同成功出口之前；**两态 VERIFIED 都必须回报 `verifiedSourceSha` 与 `verifiedSourceObjectType="commit"`**，非法对象保留实际 state、result=MISMATCH 与失败原因（exit 1）。source 仍允许旧的合法 commit 坐标且 guard 结构性红不否决；seal 保留冻结==真实 commit 全树、当前==HEAD、重放==当前、仅白名单差异全部约束。
+  2. 两份证据测试的 `manifestSourceRef()` 快捷返回前先断言坐标字面为 commit 原始对象；现场补丁测试（round2 R10-09 / round3 现场重放）在 source 与 seal 两态都断言 `verifiedSourceObjectType="commit"` 并核对 `verifiedSourceSha` 等于坐标文件内容。
+  3. 补丁生成副作用收窄：`build_patch()` 只在内存生成字节，交付 `patch.gz` 仅在全部适用条件 VERIFIED 后以同目录临时文件 + 原子替换写入；MISMATCH 或异常保留原字节（原本不存在则仍不存在）。成功时写出字节与 `patchSha256` 一致。
+  4. 回归矩阵新增：source 通道的 tree（内容匹配且重冻后命中快捷返回）/annotated tag/blob/缺失对象/非法文本/缺坐标文件六类负向 × 两轮；MISMATCH 不改写交付补丁（哨兵字节 + 文件缺失双输入）；损坏补丁异常路径的哨兵保留；source/seal 正向的坐标字段与补丁字节断言。旧负向（篡改冻结、未提交改/增/删、未提交审计变化、非白名单提交、错误冻结、补丁损坏、重放不等）全部保留。
+- 独立 guard、矩阵 `--check` 与两份 Vitest 坐标类型断言在 R2 已修且有独立证据，本轮零改动；两份 allowlist 逐项保持原样。
+- 本轮证据以两份 `COMMAND_RESULTS.json` 的 `r00-seal-r4-*` 记录与仓库外终报 `/tmp/r00-seal-c3-repair-r3.md` 为准；本追记不宣布封印 PASS，正式 C3/C4 提交与推送为后续授权任务。

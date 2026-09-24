@@ -3,6 +3,20 @@ import fs from "node:fs";
 import path from "node:path";
 import { execFileSync, spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
+import {
+  createPatchFixture,
+  disposeFixture,
+  expectCorruptPatchRejected,
+  expectFailurePreservesDeliveredPatch,
+  expectMismatch,
+  expectNonCommitCoordinateRejected,
+  expectReplayMismatchRejected,
+  expectSealStateVerified,
+  expectSourceCoordinateRejected,
+  expectSourceStateVerified,
+  fixtureGit,
+  tamperFrozenManifest,
+} from "./helpers/patch-seal-fixture";
 
 /**
  * round3（C01-C03）候选交付证据契约。
@@ -80,16 +94,30 @@ function sourceContentsAtCommit(commit: string, paths: string[]): Map<string, Bu
   return contents;
 }
 
+/**
+ * 读取审计坐标并证明其字面是存在的 commit 原始对象。必须在
+ * manifestSourceRef 的快捷返回之前执行（R2 独立验收 F1：current==frozen 时
+ * 单项用例可直接判绿，不能跳过坐标对象类型合同）。
+ */
+function verifiedCommitCoordinate(): string {
+  const verified = fs.readFileSync(path.join(ROOT, ".sync-audit", "verified-source-sha.txt"), "utf8").trim();
+  expect(verified).toMatch(/^[0-9a-f]{40}$/);
+  const probe = spawnSync("git", ["cat-file", "-t", verified], { cwd: ROOT, encoding: "utf8" });
+  expect(probe.status, `坐标对象不可读: ${probe.stderr}`).toBe(0);
+  expect(probe.stdout.trim(), "VERIFIED_SOURCE_SHA 必须指向真实 commit 对象（拒绝 tree/tag/blob/缺失）")
+    .toBe("commit");
+  return verified;
+}
+
 /** 当前树与冻结 manifest 一致 → null（直接比树）；否则经 seal guard 回退到候选提交。 */
 function manifestSourceRef(manifest: any): string | null {
+  const verified = verifiedCommitCoordinate();
   const rows = manifest.files.map((row: any) => row.path);
   if (JSON.stringify(rows) === JSON.stringify(currentSourcePaths())
     && manifest.files.every((row: any) => {
       const content = fs.readFileSync(path.join(ROOT, row.path));
       return content.byteLength === row.bytes && sha256(content) === row.sha256;
     })) return null;
-  const verified = fs.readFileSync(path.join(ROOT, ".sync-audit", "verified-source-sha.txt"), "utf8").trim();
-  expect(verified).toMatch(/^[0-9a-f]{40}$/);
   const guard = execFileSync("node", [path.join(ROOT, ".sync-audit", "verify-post-verification-diff.mjs")], {
     cwd: ROOT, encoding: "utf8",
   });
@@ -169,5 +197,301 @@ describe("round3 C01-C03 候选交付证据契约", () => {
     expect(summary.sourceManifestHash).toBe(summary.replayedSourceManifestHash);
     expect(fs.existsSync(path.join(ROOT, summary.patch))).toBe(true);
     expect(sha256(fs.readFileSync(path.join(ROOT, summary.patch)))).toBe(summary.patchSha256);
+  });
+
+  it("round3: 现场重放增量补丁并按 source/seal 两状态验收（不只读历史 VERIFIED 记录）", { timeout: 180_000 }, () => {
+    // C2 独立复核 F1：历史记录核对不能证明现行脚本可用，必须现场执行。
+    // 真实运行绝不设置夹具专用 BASE 覆盖（防以测试钩子冒充生产路径）。
+    // 现场重放按当前树再生成补丁字节（round3 补丁 diff 面包含证据文件，封印态下
+    // 字节必然漂移）；断言在再生成字节上真实执行，完成后恢复原字节以保住交付
+    // 产物与历史记录哈希。保持在本文件末位，先于它运行的记录核对不受再生成影响。
+    expect(process.env.LINGXI_PATCH_BASE_OVERRIDE).toBeUndefined();
+    const patchFile = path.join(OUT, "patches", "67dee5d2-to-round3-c01-c03.patch.gz");
+    const preserved = fs.readFileSync(patchFile);
+    try {
+      const output = execFileSync("python3", [
+        path.join(OUT, "create-round3-patch.py"),
+      ], { cwd: ROOT, encoding: "utf8" });
+      const result = JSON.parse(output.trim());
+      expect(result).toMatchObject({
+        base: BASE,
+        result: "VERIFIED",
+        replayedMatchesCurrent: true,
+        failures: [],
+      });
+      expect(result.sourceManifestHash).toBe(result.replayedSourceManifestHash);
+      // 两态共同坐标合同（R2 独立验收 F1）：任何 VERIFIED 出口都必须回报
+      // 坐标 SHA 与精确对象类型 commit，source 快捷返回不得跳过。
+      expect(result.verifiedSourceObjectType).toBe("commit");
+      expect(result.verifiedSourceSha).toBe(
+        fs.readFileSync(path.join(ROOT, ".sync-audit", "verified-source-sha.txt"), "utf8").trim(),
+      );
+      const manifest = readJson("SOURCE_MANIFEST.json");
+      const sourceState = JSON.stringify(manifest.files.map((row: any) => row.path)) === JSON.stringify(currentSourcePaths())
+        && manifest.files.every((row: any) => {
+          const content = fs.readFileSync(path.join(ROOT, row.path));
+          return content.byteLength === row.bytes && sha256(content) === row.sha256;
+        });
+      if (sourceState) {
+        expect(result.state).toBe("source");
+        expect(result.replayedMatchesFrozenManifest).toBe(true);
+      } else {
+        expect(result.state).toBe("seal");
+        expect(result.replayedMatchesFrozenManifest).toBe(false);
+        expect(result.frozenMatchesVerifiedCommit).toBe(true);
+        expect(result.currentMatchesHead).toBe(true);
+        expect(result.sealGuardPassed).toBe(true);
+        expect(result.verifiedSourceSha).toMatch(/^[0-9a-f]{40}$/);
+      }
+      expect(result.patchBytes).toBeGreaterThan(0);
+      expect(fs.existsSync(path.join(ROOT, result.patch))).toBe(true);
+      expect(sha256(fs.readFileSync(path.join(ROOT, result.patch)))).toBe(result.patchSha256);
+    } finally {
+      fs.writeFileSync(patchFile, preserved);
+    }
+  });
+});
+
+/**
+ * round3 补丁脚本双状态验收的回归矩阵（C2 独立复核 F1），与 round2 同构。
+ * 全部在 /tmp 合成 git 夹具中隔离执行：被测脚本与 diff guard 原样复制、
+ * BASE 经夹具专用环境变量注入，不触碰本仓、不污染证据目录。
+ */
+describe("round3 补丁脚本双状态回归矩阵（/tmp 合成夹具）", () => {
+  it("source 状态：当前==完整冻结 manifest 时 seal guard 红不否决 VERIFIED", () => {
+    const fx = createPatchFixture("round3", { seal: false });
+    try {
+      expectSourceStateVerified(fx);
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("seal 状态：冻结==VERIFIED、VERIFIED..HEAD 仅审计、当前==HEAD → VERIFIED", () => {
+    const fx = createPatchFixture("round3");
+    try {
+      expectSealStateVerified(fx);
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向：冻结 manifest 任一条目被篡改 → MISMATCH", () => {
+    const fx = createPatchFixture("round3");
+    try {
+      tamperFrozenManifest(fx);
+      expectMismatch(fx, {
+        state: "seal",
+        frozenMatchesVerifiedCommit: false,
+        currentMatchesHead: true,
+        sealGuardPassed: true,
+      });
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向：当前未提交/未跟踪的源码变化 → MISMATCH（guard 只看 commits，需当前==HEAD）", () => {
+    const fx = createPatchFixture("round3");
+    try {
+      fs.appendFileSync(path.join(fx.dir, "src", "app.txt"), "dirty\n");
+      expectMismatch(fx, { state: "seal", currentMatchesHead: false, sealGuardPassed: true });
+      fixtureGit(fx, ["checkout", "--", "src/app.txt"]);
+      fs.writeFileSync(path.join(fx.dir, "src", "untracked.txt"), "new\n");
+      expectMismatch(fx, { state: "seal", currentMatchesHead: false, sealGuardPassed: true });
+      fs.rmSync(path.join(fx.dir, "src", "untracked.txt"));
+      fs.rmSync(path.join(fx.dir, "src", "lib.txt"));
+      expectMismatch(fx, { state: "seal", currentMatchesHead: false, sealGuardPassed: true });
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向：当前未提交的审计文件变化 → MISMATCH（防候选字节冒充 HEAD）", () => {
+    const fx = createPatchFixture("round3");
+    try {
+      fs.appendFileSync(path.join(fx.dir, "PROGRESS.md"), "\n- 未提交台账\n");
+      expectMismatch(fx, { state: "seal", currentMatchesHead: false, sealGuardPassed: true });
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向：VERIFIED..HEAD 含非白名单已提交路径 → MISMATCH", () => {
+    const fx = createPatchFixture("round3");
+    try {
+      fs.appendFileSync(path.join(fx.dir, "src", "app.txt"), "committed\n");
+      fixtureGit(fx, ["add", "-A"]);
+      fixtureGit(fx, ["-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid", "commit", "-q", "-m", "non-audit"]);
+      expectMismatch(fx, {
+        state: "seal",
+        frozenMatchesVerifiedCommit: true,
+        currentMatchesHead: true,
+        sealGuardPassed: false,
+      });
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向：VERIFIED_SOURCE_SHA 指向不存在的对象 → MISMATCH", () => {
+    const fx = createPatchFixture("round3");
+    try {
+      expectNonCommitCoordinateRejected(fx, "0".repeat(40), "missing");
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向：VERIFIED_SOURCE_SHA 指向 tree 对象（存在且树内容相同）→ 脚本与 guard 均拒绝（C3 F1）", () => {
+    const fx = createPatchFixture("round3");
+    try {
+      const treeSha = fixtureGit(fx, ["rev-parse", `${fx.sourceCommit}^{tree}`]);
+      expect(fixtureGit(fx, ["cat-file", "-t", treeSha])).toBe("tree");
+      expectNonCommitCoordinateRejected(fx, treeSha, "tree");
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向：VERIFIED_SOURCE_SHA 指向 annotated tag 对象 → 脚本与 guard 均拒绝", () => {
+    const fx = createPatchFixture("round3");
+    try {
+      fixtureGit(fx, [
+        "-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid",
+        "tag", "-a", "-m", "seal-tag", "seal-tag", fx.sourceCommit,
+      ]);
+      const tagSha = fixtureGit(fx, ["rev-parse", "seal-tag"]);
+      expect(fixtureGit(fx, ["cat-file", "-t", tagSha])).toBe("tag");
+      expectNonCommitCoordinateRejected(fx, tagSha, "tag");
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向：VERIFIED_SOURCE_SHA 指向 blob 对象 → 脚本与 guard 均拒绝", () => {
+    const fx = createPatchFixture("round3");
+    try {
+      const blobSha = fixtureGit(fx, ["hash-object", "-w", "src/app.txt"]);
+      expect(fixtureGit(fx, ["cat-file", "-t", blobSha])).toBe("blob");
+      expectNonCommitCoordinateRejected(fx, blobSha, "blob");
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向（source 通道）：tree 对象坐标（内容匹配、重冻后命中快捷返回）→ MISMATCH（R2 F1）", () => {
+    const fx = createPatchFixture("round3", { seal: false });
+    try {
+      // R2 独立验收 F1 原样反例的 source 形态：树内容与冻结清单全等，
+      // 重冻后 replay==frozen 成立，脚本仍须在成功出口前拒绝非 commit 坐标。
+      const treeSha = fixtureGit(fx, ["rev-parse", `${fx.sourceCommit}^{tree}`]);
+      expect(fixtureGit(fx, ["cat-file", "-t", treeSha])).toBe("tree");
+      expectSourceCoordinateRejected(fx, treeSha, "tree");
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向（source 通道）：annotated tag 对象坐标 → MISMATCH", () => {
+    const fx = createPatchFixture("round3", { seal: false });
+    try {
+      fixtureGit(fx, [
+        "-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid",
+        "tag", "-a", "-m", "seal-tag", "seal-tag", fx.sourceCommit,
+      ]);
+      const tagSha = fixtureGit(fx, ["rev-parse", "seal-tag"]);
+      expect(fixtureGit(fx, ["cat-file", "-t", tagSha])).toBe("tag");
+      expectSourceCoordinateRejected(fx, tagSha, "tag");
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向（source 通道）：blob 对象坐标 → MISMATCH", () => {
+    const fx = createPatchFixture("round3", { seal: false });
+    try {
+      const blobSha = fixtureGit(fx, ["hash-object", "-w", "src/app.txt"]);
+      expect(fixtureGit(fx, ["cat-file", "-t", blobSha])).toBe("blob");
+      expectSourceCoordinateRejected(fx, blobSha, "blob");
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向（source 通道）：坐标指向不存在的对象 → MISMATCH", () => {
+    const fx = createPatchFixture("round3", { seal: false });
+    try {
+      expectSourceCoordinateRejected(fx, "0".repeat(40), "missing");
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向（source 通道）：坐标非 40 位十六进制 → MISMATCH", () => {
+    const fx = createPatchFixture("round3", { seal: false });
+    try {
+      expectSourceCoordinateRejected(fx, "not-a-sha", "malformed");
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向（source 通道）：坐标文件缺失 → MISMATCH", () => {
+    const fx = createPatchFixture("round3", { seal: false });
+    try {
+      expectSourceCoordinateRejected(fx, null, "missing-file");
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向：MISMATCH 不改写交付补丁（哨兵字节保留 / 原本不存在则仍不存在）", () => {
+    const fx = createPatchFixture("round3");
+    try {
+      expectFailurePreservesDeliveredPatch(fx);
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向：VERIFIED 指向树不等于冻结 manifest（错误冻结）→ MISMATCH", () => {
+    const fx = createPatchFixture("round3");
+    try {
+      fixtureGit(fx, ["reset", "--hard", "-q", fx.sourceCommit]);
+      fs.appendFileSync(path.join(fx.dir, "PROGRESS.md"), "\n- V2 审计改动\n");
+      fixtureGit(fx, ["add", "-A"]);
+      fixtureGit(fx, ["-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid", "commit", "-q", "-m", "v2"]);
+      const v2 = fixtureGit(fx, ["rev-parse", "HEAD"]);
+      fs.writeFileSync(path.join(fx.dir, ".sync-audit", "verified-source-sha.txt"), `${v2}\n`);
+      fixtureGit(fx, ["add", "-A"]);
+      fixtureGit(fx, ["-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid", "commit", "-q", "-m", "seal-to-v2"]);
+      expectMismatch(fx, {
+        state: "seal",
+        frozenMatchesVerifiedCommit: false,
+        currentMatchesHead: true,
+        sealGuardPassed: true,
+      });
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向：补丁损坏 → 重放校验拒绝（非零退出）", () => {
+    const fx = createPatchFixture("round3");
+    try {
+      expectCorruptPatchRejected(fx);
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("负向：重放与当前 index 不等 → MISMATCH（保留原有重放校验）", () => {
+    const fx = createPatchFixture("round3");
+    try {
+      expectReplayMismatchRejected(fx);
+    } finally {
+      disposeFixture(fx);
+    }
   });
 });

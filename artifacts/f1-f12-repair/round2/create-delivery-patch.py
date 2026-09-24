@@ -4,15 +4,21 @@ import hashlib
 import json
 import os
 import pathlib
+import re
 import subprocess
+import sys
 import tempfile
 
-BASE = "89bc0b64bf0a9b84ef3532efaa66c23213affb70"
+# 证据/生产运行一律使用硬编码 BASE。LINGXI_PATCH_BASE_OVERRIDE 仅供 /tmp 合成
+# 夹具里的负向场景测试复用同一段校验逻辑（证据测试断言该变量在真实运行时未设置）。
+BASE = os.environ.get("LINGXI_PATCH_BASE_OVERRIDE") or "89bc0b64bf0a9b84ef3532efaa66c23213affb70"
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 OUT = ROOT / "artifacts/f1-f12-repair/round2"
 # 存储为确定性 gzip（mtime=0）：补丁体积随分支积压增长，v0.1.43 起未压缩体积
 # 超 GitHub 单文件 100MB 硬限；压缩后低于该限。重放验证仍对未压缩原始字节执行，语义不变。
 PATCH = OUT / "patches/89bc0b64-to-r01-r10-source.patch.gz"
+VERIFIED_SOURCE_SHA_FILE = ROOT / ".sync-audit/verified-source-sha.txt"
+SEAL_GUARD = ROOT / ".sync-audit/verify-post-verification-diff.mjs"
 
 
 def sha256(data: bytes) -> str:
@@ -58,34 +64,24 @@ def stage_current(index_name: str) -> None:
         subprocess.run(["git", "add", "-f", "--", *python_files], cwd=ROOT, env=env, check=True)
 
 
-def rows_from_index(index_name: str) -> list[dict]:
-    """从临时 index 的 blob（git 归一化字节）逐条计算 path/bytes/sha256。
+def rows_from_entries(entries: list[tuple[str, str]]) -> list[dict]:
+    """entries 为 (path, blob_sha) 有序列表；逐条计算 path/bytes/sha256（blob 字节）。
 
     不再读工作树字节：Windows autocrlf 会把工作树字节与 blob 字节拆开
     （CRLF/LF），导致 current 与 replay 天然不一致（R10-09 Windows CI 实测）。
-    两侧统一走 index blob 后，行尾归一化由 git 同一套规则处理；仓库
-    .gitattributes 强制 text=auto eol=lf，blob 字节与工作树字节一致，
-    因此重放结果可再与冻结 SOURCE_MANIFEST.json（工作树字节）逐项对盘。
+    两侧统一走 blob 后，行尾归一化由 git 同一套规则处理；仓库 .gitattributes
+    强制 text=auto eol=lf，blob 字节与工作树字节一致，因此重放结果可再与
+    冻结 SOURCE_MANIFEST.json（工作树字节）逐项对盘。
     """
-    env = os.environ.copy()
-    env["GIT_INDEX_FILE"] = index_name
-    listing = subprocess.check_output(["git", "ls-files", "-s", "-z"], cwd=ROOT, env=env)
-    entries = []
-    for record in listing.decode().split("\0"):
-        if not record:
-            continue
-        meta, relative = record.split("\t", 1)
-        _mode, blob_sha, _stage = meta.split(" ")
-        if keep(relative):
-            entries.append((relative, blob_sha))
-    entries.sort()
+    if not entries:
+        return []
     batch_input = "\n".join(sha for _rel, sha in entries) + "\n"
     batch = subprocess.run(
-        ["git", "cat-file", "--batch"], cwd=ROOT, env=env,
+        ["git", "cat-file", "--batch"], cwd=ROOT,
         input=batch_input.encode(), stdout=subprocess.PIPE,
     )
     if batch.returncode != 0:
-        raise RuntimeError("cat-file --batch failed while building index manifest")
+        raise RuntimeError("cat-file --batch failed while building manifest rows")
     rows = []
     offset = 0
     stdout = batch.stdout
@@ -101,6 +97,57 @@ def rows_from_index(index_name: str) -> list[dict]:
         rows.append({"path": relative, "bytes": len(blob), "sha256": sha256(blob)})
         offset = end + 1
     return rows
+
+
+def rows_from_index(index_name: str) -> list[dict]:
+    env = os.environ.copy()
+    env["GIT_INDEX_FILE"] = index_name
+    listing = subprocess.check_output(["git", "ls-files", "-s", "-z"], cwd=ROOT, env=env)
+    entries = []
+    for record in listing.decode().split("\0"):
+        if not record:
+            continue
+        meta, relative = record.split("\t", 1)
+        _mode, blob_sha, _stage = meta.split(" ")
+        if keep(relative):
+            entries.append((relative, blob_sha))
+    entries.sort()
+    return rows_from_entries(entries)
+
+
+def git_object_type(sha: str) -> str | None:
+    """对象存在返回其 Git 类型（commit/tree/tag/blob），不存在返回 None。"""
+    probe = subprocess.run(
+        ["git", "cat-file", "-t", sha], cwd=ROOT,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    )
+    if probe.returncode != 0:
+        return None
+    return probe.stdout.decode(errors="replace").strip()
+
+
+def rows_from_commit(commit: str) -> list[dict]:
+    """同一 keep() 范围内某 commit 全树的 path/bytes/sha256（blob 字节）。"""
+    probe = subprocess.run(
+        ["git", "ls-tree", "-r", "-z", commit], cwd=ROOT,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    )
+    if probe.returncode != 0:
+        raise RuntimeError(
+            f"git ls-tree failed for {commit}: {probe.stdout.decode(errors='replace')[:500]}"
+        )
+    entries = []
+    for record in probe.stdout.decode().split("\0"):
+        if not record:
+            continue
+        meta, relative = record.split("\t", 1)
+        parts = meta.split(" ")
+        if len(parts) != 3 or parts[1] != "blob":
+            continue
+        if keep(relative):
+            entries.append((relative, parts[2]))
+    entries.sort()
+    return rows_from_entries(entries)
 
 
 def manifest_from_rows(rows: list[dict]) -> bytes:
@@ -127,8 +174,33 @@ def temp_index(prefix: str) -> str:
     return name
 
 
+def first_diff_paths(a_rows: list[dict], b_rows: list[dict]) -> str:
+    a_by_path = {row["path"]: row for row in a_rows}
+    b_by_path = {row["path"]: row for row in b_rows}
+    diff_paths = sorted(
+        (set(a_by_path) ^ set(b_by_path))
+        | {p for p in a_by_path.keys() & b_by_path.keys()
+           if a_by_path[p] != b_by_path[p]}
+    )
+    return json.dumps(diff_paths[:3], ensure_ascii=False)
+
+
+def seal_guard() -> tuple[bool, str]:
+    """现有 post-verification diff guard（两份 allowlist 原样）：VERIFIED..HEAD 仅审计文件。"""
+    probe = subprocess.run(
+        ["node", str(SEAL_GUARD)], cwd=ROOT,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    )
+    return probe.returncode == 0, probe.stdout.decode(errors="replace").strip()
+
+
 def build_patch() -> tuple[bytes, bytes]:
-    PATCH.parent.mkdir(parents=True, exist_ok=True)
+    """仅在内存中生成补丁字节，不写交付路径。
+
+    交付 patch.gz 只在全部适用条件 VERIFIED 后由 deliver_patch() 原子替换
+    （R2 独立验收连带修复）：此前先写交付补丁再验收，MISMATCH 或异常时交付
+    字节已被覆盖，会误导随后的历史哈希与工作区状态判读。
+    """
     index_name = temp_index("lingxi-r01-r10-index-")
     try:
         stage_current(index_name)
@@ -143,16 +215,51 @@ def build_patch() -> tuple[bytes, bytes]:
     if not content:
         raise RuntimeError("delivery source patch is empty")
     stored = gzip.compress(content, compresslevel=6, mtime=0)
-    PATCH.write_bytes(stored)
     return content, stored
 
 
+def deliver_patch(stored: bytes) -> None:
+    """同目录临时文件 + 原子替换写入交付路径；异常时删除临时文件，
+    交付路径保持原字节（原本不存在则仍不存在）。"""
+    PATCH.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_name = tempfile.mkstemp(prefix=f".{PATCH.name}.", suffix=".tmp", dir=PATCH.parent)
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(stored)
+        os.replace(tmp_name, PATCH)
+    except BaseException:
+        pathlib.Path(tmp_name).unlink(missing_ok=True)
+        raise
+
+
 def replay_and_verify(patch: bytes, stored: bytes) -> dict:
+    """重放校验 + 双状态验收（source / 纯审计 seal）。
+
+    不变式：补丁从 BASE 重放后的清单必须与当前临时 index 清单逐路径、字节数、
+    SHA-256 全等（replayedMatchesCurrent），不等即 MISMATCH。
+    随后按两种可证明的状态验收（C2 独立复核 F1 修复合同）：
+    - source 状态：当前清单与完整冻结 SOURCE_MANIFEST.json 全部条目全等
+      （C1 F2 的严格对盘原样保留；seal guard 红不否决该状态）。
+    - 纯审计 seal 状态：冻结清单与 VERIFIED_SOURCE_SHA 指向的真实 commit 全树
+      逐项全等（frozenMatchesVerifiedCommit）；现有 diff guard 绿
+      （VERIFIED..HEAD 仅审计白名单，sealGuardPassed）；当前清单与 HEAD 在
+      同一范围逐项全等（currentMatchesHead，防未提交/未跟踪源码与审计改动）。
+    坐标校验对每个独立成功出口生效（R2 独立验收 F1）：source/seal 分叉后、
+    任一 result=VERIFIED 返回前，VERIFIED_SOURCE_SHA 必须是存在的原始
+    commit 对象（40 位格式 + git cat-file -t 精确判定；tree/tag 同样被
+    ls-tree/diff 接受，格式检查不足，C3 独立复核 F1）；source 快捷返回曾
+    跳过该校验。两态 VERIFIED 都如实回报 verifiedSourceSha 与
+    verifiedSourceObjectType="commit"；非法对象保留实际 state、
+    result=MISMATCH 与失败原因，exit 1。
+    任一适用条件不满足即 result=MISMATCH，failures 逐条记录差异路径；
+    replayedMatchesFrozenManifest 在 seal 状态必为 false，不得解释为逐字全等。
+    """
     current_index = temp_index("lingxi-r01-r10-current-")
     replay_index = temp_index("lingxi-r01-r10-replay-")
     try:
         stage_current(current_index)
-        current = manifest_from_index(current_index)
+        current_rows = rows_from_index(current_index)
+        current = manifest_from_rows(current_rows)
 
         replay_env = os.environ.copy()
         replay_env["GIT_INDEX_FILE"] = replay_index
@@ -166,45 +273,104 @@ def replay_and_verify(patch: bytes, stored: bytes) -> dict:
             raise RuntimeError(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
         replay_rows = rows_from_index(replay_index)
         replayed = manifest_from_rows(replay_rows)
-        if replayed != current:
-            raise RuntimeError(
-                f"replayed source manifest mismatch: current={sha256(current)} replay={sha256(replayed)}"
-            )
-        # 与完整冻结 SOURCE_MANIFEST.json 逐项对盘（路径 + 字节数 + SHA-256），
-        # 不只比较生成 index 与重放 index（C1 独立审查 F2）。
-        frozen_raw = (OUT / "SOURCE_MANIFEST.json").read_bytes()
-        frozen = json.loads(frozen_raw.decode())["files"]
-        if replay_rows != frozen:
-            replay_by_path = {row["path"]: row for row in replay_rows}
-            frozen_by_path = {row["path"]: row for row in frozen}
-            diff_paths = sorted(
-                (set(replay_by_path) ^ set(frozen_by_path))
-                | {p for p in replay_by_path.keys() & frozen_by_path.keys()
-                   if replay_by_path[p] != frozen_by_path[p]}
-            )
-            raise RuntimeError(
-                "replayed source tree does not cover frozen SOURCE_MANIFEST.json: "
-                f"replayed={len(replay_rows)} frozen={len(frozen)} "
-                f"firstDiff={json.dumps(diff_paths[:3], ensure_ascii=False)}"
-            )
-        return {
-            "base": BASE,
-            "patch": str(PATCH.relative_to(ROOT)),
-            "patchBytes": len(stored),
-            "patchSha256": sha256(stored),
-            "patchUncompressedBytes": len(patch),
-            "sourceManifestHash": sha256(current),
-            "replayedSourceManifestHash": sha256(replayed),
-            "frozenSourceManifestHash": sha256(frozen_raw),
-            "frozenManifestEntries": len(frozen),
-            "replayedMatchesFrozenManifest": True,
-            "result": "VERIFIED",
-        }
     finally:
         pathlib.Path(current_index).unlink(missing_ok=True)
         pathlib.Path(replay_index).unlink(missing_ok=True)
 
+    # 与完整冻结 SOURCE_MANIFEST.json 逐项对盘（路径 + 字节数 + SHA-256），
+    # 不只比较生成 index 与重放 index（C1 独立审查 F2）。
+    frozen_raw = (OUT / "SOURCE_MANIFEST.json").read_bytes()
+    frozen = json.loads(frozen_raw.decode())["files"]
+    result = {
+        "base": BASE,
+        "patch": str(PATCH.relative_to(ROOT)),
+        "patchBytes": len(stored),
+        "patchSha256": sha256(stored),
+        "patchUncompressedBytes": len(patch),
+        "sourceManifestHash": sha256(current),
+        "replayedSourceManifestHash": sha256(replayed),
+        "frozenSourceManifestHash": sha256(frozen_raw),
+        "frozenManifestEntries": len(frozen),
+        "replayedMatchesCurrent": replay_rows == current_rows,
+        "replayedMatchesFrozenManifest": replay_rows == frozen,
+        "state": None,
+        "verifiedSourceSha": None,
+        "verifiedSourceObjectType": None,
+        "frozenMatchesVerifiedCommit": None,
+        "currentMatchesHead": None,
+        "sealGuardPassed": None,
+        "failures": [],
+        "result": "MISMATCH",
+    }
+    if not result["replayedMatchesCurrent"]:
+        result["failures"].append(
+            f"replayed source manifest mismatch: current={sha256(current)} "
+            f"replay={sha256(replayed)} firstDiff={first_diff_paths(current_rows, replay_rows)}"
+        )
+        return result
+    result["state"] = "source" if replay_rows == frozen else "seal"
+    # 坐标校验在 source/seal 共同成功出口之前：两态都必须先证明
+    # VERIFIED_SOURCE_SHA 字面是存在的原始 commit 对象（R2 独立验收 F1：
+    # source 快捷返回曾跳过该校验，tree 坐标也能报 VERIFIED）。
+    try:
+        verified = VERIFIED_SOURCE_SHA_FILE.read_text().strip()
+    except OSError:
+        result["failures"].append(
+            f"缺少坐标文件 {VERIFIED_SOURCE_SHA_FILE.relative_to(ROOT)}"
+        )
+        return result
+    if not re.fullmatch(r"[0-9a-f]{40}", verified):
+        result["failures"].append(f"VERIFIED_SOURCE_SHA 非 40 位十六进制: {verified}")
+        return result
+    result["verifiedSourceSha"] = verified
+    object_type = git_object_type(verified)
+    result["verifiedSourceObjectType"] = object_type
+    # 坐标必须精确指向 commit 对象：tree/tag 同样被 git ls-tree / git diff 接受，
+    # 40 位格式检查不足以证明坐标是真实源码提交（C3 独立复核 F1）。
+    if object_type != "commit":
+        result["failures"].append(
+            "VERIFIED_SOURCE_SHA 必须指向真实 commit 对象"
+            f"（git cat-file -t 实际返回 {object_type or '对象不存在'}）: {verified}"
+        )
+        return result
+    if result["state"] == "source":
+        result["result"] = "VERIFIED"
+        return result
+    try:
+        verified_rows = rows_from_commit(verified)
+    except RuntimeError as exc:
+        result["failures"].append(str(exc))
+        return result
+    head_rows = rows_from_commit("HEAD")
+    result["frozenMatchesVerifiedCommit"] = verified_rows == frozen
+    result["currentMatchesHead"] = current_rows == head_rows
+    guard_ok, guard_output = seal_guard()
+    result["sealGuardPassed"] = guard_ok
+    if not result["frozenMatchesVerifiedCommit"]:
+        result["failures"].append(
+            "frozen SOURCE_MANIFEST.json does not match VERIFIED commit tree: "
+            f"verified={verified} frozenEntries={len(frozen)} "
+            f"firstDiff={first_diff_paths(verified_rows, frozen)}"
+        )
+    if not result["currentMatchesHead"]:
+        result["failures"].append(
+            "current source manifest does not match HEAD (uncommitted or untracked "
+            f"source changes): firstDiff={first_diff_paths(head_rows, current_rows)}"
+        )
+    if not guard_ok:
+        result["failures"].append(f"post-verification diff guard failed: {guard_output[-500:]}")
+    if not result["failures"]:
+        result["result"] = "VERIFIED"
+    return result
+
 
 if __name__ == "__main__":
     patch, stored = build_patch()
-    print(json.dumps(replay_and_verify(patch, stored), ensure_ascii=False, sort_keys=True))
+    outcome = replay_and_verify(patch, stored)
+    print(json.dumps(outcome, ensure_ascii=False, sort_keys=True))
+    if outcome["result"] != "VERIFIED":
+        for failure in outcome["failures"]:
+            print(failure, file=sys.stderr)
+        sys.exit(1)
+    # 只在全部适用条件 VERIFIED 后原子替换交付补丁；MISMATCH/异常不改写。
+    deliver_patch(stored)

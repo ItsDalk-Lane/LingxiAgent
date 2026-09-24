@@ -5041,5 +5041,567 @@
     "log": "logs/r00-seal-r1-green.log",
     "logSha256": "e86c6ec55fef22892d81cdc4eb32f5439f754eba3ffe2dc95391837347e228ae",
     "sourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T13:13:28.410599+00:00",
+    "end": "2026-09-24T13:13:53.949553+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "a4c1a5abf07608b6ded48e1db68a0da7f9931098ec56bcdae3651415f21f410f",
+    "log": "logs/r00-seal-r2-typecheck.log",
+    "logSha256": "f77f0aee2cec1685d75d5da5d8756fa5af0fc37cd7eabff815df7f5d3e527e13",
+    "sourceManifestHash": "a4c1a5abf07608b6ded48e1db68a0da7f9931098ec56bcdae3651415f21f410f"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck:core-contracts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T13:13:54.249653+00:00",
+    "end": "2026-09-24T13:13:55.493342+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "a4c1a5abf07608b6ded48e1db68a0da7f9931098ec56bcdae3651415f21f410f",
+    "log": "logs/r00-seal-r2-contracts.log",
+    "logSha256": "9a3a2b6ce40e47627287266176c6142f859d948935aa73c756c0a6e541a2ced7",
+    "sourceManifestHash": "a4c1a5abf07608b6ded48e1db68a0da7f9931098ec56bcdae3651415f21f410f"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "lint:boundary"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T13:13:55.797065+00:00",
+    "end": "2026-09-24T13:13:56.999272+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "a4c1a5abf07608b6ded48e1db68a0da7f9931098ec56bcdae3651415f21f410f",
+    "log": "logs/r00-seal-r2-boundary.log",
+    "logSha256": "8560904e516cd5a5118bf780c3d9ddf190b29834c49ccde649878250d9c464ff",
+    "sourceManifestHash": "a4c1a5abf07608b6ded48e1db68a0da7f9931098ec56bcdae3651415f21f410f"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T13:13:57.334300+00:00",
+    "end": "2026-09-24T13:14:15.418270+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "a4c1a5abf07608b6ded48e1db68a0da7f9931098ec56bcdae3651415f21f410f",
+    "log": "logs/r00-seal-r2-lint.log",
+    "logSha256": "1fc2911280c11c7f686309ae4dc0d4194f8bd88ffec7f5dfda1716e0dc68d49d",
+    "sourceManifestHash": "a4c1a5abf07608b6ded48e1db68a0da7f9931098ec56bcdae3651415f21f410f"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "build:renderer"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T13:14:15.747776+00:00",
+    "end": "2026-09-24T13:14:23.336407+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "a4c1a5abf07608b6ded48e1db68a0da7f9931098ec56bcdae3651415f21f410f",
+    "log": "logs/r00-seal-r2-build-renderer.log",
+    "logSha256": "47df732d9c5bde8d7aeff428e48e8211ff8fca8d4a073dd590e57e9aad889046",
+    "sourceManifestHash": "a4c1a5abf07608b6ded48e1db68a0da7f9931098ec56bcdae3651415f21f410f"
+  },
+  {
+    "command": [
+      "python3",
+      "artifacts/f1-f12-repair/round2/create-delivery-patch.py"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T13:14:36.895469+00:00",
+    "end": "2026-09-24T13:14:49.159677+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "a4c1a5abf07608b6ded48e1db68a0da7f9931098ec56bcdae3651415f21f410f",
+    "log": "logs/r00-seal-r2-patch-r2.log",
+    "logSha256": "6afbf79b33e3947da519a98797208e9dcf8aaa8fda765e41524e94192a535494",
+    "sourceManifestHash": "a4c1a5abf07608b6ded48e1db68a0da7f9931098ec56bcdae3651415f21f410f"
+  },
+  {
+    "command": [
+      "npm",
+      "test"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T13:14:49.471632+00:00",
+    "end": "2026-09-24T13:16:23.435209+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 14921,
+      "failed": 1,
+      "skipped": 15,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "a4c1a5abf07608b6ded48e1db68a0da7f9931098ec56bcdae3651415f21f410f",
+    "log": "logs/r00-seal-r2-full.log",
+    "logSha256": "8978b5ca30cc94bf0de812cdbc3ea4811c82bd9c4f71f1092dd17a33c8fed985",
+    "sourceManifestHash": "a4c1a5abf07608b6ded48e1db68a0da7f9931098ec56bcdae3651415f21f410f"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/round2-delivery-evidence.test.ts",
+      "tests/round3-delivery-evidence.test.ts",
+      "tests/upstream-sync-matrix.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T13:16:23.748027+00:00",
+    "end": "2026-09-24T13:16:43.498726+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 45,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "a4c1a5abf07608b6ded48e1db68a0da7f9931098ec56bcdae3651415f21f410f",
+    "log": "logs/r00-seal-r2-green.log",
+    "logSha256": "3f8b8e0abfcc92ae4ff2747286f0cda32a85162f592e664af2845df9a13c84be",
+    "sourceManifestHash": "a4c1a5abf07608b6ded48e1db68a0da7f9931098ec56bcdae3651415f21f410f"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T14:21:30.631658+00:00",
+    "end": "2026-09-24T14:21:57.063828+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "f0af415fca4a19a3688da9099f2057bda475a2935c5d6431e196e3eeec6462aa",
+    "log": "logs/r00-seal-r3-typecheck.log",
+    "logSha256": "f77f0aee2cec1685d75d5da5d8756fa5af0fc37cd7eabff815df7f5d3e527e13",
+    "sourceManifestHash": "f0af415fca4a19a3688da9099f2057bda475a2935c5d6431e196e3eeec6462aa"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck:core-contracts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T14:21:57.386198+00:00",
+    "end": "2026-09-24T14:21:58.655905+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "f0af415fca4a19a3688da9099f2057bda475a2935c5d6431e196e3eeec6462aa",
+    "log": "logs/r00-seal-r3-contracts.log",
+    "logSha256": "9a3a2b6ce40e47627287266176c6142f859d948935aa73c756c0a6e541a2ced7",
+    "sourceManifestHash": "f0af415fca4a19a3688da9099f2057bda475a2935c5d6431e196e3eeec6462aa"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "lint:boundary"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T14:21:58.968131+00:00",
+    "end": "2026-09-24T14:22:00.176005+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "f0af415fca4a19a3688da9099f2057bda475a2935c5d6431e196e3eeec6462aa",
+    "log": "logs/r00-seal-r3-boundary.log",
+    "logSha256": "8560904e516cd5a5118bf780c3d9ddf190b29834c49ccde649878250d9c464ff",
+    "sourceManifestHash": "f0af415fca4a19a3688da9099f2057bda475a2935c5d6431e196e3eeec6462aa"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T14:22:00.495455+00:00",
+    "end": "2026-09-24T14:22:19.345586+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "f0af415fca4a19a3688da9099f2057bda475a2935c5d6431e196e3eeec6462aa",
+    "log": "logs/r00-seal-r3-lint.log",
+    "logSha256": "b6e30cb86f208d75fa71552c1a409fa46e6a9b0c1d91e79d6a3501d78d7d526e",
+    "sourceManifestHash": "f0af415fca4a19a3688da9099f2057bda475a2935c5d6431e196e3eeec6462aa"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "build:renderer"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T14:22:19.649002+00:00",
+    "end": "2026-09-24T14:22:27.790065+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "f0af415fca4a19a3688da9099f2057bda475a2935c5d6431e196e3eeec6462aa",
+    "log": "logs/r00-seal-r3-build-renderer.log",
+    "logSha256": "782d6867380434aec31cd61923de818db3ab6d1fff3a075d71cdb0f04852e915",
+    "sourceManifestHash": "f0af415fca4a19a3688da9099f2057bda475a2935c5d6431e196e3eeec6462aa"
+  },
+  {
+    "command": [
+      "python3",
+      "artifacts/f1-f12-repair/round2/create-delivery-patch.py"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T14:22:41.887262+00:00",
+    "end": "2026-09-24T14:22:54.311924+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "f0af415fca4a19a3688da9099f2057bda475a2935c5d6431e196e3eeec6462aa",
+    "log": "logs/r00-seal-r3-patch-r2.log",
+    "logSha256": "fecf94b96baa655c7bffe816dcf406a82188f6232d00b062147c8222f39244d6",
+    "sourceManifestHash": "f0af415fca4a19a3688da9099f2057bda475a2935c5d6431e196e3eeec6462aa"
+  },
+  {
+    "command": [
+      "npm",
+      "test"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T14:22:54.630681+00:00",
+    "end": "2026-09-24T14:24:30.464446+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 14927,
+      "failed": 1,
+      "skipped": 15,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "f0af415fca4a19a3688da9099f2057bda475a2935c5d6431e196e3eeec6462aa",
+    "log": "logs/r00-seal-r3-full.log",
+    "logSha256": "d5cf5c73b8cc02eed735c059a6270c9c690ac110b49b4c2152efb39681eb3633",
+    "sourceManifestHash": "f0af415fca4a19a3688da9099f2057bda475a2935c5d6431e196e3eeec6462aa"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/round2-delivery-evidence.test.ts",
+      "tests/round3-delivery-evidence.test.ts",
+      "tests/upstream-sync-matrix.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T14:24:30.787067+00:00",
+    "end": "2026-09-24T14:24:51.544085+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 51,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "f0af415fca4a19a3688da9099f2057bda475a2935c5d6431e196e3eeec6462aa",
+    "log": "logs/r00-seal-r3-green.log",
+    "logSha256": "1bcf3117b0b77f48956bbbdb437568ef4ddbc208388bfff119c717a390e65624",
+    "sourceManifestHash": "f0af415fca4a19a3688da9099f2057bda475a2935c5d6431e196e3eeec6462aa"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T16:22:39.218803+00:00",
+    "end": "2026-09-24T16:23:04.909447+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770",
+    "log": "logs/r00-seal-r4-typecheck.log",
+    "logSha256": "f77f0aee2cec1685d75d5da5d8756fa5af0fc37cd7eabff815df7f5d3e527e13",
+    "sourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck:core-contracts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T16:23:05.215473+00:00",
+    "end": "2026-09-24T16:23:06.465660+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770",
+    "log": "logs/r00-seal-r4-contracts.log",
+    "logSha256": "9a3a2b6ce40e47627287266176c6142f859d948935aa73c756c0a6e541a2ced7",
+    "sourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "lint:boundary"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T16:23:06.760138+00:00",
+    "end": "2026-09-24T16:23:07.945860+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770",
+    "log": "logs/r00-seal-r4-boundary.log",
+    "logSha256": "8560904e516cd5a5118bf780c3d9ddf190b29834c49ccde649878250d9c464ff",
+    "sourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T16:23:08.236989+00:00",
+    "end": "2026-09-24T16:23:26.259799+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770",
+    "log": "logs/r00-seal-r4-lint.log",
+    "logSha256": "94c56db2d6eaef8ddbc39814c43ae6640068f281a188282b68c9fe6a8734205b",
+    "sourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "build:renderer"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T16:23:26.554033+00:00",
+    "end": "2026-09-24T16:23:34.181750+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770",
+    "log": "logs/r00-seal-r4-build-renderer.log",
+    "logSha256": "3089f14b26a1b327308b294e55ff3add5ef42758be178d49014b9a5dadf61e83",
+    "sourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770"
+  },
+  {
+    "command": [
+      "python3",
+      "artifacts/f1-f12-repair/round2/create-delivery-patch.py"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T16:23:49.922780+00:00",
+    "end": "2026-09-24T16:24:01.465790+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770",
+    "log": "logs/r00-seal-r4-patch-r2.log",
+    "logSha256": "fbab976297bf6eecb4ece2364c6fd4d41207e213179f63e903e2d33b9b42f1da",
+    "sourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770"
+  },
+  {
+    "command": [
+      "npm",
+      "test"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T16:24:01.800606+00:00",
+    "end": "2026-09-24T16:25:38.572983+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 14940,
+      "failed": 2,
+      "skipped": 15,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770",
+    "log": "logs/r00-seal-r4-full.log",
+    "logSha256": "88a4caf2b7cc470aea11219aa02be1fc0b53cbe6d97a8ca01410cb341a082ccf",
+    "sourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/round2-delivery-evidence.test.ts",
+      "tests/round3-delivery-evidence.test.ts",
+      "tests/upstream-sync-matrix.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T16:25:38.870055+00:00",
+    "end": "2026-09-24T16:26:02.062352+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 65,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770",
+    "log": "logs/r00-seal-r4-green.log",
+    "logSha256": "84f6a316fcf64913d3a5174386eea0b9b716ec279b5073c8e51f500bf257c0f6",
+    "sourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770"
+  },
+  {
+    "command": [
+      "npm",
+      "test"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T16:30:56.958597+00:00",
+    "end": "2026-09-24T16:32:33.441943+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 14941,
+      "failed": 1,
+      "skipped": 15,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770",
+    "log": "logs/r00-seal-r4-full-rerun.log",
+    "logSha256": "d57f880be1654fbfc02bc7fa4b16c2110e1477940cd94716b94cddb6dc4b9a83",
+    "sourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770"
   }
 ]

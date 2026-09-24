@@ -84,12 +84,13 @@ function diffNamesSinceVerified(): string[] {
 }
 
 describe("post-verification audit seal (diff guard)", () => {
-  it("VERIFIED_SOURCE_SHA is a valid 40-hex commit reachable in this repo", () => {
+  it("VERIFIED_SOURCE_SHA is a valid 40-hex commit object in this repo", () => {
     const sha = verifiedSourceSha();
     expect(sha).toMatch(/^[0-9a-f]{40}$/);
-    // 若坐标不可达，下方 git diff 直接失败；这里显式给出可读错误。
-    expect(() => execFileSync("git", ["rev-parse", "--verify", `${sha}^{commit}`], { cwd: ROOT }))
-      .not.toThrow();
+    // 精确对象类型：`${sha}^{commit}` 可解引用 tree/tag（C3 独立复核 F1：tree SHA
+    // 曾被 ls-tree/diff 接受而冒充合法封印），坐标字面必须即 commit 对象本身。
+    const objectType = execFileSync("git", ["cat-file", "-t", sha], { cwd: ROOT, encoding: "utf-8" }).trim();
+    expect(objectType, "VERIFIED_SOURCE_SHA 必须指向真实 commit 对象（拒绝 tree/tag/blob/缺失）").toBe("commit");
   });
 
   it("changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced)", () => {
