@@ -1,0 +1,50 @@
+{
+  "runId": "run-2026-09-23T22-14-13-277Z",
+  "task": "R00-T06 desktop leg",
+  "head": "64c302ec482888222833136d0d20c64d4cbb350b",
+  "host": {
+    "capturedAt": "2026-09-23T22:14:13.277Z",
+    "platform": "darwin",
+    "arch": "arm64",
+    "nodeVersion": "v24.16.0",
+    "totalMemBytes": 103079215104,
+    "cpuModel": "Apple M3 Ultra",
+    "cpuCores": 28,
+    "hwModel": "Mac15,14",
+    "osVersion": "Darwin 27.0.0",
+    "swVers": "ProductName:\t\tmacOS; ProductVersion:\t\t27.0; BuildVersion:\t\t26A428",
+    "power": {
+      "lowPowerMode": false,
+      "source": "AC Power"
+    },
+    "loadavg": [
+      3.45654296875,
+      3.59716796875,
+      3.59130859375
+    ],
+    "uptimeSec": 756088,
+    "gitHead": "64c302ec482888222833136d0d20c64d4cbb350b",
+    "gitBranch": "codex/rust-tauri-migration"
+  },
+  "appBin": "dist/mac-arm64/Lingxi.app/Contents/MacOS/Lingxi",
+  "samples": 32,
+  "phases": {
+    "first_boot_template": {
+      "tLaunchStartLineMs": 2032.280000090599,
+      "tAppReadyMs": 11159.639999985695,
+      "serverPid": 51691,
+      "artifactsUnpackedBytes": 793124864,
+      "note": "首启解包 seed 计时单独记录，不计入稳态启动系列",
+      "quit": {
+        "mainExitMs": 259.16999995708466,
+        "serverExitMs": 0.009999990463256836,
+        "forced": false,
+        "leftoverMainPids": [],
+        "leftoverServerPids": []
+      }
+    }
+  },
+  "stub": {
+    "baseUrl": "http://127.0.0.1:63159/v1"
+  }
+}

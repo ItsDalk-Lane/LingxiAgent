@@ -1,0 +1,673 @@
+{
+  "label": "desktop-idle",
+  "startedAt": "2026-09-23T22:40:59.565Z",
+  "endedAt": "2026-09-23T22:41:05.119Z",
+  "frames": [
+    {
+      "ts": "2026-09-23T22:40:59.565Z",
+      "label": "desktop-idle#0",
+      "roots": [
+        71599,
+        71625
+      ],
+      "pids": [
+        71625,
+        71599,
+        71732,
+        71601,
+        71600
+      ],
+      "procs": [
+        {
+          "pid": 71599,
+          "ppid": 55422,
+          "rssKb": 243120,
+          "vszKb": 2003101984,
+          "pcpu": 0,
+          "etime": "00:19",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/MacOS/Lingxi"
+        },
+        {
+          "pid": 71600,
+          "ppid": 71599,
+          "rssKb": 96832,
+          "vszKb": 539528960,
+          "pcpu": 0.2,
+          "etime": "00:19",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71601,
+          "ppid": 71599,
+          "rssKb": 51040,
+          "vszKb": 539449744,
+          "pcpu": 0,
+          "etime": "00:19",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71625,
+          "ppid": 71599,
+          "rssKb": 457088,
+          "vszKb": 498398864,
+          "pcpu": 0,
+          "etime": "00:13",
+          "comm": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r00t06-dt-live-jtuTnZ/artifacts/server/0.1.43-darwin-arm64/node"
+        },
+        {
+          "pid": 71732,
+          "ppid": 71599,
+          "rssKb": 207600,
+          "vszKb": 2002855824,
+          "pcpu": 0.2,
+          "etime": "00:10",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper (Renderer).app/Contents/MacOS/Lingxi Helper (Renderer)"
+        }
+      ],
+      "treeRssKb": 1055680,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:41:00.186Z",
+      "label": "desktop-idle#1",
+      "roots": [
+        71599,
+        71625
+      ],
+      "pids": [
+        71625,
+        71599,
+        71732,
+        71601,
+        71600
+      ],
+      "procs": [
+        {
+          "pid": 71599,
+          "ppid": 55422,
+          "rssKb": 243120,
+          "vszKb": 2003101984,
+          "pcpu": 0,
+          "etime": "00:20",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/MacOS/Lingxi"
+        },
+        {
+          "pid": 71600,
+          "ppid": 71599,
+          "rssKb": 96832,
+          "vszKb": 539528960,
+          "pcpu": 0.2,
+          "etime": "00:20",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71601,
+          "ppid": 71599,
+          "rssKb": 51040,
+          "vszKb": 539449744,
+          "pcpu": 0,
+          "etime": "00:20",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71625,
+          "ppid": 71599,
+          "rssKb": 457120,
+          "vszKb": 498398864,
+          "pcpu": 0.1,
+          "etime": "00:14",
+          "comm": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r00t06-dt-live-jtuTnZ/artifacts/server/0.1.43-darwin-arm64/node"
+        },
+        {
+          "pid": 71732,
+          "ppid": 71599,
+          "rssKb": 207600,
+          "vszKb": 2002855824,
+          "pcpu": 0,
+          "etime": "00:11",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper (Renderer).app/Contents/MacOS/Lingxi Helper (Renderer)"
+        }
+      ],
+      "treeRssKb": 1055712,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:41:00.809Z",
+      "label": "desktop-idle#2",
+      "roots": [
+        71599,
+        71625
+      ],
+      "pids": [
+        71625,
+        71599,
+        71732,
+        71601,
+        71600
+      ],
+      "procs": [
+        {
+          "pid": 71599,
+          "ppid": 55422,
+          "rssKb": 243120,
+          "vszKb": 2003101984,
+          "pcpu": 0,
+          "etime": "00:20",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/MacOS/Lingxi"
+        },
+        {
+          "pid": 71600,
+          "ppid": 71599,
+          "rssKb": 96832,
+          "vszKb": 539528960,
+          "pcpu": 0,
+          "etime": "00:20",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71601,
+          "ppid": 71599,
+          "rssKb": 51040,
+          "vszKb": 539449744,
+          "pcpu": 0,
+          "etime": "00:20",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71625,
+          "ppid": 71599,
+          "rssKb": 457120,
+          "vszKb": 498398864,
+          "pcpu": 0,
+          "etime": "00:14",
+          "comm": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r00t06-dt-live-jtuTnZ/artifacts/server/0.1.43-darwin-arm64/node"
+        },
+        {
+          "pid": 71732,
+          "ppid": 71599,
+          "rssKb": 207600,
+          "vszKb": 2002855824,
+          "pcpu": 0,
+          "etime": "00:11",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper (Renderer).app/Contents/MacOS/Lingxi Helper (Renderer)"
+        }
+      ],
+      "treeRssKb": 1055712,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:41:01.422Z",
+      "label": "desktop-idle#3",
+      "roots": [
+        71599,
+        71625
+      ],
+      "pids": [
+        71625,
+        71599,
+        71732,
+        71601,
+        71600
+      ],
+      "procs": [
+        {
+          "pid": 71599,
+          "ppid": 55422,
+          "rssKb": 243120,
+          "vszKb": 2003101984,
+          "pcpu": 0,
+          "etime": "00:21",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/MacOS/Lingxi"
+        },
+        {
+          "pid": 71600,
+          "ppid": 71599,
+          "rssKb": 96832,
+          "vszKb": 539528960,
+          "pcpu": 0,
+          "etime": "00:21",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71601,
+          "ppid": 71599,
+          "rssKb": 51040,
+          "vszKb": 539449744,
+          "pcpu": 0,
+          "etime": "00:21",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71625,
+          "ppid": 71599,
+          "rssKb": 457184,
+          "vszKb": 498398864,
+          "pcpu": 0,
+          "etime": "00:15",
+          "comm": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r00t06-dt-live-jtuTnZ/artifacts/server/0.1.43-darwin-arm64/node"
+        },
+        {
+          "pid": 71732,
+          "ppid": 71599,
+          "rssKb": 207600,
+          "vszKb": 2002855824,
+          "pcpu": 0,
+          "etime": "00:12",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper (Renderer).app/Contents/MacOS/Lingxi Helper (Renderer)"
+        }
+      ],
+      "treeRssKb": 1055776,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:41:02.036Z",
+      "label": "desktop-idle#4",
+      "roots": [
+        71599,
+        71625
+      ],
+      "pids": [
+        71625,
+        71599,
+        71732,
+        71601,
+        71600
+      ],
+      "procs": [
+        {
+          "pid": 71599,
+          "ppid": 55422,
+          "rssKb": 243120,
+          "vszKb": 2003101984,
+          "pcpu": 0,
+          "etime": "00:22",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/MacOS/Lingxi"
+        },
+        {
+          "pid": 71600,
+          "ppid": 71599,
+          "rssKb": 96832,
+          "vszKb": 539528960,
+          "pcpu": 0.2,
+          "etime": "00:22",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71601,
+          "ppid": 71599,
+          "rssKb": 51040,
+          "vszKb": 539449744,
+          "pcpu": 0,
+          "etime": "00:22",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71625,
+          "ppid": 71599,
+          "rssKb": 457232,
+          "vszKb": 498398864,
+          "pcpu": 0.1,
+          "etime": "00:16",
+          "comm": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r00t06-dt-live-jtuTnZ/artifacts/server/0.1.43-darwin-arm64/node"
+        },
+        {
+          "pid": 71732,
+          "ppid": 71599,
+          "rssKb": 207600,
+          "vszKb": 2002855824,
+          "pcpu": 0.1,
+          "etime": "00:13",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper (Renderer).app/Contents/MacOS/Lingxi Helper (Renderer)"
+        }
+      ],
+      "treeRssKb": 1055824,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:41:02.646Z",
+      "label": "desktop-idle#5",
+      "roots": [
+        71599,
+        71625
+      ],
+      "pids": [
+        71625,
+        71599,
+        71732,
+        71601,
+        71600
+      ],
+      "procs": [
+        {
+          "pid": 71599,
+          "ppid": 55422,
+          "rssKb": 243120,
+          "vszKb": 2003101984,
+          "pcpu": 0,
+          "etime": "00:22",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/MacOS/Lingxi"
+        },
+        {
+          "pid": 71600,
+          "ppid": 71599,
+          "rssKb": 96832,
+          "vszKb": 539528960,
+          "pcpu": 0.2,
+          "etime": "00:22",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71601,
+          "ppid": 71599,
+          "rssKb": 51040,
+          "vszKb": 539449744,
+          "pcpu": 0,
+          "etime": "00:22",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71625,
+          "ppid": 71599,
+          "rssKb": 457232,
+          "vszKb": 498398864,
+          "pcpu": 0,
+          "etime": "00:16",
+          "comm": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r00t06-dt-live-jtuTnZ/artifacts/server/0.1.43-darwin-arm64/node"
+        },
+        {
+          "pid": 71732,
+          "ppid": 71599,
+          "rssKb": 207600,
+          "vszKb": 2002855824,
+          "pcpu": 0,
+          "etime": "00:13",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper (Renderer).app/Contents/MacOS/Lingxi Helper (Renderer)"
+        }
+      ],
+      "treeRssKb": 1055824,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:41:03.267Z",
+      "label": "desktop-idle#6",
+      "roots": [
+        71599,
+        71625
+      ],
+      "pids": [
+        71625,
+        71599,
+        71732,
+        71601,
+        71600
+      ],
+      "procs": [
+        {
+          "pid": 71599,
+          "ppid": 55422,
+          "rssKb": 243120,
+          "vszKb": 2003101984,
+          "pcpu": 0,
+          "etime": "00:23",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/MacOS/Lingxi"
+        },
+        {
+          "pid": 71600,
+          "ppid": 71599,
+          "rssKb": 96832,
+          "vszKb": 539528960,
+          "pcpu": 0,
+          "etime": "00:23",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71601,
+          "ppid": 71599,
+          "rssKb": 51040,
+          "vszKb": 539449744,
+          "pcpu": 0,
+          "etime": "00:23",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71625,
+          "ppid": 71599,
+          "rssKb": 457280,
+          "vszKb": 498398864,
+          "pcpu": 0,
+          "etime": "00:17",
+          "comm": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r00t06-dt-live-jtuTnZ/artifacts/server/0.1.43-darwin-arm64/node"
+        },
+        {
+          "pid": 71732,
+          "ppid": 71599,
+          "rssKb": 207600,
+          "vszKb": 2002855824,
+          "pcpu": 0,
+          "etime": "00:14",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper (Renderer).app/Contents/MacOS/Lingxi Helper (Renderer)"
+        }
+      ],
+      "treeRssKb": 1055872,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:41:03.887Z",
+      "label": "desktop-idle#7",
+      "roots": [
+        71599,
+        71625
+      ],
+      "pids": [
+        71625,
+        71599,
+        71732,
+        71601,
+        71600
+      ],
+      "procs": [
+        {
+          "pid": 71599,
+          "ppid": 55422,
+          "rssKb": 243120,
+          "vszKb": 2003101984,
+          "pcpu": 0,
+          "etime": "00:23",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/MacOS/Lingxi"
+        },
+        {
+          "pid": 71600,
+          "ppid": 71599,
+          "rssKb": 96832,
+          "vszKb": 539528960,
+          "pcpu": 0,
+          "etime": "00:23",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71601,
+          "ppid": 71599,
+          "rssKb": 51040,
+          "vszKb": 539449744,
+          "pcpu": 0,
+          "etime": "00:23",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71625,
+          "ppid": 71599,
+          "rssKb": 457280,
+          "vszKb": 498398864,
+          "pcpu": 0,
+          "etime": "00:17",
+          "comm": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r00t06-dt-live-jtuTnZ/artifacts/server/0.1.43-darwin-arm64/node"
+        },
+        {
+          "pid": 71732,
+          "ppid": 71599,
+          "rssKb": 207616,
+          "vszKb": 2002855824,
+          "pcpu": 0,
+          "etime": "00:14",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper (Renderer).app/Contents/MacOS/Lingxi Helper (Renderer)"
+        }
+      ],
+      "treeRssKb": 1055888,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:41:04.502Z",
+      "label": "desktop-idle#8",
+      "roots": [
+        71599,
+        71625
+      ],
+      "pids": [
+        71625,
+        71599,
+        71732,
+        71601,
+        71600
+      ],
+      "procs": [
+        {
+          "pid": 71599,
+          "ppid": 55422,
+          "rssKb": 243120,
+          "vszKb": 2003101984,
+          "pcpu": 0,
+          "etime": "00:24",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/MacOS/Lingxi"
+        },
+        {
+          "pid": 71600,
+          "ppid": 71599,
+          "rssKb": 96848,
+          "vszKb": 539529520,
+          "pcpu": 0.2,
+          "etime": "00:24",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71601,
+          "ppid": 71599,
+          "rssKb": 51040,
+          "vszKb": 539449744,
+          "pcpu": 0,
+          "etime": "00:24",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71625,
+          "ppid": 71599,
+          "rssKb": 457328,
+          "vszKb": 498398864,
+          "pcpu": 0,
+          "etime": "00:18",
+          "comm": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r00t06-dt-live-jtuTnZ/artifacts/server/0.1.43-darwin-arm64/node"
+        },
+        {
+          "pid": 71732,
+          "ppid": 71599,
+          "rssKb": 207616,
+          "vszKb": 2002855824,
+          "pcpu": 0,
+          "etime": "00:15",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper (Renderer).app/Contents/MacOS/Lingxi Helper (Renderer)"
+        }
+      ],
+      "treeRssKb": 1055952,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:41:05.119Z",
+      "label": "desktop-idle#9",
+      "roots": [
+        71599,
+        71625
+      ],
+      "pids": [
+        71625,
+        71599,
+        71732,
+        71601,
+        71600
+      ],
+      "procs": [
+        {
+          "pid": 71599,
+          "ppid": 55422,
+          "rssKb": 243056,
+          "vszKb": 2003101968,
+          "pcpu": 0,
+          "etime": "00:25",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/MacOS/Lingxi"
+        },
+        {
+          "pid": 71600,
+          "ppid": 71599,
+          "rssKb": 96832,
+          "vszKb": 539528960,
+          "pcpu": 0.2,
+          "etime": "00:25",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71601,
+          "ppid": 71599,
+          "rssKb": 51040,
+          "vszKb": 539449744,
+          "pcpu": 0,
+          "etime": "00:25",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper"
+        },
+        {
+          "pid": 71625,
+          "ppid": 71599,
+          "rssKb": 457376,
+          "vszKb": 498398864,
+          "pcpu": 0.2,
+          "etime": "00:19",
+          "comm": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r00t06-dt-live-jtuTnZ/artifacts/server/0.1.43-darwin-arm64/node"
+        },
+        {
+          "pid": 71732,
+          "ppid": 71599,
+          "rssKb": 207616,
+          "vszKb": 2002855824,
+          "pcpu": 0,
+          "etime": "00:16",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper (Renderer).app/Contents/MacOS/Lingxi Helper (Renderer)"
+        }
+      ],
+      "treeRssKb": 1055920,
+      "vanished": []
+    }
+  ],
+  "rssSeriesKb": [
+    1055680,
+    1055712,
+    1055712,
+    1055776,
+    1055824,
+    1055824,
+    1055872,
+    1055888,
+    1055952,
+    1055920
+  ],
+  "rssMedianKb": 1055824,
+  "rssMaxKb": 1055952,
+  "procCountByFrame": [
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5
+  ]
+}

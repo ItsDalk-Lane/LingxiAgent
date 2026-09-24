@@ -1,0 +1,98 @@
+{
+  "runId": "pty-2026-09-24T01-45-52-350Z",
+  "task": "R00-T06 PTY leg",
+  "head": "64c302ec482888222833136d0d20c64d4cbb350b",
+  "host": {
+    "capturedAt": "2026-09-24T01:45:52.351Z",
+    "platform": "darwin",
+    "arch": "arm64",
+    "nodeVersion": "v24.16.0",
+    "totalMemBytes": 103079215104,
+    "cpuModel": "Apple M3 Ultra",
+    "cpuCores": 28,
+    "hwModel": "Mac15,14",
+    "osVersion": "Darwin 27.0.0",
+    "swVers": "ProductName:\t\tmacOS; ProductVersion:\t\t27.0; BuildVersion:\t\t26A428",
+    "power": {
+      "lowPowerMode": false,
+      "source": "AC Power"
+    },
+    "loadavg": [
+      3.6533203125,
+      3.56884765625,
+      3.06103515625
+    ],
+    "uptimeSec": 768787,
+    "gitHead": "64c302ec482888222833136d0d20c64d4cbb350b",
+    "gitBranch": "codex/rust-tauri-migration"
+  },
+  "samples": 32,
+  "output": {
+    "lines": 8192,
+    "lineBytes": 128
+  },
+  "boundary": "真实 node-pty/TerminalSessionManager/terminal-ws-bridge/TerminalOutputStream；未经 WS chat 路由（旧系统主聊天 run_code 不可用，见报告）",
+  "phases": {
+    "pty_big_output": {
+      "spawnMs": {
+        "n": 32,
+        "mean": 3.305645937499649,
+        "median": 3.2528125000008004,
+        "p95": 4.569374999999127,
+        "min": 1.9426660000026459,
+        "max": 4.902707999997801,
+        "stdev": 0.7191504227768053,
+        "cv": 0.2175521626858689,
+        "unit": "ms"
+      },
+      "firstDeliveryMs": {
+        "n": 32,
+        "mean": 409.40569671874994,
+        "median": 403.38912499999947,
+        "p95": 424.7858750000014,
+        "min": 387.78495799999655,
+        "max": 530.979834,
+        "stdev": 24.5024723012273,
+        "cv": 0.05984887972396682,
+        "unit": "ms"
+      },
+      "totalMs": {
+        "n": 32,
+        "mean": 761.9373646250004,
+        "median": 756.6303535000004,
+        "p95": 787.648792,
+        "min": 736.1420829999988,
+        "max": 897.021084,
+        "stdev": 27.334842826342033,
+        "cv": 0.03587544606083901,
+        "unit": "ms"
+      },
+      "outputBytes": {
+        "n": 32,
+        "mean": 1056849,
+        "median": 1056849,
+        "p95": 1056849,
+        "min": 1056849,
+        "max": 1056849,
+        "stdev": 0,
+        "cv": 0,
+        "unit": "ms"
+      },
+      "transcriptBytes": {
+        "n": 32,
+        "mean": 1116507.0625,
+        "median": 1116508,
+        "p95": 1116508,
+        "min": 1116505,
+        "max": 1116508,
+        "stdev": 1.4127872245796547,
+        "cv": 0.0000012653634464400486,
+        "unit": "ms"
+      },
+      "transcriptVerified": 32,
+      "leftoverHelperProcs": 0,
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/pty-driver-pty-2026-09-24T01-45-52-350Z.jsonl"
+    }
+  }
+}

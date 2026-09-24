@@ -1,0 +1,768 @@
+{
+  "schema": "lingxi-rust-tauri/R00-T06/BASELINE_BENCHMARK/1",
+  "task": "R00-T06",
+  "group": "G1-old-electron-node",
+  "protocolDoc": "docs/rust-tauri/R00/R00-T06_PROTOCOL.md",
+  "generatedAt": "2026-09-24T01:52:28.841Z",
+  "build": {
+    "head": "64c302ec482888222833136d0d20c64d4cbb350b",
+    "branch": "codex/rust-tauri-migration",
+    "buildId": "970f3dbf-d582-4532-aa52-1d5dd98a154b",
+    "builtAt": "2026-09-23T21:38:59.562Z",
+    "rebuilt": false,
+    "recomputedAt": "2026-09-24T01:46:35.541Z",
+    "recomputeReason": "R1 修复 F02：原 summary 因 darwin→mac 路径 bug 将 serverBundle/seedArchiveDir 记为 0/null/空；产物未重建（rebuilt=false，盘上即 2026-09-23T21:38Z 原始构建），指纹与双口径大小自此重算。字节一致性守卫：重算 server bundle SHA-256 == 最终 server run（run-2026-09-23T23-12-26-989Z）逐样本记录值；app.asar SHA-256 == 原 summary 记录值。",
+    "serverBundle": {
+      "path": "dist-server/mac-arm64",
+      "logicalBytes": 672507925,
+      "duBytes": 713519104,
+      "bundleSha256": "5095cc7ff74f60bfe0ca02332ad9455aabdb9abb065e3b82135d36ec76e6081a"
+    },
+    "desktopApp": {
+      "path": "dist/mac-arm64/Lingxi.app",
+      "logicalBytes": 971247121,
+      "duBytes": 812728320,
+      "mainBundleSha256": "7b8478abcb7e3b4e239b3726236e616f0a6979ae83157399e94282be477654a1"
+    },
+    "seedArchiveDir": {
+      "path": "dist-server-artifact/mac-arm64",
+      "logicalBytes": 353708203,
+      "duBytes": 353718272,
+      "files": [
+        {
+          "file": "renderer-0.1.43.tar.gz",
+          "bytes": 77835261,
+          "sha256": "92634584a9377fb6f610cd57cb4ca6a06f78e2794cb38465622c1f42bcb296af"
+        },
+        {
+          "file": "seed-train-darwin-arm64.json",
+          "bytes": 864,
+          "sha256": "4c01f4c16a89411b96eada4b2ca35ac5fe2e3c655ad52d3b8ea68f04ac2f8973"
+        },
+        {
+          "file": "seed-train-darwin-arm64.json.sig",
+          "bytes": 64,
+          "sha256": "85028ddaa6935a398d9ac37189e6509e6dfec0eef782057a15c3a3e09e272f63"
+        },
+        {
+          "file": "server-0.1.43-darwin-arm64.tar.gz",
+          "bytes": 275872014,
+          "sha256": "1eb1881f26677f8d61fc9040fb3d612e6ff501487d9b5f586354eaaf9d90e40d"
+        }
+      ]
+    },
+    "calibersNote": "logicalBytes = statSync size 逐文件求和（逻辑字节）；duBytes = du -sk（APFS 分配字节）。协议 §9 分发占用与 G3 25% 收益对照只用 duBytes；desktopApp.duBytes 与 desktopLeg.distributionSize.lingxiApp.bytes 同口径（修复轮实测同值互证）。禁止跨口径相减或混算。",
+    "signKeyset": "throwaway ed25519（仅本机构建自洽，非发布密钥；密钥文件在 OS 临时目录，不进入交付物）"
+  },
+  "host": {
+    "capturedAt": "2026-09-23T23:12:26.989Z",
+    "platform": "darwin",
+    "arch": "arm64",
+    "nodeVersion": "v24.16.0",
+    "totalMemBytes": 103079215104,
+    "cpuModel": "Apple M3 Ultra",
+    "cpuCores": 28,
+    "hwModel": "Mac15,14",
+    "osVersion": "Darwin 27.0.0",
+    "swVers": "ProductName:\t\tmacOS; ProductVersion:\t\t27.0; BuildVersion:\t\t26A428",
+    "power": {
+      "lowPowerMode": false,
+      "source": "AC Power"
+    },
+    "loadavg": [
+      3.0068359375,
+      3.84912109375,
+      4.53076171875
+    ],
+    "uptimeSec": 759581,
+    "gitHead": "64c302ec482888222833136d0d20c64d4cbb350b",
+    "gitBranch": "codex/rust-tauri-migration"
+  },
+  "measuredPlatform": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "status": "MEASURED"
+  },
+  "pendingPlatforms": [
+    {
+      "platform": "darwin",
+      "arch": "x64",
+      "status": "PENDING_MEASUREMENT"
+    },
+    {
+      "platform": "win32",
+      "arch": "x64",
+      "status": "PENDING_MEASUREMENT"
+    },
+    {
+      "platform": "linux",
+      "arch": "x64",
+      "status": "PENDING_MEASUREMENT"
+    }
+  ],
+  "serverLeg": {
+    "runId": "run-2026-09-23T23-12-26-989Z",
+    "samples": 32,
+    "startupCold": {
+      "t_spawn_to_info_ms": {
+        "n": 32,
+        "mean": 1170.4999999962747,
+        "median": 1170.7549999952316,
+        "p95": 1195.9199999570847,
+        "min": 1141.7900000810623,
+        "max": 1196.3999999761581,
+        "stdev": 14.790326377296168,
+        "cv": 0.012635904636773379,
+        "unit": "ms"
+      },
+      "t_spawn_to_health_ms": {
+        "n": 32,
+        "mean": 1190.4315624982119,
+        "median": 1190.739999949932,
+        "p95": 1206.8400000333786,
+        "min": 1171.7599999904633,
+        "max": 1212.1599999666214,
+        "stdev": 11.190614177653352,
+        "cv": 0.00940046830929868,
+        "unit": "ms"
+      },
+      "shutdown_sigterm_tree_exit_ms": {
+        "n": 32,
+        "mean": 93.59374999627471,
+        "median": 93.58999997377396,
+        "p95": 95.62999999523163,
+        "min": 91.06000006198883,
+        "max": 95.98000001907349,
+        "stdev": 1.1675829550787578,
+        "cv": 0.012475009871120997,
+        "unit": "ms"
+      },
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/startup-run-2026-09-23T23-12-26-989Z.jsonl"
+    },
+    "startupWarm": {
+      "t_spawn_to_info_ms": {
+        "n": 32,
+        "mean": 1182.2871874943376,
+        "median": 1175.4150000214577,
+        "p95": 1201.4800000190735,
+        "min": 1147.8999999761581,
+        "max": 1251.9499999284744,
+        "stdev": 18.902377423911105,
+        "cv": 0.015987974515711004,
+        "unit": "ms"
+      },
+      "t_spawn_to_health_ms": {
+        "n": 32,
+        "mean": 1202.2150000035763,
+        "median": 1199.0950000286102,
+        "p95": 1218.3600000143051,
+        "min": 1178.3599998950958,
+        "max": 1268.2799999713898,
+        "stdev": 17.370817200664213,
+        "cv": 0.014449010535230835,
+        "unit": "ms"
+      },
+      "shutdown_sigterm_tree_exit_ms": {
+        "n": 32,
+        "mean": 94.49562499672174,
+        "median": 93.29499995708466,
+        "p95": 113.50999999046326,
+        "min": 91.46000003814697,
+        "max": 114.26999998092651,
+        "stdev": 5.14517746743575,
+        "cv": 0.05444884318839361,
+        "unit": "ms"
+      },
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/startup-run-2026-09-23T23-12-26-989Z.jsonl"
+    },
+    "idleMemory": {
+      "rssMedianKb": 451504,
+      "rssMaxKb": 451600,
+      "rssSeriesKb": [
+        451408,
+        451408,
+        451456,
+        451456,
+        451504,
+        451504,
+        451552,
+        451552,
+        451600,
+        451600
+      ],
+      "procCountByFrame": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/idle-tree-run-2026-09-23T23-12-26-989Z.json"
+    },
+    "historyLongFirstPage": {
+      "n": 32,
+      "mean": 2.71406252682209,
+      "median": 1.790000081062317,
+      "p95": 3.6600000858306885,
+      "min": 1.5500000715255737,
+      "max": 25.990000009536743,
+      "stdev": 4.2738196685847365,
+      "cv": 1.5746946234097907,
+      "unit": "ms"
+    },
+    "historyLongEtag304": {
+      "n": 32,
+      "mean": 1.7971874997019768,
+      "median": 1.5200000405311584,
+      "p95": 4.5299999713897705,
+      "min": 1.3300000429153442,
+      "max": 4.75,
+      "stdev": 0.779061606675186,
+      "cv": 0.43348933085967706,
+      "unit": "ms",
+      "statuses": [
+        304
+      ]
+    },
+    "historyShortFirstPage": {
+      "n": 32,
+      "mean": 1.247499991208315,
+      "median": 1.2199999690055847,
+      "p95": 1.559999942779541,
+      "min": 0.8600000143051147,
+      "max": 2.2899999618530273,
+      "stdev": 0.25018701896650275,
+      "cv": 0.20055071801978477,
+      "unit": "ms"
+    },
+    "historyLongFullWalk": {
+      "pages": [
+        21,
+        21,
+        21
+      ],
+      "totalMsStats": {
+        "n": 3,
+        "mean": 33.46666665871938,
+        "median": 33.74000000953674,
+        "p95": 34.62000000476837,
+        "min": 32.03999996185303,
+        "max": 34.62000000476837,
+        "stdev": 1.3115385605702106,
+        "cv": 0.03918939922953167,
+        "unit": "ms"
+      }
+    },
+    "streamRequestFast": {
+      "firstDeltaMs": {
+        "n": 32,
+        "mean": 21.81937500461936,
+        "median": 19.65499997138977,
+        "p95": 22.55999994277954,
+        "min": 17.010000109672546,
+        "max": 83.65000009536743,
+        "stdev": 11.387277561342728,
+        "cv": 0.5218883473487181,
+        "unit": "ms"
+      },
+      "runEndMs": {
+        "n": 32,
+        "mean": 29.826562486588955,
+        "median": 27.485000014305115,
+        "p95": 31.62999999523163,
+        "min": 24.009999990463257,
+        "max": 94.75,
+        "stdev": 12.022883185110866,
+        "cv": 0.40309315532142753,
+        "unit": "ms"
+      },
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/stream-run-2026-09-23T23-12-26-989Z.jsonl"
+    },
+    "cancelHangAbort": {
+      "t_abort_to_abort_result_ms": {
+        "n": 32,
+        "mean": 3.6934375017881393,
+        "median": 2.9850000739097595,
+        "p95": 6.459999918937683,
+        "min": 1.559999942779541,
+        "max": 6.850000023841858,
+        "stdev": 1.4711123936925,
+        "cv": 0.3983043961026215,
+        "unit": "ms"
+      },
+      "t_abort_to_stream_stopped_ms": {
+        "n": 32,
+        "mean": 3.4553125090897083,
+        "median": 2.740000069141388,
+        "p95": 6.2200000286102295,
+        "min": 1.3700000047683716,
+        "max": 6.569999933242798,
+        "stdev": 1.4592220235279154,
+        "cv": 0.42231260405222887,
+        "unit": "ms"
+      },
+      "abortStatuses": [
+        "accepted"
+      ],
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/cancel-run-2026-09-23T23-12-26-989Z.jsonl"
+    },
+    "finalShutdown": {
+      "sigtermTreeExitMs": 94.83000004291534,
+      "forceKilled": false,
+      "procsBefore": 1,
+      "procsAfter": 0,
+      "leftoverPids": []
+    }
+  },
+  "ptyLeg": {
+    "runId": "pty-2026-09-24T01-45-52-350Z",
+    "samples": 32,
+    "boundary": "真实 node-pty/TerminalSessionManager/terminal-ws-bridge/TerminalOutputStream；未经 WS chat 路由（旧系统主聊天 run_code 不可用，见报告）",
+    "output": {
+      "lines": 8192,
+      "lineBytes": 128
+    },
+    "ptyBigOutput": {
+      "spawnMs": {
+        "n": 32,
+        "mean": 3.305645937499649,
+        "median": 3.2528125000008004,
+        "p95": 4.569374999999127,
+        "min": 1.9426660000026459,
+        "max": 4.902707999997801,
+        "stdev": 0.7191504227768053,
+        "cv": 0.2175521626858689,
+        "unit": "ms"
+      },
+      "firstDeliveryMs": {
+        "n": 32,
+        "mean": 409.40569671874994,
+        "median": 403.38912499999947,
+        "p95": 424.7858750000014,
+        "min": 387.78495799999655,
+        "max": 530.979834,
+        "stdev": 24.5024723012273,
+        "cv": 0.05984887972396682,
+        "unit": "ms"
+      },
+      "totalMs": {
+        "n": 32,
+        "mean": 761.9373646250004,
+        "median": 756.6303535000004,
+        "p95": 787.648792,
+        "min": 736.1420829999988,
+        "max": 897.021084,
+        "stdev": 27.334842826342033,
+        "cv": 0.03587544606083901,
+        "unit": "ms"
+      },
+      "outputBytes": {
+        "n": 32,
+        "mean": 1056849,
+        "median": 1056849,
+        "p95": 1056849,
+        "min": 1056849,
+        "max": 1056849,
+        "stdev": 0,
+        "cv": 0,
+        "unit": "ms"
+      },
+      "transcriptBytes": {
+        "n": 32,
+        "mean": 1116507.0625,
+        "median": 1116508,
+        "p95": 1116508,
+        "min": 1116505,
+        "max": 1116508,
+        "stdev": 1.4127872245796547,
+        "cv": 0.0000012653634464400486,
+        "unit": "ms"
+      },
+      "transcriptVerified": 32,
+      "leftoverHelperProcs": 0,
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/pty-driver-pty-2026-09-24T01-45-52-350Z.jsonl"
+    }
+  },
+  "desktopLeg": {
+    "runId": "run-2026-09-23T22-47-51-720Z",
+    "samples": 32,
+    "firstBootTemplate": {
+      "tLaunchStartLineMs": 133.21999990940094,
+      "tAppReadyMs": 9217.539999961853,
+      "serverPid": 73832,
+      "artifactsUnpackedBytes": 793124864,
+      "note": "首启解包 seed 计时单独记录，不计入稳态启动系列",
+      "quit": {
+        "watchedPidCount": 5,
+        "teardownAllGoneMs": 260.6200000047684,
+        "forced": false,
+        "leftoverMainPids": [],
+        "leftoverServerPids": []
+      }
+    },
+    "startupCold": {
+      "t_app_ready_ms": {
+        "n": 32,
+        "mean": 9243.629062499851,
+        "median": 9227.165000021458,
+        "p95": 9375.290000081062,
+        "min": 9087.560000061989,
+        "max": 9851.25,
+        "stdev": 131.03954688838246,
+        "cv": 0.014176201360133773,
+        "unit": "ms"
+      },
+      "t_launch_start_line_ms": {
+        "n": 32,
+        "mean": 156.25374998897314,
+        "median": 160.4800000190735,
+        "p95": 162.67000007629395,
+        "min": 134.52999997138977,
+        "max": 163.24000000953674,
+        "stdev": 10.153486228246237,
+        "cv": 0.06498075232730588,
+        "unit": "ms"
+      },
+      "quit_tree_all_gone_ms": {
+        "n": 32,
+        "mean": 261.5706249885261,
+        "median": 258.7099999785423,
+        "p95": 307.55999994277954,
+        "min": 256.33000004291534,
+        "max": 307.77999997138977,
+        "stdev": 12.136353521689504,
+        "cv": 0.04639799871343302,
+        "unit": "ms"
+      },
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/desktop/startup-run-2026-09-23T22-47-51-720Z.jsonl"
+    },
+    "startupWarm": {
+      "t_app_ready_ms": {
+        "n": 32,
+        "mean": 9199.094374999404,
+        "median": 9166.269999980927,
+        "p95": 9707.360000014305,
+        "min": 8966.080000042915,
+        "max": 9796.549999952316,
+        "stdev": 170.28077575770405,
+        "cv": 0.01851060211105999,
+        "unit": "ms"
+      },
+      "t_launch_start_line_ms": {
+        "n": 32,
+        "mean": 154.0584375038743,
+        "median": 160.5699999332428,
+        "p95": 163.55000007152557,
+        "min": 131.75999999046326,
+        "max": 163.62999999523163,
+        "stdev": 12.12351755463169,
+        "cv": 0.07869427829505803,
+        "unit": "ms"
+      },
+      "quit_tree_all_gone_ms": {
+        "n": 32,
+        "mean": 263.2403125166893,
+        "median": 259.0149999856949,
+        "p95": 307.75,
+        "min": 255.4099999666214,
+        "max": 308.85000002384186,
+        "stdev": 14.640076997980115,
+        "cv": 0.055614874705225636,
+        "unit": "ms"
+      },
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/desktop/startup-run-2026-09-23T22-47-51-720Z.jsonl"
+    },
+    "idleMemory": {
+      "rssMedianKb": 1048784,
+      "rssMaxKb": 1048880,
+      "rssSeriesKb": [
+        1048624,
+        1048656,
+        1048656,
+        1048736,
+        1048784,
+        1048784,
+        1048816,
+        1048816,
+        1048880,
+        1048848
+      ],
+      "procCountByFrame": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "raw": "artifacts/rust-tauri/R00/T06/raw/desktop/idle-tree-run-2026-09-23T22-47-51-720Z.json"
+    },
+    "browserMulti": {
+      "sessions": 5,
+      "pages": [
+        "http://127.0.0.1:47613/page/p0",
+        "http://127.0.0.1:47613/page/p1",
+        "http://127.0.0.1:47613/page/p2",
+        "http://127.0.0.1:47613/page/p3",
+        "http://127.0.0.1:47613/page/p4"
+      ],
+      "startToolEndMs": {
+        "n": 1,
+        "mean": 108.96000003814697,
+        "median": 108.96000003814697,
+        "p95": 108.96000003814697,
+        "min": 108.96000003814697,
+        "max": 108.96000003814697,
+        "stdev": 0,
+        "cv": 0,
+        "unit": "ms"
+      },
+      "navigateToolEndMs": {
+        "n": 5,
+        "mean": 22.664000034332275,
+        "median": 21.430000066757202,
+        "p95": 28.180000066757202,
+        "min": 20.47000002861023,
+        "max": 28.180000066757202,
+        "stdev": 3.1378464143438216,
+        "cv": 0.13845068873943234,
+        "unit": "ms"
+      },
+      "memoryWithViews": {
+        "rssMedianKb": 1015568,
+        "rssMaxKb": 1024592,
+        "procCountByFrame": [
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6
+        ]
+      },
+      "raw": "artifacts/rust-tauri/R00/T06/raw/desktop/browser-tree-run-2026-09-23T22-47-51-720Z.json",
+      "rawRows": "artifacts/rust-tauri/R00/T06/raw/desktop/browser-run-2026-09-23T22-47-51-720Z.jsonl"
+    },
+    "pdfConvert": {
+      "spawnToExitMs": {
+        "n": 32,
+        "mean": 813.4396874979138,
+        "median": 812.0600000023842,
+        "p95": 830.6699999570847,
+        "min": 799.4199999570847,
+        "max": 835.6499999761581,
+        "stdev": 8.386653171128483,
+        "cv": 0.010310110632695177,
+        "unit": "ms"
+      },
+      "pdfBytes": {
+        "n": 32,
+        "mean": 174571,
+        "median": 174571,
+        "p95": 174571,
+        "min": 174571,
+        "max": 174571,
+        "stdev": 0,
+        "cv": 0,
+        "unit": "ms"
+      },
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/desktop/pdf-run-2026-09-23T22-47-51-720Z.jsonl"
+    },
+    "distributionSize": {
+      "lingxiApp": {
+        "path": "dist/mac-arm64/Lingxi.app",
+        "bytes": 812728320
+      }
+    },
+    "finalShutdown": {
+      "watchedPidCount": 6,
+      "teardownAllGoneMs": 258.18999993801117,
+      "forced": false,
+      "leftoverMainPids": [],
+      "leftoverServerPids": []
+    }
+  },
+  "modelWaitSeparation": {
+    "method": "客户端端到端 − stub 服务端时间（fast 模式，stub 零附加延迟）",
+    "streamRunEnd": {
+      "n": 32,
+      "clientMs": {
+        "n": 32,
+        "mean": 29.826562486588955,
+        "median": 27.485000014305115,
+        "p95": 31.62999999523163,
+        "min": 24.009999990463257,
+        "max": 94.75,
+        "stdev": 12.022883185110866,
+        "cv": 0.40309315532142753,
+        "unit": "ms"
+      },
+      "stubServiceMs": {
+        "n": 32,
+        "mean": 0.15625,
+        "median": 0,
+        "p95": 1,
+        "min": 0,
+        "max": 1,
+        "stdev": 0.36890203262847354,
+        "cv": 2.3609730088222305,
+        "unit": "ms"
+      },
+      "localOverheadMs": {
+        "n": 32,
+        "mean": 29.670312486588955,
+        "median": 27.485000014305115,
+        "p95": 31.62999999523163,
+        "min": 23.5,
+        "max": 94.75,
+        "stdev": 12.058039343625994,
+        "cv": 0.40640082065452643,
+        "unit": "ms"
+      },
+      "fixedPrefix": {
+        "note": "R1-F04 口径澄清：本块（stub journal 中带 bench-stream marker 的 665/666B 请求）是每样本首轮后的「对话标题生成器」侧线调用（system≈403B、无 tools 数组、messageCount=2），不是主聊天请求——marker 出现在其用户消息里（含首轮对话摘要）因此被 marker 关联命中。",
+        "requestBytes": {
+          "n": 32,
+          "mean": 665.6875,
+          "median": 666,
+          "p95": 666,
+          "min": 665,
+          "max": 666,
+          "stdev": 0.47092907485988494,
+          "cv": 0.0007074326540003904,
+          "unit": "bytes"
+        },
+        "messageCount": {
+          "n": 32,
+          "mean": 2,
+          "median": 2,
+          "p95": 2,
+          "min": 2,
+          "max": 2,
+          "stdev": 0,
+          "cv": 0,
+          "unit": "count"
+        },
+        "toolCount": {
+          "n": 0,
+          "unit": "count"
+        },
+        "hasSystemPromptAll": true
+      },
+      "mainChatRequest": {
+        "note": "主聊天请求（stream=true 且 tools 数组非空）。固定前缀实测（R1-F04 探针，双通道一致）：system 消息 10,626B（UTF-8）+ 7 个可见工具 schema JSON 10,287B；产品诊断 LINGXI_CACHE_CONTRACT_DEBUG=1 的 cache_contract systemPromptBytes 同值 10,626。证据：raw/server/fixed-prefix-probe-*.json 与 scripts/rust-tauri/r00-t06-probe-fixed-prefix.mjs。",
+        "streamPhaseFast": {
+          "requestBytes": {
+            "n": 32,
+            "mean": 28598.6875,
+            "median": 28599,
+            "p95": 28599,
+            "min": 28598,
+            "max": 28599,
+            "stdev": 0.47092907485988494,
+            "cv": 0.000016466807256797535,
+            "unit": "bytes"
+          },
+          "messageCount": {
+            "n": 32,
+            "mean": 2,
+            "median": 2,
+            "p95": 2,
+            "min": 2,
+            "max": 2,
+            "stdev": 0,
+            "cv": 0,
+            "unit": "count"
+          },
+          "toolCount": {
+            "n": 32,
+            "mean": 7,
+            "median": 7,
+            "p95": 7,
+            "min": 7,
+            "max": 7,
+            "stdev": 0,
+            "cv": 0,
+            "unit": "count"
+          },
+          "n": 32
+        },
+        "cancelPhaseHang": {
+          "requestBytes": {
+            "n": 32,
+            "mean": 28590.6875,
+            "median": 28591,
+            "p95": 28591,
+            "min": 28590,
+            "max": 28591,
+            "stdev": 0.47092907485988494,
+            "cv": 0.000016471414857018915,
+            "unit": "bytes"
+          },
+          "messageCount": {
+            "n": 32,
+            "mean": 2,
+            "median": 2,
+            "p95": 2,
+            "min": 2,
+            "max": 2,
+            "stdev": 0,
+            "cv": 0,
+            "unit": "count"
+          },
+          "toolCount": {
+            "n": 32,
+            "mean": 7,
+            "median": 7,
+            "p95": 7,
+            "min": 7,
+            "max": 7,
+            "stdev": 0,
+            "cv": 0,
+            "unit": "count"
+          },
+          "n": 32,
+          "note": "hang 模式同一请求在停住与客户端断开时各记一次，按 seq 去重后统计"
+        },
+        "probeDecomposition": {
+          "systemMessageBytes": 10626,
+          "toolsJsonBytes": 10287,
+          "toolCount": 7,
+          "source": "fixed-prefix-probe（真实会话路径实测，与 cache contract 诊断一致）"
+        }
+      }
+    },
+    "realProviderMeasurements": {
+      "calls": 0,
+      "note": "本轮零真实供应商调用；真实供应商测量待授权后单列"
+    }
+  },
+  "rawData": {
+    "serverDir": "artifacts/rust-tauri/R00/T06/raw/server",
+    "desktopDir": "artifacts/rust-tauri/R00/T06/raw/desktop",
+    "buildSummary": "artifacts/rust-tauri/R00/T06/raw/build-release-summary.json",
+    "serverSummary": "artifacts/rust-tauri/R00/T06/raw/server/summary-run-2026-09-23T23-12-26-989Z.json",
+    "desktopSummary": "artifacts/rust-tauri/R00/T06/raw/desktop/summary-run-2026-09-23T22-47-51-720Z.json"
+  }
+}

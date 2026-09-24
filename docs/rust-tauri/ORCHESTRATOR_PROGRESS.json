@@ -4,7 +4,7 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "6f58b9351046e8dccfeb83be6976f197acb2de8d",
+  "current_head": "64c302ec482888222833136d0d20c64d4cbb350b",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -712,7 +712,7 @@
     "R00-T05": {
       "name": "建立旧行为与故障夹具",
       "stage_id": "R00",
-      "status": "COMMITTING",
+      "status": "DONE",
       "task_base_sha": "6f58b9351046e8dccfeb83be6976f197acb2de8d",
       "executor_id": "ZCode:R00-T05 执行（ZCode）",
       "execution_result": "READY_FOR_REVIEW",
@@ -755,8 +755,8 @@
         "R00-A09": "PASS",
         "R00-A10": "PASS"
       },
-      "task_commit_sha": null,
-      "push_result": null,
+      "task_commit_sha": "64c302ec482888222833136d0d20c64d4cbb350b",
+      "push_result": "CONFIRMED",
       "blockers": [],
       "candidate_digest_sha256": "96c39f787e2f7230a28e6118c027302a1ed20843f003c316279cb841f990d052",
       "candidate_file_count": 88,
@@ -772,28 +772,98 @@
         "scope": "all 90 untracked files within T05 docs, tests/migration, artifacts/T05, replay driver",
         "product_code_diff": "none",
         "git_diff_check": "source/docs PASS; full check exits 2 only for 3 generated stdout.txt files with original trailing blank line; raw evidence preserved byte-for-byte after independent PASS"
-      }
+      },
+      "remote_verified_sha": "64c302ec482888222833136d0d20c64d4cbb350b"
     },
     "R00-T06": {
       "name": "测量旧版本并冻结性能协议",
       "stage_id": "R00",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
-      "repair_agent_id": null,
+      "status": "COMMITTING",
+      "task_base_sha": "64c302ec482888222833136d0d20c64d4cbb350b",
+      "executor_id": "ZCode:R00-T06 执行（ZCode）",
+      "execution_result": {
+        "status": "READY_FOR_REVIEW_AFTER_R1_REPAIR",
+        "candidate_sha256": "8f6de53d66c4a2d7d63c5c67de3376ae3e0e02ab981e4c2d8f41e40066143785",
+        "candidate_file_count": 82,
+        "report_sha256": "8efc7fcab601e41ea25f21b44a8406841970c96cf8baed10b2a79e93dd50ca6b",
+        "source": "ZCode:R00-T06 修复 R1（ZCode）"
+      },
+      "review_round": 2,
+      "reviewer_id": "ZCode:R00-T06 独立验收 R2（ZCode）",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "F01",
+          "severity": "MEDIUM",
+          "summary": "报告及阈值引用被弃run统计",
+          "resolution": "RESOLVED_IN_R1_REPAIR_AND_VERIFIED_R2"
+        },
+        {
+          "id": "F02",
+          "severity": "MEDIUM",
+          "summary": "macOS产物路径错误导致基线构建指纹为空",
+          "resolution": "RESOLVED_IN_R1_REPAIR_AND_VERIFIED_R2"
+        },
+        {
+          "id": "F03",
+          "severity": "LOW",
+          "summary": "分发占用逻辑字节与磁盘分配字节未区分",
+          "resolution": "RESOLVED_IN_R1_REPAIR_AND_VERIFIED_R2"
+        },
+        {
+          "id": "F04",
+          "severity": "MEDIUM",
+          "summary": "固定前缀10620B缺原始证据及稳定口径",
+          "resolution": "RESOLVED_IN_R1_REPAIR_AND_VERIFIED_R2"
+        },
+        {
+          "id": "F05",
+          "severity": "MEDIUM",
+          "summary": "阈值frozen_at早于最终数据",
+          "resolution": "RESOLVED_IN_R1_REPAIR_AND_VERIFIED_R2"
+        },
+        {
+          "id": "F06",
+          "severity": "LOW",
+          "summary": "PTY协议1MB实际仅约0.4MB；需升至1MB重测",
+          "resolution": "RESOLVED_IN_R1_REPAIR_AND_VERIFIED_R2"
+        },
+        {
+          "id": "F07",
+          "severity": "LOW",
+          "summary": "注释与协议测量条件失准",
+          "resolution": "RESOLVED_IN_R1_REPAIR_AND_VERIFIED_R2"
+        },
+        {
+          "id": "F08",
+          "severity": "LOW",
+          "summary": "基线汇总未集成office产品链指标",
+          "resolution": "FOLLOW_UP_R00_T08_OR_STAGE_REVIEW"
+        },
+        {
+          "id": "F09",
+          "severity": "LOW",
+          "summary": "字节统计unit标签沿用ms",
+          "resolution": "FOLLOW_UP_LATER_BENCH_SCRIPT_EVOLUTION"
+        },
+        {
+          "id": "F10",
+          "severity": "LOW",
+          "summary": "报告称逐样本记录bundle指纹而实际为run summary",
+          "resolution": "FOLLOW_UP_R00_T08_OR_STAGE_REVIEW"
+        }
+      ],
+      "repair_agent_id": "ZCode:R00-T06 修复 R1（ZCode）",
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R00-A11": "NOT_STARTED",
-        "R00-A12": "NOT_STARTED"
+        "R00-A11": "PASS",
+        "R00-A12": "PASS"
       },
       "task_commit_sha": null,
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "review_report": "docs/rust-tauri/R00/R00-T06_REVIEW_R2.md",
+      "review_report_sha256": "c099b4831cec8aed63f72cd4401cc8999c3b1d8dc0a75cb616e9b57ab84d58d1"
     },
     "R00-T07": {
       "name": "建立可执行验收账本",
@@ -2770,7 +2840,7 @@
       "blockers": []
     }
   },
-  "current_task": "R00-T05",
+  "current_task": "R00-T06",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",
@@ -2779,6 +2849,16 @@
     "stage_reviewer": "fresh Codex subagent created by root after all stage tasks complete",
     "stage_repair": "new ZCode task after failed stage review",
     "stage_rereviewer": "fresh Codex subagent created by root after stage repair",
-    "scope_note": "User changed execution mode on 2026-09-24; prior completed task history remains unchanged."
+    "scope_note": "User changed execution mode on 2026-09-24; prior completed task history remains unchanged.",
+    "r01_onward": {
+      "effective_from": "R01 after R00 stage independent PASS",
+      "stage_controller": "one ZCode stage controller task per R stage; root supplies stage brief then may stop until stage completion notice",
+      "task_executor": "ZCode stage controller creates separate ZCode agent/task for each T execution",
+      "task_reviewer": "ZCode stage controller creates a different ZCode agent/task for each T independent review round",
+      "task_repair": "ZCode stage controller creates a new ZCode agent/task for each T repair round",
+      "task_gate": "each T REQUIRED acceptance independently PASS before commit/push and next dependency",
+      "stage_reviewer": "after ZCode reports all stage T tasks done, root creates fresh Codex subagent for independent stage review",
+      "stage_repair": "failed stage review repaired by ZCode; root creates a fresh Codex subagent for re-review"
+    }
   }
 }

@@ -1,0 +1,279 @@
+{
+  "runId": "run-2026-09-23T23-12-26-989Z",
+  "task": "R00-T06 server leg",
+  "head": "64c302ec482888222833136d0d20c64d4cbb350b",
+  "host": {
+    "capturedAt": "2026-09-23T23:12:26.989Z",
+    "platform": "darwin",
+    "arch": "arm64",
+    "nodeVersion": "v24.16.0",
+    "totalMemBytes": 103079215104,
+    "cpuModel": "Apple M3 Ultra",
+    "cpuCores": 28,
+    "hwModel": "Mac15,14",
+    "osVersion": "Darwin 27.0.0",
+    "swVers": "ProductName:\t\tmacOS; ProductVersion:\t\t27.0; BuildVersion:\t\t26A428",
+    "power": {
+      "lowPowerMode": false,
+      "source": "AC Power"
+    },
+    "loadavg": [
+      3.0068359375,
+      3.84912109375,
+      4.53076171875
+    ],
+    "uptimeSec": 759581,
+    "gitHead": "64c302ec482888222833136d0d20c64d4cbb350b",
+    "gitBranch": "codex/rust-tauri-migration"
+  },
+  "samples": 32,
+  "serverWrapper": "dist-server/mac-arm64/hana-server",
+  "serverBundleSha256": "5095cc7ff74f60bfe0ca02332ad9455aabdb9abb065e3b82135d36ec76e6081a",
+  "stub": {
+    "baseUrl": "http://127.0.0.1:58139/v1",
+    "config": {
+      "chunkCount": 24,
+      "chunkChars": 64,
+      "delayedFirstByteMs": 250,
+      "delayedInterChunkMs": 10,
+      "hangChunksBeforeStall": 5
+    }
+  },
+  "phases": {
+    "startup_cold": {
+      "t_spawn_to_info_ms": {
+        "n": 32,
+        "mean": 1170.4999999962747,
+        "median": 1170.7549999952316,
+        "p95": 1195.9199999570847,
+        "min": 1141.7900000810623,
+        "max": 1196.3999999761581,
+        "stdev": 14.790326377296168,
+        "cv": 0.012635904636773379,
+        "unit": "ms"
+      },
+      "t_spawn_to_health_ms": {
+        "n": 32,
+        "mean": 1190.4315624982119,
+        "median": 1190.739999949932,
+        "p95": 1206.8400000333786,
+        "min": 1171.7599999904633,
+        "max": 1212.1599999666214,
+        "stdev": 11.190614177653352,
+        "cv": 0.00940046830929868,
+        "unit": "ms"
+      },
+      "shutdown_sigterm_tree_exit_ms": {
+        "n": 32,
+        "mean": 93.59374999627471,
+        "median": 93.58999997377396,
+        "p95": 95.62999999523163,
+        "min": 91.06000006198883,
+        "max": 95.98000001907349,
+        "stdev": 1.1675829550787578,
+        "cv": 0.012475009871120997,
+        "unit": "ms"
+      },
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/startup-run-2026-09-23T23-12-26-989Z.jsonl"
+    },
+    "startup_warm": {
+      "t_spawn_to_info_ms": {
+        "n": 32,
+        "mean": 1182.2871874943376,
+        "median": 1175.4150000214577,
+        "p95": 1201.4800000190735,
+        "min": 1147.8999999761581,
+        "max": 1251.9499999284744,
+        "stdev": 18.902377423911105,
+        "cv": 0.015987974515711004,
+        "unit": "ms"
+      },
+      "t_spawn_to_health_ms": {
+        "n": 32,
+        "mean": 1202.2150000035763,
+        "median": 1199.0950000286102,
+        "p95": 1218.3600000143051,
+        "min": 1178.3599998950958,
+        "max": 1268.2799999713898,
+        "stdev": 17.370817200664213,
+        "cv": 0.014449010535230835,
+        "unit": "ms"
+      },
+      "shutdown_sigterm_tree_exit_ms": {
+        "n": 32,
+        "mean": 94.49562499672174,
+        "median": 93.29499995708466,
+        "p95": 113.50999999046326,
+        "min": 91.46000003814697,
+        "max": 114.26999998092651,
+        "stdev": 5.14517746743575,
+        "cv": 0.05444884318839361,
+        "unit": "ms"
+      },
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/startup-run-2026-09-23T23-12-26-989Z.jsonl"
+    },
+    "idle_memory": {
+      "rssMedianKb": 451504,
+      "rssMaxKb": 451600,
+      "rssSeriesKb": [
+        451408,
+        451408,
+        451456,
+        451456,
+        451504,
+        451504,
+        451552,
+        451552,
+        451600,
+        451600
+      ],
+      "procCountByFrame": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/idle-tree-run-2026-09-23T23-12-26-989Z.json"
+    },
+    "history_long_first_page": {
+      "n": 32,
+      "mean": 2.71406252682209,
+      "median": 1.790000081062317,
+      "p95": 3.6600000858306885,
+      "min": 1.5500000715255737,
+      "max": 25.990000009536743,
+      "stdev": 4.2738196685847365,
+      "cv": 1.5746946234097907,
+      "unit": "ms"
+    },
+    "history_long_etag_304": {
+      "n": 32,
+      "mean": 1.7971874997019768,
+      "median": 1.5200000405311584,
+      "p95": 4.5299999713897705,
+      "min": 1.3300000429153442,
+      "max": 4.75,
+      "stdev": 0.779061606675186,
+      "cv": 0.43348933085967706,
+      "unit": "ms",
+      "statuses": [
+        304
+      ]
+    },
+    "history_short_first_page": {
+      "n": 32,
+      "mean": 1.247499991208315,
+      "median": 1.2199999690055847,
+      "p95": 1.559999942779541,
+      "min": 0.8600000143051147,
+      "max": 2.2899999618530273,
+      "stdev": 0.25018701896650275,
+      "cv": 0.20055071801978477,
+      "unit": "ms"
+    },
+    "history_long_full_walk": {
+      "pages": [
+        21,
+        21,
+        21
+      ],
+      "totalMsStats": {
+        "n": 3,
+        "mean": 33.46666665871938,
+        "median": 33.74000000953674,
+        "p95": 34.62000000476837,
+        "min": 32.03999996185303,
+        "max": 34.62000000476837,
+        "stdev": 1.3115385605702106,
+        "cv": 0.03918939922953167,
+        "unit": "ms"
+      }
+    },
+    "stream_request_fast": {
+      "firstDeltaMs": {
+        "n": 32,
+        "mean": 21.81937500461936,
+        "median": 19.65499997138977,
+        "p95": 22.55999994277954,
+        "min": 17.010000109672546,
+        "max": 83.65000009536743,
+        "stdev": 11.387277561342728,
+        "cv": 0.5218883473487181,
+        "unit": "ms"
+      },
+      "runEndMs": {
+        "n": 32,
+        "mean": 29.826562486588955,
+        "median": 27.485000014305115,
+        "p95": 31.62999999523163,
+        "min": 24.009999990463257,
+        "max": 94.75,
+        "stdev": 12.022883185110866,
+        "cv": 0.40309315532142753,
+        "unit": "ms"
+      },
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/stream-run-2026-09-23T23-12-26-989Z.jsonl"
+    },
+    "cancel_hang_abort": {
+      "t_abort_to_abort_result_ms": {
+        "n": 32,
+        "mean": 3.6934375017881393,
+        "median": 2.9850000739097595,
+        "p95": 6.459999918937683,
+        "min": 1.559999942779541,
+        "max": 6.850000023841858,
+        "stdev": 1.4711123936925,
+        "cv": 0.3983043961026215,
+        "unit": "ms"
+      },
+      "t_abort_to_stream_stopped_ms": {
+        "n": 32,
+        "mean": 3.4553125090897083,
+        "median": 2.740000069141388,
+        "p95": 6.2200000286102295,
+        "min": 1.3700000047683716,
+        "max": 6.569999933242798,
+        "stdev": 1.4592220235279154,
+        "cv": 0.42231260405222887,
+        "unit": "ms"
+      },
+      "abortStatuses": [
+        "accepted"
+      ],
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/cancel-run-2026-09-23T23-12-26-989Z.jsonl"
+    },
+    "final_shutdown": {
+      "sigtermTreeExitMs": 94.83000004291534,
+      "forceKilled": false,
+      "procsBefore": 1,
+      "procsAfter": 0,
+      "leftoverPids": []
+    }
+  },
+  "fixture": {
+    "homePath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R00/T06/raw/server/pristine-home",
+    "files": {
+      "bench-long-1000.jsonl": {
+        "messages": 1000,
+        "sha256": "d2b724253f961985fbfebf51433ae7126743c6a3051dec18a3138733f6dd8365",
+        "bytes": 443133
+      },
+      "bench-short-20.jsonl": {
+        "messages": 20,
+        "sha256": "8c5bf1899ae7816a455b8e388dc7affb532c943ed72128f3fa790d8c31fb6ba8",
+        "bytes": 8727
+      }
+    },
+    "stubBaseUrl": "http://127.0.0.1:58139/v1"
+  }
+}

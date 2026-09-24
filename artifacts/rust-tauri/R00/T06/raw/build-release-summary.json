@@ -1,0 +1,95 @@
+{
+  "startedAt": "2026-09-23T21:37:27.422Z",
+  "platform": "darwin",
+  "arch": "arm64",
+  "node": "v24.16.0",
+  "gitHead": "64c302ec482888222833136d0d20c64d4cbb350b",
+  "gitBranch": "codex/rust-tauri-migration",
+  "gitDirty": [
+    "M docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+    "?? docs/rust-tauri/R00/R00-T06_PROTOCOL.md",
+    "?? scripts/rust-tauri/r00-t06-bench-desktop.mjs",
+    "?? scripts/rust-tauri/r00-t06-bench-server.mjs",
+    "?? scripts/rust-tauri/r00-t06-build-release.mjs",
+    "?? scripts/rust-tauri/r00-t06-fixture.mjs",
+    "?? scripts/rust-tauri/r00-t06-lib.mjs",
+    "?? scripts/rust-tauri/r00-t06-smoke.mjs",
+    "?? scripts/rust-tauri/r00-t06-stub-provider.mjs",
+    "?? scripts/rust-tauri/r00-t06-summarize.mjs"
+  ],
+  "finishedAt": "2026-09-23T21:38:59.562Z",
+  "buildId": "970f3dbf-d582-4532-aa52-1d5dd98a154b",
+  "workdir": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r00-t06-build-8K2TBx",
+  "signKeyset": "throwaway ed25519（仅本机构建自洽，非发布密钥；密钥文件在 OS 临时目录，不进入交付物）",
+  "artifacts": {
+    "serverBundle": {
+      "path": "dist-server/mac-arm64",
+      "logicalBytes": 672507925,
+      "logicalBytesCaliber": "statSync size 逐文件求和（逻辑字节）",
+      "duBytes": 713519104,
+      "duBytesCaliber": "du -sk（APFS 分配字节；协议 §9 分发占用冻结口径，G3 25% 收益对照只用它）",
+      "exists": true,
+      "bundleSha256": "5095cc7ff74f60bfe0ca02332ad9455aabdb9abb065e3b82135d36ec76e6081a"
+    },
+    "desktopApp": {
+      "path": "dist/mac-arm64/Lingxi.app",
+      "logicalBytes": 971247121,
+      "logicalBytesCaliber": "statSync size 逐文件求和（逻辑字节）",
+      "duBytes": 812728320,
+      "duBytesCaliber": "du -sk（APFS 分配字节；协议 §9 分发占用冻结口径，G3 25% 收益对照只用它）",
+      "exists": true,
+      "mainBundleSha256": "7b8478abcb7e3b4e239b3726236e616f0a6979ae83157399e94282be477654a1"
+    },
+    "seedArchiveDir": {
+      "path": "dist-server-artifact/mac-arm64",
+      "logicalBytes": 353708203,
+      "logicalBytesCaliber": "statSync size 逐文件求和（逻辑字节）",
+      "duBytes": 353718272,
+      "duBytesCaliber": "du -sk（APFS 分配字节；协议 §9 分发占用冻结口径，G3 25% 收益对照只用它）",
+      "exists": true,
+      "files": [
+        {
+          "file": "renderer-0.1.43.tar.gz",
+          "bytes": 77835261,
+          "sha256": "92634584a9377fb6f610cd57cb4ca6a06f78e2794cb38465622c1f42bcb296af"
+        },
+        {
+          "file": "seed-train-darwin-arm64.json",
+          "bytes": 864,
+          "sha256": "4c01f4c16a89411b96eada4b2ca35ac5fe2e3c655ad52d3b8ea68f04ac2f8973"
+        },
+        {
+          "file": "seed-train-darwin-arm64.json.sig",
+          "bytes": 64,
+          "sha256": "85028ddaa6935a398d9ac37189e6509e6dfec0eef782057a15c3a3e09e272f63"
+        },
+        {
+          "file": "server-0.1.43-darwin-arm64.tar.gz",
+          "bytes": 275872014,
+          "sha256": "1eb1881f26677f8d61fc9040fb3d612e6ff501487d9b5f586354eaaf9d90e40d"
+        }
+      ]
+    }
+  },
+  "recomputedAt": "2026-09-24T01:46:35.541Z",
+  "rebuilt": false,
+  "recomputeReason": "R1 修复 F02：原 summary 因 darwin→mac 路径 bug 将 serverBundle/seedArchiveDir 记为 0/null/空；产物未重建（rebuilt=false，盘上即 2026-09-23T21:38Z 原始构建），指纹与双口径大小自此重算。字节一致性守卫：重算 server bundle SHA-256 == 最终 server run（run-2026-09-23T23-12-26-989Z）逐样本记录值；app.asar SHA-256 == 原 summary 记录值。",
+  "artifactMtimes": {
+    "serverBundleIndexJs": "2026-09-23T21:37:44.463Z",
+    "appAsar": "2026-09-23T21:38:54.389Z",
+    "seedArchiveDir": "2026-09-23T21:38:30.437Z"
+  },
+  "repairNote": {
+    "originalServerBundle": {
+      "path": "dist-server/darwin-arm64",
+      "bytes": 0,
+      "bundleSha256": null
+    },
+    "originalSeedArchiveDir": {
+      "path": "dist-server-artifact/darwin-arm64",
+      "bytes": 0,
+      "files": []
+    },
+    "reason": "原始值由路径 bug 产生（dist-server/darwin-arm64 不存在 → 0/null），非真实测量，留档仅为对照。"
+  }
+}

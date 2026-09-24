@@ -1,0 +1,81 @@
+{
+  "runId": "office-2026-09-23T23-28-09-564Z",
+  "task": "R00-T06 supplementary office PDF chain",
+  "head": "64c302ec482888222833136d0d20c64d4cbb350b",
+  "samples": 2,
+  "boundary": "真实产品链：WS→mcp_call→office_html-to-pdf→server spawn 打包二进制 helper（真实 printToPDF）；输入 200KB 确定性 HTML；helper exec 经 LINGXI_OFFICE_PDF_HELPER_EXEC 指向打包 Lingxi（与产品内 server→helper 合同一致）",
+  "htmlBytes": 239073,
+  "phases": {
+    "office_pdf_chain": {
+      "toolEndMs": {
+        "n": 1,
+        "mean": 897.1699999570847,
+        "median": 897.1699999570847,
+        "p95": 897.1699999570847,
+        "min": 897.1699999570847,
+        "max": 897.1699999570847,
+        "stdev": 0,
+        "cv": 0,
+        "unit": "ms"
+      },
+      "runEndMs": {
+        "n": 1,
+        "mean": 933.0299999713898,
+        "median": 933.0299999713898,
+        "p95": 933.0299999713898,
+        "min": 933.0299999713898,
+        "max": 933.0299999713898,
+        "stdev": 0,
+        "cv": 0,
+        "unit": "ms"
+      },
+      "pdfBytes": {
+        "n": 1,
+        "mean": 0,
+        "median": 0,
+        "p95": 0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0,
+        "cv": null,
+        "unit": "ms"
+      },
+      "okPdf": 0,
+      "errors": 1,
+      "treeDuringFirstConvert": {
+        "procCountByFrame": [
+          1,
+          5,
+          5,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "rssSeriesKb": [
+          467248,
+          871184,
+          1033632,
+          492816,
+          492848,
+          492912,
+          492912,
+          492912
+        ],
+        "procsSeen": [
+          "6005:/Users/study_superior/Desktop/Code/LingxiAgent/dist-server/mac-arm64/node",
+          "6130:/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/MacOS/Lingxi",
+          "6133:/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper",
+          "6134:/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper.app/Contents/MacOS/Lingxi Helper",
+          "6136:/Users/study_superior/Desktop/Code/LingxiAgent/dist/mac-arm64/Lingxi.app/Contents/Frameworks/Lingxi Helper (Renderer).app/Contents/MacOS/Lingxi Helper (Renderer)"
+        ],
+        "raw": "（内嵌本 summary）"
+      },
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/office-pdf-office-2026-09-23T23-28-09-564Z.jsonl"
+    }
+  },
+  "shutdown": {
+    "sigtermTreeExitMs": 100.85000002384186
+  }
+}

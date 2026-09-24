@@ -1,0 +1,263 @@
+{
+  "label": "server-idle",
+  "startedAt": "2026-09-23T22:09:38.441Z",
+  "endedAt": "2026-09-23T22:09:43.236Z",
+  "frames": [
+    {
+      "ts": "2026-09-23T22:09:38.441Z",
+      "label": "server-idle#0",
+      "roots": [
+        41361
+      ],
+      "pids": [
+        41361
+      ],
+      "procs": [
+        {
+          "pid": 41361,
+          "ppid": 32451,
+          "rssKb": 455088,
+          "vszKb": 506785168,
+          "pcpu": 0.2,
+          "etime": "00:11",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-server/mac-arm64/node"
+        }
+      ],
+      "treeRssKb": 455088,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:09:38.973Z",
+      "label": "server-idle#1",
+      "roots": [
+        41361
+      ],
+      "pids": [
+        41361
+      ],
+      "procs": [
+        {
+          "pid": 41361,
+          "ppid": 32451,
+          "rssKb": 455088,
+          "vszKb": 506785168,
+          "pcpu": 0,
+          "etime": "00:11",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-server/mac-arm64/node"
+        }
+      ],
+      "treeRssKb": 455088,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:09:39.506Z",
+      "label": "server-idle#2",
+      "roots": [
+        41361
+      ],
+      "pids": [
+        41361
+      ],
+      "procs": [
+        {
+          "pid": 41361,
+          "ppid": 32451,
+          "rssKb": 455136,
+          "vszKb": 506785168,
+          "pcpu": 0.1,
+          "etime": "00:12",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-server/mac-arm64/node"
+        }
+      ],
+      "treeRssKb": 455136,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:09:40.039Z",
+      "label": "server-idle#3",
+      "roots": [
+        41361
+      ],
+      "pids": [
+        41361
+      ],
+      "procs": [
+        {
+          "pid": 41361,
+          "ppid": 32451,
+          "rssKb": 455136,
+          "vszKb": 506785168,
+          "pcpu": 0,
+          "etime": "00:13",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-server/mac-arm64/node"
+        }
+      ],
+      "treeRssKb": 455136,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:09:40.576Z",
+      "label": "server-idle#4",
+      "roots": [
+        41361
+      ],
+      "pids": [
+        41361
+      ],
+      "procs": [
+        {
+          "pid": 41361,
+          "ppid": 32451,
+          "rssKb": 455200,
+          "vszKb": 506785168,
+          "pcpu": 0,
+          "etime": "00:13",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-server/mac-arm64/node"
+        }
+      ],
+      "treeRssKb": 455200,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:09:41.112Z",
+      "label": "server-idle#5",
+      "roots": [
+        41361
+      ],
+      "pids": [
+        41361
+      ],
+      "procs": [
+        {
+          "pid": 41361,
+          "ppid": 32451,
+          "rssKb": 455200,
+          "vszKb": 506785168,
+          "pcpu": 0,
+          "etime": "00:14",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-server/mac-arm64/node"
+        }
+      ],
+      "treeRssKb": 455200,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:09:41.641Z",
+      "label": "server-idle#6",
+      "roots": [
+        41361
+      ],
+      "pids": [
+        41361
+      ],
+      "procs": [
+        {
+          "pid": 41361,
+          "ppid": 32451,
+          "rssKb": 455232,
+          "vszKb": 506785168,
+          "pcpu": 0,
+          "etime": "00:14",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-server/mac-arm64/node"
+        }
+      ],
+      "treeRssKb": 455232,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:09:42.177Z",
+      "label": "server-idle#7",
+      "roots": [
+        41361
+      ],
+      "pids": [
+        41361
+      ],
+      "procs": [
+        {
+          "pid": 41361,
+          "ppid": 32451,
+          "rssKb": 455232,
+          "vszKb": 506785168,
+          "pcpu": 0,
+          "etime": "00:15",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-server/mac-arm64/node"
+        }
+      ],
+      "treeRssKb": 455232,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:09:42.705Z",
+      "label": "server-idle#8",
+      "roots": [
+        41361
+      ],
+      "pids": [
+        41361
+      ],
+      "procs": [
+        {
+          "pid": 41361,
+          "ppid": 32451,
+          "rssKb": 455264,
+          "vszKb": 506785168,
+          "pcpu": 0,
+          "etime": "00:15",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-server/mac-arm64/node"
+        }
+      ],
+      "treeRssKb": 455264,
+      "vanished": []
+    },
+    {
+      "ts": "2026-09-23T22:09:43.236Z",
+      "label": "server-idle#9",
+      "roots": [
+        41361
+      ],
+      "pids": [
+        41361
+      ],
+      "procs": [
+        {
+          "pid": 41361,
+          "ppid": 32451,
+          "rssKb": 455264,
+          "vszKb": 506785168,
+          "pcpu": 0,
+          "etime": "00:16",
+          "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-server/mac-arm64/node"
+        }
+      ],
+      "treeRssKb": 455264,
+      "vanished": []
+    }
+  ],
+  "rssSeriesKb": [
+    455088,
+    455088,
+    455136,
+    455136,
+    455200,
+    455200,
+    455232,
+    455232,
+    455264,
+    455264
+  ],
+  "rssMedianKb": 455200,
+  "rssMaxKb": 455264,
+  "procCountByFrame": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "runId": "office-2026-09-23T23-26-03-574Z",
+  "task": "R00-T06 supplementary office PDF chain",
+  "head": "64c302ec482888222833136d0d20c64d4cbb350b",
+  "samples": 2,
+  "boundary": "真实产品链：WS→mcp_call→office_html-to-pdf→server spawn 打包二进制 helper（真实 printToPDF）；输入 200KB 确定性 HTML；helper exec 经 LINGXI_OFFICE_PDF_HELPER_EXEC 指向打包 Lingxi（与产品内 server→helper 合同一致）",
+  "htmlBytes": 239073,
+  "phases": {
+    "office_pdf_chain": {
+      "toolEndMs": {
+        "n": 1,
+        "mean": 86.39999997615814,
+        "median": 86.39999997615814,
+        "p95": 86.39999997615814,
+        "min": 86.39999997615814,
+        "max": 86.39999997615814,
+        "stdev": 0,
+        "cv": 0,
+        "unit": "ms"
+      },
+      "runEndMs": {
+        "n": 1,
+        "mean": 119.62000000476837,
+        "median": 119.62000000476837,
+        "p95": 119.62000000476837,
+        "min": 119.62000000476837,
+        "max": 119.62000000476837,
+        "stdev": 0,
+        "cv": 0,
+        "unit": "ms"
+      },
+      "pdfBytes": {
+        "n": 1,
+        "mean": 0,
+        "median": 0,
+        "p95": 0,
+        "min": 0,
+        "max": 0,
+        "stdev": 0,
+        "cv": null,
+        "unit": "ms"
+      },
+      "okPdf": 0,
+      "errors": 1,
+      "treeDuringFirstConvert": {
+        "procCountByFrame": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "rssSeriesKb": [
+          470928,
+          494672,
+          494672,
+          494720,
+          494720,
+          494752,
+          494768,
+          494768
+        ],
+        "procsSeen": [
+          "5263:/Users/study_superior/Desktop/Code/LingxiAgent/dist-server/mac-arm64/node"
+        ],
+        "raw": "（内嵌本 summary）"
+      },
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/office-pdf-office-2026-09-23T23-26-03-574Z.jsonl"
+    }
+  },
+  "shutdown": {
+    "sigtermTreeExitMs": 101.08999991416931
+  }
+}

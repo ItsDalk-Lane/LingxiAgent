@@ -1,0 +1,279 @@
+{
+  "runId": "run-2026-09-23T22-05-11-181Z",
+  "task": "R00-T06 server leg",
+  "head": "64c302ec482888222833136d0d20c64d4cbb350b",
+  "host": {
+    "capturedAt": "2026-09-23T22:05:11.181Z",
+    "platform": "darwin",
+    "arch": "arm64",
+    "nodeVersion": "v24.16.0",
+    "totalMemBytes": 103079215104,
+    "cpuModel": "Apple M3 Ultra",
+    "cpuCores": 28,
+    "hwModel": "Mac15,14",
+    "osVersion": "Darwin 27.0.0",
+    "swVers": "ProductName:\t\tmacOS; ProductVersion:\t\t27.0; BuildVersion:\t\t26A428",
+    "power": {
+      "lowPowerMode": false,
+      "source": "AC Power"
+    },
+    "loadavg": [
+      3.88134765625,
+      3.62353515625,
+      3.740234375
+    ],
+    "uptimeSec": 755546,
+    "gitHead": "64c302ec482888222833136d0d20c64d4cbb350b",
+    "gitBranch": "codex/rust-tauri-migration"
+  },
+  "samples": 32,
+  "serverWrapper": "dist-server/mac-arm64/hana-server",
+  "serverBundleSha256": "5095cc7ff74f60bfe0ca02332ad9455aabdb9abb065e3b82135d36ec76e6081a",
+  "stub": {
+    "baseUrl": "http://127.0.0.1:61549/v1",
+    "config": {
+      "chunkCount": 24,
+      "chunkChars": 64,
+      "delayedFirstByteMs": 250,
+      "delayedInterChunkMs": 10,
+      "hangChunksBeforeStall": 5
+    }
+  },
+  "phases": {
+    "startup_cold": {
+      "t_spawn_to_info_ms": {
+        "n": 32,
+        "mean": 1162.9025000073016,
+        "median": 1166.5750000476837,
+        "p95": 1194.3899999856949,
+        "min": 1136.9900000095367,
+        "max": 1195.9199999570847,
+        "stdev": 17.50550161270089,
+        "cv": 0.015053284013570336,
+        "unit": "ms"
+      },
+      "t_spawn_to_health_ms": {
+        "n": 32,
+        "mean": 1183.830937501043,
+        "median": 1188.4449999928474,
+        "p95": 1211.289999961853,
+        "min": 1151.8300000429153,
+        "max": 1211.7599999904633,
+        "stdev": 18.912746919068034,
+        "cv": 0.01597588500178166,
+        "unit": "ms"
+      },
+      "shutdown_sigterm_tree_exit_ms": {
+        "n": 32,
+        "mean": 93.4309374988079,
+        "median": 93.29999995231628,
+        "p95": 95.50999999046326,
+        "min": 92.11000001430511,
+        "max": 96.5,
+        "stdev": 0.9358327653647653,
+        "cv": 0.010016304988662943,
+        "unit": "ms"
+      },
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/startup-run-2026-09-23T22-05-11-181Z.jsonl"
+    },
+    "startup_warm": {
+      "t_spawn_to_info_ms": {
+        "n": 32,
+        "mean": 1168.4912499971688,
+        "median": 1168.5999999642372,
+        "p95": 1200.2400000095367,
+        "min": 1138.8399999141693,
+        "max": 1205.4099999666214,
+        "stdev": 19.22504797406928,
+        "cv": 0.016452881417910372,
+        "unit": "ms"
+      },
+      "t_spawn_to_health_ms": {
+        "n": 32,
+        "mean": 1190.7246874906123,
+        "median": 1190.0400000214577,
+        "p95": 1222.1100000143051,
+        "min": 1157.1599999666214,
+        "max": 1238,
+        "stdev": 19.178377268973996,
+        "cv": 0.016106474880764745,
+        "unit": "ms"
+      },
+      "shutdown_sigterm_tree_exit_ms": {
+        "n": 32,
+        "mean": 92.83500000089407,
+        "median": 92.8299999833107,
+        "p95": 94.01999998092651,
+        "min": 91.03999996185303,
+        "max": 95.17999994754791,
+        "stdev": 0.8587237219061733,
+        "cv": 0.00924999969728985,
+        "unit": "ms"
+      },
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/startup-run-2026-09-23T22-05-11-181Z.jsonl"
+    },
+    "idle_memory": {
+      "rssMedianKb": 455200,
+      "rssMaxKb": 455264,
+      "rssSeriesKb": [
+        455088,
+        455088,
+        455136,
+        455136,
+        455200,
+        455200,
+        455232,
+        455232,
+        455264,
+        455264
+      ],
+      "procCountByFrame": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/idle-tree-run-2026-09-23T22-05-11-181Z.json"
+    },
+    "history_long_first_page": {
+      "n": 32,
+      "mean": 2.744375016540289,
+      "median": 1.8300000429153442,
+      "p95": 3.5500000715255737,
+      "min": 1.4800000190734863,
+      "max": 26.050000071525574,
+      "stdev": 4.2791218219143845,
+      "cv": 1.5592336310177033,
+      "unit": "ms"
+    },
+    "history_long_etag_304": {
+      "n": 32,
+      "mean": 1.4371875002980232,
+      "median": 1.4350000023841858,
+      "p95": 1.9399999380111694,
+      "min": 1.1399999856948853,
+      "max": 2.009999990463257,
+      "stdev": 0.18594543108024209,
+      "cv": 0.12938146973981016,
+      "unit": "ms",
+      "statuses": [
+        304
+      ]
+    },
+    "history_short_first_page": {
+      "n": 32,
+      "mean": 1.5571875050663948,
+      "median": 1.3050000071525574,
+      "p95": 4.399999976158142,
+      "min": 1.0399999618530273,
+      "max": 5.349999904632568,
+      "stdev": 0.8981530475975692,
+      "cv": 0.5767789971826637,
+      "unit": "ms"
+    },
+    "history_long_full_walk": {
+      "pages": [
+        1,
+        1,
+        1
+      ],
+      "totalMsStats": {
+        "n": 3,
+        "mean": 1.7233333587646484,
+        "median": 1.75,
+        "p95": 1.8200000524520874,
+        "min": 1.600000023841858,
+        "max": 1.8200000524520874,
+        "stdev": 0.11239811147526751,
+        "cv": 0.06522134031911203,
+        "unit": "ms"
+      }
+    },
+    "stream_request_fast": {
+      "firstDeltaMs": {
+        "n": 32,
+        "mean": 21.373437479138374,
+        "median": 20.12999999523163,
+        "p95": 22.610000014305115,
+        "min": 17.699999928474426,
+        "max": 55.55999994277954,
+        "stdev": 6.349847647344295,
+        "cv": 0.29709061322223385,
+        "unit": "ms"
+      },
+      "runEndMs": {
+        "n": 32,
+        "mean": 29.636874988675117,
+        "median": 28.26499992609024,
+        "p95": 31.920000076293945,
+        "min": 25.43999993801117,
+        "max": 65.96999990940094,
+        "stdev": 6.8284137889716865,
+        "cv": 0.23040262482400622,
+        "unit": "ms"
+      },
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/stream-run-2026-09-23T22-05-11-181Z.jsonl"
+    },
+    "cancel_hang_abort": {
+      "t_abort_to_abort_result_ms": {
+        "n": 32,
+        "mean": 4.262499991804361,
+        "median": 4.414999961853027,
+        "p95": 6.0299999713897705,
+        "min": 2.190000057220459,
+        "max": 6.180000066757202,
+        "stdev": 1.2313957470144374,
+        "cv": 0.2888904983887577,
+        "unit": "ms"
+      },
+      "t_abort_to_stream_stopped_ms": {
+        "n": 32,
+        "mean": 4.020625002682209,
+        "median": 4.159999966621399,
+        "p95": 5.810000061988831,
+        "min": 1.9700000286102295,
+        "max": 5.950000047683716,
+        "stdev": 1.2296863942378027,
+        "cv": 0.3058445872016076,
+        "unit": "ms"
+      },
+      "abortStatuses": [
+        "accepted"
+      ],
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/server/cancel-run-2026-09-23T22-05-11-181Z.jsonl"
+    },
+    "final_shutdown": {
+      "sigtermTreeExitMs": 96.66999995708466,
+      "forceKilled": false,
+      "procsBefore": 1,
+      "procsAfter": 0,
+      "leftoverPids": []
+    }
+  },
+  "fixture": {
+    "homePath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R00/T06/raw/server/pristine-home",
+    "files": {
+      "bench-long-1000.jsonl": {
+        "messages": 1000,
+        "sha256": "d2b724253f961985fbfebf51433ae7126743c6a3051dec18a3138733f6dd8365",
+        "bytes": 443133
+      },
+      "bench-short-20.jsonl": {
+        "messages": 20,
+        "sha256": "8c5bf1899ae7816a455b8e388dc7affb532c943ed72128f3fa790d8c31fb6ba8",
+        "bytes": 8727
+      }
+    },
+    "stubBaseUrl": "http://127.0.0.1:61549/v1"
+  }
+}

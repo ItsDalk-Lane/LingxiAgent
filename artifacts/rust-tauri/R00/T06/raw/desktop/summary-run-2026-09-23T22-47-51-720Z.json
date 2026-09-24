@@ -1,0 +1,243 @@
+{
+  "runId": "run-2026-09-23T22-47-51-720Z",
+  "task": "R00-T06 desktop leg",
+  "head": "64c302ec482888222833136d0d20c64d4cbb350b",
+  "host": {
+    "capturedAt": "2026-09-23T22:47:51.720Z",
+    "platform": "darwin",
+    "arch": "arm64",
+    "nodeVersion": "v24.16.0",
+    "totalMemBytes": 103079215104,
+    "cpuModel": "Apple M3 Ultra",
+    "cpuCores": 28,
+    "hwModel": "Mac15,14",
+    "osVersion": "Darwin 27.0.0",
+    "swVers": "ProductName:\t\tmacOS; ProductVersion:\t\t27.0; BuildVersion:\t\t26A428",
+    "power": {
+      "lowPowerMode": false,
+      "source": "AC Power"
+    },
+    "loadavg": [
+      2.9716796875,
+      3.47900390625,
+      4.2216796875
+    ],
+    "uptimeSec": 758106,
+    "gitHead": "64c302ec482888222833136d0d20c64d4cbb350b",
+    "gitBranch": "codex/rust-tauri-migration"
+  },
+  "appBin": "dist/mac-arm64/Lingxi.app/Contents/MacOS/Lingxi",
+  "samples": 32,
+  "phases": {
+    "first_boot_template": {
+      "tLaunchStartLineMs": 133.21999990940094,
+      "tAppReadyMs": 9217.539999961853,
+      "serverPid": 73832,
+      "artifactsUnpackedBytes": 793124864,
+      "note": "首启解包 seed 计时单独记录，不计入稳态启动系列",
+      "quit": {
+        "watchedPidCount": 5,
+        "teardownAllGoneMs": 260.6200000047684,
+        "forced": false,
+        "leftoverMainPids": [],
+        "leftoverServerPids": []
+      }
+    },
+    "startup_cold": {
+      "t_app_ready_ms": {
+        "n": 32,
+        "mean": 9243.629062499851,
+        "median": 9227.165000021458,
+        "p95": 9375.290000081062,
+        "min": 9087.560000061989,
+        "max": 9851.25,
+        "stdev": 131.03954688838246,
+        "cv": 0.014176201360133773,
+        "unit": "ms"
+      },
+      "t_launch_start_line_ms": {
+        "n": 32,
+        "mean": 156.25374998897314,
+        "median": 160.4800000190735,
+        "p95": 162.67000007629395,
+        "min": 134.52999997138977,
+        "max": 163.24000000953674,
+        "stdev": 10.153486228246237,
+        "cv": 0.06498075232730588,
+        "unit": "ms"
+      },
+      "quit_tree_all_gone_ms": {
+        "n": 32,
+        "mean": 261.5706249885261,
+        "median": 258.7099999785423,
+        "p95": 307.55999994277954,
+        "min": 256.33000004291534,
+        "max": 307.77999997138977,
+        "stdev": 12.136353521689504,
+        "cv": 0.04639799871343302,
+        "unit": "ms"
+      },
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/desktop/startup-run-2026-09-23T22-47-51-720Z.jsonl"
+    },
+    "startup_warm": {
+      "t_app_ready_ms": {
+        "n": 32,
+        "mean": 9199.094374999404,
+        "median": 9166.269999980927,
+        "p95": 9707.360000014305,
+        "min": 8966.080000042915,
+        "max": 9796.549999952316,
+        "stdev": 170.28077575770405,
+        "cv": 0.01851060211105999,
+        "unit": "ms"
+      },
+      "t_launch_start_line_ms": {
+        "n": 32,
+        "mean": 154.0584375038743,
+        "median": 160.5699999332428,
+        "p95": 163.55000007152557,
+        "min": 131.75999999046326,
+        "max": 163.62999999523163,
+        "stdev": 12.12351755463169,
+        "cv": 0.07869427829505803,
+        "unit": "ms"
+      },
+      "quit_tree_all_gone_ms": {
+        "n": 32,
+        "mean": 263.2403125166893,
+        "median": 259.0149999856949,
+        "p95": 307.75,
+        "min": 255.4099999666214,
+        "max": 308.85000002384186,
+        "stdev": 14.640076997980115,
+        "cv": 0.055614874705225636,
+        "unit": "ms"
+      },
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/desktop/startup-run-2026-09-23T22-47-51-720Z.jsonl"
+    },
+    "idle_memory": {
+      "rssMedianKb": 1048784,
+      "rssMaxKb": 1048880,
+      "rssSeriesKb": [
+        1048624,
+        1048656,
+        1048656,
+        1048736,
+        1048784,
+        1048784,
+        1048816,
+        1048816,
+        1048880,
+        1048848
+      ],
+      "procCountByFrame": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "raw": "artifacts/rust-tauri/R00/T06/raw/desktop/idle-tree-run-2026-09-23T22-47-51-720Z.json"
+    },
+    "browser_multi": {
+      "sessions": 5,
+      "pages": [
+        "http://127.0.0.1:47613/page/p0",
+        "http://127.0.0.1:47613/page/p1",
+        "http://127.0.0.1:47613/page/p2",
+        "http://127.0.0.1:47613/page/p3",
+        "http://127.0.0.1:47613/page/p4"
+      ],
+      "startToolEndMs": {
+        "n": 1,
+        "mean": 108.96000003814697,
+        "median": 108.96000003814697,
+        "p95": 108.96000003814697,
+        "min": 108.96000003814697,
+        "max": 108.96000003814697,
+        "stdev": 0,
+        "cv": 0,
+        "unit": "ms"
+      },
+      "navigateToolEndMs": {
+        "n": 5,
+        "mean": 22.664000034332275,
+        "median": 21.430000066757202,
+        "p95": 28.180000066757202,
+        "min": 20.47000002861023,
+        "max": 28.180000066757202,
+        "stdev": 3.1378464143438216,
+        "cv": 0.13845068873943234,
+        "unit": "ms"
+      },
+      "memoryWithViews": {
+        "rssMedianKb": 1015568,
+        "rssMaxKb": 1024592,
+        "procCountByFrame": [
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6
+        ]
+      },
+      "raw": "artifacts/rust-tauri/R00/T06/raw/desktop/browser-tree-run-2026-09-23T22-47-51-720Z.json",
+      "rawRows": "artifacts/rust-tauri/R00/T06/raw/desktop/browser-run-2026-09-23T22-47-51-720Z.jsonl"
+    },
+    "pdf_convert": {
+      "spawnToExitMs": {
+        "n": 32,
+        "mean": 813.4396874979138,
+        "median": 812.0600000023842,
+        "p95": 830.6699999570847,
+        "min": 799.4199999570847,
+        "max": 835.6499999761581,
+        "stdev": 8.386653171128483,
+        "cv": 0.010310110632695177,
+        "unit": "ms"
+      },
+      "pdfBytes": {
+        "n": 32,
+        "mean": 174571,
+        "median": 174571,
+        "p95": 174571,
+        "min": 174571,
+        "max": 174571,
+        "stdev": 0,
+        "cv": 0,
+        "unit": "ms"
+      },
+      "errors": 0,
+      "raw": "artifacts/rust-tauri/R00/T06/raw/desktop/pdf-run-2026-09-23T22-47-51-720Z.jsonl"
+    },
+    "distribution_size": {
+      "lingxiApp": {
+        "path": "dist/mac-arm64/Lingxi.app",
+        "bytes": 812728320
+      }
+    },
+    "final_shutdown": {
+      "watchedPidCount": 6,
+      "teardownAllGoneMs": 258.18999993801117,
+      "forced": false,
+      "leftoverMainPids": [],
+      "leftoverServerPids": []
+    }
+  },
+  "stub": {
+    "baseUrl": "http://127.0.0.1:47613/v1",
+    "fixedPort": 47613
+  }
+}
