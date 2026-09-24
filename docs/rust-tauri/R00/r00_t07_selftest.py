@@ -262,6 +262,26 @@ def tamper_v12(fr: FakeRoot):
     _set_result_status(fr, "RES-R00-A09", "FAIL")
 
 
+# 阶段修复 R1（STAGE-REPAIR-R00-R1）增补：COMMIT-PENDING-BASIS 窄负例的历史锚点。
+# e0b7be610 是 R00-T07 交付提交、T08 执行时点 HEAD；T08 提交 8b153b103 后它永远
+# 不再是当前 HEAD，适合作为“旧基准头”固定篡改值。
+STALE_BASIS_HEAD = "e0b7be6108c4d5bc873061dee279b7163ca78a41"
+
+
+def tamper_v13(fr: FakeRoot):
+    """阶段修复 R1 反例：旧 basis.head + 空 committed_in 的过期待提交态。
+    将某结果改回 committed_in=null（合法待提交态的前提字段同步改齐：
+    tested_sha == 篡改后 basis.head，且该 SHA 是真实 HEAD 祖先，STALE-BRANCH
+    不误伤），并把 basis.head 改成历史提交——仅 COMMIT-PENDING-BASIS 应拒绝。"""
+    amap = fr.load_json(MAP_REL)
+    amap["basis"]["head"] = STALE_BASIS_HEAD
+    for r in amap["results"]:
+        if r["result_id"] == "RES-R00-A16":
+            r["committed_in"] = None
+            r["tested_sha"] = STALE_BASIS_HEAD
+    fr.write_json(MAP_REL, amap)
+
+
 # ── A14 变体 ────────────────────────────────────────────────────────────────
 
 NEW_ENTRY = "cli:lingxi-doctor"
@@ -418,6 +438,11 @@ def build_variants() -> dict:
             "LEDGER-ERROR EXIT-CODE-CONFLICT result=RES-R00-A09",
             "status=FAIL but raw exit_code=0",
         ], "场景与结果一致 FAIL 但 exit_code=0（R1 反例③规则隔离：仅退出码矛盾）"),
+        "v13-commit-pending-stale-basis": (tamper_v13, 1, [
+            "LEDGER-ERROR COMMIT-PENDING-BASIS basis.head",
+            "committed_in=null",
+            "RES-R00-A16",
+        ], "旧 basis.head + 空 committed_in 的过期待提交态被拒绝（阶段修复 R1 窄负例）"),
     }
     a14 = {
         "v1-entry-unmapped": (tamper_a14_v1, 1, [

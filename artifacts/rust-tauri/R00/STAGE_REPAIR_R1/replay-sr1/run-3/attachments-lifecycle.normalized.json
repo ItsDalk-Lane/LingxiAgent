@@ -1,0 +1,55 @@
+{
+  "crossSessionLookup": true,
+  "crossSessionSidecarUntouched": true,
+  "discard": {
+    "managedCacheDeleted": false,
+    "resultShape": [
+      "managedCacheDeleted",
+      "sessionId",
+      "sessionPath",
+      "sidecarDeleted",
+      "unloaded"
+    ],
+    "sessionId": "sess_mig_target_0000000000000003",
+    "sessionPath": "<tmp-path>",
+    "sidecarDeleted": true,
+    "unloaded": true
+  },
+  "fork": {
+    "copiedFileCount": 1,
+    "fileIdMapCovers": {
+      "csv": false,
+      "note": true
+    },
+    "forkedCsvEntry": null,
+    "forkedManagedBytes": null,
+    "targetListAfterFork": [
+      {
+        "id": "<sf-id>",
+        "legacyFileIds": [
+          "<sf-id>"
+        ],
+        "storageKind": "external"
+      }
+    ]
+  },
+  "registered": {
+    "csv": {
+      "copiedNotMoved": false,
+      "idShape": true,
+      "storageKind": "managed_cache"
+    },
+    "note": {
+      "displayName": "note.md",
+      "idShape": true,
+      "listed": true,
+      "origin": "user_attachment",
+      "size": 40,
+      "storageKind": "external"
+    }
+  },
+  "sidecar": {
+    "version": 1
+  },
+  "sourceSurvivesDiscard": true
+}

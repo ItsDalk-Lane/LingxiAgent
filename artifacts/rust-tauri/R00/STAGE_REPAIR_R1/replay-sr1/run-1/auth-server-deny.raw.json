@@ -1,0 +1,45 @@
+[
+  {
+    "caseId": "valid-local-loopback",
+    "denied": null,
+    "principal": {
+      "connectionKind": "local",
+      "credentialKind": "loopback_token",
+      "kind": "local_user",
+      "trustState": "local",
+      "userId": "user_synthetic"
+    }
+  },
+  {
+    "caseId": "wrong-token-local",
+    "denied": {
+      "error": "forbidden",
+      "reason": "invalid_credential"
+    },
+    "principal": null
+  },
+  {
+    "caseId": "valid-token-lan",
+    "denied": {
+      "error": "forbidden",
+      "reason": "loopback_token_requires_local_transport"
+    },
+    "principal": null
+  },
+  {
+    "caseId": "missing-credential",
+    "denied": {
+      "error": "forbidden",
+      "reason": "missing_credential"
+    },
+    "principal": null
+  },
+  {
+    "caseId": "connection-not-allowed",
+    "denied": {
+      "error": "forbidden",
+      "reason": "loopback_token_requires_local_transport"
+    },
+    "principal": null
+  }
+]

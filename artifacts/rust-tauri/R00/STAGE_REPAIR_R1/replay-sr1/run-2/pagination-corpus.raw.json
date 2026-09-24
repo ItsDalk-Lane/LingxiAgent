@@ -1,0 +1,39 @@
+{
+  "equivalence": {
+    "allCount": 24,
+    "allStatus": 200,
+    "noOverlap": true,
+    "orderEqual": true,
+    "pagedCount": 24
+  },
+  "pages": [
+    {
+      "count": 10,
+      "firstId": "14",
+      "hasMore": true,
+      "lastId": "23",
+      "nextBefore": "14",
+      "query": "limit=10",
+      "status": 200
+    },
+    {
+      "count": 10,
+      "firstId": "4",
+      "hasMore": true,
+      "lastId": "13",
+      "nextBefore": "4",
+      "query": "limit=10&before=14",
+      "status": 200
+    },
+    {
+      "count": 4,
+      "firstId": "0",
+      "hasMore": false,
+      "lastId": "3",
+      "nextBefore": null,
+      "query": "limit=10&before=4",
+      "status": 200
+    }
+  ],
+  "walkDeterministic": true
+}

@@ -1,6 +1,6 @@
 # R00 阶段报告｜封存并交接基线（R00-T08）
 
-阶段与结论：**READY_FOR_REVIEW**（R00 全部 8 项任务执行完毕；T08 为执行者自评完成，独立验收由总控另派全新任务执行，本报告不自称 PASS/ACCEPTED）
+阶段与结论：**READY_FOR_REVIEW**（R00 全部 8 项任务执行完毕；T08 任务级独立验收 **PASS(R2)**（[R00-T08_REVIEW_R2.md](R00-T08_REVIEW_R2.md)）且交付已由总控提交为 `8b153b103`；阶段级独立验收 R1 判 FAIL（F1–F3），经阶段修复 R1 修复后待阶段复验，见 §17。本报告不自称阶段 PASS/ACCEPTED）
 
 ## 1. 范围
 
@@ -10,8 +10,8 @@
 
 ## 2. 源码
 
-- Task base = HEAD = `e0b7be6108c4d5bc873061dee279b7163ca78a41`（分支 `codex/rust-tauri-migration`）；stage base = `7d1a0c6bc28062ff455adcf8f68c3a80b117e90d`。
-- 工作区：总控账本 `ORCHESTRATOR_PROGRESS.json` 的预先存在未提交修改原样保留（未触碰）。T08 候选 = 173 文件（§10）。
+- Task base（T08 执行时点 HEAD，历史事实保留）= `e0b7be6108c4d5bc873061dee279b7163ca78a41`；stage base = `7d1a0c6bc28062ff455adcf8f68c3a80b117e90d`；**T08 交付提交 = 当前 HEAD = `8b153b1031bbb01204375b08e9caaa891397d7a5`**（分支 `codex/rust-tauri-migration`；提交后由阶段修复 R1 补记，见 §17）。
+- 工作区：总控账本 `ORCHESTRATOR_PROGRESS.json` 的预先存在未提交修改原样保留（未触碰）。T08 候选 = 173 文件（§10，其字节即提交 `8b153b103` 内容，阶段修复 R1 已按提交字节核验 173/173）。
 - 依赖锁：`package-lock.json` = `e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b`（R00 全程未变）。
 
 ## 3. 环境
@@ -29,7 +29,7 @@ macOS 27.0（Build 26A428）/ Darwin 27.0.0 / arm64（Mac15,14, 96GB）；Node v
 | T05 建立旧行为与故障夹具 | FIXTURE_MANIFEST + 9 组夹具 + OLD_BEHAVIOR_ORACLE + 回放驱动 | PASS（R1） |
 | T06 测量旧版本并冻结性能协议 | BASELINE_BENCHMARK / PERFORMANCE_THRESHOLDS / R00-T06_PROTOCOL + raw | PASS（R2） |
 | T07 建立可执行验收账本 | ACCEPTANCE_MAP（952 场景/16 结果）+ 校验器/自测/生成器 + BLOCKERS | PASS（R3） |
-| **T08 封存并交接基线** | 本报告 + R00_HANDOFF.json + 基线证据摘要（R00_EVIDENCE_SUMMARY.md + §10 清单）+ 验证组合原始日志（artifacts/rust-tauri/R00/T08/，物理 163 文件 = §10 清单内 162 + 清单自身） | **待独立验收** |
+| **T08 封存并交接基线** | 本报告 + R00_HANDOFF.json + 基线证据摘要（R00_EVIDENCE_SUMMARY.md + §10 清单）+ 验证组合原始日志（artifacts/rust-tauri/R00/T08/，物理 163 文件 = §10 清单内 162 + 清单自身） | **PASS（R2，任务级）**（R00-T08_REVIEW_R2.md）；已提交 `8b153b103`；阶段级复验待行（§17） |
 
 **T08 做了什么：**①按 05 §2 运行全量验证组合并保留原始 stdout/stderr/退出码（§5）；②失败分类与同条件复现（§7，A15）；③核对本阶段零生产行为改动、零真实用户数据接触（§8）；④实施验收登记的 follow-up 修复（§6）；⑤按获准路径重建验收账本并绑定 A15/A16 结果（§8.4）；⑥计算全部成果摘要并填写阶段交接模板（R00_HANDOFF.json）；⑦A16 三抽查点自验（§9）。
 
@@ -85,6 +85,12 @@ macOS 27.0（Build 26A428）/ Darwin 27.0.0 / arm64（Mac15,14, 96GB）；Node v
 
 处置：**未将其写为 PASS、未删除任何用例、未修改白名单**；原始双份日志 + 校验器输出留证（audit-seal-repro-r{1,2}.log、a15-repro-verify-r1.log）。其余 1463 文件/14895 用例通过，无环境类/未知类/新增类失败。**关键兼容/安全证明受阻项：无。**
 
+**两种基点的失败分类（阶段修复 R1 按阶段验收 R1-F2 澄清，二者同真、不可混用）：**
+
+- **相对 T08 任务基点（e0b7be610）＝预存（先前失败）**：R00 首个任务提交 `16aeb380d` 起即失败，T08 两次同条件复现、T08 R1/R2 与阶段 R1 各自复现集合一致，本修复轮第五次复证（audit-seal-trio-head-clone.log，同 4 用例 exit 1）。
+- **相对 R00 stage base（7d1a0c6bc）＝本阶段提交触发**：stage base 处 `node .sync-audit/verify-post-verification-diff.mjs` **exit 0**（仅 6 个审计文件差异），当前 HEAD 同命令 **exit 1**（641 个非白名单路径即 R00 阶段增量；两基点本修复轮实证：STAGE_REPAIR_R1/audit-seal-{stage-base,head}.log）。因此这不是“旧基线原有失败”，而是 R00 提交与旧审计坐标的冲突；未显示生产行为回归。
+- **收口归属**：正式封印推进（先把验证证据绑定复验后的真实候选提交、再按 PROGRESS.md seal 工作流重绑 VERIFIED_SOURCE_SHA）属**总控在阶段复验 PASS 后的收口动作**，不是 R01 的实现缺陷；门禁仍红期间继续如实记 FAIL，不扩大白名单、不退役门禁、不虚报验证坐标。
+
 **取证中另发现的两项工具级预存失败（非 npm test 用例，同属 A15 分类纪律）：**①`r00_t02_inventory.py --negative-checks` 在 HEAD 报 STALE——经诊断三份冻结交付与再生成输出唯一差异为 `tested_sha` 戳（16aeb380d→e0b7be610），736 功能/映射/覆盖内容逐字节零漂移，STALE 为该工具「树移动需重绑戳」设计语义；②`r00_t03_validate.py` 退出 1——冻结导入图 1664 文件 vs 当前受控源集 1677（T03 冻结后 T05+ 新增源文件），scope 断言按设计失败。二者均先于本任务会话存在于 HEAD（预存，相对 T08）、均不阻塞 R00 放行（历史 PASS 绑定各自验证树；重生成/再绑属后续任务获准路径）；③同组对照 `r00_t04_scan.py --validate` 在 HEAD 仍 exit 0。证据与诊断方法：`t02-negative-checks-at-head.log`、`t03-validate-at-head.log`、`t04-validate-at-head.log`、`t02-t03-checker-diagnosis.md`（均在 artifacts/rust-tauri/R00/T08/）。
 
 **附带发现（新增风险，非测试失败）**：round2/round3 用例失败前会重写 `artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz`（22MB→25MB，因 manifest 现含 R00 增量），跑全量测试会弄脏工作区；本任务已 `git restore` 恢复并登记 ROUND2-TEST-SIDEEFFECT（建议后续修测试卫生，属 R00 外范围）。
@@ -109,6 +115,8 @@ macOS 27.0（Build 26A428）/ Darwin 27.0.0 / arm64（Mac15,14, 96GB）；Node v
 
 ## 10. 完整映射与候选摘要（基线证据摘要）
 
+> 本节为 **T08 执行时点的候选记录**，其字节即交付提交 `8b153b103` 的内容（阶段修复 R1 已按提交字节核验 173/173）。阶段修复 R1 后的**当前**账本/HANDOFF 哈希与新候选摘要以 §17 为准。
+
 - **需求→任务→测试→结果→证据映射**：`ACCEPTANCE_MAP.json`（SHA-256 `5eeac37ce3cb19e1eaaf123a8ce3b1f3cbd286538eda5a75fed7e4095eec288a`；952 场景=200 基础+736 补充+16 t07_added；16 结果=A01–A16；832 入口；31 测试索引；PASS 32 / NOT_STARTED 183 / SPECIFIED_NOT_EXECUTED 736 / NOT_RUN_UNAUTHORIZED 1；R1 勘误修复轮经 `r00_t07_build_map.py` 重建重绑 A16 的 HANDOFF 摘要，语义差异仅 `generated_at` 与 RES-R00-A16 的 `source_digests`/`working_tree_digest` 三处）。未覆盖集合=NOT_STARTED 183 个未来阶段基础场景 + 736 补充场景（实施阶段执行）。
 - **T08 候选 = 173 文件**：逐文件 SHA-256 清单 `artifacts/rust-tauri/R00/T08/CANDIDATE_MANIFEST.txt`（其 SHA-256 即聚合 SHA；已与 git status 全集交叉核对零遗漏/零多余）：
 
@@ -123,9 +131,13 @@ d83ae896ce19d1ee5a8c0c8084244c44a32516cee5d589a35ead9fff2a448645
 
 | 项 | 严重度 | 状态 | 归属 |
 |---|---|---|---|
-| 审计封印 4 用例失败（§7） | 门禁性 | 预存，未修绿，留总控封印流程 | R00 阶段验收提交后 |
+| 审计封印 4 用例失败（§7） | 门禁性 | 相对 T08 预存 / 相对 stage base 由 R00 提交触发（§7 两基点）；未修绿、未删测、未扩白名单；正式封印留总控在阶段复验 PASS 后按 seal 工作流收口（非 R01 实现缺陷） | 总控（R00 阶段复验后） |
 | T02/T03 检查器 HEAD 预存失败（§7 附注） | 低 | 预存：T02 纯 tested_sha 戳（内容零漂移已证明）、T03 冻结图 vs 树增长；再绑/重生成留后续任务 | 后续任务 |
 | T07 账本 A13/A14 committed_in 隐含缺陷 | 中 | **已修**（补绑 e0b7be610，重建后全绿） | 本任务 |
+| 阶段 R1-F1：T08 已提交但交接/账本停 T07 待提交态 | 中 | **已修**（§17：HANDOFF/账本/BLOCKERS 重绑 8b153b103，校验器增 COMMIT-PENDING-BASIS 窄负例） | 阶段修复 R1 |
+| 阶段 R1-F3：T03 R3 两条 LOW 后续项未入交接 | 低 | **已修**（§17：T03-R3-F01/F02 入 HANDOFF unresolved_items 与本表，R07-T12 承接） | 阶段修复 R1 |
+| T03 R3-F01 heartbeat.ts 巡检状态写入/指纹去重锚点未行级登记（W1-3 执行链已覆盖，分类无漏判） | 低 | 交接登记完成；补锚点由 R07-T12 外围 worker 账本承接，最晚 R07；复验=r00_t03_build_matrices.py + r00_t03_validate.py 两差集为空（tests/cron-scheduler.test.ts 佐证） | R07-T12 |
+| T03 R3-F02 autolearn-service.ts 后台模型作业/技能写入形态未按 W15 先例登记（PI-08/D21 边界已覆盖，分类无漏判） | 低 | 交接登记完成；补 ADJACENT/SUPPORTING 登记行由 R07-T12 承接，最晚 R07；复验=同上一生成器+校验器两差集为空 | R07-T12 |
 | T05 R1-F01 守卫覆盖 | 中 | **已修**（强化+负向回归） | 本任务 |
 | T05 R1-F02 夹具散文 | 低 | **已修** | 本任务 |
 | lint docs/**.mjs node-globals 缺失 | 低 | **已修**（配置 3 行） | 本任务 |
@@ -154,3 +166,17 @@ d83ae896ce19d1ee5a8c0c8084244c44a32516cee5d589a35ead9fff2a448645
 ## 16. 远程 / 发布
 
 未获准、未执行：零 commit、零 push、零 PR、零 tag、零 release、零外部发送。提交推送由总控在独立验收通过后处理。
+
+## 17. 阶段修复 R1 增补（STAGE-REPAIR-R00-R1，2026-09-24）
+
+本节为阶段级独立验收 R1（[R00_STAGE_REVIEW_R1.md](R00_STAGE_REVIEW_R1.md)，FAIL，MUST_FIX F1–F3）后的修复记录；逐项命令、退出码与证据 SHA-256 见 [R00_STAGE_REPAIR_R1.md](R00_STAGE_REPAIR_R1.md)。§1–§16 保留 T08 执行时点表述，未回改历史结论；当前候选状态以本节为准。
+
+- **背景坐标**：T08 经任务级 R2 独立验收 PASS 后由总控提交为 `8b153b1031bbb01204375b08e9caaa891397d7a5`（当前 HEAD）。阶段 R1 发现提交后交接/账本仍停 T07 待提交态（F1）、四项封印失败的两基点分类含混（F2）、T03 R3 两条 LOW 后续项未入交接（F3）。
+- **F1 修复（坐标重绑）**：R00_HANDOFF.json `source_sha` → `8b153b103`（`task_base_sha`/`stage_base_sha` 历史保留）；`accepted_tasks[R00-T08].commit` 绑定真实提交、verdict 引用既有 R2 独立验收；R00-T07_RESULTS.json 的 RES-R00-A15/A16 `committed_in` 补绑 `8b153b103`（tested_sha 保留执行时点 `e0b7be610`，未伪称提交后运行）；经获准路径 `r00_t07_build_map.py` 重建账本与 BLOCKERS.md（`basis.head` → 当前 HEAD）。重建前后语义 diff 程序化全量比对：**19 处差异全部归因**（generated_at、basis.head、RESULTS 输入哈希、A13/A14 三条工具/输入 source_digests 及两者 working_tree_digest、A15/A16 committed_in+timestamp_basis、A16 的 HANDOFF source_digest 与 working_tree_digest、tests 索引两个脚本哈希）；A01–A12 零漂移，736 功能/952 场景内容零变化。
+- **F1 加固（窄负例）**：校验器新增规则族 `COMMIT-PENDING-BASIS`——存在 `committed_in=null` 待提交结果而 `basis.head` 已不是当前 Git HEAD 时拒绝（无待提交结果时休眠，checks 计数不变）；自测新增 a13 变体 `v13-commit-pending-stale-basis`（旧基准头+空 committed_in 必须非零），实测恰好单错误命中、exit 1。**未新增账本场景**：新变体绑定历史 T07 运行会伪造出处，故仅作脚本级耐用负例，本轮自测 19/19 留证。
+- **F2 修复（两基点分类）**：§7 与 HANDOFF `AUDIT-SEAL-PREEXISTING`（kind 改 `stage_triggered_gate_failure`）、R00_EVIDENCE_SUMMARY §4、§11 风险表统一写明：相对 T08 任务基点为预存；相对 R00 stage base 为本阶段提交触发（stage base exit 0 / HEAD exit 1 两基点本轮实证复跑）。四个 FAIL 全保留，未修绿、未删测、未扩白名单、未虚报坐标；正式封印推进属总控在阶段复验 PASS 后按 PROGRESS.md seal 工作流的收口动作，不归 R01。
+- **F3 修复（交接完整性）**：HANDOFF `unresolved_items` 新增 `T03-R3-F01`（lib/desk/heartbeat.ts 巡检状态写入/指纹去重锚点行级登记）、`T03-R3-F02`（lib/autolearn/autolearn-service.ts 后台模型作业/技能写入相邻形态登记），各含源码定位、T03 R3 引用、唯一承接任务 **R07-T12**、最晚阶段 **R07**、复验办法；§11 风险表同步两行。未追改 T03 原 PASS，未改冻结矩阵与产品代码。
+- **当前哈希（修复后）**：R00_HANDOFF.json = `c925e839c088502ae4e4d2798b9a284b26e30f26fb41ec1f39ced9a440669938`；ACCEPTANCE_MAP.json = `96f70219d1df88249e8df073f4dfe211f8562cef20f7e45b1c03064feb5362be`；BLOCKERS.md = `fd8cfeb989598069b0a422526d63b6fa5e526b1d5ef5222b87e1af8383ed841e`；R00-T07_RESULTS.json = `bc0bfb3b7119cb64c9114271c7fa689c4d00cc365254c4ff67dd1ae0686790b3`；r00_t07_validate_ledger.py = `665f39a0b42a6043d7060cce2f497bcf9fd90833c2662da825d0f7ae1c18eace`；r00_t07_selftest.py = `33a4244f23ba419296b9accf5c90e0ffbab51b82ec993b14fc4d5174f804e789`；r00_t07_build_map.py 未改（`5b8b94b5…`）。HANDOFF artifact_hashes 18 项对盘复核 0 失配（被钉文件本轮零改动）。
+- **修复轮验证**（全部真实运行，日志在 `artifacts/rust-tauri/R00/STAGE_REPAIR_R1/`）：账本校验 `LEDGER_VALID checks=14945 scenarios=952 results=16 entries=832` exit 0；自测 19/19+正面对照 exit 0；A16 spotcheck exit 0（handoff_sha256=`c925e839…` 与账本绑定值一致）；A15 复现校验 exit 0（4 失败两次一致）；migration 三文件 21/21 exit 0；六组存储/认证 74/74 exit 0；T05 三轮回放逐字节一致 exit 0；T04 扫描 exit 0；T02/T03 检查器维持已知预存 STALE/失败分类（exit 1，内容不变）；封印脚本两基点实证（stage base exit 0 / HEAD exit 1）；审计封印三文件在 HEAD 隔离副本复跑仍为同 4 用例 FAIL（exit 1）；T08 原 173 文件清单按提交 `8b153b103` 字节核验 173/173。
+- **未重跑项（如实声明）**：全量 `npm test`（本轮改动不含任何 npm test 输入——无生产代码/测试/锁定/配置变更，改动面为 R00 文档+账本+账本工具链；同一 HEAD 的两次隔离全量证据见阶段 R1 §4，本修复不冒充新跑）；typecheck/lint/boundaries/knowledge-smoke/renderer build（同理由，输入未变）；其他平台/真实供应商/长时 G1 维持原阻塞。**全量测试不得被表述为 PASS**（§7 四 FAIL 仍在）。
+- **放行状态**：本节不构成阶段 PASS 自评；当前修复后候选 = HEAD `8b153b103` + 本轮工作区改动，待总控另派**全新独立阶段复验**（READY_FOR_STAGE_REREVIEW）。

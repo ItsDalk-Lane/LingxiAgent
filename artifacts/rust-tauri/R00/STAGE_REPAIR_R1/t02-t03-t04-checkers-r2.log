@@ -1,0 +1,33 @@
+{
+ "A_anchors": 101,
+ "A2_counts_errors": 0,
+ "B_routes": 392,
+ "C_stores": 69,
+ "D_unclassified": 0,
+ "D_stale": 0,
+ "D_token_files": 146,
+ "E_samples": 8,
+ "negative": {
+  "tampered_anchor_detected": true,
+  "tampered_counts_detected": true,
+  "fake_store_detected": true,
+  "fake_uncovered_detected": true
+ },
+ "fatal_count": 0
+}
+R00_T04_SCAN_OK
+T04_EXIT=0
+STALE: FEATURE_INVENTORY.json; run python3 -B docs/rust-tauri/R00/r00_t02_inventory.py --write
+T02_EXIT=1
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R00/r00_t03_validate.py", line 63, in <module>
+    check("oracle controlled file set matches generator scope",
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          CONTROLLED and len(CONTROLLED) == GRAPH["scanned_files"],
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          f"independent={len(CONTROLLED)}, graph={GRAPH['scanned_files']}")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R00/r00_t03_validate.py", line 32, in check
+    raise AssertionError(f"{name}: {detail}")
+AssertionError: oracle controlled file set matches generator scope: independent=1677, graph=1664
+T03_EXIT=1

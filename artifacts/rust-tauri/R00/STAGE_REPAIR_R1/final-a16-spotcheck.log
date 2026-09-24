@@ -1,0 +1,4 @@
+A16-feature: PASS (feature F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-FILE-HISTORY-FILE-HISTORY-FILES--AF8E24 -> server/routes/file-history.ts:30 -> R00-T02-LA-AF8E24A2F524 -> ['R04-T04', 'R06-T05'])
+A16-data_chain: PASS (store session-jsonl (6 site files) -> fixture multi-turn-basic digests match)
+A16-test: PASS (test evidence 1 log(s) digest+content verified; rerun_command='LINGXI_MIGRATION_BLOCK_NETWORK=1 ./node_modules/.bin/vitest run tests/migration/r00-t05-replay.test.ts tests/migration/r00-a10-old-defect.test.ts tests/migration/network-guard-negative.test.ts')
+A16-SPOTCHECK-PASSED handoff_sha256=c925e839c088502ae4e4d2798b9a284b26e30f26fb41ec1f39ced9a440669938

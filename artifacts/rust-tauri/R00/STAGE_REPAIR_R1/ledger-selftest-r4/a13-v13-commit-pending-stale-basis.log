@@ -1,0 +1,9 @@
+# variant a13/v13-commit-pending-stale-basis: 旧 basis.head + 空 committed_in 的过期待提交态被拒绝（阶段修复 R1 窄负例）
+# tamper: tamper_v13
+# validator: r00_t07_validate_ledger.py --root <isolated:a13-v13-commit-pending-stale-basis> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=3/3
+# --- stdout ---
+LEDGER-ERROR COMMIT-PENDING-BASIS basis.head results ['RES-R00-A16'] have committed_in=null (commit-pending) but basis.head e0b7be6108c4d5bc873061dee279b7163ca78a41 != current git HEAD 8b153b1031bbb01204375b08e9caaa891397d7a5 (stale commit-pending state masquerading as current; rebuild via r00_t07_build_map.py to bind the real commit)
+LEDGER_INVALID errors=1 checks=14946
+# --- stderr ---
+(empty)

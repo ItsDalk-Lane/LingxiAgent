@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/migration/r00-a10-old-defect.test.ts (5 tests) 32ms
+ ✓ tests/migration/r00-t05-replay.test.ts (9 tests) 97ms
+
+ Test Files  2 passed (2)
+      Tests  14 passed (14)
+   Start at  15:04:15
+   Duration  1.45s (transform 817ms, setup 38ms, import 2.12s, tests 130ms, environment 0ms)
+

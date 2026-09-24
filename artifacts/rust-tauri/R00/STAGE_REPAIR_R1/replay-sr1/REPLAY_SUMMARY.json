@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "task_id": "R00-T05",
+  "acceptance": "R00-A09",
+  "driver": "scripts/rust-tauri/r00-t05-replay.mjs",
+  "network_isolation": "LINGXI_MIGRATION_BLOCK_NETWORK=1（vitest worker 内阻断 net/tls/dns 外连）",
+  "runs": [
+    {
+      "run": 1,
+      "exitCode": 0,
+      "stdoutPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R00/STAGE_REPAIR_R1/replay-sr1/run-1/stdout.txt",
+      "fileHashes": {
+        "attachments-lifecycle.normalized.json": "9b793065d65fd1eb1b816248b47b4463874580d93737da42eb10a7e7de9485bf",
+        "attachments-lifecycle.raw.json": "860e6d23377215cc2a4e71828f30b9833a0a208c0310e198603c647ce12da14b",
+        "auth-server-deny.normalized.json": "0ebf0e3349e9f3f95a4c13a8f1190d147caf2002fdf6539f94650e3b969155cb",
+        "auth-server-deny.raw.json": "0ebf0e3349e9f3f95a4c13a8f1190d147caf2002fdf6539f94650e3b969155cb",
+        "cancel-edges.normalized.json": "9c9a7ac92a4482efc5f3ae004fc73cb869ac394fa810e193e61fdfc03155c1e8",
+        "cancel-edges.raw.json": "9c9a7ac92a4482efc5f3ae004fc73cb869ac394fa810e193e61fdfc03155c1e8",
+        "corrupted-tail.normalized.json": "faf8ff9211a5058695a06664c950d020216d2e856ef767d30a7e6b812ddd0b35",
+        "corrupted-tail.raw.json": "2eab49db245511b6c1f566e840c93e8b2e7ececcab9fd974557fdd5016f330db",
+        "fork-lineage.normalized.json": "9a2f57c6b67858bab0c1795b592e2db0b745ff600565f69537e892ddea973344",
+        "fork-lineage.raw.json": "25316898552fc5418a072878c5c489b62ce075a0b1ccaedad8c4b70b01d2339c",
+        "mood-stream-scripts.normalized.json": "1bb3297118a1e0e588cd02c4bc54f8e98c64992d9be74b468a7974d435bf27bd",
+        "mood-stream-scripts.raw.json": "1bb3297118a1e0e588cd02c4bc54f8e98c64992d9be74b468a7974d435bf27bd",
+        "multi-turn-basic.normalized.json": "62764808edab44aa0a8f03bb4cab473da3cec6b59f5ea93a902540609d25e240",
+        "multi-turn-basic.raw.json": "7441488641546a01041f024d8504d66d1c9f947d4515629a06bb98e98d9aa095",
+        "pagination-corpus.normalized.json": "ca1e8281faa3c6d5bd316c326345fc2291f30b777b7eb70d5599aace901eced6",
+        "pagination-corpus.raw.json": "ca1e8281faa3c6d5bd316c326345fc2291f30b777b7eb70d5599aace901eced6",
+        "tool-invocation-matrix.normalized.json": "4dffb62d437c62f1256c6e3ee515a024328ef01d12c24466ae2ed4a1dbbd5ca3",
+        "tool-invocation-matrix.raw.json": "4dffb62d437c62f1256c6e3ee515a024328ef01d12c24466ae2ed4a1dbbd5ca3"
+      }
+    },
+    {
+      "run": 2,
+      "exitCode": 0,
+      "stdoutPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R00/STAGE_REPAIR_R1/replay-sr1/run-2/stdout.txt",
+      "fileHashes": {
+        "attachments-lifecycle.normalized.json": "9b793065d65fd1eb1b816248b47b4463874580d93737da42eb10a7e7de9485bf",
+        "attachments-lifecycle.raw.json": "10dcba7885504e71a5336dbff144fa29038464c795438d48e039e8c30174273b",
+        "auth-server-deny.normalized.json": "0ebf0e3349e9f3f95a4c13a8f1190d147caf2002fdf6539f94650e3b969155cb",
+        "auth-server-deny.raw.json": "0ebf0e3349e9f3f95a4c13a8f1190d147caf2002fdf6539f94650e3b969155cb",
+        "cancel-edges.normalized.json": "9c9a7ac92a4482efc5f3ae004fc73cb869ac394fa810e193e61fdfc03155c1e8",
+        "cancel-edges.raw.json": "9c9a7ac92a4482efc5f3ae004fc73cb869ac394fa810e193e61fdfc03155c1e8",
+        "corrupted-tail.normalized.json": "faf8ff9211a5058695a06664c950d020216d2e856ef767d30a7e6b812ddd0b35",
+        "corrupted-tail.raw.json": "23037944c41175e925e2b785e749643059c67f0e15fd47c193d937cd18302ee5",
+        "fork-lineage.normalized.json": "9a2f57c6b67858bab0c1795b592e2db0b745ff600565f69537e892ddea973344",
+        "fork-lineage.raw.json": "68543e87d0d29db9b4b4f2a32c761f6f885d1a0e9f6dd3d1ec65ccb2d323b01c",
+        "mood-stream-scripts.normalized.json": "1bb3297118a1e0e588cd02c4bc54f8e98c64992d9be74b468a7974d435bf27bd",
+        "mood-stream-scripts.raw.json": "1bb3297118a1e0e588cd02c4bc54f8e98c64992d9be74b468a7974d435bf27bd",
+        "multi-turn-basic.normalized.json": "62764808edab44aa0a8f03bb4cab473da3cec6b59f5ea93a902540609d25e240",
+        "multi-turn-basic.raw.json": "7441488641546a01041f024d8504d66d1c9f947d4515629a06bb98e98d9aa095",
+        "pagination-corpus.normalized.json": "ca1e8281faa3c6d5bd316c326345fc2291f30b777b7eb70d5599aace901eced6",
+        "pagination-corpus.raw.json": "ca1e8281faa3c6d5bd316c326345fc2291f30b777b7eb70d5599aace901eced6",
+        "tool-invocation-matrix.normalized.json": "4dffb62d437c62f1256c6e3ee515a024328ef01d12c24466ae2ed4a1dbbd5ca3",
+        "tool-invocation-matrix.raw.json": "4dffb62d437c62f1256c6e3ee515a024328ef01d12c24466ae2ed4a1dbbd5ca3"
+      }
+    },
+    {
+      "run": 3,
+      "exitCode": 0,
+      "stdoutPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R00/STAGE_REPAIR_R1/replay-sr1/run-3/stdout.txt",
+      "fileHashes": {
+        "attachments-lifecycle.normalized.json": "9b793065d65fd1eb1b816248b47b4463874580d93737da42eb10a7e7de9485bf",
+        "attachments-lifecycle.raw.json": "46c15b99c54d93acde7be0376c3e5c2c27ccb7a721ad3475251b5ef88a302174",
+        "auth-server-deny.normalized.json": "0ebf0e3349e9f3f95a4c13a8f1190d147caf2002fdf6539f94650e3b969155cb",
+        "auth-server-deny.raw.json": "0ebf0e3349e9f3f95a4c13a8f1190d147caf2002fdf6539f94650e3b969155cb",
+        "cancel-edges.normalized.json": "9c9a7ac92a4482efc5f3ae004fc73cb869ac394fa810e193e61fdfc03155c1e8",
+        "cancel-edges.raw.json": "9c9a7ac92a4482efc5f3ae004fc73cb869ac394fa810e193e61fdfc03155c1e8",
+        "corrupted-tail.normalized.json": "faf8ff9211a5058695a06664c950d020216d2e856ef767d30a7e6b812ddd0b35",
+        "corrupted-tail.raw.json": "5c98d59d87b3d1f1421c53e78bdd59b48d87b6f5afff866a5b02ee940253de80",
+        "fork-lineage.normalized.json": "9a2f57c6b67858bab0c1795b592e2db0b745ff600565f69537e892ddea973344",
+        "fork-lineage.raw.json": "1e3b0c654eb7f06ca413477d5a6dc082adf8156c974a038c2cbca3a4f2c7a97a",
+        "mood-stream-scripts.normalized.json": "1bb3297118a1e0e588cd02c4bc54f8e98c64992d9be74b468a7974d435bf27bd",
+        "mood-stream-scripts.raw.json": "1bb3297118a1e0e588cd02c4bc54f8e98c64992d9be74b468a7974d435bf27bd",
+        "multi-turn-basic.normalized.json": "62764808edab44aa0a8f03bb4cab473da3cec6b59f5ea93a902540609d25e240",
+        "multi-turn-basic.raw.json": "7441488641546a01041f024d8504d66d1c9f947d4515629a06bb98e98d9aa095",
+        "pagination-corpus.normalized.json": "ca1e8281faa3c6d5bd316c326345fc2291f30b777b7eb70d5599aace901eced6",
+        "pagination-corpus.raw.json": "ca1e8281faa3c6d5bd316c326345fc2291f30b777b7eb70d5599aace901eced6",
+        "tool-invocation-matrix.normalized.json": "4dffb62d437c62f1256c6e3ee515a024328ef01d12c24466ae2ed4a1dbbd5ca3",
+        "tool-invocation-matrix.raw.json": "4dffb62d437c62f1256c6e3ee515a024328ef01d12c24466ae2ed4a1dbbd5ca3"
+      }
+    }
+  ],
+  "diffs": [
+    {
+      "pair": "run-1 vs run-2",
+      "identical": true,
+      "fixtures": 9,
+      "diffPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R00/STAGE_REPAIR_R1/replay-sr1/normalized-diff-run1-run2.txt"
+    },
+    {
+      "pair": "run-1 vs run-3",
+      "identical": true,
+      "fixtures": 9,
+      "diffPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R00/STAGE_REPAIR_R1/replay-sr1/normalized-diff-run1-run3.txt"
+    }
+  ],
+  "allRunsExitedZero": true,
+  "allNormalizedIdentical": true,
+  "conclusion": "PASS-CANDIDATE: 三次重放退出码均为 0 且规范化输出逐字节一致（差异仅限声明允许字段，规范化后为零）"
+}

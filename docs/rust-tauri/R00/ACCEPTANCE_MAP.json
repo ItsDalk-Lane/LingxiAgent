@@ -4,10 +4,10 @@
  "artifact_kind": "EXECUTABLE_ACCEPTANCE_LEDGER",
  "ledger_self_status": "READY_FOR_REVIEW",
  "ledger_self_status_note": "执行者只标 READY_FOR_REVIEW；ACCEPTED 由独立验收决定（01 通用约束 §6）",
- "generated_at": "2026-09-24T05:49:35.962711+00:00",
+ "generated_at": "2026-09-24T07:01:59.064633+00:00",
  "generator": "docs/rust-tauri/R00/r00_t07_build_map.py",
  "basis": {
-  "head": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
+  "head": "8b153b1031bbb01204375b08e9caaa891397d7a5",
   "branch": "codex/rust-tauri-migration",
   "validated_repo_head": "4401afae2ee48df1512b8a8c9a1262be0efbe64f",
   "input_sha256": {
@@ -17,7 +17,7 @@
    "ENTRYPOINT_COVERAGE.json": "76fe6e2b9aaae914aaff21be6f731ba8d537b944ced6412ebca4f547c8313000",
    "FEATURE_INVENTORY.json": "48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039",
    "ENTRYPOINTS.json": "f69e658f8b35b5a486a764872e27c82b599c84ef49404903f5b72f4b0b84d669",
-   "R00-T07_RESULTS.json": "4d50dd107a739b6f5c7139802ca7396b78c04341bee3e79bcb1922e70ce3a066",
+   "R00-T07_RESULTS.json": "bc0bfb3b7119cb64c9114271c7fa689c4d00cc365254c4ff67dd1ae0686790b3",
    "r00_t07_build_map.py": "5b8b94b53a10db1ca17a4da516323d6dd6641f65f67e3eaef3c9d7f1627b225b",
    "SELFTEST_SUMMARY.json": "42ac43c1dfab286c8f07738b432220fe49b308179ad3fec24e206780fecc0981"
   },
@@ -57880,7 +57880,7 @@
    "test_id": "T-008",
    "path": "docs/rust-tauri/R00/r00_t07_selftest.py",
    "kind": "script",
-   "sha256": "2307fe30ff8da1a84671e389492a45cf1dc10e9e60beaae9a073ee3924cea5c5",
+   "sha256": "33a4244f23ba419296b9accf5c90e0ffbab51b82ec993b14fc4d5174f804e789",
    "scenario_ids": [
     "R00-A13",
     "R00-A14",
@@ -57906,7 +57906,7 @@
    "test_id": "T-009",
    "path": "docs/rust-tauri/R00/r00_t07_validate_ledger.py",
    "kind": "validator",
-   "sha256": "08a37669e14b3d857e0b1d496c3b9af9d9fe4af9bfa0e4af001db44f067be1ce",
+   "sha256": "665f39a0b42a6043d7060cce2f497bcf9fd90833c2662da825d0f7ae1c18eace",
    "scenario_ids": [
     "R00-A13",
     "R00-A14",
@@ -58875,7 +58875,7 @@
    "tested_sha": "4401afae2ee48df1512b8a8c9a1262be0efbe64f",
    "committed_in": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
    "timestamp_basis": "T07 自测机器时间戳（SELFTEST_SUMMARY.json 记录）；committed_in 由 R00-T08 补绑 T07 交付提交 e0b7be610（原 null 仅提交前合法，当前 HEAD 重建暴露后按事实修正；tested_sha 仍由构建器回填自测验证树 4401afae2）",
-   "working_tree_digest": "e074850734418f59820afee0cc31815d1f4a6ea722b20999c830d55de7220d3f",
+   "working_tree_digest": "7c921da6be5f0806a94e927a1bcb883ff76bfefe01e0767823f206104614ca4b",
    "working_tree_digest_scope": "由生成器在构建时填入（校验器/账本/输入文件当前哈希）",
    "platform": "macOS 27.0 darwin arm64",
    "toolchain": {
@@ -58921,9 +58921,9 @@
    ],
    "timestamp_utc": "2026-09-24T03:22:39.280986+00:00",
    "source_digests": {
-    "docs/rust-tauri/R00/r00_t07_validate_ledger.py": "08a37669e14b3d857e0b1d496c3b9af9d9fe4af9bfa0e4af001db44f067be1ce",
-    "docs/rust-tauri/R00/r00_t07_selftest.py": "2307fe30ff8da1a84671e389492a45cf1dc10e9e60beaae9a073ee3924cea5c5",
-    "docs/rust-tauri/R00/R00-T07_RESULTS.json": "4d50dd107a739b6f5c7139802ca7396b78c04341bee3e79bcb1922e70ce3a066",
+    "docs/rust-tauri/R00/r00_t07_validate_ledger.py": "665f39a0b42a6043d7060cce2f497bcf9fd90833c2662da825d0f7ae1c18eace",
+    "docs/rust-tauri/R00/r00_t07_selftest.py": "33a4244f23ba419296b9accf5c90e0ffbab51b82ec993b14fc4d5174f804e789",
+    "docs/rust-tauri/R00/R00-T07_RESULTS.json": "bc0bfb3b7119cb64c9114271c7fa689c4d00cc365254c4ff67dd1ae0686790b3",
     "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json": "699ef808d35d0185681e712372cf6d6585caf0e3958daab646586f0b355072a9",
     "docs/rust-tauri/R00/ENTRYPOINT_COVERAGE.json": "76fe6e2b9aaae914aaff21be6f731ba8d537b944ced6412ebca4f547c8313000",
     "docs/rust-tauri/R00/FEATURE_INVENTORY.json": "48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039",
@@ -58938,7 +58938,7 @@
    "tested_sha": "4401afae2ee48df1512b8a8c9a1262be0efbe64f",
    "committed_in": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
    "timestamp_basis": "T07 自测机器时间戳（SELFTEST_SUMMARY.json 记录）；committed_in 由 R00-T08 补绑 T07 交付提交 e0b7be610（原 null 仅提交前合法，当前 HEAD 重建暴露后按事实修正；tested_sha 仍由构建器回填自测验证树 4401afae2）",
-   "working_tree_digest": "e074850734418f59820afee0cc31815d1f4a6ea722b20999c830d55de7220d3f",
+   "working_tree_digest": "7c921da6be5f0806a94e927a1bcb883ff76bfefe01e0767823f206104614ca4b",
    "working_tree_digest_scope": "由生成器在构建时填入",
    "platform": "macOS 27.0 darwin arm64",
    "toolchain": {
@@ -58984,9 +58984,9 @@
    ],
    "timestamp_utc": "2026-09-24T03:22:41.716841+00:00",
    "source_digests": {
-    "docs/rust-tauri/R00/r00_t07_validate_ledger.py": "08a37669e14b3d857e0b1d496c3b9af9d9fe4af9bfa0e4af001db44f067be1ce",
-    "docs/rust-tauri/R00/r00_t07_selftest.py": "2307fe30ff8da1a84671e389492a45cf1dc10e9e60beaae9a073ee3924cea5c5",
-    "docs/rust-tauri/R00/R00-T07_RESULTS.json": "4d50dd107a739b6f5c7139802ca7396b78c04341bee3e79bcb1922e70ce3a066",
+    "docs/rust-tauri/R00/r00_t07_validate_ledger.py": "665f39a0b42a6043d7060cce2f497bcf9fd90833c2662da825d0f7ae1c18eace",
+    "docs/rust-tauri/R00/r00_t07_selftest.py": "33a4244f23ba419296b9accf5c90e0ffbab51b82ec993b14fc4d5174f804e789",
+    "docs/rust-tauri/R00/R00-T07_RESULTS.json": "bc0bfb3b7119cb64c9114271c7fa689c4d00cc365254c4ff67dd1ae0686790b3",
     "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json": "699ef808d35d0185681e712372cf6d6585caf0e3958daab646586f0b355072a9",
     "docs/rust-tauri/R00/ENTRYPOINT_COVERAGE.json": "76fe6e2b9aaae914aaff21be6f731ba8d537b944ced6412ebca4f547c8313000",
     "docs/rust-tauri/R00/FEATURE_INVENTORY.json": "48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039",
@@ -58999,9 +58999,9 @@
    "task_id": "R00-T08",
    "status": "PASS",
    "tested_sha": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
-   "committed_in": null,
+   "committed_in": "8b153b1031bbb01204375b08e9caaa891397d7a5",
    "timestamp_utc": "2026-09-24T04:37:00+00:00",
-   "timestamp_basis": "T08 执行会话机器时间（两次复现与校验日志内均有运行时间窗）",
+   "timestamp_basis": "T08 执行会话机器时间（两次复现与校验日志内均有运行时间窗）；committed_in 由阶段修复 STAGE-REPAIR-R00-R1 补绑 T08 交付提交 8b153b103（原 null 为 T08 提交前合法待提交态；tested_sha 保留 T08 执行时点 HEAD e0b7be610，未伪称在提交后运行）",
    "working_tree_digest": "538c57419a44a60274f4224c2fe683515f845f47210df674522b683e49605b9d",
    "working_tree_digest_scope": "以 r00_t08_a15_verify_repro.py 与 .sync-audit/verified-source-sha.txt 逐文件哈希为内容基准",
    "platform": "macOS 27.0 darwin arm64",
@@ -59063,10 +59063,10 @@
    "task_id": "R00-T08",
    "status": "PASS",
    "tested_sha": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
-   "committed_in": null,
+   "committed_in": "8b153b1031bbb01204375b08e9caaa891397d7a5",
    "timestamp_utc": "2026-09-24T04:37:00+00:00",
-   "timestamp_basis": "T08 执行会话机器时间",
-   "working_tree_digest": "2f561bb24f25226666c62f2216b4e4ed3ca5f1b167dc41268d203bef010a4feb",
+   "timestamp_basis": "T08 执行会话机器时间；committed_in 由阶段修复 STAGE-REPAIR-R00-R1 补绑 T08 交付提交 8b153b103（原 null 为 T08 提交前合法待提交态；tested_sha 保留 T08 执行时点 HEAD e0b7be610，未伪称在提交后运行）",
+   "working_tree_digest": "28998f4415f5396d746848602a0a31055ba14e59657c1533c888ed274f5bf114",
    "working_tree_digest_scope": "以 r00_t08_a16_spotcheck.py 与 R00_HANDOFF.json 逐文件哈希为内容基准",
    "platform": "macOS 27.0 darwin arm64",
    "toolchain": {
@@ -59103,7 +59103,7 @@
    ],
    "source_digests": {
     "docs/rust-tauri/R00/r00_t08_a16_spotcheck.py": "b3c7de01c531a7b30af4a8e60572c36b5132fb1624da2fc729394b405f88af9d",
-    "docs/rust-tauri/R00/R00_HANDOFF.json": "68877ff6980993e34e8fd5405b93eb0c20495b5fa242bcc41c782c06796c62a5"
+    "docs/rust-tauri/R00/R00_HANDOFF.json": "c925e839c088502ae4e4d2798b9a284b26e30f26fb41ec1f39ced9a440669938"
    }
   }
  ],

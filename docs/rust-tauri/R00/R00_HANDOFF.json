@@ -3,8 +3,9 @@
   "stage_id": "R00",
   "status": "READY_FOR_REVIEW",
   "generated_by": "R00-T08 executor (ZCode), 2026-09-24",
+  "amendment_note": "阶段修复 STAGE-REPAIR-R00-R1（2026-09-24）：T08 已经总控提交为 8b153b1031bbb01204375b08e9caaa891397d7a5（当前 HEAD），本文件按 T08 §8.4 获准路径修订：source_sha 绑定当前 HEAD、accepted_tasks[R00-T08] 绑定真实提交并引用其既有 R2 独立验收、unresolved_items 的 AUDIT-SEAL-PREEXISTING 改写两种基点分类、补入 T03-R3-F01/F02 两条 LOW 后续项。task_base_sha 保留 T08 执行时点 HEAD（历史事实）；历史 tested_sha/阈值/原始日志一律未改。修订后账本已经 r00_t07_build_map.py 重建重绑（A16 source_digests 同步），修复全记录见 docs/rust-tauri/R00/R00_STAGE_REPAIR_R1.md。status 保持 READY_FOR_REVIEW：阶段放行由总控另派的全新独立复验决定，本文件不含执行者/修复者自评 PASS。",
   "task_base_sha": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
-  "source_sha": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
+  "source_sha": "8b153b1031bbb01204375b08e9caaa891397d7a5",
   "stage_base_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
   "branch": "codex/rust-tauri-migration",
   "working_tree_digest": null,
@@ -33,20 +34,22 @@
     {"task_id": "R00-T05", "commit": "64c302ec482888222833136d0d20c64d4cbb350b", "verdict": "PASS(R1)", "deliverables": ["tests/migration/fixtures/FIXTURE_MANIFEST.json+9组夹具", "tests/migration/OLD_BEHAVIOR_ORACLE.md", "scripts/rust-tauri/r00-t05-replay.mjs"]},
     {"task_id": "R00-T06", "commit": "4401afae2ee48df1512b8a8c9a1262be0efbe64f", "verdict": "PASS(R2)", "deliverables": ["artifacts/rust-tauri/R00/T06/BASELINE_BENCHMARK.json", "docs/rust-tauri/PERFORMANCE_THRESHOLDS.json", "R00-T06_PROTOCOL.md"]},
     {"task_id": "R00-T07", "commit": "e0b7be6108c4d5bc873061dee279b7163ca78a41", "verdict": "PASS(R3)", "deliverables": ["ACCEPTANCE_MAP.json(952场景)", "BLOCKERS.md", "r00_t07_validate_ledger.py 等3工具"]},
-    {"task_id": "R00-T08", "commit": null, "verdict": "READY_FOR_REVIEW(执行者自评，独立验收另派)", "deliverables": ["R00_REPORT.md", "R00_HANDOFF.json", "基线证据摘要(R00_REPORT §10 + artifacts/rust-tauri/R00/T08/)"]}
+    {"task_id": "R00-T08", "commit": "8b153b1031bbb01204375b08e9caaa891397d7a5", "verdict": "PASS(R2)（任务级独立验收 docs/rust-tauri/R00/R00-T08_REVIEW_R2.md；阶段级放行以阶段独立复验为准）", "deliverables": ["R00_REPORT.md", "R00_HANDOFF.json", "基线证据摘要(R00_REPORT §10 + artifacts/rust-tauri/R00/T08/)"]}
   ],
   "unresolved_items": [
     {"id": "BLK-LONGRUN-G1", "kind": "not_run_this_round", "summary": "长时资源增长(2h/1000任务)未测，阈值已冻结", "resolve_by_stage": "R10", "source": "docs/rust-tauri/R00/BLOCKERS.md §3"},
     {"id": "BLK-CREDENTIALS", "kind": "anticipated", "summary": "真实供应商凭证/测试账号 LIVE 项未授权", "resolve_by_stage": "R10", "source": "BLOCKERS.md §4"},
     {"id": "BLK-PLATFORM", "kind": "anticipated", "summary": "四组目标平台真机缺失(macOS x64/Windows x64/Linux x64)", "resolve_by_stage": "R10", "source": "BLOCKERS.md §4"},
     {"id": "BLK-RELEASE-AUTH", "kind": "conditional", "summary": "R11-A14 远程发布未授权（NOT_RUN_UNAUTHORIZED）", "resolve_by_stage": "R11", "source": "BLOCKERS.md §2"},
-    {"id": "AUDIT-SEAL-PREEXISTING", "kind": "preexisting_failure", "summary": "post-verification-audit-seal / round2 / round3 交付证据 4 用例失败：VERIFIED_SOURCE_SHA=46f12ab1c 审计白名单不含 R00 迁移增量；两次同条件复现一致；不为变绿扩白名单，封印推进留待总控获准提交/封印流程", "resolve_by_stage": "R00阶段验收后由总控封印流程处理", "source": "artifacts/rust-tauri/R00/T08/audit-seal-repro-r{1,2}.log + a15-repro-verify-r1.log"},
+    {"id": "AUDIT-SEAL-PREEXISTING", "kind": "stage_triggered_gate_failure", "summary": "审计封印家族 4 用例 FAIL（post-verification-audit-seal 允许清单 + round2 R10-03/R10-04 + round3 源码 manifest；未修绿、未删除、未扩白名单）：【相对 T08 任务基点 e0b7be610】为预存——R00 首个任务提交 16aeb380d 起即失败，T08 两次同条件复现 + 阶段 R1 复验集合一致；【相对 R00 stage base 7d1a0c6bc】为本阶段提交触发——stage base 处 .sync-audit/verify-post-verification-diff.mjs exit 0（仅 6 个审计文件差异），当前 HEAD exit 1（641 个非白名单路径即 R00 阶段增量，含 .gitignore 与旧任务书移出跟踪）。根因=VERIFIED_SOURCE_SHA=46f12ab1c 审计白名单不含 R00 迁移增量；未显示生产行为回归。处置：不把全量 npm test 标 PASS、不扩白名单、不退役门禁、不虚报验证坐标；正式封印推进（先把验证证据绑定复验后的真实候选提交，再重绑 VERIFIED_SOURCE_SHA）属总控按 PROGRESS.md seal 工作流的收口动作，不是 R01 的实现缺陷", "resolve_by_stage": "R00 阶段独立复验 PASS 后由总控封印流程处理", "source": "artifacts/rust-tauri/R00/T08/audit-seal-repro-r{1,2}.log + a15-repro-verify-r1.log + artifacts/rust-tauri/R00/STAGE_REPAIR_R1/audit-seal-{stage-base,head}.log（exit 0 / exit 1 两基点实证）"},
     {"id": "T05-R1-F03", "kind": "follow_up", "summary": "模型替身可控断点(hang)能力已实现未演练", "resolve_by_stage": "R03", "source": "docs/rust-tauri/R00/R00-T05_REVIEW_R1.md F03"},
     {"id": "T05-R1-F04", "kind": "accepted_limitation", "summary": "normalize tmp-path 正则理论上可过度屏蔽（当前冻结证据全为纯路径，实测影响零）；T08 裁定不在封存期改动冻结语义，留待夹具演进", "resolve_by_stage": "后续夹具演进", "source": "R00-T05_REVIEW_R1.md F04"},
     {"id": "T06-F08", "kind": "follow_up", "summary": "BASELINE_BENCHMARK.json 未汇总 office 产品链指标；T08 处置：不改冻结测量证据，在本交接 interfaces_baseline.office_chain 与 R00_REPORT §6 提供显式指针（raw 数据完整）", "resolve_by_stage": "R08/R10 汇总器演进时并入", "source": "R00-T06_REVIEW_R2.md F08"},
     {"id": "T06-F09", "kind": "follow_up", "summary": "bench 字节数组统计块 unit 标签沿用 ms（数值正确）", "resolve_by_stage": "后续 bench 脚本演进", "source": "R00-T06_REVIEW_R2.md F09"},
     {"id": "T06-F10", "kind": "erratum", "summary": "T06 报告'逐样本记录 serverBundleSha256'措辞失准，实际记录于 run summary 单处；勘误见 R00_REPORT §6，不改冻结报告", "resolve_by_stage": "已由阶段报告勘误收口", "source": "R00-T06_REVIEW_R2.md F10"},
     {"id": "T06-O1", "kind": "follow_up", "summary": "流式首增量 CV=0.522 略超 0.5 未加注", "resolve_by_stage": "R08", "source": "R00-T06_REVIEW_R2.md O1"},
+    {"id": "T03-R3-F01", "kind": "follow_up", "summary": "lib/desk/heartbeat.ts 的巡检状态写入（jian.md exec-log 区块 in_progress/completed/skipped/failed）与指纹去重职责未在 PI_REPLACEMENT_MATRIX 的 W 表做行级登记；其执行链（hub/scheduler.ts:13,163,166 注入 onBeat/onJianBeat → _executeActivityForAgent → executeIsolated）已落 W1-3（KERNEL_MIGRATION，activation 已点名 heartbeat），分类无漏判，属登记完整性缺口——源码演进时该机制不会触发 stale 差集告警。承接动作：在 W1-3（或手工相邻区）补 heartbeat.ts 的 exec-log 状态写入锚点与一句职责说明，无需改判分类；R00 封存期不改冻结矩阵", "resolve_by_stage": "R07", "owner_task": "R07-T12", "reverify": "承接方补登记后重跑 docs/rust-tauri/R00/r00_t03_build_matrices.py 与 r00_t03_validate.py：两差集仍为空且校验 exit 0；tests/cron-scheduler.test.ts 可佐证", "source": "docs/rust-tauri/R00/R00-T03_REVIEW_R3.md §F01（LOW，未推翻 A05/A06）"},
+    {"id": "T03-R3-F02", "kind": "follow_up", "summary": "lib/autolearn/autolearn-service.ts 的后台模型作业形态（turn 观察异步触发 → callText 提炼/安全审查 :27,99 → 经 lib/tools/install-skill.ts 安装技能并通知用户）未按 W15 先例在 W 表登记相邻形态；无 Pi loop、无 Run/Task 终态、防抖状态不落盘，模型边界已由 PI-08 网关化覆盖、技能写入属 D21 Rust Skill/Config 权威，不构成 A06 漏判，属登记完整性缺口——R07 worker 账本若仅从 W 表展开会缺这一行（同类相邻形态 lib/diary/diary-writer.ts 一并登记更完整）。承接动作：补一条 ADJACENT/SUPPORTING 登记行（模型调用走 PI-08 网关、技能安装走 D21、无终态），不改任何 KERNEL/PERIPHERAL 判定；R00 封存期不改冻结矩阵", "resolve_by_stage": "R07", "owner_task": "R07-T12", "reverify": "承接方补登记后重跑 docs/rust-tauri/R00/r00_t03_build_matrices.py 与 r00_t03_validate.py：两差集仍为空且校验 exit 0", "source": "docs/rust-tauri/R00/R00-T03_REVIEW_R3.md §F02（LOW，未推翻 A05/A06）"},
     {"id": "ROUND2-TEST-SIDEEFFECT", "kind": "risk", "summary": "round2/round3-delivery-evidence 测试失败前会重写 artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz(22MB→25MB)，跑全量 npm test 会弄脏工作区（T08 已恢复并留证）；建议后续修测试卫生（先写临时目录）", "resolve_by_stage": "非 R00 范围，登记供后续任务", "source": "artifacts/rust-tauri/R00/T08/npm-test-r1.log + T08 报告"}
   ],
   "interfaces": [

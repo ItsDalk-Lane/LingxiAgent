@@ -24,6 +24,9 @@
   STATUS-RESULT-CONFLICT   场景 ledger_status=PASS 但绑定结果 status 非 PASS
   RESULT-MISSING-FIELD     结果缺字段/空值（A13：精确到字段名）
   RESULT-BAD-FIELD         字段格式非法（SHA/时间戳/类型）
+  COMMIT-PENDING-BASIS     committed_in=null 的待提交结果存在时，basis.head 必须仍是
+                           当前 Git HEAD（提交后 HEAD 前移而账本未重建重绑的，拒绝——
+                           防止旧基准头+空 committed_in 的过期待提交态冒充当前状态）
   EVIDENCE-MISSING-FILE    证据文件不存在（A13：删日志）
   EVIDENCE-HASH-MISMATCH   证据哈希不符（A13：篡改）
   EXIT-CODE-CONFLICT       exit_code 与 status 冲突（非零冒充 PASS / 零退出冒充 FAIL）
@@ -364,6 +367,24 @@ def main() -> int:
         dl = r.get("dependency_lock_hashes") or {}
         check("package-lock.json" in dl, "RESULT-MISSING-FIELD", f"result={rid}",
               "field 'dependency_lock_hashes.package-lock.json' missing")
+
+    # COMMIT-PENDING-BASIS（窄负例）：仅当存在 committed_in=null 的待提交结果时启用。
+    # 该态仅“任务已执行、交付尚待提交”的窗口合法；一旦提交使 HEAD 前移而账本未按获准
+    # 路径重建重绑，basis.head 即落后于当前 HEAD——旧基准头+空 committed_in 不得继续
+    # 冒充当前待提交态（R00 阶段修复 R1 针对此类假绿增补）。无待提交结果时本规则
+    # 休眠，不改变既有 checks 计数与离线行为。
+    pending_commit = [r for r in results if r.get("committed_in") is None]
+    if pending_commit and HEX40.match(str(head)):
+        proc = subprocess.run(["git", "-C", str(git_repo), "rev-parse", "HEAD"],
+                              capture_output=True, text=True)
+        current_head = proc.stdout.strip() if proc.returncode == 0 else ""
+        check(bool(current_head) and head == current_head, "COMMIT-PENDING-BASIS",
+              "basis.head",
+              f"results {[r.get('result_id') for r in pending_commit][:6]} have "
+              f"committed_in=null (commit-pending) but basis.head {head} != current "
+              f"git HEAD {current_head or '<unresolvable>'} (stale commit-pending "
+              f"state masquerading as current; rebuild via r00_t07_build_map.py to "
+              f"bind the real commit)")
 
     # ── 7. 证据存在与哈希（A13：删日志/篡改） ───────────────────────────────
     for r in results:

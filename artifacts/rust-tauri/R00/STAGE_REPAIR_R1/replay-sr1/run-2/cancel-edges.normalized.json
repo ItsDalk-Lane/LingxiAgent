@@ -1,0 +1,55 @@
+[
+  {
+    "caseId": "abort-before-execution",
+    "errorCode": "EXECUTION_CANCELLED",
+    "executorCalls": [],
+    "ok": false
+  },
+  {
+    "caseId": "abort-error-from-executor",
+    "errorCode": "EXECUTION_CANCELLED",
+    "executorCalls": [
+      {
+        "args": {
+          "content": "hello",
+          "path": "note.md"
+        },
+        "ctxEffectiveTargetId": "tool:first-party:write_note",
+        "ctxInvocationRoute": "direct",
+        "toolCallId": "call-cancel"
+      }
+    ],
+    "ok": false
+  },
+  {
+    "caseId": "abort-after-completion",
+    "errorCode": "EXECUTION_CANCELLED",
+    "executorCalls": [
+      {
+        "args": {
+          "content": "hello",
+          "path": "note.md"
+        },
+        "ctxEffectiveTargetId": "tool:first-party:write_note",
+        "ctxInvocationRoute": "direct",
+        "toolCallId": "call-cancel"
+      }
+    ],
+    "ok": false
+  },
+  {
+    "caseId": "approval-wait-aborted",
+    "result": {
+      "confirmationStatus": "aborted",
+      "confirmed": false,
+      "isError": true
+    },
+    "storeEmptyAfterAbort": true,
+    "toolExecutions": 0
+  },
+  {
+    "caseId": "late-resolve-rejected",
+    "lateResolveAccepted": false,
+    "storeSize": 0
+  }
+]

@@ -1,0 +1,25 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/http-route-security.test.ts (22 tests) 88ms
+ ✓ tests/ws-scope.test.ts (11 tests) 31ms
+ ✓ tests/device-registry.test.ts (4 tests) 197ms
+stdout | tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > uses real SQLite stores and matches the deterministic committed fingerprint
+[fact-store] schema migrated: v0 → v3
+
+ ✓ tests/server-auth.test.ts (8 tests) 341ms
+ ✓ tests/persistence-schema-tripwire.test.ts (15 tests) 1442ms
+     ✓ uses real SQLite stores and matches the deterministic committed fingerprint  1033ms
+ ✓ tests/persistence-store-registry.test.ts (14 tests) 6011ms
+     ✓ owns every production persistence site exactly once  1032ms
+     ✓ rejects expired and dangling exemptions  853ms
+     ✓ generates deterministic, repository-relative receipts that match the committed inventory  1671ms
+     ✓ anchors sites by ordinal so the receipt survives line shifts  1615ms
+     ✓ still reports a genuinely new write site after the ordinal change  808ms
+
+ Test Files  6 passed (6)
+      Tests  74 passed (74)
+   Start at  15:03:51
+   Duration  6.37s (transform 696ms, setup 126ms, import 701ms, tests 8.11s, environment 0ms)
+
+EXIT_CODE=0
