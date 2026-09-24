@@ -1,0 +1,151 @@
+{
+  "spec_version": "1.0",
+  "stage_id": "R00",
+  "status": "READY_FOR_REVIEW",
+  "generated_by": "R00-T08 executor (ZCode), 2026-09-24",
+  "task_base_sha": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
+  "source_sha": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
+  "stage_base_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+  "branch": "codex/rust-tauri-migration",
+  "working_tree_digest": null,
+  "working_tree_digest_note": "T08 候选聚合 SHA-256 与逐文件清单在 R00_REPORT.md §10（报告最后成文，含本文件哈希；本文件不自嵌哈希）",
+  "protocol_version": {
+    "PRELOAD_API_VERSION": 1,
+    "SERVER_PROTOCOL_VERSION": 1,
+    "source": "shared/contract-versions.json",
+    "sha256": "6d86934755a23e4f35a6dbd68957ff3d302a3ce5f6d61d40066efd68f33a6f96",
+    "note": "R00 现役现状（未升级、未替换）。目标协议契约与版本选择归 R01-T02，R00 未做任何批量升级。"
+  },
+  "data_epoch": {
+    "DATA_EPOCH": 1,
+    "source": "shared/contract-versions.json",
+    "enforcement": "server/index.ts 启动时 coordinateDataEpochStartup 事务闸（epoch 低位内核拒绝写入高位 epoch 目录）",
+    "note": "R00 只盘点未改动；epoch 迁移策略归 R01-T07 / R02"
+  },
+  "dependency_locks": {
+    "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b"
+  },
+  "accepted_tasks": [
+    {"task_id": "R00-T01", "commit": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084", "verdict": "PASS(R4)", "deliverables": ["BASELINE.json", "BASELINE_DELTA.md"]},
+    {"task_id": "R00-T02", "commit": "4b4a1d98f6d2d0e03f9573aa75b7992efed03db6", "verdict": "PASS(R10)", "deliverables": ["FEATURE_INVENTORY.json(736生产叶子)", "EXCLUSIONS.md", "FEATURE_STAGE_ACCEPTANCE.json", "ENTRYPOINT_COVERAGE.json"]},
+    {"task_id": "R00-T03", "commit": "ffcb85830ffdc75da5fe39b7a8cfddb4617f1aec", "verdict": "PASS(R3)", "deliverables": ["PI_REPLACEMENT_MATRIX.json", "RUNTIME_DEPENDENCIES.json", "R00-T03_IMPORT_GRAPH.json"]},
+    {"task_id": "R00-T04", "commit": "6f58b9351046e8dccfeb83be6976f197acb2de8d", "verdict": "PASS(R2)", "deliverables": ["ENTRYPOINTS.json", "STORES.json", "OWNERSHIP_CURRENT.md"]},
+    {"task_id": "R00-T05", "commit": "64c302ec482888222833136d0d20c64d4cbb350b", "verdict": "PASS(R1)", "deliverables": ["tests/migration/fixtures/FIXTURE_MANIFEST.json+9组夹具", "tests/migration/OLD_BEHAVIOR_ORACLE.md", "scripts/rust-tauri/r00-t05-replay.mjs"]},
+    {"task_id": "R00-T06", "commit": "4401afae2ee48df1512b8a8c9a1262be0efbe64f", "verdict": "PASS(R2)", "deliverables": ["artifacts/rust-tauri/R00/T06/BASELINE_BENCHMARK.json", "docs/rust-tauri/PERFORMANCE_THRESHOLDS.json", "R00-T06_PROTOCOL.md"]},
+    {"task_id": "R00-T07", "commit": "e0b7be6108c4d5bc873061dee279b7163ca78a41", "verdict": "PASS(R3)", "deliverables": ["ACCEPTANCE_MAP.json(952场景)", "BLOCKERS.md", "r00_t07_validate_ledger.py 等3工具"]},
+    {"task_id": "R00-T08", "commit": null, "verdict": "READY_FOR_REVIEW(执行者自评，独立验收另派)", "deliverables": ["R00_REPORT.md", "R00_HANDOFF.json", "基线证据摘要(R00_REPORT §10 + artifacts/rust-tauri/R00/T08/)"]}
+  ],
+  "unresolved_items": [
+    {"id": "BLK-LONGRUN-G1", "kind": "not_run_this_round", "summary": "长时资源增长(2h/1000任务)未测，阈值已冻结", "resolve_by_stage": "R10", "source": "docs/rust-tauri/R00/BLOCKERS.md §3"},
+    {"id": "BLK-CREDENTIALS", "kind": "anticipated", "summary": "真实供应商凭证/测试账号 LIVE 项未授权", "resolve_by_stage": "R10", "source": "BLOCKERS.md §4"},
+    {"id": "BLK-PLATFORM", "kind": "anticipated", "summary": "四组目标平台真机缺失(macOS x64/Windows x64/Linux x64)", "resolve_by_stage": "R10", "source": "BLOCKERS.md §4"},
+    {"id": "BLK-RELEASE-AUTH", "kind": "conditional", "summary": "R11-A14 远程发布未授权（NOT_RUN_UNAUTHORIZED）", "resolve_by_stage": "R11", "source": "BLOCKERS.md §2"},
+    {"id": "AUDIT-SEAL-PREEXISTING", "kind": "preexisting_failure", "summary": "post-verification-audit-seal / round2 / round3 交付证据 4 用例失败：VERIFIED_SOURCE_SHA=46f12ab1c 审计白名单不含 R00 迁移增量；两次同条件复现一致；不为变绿扩白名单，封印推进留待总控获准提交/封印流程", "resolve_by_stage": "R00阶段验收后由总控封印流程处理", "source": "artifacts/rust-tauri/R00/T08/audit-seal-repro-r{1,2}.log + a15-repro-verify-r1.log"},
+    {"id": "T05-R1-F03", "kind": "follow_up", "summary": "模型替身可控断点(hang)能力已实现未演练", "resolve_by_stage": "R03", "source": "docs/rust-tauri/R00/R00-T05_REVIEW_R1.md F03"},
+    {"id": "T05-R1-F04", "kind": "accepted_limitation", "summary": "normalize tmp-path 正则理论上可过度屏蔽（当前冻结证据全为纯路径，实测影响零）；T08 裁定不在封存期改动冻结语义，留待夹具演进", "resolve_by_stage": "后续夹具演进", "source": "R00-T05_REVIEW_R1.md F04"},
+    {"id": "T06-F08", "kind": "follow_up", "summary": "BASELINE_BENCHMARK.json 未汇总 office 产品链指标；T08 处置：不改冻结测量证据，在本交接 interfaces_baseline.office_chain 与 R00_REPORT §6 提供显式指针（raw 数据完整）", "resolve_by_stage": "R08/R10 汇总器演进时并入", "source": "R00-T06_REVIEW_R2.md F08"},
+    {"id": "T06-F09", "kind": "follow_up", "summary": "bench 字节数组统计块 unit 标签沿用 ms（数值正确）", "resolve_by_stage": "后续 bench 脚本演进", "source": "R00-T06_REVIEW_R2.md F09"},
+    {"id": "T06-F10", "kind": "erratum", "summary": "T06 报告'逐样本记录 serverBundleSha256'措辞失准，实际记录于 run summary 单处；勘误见 R00_REPORT §6，不改冻结报告", "resolve_by_stage": "已由阶段报告勘误收口", "source": "R00-T06_REVIEW_R2.md F10"},
+    {"id": "T06-O1", "kind": "follow_up", "summary": "流式首增量 CV=0.522 略超 0.5 未加注", "resolve_by_stage": "R08", "source": "R00-T06_REVIEW_R2.md O1"},
+    {"id": "ROUND2-TEST-SIDEEFFECT", "kind": "risk", "summary": "round2/round3-delivery-evidence 测试失败前会重写 artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz(22MB→25MB)，跑全量 npm test 会弄脏工作区（T08 已恢复并留证）；建议后续修测试卫生（先写临时目录）", "resolve_by_stage": "非 R00 范围，登记供后续任务", "source": "artifacts/rust-tauri/R00/T08/npm-test-r1.log + T08 报告"}
+  ],
+  "interfaces": [
+    {"name": "server-http-ws", "current_version": 1, "authority": "shared/contract-versions.json SERVER_PROTOCOL_VERSION", "consumer": "desktop renderer / CLI / Bridge 接入", "target_contract_owner": "R01-T02", "status": "现役现状盘点，目标契约未定义"},
+    {"name": "preload-bridge", "current_version": 1, "authority": "shared/contract-versions.json PRELOAD_API_VERSION；desktop/src/react/types.ts PlatformApi", "consumer": "renderer (window.hana)", "target_contract_owner": "R01-T02", "status": "现役现状盘点，目标契约未定义"},
+    {"name": "data-epoch", "current_version": 1, "authority": "shared/contract-versions.json DATA_EPOCH + core/data-epoch-coordinator.ts", "consumer": "server 启动闸", "target_contract_owner": "R01-T07", "status": "现役现状盘点，迁移/拒写策略未定"},
+    {"name": "artifact-signing-keyset", "current_version": "pinned-keyset v2（只追加）", "authority": "shared/artifact-core/pinned-keyset.json", "consumer": "scripts/notarize.cjs / 更新检查", "target_contract_owner": "R11", "status": "未改动"}
+  ],
+  "artifact_hashes": {
+    "note": "固定 T08 执行时点（HEAD=e0b7be610）终态；ACCEPTANCE_MAP.json/BLOCKERS.md/R00-T07_RESULTS.json 因含 T08 结果在交接成文后重建，其终态哈希与 T08 候选聚合 SHA 记录于 R00_REPORT.md §10，且随时可用 python3 -B docs/rust-tauri/R00/r00_t07_validate_ledger.py 复核（LEDGER_VALID）",
+    "docs/rust-tauri/R00/BASELINE.json": "4b12dd33d7458f50639b4f0000da3d742317338551df9a26033c002bd829858b",
+    "docs/rust-tauri/R00/BASELINE_DELTA.md": "611f5aba38892181221e43f79d972a80cbcbb4dcb6f21c0a14aaf87a9ceac565",
+    "docs/rust-tauri/R00/FEATURE_INVENTORY.json": "48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039",
+    "docs/rust-tauri/R00/EXCLUSIONS.md": "df55a8a4d6183626c00ac27e6c0452fb20cdd3cfe781c45d2777fbff06900666",
+    "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json": "699ef808d35d0185681e712372cf6d6585caf0e3958daab646586f0b355072a9",
+    "docs/rust-tauri/R00/ENTRYPOINT_COVERAGE.json": "76fe6e2b9aaae914aaff21be6f731ba8d537b944ced6412ebca4f547c8313000",
+    "docs/rust-tauri/R00/ENTRYPOINTS.json": "f69e658f8b35b5a486a764872e27c82b599c84ef49404903f5b72f4b0b84d669",
+    "docs/rust-tauri/R00/STORES.json": "6067bdd3be7d0232c182d8f9c1beb147e1a5b59a3fa3ae137889f31a75d7b493",
+    "docs/rust-tauri/R00/OWNERSHIP_CURRENT.md": "9d5d3b7a5b97286555b8be48c86e20148c4700ba9d4276395232736a420bd51a",
+    "docs/rust-tauri/R00/PI_REPLACEMENT_MATRIX.json": "c16b01b7bc038522696a3d74a9b8bf46f5e00581455d97ddeb77ddd217ab6d56",
+    "docs/rust-tauri/R00/RUNTIME_DEPENDENCIES.json": "68d98d48740356b3f683242b7c1985ad019564ac612e14d2fa1ad202e86d3c71",
+    "docs/rust-tauri/R00/R00-T06_PROTOCOL.md": "e941118ca2b85111ad148d92e2247a2f31824bdb54044a590e9825d60ddaebe2",
+    "docs/rust-tauri/PERFORMANCE_THRESHOLDS.json": "bf40009e347df014dba1d2a2ecb7505bf4bdccfdef1992fc99b144749a992331",
+    "artifacts/rust-tauri/R00/T06/BASELINE_BENCHMARK.json": "12b740a38b43325bb6dbdae5394ca84aedc361f318f11b33389cba0cca80644d",
+    "tests/migration/fixtures/FIXTURE_MANIFEST.json": "bee4c193a5f365b4998ec0396afc37ee9a33687bbb4a44bc2f130ca1b1fe701a",
+    "tests/migration/network-guard.ts": "1f4d055dc3628c028e72bb7a7af5eccf882d0945fb79d1f3bf44d743abc236e0",
+    "tests/migration/network-guard-negative.test.ts": "a5dc3f05127899c5293d53b37afe07d361098001b208199730d028ee34bcbb7d",
+    "scripts/rust-tauri/r00-t05-replay.mjs": "283ff9fc7aee25ae6ad2a04986d64cd0b1178823ac974f311cc98c02a9f1fde1"
+  },
+  "office_chain_pointer": {
+    "note": "T06-F08 显式指针：office 产品链（HTML→PDF）基线数据不在 BASELINE_BENCHMARK.json 顶层块，权威数据在以下 raw/summary（851.8/879.4ms 等数值见 T06 报告 §4 表）",
+    "raw_dir": "artifacts/rust-tauri/R00/T06/raw/",
+    "summary_glob": "summary-office-*.json",
+    "review_anchor": "docs/rust-tauri/R00/R00-T06_REVIEW_R2.md §F08"
+  },
+  "verification_battery": [
+    {"command": "npm run typecheck", "expected": "exit 0（tsc×3）", "log": "artifacts/rust-tauri/R00/T08/typecheck-r1.log", "exit_code": 0},
+    {"command": "npm run typecheck:core-contracts", "expected": "exit 0（28 files）", "log": "artifacts/rust-tauri/R00/T08/typecheck-core-contracts-r1.log", "exit_code": 0},
+    {"command": "npm run check:dependency-boundaries", "expected": "exit 0（2031 files）", "log": "artifacts/rust-tauri/R00/T08/check-dependency-boundaries-r1.log", "exit_code": 0},
+    {"command": "npm run check:tool-invocation-boundaries", "expected": "exit 0（2250 files）", "log": "artifacts/rust-tauri/R00/T08/check-tool-invocation-boundaries-r1.log", "exit_code": 0},
+    {"command": "npm run lint", "expected": "exit 0（T08 修复 docs/**.mjs node-globals 缺失后；0 错误 / 10887 处预存 warning 原样保留，其中 33 处可 --fix 自动修复）", "log": "artifacts/rust-tauri/R00/T08/lint-r2.log", "exit_code": 0, "note": "lint-r1.log 保留修复前失败（exit 1，单错误 docs/rust-tauri/R00/r00_t03_import_graph.mjs:254 console no-undef）"},
+    {"command": "npm run build:renderer", "expected": "exit 0（vite build）", "log": "artifacts/rust-tauri/R00/T08/build-renderer-r1.log", "exit_code": 0},
+    {"command": "npm run test:knowledge-platform-smoke", "expected": "exit 0（15 files / 125 tests）", "log": "artifacts/rust-tauri/R00/T08/knowledge-smoke-r1.log", "exit_code": 0},
+    {"command": "npm test", "expected": "文件 1463 通过/3 失败/3 跳过（共 1469）；用例 14895 通过/4 失败/15 跳过（全口径 14914）；4 预存失败（审计封印家族）两次同条件复现一致", "log": "artifacts/rust-tauri/R00/T08/npm-test-r1.log", "exit_code": 1, "classification": "4×预存(相对T08)=审计白名单不含R00增量；详见 R00_REPORT §7"},
+    {"command": "python3 -B docs/rust-tauri/R00/r00_t08_a15_verify_repro.py <repro-r1.log> <repro-r2.log>", "expected": "exit 0 A15-REPRO-VERIFIED failures=4 identical_runs=2", "log": "artifacts/rust-tauri/R00/T08/a15-repro-verify-r1.log", "exit_code": 0},
+    {"command": "node scripts/rust-tauri/r00-t05-replay.mjs --out artifacts/rust-tauri/R00/T08/replay-t08", "expected": "三 run exit 0，规范化输出逐字节一致（强化守卫下复证 A09）", "log": "artifacts/rust-tauri/R00/T08/replay-t08-driver.log", "exit_code": 0},
+    {"command": "python3 -B docs/rust-tauri/R00/r00_t08_a16_spotcheck.py", "expected": "exit 0 A16-SPOTCHECK-PASSED（三抽查点）", "log": "artifacts/rust-tauri/R00/T08/a16-spotcheck-r1.log", "exit_code": 0},
+    {"command": "python3 -B docs/rust-tauri/R00/r00_t07_selftest.py --suite all --art-dir artifacts/rust-tauri/R00/T08/ledger-selftest-r1", "expected": "exit 0（18/18 变体+正面对照）", "log": "artifacts/rust-tauri/R00/T08/ledger-selftest-r1/", "exit_code": 0},
+    {"command": "python3 -B docs/rust-tauri/R00/r00_t07_validate_ledger.py", "expected": "exit 0 LEDGER_VALID（含 A15/A16 结果后重建）", "log": "artifacts/rust-tauri/R00/T08/ledger-validate-final.log", "exit_code": 0}
+  ],
+  "spot_checks": {
+    "feature": {
+      "description": "叶子功能→源码锚点→账本场景/任务链（不依赖原执行者记忆）",
+      "inventory": "docs/rust-tauri/R00/FEATURE_INVENTORY.json",
+      "ledger": "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+      "feature_id": "F-D09-SEMANTIC_EFFECT-SEMANTIC-EFFECT-FILE-HISTORY-FILE-HISTORY-FILES--AF8E24",
+      "title": "列出有历史的文件",
+      "source_anchor": {"file": "server/routes/file-history.ts", "line": 30, "contains": "/file-history/files"},
+      "supplemental_acceptance_id": "R00-T02-LA-AF8E24A2F524",
+      "expected_mapping": {
+        "stage_ids": ["R04", "R06"],
+        "task_ids": ["R04-T04", "R06-T05"],
+        "acceptance_ids": ["R04-A07", "R04-A08", "R06-A09", "R06-A10"],
+        "status": "INVENTORIED_NOT_IMPLEMENTED"
+      }
+    },
+    "data_chain": {
+      "description": "权威存储→读写方文件→脱敏夹具→固定摘要",
+      "stores": "docs/rust-tauri/R00/STORES.json",
+      "store_id": "session-jsonl",
+      "store_classification": "authoritative/user_data, epoch-managed",
+      "site_rule_files": ["core/engine.ts", "core/session-coordinator.ts", "core/session-jsonl-file.ts", "core/slash-commands/session-ops.ts", "hub/agent-executor.ts", "server/routes/sessions.ts"],
+      "fixture_manifest": "tests/migration/fixtures/FIXTURE_MANIFEST.json",
+      "manifest_fixture_id": "multi-turn-basic",
+      "expected_manifest_input": "sessions/multi-turn-basic/session.jsonl",
+      "expected_manifest_expected": "sessions/multi-turn-basic/expected.json",
+      "fixture_sha256": {
+        "tests/migration/fixtures/sessions/multi-turn-basic/session.jsonl": "d0c599b4d8d786435f961efa1ff17d7b1bad08e94e0de027b2d6c6f4b0680086",
+        "tests/migration/fixtures/sessions/multi-turn-basic/expected.json": "62764808edab44aa0a8f03bb4cab473da3cec6b59f5ea93a902540609d25e240"
+      }
+    },
+    "test": {
+      "description": "migration 三文件真实重跑（A09 回放 + A10 反例 + T08 守卫负向回归）",
+      "rerun_command": "LINGXI_MIGRATION_BLOCK_NETWORK=1 ./node_modules/.bin/vitest run tests/migration/r00-t05-replay.test.ts tests/migration/r00-a10-old-defect.test.ts tests/migration/network-guard-negative.test.ts",
+      "expected_exit_code": 0,
+      "expected_test_files_passed": 3,
+      "expected_tests_passed": 21,
+      "expected_exit_marker": "EXIT_CODE=0",
+      "evidence_log_sha256": {
+        "artifacts/rust-tauri/R00/T08/a16-test-rerun.log": "de6fcf3af95b457e16458fdfce1e414f6635456d537fbbecf201b2b6de70af56"
+      }
+    }
+  },
+  "baseline_evidence_summary": "R00_REPORT.md §10（逐文件 SHA-256 + 聚合 SHA）；原始日志在 artifacts/rust-tauri/R00/T08/；T01–T07 原始证据目录 artifacts/rust-tauri/R00/T01–T07/",
+  "allowed_next_scope": "R01（目标契约与高风险替代验证）：以本交接的 FEATURE_INVENTORY/ENTRYPOINTS/STORES/PI_REPLACEMENT_MATRIX/RUNTIME_DEPENDENCIES/夹具/性能阈值/阻塞表为输入；接口版本与目标契约选择在 R01 决定（R00 未升级任何依赖或协议）。R00 阶段放行（独立验收 ACCEPTED）前不开始 R01 实施任务。",
+  "review_evidence": [],
+  "review_evidence_note": "由总控另派的独立验收任务填写；本文件不含执行者自评 PASS",
+  "remote_write_authorized": false,
+  "production_data_authorized": false,
+  "paid_or_external_test_authorized": false,
+  "release_authorized": false
+}

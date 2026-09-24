@@ -1,0 +1,9 @@
+# variant a13/v9b-digest-fallback: 无任务书目录时用内嵌 spec_digests 快照检测规格篡改
+# expect_exit=1 actual_exit=1
+# --- stdout ---
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A13 field 'committed_in' is null but tested_sha != basis.head (only current-task results at HEAD may be commit-pending; tested_sha=4401afae2ee48df1512b8a8c9a1262be0efbe64f, basis.head=e0b7be6108c4d5bc873061dee279b7163ca78a41)
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A14 field 'committed_in' is null but tested_sha != basis.head (only current-task results at HEAD may be commit-pending; tested_sha=4401afae2ee48df1512b8a8c9a1262be0efbe64f, basis.head=e0b7be6108c4d5bc873061dee279b7163ca78a41)
+LEDGER-ERROR SPEC-FIDELITY scenario=R00-A04 embedded spec digest 8a293730e10a64295abe085e14506b82799d02984804c8a8083976732edaf308 != snapshot 0f214f13557e6f884bb4a0e154b832eef195e1a7db3db5dac12b14104c928442 (spec text tampered after import)
+LEDGER_INVALID errors=3 checks=13143
+# --- stderr ---
+(empty)

@@ -1,0 +1,12 @@
+# variant a13/v10-scenario-result-conflict: 场景 PASS 但绑定结果 status=FAIL（R1 反例①/③状态：状态脱节与零退出同报）
+# tamper: tamper_v10
+# validator: r00_t07_validate_ledger.py --root <isolated:a13-v10-scenario-result-conflict> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=4/4
+# --- stdout ---
+LEDGER-ERROR EXIT-CODE-CONFLICT result=RES-R00-A09 status=FAIL but raw exit_code=0 (a zero exit cannot evidence FAIL; the failing signal itself is required)
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A13 field 'committed_in' is null but tested_sha != basis.head (only current-task results at HEAD may be commit-pending; tested_sha=4401afae2ee48df1512b8a8c9a1262be0efbe64f, basis.head=e0b7be6108c4d5bc873061dee279b7163ca78a41)
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A14 field 'committed_in' is null but tested_sha != basis.head (only current-task results at HEAD may be commit-pending; tested_sha=4401afae2ee48df1512b8a8c9a1262be0efbe64f, basis.head=e0b7be6108c4d5bc873061dee279b7163ca78a41)
+LEDGER-ERROR STATUS-RESULT-CONFLICT scenario=R00-A09 result=RES-R00-A09 field 'status' is 'FAIL' but scenario ledger_status=PASS (PASS scenario requires every bound result to be PASS; real FAIL/BLOCKED must not be presented as passed)
+LEDGER_INVALID errors=4 checks=14945
+# --- stderr ---
+(empty)

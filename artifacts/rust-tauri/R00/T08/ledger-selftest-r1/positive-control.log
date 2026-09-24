@@ -1,0 +1,8 @@
+# positive control: 未篡改隔离副本必须通过
+# expect_exit=0 actual_exit=1
+# --- stdout ---
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A13 field 'committed_in' is null but tested_sha != basis.head (only current-task results at HEAD may be commit-pending; tested_sha=4401afae2ee48df1512b8a8c9a1262be0efbe64f, basis.head=e0b7be6108c4d5bc873061dee279b7163ca78a41)
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A14 field 'committed_in' is null but tested_sha != basis.head (only current-task results at HEAD may be commit-pending; tested_sha=4401afae2ee48df1512b8a8c9a1262be0efbe64f, basis.head=e0b7be6108c4d5bc873061dee279b7163ca78a41)
+LEDGER_INVALID errors=2 checks=14945
+# --- stderr ---
+(empty)

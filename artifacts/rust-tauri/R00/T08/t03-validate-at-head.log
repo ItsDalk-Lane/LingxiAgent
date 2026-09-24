@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R00/r00_t03_validate.py", line 63, in <module>
+    check("oracle controlled file set matches generator scope",
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          CONTROLLED and len(CONTROLLED) == GRAPH["scanned_files"],
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          f"independent={len(CONTROLLED)}, graph={GRAPH['scanned_files']}")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R00/r00_t03_validate.py", line 32, in check
+    raise AssertionError(f"{name}: {detail}")
+AssertionError: oracle controlled file set matches generator scope: independent=1677, graph=1664

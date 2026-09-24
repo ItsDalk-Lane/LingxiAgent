@@ -1,0 +1,11 @@
+# variant a13/v3-evidence-tampered: 篡改证据文件内容（哈希不符）
+# tamper: tamper_v3
+# validator: r00_t07_validate_ledger.py --root <isolated:a13-v3-evidence-tampered> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=2/2
+# --- stdout ---
+LEDGER-ERROR EVIDENCE-HASH-MISMATCH result=RES-R00-A09 evidence 'artifacts/rust-tauri/R00/T05/REPLAY_SUMMARY.json' sha256 4f6e9c2ce8d7bb7c39cce122ece3c95fb8e81cd85f6b197c59711f4436bf88b1 != recorded d6577d175abdbfe4d97fe13c68a5ebb3fce5544e2ad9cdba1b788d252b7d6ad3
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A13 field 'committed_in' is null but tested_sha != basis.head (only current-task results at HEAD may be commit-pending; tested_sha=4401afae2ee48df1512b8a8c9a1262be0efbe64f, basis.head=e0b7be6108c4d5bc873061dee279b7163ca78a41)
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A14 field 'committed_in' is null but tested_sha != basis.head (only current-task results at HEAD may be commit-pending; tested_sha=4401afae2ee48df1512b8a8c9a1262be0efbe64f, basis.head=e0b7be6108c4d5bc873061dee279b7163ca78a41)
+LEDGER_INVALID errors=3 checks=14945
+# --- stderr ---
+(empty)

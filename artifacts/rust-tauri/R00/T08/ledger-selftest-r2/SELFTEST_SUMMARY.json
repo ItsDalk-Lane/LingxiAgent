@@ -1,0 +1,292 @@
+{
+ "generated_at": "2026-09-24T04:54:34.561554+00:00",
+ "validated_repo_head": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
+ "validator_sha256": "08a37669e14b3d857e0b1d496c3b9af9d9fe4af9bfa0e4af001db44f067be1ce",
+ "validator_path": "docs/rust-tauri/R00/r00_t07_validate_ledger.py",
+ "invocation_mode": "in-process import of r00_t07_validate_ledger.main() (equivalent argv: --root <isolated copy> --git-repo <real repo>)",
+ "fake_root_file_count": 98,
+ "temp_roots_created": 19,
+ "temp_roots_removed": 19,
+ "suites": {
+  "a13": {
+   "started_utc": "2026-09-24T04:54:34.561905+00:00",
+   "variants": [
+    {
+     "variant_id": "canonical",
+     "description": "场景手改 PASS 且删除日志：非零退出并精确指出场景 ID、结果 ID、缺失字段与证据路径",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR STATUS-PASS-WITHOUT-RESULT scenario=",
+      "field 'result_ids'",
+      "LEDGER-ERROR EVIDENCE-MISSING-FILE result=RES-R00-A01",
+      "artifacts/rust-tauri/R00/T01/startup-probe.json"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a13-canonical.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a13-canonical-_2n_co4x"
+    },
+    {
+     "variant_id": "v1-flip-no-result",
+     "description": "NOT_STARTED 场景手改 PASS 无结果记录",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR STATUS-PASS-WITHOUT-RESULT scenario=R01-A01",
+      "field 'result_ids'"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a13-v1-flip-no-result.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a13-v1-flip-no-result-pqc2icd8"
+    },
+    {
+     "variant_id": "v2-evidence-deleted",
+     "description": "删除已 PASS 结果引用的证据文件",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR EVIDENCE-MISSING-FILE result=RES-R00-A01",
+      "artifacts/rust-tauri/R00/T01/startup-probe.json"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a13-v2-evidence-deleted.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a13-v2-evidence-deleted-p8ah95my"
+    },
+    {
+     "variant_id": "v3-evidence-tampered",
+     "description": "篡改证据文件内容（哈希不符）",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR EVIDENCE-HASH-MISMATCH result=RES-R00-A09",
+      "artifacts/rust-tauri/R00/T05/REPLAY_SUMMARY.json"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a13-v3-evidence-tampered.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a13-v3-evidence-tampered-hejrtnq0"
+    },
+    {
+     "variant_id": "v4-missing-field",
+     "description": "删除结果关键字段（tested_sha / exit_code）",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR RESULT-MISSING-FIELD result=RES-R00-A03 field 'tested_sha'",
+      "LEDGER-ERROR RESULT-MISSING-FIELD result=RES-R00-A07 field 'exit_code'"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a13-v4-missing-field.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a13-v4-missing-field-0_d65opo"
+    },
+    {
+     "variant_id": "v5-stale-source",
+     "description": "结果监控的源码在运行后被修改（结果过期）",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR STALE-SOURCE result=RES-R00-A09",
+      "scripts/rust-tauri/r00-t05-replay.mjs"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a13-v5-stale-source.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a13-v5-stale-source-w8h2y6du"
+    },
+    {
+     "variant_id": "v6-exitcode-conflict",
+     "description": "exit_code=1 却保持 status=PASS（跳过/失败冒充通过）",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR EXIT-CODE-CONFLICT result=RES-R00-A10"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a13-v6-exitcode-conflict.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a13-v6-exitcode-conflict-mz7ae5vf"
+    },
+    {
+     "variant_id": "v7-duplicate-id",
+     "description": "账本 JSON 重复场景键",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR NO-DUPLICATE-ID"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a13-v7-duplicate-id.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a13-v7-duplicate-id-lgfyirya"
+    },
+    {
+     "variant_id": "v8-task-ref-missing",
+     "description": "任务声明的验收场景从账本消失",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR TASK-SCENARIO-BIJCTION task=R00-T02",
+      "acceptance 'R00-A03' missing"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a13-v8-task-ref-missing.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a13-v8-task-ref-missing-8cjbjp_k"
+    },
+    {
+     "variant_id": "v9-spec-tamper-strict",
+     "description": "篡改场景规格文本（任务书严格模式，字段级定位）",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR SPEC-FIDELITY scenario=R00-A04",
+      "spec.then"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a13-v9-spec-tamper-strict.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a13-v9-spec-tamper-strict-eqh7sh9u"
+    },
+    {
+     "variant_id": "v10-scenario-result-conflict",
+     "description": "场景 PASS 但绑定结果 status=FAIL（R1 反例①/③状态：状态脱节与零退出同报）",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR STATUS-RESULT-CONFLICT scenario=R00-A09 result=RES-R00-A09",
+      "field 'status' is 'FAIL'",
+      "LEDGER-ERROR EXIT-CODE-CONFLICT result=RES-R00-A09",
+      "status=FAIL but raw exit_code=0"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a13-v10-scenario-result-conflict.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a13-v10-scenario-result-conflict-muk5b5nb"
+    },
+    {
+     "variant_id": "v11-result-status-enum",
+     "description": "result.status 写入非法枚举 MAYBE_PASSED（R1 反例②）",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR RESULT-STATUS-ENUM result=RES-R00-A09",
+      "'MAYBE_PASSED'",
+      "LEDGER-ERROR STATUS-RESULT-CONFLICT scenario=R00-A09 result=RES-R00-A09"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a13-v11-result-status-enum.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a13-v11-result-status-enum-w8odnobj"
+    },
+    {
+     "variant_id": "v12-fail-exit-zero",
+     "description": "场景与结果一致 FAIL 但 exit_code=0（R1 反例③规则隔离：仅退出码矛盾）",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR EXIT-CODE-CONFLICT result=RES-R00-A09",
+      "status=FAIL but raw exit_code=0"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a13-v12-fail-exit-zero.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a13-v12-fail-exit-zero-sxg6smgd"
+    },
+    {
+     "variant_id": "v9b-digest-fallback",
+     "description": "篡改规格文本（内嵌快照回退模式，无任务书目录）",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR SPEC-FIDELITY scenario=R00-A04",
+      "tampered"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a13-v9b-digest-fallback.log",
+     "fake_root": "(removed)"
+    }
+   ],
+   "ended_utc": "2026-09-24T04:54:37.616940+00:00",
+   "variants_total": 14,
+   "variants_passed": 14
+  },
+  "a14": {
+   "started_utc": "2026-09-24T04:54:37.616969+00:00",
+   "variants": [
+    {
+     "variant_id": "v1-entry-unmapped",
+     "description": "入口盘点新增真实形态入口与功能、账本未映射 → 失败",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR ENTRY-COVERAGE-BIDIR entry=cli:lingxi-doctor",
+      "not mapped in ledger",
+      "LEDGER-ERROR FEATURE-INVENTORY-BIDIR features_index",
+      "F-D99-CLI-DOCTOR"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a14-v1-entry-unmapped.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a14-v1-entry-unmapped-f15ub5qe"
+    },
+    {
+     "variant_id": "v2-feature-no-scenario",
+     "description": "新功能入账本 feature 索引但无场景/任务映射 → 失败",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR ORPHAN-REQUIREMENT feature=F-D99-CLI-DOCTOR",
+      "no supplemental scenario",
+      "LEDGER-ERROR ENTRY-COVERAGE-BIDIR entry=cli:lingxi-doctor"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a14-v2-feature-no-scenario.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a14-v2-feature-no-scenario-zp38hgjs"
+    },
+    {
+     "variant_id": "v3-mapped-passes",
+     "description": "补齐 feature→scenario→task 完整映射 → 通过",
+     "expect_exit": 0,
+     "actual_exit": 0,
+     "expected_substrings": [
+      "LEDGER_VALID"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a14-v3-mapped-passes.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a14-v3-mapped-passes-y1mll3ku"
+    },
+    {
+     "variant_id": "v4-orphan-mapping",
+     "description": "账本映射盘点不存在的入口（孤立映射）→ 失败",
+     "expect_exit": 1,
+     "actual_exit": 1,
+     "expected_substrings": [
+      "LEDGER-ERROR ENTRY-COVERAGE-BIDIR entrypoint_index",
+      "cli:ghost"
+     ],
+     "missing_substrings": [],
+     "passed": true,
+     "log": "a14-v4-orphan-mapping.log",
+     "fake_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a14-v4-orphan-mapping-4s2wp9h8"
+    }
+   ],
+   "ended_utc": "2026-09-24T04:54:38.762467+00:00",
+   "variants_total": 4,
+   "variants_passed": 4
+  }
+ },
+ "all_passed": true,
+ "positive_control": {
+  "expect_exit": 0,
+  "actual_exit": 0,
+  "passed": true,
+  "log": "positive-control.log"
+ }
+}

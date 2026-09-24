@@ -1,0 +1,12 @@
+# variant a13/canonical: 场景手改 PASS 且删除日志：非零退出并精确指出场景 ID、结果 ID、缺失字段与证据路径
+# tamper: flipped scenario R00-T02-LA-000E6E1301C0; deleted artifacts/rust-tauri/R00/T01/startup-probe.json
+# validator: r00_t07_validate_ledger.py --root <isolated:a13-canonical> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=4/4
+# --- stdout ---
+LEDGER-ERROR EVIDENCE-MISSING-FILE result=RES-R00-A01 evidence file 'artifacts/rust-tauri/R00/T01/startup-probe.json' does not exist (deleted log)
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A13 field 'committed_in' is null but tested_sha != basis.head (only current-task results at HEAD may be commit-pending; tested_sha=4401afae2ee48df1512b8a8c9a1262be0efbe64f, basis.head=e0b7be6108c4d5bc873061dee279b7163ca78a41)
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A14 field 'committed_in' is null but tested_sha != basis.head (only current-task results at HEAD may be commit-pending; tested_sha=4401afae2ee48df1512b8a8c9a1262be0efbe64f, basis.head=e0b7be6108c4d5bc873061dee279b7163ca78a41)
+LEDGER-ERROR STATUS-PASS-WITHOUT-RESULT scenario=R00-T02-LA-000E6E1301C0 field 'result_ids' empty: status=PASS requires >=1 result record (no-source PASS is rejected)
+LEDGER_INVALID errors=4 checks=14944
+# --- stderr ---
+(empty)

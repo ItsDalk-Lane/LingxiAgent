@@ -1,0 +1,12 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/migration/network-guard-negative.test.ts (7 tests) 40ms
+ ✓ tests/migration/r00-a10-old-defect.test.ts (5 tests) 30ms
+ ✓ tests/migration/r00-t05-replay.test.ts (9 tests) 90ms
+
+ Test Files  3 passed (3)
+      Tests  21 passed (21)
+   Start at  12:36:57
+   Duration  1.39s (transform 851ms, setup 60ms, import 2.07s, tests 159ms, environment 0ms)
+

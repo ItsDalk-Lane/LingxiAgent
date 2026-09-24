@@ -231,7 +231,12 @@ def main() -> int:
     test_links = {
         "tests/migration/r00-t05-replay.test.ts": ["R00-A09"],
         "tests/migration/r00-a10-old-defect.test.ts": ["R00-A10"],
+        # T05 R1-F01 修复（R00-T08 落地）的守卫负向回归：保护 A09 离线前提
+        "tests/migration/network-guard-negative.test.ts": ["R00-A09"],
         "scripts/rust-tauri/r00-t05-replay.mjs": ["R00-A09"],
+        # R00-T08 取证工具（A15 复现校验 / A16 交接抽查）
+        "docs/rust-tauri/R00/r00_t08_a15_verify_repro.py": ["R00-A15"],
+        "docs/rust-tauri/R00/r00_t08_a16_spotcheck.py": ["R00-A16"],
         "docs/rust-tauri/R00/r00_t02_inventory.py": ["R00-A03", "R00-A04"],
         "docs/rust-tauri/R00/r00_t02_source_gates.py": ["R00-A03"],
         "docs/rust-tauri/R00/ask_user_ast_gate.cjs": ["R00-A03"],

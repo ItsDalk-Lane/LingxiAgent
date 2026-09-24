@@ -7,7 +7,7 @@
   "replay": {
     "test": "tests/migration/r00-t05-replay.test.ts（A09 三次重放驱动：scripts/rust-tauri/r00-t05-replay.mjs）",
     "rule": "expected.json 冻结自首次验证运行，且逐项对照过既有公开测试断言（锚点见各 fixture 的 source.anchors 与 OLD_BEHAVIOR_ORACLE.md）；回放走真实旧入口，不是对 JSON 自比。",
-    "offline": "LINGXI_MIGRATION_BLOCK_NETWORK=1 时测试 worker 内阻断 net/tls/dns 外连；所有文件/进程只使用 os.tmpdir() 临时目录。"
+    "offline": "LINGXI_MIGRATION_BLOCK_NETWORK=1 时测试 worker 内阻断外连（覆盖 net/tls 的 connect 与 createConnection 导出、dns 的 lookup/resolve*（回调与 promises 面）；管道判定仅认显式 options.path 或含 / 的字符串路径；残留局限：guard 安装前已解构捕获的原函数与 dns.Resolver 实例不在覆盖内，见 tests/migration/network-guard.ts 头注）；所有文件/进程只使用 os.tmpdir() 临时目录。"
   },
   "global_normalization": {
     "allowed_varying_keys": ["timestamp", "labelTimestamp", "createdAt", "updatedAt", "mtime", "mtimeMs", "pid"],
@@ -238,7 +238,8 @@
         "正确 loopback token + local→principal{kind:local_user,trustState:local}（对照面）",
         "错误 token→denied{error:'forbidden',reason:'invalid_credential'}",
         "loopback 凭证过 lan/custom_remote→denied reason=loopback_token_requires_local_transport",
-        "缺失凭证→denied reason=missing_credential"
+        "缺失凭证→denied reason=missing_credential",
+        "custom_remote 传输（connectionKind 非 local，connection-not-allowed 用例）→denied{error:'forbidden',reason:'loopback_token_requires_local_transport'}（与 expected.json 五用例一一对应：valid-local-loopback / wrong-token-local / valid-token-lan / missing-credential / connection-not-allowed）"
       ],
       "allowed_varying": { "note": "无变化字段（三次重放 raw 层亦逐字节一致）" }
     },

@@ -4,10 +4,10 @@
  "artifact_kind": "EXECUTABLE_ACCEPTANCE_LEDGER",
  "ledger_self_status": "READY_FOR_REVIEW",
  "ledger_self_status_note": "执行者只标 READY_FOR_REVIEW；ACCEPTED 由独立验收决定（01 通用约束 §6）",
- "generated_at": "2026-09-24T04:02:05.815278+00:00",
+ "generated_at": "2026-09-24T05:49:35.962711+00:00",
  "generator": "docs/rust-tauri/R00/r00_t07_build_map.py",
  "basis": {
-  "head": "4401afae2ee48df1512b8a8c9a1262be0efbe64f",
+  "head": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
   "branch": "codex/rust-tauri-migration",
   "validated_repo_head": "4401afae2ee48df1512b8a8c9a1262be0efbe64f",
   "input_sha256": {
@@ -17,8 +17,8 @@
    "ENTRYPOINT_COVERAGE.json": "76fe6e2b9aaae914aaff21be6f731ba8d537b944ced6412ebca4f547c8313000",
    "FEATURE_INVENTORY.json": "48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039",
    "ENTRYPOINTS.json": "f69e658f8b35b5a486a764872e27c82b599c84ef49404903f5b72f4b0b84d669",
-   "R00-T07_RESULTS.json": "8d39f81e00872a91100a46d62c9c40705c0a32a5fdd1e2339f2802081fd3f6dd",
-   "r00_t07_build_map.py": "60bb4655713160f50405465ee75a88b632ae893eb80df7274abe3729b4aa9980",
+   "R00-T07_RESULTS.json": "4d50dd107a739b6f5c7139802ca7396b78c04341bee3e79bcb1922e70ce3a066",
+   "r00_t07_build_map.py": "5b8b94b53a10db1ca17a4da516323d6dd6641f65f67e3eaef3c9d7f1627b225b",
    "SELFTEST_SUMMARY.json": "42ac43c1dfab286c8f07738b432220fe49b308179ad3fec24e206780fecc0981"
   },
   "package_lock_sha256": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b"
@@ -33,11 +33,11 @@
   "features_production": 736,
   "entrypoints_registered": 832,
   "surfaces": 37,
-  "tests": 28,
-  "results": 14,
+  "tests": 31,
+  "results": 16,
   "ledger_status_counts": {
-   "PASS": 30,
-   "NOT_STARTED": 185,
+   "PASS": 32,
+   "NOT_STARTED": 183,
    "NOT_RUN_UNAUTHORIZED": 1,
    "SPECIFIED_NOT_EXECUTED": 736
   }
@@ -159,8 +159,8 @@
    ],
    "test_ids": [
     "T-002",
-    "T-019",
-    "T-026"
+    "T-021",
+    "T-029"
    ]
   },
   "R00-A05": {
@@ -250,8 +250,8 @@
    "feature_ids": [],
    "test_ids": [
     "T-007",
-    "T-024",
-    "T-025"
+    "T-027",
+    "T-028"
    ]
   },
   "R00-A08": {
@@ -281,10 +281,10 @@
    "feature_ids": [],
    "test_ids": [
     "T-007",
-    "T-020",
-    "T-021",
-    "T-027",
-    "T-028"
+    "T-022",
+    "T-023",
+    "T-030",
+    "T-031"
    ]
   },
   "R00-A09": {
@@ -313,8 +313,9 @@
    ],
    "feature_ids": [],
    "test_ids": [
-    "T-010",
-    "T-023"
+    "T-012",
+    "T-024",
+    "T-026"
    ]
   },
   "R00-A10": {
@@ -343,7 +344,7 @@
    ],
    "feature_ids": [],
    "test_ids": [
-    "T-022"
+    "T-025"
    ]
   },
   "R00-A11": {
@@ -372,13 +373,13 @@
    ],
    "feature_ids": [],
    "test_ids": [
-    "T-011",
-    "T-012",
     "T-013",
     "T-014",
     "T-015",
+    "T-016",
     "T-017",
-    "T-018"
+    "T-019",
+    "T-020"
    ]
   },
   "R00-A12": {
@@ -407,8 +408,8 @@
    ],
    "feature_ids": [],
    "test_ids": [
-    "T-016",
-    "T-018"
+    "T-018",
+    "T-020"
    ]
   },
   "R00-A13": {
@@ -491,10 +492,14 @@
     "task_id": "R00-T08",
     "stage_id": "R00"
    },
-   "ledger_status": "NOT_STARTED",
-   "result_ids": [],
+   "ledger_status": "PASS",
+   "result_ids": [
+    "RES-R00-A15"
+   ],
    "feature_ids": [],
-   "test_ids": []
+   "test_ids": [
+    "T-010"
+   ]
   },
   "R00-A16": {
    "kind": "base",
@@ -516,10 +521,14 @@
     "task_id": "R00-T08",
     "stage_id": "R00"
    },
-   "ledger_status": "NOT_STARTED",
-   "result_ids": [],
+   "ledger_status": "PASS",
+   "result_ids": [
+    "RES-R00-A16"
+   ],
    "feature_ids": [],
-   "test_ids": []
+   "test_ids": [
+    "T-011"
+   ]
   },
   "R01-A01": {
    "kind": "base",
@@ -57921,6 +57930,24 @@
   },
   {
    "test_id": "T-010",
+   "path": "docs/rust-tauri/R00/r00_t08_a15_verify_repro.py",
+   "kind": "script",
+   "sha256": "0fcf1086083adbd1f3046f8bf867055e3757fcc72af5431e703959441413174b",
+   "scenario_ids": [
+    "R00-A15"
+   ]
+  },
+  {
+   "test_id": "T-011",
+   "path": "docs/rust-tauri/R00/r00_t08_a16_spotcheck.py",
+   "kind": "script",
+   "sha256": "b3c7de01c531a7b30af4a8e60572c36b5132fb1624da2fc729394b405f88af9d",
+   "scenario_ids": [
+    "R00-A16"
+   ]
+  },
+  {
+   "test_id": "T-012",
    "path": "scripts/rust-tauri/r00-t05-replay.mjs",
    "kind": "script",
    "sha256": "283ff9fc7aee25ae6ad2a04986d64cd0b1178823ac974f311cc98c02a9f1fde1",
@@ -57929,7 +57956,7 @@
    ]
   },
   {
-   "test_id": "T-011",
+   "test_id": "T-013",
    "path": "scripts/rust-tauri/r00-t06-bench-desktop.mjs",
    "kind": "script",
    "sha256": "063f79b96d5a4200b4c6197d3063af99db55202c18712acb459fc0642ad4c3d3",
@@ -57938,7 +57965,7 @@
    ]
   },
   {
-   "test_id": "T-012",
+   "test_id": "T-014",
    "path": "scripts/rust-tauri/r00-t06-bench-office-pdf.mjs",
    "kind": "script",
    "sha256": "fc33c1f6a6b45e681362c741c9617650977dd06b034eb01384ed237c8b656ea9",
@@ -57947,7 +57974,7 @@
    ]
   },
   {
-   "test_id": "T-013",
+   "test_id": "T-015",
    "path": "scripts/rust-tauri/r00-t06-bench-pty.mjs",
    "kind": "script",
    "sha256": "025fad801dc080e7cd63cc254ff69e890ead843fce4eb8ca659938705aa92156",
@@ -57956,7 +57983,7 @@
    ]
   },
   {
-   "test_id": "T-014",
+   "test_id": "T-016",
    "path": "scripts/rust-tauri/r00-t06-bench-server.mjs",
    "kind": "script",
    "sha256": "ae4ebc5280bfffb17217bdf7284b90bd4ff53e96acb2fb0c67429c3a5f5b473c",
@@ -57965,7 +57992,7 @@
    ]
   },
   {
-   "test_id": "T-015",
+   "test_id": "T-017",
    "path": "scripts/rust-tauri/r00-t06-build-release.mjs",
    "kind": "script",
    "sha256": "01bb6f9d886ac25558db38a3ed137070d98df07cbd057c96983759bce1354cb8",
@@ -57974,7 +58001,7 @@
    ]
   },
   {
-   "test_id": "T-016",
+   "test_id": "T-018",
    "path": "scripts/rust-tauri/r00-t06-probe-fixed-prefix.mjs",
    "kind": "script",
    "sha256": "e0c4473864d482e0b14dd85c768e9fd28f36572adec26c4164a2a3c20be72914",
@@ -57983,7 +58010,7 @@
    ]
   },
   {
-   "test_id": "T-017",
+   "test_id": "T-019",
    "path": "scripts/rust-tauri/r00-t06-stub-provider.mjs",
    "kind": "script",
    "sha256": "19e5bb0c08312709b45c4ca026346475794adedc65b4f3cf3747b78a7d090f9b",
@@ -57992,7 +58019,7 @@
    ]
   },
   {
-   "test_id": "T-018",
+   "test_id": "T-020",
    "path": "scripts/rust-tauri/r00-t06-summarize.mjs",
    "kind": "script",
    "sha256": "eac0c344293757b29291984de03afd3a0d0dfbbdc2939076a1e1d6ace262bb83",
@@ -58002,7 +58029,7 @@
    ]
   },
   {
-   "test_id": "T-019",
+   "test_id": "T-021",
    "path": "tests/config-scope.test.ts",
    "kind": "vitest",
    "sha256": "2f51a81a7f2a1c4b977a78f36d7227f526681c8e5d4495c96dbdd86ab0e6b00d",
@@ -58011,7 +58038,7 @@
    ]
   },
   {
-   "test_id": "T-020",
+   "test_id": "T-022",
    "path": "tests/device-registry.test.ts",
    "kind": "vitest",
    "sha256": "ff242f95ff1da9c08c39de6711715f5f542eff8d221b12617a2cf0c1f6c136c7",
@@ -58020,7 +58047,7 @@
    ]
   },
   {
-   "test_id": "T-021",
+   "test_id": "T-023",
    "path": "tests/http-route-security.test.ts",
    "kind": "vitest",
    "sha256": "ed2d41fbb501a864528db58aacc16f6ad372d156d5c24938abe79acf6688477a",
@@ -58029,7 +58056,16 @@
    ]
   },
   {
-   "test_id": "T-022",
+   "test_id": "T-024",
+   "path": "tests/migration/network-guard-negative.test.ts",
+   "kind": "vitest",
+   "sha256": "a5dc3f05127899c5293d53b37afe07d361098001b208199730d028ee34bcbb7d",
+   "scenario_ids": [
+    "R00-A09"
+   ]
+  },
+  {
+   "test_id": "T-025",
    "path": "tests/migration/r00-a10-old-defect.test.ts",
    "kind": "vitest",
    "sha256": "f8bdbebf2807a1619f61bef07796fc93018740fc8d7c908a6cd275f4ce6345b2",
@@ -58038,7 +58074,7 @@
    ]
   },
   {
-   "test_id": "T-023",
+   "test_id": "T-026",
    "path": "tests/migration/r00-t05-replay.test.ts",
    "kind": "vitest",
    "sha256": "ba360dda0ca51a10cc786d486d4ea753cfea81672a4bbd40c16f9e202f9c647a",
@@ -58047,7 +58083,7 @@
    ]
   },
   {
-   "test_id": "T-024",
+   "test_id": "T-027",
    "path": "tests/persistence-schema-tripwire.test.ts",
    "kind": "vitest",
    "sha256": "afd542b289289ab79d3cdd926897faac74b298f5f0de952d6fc4434eb709c59a",
@@ -58056,7 +58092,7 @@
    ]
   },
   {
-   "test_id": "T-025",
+   "test_id": "T-028",
    "path": "tests/persistence-store-registry.test.ts",
    "kind": "vitest",
    "sha256": "f011b9529f3aeeeed84695bb73282dcd7cd048a82eea835f49de2234c0e94056",
@@ -58065,7 +58101,7 @@
    ]
   },
   {
-   "test_id": "T-026",
+   "test_id": "T-029",
    "path": "tests/provider-catalog.test.ts",
    "kind": "vitest",
    "sha256": "35f3c8723344e1e1618b77738df906954a06b645f75491571ebe0c50c9c3ea6b",
@@ -58074,7 +58110,7 @@
    ]
   },
   {
-   "test_id": "T-027",
+   "test_id": "T-030",
    "path": "tests/server-auth.test.ts",
    "kind": "vitest",
    "sha256": "5f072f670f668a047466ed9edb738977bd5a093b887abd1e486a35764af7da58",
@@ -58083,7 +58119,7 @@
    ]
   },
   {
-   "test_id": "T-028",
+   "test_id": "T-031",
    "path": "tests/ws-scope.test.ts",
    "kind": "vitest",
    "sha256": "557a8fa335a14ddfd25488737daa2e3f62370878d99eafcfb7fdad9d6d0efcfe",
@@ -58581,7 +58617,7 @@
    "committed_in": "64c302ec482888222833136d0d20c64d4cbb350b",
    "timestamp_utc": "2026-09-23T20:43:42+00:00",
    "timestamp_basis": "T05 交付提交时间（REPLAY_SUMMARY.json 含各 run 精确时间戳；运行先于提交）",
-   "working_tree_digest": "976f3a2e027d9ddbba56076ce020b1da39ef506035f9c446faa036fe35006743",
+   "working_tree_digest": "417cfda317bc8ae9de2e9cd14c5104655204c569a7f09de068933cc3e1d3c882",
    "working_tree_digest_scope": "以 FIXTURE_MANIFEST.json 与 tests/migration 逐文件哈希为内容基准",
    "platform": "macOS 27.0 darwin arm64",
    "toolchain": {
@@ -58596,14 +58632,16 @@
    "command": "node scripts/rust-tauri/r00-t05-replay.mjs && npx vitest run tests/migration/r00-t05-replay.test.ts tests/migration/r00-a10-old-defect.test.ts",
    "exit_code": 0,
    "expected": "断网的隔离环境中连续重放同一组夹具三次：规范化输出一致，差异仅限声明允许字段",
-   "observed": "三 run 各自退出码 0、每 run 9 夹具 × raw/normalized 两份；两份规范化 diff（run1-run2、run1-run3）均 identical；vitest 2 文件 14/14（9 回放 + 5 反例）；REPLAY_SUMMARY PASS-CANDIDATE",
+   "observed": "三 run 各自退出码 0、每 run 9 夹具 × raw/normalized 两份；两份规范化 diff（run1-run2、run1-run3）均 identical；vitest 2 文件 14/14（9 回放 + 5 反例）；REPLAY_SUMMARY PASS-CANDIDATE；R00-T08 强化守卫（T05 R1-F01：net/tls createConnection 补丁、isPipe 修正、dns.promises.lookup/resolve* 覆盖）后受影响检查重跑：migration 3 文件 21/21、三次隔离重放规范化仍逐字节一致",
    "stub_boundary": [
     "全合成夹具（token 为显式 not-a-secret 合成值）；模型/协议为确定性本地替身；无网络、无付费服务"
    ],
    "source_paths": [
     "scripts/rust-tauri/r00-t05-replay.mjs",
     "tests/migration/r00-t05-replay.test.ts",
-    "tests/migration/fixtures/FIXTURE_MANIFEST.json"
+    "tests/migration/fixtures/FIXTURE_MANIFEST.json",
+    "tests/migration/network-guard.ts",
+    "tests/migration/network-guard-negative.test.ts"
    ],
    "evidence": [
     {
@@ -58625,12 +58663,29 @@
      "path": "docs/rust-tauri/R00/R00-T05_REPORT.md",
      "role": "executor report",
      "sha256": "924a8c8a3ae211665729339cf0c9ba2c98daeb12eeba25c583fe0cb694ceb460"
+    },
+    {
+     "path": "artifacts/rust-tauri/R00/T08/affected-migration-tests-r1.log",
+     "role": "T08 affected rerun: migration 3 files 21/21 under strengthened guard",
+     "sha256": "ae1a67d940c3f2df1d01af03fd975931bad037fbefcd325bca46b8bbc4acbe7c"
+    },
+    {
+     "path": "artifacts/rust-tauri/R00/T08/replay-t08-driver.log",
+     "role": "T08 triple replay under strengthened guard (3x exit 0, normalized identical)",
+     "sha256": "b13e7402bdfd4f77cb38ab3436d979a4b634e296a6743c96c7d1787a71693eb8"
+    },
+    {
+     "path": "artifacts/rust-tauri/R00/T08/replay-t08/REPLAY_SUMMARY.json",
+     "role": "T08 triple replay machine summary",
+     "sha256": "0295cb84babf18153815f0b25fdc5a877da22d982d96c85788e8f5ccccc36fb8"
     }
    ],
    "source_digests": {
     "scripts/rust-tauri/r00-t05-replay.mjs": "283ff9fc7aee25ae6ad2a04986d64cd0b1178823ac974f311cc98c02a9f1fde1",
     "tests/migration/r00-t05-replay.test.ts": "ba360dda0ca51a10cc786d486d4ea753cfea81672a4bbd40c16f9e202f9c647a",
-    "tests/migration/fixtures/FIXTURE_MANIFEST.json": "e11413ed00d54bda894a6db54bb883f80f334b630580d07f51798fd000d6cf55"
+    "tests/migration/fixtures/FIXTURE_MANIFEST.json": "bee4c193a5f365b4998ec0396afc37ee9a33687bbb4a44bc2f130ca1b1fe701a",
+    "tests/migration/network-guard.ts": "1f4d055dc3628c028e72bb7a7af5eccf882d0945fb79d1f3bf44d743abc236e0",
+    "tests/migration/network-guard-negative.test.ts": "a5dc3f05127899c5293d53b37afe07d361098001b208199730d028ee34bcbb7d"
    }
   },
   {
@@ -58818,9 +58873,9 @@
    "task_id": "R00-T07",
    "status": "PASS",
    "tested_sha": "4401afae2ee48df1512b8a8c9a1262be0efbe64f",
-   "committed_in": null,
-   "timestamp_basis": "T07 自测机器时间戳（SELFTEST_SUMMARY.json 记录）",
-   "working_tree_digest": "4d392dacced896640dab2059ac69014ecca5a53da36c2d195ecb29d175f04bb0",
+   "committed_in": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
+   "timestamp_basis": "T07 自测机器时间戳（SELFTEST_SUMMARY.json 记录）；committed_in 由 R00-T08 补绑 T07 交付提交 e0b7be610（原 null 仅提交前合法，当前 HEAD 重建暴露后按事实修正；tested_sha 仍由构建器回填自测验证树 4401afae2）",
+   "working_tree_digest": "e074850734418f59820afee0cc31815d1f4a6ea722b20999c830d55de7220d3f",
    "working_tree_digest_scope": "由生成器在构建时填入（校验器/账本/输入文件当前哈希）",
    "platform": "macOS 27.0 darwin arm64",
    "toolchain": {
@@ -58868,7 +58923,7 @@
    "source_digests": {
     "docs/rust-tauri/R00/r00_t07_validate_ledger.py": "08a37669e14b3d857e0b1d496c3b9af9d9fe4af9bfa0e4af001db44f067be1ce",
     "docs/rust-tauri/R00/r00_t07_selftest.py": "2307fe30ff8da1a84671e389492a45cf1dc10e9e60beaae9a073ee3924cea5c5",
-    "docs/rust-tauri/R00/R00-T07_RESULTS.json": "8d39f81e00872a91100a46d62c9c40705c0a32a5fdd1e2339f2802081fd3f6dd",
+    "docs/rust-tauri/R00/R00-T07_RESULTS.json": "4d50dd107a739b6f5c7139802ca7396b78c04341bee3e79bcb1922e70ce3a066",
     "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json": "699ef808d35d0185681e712372cf6d6585caf0e3958daab646586f0b355072a9",
     "docs/rust-tauri/R00/ENTRYPOINT_COVERAGE.json": "76fe6e2b9aaae914aaff21be6f731ba8d537b944ced6412ebca4f547c8313000",
     "docs/rust-tauri/R00/FEATURE_INVENTORY.json": "48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039",
@@ -58881,9 +58936,9 @@
    "task_id": "R00-T07",
    "status": "PASS",
    "tested_sha": "4401afae2ee48df1512b8a8c9a1262be0efbe64f",
-   "committed_in": null,
-   "timestamp_basis": "T07 自测机器时间戳（SELFTEST_SUMMARY.json 记录）",
-   "working_tree_digest": "4d392dacced896640dab2059ac69014ecca5a53da36c2d195ecb29d175f04bb0",
+   "committed_in": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
+   "timestamp_basis": "T07 自测机器时间戳（SELFTEST_SUMMARY.json 记录）；committed_in 由 R00-T08 补绑 T07 交付提交 e0b7be610（原 null 仅提交前合法，当前 HEAD 重建暴露后按事实修正；tested_sha 仍由构建器回填自测验证树 4401afae2）",
+   "working_tree_digest": "e074850734418f59820afee0cc31815d1f4a6ea722b20999c830d55de7220d3f",
    "working_tree_digest_scope": "由生成器在构建时填入",
    "platform": "macOS 27.0 darwin arm64",
    "toolchain": {
@@ -58931,11 +58986,124 @@
    "source_digests": {
     "docs/rust-tauri/R00/r00_t07_validate_ledger.py": "08a37669e14b3d857e0b1d496c3b9af9d9fe4af9bfa0e4af001db44f067be1ce",
     "docs/rust-tauri/R00/r00_t07_selftest.py": "2307fe30ff8da1a84671e389492a45cf1dc10e9e60beaae9a073ee3924cea5c5",
-    "docs/rust-tauri/R00/R00-T07_RESULTS.json": "8d39f81e00872a91100a46d62c9c40705c0a32a5fdd1e2339f2802081fd3f6dd",
+    "docs/rust-tauri/R00/R00-T07_RESULTS.json": "4d50dd107a739b6f5c7139802ca7396b78c04341bee3e79bcb1922e70ce3a066",
     "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json": "699ef808d35d0185681e712372cf6d6585caf0e3958daab646586f0b355072a9",
     "docs/rust-tauri/R00/ENTRYPOINT_COVERAGE.json": "76fe6e2b9aaae914aaff21be6f731ba8d537b944ced6412ebca4f547c8313000",
     "docs/rust-tauri/R00/FEATURE_INVENTORY.json": "48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039",
     "docs/rust-tauri/R00/ENTRYPOINTS.json": "f69e658f8b35b5a486a764872e27c82b599c84ef49404903f5b72f4b0b84d669"
+   }
+  },
+  {
+   "result_id": "RES-R00-A15",
+   "acceptance_id": "R00-A15",
+   "task_id": "R00-T08",
+   "status": "PASS",
+   "tested_sha": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
+   "committed_in": null,
+   "timestamp_utc": "2026-09-24T04:37:00+00:00",
+   "timestamp_basis": "T08 执行会话机器时间（两次复现与校验日志内均有运行时间窗）",
+   "working_tree_digest": "538c57419a44a60274f4224c2fe683515f845f47210df674522b683e49605b9d",
+   "working_tree_digest_scope": "以 r00_t08_a15_verify_repro.py 与 .sync-audit/verified-source-sha.txt 逐文件哈希为内容基准",
+   "platform": "macOS 27.0 darwin arm64",
+   "toolchain": {
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "python": "3.14.3",
+    "vitest": "4.1.10"
+   },
+   "dependency_lock_hashes": {
+    "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b"
+   },
+   "command": "./node_modules/.bin/vitest run tests/post-verification-audit-seal.test.ts tests/round2-delivery-evidence.test.ts tests/round3-delivery-evidence.test.ts  # ×2 同条件复现，退出码均 1、失败集合一致；python3 -B docs/rust-tauri/R00/r00_t08_a15_verify_repro.py 比对两次日志与预存失败登记（退出码 0）",
+   "exit_code": 0,
+   "expected": "预存失败在相同条件重跑可复现且集合一致；不将其写为 PASS、不删除；说明对后续影响",
+   "observed": "4 用例（3 文件）失败集合两次完全一致：post-verification-audit-seal 允许清单拒绝 R00 增量 1 例、round2 R10-03/R10-04 2 例、round3 源码 manifest 1 例；根因=VERIFIED_SOURCE_SHA=46f12ab1c 审计白名单不含 R00 迁移产生的 docs/artifacts/tests/scripts 增量（R00 首个任务提交起即失败，非 T08 引入）；全量 npm test 其余 1463 文件/14895 用例通过；未修绿（不扩白名单不退役门禁），对后续影响：R00 阶段验收提交并由总控按 PROGRESS.md 封印流程重绑坐标前，全量 npm test 恒含这 4 例失败；附带发现 round2/round3 测试失败前重写 artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz（已恢复）",
+   "stub_boundary": [
+    "零外发；两次复现与本机全量运行同环境；失败用例本身只读 git 与文件系统"
+   ],
+   "source_paths": [
+    "docs/rust-tauri/R00/r00_t08_a15_verify_repro.py",
+    ".sync-audit/verified-source-sha.txt"
+   ],
+   "evidence": [
+    {
+     "path": "artifacts/rust-tauri/R00/T08/npm-test-r1.log",
+     "role": "full suite run (1463 passed files, 4 preexisting failures)",
+     "sha256": "96ecf35031b10b77209550d4ded83e7b8feba18d0573a82c38aef4d6df2be6a5"
+    },
+    {
+     "path": "artifacts/rust-tauri/R00/T08/audit-seal-repro-r1.log",
+     "role": "same-condition repro run 1 (exit 1, 4 failed)",
+     "sha256": "4a7a49d3c671fc34badf48e92b39420cca7c4b50f4814ad0651cb537cfa289af"
+    },
+    {
+     "path": "artifacts/rust-tauri/R00/T08/audit-seal-repro-r2.log",
+     "role": "same-condition repro run 2 (exit 1, identical set)",
+     "sha256": "209f7ccf5aa3256b9972aacd72188e0255873a42cdc0d28d15ddc59105688052"
+    },
+    {
+     "path": "artifacts/rust-tauri/R00/T08/a15-repro-verify-r1.log",
+     "role": "repro verifier output (A15-REPRO-VERIFIED)",
+     "sha256": "145be9f94d7b634c48997844c448aa900f55a9d7cfd4db897ee39299e335e991"
+    },
+    {
+     "path": "artifacts/rust-tauri/R00/T08/environment-r1.txt",
+     "role": "run environment snapshot",
+     "sha256": "11cbc08daf8994cddbe1895a205d9a48ede6727a573e04f3e6ce45322f69a78c"
+    }
+   ],
+   "source_digests": {
+    "docs/rust-tauri/R00/r00_t08_a15_verify_repro.py": "0fcf1086083adbd1f3046f8bf867055e3757fcc72af5431e703959441413174b",
+    ".sync-audit/verified-source-sha.txt": "b2d8dc46821888fcf79bd04ffe3b017439463581a37ddf9cf25c8d31e44d33da"
+   }
+  },
+  {
+   "result_id": "RES-R00-A16",
+   "acceptance_id": "R00-A16",
+   "task_id": "R00-T08",
+   "status": "PASS",
+   "tested_sha": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
+   "committed_in": null,
+   "timestamp_utc": "2026-09-24T04:37:00+00:00",
+   "timestamp_basis": "T08 执行会话机器时间",
+   "working_tree_digest": "2f561bb24f25226666c62f2216b4e4ed3ca5f1b167dc41268d203bef010a4feb",
+   "working_tree_digest_scope": "以 r00_t08_a16_spotcheck.py 与 R00_HANDOFF.json 逐文件哈希为内容基准",
+   "platform": "macOS 27.0 darwin arm64",
+   "toolchain": {
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "python": "3.14.3",
+    "vitest": "4.1.10"
+   },
+   "dependency_lock_hashes": {
+    "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b"
+   },
+   "command": "python3 -B docs/rust-tauri/R00/r00_t08_a16_spotcheck.py  # 输入仅 R00_HANDOFF.json spot_checks 段与仓库；测试腿证据为真实重跑日志（rerun_command 记录于交接与证据内）",
+   "exit_code": 0,
+   "expected": "另一执行者只凭交接与仓库可定位固定 SHA/夹具/命令/预期，复查一个功能、一条数据链、一个测试",
+   "observed": "三点全过：feature F-D09-…-FILE-HISTORY-FILES--AF8E24 → server/routes/file-history.ts:30 锚点 → 补充场景 R00-T02-LA-AF8E24A2F524 → 任务 R04-T04/R06-T05 双向链；data_chain session-jsonl 权威存储 6 个读写方文件在位 + multi-turn-basic 夹具 SHA-256 与交接固定值一致；test migration 三文件真实重跑日志摘要与内容校验（exit 0 / 3 文件 / 21 用例）。执行者自验通过≠独立验收：独立抽查由总控另派验收者按同一交接执行",
+   "stub_boundary": [
+    "纯结构+摘要校验与本地确定性重跑；无网络、无真实用户数据"
+   ],
+   "source_paths": [
+    "docs/rust-tauri/R00/r00_t08_a16_spotcheck.py",
+    "docs/rust-tauri/R00/R00_HANDOFF.json"
+   ],
+   "evidence": [
+    {
+     "path": "artifacts/rust-tauri/R00/T08/a16-spotcheck-r1.log",
+     "role": "spotcheck output (A16-SPOTCHECK-PASSED, handoff sha256 embedded)",
+     "sha256": "9f9fb8c6ddc39fe31111da31b85c0aa92687f4564dc7b2b55d8cff0e2eb5b0c9"
+    },
+    {
+     "path": "artifacts/rust-tauri/R00/T08/a16-test-rerun.log",
+     "role": "real rerun of the pinned migration test command (exit 0, 21/21)",
+     "sha256": "de6fcf3af95b457e16458fdfce1e414f6635456d537fbbecf201b2b6de70af56"
+    }
+   ],
+   "source_digests": {
+    "docs/rust-tauri/R00/r00_t08_a16_spotcheck.py": "b3c7de01c531a7b30af4a8e60572c36b5132fb1624da2fc729394b405f88af9d",
+    "docs/rust-tauri/R00/R00_HANDOFF.json": "68877ff6980993e34e8fd5405b93eb0c20495b5fa242bcc41c782c06796c62a5"
    }
   }
  ],

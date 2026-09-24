@@ -1,0 +1,18 @@
+ProductName:		macOS
+ProductVersion:		27.0
+BuildVersion:		26A428
+Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64
+v24.16.0
+11.13.0
+Python 3.14.3
+vitest/4.1.10 darwin-arm64 node-v24.16.0
+e0b7be6108c4d5bc873061dee279b7163ca78a41
+codex/rust-tauri-migration
+2026-09-24T04:40:24Z
+ALL_PROXY=socks5://127.0.0.1:7890
+HTTPS_PROXY=http://127.0.0.1:7890
+HTTP_PROXY=http://127.0.0.1:7890
+all_proxy=socks5://127.0.0.1:7890
+http_proxy=http://127.0.0.1:7890
+https_proxy=http://127.0.0.1:7890
+no_proxy=localhost,127.0.0.1,::1,*.local,169.254/16,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16

@@ -1,0 +1,3 @@
+LEDGER-ERROR STALE-SOURCE result=RES-R00-A16 monitored source 'docs/rust-tauri/R00/R00_HANDOFF.json' changed: sha256 68877ff6980993e34e8fd5405b93eb0c20495b5fa242bcc41c782c06796c62a5 != recorded bde9eea92e6cffb9e7dfe0380d9ce0e901d0e9cfb18b2f4d3ba57794fabe2547 (result is stale relative to source change; re-run required)
+LEDGER_INVALID errors=1 checks=14945
+EXIT_CODE=1

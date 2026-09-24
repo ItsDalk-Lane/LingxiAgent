@@ -1,0 +1,9 @@
+# variant a13/v12-fail-exit-zero: 场景与结果一致 FAIL 但 exit_code=0（R1 反例③规则隔离：仅退出码矛盾）
+# tamper: tamper_v12
+# validator: r00_t07_validate_ledger.py --root <isolated:a13-v12-fail-exit-zero> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=2/2
+# --- stdout ---
+LEDGER-ERROR EXIT-CODE-CONFLICT result=RES-R00-A09 status=FAIL but raw exit_code=0 (a zero exit cannot evidence FAIL; the failing signal itself is required)
+LEDGER_INVALID errors=1 checks=14943
+# --- stderr ---
+(empty)

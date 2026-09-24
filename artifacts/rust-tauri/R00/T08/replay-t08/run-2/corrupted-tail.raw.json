@@ -1,0 +1,38 @@
+{
+  "lenientReader": {
+    "annotationAbsent": true,
+    "messageCount": 3,
+    "roles": [
+      "user",
+      "assistant",
+      "assistant"
+    ]
+  },
+  "productionEntry": {
+    "annotationAbsent": true,
+    "messageCount": 4,
+    "repairReceiptExists": true,
+    "roles": [
+      "user",
+      "assistant",
+      "toolResult",
+      "assistant"
+    ]
+  },
+  "route": {
+    "bodyAnnotationAbsent": true,
+    "messageCount": 3,
+    "repairReceiptExists": true,
+    "status": 200
+  },
+  "strictReader": {
+    "code": "session_branch_invalid_json",
+    "details": {
+      "cause": "Unterminated string in JSON at position 84 (line 1 column 85)",
+      "filePath": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-mig-replay-WOUh76/hana/sessions/session.jsonl",
+      "line": 6
+    },
+    "name": "SessionBranchError",
+    "threw": true
+  }
+}

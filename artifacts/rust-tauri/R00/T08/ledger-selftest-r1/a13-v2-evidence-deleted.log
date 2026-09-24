@@ -1,0 +1,11 @@
+# variant a13/v2-evidence-deleted: 删除已 PASS 结果引用的证据文件
+# tamper: tamper_v2
+# validator: r00_t07_validate_ledger.py --root <isolated:a13-v2-evidence-deleted> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=2/2
+# --- stdout ---
+LEDGER-ERROR EVIDENCE-MISSING-FILE result=RES-R00-A01 evidence file 'artifacts/rust-tauri/R00/T01/startup-probe.json' does not exist (deleted log)
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A13 field 'committed_in' is null but tested_sha != basis.head (only current-task results at HEAD may be commit-pending; tested_sha=4401afae2ee48df1512b8a8c9a1262be0efbe64f, basis.head=e0b7be6108c4d5bc873061dee279b7163ca78a41)
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A14 field 'committed_in' is null but tested_sha != basis.head (only current-task results at HEAD may be commit-pending; tested_sha=4401afae2ee48df1512b8a8c9a1262be0efbe64f, basis.head=e0b7be6108c4d5bc873061dee279b7163ca78a41)
+LEDGER_INVALID errors=3 checks=14944
+# --- stderr ---
+(empty)

@@ -1,0 +1,14 @@
+# variant a13/v4-missing-field: 删除结果关键字段（tested_sha / exit_code）
+# tamper: tamper_v4
+# validator: r00_t07_validate_ledger.py --root <isolated:a13-v4-missing-field> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=2/2
+# --- stdout ---
+LEDGER-ERROR EXIT-CODE-CONFLICT result=RES-R00-A07 status=PASS but raw exit_code=None (skipped/failed run must not be PASS)
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A07 field 'exit_code' value None is not an integer
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A13 field 'committed_in' is null but tested_sha != basis.head (only current-task results at HEAD may be commit-pending; tested_sha=4401afae2ee48df1512b8a8c9a1262be0efbe64f, basis.head=e0b7be6108c4d5bc873061dee279b7163ca78a41)
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A14 field 'committed_in' is null but tested_sha != basis.head (only current-task results at HEAD may be commit-pending; tested_sha=4401afae2ee48df1512b8a8c9a1262be0efbe64f, basis.head=e0b7be6108c4d5bc873061dee279b7163ca78a41)
+LEDGER-ERROR RESULT-MISSING-FIELD result=RES-R00-A03 field 'tested_sha' is missing or empty
+LEDGER-ERROR RESULT-MISSING-FIELD result=RES-R00-A07 field 'exit_code' is missing or empty
+LEDGER_INVALID errors=6 checks=14943
+# --- stderr ---
+(empty)

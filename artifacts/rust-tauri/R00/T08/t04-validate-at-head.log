@@ -1,0 +1,18 @@
+{
+ "A_anchors": 101,
+ "A2_counts_errors": 0,
+ "B_routes": 392,
+ "C_stores": 69,
+ "D_unclassified": 0,
+ "D_stale": 0,
+ "D_token_files": 146,
+ "E_samples": 8,
+ "negative": {
+  "tampered_anchor_detected": true,
+  "tampered_counts_detected": true,
+  "fake_store_detected": true,
+  "fake_uncovered_detected": true
+ },
+ "fatal_count": 0
+}
+R00_T04_SCAN_OK

@@ -1,0 +1,6 @@
+
+> lingxi@0.1.43 check:tool-invocation-boundaries
+> node scripts/check-tool-invocation-boundaries.mjs
+
+Tool invocation boundary check passed (2250 source files).
+EXIT_CODE=0

@@ -1,0 +1,50 @@
+
+> lingxi@0.1.43 test:knowledge-platform-smoke
+> vitest run tests/knowledge-store.test.ts tests/knowledge-manager-import.test.ts tests/knowledge-engine-persistence.test.ts tests/knowledge-vector-index.test.ts tests/auxiliary-slot-resolver.test.ts tests/fresh-credential-routing.test.ts tests/oauth-force-refresh.test.ts tests/model-manager-auth-storage.test.ts tests/knowledge-store-v18-migration.test.ts tests/knowledge-store-v19-migration.test.ts tests/knowledge-index-metadata-migration.test.ts tests/knowledge-multigrain-migration.test.ts tests/knowledge-vector-backend-parity.test.ts tests/knowledge-vector-backend-fallback.test.ts tests/knowledge-vector-shutdown.test.ts tests/knowledge-fast-zero-remote.test.ts tests/knowledge-detailed-engine-context.test.ts tests/knowledge-research-recovery.test.ts tests/knowledge-completeness-quality.test.ts --maxWorkers=1
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/knowledge-vector-backend-parity.test.ts (2 tests) 8084ms
+   ✓ 真实知识入口的来源召回全部命中，HNSW 热查询只定点读块  7851ms
+ ✓ tests/knowledge-vector-shutdown.test.ts (1 test) 651ms
+   ✓ 真实原生模块加载/建图期间重复关闭，子进程不崩溃且向量原值保留  651ms
+ ✓ tests/model-manager-auth-storage.test.ts (31 tests) 538ms
+ ✓ tests/oauth-force-refresh.test.ts (6 tests) 1304ms
+     ✓ refreshes exactly once when two callers race on the same stale credential  1249ms
+ ✓ tests/knowledge-vector-backend-fallback.test.ts (10 tests) 422ms
+ ✓ tests/knowledge-store.test.ts (13 tests) 193ms
+ ✓ tests/knowledge-manager-import.test.ts (2 tests) 76ms
+ ✓ tests/knowledge-vector-index.test.ts (16 tests) 78ms
+ ✓ tests/knowledge-multigrain-migration.test.ts (4 tests) 120ms
+ ✓ tests/knowledge-store-v19-migration.test.ts (5 tests) 70ms
+ ✓ tests/knowledge-store-v18-migration.test.ts (6 tests) 78ms
+ ✓ tests/knowledge-index-metadata-migration.test.ts (2 tests) 104ms
+stdout | tests/knowledge-engine-persistence.test.ts > Knowledge 引擎与持久化治理接入 > 由 Engine 持有，并在 Engine 重启后恢复 Notebook
+[session] sessions cleaned up
+
+stdout | tests/knowledge-engine-persistence.test.ts > Knowledge 引擎与持久化治理接入 > 由 Engine 持有，并在 Engine 重启后恢复 Notebook
+[session] sessions cleaned up
+
+ ✓ tests/knowledge-engine-persistence.test.ts (2 tests) 63ms
+stdout | tests/fresh-credential-routing.test.ts > AuxiliaryModelResolver fresh credential routing > returns null for an unconfigured slot with no chat fallback
+[aux-resolver] resolveAuxiliaryExecution(approval): no model (unconfigured, fallback=none)
+
+ ✓ tests/fresh-credential-routing.test.ts (5 tests) 31ms
+stdout | tests/auxiliary-slot-resolver.test.ts > Case E: approval unconfigured returns null, chat never called > approval=null → null result
+[aux-resolver] resolveAuxiliaryExecution(approval): no model (unconfigured, fallback=none)
+
+stdout | tests/auxiliary-slot-resolver.test.ts > Case G: guard unconfigured returns null > guard=null → null, neither chat nor approval consulted
+[aux-resolver] resolveAuxiliaryExecution(guard): no model (unconfigured, fallback=none)
+
+stdout | tests/auxiliary-slot-resolver.test.ts > Case H: vision capability enforcement > unconfigured vision only falls back if chat supports image
+[aux-resolver] resolveAuxiliaryExecution(vision): no model (unconfigured, fallback=image_capable_chat)
+
+ ✓ tests/auxiliary-slot-resolver.test.ts (20 tests) 34ms
+
+ Test Files  15 passed (15)
+      Tests  125 passed (125)
+   Start at  12:44:04
+   Duration  17.46s (transform 2.21s, setup 76ms, import 4.56s, tests 11.85s, environment 1ms)
+
+EXIT_CODE=0

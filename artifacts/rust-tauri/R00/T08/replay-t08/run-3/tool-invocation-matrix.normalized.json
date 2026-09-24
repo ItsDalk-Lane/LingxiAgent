@@ -1,0 +1,70 @@
+[
+  {
+    "caseId": "baseline-valid",
+    "executorCalls": [
+      {
+        "args": {
+          "content": "hello",
+          "path": "note.md"
+        },
+        "ctxEffectiveTargetId": "tool:first-party:write_note",
+        "ctxInvocationRoute": "direct",
+        "toolCallId": "call-1"
+      }
+    ],
+    "ok": true
+  },
+  {
+    "caseId": "prepared-missing",
+    "errorCode": "PREPARED_INVOCATION_MISSING",
+    "errorName": "ToolInvocationError",
+    "executorCalls": [],
+    "ok": false
+  },
+  {
+    "caseId": "tampered-arguments",
+    "errorCode": "PREPARED_INVOCATION_MISMATCH",
+    "errorName": "ToolInvocationError",
+    "executorCalls": [],
+    "ok": false
+  },
+  {
+    "caseId": "key-order-only",
+    "executorCalls": [
+      {
+        "args": {
+          "content": "hello",
+          "path": "note.md"
+        },
+        "ctxEffectiveTargetId": "tool:first-party:write_note",
+        "ctxInvocationRoute": "direct",
+        "toolCallId": "call-1"
+      }
+    ],
+    "ok": true
+  },
+  {
+    "caseId": "target-revoked",
+    "errorCode": "TARGET_REVOKED",
+    "errorName": "ToolInvocationError",
+    "executorCalls": [],
+    "ok": false
+  },
+  {
+    "caseId": "executor-generic-failure",
+    "errorCode": "TRANSPORT_FAILURE",
+    "errorName": "ToolInvocationError",
+    "executorCalls": [
+      {
+        "args": {
+          "content": "hello",
+          "path": "note.md"
+        },
+        "ctxEffectiveTargetId": "tool:first-party:write_note",
+        "ctxInvocationRoute": "direct",
+        "toolCallId": "call-1"
+      }
+    ],
+    "ok": false
+  }
+]

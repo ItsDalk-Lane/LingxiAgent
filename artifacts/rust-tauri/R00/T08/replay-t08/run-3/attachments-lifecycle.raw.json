@@ -1,0 +1,55 @@
+{
+  "crossSessionLookup": true,
+  "crossSessionSidecarUntouched": true,
+  "discard": {
+    "managedCacheDeleted": false,
+    "resultShape": [
+      "managedCacheDeleted",
+      "sessionId",
+      "sessionPath",
+      "sidecarDeleted",
+      "unloaded"
+    ],
+    "sessionId": "sess_mig_target_0000000000000003",
+    "sessionPath": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/hana-mig-files-5ZP043/agents/hana/sessions/fork-session.jsonl",
+    "sidecarDeleted": true,
+    "unloaded": true
+  },
+  "fork": {
+    "copiedFileCount": 1,
+    "fileIdMapCovers": {
+      "csv": false,
+      "note": true
+    },
+    "forkedCsvEntry": null,
+    "forkedManagedBytes": null,
+    "targetListAfterFork": [
+      {
+        "id": "sf_335cb09c3088c25a",
+        "legacyFileIds": [
+          "sf_3206a019916615da"
+        ],
+        "storageKind": "external"
+      }
+    ]
+  },
+  "registered": {
+    "csv": {
+      "copiedNotMoved": false,
+      "idShape": true,
+      "storageKind": "managed_cache"
+    },
+    "note": {
+      "displayName": "note.md",
+      "idShape": true,
+      "listed": true,
+      "origin": "user_attachment",
+      "size": 40,
+      "storageKind": "external"
+    }
+  },
+  "sidecar": {
+    "version": 1
+  },
+  "sourceSurvivesDiscard": true
+}

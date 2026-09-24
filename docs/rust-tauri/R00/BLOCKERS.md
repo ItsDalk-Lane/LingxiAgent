@@ -1,6 +1,6 @@
 # R00 阻塞登记（BLOCKERS.md）
 
-生成：`docs/rust-tauri/R00/r00_t07_build_map.py`｜基准 HEAD `4401afae2ee48df1512b8a8c9a1262be0efbe64f`｜配套账本 `ACCEPTANCE_MAP.json`。
+生成：`docs/rust-tauri/R00/r00_t07_build_map.py`｜基准 HEAD `e0b7be6108c4d5bc873061dee279b7163ca78a41`｜配套账本 `ACCEPTANCE_MAP.json`。
 状态语义遵循 01 通用约束 §6：BLOCKED 表示已到执行时点但缺凭证/平台/授权；
 未来阶段场景保持 NOT_STARTED/SPECIFIED_NOT_EXECUTED，其外部依赖在此预登记（anticipated），
 到对应阶段仍缺条件时转为 active BLOCKED，不预写 FAIL、不伪造 PASS。
@@ -31,6 +31,6 @@
 | 场景 kind supplemental | 736 |
 | 场景 kind t07_added | 16 |
 | ledger_status NOT_RUN_UNAUTHORIZED | 1 |
-| ledger_status NOT_STARTED | 185 |
-| ledger_status PASS | 30 |
+| ledger_status NOT_STARTED | 183 |
+| ledger_status PASS | 32 |
 | ledger_status SPECIFIED_NOT_EXECUTED | 736 |

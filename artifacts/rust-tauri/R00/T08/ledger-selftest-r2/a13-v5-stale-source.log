@@ -1,0 +1,10 @@
+# variant a13/v5-stale-source: 结果监控的源码在运行后被修改（结果过期）
+# tamper: tamper_v5
+# validator: r00_t07_validate_ledger.py --root <isolated:a13-v5-stale-source> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=2/2
+# --- stdout ---
+LEDGER-ERROR STALE-SOURCE result=RES-R00-A09 monitored source 'scripts/rust-tauri/r00-t05-replay.mjs' changed: sha256 4af47484125988b6e21b80fbef0faf334cecde6b4ce070d1f2ae2841ca8b55ef != recorded 283ff9fc7aee25ae6ad2a04986d64cd0b1178823ac974f311cc98c02a9f1fde1 (result is stale relative to source change; re-run required)
+LEDGER-ERROR TESTS-HASH test=T-012 test 'scripts/rust-tauri/r00-t05-replay.mjs' sha256 differs from recorded
+LEDGER_INVALID errors=2 checks=14945
+# --- stderr ---
+(empty)

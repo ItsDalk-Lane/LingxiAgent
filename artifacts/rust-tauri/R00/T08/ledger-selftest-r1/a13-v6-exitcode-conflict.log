@@ -1,0 +1,12 @@
+# variant a13/v6-exitcode-conflict: exit_code=1 却保持 status=PASS（跳过/失败冒充通过）
+# tamper: tamper_v6
+# validator: r00_t07_validate_ledger.py --root <isolated:a13-v6-exitcode-conflict> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=1/1
+# --- stdout ---
+LEDGER-ERROR EXIT-CODE-CONFLICT result=RES-R00-A10 exit_code=1 but status=PASS (nonzero exit must be FAIL or BLOCKED)
+LEDGER-ERROR EXIT-CODE-CONFLICT result=RES-R00-A10 status=PASS but raw exit_code=1 (skipped/failed run must not be PASS)
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A13 field 'committed_in' is null but tested_sha != basis.head (only current-task results at HEAD may be commit-pending; tested_sha=4401afae2ee48df1512b8a8c9a1262be0efbe64f, basis.head=e0b7be6108c4d5bc873061dee279b7163ca78a41)
+LEDGER-ERROR RESULT-BAD-FIELD result=RES-R00-A14 field 'committed_in' is null but tested_sha != basis.head (only current-task results at HEAD may be commit-pending; tested_sha=4401afae2ee48df1512b8a8c9a1262be0efbe64f, basis.head=e0b7be6108c4d5bc873061dee279b7163ca78a41)
+LEDGER_INVALID errors=4 checks=14946
+# --- stderr ---
+(empty)

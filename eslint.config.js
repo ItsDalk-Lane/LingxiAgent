@@ -69,6 +69,8 @@ export default [
       'tests/**/*.{js,mjs,ts,tsx}',
       // 同步审计脚本是入版本控制的 node 工具（build-sync-matrix/migration-smoke 等）
       '.sync-audit/**/*.{js,mjs}',
+      // docs/ 下随仓库分发的 node 工具脚本（如 docs/rust-tauri/** 的盘点/校验器）
+      'docs/**/*.{js,mjs}',
     ],
     languageOptions: {
       globals: {
