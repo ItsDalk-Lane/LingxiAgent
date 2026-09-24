@@ -4862,5 +4862,184 @@
     "log": "logs/release-gate-v043i.log",
     "logSha256": "85022767f8ffac6622ac5a0d7c99bfadc0966ad9df05019dc37ca04134803d61",
     "sourceManifestHash": "caa20e9007efcbc0292fb38e8f22aff4475994fb8e7c2ecdb7689fee878772d3"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T10:17:46.776868+00:00",
+    "end": "2026-09-24T10:18:13.005107+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725",
+    "log": "logs/r00-seal-r1-typecheck.log",
+    "logSha256": "f77f0aee2cec1685d75d5da5d8756fa5af0fc37cd7eabff815df7f5d3e527e13",
+    "sourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck:core-contracts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T10:18:13.305911+00:00",
+    "end": "2026-09-24T10:18:14.542133+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725",
+    "log": "logs/r00-seal-r1-contracts.log",
+    "logSha256": "9a3a2b6ce40e47627287266176c6142f859d948935aa73c756c0a6e541a2ced7",
+    "sourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "lint:boundary"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T10:18:14.847686+00:00",
+    "end": "2026-09-24T10:18:16.045889+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725",
+    "log": "logs/r00-seal-r1-boundary.log",
+    "logSha256": "8560904e516cd5a5118bf780c3d9ddf190b29834c49ccde649878250d9c464ff",
+    "sourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T10:18:16.349489+00:00",
+    "end": "2026-09-24T10:18:34.681338+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725",
+    "log": "logs/r00-seal-r1-lint.log",
+    "logSha256": "41453a17f0ca5867bb2224f17e7ae46840262a8877481727d99466cc86cf92cb",
+    "sourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "build:renderer"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T10:18:34.994686+00:00",
+    "end": "2026-09-24T10:18:43.091821+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725",
+    "log": "logs/r00-seal-r1-build-renderer.log",
+    "logSha256": "9d21a53d75059cc9cd946b6acea5624367b34b39bd4142d7933d1bb65d74ef83",
+    "sourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725"
+  },
+  {
+    "command": [
+      "python3",
+      "artifacts/f1-f12-repair/round2/create-delivery-patch.py"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T10:18:58.123204+00:00",
+    "end": "2026-09-24T10:19:10.313166+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725",
+    "log": "logs/r00-seal-r1-patch-r2.log",
+    "logSha256": "297a7537093e7644732b5cf6ad8d01ab4738e87141ed7e39935d0d2c1c4dd34a",
+    "sourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725"
+  },
+  {
+    "command": [
+      "npm",
+      "test"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T10:19:10.621185+00:00",
+    "end": "2026-09-24T10:20:45.488844+00:00",
+    "exitCode": 1,
+    "counts": {
+      "passed": 14897,
+      "failed": 1,
+      "skipped": 15,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725",
+    "log": "logs/r00-seal-r1-full.log",
+    "logSha256": "7d48138d8360b293c01448ae2fbcab0aa76fcb6df4048b1caec108e13d00205d",
+    "sourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/round2-delivery-evidence.test.ts",
+      "tests/round3-delivery-evidence.test.ts",
+      "tests/upstream-sync-matrix.test.ts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-24T10:20:45.799183+00:00",
+    "end": "2026-09-24T10:20:58.406066+00:00",
+    "exitCode": 0,
+    "counts": {
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725",
+    "log": "logs/r00-seal-r1-green.log",
+    "logSha256": "e86c6ec55fef22892d81cdc4eb32f5439f754eba3ffe2dc95391837347e228ae",
+    "sourceManifestHash": "75be3f38319d17ef6a985b357fe7118ab671221d65a559a66a2231be179aa725"
   }
 ]

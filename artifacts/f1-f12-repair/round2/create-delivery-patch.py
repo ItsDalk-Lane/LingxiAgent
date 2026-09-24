@@ -10,8 +10,8 @@ import tempfile
 BASE = "89bc0b64bf0a9b84ef3532efaa66c23213affb70"
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 OUT = ROOT / "artifacts/f1-f12-repair/round2"
-# 存储为确定性 gzip（mtime=0）：补丁体积随分支积压增长，v0.1.43 起 107MB 超
-# GitHub 单文件 100MB 硬限；压缩后 22MB。重放验证仍对未压缩原始字节执行，语义不变。
+# 存储为确定性 gzip（mtime=0）：补丁体积随分支积压增长，v0.1.43 起未压缩体积
+# 超 GitHub 单文件 100MB 硬限；压缩后低于该限。重放验证仍对未压缩原始字节执行，语义不变。
 PATCH = OUT / "patches/89bc0b64-to-r01-r10-source.patch.gz"
 
 
@@ -26,10 +26,23 @@ def keep(relative: str) -> bool:
 
 
 def stage_current(index_name: str) -> None:
-    """BASE + 当前树（artifacts 只保留 *.py）→ 临时 index。补丁与校验共用。"""
+    """当前已跟踪树 + 未忽略新文件 → 临时 index。补丁与校验共用。
+
+    起点是真实 index 的全部已跟踪条目（ls-files -s 经 update-index --index-info
+    逐项回放），而非 BASE read-tree：相对 BASE 新增、已跟踪却匹配 .gitignore 的
+    证据文件（artifacts/refactor-2026/**、artifacts/rust-tauri/R00/**）在空 index
+    下会被 git add 当作未跟踪忽略文件跳过（C1 独立审查 F2，曾漏 932 条）。
+    回放后 git add -A 只再纳入未忽略的新文件。
+    """
+    probe_env = os.environ.copy()
+    probe_env.pop("GIT_INDEX_FILE", None)
+    cached = subprocess.check_output(["git", "ls-files", "-s", "-z"], cwd=ROOT, env=probe_env)
     env = os.environ.copy()
     env["GIT_INDEX_FILE"] = index_name
-    subprocess.run(["git", "read-tree", BASE], cwd=ROOT, env=env, check=True)
+    subprocess.run(
+        ["git", "update-index", "-z", "--index-info"],
+        cwd=ROOT, env=env, input=cached, check=True,
+    )
     subprocess.run(["git", "add", "-A", "--", "."], cwd=ROOT, env=env, check=True)
     subprocess.run(
         ["git", "reset", "-q", BASE, "--", "artifacts/f1-f12-repair"],
@@ -41,15 +54,18 @@ def stage_current(index_name: str) -> None:
         if path.is_file()
     )
     if python_files:
-        subprocess.run(["git", "add", "--", *python_files], cwd=ROOT, env=env, check=True)
+        # 显式路径逐个加入：忽略规则对显式路径仍生效，-f 保证已跟踪脚本必入。
+        subprocess.run(["git", "add", "-f", "--", *python_files], cwd=ROOT, env=env, check=True)
 
 
-def manifest_from_index(index_name: str) -> bytes:
-    """从临时 index 的 blob（git 归一化字节）计算源码 manifest。
+def rows_from_index(index_name: str) -> list[dict]:
+    """从临时 index 的 blob（git 归一化字节）逐条计算 path/bytes/sha256。
 
     不再读工作树字节：Windows autocrlf 会把工作树字节与 blob 字节拆开
     （CRLF/LF），导致 current 与 replay 天然不一致（R10-09 Windows CI 实测）。
-    两侧统一走 index blob 后，行尾归一化由 git 同一套规则处理。
+    两侧统一走 index blob 后，行尾归一化由 git 同一套规则处理；仓库
+    .gitattributes 强制 text=auto eol=lf，blob 字节与工作树字节一致，
+    因此重放结果可再与冻结 SOURCE_MANIFEST.json（工作树字节）逐项对盘。
     """
     env = os.environ.copy()
     env["GIT_INDEX_FILE"] = index_name
@@ -84,6 +100,10 @@ def manifest_from_index(index_name: str) -> bytes:
         blob = stdout[start:end]
         rows.append({"path": relative, "bytes": len(blob), "sha256": sha256(blob)})
         offset = end + 1
+    return rows
+
+
+def manifest_from_rows(rows: list[dict]) -> bytes:
     manifest = {
         "sourceIdentity": {"kind": "worktree", "base": BASE},
         "exclusions": [
@@ -94,6 +114,10 @@ def manifest_from_index(index_name: str) -> bytes:
         "files": rows,
     }
     return (json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
+
+
+def manifest_from_index(index_name: str) -> bytes:
+    return manifest_from_rows(rows_from_index(index_name))
 
 
 def temp_index(prefix: str) -> str:
@@ -140,10 +164,28 @@ def replay_and_verify(patch: bytes, stored: bytes) -> dict:
         )
         if apply.returncode != 0:
             raise RuntimeError(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
-        replayed = manifest_from_index(replay_index)
+        replay_rows = rows_from_index(replay_index)
+        replayed = manifest_from_rows(replay_rows)
         if replayed != current:
             raise RuntimeError(
                 f"replayed source manifest mismatch: current={sha256(current)} replay={sha256(replayed)}"
+            )
+        # 与完整冻结 SOURCE_MANIFEST.json 逐项对盘（路径 + 字节数 + SHA-256），
+        # 不只比较生成 index 与重放 index（C1 独立审查 F2）。
+        frozen_raw = (OUT / "SOURCE_MANIFEST.json").read_bytes()
+        frozen = json.loads(frozen_raw.decode())["files"]
+        if replay_rows != frozen:
+            replay_by_path = {row["path"]: row for row in replay_rows}
+            frozen_by_path = {row["path"]: row for row in frozen}
+            diff_paths = sorted(
+                (set(replay_by_path) ^ set(frozen_by_path))
+                | {p for p in replay_by_path.keys() & frozen_by_path.keys()
+                   if replay_by_path[p] != frozen_by_path[p]}
+            )
+            raise RuntimeError(
+                "replayed source tree does not cover frozen SOURCE_MANIFEST.json: "
+                f"replayed={len(replay_rows)} frozen={len(frozen)} "
+                f"firstDiff={json.dumps(diff_paths[:3], ensure_ascii=False)}"
             )
         return {
             "base": BASE,
@@ -153,6 +195,9 @@ def replay_and_verify(patch: bytes, stored: bytes) -> dict:
             "patchUncompressedBytes": len(patch),
             "sourceManifestHash": sha256(current),
             "replayedSourceManifestHash": sha256(replayed),
+            "frozenSourceManifestHash": sha256(frozen_raw),
+            "frozenManifestEntries": len(frozen),
+            "replayedMatchesFrozenManifest": True,
             "result": "VERIFIED",
         }
     finally:

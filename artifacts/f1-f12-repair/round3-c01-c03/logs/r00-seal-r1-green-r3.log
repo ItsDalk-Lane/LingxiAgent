@@ -1,0 +1,15 @@
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/upstream-sync-matrix.test.ts (7 tests) 44ms
+ ✓ tests/round3-delivery-evidence.test.ts (5 tests) 785ms
+     ✓ round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试  675ms
+ ✓ tests/round2-delivery-evidence.test.ts (10 tests) 11467ms
+     ✓ R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁  663ms
+     ✓ R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示  319ms
+     ✓ R10-09: 增量补丁从干净 89bc0b64 重放后，源码摘要与当前工作树完全一致  10141ms
+
+ Test Files  3 passed (3)
+      Tests  22 passed (22)
+   Start at  18:20:59
+   Duration  11.57s (transform 88ms, setup 57ms, import 50ms, tests 12.30s, environment 0ms)

@@ -2,9 +2,14 @@
 """round3（C01-C03）增量补丁生成与重放验证 — temp-index 技法（同 round2）。
 
 防自我嵌套：补丁输出文件从 staging 摘除（否则每代嵌入上一代，体积递归膨胀，
-曾涨到 116MB 超 GitHub 硬限）。current 与 replay 两侧的源码 manifest 都从
-git index blob（归一化字节）计算：Windows autocrlf 会拆开工作树字节与 blob
-字节（CRLF/LF），读工作树的对比在 Windows 上天然不一致。
+曾涨到 116MB 超 GitHub 硬限）。临时 index 以真实 index 的已跟踪条目逐项回放
+为起点：相对 BASE 新增、已跟踪却匹配 .gitignore 的证据文件在空 index 下会被
+git add 当作未跟踪忽略文件跳过（C1 独立审查 F2，曾漏 932 条）。current 与
+replay 两侧的源码 manifest 都从 git index blob（归一化字节）计算：Windows
+autocrlf 会拆开工作树字节与 blob 字节（CRLF/LF），读工作树的对比在 Windows
+上天然不一致；仓库 .gitattributes 强制 text=auto eol=lf，blob 字节与工作树
+字节一致，因此重放结果再与完整冻结 SOURCE_MANIFEST.json 逐项对盘
+（路径 + 字节数 + SHA-256），不只比较生成 index 与重放 index。
 输出 JSON 摘要（exit 0 = VERIFIED）。
 """
 import gzip
@@ -18,8 +23,8 @@ import tempfile
 BASE = "67dee5d2de9d3b9fc75ec5ef5c555e93c65b3ccd"
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 OUT = ROOT / "artifacts/f1-f12-repair/round3-c01-c03"
-# 存储为确定性 gzip（mtime=0）：补丁体积随分支积压增长，v0.1.43 起 310MB 超
-# GitHub 单文件 100MB 硬限；压缩后 69MB。重放验证仍对未压缩原始字节执行，语义不变。
+# 存储为确定性 gzip（mtime=0）：补丁体积随分支积压增长，v0.1.43 起未压缩体积
+# 超 GitHub 单文件 100MB 硬限；压缩后低于该限。重放验证仍对未压缩原始字节执行，语义不变。
 PATCH = OUT / "patches/67dee5d2-to-round3-c01-c03.patch.gz"
 
 
@@ -47,7 +52,7 @@ def temp_index(prefix: str) -> str:
     return name
 
 
-def manifest_from_index(index_name: str) -> bytes:
+def rows_from_index(index_name: str) -> list[dict]:
     env = os.environ.copy()
     env["GIT_INDEX_FILE"] = index_name
     listing = subprocess.check_output(["git", "ls-files", "-s", "-z"], cwd=ROOT, env=env)
@@ -81,15 +86,36 @@ def manifest_from_index(index_name: str) -> bytes:
         blob = stdout[start:end]
         rows.append({"path": relative, "bytes": len(blob), "sha256": sha256(blob)})
         offset = end + 1
+    return rows
+
+
+def manifest_from_rows(rows: list[dict]) -> bytes:
     manifest = {"sourceIdentity": {"kind": "worktree", "base": BASE}, "exclusions": EXCLUSIONS, "files": rows}
     return (json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
 
 
+def manifest_from_index(index_name: str) -> bytes:
+    return manifest_from_rows(rows_from_index(index_name))
+
+
 def stage_current(index_name: str) -> None:
-    """BASE + 当前树 → 临时 index；补丁输出自身摘除（防自我嵌套）。"""
+    """当前已跟踪树 + 未忽略新文件 → 临时 index；补丁输出自身摘除（防自我嵌套）。
+
+    起点是真实 index 的全部已跟踪条目（ls-files -s 经 update-index --index-info
+    逐项回放），而非 BASE read-tree：相对 BASE 新增、已跟踪却匹配 .gitignore 的
+    证据文件（artifacts/refactor-2026/**、artifacts/rust-tauri/R00/**）在空 index
+    下会被 git add 当作未跟踪忽略文件跳过（C1 独立审查 F2，曾漏 932 条）。
+    回放后 git add -A 只再纳入未忽略的新文件。
+    """
+    probe_env = os.environ.copy()
+    probe_env.pop("GIT_INDEX_FILE", None)
+    cached = subprocess.check_output(["git", "ls-files", "-s", "-z"], cwd=ROOT, env=probe_env)
     env = os.environ.copy()
     env["GIT_INDEX_FILE"] = index_name
-    subprocess.run(["git", "read-tree", BASE], cwd=ROOT, env=env, check=True)
+    subprocess.run(
+        ["git", "update-index", "-z", "--index-info"],
+        cwd=ROOT, env=env, input=cached, check=True,
+    )
     subprocess.run(["git", "add", "-A", "--", "."], cwd=ROOT, env=env, check=True)
     subprocess.run(
         ["git", "rm", "--cached", "-q", "--ignore-unmatch", "--", str(PATCH.relative_to(ROOT))],
@@ -125,25 +151,47 @@ def main() -> None:
         )
         if apply.returncode != 0:
             raise SystemExit(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
-        replayed = manifest_from_index(replay_index)
+        replay_rows = rows_from_index(replay_index)
+        replayed = manifest_from_rows(replay_rows)
     finally:
         for name in (current_index, replay_index):
             if os.path.exists(name):
                 os.unlink(name)
 
     identical = replayed == current
+    # 与完整冻结 SOURCE_MANIFEST.json 逐项对盘（路径 + 字节数 + SHA-256），
+    # 不只比较生成 index 与重放 index（C1 独立审查 F2）。
+    frozen_raw = (OUT / "SOURCE_MANIFEST.json").read_bytes()
+    frozen = json.loads(frozen_raw.decode())["files"]
+    covers_frozen = replay_rows == frozen
     result = {
         "base": BASE,
-        "result": "VERIFIED" if identical else "MISMATCH",
+        "result": "VERIFIED" if identical and covers_frozen else "MISMATCH",
         "patch": str(PATCH.relative_to(ROOT)),
         "patchBytes": len(stored),
         "patchSha256": sha256(stored),
         "patchUncompressedBytes": len(patch),
         "sourceManifestHash": sha256(current),
         "replayedSourceManifestHash": sha256(replayed),
+        "frozenSourceManifestHash": sha256(frozen_raw),
+        "frozenManifestEntries": len(frozen),
+        "replayedMatchesFrozenManifest": covers_frozen,
     }
     print(json.dumps(result, ensure_ascii=False, indent=2))
-    if not identical:
+    if not identical or not covers_frozen:
+        if not covers_frozen:
+            replay_by_path = {row["path"]: row for row in replay_rows}
+            frozen_by_path = {row["path"]: row for row in frozen}
+            diff_paths = sorted(
+                (set(replay_by_path) ^ set(frozen_by_path))
+                | {p for p in replay_by_path.keys() & frozen_by_path.keys()
+                   if replay_by_path[p] != frozen_by_path[p]}
+            )
+            print(
+                "replayed source tree does not cover frozen SOURCE_MANIFEST.json: "
+                f"replayed={len(replay_rows)} frozen={len(frozen)} "
+                f"firstDiff={json.dumps(diff_paths[:3], ensure_ascii=False)}"
+            )
         raise SystemExit(1)
 
 
