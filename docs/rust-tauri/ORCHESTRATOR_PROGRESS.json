@@ -4,7 +4,7 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "9b2c7f11fc0fd9ece3954794acf90a213bac3c5a",
+  "current_head": "58e00b53d9fc6be03d64f51e33313f3f0063a51a",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -106,7 +106,11 @@
       "stage_review_report": "docs/rust-tauri/R00/R00_STAGE_REVIEW_R2.md",
       "stage_review_report_sha256": "4bf1363f027295e187f2c4d52c85071e255309aba94248495e6413ceee420bec",
       "stage_review_r1_report_sha256": "7284b8faeead270b40ca8753d91dcac2211d0d7a4757c67b8e45a6e69d3ef7aa",
-      "stage_findings": ["F1", "F2", "F3"],
+      "stage_findings": [
+        "F1",
+        "F2",
+        "F3"
+      ],
       "stage_repair_agent_id": "ZCode:R00 阶段修复 R1（ZCode）",
       "stage_repair_report": "docs/rust-tauri/R00/R00_STAGE_REPAIR_R1.md",
       "stage_repair_report_sha256": "6c71dd6c7a3d64547d3b4990563c60f854cfb7fed8252631b57e5dc669451b73",
@@ -115,7 +119,7 @@
     },
     "R01": {
       "title": "目标契约与高风险替代验证",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "task_ids": [
         "R01-T01",
         "R01-T02",
@@ -126,11 +130,12 @@
         "R01-T07",
         "R01-T08"
       ],
-      "stage_base_sha": null,
+      "stage_base_sha": "328cc8bb5a807bdaad520b459907fb1fa4e10dca",
       "stage_review_round": 0,
       "stage_verdict": null,
       "stage_acceptance_commit_sha": null,
-      "blockers": []
+      "blockers": [],
+      "r01_stage_controller_note": "R01 stage controller = ZCode session (this thread), started 2026-09-25. Preconditions verified: HEAD==origin/codex/rust-tauri-migration==C4 (R00 official seal), worktree clean. Per-T: fresh executor agent -> fresh independent reviewer agent -> on FAIL fresh repair + fresh re-review agents -> commit/push only after PASS."
     },
     "R02": {
       "title": "Rust独立服务、存储与事件基础",
@@ -960,23 +965,106 @@
     "R01-T01": {
       "name": "确定模块和进程所有权",
       "stage_id": "R01",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
-      "repair_agent_id": null,
+      "status": "DONE",
+      "task_base_sha": "328cc8bb5a807bdaad520b459907fb1fa4e10dca",
+      "executor_id": "ZCode:R01-T01-exec-r1 (agent_6770d863-35a1-47be-ac7e-a539f1a8862c)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 3,
+      "reviewer_id": "ZCode:R01-T01-review-r3 (agent_b6391444-caad-42e1-a15c-a6ef6358cd9d)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-F1",
+          "severity": "HIGH",
+          "summary": "校验器 transitive_deps 混用下划线 dep 名与连字符包名，DEP-03/04 永不命中、闭包断裂、D2 恒空",
+          "review_report": "docs/rust-tauri/R01/R01-T01_REVIEW_R1.md",
+          "resolution": "repair-r1 修复（包ID建图+双侧归一+D5+N8-N10），R2 复验关闭"
+        },
+        {
+          "id": "R1-F2",
+          "severity": "LOW",
+          "summary": "authoritative store 可映射 tauri-host 无机器执法",
+          "review_report": "docs/rust-tauri/R01/R01-T01_REVIEW_R1.md",
+          "resolution": "repair-r1 新增 O8+N11"
+        },
+        {
+          "id": "R1-F3",
+          "severity": "LOW",
+          "summary": "shadow 关键事实可绕过",
+          "review_report": "docs/rust-tauri/R01/R01-T01_REVIEW_R1.md",
+          "resolution": "repair-r1 锁死 11 条精确集合+N12"
+        },
+        {
+          "id": "R2-G1",
+          "severity": "MEDIUM",
+          "summary": "未登记 workspace 成员绕过 DEP-07（stealth-crate 带 tauri 被真实编译而校验器 OK）",
+          "review_report": "docs/rust-tauri/R01/R01-T01_REVIEW_R2.md",
+          "resolution": "repair-r2 D5 反向闭合+N13，R3 复验关闭"
+        },
+        {
+          "id": "R2-G2",
+          "severity": "LOW",
+          "summary": "未激活 optional 依赖声明逃逸 resolve 图",
+          "review_report": "docs/rust-tauri/R01/R01-T01_REVIEW_R2.md",
+          "resolution": "repair-r2 manifest 级声明扫描+N14，R3 复验关闭且无误杀"
+        },
+        {
+          "id": "R2-G3",
+          "severity": "LOW",
+          "summary": "O8 writer 前缀匹配可绕过（rust-service-fork）",
+          "review_report": "docs/rust-tauri/R01/R01-T01_REVIEW_R2.md",
+          "resolution": "repair-r2 锁定词表精确匹配+N15，R3 复验关闭"
+        },
+        {
+          "id": "R2-G4",
+          "severity": "INFO",
+          "summary": "归一化子串匹配存在误杀方向（taos 误中 tao），无误放",
+          "review_report": "docs/rust-tauri/R01/R01-T01_REVIEW_R2.md",
+          "resolution": "评估后不改：fail-safe 单向、当前零第三方依赖无现实误杀对象；R3 复验认可理由"
+        }
+      ],
+      "repair_agent_id": "ZCode:R01-T01-repair-r1 (agent_9f0f162b) + ZCode:R01-T01-repair-r2 (agent_cc8228c1)",
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R01-A01": "NOT_STARTED",
-        "R01-A02": "NOT_STARTED"
+        "R01-A01": "PASS",
+        "R01-A02": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "58e00b53d9fc6be03d64f51e33313f3f0063a51a",
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "review_report": "docs/rust-tauri/R01/R01-T01_REVIEW_R3.md",
+      "review_report_sha256": "f556a368a60f4ea909b808d1716d308bdd39077cc2952017e5555b1335d42ff7",
+      "review_history": [
+        {
+          "round": 1,
+          "verdict": "FAIL",
+          "report": "docs/rust-tauri/R01/R01-T01_REVIEW_R1.md",
+          "sha256": "99e8a125dffae35e2f10ffd35bd1172cf0b2faada1e9f11e934da6aa706865a4"
+        },
+        {
+          "round": "repair-1",
+          "report": "docs/rust-tauri/R01/R01-T01_REPAIR_R1.md",
+          "sha256": "da816e4e03797cb21b497e00960c802945f41be66728e9fe47c415d50a816e29"
+        },
+        {
+          "round": 2,
+          "verdict": "FAIL",
+          "report": "docs/rust-tauri/R01/R01-T01_REVIEW_R2.md",
+          "sha256": "9a4575c18823d9d6fd367750a0cf4b9172694a3274f87d716d12036b4ee9b785"
+        },
+        {
+          "round": "repair-2",
+          "report": "docs/rust-tauri/R01/R01-T01_REPAIR_R2.md",
+          "sha256": "cb9160ef72f298c8b439a66368a9f6e0defe6e7d0068afda3ca22976f166d0c5"
+        },
+        {
+          "round": 3,
+          "verdict": "PASS",
+          "report": "docs/rust-tauri/R01/R01-T01_REVIEW_R3.md",
+          "sha256": "f556a368a60f4ea909b808d1716d308bdd39077cc2952017e5555b1335d42ff7"
+        }
+      ],
+      "repair_rounds_completed": 2
     },
     "R01-T02": {
       "name": "定义单一协议源及兼容边界",
@@ -2890,7 +2978,7 @@
       "blockers": []
     }
   },
-  "current_task": "R00-SEAL",
+  "current_task": "R01-T01",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",
