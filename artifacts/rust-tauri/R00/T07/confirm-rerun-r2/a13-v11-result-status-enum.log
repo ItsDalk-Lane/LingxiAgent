@@ -1,0 +1,10 @@
+# variant a13/v11-result-status-enum: result.status 写入非法枚举 MAYBE_PASSED（R1 反例②）
+# tamper: tamper_v11
+# validator: r00_t07_validate_ledger.py --root <isolated:a13-v11-result-status-enum> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=3/3
+# --- stdout ---
+LEDGER-ERROR RESULT-STATUS-ENUM result=RES-R00-A09 field 'status' value 'MAYBE_PASSED' not in allowed result status set ['BLOCKED', 'FAIL', 'NOT_APPLICABLE', 'NOT_RUN', 'PASS', 'STALE'] (a result may not invent ambiguous outcome values)
+LEDGER-ERROR STATUS-RESULT-CONFLICT scenario=R00-A09 result=RES-R00-A09 field 'status' is 'MAYBE_PASSED' but scenario ledger_status=PASS (PASS scenario requires every bound result to be PASS; real FAIL/BLOCKED must not be presented as passed)
+LEDGER_INVALID errors=2 checks=14828
+# --- stderr ---
+(empty)

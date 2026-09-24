@@ -1,0 +1,9 @@
+# variant a13/v2-evidence-deleted: 删除已 PASS 结果引用的证据文件
+# tamper: tamper_v2
+# validator: r00_t07_validate_ledger.py --root <isolated:a13-v2-evidence-deleted> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=2/2
+# --- stdout ---
+LEDGER-ERROR EVIDENCE-MISSING-FILE result=RES-R00-A01 evidence file 'artifacts/rust-tauri/R00/T01/startup-probe.json' does not exist (deleted log)
+LEDGER_INVALID errors=1 checks=14660
+# --- stderr ---
+(empty)

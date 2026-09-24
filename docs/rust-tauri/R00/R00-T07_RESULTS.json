@@ -1,0 +1,446 @@
+{
+  "spec_version": "1.0",
+  "task_id": "R00-T07",
+  "artifact_kind": "EXECUTION_RESULTS_LEDGER",
+  "description": "R00 阶段 A01–A14 已执行结果的权威执行侧记录。由 r00_t07_build_map.py 读入并内嵌到 ACCEPTANCE_MAP.json（账本本体）；本文件是数据来源，不直接被校验器消费。A01/A02 直接转录 artifacts/rust-tauri/R00/T01 下 T01 最终 result JSON；A03–A12 依据 T02–T06 报告的实测命令/退出码/证据提炼；A13/A14 为 T07 自测（负向/增删反例）。时间戳基准见各记录 timestamp_basis。",
+  "provenance_note": "tested_sha = 执行时的任务基线树（各任务报告声明的 Task base HEAD）；committed_in = 该任务交付入库的提交。两者均在当前分支 codex/rust-tauri-migration 的历史中（校验器做祖先校验）。",
+  "common_environment": {
+    "platform": "macOS 27.0 darwin arm64",
+    "toolchain": { "node": "v24.16.0", "npm": "11.13.0", "python": "3.14.3", "vitest": "4.1.10" },
+    "isolation": "本机隔离环境；外部协议使用确定性替身（各任务报告声明）；未读真实用户数据、未调用真实供应商/付费 API、无真实外发"
+  },
+  "results": [
+    {
+      "result_id": "RES-R00-A01",
+      "acceptance_id": "R00-A01",
+      "task_id": "R00-T01",
+      "status": "PASS",
+      "tested_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+      "committed_in": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+      "timestamp_utc": "2026-09-23T05:36:29.484622+00:00",
+      "timestamp_basis": "T01 最终 result JSON 记录的机器时间戳",
+      "working_tree_digest": "8866ff76394cfc372da6d783b047dfb3d587967e1ce71e8a25310386f339a8cd",
+      "working_tree_digest_scope": "HEAD + preexisting tracked deletion diff + original untracked taskbook file hashes + package-lock; generated R00 evidence excluded to avoid self-reference",
+      "platform": "macOS 27.0 arm64",
+      "toolchain": { "node": "v24.16.0", "npm": "11.13.0", "python": "3.14.3", "vitest": "4.1.10" },
+      "dependency_lock_hashes": { "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b" },
+      "command": "python3 -B artifacts/rust-tauri/R00/T01/startup_probe_r2.py",
+      "exit_code": 0,
+      "expected": "真实目录设只读哨兵、隔离 LINGXI_HOME 启动与关闭后：生产目录哈希与哨兵不变，日志与数据只在测试目录，系统拒写真实 HOME",
+      "observed": "隔离服务健康检查 200/ok、退出码 0；两处真实 0400 哨兵与完整目录摘要前后不变；HOME/TMPDIR/LINGXI_HOME/数据/日志均在 /tmp 隔离目录；哨兵与隔离目录安全清除（T01 最终报告实测表；R1–R4 全部过程记录保留）",
+      "stub_boundary": ["未调用外部模型或账户；本机健康检查和真实服务无 mock"],
+      "source_paths": [
+        "artifacts/rust-tauri/R00/T01/startup_probe_r2.py",
+        "artifacts/rust-tauri/R00/T01/worktree_verify_r2.py"
+      ],
+      "evidence": [
+        { "path": "artifacts/rust-tauri/R00/T01/R00-A01.result.json", "role": "final machine result record (supersedes result-r1)" },
+        { "path": "artifacts/rust-tauri/R00/T01/startup-probe.json", "role": "probe output" },
+        { "path": "artifacts/rust-tauri/R00/T01/sandbox-denial.txt", "role": "sandbox denial proof" },
+        { "path": "artifacts/rust-tauri/R00/T01/isolated-tree-summary.json", "role": "isolated dir summary" },
+        { "path": "artifacts/rust-tauri/R00/T01/server-stdout.txt", "role": "server stdout" },
+        { "path": "artifacts/rust-tauri/R00/T01/server-stderr.txt", "role": "server stderr" },
+        { "path": "artifacts/rust-tauri/R00/T01/probe-regression-r4-final.txt", "role": "R4 regression matrix" },
+        { "path": "docs/rust-tauri/R00/R00-T01_REPORT.md", "role": "executor report" }
+      ]
+    },
+    {
+      "result_id": "RES-R00-A02",
+      "acceptance_id": "R00-A02",
+      "task_id": "R00-T01",
+      "status": "PASS",
+      "tested_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+      "committed_in": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+      "timestamp_utc": "2026-09-23T05:36:29.486563+00:00",
+      "timestamp_basis": "T01 最终 result JSON 记录的机器时间戳",
+      "working_tree_digest": "8866ff76394cfc372da6d783b047dfb3d587967e1ce71e8a25310386f339a8cd",
+      "working_tree_digest_scope": "HEAD + preexisting tracked deletion diff + original untracked taskbook file hashes + package-lock; generated R00 evidence excluded to avoid self-reference",
+      "platform": "macOS 27.0 arm64",
+      "toolchain": { "node": "v24.16.0", "npm": "11.13.0", "python": "3.14.3", "vitest": "4.1.10" },
+      "dependency_lock_hashes": { "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b" },
+      "command": "python3 -B artifacts/rust-tauri/R00/T01/worktree_verify_r2.py",
+      "exit_code": 0,
+      "expected": "工作区含无关未提交文件时运行基线收集：不覆盖、不丢弃、不混入交付；差异报告能区分已有改动",
+      "observed": "以首次快照为锚：17 个已跟踪删除及二进制 diff 不变、33 个原有未跟踪文件集合与逐项哈希不变、暂存区与其他已跟踪差异为空、HEAD/分支不变；候选增删改负向均使总校验非零（candidate-negative-r4-final2）",
+      "stub_boundary": ["未调用外部模型或账户；本机健康检查和真实服务无 mock"],
+      "source_paths": [
+        "artifacts/rust-tauri/R00/T01/worktree_verify_r2.py",
+        "artifacts/rust-tauri/R00/T01/worktree_current.py"
+      ],
+      "evidence": [
+        { "path": "artifacts/rust-tauri/R00/T01/R00-A02.result.json", "role": "final machine result record" },
+        { "path": "artifacts/rust-tauri/R00/T01/worktree-before.json", "role": "worktree snapshot anchor" },
+        { "path": "artifacts/rust-tauri/R00/T01/worktree-preservation-r2.json", "role": "preservation proof" },
+        { "path": "artifacts/rust-tauri/R00/T01/candidate-negative-r4-final2.txt", "role": "tamper negative matrix" },
+        { "path": "docs/rust-tauri/R00/R00-T01_REPORT.md", "role": "executor report" }
+      ]
+    },
+    {
+      "result_id": "RES-R00-A03",
+      "acceptance_id": "R00-A03",
+      "task_id": "R00-T02",
+      "status": "PASS",
+      "tested_sha": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+      "committed_in": "4b4a1d98f6d2d0e03f9573aa75b7992efed03db6",
+      "timestamp_utc": "2026-09-23T15:02:32+00:00",
+      "timestamp_basis": "T02 交付提交时间（原始运行墙钟未机器记录；运行先于提交，见 T02 报告）",
+      "working_tree_digest": null,
+      "working_tree_digest_scope": "以 ENTRYPOINT_COVERAGE.json/FEATURE_INVENTORY.json 逐文件 SHA-256 为内容基准（T02 冻结指纹，见 R00-T02_REPORT.md）",
+      "platform": "macOS 27.0 arm64",
+      "toolchain": { "node": "v24.16.0", "npm": "11.13.0", "python": "3.14.3", "vitest": "4.1.10" },
+      "dependency_lock_hashes": { "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b" },
+      "command": "python3 -B docs/rust-tauri/R00/r00_t02_inventory.py --write && python3 -B docs/rust-tauri/R00/r00_t02_inventory.py --negative-checks",
+      "exit_code": 0,
+      "expected": "UI/路由/工具/调度注册表与功能清单双向关联：每个生产入口有叶子功能归属，无无主项；撤回项不进入开发清单",
+      "observed": "832 项登记、24 域；四组结构差集为空（unowned_entries / inventory_entries_not_registered / duplicate_feature_ids / duplicate_entry_owners 均 []，见 ENTRYPOINT_COVERAGE.json differences）；R10 正例接受、14 个 R10 错例输出 NEGATIVE_DETECTED（负向日志 /tmp/r00_t02_r10_negative.log 为一次性过程记录，不入冻结候选）",
+      "stub_boundary": ["静态扫描+确定性负向检查；无进程启动、无外部调用"],
+      "source_paths": [
+        "docs/rust-tauri/R00/r00_t02_inventory.py",
+        "docs/rust-tauri/R00/r00_t02_source_gates.py"
+      ],
+      "evidence": [
+        { "path": "docs/rust-tauri/R00/ENTRYPOINT_COVERAGE.json", "role": "entry<->feature coverage with empty difference sets" },
+        { "path": "docs/rust-tauri/R00/FEATURE_INVENTORY.json", "role": "736 production + 7 non-production features" },
+        { "path": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json", "role": "feature->stage/task/acceptance + 736 supplemental scenarios" },
+        { "path": "docs/rust-tauri/R00/R00-T02_REPORT.md", "role": "executor report (R10 handover candidate)" }
+      ]
+    },
+    {
+      "result_id": "RES-R00-A04",
+      "acceptance_id": "R00-A04",
+      "task_id": "R00-T02",
+      "status": "PASS",
+      "tested_sha": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+      "committed_in": "4b4a1d98f6d2d0e03f9573aa75b7992efed03db6",
+      "timestamp_utc": "2026-09-23T15:02:32+00:00",
+      "timestamp_basis": "T02 交付提交时间（原始运行墙钟未机器记录）",
+      "working_tree_digest": null,
+      "working_tree_digest_scope": "同 RES-R00-A03",
+      "platform": "macOS 27.0 arm64",
+      "toolchain": { "node": "v24.16.0", "npm": "11.13.0", "python": "3.14.3", "vitest": "4.1.10" },
+      "dependency_lock_hashes": { "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b" },
+      "command": "python3 -B docs/rust-tauri/R00/r00_t02_inventory.py && npx vitest run tests/config-scope.test.ts tests/provider-catalog.test.ts",
+      "exit_code": 0,
+      "expected": "样本含 Ollama、现役 subagent、research 兼容表时执行分类复核：前两者保留；research 仅兼容不新增启动入口",
+      "observed": "FEATURE_INVENTORY classification_values 五类；classified_nonproduction 7 项（含 F-D05-X-FORCED-SUBAGENT-ROUTING / F-D08-X-INDEPENDENT-RESEARCH / F-D10-X-LOCAL-MODEL-MANAGEMENT 硬排除与 F-D08-C-RESEARCH-LEDGER 兼容残留）；Ollama 接入与现役 subagent 均在保留清单（EXCLUSIONS.md 分类依据与当前调用图）；vitest 2 文件 21 项通过",
+      "stub_boundary": ["静态分类复核+既有 vitest；无进程启动、无外部调用"],
+      "source_paths": [
+        "docs/rust-tauri/R00/r00_t02_inventory.py"
+      ],
+      "evidence": [
+        { "path": "docs/rust-tauri/R00/EXCLUSIONS.md", "role": "exclusion vs retained classification" },
+        { "path": "docs/rust-tauri/R00/FEATURE_INVENTORY.json", "role": "classification values + non-production entries" },
+        { "path": "docs/rust-tauri/R00/R00-T02_REPORT.md", "role": "executor report" }
+      ]
+    },
+    {
+      "result_id": "RES-R00-A05",
+      "acceptance_id": "R00-A05",
+      "task_id": "R00-T03",
+      "status": "PASS",
+      "tested_sha": "60dbe0384e553f0a0aab7d173b2dc1ba43987b82",
+      "committed_in": "ffcb85830ffdc75da5fe39b7a8cfddb4617f1aec",
+      "timestamp_utc": "2026-09-23T18:50:03+00:00",
+      "timestamp_basis": "T03 交付提交时间（最终重放时共享分支 HEAD=60dbe0384，见 T03 报告；运行先于提交）",
+      "working_tree_digest": null,
+      "working_tree_digest_scope": "以 R00-T03_VALIDATION.json input_sha256 与 PI_REPLACEMENT_MATRIX/RUNTIME_DEPENDENCIES 逐文件哈希为内容基准",
+      "platform": "macOS 27.0 arm64",
+      "toolchain": { "node": "v24.16.0", "npm": "11.13.0", "python": "3.14.3", "vitest": "4.1.10" },
+      "dependency_lock_hashes": { "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b" },
+      "command": "node docs/rust-tauri/R00/r00_t03_import_graph.mjs && python3 docs/rust-tauri/R00/r00_t03_build_matrices.py && python3 docs/rust-tauri/R00/r00_t03_validate.py",
+      "exit_code": 0,
+      "expected": "从生产组合入口对 Pi 实际使用能力做可达性复核：每项有迁移项或证据充分的未使用结论",
+      "observed": "14 项职责、19 条 worker、95 文件发现闭合、51 项依赖、15 个 hook；r00_t03_validate.py 全部 check 通过（R00-T03_VALIDATION.json status=ok）；node scripts/patch-pi-sdk.cjs 输出 [verify-pi-sdk] all checks passed",
+      "stub_boundary": ["静态导入图+独立 Python oracle 重扫描+TS transpile 探针；无进程启动、无外部调用"],
+      "source_paths": [
+        "docs/rust-tauri/R00/r00_t03_import_graph.mjs",
+        "docs/rust-tauri/R00/r00_t03_build_matrices.py",
+        "docs/rust-tauri/R00/r00_t03_validate.py"
+      ],
+      "evidence": [
+        { "path": "docs/rust-tauri/R00/R00-T03_IMPORT_GRAPH.json", "role": "import graph" },
+        { "path": "docs/rust-tauri/R00/R00-T03_VALIDATION.json", "role": "validation result with checks+negatives+oracle" },
+        { "path": "docs/rust-tauri/R00/PI_REPLACEMENT_MATRIX.json", "role": "Pi capability replacement matrix" },
+        { "path": "docs/rust-tauri/R00/R00-T03_REPORT.md", "role": "executor report" }
+      ]
+    },
+    {
+      "result_id": "RES-R00-A06",
+      "acceptance_id": "R00-A06",
+      "task_id": "R00-T03",
+      "status": "PASS",
+      "tested_sha": "60dbe0384e553f0a0aab7d173b2dc1ba43987b82",
+      "committed_in": "ffcb85830ffdc75da5fe39b7a8cfddb4617f1aec",
+      "timestamp_utc": "2026-09-23T18:50:03+00:00",
+      "timestamp_basis": "T03 交付提交时间（同 RES-R00-A05）",
+      "working_tree_digest": null,
+      "working_tree_digest_scope": "同 RES-R00-A05",
+      "platform": "macOS 27.0 arm64",
+      "toolchain": { "node": "v24.16.0", "npm": "11.13.0", "python": "3.14.3", "vitest": "4.1.10" },
+      "dependency_lock_hashes": { "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b" },
+      "command": "python3 docs/rust-tauri/R00/r00_t03_validate.py",
+      "exit_code": 0,
+      "expected": "候选 worker 含模型循环或任务终态写入时，被判为内核迁移项而非可长期保留的工具 worker",
+      "observed": "worker 双向枚举闭合（源头执行入口 + 终态 sink 子串扫描）与外围语义反例通过；19 条 worker 均无 Agent loop/上下文构建权/批准决定权/任务终态权（R00-T03_VALIDATION.json synthetic_negative_probes 记录反例检查）",
+      "stub_boundary": ["静态职责分类复核；无进程启动、无外部调用"],
+      "source_paths": [
+        "docs/rust-tauri/R00/r00_t03_validate.py"
+      ],
+      "evidence": [
+        { "path": "docs/rust-tauri/R00/PI_REPLACEMENT_MATRIX.json", "role": "worker responsibility classification" },
+        { "path": "docs/rust-tauri/R00/R00-T03_VALIDATION.json", "role": "negative probes on worker boundaries" },
+        { "path": "docs/rust-tauri/R00/RUNTIME_DEPENDENCIES.json", "role": "runtime dependency inventory" },
+        { "path": "docs/rust-tauri/R00/R00-T03_REPORT.md", "role": "executor report" }
+      ]
+    },
+    {
+      "result_id": "RES-R00-A07",
+      "acceptance_id": "R00-A07",
+      "task_id": "R00-T04",
+      "status": "PASS",
+      "tested_sha": "ffcb85830ffdc75da5fe39b7a8cfddb4617f1aec",
+      "committed_in": "6f58b9351046e8dccfeb83be6976f197acb2de8d",
+      "timestamp_utc": "2026-09-23T19:55:29+00:00",
+      "timestamp_basis": "T04 交付提交时间（运行先于提交，见 T04 报告 §1）",
+      "working_tree_digest": null,
+      "working_tree_digest_scope": "以 STORES.json/ENTRYPOINTS.json 逐文件哈希 + scan-output.json 为内容基准",
+      "platform": "macOS darwin 27 arm64",
+      "toolchain": { "node": "v24.16.0", "npm": "11.13.0", "python": "3.14.3" },
+      "dependency_lock_hashes": { "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b" },
+      "command": "python3 -B docs/rust-tauri/R00/r00_t04_scan.py && npx vitest run tests/persistence-store-registry.test.ts tests/persistence-schema-tripwire.test.ts tests/http-route-security.test.ts tests/server-auth.test.ts tests/ws-scope.test.ts tests/device-registry.test.ts && node scripts/check-persistence-schema-fingerprint.mjs",
+      "exit_code": 0,
+      "expected": "比对 stores 与源码写入点：无未登记的生产权威存储；缓存可重建理由可核实",
+      "observed": "R00_T04_SCAN_OK：A=101 锚点 0 错、B=392 路由、C=69↔69（stores↔扫描位点）、D=0 未分类 0 过期、E=8/8 抽样 excerpt、负向 4/4；vitest 6 文件 74/74（persistence-store-registry 14/14：788 位点每个恰好一个归属）；schema 指纹 170 守卫源无改动",
+      "stub_boundary": ["只读静态扫描+既有 vitest+指纹核对；无进程启动、无外部调用"],
+      "source_paths": [
+        "docs/rust-tauri/R00/r00_t04_scan.py"
+      ],
+      "evidence": [
+        { "path": "artifacts/rust-tauri/R00/T04/scan-output.json", "role": "scan machine output" },
+        { "path": "artifacts/rust-tauri/R00/T04/final-run-stdout.txt", "role": "final run stdout" },
+        { "path": "docs/rust-tauri/R00/STORES.json", "role": "69 registered stores" },
+        { "path": "docs/rust-tauri/R00/R00-T04_REPORT.md", "role": "executor report" }
+      ]
+    },
+    {
+      "result_id": "RES-R00-A08",
+      "acceptance_id": "R00-A08",
+      "task_id": "R00-T04",
+      "status": "PASS",
+      "tested_sha": "ffcb85830ffdc75da5fe39b7a8cfddb4617f1aec",
+      "committed_in": "6f58b9351046e8dccfeb83be6976f197acb2de8d",
+      "timestamp_utc": "2026-09-23T19:55:29+00:00",
+      "timestamp_basis": "T04 交付提交时间（同 RES-R00-A07）",
+      "working_tree_digest": null,
+      "working_tree_digest_scope": "同 RES-R00-A07",
+      "platform": "macOS darwin 27 arm64",
+      "toolchain": { "node": "v24.16.0", "npm": "11.13.0", "python": "3.14.3" },
+      "dependency_lock_hashes": { "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b" },
+      "command": "python3 -B docs/rust-tauri/R00/r00_t04_scan.py",
+      "exit_code": 0,
+      "expected": "选 CLI、Bridge、cron、开发调用各一个，追踪到实际工具执行：每条链明确身份/授权来源；未证实路径列风险而非安全",
+      "observed": "ENTRYPOINTS.json a08_chains 4 条（CLI/Bridge/cron/开发调用）均有源码锚点与 identity_authority；Bridge 平台账号体系列为外部信任风险（R-T04-05）、MCP app-tools 直调不经网关列为 R-T04-04，均入 OWNERSHIP_CURRENT.md §5 而非宣称已证实安全",
+      "stub_boundary": ["静态追踪+既有测试支撑；未跑真实模型/真实平台（T04 报告未验证范围明示）"],
+      "source_paths": [
+        "docs/rust-tauri/R00/r00_t04_scan.py"
+      ],
+      "evidence": [
+        { "path": "docs/rust-tauri/R00/ENTRYPOINTS.json", "role": "37 entries + a08_chains" },
+        { "path": "docs/rust-tauri/R00/OWNERSHIP_CURRENT.md", "role": "ownership + cross-process write risks" },
+        { "path": "docs/rust-tauri/R00/R00-T04_REPORT.md", "role": "executor report" }
+      ]
+    },
+    {
+      "result_id": "RES-R00-A09",
+      "acceptance_id": "R00-A09",
+      "task_id": "R00-T05",
+      "status": "PASS",
+      "tested_sha": "6f58b9351046e8dccfeb83be6976f197acb2de8d",
+      "committed_in": "64c302ec482888222833136d0d20c64d4cbb350b",
+      "timestamp_utc": "2026-09-23T20:43:42+00:00",
+      "timestamp_basis": "T05 交付提交时间（REPLAY_SUMMARY.json 含各 run 精确时间戳；运行先于提交）",
+      "working_tree_digest": null,
+      "working_tree_digest_scope": "以 FIXTURE_MANIFEST.json 与 tests/migration 逐文件哈希为内容基准",
+      "platform": "macOS 27.0 darwin arm64",
+      "toolchain": { "node": "v24.16.0", "npm": "11.13.0", "python": "3.14.3", "vitest": "4.1.10" },
+      "dependency_lock_hashes": { "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b" },
+      "command": "node scripts/rust-tauri/r00-t05-replay.mjs && npx vitest run tests/migration/r00-t05-replay.test.ts tests/migration/r00-a10-old-defect.test.ts",
+      "exit_code": 0,
+      "expected": "断网的隔离环境中连续重放同一组夹具三次：规范化输出一致，差异仅限声明允许字段",
+      "observed": "三 run 各自退出码 0、每 run 9 夹具 × raw/normalized 两份；两份规范化 diff（run1-run2、run1-run3）均 identical；vitest 2 文件 14/14（9 回放 + 5 反例）；REPLAY_SUMMARY PASS-CANDIDATE",
+      "stub_boundary": ["全合成夹具（token 为显式 not-a-secret 合成值）；模型/协议为确定性本地替身；无网络、无付费服务"],
+      "source_paths": [
+        "scripts/rust-tauri/r00-t05-replay.mjs",
+        "tests/migration/r00-t05-replay.test.ts",
+        "tests/migration/fixtures/FIXTURE_MANIFEST.json"
+      ],
+      "evidence": [
+        { "path": "artifacts/rust-tauri/R00/T05/REPLAY_SUMMARY.json", "role": "3-run replay summary" },
+        { "path": "artifacts/rust-tauri/R00/T05/normalized-diff-run1-run2.txt", "role": "normalized diff 1-2" },
+        { "path": "artifacts/rust-tauri/R00/T05/normalized-diff-run1-run3.txt", "role": "normalized diff 1-3" },
+        { "path": "docs/rust-tauri/R00/R00-T05_REPORT.md", "role": "executor report" }
+      ]
+    },
+    {
+      "result_id": "RES-R00-A10",
+      "acceptance_id": "R00-A10",
+      "task_id": "R00-T05",
+      "status": "PASS",
+      "tested_sha": "6f58b9351046e8dccfeb83be6976f197acb2de8d",
+      "committed_in": "64c302ec482888222833136d0d20c64d4cbb350b",
+      "timestamp_utc": "2026-09-23T20:43:42+00:00",
+      "timestamp_basis": "T05 交付提交时间（同 RES-R00-A09）",
+      "working_tree_digest": null,
+      "working_tree_digest_scope": "同 RES-R00-A09",
+      "platform": "macOS 27.0 darwin arm64",
+      "toolchain": { "node": "v24.16.0", "npm": "11.13.0", "python": "3.14.3", "vitest": "4.1.10" },
+      "dependency_lock_hashes": { "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b" },
+      "command": "npx vitest run tests/migration/r00-a10-old-defect.test.ts",
+      "exit_code": 0,
+      "expected": "选一个已知语义错误夹具比较旧实现与明确不变量：旧实现偏差登记，不篡改新预期来复制缺陷",
+      "observed": "5/5 通过：旧缺陷（JSONL 历史分页对损坏尾记录的处理）按修正后不变量登记为预期，OLD_BEHAVIOR_ORACLE.md 记录偏差与规则引用，未复制缺陷为新标准",
+      "stub_boundary": ["纯 vitest 断言，无进程/网络"],
+      "source_paths": [
+        "tests/migration/r00-a10-old-defect.test.ts",
+        "tests/migration/OLD_BEHAVIOR_ORACLE.md"
+      ],
+      "evidence": [
+        { "path": "tests/migration/r00-a10-old-defect.test.ts", "role": "old-defect invariant test" },
+        { "path": "tests/migration/OLD_BEHAVIOR_ORACLE.md", "role": "oracle doc with deviation registry" },
+        { "path": "docs/rust-tauri/R00/R00-T05_REPORT.md", "role": "executor report" }
+      ]
+    },
+    {
+      "result_id": "RES-R00-A11",
+      "acceptance_id": "R00-A11",
+      "task_id": "R00-T06",
+      "status": "PASS",
+      "tested_sha": "64c302ec482888222833136d0d20c64d4cbb350b",
+      "committed_in": "4401afae2ee48df1512b8a8c9a1262be0efbe64f",
+      "timestamp_utc": "2026-09-24T02:22:09+00:00",
+      "timestamp_basis": "T06 交付提交时间（R1 修复轮原始数据含逐 run 时间戳；运行先于提交）",
+      "working_tree_digest": null,
+      "working_tree_digest_scope": "server bundle SHA 5095cc7f… 与 app.asar SHA 7b8478ab… 双指纹（T06 报告 §3）+ raw/ 逐文件哈希",
+      "platform": "Apple M3 Ultra 28C/96GB, macOS 27.0 darwin arm64, AC 电源",
+      "toolchain": { "node": "v24.16.0", "npm": "11.13.0", "python": "3.14.3" },
+      "dependency_lock_hashes": { "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b" },
+      "command": "node scripts/rust-tauri/r00-t06-build-release.mjs && node scripts/rust-tauri/r00-t06-bench-server.mjs && node scripts/rust-tauri/r00-t06-bench-pty.mjs && node scripts/rust-tauri/r00-t06-bench-desktop.mjs --phases template,startup,idle,browser,pdf,size && node scripts/rust-tauri/r00-t06-bench-office-pdf.mjs",
+      "exit_code": 0,
+      "expected": "基线启动浏览器及 PDF helper 时采集资源数据：主程序与全部辅助进程均计入，采样窗口一致",
+      "observed": "桌面腿真实启动 5 浏览器视图（产品上限）与 PDF helper；office 链转换期间 server 树从 1 进程膨胀到 5 进程（helper 主+GPU+网络+Renderer 入树，RSS 峰值 1,033,888KB）后回落；每帧从根 PID 递归 pgrep+ps 同窗读数；SIGTERM 前捕获整树核对全部 PID 消失（32/32 干净，桌面 teardown median 258.7ms）；进程树帧逐进程明细入 raw/",
+      "stub_boundary": ["模型协议=确定性本地 stub（fast/delayed/hang）；真实供应商 0 次调用；浏览器视图加载本地确定性页面；PDF/PTY/历史/流式输入全合成；--dir 应用为 ad-hoc 签名+测试 seed 密钥（非可发布安装包）"],
+      "source_paths": [
+        "scripts/rust-tauri/r00-t06-build-release.mjs",
+        "scripts/rust-tauri/r00-t06-lib.mjs",
+        "scripts/rust-tauri/r00-t06-stub-provider.mjs",
+        "scripts/rust-tauri/r00-t06-fixture.mjs",
+        "scripts/rust-tauri/r00-t06-bench-server.mjs",
+        "scripts/rust-tauri/r00-t06-bench-pty.mjs",
+        "scripts/rust-tauri/r00-t06-bench-desktop.mjs",
+        "scripts/rust-tauri/r00-t06-bench-office-pdf.mjs",
+        "scripts/rust-tauri/r00-t06-summarize.mjs"
+      ],
+      "evidence": [
+        { "path": "artifacts/rust-tauri/R00/T06/BASELINE_BENCHMARK.json", "role": "G1 benchmark with full stats" },
+        { "path": "artifacts/rust-tauri/R00/T06/raw/build-release-summary.json", "role": "build fingerprints dual-metric" },
+        { "path": "docs/rust-tauri/R00/R00-T06_REPORT.md", "role": "executor report (R1 repaired)" },
+        { "path": "docs/rust-tauri/R00/R00-T06_PROTOCOL.md", "role": "frozen measurement protocol" }
+      ]
+    },
+    {
+      "result_id": "RES-R00-A12",
+      "acceptance_id": "R00-A12",
+      "task_id": "R00-T06",
+      "status": "PASS",
+      "tested_sha": "64c302ec482888222833136d0d20c64d4cbb350b",
+      "committed_in": "4401afae2ee48df1512b8a8c9a1262be0efbe64f",
+      "timestamp_utc": "2026-09-24T02:22:09+00:00",
+      "timestamp_basis": "T06 交付提交时间（阈值文件 frozen_at_basis 记录 rev1 首写时刻 2026-09-23T23:20:53Z；同 RES-R00-A11）",
+      "working_tree_digest": null,
+      "working_tree_digest_scope": "PERFORMANCE_THRESHOLDS.json 带哈希阈值文件（change_log 至 rev2）",
+      "platform": "Apple M3 Ultra 28C/96GB, macOS 27.0 darwin arm64, AC 电源",
+      "toolchain": { "node": "v24.16.0", "npm": "11.13.0", "python": "3.14.3" },
+      "dependency_lock_hashes": { "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b" },
+      "command": "node scripts/rust-tauri/r00-t06-probe-fixed-prefix.mjs && node scripts/rust-tauri/r00-t06-summarize.mjs --server-run run-2026-09-23T23-12-26-989Z --desktop-run run-2026-09-23T22-47-51-720Z --pty-run pty-2026-09-24T01-45-52-350Z",
+      "exit_code": 0,
+      "expected": "尚未产生 Rust 性能数据时保存阈值并计算摘要：所有性能门槛有固定值、适用环境和理由，后续变更需差异记录",
+      "observed": "冻结时（rev1 2026-09-23T23:20:53Z）及 R1 复核时工作区均无 rust/ 目录与任何 Rust 性能数据（frozen_before_rust_results 核验）；8 项门槛全部有固定值+单位+方向+适用平台/构建/负载+噪声容限+理由+判定规则；平台区分 darwin-arm64=MEASURED、其余 PENDING_MEASUREMENT；change_log rev2 记录 R1 数值溯源更正（fixed_prefix 10,620→10,626B 唯一判定值变更）",
+      "stub_boundary": ["阈值冻结为设计门槛非实测收益承诺；G1 基线数据来自本机测量；无 Rust 对照数据存在（前提条件）"],
+      "source_paths": [
+        "scripts/rust-tauri/r00-t06-probe-fixed-prefix.mjs",
+        "scripts/rust-tauri/r00-t06-repair-build-summary.mjs"
+      ],
+      "evidence": [
+        { "path": "docs/rust-tauri/PERFORMANCE_THRESHOLDS.json", "role": "frozen thresholds with change_log" },
+        { "path": "artifacts/rust-tauri/R00/T06/raw/server/fixed-prefix-probe-2026-09-24T01-50-15-634Z.json", "role": "fixed prefix dual-channel probe" },
+        { "path": "docs/rust-tauri/R00/R00-T06_REPORT.md", "role": "executor report (R1 repaired)" }
+      ]
+    },
+    {
+      "result_id": "RES-R00-A13",
+      "acceptance_id": "R00-A13",
+      "task_id": "R00-T07",
+      "status": "PASS",
+      "tested_sha": null,
+      "committed_in": null,
+      "timestamp_basis": "T07 自测机器时间戳（SELFTEST_SUMMARY.json 记录）",
+      "working_tree_digest": null,
+      "working_tree_digest_scope": "由生成器在构建时填入（校验器/账本/输入文件当前哈希）",
+      "platform": "macOS 27.0 darwin arm64",
+      "toolchain": { "node": "v24.16.0", "npm": "11.13.0", "python": "3.14.3" },
+      "dependency_lock_hashes": { "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b" },
+      "command": "python3 -B docs/rust-tauri/R00/r00_t07_selftest.py --suite a13",
+      "exit_code": 0,
+      "expected": "将一个场景状态手改为 PASS 且删除日志后运行账本校验：非零退出，精确指出 ID 和缺失字段",
+      "observed": "待自测后由生成器填入（SELFTEST_SUMMARY 摘要）",
+      "stub_boundary": ["隔离副本中的负向探针；不触碰生产代码、原始任务书与真实仓库文件"],
+      "source_paths": [
+        "docs/rust-tauri/R00/r00_t07_validate_ledger.py",
+        "docs/rust-tauri/R00/r00_t07_selftest.py",
+        "docs/rust-tauri/R00/R00-T07_RESULTS.json",
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ENTRYPOINT_COVERAGE.json",
+        "docs/rust-tauri/R00/FEATURE_INVENTORY.json",
+        "docs/rust-tauri/R00/ENTRYPOINTS.json"
+      ],
+      "evidence": [
+        { "path": "artifacts/rust-tauri/R00/T07/SELFTEST_SUMMARY.json", "role": "selftest machine summary (all variants, exit codes)" },
+        { "path": "artifacts/rust-tauri/R00/T07/a13-negative-flip-status.log", "role": "A13 canonical: flip PASS + delete evidence" },
+        { "path": "artifacts/rust-tauri/R00/T07/a14-entry-add-remove.log", "role": "cross-suite confirmation log" }
+      ]
+    },
+    {
+      "result_id": "RES-R00-A14",
+      "acceptance_id": "R00-A14",
+      "task_id": "R00-T07",
+      "status": "PASS",
+      "tested_sha": null,
+      "committed_in": null,
+      "timestamp_basis": "T07 自测机器时间戳（SELFTEST_SUMMARY.json 记录）",
+      "working_tree_digest": null,
+      "working_tree_digest_scope": "由生成器在构建时填入",
+      "platform": "macOS 27.0 darwin arm64",
+      "toolchain": { "node": "v24.16.0", "npm": "11.13.0", "python": "3.14.3" },
+      "dependency_lock_hashes": { "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b" },
+      "command": "python3 -B docs/rust-tauri/R00/r00_t07_selftest.py --suite a14",
+      "exit_code": 0,
+      "expected": "入口盘点增加一个生产入口后运行映射检查：缺少任务或场景会失败；补齐后通过",
+      "observed": "待自测后由生成器填入（SELFTEST_SUMMARY 摘要）",
+      "stub_boundary": ["隔离副本中的增删反例；不触碰生产代码、原始任务书与真实仓库文件"],
+      "source_paths": [
+        "docs/rust-tauri/R00/r00_t07_validate_ledger.py",
+        "docs/rust-tauri/R00/r00_t07_selftest.py",
+        "docs/rust-tauri/R00/R00-T07_RESULTS.json",
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+        "docs/rust-tauri/R00/ENTRYPOINT_COVERAGE.json",
+        "docs/rust-tauri/R00/FEATURE_INVENTORY.json",
+        "docs/rust-tauri/R00/ENTRYPOINTS.json"
+      ],
+      "evidence": [
+        { "path": "artifacts/rust-tauri/R00/T07/SELFTEST_SUMMARY.json", "role": "selftest machine summary (all variants, exit codes)" },
+        { "path": "artifacts/rust-tauri/R00/T07/a14-entry-add-remove.log", "role": "A14 canonical: add entry unmapped fails, mapped passes" },
+        { "path": "artifacts/rust-tauri/R00/T07/a13-negative-flip-status.log", "role": "cross-suite confirmation log" }
+      ]
+    }
+  ]
+}

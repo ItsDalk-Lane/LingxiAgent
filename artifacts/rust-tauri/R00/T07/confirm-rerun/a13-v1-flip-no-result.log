@@ -1,0 +1,9 @@
+# variant a13/v1-flip-no-result: NOT_STARTED 场景手改 PASS 无结果记录
+# tamper: tamper_v1
+# validator: r00_t07_validate_ledger.py --root <isolated:a13-v1-flip-no-result> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=2/2
+# --- stdout ---
+LEDGER-ERROR STATUS-PASS-WITHOUT-RESULT scenario=R01-A01 field 'result_ids' empty: status=PASS requires >=1 result record (no-source PASS is rejected)
+LEDGER_INVALID errors=1 checks=14761
+# --- stderr ---
+(empty)

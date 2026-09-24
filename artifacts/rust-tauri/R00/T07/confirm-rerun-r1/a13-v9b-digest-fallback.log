@@ -1,0 +1,7 @@
+# variant a13/v9b-digest-fallback: 无任务书目录时用内嵌 spec_digests 快照检测规格篡改
+# expect_exit=1 actual_exit=1
+# --- stdout ---
+LEDGER-ERROR SPEC-FIDELITY scenario=R00-A04 embedded spec digest 8a293730e10a64295abe085e14506b82799d02984804c8a8083976732edaf308 != snapshot 0f214f13557e6f884bb4a0e154b832eef195e1a7db3db5dac12b14104c928442 (spec text tampered after import)
+LEDGER_INVALID errors=1 checks=13027
+# --- stderr ---
+(empty)

@@ -1,0 +1,6 @@
+# positive control: 未篡改隔离副本必须通过
+# expect_exit=0 actual_exit=0
+# --- stdout ---
+LEDGER_VALID checks=14661 scenarios=952 results=12 entries=832 spec_source=taskbook-strict
+# --- stderr ---
+(empty)

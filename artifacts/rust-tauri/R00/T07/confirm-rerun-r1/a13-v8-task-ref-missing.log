@@ -1,0 +1,17 @@
+# variant a13/v8-task-ref-missing: 任务声明的验收场景从账本消失
+# tamper: tamper_v8
+# validator: r00_t07_validate_ledger.py --root <isolated:a13-v8-task-ref-missing> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=2/2
+# --- stdout ---
+LEDGER-ERROR COUNTS-MISMATCH counts.base_scenarios declared 200 != actual 199
+LEDGER-ERROR COUNTS-MISMATCH counts.scenarios_total declared 952 != actual 951
+LEDGER-ERROR SPEC-IMPORT-COMPLETE scenarios[kind=base] base scenario count 199 != 200 (scope reduction is forbidden)
+LEDGER-ERROR SPEC-IMPORT-COMPLETE scenarios[kind=base] catalog scenarios missing from ledger: ['R00-A03']
+LEDGER-ERROR STATUS-PASS-WITHOUT-RESULT result=RES-R00-A03 acceptance_id 'R00-A03' is not a ledger scenario (result without requirement)
+LEDGER-ERROR TASK-SCENARIO-BIJCTION task=R00-T02 declares acceptance 'R00-A03' missing from ledger scenarios
+LEDGER-ERROR TESTS-MISSING test=T-001 references unknown scenario 'R00-A03'
+LEDGER-ERROR TESTS-MISSING test=T-002 references unknown scenario 'R00-A03'
+LEDGER-ERROR TESTS-MISSING test=T-003 references unknown scenario 'R00-A03'
+LEDGER_INVALID errors=9 checks=14812
+# --- stderr ---
+(empty)

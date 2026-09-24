@@ -1,0 +1,8 @@
+# variant a14/v3-mapped-passes: 补齐 feature→scenario→task 完整映射 → 通过
+# tamper: tamper_a14_v3
+# validator: r00_t07_validate_ledger.py --root <isolated:a14-v3-mapped-passes> --git-repo <real repo>
+# expect_exit=0 actual_exit=0 substr_matched=1/1
+# --- stdout ---
+LEDGER_VALID checks=14771 scenarios=950 results=14 entries=833 spec_source=taskbook-strict
+# --- stderr ---
+(empty)

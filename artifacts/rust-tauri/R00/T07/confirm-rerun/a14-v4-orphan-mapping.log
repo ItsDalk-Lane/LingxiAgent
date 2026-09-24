@@ -1,0 +1,9 @@
+# variant a14/v4-orphan-mapping: 账本映射盘点不存在的入口（孤立映射）→ 失败
+# tamper: tamper_a14_v4
+# validator: r00_t07_validate_ledger.py --root <isolated:a14-v4-orphan-mapping> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=2/2
+# --- stdout ---
+LEDGER-ERROR ENTRY-COVERAGE-BIDIR entrypoint_index registered-but-unmapped entries: []; mapped-but-unregistered entries: ['cli:ghost']
+LEDGER_INVALID errors=1 checks=14763
+# --- stderr ---
+(empty)

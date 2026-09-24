@@ -1,0 +1,16 @@
+# variant a14/v2-feature-no-scenario: 新功能入账本 feature 索引但无场景/任务映射 → 失败
+# tamper: tamper_a14_v2
+# validator: r00_t07_validate_ledger.py --root <isolated:a14-v2-feature-no-scenario> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=3/3
+# --- stdout ---
+LEDGER-ERROR COUNTS-MISMATCH counts.features_production declared 736 != actual 737
+LEDGER-ERROR COUNTS-MISMATCH counts.features_total declared 743 != actual 744
+LEDGER-ERROR ENTRY-COVERAGE-BIDIR entry=cli:lingxi-doctor registration features ['F-D99-CLI-DOCTOR'] not mapped in ledger; ledger-only features []
+LEDGER-ERROR ENTRY-COVERAGE-BIDIR entrypoint_index registered-but-unmapped entries: ['cli:lingxi-doctor']; mapped-but-unregistered entries: []
+LEDGER-ERROR EVIDENCE-HASH-MISMATCH result=RES-R00-A03 evidence 'docs/rust-tauri/R00/ENTRYPOINT_COVERAGE.json' sha256 5139118650120d1db540e2a4c45fb540f2e28f0fdd129daf76b26507e632b1c2 != recorded 76fe6e2b9aaae914aaff21be6f731ba8d537b944ced6412ebca4f547c8313000
+LEDGER-ERROR EVIDENCE-HASH-MISMATCH result=RES-R00-A03 evidence 'docs/rust-tauri/R00/FEATURE_INVENTORY.json' sha256 db60f889df27045ec88040a925f2f5ebf286cc8057bc68fdb44713ec61096be9 != recorded 48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039
+LEDGER-ERROR EVIDENCE-HASH-MISMATCH result=RES-R00-A04 evidence 'docs/rust-tauri/R00/FEATURE_INVENTORY.json' sha256 db60f889df27045ec88040a925f2f5ebf286cc8057bc68fdb44713ec61096be9 != recorded 48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039
+LEDGER-ERROR ORPHAN-REQUIREMENT feature=F-D99-CLI-DOCTOR production feature has no supplemental scenario and no base acceptance
+LEDGER_INVALID errors=8 checks=14663
+# --- stderr ---
+(empty)

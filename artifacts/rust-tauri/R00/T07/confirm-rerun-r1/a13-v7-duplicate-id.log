@@ -1,0 +1,9 @@
+# variant a13/v7-duplicate-id: 账本 JSON 重复场景键
+# tamper: tamper_v7
+# validator: r00_t07_validate_ledger.py --root <isolated:a13-v7-duplicate-id> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=1/1
+# --- stdout ---
+LEDGER-ERROR NO-DUPLICATE-ID /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r00t07-a13-v7-duplicate-id-6nohm_p8/docs/rust-tauri/R00/ACCEPTANCE_MAP.json JSON duplicate key 'R00-A01'
+LEDGER_INVALID errors=1
+# --- stderr ---
+(empty)

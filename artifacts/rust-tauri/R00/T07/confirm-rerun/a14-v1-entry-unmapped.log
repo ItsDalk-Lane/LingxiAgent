@@ -1,0 +1,18 @@
+# variant a14/v1-entry-unmapped: 入口盘点新增真实形态入口与功能、账本未映射 → 失败
+# tamper: tamper_a14_v1
+# validator: r00_t07_validate_ledger.py --root <isolated:a14-v1-entry-unmapped> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=4/4
+# --- stdout ---
+LEDGER-ERROR ENTRY-COVERAGE-BIDIR entry=cli:lingxi-doctor registration features ['F-D99-CLI-DOCTOR'] not mapped in ledger; ledger-only features []
+LEDGER-ERROR ENTRY-COVERAGE-BIDIR entrypoint_index registered-but-unmapped entries: ['cli:lingxi-doctor']; mapped-but-unregistered entries: []
+LEDGER-ERROR EVIDENCE-HASH-MISMATCH result=RES-R00-A03 evidence 'docs/rust-tauri/R00/ENTRYPOINT_COVERAGE.json' sha256 5139118650120d1db540e2a4c45fb540f2e28f0fdd129daf76b26507e632b1c2 != recorded 76fe6e2b9aaae914aaff21be6f731ba8d537b944ced6412ebca4f547c8313000
+LEDGER-ERROR EVIDENCE-HASH-MISMATCH result=RES-R00-A03 evidence 'docs/rust-tauri/R00/FEATURE_INVENTORY.json' sha256 db60f889df27045ec88040a925f2f5ebf286cc8057bc68fdb44713ec61096be9 != recorded 48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039
+LEDGER-ERROR EVIDENCE-HASH-MISMATCH result=RES-R00-A04 evidence 'docs/rust-tauri/R00/FEATURE_INVENTORY.json' sha256 db60f889df27045ec88040a925f2f5ebf286cc8057bc68fdb44713ec61096be9 != recorded 48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039
+LEDGER-ERROR FEATURE-INVENTORY-BIDIR features_index ledger-only features: []; inventory-only features: ['F-D99-CLI-DOCTOR']
+LEDGER-ERROR STALE-SOURCE result=RES-R00-A13 monitored source 'docs/rust-tauri/R00/ENTRYPOINT_COVERAGE.json' changed: sha256 5139118650120d1db540e2a4c45fb540f2e28f0fdd129daf76b26507e632b1c2 != recorded 76fe6e2b9aaae914aaff21be6f731ba8d537b944ced6412ebca4f547c8313000 (result is stale relative to source change; re-run required)
+LEDGER-ERROR STALE-SOURCE result=RES-R00-A13 monitored source 'docs/rust-tauri/R00/FEATURE_INVENTORY.json' changed: sha256 db60f889df27045ec88040a925f2f5ebf286cc8057bc68fdb44713ec61096be9 != recorded 48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039 (result is stale relative to source change; re-run required)
+LEDGER-ERROR STALE-SOURCE result=RES-R00-A14 monitored source 'docs/rust-tauri/R00/ENTRYPOINT_COVERAGE.json' changed: sha256 5139118650120d1db540e2a4c45fb540f2e28f0fdd129daf76b26507e632b1c2 != recorded 76fe6e2b9aaae914aaff21be6f731ba8d537b944ced6412ebca4f547c8313000 (result is stale relative to source change; re-run required)
+LEDGER-ERROR STALE-SOURCE result=RES-R00-A14 monitored source 'docs/rust-tauri/R00/FEATURE_INVENTORY.json' changed: sha256 db60f889df27045ec88040a925f2f5ebf286cc8057bc68fdb44713ec61096be9 != recorded 48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039 (result is stale relative to source change; re-run required)
+LEDGER_INVALID errors=10 checks=14762
+# --- stderr ---
+(empty)

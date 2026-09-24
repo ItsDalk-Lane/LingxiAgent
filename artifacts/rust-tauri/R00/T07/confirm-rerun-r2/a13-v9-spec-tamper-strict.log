@@ -1,0 +1,9 @@
+# variant a13/v9-spec-tamper-strict: 篡改场景规格文本（任务书严格模式，字段级定位）
+# tamper: tamper_v9
+# validator: r00_t07_validate_ledger.py --root <isolated:a13-v9-spec-tamper-strict> --git-repo <real repo>
+# expect_exit=1 actual_exit=1 substr_matched=2/2
+# --- stdout ---
+LEDGER-ERROR SPEC-FIDELITY scenario=R00-A04 field 'spec.then' differs from acceptance-catalog.json
+LEDGER_INVALID errors=1 checks=14829
+# --- stderr ---
+(empty)
