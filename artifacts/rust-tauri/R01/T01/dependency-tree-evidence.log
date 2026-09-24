@@ -1,0 +1,14 @@
+DEPENDENCY TREE EVIDENCE (from cargo metadata, offline)
+workspace members + resolved deps:
+  lingxi-kernel -> ['lingxi_protocol']
+  lingxi-protocol -> (no dependencies)
+total packages in resolve graph: 2
+forbidden-pattern hits in dependency tree: NONE
+
+grep cross-check of raw metadata for forbidden tokens:
+   2 electron
+   2 tauri
+NOTE: the raw-grep 'tauri'/'electron' hits above are the English description
+strings of the two workspace crates (the sentence that documents the
+prohibition), NOT dependency entries. The authoritative check is the
+structured one over resolve-graph package names: forbidden-pattern hits NONE.

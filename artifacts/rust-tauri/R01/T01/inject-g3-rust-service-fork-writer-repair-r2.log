@@ -1,0 +1,19 @@
+# G3 injection: authoritative stores keep authority-kind owners, writer is the prefix look-alike 'rust-service-fork (旁路写进程)'
+# cwd=/tmp/r01-t01-repair-r2/g3-writer-fork/repo
+# generator RUST_SERVICE constant in this copy:
+216:RUST_SERVICE = "rust-service-fork (旁路写进程)"
+# regenerated OWNERSHIP_TARGET.json (regen EXIT=0; O7-drift stays clean so O8 is the sole possible failure)
+# --- repaired checker run ---
+FAIL [O8] authoritative store agent-authored-records has writer 'rust-service-fork (旁路写进程)'; the single writer of authoritative business data is rust-service, matched against the locked canonical string 'rust-service (lingxi-service 组合根进程，唯一业务数据写者)' (exact match, not a prefix -- a 'rust-service-fork' look-alike is a shadow writer and is rejected)
+PASS O7-drift OK: OWNERSHIP_TARGET_UP_TO_DATE features=736 stores=69
+PASS D5 OK: module registry matches disk and cargo metadata (exists modules present, planned modules absent)
+PASS rule DEP-01 OK for module lingxi-protocol
+PASS rule DEP-02 OK for module lingxi-kernel
+PASS rule DEP-03 OK for module lingxi-kernel
+PASS rule DEP-04 OK for module lingxi-protocol
+PASS rule DEP-06 OK for module lingxi-kernel
+PASS rule DEP-07 OK for module lingxi-protocol
+PASS rule DEP-07 OK for module lingxi-kernel
+PASS D5-reverse OK: every cargo workspace member is a registered module
+RESULT: FAIL (1 violation(s))
+# CHECKER EXIT=1

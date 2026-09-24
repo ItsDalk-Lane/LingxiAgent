@@ -1,0 +1,2 @@
+FAIL [O4] critical fact run_terminal_state carries bypass fields ['reconciliation', 'secondary_owner']; a fact has exactly one owner, dual-write/sync is not an accepted escape hatch
+RESULT: FAIL (1 violation(s))

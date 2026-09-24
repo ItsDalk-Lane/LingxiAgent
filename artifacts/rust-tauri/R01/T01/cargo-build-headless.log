@@ -1,0 +1,7 @@
+COMMAND: cargo build --workspace --offline (CARGO_TARGET_DIR=/tmp/r01-t01-target, proxies unset, post-fmt sources)
+DATE: 2026-09-24T21:48:21Z
+HOST: Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.19s
+EXIT_CODE=0

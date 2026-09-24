@@ -1,0 +1,35 @@
+# clean-copy positive regression (no injection), repaired checker
+# cwd=/tmp/r01-t01-repair-r2/repo
+PASS O1 OK: 736 features, exactly one assignment each
+PASS O3/O6 OK: every feature owner exists and is an authority kind
+PASS O2 OK: 69 stores, exactly one owner each
+PASS O8 OK: authoritative stores owned by authority kinds, written by rust-service only
+PASS O4/O5 OK: 11 critical facts, single authority-kind owner each
+PASS O7 OK: counts coherent
+PASS O7-drift OK: OWNERSHIP_TARGET_UP_TO_DATE features=736 stores=69
+PASS D5 OK: module registry matches disk and cargo metadata (exists modules present, planned modules absent)
+PASS rule DEP-01 OK for module lingxi-protocol
+PASS rule DEP-02 OK for module lingxi-kernel
+PASS rule DEP-03 OK for module lingxi-kernel
+PASS rule DEP-04 OK for module lingxi-protocol
+PASS rule DEP-06 OK for module lingxi-kernel
+PASS rule DEP-07 OK for module lingxi-protocol
+PASS rule DEP-07 OK for module lingxi-kernel
+PASS D5-reverse OK: every cargo workspace member is a registered module
+PASS-NEG N1 dual-owner run_terminal_state: REJECTED as required ([O4] critical fact run_terminal_state has 2 owners; exactly one owner is required)
+PASS-NEG N2 sync-bypass secondary_owner: REJECTED as required ([O4] critical fact run_terminal_state carries bypass fields ['reconciliation', 'secondary_owner']; a fact has exactly one owner, dual-write/sync is not an accepted escape hatch)
+PASS-NEG N3 missing-feature: REJECTED as required ([O1] 1 features lack a target owner, e.g. ['F-D01-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-QUICK-CHAT-WINDOW-A2C385'])
+PASS-NEG N4 worker-owned feature: REJECTED as required ([O6] feature F-D01-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-QUICK-CHAT-WINDOW-A2C385 owned by worker-kind owner worker.doc-parse; workers/UI never own features)
+PASS-NEG N5 worker-owned critical fact: REJECTED as required ([O5] critical fact run_terminal_state owned by worker-kind owner worker.browser-engine; only core/service/adapters kinds may own critical facts)
+PASS-NEG N6 kernel->tauri transitive dep: REJECTED as required ([D1] DEP-02: module lingxi-kernel transitively depends on forbidden ['tauri'] (pattern 'tauri'))
+PASS-NEG N7 RunContext carries AppHandle: REJECTED as required ([D3] DEP-02: forbidden token 'AppHandle' in /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r01-t01-neg7-x2rkyv7o/lingxi-kernel/src/lib.rs)
+PASS-NEG N8 kernel->lingxi-adapters (hyphenated internal crate): REJECTED as required ([D1] DEP-03: module lingxi-kernel transitively depends on forbidden ['lingxi-adapters'] (pattern 'lingxi-adapters'))
+PASS-NEG N9 kernel->lingxi-adapters->tauri (desktop via hyphenated crate): REJECTED as required ([D1] DEP-02: module lingxi-kernel transitively depends on forbidden ['tauri'] (pattern 'tauri'))
+PASS-NEG N10 forged workspace member vs allowed_module_deps whitelist: REJECTED as required ([D2] DEP-T10: module lingxi-kernel depends on disallowed workspace modules ['forged-internal'])
+PASS-NEG N11 authoritative store owned/written by tauri-host: REJECTED as required ([O8] authoritative store session-jsonl owned by host-kind owner tauri-host.desktop-host; authoritative stores require a core/service/adapters owner (never host/build/ui/worker))
+PASS-NEG N12 shadow critical fact outside locked 02 §3 set: REJECTED as required ([O4] critical fact entries outside the locked 02 §3 set: ['run_terminal_state_shadow']; adding/renaming a critical fact is a governance change (ADR-001 amendment required))
+PASS-NEG N13 unregistered workspace member (stealth-crate) with desktop dep: REJECTED as required ([D5] cargo workspace members missing from module_registry: ['stealth-crate']; an unregistered member escapes every applies_to-keyed dependency rule (DEP-07's workspace-wide desktop ban included) while cargo build --workspace still compiles it; register it deliberately with its dependency rules made effective)
+PASS-NEG N14 kernel declares optional (inactive) tauri dep: REJECTED as required ([D1] DEP-02: module lingxi-kernel declares forbidden dependencies ['tauri'] (pattern 'tauri') in its manifest; declaration alone violates the contract even if the dep is optional/inactive and absent from the resolve graph)
+PASS-NEG N15 authoritative store written by rust-service-fork shadow writer: REJECTED as required ([O8] authoritative store session-jsonl has writer 'rust-service-fork (旁路写进程)'; the single writer of authoritative business data is rust-service, matched against the locked canonical string 'rust-service (lingxi-service 组合根进程，唯一业务数据写者)' (exact match, not a prefix -- a 'rust-service-fork' look-alike is a shadow writer and is rejected))
+RESULT: OK (ownership contract + dependency rules + negative battery)
+# CHECKER EXIT=0

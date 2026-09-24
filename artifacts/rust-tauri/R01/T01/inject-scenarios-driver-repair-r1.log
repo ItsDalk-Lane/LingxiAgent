@@ -1,0 +1,30 @@
+=== scenario P1a (review B1): kernel -> lingxi-adapters external path dep (hyphenated forbidden pattern, DEP-03) ===
+/tmp/r01-t01-repair-r1/run-injections.sh: line 29: $3: unbound variable
+error: failed to load manifest for workspace member `/tmp/r01-t01-repair-r1/repo/rust/crates/lingxi-kernel`
+referenced by workspace at `/tmp/r01-t01-repair-r1/repo/rust/Cargo.toml`
+
+Caused by:
+  failed to load manifest for dependency `lingxi-adapters`
+
+Caused by:
+  failed to read `/tmp/r01-t01-repair-r1/repo/rust/external/lingxi-adapters/Cargo.toml`
+
+Caused by:
+  No such file or directory (os error 2)
+metadata probe exit=1
+inject-p1a-kernel-direct-lingxi-adapters-repair-r1.log exit=1
+=== scenario P1b (review B1, workspace-member form): planned module lingxi-adapters materialized ===
+inject-p1b-planned-module-materialized-repair-r1.log exit=1
+=== scenario P2 (review B2): kernel -> lingxi-adapters -> tauri (desktop stack transitive via hyphenated crate) ===
+/tmp/r01-t01-repair-r1/run-injections.sh: line 29: $3: unbound variable
+inject-p2-kernel-adapters-tauri-transitive-repair-r1.log exit=1
+=== scenario P3 (review B3): forged workspace member vs allowed_module_deps whitelist (D2) ===
+inject-p3-forged-member-whitelist-repair-r1.log exit=1
+=== scenario P4 (review A9 / finding F2): authoritative store session-jsonl -> tauri-host via generator closed table ===
+regenerate exit=0
+inject-p4-authoritative-store-to-host-repair-r1.log exit=1
+=== scenario P5 (review A10 / finding F3): shadow critical fact under fresh fact_id ===
+inject-p5-shadow-critical-fact-repair-r1.log exit=1
+=== restore: clean copy passes the fixed validator (guard against injection-script self-damage) ===
+inject-clean-copy-positive-repair-r1.log exit=0
+ALL SCENARIOS DONE

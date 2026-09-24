@@ -1,0 +1,76 @@
+COMMAND: python3 -B docs/rust-tauri/R01/r01_t01_build_ownership.py --check
+OWNERSHIP_TARGET_UP_TO_DATE features=736 stores=69
+EXIT_CODE=0
+
+COMMAND: cargo fmt --check (if rustfmt present)
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel/src/lib.rs:46:
+ #[derive(Debug, Clone, PartialEq, Eq)]
+ pub enum Principal {
+     LocalUser,
+-    Device { device_id: String },
+-    WebSession { account_id: String },
++    Device {
++        device_id: String,
++    },
++    WebSession {
++        account_id: String,
++    },
+     /// No user principal; narrowed, fixed permission surface.
+-    Automation { surface: String },
++    Automation {
++        surface: String,
++    },
+ }
+ 
+ /// Error returned for an illegal run-state transition.
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel/src/lib.rs:88:
+             });
+         }
+         let allowed = match from {
+-            RunStatus::Queued => matches!(
+-                to,
+-                RunStatus::Running | RunStatus::Cancelling
+-            ),
++            RunStatus::Queued => matches!(to, RunStatus::Running | RunStatus::Cancelling),
+             RunStatus::Running => matches!(
+                 to,
+                 RunStatus::WaitingApproval
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel/src/lib.rs:100:
+                     | RunStatus::Failed
+                     | RunStatus::InterruptedNeedsAttention
+             ),
+-            RunStatus::WaitingApproval => matches!(
+-                to,
+-                RunStatus::Running | RunStatus::Cancelling
+-            ),
++            RunStatus::WaitingApproval => matches!(to, RunStatus::Running | RunStatus::Cancelling),
+             RunStatus::Cancelling => to == RunStatus::Cancelled,
+             terminal => unreachable!("terminal state {terminal:?} handled above"),
+         };
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel/src/lib.rs:189:
+ 
+     #[test]
+     fn cancelling_cannot_be_revoked_back_to_running() {
+-        let err = RunStateMachine::transition(RunStatus::Cancelling, RunStatus::Running)
+-            .unwrap_err();
++        let err =
++            RunStateMachine::transition(RunStatus::Cancelling, RunStatus::Running).unwrap_err();
+         assert_eq!(err.from, RunStatus::Cancelling);
+     }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel/src/ports.rs:48:
+ /// budget/deadline by the kernel; credentials are resolved server-side
+ /// through [`CredentialPort`], never by callers and never by workers.
+ pub trait ModelPort {
+-    fn complete(&self, ctx: &RunContext, call: ModelCallId, request_digest: &str)
+-        -> Result<String, ProtocolError>;
++    fn complete(
++        &self,
++        ctx: &RunContext,
++        call: ModelCallId,
++        request_digest: &str,
++    ) -> Result<String, ProtocolError>;
+ }
+ 
+ /// Execution of one prepared, authorized tool invocation.
+EXIT_CODE=1

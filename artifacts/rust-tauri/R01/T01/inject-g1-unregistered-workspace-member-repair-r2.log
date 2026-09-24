@@ -1,0 +1,32 @@
+# G1 injection: unregistered workspace member stealth-crate -> tauri (real cargo injection, not synthetic metadata)
+# cwd=/tmp/r01-t01-repair-r2/g1-stealth/repo
+# rust/Cargo.toml members:
+members = [
+    "crates/lingxi-protocol",
+    "crates/lingxi-kernel",
+    "crates/stealth-crate",
+]
+# stealth-crate Cargo.toml:
+[package]
+name = "stealth-crate"
+version = "0.0.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+tauri = { path = "/tmp/r01-t01-repair-r2/external/tauri" }
+# cargo build --workspace --offline (proves stealth-crate is really compiled into the headless workspace):
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s
+# cargo build EXIT=0
+# --- repaired checker run ---
+PASS O1 OK: 736 features, exactly one assignment each
+PASS O3/O6 OK: every feature owner exists and is an authority kind
+PASS O2 OK: 69 stores, exactly one owner each
+PASS O8 OK: authoritative stores owned by authority kinds, written by rust-service only
+PASS O4/O5 OK: 11 critical facts, single authority-kind owner each
+PASS O7 OK: counts coherent
+PASS O7-drift OK: OWNERSHIP_TARGET_UP_TO_DATE features=736 stores=69
+FAIL [D5] cargo workspace members missing from module_registry: ['stealth-crate']; an unregistered member escapes every applies_to-keyed dependency rule (DEP-07's workspace-wide desktop ban included) while cargo build --workspace still compiles it; register it deliberately with its dependency rules made effective
+RESULT: FAIL (1 violation(s))
+# CHECKER EXIT=1

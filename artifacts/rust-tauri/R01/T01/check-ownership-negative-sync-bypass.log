@@ -1,0 +1,6 @@
+COMMAND: python3 -B docs/rust-tauri/R01/r01_t01_check_ownership.py --ownership artifacts/rust-tauri/R01/T01/negative/OWNERSHIP_TARGET.n2-sync-bypass.json --skip-deps --skip-drift
+DATE: 2026-09-24T21:45:20Z
+SCENARIO: R01-A02 variant - '二者同步' bypass attempt (secondary_owner + reconciliation fields)
+FAIL [O4] critical fact run_terminal_state carries bypass fields ['reconciliation', 'secondary_owner']; a fact has exactly one owner, dual-write/sync is not an accepted escape hatch
+RESULT: FAIL (1 violation(s))
+EXIT_CODE=1

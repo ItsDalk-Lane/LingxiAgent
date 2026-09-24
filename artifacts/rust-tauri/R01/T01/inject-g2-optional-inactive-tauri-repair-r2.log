@@ -1,0 +1,22 @@
+# G2 injection: kernel declares tauri as OPTIONAL dep, no feature activates it (real cargo injection)
+# cwd=/tmp/r01-t01-repair-r2/g2-optional/repo
+# kernel Cargo.toml tail:
+
+# INJECTED (G2): optional, never activated by any feature
+tauri = { path = "/tmp/r01-t01-repair-r2/external/tauri", optional = true }
+# cargo metadata: resolve graph must NOT contain tauri (proving resolve-graph blindness is real):
+# cargo metadata EXIT=0
+# resolve nodes: ['lingxi-kernel', 'lingxi-protocol']
+# kernel manifest declared deps: [('lingxi-protocol', False), ('tauri', True)]
+# packages[] contains tauri: False
+# --- repaired checker run ---
+PASS O1 OK: 736 features, exactly one assignment each
+PASS O3/O6 OK: every feature owner exists and is an authority kind
+PASS O2 OK: 69 stores, exactly one owner each
+PASS O8 OK: authoritative stores owned by authority kinds, written by rust-service only
+PASS O4/O5 OK: 11 critical facts, single authority-kind owner each
+PASS O7 OK: counts coherent
+PASS O7-drift OK: OWNERSHIP_TARGET_UP_TO_DATE features=736 stores=69
+FAIL [D1] DEP-02: module lingxi-kernel declares forbidden dependencies ['tauri'] (pattern 'tauri') in its manifest; declaration alone violates the contract even if the dep is optional/inactive and absent from the resolve graph
+RESULT: FAIL (1 violation(s))
+# CHECKER EXIT=1

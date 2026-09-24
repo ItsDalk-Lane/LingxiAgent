@@ -1,0 +1,13 @@
+[package]
+name = "lingxi-protocol"
+description = "Wire types, errors, IDs and schema anchors for the Lingxi agent protocol. Must never depend on tauri/electron or any desktop/webview stack."
+version = "0.0.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+# Intentionally empty for the R01-T01 minimal prototype: the crate must
+# compile offline with zero external dependencies. serde/schemars and the
+# generated JSON Schema / TS bindings are introduced by R01-T02 and locked
+# by R01-T03.

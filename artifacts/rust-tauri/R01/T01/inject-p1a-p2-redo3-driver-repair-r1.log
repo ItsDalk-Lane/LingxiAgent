@@ -1,0 +1,10 @@
+=== scenario P1a (review B1): kernel -> lingxi-adapters external path dep (hyphenated forbidden pattern, DEP-03) ===
+     Locking 1 package to latest compatible version
+      Adding lingxi-adapters v0.1.0 (/tmp/r01-t01-repair-r1/external/lingxi-adapters)
+metadata probe exit=0
+inject-p1a-kernel-direct-lingxi-adapters-repair-r1.log exit=1
+=== scenario P2 (review B2): kernel -> lingxi-adapters -> tauri (desktop stack transitive via hyphenated crate) ===
+inject-p2-kernel-adapters-tauri-transitive-repair-r1.log exit=1
+=== restore: clean copy passes the fixed validator ===
+inject-clean-copy-positive-repair-r1.log exit=0
+REDO DONE

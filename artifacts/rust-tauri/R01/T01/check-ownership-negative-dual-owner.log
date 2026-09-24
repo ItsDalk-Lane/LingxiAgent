@@ -1,0 +1,6 @@
+COMMAND: python3 -B docs/rust-tauri/R01/r01_t01_check_ownership.py --ownership artifacts/rust-tauri/R01/T01/negative/OWNERSHIP_TARGET.n1-dual-owner.json --skip-deps --skip-drift
+DATE: 2026-09-24T21:45:12Z
+SCENARIO: R01-A02 - run_terminal_state configured with two owners
+FAIL [O4] critical fact run_terminal_state has 2 owners; exactly one owner is required
+RESULT: FAIL (1 violation(s))
+EXIT_CODE=1

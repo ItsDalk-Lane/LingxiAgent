@@ -1,0 +1,25 @@
+COMMAND: python3 -B docs/rust-tauri/R01/r01_t01_check_ownership.py --self-test (final, post-fmt)
+DATE: 2026-09-24T21:48:30Z
+PASS O1 OK: 736 features, exactly one assignment each
+PASS O3/O6 OK: every feature owner exists and is an authority kind
+PASS O2 OK: 69 stores, exactly one owner each
+PASS O4/O5 OK: 11 critical facts, single authority-kind owner each
+PASS O7 OK: counts coherent
+PASS O7-drift OK: OWNERSHIP_TARGET_UP_TO_DATE features=736 stores=69
+PASS D5 OK: existing modules present on disk and in cargo metadata
+PASS rule DEP-01 OK for module lingxi-protocol
+PASS rule DEP-02 OK for module lingxi-kernel
+PASS rule DEP-03 OK for module lingxi-kernel
+PASS rule DEP-04 OK for module lingxi-protocol
+PASS rule DEP-06 OK for module lingxi-kernel
+PASS rule DEP-07 OK for module lingxi-protocol
+PASS rule DEP-07 OK for module lingxi-kernel
+PASS-NEG N1 dual-owner run_terminal_state: REJECTED as required ([O4] critical fact run_terminal_state has 2 owners; exactly one owner is required)
+PASS-NEG N2 sync-bypass secondary_owner: REJECTED as required ([O4] critical fact run_terminal_state carries bypass fields ['reconciliation', 'secondary_owner']; a fact has exactly one owner, dual-write/sync is not an accepted escape hatch)
+PASS-NEG N3 missing-feature: REJECTED as required ([O1] 1 features lack a target owner, e.g. ['F-D01-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-QUICK-CHAT-WINDOW-A2C385'])
+PASS-NEG N4 worker-owned feature: REJECTED as required ([O6] feature F-D01-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-QUICK-CHAT-WINDOW-A2C385 owned by worker-kind owner worker.doc-parse; workers/UI never own features)
+PASS-NEG N5 worker-owned critical fact: REJECTED as required ([O5] critical fact run_terminal_state owned by worker-kind owner worker.browser-engine; only core/service/adapters kinds may own critical facts)
+PASS-NEG N6 kernel->tauri transitive dep: REJECTED as required ([D1] DEP-02: module lingxi-kernel transitively depends on forbidden ['tauri'] (pattern 'tauri'))
+PASS-NEG N7 RunContext carries AppHandle: REJECTED as required ([D3] DEP-02: forbidden token 'AppHandle' in /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r01-t01-neg7-d8suvy1d/lingxi-kernel/src/lib.rs)
+RESULT: OK (ownership contract + dependency rules + negative battery)
+EXIT_CODE=0

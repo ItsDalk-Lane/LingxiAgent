@@ -1,0 +1,11 @@
+FAIL [O8] authoritative store session-jsonl owned by host-kind owner tauri-host.desktop-host; authoritative stores require a core/service/adapters owner (never host/build/ui/worker)
+PASS O7-drift OK: OWNERSHIP_TARGET_UP_TO_DATE features=736 stores=69
+PASS D5 OK: module registry matches disk and cargo metadata (exists modules present, planned modules absent)
+PASS rule DEP-01 OK for module lingxi-protocol
+PASS rule DEP-02 OK for module lingxi-kernel
+PASS rule DEP-03 OK for module lingxi-kernel
+PASS rule DEP-04 OK for module lingxi-protocol
+PASS rule DEP-06 OK for module lingxi-kernel
+PASS rule DEP-07 OK for module lingxi-protocol
+PASS rule DEP-07 OK for module lingxi-kernel
+RESULT: FAIL (1 violation(s))

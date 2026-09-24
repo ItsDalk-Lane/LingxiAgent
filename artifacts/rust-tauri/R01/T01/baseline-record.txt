@@ -1,0 +1,13 @@
+BASELINE RECORD (R01-T01 start)
+date_utc: 2026-09-24T21:47:11Z
+HEAD: 328cc8bb5a807bdaad520b459907fb1fa4e10dca
+branch: codex/rust-tauri-migration
+git status --porcelain at task start:
+ M docs/rust-tauri/ORCHESTRATOR_PROGRESS.json
+(only orchestrator ledger; untouched by this task)
+toolchain:
+cargo 1.93.0 (Homebrew)
+rustc 1.93.0 (254b59607 2026-01-19) (Homebrew)
+Python 3.14.3
+v24.16.0
+ProductName:		macOS ProductVersion:		27.0 BuildVersion:		26A428 

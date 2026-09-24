@@ -1,0 +1,3 @@
+real cargo deps[].name for kernel: ['lingxi_adapters', 'lingxi_protocol']
+real cargo deps[].pkg  for kernel: ['path+file:///tmp/r01-t01-repair-r1/external/lingxi-adapters#0.1.0', 'path+file:///tmp/r01-t01-repair-r1/repo/rust/crates/lingxi-protocol#0.0.0']
+packages[].name: ['lingxi-adapters', 'lingxi-kernel', 'lingxi-protocol']

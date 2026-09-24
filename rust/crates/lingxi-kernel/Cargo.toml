@@ -1,0 +1,10 @@
+[package]
+name = "lingxi-kernel"
+description = "Domain rules, run state machine, context assembly and ports. Depends only on lingxi-protocol; never on tauri/electron and never on lingxi-adapters (implementations are injected by lingxi-service)."
+version = "0.0.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+lingxi-protocol = { path = "../lingxi-protocol" }
