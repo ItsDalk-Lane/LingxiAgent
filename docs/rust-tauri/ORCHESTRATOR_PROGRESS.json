@@ -4,7 +4,7 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
+  "current_head": "9b2c7f11fc0fd9ece3954794acf90a213bac3c5a",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -86,7 +86,7 @@
   "stages": {
     "R00": {
       "title": "基线、功能保护与验收地图",
-      "status": "IN_PROGRESS",
+      "status": "ACCEPTED",
       "task_ids": [
         "R00-T01",
         "R00-T02",
@@ -98,10 +98,20 @@
         "R00-T08"
       ],
       "stage_base_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-      "stage_review_round": 0,
-      "stage_verdict": null,
-      "stage_acceptance_commit_sha": null,
-      "blockers": []
+      "stage_review_round": 2,
+      "stage_verdict": "PASS",
+      "stage_acceptance_commit_sha": "9b2c7f11fc0fd9ece3954794acf90a213bac3c5a",
+      "blockers": [],
+      "stage_review_agent_id": "Codex:/root/r00_stage_review_r2",
+      "stage_review_report": "docs/rust-tauri/R00/R00_STAGE_REVIEW_R2.md",
+      "stage_review_report_sha256": "4bf1363f027295e187f2c4d52c85071e255309aba94248495e6413ceee420bec",
+      "stage_review_r1_report_sha256": "7284b8faeead270b40ca8753d91dcac2211d0d7a4757c67b8e45a6e69d3ef7aa",
+      "stage_findings": ["F1", "F2", "F3"],
+      "stage_repair_agent_id": "ZCode:R00 阶段修复 R1（ZCode）",
+      "stage_repair_report": "docs/rust-tauri/R00/R00_STAGE_REPAIR_R1.md",
+      "stage_repair_report_sha256": "6c71dd6c7a3d64547d3b4990563c60f854cfb7fed8252631b57e5dc669451b73",
+      "stage_rereview_agent_id": "Codex:/root/r00_stage_review_r2",
+      "stage_push_result": "CONFIRMED_ORIGIN"
     },
     "R01": {
       "title": "目标契约与高风险替代验证",
@@ -914,7 +924,7 @@
     "R00-T08": {
       "name": "封存并交接基线",
       "stage_id": "R00",
-      "status": "ACCEPTED_PENDING_COMMIT",
+      "status": "DONE",
       "task_base_sha": "e0b7be6108c4d5bc873061dee279b7163ca78a41",
       "executor_id": "ZCode:R00-T08 执行（ZCode）",
       "execution_result": "READY_FOR_REVIEW",
@@ -941,8 +951,8 @@
         "R00-A15": "PASS",
         "R00-A16": "PASS"
       },
-      "task_commit_sha": null,
-      "push_result": null,
+      "task_commit_sha": "8b153b1031bbb01204375b08e9caaa891397d7a5",
+      "push_result": "CONFIRMED_ORIGIN",
       "blockers": [],
       "review_report": "docs/rust-tauri/R00/R00-T08_REVIEW_R2.md",
       "review_report_sha256": "46c3fb23fae07c950c8644b9bd792ae100fd9811dd66e607b9cd8b657832d1e3"
@@ -2880,7 +2890,7 @@
       "blockers": []
     }
   },
-  "current_task": "R00-T08",
+  "current_task": "R00-SEAL",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",
