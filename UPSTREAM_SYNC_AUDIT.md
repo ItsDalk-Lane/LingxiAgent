@@ -15,7 +15,7 @@
 | U1：上游目标 | `c6d0405294be67cb134c2758f6472748ee73e2be` | openhanako `v0.447.4` |
 | L0：Lingxi 同步基线 | `97595264ead8735a04559507ddaade25db8a4e15` | chore: sync upstream 0.444.1 and pi SDK 0.84.1 (PR #2) |
 | L1：同步开始 Lingxi | `ca0b417e36a6a1f80947458aaed328a25718e41b` | 2026-08-20 main HEAD |
-| VERIFIED_SOURCE_SHA | 46f12ab1c5bc00f02a685346a3efc1b473590393 | 2026-09-22 v0.1.43 发布树（e7e991669 refactor-2026 候选 + 228123462 发布元数据 + 8cb7b77c6 证据刷新与补丁 gzip 化；preflight/发布族/证据门禁/全量复验绿）；验证证据见 PROGRESS.md 最新条目 |
+| VERIFIED_SOURCE_SHA | f2b8c687ae7bb5511edbaf5f6e0945affb0c80b8 | 2026-09-25 R00 阶段收官 source/evidence 树（15e1fe352 C1 证据重绑定 + f2b8c687a C3：R2/R3 坐标对象类型校验修复与证据重冻结，分支 codex/rust-tauri-migration；C3 经独立验收 R3 PASS——仅 C3 候选）。本坐标行所在六文件为 C4 候选：尚待独立验收与正式提交，提交前 HEAD 仍是 C3、验证证据与局限见 PROGRESS.md 最新条目与仓库外 /tmp/r00-seal-c4-preparation-r1.md |
 
 v0.1.35 仓库内的[功能 CI 记录](artifacts/release-v0.1.35/feature-ci-validation.json)
 对应 `2c835ac77afb1a73cd83816ad3d613297dc770a8`，不单独证明上述发布资料提交重新执行了
