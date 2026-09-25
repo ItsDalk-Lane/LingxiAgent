@@ -1,0 +1,1 @@
+{"step":"P2","capability":"登录持久化-跨进程重启","op":"新进程同 partition 访问 /account","expect":"仍 LOGGED_IN demo","actual":"whoami=LOGGED_IN demo","verdict":"VERIFIED","evidence":[]}

@@ -1,0 +1,21 @@
+sandbox_extension_issue_file_to_process failed for /tmp/r01t04/WKSpike.app: 1 (Operation not permitted)
+[W0] VERIFIED — 证据源: lines=3288-3453
+[W1] VERIFIED — 导航+DOM引用snapshot: nav=true snap_len=238 has_refs=true
+[W2] VERIFIED — 截图(视口): 42968 bytes
+[W3] VERIFIED — 中文输入(JS): value=灵犀你好2026
+[W4] VERIFIED — select+表单提交语义: SUBMITTED title=灵犀你好2026 choice=c agree=null
+[W5a] VERIFIED — 滚动: scrollY=900
+[W5b] VERIFIED — 整页长截图: img=1280x11848 bytes=367415
+[W6] UNVERIFIED — 上传(agent驱动): js-assign-ok len=0
+sandbox_extension_issue_file failed for : 2 (No such file or directory)
+[W7] VERIFIED — 下载: download=true finished fileMatch=true bytes=46
+[W8] VERIFIED — 弹窗(window.open): popup=http://127.0.0.1:18281/popup-target|POPUP_TARGET_LOADED
+[W9] VERIFIED — JS 对话框: alert=alert:t04-alert-你好→alert-done | confirm=confirm:t04-confirm?→confirm:false
+[W10] VERIFIED — 登录+cookie: whoami=LOGGED_IN demo cookie=true
+[W11] VERIFIED — 两会话隔离(独立 dataStore): A=[STORAGE_READ local=ALPHA_A cookie=t04-cookie=ALPHA_A] B=[STORAGE_READ local=BRAVO_B cookie=t04-cookie=BRAVO_B]
+[W12] VERIFIED — 登录持久化(forIdentifier): first=LOGGED_IN demo afterRecreate=LOGGED_IN demo
+[W13] UNVERIFIED — 代理配置(WK): deadProxyNav=true err=none defaultNav=true；结论：API 可用且 per-dataStore，但 loopback 绕过使负向验证不可完成
+[W14] VERIFIED — 不可信页拿不到宿主权限: PROBE_RESULT {"hana":"undefined","hanaKeys":[],"processGlobal":"undefined","requireGlobal":"undefined","nodeIntegration":null,"cdpHttpJson":"BLOCKED:TypeError","cdpHttpLocalhost":"BLOCKED:TypeError","cdpWs":"BLOCKED:error","showOpenFilePicker":"undefined"}
+[W15] VERIFIED — 挂起/热恢复: ta1=suspend-marker-保留
+[W16] UNVERIFIED — 用户接管(独立输入通道): value= osaStatus=0 err= appActive=false keyWin=false firstRespIsWV=true focusEl=t1
+[wkwebview] done pass=15 fail=0

@@ -1,0 +1,35 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling memchr v2.8.3
+   Compiling syn v3.0.6
+   Compiling serde_derive v1.0.229
+   Compiling lingxi-browser-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-browser-spike)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.57s
+     Running unittests src/lib.rs (/tmp/r01t04/cargo-target/debug/deps/lingxi_browser_spike-3771f1fdb014b3bf)
+
+running 7 tests
+test ops::tests::find_ref_parses_snapshot_lines ... ok
+test snapshot_source::tests::sha256_hex_stable ... ok
+test cdp::tests::png_dims_parse ... ok
+test cdp::tests::events_buffered_and_waitable ... ok
+test cdp::tests::roundtrip_command_response ... ok
+test snapshot_source::tests::extracts_from_repo ... ok
+test cdp::tests::remote_error_surfaces ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running unittests src/bin/spike_browser.rs (/tmp/r01t04/cargo-target/debug/deps/spike_browser-1c65a8fe2b0eea2b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_browser_spike
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

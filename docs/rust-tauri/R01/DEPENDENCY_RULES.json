@@ -1,194 +1,275 @@
 {
- "schema_version": 1,
- "task_id": "R01-T01",
- "stage_id": "R01",
- "maintained_by": "hand-authored contract; machine-verified by docs/rust-tauri/R01/r01_t01_check_ownership.py against cargo metadata and crate sources",
- "module_registry": [
-  {
-   "module": "lingxi-protocol",
-   "kind": "core-protocol",
-   "crate_path": "rust/crates/lingxi-protocol",
-   "status": "exists",
-   "establish_stage": "R01-T01",
-   "responsibility": "wire 类型、错误、ID、schema 导出；不依赖桌面"
-  },
-  {
-   "module": "lingxi-kernel",
-   "kind": "core-kernel",
-   "crate_path": "rust/crates/lingxi-kernel",
-   "status": "exists",
-   "establish_stage": "R01-T01",
-   "responsibility": "领域规则、运行状态机、上下文及 ports；不依赖桌面，不反向依赖 adapters"
-  },
-  {
-   "module": "lingxi-adapters",
-   "kind": "adapters",
-   "crate_path": "rust/crates/lingxi-adapters",
-   "status": "planned",
-   "establish_stage": "R02",
-   "responsibility": "storage/models/tools/integrations 各模块的端口实现，由 service 注入"
-  },
-  {
-   "module": "lingxi-service",
-   "kind": "service",
-   "crate_path": "rust/crates/lingxi-service",
-   "status": "planned",
-   "establish_stage": "R02",
-   "responsibility": "HTTP/WS、身份边界、配置、进程组合根"
-  },
-  {
-   "module": "lingxi-cli",
-   "kind": "cli",
-   "crate_path": "rust/crates/lingxi-cli",
-   "status": "planned",
-   "establish_stage": "R07",
-   "responsibility": "保留 CLI 命令语义，连接同一 service"
-  },
-  {
-   "module": "lingxi-spike",
-   "kind": "prototype",
-   "crate_path": "rust/crates/lingxi-spike",
-   "status": "exists",
-   "establish_stage": "R01-T03",
-   "responsibility": "依赖锁定构建原型（tokio/axum/reqwest/rusqlite/tracing/jsonschema/rmcp 编译与运行证据）；非生产组件，不拥有任何业务事实；DEP-07 桌面禁令对其生效",
-   "note": "Deliberately registered as exists by R01-T03 per the D5-reverse contract (every workspace member must be a registered module). No owner in OWNERSHIP_TARGET.json points at it; it carries no critical fact."
-  },
-  {
-   "module": "xtask",
-   "kind": "build-automation",
-   "crate_path": "rust/crates/xtask",
-   "status": "planned",
-   "establish_stage": "R02",
-   "responsibility": "schema、边界、测试编排与产物检查"
-  },
-  {
-   "module": "tauri-host",
-   "kind": "desktop-host",
-   "crate_path": "desktop/src-tauri",
-   "status": "planned",
-   "establish_stage": "R09",
-   "responsibility": "独立桌面构建；依赖协议，不嵌入业务内核",
-   "note": "独立 manifest，与 headless workspace 分开，避免 cargo test --workspace 被迫安装 WebView 依赖"
-  }
- ],
- "dependency_rules": [
-  {
-   "id": "DEP-01",
-   "name": "protocol-no-desktop",
-   "applies_to_modules": ["lingxi-protocol"],
-   "forbidden_dep_patterns": ["tauri", "electron", "tao", "wry", "webkit2gtk", "winit", "webview"],
-   "forbidden_source_tokens": ["AppHandle", "tauri::", "wry::", "tao::", "webkit2gtk", "electron"],
-   "enforcement": "cargo-metadata-transitive + source-scan",
-   "rationale": "协议 crate 是 wire 权威；桌面依赖会把核心绑死到宿主（02 §2）"
-  },
-  {
-   "id": "DEP-02",
-   "name": "kernel-no-desktop",
-   "applies_to_modules": ["lingxi-kernel"],
-   "forbidden_dep_patterns": ["tauri", "electron", "tao", "wry", "webkit2gtk", "winit", "webview"],
-   "forbidden_source_tokens": ["AppHandle", "tauri::", "wry::", "tao::", "webkit2gtk", "electron"],
-   "enforcement": "cargo-metadata-transitive + source-scan",
-   "rationale": "核心/协议不能依赖 tauri/electron（R01-T01 步骤 2）"
-  },
-  {
-   "id": "DEP-03",
-   "name": "kernel-no-adapters",
-   "applies_to_modules": ["lingxi-kernel"],
-   "forbidden_dep_patterns": ["lingxi-adapters"],
-   "forbidden_source_tokens": [],
-   "enforcement": "cargo-metadata-transitive",
-   "rationale": "adapter 接口（ports）位于 kernel；实现由 service 注入，kernel 禁止反向导入 adapter（02 §2）"
-  },
-  {
-   "id": "DEP-04",
-   "name": "protocol-no-kernel",
-   "applies_to_modules": ["lingxi-protocol"],
-   "forbidden_dep_patterns": ["lingxi-kernel", "lingxi-adapters", "lingxi-service"],
-   "forbidden_source_tokens": [],
-   "enforcement": "cargo-metadata-transitive",
-   "rationale": "协议层是最底层，任何上层不得被协议反向依赖"
-  },
-  {
-   "id": "DEP-05",
-   "name": "host-via-service-and-protocol-only",
-   "applies_to_modules": ["tauri-host"],
-   "allowed_module_deps": ["lingxi-protocol", "lingxi-service"],
-   "forbidden_dep_patterns": ["electron"],
-   "forbidden_source_tokens": [],
-   "enforcement": "cargo-metadata-transitive (在 tauri-host 建立后生效)",
-   "effective_from_stage": "R09",
-   "rationale": "宿主和传输只能依赖内核公开接口；Tauri 不拥有 Agent 业务执行权"
-  },
-  {
-   "id": "DEP-06",
-   "name": "no-apphandle-in-runcontext",
-   "applies_to_modules": ["lingxi-kernel"],
-   "source_scan": {
-    "symbol": "RunContext",
-    "forbidden_field_types": ["AppHandle", "Window", "WebviewWindow"]
-   },
-   "enforcement": "source-scan",
-   "rationale": "不把 AppHandle 放进 RunContext（R01-T01 步骤 2）"
-  },
-  {
-   "id": "DEP-07",
-   "name": "no-desktop-dependency-anywhere-in-headless-workspace",
-   "applies_to_modules": ["lingxi-protocol", "lingxi-kernel", "lingxi-adapters", "lingxi-service", "lingxi-cli", "xtask", "lingxi-spike"],
-   "forbidden_dep_patterns": ["tauri", "electron", "tao", "wry", "webkit2gtk"],
-   "forbidden_source_tokens": [],
-   "enforcement": "cargo-metadata-transitive",
-   "effective_from_stage": "R01-T01",
-   "rationale": "Rust 服务无需 Tauri 也能启动（02 §1）；headless workspace 全程无桌面依赖"
-  }
- ],
- "trust_boundaries": [
-  {
-   "id": "TB-01",
-   "component": "rust-service (lingxi-service 组合根)",
-   "started_by": "tauri-host（托管本地服务）或用户直接启动（CLI/systemd/手动 headless）",
-   "stopped_by": "启动者负责生命周期；远端客户端不能结束远端服务",
-   "writes": "全部 authoritative 业务 store（单一写进程）；server-info/epoch 元数据",
-   "trust": "进程内持有凭证材料与授权决定；边界内全可信，边界上全部经认证层"
-  },
-  {
-   "id": "TB-02",
-   "component": "tauri-host（桌面宿主）",
-   "started_by": "用户/操作系统",
-   "stopped_by": "用户/操作系统",
-   "writes": "仅自身壳自态（窗口/GPU/更新通道/诊断）与签名产物应用；不写任何 Agent 业务事实",
-   "trust": "半可信：持有本地服务进程托管权，但业务授权恒在 kernel.policy/service.auth"
-  },
-  {
-   "id": "TB-03",
-   "component": "旧 Electron 壳（现役生产，迁移期冻结）",
-   "started_by": "用户/操作系统",
-   "stopped_by": "用户/操作系统",
-   "writes": "现状同 R00 OWNERSHIP_CURRENT §3；迁移期与新内核不得双写同一权威数据（epoch 闸/分离数据根）",
-   "trust": "现役可信生产组件；其生产入口地位不因 R01 原型改变"
-  },
-  {
-   "id": "TB-04",
-   "component": "外围 worker（doc-parse/browser-engine/media-encode/bridge-sdk）",
-   "started_by": "rust-service 按租约拉起",
-   "stopped_by": "rust-service（取消传播+进程树核实）",
-   "writes": "仅自身 scratch；无 authoritative store 写权",
-   "trust": "不可信执行体：无运行终态/批准决定/上下文组装/模型循环权；模型访问经受控回调"
-  },
-  {
-   "id": "TB-05",
-   "component": "外部服务（模型 provider/Bridge 平台/MCP server）",
-   "started_by": "外部",
-   "stopped_by": "外部",
-   "writes": "无本地 store 写权；其响应经 adapters 校验后进入内核",
-   "trust": "完全不可信；Bridge 平台账号体系属外部信任假设（R00 R-T04-05）"
-  },
-  {
-   "id": "TB-06",
-   "component": "react-ui（展示层）",
-   "started_by": "宿主加载",
-   "stopped_by": "宿主",
-   "writes": "无；一切持久化经 service 协议",
-   "trust": "不可信渲染面；外部网页/工具输出不与主界面共享可信 native 权限（02 §9）"
-  }
- ]
+  "schema_version": 1,
+  "task_id": "R01-T01",
+  "stage_id": "R01",
+  "maintained_by": "hand-authored contract; machine-verified by docs/rust-tauri/R01/r01_t01_check_ownership.py against cargo metadata and crate sources",
+  "module_registry": [
+    {
+      "module": "lingxi-protocol",
+      "kind": "core-protocol",
+      "crate_path": "rust/crates/lingxi-protocol",
+      "status": "exists",
+      "establish_stage": "R01-T01",
+      "responsibility": "wire 类型、错误、ID、schema 导出；不依赖桌面"
+    },
+    {
+      "module": "lingxi-kernel",
+      "kind": "core-kernel",
+      "crate_path": "rust/crates/lingxi-kernel",
+      "status": "exists",
+      "establish_stage": "R01-T01",
+      "responsibility": "领域规则、运行状态机、上下文及 ports；不依赖桌面，不反向依赖 adapters"
+    },
+    {
+      "module": "lingxi-adapters",
+      "kind": "adapters",
+      "crate_path": "rust/crates/lingxi-adapters",
+      "status": "planned",
+      "establish_stage": "R02",
+      "responsibility": "storage/models/tools/integrations 各模块的端口实现，由 service 注入"
+    },
+    {
+      "module": "lingxi-service",
+      "kind": "service",
+      "crate_path": "rust/crates/lingxi-service",
+      "status": "planned",
+      "establish_stage": "R02",
+      "responsibility": "HTTP/WS、身份边界、配置、进程组合根"
+    },
+    {
+      "module": "lingxi-cli",
+      "kind": "cli",
+      "crate_path": "rust/crates/lingxi-cli",
+      "status": "planned",
+      "establish_stage": "R07",
+      "responsibility": "保留 CLI 命令语义，连接同一 service"
+    },
+    {
+      "module": "lingxi-spike",
+      "kind": "prototype",
+      "crate_path": "rust/crates/lingxi-spike",
+      "status": "exists",
+      "establish_stage": "R01-T03",
+      "responsibility": "依赖锁定构建原型（tokio/axum/reqwest/rusqlite/tracing/jsonschema/rmcp 编译与运行证据）；非生产组件，不拥有任何业务事实；DEP-07 桌面禁令对其生效",
+      "note": "Deliberately registered as exists by R01-T03 per the D5-reverse contract (every workspace member must be a registered module). No owner in OWNERSHIP_TARGET.json points at it; it carries no critical fact."
+    },
+    {
+      "module": "lingxi-browser-spike",
+      "kind": "prototype",
+      "crate_path": "rust/crates/lingxi-browser-spike",
+      "status": "exists",
+      "establish_stage": "R01-T04",
+      "responsibility": "浏览器宿主替换原型（CDP-over-pipe 驱动受控 Chromium，逐能力实测 R01-A07/A08）；非生产组件，不接入生产入口，不拥有任何业务事实；DEP-07 桌面禁令对其生效",
+      "note": "Deliberately registered as exists by R01-T04 per the D5-reverse contract (every workspace member must be a registered module). No owner in OWNERSHIP_TARGET.json points at it; it carries no critical fact. Deps base64/libc/serde/serde_json/sha2 全部复用已锁定版本，无新增第三方版本。"
+    },
+    {
+      "module": "xtask",
+      "kind": "build-automation",
+      "crate_path": "rust/crates/xtask",
+      "status": "planned",
+      "establish_stage": "R02",
+      "responsibility": "schema、边界、测试编排与产物检查"
+    },
+    {
+      "module": "tauri-host",
+      "kind": "desktop-host",
+      "crate_path": "desktop/src-tauri",
+      "status": "planned",
+      "establish_stage": "R09",
+      "responsibility": "独立桌面构建；依赖协议，不嵌入业务内核",
+      "note": "独立 manifest，与 headless workspace 分开，避免 cargo test --workspace 被迫安装 WebView 依赖"
+    }
+  ],
+  "dependency_rules": [
+    {
+      "id": "DEP-01",
+      "name": "protocol-no-desktop",
+      "applies_to_modules": [
+        "lingxi-protocol"
+      ],
+      "forbidden_dep_patterns": [
+        "tauri",
+        "electron",
+        "tao",
+        "wry",
+        "webkit2gtk",
+        "winit",
+        "webview"
+      ],
+      "forbidden_source_tokens": [
+        "AppHandle",
+        "tauri::",
+        "wry::",
+        "tao::",
+        "webkit2gtk",
+        "electron"
+      ],
+      "enforcement": "cargo-metadata-transitive + source-scan",
+      "rationale": "协议 crate 是 wire 权威；桌面依赖会把核心绑死到宿主（02 §2）"
+    },
+    {
+      "id": "DEP-02",
+      "name": "kernel-no-desktop",
+      "applies_to_modules": [
+        "lingxi-kernel"
+      ],
+      "forbidden_dep_patterns": [
+        "tauri",
+        "electron",
+        "tao",
+        "wry",
+        "webkit2gtk",
+        "winit",
+        "webview"
+      ],
+      "forbidden_source_tokens": [
+        "AppHandle",
+        "tauri::",
+        "wry::",
+        "tao::",
+        "webkit2gtk",
+        "electron"
+      ],
+      "enforcement": "cargo-metadata-transitive + source-scan",
+      "rationale": "核心/协议不能依赖 tauri/electron（R01-T01 步骤 2）"
+    },
+    {
+      "id": "DEP-03",
+      "name": "kernel-no-adapters",
+      "applies_to_modules": [
+        "lingxi-kernel"
+      ],
+      "forbidden_dep_patterns": [
+        "lingxi-adapters"
+      ],
+      "forbidden_source_tokens": [],
+      "enforcement": "cargo-metadata-transitive",
+      "rationale": "adapter 接口（ports）位于 kernel；实现由 service 注入，kernel 禁止反向导入 adapter（02 §2）"
+    },
+    {
+      "id": "DEP-04",
+      "name": "protocol-no-kernel",
+      "applies_to_modules": [
+        "lingxi-protocol"
+      ],
+      "forbidden_dep_patterns": [
+        "lingxi-kernel",
+        "lingxi-adapters",
+        "lingxi-service"
+      ],
+      "forbidden_source_tokens": [],
+      "enforcement": "cargo-metadata-transitive",
+      "rationale": "协议层是最底层，任何上层不得被协议反向依赖"
+    },
+    {
+      "id": "DEP-05",
+      "name": "host-via-service-and-protocol-only",
+      "applies_to_modules": [
+        "tauri-host"
+      ],
+      "allowed_module_deps": [
+        "lingxi-protocol",
+        "lingxi-service"
+      ],
+      "forbidden_dep_patterns": [
+        "electron"
+      ],
+      "forbidden_source_tokens": [],
+      "enforcement": "cargo-metadata-transitive (在 tauri-host 建立后生效)",
+      "effective_from_stage": "R09",
+      "rationale": "宿主和传输只能依赖内核公开接口；Tauri 不拥有 Agent 业务执行权"
+    },
+    {
+      "id": "DEP-06",
+      "name": "no-apphandle-in-runcontext",
+      "applies_to_modules": [
+        "lingxi-kernel"
+      ],
+      "source_scan": {
+        "symbol": "RunContext",
+        "forbidden_field_types": [
+          "AppHandle",
+          "Window",
+          "WebviewWindow"
+        ]
+      },
+      "enforcement": "source-scan",
+      "rationale": "不把 AppHandle 放进 RunContext（R01-T01 步骤 2）"
+    },
+    {
+      "id": "DEP-07",
+      "name": "no-desktop-dependency-anywhere-in-headless-workspace",
+      "applies_to_modules": [
+        "lingxi-protocol",
+        "lingxi-kernel",
+        "lingxi-adapters",
+        "lingxi-service",
+        "lingxi-cli",
+        "xtask",
+        "lingxi-spike",
+        "lingxi-browser-spike"
+      ],
+      "forbidden_dep_patterns": [
+        "tauri",
+        "electron",
+        "tao",
+        "wry",
+        "webkit2gtk"
+      ],
+      "forbidden_source_tokens": [],
+      "enforcement": "cargo-metadata-transitive",
+      "effective_from_stage": "R01-T01",
+      "rationale": "Rust 服务无需 Tauri 也能启动（02 §1）；headless workspace 全程无桌面依赖"
+    }
+  ],
+  "trust_boundaries": [
+    {
+      "id": "TB-01",
+      "component": "rust-service (lingxi-service 组合根)",
+      "started_by": "tauri-host（托管本地服务）或用户直接启动（CLI/systemd/手动 headless）",
+      "stopped_by": "启动者负责生命周期；远端客户端不能结束远端服务",
+      "writes": "全部 authoritative 业务 store（单一写进程）；server-info/epoch 元数据",
+      "trust": "进程内持有凭证材料与授权决定；边界内全可信，边界上全部经认证层"
+    },
+    {
+      "id": "TB-02",
+      "component": "tauri-host（桌面宿主）",
+      "started_by": "用户/操作系统",
+      "stopped_by": "用户/操作系统",
+      "writes": "仅自身壳自态（窗口/GPU/更新通道/诊断）与签名产物应用；不写任何 Agent 业务事实",
+      "trust": "半可信：持有本地服务进程托管权，但业务授权恒在 kernel.policy/service.auth"
+    },
+    {
+      "id": "TB-03",
+      "component": "旧 Electron 壳（现役生产，迁移期冻结）",
+      "started_by": "用户/操作系统",
+      "stopped_by": "用户/操作系统",
+      "writes": "现状同 R00 OWNERSHIP_CURRENT §3；迁移期与新内核不得双写同一权威数据（epoch 闸/分离数据根）",
+      "trust": "现役可信生产组件；其生产入口地位不因 R01 原型改变"
+    },
+    {
+      "id": "TB-04",
+      "component": "外围 worker（doc-parse/browser-engine/media-encode/bridge-sdk）",
+      "started_by": "rust-service 按租约拉起",
+      "stopped_by": "rust-service（取消传播+进程树核实）",
+      "writes": "仅自身 scratch；无 authoritative store 写权",
+      "trust": "不可信执行体：无运行终态/批准决定/上下文组装/模型循环权；模型访问经受控回调"
+    },
+    {
+      "id": "TB-05",
+      "component": "外部服务（模型 provider/Bridge 平台/MCP server）",
+      "started_by": "外部",
+      "stopped_by": "外部",
+      "writes": "无本地 store 写权；其响应经 adapters 校验后进入内核",
+      "trust": "完全不可信；Bridge 平台账号体系属外部信任假设（R00 R-T04-05）"
+    },
+    {
+      "id": "TB-06",
+      "component": "react-ui（展示层）",
+      "started_by": "宿主加载",
+      "stopped_by": "宿主",
+      "writes": "无；一切持久化经 service 协议",
+      "trust": "不可信渲染面；外部网页/工具输出不与主界面共享可信 native 权限（02 §9）"
+    }
+  ]
 }

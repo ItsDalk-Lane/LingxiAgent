@@ -1057,6 +1057,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "lingxi-browser-spike"
+version = "0.0.0"
+dependencies = [
+ "base64",
+ "libc",
+ "serde",
+ "serde_json",
+ "sha2",
+]
+
+[[package]]
 name = "lingxi-kernel"
 version = "0.0.0"
 dependencies = [

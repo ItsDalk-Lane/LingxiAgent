@@ -1,0 +1,1 @@
+{"step":"P1","capability":"登录持久化-写入","op":"partition 登录并写 cookie","expect":"LOGGED_IN demo + cookie 写入","actual":"whoami=LOGGED_IN demo cookie=1","verdict":"VERIFIED","evidence":[]}

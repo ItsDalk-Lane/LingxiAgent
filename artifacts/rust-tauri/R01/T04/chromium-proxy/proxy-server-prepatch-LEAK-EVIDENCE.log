@@ -1,0 +1,27 @@
+node:events:487
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use 127.0.0.1:18282
+    at Server.setupListenHandle [as _listen2] (node:net:2008:16)
+    at listenInCluster (node:net:2065:12)
+    at node:net:2274:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:2044:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '127.0.0.1',
+  port: 18282
+}[t04-proxy] HTTP GET http://clients2.google.com/time/1/current?cup2key=10:UEJf9e8isqJIU9cwwfKtmmw3EzYDaEH8wD5XQXJ-o1c&cup2hreq=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+[t04-proxy] CONNECT www.gstatic.com:443
+[t04-proxy] CONNECT www.google.com:443
+[t04-proxy] CONNECT www.google.com:443
+[t04-proxy] CONNECT accounts.google.com:443
+[t04-proxy] CONNECT update.googleapis.com:443
+[t04-proxy] HTTP GET http://127.0.0.1:18281/form
+[t04-proxy] CONNECT content-autofill.googleapis.com:443
+[t04-proxy] HTTP GET http://127.0.0.1:18281/favicon.ico
+[t04-proxy] CONNECT content-autofill.googleapis.com:443

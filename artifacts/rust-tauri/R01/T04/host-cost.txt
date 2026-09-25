@@ -1,0 +1,18 @@
+# R01-T04 宿主成本取证 (2026-09-25T04:22:51Z)
+
+## Google Chrome.app（受控 Chromium 宿主，host-provided）
+1.4G	/Applications/Google Chrome.app
+Google Chrome 153.0.8010.52 
+
+## spike 二进制（debug 构建）
+-rwxr-xr-x@ 1 study_superior  wheel  2325008 Sep 25 12:22 /tmp/r01t04/cargo-target/debug/spike_browser
+
+## wkwebview_spike 二进制（swiftc -O）
+-rwxr-xr-x@ 1 study_superior  wheel  190624 Sep 25 12:08 /tmp/r01t04/wkwebview_spike
+
+## Electron 宿主（node_modules 内）
+273M	node_modules/electron/dist/Electron.app
+## Chromium 会话 RSS（A14 采样，transcript 内）
+pid=78379 tree_rss=1395824KB
+10989 bytes, 1280x773
+after cold relaunch: Some("LOGGED_IN demo")

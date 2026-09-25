@@ -1,0 +1,24 @@
+[E0] VERIFIED — 证据源: lines=3288-3453 sha256=387b2e10ee8e39abfbbf21b78f29c4046b519598e8f92d9a66f345d4c6f80e21
+[E1] VERIFIED — 导航+DOM引用snapshot: len=238 has_refs=true url=http://127.0.0.1:18281/form
+[E2] VERIFIED — 截图(视口): bytes=25059 size=1280x860
+[E3] VERIFIED — 中文输入(insertText): value=灵犀你好2026
+[E4] VERIFIED — select+表单提交语义: ref=5 echo=SUBMITTED title=灵犀你好2026 choice=c agree=null
+[E5a] VERIFIED — 滚动: scrollY=900
+[E5b] VERIFIED — 整页长截图: capturePage size=1280x860（视口 1280x860 → 无视口外捕获能力，生产语义即视口截图）
+[E6] UNVERIFIED — 上传(agent驱动): JS files 赋值尝试: threw:Cannot set properties of null (setting 'files')
+[E7] VERIFIED — 下载: event=completed bytes=46 match=true
+[E8] VERIFIED — 弹窗(window.open): opened=["http://127.0.0.1:18281/popup-target"]
+[E9] VERIFIED — JS 对话框: {"calls":["alert:t04-alert-你好","confirm:t04-confirm?"],"result":"confirm:false"}
+[E10] VERIFIED — 登录+cookie: whoami=LOGGED_IN demo cookie=1
+[E11] VERIFIED — cookie 开关: whoami=http://127.0.0.1:18281/login
+[E12] VERIFIED — 两会话隔离(partition): A=[STORAGE_READ local=ALPHA_A cookie=t04-cookie=ALPHA_A] B=[STORAGE_READ local=BRAVO_B cookie=t04-cookie=BRAVO_B]
+[E13] VERIFIED — 不可信页拿不到宿主权限: PROBE_RESULT {"hana":"undefined","hanaKeys":[],"processGlobal":"undefined","requireGlobal":"undefined","nodeIntegration":null,"cdpHttpJson":"BLOCKED:TypeError","cdpHttpLocalhost":"BLOCKED:TypeError","cdpWs":"BLOCKED:error","showOpenFilePicker":"function"}
+[E14] VERIFIED — 挂起/热恢复: ta1=suspend-marker-保留
+[E15] VERIFIED — 代理(生产语义观测): defaultSession resolveProxy=PROXY 127.0.0.1:9；partition 代理=未配置（跟随系统/直连）
+2026-09-25 12:14:07.665 Electron[80762:24705753] TSM AdjustCapsLockLEDForKeyTransitionHandling - _ISSetPhysicalKeyboardCapsLockLED Inhibit
+[E16] VERIFIED — 用户接管(独立输入通道): value=ELEC-HUMAN err=
+[electron-harness] mode=main pass=17 fail=0 unverified=1
+[P1] VERIFIED — 登录持久化-写入: whoami=LOGGED_IN demo cookie=1
+[electron-harness] mode=login-write pass=1 fail=0 unverified=0
+[P2] VERIFIED — 登录持久化-跨进程重启: whoami=LOGGED_IN demo
+[electron-harness] mode=login-verify pass=1 fail=0 unverified=0

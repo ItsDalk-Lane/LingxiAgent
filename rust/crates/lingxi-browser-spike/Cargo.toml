@@ -1,0 +1,19 @@
+[package]
+name = "lingxi-browser-spike"
+description = "R01-T04 browser-host replacement spike: drives a controlled, visible Chromium via CDP over --remote-debugging-pipe (no TCP debug port). Proves the D14 browser capability contract (visible interaction, DOM refs, screenshots, download, tabs, suspend/resume, cookies, proxy, session isolation, untrusted-page confinement) against a local-only test site. Not a production component; owns no business fact (registered as kind=prototype in docs/rust-tauri/R01/DEPENDENCY_RULES.json, bound by DEP-07)."
+version = "0.0.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+# All entries below are already locked members of the workspace dep tree
+# (introduced by R01-T02/T03); no new third-party version enters the lock.
+base64 = "0.23.1"
+# libc is promoted from transitive to direct dependency for pipe(2)/dup2(2)
+# fd wiring of the CDP pipe transport; decision recorded in
+# docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md (D-09).
+libc = "0.2.189"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+sha2 = "0.11.0"
