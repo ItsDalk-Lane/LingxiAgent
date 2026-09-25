@@ -1,0 +1,5 @@
+# R01-T02 evidence run
+utc=2026-09-25T00:04:53Z
+HEAD=a98d24877e056dcb490f23ec739713ca937e646e
+node=v24.16.0 cargo=cargo 1.93.0 (Homebrew) rustc=rustc 1.93.0 (254b59607 2026-01-19) (Homebrew)
+proxy env: http_proxy=http://127.0.0.1:7890 https_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7890 (dead; all cargo commands run with env -u ... direct)

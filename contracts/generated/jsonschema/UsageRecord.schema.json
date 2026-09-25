@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Token usage of one model call; usage and causal trace belong to exactly\none modelCall record (contract §3).",
+  "properties": {
+    "inputTokens": {
+      "type": "string"
+    },
+    "outputTokens": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "inputTokens",
+    "outputTokens"
+  ],
+  "title": "UsageRecord",
+  "type": "object"
+}

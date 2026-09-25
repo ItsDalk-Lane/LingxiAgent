@@ -1,0 +1,110 @@
+{
+  "authority": "rust/crates/lingxi-protocol (golden_samples in lingxi-protocol-gen)",
+  "canonicalization": "lingxi-canonical-json-v1",
+  "samples": [
+    {
+      "checks": [],
+      "file": "client-hello.json",
+      "sha256": "75227352d13e49f924afbbd6afe3a0070752227679a5b50c9cd35ff63aa3e826",
+      "type": "ClientHello"
+    },
+    {
+      "checks": [],
+      "file": "server-hello.json",
+      "sha256": "0d8a46453cd55d78e5afa1eac9f57136d7ea308d4ae422619bcab70903bac17c",
+      "type": "ServerHello"
+    },
+    {
+      "checks": [],
+      "file": "error-version-incompatible.json",
+      "sha256": "c71775e55efe1a6f936b6044f4843f84d290417a916b123ab710e3939870f031",
+      "type": "ProtocolError"
+    },
+    {
+      "checks": [
+        {
+          "field": "seq",
+          "kind": "big_seq_string",
+          "note": "seq exceeds 2^53-1; TS must keep it a string/BigInt, never a Number"
+        }
+      ],
+      "file": "event-assistant-segment-delta.json",
+      "sha256": "b7f5227fcc28cd40a527532b3ce92f9d2dce58da12b3d864e182a2085f65e68a",
+      "type": "EventEnvelope"
+    },
+    {
+      "checks": [],
+      "file": "event-run-state-failed.json",
+      "sha256": "6d5321d9441f23c51cc9d0d3718f7295ff6341db4b7ea03c45a3cdc316c667ac",
+      "type": "EventEnvelope"
+    },
+    {
+      "checks": [
+        {
+          "args": {
+            "command": "ls -la",
+            "path": "/tmp/灵犀测试",
+            "timeoutMs": 30000
+          },
+          "digestField": [
+            "payload",
+            "toolCall",
+            "argsDigest",
+            "hex"
+          ],
+          "kind": "args_digest",
+          "note": "TS recomputes sha256(canonical(args)) and asserts equality with the digest embedded at digestField"
+        }
+      ],
+      "file": "event-tool-call-started.json",
+      "sha256": "997675f9ce2cac50370ea87149ef3581f9f668ec9871a7845ee7f7334c2f8bbd",
+      "type": "EventEnvelope"
+    },
+    {
+      "checks": [],
+      "file": "event-tool-call-completed.json",
+      "sha256": "7638aab9612f3a6e0dbcb49f5fd65d22250bd9587c9d092bdbb8ed9edf75510a",
+      "type": "EventEnvelope"
+    },
+    {
+      "checks": [
+        {
+          "kind": "unknown_event_preserved",
+          "note": "payload.type is not in the v1 vocabulary; TS must surface it as unknown and keep every field"
+        }
+      ],
+      "file": "event-unknown-future.json",
+      "sha256": "673d7445370358504de63df9eecbe9d5139b7b6214e208e15a316c1d8e5f15f5",
+      "type": "EventEnvelope"
+    },
+    {
+      "checks": [],
+      "file": "history-page.json",
+      "sha256": "f4028270f5d05b1189cdeb162212f1ccf872806d704a07fd42f1812a8d648f5c",
+      "type": "HistoryPage"
+    },
+    {
+      "checks": [],
+      "file": "model-request.json",
+      "sha256": "fad11db1f05e1eb951857a0d695dd1b9af3631e7f331c4a68fdd1c726fb14c5a",
+      "type": "ModelRequest"
+    },
+    {
+      "checks": [],
+      "file": "approval-request.json",
+      "sha256": "e5779a182953639fad9c0a692948a849984a62e71e35923c13b335c367d01156",
+      "type": "ApprovalRequest"
+    },
+    {
+      "checks": [
+        {
+          "kind": "schema_verbatim",
+          "note": "schema must round-trip byte-identically, x-vendor-extension included"
+        }
+      ],
+      "file": "tool-schema-document.json",
+      "sha256": "7dbbb59468cb3e41fd9390eb5c02506aebc84737f535e9448de0ee691cd2f392",
+      "type": "ToolSchemaDocument"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A third-party tool schema document. `schema` is preserved **verbatim**\n(never normalized, merged or pruned); the boundary validates the dialect\nand, for supported dialects, validates values against the schema at the\ninvocation boundary.",
+  "properties": {
+    "dialect": {
+      "type": "string"
+    },
+    "schema": true
+  },
+  "required": [
+    "dialect",
+    "schema"
+  ],
+  "title": "ToolSchemaDocument",
+  "type": "object"
+}

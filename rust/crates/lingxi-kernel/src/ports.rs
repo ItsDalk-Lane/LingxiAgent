@@ -74,7 +74,9 @@ pub trait ToolPort {
 /// Result of one tool call. `Unknown` is mandatory: an externally
 /// completed side effect with no local receipt is never silently
 /// retried and never reported as success.
-#[derive(Debug, Clone, PartialEq, Eq)]
+// NOTE: not `Eq` — it carries `ProtocolError`, whose `details` holds
+// arbitrary JSON values.
+#[derive(Debug, Clone, PartialEq)]
 pub enum ToolOutcome {
     Success { content_digest: String },
     Failed { error: ProtocolError },

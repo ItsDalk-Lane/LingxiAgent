@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Canonical assistant phase, aligned with the incumbent\n`server/assistant-event-normalizer.ts` vocabulary (S09). There is exactly\none authoritative MOOD/thinking-tag parsing entry; clients never\nre-clean phases themselves.",
+  "oneOf": [
+    {
+      "enum": [
+        "reasoning",
+        "commentary",
+        "final_answer"
+      ],
+      "type": "string"
+    },
+    {
+      "const": "unresolved",
+      "description": "Phase could not be resolved from provider events; surfaced, never\nguessed into `final_answer` silently (a diagnostic accompanies it).",
+      "type": "string"
+    }
+  ],
+  "title": "AssistantPhase"
+}

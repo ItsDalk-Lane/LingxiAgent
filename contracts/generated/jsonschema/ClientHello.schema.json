@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Client → server handshake opening. Closed struct: unknown fields are a\nhard `invalid_message` error, because guessing at negotiation inputs is\nexactly the failure mode R01-A04 forbids.",
+  "properties": {
+    "caps": {
+      "description": "Optional capability tokens the client wants; unknown tokens are\nreported back in `ServerHello::rejected_caps`, never silently\ndropped.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "clientKind": {
+      "description": "Client kind, e.g. `desktop`, `cli`, `web`. Free-form, informational.",
+      "type": "string"
+    },
+    "clientVersion": {
+      "description": "Client implementation version (informational, e.g. app version).",
+      "type": "string"
+    },
+    "protocol": {
+      "description": "Protocol family; must be `lingxi.wire`.",
+      "type": "string"
+    },
+    "protocolMax": {
+      "description": "Highest wire protocol version the client can speak.",
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "protocolMin": {
+      "description": "Lowest wire protocol version the client can speak.",
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "protocol",
+    "clientKind",
+    "clientVersion",
+    "protocolMin",
+    "protocolMax"
+  ],
+  "title": "ClientHello",
+  "type": "object"
+}

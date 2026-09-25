@@ -1,0 +1,30 @@
+{
+  "$defs": {
+    "PrincipalKind": {
+      "enum": [
+        "local_user",
+        "device",
+        "web_session",
+        "automation"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Authenticated principal reference on the wire (identity facts only;\ncredential material never crosses the wire).",
+  "properties": {
+    "kind": {
+      "$ref": "#/$defs/PrincipalKind"
+    },
+    "principalId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "kind",
+    "principalId"
+  ],
+  "title": "PrincipalRef",
+  "type": "object"
+}

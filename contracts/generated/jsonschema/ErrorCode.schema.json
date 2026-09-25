@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Machine-diagnosable error code for the protocol error envelope.",
+  "oneOf": [
+    {
+      "enum": [
+        "invalid_message",
+        "version_incompatible",
+        "unauthorized",
+        "forbidden",
+        "not_found",
+        "conflict",
+        "cancelled",
+        "budget_exceeded",
+        "upstream_unavailable",
+        "internal"
+      ],
+      "type": "string"
+    },
+    {
+      "const": "cursor_expired",
+      "description": "Pagination cursor is too old or unknown; the client must re-fetch a\nsnapshot instead of silently missing events (contract §7).",
+      "type": "string"
+    },
+    {
+      "const": "unknown_schema_dialect",
+      "description": "A tool/provider schema arrived in a dialect this boundary does not\nsupport. Never falls back to lenient parsing (contract §5).",
+      "type": "string"
+    }
+  ],
+  "title": "ErrorCode"
+}

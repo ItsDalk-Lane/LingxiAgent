@@ -1,0 +1,5 @@
+== [1/2] contracts/generated (lingxi-protocol-gen --check)
+OK: 56 generated files match regeneration (no diff) under /Users/study_superior/Desktop/Code/LingxiAgent/contracts/generated
+== [2/2] API_COMPAT_MATRIX.json (extract --check)
+OK: API_COMPAT_MATRIX.json matches regeneration (624 entries)
+OK: all generated artifacts are drift-free

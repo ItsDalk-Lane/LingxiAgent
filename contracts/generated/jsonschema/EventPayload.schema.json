@@ -1,0 +1,809 @@
+{
+  "$defs": {
+    "ApprovalDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "approvalId": {
+          "type": "string"
+        },
+        "approved": {
+          "type": "boolean"
+        },
+        "decidedBy": {
+          "description": "Who decided (principal id); set by the service auth layer, never by\nthe model or the frontend.",
+          "type": "string"
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "approvalId",
+        "approved",
+        "decidedBy"
+      ],
+      "type": "object"
+    },
+    "ApprovalRequest": {
+      "additionalProperties": false,
+      "description": "Approval request: bound to target, principal, run, normalized argument\ndigest, resources, generation, expiry and use count. A JSON field saying\n`\"approved\": true` is never by itself an authorization — the kernel-side\n`PreparedInvocation` is not forgeable from model output.",
+      "properties": {
+        "approvalId": {
+          "type": "string"
+        },
+        "argsDigest": {
+          "$ref": "#/$defs/ContentDigest"
+        },
+        "attempt": {
+          "$ref": "#/$defs/AttemptId"
+        },
+        "expiresAtUnixMs": {
+          "type": "string"
+        },
+        "generation": {
+          "type": "string"
+        },
+        "principal": {
+          "$ref": "#/$defs/PrincipalRef"
+        },
+        "remainingUses": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "resources": {
+          "items": {
+            "$ref": "#/$defs/ResourceRef"
+          },
+          "type": "array"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "target": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "approvalId",
+        "target",
+        "principal",
+        "runId",
+        "attempt",
+        "argsDigest",
+        "generation",
+        "expiresAtUnixMs"
+      ],
+      "type": "object"
+    },
+    "AssistantPhase": {
+      "description": "Canonical assistant phase, aligned with the incumbent\n`server/assistant-event-normalizer.ts` vocabulary (S09). There is exactly\none authoritative MOOD/thinking-tag parsing entry; clients never\nre-clean phases themselves.",
+      "oneOf": [
+        {
+          "enum": [
+            "reasoning",
+            "commentary",
+            "final_answer"
+          ],
+          "type": "string"
+        },
+        {
+          "const": "unresolved",
+          "description": "Phase could not be resolved from provider events; surfaced, never\nguessed into `final_answer` silently (a diagnostic accompanies it).",
+          "type": "string"
+        }
+      ]
+    },
+    "AttemptId": {
+      "description": "Identity of one attempt within a run (retry generation fence).\n\nOpaque string identifier. Equality and ordering carry no\nsemantics; the string form is preserved verbatim across\nmigrations (legacy IDs are never renumbered). On the wire this is\na plain JSON string (`#[serde(transparent)]`).",
+      "type": "string"
+    },
+    "ContentBlock": {
+      "description": "One block of normalized message content.\n\n`opaque` preserves provider-specific state (e.g. reasoning signatures /\nopaque blocks) **verbatim** — contract §6 forbids flattening such state\ninto ordinary text or dropping it for uniformity.",
+      "oneOf": [
+        {
+          "properties": {
+            "text": {
+              "type": "string"
+            },
+            "type": {
+              "const": "text",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "text"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "text": {
+              "type": "string"
+            },
+            "type": {
+              "const": "reasoning",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "text"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "resource": {
+              "$ref": "#/$defs/ResourceRef"
+            },
+            "type": {
+              "const": "resource_ref",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "resource"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Provider-opaque payload, preserved byte-identically.",
+          "properties": {
+            "data": true,
+            "provider": {
+              "type": "string"
+            },
+            "type": {
+              "const": "opaque",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "provider",
+            "data"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "ContentDigest": {
+      "additionalProperties": false,
+      "description": "Hash of canonical content (protocol §6). `algorithm` is `sha256`;\n`canonicalization` names the canonical JSON profile.",
+      "properties": {
+        "algorithm": {
+          "type": "string"
+        },
+        "canonicalization": {
+          "type": "string"
+        },
+        "hex": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "algorithm",
+        "canonicalization",
+        "hex"
+      ],
+      "type": "object"
+    },
+    "ErrorCode": {
+      "description": "Machine-diagnosable error code for the protocol error envelope.",
+      "oneOf": [
+        {
+          "enum": [
+            "invalid_message",
+            "version_incompatible",
+            "unauthorized",
+            "forbidden",
+            "not_found",
+            "conflict",
+            "cancelled",
+            "budget_exceeded",
+            "upstream_unavailable",
+            "internal"
+          ],
+          "type": "string"
+        },
+        {
+          "const": "cursor_expired",
+          "description": "Pagination cursor is too old or unknown; the client must re-fetch a\nsnapshot instead of silently missing events (contract §7).",
+          "type": "string"
+        },
+        {
+          "const": "unknown_schema_dialect",
+          "description": "A tool/provider schema arrived in a dialect this boundary does not\nsupport. Never falls back to lenient parsing (contract §5).",
+          "type": "string"
+        }
+      ]
+    },
+    "KnownEventPayload": {
+      "description": "The known event vocabulary of `lingxi.wire` v1. Closed per variant, but\nthe vocabulary itself is open through [`EventPayload::Unknown`].",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "from": {
+              "$ref": "#/$defs/RunStatus"
+            },
+            "reason": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "to": {
+              "$ref": "#/$defs/RunStatus"
+            },
+            "type": {
+              "const": "run_state_changed",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "from",
+            "to"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "model": {
+              "type": "string"
+            },
+            "modelCallId": {
+              "$ref": "#/$defs/ModelCallId"
+            },
+            "operation": {
+              "type": "string"
+            },
+            "provider": {
+              "type": "string"
+            },
+            "type": {
+              "const": "model_call_started",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "modelCallId",
+            "provider",
+            "model",
+            "operation"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "delta": {
+              "type": "string"
+            },
+            "modelCallId": {
+              "$ref": "#/$defs/ModelCallId"
+            },
+            "phase": {
+              "$ref": "#/$defs/AssistantPhase"
+            },
+            "type": {
+              "const": "model_call_delta",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "modelCallId",
+            "phase",
+            "delta"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "modelCallId": {
+              "$ref": "#/$defs/ModelCallId"
+            },
+            "type": {
+              "const": "model_call_completed",
+              "type": "string"
+            },
+            "usage": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/UsageRecord"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "modelCallId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "toolCall": {
+              "$ref": "#/$defs/ToolCallDescriptor"
+            },
+            "type": {
+              "const": "tool_call_started",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "toolCall"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "result": {
+              "$ref": "#/$defs/ToolResultWire"
+            },
+            "toolCallId": {
+              "$ref": "#/$defs/ToolCallId"
+            },
+            "type": {
+              "const": "tool_call_completed",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "toolCallId",
+            "result"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "request": {
+              "$ref": "#/$defs/ApprovalRequest"
+            },
+            "type": {
+              "const": "approval_requested",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "request"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "decision": {
+              "$ref": "#/$defs/ApprovalDecision"
+            },
+            "type": {
+              "const": "approval_decided",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "decision"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "$ref": "#/$defs/SegmentKind"
+            },
+            "segmentId": {
+              "type": "string"
+            },
+            "semanticPhase": {
+              "$ref": "#/$defs/AssistantPhase"
+            },
+            "type": {
+              "const": "assistant_segment_start",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "segmentId",
+            "kind",
+            "semanticPhase"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "delta": {
+              "type": "string"
+            },
+            "segmentId": {
+              "type": "string"
+            },
+            "semanticPhase": {
+              "$ref": "#/$defs/AssistantPhase"
+            },
+            "type": {
+              "const": "assistant_segment_delta",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "segmentId",
+            "delta",
+            "semanticPhase"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "segmentId": {
+              "type": "string"
+            },
+            "semanticPhase": {
+              "$ref": "#/$defs/AssistantPhase"
+            },
+            "type": {
+              "const": "assistant_segment_end",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "segmentId",
+            "semanticPhase"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "message": {
+              "$ref": "#/$defs/NormalizedMessage"
+            },
+            "type": {
+              "const": "final_message_committed",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "message"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "ModelCallId": {
+      "description": "Identity of one model call. Run != ModelCall != ToolCall.\n\nOpaque string identifier. Equality and ordering carry no\nsemantics; the string form is preserved verbatim across\nmigrations (legacy IDs are never renumbered). On the wire this is\na plain JSON string (`#[serde(transparent)]`).",
+      "type": "string"
+    },
+    "NormalizedMessage": {
+      "additionalProperties": false,
+      "description": "A normalized assistant/user message as committed to history.",
+      "properties": {
+        "content": {
+          "items": {
+            "$ref": "#/$defs/ContentBlock"
+          },
+          "type": "array"
+        },
+        "modelCallId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ModelCallId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "role": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "content"
+      ],
+      "type": "object"
+    },
+    "PrincipalKind": {
+      "enum": [
+        "local_user",
+        "device",
+        "web_session",
+        "automation"
+      ],
+      "type": "string"
+    },
+    "PrincipalRef": {
+      "additionalProperties": false,
+      "description": "Authenticated principal reference on the wire (identity facts only;\ncredential material never crosses the wire).",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/PrincipalKind"
+        },
+        "principalId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "principalId"
+      ],
+      "type": "object"
+    },
+    "ProtocolError": {
+      "additionalProperties": false,
+      "description": "Structured protocol error envelope.\n\n`retryable` is advisory for clients; safety-critical retries (external\nside effects) additionally require idempotency keys or state\nverification, which is a kernel/service concern, not a wire concern.\n`details` carries machine-readable diagnostics (e.g. supported version\nranges on `version_incompatible`); extensions to an error go there, so\nthe envelope itself stays closed to unknown fields.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "details": {
+          "additionalProperties": true,
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable"
+      ],
+      "type": "object"
+    },
+    "ResourceId": {
+      "description": "Identity of one persisted resource (session file / attachment).\n\nOpaque string identifier. Equality and ordering carry no\nsemantics; the string form is preserved verbatim across\nmigrations (legacy IDs are never renumbered). On the wire this is\na plain JSON string (`#[serde(transparent)]`).",
+      "type": "string"
+    },
+    "ResourceKind": {
+      "enum": [
+        "session_file",
+        "attachment",
+        "artifact",
+        "export"
+      ],
+      "type": "string"
+    },
+    "ResourceRef": {
+      "additionalProperties": false,
+      "description": "Reference to a real, authorized resource (contract §3: ResourceService\nowns real files and grants; a model claiming a file exists never creates\na resource reference by itself).",
+      "properties": {
+        "digest": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ContentDigest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "displayName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "$ref": "#/$defs/ResourceKind"
+        },
+        "resourceId": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "sizeBytes": {
+          "description": "Byte size as a decimal string (precision rule: all u64 on the wire\nare strings).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "uri": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "resourceId",
+        "kind"
+      ],
+      "type": "object"
+    },
+    "RunId": {
+      "description": "Identity of one user task execution (one Run).\n\nOpaque string identifier. Equality and ordering carry no\nsemantics; the string form is preserved verbatim across\nmigrations (legacy IDs are never renumbered). On the wire this is\na plain JSON string (`#[serde(transparent)]`).",
+      "type": "string"
+    },
+    "RunStatus": {
+      "description": "Lifecycle state of one Run (taskbook `02_目标架构与强制契约.md` §4).\n\nTerminal states never migrate back to active states. Completion state\nand delivery quality are separate facts: a run may complete without a\nfinal assistant message, and that must not be fabricated.",
+      "oneOf": [
+        {
+          "enum": [
+            "queued",
+            "running",
+            "waiting_approval",
+            "cancelling",
+            "cancelled",
+            "completed",
+            "failed"
+          ],
+          "type": "string"
+        },
+        {
+          "const": "interrupted_needs_attention",
+          "description": "Recovery cannot safely continue; needs operator attention.",
+          "type": "string"
+        }
+      ]
+    },
+    "SegmentKind": {
+      "enum": [
+        "text",
+        "reasoning"
+      ],
+      "type": "string"
+    },
+    "ToolCallDescriptor": {
+      "additionalProperties": false,
+      "description": "Wire descriptor of one tool call as announced at start.",
+      "properties": {
+        "argsDigest": {
+          "$ref": "#/$defs/ContentDigest"
+        },
+        "argsSummary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "target": {
+          "description": "Registry target id at the pinned generation.",
+          "type": "string"
+        },
+        "toolCallId": {
+          "$ref": "#/$defs/ToolCallId"
+        }
+      },
+      "required": [
+        "toolCallId",
+        "target",
+        "argsDigest"
+      ],
+      "type": "object"
+    },
+    "ToolCallId": {
+      "description": "Identity of one tool call.\n\nOpaque string identifier. Equality and ordering carry no\nsemantics; the string form is preserved verbatim across\nmigrations (legacy IDs are never renumbered). On the wire this is\na plain JSON string (`#[serde(transparent)]`).",
+      "type": "string"
+    },
+    "ToolResultStatus": {
+      "oneOf": [
+        {
+          "enum": [
+            "success",
+            "failed",
+            "cancelled"
+          ],
+          "type": "string"
+        },
+        {
+          "const": "unknown",
+          "description": "Externally completed side effect with no local receipt; never\nsilently retried and never reported as success.",
+          "type": "string"
+        }
+      ]
+    },
+    "ToolResultWire": {
+      "additionalProperties": false,
+      "description": "Structured result of one tool call (contract §5: distinguishes\nsuccess/failed/cancelled/unknown, carries content blocks, resource refs,\ntruncation and the error with retry semantics).",
+      "properties": {
+        "content": {
+          "items": {
+            "$ref": "#/$defs/ContentBlock"
+          },
+          "type": "array"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProtocolError"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resourceRefs": {
+          "items": {
+            "$ref": "#/$defs/ResourceRef"
+          },
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/ToolResultStatus"
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "status",
+        "truncated"
+      ],
+      "type": "object"
+    },
+    "UsageRecord": {
+      "additionalProperties": false,
+      "description": "Token usage of one model call; usage and causal trace belong to exactly\none modelCall record (contract §3).",
+      "properties": {
+        "inputTokens": {
+          "type": "string"
+        },
+        "outputTokens": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "inputTokens",
+        "outputTokens"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/KnownEventPayload"
+    },
+    {
+      "additionalProperties": true,
+      "description": "Unknown event type: preserved verbatim and surfaced as unsupported; never silently dropped.",
+      "properties": {
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    }
+  ],
+  "title": "EventPayload"
+}

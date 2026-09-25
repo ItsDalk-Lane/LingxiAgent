@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Budget facts pinned to a model request (contract §6).",
+  "properties": {
+    "deadlineUnixMs": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "maxCostMicros": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "maxTokens": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "title": "Budget",
+  "type": "object"
+}

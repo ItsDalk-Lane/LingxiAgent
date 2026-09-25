@@ -1,0 +1,33 @@
+{
+  "$defs": {
+    "Cursor": {
+      "description": "Opaque pagination cursor. The server owns its meaning; clients must\ntreat it as an untranslatable token. An expired/unknown cursor fails with\n`cursor_expired`; the client must re-fetch a snapshot (contract §7).",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Request half of cursor pagination.",
+  "properties": {
+    "cursor": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Cursor"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "limit": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    }
+  },
+  "title": "PageRequest",
+  "type": "object"
+}

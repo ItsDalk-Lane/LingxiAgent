@@ -1,0 +1,173 @@
+{
+  "$defs": {
+    "AttemptId": {
+      "description": "Identity of one attempt within a run (retry generation fence).\n\nOpaque string identifier. Equality and ordering carry no\nsemantics; the string form is preserved verbatim across\nmigrations (legacy IDs are never renumbered). On the wire this is\na plain JSON string (`#[serde(transparent)]`).",
+      "type": "string"
+    },
+    "ContentDigest": {
+      "additionalProperties": false,
+      "description": "Hash of canonical content (protocol §6). `algorithm` is `sha256`;\n`canonicalization` names the canonical JSON profile.",
+      "properties": {
+        "algorithm": {
+          "type": "string"
+        },
+        "canonicalization": {
+          "type": "string"
+        },
+        "hex": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "algorithm",
+        "canonicalization",
+        "hex"
+      ],
+      "type": "object"
+    },
+    "PrincipalKind": {
+      "enum": [
+        "local_user",
+        "device",
+        "web_session",
+        "automation"
+      ],
+      "type": "string"
+    },
+    "PrincipalRef": {
+      "additionalProperties": false,
+      "description": "Authenticated principal reference on the wire (identity facts only;\ncredential material never crosses the wire).",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/PrincipalKind"
+        },
+        "principalId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "principalId"
+      ],
+      "type": "object"
+    },
+    "ResourceId": {
+      "description": "Identity of one persisted resource (session file / attachment).\n\nOpaque string identifier. Equality and ordering carry no\nsemantics; the string form is preserved verbatim across\nmigrations (legacy IDs are never renumbered). On the wire this is\na plain JSON string (`#[serde(transparent)]`).",
+      "type": "string"
+    },
+    "ResourceKind": {
+      "enum": [
+        "session_file",
+        "attachment",
+        "artifact",
+        "export"
+      ],
+      "type": "string"
+    },
+    "ResourceRef": {
+      "additionalProperties": false,
+      "description": "Reference to a real, authorized resource (contract §3: ResourceService\nowns real files and grants; a model claiming a file exists never creates\na resource reference by itself).",
+      "properties": {
+        "digest": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ContentDigest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "displayName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "$ref": "#/$defs/ResourceKind"
+        },
+        "resourceId": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "sizeBytes": {
+          "description": "Byte size as a decimal string (precision rule: all u64 on the wire\nare strings).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "uri": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "resourceId",
+        "kind"
+      ],
+      "type": "object"
+    },
+    "RunId": {
+      "description": "Identity of one user task execution (one Run).\n\nOpaque string identifier. Equality and ordering carry no\nsemantics; the string form is preserved verbatim across\nmigrations (legacy IDs are never renumbered). On the wire this is\na plain JSON string (`#[serde(transparent)]`).",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Approval request: bound to target, principal, run, normalized argument\ndigest, resources, generation, expiry and use count. A JSON field saying\n`\"approved\": true` is never by itself an authorization — the kernel-side\n`PreparedInvocation` is not forgeable from model output.",
+  "properties": {
+    "approvalId": {
+      "type": "string"
+    },
+    "argsDigest": {
+      "$ref": "#/$defs/ContentDigest"
+    },
+    "attempt": {
+      "$ref": "#/$defs/AttemptId"
+    },
+    "expiresAtUnixMs": {
+      "type": "string"
+    },
+    "generation": {
+      "type": "string"
+    },
+    "principal": {
+      "$ref": "#/$defs/PrincipalRef"
+    },
+    "remainingUses": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "resources": {
+      "items": {
+        "$ref": "#/$defs/ResourceRef"
+      },
+      "type": "array"
+    },
+    "runId": {
+      "$ref": "#/$defs/RunId"
+    },
+    "target": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "approvalId",
+    "target",
+    "principal",
+    "runId",
+    "attempt",
+    "argsDigest",
+    "generation",
+    "expiresAtUnixMs"
+  ],
+  "title": "ApprovalRequest",
+  "type": "object"
+}

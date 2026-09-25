@@ -1,0 +1,22 @@
+== N1 tampered TS copy -> lingxi-protocol-verify --ts
+ROUND-TRIP FAILURES (1):
+  - event-assistant-segment-delta.json: TS re-encoded bytes differ from golden (NOT semantically equal)
+N1 exit=1 (expected 1)
+
+== N2 tampered golden -> TS roundtrip
+  [check] event-assistant-segment-delta.json (EventEnvelope): seq=9007199254741003 kept as string; Number() would lose precision (Number→9007199254741004, BigInt roundtrip mismatch proven)
+  [check] event-tool-call-started.json (EventEnvelope): args digest parity sha256=0e7018f10d17014509aadb62038f1f3f84ad3d3d8178bdfe1db1a0cd6b34d6e0
+  [check] event-unknown-future.json (EventEnvelope): unknown event "future_recall_started" preserved with 3 top-level fields (incl. permissionHint)
+  [check] tool-schema-document.json (ToolSchemaDocument): third-party schema verbatim, vendor extension intact
+ROUND-TRIP FAILURES (1):
+  - event-run-state-failed.json (EventEnvelope): sha256 f9c8cf460f1a087aa5934028f004a8199a3743572cfd80a9278deb338edbdad4 != index 6d5321d9441f23c51cc9d0d3718f7295ff6341db4b7ea03c45a3cdc316c667ac
+N2 exit=1 (expected 1)
+
+== N3 tampered generated tree -> gen --check
+GENERATED DRIFT DETECTED (1 problems):
+  - drift: ts/lingxi-protocol.ts (disk 12271 bytes sha256=ca30808d21ebc1cb5659c2361a7bce8c1cd542812eb01ed3ec1ec459d3711b1d, regenerated 12269 bytes sha256=28059f4d1776fc2aed820622c93f25fb4341679211ef13a8c81de8586d2a3d27)
+regenerate with: cargo run -p lingxi-protocol --bin lingxi-protocol-gen
+N3 exit=1 (expected 1)
+
+== restore check: golden restored, roundtrip green again
+restored roundtrip exit=0 (expected 0)

@@ -7,7 +7,14 @@ license.workspace = true
 publish.workspace = true
 
 [dependencies]
-# Intentionally empty for the R01-T01 minimal prototype: the crate must
-# compile offline with zero external dependencies. serde/schemars and the
-# generated JSON Schema / TS bindings are introduced by R01-T02 and locked
-# by R01-T03.
+# R01-T02: serde data types are the single protocol authority; schemars
+# derives the generated JSON Schema; sha1/sha2/base64 serve the handshake
+# prototype (WS accept key) and content digests. Exact versions are pinned
+# by rust/Cargo.lock; the toolchain/version locking policy itself is
+# R01-T03 scope.
+base64 = "0.23.1"
+schemars = "1.2.2"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+sha1 = "0.11.0"
+sha2 = "0.11.0"

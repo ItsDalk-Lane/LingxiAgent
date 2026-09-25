@@ -1,0 +1,62 @@
+{
+  "$defs": {
+    "ErrorCode": {
+      "description": "Machine-diagnosable error code for the protocol error envelope.",
+      "oneOf": [
+        {
+          "enum": [
+            "invalid_message",
+            "version_incompatible",
+            "unauthorized",
+            "forbidden",
+            "not_found",
+            "conflict",
+            "cancelled",
+            "budget_exceeded",
+            "upstream_unavailable",
+            "internal"
+          ],
+          "type": "string"
+        },
+        {
+          "const": "cursor_expired",
+          "description": "Pagination cursor is too old or unknown; the client must re-fetch a\nsnapshot instead of silently missing events (contract §7).",
+          "type": "string"
+        },
+        {
+          "const": "unknown_schema_dialect",
+          "description": "A tool/provider schema arrived in a dialect this boundary does not\nsupport. Never falls back to lenient parsing (contract §5).",
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Structured protocol error envelope.\n\n`retryable` is advisory for clients; safety-critical retries (external\nside effects) additionally require idempotency keys or state\nverification, which is a kernel/service concern, not a wire concern.\n`details` carries machine-readable diagnostics (e.g. supported version\nranges on `version_incompatible`); extensions to an error go there, so\nthe envelope itself stays closed to unknown fields.",
+  "properties": {
+    "code": {
+      "$ref": "#/$defs/ErrorCode"
+    },
+    "details": {
+      "additionalProperties": true,
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "message": {
+      "type": "string"
+    },
+    "retryable": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "code",
+    "message",
+    "retryable"
+  ],
+  "title": "ProtocolError",
+  "type": "object"
+}

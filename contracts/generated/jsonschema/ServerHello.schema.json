@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Server → client handshake acceptance.",
+  "properties": {
+    "dataEpoch": {
+      "description": "Data epoch of the server's stores (mirrors DATA_EPOCH; epoch\nmigration strategy itself is R01-T07 scope).",
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "protocol": {
+      "type": "string"
+    },
+    "rejectedCaps": {
+      "description": "Capability tokens from `ClientHello::caps` the server does not\nrecognize. Reported, never silently dropped.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "selectedProtocol": {
+      "description": "The single negotiated wire protocol version.",
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "serverKind": {
+      "description": "Server identity for diagnostics (kind + version, informational).",
+      "type": "string"
+    },
+    "serverVersion": {
+      "type": "string"
+    },
+    "wireProtocolMax": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "wireProtocolMin": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "protocol",
+    "selectedProtocol",
+    "wireProtocolMin",
+    "wireProtocolMax",
+    "dataEpoch",
+    "serverKind",
+    "serverVersion"
+  ],
+  "title": "ServerHello",
+  "type": "object"
+}

@@ -1,0 +1,7 @@
+roundtrip exit=0
+check-generated exit=0
+handshake exit=0
+t01-positive exit=0
+t01-selftest exit=0
+t01-generator-check exit=0
+cargo-test-workspace exit=0

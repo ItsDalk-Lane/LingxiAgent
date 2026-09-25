@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Lifecycle state of one Run (taskbook `02_目标架构与强制契约.md` §4).\n\nTerminal states never migrate back to active states. Completion state\nand delivery quality are separate facts: a run may complete without a\nfinal assistant message, and that must not be fabricated.",
+  "oneOf": [
+    {
+      "enum": [
+        "queued",
+        "running",
+        "waiting_approval",
+        "cancelling",
+        "cancelled",
+        "completed",
+        "failed"
+      ],
+      "type": "string"
+    },
+    {
+      "const": "interrupted_needs_attention",
+      "description": "Recovery cannot safely continue; needs operator attention.",
+      "type": "string"
+    }
+  ],
+  "title": "RunStatus"
+}

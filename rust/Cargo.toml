@@ -12,8 +12,10 @@
 #     (or any desktop/webview stack).
 #   - lingxi-kernel must not depend on lingxi-adapters (ports live in
 #     kernel; implementations are injected by lingxi-service).
-#   - no external crates in this minimal prototype; version locking of
-#     third-party dependencies is R01-T03 scope.
+#   - third-party crates enter only through this workspace (introduced by
+#     R01-T02: serde/serde_json/schemars/sha1/sha2/base64, exact versions
+#     pinned in Cargo.lock); the toolchain and version-locking policy
+#     itself is R01-T03 scope.
 [workspace]
 resolver = "2"
 members = [

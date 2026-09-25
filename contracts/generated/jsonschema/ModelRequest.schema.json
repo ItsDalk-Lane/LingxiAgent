@@ -1,0 +1,117 @@
+{
+  "$defs": {
+    "AttemptId": {
+      "description": "Identity of one attempt within a run (retry generation fence).\n\nOpaque string identifier. Equality and ordering carry no\nsemantics; the string form is preserved verbatim across\nmigrations (legacy IDs are never renumbered). On the wire this is\na plain JSON string (`#[serde(transparent)]`).",
+      "type": "string"
+    },
+    "Budget": {
+      "additionalProperties": false,
+      "description": "Budget facts pinned to a model request (contract §6).",
+      "properties": {
+        "deadlineUnixMs": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "maxCostMicros": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "maxTokens": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "ModelCallId": {
+      "description": "Identity of one model call. Run != ModelCall != ToolCall.\n\nOpaque string identifier. Equality and ordering carry no\nsemantics; the string form is preserved verbatim across\nmigrations (legacy IDs are never renumbered). On the wire this is\na plain JSON string (`#[serde(transparent)]`).",
+      "type": "string"
+    },
+    "PrincipalKind": {
+      "enum": [
+        "local_user",
+        "device",
+        "web_session",
+        "automation"
+      ],
+      "type": "string"
+    },
+    "PrincipalRef": {
+      "additionalProperties": false,
+      "description": "Authenticated principal reference on the wire (identity facts only;\ncredential material never crosses the wire).",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/PrincipalKind"
+        },
+        "principalId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "principalId"
+      ],
+      "type": "object"
+    },
+    "RunId": {
+      "description": "Identity of one user task execution (one Run).\n\nOpaque string identifier. Equality and ordering carry no\nsemantics; the string form is preserved verbatim across\nmigrations (legacy IDs are never renumbered). On the wire this is\na plain JSON string (`#[serde(transparent)]`).",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The fixed identity/authority set every model request carries\n(contract §6). Credentials are resolved server-side; `provider`+`model`\nare a pair — same model id under a different provider is a different\nmodel.",
+  "properties": {
+    "attempt": {
+      "$ref": "#/$defs/AttemptId"
+    },
+    "budget": {
+      "$ref": "#/$defs/Budget"
+    },
+    "configGeneration": {
+      "description": "Registry/configuration generation the request snapshot was taken at.",
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "modelCallId": {
+      "$ref": "#/$defs/ModelCallId"
+    },
+    "operation": {
+      "type": "string"
+    },
+    "principal": {
+      "$ref": "#/$defs/PrincipalRef"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "purpose": {
+      "type": "string"
+    },
+    "runId": {
+      "$ref": "#/$defs/RunId"
+    }
+  },
+  "required": [
+    "principal",
+    "runId",
+    "attempt",
+    "modelCallId",
+    "purpose",
+    "provider",
+    "model",
+    "operation",
+    "budget",
+    "configGeneration"
+  ],
+  "title": "ModelRequest",
+  "type": "object"
+}
