@@ -4,7 +4,7 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "8994c67bc48f607769c50299a6c59e638425a58b",
+  "current_head": "73bde3b5a28944ef9f69e228128c9206ad424145",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -1449,29 +1449,79 @@
     "R01-T07": {
       "name": "确定存储切换与旧版本拒写策略",
       "stage_id": "R01",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "task_base_sha": "8994c67bc48f607769c50299a6c59e638425a58b",
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
-      "repair_agent_id": null,
+      "executor_id": "ZCode:R01-T07-exec-r1 (agent_1712d2ab-506d-42ca-ba5f-4348917dc98a)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 2,
+      "reviewer_id": "ZCode:R01-T07-review-r2 (agent_efd254d1-e6e0-4eea-a98c-fc31c110a32e)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-F1",
+          "severity": "MEDIUM",
+          "summary": "ADR-004 §2 闸软化边界声明与实测不符：R7/R9/R10 corrupt 类变体 fail-open（coordinator:547-550 丢弃日志 toEpoch → mustBlock 误判，警告文本失实）",
+          "review_report": "docs/rust-tauri/R01/R01-T07_REVIEW_R1.md",
+          "resolution": "repair-r1：ADR 改写为实测边界+4 变体证据+生产缺陷立项（候选 R02）；R2 复验关闭"
+        },
+        {
+          "id": "R1-F2",
+          "severity": "LOW",
+          "summary": "印章篡改窗口实证闸为协作式",
+          "review_report": "docs/rust-tauri/R01/R01-T07_REVIEW_R1.md",
+          "resolution": "repair-r1 补登 ADR/ROLLBACK_DESIGN，支持 D2 分离根必要性"
+        },
+        {
+          "id": "R1-F3",
+          "severity": "LOW",
+          "summary": "desktop 壳 6 个 shell-local 存储不过闸，新旧壳共享根争抢风险",
+          "review_report": "docs/rust-tauri/R01/R01-T07_REVIEW_R1.md",
+          "resolution": "挂 R09 强制项（ADR §5+矩阵 note）"
+        },
+        {
+          "id": "PROD-DEFECT-1",
+          "severity": "REGISTERED",
+          "summary": "生产缺陷立项：data-epoch-coordinator corrupt-failure fail-open + 警告文本失实（R01 不改生产代码）",
+          "resolution": "归属候选 R02；已入 ADR-004 §5 与 R01-T07_REPAIR_R1 §5，须入 R01-T08 风险登记/HANDOFF"
+        }
+      ],
+      "repair_agent_id": "ZCode:R01-T07-repair-r1 (agent_a67ae0c9-0d83-49a8-b755-11eb9f84bc50)",
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R01-A13": "NOT_STARTED",
-        "R01-A14": "NOT_STARTED"
+        "R01-A13": "PASS",
+        "R01-A14": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "73bde3b5a28944ef9f69e228128c9206ad424145",
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "review_report": "docs/rust-tauri/R01/R01-T07_REVIEW_R2.md",
+      "review_report_sha256": "7a12213446f43e9314999cbdc7105374de4a87c28df903c185259ebd381fbceb",
+      "review_history": [
+        {
+          "round": 1,
+          "verdict": "FAIL",
+          "report": "docs/rust-tauri/R01/R01-T07_REVIEW_R1.md",
+          "sha256": "bb6aecfff133c77ba922a0e1c9becfb4187cf02c5ff12032806dfc21d2b84485"
+        },
+        {
+          "round": "repair-1",
+          "report": "docs/rust-tauri/R01/R01-T07_REPAIR_R1.md",
+          "sha256": "d0f0cf21c60518723310c74d3371b74085e5954aef0ceb6f97e988c5c7fe49b4"
+        },
+        {
+          "round": 2,
+          "verdict": "PASS",
+          "report": "docs/rust-tauri/R01/R01-T07_REVIEW_R2.md",
+          "sha256": "7a12213446f43e9314999cbdc7105374de4a87c28df903c185259ebd381fbceb"
+        }
+      ],
+      "repair_rounds_completed": 1
     },
     "R01-T08": {
       "name": "冻结架构关卡与风险决策",
       "stage_id": "R01",
-      "status": "PENDING",
-      "task_base_sha": null,
+      "status": "IN_PROGRESS",
+      "task_base_sha": "73bde3b5a28944ef9f69e228128c9206ad424145",
       "executor_id": null,
       "execution_result": null,
       "review_round": 0,
@@ -3253,7 +3303,7 @@
       "blockers": []
     }
   },
-  "current_task": "R01-T07",
+  "current_task": "R01-T08",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",
