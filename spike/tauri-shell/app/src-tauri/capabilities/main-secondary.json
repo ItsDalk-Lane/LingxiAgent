@@ -1,0 +1,9 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main-secondary-capability",
+  "description": "多 capability 叠加验证（W02 merge 语义）：shell_secondary_probe 只在此文件中授权；main 窗口同时挂在 main-capability 下，实测有效权限 = 两者并集。",
+  "windows": ["main"],
+  "permissions": [
+    "allow-shell-secondary-probe"
+  ]
+}

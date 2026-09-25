@@ -1,0 +1,17 @@
+== repair-r1 standalone negative: crash-recovery assertion (F4) ==
+script under test: spike/tauri-shell/scripts/run_e2e.sh (heredoc extracted verbatim, see assert-block-extracted.txt)
+
+-- negative: probe exit=0 but restart failed with symlink refusal (review §3.1 shape) --
+RECOVERY-ASSERT FAILED: restart.restarted != true: 'ERR:sidecar() failed: StartingBinary found current_exe() that contains a symlink'; ping_after_restart not a real pong: 'ERR:sidecar not running'; final_status alive!=true or restarts!=1: {'alive': False, 'hello': None, 'pid': None, 'restarts': 1}
+probe_exit=0 assert_exit=1 -> step_exit=1 (OLD runner would record exit=0 here)
+
+-- positive control (real recovery semantics) --
+RECOVERY-ASSERT OK: alive=false -> restarted=true -> pong seq>=2 -> restarts=1
+assert_exit=0
+
+-- control: missing file --
+RECOVERY-ASSERT FAILED: sidecar-recovery.json unreadable: [Errno 2] No such file or directory: 'does-not-exist.json'
+assert_exit=1
+-- control: garbage json --
+RECOVERY-ASSERT FAILED: sidecar-recovery.json unreadable: Expecting value: line 1 column 1 (char 0)
+assert_exit=1

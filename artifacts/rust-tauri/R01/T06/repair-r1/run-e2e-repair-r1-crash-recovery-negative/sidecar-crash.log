@@ -1,0 +1,5 @@
+sidecar pid=81735
+kill -9 sent
+sabotage injected: sidecar binary corrupted before restart probe
+sidecar-recovery drill captured
+RECOVERY-ASSERT FAILED: restart.restarted != true: 'ERR:spawn failed: Permission denied (os error 13)'; ping_after_restart not a real pong: 'ERR:sidecar not running'; final_status alive!=true or restarts!=1: {'alive': False, 'hello': {'lingxi_sidecar_hello': True, 'name': 'lingxi-t06-sidecar', 'protocol': 1, 'version': '1.0.0'}, 'pid': None, 'restarts': 1}

@@ -1,0 +1,4 @@
+sidecar pid=75069
+kill -9 sent
+sidecar-recovery drill captured
+RECOVERY-ASSERT OK: alive=false -> restarted=true -> pong seq>=2 -> restarts=1

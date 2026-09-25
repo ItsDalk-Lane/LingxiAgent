@@ -1,0 +1,19 @@
+step0 preflight done
+[sidecar-build] expected=[exit 0] actual=[    Finished `release` profile [optimized] target(s) in 0.00s] exit=0
+[sidecar-integration-tests] expected=[exit 0, 7 tests pass] actual=[test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s] exit=0
+[app-test-build] expected=[exit 0] actual=[    Finished `release` profile [optimized] target(s) in 41.52s] exit=0
+[app-release-build] expected=[exit 0] actual=[    Finished `release` profile [optimized] target(s) in 0.20s] exit=0
+[runA-page-reports] expected=[3 reports (main,untrusted,remote)] actual=[{"reports":["main","remote","untrusted"]}] exit=0
+[runA-webdriver-session] expected=[exit 0, 3 windows] actual=[session-test OK: windows=untrusted,remote,main] exit=0
+[runA-sidecar-crash-recovery] expected=[dead detected + restart ok + pong seq>=2 + restarts=1] actual=[{"final_status": "{'alive': True, 'hello': {'lingxi_sidecar_hello': True, 'nam", "ping_after_restart": "{'ok': True, 'pong': True, 'seq': 2}", "restart": "{'hello': {'lingxi_sidecar_hello': True, 'name': 'lingxi-t06", "status_after_kill": "{'alive': False, 'hello': {'lingxi_sidecar_hello': True, 'na"}] exit=0
+[runA-app-exit] expected=[exit 0 (graceful finish_e2e)] actual=[exit=0] exit=0
+[runA-sidecar-cleanup] expected=[no orphan sidecar] actual=[no sidecar process after app exit (good)] exit=0
+[runB-webdriver-closed] expected=[port closed, exit 0] actual=[}] exit=0
+[runB-page-reports] expected=[3 reports] actual=[{"reports":["main","remote","untrusted"]}] exit=0
+[runB-sigkill-orphan] expected=[no orphan sidecar] actual=[no sidecar process after host SIGKILL (good)] exit=0
+[relaunch-probe] expected=[second instance observed] actual=[observed] exit=0
+[tauri-build-bundle] expected=[exit 0, .app + signed updater artifacts] actual=[    Finished 1 updater signature at:         /private/tmp/lingxi-t06-target-app/release/bundle/macos/lingxi-t06-shell-spike.app.tar.gz.sig  ] exit=0
+bundle bin: /tmp/lingxi-t06-target-app/release/bundle/macos/lingxi-t06-shell-spike.app/Contents/MacOS/lingxi-tauri-shell-spike
+bundle run from realpath: /private/tmp/lingxi-t06-bundle-run/lingxi-t06-shell-spike.app/Contents/MacOS/lingxi-tauri-shell-spike
+[runBundle-page-reports] expected=[3 reports] actual=[{"reports":["main","untrusted","remote"]}] exit=0
+run_e2e complete. summary at /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R01/T06/repair-r1/run-e2e-repair-r1-realpath/runner-summary.txt

@@ -83,5 +83,20 @@
  "headless_workspace_no_desktop_deps": {
   "status": "VERIFIED",
   "detail": "锁树中 tauri/webview2-com/gtk/webkit2gtk/openssl-sys/native-tls 全部 absent（cargo metadata 实测，见 R01-T03_REPORT.md §6）；DEP-07 校验器正向通过（t01-check-positive.log）。"
+ },
+ "desktop_prototype_r01_t06": {
+  "added_by": "ZCode:R01-T06-exec-r1",
+  "spike": "spike/tauri-shell/（独立 manifest，非 rust/ workspace 成员）",
+  "stack": "Tauri 2.11.6 + wry 0.55.1/tao 0.35.3 + 官方插件组（shell/notification/dialog/clipboard-manager/global-shortcut/autostart/updater/process/wdio-webdriver(test-only)），锁树 603 crates 见 spike/tauri-shell/app/src-tauri/Cargo.lock 与 DEPENDENCY_DECISIONS.md D-11",
+  "platforms": {
+   "macOS arm64": {
+    "status": "VERIFIED",
+    "detail": "系统能力 13 项实测（窗口/托盘/快捷键/通知/剪贴板/对话框/录音拒绝路径/语音查询/屏幕权限查询/辅助功能/更新器/自启动/重启）+ ACL 负向 A11 + 双产物 A12 + sidecar 生命周期 8 场景全绿；证据 artifacts/rust-tauri/R01/T06/（runner-summary.txt 15 步 exit=0），矩阵 docs/rust-tauri/R01/SHELL_CAPABILITY_MATRIX.json",
+    "machine": "Mac15,14 macOS 27.0 (BuildVersion 26A428)"
+   },
+   "macOS x64": {"status": "UNVERIFIED", "owner": "R09/R10 平台验收负责人（总控指派）", "verify_by_stage": "R09 最迟 R10"},
+   "Windows x64": {"status": "UNVERIFIED", "detail": "tauri-driver 官方 WebDriver 路径在 Windows 可用（与 macOS 的 wdio-webdriver 路径不同）；WebView2 Runtime 分发策略未评估", "owner": "R09/R10 平台验收负责人（总控指派）", "verify_by_stage": "R09 最迟 R10"},
+   "Linux x64": {"status": "UNVERIFIED", "detail": "预计需要 webkit2gtk 系统依赖（未测）；tauri-driver 可用", "owner": "R09/R10 平台验收负责人（总控指派）", "verify_by_stage": "R09 最迟 R10"}
+  }
  }
 }

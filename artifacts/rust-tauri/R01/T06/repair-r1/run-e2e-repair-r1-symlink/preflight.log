@@ -1,0 +1,21 @@
+date: 2026-09-25T10:20:00Z
+uname: Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64
+ProductName:		macOS
+ProductVersion:		27.0
+BuildVersion:		26A428
+HEAD: 76bd42c439e180163b150a0058bd6c9e4875c940
+git status --porcelain:
+ M docs/rust-tauri/ORCHESTRATOR_PROGRESS.json
+ M docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md
+ M docs/rust-tauri/R01/PLATFORM_BUILD_MATRIX.json
+?? artifacts/rust-tauri/R01/T06/
+?? docs/rust-tauri/R01/R01-T06_REPORT.md
+?? docs/rust-tauri/R01/R01-T06_REVIEW_R1.md
+?? docs/rust-tauri/R01/SHELL_CAPABILITY_MATRIX.json
+?? docs/rust-tauri/R01/TAURI_SPIKE_REPORT.md
+?? spike/
+rustc: rustc 1.98.1 (48a229cea 2026-09-01)
+cargo: cargo 1.98.1 (797e8a9bc 2026-08-05)
+node: v24.16.0
+proxy env present: http_proxyhttps_proxyall_proxy
+tauri CLI: tauri-cli 2.11.5

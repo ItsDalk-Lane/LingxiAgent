@@ -1,0 +1,26 @@
+{
+  "final_status": {
+    "alive": false,
+    "hello": {
+      "lingxi_sidecar_hello": true,
+      "name": "lingxi-t06-sidecar",
+      "protocol": 1,
+      "version": "1.0.0"
+    },
+    "pid": null,
+    "restarts": 1
+  },
+  "ping_after_restart": "ERR:sidecar not running",
+  "restart": "ERR:spawn failed: Permission denied (os error 13)",
+  "status_after_kill": {
+    "alive": false,
+    "hello": {
+      "lingxi_sidecar_hello": true,
+      "name": "lingxi-t06-sidecar",
+      "protocol": 1,
+      "version": "1.0.0"
+    },
+    "pid": null,
+    "restarts": 0
+  }
+}

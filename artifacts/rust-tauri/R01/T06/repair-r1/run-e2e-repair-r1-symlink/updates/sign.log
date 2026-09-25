@@ -1,0 +1,10 @@
+Signing without an app version. Pass --app-version to bind this signature to a version; updaters configured with `requireSignedVersion` will reject this signature.
+
+Your file was signed successfully, You can find the signature here:
+/private/tmp/t06-repair-r1-symlink/evidence/updates/fake-update-0.2.0.tar.gz.sig
+
+Public signature:
+dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTOVhXb3V5VUN1RExJUXJpc0diNGtSdVg3Sk9OSyswU0RRM1JiVGVBUDRyN3hqdGVxTFdaOEc5L2krVWFMZXN2QktwVW9ZMmFEczdSTVp5UjlOaG9TNFlQUnFIa1hVQWd3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkwMzMxNjY5CWZpbGU6ZmFrZS11cGRhdGUtMC4yLjAudGFyLmd6ClZkVFZzSVZHNVk3bVE4Yy9DVjcxNUtES2RxREM2SGFXNy9lV2UvVWk4WnAzVnpYY1lCZHp6bUo4NGY2S0hOMUJZYnE3M1NiVzZhUVZNYkZsMHB2TkFBPT0K
+
+Make sure to include this into the signature field of your update server.
+pubkey-in-config-must-match: dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IENBRTQwQzkyRTZBNURCRApSV1M5WFdvdXlVQ3VESTJaakNlaThPZE03U21qTm0rRWd0TzM3ZE4yYUJDWkNNYmFhVWxqbGhSSgo=

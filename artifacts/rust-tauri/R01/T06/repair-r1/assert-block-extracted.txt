@@ -1,0 +1,27 @@
+python3 - "$EVID/run-test/sidecar-recovery.json" >> "$EVID/run-test/sidecar-crash.log" 2>&1 <<'PYEOF'
+import json, sys
+try:
+    d = json.load(open(sys.argv[1]))
+except Exception as e:
+    print(f"RECOVERY-ASSERT FAILED: sidecar-recovery.json unreadable: {e}")
+    sys.exit(1)
+errs = []
+sak = d.get('status_after_kill')
+if not isinstance(sak, dict) or sak.get('alive') is not False:
+    errs.append(f"status_after_kill.alive != false: {sak!r}")
+rst = d.get('restart')
+if not isinstance(rst, dict) or rst.get('restarted') is not True:
+    errs.append(f"restart.restarted != true: {rst!r}")
+ping = d.get('ping_after_restart')
+if not isinstance(ping, dict) or ping.get('ok') is not True or ping.get('pong') is not True:
+    errs.append(f"ping_after_restart not a real pong: {ping!r}")
+elif not isinstance(ping.get('seq'), int) or ping['seq'] < 2:
+    errs.append(f"pong seq not incremented (expect >=2): {ping.get('seq')!r}")
+fs = d.get('final_status')
+if not isinstance(fs, dict) or fs.get('alive') is not True or fs.get('restarts') != 1:
+    errs.append(f"final_status alive!=true or restarts!=1: {fs!r}")
+if errs:
+    print('RECOVERY-ASSERT FAILED: ' + '; '.join(errs))
+    sys.exit(1)
+print('RECOVERY-ASSERT OK: alive=false -> restarted=true -> pong seq>=2 -> restarts=1')
+PYEOF

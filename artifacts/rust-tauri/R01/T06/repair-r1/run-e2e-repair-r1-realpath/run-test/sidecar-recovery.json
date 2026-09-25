@@ -1,0 +1,38 @@
+{
+  "final_status": {
+    "alive": true,
+    "hello": {
+      "lingxi_sidecar_hello": true,
+      "name": "lingxi-t06-sidecar",
+      "protocol": 1,
+      "version": "1.0.0"
+    },
+    "pid": 75158,
+    "restarts": 1
+  },
+  "ping_after_restart": {
+    "ok": true,
+    "pong": true,
+    "seq": 2
+  },
+  "restart": {
+    "hello": {
+      "lingxi_sidecar_hello": true,
+      "name": "lingxi-t06-sidecar",
+      "protocol": 1,
+      "version": "1.0.0"
+    },
+    "restarted": true
+  },
+  "status_after_kill": {
+    "alive": false,
+    "hello": {
+      "lingxi_sidecar_hello": true,
+      "name": "lingxi-t06-sidecar",
+      "protocol": 1,
+      "version": "1.0.0"
+    },
+    "pid": null,
+    "restarts": 0
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "final_status": {"alive": false, "hello": null, "pid": null, "restarts": 1},
+  "ping_after_restart": "ERR:sidecar not running",
+  "restart": "ERR:sidecar() failed: StartingBinary found current_exe() that contains a symlink",
+  "status_after_kill": {"alive": false, "hello": null, "pid": null, "restarts": 0}
+}

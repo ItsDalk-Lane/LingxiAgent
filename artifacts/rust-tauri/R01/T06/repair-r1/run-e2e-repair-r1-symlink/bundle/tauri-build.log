@@ -1,0 +1,53 @@
+        Info Looking up installed tauri packages to check mismatched versions...
+   Compiling objc2-exception-helper v0.1.1
+   Compiling ring v0.17.14
+   Compiling mac-notification-sys v0.6.15
+   Compiling lingxi-tauri-shell-spike v0.1.0 (/Users/study_superior/Desktop/Code/LingxiAgent/spike/tauri-shell/app/src-tauri)
+   Compiling objc2 v0.6.4
+   Compiling objc2-core-foundation v0.3.2
+   Compiling block2 v0.6.2
+   Compiling dispatch2 v0.3.1
+   Compiling objc2-foundation v0.3.2
+   Compiling objc2-core-graphics v0.3.2
+   Compiling rustls v0.23.45
+   Compiling rustls-webpki v0.103.15
+   Compiling tokio-rustls v0.26.5
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.13.5
+   Compiling objc2-app-kit v0.3.2
+   Compiling notify-rust v4.18.0
+   Compiling objc2-web-kit v0.3.2
+   Compiling muda v0.19.3
+   Compiling tao v0.35.3
+   Compiling window-vibrancy v0.6.0
+   Compiling objc2-osa-kit v0.3.2
+   Compiling arboard v3.6.1
+   Compiling global-hotkey v0.8.0
+   Compiling rfd v0.16.0
+   Compiling osakit v0.3.1
+   Compiling tauri-runtime v2.11.3
+   Compiling wry v0.55.1
+   Compiling tray-icon v0.24.2
+   Compiling tauri-runtime-wry v2.11.4
+   Compiling tauri v2.11.6
+   Compiling tauri-plugin-fs v2.5.2
+   Compiling tauri-plugin-notification v2.4.0
+   Compiling tauri-plugin-process v2.3.1
+   Compiling tauri-plugin-shell v2.3.6
+   Compiling tauri-plugin-autostart v2.5.1
+   Compiling tauri-plugin-clipboard-manager v2.3.3
+   Compiling tauri-plugin-updater v2.12.0
+   Compiling tauri-plugin-global-shortcut v2.3.2
+   Compiling tauri-plugin-dialog v2.7.3
+    Finished `release` profile [optimized] target(s) in 28.55s
+       Built application at: /tmp/lingxi-t06-target-app/release/lingxi-tauri-shell-spike
+    Bundling lingxi-t06-shell-spike.app (/tmp/lingxi-t06-target-app/release/bundle/macos/lingxi-t06-shell-spike.app)
+    Bundling /tmp/lingxi-t06-target-app/release/bundle/macos/lingxi-t06-shell-spike.app.tar.gz (/tmp/lingxi-t06-target-app/release/bundle/macos/lingxi-t06-shell-spike.app.tar.gz)
+    Finished 1 bundle at:
+        /tmp/lingxi-t06-target-app/release/bundle/macos/lingxi-t06-shell-spike.app
+        /tmp/lingxi-t06-target-app/release/bundle/macos/lingxi-t06-shell-spike.app.tar.gz (updater)
+
+    Finished 1 updater signature at:
+        /private/tmp/lingxi-t06-target-app/release/bundle/macos/lingxi-t06-shell-spike.app.tar.gz.sig
+

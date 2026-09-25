@@ -1,0 +1,14 @@
+{"data":{"cfg_e2e_test":false,"debug_assertions":false,"mode":"e2e","pid":78487,"version":"0.1.0"},"event":"host.started","ts_ms":1790331684271}
+{"data":{"hello":{"lingxi_sidecar_hello":true,"name":"lingxi-t06-sidecar","protocol":1,"version":"1.0.0"},"pid":78492},"event":"sidecar.spawned","ts_ms":1790331684274}
+{"data":{"hello":{"lingxi_sidecar_hello":true,"name":"lingxi-t06-sidecar","protocol":1,"version":"1.0.0"}},"event":"sidecar.handshake_ok","ts_ms":1790331684274}
+{"data":{"ok":true},"event":"window.untrusted_created","ts_ms":1790331684315}
+{"data":{"ok":true,"url":"http://127.0.0.1:19274/remote.html"},"event":"window.remote_created","ts_ms":1790331684352}
+{"data":{"ok":true,"results":{"current_monitor":"Ok(Some(Object {\"name\": String(\"Monitor #10001\"), \"scale_factor\": Number(1.0), \"size\": Array [Number(2560), Number(1440)]}))","inner_size":"Ok((900, 640))","is_maximized_after":"Ok(false)","is_maximized_before":"Ok(false)","maximize":"Ok(())","scale_factor":"Ok(1.0)","set_always_on_top":"Ok(())","unmaximize":"Ok(())"}},"event":"window.ops","ts_ms":1790331684354}
+{"data":{"detail":"tray icon + menu created","ok":true},"event":"tray.created","ts_ms":1790331684365}
+{"data":{"detail":{"registered":true,"shortcut":"CmdOrControl+Alt+Shift+9"},"ok":true},"event":"shortcut.register","ts_ms":1790331684365}
+{"data":{"detail":{"had_previous":true,"restored":true,"roundtrip_ok":true},"ok":true},"event":"clipboard.roundtrip","ts_ms":1790331684366}
+{"data":{"detail":{"permission":"Granted","shown":true},"ok":true},"event":"notification.probe","ts_ms":1790331684366}
+{"data":{"detail":{"enabled_after_disable":false,"enabled_after_enable":true},"ok":true},"event":"autostart.probe","ts_ms":1790331684367}
+{"data":{"error":"download: The signature verification failed","ok":false},"event":"updater.probe","ts_ms":1790331684370}
+{"data":{"exit":0,"ok":true,"stderr":"","stdout":"{\"accessibility_trusted\":\"trusted\",\"camera\":\"not_determined\",\"microphone\":\"not_determined\",\"screen_recording_preflight\":\"granted\",\"speech_recognition\":\"not_determined\"}\n"},"event":"tcc.status","ts_ms":1790331684406}
+{"data":{"api":"pick_file(callback)"},"event":"dialog.open_presenting","ts_ms":1790331686871}

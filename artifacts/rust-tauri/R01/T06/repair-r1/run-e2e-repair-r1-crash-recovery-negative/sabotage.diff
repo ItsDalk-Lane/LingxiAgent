@@ -1,0 +1,8 @@
+17c17
+< SPIKE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+---
+> SPIKE_DIR="/Users/study_superior/Desktop/Code/LingxiAgent/spike/tauri-shell"  # sabotage copy: hardcoded (script lives in /tmp)
+198a199,201
+> # NEGATIVE-TEST SABOTAGE (repair-r1, not in repo runner): corrupt sidecar binary so restart spawn truly fails
+> echo "SABOTAGED not a mach-o binary" > "$EVID/build/lingxi-t06-sidecar" && chmod 644 "$EVID/build/lingxi-t06-sidecar"
+> echo "sabotage injected: sidecar binary corrupted before restart probe" >> "$EVID/run-test/sidecar-crash.log"

@@ -1,0 +1,272 @@
+{
+  "steps": [
+    {
+      "step": "status",
+      "status": 200,
+      "body": {
+        "value": {
+          "message": "tauri-plugin-webdriver is ready",
+          "ready": true
+        }
+      }
+    },
+    {
+      "step": "new_session",
+      "status": 200,
+      "body": {
+        "value": {
+          "capabilities": {
+            "acceptInsecureCerts": false,
+            "browserName": "webkit",
+            "browserVersion": "605.1.15",
+            "pageLoadStrategy": "normal",
+            "platformName": "macos",
+            "setWindowRect": true,
+            "timeouts": {
+              "implicit": 0,
+              "pageLoad": 300000,
+              "script": 30000
+            }
+          },
+          "sessionId": "501332f2-0a7c-44df-829b-2c169b507177"
+        }
+      }
+    },
+    {
+      "step": "handles",
+      "status": 200,
+      "body": {
+        "value": [
+          "untrusted",
+          "remote",
+          "main"
+        ]
+      }
+    }
+  ],
+  "perWindow": {
+    "untrusted": {
+      "ident": "untrusted|T06-DONE-untrusted|tauri://localhost/untrusted.html",
+      "pageResult": {
+        "href": "tauri://localhost/untrusted.html",
+        "label": "untrusted",
+        "results": {
+          "finish_e2e": {
+            "error": "Command finish_e2e not allowed by ACL",
+            "ok": false
+          },
+          "getDisplayMedia": {
+            "error": "getDisplayMedia must be called from a user gesture handler.",
+            "ok": false
+          },
+          "invoke_available": {
+            "ok": true
+          },
+          "media_enumerate_devices": {
+            "ok": true,
+            "value": "audioinput:unlabeled"
+          },
+          "mic_getUserMedia": {
+            "error": "timeout-possibly-permission-prompt",
+            "ok": false
+          },
+          "plugin_clipboard_read_text": {
+            "error": "Command plugin:clipboard-manager|read_text not allowed by ACL",
+            "ok": false
+          },
+          "plugin_dialog_open": {
+            "error": "Command plugin:dialog|open not allowed by ACL",
+            "ok": false
+          },
+          "plugin_notification_is_permission_granted": {
+            "error": "Command plugin:notification|is_permission_granted not allowed by ACL",
+            "ok": false
+          },
+          "plugin_shell_execute": {
+            "error": "Command plugin:shell|execute not allowed by ACL",
+            "ok": false
+          },
+          "shell_public_info": {
+            "error": "Command shell_public_info not allowed by ACL",
+            "ok": false
+          },
+          "shell_secondary_probe": {
+            "error": "Command shell_secondary_probe not allowed by ACL",
+            "ok": false
+          },
+          "shell_sensitive_probe": {
+            "error": "Command shell_sensitive_probe not allowed by ACL",
+            "ok": false
+          },
+          "sidecar_ping": {
+            "error": "Command sidecar_ping not allowed by ACL",
+            "ok": false
+          },
+          "sidecar_status": {
+            "error": "Command sidecar_status not allowed by ACL",
+            "ok": false
+          },
+          "tauri_injected": {
+            "ok": true,
+            "value": "app,core,dpi,event,image,menu,mocks,path,tray,webview,webviewWindow,window"
+          },
+          "totally_unknown_command": {
+            "error": "Command shell_exec_arbitrary not allowed by ACL",
+            "ok": false
+          }
+        },
+        "ts": 1790331324701
+      },
+      "driverSensitiveProbe": {
+        "error": "Command shell_sensitive_probe not allowed by ACL",
+        "ok": false
+      }
+    },
+    "remote": {
+      "ident": "remote|T06-DONE-remote|http://127.0.0.1:19274/remote.html",
+      "pageResult": {
+        "href": "http://127.0.0.1:19274/remote.html",
+        "label": "remote",
+        "results": {
+          "finish_e2e": {
+            "error": "Command finish_e2e not allowed by ACL",
+            "ok": false
+          },
+          "getDisplayMedia": {
+            "error": "getDisplayMedia must be called from a user gesture handler.",
+            "ok": false
+          },
+          "invoke_available": {
+            "ok": true
+          },
+          "media_enumerate_devices": {
+            "ok": true,
+            "value": "audioinput:unlabeled"
+          },
+          "mic_getUserMedia": {
+            "error": "timeout-possibly-permission-prompt",
+            "ok": false
+          },
+          "plugin_clipboard_read_text": {
+            "error": "Command plugin:clipboard-manager|read_text not allowed by ACL",
+            "ok": false
+          },
+          "plugin_dialog_open": {
+            "error": "Command plugin:dialog|open not allowed by ACL",
+            "ok": false
+          },
+          "plugin_notification_is_permission_granted": {
+            "error": "Command plugin:notification|is_permission_granted not allowed by ACL",
+            "ok": false
+          },
+          "plugin_shell_execute": {
+            "error": "Command plugin:shell|execute not allowed by ACL",
+            "ok": false
+          },
+          "shell_public_info": {
+            "error": "Command shell_public_info not allowed by ACL",
+            "ok": false
+          },
+          "shell_secondary_probe": {
+            "error": "Command shell_secondary_probe not allowed by ACL",
+            "ok": false
+          },
+          "shell_sensitive_probe": {
+            "error": "Command shell_sensitive_probe not allowed by ACL",
+            "ok": false
+          },
+          "sidecar_ping": {
+            "error": "Command sidecar_ping not allowed by ACL",
+            "ok": false
+          },
+          "sidecar_status": {
+            "error": "Command sidecar_status not allowed by ACL",
+            "ok": false
+          },
+          "tauri_injected": {
+            "ok": true,
+            "value": "app,core,dpi,event,image,menu,mocks,path,tray,webview,webviewWindow,window"
+          },
+          "totally_unknown_command": {
+            "error": "Command shell_exec_arbitrary not allowed by ACL",
+            "ok": false
+          }
+        },
+        "ts": 1790331324687
+      },
+      "driverSensitiveProbe": {
+        "error": "Command shell_sensitive_probe not allowed by ACL",
+        "ok": false
+      }
+    },
+    "main": {
+      "ident": "main|T06-DONE-main|tauri://localhost",
+      "pageResult": {
+        "href": "tauri://localhost",
+        "label": "main",
+        "results": {
+          "getDisplayMedia": {
+            "error": "getDisplayMedia must be called from a user gesture handler.",
+            "ok": false
+          },
+          "invoke_available": {
+            "ok": true
+          },
+          "media_enumerate_devices": {
+            "ok": true,
+            "value": "audioinput:unlabeled"
+          },
+          "mic_getUserMedia": {
+            "error": "The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.",
+            "ok": false
+          },
+          "plugin_clipboard_read_text": {
+            "ok": true,
+            "value": "t06-clipboard-probe-中文剪贴板"
+          },
+          "plugin_notification_is_permission_granted": {
+            "ok": true,
+            "value": "true"
+          },
+          "plugin_shell_execute": {
+            "error": "Command plugin:shell|execute not allowed by ACL",
+            "ok": false
+          },
+          "shell_public_info": {
+            "ok": true,
+            "value": "{\"app\":\"lingxi-t06-shell-spike\",\"spike\":\"R01-T06\",\"platform\":\"macos\"}"
+          },
+          "shell_secondary_probe": {
+            "ok": true,
+            "value": "SECONDARY_PROBE_OK (granted only via main-secondary-capability)"
+          },
+          "shell_sensitive_probe": {
+            "ok": true,
+            "value": "SENSITIVE_PROBE_OK marker=/tmp/lingxi-t06-scratch/sensitive-probe-executed.marker"
+          },
+          "sidecar_ping": {
+            "ok": true,
+            "value": "{\"ok\":true,\"pong\":true,\"seq\":1}"
+          },
+          "sidecar_status": {
+            "ok": true,
+            "value": "{\"alive\":true,\"hello\":{\"lingxi_sidecar_hello\":true,\"name\":\"lingxi-t06-sidecar\",\"protocol\":1,\"version\":\"1.0.0\"},\"pid\":75069,\"restarts\":0}"
+          },
+          "tauri_injected": {
+            "ok": true,
+            "value": "app,core,dpi,event,image,menu,mocks,path,tray,webview,webviewWindow,window"
+          },
+          "totally_unknown_command": {
+            "error": "Command shell_exec_arbitrary not allowed by ACL",
+            "ok": false
+          }
+        },
+        "ts": 1790331322433
+      },
+      "driverSensitiveProbe": {
+        "ok": true,
+        "value": "SENSITIVE_PROBE_OK marker=/tmp/lingxi-t06-scratch/sensitive-probe-executed.marker"
+      }
+    }
+  }
+}

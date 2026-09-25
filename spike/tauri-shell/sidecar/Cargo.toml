@@ -1,0 +1,10 @@
+[package]
+name = "lingxi-t06-sidecar"
+version = "1.0.0"
+description = "R01-T06 fixed-binary restricted-args sidecar prototype (isolated spike, not production)"
+edition = "2021"
+
+[dependencies]
+
+[profile.release]
+strip = true

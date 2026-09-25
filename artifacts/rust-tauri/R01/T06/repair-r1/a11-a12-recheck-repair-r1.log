@@ -1,0 +1,34 @@
+== A11 quick recheck (repair-r1, realpath round run-e2e-repair-r1-realpath) ==
+-- artifacts/rust-tauri/R01/T06/repair-r1/run-e2e-repair-r1-realpath/run-test/page-reports.jsonl --
+main (tauri://localhost): acl_rejected=2 ok=10 other_fail=['mic_getUserMedia', 'getDisplayMedia']
+remote (http://127.0.0.1:19274/remote.html): acl_rejected=11 ok=3 other_fail=['mic_getUserMedia', 'getDisplayMedia']
+untrusted (tauri://localhost/untrusted.html): acl_rejected=11 ok=3 other_fail=['mic_getUserMedia', 'getDisplayMedia']
+-- artifacts/rust-tauri/R01/T06/repair-r1/run-e2e-repair-r1-realpath/run-release/page-reports.jsonl --
+main (tauri://localhost): acl_rejected=2 ok=10 other_fail=['mic_getUserMedia', 'getDisplayMedia']
+remote (http://127.0.0.1:19274/remote.html): acl_rejected=11 ok=3 other_fail=['mic_getUserMedia', 'getDisplayMedia']
+untrusted (tauri://localhost/untrusted.html): acl_rejected=11 ok=3 other_fail=['mic_getUserMedia', 'getDisplayMedia']
+-- artifacts/rust-tauri/R01/T06/repair-r1/run-e2e-repair-r1-realpath/run-bundle/page-reports.jsonl --
+main (tauri://localhost): acl_rejected=2 ok=10 other_fail=['mic_getUserMedia', 'getDisplayMedia']
+untrusted (tauri://localhost/untrusted.html): acl_rejected=11 ok=3 other_fail=['mic_getUserMedia', 'getDisplayMedia']
+remote (http://127.0.0.1:19274/remote.html): acl_rejected=11 ok=3 other_fail=['mic_getUserMedia', 'getDisplayMedia']
+-- webdriver driver-side sensitive probe (run-test) --
+untrusted -> {"error": "Command shell_sensitive_probe not allowed by ACL", "ok": false}
+remote -> {"error": "Command shell_sensitive_probe not allowed by ACL", "ok": false}
+main -> {"ok": true, "value": "SENSITIVE_PROBE_OK marker=/tmp/lingxi-t06-scratch/sensitive-probe-executed.marker"}
+
+== A12 quick recheck ==
+-- runB webdriver closed-check --
+{
+  "tcp": "closed:ECONNREFUSED",
+  "http": "refused:ECONNREFUSED",
+  "closed": true
+}
+-- binary strings probe --
+== app-test strings wdio/webdriver count:
+40
+== app-release strings wdio/webdriver count:
+0
+== app-test webdriver count:
+41
+== app-release webdriver count:
+0

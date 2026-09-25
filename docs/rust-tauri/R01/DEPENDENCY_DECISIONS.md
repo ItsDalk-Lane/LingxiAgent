@@ -229,3 +229,39 @@ ADR 格式依据任务书 06 §1。本文件每条决策含：问题与用户目
 **退出条件：**R09 正式宿主定型后 spike_pdf 随原型下线或被正式 renderer 模块吸收。
 
 **受影响任务/测试：**R01-T05 spike 本体与校验器（T01 正向/N1-N15、T02 roundtrip/handshake/check-generated、cargo test --workspace）。
+
+## D-11 R01-T06 桌面壳原型依赖：Tauri 2.11.6 + 官方插件组（独立于 rust/ workspace 的 spike 锁树）
+
+**问题与用户目标：**桌面壳候选（W01/W02/W13）必须真实选定并锁定版本；原型要覆盖窗口/托盘/快捷键/通知/剪贴板/对话框/自启动/更新器/sidecar/ACL 负向/E2E 测试路径，且不得污染 headless rust/ workspace（DEP-07）。
+
+**基线证据：**R01-T03 锁表仅覆盖 headless 栈（279 crates）；桌面栈此前零锁定。现役生产壳为 Electron 42（desktop/main.cjs），本任务零改动生产目录。
+
+**不可违反契约：**Tauri 原型放独立 manifest 目录、不进 rust/ workspace；不接入生产入口；测试插件（wdio-webdriver）必须 feature 门控、发布构建可证明缺席（A12）；updater 测试私钥不入库。
+
+**候选及实际验证：**
+- Tauri v2 当前稳定线 2.x：采用并实测。锁树 603 crates（spike/tauri-shell/app/src-tauri/Cargo.lock）。W03 测试路径实测：tauri-driver 仅 Windows/Linux（macOS 无 WKWebView 驱动，不可用，如实记录）；macOS 路径 = tauri-plugin-wdio-webdriver 1.4.0 嵌入式 WebDriver（optional 依赖 + `e2e-test` feature，release 构建二进制 strings 探测 wdio/webdriver 计数为 0，端口 ECONNREFUSED）。
+- Electron 保留：现役生产壳不动（TB-03），本决策只覆盖迁移目标候选。
+- 选 Tauri 而非继续 Electron 的架构理由归任务书 02（壳瘦身、Rust 单一技术栈、capabilities ACL 默认拒绝模型）；本任务以 A11 负向实测确认 ACL 模型真实生效（未授权 webview 11/11 拒绝，远程 URL 零权限）。
+
+**选择与理由：**Tauri 2.11.6 + 下列官方插件全锁（见下表）。插件全部来自 tauri-apps 官方 org、semver 界写在 manifest、精确版本锁在 spike 自有 Cargo.lock（与 T02/T03 先例一致的双层锁定）。
+
+| 依赖 | 锁定版本 | 用途 |
+|---|---|---|
+| tauri / tauri-build | 2.11.6 / 2.6.3 | 壳核心（features: image-png, tray-icon） |
+| wry / tao（传递） | 0.55.1 / 0.35.3 | WebView/窗口运行时（macOS=WKWebView） |
+| tauri-plugin-shell | 2.3.6 | sidecar spawn/事件泵（**仅 Rust 侧，capabilities 零 shell 权限**） |
+| tauri-plugin-notification | 2.4.0 | 系统通知 |
+| tauri-plugin-dialog | 2.7.3 | 文件对话框（实测：用 callback API，blocking 变体有外部取消不返回缺陷，见 TAURI_SPIKE_REPORT §7-R1） |
+| tauri-plugin-clipboard-manager | 2.3.3 | 剪贴板 |
+| tauri-plugin-global-shortcut | 2.3.2 | 全局快捷键 |
+| tauri-plugin-autostart | 2.5.1 | 登录自启动 |
+| tauri-plugin-updater | 2.12.0 | 更新（minisign 验签实测正负向） |
+| tauri-plugin-process | 2.3.1 | 进程退出/重启 |
+| tauri-plugin-wdio-webdriver | 1.4.0 | E2E WebDriver（**optional，feature e2e-test 门控**） |
+| serde / serde_json / tokio | 1.0.229 / 1.0.151 / 1.53.1 | 与 rust/ workspace 锁表同版本对齐 |
+
+**性能/安全/兼容影响：**prototype 定位；DEP-07 对 rust/ workspace 的桌面禁令不受本锁树影响（spike 为独立 manifest——无显式 `[workspace]` 段、无祖先 workspace 可归入，T01 校验器 D5-reverse 不受影响——spike 不是 workspace member，也未在 DEPENDENCY_RULES.json module_registry 登记，登记会触发"exists 但缺席 workspace"误报；隔离决策在此显式记录）。603 crates 的许可/安全扫描（cargo audit 等）未跑——spike 锁树不是生产依赖图，正式扫描归 R09 tauri-host 建立时对其自有锁树执行。
+
+**退出条件：**R09 tauri-host（desktop/src-tauri，planned）建立时以本锁表为起点重新评估最新 2.x；若官方插件在 R09 真实业务面暴露缺陷，按上游 issue 升/降锁并复测本任务的能力矩阵。
+
+**受影响任务/测试：**R09（宿主集成）、R10（跨平台产物）；本任务证据 artifacts/rust-tauri/R01/T06/ 与 docs/rust-tauri/R01/{SHELL_CAPABILITY_MATRIX.json,TAURI_SPIKE_REPORT.md,R01-T06_REPORT.md}。

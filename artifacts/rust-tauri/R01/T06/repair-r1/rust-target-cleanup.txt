@@ -1,0 +1,5 @@
+2.8G	rust/target
+deleted_at_utc: 2026-09-25T10:13:45Z
+by: ZCode:R01-T06-repair-r1
+reason: R01-T06 任务产生的未跟踪 cargo 构建残留（验收 §12 建议清理）；后续构建一律 CARGO_TARGET_DIR=/tmp
+path: rust/target/（仅此目录，未动其他任何文件）

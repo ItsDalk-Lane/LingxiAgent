@@ -1,0 +1,6 @@
+{
+  "status_after_kill": {"alive": false, "hello": {"lingxi_sidecar_hello": true}, "pid": null, "restarts": 0},
+  "restart": {"restarted": true, "hello": {"lingxi_sidecar_hello": true}},
+  "ping_after_restart": {"ok": true, "pong": true, "seq": 2},
+  "final_status": {"alive": true, "hello": {"lingxi_sidecar_hello": true}, "pid": 12345, "restarts": 1}
+}
