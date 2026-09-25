@@ -4,7 +4,7 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "58e00b53d9fc6be03d64f51e33313f3f0063a51a",
+  "current_head": "9390ae01d9e8145400eb3c44e8044bc2e1b46524",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -1030,7 +1030,12 @@
         "R01-A02": "PASS"
       },
       "task_commit_sha": "58e00b53d9fc6be03d64f51e33313f3f0063a51a",
-      "push_result": null,
+      "push_result": {
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "a98d24877e056dcb490f23ec739713ca937e646e",
+        "note": "task commit 58e00b53d + ledger commit a98d24877 pushed; ls-remote verified"
+      },
       "blockers": [],
       "review_report": "docs/rust-tauri/R01/R01-T01_REVIEW_R3.md",
       "review_report_sha256": "f556a368a60f4ea909b808d1716d308bdd39077cc2952017e5555b1335d42ff7",
@@ -1069,28 +1074,75 @@
     "R01-T02": {
       "name": "定义单一协议源及兼容边界",
       "stage_id": "R01",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "a98d24877e056dcb490f23ec739713ca937e646e",
+      "executor_id": "ZCode:R01-T02-exec-r1 (agent_0c40f679-c9fe-4068-a81d-3b868a67837e)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 1,
+      "reviewer_id": "ZCode:R01-T02-review-r1 (agent_3322e893-b3d4-482a-9e32-432f48074a0e)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "F1",
+          "severity": "LOW",
+          "summary": "canonical 键排序在非 BMP 边界 Rust/TS 分叉",
+          "review_report": "docs/rust-tauri/R01/R01-T02_REVIEW_R1.md",
+          "resolution": "立项，不阻塞 T02；记入 R01-T08 风险登记"
+        },
+        {
+          "id": "F2",
+          "severity": "MEDIUM",
+          "summary": "TS canonical-json 对含浮点/>2^53 整数的合法第三方 schema 硬失败，spec §8 与 §9 表述矛盾",
+          "review_report": "docs/rust-tauri/R01/R01-T02_REVIEW_R1.md",
+          "resolution": "立项修复，截止先于 R04/R08；记入 R01-T08 风险登记"
+        },
+        {
+          "id": "F3",
+          "severity": "MEDIUM",
+          "summary": "生成 schema 的 EventPayload 回退分支吞掉畸形已知事件；eventType 一致性与 schemaVersion=1 两信封不变量未编码进 schema",
+          "review_report": "docs/rust-tauri/R01/R01-T02_REVIEW_R1.md",
+          "resolution": "立项修复，截止先于 R04/R08；记入 R01-T08 风险登记"
+        },
+        {
+          "id": "F4",
+          "severity": "LOW",
+          "summary": "Rust Seq 解析接受 007/+5，比 schema pattern 宽松",
+          "review_report": "docs/rust-tauri/R01/R01-T02_REVIEW_R1.md",
+          "resolution": "立项，记入 R01-T08 风险登记"
+        },
+        {
+          "id": "F5",
+          "severity": "LOW",
+          "summary": "WS 关闭码对 invalid_message 也硬编码 4409",
+          "review_report": "docs/rust-tauri/R01/R01-T02_REVIEW_R1.md",
+          "resolution": "立项，记入 R01-T08 风险登记"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R01-A03": "NOT_STARTED",
-        "R01-A04": "NOT_STARTED"
+        "R01-A03": "PASS",
+        "R01-A04": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "9390ae01d9e8145400eb3c44e8044bc2e1b46524",
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "review_report": "docs/rust-tauri/R01/R01-T02_REVIEW_R1.md",
+      "review_report_sha256": "023e6d5040e78034031d7794c0dd56829f674a6bbb238e57bade189060f25d08",
+      "review_history": [
+        {
+          "round": 1,
+          "verdict": "PASS",
+          "report": "docs/rust-tauri/R01/R01-T02_REVIEW_R1.md",
+          "sha256": "023e6d5040e78034031d7794c0dd56829f674a6bbb238e57bade189060f25d08"
+        }
+      ],
+      "repair_rounds_completed": 0
     },
     "R01-T03": {
       "name": "锁定依赖与构建原型",
       "stage_id": "R01",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "task_base_sha": null,
       "executor_id": null,
       "execution_result": null,
@@ -2978,7 +3030,7 @@
       "blockers": []
     }
   },
-  "current_task": "R01-T01",
+  "current_task": "R01-T03",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",
