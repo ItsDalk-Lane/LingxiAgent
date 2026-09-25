@@ -4,7 +4,7 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "358299c1e9a768a75186f197686d25ee6636d6d7",
+  "current_head": "f783a8e8e263c9565a76b8fad8cabc688c8a2b6d",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -135,7 +135,7 @@
       "stage_verdict": "PENDING_STAGE_ACCEPTANCE",
       "stage_acceptance_commit_sha": null,
       "blockers": [],
-      "r01_stage_controller_note": "R01-T01..T08 全部经全新独立验收代理 PASS 并已提交推送；R01_REPORT/R01_HANDOFF/RISK_REGISTER/R01_ACCEPTANCE_LEDGER 已由 R01-T08 冻结。本总控不宣告阶段 PASS：阶段级独立验收须由用户另建全新 Codex 子代理执行；阶段验收前不进入 R02。"
+      "r01_stage_controller_note": "R01-T01..T08 全部经全新独立验收代理 PASS 并已提交推送；R01_REPORT/R01_HANDOFF/RISK_REGISTER/R01_ACCEPTANCE_LEDGER 已由 R01-T08 冻结。本总控不宣告阶段 PASS：阶段级独立验收须由用户另建全新 Codex 子代理执行；阶段验收前不进入 R02。 远端 origin/codex/rust-tauri-migration 已核至 f783a8e8e（ls-remote 验证），包含 T01–T08 全部任务与账本提交。"
     },
     "R02": {
       "title": "Rust独立服务、存储与事件基础",
@@ -1555,7 +1555,12 @@
         "R01-A16": "PASS"
       },
       "task_commit_sha": "358299c1e9a768a75186f197686d25ee6636d6d7",
-      "push_result": null,
+      "push_result": {
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "f783a8e8e263c9565a76b8fad8cabc688c8a2b6d",
+        "note": "task commit 358299c1e + ledger commit f783a8e8e pushed; ls-remote verified"
+      },
       "blockers": [],
       "review_report": "docs/rust-tauri/R01/R01-T08_REVIEW_R1.md",
       "review_report_sha256": "4a0c50ade4b10d3bb18b8303c78fb0670a42fee86852d4faf380804f9d731fcf",
