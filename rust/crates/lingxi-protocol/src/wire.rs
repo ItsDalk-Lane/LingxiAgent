@@ -168,11 +168,20 @@ pub enum SegmentKind {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ContentBlock {
-    Text { text: String },
-    Reasoning { text: String },
-    ResourceRef { resource: ResourceRef },
+    Text {
+        text: String,
+    },
+    Reasoning {
+        text: String,
+    },
+    ResourceRef {
+        resource: ResourceRef,
+    },
     /// Provider-opaque payload, preserved byte-identically.
-    Opaque { provider: String, data: serde_json::Value },
+    Opaque {
+        provider: String,
+        data: serde_json::Value,
+    },
 }
 
 /// A normalized assistant/user message as committed to history.
@@ -531,12 +540,9 @@ impl<'de> Deserialize<'de> for EventPayload {
         let obj = value
             .as_object()
             .ok_or_else(|| serde::de::Error::custom("event payload must be a JSON object"))?;
-        let event_type = obj
-            .get("type")
-            .and_then(|t| t.as_str())
-            .ok_or_else(|| {
-                serde::de::Error::custom("event payload requires a string \"type\" tag")
-            })?;
+        let event_type = obj.get("type").and_then(|t| t.as_str()).ok_or_else(|| {
+            serde::de::Error::custom("event payload requires a string \"type\" tag")
+        })?;
         if KNOWN_EVENT_TYPES.contains(&event_type) {
             let known = serde_json::from_value::<KnownEventPayload>(value)
                 .map_err(serde::de::Error::custom)?;
@@ -559,14 +565,12 @@ impl JsonSchema for EventPayload {
         let mut known_value = known.to_value();
         // Inline the $ref target's anyOf so the union with the open fallback
         // stays legible; keep the $ref if the known schema is not an anyOf.
-        let known_branch = if let Some(any_of) = known_value
-            .as_object_mut()
-            .and_then(|o| o.remove("anyOf"))
-        {
-            serde_json::json!({ "anyOf": any_of })
-        } else {
-            known_value
-        };
+        let known_branch =
+            if let Some(any_of) = known_value.as_object_mut().and_then(|o| o.remove("anyOf")) {
+                serde_json::json!({ "anyOf": any_of })
+            } else {
+                known_value
+            };
         schemars::json_schema!({
             "anyOf": [
                 known_branch,
@@ -678,8 +682,7 @@ impl<'de> Deserialize<'de> for EventEnvelope {
 /// Schema dialects this boundary can validate. Anything else is an explicit
 /// `unknown_schema_dialect` error — contract §5 forbids leniently treating
 /// an unrecognized dialect as JSON Schema.
-pub const SUPPORTED_SCHEMA_DIALECTS: &[&str] =
-    &["json-schema/2020-12", "json-schema/draft-07"];
+pub const SUPPORTED_SCHEMA_DIALECTS: &[&str] = &["json-schema/2020-12", "json-schema/draft-07"];
 
 /// A third-party tool schema document. `schema` is preserved **verbatim**
 /// (never normalized, merged or pruned); the boundary validates the dialect
@@ -697,19 +700,15 @@ pub fn check_schema_dialect(dialect: &str) -> Result<(), ProtocolError> {
     if SUPPORTED_SCHEMA_DIALECTS.contains(&dialect) {
         return Ok(());
     }
-    Err(
-        ProtocolError::new(
-            ErrorCode::UnknownSchemaDialect,
-            format!(
-                "unsupported schema dialect {dialect:?}; supported: {SUPPORTED_SCHEMA_DIALECTS:?}"
-            ),
-            false,
-        )
-        .with_details(serde_json::Map::from_iter([(
-            "dialect".into(),
-            dialect.into(),
-        )])),
+    Err(ProtocolError::new(
+        ErrorCode::UnknownSchemaDialect,
+        format!("unsupported schema dialect {dialect:?}; supported: {SUPPORTED_SCHEMA_DIALECTS:?}"),
+        false,
     )
+    .with_details(serde_json::Map::from_iter([(
+        "dialect".into(),
+        dialect.into(),
+    )])))
 }
 
 /// Convenience: the full error body used on handshake/negotiation failures

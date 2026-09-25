@@ -1,7 +1,11 @@
-# Lingxi Rust workspace (R01-T01 minimal prototype).
+# Lingxi Rust workspace (R01-T01 minimal prototype; R01-T03 added lingxi-spike).
 #
-# Scope: only the two core crates that must exist for R01-A01
-# (lingxi-protocol, lingxi-kernel). The remaining responsibility modules
+# Scope: the two core crates that must exist for R01-A01
+# (lingxi-protocol, lingxi-kernel), plus lingxi-spike — the R01-T03
+# dependency-locking build prototype (tokio/axum/reqwest/rusqlite/tracing/
+# jsonschema/rmcp compile-and-run proofs; registered as kind=prototype in
+# docs/rust-tauri/R01/DEPENDENCY_RULES.json, bound by DEP-07 no-desktop rule).
+# The remaining responsibility modules
 # (lingxi-adapters / lingxi-service / lingxi-cli / xtask) are declared in
 # docs/rust-tauri/R01/ADR-001-ownership.md with their establishment stages
 # and will be added as workspace members by later stages.
@@ -13,14 +17,16 @@
 #   - lingxi-kernel must not depend on lingxi-adapters (ports live in
 #     kernel; implementations are injected by lingxi-service).
 #   - third-party crates enter only through this workspace (introduced by
-#     R01-T02: serde/serde_json/schemars/sha1/sha2/base64, exact versions
-#     pinned in Cargo.lock); the toolchain and version-locking policy
-#     itself is R01-T03 scope.
+#     R01-T02: serde/serde_json/schemars/sha1/sha2/base64; R01-T03 added
+#     tokio/axum/reqwest/rusqlite/tracing/tracing-subscriber/jsonschema/rmcp,
+#     exact versions pinned in Cargo.lock); the toolchain itself is pinned
+#     by rust-toolchain.toml at the repo root (R01-T03).
 [workspace]
 resolver = "2"
 members = [
     "crates/lingxi-protocol",
     "crates/lingxi-kernel",
+    "crates/lingxi-spike",
 ]
 
 [workspace.package]

@@ -118,9 +118,7 @@ fn read_http_request(stream: &mut TcpStream) -> std::io::Result<Option<HttpReque
 }
 
 fn find_subslice(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    haystack
-        .windows(needle.len())
-        .position(|w| w == needle)
+    haystack.windows(needle.len()).position(|w| w == needle)
 }
 
 fn write_http_response(
@@ -265,12 +263,9 @@ fn handle_hello(body: &[u8]) -> (u16, &'static str, Vec<u8>) {
             (200, "OK", canonical_bytes(&reply))
         }
         Err(err) => {
-            let status = if err.code == ErrorCode::VersionIncompatible {
-                400
-            } else {
-                400
-            };
-            (status, "Bad Request", canonical_bytes(&err))
+            // All handshake rejections are HTTP 400 (version-incompatible
+            // included); the wire error body carries the specific code.
+            (400, "Bad Request", canonical_bytes(&err))
         }
     }
 }
@@ -296,7 +291,7 @@ fn handle_connection(mut stream: TcpStream, index: usize) -> std::io::Result<()>
         && path == "/lingxi/v1/ws"
         && request
             .header("upgrade")
-            .map_or(false, |v| v.eq_ignore_ascii_case("websocket"))
+            .is_some_and(|v| v.eq_ignore_ascii_case("websocket"))
     {
         let key = request.header("sec-websocket-key").unwrap_or_default();
         let accept = websocket_accept(key);
@@ -358,10 +353,7 @@ fn handle_connection(mut stream: TcpStream, index: usize) -> std::io::Result<()>
         format!("no such endpoint: {} {path}", request.method),
         false,
     ));
-    log(&format!(
-        "conn#{index} {} {path} -> 404",
-        request.method
-    ));
+    log(&format!("conn#{index} {} {path} -> 404", request.method));
     write_http_response(&mut stream, 404, "Not Found", "application/json", &body)
 }
 

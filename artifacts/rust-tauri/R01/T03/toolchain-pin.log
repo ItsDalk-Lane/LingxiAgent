@@ -1,0 +1,18 @@
+=== rustup install record ===
+install method: official script https://sh.rustup.rs (rustup-init), 2026-09-25, profile minimal + components rustfmt/clippy
+rustup 1.29.1 (d95a37b6a 2026-08-13)
+info: This is the version for the rustup toolchain manager, not the rustc compiler.
+info: the currently active `rustc` version is `rustc 1.98.1 (48a229cea 2026-09-01)`
+stable-aarch64-apple-darwin (default)
+1.98.1-aarch64-apple-darwin (active)
+=== rust-toolchain.toml honored (inside repo root) ===
+rustc 1.98.1 (48a229cea 2026-09-01)
+binary: rustc
+commit-hash: 48a229ceaefd4985c50990b14116b6d856af0985
+commit-date: 2026-09-01
+host: aarch64-apple-darwin
+release: 1.98.1
+LLVM version: 22.1.8
+cargo 1.98.1 (797e8a9bc 2026-08-05)
+=== homebrew rust still present but bypassed ===
+rustc 1.93.0 (254b59607 2026-01-19) (Homebrew)

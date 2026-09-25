@@ -1,0 +1,3 @@
+[2m2026-09-25T01:12:30.727836Z[0m [32m INFO[0m [2mspike_tls_probe[0m[2m:[0m https response [3mstatus[0m[2m=[0m200 OK
+SPIKE_TLS_OK url=https://index.crates.io/config.json status=200 OK verification=enabled backend=rustls-platform-verifier
+exit=0

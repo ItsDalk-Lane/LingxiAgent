@@ -101,27 +101,25 @@ pub fn negotiate_protocol(client: &ClientHello) -> Result<u32, ProtocolError> {
     if lo <= hi {
         return Ok(hi);
     }
-    Err(
-        ProtocolError::new(
-            ErrorCode::VersionIncompatible,
-            format!(
-                "client supports {WIRE_PROTOCOL_NAME} {}..={}, server supports {}..={}; \
+    Err(ProtocolError::new(
+        ErrorCode::VersionIncompatible,
+        format!(
+            "client supports {WIRE_PROTOCOL_NAME} {}..={}, server supports {}..={}; \
                  no common version exists and no default is guessed",
-                client.protocol_min,
-                client.protocol_max,
-                WIRE_PROTOCOL_MIN_SUPPORTED,
-                WIRE_PROTOCOL_MAX_SUPPORTED,
-            ),
-            false,
-        )
-        .with_details(serde_json::Map::from_iter([
-            ("protocol".into(), WIRE_PROTOCOL_NAME.into()),
-            ("clientMin".into(), client.protocol_min.into()),
-            ("clientMax".into(), client.protocol_max.into()),
-            ("supportedMin".into(), WIRE_PROTOCOL_MIN_SUPPORTED.into()),
-            ("supportedMax".into(), WIRE_PROTOCOL_MAX_SUPPORTED.into()),
-        ])),
+            client.protocol_min,
+            client.protocol_max,
+            WIRE_PROTOCOL_MIN_SUPPORTED,
+            WIRE_PROTOCOL_MAX_SUPPORTED,
+        ),
+        false,
     )
+    .with_details(serde_json::Map::from_iter([
+        ("protocol".into(), WIRE_PROTOCOL_NAME.into()),
+        ("clientMin".into(), client.protocol_min.into()),
+        ("clientMax".into(), client.protocol_max.into()),
+        ("supportedMin".into(), WIRE_PROTOCOL_MIN_SUPPORTED.into()),
+        ("supportedMax".into(), WIRE_PROTOCOL_MAX_SUPPORTED.into()),
+    ])))
 }
 
 /// Builds the success response for a negotiated hello.

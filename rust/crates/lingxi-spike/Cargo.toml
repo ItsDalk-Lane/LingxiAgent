@@ -1,0 +1,31 @@
+[package]
+name = "lingxi-spike"
+description = "R01-T03 dependency-locking build prototype: compile-and-run proofs for tokio/axum/reqwest/rustls/rusqlite/tracing/jsonschema/rmcp on the pinned toolchain. Not a production component; owns no business fact (registered as kind=prototype in DEPENDENCY_RULES.json, bound by DEP-07 no-desktop rule)."
+version = "0.0.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+# R01-T03: candidate versions resolved from crates.io on 2026-09-25 and compiled
+# against rustc 1.98.1 (pinned by rust-toolchain.toml at the repo root). Exact
+# resolved versions are locked in rust/Cargo.lock; see
+# docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md for the per-item rationale.
+[dependencies]
+axum = "0.8.9"
+jsonschema = "0.57.0"
+# reqwest default-tls on 0.13 = rustls + aws-lc-rs + rustls-platform-verifier
+# (platform native root certificates). TLS verification is NEVER disabled;
+# the red line forbids turning it off to fix connectivity.
+reqwest = { version = "0.13.5", features = ["json"] }
+# Official MCP Rust SDK (W12). Minimal feature set for the in-process
+# handshake proof: client + server roles over a tokio AsyncRead/AsyncWrite
+# transport (duplex); stdio/child-process transports validated in later stages.
+rmcp = { version = "3.4.1", default-features = false, features = ["client", "server"] }
+# rusqlite (W14) with bundled SQLite: the engine is compiled in, so the binary
+# never falls back to a system-wide libsqlite3 (see A06 / DEPENDENCY_DECISIONS).
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "sync", "net", "io-util", "time"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["fmt", "env-filter"] }

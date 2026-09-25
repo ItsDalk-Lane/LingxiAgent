@@ -62,10 +62,9 @@ fn main() -> ExitCode {
         .map(|w| w[1].clone());
 
     let index_path = Path::new(&golden_dir).join("index.json");
-    let index: Value = serde_json::from_slice(
-        &std::fs::read(&index_path).expect("read golden/index.json"),
-    )
-    .expect("parse golden/index.json");
+    let index: Value =
+        serde_json::from_slice(&std::fs::read(&index_path).expect("read golden/index.json"))
+            .expect("parse golden/index.json");
 
     let mut failures: Vec<String> = Vec::new();
     let mut count = 0usize;
@@ -115,12 +114,16 @@ fn main() -> ExitCode {
         }
 
         // Sample-specific checks recorded in golden/index.json
-        for check in sample["checks"].as_array().map(|v| v.as_slice()).unwrap_or(&[]) {
+        for check in sample["checks"]
+            .as_array()
+            .map(|v| v.as_slice())
+            .unwrap_or(&[])
+        {
             if check["kind"] == "big_seq_string" {
                 let v: Value = serde_json::from_slice(&golden).unwrap();
                 let seq = v["seq"].as_str().expect("seq must be a string");
                 let parsed: u64 = seq.parse().expect("seq must be a u64 decimal string");
-                if parsed <= (1u64 << 53) - 1 {
+                if parsed < (1u64 << 53) {
                     failures.push(format!(
                         "{file}: big_seq_string sample does not exceed 2^53-1"
                     ));

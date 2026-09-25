@@ -1,0 +1,12 @@
+[2m2026-09-25T01:12:26.944522Z[0m [32m INFO[0m [1mserve_inner[0m[2m:[0m [2mrmcp::service[0m[2m:[0m Service initialized as server [3mpeer_info[0m[2m=[0mSome(InitializeRequestParams { meta: None, protocol_version: ProtocolVersion("2025-11-25"), capabilities: ClientCapabilities { experimental: None, extensions: None, roots: None, sampling: None, elicitation: None }, client_info: Implementation { name: "rmcp", title: None, version: "3.4.1", description: None, icons: None, website_url: None } })
+[2m2026-09-25T01:12:26.944527Z[0m [32m INFO[0m [1mserve_inner[0m[2m:[0m [2mrmcp::service[0m[2m:[0m Service initialized as client [3mpeer_info[0m[2m=[0mSome(ServerPeerInfo { protocol_version: ProtocolVersion("2025-11-25"), capabilities: ServerCapabilities { experimental: None, extensions: None, logging: None, completions: None, prompts: None, resources: None, tools: Some(ToolsCapability { list_changed: None }) }, server_info: Some(Implementation { name: "lingxi-spike-mcp", title: None, version: "0.0.0", description: None, icons: None, website_url: None }), instructions: None, meta: None })
+[2m2026-09-25T01:12:26.944786Z[0m [32m INFO[0m [2mspike_mcp_handshake[0m[2m:[0m initialize completed [3mprotocol[0m[2m=[0m2025-11-25 [3mserver[0m[2m=[0mlingxi-spike-mcp
+[2m2026-09-25T01:12:26.945132Z[0m [32m INFO[0m [1mserve_inner[0m[2m:[0m [2mrmcp::service[0m[2m:[0m received notification [3mnotification[0m[2m=[0mInitializedNotification(NotificationNoParam { method: InitializedNotificationMethod, extensions: Extensions })
+[2m2026-09-25T01:12:26.945459Z[0m [32m INFO[0m [1mserve_inner[0m[2m:[0m [2mrmcp::handler::server[0m[2m:[0m client initialized
+[2m2026-09-25T01:12:26.945968Z[0m [32m INFO[0m [2mspike_mcp_handshake[0m[2m:[0m list_tools ok [3mtools[0m[2m=[0m0
+[2m2026-09-25T01:12:26.946028Z[0m [32m INFO[0m [1mserve_inner[0m[2m:[0m [2mrmcp::service[0m[2m:[0m task cancelled
+[2m2026-09-25T01:12:26.946097Z[0m [32m INFO[0m [1mserve_inner[0m[2m:[0m [2mrmcp::service[0m[2m:[0m serve finished [3mquit_reason[0m[2m=[0mCancelled
+[2m2026-09-25T01:12:26.946181Z[0m [32m INFO[0m [1mserve_inner[0m[2m:[0m [2mrmcp::service[0m[2m:[0m input stream terminated
+SPIKE_MCP_OK negotiated_protocol=2025-11-25 server=lingxi-spike-mcp tools=0
+[2m2026-09-25T01:12:26.946214Z[0m [32m INFO[0m [1mserve_inner[0m[2m:[0m [2mrmcp::service[0m[2m:[0m serve finished [3mquit_reason[0m[2m=[0mClosed
+exit=0

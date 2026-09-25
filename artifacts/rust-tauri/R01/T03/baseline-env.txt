@@ -1,0 +1,36 @@
+=== baseline ===
+Fri Sep 25 08:42:04 CST 2026
+9705fe0fbaa4c8898dbede0a62a5c97465ca64e3
+codex/rust-tauri-migration
+ M docs/rust-tauri/ORCHESTRATOR_PROGRESS.json
+?? artifacts/rust-tauri/R01/T03/
+=== toolchain (pre-rustup) ===
+/opt/homebrew/bin/cargo
+/opt/homebrew/bin/rustc
+cargo 1.93.0 (Homebrew)
+rustc 1.93.0 (254b59607 2026-01-19) (Homebrew)
+rustc 1.93.0 (254b59607 2026-01-19) (Homebrew)
+binary: rustc
+commit-hash: 254b59607d4417e9dffbc307138ae5c86280fe4c
+commit-date: 2026-01-19
+host: aarch64-apple-darwin
+release: 1.93.0
+LLVM version: 21.1.8
+=== node/python ===
+v24.16.0
+11.13.0
+Python 3.14.3
+=== proxy env ===
+all_proxy=socks5://127.0.0.1:7890
+ALL_PROXY=socks5://127.0.0.1:7890
+http_proxy=http://127.0.0.1:7890
+HTTP_PROXY=http://127.0.0.1:7890
+https_proxy=http://127.0.0.1:7890
+HTTPS_PROXY=http://127.0.0.1:7890
+no_proxy=localhost,127.0.0.1,::1,*.local,169.254/16,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+=== os ===
+ProductName:		macOS
+ProductVersion:		27.0
+BuildVersion:		26A428
+arm64
+Mac15,14

@@ -1,0 +1,24 @@
+# R01-A06 missing-dependency diagnosis
+# date: Fri Sep 25 09:14:15 CST 2026
+rustc 1.98.1 (48a229cea 2026-09-01)
+cargo 1.98.1 (797e8a9bc 2026-08-05)
+# isolated copy: /tmp/r01t03-a06/work ; fresh CARGO_HOME=/tmp/r01t03-a06/cargo-home
+# step 1: fetch all locked crates (online, proxy stripped)
+fetch exit=0
+# step 2: SABOTAGE — remove rmcp 3.4.1 crate source AND cached .crate from the isolated CARGO_HOME
+0
+rmcp source removed (0 remaining)
+# step 3: run prototype install check in sabotaged isolated copy (--locked --offline)
+error: failed to download `rmcp v3.4.1`
+
+Caused by:
+  attempting to make an HTTP request, but --offline was specified
+sabotaged install-check exit=101
+# step 4: CONTROL — restore rmcp (re-fetch), rerun identical install check
+re-fetch exit=0
+{"check":"lingxi-spike install-check (R01-A06)","exe":"/tmp/r01t03-a06/target/debug/spike_check_deps","linked_libraries":[{"path":"/System/Library/Frameworks/Security.framework/Versions/A/Security","status":"ok-dyld-shared-cache"},{"path":"/System/Library/Frameworks/SystemConfiguration.framework/Versions/A/SystemConfiguration","status":"ok-dyld-shared-cache"},{"path":"/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation","status":"ok-dyld-shared-cache"},{"path":"/usr/lib/libiconv.2.dylib","status":"ok-dyld-shared-cache"},{"path":"/usr/lib/libSystem.B.dylib","status":"ok-dyld-shared-cache"}],"result":"OK","sqlite":{"linkage":"bundled (static)","sqlite_version":"3.53.2","status":"ok"},"tls":{"backend":"rustls + rustls-platform-verifier (platform native roots)","status":"ok"}}
+SPIKE_CHECK_DEPS_OK
+restored install-check exit=
+# step 4b: control rerun with explicit exit capture (previous line's exit var was empty due to zsh PIPESTATUS)
+SPIKE_CHECK_DEPS_OK
+restored install-check exit=0

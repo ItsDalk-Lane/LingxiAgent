@@ -448,7 +448,10 @@ mod tests {
         let err = serde_json::from_str::<ProtocolError>(
             r#"{"code":"internal","message":"x","retryable":false,"surprise":1}"#,
         );
-        assert!(err.is_err(), "closed error envelope must reject unknown fields");
+        assert!(
+            err.is_err(),
+            "closed error envelope must reject unknown fields"
+        );
     }
 
     #[test]

@@ -1,0 +1,87 @@
+{
+ "schema_version": 1,
+ "task_id": "R01-T03",
+ "generated_by": "ZCode:R01-T03-exec-r1",
+ "date": "2026-09-25",
+ "toolchain": {
+  "pinned_by": "rust-toolchain.toml (repo root, channel 1.98.1, components rustfmt+clippy)",
+  "rustc": "1.98.1 (48a229cea 2026-09-01)",
+  "cargo": "1.98.1 (797e8a9bc 2026-08-05)",
+  "rustup": "1.29.1 (d95a37b6a 2026-08-13)",
+  "note": "本机另有 Homebrew rust 1.93.0 (/opt/homebrew/bin) 不读 rust-toolchain.toml；锁定仅对经 rustup 代理（~/.cargo/bin）的调用生效。CI/开发者必须把 ~/.cargo/bin 放在 PATH 前。"
+ },
+ "platforms": [
+  {
+   "platform": "macOS arm64",
+   "target_triple": "aarch64-apple-darwin",
+   "status": "VERIFIED",
+   "evidence": "artifacts/rust-tauri/R01/T03/{a05-clean-build.log,a06-missing-dependency.log,run-spike_*.log,cargo-test-workspace.log}",
+   "machine": "Mac15,14 macOS 27.0 (BuildVersion 26A428)",
+   "native_libraries": {
+    "status": "VERIFIED",
+    "detail": "rusqlite bundled (libsqlite3-sys 0.38.2) 静态编译 SQLite 3.53.2；otool -L 实测链接仅 Security/SystemConfiguration/CoreFoundation/libiconv/libSystem，无 libsqlite3 依赖（run-spike_check_deps.log）。aws-lc-sys 0.45.0 用 Apple clang 21.0.0 构建成功，无需 cmake（本机无 cmake 实测）。"
+   },
+   "tls_root_certificates": {
+    "status": "VERIFIED",
+    "detail": "reqwest 0.13.5 default-tls = rustls 0.23.45 + aws-lc-rs 1.18.1 + rustls-platform-verifier 0.7.1（读 macOS Security framework 根证书）。spike_tls_probe 对 https://index.crates.io/config.json HTTPS 200，证书校验开启（run-spike_tls_probe.log）。"
+   },
+   "proxy": {
+    "status": "VERIFIED",
+    "detail": "reqwest system-proxy feature 编译在内；开发机 127.0.0.1:7890 死代理环境下，剥离代理变量后 HTTPS 直连实测成功。reqwest 读取系统/环境代理配置的行为未做穷尽验证（代理协议矩阵归 R05/R09）。"
+   },
+   "cross_compilation": {
+    "status": "NOT_APPLICABLE",
+    "detail": "本机即目标平台，无需交叉编译。"
+   },
+   "dynamic_linking": {
+    "status": "VERIFIED",
+    "detail": "产物为 Mach-O 动态链接系统框架；无第三方 dylib 依赖。spike_check_deps 实测枚举并确认全部链接库存在。"
+   },
+   "build_tools_required": ["Apple clang (Xcode CLT)", "rustup 管理的 rustc/cargo 1.98.1"],
+   "build_tools_not_required": ["cmake（本目标实测不需要）", "nasm", "OpenSSL 开发库"]
+  },
+  {
+   "platform": "macOS x64",
+   "target_triple": "x86_64-apple-darwin",
+   "status": "UNVERIFIED",
+   "native_libraries": {"status": "UNVERIFIED", "detail": "预期同 arm64（bundled SQLite + aws-lc-rs 均支持 x86_64-apple-darwin）；需 rustup target add x86_64-apple-darwin 后实测。"},
+   "tls_root_certificates": {"status": "UNVERIFIED", "detail": "rustls-platform-verifier 走 Security framework，预期同 arm64；需实测。"},
+   "proxy": {"status": "UNVERIFIED", "detail": "同 arm64 预期；需实测。"},
+   "cross_compilation": {"status": "UNVERIFIED", "detail": "可从 arm64 主机交叉编译 x86_64-apple-darwin（rustup target add）；aws-lc-sys 交叉构建是否需要额外工具未验证。"},
+   "dynamic_linking": {"status": "UNVERIFIED", "detail": "预期仅系统框架；需实测 otool -L。"},
+   "build_tools_required": ["Apple clang (Xcode CLT)", "rustup target x86_64-apple-darwin"],
+   "owner": "R09/R10 平台验收负责人（总控指派）",
+   "verify_by_stage": "R09（Tauri 宿主集成）最迟 R10（跨平台产物）"
+  },
+  {
+   "platform": "Windows x64",
+   "target_triple": "x86_64-pc-windows-msvc",
+   "status": "UNVERIFIED",
+   "native_libraries": {"status": "UNVERIFIED", "detail": "rusqlite bundled 用 MSVC cl 编译 C 源（cc crate 支持）；aws-lc-sys 在 Windows MSVC 历史上需要 NASM 或使用预生成汇编，本次未实测——列为平台风险 PR-WIN-01。"},
+   "tls_root_certificates": {"status": "UNVERIFIED", "detail": "rustls-platform-verifier 在 Windows 走 Schannel 系统根证书库；未实测。"},
+   "proxy": {"status": "UNVERIFIED", "detail": "reqwest system-proxy 支持 Windows 系统代理（WinHTTP 注册表）；未实测。"},
+   "cross_compilation": {"status": "UNVERIFIED", "detail": "从 macOS 交叉编译 windows-msvc 不受官方支持（需要 Windows SDK + MSVC link.exe）；预期需要 Windows 构建机或 CI runner。"},
+   "dynamic_linking": {"status": "UNVERIFIED", "detail": "MSVC 目标默认动态链接 vcruntime；静态 CRT (/MT) 与否的决策未做，归 R09。"},
+   "build_tools_required": ["MSVC Build Tools (cl/link)", "Windows SDK", "rustup target x86_64-pc-windows-msvc", "可能需 NASM（PR-WIN-01）"],
+   "owner": "R09/R10 平台验收负责人（总控指派）",
+   "verify_by_stage": "R09（Tauri 宿主集成）最迟 R10（跨平台产物）"
+  },
+  {
+   "platform": "Linux x64",
+   "target_triple": "x86_64-unknown-linux-gnu",
+   "status": "UNVERIFIED",
+   "native_libraries": {"status": "UNVERIFIED", "detail": "rusqlite bundled 需 gcc/cc；aws-lc-sys 需 gcc（通常无需 cmake，未实测）。无 openssl-sys 依赖（锁树实测 absent）——选择 rustls 已消除 OpenSSL 开发库要求。"},
+   "tls_root_certificates": {"status": "UNVERIFIED", "detail": "rustls-platform-verifier 在 Linux 读系统根证书（/etc/ssl 等，经 openssl-probe 类探测）并回退 webpki-root-certs；容器/精简镜像缺 ca-certificates 时的行为未实测——列为平台风险 PR-LNX-01。"},
+   "proxy": {"status": "UNVERIFIED", "detail": "reqwest system-proxy 读 http_proxy/https_proxy 环境变量；未实测。"},
+   "cross_compilation": {"status": "UNVERIFIED", "detail": "可用 cross/容器构建；glibc 版本下限（构建机 glibc 决定产物可运行范围）未测定——列为平台风险 PR-LNX-02。"},
+   "dynamic_linking": {"status": "UNVERIFIED", "detail": "默认动态链接 glibc；静态 musl（x86_64-unknown-linux-musl）与否的决策未做，归 R09/R10。"},
+   "build_tools_required": ["gcc/cc", "rustup target x86_64-unknown-linux-gnu"],
+   "owner": "R09/R10 平台验收负责人（总控指派）",
+   "verify_by_stage": "R09（Tauri 宿主集成）最迟 R10（跨平台产物）"
+  }
+ ],
+ "headless_workspace_no_desktop_deps": {
+  "status": "VERIFIED",
+  "detail": "锁树中 tauri/webview2-com/gtk/webkit2gtk/openssl-sys/native-tls 全部 absent（cargo metadata 实测，见 R01-T03_REPORT.md §6）；DEP-07 校验器正向通过（t01-check-positive.log）。"
+ }
+}

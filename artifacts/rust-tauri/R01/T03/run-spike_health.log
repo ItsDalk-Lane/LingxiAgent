@@ -1,0 +1,5 @@
+[2m2026-09-25T01:12:24.237042Z[0m [32m INFO[0m [2mspike_health[0m[2m:[0m health prototype listening [3maddr[0m[2m=[0m127.0.0.1:52093
+[2m2026-09-25T01:12:24.246067Z[0m [32m INFO[0m [2mspike_health[0m[2m:[0m GET /hello [3mstatus[0m[2m=[0m200 OK [3mbody[0m[2m=[0mhello from lingxi rust core
+[2m2026-09-25T01:12:24.246613Z[0m [32m INFO[0m [2mspike_health[0m[2m:[0m GET /health [3mstatus[0m[2m=[0m200 OK [3mbody[0m[2m=[0m{"component":"lingxi-spike-health","protocol":"lingxi.wire","protocolVersion":1,"status":"ok"}
+SPIKE_HEALTH_OK addr=127.0.0.1:52093 hello=200 health=200
+exit=0

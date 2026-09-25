@@ -1,0 +1,9 @@
+== [1/2] contracts/generated (lingxi-protocol-gen --check)
+OK: 56 generated files match regeneration (no diff) under /Users/study_superior/Desktop/Code/LingxiAgent/contracts/generated
+== [2/2] API_COMPAT_MATRIX.json (extract --check)
+DRIFT: API_COMPAT_MATRIX.json differs from regeneration
+  line 6:
+    disk:     "headSha": "a98d24877e056dcb490f23ec739713ca937e646e",
+    gen:      "headSha": "9705fe0fbaa4c8898dbede0a62a5c97465ca64e3",
+regenerate: node scripts/rust-tauri/r01-t02-extract-api-surface.mjs
+exit=1

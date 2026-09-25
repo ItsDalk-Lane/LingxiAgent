@@ -1,0 +1,131 @@
+# command: cargo test --workspace --offline (pinned toolchain)
+cargo 1.98.1 (797e8a9bc 2026-08-05)
+rustc 1.98.1 (48a229cea 2026-09-01)
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-spike)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.21s
+     Running unittests src/lib.rs (/tmp/lingxi-r01t03-target/debug/deps/lingxi_kernel-1b1acaed818d95e2)
+
+running 7 tests
+test tests::cancellation_resolves_only_to_cancelled ... ok
+test tests::queued_cannot_skip_to_completed ... ok
+test tests::happy_path_queued_to_completed ... ok
+test tests::cancelling_cannot_be_revoked_back_to_running ... ok
+test tests::terminal_states_reject_every_transition ... ok
+test tests::seq_precision_holds_across_kernel_boundary ... ok
+test tests::run_context_carries_identity_only ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/tmp/lingxi-r01t03-target/debug/deps/lingxi_protocol-d90789915c0df003)
+
+running 19 tests
+test tests::r00_baseline_versions_are_one ... ok
+test handshake::tests::intersection_selects_highest_common ... ok
+test tests::seq_wire_string_rejects_garbage ... ok
+test handshake::tests::unknown_caps_are_reported_not_dropped ... ok
+test wire::tests::dialect_check_is_explicit ... ok
+test handshake::tests::wrong_family_and_malformed_range_are_invalid_message ... ok
+test handshake::tests::disjoint_ranges_fail_explicitly ... ok
+test tests::terminal_states_are_terminal_and_named_stably ... ok
+test tests::ids_are_opaque_and_preserved ... ok
+test tests::protocol_error_rejects_unknown_fields ... ok
+test canon::tests::canonical_form_has_no_whitespace_or_trailing_newline ... ok
+test tests::seq_wire_string_roundtrips_beyond_js_safe_integer ... ok
+test canon::tests::canonical_form_sorts_keys_and_keeps_utf8 ... ok
+test tests::error_codes_have_stable_wire_names ... ok
+test handshake::tests::client_hello_rejects_unknown_fields ... ok
+test wire::tests::unknown_event_payload_is_preserved_verbatim ... ok
+test wire::tests::u64_fields_are_decimal_strings ... ok
+test wire::tests::closed_payload_variants_reject_unknown_fields ... ok
+test wire::tests::envelope_roundtrips_and_validates_event_type ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-proto-server.rs (/tmp/lingxi-r01t03-target/debug/deps/lingxi_proto_server-b386498339ddb0ca)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-protocol-gen.rs (/tmp/lingxi-r01t03-target/debug/deps/lingxi_protocol_gen-c66177ea2b0ba198)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-protocol-verify.rs (/tmp/lingxi-r01t03-target/debug/deps/lingxi_protocol_verify-621781e0733a1003)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/tmp/lingxi-r01t03-target/debug/deps/lingxi_spike-b31ccf3a8c7e31e3)
+
+running 7 tests
+test queue::tests::zero_capacity_is_rejected ... ok
+test queue::tests::bounded_queue_reports_full_instead_of_dropping ... ok
+test queue::tests::put_get_count_roundtrip_and_wal ... ok
+test schema::tests::golden_client_hello_validates_against_generated_schema ... ok
+test schema::tests::golden_server_hello_validates ... ok
+test schema::tests::tampered_client_hello_is_rejected ... ok
+test queue::tests::many_jobs_all_complete_in_order ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running unittests src/bin/spike_check_deps.rs (/tmp/lingxi-r01t03-target/debug/deps/spike_check_deps-59eadbd8094d7195)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_health.rs (/tmp/lingxi-r01t03-target/debug/deps/spike_health-61771c1be8a0d9a8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_mcp_handshake.rs (/tmp/lingxi-r01t03-target/debug/deps/spike_mcp_handshake-558e13fa2010080e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_schema_validate.rs (/tmp/lingxi-r01t03-target/debug/deps/spike_schema_validate-e7e8ff00d517f8b4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_sqlite_queue.rs (/tmp/lingxi-r01t03-target/debug/deps/spike_sqlite_queue-4490cfd2af73bcd0)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_tls_probe.rs (/tmp/lingxi-r01t03-target/debug/deps/spike_tls_probe-7dd4bae4629c0e99)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_kernel
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_spike
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+exit=0

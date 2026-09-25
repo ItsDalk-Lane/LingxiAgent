@@ -45,6 +45,15 @@
    "responsibility": "保留 CLI 命令语义，连接同一 service"
   },
   {
+   "module": "lingxi-spike",
+   "kind": "prototype",
+   "crate_path": "rust/crates/lingxi-spike",
+   "status": "exists",
+   "establish_stage": "R01-T03",
+   "responsibility": "依赖锁定构建原型（tokio/axum/reqwest/rusqlite/tracing/jsonschema/rmcp 编译与运行证据）；非生产组件，不拥有任何业务事实；DEP-07 桌面禁令对其生效",
+   "note": "Deliberately registered as exists by R01-T03 per the D5-reverse contract (every workspace member must be a registered module). No owner in OWNERSHIP_TARGET.json points at it; it carries no critical fact."
+  },
+  {
    "module": "xtask",
    "kind": "build-automation",
    "crate_path": "rust/crates/xtask",
@@ -124,7 +133,7 @@
   {
    "id": "DEP-07",
    "name": "no-desktop-dependency-anywhere-in-headless-workspace",
-   "applies_to_modules": ["lingxi-protocol", "lingxi-kernel", "lingxi-adapters", "lingxi-service", "lingxi-cli", "xtask"],
+   "applies_to_modules": ["lingxi-protocol", "lingxi-kernel", "lingxi-adapters", "lingxi-service", "lingxi-cli", "xtask", "lingxi-spike"],
    "forbidden_dep_patterns": ["tauri", "electron", "tao", "wry", "webkit2gtk"],
    "forbidden_source_tokens": [],
    "enforcement": "cargo-metadata-transitive",

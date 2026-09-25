@@ -1,0 +1,59 @@
+# R01-T03 deliverable + evidence SHA-256 (generated Fri Sep 25 09:23:59 CST 2026)
+# repo HEAD: 9705fe0fbaa4c8898dbede0a62a5c97465ca64e3
+
+## deliverables
+eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37  rust-toolchain.toml
+6661b74c06442a6e9a5ddefca5ffd3848cd3e9b06f18d4bda5875cbbc18cfa25  rust/Cargo.toml
+480cb513de317235cf11de31af6db26a9b1e937effbcd521a077c7eddd1f3560  rust/Cargo.lock
+f24d788bf0709d190ada0ea235d11cdfda1b4b1456806c31345504a84a3bbbcf  docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md
+37a52ff0403143e7fcbbd489959e5bcdf18e51e76175bff54a6451cd43299568  docs/rust-tauri/R01/PLATFORM_BUILD_MATRIX.json
+ba7c66f1226341b06a2440f0c80f3d4fbaf33cf2becc034c72904f782745740a  docs/rust-tauri/R01/DEPENDENCY_RULES.json
+
+## lingxi-spike crate sources
+6a63f3596f63a2e21735fff068adc228f5ae653dbae206d671df93086282ca48  rust/crates/lingxi-spike/Cargo.toml
+53c94d2b284c821380dc76c36bbf4291191d435830dbc3cb63aa201deddb4703  rust/crates/lingxi-spike/src/bin/spike_check_deps.rs
+70e78dc7751cec49390571d350afc033fbecd1fbf122bd80f3ea4b83c0bde1df  rust/crates/lingxi-spike/src/bin/spike_health.rs
+252907eba94763808ba76825f6b151d93ad239e30adce67ae0c948fac61f5fae  rust/crates/lingxi-spike/src/bin/spike_mcp_handshake.rs
+0c9e6767ba8d422914cfd0681f951c90197f64da49c4354c72b296184a215e27  rust/crates/lingxi-spike/src/bin/spike_schema_validate.rs
+e9f4300f5cb23937808137687f61c546750f971586812624a1874ef2ee7b6814  rust/crates/lingxi-spike/src/bin/spike_sqlite_queue.rs
+739f2fc2c95d4244843f3bbd32b0b19f2fc40b24d26b43cf51fe36ef383b5133  rust/crates/lingxi-spike/src/bin/spike_tls_probe.rs
+8c71c6cbadcfa9aa6f1d1c13dd228713b03e20c1ab52324c86a5f66e282d7c7c  rust/crates/lingxi-spike/src/lib.rs
+06e475d6f058f4dc1ba74385c0b67a7da887a7c7f5642cd7f4fdfa45afce51ad  rust/crates/lingxi-spike/src/queue.rs
+ae47842f9ad56f6a7ae2cadfd6ed54c4f4fab77ca86bf89947ea17723f4d7403  rust/crates/lingxi-spike/src/schema.rs
+
+## modified lingxi-protocol sources (toolchain reformat + clippy-equivalent fixes)
+1aeddfa2c4d4a8eab8ab75aed8a2555288c6ce2e1ebe05584b307d0cc0760aa3  rust/crates/lingxi-protocol/src/bin/lingxi-proto-server.rs
+f28a07e5963bdc47b93ed02bae4cf93f4e90f5cde9ab29b177b9694630f354ad  rust/crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs
+81bfbc58dc3221ccc5b5987228856b105a09965038ea9aba4fa61bff8812adaf  rust/crates/lingxi-protocol/src/bin/lingxi-protocol-verify.rs
+55a981f8d106075f1139d268517e3faa668e5f84f35978c4e5de16a6257697b4  rust/crates/lingxi-protocol/src/canon.rs
+17bb9902607d3d94fa2356cd2b55a32ad76b6eda38377b8d181be931af25d51d  rust/crates/lingxi-protocol/src/handshake.rs
+6726253f276829925d37deeb8fd3da3cb6bbd1f82fd4ff076bf48f52ef34066e  rust/crates/lingxi-protocol/src/lib.rs
+a3509c6d31fe584980bef21cc615e21a56afe44ab57266108b3f5d2d7c71d3ff  rust/crates/lingxi-protocol/src/wire.rs
+
+## evidence logs
+dcdb62b5b323f75a6e0ca85d7b30c32cfb192e5f96354614b7221b1915a30cc6  artifacts/rust-tauri/R01/T03/a05-clean-build.log
+de5e86faf4f3a220d947d7ab1d726ded26982a0d4731c2488447f3a540379910  artifacts/rust-tauri/R01/T03/a06-missing-dependency.log
+c15ea61cb645d395653312d63db3d6d63fcefc8b55737349ba4ed3ea69652bf1  artifacts/rust-tauri/R01/T03/baseline-env.txt
+6c602afbc52ff8378353796b88ce6094594a26a84306d4f707815e7396e237f4  artifacts/rust-tauri/R01/T03/cargo-audit.json
+668c4743fd9da0f6c30623a24ecf5fa8074672dffddbc79174d1b1ebd24bbee7  artifacts/rust-tauri/R01/T03/cargo-audit.log
+4a77a703cb3e69adb28b152055da5de5b93463c08e2e8132b0c2200700718bf5  artifacts/rust-tauri/R01/T03/cargo-clippy.log
+19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061  artifacts/rust-tauri/R01/T03/cargo-fmt-check.log
+aa9d9da02b8fa0b13a3c3813c2cc5cb3f884de493325934988d6a5ea091d9b27  artifacts/rust-tauri/R01/T03/cargo-test-workspace.log
+e870197045c02912ebbb8cf5526136eafd8951be32ab662e460b857b58760872  artifacts/rust-tauri/R01/T03/license-inventory.txt
+e0cab5f3453dfc9024e8f3a14e410fb6d8992474941f3da1c01ea3c825108d1a  artifacts/rust-tauri/R01/T03/locked-versions.txt
+37593a45dd9b248bc1e8d793d5fb0e7bfc6fb96a55e3d8e30ae274dbc0b27ec4  artifacts/rust-tauri/R01/T03/run-spike_check_deps.log
+3f05275bbe34d5a5235098064320d021c5bca48bea6523efc36d4a4b3af0dd3c  artifacts/rust-tauri/R01/T03/run-spike_health.log
+6c80eef6a201bd9c65445a913534c6a5293a7ed28e8bd2f8f0c1e5d5408f34ef  artifacts/rust-tauri/R01/T03/run-spike_mcp_handshake.log
+b5fc89135c8665fea4923e0228831e0907d5d6b3c4f5e7a2cae9184ac38e1028  artifacts/rust-tauri/R01/T03/run-spike_schema_validate.log
+43981fab8bca818b9de4a23ed8d93d461c41e65fcea9c803526d714a7363dca1  artifacts/rust-tauri/R01/T03/run-spike_sqlite_queue.log
+d7793be462f0b97ef24517e728f1b4f63ddfd026f09c5c4f7f5584d379ef58bc  artifacts/rust-tauri/R01/T03/run-spike_tls_probe.log
+bab07406c2dcc97bb90e57be6ef1de5895964739f4cd34bf617134c9c84ea387  artifacts/rust-tauri/R01/T03/t01-check-positive.log
+fa86a2554f86844603dfe38e54df6049c03e3520c971cf75786f94680f226df5  artifacts/rust-tauri/R01/T03/t01-check-selftest-n1-n15.log
+18cc3d3ede1471f4b1a29a118683c0ffb7960ce292d7a2adda43231e8ea5e67e  artifacts/rust-tauri/R01/T03/t01-generator-check.log
+74e6d444709fd84019bbf63bca8d066ed05de2e0c201a9c175b1a90895259f3c  artifacts/rust-tauri/R01/T03/t02-check-generated.log
+f09bc8e2ec4f6dc8e01fec4564c3b8022b0293533f6ce1cd8aee5241ad4463dc  artifacts/rust-tauri/R01/T03/t02-handshake.log
+89e14f1a77c7f02ee695cf37234f9713eba7a1b90bd88a9219b0cb972956e9b9  artifacts/rust-tauri/R01/T03/t02-roundtrip.log
+63aa3dd3273420fe148a117d25641476b83057dc46e0b771d8e86bb946558529  artifacts/rust-tauri/R01/T03/toolchain-pin.log
+3770e8ef28eacfd60cc713835b1ffef627cda83d39fe6fdb30d1ece6c6d1416d  artifacts/rust-tauri/R01/T03/handshake/server.log
+8c2f71538b05f0907747f4b805b13dbbbbcfdcc19f8b08c12d0410ba744de452  artifacts/rust-tauri/R01/T03/handshake/transcript.jsonl
+# note: SHASUMS.txt does not hash itself (self-reference removed); R01-T03_REPORT.md sha256 = 65d4ca57be8192102a64c22d3300f12f32f5c554d423caa37f53a671df1a6803

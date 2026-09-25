@@ -119,7 +119,7 @@ impl TsEmitter {
     }
 
     fn ts_for(&self, schema: &Value) -> String {
-        if schema.as_bool() == Some(true) || schema.as_object().map_or(false, |o| o.is_empty()) {
+        if schema.as_bool() == Some(true) || schema.as_object().is_some_and(|o| o.is_empty()) {
             return "unknown".to_string();
         }
         if let Some(r) = schema.get("$ref").and_then(|r| r.as_str()) {
@@ -260,7 +260,10 @@ impl TsEmitter {
             if let Some(d) = description {
                 out.push_str(&format!("/** {} */\n", d.replace("*/", "* /")));
             }
-            out.push_str(&format!("export type {name} = {};\n\n", self.ts_for(schema)));
+            out.push_str(&format!(
+                "export type {name} = {};\n\n",
+                self.ts_for(schema)
+            ));
         }
         for (type_name, root) in registry {
             if self.defs.contains_key(&sanitize_name(type_name)) {
@@ -293,7 +296,7 @@ fn json_prop_name(name: &str) -> String {
     if name
         .chars()
         .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '$')
-        && !name.chars().next().map_or(false, |c| c.is_ascii_digit())
+        && !name.chars().next().is_some_and(|c| c.is_ascii_digit())
         && !name.is_empty()
     {
         name.to_string()
@@ -345,8 +348,21 @@ fn golden_samples() -> Vec<Golden> {
     push(&mut out, "client-hello.json", "ClientHello", &hello, vec![]);
 
     // 2. handshake: server hello
-    let server_hello = accept_hello(&hello, 1, "lingxi-proto-server", "0.0.0-r01t02", 1, &["events.v1"]);
-    push(&mut out, "server-hello.json", "ServerHello", &server_hello, vec![]);
+    let server_hello = accept_hello(
+        &hello,
+        1,
+        "lingxi-proto-server",
+        "0.0.0-r01t02",
+        1,
+        &["events.v1"],
+    );
+    push(
+        &mut out,
+        "server-hello.json",
+        "ServerHello",
+        &server_hello,
+        vec![],
+    );
 
     // 3. handshake failure: version incompatible (client 2..=2)
     let mut too_new = hello.clone();
@@ -404,7 +420,13 @@ fn golden_samples() -> Vec<Golden> {
             reason: Some("模型调用失败：上游超时（示例错误）".into()),
         })),
     );
-    push(&mut out, "event-run-state-failed.json", "EventEnvelope", &env_failed, vec![]);
+    push(
+        &mut out,
+        "event-run-state-failed.json",
+        "EventEnvelope",
+        &env_failed,
+        vec![],
+    );
 
     // 6a. event: tool call started — carries the normalized-argument digest
     // (参数摘要) the approval boundary binds to; the TS side recomputes
@@ -568,7 +590,13 @@ fn golden_samples() -> Vec<Golden> {
         },
         config_generation: 7,
     };
-    push(&mut out, "model-request.json", "ModelRequest", &model_request, vec![]);
+    push(
+        &mut out,
+        "model-request.json",
+        "ModelRequest",
+        &model_request,
+        vec![],
+    );
 
     // 10. approval request: binds target/principal/run/args-digest/resources/generation/expiry
     let approval = ApprovalRequest {
@@ -580,13 +608,21 @@ fn golden_samples() -> Vec<Golden> {
         },
         run_id: RunId::new("run-0001"),
         attempt: AttemptId::new("attempt-1"),
-        args_digest: digest_arguments(&json!({"command": "rm -rf /tmp/示例", "reason": "清理临时目录"})),
+        args_digest: digest_arguments(
+            &json!({"command": "rm -rf /tmp/示例", "reason": "清理临时目录"}),
+        ),
         resources: vec![],
         generation: 7,
         expires_at_unix_ms: 1_800_000_000_000,
         remaining_uses: Some(1),
     };
-    push(&mut out, "approval-request.json", "ApprovalRequest", &approval, vec![]);
+    push(
+        &mut out,
+        "approval-request.json",
+        "ApprovalRequest",
+        &approval,
+        vec![],
+    );
 
     // 11. third-party tool schema preserved verbatim at the boundary
     let tool_schema = ToolSchemaDocument {

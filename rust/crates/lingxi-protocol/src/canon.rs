@@ -66,9 +66,7 @@ mod tests {
         let v = json!({"b": 1, "a": "灵犀", "z": null, "m": [3, 2, 1]});
         assert_eq!(
             canonical_json_bytes(&v),
-            r#"{"a":"灵犀","b":1,"m":[3,2,1],"z":null}"#
-                .as_bytes()
-                .to_vec()
+            r#"{"a":"灵犀","b":1,"m":[3,2,1],"z":null}"#.as_bytes().to_vec()
         );
     }
 
