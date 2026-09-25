@@ -1,0 +1,34 @@
+{
+ "candidate_spawn_to_exit": {
+  "n": 16,
+  "median_ms": 1644.25,
+  "p95_ms": 1663.5,
+  "min_ms": 1628.2,
+  "max_ms": 1734.3,
+  "all_exit0": true
+ },
+ "candidate_printToPDF_only": {
+  "n": 16,
+  "median_ms": 312.5,
+  "p95_ms": 324,
+  "min_ms": 307,
+  "max_ms": 330,
+  "all_exit0": true
+ },
+ "old_spawn_to_exit": {
+  "n": 8,
+  "median_ms": 953.5,
+  "p95_ms": 1021,
+  "min_ms": 931,
+  "max_ms": 1021,
+  "all_exit0": true
+ },
+ "sample_bytes": 271712,
+ "r00_t06_baseline": {
+  "helper_direct_median_ms": 812.1,
+  "helper_direct_p95_ms": 835.6,
+  "product_chain_median_ms": 851.8,
+  "product_chain_p95_ms": 879.4,
+  "sample_bytes": 239073
+ }
+}

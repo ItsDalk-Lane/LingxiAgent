@@ -211,3 +211,21 @@ ADR 格式依据任务书 06 §1。本文件每条决策含：问题与用户目
 **退出条件：**R09 正式宿主实现确定后，若 CDP 机制保留则 libc 随正式模块登记，否则随原型下线。
 
 **受影响任务/测试：**R01-T04 spike 本体与校验器（T01 正向/N1-N15、T02 roundtrip/handshake）。
+
+## D-10 R01-T05 原型依赖：零新增（spike_pdf 复用 lingxi-browser-spike 依赖面）
+**不可违反契约：**原型 crate 不得引入未锁定的第三方版本；不接入生产入口；候选后端必须逐项实测而非以「支持 PDF 的 Rust 库」充当等价证据。
+
+**候选及实际验证：**
+- 候选后端 = 受控 Chromium（Chrome 153.0.8010.52 本机实测）经 CDP `Page.printToPDF`，复用 R01-T04 已验证的 pipe 传输与 launcher；spike_pdf 以 bin target 加入既有 lingxi-browser-spike crate，**无新 crate、无新第三方依赖、Cargo.lock 零变化**（可 `git diff rust/Cargo.lock` 取证）。
+- 纯 Rust HTML→PDF 库（printpdf/wkhtml 系/headless_chrome 包装等）未进入实测：任务书明确禁止以库能力声明充当等价证据，且它们无法满足 @page/preferCSSPageSize/Chromium 打印管线逐语义对齐；受控 Chromium 是与现役 Electron printToPDF 同引擎族的唯一候选，直接实测。
+- 字体验证/文本提取/位图渲染工具链使用 macOS 系统框架（PDFKit/Quartz/CryptoKit，swiftc 编译），不进入 Rust 依赖图。
+
+**选择与理由：**同引擎族（Chromium printToPDF）是唯一能逐项对齐现役 HTML 打印语义的候选；复用 T04 依赖面满足零新增约束。
+
+**依赖版本：**无变化（base64 0.23.1 / libc 0.2.189 / serde 1.0.229 / serde_json 1.0.151 / sha2 0.11.0 沿用）。
+
+**性能/安全/兼容影响：**prototype kind；DEP-07 生效；渲染宿主为外部 Chrome 二进制（非 cargo 依赖），分发成本与许可评估见 ADR-003。
+
+**退出条件：**R09 正式宿主定型后 spike_pdf 随原型下线或被正式 renderer 模块吸收。
+
+**受影响任务/测试：**R01-T05 spike 本体与校验器（T01 正向/N1-N15、T02 roundtrip/handshake/check-generated、cargo test --workspace）。

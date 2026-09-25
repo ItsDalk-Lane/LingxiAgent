@@ -1,6 +1,6 @@
 [package]
 name = "lingxi-browser-spike"
-description = "R01-T04 browser-host replacement spike: drives a controlled, visible Chromium via CDP over --remote-debugging-pipe (no TCP debug port). Proves the D14 browser capability contract (visible interaction, DOM refs, screenshots, download, tabs, suspend/resume, cookies, proxy, session isolation, untrusted-page confinement) against a local-only test site. Not a production component; owns no business fact (registered as kind=prototype in docs/rust-tauri/R01/DEPENDENCY_RULES.json, bound by DEP-07)."
+description = "R01-T04 browser-host replacement spike + R01-T05 HTML-to-PDF candidate-chain spike: drives a controlled Chromium via CDP over --remote-debugging-pipe (no TCP debug port). spike_browser proves the D14 browser capability contract against a local-only test site; spike_pdf replicates the office-pdf-helper job contract (font injection, asset wait, JS toggle, printToPDF params, timeouts) with an added Fetch-domain resource allowlist. Not a production component; owns no business fact (registered as kind=prototype in docs/rust-tauri/R01/DEPENDENCY_RULES.json, bound by DEP-07)."
 version = "0.0.0"
 edition.workspace = true
 license.workspace = true

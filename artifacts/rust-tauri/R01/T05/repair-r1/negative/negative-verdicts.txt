@@ -1,0 +1,7 @@
+ws-negative-exit PASS exit=0 且页面正常产出（封堵不误伤渲染）
+ws-negative-canary PASS canary 对 ws://127.0.0.1:18291 握手零命中
+ws-negative-pagemarker PASS 页面 JS 观测：loopback/remote 均 BLOCKED
+print-timeout-exit PASS exit=2（printToPDF 阶段超时按契约归类）
+print-timeout-artifact PASS 零伪产物
+print-timeout-error PASS error=printToPDF: timeout: Page.printToPDF id=13
+print-timeout-cleanup PASS profile_removed=true

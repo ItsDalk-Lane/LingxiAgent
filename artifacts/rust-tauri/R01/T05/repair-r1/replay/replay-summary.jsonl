@@ -1,0 +1,19 @@
+{"scenario": "a09-old", "exit": 0, "expected_exit": "0", "detail": "S1 旧链"}
+{"scenario": "a09-new", "exit": 0, "expected_exit": "0", "detail": "S1 候选链"}
+{"scenario": "a09-compare", "exit": 0, "expected_exit": "0", "detail": "A09 语义+视觉断言"}
+{"scenario": "s2-preftrue-old", "exit": 0, "expected_exit": "0", "detail": "S2 preferCSSPageSize=true old"}
+{"scenario": "s2-preftrue-new", "exit": 0, "expected_exit": "0", "detail": "S2 preferCSSPageSize=true new"}
+{"scenario": "s2-preffalse-old", "exit": 0, "expected_exit": "0", "detail": "S2 preferCSSPageSize=false old"}
+{"scenario": "s2-preffalse-new", "exit": 0, "expected_exit": "0", "detail": "S2 preferCSSPageSize=false new"}
+{"scenario": "s3-old", "exit": 0, "expected_exit": "0", "detail": "S3 Letter landscape margins old"}
+{"scenario": "s3-new", "exit": 0, "expected_exit": "0", "detail": "S3 Letter landscape margins new"}
+{"scenario": "s4-jsfalse-old", "exit": 0, "expected_exit": "0", "detail": "S4 allowJavaScript=false old"}
+{"scenario": "s4-jsfalse-new", "exit": 0, "expected_exit": "0", "detail": "S4 allowJavaScript=false new"}
+{"scenario": "s4-jstrue-old", "exit": 0, "expected_exit": "0", "detail": "S4 allowJavaScript=true old"}
+{"scenario": "s4-jstrue-new", "exit": 0, "expected_exit": "0", "detail": "S4 allowJavaScript=true new"}
+{"scenario": "font-negative-new", "exit": 0, "expected_exit": "0", "detail": "候选链不注入字体"}
+{"scenario": "a10-dangerous-new", "exit": 0, "expected_exit": "0", "detail": "候选链危险样本（拦截后仍应产出）"}
+{"scenario": "a10-dangerous-old", "exit": 0, "expected_exit": "0", "detail": "旧链危险样本decoy变体（参考行为）"}
+{"scenario": "a10-infinite-new", "exit": 2, "expected_exit": "2", "detail": "候选链无限脚本必须超时退出且无产物"}
+{"scenario": "a10-infinite-old", "exit": 1, "expected_exit": "非0", "detail": "旧链无限脚本（参考行为）"}
+{"scenario": "a10-infinite-jsoff-new", "exit": 0, "expected_exit": "0", "detail": "JS 关闭时无限脚本样本应正常产出"}

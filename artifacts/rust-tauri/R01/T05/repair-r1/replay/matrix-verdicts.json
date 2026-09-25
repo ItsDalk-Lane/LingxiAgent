@@ -1,0 +1,147 @@
+{
+ "art": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R01/T05/repair-r1/replay",
+ "verified": 28,
+ "failed": 0,
+ "verdicts": [
+  {
+   "scenario": "s2-page-css-true-old",
+   "verdict": "VERIFIED",
+   "evidence": "MediaBox=[0, 0, 594.96, 420] expect≈[0,0,595.3,419.5] (A5 landscape, CSS 优先)"
+  },
+  {
+   "scenario": "s2-page-css-true-new",
+   "verdict": "VERIFIED",
+   "evidence": "MediaBox=[0, 0, 594.96, 420] expect≈[0,0,595.3,419.5] (A5 landscape, CSS 优先)"
+  },
+  {
+   "scenario": "s2-page-css-false-old",
+   "verdict": "VERIFIED",
+   "evidence": "MediaBox=[0, 0, 842.88, 595.92] expect≈[0,0,842.88,595.92]（old 链实测语义；两链差异=KNOWN-DIFF，见 spike 报告）"
+  },
+  {
+   "scenario": "s2-page-css-false-new",
+   "verdict": "VERIFIED",
+   "evidence": "MediaBox=[0, 0, 594.96, 420] expect≈[0,0,594.96,420.0]（new 链实测语义；两链差异=KNOWN-DIFF，见 spike 报告）"
+  },
+  {
+   "scenario": "s2-break-before-old",
+   "verdict": "VERIFIED",
+   "evidence": "pages=4 marker_on_pages=[2]"
+  },
+  {
+   "scenario": "s2-break-before-new",
+   "verdict": "VERIFIED",
+   "evidence": "pages=4 marker_on_pages=[2]"
+  },
+  {
+   "scenario": "s3-letter-landscape-old",
+   "verdict": "VERIFIED",
+   "evidence": "MediaBox=[0, 0, 792, 612] expect≈792x612"
+  },
+  {
+   "scenario": "s3-margins-old",
+   "verdict": "VERIFIED",
+   "evidence": "inkBBox=[217, 151, 880, 398] expect top≈144 left≈216 (px@2x)"
+  },
+  {
+   "scenario": "s3-letter-landscape-new",
+   "verdict": "VERIFIED",
+   "evidence": "MediaBox=[0, 0, 792, 612] expect≈792x612"
+  },
+  {
+   "scenario": "s3-margins-new",
+   "verdict": "VERIFIED",
+   "evidence": "inkBBox=[217, 151, 880, 398] expect top≈144 left≈216 (px@2x)"
+  },
+  {
+   "scenario": "s3-margins-parity",
+   "verdict": "VERIFIED",
+   "evidence": "old bbox=[217, 151, 880, 398] new bbox=[217, 151, 880, 398]"
+  },
+  {
+   "scenario": "s4-js-off-old",
+   "verdict": "VERIFIED",
+   "evidence": "static=Y jsmarker=N"
+  },
+  {
+   "scenario": "s4-js-on-old",
+   "verdict": "VERIFIED",
+   "evidence": "jsmarker=Y"
+  },
+  {
+   "scenario": "s4-js-off-new",
+   "verdict": "VERIFIED",
+   "evidence": "static=Y jsmarker=N"
+  },
+  {
+   "scenario": "s4-js-on-new",
+   "verdict": "VERIFIED",
+   "evidence": "jsmarker=Y"
+  },
+  {
+   "scenario": "font-negative-control",
+   "verdict": "VERIFIED",
+   "evidence": "fonts embedded without injection: ['AAAAAA+STSongti-SC-Bold', 'BAAAAA+STSongti-SC-Regular', 'CAAAAA+STSongti-SC-Bold', 'DAAAAA+STSongti-SC-Bold', 'EAAAAA+PingFangSC-Semibold', 'FAAAAA+.PingFangHK-Bold', 'GAAAAA+STSongti-SC-Regular', 'HAAAAA+STSongti-SC-Regular', 'IAAAAA+STSongti-SC-Regular', 'JAAAAA+STSongti-SC-Bold', 'KAAAAA+Menlo-Regular']"
+  },
+  {
+   "scenario": "font-injection-old",
+   "verdict": "VERIFIED",
+   "evidence": "{'EBGaramond': True, 'NotoSerifSC': True, 'JetBrainsMono': True} fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular']…"
+  },
+  {
+   "scenario": "font-injection-new",
+   "verdict": "VERIFIED",
+   "evidence": "{'EBGaramond': True, 'NotoSerifSC': True, 'JetBrainsMono': True} fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular']…"
+  },
+  {
+   "scenario": "a10-cand-unauthorized-denied",
+   "verdict": "VERIFIED",
+   "evidence": "fetch DENIED count=7（passwd iframe+img+master.passwd+远端+loopback canary 全部非 allowlist）"
+  },
+  {
+   "scenario": "a10-cand-no-leak-in-output",
+   "verdict": "VERIFIED",
+   "evidence": "outcome=ok passwd-in-text=no"
+  },
+  {
+   "scenario": "a10-cand-canary-denied-at-fetch-layer",
+   "verdict": "VERIFIED",
+   "evidence": "候选链 fetch-log 含 loopback canary DENY=True；canary.log 命中经时间戳归属旧链窗口（旧链无拦截层，实测会真实抓取 loopback 资源——RECORD-ONLY）"
+  },
+  {
+   "scenario": "a10-old-canary-hit-recorded",
+   "verdict": "VERIFIED",
+   "evidence": "RECORD-ONLY canary.log 行数=2（含 curl 自验 /selftest 与旧链 loopback-canary GET；时间戳归属见 R01-T05_REPORT）"
+  },
+  {
+   "scenario": "a10-old-reference-behavior",
+   "verdict": "VERIFIED",
+   "evidence": "RECORD-ONLY old exit=0 decoy-leak-in-text=YES (生产 helper 无资源拦截层；file:// 越权内容会进入 PDF——本证据用合成诱饵，真实 /etc/passwd 泄漏已另行确认并记录于 PDF_SPIKE_REPORT)"
+  },
+  {
+   "scenario": "a10-cand-timeout-kill",
+   "verdict": "VERIFIED",
+   "evidence": "outcome={'error': 'loadURL timed out after 5000ms', 'status': 'error'}"
+  },
+  {
+   "scenario": "a10-cand-no-false-artifact",
+   "verdict": "VERIFIED",
+   "evidence": "s6.pdf exists=False"
+  },
+  {
+   "scenario": "a10-cand-cleanup",
+   "verdict": "VERIFIED",
+   "evidence": "cleanup={'leftover_processes_after': [], 'leftover_processes_before_profile_rm': [], 'profile_removed': True}"
+  },
+  {
+   "scenario": "a10-jsoff-inert-script-ok",
+   "verdict": "VERIFIED",
+   "evidence": "outcome=ok（JS 关闭时死循环惰性化，应正常产出）"
+  },
+  {
+   "scenario": "a10-old-infinite-reference",
+   "verdict": "VERIFIED",
+   "evidence": "RECORD-ONLY old: {\"job\":\"/tmp/r01t05-replay/job-a10i-old.json\",\"exit_code\":1,\"signal\":null,\"spawn_error\":null,\"wall_ms\":5321,\"timed_out\":false,\"output_exists\":false,\"output_size\":0}"
+  }
+ ]
+}

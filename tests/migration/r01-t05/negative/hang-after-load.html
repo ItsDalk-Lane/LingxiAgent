@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>R01-T05 repair-r1 hang-after-load probe</title></head>
+<body>
+<p>HANG-AFTER-LOAD-FIXTURE-REPAIR-R1</p>
+<script>
+// R1 验收 F2 负向用例（复刻验收 ATK5）：load 事件正常触发后挂死主线程，
+// 使 Page.printToPDF 永不返回 → 候选链应在 printToPDF 阶段超时并按契约 exit 2
+// （修复前实测 exit 1，错误文案 "printToPDF: timeout: Page.printToPDF id=N"）。
+window.addEventListener("load", function () {
+  setTimeout(function () { while (true) {} }, 0);
+});
+</script>
+</body>
+</html>

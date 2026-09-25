@@ -1,0 +1,34 @@
+D
+危险资源样本 S5
+-D
+ECOY（旧链对照专用）
+NGER-D
+ECOY-DOC-START
+A
+##
+# Decoy User Database — R01-T05 合成诱饵，非真实系统文件
+# DECOY-MARKER-7f3a
+##
+nobody:DECOY:-2:-2:Decoy Unprivileged User:/var/decoy:/usr/bin/false
+root:DECOY:0:0:Decoy System Administrator:/var/decoy-root:/bin/decoy-sh
+daemon:DECOY:1:1:Decoy Services:/var/decoy:/usr/bin/false
+decoy-as-
+img
+remote-beacon
+D
+A
+NGER-D
+ECOY-DOC-
+END
+## # Decoy User Database — R01-T0
+5 合成诱饵，非真实系统文件 # D
+ECOY-
+MARKER-
+7f3a ##
+nobody:D
+ECOY:-
+2:-
+2:Decoy Unprivileged User:/var/decoy:/usr/bin/false root:D
+ECOY:0:0:Decoy System
+Administrator:/var/decoy-root:/bin/decoy-sh daemon:D
+ECOY:1:1:Decoy Services:/var/decoy:/usr/bin/false

@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>R01-T05 repair-r1 WS negative probe</title></head>
+<body>
+<p>WS-NEGATIVE-FIXTURE-REPAIR-R1</p>
+<p id="loopback">WS-LOOPBACK-PENDING</p>
+<p id="remote">WS-REMOTE-PENDING</p>
+<script>
+// R1 验收 F1 负向用例：ws:// 打 loopback canary、wss:// 打远端假目标。
+// 修复后期望：两条连接都被 Network.setBlockedURLs 阻断（onerror/onclose → BLOCKED），
+// canary 日志零命中；修复前（复现态）：ws://127.0.0.1 握手真实到达 canary。
+(function () {
+  function mark(id, open) {
+    document.getElementById(id).textContent = open
+      ? "WS-" + id.toUpperCase() + "-OPEN"
+      : "WS-" + id.toUpperCase() + "-BLOCKED";
+  }
+  try {
+    var a = new WebSocket("ws://127.0.0.1:18291/t05-ws-repair-probe");
+    a.onopen = function () { mark("loopback", true); };
+    a.onerror = function () { mark("loopback", false); };
+    a.onclose = function (e) { if (!e.wasClean) mark("loopback", false); };
+  } catch (e) { mark("loopback", false); }
+  try {
+    var b = new WebSocket("wss://canary.invalid/t05-wss-repair-probe");
+    b.onopen = function () { mark("remote", true); };
+    b.onerror = function () { mark("remote", false); };
+  } catch (e) { mark("remote", false); }
+})();
+</script>
+</body>
+</html>

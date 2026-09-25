@@ -1,0 +1,31 @@
+{
+  "asset_wait_note": "javascript=false: evaluate skipped (same as helper catch path); settleMs only",
+  "browser_version": "Chrome/153.0.8010.52",
+  "chrome": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "cleanup": {
+    "leftover_processes_after": [],
+    "leftover_processes_before_profile_rm": [],
+    "profile_removed": true
+  },
+  "fetch_decisions": 13,
+  "fetch_denies": 0,
+  "headless": true,
+  "job": "/tmp/r01t05-replay/job-s2-preffalse-new.json",
+  "launch_ms": 1,
+  "outcome": {
+    "output_path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R01/T05/s2-preffalse/new/s2.pdf",
+    "pdf_bytes": 154525,
+    "pdf_sha256": "f6c6042c59ef8047cb6ddd9ae4325b08a6d658074e9b3c1c2e48ba7b5fd1398b",
+    "status": "ok"
+  },
+  "proxy": "127.0.0.1:18482",
+  "timings": {
+    "asset_wait_ms": 260,
+    "attach_ms": 48,
+    "font_inject_ms": 25,
+    "navigate_ms": 17,
+    "print_ms": 83,
+    "total_ms": 436
+  },
+  "wall_ms": 1049
+}

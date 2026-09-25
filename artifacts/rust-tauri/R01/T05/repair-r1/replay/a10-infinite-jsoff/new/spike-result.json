@@ -1,0 +1,32 @@
+{
+  "asset_wait_note": "javascript=false: evaluate skipped (same as helper catch path); settleMs only",
+  "browser_version": "Chrome/153.0.8010.52",
+  "chrome": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "cleanup": {
+    "leftover_processes_after": [],
+    "leftover_processes_before_profile_rm": [],
+    "profile_removed": true
+  },
+  "connect_boundary": "CSP connect-src (ws:/wss: excluded) via Page.addScriptToEvaluateOnNewDocument",
+  "fetch_decisions": 14,
+  "fetch_denies": 0,
+  "headless": true,
+  "job": "/tmp/r01t05-replay/job-a10i-jsoff.json",
+  "launch_ms": 1,
+  "outcome": {
+    "output_path": "artifacts/rust-tauri/R01/T05/repair-r1/replay/a10-infinite-jsoff/new/s6.pdf",
+    "pdf_bytes": 89411,
+    "pdf_sha256": "8c4b237b34f80a8f883b886a5696a28c20b2e4dd27e45c2e78ede85b504672fc",
+    "status": "ok"
+  },
+  "proxy": "127.0.0.1:18482",
+  "timings": {
+    "asset_wait_ms": 255,
+    "attach_ms": 69,
+    "font_inject_ms": 26,
+    "navigate_ms": 14,
+    "print_ms": 76,
+    "total_ms": 446
+  },
+  "wall_ms": 1059
+}

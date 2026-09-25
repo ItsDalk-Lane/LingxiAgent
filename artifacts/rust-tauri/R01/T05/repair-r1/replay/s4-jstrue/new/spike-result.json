@@ -1,0 +1,32 @@
+{
+  "asset_wait_note": "js-enabled fonts.ready+images awaited",
+  "browser_version": "Chrome/153.0.8010.52",
+  "chrome": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "cleanup": {
+    "leftover_processes_after": [],
+    "leftover_processes_before_profile_rm": [],
+    "profile_removed": true
+  },
+  "connect_boundary": "CSP connect-src (ws:/wss: excluded) via Page.addScriptToEvaluateOnNewDocument",
+  "fetch_decisions": 5,
+  "fetch_denies": 0,
+  "headless": true,
+  "job": "/tmp/r01t05-replay/job-s4-jstrue-new.json",
+  "launch_ms": 1,
+  "outcome": {
+    "output_path": "artifacts/rust-tauri/R01/T05/repair-r1/replay/s4-jstrue/new/s4.pdf",
+    "pdf_bytes": 44443,
+    "pdf_sha256": "3a6eee0e3a39315390ca465423c4d5897cc6507fb5757f07642e198ead4f9716",
+    "status": "ok"
+  },
+  "proxy": "127.0.0.1:18482",
+  "timings": {
+    "asset_wait_ms": 255,
+    "attach_ms": 49,
+    "font_inject_ms": 22,
+    "navigate_ms": 22,
+    "print_ms": 66,
+    "total_ms": 418
+  },
+  "wall_ms": 1034
+}

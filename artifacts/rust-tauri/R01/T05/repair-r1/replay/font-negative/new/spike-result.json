@@ -1,0 +1,32 @@
+{
+  "asset_wait_note": "javascript=false: evaluate skipped (same as helper catch path); settleMs only",
+  "browser_version": "Chrome/153.0.8010.52",
+  "chrome": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "cleanup": {
+    "leftover_processes_after": [],
+    "leftover_processes_before_profile_rm": [],
+    "profile_removed": true
+  },
+  "connect_boundary": "CSP connect-src (ws:/wss: excluded) via Page.addScriptToEvaluateOnNewDocument",
+  "fetch_decisions": 2,
+  "fetch_denies": 0,
+  "headless": true,
+  "job": "/tmp/r01t05-replay/job-fontneg.json",
+  "launch_ms": 1,
+  "outcome": {
+    "output_path": "artifacts/rust-tauri/R01/T05/repair-r1/replay/font-negative/new/s1-nofont.pdf",
+    "pdf_bytes": 636887,
+    "pdf_sha256": "ea9941a73d238d61facd2fedafd6f717fd5ac56af1687015b63a428929202a6f",
+    "status": "ok"
+  },
+  "proxy": "127.0.0.1:18482",
+  "timings": {
+    "asset_wait_ms": 254,
+    "attach_ms": 60,
+    "font_inject_ms": 0,
+    "navigate_ms": 59,
+    "print_ms": 353,
+    "total_ms": 734
+  },
+  "wall_ms": 1347
+}

@@ -1,0 +1,14 @@
+{"decision":"ALLOW","resourceType":"Document","url":"file:///Users/study_superior/Desktop/Code/LingxiAgent/tests/migration/r01-t05/samples/s5-dangerous.html"}
+{"decision":"DENY","reason":"file outside allowlist: file:///etc/hosts","resourceType":"XHR","url":"file:///etc/hosts"}
+{"decision":"DENY","reason":"file outside allowlist: file:///etc/passwd","resourceType":"XHR","url":"file:///etc/passwd"}
+{"decision":"DENY","reason":"scheme not allowed: https://canary.invalid/t05-beacon.png","resourceType":"Image","url":"https://canary.invalid/t05-beacon.png"}
+{"decision":"DENY","reason":"file outside allowlist: file:///etc/passwd","resourceType":"Image","url":"file:///etc/passwd"}
+{"decision":"DENY","reason":"file outside allowlist: file:///etc/master.passwd","resourceType":"Image","url":"file:///etc/master.passwd"}
+{"decision":"DENY","reason":"scheme not allowed: http://127.0.0.1:18291/t05-loopback-canary.png","resourceType":"Image","url":"http://127.0.0.1:18291/t05-loopback-canary.png"}
+{"decision":"DENY","reason":"file outside allowlist: file:///etc/passwd","resourceType":"Document","url":"file:///etc/passwd"}
+{"decision":"ALLOW","resourceType":"Font","url":"file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/themes/fonts/ebgaramond-9947e6f6e128.woff2"}
+{"decision":"ALLOW","resourceType":"Font","url":"file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/themes/fonts/notoserifsc-693014a08415.woff2"}
+{"decision":"ALLOW","resourceType":"Font","url":"file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/themes/fonts/notoserifsc-119da54bda94.woff2"}
+{"decision":"ALLOW","resourceType":"Font","url":"file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/themes/fonts/notoserifsc-20a28253a539.woff2"}
+{"decision":"ALLOW","resourceType":"Font","url":"file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/themes/fonts/notoserifsc-f0605f0725c5.woff2"}
+{"decision":"ALLOW","resourceType":"Font","url":"file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/themes/fonts/ebgaramond-9947e6f6e128.woff2"}

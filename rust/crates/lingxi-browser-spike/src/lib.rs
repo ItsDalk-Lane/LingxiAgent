@@ -16,4 +16,5 @@
 pub mod cdp;
 pub mod launcher;
 pub mod ops;
+pub mod pdf;
 pub mod snapshot_source;

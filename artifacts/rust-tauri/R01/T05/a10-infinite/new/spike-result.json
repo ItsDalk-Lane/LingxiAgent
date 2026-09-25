@@ -1,0 +1,22 @@
+{
+  "asset_wait_note": null,
+  "browser_version": "Chrome/153.0.8010.52",
+  "chrome": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "cleanup": {
+    "leftover_processes_after": [],
+    "leftover_processes_before_profile_rm": [],
+    "profile_removed": true
+  },
+  "fetch_decisions": 1,
+  "fetch_denies": 0,
+  "headless": true,
+  "job": "/tmp/r01t05-replay/job-a10i-new.json",
+  "launch_ms": 1,
+  "outcome": {
+    "error": "loadURL timed out after 5000ms",
+    "status": "error"
+  },
+  "proxy": "127.0.0.1:18482",
+  "timings": null,
+  "wall_ms": 5705
+}

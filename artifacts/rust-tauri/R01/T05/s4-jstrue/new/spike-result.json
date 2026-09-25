@@ -1,0 +1,31 @@
+{
+  "asset_wait_note": "js-enabled fonts.ready+images awaited",
+  "browser_version": "Chrome/153.0.8010.52",
+  "chrome": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "cleanup": {
+    "leftover_processes_after": [],
+    "leftover_processes_before_profile_rm": [],
+    "profile_removed": true
+  },
+  "fetch_decisions": 5,
+  "fetch_denies": 0,
+  "headless": true,
+  "job": "/tmp/r01t05-replay/job-s4-jstrue-new.json",
+  "launch_ms": 1,
+  "outcome": {
+    "output_path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R01/T05/s4-jstrue/new/s4.pdf",
+    "pdf_bytes": 44443,
+    "pdf_sha256": "dd7e8b550fda798318632af7c97748a3b6ad42f6134f8a2c7140deec4278654c",
+    "status": "ok"
+  },
+  "proxy": "127.0.0.1:18482",
+  "timings": {
+    "asset_wait_ms": 260,
+    "attach_ms": 53,
+    "font_inject_ms": 28,
+    "navigate_ms": 17,
+    "print_ms": 70,
+    "total_ms": 430
+  },
+  "wall_ms": 1047
+}

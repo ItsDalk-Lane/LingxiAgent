@@ -1,0 +1,19 @@
+[repair-r1-neg] build spike_pdf + pdf_probe
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+[repair-r1-neg] case1 ws-negative
+[repair-r1-neg] ws-negative-exit => PASS (exit=0 且页面正常产出（封堵不误伤渲染）)
+[repair-r1-neg] ws-negative-canary => PASS (canary 对 ws://127.0.0.1:18291 握手零命中)
+[repair-r1-neg] ws-negative-pagemarker => PASS (页面 JS 观测：loopback/remote 均 BLOCKED)
+[repair-r1-neg] case2 print-timeout
+[repair-r1-neg] print-timeout-exit => PASS (exit=2（printToPDF 阶段超时按契约归类）)
+[repair-r1-neg] print-timeout-artifact => PASS (零伪产物)
+[repair-r1-neg] print-timeout-error => PASS (error=printToPDF: timeout: Page.printToPDF id=13)
+[repair-r1-neg] print-timeout-cleanup => PASS (profile_removed=true)
+[repair-r1-neg] done; verdicts at artifacts/rust-tauri/R01/T05/repair-r1/negative/negative-verdicts.txt
+ws-negative-exit PASS exit=0 且页面正常产出（封堵不误伤渲染）
+ws-negative-canary PASS canary 对 ws://127.0.0.1:18291 握手零命中
+ws-negative-pagemarker PASS 页面 JS 观测：loopback/remote 均 BLOCKED
+print-timeout-exit PASS exit=2（printToPDF 阶段超时按契约归类）
+print-timeout-artifact PASS 零伪产物
+print-timeout-error PASS error=printToPDF: timeout: Page.printToPDF id=13
+print-timeout-cleanup PASS profile_removed=true

@@ -1,0 +1,63 @@
+== [1/5] cargo test -p lingxi-protocol (incl. round-trip property tests)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running unittests src/lib.rs (/tmp/lingxi-r01t02-target/debug/deps/lingxi_protocol-66649b813874453d)
+
+running 19 tests
+test canon::tests::canonical_form_has_no_whitespace_or_trailing_newline ... ok
+test canon::tests::canonical_form_sorts_keys_and_keeps_utf8 ... ok
+test handshake::tests::client_hello_rejects_unknown_fields ... ok
+test handshake::tests::intersection_selects_highest_common ... ok
+test handshake::tests::unknown_caps_are_reported_not_dropped ... ok
+test tests::ids_are_opaque_and_preserved ... ok
+test handshake::tests::wrong_family_and_malformed_range_are_invalid_message ... ok
+test tests::error_codes_have_stable_wire_names ... ok
+test handshake::tests::disjoint_ranges_fail_explicitly ... ok
+test tests::protocol_error_rejects_unknown_fields ... ok
+test tests::r00_baseline_versions_are_one ... ok
+test tests::seq_wire_string_rejects_garbage ... ok
+test tests::seq_wire_string_roundtrips_beyond_js_safe_integer ... ok
+test tests::terminal_states_are_terminal_and_named_stably ... ok
+test wire::tests::dialect_check_is_explicit ... ok
+test wire::tests::closed_payload_variants_reject_unknown_fields ... ok
+test wire::tests::u64_fields_are_decimal_strings ... ok
+test wire::tests::unknown_event_payload_is_preserved_verbatim ... ok
+test wire::tests::envelope_roundtrips_and_validates_event_type ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-proto-server.rs (/tmp/lingxi-r01t02-target/debug/deps/lingxi_proto_server-4043a5308123e977)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-protocol-gen.rs (/tmp/lingxi-r01t02-target/debug/deps/lingxi_protocol_gen-8fc89aad86817648)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-protocol-verify.rs (/tmp/lingxi-r01t02-target/debug/deps/lingxi_protocol_verify-49311dec86a82a2b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+== [2/5] generated tree is drift-free (lingxi-protocol-gen --check)
+OK: 56 generated files match regeneration (no diff) under /Users/study_superior/Desktop/Code/LingxiAgent/contracts/generated
+== [3/5] TS consumer: decode + schema-validate + re-encode (/tmp/lingxi-r01t02-ts-out.Z6sy1B)
+  [check] event-assistant-segment-delta.json (EventEnvelope): seq=9007199254741003 kept as string; Number() would lose precision (Number→9007199254741004, BigInt roundtrip mismatch proven)
+  [check] event-tool-call-started.json (EventEnvelope): args digest parity sha256=0e7018f10d17014509aadb62038f1f3f84ad3d3d8178bdfe1db1a0cd6b34d6e0
+  [check] event-unknown-future.json (EventEnvelope): unknown event "future_recall_started" preserved with 3 top-level fields (incl. permissionHint)
+  [check] tool-schema-document.json (ToolSchemaDocument): third-party schema verbatim, vendor extension intact
+OK: 12 golden samples decoded, schema-validated and re-encoded byte-identically by the TS consumer; re-encoded copies written to /tmp/lingxi-r01t02-ts-out.Z6sy1B
+== [4/5] Rust read-back of the TS re-encoded copies
+OK: 12 golden samples verified (Rust decode→encode byte-stable; TS re-encoded copies byte-identical)
+== [5/5] tsc --noEmit on generated TS bindings + type usage
+OK: R01-A03 round-trip gate passed (Rust→TS→Rust byte-identical)

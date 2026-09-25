@@ -59,7 +59,7 @@
       "crate_path": "rust/crates/lingxi-browser-spike",
       "status": "exists",
       "establish_stage": "R01-T04",
-      "responsibility": "浏览器宿主替换原型（CDP-over-pipe 驱动受控 Chromium，逐能力实测 R01-A07/A08）；非生产组件，不接入生产入口，不拥有任何业务事实；DEP-07 桌面禁令对其生效",
+      "responsibility": "浏览器宿主替换原型（CDP-over-pipe 驱动受控 Chromium，逐能力实测 R01-A07/A08）；R01-T05 起同 crate 以 spike_pdf bin 承载 HTML→PDF 候选链原型（复用同一 CDP 传输/launcher，零新增依赖）；非生产组件，不接入生产入口，不拥有任何业务事实；DEP-07 桌面禁令对其生效",
       "note": "Deliberately registered as exists by R01-T04 per the D5-reverse contract (every workspace member must be a registered module). No owner in OWNERSHIP_TARGET.json points at it; it carries no critical fact. Deps base64/libc/serde/serde_json/sha2 全部复用已锁定版本，无新增第三方版本。"
     },
     {

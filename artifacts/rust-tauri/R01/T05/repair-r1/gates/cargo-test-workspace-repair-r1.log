@@ -1,0 +1,355 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling memchr v2.8.3
+   Compiling serde v1.0.229
+   Compiling autocfg v1.5.1
+   Compiling serde_json v1.0.151
+   Compiling once_cell v1.21.4
+   Compiling pin-project-lite v0.2.17
+   Compiling find-msvc-tools v0.1.13
+   Compiling futures-core v0.3.34
+   Compiling shlex v2.0.1
+   Compiling bytes v1.12.1
+   Compiling pkg-config v0.3.34
+   Compiling smallvec v1.16.1
+   Compiling ref-cast v1.0.27
+   Compiling stable_deref_trait v1.2.1
+   Compiling log v0.4.34
+   Compiling futures-sink v0.3.34
+   Compiling fs_extra v1.3.0
+   Compiling dunce v1.0.5
+   Compiling foldhash v0.2.0
+   Compiling equivalent v1.0.2
+   Compiling slab v0.4.12
+   Compiling allocator-api2 v0.2.21
+   Compiling core-foundation-sys v0.8.7
+   Compiling jobserver v0.1.35
+   Compiling socket2 v0.6.5
+   Compiling mio v1.2.3
+   Compiling futures-io v0.3.34
+   Compiling futures-channel v0.3.34
+   Compiling tracing-core v0.1.36
+   Compiling futures-task v0.3.34
+   Compiling dyn-clone v1.0.20
+   Compiling aws-lc-rs v1.18.1
+   Compiling percent-encoding v2.3.2
+   Compiling litemap v0.8.3
+   Compiling bitflags v2.13.2
+   Compiling writeable v0.6.4
+   Compiling utf8_iter v1.0.4
+   Compiling zeroize v1.9.0
+   Compiling cc v1.4.7
+   Compiling icu_normalizer_data v2.3.0
+   Compiling hashbrown v0.17.1
+   Compiling icu_properties_data v2.3.0
+   Compiling httparse v1.10.1
+   Compiling tower-service v0.3.3
+   Compiling system-configuration-sys v0.6.0
+   Compiling fnv v1.0.7
+   Compiling atomic-waker v1.1.2
+   Compiling rustls v0.23.45
+   Compiling num-traits v0.2.19
+   Compiling rustls-pki-types v1.15.1
+   Compiling regex-syntax v0.8.11
+   Compiling try-lock v0.2.5
+   Compiling untrusted v0.9.0
+   Compiling rustversion v1.0.23
+   Compiling http v1.5.0
+   Compiling aho-corasick v1.1.5
+   Compiling form_urlencoded v1.2.2
+   Compiling core-foundation v0.9.4
+   Compiling sync_wrapper v1.0.2
+   Compiling want v0.3.1
+   Compiling scopeguard v1.2.0
+   Compiling getrandom v0.3.4
+   Compiling subtle v2.6.1
+   Compiling httpdate v1.0.3
+   Compiling version_check v0.9.5
+   Compiling zerocopy v0.8.58
+   Compiling tower-layer v0.3.3
+   Compiling ipnet v2.12.2
+   Compiling parking_lot_core v0.9.12
+   Compiling core-foundation v0.10.1
+   Compiling security-framework-sys v2.17.0
+   Compiling mime v0.3.17
+   Compiling vcpkg v0.2.15
+   Compiling getrandom v0.4.3
+   Compiling lock_api v0.4.14
+   Compiling multiversion_no_op v1.0.0
+   Compiling heck v0.5.0
+   Compiling thiserror v2.0.21
+   Compiling unicode-general-category v1.1.0
+   Compiling ahash v0.8.12
+   Compiling borrow-or-share v0.2.4
+   Compiling bit-vec v0.8.0
+   Compiling cmake v0.1.58
+   Compiling security-framework v3.7.0
+   Compiling http-body v1.1.0
+   Compiling simdutf8 v0.1.5
+   Compiling num-cmp v0.1.0
+   Compiling outref v0.5.2
+   Compiling bit-set v0.8.0
+   Compiling rmcp v3.4.1
+   Compiling vsimd v0.8.0
+   Compiling system-configuration v0.7.0
+   Compiling http-body-util v0.1.5
+   Compiling lazy_static v1.5.0
+   Compiling ryu v1.0.23
+   Compiling bytecount v0.6.9
+   Compiling micromap v0.3.0
+   Compiling sharded-slab v0.1.7
+   Compiling hashlink v0.12.2
+   Compiling tracing-log v0.2.0
+   Compiling thread_local v1.1.10
+   Compiling pastey v0.2.3
+   Compiling nu-ansi-term v0.50.3
+   Compiling matchit v0.8.4
+   Compiling fallible-iterator v0.3.0
+   Compiling data-encoding v2.11.1
+   Compiling uuid-simd v0.8.0
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling sha1 v0.11.0
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling uuid v1.26.1
+   Compiling parking_lot v0.12.5
+   Compiling aws-lc-sys v0.45.0
+   Compiling libsqlite3-sys v0.38.2
+   Compiling encoding_rs v0.8.42
+   Compiling regex-automata v0.4.18
+   Compiling jsonschema-regex v0.57.0
+   Compiling indexmap v2.14.2
+   Compiling serde_path_to_error v0.1.20
+   Compiling num-integer v0.1.47
+   Compiling num-complex v0.4.6
+   Compiling num-bigint v0.4.8
+   Compiling num-iter v0.1.46
+   Compiling num-rational v0.4.2
+   Compiling num v0.4.3
+   Compiling fraction v0.17.0
+   Compiling regex v1.13.1
+   Compiling fancy-regex v0.19.2
+   Compiling matchers v0.2.0
+   Compiling synstructure v0.14.0
+   Compiling serde_derive_internals v0.30.0
+   Compiling tracing-attributes v0.1.31
+   Compiling strum_macros v0.28.0
+   Compiling serde_derive v1.0.229
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling ref-cast-impl v1.0.27
+   Compiling tokio-macros v2.7.2
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling futures-macro v0.3.34
+   Compiling thiserror-impl v2.0.21
+   Compiling schemars_derive v1.2.2
+   Compiling tokio v1.53.1
+   Compiling futures-util v0.3.34
+   Compiling tracing v0.1.44
+   Compiling zerofrom v0.1.8
+   Compiling strum v0.28.0
+   Compiling yoke v0.8.3
+   Compiling axum-core v0.5.6
+   Compiling tracing-subscriber v0.3.23
+   Compiling rusqlite v0.40.2
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling chrono v0.4.45
+   Compiling fluent-uri v0.4.1
+   Compiling serde_urlencoded v0.7.1
+   Compiling email_address v0.2.9
+   Compiling lingxi-browser-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-browser-spike)
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling jsonschema-value v0.57.0
+   Compiling icu_locale_core v2.3.0
+   Compiling icu_collections v2.3.0
+   Compiling futures-executor v0.3.34
+   Compiling futures v0.3.34
+   Compiling referencing v0.57.0
+   Compiling schemars v1.2.2
+   Compiling icu_provider v2.3.1
+   Compiling tokio-util v0.7.19
+   Compiling tower v0.5.3
+   Compiling tokio-stream v0.1.19
+   Compiling icu_properties v2.3.0
+   Compiling icu_normalizer v2.3.0
+   Compiling h2 v0.4.19
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling tower-http v0.6.11
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling hyper v1.11.1
+   Compiling hyper-util v0.1.21
+   Compiling rustls-webpki v0.103.15
+   Compiling axum v0.8.9
+   Compiling tokio-rustls v0.26.5
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.13.5
+   Compiling jsonschema v0.57.0
+   Compiling lingxi-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-spike)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.30s
+     Running unittests src/lib.rs (/tmp/r01t05-repair/cargo-target/debug/deps/lingxi_browser_spike-d25dbff7ca8425a8)
+
+running 11 tests
+test pdf::tests::page_sizes ... ok
+test snapshot_source::tests::sha256_hex_stable ... ok
+test pdf::tests::percent_decode ... ok
+test pdf::tests::font_css_extract_and_rewrite ... ok
+test cdp::tests::png_dims_parse ... ok
+test ops::tests::find_ref_parses_snapshot_lines ... ok
+test cdp::tests::events_buffered_and_waitable ... ok
+test cdp::tests::roundtrip_command_response ... ok
+test pdf::tests::fetch_policy ... ok
+test snapshot_source::tests::extracts_from_repo ... ok
+test cdp::tests::remote_error_surfaces ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running unittests src/bin/spike_browser.rs (/tmp/r01t05-repair/cargo-target/debug/deps/spike_browser-6bbdf9f73811746e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_pdf.rs (/tmp/r01t05-repair/cargo-target/debug/deps/spike_pdf-93ad1486195c4fe6)
+
+running 1 test
+test tests::timeout_exit_code_classification ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/tmp/r01t05-repair/cargo-target/debug/deps/lingxi_kernel-1b1acaed818d95e2)
+
+running 7 tests
+test tests::happy_path_queued_to_completed ... ok
+test tests::cancelling_cannot_be_revoked_back_to_running ... ok
+test tests::cancellation_resolves_only_to_cancelled ... ok
+test tests::queued_cannot_skip_to_completed ... ok
+test tests::run_context_carries_identity_only ... ok
+test tests::seq_precision_holds_across_kernel_boundary ... ok
+test tests::terminal_states_reject_every_transition ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/tmp/r01t05-repair/cargo-target/debug/deps/lingxi_protocol-d90789915c0df003)
+
+running 19 tests
+test handshake::tests::intersection_selects_highest_common ... ok
+test handshake::tests::unknown_caps_are_reported_not_dropped ... ok
+test tests::error_codes_have_stable_wire_names ... ok
+test tests::r00_baseline_versions_are_one ... ok
+test tests::seq_wire_string_rejects_garbage ... ok
+test handshake::tests::wrong_family_and_malformed_range_are_invalid_message ... ok
+test canon::tests::canonical_form_has_no_whitespace_or_trailing_newline ... ok
+test tests::terminal_states_are_terminal_and_named_stably ... ok
+test tests::ids_are_opaque_and_preserved ... ok
+test wire::tests::dialect_check_is_explicit ... ok
+test tests::seq_wire_string_roundtrips_beyond_js_safe_integer ... ok
+test tests::protocol_error_rejects_unknown_fields ... ok
+test handshake::tests::client_hello_rejects_unknown_fields ... ok
+test canon::tests::canonical_form_sorts_keys_and_keeps_utf8 ... ok
+test handshake::tests::disjoint_ranges_fail_explicitly ... ok
+test wire::tests::unknown_event_payload_is_preserved_verbatim ... ok
+test wire::tests::u64_fields_are_decimal_strings ... ok
+test wire::tests::closed_payload_variants_reject_unknown_fields ... ok
+test wire::tests::envelope_roundtrips_and_validates_event_type ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-proto-server.rs (/tmp/r01t05-repair/cargo-target/debug/deps/lingxi_proto_server-b386498339ddb0ca)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-protocol-gen.rs (/tmp/r01t05-repair/cargo-target/debug/deps/lingxi_protocol_gen-c66177ea2b0ba198)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-protocol-verify.rs (/tmp/r01t05-repair/cargo-target/debug/deps/lingxi_protocol_verify-621781e0733a1003)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/tmp/r01t05-repair/cargo-target/debug/deps/lingxi_spike-b31ccf3a8c7e31e3)
+
+running 7 tests
+test queue::tests::zero_capacity_is_rejected ... ok
+test queue::tests::bounded_queue_reports_full_instead_of_dropping ... ok
+test queue::tests::put_get_count_roundtrip_and_wal ... ok
+test schema::tests::golden_server_hello_validates ... ok
+test schema::tests::golden_client_hello_validates_against_generated_schema ... ok
+test schema::tests::tampered_client_hello_is_rejected ... ok
+test queue::tests::many_jobs_all_complete_in_order ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running unittests src/bin/spike_check_deps.rs (/tmp/r01t05-repair/cargo-target/debug/deps/spike_check_deps-59eadbd8094d7195)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_health.rs (/tmp/r01t05-repair/cargo-target/debug/deps/spike_health-61771c1be8a0d9a8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_mcp_handshake.rs (/tmp/r01t05-repair/cargo-target/debug/deps/spike_mcp_handshake-558e13fa2010080e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_schema_validate.rs (/tmp/r01t05-repair/cargo-target/debug/deps/spike_schema_validate-e7e8ff00d517f8b4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_sqlite_queue.rs (/tmp/r01t05-repair/cargo-target/debug/deps/spike_sqlite_queue-4490cfd2af73bcd0)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_tls_probe.rs (/tmp/r01t05-repair/cargo-target/debug/deps/spike_tls_probe-7dd4bae4629c0e99)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_browser_spike
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_kernel
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_spike
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

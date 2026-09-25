@@ -1,0 +1,327 @@
+{
+ "old_pdf": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R01/T05/a09/old/s1-long-zh.pdf",
+ "new_pdf": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R01/T05/a09/new/s1-long-zh.pdf",
+ "all_pass": true,
+ "checks": [
+  {
+   "name": "page_count_equal",
+   "pass": true,
+   "detail": "old=74 new=74"
+  },
+  {
+   "name": "no_blank_pages_old",
+   "pass": true,
+   "detail": "blank pages: []"
+  },
+  {
+   "name": "no_blank_pages_new",
+   "pass": true,
+   "detail": "blank pages: []"
+  },
+  {
+   "name": "token:龘",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:靐",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:麤",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:爨",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:驫",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:鬱",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:齉",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:爩",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:龗",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:灪",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:𠮷",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:ROW-001-END",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:ROW-070-END",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:ROW-140-END",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:DOC-END-OMEGA",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:求根公式",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:欧拉恒等式",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:render",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:print_to_pdf",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token:跨页长表格",
+   "pass": true,
+   "detail": "old=Y new=Y"
+  },
+  {
+   "name": "token-new:𪚥",
+   "pass": true,
+   "detail": "new=Y old=N(旧链差异,记录)"
+  },
+  {
+   "name": "table_rows_old",
+   "pass": true,
+   "detail": "140/140"
+  },
+  {
+   "name": "table_rows_new",
+   "pass": true,
+   "detail": "140/140"
+  },
+  {
+   "name": "text_similarity",
+   "pass": true,
+   "detail": "normalized ratio=0.99910 len old=87161 new=87148"
+  },
+  {
+   "name": "visual_grid_diff",
+   "pass": true,
+   "detail": "per-page 16x16 luma grid mean|Δ|: max=7.16 mean=6.43 warn>20 (0-255 scale)"
+  },
+  {
+   "name": "font_embedded_old:EBGaramond",
+   "pass": true,
+   "detail": "old fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular', 'CAAAAA+NotoSerifSC-Bold', 'CBAAAA+NotoSerifSC-Bold']…"
+  },
+  {
+   "name": "font_embedded_new:EBGaramond",
+   "pass": true,
+   "detail": "new fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular', 'CAAAAA+NotoSerifSC-Bold', 'CBAAAA+NotoSerifSC-Bold']…"
+  },
+  {
+   "name": "font_embedded_old:NotoSerifSC",
+   "pass": true,
+   "detail": "old fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular', 'CAAAAA+NotoSerifSC-Bold', 'CBAAAA+NotoSerifSC-Bold']…"
+  },
+  {
+   "name": "font_embedded_new:NotoSerifSC",
+   "pass": true,
+   "detail": "new fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular', 'CAAAAA+NotoSerifSC-Bold', 'CBAAAA+NotoSerifSC-Bold']…"
+  },
+  {
+   "name": "font_embedded_old:JetBrainsMono",
+   "pass": true,
+   "detail": "old fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular', 'CAAAAA+NotoSerifSC-Bold', 'CBAAAA+NotoSerifSC-Bold']…"
+  },
+  {
+   "name": "font_embedded_new:JetBrainsMono",
+   "pass": true,
+   "detail": "new fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular', 'CAAAAA+NotoSerifSC-Bold', 'CBAAAA+NotoSerifSC-Bold']…"
+  },
+  {
+   "name": "images_present",
+   "pass": true,
+   "detail": "image XObjects old=2 new=2"
+  }
+ ],
+ "basefonts_old": [
+  "AAAAAA+NotoSerifSC-Bold",
+  "ABAAAA+NotoSerifSC-Bold",
+  "ACAAAA+NotoSerifSC-Regular",
+  "BAAAAA+NotoSerifSC-Bold",
+  "BBAAAA+STSongti-SC-Bold",
+  "BCAAAA+NotoSerifSC-Regular",
+  "CAAAAA+NotoSerifSC-Bold",
+  "CBAAAA+NotoSerifSC-Bold",
+  "CCAAAA+NotoSerifSC-Regular",
+  "DAAAAA+NotoSerifSC-Bold",
+  "DBAAAA+PingFangSC-Semibold",
+  "DCAAAA+NotoSerifSC-Regular",
+  "EAAAAA+NotoSerifSC-Bold",
+  "EBAAAA+NotoSerifSC-Bold",
+  "ECAAAA+JetBrainsMono-Regular",
+  "FAAAAA+NotoSerifSC-Bold",
+  "FBAAAA+EBGaramond-Regular",
+  "FCAAAA+NotoSerifSC-Regular",
+  "GAAAAA+NotoSerifSC-Bold",
+  "GBAAAA+NotoSerifSC-Regular",
+  "GCAAAA+NotoSerifSC-Regular",
+  "HAAAAA+EBGaramondRoman-SemiBold",
+  "HBAAAA+NotoSerifSC-Regular",
+  "HCAAAA+NotoSerifSC-Regular",
+  "IAAAAA+NotoSerifSC-Regular",
+  "IBAAAA+NotoSerifSC-Regular",
+  "ICAAAA+NotoSerifSC-Regular",
+  "JAAAAA+NotoSerifSC-Regular",
+  "JBAAAA+NotoSerifSC-Regular",
+  "JCAAAA+NotoSerifSC-Bold",
+  "KAAAAA+NotoSerifSC-Regular",
+  "KBAAAA+EBGaramond-Regular",
+  "KCAAAA+NotoSerifSC-Regular",
+  "LAAAAA+NotoSerifSC-Regular",
+  "LBAAAA+EBGaramond-Regular",
+  "LCAAAA+NotoSerifSC-Regular",
+  "MAAAAA+NotoSerifSC-Regular",
+  "MBAAAA+NotoSerifSC-Regular",
+  "MCAAAA+NotoSerifSC-Regular",
+  "NAAAAA+NotoSerifSC-Regular",
+  "NBAAAA+NotoSerifSC-Regular",
+  "NCAAAA+NotoSerifSC-Regular",
+  "OAAAAA+NotoSerifSC-Regular",
+  "OBAAAA+EBGaramond-Regular",
+  "OCAAAA+NotoSerifSC-Regular",
+  "PAAAAA+NotoSerifSC-Regular",
+  "PBAAAA+STSongti-SC-Regular",
+  "PCAAAA+NotoSerifSC-Regular",
+  "QAAAAA+NotoSerifSC-Bold",
+  "QBAAAA+NotoSerifSC-Regular",
+  "QCAAAA+NotoSerifSC-Regular",
+  "RAAAAA+NotoSerifSC-Bold",
+  "RBAAAA+EBGaramondRoman-SemiBold",
+  "RCAAAA+NotoSerifSC-Regular",
+  "SAAAAA+NotoSerifSC-Bold",
+  "SBAAAA+NotoSerifSC-Bold",
+  "TAAAAA+EBGaramondRoman-SemiBold",
+  "TBAAAA+NotoSerifSC-Bold",
+  "UAAAAA+NotoSerifSC-Bold",
+  "UBAAAA+NotoSerifSC-Bold",
+  "VAAAAA+NotoSerifSC-Bold",
+  "VBAAAA+NotoSerifSC-Bold",
+  "WAAAAA+NotoSerifSC-Bold",
+  "WBAAAA+NotoSerifSC-Bold",
+  "XAAAAA+NotoSerifSC-Bold",
+  "XBAAAA+NotoSerifSC-Bold",
+  "YAAAAA+NotoSerifSC-Bold",
+  "YBAAAA+NotoSerifSC-Regular",
+  "ZAAAAA+NotoSerifSC-Bold",
+  "ZBAAAA+NotoSerifSC-Regular"
+ ],
+ "basefonts_new": [
+  "AAAAAA+NotoSerifSC-Bold",
+  "ABAAAA+NotoSerifSC-Bold",
+  "ACAAAA+NotoSerifSC-Regular",
+  "BAAAAA+NotoSerifSC-Bold",
+  "BBAAAA+STSongti-SC-Bold",
+  "BCAAAA+NotoSerifSC-Regular",
+  "CAAAAA+NotoSerifSC-Bold",
+  "CBAAAA+NotoSerifSC-Bold",
+  "CCAAAA+NotoSerifSC-Regular",
+  "DAAAAA+NotoSerifSC-Bold",
+  "DBAAAA+PingFangSC-Semibold",
+  "DCAAAA+NotoSerifSC-Regular",
+  "EAAAAA+NotoSerifSC-Bold",
+  "EBAAAA+.PingFangHK-Bold",
+  "ECAAAA+NotoSerifSC-Regular",
+  "FAAAAA+NotoSerifSC-Bold",
+  "FBAAAA+NotoSerifSC-Bold",
+  "FCAAAA+JetBrainsMono-Regular",
+  "GAAAAA+NotoSerifSC-Bold",
+  "GBAAAA+EBGaramond-Regular",
+  "GCAAAA+NotoSerifSC-Regular",
+  "HAAAAA+EBGaramondRoman-SemiBold",
+  "HBAAAA+NotoSerifSC-Regular",
+  "HCAAAA+NotoSerifSC-Regular",
+  "IAAAAA+NotoSerifSC-Regular",
+  "IBAAAA+NotoSerifSC-Regular",
+  "ICAAAA+NotoSerifSC-Regular",
+  "JAAAAA+NotoSerifSC-Regular",
+  "JBAAAA+NotoSerifSC-Regular",
+  "JCAAAA+NotoSerifSC-Regular",
+  "KAAAAA+NotoSerifSC-Regular",
+  "KBAAAA+NotoSerifSC-Regular",
+  "KCAAAA+NotoSerifSC-Bold",
+  "LAAAAA+NotoSerifSC-Regular",
+  "LBAAAA+EBGaramond-Regular",
+  "LCAAAA+NotoSerifSC-Regular",
+  "MAAAAA+NotoSerifSC-Regular",
+  "MBAAAA+EBGaramond-Regular",
+  "MCAAAA+NotoSerifSC-Regular",
+  "NAAAAA+NotoSerifSC-Regular",
+  "NBAAAA+NotoSerifSC-Regular",
+  "NCAAAA+NotoSerifSC-Regular",
+  "OAAAAA+NotoSerifSC-Regular",
+  "OBAAAA+NotoSerifSC-Regular",
+  "OCAAAA+NotoSerifSC-Regular",
+  "PAAAAA+NotoSerifSC-Regular",
+  "PBAAAA+EBGaramond-Regular",
+  "PCAAAA+NotoSerifSC-Regular",
+  "QAAAAA+NotoSerifSC-Bold",
+  "QBAAAA+STSongti-SC-Regular",
+  "QCAAAA+NotoSerifSC-Regular",
+  "RAAAAA+NotoSerifSC-Bold",
+  "RBAAAA+NotoSerifSC-Regular",
+  "RCAAAA+NotoSerifSC-Regular",
+  "SAAAAA+NotoSerifSC-Bold",
+  "SBAAAA+EBGaramondRoman-SemiBold",
+  "SCAAAA+NotoSerifSC-Regular",
+  "TAAAAA+EBGaramondRoman-SemiBold",
+  "TBAAAA+NotoSerifSC-Bold",
+  "UAAAAA+NotoSerifSC-Bold",
+  "UBAAAA+NotoSerifSC-Bold",
+  "VAAAAA+NotoSerifSC-Bold",
+  "VBAAAA+NotoSerifSC-Bold",
+  "WAAAAA+NotoSerifSC-Bold",
+  "WBAAAA+NotoSerifSC-Bold",
+  "XAAAAA+NotoSerifSC-Bold",
+  "XBAAAA+NotoSerifSC-Bold",
+  "YAAAAA+NotoSerifSC-Bold",
+  "YBAAAA+NotoSerifSC-Bold",
+  "ZAAAAA+NotoSerifSC-Bold",
+  "ZBAAAA+NotoSerifSC-Regular"
+ ]
+}

@@ -1,0 +1,6 @@
+@page 语义样本 S2
+本页声明 @page size:A
+5 landscape; margin:1
+5mm。preferCSSPageSize=true 时 MediaBox 应为 A
+5
+横版。
