@@ -3,8 +3,8 @@
   "task": "R01-T02",
   "generatedBy": "scripts/rust-tauri/r01-t02-extract-api-surface.mjs (机械提取,禁止手改条目)",
   "generatedFrom": {
-    "headSha": "a98d24877e056dcb490f23ec739713ca937e646e",
-    "note": "sourceDigests 绑定提取时刻的源码内容;--check 在当前工作区重跑并 diff。",
+    "contentSha": "2f55e3dd4130bdba5aa66cfae9ccb5a6c833112a8d506ed0a4c3fdeb00fe0e3a",
+    "note": "contentSha=sha256(JSON.stringify({fullInventory,surfaces,summary,sourceDigests})),内容派生戳,不嵌入 git HEAD 等移动坐标;--check 在当前工作区重跑并全文逐字节 diff(无字段豁免)。",
     "sourceDigests": {
       "desktop/preload.cjs": "19fb7dd910ac3eec8d36bd7bdd67f079e9fda7d3bbf2a1d71553edd877788ed7",
       "desktop/src/react/types.ts": "7c290e67fe966458f2be3099273aa4aff85e5e7ac9b23df0088f22bb1127c372",

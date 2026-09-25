@@ -1,0 +1,5 @@
+# R01-T02 fix-headsha-r1 evidence run
+utc=2026-09-25T01:55:31Z
+HEAD=58789bc11def0c75fb41d92847e8afae4bf0a6fe
+node=v24.16.0 cargo=cargo 1.98.1 (797e8a9bc 2026-08-05) rustc=rustc 1.98.1 (48a229cea 2026-09-01) (locked via rustup, channel parsed from rust-toolchain.toml)
+proxy env: dead 127.0.0.1:7890 proxies stripped via env -u in cargo invocations

@@ -1,0 +1,11 @@
+check-generated @ current HEAD (58789bc1) exit=0
+roundtrip exit=0
+handshake exit=0
+cargo-test-workspace (rustup run 1.98.1, --offline) exit=0
+t01-positive exit=0
+t01-selftest (N1-N15) exit=0
+t01-generator-check exit=0
+future-commit: /tmp clone fix commit 11a693e8 -> check-generated exit=0
+future-commit: +1 empty commit abe80148 -> check-generated exit=0
+future-commit: +2 empty commits -> check-generated exit=0
+negative: tampered matrix exit=1; tampered source exit=1; restored exit=0

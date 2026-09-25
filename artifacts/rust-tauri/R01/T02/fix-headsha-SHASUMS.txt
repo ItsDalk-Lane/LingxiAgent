@@ -1,0 +1,19 @@
+# R01-T02 fix-headsha-r1 SHASUMS (repo-root-relative; verify from repo root: tail -n +2 <this> | shasum -a 256 -c -)
+f54dc6c8cbbf5d888df68b2c7c8ba731fe75f514bde51607dd932f00335ebdf1  scripts/rust-tauri/r01-t02-extract-api-surface.mjs
+02c335ef85939165d203793a4de68dc82d90e2acb29cf8f6a3f1f5a626aa29c8  scripts/rust-tauri/r01-t02-check-generated.sh
+6f7a34244b23f94e6300fbd777f0c834fa2d233bfb8ca2e963a9fe068cb2af06  docs/rust-tauri/R01/API_COMPAT_MATRIX.json
+6f3f9caf786481b44421a8d91c744356f7aacdaff9963f40e3f0bc63cb40245d  docs/rust-tauri/R01/PROTOCOL_SPEC.md
+df69a2de4f8ae1afed167f2dc3f995b38799d789ccdef0177ba62c06e739f8d8  docs/rust-tauri/R01/R01-T02_FIX_HEADSHA_R1.md
+8d826a1ee9fa4f1ee1b4774c5bf6c66b5395a909321870fa2ebc2c57d0147a2d  artifacts/rust-tauri/R01/T02/fix-headsha-ENVIRONMENT.txt
+86082840c23329338913b8c46b05b9ac2c4a4325f78d12c0233d7fcdaa00a6f0  artifacts/rust-tauri/R01/T02/fix-headsha-EXIT_CODES.txt
+98ace3c6bfbc935f6276780f9a79f989d490cb1055a607283f7f5fcc5e7fc135  artifacts/rust-tauri/R01/T02/fix-headsha-cargo-test.log
+34910e03c2f6920fcdfcbd575728b0dde5781aacb4ccac3b7b08be836e62eeac  artifacts/rust-tauri/R01/T02/fix-headsha-check-generated.log
+aa5ef4696c4a3c2552c6db5e7a9471e26710346d9b9d73201081d2fe5efae4c7  artifacts/rust-tauri/R01/T02/fix-headsha-future-commit-a.log
+aa5ef4696c4a3c2552c6db5e7a9471e26710346d9b9d73201081d2fe5efae4c7  artifacts/rust-tauri/R01/T02/fix-headsha-future-commit-b.log
+aa5ef4696c4a3c2552c6db5e7a9471e26710346d9b9d73201081d2fe5efae4c7  artifacts/rust-tauri/R01/T02/fix-headsha-future-commit-c.log
+fcba5170a15830bb7cacee5d993016d1c4685834f00a80ffb1281ba27f0e197c  artifacts/rust-tauri/R01/T02/fix-headsha-handshake.log
+ad10a497fac16648daa459c2abab305beb2f5cc083bdeea48157acb5b3d9f01f  artifacts/rust-tauri/R01/T02/fix-headsha-negative-proofs.log
+03989955377654c3ee7153356ecaf52f6f4c4f71112e0dcbacbf5262b60e9c37  artifacts/rust-tauri/R01/T02/fix-headsha-roundtrip.log
+5b62621f993eb9334fce5cb3cd9f0485ef3ecd2d1a06927d61cfff1e739eff55  artifacts/rust-tauri/R01/T02/fix-headsha-t01-generator-check.log
+22ad152ffcbd52aee5c833237a73b710dd84aa5a43c908eabbd238f2c5a4269f  artifacts/rust-tauri/R01/T02/fix-headsha-t01-positive.log
+62981fcc206625eeb5d74b302efe6b9f03a79ed28ac0ff3ff8a3a7634d254191  artifacts/rust-tauri/R01/T02/fix-headsha-t01-selftest.log

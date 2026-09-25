@@ -1,0 +1,21 @@
+== clone HEADs: fix=11a693e8b8c4e3ead34790b3989c5d0a8b442803 +1=abe8014870cb840af796f9bcc42a7ae656d3455b (+2nd dummy on top)
+== neg1: one-byte tamper of a matrix entry (disposition retain->retaiX)
+DRIFT: API_COMPAT_MATRIX.json differs from regeneration
+  line 204:
+    disk:         "disposition": "retaiX",
+    gen:          "disposition": "retain",
+regenerate: node scripts/rust-tauri/r01-t02-extract-api-surface.mjs
+neg1 exit=1
+== neg2: append line to scanned source server/routes/auth.ts
+DRIFT: API_COMPAT_MATRIX.json differs from regeneration
+  line 6:
+    disk:     "contentSha": "2f55e3dd4130bdba5aa66cfae9ccb5a6c833112a8d506ed0a4c3fdeb00fe0e3a",
+    gen:      "contentSha": "15c16a41695a1a860aa050fa3a2782ff3a17b8edc153b56634259556e11c1996",
+  line 16:
+    disk:       "server/routes/auth.ts": "4f735d1ef762a3c8f55d6baac2b45a9b1c137fab2678a10b4a59e35ccd144118",
+    gen:        "server/routes/auth.ts": "d4bb4568901b8f8ac36f10f05bf9fb840d151294dcfdbafe98687d1e6ff3a610",
+regenerate: node scripts/rust-tauri/r01-t02-extract-api-surface.mjs
+neg2 exit=1
+== restore control
+OK: API_COMPAT_MATRIX.json matches regeneration (624 entries)
+restored exit=0

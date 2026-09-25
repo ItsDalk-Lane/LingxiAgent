@@ -1,0 +1,26 @@
+== [1/3] build lingxi-proto-server
+== [2/3] start server (5 connections) + run handshake client
+server on 127.0.0.1:59734 (pid 54369)
+OK: 5 handshake scenarios recorded to /tmp/fix-headsha-handshake/transcript.jsonl
+  http-ok: HTTP 200
+  http-too-new: HTTP 400
+  http-too-old: HTTP 400
+  ws-ok: WS frame {"dataEpoch":1,"protocol":"lingxi.wire","selectedProtocol":1,"serverKind":"lingx
+  ws-ok: WS close 1000 handshake complete
+  ws-too-new: WS frame {"code":"version_incompatible","details":{"clientMax":3,"clientMin":3,"protocol"
+  ws-too-new: WS close 4409 version_incompatible
+client exit=0 server exit=0
+LISTENING 59734
+supported 1..=1 (lingxi.wire)
+conn#1 HTTP POST /lingxi/v1/handshake -> 200 selectedProtocol=1
+conn#2 HTTP POST /lingxi/v1/handshake -> 400 error=version_incompatible details={"clientMax":2,"clientMin":2,"protocol":"lingxi.wire","supportedMax":1,"supportedMin":1}
+conn#3 HTTP POST /lingxi/v1/handshake -> 400 error=version_incompatible details={"clientMax":0,"clientMin":0,"protocol":"lingxi.wire","supportedMax":1,"supportedMin":1}
+conn#4 WS /lingxi/v1/ws -> 101 upgraded
+conn#4 WS hello -> selected=1, close=1000 selectedProtocol=1
+conn#4 WS client close code=1000 reason=""
+conn#5 WS /lingxi/v1/ws -> 101 upgraded
+conn#5 WS hello -> rejected, close=4409 error=version_incompatible details={"clientMax":3,"clientMin":3,"protocol":"lingxi.wire","supportedMax":1,"supportedMin":1}
+conn#5 WS client close code=4409 reason=""
+DONE
+== [3/3] result
+OK: R01-A04 handshake gate passed; transcript: /tmp/fix-headsha-handshake/transcript.jsonl

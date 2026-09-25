@@ -25,7 +25,6 @@
 import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -364,16 +363,28 @@ const sourceDigests = Object.fromEntries(
   sourceFiles.sort().map((f) => [f, sha256File(path.join(REPO, f))]),
 );
 
-let headSha = "unknown";
-try {
-  headSha = execSync("git rev-parse HEAD", { cwd: REPO }).toString().trim();
-} catch {}
+const surfaces = {
+  httpRoutes: httpEntries,
+  wsEndpoints: wsEntries,
+  preloadBridge: preloadEntries,
+  platformApi: platformApiEntries,
+};
 
 const inventory = {
   mounts,
   factoryModules,
   preloadIpcChannels: preload.channels,
 };
+
+// Content-derived stamp (fix-headsha-r1): the matrix must NOT embed moving
+// coordinates such as `git rev-parse HEAD` — a committed artifact containing
+// the generating HEAD makes "--check ⇒ no diff" unsatisfiable on every later
+// commit. contentSha is a pure function of the extracted content, so
+// regeneration is byte-identical on any commit whose scanned sources are
+// unchanged, and --check compares the full file with no field exemptions.
+const contentSha = createHash("sha256")
+  .update(JSON.stringify({ fullInventory: inventory, surfaces, summary, sourceDigests }))
+  .digest("hex");
 
 if (INVENTORY_ONLY) {
   console.log(JSON.stringify({ inventory, httpEntries, wsEntries, preloadEntries, platformApiEntries }, null, 2));
@@ -385,8 +396,10 @@ const matrix = {
   task: "R01-T02",
   generatedBy: "scripts/rust-tauri/r01-t02-extract-api-surface.mjs (机械提取,禁止手改条目)",
   generatedFrom: {
-    headSha,
-    note: "sourceDigests 绑定提取时刻的源码内容;--check 在当前工作区重跑并 diff。",
+    contentSha,
+    note:
+      "contentSha=sha256(JSON.stringify({fullInventory,surfaces,summary,sourceDigests}))," +
+      "内容派生戳,不嵌入 git HEAD 等移动坐标;--check 在当前工作区重跑并全文逐字节 diff(无字段豁免)。",
     sourceDigests,
   },
   policy: {
@@ -408,12 +421,7 @@ const matrix = {
     mountTableSize: mounts.length,
     preloadIpcChannels: preload.channels,
   },
-  surfaces: {
-    httpRoutes: httpEntries,
-    wsEndpoints: wsEntries,
-    preloadBridge: preloadEntries,
-    platformApi: platformApiEntries,
-  },
+  surfaces,
   summary,
 };
 

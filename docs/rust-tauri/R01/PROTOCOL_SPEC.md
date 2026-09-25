@@ -156,3 +156,10 @@ golden、内容摘要、跨语言字节相等判定统一使用该 profile：
   R09 以 Tauri command/event 承接（`native_host_mapping`）。
 - `controlled_deprecation`：仅 `/internal/browser` 原始 WS 通道（由 R04/R09 浏览器引擎
   控制通道替代；退役需 R08 旧客户端下线证据）。
+
+矩阵戳记与门禁语义（fix-headsha-r1）：`generatedFrom.contentSha` 是内容派生戳
+（`sha256(JSON.stringify({fullInventory, surfaces, summary, sourceDigests}))`），为被扫描
+源码内容的纯函数；矩阵**不嵌入** git HEAD 等移动坐标，因此"重新生成 → 无 diff"契约在
+任意提交上成立，`--check` 为全文逐字节比较、无字段豁免。门禁
+`scripts/rust-tauri/r01-t02-check-generated.sh` 解析 `rust-toolchain.toml` 的 channel 并
+经 `rustup run` 显式调用锁定工具链，不依赖 PATH 顺序。
