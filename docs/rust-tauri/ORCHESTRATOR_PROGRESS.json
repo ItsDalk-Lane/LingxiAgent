@@ -4,7 +4,7 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "73bde3b5a28944ef9f69e228128c9206ad424145",
+  "current_head": "358299c1e9a768a75186f197686d25ee6636d6d7",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -119,7 +119,7 @@
     },
     "R01": {
       "title": "目标契约与高风险替代验证",
-      "status": "IN_PROGRESS",
+      "status": "READY_FOR_REVIEW",
       "task_ids": [
         "R01-T01",
         "R01-T02",
@@ -132,10 +132,10 @@
       ],
       "stage_base_sha": "328cc8bb5a807bdaad520b459907fb1fa4e10dca",
       "stage_review_round": 0,
-      "stage_verdict": null,
+      "stage_verdict": "PENDING_STAGE_ACCEPTANCE",
       "stage_acceptance_commit_sha": null,
       "blockers": [],
-      "r01_stage_controller_note": "R01 stage controller = ZCode session (this thread), started 2026-09-25. Preconditions verified: HEAD==origin/codex/rust-tauri-migration==C4 (R00 official seal), worktree clean. Per-T: fresh executor agent -> fresh independent reviewer agent -> on FAIL fresh repair + fresh re-review agents -> commit/push only after PASS."
+      "r01_stage_controller_note": "R01-T01..T08 全部经全新独立验收代理 PASS 并已提交推送；R01_REPORT/R01_HANDOFF/RISK_REGISTER/R01_ACCEPTANCE_LEDGER 已由 R01-T08 冻结。本总控不宣告阶段 PASS：阶段级独立验收须由用户另建全新 Codex 子代理执行；阶段验收前不进入 R02。"
     },
     "R02": {
       "title": "Rust独立服务、存储与事件基础",
@@ -1520,23 +1520,60 @@
     "R01-T08": {
       "name": "冻结架构关卡与风险决策",
       "stage_id": "R01",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "task_base_sha": "73bde3b5a28944ef9f69e228128c9206ad424145",
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "executor_id": "ZCode:R01-T08-exec-r1 (agent_a3d5f67b-877f-47b2-96b6-de3c10b8fff1)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 1,
+      "reviewer_id": "ZCode:R01-T08-review-r1 (agent_2c68e944-d448-4db2-abde-c2a00f817d2e)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "RR-T08-F1",
+          "severity": "MEDIUM",
+          "summary": "T02 关卡脚本共享默认 CARGO_TARGET_DIR + env!(CARGO_MANIFEST_DIR) 编译期路径：陈旧二进制可在错误树绿（执行者以 fresh target 复跑证明本仓树零漂移）",
+          "review_report": "docs/rust-tauri/R01/R01-T08_REVIEW_R1.md",
+          "resolution": "执行者如实披露并入 RISK_REGISTER；R2 加固（target dir 隔离）挂 R02"
+        },
+        {
+          "id": "O1",
+          "severity": "INFO",
+          "summary": "HANDOFF T04 docfix_commit 标签指向纯账本 chore 提交（内容实在 abe4d545 内）",
+          "resolution": "docfix-r1 修正指针并全量核查同类指针无第二例"
+        },
+        {
+          "id": "O2",
+          "severity": "INFO",
+          "summary": "gate 对挂账核验为存在性+字段非空，敷衍条目防伪依赖独立验收（设计内分工）",
+          "resolution": "docfix-r1 在 HANDOFF stage_gate_position 补设计边界说明"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R01-A15": "NOT_STARTED",
-        "R01-A16": "NOT_STARTED"
+        "R01-A15": "PASS",
+        "R01-A16": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "358299c1e9a768a75186f197686d25ee6636d6d7",
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "review_report": "docs/rust-tauri/R01/R01-T08_REVIEW_R1.md",
+      "review_report_sha256": "4a0c50ade4b10d3bb18b8303c78fb0670a42fee86852d4faf380804f9d731fcf",
+      "review_history": [
+        {
+          "round": 1,
+          "verdict": "PASS",
+          "report": "docs/rust-tauri/R01/R01-T08_REVIEW_R1.md",
+          "sha256": "4a0c50ade4b10d3bb18b8303c78fb0670a42fee86852d4faf380804f9d731fcf"
+        },
+        {
+          "round": "docfix-1",
+          "agent": "ZCode:R01-T08-docfix-r1 (agent_6dea5739-8305-485b-98ae-9c70fd472450)",
+          "report": "docs/rust-tauri/R01/R01-T08_DOCFIX_R1.md",
+          "sha256": "766ef4260bac2b4dbf36a04a6b78dd3b3d63b6088db8d6b7c7eca86a91be62ce"
+        }
+      ],
+      "repair_rounds_completed": 0
     },
     "R02-T01": {
       "name": "实现 workspace 与组合根",
@@ -3303,7 +3340,7 @@
       "blockers": []
     }
   },
-  "current_task": "R01-T08",
+  "current_task": null,
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",
