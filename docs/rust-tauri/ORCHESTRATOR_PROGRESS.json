@@ -4,7 +4,7 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "b9442d86f3da87aaea4f51faeeecb68483b09a1e",
+  "current_head": "abe4d5452ed6d455bc2c53f8e0c813afd80aa0e8",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -1218,29 +1218,73 @@
     "R01-T04": {
       "name": "浏览器替代原型",
       "stage_id": "R01",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "task_base_sha": "b9442d86f3da87aaea4f51faeeecb68483b09a1e",
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
-      "repair_agent_id": null,
+      "executor_id": "ZCode:R01-T04-exec-r1 (agent_33bd5e45-03d5-4dc1-bd39-b6ea368aaed0)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 1,
+      "reviewer_id": "ZCode:R01-T04-review-r1 (agent_e078fce0-0bb0-4d0b-9bed-49564c18e339)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "F1",
+          "severity": "LOW",
+          "summary": "D-09 serde/serde_json 版本号与 Cargo.lock 不符",
+          "review_report": "docs/rust-tauri/R01/R01-T04_REVIEW_R1.md",
+          "resolution": "docfix-r1 修正，docfix-review PASS"
+        },
+        {
+          "id": "F2",
+          "severity": "LOW",
+          "summary": "spike 报告'无真实外发'措辞过宽（GCM 后台外联未披露）",
+          "review_report": "docs/rust-tauri/R01/R01-T04_REVIEW_R1.md",
+          "resolution": "docfix-r1 措辞精确化+披露+实测，docfix-review PASS"
+        },
+        {
+          "id": "INCIDENT-1",
+          "severity": "DISCLOSED",
+          "summary": "初版测试代理未限目标致 Chrome 后台流量外发一次（1 GET+7 CONNECT 盲隧道，无任务数据/凭证）；已修补 proxy.mjs 非 loopback 全拒并留预修补证据",
+          "review_report": "docs/rust-tauri/R01/R01-T04_REPORT.md §4",
+          "resolution": "已修补+验收方实测 REFUSED 行为复现；docfix 补 GCM 同类披露"
+        }
+      ],
+      "repair_agent_id": "ZCode:R01-T04-docfix-r1 (agent_d0b785b7)",
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R01-A07": "NOT_STARTED",
-        "R01-A08": "NOT_STARTED"
+        "R01-A07": "PASS",
+        "R01-A08": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "abe4d5452ed6d455bc2c53f8e0c813afd80aa0e8",
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "review_report": "docs/rust-tauri/R01/R01-T04_REVIEW_R1.md",
+      "review_report_sha256": "59a5efe438f9e54185baf64d428d40b5302fbd62aec3e34138589e60754d3aa5",
+      "review_history": [
+        {
+          "round": 1,
+          "verdict": "PASS",
+          "report": "docs/rust-tauri/R01/R01-T04_REVIEW_R1.md",
+          "sha256": "59a5efe438f9e54185baf64d428d40b5302fbd62aec3e34138589e60754d3aa5"
+        },
+        {
+          "round": "docfix-1",
+          "report": "docs/rust-tauri/R01/R01-T04_DOCFIX_R1.md",
+          "sha256": "a553fa93c9679196fb9319304e3a603d7b747a73a20a2e4440303fc6e0da2781"
+        },
+        {
+          "round": "docfix-review-1",
+          "verdict": "PASS",
+          "report": "docs/rust-tauri/R01/R01-T04_DOCFIX_REVIEW_R1.md",
+          "sha256": "3aa6e5189ca7901519e68b39c1ff7143ea0d97de3dbb1ea99796bc8c052dd022"
+        }
+      ],
+      "repair_rounds_completed": 0
     },
     "R01-T05": {
       "name": "HTML/PDF与办公处理原型",
       "stage_id": "R01",
-      "status": "PENDING",
-      "task_base_sha": null,
+      "status": "IN_PROGRESS",
+      "task_base_sha": "abe4d5452ed6d455bc2c53f8e0c813afd80aa0e8",
       "executor_id": null,
       "execution_result": null,
       "review_round": 0,
@@ -3085,7 +3129,7 @@
       "blockers": []
     }
   },
-  "current_task": "R01-T04",
+  "current_task": "R01-T05",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",
