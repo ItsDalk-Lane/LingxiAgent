@@ -4,7 +4,7 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "9390ae01d9e8145400eb3c44e8044bc2e1b46524",
+  "current_head": "5b63323b9a81b7e7603b32ace0673674b8bc2405",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -1125,7 +1125,12 @@
         "R01-A04": "PASS"
       },
       "task_commit_sha": "9390ae01d9e8145400eb3c44e8044bc2e1b46524",
-      "push_result": null,
+      "push_result": {
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "9705fe0fbaa4c8898dbede0a62a5c97465ca64e3",
+        "note": "task commit 9390ae01d + ledger commit 9705fe0fb pushed; ls-remote verified"
+      },
       "blockers": [],
       "review_report": "docs/rust-tauri/R01/R01-T02_REVIEW_R1.md",
       "review_report_sha256": "023e6d5040e78034031d7794c0dd56829f674a6bbb238e57bade189060f25d08",
@@ -1142,23 +1147,56 @@
     "R01-T03": {
       "name": "锁定依赖与构建原型",
       "stage_id": "R01",
-      "status": "IN_PROGRESS",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "9705fe0fbaa4c8898dbede0a62a5c97465ca64e3",
+      "executor_id": "ZCode:R01-T03-exec-r1 (agent_23466d25-695a-472d-b023-5da2fea456a9)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 1,
+      "reviewer_id": "ZCode:R01-T03-review-r1 (agent_fdc2eb25-1eb0-4a60-a7f2-99090e3f0fee)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "F1",
+          "severity": "MEDIUM-LOW",
+          "summary": "T02 生成器把 git HEAD 嵌入已提交生成物，check-generated 在任何后续提交后恒红（预存，非 T03 引入）",
+          "review_report": "docs/rust-tauri/R01/R01-T03_REVIEW_R1.md",
+          "resolution": "归属 T02 修复（豁免该字段比较或改内容派生戳），总控另派修复代理"
+        },
+        {
+          "id": "F2",
+          "severity": "INFO",
+          "summary": "check-generated 用裸 cargo 依赖 PATH 顺序，建议门禁显式锁工具链",
+          "review_report": "docs/rust-tauri/R01/R01-T03_REVIEW_R1.md",
+          "resolution": "随 T02 headSha 修复一并处理"
+        },
+        {
+          "id": "F3",
+          "severity": "INFO",
+          "summary": "check_deps 动态库缺失分支在 macOS 只能源码确证",
+          "review_report": "docs/rust-tauri/R01/R01-T03_REVIEW_R1.md",
+          "resolution": "归 R09/R10 实跑"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R01-A05": "NOT_STARTED",
-        "R01-A06": "NOT_STARTED"
+        "R01-A05": "PASS",
+        "R01-A06": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "5b63323b9a81b7e7603b32ace0673674b8bc2405",
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "review_report": "docs/rust-tauri/R01/R01-T03_REVIEW_R1.md",
+      "review_report_sha256": "9ea5c437827157d46045aef25f31ce32633fbaa56e1345548d73898d4b956f99",
+      "review_history": [
+        {
+          "round": 1,
+          "verdict": "PASS",
+          "report": "docs/rust-tauri/R01/R01-T03_REVIEW_R1.md",
+          "sha256": "9ea5c437827157d46045aef25f31ce32633fbaa56e1345548d73898d4b956f99"
+        }
+      ],
+      "repair_rounds_completed": 0
     },
     "R01-T04": {
       "name": "浏览器替代原型",
@@ -3030,7 +3068,7 @@
       "blockers": []
     }
   },
-  "current_task": "R01-T03",
+  "current_task": "R01-T02-fix-headsha",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",
