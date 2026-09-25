@@ -4,7 +4,7 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "abe4d5452ed6d455bc2c53f8e0c813afd80aa0e8",
+  "current_head": "4fa0b573ce8cb9b574d78e72b72455f98e360273",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -1283,28 +1283,100 @@
     "R01-T05": {
       "name": "HTML/PDF与办公处理原型",
       "stage_id": "R01",
-      "status": "IN_PROGRESS",
-      "task_base_sha": "abe4d5452ed6d455bc2c53f8e0c813afd80aa0e8",
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
-      "repair_agent_id": null,
+      "status": "DONE",
+      "task_base_sha": "5a8a8e24ab9e8e105da5132d16b175221a91d646",
+      "executor_id": "ZCode:R01-T05-exec-r1 (agent_9118db9e-a378-4526-904c-c4a2a62f3a78)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 2,
+      "reviewer_id": "ZCode:R01-T05-review-r2 (agent_ba7162ed-aaad-4ee3-97ab-55122d87d7e4)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-F1",
+          "severity": "MEDIUM",
+          "summary": "候选链资源边界不覆盖 WebSocket（ws://loopback 握手到达 canary）",
+          "review_report": "docs/rust-tauri/R01/R01-T05_REVIEW_R1.md",
+          "resolution": "repair-r1 CSP connect-src 封堵（setBlockedURLs 无效留证），R2 复验关闭；WebRTC 残留面 N2 入 R09 门禁"
+        },
+        {
+          "id": "R1-F2",
+          "severity": "LOW",
+          "summary": "printToPDF 超时 exit=1≠文档承诺 2",
+          "review_report": "docs/rust-tauri/R01/R01-T05_REVIEW_R1.md",
+          "resolution": "repair-r1 error_is_timeout()，R2 关闭"
+        },
+        {
+          "id": "R1-F3",
+          "severity": "LOW",
+          "summary": "计数笔误（41→35；623→632）",
+          "review_report": "docs/rust-tauri/R01/R01-T05_REVIEW_R1.md",
+          "resolution": "repair-r1 更正，R2 关闭"
+        },
+        {
+          "id": "R1-F4/F5",
+          "severity": "INFO",
+          "summary": "cargo test 数量少报、A09 文本层差异主因",
+          "review_report": "docs/rust-tauri/R01/R01-T05_REVIEW_R1.md",
+          "resolution": "repair-r1 §7 勘误段"
+        },
+        {
+          "id": "R2-N1",
+          "severity": "LOW",
+          "summary": "负向测试资产注释仍误注封堵机制为 setBlockedURLs（实际 CSP）",
+          "review_report": "docs/rust-tauri/R01/R01-T05_REVIEW_R2.md",
+          "resolution": "移交 R01-T08 收口（注释更正）"
+        },
+        {
+          "id": "R2-N2",
+          "severity": "INFO",
+          "summary": "WebRTC 在 Fetch 域与 CSP connect-src 双重边界之外（未做端到端外带）",
+          "review_report": "docs/rust-tauri/R01/R01-T05_REVIEW_R2.md",
+          "resolution": "入 R09 门禁显式决策，记入 R01-T08 风险登记"
+        },
+        {
+          "id": "R2-N3",
+          "severity": "INFO",
+          "summary": "证据清单分裂两处（根 632 / repair-r1 子树 653），措辞可误读",
+          "review_report": "docs/rust-tauri/R01/R01-T05_REVIEW_R2.md",
+          "resolution": "移交 R01-T08 收口说明"
+        }
+      ],
+      "repair_agent_id": "ZCode:R01-T05-repair-r1 (agent_65a7f786-eb23-43ad-9c5f-97a1f6298835)",
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R01-A09": "NOT_STARTED",
-        "R01-A10": "NOT_STARTED"
+        "R01-A09": "PASS",
+        "R01-A10": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "4fa0b573ce8cb9b574d78e72b72455f98e360273",
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "review_report": "docs/rust-tauri/R01/R01-T05_REVIEW_R2.md",
+      "review_report_sha256": "08423fa7c6d41237975e478e57ceb8e7ac5271ebed8b9476d539d74c367c711f",
+      "review_history": [
+        {
+          "round": 1,
+          "verdict": "PASS(with F1-F5)",
+          "report": "docs/rust-tauri/R01/R01-T05_REVIEW_R1.md",
+          "sha256": "292e4c7a347119aae090f12aa71eeef3d07d8eb12f78e9455906d886c84dbd53"
+        },
+        {
+          "round": "repair-1",
+          "report": "docs/rust-tauri/R01/R01-T05_REPAIR_R1.md",
+          "sha256": "3965349f19eef8c0e3052a24e0dba65a3371ae2ce0eb3f925b4b4979a96bbbd5"
+        },
+        {
+          "round": 2,
+          "verdict": "PASS",
+          "report": "docs/rust-tauri/R01/R01-T05_REVIEW_R2.md",
+          "sha256": "08423fa7c6d41237975e478e57ceb8e7ac5271ebed8b9476d539d74c367c711f"
+        }
+      ],
+      "repair_rounds_completed": 1
     },
     "R01-T06": {
       "name": "系统能力与桌面安全原型",
       "stage_id": "R01",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "task_base_sha": null,
       "executor_id": null,
       "execution_result": null,
@@ -3129,7 +3201,7 @@
       "blockers": []
     }
   },
-  "current_task": "R01-T05",
+  "current_task": "R01-T06",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",
