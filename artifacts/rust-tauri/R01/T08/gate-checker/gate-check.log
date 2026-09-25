@@ -1,0 +1,42 @@
+[    COMPLETE] browser_host
+    navigation_snapshot_input_scroll: VERIFIED -> PASS
+    viewport_screenshot: VERIFIED -> PASS
+    session_isolation: VERIFIED -> PASS
+    untrusted_page_sandbox: VERIFIED -> PASS
+    user_takeover: VERIFIED -> PASS
+    fetch_interception_layer: UNVERIFIED -> TRACKED(RR-T05-X1 -> R09（browser worker 边界实现与门禁）)
+    webrtc_exfiltration_boundary: UNVERIFIED -> TRACKED(RR-T05-N2 -> R09（门禁显式决策，如 launcher 层开关/策略禁用）)
+[    COMPLETE] pdf_renderer
+    chinese_longdoc_fidelity: VERIFIED -> PASS
+    dangerous_resource_denial: VERIFIED -> PASS
+    infinite_script_timeout: VERIFIED -> PASS
+    ws_loopback_boundary: VERIFIED -> PASS
+    matrix_28_verified: VERIFIED -> PASS
+[    COMPLETE] shell_capabilities
+    window_tray_shortcut_notification_clipboard_dialog_accessibility_updater_loginstartup_restart: VERIFIED -> PASS
+    sidecar_lifecycle_acl: VERIFIED -> PASS
+    capability_matrix_source: VERIFIED -> PASS
+    recording_authorized_path: UNVERIFIED -> TRACKED(RR-T06-MIC -> R09)
+    speech_recognition_authorized_chain: UNVERIFIED -> TRACKED(RR-T06-SPEECH -> R09)
+    screen_real_capture: UNVERIFIED -> TRACKED(RR-T06-SCREEN -> R09)
+    proxy_matrix: UNVERIFIED -> TRACKED(RR-T06-PROXY -> R09 最迟 R10)
+    cross_platform_windows_linux_macx64: UNVERIFIED -> TRACKED(RR-T06-PLATFORM -> R09（宿主集成）最迟 R10（跨平台产物）)
+[    COMPLETE] storage_cutover
+    old_binary_write_refusal: VERIFIED -> PASS
+    rollback_no_data_loss_drill: VERIFIED -> PASS
+    data_compatibility_matrix: VERIFIED -> PASS
+    corrupt_failure_failopen_fix: REGISTERED_DEFECT -> TRACKED(RR-T07-PROD-DEFECT-1 -> R02（新 coordinator 实现时修复并重跑 4 变体演练）)
+    shell_local_stores_gate: UNVERIFIED -> TRACKED(RR-T07-F3 -> R09（强制项）)
+    cooperative_gate_physical_separation: DOCUMENTED -> TRACKED(RR-T07-F2 -> R08/R09（分离数据根/原子活动目录指针落地时覆盖）)
+[    COMPLETE] protocol_chain
+    cross_language_roundtrip: VERIFIED -> PASS
+    version_incompatibility_diagnosis: VERIFIED -> PASS
+    generated_drift_free: VERIFIED -> PASS
+    ownership_machine_gate: VERIFIED -> PASS
+    canonical_non_bmp_divergence: OPEN_FINDING -> TRACKED(RR-T02-F1 -> R04（工具网关消费规范序列化之前）)
+    ts_canonical_float_bigint: OPEN_FINDING -> TRACKED(RR-T02-F2 -> R04（先于 R04/R08 的协议消费点，验收裁定口径）)
+    eventpayload_fallback_invariants: OPEN_FINDING -> TRACKED(RR-T02-F3 -> R04（先于 R04/R08）)
+    seq_parse_lenient: OPEN_FINDING -> TRACKED(RR-T02-F4 -> R04)
+    ws_close_code_hardcoded: OPEN_FINDING -> TRACKED(RR-T02-F5 -> R08（旧 Electron 客户端接入消费 WS 语义之前）)
+VERDICT: PASS_WITH_CONDITIONS
+SHELL-REPLACEMENT: ALLOWED_FOR_NEXT_STAGE_ONLY: 实施平台高风险必需能力均有真实原型证据；15 个递延项已全部挂账（截止阶段+失败处理），跨平台/授权态放行挂 R09/R10 强制关卡

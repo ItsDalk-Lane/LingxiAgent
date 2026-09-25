@@ -1,0 +1,204 @@
+{
+  "schema_version": "1.0",
+  "task_id": "R01-T08",
+  "generated_by": "ZCode:R01-T08-exec-r1",
+  "date": "2026-09-25",
+  "purpose": "R01 阶段关卡检查器（r01_t08_gate_check.py）的真实输入：逐高风险能力域列出必需能力、状态、证据文件（SHA-256 钉住）与递延项的风险登记引用。状态词来自各 spike 报告/能力矩阵的实测结论，平台范围为 macOS 27.0 arm64 单机。",
+  "implementation_platform": "macOS 27.0 arm64",
+  "areas": {
+    "browser_host": {
+      "adr": "docs/rust-tauri/R01/ADR-002-browser-host.md",
+      "selected_candidate": "controlled-chromium-cdp-over-pipe（ADR-002 方向；WKWebView/wry 缺口见 BROWSER_SPIKE_REPORT §对比表）",
+      "required_capabilities": [
+        {
+          "id": "navigation_snapshot_input_scroll",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T04/chromium/summary.json",
+          "sha256": "5015faee111010b6a6c65b200b9e8fdafd89088f7cf44ebfa41d25d96dfd2e28",
+          "note": "21 pass / 0 fail：导航、data-hana-ref 快照、点击/insertText/select/滚动、弹窗转新 tab"
+        },
+        {
+          "id": "viewport_screenshot",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T04/chromium/summary.json",
+          "sha256": "5015faee111010b6a6c65b200b9e8fdafd89088f7cf44ebfa41d25d96dfd2e28",
+          "note": "视口截图在 chromium 套件内（screenshots/ 产物）；WKWebView 经 wry 无截图 API 属落选候选缺口"
+        },
+        {
+          "id": "session_isolation",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T04/chromium-iso/summary.json",
+          "sha256": "75cb1a51d07c227d4f101e7bb31f78285ad487e2af4843370a851cfdf1784ebf",
+          "note": "跨会话/默认会话隔离 7 pass / 0 fail（ADV-1/2/3/7 独立复验一致）"
+        },
+        {
+          "id": "untrusted_page_sandbox",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T04/chromium-proxy/summary.json",
+          "sha256": "5bcb390af62810fa627a149b6da70fe3a641c72b97e9a0315a39477e58522e10",
+          "note": "不可信页 file:// 读取/CDP 端口探测全拒（ADV-4/5/6）；资源边界缺口（无 Fetch 拦截层、loopback WS）登记 RR-T05-X1 挂 R09"
+        },
+        {
+          "id": "user_takeover",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T04/chromium-takeover/summary.json",
+          "sha256": "507dfd9a91c41aee2ce47d2f05b6b23876fcf5d0316a31dd1f79e3ddc2f71443",
+          "note": "D1-D4 全 VERIFIED：窗口可见（CGWindowList onscreen=1）、osascript OS 通道键入落页面输入框且 CDP 读回、整屏 screencapture 留证；transcript 2b2bf4bf…"
+        }
+      ],
+      "deferred_capabilities": [
+        {"id": "fetch_interception_layer", "status": "UNVERIFIED", "risk_id": "RR-T05-X1"},
+        {"id": "webrtc_exfiltration_boundary", "status": "UNVERIFIED", "risk_id": "RR-T05-N2"}
+      ]
+    },
+    "pdf_renderer": {
+      "adr": "docs/rust-tauri/R01/ADR-003-document-renderer.md",
+      "selected_candidate": "controlled-chromium-printToPDF（候选链，CSP connect-src 边界）",
+      "required_capabilities": [
+        {
+          "id": "chinese_longdoc_fidelity",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T05/a09/compare.json",
+          "sha256": "f939fcc2f65f773d677457ccbf40b17a68620af5f444f5c9f4326600aed8f445",
+          "note": "中文长文档 35 项全过（74 页、140/140 行、相似度 0.99910、字体三族双链嵌入）"
+        },
+        {
+          "id": "dangerous_resource_denial",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T05/a10-dangerous/new/run-result.json",
+          "sha256": "90cd337cdebdc492ce01335f2a4d51f0c6bb4b45e40dabece3f4ed1c0207ad63",
+          "note": "S5：7×DENY（/etc/passwd iframe/img/XHR、master.passwd、/etc/hosts、canary.invalid、loopback canary），输出无泄漏"
+        },
+        {
+          "id": "infinite_script_timeout",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T05/a10-infinite/new/run-result.json",
+          "sha256": "d5392dc3a65a1c5f91fb87f85da3afa94615b8de68c18dfb13194f7208e37359",
+          "note": "S6：5s 超时 exit=2、杀树、无伪产物、profile 已删"
+        },
+        {
+          "id": "ws_loopback_boundary",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T05/repair-r1/negative/negative-verdicts.txt",
+          "sha256": "b8b8f831d40878b1f0afa99996f060c7f9e2ffaed88f00fc31958c1beddad559",
+          "note": "repair-r1 负向 7/7 PASS：CSP connect-src 封堵 WS（setBlockedURLs 实测无效留证），不误伤渲染"
+        },
+        {
+          "id": "matrix_28_verified",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T05/matrix-verdicts.json",
+          "sha256": "711591db2ab0c865071f3e58c3d64dbccd2269d685c28ab89f6c47485ca9cc97",
+          "note": "19 场景矩阵 28 VERIFIED / 0 FAILED"
+        }
+      ],
+      "deferred_capabilities": []
+    },
+    "shell_capabilities": {
+      "adr": "docs/rust-tauri/R01/TAURI_SPIKE_REPORT.md（选型证据）",
+      "selected_candidate": "tauri-2-shell（spike/tauri-shell）",
+      "required_capabilities": [
+        {
+          "id": "window_tray_shortcut_notification_clipboard_dialog_accessibility_updater_loginstartup_restart",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T06/runner-summary.txt",
+          "sha256": "235c8c6031a1492fa0cd652eb9d4215a8fe7a72bf12755b604e3531922350d6c",
+          "note": "15 步 e2e 全 exit=0（realpath 轮 R2 复验一致）；SHELL_CAPABILITY_MATRIX 10 项 VERIFIED"
+        },
+        {
+          "id": "sidecar_lifecycle_acl",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T06/runner-summary.txt",
+          "sha256": "235c8c6031a1492fa0cd652eb9d4215a8fe7a72bf12755b604e3531922350d6c",
+          "note": "sidecar 崩溃恢复断言（RECOVERY-ASSERT OK）+ sabotage 负向 exit=1；ACL：untrusted/remote 11/11 全拒、main 授权命令全通、plugin:shell|execute 仍拒"
+        },
+        {
+          "id": "capability_matrix_source",
+          "status": "VERIFIED",
+          "evidence": "docs/rust-tauri/R01/SHELL_CAPABILITY_MATRIX.json",
+          "sha256": "f72f5d79dfe2a0f325b1bc6f0fb55dd1bcf500a03d9114cf42250f8ae4098e3a",
+          "note": "能力矩阵机器可读源（14 能力逐项状态）"
+        }
+      ],
+      "deferred_capabilities": [
+        {"id": "recording_authorized_path", "status": "UNVERIFIED", "risk_id": "RR-T06-MIC"},
+        {"id": "speech_recognition_authorized_chain", "status": "UNVERIFIED", "risk_id": "RR-T06-SPEECH"},
+        {"id": "screen_real_capture", "status": "UNVERIFIED", "risk_id": "RR-T06-SCREEN"},
+        {"id": "proxy_matrix", "status": "UNVERIFIED", "risk_id": "RR-T06-PROXY"},
+        {"id": "cross_platform_windows_linux_macx64", "status": "UNVERIFIED", "risk_id": "RR-T06-PLATFORM"}
+      ]
+    },
+    "storage_cutover": {
+      "adr": "docs/rust-tauri/R01/ADR-004-storage-cutover.md",
+      "selected_candidate": "分离数据根 + 原子活动目录指针 + epoch 闸（ADR-004 D2；旧程序拒写可验证）",
+      "required_capabilities": [
+        {
+          "id": "old_binary_write_refusal",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T07/a13/a7b-old-on-active-epoch2-refused.log",
+          "sha256": "2fa239e943b8e64f3b650295ac06f660e7f66d20fa65321266010ac773ff0f17",
+          "note": "旧程序面对 epoch-2 活动目录真实拒写（A13；另有 c1/escape-off/r11/half2/r8 阻断变体实测）"
+        },
+        {
+          "id": "rollback_no_data_loss_drill",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T07/a14/rollback-drill-summary.json",
+          "sha256": "4bfe20cbb1198ab4477f3b8c6713527e5c38493b0c9f4ef523b43a5cc4674ed9",
+          "note": "A14：ROLLBACK-DRILL-PASSED，新数据先导出归档再动指针、幂等合并（两次合并逻辑内容 sha256 稳定）"
+        },
+        {
+          "id": "data_compatibility_matrix",
+          "status": "VERIFIED",
+          "evidence": "docs/rust-tauri/R01/DATA_COMPATIBILITY_MATRIX.json",
+          "sha256": "458bb2da36e2f14f4100b985e6ceb5480fc1b5f947a441aced41077331acbbb1",
+          "note": "69 存储逐项切换策略（生成器 r01_t07_build_matrix.py，确定性）"
+        }
+      ],
+      "deferred_capabilities": [
+        {"id": "corrupt_failure_failopen_fix", "status": "REGISTERED_DEFECT", "risk_id": "RR-T07-PROD-DEFECT-1"},
+        {"id": "shell_local_stores_gate", "status": "UNVERIFIED", "risk_id": "RR-T07-F3"},
+        {"id": "cooperative_gate_physical_separation", "status": "DOCUMENTED", "risk_id": "RR-T07-F2"}
+      ]
+    },
+    "protocol_chain": {
+      "adr": "docs/rust-tauri/R01/PROTOCOL_SPEC.md（lingxi.wire v1）",
+      "selected_candidate": "rust-serde-single-source + 生成 JSON Schema/TS/golden（--check 无 diff 门禁）",
+      "required_capabilities": [
+        {
+          "id": "cross_language_roundtrip",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T08/gates/t02-roundtrip-fresh-target.log",
+          "sha256": "02efaa2e625ebfdbd8abced4ab7f436516e63ed774d8f58794a8200cd22360ec",
+          "note": "T08 全新 CARGO_TARGET_DIR 复跑 exit=0：12 golden Rust→TS→Rust 逐字节一致 + tsc + 负向"
+        },
+        {
+          "id": "version_incompatibility_diagnosis",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T08/gates/t02-handshake-fresh-target.log",
+          "sha256": "2728d798d664ed1f6f10b13b7fdc4f4e30daf7e7a22e436430c239aaa731af8d",
+          "note": "T08 复跑 exit=0：5 场景握手、版本不兼容 400/4409 带 details、不进入默认猜测"
+        },
+        {
+          "id": "generated_drift_free",
+          "status": "VERIFIED",
+          "evidence": "artifacts/rust-tauri/R01/T08/gates/t02-check-generated-fresh-target.log",
+          "sha256": "34910e03c2f6920fcdfcbd575728b0dde5781aacb4ccac3b7b08be836e62eeac",
+          "note": "T08 全新 target 复跑：56 生成文件 + 624 矩阵条目零漂移，正确指向本仓库树（共享缓存错绑见 RR-T08-F1）"
+        },
+        {
+          "id": "ownership_machine_gate",
+          "status": "VERIFIED",
+          "evidence": "docs/rust-tauri/R01/OWNERSHIP_TARGET.json",
+          "sha256": "6dfbdd6c7f6c1c705e156a6b043b7c137003f7ce3a6ad1d6ffa1e3c80bd9e381",
+          "note": "T01 校验器正向+N1-N15+生成器 --check 在 T08 复跑全 exit=0（gates/t01-*.log）"
+        }
+      ],
+      "deferred_capabilities": [
+        {"id": "canonical_non_bmp_divergence", "status": "OPEN_FINDING", "risk_id": "RR-T02-F1"},
+        {"id": "ts_canonical_float_bigint", "status": "OPEN_FINDING", "risk_id": "RR-T02-F2"},
+        {"id": "eventpayload_fallback_invariants", "status": "OPEN_FINDING", "risk_id": "RR-T02-F3"},
+        {"id": "seq_parse_lenient", "status": "OPEN_FINDING", "risk_id": "RR-T02-F4"},
+        {"id": "ws_close_code_hardcoded", "status": "OPEN_FINDING", "risk_id": "RR-T02-F5"}
+      ]
+    }
+  }
+}

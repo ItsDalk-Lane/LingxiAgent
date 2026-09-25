@@ -1,0 +1,6 @@
+scanned production files: 2209
+prototype tracked files (rust/+spike/+contracts/+tests/migration/r01-*+scripts/rust-tauri/r01-*): 209
+prototype files under production dirs: 0
+gitignore spike build outputs: {'spike/tauri-shell/app/src-tauri/target/': True, 'spike/tauri-shell/app/node_modules/': True}
+gitignore rust/target ignored: False（如实报告；不判负，目录约定建议 R02 增补）
+RESULT: ISOLATED（生产入口零引用 R01 原型/生成物）

@@ -1,0 +1,118 @@
+{
+ "checks": [
+  {
+   "check": "C1-inventory-count",
+   "detail": "features=736",
+   "status": "PASS"
+  },
+  {
+   "check": "C1-ownership-count",
+   "detail": "feature_ownership=736",
+   "status": "PASS"
+  },
+  {
+   "check": "C1-store-count",
+   "detail": "store_ownership=69",
+   "status": "PASS"
+  },
+  {
+   "check": "C2-bijection",
+   "detail": "736 F-ID 双向一一对应，无缺失/孤儿/重复",
+   "status": "PASS"
+  },
+  {
+   "check": "C3-owner-registered",
+   "detail": "全部 target_owner 在 owner_registry 登记",
+   "status": "PASS"
+  },
+  {
+   "check": "C3-no-worker-owner",
+   "detail": "无 F-ID 由 worker 类 owner 承载（worker_restrictions 规则 3）",
+   "status": "PASS"
+  },
+  {
+   "check": "C4-implementation-path",
+   "detail": "全部 F-ID 有非空且合法的实施阶段（实现路径存在）",
+   "status": "PASS"
+  },
+  {
+   "check": "C5-critical-facts-set",
+   "detail": "11 条关键事实与冻结集精确一致",
+   "status": "PASS"
+  },
+  {
+   "check": "C5-critical-fact-owners",
+   "detail": "11 条关键事实均由 core/service 类 owner 单独负责",
+   "status": "PASS"
+  },
+  {
+   "check": "C6-store-owners",
+   "detail": "69 个存储 target_owner 全部登记，authoritative 均有目标写进程",
+   "status": "PASS"
+  },
+  {
+   "check": "C6-no-worker-store",
+   "detail": "无存储由 worker 类 owner 承载",
+   "status": "PASS"
+  },
+  {
+   "check": "C7-reverse-histogram",
+   "detail": "19 个 owner 承载 F-ID；零 F-ID owner（非缺陷，承担存储/职责）: ['adapters.models', 'adapters.storage', 'cli.commands', 'react-ui', 'service.auth', 'service.composition', 'worker.bridge-sdk', 'worker.browser-engine', 'worker.doc-parse', 'worker.media-encode', 'xtask.automation']",
+   "status": "PASS"
+  },
+  {
+   "check": "C8-pi-count",
+   "detail": "Pi 能力 14 条",
+   "status": "PASS"
+  },
+  {
+   "check": "C8-pi-no-second-loop",
+   "detail": "14 条 Pi 能力全部 KERNEL_MIGRATION 且有 Rust 归属与目标阶段——无仅靠第二 Agent loop 的保留项",
+   "status": "PASS"
+  },
+  {
+   "check": "C9-pi-coverage-diff",
+   "detail": "unmapped_index_symbols/vendor_files/adapter_submodules/hooks 全空",
+   "status": "PASS"
+  },
+  {
+   "check": "C9-worker-counterexamples",
+   "detail": "19 条 worker 反例全部闭合",
+   "status": "PASS"
+  }
+ ],
+ "counts": {
+  "critical_facts": 11,
+  "feature_ownership": 736,
+  "features": 736,
+  "owners": 30,
+  "stores": 69
+ },
+ "inputs": {
+  "inventory": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R00/FEATURE_INVENTORY.json",
+  "ownership_target": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R01/OWNERSHIP_TARGET.json",
+  "pi_replacement_matrix": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R00/PI_REPLACEMENT_MATRIX.json"
+ },
+ "owner_feature_histogram": {
+  "adapters.browser": 18,
+  "adapters.integrations": 27,
+  "adapters.tools": 9,
+  "build-release.tooling": 9,
+  "kernel.context": 31,
+  "kernel.knowledge": 23,
+  "kernel.memory": 37,
+  "kernel.model-gateway": 124,
+  "kernel.policy": 13,
+  "kernel.resource": 57,
+  "kernel.run-supervisor": 120,
+  "kernel.scheduler": 15,
+  "kernel.session": 66,
+  "kernel.skill": 42,
+  "kernel.tool-gateway": 45,
+  "service.credentials": 6,
+  "service.transport": 39,
+  "tauri-host.desktop-host": 46,
+  "tauri-host.os-helper": 9
+ },
+ "verdict": "COVERAGE-CLOSED"
+}

@@ -1,0 +1,6 @@
+PASS positive-control: 真实 R01 数据 verdict=PASS_WITH_CONDITIONS（browser_host=COMPLETE，deferred=15）
+PASS-NEG N1-screenshot-pass-takeover-fail: verdict=NO-GO browser_host=NOT_COMPLETE shell_path=BLOCKED: 存在未真实验证的高风险必需能力/不可信证据，替壳路径明确阻塞…
+PASS-NEG N2-evidence-hash-tampered: verdict=NO-GO pdf_renderer=BLOCKED
+PASS-NEG N3-untracked-deferred: verdict=NO-GO shell_capabilities=BLOCKED
+PASS-NEG N4-required-unverified: verdict=NO-GO storage_cutover=NOT_COMPLETE
+SELF-TEST OK (5/5)

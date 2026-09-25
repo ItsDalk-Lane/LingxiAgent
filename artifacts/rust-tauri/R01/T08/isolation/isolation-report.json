@@ -1,0 +1,23 @@
+{
+ "forbidden_patterns": [
+  "rust/crates",
+  "lingxi-protocol",
+  "lingxi-kernel",
+  "lingxi-spike",
+  "lingxi-browser-spike",
+  "spike/tauri-shell",
+  "contracts/generated",
+  "tests/migration/r01",
+  "lingxi.wire"
+ ],
+ "gitignore_rust_target_ignored": false,
+ "gitignore_spike_build_outputs": {
+  "spike/tauri-shell/app/node_modules/": true,
+  "spike/tauri-shell/app/src-tauri/target/": true
+ },
+ "prototype_files_under_production_dirs": [],
+ "prototype_tracked_files": 209,
+ "scanned_production_files": 2209,
+ "verdict": "ISOLATED",
+ "violations": []
+}

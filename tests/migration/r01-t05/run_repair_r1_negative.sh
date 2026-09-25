@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # R01-T05 repair-r1 负向用例（对应 R1 验收 F1/F2）：
-#   case1 ws-negative      — WebSocket 边界：ws://loopback canary 与 wss://远端必须被
-#                            Network.setBlockedURLs 阻断（canary 零命中 + 页面标记 BLOCKED），
-#                            页面其余部分正常产出（exit 0）。
+#   case1 ws-negative      — WebSocket 边界：ws://loopback canary 与 wss:// 远端必须被
+#                            注入 CSP（meta connect-src 白名单，刻意排除 ws:/wss:）阻断
+#                            （canary 零命中 + 页面标记 BLOCKED），页面其余部分正常产出
+#                            （exit 0）。注：早期注释误写 Network.setBlockedURLs——该机制
+#                            对 WS 实测无效（repair-r1 与 R2 独立复证一致），实际封堵
+#                            机制为 CSP connect-src；R2 验收 N1 由 R01-T08 更正本注释。
 #   case2 print-timeout    — load 后挂死主线程使 printToPDF 阶段超时，契约 exit=2
 #                            （修复前实测 exit 1）、零伪产物。
 # 用法：bash tests/migration/r01-t05/run_repair_r1_negative.sh [artifacts_dir]

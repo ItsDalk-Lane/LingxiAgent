@@ -1,0 +1,241 @@
+{
+ "areas": {
+  "browser_host": {
+   "adr": "docs/rust-tauri/R01/ADR-002-browser-host.md",
+   "capabilities": [
+    {
+     "id": "navigation_snapshot_input_scroll",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "viewport_screenshot",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "session_isolation",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "untrusted_page_sandbox",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "user_takeover",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "fetch_interception_layer",
+     "result": "TRACKED(RR-T05-X1 -> R09（browser worker 边界实现与门禁）)",
+     "risk_id": "RR-T05-X1",
+     "status": "UNVERIFIED"
+    },
+    {
+     "id": "webrtc_exfiltration_boundary",
+     "result": "TRACKED(RR-T05-N2 -> R09（门禁显式决策，如 launcher 层开关/策略禁用）)",
+     "risk_id": "RR-T05-N2",
+     "status": "UNVERIFIED"
+    }
+   ],
+   "problems": [],
+   "selected_candidate": "controlled-chromium-cdp-over-pipe（ADR-002 方向；WKWebView/wry 缺口见 BROWSER_SPIKE_REPORT §对比表）",
+   "verdict": "COMPLETE"
+  },
+  "pdf_renderer": {
+   "adr": "docs/rust-tauri/R01/ADR-003-document-renderer.md",
+   "capabilities": [
+    {
+     "id": "chinese_longdoc_fidelity",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "dangerous_resource_denial",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "infinite_script_timeout",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "ws_loopback_boundary",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "matrix_28_verified",
+     "result": "PASS",
+     "status": "VERIFIED"
+    }
+   ],
+   "problems": [],
+   "selected_candidate": "controlled-chromium-printToPDF（候选链，CSP connect-src 边界）",
+   "verdict": "COMPLETE"
+  },
+  "protocol_chain": {
+   "adr": "docs/rust-tauri/R01/PROTOCOL_SPEC.md（lingxi.wire v1）",
+   "capabilities": [
+    {
+     "id": "cross_language_roundtrip",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "version_incompatibility_diagnosis",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "generated_drift_free",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "ownership_machine_gate",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "canonical_non_bmp_divergence",
+     "result": "TRACKED(RR-T02-F1 -> R04（工具网关消费规范序列化之前）)",
+     "risk_id": "RR-T02-F1",
+     "status": "OPEN_FINDING"
+    },
+    {
+     "id": "ts_canonical_float_bigint",
+     "result": "TRACKED(RR-T02-F2 -> R04（先于 R04/R08 的协议消费点，验收裁定口径）)",
+     "risk_id": "RR-T02-F2",
+     "status": "OPEN_FINDING"
+    },
+    {
+     "id": "eventpayload_fallback_invariants",
+     "result": "TRACKED(RR-T02-F3 -> R04（先于 R04/R08）)",
+     "risk_id": "RR-T02-F3",
+     "status": "OPEN_FINDING"
+    },
+    {
+     "id": "seq_parse_lenient",
+     "result": "TRACKED(RR-T02-F4 -> R04)",
+     "risk_id": "RR-T02-F4",
+     "status": "OPEN_FINDING"
+    },
+    {
+     "id": "ws_close_code_hardcoded",
+     "result": "TRACKED(RR-T02-F5 -> R08（旧 Electron 客户端接入消费 WS 语义之前）)",
+     "risk_id": "RR-T02-F5",
+     "status": "OPEN_FINDING"
+    }
+   ],
+   "problems": [],
+   "selected_candidate": "rust-serde-single-source + 生成 JSON Schema/TS/golden（--check 无 diff 门禁）",
+   "verdict": "COMPLETE"
+  },
+  "shell_capabilities": {
+   "adr": "docs/rust-tauri/R01/TAURI_SPIKE_REPORT.md（选型证据）",
+   "capabilities": [
+    {
+     "id": "window_tray_shortcut_notification_clipboard_dialog_accessibility_updater_loginstartup_restart",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "sidecar_lifecycle_acl",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "capability_matrix_source",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "recording_authorized_path",
+     "result": "TRACKED(RR-T06-MIC -> R09)",
+     "risk_id": "RR-T06-MIC",
+     "status": "UNVERIFIED"
+    },
+    {
+     "id": "speech_recognition_authorized_chain",
+     "result": "TRACKED(RR-T06-SPEECH -> R09)",
+     "risk_id": "RR-T06-SPEECH",
+     "status": "UNVERIFIED"
+    },
+    {
+     "id": "screen_real_capture",
+     "result": "TRACKED(RR-T06-SCREEN -> R09)",
+     "risk_id": "RR-T06-SCREEN",
+     "status": "UNVERIFIED"
+    },
+    {
+     "id": "proxy_matrix",
+     "result": "TRACKED(RR-T06-PROXY -> R09 最迟 R10)",
+     "risk_id": "RR-T06-PROXY",
+     "status": "UNVERIFIED"
+    },
+    {
+     "id": "cross_platform_windows_linux_macx64",
+     "result": "TRACKED(RR-T06-PLATFORM -> R09（宿主集成）最迟 R10（跨平台产物）)",
+     "risk_id": "RR-T06-PLATFORM",
+     "status": "UNVERIFIED"
+    }
+   ],
+   "problems": [],
+   "selected_candidate": "tauri-2-shell（spike/tauri-shell）",
+   "verdict": "COMPLETE"
+  },
+  "storage_cutover": {
+   "adr": "docs/rust-tauri/R01/ADR-004-storage-cutover.md",
+   "capabilities": [
+    {
+     "id": "old_binary_write_refusal",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "rollback_no_data_loss_drill",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "data_compatibility_matrix",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
+     "id": "corrupt_failure_failopen_fix",
+     "result": "TRACKED(RR-T07-PROD-DEFECT-1 -> R02（新 coordinator 实现时修复并重跑 4 变体演练）)",
+     "risk_id": "RR-T07-PROD-DEFECT-1",
+     "status": "REGISTERED_DEFECT"
+    },
+    {
+     "id": "shell_local_stores_gate",
+     "result": "TRACKED(RR-T07-F3 -> R09（强制项）)",
+     "risk_id": "RR-T07-F3",
+     "status": "UNVERIFIED"
+    },
+    {
+     "id": "cooperative_gate_physical_separation",
+     "result": "TRACKED(RR-T07-F2 -> R08/R09（分离数据根/原子活动目录指针落地时覆盖）)",
+     "risk_id": "RR-T07-F2",
+     "status": "DOCUMENTED"
+    }
+   ],
+   "problems": [],
+   "selected_candidate": "分离数据根 + 原子活动目录指针 + epoch 闸（ADR-004 D2；旧程序拒写可验证）",
+   "verdict": "COMPLETE"
+  }
+ },
+ "blocking_reasons": [],
+ "deferred_count": 15,
+ "implementation_platform": "macOS 27.0 arm64",
+ "inputs_file": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R01/r01_t08_gate_inputs.json",
+ "register_file": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R01/RISK_REGISTER.json",
+ "shell_replacement_path": "ALLOWED_FOR_NEXT_STAGE_ONLY: 实施平台高风险必需能力均有真实原型证据；15 个递延项已全部挂账（截止阶段+失败处理），跨平台/授权态放行挂 R09/R10 强制关卡",
+ "verdict": "PASS_WITH_CONDITIONS"
+}

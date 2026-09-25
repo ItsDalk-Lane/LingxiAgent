@@ -7,8 +7,10 @@
 <p id="remote">WS-REMOTE-PENDING</p>
 <script>
 // R1 验收 F1 负向用例：ws:// 打 loopback canary、wss:// 打远端假目标。
-// 修复后期望：两条连接都被 Network.setBlockedURLs 阻断（onerror/onclose → BLOCKED），
+// 修复后期望：两条连接都被注入 CSP 的 connect-src 白名单阻断（onerror/onclose → BLOCKED），
 // canary 日志零命中；修复前（复现态）：ws://127.0.0.1 握手真实到达 canary。
+// 注：本注释早期误写 Network.setBlockedURLs——该机制对 WS 实测无效（repair-r1 与
+// R2 独立复证一致），实际封堵机制为 CSP connect-src；R2 验收 N1 由 R01-T08 更正。
 (function () {
   function mark(id, open) {
     document.getElementById(id).textContent = open
