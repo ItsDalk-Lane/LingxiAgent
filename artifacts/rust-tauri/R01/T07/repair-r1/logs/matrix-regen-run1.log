@@ -1,0 +1,17 @@
+written /Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R01/DATA_COMPATIBILITY_MATRIX.json 69 stores
+{
+ "stores": 69,
+ "by_cutover_strategy": {
+  "preserve-format": 35,
+  "regenerable": 13,
+  "switch-to-new-authority": 11,
+  "epoch-mechanism": 4,
+  "shell-local": 6
+ },
+ "by_epoch_protection": {
+  "protected-if-stamp-intact": 58,
+  "self": 4,
+  "not-gated-by-construction": 6,
+  "not-protected-pre-gate": 1
+ }
+}

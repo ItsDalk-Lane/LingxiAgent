@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "transitionId": "repair-r1-transition-0002",
+  "fromEpoch": 1,
+  "toEpoch": 2,
+  "migrationIds": [
+    "m-repair-r1-0002"
+  ],
+  "affectedStoreIds": [
+    "session-jsonl"
+  ],
+  "recoveryModes": {
+    "m-repair-r1-0002": "resume-idempotent"
+  },
+  "phase": "barrier_raised",
+  "checkpointId": "ckpt-repair

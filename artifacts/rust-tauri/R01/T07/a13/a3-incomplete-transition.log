@@ -1,0 +1,8 @@
+LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE reason=corrupt-journal
+[data-epoch] 数据安全闸拒绝启动（corrupt-journal）：transition journal recoveryModes must exactly cover migrationIds
+位置：/tmp/lingxi-r01-t07-sandbox/epoch2-transition-home/data-epoch-transition.json
+请检查文件系统与对应元数据；不要删除未知状态后强行启动。
+[data-epoch] The data safety gate refused startup (corrupt-journal): transition journal recoveryModes must exactly cover migrationIds
+Location: /tmp/lingxi-r01-t07-sandbox/epoch2-transition-home/data-epoch-transition.json
+Inspect the filesystem and metadata; do not delete unknown state merely to force startup.
+EXIT_CODE=1

@@ -1,0 +1,6 @@
+D .
+D ./agents
+D ./agents/agent-main
+D ./agents/agent-main/sessions
+F ./agents/agent-main/sessions/control.jsonl
+F ./data-epoch.json

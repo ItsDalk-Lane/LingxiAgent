@@ -1,0 +1,8 @@
+Data-epoch diagnostics [2m(/tmp/lingxi-r01-t07-sandbox/epoch2-home)[0m
+  Kernel DATA_EPOCH    1
+  Stamp                minimumReaderEpoch=2 committedDataEpoch=2
+  Last written by      9.9.9-rust-prototype at 2026-09-25T11:05:32.752542+00:00
+  Journal              [2mnone[0m
+  Maintenance          [32msteady, no transition in progress[0m
+  Checkpoints          [2mnone available[0m
+EXIT_CODE=0

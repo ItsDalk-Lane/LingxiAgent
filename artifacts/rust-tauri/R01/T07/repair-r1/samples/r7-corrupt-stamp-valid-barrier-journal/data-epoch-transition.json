@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "transitionId": "repair-r1-transition-0002",
+  "fromEpoch": 1,
+  "toEpoch": 2,
+  "migrationIds": [
+    "m-repair-r1-0002"
+  ],
+  "affectedStoreIds": [
+    "session-jsonl"
+  ],
+  "recoveryModes": {
+    "m-repair-r1-0002": "resume-idempotent"
+  },
+  "phase": "barrier_raised",
+  "checkpointId": "ckpt-repair-r1-0002",
+  "checkpointReceipt": {
+    "id": "ckpt-repair-r1-0002",
+    "createdAt": "2026-09-25T00:00:00.000Z",
+    "storeDigests": {
+      "session-jsonl": "sha256:repair-r1-synthetic"
+    }
+  },
+  "createdAt": "2026-09-25T00:00:00.000Z",
+  "updatedAt": "2026-09-25T12:24:37.258Z",
+  "lastVersion": "0.0.0-repair-r1-newworld"
+}

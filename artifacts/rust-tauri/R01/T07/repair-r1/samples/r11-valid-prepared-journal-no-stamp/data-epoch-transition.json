@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "transitionId": "repair-r1-transition-0003",
+  "fromEpoch": 1,
+  "toEpoch": 2,
+  "migrationIds": [
+    "m-repair-r1-0003"
+  ],
+  "affectedStoreIds": [
+    "session-jsonl"
+  ],
+  "recoveryModes": {
+    "m-repair-r1-0003": "resume-idempotent"
+  },
+  "phase": "prepared",
+  "checkpointId": null,
+  "checkpointReceipt": null,
+  "createdAt": "2026-09-25T00:00:00.000Z",
+  "updatedAt": "2026-09-25T12:24:37.259Z",
+  "lastVersion": "0.0.0-repair-r1-newworld"
+}

@@ -1,0 +1,8 @@
+step1 PRECHECK ok: active->epoch-2, stamp committed=2, no server running (drill assumption)
+step2 W06-BACKUP ok: integrity_check=ok rows=4 post_cutover_rows=2
+step3 EXPORT ok: archive entries=4
+step4 RESTORE ok: active -> /tmp/lingxi-r01-t07-sandbox/rollback/root/epoch-1-restored (atomic rename swap)
+step5 OLD-BINARY ok: STARTED=1 on restored epoch-1; epoch-2 root byte-identical
+step6 ARCHIVE-VERIFY ok: 4 files sha256-verified
+step7 REIMPORT-IDEMPOTENT ok: logical-content sha256 stable across two merges (8659059db92e6a51…)
+ROLLBACK-DRILL-PASSED

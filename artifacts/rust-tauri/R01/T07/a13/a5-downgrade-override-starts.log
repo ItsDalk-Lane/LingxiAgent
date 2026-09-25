@@ -1,0 +1,115 @@
+[data-epoch] WARNING: opening minimum reader epoch 2 with kernel epoch 1; the explicit downgrade override accepts possible data corruption. 警告：正在用 epoch=1 的旧内核打开最低读取要求为 epoch=2 的数据目录，显式降级覆盖已接受潜在的数据损坏风险。
+[server] ① ensureFirstRun...
+[first-run] 首次启动，正在创建默认助手...
+[first-run] 默认助手 "lingxi" 已创建
+[server] ① ensureFirstRun 完成
+[server] ① ensureLocalIdentityRegistries...
+[server] ① ensureLocalIdentityRegistries 完成
+[server] ② 创建 LingxiEngine...
+[server] ② LingxiEngine 构造完成，开始 init...
+[server] [migrations] _dataVersion=0，待执行 1 条迁移
+[server] [migrations] #54 完成
+[server] [credential-custody] tightened .
+[server] [credential-custody] tightened users.json
+[server] [credential-custody] tightened security
+[server] [credential-custody] tightened security/execution-leases.json
+[server] [credential-custody] tightened security/grants.json
+[server] [init] 1/5 Pi SDK 初始化...
+[server] [init] 1/5 AuthStorage + ModelRegistry + 0 个模型就绪
+[server] [init] 2/5 初始化所有 agent...
+[server]   [compat] dirs: 创建了 4 个缺失目录
+[server]   [compat] 3 项检查完成，1 项已修复
+[server]   [agent] 1. loadConfig...
+[server]   [agent] 1. loadConfig 完成
+[server]   [agent] 3. 模块初始化完成
+[server]   [agent] 4. FactStore...
+[fact-store] schema migrated: v0 → v3
+[server]   [agent] 4. FactStore + SummaryManager 完成
+[aux-resolver] resolveAuxiliaryExecution(memory): no model (unconfigured, fallback=chat)
+[agent] 记忆系统暂不可用：memory slot 未配置且无 chat 可 fallback
+[server]   [agent] 4. memoryTicker...
+[server]   [agent] 4. memoryTicker 创建完成
+[memory-ticker] v3 已启动（turn-based，每日任务备用 timer 1h）
+[server]   [agent] 7. 创建工具...
+[server]   [agent] 8. Desk 系统...
+[server]   [agent] 9. buildSystemPrompt...
+[server]   [agent] init 全部完成
+[memory-ticker] 每日任务开始 (2026-09-25)
+[aux-resolver] resolveAuxiliaryExecution(memory): no model (unconfigured, fallback=chat)
+[memory-ticker] week.md 迁移失败: memory slot resolved to null (no model configured and no chat fallback)
+[aux-resolver] resolveAuxiliaryExecution(memory): no model (unconfigured, fallback=chat)
+[server] [init] 1 个 agent 已加载配置，焦点 runtime 已就绪
+[server] [init] 2/5 1 个 agent 已就绪
+[server] [init] 3/5 ResourceLoader 初始化...
+[memory-ticker] compileDaily 失败: memory slot resolved to null (no model configured and no chat fallback)
+[aux-resolver] resolveAuxiliaryExecution(memory): no model (unconfigured, fallback=chat)
+[memory-ticker] compileToday(daily) 失败: memory slot resolved to null (no model configured and no chat fallback)
+[aux-resolver] resolveAuxiliaryExecution(memory): no model (unconfigured, fallback=chat)
+[memory-ticker] compileFacts 失败: memory slot resolved to null (no model configured and no chat fallback)
+[agent] Lingxi 记忆编译完成，system prompt 已刷新
+[aux-resolver] resolveAuxiliaryExecution(summarize): no model (unconfigured, fallback=chat)
+[aux-resolver] resolveAuxiliaryExecution(memory): no model (unconfigured, fallback=chat)
+[memory-ticker] deep-memory 失败: memory slot resolved to null (no model configured and no chat fallback)
+[memory-ticker] 每日任务部分失败，已完成: []，1 小时后重试未完成步骤
+[agent-mgr] [description] lingxi: 生成跳过（LLM 不可用或返回空）
+[aux-resolver] resolveAuxiliaryExecution(memory): no model (unconfigured, fallback=chat)
+[memory-ticker] compileToday 失败: memory slot resolved to null (no model configured and no chat fallback)
+[server] [init] 3/5 ResourceLoader 完成 (12ms, 20 skills, 16 external)
+[server] [init] 4/5 发现可用模型...
+[server] [init] 4/5 找到 0 个模型: 
+[engine] ⚠ 未找到可用模型，请在设置中配置 API key
+[server] ✿ 沙盒已启用
+[aux-resolver] resolveAuxiliaryExecution(summarize): no model (unconfigured, fallback=chat)
+[server] ✿ 初始化完成（0.1s）
+[server] ② engine.init 完成
+[aux-resolver] resolveAuxiliaryExecutionSync(summarize): no model (unconfigured, fallback=chat)
+[agent-mgr] [description] lingxi: 生成跳过（LLM 不可用或返回空）
+[plugin-manager] loading plugin "beautify"...
+[plugin-manager] loading "beautify" tools...
+[plugin-manager] loaded "beautify" tools (4ms)
+[plugin-manager] loading "beautify" configuration...
+[plugin-manager] loaded "beautify" configuration (0ms)
+[plugin-manager] loading "beautify" lifecycle import...
+[plugin-manager] loaded "beautify" lifecycle import (1ms)
+[plugin-manager] loading "beautify" lifecycle onload...
+[plugin:beautify] beautify plugin loaded
+[plugin-manager] loaded "beautify" lifecycle onload (0ms)
+[plugin-manager] plugin "beautify" loaded (6ms)
+[plugin-manager] loading plugin "jimeng-cli"...
+[plugin-manager] loading "jimeng-cli" providers...
+[plugin-manager] loaded "jimeng-cli" providers (0ms)
+[plugin-manager] loading "jimeng-cli" lifecycle import...
+[plugin-manager] loaded "jimeng-cli" lifecycle import (2ms)
+[plugin-manager] loading "jimeng-cli" lifecycle onload...
+[media] adapter registered: jimeng-cli-images
+[plugin:jimeng-cli] jimeng-cli adapter registered: jimeng-cli-images
+[media] adapter registered: jimeng-cli-videos
+[plugin:jimeng-cli] jimeng-cli adapter registered: jimeng-cli-videos
+[plugin-manager] loaded "jimeng-cli" lifecycle onload (1ms)
+[plugin-manager] plugin "jimeng-cli" loaded (4ms)
+[plugin-manager] loading plugin "media"...
+[plugin-manager] loading "media" tools...
+[plugin-manager] loaded "media" tools (2ms)
+[plugin-manager] plugin "media" loaded (2ms)
+[plugin-manager] loading plugin "office"...
+[plugin-manager] loading "office" tools...
+[plugin-manager] loaded "office" tools (2ms)
+[plugin-manager] plugin "office" loaded (3ms)
+[cron] 调度器已启动（间隔 60 秒）
+[scheduler] Studio cron 已启动
+[server] ⚠ 无可用模型，跳过 session 创建：available models list is empty (no provider has valid api_key + models)
+[server] LingxiAgent Server 运行在 http://127.0.0.1:18815
+[server] ready: port=18815
+[server] Bridge manager 初始化...
+[server] Bridge manager 初始化完成
+[aux-resolver] resolveAuxiliaryExecution(summarize): no model (unconfigured, fallback=chat)
+[agent-mgr] [description] lingxi: 生成跳过（LLM 不可用或返回空）
+[server] 
+正在关闭...
+[server] HTTP server 已关闭
+[media] adapter unregistered: jimeng-cli-videos
+[media] adapter unregistered: jimeng-cli-images
+[session] sessions cleaned up
+[server] Hub + Engine 已清理
+EXIT_CODE=0
+EFFECTIVE_HOME_CHECK:

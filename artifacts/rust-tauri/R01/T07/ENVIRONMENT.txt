@@ -1,0 +1,10 @@
+date: 2026-09-25T11:26:32Z
+os: Darwin 27.0.0 arm64 (27.0)
+node: v24.16.0
+npm: 11.13.0
+python3: Python 3.14.3
+repo HEAD: 82870879d02b23a03c65fcf6cb9fb03b1425012b
+branch: codex/rust-tauri-migration
+sandbox: /tmp/lingxi-r01-t07-sandbox (synthetic only; no real user data)
+proxy env stripped in all probes: all_proxy ALL_PROXY http_proxy HTTP_PROXY https_proxy HTTPS_PROXY
+old binary basis: current-HEAD production entries (node server/main-full.ts; node cli/entry.ts) — scripts/launch.js bypassed because dev-env.js force-overrides LINGXI_HOME to ~/.lingxi-dev (scripts/dev-env.js:11)

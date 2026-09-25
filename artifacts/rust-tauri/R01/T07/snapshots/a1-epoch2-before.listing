@@ -1,0 +1,10 @@
+D .
+D ./agents
+D ./agents/agent-main
+D ./agents/agent-main/sessions
+F ./agents/agent-main/sessions/sentinel.jsonl
+D ./attachments
+F ./attachments/blob-aa11.bin
+F ./data-epoch.json
+D ./runs
+F ./runs/run-2026-0001.json

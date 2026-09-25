@@ -1,0 +1,14 @@
+{
+  "result": "ROLLBACK-DRILL-PASSED",
+  "post_cutover_messages_preserved": 2,
+  "archive": "/tmp/lingxi-r01-t07-sandbox/rollback/rollback-archive",
+  "restored_root": "/tmp/lingxi-r01-t07-sandbox/rollback/root/epoch-1-restored",
+  "epoch2_untouched": true,
+  "old_binary_started_on_restored": true,
+  "reimport_idempotent": true,
+  "not_possible_in_old_version": [
+    "editing/browsing post-cutover sessions (they live only in the rollback archive + epoch-2 root)",
+    "resuming post-cutover runs",
+    "seeing post-cutover attachments in the old UI (files preserved in archive, re-import on next forward-roll)"
+  ]
+}

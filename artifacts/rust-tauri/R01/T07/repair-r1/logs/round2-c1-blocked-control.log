@@ -1,0 +1,7 @@
+LINGXI_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked
+此数据目录要求数据 epoch=2 或更高版本的内核 (last opened by version 0.0.0-repair-r1-newworld)，本内核 epoch=1。继续使用旧内核可能静默损坏数据。请升级到较新版本，或在确认风险后设置 LINGXI_ALLOW_DATA_DOWNGRADE=1（或对 hana serve 传 --allow-data-downgrade）。
+This data directory requires a kernel at data epoch=2 or newer (last opened by version 0.0.0-repair-r1-newworld); this kernel is epoch=1. Continuing with an older kernel risks silent corruption. Upgrade, or explicitly accept the risk with LINGXI_ALLOW_DATA_DOWNGRADE=1 (or --allow-data-downgrade for hana serve).
+STARTED=0
+EXIT_CODE=1
+EFFECTIVE_HOME_CHECK (server-info.json read back from synthetic home):
+(no server-info.json in synthetic home)

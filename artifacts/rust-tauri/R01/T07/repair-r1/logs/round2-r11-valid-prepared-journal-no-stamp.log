@@ -1,0 +1,11 @@
+LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE reason=incomplete-transition
+[data-epoch] 数据安全闸拒绝启动（incomplete-transition）：transition is stopped at phase prepared
+位置：/tmp/lingxi-r01t07-repair-r1/homes/r11-valid-prepared-journal-no-stamp/data-epoch-transition.json
+请保留检查点与过渡日志，使用维护/恢复流程处理；普通启动不会自动续跑或回滚。
+[data-epoch] The data safety gate refused startup (incomplete-transition): transition is stopped at phase prepared
+Location: /tmp/lingxi-r01t07-repair-r1/homes/r11-valid-prepared-journal-no-stamp/data-epoch-transition.json
+Keep the checkpoint and transition journal, then use the maintenance/recovery flow; ordinary startup will not auto-resume or roll back.
+STARTED=0
+EXIT_CODE=1
+EFFECTIVE_HOME_CHECK (server-info.json read back from synthetic home):
+(no server-info.json in synthetic home)
