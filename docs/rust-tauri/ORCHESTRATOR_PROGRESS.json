@@ -4,7 +4,7 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "4fa0b573ce8cb9b574d78e72b72455f98e360273",
+  "current_head": "8994c67bc48f607769c50299a6c59e638425a58b",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -1376,29 +1376,81 @@
     "R01-T06": {
       "name": "系统能力与桌面安全原型",
       "stage_id": "R01",
-      "status": "IN_PROGRESS",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
-      "repair_agent_id": null,
+      "status": "DONE",
+      "task_base_sha": "76bd42c439e180163b150a0058bd6c9e4875c940",
+      "executor_id": "ZCode:R01-T06-exec-r1 (agent_32e97678-9102-4a0c-aad2-7687d7ad8987)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 2,
+      "reviewer_id": "ZCode:R01-T06-review-r2 (agent_fbed8cb6-426d-430d-9465-8260b97712dc)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-F1",
+          "severity": "LOW",
+          "summary": "指控矩阵 screen 项行号写反——经修复方与 R2 复验双方行级源码核对，系验收方误读，矩阵本就正确",
+          "review_report": "docs/rust-tauri/R01/R01-T06_REVIEW_R1.md",
+          "resolution": "不改矩阵；R2 裁定否证成立（git show HEAD:desktop/main.cjs 行级证据）"
+        },
+        {
+          "id": "R1-F2",
+          "severity": "LOW",
+          "summary": "PLATFORM_BUILD_MATRIX 步数 18→15",
+          "review_report": "docs/rust-tauri/R01/R01-T06_REVIEW_R1.md",
+          "resolution": "repair-r1 更正，R2 关闭"
+        },
+        {
+          "id": "R1-F3",
+          "severity": "LOW",
+          "summary": "'spike manifest 自带 [workspace]'字面失实",
+          "review_report": "docs/rust-tauri/R01/R01-T06_REVIEW_R1.md",
+          "resolution": "repair-r1 四处措辞更正，R2 关闭"
+        },
+        {
+          "id": "R1-F4",
+          "severity": "LOW",
+          "summary": "crash-recovery 步只记 probe 退出码不校验恢复语义（符号链接轮假绿）",
+          "review_report": "docs/rust-tauri/R01/R01-T06_REVIEW_R1.md",
+          "resolution": "repair-r1 realpath 入口+恢复语义断言+sabotage 负向 exit=1，R2 关闭"
+        }
+      ],
+      "repair_agent_id": "ZCode:R01-T06-repair-r1 (agent_9d9020d9-7310-45ab-a714-ec88d73793cb)",
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R01-A11": "NOT_STARTED",
-        "R01-A12": "NOT_STARTED"
+        "R01-A11": "PASS",
+        "R01-A12": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "8994c67bc48f607769c50299a6c59e638425a58b",
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "review_report": "docs/rust-tauri/R01/R01-T06_REVIEW_R2.md",
+      "review_report_sha256": "b506be877c51f359988b7dedfd9b6b206d4588025553c9954e4c32059ce5005e",
+      "review_history": [
+        {
+          "round": 1,
+          "verdict": "PASS(with F1-F4)",
+          "report": "docs/rust-tauri/R01/R01-T06_REVIEW_R1.md",
+          "sha256": "7e6d8e38971169e028dfafaf7c93350e592a52472233d01cd3312b1d6c305a00"
+        },
+        {
+          "round": "repair-1",
+          "report": "docs/rust-tauri/R01/R01-T06_REPAIR_R1.md",
+          "sha256": "33f83da10b549679777cfac38ddc6a476912d0d527b40f51c8323d0be303320b"
+        },
+        {
+          "round": 2,
+          "verdict": "PASS",
+          "report": "docs/rust-tauri/R01/R01-T06_REVIEW_R2.md",
+          "sha256": "b506be877c51f359988b7dedfd9b6b206d4588025553c9954e4c32059ce5005e"
+        }
+      ],
+      "repair_rounds_completed": 1,
+      "notes": "原型 app-test/app-release 二进制（约124MB，6份）未入库，可由 spike/tauri-shell 锁定工具链复现；验收时二进制 SHA-256 录于 SHA256SUMS/SHASUMS-binaries.txt；rust/target 2.8G 残留已清"
     },
     "R01-T07": {
       "name": "确定存储切换与旧版本拒写策略",
       "stage_id": "R01",
-      "status": "PENDING",
-      "task_base_sha": null,
+      "status": "IN_PROGRESS",
+      "task_base_sha": "8994c67bc48f607769c50299a6c59e638425a58b",
       "executor_id": null,
       "execution_result": null,
       "review_round": 0,
@@ -3201,7 +3253,7 @@
       "blockers": []
     }
   },
-  "current_task": "R01-T06",
+  "current_task": "R01-T07",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",
