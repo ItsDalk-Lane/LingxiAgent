@@ -435,6 +435,14 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
                 return RoutePolicy::Scope("chat");
             }
         }
+        // R02-T05: event snapshot / cursor continuation page (same scope
+        // as the session read it projects; ownership is re-checked per
+        // request against the session the stream belongs to).
+        if let Some(id) = rest.strip_suffix("/events") {
+            if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
+                return RoutePolicy::Scope("chat");
+            }
+        }
         // Known session subtree, wrong verb/shape: local only (fail closed).
         return RoutePolicy::LocalOnly;
     }

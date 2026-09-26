@@ -442,6 +442,17 @@ pub enum WsClientRequest {
         #[serde(rename = "sessionId")]
         session_id: String,
     },
+    /// R02-T05 event subscription: `streamId` + optional server-issued
+    /// `cursor` (resume). Answers with a `subscribed`/`snapshot_required`
+    /// CONTROL frame (see `events.rs`), then business-event frames —
+    /// which are bare canonical `EventEnvelope` objects (PROTOCOL_SPEC
+    /// §5), never mixed into the control class.
+    SubscribeEvents {
+        #[serde(rename = "streamId")]
+        stream_id: String,
+        #[serde(default)]
+        cursor: Option<lingxi_protocol::Cursor>,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]

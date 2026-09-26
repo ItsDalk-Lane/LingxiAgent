@@ -30,6 +30,7 @@ use lingxi_protocol::{
 };
 
 use crate::auth::{Principal, PrincipalKind, LOCAL_OWNER_USER_ID};
+use crate::events::EventService;
 
 /// Summary shape returned by the read endpoint (runs carry only committed
 /// facts; no echo of failed attempts).
@@ -282,7 +283,9 @@ impl SessionStore {
 
     /// Executes: persists a run (start + terminal outcome with its key
     /// events, each as one storage-port transaction) bound to the
-    /// authenticated principal. Storage failures surface as
+    /// authenticated principal, and publishes each commit's events
+    /// strictly AFTER the commit returned Ok (R02-T05 wiring of the T04
+    /// authority chain). Storage failures surface as
     /// [`SessionExecuteError::Storage`] — no visible success (R02-A07).
     ///
     /// The R02 representative run completes WITHOUT a final assistant
@@ -292,6 +295,7 @@ impl SessionStore {
     pub async fn execute_for<P: StoragePort>(
         &self,
         port: &P,
+        events: &EventService,
         principal: &Principal,
         session_id: &str,
         input: &str,
@@ -327,9 +331,14 @@ impl SessionStore {
 
         // 1) Durable run start (one transaction: run row + attempt row +
         //    run_state_changed queued→running key event).
-        port.record_run_started(&ctx, now_ms)
+        let started = port
+            .record_run_started(&ctx, now_ms)
             .await
             .map_err(SessionExecuteError::Storage)?;
+        // Publication happens HERE, strictly after the commit returned Ok:
+        // the hub only ever sees events that are already durable (slow or
+        // absent subscribers catch up from the storage authority).
+        events.publish_committed(&started.events);
 
         // 2) Terminal outcome in one transaction with its key event.
         //    Failed -> no success response, no completion event visible.
@@ -352,9 +361,9 @@ impl SessionStore {
             .commit_run_outcome(&ctx, outcome, now_ms)
             .await
             .map_err(SessionExecuteError::Storage)?;
-        // Publication happens HERE, strictly after the commit returned Ok:
-        // until R02-T05 wires the event streams, publication is the HTTP
-        // response plus this audit log line.
+        events.publish_committed(&committed.events);
+        // Post-commit audit trail (the durable log remains the authority;
+        // live delivery is the event service's job now).
         tracing::info!(
             run_id = %run_id,
             session_id = %session_id,
@@ -441,8 +450,35 @@ fn kernel_principal_of(principal: &Principal) -> KernelPrincipal {
 mod tests {
     use super::*;
     use crate::auth::{ConnectionKindSerde, CredentialKind, PrincipalKind as Pk, TrustState};
+    use crate::events::EventLimits;
     use lingxi_kernel::ports::{CommittedOutcome, KeyEvent};
     use std::sync::Mutex as StdMutex;
+
+    /// Real event service over a real (temp) run database: the publication
+    /// path in these unit tests runs the SAME code as production, never a
+    /// mocked hub (only the session backend stays in-memory because these
+    /// tests exercise ownership logic, not persistence — persistence is
+    /// covered by service_persistence.rs / event_subscription.rs).
+    async fn event_service_for_test() -> (EventService, std::path::PathBuf) {
+        static SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+        let dir = std::env::temp_dir().join(format!(
+            "lingxi-r02t05-sessunit-{}-{}",
+            std::process::id(),
+            SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+        ));
+        std::fs::create_dir_all(&dir).expect("create temp dir");
+        let db = std::sync::Arc::new(
+            lingxi_adapters::storage::RunDatabase::open(
+                &dir.join("runs.db"),
+                lingxi_adapters::storage::StoreOptions::default(),
+            )
+            .await
+            .expect("open event read db"),
+        );
+        let sessions = std::sync::Arc::new(SessionStore::new((*db).clone()));
+        let service = EventService::new(db, sessions, EventLimits::default()).expect("limits");
+        (service, dir)
+    }
 
     fn owner_principal() -> Principal {
         Principal {
@@ -606,11 +642,12 @@ mod tests {
             runs,
             outcomes: StdMutex::new(Vec::new()),
         };
+        let (events, dir) = event_service_for_test().await;
         let owner = owner_principal();
         assert_eq!(store.list_for(&owner).await.unwrap().len(), 2);
 
         let accepted = store
-            .execute_for(&port, &owner, "sess_local_alpha", "hello", 1234)
+            .execute_for(&port, &events, &owner, "sess_local_alpha", "hello", 1234)
             .await
             .unwrap();
         assert_eq!(accepted.run_count, 1);
@@ -625,6 +662,8 @@ mod tests {
             SessionAccess::Ok(_) => {}
             other => panic!("owner read must succeed, got {other:?}"),
         }
+        drop(events);
+        let _ = std::fs::remove_dir_all(dir);
     }
 
     #[tokio::test]
@@ -635,6 +674,7 @@ mod tests {
             runs,
             outcomes: StdMutex::new(Vec::new()),
         };
+        let (events, dir) = event_service_for_test().await;
         let foreign = device_principal("user_remote_b");
         assert!(
             store.list_for(&foreign).await.unwrap().is_empty(),
@@ -645,7 +685,7 @@ mod tests {
             other => panic!("cross-principal read must be Forbidden, got {other:?}"),
         }
         match store
-            .execute_for(&port, &foreign, "sess_local_alpha", "inject", 1500)
+            .execute_for(&port, &events, &foreign, "sess_local_alpha", "inject", 1500)
             .await
         {
             Err(SessionExecuteError::Forbidden) => {}
@@ -660,6 +700,8 @@ mod tests {
             SessionAccess::NotFound => {}
             other => panic!("unknown session must be NotFound, got {other:?}"),
         }
+        drop(events);
+        let _ = std::fs::remove_dir_all(dir);
     }
 
     #[tokio::test]
@@ -680,9 +722,10 @@ mod tests {
             runs,
             outcomes: StdMutex::new(Vec::new()),
         };
+        let (events, dir) = event_service_for_test().await;
         let owner = owner_principal();
         match store
-            .execute_for(&port, &owner, "sess_local_alpha", "hello", 1234)
+            .execute_for(&port, &events, &owner, "sess_local_alpha", "hello", 1234)
             .await
         {
             Err(SessionExecuteError::Storage(StorageError::Io { detail })) => {
@@ -694,6 +737,8 @@ mod tests {
             port.outcomes.lock().unwrap().is_empty(),
             "no outcome may be committed on failure"
         );
+        drop(events);
+        let _ = std::fs::remove_dir_all(dir);
     }
 
     #[test]

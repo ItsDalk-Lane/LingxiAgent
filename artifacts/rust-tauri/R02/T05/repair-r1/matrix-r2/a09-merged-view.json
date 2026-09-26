@@ -1,0 +1,195 @@
+{
+ "controls": [
+  {
+   "frameKind": "control",
+   "fromSeq": "0",
+   "mode": "snapshot",
+   "snapshotSeq": "4",
+   "streamId": "sess_local_alpha",
+   "type": "subscribed"
+  }
+ ],
+ "events": [
+  {
+   "attempt": "run_000001a0ddca6d5d_000001#a1",
+   "eventId": "run_000001a0ddca6d5d_000001-start",
+   "eventType": "run_state_changed",
+   "payload": {
+    "from": "queued",
+    "to": "running",
+    "type": "run_state_changed"
+   },
+   "runId": "run_000001a0ddca6d5d_000001",
+   "schemaVersion": 1,
+   "seq": "1",
+   "sessionId": "sess_local_alpha",
+   "streamId": "sess_local_alpha"
+  },
+  {
+   "attempt": "run_000001a0ddca6d5d_000001#a1",
+   "eventId": "run_000001a0ddca6d5d_000001-done",
+   "eventType": "run_state_changed",
+   "payload": {
+    "from": "running",
+    "to": "completed",
+    "type": "run_state_changed"
+   },
+   "runId": "run_000001a0ddca6d5d_000001",
+   "schemaVersion": 1,
+   "seq": "2",
+   "sessionId": "sess_local_alpha",
+   "streamId": "sess_local_alpha"
+  },
+  {
+   "attempt": "run_000001a0ddca6d5f_000002#a1",
+   "eventId": "run_000001a0ddca6d5f_000002-start",
+   "eventType": "run_state_changed",
+   "payload": {
+    "from": "queued",
+    "to": "running",
+    "type": "run_state_changed"
+   },
+   "runId": "run_000001a0ddca6d5f_000002",
+   "schemaVersion": 1,
+   "seq": "3",
+   "sessionId": "sess_local_alpha",
+   "streamId": "sess_local_alpha"
+  },
+  {
+   "attempt": "run_000001a0ddca6d5f_000002#a1",
+   "eventId": "run_000001a0ddca6d5f_000002-done",
+   "eventType": "run_state_changed",
+   "payload": {
+    "from": "running",
+    "to": "completed",
+    "type": "run_state_changed"
+   },
+   "runId": "run_000001a0ddca6d5f_000002",
+   "schemaVersion": 1,
+   "seq": "4",
+   "sessionId": "sess_local_alpha",
+   "streamId": "sess_local_alpha"
+  },
+  {
+   "attempt": "run_000001a0ddca6d61_000003#a1",
+   "eventId": "run_000001a0ddca6d61_000003-start",
+   "eventType": "run_state_changed",
+   "payload": {
+    "from": "queued",
+    "to": "running",
+    "type": "run_state_changed"
+   },
+   "runId": "run_000001a0ddca6d61_000003",
+   "schemaVersion": 1,
+   "seq": "5",
+   "sessionId": "sess_local_alpha",
+   "streamId": "sess_local_alpha"
+  },
+  {
+   "attempt": "run_000001a0ddca6d61_000003#a1",
+   "eventId": "run_000001a0ddca6d61_000003-done",
+   "eventType": "run_state_changed",
+   "payload": {
+    "from": "running",
+    "to": "completed",
+    "type": "run_state_changed"
+   },
+   "runId": "run_000001a0ddca6d61_000003",
+   "schemaVersion": 1,
+   "seq": "6",
+   "sessionId": "sess_local_alpha",
+   "streamId": "sess_local_alpha"
+  },
+  {
+   "attempt": "run_000001a0ddca6d62_000004#a1",
+   "eventId": "run_000001a0ddca6d62_000004-start",
+   "eventType": "run_state_changed",
+   "payload": {
+    "from": "queued",
+    "to": "running",
+    "type": "run_state_changed"
+   },
+   "runId": "run_000001a0ddca6d62_000004",
+   "schemaVersion": 1,
+   "seq": "7",
+   "sessionId": "sess_local_alpha",
+   "streamId": "sess_local_alpha"
+  },
+  {
+   "attempt": "run_000001a0ddca6d62_000004#a1",
+   "eventId": "run_000001a0ddca6d62_000004-done",
+   "eventType": "run_state_changed",
+   "payload": {
+    "from": "running",
+    "to": "completed",
+    "type": "run_state_changed"
+   },
+   "runId": "run_000001a0ddca6d62_000004",
+   "schemaVersion": 1,
+   "seq": "8",
+   "sessionId": "sess_local_alpha",
+   "streamId": "sess_local_alpha"
+  },
+  {
+   "attempt": "run_000001a0ddca6d63_000005#a1",
+   "eventId": "run_000001a0ddca6d63_000005-start",
+   "eventType": "run_state_changed",
+   "payload": {
+    "from": "queued",
+    "to": "running",
+    "type": "run_state_changed"
+   },
+   "runId": "run_000001a0ddca6d63_000005",
+   "schemaVersion": 1,
+   "seq": "9",
+   "sessionId": "sess_local_alpha",
+   "streamId": "sess_local_alpha"
+  },
+  {
+   "attempt": "run_000001a0ddca6d63_000005#a1",
+   "eventId": "run_000001a0ddca6d63_000005-done",
+   "eventType": "run_state_changed",
+   "payload": {
+    "from": "running",
+    "to": "completed",
+    "type": "run_state_changed"
+   },
+   "runId": "run_000001a0ddca6d63_000005",
+   "schemaVersion": 1,
+   "seq": "10",
+   "sessionId": "sess_local_alpha",
+   "streamId": "sess_local_alpha"
+  },
+  {
+   "attempt": "run_000001a0ddca6d64_000006#a1",
+   "eventId": "run_000001a0ddca6d64_000006-start",
+   "eventType": "run_state_changed",
+   "payload": {
+    "from": "queued",
+    "to": "running",
+    "type": "run_state_changed"
+   },
+   "runId": "run_000001a0ddca6d64_000006",
+   "schemaVersion": 1,
+   "seq": "11",
+   "sessionId": "sess_local_alpha",
+   "streamId": "sess_local_alpha"
+  },
+  {
+   "attempt": "run_000001a0ddca6d64_000006#a1",
+   "eventId": "run_000001a0ddca6d64_000006-done",
+   "eventType": "run_state_changed",
+   "payload": {
+    "from": "running",
+    "to": "completed",
+    "type": "run_state_changed"
+   },
+   "runId": "run_000001a0ddca6d64_000006",
+   "schemaVersion": 1,
+   "seq": "12",
+   "sessionId": "sess_local_alpha",
+   "streamId": "sess_local_alpha"
+  }
+ ],
+ "snapshotSeq": 4
+}

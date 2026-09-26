@@ -23,6 +23,7 @@
 
 pub mod auth;
 pub mod config;
+pub mod events;
 pub mod instance;
 pub mod limits;
 pub mod paths;
@@ -38,6 +39,12 @@ pub use auth::{
 pub use config::{
     parse_cli, read_config_home, resolve_effective_home, CliOptions, ConfigError, HomeSource,
     IgnoredHomeSource, ResolvedHome, HOME_ENV_VAR,
+};
+pub use events::{
+    control_frame_of_detach, control_snapshot_required_json, control_subscribed_json, DetachReason,
+    EventCut, EventHub, EventLimits, EventService, SnapshotRequired, SubscribeCursor,
+    SubscribeOutcome, SubscribePageError, SubscribeReject, SubscriberStats, SubscriptionFrame,
+    SubscriptionGuard,
 };
 pub use instance::{
     acquire, probe_peer, InstanceGuard, InstanceIdentity, InstanceLockError, InstanceRecord,
@@ -210,8 +217,7 @@ pub struct HealthResponse {
 }
 
 /// Live service state shared by handlers: the injected port implementations
-/// (auth / tickets / storage / sessions / limits) live here — events
-/// arrive with R02-T05.
+/// (auth / tickets / storage / sessions / events / limits) live here.
 #[derive(Clone)]
 pub struct ServiceState {
     config: Arc<ServiceConfig>,
@@ -219,6 +225,7 @@ pub struct ServiceState {
     tickets: Arc<WsTicketService>,
     storage: Arc<RunDatabase>,
     sessions: Arc<sessions::SessionStore>,
+    events: Arc<events::EventService>,
     rate: Arc<limits::RateLimiter>,
     ws_conns: Arc<limits::WsConnectionCounter>,
 }
@@ -332,7 +339,20 @@ impl ServiceState {
             .ensure_session_seed(sessions::SessionStore::seed_rows(auth::now_unix_ms()))
             .await
             .map_err(ServiceStartupError::Storage)?;
-        let session_store = sessions::SessionStore::new(storage.clone());
+        let storage = Arc::new(storage);
+        let session_store = sessions::SessionStore::new((*storage).clone());
+        let session_arc = Arc::new(session_store);
+        // R02-T05: the event subscription service over the same durable
+        // log (snapshot/cursor protocol + post-commit publication hub).
+        // Limits are the production defaults here; overflow/flow-control
+        // tests inject smaller ones through their own EventService
+        // instances (the hub semantics are identical).
+        let events = events::EventService::new(
+            Arc::clone(&storage),
+            Arc::clone(&session_arc),
+            events::EventLimits::default(),
+        )
+        .map_err(ServiceStartupError::Storage)?;
         Ok(Self {
             config: Arc::new(config),
             auth: Arc::new(auth),
@@ -340,8 +360,9 @@ impl ServiceState {
                 ws_ticket_ttl_ms,
                 ws::DEFAULT_WS_MAX_TICKETS,
             )),
-            storage: Arc::new(storage),
-            sessions: Arc::new(session_store),
+            storage,
+            sessions: session_arc,
+            events: Arc::new(events),
             rate: Arc::new(limits::RateLimiter::new(rate_window_ms, rate_max)),
             ws_conns: Arc::new(limits::WsConnectionCounter::new(ws_max_connections)),
         })
@@ -361,6 +382,12 @@ impl ServiceState {
 
     pub fn sessions(&self) -> &sessions::SessionStore {
         &self.sessions
+    }
+
+    /// The injected event subscription service (R02-T05: snapshot/cursor
+    /// protocol + post-commit publication hub).
+    pub fn events(&self) -> &Arc<events::EventService> {
+        &self.events
     }
 
     /// The injected storage port implementation (composition root handle
@@ -832,6 +859,141 @@ async fn get_session(
     }
 }
 
+/// `GET /lingxi/v1/sessions/{id}/events` — snapshot / cursor continuation
+/// page of the session's event stream (R02-T05). Transport DTO reusing the
+/// protocol `Page` semantics (`items`/`nextCursor`/`snapshotSeq` pin the
+/// boundary the following subscription joins at) plus the stream id.
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct EventsPageBody {
+    stream_id: String,
+    mode: &'static str,
+    from_seq: lingxi_protocol::Seq,
+    snapshot_seq: lingxi_protocol::Seq,
+    items: Vec<lingxi_protocol::EventEnvelope>,
+    next_cursor: Option<lingxi_protocol::Cursor>,
+}
+
+async fn session_events_page(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+    axum::extract::RawQuery(query): axum::extract::RawQuery,
+) -> Response {
+    // Query params: strict parse (unknown keys are hard errors, mirroring
+    // the closed-struct policy of the JSON bodies).
+    let pairs = ws::parse_query_pairs(query.as_deref().unwrap_or(""));
+    let mut cursor = None;
+    let mut limit = None;
+    for (key, value) in pairs {
+        match key.as_str() {
+            "cursor" => {
+                if cursor
+                    .replace(lingxi_protocol::Cursor::new(value))
+                    .is_some()
+                {
+                    return EndpointError::invalid_message("duplicate cursor query parameter")
+                        .into_response();
+                }
+            }
+            "limit" => match value.parse::<u32>() {
+                Ok(parsed) => limit = Some(parsed),
+                Err(_) => {
+                    return EndpointError::invalid_message(
+                        "limit must be a non-negative decimal integer",
+                    )
+                    .into_response();
+                }
+            },
+            other => {
+                return EndpointError::invalid_message(format!(
+                    "unknown query parameter {other:?}"
+                ))
+                .into_response();
+            }
+        }
+    }
+    match state
+        .events
+        .events_page(&principal, &session_id, cursor, limit)
+        .await
+    {
+        Ok(cut) => (
+            StatusCode::OK,
+            Json(EventsPageBody {
+                stream_id: cut.stream_id,
+                mode: cut.mode,
+                from_seq: cut.from_seq,
+                snapshot_seq: cut.snapshot_seq,
+                items: cut.events,
+                next_cursor: cut.next_cursor,
+            }),
+        )
+            .into_response(),
+        Err(events::SubscribePageError::CursorExpired(required)) => {
+            // The explicit rebuild directive (R02-A10): the client refetches
+            // a snapshot and resubscribes — never an empty page, never a
+            // silent replay.
+            let mut err = EndpointError::new(
+                StatusCode::CONFLICT,
+                ErrorCode::CursorExpired,
+                "cursor predates the retained event floor; refetch a snapshot",
+            );
+            let details = err.error.details.get_or_insert_with(serde_json::Map::new);
+            details.insert(
+                "reason".to_string(),
+                serde_json::Value::String("snapshot_required".to_string()),
+            );
+            // floorSeq mirrors the WS control frame: present only when the
+            // stream still retains events (a purge-emptied stream has no
+            // floor to name — the directive itself is the instruction).
+            if let Some(floor) = required.floor {
+                details.insert(
+                    "floorSeq".to_string(),
+                    serde_json::Value::String(floor.to_wire_string()),
+                );
+            }
+            details.insert(
+                "streamId".to_string(),
+                serde_json::Value::String(required.stream_id),
+            );
+            err.into_response()
+        }
+        Err(events::SubscribePageError::InvalidLimit { requested, max }) => {
+            EndpointError::invalid_message(format!("limit {requested} out of range 1..={max}"))
+                .into_response()
+        }
+        Err(events::SubscribePageError::Reject(reject)) => match &reject {
+            events::SubscribeReject::StreamNotFound { .. } => {
+                EndpointError::not_found().into_response()
+            }
+            events::SubscribeReject::Forbidden { .. } => {
+                EndpointError::forbidden("cross_principal_access").into_response()
+            }
+            events::SubscribeReject::MalformedCursor { detail } => {
+                EndpointError::invalid_message(format!("malformed cursor: {detail}"))
+                    .into_response()
+            }
+            events::SubscribeReject::StaleStreamCursor {
+                stream_id,
+                cursor_stream,
+            } => EndpointError::invalid_message(format!(
+                "cursor was issued for stream {cursor_stream:?}, not {stream_id:?} \
+                 (stale stream cursor)"
+            ))
+            .into_response(),
+            events::SubscribeReject::FutureCursor { seq, head, .. } => {
+                EndpointError::invalid_message(format!(
+                    "cursor seq {} is beyond the committed head {} (future cursor)",
+                    seq, head
+                ))
+                .into_response()
+            }
+            events::SubscribeReject::Storage(err) => EndpointError::storage(err).into_response(),
+        },
+    }
+}
+
 async fn execute_session(
     axum::Extension(principal): axum::Extension<Principal>,
     State(state): State<ServiceState>,
@@ -849,6 +1011,7 @@ async fn execute_session(
         .sessions
         .execute_for(
             storage.as_ref(),
+            state.events(),
             &principal,
             &session_id,
             &request.input,
@@ -1076,97 +1239,293 @@ async fn run_ws_session<IO>(
         }
     }
 
-    // 2. Request loop: per-message authorization through the SAME session
-    //    ownership rule as the HTTP read endpoint.
+    // 2. Request loop with interleaved event delivery (R02-T05): inbound
+    //    frames (session_read / subscribe_events / ping / close) race the
+    //    active subscription's mailbox; each event frame written to the
+    //    socket is a bare canonical EventEnvelope (PROTOCOL_SPEC §5),
+    //    control frames carry frameKind:"control".
+    let mut subscription: Option<events::SubscriptionGuard> = None;
     loop {
-        match ws::read_ws_frame(&mut io).await {
-            Ok(Some(ws::WsFrame::Text(bytes))) => {
-                let request: ws::WsClientRequest = match serde_json::from_slice(&bytes) {
-                    Ok(request) => request,
-                    Err(err) => {
-                        let error = ProtocolError::new(
-                            ErrorCode::InvalidMessage,
-                            format!("frame is not a valid ws request: {err}"),
-                            false,
-                        );
-                        let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
-                        let _ = ws::write_ws_close(
-                            &mut io,
-                            ws::WS_CLOSE_INVALID_MESSAGE,
-                            "invalid_message",
-                        )
-                        .await;
-                        return;
-                    }
-                };
-                let ws::WsClientRequest::SessionRead { session_id } = request;
-                let access = state.sessions.get_for(&principal, &session_id).await;
-                match access {
-                    Ok(sessions::SessionAccess::Ok(facts)) => {
-                        let message = ws::WsServerMessage::SessionReadResult {
-                            session_id: facts.session_id,
-                            run_count: facts.run_count,
+        let sub_mailbox = subscription.as_ref().map(|s| s.mailbox().clone());
+        let sub_frame = async {
+            match sub_mailbox {
+                Some(mailbox) => mailbox.recv().await,
+                None => std::future::pending::<Option<events::SubscriptionFrame>>().await,
+            }
+        };
+        tokio::select! {
+            incoming = ws::read_ws_frame(&mut io) => {
+                match incoming {
+                    Ok(Some(ws::WsFrame::Text(bytes))) => {
+                        let request: ws::WsClientRequest = match serde_json::from_slice(&bytes) {
+                            Ok(request) => request,
+                            Err(err) => {
+                                let error = ProtocolError::new(
+                                    ErrorCode::InvalidMessage,
+                                    format!("frame is not a valid ws request: {err}"),
+                                    false,
+                                );
+                                let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
+                                let _ = ws::write_ws_close(
+                                    &mut io,
+                                    ws::WS_CLOSE_INVALID_MESSAGE,
+                                    "invalid_message",
+                                )
+                                .await;
+                                return;
+                            }
                         };
-                        if let Err(err) =
-                            ws::write_ws_text(&mut io, &canon::canonical_bytes(&message)).await
-                        {
-                            tracing::warn!(%err, "cannot send ws reply");
+                        match request {
+                            ws::WsClientRequest::SessionRead { session_id } => {
+                                let access = state.sessions.get_for(&principal, &session_id).await;
+                                match access {
+                                    Ok(sessions::SessionAccess::Ok(facts)) => {
+                                        let message = ws::WsServerMessage::SessionReadResult {
+                                            session_id: facts.session_id,
+                                            run_count: facts.run_count,
+                                        };
+                                        if let Err(err) =
+                                            ws::write_ws_text(&mut io, &canon::canonical_bytes(&message)).await
+                                        {
+                                            tracing::warn!(%err, "cannot send ws reply");
+                                            return;
+                                        }
+                                    }
+                                    Ok(sessions::SessionAccess::NotFound) => {
+                                        let error =
+                                            ProtocolError::new(ErrorCode::NotFound, "session not found", false);
+                                        let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
+                                        let _ =
+                                            ws::write_ws_close(&mut io, ws::WS_CLOSE_NOT_FOUND, "not_found").await;
+                                        return;
+                                    }
+                                    Ok(sessions::SessionAccess::Forbidden) => {
+                                        let error = ProtocolError::new(
+                                            ErrorCode::Forbidden,
+                                            "session belongs to another principal",
+                                            false,
+                                        )
+                                        .with_details(serde_json::Map::from_iter([(
+                                            "reason".to_string(),
+                                            serde_json::Value::String("cross_principal_access".to_string()),
+                                        )]));
+                                        let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
+                                        let _ =
+                                            ws::write_ws_close(&mut io, ws::WS_CLOSE_FORBIDDEN, "forbidden").await;
+                                        return;
+                                    }
+                                    Err(err) => {
+                                        let error = ProtocolError::new(
+                                            ErrorCode::Internal,
+                                            format!("run database read failed: {err}"),
+                                            false,
+                                        );
+                                        let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
+                                        let _ = ws::write_ws_close(&mut io, 1011, "internal").await;
+                                        return;
+                                    }
+                                }
+                            }
+                            ws::WsClientRequest::SubscribeEvents { stream_id, cursor } => {
+                                if subscription.is_some() {
+                                    let error = ProtocolError::new(
+                                        ErrorCode::InvalidMessage,
+                                        "this connection already holds an active event subscription",
+                                        false,
+                                    )
+                                    .with_details(serde_json::Map::from_iter([(
+                                        "reason".to_string(),
+                                        serde_json::Value::String("already_subscribed".to_string()),
+                                    )]));
+                                    let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
+                                    let _ = ws::write_ws_close(
+                                        &mut io,
+                                        ws::WS_CLOSE_INVALID_MESSAGE,
+                                        "invalid_message",
+                                    )
+                                    .await;
+                                    return;
+                                }
+                                match state.events.subscribe(&principal, &stream_id, cursor).await {
+                                    Ok(events::SubscribeOutcome::Started { cut, subscription: sub }) => {
+                                        // Control frame first (explicit boundary), then the
+                                        // snapshot cut, then live frames from the mailbox.
+                                        if let Err(err) = ws::write_ws_text(
+                                            &mut io,
+                                            events::control_subscribed_json(&cut).as_bytes(),
+                                        )
+                                        .await
+                                        {
+                                            tracing::warn!(%err, "cannot send subscribed control frame");
+                                            return;
+                                        }
+                                        for envelope in &cut.events {
+                                            if let Err(err) =
+                                                ws::write_ws_text(&mut io, &canon::canonical_bytes(envelope)).await
+                                            {
+                                                tracing::warn!(%err, "cannot send snapshot event");
+                                                return;
+                                            }
+                                        }
+                                        subscription = Some(sub);
+                                    }
+                                    Ok(events::SubscribeOutcome::RequiresSnapshot(required)) => {
+                                        // Explicit rebuild directive: NOT an error close — the
+                                        // connection stays for the resubscribe-after-snapshot.
+                                        if let Err(err) = ws::write_ws_text(
+                                            &mut io,
+                                            events::control_snapshot_required_json(
+                                                &required.stream_id,
+                                                required.floor,
+                                                required.reason,
+                                            )
+                                            .as_bytes(),
+                                        )
+                                        .await
+                                        {
+                                            tracing::warn!(%err, "cannot send snapshot_required frame");
+                                            return;
+                                        }
+                                    }
+                                    Err(reject) => {
+                                        let (error, close_code, close_reason) = match &reject {
+                                            events::SubscribeReject::StreamNotFound { stream_id } => (
+                                                ProtocolError::new(
+                                                    ErrorCode::NotFound,
+                                                    format!("event stream {stream_id} not found (stale stream)"),
+                                                    false,
+                                                )
+                                                .with_details(reason_details("stream_not_found")),
+                                                ws::WS_CLOSE_NOT_FOUND,
+                                                "not_found",
+                                            ),
+                                            events::SubscribeReject::Forbidden { stream_id } => (
+                                                ProtocolError::new(
+                                                    ErrorCode::Forbidden,
+                                                    format!("event stream {stream_id} belongs to another principal"),
+                                                    false,
+                                                )
+                                                .with_details(reason_details("cross_principal_access")),
+                                                ws::WS_CLOSE_FORBIDDEN,
+                                                "forbidden",
+                                            ),
+                                            events::SubscribeReject::MalformedCursor { detail } => (
+                                                ProtocolError::new(
+                                                    ErrorCode::InvalidMessage,
+                                                    format!("malformed cursor: {detail}"),
+                                                    false,
+                                                )
+                                                .with_details(reason_details("malformed_cursor")),
+                                                ws::WS_CLOSE_INVALID_MESSAGE,
+                                                "invalid_message",
+                                            ),
+                                            events::SubscribeReject::StaleStreamCursor { stream_id, cursor_stream } => (
+                                                ProtocolError::new(
+                                                    ErrorCode::InvalidMessage,
+                                                    format!(
+                                                        "cursor was issued for stream {cursor_stream:?}, \
+                                                         not {stream_id:?} (stale stream cursor)"
+                                                    ),
+                                                    false,
+                                                )
+                                                .with_details(reason_details("stale_stream_cursor")),
+                                                ws::WS_CLOSE_INVALID_MESSAGE,
+                                                "invalid_message",
+                                            ),
+                                            events::SubscribeReject::FutureCursor { seq, head, .. } => (
+                                                ProtocolError::new(
+                                                    ErrorCode::InvalidMessage,
+                                                    format!(
+                                                        "cursor seq {seq} is beyond the committed head \
+                                                         {head} (future cursor)"
+                                                    ),
+                                                    false,
+                                                )
+                                                .with_details(reason_details("future_cursor")),
+                                                ws::WS_CLOSE_INVALID_MESSAGE,
+                                                "invalid_message",
+                                            ),
+                                            events::SubscribeReject::Storage(err) => (
+                                                ProtocolError::new(
+                                                    ErrorCode::Internal,
+                                                    format!("run database read failed: {err}"),
+                                                    false,
+                                                ),
+                                                1011,
+                                                "internal",
+                                            ),
+                                        };
+                                        let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
+                                        let _ =
+                                            ws::write_ws_close(&mut io, close_code, close_reason).await;
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Ok(Some(ws::WsFrame::Ping(payload))) => {
+                        if let Err(err) = ws::write_ws_frame(&mut io, 0xA, &payload).await {
+                            tracing::warn!(%err, "cannot send pong");
                             return;
                         }
                     }
-                    Ok(sessions::SessionAccess::NotFound) => {
-                        let error =
-                            ProtocolError::new(ErrorCode::NotFound, "session not found", false);
-                        let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
-                        let _ =
-                            ws::write_ws_close(&mut io, ws::WS_CLOSE_NOT_FOUND, "not_found").await;
+                    Ok(Some(ws::WsFrame::Pong)) => {}
+                    Ok(Some(ws::WsFrame::Close(code, reason))) => {
+                        let _ = ws::write_ws_close(&mut io, code, &reason).await;
                         return;
                     }
-                    Ok(sessions::SessionAccess::Forbidden) => {
-                        let error = ProtocolError::new(
-                            ErrorCode::Forbidden,
-                            "session belongs to another principal",
-                            false,
-                        )
-                        .with_details(serde_json::Map::from_iter([(
-                            "reason".to_string(),
-                            serde_json::Value::String("cross_principal_access".to_string()),
-                        )]));
-                        let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
-                        let _ =
-                            ws::write_ws_close(&mut io, ws::WS_CLOSE_FORBIDDEN, "forbidden").await;
-                        return;
-                    }
+                    Ok(None) => return,
                     Err(err) => {
-                        let error = ProtocolError::new(
-                            ErrorCode::Internal,
-                            format!("run database read failed: {err}"),
-                            false,
-                        );
-                        let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
-                        let _ = ws::write_ws_close(&mut io, 1011, "internal").await;
+                        tracing::warn!(%err, "ws session read failed");
                         return;
                     }
                 }
             }
-            Ok(Some(ws::WsFrame::Ping(payload))) => {
-                if let Err(err) = ws::write_ws_frame(&mut io, 0xA, &payload).await {
-                    tracing::warn!(%err, "cannot send pong");
+            frame = sub_frame => {
+                let Some(frame) = frame else {
+                    // Mailbox closed (subscription dropped): stop racing it.
+                    subscription = None;
+                    continue;
+                };
+                let payload_bytes = match &frame {
+                    events::SubscriptionFrame::Event(envelope) => {
+                        canon::canonical_bytes(envelope.as_ref())
+                    }
+                    events::SubscriptionFrame::SnapshotRequired { reason } => {
+                        let stream_id = subscription
+                            .as_ref()
+                            .and_then(|s| state.events.hub().subscriber_stats(s.subscriber_id()))
+                            .map(|stats| stats.stream_id)
+                            .unwrap_or_default();
+                        events::control_snapshot_required_json(
+                            &stream_id,
+                            None,
+                            reason.wire_reason(),
+                        )
+                        .into_bytes()
+                    }
+                };
+                if let Err(err) = ws::write_ws_text(&mut io, &payload_bytes).await {
+                    tracing::warn!(%err, "cannot deliver subscription frame");
                     return;
                 }
-            }
-            Ok(Some(ws::WsFrame::Pong)) => {}
-            Ok(Some(ws::WsFrame::Close(code, reason))) => {
-                let _ = ws::write_ws_close(&mut io, code, &reason).await;
-                return;
-            }
-            Ok(None) => return,
-            Err(err) => {
-                tracing::warn!(%err, "ws session read failed");
-                return;
+                if matches!(frame, events::SubscriptionFrame::SnapshotRequired { .. }) {
+                    // Detached: the client must rebuild from a snapshot and
+                    // may resubscribe on this connection.
+                    subscription = None;
+                }
             }
         }
     }
+}
+
+/// Machine reason detail block for subscribe rejections.
+fn reason_details(reason: &str) -> serde_json::Map<String, serde_json::Value> {
+    serde_json::Map::from_iter([(
+        "reason".to_string(),
+        serde_json::Value::String(reason.to_string()),
+    )])
 }
 
 /// Builds the full HTTP router with all injected state: public health plus
@@ -1181,6 +1540,10 @@ pub fn build_router(state: ServiceState) -> Router {
         .route(
             "/lingxi/v1/sessions/{session_id}/execute",
             post(execute_session),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/events",
+            get(session_events_page),
         )
         .route("/lingxi/v1/ws-ticket", post(ws_ticket))
         .route(

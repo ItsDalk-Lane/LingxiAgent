@@ -1,0 +1,12 @@
+case=cli source=cli home=/private/tmp/lingxi-r02t02-a04.NBrov7/case1234/root-cli
+case=env source=env home=/private/tmp/lingxi-r02t02-a04.NBrov7/case1234/root-env
+case=config-file source=config-file home=/private/tmp/lingxi-r02t02-a04.NBrov7/case1234/root-config
+case=conflict source=cli home=/private/tmp/lingxi-r02t02-a04.NBrov7/case4/root-cli4
+case=test-mode source=test-mode home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-service-test-33162-18d8da7632ba8d98
+neg-no-source exit=2
+neg-relative-home exit=2
+neg-duplicate-home exit=2
+neg-equals-form exit=2
+neg-flag-shaped exit=2
+neg-missing-config exit=2
+neg-bad-config exit=2

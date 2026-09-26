@@ -1,0 +1,12 @@
+== building lingxi-service + lingxi-storage-inspect (rustup 1.98.1, /tmp/rust-target-r02-t05-repair, --locked) ==
+PASS build (locked, offline)
+== service up addr=127.0.0.1:52359 home=/tmp/lingxi-r02t05-home-KDugqf ==
+== running r02_t05_events_probe.py (A09 race / A10 expiry / negatives) ==
+== building lingxi-service + lingxi-storage-inspect (rustup 1.98.1, /tmp/rust-target-r02-t05-repair, --locked) ==
+PASS build (locked, offline)
+== service up addr=127.0.0.1:52662 home=/tmp/lingxi-r02t05-home-sbNM3M ==
+== running r02_t05_events_probe.py (A09 race / A10 expiry / negatives) ==
+PASS probe matrix (A09 merged==durable; A10 snapshot_required + rebuild; F03 purge-all directive; negatives)
+PASS cross-check (probe merged view == inspector dump == service page)
+== shutting the service down (graceful; logs retained) ==
+RESULT: ALL R02-T05 BINARY-MATRIX CASES PASSED

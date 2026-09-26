@@ -230,6 +230,65 @@ pub trait StoragePort: Send + Sync {
     ) -> impl std::future::Future<Output = Result<Option<RunRecord>, StorageError>> + Send;
 }
 
+/// Read/maintenance surface over the durable key-event log (R02-T05).
+///
+/// The storage port ([`StoragePort`]) WRITES key events as part of run
+/// transactions; this port is the READ half consumers use to rebuild a
+/// consistent view: snapshots, cursor continuation and gap detection.
+///
+/// Contract (taskbook 02 §7, R02-T05):
+/// - `seq` is assigned per stream by the single writer inside the
+///   committing transaction, so within one stream the durable log is
+///   strictly increasing with no holes; every event with `seq <= head`
+///   is already committed, and any event committed later gets
+///   `seq > head` (that is what makes snapshot+subscription joins
+///   gap-free).
+/// - Implementations return envelopes exactly as committed (rebuilt from
+///   the durable row; a disagreement between the stored `event_type`
+///   column and the payload tag is [`StorageError::Corrupted`], never a
+///   guess about which one is authoritative).
+/// - `purge_events_before` is the retention maintenance operation. It
+///   MUST NOT be used to silently skip history: after a purge, a cursor
+///   pointing before the new floor must surface as an explicit
+///   expired-cursor condition on the read paths (the caller decides the
+///   signal shape; the storage layer just reports the floor).
+pub trait EventStorePort: Send + Sync {
+    /// Highest committed `seq` of the stream (`None` when the stream has
+    /// no events / is unknown — callers combine with session lookups to
+    /// distinguish "stale stream" from "empty stream").
+    fn stream_head(
+        &self,
+        stream_id: &str,
+    ) -> impl std::future::Future<Output = Result<Option<Seq>, StorageError>> + Send;
+
+    /// Lowest retained `seq` of the stream (`None` when empty). Equals the
+    /// first non-purged event; a gap between a client cursor and this
+    /// floor means the events the cursor expects were truncated.
+    fn stream_floor(
+        &self,
+        stream_id: &str,
+    ) -> impl std::future::Future<Output = Result<Option<Seq>, StorageError>> + Send;
+
+    /// Committed events of the stream with `seq > after_seq`, ascending,
+    /// at most `limit`. This is the single read used by BOTH snapshot
+    /// cuts and cursor continuation (same ordering, same authority).
+    fn stream_events_after(
+        &self,
+        stream_id: &str,
+        after_seq: Seq,
+        limit: u32,
+    ) -> impl std::future::Future<Output = Result<Vec<EventEnvelope>, StorageError>> + Send;
+
+    /// Retention maintenance: deletes committed events with
+    /// `seq < before_seq` (exclusive) and returns how many rows were
+    /// removed. See the trait docs for the no-silent-gap contract.
+    fn purge_events_before(
+        &self,
+        stream_id: &str,
+        before_seq: Seq,
+    ) -> impl std::future::Future<Output = Result<u64, StorageError>> + Send;
+}
+
 /// Model provider access. Every request is pinned to
 /// principal/run/attempt/modelCall/purpose/provider/model/operation/
 /// budget/deadline by the kernel; credentials are resolved server-side

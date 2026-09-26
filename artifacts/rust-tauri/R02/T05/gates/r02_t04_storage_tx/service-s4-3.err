@@ -1,0 +1,7 @@
+2026-09-26T11:11:46.111421Z  INFO lingxi_service: data root resolved effective_home=/tmp/lingxi-r02t04-bin-eLcR8O source=cli ignored_sources=none
+2026-09-26T11:11:46.111531Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/tmp/lingxi-r02t04-bin-eLcR8O runtime_dir=/private/tmp/lingxi-r02t04-bin-eLcR8O/lingxi-service
+2026-09-26T11:11:46.111628Z  INFO lingxi_service: single-writer lock acquired instance_id=d662e2e9b69196602bcb14a350017c8c start_nonce=95151999884663e0 pid=34364 entropy="os-random-device" lock=/private/tmp/lingxi-r02t04-bin-eLcR8O/lingxi-service/instance.lock network_mode=loopback
+2026-09-26T11:11:46.121631Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only);          run database migrated and seeded local_token_file=/private/tmp/lingxi-r02t04-bin-eLcR8O/lingxi-service/local-token.json run_database=/private/tmp/lingxi-r02t04-bin-eLcR8O/lingxi-service/data/runs.db
+2026-09-26T11:11:46.131850Z  INFO lingxi_service: instance record published (atomic write) record=/private/tmp/lingxi-r02t04-bin-eLcR8O/lingxi-service/instance.json bind_addr=127.0.0.1:64064
+2026-09-26T11:11:46.173523Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-09-26T11:11:46.174150Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record                          removed, lock released)

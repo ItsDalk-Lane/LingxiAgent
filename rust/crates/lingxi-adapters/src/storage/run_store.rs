@@ -248,6 +248,34 @@ impl RunDatabase {
             .await
     }
 
+    /// Retention maintenance (R02-T05): deletes committed key events with
+    /// `seq < before_seq` (exclusive) for one stream, returning the number
+    /// of rows removed. Runs in one write transaction on the same
+    /// single-writer queue as every other mutation. This is the honest
+    /// product surface that creates the R02-A10 "cursor beyond retention"
+    /// precondition; read paths detect the resulting floor gap explicitly.
+    pub async fn purge_events_before(
+        &self,
+        stream_id: &str,
+        before_seq: lingxi_protocol::Seq,
+    ) -> Result<u64, StorageError> {
+        let stream_id = stream_id.to_string();
+        let busy = self.queue.options().busy_timeout_ms;
+        self.queue
+            .submit(move |conn| {
+                with_write_txn(conn, busy, |conn| {
+                    let removed = conn
+                        .execute(
+                            "DELETE FROM key_events WHERE stream_id = ?1 AND seq < ?2",
+                            rusqlite::params![stream_id, before_seq.value() as i64],
+                        )
+                        .map_err(migrations::map_rusqlite)?;
+                    Ok(removed as u64)
+                })
+            })
+            .await
+    }
+
     /// Raw SQL probe (read-only SELECT expected) — evidence/inspection
     /// seam used by tests to query the REAL database file through the same
     /// worker. Never used on the write path.
@@ -799,5 +827,145 @@ impl StoragePort for RunDatabase {
                 }))
             })
             .await
+    }
+}
+
+// ── EventStorePort (R02-T05 read half) ──────────────────────────────────────
+
+/// Negative seq columns are corruption (loud), never a sign flip.
+fn seq_from_i64(value: i64, which: &str) -> Result<Seq, StorageError> {
+    u64::try_from(value)
+        .map(Seq::new)
+        .map_err(|_| StorageError::Corrupted {
+            detail: format!("key_events {which} value {value} is negative"),
+        })
+}
+
+/// Column order of the `key_events` SELECT used by
+/// [`EventStorePort::stream_events_after`].
+type KeyEventRow = (
+    String,
+    String,
+    i64,
+    String,
+    Option<String>,
+    Option<String>,
+    String,
+    String,
+);
+
+/// Rebuilds the durable envelope of one key_events row, cross-checking the
+/// stored `event_type` column against the payload tag (a disagreement is
+/// corruption, not a guess about which side is authoritative — mirrors the
+/// envelope invariant of `lingxi.wire`).
+fn envelope_from_parts(
+    (event_id, stream_id, seq, session_id, run_id, attempt, stored_event_type, payload_json): KeyEventRow,
+) -> Result<EventEnvelope, StorageError> {
+    let payload: EventPayload =
+        serde_json::from_str(&payload_json).map_err(|err| StorageError::Corrupted {
+            detail: format!("key_events payload for {event_id} is not valid JSON: {err}"),
+        })?;
+    let payload_tag = payload.event_type().to_string();
+    if payload_tag != stored_event_type {
+        return Err(StorageError::Corrupted {
+            detail: format!(
+                "key_events row {event_id} (stream {stream_id} seq {seq}) stores \
+                 event_type {stored_event_type:?} but its payload tag is {payload_tag:?}; \
+                 refusing to guess which is authoritative"
+            ),
+        });
+    }
+    Ok(EventEnvelope::new(
+        EventId::new(event_id),
+        StreamId::new(stream_id),
+        Seq::new(u64::try_from(seq).map_err(|_| StorageError::Corrupted {
+            detail: format!("key_events seq {seq} is negative"),
+        })?),
+        SessionId::new(session_id),
+        run_id.map(lingxi_protocol::RunId::new),
+        attempt.map(AttemptId::new),
+        payload,
+    ))
+}
+
+impl lingxi_kernel::ports::EventStorePort for RunDatabase {
+    async fn stream_head(&self, stream_id: &str) -> Result<Option<Seq>, StorageError> {
+        let stream_id = stream_id.to_string();
+        self.queue
+            .submit(move |conn| {
+                let head: Option<i64> = conn
+                    .query_row(
+                        "SELECT MAX(seq) FROM key_events WHERE stream_id = ?1",
+                        [&stream_id],
+                        |row| row.get(0),
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                head.map(|h| seq_from_i64(h, "MAX(seq)")).transpose()
+            })
+            .await
+    }
+
+    async fn stream_floor(&self, stream_id: &str) -> Result<Option<Seq>, StorageError> {
+        let stream_id = stream_id.to_string();
+        self.queue
+            .submit(move |conn| {
+                let floor: Option<i64> = conn
+                    .query_row(
+                        "SELECT MIN(seq) FROM key_events WHERE stream_id = ?1",
+                        [&stream_id],
+                        |row| row.get(0),
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                floor.map(|f| seq_from_i64(f, "MIN(seq)")).transpose()
+            })
+            .await
+    }
+
+    async fn stream_events_after(
+        &self,
+        stream_id: &str,
+        after_seq: Seq,
+        limit: u32,
+    ) -> Result<Vec<EventEnvelope>, StorageError> {
+        let stream_id = stream_id.to_string();
+        let after = after_seq.value() as i64;
+        self.queue
+            .submit(move |conn| {
+                let mut stmt = conn
+                    .prepare(
+                        "SELECT event_id, stream_id, seq, session_id, run_id, attempt, \
+                         event_type, payload_json FROM key_events \
+                         WHERE stream_id = ?1 AND seq > ?2 ORDER BY seq ASC LIMIT ?3",
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                let rows = stmt
+                    .query_map(rusqlite::params![stream_id, after, limit as i64], |row| {
+                        Ok((
+                            row.get::<_, String>(0)?,
+                            row.get::<_, String>(1)?,
+                            row.get::<_, i64>(2)?,
+                            row.get::<_, String>(3)?,
+                            row.get::<_, Option<String>>(4)?,
+                            row.get::<_, Option<String>>(5)?,
+                            row.get::<_, String>(6)?,
+                            row.get::<_, String>(7)?,
+                        ))
+                    })
+                    .map_err(migrations::map_rusqlite)?;
+                let mut out = Vec::new();
+                for row in rows {
+                    out.push(envelope_from_parts(row.map_err(migrations::map_rusqlite)?)?);
+                }
+                Ok(out)
+            })
+            .await
+    }
+
+    async fn purge_events_before(
+        &self,
+        stream_id: &str,
+        before_seq: Seq,
+    ) -> Result<u64, StorageError> {
+        RunDatabase::purge_events_before(self, stream_id, before_seq).await
     }
 }
