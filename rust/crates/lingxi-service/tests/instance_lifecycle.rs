@@ -72,6 +72,7 @@ async fn start_on(tag: &str, wipe: bool) -> Started {
         data_home: layout.home.clone(),
         home_source: HomeSource::Cli,
         network_mode: lingxi_service::NetworkMode::Loopback,
+        shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
     };
     let state = ServiceState::bootstrap(config, &layout)
         .await

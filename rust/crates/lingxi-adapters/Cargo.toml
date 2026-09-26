@@ -10,8 +10,12 @@ publish.workspace = true
 # workspace dependency tree at exactly this version (no new third-party
 # version enters rust/Cargo.lock with this crate; the lock only gains the
 # workspace member and its dependency references):
-#   - rusqlite 0.40.2 + bundled (R01-T03 lock, same feature set as
-#     lingxi-spike): the SQLite engine is compiled in; no system libsqlite3.
+#   - rusqlite 0.40.2 + bundled + backup (R01-T03 lock, same feature set as
+#     lingxi-spike; R02-T06 additionally enables the `backup` feature flag
+#     for the SQLite Online Backup API — that flag only unlocks code inside
+#     the already-locked rusqlite/libsqlite3-sys pair and adds NO new crates
+#     to rust/Cargo.lock): the SQLite engine is compiled in; no system
+#     libsqlite3.
 #   - tokio 1.53.1 (sync): the bounded mpsc/oneshot queue in front of the
 #     dedicated synchronous worker thread.
 #   - sha2 0.11.0: migration fingerprints (sha256 over the SQL text).
@@ -21,11 +25,14 @@ publish.workspace = true
 [dependencies]
 lingxi-kernel = { path = "../lingxi-kernel" }
 lingxi-protocol = { path = "../lingxi-protocol" }
-rusqlite = { version = "0.40.2", features = ["bundled"] }
+rusqlite = { version = "0.40.2", features = ["bundled", "backup"] }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
 sha2 = "0.11.0"
-tokio = { version = "1.53.1", features = ["sync", "macros", "rt"] }
+# R02-T06: `time` feature flag added for the backup-while-writing
+# integration test's head-start sleep (same locked tokio 1.53.1; the flag
+# unlocks existing code inside the crate — no new lock entries).
+tokio = { version = "1.53.1", features = ["sync", "macros", "rt", "time"] }
 tracing = "0.1.44"
 
 # Dev-only: RLIMIT_FSIZE/SIGXFSZ fault injection for the R02-A07

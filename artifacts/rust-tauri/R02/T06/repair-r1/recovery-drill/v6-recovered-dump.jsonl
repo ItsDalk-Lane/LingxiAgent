@@ -1,0 +1,6 @@
+{"row":[1,"initial_run_message_schema","479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8",1790438788713,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":["sess_local_alpha","lingxi","user_local","Synthetic session alpha",1790438788714],"table":"sessions"}
+{"row":["sess_local_beta","lingxi","user_local","Synthetic session beta",1790438788714],"table":"sessions"}
+{"row":["run_000001a0de77cead_000001","sess_local_alpha","local_user","user_local","principal_local",1,"running",null,1,1790438788781,1790438788781,1],"table":"runs"}
+{"row":["run_000001a0de77cead_000001","run_000001a0de77cead_000001#a1",1,1790438788781],"table":"run_attempts"}
+{"row":["run_000001a0de77cead_000001-start","sess_local_alpha",1,"sess_local_alpha","run_000001a0de77cead_000001","run_000001a0de77cead_000001#a1","run_state_changed","{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}",1790438788781],"table":"key_events"}

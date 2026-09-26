@@ -23,11 +23,13 @@
 
 pub mod auth;
 pub mod config;
+pub mod epoch;
 pub mod events;
 pub mod instance;
 pub mod limits;
 pub mod paths;
 pub mod sessions;
+pub mod shutdown;
 pub mod transport;
 pub mod ws;
 
@@ -39,6 +41,11 @@ pub use auth::{
 pub use config::{
     parse_cli, read_config_home, resolve_effective_home, CliOptions, ConfigError, HomeSource,
     IgnoredHomeSource, ResolvedHome, HOME_ENV_VAR,
+};
+pub use epoch::{
+    coordinate_data_epoch_startup, read_journal, read_stamp, render_block, EpochGateBlock,
+    EpochStamp, GateDecision, JournalRead, StampFormat, StampRead, TransitionJournal,
+    EPOCH_BLOCKED_MARKER, EPOCH_TRANSITION_INCOMPLETE_MARKER, JOURNAL_FILE_NAME, STAMP_FILE_NAME,
 };
 pub use events::{
     control_frame_of_detach, control_snapshot_required_json, control_subscribed_json, DetachReason,
@@ -54,6 +61,10 @@ pub use paths::{prepare_layout, DataRootLayout};
 pub use sessions::{
     ExecuteAccepted, ExecuteRequest, RunSummary, SessionAccess, SessionBackend,
     SessionExecuteError, SessionFacts, SessionStore, SessionView,
+};
+pub use shutdown::{
+    graceful_shutdown, WsSessionGuard, WsShutdown, DEFAULT_SHUTDOWN_TIMEOUT_MS,
+    SHUTDOWN_TIMEOUT_MARKER,
 };
 pub use transport::{check_origin, infer_connection_kind, ConnectionKind, NetworkMode};
 pub use ws::{WsTicketService, WS_CLOSE_FORBIDDEN, WS_CLOSE_UNAUTHORIZED};
@@ -112,6 +123,9 @@ pub struct ServiceConfig {
     pub home_source: HomeSource,
     /// Network exposure: loopback (default) or explicitly configured LAN.
     pub network_mode: NetworkMode,
+    /// Graceful-shutdown deadline per phase in milliseconds (R02-T06);
+    /// CLI `--shutdown-timeout-ms` or the production default.
+    pub shutdown_timeout_ms: u64,
 }
 
 impl ServiceConfig {
@@ -161,11 +175,15 @@ impl ServiceConfig {
                 mode: NetworkMode::Loopback,
             });
         }
+        let shutdown_timeout_ms = cli
+            .shutdown_timeout_ms
+            .unwrap_or(shutdown::DEFAULT_SHUTDOWN_TIMEOUT_MS);
         Ok(Self {
             bind_addr,
             data_home,
             home_source: resolved.source,
             network_mode,
+            shutdown_timeout_ms,
         })
     }
 
@@ -228,6 +246,8 @@ pub struct ServiceState {
     events: Arc<events::EventService>,
     rate: Arc<limits::RateLimiter>,
     ws_conns: Arc<limits::WsConnectionCounter>,
+    /// Managed-task shutdown broadcast for active WS sessions (R02-T06).
+    ws_shutdown: Arc<shutdown::WsShutdown>,
 }
 
 impl std::fmt::Debug for ServiceState {
@@ -365,6 +385,7 @@ impl ServiceState {
             events: Arc::new(events),
             rate: Arc::new(limits::RateLimiter::new(rate_window_ms, rate_max)),
             ws_conns: Arc::new(limits::WsConnectionCounter::new(ws_max_connections)),
+            ws_shutdown: Arc::new(shutdown::WsShutdown::new()),
         })
     }
 
@@ -394,6 +415,13 @@ impl ServiceState {
     /// for the close/checkpoint path).
     pub fn storage(&self) -> &Arc<RunDatabase> {
         &self.storage
+    }
+
+    /// The managed-task shutdown handle (R02-T06): the binary subscribes
+    /// once for the shutdown broadcast; every WS session task subscribes
+    /// per connection.
+    pub fn ws_shutdown(&self) -> Arc<shutdown::WsShutdown> {
+        Arc::clone(&self.ws_shutdown)
     }
 
     pub fn ws_connection_count(&self) -> usize {
@@ -1171,6 +1199,12 @@ async fn run_ws_session<IO>(
 ) where
     IO: tokio::io::AsyncRead + tokio::io::AsyncWrite + Unpin,
 {
+    // R02-T06: this session is a MANAGED TASK of the shutdown coordinator —
+    // register it (open count) and watch the shutdown broadcast. The guard
+    // decrements the count on every exit path of this loop.
+    let mut shutdown_rx = state.ws_shutdown().subscribe();
+    let _session_guard = shutdown::WsSessionGuard::new(state.ws_shutdown());
+
     // 1. lingxi.wire handshake: first text frame must be a ClientHello.
     match ws::read_ws_frame(&mut io).await {
         Ok(Some(ws::WsFrame::Text(bytes))) => {
@@ -1254,6 +1288,14 @@ async fn run_ws_session<IO>(
             }
         };
         tokio::select! {
+            shutdown = shutdown_rx.changed() => {
+                // R02-T06: the coordinator broadcast a shutdown — send a
+                // polite close(1001) and end the session so the drain can
+                // complete within the deadline.
+                let _ = shutdown;
+                let _ = ws::write_ws_close(&mut io, 1001, "server_shutdown").await;
+                return;
+            }
             incoming = ws::read_ws_frame(&mut io) => {
                 match incoming {
                     Ok(Some(ws::WsFrame::Text(bytes))) => {

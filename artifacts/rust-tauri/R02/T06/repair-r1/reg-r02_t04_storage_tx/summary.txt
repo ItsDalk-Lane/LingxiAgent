@@ -1,0 +1,18 @@
+== building lingxi-service + lingxi-storage-inspect (rustup 1.98.1, /tmp/rust-target-r02-t04, --locked) ==
+PASS build (locked, offline)
+== S1: full lifecycle over the real database ==
+PASS S1 execute accepted (http=200)
+PASS S1 graceful stop (exit 0, WAL checkpointed)
+PASS S1 inspect: runs=1 key_events=2 (terminal+event committed together)
+PASS S1 restart reads runCount=1 from the database
+== S2: kill -9 after committed execute — no half terminal state ==
+PASS S2 crash delivered (kill -9 right after the committed execute)
+PASS S2 inspect: terminal rows and completion events coexist (same transaction, crash-safe)
+PASS S2 restart recovers the committed-but-crashed run (runCount=1)
+== S3: real IO fault at startup — loud refusal, no fallback ==
+PASS S3 unwritable home: exit=2, explicit error, no readiness line
+== S4 (A08): three migration checks, stable version/counts/fingerprints ==
+PASS S4 3x migration checks: version=1, fingerprint identical, row counts stable
+PASS S4 inspect is read-only (db file hashes unchanged)
+PASS no leftover processes
+RESULT: R02-T04 binary evidence ALL GREEN

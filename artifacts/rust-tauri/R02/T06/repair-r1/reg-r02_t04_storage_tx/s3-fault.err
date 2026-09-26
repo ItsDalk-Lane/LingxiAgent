@@ -1,0 +1,2 @@
+2026-09-26T16:08:49.428902Z  INFO lingxi_service: data root resolved effective_home=/tmp/lingxi-r02t04-fault-KEfybC source=cli ignored_sources=none
+error: cannot create data root "/private/tmp/lingxi-r02t04-fault-KEfybC/lingxi-service": Permission denied (os error 13)

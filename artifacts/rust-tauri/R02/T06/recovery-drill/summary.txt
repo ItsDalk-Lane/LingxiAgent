@@ -1,0 +1,19 @@
+== building lingxi-service + lingxi-storage-inspect (rustup 1.98.1, /tmp/rust-target-r02-t06, --locked) ==
+PASS build (locked, offline)
+== v1 (R02-A12/drill): torn stamp + readable higher-epoch journal ==
+PASS v1 exit=2 reason=corrupt-stamp evidence 1→2 named; files byte-identical; no auth state written
+== v2: valid stamp + torn transition journal ==
+PASS v2 exit=2 reason=corrupt-journal; files byte-identical
+== v3 (headline fail-open shape): missing stamp + readable higher-epoch journal ==
+PASS v3 exit=2 reason=corrupt-transition evidence 1→2 named; no stamp invented; files byte-identical
+== v4: healthy control (fresh home starts) ==
+PASS v4 fresh home stamped (v2, epoch 1) and served; graceful stop exit 0
+== v5 (A12): garbage main db file ==
+PASS v5 exit=2 explicit corruption refusal; corrupt file byte-identical; no empty db substituted
+== v6 (INFO row): torn WAL tail (SQLite recovery by design) ==
+v6 observed: service started after WAL recovery (by design); recovered view transaction-consistent; graceful stop exit=0
+== v7 (A12): tampered migration receipt ==
+PASS v7 exit=2 SchemaTampered refusal; file byte-identical
+== v8 (INFO row): garbage WAL header (SQLite recovery semantics) ==
+v8 observed: exit=0 ready=1 (SQLite may recover or refuse; files: runs.db )
+RESULT: R02-T06 recovery drill + A12 corruption matrix ALL GREEN (v8 informational)

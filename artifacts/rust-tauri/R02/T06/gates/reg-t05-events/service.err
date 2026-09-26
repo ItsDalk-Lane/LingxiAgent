@@ -1,0 +1,19 @@
+2026-09-26T15:13:07.797070Z  INFO lingxi_service: data root resolved effective_home=/tmp/lingxi-r02t05-home-OKivEs source=cli ignored_sources=none
+2026-09-26T15:13:07.797509Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/tmp/lingxi-r02t05-home-OKivEs runtime_dir=/private/tmp/lingxi-r02t05-home-OKivEs/lingxi-service
+2026-09-26T15:13:07.797729Z  INFO lingxi_service: single-writer lock acquired instance_id=b4ce240a0c343bef22478f4a186111bc start_nonce=768171c711a0d85d pid=30753 entropy="os-random-device" lock=/private/tmp/lingxi-r02t05-home-OKivEs/lingxi-service/instance.lock network_mode=loopback
+2026-09-26T15:13:07.815245Z  INFO lingxi_service: data-epoch gate passed home=/private/tmp/lingxi-r02t05-home-OKivEs decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-09-26T15:13:07.846410Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/tmp/lingxi-r02t05-home-OKivEs/lingxi-service/data/runs.db applied=[1] version=1
+2026-09-26T15:13:07.846677Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only);          run database migrated and seeded local_token_file=/private/tmp/lingxi-r02t05-home-OKivEs/lingxi-service/local-token.json run_database=/private/tmp/lingxi-r02t05-home-OKivEs/lingxi-service/data/runs.db
+2026-09-26T15:13:07.855138Z  INFO lingxi_service: instance record published (atomic write) record=/private/tmp/lingxi-r02t05-home-OKivEs/lingxi-service/instance.json bind_addr=127.0.0.1:49378
+2026-09-26T15:13:07.977140Z  INFO lingxi_service::sessions: run committed and published (post-commit) run_id=run_000001a0de46f788_000001 session_id=sess_local_alpha events=run_000001a0de46f788_000001-done input_chars=10
+2026-09-26T15:13:07.978073Z  INFO lingxi_service::sessions: run committed and published (post-commit) run_id=run_000001a0de46f789_000002 session_id=sess_local_alpha events=run_000001a0de46f789_000002-done input_chars=10
+2026-09-26T15:13:07.979951Z  INFO lingxi_service::sessions: run committed and published (post-commit) run_id=run_000001a0de46f78b_000003 session_id=sess_local_alpha events=run_000001a0de46f78b_000003-done input_chars=12
+2026-09-26T15:13:07.980769Z  INFO lingxi_service::sessions: run committed and published (post-commit) run_id=run_000001a0de46f78c_000004 session_id=sess_local_alpha events=run_000001a0de46f78c_000004-done input_chars=12
+2026-09-26T15:13:07.981744Z  INFO lingxi_service::sessions: run committed and published (post-commit) run_id=run_000001a0de46f78d_000005 session_id=sess_local_alpha events=run_000001a0de46f78d_000005-done input_chars=12
+2026-09-26T15:13:07.982534Z  INFO lingxi_service::sessions: run committed and published (post-commit) run_id=run_000001a0de46f78e_000006 session_id=sess_local_alpha events=run_000001a0de46f78e_000006-done input_chars=12
+2026-09-26T15:13:08.987837Z  INFO lingxi_service::sessions: run committed and published (post-commit) run_id=run_000001a0de46fb7a_000007 session_id=sess_local_alpha events=run_000001a0de46fb7a_000007-done input_chars=8
+2026-09-26T15:13:08.994185Z  INFO lingxi_service::sessions: run committed and published (post-commit) run_id=run_000001a0de46fb81_000008 session_id=sess_local_beta events=run_000001a0de46fb81_000008-done input_chars=8
+2026-09-26T15:13:09.443677Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-09-26T15:13:09.444662Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-09-26T15:13:09.444848Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-09-26T15:13:09.444869Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

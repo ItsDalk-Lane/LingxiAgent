@@ -31,6 +31,7 @@ fn test_config(tag: &str) -> ServiceConfig {
         data_home: synthetic_home(tag),
         home_source: HomeSource::Cli,
         network_mode: NetworkMode::Loopback,
+        shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
     }
 }
 
@@ -186,6 +187,7 @@ fn prepare_data_home_creates_and_is_idempotent() {
         data_home: home.clone(),
         home_source: HomeSource::Cli,
         network_mode: NetworkMode::Loopback,
+        shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
     };
     config.prepare_data_home().expect("creates missing home");
     assert!(home.is_dir());
@@ -206,6 +208,7 @@ fn prepare_data_home_rejects_file_as_home() {
         data_home: home.clone(),
         home_source: HomeSource::Cli,
         network_mode: NetworkMode::Loopback,
+        shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
     };
     let err = config.prepare_data_home().expect_err("must refuse loudly");
     assert!(

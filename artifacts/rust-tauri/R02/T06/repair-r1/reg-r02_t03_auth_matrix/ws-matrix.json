@@ -1,0 +1,75 @@
+{
+ "results": [
+  {
+   "case": "ws-evil-origin",
+   "expected": 403,
+   "actual": 403,
+   "ok": true,
+   "detail": "{\"code\":\"forbidden\",\"details\":{\"reason\":\"bad_origin\"},\"message\":\"transport policy rejected the request\",\"retryable\":false}"
+  },
+  {
+   "case": "ws-foreign-host",
+   "expected": 403,
+   "actual": 403,
+   "ok": true,
+   "detail": "HTTP/1.1 403 Forbidden"
+  },
+  {
+   "case": "ws-no-credential",
+   "expected": 401,
+   "actual": 401,
+   "ok": true,
+   "detail": "{\"code\":\"unauthorized\",\"details\":{\"reason\":\"missing_credential\"},\"message\":\"authentication required\",\"retryable\":false}"
+  },
+  {
+   "case": "ws-ticket-legit-origin-upgrade",
+   "expected": 101,
+   "actual": 101,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-server-hello",
+   "expected": true,
+   "actual": true,
+   "ok": true,
+   "detail": "{\"dataEpoch\":1,\"protocol\":\"lingxi.wire\",\"selectedProtocol\":1,\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wire"
+  },
+  {
+   "case": "ws-session-read-owner",
+   "expected": true,
+   "actual": true,
+   "ok": true,
+   "detail": "{\"runCount\":1,\"sessionId\":\"sess_local_alpha\",\"type\":\"sessionReadResult\"}"
+  },
+  {
+   "case": "ws-ticket-replay",
+   "expected": 401,
+   "actual": 401,
+   "ok": true,
+   "detail": "{\"code\":\"unauthorized\",\"details\":{\"reason\":\"invalid_ws_ticket\"},\"message\":\"authentication required\",\"retryable\":false}"
+  },
+  {
+   "case": "ws-no-origin-cli-bearer",
+   "expected": 101,
+   "actual": 101,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-cli-server-hello",
+   "expected": true,
+   "actual": true,
+   "ok": true,
+   "detail": "{\"dataEpoch\":1,\"protocol\":\"lingxi.wire\",\"selectedProtocol\":1,\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wire"
+  },
+  {
+   "case": "ws-ticket-expired",
+   "expected": 401,
+   "actual": 401,
+   "ok": true,
+   "detail": "{\"code\":\"unauthorized\",\"details\":{\"reason\":\"invalid_ws_ticket\"},\"message\":\"authentication required\",\"retryable\":false}"
+  }
+ ],
+ "all_ok": true
+}

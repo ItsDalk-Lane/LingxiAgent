@@ -1122,6 +1122,7 @@ dependencies = [
  "lingxi-adapters",
  "lingxi-kernel",
  "lingxi-protocol",
+ "rusqlite",
  "serde",
  "serde_json",
  "sha1",

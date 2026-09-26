@@ -66,6 +66,9 @@ pub struct CliOptions {
     /// loopback default. LAN exposure exists ONLY through this flag
     /// (R02-T03).
     pub network_mode: Option<String>,
+    /// Explicit graceful-shutdown deadline in milliseconds
+    /// (`--shutdown-timeout-ms`, R02-T06); `None` = the production default.
+    pub shutdown_timeout_ms: Option<u64>,
 }
 
 /// Result of home-source precedence resolution.
@@ -115,6 +118,10 @@ pub enum ConfigError {
     },
     /// `--network-mode` value outside the strict `loopback|lan` vocabulary.
     BadNetworkMode {
+        value: String,
+    },
+    /// `--shutdown-timeout-ms` value that is not a positive decimal integer.
+    InvalidShutdownTimeout {
         value: String,
     },
     /// Non-loopback bind while the (default) loopback network mode is in
@@ -182,6 +189,12 @@ impl fmt::Display for ConfigError {
                 f,
                 "invalid --network-mode {value:?}: must be \"loopback\" or \"lan\" \
                  (LAN exposure is an explicit opt-in, the default is loopback)"
+            ),
+            ConfigError::InvalidShutdownTimeout { value } => write!(
+                f,
+                "invalid --shutdown-timeout-ms {value:?}: must be a positive \
+                 decimal integer (milliseconds; the graceful-shutdown deadline \
+                 for each shutdown phase)"
             ),
             ConfigError::NetworkModeBindMismatch { bind, mode } => write!(
                 f,
@@ -315,6 +328,32 @@ where
                     });
                 }
                 options.network_mode = Some(value);
+            }
+            "--shutdown-timeout-ms" => {
+                if options.shutdown_timeout_ms.is_some() {
+                    return Err(ConfigError::DuplicateArgument {
+                        flag: "--shutdown-timeout-ms".to_string(),
+                    });
+                }
+                let value = iter.next().ok_or(ConfigError::MissingArgumentValue {
+                    flag: "--shutdown-timeout-ms".to_string(),
+                })?;
+                if is_flag_shaped(&value) {
+                    return Err(ConfigError::FlagShapedValue {
+                        flag: "--shutdown-timeout-ms".to_string(),
+                        value,
+                    });
+                }
+                let parsed: u64 = match value.parse::<u64>() {
+                    Ok(parsed) => parsed,
+                    Err(_) => {
+                        return Err(ConfigError::InvalidShutdownTimeout { value });
+                    }
+                };
+                if parsed == 0 {
+                    return Err(ConfigError::InvalidShutdownTimeout { value });
+                }
+                options.shutdown_timeout_ms = Some(parsed);
             }
             other => {
                 return Err(ConfigError::UnknownArgument {
@@ -608,6 +647,38 @@ mod tests {
     fn cli_empty_is_no_flags_not_an_error() {
         let options = parse_cli(args(&[])).unwrap();
         assert_eq!(options, CliOptions::default());
+    }
+
+    #[test]
+    fn cli_shutdown_timeout_strictness() {
+        // R02-T06: explicit shutdown deadline, same strict rules as every
+        // value flag plus a positive-integer value check.
+        let options = parse_cli(args(&["--shutdown-timeout-ms", "250"])).unwrap();
+        assert_eq!(options.shutdown_timeout_ms, Some(250));
+        assert!(matches!(
+            parse_cli(args(&["--shutdown-timeout-ms", "10", "--shutdown-timeout-ms", "20"])),
+            Err(ConfigError::DuplicateArgument { flag }) if flag == "--shutdown-timeout-ms"
+        ));
+        assert!(matches!(
+            parse_cli(args(&["--shutdown-timeout-ms", "--home"])),
+            Err(ConfigError::FlagShapedValue { .. })
+        ));
+        assert!(matches!(
+            parse_cli(args(&["--shutdown-timeout-ms"])),
+            Err(ConfigError::MissingArgumentValue { .. })
+        ));
+        assert!(matches!(
+            parse_cli(args(&["--shutdown-timeout-ms", "abc"])),
+            Err(ConfigError::InvalidShutdownTimeout { .. })
+        ));
+        assert!(matches!(
+            parse_cli(args(&["--shutdown-timeout-ms", "0"])),
+            Err(ConfigError::InvalidShutdownTimeout { .. })
+        ));
+        assert!(matches!(
+            parse_cli(args(&["--shutdown-timeout-ms=-5"])),
+            Err(ConfigError::UnknownArgument { .. })
+        ));
     }
 
     // ---- precedence resolution (acceptance R02-A04, resolution half) ----

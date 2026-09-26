@@ -58,6 +58,7 @@ async fn start_server(tag: &str, ticket_ttl_ms: u64, rate_max: u32, ws_max: usiz
         data_home: home.clone(),
         home_source: HomeSource::Cli,
         network_mode: NetworkMode::Loopback,
+        shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
     };
     let state = ServiceState::bootstrap_with_limits(
         config,

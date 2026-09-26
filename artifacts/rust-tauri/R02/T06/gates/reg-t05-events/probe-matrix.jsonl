@@ -1,0 +1,25 @@
+{"case": "a09-writers-clean", "ok": true, "detail": "[]"}
+{"case": "a09-one-subscribed-control", "ok": true, "detail": "[{'frameKind': 'control', 'fromSeq': '0', 'mode': 'snapshot', 'snapshotSeq': '4', 'streamId': 'sess_local_alpha', 'type': 'subscribed'}]"}
+{"case": "a09-explicit-boundary", "ok": true, "detail": "snapshotSeq=4 snapshot-events=4"}
+{"case": "a09-no-gap-no-dup", "ok": true, "detail": "n=12/12 first=[1] last=[12] contiguous=True unique=True"}
+{"case": "a09-merged-equals-durable-log", "ok": true, "detail": "merged=12 durable=12"}
+{"case": "a09-terminal-events-recovered", "ok": true, "detail": "completed transitions=6 (6 runs)"}
+{"case": "a10-purge-rows", "ok": true, "detail": "removed=7"}
+{"case": "a10-http-explicit-cursor-expired", "ok": true, "detail": "status=409 body={\"code\":\"cursor_expired\",\"details\":{\"floorSeq\":\"8\",\"reason\":\"snapshot_required\",\"streamId\":\"sess_local_alpha\"},\"message\":\"cursor predates the retained event floor; refetch a snapshot\",\"retryable\":fals"}
+{"case": "a10-ws-snapshot-required-control", "ok": true, "detail": "{\"floorSeq\":\"8\",\"frameKind\":\"control\",\"reason\":\"events_truncated\",\"streamId\":\"sess_local_alpha\",\"type\":\"snapshot_required\"}"}
+{"case": "a10-socket-still-open", "ok": true, "detail": "{\"runCount\":7,\"sessionId\":\"sess_local_alpha\",\"type\":\"sessionReadResult\"}"}
+{"case": "a10-rebuild-matches-authority", "ok": true, "detail": "rebuilt=7 from=[8] authority=7"}
+{"case": "f03-beta-page", "ok": true, "detail": "{\"streamId\":\"sess_local_beta\",\"mode\":\"snapshot\",\"fromSeq\":\"0\",\"snapshotSeq\":\"1\",\"items\":[{\"schemaVersion\":1,\"eventId\":\"r"}
+{"case": "f03-purge-all-rows", "ok": true, "detail": "removed=2"}
+{"case": "f03-http-stale-cursor-snapshot-required", "ok": true, "detail": "status=409 body={\"code\":\"cursor_expired\",\"details\":{\"reason\":\"snapshot_required\",\"streamId\":\"sess_local_beta\"},\"message\":\"cursor predates the retained event floor; refetch a snapshot\",\"retryable\":false}"}
+{"case": "f03-ws-stale-cursor-snapshot-required", "ok": true, "detail": "{\"frameKind\":\"control\",\"reason\":\"events_truncated\",\"streamId\":\"sess_local_beta\",\"type\":\"snapshot_required\"}"}
+{"case": "f03-socket-still-open", "ok": true, "detail": "{\"runCount\":1,\"sessionId\":\"sess_local_beta\",\"type\":\"sessionReadResult\"}"}
+{"case": "f03-empty-rebuild-cut", "ok": true, "detail": "{\"frameKind\":\"control\",\"fromSeq\":\"0\",\"mode\":\"snapshot\",\"snapshotSeq\":\"0\",\"streamId\":\"sess_local_beta\",\"type\":\"subscribed\"}"}
+{"case": "neg-unknown-stream-ws", "ok": true, "detail": "[('text', 0, '{\"code\":\"not_found\",\"details\":{\"reason\":\"stream_not_found\"},\"message\":\"event stream stream_never_existed not found (stale stream)\",\"retryable\":false}'), ('close', 4404, 'not_found')]"}
+{"case": "neg-unknown-stream-http-404", "ok": true, "detail": "status=404"}
+{"case": "neg-future-cursor-rejected", "ok": true, "detail": "[('text', 0, '{\"code\":\"invalid_message\",\"details\":{\"reason\":\"future_cursor\"},\"message\":\"cursor seq 99999 is beyond the committed head 14 (future cursor)\",\"retryable\":false}'), ('close', 4409, 'invalid"}
+{"case": "neg-malformed-cursor-rejected", "ok": true, "detail": "[('text', 0, '{\"code\":\"invalid_message\",\"details\":{\"reason\":\"malformed_cursor\"},\"message\":\"malformed cursor: cursor is not valid base64url\",\"retryable\":false}'), ('close', 4409, 'invalid_message')]"}
+{"case": "neg-duplicate-subscribe-closed", "ok": true, "detail": "[('text', 0, '{\"attempt\":\"run_000001a0de46f78d_000005#a1\",\"eventId\":\"run_000001a0de46f78d_000005-start\",\"eventType\":\"run_state_changed\",\"payload\":{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_chan"}
+{"case": "neg-credential-issued", "ok": true, "detail": "status=201"}
+{"case": "neg-cross-principal-403", "ok": true, "detail": "status=403"}
+PROBE OK: all cases passed

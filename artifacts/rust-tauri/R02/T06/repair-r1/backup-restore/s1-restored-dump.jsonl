@@ -1,0 +1,15 @@
+{"row":[1,"initial_run_message_schema","479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8",1790438778630,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":["sess_local_alpha","lingxi","user_local","Synthetic session alpha",1790438778632],"table":"sessions"}
+{"row":["sess_local_beta","lingxi","user_local","Synthetic session beta",1790438778632],"table":"sessions"}
+{"row":["run_000001a0de77a7f7_000001","sess_local_alpha","local_user","user_local","principal_local",1,"completed",null,1,1790438778871,1790438778871,2],"table":"runs"}
+{"row":["run_000001a0de77a803_000002","sess_local_alpha","local_user","user_local","principal_local",1,"completed",null,1,1790438778883,1790438778883,4],"table":"runs"}
+{"row":["run_000001a0de77a80d_000003","sess_local_alpha","local_user","user_local","principal_local",1,"completed",null,1,1790438778893,1790438778893,6],"table":"runs"}
+{"row":["run_000001a0de77a7f7_000001","run_000001a0de77a7f7_000001#a1",1,1790438778871],"table":"run_attempts"}
+{"row":["run_000001a0de77a803_000002","run_000001a0de77a803_000002#a1",1,1790438778883],"table":"run_attempts"}
+{"row":["run_000001a0de77a80d_000003","run_000001a0de77a80d_000003#a1",1,1790438778893],"table":"run_attempts"}
+{"row":["run_000001a0de77a7f7_000001-start","sess_local_alpha",1,"sess_local_alpha","run_000001a0de77a7f7_000001","run_000001a0de77a7f7_000001#a1","run_state_changed","{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}",1790438778871],"table":"key_events"}
+{"row":["run_000001a0de77a7f7_000001-done","sess_local_alpha",2,"sess_local_alpha","run_000001a0de77a7f7_000001","run_000001a0de77a7f7_000001#a1","run_state_changed","{\"from\":\"running\",\"to\":\"completed\",\"type\":\"run_state_changed\"}",1790438778871],"table":"key_events"}
+{"row":["run_000001a0de77a803_000002-start","sess_local_alpha",3,"sess_local_alpha","run_000001a0de77a803_000002","run_000001a0de77a803_000002#a1","run_state_changed","{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}",1790438778883],"table":"key_events"}
+{"row":["run_000001a0de77a803_000002-done","sess_local_alpha",4,"sess_local_alpha","run_000001a0de77a803_000002","run_000001a0de77a803_000002#a1","run_state_changed","{\"from\":\"running\",\"to\":\"completed\",\"type\":\"run_state_changed\"}",1790438778883],"table":"key_events"}
+{"row":["run_000001a0de77a80d_000003-start","sess_local_alpha",5,"sess_local_alpha","run_000001a0de77a80d_000003","run_000001a0de77a80d_000003#a1","run_state_changed","{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}",1790438778893],"table":"key_events"}
+{"row":["run_000001a0de77a80d_000003-done","sess_local_alpha",6,"sess_local_alpha","run_000001a0de77a80d_000003","run_000001a0de77a80d_000003#a1","run_state_changed","{\"from\":\"running\",\"to\":\"completed\",\"type\":\"run_state_changed\"}",1790438778893],"table":"key_events"}

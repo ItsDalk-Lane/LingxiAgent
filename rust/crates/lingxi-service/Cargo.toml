@@ -59,3 +59,10 @@ lingxi-adapters = { path = "../lingxi-adapters" }
 # uses tokio's "sync" feature (Notify behind the bounded subscriber
 # mailboxes); same locked tokio version, feature flag only — no new lock
 # entries beyond this crate's existing references.
+#
+# R02-T06 dev-only: rusqlite at the SAME locked version + bundled feature as
+# lingxi-adapters (zero new lock entries). Used exclusively by the shutdown
+# coordinator tests to hold a REAL external WAL write lock while proving the
+# deadline bounds a blocked DB close.
+[dev-dependencies]
+rusqlite = { version = "0.40.2", features = ["bundled"] }

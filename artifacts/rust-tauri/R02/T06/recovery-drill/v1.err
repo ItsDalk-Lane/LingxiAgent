@@ -1,0 +1,10 @@
+2026-09-26T15:13:48.139518Z  INFO lingxi_service: data root resolved effective_home=/tmp/lingxi-r02t06-drill-v1-jgcaGB source=cli ignored_sources=none
+2026-09-26T15:13:48.140021Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/tmp/lingxi-r02t06-drill-v1-jgcaGB runtime_dir=/private/tmp/lingxi-r02t06-drill-v1-jgcaGB/lingxi-service
+2026-09-26T15:13:48.140274Z  INFO lingxi_service: single-writer lock acquired instance_id=d00d52f27572b2d5f3bb470eeb5e08bf start_nonce=bfc7b7ba7f68060a pid=31189 entropy="os-random-device" lock=/private/tmp/lingxi-r02t06-drill-v1-jgcaGB/lingxi-service/instance.lock network_mode=loopback
+LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE reason=corrupt-stamp evidence=transitionJournal(fromEpoch=1,toEpoch=2,phase=barrier_raised,transitionId=transition-1-2)
+[data-epoch] The data safety gate refused startup (corrupt-stamp): the epoch stamp is corrupt (EOF while parsing a string at line 1 column 18); a readable transition journal targeting epochs 1→2 is present, so startup is refused instead of guessing
+[data-epoch] A READABLE transition journal is present in this data home: epochs 1→2, phase=barrier_raised, transitionId=transition-1-2. It is concrete higher-epoch evidence, so startup is refused instead of guessing.
+[data-epoch] 数据安全闸拒绝启动（corrupt-stamp）：the epoch stamp is corrupt (EOF while parsing a string at line 1 column 18); a readable transition journal targeting epochs 1→2 is present, so startup is refused instead of guessing
+[data-epoch] 请保留现场文件，使用维护/恢复流程处理；不要删除未知状态后强行启动。
+
+2026-09-26T15:13:48.140885Z ERROR lingxi_service: data-epoch gate refused startup (exit 2) reason="corrupt-stamp" home=/private/tmp/lingxi-r02t06-drill-v1-jgcaGB

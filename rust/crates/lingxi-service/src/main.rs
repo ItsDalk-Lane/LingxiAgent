@@ -21,14 +21,17 @@
 use std::io::IsTerminal as _;
 use std::process::ExitCode;
 
+use lingxi_service::epoch;
 use lingxi_service::instance::InstanceLockError;
+use lingxi_service::shutdown;
 use lingxi_service::{
     acquire, parse_cli, prepare_layout, run, InstanceRecord, ServiceConfig, ServiceState,
     HOME_ENV_VAR, SINGLE_WRITER_BLOCKED_MARKER, STALE_RECORD_MARKER,
 };
 
 const USAGE: &str = r#"usage: lingxi-service [--bind <SOCKADDR>] [--home <DIR>] \
-[--config <FILE>] [--test-mode] [--network-mode <loopback|lan>]
+[--config <FILE>] [--test-mode] [--network-mode <loopback|lan>] \
+[--shutdown-timeout-ms <MS>]
 
 Options:
   --bind <SOCKADDR>       Listen address (default 127.0.0.1:0, loopback + ephemeral).
@@ -40,6 +43,10 @@ Options:
                           opt-in: a non-loopback --bind without --network-mode lan
                           is a startup error, and even loopback requests require
                           authentication (no loopback-trust exemption).
+  --shutdown-timeout-ms <MS>  Graceful-shutdown deadline per shutdown phase
+                          (default 10000). A phase that exceeds it prints the
+                          LINGXI_SERVICE_SHUTDOWN_TIMEOUT marker and the shutdown
+                          continues; the exit code reports it.
   --help                  Print this help and exit 0.
   --version               Print server identity/version and exit 0.
 
@@ -48,10 +55,13 @@ Every explicitly given source is validated even when it loses precedence.
 No source at all is a startup error (exit 2) - there is no default into a
 real user directory.
 
-Exit codes: 0 clean stop; 1 serve failure; 2 configuration/startup error;
-3 single-writer lock held by another instance (or lock IO failure);
+Exit codes: 0 clean stop; 1 serve failure; 2 configuration/startup error
+(including a data-epoch gate refusal: corrupt epoch metadata, a higher-epoch
+stamp, or an incomplete transition — see the LINGXI_DATA_EPOCH_* stderr
+markers); 3 single-writer lock held by another instance (or lock IO failure);
 4 shutdown instance-record cleanup failed;
-5 run database shutdown (drain/checkpoint) failed.
+5 run database shutdown (drain/checkpoint) failed;
+6 a shutdown phase exceeded --shutdown-timeout-ms (recorded explicitly).
 "#;
 
 fn print_version() {
@@ -183,6 +193,46 @@ async fn main() -> ExitCode {
         );
     }
 
+    // ---- data-epoch startup gate (R02-T06 + PROD-DEFECT-1 closure) ----
+    // Immediately after the same-home mutex and BEFORE any store is opened
+    // or auth state is written (mirrors the incumbent server/index.ts
+    // ordering). Fail-closed on EVERY failure: corrupt epoch metadata, a
+    // higher-epoch stamp, an incomplete transition or foreign unstamped
+    // data all refuse startup with a truthful diagnostic — the incumbent
+    // DATA_EPOCH=1 baseline softening (the registered fail-open defect
+    // RR-T07-PROD-DEFECT-1) does not exist in this stack.
+    {
+        let now_ms = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_millis() as i64)
+            .unwrap_or(0);
+        match epoch::coordinate_data_epoch_startup(
+            &layout.home,
+            u64::from(lingxi_protocol::ContractVersions::R00_BASELINE.data_epoch),
+            lingxi_service::server_version(),
+            now_ms,
+        ) {
+            Ok(decision) => {
+                tracing::info!(
+                    home = %layout.home.display(),
+                    decision = ?decision,
+                    "data-epoch gate passed"
+                );
+            }
+            Err(block) => {
+                // Machine-readable marker line first (desktop recognition
+                // contract), then the full bilingual diagnostic.
+                eprintln!("{}", epoch::render_block(&block));
+                tracing::error!(
+                    reason = block.reason,
+                    home = %layout.home.display(),
+                    "data-epoch gate refused startup (exit 2)"
+                );
+                return ExitCode::from(2);
+            }
+        }
+    }
+
     // ---- auth bootstrap (R02-T03): loopback token + registries ----
     // Runs after the lock, before the bind: a broken auth store is a
     // startup error (exit 2), never an auth-less serve.
@@ -207,8 +257,18 @@ async fn main() -> ExitCode {
     // starts); after `run` returns, this task is its only user again.
     let guard = std::sync::Arc::new(std::sync::Mutex::new(guard));
     let ready_guard = std::sync::Arc::clone(&guard);
-    let shutdown = shutdown_signal();
+    let ws_signal = state.ws_shutdown();
+    let shutdown = async move {
+        shutdown_signal().await;
+        // R02-T06: broadcast the shutdown to the managed WS sessions at
+        // SIGNAL time, before the transport's own graceful wait — axum
+        // waits for upgraded connections to finish, so the sessions must
+        // self-terminate now (close frame 1001) or the stop would deadlock.
+        ws_signal.request_close();
+    };
     let storage = std::sync::Arc::clone(state.storage());
+    let ws_shutdown = state.ws_shutdown();
+    let shutdown_timeout_ms = state.config().shutdown_timeout_ms;
     let result = run(state, shutdown, move |addr| {
         let mut guard = ready_guard
             .lock()
@@ -233,27 +293,67 @@ async fn main() -> ExitCode {
 
     match result {
         Ok(()) => {
-            // R02-T04 shutdown order: stop serving -> close the run
-            // database (drain + WAL TRUNCATE checkpoint + join worker) ->
-            // remove OUR record -> unlock. A failed storage close is its
-            // own loud exit code (5), distinct from record cleanup (4).
-            if let Err(err) = storage.close().await {
-                eprintln!("error: run database shutdown failed: {err}");
-                return ExitCode::from(5);
-            }
-            let mut guard = guard
-                .lock()
-                .unwrap_or_else(|poisoned| poisoned.into_inner());
-            match guard.release() {
-                Ok(()) => {
-                    tracing::info!(
-                        "lingxi-service stopped cleanly (run database closed, own record                          removed, lock released)"
+            // R02-T06 shutdown coordinator: stop serving (already drained by
+            // the transport above) -> wait/cancel managed WS tasks -> close
+            // the run database (event flush = queue drain + WAL TRUNCATE
+            // checkpoint + worker join) -> remove OUR record -> unlock.
+            // Every phase is bounded by --shutdown-timeout-ms; timeouts are
+            // loud (LINGXI_SERVICE_SHUTDOWN_TIMEOUT) and reported through a
+            // dedicated exit code.
+            let deadline = std::time::Duration::from_millis(shutdown_timeout_ms);
+            // After `run` returned, the on_ready closure is gone: the Arc is
+            // uniquely ours. Unwrap it so the shutdown coordinator holds the
+            // InstanceGuard directly (a std MutexGuard must not be held
+            // across the coordinator's awaits).
+            let guard_mutex = match std::sync::Arc::try_unwrap(guard) {
+                Ok(mutex) => mutex,
+                Err(_) => {
+                    eprintln!(
+                        "error: instance record guard is still shared after the \
+                         server stopped; cannot run the shutdown sequence"
                     );
+                    return ExitCode::FAILURE;
+                }
+            };
+            let mut guard = match guard_mutex.into_inner() {
+                Ok(guard) => guard,
+                Err(poisoned) => poisoned.into_inner(),
+            };
+            let report = shutdown::graceful_shutdown(
+                &storage,
+                &ws_shutdown,
+                &mut guard,
+                deadline,
+                shutdown_timeout_ms,
+            )
+            .await;
+            match report.exit_code() {
+                0 => {
+                    tracing::info!("lingxi-service stopped cleanly (run database closed, own record removed, lock released)");
                     ExitCode::SUCCESS
                 }
-                Err(err) => {
-                    eprintln!("error: shutdown instance-record cleanup failed: {err}");
+                4 => {
+                    eprintln!(
+                        "error: shutdown instance-record cleanup failed: {}",
+                        report.record_error.unwrap_or_else(|| "unknown".to_string())
+                    );
                     ExitCode::from(4)
+                }
+                5 => {
+                    eprintln!(
+                        "error: run database shutdown failed: {}",
+                        report
+                            .storage_error
+                            .as_ref()
+                            .map(|e| e.to_string())
+                            .unwrap_or_else(|| "unknown".to_string())
+                    );
+                    ExitCode::from(5)
+                }
+                6 => ExitCode::from(6),
+                other => {
+                    eprintln!("error: unexpected shutdown report exit code {other}");
+                    ExitCode::FAILURE
                 }
             }
         }

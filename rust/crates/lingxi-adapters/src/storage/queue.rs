@@ -360,7 +360,70 @@ fn open_and_pragma(
         .map_err(migrations::map_rusqlite)?;
     conn.pragma_update(None, "synchronous", "FULL")
         .map_err(migrations::map_rusqlite)?;
+    // R02-T06 (T04 REVIEW F04 follow-up): defense in depth — the files live
+    // in a 0700 directory, but the files themselves are also tightened to
+    // owner-only so a future directory-permission regression cannot expose
+    // them. A failure here is a loud open error (the store must never run
+    // with looser-than-intended file semantics silently).
+    tighten_db_file_permissions(path)?;
     Ok((conn, journal))
+}
+
+/// Tightens the database file and its present WAL sidecars to 0600 on unix.
+/// The main file is strict (failure = open failure); sidecars may not exist
+/// yet on first open, so a missing sidecar is skipped and a failing sidecar
+/// chmod is logged loudly (the sidecars are recreated per-session by SQLite
+/// and are re-tightened on every subsequent open).
+fn tighten_db_file_permissions(path: &Path) -> Result<(), StorageError> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let tighten = |p: &Path| -> std::io::Result<bool> {
+            let Ok(meta) = std::fs::metadata(p) else {
+                return Ok(false); // sidecar not created yet on a first open
+            };
+            let mut perms = meta.permissions();
+            if perms.mode() & 0o777 == 0o600 {
+                return Ok(false);
+            }
+            perms.set_mode(0o600);
+            std::fs::set_permissions(p, perms)?;
+            Ok(true)
+        };
+        tighten(path).map_err(|source| StorageError::Io {
+            detail: format!(
+                "cannot tighten database file permissions to 0600 ({}): {source}",
+                path.display()
+            ),
+        })?;
+        for suffix in ["-wal", "-shm"] {
+            let sidecar = std::path::PathBuf::from(format!("{}{suffix}", path.display()));
+            match tighten(&sidecar) {
+                Ok(true) => {
+                    tracing::debug!(
+                        file = %sidecar.display(),
+                        "tightened WAL sidecar permissions to 0600"
+                    );
+                }
+                Ok(false) => {}
+                Err(source) => {
+                    // Non-fatal by design (the containing directory is 0700
+                    // and the sidecar is recreated per session), but never
+                    // silent: the condition is logged with the OS error.
+                    tracing::warn!(
+                        file = %sidecar.display(),
+                        %source,
+                        "cannot tighten WAL sidecar permissions (directory remains 0700; will retry on next open)"
+                    );
+                }
+            }
+        }
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = path;
+    }
+    Ok(())
 }
 
 /// TRUNCATE checkpoint: rewinds the WAL file to zero length. Errors are

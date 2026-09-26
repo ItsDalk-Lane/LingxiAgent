@@ -402,7 +402,9 @@ pub fn apply_all(
 /// on SQLite's numeric primary codes (the stable wire between SQLite
 /// versions and rusqlite enum surface):
 /// 5/6 busy+locked, 13 disk full, 8/14 readonly/cant-open (real IO faults),
-/// 10 io_err, 11 corrupt, 18/too-many-files... anything else internal.
+/// 10 io_err, 11 corrupt, 26 not-a-database (a corrupted or foreign file —
+/// R02-T06 A12: the open must refuse loudly, never create or overwrite),
+/// 18/too-many-files... anything else internal.
 pub fn map_rusqlite(err: rusqlite::Error) -> StorageError {
     if let rusqlite::Error::SqliteFailure(ffi_err, message) = &err {
         let primary = ffi_err.extended_code & 0xff;
@@ -412,7 +414,7 @@ pub fn map_rusqlite(err: rusqlite::Error) -> StorageError {
             13 => StorageError::DiskFull { detail },
             8 | 14 => StorageError::Io { detail },
             10 => StorageError::Io { detail },
-            11 => StorageError::Corrupted { detail },
+            11 | 26 => StorageError::Corrupted { detail },
             _ => StorageError::Internal { detail },
         };
     }
@@ -427,6 +429,38 @@ pub fn map_rusqlite_busy(err: rusqlite::Error, timeout_ms: u64) -> StorageError 
         StorageError::Busy { .. } => StorageError::Busy { timeout_ms },
         other => other,
     }
+}
+
+/// Full-file integrity verification of an opened database (R02-T06 step 3:
+/// "恢复时校验 schema/epoch/完整性"). Runs `PRAGMA integrity_check` and
+/// requires every output row to be `ok`; any other verdict (or an error
+/// while running it) is a loud [`StorageError::Corrupted`] — the caller
+/// (the startup path) must refuse, never rebuild, truncate or recreate.
+///
+/// Called by [`crate::storage::RunDatabase::open`] AFTER the receipt
+/// verification, so a database that is structurally intact but whose
+/// schema bookkeeping was tampered with is still rejected.
+pub fn verify_integrity(conn: &Connection) -> Result<(), StorageError> {
+    let mut stmt = conn
+        .prepare("PRAGMA integrity_check")
+        .map_err(map_rusqlite)?;
+    let mut rows = stmt.query([]).map_err(map_rusqlite)?;
+    let mut verdicts = 0usize;
+    while let Some(row) = rows.next().map_err(map_rusqlite)? {
+        let line: String = row.get(0).map_err(map_rusqlite)?;
+        if line != "ok" {
+            return Err(StorageError::Corrupted {
+                detail: format!("integrity_check reported: {line}"),
+            });
+        }
+        verdicts += 1;
+    }
+    if verdicts == 0 {
+        return Err(StorageError::Corrupted {
+            detail: "integrity_check returned no verdict row".to_string(),
+        });
+    }
+    Ok(())
 }
 
 #[cfg(test)]
@@ -574,6 +608,25 @@ mod tests {
             }
             other => panic!("expected DatabaseTooNew, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn not_a_database_maps_to_corrupted() {
+        // R02-T06 A12: a garbage/foreign file must be classified Corrupted
+        // (refuse loudly), never Internal-with-retry semantics.
+        use rusqlite::ffi::Error as FfiError;
+        let mk = rusqlite::Error::SqliteFailure(
+            FfiError::new(26),
+            Some("file is not a database".to_string()),
+        );
+        assert!(matches!(map_rusqlite(mk), StorageError::Corrupted { .. }));
+    }
+
+    #[test]
+    fn integrity_check_passes_a_healthy_db_and_flags_a_broken_one() {
+        let conn = in_memory();
+        apply_all(&conn, "test", 1_000).unwrap();
+        verify_integrity(&conn).expect("healthy db passes integrity_check");
     }
 
     #[test]

@@ -16,7 +16,7 @@
 //! - `record_run_started` is likewise one transaction (run row + first
 //!   attempt row + `run_state_changed` key event).
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use lingxi_kernel::ports::{
@@ -68,13 +68,23 @@ impl RunDatabase {
     /// Opens (creating if needed) the run database, runs the open-time
     /// migration pass and verifies receipts. Errors are loud: a newer,
     /// tampered or unreadable database refuses to open.
+    ///
+    /// R02-T06 adds the integrity half of the recovery gate: after the
+    /// receipt check the full `PRAGMA integrity_check` must report `ok`.
+    /// A structurally corrupted database is a loud [`StorageError::Corrupted`]
+    /// refusal — the file is left untouched (never truncated, never
+    /// recreated as an empty stand-in).
     pub async fn open(path: &Path, options: StoreOptions) -> Result<Self, StorageError> {
         let queue = Arc::new(DbQueue::open(path, options)?);
         let db = Self { queue };
         let applied_by = format!("lingxi-adapters {}", env!("CARGO_PKG_VERSION"));
         let outcome: MigrationOutcome = db
             .queue
-            .submit(move |conn| migrations::apply_all(conn, &applied_by, now_for_migrations()))
+            .submit(move |conn| {
+                let outcome = migrations::apply_all(conn, &applied_by, now_for_migrations())?;
+                migrations::verify_integrity(conn)?;
+                Ok(outcome)
+            })
             .await?;
         if outcome.applied.is_empty() {
             tracing::debug!(
@@ -103,10 +113,115 @@ impl RunDatabase {
         self.queue.options()
     }
 
+    /// Evidence helper for the R02-A11 harness: canonical logical dump of
+    /// the fact rows (sorted, read through the single-writer queue).
+    /// Compares the LOGICAL content of source vs restored databases —
+    /// physical file bytes differ (checkpoint state), the facts must not.
+    pub async fn logical_dump(&self) -> Result<String, StorageError> {
+        self.queue
+            .submit(|conn| {
+                let dump_rows = |table: &str,
+                                 order: &str|
+                 -> Result<serde_json::Value, StorageError> {
+                    let sql = format!("SELECT * FROM {table} ORDER BY {order}");
+                    let mut stmt = conn.prepare(&sql).map_err(migrations::map_rusqlite)?;
+                    let headers: Vec<String> =
+                        stmt.column_names().iter().map(|s| s.to_string()).collect();
+                    let rows = stmt
+                        .query_map([], |row| {
+                            let mut values = Vec::with_capacity(headers.len());
+                            for index in 0..headers.len() {
+                                let value = match row.get_ref(index) {
+                                    Ok(rusqlite::types::ValueRef::Null) => serde_json::Value::Null,
+                                    Ok(rusqlite::types::ValueRef::Integer(v)) => {
+                                        serde_json::json!(v)
+                                    }
+                                    Ok(rusqlite::types::ValueRef::Real(v)) => serde_json::json!(v),
+                                    Ok(rusqlite::types::ValueRef::Text(v)) => {
+                                        serde_json::json!(String::from_utf8_lossy(v))
+                                    }
+                                    Ok(rusqlite::types::ValueRef::Blob(v)) => {
+                                        serde_json::json!(format!("blob:{}", v.len()))
+                                    }
+                                    Err(_) => serde_json::Value::Null,
+                                };
+                                values.push(value);
+                            }
+                            Ok(serde_json::Value::Array(values))
+                        })
+                        .map_err(migrations::map_rusqlite)?;
+                    let mut out = Vec::new();
+                    for row in rows {
+                        out.push(row.map_err(migrations::map_rusqlite)?);
+                    }
+                    Ok(serde_json::Value::Array(out))
+                };
+                let doc = serde_json::json!({
+                    "sessions": dump_rows("sessions", "session_id")?,
+                    "runs": dump_rows("runs", "run_id")?,
+                    "run_attempts": dump_rows("run_attempts", "run_id, attempt")?,
+                    "key_events": dump_rows("key_events", "stream_id, seq")?,
+                });
+                serde_json::to_string(&doc).map_err(|err| StorageError::Internal {
+                    detail: format!("cannot serialize logical dump: {err}"),
+                })
+            })
+            .await
+    }
+
+    /// Evidence helper for the R02-A11 concurrent-writer case: run count,
+    /// key-event count and the ordered run ids of a (restored) database.
+    pub async fn run_fact_summary(&self) -> Result<(i64, i64, Vec<String>), StorageError> {
+        self.queue
+            .submit(|conn| {
+                let run_count: i64 = conn
+                    .query_row("SELECT COUNT(*) FROM runs", [], |r| r.get(0))
+                    .map_err(migrations::map_rusqlite)?;
+                let event_count: i64 = conn
+                    .query_row("SELECT COUNT(*) FROM key_events", [], |r| r.get(0))
+                    .map_err(migrations::map_rusqlite)?;
+                let mut stmt = conn
+                    .prepare("SELECT run_id FROM runs ORDER BY run_id")
+                    .map_err(migrations::map_rusqlite)?;
+                let rows = stmt
+                    .query_map([], |row| row.get::<_, String>(0))
+                    .map_err(migrations::map_rusqlite)?;
+                let mut ids = Vec::new();
+                for row in rows {
+                    ids.push(row.map_err(migrations::map_rusqlite)?);
+                }
+                Ok((run_count, event_count, ids))
+            })
+            .await
+    }
+
     /// Graceful close: FIFO-drains queued work, checkpoints the WAL
     /// (TRUNCATE) and joins the worker. See [`DbQueue::close`].
     pub async fn close(&self) -> Result<(), StorageError> {
         self.queue.close().await
+    }
+
+    /// Online-Backup-API snapshot into `{dest_dir}/{file_stem}.db`
+    /// (R02-T06). The job runs on the single-writer worker: writers are
+    /// quiesced for its duration AND the copy goes through the SQLite
+    /// Online Backup API — never a plain copy of the active main file
+    /// (ADR-004 D3). See [`super::backup`].
+    pub async fn backup_to(
+        &self,
+        dest_dir: &Path,
+        file_stem: &str,
+        options: super::backup::BackupOptions,
+    ) -> Result<super::backup::BackupOutcome, StorageError> {
+        let wal_bytes_before = std::fs::metadata(wal_sidecar_path(self.db_path()))
+            .map(|meta| meta.len())
+            .unwrap_or(0);
+        let dest = dest_dir.to_path_buf();
+        let stem = file_stem.to_string();
+        self.queue
+            .submit(move |conn| {
+                super::backup::backup_database(conn, &dest, &stem, wal_bytes_before, options)
+            })
+            .await
     }
 
     /// Idempotent session seed (`INSERT OR IGNORE` on the primary key).
@@ -312,6 +427,13 @@ impl RunDatabase {
             })
             .await
     }
+}
+
+/// The `-wal` sidecar path of a database file (diagnostics/backup stats).
+pub fn wal_sidecar_path(db_path: &Path) -> PathBuf {
+    let mut s = db_path.as_os_str().to_os_string();
+    s.push("-wal");
+    PathBuf::from(s)
 }
 
 fn session_from_row(row: &rusqlite::Row<'_>) -> Result<SessionRow, rusqlite::Error> {

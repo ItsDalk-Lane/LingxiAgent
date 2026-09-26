@@ -1,0 +1,13 @@
+2026-09-26T16:06:29.365869Z  INFO lingxi_service: data root resolved effective_home=/tmp/lingxi-r02t06-drill-v8-IHlx01 source=cli ignored_sources=none
+2026-09-26T16:06:29.365998Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/tmp/lingxi-r02t06-drill-v8-IHlx01 runtime_dir=/private/tmp/lingxi-r02t06-drill-v8-IHlx01/lingxi-service
+2026-09-26T16:06:29.374565Z  INFO lingxi_service: single-writer lock acquired instance_id=46b1c9a9d6c5f107b8b760e82c4f1d8e start_nonce=06189ed8b722e3bf pid=73119 entropy="os-random-device" lock=/private/tmp/lingxi-r02t06-drill-v8-IHlx01/lingxi-service/instance.lock network_mode=loopback
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/tmp/lingxi-r02t06-drill-v8-IHlx01 previousInstanceId=f8dccf5f7cd38cec8bab7f15b611e7c2 previousPid=73107 previousStartNonce=e0b81f4cded7067c previousStartedAtUnixMs=1790438789236 handshakeMismatches=none
+2026-09-26T16:06:29.374755Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) stale_instance_id=f8dccf5f7cd38cec8bab7f15b611e7c2 stale_archive=/private/tmp/lingxi-r02t06-drill-v8-IHlx01/lingxi-service/instance.stale.json
+2026-09-26T16:06:29.374845Z  INFO lingxi_service: data-epoch gate passed home=/private/tmp/lingxi-r02t06-drill-v8-IHlx01 decision=ProceedSteady(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-09-26T16:06:29.386561Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/tmp/lingxi-r02t06-drill-v8-IHlx01/lingxi-service/data/runs.db applied=[1] version=1
+2026-09-26T16:06:29.386685Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only);          run database migrated and seeded local_token_file=/private/tmp/lingxi-r02t06-drill-v8-IHlx01/lingxi-service/local-token.json run_database=/private/tmp/lingxi-r02t06-drill-v8-IHlx01/lingxi-service/data/runs.db
+2026-09-26T16:06:29.395583Z  INFO lingxi_service: instance record published (atomic write) record=/private/tmp/lingxi-r02t06-drill-v8-IHlx01/lingxi-service/instance.json bind_addr=127.0.0.1:62922
+2026-09-26T16:06:29.426206Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-09-26T16:06:29.427031Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-09-26T16:06:29.427191Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-09-26T16:06:29.427215Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

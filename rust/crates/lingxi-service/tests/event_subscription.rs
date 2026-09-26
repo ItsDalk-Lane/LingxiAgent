@@ -46,6 +46,7 @@ fn config_for(home: &std::path::Path) -> ServiceConfig {
         data_home: home.to_path_buf(),
         home_source: HomeSource::Cli,
         network_mode: NetworkMode::Loopback,
+        shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
     }
 }
 
