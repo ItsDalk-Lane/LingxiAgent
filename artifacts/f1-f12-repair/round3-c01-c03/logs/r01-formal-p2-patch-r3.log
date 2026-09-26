@@ -1,0 +1,92 @@
+{
+  "base": "67dee5d2de9d3b9fc75ec5ef5c555e93c65b3ccd",
+  "patch": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz",
+  "patchBytes": 581919850,
+  "patchSha256": "3899bcc0a3b7aafd4af801966d04e0c1ee817bff94715d52db4ac338721bdabd",
+  "patchUncompressedBytes": 989864147,
+  "patchFormat": "sharded",
+  "patchShardBytes": 45000000,
+  "patchManifest": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.shards.json",
+  "patchShards": [
+    {
+      "path": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00001",
+      "bytes": 45000000,
+      "sha256": "f7cf67f93da9f1e35c70cc28fd1f10edde92e3da7f0d89cf35f5c2d29231e199"
+    },
+    {
+      "path": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00002",
+      "bytes": 45000000,
+      "sha256": "b52b2c7817198aa38543e40fb0474d87f5c87487b126ea1470bc0eb95384e315"
+    },
+    {
+      "path": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00003",
+      "bytes": 45000000,
+      "sha256": "31ef506645e3f9ed82ba37a05f14fd8c864789b041af924946eef187c911a3f7"
+    },
+    {
+      "path": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00004",
+      "bytes": 45000000,
+      "sha256": "2805c2003252fa5a98fd1e363443067aa6e63abe7cdeed3dca6f55bcef4bf444"
+    },
+    {
+      "path": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00005",
+      "bytes": 45000000,
+      "sha256": "b880dab27e31e0633dc71039353a8e6ed21460ad4b42e51abd04817a8e7fc8e4"
+    },
+    {
+      "path": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00006",
+      "bytes": 45000000,
+      "sha256": "e8f2a177af7976e08046b4b5441ab7dd5b845631525356ea4787b1fd93873784"
+    },
+    {
+      "path": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00007",
+      "bytes": 45000000,
+      "sha256": "9f1cf08c5b290d45c0ab98ca4c7f5b5aaf9ad9882ab8ab8ef166bb036cfd6d35"
+    },
+    {
+      "path": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00008",
+      "bytes": 45000000,
+      "sha256": "f6d3fcab95e92feb934254457f979dd0931a0b66cfcc4d937b85ad3c98608c0d"
+    },
+    {
+      "path": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00009",
+      "bytes": 45000000,
+      "sha256": "c31b1db81784a6a65b5cc943cb6de41e5b0bd745730564966fc1011ea6091684"
+    },
+    {
+      "path": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00010",
+      "bytes": 45000000,
+      "sha256": "0b055921503fc876f0c9bbc9aa2f0149651868040b9559c221f252999fa47a4d"
+    },
+    {
+      "path": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00011",
+      "bytes": 45000000,
+      "sha256": "4057a6b3d2db33462eed04598b6f147ce9e5f69ae8dcc368b1b7976da35ac35a"
+    },
+    {
+      "path": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00012",
+      "bytes": 45000000,
+      "sha256": "e96e62dcd9f04723e7a70a7e7c567cbbaf43b66be2bab980831f9308642e34b1"
+    },
+    {
+      "path": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00013",
+      "bytes": 41919850,
+      "sha256": "7dfceb67d9ef243e68da82f0821aa59e3361ebcf0ea3e90773d49fe52bd8187a"
+    }
+  ],
+  "patchMaxDeliveredFileBytes": 45000000,
+  "sourceManifestHash": "92a1c77e09f87bd1ef345056aea10eff388bfeae0b54db781845a4bb4c667269",
+  "replayedSourceManifestHash": "92a1c77e09f87bd1ef345056aea10eff388bfeae0b54db781845a4bb4c667269",
+  "frozenSourceManifestHash": "92a1c77e09f87bd1ef345056aea10eff388bfeae0b54db781845a4bb4c667269",
+  "frozenManifestEntries": 8319,
+  "replayedMatchesCurrent": true,
+  "replayedMatchesFrozenManifest": true,
+  "state": "source",
+  "verifiedSourceSha": "fe394bbbef22c7879338b9bee8fc7ee5a80d22b0",
+  "verifiedSourceObjectType": "commit",
+  "frozenMatchesVerifiedCommit": null,
+  "currentMatchesHead": null,
+  "sealGuardPassed": null,
+  "failures": [],
+  "result": "VERIFIED"
+}
