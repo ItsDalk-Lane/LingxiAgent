@@ -50,7 +50,8 @@ real user directory.
 
 Exit codes: 0 clean stop; 1 serve failure; 2 configuration/startup error;
 3 single-writer lock held by another instance (or lock IO failure);
-4 shutdown instance-record cleanup failed.
+4 shutdown instance-record cleanup failed;
+5 run database shutdown (drain/checkpoint) failed.
 "#;
 
 fn print_version() {
@@ -187,7 +188,7 @@ async fn main() -> ExitCode {
     // startup error (exit 2), never an auth-less serve.
     let home_display = layout.home.display().to_string();
     let source_display = config.home_source.to_string();
-    let state = match ServiceState::bootstrap(config, &layout) {
+    let state = match ServiceState::bootstrap(config, &layout).await {
         Ok(state) => state,
         Err(err) => {
             eprintln!("error: {err}");
@@ -196,7 +197,8 @@ async fn main() -> ExitCode {
     };
     tracing::info!(
         local_token_file = %state.auth().local_token_path().display(),
-        "auth service bootstrapped (per-start loopback token, owner-only)"
+        run_database = %state.storage().db_path().display(),
+        "auth service bootstrapped (per-start loopback token, owner-only);          run database migrated and seeded"
     );
 
     // ---- serve; publish the instance record once the address is known ----
@@ -206,6 +208,7 @@ async fn main() -> ExitCode {
     let guard = std::sync::Arc::new(std::sync::Mutex::new(guard));
     let ready_guard = std::sync::Arc::clone(&guard);
     let shutdown = shutdown_signal();
+    let storage = std::sync::Arc::clone(state.storage());
     let result = run(state, shutdown, move |addr| {
         let mut guard = ready_guard
             .lock()
@@ -230,14 +233,21 @@ async fn main() -> ExitCode {
 
     match result {
         Ok(()) => {
-            // Shutdown cleanup: remove OUR record only, then unlock.
+            // R02-T04 shutdown order: stop serving -> close the run
+            // database (drain + WAL TRUNCATE checkpoint + join worker) ->
+            // remove OUR record -> unlock. A failed storage close is its
+            // own loud exit code (5), distinct from record cleanup (4).
+            if let Err(err) = storage.close().await {
+                eprintln!("error: run database shutdown failed: {err}");
+                return ExitCode::from(5);
+            }
             let mut guard = guard
                 .lock()
                 .unwrap_or_else(|poisoned| poisoned.into_inner());
             match guard.release() {
                 Ok(()) => {
                     tracing::info!(
-                        "lingxi-service stopped cleanly (own record removed, lock released)"
+                        "lingxi-service stopped cleanly (run database closed, own record                          removed, lock released)"
                     );
                     ExitCode::SUCCESS
                 }

@@ -1,0 +1,21 @@
+{
+  "compiledIn": [
+    {
+      "fingerprint": "479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8",
+      "name": "initial_run_message_schema",
+      "version": 1
+    }
+  ],
+  "dbPath": "withheld-from-evidence",
+  "receipts": [
+    {
+      "appliedAtUnixMs": 1790414106236,
+      "appliedBy": "lingxi-adapters 0.0.0",
+      "fingerprint": "479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8",
+      "name": "initial_run_message_schema",
+      "version": 1
+    }
+  ],
+  "supportedVersion": 1,
+  "userVersion": 1
+}

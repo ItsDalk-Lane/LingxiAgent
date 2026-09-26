@@ -1,0 +1,35 @@
+[package]
+name = "lingxi-adapters"
+description = "Port implementations injected by lingxi-service (R02-T04): SQLite-backed storage for the new run/message database behind a bounded single-writer work queue. Never depends on lingxi-service (DEP-09); implements kernel ports only."
+version = "0.0.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+# R02-T04: every third-party crate below is ALREADY a locked member of the
+# workspace dependency tree at exactly this version (no new third-party
+# version enters rust/Cargo.lock with this crate; the lock only gains the
+# workspace member and its dependency references):
+#   - rusqlite 0.40.2 + bundled (R01-T03 lock, same feature set as
+#     lingxi-spike): the SQLite engine is compiled in; no system libsqlite3.
+#   - tokio 1.53.1 (sync): the bounded mpsc/oneshot queue in front of the
+#     dedicated synchronous worker thread.
+#   - sha2 0.11.0: migration fingerprints (sha256 over the SQL text).
+#   - tracing 0.1.44: worker diagnostics (never payloads/secrets).
+#   - serde/serde_json 1.0.229/1.0.151: canonical payload serialization via
+#     lingxi-protocol's canonical JSON profile.
+[dependencies]
+lingxi-kernel = { path = "../lingxi-kernel" }
+lingxi-protocol = { path = "../lingxi-protocol" }
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+sha2 = "0.11.0"
+tokio = { version = "1.53.1", features = ["sync", "macros", "rt"] }
+tracing = "0.1.44"
+
+# Dev-only: RLIMIT_FSIZE/SIGXFSZ fault injection for the R02-A07
+# disk-write-failure acceptance tests (locked version, same as
+# lingxi-browser-spike's direct dependency).
+[dev-dependencies]
+libc = "0.2.189"

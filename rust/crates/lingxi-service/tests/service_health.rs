@@ -83,8 +83,9 @@ async fn start_test_server(tag: &str) -> TestServer {
     let home_for_task = config.data_home.clone();
     let handle = tokio::spawn(async move {
         let layout = prepare_layout(&home_for_task).expect("prepare layout (synthetic home)");
-        let state =
-            ServiceState::bootstrap(config, &layout).expect("auth bootstrap (synthetic home)");
+        let state = ServiceState::bootstrap(config, &layout)
+            .await
+            .expect("bootstrap (synthetic home, real run database)");
         run(
             state,
             async {

@@ -47,3 +47,11 @@ base64 = "0.23.1"
 #     TokioIo adapts hyper's upgraded connection IO to tokio's
 #     AsyncRead/AsyncWrite for the WS frame codec.
 hyper-util = { version = "0.1.21", default-features = false, features = ["tokio"] }
+# R02-T04 additions — both are workspace members, zero third-party change:
+#   - lingxi-kernel: the StoragePort contract this composition root now
+#     injects (R02-T01 deliberately deferred the edge until a port
+#     implementation existed to inject).
+#   - lingxi-adapters: the SQLite-backed StoragePort implementation (new
+#     run/message database behind a bounded single-writer queue).
+lingxi-kernel = { path = "../lingxi-kernel" }
+lingxi-adapters = { path = "../lingxi-adapters" }

@@ -1,0 +1,48 @@
+{
+ "schema_version": "1.0",
+ "task_id": "R02-T04",
+ "stage_id": "R02",
+ "generated_by": "ZCode:R02-T04 (EXECUTOR-R02-T04, 2026-09-26); fingerprints = sha256 over the migration SQL text, cross-checked against the on-disk receipt produced by lingxi-storage-inspect in artifacts/rust-tauri/R02/T04/s4-migrations-round1.json",
+ "deterministic": "no timestamps/randomness; identical migration SQL produces identical fingerprints",
+ "new_persistence_points": [
+  {
+   "store_id": "rust-runs-db",
+   "kind": "sqlite-database",
+   "path_pattern": "{LINGXI_HOME}/lingxi-service/data/runs.db (+-wal/-shm siblings)",
+   "created_by_task": "R02-T04",
+   "owner": "adapters.storage (module lingxi-adapters; port contract in lingxi-kernel::ports::StoragePort)",
+   "writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "tables": {
+    "sessions": "kernel.session",
+    "runs": "kernel.run-supervisor",
+    "run_attempts": "kernel.run-supervisor",
+    "invocations": "kernel.tool-gateway (rows arrive R04; schema present)",
+    "messages": "kernel.session (normalized messages; rows arrive R05+; schema present)",
+    "key_events": "kernel.run-supervisor / kernel.session (key events for recovery; consumed by R02-T05)",
+    "schema_migrations": "adapters.storage (migration receipts)"
+   },
+   "pragmas": {
+    "journal_mode": "WAL (verified at open; refusal if not negotiated)",
+    "busy_timeout_ms": 5000,
+    "wal_autocheckpoint_pages": 1000,
+    "foreign_keys": "ON",
+    "synchronous": "FULL"
+   },
+   "migrations": [
+    {
+     "version": 1,
+     "name": "initial_run_message_schema",
+     "fingerprint_sha256": "479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8"
+    }
+   ],
+   "cutover_strategy": "switch-to-new-authority (new isolated database under the new rust data root; no incumbent store is written by this task)",
+   "notes": "Bounded single-writer work queue (capacity 64) fronts all SQLite access; QueueFull is explicit backpressure; terminal status + key events commit in one BEGIN IMMEDIATE transaction; event publication happens only after commit returns Ok."
+  }
+ ],
+ "incumbent_stores_untouched": {
+  "authority": "docs/rust-tauri/R01/DATA_COMPATIBILITY_MATRIX.json (69 stores, per-store strategy)",
+  "summary": "35 preserve-format + 13 regenerable + 11 switch-to-new-authority + 6 shell-local + 4 epoch-mechanism",
+  "statement": "R02-T04 does not merge, migrate or rewrite ANY incumbent store. The 11 switch-to-new-authority stores remain the old JSONL/SQLite formats until the R08 cutover drills (read-only import + receipts + verification + switch per ADR-004). The other 58 stores keep their formats and owners.",
+  "rust_readers_writers_in_this_task": "none (no preserve-format store is read or written by R02-T04 code)"
+ }
+}

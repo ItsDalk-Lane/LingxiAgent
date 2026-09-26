@@ -67,6 +67,7 @@ async fn start_server(tag: &str, ticket_ttl_ms: u64, rate_max: u32, ws_max: usiz
         rate_max,
         ws_max,
     )
+    .await
     .expect("bootstrap");
     let token = state.auth().local_token();
 

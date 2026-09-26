@@ -48,6 +48,8 @@ pub enum Principal {
     LocalUser,
     Device {
         device_id: String,
+        /// Owning user of the paired device (ownership column target).
+        user_id: String,
     },
     WebSession {
         account_id: String,
@@ -57,6 +59,36 @@ pub enum Principal {
         surface: String,
     },
 }
+
+impl Principal {
+    /// Stable storage vocabulary for ownership columns of the new run
+    /// database (kind half). Mirrors the incumbent wire names; changing a
+    /// value is a data migration, not a rename.
+    pub fn storage_kind(&self) -> &'static str {
+        match self {
+            Principal::LocalUser => "local_user",
+            Principal::Device { .. } => "device",
+            Principal::WebSession { .. } => "web_session",
+            Principal::Automation { .. } => "automation",
+        }
+    }
+
+    /// Subject half of the storage ownership key. For the local owner this
+    /// is the same constant the service auth layer uses
+    /// (`user_local`), so run rows and session rows agree on one owner id.
+    pub fn storage_subject(&self) -> String {
+        match self {
+            Principal::LocalUser => LOCAL_OWNER_SUBJECT.to_string(),
+            Principal::Device { user_id, .. } => user_id.clone(),
+            Principal::WebSession { account_id } => account_id.clone(),
+            Principal::Automation { surface } => surface.to_string(),
+        }
+    }
+}
+
+/// Owning user id of the local owner (single constant shared by the kernel
+/// storage vocabulary and the service auth layer's `LOCAL_OWNER_USER_ID`).
+pub const LOCAL_OWNER_SUBJECT: &str = "user_local";
 
 /// Error returned for an illegal run-state transition.
 #[derive(Debug, Clone, PartialEq, Eq)]

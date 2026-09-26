@@ -167,13 +167,21 @@ expect_green nb-restored || exit 1
 DIRTY=0
 
 echo "== [3/4] N-C: inject composition-root INVERSION kernel->lingxi-service (DEP-08)"
+# R02-T04 note: lingxi-service now legitimately depends on
+# lingxi-adapters (port injection), which depends on lingxi-kernel, so the
+# injected inversion kernel->lingxi-service forms a cargo-level CYCLE
+# before the checker even resolves the graph. The rejection is therefore
+# structural (cyclic package dependency naming lingxi-service); before
+# R02-T04 the same injection was rejected by the checker's own DEP-08
+# with the localized message. Both forms reject loudly and both name
+# lingxi-service; the localization grep matches either shape.
 DIRTY=1
 cat >> "$KERNEL_MANIFEST" <<EOF
 
 $INJECTION_MARKER
 lingxi-service = { path = "../lingxi-service" }
 EOF
-expect_fail nc-service-inversion "DEP-08" "module lingxi-kernel transitively depends on forbidden \['lingxi-service'\]" || exit 1
+expect_fail nc-service-inversion "lingxi-service" "cyclic package dependency" || exit 1
 cp "$GUARD_DIR/kernel-Cargo.toml.orig" "$KERNEL_MANIFEST"
 cp "$GUARD_DIR/Cargo.lock.orig" "$LOCKFILE"
 expect_green nc-restored || exit 1

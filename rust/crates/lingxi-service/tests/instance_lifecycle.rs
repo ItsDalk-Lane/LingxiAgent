@@ -73,7 +73,9 @@ async fn start_on(tag: &str, wipe: bool) -> Started {
         home_source: HomeSource::Cli,
         network_mode: lingxi_service::NetworkMode::Loopback,
     };
-    let state = ServiceState::bootstrap(config, &layout).expect("auth bootstrap (synthetic home)");
+    let state = ServiceState::bootstrap(config, &layout)
+        .await
+        .expect("bootstrap (synthetic home, real run database)");
     let (stop_tx, stop_rx) = tokio::sync::oneshot::channel::<()>();
     let (ready_tx, ready_rx) = tokio::sync::oneshot::channel::<SocketAddr>();
     let record_path = layout.record_path.clone();

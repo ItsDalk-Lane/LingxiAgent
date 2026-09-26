@@ -12,7 +12,11 @@
 # kind=prototype, bound by DEP-07), plus lingxi-service — the R02-T01
 # independent service / composition root (headless binary: explicit config,
 # health endpoint, graceful shutdown; registered as kind=service, bound by
-# DEP-07; port injections arrive with R02-T03/T04/T05).
+# DEP-07; port injections arrive with R02-T03/T04/T05), plus
+# lingxi-adapters — the R02-T04 port-implementation crate (SQLite-backed
+# storage for the new run/message database behind a bounded single-writer
+# work queue; deliberate D5 registry update planned→exists, bound by
+# DEP-07/DEP-09: no desktop stack, no dependency on lingxi-service).
 # The remaining responsibility modules
 # (lingxi-adapters / lingxi-cli / xtask) are declared in
 # docs/rust-tauri/R01/ADR-001-ownership.md with their establishment stages
@@ -42,6 +46,7 @@ members = [
     "crates/lingxi-spike",
     "crates/lingxi-browser-spike",
     "crates/lingxi-service",
+    "crates/lingxi-adapters",
 ]
 
 [workspace.package]

@@ -1067,6 +1067,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "lingxi-adapters"
+version = "0.0.0"
+dependencies = [
+ "libc",
+ "lingxi-kernel",
+ "lingxi-protocol",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "lingxi-browser-spike"
 version = "0.0.0"
 dependencies = [
@@ -1104,6 +1119,8 @@ dependencies = [
  "base64",
  "hyper",
  "hyper-util",
+ "lingxi-adapters",
+ "lingxi-kernel",
  "lingxi-protocol",
  "serde",
  "serde_json",

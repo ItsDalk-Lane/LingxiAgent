@@ -44,6 +44,10 @@ pub use instance::{
     PeerProbe, SINGLE_WRITER_BLOCKED_MARKER, STALE_RECORD_MARKER,
 };
 pub use paths::{prepare_layout, DataRootLayout};
+pub use sessions::{
+    ExecuteAccepted, ExecuteRequest, RunSummary, SessionAccess, SessionBackend,
+    SessionExecuteError, SessionFacts, SessionStore, SessionView,
+};
 pub use transport::{check_origin, infer_connection_kind, ConnectionKind, NetworkMode};
 pub use ws::{WsTicketService, WS_CLOSE_FORBIDDEN, WS_CLOSE_UNAUTHORIZED};
 
@@ -58,6 +62,8 @@ use axum::middleware::{self, Next};
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
+use lingxi_adapters::storage::{RunDatabase, StoreOptions, RUNS_DB_FILE_NAME};
+use lingxi_kernel::ports::StorageError;
 use lingxi_protocol::handshake::{
     negotiate_protocol, ClientHello, ServerHello, WIRE_PROTOCOL_MAX_SUPPORTED,
     WIRE_PROTOCOL_MIN_SUPPORTED, WIRE_PROTOCOL_NAME,
@@ -204,28 +210,43 @@ pub struct HealthResponse {
 }
 
 /// Live service state shared by handlers: the injected port implementations
-/// (auth / tickets / sessions / limits) live here — storage arrives with
-/// R02-T04, events with R02-T05.
-#[derive(Debug, Clone)]
+/// (auth / tickets / storage / sessions / limits) live here — events
+/// arrive with R02-T05.
+#[derive(Clone)]
 pub struct ServiceState {
     config: Arc<ServiceConfig>,
     auth: Arc<AuthService>,
     tickets: Arc<WsTicketService>,
+    storage: Arc<RunDatabase>,
     sessions: Arc<sessions::SessionStore>,
     rate: Arc<limits::RateLimiter>,
     ws_conns: Arc<limits::WsConnectionCounter>,
 }
 
-/// Failures of the pre-serve bootstrap (auth store preparation).
+impl std::fmt::Debug for ServiceState {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ServiceState")
+            .field("config", &self.config)
+            .field("db_path", &self.storage.db_path())
+            .finish_non_exhaustive()
+    }
+}
+
+/// Failures of the pre-serve bootstrap (auth store / run database
+/// preparation). Storage failures are loud: a database that cannot open,
+/// is newer than this build, or has tampered migration receipts refuses
+/// to serve (R02-T04).
 #[derive(Debug)]
 pub enum ServiceStartupError {
     Auth(AuthSetupError),
+    Storage(StorageError),
 }
 
 impl fmt::Display for ServiceStartupError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Auth(err) => write!(f, "auth bootstrap failed: {err}"),
+            Self::Storage(err) => write!(f, "run database bootstrap failed: {err}"),
         }
     }
 }
@@ -239,7 +260,7 @@ impl ServiceState {
     /// built after this point enforces authentication from the first
     /// business route — there is no auth-less construction path in
     /// production code.
-    pub fn bootstrap(
+    pub async fn bootstrap(
         config: ServiceConfig,
         layout: &DataRootLayout,
     ) -> Result<Self, ServiceStartupError> {
@@ -251,12 +272,13 @@ impl ServiceState {
             limits::DEFAULT_HTTP_RATE_MAX,
             limits::DEFAULT_WS_MAX_CONNECTIONS,
         )
+        .await
     }
 
     /// Same as [`ServiceState::bootstrap`] with injectable limits (tests
     /// drive small TTLs/budgets instead of waiting real time; the limit
     /// logic itself is identical).
-    pub fn bootstrap_with_limits(
+    pub async fn bootstrap_with_limits(
         config: ServiceConfig,
         layout: &DataRootLayout,
         ws_ticket_ttl_ms: u64,
@@ -264,9 +286,53 @@ impl ServiceState {
         rate_max: u32,
         ws_max_connections: usize,
     ) -> Result<Self, ServiceStartupError> {
+        Self::bootstrap_with_limits_and_store(
+            config,
+            layout,
+            ws_ticket_ttl_ms,
+            rate_window_ms,
+            rate_max,
+            ws_max_connections,
+            StoreOptions::default(),
+        )
+        .await
+    }
+
+    /// Same as [`ServiceState::bootstrap_with_limits`] with injectable
+    /// storage options (tests drive small queue bounds; production keeps
+    /// the defaults).
+    pub async fn bootstrap_with_limits_and_store(
+        config: ServiceConfig,
+        layout: &DataRootLayout,
+        ws_ticket_ttl_ms: u64,
+        rate_window_ms: u64,
+        rate_max: u32,
+        ws_max_connections: usize,
+        store_options: StoreOptions,
+    ) -> Result<Self, ServiceStartupError> {
         let identity = instance::InstanceIdentity::generate();
         let auth = AuthService::bootstrap(layout, &identity.instance_id)
             .map_err(ServiceStartupError::Auth)?;
+        // R02-T04: open the run/message database inside the private runtime
+        // dir ({home}/lingxi-service/data/runs.db — fixed names, never
+        // user-derived), run migrations and seed the synthetic sessions.
+        // Failure is a startup error (exit 2 in the binary): never an
+        // in-memory degraded fallback.
+        let data_dir = layout.runtime_dir.join("data");
+        paths::ensure_private_dir(&data_dir).map_err(|err| {
+            ServiceStartupError::Storage(StorageError::Io {
+                detail: format!("cannot prepare data dir {}: {err}", data_dir.display()),
+            })
+        })?;
+        let db_path = data_dir.join(RUNS_DB_FILE_NAME);
+        let storage = RunDatabase::open(&db_path, store_options)
+            .await
+            .map_err(ServiceStartupError::Storage)?;
+        storage
+            .ensure_session_seed(sessions::SessionStore::seed_rows(auth::now_unix_ms()))
+            .await
+            .map_err(ServiceStartupError::Storage)?;
+        let session_store = sessions::SessionStore::new(storage.clone());
         Ok(Self {
             config: Arc::new(config),
             auth: Arc::new(auth),
@@ -274,7 +340,8 @@ impl ServiceState {
                 ws_ticket_ttl_ms,
                 ws::DEFAULT_WS_MAX_TICKETS,
             )),
-            sessions: Arc::new(sessions::SessionStore::seeded(auth::now_unix_ms())),
+            storage: Arc::new(storage),
+            sessions: Arc::new(session_store),
             rate: Arc::new(limits::RateLimiter::new(rate_window_ms, rate_max)),
             ws_conns: Arc::new(limits::WsConnectionCounter::new(ws_max_connections)),
         })
@@ -294,6 +361,12 @@ impl ServiceState {
 
     pub fn sessions(&self) -> &sessions::SessionStore {
         &self.sessions
+    }
+
+    /// The injected storage port implementation (composition root handle
+    /// for the close/checkpoint path).
+    pub fn storage(&self) -> &Arc<RunDatabase> {
+        &self.storage
     }
 
     pub fn ws_connection_count(&self) -> usize {
@@ -424,6 +497,37 @@ impl EndpointError {
 
     pub fn invalid_message(message: impl Into<String>) -> Self {
         Self::new(StatusCode::BAD_REQUEST, ErrorCode::InvalidMessage, message)
+    }
+
+    /// Maps a storage-port failure (R02-A07: no fake success). Retryable
+    /// backpressure (bounded queue full / busy) answers 503; every other
+    /// storage failure is a 500. Both carry the machine reason.
+    pub fn storage(err: &StorageError) -> Self {
+        let status = if err.retryable() {
+            StatusCode::SERVICE_UNAVAILABLE
+        } else {
+            StatusCode::INTERNAL_SERVER_ERROR
+        };
+        let mut out = Self::new(
+            status,
+            ErrorCode::Internal,
+            format!("run database operation failed: {err}"),
+        );
+        let details = out.error.details.get_or_insert_with(serde_json::Map::new);
+        details.insert(
+            "reason".to_string(),
+            serde_json::Value::String(match err {
+                StorageError::QueueFull => "db_queue_full".to_string(),
+                StorageError::Busy { .. } => "db_busy".to_string(),
+                StorageError::DiskFull { .. } => "db_disk_full".to_string(),
+                _ => "db_failure".to_string(),
+            }),
+        );
+        details.insert(
+            "retryable".to_string(),
+            serde_json::Value::Bool(err.retryable()),
+        );
+        out
     }
 
     pub fn status(&self) -> StatusCode {
@@ -686,7 +790,10 @@ async fn list_sessions(
     struct Body {
         sessions: Vec<sessions::SessionView>,
     }
-    let sessions = state.sessions.list_for(&principal);
+    let sessions = match state.sessions.list_for(&principal).await {
+        Ok(views) => views,
+        Err(err) => return EndpointError::storage(&err).into_response(),
+    };
     (StatusCode::OK, Json(Body { sessions })).into_response()
 }
 
@@ -695,8 +802,8 @@ async fn get_session(
     State(state): State<ServiceState>,
     Path(session_id): Path<String>,
 ) -> Response {
-    match state.sessions.get_for(&principal, &session_id) {
-        sessions::SessionAccess::Ok(record) => {
+    match state.sessions.get_for(&principal, &session_id).await {
+        Ok(sessions::SessionAccess::Ok(facts)) => {
             #[derive(Serialize)]
             #[serde(rename_all = "camelCase")]
             struct Body {
@@ -708,29 +815,20 @@ async fn get_session(
                 last_runs: Vec<sessions::RunSummary>,
             }
             let body = Body {
-                session_id: record.session_id,
-                agent_id: record.agent_id,
-                owner_user_id: record.owner_user_id,
-                title: record.title,
-                run_count: record.runs.len() as u64,
-                last_runs: record
-                    .runs
-                    .iter()
-                    .rev()
-                    .take(5)
-                    .map(|r| sessions::RunSummary {
-                        run_id: r.run_id.clone(),
-                        principal_id: r.principal_id.clone(),
-                        started_at_unix_ms: r.started_at_unix_ms,
-                    })
-                    .collect(),
+                session_id: facts.session_id,
+                agent_id: facts.agent_id,
+                owner_user_id: facts.owner_user_id,
+                title: facts.title,
+                run_count: facts.run_count,
+                last_runs: facts.last_runs,
             };
             (StatusCode::OK, Json(body)).into_response()
         }
-        sessions::SessionAccess::NotFound => EndpointError::not_found().into_response(),
-        sessions::SessionAccess::Forbidden => {
+        Ok(sessions::SessionAccess::NotFound) => EndpointError::not_found().into_response(),
+        Ok(sessions::SessionAccess::Forbidden) => {
             EndpointError::forbidden("cross_principal_access").into_response()
         }
+        Err(err) => EndpointError::storage(&err).into_response(),
     }
 }
 
@@ -746,14 +844,25 @@ async fn execute_session(
             return EndpointError::from_json_rejection(&rejection).into_response();
         }
     };
+    let storage = Arc::clone(state.storage());
     match state
         .sessions
-        .execute_for(&principal, &session_id, &request.input, auth::now_unix_ms())
+        .execute_for(
+            storage.as_ref(),
+            &principal,
+            &session_id,
+            &request.input,
+            auth::now_unix_ms(),
+        )
+        .await
     {
         Ok(accepted) => (StatusCode::OK, Json(accepted)).into_response(),
         Err(sessions::SessionExecuteError::NotFound) => EndpointError::not_found().into_response(),
         Err(sessions::SessionExecuteError::Forbidden) => {
             EndpointError::forbidden("cross_principal_access").into_response()
+        }
+        Err(sessions::SessionExecuteError::Storage(err)) => {
+            EndpointError::storage(&err).into_response()
         }
     }
 }
@@ -991,11 +1100,12 @@ async fn run_ws_session<IO>(
                     }
                 };
                 let ws::WsClientRequest::SessionRead { session_id } = request;
-                match state.sessions.get_for(&principal, &session_id) {
-                    sessions::SessionAccess::Ok(record) => {
+                let access = state.sessions.get_for(&principal, &session_id).await;
+                match access {
+                    Ok(sessions::SessionAccess::Ok(facts)) => {
                         let message = ws::WsServerMessage::SessionReadResult {
-                            session_id: record.session_id,
-                            run_count: record.runs.len() as u64,
+                            session_id: facts.session_id,
+                            run_count: facts.run_count,
                         };
                         if let Err(err) =
                             ws::write_ws_text(&mut io, &canon::canonical_bytes(&message)).await
@@ -1004,7 +1114,7 @@ async fn run_ws_session<IO>(
                             return;
                         }
                     }
-                    sessions::SessionAccess::NotFound => {
+                    Ok(sessions::SessionAccess::NotFound) => {
                         let error =
                             ProtocolError::new(ErrorCode::NotFound, "session not found", false);
                         let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
@@ -1012,7 +1122,7 @@ async fn run_ws_session<IO>(
                             ws::write_ws_close(&mut io, ws::WS_CLOSE_NOT_FOUND, "not_found").await;
                         return;
                     }
-                    sessions::SessionAccess::Forbidden => {
+                    Ok(sessions::SessionAccess::Forbidden) => {
                         let error = ProtocolError::new(
                             ErrorCode::Forbidden,
                             "session belongs to another principal",
@@ -1025,6 +1135,16 @@ async fn run_ws_session<IO>(
                         let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
                         let _ =
                             ws::write_ws_close(&mut io, ws::WS_CLOSE_FORBIDDEN, "forbidden").await;
+                        return;
+                    }
+                    Err(err) => {
+                        let error = ProtocolError::new(
+                            ErrorCode::Internal,
+                            format!("run database read failed: {err}"),
+                            false,
+                        );
+                        let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
+                        let _ = ws::write_ws_close(&mut io, 1011, "internal").await;
                         return;
                     }
                 }

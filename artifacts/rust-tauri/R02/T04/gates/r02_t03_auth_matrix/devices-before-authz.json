@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "devices": [
+    {
+      "schemaVersion": 1,
+      "deviceId": "device_327239f800c874a20f05abb44e38e362",
+      "userId": "user_remote",
+      "displayName": "Synthetic device for user_remote",
+      "deviceKind": "cli",
+      "status": "active",
+      "trustState": "lan",
+      "createdAtUnixMs": 1790414326253,
+      "lastSeenAtUnixMs": null
+    },
+    {
+      "schemaVersion": 1,
+      "deviceId": "device_8959de7073846b72ad3a61226b9bc251",
+      "userId": "user_remote_b",
+      "displayName": "Synthetic device for user_remote_b",
+      "deviceKind": "cli",
+      "status": "active",
+      "trustState": "lan",
+      "createdAtUnixMs": 1790414326316,
+      "lastSeenAtUnixMs": 1790414326378
+    }
+  ],
+  "createdAtUnixMs": 1790414325853,
+  "updatedAtUnixMs": 1790414326378
+}
