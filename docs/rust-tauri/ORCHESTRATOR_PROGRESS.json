@@ -165,7 +165,7 @@
     },
     "R02": {
       "title": "Rust独立服务、存储与事件基础",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "task_ids": [
         "R02-T01",
         "R02-T02",
@@ -176,7 +176,7 @@
         "R02-T07",
         "R02-T08"
       ],
-      "stage_base_sha": null,
+      "stage_base_sha": "201584f2917a7fd96d6ea603bdeddbd420082cfe",
       "stage_review_round": 0,
       "stage_verdict": null,
       "stage_acceptance_commit_sha": null,
@@ -1641,23 +1641,46 @@
     "R02-T01": {
       "name": "实现 workspace 与组合根",
       "stage_id": "R02",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "201584f2917a7fd96d6ea603bdeddbd420082cfe",
+      "executor_id": "ZCode:R02-T01-exec-r1 (agent_7670a292-ae2f-4c84-b741-0890dc411a03)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 1,
+      "reviewer_id": "ZCode:R02-T01-review-r1 (agent_d8a9f81f-a4f7-432f-9721-a4753f0263e3)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-F01",
+          "severity": "MINOR",
+          "summary": "DEP-08 未机器执法契约句「环境变量」一半（std::env 非依赖边，D1/D3 不可见）；kernel 现状零 env 访问",
+          "review_report": "docs/rust-tauri/R02/R02-T01_REVIEW_R1.md",
+          "resolution": "移交 R02-T02（配置/环境解析任务）在 service 侧收口并加 kernel forbidden_source_tokens；T02 验收核对"
+        },
+        {
+          "id": "R1-F02",
+          "severity": "MINOR",
+          "summary": "执行报告 §8 脚本名笔误（rust_t01_service_smoke.sh 应为 r02_t01_service_smoke.sh）",
+          "review_report": "docs/rust-tauri/R02/R02-T01_REVIEW_R1.md",
+          "resolution": "不阻塞；正确脚本名以验收报告 §10 与仓库 scripts/rust-tauri/ 实际文件为准，历史报告不改写"
+        },
+        {
+          "id": "R1-F03",
+          "severity": "MINOR",
+          "summary": "CLI 边界（--bind 吞 flag 形态值、重复 --home 后者覆盖）当前全部响亮失败 exit 2，完整语义未定",
+          "review_report": "docs/rust-tauri/R02/R02-T01_REVIEW_R1.md",
+          "resolution": "完整 CLI/优先级语义归 R02-T02 配置解析器（任务书步骤 1），T02 验收核对"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R02-A01": "NOT_STARTED",
-        "R02-A02": "NOT_STARTED"
+        "R02-A01": "PASS",
+        "R02-A02": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "9d26b5aa9f8cd14a4c4ea6865393d46317c54693",
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "task_commit_note": "任务提交（本账本提交的直接父提交）；两提交一并推送，push_result 由下一账本提交补登（同 R01 惯例）"
     },
     "R02-T02": {
       "name": "配置、路径与安全启动",
