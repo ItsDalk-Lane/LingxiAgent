@@ -12,7 +12,9 @@ use std::net::SocketAddr;
 use std::path::PathBuf;
 use std::time::Duration;
 
-use lingxi_service::{run, HomeSource, ServiceConfig, ServiceError};
+use lingxi_service::{
+    prepare_layout, run, HomeSource, NetworkMode, ServiceConfig, ServiceError, ServiceState,
+};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 /// Unique synthetic home under the system temp dir for this test run.
@@ -28,6 +30,7 @@ fn test_config(tag: &str) -> ServiceConfig {
             .unwrap_or_else(|_| panic!("static loopback address must parse (test bug, tag {tag})")),
         data_home: synthetic_home(tag),
         home_source: HomeSource::Cli,
+        network_mode: NetworkMode::Loopback,
     }
 }
 
@@ -77,9 +80,13 @@ async fn start_test_server(tag: &str) -> TestServer {
     let (stop_tx, stop_rx) = tokio::sync::oneshot::channel::<()>();
     let (ready_tx, ready_rx) = tokio::sync::oneshot::channel::<SocketAddr>();
     let home = config.data_home.clone();
+    let home_for_task = config.data_home.clone();
     let handle = tokio::spawn(async move {
+        let layout = prepare_layout(&home_for_task).expect("prepare layout (synthetic home)");
+        let state =
+            ServiceState::bootstrap(config, &layout).expect("auth bootstrap (synthetic home)");
         run(
-            config,
+            state,
             async {
                 let _ = stop_rx.await;
             },
@@ -149,13 +156,17 @@ async fn health_check_over_real_loopback() {
 }
 
 #[tokio::test]
-async fn unknown_route_is_not_found() {
+async fn unknown_route_is_not_found_for_owner_but_closed_for_strangers() {
     let server = start_test_server("not-found").await;
 
+    // R02-T03: unknown routes fail CLOSED — an unauthenticated request to
+    // an unknown /lingxi/v1 path is denied (401) before the 404 would
+    // reveal route existence. (The T01 contract was a bare 404; the
+    // fail-closed default supersedes it, see the task report.)
     let (head, _body) = http_get(server.addr, "/lingxi/v1/nope").await;
     assert!(
-        head.starts_with("HTTP/1.1 404 "),
-        "unknown route must 404, got: {head}"
+        head.starts_with("HTTP/1.1 401 "),
+        "unknown route must fail closed for strangers, got: {head}"
     );
 
     server.stop_and_assert_clean().await;
@@ -173,6 +184,7 @@ fn prepare_data_home_creates_and_is_idempotent() {
             .unwrap_or_else(|_| panic!("static loopback address must parse")),
         data_home: home.clone(),
         home_source: HomeSource::Cli,
+        network_mode: NetworkMode::Loopback,
     };
     config.prepare_data_home().expect("creates missing home");
     assert!(home.is_dir());
@@ -192,6 +204,7 @@ fn prepare_data_home_rejects_file_as_home() {
             .unwrap_or_else(|_| panic!("static loopback address must parse")),
         data_home: home.clone(),
         home_source: HomeSource::Cli,
+        network_mode: NetworkMode::Loopback,
     };
     let err = config.prepare_data_home().expect_err("must refuse loudly");
     assert!(

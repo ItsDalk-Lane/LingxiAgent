@@ -27,3 +27,23 @@ serde_json = "1.0.151"
 tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "net", "signal", "io-util", "time"] }
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["fmt", "env-filter"] }
+# R02-T03 additions — every crate below is ALREADY a locked member of the
+# workspace dependency tree at exactly this version (no new third-party
+# version enters rust/Cargo.lock with this task; the lock only gains
+# dependency references for this crate):
+#   - hyper 1.11.1: axum's own HTTP implementation, needed to name
+#     hyper::upgrade::OnUpgrade for the WebSocket upgrade path (axum's `ws`
+#     feature is deliberately NOT enabled — it would pull the unlocked
+#     tokio-tungstenite/tungstenite pair into Cargo.lock).
+#   - sha1 0.11.0 / base64 0.23.1: RFC 6455 Sec-WebSocket-Accept computation
+#     (the same roles they already serve in lingxi-protocol's handshake bins).
+#   - sha2 0.11.0: fixed-length digests so token comparison is length-safe
+#     and constant-time (hash-then-compare).
+hyper = "1.11.1"
+sha1 = "0.11.0"
+sha2 = "0.11.0"
+base64 = "0.23.1"
+#   - hyper-util 0.1.21 (axum's own runtime glue, same locked version):
+#     TokioIo adapts hyper's upgraded connection IO to tokio's
+#     AsyncRead/AsyncWrite for the WS frame codec.
+hyper-util = { version = "0.1.21", default-features = false, features = ["tokio"] }

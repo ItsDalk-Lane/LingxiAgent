@@ -17,7 +17,7 @@ use std::time::Duration;
 use lingxi_service::instance::InstanceLockError;
 use lingxi_service::{
     acquire, prepare_layout, run, HomeSource, InstanceGuard, InstanceRecord, ServiceConfig,
-    ServiceError,
+    ServiceError, ServiceState,
 };
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
@@ -71,7 +71,9 @@ async fn start_on(tag: &str, wipe: bool) -> Started {
         bind_addr: "127.0.0.1:0".parse().expect("static addr parses"),
         data_home: layout.home.clone(),
         home_source: HomeSource::Cli,
+        network_mode: lingxi_service::NetworkMode::Loopback,
     };
+    let state = ServiceState::bootstrap(config, &layout).expect("auth bootstrap (synthetic home)");
     let (stop_tx, stop_rx) = tokio::sync::oneshot::channel::<()>();
     let (ready_tx, ready_rx) = tokio::sync::oneshot::channel::<SocketAddr>();
     let record_path = layout.record_path.clone();
@@ -79,7 +81,7 @@ async fn start_on(tag: &str, wipe: bool) -> Started {
     let ready_guard = Arc::clone(&publish_guard);
     let handle = tokio::spawn(async move {
         run(
-            config,
+            state,
             async {
                 let _ = stop_rx.await;
             },

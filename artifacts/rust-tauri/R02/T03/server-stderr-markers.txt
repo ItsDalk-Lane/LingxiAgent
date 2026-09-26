@@ -1,0 +1,27 @@
+2026-09-26T07:58:55.728895Z  INFO lingxi_service: data root resolved effective_home=/tmp/lingxi-r02t03-home-S6vS6J source=cli ignored_sources=none
+2026-09-26T07:58:55.729328Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/tmp/lingxi-r02t03-home-S6vS6J runtime_dir=/private/tmp/lingxi-r02t03-home-S6vS6J/lingxi-service
+2026-09-26T07:58:55.729695Z  INFO lingxi_service: single-writer lock acquired instance_id=cede9cdfc69f1eb87bc1363038203e31 start_nonce=2ccac61b22441c46 pid=54882 entropy="os-random-device" lock=/private/tmp/lingxi-r02t03-home-S6vS6J/lingxi-service/instance.lock network_mode=loopback
+2026-09-26T07:58:55.761466Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only) local_token_file=/private/tmp/lingxi-r02t03-home-S6vS6J/lingxi-service/local-token.json
+2026-09-26T07:58:55.770224Z  INFO lingxi_service: instance record published (atomic write) record=/private/tmp/lingxi-r02t03-home-S6vS6J/lingxi-service/instance.json bind_addr=127.0.0.1:57317
+LINGXI_AUTH_REJECTED method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401 reason=missing_credential remote=127.0.0.1:57318
+LINGXI_AUTH_REJECTED method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=401 reason=missing_credential remote=127.0.0.1:57319
+LINGXI_AUTH_REJECTED method=POST path=/lingxi/v1/ws-ticket status=401 reason=missing_credential remote=127.0.0.1:57320
+LINGXI_AUTH_REJECTED method=GET path=/lingxi/v1/me status=401 reason=missing_credential remote=127.0.0.1:57321
+LINGXI_AUTH_REJECTED method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401 reason=missing_credential remote=127.0.0.1:57322
+LINGXI_AUTH_REJECTED method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401 reason=invalid_credential remote=127.0.0.1:57327
+LINGXI_AUTH_REJECTED method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401 reason=invalid_credential remote=127.0.0.1:57334
+LINGXI_AUTH_REJECTED method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=401 reason=invalid_credential remote=127.0.0.1:57335
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/health status=403 reason=bad_origin origin=http://evil.example host=127.0.0.1:57317 remote=127.0.0.1:57343
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/me status=403 reason=bad_origin origin=https://attacker.invalid host=127.0.0.1:57317 remote=127.0.0.1:57344
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/health status=403 reason=bad_origin origin=http://sub.localhost:1 host=127.0.0.1:57317 remote=127.0.0.1:57349
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/health status=403 reason=bad_origin origin=http://127.0.0.1.evil.example host=127.0.0.1:57317 remote=127.0.0.1:57350
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/health status=403 reason=loopback_host_mismatch origin=absent host=evil.example remote=127.0.0.1:57351
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/me status=403 reason=loopback_host_mismatch origin=absent host=evil.example remote=127.0.0.1:57352
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/health status=429 reason=rate_limited origin=absent host=127.0.0.1:57317 remote=127.0.0.1:57589
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/ws status=403 reason=bad_origin origin=http://evil.example host=127.0.0.1:57317 remote=127.0.0.1:57615
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/ws status=403 reason=loopback_host_mismatch origin=absent host=rebinder.example remote=127.0.0.1:57616
+LINGXI_AUTH_REJECTED method=GET path=/lingxi/v1/ws status=401 reason=missing_credential remote=127.0.0.1:57617
+LINGXI_AUTH_REJECTED method=GET path=/lingxi/v1/ws status=401 reason=invalid_ws_ticket remote=127.0.0.1:57620
+LINGXI_AUTH_REJECTED method=GET path=/lingxi/v1/ws status=401 reason=invalid_ws_ticket remote=127.0.0.1:57695
+2026-09-26T07:59:42.020066Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-09-26T07:59:42.020397Z  INFO lingxi_service: lingxi-service stopped cleanly (own record removed, lock released)

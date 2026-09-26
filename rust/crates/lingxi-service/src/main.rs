@@ -23,21 +23,25 @@ use std::process::ExitCode;
 
 use lingxi_service::instance::InstanceLockError;
 use lingxi_service::{
-    acquire, parse_cli, prepare_layout, run, InstanceRecord, ServiceConfig, HOME_ENV_VAR,
-    SINGLE_WRITER_BLOCKED_MARKER, STALE_RECORD_MARKER,
+    acquire, parse_cli, prepare_layout, run, InstanceRecord, ServiceConfig, ServiceState,
+    HOME_ENV_VAR, SINGLE_WRITER_BLOCKED_MARKER, STALE_RECORD_MARKER,
 };
 
 const USAGE: &str = r#"usage: lingxi-service [--bind <SOCKADDR>] [--home <DIR>] \
-[--config <FILE>] [--test-mode]
+[--config <FILE>] [--test-mode] [--network-mode <loopback|lan>]
 
 Options:
-  --bind <SOCKADDR>  Listen address (default 127.0.0.1:0, loopback + ephemeral).
-  --home <DIR>       Absolute service data root (created if missing).
-  --config <FILE>    Strict JSON config file ({"home": "/absolute/path"}).
-  --test-mode        Force an isolated synthetic home under the system temp
-                     dir; --home/LINGXI_HOME/--config home are ignored.
-  --help             Print this help and exit 0.
-  --version          Print server identity/version and exit 0.
+  --bind <SOCKADDR>       Listen address (default 127.0.0.1:0, loopback + ephemeral).
+  --home <DIR>            Absolute service data root (created if missing).
+  --config <FILE>         Strict JSON config file ({"home": "/absolute/path"}).
+  --test-mode             Force an isolated synthetic home under the system temp
+                          dir; --home/LINGXI_HOME/--config home are ignored.
+  --network-mode <MODE>   loopback (default) or lan. LAN exposure is an explicit
+                          opt-in: a non-loopback --bind without --network-mode lan
+                          is a startup error, and even loopback requests require
+                          authentication (no loopback-trust exemption).
+  --help                  Print this help and exit 0.
+  --version               Print server identity/version and exit 0.
 
 Data-root precedence: --test-mode > --home > LINGXI_HOME (env) > --config home.
 Every explicitly given source is validated even when it loses precedence.
@@ -152,6 +156,7 @@ async fn main() -> ExitCode {
         pid = guard.identity().pid,
         entropy = lingxi_service::instance::entropy_source(),
         lock = %layout.lock_path.display(),
+        network_mode = %config.network_mode,
         "single-writer lock acquired"
     );
     if let Some(stale) = stale {
@@ -177,16 +182,31 @@ async fn main() -> ExitCode {
         );
     }
 
+    // ---- auth bootstrap (R02-T03): loopback token + registries ----
+    // Runs after the lock, before the bind: a broken auth store is a
+    // startup error (exit 2), never an auth-less serve.
+    let home_display = layout.home.display().to_string();
+    let source_display = config.home_source.to_string();
+    let state = match ServiceState::bootstrap(config, &layout) {
+        Ok(state) => state,
+        Err(err) => {
+            eprintln!("error: {err}");
+            return ExitCode::from(2);
+        }
+    };
+    tracing::info!(
+        local_token_file = %state.auth().local_token_path().display(),
+        "auth service bootstrapped (per-start loopback token, owner-only)"
+    );
+
     // ---- serve; publish the instance record once the address is known ----
     // The guard is shared with the on_ready callback (which runs exactly
     // once, synchronously, after the listener is bound and before serving
     // starts); after `run` returns, this task is its only user again.
     let guard = std::sync::Arc::new(std::sync::Mutex::new(guard));
     let ready_guard = std::sync::Arc::clone(&guard);
-    let home_display = layout.home.display().to_string();
-    let source_display = config.home_source.to_string();
     let shutdown = shutdown_signal();
-    let result = run(config, shutdown, move |addr| {
+    let result = run(state, shutdown, move |addr| {
         let mut guard = ready_guard
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner());

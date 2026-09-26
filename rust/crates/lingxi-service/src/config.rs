@@ -62,6 +62,10 @@ pub struct CliOptions {
     pub home: Option<PathBuf>,
     pub config: Option<PathBuf>,
     pub test_mode: bool,
+    /// Explicit network mode (`--network-mode loopback|lan`); `None` = the
+    /// loopback default. LAN exposure exists ONLY through this flag
+    /// (R02-T03).
+    pub network_mode: Option<String>,
 }
 
 /// Result of home-source precedence resolution.
@@ -92,17 +96,55 @@ pub const HOME_ENV_VAR: &str = "LINGXI_HOME";
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ConfigError {
     MissingHome,
-    RelativeHome { value: PathBuf },
-    HomeIsFilesystemRoot { value: PathBuf },
-    HomeIsNotADirectory { value: PathBuf },
-    HomeCreateFailed { value: PathBuf, source: String },
-    BadBind { value: String, source: String },
-    UnknownArgument { value: String },
-    MissingArgumentValue { flag: String },
-    DuplicateArgument { flag: String },
-    FlagShapedValue { flag: String, value: String },
-    ConfigFileUnreadable { path: PathBuf, source: String },
-    ConfigFileInvalid { path: PathBuf, detail: String },
+    RelativeHome {
+        value: PathBuf,
+    },
+    HomeIsFilesystemRoot {
+        value: PathBuf,
+    },
+    HomeIsNotADirectory {
+        value: PathBuf,
+    },
+    HomeCreateFailed {
+        value: PathBuf,
+        source: String,
+    },
+    BadBind {
+        value: String,
+        source: String,
+    },
+    /// `--network-mode` value outside the strict `loopback|lan` vocabulary.
+    BadNetworkMode {
+        value: String,
+    },
+    /// Non-loopback bind while the (default) loopback network mode is in
+    /// effect: LAN exposure must be an explicit choice, never a silent
+    /// side effect of `--bind`.
+    NetworkModeBindMismatch {
+        bind: std::net::SocketAddr,
+        mode: crate::transport::NetworkMode,
+    },
+    UnknownArgument {
+        value: String,
+    },
+    MissingArgumentValue {
+        flag: String,
+    },
+    DuplicateArgument {
+        flag: String,
+    },
+    FlagShapedValue {
+        flag: String,
+        value: String,
+    },
+    ConfigFileUnreadable {
+        path: PathBuf,
+        source: String,
+    },
+    ConfigFileInvalid {
+        path: PathBuf,
+        detail: String,
+    },
 }
 
 impl fmt::Display for ConfigError {
@@ -136,6 +178,17 @@ impl fmt::Display for ConfigError {
             ConfigError::BadBind { value, source } => {
                 write!(f, "invalid --bind {value:?}: {source}")
             }
+            ConfigError::BadNetworkMode { value } => write!(
+                f,
+                "invalid --network-mode {value:?}: must be \"loopback\" or \"lan\" \
+                 (LAN exposure is an explicit opt-in, the default is loopback)"
+            ),
+            ConfigError::NetworkModeBindMismatch { bind, mode } => write!(
+                f,
+                "--bind {bind} is not a loopback address while the network mode is \
+                 {mode}: pass --network-mode lan explicitly to expose the service \
+                 beyond loopback (never a silent LAN bind)"
+            ),
             ConfigError::UnknownArgument { value } => {
                 write!(f, "unknown argument {value:?}")
             }
@@ -245,6 +298,23 @@ where
                     });
                 }
                 options.test_mode = true;
+            }
+            "--network-mode" => {
+                if options.network_mode.is_some() {
+                    return Err(ConfigError::DuplicateArgument {
+                        flag: "--network-mode".to_string(),
+                    });
+                }
+                let value = iter.next().ok_or(ConfigError::MissingArgumentValue {
+                    flag: "--network-mode".to_string(),
+                })?;
+                if is_flag_shaped(&value) {
+                    return Err(ConfigError::FlagShapedValue {
+                        flag: "--network-mode".to_string(),
+                        value,
+                    });
+                }
+                options.network_mode = Some(value);
             }
             other => {
                 return Err(ConfigError::UnknownArgument {
@@ -501,12 +571,37 @@ mod tests {
             "--config",
             "/tmp/c.json",
             "--test-mode",
+            "--network-mode",
+            "lan",
         ]))
         .unwrap();
         assert_eq!(options.bind.as_deref(), Some("127.0.0.1:8080"));
         assert_eq!(options.home, Some(PathBuf::from("/tmp/h")));
         assert_eq!(options.config, Some(PathBuf::from("/tmp/c.json")));
         assert!(options.test_mode);
+        assert_eq!(options.network_mode.as_deref(), Some("lan"));
+    }
+
+    #[test]
+    fn cli_network_mode_strictness() {
+        // Duplicate / flag-shaped / missing value follow the same strict
+        // rules as every value flag.
+        assert!(matches!(
+            parse_cli(args(&["--network-mode", "lan", "--network-mode", "loopback"])),
+            Err(ConfigError::DuplicateArgument { flag }) if flag == "--network-mode"
+        ));
+        assert!(matches!(
+            parse_cli(args(&["--network-mode", "--home"])),
+            Err(ConfigError::FlagShapedValue { .. })
+        ));
+        assert!(matches!(
+            parse_cli(args(&["--network-mode"])),
+            Err(ConfigError::MissingArgumentValue { .. })
+        ));
+        assert!(matches!(
+            parse_cli(args(&["--network-mode=lan"])),
+            Err(ConfigError::UnknownArgument { .. })
+        ));
     }
 
     #[test]
