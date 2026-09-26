@@ -12,7 +12,7 @@ use std::net::SocketAddr;
 use std::path::PathBuf;
 use std::time::Duration;
 
-use lingxi_service::{run, ServiceConfig, ServiceError};
+use lingxi_service::{run, HomeSource, ServiceConfig, ServiceError};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 /// Unique synthetic home under the system temp dir for this test run.
@@ -27,6 +27,7 @@ fn test_config(tag: &str) -> ServiceConfig {
             .parse()
             .unwrap_or_else(|_| panic!("static loopback address must parse (test bug, tag {tag})")),
         data_home: synthetic_home(tag),
+        home_source: HomeSource::Cli,
     }
 }
 
@@ -171,6 +172,7 @@ fn prepare_data_home_creates_and_is_idempotent() {
             .parse()
             .unwrap_or_else(|_| panic!("static loopback address must parse")),
         data_home: home.clone(),
+        home_source: HomeSource::Cli,
     };
     config.prepare_data_home().expect("creates missing home");
     assert!(home.is_dir());
@@ -189,6 +191,7 @@ fn prepare_data_home_rejects_file_as_home() {
             .parse()
             .unwrap_or_else(|_| panic!("static loopback address must parse")),
         data_home: home.clone(),
+        home_source: HomeSource::Cli,
     };
     let err = config.prepare_data_home().expect_err("must refuse loudly");
     assert!(

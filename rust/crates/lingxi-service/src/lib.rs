@@ -1,23 +1,37 @@
-//! lingxi-service — Rust 独立服务与组合根（R02-T01）。
+//! lingxi-service — Rust 独立服务与组合根（R02-T01 建立，R02-T02 扩展配置/路径/实例）。
 //!
-//! 契约锚点（任务书 `02_目标架构与强制契约.md` §1/§2，R02-T01 步骤 1）：
+//! 契约锚点（任务书 `02_目标架构与强制契约.md` §1/§2，R02-T01/T02）：
 //! - 本 crate 是进程组合根：配置、传输（HTTP）与 port 注入都在这里发生；
 //!   领域（lingxi-kernel）不直接访问 HTTP、UI、环境变量或数据库。
 //!   由 `docs/rust-tauri/R01/r01_t01_check_ownership.py` 对
 //!   `docs/rust-tauri/R01/DEPENDENCY_RULES.json` 机械执法
-//!   （DEP-07 全 workspace 桌面禁令 + DEP-08 kernel 禁基础设施依赖）。
-//! - 本任务只建立当前阶段真实使用的抽象：显式配置 + 健康检查 + 优雅关闭。
-//!   存储/事件/认证 port 实现分别由 R02-T04/T05/T03 落地并在此注入，
-//!   不预造空 manager。
-//! - 数据根（home）必须显式给出且为绝对路径，缺省即拒绝启动——不存在
-//!   静默落进真实用户目录的默认值（优先级解析的完整契约归 R02-T02）。
+//!   （DEP-07 全 workspace 桌面禁令 + DEP-08 kernel 禁基础设施依赖与
+//!   `std::env`/`env::var` 源码 token——环境变量读取只在组合根发生）。
+//! - 数据根优先级（R02-T02，模块 [`config`]）：
+//!   `--test-mode` > `--home` > `LINGXI_HOME` > `--config` 文件 `home`；
+//!   无来源即拒启，不存在静默落进真实用户目录的默认值。
+//!   规范化目录/权限/原子写见 [`paths`]；实例身份与本地单写者锁见
+//!   [`instance`]（锁是唯一存活权威，PID 只作诊断，绝不参与判定）。
 //! - 版本事实单一来源：wire 协议版本与 data epoch 取自 lingxi-protocol
-//!   常量，本 crate 不复制第二份。
+//!   常量，本 crate 不复制第二份（实例记录快照同一来源）。
+
+pub mod config;
+pub mod instance;
+pub mod paths;
+
+pub use config::{
+    parse_cli, read_config_home, resolve_effective_home, CliOptions, ConfigError, HomeSource,
+    IgnoredHomeSource, ResolvedHome, HOME_ENV_VAR,
+};
+pub use instance::{
+    acquire, probe_peer, InstanceGuard, InstanceIdentity, InstanceLockError, InstanceRecord,
+    PeerProbe, SINGLE_WRITER_BLOCKED_MARKER, STALE_RECORD_MARKER,
+};
+pub use paths::{prepare_layout, DataRootLayout};
 
 use std::fmt;
 use std::future::Future;
 use std::net::SocketAddr;
-use std::path::{Path, PathBuf};
 
 use axum::extract::State;
 use axum::routing::get;
@@ -37,107 +51,45 @@ pub fn server_version() -> &'static str {
 
 /// Explicit, fully-resolved service configuration.
 ///
-/// Built from CLI arguments only at R02-T01. R02-T02 extends the sources
-/// (env/config file precedence) — the invariant that survives every stage is
-/// that the *effective* root is explicit here, never a silent default into a
-/// real user directory.
+/// `data_home` is the effective root chosen by the documented precedence
+/// ([`config::resolve_effective_home`]); `home_source` records where it
+/// came from so the safe log and readiness line can always answer "why is
+/// this the root". The invariant that survives every stage: the effective
+/// root is explicit here, never a silent default into a real user
+/// directory.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServiceConfig {
     /// Socket address to listen on. Defaults to loopback with an ephemeral
     /// port; LAN binding requires explicit configuration (R02-T03 owns the
     /// auth surface that would make that safe).
     pub bind_addr: SocketAddr,
-    /// Absolute path of the isolated service data root. Required: the
-    /// composition root refuses to start without it.
-    pub data_home: PathBuf,
+    /// Absolute path of the isolated service data root (as given by the
+    /// winning source; canonicalization happens in [`paths::prepare_layout`]).
+    pub data_home: std::path::PathBuf,
+    /// Which source supplied `data_home` (diagnostics; see [`HomeSource`]).
+    pub home_source: HomeSource,
 }
-
-/// Errors raised while assembling the service. Display strings are
-/// user-facing and carry no secrets (paths only ever appear as the
-/// caller-supplied data root, which is not secret material).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ConfigError {
-    MissingHome,
-    RelativeHome { value: PathBuf },
-    HomeIsNotADirectory { value: PathBuf },
-    HomeCreateFailed { value: PathBuf, source: String },
-    BadBind { value: String, source: String },
-    UnknownArgument { value: String },
-    MissingArgumentValue { flag: String },
-}
-
-impl fmt::Display for ConfigError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            ConfigError::MissingHome => write!(
-                f,
-                "missing required --home <DIR>: the service data root must be \
-                 explicit; there is no default into a real user directory"
-            ),
-            ConfigError::RelativeHome { value } => write!(
-                f,
-                "--home must be an absolute path, got {:?}",
-                value.display()
-            ),
-            ConfigError::HomeIsNotADirectory { value } => write!(
-                f,
-                "--home {:?} exists but is not a directory",
-                value.display()
-            ),
-            ConfigError::HomeCreateFailed { value, source } => {
-                write!(f, "cannot create --home {:?}: {source}", value.display())
-            }
-            ConfigError::BadBind { value, source } => {
-                write!(f, "invalid --bind {value:?}: {source}")
-            }
-            ConfigError::UnknownArgument { value } => {
-                write!(f, "unknown argument {value:?}")
-            }
-            ConfigError::MissingArgumentValue { flag } => {
-                write!(f, "flag {flag} requires a value")
-            }
-        }
-    }
-}
-
-impl std::error::Error for ConfigError {}
 
 impl ServiceConfig {
     /// Default bind target: loopback with an ephemeral port.
     pub const DEFAULT_BIND: &'static str = "127.0.0.1:0";
 
-    /// Parses CLI arguments (excluding the program name).
-    pub fn from_cli_args<I, S>(args: I) -> Result<Self, ConfigError>
-    where
-        I: IntoIterator<Item = S>,
-        S: Into<String>,
-    {
-        let mut bind: Option<String> = None;
-        let mut home: Option<PathBuf> = None;
-        let mut iter = args.into_iter().map(Into::into).peekable();
-        while let Some(arg) = iter.next() {
-            match arg.as_str() {
-                "--bind" => {
-                    let value = iter.next().ok_or(ConfigError::MissingArgumentValue {
-                        flag: "--bind".to_string(),
-                    })?;
-                    bind = Some(value);
-                }
-                "--home" => {
-                    let value = iter.next().ok_or(ConfigError::MissingArgumentValue {
-                        flag: "--home".to_string(),
-                    })?;
-                    home = Some(PathBuf::from(value));
-                }
-                other => {
-                    return Err(ConfigError::UnknownArgument {
-                        value: other.to_string(),
-                    })
-                }
-            }
-        }
-
-        let bind_raw = bind.unwrap_or_else(|| Self::DEFAULT_BIND.to_string());
+    /// Assembles a configuration from already-parsed CLI options plus the
+    /// injected environment value. The binary passes
+    /// `std::env::var(HOME_ENV_VAR).ok().as_deref()` and
+    /// `std::env::temp_dir()`; tests inject synthetic values — the library
+    /// itself never touches process state (so precedence is unit-testable
+    /// without polluting the outer shell).
+    pub fn from_sources(
+        cli: &CliOptions,
+        env_home: Option<&str>,
+        temp_base: &std::path::Path,
+    ) -> Result<Self, ConfigError> {
+        let resolved = resolve_effective_home(cli, env_home, temp_base)?;
+        let bind_raw = cli
+            .bind
+            .clone()
+            .unwrap_or_else(|| Self::DEFAULT_BIND.to_string());
         let bind_addr: SocketAddr =
             bind_raw
                 .parse::<SocketAddr>()
@@ -145,40 +97,46 @@ impl ServiceConfig {
                     value: bind_raw.clone(),
                     source: source.to_string(),
                 })?;
-
-        let data_home = home.ok_or(ConfigError::MissingHome)?;
+        let data_home = resolved.path;
         if !data_home.is_absolute() {
             return Err(ConfigError::RelativeHome { value: data_home });
         }
-
         Ok(Self {
             bind_addr,
             data_home,
+            home_source: resolved.source,
         })
+    }
+
+    /// Backwards-compatible CLI-args constructor (R02-T01 surface):
+    /// resolves strictly from CLI arguments only, env = None.
+    pub fn from_cli_args<I, S>(args: I) -> Result<Self, ConfigError>
+    where
+        I: IntoIterator<Item = S>,
+        S: Into<String>,
+    {
+        let cli = parse_cli(args)?;
+        Self::from_sources(&cli, None, &std::env::temp_dir())
     }
 
     /// Creates the data root if it does not exist yet. Fails loudly when the
     /// path exists as a non-directory or cannot be created — never a silent
     /// fallback to some other location.
     pub fn prepare_data_home(&self) -> Result<(), ConfigError> {
-        prepare_data_root(&self.data_home)
-    }
-}
-
-fn prepare_data_root(path: &Path) -> Result<(), ConfigError> {
-    if path.exists() {
-        if path.is_dir() {
-            Ok(())
-        } else {
-            Err(ConfigError::HomeIsNotADirectory {
-                value: path.to_path_buf(),
-            })
+        if self.data_home.exists() && !self.data_home.is_dir() {
+            return Err(ConfigError::HomeIsNotADirectory {
+                value: self.data_home.clone(),
+            });
         }
-    } else {
-        std::fs::create_dir_all(path).map_err(|source| ConfigError::HomeCreateFailed {
-            value: path.to_path_buf(),
-            source: source.to_string(),
-        })
+        if !self.data_home.exists() {
+            std::fs::create_dir_all(&self.data_home).map_err(|source| {
+                ConfigError::HomeCreateFailed {
+                    value: self.data_home.clone(),
+                    source: source.to_string(),
+                }
+            })?;
+        }
+        Ok(())
     }
 }
 
@@ -266,6 +224,11 @@ impl std::error::Error for ServiceError {}
 /// Binds, reports the concrete local address through `on_ready`, and serves
 /// until `shutdown` resolves (SIGINT/SIGTERM in the binary; a test-controlled
 /// future in the harness). In-flight requests drain before returning.
+///
+/// Note (R02-T02): single-writer locking and the instance record are owned
+/// by the CALLER (`instance::acquire` + `InstanceGuard::publish` inside
+/// `on_ready`); this function stays transport-only so the in-process test
+/// harness keeps working without a data root.
 pub async fn run<F>(
     config: ServiceConfig,
     shutdown: F,
@@ -296,6 +259,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::PathBuf;
 
     fn args(list: &[&str]) -> Vec<String> {
         list.iter().map(|s| s.to_string()).collect()
@@ -336,6 +300,7 @@ mod tests {
                 .unwrap();
         assert_eq!(cfg.bind_addr, "127.0.0.1:8080".parse().unwrap());
         assert_eq!(cfg.data_home, PathBuf::from("/tmp/h"));
+        assert_eq!(cfg.home_source, HomeSource::Cli);
     }
 
     #[test]
