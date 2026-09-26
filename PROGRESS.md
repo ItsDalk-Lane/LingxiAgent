@@ -13,7 +13,7 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = fe394bbbef22c7879338b9bee8fc7ee5a80d22b0  (2026-09-26 R01 完整阶段独立第11轮 PASS 后的真实源码/证据树；p1 正式提交后复验待本次六审计提交执行，不用预演SHA)
+VERIFIED_SOURCE_SHA   = ab4f228155dd4246734e6c4c45d7288072361f3c  (2026-09-26 R01 完整阶段独立第11轮 PASS 后的真实源码/证据树；p2 正式提交后复验待本次六审计提交执行，不用预演SHA)
 历史 VERIFIED_SOURCE_SHA = 46f12ab1c5bc00f02a685346a3efc1b473590393  (2026-09-22 v0.1.43 发布树：e7e991669 refactor-2026 候选 + 228123462 发布元数据 + 8cb7b77c6 证据刷新与补丁 gzip 化 + 46f12ab1c 纯审计收官)
 历史 VERIFIED_SOURCE_SHA = adca95ca3947bcada920e66caabfbd059d9993e6  (2026-09-21 v0.1.42 发布树：6a9106552 发布元数据 + adca95ca3 证据刷新，分支 fix/git-history-stats；坐标后全量复验 14690 通过 / 0 失败)
 历史 VERIFIED_SOURCE_SHA = 4c5a119a3e1766bf8c26b6aa11e658f4971e6cba  (2026-09-21 0.1.42 候选树：Git 入口迁移 + 会话谱系深度上限，分支 fix/git-history-stats)
@@ -2052,4 +2052,10 @@ M  desktop/src/react/__tests__/components/TodoPanel.test.tsx
 
 - 第11轮完整阶段独立 PASS，报告 docs/rust-tauri/R01/STAGE_HISTORY/R01_STAGE_REVIEW_R11.md；126件冻结候选指纹1917800317b41362c2c330b3f5c096c3c2891d2356481bee0b3803bc780f6be7。
 - 真实源码提交 cdc170d7ce8e8742cc269c59347c20d75835d871；真实证据提交/本次 VERIFIED_SOURCE_SHA `fe394bbbef22c7879338b9bee8fc7ee5a80d22b0`。绿色 typecheck/core-contracts/lint:boundary/lint/build:renderer 全 exit0、执行期间源码零漂移；round2/round3 source态真实重放 VERIFIED、分片逐片和总hash复核。命令记录见各家族 COMMAND_RESULTS.json 的 r01-formal-p1-* 标签。
+- 本次仅同步既有六审计坐标；完整正式终态四文件74/74与全量0失败尚待真实审计提交后执行，未提前记绿、未放行后续阶段。结果将追加于本台账。
+
+## 2026-09-26 R01 真实阶段封印 p2
+
+- 第11轮完整阶段独立 PASS，报告 docs/rust-tauri/R01/STAGE_HISTORY/R01_STAGE_REVIEW_R11.md；126件冻结候选指纹1917800317b41362c2c330b3f5c096c3c2891d2356481bee0b3803bc780f6be7。
+- 真实源码提交 0ed84e0b5e9821d217457e7013b4b579002ae095；真实证据提交/本次 VERIFIED_SOURCE_SHA `ab4f228155dd4246734e6c4c45d7288072361f3c`。绿色 typecheck/core-contracts/lint:boundary/lint/build:renderer 全 exit0、执行期间源码零漂移；round2/round3 source态真实重放 VERIFIED、分片逐片和总hash复核。命令记录见各家族 COMMAND_RESULTS.json 的 r01-formal-p2-* 标签。
 - 本次仅同步既有六审计坐标；完整正式终态四文件74/74与全量0失败尚待真实审计提交后执行，未提前记绿、未放行后续阶段。结果将追加于本台账。
