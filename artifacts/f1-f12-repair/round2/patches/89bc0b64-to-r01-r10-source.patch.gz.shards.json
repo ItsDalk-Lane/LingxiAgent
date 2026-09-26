@@ -1,0 +1,39 @@
+{
+  "format": "patch-gzip-shards/v1",
+  "patch": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz",
+  "patchBytes": 268425735,
+  "patchSha256": "448cfc45b2389517ce13eb2224f641353c2b70e96fd15e9fa68ad2c41fbb8464",
+  "shardBytes": 45000000,
+  "shards": [
+    {
+      "bytes": 45000000,
+      "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00001",
+      "sha256": "2c6fa35afc68407f0d332930c193c529b94df7ba582c38d06f1f0ce1930da8b9"
+    },
+    {
+      "bytes": 45000000,
+      "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00002",
+      "sha256": "559ef1b65446dc444bed63be1643e507ddf59c20185da19f54d865ae48b4c37e"
+    },
+    {
+      "bytes": 45000000,
+      "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00003",
+      "sha256": "e86eff0228bca07a03bde9ea0192d48d0fe47b1c6bc7be3ac89412cf7b7d809a"
+    },
+    {
+      "bytes": 45000000,
+      "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00004",
+      "sha256": "154974af03b6ad6eb2f7d4431c87f94b554a0879541638dfe6f2d79972ba6149"
+    },
+    {
+      "bytes": 45000000,
+      "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00005",
+      "sha256": "9f11cc02da738b2d03188f082a82910554ef10cf9d5acae8a0161d8d5d5bfe71"
+    },
+    {
+      "bytes": 43425735,
+      "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00006",
+      "sha256": "8cb5e92c5c0008edad882ca8871694c5700b02db5e34b857773e86f3590b5000"
+    }
+  ]
+}

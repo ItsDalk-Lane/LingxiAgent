@@ -5603,5 +5603,130 @@
     "log": "logs/r00-seal-r4-full-rerun.log",
     "logSha256": "d57f880be1654fbfc02bc7fa4b16c2110e1477940cd94716b94cddb6dc4b9a83",
     "sourceManifestHash": "47dbddc11630e630df5404e3ef270e606bc8192e104192a031ce75fde2e53770"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-26T04:38:15.079994+00:00",
+    "end": "2026-09-26T04:38:41.394134+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "89ffcd0e621712d85197b285213f695480ef60c317dbd95cf43be8c75867a186",
+    "log": "logs/r01-formal-p1-typecheck.log",
+    "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+    "sourceManifestHash": "89ffcd0e621712d85197b285213f695480ef60c317dbd95cf43be8c75867a186"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "typecheck:core-contracts"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-26T04:38:41.867406+00:00",
+    "end": "2026-09-26T04:38:43.282629+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "89ffcd0e621712d85197b285213f695480ef60c317dbd95cf43be8c75867a186",
+    "log": "logs/r01-formal-p1-contracts.log",
+    "logSha256": "9a3a2b6ce40e47627287266176c6142f859d948935aa73c756c0a6e541a2ced7",
+    "sourceManifestHash": "89ffcd0e621712d85197b285213f695480ef60c317dbd95cf43be8c75867a186"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "lint:boundary"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-26T04:38:43.756804+00:00",
+    "end": "2026-09-26T04:38:45.134127+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "89ffcd0e621712d85197b285213f695480ef60c317dbd95cf43be8c75867a186",
+    "log": "logs/r01-formal-p1-boundary.log",
+    "logSha256": "8560904e516cd5a5118bf780c3d9ddf190b29834c49ccde649878250d9c464ff",
+    "sourceManifestHash": "89ffcd0e621712d85197b285213f695480ef60c317dbd95cf43be8c75867a186"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-26T04:38:45.609478+00:00",
+    "end": "2026-09-26T04:39:04.292087+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "89ffcd0e621712d85197b285213f695480ef60c317dbd95cf43be8c75867a186",
+    "log": "logs/r01-formal-p1-lint.log",
+    "logSha256": "3c66e2199fc12d100037fa92287cbaf77d67dffd1aa1e75a1144e957611ae052",
+    "sourceManifestHash": "89ffcd0e621712d85197b285213f695480ef60c317dbd95cf43be8c75867a186"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "build:renderer"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-26T04:39:04.761084+00:00",
+    "end": "2026-09-26T04:39:12.938060+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "89ffcd0e621712d85197b285213f695480ef60c317dbd95cf43be8c75867a186",
+    "log": "logs/r01-formal-p1-build-renderer.log",
+    "logSha256": "36bdbdd711a5bd984d1a0782ba0b6c6890c8f6ef793243fcdf026a7e0acbc657",
+    "sourceManifestHash": "89ffcd0e621712d85197b285213f695480ef60c317dbd95cf43be8c75867a186"
+  },
+  {
+    "command": [
+      "python3",
+      "artifacts/f1-f12-repair/round2/create-delivery-patch.py"
+    ],
+    "cwd": "<WORKTREE>",
+    "platform": "Darwin",
+    "arch": "arm64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "start": "2026-09-26T04:39:13.404501+00:00",
+    "end": "2026-09-26T04:39:41.344387+00:00",
+    "exitCode": 0,
+    "counts": null,
+    "sourceChangedDuringCommand": false,
+    "endSourceManifestHash": "89ffcd0e621712d85197b285213f695480ef60c317dbd95cf43be8c75867a186",
+    "log": "logs/r01-formal-p1-patch-r2.log",
+    "logSha256": "0e22dd5b7db9f045293b901d322168520b78063ae79d01fbf0655caf7cb3bc01",
+    "sourceManifestHash": "89ffcd0e621712d85197b285213f695480ef60c317dbd95cf43be8c75867a186"
   }
 ]
