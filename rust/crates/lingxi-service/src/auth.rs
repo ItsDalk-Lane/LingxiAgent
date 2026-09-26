@@ -977,6 +977,12 @@ fn hex_random(n_bytes: usize) -> String {
     out
 }
 
+/// Public accessor for the one entropy authority (R02-T07: the request-id
+/// generator shares this source instead of minting a second one).
+pub fn hex_random_public(n_bytes: usize) -> String {
+    hex_random(n_bytes)
+}
+
 /// Generates a synthetic base64url token (OS randomness, documented
 /// fallback); shared with the WS ticket service so every secret on this
 /// surface has one entropy authority.

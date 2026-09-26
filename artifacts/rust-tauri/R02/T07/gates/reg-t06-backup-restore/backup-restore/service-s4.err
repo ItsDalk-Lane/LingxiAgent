@@ -1,0 +1,11 @@
+2026-09-26T18:35:03.206960Z  INFO lingxi_service: data root resolved effective_home=/tmp/lingxi-r02t06-bk-iRn11K source=cli ignored_sources=none
+2026-09-26T18:35:03.207171Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/tmp/lingxi-r02t06-bk-iRn11K runtime_dir=/private/tmp/lingxi-r02t06-bk-iRn11K/lingxi-service
+2026-09-26T18:35:03.207386Z  INFO lingxi_service: single-writer lock acquired instance_id=e570e1b364cca79a220556c52cebac57 start_nonce=f431c9722735575e pid=44692 entropy="os-random-device" lock=/private/tmp/lingxi-r02t06-bk-iRn11K/lingxi-service/instance.lock network_mode=loopback
+2026-09-26T18:35:03.207715Z  INFO lingxi_service: data-epoch gate passed home=/private/tmp/lingxi-r02t06-bk-iRn11K decision=ProceedSteady(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-09-26T18:35:03.218607Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only);          run database migrated and seeded local_token_file=/private/tmp/lingxi-r02t06-bk-iRn11K/lingxi-service/local-token.json run_database=/private/tmp/lingxi-r02t06-bk-iRn11K/lingxi-service/data/runs.db
+2026-09-26T18:35:03.228491Z  INFO lingxi_service: instance record published (atomic write) record=/private/tmp/lingxi-r02t06-bk-iRn11K/lingxi-service/instance.json bind_addr=127.0.0.1:61302
+2026-09-26T18:35:03.326577Z  INFO lingxi_service: request handled request_id=req-2663b1a500f1816469ed7eb7177c3bd9 method=GET path=/lingxi/v1/ws status=101
+2026-09-26T18:35:04.319197Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-09-26T18:35:04.320191Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-09-26T18:35:04.320427Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-09-26T18:35:04.320491Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

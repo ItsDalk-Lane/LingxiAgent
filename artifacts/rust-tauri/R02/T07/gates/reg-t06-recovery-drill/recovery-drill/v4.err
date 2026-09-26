@@ -1,0 +1,11 @@
+2026-09-26T18:35:05.063928Z  INFO lingxi_service: data root resolved effective_home=/tmp/lingxi-r02t06-drill-v4-rPCZih source=cli ignored_sources=none
+2026-09-26T18:35:05.064187Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/tmp/lingxi-r02t06-drill-v4-rPCZih runtime_dir=/private/tmp/lingxi-r02t06-drill-v4-rPCZih/lingxi-service
+2026-09-26T18:35:05.064347Z  INFO lingxi_service: single-writer lock acquired instance_id=79f82b611479b61466b0c544615c1705 start_nonce=1b9801fe3ec76b43 pid=44799 entropy="os-random-device" lock=/private/tmp/lingxi-r02t06-drill-v4-rPCZih/lingxi-service/instance.lock network_mode=loopback
+2026-09-26T18:35:05.077317Z  INFO lingxi_service: data-epoch gate passed home=/private/tmp/lingxi-r02t06-drill-v4-rPCZih decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-09-26T18:35:05.105597Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/tmp/lingxi-r02t06-drill-v4-rPCZih/lingxi-service/data/runs.db applied=[1] version=1
+2026-09-26T18:35:05.105966Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only);          run database migrated and seeded local_token_file=/private/tmp/lingxi-r02t06-drill-v4-rPCZih/lingxi-service/local-token.json run_database=/private/tmp/lingxi-r02t06-drill-v4-rPCZih/lingxi-service/data/runs.db
+2026-09-26T18:35:05.115314Z  INFO lingxi_service: instance record published (atomic write) record=/private/tmp/lingxi-r02t06-drill-v4-rPCZih/lingxi-service/instance.json bind_addr=127.0.0.1:61304
+2026-09-26T18:35:05.130809Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-09-26T18:35:05.131823Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-09-26T18:35:05.132103Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-09-26T18:35:05.132187Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

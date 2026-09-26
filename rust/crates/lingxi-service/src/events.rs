@@ -62,6 +62,11 @@ use crate::sessions::{SessionAccess, SessionStore};
 
 /// Flow-control knobs of the event surface. Defaults are the production
 /// values; tests inject small ones and drive overflow deterministically.
+///
+/// R02-T07 added the subscriber/stream registry caps (任务书 step 3:
+/// "对…事件缓存、订阅者…设置上限"): exceeding a cap is an explicit
+/// `rejected` answer (`SubscribeReject::SubscriberLimit`), never a silent
+/// admission into unbounded registry growth.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EventLimits {
     /// Hard bound of one subscriber's mailbox (frames). Events may occupy
@@ -77,15 +82,40 @@ pub struct EventLimits {
     pub page_limit_max: u32,
     /// Default page size when the caller does not ask.
     pub page_limit_default: u32,
+    /// Maximum concurrently LIVE subscribers across the whole service
+    /// (R02-T07). Over the cap a subscribe request is explicitly rejected.
+    pub max_subscribers_total: usize,
+    /// Maximum concurrently LIVE subscribers on ONE stream (R02-T07).
+    pub max_subscribers_per_stream: usize,
+    /// Maximum tracked in-memory stream states (the hub's "event cache"
+    /// registry; R02-T07). Streams with no subscribers and no parked
+    /// publications are evictable — their baseline is rebuilt from the
+    /// durable log on the next registration, so eviction is lossless.
+    pub max_tracked_streams: usize,
 }
+
+/// Production default of [`EventLimits::subscriber_queue_capacity`]
+/// (also the USAGE-documented default of `--event-subscriber-queue`).
+pub const DEFAULT_EVENT_SUBSCRIBER_QUEUE: usize = 128;
+/// Production default of [`EventLimits::reorder_pending_bound`].
+pub const DEFAULT_EVENT_REORDER_BOUND: usize = 64;
+/// Production default of [`EventLimits::max_subscribers_total`].
+pub const DEFAULT_MAX_SUBSCRIBERS_TOTAL: usize = 256;
+/// Production default of [`EventLimits::max_subscribers_per_stream`].
+pub const DEFAULT_MAX_SUBSCRIBERS_PER_STREAM: usize = 32;
+/// Production default of [`EventLimits::max_tracked_streams`].
+pub const DEFAULT_MAX_TRACKED_STREAMS: usize = 4096;
 
 impl Default for EventLimits {
     fn default() -> Self {
         Self {
-            subscriber_queue_capacity: 128,
-            reorder_pending_bound: 64,
+            subscriber_queue_capacity: DEFAULT_EVENT_SUBSCRIBER_QUEUE,
+            reorder_pending_bound: DEFAULT_EVENT_REORDER_BOUND,
             page_limit_max: 500,
             page_limit_default: 200,
+            max_subscribers_total: DEFAULT_MAX_SUBSCRIBERS_TOTAL,
+            max_subscribers_per_stream: DEFAULT_MAX_SUBSCRIBERS_PER_STREAM,
+            max_tracked_streams: DEFAULT_MAX_TRACKED_STREAMS,
         }
     }
 }
@@ -116,6 +146,21 @@ impl EventLimits {
         if self.page_limit_default > self.page_limit_max {
             return Err(StorageError::InvalidRequest {
                 detail: "page_limit_default must be <= page_limit_max".to_string(),
+            });
+        }
+        if self.max_subscribers_per_stream == 0 || self.max_subscribers_total == 0 {
+            return Err(StorageError::InvalidRequest {
+                detail: "subscriber caps must be >= 1 (0 would reject every subscribe)".to_string(),
+            });
+        }
+        if self.max_subscribers_per_stream > self.max_subscribers_total {
+            return Err(StorageError::InvalidRequest {
+                detail: "max_subscribers_per_stream must be <= max_subscribers_total".to_string(),
+            });
+        }
+        if self.max_tracked_streams == 0 {
+            return Err(StorageError::InvalidRequest {
+                detail: "max_tracked_streams must be >= 1".to_string(),
             });
         }
         Ok(())
@@ -307,11 +352,22 @@ impl Mailbox {
     }
 
     /// Async receive; `None` once closed AND drained.
+    /// R02-A14 defect fix (found by the binary-level slow-subscriber
+    /// storm): `Notify::notified()` registers the waiter only when the
+    /// future is FIRST POLLED, so the previous
+    /// `create → try_recv → await` sequence had a lost-wakeup window: a
+    /// push + `notify_waiters` landing between the empty `try_recv` and
+    /// the first poll left the consumer parked forever with frames
+    /// already in its queue (observed: a healthy subscriber silently
+    /// stalled mid-storm, no detach, no log). `Notified::enable()`
+    /// registers the waiter BEFORE the empty check, closing both
+    /// orderings: a push before `enable` is covered by the subsequent
+    /// `try_recv`; a push after `enable` fires the registered waiter.
     pub async fn recv(&self) -> Option<SubscriptionFrame> {
         loop {
-            // Register interest BEFORE checking so a notify racing between
-            // the check and the await cannot be lost.
             let notified = self.notify.notified();
+            tokio::pin!(notified);
+            notified.as_mut().enable();
             if let Some(frame) = self.try_recv() {
                 return Some(frame);
             }
@@ -327,6 +383,27 @@ impl Mailbox {
 
 /// Sentinel cut while the durable snapshot is being taken.
 const HOLD_ALL: u64 = u64::MAX;
+
+/// Which registry bound refused a registration (R02-T07; surfaced as the
+/// machine-readable `scope` of a `subscriber_limit` rejection).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SubscriberCapKind {
+    /// The service-wide subscriber registry is at
+    /// [`EventLimits::max_subscribers_total`].
+    Total,
+    /// This stream's subscriber count is at
+    /// [`EventLimits::max_subscribers_per_stream`].
+    PerStream,
+}
+
+impl SubscriberCapKind {
+    pub fn scope(&self) -> &'static str {
+        match self {
+            SubscriberCapKind::Total => "total",
+            SubscriberCapKind::PerStream => "stream",
+        }
+    }
+}
 
 struct SubscriberState {
     id: u64,
@@ -401,6 +478,27 @@ impl EventHub {
             let stream_key = envelope.stream_id.to_string();
             let seq = envelope.seq.value();
             if !inner.streams.contains_key(&stream_key) {
+                // The tracked-stream registry is bounded (R02-T07 event
+                // cache cap): make room by evicting streams that hold no
+                // subscriber and no parked publication (their baseline
+                // rebuilds from the durable log on the next registration —
+                // lossless). If nothing is evictable, the publication is
+                // NOT silently swallowed: a loud error records the skip
+                // and the durable log stays authoritative.
+                if inner.streams.len() >= self.limits.max_tracked_streams {
+                    self.evict_idle_streams(&mut inner);
+                }
+                if inner.streams.len() >= self.limits.max_tracked_streams {
+                    tracing::error!(
+                        stream = %envelope.stream_id,
+                        seq = %envelope.seq,
+                        bound = self.limits.max_tracked_streams,
+                        "event cache stream cap reached and no evictable stream; \
+                         live fan-out skipped for this event (durable log remains \
+                         authoritative; clients resync via snapshot)"
+                    );
+                    continue;
+                }
                 inner.streams.insert(
                     stream_key.clone(),
                     StreamState {
@@ -491,6 +589,40 @@ impl EventHub {
         }
     }
 
+    /// Evicts tracked streams that cannot lose anything: no subscribers
+    /// (nobody receives from the in-memory state) and no parked pending
+    /// publication (nothing is waiting to be delivered). Baseline state
+    /// rebuilds from the durable log via the known-head alignment on the
+    /// next registration.
+    fn evict_idle_streams(&self, inner: &mut HubInner) {
+        let mut evictable: Vec<String> = inner
+            .streams
+            .iter()
+            .filter(|(key, state)| {
+                let has_subscribers = inner.subscribers.values().any(|s| &s.stream_id == *key);
+                !has_subscribers && state.pending.is_empty()
+            })
+            .map(|(key, _)| key.clone())
+            .collect();
+        evictable.sort();
+        let mut removed = 0usize;
+        for key in evictable {
+            if inner.streams.len() < self.limits.max_tracked_streams {
+                break;
+            }
+            inner.streams.remove(&key);
+            removed += 1;
+        }
+        if removed > 0 {
+            tracing::debug!(
+                evicted = removed,
+                tracked = inner.streams.len(),
+                "event cache eviction: idle streams dropped (subscribers rebuild \
+                 baselines from the durable log)"
+            );
+        }
+    }
+
     /// Delivers `envelope` (whose seq equals the stream's `next_seq`) to
     /// the stream's subscribers and advances `next_seq`.
     ///
@@ -577,13 +709,29 @@ impl EventHub {
     /// registering (used for restart baseline alignment — see below). The
     /// returned guard is in the HOLD state until
     /// [`EventHub::release_hold`] pins the durable cut.
+    ///
+    /// Fallible (R02-T07): the subscriber registry is bounded — over
+    /// [`EventLimits::max_subscribers_total`] or
+    /// [`EventLimits::max_subscribers_per_stream`] the registration is
+    /// explicitly refused (never a silent over-cap admission).
     fn register(
         &self,
         stream_id: &str,
         after_seq: u64,
         known_head: Option<u64>,
-    ) -> SubscriptionGuard {
+    ) -> Result<SubscriptionGuard, SubscriberCapKind> {
         let mut inner = self.hub_lock();
+        if inner.subscribers.len() >= self.limits.max_subscribers_total {
+            return Err(SubscriberCapKind::Total);
+        }
+        let on_stream = inner
+            .subscribers
+            .values()
+            .filter(|s| s.stream_id == stream_id)
+            .count();
+        if on_stream >= self.limits.max_subscribers_per_stream {
+            return Err(SubscriberCapKind::PerStream);
+        }
         let id = inner.next_subscriber_id;
         inner.next_subscriber_id += 1;
         // Baseline alignment for a stream this process has not delivered
@@ -646,11 +794,11 @@ impl EventHub {
                 dropped_deltas: 0,
             },
         );
-        SubscriptionGuard {
+        Ok(SubscriptionGuard {
             subscriber_id: id,
             mailbox,
             hub: None,
-        }
+        })
     }
 
     /// Completes the registration: everything `<= cut` was in the durable
@@ -716,6 +864,21 @@ impl EventHub {
             })
     }
 
+    /// Live snapshot of the hub registries (R02-A14 queue/registry
+    /// monitoring evidence; also used by tests).
+    pub fn hub_stats(&self) -> HubStats {
+        let inner = self.hub_lock();
+        HubStats {
+            tracked_streams: inner.streams.len(),
+            live_subscribers: inner.subscribers.len(),
+            broken_streams: inner.streams.values().filter(|s| s.broken).count(),
+            max_subscribers_total: self.limits.max_subscribers_total,
+            max_subscribers_per_stream: self.limits.max_subscribers_per_stream,
+            max_tracked_streams: self.limits.max_tracked_streams,
+            subscriber_queue_capacity: self.limits.subscriber_queue_capacity,
+        }
+    }
+
     fn hub_lock(&self) -> std::sync::MutexGuard<'_, HubInner> {
         self.inner
             .lock()
@@ -730,6 +893,21 @@ pub struct SubscriberStats {
     pub last_enqueued_seq: Seq,
     pub dropped_deltas: u64,
     pub detached: Option<DetachReason>,
+}
+
+/// Live hub registry snapshot (R02-T07 bounded-resource observability:
+/// real sampled numbers for the A14 queue/registry monitoring, and the
+/// `LINGXI_HUB_STATS` log line payload).
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HubStats {
+    pub tracked_streams: usize,
+    pub live_subscribers: usize,
+    pub broken_streams: usize,
+    pub max_subscribers_total: usize,
+    pub max_subscribers_per_stream: usize,
+    pub max_tracked_streams: usize,
+    pub subscriber_queue_capacity: usize,
 }
 
 /// Consumer-side handle; dropping it unregisters the subscription.
@@ -766,6 +944,18 @@ fn detach_with_signal(inner: &mut HubInner, id: u64, mailbox: Arc<Mailbox>, reas
         return;
     }
     subscriber.detached = Some(reason.clone());
+    // Flow-control observability (R02-A14 evidence): a detach is a real
+    // backpressure event — record the queue state that caused it (real
+    // sampled numbers, not hand-filled).
+    tracing::error!(
+        stream = %subscriber.stream_id,
+        subscriber = id,
+        reason = reason.wire_reason(),
+        queue_capacity = subscriber.queue_capacity,
+        dropped_deltas = subscriber.dropped_deltas,
+        last_enqueued_seq = subscriber.last_enqueued_seq,
+        "subscription detached with explicit snapshot_required signal"
+    );
     // The reserved slot makes this deliverable even under pressure; if the
     // consumer is already gone there is nothing to signal.
     let _ = mailbox.push_signal(SubscriptionFrame::SnapshotRequired { reason });
@@ -871,6 +1061,17 @@ pub enum SubscribeReject {
         seq: Seq,
         head: Seq,
     },
+    /// A bounded registry refused the registration (R02-T07): the
+    /// service-wide subscriber count or this stream's subscriber count is
+    /// at its configured cap. Explicit rejection — the caller retries
+    /// later or reduces its subscription footprint.
+    SubscriberLimit {
+        stream_id: String,
+        /// Which cap: `total` or `stream`.
+        scope: &'static str,
+        /// The configured cap that was reached.
+        limit: usize,
+    },
     Storage(StorageError),
 }
 
@@ -883,6 +1084,7 @@ impl SubscribeReject {
             SubscribeReject::MalformedCursor { .. } => "malformed_cursor",
             SubscribeReject::StaleStreamCursor { .. } => "stale_stream_cursor",
             SubscribeReject::FutureCursor { .. } => "future_cursor",
+            SubscribeReject::SubscriberLimit { .. } => "subscriber_limit",
             SubscribeReject::Storage(_) => "db_failure",
         }
     }
@@ -1029,10 +1231,20 @@ impl EventService {
         };
 
         // 4. Register (hold) BEFORE the durable page read: events published
-        //    from now on buffer in the hold instead of racing the cut.
+        //    from now on buffer in the hold instead of racing the cut. The
+        //    subscriber registry is bounded (R02-T07): over a cap the
+        //    subscribe is explicitly rejected.
         let mut subscription = self
             .hub
-            .register(stream_id, after.value(), Some(head.value()));
+            .register(stream_id, after.value(), Some(head.value()))
+            .map_err(|kind| SubscribeReject::SubscriberLimit {
+                stream_id: stream_id.to_string(),
+                scope: kind.scope(),
+                limit: match kind {
+                    SubscriberCapKind::Total => self.limits.max_subscribers_total,
+                    SubscriberCapKind::PerStream => self.limits.max_subscribers_per_stream,
+                },
+            })?;
         let page_limit = u64::from(self.limits.page_limit_max);
         let events = match self
             .storage
@@ -1233,7 +1445,18 @@ mod tests {
             reorder_pending_bound: pending,
             page_limit_max: 50,
             page_limit_default: 50,
+            ..EventLimits::default()
         }
+    }
+
+    /// A hub whose registry caps are small enough to overflow in tests.
+    fn capped_hub(total: usize, per_stream: usize, streams: usize) -> EventHub {
+        EventHub::new(EventLimits {
+            max_subscribers_total: total,
+            max_subscribers_per_stream: per_stream,
+            max_tracked_streams: streams,
+            ..EventLimits::default()
+        })
     }
 
     #[test]
@@ -1282,7 +1505,7 @@ mod tests {
     #[test]
     fn hub_delivers_in_seq_order_despite_out_of_order_publish() {
         let hub = EventHub::new(limits(8, 8));
-        let sub = hub.register("sess_a", 0, None);
+        let sub = hub.register("sess_a", 0, None).expect("under cap");
         hub.release_hold(sub.subscriber_id(), 0);
         // Publish 3 then 1 then 2: 3 parks, 1 delivers and flushes.
         hub.publish(&[envelope("sess_a", 3, false)]);
@@ -1301,7 +1524,7 @@ mod tests {
     #[test]
     fn hub_dedups_duplicate_publication_by_seq_and_event_id() {
         let hub = EventHub::new(limits(8, 8));
-        let sub = hub.register("sess_a", 0, None);
+        let sub = hub.register("sess_a", 0, None).expect("under cap");
         hub.release_hold(sub.subscriber_id(), 0);
         let events = vec![envelope("sess_a", 1, false), envelope("sess_a", 2, false)];
         hub.publish(&events);
@@ -1328,7 +1551,7 @@ mod tests {
         // A fresh hub (process restart) seeing seq 7 first must accept it as
         // the baseline instead of parking it forever.
         let hub = EventHub::new(limits(8, 8));
-        let sub = hub.register("sess_a", 6, Some(6));
+        let sub = hub.register("sess_a", 6, Some(6)).expect("under cap");
         hub.release_hold(sub.subscriber_id(), 6);
         hub.publish(&[envelope("sess_a", 8, false)]);
         hub.publish(&[envelope("sess_a", 7, false)]);
@@ -1346,7 +1569,7 @@ mod tests {
     fn key_event_overflow_detaches_with_explicit_signal() {
         // capacity 3 → 2 event slots + 1 reserved signal slot.
         let hub = EventHub::new(limits(3, 8));
-        let sub = hub.register("sess_a", 0, None);
+        let sub = hub.register("sess_a", 0, None).expect("under cap");
         hub.release_hold(sub.subscriber_id(), 0);
         hub.publish(&[envelope("sess_a", 1, false), envelope("sess_a", 2, false)]);
         // Queue now full for events: a KEY event must not be silently
@@ -1377,7 +1600,7 @@ mod tests {
         // dropped (bounded, counted); the following key event still
         // detaches rather than being lost — deltas never displace keys.
         let hub = EventHub::new(limits(3, 8));
-        let sub = hub.register("sess_a", 0, None);
+        let sub = hub.register("sess_a", 0, None).expect("under cap");
         hub.release_hold(sub.subscriber_id(), 0);
         hub.publish(&[envelope("sess_a", 1, true), envelope("sess_a", 2, true)]);
         hub.publish(&[envelope("sess_a", 3, true)]); // delta overflow → dropped
@@ -1399,7 +1622,7 @@ mod tests {
     #[test]
     fn reorder_bound_overflow_breaks_the_stream_loudly() {
         let hub = EventHub::new(limits(8, 2));
-        let sub = hub.register("sess_a", 0, None);
+        let sub = hub.register("sess_a", 0, None).expect("under cap");
         hub.release_hold(sub.subscriber_id(), 0);
         hub.publish(&[envelope("sess_a", 1, false)]);
         // Park 3 events beyond seq 1 with bound 2 → broken stream.
@@ -1424,7 +1647,7 @@ mod tests {
     #[test]
     fn hold_buffers_events_and_releases_at_the_cut() {
         let hub = EventHub::new(limits(8, 8));
-        let sub = hub.register("sess_a", 0, None);
+        let sub = hub.register("sess_a", 0, None).expect("under cap");
         // Registration is in the HOLD state: nothing is delivered yet.
         hub.publish(&[envelope("sess_a", 1, false), envelope("sess_a", 2, false)]);
         assert!(sub.mailbox().try_recv().is_none(), "hold must buffer");
@@ -1461,7 +1684,7 @@ mod tests {
         // probe A delivered [4] instead of [3,4], with no detach, no
         // snapshot_required and no loss counter).
         let hub = EventHub::new(limits(8, 8));
-        let sub = hub.register("sess_a", 0, None);
+        let sub = hub.register("sess_a", 0, None).expect("under cap");
         hub.publish(&[envelope("sess_a", 1, false)]);
         hub.publish(&[envelope("sess_a", 2, false)]);
         hub.publish(&[envelope("sess_a", 3, false)]); // buffered in the hold, seq > future cut
@@ -1498,7 +1721,7 @@ mod tests {
         // delta is DELIVERED by the flush (dropped_deltas stays 0) — a
         // bookkeeping slip is not the bounded, counted overflow loss.
         let hub = EventHub::new(limits(8, 8));
-        let sub = hub.register("sess_a", 0, None);
+        let sub = hub.register("sess_a", 0, None).expect("under cap");
         hub.publish(&[envelope("sess_a", 1, false)]);
         hub.publish(&[envelope("sess_a", 2, true)]); // delta buffered in the hold
         hub.release_hold(sub.subscriber_id(), 1); // cut = 1; held delta 2 is above it
@@ -1533,10 +1756,10 @@ mod tests {
         // delivery stalled forever, silently, for every later subscriber.
         let hub = EventHub::new(limits(8, 8));
         hub.publish(&[envelope("sess_a", 3, false)]); // parks (next_seq = 1)
-        let sub = hub.register("sess_a", 0, Some(2)); // baseline alignment: next_seq = 3
-                                                      // The durable page read follows the registration and sees the
-                                                      // committed event 3, so the cut pins 3 (the subscriber receives 3
-                                                      // from the cut, not live).
+        let sub = hub.register("sess_a", 0, Some(2)).expect("under cap"); // baseline alignment: next_seq = 3
+                                                                          // The durable page read follows the registration and sees the
+                                                                          // committed event 3, so the cut pins 3 (the subscriber receives 3
+                                                                          // from the cut, not live).
         hub.release_hold(sub.subscriber_id(), 3);
         hub.publish(&[envelope("sess_a", 4, false)]);
         hub.publish(&[envelope("sess_a", 5, false)]);
@@ -1563,7 +1786,7 @@ mod tests {
         let hub = EventHub::new(limits(8, 8));
         hub.publish(&[envelope("sess_a", 3, false)]);
         hub.publish(&[envelope("sess_a", 4, false)]); // parked chain {3, 4}
-        let sub = hub.register("sess_a", 0, Some(2)); // next_seq 1 → 3; chain drains
+        let sub = hub.register("sess_a", 0, Some(2)).expect("under cap"); // next_seq 1 → 3; chain drains
         hub.release_hold(sub.subscriber_id(), 4); // cut covers the drained 3 and 4
         hub.publish(&[envelope("sess_a", 5, false)]);
         let mut seen = Vec::new();
@@ -1583,7 +1806,7 @@ mod tests {
     #[test]
     fn drop_guard_unregisters_and_prunes_on_publish() {
         let hub = EventHub::new(limits(8, 8));
-        let sub = hub.register("sess_a", 0, None);
+        let sub = hub.register("sess_a", 0, None).expect("under cap");
         hub.release_hold(sub.subscriber_id(), 0);
         let mailbox = sub.mailbox().clone();
         drop(sub);
@@ -1624,6 +1847,79 @@ mod tests {
         assert_eq!(value["reason"], "events_truncated");
     }
 
+    // R02-A14 contract at hub level: under a sustained 24-writer storm a
+    // subscriber either receives EVERY event or is explicitly detached
+    // (slow_consumer signal it can observe) — a silent stall (frames stuck
+    // in a mailbox nobody wakes for) is the bug the R02-A14 storm
+    // investigation found in `Mailbox::recv` and this test pins the
+    // no-silent-loss invariant.
+    #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+    async fn hub_storm_is_explicit_at_every_subscriber() {
+        use std::sync::Arc as StdArc;
+        let hub = StdArc::new(EventHub::new(EventLimits {
+            subscriber_queue_capacity: 4,
+            ..EventLimits::default()
+        }));
+        let reader = hub.register("s", 0, None).expect("under cap");
+        hub.release_hold(reader.subscriber_id(), 0);
+
+        const WRITERS: u64 = 24;
+        const PER_WRITER: u64 = 34;
+        const TOTAL: u64 = WRITERS * PER_WRITER;
+        let mut handles = Vec::new();
+        for w in 0..WRITERS {
+            let hub = StdArc::clone(&hub);
+            handles.push(tokio::spawn(async move {
+                for i in 0..PER_WRITER {
+                    let seq = i * WRITERS + w + 1;
+                    hub.publish(&[envelope("s", seq, false)]);
+                    tokio::task::yield_now().await;
+                }
+            }));
+        }
+        let mailbox = reader.mailbox().clone();
+        let consumer = tokio::spawn(async move {
+            let mut got: Vec<u64> = Vec::new();
+            let mut detached = false;
+            loop {
+                match tokio::time::timeout(std::time::Duration::from_secs(10), mailbox.recv()).await
+                {
+                    Ok(Some(SubscriptionFrame::Event(e))) => got.push(e.seq.value()),
+                    Ok(Some(SubscriptionFrame::SnapshotRequired { .. })) => {
+                        detached = true;
+                        break;
+                    }
+                    Ok(None) => break,
+                    Err(_) => break, // 10s without any frame: the stall the test must not see
+                }
+            }
+            (got, detached)
+        });
+        for h in handles {
+            h.await.expect("writer task");
+        }
+        let (got, detached) = tokio::time::timeout(std::time::Duration::from_secs(30), consumer)
+            .await
+            .expect("consumer terminated (no silent stall)")
+            .expect("consumer task");
+        // No silent loss: the subscriber either received the whole stream
+        // or every event beyond its last delivery is covered by an
+        // EXPLICIT detach signal.
+        let stats = hub.subscriber_stats(reader.subscriber_id()).expect("live");
+        assert!(
+            got == (1..=TOTAL).collect::<Vec<u64>>() || (detached && stats.detached.is_some()),
+            "silent stall: got={} detached={detached:?} stats={stats:?}",
+            got.len()
+        );
+        if detached {
+            assert_eq!(
+                stats.detached,
+                Some(DetachReason::SlowConsumer),
+                "an overflow detach must be explicit and named"
+            );
+        }
+    }
+
     #[test]
     fn event_limits_validation_is_loud() {
         assert!(EventLimits::default().validate().is_ok());
@@ -1634,5 +1930,115 @@ mod tests {
             ..EventLimits::default()
         };
         assert!(bad.validate().is_err(), "default > max rejected");
+        let bad = EventLimits {
+            max_subscribers_per_stream: 999,
+            ..EventLimits::default()
+        };
+        assert!(
+            bad.validate().is_err(),
+            "per-stream cap over the total cap rejected"
+        );
+        let bad = EventLimits {
+            max_tracked_streams: 0,
+            ..EventLimits::default()
+        };
+        assert!(bad.validate().is_err(), "0 tracked streams rejected");
+    }
+
+    // ── R02-T07: bounded subscriber / stream registries ─────────────────────
+
+    #[test]
+    fn subscriber_total_cap_rejects_explicitly() {
+        // Production wiring: EventService::subscribe hands the guard a hub
+        // Arc so Drop unregisters. The test mirrors that exactly.
+        let hub = std::sync::Arc::new(capped_hub(2, 8, 64));
+        let mut s1 = hub.register("sess_a", 0, None).expect("under cap");
+        s1.hub = Some(Arc::clone(&hub));
+        let s2 = hub.register("sess_b", 0, None).expect("under cap");
+        assert!(
+            matches!(
+                hub.register("sess_c", 0, None),
+                Err(SubscriberCapKind::Total)
+            ),
+            "the third subscriber must be explicitly refused, never admitted"
+        );
+        drop(s1);
+        // Freed slots are reusable (the bound is on LIVE subscribers).
+        let s3 = hub.register("sess_c", 0, None).expect("freed slot");
+        drop(s2);
+        drop(s3);
+    }
+
+    #[test]
+    fn subscriber_stream_cap_rejects_but_other_streams_still_subscribe() {
+        let hub = capped_hub(64, 2, 64);
+        let a1 = hub.register("sess_a", 0, None).expect("under cap");
+        let a2 = hub.register("sess_a", 0, None).expect("under cap");
+        assert!(
+            matches!(
+                hub.register("sess_a", 0, None),
+                Err(SubscriberCapKind::PerStream)
+            ),
+            "the third subscriber ON THIS STREAM must be refused"
+        );
+        // A different stream is unaffected (the total cap has room).
+        hub.register("sess_b", 0, None).expect("other stream fine");
+        drop(a1);
+        drop(a2);
+    }
+
+    #[test]
+    fn idle_stream_eviction_keeps_live_and_parked_streams() {
+        // Registry cap 2: a stream with a LIVE subscriber and a stream with
+        // a PARKED publication must never be evicted; the idle one is the
+        // eviction victim.
+        let hub = capped_hub(64, 64, 2);
+        let sub = hub.register("live", 0, None).expect("under cap");
+        hub.release_hold(sub.subscriber_id(), 0);
+        hub.publish(&[envelope("live", 1, false)]);
+        hub.publish(&[envelope("live", 2, false)]);
+        hub.publish(&[envelope("idle", 1, false)]);
+        assert_eq!(hub.hub_stats().tracked_streams, 2);
+        // Inserting a third (parked) stream forces an eviction: the idle
+        // stream is dropped, the parked one is tracked (cap respected).
+        hub.publish(&[envelope("parked", 3, false)]); // parks (next_seq 1)
+        let stats = hub.hub_stats();
+        assert!(
+            stats.tracked_streams <= 2,
+            "registry must stay at the cap: {stats:?}"
+        );
+        // A NEW stream finds nothing evictable (live subscriber + pending
+        // parked state) → its fan-out is skipped loudly, the durable log
+        // stays authoritative, and the registry does not grow.
+        hub.publish(&[envelope("new", 1, false)]);
+        assert_eq!(hub.hub_stats().tracked_streams, 2);
+        // The live stream survived intact (ordering continues, no replays).
+        hub.publish(&[envelope("live", 3, false)]);
+        let mut seen = Vec::new();
+        while let Some(frame) = sub.mailbox().try_recv() {
+            match frame {
+                SubscriptionFrame::Event(e) => seen.push(e.seq.value()),
+                other => panic!("unexpected frame {other:?}"),
+            }
+        }
+        assert_eq!(seen, vec![1, 2, 3], "live stream must keep its baseline");
+        // The parked stream must not lose its pending publication —
+        // resubscribe (fresh baseline alignment) and the parked event is
+        // covered by the durable cut, live delivery continues above it.
+        let resumed = hub.register("parked", 0, Some(2)).expect("under cap");
+        hub.release_hold(resumed.subscriber_id(), 3);
+        hub.publish(&[envelope("parked", 4, false)]);
+        let mut seen = Vec::new();
+        while let Some(frame) = resumed.mailbox().try_recv() {
+            match frame {
+                SubscriptionFrame::Event(e) => seen.push(e.seq.value()),
+                other => panic!("unexpected frame {other:?}"),
+            }
+        }
+        assert_eq!(
+            seen,
+            vec![4],
+            "parked baseline must survive eviction pressure"
+        );
     }
 }

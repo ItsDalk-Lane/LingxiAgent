@@ -1,0 +1,5 @@
+2026-09-26T18:35:05.208089Z  INFO lingxi_service: data root resolved effective_home=/tmp/lingxi-r02t06-drill-v5-nIOx52 source=cli ignored_sources=none
+2026-09-26T18:35:05.208329Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/tmp/lingxi-r02t06-drill-v5-nIOx52 runtime_dir=/private/tmp/lingxi-r02t06-drill-v5-nIOx52/lingxi-service
+2026-09-26T18:35:05.208496Z  INFO lingxi_service: single-writer lock acquired instance_id=29f779d4c2956121bad5a3daf0a3e2c1 start_nonce=4972920a1b9f3664 pid=44817 entropy="os-random-device" lock=/private/tmp/lingxi-r02t06-drill-v5-nIOx52/lingxi-service/instance.lock network_mode=loopback
+2026-09-26T18:35:05.217291Z  INFO lingxi_service: data-epoch gate passed home=/private/tmp/lingxi-r02t06-drill-v5-nIOx52 decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+error: run database bootstrap failed: stored state corrupt: file is not a database

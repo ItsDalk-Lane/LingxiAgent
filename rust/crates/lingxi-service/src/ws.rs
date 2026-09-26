@@ -473,6 +473,10 @@ pub const WS_CLOSE_INVALID_MESSAGE: u16 = 4409;
 pub const WS_CLOSE_UNAUTHORIZED: u16 = 4401;
 pub const WS_CLOSE_FORBIDDEN: u16 = 4403;
 pub const WS_CLOSE_NOT_FOUND: u16 = 4404;
+/// RFC 6455 1013 "Try Again Later" — the close code for an explicit
+/// resource-cap rejection (R02-T07: subscriber/connection registry full;
+/// the client may retry after backing off).
+pub const WS_CLOSE_TRY_AGAIN_LATER: u16 = 1013;
 
 /// Authentication shape used at the upgrade boundary: bearer/query token or
 /// a one-shot ws ticket. Defined here so both the HTTP middleware and the

@@ -69,6 +69,17 @@ pub struct CliOptions {
     /// Explicit graceful-shutdown deadline in milliseconds
     /// (`--shutdown-timeout-ms`, R02-T06); `None` = the production default.
     pub shutdown_timeout_ms: Option<u64>,
+    /// Resource-limit overrides (R02-T07); `None` = the documented
+    /// production default of the corresponding limit.
+    pub max_ws_connections: Option<usize>,
+    pub db_queue_bound: Option<usize>,
+    pub event_subscriber_queue: Option<usize>,
+    pub event_reorder_bound: Option<usize>,
+    pub max_subscribers: Option<usize>,
+    pub log_max_bytes: Option<u64>,
+    pub log_max_files: Option<usize>,
+    /// Per-peer HTTP request budget per rate window (R02-T07).
+    pub http_rate_max: Option<u32>,
 }
 
 /// Result of home-source precedence resolution.
@@ -123,6 +134,13 @@ pub enum ConfigError {
     /// `--shutdown-timeout-ms` value that is not a positive decimal integer.
     InvalidShutdownTimeout {
         value: String,
+    },
+    /// A resource-limit flag (R02-T07) whose value is not a positive
+    /// decimal integer within its documented constraint.
+    InvalidLimit {
+        flag: String,
+        value: String,
+        constraint: String,
     },
     /// Non-loopback bind while the (default) loopback network mode is in
     /// effect: LAN exposure must be an explicit choice, never a silent
@@ -195,6 +213,15 @@ impl fmt::Display for ConfigError {
                 "invalid --shutdown-timeout-ms {value:?}: must be a positive \
                  decimal integer (milliseconds; the graceful-shutdown deadline \
                  for each shutdown phase)"
+            ),
+            ConfigError::InvalidLimit {
+                flag,
+                value,
+                constraint,
+            } => write!(
+                f,
+                "invalid {flag} {value:?}: must be a positive decimal integer \
+                 ({constraint})"
             ),
             ConfigError::NetworkModeBindMismatch { bind, mode } => write!(
                 f,
@@ -355,6 +382,103 @@ where
                 }
                 options.shutdown_timeout_ms = Some(parsed);
             }
+            // ── Resource-limit flags (R02-T07): strict positive integers ──
+            "--max-ws-connections" => {
+                if options.max_ws_connections.is_some() {
+                    return Err(ConfigError::DuplicateArgument {
+                        flag: "--max-ws-connections".to_string(),
+                    });
+                }
+                options.max_ws_connections = Some(parse_limit_value(
+                    &mut iter,
+                    "--max-ws-connections",
+                    "concurrently-upgraded WebSocket connections",
+                )? as usize);
+            }
+            "--db-queue-bound" => {
+                if options.db_queue_bound.is_some() {
+                    return Err(ConfigError::DuplicateArgument {
+                        flag: "--db-queue-bound".to_string(),
+                    });
+                }
+                options.db_queue_bound = Some(parse_limit_value(
+                    &mut iter,
+                    "--db-queue-bound",
+                    "pending single-writer DB queue jobs",
+                )? as usize);
+            }
+            "--event-subscriber-queue" => {
+                if options.event_subscriber_queue.is_some() {
+                    return Err(ConfigError::DuplicateArgument {
+                        flag: "--event-subscriber-queue".to_string(),
+                    });
+                }
+                options.event_subscriber_queue = Some(parse_limit_value(
+                    &mut iter,
+                    "--event-subscriber-queue",
+                    "per-subscriber event mailbox frames (>= 2)",
+                )? as usize);
+            }
+            "--event-reorder-bound" => {
+                if options.event_reorder_bound.is_some() {
+                    return Err(ConfigError::DuplicateArgument {
+                        flag: "--event-reorder-bound".to_string(),
+                    });
+                }
+                options.event_reorder_bound = Some(parse_limit_value(
+                    &mut iter,
+                    "--event-reorder-bound",
+                    "per-stream event reorder buffer entries (>= 1)",
+                )? as usize);
+            }
+            "--max-subscribers" => {
+                if options.max_subscribers.is_some() {
+                    return Err(ConfigError::DuplicateArgument {
+                        flag: "--max-subscribers".to_string(),
+                    });
+                }
+                options.max_subscribers = Some(parse_limit_value(
+                    &mut iter,
+                    "--max-subscribers",
+                    "concurrently live event subscribers",
+                )? as usize);
+            }
+            "--log-max-bytes" => {
+                if options.log_max_bytes.is_some() {
+                    return Err(ConfigError::DuplicateArgument {
+                        flag: "--log-max-bytes".to_string(),
+                    });
+                }
+                options.log_max_bytes = Some(parse_limit_value(
+                    &mut iter,
+                    "--log-max-bytes",
+                    "bytes per log file before rotation (>= 65536)",
+                )?);
+            }
+            "--log-max-files" => {
+                if options.log_max_files.is_some() {
+                    return Err(ConfigError::DuplicateArgument {
+                        flag: "--log-max-files".to_string(),
+                    });
+                }
+                options.log_max_files = Some(parse_limit_value(
+                    &mut iter,
+                    "--log-max-files",
+                    "log files kept on disk (>= 2)",
+                )? as usize);
+            }
+            "--http-rate-max" => {
+                if options.http_rate_max.is_some() {
+                    return Err(ConfigError::DuplicateArgument {
+                        flag: "--http-rate-max".to_string(),
+                    });
+                }
+                options.http_rate_max = Some(parse_limit_value(
+                    &mut iter,
+                    "--http-rate-max",
+                    "per-peer HTTP requests per rate window",
+                )? as u32);
+            }
             other => {
                 return Err(ConfigError::UnknownArgument {
                     value: other.to_string(),
@@ -363,6 +487,43 @@ where
         }
     }
     Ok(options)
+}
+
+/// Strictly parses one positive-integer limit-flag value (shared by all
+/// R02-T07 resource-limit flags): exactly the next token, not flag-shaped,
+/// a positive decimal integer. Any deviation is a loud
+/// [`ConfigError::InvalidLimit`] (or the shared missing/flag-shaped
+/// errors) — never a silent default.
+fn parse_limit_value<I>(iter: &mut I, flag: &str, constraint: &str) -> Result<u64, ConfigError>
+where
+    I: Iterator<Item = String>,
+{
+    let value = iter
+        .next()
+        .ok_or_else(|| ConfigError::MissingArgumentValue {
+            flag: flag.to_string(),
+        })?;
+    if is_flag_shaped(&value) {
+        return Err(ConfigError::FlagShapedValue {
+            flag: flag.to_string(),
+            value,
+        });
+    }
+    let parsed = value
+        .parse::<u64>()
+        .map_err(|_| ConfigError::InvalidLimit {
+            flag: flag.to_string(),
+            value: value.clone(),
+            constraint: constraint.to_string(),
+        })?;
+    if parsed == 0 {
+        return Err(ConfigError::InvalidLimit {
+            flag: flag.to_string(),
+            value,
+            constraint: constraint.to_string(),
+        });
+    }
+    Ok(parsed)
 }
 
 /// Reads the `home` value from a strict JSON config file
@@ -927,5 +1088,90 @@ mod tests {
         let b = test_mode_home_name(std::process::id());
         assert_ne!(a, b);
         assert!(a.starts_with("lingxi-service-test-"));
+    }
+
+    // ── R02-T07: resource-limit flags ───────────────────────────────────────
+
+    #[test]
+    fn limit_flags_parse_strictly() {
+        let cli = parse_cli([
+            "--home",
+            "/tmp/h",
+            "--max-ws-connections",
+            "4",
+            "--db-queue-bound",
+            "2",
+            "--event-subscriber-queue",
+            "8",
+            "--event-reorder-bound",
+            "16",
+            "--max-subscribers",
+            "32",
+            "--log-max-bytes",
+            "1048576",
+            "--log-max-files",
+            "3",
+        ])
+        .expect("valid limits");
+        assert_eq!(cli.max_ws_connections, Some(4));
+        assert_eq!(cli.db_queue_bound, Some(2));
+        assert_eq!(cli.event_subscriber_queue, Some(8));
+        assert_eq!(cli.event_reorder_bound, Some(16));
+        assert_eq!(cli.max_subscribers, Some(32));
+        assert_eq!(cli.log_max_bytes, Some(1048576));
+        assert_eq!(cli.log_max_files, Some(3));
+    }
+
+    #[test]
+    fn limit_flags_reject_garbage_zero_and_flag_shaped_values() {
+        for (flag, value) in [
+            ("--max-ws-connections", "zero"),
+            ("--max-ws-connections", "0"),
+            ("--max-ws-connections", "-1"),
+            ("--db-queue-bound", "0"),
+            ("--event-subscriber-queue", "abc"),
+            ("--event-reorder-bound", "0x10"),
+            ("--max-subscribers", ""),
+            ("--log-max-bytes", "0"),
+            ("--log-max-files", "1.5"),
+        ] {
+            let err = parse_cli(["--home", "/tmp/h", flag, value]).unwrap_err();
+            assert!(
+                matches!(err, ConfigError::InvalidLimit { .. }),
+                "{flag} {value:?}: expected InvalidLimit, got {err:?}"
+            );
+        }
+        // Flag-shaped values are still rejected.
+        let err = parse_cli([
+            "--home",
+            "/tmp/h",
+            "--max-ws-connections",
+            "--db-queue-bound",
+        ])
+        .unwrap_err();
+        assert!(
+            matches!(err, ConfigError::FlagShapedValue { .. }),
+            "{err:?}"
+        );
+        // Missing values too.
+        let err = parse_cli(["--home", "/tmp/h", "--max-subscribers"]).unwrap_err();
+        assert!(
+            matches!(err, ConfigError::MissingArgumentValue { .. }),
+            "{err:?}"
+        );
+        // Duplicates too.
+        let err = parse_cli([
+            "--home",
+            "/tmp/h",
+            "--max-subscribers",
+            "2",
+            "--max-subscribers",
+            "3",
+        ])
+        .unwrap_err();
+        assert!(
+            matches!(err, ConfigError::DuplicateArgument { .. }),
+            "{err:?}"
+        );
     }
 }

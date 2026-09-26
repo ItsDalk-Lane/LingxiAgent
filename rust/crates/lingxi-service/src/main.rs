@@ -18,7 +18,6 @@
 //!   removed only if it is still ours; exit code 0 on clean stop, 4 if
 //!   shutdown record-cleanup failed, 1 on serve failure. Nothing swallowed.
 
-use std::io::IsTerminal as _;
 use std::process::ExitCode;
 
 use lingxi_service::epoch;
@@ -31,7 +30,9 @@ use lingxi_service::{
 
 const USAGE: &str = r#"usage: lingxi-service [--bind <SOCKADDR>] [--home <DIR>] \
 [--config <FILE>] [--test-mode] [--network-mode <loopback|lan>] \
-[--shutdown-timeout-ms <MS>]
+[--shutdown-timeout-ms <MS>] [--max-ws-connections <N>] [--db-queue-bound <N>] \
+[--event-subscriber-queue <N>] [--event-reorder-bound <N>] [--max-subscribers <N>] \
+[--log-max-bytes <N>] [--log-max-files <N>] [--http-rate-max <N>]
 
 Options:
   --bind <SOCKADDR>       Listen address (default 127.0.0.1:0, loopback + ephemeral).
@@ -47,6 +48,35 @@ Options:
                           (default 10000). A phase that exceeds it prints the
                           LINGXI_SERVICE_SHUTDOWN_TIMEOUT marker and the shutdown
                           continues; the exit code reports it.
+  --max-ws-connections <N>    Concurrently-upgraded WebSocket connection ceiling
+                          (default 16). Also bounds the managed-task registry:
+                          a session task is spawned only after a slot was
+                          acquired. Over the ceiling the upgrade is rejected
+                          with 503 budget_exceeded (reason=ws_connection_limit).
+  --db-queue-bound <N>        Pending jobs of the bounded single-writer DB
+                          queue (default 64). Full = explicit 503 backpressure
+                          (reason=db_queue_full, retryable=true); nothing is
+                          silently buffered without bound.
+  --event-subscriber-queue <N> Per-subscriber event mailbox frames (default 128).
+                          A key event that cannot fit detaches the subscription
+                          with an explicit snapshot_required (slow_consumer) —
+                          key events are never silently dropped.
+  --event-reorder-bound <N>   Per-stream event reorder buffer (default 64).
+                          Overflow marks the stream broken and detaches its
+                          subscribers with snapshot_required (publication_gap).
+  --max-subscribers <N>       Live event subscribers accepted before explicit
+                          rejection (default 256; per-stream default 32). Over
+                          the cap a subscribe is rejected (503 / budget_exceeded,
+                          reason=subscriber_limit).
+  --log-max-bytes <N>         Bytes per log file before rotation (default
+                          5242880 = 5 MiB). Log files live under
+                          {home}/lingxi-service/logs/ and every line is
+                          redacted before it reaches stderr or the file.
+  --log-max-files <N>         Log files kept on disk, oldest pruned (default 7).
+  --http-rate-max <N>         Per-peer HTTP request budget per 10 s window
+                          (default 240). Over the budget a request is
+                          explicitly rejected with 429
+                          (reason=rate_limited, retryable=true).
   --help                  Print this help and exit 0.
   --version               Print server identity/version and exit 0.
 
@@ -57,7 +87,7 @@ real user directory.
 
 Exit codes: 0 clean stop; 1 serve failure; 2 configuration/startup error
 (including a data-epoch gate refusal: corrupt epoch metadata, a higher-epoch
-stamp, or an incomplete transition — see the LINGXI_DATA_EPOCH_* stderr
+stamp, or an incomplete transition - see the LINGXI_DATA_EPOCH_* stderr
 markers); 3 single-writer lock held by another instance (or lock IO failure);
 4 shutdown instance-record cleanup failed;
 5 run database shutdown (drain/checkpoint) failed;
@@ -77,15 +107,17 @@ fn print_version() {
 
 #[tokio::main]
 async fn main() -> ExitCode {
-    tracing_subscriber::fmt()
-        .with_env_filter(
-            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "info".into()),
-        )
-        // ANSI only on a real terminal: the safe log must stay
-        // machine-greppable when redirected (evidence scripts key on it).
-        .with_ansi(std::io::stderr().is_terminal())
-        .with_writer(std::io::stderr)
-        .init();
+    // R02-T07 logging pipeline: ONE global subscriber whose writer redacts
+    // every event line (mirror of the incumbent log-redactor semantics)
+    // and fans out to stderr plus (once the data home is known) a
+    // size-capped rotating file under {home}/lingxi-service/logs/. A
+    // second subscriber would be a hard error — surfaced here instead of
+    // panicking.
+    let log_router = lingxi_service::LogRouter::new(true);
+    if let Err(err) = lingxi_service::init_tracing(log_router.clone()) {
+        eprintln!("error: cannot install the tracing subscriber: {err}");
+        return ExitCode::from(2);
+    }
 
     let argv: Vec<String> = std::env::args().skip(1).collect();
     if argv.iter().any(|a| a == "--help" || a == "-h") {
@@ -104,6 +136,40 @@ async fn main() -> ExitCode {
             eprintln!("error: {err}");
             return ExitCode::from(2);
         }
+    };
+
+    // ---- composition-root dependency wiring (R02-T07 resource limits) ----
+    // Every limit has a documented production default; the CLI can only
+    // override it explicitly. Validation happens in bootstrap_with_deps
+    // (a degenerate limit is a loud startup error, exit 2 — never a silent
+    // unbounded fallback).
+    let deps = lingxi_service::ServiceDeps {
+        ws_max_connections: cli
+            .max_ws_connections
+            .unwrap_or(lingxi_service::limits::DEFAULT_WS_MAX_CONNECTIONS),
+        rate_max: cli
+            .http_rate_max
+            .unwrap_or(lingxi_service::limits::DEFAULT_HTTP_RATE_MAX),
+        store_options: match cli.db_queue_bound {
+            Some(capacity) => lingxi_service::StoreOptions {
+                queue_capacity: capacity,
+                ..lingxi_service::StoreOptions::default()
+            },
+            None => lingxi_service::StoreOptions::default(),
+        },
+        event_limits: lingxi_service::EventLimits {
+            subscriber_queue_capacity: cli
+                .event_subscriber_queue
+                .unwrap_or(lingxi_service::events::DEFAULT_EVENT_SUBSCRIBER_QUEUE),
+            reorder_pending_bound: cli
+                .event_reorder_bound
+                .unwrap_or(lingxi_service::events::DEFAULT_EVENT_REORDER_BOUND),
+            max_subscribers_total: cli
+                .max_subscribers
+                .unwrap_or(lingxi_service::events::DEFAULT_MAX_SUBSCRIBERS_TOTAL),
+            ..lingxi_service::EventLimits::default()
+        },
+        ..lingxi_service::ServiceDeps::default()
     };
     // The environment is read HERE, at the composition root only (DEP-08
     // keeps the domain free of std::env by machine-checked rule).
@@ -193,6 +259,37 @@ async fn main() -> ExitCode {
         );
     }
 
+    // ---- attach the rotating file log (R02-T07) ----
+    // Attached ONLY AFTER the single-writer lock is held: until this
+    // process owns the home it must not write into it (a lock-rejected
+    // second instance leaves the home tree byte-identical — T02/A03).
+    // From here on, every tracing line lands in BOTH the redacted rotating
+    // file ({home}/lingxi-service/logs/) and stderr. A broken log dir is an
+    // EXPLICIT degradation (marker + error log, service continues
+    // stderr-only): losing diagnostics must not refuse service, but it must
+    // never be silent. Pre-lock diagnostics stay stderr-only (captured by
+    // every evidence harness).
+    let log_dir = layout.runtime_dir.join("logs");
+    let log_config = lingxi_service::LogRotationConfig {
+        max_bytes: cli
+            .log_max_bytes
+            .unwrap_or(lingxi_service::DEFAULT_LOG_MAX_BYTES),
+        max_files: cli
+            .log_max_files
+            .unwrap_or(lingxi_service::DEFAULT_LOG_MAX_FILES),
+    };
+    if let Err(err) = log_router.attach_file(log_dir.clone(), &log_config) {
+        eprintln!(
+            "LINGXI_SERVICE_LOG_WRITE_FAILED error={err} (continuing stderr-only; log dir {})",
+            log_dir.display()
+        );
+        tracing::error!(
+            error = %err,
+            log_dir = %log_dir.display(),
+            "rotating file log unavailable (explicit degradation: stderr-only)"
+        );
+    }
+
     // ---- data-epoch startup gate (R02-T06 + PROD-DEFECT-1 closure) ----
     // Immediately after the same-home mutex and BEFORE any store is opened
     // or auth state is written (mirrors the incumbent server/index.ts
@@ -238,7 +335,7 @@ async fn main() -> ExitCode {
     // startup error (exit 2), never an auth-less serve.
     let home_display = layout.home.display().to_string();
     let source_display = config.home_source.to_string();
-    let state = match ServiceState::bootstrap(config, &layout).await {
+    let state = match ServiceState::bootstrap_with_deps(config, &layout, deps).await {
         Ok(state) => state,
         Err(err) => {
             eprintln!("error: {err}");

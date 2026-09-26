@@ -25,9 +25,12 @@ pub mod auth;
 pub mod config;
 pub mod epoch;
 pub mod events;
+pub mod inject;
 pub mod instance;
 pub mod limits;
+pub mod logging;
 pub mod paths;
+pub mod redaction;
 pub mod sessions;
 pub mod shutdown;
 pub mod transport;
@@ -49,15 +52,24 @@ pub use epoch::{
 };
 pub use events::{
     control_frame_of_detach, control_snapshot_required_json, control_subscribed_json, DetachReason,
-    EventCut, EventHub, EventLimits, EventService, SnapshotRequired, SubscribeCursor,
-    SubscribeOutcome, SubscribePageError, SubscribeReject, SubscriberStats, SubscriptionFrame,
-    SubscriptionGuard,
+    EventCut, EventHub, EventLimits, EventService, HubStats, SnapshotRequired, SubscribeCursor,
+    SubscribeOutcome, SubscribePageError, SubscribeReject, SubscriberCapKind, SubscriberStats,
+    SubscriptionFrame, SubscriptionGuard,
+};
+pub use inject::{
+    ManualClock, RandomRequestIdGen, RequestIdGen, SequentialRequestIdGen, ServiceClock,
+    SystemClock,
 };
 pub use instance::{
     acquire, probe_peer, InstanceGuard, InstanceIdentity, InstanceLockError, InstanceRecord,
     PeerProbe, SINGLE_WRITER_BLOCKED_MARKER, STALE_RECORD_MARKER,
 };
+pub use lingxi_adapters::storage::StoreOptions;
+pub use logging::{
+    init_tracing, LogRotationConfig, LogRouter, DEFAULT_LOG_MAX_BYTES, DEFAULT_LOG_MAX_FILES,
+};
 pub use paths::{prepare_layout, DataRootLayout};
+pub use redaction::{redact_line, redact_text};
 pub use sessions::{
     ExecuteAccepted, ExecuteRequest, RunSummary, SessionAccess, SessionBackend,
     SessionExecuteError, SessionFacts, SessionStore, SessionView,
@@ -67,7 +79,9 @@ pub use shutdown::{
     SHUTDOWN_TIMEOUT_MARKER,
 };
 pub use transport::{check_origin, infer_connection_kind, ConnectionKind, NetworkMode};
-pub use ws::{WsTicketService, WS_CLOSE_FORBIDDEN, WS_CLOSE_UNAUTHORIZED};
+pub use ws::{
+    WsTicketService, WS_CLOSE_FORBIDDEN, WS_CLOSE_TRY_AGAIN_LATER, WS_CLOSE_UNAUTHORIZED,
+};
 
 use std::fmt;
 use std::future::Future;
@@ -80,7 +94,7 @@ use axum::middleware::{self, Next};
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
-use lingxi_adapters::storage::{RunDatabase, StoreOptions, RUNS_DB_FILE_NAME};
+use lingxi_adapters::storage::{RunDatabase, RUNS_DB_FILE_NAME};
 use lingxi_kernel::ports::StorageError;
 use lingxi_protocol::handshake::{
     negotiate_protocol, ClientHello, ServerHello, WIRE_PROTOCOL_MAX_SUPPORTED,
@@ -248,6 +262,11 @@ pub struct ServiceState {
     ws_conns: Arc<limits::WsConnectionCounter>,
     /// Managed-task shutdown broadcast for active WS sessions (R02-T06).
     ws_shutdown: Arc<shutdown::WsShutdown>,
+    /// Injectable clock (R02-T07): rate limiting, ticket expiry, execute
+    /// timestamps all read through this surface.
+    clock: Arc<dyn ServiceClock>,
+    /// Injectable per-request id source (R02-T07).
+    request_ids: Arc<dyn RequestIdGen>,
 }
 
 impl std::fmt::Debug for ServiceState {
@@ -279,6 +298,70 @@ impl fmt::Display for ServiceStartupError {
 }
 
 impl std::error::Error for ServiceStartupError {}
+
+/// Explicit dependency set of the composition root (R02-T07): the resource
+/// limits AND the injectable clock / request-id generator. `Default` is
+/// the production wiring (system clock, OS-random request ids, the
+/// documented limit defaults); tests inject a `ManualClock` /
+/// `SequentialRequestIdGen` plus small caps and prove ordering without
+/// sleeps.
+#[derive(Clone)]
+pub struct ServiceDeps {
+    /// WS upgrade-ticket lifetime (R02-T03).
+    pub ws_ticket_ttl_ms: u64,
+    /// Per-peer HTTP rate-limit window (R02-T03).
+    pub rate_window_ms: u64,
+    /// Per-peer HTTP rate budget per window (R02-T03).
+    pub rate_max: u32,
+    /// Concurrently-upgraded WS connection ceiling (R02-T03; this is also
+    /// the bound of the managed-task registry — every WS session task is
+    /// spawned only after a slot was acquired, so the registry can never
+    /// outgrow it).
+    pub ws_max_connections: usize,
+    /// Pending WS ticket registry bound (R02-T03).
+    pub ws_max_tickets: usize,
+    /// Bounded single-writer DB queue knobs (R02-T04; `queue_capacity` is
+    /// the DB-request cap: full = explicit 503 backpressure).
+    pub store_options: StoreOptions,
+    /// Event-surface flow control and registry caps (R02-T05 + R02-T07).
+    pub event_limits: EventLimits,
+    /// Injectable clock (R02-T07).
+    pub clock: std::sync::Arc<dyn ServiceClock>,
+    /// Injectable per-request id source (R02-T07).
+    pub request_ids: std::sync::Arc<dyn RequestIdGen>,
+}
+
+impl Default for ServiceDeps {
+    fn default() -> Self {
+        Self {
+            ws_ticket_ttl_ms: ws::DEFAULT_WS_TICKET_TTL_MS,
+            rate_window_ms: limits::DEFAULT_HTTP_RATE_WINDOW_MS,
+            rate_max: limits::DEFAULT_HTTP_RATE_MAX,
+            ws_max_connections: limits::DEFAULT_WS_MAX_CONNECTIONS,
+            ws_max_tickets: ws::DEFAULT_WS_MAX_TICKETS,
+            store_options: StoreOptions::default(),
+            event_limits: EventLimits::default(),
+            clock: std::sync::Arc::new(SystemClock),
+            request_ids: std::sync::Arc::new(RandomRequestIdGen),
+        }
+    }
+}
+
+impl std::fmt::Debug for ServiceDeps {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ServiceDeps")
+            .field("ws_ticket_ttl_ms", &self.ws_ticket_ttl_ms)
+            .field("rate_window_ms", &self.rate_window_ms)
+            .field("rate_max", &self.rate_max)
+            .field("ws_max_connections", &self.ws_max_connections)
+            .field("ws_max_tickets", &self.ws_max_tickets)
+            .field("store_options", &self.store_options)
+            .field("event_limits", &self.event_limits)
+            .field("clock", &"Arc<dyn ServiceClock>")
+            .field("request_ids", &"Arc<dyn RequestIdGen>")
+            .finish()
+    }
+}
 
 impl ServiceState {
     /// Prepares the full runtime state with the DEFAULT limits: loopback
@@ -337,6 +420,35 @@ impl ServiceState {
         ws_max_connections: usize,
         store_options: StoreOptions,
     ) -> Result<Self, ServiceStartupError> {
+        Self::bootstrap_with_deps(
+            config,
+            layout,
+            ServiceDeps {
+                ws_ticket_ttl_ms,
+                rate_window_ms,
+                rate_max,
+                ws_max_connections,
+                store_options,
+                ..ServiceDeps::default()
+            },
+        )
+        .await
+    }
+
+    /// Full-injection constructor (R02-T07): every limit and the clock /
+    /// request-id source are explicit. There is no other construction
+    /// path — the default-facing constructors delegate here.
+    pub async fn bootstrap_with_deps(
+        config: ServiceConfig,
+        layout: &DataRootLayout,
+        deps: ServiceDeps,
+    ) -> Result<Self, ServiceStartupError> {
+        deps.event_limits
+            .validate()
+            .map_err(ServiceStartupError::Storage)?;
+        deps.store_options
+            .validate()
+            .map_err(ServiceStartupError::Storage)?;
         let identity = instance::InstanceIdentity::generate();
         let auth = AuthService::bootstrap(layout, &identity.instance_id)
             .map_err(ServiceStartupError::Auth)?;
@@ -352,11 +464,11 @@ impl ServiceState {
             })
         })?;
         let db_path = data_dir.join(RUNS_DB_FILE_NAME);
-        let storage = RunDatabase::open(&db_path, store_options)
+        let storage = RunDatabase::open(&db_path, deps.store_options.clone())
             .await
             .map_err(ServiceStartupError::Storage)?;
         storage
-            .ensure_session_seed(sessions::SessionStore::seed_rows(auth::now_unix_ms()))
+            .ensure_session_seed(sessions::SessionStore::seed_rows(deps.clock.now_unix_ms()))
             .await
             .map_err(ServiceStartupError::Storage)?;
         let storage = Arc::new(storage);
@@ -364,28 +476,30 @@ impl ServiceState {
         let session_arc = Arc::new(session_store);
         // R02-T05: the event subscription service over the same durable
         // log (snapshot/cursor protocol + post-commit publication hub).
-        // Limits are the production defaults here; overflow/flow-control
-        // tests inject smaller ones through their own EventService
-        // instances (the hub semantics are identical).
+        // Limits come from the deps; overflow/flow-control tests inject
+        // smaller ones through the same path (the hub semantics are
+        // identical).
         let events = events::EventService::new(
             Arc::clone(&storage),
             Arc::clone(&session_arc),
-            events::EventLimits::default(),
+            deps.event_limits.clone(),
         )
         .map_err(ServiceStartupError::Storage)?;
         Ok(Self {
             config: Arc::new(config),
             auth: Arc::new(auth),
             tickets: Arc::new(WsTicketService::new(
-                ws_ticket_ttl_ms,
-                ws::DEFAULT_WS_MAX_TICKETS,
+                deps.ws_ticket_ttl_ms,
+                deps.ws_max_tickets,
             )),
             storage,
             sessions: session_arc,
             events: Arc::new(events),
-            rate: Arc::new(limits::RateLimiter::new(rate_window_ms, rate_max)),
-            ws_conns: Arc::new(limits::WsConnectionCounter::new(ws_max_connections)),
+            rate: Arc::new(limits::RateLimiter::new(deps.rate_window_ms, deps.rate_max)),
+            ws_conns: Arc::new(limits::WsConnectionCounter::new(deps.ws_max_connections)),
             ws_shutdown: Arc::new(shutdown::WsShutdown::new()),
+            clock: deps.clock,
+            request_ids: deps.request_ids,
         })
     }
 
@@ -424,6 +538,17 @@ impl ServiceState {
         Arc::clone(&self.ws_shutdown)
     }
 
+    /// The injected clock (R02-T07): every served-path timestamp reads
+    /// through this surface, so tests drive time instead of sleeping.
+    pub fn clock(&self) -> &Arc<dyn ServiceClock> {
+        &self.clock
+    }
+
+    /// The injected request-id source (R02-T07).
+    pub fn request_ids(&self) -> &Arc<dyn RequestIdGen> {
+        &self.request_ids
+    }
+
     pub fn ws_connection_count(&self) -> usize {
         self.ws_conns.current()
     }
@@ -452,9 +577,24 @@ fn health_payload() -> HealthResponse {
 /// Endpoint error: an HTTP status carrying the frozen `ProtocolError`
 /// structure, with machine reasons in `details` (mirrors the incumbent
 /// `{error, reason}` vocabulary without inventing a second error model).
+///
+/// R02-T07 structured-error contract: every outward error carries
+/// - `code` (frozen protocol vocabulary),
+/// - `retryable` (advisory for clients), and
+/// - `details.causeId` — a stable, secret-free cause identifier
+///   (`domain.cause` vocabulary, e.g. `auth.missing_credential`,
+///   `storage.queue_full`, `events.subscriber_limit`) that ties the outward
+///   error to its diagnostic trail. The envelope itself stays closed (the
+///   frozen struct is not modified — `causeId` rides in `details`).
+///
+/// The error-enrichment middleware adds `details.requestId` and passes the
+/// `message` through [`redaction::redact_text`] with the data home, so an
+/// outward error can never echo a token, the raw request authentication
+/// header or a local secret path.
 pub struct EndpointError {
     status: StatusCode,
     error: ProtocolError,
+    cause_id: String,
 }
 
 impl EndpointError {
@@ -462,6 +602,7 @@ impl EndpointError {
         Self {
             status,
             error: ProtocolError::new(code, message, false),
+            cause_id: code.wire_name().to_string(),
         }
     }
 
@@ -471,6 +612,12 @@ impl EndpointError {
             "reason".to_string(),
             serde_json::Value::String(reason.to_string()),
         );
+        self
+    }
+
+    /// Sets the structured cause identifier (`details.causeId`).
+    pub fn with_cause(mut self, cause_id: impl Into<String>) -> Self {
+        self.cause_id = cause_id.into();
         self
     }
 
@@ -490,6 +637,7 @@ impl EndpointError {
             "authentication required",
         )
         .with_reason(reason)
+        .with_cause(format!("auth.{reason}"))
     }
 
     pub fn forbidden(reason: &str) -> Self {
@@ -499,6 +647,7 @@ impl EndpointError {
             "not allowed for this principal",
         )
         .with_reason(reason)
+        .with_cause(format!("authz.{reason}"))
     }
 
     pub fn local_only() -> Self {
@@ -511,6 +660,7 @@ impl EndpointError {
             ErrorCode::NotFound,
             "resource not found",
         )
+        .with_cause("resource.not_found")
     }
 
     pub fn invalid_transport(reason: &str) -> Self {
@@ -520,6 +670,7 @@ impl EndpointError {
             "transport policy rejected the request",
         )
         .with_reason(reason)
+        .with_cause(format!("transport.{reason}"))
     }
 
     pub fn rate_limited() -> Self {
@@ -529,6 +680,7 @@ impl EndpointError {
             "rate limit exceeded",
         )
         .with_reason("rate_limited")
+        .with_cause("transport.rate_limited")
     }
 
     pub fn payload_too_large(detail: String) -> Self {
@@ -538,6 +690,7 @@ impl EndpointError {
             format!("request body exceeds the configured limit: {detail}"),
         )
         .with_reason("body_limit_exceeded")
+        .with_cause("transport.body_limit_exceeded")
     }
 
     /// Maps an axum `Json` rejection: body-limit failures keep their 413,
@@ -552,11 +705,35 @@ impl EndpointError {
 
     pub fn invalid_message(message: impl Into<String>) -> Self {
         Self::new(StatusCode::BAD_REQUEST, ErrorCode::InvalidMessage, message)
+            .with_cause("request.invalid_message")
+    }
+
+    /// Stable `storage.<cause>` identifier for a storage-port failure.
+    /// Part of the R02-T07 structured-error vocabulary (shared with the WS
+    /// surface), never carries a path or SQLite text on its own.
+    pub fn storage_cause_id(err: &StorageError) -> String {
+        format!(
+            "storage.{}",
+            match err {
+                StorageError::QueueFull => "queue_full",
+                StorageError::QueueClosed => "queue_closed",
+                StorageError::Busy { .. } => "busy",
+                StorageError::DiskFull { .. } => "disk_full",
+                StorageError::Io { .. } => "io",
+                StorageError::Conflict { .. } => "conflict",
+                StorageError::DatabaseTooNew { .. } => "database_too_new",
+                StorageError::SchemaTampered { .. } => "schema_tampered",
+                StorageError::Corrupted { .. } => "corrupted",
+                StorageError::InvalidRequest { .. } => "invalid_request",
+                StorageError::Internal { .. } => "internal",
+            }
+        )
     }
 
     /// Maps a storage-port failure (R02-A07: no fake success). Retryable
     /// backpressure (bounded queue full / busy) answers 503; every other
-    /// storage failure is a 500. Both carry the machine reason.
+    /// storage failure is a 500. Both carry the machine reason AND the
+    /// structured causeId.
     pub fn storage(err: &StorageError) -> Self {
         let status = if err.retryable() {
             StatusCode::SERVICE_UNAVAILABLE
@@ -567,7 +744,8 @@ impl EndpointError {
             status,
             ErrorCode::Internal,
             format!("run database operation failed: {err}"),
-        );
+        )
+        .with_cause(Self::storage_cause_id(err));
         let details = out.error.details.get_or_insert_with(serde_json::Map::new);
         details.insert(
             "reason".to_string(),
@@ -588,10 +766,21 @@ impl EndpointError {
     pub fn status(&self) -> StatusCode {
         self.status
     }
+
+    /// The structured cause identifier (`details.causeId`).
+    pub fn cause_id(&self) -> &str {
+        &self.cause_id
+    }
 }
 
 impl IntoResponse for EndpointError {
-    fn into_response(self) -> Response {
+    fn into_response(mut self) -> Response {
+        // Single choke point for the structured cause: every outward error
+        // body carries details.causeId (secret-free by vocabulary).
+        let details = self.error.details.get_or_insert_with(serde_json::Map::new);
+        details
+            .entry("causeId".to_string())
+            .or_insert_with(|| serde_json::Value::String(self.cause_id.clone()));
         let body = serde_json::to_value(&self.error).unwrap_or_else(|err| {
             // Serializing this plain struct cannot fail; if it ever does,
             // answer with a minimal valid protocol error instead of a
@@ -600,7 +789,8 @@ impl IntoResponse for EndpointError {
             serde_json::json!({
                 "code": "internal",
                 "message": "error serialization failed",
-                "retryable": false
+                "retryable": false,
+                "details": { "causeId": "internal.error" }
             })
         });
         (self.status, Json(body)).into_response()
@@ -615,6 +805,116 @@ pub const TRANSPORT_REJECTED_MARKER: &str = "LINGXI_TRANSPORT_REJECTED";
 /// Machine-readable stderr marker for authentication/authorization
 /// rejections.
 pub const AUTH_REJECTED_MARKER: &str = "LINGXI_AUTH_REJECTED";
+/// Machine-readable stderr marker for a log-file write failure (explicit
+/// degradation notice; see [`logging::LogRouter`]).
+pub const LOG_WRITE_FAILED_MARKER: &str = "LINGXI_SERVICE_LOG_WRITE_FAILED";
+
+/// Per-request correlation id (R02-T07): minted by the outermost
+/// middleware, carried in request extensions, rejection marker lines and
+/// error response `details.requestId` — the anchor that ties any
+/// diagnostic line back to its request.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RequestId(pub String);
+
+/// Outermost middleware (R02-T07): mints the request id, logs one
+/// structured completion line per request, and enriches every error
+/// response body with `details.requestId` plus the REDACTED message (the
+/// data home is replaced, so a storage/auth error can never leak a local
+/// secret path, a token or request credential material).
+async fn error_enrichment(
+    State(state): State<ServiceState>,
+    mut req: Request,
+    next: Next,
+) -> Response {
+    let request_id = state.request_ids.next_request_id();
+    let method = req.method().to_string();
+    let path = req.uri().path().to_string();
+    req.extensions_mut().insert(RequestId(request_id.clone()));
+    let mut response = next.run(req).await;
+    let status = response.status();
+    // Liveness probes (peer-probe health checks) are infrastructure noise:
+    // logging each one would append to the probee's home log on every
+    // single-writer collision check (T02's tree-hash contract observes the
+    // home must not change across a rejected second instance), and health
+    // probes carry no business correlation worth a line. Everything else
+    // gets one structured completion line.
+    if path != "/lingxi/v1/health" {
+        tracing::info!(
+            request_id = %request_id,
+            method = %method,
+            path = %path,
+            status = status.as_u16(),
+            "request handled"
+        );
+    }
+    if status.is_client_error() || status.is_server_error() {
+        let (parts, body) = response.into_parts();
+        let bytes = match axum::body::to_bytes(body, limits::DEFAULT_BODY_LIMIT_BYTES).await {
+            Ok(bytes) => bytes,
+            Err(err) => {
+                // A body that cannot even be buffered is not silently
+                // passed through: replace it with a minimal valid error
+                // (the client keeps a well-formed response; the incident
+                // is logged).
+                tracing::error!(%err, request_id = %request_id, "cannot buffer error response body");
+                let fallback = serde_json::json!({
+                    "code": "internal",
+                    "message": "error response could not be delivered",
+                    "retryable": false,
+                    "details": {
+                        "causeId": "internal.error_response_undeliverable",
+                        "requestId": request_id,
+                    }
+                });
+                return (
+                    status,
+                    [(header::CONTENT_TYPE, "application/json")],
+                    serde_json::to_string(&fallback).unwrap_or_default(),
+                )
+                    .into_response();
+            }
+        };
+        match serde_json::from_slice::<serde_json::Value>(&bytes) {
+            Ok(mut value) if value.get("code").is_some() && value.is_object() => {
+                let object = value.as_object_mut().expect("checked is_object");
+                // The message passes the redactor WITH the data home: no
+                // local secret path (and no secret-shaped material) can
+                // leave in an error body.
+                if let Some(message) = object.get("message").and_then(|m| m.as_str()) {
+                    let redacted = redact_text(message, Some(state.config().data_home.as_path()));
+                    object.insert("message".to_string(), serde_json::Value::String(redacted));
+                }
+                let details = object
+                    .entry("details")
+                    .or_insert_with(|| serde_json::Value::Object(serde_json::Map::new()));
+                if let Some(details) = details.as_object_mut() {
+                    details
+                        .entry("requestId".to_string())
+                        .or_insert_with(|| serde_json::Value::String(request_id.clone()));
+                }
+                let serialized = serde_json::to_string(&value).unwrap_or_else(|err| {
+                    tracing::error!(%err, "cannot serialize enriched error");
+                    String::from(
+                        "{\"code\":\"internal\",\"message\":\"error \
+                        serialization failed\",\"retryable\":false}",
+                    )
+                });
+                response = (
+                    status,
+                    [(header::CONTENT_TYPE, "application/json")],
+                    serialized,
+                )
+                    .into_response();
+            }
+            _ => {
+                // Not a protocol-error body (e.g. a plain axum rejection):
+                // pass through unchanged.
+                response = Response::from_parts(parts, axum::body::Body::from(bytes));
+            }
+        }
+    }
+    response
+}
 
 async fn transport_guard(
     State(state): State<ServiceState>,
@@ -624,6 +924,11 @@ async fn transport_guard(
 ) -> Response {
     let method = req.method().to_string();
     let path = req.uri().path().to_string();
+    let request_id = req
+        .extensions()
+        .get::<RequestId>()
+        .map(|r| r.0.clone())
+        .unwrap_or_default();
     let host = req
         .headers()
         .get(header::HOST)
@@ -637,11 +942,17 @@ async fn transport_guard(
         .map(|v| v.to_string());
 
     let reject = |status: StatusCode, reason: &str, resp: EndpointError| {
+        // The marker line passes the redactor before printing: the marker
+        // vocabulary itself is secret-free, but any future field added
+        // here is structurally guarded.
         eprintln!(
-            "{TRANSPORT_REJECTED_MARKER} method={method} path={path} status={} reason={reason} \
-             origin={} host={host} remote={remote}",
-            status.as_u16(),
-            origin.as_deref().unwrap_or("absent"),
+            "{}",
+            redact_line(&format!(
+                "{TRANSPORT_REJECTED_MARKER} request_id={request_id} method={method} path={path} \
+                 status={} reason={reason} origin={} host={host} remote={remote}",
+                status.as_u16(),
+                origin.as_deref().unwrap_or("absent"),
+            ))
         );
         resp
     };
@@ -675,8 +986,9 @@ async fn transport_guard(
             }
         };
 
-    // Rate limit (per remote peer, fixed window).
-    if !state.rate.check(remote.ip(), auth::now_unix_ms()) {
+    // Rate limit (per remote peer, fixed window) — driven by the injected
+    // clock (R02-T07).
+    if !state.rate.check(remote.ip(), state.clock.now_unix_ms()) {
         return reject(
             StatusCode::TOO_MANY_REQUESTS,
             "rate_limited",
@@ -694,6 +1006,11 @@ async fn transport_guard(
 async fn auth_guard(State(state): State<ServiceState>, req: Request, next: Next) -> Response {
     let method = req.method().to_string();
     let path = req.uri().path().to_string();
+    let request_id = req
+        .extensions()
+        .get::<RequestId>()
+        .map(|r| r.0.clone())
+        .unwrap_or_default();
     if classify_route(&method, &path) == RoutePolicy::Public {
         return next.run(req).await;
     }
@@ -707,15 +1024,23 @@ async fn auth_guard(State(state): State<ServiceState>, req: Request, next: Next)
     let Some(connection_kind) = req.extensions().get::<ConnectionKind>().copied() else {
         // Unreachable when the transport guard is layered (it always
         // inserts the kind); fail closed rather than guess.
-        eprintln!("{AUTH_REJECTED_MARKER} method={method} path={path} status=500 reason=missing_transport_context");
+        eprintln!(
+            "{}",
+            redact_line(&format!(
+                "{AUTH_REJECTED_MARKER} request_id={request_id} method={method} path={path} \
+                 status=500 reason=missing_transport_context"
+            ))
+        );
         return EndpointError::new(
             StatusCode::INTERNAL_SERVER_ERROR,
             ErrorCode::Internal,
             "transport context missing",
         )
+        .with_cause("internal.missing_transport_context")
         .into_response();
     };
 
+    let now_ms = state.clock.now_unix_ms();
     let principal = if path == "/lingxi/v1/ws" {
         // WS upgrade credentials: one-shot ticket, or bearer/query token
         // through the same authenticate call. The consumed/verified
@@ -728,12 +1053,7 @@ async fn auth_guard(State(state): State<ServiceState>, req: Request, next: Next)
         let auth_result = match ws::ws_credential_from(authorization.as_deref(), &query) {
             Some(ws::WsCredential::Ticket(ticket)) => state
                 .tickets
-                .consume(
-                    &ticket,
-                    connection_kind,
-                    "/lingxi/v1/ws",
-                    auth::now_unix_ms(),
-                )
+                .consume(&ticket, connection_kind, "/lingxi/v1/ws", now_ms)
                 .ok_or(AuthDenial {
                     reason: "invalid_ws_ticket",
                     credential_source: Some("ws_ticket"),
@@ -761,13 +1081,17 @@ async fn auth_guard(State(state): State<ServiceState>, req: Request, next: Next)
         };
         match auth_result {
             Ok((principal, source)) => {
-                tracing::debug!(%source, "ws upgrade authenticated");
+                tracing::debug!(%source, request_id = %request_id, "ws upgrade authenticated");
                 principal
             }
             Err(denial) => {
                 eprintln!(
-                    "{AUTH_REJECTED_MARKER} method={method} path={path} status=401 reason={} remote={remote}",
-                    denial.reason
+                    "{}",
+                    redact_line(&format!(
+                        "{AUTH_REJECTED_MARKER} request_id={request_id} method={method} path={path} \
+                         status=401 reason={} remote={remote}",
+                        denial.reason
+                    ))
                 );
                 return EndpointError::unauthorized(denial.reason).into_response();
             }
@@ -786,13 +1110,16 @@ async fn auth_guard(State(state): State<ServiceState>, req: Request, next: Next)
             Ok(principal) => principal,
             Err(denial) => {
                 eprintln!(
-                    "{AUTH_REJECTED_MARKER} method={method} path={path} status=401 reason={} \
-                     remote={}",
-                    denial.reason,
-                    req.extensions()
-                        .get::<SocketAddr>()
-                        .map(|a| a.to_string())
-                        .unwrap_or_else(|| "unknown".to_string())
+                    "{}",
+                    redact_line(&format!(
+                        "{AUTH_REJECTED_MARKER} request_id={request_id} method={method} path={path} \
+                         status=401 reason={} remote={}",
+                        denial.reason,
+                        req.extensions()
+                            .get::<SocketAddr>()
+                            .map(|a| a.to_string())
+                            .unwrap_or_else(|| "unknown".to_string())
+                    ))
                 );
                 return EndpointError::unauthorized(denial.reason).into_response();
             }
@@ -802,14 +1129,17 @@ async fn auth_guard(State(state): State<ServiceState>, req: Request, next: Next)
     // Route-level authorization (shared with the WS path: same table).
     if let Err(denial) = authorize_route(&method, &path, Some(&principal)) {
         eprintln!(
-            "{AUTH_REJECTED_MARKER} method={method} path={path} status={} reason={} \
-             remote={}",
-            denial.status,
-            denial.reason,
-            req.extensions()
-                .get::<SocketAddr>()
-                .map(|a| a.to_string())
-                .unwrap_or_else(|| "unknown".to_string())
+            "{}",
+            redact_line(&format!(
+                "{AUTH_REJECTED_MARKER} request_id={request_id} method={method} path={path} \
+                 status={} reason={} remote={}",
+                denial.status,
+                denial.reason,
+                req.extensions()
+                    .get::<SocketAddr>()
+                    .map(|a| a.to_string())
+                    .unwrap_or_else(|| "unknown".to_string())
+            ))
         );
         let mut err = EndpointError::forbidden(denial.reason);
         if let Some(scope) = denial.required_scope {
@@ -966,7 +1296,8 @@ async fn session_events_page(
                 StatusCode::CONFLICT,
                 ErrorCode::CursorExpired,
                 "cursor predates the retained event floor; refetch a snapshot",
-            );
+            )
+            .with_cause("events.cursor_expired");
             let details = err.error.details.get_or_insert_with(serde_json::Map::new);
             details.insert(
                 "reason".to_string(),
@@ -989,17 +1320,21 @@ async fn session_events_page(
         }
         Err(events::SubscribePageError::InvalidLimit { requested, max }) => {
             EndpointError::invalid_message(format!("limit {requested} out of range 1..={max}"))
+                .with_cause("request.invalid_limit")
                 .into_response()
         }
         Err(events::SubscribePageError::Reject(reject)) => match &reject {
-            events::SubscribeReject::StreamNotFound { .. } => {
-                EndpointError::not_found().into_response()
-            }
+            events::SubscribeReject::StreamNotFound { .. } => EndpointError::not_found()
+                .with_cause("events.stream_not_found")
+                .into_response(),
             events::SubscribeReject::Forbidden { .. } => {
-                EndpointError::forbidden("cross_principal_access").into_response()
+                EndpointError::forbidden("cross_principal_access")
+                    .with_cause("events.cross_principal_access")
+                    .into_response()
             }
             events::SubscribeReject::MalformedCursor { detail } => {
                 EndpointError::invalid_message(format!("malformed cursor: {detail}"))
+                    .with_cause("events.malformed_cursor")
                     .into_response()
             }
             events::SubscribeReject::StaleStreamCursor {
@@ -1009,14 +1344,26 @@ async fn session_events_page(
                 "cursor was issued for stream {cursor_stream:?}, not {stream_id:?} \
                  (stale stream cursor)"
             ))
+            .with_cause("events.stale_stream_cursor")
             .into_response(),
             events::SubscribeReject::FutureCursor { seq, head, .. } => {
                 EndpointError::invalid_message(format!(
                     "cursor seq {} is beyond the committed head {} (future cursor)",
                     seq, head
                 ))
+                .with_cause("events.future_cursor")
                 .into_response()
             }
+            // Bounded subscriber registry (R02-T07): an explicit 503, the
+            // caller retries later — never a silent admission.
+            events::SubscribeReject::SubscriberLimit { scope, limit, .. } => EndpointError::new(
+                StatusCode::SERVICE_UNAVAILABLE,
+                ErrorCode::BudgetExceeded,
+                format!("event subscriber limit reached ({scope} cap {limit})"),
+            )
+            .with_reason("subscriber_limit")
+            .with_cause("events.subscriber_limit")
+            .into_response(),
             events::SubscribeReject::Storage(err) => EndpointError::storage(err).into_response(),
         },
     }
@@ -1043,7 +1390,7 @@ async fn execute_session(
             &principal,
             &session_id,
             &request.input,
-            auth::now_unix_ms(),
+            state.clock.now_unix_ms(),
         )
         .await
     {
@@ -1130,7 +1477,7 @@ async fn ws_ticket(
         principal,
         connection_kind,
         "/lingxi/v1/ws",
-        auth::now_unix_ms(),
+        state.clock.now_unix_ms(),
     );
     #[derive(Serialize)]
     #[serde(rename_all = "camelCase")]
@@ -1151,19 +1498,29 @@ async fn ws_ticket(
 async fn ws_handler(
     State(state): State<ServiceState>,
     axum::Extension(principal): axum::Extension<Principal>,
+    request_id: Option<axum::Extension<RequestId>>,
     ws_upgrade: Result<ws::WsUpgrade, ws::WsUpgradeRejection>,
 ) -> Response {
+    let request_id = request_id
+        .map(|axum::Extension(id)| id.0)
+        .unwrap_or_default();
     let upgrade = match ws_upgrade {
         Ok(upgrade) => upgrade,
         Err(rejection) => {
             eprintln!(
-                "{TRANSPORT_REJECTED_MARKER} method=GET path=/lingxi/v1/ws status={} reason={}",
-                rejection.status, rejection.reason
+                "{}",
+                redact_line(&format!(
+                    "{TRANSPORT_REJECTED_MARKER} request_id={request_id} method=GET \
+                     path=/lingxi/v1/ws status={} reason={}",
+                    rejection.status, rejection.reason
+                ))
             );
             return EndpointError::invalid_transport(rejection.reason).into_response();
         }
     };
     // Connection ceiling BEFORE the 101: a refused upgrade must not count.
+    // This is also the managed-task registry bound: the session task is
+    // spawned only after a slot was acquired (R02-T07).
     let Some(slot) = state.ws_conns_arc().acquire() else {
         return EndpointError::new(
             StatusCode::SERVICE_UNAVAILABLE,
@@ -1171,6 +1528,7 @@ async fn ws_handler(
             "websocket connection limit reached",
         )
         .with_reason("ws_connection_limit")
+        .with_cause("transport.ws_connection_limit")
         .into_response();
     };
     let state_for_task = state.clone();
@@ -1437,7 +1795,7 @@ async fn run_ws_session<IO>(
                                                     format!("event stream {stream_id} not found (stale stream)"),
                                                     false,
                                                 )
-                                                .with_details(reason_details("stream_not_found")),
+                                                .with_details(error_details("stream_not_found", "events.stream_not_found")),
                                                 ws::WS_CLOSE_NOT_FOUND,
                                                 "not_found",
                                             ),
@@ -1447,7 +1805,7 @@ async fn run_ws_session<IO>(
                                                     format!("event stream {stream_id} belongs to another principal"),
                                                     false,
                                                 )
-                                                .with_details(reason_details("cross_principal_access")),
+                                                .with_details(error_details("cross_principal_access", "events.cross_principal_access")),
                                                 ws::WS_CLOSE_FORBIDDEN,
                                                 "forbidden",
                                             ),
@@ -1457,7 +1815,7 @@ async fn run_ws_session<IO>(
                                                     format!("malformed cursor: {detail}"),
                                                     false,
                                                 )
-                                                .with_details(reason_details("malformed_cursor")),
+                                                .with_details(error_details("malformed_cursor", "events.malformed_cursor")),
                                                 ws::WS_CLOSE_INVALID_MESSAGE,
                                                 "invalid_message",
                                             ),
@@ -1470,7 +1828,7 @@ async fn run_ws_session<IO>(
                                                     ),
                                                     false,
                                                 )
-                                                .with_details(reason_details("stale_stream_cursor")),
+                                                .with_details(error_details("stale_stream_cursor", "events.stale_stream_cursor")),
                                                 ws::WS_CLOSE_INVALID_MESSAGE,
                                                 "invalid_message",
                                             ),
@@ -1483,16 +1841,33 @@ async fn run_ws_session<IO>(
                                                     ),
                                                     false,
                                                 )
-                                                .with_details(reason_details("future_cursor")),
+                                                .with_details(error_details("future_cursor", "events.future_cursor")),
                                                 ws::WS_CLOSE_INVALID_MESSAGE,
                                                 "invalid_message",
+                                            ),
+                                            events::SubscribeReject::SubscriberLimit { scope, limit, .. } => (
+                                                ProtocolError::new(
+                                                    ErrorCode::BudgetExceeded,
+                                                    format!(
+                                                        "event subscriber limit reached \
+                                                         ({scope} cap {limit})"
+                                                    ),
+                                                    false,
+                                                )
+                                                .with_details(error_details("subscriber_limit", "events.subscriber_limit")),
+                                                WS_CLOSE_TRY_AGAIN_LATER,
+                                                "try_again_later",
                                             ),
                                             events::SubscribeReject::Storage(err) => (
                                                 ProtocolError::new(
                                                     ErrorCode::Internal,
                                                     format!("run database read failed: {err}"),
                                                     false,
-                                                ),
+                                                )
+                                                .with_details(error_details(
+                                                    "db_failure",
+                                                    &EndpointError::storage_cause_id(err),
+                                                )),
                                                 1011,
                                                 "internal",
                                             ),
@@ -1562,17 +1937,25 @@ async fn run_ws_session<IO>(
     }
 }
 
-/// Machine reason detail block for subscribe rejections.
-fn reason_details(reason: &str) -> serde_json::Map<String, serde_json::Value> {
-    serde_json::Map::from_iter([(
-        "reason".to_string(),
-        serde_json::Value::String(reason.to_string()),
-    )])
+/// Machine reason detail block for subscribe rejections, with the
+/// structured `causeId` of the R02-T07 error vocabulary.
+fn error_details(reason: &str, cause_id: &str) -> serde_json::Map<String, serde_json::Value> {
+    serde_json::Map::from_iter([
+        (
+            "reason".to_string(),
+            serde_json::Value::String(reason.to_string()),
+        ),
+        (
+            "causeId".to_string(),
+            serde_json::Value::String(cause_id.to_string()),
+        ),
+    ])
 }
 
 /// Builds the full HTTP router with all injected state: public health plus
-/// the authenticated business surface, behind the shared transport guard
-/// and authentication/authorization middleware.
+/// the authenticated business surface. Layer order (outermost last):
+/// request-id/error enrichment → transport guard → auth guard → routes,
+/// with the body limit applied at the extraction boundary.
 pub fn build_router(state: ServiceState) -> Router {
     Router::new()
         .route("/lingxi/v1/health", get(health))
@@ -1600,6 +1983,10 @@ pub fn build_router(state: ServiceState) -> Router {
         .layer(middleware::from_fn_with_state(
             state.clone(),
             transport_guard,
+        ))
+        .layer(middleware::from_fn_with_state(
+            state.clone(),
+            error_enrichment,
         ))
         .with_state(state)
 }

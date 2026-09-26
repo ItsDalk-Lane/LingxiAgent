@@ -1,0 +1,16 @@
+== building lingxi-service + lingxi-storage-inspect (rustup 1.98.1, /tmp/rust-target-r02-t06, --locked) ==
+PASS build (locked, offline)
+== S1 (R02-A11): WAL-resident committed data survives backup+restore ==
+PASS S1 three committed executes (http 200 each)
+PASS S1 precondition: WAL non-empty (committed data not yet checkpointed, bytes=292552)
+PASS S1 kill -9 (writers stopped; WAL preserved, bytes=292552)
+PASS S1 online backup produced runs.db + manifest (sha256 recorded)
+PASS S1 restore passed the full recovery open (receipts + integrity) in another directory
+PASS S1 logical dump equal; all 3 runs terminal-complete with both events (transaction boundaries intact)
+== S2: graceful stop (SIGTERM) exits 0 ==
+PASS S2 graceful stop exit 0 (coordinator: drain -> checkpoint -> record removal)
+== S3: backup interruption (unwritable destination) ==
+PASS S3 interrupted backup: explicit failure, zero artifacts (no half backup masquerading as success)
+== S4: open WebSocket session + SIGTERM -> close(1001), exit 0 ==
+PASS S4 WS session received close(1001); service exited 0 (managed-task shutdown, no deadlock)
+RESULT: R02-T06 backup/restore binary evidence ALL GREEN
