@@ -1867,30 +1867,65 @@
         "R02-A08": "PASS"
       },
       "task_commit_sha": "dbfbc18566e2fd1e32a25d4b342b2fd8a9ec3c36",
-      "push_result": null,
+      "push_result": {
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "e80c4b5d04b7697ae0277d74cbc661f777e65a39",
+        "note": "task commit dbfbc1856 + ledger commit 3c7d05ca4 pushed; 遗漏补齐提交 e80c4b5d0（DEPENDENCY_RULES.json D5 更新入仓，T04 验收时已核验内容）亦推送；ls-remote verified = e80c4b5d0"
+      },
       "blockers": [],
       "task_commit_note": "任务提交（本账本提交的直接父提交）；两提交一并推送，push_result 由下一账本提交补登"
     },
     "R02-T05": {
       "name": "事件顺序、快照和断线续读",
       "stage_id": "R02",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "3c7d05ca41c37019fc7a1a94beac5413c701466b",
+      "executor_id": "ZCode:R02-T05-exec-r2 (agent_d23d0f82-6345-497e-a549-a9b7031287e5)；前置 exec-r1 (超时中断，部分改动由 exec-r2 逐项核验处置，处置记录见 R02-T05_REPORT.md §0)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 2,
+      "reviewer_id": "ZCode:R02-T05-review-r2 (agent_b7e92052-4efe-4b7c-81a6-c6b4d35e0051)；R1=agent_6150dda2-e2f6-4c8f-b22f-d5e9ab417ba9",
+      "review_verdict": "PASS(R2)",
+      "findings": [
+        {
+          "id": "R1-F01",
+          "severity": "BLOCKING→CLOSED",
+          "summary": "hold-join 静默丢 seq>cut 的已缓冲关键事件（探针 A 实收[4]非[3,4]；生产施压 63/500 空洞）",
+          "review_report": "docs/rust-tauri/R02/R02-T05_REVIEW_R1.md",
+          "resolution": "REPAIR-R1（agent_d8be9581-a1ca-44e4-bf21-6c04f86ad56e）release_hold 重锚 cut+基线对齐 drain+purge-all 词汇；回退法复现修复前必失败；R2 复验关闭（含修复引入面对抗：快照覆盖≤cut 零二次投递）"
+        },
+        {
+          "id": "R1-F02",
+          "severity": "MINOR→CLOSED",
+          "summary": "重启基线对齐后 pending 滞留（流永久破损）",
+          "review_report": "docs/rust-tauri/R02/R02-T05_REVIEW_R1.md",
+          "resolution": "REPAIR-R1 register 排空 parked 链；R2 复验关闭"
+        },
+        {
+          "id": "R1-F03",
+          "severity": "MINOR→CLOSED",
+          "summary": "purge-all 后陈旧合法游标走 FutureCursor(4409) 而非 snapshot_required",
+          "review_report": "docs/rust-tauri/R02/R02-T05_REVIEW_R1.md",
+          "resolution": "REPAIR-R1 floor 检查前移+RequiresSnapshot 分支（顺带闭合 TOCTOU purge-all）；负例未放松；R2 复验关闭"
+        },
+        {
+          "id": "R2-F01",
+          "severity": "MINOR",
+          "summary": "subscribe floor 读/页读 TOCTOU：部分截断落在两读之间时 resume 静默 seq 空洞（动态复现 215 空洞/2400 resume）；R02 生产无 purge 调用方（grep 核验），非修复引入",
+          "review_report": "docs/rust-tauri/R02/R02-T05_REVIEW_R2.md",
+          "resolution": "R03 交接强制项：保留策略接入（R03+）前完成 resume 首事件连续性复检或页读后 floor 复检+确定性回归测试；登记 RISK_REGISTER（阶段收口写入）"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R02-A09": "NOT_STARTED",
-        "R02-A10": "NOT_STARTED"
+        "R02-A09": "PASS(R2)",
+        "R02-A10": "PASS(R2)"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "01715943dcc0685cd9ccfdc1df06a4524b88cf10",
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "task_commit_note": "任务提交（本账本提交的直接父提交）；两提交一并推送，push_result 由下一账本提交补登"
     },
     "R02-T06": {
       "name": "备份、关闭与启动恢复",
