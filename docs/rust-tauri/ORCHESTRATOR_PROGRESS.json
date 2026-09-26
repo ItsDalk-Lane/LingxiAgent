@@ -1727,30 +1727,72 @@
         "R02-A04": "PASS"
       },
       "task_commit_sha": "c285d500c967622a114ae6c648116e99583b44e1",
-      "push_result": null,
+      "push_result": {
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "0bdacbd86f87a4b477757f7f799ee8f203a5a4a5",
+        "note": "task commit c285d500c + ledger commit 0bdacbd86 pushed 2026-09-26; ls-remote verified"
+      },
       "blockers": [],
       "task_commit_note": "任务提交（本账本提交的直接父提交）；两提交一并推送，push_result 由下一账本提交补登（同 R01 惯例）"
     },
     "R02-T03": {
       "name": "实现 HTTP/WS 认证与资源范围",
       "stage_id": "R02",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "0bdacbd86f87a4b477757f7f799ee8f203a5a4a5",
+      "executor_id": "ZCode:R02-T03-exec-r1 (agent_9066f398-4aae-4800-b7be-297d58c927fd)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 1,
+      "reviewer_id": "ZCode:R02-T03-review-r1 (agent_b3e65de1-b3a5-4ad3-a85b-8889a7b105dc)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-F01",
+          "severity": "MINOR",
+          "summary": "WS 帧编解码接受未掩码客户端帧（RFC 6455 §5.1 MUST-close 缺口，注释失配；loopback 威胁模型内影响低）",
+          "review_report": "docs/rust-tauri/R02/R02-T03_REVIEW_R1.md",
+          "resolution": "不阻塞；挂 R08/R09 消费者接入前收口（登记到 RISK_REGISTER，R02 收口时写入）"
+        },
+        {
+          "id": "R1-F02",
+          "severity": "MINOR",
+          "summary": "运行中服务设备注册表为启动快照（跨进程撤销不可见；现役按次读盘）；A05 撤销“集成层”声明不实（实际为库层单测）",
+          "review_report": "docs/rust-tauri/R02/R02-T03_REVIEW_R1.md",
+          "resolution": "不阻塞；撤销语义 wire 级覆盖挂 R08/R09；报告不实声明以验收报告为准（历史报告不改写）"
+        },
+        {
+          "id": "R1-F03",
+          "severity": "MINOR",
+          "summary": "WsUpgradeRejection.status 死字段（400/405 未用，升级拒绝折叠为 403）",
+          "review_report": "docs/rust-tauri/R02/R02-T03_REVIEW_R1.md",
+          "resolution": "不阻塞；WS close code 语义统一归 R08（RR-T02-F5 同族）"
+        },
+        {
+          "id": "R1-F04",
+          "severity": "MINOR",
+          "summary": "classify_route 剥尾斜杠与路由精确匹配不一致（/health/ 未认证 404；无泄露，一致性缺口）",
+          "review_report": "docs/rust-tauri/R02/R02-T03_REVIEW_R1.md",
+          "resolution": "不阻塞；路由归一化一致性由 R02-T08 门禁核查时复核或后续消费 T 收口"
+        },
+        {
+          "id": "R1-F05",
+          "severity": "MINOR",
+          "summary": "报告/测试命名精度（撤销行措辞、owner-404 断言缺失、tunnel 轴未列分歧清单）",
+          "review_report": "docs/rust-tauri/R02/R02-T03_REVIEW_R1.md",
+          "resolution": "不阻塞；以验收报告记录为准"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R02-A05": "NOT_STARTED",
-        "R02-A06": "NOT_STARTED"
+        "R02-A05": "PASS",
+        "R02-A06": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "95b65bd484ecc287c0df1b4ba71ffe0e1db43265",
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "task_commit_note": "任务提交（本账本提交的直接父提交）；两提交一并推送，push_result 由下一账本提交补登"
     },
     "R02-T04": {
       "name": "实现存储 ports 与运行库事务",
