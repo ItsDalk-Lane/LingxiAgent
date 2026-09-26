@@ -1678,30 +1678,58 @@
         "R02-A02": "PASS"
       },
       "task_commit_sha": "9d26b5aa9f8cd14a4c4ea6865393d46317c54693",
-      "push_result": null,
+      "push_result": {
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "42c49faaaf35d98d41dff95bb16d0aecf463418e",
+        "note": "task commit 9d26b5aa9 + ledger commit 42c49faaa pushed 2026-09-26; ls-remote verified = 42c49faaa"
+      },
       "blockers": [],
       "task_commit_note": "任务提交（本账本提交的直接父提交）；两提交一并推送，push_result 由下一账本提交补登（同 R01 惯例）"
     },
     "R02-T02": {
       "name": "配置、路径与安全启动",
       "stage_id": "R02",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "42c49faaaf35d98d41dff95bb16d0aecf463418e",
+      "executor_id": "ZCode:R02-T02-exec-r1 (agent_ee237647-79af-45a2-9989-c086bc09938c)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 1,
+      "reviewer_id": "ZCode:R02-T02-review-r1 (agent_30aa372f-5bf7-457f-9b8e-2ef67f568fbf)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-F01",
+          "severity": "MINOR",
+          "summary": "--home --help 因 main.rs 预扫描 exit 0 而非 exit 2 FlagShapedValue（语义不一致，无副作用）",
+          "review_report": "docs/rust-tauri/R02/R02-T02_REVIEW_R1.md",
+          "resolution": "不阻塞；CLI 边角语义由后续涉及 CLI 的任务顺带统一（R02-T08 交付核查时复核）"
+        },
+        {
+          "id": "R1-F02",
+          "severity": "MINOR",
+          "summary": "ensure_private_dir 归一化到 0700（0500 目录被加回 owner-write），与「只收紧」doc 失配",
+          "review_report": "docs/rust-tauri/R02/R02-T02_REVIEW_R1.md",
+          "resolution": "不阻塞；文档措辞与行为的对齐归 R02-T07（日志/资源与文档一致性）或 T08 收口复核"
+        },
+        {
+          "id": "R1-F03",
+          "severity": "MINOR",
+          "summary": "DEPENDENCY_RULES.json 整文件缩进重排（文本 diff 589 行），语义已证仅 DEP-08 三处",
+          "review_report": "docs/rust-tauri/R02/R02-T02_REVIEW_R1.md",
+          "resolution": "语义零变化已经独立 JSON 深比对证明；后续对 DEPENDENCY_RULES.json 的编辑保持既有缩进避免再放大 diff"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R02-A03": "NOT_STARTED",
-        "R02-A04": "NOT_STARTED"
+        "R02-A03": "PASS",
+        "R02-A04": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "c285d500c967622a114ae6c648116e99583b44e1",
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "task_commit_note": "任务提交（本账本提交的直接父提交）；两提交一并推送，push_result 由下一账本提交补登（同 R01 惯例）"
     },
     "R02-T03": {
       "name": "实现 HTTP/WS 认证与资源范围",
